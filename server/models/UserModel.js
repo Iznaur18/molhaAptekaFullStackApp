@@ -13,19 +13,22 @@ const UserSchema = new mongoose.Schema({
         required: true,
         select: false, // не отдавать по умолчанию при find()
     },
-    fullName: {
+    userName: {
         type: String,
         trim: true,
         unique: true,
-        default: "Изнаур Изнауров Изнаурович",
+        required: true,
     },
-    phone: {
+    phoneNumber: {
         type: String,
         trim: true,
         unique: true,
         required: true,
     },
     role: {
+        // Роль можно менять программно — никаких ограничений на это на уровне схемы нет.
+        // Однако! Безопасность смены роли нужно отдельно реализовать в бизнес-логике (например, ограничить изменение роли только для админа).
+        // Здесь важное: просто так менять роли сможет любой код с доступом к этой модели — предусмотрите проверки в контроллерах/роутах!
         type: String,
         enum: ['user', 'admin', 'pharmacist'], // enum - это поле, которое определяет, какие значения может принимать поле.
         default: 'user', // default - это поле, которое определяет, какое значение будет по умолчанию.
@@ -34,7 +37,7 @@ const UserSchema = new mongoose.Schema({
         type: String,
         default: "https://i.pinimg.com/originals/c9/31/92/c93192b782081d4d1d70b03a3c1cf011.jpg", // default - это поле, которое определяет, какое значение будет по умолчанию.
     },
-    address: {
+    address: { // address - это поле, которое определяет, адрес пользователя.
         type: String,
         trim: true,
         required: true,
