@@ -1,3 +1,4 @@
 import { uploadRouter } from './uploadRouter.js';
+import { authRouter } from './authRouter.js';
 
-export { uploadRouter }; // Получаем в файле index.js и используем в app.use('/upload', uploadRouter);
+export { uploadRouter, authRouter };
