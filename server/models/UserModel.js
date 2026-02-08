@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { DEFAULT_AVATAR_URL } from '../constants.js';
+import { DEFAULT_AVATAR_URL, DEFAULT_BACKGROUND_URL } from '../constants/constants.js';
 
 const UserSchema = new mongoose.Schema(
   {
@@ -56,6 +56,10 @@ const UserSchema = new mongoose.Schema(
       type: String,
       default: DEFAULT_AVATAR_URL, // значение по умолчанию
     },
+    userBackgroundUrl: {
+      type: String,
+      default: DEFAULT_BACKGROUND_URL, // значение по умолчанию
+    },
     isActiveUser: { // активен ли пользователь
       type: Boolean,
       default: true,
@@ -94,8 +98,14 @@ const UserSchema = new mongoose.Schema(
       default: 0,
     },
     userRatingByVotes: { // рейтинг пользователя по оценкам
-      type: Number,
-      default: 0,
+      countVotes: { // количество проголосовавших за пользователя
+        type: Number,
+        default: 0,
+      },
+      totalRating: { // общее количество рейтинга
+        type: Number,
+        default: 0,
+      },
     },
 
     // - - - Поля для входа через Telegram Web App - - -

@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import { UserModel } from '../models/index.js';
 import { sendUserWithToken, errorRes } from '../utils/index.js';
-import { DEFAULT_AVATAR_URL } from '../constants.js';
+import { DEFAULT_AVATAR_URL } from '../constants/constants.js';
 
 /** Регистрация только по email + пароль. POST /auth/register */
 export const registerUserController = async (req, res) => { // обработчик регистрации пользователя по email + пароль
@@ -10,10 +10,10 @@ export const registerUserController = async (req, res) => { // обработч�
 
         //TODO: (Разобраться) Проверка на существование пользователя с таким email или userName или userPhoneNumber
         const orConditions = [{ email }, { userName }]; // ищем пользователя по email или userName
-        if (phoneNumber != null && phoneNumber !== '') orConditions.push({ userPhoneNumber: phoneNumber }); // если phoneNumber не передан в запросе, подставляем undefined
+        if (phoneNumber != null && phoneNumber !== '') orConditions.push({ userPhoneNumber: phoneNumber }); // если phoneNumber не пустая строка, в orConditions добавляем userPhoneNumber
         const exists = await UserModel.findOne({ $or: orConditions }); // ищем пользователя по email или userName или userPhoneNumber
-        if (exists) { // если пользователь с таким email или userName уже существует, возвращаем ошибку
-            return errorRes(res, 400, 'Пользователь с таким email или username уже существует');
+        if (exists) { // если пользователь с таким email или userName или userPhoneNumber уже существует, возвращаем ошибку
+            return errorRes(res, 400, 'Пользователь с таким email или userName или userPhoneNumber уже существует');
         }
 
         const salt = await bcrypt.genSalt(10); // генерируем соль для хеширования пароля
