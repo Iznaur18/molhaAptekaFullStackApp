@@ -26,6 +26,7 @@ export const loginUserController = async (req, res) => { // обработчик
         return sendUserWithToken(user, res); // отправляем пользователя с токеном вход по email + пароль
 
     } catch (error) {
+        console.error(error);
         return res.status(500).json({ message: 'Ошибка при входе' }); // если произошла ошибка, возвращаем ошибку
     }
 };

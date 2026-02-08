@@ -2,7 +2,8 @@ import mongoose from 'mongoose';
 
 const UserSchema = new mongoose.Schema(
   {
-    email: {
+    // - - - Поля для входа - - -
+    email: { // email пользователя
       type: String,
       required: false, // обязателен только при регистрации по email; при входе через Telegram не заполняется
       unique: true, // значение должно быть уникальным
@@ -10,63 +11,102 @@ const UserSchema = new mongoose.Schema(
       sparse: true, // уникальность только среди непустых; несколько null допустимы
       trim: true, // убирает пробелы в начале и в конце строки
     },
-    passwordHash: {
+    passwordHash: { // хеш пароля
       type: String,
       required: false, // только для входа по email; при входе через Telegram не заполняется
       select: false, // не отдавать по умолчанию при find()
     },
-    userName: {
+
+    // - - - Информация о пользователе - - -
+    userBirthDate: { // дата рождения
+      type: Date, // тип даты
+      default: null, // значение по умолчанию
+    },
+    userGender: { // пол пользователя
+      type: String,
+      enum: ['male', 'female', 'noSelected'], // допустимые значения поля
+      default: 'noSelected', // значение по умолчанию
+    },
+    userAddress: { // адрес пользователя
+      type: String,
+      trim: true,
+    },
+    userName: { // ник пользователя
       type: String,
       trim: true,
       unique: true,
       required: false, // при Telegram заполняется как tg_<telegramUserId>
       sparse: true,
     },
-    phoneNumber: {
+    userPhoneNumber: { // номер телефона пользователя
       type: Number,
       trim: true,
       unique: true,
       required: false,
       sparse: true,
     },
-    role: {
+    userLastLoginAt: { // дата последнего входа
+      type: Date, // тип даты
+      default: null, // значение по умолчанию
+    },
+    userAvatarUrl: {
+      type: String,
+      default: "https://i.pinimg.com/originals/c9/31/92/c93192b782081d4d1d70b03a3c1cf011.jpg", // значение по умолчанию
+    },
+    isActiveUser: { // активен ли пользователь
+      type: Boolean,
+      default: true,
+    },
+    isBlockedUser: { // заблокирован ли пользователь
+      type: Boolean,
+      default: false,
+    },
+    userRole: {
       // Роль можно менять программно — никаких ограничений на это на уровне схемы нет.
       // Безопасность смены роли нужно отдельно реализовать в бизнес-логике (например, ограничить изменение роли только для админа)
       type: String,
       enum: ['user', 'admin', 'pharmacist'], // допустимые значения поля
       default: 'user', // значение по умолчанию
     },
-    avatarUrl: {
-      type: String,
-      default: "https://i.pinimg.com/originals/c9/31/92/c93192b782081d4d1d70b03a3c1cf011.jpg", // значение по умолчанию
+
+    // - - - Поля для маркетинга - - -
+    userDiscountPercent: { // процент скидки
+      type: Number,
+      default: 0,
     },
-    address: {
-      // адрес пользователя
-      type: String,
-      trim: true,
-    },
-    isActive: {
-      // активен ли пользователь
-      type: Boolean,
-      default: true,
-    },
-    isPremium: {
-      // является ли пользователь премиум-пользователем
+    notificationsEnabled: { // включены ли уведомления
       type: Boolean,
       default: false,
     },
-    // --- Поля для входа через Telegram Web App ---
-    telegramUserId: {
+    isPremiumUser: { // является ли пользователь премиум-пользователем
+      type: Boolean,
+      default: false,
+    },
+    notesAboutUser: { // заметки о пользователе
+      type: String,
+      default: '',
+    },
+    userLoyaltyPoints: { // количество баллов лояльности
+      type: Number,
+      default: 0,
+    },
+    userRatingByVotes: { // рейтинг пользователя по оценкам
+      type: Number,
+      default: 0,
+    },
+
+    // - - - Поля для входа через Telegram Web App - - -
+    telegramUserId: { // telegramUserId пользователя
       type: String,
       required: false,
       unique: true,
       sparse: true,
     },
-    telegramUsername: {
+    telegramUsername: { // telegramUsername пользователя
       type: String,
       trim: true,
     },
-    telegramPhotoUrl: {
+    telegramPhotoUrl: { // telegramPhotoUrl пользователя
       type: String,
     },
   },

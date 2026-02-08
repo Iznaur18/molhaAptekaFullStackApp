@@ -7,11 +7,6 @@ export const registerUserController = async (req, res) => { // обработч�
     try {
         const { email, password, userName, phoneNumber, avatarUrl, address } = req.body; // извлекаем данные из тела запроса
 
-        // Проверяем обязательные поля (email, password, userName, phoneNumber)
-        if (!email || !password || !userName || !phoneNumber) { // если email, пароль, ник или номер телефона не переданы в запросе, возвращаем ошибку
-            return res.status(400).json({ message: 'Укажите email, пароль, ник и номер телефона' }); // если email, пароль, ник или номер телефона не переданы в запросе, возвращаем ошибку
-        }
-
         // Проверка на существование пользователя с таким email или userName
         const exists = await UserModel.findOne({ 
             $or: [{ email }, { userName }] // ищем пользователя по email или userName
@@ -27,15 +22,16 @@ export const registerUserController = async (req, res) => { // обработч�
             email, // email передаем в документ
             passwordHash, // passwordHash передаем в документ
             userName: userName || undefined, // если userName не передан в запросе, подставляем undefined
-            phoneNumber: (phoneNumber !== undefined && phoneNumber !== '') ? phoneNumber : undefined, // если phoneNumber не передан в запросе, подставляем undefined
-            avatarUrl: avatarUrl ?? 'https://i.pinimg.com/originals/c9/31/92/c93192b782081d4d1d70b03a3c1cf011.jpg', // если avatarUrl не передан в запросе, подставляем https://i.pinimg.com/originals/c9/31/92/c93192b782081d4d1d70b03a3c1cf011.jpg
-            address: address ?? undefined, // если address не передан в запросе, подставляем undefined
+            userPhoneNumber: (phoneNumber !== undefined && phoneNumber !== '') ? phoneNumber : undefined, // если phoneNumber не передан в запросе, подставляем undefined
+            userAvatarUrl: avatarUrl ?? 'https://i.pinimg.com/originals/c9/31/92/c93192b782081d4d1d70b03a3c1cf011.jpg', // если avatarUrl не передан в запросе, подставляем https://i.pinimg.com/originals/c9/31/92/c93192b782081d4d1d70b03a3c1cf011.jpg
+            userAddress: address ?? undefined, // если address не передан в запросе, подставляем undefined
         });
 
         const user = await doc.save(); // сохраняем пользователя в базу данных
 
         return sendUserWithToken(user, res); // отправляем пользователя с токеном
     } catch (error) {
+        console.error(error);
         return res.status(500).json({ message: 'Ошибка при регистрации пользователя' });
     }
 };

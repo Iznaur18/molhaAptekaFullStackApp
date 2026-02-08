@@ -18,8 +18,8 @@ export const authTelegramController = async (req, res) => { // обработч�
 
         const doc = new UserModel({ // создаем новый пользователя в базе данных если пользователь не найден по telegramUserId
             userName: userName ?? `tg_${telegramUserId}`, // если userName не передан в запросе, подставляем tg_<telegramUserId>
-            avatarUrl: avatarUrl ?? undefined, // если avatarUrl не передан в запросе, подставляем undefined
-            address: address ?? undefined, // если address не передан в запросе, подставляем undefined
+            userAvatarUrl: avatarUrl ?? undefined, // если avatarUrl не передан в запросе, подставляем undefined
+            userAddress: address ?? undefined, // если address не передан в запросе, подставляем undefined
             telegramUserId, // telegramUserId передаем в документ
             telegramUsername: telegramUsername ?? undefined, // если telegramUsername не передан в запросе, подставляем undefined
             telegramPhotoUrl: telegramPhotoUrl ?? undefined, // если telegramPhotoUrl не передан в запросе, подставляем undefined
@@ -33,6 +33,7 @@ export const authTelegramController = async (req, res) => { // обработч�
         if (error.code === 11000) { // если пользователь с таким telegramUserId уже существует, возвращаем ошибку
             return res.status(400).json({ message: 'Пользователь с таким telegram уже существует' }); // если пользователь с таким telegramUserId уже существует, возвращаем ошибку
         }
+        console.error(error);
         return res.status(500).json({ message: 'Ошибка при авторизации через Telegram' });
     }
 };
