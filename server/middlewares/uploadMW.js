@@ -6,17 +6,26 @@ export const storage = multer.diskStorage({
     cb(null, 'uploads');
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname);
+    // Уникальное имя только из timestamp и mimetype, без originalname — защита от path traversal
+    const raw = file.mimetype.split('/')[1] || 'bin';
+    const ext = raw.replace(/[^a-z0-9]/gi, '') || 'bin';
+    cb(null, `${Date.now()}-${Math.random().toString(36).slice(2, 9)}.${ext}`);
   }
 });
 
 // фильтр по типу файла (только jpeg/png)
 export const fileFilter = (req, file, cb) => {
-  if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
-    cb(null, true);
+  if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' || file.mimetype === 'image/jpg' || file.mimetype === 'image/webp' || file.mimetype === 'image/svg') {
+    cb(null, true); // если тип файла разрешен, возвращаем true
   } else {
-    cb(null, false);
+    cb(null, false); // если тип файла не разрешен, возвращаем ошибку
   }
 };
 
-export const uploadMW = multer({ storage, fileFilter }); // Получаем в файле routes/upload.js
+const FILE_SIZE_LIMIT = 5 * 1024 * 1024; // 5 MB
+
+export const uploadMW = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: FILE_SIZE_LIMIT }
+});

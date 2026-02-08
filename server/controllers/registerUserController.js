@@ -1,18 +1,19 @@
 import bcrypt from 'bcrypt';
 import { UserModel } from '../models/index.js';
-import { sendUserWithToken } from '../utils/index.js';
+import { sendUserWithToken, errorRes } from '../utils/index.js';
+import { DEFAULT_AVATAR_URL } from '../constants.js';
 
 /** Регистрация только по email + пароль. POST /auth/register */
 export const registerUserController = async (req, res) => { // обработчик регистрации пользователя по email + пароль
     try {
-        const { email, password, userName, phoneNumber, avatarUrl, address } = req.body; // извлекаем данные из тела запроса
+        const { email, password, userName, phoneNumber, avatarUrl } = req.body; // извлекаем данные из тела запроса
 
-        // Проверка на существование пользователя с таким email или userName
-        const exists = await UserModel.findOne({ 
-            $or: [{ email }, { userName }] // ищем пользователя по email или userName
-        });
+        //TODO: (Разобраться) Проверка на существование пользователя с таким email или userName или userPhoneNumber
+        const orConditions = [{ email }, { userName }]; // ищем пользователя по email или userName
+        if (phoneNumber != null && phoneNumber !== '') orConditions.push({ userPhoneNumber: phoneNumber }); // если phoneNumber не передан в запросе, подставляем undefined
+        const exists = await UserModel.findOne({ $or: orConditions }); // ищем пользователя по email или userName или userPhoneNumber
         if (exists) { // если пользователь с таким email или userName уже существует, возвращаем ошибку
-            return res.status(400).json({ message: 'Пользователь с таким email или username уже существует' });
+            return errorRes(res, 400, 'Пользователь с таким email или username уже существует');
         }
 
         const salt = await bcrypt.genSalt(10); // генерируем соль для хеширования пароля
@@ -22,9 +23,8 @@ export const registerUserController = async (req, res) => { // обработч�
             email, // email передаем в документ
             passwordHash, // passwordHash передаем в документ
             userName: userName || undefined, // если userName не передан в запросе, подставляем undefined
-            userPhoneNumber: (phoneNumber !== undefined && phoneNumber !== '') ? phoneNumber : undefined, // если phoneNumber не передан в запросе, подставляем undefined
-            userAvatarUrl: avatarUrl ?? 'https://i.pinimg.com/originals/c9/31/92/c93192b782081d4d1d70b03a3c1cf011.jpg', // если avatarUrl не передан в запросе, подставляем https://i.pinimg.com/originals/c9/31/92/c93192b782081d4d1d70b03a3c1cf011.jpg
-            userAddress: address ?? undefined, // если address не передан в запросе, подставляем undefined
+            userPhoneNumber: (phoneNumber != null && phoneNumber !== '') ? String(phoneNumber).trim() : undefined, // если phoneNumber не передан в запросе, подставляем undefined
+            userAvatarUrl: avatarUrl ?? DEFAULT_AVATAR_URL, // если avatarUrl не передан в запросе, подставляем значение по умолчанию
         });
 
         const user = await doc.save(); // сохраняем пользователя в базу данных
@@ -32,6 +32,6 @@ export const registerUserController = async (req, res) => { // обработч�
         return sendUserWithToken(user, res); // отправляем пользователя с токеном
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: 'Ошибка при регистрации пользователя' });
+        return errorRes(res, 500, 'Ошибка при регистрации пользователя');
     }
 };

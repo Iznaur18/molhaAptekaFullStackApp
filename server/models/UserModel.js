@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { DEFAULT_AVATAR_URL } from '../constants.js';
 
 const UserSchema = new mongoose.Schema(
   {
@@ -29,7 +30,9 @@ const UserSchema = new mongoose.Schema(
     },
     userAddress: { // адрес пользователя
       type: String,
-      trim: true,
+      trim: true, // убирает пробелы в начале и в конце строки
+      required: false,
+      default: '',
     },
     userName: { // ник пользователя
       type: String,
@@ -38,8 +41,8 @@ const UserSchema = new mongoose.Schema(
       required: false, // при Telegram заполняется как tg_<telegramUserId>
       sparse: true,
     },
-    userPhoneNumber: { // номер телефона пользователя
-      type: Number,
+    userPhoneNumber: { // номер телефона пользователя (строка — сохраняются ведущие нули)
+      type: String,
       trim: true,
       unique: true,
       required: false,
@@ -51,7 +54,7 @@ const UserSchema = new mongoose.Schema(
     },
     userAvatarUrl: {
       type: String,
-      default: "https://i.pinimg.com/originals/c9/31/92/c93192b782081d4d1d70b03a3c1cf011.jpg", // значение по умолчанию
+      default: DEFAULT_AVATAR_URL, // значение по умолчанию
     },
     isActiveUser: { // активен ли пользователь
       type: Boolean,

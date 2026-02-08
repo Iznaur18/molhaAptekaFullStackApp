@@ -1,5 +1,5 @@
 import { UserModel } from '../models/index.js';
-import { sendUserWithToken } from '../utils/index.js';
+import { sendUserWithToken, errorRes } from '../utils/index.js';
 
 /** Вход/регистрация через Telegram. POST /auth/telegram — если пользователь есть, логин; иначе создание. */
 export const authTelegramController = async (req, res) => { // обработчик входа/регистрации через Telegram
@@ -7,7 +7,7 @@ export const authTelegramController = async (req, res) => { // обработч�
         const { telegramUserId, telegramUsername, telegramPhotoUrl, userName, avatarUrl, address } = req.body; // извлекаем данные из тела запроса для создания нового пользователя. API Telegram присылает эти данные в теле запроса.
 
         if (!telegramUserId) { // если telegramUserId не передан в запросе, возвращаем ошибку
-            return res.status(400).json({ message: 'Укажите telegramUserId' });
+            return errorRes(res, 400, 'Укажите telegramUserId');
         }
 
         const findedUser = await UserModel.findOne({ telegramUserId }); // ищем пользователя по telegramUserId. Возвращает первый найденный пользователь. Если пользователь не найден, возвращает null.
@@ -31,9 +31,9 @@ export const authTelegramController = async (req, res) => { // обработч�
 
     } catch (error) {
         if (error.code === 11000) { // если пользователь с таким telegramUserId уже существует, возвращаем ошибку
-            return res.status(400).json({ message: 'Пользователь с таким telegram уже существует' }); // если пользователь с таким telegramUserId уже существует, возвращаем ошибку
+            return errorRes(res, 400, 'Пользователь с таким telegram уже существует');
         }
         console.error(error);
-        return res.status(500).json({ message: 'Ошибка при авторизации через Telegram' });
+        return errorRes(res, 500, 'Ошибка при авторизации через Telegram');
     }
 };
