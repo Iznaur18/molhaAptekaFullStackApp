@@ -47,9 +47,10 @@ export const userVoteRatingController = async (req, res) => {
             userVoteValue: userVoteValue,
         });
         
-        await vote.save(); // сохраняем голос в базе данных
+        await vote.save();
 
-        await vote.populate([
+        try {
+            await vote.populate([
             { path: 'userVoter', select: 'userName email' },
             { path: 'userVoteTarget', select: 'userName email' },
         ]); // популируем пользователя который проголосовал и целевого пользователя
@@ -68,11 +69,21 @@ export const userVoteRatingController = async (req, res) => {
         .select('_id userRatingByVotes userName email userAvatarUrl') // в ответ клиенту только _id и рейтинг, без лишних/чувствительных полей
         .lean(); // возвращаем обновленный документ в формате JSON
 
-        return successRes(res, { user: updatedUserVoteTarget, message: 'Голос успешно поставлен' }); // отправляем обновленный документ целевого пользователя и сообщение о успешном голосовании
-        
+            return successRes(res, { user: updatedUserVoteTarget, message: 'Голос успешно поставлен' });
+        } catch (errorAfterSave) {
+            await UserVoteRatingModel.findByIdAndDelete(vote._id);
+            await UserModel.findByIdAndUpdate(userVoteTargetIdClient, {
+                $inc: {
+                    'userRatingByVotes.countVotes': -1,
+                    'userRatingByVotes.totalRating': -userVoteValue,
+                },
+            });
+            throw errorAfterSave;
+        }
     } catch (error) {
-        console.error(error);
-        return errorRes(res, 500, 'Ошибка при голосовании за пользователя');
+        console.error('Vote error:', error);
+        const message = error.message || 'Ошибка при голосовании за пользователя';
+        return errorRes(res, 500, message);
     }
 };
 
