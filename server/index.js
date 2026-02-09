@@ -2,7 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
-import { uploadRouter, authRouter } from './routes/index.js';
+import { uploadRouter, authRouter, voteRouter } from './routes/index.js';
 import { errorRes } from './utils/index.js';
 
 if (!process.env.JWT_SECRET) {
@@ -33,6 +33,9 @@ app.use('/upload', uploadRouter); // Это префикс, который бу�
 
 // авторизация: POST /auth/register, POST /auth/login, POST /auth/telegram
 app.use('/auth', authRouter); // Это префикс для маршрутов авторизации.
+
+// голосование за пользователя: POST /vote/users/:userVoteTargetIdClient (body: userVoteValueClient 1–10)
+app.use('/user', voteRouter);
 
 // глобальный обработчик ошибок (необработанные исключения, в т.ч. от multer)
 app.use((err, req, res, next) => { // обработчик ошибок
