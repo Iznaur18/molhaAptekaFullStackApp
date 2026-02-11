@@ -9,7 +9,9 @@ const TOKEN_OPTIONS = { expiresIn: '30d' };
  * @param {object} res - объект response Express
  */
 export function sendUserWithToken(user, res) { // функция отправляет пользователя с токеном
+
     const { passwordHash, ...userData } = user._doc; // извлекаем все поля из user._doc, кроме passwordHash
+    
     const token = jwt.sign( // генерируем токен для пользователя
         { _id: user._id }, // поле _id пользователя, полученный из базы данных
         process.env.JWT_SECRET, // секретный ключ для подписи токена

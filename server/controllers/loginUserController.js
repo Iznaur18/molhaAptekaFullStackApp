@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import { UserModel } from '../models/index.js';
-import { sendUserWithToken, errorRes } from '../utils/index.js';
+import { sendUserWithToken, errorRes, successRes } from '../utils/index.js';
+import { USER_DATA } from '../constants/constants.js';
 
 /** Вход по email + пароль. POST /auth/login */
 export const loginUserController = async (req, res) => { // обработчик входа по email + пароль
@@ -28,5 +29,57 @@ export const loginUserController = async (req, res) => { // обработчик
     } catch (error) {
         console.error(error);
         return errorRes(res, 500, 'Ошибка при входе'); // если произошла ошибка, возвращаем ошибку
+    }
+};
+
+/** Получение данных текущего пользователя. GET /auth/me (требует Authorization: Bearer <token>) */
+export const userMeController = async (req, res) => {
+    try {
+        // 1. id текущего пользователя из auth middleware (JWT)
+        const userIdClient = req.userId;
+
+        if (!userIdClient) {
+            return errorRes(res, 401, 'Вы не авторизованы');
+        }
+
+        // 2. Ищем пользователя в БД по id
+        const userIdServer = await UserModel.findById(userIdClient)
+            .select(USER_DATA) // Клиент получит всё что в select()
+            .lean();
+
+        if (!userIdServer) {
+            return errorRes(res, 404, 'Пользователь не найден');
+        }
+
+        return successRes(res, { user: userIdServer });
+        
+    } catch (error) {
+        console.error('userMe error:', error);
+        return errorRes(res, 500, error.message || 'Ошибка при получении своих данных');
+    }
+};
+
+/** Получение профиля другого пользователя по id. GET /user/:userId (публичный — без авторизации) */
+export const userGetProfileController = async (req, res) => {
+    try {
+        const { userIdClient } = req.params; // id юзера из URL
+
+        if (!userIdClient) {
+            return errorRes(res, 400, 'ID пользователя обязателен');
+        }
+
+        const userIdServer = await UserModel.findById(userIdClient)
+            .select(USER_DATA)
+            .lean();
+
+        if (!userIdServer) {
+            return errorRes(res, 404, 'Пользователь не найден');
+        }
+
+        return successRes(res, { user: userIdServer });
+        
+    } catch (error) {
+        console.error('userGetProfile error:', error);
+        return errorRes(res, 500, error.message || 'Ошибка при получении профиля');
     }
 };
