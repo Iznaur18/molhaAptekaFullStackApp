@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
+import helmet from 'helmet';
 import { uploadRouter, authRouter, voteRouter, userRouter } from './routes/index.js';
 import { generalRateLimiter, errorHandler, notFoundHandler } from './middlewares/index.js';
 
@@ -9,7 +10,7 @@ if (!process.env.JWT_SECRET) {
   console.error('JWT_SECRET не задан в .env'); // выводим ошибку в консоль
   process.exit(1); // выход из программы с кодом 1 (ошибка)
 }
-if (!process.env.MONGO_URI) {
+if (!process.env.MONGO_URI) { // если MONGO_URI не задан в .env, то выводим ошибку в консоль и выходим из программы с кодом 1 (ошибка)
   console.error('MONGO_URI не задан в .env'); // выводим ошибку в консоль
   process.exit(1); // выход из программы с кодом 1 (ошибка)
 }
@@ -21,9 +22,10 @@ mongoose.connect(process.env.MONGO_URI) // подключаемся к MongoDB. 
     process.exit(1); // выход из программы с кодом 1 (ошибка)
   });
 
-const app = express();
-app.use(express.json());
+const app = express(); // создаем экземпляр express
+app.use(express.json()); // middleware для парсинга JSON в теле запроса
 app.use(process.env.FRONTEND_URL ? cors({ origin: process.env.FRONTEND_URL }) : cors()); // разрешаем запросы только с определенного домена если FRONTEND_URL задан в .env
+app.use(helmet()); // защита от некоторых типов атак
 
 // Общий rate limiting для всех API запросов (защита от DDoS)
 // Применяется ко всем маршрутам, кроме статических файлов

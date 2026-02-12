@@ -5,7 +5,7 @@ import { handleValidationByExpressErrors } from './handleValidationByExpressErro
  * Валидация параметра userId в URL
  */
 export const userIdParamValidation = [
-    param('userIdClient')
+    param('userIdClient') // сюда попадает id пользователя из URL из req.params
         .notEmpty() // не пустой
         .withMessage('ID пользователя обязателен') // ошибка если id пользователя не передан
         .isMongoId() // валидный ObjectId
@@ -17,7 +17,7 @@ export const userIdParamValidation = [
  * Валидация обновления профиля пользователя
  */
 export const updateProfileValidation = [
-    body('userName') // userName - имя пользователя
+    body('userName') // body значит из запроса req.body. Берем поле userName из тела запроса согласно МОДЕЛИ UserModel
         .optional({ nullable: true, checkFalsy: true }) // опциональное поле, nullable: true - разрешает null, checkFalsy: true - разрешает false
         .trim() // обрезаем пробелы перед валидацией
         .custom((value) => {

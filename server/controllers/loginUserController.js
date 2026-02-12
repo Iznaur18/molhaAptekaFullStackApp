@@ -133,7 +133,7 @@ export const userUpdateProfileController = async (req, res) => {
 
         // 5. Проверка уникальности userName и userPhoneNumber перед обновлением
         if (updateData.userName) {
-            const existingUser = await UserModel.findOne({ userName: updateData.userName, _id: { $ne: targetUserId } });
+            const existingUser = await UserModel.findOne({ userName: updateData.userName, _id: { $ne: targetUserId } }); 
             if (existingUser) {
                 return errorRes(res, 409, 'Пользователь с таким именем уже существует');
             }
