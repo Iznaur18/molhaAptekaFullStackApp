@@ -4,11 +4,7 @@ import { sendUserWithToken, errorRes } from '../utils/index.js';
 /** Вход/регистрация через Telegram. POST /auth/telegram — если пользователь есть, логин; иначе создание. */
 export const authTelegramController = async (req, res) => { // обработчик входа/регистрации через Telegram
     try {
-        const { telegramUserId, telegramUsername, telegramPhotoUrl, userName, avatarUrl, address } = req.body; // извлекаем данные из тела запроса для создания нового пользователя. API Telegram присылает эти данные в теле запроса.
-
-        if (!telegramUserId) { // если telegramUserId не передан в запросе, возвращаем ошибку
-            return errorRes(res, 400, 'Укажите telegramUserId');
-        }
+        const { telegramUserId, telegramUsername, telegramPhotoUrl, userName, avatarUrl, address } = req.body; // извлекаем данные из тела запроса для создания нового пользователя. API Telegram присылает эти данные в теле запроса. (валидация telegramUserId выполняется в middleware telegramAuthValidation)
 
         const findedUser = await UserModel.findOne({ telegramUserId }); // ищем пользователя по telegramUserId. Возвращает первый найденный пользователь. Если пользователь не найден, возвращает null.
 

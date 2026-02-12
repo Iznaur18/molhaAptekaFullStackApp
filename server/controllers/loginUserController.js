@@ -7,11 +7,7 @@ import { USER_DATA, ALLOWED_FIELDS_FOR_USER, ALLOWED_FIELDS_FOR_ADMIN } from '..
 /** Вход по email + пароль. POST /auth/login */
 export const loginUserController = async (req, res) => { // обработчик входа по email + пароль
     try {
-        const { email, password } = req.body; // извлекаем email и пароль из тела запроса
-
-        if (!email || !password) { // если email или пароль не переданы в запросе, возвращаем ошибку
-            return errorRes(res, 400, 'Укажите email и пароль');
-        }
+        const { email, password } = req.body; // извлекаем email и пароль из тела запроса (валидация выполняется в middleware loginUserValidation)
 
         const user = await UserModel.findOne({ email }).select('+passwordHash'); // ищем пользователя по email и выбираем поле passwordHash для сравнения пароля с переданным паролем из запроса
 
@@ -63,16 +59,7 @@ export const userMeController = async (req, res) => {
 /** Получение профиля другого пользователя по id. GET /user/:userId (публичный — без авторизации) */
 export const userGetProfileController = async (req, res) => {
     try {
-        const { userIdClient } = req.params; // id юзера из URL
-
-        if (!userIdClient) {
-            return errorRes(res, 400, 'ID пользователя обязателен');
-        }
-
-        // Проверка валидности ObjectId
-        if (!mongoose.Types.ObjectId.isValid(userIdClient)) {
-            return errorRes(res, 400, 'Неверный формат ID пользователя');
-        }
+        const { userIdClient } = req.params; // id юзера из URL (валидация выполняется в middleware userIdParamValidation)
 
         const userIdServer = await UserModel.findById(userIdClient)
             .select(USER_DATA)
@@ -94,14 +81,9 @@ export const userGetProfileController = async (req, res) => {
 export const userUpdateProfileController = async (req, res) => {
     try {
         const currentUserId = req.userId; // кто обновляет (id из auth middleware) Прошел ли JWT авторизацию
-        const targetUserId = req.params.userIdClient; // кого обновляем (id из URL) ID пользователя которого обновляем
+        const targetUserId = req.params.userIdClient; // кого обновляем (id из URL) ID пользователя которого обновляем (валидация выполняется в middleware userIdParamValidation)
 
-        // 1. Проверка валидности ObjectId
-        if (!mongoose.Types.ObjectId.isValid(targetUserId)) { // проверяем, является ли targetUserId валидным ObjectId
-            return errorRes(res, 400, 'Неверный формат ID пользователя');
-        }
-
-        // 2. Проверка существования текущего пользователя
+        // 1. Проверка существования текущего пользователя
         const currentUserRole = await UserModel.findById(currentUserId).select('userRole').lean(); // ищем пользователя в БД по id и выбираем поле userRole
 
         if (!currentUserRole) {
@@ -118,89 +100,27 @@ export const userUpdateProfileController = async (req, res) => {
         const updateData = {}; // объект для обновления профиля с разрешенными полями из запроса
         const allowedFields = isCurrentUserAdmin ? ALLOWED_FIELDS_FOR_ADMIN : ALLOWED_FIELDS_FOR_USER; // разрешенные поля для обновления профиля в зависимости от роли пользователя
 
-        // 3. Сбор и валидация данных для обновления
+        // 3. Сбор и конвертация данных для обновления (валидация форматов и типов выполняется в middleware updateProfileValidation)
         for (const field of allowedFields) {
             if (req.body[field] !== undefined) { // если поле есть в запросе и не undefined, то добавляем его в updateData
-                const value = req.body[field]; // значение поля из запроса (строка, число, булево значение, null, undefined)
+                const value = req.body[field]; // значение поля из запроса (уже валидировано в middleware)
 
-                // Валидация типов данных
-                if (field === 'userBirthDate') { // если поле userBirthDate, то проверяем, является ли значение валидной датой
-                    // Проверка и конвертация даты
-                    if (value !== null && value !== '') { // если значение не null и не пустое, то конвертируем его в дату
-                        const date = new Date(value); // конвертируем значение в дату
-                        if (isNaN(date.getTime())) { // если значение не является валидной датой, возвращаем ошибку
-                            return errorRes(res, 400, `Поле ${field} должно быть валидной датой`);
-                        }
-                        // Проверка, что дата не в будущем
-                        if (date > new Date()) { // если дата в будущем, возвращаем ошибку
-                            return errorRes(res, 400, 'Дата рождения не может быть в будущем');
-                        }
-                        updateData[field] = date; // добавляем дату в updateData
-                    } else {
-                        updateData[field] = null; // добавляем null в updateData
-                    }
-                } else if (field === 'userGender') {
-                    // Валидация enum значений
-                    const validGenders = ['male', 'female', 'noSelected'];
-                    if (!validGenders.includes(value)) {
-                        return errorRes(res, 400, `Поле ${field} должно быть одним из: ${validGenders.join(', ')}`);
-                    }
-                    updateData[field] = value;
-                } else if (field === 'userRole') {
-                    // Валидация enum значений для роли
-                    const validRoles = ['user', 'admin', 'pharmacist'];
-                    if (!validRoles.includes(value)) {
-                        return errorRes(res, 400, `Поле ${field} должно быть одним из: ${validRoles.join(', ')}`);
-                    }
-                    updateData[field] = value;
-                } else if (field === 'userDiscountPercent') {
-                    // Валидация диапазона для процента скидки
-                    const numValue = Number(value);
-                    if (isNaN(numValue) || numValue < 0 || numValue > 100) {
-                        return errorRes(res, 400, 'Процент скидки должен быть числом от 0 до 100');
-                    }
-                    updateData[field] = numValue;
-                } else if (field === 'userAvatarUrl' || field === 'userBackgroundUrl') {
-                    // Валидация URL (базовая проверка)
-                    if (value !== null && value !== '' && typeof value === 'string') {
-                        try {
-                            new URL(value); // Проверка формата URL
-                            updateData[field] = value;
-                        } catch {
-                            return errorRes(res, 400, `Поле ${field} должно быть валидным URL`);
-                        }
-                    } else if (value === null || value === '') {
-                        updateData[field] = value; // Разрешаем очистку
-                    } else {
-                        return errorRes(res, 400, `Поле ${field} должно быть строкой или null`);
-                    }
-                } else if (field === 'userName') {
-                    // Валидация имени пользователя
-                    if (value === null || value === '') {
-                        return errorRes(res, 400, 'Имя пользователя не может быть пустым');
-                    }
-                    if (typeof value !== 'string' || value.trim().length < 3) {
-                        return errorRes(res, 400, 'Имя пользователя должно быть строкой не менее 3 символов');
-                    }
-                    updateData[field] = value.trim();
-                } else if (field === 'userPhoneNumber') {
-                    // Валидация номера телефона (разрешаем null для очистки)
+                // Конвертация типов данных (валидация форматов уже выполнена в middleware)
+                if (field === 'userBirthDate') {
+                    // Конвертация даты (валидация формата и диапазона уже выполнена в middleware)
                     if (value !== null && value !== '') {
-                        if (typeof value !== 'string') {
-                            return errorRes(res, 400, 'Номер телефона должен быть строкой');
-                        }
-                        updateData[field] = value.trim();
+                        updateData[field] = new Date(value); // конвертируем строку в Date объект
                     } else {
-                        updateData[field] = value; // Разрешаем null или пустую строку
+                        updateData[field] = null; // разрешаем очистку поля
                     }
-                } else if (field === 'isActiveUser' || field === 'isBlockedUser' || field === 'isPremiumUser' || field === 'notificationsEnabled') {
-                    // Валидация булевых значений
-                    if (typeof value !== 'boolean') {
-                        return errorRes(res, 400, `Поле ${field} должно быть булевым значением (true/false)`);
-                    }
-                    updateData[field] = value;
+                } else if (field === 'userDiscountPercent') {
+                    // Конвертация в число (валидация диапазона уже выполнена в middleware)
+                    updateData[field] = Number(value);
+                } else if (field === 'userName' || field === 'userPhoneNumber' || field === 'userAddress' || field === 'notesAboutUser') {
+                    // Для строковых полей применяем trim (валидация уже выполнена в middleware)
+                    updateData[field] = typeof value === 'string' ? value.trim() : value;
                 } else {
-                    // Для остальных полей (userAddress, notesAboutUser) - просто присваиваем
+                    // Для остальных полей (userGender, userRole, URL поля, булевы) - просто присваиваем (валидация уже выполнена в middleware)
                     updateData[field] = value;
                 }
             }
@@ -268,14 +188,9 @@ export const userUpdateProfileController = async (req, res) => {
 export const userDeleteProfileController = async (req, res) => {
     try {
         const currentUserId = req.userId; // кто удаляет (id из auth middleware) Прошел ли JWT авторизацию
-        const targetUserId = req.params.userIdClient; // кого удаляем (id из URL) ID пользователя которого удаляем
+        const targetUserId = req.params.userIdClient; // кого удаляем (id из URL) ID пользователя которого удаляем (валидация выполняется в middleware userIdParamValidation)
 
-        // 1. Проверка валидности ObjectId
-        if (!mongoose.Types.ObjectId.isValid(targetUserId)) {
-            return errorRes(res, 400, 'Неверный формат ID пользователя');
-        }
-
-        // 2. Проверка существования текущего пользователя
+        // 1. Проверка существования текущего пользователя
         const currentUserRole = await UserModel.findById(currentUserId).select('userRole').lean();
         if (!currentUserRole) {
             return errorRes(res, 401, 'Текущий пользователь не найден. Токен недействителен');

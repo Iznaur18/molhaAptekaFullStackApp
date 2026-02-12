@@ -128,4 +128,29 @@ const UserSchema = new mongoose.Schema(
   }
 );
 
+// Индексы для производительности
+// Индекс для поиска по email (уже есть unique индекс, но явно указываем для ясности)
+UserSchema.index({ email: 1 }, { sparse: true });
+
+// Индекс для поиска по userName (уже есть unique индекс, но явно указываем для ясности)
+UserSchema.index({ userName: 1 }, { sparse: true });
+
+// Индекс для поиска по telegramUserId (уже есть unique индекс, но явно указываем для ясности)
+UserSchema.index({ telegramUserId: 1 }, { sparse: true });
+
+// Индекс для поиска по userPhoneNumber (уже есть unique индекс, но явно указываем для ясности)
+UserSchema.index({ userPhoneNumber: 1 }, { sparse: true });
+
+// Составной индекс для фильтрации активных пользователей по роли (для админ-панели)
+UserSchema.index({ userRole: 1, isActiveUser: 1, isBlockedUser: 1 });
+
+// Индекс для сортировки по рейтингу (для топ пользователей)
+UserSchema.index({ 'userRatingByVotes.countVotes': -1, 'userRatingByVotes.totalRating': -1 });
+
+// Индекс для поиска по дате последнего входа (для аналитики)
+UserSchema.index({ userLastLoginAt: -1 });
+
+// Индекс для поиска премиум пользователей
+UserSchema.index({ isPremiumUser: 1 });
+
 export const UserModel = mongoose.model('User', UserSchema); // Модель пользователя для MongoDB

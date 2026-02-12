@@ -6,22 +6,15 @@ import { USER_ME_RAITING } from '../constants/constants.js';
 export const userVoteRatingController = async (req, res) => {
     try {
         // 1. Достаём из запроса: id цели голосования (params), оценку 1–10 (body), id голосующего (из auth middleware)
+        // Валидация параметров и тела запроса выполняется в middleware: voteTargetIdParamValidation и voteValidation
         const { userVoteTargetIdClient } = req.params; // id пользователя за которого проголосовали
         const { userVoteValueClient } = req.body; // значение голоса которое пользователь ставит за целевого пользователя
         const userVoterIdClient = req.userId; // id пользователя который проголосовал из auth middleware
 
-        // 2. Проверка наличия обязательных полей
-        if (!userVoteTargetIdClient || userVoteValueClient == null || !userVoterIdClient) {
-            return errorRes(res, 400, 'Не все поля заполнены');
-        }
-
-        // 3. Оценка должна быть числом от 1 до 10
+        // 2. Конвертация значения голоса (валидация диапазона уже выполнена в middleware)
         const userVoteValue = Math.round(Number(userVoteValueClient)); // значение голоса, округленное до целого
-        if (Number.isNaN(userVoteValue) || userVoteValue < 1 || userVoteValue > 10) {
-            return errorRes(res, 400, 'Оценка должна быть числом от 1 до 10');
-        }
 
-        // 4. Запрет голосовать за себя (явная проверка — в ответе 400, а не 500)
+        // 3. Запрет голосовать за себя (бизнес-логика, не валидация)
         if (String(userVoterIdClient) === String(userVoteTargetIdClient)) {
             return errorRes(res, 400, 'Нельзя голосовать за самого себя');
         }
@@ -95,15 +88,10 @@ export const userVoteRatingController = async (req, res) => {
 
 export const userGetRatingController = async (req, res) => {
     try {
-        // 1. Извлекаем id пользователя из параметров URL-адреса
-        const { userIdClient } = req.params; // название userIdClient, обязательно для запроса в URL роута
+        // 1. Извлекаем id пользователя из параметров URL-адреса (валидация выполняется в middleware ratingUserIdParamValidation)
+        const { userIdClient } = req.params;
 
-        // 2. Проверяем наличие id — без него запрос невалиден
-        if (!userIdClient) {
-            return errorRes(res, 400, 'ID пользователя обязателен');
-        }
-
-        // 3. Ищем пользователя в БД по id, выбираем только нужные поля (без пароля и т.п.)
+        // 2. Ищем пользователя в БД по id, выбираем только нужные поля (без пароля и т.п.)
         const userIdServer = await UserModel.findById(userIdClient)
             .select(USER_ME_RAITING)
             .lean(); // Запросы только для чтения. Когда нужно вернуть данные в API. Когда не планируется вызывать .save() или методы mongoose для результата.

@@ -1,9 +1,17 @@
 import { validationResult } from 'express-validator';
+import { errorRes } from '../utils/index.js';
 
-export const handleValidationByExpressErrors = (req, res, next) => { // функция для обработки ошибок валидации
+/**
+ * Middleware для обработки ошибок валидации express-validator
+ * Возвращает ошибки в едином формате приложения
+ */
+export const handleValidationByExpressErrors = (req, res, next) => {
     const errors = validationResult(req); // получаем ошибки валидации
+    
     if (!errors.isEmpty()) { // если есть ошибки, возвращаем ошибку
-        return res.status(400).json({ errors: errors.array() }); // возвращаем ошибку
+        const errorMessages = errors.array().map(err => err.msg).join(', ');
+        return errorRes(res, 400, `Ошибка валидации: ${errorMessages}`);
     }
+    
     next(); // продолжаем выполнение следующего middleware
 }

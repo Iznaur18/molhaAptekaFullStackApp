@@ -3,7 +3,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import { uploadRouter, authRouter, voteRouter, userRouter } from './routes/index.js';
-import { errorRes } from './utils/index.js';
+import { generalRateLimiter, errorHandler, notFoundHandler } from './middlewares/index.js';
 
 if (!process.env.JWT_SECRET) {
   console.error('JWT_SECRET не задан в .env'); // выводим ошибку в консоль
@@ -25,6 +25,10 @@ const app = express();
 app.use(express.json());
 app.use(process.env.FRONTEND_URL ? cors({ origin: process.env.FRONTEND_URL }) : cors()); // разрешаем запросы только с определенного домена если FRONTEND_URL задан в .env
 
+// Общий rate limiting для всех API запросов (защита от DDoS)
+// Применяется ко всем маршрутам, кроме статических файлов
+app.use(generalRateLimiter);
+
 // раздача загруженных файлов по URL /uploads/...
 app.use('/uploads', express.static('uploads')); // раздаем загруженные файлы по URL /uploads/...
 
@@ -39,14 +43,11 @@ app.use('/vote', voteRouter);
 
 app.use('/user', userRouter);
 
-// глобальный обработчик ошибок (необработанные исключения, в т.ч. от multer)
-app.use((err, req, res, next) => { // обработчик ошибок
-  console.error(err);
-  if (err.code === 'LIMIT_FILE_SIZE') { // если ошибка связана с размером файла
-    return errorRes(res, 413, 'Файл слишком большой. Максимум 5 MB.');
-  }
-  errorRes(res, 500, 'Ошибка сервера'); // если ошибка не связана с размером файла
-});
+// Обработчик несуществующих маршрутов (404) - должен быть перед errorHandler
+app.use(notFoundHandler);
+
+// Централизованный обработчик ошибок (должен быть последним middleware)
+app.use(errorHandler);
 
 const PORT = process.env.PORT ?? 4444; // порт для запуска сервера. Через process.env.PORT мы получаем порт из файла .env.
 app.listen(PORT, (err) => { // запускаем сервер на порту PORT
