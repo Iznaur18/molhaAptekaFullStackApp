@@ -4,6 +4,7 @@ import { telegramAuthValidation } from './telegramAuthValidation.js';
 import { updateProfileValidation, userIdParamValidation } from './updateProfileValidation.js';
 import { voteValidation, voteTargetIdParamValidation } from './voteValidation.js';
 import { ratingUserIdParamValidation } from './ratingValidation.js';
+import { userSearchValidation } from './userSearchValidation.js';
 
 export { 
     loginUserValidation, 
@@ -13,5 +14,6 @@ export {
     userIdParamValidation,
     voteValidation,
     voteTargetIdParamValidation,
-    ratingUserIdParamValidation
+    ratingUserIdParamValidation,
+    userSearchValidation
 };
