@@ -1,5 +1,5 @@
 import { param } from 'express-validator';
-import { handleValidationByExpressErrors } from './handleValidationByExpressErrors.js';
+import { handleValidationByExpressErrors } from '../handleValidationByExpressErrors.js';
 
 /**
  * Валидация параметра userId в URL для получения рейтинга

@@ -1,5 +1,5 @@
-import { UserModel } from '../models/index.js';
-import { successRes, errorRes } from '../utils/index.js';
+import { UserModel } from '../../models/index.js';
+import { successRes, errorRes } from '../../utils/index.js';
 
 export const userSearchController = async (req, res) => {
     try {

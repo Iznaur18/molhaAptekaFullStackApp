@@ -1,9 +1,10 @@
-import { uploadController } from './uploadController.js';
-import { registerUserController } from './registerUserController.js';
-import { loginUserController, userGetProfileController, userMeController, userUpdateProfileController, userDeleteProfileController } from './loginUserController.js';
-import { authTelegramController } from './authTelegramController.js';
-import { userVoteRatingController, userGetRatingController } from './userVoteRatingController.js';
-import { userSearchController } from './userSearchController.js';
+import { uploadController } from './User/uploadController.js';
+import { registerUserController } from './User/registerUserController.js';
+import { loginUserController, userGetProfileController, userMeController, userUpdateProfileController, userDeleteProfileController } from './User/loginUserController.js';
+import { authTelegramController } from './User/authTelegramController.js';
+import { userVoteRatingController, userGetRatingController } from './User/userVoteRatingController.js';
+import { userSearchController } from './User/userSearchController.js';
+import { makeOrderController, getMyOrdersController, getAllOrdersController } from './Order/makeOrderController.js';
 
 export {
     uploadController,
@@ -16,4 +17,8 @@ export {
     userMeController,
     userUpdateProfileController,
     userDeleteProfileController,
-    userSearchController }; // Получаем в файле routes/uploadRouter.js и используем в router.post('/', uploadMW.single('image'), uploadController);
+    userSearchController,
+    makeOrderController,
+    getMyOrdersController,
+    getAllOrdersController };
+    // Получаем в файле routes/uploadRouter.js и используем в router.post('/', uploadMW.single('image'), uploadController);

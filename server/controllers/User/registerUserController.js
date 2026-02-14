@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
-import { UserModel } from '../models/index.js';
-import { sendUserWithToken, errorRes } from '../utils/index.js';
-import { DEFAULT_AVATAR_URL } from '../constants/constants.js';
+import { UserModel } from '../../models/index.js';
+import { sendUserWithToken, errorRes } from '../../utils/index.js';
+import { DEFAULT_AVATAR_URL } from '../../constants/constants.js';
 
 /** Регистрация только по email + пароль. POST /auth/register */
 export const registerUserController = async (req, res) => { // обработчик регистрации пользователя по email + пароль

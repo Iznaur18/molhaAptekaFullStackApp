@@ -1,4 +1,4 @@
-import { successRes, errorRes } from '../utils/index.js';
+import { successRes, errorRes } from '../../utils/index.js';
 
 // обработчик успешной загрузки файла — отдаёт клиенту данные о файле.
 export function uploadController(req, res) {

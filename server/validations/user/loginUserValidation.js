@@ -1,5 +1,5 @@
 import { body } from 'express-validator';
-import { handleValidationByExpressErrors } from './handleValidationByExpressErrors.js';
+import { handleValidationByExpressErrors } from '../handleValidationByExpressErrors.js';
 
 export const loginUserValidation = [ // массив валидаций для входа пользователя
     body('email').isEmail().withMessage('Неверный email'), // валидация email

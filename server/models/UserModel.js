@@ -97,6 +97,14 @@ const UserSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+
+    // - - - Список покупок / заказов (подготовка под будущую модель) - - -
+    buyList: { // список id заказов или покупок; при создании модели Order/Purchase указать ref: 'Order' или ref: 'Purchase'
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }], 
+      default: ["Список покупок пуст"], // значение по умолчанию
+    },
+
+    // - - - Рейтинг пользователя по оценкам - - -
     userRatingByVotes: { // рейтинг пользователя по оценкам
       countVotes: { // количество проголосовавших за пользователя
         type: Number,

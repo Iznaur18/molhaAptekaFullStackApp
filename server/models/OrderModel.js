@@ -1,0 +1,37 @@
+import mongoose from 'mongoose';
+
+const OrderSchema = new mongoose.Schema({ // схема заказа
+    userId: { // id пользователя который сделал заказ
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
+    },
+    items: { // список id товаров в заказе для связи с моделью Product
+        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
+        required: true,
+    },
+    totalAmount: { // общая сумма заказа
+        type: Number,
+        required: true,
+    },
+    deliveryAddress: { // адрес доставки
+        type: String,
+        required: true,
+    },
+    deliveryDate: { // дата доставки
+        type: Date,
+        required: true,
+    },
+    paymentMethod: { // метод оплаты
+        type: String,
+        required: true,
+    },
+    status: { // статус заказа
+        type: String,
+        required: true,
+    },
+}, {
+    timestamps: true, // когда заказ создан/обновлен
+});
+
+export default mongoose.model('Order', OrderSchema);

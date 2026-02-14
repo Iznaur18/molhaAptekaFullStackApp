@@ -1,5 +1,5 @@
 import { query } from 'express-validator'; // query — это объект с теми параметрами, которые пришли в URL после ?
-import { handleValidationByExpressErrors } from './handleValidationByExpressErrors.js'; // handleValidationByExpressErrors — это функция, которая обрабатывает ошибки валидации и отправляет их клиенту
+import { handleValidationByExpressErrors } from '../handleValidationByExpressErrors.js'; // handleValidationByExpressErrors — это функция, которая обрабатывает ошибки валидации и отправляет их клиенту
 
 /**
  * Валидация query-параметров для GET /user/search

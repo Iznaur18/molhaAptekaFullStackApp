@@ -1,6 +1,6 @@
 import { Router } from 'express'; // Импортируем Router из express. Он будет использоваться для создания роута.
 import { uploadMW, checkAuthMW, uploadRateLimiter } from '../middlewares/index.js'; // Импортируем uploadMW и checkAuthMW из middlewares/index.js. Он будет использоваться для загрузки файла.
-import { uploadController } from '../controllers/uploadController.js'; // Импортируем uploadController из controllers/uploadController.js. Это должен быть обработчик запроса на загрузку файла.
+import { uploadController } from '../controllers/index.js';
 
 const router = Router(); // Создаем роут для загрузки файла. Этот роут будет использоваться в index.js. Это роутер, который будет использоваться для загрузки файла.
 

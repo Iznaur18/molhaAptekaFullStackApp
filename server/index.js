@@ -3,7 +3,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import helmet from 'helmet';
-import { uploadRouter, authRouter, voteRouter, userRouter } from './routes/index.js';
+import { uploadRouter, authRouter, voteRouter, userRouter, orderRouter } from './routes/index.js';
 import { generalRateLimiter, errorHandler, notFoundHandler } from './middlewares/index.js';
 
 if (!process.env.JWT_SECRET) {
@@ -44,6 +44,8 @@ app.use('/auth', authRouter); // Это префикс для маршрутов
 app.use('/vote', voteRouter);
 
 app.use('/user', userRouter);
+
+app.use('/order', orderRouter);
 
 // Обработчик несуществующих маршрутов (404) - должен быть перед errorHandler
 app.use(notFoundHandler);

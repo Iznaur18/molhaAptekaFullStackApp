@@ -1,6 +1,6 @@
-import { UserVoteRatingModel, UserModel } from '../models/index.js';
-import { errorRes, successRes } from '../utils/index.js';
-import { USER_ME_RAITING } from '../constants/constants.js';
+import { UserVoteRatingModel, UserModel } from '../../models/index.js';
+import { errorRes, successRes } from '../../utils/index.js';
+import { USER_ME_RAITING } from '../../constants/constants.js';
 
 /** Голосование за пользователя. POST /user/vote */
 export const userVoteRatingController = async (req, res) => {

@@ -1,5 +1,5 @@
-import { UserModel } from '../models/index.js';
-import { sendUserWithToken, errorRes } from '../utils/index.js';
+import { UserModel } from '../../models/index.js';
+import { sendUserWithToken, errorRes } from '../../utils/index.js';
 
 /** Вход/регистрация через Telegram. POST /auth/telegram — если пользователь есть, логин; иначе создание. */
 export const authTelegramController = async (req, res) => { // обработчик входа/регистрации через Telegram

@@ -1,5 +1,5 @@
 import { body } from 'express-validator';
-import { handleValidationByExpressErrors } from './handleValidationByExpressErrors.js';
+import { handleValidationByExpressErrors } from '../handleValidationByExpressErrors.js';
 
 export const registerUserValidation = [ // массив валидаций для регистрации пользователя
     body('email')

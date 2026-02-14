@@ -1,8 +1,8 @@
 import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
-import { UserModel, UserVoteRatingModel } from '../models/index.js';
-import { sendUserWithToken, errorRes, successRes } from '../utils/index.js';
-import { USER_DATA, ALLOWED_FIELDS_FOR_USER, ALLOWED_FIELDS_FOR_ADMIN } from '../constants/constants.js';
+import { UserModel, UserVoteRatingModel } from '../../models/index.js';
+import { sendUserWithToken, errorRes, successRes } from '../../utils/index.js';
+import { USER_DATA, ALLOWED_FIELDS_FOR_USER, ALLOWED_FIELDS_FOR_ADMIN } from '../../constants/constants.js';
 
 /** Вход по email + пароль. POST /auth/login */
 export const loginUserController = async (req, res) => { // обработчик входа по email + пароль
