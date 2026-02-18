@@ -75,7 +75,7 @@ const UserSchema = new mongoose.Schema(
       enum: ['user', 'admin', 'pharmacist'], // допустимые значения поля
       default: 'user', // значение по умолчанию
     },
-
+    
     // - - - Поля для маркетинга - - -
     userDiscountPercent: { // процент скидки
       type: Number,
@@ -100,8 +100,8 @@ const UserSchema = new mongoose.Schema(
 
     // - - - Список покупок / заказов (подготовка под будущую модель) - - -
     buyList: { // список id заказов или покупок; при создании модели Order/Purchase указать ref: 'Order' или ref: 'Purchase'
-      type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }], 
-      default: ["Список покупок пуст"], // значение по умолчанию
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }], // массив id заказов или покупок
+      default: [], // значение по умолчанию 
     },
 
     // - - - Рейтинг пользователя по оценкам - - -
@@ -136,19 +136,7 @@ const UserSchema = new mongoose.Schema(
   }
 );
 
-// Индексы для производительности
-// Индекс для поиска по email (уже есть unique индекс, но явно указываем для ясности)
-UserSchema.index({ email: 1 }, { sparse: true });
-
-// Индекс для поиска по userName (уже есть unique индекс, но явно указываем для ясности)
-UserSchema.index({ userName: 1 }, { sparse: true });
-
-// Индекс для поиска по telegramUserId (уже есть unique индекс, но явно указываем для ясности)
-UserSchema.index({ telegramUserId: 1 }, { sparse: true });
-
-// Индекс для поиска по userPhoneNumber (уже есть unique индекс, но явно указываем для ясности)
-UserSchema.index({ userPhoneNumber: 1 }, { sparse: true });
-
+// Индексы для производительности (email, userName, telegramUserId, userPhoneNumber уже индексируются через unique: true в полях)
 // Составной индекс для фильтрации активных пользователей по роли (для админ-панели)
 UserSchema.index({ userRole: 1, isActiveUser: 1, isBlockedUser: 1 });
 

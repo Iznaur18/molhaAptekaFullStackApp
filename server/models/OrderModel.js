@@ -1,13 +1,16 @@
 import mongoose from 'mongoose';
 
 const OrderSchema = new mongoose.Schema({ // схема заказа
-    userId: { // id пользователя который сделал заказ
+    userBuyerId: { // id пользователя который сделал заказ
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,
     },
-    items: { // список id товаров в заказе для связи с моделью Product
-        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
+    items: { // позиции заказа: товар и количество
+        type: [{
+            productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+            quantity: { type: Number, required: true, min: 1 },
+        }],
         required: true,
     },
     totalAmount: { // общая сумма заказа

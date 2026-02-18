@@ -5,6 +5,7 @@ import { authTelegramController } from './User/authTelegramController.js';
 import { userVoteRatingController, userGetRatingController } from './User/userVoteRatingController.js';
 import { userSearchController } from './User/userSearchController.js';
 import { makeOrderController, getMyOrdersController, getAllOrdersController } from './Order/makeOrderController.js';
+import { postProductController } from './Product/postProductController.js';
 
 export {
     uploadController,
@@ -20,5 +21,6 @@ export {
     userSearchController,
     makeOrderController,
     getMyOrdersController,
-    getAllOrdersController };
+    getAllOrdersController,
+    postProductController };
     // Получаем в файле routes/uploadRouter.js и используем в router.post('/', uploadMW.single('image'), uploadController);
