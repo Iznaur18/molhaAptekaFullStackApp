@@ -6,6 +6,7 @@ import { userVoteRatingController, userGetRatingController } from './User/userVo
 import { userSearchController } from './User/userSearchController.js';
 import { makeOrderController, getMyOrdersController, getAllOrdersController } from './Order/makeOrderController.js';
 import { postProductController } from './Product/postProductController.js';
+import { getProductsController, getMyProductsController } from './Product/getProducts.js';
 
 export {
     uploadController,
@@ -22,5 +23,8 @@ export {
     makeOrderController,
     getMyOrdersController,
     getAllOrdersController,
-    postProductController };
+    postProductController,
+    getProductsController,
+    getMyProductsController
+};
     // Получаем в файле routes/uploadRouter.js и используем в router.post('/', uploadMW.single('image'), uploadController);

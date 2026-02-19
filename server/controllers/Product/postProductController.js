@@ -4,7 +4,7 @@ import { errorRes, successRes } from '../../utils/index.js';
 export const postProductController = async (req, res) => {
     try {
         const userId = req.userId; // id пользователя который продает продукт найденный по userId из JWT
-        const { productName, productDescription, productPrice } = req.body; // извлекаем данные из тела запроса
+        const { productName, productDescription, productPrice, productCategory, productIsAvailable } = req.body; // извлекаем данные из тела запроса
 
         // Валидация позже
 
@@ -19,6 +19,8 @@ export const postProductController = async (req, res) => {
             productDescription,
             productPrice,
             productSeller: userId, // id пользователя который продает продукт найденный по userId из JWT
+            productCategory,
+            productIsAvailable,
         });
 
         await product.populate('productSeller', 'userName _id'); // подставляем данные продавца вместо id

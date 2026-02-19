@@ -10,7 +10,15 @@ const ProductSchema = new Schema({
         ref: "User",
         required: true
     },
-    
+    productCategory: {
+        type: String,
+        enum: ['electronics', 'clothing', 'food'],
+        required: true
+    },
+    productIsAvailable: {
+        type: Boolean,
+        default: true
+    },
 },{timestamps: true}
 )
 
