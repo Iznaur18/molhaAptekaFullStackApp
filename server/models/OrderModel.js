@@ -30,6 +30,7 @@ const OrderSchema = new mongoose.Schema({ // схема заказа
         required: true,
     },
     status: { // статус заказа
+        default: 'pending',
         type: String,
         required: true,
     },

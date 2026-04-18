@@ -7,7 +7,7 @@ export const makeOrderController = async (req, res) => {
         const userId = req.userId; // только из авторизации, не из body — иначе любой мог бы создавать заказы от чужого имени
 
         // Создание заказа: из body ожидается items в виде [{ productId, quantity }, ...]. items — это массив объектов, каждый объект содержит productId и quantity. Проверяем, что items — массив и в нём есть хотя бы один элемент.
-        const { items, deliveryAddress, paymentMethod, status } = req.body; // извлекаем данные из тела запроса (totalAmount и deliveryDate не из body — считаем/ставим на сервере)
+        const { items, deliveryAddress, paymentMethod } = req.body; // извлекаем данные из тела запроса (totalAmount, deliveryDate и status не из body — считаем/ставим на сервере)
         
         // items: [{ productId, quantity }, ...]. Проверяем, что items — массив и в нём есть хотя бы один элемент.
         const normalizedItems = Array.isArray(items) && items.length > 0
@@ -55,7 +55,7 @@ export const makeOrderController = async (req, res) => {
             deliveryAddress,
             deliveryDate, // актуальная дата по МСК (текущий момент; на фронте отображать с timeZone 'Europe/Moscow')
             paymentMethod,
-            status,
+            status: 'pending', // Статус заказа автоматически ставим в процессе.
         });
 
         await order.populate('userBuyerId', 'userName email _id'); // подставляем данные пользователя (покупателя) в заказ
