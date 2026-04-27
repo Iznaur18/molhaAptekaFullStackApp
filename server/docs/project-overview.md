@@ -1,4 +1,4 @@
-# Обзор проекта Molha Apteka
+# Обзор проекта Rassro
 
 Краткое описание стека, структуры, связей и ключевых решений.
 
@@ -9,7 +9,7 @@ npm run start:dev
 
 ## Что это за проект
 
-Backend приложения (API) для аптеки: пользователи, авторизация (email и Telegram), профили, рейтинг по голосам, загрузка файлов. Фронтенд подключается по API; статика и загрузки отдаются с этого же сервера.
+Backend приложения Rassro (API): пользователи, авторизация (email и Telegram), профили, рейтинг по голосам, загрузка файлов. Фронтенд подключается по API; статика и загрузки отдаются с этого же сервера.
 
 ---
 
@@ -98,12 +98,19 @@ rateLimiter (опц.) → checkAuthMW (JWT) → param/body validation → contro
 | POST | `/auth/login` | Вход по email + password |
 | POST | `/auth/telegram` | Вход/регистрация по Telegram (body: telegramUserId) |
 | GET | `/auth/me` | Текущий пользователь (нужен JWT) |
+| GET | `/user/search` | Поиск пользователей (query по валидации `userSearchValidation`) |
 | GET | `/user/:userIdClient` | Публичный профиль по ID |
 | PATCH | `/user/:userIdClient` | Обновление профиля (JWT; свои поля или админ — все разрешённые) |
 | DELETE | `/user/:userIdClient` | Удаление пользователя (JWT; себя или админ) |
 | GET | `/vote/rating/:userIdClient` | Рейтинг пользователя по голосам |
 | POST | `/vote/:userVoteTargetIdClient` | Поставить/обновить оценку 1–10 (JWT) |
 | POST | `/upload` | Загрузка изображения (JWT, multipart, поле `image`) |
+| GET | `/order/all` | Все заказы (в коде сейчас без `checkAuthMW`; в комментарии — задумка «только админ») |
+| GET | `/order` | Мои заказы (JWT) |
+| POST | `/order` | Создать заказ (JWT) |
+| GET | `/product` | Список всех продуктов |
+| GET | `/product/my` | Мои продукты (JWT) |
+| POST | `/product` | Создать продукт (JWT, body по `makeProductValidation`) |
 
 Статика загрузок: `GET /uploads/<filename>`.
 
