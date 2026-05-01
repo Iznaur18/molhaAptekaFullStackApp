@@ -1,0 +1,39 @@
+/**
+ * @typedef {object} UserRatingByVotes
+ * @property {number} countVotes
+ * @property {number} totalRating
+ */
+
+/**
+ * Публичное представление пользователя (как документ User без `passwordHash`).
+ * Совпадает с полями из `USER_DATA` в `server/constants/constants.js`.
+ *
+ * @typedef {object} UserPublicProfile
+ * @property {string} _id
+ * @property {string} [userName]
+ * @property {string} [email]
+ * @property {string|null} [userBirthDate]
+ * @property {'male'|'female'|'noSelected'} [userGender]
+ * @property {string} [userAddress]
+ * @property {string} [userPhoneNumber]
+ * @property {string|null} [userLastLoginAt]
+ * @property {string} [userAvatarUrl]
+ * @property {string} [userBackgroundUrl]
+ * @property {boolean} [isActiveUser]
+ * @property {boolean} [isBlockedUser]
+ * @property {'user'|'admin'|'pharmacist'} [userRole]
+ * @property {number} [userDiscountPercent]
+ * @property {boolean} [notificationsEnabled]
+ * @property {boolean} [isPremiumUser]
+ * @property {string} [notesAboutUser]
+ * @property {number} [userLoyaltyPoints]
+ * @property {string[]} [buyList]
+ * @property {UserRatingByVotes} [userRatingByVotes]
+ * @property {string} [telegramUserId]
+ * @property {string} [telegramUsername]
+ * @property {string} [telegramPhotoUrl]
+ * @property {string} [createdAt]
+ * @property {string} [updatedAt]
+ */
+
+export {};
