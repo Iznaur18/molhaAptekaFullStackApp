@@ -4,6 +4,10 @@ const Schema = mongoose.Schema;
 const ProductSchema = new Schema({
     productName: {type: String, required: true},
     productDescription: String,
+    productImageUrl: {
+        type: String,
+        default: ''
+    },
     productPrice: {type: Number, required: true},
     productSeller: {
         type: Schema.Types.ObjectId,

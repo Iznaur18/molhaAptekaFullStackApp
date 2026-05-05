@@ -39,7 +39,9 @@ export const userSearchController = async (req, res) => {
 
         // UserModel.find(querySearch) — найти всех пользователей по собранному условию querySearch (и текст, и флаги).
         const users = await UserModel.find(querySearch) // найти пользователей по querySearch. querySearch — объект с тем, что будет использоваться для поиска пользователей
-            .select('_id userName userPhoneNumber email isPremiumUser isActiveUser isBlockedUser') // выбрать поля, которые нужно вернуть (_id нужен клиенту для ссылки на профиль)
+            .select(
+                '_id userName userPhoneNumber email isPremiumUser isActiveUser isBlockedUser userAvatarUrl telegramPhotoUrl userLoyaltyPoints',
+            ) // публичный список: ник, аватар, баллы и служебные флаги
             .sort({ userName: 1 }) // сортировать по userName по возрастанию
             .skip(skip) // пропустить skip пользователей
             .limit(limit) // ограничить количество пользователей на странице
@@ -49,8 +51,8 @@ export const userSearchController = async (req, res) => {
         // Результат в total — нужно клиенту, чтобы рисовать страницы («всего 50, по 10 на странице = 5 страниц»).
         const total = await UserModel.countDocuments(querySearch);
 
-        if (!users || users.length === 0) { // если пользователи не найдены или их нет
-            return successRes(res, { users: 'Пользователи не найдены ни по одному из параметров', total: 0, page: 1, limit: 10 });
+        if (!users || users.length === 0) {
+            return successRes(res, { users: [], total: 0, page, limit });
         }
         
         return successRes(res, { users, total, page, limit });

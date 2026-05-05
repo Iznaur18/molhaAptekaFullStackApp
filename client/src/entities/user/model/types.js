@@ -1,4 +1,33 @@
 /**
+ * Элемент списка из `GET /user/search` (подмножество полей User).
+ *
+ * @typedef {object} UserSearchListItem
+ * @property {string} _id
+ * @property {string} [userName]
+ * @property {string} [email]
+ * @property {string} [userAvatarUrl]
+ * @property {string} [telegramPhotoUrl]
+ * @property {number} [userLoyaltyPoints]
+ */
+
+/**
+ * Поля, которые клиент может передать при `POST /auth/register`
+ * (совпадают с разрешёнными ключами в теле запроса на сервере).
+ *
+ * @typedef {object} RegisterUserPayload
+ * @property {string} email
+ * @property {string} password
+ * @property {string} [userName]
+ * @property {string} [phoneNumber]
+ * @property {string} [avatarUrl]
+ * @property {string} [backgroundUrl]
+ * @property {string} [userBirthDate] ISO 8601 (дата)
+ * @property {'male'|'female'|'noSelected'} [userGender]
+ * @property {string} [userAddress]
+ * @property {boolean} notificationsEnabled
+ */
+
+/**
  * @typedef {object} UserRatingByVotes
  * @property {number} countVotes
  * @property {number} totalRating

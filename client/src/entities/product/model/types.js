@@ -1,23 +1,26 @@
 /**
- * Категории товаров: ограниченный набор вариантов.
  * @typedef {'electronics'|'clothing'|'food'} ProductCategory
  */
 
 /**
- * Продавец в карточке товара: в шаблоне — полный `UserPublicProfile`;
- * с `GET /product` сейчас приходит подмножество полей (остальные можно догрузить по `GET /user/:id`).
+ * Продавец после `populate('productSeller', ...)` в `getProducts.js`.
+ * В карточке гостя показываем только `userName`; остальные поля могут прийти с API.
  *
- * @typedef {import('../../user/model/types.js').UserPublicProfile} ProductSellerPopulated
+ * @typedef {object} ProductSellerPopulated
+ * @property {string} _id
+ * @property {string} [userName]
  */
 
 /**
- * Описание одного продукта в списке (`GET /product` с lean+populate).
- * @typedef {object} ProductListItem
+ * Товар из `GET /product` (lean + populate).
+ *
+ * @typedef {object} ProductFromApi
  * @property {string} _id
  * @property {string} productName
  * @property {string} [productDescription]
+ * @property {string} [productImageUrl]
  * @property {number} productPrice
- * @property {ProductSellerPopulated} productSeller
+ * @property {ProductSellerPopulated|string} productSeller
  * @property {ProductCategory} productCategory
  * @property {boolean} productIsAvailable
  * @property {string} createdAt

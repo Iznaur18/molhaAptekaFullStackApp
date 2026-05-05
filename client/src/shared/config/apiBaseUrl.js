@@ -1,4 +1,4 @@
-const trimTrailingSlash = (url) => url.replace(/\/$/, '');
+const trimTrailingSlash = (url) => url.replace(/\/$/, "");
 
 const fromEnv = import.meta.env.VITE_API_URL;
 
@@ -7,4 +7,4 @@ const fromEnv = import.meta.env.VITE_API_URL;
  * В production задай VITE_API_URL в .env.
  */
 export const API_BASE_URL =
-  import.meta.env.PROD && fromEnv ? trimTrailingSlash(String(fromEnv)) : '';
+  import.meta.env.PROD && fromEnv ? trimTrailingSlash(String(fromEnv)) : "";

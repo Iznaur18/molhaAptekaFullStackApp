@@ -1,16 +1,16 @@
-import axios from 'axios';
+import axios from "axios";
 
-import { API_BASE_URL } from '../config/apiBaseUrl.js';
+import { API_BASE_URL } from "../config/apiBaseUrl.js";
 
-const BEARER_PREFIX = 'Bearer';
+const BEARER_PREFIX = "Bearer";
 
 /** Ключ в `localStorage` для JWT после логина (сервер: `Authorization: Bearer`). */
-export const AUTH_TOKEN_STORAGE_KEY = 'rassro_auth_token';
+export const AUTH_TOKEN_STORAGE_KEY = "rassro_auth_token";
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL || undefined,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 

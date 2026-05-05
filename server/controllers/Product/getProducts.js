@@ -35,7 +35,10 @@ export const getProductsController = async (req, res) => {
 export const getMyProductsController = async (req, res) => {
     try {
         const userId = req.userId;
-        const products = await ProductModel.find({ productSeller: userId });
+        const products = await ProductModel.find({ productSeller: userId })
+            .populate('productSeller', 'userName email userPhoneNumber _id userRatingByVotes')
+            .sort({ createdAt: -1 })
+            .lean();
         return successRes(res, { products });
     } catch (error) {
         console.error(error);

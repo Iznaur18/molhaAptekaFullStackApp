@@ -1,11 +1,11 @@
-import { ProductCatalogPlaceholder } from './widgets/product-catalog-placeholder/ui/ProductCatalogPlaceholder.jsx';
+import { HomePage } from "./pages/home/ui/HomePage.jsx";
 
-import './App.css';
+import "./App.css";
 
 function App() {
   return (
     <main className="app-main">
-      <ProductCatalogPlaceholder />
+      <HomePage />
     </main>
   );
 }

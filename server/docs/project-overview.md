@@ -92,25 +92,25 @@ rateLimiter (опц.) → checkAuthMW (JWT) → param/body validation → contro
 
 ## API (кратко)
 
-| Метод | Путь | Описание |
-|-------|------|----------|
-| POST | `/auth/register` | Регистрация (email, password, опц. userName, phoneNumber, avatarUrl) |
-| POST | `/auth/login` | Вход по email + password |
-| POST | `/auth/telegram` | Вход/регистрация по Telegram (body: telegramUserId) |
-| GET | `/auth/me` | Текущий пользователь (нужен JWT) |
-| GET | `/user/search` | Поиск пользователей (query по валидации `userSearchValidation`) |
-| GET | `/user/:userIdClient` | Публичный профиль по ID |
-| PATCH | `/user/:userIdClient` | Обновление профиля (JWT; свои поля или админ — все разрешённые) |
+| Метод  | Путь | Описание |
+|--------|------|----------|
+| GET    | `/auth/me` | Текущий пользователь (нужен JWT) |
+| GET    | `/user/search` | Поиск пользователей (query по валидации `userSearchValidation`) |
+| GET    | `/user/:userIdClient` | Публичный профиль по ID |
+| GET    | `/vote/rating/:userIdClient` | Рейтинг пользователя по голосам | свой и чужой
+| GET    | `/order/all` | Все заказы от всех (в коде сейчас без `checkAuthMW`; в комментарии — задумка «только админ») |
+| GET    | `/order` | Мои заказы (JWT) | то что я заказал
+| GET    | `/product` | Список всех продуктов | от всех юзеров
+| GET    | `/product/my` | Мои продукты (JWT) | лично созданные
+| POST   | `/auth/register` | Регистрация (email, password, опц. userName, phoneNumber, avatarUrl) |
+| POST   | `/auth/login` | Вход по email + password |
+| POST   | `/auth/telegram` | Вход/регистрация по Telegram (body: telegramUserId) |
+| POST   | `/vote/:userVoteTargetIdClient` | Поставить/обновить оценку 1–10 (JWT) |
+| POST   | `/upload` | Загрузка изображения (JWT, multipart, поле `image`) |
+| POST   | `/order` | Создать заказ (JWT) |
+| POST   | `/product` | Создать продукт (JWT, body по `makeProductValidation`) |
+| PATCH  | `/user/:userIdClient` | Обновление профиля (JWT; свои поля или админ — все разрешённые) |
 | DELETE | `/user/:userIdClient` | Удаление пользователя (JWT; себя или админ) |
-| GET | `/vote/rating/:userIdClient` | Рейтинг пользователя по голосам |
-| POST | `/vote/:userVoteTargetIdClient` | Поставить/обновить оценку 1–10 (JWT) |
-| POST | `/upload` | Загрузка изображения (JWT, multipart, поле `image`) |
-| GET | `/order/all` | Все заказы (в коде сейчас без `checkAuthMW`; в комментарии — задумка «только админ») |
-| GET | `/order` | Мои заказы (JWT) |
-| POST | `/order` | Создать заказ (JWT) |
-| GET | `/product` | Список всех продуктов |
-| GET | `/product/my` | Мои продукты (JWT) |
-| POST | `/product` | Создать продукт (JWT, body по `makeProductValidation`) |
 
 Статика загрузок: `GET /uploads/<filename>`.
 

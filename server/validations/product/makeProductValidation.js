@@ -14,6 +14,11 @@ export const makeProductValidation = [
         .isLength({ min: 10 })
         .withMessage('Описание продукта должно быть не менее 10 символов')
         .trim(),
+    body('productImageUrl')
+        .optional({ values: 'falsy' })
+        .isURL({ require_protocol: true })
+        .withMessage('Ссылка на картинку должна быть валидным URL с http/https')
+        .trim(),
     body('productPrice')
         .notEmpty()
         .withMessage('Цена продукта обязательна')

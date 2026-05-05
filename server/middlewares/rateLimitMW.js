@@ -21,7 +21,7 @@ export const generalRateLimiter = rateLimit({
  */
 export const authRateLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 минут
-    max: 5, // максимум 5 попыток входа/регистрации за 15 минут
+    max: 55, // максимум 5 попыток входа/регистрации за 15 минут
     message: {
         success: false,
         message: 'Слишком много попыток входа. Попробуйте через 15 минут'
@@ -37,7 +37,7 @@ export const authRateLimiter = rateLimit({
  */
 export const updateProfileRateLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 1 час
-    max: 20, // максимум 20 обновлений профиля в час
+    max: 120, // максимум 20 обновлений профиля в час
     message: {
         success: false,
         message: 'Слишком много обновлений профиля. Попробуйте позже'
@@ -52,7 +52,7 @@ export const updateProfileRateLimiter = rateLimit({
  */
 export const voteRateLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 1 час
-    max: 10, // максимум 10 голосов в час
+    max: 110, // максимум 10 голосов в час
     message: {
         success: false,
         message: 'Слишком много голосований. Попробуйте позже'
@@ -67,7 +67,7 @@ export const voteRateLimiter = rateLimit({
  */
 export const uploadRateLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 1 час
-    max: 10, // максимум 10 загрузок в час
+    max: 110, // максимум 10 загрузок в час
     message: {
         success: false,
         message: 'Слишком много загрузок файлов. Попробуйте позже'

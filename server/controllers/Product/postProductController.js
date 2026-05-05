@@ -4,7 +4,14 @@ import { errorRes, successRes } from '../../utils/index.js';
 export const postProductController = async (req, res) => {
     try {
         const userId = req.userId; // id пользователя который продает продукт найденный по userId из JWT
-        const { productName, productDescription, productPrice, productCategory, productIsAvailable } = req.body; // извлекаем данные из тела запроса
+        const {
+            productName,
+            productDescription,
+            productImageUrl,
+            productPrice,
+            productCategory,
+            productIsAvailable
+        } = req.body; // извлекаем данные из тела запроса
 
         // Валидация позже
 
@@ -17,6 +24,7 @@ export const postProductController = async (req, res) => {
         const product = await ProductModel.create({ // создаем новый продукт в базе данных
             productName,
             productDescription,
+            productImageUrl,
             productPrice,
             productSeller: userId, // id пользователя который продает продукт найденный по userId из JWT
             productCategory,

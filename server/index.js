@@ -11,18 +11,14 @@ if (!process.env.JWT_SECRET) {
   process.exit(1); // выход из программы с кодом 1 (ошибка)
 }
 if (!process.env.MONGO_URI) { // если MONGO_URI не задан в .env, то выводим ошибку в консоль и выходим из программы с кодом 1 (ошибка)
-  console.error('MONGO_URI не задан в .env'); // выводим ошибку в консоль
-  process.exit(1); // выход из программы с кодом 1 (ошибка)
+    console.error('MONGO_URI не задан в .env'); // выводим ошибку в консоль
+    process.exit(1); // выход из программы с кодом 1 (ошибка)
 }
 
-mongoose.connect(process.env.MONGO_URI) // подключаемся к MongoDB. Через process.env.MONGO_URI мы получаем URI из файла .env.
-  .then(() => console.log('Connected to MongoDB'))
-  .catch((err) => {
-    console.error('Ошибка подключения к MongoDB:', err); // выводим ошибку в консоль
-    process.exit(1); // выход из программы с кодом 1 (ошибка)
-  });
-
 const app = express(); // создаем экземпляр express
+// Один hop прокси (Vite dev `server.proxy`, nginx и т.п.) — иначе `express-rate-limit` v7
+// может кинуть ValidationError из‑за `X-Forwarded-For` при `trust proxy === false`.
+app.set('trust proxy', 1);
 app.use(express.json()); // middleware для парсинга JSON в теле запроса
 app.use(process.env.FRONTEND_URL ? cors({ origin: process.env.FRONTEND_URL }) : cors()); // разрешаем запросы только с определенного домена если FRONTEND_URL задан в .env
 app.use(helmet()); // защита от некоторых типов атак
@@ -56,7 +52,24 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 const PORT = process.env.PORT ?? 4444; // порт для запуска сервера. Через process.env.PORT мы получаем порт из файла .env.
-app.listen(PORT, (err) => { // запускаем сервер на порту PORT
-  if (err) return console.log('Ошибка запуска сервера:', err);
-  console.log(`Сервер успешно запущен и ожидает подключения на порту ${PORT}.`);
-});
+
+async function start() {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log('Connected to MongoDB');
+
+    app
+      .listen(PORT, () => {
+        console.log(`Сервер успешно запущен на ${PORT}.`);
+      })
+      .on('error', (err) => {
+        console.error('Ошибка запуска сервера:', err);
+        process.exit(1);
+      });
+  } catch (err) {
+    console.error('Ошибка подключения к MongoDB:', err);
+    process.exit(1);
+  }
+}
+
+void start();

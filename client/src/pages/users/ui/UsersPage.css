@@ -1,0 +1,21 @@
+.users-page__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.users-page__item {
+  margin: 0;
+}
+
+.users-page__state {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.users-page__state_error {
+  color: #b42318;
+}
