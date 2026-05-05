@@ -1,17 +1,20 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { fetchAllProducts } from "../../../entities/product/api/fetchAllProducts.js";
+import { deleteMyProduct } from "../../../entities/product/api/deleteMyProduct.js";
 import { fetchMyProducts } from "../../../entities/product/api/fetchMyProducts.js";
 import {
   PRODUCT_CATEGORIES,
   PRODUCT_CATEGORY_LABEL_RU,
 } from "../../../entities/product/model/productConstants.js";
+import { CreateProductModal } from "../../../entities/product/ui/CreateProductModal.jsx";
 import { ProductCard } from "../../../entities/product/ui/ProductCard.jsx";
 import { fetchCurrentUserProfile } from "../../../entities/user/api/fetchCurrentUserProfile.js";
 import { fetchUserProfileById } from "../../../entities/user/api/fetchUserProfileById.js";
 import { LoginModal } from "../../../entities/user/ui/LoginModal.jsx";
 import { RegisterModal } from "../../../entities/user/ui/RegisterModal.jsx";
 import { MyProfileModal } from "../../../entities/user/ui/MyProfileModal.jsx";
+import { UserVoteRatingForm } from "../../../entities/user-vote-rating/ui/UserVoteRatingForm.jsx";
 import { UserDetailsModal } from "../../../entities/user/ui/UserDetailsModal.jsx";
 import { UsersPage } from "../../users/ui/UsersPage.jsx";
 import { AUTH_TOKEN_STORAGE_KEY } from "../../../shared/api/index.js";
@@ -68,6 +71,12 @@ export function HomePage() {
   /** @type {[import('../../../entities/product/model/types.js').ProductFromApi[] | null, import('react').Dispatch<import('react').SetStateAction<import('../../../entities/product/model/types.js').ProductFromApi[] | null>>]} */
   const [onlyMyProductsCatalog, setOnlyMyProductsCatalog] = useState(null);
   const [myProductsCatalogError, setMyProductsCatalogError] = useState("");
+  const [deletingProductId, setDeletingProductId] = useState(null);
+  const [isCreateProductModalOpen, setIsCreateProductModalOpen] =
+    useState(false);
+  /** @type {[string | null, import('react').Dispatch<import('react').SetStateAction<string | null>>]} */
+  const [currentUserId, setCurrentUserId] = useState(null);
+  const [usersListTick, setUsersListTick] = useState(0);
   /** @type {import('react').RefObject<HTMLDivElement | null>} */
   const productCategoryFilterRef = useRef(null);
 
@@ -101,6 +110,29 @@ export function HomePage() {
       setOnlyMyProductsCatalog(null);
       setMyProductsCatalogError("");
     }
+  }, [isAuthorized]);
+
+  useEffect(() => {
+    if (!isAuthorized) {
+      setCurrentUserId(null);
+      return undefined;
+    }
+
+    let cancelled = false;
+
+    void (async () => {
+      try {
+        const me = await fetchCurrentUserProfile();
+        if (cancelled) return;
+        setCurrentUserId(String(me._id));
+      } catch {
+        if (!cancelled) setCurrentUserId(null);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [isAuthorized]);
 
   useEffect(() => {
@@ -144,6 +176,7 @@ export function HomePage() {
     } catch {
       // storage недоступен
     }
+    setCurrentUserId(null);
     setIsAuthorized(false);
     closeMyProfileModal();
   };
@@ -219,6 +252,33 @@ export function HomePage() {
           ? e.message
           : API_CLIENT_UI.FETCH_MY_PRODUCTS_FALLBACK;
       setMyProductsCatalogError(message);
+    }
+  };
+
+  const handleCreateProductSuccess = (product) => {
+    setProducts((prev) => [product, ...prev]);
+    setOnlyMyProductsCatalog((prev) =>
+      prev !== null ? [product, ...prev] : prev,
+    );
+  };
+
+  const handleDeleteMyProduct = async (productId) => {
+    try {
+      setDeletingProductId(productId);
+      setMyProductsCatalogError("");
+      await deleteMyProduct(productId);
+      setProducts((prev) => prev.filter((p) => String(p._id) !== productId));
+      setOnlyMyProductsCatalog((prev) =>
+        prev ? prev.filter((p) => String(p._id) !== productId) : prev,
+      );
+    } catch (e) {
+      const message =
+        e instanceof Error
+          ? e.message
+          : API_CLIENT_UI.DELETE_MY_PRODUCT_FALLBACK;
+      setMyProductsCatalogError(message);
+    } finally {
+      setDeletingProductId(null);
     }
   };
 
@@ -349,11 +409,24 @@ export function HomePage() {
                   </ul>
                 ) : null}
               </div>
-              <p className="home-page__subtitle">
-                {onlyMyProductsCatalog !== null
-                  ? HOME_PAGE_UI.SUBTITLE_MY_ONLY
-                  : HOME_PAGE_UI.SUBTITLE_ALL_PRODUCTS}
-              </p>
+              {onlyMyProductsCatalog !== null ? (
+                <div className="home-page__my-products-subtitle-row">
+                  <button
+                    type="button"
+                    className="home-page__create-product-button"
+                    onClick={() => setIsCreateProductModalOpen(true)}
+                  >
+                    {HOME_PAGE_UI.CREATE_PRODUCT_BUTTON}
+                  </button>
+                  <p className="home-page__subtitle">
+                    {HOME_PAGE_UI.SUBTITLE_MY_ONLY}
+                  </p>
+                </div>
+              ) : (
+                <p className="home-page__subtitle">
+                  {HOME_PAGE_UI.SUBTITLE_ALL_PRODUCTS}
+                </p>
+              )}
             </>
           )}
         </div>
@@ -387,7 +460,10 @@ export function HomePage() {
         </div>
       </header>
       {mainView === "users" ? (
-        <UsersPage onUserRowClick={handleSellerNameClick} />
+        <UsersPage
+          key={usersListTick}
+          onUserRowClick={handleSellerNameClick}
+        />
       ) : (
         <>
           {myProductsCatalogError ? (
@@ -417,6 +493,14 @@ export function HomePage() {
                   <ProductCard
                     product={product}
                     onSellerNameClick={handleSellerNameClick}
+                    onDeleteProduct={
+                      onlyMyProductsCatalog !== null
+                        ? handleDeleteMyProduct
+                        : undefined
+                    }
+                    isDeletePending={
+                      deletingProductId === String(product._id)
+                    }
                   />
                 </div>
               ))}
@@ -430,6 +514,32 @@ export function HomePage() {
         user={sellerModal.phase === "success" ? sellerModal.user : null}
         isLoading={sellerModal.phase === "loading"}
         errorMessage={sellerModal.phase === "error" ? sellerModal.error : null}
+        footer={
+          sellerModal.phase === "success" && sellerModal.user ? (
+            <UserVoteRatingForm
+              key={String(sellerModal.user._id)}
+              targetUser={sellerModal.user}
+              currentUserId={currentUserId}
+              isAuthorized={isAuthorized}
+              onRequestLogin={() => setIsLoginModalOpen(true)}
+              onVotePersisted={() => setUsersListTick((n) => n + 1)}
+              onRated={(snapshot) => {
+                setSellerModal((prev) => {
+                  if (prev.phase !== "success" || !prev.user) return prev;
+                  return {
+                    ...prev,
+                    user: {
+                      ...prev.user,
+                      userRatingByVotes:
+                        snapshot.userRatingByVotes ??
+                        prev.user.userRatingByVotes,
+                    },
+                  };
+                });
+              }}
+            />
+          ) : null
+        }
       />
       <MyProfileModal
         isOpen={myProfileModal.open}
@@ -457,6 +567,11 @@ export function HomePage() {
           setIsAuthorized(true);
           setIsRegisterModalOpen(false);
         }}
+      />
+      <CreateProductModal
+        isOpen={isCreateProductModalOpen}
+        onClose={() => setIsCreateProductModalOpen(false)}
+        onSuccess={handleCreateProductSuccess}
       />
     </div>
   );

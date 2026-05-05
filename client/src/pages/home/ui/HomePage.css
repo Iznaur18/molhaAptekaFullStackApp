@@ -147,6 +147,30 @@
   background: rgba(31, 111, 235, 0.08);
 }
 
+.home-page__my-products-subtitle-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.65rem 1rem;
+}
+
+.home-page__create-product-button {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid rgba(31, 111, 235, 0.45);
+  border-radius: 0.5rem;
+  background: #1f6feb;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.home-page__create-product-button:hover {
+  filter: brightness(1.05);
+}
+
 .home-page__subtitle {
   margin: 0;
   font-size: 0.95rem;

@@ -6,6 +6,7 @@ import { voteValidation, voteTargetIdParamValidation } from './user/voteValidati
 import { ratingUserIdParamValidation } from './user/ratingValidation.js';
 import { userSearchValidation } from './user/userSearchValidation.js';
 import { makeProductValidation } from './product/makeProductValidation.js';
+import { productIdParamValidation } from './product/productIdParamValidation.js';
 
 export { 
     loginUserValidation, 
@@ -17,5 +18,6 @@ export {
     voteTargetIdParamValidation,
     ratingUserIdParamValidation,
     userSearchValidation,
-    makeProductValidation
+    makeProductValidation,
+    productIdParamValidation
 };

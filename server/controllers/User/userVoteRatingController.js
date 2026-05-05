@@ -1,74 +1,125 @@
+import mongoose from 'mongoose';
 import { UserVoteRatingModel, UserModel } from '../../models/index.js';
 import { errorRes, successRes } from '../../utils/index.js';
 import { USER_ME_RAITING } from '../../constants/constants.js';
 
-/** Голосование за пользователя. POST /user/vote */
+const VOTE_RESPONSE_USER_FIELDS = '_id userRatingByVotes userName email userAvatarUrl';
+
+/** @param {unknown} id */
+function toObjectId(id) {
+    return new mongoose.Types.ObjectId(String(id));
+}
+
+/** Оценка текущего пользователя (JWT) целевому: если уже голосовал — значение 1–10, иначе `null`. GET /vote/me/:userVoteTargetIdClient */
+export const getMyVoteForTargetController = async (req, res) => {
+    try {
+        const voterOid = toObjectId(req.userId);
+        const targetOid = toObjectId(req.params.userVoteTargetIdClient);
+
+        if (String(voterOid) === String(targetOid)) {
+            return successRes(res, { myVoteValue: null });
+        }
+
+        const row = await UserVoteRatingModel.findOne({
+            userVoter: voterOid,
+            userVoteTarget: targetOid,
+        })
+            .select('userVoteValue')
+            .lean();
+
+        return successRes(res, {
+            myVoteValue: row?.userVoteValue ?? null,
+        });
+    } catch (error) {
+        console.error('getMyVoteForTarget error:', error);
+        return errorRes(res, 500, error.message || 'Ошибка при получении вашей оценки');
+    }
+};
+
+/** Голосование за пользователя: первый раз или обновление оценки. POST /vote/:userVoteTargetIdClient */
 export const userVoteRatingController = async (req, res) => {
     try {
-        // 1. Достаём из запроса: id цели голосования (params), оценку 1–10 (body), id голосующего (из auth middleware)
-        // Валидация параметров и тела запроса выполняется в middleware: voteTargetIdParamValidation и voteValidation
-        const { userVoteTargetIdClient } = req.params; // id пользователя за которого проголосовали
-        const { userVoteValueClient } = req.body; // значение голоса которое пользователь ставит за целевого пользователя
-        const userVoterIdClient = req.userId; // id пользователя который проголосовал из auth middleware
+        const targetOid = toObjectId(req.params.userVoteTargetIdClient);
+        const voterOid = toObjectId(req.userId);
+        const { userVoteValueClient } = req.body;
 
-        // 2. Конвертация значения голоса (валидация диапазона уже выполнена в middleware)
-        const userVoteValue = Math.round(Number(userVoteValueClient)); // значение голоса, округленное до целого
+        const userVoteValue = Math.round(Number(userVoteValueClient));
 
-        // 3. Запрет голосовать за себя (бизнес-логика, не валидация)
-        if (String(userVoterIdClient) === String(userVoteTargetIdClient)) {
+        if (String(voterOid) === String(targetOid)) {
             return errorRes(res, 400, 'Нельзя голосовать за самого себя');
         }
 
-        // 5. Проверяем, не голосовал ли уже этот пользователь за этого целевого
-        const existingUserVoteRating = await UserVoteRatingModel.findOne({
-            userVoter: userVoterIdClient,
-            userVoteTarget: userVoteTargetIdClient,
-        });
-        if (existingUserVoteRating) { // если голос уже существует, возвращаем ошибку
-            return errorRes(res, 400, 'Вы уже голосовали за этого пользователя');
-        }
-
-        // 6. Проверяем, что целевой пользователь существует
-        const userVoteTarget = await UserModel.findById(userVoteTargetIdClient);
-        if (!userVoteTarget) { // если целевой пользователь не найден, возвращаем ошибку
+        const userVoteTarget = await UserModel.findById(targetOid);
+        if (!userVoteTarget) {
             return errorRes(res, 404, 'Целевой пользователь не найден');
         }
 
-        // 7. Создаём и сохраняем запись голоса (в модели есть запрет голосовать за себя)
-        const vote = new UserVoteRatingModel({ // создаем новый голос в базе данных о голосовании за целевого пользователя с указанным значением голоса
-            userVoter: userVoterIdClient, // id пользователя который проголосовал из клиентского запроса добавляем в базу данных
-            userVoteTarget: userVoteTargetIdClient,
-            userVoteValue: userVoteValue,
+        const existingVote = await UserVoteRatingModel.findOne({
+            userVoter: voterOid,
+            userVoteTarget: targetOid,
+        }).lean();
+
+        if (existingVote) {
+            const delta = userVoteValue - existingVote.userVoteValue;
+
+            if (delta !== 0) {
+                try {
+                    await UserModel.findByIdAndUpdate(targetOid, {
+                        $inc: { 'userRatingByVotes.totalRating': delta },
+                    });
+                    await UserVoteRatingModel.findByIdAndUpdate(existingVote._id, {
+                        userVoteValue,
+                    });
+                } catch (err) {
+                    await UserModel.findByIdAndUpdate(targetOid, {
+                        $inc: { 'userRatingByVotes.totalRating': -delta },
+                    }).catch(() => {});
+                    throw err;
+                }
+            }
+
+            const updatedTargetUser = await UserModel.findById(targetOid)
+                .select(VOTE_RESPONSE_USER_FIELDS)
+                .lean();
+
+            const message =
+                delta === 0 ? 'Оценка без изменений' : 'Оценка обновлена';
+
+            return successRes(res, {
+                user: updatedTargetUser,
+                message,
+            });
+        }
+
+        const vote = new UserVoteRatingModel({
+            userVoter: voterOid,
+            userVoteTarget: targetOid,
+            userVoteValue,
         });
-        
+
         await vote.save();
 
         try {
-            // Популируем связи: подставляем данные голосующего и целевого пользователя вместо ObjectId
-            await vote.populate([
-                { path: 'userVoter', select: 'userName email' },
-                { path: 'userVoteTarget', select: 'userName email' },
-            ]);
-
-        // 8. Обновляем агрегат рейтинга у целевого пользователя атомарно ($inc)
-        const updatedUserVoteTarget = await UserModel.findByIdAndUpdate(
-            userVoteTargetIdClient,
-            {
-                $inc: {
-                    'userRatingByVotes.countVotes': 1,    // +1 к числу голосов
-                    'userRatingByVotes.totalRating': userVoteValue, // прибавляем оценку к сумме
+            const updatedTargetUser = await UserModel.findByIdAndUpdate(
+                targetOid,
+                {
+                    $inc: {
+                        'userRatingByVotes.countVotes': 1,
+                        'userRatingByVotes.totalRating': userVoteValue,
+                    },
                 },
-            },
-            { new: true }                                 // возвращаем обновлённый документ
-        )
-            .select('_id userRatingByVotes userName email userAvatarUrl')
-            .lean();
+                { new: true },
+            )
+                .select(VOTE_RESPONSE_USER_FIELDS)
+                .lean();
 
-            return successRes(res, { user: updatedUserVoteTarget, message: 'Голос успешно поставлен' });
+            return successRes(res, {
+                user: updatedTargetUser,
+                message: 'Голос успешно поставлен',
+            });
         } catch (errorAfterSave) {
-            // Откат при ошибке: удаляем голос и отменяем изменения рейтинга у целевого пользователя
             await UserVoteRatingModel.findByIdAndDelete(vote._id);
-            await UserModel.findByIdAndUpdate(userVoteTargetIdClient, {
+            await UserModel.findByIdAndUpdate(targetOid, {
                 $inc: {
                     'userRatingByVotes.countVotes': -1,
                     'userRatingByVotes.totalRating': -userVoteValue,
@@ -77,36 +128,29 @@ export const userVoteRatingController = async (req, res) => {
             throw errorAfterSave;
         }
     } catch (error) {
-        // Любая неожиданная ошибка — логируем и отдаём 500
         console.error('Vote error:', error);
         const message = error.message || 'Ошибка при голосовании за пользователя';
         return errorRes(res, 500, message);
     }
 };
 
-/** Получение рейтинга пользователя. GET /user/rating/:userId */
+/** Получение рейтинга пользователя. GET /vote/rating/:userId */
 
 export const userGetRatingController = async (req, res) => {
     try {
-        // 1. Извлекаем id пользователя из параметров URL-адреса (валидация выполняется в middleware ratingUserIdParamValidation)
         const { userIdClient } = req.params;
 
-        // 2. Ищем пользователя в БД по id, выбираем только нужные поля (без пароля и т.п.)
         const userIdServer = await UserModel.findById(userIdClient)
             .select(USER_ME_RAITING)
-            .lean(); // Запросы только для чтения. Когда нужно вернуть данные в API. Когда не планируется вызывать .save() или методы mongoose для результата.
+            .lean();
 
-        // 4. Если пользователь не найден — возвращаем 404
         if (!userIdServer) {
             return errorRes(res, 404, 'Пользователь не найден');
         }
 
-        // 5. Достаём из документа счётчики голосов и сумму оценок (если нет — берём 0)
         const { countVotes = 0, totalRating = 0 } = userIdServer.userRatingByVotes || {};
-        // 6. Считаем средний рейтинг: сумма оценок / количество голосов (деление на ноль избегаем)
         const averageRating = countVotes > 0 ? totalRating / countVotes : 0;
 
-        // 7. Отдаём клиенту данные пользователя и рейтинг (среднее округлено до 1 знака)
         return successRes(res, {
             user: {
                 _id: userIdServer._id,
@@ -120,7 +164,6 @@ export const userGetRatingController = async (req, res) => {
             },
         });
     } catch (error) {
-        // Ошибка при запросе к БД или иная — отдаём 500
         console.error('Get rating error:', error);
         return errorRes(res, 500, error.message || 'Ошибка при получении рейтинга');
     }

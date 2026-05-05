@@ -1,0 +1,67 @@
+.product-image-lightbox {
+  --product-image-lightbox-backdrop: rgb(0 0 0 / 72%);
+  --product-image-lightbox-padding: 1rem;
+  --product-image-lightbox-z: 1100;
+
+  position: fixed;
+  inset: 0;
+  z-index: var(--product-image-lightbox-z);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--product-image-lightbox-padding);
+  box-sizing: border-box;
+}
+
+.product-image-lightbox__backdrop {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: var(--product-image-lightbox-backdrop);
+  cursor: pointer;
+}
+
+.product-image-lightbox__surface {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
+  max-width: calc(100vw - 2 * var(--product-image-lightbox-padding));
+  max-height: calc(100vh - 2 * var(--product-image-lightbox-padding));
+}
+
+.product-image-lightbox__close {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0.25rem 0.55rem;
+  border: 1px solid color-mix(in srgb, CanvasText 18%, transparent);
+  border-radius: 8px;
+  background: Canvas;
+  color: CanvasText;
+  font: inherit;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.product-image-lightbox__close:hover {
+  background: color-mix(in srgb, CanvasText 8%, Canvas);
+}
+
+.product-image-lightbox__img {
+  display: block;
+  max-width: min(
+    100%,
+    calc(100vw - 2 * var(--product-image-lightbox-padding))
+  );
+  max-height: calc(100vh - 2 * var(--product-image-lightbox-padding) - 2.5rem);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 10px;
+  box-shadow: 0 12px 40px rgb(0 0 0 / 35%);
+}

@@ -16,7 +16,7 @@ const ProductSchema = new Schema({
     },
     productCategory: {
         type: String,
-        enum: ['electronics', 'clothing', 'food'],
+        enum: ['electronics', 'clothing', 'food', 'figures'],
         required: true
     },
     productIsAvailable: {

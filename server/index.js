@@ -36,7 +36,7 @@ app.use('/upload', uploadRouter); // Это префикс, который бу�
 // авторизация: POST /auth/register, POST /auth/login, POST /auth/telegram
 app.use('/auth', authRouter); // Это префикс для маршрутов авторизации.
 
-// голосование за пользователя: POST /vote/users/:userVoteTargetIdClient (body: userVoteValueClient 1–10)
+// голосование за пользователя: POST /vote/:userVoteTargetIdClient (body: userVoteValueClient 1–10)
 app.use('/vote', voteRouter);
 
 app.use('/user', userRouter);

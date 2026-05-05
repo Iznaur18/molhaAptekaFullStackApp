@@ -40,8 +40,8 @@ export const userSearchController = async (req, res) => {
         // UserModel.find(querySearch) — найти всех пользователей по собранному условию querySearch (и текст, и флаги).
         const users = await UserModel.find(querySearch) // найти пользователей по querySearch. querySearch — объект с тем, что будет использоваться для поиска пользователей
             .select(
-                '_id userName userPhoneNumber email isPremiumUser isActiveUser isBlockedUser userAvatarUrl telegramPhotoUrl userLoyaltyPoints',
-            ) // публичный список: ник, аватар, баллы и служебные флаги
+                '_id userName userPhoneNumber email isPremiumUser isActiveUser isBlockedUser userAvatarUrl telegramPhotoUrl userLoyaltyPoints userRatingByVotes',
+            ) // публичный список: ник, аватар, рейтинг по голосам, баллы и служебные флаги
             .sort({ userName: 1 }) // сортировать по userName по возрастанию
             .skip(skip) // пропустить skip пользователей
             .limit(limit) // ограничить количество пользователей на странице

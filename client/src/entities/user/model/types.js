@@ -1,4 +1,10 @@
 /**
+ * @typedef {object} UserRatingByVotes
+ * @property {number} countVotes
+ * @property {number} totalRating
+ */
+
+/**
  * Элемент списка из `GET /user/search` (подмножество полей User).
  *
  * @typedef {object} UserSearchListItem
@@ -8,6 +14,7 @@
  * @property {string} [userAvatarUrl]
  * @property {string} [telegramPhotoUrl]
  * @property {number} [userLoyaltyPoints]
+ * @property {UserRatingByVotes} [userRatingByVotes]
  */
 
 /**
@@ -25,12 +32,6 @@
  * @property {'male'|'female'|'noSelected'} [userGender]
  * @property {string} [userAddress]
  * @property {boolean} notificationsEnabled
- */
-
-/**
- * @typedef {object} UserRatingByVotes
- * @property {number} countVotes
- * @property {number} totalRating
  */
 
 /**

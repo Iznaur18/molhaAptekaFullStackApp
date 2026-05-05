@@ -26,6 +26,10 @@ export const API_CLIENT_UI = {
   FETCH_USERS_SEARCH_FALLBACK: "Не удалось загрузить пользователей",
   FETCH_USERS_PAGE_FALLBACK: "Не удалось загрузить список",
   FETCH_MY_PRODUCTS_FALLBACK: "Не удалось загрузить ваши товары",
+  DELETE_MY_PRODUCT_FALLBACK: "Не удалось удалить товар",
+  CREATE_PRODUCT_FALLBACK: "Не удалось создать товар",
+  VOTE_SUBMIT_FALLBACK: "Не удалось отправить оценку",
+  FETCH_MY_VOTE_FALLBACK: "Не удалось загрузить вашу оценку",
 };
 
 /** Поиск пользователей (`GET /user/search`) */
@@ -52,6 +56,7 @@ export const HOME_PAGE_UI = {
   FILTER_BUTTON: "Фильтр",
   CATEGORY_ALL: "Все категории",
   SUBTITLE_MY_ONLY: "Показаны только ваши товары.",
+  CREATE_PRODUCT_BUTTON: "Создать товар",
   SUBTITLE_ALL_PRODUCTS: "Все позиции из каталога",
   AUTH_MY_PROFILE: "Мой профиль",
   AUTH_LOGIN: "Войти",
@@ -71,12 +76,37 @@ export const USERS_PAGE_UI = {
 /** Строка каталога пользователей */
 export const USER_LIST_ROW_UI = {
   MISSING_NAME: COMMON_UI.EM_DASH,
-  LOYALTY_POINTS_SUFFIX: "баллов",
+  RATING_TITLE: "Средняя оценка · число голосов",
+};
+
+/** Модалка создания товара (`POST /product`) */
+export const CREATE_PRODUCT_MODAL_UI = {
+  ARIA_DIALOG: "Создание товара",
+  ARIA_CLOSE_BACKDROP: "Закрыть окно создания товара",
+  TITLE: "Новый товар",
+  LABEL_NAME: "Название",
+  LABEL_DESCRIPTION: "Описание",
+  LABEL_IMAGE_URL: "Ссылка на изображение (необязательно)",
+  LABEL_PRICE: "Цена",
+  LABEL_CATEGORY: "Категория",
+  LABEL_AVAILABLE: "Товар в наличии",
+  SUBMIT_IDLE: "Создать",
+  SUBMIT_LOADING: "Создаём…",
+  ERROR_PRICE: "Укажите корректную цену (число ≥ 0)",
+  ERROR_GENERIC: "Не удалось создать товар",
 };
 
 /** Карточка товара (заголовок по умолчанию) */
 export const PRODUCT_CARD_UI = {
   DEFAULT_TITLE: "Товар",
+  DELETE_PRODUCT: "Удалить товар",
+  DELETE_PRODUCT_PENDING: "Удаление…",
+  DELETE_CONFIRM_QUESTION: "Вы уверены, что хотите удалить этот товар?",
+  DELETE_CONFIRM_YES: "Да, удалить",
+  DELETE_CONFIRM_CANCEL: "Отмена",
+  IMAGE_LIGHTBOX_OPEN_LABEL: "Показать изображение в полном размере",
+  IMAGE_LIGHTBOX_CLOSE: "Закрыть просмотр изображения",
+  IMAGE_LIGHTBOX_DIALOG_LABEL: "Изображение товара",
 };
 
 /** Модалка входа */
@@ -115,6 +145,23 @@ export const REGISTER_MODAL_UI = {
   ERROR_GENERIC: "Ошибка при регистрации",
   PASSWORD_MIN_LENGTH: 6,
   USERNAME_MIN_LENGTH: 3,
+};
+
+/** Оценка пользователя `POST /vote/:targetUserId` */
+export const USER_VOTE_RATING_UI = {
+  TITLE: "Оценка",
+  CURRENT_AGGREGATE: "Сейчас в профиле",
+  RANGE_LABEL: "Ваша оценка",
+  SUBMIT: "Отправить оценку",
+  SUBMIT_LOADING: "Отправка…",
+  ALREADY_RATED: "Вы уже оценили пользователя",
+  LOGIN_HINT: "Войдите, чтобы поставить оценку.",
+  LOGIN_BUTTON: "Войти",
+  SELF_HINT: "Нельзя оценить свой профиль.",
+  ME_LOADING: "Загрузка…",
+  MY_VOTE_RESOLVING: "Проверяем вашу оценку…",
+  SUCCESS: "Оценка сохранена",
+  SUCCESS_FLASH_MS: 2800,
 };
 
 /** Модалка карточки пользователя (продавец / общий шаблон) */

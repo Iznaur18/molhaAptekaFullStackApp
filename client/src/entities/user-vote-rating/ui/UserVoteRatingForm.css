@@ -1,0 +1,116 @@
+.user-vote-rating-form {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.user-vote-rating-form_guest,
+.user-vote-rating-form_self {
+  align-items: flex-start;
+}
+
+.user-vote-rating-form__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.user-vote-rating-form__aggregate {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  opacity: 0.88;
+}
+
+.user-vote-rating-form__aggregate-label {
+  font-weight: 600;
+}
+
+.user-vote-rating-form__range-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+}
+
+.user-vote-rating-form__range-caption {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+}
+
+.user-vote-rating-form__score {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.user-vote-rating-form__range {
+  width: 100%;
+  accent-color: #1f6feb;
+}
+
+.user-vote-rating-form__error {
+  margin: 0;
+  font-size: 0.84rem;
+  color: #b42318;
+}
+
+.user-vote-rating-form__flash {
+  margin: 0;
+  font-size: 0.84rem;
+  color: #067647;
+}
+
+.user-vote-rating-form__submit {
+  align-self: flex-start;
+  margin-top: 0.15rem;
+  padding: 0.45rem 0.85rem;
+  border: 1px solid #1f6feb;
+  border-radius: 0.5rem;
+  background: #1f6feb;
+  color: #fff;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.user-vote-rating-form__submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.user-vote-rating-form__submit_done {
+  border-color: color-mix(in srgb, CanvasText 22%, transparent);
+  background: color-mix(in srgb, CanvasText 8%, transparent);
+  color: inherit;
+  cursor: default;
+}
+
+.user-vote-rating-form__submit_done:disabled {
+  opacity: 1;
+}
+
+.user-vote-rating-form__hint {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  opacity: 0.88;
+}
+
+.user-vote-rating-form__login {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid rgba(31, 111, 235, 0.45);
+  border-radius: 0.5rem;
+  background: transparent;
+  color: #1f6feb;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.user-vote-rating-form__login:hover {
+  background: rgba(31, 111, 235, 0.08);
+}

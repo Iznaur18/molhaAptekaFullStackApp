@@ -1,5 +1,5 @@
 /**
- * @typedef {'electronics'|'clothing'|'food'} ProductCategory
+ * @typedef {'electronics'|'clothing'|'food'|'figures'} ProductCategory
  */
 
 /**

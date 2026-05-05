@@ -1,0 +1,97 @@
+.create-product-category-select {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.create-product-category-select__legend {
+  font-size: 0.875rem;
+}
+
+.create-product-category-select__trigger {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  margin: 0;
+  padding: 0.5rem 0.625rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background: #fff;
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+}
+
+.create-product-category-select__trigger:hover:not(:disabled) {
+  border-color: #9ca3af;
+}
+
+.create-product-category-select__trigger:focus-visible {
+  outline: 2px solid #1f6feb;
+  outline-offset: 2px;
+}
+
+.create-product-category-select__trigger:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.create-product-category-select__value {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.create-product-category-select__chevron {
+  flex-shrink: 0;
+  opacity: 0.65;
+  font-size: 0.75rem;
+}
+
+.create-product-category-select__menu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 0.25rem);
+  z-index: 5;
+  margin: 0;
+  padding: 0.25rem;
+  list-style: none;
+  max-height: 14rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(17, 24, 39, 0.18);
+}
+
+.create-product-category-select__option {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0.45rem 0.55rem;
+  border: none;
+  border-radius: 0.35rem;
+  background: transparent;
+  font: inherit;
+  font-size: 0.9375rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.create-product-category-select__option:hover {
+  background: rgba(31, 111, 235, 0.08);
+}
+
+.create-product-category-select__option_selected {
+  font-weight: 600;
+  background: rgba(31, 111, 235, 0.12);
+}

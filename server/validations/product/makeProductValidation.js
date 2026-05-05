@@ -28,8 +28,8 @@ export const makeProductValidation = [
     body('productCategory')
         .notEmpty()
         .withMessage('Категория продукта обязательна')
-        .isIn(['electronics', 'clothing', 'food'])
-        .withMessage('Категория продукта должна быть одной из: electronics, clothing, food')
+        .isIn(['electronics', 'clothing', 'food', 'figures'])
+        .withMessage('Категория продукта должна быть одной из: electronics, clothing, food, figures')
         .trim(),
     body('productIsAvailable')
         .notEmpty()

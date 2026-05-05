@@ -18,10 +18,19 @@ export const voteTargetIdParamValidation = [
  */
 export const voteValidation = [
     body('userVoteValueClient')
-        .notEmpty()
+        .exists({ checkNull: true })
         .withMessage('Значение голоса обязательно')
-        .isInt({ min: 1, max: 10 })
-        .withMessage('Оценка должна быть числом от 1 до 10'),
-    
+        .bail()
+        .custom((value) => {
+            const n =
+                typeof value === 'number'
+                    ? Math.round(value)
+                    : parseInt(String(value).trim(), 10);
+            if (!Number.isInteger(n) || n < 1 || n > 10) {
+                throw new Error('Оценка должна быть целым числом от 1 до 10');
+            }
+            return true;
+        }),
+
     handleValidationByExpressErrors
 ];

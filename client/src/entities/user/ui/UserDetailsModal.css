@@ -146,12 +146,10 @@
   height: 3rem;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid color-mix(in srgb, CanvasText 18%, transparent);
-  box-shadow: 0 2px 8px color-mix(in srgb, #000 12%, transparent);
-}
-
-.user-details-modal_register .user-details-modal__avatar {
-  border-color: #e5e7eb;
+  border: none;
+  box-shadow:
+    0 10px 28px rgb(15 23 42 / 0.14),
+    0 3px 10px rgb(15 23 42 / 0.08);
 }
 
 .user-details-modal__avatar_lead {

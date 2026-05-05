@@ -1,0 +1,50 @@
+import { apiClient } from "../../../shared/api/index.js";
+import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
+
+/**
+ * Тело для `POST /product` (совпадает с `makeProductValidation`).
+ *
+ * @typedef {object} CreateProductBody
+ * @property {string} productName
+ * @property {string} productDescription
+ * @property {string} [productImageUrl]
+ * @property {number} productPrice
+ * @property {import('../model/types.js').ProductCategory} productCategory
+ * @property {boolean} productIsAvailable
+ */
+
+/**
+ * `POST /product` — создать товар (Bearer).
+ *
+ * @param {CreateProductBody} body
+ * @returns {Promise<import('../model/types.js').ProductFromApi>}
+ */
+export async function createProduct(body) {
+  try {
+    const payload = {
+      productName: body.productName.trim(),
+      productDescription: body.productDescription.trim(),
+      productPrice: body.productPrice,
+      productCategory: body.productCategory,
+      productIsAvailable: body.productIsAvailable,
+    };
+    const imageUrl = body.productImageUrl?.trim();
+    if (imageUrl) {
+      payload.productImageUrl = imageUrl;
+    }
+
+    const { data } = await apiClient.post("/product", payload);
+
+    if (!data?.success || data.data?.product == null) {
+      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
+    }
+
+    return data.data.product;
+  } catch (e) {
+    const message =
+      e?.response?.data?.message ??
+      e?.message ??
+      API_CLIENT_UI.CREATE_PRODUCT_FALLBACK;
+    throw new Error(message);
+  }
+}
