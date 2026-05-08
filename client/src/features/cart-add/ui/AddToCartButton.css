@@ -1,0 +1,59 @@
+.add-to-cart {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0.45rem 1rem;
+  border: 1px solid #1f6feb;
+  border-radius: 0.5rem;
+  background: #1f6feb;
+  color: #fff;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.add-to-cart:hover {
+  background: #1557b3;
+  border-color: #1557b3;
+}
+
+.add-to-cart__stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.4rem;
+  border: 1px solid #1f6feb;
+  border-radius: 0.5rem;
+  background: rgba(31, 111, 235, 0.06);
+}
+
+.add-to-cart__step-button {
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: none;
+  border-radius: 0.35rem;
+  background: #fff;
+  color: #1f6feb;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.add-to-cart__step-button:hover {
+  background: #1f6feb;
+  color: #fff;
+}
+
+.add-to-cart__quantity {
+  min-width: 1.4rem;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #111827;
+}

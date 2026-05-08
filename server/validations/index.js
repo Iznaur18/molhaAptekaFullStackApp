@@ -7,6 +7,12 @@ import { ratingUserIdParamValidation } from './user/ratingValidation.js';
 import { userSearchValidation } from './user/userSearchValidation.js';
 import { makeProductValidation } from './product/makeProductValidation.js';
 import { productIdParamValidation } from './product/productIdParamValidation.js';
+import { productsSearchValidation } from './product/productsSearchValidation.js';
+import { makeOrderValidation } from './order/makeOrderValidation.js';
+import { updateOrderStatusValidation } from './order/updateOrderStatusValidation.js';
+import { getAllOrdersValidation } from './order/getAllOrdersValidation.js';
+import { getMySalesValidation } from './order/getMySalesValidation.js';
+import { orderItemActionValidation } from './order/orderItemActionValidation.js';
 
 export { 
     loginUserValidation, 
@@ -19,5 +25,11 @@ export {
     ratingUserIdParamValidation,
     userSearchValidation,
     makeProductValidation,
-    productIdParamValidation
+    productIdParamValidation,
+    productsSearchValidation,
+    makeOrderValidation,
+    updateOrderStatusValidation,
+    getAllOrdersValidation,
+    getMySalesValidation,
+    orderItemActionValidation,
 };

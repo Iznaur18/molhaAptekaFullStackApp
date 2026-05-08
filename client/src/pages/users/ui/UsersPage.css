@@ -1,3 +1,9 @@
+.users-page {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
 .users-page__list {
   margin: 0;
   padding: 0;

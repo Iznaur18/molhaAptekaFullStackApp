@@ -1,0 +1,56 @@
+.my-sales-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.my-sales-page__filters {
+  display: flex;
+  gap: 0.85rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.my-sales-page__filter-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: #4b5563;
+}
+
+.my-sales-page__filter-control {
+  padding: 0.4rem 0.65rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.4rem;
+  background: #fff;
+  font: inherit;
+  font-size: 0.9rem;
+  color: #111827;
+}
+
+.my-sales-page__search {
+  width: min(34rem, 100%);
+}
+
+.my-sales-page__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.my-sales-page__item {
+  margin: 0;
+}
+
+.my-sales-page__state {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.my-sales-page__state_error {
+  color: #b42318;
+}

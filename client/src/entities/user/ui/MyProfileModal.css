@@ -1,3 +1,9 @@
+.my-profile-modal__header-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
 .my-profile-modal__header-action {
   flex-shrink: 0;
   margin: 0;

@@ -1,0 +1,39 @@
+.order-status-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.order-status-select__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: #4b5563;
+}
+
+.order-status-select__control {
+  padding: 0.35rem 0.6rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.4rem;
+  background: #fff;
+  font: inherit;
+  font-size: 0.9rem;
+  color: #111827;
+}
+
+.order-status-select__control:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.order-status-select__pending {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.order-status-select__error {
+  font-size: 0.8rem;
+  color: #b42318;
+}

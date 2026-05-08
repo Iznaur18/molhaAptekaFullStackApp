@@ -1,0 +1,36 @@
+.header-cart-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid rgba(31, 111, 235, 0.45);
+  border-radius: 0.5rem;
+  background: transparent;
+  color: #1f6feb;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.header-cart-button:hover {
+  border-color: #1f6feb;
+  background: rgba(31, 111, 235, 0.08);
+}
+
+.header-cart-button__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.4rem;
+  height: 1.4rem;
+  padding: 0 0.4rem;
+  border-radius: 0.7rem;
+  background: #1f6feb;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+}

@@ -24,17 +24,43 @@ export const API_CLIENT_UI = {
   FETCH_ME_FALLBACK: "Не удалось загрузить мой профиль",
   FETCH_USER_PROFILE_FALLBACK: "Не удалось загрузить профиль",
   FETCH_USERS_SEARCH_FALLBACK: "Не удалось загрузить пользователей",
-  FETCH_USERS_PAGE_FALLBACK: "Не удалось загрузить список",
   FETCH_MY_PRODUCTS_FALLBACK: "Не удалось загрузить ваши товары",
   DELETE_MY_PRODUCT_FALLBACK: "Не удалось удалить товар",
   CREATE_PRODUCT_FALLBACK: "Не удалось создать товар",
   VOTE_SUBMIT_FALLBACK: "Не удалось отправить оценку",
   FETCH_MY_VOTE_FALLBACK: "Не удалось загрузить вашу оценку",
+  CREATE_ORDER_FALLBACK: "Не удалось оформить заказ",
+  FETCH_MY_ORDERS_FALLBACK: "Не удалось загрузить ваши заказы",
+  FETCH_MY_SALES_FALLBACK: "Не удалось загрузить ваши продажи",
+  FETCH_ALL_ORDERS_FALLBACK: "Не удалось загрузить заказы",
+  UPDATE_ORDER_STATUS_FALLBACK: "Не удалось обновить статус заказа",
 };
 
 /** Поиск пользователей (`GET /user/search`) */
 export const USER_SEARCH_UI = {
   API_PAGE_LIMIT: 100,
+  DEBOUNCE_MS: 350,
+};
+
+/** Поле поиска пользователей */
+export const USER_SEARCH_INPUT_UI = {
+  PLACEHOLDER: "Поиск по нику, телефону или email…",
+  ARIA_LABEL: "Поиск пользователей",
+  CLEAR_ARIA: "Очистить поле поиска",
+  PENDING_ARIA: "Идёт поиск",
+};
+
+/** Поиск товаров (`GET /product` и `GET /product/my`) */
+export const PRODUCT_SEARCH_UI = {
+  DEBOUNCE_MS: 350,
+};
+
+/** Поле поиска товаров */
+export const PRODUCT_SEARCH_INPUT_UI = {
+  PLACEHOLDER: "Поиск товара по названию…",
+  ARIA_LABEL: "Поиск товаров",
+  CLEAR_ARIA: "Очистить поле поиска",
+  PENDING_ARIA: "Идёт поиск",
 };
 
 /** Главная страница каталога */
@@ -51,8 +77,15 @@ export const HOME_PAGE_UI = {
   BREADCRUMB_SEPARATOR: " > ",
   ARIA_MY_PRODUCTS_CRUMB: "Главная, Мой профиль, Мои товары",
   TITLE_USERS: "Пользователи",
+  TITLE_CART: "Корзина",
+  TITLE_MY_ORDERS: "Мои заказы",
+  TITLE_MY_SALES: "Мои продажи",
+  TITLE_ADMIN_ORDERS: "Все заказы",
   NAV_TO_CATALOG: "← Каталог товаров",
   NAV_TO_USERS: "Пользователи",
+  NAV_TO_CART: "Корзина",
+  NAV_TO_MY_ORDERS: "Мои заказы",
+  NAV_TO_ADMIN_ORDERS: "Все заказы",
   FILTER_BUTTON: "Фильтр",
   CATEGORY_ALL: "Все категории",
   SUBTITLE_MY_ONLY: "Показаны только ваши товары.",
@@ -65,12 +98,114 @@ export const HOME_PAGE_UI = {
   EMPTY_NO_PRODUCTS: "Товаров пока нет.",
   EMPTY_MY_FILTERED: "У вас нет товаров в каталоге с текущими фильтрами.",
   EMPTY_CATEGORY: "В выбранной категории товаров нет.",
+  EMPTY_BY_QUERY: "По вашему запросу ничего не найдено.",
+};
+
+/** Кнопка добавления товара в корзину */
+export const ADD_TO_CART_UI = {
+  ADD: "В корзину",
+  DECREASE_ARIA: "Уменьшить количество",
+  INCREASE_ARIA: "Увеличить количество",
+  QUANTITY_ARIA: "Количество в корзине",
+};
+
+/** Кнопка корзины в шапке */
+export const HEADER_CART_BUTTON_UI = {
+  LABEL: "Корзина",
+  ARIA: "Открыть корзину",
+  COUNT_ARIA: "Товаров в корзине",
+};
+
+/** Страница «Корзина» */
+export const CART_PAGE_UI = {
+  TITLE: "Корзина",
+  EMPTY: "Корзина пуста.",
+  LOADING: "Загрузка корзины…",
+  TOTAL_LABEL: "Итого",
+  REMOVE_LINE_ARIA: "Удалить из корзины",
+  CLEAR_ALL: "Очистить корзину",
+  GO_TO_CATALOG: "Перейти в каталог",
+  AUTH_REQUIRED: "Войдите, чтобы оформить заказ.",
+  AUTH_LOGIN: "Войти",
+  PRODUCT_DELETED_OR_HIDDEN: "Товар недоступен",
+};
+
+/** Форма оформления заказа */
+export const CHECKOUT_FORM_UI = {
+  HEADING: "Оформление заказа",
+  LABEL_DELIVERY_ADDRESS: "Адрес доставки",
+  PLACEHOLDER_DELIVERY_ADDRESS: "Город, улица, дом, квартира",
+  LABEL_PAYMENT_METHOD: "Способ оплаты",
+  SUBMIT_IDLE: "Оформить заказ",
+  SUBMIT_LOADING: "Оформляем…",
+  SUCCESS: "Заказ успешно оформлен",
+  ERROR_GENERIC: "Не удалось оформить заказ",
+  ADDRESS_MAX_LENGTH: 300,
+};
+
+/** Подписи карточки заказа (используется на Мои заказы и Все заказы) */
+export const ORDER_CARD_UI = {
+  ITEMS_HEADING: "Позиции",
+  TOTAL_LABEL: "Итого",
+  ADDRESS_LABEL: "Адрес доставки",
+  PAYMENT_LABEL: "Оплата",
+  STATUS_LABEL: "Статус",
+  ITEM_STATUS_LABEL: "Статус позиции",
+  ITEM_DELIVERED_AT_LABEL: "Доставлен",
+  ITEM_CONFIRMED_AT_LABEL: "Подтверждён",
+  CREATED_LABEL: "Создан",
+  BUYER_LABEL: "Покупатель",
+  ACTION_SHIPPED: "Отправлен",
+  ACTION_DELIVERED: "Доставлен",
+  ACTION_CONFIRM: "Подтвердить",
+  ACTION_PENDING: "Сохраняем…",
+};
+
+/** Страница «Мои заказы» */
+export const MY_ORDERS_PAGE_UI = {
+  TITLE: "Мои заказы",
+  LOADING: "Загрузка заказов…",
+  EMPTY: "У вас пока нет заказов.",
+};
+
+/** Страница «Мои продажи» */
+export const MY_SALES_PAGE_UI = {
+  TITLE: "Мои продажи",
+  LOADING: "Загрузка продаж…",
+  EMPTY: "У вас пока нет продаж.",
+  EMPTY_BY_FILTER: "По выбранному статусу продаж нет.",
+  EMPTY_BY_SEARCH: "По вашему запросу покупатель не найден.",
+  STATUS_FILTER_LABEL: "Фильтр по статусу",
+  STATUS_FILTER_ALL: "Все статусы",
+  SEARCH_LABEL: "Поиск покупателя",
+  SEARCH_PLACEHOLDER: "Имя, email или телефон покупателя…",
+  SEARCH_DEBOUNCE_MS: 350,
+};
+
+/** Страница «Все заказы» (админ) */
+export const ADMIN_ORDERS_PAGE_UI = {
+  TITLE: "Все заказы",
+  LOADING: "Загрузка заказов…",
+  EMPTY: "Заказов пока нет.",
+  EMPTY_BY_FILTER: "По выбранному статусу заказов нет.",
+  STATUS_FILTER_LABEL: "Фильтр по статусу",
+  STATUS_FILTER_ALL: "Все статусы",
+  STATUS_CHANGE_LABEL: "Сменить статус",
+  STATUS_CHANGE_PENDING: "Сохраняем…",
+  BUYER_LABEL: "Покупатель",
+  ITEMS_HEADING: "Позиции",
+  TOTAL_LABEL: "Итого",
+  ADDRESS_LABEL: "Адрес доставки",
+  PAYMENT_LABEL: "Оплата",
+  CREATED_LABEL: "Создан",
+  PAGE_LIMIT: 20,
 };
 
 /** Экран списка пользователей */
 export const USERS_PAGE_UI = {
   LOADING: "Загрузка пользователей…",
   EMPTY: "Пользователей пока нет.",
+  EMPTY_BY_QUERY: "Никого не нашли по этому запросу.",
 };
 
 /** Строка каталога пользователей */
@@ -178,6 +313,9 @@ export const USER_DETAILS_MODAL_UI = {
 export const MY_PROFILE_MODAL_UI = {
   TAB_TITLE: "Мой профиль",
   TAB_MY_PRODUCTS: "Мои товары",
+  TAB_MY_SALES: "Мои продажи",
+  TAB_MY_ORDERS: "Мои заказы",
+  TAB_ADMIN_ORDERS: "Все заказы",
   LOGOUT: "Выйти",
   LOGOUT_CONFIRM: "Вы точно хотите выйти?",
   LOGOUT_YES: "Да выйти",

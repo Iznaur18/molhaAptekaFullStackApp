@@ -1,13 +1,54 @@
 import { Router } from 'express';
-import { makeOrderController, getMyOrdersController, getAllOrdersController } from '../controllers/index.js';
-import { checkAuthMW } from '../middlewares/index.js';
+
+import {
+    makeOrderController,
+    getMyOrdersController,
+    getMySalesController,
+    getAllOrdersController,
+    updateOrderStatusController,
+    markOrderItemShippedBySellerController,
+    markOrderItemDeliveredBySellerController,
+    confirmOrderItemByBuyerController,
+} from '../controllers/index.js';
+import { checkAuthMW, checkAdminMW } from '../middlewares/index.js';
+import {
+    makeOrderValidation,
+    updateOrderStatusValidation,
+    getAllOrdersValidation,
+    getMySalesValidation,
+    orderItemActionValidation,
+} from '../validations/index.js';
 
 const router = Router();
 
-// Все заказы с привязкой к пользователю — только для админа (маршрут /all должен быть выше /)
-// router.get('/all', checkAuthMW, getAllOrdersController);
-router.get('/all', getAllOrdersController);
-router.get('/', checkAuthMW, getMyOrdersController); // в index.js с /order
-router.post('/', checkAuthMW, makeOrderController);
+router.get('/all', checkAuthMW, checkAdminMW, getAllOrdersValidation, getAllOrdersController);
+router.get('/', checkAuthMW, getMyOrdersController);
+router.get('/sales', checkAuthMW, getMySalesValidation, getMySalesController);
+router.post('/', checkAuthMW, makeOrderValidation, makeOrderController);
+router.patch(
+    '/:orderId/status',
+    checkAuthMW,
+    checkAdminMW,
+    updateOrderStatusValidation,
+    updateOrderStatusController,
+);
+router.patch(
+    '/:orderId/items/:itemIndex/shipped',
+    checkAuthMW,
+    orderItemActionValidation,
+    markOrderItemShippedBySellerController,
+);
+router.patch(
+    '/:orderId/items/:itemIndex/delivered',
+    checkAuthMW,
+    orderItemActionValidation,
+    markOrderItemDeliveredBySellerController,
+);
+router.patch(
+    '/:orderId/items/:itemIndex/confirm',
+    checkAuthMW,
+    orderItemActionValidation,
+    confirmOrderItemByBuyerController,
+);
 
 export { router as orderRouter };

@@ -1,0 +1,9 @@
+/** Поля популяции для отображения позиций заказа на клиенте. */
+export const ORDER_ITEMS_POPULATE = {
+    path: 'items.productId',
+    select: 'productName productPrice productImageUrl productSeller',
+    populate: { path: 'productSeller', select: 'userName _id' },
+};
+
+/** Поля покупателя в `populate('userBuyerId', ...)`. */
+export const ORDER_BUYER_PUBLIC_FIELDS = 'userName email _id userPhoneNumber';

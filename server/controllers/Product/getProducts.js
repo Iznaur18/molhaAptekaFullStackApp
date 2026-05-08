@@ -1,31 +1,47 @@
 import { ProductModel } from '../../models/index.js';
-import { errorRes, successRes } from '../../utils/index.js';
+import { buildRegexSearchOr, errorRes, successRes } from '../../utils/index.js';
+
+const SELLER_PUBLIC_FIELDS = 'userName email userPhoneNumber _id userRatingByVotes';
+const PRODUCT_SEARCH_FIELDS = ['productName'];
+const DEFAULT_PAGE = 1;
+const DEFAULT_LIMIT = 10;
+const MAX_LIMIT = 100;
+
+const parsePagination = (query) => {
+    const page = Math.max(1, Number(query.page) || DEFAULT_PAGE);
+    const limit = Math.min(MAX_LIMIT, Math.max(1, Number(query.limit) || DEFAULT_LIMIT));
+    const skip = (page - 1) * limit;
+    return { page, limit, skip };
+};
+
+const buildProductsQuery = (search, baseQuery = {}) => {
+    const searchCondition = buildRegexSearchOr(search, PRODUCT_SEARCH_FIELDS);
+    return searchCondition ? { ...baseQuery, ...searchCondition } : baseQuery;
+};
 
 export const getProductsController = async (req, res) => {
     try {
-        const page = Math.max(1, Number(req.query.page) || 1); // из клиента придет page=2 в URL.
-        const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 10)); // parseInt(limitParam, 10) — преобразует строку в число, 10 — основание системы счисления (десятичная система)
-        const skip = (page - 1) * limit; // skip — количество продуктов, которые нужно пропустить
+        const { page, limit, skip } = parsePagination(req.query);
+        const productsQuery = buildProductsQuery(req.query.search);
 
-        const [products, total] = await Promise.all([ // Promise.all — это метод, который позволяет ожидать выполнения нескольких Promise-ов одновременно
-            ProductModel.find()
-                .populate('productSeller', 'userName email userPhoneNumber _id userRatingByVotes')
+        const [products, total] = await Promise.all([
+            ProductModel.find(productsQuery)
+                .populate('productSeller', SELLER_PUBLIC_FIELDS)
                 .sort({ createdAt: -1 })
                 .skip(skip)
                 .limit(limit)
                 .lean(),
-            ProductModel.countDocuments(), // countDocuments — это метод, который позволяет посчитать количество документов в коллекции
+            ProductModel.countDocuments(productsQuery),
         ]);
 
-        const pagination = { 
-            page: page,
-            limit: limit,
-            total: total,
+        const pagination = {
+            page,
+            limit,
+            total,
             totalPages: Math.ceil(total / limit),
-        }; // pagination — объект с информацией о пагинации
+        };
 
-        return successRes(res, { products, pagination }); // отправляем клиенту данные о продуктах и информацию о пагинации
-        // GET /product?page=2&limit=10 — вернёт вторую страницу по 10 товаров и метаданные пагинации.
+        return successRes(res, { products, pagination });
     } catch (error) {
         console.error(error);
         return errorRes(res, 500, 'Ошибка при получении продуктов');
@@ -34,11 +50,15 @@ export const getProductsController = async (req, res) => {
 
 export const getMyProductsController = async (req, res) => {
     try {
-        const userId = req.userId;
-        const products = await ProductModel.find({ productSeller: userId })
-            .populate('productSeller', 'userName email userPhoneNumber _id userRatingByVotes')
+        const productsQuery = buildProductsQuery(req.query.search, {
+            productSeller: req.userId,
+        });
+
+        const products = await ProductModel.find(productsQuery)
+            .populate('productSeller', SELLER_PUBLIC_FIELDS)
             .sort({ createdAt: -1 })
             .lean();
+
         return successRes(res, { products });
     } catch (error) {
         console.error(error);

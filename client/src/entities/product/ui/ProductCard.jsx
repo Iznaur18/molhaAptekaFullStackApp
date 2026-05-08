@@ -1,15 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 
+import { AddToCartButton } from "../../../features/cart-add/ui/AddToCartButton.jsx";
+import {
+  COMMON_UI,
+  PRODUCT_CARD_UI,
+} from "../../../shared/config/appUiCopy.js";
 import { formatProductFieldForDisplay } from "../lib/formatProductFieldForDisplay.js";
 import {
   PRODUCT_FIELD_LABEL_RU,
   PRODUCT_IMAGE_PLACEHOLDER_URL,
   PRODUCT_MODEL_FIELD_KEYS,
 } from "../model/productConstants.js";
-import {
-  COMMON_UI,
-  PRODUCT_CARD_UI,
-} from "../../../shared/config/appUiCopy.js";
 
 import { ProductImageLightbox } from "./ProductImageLightbox.jsx";
 
@@ -210,9 +211,13 @@ export function ProductCard({
           );
         })}
       </dl>
-      {onDeleteProduct ? (
-        <div className="product-card__footer-actions">{renderDeleteFooter()}</div>
-      ) : null}
+      <div className="product-card__footer-actions">
+        {onDeleteProduct
+          ? renderDeleteFooter()
+          : product.productIsAvailable !== false && product._id != null ? (
+              <AddToCartButton productId={String(product._id)} />
+            ) : null}
+      </div>
     </article>
   );
 }

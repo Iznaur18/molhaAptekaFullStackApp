@@ -112,6 +112,11 @@
   background: rgba(31, 111, 235, 0.08);
 }
 
+.home-page__search-row {
+  width: min(100%, 28rem);
+  margin: 0 0 0.65rem;
+}
+
 .home-page__category-list {
   position: absolute;
   left: 0;

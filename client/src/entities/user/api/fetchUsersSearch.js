@@ -42,33 +42,3 @@ export async function fetchUsersSearchPage(params = {}) {
     throw new Error(message);
   }
 }
-
-/**
- * Все страницы поиска (пустой search = все пользователи), до лимита API.
- *
- * @returns {Promise<import('../model/types.js').UserSearchListItem[]>}
- */
-export async function fetchAllUsersForPublicList() {
-  try {
-    const limit = USER_SEARCH_UI.API_PAGE_LIMIT;
-    const merged = [];
-    let page = 1;
-    let total = Infinity;
-
-    while (merged.length < total) {
-      const { users, total: t } = await fetchUsersSearchPage({ page, limit });
-      total = t;
-      merged.push(...users);
-      if (users.length < limit) break;
-      page += 1;
-    }
-
-    return merged;
-  } catch (e) {
-    const message =
-      e instanceof Error
-        ? e.message
-        : API_CLIENT_UI.FETCH_USERS_SEARCH_FALLBACK;
-    throw new Error(message);
-  }
-}

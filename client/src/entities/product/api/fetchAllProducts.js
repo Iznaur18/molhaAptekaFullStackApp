@@ -2,18 +2,27 @@ import { apiClient } from "../../../shared/api/index.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 import { PRODUCTS_FETCH_PAGE_LIMIT } from "../model/productConstants.js";
 
+const buildPaginationParams = (page, limit, search) => ({
+  page,
+  limit,
+  ...(search ? { search } : {}),
+});
+
 /**
+ * `GET /product` — все товары каталога. При указании `search` — фильтрация по названию.
+ *
+ * @param {{ search?: string }} [options]
  * @returns {Promise<import('../model/types.js').ProductFromApi[]>}
  */
-export async function fetchAllProducts() {
+export async function fetchAllProducts({ search } = {}) {
   const limit = PRODUCTS_FETCH_PAGE_LIMIT;
-  let page = 1;
   /** @type {import('../model/types.js').ProductFromApi[]} */
   const all = [];
+  let page = 1;
 
   while (true) {
     const { data } = await apiClient.get("/product", {
-      params: { page, limit },
+      params: buildPaginationParams(page, limit, search),
     });
 
     if (!data?.success || !data.data) {

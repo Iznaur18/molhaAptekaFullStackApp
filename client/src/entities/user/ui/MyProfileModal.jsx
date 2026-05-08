@@ -15,6 +15,9 @@ import "./MyProfileModal.css";
  * errorMessage?: string | null;
  * onLogout: () => void;
  * onMyProductsClick?: () => void;
+ * onMySalesClick?: () => void;
+ * onMyOrdersClick?: () => void;
+ * onAdminOrdersClick?: () => void;
  * }} props
  */
 export function MyProfileModal({
@@ -25,6 +28,9 @@ export function MyProfileModal({
   errorMessage = null,
   onLogout,
   onMyProductsClick,
+  onMySalesClick,
+  onMyOrdersClick,
+  onAdminOrdersClick,
 }) {
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
 
@@ -73,12 +79,13 @@ export function MyProfileModal({
     </div>
   ) : null;
 
-  const canUseMyProducts = Boolean(user) && !isLoading && !errorMessage;
+  const isProfileReady = Boolean(user) && !isLoading && !errorMessage;
+  const canUseMyProducts = isProfileReady && Boolean(onMyProductsClick);
+  const canUseMySales = isProfileReady && Boolean(onMySalesClick);
+  const canUseMyOrders = isProfileReady && Boolean(onMyOrdersClick);
+  const canUseAdminOrders =
+    isProfileReady && Boolean(onAdminOrdersClick) && user?.userRole === "admin";
   const isProfileTabActive = !isLoading;
-
-  const handleMyProductsClick = () => {
-    onMyProductsClick?.();
-  };
 
   const profileTitleClassName = [
     "my-profile-modal__header-action",
@@ -101,14 +108,41 @@ export function MyProfileModal({
   );
 
   const titleAccessory = (
-    <button
-      type="button"
-      className="my-profile-modal__header-action"
-      disabled={!canUseMyProducts}
-      onClick={handleMyProductsClick}
-    >
-      {MY_PROFILE_MODAL_UI.TAB_MY_PRODUCTS}
-    </button>
+    <div className="my-profile-modal__header-actions">
+      <button
+        type="button"
+        className="my-profile-modal__header-action"
+        disabled={!canUseMyProducts}
+        onClick={() => onMyProductsClick?.()}
+      >
+        {MY_PROFILE_MODAL_UI.TAB_MY_PRODUCTS}
+      </button>
+      <button
+        type="button"
+        className="my-profile-modal__header-action"
+        disabled={!canUseMySales}
+        onClick={() => onMySalesClick?.()}
+      >
+        {MY_PROFILE_MODAL_UI.TAB_MY_SALES}
+      </button>
+      <button
+        type="button"
+        className="my-profile-modal__header-action"
+        disabled={!canUseMyOrders}
+        onClick={() => onMyOrdersClick?.()}
+      >
+        {MY_PROFILE_MODAL_UI.TAB_MY_ORDERS}
+      </button>
+      {canUseAdminOrders ? (
+        <button
+          type="button"
+          className="my-profile-modal__header-action"
+          onClick={() => onAdminOrdersClick?.()}
+        >
+          {MY_PROFILE_MODAL_UI.TAB_ADMIN_ORDERS}
+        </button>
+      ) : null}
+    </div>
   );
 
   return (

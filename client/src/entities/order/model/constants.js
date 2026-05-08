@@ -1,25 +1,40 @@
-/** Как `default: 'pending'` у `status` в `server/models/OrderModel.js`. */
+/** Способы оплаты — совпадают с `enum` в `server/constants/orderConstants.js`. */
+export const ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY = "cashOnDelivery";
+export const ORDER_PAYMENT_METHOD_CARD_PREPAID = "cardPrepaid";
+
+export const ORDER_PAYMENT_METHODS = [
+  ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
+  ORDER_PAYMENT_METHOD_CARD_PREPAID,
+];
+
+export const ORDER_PAYMENT_METHOD_LABEL_RU = {
+  [ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY]: "Наличными при получении",
+  [ORDER_PAYMENT_METHOD_CARD_PREPAID]: "Картой заранее",
+};
+
+/** Статусы заказа — совпадают с `enum` в `server/constants/orderConstants.js`. */
 export const ORDER_STATUS_PENDING = "pending";
+export const ORDER_STATUS_CONFIRMED = "confirmed";
+export const ORDER_STATUS_SHIPPED = "shipped";
+export const ORDER_STATUS_DELIVERED = "delivered";
+export const ORDER_STATUS_CANCELLED = "cancelled";
 
-/**
- * Пример `paymentMethod`; на сервере поле — `String` без enum.
- * Используйте свои константы под реальные способы оплаты.
- */
-export const ORDER_PAYMENT_METHOD_CARD = "card";
+export const ORDER_STATUSES = [
+  ORDER_STATUS_PENDING,
+  ORDER_STATUS_CONFIRMED,
+  ORDER_STATUS_SHIPPED,
+  ORDER_STATUS_DELIVERED,
+  ORDER_STATUS_CANCELLED,
+];
 
-/** Как `min: 1` у `quantity` в элементе `items` на сервере. */
+export const ORDER_STATUS_LABEL_RU = {
+  [ORDER_STATUS_PENDING]: "В обработке",
+  [ORDER_STATUS_CONFIRMED]: "Подтверждён",
+  [ORDER_STATUS_SHIPPED]: "Отправлен",
+  [ORDER_STATUS_DELIVERED]: "Доставлен",
+  [ORDER_STATUS_CANCELLED]: "Отменён",
+};
+
 export const ORDER_LINE_ITEM_QUANTITY_MIN = 1;
 
-/** Порядок полей lean-документа заказа для визуализации. */
-export const ORDER_STRUCTURE_KEYS = [
-  "_id",
-  "userBuyerId",
-  "items",
-  "totalAmount",
-  "deliveryAddress",
-  "deliveryDate",
-  "paymentMethod",
-  "status",
-  "createdAt",
-  "updatedAt",
-];
+export const CART_STORAGE_KEY = "rassro:cart";

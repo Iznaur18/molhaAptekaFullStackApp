@@ -4,7 +4,16 @@ import { loginUserController, userGetProfileController, userMeController, userUp
 import { authTelegramController } from './User/authTelegramController.js';
 import { userVoteRatingController, userGetRatingController, getMyVoteForTargetController } from './User/userVoteRatingController.js';
 import { userSearchController } from './User/userSearchController.js';
-import { makeOrderController, getMyOrdersController, getAllOrdersController } from './Order/makeOrderController.js';
+import { makeOrderController } from './Order/makeOrderController.js';
+import { getMyOrdersController } from './Order/getMyOrdersController.js';
+import { getMySalesController } from './Order/getMySalesController.js';
+import { getAllOrdersController } from './Order/getAllOrdersController.js';
+import { updateOrderStatusController } from './Order/updateOrderStatusController.js';
+import {
+    markOrderItemShippedBySellerController,
+    markOrderItemDeliveredBySellerController,
+    confirmOrderItemByBuyerController,
+} from './Order/updateOrderItemStatusController.js';
 import { postProductController } from './Product/postProductController.js';
 import { getProductsController, getMyProductsController } from './Product/getProducts.js';
 import { deleteMyProductController } from './Product/deleteMyProductController.js';
@@ -24,7 +33,12 @@ export {
     userSearchController,
     makeOrderController,
     getMyOrdersController,
+    getMySalesController,
     getAllOrdersController,
+    updateOrderStatusController,
+    markOrderItemShippedBySellerController,
+    markOrderItemDeliveredBySellerController,
+    confirmOrderItemByBuyerController,
     postProductController,
     getProductsController,
     getMyProductsController,
