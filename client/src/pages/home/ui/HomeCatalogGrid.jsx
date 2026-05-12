@@ -31,6 +31,8 @@ const pickEmptyMessage = ({ products, hasQuery, isMineMode, isFiltered }) => {
  *   onOpenProductDetails: (product: import('../../../entities/product/model/types.js').ProductFromApi) => void;
  *   onSetMyProductAvailability: (productId: string, productIsAvailable: boolean) => void | Promise<void>;
  *   togglingAvailabilityProductId: string | null;
+ *   isAuthorized: boolean;
+ *   onRequestLoginAddToCart: () => void;
  * }} props
  */
 export function HomeCatalogGrid({
@@ -45,6 +47,8 @@ export function HomeCatalogGrid({
   onOpenProductDetails,
   onSetMyProductAvailability,
   togglingAvailabilityProductId,
+  isAuthorized,
+  onRequestLoginAddToCart,
 }) {
   const visibleProducts = useMemo(() => {
     if (!selectedProductCategory) return products;
@@ -89,6 +93,8 @@ export function HomeCatalogGrid({
                   togglingAvailabilityProductId === String(product._id)
                 }
                 onOpenDetails={onOpenProductDetails}
+                isAuthorized={isAuthorized}
+                onRequestLoginAddToCart={onRequestLoginAddToCart}
               />
             </div>
           ))}

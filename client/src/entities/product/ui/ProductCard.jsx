@@ -28,6 +28,8 @@ function isAbsoluteHttpUrl(value) {
  * @param {(productId: string, productIsAvailable: boolean) => void | Promise<void>} [props.onSetProductAvailability]
  * @param {boolean} [props.isAvailabilityTogglePending]
  * @param {(product: import('../model/types.js').ProductFromApi) => void} props.onOpenDetails
+ * @param {boolean} props.isAuthorized
+ * @param {() => void} props.onRequestLoginAddToCart
  */
 export function ProductCard({
   product,
@@ -37,6 +39,8 @@ export function ProductCard({
   onSetProductAvailability,
   isAvailabilityTogglePending = false,
   onOpenDetails,
+  isAuthorized,
+  onRequestLoginAddToCart,
 }) {
   const heading = product.productName?.trim() || PRODUCT_CARD_UI.DEFAULT_TITLE;
   const galleryUrls = useMemo(() => resolveProductImageUrls(product), [product]);
@@ -340,7 +344,11 @@ export function ProductCard({
             {renderDeleteFooter()}
           </>
         ) : product.productIsAvailable !== false && product._id != null ? (
-          <AddToCartButton productId={String(product._id)} />
+          <AddToCartButton
+            productId={String(product._id)}
+            isAuthorized={isAuthorized}
+            onRequestLogin={onRequestLoginAddToCart}
+          />
         ) : null}
       </div>
     </article>

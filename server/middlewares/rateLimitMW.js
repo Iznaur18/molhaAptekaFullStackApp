@@ -75,3 +75,15 @@ export const uploadRateLimiter = rateLimit({
     standardHeaders: true,
     legacyHeaders: false,
 });
+
+/** Лимит на полную замену корзины (частые debounce-сейвы с клиента). */
+export const cartReplaceRateLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 400,
+    message: {
+        success: false,
+        message: 'Слишком много обновлений корзины. Попробуйте позже',
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+});

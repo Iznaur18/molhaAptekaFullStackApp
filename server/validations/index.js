@@ -14,6 +14,7 @@ import { updateOrderStatusValidation } from './order/updateOrderStatusValidation
 import { getAllOrdersValidation } from './order/getAllOrdersValidation.js';
 import { getMySalesValidation } from './order/getMySalesValidation.js';
 import { orderItemActionValidation } from './order/orderItemActionValidation.js';
+import { replaceMyCartValidation } from './cart/replaceMyCartValidation.js';
 
 export { 
     loginUserValidation, 
@@ -34,4 +35,5 @@ export {
     getAllOrdersValidation,
     getMySalesValidation,
     orderItemActionValidation,
+    replaceMyCartValidation,
 };

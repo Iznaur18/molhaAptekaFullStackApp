@@ -3,7 +3,15 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import helmet from 'helmet';
-import { uploadRouter, authRouter, voteRouter, userRouter, orderRouter, productRouter } from './routes/index.js';
+import {
+    uploadRouter,
+    authRouter,
+    voteRouter,
+    userRouter,
+    orderRouter,
+    productRouter,
+    cartRouter,
+} from './routes/index.js';
 import { generalRateLimiter, errorHandler, notFoundHandler } from './middlewares/index.js';
 
 if (!process.env.JWT_SECRET) {
@@ -42,6 +50,8 @@ app.use('/vote', voteRouter);
 app.use('/user', userRouter);
 
 app.use('/order', orderRouter);
+
+app.use('/cart', cartRouter);
 
 app.use('/product', productRouter);
 

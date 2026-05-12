@@ -1,36 +1,35 @@
 import {
   createContext,
   useCallback,
-  useEffect,
   useMemo,
   useReducer,
+  useRef,
 } from "react";
 
+import { replaceMyCart } from "../api/replaceMyCart.js";
+import { AUTH_TOKEN_STORAGE_KEY } from "../../../shared/api/index.js";
 import {
   CART_ACTION_ADD,
   CART_ACTION_CLEAR,
+  CART_ACTION_HYDRATE,
   CART_ACTION_REMOVE,
   CART_ACTION_SET_QUANTITY,
   cartReducer,
 } from "./cartReducer.js";
-import { readCartFromStorage, writeCartToStorage } from "./cartStorage.js";
 
 /** @type {import('react').Context<import('./types.js').CartContextValue | null>} */
 export const CartContext = createContext(null);
 
 const sumQuantities = (items) =>
-  Object.values(items).reduce((sum, qty) => sum + qty, 0);
-
-export function CartProvider({ children }) {
-  const [items, dispatch] = useReducer(
-    cartReducer,
-    undefined,
-    readCartFromStorage,
+  Object.values(items).reduce(
+    (sum, qty) => sum + Math.floor(Number(qty) || 0),
+    0,
   );
 
-  useEffect(() => {
-    writeCartToStorage(items);
-  }, [items]);
+export function CartProvider({ children }) {
+  const [items, dispatch] = useReducer(cartReducer, {});
+  const itemsRef = useRef(items);
+  itemsRef.current = items;
 
   const addItem = useCallback((productId, quantity = 1) => {
     dispatch({ type: CART_ACTION_ADD, productId, quantity });
@@ -48,6 +47,30 @@ export function CartProvider({ children }) {
     dispatch({ type: CART_ACTION_CLEAR });
   }, []);
 
+  const hydrateCart = useCallback(
+    /** @param {import('./types.js').CartItemsByProductId} payload */
+    (payload) => {
+      dispatch({ type: CART_ACTION_HYDRATE, payload });
+    },
+    [],
+  );
+
+  /** Сохранить текущую корзину на сервер, пока в storage ещё есть JWT (например перед выходом). */
+  const flushRemoteCart = useCallback(async () => {
+    try {
+      let token = null;
+      try {
+        token = localStorage.getItem(AUTH_TOKEN_STORAGE_KEY);
+      } catch {
+        return;
+      }
+      if (!token) return;
+      await replaceMyCart(itemsRef.current);
+    } catch {
+      // выход не блокируем
+    }
+  }, []);
+
   const totalCount = useMemo(() => sumQuantities(items), [items]);
 
   const value = useMemo(
@@ -57,9 +80,20 @@ export function CartProvider({ children }) {
       setItemQuantity,
       removeItem,
       clearCart,
+      hydrateCart,
+      flushRemoteCart,
       totalCount,
     }),
-    [items, addItem, setItemQuantity, removeItem, clearCart, totalCount],
+    [
+      items,
+      addItem,
+      setItemQuantity,
+      removeItem,
+      clearCart,
+      hydrateCart,
+      flushRemoteCart,
+      totalCount,
+    ],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

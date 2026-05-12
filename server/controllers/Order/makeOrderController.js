@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-import { OrderModel, ProductModel, UserModel } from '../../models/index.js';
+import { CartModel, OrderModel, ProductModel, UserModel } from '../../models/index.js';
 import { errorRes, successRes } from '../../utils/index.js';
 
 import {
@@ -87,6 +87,12 @@ export const makeOrderController = async (req, res) => {
 
         await order.populate('userBuyerId', ORDER_BUYER_PUBLIC_FIELDS);
         await order.populate(ORDER_ITEMS_POPULATE);
+
+        await CartModel.findOneAndUpdate(
+            { userId: new mongoose.Types.ObjectId(String(userId)) },
+            { $set: { items: {} } },
+            { upsert: true },
+        );
 
         return successRes(res, { message: 'Заказ успешно создан', order });
     } catch (error) {

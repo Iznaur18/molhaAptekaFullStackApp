@@ -33,6 +33,8 @@ export const API_CLIENT_UI = {
   VOTE_SUBMIT_FALLBACK: "Не удалось отправить оценку",
   FETCH_MY_VOTE_FALLBACK: "Не удалось загрузить вашу оценку",
   CREATE_ORDER_FALLBACK: "Не удалось оформить заказ",
+  FETCH_CART_FALLBACK: "Не удалось загрузить корзину",
+  REPLACE_CART_FALLBACK: "Не удалось сохранить корзину",
   FETCH_MY_ORDERS_FALLBACK: "Не удалось загрузить ваши заказы",
   FETCH_MY_SALES_FALLBACK: "Не удалось загрузить ваши продажи",
   FETCH_ALL_ORDERS_FALLBACK: "Не удалось загрузить заказы",
@@ -107,6 +109,7 @@ export const HOME_PAGE_UI = {
 /** Кнопка добавления товара в корзину */
 export const ADD_TO_CART_UI = {
   ADD: "В корзину",
+  LOGIN_TO_ADD: "Войти, чтобы добавить",
   DECREASE_ARIA: "Уменьшить количество",
   INCREASE_ARIA: "Увеличить количество",
   QUANTITY_ARIA: "Количество в корзине",

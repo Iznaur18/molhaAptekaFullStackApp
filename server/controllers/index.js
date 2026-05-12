@@ -18,6 +18,8 @@ import { postProductController } from './Product/postProductController.js';
 import { getProductsController, getMyProductsController } from './Product/getProducts.js';
 import { deleteMyProductController } from './Product/deleteMyProductController.js';
 import { patchMyProductAvailabilityController } from './Product/patchMyProductAvailabilityController.js';
+import { getMyCartController } from './Cart/getMyCartController.js';
+import { replaceMyCartController } from './Cart/replaceMyCartController.js';
 
 export {
     uploadController,
@@ -45,5 +47,6 @@ export {
     getMyProductsController,
     deleteMyProductController,
     patchMyProductAvailabilityController,
+    getMyCartController,
+    replaceMyCartController,
 };
-    // Получаем в файле routes/uploadRouter.js и используем в router.post('/', uploadMW.single('image'), uploadController);

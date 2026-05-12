@@ -13,7 +13,7 @@ import "./MyProfileModal.css";
  * user: import('../model/types.js').UserPublicProfile | null;
  * isLoading?: boolean;
  * errorMessage?: string | null;
- * onLogout: () => void;
+ * onLogout: () => void | Promise<void>;
  * onEditProfileClick?: () => void;
  * onMyProductsClick?: () => void;
  * onMySalesClick?: () => void;
@@ -75,7 +75,7 @@ export function MyProfileModal({
                 type="button"
                 className="my-profile-modal__logout-yes"
                 onClick={() => {
-                  onLogout();
+                  void onLogout();
                   setIsLogoutConfirmOpen(false);
                 }}
               >

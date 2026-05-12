@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 
+import { useCart } from "../../../entities/cart/model/useCart.js";
+import { CartServerSync } from "../../../entities/cart/ui/CartServerSync.jsx";
+import { CART_STORAGE_KEY } from "../../../entities/order/model/constants.js";
 import { deleteMyProduct } from "../../../entities/product/api/deleteMyProduct.js";
 import { patchMyProductAvailability } from "../../../entities/product/api/patchMyProductAvailability.js";
 import { fetchAllProducts } from "../../../entities/product/api/fetchAllProducts.js";
@@ -72,6 +75,8 @@ const useCurrentUserId = (isAuthorized) => {
 };
 
 export function HomePage() {
+  const { flushRemoteCart } = useCart();
+
   /** @type {[HomeMainView, import('react').Dispatch<import('react').SetStateAction<HomeMainView>>]} */
   const [mainView, setMainView] = useState("catalog");
   /** @type {[ProductsMode, import('react').Dispatch<import('react').SetStateAction<ProductsMode>>]} */
@@ -163,9 +168,11 @@ export function HomePage() {
     setIsEditProfileOpen(false);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await flushRemoteCart();
     try {
       localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
+      localStorage.removeItem(CART_STORAGE_KEY);
     } catch {
       // storage недоступен
     }
@@ -349,12 +356,15 @@ export function HomePage() {
         onOpenProductDetails={setCatalogProductDetails}
         onSetMyProductAvailability={handleSetMyProductAvailability}
         togglingAvailabilityProductId={togglingAvailabilityProductId}
+        isAuthorized={isAuthorized}
+        onRequestLoginAddToCart={() => setIsLoginModalOpen(true)}
       />
     );
   };
 
   return (
     <div className="home-page">
+      <CartServerSync isAuthorized={isAuthorized} />
       <HomePageHeader
         mainView={mainView}
         isMineMode={isMineMode}

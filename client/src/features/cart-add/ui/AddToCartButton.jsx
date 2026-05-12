@@ -5,12 +5,29 @@ import "./AddToCartButton.css";
 
 /**
  * Кнопка добавления товара в корзину. Если товар уже в корзине — показывает stepper.
+ * Без авторизации — предложение войти (корзина только на сервере для залогиненных).
  *
- * @param {{ productId: string }} props
+ * @param {{
+ *   productId: string;
+ *   isAuthorized: boolean;
+ *   onRequestLogin: () => void;
+ * }} props
  */
-export function AddToCartButton({ productId }) {
+export function AddToCartButton({ productId, isAuthorized, onRequestLogin }) {
   const { items, addItem, setItemQuantity, removeItem } = useCart();
   const quantity = items[productId] ?? 0;
+
+  if (!isAuthorized) {
+    return (
+      <button
+        type="button"
+        className="add-to-cart add-to-cart--login"
+        onClick={onRequestLogin}
+      >
+        {ADD_TO_CART_UI.LOGIN_TO_ADD}
+      </button>
+    );
+  }
 
   if (quantity === 0) {
     return (
