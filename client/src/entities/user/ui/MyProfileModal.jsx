@@ -14,6 +14,7 @@ import "./MyProfileModal.css";
  * isLoading?: boolean;
  * errorMessage?: string | null;
  * onLogout: () => void;
+ * onEditProfileClick?: () => void;
  * onMyProductsClick?: () => void;
  * onMySalesClick?: () => void;
  * onMyOrdersClick?: () => void;
@@ -27,6 +28,7 @@ export function MyProfileModal({
   isLoading = false,
   errorMessage = null,
   onLogout,
+  onEditProfileClick,
   onMyProductsClick,
   onMySalesClick,
   onMyOrdersClick,
@@ -39,47 +41,60 @@ export function MyProfileModal({
   }, [isOpen]);
 
   const showLogoutBlock = !isLoading;
+  const isProfileReady = Boolean(user) && !isLoading && !errorMessage;
+  const showEditProfile =
+    isProfileReady && typeof onEditProfileClick === "function";
 
   const footer = showLogoutBlock ? (
-    <div className="my-profile-modal__logout">
-      {!isLogoutConfirmOpen ? (
+    <div className="my-profile-modal__footer-row">
+      {showEditProfile ? (
         <button
           type="button"
-          className="my-profile-modal__logout-trigger"
-          onClick={() => setIsLogoutConfirmOpen(true)}
+          className="my-profile-modal__edit-profile"
+          onClick={onEditProfileClick}
         >
-          {MY_PROFILE_MODAL_UI.LOGOUT}
+          {MY_PROFILE_MODAL_UI.EDIT_PROFILE}
         </button>
-      ) : (
-        <div className="my-profile-modal__logout-confirm">
-          <p className="my-profile-modal__logout-question">
-            {MY_PROFILE_MODAL_UI.LOGOUT_CONFIRM}
-          </p>
-          <div className="my-profile-modal__logout-actions">
-            <button
-              type="button"
-              className="my-profile-modal__logout-yes"
-              onClick={() => {
-                onLogout();
-                setIsLogoutConfirmOpen(false);
-              }}
-            >
-              {MY_PROFILE_MODAL_UI.LOGOUT_YES}
-            </button>
-            <button
-              type="button"
-              className="my-profile-modal__logout-cancel"
-              onClick={() => setIsLogoutConfirmOpen(false)}
-            >
-              {MY_PROFILE_MODAL_UI.LOGOUT_CANCEL}
-            </button>
+      ) : null}
+      <div className="my-profile-modal__logout">
+        {!isLogoutConfirmOpen ? (
+          <button
+            type="button"
+            className="my-profile-modal__logout-trigger"
+            onClick={() => setIsLogoutConfirmOpen(true)}
+          >
+            {MY_PROFILE_MODAL_UI.LOGOUT}
+          </button>
+        ) : (
+          <div className="my-profile-modal__logout-confirm">
+            <p className="my-profile-modal__logout-question">
+              {MY_PROFILE_MODAL_UI.LOGOUT_CONFIRM}
+            </p>
+            <div className="my-profile-modal__logout-actions">
+              <button
+                type="button"
+                className="my-profile-modal__logout-yes"
+                onClick={() => {
+                  onLogout();
+                  setIsLogoutConfirmOpen(false);
+                }}
+              >
+                {MY_PROFILE_MODAL_UI.LOGOUT_YES}
+              </button>
+              <button
+                type="button"
+                className="my-profile-modal__logout-cancel"
+                onClick={() => setIsLogoutConfirmOpen(false)}
+              >
+                {MY_PROFILE_MODAL_UI.LOGOUT_CANCEL}
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   ) : null;
 
-  const isProfileReady = Boolean(user) && !isLoading && !errorMessage;
   const canUseMyProducts = isProfileReady && Boolean(onMyProductsClick);
   const canUseMySales = isProfileReady && Boolean(onMySalesClick);
   const canUseMyOrders = isProfileReady && Boolean(onMyOrdersClick);

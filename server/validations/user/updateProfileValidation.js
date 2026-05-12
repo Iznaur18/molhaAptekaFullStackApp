@@ -1,5 +1,10 @@
 import { body, param } from 'express-validator';
 import { handleValidationByExpressErrors } from '../handleValidationByExpressErrors.js';
+import {
+  assertUserNameFormat,
+  normalizeUserNameInput,
+} from './userNameRules.js';
+import { assertAtMostWords } from '../../utils/maxWordsText.js';
 
 /**
  * Валидация параметра userId в URL
@@ -17,17 +22,23 @@ export const userIdParamValidation = [
  * Валидация обновления профиля пользователя
  */
 export const updateProfileValidation = [
-    body('userName') // body значит из запроса req.body. Берем поле userName из тела запроса согласно МОДЕЛИ UserModel
-        .optional({ nullable: true, checkFalsy: true }) // опциональное поле, nullable: true - разрешает null, checkFalsy: true - разрешает false
-        .trim() // обрезаем пробелы перед валидацией
+    body('userName')
+        .optional({ nullable: true, checkFalsy: true })
+        .customSanitizer((value) => {
+            if (value === null || value === undefined) return value;
+            if (typeof value === 'string' && value.trim() === '') return null;
+            return normalizeUserNameInput(value);
+        })
         .custom((value) => {
-            if (value === null || value === '') { // если значение null или пустое, то разрешаем
-                return true; // Разрешаем null для очистки
+            if (value === null || value === '') {
+                return true;
             }
-            if (typeof value !== 'string' || value.length < 3) { // если значение не строка или длина строки меньше 3 символов, то ошибка
-                throw new Error('Имя пользователя должно быть строкой не менее 3 символов');
+            try {
+                assertUserNameFormat(value);
+            } catch (e) {
+                throw new Error(e instanceof Error ? e.message : 'Неверный никнейм');
             }
-            return true; // возвращаем true
+            return true;
         }),
     
     body('userBirthDate')
@@ -60,6 +71,11 @@ export const updateProfileValidation = [
             }
             if (typeof value !== 'string') { // если значение не строка, то ошибка
                 throw new Error('Адрес должен быть строкой');
+            }
+            try {
+                assertAtMostWords(value, 'Адрес');
+            } catch (e) {
+                throw new Error(e instanceof Error ? e.message : 'Слишком длинный адрес');
             }
             return true; // возвращаем true
         }),
@@ -145,6 +161,11 @@ export const updateProfileValidation = [
             }
             if (typeof value !== 'string') {
                 throw new Error('Заметки должны быть строкой');
+            }
+            try {
+                assertAtMostWords(value, 'Заметки о пользователе');
+            } catch (e) {
+                throw new Error(e instanceof Error ? e.message : 'Слишком длинный текст');
             }
             return true;
         }),

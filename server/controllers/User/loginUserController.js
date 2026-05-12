@@ -116,7 +116,10 @@ export const userUpdateProfileController = async (req, res) => {
                 } else if (field === 'userDiscountPercent') {
                     // Конвертация в число (валидация диапазона уже выполнена в middleware)
                     updateData[field] = Number(value);
-                } else if (field === 'userName' || field === 'userPhoneNumber' || field === 'userAddress' || field === 'notesAboutUser') {
+                } else if (field === 'userName') {
+                    updateData[field] =
+                        typeof value === 'string' ? value.trim().toLowerCase() : value;
+                } else if (field === 'userPhoneNumber' || field === 'userAddress' || field === 'notesAboutUser') {
                     // Для строковых полей применяем trim (валидация уже выполнена в middleware)
                     updateData[field] = typeof value === 'string' ? value.trim() : value;
                 } else {

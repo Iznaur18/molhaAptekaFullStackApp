@@ -17,6 +17,7 @@ import {
 import { postProductController } from './Product/postProductController.js';
 import { getProductsController, getMyProductsController } from './Product/getProducts.js';
 import { deleteMyProductController } from './Product/deleteMyProductController.js';
+import { patchMyProductAvailabilityController } from './Product/patchMyProductAvailabilityController.js';
 
 export {
     uploadController,
@@ -42,6 +43,7 @@ export {
     postProductController,
     getProductsController,
     getMyProductsController,
-    deleteMyProductController
+    deleteMyProductController,
+    patchMyProductAvailabilityController,
 };
     // Получаем в файле routes/uploadRouter.js и используем в router.post('/', uploadMW.single('image'), uploadController);

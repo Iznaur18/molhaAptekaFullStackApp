@@ -83,6 +83,7 @@ const useCurrentUserAddress = (isAuthorized) => {
  *   onRequestLogin: () => void;
  *   onGoToCatalog: () => void;
  *   onCheckoutSuccess: () => void;
+ *   onSellerNameClick?: (userId: string) => void;
  * }} props
  */
 export function CartPage({
@@ -90,6 +91,7 @@ export function CartPage({
   onRequestLogin,
   onGoToCatalog,
   onCheckoutSuccess,
+  onSellerNameClick,
 }) {
   const { items, clearCart } = useCart();
   const { phase, products, error } = useCatalogProducts();
@@ -220,6 +222,7 @@ export function CartPage({
         isOpen={selectedProduct != null}
         product={selectedProduct}
         onClose={() => setSelectedProduct(null)}
+        onSellerNameClick={onSellerNameClick}
       />
     </div>
   );

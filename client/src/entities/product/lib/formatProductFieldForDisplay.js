@@ -3,6 +3,7 @@ import {
   FORMAT_BOOLEAN_RU,
 } from "../../../shared/config/appUiCopy.js";
 import { PRODUCT_CATEGORY_LABEL_RU } from "../model/productConstants.js";
+import { resolveProductImageUrls } from "./resolveProductImageUrls.js";
 
 const RUBLE_FORMAT = new Intl.NumberFormat(COMMON_UI.LOCALE_RU, {
   style: "currency",
@@ -52,6 +53,11 @@ export function formatProductFieldForDisplay(key, product) {
       return raw == null ? COMMON_UI.EM_DASH : String(raw);
     case "productDescription":
       return raw == null || raw === "" ? COMMON_UI.EM_DASH : String(raw);
+    case "productImageUrls": {
+      const urls = resolveProductImageUrls(product);
+      if (urls.length === 0) return COMMON_UI.EM_DASH;
+      return `${urls.length} шт.`;
+    }
     case "productImageUrl":
       return isAbsoluteHttpUrl(raw) ? raw.trim() : COMMON_UI.EM_DASH;
     case "productPrice":

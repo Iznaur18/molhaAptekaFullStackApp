@@ -1,5 +1,10 @@
 import { body } from 'express-validator';
 import { handleValidationByExpressErrors } from '../handleValidationByExpressErrors.js';
+import {
+  assertUserNameFormat,
+  normalizeUserNameInput,
+} from './userNameRules.js';
+import { assertAtMostWords } from '../../utils/maxWordsText.js';
 
 const USER_GENDER_VALUES = ['male', 'female', 'noSelected'];
 
@@ -11,8 +16,16 @@ export const registerUserValidation = [
   body('userName')
     .optional({ values: 'falsy' })
     .trim()
-    .isLength({ min: 3 })
-    .withMessage('Ник должен быть не менее 3 символов'),
+    .customSanitizer((value) => normalizeUserNameInput(value))
+    .custom((value) => {
+      if (value === undefined || value === '') return true;
+      try {
+        assertUserNameFormat(value);
+      } catch (e) {
+        throw new Error(e instanceof Error ? e.message : 'Неверный никнейм');
+      }
+      return true;
+    }),
 
   body('phoneNumber')
     .optional({ values: 'falsy' })
@@ -42,7 +55,16 @@ export const registerUserValidation = [
     .trim()
     .isString()
     .isLength({ max: 2000 })
-    .withMessage('Адрес слишком длинный'),
+    .withMessage('Адрес слишком длинный')
+    .custom((value) => {
+      if (value === undefined || value === '') return true;
+      try {
+        assertAtMostWords(value, 'Адрес');
+      } catch (e) {
+        throw new Error(e instanceof Error ? e.message : 'Слишком длинный адрес');
+      }
+      return true;
+    }),
 
   body('notificationsEnabled').optional().isBoolean().withMessage('notificationsEnabled должен быть boolean'),
 

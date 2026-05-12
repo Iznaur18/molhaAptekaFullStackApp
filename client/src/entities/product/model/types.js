@@ -18,6 +18,7 @@
  * @property {string} _id
  * @property {string} productName
  * @property {string} [productDescription]
+ * @property {string[]} [productImageUrls]
  * @property {string} [productImageUrl]
  * @property {number} productPrice
  * @property {ProductSellerPopulated|string} productSeller

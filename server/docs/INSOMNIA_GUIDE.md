@@ -63,6 +63,10 @@
 {
   "productName": "Aspirin",
   "productDescription": "Pain relief tablets, 20 pcs",
+  "productImageUrls": [
+    "https://example.com/a.jpg",
+    "https://example.com/b.jpg"
+  ],
   "productPrice": 199.99,
   "productCategory": "food",
   "productIsAvailable": true

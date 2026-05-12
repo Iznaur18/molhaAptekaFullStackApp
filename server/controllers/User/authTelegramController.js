@@ -1,5 +1,10 @@
 import { UserModel } from '../../models/index.js';
 import { sendUserWithToken, errorRes } from '../../utils/index.js';
+import {
+  assertUserNameFormat,
+  defaultTelegramUserName,
+  normalizeUserNameInput,
+} from '../../validations/user/userNameRules.js';
 
 /** Вход/регистрация через Telegram. POST /auth/telegram — если пользователь есть, логин; иначе создание. */
 export const authTelegramController = async (req, res) => { // обработчик входа/регистрации через Telegram
@@ -12,8 +17,23 @@ export const authTelegramController = async (req, res) => { // обработч�
             return sendUserWithToken(findedUser, res); // отправляем пользователя с токеном
         }
 
-        const doc = new UserModel({ // создаем новый пользователя в базе данных если пользователь не найден по telegramUserId
-            userName: userName ?? `tg_${telegramUserId}`, // если userName не передан в запросе, подставляем tg_<telegramUserId>
+        let resolvedUserName;
+        try {
+            const normalized = normalizeUserNameInput(userName);
+            if (normalized !== undefined) {
+                assertUserNameFormat(normalized);
+                resolvedUserName = normalized;
+            } else {
+                resolvedUserName = defaultTelegramUserName(telegramUserId);
+            }
+        } catch (e) {
+            const msg =
+                e instanceof Error ? e.message : 'Неверный никнейм для Telegram';
+            return errorRes(res, 400, msg);
+        }
+
+        const doc = new UserModel({
+            userName: resolvedUserName,
             userAvatarUrl: avatarUrl ?? undefined, // если avatarUrl не передан в запросе, подставляем undefined
             userAddress: address ?? undefined, // если address не передан в запросе, подставляем undefined
             telegramUserId, // telegramUserId передаем в документ

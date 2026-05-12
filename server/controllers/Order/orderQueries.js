@@ -1,7 +1,7 @@
 /** Поля популяции для отображения позиций заказа на клиенте. */
 export const ORDER_ITEMS_POPULATE = {
     path: 'items.productId',
-    select: 'productName productPrice productImageUrl productSeller',
+    select: 'productName productPrice productImageUrls productSeller',
     populate: { path: 'productSeller', select: 'userName _id' },
 };
 

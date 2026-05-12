@@ -25,7 +25,7 @@ const buildItemsWithPriceSnapshot = (items, priceById) =>
 const fetchAvailableProductPrices = async (productIds) => {
     const products = await ProductModel.find({
         _id: { $in: productIds },
-        productIsAvailable: true,
+        productIsAvailable: { $ne: false },
     })
         .select('_id productPrice')
         .lean();

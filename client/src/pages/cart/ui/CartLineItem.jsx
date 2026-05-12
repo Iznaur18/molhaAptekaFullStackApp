@@ -1,4 +1,5 @@
 import { useCart } from "../../../entities/cart/model/useCart.js";
+import { resolveProductImageUrls } from "../../../entities/product/lib/resolveProductImageUrls.js";
 import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../../../entities/product/model/productConstants.js";
 import {
   CART_PAGE_UI,
@@ -8,14 +9,12 @@ import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 
 import "./CartLineItem.css";
 
-function isAbsoluteHttpUrl(value) {
-  return typeof value === "string" && /^https?:\/\//i.test(value.trim());
-}
-
-const pickImageUrl = (product) =>
-  isAbsoluteHttpUrl(product?.productImageUrl)
-    ? product.productImageUrl.trim()
+const pickImageUrl = (product) => {
+  const first = resolveProductImageUrls(product)[0];
+  return typeof first === "string" && /^https?:\/\//i.test(first.trim())
+    ? first.trim()
     : PRODUCT_IMAGE_PLACEHOLDER_URL;
+};
 
 /**
  * @param {{

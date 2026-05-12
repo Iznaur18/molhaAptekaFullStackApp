@@ -6,13 +6,12 @@ import {
   PRODUCT_CARD_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { formatProductFieldForDisplay } from "../lib/formatProductFieldForDisplay.js";
+import { resolveProductImageUrls } from "../lib/resolveProductImageUrls.js";
 import {
+  PRODUCT_CARD_PREVIEW_FIELD_KEYS,
   PRODUCT_FIELD_LABEL_RU,
   PRODUCT_IMAGE_PLACEHOLDER_URL,
-  PRODUCT_MODEL_FIELD_KEYS,
 } from "../model/productConstants.js";
-
-import { ProductImageLightbox } from "./ProductImageLightbox.jsx";
 
 import "./ProductCard.css";
 
@@ -26,25 +25,40 @@ function isAbsoluteHttpUrl(value) {
  * @param {(userId: string) => void} [props.onSellerNameClick]
  * @param {(productId: string) => void | Promise<void>} [props.onDeleteProduct]
  * @param {boolean} [props.isDeletePending]
+ * @param {(productId: string, productIsAvailable: boolean) => void | Promise<void>} [props.onSetProductAvailability]
+ * @param {boolean} [props.isAvailabilityTogglePending]
+ * @param {(product: import('../model/types.js').ProductFromApi) => void} props.onOpenDetails
  */
 export function ProductCard({
   product,
   onSellerNameClick,
   onDeleteProduct,
   isDeletePending = false,
+  onSetProductAvailability,
+  isAvailabilityTogglePending = false,
+  onOpenDetails,
 }) {
   const heading = product.productName?.trim() || PRODUCT_CARD_UI.DEFAULT_TITLE;
-  const primaryImageUrl = useMemo(
-    () =>
-      isAbsoluteHttpUrl(product.productImageUrl)
-        ? product.productImageUrl.trim()
-        : null,
-    [product.productImageUrl],
-  );
+  const galleryUrls = useMemo(() => resolveProductImageUrls(product), [product]);
+  const [cardImageIndex, setCardImageIndex] = useState(0);
+
+  const primaryImageUrl = useMemo(() => {
+    const url = galleryUrls[cardImageIndex];
+    return isAbsoluteHttpUrl(url) ? url.trim() : null;
+  }, [galleryUrls, cardImageIndex]);
   const [imageLoadFailed, setImageLoadFailed] = useState(false);
   const [useFallbackImage, setUseFallbackImage] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
-  const [isImageLightboxOpen, setIsImageLightboxOpen] = useState(false);
+
+  useEffect(() => {
+    setCardImageIndex(0);
+  }, [product._id]);
+
+  useEffect(() => {
+    setCardImageIndex((i) =>
+      Math.min(i, Math.max(0, galleryUrls.length - 1)),
+    );
+  }, [galleryUrls.length]);
 
   useEffect(() => {
     setImageLoadFailed(false);
@@ -58,10 +72,6 @@ export function ProductCard({
   useEffect(() => {
     if (onDeleteProduct == null) setIsDeleteConfirmOpen(false);
   }, [onDeleteProduct]);
-
-  useEffect(() => {
-    setIsImageLightboxOpen(false);
-  }, [product._id]);
 
   const imageUrl = useFallbackImage
     ? PRODUCT_IMAGE_PLACEHOLDER_URL
@@ -88,12 +98,93 @@ export function ProductCard({
     void onDeleteProduct(String(product._id));
   };
 
-  const handleOpenImageLightbox = () => {
-    setIsImageLightboxOpen(true);
+  const isListedForOthers = product.productIsAvailable !== false;
+  const ownerActionsLocked =
+    isDeletePending ||
+    isAvailabilityTogglePending ||
+    isDeleteConfirmOpen;
+
+  const handleAvailabilityToggle = () => {
+    if (onSetProductAvailability == null || product._id == null) return;
+    if (ownerActionsLocked) return;
+    void onSetProductAvailability(String(product._id), !isListedForOthers);
   };
 
-  const handleCloseImageLightbox = () => {
-    setIsImageLightboxOpen(false);
+  const renderOwnerCatalogVisibility = () => {
+    if (onSetProductAvailability == null) return null;
+
+    if (isAvailabilityTogglePending) {
+      return (
+        <p
+          className="product-card__availability-pending"
+          aria-live="polite"
+        >
+          {PRODUCT_CARD_UI.AVAILABILITY_TOGGLE_PENDING}
+        </p>
+      );
+    }
+
+    return (
+      <div className="product-card__availability">
+        <p className="product-card__availability-status">
+          {isListedForOthers
+            ? PRODUCT_CARD_UI.AVAILABILITY_STATUS_VISIBLE
+            : PRODUCT_CARD_UI.AVAILABILITY_STATUS_HIDDEN}
+        </p>
+        <button
+          type="button"
+          className="product-card__availability-toggle"
+          onClick={handleAvailabilityToggle}
+          disabled={ownerActionsLocked}
+        >
+          {isListedForOthers
+            ? PRODUCT_CARD_UI.HIDE_FROM_CATALOG
+            : PRODUCT_CARD_UI.SHOW_IN_CATALOG}
+        </button>
+      </div>
+    );
+  };
+
+  const handleOpenDetails = () => {
+    onOpenDetails(product);
+  };
+
+  /** @param {import('react').KeyboardEvent<HTMLDivElement>} event */
+  const handleDetailsSurfaceKeyDown = (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    onOpenDetails(product);
+  };
+
+  /** @param {import('react').MouseEvent<HTMLButtonElement>} event */
+  const handleSellerClick = (event) => {
+    event.stopPropagation();
+    const raw = product.productSeller;
+    if (
+      typeof onSellerNameClick !== "function" ||
+      raw == null ||
+      typeof raw !== "object" ||
+      raw._id == null
+    ) {
+      return;
+    }
+    onSellerNameClick(String(raw._id));
+  };
+
+  /** @param {import('react').MouseEvent<HTMLButtonElement>} event */
+  const handleCardImagePrev = (event) => {
+    event.stopPropagation();
+    const n = galleryUrls.length;
+    if (n <= 1) return;
+    setCardImageIndex((i) => (i - 1 + n) % n);
+  };
+
+  /** @param {import('react').MouseEvent<HTMLButtonElement>} event */
+  const handleCardImageNext = (event) => {
+    event.stopPropagation();
+    const n = galleryUrls.length;
+    if (n <= 1) return;
+    setCardImageIndex((i) => (i + 1) % n);
   };
 
   const renderDeleteFooter = () => {
@@ -147,15 +238,24 @@ export function ProductCard({
     );
   };
 
+  const detailsSurfaceLabel = `${PRODUCT_CARD_UI.OPEN_DETAILS_ARIA} ${heading}`;
+
   return (
-    <article className="product-card" aria-label={heading}>
-      {imageUrl && !imageLoadFailed ? (
-        <>
-          <button
-            type="button"
-            className="product-card__image-trigger"
-            aria-label={PRODUCT_CARD_UI.IMAGE_LIGHTBOX_OPEN_LABEL}
-            onClick={handleOpenImageLightbox}
+    <article className="product-card">
+      <div
+        className="product-card__details-surface"
+        tabIndex={0}
+        aria-label={detailsSurfaceLabel}
+        onClick={handleOpenDetails}
+        onKeyDown={handleDetailsSurfaceKeyDown}
+      >
+        {imageUrl && !imageLoadFailed ? (
+          <div
+            className={
+              galleryUrls.length > 1
+                ? "product-card__image-frame product-card__image-frame--gallery"
+                : "product-card__image-frame"
+            }
           >
             <img
               className="product-card__image"
@@ -166,57 +266,82 @@ export function ProductCard({
               onError={handleImageError}
               draggable={false}
             />
-          </button>
-          {isImageLightboxOpen ? (
-            <ProductImageLightbox
-              onClose={handleCloseImageLightbox}
-              src={imageUrl}
-              alt={heading}
-            />
-          ) : null}
-        </>
-      ) : null}
-      <h2 className="product-card__heading">{heading}</h2>
-      <dl className="product-card__fields">
-        {PRODUCT_MODEL_FIELD_KEYS.map((key) => {
-          const raw = product[key];
-          const display = formatProductFieldForDisplay(key, product);
-          const canOpenSellerProfile =
-            key === "productSeller" &&
-            typeof onSellerNameClick === "function" &&
-            raw != null &&
-            typeof raw === "object" &&
-            raw._id != null &&
-            display !== COMMON_UI.EM_DASH;
-
-          return (
-            <div key={key} className="product-card__row">
-              <dt className="product-card__key">
-                {PRODUCT_FIELD_LABEL_RU[key] ?? key}
-              </dt>
-              <dd className="product-card__value">
-                {canOpenSellerProfile ? (
+            {galleryUrls.length > 1 ? (
+              <>
+                <div className="product-card__image-nav">
                   <button
                     type="button"
-                    className="product-card__seller-name"
-                    onClick={() => onSellerNameClick(String(raw._id))}
+                    className="product-card__image-nav-btn"
+                    aria-label={PRODUCT_CARD_UI.GALLERY_PREV}
+                    onClick={handleCardImagePrev}
                   >
-                    {display}
+                    ‹
                   </button>
-                ) : (
-                  display
-                )}
-              </dd>
-            </div>
-          );
-        })}
-      </dl>
-      <div className="product-card__footer-actions">
-        {onDeleteProduct
-          ? renderDeleteFooter()
-          : product.productIsAvailable !== false && product._id != null ? (
-              <AddToCartButton productId={String(product._id)} />
+                  <button
+                    type="button"
+                    className="product-card__image-nav-btn"
+                    aria-label={PRODUCT_CARD_UI.GALLERY_NEXT}
+                    onClick={handleCardImageNext}
+                  >
+                    ›
+                  </button>
+                </div>
+                <span className="product-card__image-counter" aria-live="polite">
+                  {cardImageIndex + 1} / {galleryUrls.length}
+                </span>
+              </>
             ) : null}
+          </div>
+        ) : null}
+        <h2 className="product-card__heading">{heading}</h2>
+        <dl className="product-card__fields product-card__fields--preview">
+          {PRODUCT_CARD_PREVIEW_FIELD_KEYS.map((key) => {
+            const raw = product[key];
+            const display = formatProductFieldForDisplay(key, product);
+            const canOpenSellerProfile =
+              key === "productSeller" &&
+              typeof onSellerNameClick === "function" &&
+              raw != null &&
+              typeof raw === "object" &&
+              raw._id != null &&
+              display !== COMMON_UI.EM_DASH;
+            const rowClass = ["product-card__row"];
+            if (key === "productPrice") rowClass.push("product-card__row--price");
+            if (key === "productCategory")
+              rowClass.push("product-card__row--category");
+
+            return (
+              <div key={key} className={rowClass.join(" ")}>
+                <dt className="product-card__key">
+                  {PRODUCT_FIELD_LABEL_RU[key] ?? key}
+                </dt>
+                <dd className="product-card__value">
+                  {canOpenSellerProfile ? (
+                    <button
+                      type="button"
+                      className="product-card__seller-name"
+                      onClick={handleSellerClick}
+                    >
+                      {display}
+                    </button>
+                  ) : (
+                    display
+                  )}
+                </dd>
+              </div>
+            );
+          })}
+        </dl>
+      </div>
+      <div className="product-card__footer-actions">
+        {onDeleteProduct ? (
+          <>
+            {renderOwnerCatalogVisibility()}
+            {renderDeleteFooter()}
+          </>
+        ) : product.productIsAvailable !== false && product._id != null ? (
+          <AddToCartButton productId={String(product._id)} />
+        ) : null}
       </div>
     </article>
   );

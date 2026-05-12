@@ -26,7 +26,7 @@ export const registerUserController = async (req, res) => {
 
     const orConditions = [{ email }];
     if (userName != null && String(userName).trim() !== '') {
-      orConditions.push({ userName: String(userName).trim() });
+      orConditions.push({ userName: String(userName).trim().toLowerCase() });
     }
     if (phoneNumber != null && phoneNumber !== '') {
       orConditions.push({ userPhoneNumber: String(phoneNumber).trim() });
@@ -45,7 +45,10 @@ export const registerUserController = async (req, res) => {
     const doc = new UserModel({
       email,
       passwordHash,
-      userName: userName || undefined,
+      userName:
+        userName != null && String(userName).trim() !== ''
+          ? String(userName).trim().toLowerCase()
+          : undefined,
       userPhoneNumber,
       userAvatarUrl: pickUrlOrDefault(avatarUrl, DEFAULT_AVATAR_URL),
       userBackgroundUrl: pickUrlOrDefault(backgroundUrl, DEFAULT_BACKGROUND_URL),

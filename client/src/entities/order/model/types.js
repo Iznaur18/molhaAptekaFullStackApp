@@ -3,7 +3,7 @@
  *
  * @typedef {object} OrderLineItem
  * @property {string} [_id]
- * @property {string | { _id: string; productName?: string; productPrice?: number; productImageUrl?: string; productSeller?: { _id: string; userName?: string } | string }} productId
+ * @property {string | { _id: string; productName?: string; productPrice?: number; productImageUrls?: string[]; productImageUrl?: string; productSeller?: { _id: string; userName?: string } | string }} productId
  * @property {number} quantity
  * @property {number} unitPriceAtOrder
  * @property {number} [itemIndex]

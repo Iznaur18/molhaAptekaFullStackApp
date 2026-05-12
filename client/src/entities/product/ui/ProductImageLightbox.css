@@ -1,7 +1,9 @@
+@import "./productImageTokens.css";
+
 .product-image-lightbox {
   --product-image-lightbox-backdrop: rgb(0 0 0 / 72%);
   --product-image-lightbox-padding: 1rem;
-  --product-image-lightbox-z: 1100;
+  --product-image-lightbox-z: 1400;
 
   position: fixed;
   inset: 0;
@@ -52,16 +54,74 @@
   background: color-mix(in srgb, CanvasText 8%, Canvas);
 }
 
+.product-image-lightbox__stage {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  max-width: calc(100vw - 2 * var(--product-image-lightbox-padding));
+}
+
+.product-image-lightbox__stage--multi .product-image-lightbox__img-box {
+  width: min(
+    var(--product-image-lightbox-viewport),
+    calc(100vw - 2 * var(--product-image-lightbox-padding) - 5.5rem)
+  );
+  height: min(
+    var(--product-image-lightbox-viewport),
+    calc(100vw - 2 * var(--product-image-lightbox-padding) - 5.5rem)
+  );
+}
+
+.product-image-lightbox__img-box {
+  box-sizing: border-box;
+  width: var(--product-image-lightbox-viewport);
+  height: var(--product-image-lightbox-viewport);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-image-lightbox__nav {
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  margin: 0;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, CanvasText 20%, transparent);
+  border-radius: 50%;
+  background: color-mix(in srgb, Canvas 92%, transparent);
+  color: CanvasText;
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.product-image-lightbox__nav:hover {
+  background: Canvas;
+}
+
 .product-image-lightbox__img {
   display: block;
-  max-width: min(
-    100%,
-    calc(100vw - 2 * var(--product-image-lightbox-padding))
-  );
-  max-height: calc(100vh - 2 * var(--product-image-lightbox-padding) - 2.5rem);
+  max-width: 100%;
+  max-height: 100%;
   width: auto;
   height: auto;
   object-fit: contain;
+  object-position: center;
   border-radius: 10px;
   box-shadow: 0 12px 40px rgb(0 0 0 / 35%);
+}
+
+.product-image-lightbox__counter {
+  margin: 0;
+  align-self: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #f9fafb;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 80%);
 }

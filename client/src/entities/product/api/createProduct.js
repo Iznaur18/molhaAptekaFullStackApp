@@ -7,6 +7,7 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
  * @typedef {object} CreateProductBody
  * @property {string} productName
  * @property {string} productDescription
+ * @property {string[]} [productImageUrls]
  * @property {string} [productImageUrl]
  * @property {number} productPrice
  * @property {import('../model/types.js').ProductCategory} productCategory
@@ -28,9 +29,15 @@ export async function createProduct(body) {
       productCategory: body.productCategory,
       productIsAvailable: body.productIsAvailable,
     };
-    const imageUrl = body.productImageUrl?.trim();
-    if (imageUrl) {
-      payload.productImageUrl = imageUrl;
+    const urls = Array.isArray(body.productImageUrls)
+      ? body.productImageUrls.map((s) => String(s).trim()).filter(Boolean)
+      : [];
+    if (urls.length > 0) {
+      payload.productImageUrls = urls;
+    }
+    const legacy = body.productImageUrl?.trim();
+    if (legacy && urls.length === 0) {
+      payload.productImageUrl = legacy;
     }
 
     const { data } = await apiClient.post("/product", payload);

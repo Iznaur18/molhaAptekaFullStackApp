@@ -28,6 +28,9 @@ const pickEmptyMessage = ({ products, hasQuery, isMineMode, isFiltered }) => {
  *   onSellerNameClick: (userId: string) => void;
  *   onDeleteMyProduct: (productId: string) => void;
  *   myProductsCatalogError: string;
+ *   onOpenProductDetails: (product: import('../../../entities/product/model/types.js').ProductFromApi) => void;
+ *   onSetMyProductAvailability: (productId: string, productIsAvailable: boolean) => void | Promise<void>;
+ *   togglingAvailabilityProductId: string | null;
  * }} props
  */
 export function HomeCatalogGrid({
@@ -39,6 +42,9 @@ export function HomeCatalogGrid({
   onSellerNameClick,
   onDeleteMyProduct,
   myProductsCatalogError,
+  onOpenProductDetails,
+  onSetMyProductAvailability,
+  togglingAvailabilityProductId,
 }) {
   const visibleProducts = useMemo(() => {
     if (!selectedProductCategory) return products;
@@ -76,6 +82,13 @@ export function HomeCatalogGrid({
                 onSellerNameClick={onSellerNameClick}
                 onDeleteProduct={isMineMode ? onDeleteMyProduct : undefined}
                 isDeletePending={deletingProductId === String(product._id)}
+                onSetProductAvailability={
+                  isMineMode ? onSetMyProductAvailability : undefined
+                }
+                isAvailabilityTogglePending={
+                  togglingAvailabilityProductId === String(product._id)
+                }
+                onOpenDetails={onOpenProductDetails}
               />
             </div>
           ))}

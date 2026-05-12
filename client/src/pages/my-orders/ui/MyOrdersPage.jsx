@@ -12,7 +12,10 @@ import {
 
 import "./MyOrdersPage.css";
 
-export function MyOrdersPage() {
+/**
+ * @param {{ onSellerNameClick?: (userId: string) => void }} [props]
+ */
+export function MyOrdersPage({ onSellerNameClick }) {
   const [phase, setPhase] = useState("loading");
   const [orders, setOrders] = useState(
     /** @type {import('../../../entities/order/model/types.js').Order[]} */ ([]),
@@ -128,6 +131,7 @@ export function MyOrdersPage() {
         isOpen={selectedProduct != null}
         product={selectedProduct}
         onClose={() => setSelectedProduct(null)}
+        onSellerNameClick={onSellerNameClick}
       />
     </>
   );

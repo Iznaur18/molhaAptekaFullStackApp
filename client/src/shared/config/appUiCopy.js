@@ -22,10 +22,13 @@ export const API_CLIENT_UI = {
   LOGIN_FALLBACK: "Не удалось выполнить вход",
   REGISTER_FALLBACK: "Не удалось зарегистрироваться",
   FETCH_ME_FALLBACK: "Не удалось загрузить мой профиль",
+  UPDATE_PROFILE_FALLBACK: "Не удалось сохранить профиль",
   FETCH_USER_PROFILE_FALLBACK: "Не удалось загрузить профиль",
   FETCH_USERS_SEARCH_FALLBACK: "Не удалось загрузить пользователей",
   FETCH_MY_PRODUCTS_FALLBACK: "Не удалось загрузить ваши товары",
   DELETE_MY_PRODUCT_FALLBACK: "Не удалось удалить товар",
+  PATCH_MY_PRODUCT_AVAILABILITY_FALLBACK:
+    "Не удалось обновить видимость товара",
   CREATE_PRODUCT_FALLBACK: "Не удалось создать товар",
   VOTE_SUBMIT_FALLBACK: "Не удалось отправить оценку",
   FETCH_MY_VOTE_FALLBACK: "Не удалось загрузить вашу оценку",
@@ -221,7 +224,11 @@ export const CREATE_PRODUCT_MODAL_UI = {
   TITLE: "Новый товар",
   LABEL_NAME: "Название",
   LABEL_DESCRIPTION: "Описание",
-  LABEL_IMAGE_URL: "Ссылка на изображение (необязательно)",
+  LABEL_IMAGE_URLS:
+    "Ссылки на изображения (необязательно, до 5 URL с http/https)",
+  ADD_IMAGE_ROW: "Добавить ещё фото",
+  REMOVE_IMAGE_ROW_ARIA: "Удалить поле ссылки на изображение",
+  IMAGE_ROW_ARIA_PREFIX: "Ссылка на изображение",
   LABEL_PRICE: "Цена",
   LABEL_CATEGORY: "Категория",
   LABEL_AVAILABLE: "Товар в наличии",
@@ -231,9 +238,22 @@ export const CREATE_PRODUCT_MODAL_UI = {
   ERROR_GENERIC: "Не удалось создать товар",
 };
 
+/** Модалка карточки товара в каталоге */
+export const PRODUCT_DETAILS_MODAL_UI = {
+  GALLERY_THUMBS_ARIA: "Дополнительные фотографии товара",
+  OPEN_GALLERY_FULLSCREEN: "Просмотреть все фото в полном экране",
+  SLIDER_REGION_ARIA: "Слайдер фотографий товара",
+};
+
 /** Карточка товара (заголовок по умолчанию) */
 export const PRODUCT_CARD_UI = {
   DEFAULT_TITLE: "Товар",
+  OPEN_DETAILS_ARIA: "Подробнее о товаре:",
+  AVAILABILITY_STATUS_VISIBLE: "В каталоге для всех",
+  AVAILABILITY_STATUS_HIDDEN: "Скрыт от покупателей",
+  HIDE_FROM_CATALOG: "Скрыть от покупателей",
+  SHOW_IN_CATALOG: "Показать в каталоге",
+  AVAILABILITY_TOGGLE_PENDING: "Обновление…",
   DELETE_PRODUCT: "Удалить товар",
   DELETE_PRODUCT_PENDING: "Удаление…",
   DELETE_CONFIRM_QUESTION: "Вы уверены, что хотите удалить этот товар?",
@@ -242,6 +262,9 @@ export const PRODUCT_CARD_UI = {
   IMAGE_LIGHTBOX_OPEN_LABEL: "Показать изображение в полном размере",
   IMAGE_LIGHTBOX_CLOSE: "Закрыть просмотр изображения",
   IMAGE_LIGHTBOX_DIALOG_LABEL: "Изображение товара",
+  IMAGE_LIGHTBOX_DIALOG_LABEL_GALLERY: "Фотографии товара",
+  GALLERY_PREV: "Предыдущее фото",
+  GALLERY_NEXT: "Следующее фото",
 };
 
 /** Модалка входа */
@@ -265,7 +288,9 @@ export const REGISTER_MODAL_UI = {
   TITLE: "Регистрация",
   LABEL_EMAIL: "Email",
   LABEL_PASSWORD: "Пароль",
-  LABEL_USERNAME: "Ник (userName)",
+  LABEL_USERNAME: "Никнейм",
+  USERNAME_HINT:
+    "Только a–z и 0–9, без пробелов, 3–30 символов (как одно слово в нижнем регистре).",
   LABEL_PHONE: "Телефон (phoneNumber → userPhoneNumber)",
   LABEL_BIRTH: "Дата рождения (userBirthDate)",
   LABEL_GENDER: "Пол (userGender)",
@@ -280,6 +305,7 @@ export const REGISTER_MODAL_UI = {
   ERROR_GENERIC: "Ошибка при регистрации",
   PASSWORD_MIN_LENGTH: 6,
   USERNAME_MIN_LENGTH: 3,
+  USERNAME_MAX_LENGTH: 30,
 };
 
 /** Оценка пользователя `POST /vote/:targetUserId` */
@@ -316,10 +342,35 @@ export const MY_PROFILE_MODAL_UI = {
   TAB_MY_SALES: "Мои продажи",
   TAB_MY_ORDERS: "Мои заказы",
   TAB_ADMIN_ORDERS: "Все заказы",
+  EDIT_PROFILE: "Изменить профиль",
   LOGOUT: "Выйти",
   LOGOUT_CONFIRM: "Вы точно хотите выйти?",
   LOGOUT_YES: "Да выйти",
   LOGOUT_CANCEL: "Отменить выход",
+};
+
+/** Модалка редактирования своего профиля (`PATCH /user/:id`) */
+export const EDIT_PROFILE_MODAL_UI = {
+  ARIA_DIALOG: "Редактирование профиля",
+  ARIA_CLOSE_BACKDROP: "Закрыть без сохранения",
+  TITLE: "Редактирование профиля",
+  LABEL_EMAIL: "Email (нельзя изменить)",
+  LABEL_USERNAME: "Никнейм",
+  USERNAME_HINT:
+    "Только a–z и 0–9, без пробелов, 3–30 символов. Пусто — не менять ник.",
+  LABEL_PHONE: "Телефон",
+  LABEL_BIRTH: "Дата рождения",
+  LABEL_GENDER: "Пол",
+  LABEL_ADDRESS: "Адрес",
+  LABEL_AVATAR_URL: "URL аватара",
+  LABEL_BG_URL: "URL фона",
+  LABEL_NOTIFICATIONS: "Уведомления по email",
+  LABEL_NOTES: "Заметки о себе",
+  WORDS_USED: (n, max) => `Слов: ${n} / ${max}`,
+  PLACEHOLDER_HTTPS: "https://…",
+  SUBMIT_IDLE: "Сохранить",
+  SUBMIT_LOADING: "Сохранение…",
+  CANCEL: "Отмена",
 };
 
 /** Подписи полей профиля в `dl` и форматирование */

@@ -1,20 +1,49 @@
-import { useEffect } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { COMMON_UI, PRODUCT_CARD_UI } from "../../../shared/config/appUiCopy.js";
 
 import "./ProductImageLightbox.css";
 
+function filterHttpImageUrls(imageUrls) {
+  if (!Array.isArray(imageUrls)) return [];
+  return imageUrls
+    .map((s) => String(s).trim())
+    .filter((u) => /^https?:\/\//i.test(u));
+}
+
 /**
- * Полноэкранный просмотр: монтируется только пока открыт.
+ * Полноэкранный просмотр одного или нескольких изображений (портал в `body`).
  *
  * @param {{
  *   onClose: () => void;
- *   src: string;
- *   alt: string;
+ *   imageUrls: string[];
+ *   startIndex?: number;
  * }} props
  */
-export function ProductImageLightbox({ onClose, src, alt }) {
+export function ProductImageLightbox({ onClose, imageUrls, startIndex = 0 }) {
+  const urls = useMemo(() => filterHttpImageUrls(imageUrls), [imageUrls]);
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const max = Math.max(0, urls.length - 1);
+    setIndex(Math.min(Math.max(0, startIndex), max));
+  }, [startIndex, urls]);
+
+  const safeIndex = Math.min(index, Math.max(0, urls.length - 1));
+  const src = urls[safeIndex] ?? "";
+  const len = urls.length;
+
+  const goPrev = useCallback(() => {
+    if (len <= 1) return;
+    setIndex((i) => (i - 1 + len) % len);
+  }, [len]);
+
+  const goNext = useCallback(() => {
+    if (len <= 1) return;
+    setIndex((i) => (i + 1) % len);
+  }, [len]);
+
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -25,18 +54,41 @@ export function ProductImageLightbox({ onClose, src, alt }) {
 
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopPropagation();
+        onClose();
+        return;
+      }
+      if (len <= 1) return;
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        event.stopPropagation();
+        setIndex((i) => (i - 1 + len) % len);
+      }
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        event.stopPropagation();
+        setIndex((i) => (i + 1) % len);
+      }
     };
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
+
+    document.addEventListener("keydown", handleKeyDown, true);
+    return () => document.removeEventListener("keydown", handleKeyDown, true);
+  }, [len, onClose]);
+
+  if (len === 0) return null;
 
   return createPortal(
     <div
       className="product-image-lightbox"
       role="dialog"
       aria-modal="true"
-      aria-label={PRODUCT_CARD_UI.IMAGE_LIGHTBOX_DIALOG_LABEL}
+      aria-label={
+        len > 1
+          ? PRODUCT_CARD_UI.IMAGE_LIGHTBOX_DIALOG_LABEL_GALLERY
+          : PRODUCT_CARD_UI.IMAGE_LIGHTBOX_DIALOG_LABEL
+      }
     >
       <button
         type="button"
@@ -53,12 +105,47 @@ export function ProductImageLightbox({ onClose, src, alt }) {
         >
           {COMMON_UI.MODAL_CLOSE_GLYPH}
         </button>
-        <img
-          className="product-image-lightbox__img"
-          src={src}
-          alt={alt}
-          decoding="async"
-        />
+        <div
+          className={
+            len > 1
+              ? "product-image-lightbox__stage product-image-lightbox__stage--multi"
+              : "product-image-lightbox__stage"
+          }
+        >
+          {len > 1 ? (
+            <button
+              type="button"
+              className="product-image-lightbox__nav product-image-lightbox__nav--prev"
+              aria-label={PRODUCT_CARD_UI.GALLERY_PREV}
+              onClick={goPrev}
+            >
+              ‹
+            </button>
+          ) : null}
+          <div className="product-image-lightbox__img-box">
+            <img
+              className="product-image-lightbox__img"
+              src={src}
+              alt=""
+              decoding="async"
+            />
+          </div>
+          {len > 1 ? (
+            <button
+              type="button"
+              className="product-image-lightbox__nav product-image-lightbox__nav--next"
+              aria-label={PRODUCT_CARD_UI.GALLERY_NEXT}
+              onClick={goNext}
+            >
+              ›
+            </button>
+          ) : null}
+        </div>
+        {len > 1 ? (
+          <p className="product-image-lightbox__counter" aria-live="polite">
+            {safeIndex + 1} / {len}
+          </p>
+        ) : null}
       </div>
     </div>,
     document.body,

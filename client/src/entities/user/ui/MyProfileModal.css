@@ -42,6 +42,30 @@
   cursor: not-allowed;
 }
 
+.my-profile-modal__footer-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.my-profile-modal__edit-profile {
+  flex-shrink: 0;
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, #1f6feb 45%, CanvasText 15%);
+  background: color-mix(in srgb, #1f6feb 10%, transparent);
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+}
+
+.my-profile-modal__edit-profile:hover {
+  background: color-mix(in srgb, #1f6feb 18%, transparent);
+}
+
 .my-profile-modal__logout {
   display: flex;
   flex-direction: column;

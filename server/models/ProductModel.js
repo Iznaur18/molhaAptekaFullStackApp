@@ -1,29 +1,42 @@
 import mongoose from "mongoose";
+
+import { PRODUCT_IMAGE_URLS_MAX } from "../constants/productConstants.js";
+
 const Schema = mongoose.Schema;
 
-const ProductSchema = new Schema({
-    productName: {type: String, required: true},
+const ProductSchema = new Schema(
+  {
+    productName: { type: String, required: true },
     productDescription: String,
-    productImageUrl: {
-        type: String,
-        default: ''
+    productImageUrls: {
+      type: [String],
+      default: [],
+      validate: {
+        validator(value) {
+          return (
+            Array.isArray(value) && value.length <= PRODUCT_IMAGE_URLS_MAX
+          );
+        },
+        message: `Не более ${PRODUCT_IMAGE_URLS_MAX} изображений`,
+      },
     },
-    productPrice: {type: Number, required: true},
+    productPrice: { type: Number, required: true },
     productSeller: {
-        type: Schema.Types.ObjectId,
-        ref: "User",
-        required: true
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
     productCategory: {
-        type: String,
-        enum: ['electronics', 'clothing', 'food', 'figures'],
-        required: true
+      type: String,
+      enum: ["electronics", "clothing", "food", "figures"],
+      required: true,
     },
     productIsAvailable: {
-        type: Boolean,
-        default: true
+      type: Boolean,
+      default: true,
     },
-},{timestamps: true}
-)
+  },
+  { timestamps: true },
+);
 
-export default mongoose.model('Product', ProductSchema);
+export default mongoose.model("Product", ProductSchema);

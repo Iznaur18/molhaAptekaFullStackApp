@@ -22,7 +22,10 @@ import { SearchInput } from "../../../shared/ui/SearchInput/SearchInput.jsx";
 
 import "./MySalesPage.css";
 
-export function MySalesPage() {
+/**
+ * @param {{ onSellerNameClick?: (userId: string) => void }} [props]
+ */
+export function MySalesPage({ onSellerNameClick }) {
   const [statusFilter, setStatusFilter] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebouncedValue(
@@ -207,6 +210,7 @@ export function MySalesPage() {
         isOpen={selectedProduct != null}
         product={selectedProduct}
         onClose={() => setSelectedProduct(null)}
+        onSellerNameClick={onSellerNameClick}
       />
     </div>
   );

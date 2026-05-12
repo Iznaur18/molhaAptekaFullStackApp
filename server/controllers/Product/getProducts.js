@@ -22,7 +22,9 @@ const buildProductsQuery = (search, baseQuery = {}) => {
 export const getProductsController = async (req, res) => {
     try {
         const { page, limit, skip } = parsePagination(req.query);
-        const productsQuery = buildProductsQuery(req.query.search);
+        const productsQuery = buildProductsQuery(req.query.search, {
+            productIsAvailable: { $ne: false },
+        });
 
         const [products, total] = await Promise.all([
             ProductModel.find(productsQuery)

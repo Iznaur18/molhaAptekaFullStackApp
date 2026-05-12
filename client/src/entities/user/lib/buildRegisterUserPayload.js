@@ -37,7 +37,7 @@ export function buildRegisterUserPayload(form) {
   const userAddress = trimOrUndef(form.userAddress);
   const userBirthDate = trimOrUndef(form.userBirthDate);
 
-  if (userName) payload.userName = userName;
+  if (userName) payload.userName = userName.toLowerCase();
   if (phoneNumber) payload.phoneNumber = phoneNumber;
   if (avatarUrl) payload.avatarUrl = avatarUrl;
   if (backgroundUrl) payload.backgroundUrl = backgroundUrl;

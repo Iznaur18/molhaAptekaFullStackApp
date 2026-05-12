@@ -1,13 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 
 import { deleteMyProduct } from "../../../entities/product/api/deleteMyProduct.js";
+import { patchMyProductAvailability } from "../../../entities/product/api/patchMyProductAvailability.js";
 import { fetchAllProducts } from "../../../entities/product/api/fetchAllProducts.js";
 import { fetchMyProducts } from "../../../entities/product/api/fetchMyProducts.js";
 import { CreateProductModal } from "../../../entities/product/ui/CreateProductModal.jsx";
+import { ProductDetailsModal } from "../../../entities/product/ui/ProductDetailsModal.jsx";
 import { fetchCurrentUserProfile } from "../../../entities/user/api/fetchCurrentUserProfile.js";
 import { fetchUserProfileById } from "../../../entities/user/api/fetchUserProfileById.js";
 import { LoginModal } from "../../../entities/user/ui/LoginModal.jsx";
 import { MyProfileModal } from "../../../entities/user/ui/MyProfileModal.jsx";
+import { EditProfileModal } from "../../../entities/user/ui/EditProfileModal.jsx";
 import { RegisterModal } from "../../../entities/user/ui/RegisterModal.jsx";
 import { UserDetailsModal } from "../../../entities/user/ui/UserDetailsModal.jsx";
 import { UserVoteRatingForm } from "../../../entities/user-vote-rating/ui/UserVoteRatingForm.jsx";
@@ -95,10 +98,15 @@ export function HomePage() {
   const [selectedProductCategory, setSelectedProductCategory] = useState(null);
   const [myProductsCatalogError, setMyProductsCatalogError] = useState("");
   const [deletingProductId, setDeletingProductId] = useState(null);
+  const [togglingAvailabilityProductId, setTogglingAvailabilityProductId] =
+    useState(null);
   const [isCreateProductModalOpen, setIsCreateProductModalOpen] =
     useState(false);
   const [usersListTick, setUsersListTick] = useState(0);
   const [currentUserId, setCurrentUserId] = useCurrentUserId(isAuthorized);
+  /** @type {[ProductFromApi | null, import('react').Dispatch<import('react').SetStateAction<ProductFromApi | null>>]} */
+  const [catalogProductDetails, setCatalogProductDetails] = useState(null);
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
 
   const debouncedProductSearchTerm = useDebouncedValue(
     productSearchTerm,
@@ -152,6 +160,7 @@ export function HomePage() {
 
   const closeMyProfileModal = () => {
     setMyProfileModal(EMPTY_PROFILE_MODAL);
+    setIsEditProfileOpen(false);
   };
 
   const handleLogout = () => {
@@ -243,6 +252,32 @@ export function HomePage() {
     setProducts((prev) => [product, ...prev]);
   };
 
+  /**
+   * @param {string} productId
+   * @param {boolean} productIsAvailable
+   */
+  const handleSetMyProductAvailability = async (productId, productIsAvailable) => {
+    try {
+      setTogglingAvailabilityProductId(productId);
+      setMyProductsCatalogError("");
+      const updated = await patchMyProductAvailability(
+        productId,
+        productIsAvailable,
+      );
+      setProducts((prev) =>
+        prev.map((p) => (String(p._id) === productId ? updated : p)),
+      );
+    } catch (e) {
+      const message =
+        e instanceof Error
+          ? e.message
+          : API_CLIENT_UI.PATCH_MY_PRODUCT_AVAILABILITY_FALLBACK;
+      setMyProductsCatalogError(message);
+    } finally {
+      setTogglingAvailabilityProductId(null);
+    }
+  };
+
   /** @param {string} productId */
   const handleDeleteMyProduct = async (productId) => {
     try {
@@ -277,14 +312,15 @@ export function HomePage() {
           onRequestLogin={() => setIsLoginModalOpen(true)}
           onGoToCatalog={() => setMainView("catalog")}
           onCheckoutSuccess={() => setMainView("my-orders")}
+          onSellerNameClick={handleSellerNameClick}
         />
       );
     }
     if (mainView === "my-orders") {
-      return <MyOrdersPage />;
+      return <MyOrdersPage onSellerNameClick={handleSellerNameClick} />;
     }
     if (mainView === "my-sales") {
-      return <MySalesPage />;
+      return <MySalesPage onSellerNameClick={handleSellerNameClick} />;
     }
     if (mainView === "admin-orders") {
       return <AdminOrdersPage />;
@@ -310,6 +346,9 @@ export function HomePage() {
         onSellerNameClick={handleSellerNameClick}
         onDeleteMyProduct={handleDeleteMyProduct}
         myProductsCatalogError={myProductsCatalogError}
+        onOpenProductDetails={setCatalogProductDetails}
+        onSetMyProductAvailability={handleSetMyProductAvailability}
+        togglingAvailabilityProductId={togglingAvailabilityProductId}
       />
     );
   };
@@ -384,10 +423,26 @@ export function HomePage() {
           myProfileModal.phase === "error" ? myProfileModal.error : null
         }
         onLogout={handleLogout}
+        onEditProfileClick={() => setIsEditProfileOpen(true)}
         onMyProductsClick={handleMyProductsFromProfile}
         onMySalesClick={handleMySalesFromProfile}
         onMyOrdersClick={handleMyOrdersFromProfile}
         onAdminOrdersClick={handleAdminOrdersFromProfile}
+      />
+      <EditProfileModal
+        isOpen={isEditProfileOpen}
+        onClose={() => setIsEditProfileOpen(false)}
+        user={
+          myProfileModal.phase === "success" ? myProfileModal.user : null
+        }
+        onSaved={(updatedUser) => {
+          setMyProfileModal((prev) =>
+            prev.open && prev.phase === "success" && prev.user
+              ? { ...prev, user: { ...prev.user, ...updatedUser } }
+              : prev,
+          );
+          setIsEditProfileOpen(false);
+        }}
       />
       <LoginModal
         isOpen={isLoginModalOpen}
@@ -409,6 +464,12 @@ export function HomePage() {
         isOpen={isCreateProductModalOpen}
         onClose={() => setIsCreateProductModalOpen(false)}
         onSuccess={handleCreateProductSuccess}
+      />
+      <ProductDetailsModal
+        isOpen={catalogProductDetails != null}
+        product={catalogProductDetails}
+        onClose={() => setCatalogProductDetails(null)}
+        onSellerNameClick={handleSellerNameClick}
       />
     </div>
   );

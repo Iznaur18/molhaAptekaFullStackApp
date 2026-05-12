@@ -1,6 +1,8 @@
+@import "../../../entities/product/ui/productImageTokens.css";
+
 .cart-line {
   display: grid;
-  grid-template-columns: 4rem 1fr auto auto auto;
+  grid-template-columns: var(--product-image-thumb-side) 1fr auto auto auto;
   align-items: center;
   gap: 0.85rem;
   padding: 0.65rem 0.85rem;
@@ -10,9 +12,10 @@
 }
 
 .cart-line__image {
-  width: 4rem;
-  height: 4rem;
+  width: var(--product-image-thumb-side);
+  height: var(--product-image-thumb-side);
   object-fit: cover;
+  object-position: center;
   border-radius: 0.4rem;
   background: #f3f4f6;
 }

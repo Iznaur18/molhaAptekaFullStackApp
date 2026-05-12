@@ -9,6 +9,13 @@ export const USER_GENDER_LABEL_RU = {
   [USER_GENDER_NO_SELECTED]: "Не указан",
 };
 
+/** Как в `server/validations/user/userNameRules.js`. */
+export const USER_NAME_MIN_LENGTH = 3;
+export const USER_NAME_MAX_LENGTH = 30;
+
+/** Как `MAX_TEXT_FIELD_WORDS` в `server/utils/maxWordsText.js` (адрес, заметки). */
+export const PROFILE_FIELD_MAX_WORDS = 10;
+
 /** Как в `server/models/UserModel.js` — `userRole.enum`. */
 export const USER_ROLE_USER = "user";
 export const USER_ROLE_ADMIN = "admin";
