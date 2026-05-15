@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 
 import { selectCartLines } from "../../../entities/cart/lib/selectCartLines.js";
 import { useCart } from "../../../entities/cart/model/useCart.js";
@@ -24,6 +24,14 @@ const useCatalogProducts = () => {
   );
   const [error, setError] = useState("");
 
+  const patchProductStats = useCallback((productId, patch) => {
+    setProducts((prev) =>
+      prev.map((p) =>
+        String(p._id) === productId ? { ...p, ...patch } : p,
+      ),
+    );
+  }, []);
+
   useEffect(() => {
     let isCancelled = false;
 
@@ -46,7 +54,7 @@ const useCatalogProducts = () => {
     };
   }, []);
 
-  return { phase, products, error };
+  return { phase, products, error, patchProductStats };
 };
 
 const useCurrentUserAddress = (isAuthorized) => {
@@ -94,7 +102,7 @@ export function CartPage({
   onSellerNameClick,
 }) {
   const { items, clearCart } = useCart();
-  const { phase, products, error } = useCatalogProducts();
+  const { phase, products, error, patchProductStats } = useCatalogProducts();
   const defaultAddress = useCurrentUserAddress(isAuthorized);
   const [submitState, setSubmitState] = useState({
     isSubmitting: false,
@@ -102,6 +110,13 @@ export function CartPage({
     success: "",
   });
   const [selectedProduct, setSelectedProduct] = useState(null);
+
+  const handleProductStatsUpdate = useCallback((productId, stats) => {
+    patchProductStats(productId, stats);
+    setSelectedProduct((prev) =>
+      prev && String(prev._id) === productId ? { ...prev, ...stats } : prev,
+    );
+  }, [patchProductStats]);
 
   const { lines, total } = useMemo(
     () => selectCartLines(items, products),
@@ -223,6 +238,8 @@ export function CartPage({
         product={selectedProduct}
         onClose={() => setSelectedProduct(null)}
         onSellerNameClick={onSellerNameClick}
+        isAuthorized={isAuthorized}
+        onProductStatsUpdate={handleProductStatsUpdate}
       />
     </div>
   );

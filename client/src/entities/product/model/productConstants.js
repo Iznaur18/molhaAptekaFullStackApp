@@ -1,15 +1,67 @@
 /** Совпадает с `server/constants/productConstants.js`. */
 export const PRODUCT_IMAGE_URLS_MAX = 5;
 
-/** Совпадает с `enum` в `server/models/ProductModel.js`. */
+export const PRODUCT_CATEGORY_GROCERY = "grocery";
 export const PRODUCT_CATEGORY_ELECTRONICS = "electronics";
 export const PRODUCT_CATEGORY_CLOTHING = "clothing";
+export const PRODUCT_CATEGORY_FOOTWEAR = "footwear";
+export const PRODUCT_CATEGORY_HOME_GARDEN = "home_garden";
+export const PRODUCT_CATEGORY_KIDS = "kids";
+export const PRODUCT_CATEGORY_BEAUTY_HEALTH = "beauty_health";
+export const PRODUCT_CATEGORY_APPLIANCES = "appliances";
+export const PRODUCT_CATEGORY_SPORT_LEISURE = "sport_leisure";
+export const PRODUCT_CATEGORY_CONSTRUCTION = "construction";
+export const PRODUCT_CATEGORY_PHARMACY = "pharmacy";
+export const PRODUCT_CATEGORY_PETS = "pets";
+export const PRODUCT_CATEGORY_BOOKS = "books";
+export const PRODUCT_CATEGORY_TOURISM_OUTDOORS = "tourism_outdoors";
+export const PRODUCT_CATEGORY_AUTO_PARTS = "auto_parts";
+export const PRODUCT_CATEGORY_FURNITURE = "furniture";
+export const PRODUCT_CATEGORY_HOBBY_CRAFTS = "hobby_crafts";
+export const PRODUCT_CATEGORY_ACCESSORIES = "accessories";
+export const PRODUCT_CATEGORY_JEWELRY = "jewelry";
+export const PRODUCT_CATEGORY_MUSIC_VIDEO = "music_video";
+export const PRODUCT_CATEGORY_STATIONERY = "stationery";
+export const PRODUCT_CATEGORY_ANTIQUES = "antiques";
+export const PRODUCT_CATEGORY_DIGITAL = "digital";
+export const PRODUCT_CATEGORY_HOUSEHOLD_CARE = "household_care";
+export const PRODUCT_CATEGORY_GAMES = "games";
+export const PRODUCT_CATEGORY_AUTOMOBILES = "automobiles";
+export const PRODUCT_CATEGORY_TRAVEL_SERVICES = "travel_services";
+/** Устаревший slug (до расширения списка). */
 export const PRODUCT_CATEGORY_FOOD = "food";
+/** Устаревший slug (до расширения списка). */
 export const PRODUCT_CATEGORY_FIGURES = "figures";
 
+/** Порядок — для фильтра и формы создания товара. */
 export const PRODUCT_CATEGORIES = [
+  PRODUCT_CATEGORY_GROCERY,
   PRODUCT_CATEGORY_ELECTRONICS,
   PRODUCT_CATEGORY_CLOTHING,
+  PRODUCT_CATEGORY_FOOTWEAR,
+  PRODUCT_CATEGORY_HOME_GARDEN,
+  PRODUCT_CATEGORY_KIDS,
+  PRODUCT_CATEGORY_BEAUTY_HEALTH,
+  PRODUCT_CATEGORY_APPLIANCES,
+  PRODUCT_CATEGORY_SPORT_LEISURE,
+  PRODUCT_CATEGORY_CONSTRUCTION,
+  PRODUCT_CATEGORY_PHARMACY,
+  PRODUCT_CATEGORY_PETS,
+  PRODUCT_CATEGORY_BOOKS,
+  PRODUCT_CATEGORY_TOURISM_OUTDOORS,
+  PRODUCT_CATEGORY_AUTO_PARTS,
+  PRODUCT_CATEGORY_FURNITURE,
+  PRODUCT_CATEGORY_HOBBY_CRAFTS,
+  PRODUCT_CATEGORY_ACCESSORIES,
+  PRODUCT_CATEGORY_JEWELRY,
+  PRODUCT_CATEGORY_MUSIC_VIDEO,
+  PRODUCT_CATEGORY_STATIONERY,
+  PRODUCT_CATEGORY_ANTIQUES,
+  PRODUCT_CATEGORY_DIGITAL,
+  PRODUCT_CATEGORY_HOUSEHOLD_CARE,
+  PRODUCT_CATEGORY_GAMES,
+  PRODUCT_CATEGORY_AUTOMOBILES,
+  PRODUCT_CATEGORY_TRAVEL_SERVICES,
   PRODUCT_CATEGORY_FOOD,
   PRODUCT_CATEGORY_FIGURES,
 ];
@@ -19,14 +71,42 @@ export const PRODUCT_IMAGE_PLACEHOLDER_URL =
 
 /** Подписи для UI (сервер отдаёт только ключ enum). */
 export const PRODUCT_CATEGORY_LABEL_RU = {
+  [PRODUCT_CATEGORY_GROCERY]: "Продукты питания",
   [PRODUCT_CATEGORY_ELECTRONICS]: "Электроника",
   [PRODUCT_CATEGORY_CLOTHING]: "Одежда",
+  [PRODUCT_CATEGORY_FOOTWEAR]: "Обувь",
+  [PRODUCT_CATEGORY_HOME_GARDEN]: "Дом и сад",
+  [PRODUCT_CATEGORY_KIDS]: "Детские товары",
+  [PRODUCT_CATEGORY_BEAUTY_HEALTH]: "Красота и здоровье",
+  [PRODUCT_CATEGORY_APPLIANCES]: "Бытовая техника",
+  [PRODUCT_CATEGORY_SPORT_LEISURE]: "Спорт и отдых",
+  [PRODUCT_CATEGORY_CONSTRUCTION]: "Строительство и ремонт",
+  [PRODUCT_CATEGORY_PHARMACY]: "Аптека",
+  [PRODUCT_CATEGORY_PETS]: "Товары для животных",
+  [PRODUCT_CATEGORY_BOOKS]: "Книги",
+  [PRODUCT_CATEGORY_TOURISM_OUTDOORS]: "Туризм, рыбалка, охота",
+  [PRODUCT_CATEGORY_AUTO_PARTS]: "Автотовары",
+  [PRODUCT_CATEGORY_FURNITURE]: "Мебель",
+  [PRODUCT_CATEGORY_HOBBY_CRAFTS]: "Хобби и творчество",
+  [PRODUCT_CATEGORY_ACCESSORIES]: "Аксессуары",
+  [PRODUCT_CATEGORY_JEWELRY]: "Ювелирные украшения",
+  [PRODUCT_CATEGORY_MUSIC_VIDEO]: "Музыка и видео",
+  [PRODUCT_CATEGORY_STATIONERY]: "Канцелярские товары",
+  [PRODUCT_CATEGORY_ANTIQUES]: "Антиквариат и коллекционирование",
+  [PRODUCT_CATEGORY_DIGITAL]: "Цифровые товары",
+  [PRODUCT_CATEGORY_HOUSEHOLD_CARE]: "Бытовая химия и гигиена",
+  [PRODUCT_CATEGORY_GAMES]: "Игры и консоли",
+  [PRODUCT_CATEGORY_AUTOMOBILES]: "Автомобили",
+  [PRODUCT_CATEGORY_TRAVEL_SERVICES]: "Билеты, отели, туры",
   [PRODUCT_CATEGORY_FOOD]: "Продукты",
   [PRODUCT_CATEGORY_FIGURES]: "Фигурки",
 };
 
 /** Верхняя граница `limit` в `server/controllers/Product/getProducts.js`. */
 export const PRODUCTS_FETCH_PAGE_LIMIT = 100;
+
+/** Размер страницы каталога на главной (клиент). */
+export const CATALOG_PAGE_SIZE = 24;
 
 /**
  * Поля lean-документа Product: схема `server/models/ProductModel.js` + `timestamps`.
@@ -41,6 +121,7 @@ export const PRODUCT_MODEL_FIELD_KEYS = [
   "productSeller",
   "productCategory",
   "productIsAvailable",
+  "uniqueViewerCount",
   "createdAt",
   "updatedAt",
 ];
@@ -61,6 +142,7 @@ export const PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS = [
   "productCategory",
   "productSeller",
   "productIsAvailable",
+  "uniqueViewerCount",
 ];
 
 /** Нижний ряд модалки: на всю ширину под верхним блоком. */
@@ -81,6 +163,7 @@ export const PRODUCT_FIELD_LABEL_RU = {
   productSeller: "Продавец",
   productCategory: "Категория",
   productIsAvailable: "В наличии",
+  uniqueViewerCount: "Уникальные просмотры",
   createdAt: "Создан",
   updatedAt: "Обновлён",
 };

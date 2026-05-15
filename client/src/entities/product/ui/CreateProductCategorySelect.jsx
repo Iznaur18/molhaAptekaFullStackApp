@@ -62,6 +62,11 @@ export function CreateProductCategorySelect({
     setIsOpen(false);
   };
 
+  /** Не отдаём колесо прокрутки родителю (модалка / страница). */
+  const handleCategoryMenuWheel = (event) => {
+    event.stopPropagation();
+  };
+
   return (
     <div className="create-product-category-select" ref={rootRef}>
       <span className="create-product-category-select__legend">
@@ -83,7 +88,11 @@ export function CreateProductCategorySelect({
         </span>
       </button>
       {isOpen ? (
-        <ul className="create-product-category-select__menu" role="listbox">
+        <ul
+          className="create-product-category-select__menu"
+          role="listbox"
+          onWheel={handleCategoryMenuWheel}
+        >
           {PRODUCT_CATEGORIES.map((category) => (
             <li key={category} role="presentation">
               <button

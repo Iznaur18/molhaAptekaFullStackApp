@@ -83,6 +83,15 @@ export function HomePageHeader({
     return () => document.removeEventListener("pointerdown", handlePointerDown);
   }, [isProductCategoryListOpen, onCloseProductCategoryFilter]);
 
+  useEffect(() => {
+    if (!isProductCategoryListOpen) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isProductCategoryListOpen]);
+
   const isCatalogView = mainView === "catalog";
 
   return (
@@ -231,6 +240,7 @@ function CatalogTitleAndFilters({
             id={PRODUCT_CATEGORY_FILTER_LIST_ID}
             className="home-page__category-list"
             role="list"
+            onWheel={(event) => event.stopPropagation()}
           >
             <li className="home-page__category-item">
               <button

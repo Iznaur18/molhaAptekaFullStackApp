@@ -81,6 +81,23 @@
   word-break: break-word;
 }
 
+.order-card__buyer-link {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: inherit;
+  color: #1f6feb;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.order-card__buyer-link:hover {
+  text-decoration: underline;
+}
+
 .order-card__items-heading {
   margin: 0.25rem 0 0;
   font-size: 0.95rem;

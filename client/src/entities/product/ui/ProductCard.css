@@ -266,6 +266,30 @@
   opacity: 0.85;
 }
 
+.product-card__edit {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  color: inherit;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.product-card__edit:hover:not(:disabled) {
+  background: color-mix(in srgb, currentColor 10%, transparent);
+}
+
+.product-card__edit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
 .product-card__delete {
   box-sizing: border-box;
   width: 100%;

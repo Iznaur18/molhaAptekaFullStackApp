@@ -24,26 +24,37 @@ function isAbsoluteHttpUrl(value) {
  * @param {import('../model/types.js').ProductFromApi} props.product
  * @param {(userId: string) => void} [props.onSellerNameClick]
  * @param {(productId: string) => void | Promise<void>} [props.onDeleteProduct]
+ * @param {(product: import('../model/types.js').ProductFromApi) => void} [props.onEditProduct]
  * @param {boolean} [props.isDeletePending]
  * @param {(productId: string, productIsAvailable: boolean) => void | Promise<void>} [props.onSetProductAvailability]
  * @param {boolean} [props.isAvailabilityTogglePending]
  * @param {(product: import('../model/types.js').ProductFromApi) => void} props.onOpenDetails
  * @param {boolean} props.isAuthorized
  * @param {() => void} props.onRequestLoginAddToCart
+ * @param {boolean} [props.isMineMode]
  */
 export function ProductCard({
   product,
   onSellerNameClick,
   onDeleteProduct,
+  onEditProduct,
   isDeletePending = false,
   onSetProductAvailability,
   isAvailabilityTogglePending = false,
   onOpenDetails,
   isAuthorized,
   onRequestLoginAddToCart,
+  isMineMode = false,
 }) {
   const heading = product.productName?.trim() || PRODUCT_CARD_UI.DEFAULT_TITLE;
   const galleryUrls = useMemo(() => resolveProductImageUrls(product), [product]);
+  const previewFieldKeys = useMemo(
+    () =>
+      isMineMode
+        ? [...PRODUCT_CARD_PREVIEW_FIELD_KEYS, "uniqueViewerCount"]
+        : PRODUCT_CARD_PREVIEW_FIELD_KEYS,
+    [isMineMode],
+  );
   const [cardImageIndex, setCardImageIndex] = useState(0);
 
   const primaryImageUrl = useMemo(() => {
@@ -107,6 +118,26 @@ export function ProductCard({
     isDeletePending ||
     isAvailabilityTogglePending ||
     isDeleteConfirmOpen;
+
+  const handleEditClick = (event) => {
+    event.stopPropagation();
+    if (onEditProduct == null || product._id == null) return;
+    onEditProduct(product);
+  };
+
+  const renderEditButton = () => {
+    if (onEditProduct == null) return null;
+    return (
+      <button
+        type="button"
+        className="product-card__edit"
+        onClick={handleEditClick}
+        disabled={ownerActionsLocked}
+      >
+        {PRODUCT_CARD_UI.EDIT_PRODUCT}
+      </button>
+    );
+  };
 
   const handleAvailabilityToggle = () => {
     if (onSetProductAvailability == null || product._id == null) return;
@@ -299,7 +330,7 @@ export function ProductCard({
         ) : null}
         <h2 className="product-card__heading">{heading}</h2>
         <dl className="product-card__fields product-card__fields--preview">
-          {PRODUCT_CARD_PREVIEW_FIELD_KEYS.map((key) => {
+          {previewFieldKeys.map((key) => {
             const raw = product[key];
             const display = formatProductFieldForDisplay(key, product);
             const canOpenSellerProfile =
@@ -341,6 +372,7 @@ export function ProductCard({
         {onDeleteProduct ? (
           <>
             {renderOwnerCatalogVisibility()}
+            {renderEditButton()}
             {renderDeleteFooter()}
           </>
         ) : product.productIsAvailable !== false && product._id != null ? (

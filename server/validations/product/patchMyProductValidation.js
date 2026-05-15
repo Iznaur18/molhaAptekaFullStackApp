@@ -1,4 +1,4 @@
-import { body } from "express-validator";
+import { body, oneOf } from "express-validator";
 
 import {
   PRODUCT_CATEGORY_VALUES,
@@ -25,16 +25,30 @@ const assertHttpImageUrl = (raw, label) => {
   }
 };
 
-export const makeProductValidation = [
+export const patchMyProductValidation = [
+  oneOf(
+    [
+      body("productName").exists(),
+      body("productDescription").exists(),
+      body("productPrice").exists(),
+      body("productCategory").exists(),
+      body("productImageUrls").exists(),
+      body("productImageUrl").exists(),
+      body("productIsAvailable").exists(),
+    ],
+    { message: "Укажите хотя бы одно поле для обновления" },
+  ),
   body("productName")
+    .optional()
     .notEmpty()
-    .withMessage("Название продукта обязательно")
+    .withMessage("Название продукта не может быть пустым")
     .isLength({ min: 3 })
     .withMessage("Название продукта должно быть не менее 3 символов")
     .trim(),
   body("productDescription")
+    .optional()
     .notEmpty()
-    .withMessage("Описание продукта обязательно")
+    .withMessage("Описание продукта не может быть пустым")
     .isLength({ min: 10 })
     .withMessage("Описание продукта должно быть не менее 10 символов")
     .trim()
@@ -69,21 +83,20 @@ export const makeProductValidation = [
     .withMessage("Ссылка на картинку должна быть валидным URL с http/https")
     .trim(),
   body("productPrice")
-    .notEmpty()
-    .withMessage("Цена продукта обязательна")
+    .optional()
     .isFloat({ min: 0 })
     .withMessage("Цена продукта должна быть положительным числом")
     .toFloat(),
   body("productCategory")
+    .optional()
     .notEmpty()
-    .withMessage("Категория продукта обязательна")
+    .withMessage("Категория продукта не может быть пустой")
     .isIn(PRODUCT_CATEGORY_VALUES)
     .withMessage("Указана неизвестная категория товара")
     .trim(),
   body("productIsAvailable")
-    .notEmpty()
-    .withMessage("Доступность продукта обязательна")
+    .optional()
     .isBoolean()
-    .withMessage("Доступность продукта должна быть булевым значением"),
+    .withMessage("productIsAvailable должно быть true или false"),
   handleValidationByExpressErrors,
 ];

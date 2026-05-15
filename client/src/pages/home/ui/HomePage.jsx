@@ -1,12 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useCart } from "../../../entities/cart/model/useCart.js";
 import { CartServerSync } from "../../../entities/cart/ui/CartServerSync.jsx";
 import { CART_STORAGE_KEY } from "../../../entities/order/model/constants.js";
 import { deleteMyProduct } from "../../../entities/product/api/deleteMyProduct.js";
-import { patchMyProductAvailability } from "../../../entities/product/api/patchMyProductAvailability.js";
-import { fetchAllProducts } from "../../../entities/product/api/fetchAllProducts.js";
-import { fetchMyProducts } from "../../../entities/product/api/fetchMyProducts.js";
+import { patchMyProduct } from "../../../entities/product/api/patchMyProduct.js";
+import { fetchCatalogProductsPage } from "../../../entities/product/api/fetchCatalogProductsPage.js";
+import { fetchMyProductsPage } from "../../../entities/product/api/fetchMyProducts.js";
+import { CATALOG_PAGE_SIZE } from "../../../entities/product/model/productConstants.js";
 import { CreateProductModal } from "../../../entities/product/ui/CreateProductModal.jsx";
 import { ProductDetailsModal } from "../../../entities/product/ui/ProductDetailsModal.jsx";
 import { fetchCurrentUserProfile } from "../../../entities/user/api/fetchCurrentUserProfile.js";
@@ -107,11 +108,22 @@ export function HomePage() {
     useState(null);
   const [isCreateProductModalOpen, setIsCreateProductModalOpen] =
     useState(false);
+  /** @type {[import('../../../entities/product/model/types.js').ProductFromApi | null, import('react').Dispatch<import('react').SetStateAction<import('../../../entities/product/model/types.js').ProductFromApi | null>>]} */
+  const [productToEdit, setProductToEdit] = useState(null);
   const [usersListTick, setUsersListTick] = useState(0);
   const [currentUserId, setCurrentUserId] = useCurrentUserId(isAuthorized);
   /** @type {[ProductFromApi | null, import('react').Dispatch<import('react').SetStateAction<ProductFromApi | null>>]} */
   const [catalogProductDetails, setCatalogProductDetails] = useState(null);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+
+  const catalogFetchSeq = useRef(0);
+  const catalogPageRef = useRef(0);
+  const catalogSentinelRef = useRef(/** @type {HTMLDivElement | null} */ (null));
+  const [catalogHasMore, setCatalogHasMore] = useState(false);
+  const [isCatalogLoadingMore, setIsCatalogLoadingMore] = useState(false);
+  const [catalogLoadMoreError, setCatalogLoadMoreError] = useState(
+    /** @type {string | null} */ (null),
+  );
 
   const debouncedProductSearchTerm = useDebouncedValue(
     productSearchTerm,
@@ -129,22 +141,47 @@ export function HomePage() {
     }
   }, [isAuthorized]);
 
+  const loadCatalogPage = useCallback(
+    async (pageNum) => {
+      const search = debouncedProductSearchTerm.trim();
+      const productCategory = selectedProductCategory ?? undefined;
+      if (productsMode === "mine") {
+        return fetchMyProductsPage({
+          page: pageNum,
+          limit: CATALOG_PAGE_SIZE,
+          search: search || undefined,
+          productCategory,
+        });
+      }
+      return fetchCatalogProductsPage({
+        page: pageNum,
+        limit: CATALOG_PAGE_SIZE,
+        search: search || undefined,
+        productCategory,
+      });
+    },
+    [productsMode, debouncedProductSearchTerm, selectedProductCategory],
+  );
+
   useEffect(() => {
-    let isCancelled = false;
-    const search = debouncedProductSearchTerm.trim();
+    const seq = ++catalogFetchSeq.current;
+    setProducts([]);
+    catalogPageRef.current = 0;
+    setCatalogHasMore(true);
+    setCatalogLoadMoreError(null);
+    setIsCatalogLoadingMore(false);
+    setCatalogStatus({ kind: "loading" });
 
     void (async () => {
       try {
-        setCatalogStatus({ kind: "loading" });
-        const list =
-          productsMode === "mine"
-            ? await fetchMyProducts({ search })
-            : await fetchAllProducts({ search });
-        if (isCancelled) return;
-        setProducts(list);
+        const { products, pagination } = await loadCatalogPage(1);
+        if (seq !== catalogFetchSeq.current) return;
+        setProducts(products);
+        catalogPageRef.current = 1;
+        setCatalogHasMore(pagination.page < pagination.totalPages);
         setCatalogStatus({ kind: "idle" });
       } catch (e) {
-        if (isCancelled) return;
+        if (seq !== catalogFetchSeq.current) return;
         const message =
           e?.response?.data?.message ??
           e?.message ??
@@ -152,11 +189,81 @@ export function HomePage() {
         setCatalogStatus({ kind: "error", message });
       }
     })();
+  }, [productsMode, debouncedProductSearchTerm, selectedProductCategory, loadCatalogPage]);
 
-    return () => {
-      isCancelled = true;
-    };
-  }, [productsMode, debouncedProductSearchTerm]);
+  const loadNextCatalogPage = useCallback(async () => {
+    if (!catalogHasMore || isCatalogLoadingMore) {
+      return;
+    }
+    if (catalogStatus.kind !== "idle") return;
+
+    const seqAtStart = catalogFetchSeq.current;
+    const nextPage = catalogPageRef.current + 1;
+
+    setIsCatalogLoadingMore(true);
+    setCatalogLoadMoreError(null);
+
+    try {
+      const { products, pagination } = await loadCatalogPage(
+        nextPage,
+      );
+      if (seqAtStart !== catalogFetchSeq.current) return;
+
+      setProducts((prev) => {
+        const seen = new Set(prev.map((p) => String(p._id)));
+        const addon = products.filter((p) => !seen.has(String(p._id)));
+        return [...prev, ...addon];
+      });
+      catalogPageRef.current = nextPage;
+      setCatalogHasMore(pagination.page < pagination.totalPages);
+    } catch (e) {
+      if (seqAtStart !== catalogFetchSeq.current) return;
+      setCatalogLoadMoreError(
+        e instanceof Error ? e.message : HOME_PAGE_UI.FETCH_PRODUCTS_FALLBACK,
+      );
+    } finally {
+      if (seqAtStart === catalogFetchSeq.current) {
+        setIsCatalogLoadingMore(false);
+      }
+    }
+  }, [
+    catalogHasMore,
+    isCatalogLoadingMore,
+    catalogStatus.kind,
+    loadCatalogPage,
+  ]);
+
+  useEffect(() => {
+    if (mainView !== "catalog") return undefined;
+    if (catalogStatus.kind !== "idle") return undefined;
+    if (!catalogHasMore || catalogLoadMoreError) return undefined;
+
+    const el = catalogSentinelRef.current;
+    if (!el) return undefined;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const hit = entries.some((entry) => entry.isIntersecting);
+        if (!hit) return;
+        void loadNextCatalogPage();
+      },
+      { root: null, rootMargin: "200px 0px", threshold: 0 },
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [
+    mainView,
+    catalogStatus.kind,
+    catalogHasMore,
+    catalogLoadMoreError,
+    loadNextCatalogPage,
+  ]);
+
+  const handleRetryCatalogLoadMore = useCallback(() => {
+    setCatalogLoadMoreError(null);
+    void loadNextCatalogPage();
+  }, [loadNextCatalogPage]);
 
   const closeSellerModal = () => {
     sellerFetchSeq.current += 1;
@@ -205,6 +312,17 @@ export function HomePage() {
     setSelectedProductCategory(category);
     setIsProductCategoryListOpen(false);
   };
+
+  const handleProductStatsUpdate = useCallback((productId, stats) => {
+    setCatalogProductDetails((prev) =>
+      prev && String(prev._id) === productId ? { ...prev, ...stats } : prev,
+    );
+    setProducts((prev) =>
+      prev.map((p) =>
+        String(p._id) === productId ? { ...p, ...stats } : p,
+      ),
+    );
+  }, []);
 
   const handleMyProfileClick = () => {
     setMyProfileModal({ open: true, phase: "loading", user: null, error: "" });
@@ -259,6 +377,33 @@ export function HomePage() {
     setProducts((prev) => [product, ...prev]);
   };
 
+  /** @param {import('../../../entities/product/model/types.js').ProductFromApi} product */
+  const handleOpenEditMyProduct = (product) => {
+    setProductToEdit(product);
+  };
+
+  const handleCloseEditProductModal = () => {
+    setProductToEdit(null);
+  };
+
+  /** @param {import('../../../entities/product/model/types.js').ProductFromApi} product */
+  const handleEditProductSuccess = (product) => {
+    const id = String(product._id);
+    setProducts((prev) => {
+      if (
+        selectedProductCategory &&
+        product.productCategory !== selectedProductCategory
+      ) {
+        return prev.filter((p) => String(p._id) !== id);
+      }
+      if (!prev.some((p) => String(p._id) === id)) {
+        return prev;
+      }
+      return prev.map((p) => (String(p._id) === id ? product : p));
+    });
+    setProductToEdit(null);
+  };
+
   /**
    * @param {string} productId
    * @param {boolean} productIsAvailable
@@ -267,10 +412,9 @@ export function HomePage() {
     try {
       setTogglingAvailabilityProductId(productId);
       setMyProductsCatalogError("");
-      const updated = await patchMyProductAvailability(
-        productId,
+      const updated = await patchMyProduct(productId, {
         productIsAvailable,
-      );
+      });
       setProducts((prev) =>
         prev.map((p) => (String(p._id) === productId ? updated : p)),
       );
@@ -278,7 +422,7 @@ export function HomePage() {
       const message =
         e instanceof Error
           ? e.message
-          : API_CLIENT_UI.PATCH_MY_PRODUCT_AVAILABILITY_FALLBACK;
+          : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK;
       setMyProductsCatalogError(message);
     } finally {
       setTogglingAvailabilityProductId(null);
@@ -324,10 +468,16 @@ export function HomePage() {
       );
     }
     if (mainView === "my-orders") {
-      return <MyOrdersPage onSellerNameClick={handleSellerNameClick} />;
+      return <MyOrdersPage
+        isAuthorized={isAuthorized}
+        onSellerNameClick={handleSellerNameClick}
+      />;
     }
     if (mainView === "my-sales") {
-      return <MySalesPage onSellerNameClick={handleSellerNameClick} />;
+      return <MySalesPage
+        isAuthorized={isAuthorized}
+        onSellerNameClick={handleSellerNameClick}
+      />;
     }
     if (mainView === "admin-orders") {
       return <AdminOrdersPage />;
@@ -352,12 +502,18 @@ export function HomePage() {
         deletingProductId={deletingProductId}
         onSellerNameClick={handleSellerNameClick}
         onDeleteMyProduct={handleDeleteMyProduct}
+        onEditMyProduct={handleOpenEditMyProduct}
         myProductsCatalogError={myProductsCatalogError}
         onOpenProductDetails={setCatalogProductDetails}
         onSetMyProductAvailability={handleSetMyProductAvailability}
         togglingAvailabilityProductId={togglingAvailabilityProductId}
         isAuthorized={isAuthorized}
         onRequestLoginAddToCart={() => setIsLoginModalOpen(true)}
+        catalogSentinelRef={catalogSentinelRef}
+        catalogHasMore={catalogHasMore}
+        isCatalogLoadingMore={isCatalogLoadingMore}
+        catalogLoadMoreError={catalogLoadMoreError}
+        onRetryCatalogLoadMore={handleRetryCatalogLoadMore}
       />
     );
   };
@@ -475,11 +631,20 @@ export function HomePage() {
         onClose={() => setIsCreateProductModalOpen(false)}
         onSuccess={handleCreateProductSuccess}
       />
+      <CreateProductModal
+        isOpen={productToEdit != null}
+        onClose={handleCloseEditProductModal}
+        onSuccess={handleEditProductSuccess}
+        mode="edit"
+        productToEdit={productToEdit}
+      />
       <ProductDetailsModal
         isOpen={catalogProductDetails != null}
         product={catalogProductDetails}
         onClose={() => setCatalogProductDetails(null)}
         onSellerNameClick={handleSellerNameClick}
+        isAuthorized={isAuthorized}
+        onProductStatsUpdate={handleProductStatsUpdate}
       />
     </div>
   );

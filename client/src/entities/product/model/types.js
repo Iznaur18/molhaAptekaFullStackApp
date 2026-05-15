@@ -1,5 +1,5 @@
 /**
- * @typedef {'electronics'|'clothing'|'food'|'figures'} ProductCategory
+ * @typedef {import('./productConstants.js').PRODUCT_CATEGORIES[number]} ProductCategory
  */
 
 /**
@@ -24,6 +24,7 @@
  * @property {ProductSellerPopulated|string} productSeller
  * @property {ProductCategory} productCategory
  * @property {boolean} productIsAvailable
+ * @property {number} [uniqueViewerCount]
  * @property {string} createdAt
  * @property {string} updatedAt
  */

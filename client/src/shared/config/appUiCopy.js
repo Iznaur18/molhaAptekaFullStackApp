@@ -27,8 +27,7 @@ export const API_CLIENT_UI = {
   FETCH_USERS_SEARCH_FALLBACK: "Не удалось загрузить пользователей",
   FETCH_MY_PRODUCTS_FALLBACK: "Не удалось загрузить ваши товары",
   DELETE_MY_PRODUCT_FALLBACK: "Не удалось удалить товар",
-  PATCH_MY_PRODUCT_AVAILABILITY_FALLBACK:
-    "Не удалось обновить видимость товара",
+  PATCH_MY_PRODUCT_FALLBACK: "Не удалось обновить товар",
   CREATE_PRODUCT_FALLBACK: "Не удалось создать товар",
   VOTE_SUBMIT_FALLBACK: "Не удалось отправить оценку",
   FETCH_MY_VOTE_FALLBACK: "Не удалось загрузить вашу оценку",
@@ -37,6 +36,7 @@ export const API_CLIENT_UI = {
   REPLACE_CART_FALLBACK: "Не удалось сохранить корзину",
   FETCH_MY_ORDERS_FALLBACK: "Не удалось загрузить ваши заказы",
   FETCH_MY_SALES_FALLBACK: "Не удалось загрузить ваши продажи",
+  RECORD_PRODUCT_VIEW_FALLBACK: "Не удалось записать просмотр товара",
   FETCH_ALL_ORDERS_FALLBACK: "Не удалось загрузить заказы",
   UPDATE_ORDER_STATUS_FALLBACK: "Не удалось обновить статус заказа",
 };
@@ -104,6 +104,9 @@ export const HOME_PAGE_UI = {
   EMPTY_MY_FILTERED: "У вас нет товаров в каталоге с текущими фильтрами.",
   EMPTY_CATEGORY: "В выбранной категории товаров нет.",
   EMPTY_BY_QUERY: "По вашему запросу ничего не найдено.",
+  CATALOG_LOAD_MORE_FAIL: "Не удалось подгрузить ещё товары",
+  CATALOG_LOAD_MORE_RETRY: "Повторить",
+  CATALOG_LOADING_MORE: "Подгружаем…",
 };
 
 /** Кнопка добавления товара в корзину */
@@ -186,6 +189,9 @@ export const MY_SALES_PAGE_UI = {
   SEARCH_LABEL: "Поиск покупателя",
   SEARCH_PLACEHOLDER: "Имя, email или телефон покупателя…",
   SEARCH_DEBOUNCE_MS: 350,
+  PRODUCT_FILTER_LABEL: "Товары",
+  PRODUCT_FILTER_EMPTY_CATALOG: "В каталоге нет товаров — фильтр по позициям недоступен.",
+  EMPTY_BY_PRODUCT_FILTER: "По выбранным товарам продаж не найдено.",
 };
 
 /** Страница «Все заказы» (админ) */
@@ -223,8 +229,11 @@ export const USER_LIST_ROW_UI = {
 /** Модалка создания товара (`POST /product`) */
 export const CREATE_PRODUCT_MODAL_UI = {
   ARIA_DIALOG: "Создание товара",
+  ARIA_DIALOG_EDIT: "Редактирование товара",
   ARIA_CLOSE_BACKDROP: "Закрыть окно создания товара",
+  ARIA_CLOSE_BACKDROP_EDIT: "Закрыть окно редактирования товара",
   TITLE: "Новый товар",
+  TITLE_EDIT: "Редактирование товара",
   LABEL_NAME: "Название",
   LABEL_DESCRIPTION: "Описание",
   LABEL_IMAGE_URLS:
@@ -237,8 +246,11 @@ export const CREATE_PRODUCT_MODAL_UI = {
   LABEL_AVAILABLE: "Товар в наличии",
   SUBMIT_IDLE: "Создать",
   SUBMIT_LOADING: "Создаём…",
+  SUBMIT_EDIT_IDLE: "Сохранить",
+  SUBMIT_EDIT_LOADING: "Сохраняем…",
   ERROR_PRICE: "Укажите корректную цену (число ≥ 0)",
   ERROR_GENERIC: "Не удалось создать товар",
+  ERROR_EDIT_GENERIC: "Не удалось сохранить изменения",
 };
 
 /** Модалка карточки товара в каталоге */
@@ -257,6 +269,7 @@ export const PRODUCT_CARD_UI = {
   HIDE_FROM_CATALOG: "Скрыть от покупателей",
   SHOW_IN_CATALOG: "Показать в каталоге",
   AVAILABILITY_TOGGLE_PENDING: "Обновление…",
+  EDIT_PRODUCT: "Изменить",
   DELETE_PRODUCT: "Удалить товар",
   DELETE_PRODUCT_PENDING: "Удаление…",
   DELETE_CONFIRM_QUESTION: "Вы уверены, что хотите удалить этот товар?",

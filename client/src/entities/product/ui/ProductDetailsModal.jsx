@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
+import { recordProductView } from "../api/recordProductView.js";
 import {
   COMMON_UI,
   PRODUCT_CARD_UI,
@@ -75,6 +76,11 @@ function renderFieldRows(product, keys, handlers) {
  *   onClose: () => void;
  *   product: import("../model/types.js").ProductFromApi | null;
  *   onSellerNameClick?: (userId: string) => void;
+ *   isAuthorized?: boolean;
+ *   onProductStatsUpdate?: (
+ *     productId: string,
+ *     stats: { uniqueViewerCount: number },
+ *   ) => void;
  * }} props
  */
 export function ProductDetailsModal({
@@ -82,6 +88,8 @@ export function ProductDetailsModal({
   onClose,
   product,
   onSellerNameClick,
+  isAuthorized = false,
+  onProductStatsUpdate,
 }) {
   const imageUrls = useMemo(
     () => (product ? resolveProductImageUrls(product) : []),
@@ -94,6 +102,25 @@ export function ProductDetailsModal({
     setActiveImageIndex(0);
     setLightboxOpen(false);
   }, [product?._id]);
+
+  useEffect(() => {
+    if (!isOpen || !product?._id || !isAuthorized) return undefined;
+    let cancelled = false;
+    void (async () => {
+      try {
+        const { uniqueViewerCount } = await recordProductView(
+          String(product._id),
+        );
+        if (cancelled) return;
+        onProductStatsUpdate?.(String(product._id), { uniqueViewerCount });
+      } catch {
+        // метрика не должна ломать модалку
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen, product?._id, isAuthorized, onProductStatsUpdate]);
 
   useEffect(() => {
     if (!isOpen) return undefined;

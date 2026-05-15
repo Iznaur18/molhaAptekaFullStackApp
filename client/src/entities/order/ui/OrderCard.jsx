@@ -25,6 +25,34 @@ const formatBuyer = (buyer) => {
   return buyer.userName?.trim() || buyer.email || COMMON_UI.EM_DASH;
 };
 
+/**
+ * @param {{
+ *   buyer: import("../model/types.js").Order["userBuyerId"];
+ *   onBuyerNameClick?: (userId: string) => void;
+ * }} props
+ */
+function renderBuyerValue(buyer, onBuyerNameClick) {
+  if (buyer == null || typeof buyer === "string") {
+    return COMMON_UI.EM_DASH;
+  }
+  const label = formatBuyer(buyer);
+  const canLink =
+    typeof onBuyerNameClick === "function" && buyer._id != null;
+
+  if (canLink) {
+    return (
+      <button
+        type="button"
+        className="order-card__buyer-link"
+        onClick={() => onBuyerNameClick(String(buyer._id))}
+      >
+        {label}
+      </button>
+    );
+  }
+  return label;
+}
+
 const formatProductName = (productId) => {
   if (productId == null || typeof productId === "string") return COMMON_UI.EM_DASH;
   return productId.productName?.trim() || COMMON_UI.EM_DASH;
@@ -41,6 +69,7 @@ const formatProductName = (productId) => {
  *   onConfirmDelivered?: (ctx: { orderId: string; itemIndex: number }) => void | Promise<void>;
  *   pendingActionKey?: string | null;
  *   itemActionErrors?: Record<string, string>;
+ *   onBuyerNameClick?: (userId: string) => void;
  * }} props
  */
 export function OrderCard({
@@ -53,6 +82,7 @@ export function OrderCard({
   onConfirmDelivered,
   pendingActionKey = null,
   itemActionErrors = {},
+  onBuyerNameClick,
 }) {
   return (
     <article className="order-card">
@@ -69,7 +99,7 @@ export function OrderCard({
         {showBuyer ? (
           <div className="order-card__meta-row">
             <dt>{ORDER_CARD_UI.BUYER_LABEL}</dt>
-            <dd>{formatBuyer(order.userBuyerId)}</dd>
+            <dd>{renderBuyerValue(order.userBuyerId, onBuyerNameClick)}</dd>
           </div>
         ) : null}
         <div className="order-card__meta-row">

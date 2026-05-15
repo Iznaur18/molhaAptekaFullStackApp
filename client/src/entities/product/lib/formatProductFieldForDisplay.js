@@ -70,6 +70,10 @@ export function formatProductFieldForDisplay(key, product) {
       const label = PRODUCT_CATEGORY_LABEL_RU[raw];
       return label ?? (raw == null ? COMMON_UI.EM_DASH : String(raw));
     }
+    case "uniqueViewerCount": {
+      const n = Number(raw);
+      return Number.isFinite(n) ? String(Math.max(0, Math.floor(n))) : "0";
+    }
     case "productIsAvailable":
       if (raw === true) return FORMAT_BOOLEAN_RU.YES;
       if (raw === false) return FORMAT_BOOLEAN_RU.NO;

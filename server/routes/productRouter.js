@@ -4,14 +4,15 @@ import {
     getProductsController,
     getMyProductsController,
     deleteMyProductController,
-    patchMyProductAvailabilityController,
+    patchMyProductController,
+    recordProductViewController,
 } from '../controllers/index.js';
 import { checkAuthMW } from '../middlewares/index.js';
 import {
     makeProductValidation,
     productIdParamValidation,
     productsSearchValidation,
-    updateProductAvailabilityValidation,
+    patchMyProductValidation,
 } from '../validations/index.js';
 
 const router = Router();
@@ -19,12 +20,18 @@ const router = Router();
 router.post('/', checkAuthMW, makeProductValidation, postProductController);
 router.get('/', productsSearchValidation, getProductsController);
 router.get('/my', checkAuthMW, productsSearchValidation, getMyProductsController);
+router.post(
+    '/:productId/view',
+    checkAuthMW,
+    productIdParamValidation,
+    recordProductViewController,
+);
 router.patch(
     '/:productId',
     checkAuthMW,
     productIdParamValidation,
-    updateProductAvailabilityValidation,
-    patchMyProductAvailabilityController,
+    patchMyProductValidation,
+    patchMyProductController,
 );
 router.delete(
     '/:productId',

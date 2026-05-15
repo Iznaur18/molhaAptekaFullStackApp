@@ -1,4 +1,6 @@
 import { query } from 'express-validator';
+
+import { PRODUCT_CATEGORY_VALUES } from '../../constants/productConstants.js';
 import { handleValidationByExpressErrors } from '../handleValidationByExpressErrors.js';
 
 /**
@@ -22,5 +24,12 @@ export const productsSearchValidation = [
         .isInt({ min: 1, max: 100 })
         .withMessage('limit должен быть целым числом от 1 до 100')
         .toInt(),
+    query('productCategory')
+        .optional()
+        .isString()
+        .withMessage('productCategory должен быть строкой')
+        .trim()
+        .isIn(PRODUCT_CATEGORY_VALUES)
+        .withMessage('Указана неизвестная категория'),
     handleValidationByExpressErrors,
 ];

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { fetchMyOrders } from "../../../entities/order/api/fetchMyOrders.js";
 import { confirmOrderItem } from "../../../entities/order/api/updateOrderItemStatus.js";
@@ -13,9 +13,12 @@ import {
 import "./MyOrdersPage.css";
 
 /**
- * @param {{ onSellerNameClick?: (userId: string) => void }} [props]
+ * @param {{
+ *   isAuthorized: boolean;
+ *   onSellerNameClick?: (userId: string) => void;
+ * }} props
  */
-export function MyOrdersPage({ onSellerNameClick }) {
+export function MyOrdersPage({ isAuthorized, onSellerNameClick }) {
   const [phase, setPhase] = useState("loading");
   const [orders, setOrders] = useState(
     /** @type {import('../../../entities/order/model/types.js').Order[]} */ ([]),
@@ -89,6 +92,12 @@ export function MyOrdersPage({ onSellerNameClick }) {
     }
   };
 
+  const handleProductStatsUpdate = useCallback((productId, stats) => {
+    setSelectedProduct((prev) =>
+      prev && String(prev._id) === productId ? { ...prev, ...stats } : prev,
+    );
+  }, []);
+
   if (phase === "loading") {
     return <p className="my-orders-page__state">{MY_ORDERS_PAGE_UI.LOADING}</p>;
   }
@@ -132,6 +141,8 @@ export function MyOrdersPage({ onSellerNameClick }) {
         product={selectedProduct}
         onClose={() => setSelectedProduct(null)}
         onSellerNameClick={onSellerNameClick}
+        isAuthorized={isAuthorized}
+        onProductStatsUpdate={handleProductStatsUpdate}
       />
     </>
   );

@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
 
-import { PRODUCT_IMAGE_URLS_MAX } from "../constants/productConstants.js";
+import {
+  PRODUCT_CATEGORY_VALUES,
+  PRODUCT_IMAGE_URLS_MAX,
+} from "../constants/productConstants.js";
 
 const Schema = mongoose.Schema;
 
@@ -28,12 +31,17 @@ const ProductSchema = new Schema(
     },
     productCategory: {
       type: String,
-      enum: ["electronics", "clothing", "food", "figures"],
+      enum: PRODUCT_CATEGORY_VALUES,
       required: true,
     },
     productIsAvailable: {
       type: Boolean,
       default: true,
+    },
+    uniqueViewerCount: {
+      type: Number,
+      default: 0,
+      min: 0,
     },
   },
   { timestamps: true },

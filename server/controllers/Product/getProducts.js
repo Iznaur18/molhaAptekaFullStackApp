@@ -19,11 +19,19 @@ const buildProductsQuery = (search, baseQuery = {}) => {
     return searchCondition ? { ...baseQuery, ...searchCondition } : baseQuery;
 };
 
+const categoryFromQuery = (query) => {
+    const raw = query?.productCategory;
+    if (raw == null || String(raw).trim() === '') return null;
+    return String(raw).trim();
+};
+
 export const getProductsController = async (req, res) => {
     try {
         const { page, limit, skip } = parsePagination(req.query);
+        const category = categoryFromQuery(req.query);
         const productsQuery = buildProductsQuery(req.query.search, {
             productIsAvailable: { $ne: false },
+            ...(category ? { productCategory: category } : {}),
         });
 
         const [products, total] = await Promise.all([
@@ -52,16 +60,31 @@ export const getProductsController = async (req, res) => {
 
 export const getMyProductsController = async (req, res) => {
     try {
+        const { page, limit, skip } = parsePagination(req.query);
+        const category = categoryFromQuery(req.query);
         const productsQuery = buildProductsQuery(req.query.search, {
             productSeller: req.userId,
+            ...(category ? { productCategory: category } : {}),
         });
 
-        const products = await ProductModel.find(productsQuery)
-            .populate('productSeller', SELLER_PUBLIC_FIELDS)
-            .sort({ createdAt: -1 })
-            .lean();
+        const [products, total] = await Promise.all([
+            ProductModel.find(productsQuery)
+                .populate('productSeller', SELLER_PUBLIC_FIELDS)
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit)
+                .lean(),
+            ProductModel.countDocuments(productsQuery),
+        ]);
 
-        return successRes(res, { products });
+        const pagination = {
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit),
+        };
+
+        return successRes(res, { products, pagination });
     } catch (error) {
         console.error(error);
         return errorRes(res, 500, 'Ошибка при получении своих продуктов');

@@ -1,9 +1,12 @@
+import mongoose from 'mongoose';
 import { query } from 'express-validator';
 
 import { ORDER_STATUSES } from '../../constants/orderConstants.js';
 import { handleValidationByExpressErrors } from '../handleValidationByExpressErrors.js';
 
 const SEARCH_MAX_LENGTH = 100;
+const PRODUCT_IDS_QUERY_MAX_LENGTH = 2800;
+const MAX_PRODUCT_IDS_IN_FILTER = 50;
 
 /** Валидация query `GET /order/sales` (продажи текущего продавца). */
 export const getMySalesValidation = [
@@ -28,5 +31,28 @@ export const getMySalesValidation = [
         .trim()
         .isLength({ max: SEARCH_MAX_LENGTH })
         .withMessage(`search не более ${SEARCH_MAX_LENGTH} символов`),
+    query('productIds')
+        .optional()
+        .isString()
+        .withMessage('productIds должен быть строкой')
+        .trim()
+        .isLength({ max: PRODUCT_IDS_QUERY_MAX_LENGTH })
+        .withMessage(`productIds не длиннее ${PRODUCT_IDS_QUERY_MAX_LENGTH} символов`)
+        .custom((value) => {
+            if (!value || String(value).trim() === '') return true;
+            const parts = value
+                .split(',')
+                .map((s) => s.trim())
+                .filter(Boolean);
+            if (parts.length > MAX_PRODUCT_IDS_IN_FILTER) {
+                throw new Error(`не более ${MAX_PRODUCT_IDS_IN_FILTER} товаров в фильтре`);
+            }
+            for (const id of parts) {
+                if (!mongoose.isValidObjectId(id)) {
+                    throw new Error('неверный идентификатор товара в productIds');
+                }
+            }
+            return true;
+        }),
     handleValidationByExpressErrors,
 ];

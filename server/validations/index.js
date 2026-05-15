@@ -8,7 +8,7 @@ import { userSearchValidation } from './user/userSearchValidation.js';
 import { makeProductValidation } from './product/makeProductValidation.js';
 import { productIdParamValidation } from './product/productIdParamValidation.js';
 import { productsSearchValidation } from './product/productsSearchValidation.js';
-import { updateProductAvailabilityValidation } from './product/updateProductAvailabilityValidation.js';
+import { patchMyProductValidation } from './product/patchMyProductValidation.js';
 import { makeOrderValidation } from './order/makeOrderValidation.js';
 import { updateOrderStatusValidation } from './order/updateOrderStatusValidation.js';
 import { getAllOrdersValidation } from './order/getAllOrdersValidation.js';
@@ -29,7 +29,7 @@ export {
     makeProductValidation,
     productIdParamValidation,
     productsSearchValidation,
-    updateProductAvailabilityValidation,
+    patchMyProductValidation,
     makeOrderValidation,
     updateOrderStatusValidation,
     getAllOrdersValidation,

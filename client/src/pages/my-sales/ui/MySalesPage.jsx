@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { fetchMySales } from "../../../entities/order/api/fetchMySales.js";
 import {
@@ -12,9 +12,11 @@ import {
   ORDER_STATUS_LABEL_RU,
 } from "../../../entities/order/model/constants.js";
 import { OrderCard } from "../../../entities/order/ui/OrderCard.jsx";
+import { fetchAllMyProducts } from "../../../entities/product/api/fetchMyProducts.js";
 import { ProductDetailsModal } from "../../../entities/product/ui/ProductDetailsModal.jsx";
 import {
   API_CLIENT_UI,
+  COMMON_UI,
   MY_SALES_PAGE_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { useDebouncedValue } from "../../../shared/lib/useDebouncedValue.js";
@@ -23,9 +25,12 @@ import { SearchInput } from "../../../shared/ui/SearchInput/SearchInput.jsx";
 import "./MySalesPage.css";
 
 /**
- * @param {{ onSellerNameClick?: (userId: string) => void }} [props]
+ * @param {{
+ *   isAuthorized: boolean;
+ *   onSellerNameClick?: (userId: string) => void;
+ * }} props
  */
-export function MySalesPage({ onSellerNameClick }) {
+export function MySalesPage({ isAuthorized, onSellerNameClick }) {
   const [statusFilter, setStatusFilter] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebouncedValue(
@@ -34,7 +39,16 @@ export function MySalesPage({ onSellerNameClick }) {
   );
   const isSearchPending = searchTerm !== debouncedSearchTerm;
   const hasSearchQuery = debouncedSearchTerm.trim() !== "";
+  const [selectedProductIds, setSelectedProductIds] = useState(
+    /** @type {string[]} */ ([]),
+  );
+
   const [phase, setPhase] = useState("loading");
+  const [catalogProducts, setCatalogProducts] = useState(
+    /** @type {import('../../../entities/product/model/types.js').ProductFromApi[]} */ (
+      []
+    ),
+  );
   const [orders, setOrders] = useState(
     /** @type {import('../../../entities/order/model/types.js').Order[]} */ ([]),
   );
@@ -43,13 +57,40 @@ export function MySalesPage({ onSellerNameClick }) {
   const [pendingActionKey, setPendingActionKey] = useState(null);
   const [itemActionErrors, setItemActionErrors] = useState({});
 
-  const reloadSales = async () => {
-    const list = await fetchMySales({
+  const getSalesParams = useCallback(() => {
+    return {
       ...(statusFilter ? { status: statusFilter } : {}),
       ...(hasSearchQuery ? { search: debouncedSearchTerm.trim() } : {}),
-    });
+      ...(selectedProductIds.length > 0 ? { productIds: selectedProductIds } : {}),
+    };
+  }, [
+    statusFilter,
+    hasSearchQuery,
+    debouncedSearchTerm,
+    selectedProductIds,
+  ]);
+
+  const reloadSales = useCallback(async () => {
+    const list = await fetchMySales(getSalesParams());
     setOrders(list);
-  };
+  }, [getSalesParams]);
+
+  const sortedCatalogProducts = useMemo(
+    () =>
+      [...catalogProducts].sort((a, b) =>
+        (a.productName ?? "").localeCompare(
+          b.productName ?? "",
+          COMMON_UI.LOCALE_RU,
+        ),
+      ),
+    [catalogProducts],
+  );
+
+  const handleProductStatsUpdate = useCallback((productId, stats) => {
+    setSelectedProduct((prev) =>
+      prev && String(prev._id) === productId ? { ...prev, ...stats } : prev,
+    );
+  }, []);
 
   useEffect(() => {
     let isCancelled = false;
@@ -57,11 +98,12 @@ export function MySalesPage({ onSellerNameClick }) {
 
     const load = async () => {
       try {
-        const list = await fetchMySales({
-          ...(statusFilter ? { status: statusFilter } : {}),
-          ...(hasSearchQuery ? { search: debouncedSearchTerm.trim() } : {}),
-        });
+        const [products, list] = await Promise.all([
+          fetchAllMyProducts(),
+          fetchMySales(getSalesParams()),
+        ]);
         if (isCancelled) return;
+        setCatalogProducts(products);
         setOrders(list);
         setPhase("success");
       } catch (e) {
@@ -79,7 +121,15 @@ export function MySalesPage({ onSellerNameClick }) {
     return () => {
       isCancelled = true;
     };
-  }, [statusFilter, debouncedSearchTerm, hasSearchQuery]);
+  }, [getSalesParams]);
+
+  const handleToggleProductFilter = useCallback((productId) => {
+    setSelectedProductIds((prev) =>
+      prev.includes(productId)
+        ? prev.filter((id) => id !== productId)
+        : [...prev, productId],
+    );
+  }, []);
 
   const handleMarkDelivered = async ({ orderId, itemIndex }) => {
     const actionKey = `${orderId}:${itemIndex}`;
@@ -107,7 +157,9 @@ export function MySalesPage({ onSellerNameClick }) {
       void reloadSales();
     } catch (e) {
       const message =
-        e instanceof Error ? e.message : API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK;
+        e instanceof Error
+          ? e.message
+          : API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK;
       setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
       void reloadSales();
     } finally {
@@ -141,7 +193,9 @@ export function MySalesPage({ onSellerNameClick }) {
       void reloadSales();
     } catch (e) {
       const message =
-        e instanceof Error ? e.message : API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK;
+        e instanceof Error
+          ? e.message
+          : API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK;
       setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
       void reloadSales();
     } finally {
@@ -161,6 +215,14 @@ export function MySalesPage({ onSellerNameClick }) {
     );
   }
 
+  const emptyMessage = hasSearchQuery
+    ? MY_SALES_PAGE_UI.EMPTY_BY_SEARCH
+    : selectedProductIds.length > 0
+      ? MY_SALES_PAGE_UI.EMPTY_BY_PRODUCT_FILTER
+      : statusFilter
+        ? MY_SALES_PAGE_UI.EMPTY_BY_FILTER
+        : MY_SALES_PAGE_UI.EMPTY;
+
   if (orders.length === 0) {
     return (
       <div className="my-sales-page">
@@ -170,14 +232,11 @@ export function MySalesPage({ onSellerNameClick }) {
           searchTerm={searchTerm}
           onSearchTermChange={setSearchTerm}
           isSearchPending={isSearchPending}
+          catalogProducts={sortedCatalogProducts}
+          selectedProductIds={selectedProductIds}
+          onToggleProductFilter={handleToggleProductFilter}
         />
-        <p className="my-sales-page__state">
-          {hasSearchQuery
-            ? MY_SALES_PAGE_UI.EMPTY_BY_SEARCH
-            : statusFilter
-              ? MY_SALES_PAGE_UI.EMPTY_BY_FILTER
-              : MY_SALES_PAGE_UI.EMPTY}
-        </p>
+        <p className="my-sales-page__state">{emptyMessage}</p>
       </div>
     );
   }
@@ -190,6 +249,9 @@ export function MySalesPage({ onSellerNameClick }) {
         searchTerm={searchTerm}
         onSearchTermChange={setSearchTerm}
         isSearchPending={isSearchPending}
+        catalogProducts={sortedCatalogProducts}
+        selectedProductIds={selectedProductIds}
+        onToggleProductFilter={handleToggleProductFilter}
       />
       <ul className="my-sales-page__list" role="list">
         {orders.map((order) => (
@@ -197,6 +259,7 @@ export function MySalesPage({ onSellerNameClick }) {
             <OrderCard
               order={order}
               showBuyer
+              onBuyerNameClick={onSellerNameClick}
               onProductClick={setSelectedProduct}
               onMarkShipped={handleMarkShipped}
               onMarkDelivered={handleMarkDelivered}
@@ -211,17 +274,34 @@ export function MySalesPage({ onSellerNameClick }) {
         product={selectedProduct}
         onClose={() => setSelectedProduct(null)}
         onSellerNameClick={onSellerNameClick}
+        isAuthorized={isAuthorized}
+        onProductStatsUpdate={handleProductStatsUpdate}
       />
     </div>
   );
 }
 
+/**
+ * @param {{
+ *   statusFilter: string;
+ *   onStatusFilterChange: (value: string) => void;
+ *   searchTerm: string;
+ *   onSearchTermChange: (value: string) => void;
+ *   isSearchPending: boolean;
+ *   catalogProducts: import("../../../entities/product/model/types.js").ProductFromApi[];
+ *   selectedProductIds: string[];
+ *   onToggleProductFilter: (productId: string) => void;
+ * }} props
+ */
 function SalesFilters({
   statusFilter,
   onStatusFilterChange,
   searchTerm,
   onSearchTermChange,
   isSearchPending,
+  catalogProducts,
+  selectedProductIds,
+  onToggleProductFilter,
 }) {
   return (
     <div className="my-sales-page__filters">
@@ -240,6 +320,37 @@ function SalesFilters({
           ))}
         </select>
       </label>
+
+      <div className="my-sales-page__product-filter" role="group">
+        <span className="my-sales-page__filter-label" id="my-sales-product-filter-label">
+          {MY_SALES_PAGE_UI.PRODUCT_FILTER_LABEL}
+        </span>
+        {catalogProducts.length === 0 ? (
+          <p className="my-sales-page__product-filter-empty">
+            {MY_SALES_PAGE_UI.PRODUCT_FILTER_EMPTY_CATALOG}
+          </p>
+        ) : (
+          <div
+            className="my-sales-page__product-checkboxes"
+            aria-labelledby="my-sales-product-filter-label"
+          >
+            {catalogProducts.map((product) => {
+              const id = String(product._id);
+              return (
+                <label key={id} className="my-sales-page__product-option">
+                  <input
+                    type="checkbox"
+                    checked={selectedProductIds.includes(id)}
+                    onChange={() => onToggleProductFilter(id)}
+                  />
+                  <span>{product.productName}</span>
+                </label>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
       <div className="my-sales-page__search">
         <SearchInput
           value={searchTerm}

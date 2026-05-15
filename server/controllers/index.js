@@ -17,7 +17,8 @@ import {
 import { postProductController } from './Product/postProductController.js';
 import { getProductsController, getMyProductsController } from './Product/getProducts.js';
 import { deleteMyProductController } from './Product/deleteMyProductController.js';
-import { patchMyProductAvailabilityController } from './Product/patchMyProductAvailabilityController.js';
+import { patchMyProductController } from './Product/patchMyProductController.js';
+import { recordProductViewController } from './Product/recordProductViewController.js';
 import { getMyCartController } from './Cart/getMyCartController.js';
 import { replaceMyCartController } from './Cart/replaceMyCartController.js';
 
@@ -46,7 +47,8 @@ export {
     getProductsController,
     getMyProductsController,
     deleteMyProductController,
-    patchMyProductAvailabilityController,
+    patchMyProductController,
+    recordProductViewController,
     getMyCartController,
     replaceMyCartController,
 };
