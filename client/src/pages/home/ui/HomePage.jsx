@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { useCart } from "../../../entities/cart/model/useCart.js";
 import { CartServerSync } from "../../../entities/cart/ui/CartServerSync.jsx";
@@ -29,6 +30,10 @@ import {
   HOME_PAGE_UI,
   PRODUCT_SEARCH_UI,
 } from "../../../shared/config/appUiCopy.js";
+import {
+  mainViewToPathname,
+  pathnameToMainView,
+} from "../../../shared/lib/homeMainViewPaths.js";
 import { useDebouncedValue } from "../../../shared/lib/useDebouncedValue.js";
 
 import { HomeCatalogGrid } from "./HomeCatalogGrid.jsx";
@@ -77,9 +82,25 @@ const useCurrentUserId = (isAuthorized) => {
 
 export function HomePage() {
   const { flushRemoteCart } = useCart();
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  /** @type {[HomeMainView, import('react').Dispatch<import('react').SetStateAction<HomeMainView>>]} */
-  const [mainView, setMainView] = useState("catalog");
+  const mainView = useMemo(() => {
+    return pathnameToMainView(location.pathname) ?? "catalog";
+  }, [location.pathname]);
+
+  const goToMainView = useCallback(
+    (/** @type {HomeMainView} */ view) => {
+      navigate(mainViewToPathname(view));
+    },
+    [navigate],
+  );
+
+  useEffect(() => {
+    if (pathnameToMainView(location.pathname) !== null) return undefined;
+    navigate("/", { replace: true });
+    return undefined;
+  }, [location.pathname, navigate]);
   /** @type {[ProductsMode, import('react').Dispatch<import('react').SetStateAction<ProductsMode>>]} */
   const [productsMode, setProductsMode] = useState("all");
   /** @type {[ProductFromApi[], import('react').Dispatch<import('react').SetStateAction<ProductFromApi[]>>]} */
@@ -286,7 +307,7 @@ export function HomePage() {
     setCurrentUserId(null);
     setIsAuthorized(false);
     closeMyProfileModal();
-    setMainView("catalog");
+    navigate("/", { replace: true });
   };
 
   /** @param {string} userId */
@@ -344,7 +365,7 @@ export function HomePage() {
   const handleNavigateToFullCatalogFromBreadcrumb = () => {
     setProductsMode("all");
     setMyProductsCatalogError("");
-    setMainView("catalog");
+    goToMainView("catalog");
     setSelectedProductCategory(null);
     setIsProductCategoryListOpen(false);
   };
@@ -353,22 +374,22 @@ export function HomePage() {
     if (myProfileModal.phase !== "success" || !myProfileModal.user?._id) return;
     setMyProductsCatalogError("");
     setProductsMode("mine");
-    setMainView("catalog");
+    goToMainView("catalog");
     closeMyProfileModal();
   };
 
   const handleMyOrdersFromProfile = () => {
-    setMainView("my-orders");
+    goToMainView("my-orders");
     closeMyProfileModal();
   };
 
   const handleMySalesFromProfile = () => {
-    setMainView("my-sales");
+    goToMainView("my-sales");
     closeMyProfileModal();
   };
 
   const handleAdminOrdersFromProfile = () => {
-    setMainView("admin-orders");
+    goToMainView("admin-orders");
     closeMyProfileModal();
   };
 
@@ -461,8 +482,8 @@ export function HomePage() {
         <CartPage
           isAuthorized={isAuthorized}
           onRequestLogin={() => setIsLoginModalOpen(true)}
-          onGoToCatalog={() => setMainView("catalog")}
-          onCheckoutSuccess={() => setMainView("my-orders")}
+          onGoToCatalog={() => goToMainView("catalog")}
+          onCheckoutSuccess={() => goToMainView("my-orders")}
           onSellerNameClick={handleSellerNameClick}
         />
       );
@@ -529,7 +550,7 @@ export function HomePage() {
         productSearchTerm={productSearchTerm}
         isProductSearchPending={isProductSearchPending}
         isAuthorized={isAuthorized}
-        onSetMainView={setMainView}
+        onSetMainView={goToMainView}
         onProductCategorySelect={handleProductCategorySelect}
         onProductCategoryFilterToggle={() =>
           setIsProductCategoryListOpen((open) => !open)
