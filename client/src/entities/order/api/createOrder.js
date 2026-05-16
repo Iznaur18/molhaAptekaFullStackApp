@@ -7,6 +7,7 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
  * @param {{
  *   items: { productId: string; quantity: number }[];
  *   deliveryAddress: string;
+ *   deliveryAddressFlat: string;
  *   paymentMethod: import('../model/constants.js').ORDER_PAYMENT_METHODS[number];
  * }} payload
  * @returns {Promise<import('../model/types.js').Order>}

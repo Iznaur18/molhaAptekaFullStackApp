@@ -214,6 +214,13 @@
   gap: 0.45rem;
 }
 
+.product-card__open-sales-hint {
+  margin: 0 0 0.5rem;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: #6b7280;
+}
+
 .product-card__availability {
   display: flex;
   flex-direction: column;

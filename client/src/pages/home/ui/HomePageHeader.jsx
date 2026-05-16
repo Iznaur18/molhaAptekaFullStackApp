@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 
 import {
+  CATALOG_SORT_OPTIONS,
+  CATALOG_SORT_LABEL_RU,
   PRODUCT_CATEGORIES,
   PRODUCT_CATEGORY_LABEL_RU,
 } from "../../../entities/product/model/productConstants.js";
@@ -41,6 +43,8 @@ const NON_CATALOG_VIEW_TITLES = {
  *   onLoginClick: () => void;
  *   onRegisterClick: () => void;
  *   onNavigateToFullCatalogFromBreadcrumb: () => void;
+ *   catalogSort: string;
+ *   onCatalogSortChange: (sort: string) => void;
  * }} props
  */
 export function HomePageHeader({
@@ -61,6 +65,8 @@ export function HomePageHeader({
   onLoginClick,
   onRegisterClick,
   onNavigateToFullCatalogFromBreadcrumb,
+  catalogSort,
+  onCatalogSortChange,
 }) {
   /** @type {import('react').RefObject<HTMLDivElement | null>} */
   const productCategoryFilterRef = useRef(null);
@@ -126,6 +132,8 @@ export function HomePageHeader({
             onNavigateToFullCatalogFromBreadcrumb={
               onNavigateToFullCatalogFromBreadcrumb
             }
+            catalogSort={catalogSort}
+            onCatalogSortChange={onCatalogSortChange}
           />
         )}
       </div>
@@ -175,6 +183,8 @@ function CatalogTitleAndFilters({
   onProductSearchTermChange,
   onCreateProductClick,
   onNavigateToFullCatalogFromBreadcrumb,
+  catalogSort,
+  onCatalogSortChange,
 }) {
   return (
     <>
@@ -264,6 +274,23 @@ function CatalogTitleAndFilters({
             ))}
           </ul>
         ) : null}
+      </div>
+
+      <div className="home-page__sort">
+        <label className="home-page__sort-label">
+          <span>{HOME_PAGE_UI.SORT_LABEL}</span>
+          <select
+            className="home-page__sort-control"
+            value={catalogSort}
+            onChange={(event) => onCatalogSortChange(event.target.value)}
+          >
+            {CATALOG_SORT_OPTIONS.map((sortKey) => (
+              <option key={sortKey} value={sortKey}>
+                {CATALOG_SORT_LABEL_RU[sortKey]}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
 
       <div className="home-page__search-row">

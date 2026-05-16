@@ -58,11 +58,13 @@ const useCatalogProducts = () => {
 };
 
 const useCurrentUserAddress = (isAuthorized) => {
-  const [address, setAddress] = useState("");
+  const [address, setAddress] = useState(
+    /** @type {Partial<{ userAddress?: string; userAddressFlat?: string; userAddressFiasId?: string; userAddressGeo?: { lat?: number; lon?: number } | null }>} */ ({}),
+  );
 
   useEffect(() => {
     if (!isAuthorized) {
-      setAddress("");
+      setAddress({});
       return undefined;
     }
     let isCancelled = false;
@@ -71,9 +73,14 @@ const useCurrentUserAddress = (isAuthorized) => {
       try {
         const me = await fetchCurrentUserProfile();
         if (isCancelled) return;
-        setAddress(me?.userAddress ?? "");
+        setAddress({
+          userAddress: me?.userAddress,
+          userAddressFlat: me?.userAddressFlat,
+          userAddressFiasId: me?.userAddressFiasId,
+          userAddressGeo: me?.userAddressGeo,
+        });
       } catch {
-        if (!isCancelled) setAddress("");
+        if (!isCancelled) setAddress({});
       }
     })();
 
@@ -134,7 +141,11 @@ export function CartPage({
   const isCartEmpty = lines.length === 0;
   const canCheckout = isAuthorized && purchasableLines.length > 0;
 
-  const handleCheckoutSubmit = async ({ deliveryAddress, paymentMethod }) => {
+  const handleCheckoutSubmit = async ({
+    deliveryAddress,
+    deliveryAddressFlat,
+    paymentMethod,
+  }) => {
     setSubmitState({ isSubmitting: true, error: "", success: "" });
     try {
       const orderItems = purchasableLines.map((line) => ({
@@ -144,6 +155,7 @@ export function CartPage({
       await createOrder({
         items: orderItems,
         deliveryAddress,
+        deliveryAddressFlat,
         paymentMethod,
       });
       clearCart();

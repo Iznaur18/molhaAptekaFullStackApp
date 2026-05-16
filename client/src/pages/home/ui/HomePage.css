@@ -94,6 +94,28 @@
   margin: 0 0 0.5rem;
 }
 
+.home-page__sort {
+  margin: 0 0 0.5rem;
+}
+
+.home-page__sort-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: #4b5563;
+}
+
+.home-page__sort-control {
+  padding: 0.4rem 0.65rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.4rem;
+  background: #fff;
+  font: inherit;
+  font-size: 0.9rem;
+  color: #111827;
+}
+
 .home-page__filter-button {
   display: inline-flex;
   align-items: center;

@@ -1,5 +1,6 @@
+import { validateRuDeliveryAddressForm } from "../../address/lib/validateRuDeliveryAddressForm.js";
 import { countWords } from "./countWords.js";
-import {
+import { validateRuPhoneField } from "./ruPhone.js";import {
   PROFILE_FIELD_MAX_WORDS,
   USER_GENDER_FEMALE,
   USER_GENDER_MALE,
@@ -25,8 +26,14 @@ export function validateEditProfileForm(form) {
     }
   }
 
-  if (countWords(form.userAddress) > PROFILE_FIELD_MAX_WORDS) {
-    return `Адрес: не больше ${PROFILE_FIELD_MAX_WORDS} слов`;
+  const phoneError = validateRuPhoneField(form.userPhoneNumber);
+  if (phoneError) return phoneError;
+
+  const addressLine = String(form.deliveryAddress.line ?? "").trim();
+  const addressFlat = String(form.deliveryAddress.flat ?? "").trim();
+  if (addressLine || addressFlat) {
+    const addressError = validateRuDeliveryAddressForm(form.deliveryAddress);
+    if (addressError) return addressError;
   }
   if (countWords(form.notesAboutUser) > PROFILE_FIELD_MAX_WORDS) {
     return `Заметки: не больше ${PROFILE_FIELD_MAX_WORDS} слов`;

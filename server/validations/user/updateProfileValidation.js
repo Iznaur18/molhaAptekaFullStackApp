@@ -1,10 +1,15 @@
 import { body, param } from 'express-validator';
 import { handleValidationByExpressErrors } from '../handleValidationByExpressErrors.js';
 import {
+  assertRuPhoneFormat,
+  normalizeRuPhoneInput,
+} from './ruPhoneRules.js';
+import {
   assertUserNameFormat,
   normalizeUserNameInput,
 } from './userNameRules.js';
 import { assertAtMostWords } from '../../utils/maxWordsText.js';
+import { ruDeliveryAddressBodyValidation } from '../address/ruDeliveryAddressValidation.js';
 
 /**
  * Валидация параметра userId в URL
@@ -62,36 +67,26 @@ export const updateProfileValidation = [
         .isIn(['male', 'female', 'noSelected'])
         .withMessage('Пол должен быть одним из: male, female, noSelected'),
     
-    body('userAddress')
-        .optional({ nullable: true }) // опциональное поле, nullable: true - разрешает null
-        .trim() // обрезаем пробелы перед валидацией
-        .custom((value) => {
-            if (value === null || value === '') { // если значение null или пустое, то разрешаем
-                return true; // Разрешаем null
-            }
-            if (typeof value !== 'string') { // если значение не строка, то ошибка
-                throw new Error('Адрес должен быть строкой');
-            }
-            try {
-                assertAtMostWords(value, 'Адрес');
-            } catch (e) {
-                throw new Error(e instanceof Error ? e.message : 'Слишком длинный адрес');
-            }
-            return true; // возвращаем true
-        }),
+    ...ruDeliveryAddressBodyValidation(),
     
     body('userPhoneNumber')
-        .optional({ nullable: true, checkFalsy: true }) // опциональное поле, nullable: true - разрешает null, checkFalsy: true - разрешает false
-        .trim() // обрезаем пробелы перед валидацией
+        .optional({ nullable: true, checkFalsy: true })
+        .trim()
+        .customSanitizer((value) => {
+            if (value === null || value === undefined) return value;
+            if (typeof value === 'string' && value.trim() === '') return null;
+            return normalizeRuPhoneInput(value);
+        })
         .custom((value) => {
-            if (value === null || value === '') { // если значение null или пустое, то разрешаем
-                return true; // Разрешаем null для очистки
+            if (value === null || value === '') {
+                return true;
             }
-            // Базовая проверка формата телефона (более строгая проверка в контроллере не нужна, так как это опциональное поле)
-            if (typeof value !== 'string') { // если значение не строка, то ошибка
-                throw new Error('Номер телефона должен быть строкой');
+            try {
+                assertRuPhoneFormat(value);
+            } catch (e) {
+                throw new Error(e instanceof Error ? e.message : 'Неверный номер телефона');
             }
-            return true; // возвращаем true
+            return true;
         }),
     
     body('userAvatarUrl')

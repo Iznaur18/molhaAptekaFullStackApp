@@ -101,6 +101,7 @@ export function ProductCard({
   };
 
   const handleDeleteIntentClick = () => {
+    if (hasOpenSalesLocked) return;
     setIsDeleteConfirmOpen(true);
   };
 
@@ -114,10 +115,12 @@ export function ProductCard({
   };
 
   const isListedForOthers = product.productIsAvailable !== false;
+  const hasOpenSalesLocked = product.hasOpenSales === true;
   const ownerActionsLocked =
     isDeletePending ||
     isAvailabilityTogglePending ||
-    isDeleteConfirmOpen;
+    isDeleteConfirmOpen ||
+    hasOpenSalesLocked;
 
   const handleEditClick = (event) => {
     event.stopPropagation();
@@ -267,9 +270,19 @@ export function ProductCard({
         type="button"
         className="product-card__delete"
         onClick={handleDeleteIntentClick}
+        disabled={hasOpenSalesLocked}
       >
         {PRODUCT_CARD_UI.DELETE_PRODUCT}
       </button>
+    );
+  };
+
+  const renderOpenSalesHint = () => {
+    if (onDeleteProduct == null || !hasOpenSalesLocked) return null;
+    return (
+      <p className="product-card__open-sales-hint">
+        {PRODUCT_CARD_UI.OPEN_SALES_LOCKED_HINT}
+      </p>
     );
   };
 
@@ -371,6 +384,7 @@ export function ProductCard({
       <div className="product-card__footer-actions">
         {onDeleteProduct ? (
           <>
+            {renderOpenSalesHint()}
             {renderOwnerCatalogVisibility()}
             {renderEditButton()}
             {renderDeleteFooter()}

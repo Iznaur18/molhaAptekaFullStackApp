@@ -1,6 +1,9 @@
 import { ProductModel } from "../../models/index.js";
 import { mergeProductImageUrlsFromBody } from "../../utils/mergeProductImageUrlsFromBody.js";
-import { isProductReferencedInAnyOrder } from "../../utils/productOrderLocks.js";
+import {
+  hasProductOpenSales,
+  OPEN_SALES_BLOCK_MESSAGE,
+} from "../../utils/productOrderLocks.js";
 import { errorRes, successRes } from "../../utils/index.js";
 
 const SELLER_PUBLIC_FIELDS =
@@ -12,12 +15,8 @@ export const patchMyProductController = async (req, res) => {
     const userId = req.userId;
     const { productId } = req.params;
 
-    if (await isProductReferencedInAnyOrder(productId)) {
-      return errorRes(
-        res,
-        409,
-        "Товар нельзя изменить: он уже есть в заказе",
-      );
+    if (await hasProductOpenSales(productId)) {
+      return errorRes(res, 409, OPEN_SALES_BLOCK_MESSAGE);
     }
 
     const body = req.body;

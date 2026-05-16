@@ -5,7 +5,14 @@ import {
 } from "../../../shared/config/appUiCopy.js";
 
 /**
- * @param {{ page?: number; limit?: number; search?: string }} [params]
+ * @param {{
+ *   page?: number;
+ *   limit?: number;
+ *   search?: string;
+ *   sort?: 'name' | 'rating';
+ *   minRating?: number;
+ *   onlyRated?: boolean;
+ * }} [params]
  * @returns {Promise<{ users: import('../model/types.js').UserSearchListItem[]; total: number; page: number; limit: number }>}
  */
 export async function fetchUsersSearchPage(params = {}) {
@@ -18,6 +25,13 @@ export async function fetchUsersSearchPage(params = {}) {
         ...(params.search != null && params.search !== ""
           ? { search: params.search }
           : {}),
+        ...(params.sort != null && params.sort !== ""
+          ? { sort: params.sort }
+          : {}),
+        ...(params.minRating != null && params.minRating > 0
+          ? { minRating: params.minRating }
+          : {}),
+        ...(params.onlyRated === true ? { onlyRated: "true" } : {}),
       },
     });
 

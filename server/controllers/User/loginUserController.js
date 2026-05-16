@@ -119,13 +119,36 @@ export const userUpdateProfileController = async (req, res) => {
                 } else if (field === 'userName') {
                     updateData[field] =
                         typeof value === 'string' ? value.trim().toLowerCase() : value;
-                } else if (field === 'userPhoneNumber' || field === 'userAddress' || field === 'notesAboutUser') {
+                } else if (
+                    field === 'userPhoneNumber' ||
+                    field === 'userAddress' ||
+                    field === 'userAddressFlat' ||
+                    field === 'userAddressFiasId' ||
+                    field === 'notesAboutUser'
+                ) {
                     // Для строковых полей применяем trim (валидация уже выполнена в middleware)
                     updateData[field] = typeof value === 'string' ? value.trim() : value;
+                } else if (field === 'userAddressGeo') {
+                    updateData[field] = value;
                 } else {
                     // Для остальных полей (userGender, userRole, URL поля, булевы) - просто присваиваем (валидация уже выполнена в middleware)
                     updateData[field] = value;
                 }
+            }
+        }
+
+        if (req.verifiedDeliveryAddress !== undefined) {
+            if (req.verifiedDeliveryAddress === null) {
+                updateData.userAddress = null;
+                updateData.userAddressFlat = null;
+                updateData.userAddressFiasId = null;
+                updateData.userAddressGeo = null;
+            } else {
+                const verified = req.verifiedDeliveryAddress;
+                updateData.userAddress = verified.displayAddress;
+                updateData.userAddressFlat = verified.flat;
+                updateData.userAddressFiasId = verified.fiasId;
+                updateData.userAddressGeo = verified.geo;
             }
         }
 

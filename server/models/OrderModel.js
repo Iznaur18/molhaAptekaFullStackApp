@@ -78,6 +78,16 @@ const OrderSchema = new mongoose.Schema(
             required: true,
             trim: true,
         },
+        deliveryAddressFlat: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        deliveryAddressFiasId: {
+            type: String,
+            trim: true,
+            default: '',
+        },
         paymentMethod: {
             type: String,
             required: true,

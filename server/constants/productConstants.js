@@ -1,6 +1,9 @@
 /** Максимум URL изображений на один товар (схема, валидация, бизнес-логика). */
 export const PRODUCT_IMAGE_URLS_MAX = 5;
 
+/** Максимум слов в описании товара (валидация POST/PATCH /product). */
+export const PRODUCT_DESCRIPTION_MAX_WORDS = 100;
+
 /**
  * Slug категории товара. Совпадает с клиентом `client/.../productConstants.js`.
  * `food`, `figures` — устаревшие значения enum до расширения списка (могут остаться в БД).

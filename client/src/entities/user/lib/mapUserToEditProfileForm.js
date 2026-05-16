@@ -1,3 +1,4 @@
+import { addressValueFromUser } from "../../address/lib/addressValueFromUser.js";
 import {
   DEFAULT_USER_AVATAR_URL,
   DEFAULT_USER_BACKGROUND_URL,
@@ -9,7 +10,7 @@ import {
  * @property {string} userName
  * @property {string} userBirthDate
  * @property {'male'|'female'|'noSelected'} userGender
- * @property {string} userAddress
+ * @property {import('../../address/model/types.js').RuDeliveryAddressValue} deliveryAddress
  * @property {string} userPhoneNumber
  * @property {string} userAvatarUrl
  * @property {string} userBackgroundUrl
@@ -32,7 +33,7 @@ export function mapUserToEditProfileForm(user) {
     userName: user.userName ?? "",
     userBirthDate: birthInput,
     userGender: user.userGender ?? USER_GENDER_NO_SELECTED,
-    userAddress: user.userAddress ?? "",
+    deliveryAddress: addressValueFromUser(user),
     userPhoneNumber: user.userPhoneNumber ?? "",
     userAvatarUrl: user.userAvatarUrl ?? DEFAULT_USER_AVATAR_URL,
     userBackgroundUrl: user.userBackgroundUrl ?? DEFAULT_USER_BACKGROUND_URL,

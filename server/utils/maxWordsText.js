@@ -1,4 +1,4 @@
-/** Максимум слов для длинных текстовых полей (описание товара, заметки в профиле). */
+/** Максимум слов для полей профиля (адрес, заметки). */
 export const MAX_TEXT_FIELD_WORDS = 10;
 
 /**
@@ -15,12 +15,17 @@ export function countWords(raw) {
 /**
  * @param {unknown} value
  * @param {string} fieldLabelRu — подпись для сообщения об ошибке
+ * @param {number} [maxWords]
  */
-export function assertAtMostWords(value, fieldLabelRu) {
+export function assertAtMostWords(
+  value,
+  fieldLabelRu,
+  maxWords = MAX_TEXT_FIELD_WORDS,
+) {
   const n = countWords(value);
-  if (n > MAX_TEXT_FIELD_WORDS) {
+  if (n > maxWords) {
     throw new Error(
-      `${fieldLabelRu}: не больше ${MAX_TEXT_FIELD_WORDS} слов (сейчас ${n})`,
+      `${fieldLabelRu}: не больше ${maxWords} слов (сейчас ${n})`,
     );
   }
 }

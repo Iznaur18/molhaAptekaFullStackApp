@@ -9,6 +9,9 @@ export const USER_GENDER_LABEL_RU = {
   [USER_GENDER_NO_SELECTED]: "Не указан",
 };
 
+/** Как в `server/validations/user/ruPhoneRules.js` — 7 + 10 цифр (РФ). */
+export const RU_PHONE_MAX_DIGITS = 11;
+
 /** Как в `server/validations/user/userNameRules.js`. */
 export const USER_NAME_MIN_LENGTH = 3;
 export const USER_NAME_MAX_LENGTH = 30;

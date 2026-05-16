@@ -90,7 +90,11 @@ export function getUserProfileRows(user) {
     {
       id: "userAddress",
       label: L.userAddress,
-      value: dashIfEmpty(user.userAddress),
+      value: dashIfEmpty(
+        [user.userAddress, user.userAddressFlat ? `кв. ${user.userAddressFlat}` : ""]
+          .filter(Boolean)
+          .join(", "),
+      ),
     },
     {
       id: "userPhoneNumber",

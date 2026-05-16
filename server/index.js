@@ -11,6 +11,7 @@ import {
     orderRouter,
     productRouter,
     cartRouter,
+    addressRouter,
 } from './routes/index.js';
 import { generalRateLimiter, errorHandler, notFoundHandler } from './middlewares/index.js';
 
@@ -54,6 +55,8 @@ app.use('/order', orderRouter);
 app.use('/cart', cartRouter);
 
 app.use('/product', productRouter);
+
+app.use('/address', addressRouter);
 
 // Обработчик несуществующих маршрутов (404) - должен быть перед errorHandler
 app.use(notFoundHandler);

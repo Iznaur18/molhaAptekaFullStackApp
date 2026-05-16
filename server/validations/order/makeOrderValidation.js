@@ -4,9 +4,8 @@ import {
     ORDER_LINE_ITEM_QUANTITY_MIN,
     ORDER_PAYMENT_METHODS,
 } from '../../constants/orderConstants.js';
+import { ruDeliveryAddressBodyValidation } from '../address/ruDeliveryAddressValidation.js';
 import { handleValidationByExpressErrors } from '../handleValidationByExpressErrors.js';
-
-const DELIVERY_ADDRESS_MAX_LENGTH = 300;
 const ITEMS_MAX_LENGTH = 100;
 
 /** Валидация тела `POST /order`. totalAmount/status/unitPriceAtOrder ставятся на сервере. */
@@ -21,14 +20,11 @@ export const makeOrderValidation = [
         .isInt({ min: ORDER_LINE_ITEM_QUANTITY_MIN })
         .withMessage(`items[].quantity должен быть целым числом >= ${ORDER_LINE_ITEM_QUANTITY_MIN}`)
         .toInt(),
-    body('deliveryAddress')
-        .isString()
-        .withMessage('deliveryAddress должен быть строкой')
-        .trim()
-        .notEmpty()
-        .withMessage('deliveryAddress обязателен')
-        .isLength({ max: DELIVERY_ADDRESS_MAX_LENGTH })
-        .withMessage(`deliveryAddress не более ${DELIVERY_ADDRESS_MAX_LENGTH} символов`),
+    ...ruDeliveryAddressBodyValidation({
+        lineField: 'deliveryAddress',
+        flatField: 'deliveryAddressFlat',
+        lineRequired: true,
+    }),
     body('paymentMethod')
         .isIn(ORDER_PAYMENT_METHODS)
         .withMessage(`paymentMethod должен быть одним из: ${ORDER_PAYMENT_METHODS.join(', ')}`),

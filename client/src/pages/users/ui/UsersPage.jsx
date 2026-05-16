@@ -13,11 +13,17 @@ import { SearchInput } from "../../../shared/ui/SearchInput/SearchInput.jsx";
 
 import "./UsersPage.css";
 
+const SORT_NAME = "name";
+const SORT_RATING = "rating";
+const MIN_RATING_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
 /**
  * @param {{ onUserRowClick?: (userId: string) => void }} props
  */
 export function UsersPage({ onUserRowClick }) {
   const [searchTerm, setSearchTerm] = useState("");
+  const [sort, setSort] = useState(SORT_NAME);
+  const [minRating, setMinRating] = useState("");
   const [users, setUsers] = useState(
     /** @type {import('../../../entities/user/model/types.js').UserSearchListItem[]} */ ([]),
   );
@@ -26,7 +32,10 @@ export function UsersPage({ onUserRowClick }) {
 
   const debouncedSearch = useDebouncedValue(searchTerm, USER_SEARCH_UI.DEBOUNCE_MS);
   const isSearchPending = searchTerm !== debouncedSearch;
-  const hasQuery = debouncedSearch.trim() !== "";
+  const hasSearchQuery = debouncedSearch.trim() !== "";
+  const minRatingNum = minRating === "" ? null : Number(minRating);
+  const hasActiveFilters =
+    hasSearchQuery || sort !== SORT_NAME || minRatingNum != null;
 
   useEffect(() => {
     let isCancelled = false;
@@ -36,6 +45,8 @@ export function UsersPage({ onUserRowClick }) {
       try {
         const { users: list } = await fetchUsersSearchPage({
           search: debouncedSearch.trim(),
+          sort,
+          ...(minRatingNum != null ? { minRating: minRatingNum } : {}),
         });
         if (isCancelled) return;
         setUsers(list);
@@ -54,7 +65,7 @@ export function UsersPage({ onUserRowClick }) {
     return () => {
       isCancelled = true;
     };
-  }, [debouncedSearch]);
+  }, [debouncedSearch, sort, minRatingNum]);
 
   return (
     <div className="users-page">
@@ -67,11 +78,39 @@ export function UsersPage({ onUserRowClick }) {
         pendingAriaLabel={USER_SEARCH_INPUT_UI.PENDING_ARIA}
         isPending={isSearchPending}
       />
+      <div className="users-page__filters">
+        <label className="users-page__filter-label">
+          <span>{USERS_PAGE_UI.SORT_LABEL}</span>
+          <select
+            className="users-page__filter-control"
+            value={sort}
+            onChange={(event) => setSort(event.target.value)}
+          >
+            <option value={SORT_NAME}>{USERS_PAGE_UI.SORT_NAME}</option>
+            <option value={SORT_RATING}>{USERS_PAGE_UI.SORT_RATING}</option>
+          </select>
+        </label>
+        <label className="users-page__filter-label">
+          <span>{USERS_PAGE_UI.MIN_RATING_LABEL}</span>
+          <select
+            className="users-page__filter-control"
+            value={minRating}
+            onChange={(event) => setMinRating(event.target.value)}
+          >
+            <option value="">{USERS_PAGE_UI.MIN_RATING_ANY}</option>
+            {MIN_RATING_OPTIONS.map((value) => (
+              <option key={value} value={String(value)}>
+                {value}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
       <UsersPageBody
         phase={phase}
         users={users}
         error={error}
-        hasQuery={hasQuery}
+        hasActiveFilters={hasActiveFilters}
         onUserRowClick={onUserRowClick}
       />
     </div>
@@ -83,11 +122,11 @@ export function UsersPage({ onUserRowClick }) {
  *   phase: 'loading' | 'success' | 'error';
  *   users: import('../../../entities/user/model/types.js').UserSearchListItem[];
  *   error: string;
- *   hasQuery: boolean;
+ *   hasActiveFilters: boolean;
  *   onUserRowClick?: (userId: string) => void;
  * }} props
  */
-function UsersPageBody({ phase, users, error, hasQuery, onUserRowClick }) {
+function UsersPageBody({ phase, users, error, hasActiveFilters, onUserRowClick }) {
   if (phase === "loading") {
     return <p className="users-page__state">{USERS_PAGE_UI.LOADING}</p>;
   }
@@ -103,7 +142,7 @@ function UsersPageBody({ phase, users, error, hasQuery, onUserRowClick }) {
   if (users.length === 0) {
     return (
       <p className="users-page__state">
-        {hasQuery ? USERS_PAGE_UI.EMPTY_BY_QUERY : USERS_PAGE_UI.EMPTY}
+        {hasActiveFilters ? USERS_PAGE_UI.EMPTY_BY_FILTERS : USERS_PAGE_UI.EMPTY}
       </p>
     );
   }

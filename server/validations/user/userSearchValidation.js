@@ -34,5 +34,18 @@ export const userSearchValidation = [
         .optional()
         .isIn(['true', 'false'])
         .withMessage('isBlockedUser должен быть true или false'),
+    query('sort')
+        .optional()
+        .isIn(['name', 'rating'])
+        .withMessage('sort должен быть name или rating'),
+    query('minRating')
+        .optional()
+        .isFloat({ min: 1, max: 10 })
+        .withMessage('minRating должен быть числом от 1 до 10')
+        .toFloat(),
+    query('onlyRated')
+        .optional()
+        .isIn(['true', 'false'])
+        .withMessage('onlyRated должен быть true или false'),
     handleValidationByExpressErrors
 ];

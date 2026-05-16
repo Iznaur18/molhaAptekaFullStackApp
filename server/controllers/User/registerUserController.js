@@ -20,14 +20,11 @@ export const registerUserController = async (req, res) => {
       backgroundUrl,
       userBirthDate,
       userGender,
-      userAddress,
       notificationsEnabled,
     } = req.body;
 
-    const orConditions = [{ email }];
-    if (userName != null && String(userName).trim() !== '') {
-      orConditions.push({ userName: String(userName).trim().toLowerCase() });
-    }
+    const normalizedUserName = String(userName).trim().toLowerCase();
+    const orConditions = [{ email }, { userName: normalizedUserName }];
     if (phoneNumber != null && phoneNumber !== '') {
       orConditions.push({ userPhoneNumber: String(phoneNumber).trim() });
     }
@@ -45,17 +42,19 @@ export const registerUserController = async (req, res) => {
     const doc = new UserModel({
       email,
       passwordHash,
-      userName:
-        userName != null && String(userName).trim() !== ''
-          ? String(userName).trim().toLowerCase()
-          : undefined,
+      userName: normalizedUserName,
       userPhoneNumber,
       userAvatarUrl: pickUrlOrDefault(avatarUrl, DEFAULT_AVATAR_URL),
       userBackgroundUrl: pickUrlOrDefault(backgroundUrl, DEFAULT_BACKGROUND_URL),
       ...(userBirthDate ? { userBirthDate: new Date(userBirthDate) } : {}),
       ...(userGender ? { userGender } : {}),
-      ...(userAddress != null && String(userAddress).trim() !== ''
-        ? { userAddress: String(userAddress).trim() }
+      ...(req.verifiedDeliveryAddress
+        ? {
+            userAddress: req.verifiedDeliveryAddress.displayAddress,
+            userAddressFlat: req.verifiedDeliveryAddress.flat,
+            userAddressFiasId: req.verifiedDeliveryAddress.fiasId,
+            userAddressGeo: req.verifiedDeliveryAddress.geo,
+          }
         : {}),
       ...(typeof notificationsEnabled === 'boolean' ? { notificationsEnabled } : {}),
     });

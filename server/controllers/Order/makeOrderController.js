@@ -52,7 +52,8 @@ const appendOrderToBuyList = async (userId, orderId) => {
 export const makeOrderController = async (req, res) => {
     try {
         const userId = req.userId;
-        const { items, deliveryAddress, paymentMethod } = req.body;
+        const { items, paymentMethod } = req.body;
+        const verified = req.verifiedDeliveryAddress;
 
         const uniqueProductIds = [
             ...new Set(items.map((item) => String(item.productId))),
@@ -75,7 +76,9 @@ export const makeOrderController = async (req, res) => {
             userBuyerId: userId,
             items: itemsWithPrice,
             totalAmount,
-            deliveryAddress,
+            deliveryAddress: verified.displayAddress,
+            deliveryAddressFlat: verified.flat,
+            deliveryAddressFiasId: verified.fiasId,
             paymentMethod,
             status,
         });

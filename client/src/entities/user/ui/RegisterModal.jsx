@@ -2,7 +2,11 @@ import { useState } from "react";
 
 import { AUTH_TOKEN_STORAGE_KEY } from "../../../shared/api/index.js";
 import { registerUser } from "../api/registerUser.js";
+import { AddressDeliveryFields } from "../../address/ui/AddressDeliveryFields.jsx";
+import { validateRuDeliveryAddressForm } from "../../address/lib/validateRuDeliveryAddressForm.js";
 import { buildRegisterUserPayload } from "../lib/buildRegisterUserPayload.js";
+import { limitRuPhoneInput, validateRuPhoneField } from "../lib/ruPhone.js";
+import { validateUserNameField } from "../lib/validateUserName.js";
 import {
   USER_GENDER_FEMALE,
   USER_GENDER_MALE,
@@ -25,7 +29,13 @@ const INITIAL_FORM = {
   backgroundUrl: "",
   userBirthDate: "",
   userGender: USER_GENDER_NO_SELECTED,
-  userAddress: "",
+  deliveryAddress: {
+    line: "",
+    flat: "",
+    fiasId: "",
+    geo: null,
+    selectedFromSuggest: false,
+  },
   notificationsEnabled: false,
 };
 
@@ -54,11 +64,38 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
     if (name === "userName" && typeof nextValue === "string") {
       nextValue = nextValue.toLowerCase().replace(/[^a-z0-9]/g, "");
     }
+    if (name === "phoneNumber" && typeof nextValue === "string") {
+      nextValue = limitRuPhoneInput(nextValue);
+    }
     setForm((prev) => ({ ...prev, [name]: nextValue }));
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    const userNameError = validateUserNameField(form.userName, { required: true });
+    if (userNameError) {
+      setStatus({ kind: "error", message: userNameError });
+      return;
+    }
+
+    const phoneError = validateRuPhoneField(form.phoneNumber);
+    if (phoneError) {
+      setStatus({ kind: "error", message: phoneError });
+      return;
+    }
+
+    const addressLine = String(form.deliveryAddress.line ?? "").trim();
+    const addressFlat = String(form.deliveryAddress.flat ?? "").trim();
+    const addressError =
+      addressLine || addressFlat
+        ? validateRuDeliveryAddressForm(form.deliveryAddress)
+        : null;
+    if (addressError) {
+      setStatus({ kind: "error", message: addressError });
+      return;
+    }
+
     setStatus({ kind: "loading", message: "" });
 
     try {
@@ -141,6 +178,7 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
                 name="userName"
                 value={form.userName}
                 onChange={handleChange}
+                required
                 minLength={REGISTER_MODAL_UI.USERNAME_MIN_LENGTH}
                 maxLength={REGISTER_MODAL_UI.USERNAME_MAX_LENGTH}
                 title={REGISTER_MODAL_UI.USERNAME_HINT}
@@ -157,6 +195,7 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
                 value={form.phoneNumber}
                 onChange={handleChange}
                 autoComplete="tel"
+                inputMode="tel"
               />
             </label>
             <label className="register-modal__label">
@@ -184,17 +223,15 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
                 ))}
               </select>
             </label>
-            <label className="register-modal__label">
-              {REGISTER_MODAL_UI.LABEL_ADDRESS}
-              <input
-                className="register-modal__input"
-                type="text"
-                name="userAddress"
-                value={form.userAddress}
-                onChange={handleChange}
-                autoComplete="street-address"
-              />
-            </label>
+            <AddressDeliveryFields
+              value={form.deliveryAddress}
+              onChange={(deliveryAddress) =>
+                setForm((prev) => ({ ...prev, deliveryAddress }))
+              }
+              lineInputClassName="register-modal__input"
+              flatInputClassName="register-modal__input"
+              labels={{ line: REGISTER_MODAL_UI.LABEL_ADDRESS }}
+            />
             <label className="register-modal__label">
               {REGISTER_MODAL_UI.LABEL_AVATAR_URL}
               <input

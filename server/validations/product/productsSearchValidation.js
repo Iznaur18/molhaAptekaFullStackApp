@@ -1,5 +1,6 @@
 import { query } from 'express-validator';
 
+import { PRODUCT_SORT_VALUES } from '../../constants/productCatalogSort.js';
 import { PRODUCT_CATEGORY_VALUES } from '../../constants/productConstants.js';
 import { handleValidationByExpressErrors } from '../handleValidationByExpressErrors.js';
 
@@ -31,5 +32,9 @@ export const productsSearchValidation = [
         .trim()
         .isIn(PRODUCT_CATEGORY_VALUES)
         .withMessage('Указана неизвестная категория'),
+    query('sort')
+        .optional()
+        .isIn(PRODUCT_SORT_VALUES)
+        .withMessage('sort должен быть newest, views или purchases'),
     handleValidationByExpressErrors,
 ];

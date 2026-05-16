@@ -75,7 +75,8 @@ export const HOME_PAGE_UI = {
   FETCH_PRODUCTS_FALLBACK: "Не удалось загрузить товары",
   FETCH_PROFILE_FALLBACK: "Не удалось загрузить профиль",
   FETCH_MY_PROFILE_FALLBACK: "Не удалось загрузить мой профиль",
-  TITLE_CATALOG: "Каталог товаров",
+  // TITLE_CATALOG: "Каталог товаров",
+  TITLE_CATALOG: "iziBuy — покупай и продавай",
   BREADCRUMB_HOME: "Главная",
   BREADCRUMB_MY_PROFILE: "Мой профиль",
   BREADCRUMB_MY_PRODUCTS: "Мои товары",
@@ -92,6 +93,7 @@ export const HOME_PAGE_UI = {
   NAV_TO_MY_ORDERS: "Мои заказы",
   NAV_TO_ADMIN_ORDERS: "Все заказы",
   FILTER_BUTTON: "Фильтр",
+  SORT_LABEL: "Сортировка",
   CATEGORY_ALL: "Все категории",
   SUBTITLE_MY_ONLY: "Показаны только ваши товары.",
   CREATE_PRODUCT_BUTTON: "Создать товар",
@@ -137,6 +139,18 @@ export const CART_PAGE_UI = {
   AUTH_REQUIRED: "Войдите, чтобы оформить заказ.",
   AUTH_LOGIN: "Войти",
   PRODUCT_DELETED_OR_HIDDEN: "Товар недоступен",
+};
+
+/** DaData: адрес до дома + квартира */
+export const ADDRESS_DELIVERY_UI = {
+  LABEL_LINE: "Адрес (город, улица, дом)",
+  LABEL_FLAT: "Квартира / офис",
+  PLACEHOLDER_LINE: "Начните вводить и выберите из списка",
+  PLACEHOLDER_FLAT: "12",
+  HINT_LINE: "Выберите вариант из подсказок DaData",
+  HINT_FLAT: "Обязательно для доставки",
+  SUGGEST_LOADING: "Ищем адреса…",
+  SUGGEST_ERROR: "Подсказки недоступны",
 };
 
 /** Форма оформления заказа */
@@ -218,6 +232,12 @@ export const USERS_PAGE_UI = {
   LOADING: "Загрузка пользователей…",
   EMPTY: "Пользователей пока нет.",
   EMPTY_BY_QUERY: "Никого не нашли по этому запросу.",
+  EMPTY_BY_FILTERS: "Никого не нашли с такими фильтрами.",
+  SORT_LABEL: "Сортировка",
+  SORT_NAME: "По имени",
+  SORT_RATING: "По рейтингу",
+  MIN_RATING_LABEL: "Средняя оценка от",
+  MIN_RATING_ANY: "Любая",
 };
 
 /** Строка каталога пользователей */
@@ -235,9 +255,11 @@ export const CREATE_PRODUCT_MODAL_UI = {
   TITLE: "Новый товар",
   TITLE_EDIT: "Редактирование товара",
   LABEL_NAME: "Название",
-  LABEL_DESCRIPTION: "Описание",
+  LABEL_DESCRIPTION: "Описание (до 100 слов)",
   LABEL_IMAGE_URLS:
     "Ссылки на изображения (необязательно, до 5 URL с http/https)",
+  IMAGE_ORDER_HINT: "Перетащите за ⋮⋮ — порядок в каталоге (1 — главное фото).",
+  DRAG_HANDLE_ARIA: "Перетащить для смены порядка",
   ADD_IMAGE_ROW: "Добавить ещё фото",
   REMOVE_IMAGE_ROW_ARIA: "Удалить поле ссылки на изображение",
   IMAGE_ROW_ARIA_PREFIX: "Ссылка на изображение",
@@ -275,6 +297,8 @@ export const PRODUCT_CARD_UI = {
   DELETE_CONFIRM_QUESTION: "Вы уверены, что хотите удалить этот товар?",
   DELETE_CONFIRM_YES: "Да, удалить",
   DELETE_CONFIRM_CANCEL: "Отмена",
+  OPEN_SALES_LOCKED_HINT:
+    "Скрыть или удалить можно, когда все покупки по товару подтверждены покупателями (или отменены).",
   IMAGE_LIGHTBOX_OPEN_LABEL: "Показать изображение в полном размере",
   IMAGE_LIGHTBOX_CLOSE: "Закрыть просмотр изображения",
   IMAGE_LIGHTBOX_DIALOG_LABEL: "Изображение товара",

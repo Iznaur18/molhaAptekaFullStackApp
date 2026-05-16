@@ -10,6 +10,7 @@ import { CATALOG_PAGE_SIZE, PRODUCTS_FETCH_PAGE_LIMIT } from "../model/productCo
  *   page?: number;
  *   limit?: number;
  *   productCategory?: string;
+ *   sort?: string;
  * }} [options]
  * @returns {Promise<{
  *   products: import('../model/types.js').ProductFromApi[];
@@ -21,6 +22,7 @@ export async function fetchMyProductsPage({
   page = 1,
   limit = CATALOG_PAGE_SIZE,
   productCategory,
+  sort,
 } = {}) {
   try {
     const { data } = await apiClient.get("/product/my", {
@@ -29,6 +31,7 @@ export async function fetchMyProductsPage({
         limit,
         ...(search ? { search } : {}),
         ...(productCategory ? { productCategory } : {}),
+        ...(sort ? { sort } : {}),
       },
     });
 

@@ -1,5 +1,8 @@
 import { ProductModel } from '../../models/index.js';
-import { isProductReferencedInActiveOrder } from '../../utils/productOrderLocks.js';
+import {
+    hasProductOpenSales,
+    OPEN_SALES_BLOCK_MESSAGE,
+} from '../../utils/productOrderLocks.js';
 import { errorRes, successRes } from '../../utils/index.js';
 
 /** Удаление своего товара. DELETE /product/:productId (JWT = продавец) */
@@ -8,12 +11,8 @@ export const deleteMyProductController = async (req, res) => {
         const userId = req.userId;
         const { productId } = req.params;
 
-        if (await isProductReferencedInActiveOrder(productId)) {
-            return errorRes(
-                res,
-                409,
-                'Нельзя удалить товар с незавершённым заказом',
-            );
+        if (await hasProductOpenSales(productId)) {
+            return errorRes(res, 409, OPEN_SALES_BLOCK_MESSAGE);
         }
 
         const deleted = await ProductModel.findOneAndDelete({

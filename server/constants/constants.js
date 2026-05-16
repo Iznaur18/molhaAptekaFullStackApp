@@ -4,7 +4,7 @@ export const DEFAULT_AVATAR_URL = 'https://i.pinimg.com/originals/c9/31/92/c9319
 export const DEFAULT_BACKGROUND_URL = 'https://krisp.ai/blog/wp-content/uploads/2024/07/background-meme1.jpg';
 
 /** Поля пользователя для отображения на клиенте (GET /me, GET /user/:id). Строка для .select() — без passwordHash */
-export const USER_DATA = '_id userName email userAvatarUrl userBackgroundUrl userBirthDate userGender userAddress userPhoneNumber userRole userDiscountPercent userLoyaltyPoints isPremiumUser notificationsEnabled userRatingByVotes telegramUserId telegramUsername telegramPhotoUrl isActiveUser isBlockedUser createdAt updatedAt userLastLoginAt notesAboutUser buyList';
+export const USER_DATA = '_id userName email userAvatarUrl userBackgroundUrl userBirthDate userGender userAddress userAddressFlat userAddressFiasId userAddressGeo userPhoneNumber userRole userDiscountPercent userLoyaltyPoints isPremiumUser notificationsEnabled userRatingByVotes telegramUserId telegramUsername telegramPhotoUrl isActiveUser isBlockedUser createdAt updatedAt userLastLoginAt notesAboutUser buyList';
 
 /** Поля пользователя для отображения на клиенте (GET /me/rating). Строка для .select() — без passwordHash */
 export const USER_ME_RAITING =  "_id userRatingByVotes userName email userAvatarUrl";
@@ -12,7 +12,12 @@ export const USER_ME_RAITING =  "_id userRatingByVotes userName email userAvatar
 // Разрешённые поля для обычного пользователя, иначе возвращаются все поля такие как passwordHash, userRole, email, userPhoneNumber, isActiveUser, isBlockedUser
 export const ALLOWED_FIELDS_FOR_USER = [
     'userName', 'userBirthDate', 'userGender', 
-    'userAddress', 'userPhoneNumber', 'userAvatarUrl', 
+    'userAddress',
+    'userAddressFlat',
+    'userAddressFiasId',
+    'userAddressGeo',
+    'userPhoneNumber',
+    'userAvatarUrl', 
     'userBackgroundUrl', 'notificationsEnabled', "notesAboutUser"
   ];
 

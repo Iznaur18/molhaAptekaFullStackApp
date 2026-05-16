@@ -19,7 +19,14 @@ const parsePagination = (query) => {
     return { page, limit, skip };
 };
 
-const buildUsersQuery = ({ search, isPremiumUser, isActiveUser, isBlockedUser }) => {
+const buildUsersQuery = ({
+    search,
+    isPremiumUser,
+    isActiveUser,
+    isBlockedUser,
+    minRating,
+    onlyRated,
+}) => {
     const usersQuery = {};
     const searchCondition = buildRegexSearchOr(search, USER_SEARCH_FIELDS);
 
@@ -28,7 +35,36 @@ const buildUsersQuery = ({ search, isPremiumUser, isActiveUser, isBlockedUser })
     if (isActiveUser === TRUE_FLAG) usersQuery.isActiveUser = true;
     if (isBlockedUser === TRUE_FLAG) usersQuery.isBlockedUser = true;
 
+    const hasMinRating = typeof minRating === 'number' && !Number.isNaN(minRating);
+    if (onlyRated === TRUE_FLAG || hasMinRating) {
+        usersQuery['userRatingByVotes.countVotes'] = { $gte: 1 };
+    }
+    if (hasMinRating) {
+        usersQuery.$expr = {
+            $gte: [
+                {
+                    $divide: [
+                        '$userRatingByVotes.totalRating',
+                        '$userRatingByVotes.countVotes',
+                    ],
+                },
+                minRating,
+            ],
+        };
+    }
+
     return usersQuery;
+};
+
+const resolveSort = (sortParam) => {
+    if (sortParam === 'rating') {
+        return {
+            'userRatingByVotes.countVotes': -1,
+            'userRatingByVotes.totalRating': -1,
+            userName: 1,
+        };
+    }
+    return { userName: 1 };
 };
 
 export const userSearchController = async (req, res) => {
@@ -36,10 +72,12 @@ export const userSearchController = async (req, res) => {
         const { page, limit, skip } = parsePagination(req.query);
         const usersQuery = buildUsersQuery(req.query);
 
+        const sort = resolveSort(req.query.sort);
+
         const [users, total] = await Promise.all([
             UserModel.find(usersQuery)
                 .select(USER_PUBLIC_LIST_FIELDS)
-                .sort({ userName: 1 })
+                .sort(sort)
                 .skip(skip)
                 .limit(limit)
                 .lean(),

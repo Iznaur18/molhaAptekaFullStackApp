@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 
+import { AddressDeliveryFields } from "../../../entities/address/ui/AddressDeliveryFields.jsx";
+import { addressValueFromUser } from "../../../entities/address/lib/addressValueFromUser.js";
+import { validateRuDeliveryAddressForm } from "../../../entities/address/lib/validateRuDeliveryAddressForm.js";
 import {
   ORDER_PAYMENT_METHODS,
   ORDER_PAYMENT_METHOD_CARD_PREPAID,
@@ -11,12 +14,18 @@ import "./CheckoutForm.css";
 
 /**
  * @param {{
- *   defaultDeliveryAddress: string;
+ *   defaultDeliveryAddress: Partial<{
+ *     userAddress?: string;
+ *     userAddressFlat?: string;
+ *     userAddressFiasId?: string;
+ *     userAddressGeo?: { lat?: number; lon?: number } | null;
+ *   }>;
  *   isSubmitting: boolean;
  *   submitError: string;
  *   submitSuccess: string;
  *   onSubmit: (payload: {
  *     deliveryAddress: string;
+ *     deliveryAddressFlat: string;
  *     paymentMethod: string;
  *   }) => void | Promise<void>;
  *   isDisabled?: boolean;
@@ -30,47 +39,55 @@ export function CheckoutForm({
   onSubmit,
   isDisabled = false,
 }) {
-  const [deliveryAddress, setDeliveryAddress] = useState(
-    defaultDeliveryAddress,
+  const [deliveryAddress, setDeliveryAddress] = useState(() =>
+    addressValueFromUser(defaultDeliveryAddress),
   );
   const [paymentMethod, setPaymentMethod] = useState(
     ORDER_PAYMENT_METHOD_CARD_PREPAID,
   );
+  const [localError, setLocalError] = useState("");
 
   useEffect(() => {
-    setDeliveryAddress(defaultDeliveryAddress);
+    setDeliveryAddress(addressValueFromUser(defaultDeliveryAddress));
   }, [defaultDeliveryAddress]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    const validationError = validateRuDeliveryAddressForm(deliveryAddress, {
+      required: true,
+    });
+    if (validationError) {
+      setLocalError(validationError);
+      return;
+    }
+    setLocalError("");
     void onSubmit({
-      deliveryAddress: deliveryAddress.trim(),
+      deliveryAddress: deliveryAddress.line.trim(),
+      deliveryAddressFlat: deliveryAddress.flat.trim(),
       paymentMethod,
     });
   };
 
-  const isAddressValid = deliveryAddress.trim().length > 0;
+  const isAddressValid =
+    validateRuDeliveryAddressForm(deliveryAddress, { required: true }) ===
+    null;
   const isFormDisabled = isDisabled || isSubmitting || !isAddressValid;
+  const displayError = localError || submitError;
 
   return (
     <form className="checkout-form" onSubmit={handleSubmit}>
       <h2 className="checkout-form__heading">{CHECKOUT_FORM_UI.HEADING}</h2>
 
-      <label className="checkout-form__field">
-        <span className="checkout-form__label">
-          {CHECKOUT_FORM_UI.LABEL_DELIVERY_ADDRESS}
-        </span>
-        <input
-          type="text"
-          className="checkout-form__input"
-          value={deliveryAddress}
-          onChange={(event) => setDeliveryAddress(event.target.value)}
-          placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_DELIVERY_ADDRESS}
-          maxLength={CHECKOUT_FORM_UI.ADDRESS_MAX_LENGTH}
-          disabled={isDisabled || isSubmitting}
-          required
-        />
-      </label>
+      <AddressDeliveryFields
+        value={deliveryAddress}
+        onChange={setDeliveryAddress}
+        disabled={isDisabled || isSubmitting}
+        lineInputClassName="checkout-form__input"
+        flatInputClassName="checkout-form__input"
+        labels={{
+          line: CHECKOUT_FORM_UI.LABEL_DELIVERY_ADDRESS,
+        }}
+      />
 
       <fieldset className="checkout-form__fieldset">
         <legend className="checkout-form__legend">
@@ -91,9 +108,9 @@ export function CheckoutForm({
         ))}
       </fieldset>
 
-      {submitError ? (
+      {displayError ? (
         <p className="checkout-form__error" role="alert">
-          {submitError}
+          {displayError}
         </p>
       ) : null}
       {submitSuccess ? (

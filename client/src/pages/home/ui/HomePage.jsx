@@ -8,7 +8,10 @@ import { deleteMyProduct } from "../../../entities/product/api/deleteMyProduct.j
 import { patchMyProduct } from "../../../entities/product/api/patchMyProduct.js";
 import { fetchCatalogProductsPage } from "../../../entities/product/api/fetchCatalogProductsPage.js";
 import { fetchMyProductsPage } from "../../../entities/product/api/fetchMyProducts.js";
-import { CATALOG_PAGE_SIZE } from "../../../entities/product/model/productConstants.js";
+import {
+  CATALOG_PAGE_SIZE,
+  CATALOG_SORT_NEWEST,
+} from "../../../entities/product/model/productConstants.js";
 import { CreateProductModal } from "../../../entities/product/ui/CreateProductModal.jsx";
 import { ProductDetailsModal } from "../../../entities/product/ui/ProductDetailsModal.jsx";
 import { fetchCurrentUserProfile } from "../../../entities/user/api/fetchCurrentUserProfile.js";
@@ -123,6 +126,7 @@ export function HomePage() {
   const [isProductCategoryListOpen, setIsProductCategoryListOpen] =
     useState(false);
   const [selectedProductCategory, setSelectedProductCategory] = useState(null);
+  const [catalogSort, setCatalogSort] = useState(CATALOG_SORT_NEWEST);
   const [myProductsCatalogError, setMyProductsCatalogError] = useState("");
   const [deletingProductId, setDeletingProductId] = useState(null);
   const [togglingAvailabilityProductId, setTogglingAvailabilityProductId] =
@@ -172,6 +176,7 @@ export function HomePage() {
           limit: CATALOG_PAGE_SIZE,
           search: search || undefined,
           productCategory,
+          sort: catalogSort,
         });
       }
       return fetchCatalogProductsPage({
@@ -179,9 +184,10 @@ export function HomePage() {
         limit: CATALOG_PAGE_SIZE,
         search: search || undefined,
         productCategory,
+        sort: catalogSort,
       });
     },
-    [productsMode, debouncedProductSearchTerm, selectedProductCategory],
+    [productsMode, debouncedProductSearchTerm, selectedProductCategory, catalogSort],
   );
 
   useEffect(() => {
@@ -210,7 +216,7 @@ export function HomePage() {
         setCatalogStatus({ kind: "error", message });
       }
     })();
-  }, [productsMode, debouncedProductSearchTerm, selectedProductCategory, loadCatalogPage]);
+  }, [productsMode, debouncedProductSearchTerm, selectedProductCategory, catalogSort, loadCatalogPage]);
 
   const loadNextCatalogPage = useCallback(async () => {
     if (!catalogHasMore || isCatalogLoadingMore) {
@@ -437,7 +443,11 @@ export function HomePage() {
         productIsAvailable,
       });
       setProducts((prev) =>
-        prev.map((p) => (String(p._id) === productId ? updated : p)),
+        prev.map((p) =>
+          String(p._id) === productId
+            ? { ...updated, hasOpenSales: p.hasOpenSales }
+            : p,
+        ),
       );
     } catch (e) {
       const message =
@@ -564,6 +574,8 @@ export function HomePage() {
         onNavigateToFullCatalogFromBreadcrumb={
           handleNavigateToFullCatalogFromBreadcrumb
         }
+        catalogSort={catalogSort}
+        onCatalogSortChange={setCatalogSort}
       />
 
       {renderMainContent()}

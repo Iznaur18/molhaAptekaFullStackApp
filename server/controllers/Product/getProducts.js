@@ -1,7 +1,11 @@
-import { ProductModel } from '../../models/index.js';
+import { getProductIdsWithOpenSales } from '../../utils/productOrderLocks.js';
+import {
+    countProducts,
+    findProductsPage,
+    parseProductSortFromQuery,
+} from '../../utils/productCatalogQuery.js';
 import { buildRegexSearchOr, errorRes, successRes } from '../../utils/index.js';
 
-const SELLER_PUBLIC_FIELDS = 'userName email userPhoneNumber _id userRatingByVotes';
 const PRODUCT_SEARCH_FIELDS = ['productName'];
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 10;
@@ -25,33 +29,32 @@ const categoryFromQuery = (query) => {
     return String(raw).trim();
 };
 
+const buildPagination = (page, limit, total) => ({
+    page,
+    limit,
+    total,
+    totalPages: Math.ceil(total / limit),
+});
+
 export const getProductsController = async (req, res) => {
     try {
         const { page, limit, skip } = parsePagination(req.query);
         const category = categoryFromQuery(req.query);
+        const sort = parseProductSortFromQuery(req.query);
         const productsQuery = buildProductsQuery(req.query.search, {
             productIsAvailable: { $ne: false },
             ...(category ? { productCategory: category } : {}),
         });
 
         const [products, total] = await Promise.all([
-            ProductModel.find(productsQuery)
-                .populate('productSeller', SELLER_PUBLIC_FIELDS)
-                .sort({ createdAt: -1 })
-                .skip(skip)
-                .limit(limit)
-                .lean(),
-            ProductModel.countDocuments(productsQuery),
+            findProductsPage(productsQuery, sort, skip, limit),
+            countProducts(productsQuery),
         ]);
 
-        const pagination = {
-            page,
-            limit,
-            total,
-            totalPages: Math.ceil(total / limit),
-        };
-
-        return successRes(res, { products, pagination });
+        return successRes(res, {
+            products,
+            pagination: buildPagination(page, limit, total),
+        });
     } catch (error) {
         console.error(error);
         return errorRes(res, 500, 'Ошибка при получении продуктов');
@@ -62,29 +65,29 @@ export const getMyProductsController = async (req, res) => {
     try {
         const { page, limit, skip } = parsePagination(req.query);
         const category = categoryFromQuery(req.query);
+        const sort = parseProductSortFromQuery(req.query);
         const productsQuery = buildProductsQuery(req.query.search, {
             productSeller: req.userId,
             ...(category ? { productCategory: category } : {}),
         });
 
         const [products, total] = await Promise.all([
-            ProductModel.find(productsQuery)
-                .populate('productSeller', SELLER_PUBLIC_FIELDS)
-                .sort({ createdAt: -1 })
-                .skip(skip)
-                .limit(limit)
-                .lean(),
-            ProductModel.countDocuments(productsQuery),
+            findProductsPage(productsQuery, sort, skip, limit),
+            countProducts(productsQuery),
         ]);
 
-        const pagination = {
-            page,
-            limit,
-            total,
-            totalPages: Math.ceil(total / limit),
-        };
+        const openSalesIds = await getProductIdsWithOpenSales(
+            products.map((p) => String(p._id)),
+        );
+        const productsWithSalesFlags = products.map((product) => ({
+            ...product,
+            hasOpenSales: openSalesIds.has(String(product._id)),
+        }));
 
-        return successRes(res, { products, pagination });
+        return successRes(res, {
+            products: productsWithSalesFlags,
+            pagination: buildPagination(page, limit, total),
+        });
     } catch (error) {
         console.error(error);
         return errorRes(res, 500, 'Ошибка при получении своих продуктов');

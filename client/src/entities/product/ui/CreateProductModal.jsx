@@ -4,10 +4,16 @@ import { createProduct } from "../api/createProduct.js";
 import { patchMyProduct } from "../api/patchMyProduct.js";
 import { resolveProductImageUrls } from "../lib/resolveProductImageUrls.js";
 import {
+  createImageRow,
+  imageRowsFromUrls,
+} from "../lib/productImageRowHelpers.js";
+import {
   PRODUCT_CATEGORY_ELECTRONICS,
-  PRODUCT_IMAGE_URLS_MAX,
 } from "../model/productConstants.js";
 import { CreateProductCategorySelect } from "./CreateProductCategorySelect.jsx";
+import { urlsFromImageRows } from "../lib/productImageRowHelpers.js";
+import { validateProductDescription } from "../lib/validateProductDescription.js";
+import { ProductImageUrlSortableList } from "./ProductImageUrlSortableList.jsx";
 import {
   COMMON_UI,
   CREATE_PRODUCT_MODAL_UI,
@@ -18,7 +24,7 @@ import "./CreateProductModal.css";
 const INITIAL_FORM = {
   productName: "",
   productDescription: "",
-  productImageUrls: [""],
+  productImageRows: [createImageRow("")],
   productPrice: "",
   productCategory: PRODUCT_CATEGORY_ELECTRONICS,
   productIsAvailable: true,
@@ -37,7 +43,7 @@ function formStateFromProduct(product) {
   return {
     productName: product.productName?.trim() ?? "",
     productDescription: product.productDescription?.trim() ?? "",
-    productImageUrls: urls.length > 0 ? urls : [""],
+    productImageRows: imageRowsFromUrls(urls),
     productPrice: priceStr,
     productCategory: product.productCategory ?? PRODUCT_CATEGORY_ELECTRONICS,
     productIsAvailable: product.productIsAvailable !== false,
@@ -63,6 +69,7 @@ export function CreateProductModal({
   const [form, setForm] = useState(INITIAL_FORM);
   const [status, setStatus] = useState({ kind: "idle", message: "" });
   const isEdit = mode === "edit";
+  const isSubmitting = status.kind === "loading";
 
   useEffect(() => {
     if (!isOpen) return;
@@ -100,37 +107,6 @@ export function CreateProductModal({
     onClose();
   };
 
-  /** @param {number} index */
-  const handleImageRowChange = (index) => (event) => {
-    const { value } = event.target;
-    setForm((prev) => ({
-      ...prev,
-      productImageUrls: prev.productImageUrls.map((v, i) =>
-        i === index ? value : v,
-      ),
-    }));
-  };
-
-  const handleAddImageRow = () => {
-    setForm((prev) => {
-      if (prev.productImageUrls.length >= PRODUCT_IMAGE_URLS_MAX) return prev;
-      return { ...prev, productImageUrls: [...prev.productImageUrls, ""] };
-    });
-  };
-
-  /** @param {number} index */
-  const handleRemoveImageRow = (index) => () => {
-    setForm((prev) => {
-      if (prev.productImageUrls.length <= 1) {
-        return { ...prev, productImageUrls: [""] };
-      }
-      return {
-        ...prev,
-        productImageUrls: prev.productImageUrls.filter((_, i) => i !== index),
-      };
-    });
-  };
-
   const parsePrice = (raw) => {
     const normalized = String(raw).trim().replace(",", ".");
     return Number(normalized);
@@ -150,9 +126,15 @@ export function CreateProductModal({
         return;
       }
 
-      const urls = form.productImageUrls
-        .map((s) => String(s).trim())
-        .filter(Boolean);
+      const descriptionError = validateProductDescription(
+        form.productDescription,
+      );
+      if (descriptionError) {
+        setStatus({ kind: "error", message: descriptionError });
+        return;
+      }
+
+      const urls = urlsFromImageRows(form.productImageRows);
 
       let product;
       if (isEdit) {
@@ -247,6 +229,7 @@ export function CreateProductModal({
                 required
                 minLength={3}
                 autoComplete="off"
+                disabled={isSubmitting}
               />
             </label>
             <label className="create-product-modal__label">
@@ -258,50 +241,16 @@ export function CreateProductModal({
                 onChange={handleChange}
                 required
                 minLength={10}
+                disabled={isSubmitting}
               />
             </label>
-            <fieldset className="create-product-modal__images-fieldset">
-              <legend className="create-product-modal__images-legend">
-                {CREATE_PRODUCT_MODAL_UI.LABEL_IMAGE_URLS}
-              </legend>
-              {form.productImageUrls.map((url, index) => (
-                <div
-                  key={index}
-                  className="create-product-modal__image-row"
-                >
-                  <input
-                    className="create-product-modal__input"
-                    type="url"
-                    value={url}
-                    onChange={handleImageRowChange(index)}
-                    placeholder="https://"
-                    autoComplete="off"
-                    aria-label={`${CREATE_PRODUCT_MODAL_UI.IMAGE_ROW_ARIA_PREFIX} ${index + 1}`}
-                  />
-                  {form.productImageUrls.length > 1 ? (
-                    <button
-                      type="button"
-                      className="create-product-modal__image-remove"
-                      onClick={handleRemoveImageRow(index)}
-                      aria-label={
-                        CREATE_PRODUCT_MODAL_UI.REMOVE_IMAGE_ROW_ARIA
-                      }
-                    >
-                      {COMMON_UI.MODAL_CLOSE_GLYPH}
-                    </button>
-                  ) : null}
-                </div>
-              ))}
-              {form.productImageUrls.length < PRODUCT_IMAGE_URLS_MAX ? (
-                <button
-                  type="button"
-                  className="create-product-modal__image-add"
-                  onClick={handleAddImageRow}
-                >
-                  {CREATE_PRODUCT_MODAL_UI.ADD_IMAGE_ROW}
-                </button>
-              ) : null}
-            </fieldset>
+            <ProductImageUrlSortableList
+              rows={form.productImageRows}
+              onRowsChange={(productImageRows) =>
+                setForm((prev) => ({ ...prev, productImageRows }))
+              }
+              disabled={isSubmitting}
+            />
             <label className="create-product-modal__label">
               {CREATE_PRODUCT_MODAL_UI.LABEL_PRICE}
               <input
@@ -313,11 +262,12 @@ export function CreateProductModal({
                 required
                 inputMode="decimal"
                 autoComplete="off"
+                disabled={isSubmitting}
               />
             </label>
             <CreateProductCategorySelect
               value={form.productCategory}
-              disabled={status.kind === "loading"}
+              disabled={isSubmitting}
               onChange={(productCategory) =>
                 setForm((prev) => ({ ...prev, productCategory }))
               }
@@ -327,6 +277,7 @@ export function CreateProductModal({
                 type="checkbox"
                 checked={form.productIsAvailable}
                 onChange={handleAvailableChange}
+                disabled={isSubmitting}
               />
               {CREATE_PRODUCT_MODAL_UI.LABEL_AVAILABLE}
             </label>
@@ -341,9 +292,9 @@ export function CreateProductModal({
             <button
               type="submit"
               className="create-product-modal__submit"
-              disabled={status.kind === "loading"}
+              disabled={isSubmitting}
             >
-              {status.kind === "loading" ? submitLoading : submitIdle}
+              {isSubmitting ? submitLoading : submitIdle}
             </button>
           </form>
         </div>

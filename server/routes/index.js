@@ -5,6 +5,7 @@ import { userRouter } from './userRouter.js';
 import { orderRouter } from './orderRouter.js';
 import { productRouter } from './productRouter.js';
 import { cartRouter } from './cartRouter.js';
+import { addressRouter } from './addressRouter.js';
 
 export {
     uploadRouter,
@@ -14,4 +15,5 @@ export {
     orderRouter,
     productRouter,
     cartRouter,
+    addressRouter,
 };

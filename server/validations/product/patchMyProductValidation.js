@@ -2,6 +2,7 @@ import { body, oneOf } from "express-validator";
 
 import {
   PRODUCT_CATEGORY_VALUES,
+  PRODUCT_DESCRIPTION_MAX_WORDS,
   PRODUCT_IMAGE_URLS_MAX,
 } from "../../constants/productConstants.js";
 import { assertAtMostWords } from "../../utils/maxWordsText.js";
@@ -54,7 +55,11 @@ export const patchMyProductValidation = [
     .trim()
     .custom((value) => {
       try {
-        assertAtMostWords(value, "Описание товара");
+        assertAtMostWords(
+          value,
+          "Описание товара",
+          PRODUCT_DESCRIPTION_MAX_WORDS,
+        );
       } catch (e) {
         throw new Error(
           e instanceof Error ? e.message : "Слишком длинное описание",

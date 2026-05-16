@@ -3,8 +3,10 @@ import { createPortal } from "react-dom";
 
 import { patchUserProfile } from "../api/patchUserProfile.js";
 import { buildPatchUserProfileBody } from "../lib/buildPatchUserProfileBody.js";
+import { AddressDeliveryFields } from "../../address/ui/AddressDeliveryFields.jsx";
 import { countWords } from "../lib/countWords.js";
 import { mapUserToEditProfileForm } from "../lib/mapUserToEditProfileForm.js";
+import { limitRuPhoneInput } from "../lib/ruPhone.js";
 import { validateEditProfileForm } from "../lib/validateEditProfileForm.js";
 import {
   PROFILE_FIELD_MAX_WORDS,
@@ -65,10 +67,6 @@ export function EditProfileModal({ isOpen, onClose, user, onSaved }) {
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [isOpen, onClose]);
 
-  const addressWords = useMemo(
-    () => countWords(form.userAddress),
-    [form.userAddress],
-  );
   const notesWords = useMemo(
     () => countWords(form.notesAboutUser),
     [form.notesAboutUser],
@@ -81,6 +79,9 @@ export function EditProfileModal({ isOpen, onClose, user, onSaved }) {
     let nextValue = type === "checkbox" ? checked : value;
     if (name === "userName" && typeof nextValue === "string") {
       nextValue = nextValue.toLowerCase().replace(/[^a-z0-9]/g, "");
+    }
+    if (name === "userPhoneNumber" && typeof nextValue === "string") {
+      nextValue = limitRuPhoneInput(nextValue);
     }
     setForm((prev) => ({ ...prev, [name]: nextValue }));
   };
@@ -180,6 +181,7 @@ export function EditProfileModal({ isOpen, onClose, user, onSaved }) {
                 value={form.userPhoneNumber}
                 onChange={handleChange}
                 autoComplete="tel"
+                inputMode="tel"
               />
             </label>
             <label className="edit-profile-modal__label">
@@ -207,29 +209,16 @@ export function EditProfileModal({ isOpen, onClose, user, onSaved }) {
                 ))}
               </select>
             </label>
-            <label className="edit-profile-modal__label">
-              {EDIT_PROFILE_MODAL_UI.LABEL_ADDRESS}
-              <input
-                className="edit-profile-modal__input"
-                type="text"
-                name="userAddress"
-                value={form.userAddress}
-                onChange={handleChange}
-                autoComplete="street-address"
-              />
-              <span
-                className={
-                  addressWords > PROFILE_FIELD_MAX_WORDS
-                    ? "edit-profile-modal__word-meter edit-profile-modal__word-meter_overflow"
-                    : "edit-profile-modal__word-meter"
-                }
-              >
-                {EDIT_PROFILE_MODAL_UI.WORDS_USED(
-                  addressWords,
-                  PROFILE_FIELD_MAX_WORDS,
-                )}
-              </span>
-            </label>
+            <AddressDeliveryFields
+              value={form.deliveryAddress}
+              onChange={(deliveryAddress) =>
+                setForm((prev) => ({ ...prev, deliveryAddress }))
+              }
+              disabled={isSubmitting}
+              lineInputClassName="edit-profile-modal__input"
+              flatInputClassName="edit-profile-modal__input"
+              labels={{ line: EDIT_PROFILE_MODAL_UI.LABEL_ADDRESS }}
+            />
             <label className="edit-profile-modal__label">
               {EDIT_PROFILE_MODAL_UI.LABEL_AVATAR_URL}
               <input

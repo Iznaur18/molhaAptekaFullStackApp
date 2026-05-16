@@ -24,13 +24,14 @@
  * @typedef {object} RegisterUserPayload
  * @property {string} email
  * @property {string} password
- * @property {string} [userName]
+ * @property {string} userName
  * @property {string} [phoneNumber]
  * @property {string} [avatarUrl]
  * @property {string} [backgroundUrl]
  * @property {string} [userBirthDate] ISO 8601 (дата)
  * @property {'male'|'female'|'noSelected'} [userGender]
  * @property {string} [userAddress]
+ * @property {string} [userAddressFlat]
  * @property {boolean} notificationsEnabled
  */
 
@@ -45,6 +46,9 @@
  * @property {string|null} [userBirthDate]
  * @property {'male'|'female'|'noSelected'} [userGender]
  * @property {string} [userAddress]
+ * @property {string} [userAddressFlat]
+ * @property {string} [userAddressFiasId]
+ * @property {{ lat?: number; lon?: number } | null} [userAddressGeo]
  * @property {string} [userPhoneNumber]
  * @property {string|null} [userLastLoginAt]
  * @property {string} [userAvatarUrl]

@@ -1,6 +1,8 @@
 /** Совпадает с `server/constants/productConstants.js`. */
 export const PRODUCT_IMAGE_URLS_MAX = 5;
 
+export const PRODUCT_DESCRIPTION_MAX_WORDS = 100;
+
 export const PRODUCT_CATEGORY_GROCERY = "grocery";
 export const PRODUCT_CATEGORY_ELECTRONICS = "electronics";
 export const PRODUCT_CATEGORY_CLOTHING = "clothing";
@@ -107,6 +109,24 @@ export const PRODUCTS_FETCH_PAGE_LIMIT = 100;
 
 /** Размер страницы каталога на главной (клиент). */
 export const CATALOG_PAGE_SIZE = 24;
+
+/** Query `sort` для GET /product — совпадает с `server/constants/productCatalogSort.js`. */
+export const CATALOG_SORT_NEWEST = "newest";
+export const CATALOG_SORT_VIEWS = "views";
+export const CATALOG_SORT_PURCHASES = "purchases";
+
+export const CATALOG_SORT_OPTIONS = [
+  CATALOG_SORT_NEWEST,
+  CATALOG_SORT_VIEWS,
+  CATALOG_SORT_PURCHASES,
+];
+
+/** @type {Record<string, string>} */
+export const CATALOG_SORT_LABEL_RU = {
+  [CATALOG_SORT_NEWEST]: "Новинки",
+  [CATALOG_SORT_VIEWS]: "По просмотрам",
+  [CATALOG_SORT_PURCHASES]: "Больше всего купили",
+};
 
 /**
  * Поля lean-документа Product: схема `server/models/ProductModel.js` + `timestamps`.

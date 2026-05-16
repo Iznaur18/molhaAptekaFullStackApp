@@ -1,3 +1,5 @@
+import { appendRuAddressToPayload } from "../../address/lib/appendRuAddressToPayload.js";
+import { normalizeRuPhoneInput } from "./ruPhone.js";
 import {
   DEFAULT_USER_AVATAR_URL,
   DEFAULT_USER_BACKGROUND_URL,
@@ -26,11 +28,21 @@ export function buildPatchUserProfileBody(form) {
 
   body.userGender = form.userGender;
 
-  const addr = String(form.userAddress).trim();
-  body.userAddress = addr === "" ? null : addr;
+  const line = String(form.deliveryAddress.line ?? "").trim();
+  const flat = String(form.deliveryAddress.flat ?? "").trim();
+  if (line === "" && flat === "") {
+    body.userAddress = null;
+    body.userAddressFlat = null;
+  } else {
+    appendRuAddressToPayload(body, form.deliveryAddress);
+  }
 
-  const phone = String(form.userPhoneNumber).trim();
-  body.userPhoneNumber = phone === "" ? null : phone;
+  const phoneRaw = String(form.userPhoneNumber).trim();
+  if (phoneRaw === "") {
+    body.userPhoneNumber = null;
+  } else {
+    body.userPhoneNumber = normalizeRuPhoneInput(phoneRaw);
+  }
 
   const av = String(form.userAvatarUrl).trim();
   body.userAvatarUrl = av === "" ? DEFAULT_USER_AVATAR_URL : av;

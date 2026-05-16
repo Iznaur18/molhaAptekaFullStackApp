@@ -1,3 +1,5 @@
+import { appendRuAddressToPayload } from "../../address/lib/appendRuAddressToPayload.js";
+import { normalizeRuPhoneInput } from "./ruPhone.js";
 import {
   USER_GENDER_FEMALE,
   USER_GENDER_MALE,
@@ -14,7 +16,7 @@ import {
  *   backgroundUrl: string;
  *   userBirthDate: string;
  *   userGender: string;
- *   userAddress: string;
+ *   deliveryAddress: import('../../address/model/types.js').RuDeliveryAddressValue;
  *   notificationsEnabled: boolean;
  * }} form
  * @returns {import('../model/types.js').RegisterUserPayload}
@@ -30,18 +32,20 @@ export function buildRegisterUserPayload(form) {
     password: form.password,
   };
 
-  const userName = trimOrUndef(form.userName);
-  const phoneNumber = trimOrUndef(form.phoneNumber);
+  const userName = String(form.userName).trim().toLowerCase();
+  let phoneNumber = trimOrUndef(form.phoneNumber);
+  if (phoneNumber) {
+    phoneNumber = normalizeRuPhoneInput(phoneNumber);
+  }
   const avatarUrl = trimOrUndef(form.avatarUrl);
   const backgroundUrl = trimOrUndef(form.backgroundUrl);
-  const userAddress = trimOrUndef(form.userAddress);
   const userBirthDate = trimOrUndef(form.userBirthDate);
 
-  if (userName) payload.userName = userName.toLowerCase();
+  payload.userName = userName;
   if (phoneNumber) payload.phoneNumber = phoneNumber;
   if (avatarUrl) payload.avatarUrl = avatarUrl;
   if (backgroundUrl) payload.backgroundUrl = backgroundUrl;
-  if (userAddress) payload.userAddress = userAddress;
+  appendRuAddressToPayload(payload, form.deliveryAddress);
   if (userBirthDate) payload.userBirthDate = userBirthDate;
 
   const allowedGender = [

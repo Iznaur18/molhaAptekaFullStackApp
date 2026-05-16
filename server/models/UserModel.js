@@ -28,11 +28,31 @@ const UserSchema = new mongoose.Schema(
       enum: ['male', 'female', 'noSelected'], // допустимые значения поля
       default: 'noSelected', // значение по умолчанию
     },
-    userAddress: { // адрес пользователя
+    userAddress: { // адрес пользователя (нормализованный DaData)
       type: String,
       trim: true, // убирает пробелы в начале и в конце строки
       required: false,
       default: '',
+    },
+    userAddressFlat: {
+      type: String,
+      trim: true,
+      required: false,
+      default: '',
+    },
+    userAddressFiasId: {
+      type: String,
+      trim: true,
+      required: false,
+      default: '',
+    },
+    userAddressGeo: {
+      type: {
+        lat: { type: Number },
+        lon: { type: Number },
+      },
+      _id: false,
+      default: null,
     },
     userName: { // ник пользователя
       type: String,
