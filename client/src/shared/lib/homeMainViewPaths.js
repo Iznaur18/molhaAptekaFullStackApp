@@ -1,6 +1,7 @@
 /**
- * Пути экранов главной SPA. Не использовать `/cart`: в dev Vite проксирует
- * `/cart` на Express (см. vite.config.js).
+ * Пути экранов главной SPA. Не использовать `/cart` и `/users`: в dev Vite
+ * проксирует `/cart` и `/user` на Express (см. vite.config.js); `/users` на
+ * :4444 даёт 404 JSON вместо SPA.
  *
  * @typedef {'catalog' | 'users' | 'cart' | 'my-sales' | 'my-orders' | 'admin-orders'} HomeMainView
  */
@@ -8,7 +9,8 @@
 /** @type {Record<HomeMainView, string>} */
 export const HOME_MAIN_VIEW_PATH = {
   catalog: "/",
-  users: "/users",
+  /** Список пользователей; не `/users` — путается с API и при F5 на :4444. */
+  users: "/user-list",
   /** UI корзины; не `/cart` из‑за proxy в Vite. */
   cart: "/basket",
   "my-sales": "/my-sales",
@@ -24,6 +26,9 @@ const PATH_TO_VIEW = new Map(
   ]),
 );
 
+/** Старые закладки; на Express :4444 по-прежнему 404. */
+const LEGACY_PATH_TO_VIEW = new Map([["/users", "users"]]);
+
 /**
  * @param {string} pathname
  * @returns {string}
@@ -38,7 +43,12 @@ function normalizePathname(pathname) {
  * @returns {HomeMainView | null}
  */
 export function pathnameToMainView(pathname) {
-  return PATH_TO_VIEW.get(normalizePathname(pathname)) ?? null;
+  const normalized = normalizePathname(pathname);
+  return (
+    PATH_TO_VIEW.get(normalized) ??
+    LEGACY_PATH_TO_VIEW.get(normalized) ??
+    null
+  );
 }
 
 /**

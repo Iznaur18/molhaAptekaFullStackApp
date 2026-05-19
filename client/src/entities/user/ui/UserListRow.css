@@ -32,14 +32,35 @@
     0 2px 6px rgb(15 23 42 / 0.07);
 }
 
-.user-list-row__name {
+.user-list-row__main {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.user-list-row__name {
   font-size: 0.95rem;
   font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.user-list-row__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.user-list-row__badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.05rem 0.35rem;
+  border-radius: 0.25rem;
+  background: #f3f4f6;
+  color: #4b5563;
 }
 
 .user-list-row__rating {

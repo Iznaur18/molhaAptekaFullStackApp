@@ -39,6 +39,7 @@ export const API_CLIENT_UI = {
   RECORD_PRODUCT_VIEW_FALLBACK: "Не удалось записать просмотр товара",
   FETCH_ALL_ORDERS_FALLBACK: "Не удалось загрузить заказы",
   UPDATE_ORDER_STATUS_FALLBACK: "Не удалось обновить статус заказа",
+  DELETE_USER_FALLBACK: "Не удалось удалить пользователя",
 };
 
 /** Поиск пользователей (`GET /user/search`) */
@@ -238,10 +239,44 @@ export const USERS_PAGE_UI = {
   SORT_RATING: "По рейтингу",
   MIN_RATING_LABEL: "Средняя оценка от",
   MIN_RATING_ANY: "Любая",
+  FILTER_ROLE_LABEL: "Роль",
+  FILTER_ROLE_ANY: "Любая",
+  FILTER_PREMIUM_LABEL: "Премиум",
+  FILTER_PREMIUM_ANY: "Все",
+  FILTER_PREMIUM_ONLY: "Только премиум",
+  FILTER_BLOCKED_LABEL: "Блокировка",
+  FILTER_BLOCKED_ANY: "Не заблокированные",
+  FILTER_BLOCKED_ONLY: "Только заблокированные",
+  FILTER_ACTIVE_LABEL: "Учётка",
+  FILTER_ACTIVE_ANY: "Активные",
+  FILTER_ACTIVE_INACTIVE: "Отключённые",
+};
+
+/** Админ: редактирование чужого профиля */
+export const ADMIN_EDIT_USER_UI = {
+  TITLE: "Редактирование пользователя",
+  SECTION_ADMIN: "Администрирование",
+  LABEL_ROLE: "Роль",
+  LABEL_DISCOUNT: "Скидка, %",
+  LABEL_PREMIUM: "Премиум",
+  LABEL_ACCOUNT_ACTIVE: "Учётка активна",
+  LABEL_BLOCKED: "Заблокирован",
+  EDIT_BUTTON: "Редактировать",
+  DELETE_BUTTON: "Удалить пользователя",
+  DELETE_CONFIRM_TITLE: "Удалить пользователя?",
+  DELETE_CONFIRM_HINT: (token) =>
+    `Введите «${token}» для подтверждения`,
+  DELETE_CONFIRM_PLACEHOLDER: "Подтверждение",
+  DELETE_SUBMIT: "Удалить",
+  DELETE_CANCEL: "Отмена",
+  DELETE_LOADING: "Удаление…",
 };
 
 /** Строка каталога пользователей */
 export const USER_LIST_ROW_UI = {
+  BADGE_PREMIUM: "Премиум",
+  BADGE_BLOCKED: "Блок",
+  BADGE_INACTIVE: "Откл.",
   MISSING_NAME: COMMON_UI.EM_DASH,
   RATING_TITLE: "Средняя оценка · число голосов",
 };
@@ -328,6 +363,7 @@ export const REGISTER_MODAL_UI = {
   TITLE: "Регистрация",
   LABEL_EMAIL: "Email",
   LABEL_PASSWORD: "Пароль",
+  LABEL_PASSWORD_CONFIRM: "Повторите пароль",
   LABEL_USERNAME: "Никнейм",
   USERNAME_HINT:
     "Только a–z и 0–9, без пробелов, 3–30 символов (как одно слово в нижнем регистре).",
@@ -343,6 +379,8 @@ export const REGISTER_MODAL_UI = {
   SUBMIT_LOADING: "Регистрация…",
   SUCCESS: "Регистрация прошла успешно",
   ERROR_GENERIC: "Ошибка при регистрации",
+  ERROR_PASSWORD_MISMATCH: "Пароли не совпадают",
+  ERROR_PASSWORD_TOO_SHORT: "Пароль должен быть не менее 6 символов",
   PASSWORD_MIN_LENGTH: 6,
   USERNAME_MIN_LENGTH: 3,
   USERNAME_MAX_LENGTH: 30,

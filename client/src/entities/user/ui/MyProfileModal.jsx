@@ -172,6 +172,7 @@ export function MyProfileModal({
       titleAccessory={titleAccessory}
       footer={footer}
       layoutVariant="register"
+      showAdminRole={user?.userRole === "admin"}
     />
   );
 }

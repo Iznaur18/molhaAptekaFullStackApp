@@ -1,3 +1,4 @@
+import { getHiddenSellerIds } from '../../utils/adminUserGuard.js';
 import { getProductIdsWithOpenSales } from '../../utils/productOrderLocks.js';
 import {
     countProducts,
@@ -41,9 +42,13 @@ export const getProductsController = async (req, res) => {
         const { page, limit, skip } = parsePagination(req.query);
         const category = categoryFromQuery(req.query);
         const sort = parseProductSortFromQuery(req.query);
+        const hiddenSellerIds = await getHiddenSellerIds();
         const productsQuery = buildProductsQuery(req.query.search, {
             productIsAvailable: { $ne: false },
             ...(category ? { productCategory: category } : {}),
+            ...(hiddenSellerIds.length > 0
+                ? { productSeller: { $nin: hiddenSellerIds } }
+                : {}),
         });
 
         const [products, total] = await Promise.all([

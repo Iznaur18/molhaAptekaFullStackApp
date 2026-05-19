@@ -18,9 +18,12 @@ import { fetchCurrentUserProfile } from "../../../entities/user/api/fetchCurrent
 import { fetchUserProfileById } from "../../../entities/user/api/fetchUserProfileById.js";
 import { LoginModal } from "../../../entities/user/ui/LoginModal.jsx";
 import { MyProfileModal } from "../../../entities/user/ui/MyProfileModal.jsx";
+import { AdminDeleteUserConfirmModal } from "../../../entities/user/ui/AdminDeleteUserConfirmModal.jsx";
+import { AdminUserModalFooter } from "../../../entities/user/ui/AdminUserModalFooter.jsx";
 import { EditProfileModal } from "../../../entities/user/ui/EditProfileModal.jsx";
 import { RegisterModal } from "../../../entities/user/ui/RegisterModal.jsx";
 import { UserDetailsModal } from "../../../entities/user/ui/UserDetailsModal.jsx";
+import { USER_ROLE_ADMIN } from "../../../entities/user/model/userConstants.js";
 import { UserVoteRatingForm } from "../../../entities/user-vote-rating/ui/UserVoteRatingForm.jsx";
 import { AdminOrdersPage } from "../../admin-orders/ui/AdminOrdersPage.jsx";
 import { CartPage } from "../../cart/ui/CartPage.jsx";
@@ -56,12 +59,16 @@ const EMPTY_PROFILE_MODAL = Object.freeze({
   error: "",
 });
 
-const useCurrentUserId = (isAuthorized) => {
+const useCurrentUserSession = (isAuthorized) => {
   const [currentUserId, setCurrentUserId] = useState(null);
+  const [currentUserRole, setCurrentUserRole] = useState(
+    /** @type {'user'|'admin'|'moderator'|null} */ (null),
+  );
 
   useEffect(() => {
     if (!isAuthorized) {
       setCurrentUserId(null);
+      setCurrentUserRole(null);
       return undefined;
     }
     let isCancelled = false;
@@ -69,9 +76,15 @@ const useCurrentUserId = (isAuthorized) => {
     void (async () => {
       try {
         const me = await fetchCurrentUserProfile();
-        if (!isCancelled) setCurrentUserId(String(me._id));
+        if (!isCancelled) {
+          setCurrentUserId(String(me._id));
+          setCurrentUserRole(me.userRole ?? "user");
+        }
       } catch {
-        if (!isCancelled) setCurrentUserId(null);
+        if (!isCancelled) {
+          setCurrentUserId(null);
+          setCurrentUserRole(null);
+        }
       }
     })();
 
@@ -80,7 +93,7 @@ const useCurrentUserId = (isAuthorized) => {
     };
   }, [isAuthorized]);
 
-  return [currentUserId, setCurrentUserId];
+  return [currentUserId, currentUserRole, setCurrentUserId];
 };
 
 export function HomePage() {
@@ -136,7 +149,11 @@ export function HomePage() {
   /** @type {[import('../../../entities/product/model/types.js').ProductFromApi | null, import('react').Dispatch<import('react').SetStateAction<import('../../../entities/product/model/types.js').ProductFromApi | null>>]} */
   const [productToEdit, setProductToEdit] = useState(null);
   const [usersListTick, setUsersListTick] = useState(0);
-  const [currentUserId, setCurrentUserId] = useCurrentUserId(isAuthorized);
+  const [currentUserId, currentUserRole, setCurrentUserId] =
+    useCurrentUserSession(isAuthorized);
+  const isAdmin = currentUserRole === USER_ROLE_ADMIN;
+  const [isAdminEditUserOpen, setIsAdminEditUserOpen] = useState(false);
+  const [isAdminDeleteUserOpen, setIsAdminDeleteUserOpen] = useState(false);
   /** @type {[ProductFromApi | null, import('react').Dispatch<import('react').SetStateAction<ProductFromApi | null>>]} */
   const [catalogProductDetails, setCatalogProductDetails] = useState(null);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
@@ -295,6 +312,8 @@ export function HomePage() {
   const closeSellerModal = () => {
     sellerFetchSeq.current += 1;
     setSellerModal(EMPTY_PROFILE_MODAL);
+    setIsAdminEditUserOpen(false);
+    setIsAdminDeleteUserOpen(false);
   };
 
   const closeMyProfileModal = () => {
@@ -484,6 +503,7 @@ export function HomePage() {
         <UsersPage
           key={usersListTick}
           onUserRowClick={handleSellerNameClick}
+          isAdminViewer={isAdmin}
         />
       );
     }
@@ -588,28 +608,58 @@ export function HomePage() {
         errorMessage={sellerModal.phase === "error" ? sellerModal.error : null}
         footer={
           sellerModal.phase === "success" && sellerModal.user ? (
-            <UserVoteRatingForm
-              key={String(sellerModal.user._id)}
-              targetUser={sellerModal.user}
-              currentUserId={currentUserId}
-              isAuthorized={isAuthorized}
-              onRequestLogin={() => setIsLoginModalOpen(true)}
-              onVotePersisted={() => setUsersListTick((n) => n + 1)}
-              onRated={(snapshot) => {
-                setSellerModal((prev) => {
-                  if (prev.phase !== "success" || !prev.user) return prev;
-                  return {
-                    ...prev,
-                    user: {
-                      ...prev.user,
-                      userRatingByVotes:
-                        snapshot.userRatingByVotes ??
-                        prev.user.userRatingByVotes,
-                    },
-                  };
-                });
-              }}
-            />
+            isAdmin ? (
+              <AdminUserModalFooter
+                onEditClick={() => setIsAdminEditUserOpen(true)}
+                onDeleteClick={() => setIsAdminDeleteUserOpen(true)}
+              >
+                <UserVoteRatingForm
+                  key={String(sellerModal.user._id)}
+                  targetUser={sellerModal.user}
+                  currentUserId={currentUserId}
+                  isAuthorized={isAuthorized}
+                  onRequestLogin={() => setIsLoginModalOpen(true)}
+                  onVotePersisted={() => setUsersListTick((n) => n + 1)}
+                  onRated={(snapshot) => {
+                    setSellerModal((prev) => {
+                      if (prev.phase !== "success" || !prev.user) return prev;
+                      return {
+                        ...prev,
+                        user: {
+                          ...prev.user,
+                          userRatingByVotes:
+                            snapshot.userRatingByVotes ??
+                            prev.user.userRatingByVotes,
+                        },
+                      };
+                    });
+                  }}
+                />
+              </AdminUserModalFooter>
+            ) : (
+              <UserVoteRatingForm
+                key={String(sellerModal.user._id)}
+                targetUser={sellerModal.user}
+                currentUserId={currentUserId}
+                isAuthorized={isAuthorized}
+                onRequestLogin={() => setIsLoginModalOpen(true)}
+                onVotePersisted={() => setUsersListTick((n) => n + 1)}
+                onRated={(snapshot) => {
+                  setSellerModal((prev) => {
+                    if (prev.phase !== "success" || !prev.user) return prev;
+                    return {
+                      ...prev,
+                      user: {
+                        ...prev.user,
+                        userRatingByVotes:
+                          snapshot.userRatingByVotes ??
+                          prev.user.userRatingByVotes,
+                      },
+                    };
+                  });
+                }}
+              />
+            )
           ) : null
         }
       />
@@ -641,6 +691,30 @@ export function HomePage() {
               : prev,
           );
           setIsEditProfileOpen(false);
+        }}
+      />
+      <EditProfileModal
+        isOpen={isAdminEditUserOpen}
+        onClose={() => setIsAdminEditUserOpen(false)}
+        adminMode
+        user={sellerModal.phase === "success" ? sellerModal.user : null}
+        onSaved={(updatedUser) => {
+          setSellerModal((prev) =>
+            prev.open && prev.phase === "success" && prev.user
+              ? { ...prev, user: { ...prev.user, ...updatedUser } }
+              : prev,
+          );
+          setUsersListTick((n) => n + 1);
+          setIsAdminEditUserOpen(false);
+        }}
+      />
+      <AdminDeleteUserConfirmModal
+        isOpen={isAdminDeleteUserOpen}
+        user={sellerModal.phase === "success" ? sellerModal.user : null}
+        onClose={() => setIsAdminDeleteUserOpen(false)}
+        onDeleted={() => {
+          closeSellerModal();
+          setUsersListTick((n) => n + 1);
         }}
       />
       <LoginModal

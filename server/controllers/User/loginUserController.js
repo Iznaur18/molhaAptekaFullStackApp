@@ -3,6 +3,12 @@ import mongoose from 'mongoose';
 import { UserModel, UserVoteRatingModel } from '../../models/index.js';
 import { sendUserWithToken, errorRes, successRes } from '../../utils/index.js';
 import { USER_DATA, ALLOWED_FIELDS_FOR_USER, ALLOWED_FIELDS_FOR_ADMIN } from '../../constants/constants.js';
+import {
+    assertCanDeleteUser,
+    assertCanSetUserRole,
+} from '../../utils/adminUserGuard.js';
+import { getOptionalViewerFromRequest } from '../../utils/optionalViewerFromRequest.js';
+import { sanitizeUserProfileForViewer } from '../../utils/userProfileVisibility.js';
 
 /** Вход по email + пароль. POST /auth/login */
 export const loginUserController = async (req, res) => { // обработчик входа по email + пароль
@@ -20,6 +26,17 @@ export const loginUserController = async (req, res) => { // обработчик
         if (!isValidPassword) { // если пароль из запроса не совпадает с паролем из базы данных, возвращаем ошибку
             return errorRes(res, 400, 'Неверный email или пароль');
         }
+
+        if (user.isBlockedUser) {
+            return errorRes(res, 403, 'Аккаунт заблокирован');
+        }
+
+        if (user.isActiveUser === false) {
+            return errorRes(res, 403, 'Аккаунт отключён администратором');
+        }
+
+        user.userLastLoginAt = new Date();
+        await user.save({ validateBeforeSave: false });
 
         return sendUserWithToken(user, res); // отправляем пользователя с токеном вход по email + пароль
 
@@ -69,7 +86,25 @@ export const userGetProfileController = async (req, res) => {
             return errorRes(res, 404, 'Пользователь не найден');
         }
 
-        return successRes(res, { user: userIdServer });
+        const viewer = await getOptionalViewerFromRequest(req);
+
+        if (userIdServer.isBlockedUser) {
+            const isAdminViewer =
+                viewer?.userRole === 'admin' && !viewer.isBlockedUser;
+            if (!isAdminViewer) {
+                return errorRes(res, 404, 'Пользователь не найден');
+            }
+        }
+
+        const publicUser = sanitizeUserProfileForViewer(userIdServer, {
+            viewer,
+            viewerId: viewer?._id ?? null,
+        });
+        if (!publicUser) {
+            return errorRes(res, 404, 'Пользователь не найден');
+        }
+
+        return successRes(res, { user: publicUser });
         
     } catch (error) {
         console.error('userGetProfile error:', error);
@@ -157,6 +192,18 @@ export const userUpdateProfileController = async (req, res) => {
             return errorRes(res, 400, 'Нет данных для обновления. Укажите хотя бы одно разрешенное поле');
         }
 
+        if (updateData.userRole !== undefined) {
+            try {
+                await assertCanSetUserRole(targetUserId, updateData.userRole);
+            } catch (e) {
+                return errorRes(
+                    res,
+                    400,
+                    e instanceof Error ? e.message : 'Нельзя изменить роль',
+                );
+            }
+        }
+
         // 5. Проверка уникальности userName и userPhoneNumber перед обновлением
         if (updateData.userName) {
             const existingUser = await UserModel.findOne({ userName: updateData.userName, _id: { $ne: targetUserId } }); 
@@ -176,7 +223,12 @@ export const userUpdateProfileController = async (req, res) => {
         console.log(`[UPDATE PROFILE] User ${currentUserId} updating profile ${targetUserId}. Fields: ${Object.keys(updateData).join(', ')}`);
 
         // 7. Обновление профиля пользователя
-        const userDataUpdated = await UserModel.findByIdAndUpdate(targetUserId, updateData, { new: true, runValidators: true }).select(allowedFields.join(' '));
+        const selectFields = isCurrentUserAdmin ? USER_DATA : allowedFields.join(' ');
+        const userDataUpdated = await UserModel.findByIdAndUpdate(
+            targetUserId,
+            updateData,
+            { returnDocument: 'after', runValidators: true },
+        ).select(selectFields);
 
         if (!userDataUpdated) {
             return errorRes(res, 404, 'Пользователь не найден или не удалось обновить');
@@ -233,6 +285,16 @@ export const userDeleteProfileController = async (req, res) => {
 
         if (!isCurrentUserOwner && !isCurrentUserAdmin) {
             return errorRes(res, 403, 'У вас нет прав на удаление этого профиля');
+        }
+
+        try {
+            await assertCanDeleteUser(targetUserId);
+        } catch (e) {
+            return errorRes(
+                res,
+                400,
+                e instanceof Error ? e.message : 'Нельзя удалить пользователя',
+            );
         }
 
         // 4. Логирование удаления (для аудита)

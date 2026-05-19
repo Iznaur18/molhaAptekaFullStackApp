@@ -27,6 +27,7 @@ function isAbsoluteHttpUrl(value) {
  * @param {import('react').ReactNode} [props.titleAccessory]
  * @param {import('react').ReactNode} [props.footer]
  * @param {'default'|'register'} [props.layoutVariant]
+ * @param {boolean} [props.showAdminRole]
  */
 export function UserDetailsModal({
   isOpen,
@@ -39,6 +40,7 @@ export function UserDetailsModal({
   titleAccessory = null,
   footer = null,
   layoutVariant = "default",
+  showAdminRole = false,
 }) {
   const photoUrl = user ? pickUserProfilePhotoUrl(user) : null;
   const backgroundUrl = user ? pickUserProfileBackgroundUrl(user) : null;
@@ -77,7 +79,7 @@ export function UserDetailsModal({
           ? `${USER_DETAILS_MODAL_UI.TITLE_WITH_NAME_PREFIX}${user.userName}`
           : USER_DETAILS_MODAL_UI.TITLE_FALLBACK;
 
-  const rows = user ? getUserProfileRows(user) : [];
+  const rows = user ? getUserProfileRows(user, { showAdminRole }) : [];
 
   const canShowBackground = Boolean(backgroundUrl) && !backgroundLoadFailed;
   const showProfileBanner =

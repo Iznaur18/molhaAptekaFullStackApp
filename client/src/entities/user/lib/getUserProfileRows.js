@@ -6,7 +6,9 @@ import {
 } from "../../../shared/config/appUiCopy.js";
 import {
   USER_GENDER_LABEL_RU,
+  USER_ROLE_ADMIN,
   USER_ROLE_LABEL_RU,
+  USER_ROLE_USER,
 } from "../model/userConstants.js";
 
 const DATE_TIME_FORMAT = new Intl.DateTimeFormat(
@@ -66,14 +68,23 @@ function formatUrl(value) {
 
 const L = USER_PROFILE_COPY.LABELS;
 
+const INTERNAL_ROW_IDS = new Set([
+  "isActiveUser",
+  "isBlockedUser",
+  "userDiscountPercent",
+  "notesAboutUser",
+]);
+
 /**
  * @param {import('../model/types.js').UserPublicProfile} user
+ * @param {{ showAdminRole?: boolean }} [options]
  * @returns {{ id: string, label: string, value: string }[]}
  */
-export function getUserProfileRows(user) {
+export function getUserProfileRows(user, options = {}) {
+  const { showAdminRole = false } = options;
   const rating = user.userRatingByVotes;
 
-  return [
+  const rows = [
     { id: "_id", label: L._id, value: dashIfEmpty(user._id) },
     { id: "userName", label: L.userName, value: dashIfEmpty(user.userName) },
     { id: "email", label: L.email, value: dashIfEmpty(user.email) },
@@ -182,4 +193,24 @@ export function getUserProfileRows(user) {
     { id: "createdAt", label: L.createdAt, value: formatIso(user.createdAt) },
     { id: "updatedAt", label: L.updatedAt, value: formatIso(user.updatedAt) },
   ];
+
+  return rows.filter((row) => {
+    if (INTERNAL_ROW_IDS.has(row.id) && user[row.id] === undefined) {
+      return false;
+    }
+
+    if (row.id !== "userRole") {
+      return true;
+    }
+
+    const role = user.userRole;
+    if (!role || role === USER_ROLE_USER) {
+      return false;
+    }
+    if (role === USER_ROLE_ADMIN) {
+      return showAdminRole;
+    }
+
+    return true;
+  });
 }

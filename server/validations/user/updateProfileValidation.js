@@ -124,8 +124,8 @@ export const updateProfileValidation = [
     
     body('userRole')
         .optional({ nullable: true })
-        .isIn(['user', 'admin', 'pharmacist'])
-        .withMessage('Роль должна быть одной из: user, admin, pharmacist'),
+        .isIn(['user', 'admin', 'moderator'])
+        .withMessage('Роль должна быть одной из: user, admin, moderator'),
     
     body('isActiveUser')
         .optional({ nullable: true })

@@ -7,15 +7,23 @@ import { validateRuPhoneField } from "./ruPhone.js";import {
   USER_GENDER_NO_SELECTED,
   USER_NAME_MAX_LENGTH,
   USER_NAME_MIN_LENGTH,
+  USER_ROLE_ADMIN,
+  USER_ROLE_MODERATOR,
+  USER_ROLE_USER,
 } from "../model/userConstants.js";
+
+const DISCOUNT_MIN = 0;
+const DISCOUNT_MAX = 100;
 
 const USER_NAME_PATTERN = /^[a-z0-9]+$/;
 
 /**
  * @param {import('./mapUserToEditProfileForm.js').EditProfileFormState} form
+ * @param {{ includeAdmin?: boolean }} [options]
  * @returns {string | null} сообщение об ошибке или null
  */
-export function validateEditProfileForm(form) {
+export function validateEditProfileForm(form, options = {}) {
+  const { includeAdmin = false } = options;
   const name = String(form.userName).trim().toLowerCase();
   if (name.length > 0) {
     if (name.length < USER_NAME_MIN_LENGTH || name.length > USER_NAME_MAX_LENGTH) {
@@ -64,6 +72,26 @@ export function validateEditProfileForm(form) {
     gender !== USER_GENDER_NO_SELECTED
   ) {
     return "Некорректное значение поля «пол»";
+  }
+
+  if (includeAdmin) {
+    const role = form.userRole;
+    if (
+      role !== USER_ROLE_USER &&
+      role !== USER_ROLE_ADMIN &&
+      role !== USER_ROLE_MODERATOR
+    ) {
+      return "Некорректная роль";
+    }
+
+    const discount = Number(String(form.userDiscountPercent).trim());
+    if (
+      !Number.isFinite(discount) ||
+      discount < DISCOUNT_MIN ||
+      discount > DISCOUNT_MAX
+    ) {
+      return `Скидка: число от ${DISCOUNT_MIN} до ${DISCOUNT_MAX}`;
+    }
   }
 
   return null;

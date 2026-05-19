@@ -1,8 +1,13 @@
 import { UserModel } from '../../models/index.js';
 import { buildRegexSearchOr, errorRes, successRes } from '../../utils/index.js';
+import { getOptionalViewerFromRequest } from '../../utils/optionalViewerFromRequest.js';
+import {
+    applyAdminVisibilityToUsersSearchQuery,
+    sanitizeUsersSearchList,
+} from '../../utils/userProfileVisibility.js';
 
 const USER_PUBLIC_LIST_FIELDS =
-    '_id userName userPhoneNumber email isPremiumUser isActiveUser isBlockedUser userAvatarUrl telegramPhotoUrl userLoyaltyPoints userRatingByVotes';
+    '_id userName userPhoneNumber email userRole isPremiumUser isActiveUser isBlockedUser userAvatarUrl telegramPhotoUrl userLoyaltyPoints userRatingByVotes';
 const USER_SEARCH_FIELDS = ['userName', 'userPhoneNumber', 'email'];
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 10;
@@ -32,9 +37,18 @@ const buildUsersQuery = ({
 
     if (searchCondition) Object.assign(usersQuery, searchCondition);
     if (isPremiumUser === TRUE_FLAG) usersQuery.isPremiumUser = true;
-    if (isActiveUser === TRUE_FLAG) usersQuery.isActiveUser = true;
-    if (isBlockedUser === TRUE_FLAG) usersQuery.isBlockedUser = true;
-
+    if (isActiveUser === TRUE_FLAG) {
+        usersQuery.isActiveUser = true;
+    } else if (isActiveUser === 'false') {
+        usersQuery.isActiveUser = false;
+    } else {
+        usersQuery.isActiveUser = { $ne: false };
+    }
+    if (isBlockedUser === TRUE_FLAG) {
+        usersQuery.isBlockedUser = true;
+    } else {
+        usersQuery.isBlockedUser = { $ne: true };
+    }
     const hasMinRating = typeof minRating === 'number' && !Number.isNaN(minRating);
     if (onlyRated === TRUE_FLAG || hasMinRating) {
         usersQuery['userRatingByVotes.countVotes'] = { $gte: 1 };
@@ -71,10 +85,16 @@ export const userSearchController = async (req, res) => {
     try {
         const { page, limit, skip } = parsePagination(req.query);
         const usersQuery = buildUsersQuery(req.query);
+        const viewer = await getOptionalViewerFromRequest(req);
+
+        applyAdminVisibilityToUsersSearchQuery(usersQuery, {
+            viewer,
+            roleFilter: req.query.userRole,
+        });
 
         const sort = resolveSort(req.query.sort);
 
-        const [users, total] = await Promise.all([
+        const [usersRaw, total] = await Promise.all([
             UserModel.find(usersQuery)
                 .select(USER_PUBLIC_LIST_FIELDS)
                 .sort(sort)
@@ -83,6 +103,8 @@ export const userSearchController = async (req, res) => {
                 .lean(),
             UserModel.countDocuments(usersQuery),
         ]);
+
+        const users = sanitizeUsersSearchList(usersRaw, { viewer });
 
         return successRes(res, { users, total, page, limit });
     } catch (error) {

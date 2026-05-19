@@ -12,6 +12,10 @@ import {
  *   sort?: 'name' | 'rating';
  *   minRating?: number;
  *   onlyRated?: boolean;
+ *   userRole?: 'user' | 'admin' | 'moderator';
+ *   isPremiumUser?: boolean;
+ *   isBlockedUser?: boolean;
+ *   isActiveUser?: boolean;
  * }} [params]
  * @returns {Promise<{ users: import('../model/types.js').UserSearchListItem[]; total: number; page: number; limit: number }>}
  */
@@ -32,6 +36,10 @@ export async function fetchUsersSearchPage(params = {}) {
           ? { minRating: params.minRating }
           : {}),
         ...(params.onlyRated === true ? { onlyRated: "true" } : {}),
+        ...(params.userRole ? { userRole: params.userRole } : {}),
+        ...(params.isPremiumUser === true ? { isPremiumUser: "true" } : {}),
+        ...(params.isBlockedUser === true ? { isBlockedUser: "true" } : {}),
+        ...(params.isActiveUser === false ? { isActiveUser: "false" } : {}),
       },
     });
 

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { patchUserProfile } from "../api/patchUserProfile.js";
+import { buildAdminPatchUserProfileBody } from "../lib/buildAdminPatchUserProfileBody.js";
 import { buildPatchUserProfileBody } from "../lib/buildPatchUserProfileBody.js";
 import { AddressDeliveryFields } from "../../address/ui/AddressDeliveryFields.jsx";
 import { countWords } from "../lib/countWords.js";
@@ -15,8 +16,13 @@ import {
   USER_GENDER_LABEL_RU,
   USER_GENDER_NO_SELECTED,
   USER_NAME_MAX_LENGTH,
+  USER_ROLE_ADMIN,
+  USER_ROLE_MODERATOR,
+  USER_ROLE_USER,
+  USER_ROLE_LABEL_RU,
 } from "../model/userConstants.js";
 import {
+  ADMIN_EDIT_USER_UI,
   COMMON_UI,
   EDIT_PROFILE_MODAL_UI,
   USER_DETAILS_MODAL_UI,
@@ -30,15 +36,24 @@ const GENDER_OPTIONS = [
   USER_GENDER_NO_SELECTED,
 ];
 
+const ROLE_OPTIONS = [USER_ROLE_USER, USER_ROLE_MODERATOR, USER_ROLE_ADMIN];
+
 /**
  * @param {{
  *   isOpen: boolean;
  *   onClose: () => void;
  *   user: import('../model/types.js').UserPublicProfile | null;
  *   onSaved: (user: import('../model/types.js').UserPublicProfile) => void;
+ *   adminMode?: boolean;
  * }} props
  */
-export function EditProfileModal({ isOpen, onClose, user, onSaved }) {
+export function EditProfileModal({
+  isOpen,
+  onClose,
+  user,
+  onSaved,
+  adminMode = false,
+}) {
   const [form, setForm] = useState(() => mapUserToEditProfileForm({ _id: "" }));
   const [feedback, setFeedback] = useState({ kind: "idle", message: "" });
 
@@ -95,7 +110,9 @@ export function EditProfileModal({ isOpen, onClose, user, onSaved }) {
     event.preventDefault();
     if (!user?._id) return;
 
-    const clientError = validateEditProfileForm(form);
+    const clientError = validateEditProfileForm(form, {
+      includeAdmin: adminMode,
+    });
     if (clientError) {
       setFeedback({ kind: "error", message: clientError });
       return;
@@ -104,7 +121,9 @@ export function EditProfileModal({ isOpen, onClose, user, onSaved }) {
     setFeedback({ kind: "loading", message: "" });
 
     try {
-      const body = buildPatchUserProfileBody(form);
+      const body = adminMode
+        ? buildAdminPatchUserProfileBody(form)
+        : buildPatchUserProfileBody(form);
       const updated = await patchUserProfile(String(user._id), body);
       onSaved(updated);
     } catch (e) {
@@ -121,7 +140,9 @@ export function EditProfileModal({ isOpen, onClose, user, onSaved }) {
       className="edit-profile-modal"
       role="dialog"
       aria-modal="true"
-      aria-label={EDIT_PROFILE_MODAL_UI.ARIA_DIALOG}
+      aria-label={
+        adminMode ? ADMIN_EDIT_USER_UI.TITLE : EDIT_PROFILE_MODAL_UI.ARIA_DIALOG
+      }
     >
       <button
         type="button"
@@ -132,7 +153,7 @@ export function EditProfileModal({ isOpen, onClose, user, onSaved }) {
       <div className="edit-profile-modal__card">
         <div className="edit-profile-modal__header">
           <h2 className="edit-profile-modal__title">
-            {EDIT_PROFILE_MODAL_UI.TITLE}
+            {adminMode ? ADMIN_EDIT_USER_UI.TITLE : EDIT_PROFILE_MODAL_UI.TITLE}
           </h2>
           <button
             type="button"
@@ -252,6 +273,68 @@ export function EditProfileModal({ isOpen, onClose, user, onSaved }) {
               />
               {EDIT_PROFILE_MODAL_UI.LABEL_NOTIFICATIONS}
             </label>
+            {adminMode ? (
+              <fieldset className="edit-profile-modal__fieldset">
+                <legend className="edit-profile-modal__legend">
+                  {ADMIN_EDIT_USER_UI.SECTION_ADMIN}
+                </legend>
+                <label className="edit-profile-modal__label">
+                  {ADMIN_EDIT_USER_UI.LABEL_ROLE}
+                  <select
+                    className="edit-profile-modal__input"
+                    name="userRole"
+                    value={form.userRole}
+                    onChange={handleChange}
+                  >
+                    {ROLE_OPTIONS.map((value) => (
+                      <option key={value} value={value}>
+                        {USER_ROLE_LABEL_RU[value]}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="edit-profile-modal__label">
+                  {ADMIN_EDIT_USER_UI.LABEL_DISCOUNT}
+                  <input
+                    className="edit-profile-modal__input"
+                    type="number"
+                    name="userDiscountPercent"
+                    min={0}
+                    max={100}
+                    step={1}
+                    value={form.userDiscountPercent}
+                    onChange={handleChange}
+                  />
+                </label>
+                <label className="edit-profile-modal__label edit-profile-modal__label_row">
+                  <input
+                    type="checkbox"
+                    name="isPremiumUser"
+                    checked={form.isPremiumUser}
+                    onChange={handleChange}
+                  />
+                  {ADMIN_EDIT_USER_UI.LABEL_PREMIUM}
+                </label>
+                <label className="edit-profile-modal__label edit-profile-modal__label_row">
+                  <input
+                    type="checkbox"
+                    name="isActiveUser"
+                    checked={form.isActiveUser}
+                    onChange={handleChange}
+                  />
+                  {ADMIN_EDIT_USER_UI.LABEL_ACCOUNT_ACTIVE}
+                </label>
+                <label className="edit-profile-modal__label edit-profile-modal__label_row">
+                  <input
+                    type="checkbox"
+                    name="isBlockedUser"
+                    checked={form.isBlockedUser}
+                    onChange={handleChange}
+                  />
+                  {ADMIN_EDIT_USER_UI.LABEL_BLOCKED}
+                </label>
+              </fieldset>
+            ) : null}
             <label className="edit-profile-modal__label">
               {EDIT_PROFILE_MODAL_UI.LABEL_NOTES}
               <textarea

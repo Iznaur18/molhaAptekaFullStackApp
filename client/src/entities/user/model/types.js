@@ -15,6 +15,10 @@
  * @property {string} [telegramPhotoUrl]
  * @property {number} [userLoyaltyPoints]
  * @property {UserRatingByVotes} [userRatingByVotes]
+ * @property {'user'|'admin'|'moderator'} [userRole]
+ * @property {boolean} [isPremiumUser]
+ * @property {boolean} [isActiveUser]
+ * @property {boolean} [isBlockedUser]
  */
 
 /**
@@ -24,6 +28,7 @@
  * @typedef {object} RegisterUserPayload
  * @property {string} email
  * @property {string} password
+ * @property {string} passwordConfirm
  * @property {string} userName
  * @property {string} [phoneNumber]
  * @property {string} [avatarUrl]
@@ -55,7 +60,7 @@
  * @property {string} [userBackgroundUrl]
  * @property {boolean} [isActiveUser]
  * @property {boolean} [isBlockedUser]
- * @property {'user'|'admin'|'pharmacist'} [userRole]
+ * @property {'user'|'admin'|'moderator'} [userRole]
  * @property {number} [userDiscountPercent]
  * @property {boolean} [notificationsEnabled]
  * @property {boolean} [isPremiumUser]

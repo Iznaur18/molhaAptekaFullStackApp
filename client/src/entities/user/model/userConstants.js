@@ -22,12 +22,12 @@ export const PROFILE_FIELD_MAX_WORDS = 10;
 /** Как в `server/models/UserModel.js` — `userRole.enum`. */
 export const USER_ROLE_USER = "user";
 export const USER_ROLE_ADMIN = "admin";
-export const USER_ROLE_PHARMACIST = "pharmacist";
+export const USER_ROLE_MODERATOR = "moderator";
 
 export const USER_ROLE_LABEL_RU = {
   [USER_ROLE_USER]: "Пользователь",
   [USER_ROLE_ADMIN]: "Администратор",
-  [USER_ROLE_PHARMACIST]: "Фармацевт",
+  [USER_ROLE_MODERATOR]: "Модератор",
 };
 
 /** Совпадает с `server/constants/constants.js`. */

@@ -47,5 +47,9 @@ export const userSearchValidation = [
         .optional()
         .isIn(['true', 'false'])
         .withMessage('onlyRated должен быть true или false'),
+    query('userRole')
+        .optional()
+        .isIn(['user', 'admin', 'moderator'])
+        .withMessage('userRole должен быть user, admin или moderator'),
     handleValidationByExpressErrors
 ];

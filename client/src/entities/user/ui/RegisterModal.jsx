@@ -6,6 +6,7 @@ import { AddressDeliveryFields } from "../../address/ui/AddressDeliveryFields.js
 import { validateRuDeliveryAddressForm } from "../../address/lib/validateRuDeliveryAddressForm.js";
 import { buildRegisterUserPayload } from "../lib/buildRegisterUserPayload.js";
 import { limitRuPhoneInput, validateRuPhoneField } from "../lib/ruPhone.js";
+import { validatePasswordConfirm } from "../lib/validatePasswordConfirm.js";
 import { validateUserNameField } from "../lib/validateUserName.js";
 import {
   USER_GENDER_FEMALE,
@@ -23,6 +24,7 @@ import "./RegisterModal.css";
 const INITIAL_FORM = {
   email: "",
   password: "",
+  passwordConfirm: "",
   userName: "",
   phoneNumber: "",
   avatarUrl: "",
@@ -72,6 +74,15 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    const passwordError = validatePasswordConfirm(
+      form.password,
+      form.passwordConfirm,
+    );
+    if (passwordError) {
+      setStatus({ kind: "error", message: passwordError });
+      return;
+    }
 
     const userNameError = validateUserNameField(form.userName, { required: true });
     if (userNameError) {
@@ -164,6 +175,19 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
                 type="password"
                 name="password"
                 value={form.password}
+                onChange={handleChange}
+                required
+                minLength={REGISTER_MODAL_UI.PASSWORD_MIN_LENGTH}
+                autoComplete="new-password"
+              />
+            </label>
+            <label className="register-modal__label">
+              {REGISTER_MODAL_UI.LABEL_PASSWORD_CONFIRM}
+              <input
+                className="register-modal__input"
+                type="password"
+                name="passwordConfirm"
+                value={form.passwordConfirm}
                 onChange={handleChange}
                 required
                 minLength={REGISTER_MODAL_UI.PASSWORD_MIN_LENGTH}

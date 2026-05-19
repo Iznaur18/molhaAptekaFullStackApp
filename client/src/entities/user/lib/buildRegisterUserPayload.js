@@ -10,6 +10,7 @@ import {
  * @param {{
  *   email: string;
  *   password: string;
+ *   passwordConfirm: string;
  *   userName: string;
  *   phoneNumber: string;
  *   avatarUrl: string;
@@ -30,6 +31,7 @@ export function buildRegisterUserPayload(form) {
   const payload = {
     email: form.email.trim(),
     password: form.password,
+    passwordConfirm: form.passwordConfirm,
   };
 
   const userName = String(form.userName).trim().toLowerCase();

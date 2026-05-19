@@ -17,6 +17,16 @@ export const registerUserValidation = [
 
   body('password').isLength({ min: 6 }).withMessage('Пароль должен быть не менее 6 символов'),
 
+  body('passwordConfirm')
+    .exists({ checkFalsy: true })
+    .withMessage('Повторите пароль')
+    .custom((value, { req }) => {
+      if (value !== req.body.password) {
+        throw new Error('Пароли не совпадают');
+      }
+      return true;
+    }),
+
   body('userName')
     .trim()
     .notEmpty()

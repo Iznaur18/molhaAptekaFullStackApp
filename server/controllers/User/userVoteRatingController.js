@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { UserVoteRatingModel, UserModel } from '../../models/index.js';
 import { errorRes, successRes } from '../../utils/index.js';
 import { USER_ME_RAITING } from '../../constants/constants.js';
+import { ADMIN_ROLE } from '../../utils/adminUserGuard.js';
 
 const VOTE_RESPONSE_USER_FIELDS = '_id userRatingByVotes userName email userAvatarUrl';
 
@@ -49,8 +50,12 @@ export const userVoteRatingController = async (req, res) => {
             return errorRes(res, 400, 'Нельзя голосовать за самого себя');
         }
 
-        const userVoteTarget = await UserModel.findById(targetOid);
+        const userVoteTarget = await UserModel.findById(targetOid).select('userRole');
         if (!userVoteTarget) {
+            return errorRes(res, 404, 'Целевой пользователь не найден');
+        }
+
+        if (userVoteTarget.userRole === ADMIN_ROLE) {
             return errorRes(res, 404, 'Целевой пользователь не найден');
         }
 

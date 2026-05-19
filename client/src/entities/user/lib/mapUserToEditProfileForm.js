@@ -3,6 +3,7 @@ import {
   DEFAULT_USER_AVATAR_URL,
   DEFAULT_USER_BACKGROUND_URL,
   USER_GENDER_NO_SELECTED,
+  USER_ROLE_USER,
 } from "../model/userConstants.js";
 
 /**
@@ -16,6 +17,11 @@ import {
  * @property {string} userBackgroundUrl
  * @property {boolean} notificationsEnabled
  * @property {string} notesAboutUser
+ * @property {'user'|'admin'|'moderator'} userRole
+ * @property {string} userDiscountPercent
+ * @property {boolean} isPremiumUser
+ * @property {boolean} isActiveUser
+ * @property {boolean} isBlockedUser
  */
 
 /**
@@ -39,5 +45,11 @@ export function mapUserToEditProfileForm(user) {
     userBackgroundUrl: user.userBackgroundUrl ?? DEFAULT_USER_BACKGROUND_URL,
     notificationsEnabled: Boolean(user.notificationsEnabled),
     notesAboutUser: user.notesAboutUser ?? "",
+    userRole: user.userRole ?? USER_ROLE_USER,
+    userDiscountPercent:
+      user.userDiscountPercent != null ? String(user.userDiscountPercent) : "0",
+    isPremiumUser: Boolean(user.isPremiumUser),
+    isActiveUser: user.isActiveUser !== false,
+    isBlockedUser: Boolean(user.isBlockedUser),
   };
 }
