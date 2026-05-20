@@ -4,6 +4,10 @@ import {
   PRODUCT_CATEGORY_VALUES,
   PRODUCT_IMAGE_URLS_MAX,
 } from "../constants/productConstants.js";
+import {
+  PRODUCT_MODERATION_APPROVED,
+  PRODUCT_MODERATION_STATUSES,
+} from "../constants/productModerationConstants.js";
 
 const Schema = mongoose.Schema;
 
@@ -37,6 +41,17 @@ const ProductSchema = new Schema(
     productIsAvailable: {
       type: Boolean,
       default: true,
+    },
+    productModerationStatus: {
+      type: String,
+      enum: PRODUCT_MODERATION_STATUSES,
+      default: PRODUCT_MODERATION_APPROVED,
+    },
+    productModerationComment: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: 2000,
     },
     uniqueViewerCount: {
       type: Number,

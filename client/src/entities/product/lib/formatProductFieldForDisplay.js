@@ -3,6 +3,7 @@ import {
   FORMAT_BOOLEAN_RU,
 } from "../../../shared/config/appUiCopy.js";
 import { PRODUCT_CATEGORY_LABEL_RU } from "../model/productConstants.js";
+import { getProductModerationBadgeLabel } from "./getProductModerationUi.js";
 import { resolveProductImageUrls } from "./resolveProductImageUrls.js";
 
 const RUBLE_FORMAT = new Intl.NumberFormat(COMMON_UI.LOCALE_RU, {
@@ -78,6 +79,12 @@ export function formatProductFieldForDisplay(key, product) {
       if (raw === true) return FORMAT_BOOLEAN_RU.YES;
       if (raw === false) return FORMAT_BOOLEAN_RU.NO;
       return COMMON_UI.EM_DASH;
+    case "productModerationStatus":
+      return getProductModerationBadgeLabel(product);
+    case "productModerationComment": {
+      const text = raw == null ? "" : String(raw).trim();
+      return text === "" ? COMMON_UI.EM_DASH : text;
+    }
     case "createdAt":
     case "updatedAt":
       return formatIsoDate(raw);

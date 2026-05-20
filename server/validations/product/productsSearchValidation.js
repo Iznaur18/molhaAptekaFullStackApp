@@ -36,5 +36,9 @@ export const productsSearchValidation = [
         .optional()
         .isIn(PRODUCT_SORT_VALUES)
         .withMessage('sort должен быть newest, views или purchases'),
+    query('includeHidden')
+        .optional()
+        .isIn(['true', 'false'])
+        .withMessage('includeHidden должен быть true или false'),
     handleValidationByExpressErrors,
 ];

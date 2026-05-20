@@ -9,6 +9,7 @@ import {
     ORDER_STATUS_CONFIRMED,
     ORDER_STATUS_DELIVERED,
 } from '../../constants/orderConstants.js';
+import { normalizeOrderDocumentForRuntime } from './orderStatus.js';
 
 /** `PATCH /order/:orderId/status` — смена статуса заказа (только админ). */
 export const updateOrderStatusController = async (req, res) => {
@@ -20,6 +21,7 @@ export const updateOrderStatusController = async (req, res) => {
         if (!order) {
             return errorRes(res, 404, 'Заказ не найден');
         }
+        normalizeOrderDocumentForRuntime(order);
 
         const now = new Date();
         order.items.forEach((item) => {

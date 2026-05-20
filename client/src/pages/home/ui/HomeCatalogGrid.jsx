@@ -12,6 +12,7 @@ import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
  *   onDeleteMyProduct: (productId: string) => void;
  *   onEditMyProduct?: (product: import('../../../entities/product/model/types.js').ProductFromApi) => void;
  *   myProductsCatalogError: string;
+ *   myProductsCatalogNotice?: string;
  *   onOpenProductDetails: (product: import('../../../entities/product/model/types.js').ProductFromApi) => void;
  *   onSetMyProductAvailability?: (productId: string, productIsAvailable: boolean) => void | Promise<void>;
  *   togglingAvailabilityProductId: string | null;
@@ -34,6 +35,7 @@ export function HomeCatalogGrid({
   onDeleteMyProduct,
   onEditMyProduct,
   myProductsCatalogError,
+  myProductsCatalogNotice = "",
   onOpenProductDetails,
   onSetMyProductAvailability,
   togglingAvailabilityProductId,
@@ -59,6 +61,11 @@ export function HomeCatalogGrid({
 
   return (
     <>
+      {myProductsCatalogNotice ? (
+        <p className="home-page__state home-page__state_notice" role="status">
+          {myProductsCatalogNotice}
+        </p>
+      ) : null}
       {myProductsCatalogError ? (
         <p className="home-page__state home-page__state_error" role="alert">
           {myProductsCatalogError}

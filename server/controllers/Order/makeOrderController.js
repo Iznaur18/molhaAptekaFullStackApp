@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 
+import { PRODUCT_MODERATION_APPROVED } from '../../constants/productModerationConstants.js';
 import { CartModel, OrderModel, ProductModel, UserModel } from '../../models/index.js';
 import { errorRes, successRes } from '../../utils/index.js';
 
@@ -25,6 +26,7 @@ const buildItemsWithPriceSnapshot = (items, priceById) =>
 const fetchAvailableProductPrices = async (productIds) => {
     const products = await ProductModel.find({
         _id: { $in: productIds },
+        productModerationStatus: PRODUCT_MODERATION_APPROVED,
         productIsAvailable: { $ne: false },
     })
         .select('_id productPrice')

@@ -9,6 +9,7 @@ import { makeProductValidation } from './product/makeProductValidation.js';
 import { productIdParamValidation } from './product/productIdParamValidation.js';
 import { productsSearchValidation } from './product/productsSearchValidation.js';
 import { patchMyProductValidation } from './product/patchMyProductValidation.js';
+import { rejectProductModerationValidation } from './product/rejectProductModerationValidation.js';
 import { makeOrderValidation } from './order/makeOrderValidation.js';
 import { updateOrderStatusValidation } from './order/updateOrderStatusValidation.js';
 import { getAllOrdersValidation } from './order/getAllOrdersValidation.js';
@@ -30,6 +31,7 @@ export {
     productIdParamValidation,
     productsSearchValidation,
     patchMyProductValidation,
+    rejectProductModerationValidation,
     makeOrderValidation,
     updateOrderStatusValidation,
     getAllOrdersValidation,

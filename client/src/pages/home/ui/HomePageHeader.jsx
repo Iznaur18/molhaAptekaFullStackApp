@@ -22,6 +22,7 @@ const NON_CATALOG_VIEW_TITLES = {
   "my-sales": HOME_PAGE_UI.TITLE_MY_SALES,
   "my-orders": HOME_PAGE_UI.TITLE_MY_ORDERS,
   "admin-orders": HOME_PAGE_UI.TITLE_ADMIN_ORDERS,
+  "product-moderation": HOME_PAGE_UI.TITLE_PRODUCT_MODERATION,
 };
 
 /**
@@ -38,13 +39,16 @@ const NON_CATALOG_VIEW_TITLES = {
  *   onProductCategoryFilterToggle: () => void;
  *   onCloseProductCategoryFilter: () => void;
  *   onProductSearchTermChange: (next: string) => void;
- *   onCreateProductClick: () => void;
+ *   onPlaceProductClick: () => void;
  *   onMyProfileClick: () => void;
  *   onLoginClick: () => void;
  *   onRegisterClick: () => void;
  *   onNavigateToFullCatalogFromBreadcrumb: () => void;
  *   catalogSort: string;
  *   onCatalogSortChange: (sort: string) => void;
+ *   isAdmin: boolean;
+ *   showHiddenCatalogProducts: boolean;
+ *   onShowHiddenCatalogProductsChange: (next: boolean) => void;
  * }} props
  */
 export function HomePageHeader({
@@ -60,13 +64,16 @@ export function HomePageHeader({
   onProductCategoryFilterToggle,
   onCloseProductCategoryFilter,
   onProductSearchTermChange,
-  onCreateProductClick,
+  onPlaceProductClick,
   onMyProfileClick,
   onLoginClick,
   onRegisterClick,
   onNavigateToFullCatalogFromBreadcrumb,
   catalogSort,
   onCatalogSortChange,
+  isAdmin,
+  showHiddenCatalogProducts,
+  onShowHiddenCatalogProductsChange,
 }) {
   /** @type {import('react').RefObject<HTMLDivElement | null>} */
   const productCategoryFilterRef = useRef(null);
@@ -128,17 +135,33 @@ export function HomePageHeader({
             onProductCategorySelect={onProductCategorySelect}
             onProductCategoryFilterToggle={onProductCategoryFilterToggle}
             onProductSearchTermChange={onProductSearchTermChange}
-            onCreateProductClick={onCreateProductClick}
+            onPlaceProductClick={onPlaceProductClick}
             onNavigateToFullCatalogFromBreadcrumb={
               onNavigateToFullCatalogFromBreadcrumb
             }
             catalogSort={catalogSort}
             onCatalogSortChange={onCatalogSortChange}
+            isAdmin={isAdmin}
+            showHiddenCatalogProducts={showHiddenCatalogProducts}
+            onShowHiddenCatalogProductsChange={
+              onShowHiddenCatalogProductsChange
+            }
           />
         )}
       </div>
       <div className="home-page__auth-actions">
         <HeaderCartButton onClick={() => onSetMainView("cart")} />
+        <button
+          type="button"
+          className="home-page__list-product-button"
+          onClick={() =>
+            isAuthorized ? onPlaceProductClick() : onLoginClick()
+          }
+        >
+          {isAuthorized
+            ? HOME_PAGE_UI.LIST_PRODUCT_BUTTON
+            : HOME_PAGE_UI.LOGIN_TO_LIST_PRODUCT}
+        </button>
         {isAuthorized ? (
           <button
             type="button"
@@ -181,11 +204,16 @@ function CatalogTitleAndFilters({
   onProductCategorySelect,
   onProductCategoryFilterToggle,
   onProductSearchTermChange,
-  onCreateProductClick,
+  onPlaceProductClick,
   onNavigateToFullCatalogFromBreadcrumb,
   catalogSort,
   onCatalogSortChange,
+  isAdmin,
+  showHiddenCatalogProducts,
+  onShowHiddenCatalogProductsChange,
 }) {
+  const showAdminHiddenToggle = isAdmin && !isMineMode;
+
   return (
     <>
       <div className="home-page__title-row">
@@ -276,7 +304,8 @@ function CatalogTitleAndFilters({
         ) : null}
       </div>
 
-      <div className="home-page__sort">
+      <div className="home-page__catalog-filters-row">
+        <div className="home-page__sort">
         <label className="home-page__sort-label">
           <span>{HOME_PAGE_UI.SORT_LABEL}</span>
           <select
@@ -290,7 +319,20 @@ function CatalogTitleAndFilters({
               </option>
             ))}
           </select>
-        </label>
+          </label>
+        </div>
+        {showAdminHiddenToggle ? (
+          <label className="home-page__hidden-toggle">
+            <input
+              type="checkbox"
+              checked={showHiddenCatalogProducts}
+              onChange={(event) =>
+                onShowHiddenCatalogProductsChange(event.target.checked)
+              }
+            />
+            <span>{HOME_PAGE_UI.SHOW_HIDDEN_PRODUCTS}</span>
+          </label>
+        ) : null}
       </div>
 
       <div className="home-page__search-row">
@@ -310,9 +352,9 @@ function CatalogTitleAndFilters({
           <button
             type="button"
             className="home-page__create-product-button"
-            onClick={onCreateProductClick}
+            onClick={onPlaceProductClick}
           >
-            {HOME_PAGE_UI.CREATE_PRODUCT_BUTTON}
+            {HOME_PAGE_UI.LIST_PRODUCT_BUTTON}
           </button>
           <p className="home-page__subtitle">{HOME_PAGE_UI.SUBTITLE_MY_ONLY}</p>
         </div>

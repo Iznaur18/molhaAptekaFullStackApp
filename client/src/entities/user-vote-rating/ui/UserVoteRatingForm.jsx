@@ -28,6 +28,20 @@ function formatAggregateLine(userRatingByVotes) {
 }
 
 /**
+ * @param {{ children: import('react').ReactNode }} props
+ */
+function VoteRatingCollapsible({ children }) {
+  return (
+    <details className="user-vote-rating-form__details">
+      <summary className="user-vote-rating-form__summary">
+        {USER_VOTE_RATING_UI.COLLAPSE_SUMMARY}
+      </summary>
+      <div className="user-vote-rating-form__panel">{children}</div>
+    </details>
+  );
+}
+
+/**
  * @param {{
  *   targetUser: import('../../user/model/types.js').UserPublicProfile;
  *   currentUserId: string | null;
@@ -129,6 +143,7 @@ export function UserVoteRatingForm({
 
   if (!isAuthorized) {
     return (
+      <VoteRatingCollapsible>
       <div className="user-vote-rating-form user-vote-rating-form_guest">
         <p className="user-vote-rating-form__hint">{USER_VOTE_RATING_UI.LOGIN_HINT}</p>
         <button
@@ -139,28 +154,38 @@ export function UserVoteRatingForm({
           {USER_VOTE_RATING_UI.LOGIN_BUTTON}
         </button>
       </div>
+      </VoteRatingCollapsible>
     );
   }
 
   if (currentUserId == null) {
     return (
-      <div className="user-vote-rating-form">
-        <p className="user-vote-rating-form__hint">{USER_VOTE_RATING_UI.ME_LOADING}</p>
-      </div>
+      <VoteRatingCollapsible>
+        <div className="user-vote-rating-form">
+          <p className="user-vote-rating-form__hint">
+            {USER_VOTE_RATING_UI.ME_LOADING}
+          </p>
+        </div>
+      </VoteRatingCollapsible>
     );
   }
 
   if (isSelf) {
     return (
-      <div className="user-vote-rating-form user-vote-rating-form_self">
-        <p className="user-vote-rating-form__hint">{USER_VOTE_RATING_UI.SELF_HINT}</p>
-      </div>
+      <VoteRatingCollapsible>
+        <div className="user-vote-rating-form user-vote-rating-form_self">
+          <p className="user-vote-rating-form__hint">
+            {USER_VOTE_RATING_UI.SELF_HINT}
+          </p>
+        </div>
+      </VoteRatingCollapsible>
     );
   }
 
   if (!myVoteResolved) {
     return (
-      <div className="user-vote-rating-form" aria-busy="true">
+      <VoteRatingCollapsible>
+        <div className="user-vote-rating-form" aria-busy="true">
         <h3 className="user-vote-rating-form__title">{USER_VOTE_RATING_UI.TITLE}</h3>
         <p className="user-vote-rating-form__aggregate">
           <span className="user-vote-rating-form__aggregate-label">
@@ -168,14 +193,18 @@ export function UserVoteRatingForm({
           </span>
           {aggregateText}
         </p>
-        <p className="user-vote-rating-form__hint">{USER_VOTE_RATING_UI.MY_VOTE_RESOLVING}</p>
-      </div>
+        <p className="user-vote-rating-form__hint">
+          {USER_VOTE_RATING_UI.MY_VOTE_RESOLVING}
+        </p>
+        </div>
+      </VoteRatingCollapsible>
     );
   }
 
   return (
-    <div className="user-vote-rating-form">
-      <h3 className="user-vote-rating-form__title">{USER_VOTE_RATING_UI.TITLE}</h3>
+    <VoteRatingCollapsible>
+      <div className="user-vote-rating-form">
+        <h3 className="user-vote-rating-form__title">{USER_VOTE_RATING_UI.TITLE}</h3>
       <p className="user-vote-rating-form__aggregate">
         <span className="user-vote-rating-form__aggregate-label">
           {USER_VOTE_RATING_UI.CURRENT_AGGREGATE}:{" "}
@@ -228,6 +257,7 @@ export function UserVoteRatingForm({
             : USER_VOTE_RATING_UI.SUBMIT}
         </button>
       )}
-    </div>
+      </div>
+    </VoteRatingCollapsible>
   );
 }

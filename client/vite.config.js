@@ -17,10 +17,27 @@ const DEV_API_PROXY_PREFIXES = [
   "/upload",
 ];
 
+/** Не проксировать SPA-пути вроде `/user-list` (префикс API — только `/user` и `/user/...`). */
+const shouldProxyToApi = (prefix, pathname) => {
+  if (prefix === "/user") {
+    return /^\/user(?:\/|$)/.test(pathname);
+  }
+  return pathname === prefix || pathname.startsWith(`${prefix}/`);
+};
+
 const devApiProxy = Object.fromEntries(
   DEV_API_PROXY_PREFIXES.map((prefix) => [
     prefix,
-    { target: LOCAL_API_ORIGIN, changeOrigin: true },
+    {
+      target: LOCAL_API_ORIGIN,
+      changeOrigin: true,
+      bypass(req) {
+        const pathname = (req.url ?? "").split("?")[0];
+        if (!shouldProxyToApi(prefix, pathname)) {
+          return "/index.html";
+        }
+      },
+    },
   ]),
 );
 

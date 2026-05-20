@@ -19,6 +19,7 @@ import "./MyProfileModal.css";
  * onMySalesClick?: () => void;
  * onMyOrdersClick?: () => void;
  * onAdminOrdersClick?: () => void;
+ * onProductModerationClick?: () => void;
  * }} props
  */
 export function MyProfileModal({
@@ -33,6 +34,7 @@ export function MyProfileModal({
   onMySalesClick,
   onMyOrdersClick,
   onAdminOrdersClick,
+  onProductModerationClick,
 }) {
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
 
@@ -100,6 +102,8 @@ export function MyProfileModal({
   const canUseMyOrders = isProfileReady && Boolean(onMyOrdersClick);
   const canUseAdminOrders =
     isProfileReady && Boolean(onAdminOrdersClick) && user?.userRole === "admin";
+  const canUseProductModeration =
+    isProfileReady && Boolean(onProductModerationClick);
   const isProfileTabActive = !isLoading;
 
   const profileTitleClassName = [
@@ -155,6 +159,15 @@ export function MyProfileModal({
           onClick={() => onAdminOrdersClick?.()}
         >
           {MY_PROFILE_MODAL_UI.TAB_ADMIN_ORDERS}
+        </button>
+      ) : null}
+      {canUseProductModeration ? (
+        <button
+          type="button"
+          className="my-profile-modal__header-action"
+          onClick={() => onProductModerationClick?.()}
+        >
+          {MY_PROFILE_MODAL_UI.TAB_PRODUCT_MODERATION}
         </button>
       ) : null}
     </div>

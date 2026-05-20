@@ -29,17 +29,22 @@ export const API_CLIENT_UI = {
   DELETE_MY_PRODUCT_FALLBACK: "Не удалось удалить товар",
   PATCH_MY_PRODUCT_FALLBACK: "Не удалось обновить товар",
   CREATE_PRODUCT_FALLBACK: "Не удалось создать товар",
+  CREATE_PRODUCT_PENDING_HINT:
+    "Товар отправлен на проверку. После одобрения модератором он появится в каталоге.",
   VOTE_SUBMIT_FALLBACK: "Не удалось отправить оценку",
   FETCH_MY_VOTE_FALLBACK: "Не удалось загрузить вашу оценку",
   CREATE_ORDER_FALLBACK: "Не удалось оформить заказ",
   FETCH_CART_FALLBACK: "Не удалось загрузить корзину",
   REPLACE_CART_FALLBACK: "Не удалось сохранить корзину",
-  FETCH_MY_ORDERS_FALLBACK: "Не удалось загрузить ваши заказы",
+  FETCH_MY_ORDERS_FALLBACK: "Не удалось загрузить ваши покупки",
   FETCH_MY_SALES_FALLBACK: "Не удалось загрузить ваши продажи",
   RECORD_PRODUCT_VIEW_FALLBACK: "Не удалось записать просмотр товара",
   FETCH_ALL_ORDERS_FALLBACK: "Не удалось загрузить заказы",
   UPDATE_ORDER_STATUS_FALLBACK: "Не удалось обновить статус заказа",
   DELETE_USER_FALLBACK: "Не удалось удалить пользователя",
+  FETCH_MODERATION_QUEUE_FALLBACK: "Не удалось загрузить очередь модерации",
+  APPROVE_PRODUCT_MODERATION_FALLBACK: "Не удалось одобрить товар",
+  REJECT_PRODUCT_MODERATION_FALLBACK: "Не удалось отклонить товар",
 };
 
 /** Поиск пользователей (`GET /user/search`) */
@@ -85,19 +90,22 @@ export const HOME_PAGE_UI = {
   ARIA_MY_PRODUCTS_CRUMB: "Главная, Мой профиль, Мои товары",
   TITLE_USERS: "Пользователи",
   TITLE_CART: "Корзина",
-  TITLE_MY_ORDERS: "Мои заказы",
+  TITLE_MY_ORDERS: "Мои покупки",
   TITLE_MY_SALES: "Мои продажи",
   TITLE_ADMIN_ORDERS: "Все заказы",
+  TITLE_PRODUCT_MODERATION: "На модерации",
   NAV_TO_CATALOG: "← Каталог товаров",
   NAV_TO_USERS: "Пользователи",
   NAV_TO_CART: "Корзина",
-  NAV_TO_MY_ORDERS: "Мои заказы",
+  NAV_TO_MY_ORDERS: "Мои покупки",
   NAV_TO_ADMIN_ORDERS: "Все заказы",
   FILTER_BUTTON: "Фильтр",
   SORT_LABEL: "Сортировка",
+  SHOW_HIDDEN_PRODUCTS: "Показывать скрытые товары",
   CATEGORY_ALL: "Все категории",
   SUBTITLE_MY_ONLY: "Показаны только ваши товары.",
-  CREATE_PRODUCT_BUTTON: "Создать товар",
+  LIST_PRODUCT_BUTTON: "Разместить товар",
+  LOGIN_TO_LIST_PRODUCT: "Войти, чтобы разместить",
   SUBTITLE_ALL_PRODUCTS: "Все позиции из каталога",
   AUTH_MY_PROFILE: "Мой профиль",
   AUTH_LOGIN: "Войти",
@@ -167,7 +175,7 @@ export const CHECKOUT_FORM_UI = {
   ADDRESS_MAX_LENGTH: 300,
 };
 
-/** Подписи карточки заказа (используется на Мои заказы и Все заказы) */
+/** Подписи карточки заказа (используется на Мои покупки и Все заказы) */
 export const ORDER_CARD_UI = {
   ITEMS_HEADING: "Позиции",
   TOTAL_LABEL: "Итого",
@@ -185,11 +193,29 @@ export const ORDER_CARD_UI = {
   ACTION_PENDING: "Сохраняем…",
 };
 
-/** Страница «Мои заказы» */
+/** Страница «Мои покупки» */
 export const MY_ORDERS_PAGE_UI = {
-  TITLE: "Мои заказы",
-  LOADING: "Загрузка заказов…",
-  EMPTY: "У вас пока нет заказов.",
+  TITLE: "Мои покупки",
+  LOADING: "Загрузка покупок…",
+  EMPTY: "У вас пока нет покупок.",
+};
+
+/** Очередь модерации товаров (admin / moderator) */
+export const PRODUCT_MODERATION_PAGE_UI = {
+  TITLE: "На модерации",
+  LOADING: "Загрузка очереди…",
+  EMPTY: "Нет товаров, ожидающих проверки.",
+  BADGE_PENDING: "На проверке",
+  BADGE_APPROVED: "Одобрен",
+  BADGE_REJECTED: "Отклонён",
+  REJECT_COMMENT_LABEL: "Комментарий для продавца (необязательно)",
+  REJECT_COMMENT_PLACEHOLDER: "Причина отклонения…",
+  APPROVE: "Одобрить",
+  REJECT: "Отклонить",
+  ACTION_PENDING: "Сохраняем…",
+  SELLER_LABEL: "Продавец",
+  CREATED_LABEL: "Создан",
+  REJECTION_COMMENT_PREFIX: "Комментарий модератора:",
 };
 
 /** Страница «Мои продажи» */
@@ -317,6 +343,22 @@ export const PRODUCT_DETAILS_MODAL_UI = {
   SLIDER_REGION_ARIA: "Слайдер фотографий товара",
 };
 
+/** Блок статуса товара в модалке (admin / moderator) */
+export const PRODUCT_DETAILS_ADMIN_STATUS_UI = {
+  SECTION_ARIA: "Служебная информация о товаре",
+  HEADING: "Модерация и ограничения",
+  MODERATION_STATUS_LABEL: "Статус модерации",
+  MODERATION_COMMENT_LABEL: "Комментарий модератора",
+  CATALOG_LABEL: "В общем каталоге",
+  SALES_LOCK_LABEL: "Скрытие и удаление",
+  SALES_LOCK_BLOCKED: "Заблокировано — есть незавершённые заказы",
+  SALES_LOCK_CLEAR: "Доступно — нет блокирующих заказов",
+  SELLER_SECTION_HEADING: "Продавец",
+  SELLER_EMAIL_LABEL: "Email",
+  SELLER_PHONE_LABEL: "Телефон",
+  SELLER_RATING_LABEL: "Средняя оценка",
+};
+
 /** Карточка товара (заголовок по умолчанию) */
 export const PRODUCT_CARD_UI = {
   DEFAULT_TITLE: "Товар",
@@ -334,6 +376,7 @@ export const PRODUCT_CARD_UI = {
   DELETE_CONFIRM_CANCEL: "Отмена",
   OPEN_SALES_LOCKED_HINT:
     "Скрыть или удалить можно, когда все покупки по товару подтверждены покупателями (или отменены).",
+  HIDDEN_FROM_CATALOG_BADGE: "Скрыт от покупателей",
   IMAGE_LIGHTBOX_OPEN_LABEL: "Показать изображение в полном размере",
   IMAGE_LIGHTBOX_CLOSE: "Закрыть просмотр изображения",
   IMAGE_LIGHTBOX_DIALOG_LABEL: "Изображение товара",
@@ -379,6 +422,7 @@ export const REGISTER_MODAL_UI = {
   SUBMIT_LOADING: "Регистрация…",
   SUCCESS: "Регистрация прошла успешно",
   ERROR_GENERIC: "Ошибка при регистрации",
+  ERROR_REQUIRED_FIELDS: "Заполните обязательные поля",
   ERROR_PASSWORD_MISMATCH: "Пароли не совпадают",
   ERROR_PASSWORD_TOO_SHORT: "Пароль должен быть не менее 6 символов",
   PASSWORD_MIN_LENGTH: 6,
@@ -388,6 +432,7 @@ export const REGISTER_MODAL_UI = {
 
 /** Оценка пользователя `POST /vote/:targetUserId` */
 export const USER_VOTE_RATING_UI = {
+  COLLAPSE_SUMMARY: "Оценить пользователя",
   TITLE: "Оценка",
   CURRENT_AGGREGATE: "Сейчас в профиле",
   RANGE_LABEL: "Ваша оценка",
@@ -418,8 +463,9 @@ export const MY_PROFILE_MODAL_UI = {
   TAB_TITLE: "Мой профиль",
   TAB_MY_PRODUCTS: "Мои товары",
   TAB_MY_SALES: "Мои продажи",
-  TAB_MY_ORDERS: "Мои заказы",
+  TAB_MY_ORDERS: "Мои покупки",
   TAB_ADMIN_ORDERS: "Все заказы",
+  TAB_PRODUCT_MODERATION: "На модерации",
   EDIT_PROFILE: "Изменить профиль",
   LOGOUT: "Выйти",
   LOGOUT_CONFIRM: "Вы точно хотите выйти?",

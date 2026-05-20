@@ -1,9 +1,9 @@
 /**
  * Пути экранов главной SPA. Не использовать `/cart` и `/users`: в dev Vite
- * проксирует `/cart` и `/user` на Express (см. vite.config.js); `/users` на
- * :4444 даёт 404 JSON вместо SPA.
+ * проксирует `/cart` и `/user/...` на Express (см. vite.config.js).
+ * Путь `/user-list` ок: не совпадает с API `/user` (иначе F5 → 404 JSON).
  *
- * @typedef {'catalog' | 'users' | 'cart' | 'my-sales' | 'my-orders' | 'admin-orders'} HomeMainView
+ * @typedef {'catalog' | 'users' | 'cart' | 'my-sales' | 'my-orders' | 'admin-orders' | 'product-moderation'} HomeMainView
  */
 
 /** @type {Record<HomeMainView, string>} */
@@ -16,6 +16,7 @@ export const HOME_MAIN_VIEW_PATH = {
   "my-sales": "/my-sales",
   "my-orders": "/my-orders",
   "admin-orders": "/admin-orders",
+  "product-moderation": "/moderation-products",
 };
 
 /** @type {Map<string, HomeMainView>} */

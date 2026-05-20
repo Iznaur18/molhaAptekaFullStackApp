@@ -12,10 +12,13 @@ import { formatProductFieldForDisplay } from "../lib/formatProductFieldForDispla
 import { resolveProductImageUrls } from "../lib/resolveProductImageUrls.js";
 import {
   PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS,
+  PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS_STAFF,
   PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS,
+  PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS_ADMIN,
   PRODUCT_FIELD_LABEL_RU,
   PRODUCT_IMAGE_PLACEHOLDER_URL,
 } from "../model/productConstants.js";
+import { ProductDetailsAdminStatusPanel } from "./ProductDetailsAdminStatusPanel.jsx";
 import { ProductImageLightbox } from "./ProductImageLightbox.jsx";
 
 import "./ProductDetailsModal.css";
@@ -27,6 +30,7 @@ import "./ProductDetailsModal.css";
  */
 function renderFieldRows(product, keys, handlers) {
   const { onClose, onSellerNameClick } = handlers;
+  const imageUrls = resolveProductImageUrls(product);
 
   return keys.map((key) => {
     const raw = product[key];
@@ -40,24 +44,46 @@ function renderFieldRows(product, keys, handlers) {
       display !== COMMON_UI.EM_DASH;
 
     const ddClass =
-      key === "productDescription"
+      key === "productDescription" ||
+      key === "productModerationComment" ||
+      key === "productImageUrls"
         ? "product-details-modal__value product-details-modal__value--multiline"
         : "product-details-modal__value";
 
-    const valueNode = canOpenSellerProfile ? (
-      <button
-        type="button"
-        className="product-details-modal__seller-link"
-        onClick={() => {
-          onClose();
-          onSellerNameClick(String(raw._id));
-        }}
-      >
-        {display}
-      </button>
-    ) : (
-      display
-    );
+    let valueNode;
+    if (canOpenSellerProfile) {
+      valueNode = (
+        <button
+          type="button"
+          className="product-details-modal__seller-link"
+          onClick={() => {
+            onClose();
+            onSellerNameClick(String(raw._id));
+          }}
+        >
+          {display}
+        </button>
+      );
+    } else if (key === "productImageUrls" && imageUrls.length > 0) {
+      valueNode = (
+        <ul className="product-details-modal__image-url-list">
+          {imageUrls.map((url, index) => (
+            <li key={`${index}-${url}`}>
+              <a
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="product-details-modal__image-url-link"
+              >
+                {url}
+              </a>
+            </li>
+          ))}
+        </ul>
+      );
+    } else {
+      valueNode = display;
+    }
 
     return (
       <div key={key} className="product-details-modal__row">
@@ -81,6 +107,9 @@ function renderFieldRows(product, keys, handlers) {
  *     productId: string,
  *     stats: { uniqueViewerCount: number },
  *   ) => void;
+ *   adminFooter?: import('react').ReactNode;
+ *   showStaffDetails?: boolean;
+ *   showAdminSalesLock?: boolean;
  * }} props
  */
 export function ProductDetailsModal({
@@ -90,6 +119,9 @@ export function ProductDetailsModal({
   onSellerNameClick,
   isAuthorized = false,
   onProductStatsUpdate,
+  adminFooter = null,
+  showStaffDetails = false,
+  showAdminSalesLock = false,
 }) {
   const imageUrls = useMemo(
     () => (product ? resolveProductImageUrls(product) : []),
@@ -169,6 +201,13 @@ export function ProductDetailsModal({
 
   if (!isOpen || !product) return null;
 
+  const topRowFieldKeys = showStaffDetails
+    ? PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS_ADMIN
+    : PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS;
+  const bottomRowFieldKeys = showStaffDetails
+    ? PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS_STAFF
+    : PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS;
+
   const title = product.productName?.trim() || "Товар";
   const displayUrls =
     imageUrls.length > 0 ? imageUrls : [PRODUCT_IMAGE_PLACEHOLDER_URL];
@@ -207,6 +246,12 @@ export function ProductDetailsModal({
           </header>
 
           <div className="product-details-modal__body">
+            {showStaffDetails ? (
+              <ProductDetailsAdminStatusPanel
+                product={product}
+                showSalesLock={showAdminSalesLock}
+              />
+            ) : null}
             <div className="product-details-modal__row-top">
               <div className="product-details-modal__image-aside">
                 <div
@@ -312,24 +357,25 @@ export function ProductDetailsModal({
                 ) : null}
               </div>
               <dl className="product-details-modal__list product-details-modal__list--top">
-                {renderFieldRows(
-                  product,
-                  PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS,
-                  { onClose, onSellerNameClick },
-                )}
+                {renderFieldRows(product, topRowFieldKeys, {
+                  onClose,
+                  onSellerNameClick,
+                })}
               </dl>
             </div>
 
             <div className="product-details-modal__row-bottom">
               <dl className="product-details-modal__list product-details-modal__list--bottom">
-                {renderFieldRows(
-                  product,
-                  PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS,
-                  { onClose, onSellerNameClick },
-                )}
+                {renderFieldRows(product, bottomRowFieldKeys, {
+                  onClose,
+                  onSellerNameClick,
+                })}
               </dl>
             </div>
           </div>
+          {adminFooter ? (
+            <footer className="product-details-modal__footer">{adminFooter}</footer>
+          ) : null}
         </div>
       </div>
       {lightboxOpen && imageUrls.length > 0 ? (

@@ -161,7 +161,11 @@ export function MySalesPage({ isAuthorized, onSellerNameClick }) {
           ? e.message
           : API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK;
       setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
-      void reloadSales();
+      try {
+        await reloadSales();
+      } catch {
+        /* откат списка не критичен при 429 после серии ошибок */
+      }
     } finally {
       setPendingActionKey(null);
     }
@@ -197,7 +201,11 @@ export function MySalesPage({ isAuthorized, onSellerNameClick }) {
           ? e.message
           : API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK;
       setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
-      void reloadSales();
+      try {
+        await reloadSales();
+      } catch {
+        /* откат списка не критичен при 429 после серии ошибок */
+      }
     } finally {
       setPendingActionKey(null);
     }

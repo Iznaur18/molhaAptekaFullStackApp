@@ -5,6 +5,7 @@ import {
     CART_LINE_ITEM_QUANTITY_MIN,
     CART_MAX_DISTINCT_PRODUCTS,
 } from '../../constants/cartConstants.js';
+import { PRODUCT_MODERATION_APPROVED } from '../../constants/productModerationConstants.js';
 import { ProductModel } from '../../models/index.js';
 
 /**
@@ -77,6 +78,7 @@ export const filterCartItemsToPurchasableProducts = async (items) => {
     const oids = ids.map((id) => new mongoose.Types.ObjectId(id));
     const alive = await ProductModel.find({
         _id: { $in: oids },
+        productModerationStatus: PRODUCT_MODERATION_APPROVED,
         productIsAvailable: { $ne: false },
     })
         .select('_id')

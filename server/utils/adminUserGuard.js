@@ -2,6 +2,16 @@ import { UserModel } from '../models/index.js';
 
 export const ADMIN_ROLE = 'admin';
 
+/**
+ * @param {string | undefined | null} userId
+ * @returns {Promise<boolean>}
+ */
+export async function isUserAdmin(userId) {
+    if (!userId) return false;
+    const user = await UserModel.findById(userId).select('userRole').lean();
+    return user?.userRole === ADMIN_ROLE;
+}
+
 export async function countAdminUsers(excludeUserId = null) {
     const query = { userRole: ADMIN_ROLE };
     if (excludeUserId) {

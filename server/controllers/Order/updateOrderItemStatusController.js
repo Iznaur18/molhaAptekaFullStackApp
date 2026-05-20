@@ -13,6 +13,7 @@ import {
 } from './orderQueries.js';
 import {
     buildOrderStatusFromItems,
+    normalizeOrderDocumentForRuntime,
     normalizeOrderItemsForRuntime,
 } from './orderStatus.js';
 
@@ -38,6 +39,7 @@ export const markOrderItemDeliveredBySellerController = async (req, res) => {
 
         const order = await OrderModel.findById(orderId).populate(ORDER_ITEMS_POPULATE);
         if (!order) return errorRes(res, 404, 'Заказ не найден');
+        normalizeOrderDocumentForRuntime(order);
         normalizeOrderItemsForRuntime(order.items);
 
         const targetItem = getOrderItemByIndex(order, itemIndex);
@@ -82,6 +84,7 @@ export const markOrderItemShippedBySellerController = async (req, res) => {
 
         const order = await OrderModel.findById(orderId).populate(ORDER_ITEMS_POPULATE);
         if (!order) return errorRes(res, 404, 'Заказ не найден');
+        normalizeOrderDocumentForRuntime(order);
         normalizeOrderItemsForRuntime(order.items);
 
         const targetItem = getOrderItemByIndex(order, itemIndex);
@@ -123,6 +126,7 @@ export const confirmOrderItemByBuyerController = async (req, res) => {
 
         const order = await OrderModel.findById(orderId).populate(ORDER_ITEMS_POPULATE);
         if (!order) return errorRes(res, 404, 'Заказ не найден');
+        normalizeOrderDocumentForRuntime(order);
         normalizeOrderItemsForRuntime(order.items);
 
         if (normalizeId(order.userBuyerId) !== buyerId) {

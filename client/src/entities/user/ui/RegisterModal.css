@@ -112,6 +112,23 @@
   font-size: 0.9375rem;
 }
 
+.register-modal__label--invalid {
+  color: #b42318;
+  font-weight: 600;
+}
+
+.register-modal__input.register-modal__input--invalid {
+  border: 2px solid #d92d20;
+  background-color: #fef3f2;
+  box-shadow: 0 0 0 1px #d92d20;
+}
+
+.register-modal__input.register-modal__input--invalid:focus {
+  border-color: #b42318;
+  outline: 2px solid #fda29b;
+  outline-offset: 1px;
+}
+
 .register-modal__message {
   margin: 0;
   font-size: 0.875rem;

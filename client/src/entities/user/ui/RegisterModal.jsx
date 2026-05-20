@@ -5,6 +5,7 @@ import { registerUser } from "../api/registerUser.js";
 import { AddressDeliveryFields } from "../../address/ui/AddressDeliveryFields.jsx";
 import { validateRuDeliveryAddressForm } from "../../address/lib/validateRuDeliveryAddressForm.js";
 import { buildRegisterUserPayload } from "../lib/buildRegisterUserPayload.js";
+import { getRegisterEmptyRequiredFieldKeys } from "../lib/getRegisterEmptyRequiredFieldKeys.js";
 import { limitRuPhoneInput, validateRuPhoneField } from "../lib/ruPhone.js";
 import { validatePasswordConfirm } from "../lib/validatePasswordConfirm.js";
 import { validateUserNameField } from "../lib/validateUserName.js";
@@ -48,6 +49,14 @@ const GENDER_OPTIONS = [
 ];
 
 /**
+ * @param {string} baseClass
+ * @param {string} fieldKey
+ * @param {Set<string>} invalidFields
+ */
+const withInvalidFieldClass = (baseClass, fieldKey, invalidFields) =>
+  invalidFields.has(fieldKey) ? `${baseClass} ${baseClass}--invalid` : baseClass;
+
+/**
  * @param {{
  *   isOpen: boolean;
  *   onClose: () => void;
@@ -57,6 +66,9 @@ const GENDER_OPTIONS = [
 export function RegisterModal({ isOpen, onClose, onSuccess }) {
   const [form, setForm] = useState(INITIAL_FORM);
   const [status, setStatus] = useState({ kind: "idle", message: "" });
+  const [invalidFields, setInvalidFields] = useState(
+    /** @type {Set<string>} */ (() => new Set()),
+  );
 
   if (!isOpen) return null;
 
@@ -70,22 +82,41 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
       nextValue = limitRuPhoneInput(nextValue);
     }
     setForm((prev) => ({ ...prev, [name]: nextValue }));
+    setInvalidFields((prev) => {
+      if (!prev.has(name)) return prev;
+      const next = new Set(prev);
+      next.delete(name);
+      return next;
+    });
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    const emptyRequired = getRegisterEmptyRequiredFieldKeys(form);
+    if (emptyRequired.length > 0) {
+      setInvalidFields(new Set(emptyRequired));
+      setStatus({
+        kind: "error",
+        message: REGISTER_MODAL_UI.ERROR_REQUIRED_FIELDS,
+      });
+      return;
+    }
+    setInvalidFields(new Set());
 
     const passwordError = validatePasswordConfirm(
       form.password,
       form.passwordConfirm,
     );
     if (passwordError) {
+      setInvalidFields(new Set(["password", "passwordConfirm"]));
       setStatus({ kind: "error", message: passwordError });
       return;
     }
 
     const userNameError = validateUserNameField(form.userName, { required: true });
     if (userNameError) {
+      setInvalidFields(new Set(["userName"]));
       setStatus({ kind: "error", message: userNameError });
       return;
     }
@@ -114,6 +145,7 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
       const { token } = await registerUser(payload);
       localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, token);
       setForm(INITIAL_FORM);
+      setInvalidFields(new Set());
       setStatus({ kind: "success", message: REGISTER_MODAL_UI.SUCCESS });
       onSuccess?.();
     } catch (error) {
@@ -127,6 +159,7 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
 
   const handleClose = () => {
     setStatus({ kind: "idle", message: "" });
+    setInvalidFields(new Set());
     onClose();
   };
 
@@ -154,55 +187,101 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
             {COMMON_UI.MODAL_CLOSE_GLYPH}
           </button>
         </div>
-        <form className="register-modal__body" onSubmit={handleSubmit}>
+        <form
+          className="register-modal__body"
+          onSubmit={handleSubmit}
+          noValidate
+        >
           <div className="register-modal__scroll">
-            <label className="register-modal__label">
+            <label
+              className={withInvalidFieldClass(
+                "register-modal__label",
+                "email",
+                invalidFields,
+              )}
+            >
               {REGISTER_MODAL_UI.LABEL_EMAIL}
               <input
-                className="register-modal__input"
+                className={withInvalidFieldClass(
+                  "register-modal__input",
+                  "email",
+                  invalidFields,
+                )}
                 type="email"
                 name="email"
                 value={form.email}
                 onChange={handleChange}
-                required
+                aria-required="true"
+                aria-invalid={invalidFields.has("email")}
                 autoComplete="email"
               />
             </label>
-            <label className="register-modal__label">
+            <label
+              className={withInvalidFieldClass(
+                "register-modal__label",
+                "password",
+                invalidFields,
+              )}
+            >
               {REGISTER_MODAL_UI.LABEL_PASSWORD}
               <input
-                className="register-modal__input"
+                className={withInvalidFieldClass(
+                  "register-modal__input",
+                  "password",
+                  invalidFields,
+                )}
                 type="password"
                 name="password"
                 value={form.password}
                 onChange={handleChange}
-                required
-                minLength={REGISTER_MODAL_UI.PASSWORD_MIN_LENGTH}
+                aria-required="true"
+                aria-invalid={invalidFields.has("password")}
                 autoComplete="new-password"
               />
             </label>
-            <label className="register-modal__label">
+            <label
+              className={withInvalidFieldClass(
+                "register-modal__label",
+                "passwordConfirm",
+                invalidFields,
+              )}
+            >
               {REGISTER_MODAL_UI.LABEL_PASSWORD_CONFIRM}
               <input
-                className="register-modal__input"
+                className={withInvalidFieldClass(
+                  "register-modal__input",
+                  "passwordConfirm",
+                  invalidFields,
+                )}
                 type="password"
                 name="passwordConfirm"
                 value={form.passwordConfirm}
                 onChange={handleChange}
-                required
-                minLength={REGISTER_MODAL_UI.PASSWORD_MIN_LENGTH}
+                aria-required="true"
+                aria-invalid={invalidFields.has("passwordConfirm")}
                 autoComplete="new-password"
               />
             </label>
-            <label className="register-modal__label">
+            <label
+              className={withInvalidFieldClass(
+                "register-modal__label",
+                "userName",
+                invalidFields,
+              )}
+            >
               {REGISTER_MODAL_UI.LABEL_USERNAME}
               <input
-                className="register-modal__input"
+                className={withInvalidFieldClass(
+                  "register-modal__input",
+                  "userName",
+                  invalidFields,
+                )}
                 type="text"
                 name="userName"
                 value={form.userName}
                 onChange={handleChange}
-                required
+                aria-required="true"
+                aria-invalid={invalidFields.has("userName")}
                 minLength={REGISTER_MODAL_UI.USERNAME_MIN_LENGTH}
                 maxLength={REGISTER_MODAL_UI.USERNAME_MAX_LENGTH}
                 title={REGISTER_MODAL_UI.USERNAME_HINT}

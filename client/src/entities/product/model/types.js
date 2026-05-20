@@ -24,7 +24,9 @@
  * @property {ProductSellerPopulated|string} productSeller
  * @property {ProductCategory} productCategory
  * @property {boolean} productIsAvailable
- * @property {boolean} [hasOpenSales] — `GET /product/my`: незавершённые продажи (нет confirmed/cancelled по всем позициям)
+ * @property {'pending'|'approved'|'rejected'} [productModerationStatus]
+ * @property {string} [productModerationComment]
+ * @property {boolean} [hasOpenSales] — незавершённые продажи (`GET /product/my`, для admin — `GET /product`)
  * @property {number} [uniqueViewerCount]
  * @property {string} createdAt
  * @property {string} updatedAt

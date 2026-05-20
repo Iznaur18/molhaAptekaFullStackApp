@@ -10,6 +10,7 @@ import {
 import {
   PRODUCT_CATEGORY_ELECTRONICS,
 } from "../model/productConstants.js";
+import { PRODUCT_MODERATION_APPROVED } from "../model/productModerationConstants.js";
 import { CreateProductCategorySelect } from "./CreateProductCategorySelect.jsx";
 import { urlsFromImageRows } from "../lib/productImageRowHelpers.js";
 import { validateProductDescription } from "../lib/validateProductDescription.js";
@@ -70,6 +71,10 @@ export function CreateProductModal({
   const [status, setStatus] = useState({ kind: "idle", message: "" });
   const isEdit = mode === "edit";
   const isSubmitting = status.kind === "loading";
+  const showCatalogAvailabilityToggle =
+    !isEdit ||
+    (productToEdit?.productModerationStatus ?? PRODUCT_MODERATION_APPROVED) ===
+      PRODUCT_MODERATION_APPROVED;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -145,14 +150,17 @@ export function CreateProductModal({
           });
           return;
         }
-        product = await patchMyProduct(String(productToEdit._id), {
+        const patchBody = {
           productName: form.productName.trim(),
           productDescription: form.productDescription.trim(),
           productImageUrls: urls,
           productPrice,
           productCategory: form.productCategory,
-          productIsAvailable: form.productIsAvailable,
-        });
+        };
+        if (showCatalogAvailabilityToggle) {
+          patchBody.productIsAvailable = form.productIsAvailable;
+        }
+        product = await patchMyProduct(String(productToEdit._id), patchBody);
       } else {
         product = await createProduct({
           productName: form.productName,
@@ -272,15 +280,17 @@ export function CreateProductModal({
                 setForm((prev) => ({ ...prev, productCategory }))
               }
             />
-            <label className="create-product-modal__check">
-              <input
-                type="checkbox"
-                checked={form.productIsAvailable}
-                onChange={handleAvailableChange}
-                disabled={isSubmitting}
-              />
-              {CREATE_PRODUCT_MODAL_UI.LABEL_AVAILABLE}
-            </label>
+            {showCatalogAvailabilityToggle ? (
+              <label className="create-product-modal__check">
+                <input
+                  type="checkbox"
+                  checked={form.productIsAvailable}
+                  onChange={handleAvailableChange}
+                  disabled={isSubmitting}
+                />
+                {CREATE_PRODUCT_MODAL_UI.LABEL_AVAILABLE}
+              </label>
+            ) : null}
             {status.kind === "error" ? (
               <p
                 className="create-product-modal__message create-product-modal__message_error"

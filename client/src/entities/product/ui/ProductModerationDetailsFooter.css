@@ -1,0 +1,61 @@
+.product-moderation-details-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.product-moderation-details-footer__error {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #b42318;
+}
+
+.product-moderation-details-footer__reject-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+  color: #344054;
+}
+
+.product-moderation-details-footer__reject-input {
+  box-sizing: border-box;
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.625rem;
+  font: inherit;
+  font-size: 0.9375rem;
+}
+
+.product-moderation-details-footer__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.product-moderation-details-footer__btn {
+  border-radius: 0.5rem;
+  padding: 0.45rem 0.85rem;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.product-moderation-details-footer__btn_approve {
+  border: 1px solid #067647;
+  background: #067647;
+  color: #fff;
+}
+
+.product-moderation-details-footer__btn_reject {
+  border: 1px solid #b42318;
+  background: #fff;
+  color: #b42318;
+}
+
+.product-moderation-details-footer__btn:disabled {
+  opacity: 0.65;
+  cursor: default;
+}

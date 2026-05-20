@@ -1,4 +1,5 @@
-import { getHiddenSellerIds } from '../../utils/adminUserGuard.js';
+import { PRODUCT_MODERATION_APPROVED } from '../../constants/productModerationConstants.js';
+import { getHiddenSellerIds, isUserAdmin } from '../../utils/adminUserGuard.js';
 import { getProductIdsWithOpenSales } from '../../utils/productOrderLocks.js';
 import {
     countProducts,
@@ -43,21 +44,41 @@ export const getProductsController = async (req, res) => {
         const category = categoryFromQuery(req.query);
         const sort = parseProductSortFromQuery(req.query);
         const hiddenSellerIds = await getHiddenSellerIds();
-        const productsQuery = buildProductsQuery(req.query.search, {
-            productIsAvailable: { $ne: false },
+        const isAdmin = await isUserAdmin(req.userId);
+        const includeHidden =
+            isAdmin && String(req.query.includeHidden).toLowerCase() === 'true';
+
+        const catalogBaseQuery = {
+            productModerationStatus: PRODUCT_MODERATION_APPROVED,
             ...(category ? { productCategory: category } : {}),
             ...(hiddenSellerIds.length > 0
                 ? { productSeller: { $nin: hiddenSellerIds } }
                 : {}),
-        });
+        };
+        if (!includeHidden) {
+            catalogBaseQuery.productIsAvailable = { $ne: false };
+        }
+
+        const productsQuery = buildProductsQuery(req.query.search, catalogBaseQuery);
 
         const [products, total] = await Promise.all([
             findProductsPage(productsQuery, sort, skip, limit),
             countProducts(productsQuery),
         ]);
 
+        let productsPayload = products;
+        if (isAdmin) {
+            const openSalesIds = await getProductIdsWithOpenSales(
+                products.map((p) => String(p._id)),
+            );
+            productsPayload = products.map((product) => ({
+                ...product,
+                hasOpenSales: openSalesIds.has(String(product._id)),
+            }));
+        }
+
         return successRes(res, {
-            products,
+            products: productsPayload,
             pagination: buildPagination(page, limit, total),
         });
     } catch (error) {

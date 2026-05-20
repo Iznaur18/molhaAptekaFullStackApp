@@ -1,0 +1,13 @@
+.product-details-admin-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.product-details-admin-footer__error {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.4;
+  color: #b42318;
+}

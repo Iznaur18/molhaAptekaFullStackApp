@@ -17,6 +17,21 @@ const ITEM_RUNTIME_DEFAULTS = Object.freeze({
     confirmedBy: null,
 });
 
+/** Подкладывает обязательные поля адреса для заказов, созданных до `deliveryAddressFlat`. */
+export const normalizeOrderDocumentForRuntime = (order) => {
+    if (!order || typeof order !== 'object') return order;
+
+    const flat = order.deliveryAddressFlat;
+    if (flat == null || String(flat).trim() === '') {
+        order.deliveryAddressFlat = order.deliveryAddress ?? '';
+    }
+    if (order.deliveryAddressFiasId == null) {
+        order.deliveryAddressFiasId = '';
+    }
+
+    return order;
+};
+
 /** Подкладывает дефолты item-level полей для совместимости со старыми документами. */
 export const normalizeOrderItemsForRuntime = (items) => {
     if (!Array.isArray(items)) return [];

@@ -154,6 +154,15 @@ export const PRODUCT_CARD_PREVIEW_FIELD_KEYS = [
   "productIsAvailable",
 ];
 
+/** Поля на карточке в очереди «На модерации» (как каталог + описание и дата). */
+export const PRODUCT_CARD_MODERATION_PREVIEW_FIELD_KEYS = [
+  "productPrice",
+  "productCategory",
+  "productSeller",
+  "productDescription",
+  "createdAt",
+];
+
 /**
  * Верхний ряд модалки товара: слева квадратное фото, справа — эти поля.
  */
@@ -165,9 +174,26 @@ export const PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS = [
   "uniqueViewerCount",
 ];
 
+/** Верхний ряд модалки для админа: видимость и блокировка — в `ProductDetailsAdminStatusPanel`. */
+export const PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS_ADMIN = [
+  "productPrice",
+  "productCategory",
+  "productSeller",
+  "uniqueViewerCount",
+];
+
 /** Нижний ряд модалки: на всю ширину под верхним блоком. */
 export const PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS = [
   "productDescription",
+  "_id",
+  "createdAt",
+  "updatedAt",
+];
+
+/** Нижний ряд для admin / moderator: описание, ссылки на фото, служебные даты. */
+export const PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS_STAFF = [
+  "productDescription",
+  "productImageUrls",
   "_id",
   "createdAt",
   "updatedAt",
@@ -183,6 +209,8 @@ export const PRODUCT_FIELD_LABEL_RU = {
   productSeller: "Продавец",
   productCategory: "Категория",
   productIsAvailable: "В наличии",
+  productModerationStatus: "Статус модерации",
+  productModerationComment: "Комментарий модератора",
   uniqueViewerCount: "Уникальные просмотры",
   createdAt: "Создан",
   updatedAt: "Обновлён",

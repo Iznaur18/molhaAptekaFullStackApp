@@ -8,10 +8,21 @@ import {
 import { formatProductFieldForDisplay } from "../lib/formatProductFieldForDisplay.js";
 import { resolveProductImageUrls } from "../lib/resolveProductImageUrls.js";
 import {
+  canSellerDeleteProduct,
+  canSellerEditProduct,
+  canSellerToggleCatalogVisibility,
+  getProductModerationBadgeClassName,
+  getProductModerationBadgeLabel,
+} from "../lib/getProductModerationUi.js";
+import { PRODUCT_MODERATION_REJECTED } from "../model/productModerationConstants.js";
+import {
+  PRODUCT_CARD_MODERATION_PREVIEW_FIELD_KEYS,
   PRODUCT_CARD_PREVIEW_FIELD_KEYS,
   PRODUCT_FIELD_LABEL_RU,
   PRODUCT_IMAGE_PLACEHOLDER_URL,
 } from "../model/productConstants.js";
+import { ProductModerationDetailsFooter } from "./ProductModerationDetailsFooter.jsx";
+import { PRODUCT_MODERATION_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
 import "./ProductCard.css";
 
@@ -28,10 +39,19 @@ function isAbsoluteHttpUrl(value) {
  * @param {boolean} [props.isDeletePending]
  * @param {(productId: string, productIsAvailable: boolean) => void | Promise<void>} [props.onSetProductAvailability]
  * @param {boolean} [props.isAvailabilityTogglePending]
- * @param {(product: import('../model/types.js').ProductFromApi) => void} props.onOpenDetails
- * @param {boolean} props.isAuthorized
- * @param {() => void} props.onRequestLoginAddToCart
+ * @param {(product: import('../model/types.js').ProductFromApi) => void} [props.onOpenDetails]
+ * @param {boolean} [props.isAuthorized]
+ * @param {() => void} [props.onRequestLoginAddToCart]
  * @param {boolean} [props.isMineMode]
+ * @param {boolean} [props.isModerationQueue]
+ * @param {{
+ *   rejectComment: string;
+ *   onRejectCommentChange: (value: string) => void;
+ *   onApprove: () => void;
+ *   onReject: () => void;
+ *   isBusy?: boolean;
+ *   errorMessage?: string;
+ * } | null} [props.moderationActions]
  */
 export function ProductCard({
   product,
@@ -42,19 +62,21 @@ export function ProductCard({
   onSetProductAvailability,
   isAvailabilityTogglePending = false,
   onOpenDetails,
-  isAuthorized,
-  onRequestLoginAddToCart,
+  isAuthorized = false,
+  onRequestLoginAddToCart = () => {},
   isMineMode = false,
+  isModerationQueue = false,
+  moderationActions = null,
 }) {
   const heading = product.productName?.trim() || PRODUCT_CARD_UI.DEFAULT_TITLE;
   const galleryUrls = useMemo(() => resolveProductImageUrls(product), [product]);
-  const previewFieldKeys = useMemo(
-    () =>
-      isMineMode
-        ? [...PRODUCT_CARD_PREVIEW_FIELD_KEYS, "uniqueViewerCount"]
-        : PRODUCT_CARD_PREVIEW_FIELD_KEYS,
-    [isMineMode],
-  );
+  const previewFieldKeys = useMemo(() => {
+    if (isModerationQueue) return PRODUCT_CARD_MODERATION_PREVIEW_FIELD_KEYS;
+    if (isMineMode) {
+      return [...PRODUCT_CARD_PREVIEW_FIELD_KEYS, "uniqueViewerCount"];
+    }
+    return PRODUCT_CARD_PREVIEW_FIELD_KEYS;
+  }, [isMineMode, isModerationQueue]);
   const [cardImageIndex, setCardImageIndex] = useState(0);
 
   const primaryImageUrl = useMemo(() => {
@@ -116,11 +138,22 @@ export function ProductCard({
 
   const isListedForOthers = product.productIsAvailable !== false;
   const hasOpenSalesLocked = product.hasOpenSales === true;
+  const sellerCanEdit = !isMineMode || canSellerEditProduct(product);
+  const sellerCanDelete = !isMineMode || canSellerDeleteProduct(product);
+  const sellerCanToggleVisibility =
+    !isMineMode || canSellerToggleCatalogVisibility(product);
   const ownerActionsLocked =
     isDeletePending ||
     isAvailabilityTogglePending ||
     isDeleteConfirmOpen ||
-    hasOpenSalesLocked;
+    hasOpenSalesLocked ||
+    !sellerCanEdit;
+  const rejectionComment =
+    isMineMode &&
+    product.productModerationStatus === PRODUCT_MODERATION_REJECTED &&
+    String(product.productModerationComment ?? "").trim() !== ""
+      ? String(product.productModerationComment).trim()
+      : "";
 
   const handleEditClick = (event) => {
     event.stopPropagation();
@@ -148,8 +181,27 @@ export function ProductCard({
     void onSetProductAvailability(String(product._id), !isListedForOthers);
   };
 
+  const renderModerationBadge = () => {
+    if (!isMineMode && !isModerationQueue) return null;
+    return (
+      <>
+        <span className={getProductModerationBadgeClassName(product)}>
+          {getProductModerationBadgeLabel(product)}
+        </span>
+        {rejectionComment ? (
+          <p className="product-card__moderation-comment">
+            {PRODUCT_MODERATION_PAGE_UI.REJECTION_COMMENT_PREFIX}{" "}
+            {rejectionComment}
+          </p>
+        ) : null}
+      </>
+    );
+  };
+
   const renderOwnerCatalogVisibility = () => {
-    if (onSetProductAvailability == null) return null;
+    if (onSetProductAvailability == null || !sellerCanToggleVisibility) {
+      return null;
+    }
 
     if (isAvailabilityTogglePending) {
       return (
@@ -184,11 +236,12 @@ export function ProductCard({
   };
 
   const handleOpenDetails = () => {
-    onOpenDetails(product);
+    onOpenDetails?.(product);
   };
 
   /** @param {import('react').KeyboardEvent<HTMLDivElement>} event */
   const handleDetailsSurfaceKeyDown = (event) => {
+    if (isModerationQueue || onOpenDetails == null) return;
     if (event.key !== "Enter" && event.key !== " ") return;
     event.preventDefault();
     onOpenDetails(product);
@@ -226,7 +279,7 @@ export function ProductCard({
   };
 
   const renderDeleteFooter = () => {
-    if (onDeleteProduct == null) return null;
+    if (onDeleteProduct == null || !sellerCanDelete) return null;
 
     if (isDeletePending) {
       return (
@@ -287,15 +340,22 @@ export function ProductCard({
   };
 
   const detailsSurfaceLabel = `${PRODUCT_CARD_UI.OPEN_DETAILS_ARIA} ${heading}`;
+  const bodyClassName = isModerationQueue
+    ? "product-card__body"
+    : "product-card__details-surface";
 
   return (
     <article className="product-card">
       <div
-        className="product-card__details-surface"
-        tabIndex={0}
-        aria-label={detailsSurfaceLabel}
-        onClick={handleOpenDetails}
-        onKeyDown={handleDetailsSurfaceKeyDown}
+        className={bodyClassName}
+        {...(isModerationQueue
+          ? {}
+          : {
+              tabIndex: 0,
+              "aria-label": detailsSurfaceLabel,
+              onClick: handleOpenDetails,
+              onKeyDown: handleDetailsSurfaceKeyDown,
+            })}
       >
         {imageUrl && !imageLoadFailed ? (
           <div
@@ -342,6 +402,12 @@ export function ProductCard({
           </div>
         ) : null}
         <h2 className="product-card__heading">{heading}</h2>
+        {renderModerationBadge()}
+        {!isMineMode && !isModerationQueue && product.productIsAvailable === false ? (
+          <p className="product-card__hidden-badge" role="status">
+            {PRODUCT_CARD_UI.HIDDEN_FROM_CATALOG_BADGE}
+          </p>
+        ) : null}
         <dl className="product-card__fields product-card__fields--preview">
           {previewFieldKeys.map((key) => {
             const raw = product[key];
@@ -357,13 +423,21 @@ export function ProductCard({
             if (key === "productPrice") rowClass.push("product-card__row--price");
             if (key === "productCategory")
               rowClass.push("product-card__row--category");
+            if (key === "productDescription")
+              rowClass.push("product-card__row--description");
 
             return (
               <div key={key} className={rowClass.join(" ")}>
                 <dt className="product-card__key">
                   {PRODUCT_FIELD_LABEL_RU[key] ?? key}
                 </dt>
-                <dd className="product-card__value">
+                <dd
+                  className={
+                    key === "productDescription"
+                      ? "product-card__value product-card__value--multiline"
+                      : "product-card__value"
+                  }
+                >
                   {canOpenSellerProfile ? (
                     <button
                       type="button"
@@ -382,7 +456,16 @@ export function ProductCard({
         </dl>
       </div>
       <div className="product-card__footer-actions">
-        {onDeleteProduct ? (
+        {isModerationQueue && moderationActions ? (
+          <ProductModerationDetailsFooter
+            rejectComment={moderationActions.rejectComment}
+            onRejectCommentChange={moderationActions.onRejectCommentChange}
+            onApprove={moderationActions.onApprove}
+            onReject={moderationActions.onReject}
+            isBusy={moderationActions.isBusy}
+            errorMessage={moderationActions.errorMessage}
+          />
+        ) : onDeleteProduct ? (
           <>
             {renderOpenSalesHint()}
             {renderOwnerCatalogVisibility()}

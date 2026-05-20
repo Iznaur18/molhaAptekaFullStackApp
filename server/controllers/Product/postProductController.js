@@ -1,4 +1,9 @@
 import { ProductModel, UserModel } from "../../models/index.js";
+import {
+    PRODUCT_MODERATION_APPROVED,
+    PRODUCT_MODERATION_PENDING,
+} from "../../constants/productModerationConstants.js";
+import { isUserAdmin } from "../../utils/adminUserGuard.js";
 import { mergeProductImageUrlsFromBody } from "../../utils/mergeProductImageUrlsFromBody.js";
 import { errorRes, successRes } from "../../utils/index.js";
 
@@ -20,6 +25,13 @@ export const postProductController = async (req, res) => {
     }
 
     const productImageUrls = mergeProductImageUrlsFromBody(req.body);
+    const isAdmin = await isUserAdmin(userId);
+    const productModerationStatus = isAdmin
+      ? PRODUCT_MODERATION_APPROVED
+      : PRODUCT_MODERATION_PENDING;
+    const listedInCatalog = isAdmin
+      ? productIsAvailable !== false
+      : false;
 
     const product = await ProductModel.create({
       productName,
@@ -28,7 +40,9 @@ export const postProductController = async (req, res) => {
       productPrice,
       productSeller: userId,
       productCategory,
-      productIsAvailable,
+      productIsAvailable: listedInCatalog,
+      productModerationStatus,
+      productModerationComment: "",
     });
 
     await product.populate("productSeller", "userName _id");
