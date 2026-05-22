@@ -75,6 +75,11 @@ export function formatProductFieldForDisplay(key, product) {
       const n = Number(raw);
       return Number.isFinite(n) ? String(Math.max(0, Math.floor(n))) : "0";
     }
+    case "soldQuantity": {
+      const n = Number(raw);
+      const units = Number.isFinite(n) ? Math.max(0, Math.floor(n)) : 0;
+      return `${units} шт.`;
+    }
     case "productIsAvailable":
       if (raw === true) return FORMAT_BOOLEAN_RU.YES;
       if (raw === false) return FORMAT_BOOLEAN_RU.NO;

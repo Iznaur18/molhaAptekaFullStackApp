@@ -142,6 +142,7 @@ export const PRODUCT_MODEL_FIELD_KEYS = [
   "productCategory",
   "productIsAvailable",
   "uniqueViewerCount",
+  "soldQuantity",
   "createdAt",
   "updatedAt",
 ];
@@ -152,6 +153,7 @@ export const PRODUCT_CARD_PREVIEW_FIELD_KEYS = [
   "productCategory",
   "productSeller",
   "productIsAvailable",
+  "soldQuantity",
 ];
 
 /** Поля на карточке в очереди «На модерации» (как каталог + описание и дата). */
@@ -171,6 +173,7 @@ export const PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS = [
   "productCategory",
   "productSeller",
   "productIsAvailable",
+  "soldQuantity",
   "uniqueViewerCount",
 ];
 
@@ -179,6 +182,7 @@ export const PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS_ADMIN = [
   "productPrice",
   "productCategory",
   "productSeller",
+  "soldQuantity",
   "uniqueViewerCount",
 ];
 
@@ -212,6 +216,7 @@ export const PRODUCT_FIELD_LABEL_RU = {
   productModerationStatus: "Статус модерации",
   productModerationComment: "Комментарий модератора",
   uniqueViewerCount: "Уникальные просмотры",
+  soldQuantity: "Продано",
   createdAt: "Создан",
   updatedAt: "Обновлён",
 };

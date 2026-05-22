@@ -25,6 +25,42 @@ export const parseProductSortFromQuery = (query) => {
     return PRODUCT_SORT_NEWEST;
 };
 
+const soldQuantityLookupStage = () => ({
+    $lookup: {
+        from: 'orders',
+        let: { productId: '$_id' },
+        pipeline: [
+            { $unwind: '$items' },
+            {
+                $match: {
+                    $expr: {
+                        $eq: ['$items.productId', '$$productId'],
+                    },
+                    'items.status': { $in: SALE_COUNT_ITEM_STATUSES },
+                },
+            },
+            {
+                $group: {
+                    _id: null,
+                    soldQuantity: { $sum: '$items.quantity' },
+                },
+            },
+        ],
+        as: 'salesStats',
+    },
+});
+
+const soldQuantityAddFieldsStage = () => ({
+    $addFields: {
+        soldQuantity: {
+            $ifNull: [
+                { $arrayElemAt: ['$salesStats.soldQuantity', 0] },
+                0,
+            ],
+        },
+    },
+});
+
 const sellerLookupStages = () => [
     {
         $lookup: {
@@ -47,69 +83,32 @@ const sellerLookupStages = () => [
     },
 ];
 
+const sortStageForCatalog = (sort) => {
+    if (sort === PRODUCT_SORT_PURCHASES) {
+        return { $sort: { soldQuantity: -1, createdAt: -1 } };
+    }
+    if (sort === PRODUCT_SORT_VIEWS) {
+        return { $sort: { uniqueViewerCount: -1, createdAt: -1 } };
+    }
+    return { $sort: { createdAt: -1 } };
+};
+
 /**
  * @param {Record<string, unknown>} productsQuery
  * @param {string} sort
  * @param {number} skip
  * @param {number} limit
  */
-export const findProductsPage = async (productsQuery, sort, skip, limit) => {
-    if (sort === PRODUCT_SORT_PURCHASES) {
-        return ProductModel.aggregate([
-            { $match: productsQuery },
-            {
-                $lookup: {
-                    from: 'orders',
-                    let: { productId: '$_id' },
-                    pipeline: [
-                        { $unwind: '$items' },
-                        {
-                            $match: {
-                                $expr: {
-                                    $eq: ['$items.productId', '$$productId'],
-                                },
-                                'items.status': { $in: SALE_COUNT_ITEM_STATUSES },
-                            },
-                        },
-                        {
-                            $group: {
-                                _id: null,
-                                soldQuantity: { $sum: '$items.quantity' },
-                            },
-                        },
-                    ],
-                    as: 'salesStats',
-                },
-            },
-            {
-                $addFields: {
-                    soldQuantity: {
-                        $ifNull: [
-                            { $arrayElemAt: ['$salesStats.soldQuantity', 0] },
-                            0,
-                        ],
-                    },
-                },
-            },
-            { $sort: { soldQuantity: -1, createdAt: -1 } },
-            { $skip: skip },
-            { $limit: limit },
-            ...sellerLookupStages(),
-        ]);
-    }
-
-    const sortSpec =
-        sort === PRODUCT_SORT_VIEWS
-            ? { uniqueViewerCount: -1, createdAt: -1 }
-            : { createdAt: -1 };
-
-    return ProductModel.find(productsQuery)
-        .populate('productSeller', 'userName email userPhoneNumber _id userRatingByVotes')
-        .sort(sortSpec)
-        .skip(skip)
-        .limit(limit)
-        .lean();
-};
+export const findProductsPage = async (productsQuery, sort, skip, limit) =>
+    ProductModel.aggregate([
+        { $match: productsQuery },
+        soldQuantityLookupStage(),
+        soldQuantityAddFieldsStage(),
+        sortStageForCatalog(sort),
+        { $skip: skip },
+        { $limit: limit },
+        ...sellerLookupStages(),
+    ]);
 
 /**
  * @param {Record<string, unknown>} productsQuery

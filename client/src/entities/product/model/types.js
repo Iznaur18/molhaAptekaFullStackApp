@@ -28,6 +28,7 @@
  * @property {string} [productModerationComment]
  * @property {boolean} [hasOpenSales] — незавершённые продажи (`GET /product/my`, для admin — `GET /product`)
  * @property {number} [uniqueViewerCount]
+ * @property {number} [soldQuantity] — сумма `quantity` по позициям `confirmed`/`delivered`
  * @property {string} createdAt
  * @property {string} updatedAt
  */
