@@ -5,6 +5,7 @@ import { updateProfileValidation, userIdParamValidation } from './user/updatePro
 import { voteValidation, voteTargetIdParamValidation } from './user/voteValidation.js';
 import { ratingUserIdParamValidation } from './user/ratingValidation.js';
 import { userSearchValidation } from './user/userSearchValidation.js';
+import { userSellerProductsValidation } from './user/userSellerProductsValidation.js';
 import { makeProductValidation } from './product/makeProductValidation.js';
 import { productIdParamValidation } from './product/productIdParamValidation.js';
 import { productsSearchValidation } from './product/productsSearchValidation.js';
@@ -27,6 +28,7 @@ export {
     voteTargetIdParamValidation,
     ratingUserIdParamValidation,
     userSearchValidation,
+    userSellerProductsValidation,
     makeProductValidation,
     productIdParamValidation,
     productsSearchValidation,

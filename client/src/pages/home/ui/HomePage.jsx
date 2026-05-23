@@ -766,6 +766,9 @@ export function HomePage() {
         user={sellerModal.phase === "success" ? sellerModal.user : null}
         isLoading={sellerModal.phase === "loading"}
         errorMessage={sellerModal.phase === "error" ? sellerModal.error : null}
+        currentUserId={currentUserId}
+        isAuthorized={isAuthorized}
+        onPurchaseProductClick={(product) => setCatalogProductDetails(product)}
         footer={
           sellerModal.phase === "success" && sellerModal.user ? (
             isAdmin ? (
@@ -921,7 +924,6 @@ export function HomePage() {
         showStaffDetails={
           canModerateProducts && catalogProductDetails != null
         }
-        showAdminSalesLock={isAdmin}
         adminFooter={
           isAdmin && catalogProductDetails ? (
             <ProductDetailsAdminFooter

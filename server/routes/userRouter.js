@@ -1,12 +1,37 @@
 import { Router } from 'express';
-import { userGetProfileController, userUpdateProfileController, userDeleteProfileController, userSearchController } from '../controllers/index.js';
+import {
+    userGetProfileController,
+    userUpdateProfileController,
+    userDeleteProfileController,
+    userSearchController,
+    getUserPurchasesController,
+    getUserProductsController,
+} from '../controllers/index.js';
 import { checkAuthMW, updateProfileRateLimiter } from '../middlewares/index.js';
-import { userIdParamValidation, updateProfileValidation, userSearchValidation } from '../validations/index.js';
+import {
+    userIdParamValidation,
+    updateProfileValidation,
+    userSearchValidation,
+    userSellerProductsValidation,
+} from '../validations/index.js';
 
 const router = Router()
 
 // в index.js с /user (маршрут /search должен быть выше /:userIdClient, иначе "search" попадёт в userIdClient)
 router.get('/search', userSearchValidation, userSearchController); // GET /user/search - поиск пользователей
+router.get(
+    '/:userIdClient/purchases',
+    checkAuthMW,
+    userIdParamValidation,
+    getUserPurchasesController,
+);
+router.get(
+    '/:userIdClient/products',
+    checkAuthMW,
+    userIdParamValidation,
+    userSellerProductsValidation,
+    getUserProductsController,
+);
 router.get('/:userIdClient', userIdParamValidation, userGetProfileController); // GET /user/:userIdClient - получение профиля пользователя (публичный) 
 
 // Rate limiting для обновления профиля (защита от массовых изменений)

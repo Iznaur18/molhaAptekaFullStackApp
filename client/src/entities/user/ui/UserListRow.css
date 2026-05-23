@@ -43,6 +43,10 @@
 .user-list-row__name {
   font-size: 0.95rem;
   font-weight: 600;
+  max-width: 100%;
+}
+
+.user-list-row__name-text {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

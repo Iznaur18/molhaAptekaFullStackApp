@@ -8,6 +8,65 @@ import {
     PRODUCT_SORT_VIEWS,
 } from '../constants/productCatalogSort.js';
 import { ProductModel } from '../models/index.js';
+import mongoose from 'mongoose';
+
+const { ObjectId } = mongoose.Types;
+
+/**
+ * В aggregate `$match` строковый id не совпадает с ObjectId в БД (в отличие от countDocuments).
+ *
+ * @param {unknown} value
+ */
+const toObjectIdIfValid = (value) => {
+    if (value == null) {
+        return value;
+    }
+    if (value instanceof ObjectId) {
+        return value;
+    }
+    if (typeof value === 'string' && ObjectId.isValid(value)) {
+        return new ObjectId(value);
+    }
+    return value;
+};
+
+/**
+ * @param {unknown} fieldValue
+ */
+const normalizeObjectIdMatchField = (fieldValue) => {
+    if (fieldValue == null || typeof fieldValue !== 'object') {
+        return toObjectIdIfValid(fieldValue);
+    }
+    if (Array.isArray(fieldValue)) {
+        return fieldValue.map(toObjectIdIfValid);
+    }
+    if ('$in' in fieldValue && Array.isArray(fieldValue.$in)) {
+        return { ...fieldValue, $in: fieldValue.$in.map(toObjectIdIfValid) };
+    }
+    if ('$nin' in fieldValue && Array.isArray(fieldValue.$nin)) {
+        return { ...fieldValue, $nin: fieldValue.$nin.map(toObjectIdIfValid) };
+    }
+    if ('$eq' in fieldValue) {
+        return { ...fieldValue, $eq: toObjectIdIfValid(fieldValue.$eq) };
+    }
+    return fieldValue;
+};
+
+/**
+ * @param {Record<string, unknown>} productsQuery
+ */
+export const normalizeProductsQueryForAggregate = (productsQuery) => {
+    const normalized = { ...productsQuery };
+    if ('productSeller' in normalized) {
+        normalized.productSeller = normalizeObjectIdMatchField(
+            normalized.productSeller,
+        );
+    }
+    if ('_id' in normalized) {
+        normalized._id = normalizeObjectIdMatchField(normalized._id);
+    }
+    return normalized;
+};
 
 const SALE_COUNT_ITEM_STATUSES = [
     ORDER_STATUS_DELIVERED,
@@ -101,7 +160,7 @@ const sortStageForCatalog = (sort) => {
  */
 export const findProductsPage = async (productsQuery, sort, skip, limit) =>
     ProductModel.aggregate([
-        { $match: productsQuery },
+        { $match: normalizeProductsQueryForAggregate(productsQuery) },
         soldQuantityLookupStage(),
         soldQuantityAddFieldsStage(),
         sortStageForCatalog(sort),

@@ -1,0 +1,95 @@
+.user-profile-purchases {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background: color-mix(in srgb, CanvasText 4%, Canvas);
+  border: 1px solid color-mix(in srgb, CanvasText 12%, transparent);
+}
+
+.user-profile-purchases__heading {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.user-profile-purchases__state {
+  margin: 0;
+  font-size: 0.875rem;
+  color: color-mix(in srgb, CanvasText 70%, transparent);
+}
+
+.user-profile-purchases__state_error {
+  color: #b91c1c;
+}
+
+.user-profile-purchases__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.user-profile-purchases__item {
+  margin: 0;
+}
+
+.user-profile-purchases__row {
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 6px;
+  line-height: 0;
+}
+
+.user-profile-purchases__row:hover .user-profile-purchases__thumb {
+  outline: 2px solid color-mix(in srgb, #2563eb 55%, transparent);
+  outline-offset: 2px;
+}
+
+.user-profile-purchases__thumb {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  object-fit: cover;
+  background: color-mix(in srgb, CanvasText 8%, Canvas);
+  border: 1px solid color-mix(in srgb, CanvasText 14%, transparent);
+}
+
+.user-profile-purchases__row_unavailable .user-profile-purchases__thumb {
+  opacity: 0.72;
+}
+
+.user-profile-purchases__hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.8125rem;
+  color: #b45309;
+}
+
+.user-profile-purchases__more {
+  margin-top: 0.5rem;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid color-mix(in srgb, CanvasText 20%, transparent);
+  border-radius: 6px;
+  background: color-mix(in srgb, CanvasText 4%, Canvas);
+  color: inherit;
+  font: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.user-profile-purchases__more:hover:not(:disabled) {
+  border-color: #2563eb;
+  color: #2563eb;
+}
+
+.user-profile-purchases__more:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}

@@ -24,6 +24,8 @@ export const API_CLIENT_UI = {
   FETCH_ME_FALLBACK: "Не удалось загрузить мой профиль",
   UPDATE_PROFILE_FALLBACK: "Не удалось сохранить профиль",
   FETCH_USER_PROFILE_FALLBACK: "Не удалось загрузить профиль",
+  FETCH_USER_PURCHASES_FALLBACK: "Не удалось загрузить покупки",
+  FETCH_USER_PRODUCTS_FALLBACK: "Не удалось загрузить товары",
   FETCH_USERS_SEARCH_FALLBACK: "Не удалось загрузить пользователей",
   FETCH_MY_PRODUCTS_FALLBACK: "Не удалось загрузить ваши товары",
   DELETE_MY_PRODUCT_FALLBACK: "Не удалось удалить товар",
@@ -172,7 +174,7 @@ export const CHECKOUT_FORM_UI = {
   SUBMIT_LOADING: "Оформляем…",
   SUCCESS: "Заказ успешно оформлен",
   ERROR_GENERIC: "Не удалось оформить заказ",
-  ADDRESS_MAX_LENGTH: 300,
+  ADDRESS_MAX_LENGTH: 30,
 };
 
 /** Подписи карточки заказа (используется на Мои покупки и Все заказы) */
@@ -298,6 +300,13 @@ export const ADMIN_EDIT_USER_UI = {
   DELETE_LOADING: "Удаление…",
 };
 
+/** Визуал премиум-пользователя (галочка, золотая обводка аватара). */
+export const USER_PREMIUM_UI = {
+  CHECK_GLYPH: "✓",
+  CHECK_ARIA: "Премиум-пользователь",
+  CHECK_TITLE: "Премиум",
+};
+
 /** Строка каталога пользователей */
 export const USER_LIST_ROW_UI = {
   BADGE_PREMIUM: "Премиум",
@@ -341,22 +350,6 @@ export const PRODUCT_DETAILS_MODAL_UI = {
   GALLERY_THUMBS_ARIA: "Дополнительные фотографии товара",
   OPEN_GALLERY_FULLSCREEN: "Просмотреть все фото в полном экране",
   SLIDER_REGION_ARIA: "Слайдер фотографий товара",
-};
-
-/** Блок статуса товара в модалке (admin / moderator) */
-export const PRODUCT_DETAILS_ADMIN_STATUS_UI = {
-  SECTION_ARIA: "Служебная информация о товаре",
-  HEADING: "Модерация и ограничения",
-  MODERATION_STATUS_LABEL: "Статус модерации",
-  MODERATION_COMMENT_LABEL: "Комментарий модератора",
-  CATALOG_LABEL: "В общем каталоге",
-  SALES_LOCK_LABEL: "Скрытие и удаление",
-  SALES_LOCK_BLOCKED: "Заблокировано — есть незавершённые заказы",
-  SALES_LOCK_CLEAR: "Доступно — нет блокирующих заказов",
-  SELLER_SECTION_HEADING: "Продавец",
-  SELLER_EMAIL_LABEL: "Email",
-  SELLER_PHONE_LABEL: "Телефон",
-  SELLER_RATING_LABEL: "Средняя оценка",
 };
 
 /** Карточка товара (заголовок по умолчанию) */
@@ -458,6 +451,25 @@ export const USER_DETAILS_MODAL_UI = {
   ARIA_CLOSE: "Закрыть",
 };
 
+/** Блок покупок в чужом профиле (авторизованный зритель). */
+export const USER_PROFILE_PURCHASES_UI = {
+  HEADING: "Список покупок",
+  LOADING: "Загрузка покупок…",
+  EMPTY: "Покупок нет",
+  UNAVAILABLE: "Товар недоступен или удален",
+};
+
+/** Блок товаров продавца в чужом профиле (авторизованный зритель). */
+export const USER_PROFILE_PRODUCTS_UI = {
+  HEADING: "Список товаров",
+  LOADING: "Загрузка товаров…",
+  EMPTY: "Товаров нет",
+  SHOW_MORE: "Показать ещё",
+  SHOW_LESS: "Показать меньше",
+  LOADING_MORE: "Загрузка…",
+  UNAVAILABLE: "Товар недоступен или удален",
+};
+
 /** «Мой профиль» в шапке модалки и выход */
 export const MY_PROFILE_MODAL_UI = {
   TAB_TITLE: "Мой профиль",
@@ -518,7 +530,6 @@ export const USER_PROFILE_COPY = {
     isPremiumUser: "Премиум",
     notesAboutUser: "Заметки",
     userLoyaltyPoints: "Баллы лояльности",
-    buyList: "Список покупок (id)",
     userRatingByVotes: "Рейтинг по голосам",
     telegramUserId: "Telegram user id",
     telegramUsername: "Telegram username",

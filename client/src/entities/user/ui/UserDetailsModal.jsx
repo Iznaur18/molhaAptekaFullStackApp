@@ -3,6 +3,10 @@ import { useEffect, useState } from "react";
 import { getUserProfileRows } from "../lib/getUserProfileRows.js";
 import { pickUserProfileBackgroundUrl } from "../lib/pickUserProfileBackgroundUrl.js";
 import { pickUserProfilePhotoUrl } from "../lib/pickUserProfilePhotoUrl.js";
+import { UserProfilePurchasesList } from "./UserProfilePurchasesList.jsx";
+import { UserProfileProductsList } from "./UserProfileProductsList.jsx";
+import { UserPremiumAvatar } from "./UserPremiumAvatar.jsx";
+import { UserPremiumDisplayName } from "./UserPremiumDisplayName.jsx";
 
 import {
   COMMON_UI,
@@ -28,6 +32,9 @@ function isAbsoluteHttpUrl(value) {
  * @param {import('react').ReactNode} [props.footer]
  * @param {'default'|'register'} [props.layoutVariant]
  * @param {boolean} [props.showAdminRole]
+ * @param {string | null} [props.currentUserId]
+ * @param {boolean} [props.isAuthorized]
+ * @param {(product: import('../../product/model/types.js').ProductFromApi) => void} [props.onPurchaseProductClick]
  */
 export function UserDetailsModal({
   isOpen,
@@ -41,6 +48,9 @@ export function UserDetailsModal({
   footer = null,
   layoutVariant = "default",
   showAdminRole = false,
+  currentUserId = null,
+  isAuthorized = false,
+  onPurchaseProductClick,
 }) {
   const photoUrl = user ? pickUserProfilePhotoUrl(user) : null;
   const backgroundUrl = user ? pickUserProfileBackgroundUrl(user) : null;
@@ -69,17 +79,26 @@ export function UserDetailsModal({
 
   if (!isOpen) return null;
 
-  const title = titleOverride
+  const isPremiumUser = Boolean(user?.isPremiumUser);
+
+  const titleText = titleOverride
     ? titleOverride
     : isLoading
       ? USER_DETAILS_MODAL_UI.TITLE_LOADING
       : errorMessage
         ? USER_DETAILS_MODAL_UI.TITLE_FALLBACK
-        : user?.userName
-          ? `${USER_DETAILS_MODAL_UI.TITLE_WITH_NAME_PREFIX}${user.userName}`
+        : user?.userName?.trim()
+          ? null
           : USER_DETAILS_MODAL_UI.TITLE_FALLBACK;
 
   const rows = user ? getUserProfileRows(user, { showAdminRole }) : [];
+
+  const showOtherUserProfileLists =
+    Boolean(user?._id) &&
+    isAuthorized &&
+    currentUserId != null &&
+    String(user._id) !== String(currentUserId) &&
+    layoutVariant !== "register";
 
   const canShowBackground = Boolean(backgroundUrl) && !backgroundLoadFailed;
   const showProfileBanner =
@@ -125,7 +144,17 @@ export function UserDetailsModal({
                 id="user-details-modal-title"
                 className="user-details-modal__title"
               >
-                {title}
+                {titleText != null ? (
+                  titleText
+                ) : (
+                  <>
+                    {USER_DETAILS_MODAL_UI.TITLE_WITH_NAME_PREFIX}
+                    <UserPremiumDisplayName
+                      name={String(user?.userName ?? "").trim()}
+                      isPremium={isPremiumUser}
+                    />
+                  </>
+                )}
               </h2>
             )}
             {titleAccessory}
@@ -178,15 +207,27 @@ export function UserDetailsModal({
                       />
                     ) : null}
                     {photoUrl && !avatarLoadFailed ? (
-                      <img
+                      <UserPremiumAvatar
                         className="user-details-modal__avatar user-details-modal__avatar_lead user-details-modal__avatar_on-banner"
                         src={photoUrl}
-                        alt=""
+                        isPremium={isPremiumUser}
                         decoding="async"
                         onError={() => setAvatarLoadFailed(true)}
                       />
                     ) : null}
                   </div>
+                ) : null}
+                {showOtherUserProfileLists ? (
+                  <>
+                    <UserProfilePurchasesList
+                      targetUserId={String(user._id)}
+                      onProductClick={onPurchaseProductClick}
+                    />
+                    <UserProfileProductsList
+                      targetUserId={String(user._id)}
+                      onProductClick={onPurchaseProductClick}
+                    />
+                  </>
                 ) : null}
                 <dl className="user-details-modal__list">
                   {rows.map((row) => (

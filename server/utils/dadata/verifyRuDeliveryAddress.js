@@ -38,12 +38,6 @@ function pickFlatFromCleaned(cleaned) {
  * }>}
  */
 export async function verifyRuDeliveryAddress({ addressLine, flat }) {
-  if (!isDadataConfigured()) {
-    throw new Error(
-      'Проверка адресов не настроена (DADATA_API_KEY, DADATA_SECRET_KEY)',
-    );
-  }
-
   const line = String(addressLine ?? '').trim();
   const flatInput = String(flat ?? '').trim();
 
@@ -58,6 +52,15 @@ export async function verifyRuDeliveryAddress({ addressLine, flat }) {
   }
   if (flatInput.length > ADDRESS_FLAT_MAX_LENGTH) {
     throw new Error(`Квартира: не более ${ADDRESS_FLAT_MAX_LENGTH} символов`);
+  }
+
+  if (!isDadataConfigured()) {
+    return {
+      displayAddress: line,
+      flat: flatInput,
+      fiasId: '',
+      geo: null,
+    };
   }
 
   const cleaned = await cleanRuAddress(buildAddressQueryForClean(line, flatInput));

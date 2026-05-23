@@ -4,6 +4,8 @@ import { loginUserController, userGetProfileController, userMeController, userUp
 import { authTelegramController } from './User/authTelegramController.js';
 import { userVoteRatingController, userGetRatingController, getMyVoteForTargetController } from './User/userVoteRatingController.js';
 import { userSearchController } from './User/userSearchController.js';
+import { getUserPurchasesController } from './User/getUserPurchasesController.js';
+import { getUserProductsController } from './User/getUserProductsController.js';
 import { makeOrderController } from './Order/makeOrderController.js';
 import { getMyOrdersController } from './Order/getMyOrdersController.js';
 import { getMySalesController } from './Order/getMySalesController.js';
@@ -40,6 +42,8 @@ export {
     userUpdateProfileController,
     userDeleteProfileController,
     userSearchController,
+    getUserPurchasesController,
+    getUserProductsController,
     makeOrderController,
     getMyOrdersController,
     getMySalesController,

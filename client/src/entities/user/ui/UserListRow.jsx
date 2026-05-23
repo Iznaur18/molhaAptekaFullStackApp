@@ -2,6 +2,8 @@ import { useMemo, useState } from "react";
 
 import { formatSearchRowRating } from "../lib/formatSearchRowRating.js";
 import { pickUserProfilePhotoUrl } from "../lib/pickUserProfilePhotoUrl.js";
+import { UserPremiumAvatar } from "./UserPremiumAvatar.jsx";
+import { UserPremiumDisplayName } from "./UserPremiumDisplayName.jsx";
 import {
   DEFAULT_USER_AVATAR_URL,
   USER_ROLE_LABEL_RU,
@@ -37,7 +39,6 @@ export function UserListRow({ user, onRowClick }) {
     ) {
       items.push(USER_ROLE_LABEL_RU[user.userRole] ?? user.userRole);
     }
-    if (user.isPremiumUser) items.push(USER_LIST_ROW_UI.BADGE_PREMIUM);
     if (user.isBlockedUser) items.push(USER_LIST_ROW_UI.BADGE_BLOCKED);
     if (user.isActiveUser === false) items.push(USER_LIST_ROW_UI.BADGE_INACTIVE);
     return items;
@@ -49,15 +50,20 @@ export function UserListRow({ user, onRowClick }) {
 
   return (
     <button type="button" className="user-list-row" onClick={handleClick}>
-      <img
+      <UserPremiumAvatar
         className="user-list-row__avatar"
         src={src}
-        alt=""
+        isPremium={Boolean(user.isPremiumUser)}
         decoding="async"
         onError={() => setImgFailed(true)}
       />
       <span className="user-list-row__main">
-        <span className="user-list-row__name">{nickname}</span>
+        <UserPremiumDisplayName
+          name={nickname}
+          isPremium={Boolean(user.isPremiumUser)}
+          className="user-list-row__name"
+          textClassName="user-list-row__name-text"
+        />
         {metaBadges.length > 0 ? (
           <span className="user-list-row__badges">
             {metaBadges.map((label) => (

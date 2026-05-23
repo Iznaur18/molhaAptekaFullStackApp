@@ -1,0 +1,32 @@
+.user-premium-avatar {
+  box-sizing: border-box;
+  border: 2px solid #d4af37 !important;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, #d4af37 45%, transparent),
+    0 6px 18px rgb(15 23 42 / 0.12);
+}
+
+.user-premium-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.user-premium-name__text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-premium-check {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+
+.user-premium-verified-badge {
+  display: block;
+}

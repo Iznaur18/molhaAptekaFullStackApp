@@ -18,7 +18,6 @@ import {
   PRODUCT_FIELD_LABEL_RU,
   PRODUCT_IMAGE_PLACEHOLDER_URL,
 } from "../model/productConstants.js";
-import { ProductDetailsAdminStatusPanel } from "./ProductDetailsAdminStatusPanel.jsx";
 import { ProductImageLightbox } from "./ProductImageLightbox.jsx";
 
 import "./ProductDetailsModal.css";
@@ -109,7 +108,6 @@ function renderFieldRows(product, keys, handlers) {
  *   ) => void;
  *   adminFooter?: import('react').ReactNode;
  *   showStaffDetails?: boolean;
- *   showAdminSalesLock?: boolean;
  * }} props
  */
 export function ProductDetailsModal({
@@ -121,7 +119,6 @@ export function ProductDetailsModal({
   onProductStatsUpdate,
   adminFooter = null,
   showStaffDetails = false,
-  showAdminSalesLock = false,
 }) {
   const imageUrls = useMemo(
     () => (product ? resolveProductImageUrls(product) : []),
@@ -246,12 +243,6 @@ export function ProductDetailsModal({
           </header>
 
           <div className="product-details-modal__body">
-            {showStaffDetails ? (
-              <ProductDetailsAdminStatusPanel
-                product={product}
-                showSalesLock={showAdminSalesLock}
-              />
-            ) : null}
             <div className="product-details-modal__row-top">
               <div className="product-details-modal__image-aside">
                 <div

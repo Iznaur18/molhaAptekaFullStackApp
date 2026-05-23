@@ -48,11 +48,6 @@ function formatRole(value) {
   return USER_ROLE_LABEL_RU[value] ?? String(value);
 }
 
-function formatBuyList(value) {
-  if (!Array.isArray(value) || value.length === 0) return COMMON_UI.EM_DASH;
-  return value.join(", ");
-}
-
 function formatRating(value) {
   if (!value || typeof value !== "object") return COMMON_UI.EM_DASH;
   const { countVotes = 0, totalRating = 0 } = value;
@@ -169,7 +164,6 @@ export function getUserProfileRows(user, options = {}) {
           ? COMMON_UI.EM_DASH
           : String(user.userLoyaltyPoints),
     },
-    { id: "buyList", label: L.buyList, value: formatBuyList(user.buyList) },
     {
       id: "userRatingByVotes",
       label: L.userRatingByVotes,

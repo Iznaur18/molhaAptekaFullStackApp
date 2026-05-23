@@ -177,7 +177,7 @@ export const PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS = [
   "uniqueViewerCount",
 ];
 
-/** Верхний ряд модалки для админа: видимость и блокировка — в `ProductDetailsAdminStatusPanel`. */
+/** Верхний ряд модалки для admin / moderator (расширенный набор полей). */
 export const PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS_ADMIN = [
   "productPrice",
   "productCategory",
