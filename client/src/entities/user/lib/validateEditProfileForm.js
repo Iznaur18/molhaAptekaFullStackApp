@@ -1,6 +1,7 @@
 import { validateRuDeliveryAddressForm } from "../../address/lib/validateRuDeliveryAddressForm.js";
 import { countWords } from "./countWords.js";
-import { validateRuPhoneField } from "./ruPhone.js";import {
+import { validateRuPhoneField } from "./ruPhone.js";
+import {
   PROFILE_FIELD_MAX_WORDS,
   USER_GENDER_FEMALE,
   USER_GENDER_MALE,
@@ -11,6 +12,8 @@ import { validateRuPhoneField } from "./ruPhone.js";import {
   USER_ROLE_MODERATOR,
   USER_ROLE_USER,
 } from "../model/userConstants.js";
+import { isHttpBackgroundImageUrl } from "./userBackgroundValue.js";
+import { isUserBackgroundPresetId } from "../model/userBackgroundPresets.js";
 
 const DISCOUNT_MIN = 0;
 const DISCOUNT_MAX = 100;
@@ -19,11 +22,11 @@ const USER_NAME_PATTERN = /^[a-z0-9]+$/;
 
 /**
  * @param {import('./mapUserToEditProfileForm.js').EditProfileFormState} form
- * @param {{ includeAdmin?: boolean }} [options]
+ * @param {{ includeAdmin?: boolean; backgroundMode?: 'preset' | 'image' | 'admin' }} [options]
  * @returns {string | null} сообщение об ошибке или null
  */
 export function validateEditProfileForm(form, options = {}) {
-  const { includeAdmin = false } = options;
+  const { includeAdmin = false, backgroundMode = "preset" } = options;
   const name = String(form.userName).trim().toLowerCase();
   if (name.length > 0) {
     if (name.length < USER_NAME_MIN_LENGTH || name.length > USER_NAME_MAX_LENGTH) {
@@ -56,13 +59,21 @@ export function validateEditProfileForm(form, options = {}) {
     }
   }
 
-  const bg = String(form.userBackgroundUrl).trim();
-  if (bg !== "") {
-    try {
-      void new URL(bg);
-    } catch {
+  if (backgroundMode === "image") {
+    const imageUrl = String(form.backgroundImageUrl ?? "").trim();
+    if (imageUrl !== "" && !isHttpBackgroundImageUrl(imageUrl)) {
+      return "Укажите корректный URL фона (http или https)";
+    }
+  } else if (backgroundMode === "admin") {
+    const imageUrl = String(form.backgroundImageUrl ?? "").trim();
+    if (imageUrl !== "" && !isHttpBackgroundImageUrl(imageUrl)) {
       return "Некорректный URL фона";
     }
+    if (imageUrl === "" && !isUserBackgroundPresetId(form.backgroundPresetId)) {
+      return "Выберите цвет фона";
+    }
+  } else if (!isUserBackgroundPresetId(form.backgroundPresetId)) {
+    return "Выберите цвет фона";
   }
 
   const gender = form.userGender;

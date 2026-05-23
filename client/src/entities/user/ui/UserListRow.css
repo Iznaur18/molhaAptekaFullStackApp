@@ -1,29 +1,42 @@
 .user-list-row {
   box-sizing: border-box;
   display: flex;
-  align-items: center;
-  gap: 0.85rem;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.55rem;
   width: 100%;
+  height: 100%;
   margin: 0;
-  padding: 0.65rem 0.85rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  background: #fff;
+  padding: 0.85rem;
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, currentColor 3.5%, transparent);
   color: #111827;
   font: inherit;
   text-align: left;
   cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .user-list-row:hover {
   border-color: #1f6feb;
-  background: rgba(31, 111, 235, 0.06);
+  box-shadow: 0 4px 14px color-mix(in srgb, CanvasText 6%, transparent);
+}
+
+.user-list-row__head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
 }
 
 .user-list-row__avatar {
   flex-shrink: 0;
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 4.25rem;
+  height: 4.25rem;
   border-radius: 50%;
   object-fit: cover;
   border: none;
@@ -32,29 +45,38 @@
     0 2px 6px rgb(15 23 42 / 0.07);
 }
 
-.user-list-row__main {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-}
-
 .user-list-row__name {
-  font-size: 0.95rem;
-  font-weight: 600;
-  max-width: 100%;
+  width: 100%;
+  font-size: 0.98rem;
+  font-weight: 700;
+  line-height: 1.28;
+  text-align: center;
+  justify-content: center;
 }
 
 .user-list-row__name-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  word-break: break-word;
+  white-space: normal;
+}
+
+.user-list-row__email {
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: #6b7280;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-align: center;
 }
 
 .user-list-row__badges {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 0.25rem;
 }
 
@@ -67,13 +89,91 @@
   color: #4b5563;
 }
 
-.user-list-row__rating {
-  flex-shrink: 0;
-  max-width: 42%;
-  font-size: 0.82rem;
+.user-list-row__metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem;
+  margin-top: auto;
+  padding-top: 0.55rem;
+  border-top: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+}
+
+.user-list-row__metric {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+  padding: 0.45rem 0.5rem;
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, CanvasText 4%, transparent);
+}
+
+.user-list-row__metric-label {
+  font-size: 0.68rem;
   font-weight: 600;
-  opacity: 0.82;
-  text-align: right;
+  color: #6b7280;
+  line-height: 1.2;
+}
+
+.user-list-row__metric-value {
+  display: flex;
+  align-items: baseline;
+  gap: 0.2rem;
+  min-width: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  color: #111827;
+}
+
+.user-list-row__metric_sales {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.user-list-row__metric_rating {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.user-list-row__metric_purchases {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.user-list-row__metric_confirmed {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.user-list-row__metric-label_long {
+  line-height: 1.15;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.user-list-row__metric-value_confirmed-yes {
+  color: #047857;
+}
+
+.user-list-row__metric-value_confirmed-no {
+  color: #b42318;
+}
+
+.user-list-row__metric-value_amount {
+  font-size: 0.88rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-list-row__metric-value_muted {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

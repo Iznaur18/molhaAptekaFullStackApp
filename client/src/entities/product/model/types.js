@@ -3,12 +3,24 @@
  */
 
 /**
- * Продавец после `populate('productSeller', ...)` в `getProducts.js`.
- * В карточке гостя показываем только `userName`; остальные поля могут прийти с API.
+ * @typedef {import('../../user/model/types.js').UserRatingByVotes} UserRatingByVotes
+ */
+
+/**
+ * Продавец в ответах `GET /product` и связанных эндпоинтах.
  *
  * @typedef {object} ProductSellerPopulated
  * @property {string} _id
  * @property {string} [userName]
+ * @property {string} [email]
+ * @property {string} [userPhoneNumber]
+ * @property {string} [userAddress]
+ * @property {UserRatingByVotes} [userRatingByVotes]
+ * @property {boolean} [isPremiumUser]
+ * @property {boolean} [isUserDataConfirmed]
+ * @property {string} [createdAt]
+ * @property {number} [sellerListedProductCount] — одобренные и видимые в каталоге
+ * @property {'user'|'admin'|'moderator'} [userRole]
  */
 
 /**

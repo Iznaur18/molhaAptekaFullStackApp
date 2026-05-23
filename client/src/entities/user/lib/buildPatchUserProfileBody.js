@@ -1,17 +1,17 @@
 import { appendRuAddressToPayload } from "../../address/lib/appendRuAddressToPayload.js";
 import { normalizeRuPhoneInput } from "./ruPhone.js";
-import {
-  DEFAULT_USER_AVATAR_URL,
-  DEFAULT_USER_BACKGROUND_URL,
-} from "../model/userConstants.js";
+import { serializeUserBackgroundForForm } from "./userBackgroundValue.js";
+import { DEFAULT_USER_AVATAR_URL } from "../model/userConstants.js";
 
 /**
  * Тело `PATCH /user/:id` (только разрешённые пользователю поля).
  *
  * @param {import('./mapUserToEditProfileForm.js').EditProfileFormState} form
+ * @param {{ backgroundMode?: 'preset' | 'image' | 'admin' }} [options]
  * @returns {Record<string, unknown>}
  */
-export function buildPatchUserProfileBody(form) {
+export function buildPatchUserProfileBody(form, options = {}) {
+  const { backgroundMode = "preset" } = options;
   const body = {};
 
   const rawName = String(form.userName).trim().toLowerCase();
@@ -47,8 +47,20 @@ export function buildPatchUserProfileBody(form) {
   const av = String(form.userAvatarUrl).trim();
   body.userAvatarUrl = av === "" ? DEFAULT_USER_AVATAR_URL : av;
 
-  const bg = String(form.userBackgroundUrl).trim();
-  body.userBackgroundUrl = bg === "" ? DEFAULT_USER_BACKGROUND_URL : bg;
+  if (backgroundMode === "image") {
+    const imageUrl = String(form.backgroundImageUrl ?? "").trim();
+    if (imageUrl !== "") {
+      body.userBackgroundUrl = serializeUserBackgroundForForm("image", {
+        presetId: form.backgroundPresetId,
+        imageUrl,
+      });
+    }
+  } else {
+    body.userBackgroundUrl = serializeUserBackgroundForForm(backgroundMode, {
+      presetId: form.backgroundPresetId,
+      imageUrl: form.backgroundImageUrl,
+    });
+  }
 
   body.notificationsEnabled = Boolean(form.notificationsEnabled);
 

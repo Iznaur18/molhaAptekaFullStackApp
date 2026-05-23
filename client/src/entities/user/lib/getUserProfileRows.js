@@ -10,6 +10,7 @@ import {
   USER_ROLE_LABEL_RU,
   USER_ROLE_USER,
 } from "../model/userConstants.js";
+import { formatUserBackgroundForDisplay } from "./userBackgroundValue.js";
 
 const DATE_TIME_FORMAT = new Intl.DateTimeFormat(
   COMMON_UI.LOCALE_RU,
@@ -113,6 +114,11 @@ export function getUserProfileRows(user, options = {}) {
       value: formatIso(user.userLastLoginAt),
     },
     {
+      id: "isUserDataConfirmed",
+      label: L.isUserDataConfirmed,
+      value: formatBooleanRu(user.isUserDataConfirmed === true),
+    },
+    {
       id: "userAvatarUrl",
       label: L.userAvatarUrl,
       value: formatUrl(user.userAvatarUrl),
@@ -120,7 +126,7 @@ export function getUserProfileRows(user, options = {}) {
     {
       id: "userBackgroundUrl",
       label: L.userBackgroundUrl,
-      value: formatUrl(user.userBackgroundUrl),
+      value: formatUserBackgroundForDisplay(user.userBackgroundUrl),
     },
     {
       id: "isActiveUser",

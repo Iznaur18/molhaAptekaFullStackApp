@@ -1,0 +1,55 @@
+.user-background-presets {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.user-background-presets__legend {
+  margin: 0 0 0.45rem;
+  padding: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: color-mix(in srgb, CanvasText 72%, transparent);
+}
+
+.user-background-presets__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr));
+  gap: 0.45rem;
+}
+
+.user-background-presets__option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.35rem 0.25rem;
+  border: 1px solid color-mix(in srgb, CanvasText 14%, transparent);
+  border-radius: 0.45rem;
+  cursor: pointer;
+}
+
+.user-background-presets__option_selected {
+  border-color: #1f6feb;
+  box-shadow: 0 0 0 1px #1f6feb;
+}
+
+.user-background-presets__input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.user-background-presets__swatch {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.35rem;
+  border: 1px solid color-mix(in srgb, CanvasText 18%, transparent);
+}
+
+.user-background-presets__label {
+  font-size: 0.68rem;
+  line-height: 1.2;
+  text-align: center;
+  color: color-mix(in srgb, CanvasText 78%, transparent);
+}

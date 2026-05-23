@@ -18,7 +18,10 @@
  * @property {'user'|'admin'|'moderator'} [userRole]
  * @property {boolean} [isPremiumUser]
  * @property {boolean} [isActiveUser]
+ * @property {boolean} [isUserDataConfirmed]
  * @property {boolean} [isBlockedUser]
+ * @property {number} [totalSalesAmount] — сумма продаж (quantity × unitPriceAtOrder)
+ * @property {number} [totalPurchasesAmount] — сумма покупок как покупателя
  */
 
 /**
@@ -32,7 +35,7 @@
  * @property {string} userName
  * @property {string} [phoneNumber]
  * @property {string} [avatarUrl]
- * @property {string} [backgroundUrl]
+ * @property {string} [backgroundPresetId]
  * @property {string} [userBirthDate] ISO 8601 (дата)
  * @property {'male'|'female'|'noSelected'} [userGender]
  * @property {string} [userAddress]
@@ -59,6 +62,7 @@
  * @property {string} [userAvatarUrl]
  * @property {string} [userBackgroundUrl]
  * @property {boolean} [isActiveUser]
+ * @property {boolean} [isUserDataConfirmed]
  * @property {boolean} [isBlockedUser]
  * @property {'user'|'admin'|'moderator'} [userRole]
  * @property {number} [userDiscountPercent]

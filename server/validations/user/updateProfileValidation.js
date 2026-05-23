@@ -10,6 +10,8 @@ import {
 } from './userNameRules.js';
 import { assertAtMostWords } from '../../utils/maxWordsText.js';
 import { ruDeliveryAddressBodyValidation } from '../address/ruDeliveryAddressValidation.js';
+import { parseUserBackgroundPresetId } from '../../constants/userBackgroundPresets.js';
+import { isHttpBackgroundImageUrl } from '../../utils/userBackgroundValue.js';
 
 /**
  * Валидация параметра userId в URL
@@ -103,18 +105,21 @@ export const updateProfileValidation = [
             }
         }),
     
-    body('userBackgroundUrl') // userBackgroundUrl - URL фона пользователя
-        .optional({ nullable: true, checkFalsy: true }) // опциональное поле, nullable: true - разрешает null, checkFalsy: true - разрешает false
+    body('userBackgroundUrl')
+        .optional({ nullable: true, checkFalsy: true })
         .custom((value) => {
-            if (value === null || value === '') { // если значение null или пустое, то разрешаем
-                return true; // Разрешаем null для очистки
-            }
-            try {
-                new URL(value);
+            if (value === null || value === '') {
                 return true;
-            } catch {
-                throw new Error('URL фона должен быть валидным URL');
             }
+            if (parseUserBackgroundPresetId(value)) {
+                return true;
+            }
+            if (isHttpBackgroundImageUrl(value)) {
+                return true;
+            }
+            throw new Error(
+                'Фон: пресет preset:<id> или URL (http/https)',
+            );
         }),
     
     body('notificationsEnabled') // notificationsEnabled - уведомления пользователя
@@ -131,6 +136,11 @@ export const updateProfileValidation = [
         .optional({ nullable: true })
         .isBoolean()
         .withMessage('isActiveUser должен быть булевым значением'),
+
+    body('isUserDataConfirmed')
+        .optional({ nullable: true })
+        .isBoolean()
+        .withMessage('isUserDataConfirmed должен быть булевым значением'),
     
     body('isBlockedUser')
         .optional({ nullable: true })

@@ -1,8 +1,10 @@
 import { useEffect, useRef } from "react";
 
+import { formatSellerProductsQuota } from "../../../entities/product/lib/sellerProductsLimit.js";
 import {
-  CATALOG_SORT_OPTIONS,
   CATALOG_SORT_LABEL_RU,
+  CATALOG_SORT_OPTIONS,
+  CATALOG_SORT_OPTIONS_MY_PRODUCTS,
   PRODUCT_CATEGORIES,
   PRODUCT_CATEGORY_LABEL_RU,
 } from "../../../entities/product/model/productConstants.js";
@@ -49,6 +51,10 @@ const NON_CATALOG_VIEW_TITLES = {
  *   isAdmin: boolean;
  *   showHiddenCatalogProducts: boolean;
  *   onShowHiddenCatalogProductsChange: (next: boolean) => void;
+ *   myProductsTotal: number | null;
+ *   sellerProductsLimit: number | null;
+ *   isPlaceProductDisabled: boolean;
+ *   placeProductDisabledTitle: string;
  * }} props
  */
 export function HomePageHeader({
@@ -74,6 +80,10 @@ export function HomePageHeader({
   isAdmin,
   showHiddenCatalogProducts,
   onShowHiddenCatalogProductsChange,
+  myProductsTotal,
+  sellerProductsLimit,
+  isPlaceProductDisabled,
+  placeProductDisabledTitle,
 }) {
   /** @type {import('react').RefObject<HTMLDivElement | null>} */
   const productCategoryFilterRef = useRef(null);
@@ -146,6 +156,10 @@ export function HomePageHeader({
             onShowHiddenCatalogProductsChange={
               onShowHiddenCatalogProductsChange
             }
+            myProductsTotal={myProductsTotal}
+            sellerProductsLimit={sellerProductsLimit}
+            isPlaceProductDisabled={isPlaceProductDisabled}
+            placeProductDisabledTitle={placeProductDisabledTitle}
           />
         )}
       </div>
@@ -154,6 +168,12 @@ export function HomePageHeader({
         <button
           type="button"
           className="home-page__list-product-button"
+          disabled={isAuthorized && isPlaceProductDisabled}
+          title={
+            isAuthorized && isPlaceProductDisabled
+              ? placeProductDisabledTitle
+              : undefined
+          }
           onClick={() =>
             isAuthorized ? onPlaceProductClick() : onLoginClick()
           }
@@ -211,8 +231,21 @@ function CatalogTitleAndFilters({
   isAdmin,
   showHiddenCatalogProducts,
   onShowHiddenCatalogProductsChange,
+  myProductsTotal,
+  sellerProductsLimit,
+  isPlaceProductDisabled,
+  placeProductDisabledTitle,
 }) {
   const showAdminHiddenToggle = isAdmin && !isMineMode;
+  const showProductsQuota =
+    isMineMode && sellerProductsLimit != null && !isAdmin;
+  const productsQuotaText =
+    showProductsQuota && sellerProductsLimit != null
+      ? formatSellerProductsQuota(myProductsTotal, sellerProductsLimit)
+      : null;
+  const catalogSortOptions = isMineMode
+    ? CATALOG_SORT_OPTIONS_MY_PRODUCTS
+    : CATALOG_SORT_OPTIONS;
 
   return (
     <>
@@ -313,7 +346,7 @@ function CatalogTitleAndFilters({
             value={catalogSort}
             onChange={(event) => onCatalogSortChange(event.target.value)}
           >
-            {CATALOG_SORT_OPTIONS.map((sortKey) => (
+            {catalogSortOptions.map((sortKey) => (
               <option key={sortKey} value={sortKey}>
                 {CATALOG_SORT_LABEL_RU[sortKey]}
               </option>
@@ -352,10 +385,25 @@ function CatalogTitleAndFilters({
           <button
             type="button"
             className="home-page__create-product-button"
+            disabled={isPlaceProductDisabled}
+            title={isPlaceProductDisabled ? placeProductDisabledTitle : undefined}
             onClick={onPlaceProductClick}
           >
             {HOME_PAGE_UI.LIST_PRODUCT_BUTTON}
           </button>
+          {productsQuotaText ? (
+            <p
+              className="home-page__my-products-quota"
+              aria-label={`${HOME_PAGE_UI.MY_PRODUCTS_QUOTA_LABEL}: ${productsQuotaText}`}
+            >
+              <span className="home-page__my-products-quota-label">
+                {HOME_PAGE_UI.MY_PRODUCTS_QUOTA_LABEL}:
+              </span>{" "}
+              <span className="home-page__my-products-quota-value">
+                {productsQuotaText}
+              </span>
+            </p>
+          ) : null}
           <p className="home-page__subtitle">{HOME_PAGE_UI.SUBTITLE_MY_ONLY}</p>
         </div>
       ) : (

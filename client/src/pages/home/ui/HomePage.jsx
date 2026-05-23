@@ -11,7 +11,12 @@ import { fetchMyProductsPage } from "../../../entities/product/api/fetchMyProduc
 import {
   CATALOG_PAGE_SIZE,
   CATALOG_SORT_NEWEST,
+  CATALOG_SORT_PREMIUM,
+  CATALOG_SORT_CONFIRMED,
+  SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE,
 } from "../../../entities/product/model/productConstants.js";
+import { isCurrentUserProductSeller } from "../../../entities/product/lib/isCurrentUserProductSeller.js";
+import { getSellerProductsLimit } from "../../../entities/product/lib/sellerProductsLimit.js";
 import { CreateProductModal } from "../../../entities/product/ui/CreateProductModal.jsx";
 import { ProductDetailsAdminFooter } from "../../../entities/product/ui/ProductDetailsAdminFooter.jsx";
 import { ProductDetailsModal } from "../../../entities/product/ui/ProductDetailsModal.jsx";
@@ -70,11 +75,13 @@ const useCurrentUserSession = (isAuthorized) => {
   const [currentUserRole, setCurrentUserRole] = useState(
     /** @type {'user'|'admin'|'moderator'|null} */ (null),
   );
+  const [isPremiumUser, setIsPremiumUser] = useState(false);
 
   useEffect(() => {
     if (!isAuthorized) {
       setCurrentUserId(null);
       setCurrentUserRole(null);
+      setIsPremiumUser(false);
       return undefined;
     }
     let isCancelled = false;
@@ -85,11 +92,13 @@ const useCurrentUserSession = (isAuthorized) => {
         if (!isCancelled) {
           setCurrentUserId(String(me._id));
           setCurrentUserRole(me.userRole ?? "user");
+          setIsPremiumUser(Boolean(me.isPremiumUser));
         }
       } catch {
         if (!isCancelled) {
           setCurrentUserId(null);
           setCurrentUserRole(null);
+          setIsPremiumUser(false);
         }
       }
     })();
@@ -99,7 +108,7 @@ const useCurrentUserSession = (isAuthorized) => {
     };
   }, [isAuthorized]);
 
-  return [currentUserId, currentUserRole, setCurrentUserId];
+  return [currentUserId, currentUserRole, isPremiumUser, setCurrentUserId];
 };
 
 export function HomePage() {
@@ -157,9 +166,21 @@ export function HomePage() {
   /** @type {[import('../../../entities/product/model/types.js').ProductFromApi | null, import('react').Dispatch<import('react').SetStateAction<import('../../../entities/product/model/types.js').ProductFromApi | null>>]} */
   const [productToEdit, setProductToEdit] = useState(null);
   const [usersListTick, setUsersListTick] = useState(0);
-  const [currentUserId, currentUserRole, setCurrentUserId] =
+  const [catalogRefreshTick, setCatalogRefreshTick] = useState(0);
+  const [currentUserId, currentUserRole, isPremiumUser, setCurrentUserId] =
     useCurrentUserSession(isAuthorized);
+  const [myProductsTotal, setMyProductsTotal] = useState(
+    /** @type {number | null} */ (null),
+  );
   const isAdmin = currentUserRole === USER_ROLE_ADMIN;
+  const sellerProductsLimit = useMemo(() => {
+    if (isAdmin) return null;
+    return getSellerProductsLimit({ isPremiumUser });
+  }, [isAdmin, isPremiumUser]);
+  const isAtSellerProductsLimit =
+    sellerProductsLimit != null &&
+    myProductsTotal != null &&
+    myProductsTotal >= sellerProductsLimit;
   const canModerateProducts =
     currentUserRole === USER_ROLE_ADMIN ||
     currentUserRole === USER_ROLE_MODERATOR;
@@ -200,13 +221,68 @@ export function HomePage() {
     productSearchTerm !== debouncedProductSearchTerm;
   const hasProductSearchQuery = debouncedProductSearchTerm.trim() !== "";
   const isMineMode = productsMode === "mine";
+  const catalogDetailsShowAddToCart = useMemo(() => {
+    const product = catalogProductDetails;
+    if (!product) {
+      return false;
+    }
+    if (isMineMode || canModerateProducts || isAdmin) {
+      return false;
+    }
+    if (isCurrentUserProductSeller(product, currentUserId)) {
+      return false;
+    }
+    return true;
+  }, [
+    catalogProductDetails,
+    isMineMode,
+    canModerateProducts,
+    isAdmin,
+    currentUserId,
+  ]);
 
   useEffect(() => {
     if (!isAuthorized) {
       setProductsMode("all");
       setMyProductsCatalogError("");
+      setMyProductsTotal(null);
     }
   }, [isAuthorized]);
+
+  useEffect(() => {
+    if (
+      productsMode === "mine" &&
+      (catalogSort === CATALOG_SORT_PREMIUM ||
+        catalogSort === CATALOG_SORT_CONFIRMED)
+    ) {
+      setCatalogSort(CATALOG_SORT_NEWEST);
+    }
+  }, [productsMode, catalogSort]);
+
+  useEffect(() => {
+    if (!isAuthorized || isAdmin) {
+      setMyProductsTotal(null);
+      return undefined;
+    }
+
+    let isCancelled = false;
+    void (async () => {
+      try {
+        const { pagination } = await fetchMyProductsPage({ page: 1, limit: 1 });
+        if (!isCancelled) {
+          setMyProductsTotal(pagination.total);
+        }
+      } catch {
+        if (!isCancelled) {
+          setMyProductsTotal(null);
+        }
+      }
+    })();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [isAuthorized, isAdmin]);
 
   useEffect(() => {
     if (!isAdmin) {
@@ -264,6 +340,13 @@ export function HomePage() {
         setProducts(products);
         catalogPageRef.current = 1;
         setCatalogHasMore(pagination.page < pagination.totalPages);
+        if (
+          productsMode === "mine" &&
+          !debouncedProductSearchTerm.trim() &&
+          !selectedProductCategory
+        ) {
+          setMyProductsTotal(pagination.total);
+        }
         setCatalogStatus({ kind: "idle" });
       } catch (e) {
         if (seq !== catalogFetchSeq.current) return;
@@ -281,6 +364,7 @@ export function HomePage() {
     catalogSort,
     showHiddenCatalogProducts,
     loadCatalogPage,
+    catalogRefreshTick,
   ]);
 
   const loadNextCatalogPage = useCallback(async () => {
@@ -479,11 +563,17 @@ export function HomePage() {
         ? API_CLIENT_UI.CREATE_PRODUCT_PENDING_HINT
         : "",
     );
+    setMyProductsTotal((prev) => (prev != null ? prev + 1 : prev));
     setProducts((prev) => {
       const id = String(product._id);
       const without = prev.filter((p) => String(p._id) !== id);
       return [product, ...without];
     });
+  };
+
+  const handlePlaceProductClick = () => {
+    if (isAtSellerProductsLimit) return;
+    setIsCreateProductModalOpen(true);
   };
 
   /** @param {import('../../../entities/product/model/types.js').ProductFromApi} product */
@@ -583,6 +673,9 @@ export function HomePage() {
       setMyProductsCatalogError("");
       await deleteMyProduct(productId);
       setProducts((prev) => prev.filter((p) => String(p._id) !== productId));
+      setMyProductsTotal((prev) =>
+        prev != null && prev > 0 ? prev - 1 : prev,
+      );
     } catch (e) {
       const message =
         e instanceof Error
@@ -744,7 +837,11 @@ export function HomePage() {
         }
         onCloseProductCategoryFilter={() => setIsProductCategoryListOpen(false)}
         onProductSearchTermChange={setProductSearchTerm}
-        onPlaceProductClick={() => setIsCreateProductModalOpen(true)}
+        onPlaceProductClick={handlePlaceProductClick}
+        myProductsTotal={myProductsTotal}
+        sellerProductsLimit={sellerProductsLimit}
+        isPlaceProductDisabled={isAtSellerProductsLimit}
+        placeProductDisabledTitle={SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE}
         onMyProfileClick={handleMyProfileClick}
         onLoginClick={() => setIsLoginModalOpen(true)}
         onRegisterClick={() => setIsRegisterModalOpen(true)}
@@ -771,10 +868,12 @@ export function HomePage() {
         onPurchaseProductClick={(product) => setCatalogProductDetails(product)}
         footer={
           sellerModal.phase === "success" && sellerModal.user ? (
-            isAdmin ? (
+            canModerateProducts ? (
               <AdminUserModalFooter
                 onEditClick={() => setIsAdminEditUserOpen(true)}
-                onDeleteClick={() => setIsAdminDeleteUserOpen(true)}
+                onDeleteClick={
+                  isAdmin ? () => setIsAdminDeleteUserOpen(true) : undefined
+                }
               >
                 <UserVoteRatingForm
                   key={String(sellerModal.user._id)}
@@ -856,6 +955,7 @@ export function HomePage() {
               ? { ...prev, user: { ...prev.user, ...updatedUser } }
               : prev,
           );
+          setIsPremiumUser(Boolean(updatedUser.isPremiumUser));
           setIsEditProfileOpen(false);
         }}
       />
@@ -863,6 +963,7 @@ export function HomePage() {
         isOpen={isAdminEditUserOpen}
         onClose={() => setIsAdminEditUserOpen(false)}
         adminMode
+        staffCanEditRole={isAdmin}
         user={sellerModal.phase === "success" ? sellerModal.user : null}
         onSaved={(updatedUser) => {
           setSellerModal((prev) =>
@@ -879,8 +980,31 @@ export function HomePage() {
         user={sellerModal.phase === "success" ? sellerModal.user : null}
         onClose={() => setIsAdminDeleteUserOpen(false)}
         onDeleted={() => {
+          const deletedSellerId =
+            sellerModal.phase === "success" && sellerModal.user?._id != null
+              ? String(sellerModal.user._id)
+              : null;
           closeSellerModal();
+          setCatalogProductDetails(null);
           setUsersListTick((n) => n + 1);
+          setCatalogRefreshTick((n) => n + 1);
+          if (deletedSellerId) {
+            setProducts((prev) =>
+              prev.filter((product) => {
+                const seller = product.productSeller;
+                if (seller == null) {
+                  return true;
+                }
+                if (typeof seller === "string") {
+                  return seller !== deletedSellerId;
+                }
+                if (typeof seller === "object" && seller._id != null) {
+                  return String(seller._id) !== deletedSellerId;
+                }
+                return true;
+              }),
+            );
+          }
         }}
       />
       <LoginModal
@@ -921,6 +1045,8 @@ export function HomePage() {
         onSellerNameClick={handleSellerNameClick}
         isAuthorized={isAuthorized}
         onProductStatsUpdate={handleProductStatsUpdate}
+        showAddToCart={catalogDetailsShowAddToCart}
+        onRequestLogin={() => setIsLoginModalOpen(true)}
         showStaffDetails={
           canModerateProducts && catalogProductDetails != null
         }

@@ -1,6 +1,16 @@
 /** Максимум URL изображений на один товар (схема, валидация, бизнес-логика). */
 export const PRODUCT_IMAGE_URLS_MAX = 5;
 
+/** Лимит товаров продавца (не премиум). */
+export const SELLER_PRODUCTS_LIMIT_REGULAR = 15;
+
+/** Лимит товаров продавца (премиум). */
+export const SELLER_PRODUCTS_LIMIT_PREMIUM = 30;
+
+/** Ответ при попытке создать товар сверх лимита. */
+export const SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE =
+    'Достигнут лимит товаров: 15 для обычных пользователей, 30 для премиум.';
+
 /** Максимум слов в описании товара (валидация POST/PATCH /product). */
 export const PRODUCT_DESCRIPTION_MAX_WORDS = 100;
 

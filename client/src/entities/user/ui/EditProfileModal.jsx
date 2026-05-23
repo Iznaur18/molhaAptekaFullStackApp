@@ -27,6 +27,8 @@ import {
   EDIT_PROFILE_MODAL_UI,
   USER_DETAILS_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
+import { UserBackgroundPresetPicker } from "./UserBackgroundPresetPicker.jsx";
+import { UserBackgroundPreview } from "./UserBackgroundPreview.jsx";
 
 import "./EditProfileModal.css";
 
@@ -45,6 +47,7 @@ const ROLE_OPTIONS = [USER_ROLE_USER, USER_ROLE_MODERATOR, USER_ROLE_ADMIN];
  *   user: import('../model/types.js').UserPublicProfile | null;
  *   onSaved: (user: import('../model/types.js').UserPublicProfile) => void;
  *   adminMode?: boolean;
+ *   staffCanEditRole?: boolean;
  * }} props
  */
 export function EditProfileModal({
@@ -53,6 +56,7 @@ export function EditProfileModal({
   user,
   onSaved,
   adminMode = false,
+  staffCanEditRole = false,
 }) {
   const [form, setForm] = useState(() => mapUserToEditProfileForm({ _id: "" }));
   const [feedback, setFeedback] = useState({ kind: "idle", message: "" });
@@ -87,6 +91,13 @@ export function EditProfileModal({
     [form.notesAboutUser],
   );
 
+  const isPremiumUser = Boolean(user?.isPremiumUser);
+  const backgroundMode = adminMode
+    ? "admin"
+    : isPremiumUser
+      ? "image"
+      : "preset";
+
   const isSubmitting = feedback.kind === "loading";
 
   const handleChange = (event) => {
@@ -112,6 +123,7 @@ export function EditProfileModal({
 
     const clientError = validateEditProfileForm(form, {
       includeAdmin: adminMode,
+      backgroundMode,
     });
     if (clientError) {
       setFeedback({ kind: "error", message: clientError });
@@ -123,7 +135,7 @@ export function EditProfileModal({
     try {
       const body = adminMode
         ? buildAdminPatchUserProfileBody(form)
-        : buildPatchUserProfileBody(form);
+        : buildPatchUserProfileBody(form, { backgroundMode });
       const updated = await patchUserProfile(String(user._id), body);
       onSaved(updated);
     } catch (e) {
@@ -252,18 +264,52 @@ export function EditProfileModal({
                 autoComplete="off"
               />
             </label>
-            <label className="edit-profile-modal__label">
-              {EDIT_PROFILE_MODAL_UI.LABEL_BG_URL}
-              <input
-                className="edit-profile-modal__input"
-                type="url"
-                name="userBackgroundUrl"
-                value={form.userBackgroundUrl}
-                onChange={handleChange}
-                placeholder={EDIT_PROFILE_MODAL_UI.PLACEHOLDER_HTTPS}
-                autoComplete="off"
+            <div className="edit-profile-modal__background-block">
+              <p className="edit-profile-modal__background-label">
+                {EDIT_PROFILE_MODAL_UI.LABEL_BG_PREVIEW}
+              </p>
+              <UserBackgroundPreview
+                presetId={form.backgroundPresetId}
+                imageUrl={form.backgroundImageUrl}
+                mode={backgroundMode}
               />
-            </label>
+            </div>
+            {backgroundMode === "preset" ? (
+              <UserBackgroundPresetPicker
+                value={form.backgroundPresetId}
+                onChange={(presetId) =>
+                  setForm((prev) => ({ ...prev, backgroundPresetId: presetId }))
+                }
+                disabled={isSubmitting}
+                legend={EDIT_PROFILE_MODAL_UI.LABEL_BG_PRESET}
+              />
+            ) : null}
+            {backgroundMode === "image" || backgroundMode === "admin" ? (
+              <label className="edit-profile-modal__label">
+                {backgroundMode === "admin"
+                  ? EDIT_PROFILE_MODAL_UI.LABEL_BG_URL_ADMIN
+                  : EDIT_PROFILE_MODAL_UI.LABEL_BG_URL}
+                <input
+                  className="edit-profile-modal__input"
+                  type="url"
+                  name="backgroundImageUrl"
+                  value={form.backgroundImageUrl}
+                  onChange={handleChange}
+                  placeholder={EDIT_PROFILE_MODAL_UI.PLACEHOLDER_HTTPS}
+                  autoComplete="off"
+                />
+              </label>
+            ) : null}
+            {backgroundMode === "admin" ? (
+              <UserBackgroundPresetPicker
+                value={form.backgroundPresetId}
+                onChange={(presetId) =>
+                  setForm((prev) => ({ ...prev, backgroundPresetId: presetId }))
+                }
+                disabled={isSubmitting}
+                legend={EDIT_PROFILE_MODAL_UI.LABEL_BG_PRESET}
+              />
+            ) : null}
             <label className="edit-profile-modal__label edit-profile-modal__label_row">
               <input
                 type="checkbox"
@@ -278,33 +324,46 @@ export function EditProfileModal({
                 <legend className="edit-profile-modal__legend">
                   {ADMIN_EDIT_USER_UI.SECTION_ADMIN}
                 </legend>
-                <label className="edit-profile-modal__label">
-                  {ADMIN_EDIT_USER_UI.LABEL_ROLE}
-                  <select
-                    className="edit-profile-modal__input"
-                    name="userRole"
-                    value={form.userRole}
-                    onChange={handleChange}
-                  >
-                    {ROLE_OPTIONS.map((value) => (
-                      <option key={value} value={value}>
-                        {USER_ROLE_LABEL_RU[value]}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className="edit-profile-modal__label">
-                  {ADMIN_EDIT_USER_UI.LABEL_DISCOUNT}
+                {staffCanEditRole ? (
+                  <>
+                    <label className="edit-profile-modal__label">
+                      {ADMIN_EDIT_USER_UI.LABEL_ROLE}
+                      <select
+                        className="edit-profile-modal__input"
+                        name="userRole"
+                        value={form.userRole}
+                        onChange={handleChange}
+                      >
+                        {ROLE_OPTIONS.map((value) => (
+                          <option key={value} value={value}>
+                            {USER_ROLE_LABEL_RU[value]}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="edit-profile-modal__label">
+                      {ADMIN_EDIT_USER_UI.LABEL_DISCOUNT}
+                      <input
+                        className="edit-profile-modal__input"
+                        type="number"
+                        name="userDiscountPercent"
+                        min={0}
+                        max={100}
+                        step={1}
+                        value={form.userDiscountPercent}
+                        onChange={handleChange}
+                      />
+                    </label>
+                  </>
+                ) : null}
+                <label className="edit-profile-modal__label edit-profile-modal__label_row">
                   <input
-                    className="edit-profile-modal__input"
-                    type="number"
-                    name="userDiscountPercent"
-                    min={0}
-                    max={100}
-                    step={1}
-                    value={form.userDiscountPercent}
+                    type="checkbox"
+                    name="isUserDataConfirmed"
+                    checked={form.isUserDataConfirmed}
                     onChange={handleChange}
                   />
+                  {ADMIN_EDIT_USER_UI.LABEL_USER_DATA_CONFIRMED}
                 </label>
                 <label className="edit-profile-modal__label edit-profile-modal__label_row">
                   <input

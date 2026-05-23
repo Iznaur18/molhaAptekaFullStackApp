@@ -106,6 +106,7 @@ export const HOME_PAGE_UI = {
   SHOW_HIDDEN_PRODUCTS: "Показывать скрытые товары",
   CATEGORY_ALL: "Все категории",
   SUBTITLE_MY_ONLY: "Показаны только ваши товары.",
+  MY_PRODUCTS_QUOTA_LABEL: "Товаров",
   LIST_PRODUCT_BUTTON: "Разместить товар",
   LOGIN_TO_LIST_PRODUCT: "Войти, чтобы разместить",
   SUBTITLE_ALL_PRODUCTS: "Все позиции из каталога",
@@ -278,6 +279,10 @@ export const USERS_PAGE_UI = {
   FILTER_ACTIVE_LABEL: "Учётка",
   FILTER_ACTIVE_ANY: "Активные",
   FILTER_ACTIVE_INACTIVE: "Отключённые",
+  FILTER_CONFIRMED_LABEL: "Подтверждение данных",
+  FILTER_CONFIRMED_ANY: "Все",
+  FILTER_CONFIRMED_ONLY: "Только подтверждённые",
+  FILTER_CONFIRMED_NOT: "Не подтверждённые",
 };
 
 /** Админ: редактирование чужого профиля */
@@ -289,6 +294,7 @@ export const ADMIN_EDIT_USER_UI = {
   LABEL_PREMIUM: "Премиум",
   LABEL_ACCOUNT_ACTIVE: "Учётка активна",
   LABEL_BLOCKED: "Заблокирован",
+  LABEL_USER_DATA_CONFIRMED: "Данные подтверждены",
   EDIT_BUTTON: "Редактировать",
   DELETE_BUTTON: "Удалить пользователя",
   DELETE_CONFIRM_TITLE: "Удалить пользователя?",
@@ -314,6 +320,10 @@ export const USER_LIST_ROW_UI = {
   BADGE_INACTIVE: "Откл.",
   MISSING_NAME: COMMON_UI.EM_DASH,
   RATING_TITLE: "Средняя оценка · число голосов",
+  TOTAL_SALES_LABEL: "Продаж на сумму",
+  TOTAL_PURCHASES_LABEL: "Покупок на сумму",
+  RATING_LABEL: "Рейтинг",
+  USER_DATA_CONFIRMED_LABEL: "Пользователь подтверждён",
 };
 
 /** Модалка создания товара (`POST /product`) */
@@ -350,6 +360,15 @@ export const PRODUCT_DETAILS_MODAL_UI = {
   GALLERY_THUMBS_ARIA: "Дополнительные фотографии товара",
   OPEN_GALLERY_FULLSCREEN: "Просмотреть все фото в полном экране",
   SLIDER_REGION_ARIA: "Слайдер фотографий товара",
+  DETAILS_SECTION_ARIA: "Описание и служебная информация о товаре",
+};
+
+/** Превью продавца в модалке товара */
+export const PRODUCT_SELLER_PREVIEW_UI = {
+  SECTION_LABEL: "Продавец",
+  OPEN_PROFILE_ARIA: "Открыть профиль продавца",
+  LISTED_PRODUCTS_LABEL: "Товаров в продаже",
+  PREMIUM_LABEL: "Премиум",
 };
 
 /** Карточка товара (заголовок по умолчанию) */
@@ -408,7 +427,8 @@ export const REGISTER_MODAL_UI = {
   LABEL_GENDER: "Пол (userGender)",
   LABEL_ADDRESS: "Адрес (userAddress)",
   LABEL_AVATAR_URL: "URL аватара (avatarUrl → userAvatarUrl)",
-  LABEL_BG_URL: "URL фона (backgroundUrl → userBackgroundUrl)",
+  LABEL_BG_PRESET: "Цвет фона профиля",
+  LABEL_BG_PREVIEW: "Предпросмотр фона",
   LABEL_NOTIFICATIONS: "Уведомления (notificationsEnabled)",
   PLACEHOLDER_HTTPS: "https://…",
   SUBMIT_IDLE: "Зарегистрироваться",
@@ -499,7 +519,10 @@ export const EDIT_PROFILE_MODAL_UI = {
   LABEL_GENDER: "Пол",
   LABEL_ADDRESS: "Адрес",
   LABEL_AVATAR_URL: "URL аватара",
-  LABEL_BG_URL: "URL фона",
+  LABEL_BG_PRESET: "Цвет фона",
+  LABEL_BG_URL: "URL фона (премиум)",
+  LABEL_BG_PREVIEW: "Предпросмотр",
+  LABEL_BG_URL_ADMIN: "URL фона (приоритет над цветом)",
   LABEL_NOTIFICATIONS: "Уведомления по email",
   LABEL_NOTES: "Заметки о себе",
   WORDS_USED: (n, max) => `Слов: ${n} / ${max}`,
@@ -521,8 +544,9 @@ export const USER_PROFILE_COPY = {
     userPhoneNumber: "Телефон",
     userLastLoginAt: "Последний вход",
     userAvatarUrl: "URL аватара",
-    userBackgroundUrl: "URL фона",
+    userBackgroundUrl: "Фон профиля",
     isActiveUser: "Активен",
+    isUserDataConfirmed: "Пользователь подтверждён",
     isBlockedUser: "Заблокирован",
     userRole: "Роль",
     userDiscountPercent: "Скидка, %",

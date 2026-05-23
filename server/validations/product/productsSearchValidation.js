@@ -35,7 +35,9 @@ export const productsSearchValidation = [
     query('sort')
         .optional()
         .isIn(PRODUCT_SORT_VALUES)
-        .withMessage('sort должен быть newest, views или purchases'),
+        .withMessage(
+            'sort должен быть newest, views, purchases, premium или confirmed',
+        ),
     query('includeHidden')
         .optional()
         .isIn(['true', 'false'])

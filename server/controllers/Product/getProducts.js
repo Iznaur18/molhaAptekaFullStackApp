@@ -1,5 +1,14 @@
 import { PRODUCT_MODERATION_APPROVED } from '../../constants/productModerationConstants.js';
+import {
+    PRODUCT_SORT_CONFIRMED,
+    PRODUCT_SORT_PREMIUM,
+} from '../../constants/productCatalogSort.js';
 import { getHiddenSellerIds, isUserAdmin } from '../../utils/adminUserGuard.js';
+import { getConfirmedSellerIds } from '../../utils/confirmedSellerCatalog.js';
+import {
+    filterSellerIdsExcludingHidden,
+    getPremiumSellerIds,
+} from '../../utils/premiumSellerCatalog.js';
 import { getProductIdsWithOpenSales } from '../../utils/productOrderLocks.js';
 import {
     countProducts,
@@ -42,6 +51,8 @@ export const getProductsController = async (req, res) => {
     try {
         const { page, limit, skip } = parsePagination(req.query);
         const category = categoryFromQuery(req.query);
+        const premiumOnly = req.query.sort === PRODUCT_SORT_PREMIUM;
+        const confirmedOnly = req.query.sort === PRODUCT_SORT_CONFIRMED;
         const sort = parseProductSortFromQuery(req.query);
         const hiddenSellerIds = await getHiddenSellerIds();
         const isAdmin = await isUserAdmin(req.userId);
@@ -51,15 +62,38 @@ export const getProductsController = async (req, res) => {
         const catalogBaseQuery = {
             productModerationStatus: PRODUCT_MODERATION_APPROVED,
             ...(category ? { productCategory: category } : {}),
-            ...(hiddenSellerIds.length > 0
-                ? { productSeller: { $nin: hiddenSellerIds } }
-                : {}),
         };
         if (!includeHidden) {
             catalogBaseQuery.productIsAvailable = { $ne: false };
         }
 
+        if (premiumOnly) {
+            const premiumSellerIds = filterSellerIdsExcludingHidden(
+                await getPremiumSellerIds(),
+                hiddenSellerIds,
+            );
+            catalogBaseQuery.productSeller = { $in: premiumSellerIds };
+        } else if (confirmedOnly) {
+            const confirmedSellerIds = filterSellerIdsExcludingHidden(
+                await getConfirmedSellerIds(),
+                hiddenSellerIds,
+            );
+            catalogBaseQuery.productSeller = { $in: confirmedSellerIds };
+        } else if (hiddenSellerIds.length > 0) {
+            catalogBaseQuery.productSeller = { $nin: hiddenSellerIds };
+        }
+
         const productsQuery = buildProductsQuery(req.query.search, catalogBaseQuery);
+
+        if (
+            (premiumOnly || confirmedOnly) &&
+            catalogBaseQuery.productSeller?.$in?.length === 0
+        ) {
+            return successRes(res, {
+                products: [],
+                pagination: buildPagination(page, limit, 0),
+            });
+        }
 
         const [products, total] = await Promise.all([
             findProductsPage(productsQuery, sort, skip, limit),

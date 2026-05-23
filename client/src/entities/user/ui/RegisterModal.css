@@ -90,6 +90,17 @@
   min-height: 2.75rem;
 }
 
+.register-modal__background-block {
+  margin-bottom: 0.5rem;
+}
+
+.register-modal__background-label {
+  margin: 0 0 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #374151;
+}
+
 .register-modal__label {
   display: flex;
   flex-direction: column;

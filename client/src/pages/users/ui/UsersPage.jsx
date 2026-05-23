@@ -39,6 +39,7 @@ export function UsersPage({ onUserRowClick, isAdminViewer = false }) {
   const [premiumFilter, setPremiumFilter] = useState("");
   const [blockedFilter, setBlockedFilter] = useState("");
   const [activeFilter, setActiveFilter] = useState("");
+  const [confirmedFilter, setConfirmedFilter] = useState("");
   const [users, setUsers] = useState(
     /** @type {import('../../../entities/user/model/types.js').UserSearchListItem[]} */ ([]),
   );
@@ -59,7 +60,8 @@ export function UsersPage({ onUserRowClick, isAdminViewer = false }) {
     roleFilter !== "" ||
     premiumFilter !== "" ||
     blockedFilter !== "" ||
-    activeFilter !== "";
+    activeFilter !== "" ||
+    confirmedFilter !== "";
 
   useEffect(() => {
     let isCancelled = false;
@@ -75,6 +77,10 @@ export function UsersPage({ onUserRowClick, isAdminViewer = false }) {
           ...(premiumFilter === "premium" ? { isPremiumUser: true } : {}),
           ...(blockedFilter === "blocked" ? { isBlockedUser: true } : {}),
           ...(activeFilter === "inactive" ? { isActiveUser: false } : {}),
+          ...(confirmedFilter === "confirmed"
+            ? { isUserDataConfirmed: true }
+            : {}),
+          ...(confirmedFilter === "not" ? { isUserDataConfirmed: "not" } : {}),
         });
         if (isCancelled) return;
         setUsers(list);
@@ -101,6 +107,7 @@ export function UsersPage({ onUserRowClick, isAdminViewer = false }) {
     premiumFilter,
     blockedFilter,
     activeFilter,
+    confirmedFilter,
   ]);
 
   return (
@@ -191,6 +198,20 @@ export function UsersPage({ onUserRowClick, isAdminViewer = false }) {
             </option>
           </select>
         </label>
+        <label className="users-page__filter-label">
+          <span>{USERS_PAGE_UI.FILTER_CONFIRMED_LABEL}</span>
+          <select
+            className="users-page__filter-control"
+            value={confirmedFilter}
+            onChange={(event) => setConfirmedFilter(event.target.value)}
+          >
+            <option value="">{USERS_PAGE_UI.FILTER_CONFIRMED_ANY}</option>
+            <option value="confirmed">
+              {USERS_PAGE_UI.FILTER_CONFIRMED_ONLY}
+            </option>
+            <option value="not">{USERS_PAGE_UI.FILTER_CONFIRMED_NOT}</option>
+          </select>
+        </label>
       </div>
       <UsersPageBody
         phase={phase}
@@ -234,12 +255,12 @@ function UsersPageBody({ phase, users, error, hasActiveFilters, onUserRowClick }
   }
 
   return (
-    <ul className="users-page__list" role="list">
+    <div className="users-page__grid" role="list">
       {users.map((user) => (
-        <li key={user._id} className="users-page__item" role="listitem">
+        <div key={user._id} className="users-page__cell" role="listitem">
           <UserListRow user={user} onRowClick={onUserRowClick} />
-        </li>
+        </div>
       ))}
-    </ul>
+    </div>
   );
 }

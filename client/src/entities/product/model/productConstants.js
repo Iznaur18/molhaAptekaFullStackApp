@@ -1,6 +1,11 @@
 /** Совпадает с `server/constants/productConstants.js`. */
 export const PRODUCT_IMAGE_URLS_MAX = 5;
 
+export const SELLER_PRODUCTS_LIMIT_REGULAR = 15;
+export const SELLER_PRODUCTS_LIMIT_PREMIUM = 30;
+export const SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE =
+  "Достигнут лимит товаров: 15 для обычных пользователей, 30 для премиум.";
+
 export const PRODUCT_DESCRIPTION_MAX_WORDS = 100;
 
 export const PRODUCT_CATEGORY_GROCERY = "grocery";
@@ -114,8 +119,19 @@ export const CATALOG_PAGE_SIZE = 24;
 export const CATALOG_SORT_NEWEST = "newest";
 export const CATALOG_SORT_VIEWS = "views";
 export const CATALOG_SORT_PURCHASES = "purchases";
+export const CATALOG_SORT_PREMIUM = "premium";
+export const CATALOG_SORT_CONFIRMED = "confirmed";
 
 export const CATALOG_SORT_OPTIONS = [
+  CATALOG_SORT_NEWEST,
+  CATALOG_SORT_VIEWS,
+  CATALOG_SORT_PURCHASES,
+  CATALOG_SORT_PREMIUM,
+  CATALOG_SORT_CONFIRMED,
+];
+
+/** Сортировки в «Мои товары» (без фильтра только премиум). */
+export const CATALOG_SORT_OPTIONS_MY_PRODUCTS = [
   CATALOG_SORT_NEWEST,
   CATALOG_SORT_VIEWS,
   CATALOG_SORT_PURCHASES,
@@ -126,6 +142,8 @@ export const CATALOG_SORT_LABEL_RU = {
   [CATALOG_SORT_NEWEST]: "Новинки",
   [CATALOG_SORT_VIEWS]: "По просмотрам",
   [CATALOG_SORT_PURCHASES]: "Больше всего купили",
+  [CATALOG_SORT_PREMIUM]: "Только премиум",
+  [CATALOG_SORT_CONFIRMED]: "Подтверждённые продавцы",
 };
 
 /**
@@ -147,13 +165,11 @@ export const PRODUCT_MODEL_FIELD_KEYS = [
   "updatedAt",
 ];
 
-/** Поля превью на карточке каталога (остальное — в модалке). */
+/** Поля превью на карточке каталога (остальное — в модалке, в т.ч. soldQuantity и productIsAvailable). */
 export const PRODUCT_CARD_PREVIEW_FIELD_KEYS = [
   "productPrice",
   "productCategory",
   "productSeller",
-  "productIsAvailable",
-  "soldQuantity",
 ];
 
 /** Поля на карточке в очереди «На модерации» (как каталог + описание и дата). */
@@ -171,7 +187,6 @@ export const PRODUCT_CARD_MODERATION_PREVIEW_FIELD_KEYS = [
 export const PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS = [
   "productPrice",
   "productCategory",
-  "productSeller",
   "productIsAvailable",
   "soldQuantity",
   "uniqueViewerCount",
@@ -181,7 +196,6 @@ export const PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS = [
 export const PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS_ADMIN = [
   "productPrice",
   "productCategory",
-  "productSeller",
   "soldQuantity",
   "uniqueViewerCount",
 ];

@@ -10,11 +10,14 @@ import { limitRuPhoneInput, validateRuPhoneField } from "../lib/ruPhone.js";
 import { validatePasswordConfirm } from "../lib/validatePasswordConfirm.js";
 import { validateUserNameField } from "../lib/validateUserName.js";
 import {
+  DEFAULT_USER_BACKGROUND_PRESET_ID,
   USER_GENDER_FEMALE,
   USER_GENDER_MALE,
   USER_GENDER_NO_SELECTED,
   USER_GENDER_LABEL_RU,
 } from "../model/userConstants.js";
+import { UserBackgroundPresetPicker } from "./UserBackgroundPresetPicker.jsx";
+import { UserBackgroundPreview } from "./UserBackgroundPreview.jsx";
 import {
   COMMON_UI,
   REGISTER_MODAL_UI,
@@ -29,7 +32,7 @@ const INITIAL_FORM = {
   userName: "",
   phoneNumber: "",
   avatarUrl: "",
-  backgroundUrl: "",
+  backgroundPresetId: DEFAULT_USER_BACKGROUND_PRESET_ID,
   userBirthDate: "",
   userGender: USER_GENDER_NO_SELECTED,
   deliveryAddress: {
@@ -346,17 +349,24 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
                 placeholder={REGISTER_MODAL_UI.PLACEHOLDER_HTTPS}
               />
             </label>
-            <label className="register-modal__label">
-              {REGISTER_MODAL_UI.LABEL_BG_URL}
-              <input
-                className="register-modal__input"
-                type="url"
-                name="backgroundUrl"
-                value={form.backgroundUrl}
-                onChange={handleChange}
-                placeholder={REGISTER_MODAL_UI.PLACEHOLDER_HTTPS}
+            <div className="register-modal__background-block">
+              <p className="register-modal__background-label">
+                {REGISTER_MODAL_UI.LABEL_BG_PREVIEW}
+              </p>
+              <UserBackgroundPreview
+                presetId={form.backgroundPresetId}
+                imageUrl=""
+                mode="preset"
               />
-            </label>
+            </div>
+            <UserBackgroundPresetPicker
+              value={form.backgroundPresetId}
+              onChange={(presetId) =>
+                setForm((prev) => ({ ...prev, backgroundPresetId: presetId }))
+              }
+              disabled={status.kind === "loading"}
+              legend={REGISTER_MODAL_UI.LABEL_BG_PRESET}
+            />
             <label className="register-modal__label register-modal__label_row">
               <input
                 type="checkbox"

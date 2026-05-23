@@ -223,7 +223,7 @@
   white-space: nowrap;
 }
 
-.home-page__list-product-button:hover {
+.home-page__list-product-button:hover:not(:disabled) {
   border-color: #1f6feb;
   background: rgba(31, 111, 235, 0.08);
 }
@@ -241,8 +241,26 @@
   cursor: pointer;
 }
 
-.home-page__create-product-button:hover {
+.home-page__create-product-button:hover:not(:disabled) {
   filter: brightness(1.05);
+}
+
+.home-page__create-product-button:disabled,
+.home-page__list-product-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.home-page__my-products-quota {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1f6feb;
+}
+
+.home-page__my-products-quota-label {
+  font-weight: 500;
+  opacity: 0.85;
 }
 
 .home-page__subtitle {

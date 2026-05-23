@@ -10,6 +10,8 @@ import {
 import { ProductModel } from '../models/index.js';
 import mongoose from 'mongoose';
 
+import { attachProductSellerSnapshots } from './attachProductSellerSnapshots.js';
+
 const { ObjectId } = mongoose.Types;
 
 /**
@@ -158,8 +160,8 @@ const sortStageForCatalog = (sort) => {
  * @param {number} skip
  * @param {number} limit
  */
-export const findProductsPage = async (productsQuery, sort, skip, limit) =>
-    ProductModel.aggregate([
+export const findProductsPage = async (productsQuery, sort, skip, limit) => {
+    const products = await ProductModel.aggregate([
         { $match: normalizeProductsQueryForAggregate(productsQuery) },
         soldQuantityLookupStage(),
         soldQuantityAddFieldsStage(),
@@ -168,6 +170,9 @@ export const findProductsPage = async (productsQuery, sort, skip, limit) =>
         { $limit: limit },
         ...sellerLookupStages(),
     ]);
+
+    return attachProductSellerSnapshots(products);
+};
 
 /**
  * @param {Record<string, unknown>} productsQuery

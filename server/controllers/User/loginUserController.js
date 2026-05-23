@@ -2,13 +2,24 @@ import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
 import { UserModel, UserVoteRatingModel } from '../../models/index.js';
 import { sendUserWithToken, errorRes, successRes } from '../../utils/index.js';
-import { USER_DATA, ALLOWED_FIELDS_FOR_USER, ALLOWED_FIELDS_FOR_ADMIN } from '../../constants/constants.js';
+import {
+    USER_DATA,
+    ALLOWED_FIELDS_FOR_USER,
+    ALLOWED_FIELDS_FOR_ADMIN,
+    ALLOWED_FIELDS_FOR_MODERATOR,
+} from '../../constants/constants.js';
+import { isStaffRole } from '../../utils/adminUserGuard.js';
 import {
     assertCanDeleteUser,
     assertCanSetUserRole,
 } from '../../utils/adminUserGuard.js';
+import { deleteSellerProductsAndRelatedData } from '../../utils/deleteUserCascade.js';
 import { getOptionalViewerFromRequest } from '../../utils/optionalViewerFromRequest.js';
 import { sanitizeUserProfileForViewer } from '../../utils/userProfileVisibility.js';
+import {
+    backgroundValueAfterPremiumChange,
+    normalizeUserBackgroundForSave,
+} from '../../utils/userBackgroundValue.js';
 
 /** Вход по email + пароль. POST /auth/login */
 export const loginUserController = async (req, res) => { // обработчик входа по email + пароль
@@ -125,15 +136,21 @@ export const userUpdateProfileController = async (req, res) => {
             return errorRes(res, 401, 'Текущий пользователь не найден. Токен недействителен');
         }
 
-        const isCurrentUserOwner = String(currentUserId) === String(targetUserId); // текущий пользователь является владельцем обновляемого профиля
-        const isCurrentUserAdmin = currentUserRole.userRole === 'admin'; // текущий пользователь является администратором
+        const isCurrentUserOwner = String(currentUserId) === String(targetUserId);
+        const editorRole = currentUserRole.userRole;
+        const isCurrentUserAdmin = editorRole === 'admin';
+        const isCurrentUserStaff = isStaffRole(editorRole);
 
-        if (!isCurrentUserOwner && !isCurrentUserAdmin) { // если текущий пользователь не является владельцем обновляемого профиля и не является администратором, возвращаем ошибку
+        if (!isCurrentUserOwner && !isCurrentUserStaff) {
             return errorRes(res, 403, 'У вас нет прав на обновление этого профиля');
         }
 
-        const updateData = {}; // объект для обновления профиля с разрешенными полями из запроса
-        const allowedFields = isCurrentUserAdmin ? ALLOWED_FIELDS_FOR_ADMIN : ALLOWED_FIELDS_FOR_USER; // разрешенные поля для обновления профиля в зависимости от роли пользователя
+        const updateData = {};
+        const allowedFields = isCurrentUserOwner
+            ? ALLOWED_FIELDS_FOR_USER
+            : isCurrentUserAdmin
+              ? ALLOWED_FIELDS_FOR_ADMIN
+              : ALLOWED_FIELDS_FOR_MODERATOR;
 
         // 3. Сбор и конвертация данных для обновления (валидация форматов и типов выполняется в middleware updateProfileValidation)
         for (const field of allowedFields) {
@@ -193,6 +210,9 @@ export const userUpdateProfileController = async (req, res) => {
         }
 
         if (updateData.userRole !== undefined) {
+            if (!isCurrentUserAdmin) {
+                return errorRes(res, 403, 'Только администратор может менять роль');
+            }
             try {
                 await assertCanSetUserRole(targetUserId, updateData.userRole);
             } catch (e) {
@@ -202,6 +222,10 @@ export const userUpdateProfileController = async (req, res) => {
                     e instanceof Error ? e.message : 'Нельзя изменить роль',
                 );
             }
+        }
+
+        if (updateData.userDiscountPercent !== undefined && !isCurrentUserAdmin) {
+            return errorRes(res, 403, 'Только администратор может менять скидку');
         }
 
         // 5. Проверка уникальности userName и userPhoneNumber перед обновлением
@@ -219,11 +243,51 @@ export const userUpdateProfileController = async (req, res) => {
             }
         }
 
+        const targetUserBeforeUpdate = await UserModel.findById(targetUserId)
+            .select('isPremiumUser userBackgroundUrl')
+            .lean();
+
+        if (!targetUserBeforeUpdate) {
+            return errorRes(res, 404, 'Пользователь не найден');
+        }
+
+        const wasPremium = Boolean(targetUserBeforeUpdate.isPremiumUser);
+        const nextPremium =
+            updateData.isPremiumUser !== undefined
+                ? Boolean(updateData.isPremiumUser)
+                : wasPremium;
+
+        if (wasPremium && !nextPremium) {
+            updateData.userBackgroundUrl = backgroundValueAfterPremiumChange(
+                wasPremium,
+                nextPremium,
+                targetUserBeforeUpdate.userBackgroundUrl,
+            );
+        } else if (updateData.userBackgroundUrl !== undefined) {
+            try {
+                updateData.userBackgroundUrl = normalizeUserBackgroundForSave(
+                    updateData.userBackgroundUrl,
+                    {
+                        isPremiumUser: nextPremium,
+                        isAdminEditor: isCurrentUserStaff,
+                    },
+                );
+            } catch (e) {
+                return errorRes(
+                    res,
+                    400,
+                    e instanceof Error ? e.message : 'Некорректный фон профиля',
+                );
+            }
+        }
+
         // 6. Логирование изменений (для аудита)
         console.log(`[UPDATE PROFILE] User ${currentUserId} updating profile ${targetUserId}. Fields: ${Object.keys(updateData).join(', ')}`);
 
         // 7. Обновление профиля пользователя
-        const selectFields = isCurrentUserAdmin ? USER_DATA : allowedFields.join(' ');
+        const selectFields = isCurrentUserStaff && !isCurrentUserOwner
+            ? USER_DATA
+            : allowedFields.join(' ');
         const userDataUpdated = await UserModel.findByIdAndUpdate(
             targetUserId,
             updateData,
@@ -300,8 +364,28 @@ export const userDeleteProfileController = async (req, res) => {
         // 4. Логирование удаления (для аудита)
         console.log(`[DELETE PROFILE] User ${currentUserId} deleting profile ${targetUserId} (${targetUser.userName || 'N/A'})`);
 
-        // 5. Каскадное удаление связанных данных
-        // Удаляем все голоса, где пользователь был голосующим или целью голосования
+        let cascadeSummary = { deletedProductCount: 0, updatedCarts: 0 };
+        try {
+            cascadeSummary = await deleteSellerProductsAndRelatedData(targetUserId);
+        } catch (cascadeError) {
+            const statusCode =
+                cascadeError &&
+                typeof cascadeError === 'object' &&
+                'statusCode' in cascadeError &&
+                cascadeError.statusCode === 409
+                    ? 409
+                    : 500;
+            const message =
+                cascadeError instanceof Error
+                    ? cascadeError.message
+                    : 'Ошибка при удалении товаров пользователя';
+            return errorRes(res, statusCode, message);
+        }
+        console.log(
+            `[DELETE PROFILE] Deleted ${cascadeSummary.deletedProductCount} products, updated ${cascadeSummary.updatedCarts} carts for user ${targetUserId}`,
+        );
+
+        // Каскад: голоса
         const deletedVotes = await UserVoteRatingModel.deleteMany({
             $or: [
                 { userVoter: targetUserId },
@@ -310,7 +394,7 @@ export const userDeleteProfileController = async (req, res) => {
         });
         console.log(`[DELETE PROFILE] Deleted ${deletedVotes.deletedCount} vote records for user ${targetUserId}`);
 
-        // 6. Удаление профиля пользователя
+        // Удаление профиля пользователя
         const deletedUser = await UserModel.findByIdAndDelete(targetUserId);
         if (!deletedUser) {
             return errorRes(res, 404, 'Пользователь не найден или уже был удален');

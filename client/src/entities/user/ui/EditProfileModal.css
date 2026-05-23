@@ -121,6 +121,17 @@
   resize: vertical;
 }
 
+.edit-profile-modal__background-block {
+  margin-bottom: 0.5rem;
+}
+
+.edit-profile-modal__background-label {
+  margin: 0 0 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: color-mix(in srgb, CanvasText 72%, transparent);
+}
+
 .edit-profile-modal__hint {
   font-size: 0.78rem;
   line-height: 1.35;

@@ -12,7 +12,7 @@ const ALLOWED_ROLES = [USER_ROLE_USER, USER_ROLE_ADMIN, USER_ROLE_MODERATOR];
  * @returns {Record<string, unknown>}
  */
 export function buildAdminPatchUserProfileBody(form) {
-  const body = buildPatchUserProfileBody(form);
+  const body = buildPatchUserProfileBody(form, { backgroundMode: "admin" });
 
   const role = form.userRole;
   if (ALLOWED_ROLES.includes(role)) {
@@ -24,6 +24,7 @@ export function buildAdminPatchUserProfileBody(form) {
 
   body.isPremiumUser = Boolean(form.isPremiumUser);
   body.isActiveUser = Boolean(form.isActiveUser);
+  body.isUserDataConfirmed = Boolean(form.isUserDataConfirmed);
   body.isBlockedUser = Boolean(form.isBlockedUser);
 
   return body;

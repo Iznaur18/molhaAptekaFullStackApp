@@ -4,10 +4,13 @@ import {
     PRODUCT_MODERATION_PENDING,
     PRODUCT_MODERATION_REJECTED,
 } from '../../constants/productModerationConstants.js';
+import { PRODUCT_SELLER_PUBLIC_SELECT } from '../../constants/productSellerPublicFields.js';
+import {
+    attachProductSellerSnapshot,
+    attachProductSellerSnapshots,
+} from '../../utils/attachProductSellerSnapshots.js';
 import { isUserAdmin } from '../../utils/adminUserGuard.js';
 import { errorRes, successRes } from '../../utils/index.js';
-
-const SELLER_PUBLIC_FIELDS = 'userName email userPhoneNumber _id userRatingByVotes';
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 100;
@@ -31,13 +34,15 @@ export const getPendingModerationProductsController = async (req, res) => {
                 .sort({ createdAt: 1 })
                 .skip(skip)
                 .limit(limit)
-                .populate('productSeller', SELLER_PUBLIC_FIELDS)
+                .populate('productSeller', PRODUCT_SELLER_PUBLIC_SELECT)
                 .lean(),
             ProductModel.countDocuments(filter),
         ]);
 
+        const productsWithSeller = await attachProductSellerSnapshots(products);
+
         return successRes(res, {
-            products,
+            products: productsWithSeller,
             total,
             page,
             limit,
@@ -66,11 +71,13 @@ export const approveProductModerationController = async (req, res) => {
         product.productModerationComment = '';
         product.productIsAvailable = true;
         await product.save();
-        await product.populate('productSeller', SELLER_PUBLIC_FIELDS);
+        await product.populate('productSeller', PRODUCT_SELLER_PUBLIC_SELECT);
+
+        const enriched = await attachProductSellerSnapshot(product.toObject());
 
         return successRes(res, {
             message: 'Товар одобрен и опубликован в каталоге',
-            product: product.toObject(),
+            product: enriched,
         });
     } catch (error) {
         console.error('approveProductModerationController error:', error);
@@ -98,11 +105,13 @@ export const rejectProductModerationController = async (req, res) => {
         product.productModerationComment = comment;
         product.productIsAvailable = false;
         await product.save();
-        await product.populate('productSeller', SELLER_PUBLIC_FIELDS);
+        await product.populate('productSeller', PRODUCT_SELLER_PUBLIC_SELECT);
+
+        const enriched = await attachProductSellerSnapshot(product.toObject());
 
         return successRes(res, {
             message: 'Товар отклонён',
-            product: product.toObject(),
+            product: enriched,
         });
     } catch (error) {
         console.error('rejectProductModerationController error:', error);

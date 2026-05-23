@@ -84,6 +84,10 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    isUserDataConfirmed: {
+      type: Boolean,
+      default: false,
+    },
     isBlockedUser: { // заблокирован ли пользователь
       type: Boolean,
       default: false,

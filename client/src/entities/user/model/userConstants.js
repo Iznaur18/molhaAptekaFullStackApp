@@ -34,5 +34,4 @@ export const USER_ROLE_LABEL_RU = {
 export const DEFAULT_USER_AVATAR_URL =
   "https://i.pinimg.com/originals/c9/31/92/c93192b782081d4d1d70b03a3c1cf011.jpg";
 
-export const DEFAULT_USER_BACKGROUND_URL =
-  "https://krisp.ai/blog/wp-content/uploads/2024/07/background-meme1.jpg";
+export { DEFAULT_USER_BACKGROUND_PRESET_ID } from "./userBackgroundPresets.js";

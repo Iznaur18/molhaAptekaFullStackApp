@@ -1,10 +1,12 @@
 import { appendRuAddressToPayload } from "../../address/lib/appendRuAddressToPayload.js";
 import { normalizeRuPhoneInput } from "./ruPhone.js";
 import {
+  DEFAULT_USER_BACKGROUND_PRESET_ID,
   USER_GENDER_FEMALE,
   USER_GENDER_MALE,
   USER_GENDER_NO_SELECTED,
 } from "../model/userConstants.js";
+import { isUserBackgroundPresetId } from "../model/userBackgroundPresets.js";
 
 /**
  * @param {{
@@ -14,7 +16,7 @@ import {
  *   userName: string;
  *   phoneNumber: string;
  *   avatarUrl: string;
- *   backgroundUrl: string;
+ *   backgroundPresetId: string;
  *   userBirthDate: string;
  *   userGender: string;
  *   deliveryAddress: import('../../address/model/types.js').RuDeliveryAddressValue;
@@ -40,13 +42,17 @@ export function buildRegisterUserPayload(form) {
     phoneNumber = normalizeRuPhoneInput(phoneNumber);
   }
   const avatarUrl = trimOrUndef(form.avatarUrl);
-  const backgroundUrl = trimOrUndef(form.backgroundUrl);
+  const presetId = String(form.backgroundPresetId ?? "").trim();
   const userBirthDate = trimOrUndef(form.userBirthDate);
 
   payload.userName = userName;
   if (phoneNumber) payload.phoneNumber = phoneNumber;
   if (avatarUrl) payload.avatarUrl = avatarUrl;
-  if (backgroundUrl) payload.backgroundUrl = backgroundUrl;
+  if (isUserBackgroundPresetId(presetId)) {
+    payload.backgroundPresetId = presetId;
+  } else if (presetId === "") {
+    payload.backgroundPresetId = DEFAULT_USER_BACKGROUND_PRESET_ID;
+  }
   appendRuAddressToPayload(payload, form.deliveryAddress);
   if (userBirthDate) payload.userBirthDate = userBirthDate;
 

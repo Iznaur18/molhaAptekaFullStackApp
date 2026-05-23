@@ -1,6 +1,14 @@
 import { UserModel } from '../models/index.js';
 
 export const ADMIN_ROLE = 'admin';
+export const MODERATOR_ROLE = 'moderator';
+
+/**
+ * @param {string | undefined | null} role
+ */
+export function isStaffRole(role) {
+    return role === ADMIN_ROLE || role === MODERATOR_ROLE;
+}
 
 /**
  * @param {string | undefined | null} userId

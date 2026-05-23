@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { getUserProfileRows } from "../lib/getUserProfileRows.js";
-import { pickUserProfileBackgroundUrl } from "../lib/pickUserProfileBackgroundUrl.js";
+import { resolveUserProfileBackgroundFromUser } from "../lib/userBackgroundValue.js";
 import { pickUserProfilePhotoUrl } from "../lib/pickUserProfilePhotoUrl.js";
 import { UserProfilePurchasesList } from "./UserProfilePurchasesList.jsx";
 import { UserProfileProductsList } from "./UserProfileProductsList.jsx";
@@ -53,7 +53,9 @@ export function UserDetailsModal({
   onPurchaseProductClick,
 }) {
   const photoUrl = user ? pickUserProfilePhotoUrl(user) : null;
-  const backgroundUrl = user ? pickUserProfileBackgroundUrl(user) : null;
+  const profileBackground = user
+    ? resolveUserProfileBackgroundFromUser(user)
+    : null;
   const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
   const [backgroundLoadFailed, setBackgroundLoadFailed] = useState(false);
   const isRegisterLayout = layoutVariant === "register";
@@ -100,7 +102,10 @@ export function UserDetailsModal({
     String(user._id) !== String(currentUserId) &&
     layoutVariant !== "register";
 
-  const canShowBackground = Boolean(backgroundUrl) && !backgroundLoadFailed;
+  const canShowBackground =
+    Boolean(profileBackground) &&
+    (profileBackground.kind === "preset" ||
+      (profileBackground.kind === "image" && !backgroundLoadFailed));
   const showProfileBanner =
     Boolean(user) &&
     (canShowBackground || (Boolean(photoUrl) && !avatarLoadFailed));
@@ -195,15 +200,22 @@ export function UserDetailsModal({
                         : "user-details-modal__banner"
                     }
                   >
-                    {canShowBackground ? (
+                    {canShowBackground && profileBackground?.kind === "image" ? (
                       <img
                         className="user-details-modal__banner-image"
-                        src={backgroundUrl}
+                        src={profileBackground.url}
                         alt=""
                         decoding="async"
                         loading="lazy"
                         referrerPolicy="no-referrer"
                         onError={() => setBackgroundLoadFailed(true)}
+                      />
+                    ) : null}
+                    {canShowBackground && profileBackground?.kind === "preset" ? (
+                      <div
+                        className="user-details-modal__banner-color"
+                        style={{ backgroundColor: profileBackground.color }}
+                        aria-hidden="true"
                       />
                     ) : null}
                     {photoUrl && !avatarLoadFailed ? (

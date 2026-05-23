@@ -29,17 +29,16 @@
   color: #111827;
 }
 
-.users-page__list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+.users-page__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  align-items: stretch;
 }
 
-.users-page__item {
-  margin: 0;
+.users-page__cell {
+  min-width: 0;
+  display: flex;
 }
 
 .users-page__state {

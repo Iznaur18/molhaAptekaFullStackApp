@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
+import { AddToCartButton } from "../../../features/cart-add/ui/AddToCartButton.jsx";
 import { recordProductView } from "../api/recordProductView.js";
 import {
   COMMON_UI,
@@ -19,8 +20,45 @@ import {
   PRODUCT_IMAGE_PLACEHOLDER_URL,
 } from "../model/productConstants.js";
 import { ProductImageLightbox } from "./ProductImageLightbox.jsx";
+import { ProductDetailsSellerPreview } from "./ProductDetailsSellerPreview.jsx";
 
 import "./ProductDetailsModal.css";
+
+const PRODUCT_DETAILS_STAT_FIELD_KEYS = new Set([
+  "productCategory",
+  "productIsAvailable",
+  "soldQuantity",
+  "uniqueViewerCount",
+]);
+
+const PRODUCT_DETAILS_BLOCK_FIELD_KEYS = new Set([
+  "productDescription",
+  "productModerationComment",
+  "productImageUrls",
+]);
+
+const PRODUCT_DETAILS_META_FIELD_KEYS = new Set([
+  "_id",
+  "createdAt",
+  "updatedAt",
+]);
+
+/**
+ * @param {string} key
+ */
+function getProductDetailsRowClassName(key) {
+  const classes = ["product-details-modal__row"];
+  if (key === "productPrice") {
+    classes.push("product-details-modal__row--price");
+  } else if (PRODUCT_DETAILS_STAT_FIELD_KEYS.has(key)) {
+    classes.push("product-details-modal__row--stat");
+  } else if (PRODUCT_DETAILS_BLOCK_FIELD_KEYS.has(key)) {
+    classes.push("product-details-modal__row--block");
+  } else if (PRODUCT_DETAILS_META_FIELD_KEYS.has(key)) {
+    classes.push("product-details-modal__row--meta");
+  }
+  return classes.join(" ");
+}
 
 /**
  * @param {import("../model/types.js").ProductFromApi} product
@@ -85,7 +123,7 @@ function renderFieldRows(product, keys, handlers) {
     }
 
     return (
-      <div key={key} className="product-details-modal__row">
+      <div key={key} className={getProductDetailsRowClassName(key)}>
         <dt className="product-details-modal__key">
           {PRODUCT_FIELD_LABEL_RU[key] ?? key}
         </dt>
@@ -108,6 +146,8 @@ function renderFieldRows(product, keys, handlers) {
  *   ) => void;
  *   adminFooter?: import('react').ReactNode;
  *   showStaffDetails?: boolean;
+ *   showAddToCart?: boolean;
+ *   onRequestLogin?: () => void;
  * }} props
  */
 export function ProductDetailsModal({
@@ -119,6 +159,8 @@ export function ProductDetailsModal({
   onProductStatsUpdate,
   adminFooter = null,
   showStaffDetails = false,
+  showAddToCart = false,
+  onRequestLogin = () => {},
 }) {
   const imageUrls = useMemo(
     () => (product ? resolveProductImageUrls(product) : []),
@@ -204,6 +246,25 @@ export function ProductDetailsModal({
   const bottomRowFieldKeys = showStaffDetails
     ? PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS_STAFF
     : PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS;
+  const fieldHandlers = { onClose, onSellerNameClick };
+  const handleOpenSellerProfile =
+    typeof onSellerNameClick === "function"
+      ? (userId) => {
+          onClose();
+          onSellerNameClick(userId);
+        }
+      : undefined;
+  const topStatFieldKeys = topRowFieldKeys.filter(
+    (key) => key !== "productPrice",
+  );
+  const bottomBlockFieldKeys = bottomRowFieldKeys.filter((key) =>
+    PRODUCT_DETAILS_BLOCK_FIELD_KEYS.has(key),
+  );
+  const bottomMetaFieldKeys = bottomRowFieldKeys.filter((key) =>
+    PRODUCT_DETAILS_META_FIELD_KEYS.has(key),
+  );
+  const canShowAddToCart =
+    showAddToCart && product._id != null && !adminFooter && !showStaffDetails;
 
   const title = product.productName?.trim() || "Товар";
   const displayUrls =
@@ -347,22 +408,68 @@ export function ProductDetailsModal({
                   </div>
                 ) : null}
               </div>
-              <dl className="product-details-modal__list product-details-modal__list--top">
-                {renderFieldRows(product, topRowFieldKeys, {
-                  onClose,
-                  onSellerNameClick,
-                })}
-              </dl>
+              <div className="product-details-modal__spec">
+                {topRowFieldKeys.includes("productPrice") ? (
+                  <div className="product-details-modal__price-block">
+                    <dl className="product-details-modal__price-dl">
+                      {renderFieldRows(
+                        product,
+                        ["productPrice"],
+                        fieldHandlers,
+                      )}
+                    </dl>
+                    {canShowAddToCart ? (
+                      <AddToCartButton
+                        productId={String(product._id)}
+                        isAuthorized={isAuthorized}
+                        onRequestLogin={onRequestLogin}
+                      />
+                    ) : null}
+                  </div>
+                ) : null}
+                {topStatFieldKeys.length > 0 ? (
+                  <dl className="product-details-modal__stats-grid">
+                    {renderFieldRows(
+                      product,
+                      topStatFieldKeys,
+                      fieldHandlers,
+                    )}
+                  </dl>
+                ) : null}
+              </div>
             </div>
 
-            <div className="product-details-modal__row-bottom">
-              <dl className="product-details-modal__list product-details-modal__list--bottom">
-                {renderFieldRows(product, bottomRowFieldKeys, {
-                  onClose,
-                  onSellerNameClick,
-                })}
-              </dl>
-            </div>
+            <ProductDetailsSellerPreview
+              seller={product.productSeller}
+              onOpenProfile={handleOpenSellerProfile}
+            />
+
+            {(bottomBlockFieldKeys.length > 0 ||
+              bottomMetaFieldKeys.length > 0) && (
+              <section
+                className="product-details-modal__details"
+                aria-label={PRODUCT_DETAILS_MODAL_UI.DETAILS_SECTION_ARIA}
+              >
+                {bottomBlockFieldKeys.length > 0 ? (
+                  <dl className="product-details-modal__blocks">
+                    {renderFieldRows(
+                      product,
+                      bottomBlockFieldKeys,
+                      fieldHandlers,
+                    )}
+                  </dl>
+                ) : null}
+                {bottomMetaFieldKeys.length > 0 ? (
+                  <dl className="product-details-modal__meta-grid">
+                    {renderFieldRows(
+                      product,
+                      bottomMetaFieldKeys,
+                      fieldHandlers,
+                    )}
+                  </dl>
+                ) : null}
+              </section>
+            )}
           </div>
           {adminFooter ? (
             <footer className="product-details-modal__footer">{adminFooter}</footer>

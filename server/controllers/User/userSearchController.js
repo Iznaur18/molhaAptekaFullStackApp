@@ -5,9 +5,10 @@ import {
     applyAdminVisibilityToUsersSearchQuery,
     sanitizeUsersSearchList,
 } from '../../utils/userProfileVisibility.js';
+import { attachUserListCommerceStats } from '../../utils/attachUserListCommerceStats.js';
 
 const USER_PUBLIC_LIST_FIELDS =
-    '_id userName userPhoneNumber email userRole isPremiumUser isActiveUser isBlockedUser userAvatarUrl telegramPhotoUrl userLoyaltyPoints userRatingByVotes';
+    '_id userName userPhoneNumber email userRole isPremiumUser isUserDataConfirmed isActiveUser isBlockedUser userAvatarUrl telegramPhotoUrl userLoyaltyPoints userRatingByVotes';
 const USER_SEARCH_FIELDS = ['userName', 'userPhoneNumber', 'email'];
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 10;
@@ -27,6 +28,7 @@ const parsePagination = (query) => {
 const buildUsersQuery = ({
     search,
     isPremiumUser,
+    isUserDataConfirmed,
     isActiveUser,
     isBlockedUser,
     minRating,
@@ -37,6 +39,11 @@ const buildUsersQuery = ({
 
     if (searchCondition) Object.assign(usersQuery, searchCondition);
     if (isPremiumUser === TRUE_FLAG) usersQuery.isPremiumUser = true;
+    if (isUserDataConfirmed === TRUE_FLAG) {
+        usersQuery.isUserDataConfirmed = true;
+    } else if (isUserDataConfirmed === 'false') {
+        usersQuery.isUserDataConfirmed = { $ne: true };
+    }
     if (isActiveUser === TRUE_FLAG) {
         usersQuery.isActiveUser = true;
     } else if (isActiveUser === 'false') {
@@ -104,7 +111,8 @@ export const userSearchController = async (req, res) => {
             UserModel.countDocuments(usersQuery),
         ]);
 
-        const users = sanitizeUsersSearchList(usersRaw, { viewer });
+        const usersSanitized = sanitizeUsersSearchList(usersRaw, { viewer });
+        const users = await attachUserListCommerceStats(usersSanitized);
 
         return successRes(res, { users, total, page, limit });
     } catch (error) {

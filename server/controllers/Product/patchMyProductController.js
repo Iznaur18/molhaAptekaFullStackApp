@@ -10,10 +10,9 @@ import {
     hasProductOpenSales,
     OPEN_SALES_BLOCK_MESSAGE,
 } from "../../utils/productOrderLocks.js";
+import { PRODUCT_SELLER_PUBLIC_SELECT } from "../../constants/productSellerPublicFields.js";
+import { attachProductSellerSnapshot } from "../../utils/attachProductSellerSnapshots.js";
 import { errorRes, successRes } from "../../utils/index.js";
-
-const SELLER_PUBLIC_FIELDS =
-    "userName email userPhoneNumber _id userRatingByVotes";
 
 const PENDING_EDIT_BLOCK_MESSAGE =
     "Нельзя редактировать товар, пока он на модерации";
@@ -103,7 +102,7 @@ export const patchMyProductController = async (req, res) => {
             { $set },
             { new: true, runValidators: true },
         )
-            .populate("productSeller", SELLER_PUBLIC_FIELDS)
+            .populate("productSeller", PRODUCT_SELLER_PUBLIC_SELECT)
             .lean();
 
         if (!product) {
@@ -114,9 +113,11 @@ export const patchMyProductController = async (req, res) => {
             );
         }
 
+        const productWithSeller = await attachProductSellerSnapshot(product);
+
         return successRes(res, {
             message: "Товар обновлён",
-            product,
+            product: productWithSeller,
         });
     } catch (error) {
         console.error(error);

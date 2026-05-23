@@ -5,7 +5,7 @@ import "./AdminUserModalFooter.css";
 /**
  * @param {{
  *   onEditClick: () => void;
- *   onDeleteClick: () => void;
+ *   onDeleteClick?: () => void;
  *   children?: import('react').ReactNode;
  * }} props
  */
@@ -24,13 +24,15 @@ export function AdminUserModalFooter({
         >
           {ADMIN_EDIT_USER_UI.EDIT_BUTTON}
         </button>
-        <button
-          type="button"
-          className="admin-user-modal-footer__btn admin-user-modal-footer__btn_delete"
-          onClick={onDeleteClick}
-        >
-          {ADMIN_EDIT_USER_UI.DELETE_BUTTON}
-        </button>
+        {onDeleteClick ? (
+          <button
+            type="button"
+            className="admin-user-modal-footer__btn admin-user-modal-footer__btn_delete"
+            onClick={onDeleteClick}
+          >
+            {ADMIN_EDIT_USER_UI.DELETE_BUTTON}
+          </button>
+        ) : null}
       </div>
       {children}
     </div>

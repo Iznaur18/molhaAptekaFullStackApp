@@ -6,6 +6,7 @@ import {
   PRODUCT_CARD_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { formatProductFieldForDisplay } from "../lib/formatProductFieldForDisplay.js";
+import { shouldShowPremiumProductCardChrome } from "../lib/isPremiumSellerProduct.js";
 import { resolveProductImageUrls } from "../lib/resolveProductImageUrls.js";
 import {
   canSellerDeleteProduct,
@@ -343,8 +344,12 @@ export function ProductCard({
   const bodyClassName = isModerationQueue
     ? "product-card__body"
     : "product-card__details-surface";
-
-  return (
+  const showPremiumChrome = shouldShowPremiumProductCardChrome({
+    product,
+    isMineMode,
+    isModerationQueue,
+  });
+  const card = (
     <article className="product-card">
       <div
         className={bodyClassName}
@@ -482,4 +487,10 @@ export function ProductCard({
       </div>
     </article>
   );
+
+  if (!showPremiumChrome) {
+    return card;
+  }
+
+  return <div className="product-card-premium-frame">{card}</div>;
 }

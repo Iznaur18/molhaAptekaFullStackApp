@@ -16,6 +16,7 @@ import {
  *   isPremiumUser?: boolean;
  *   isBlockedUser?: boolean;
  *   isActiveUser?: boolean;
+ *   isUserDataConfirmed?: boolean | 'not';
  * }} [params]
  * @returns {Promise<{ users: import('../model/types.js').UserSearchListItem[]; total: number; page: number; limit: number }>}
  */
@@ -40,6 +41,12 @@ export async function fetchUsersSearchPage(params = {}) {
         ...(params.isPremiumUser === true ? { isPremiumUser: "true" } : {}),
         ...(params.isBlockedUser === true ? { isBlockedUser: "true" } : {}),
         ...(params.isActiveUser === false ? { isActiveUser: "false" } : {}),
+        ...(params.isUserDataConfirmed === true
+          ? { isUserDataConfirmed: "true" }
+          : {}),
+        ...(params.isUserDataConfirmed === "not"
+          ? { isUserDataConfirmed: "false" }
+          : {}),
       },
     });
 

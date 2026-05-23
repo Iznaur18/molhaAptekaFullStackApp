@@ -1,7 +1,8 @@
 import { addressValueFromUser } from "../../address/lib/addressValueFromUser.js";
+import { parseUserBackgroundFormFields } from "./userBackgroundValue.js";
 import {
   DEFAULT_USER_AVATAR_URL,
-  DEFAULT_USER_BACKGROUND_URL,
+  DEFAULT_USER_BACKGROUND_PRESET_ID,
   USER_GENDER_NO_SELECTED,
   USER_ROLE_USER,
 } from "../model/userConstants.js";
@@ -14,13 +15,15 @@ import {
  * @property {import('../../address/model/types.js').RuDeliveryAddressValue} deliveryAddress
  * @property {string} userPhoneNumber
  * @property {string} userAvatarUrl
- * @property {string} userBackgroundUrl
+ * @property {string} backgroundPresetId
+ * @property {string} backgroundImageUrl
  * @property {boolean} notificationsEnabled
  * @property {string} notesAboutUser
  * @property {'user'|'admin'|'moderator'} userRole
  * @property {string} userDiscountPercent
  * @property {boolean} isPremiumUser
  * @property {boolean} isActiveUser
+ * @property {boolean} isUserDataConfirmed
  * @property {boolean} isBlockedUser
  */
 
@@ -35,6 +38,10 @@ export function mapUserToEditProfileForm(user) {
       ? birth.slice(0, 10)
       : "";
 
+  const { presetId, imageUrl } = parseUserBackgroundFormFields(
+    user.userBackgroundUrl,
+  );
+
   return {
     userName: user.userName ?? "",
     userBirthDate: birthInput,
@@ -42,7 +49,8 @@ export function mapUserToEditProfileForm(user) {
     deliveryAddress: addressValueFromUser(user),
     userPhoneNumber: user.userPhoneNumber ?? "",
     userAvatarUrl: user.userAvatarUrl ?? DEFAULT_USER_AVATAR_URL,
-    userBackgroundUrl: user.userBackgroundUrl ?? DEFAULT_USER_BACKGROUND_URL,
+    backgroundPresetId: presetId || DEFAULT_USER_BACKGROUND_PRESET_ID,
+    backgroundImageUrl: imageUrl,
     notificationsEnabled: Boolean(user.notificationsEnabled),
     notesAboutUser: user.notesAboutUser ?? "",
     userRole: user.userRole ?? USER_ROLE_USER,
@@ -50,6 +58,7 @@ export function mapUserToEditProfileForm(user) {
       user.userDiscountPercent != null ? String(user.userDiscountPercent) : "0",
     isPremiumUser: Boolean(user.isPremiumUser),
     isActiveUser: user.isActiveUser !== false,
+    isUserDataConfirmed: user.isUserDataConfirmed === true,
     isBlockedUser: Boolean(user.isBlockedUser),
   };
 }

@@ -9,6 +9,7 @@ import {
   normalizeUserNameInput,
 } from './userNameRules.js';
 import { ruDeliveryAddressBodyValidation } from '../address/ruDeliveryAddressValidation.js';
+import { isUserBackgroundPresetId } from '../../constants/userBackgroundPresets.js';
 
 const USER_GENDER_VALUES = ['male', 'female', 'noSelected'];
 
@@ -57,10 +58,15 @@ export const registerUserValidation = [
 
   body('avatarUrl').optional({ values: 'falsy' }).isURL().withMessage('URL аватара должен быть валидным URL'),
 
-  body('backgroundUrl')
+  body('backgroundPresetId')
     .optional({ values: 'falsy' })
-    .isURL()
-    .withMessage('URL фона должен быть валидным URL'),
+    .custom((value) => {
+      if (value == null || String(value).trim() === '') return true;
+      if (!isUserBackgroundPresetId(String(value).trim())) {
+        throw new Error('Некорректный пресет фона');
+      }
+      return true;
+    }),
 
   body('userBirthDate')
     .optional({ values: 'falsy' })

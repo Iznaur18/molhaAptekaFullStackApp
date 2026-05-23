@@ -26,6 +26,10 @@ export const userSearchValidation = [
         .optional()
         .isIn(['true', 'false'])
         .withMessage('isPremiumUser должен быть true или false'),
+    query('isUserDataConfirmed')
+        .optional()
+        .isIn(['true', 'false'])
+        .withMessage('isUserDataConfirmed должен быть true или false'),
     query('isActiveUser')
         .optional()
         .isIn(['true', 'false'])

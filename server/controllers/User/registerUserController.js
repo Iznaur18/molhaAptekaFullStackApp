@@ -1,11 +1,25 @@
 import bcrypt from 'bcrypt';
 import { UserModel } from '../../models/index.js';
 import { sendUserWithToken, errorRes } from '../../utils/index.js';
-import { DEFAULT_AVATAR_URL, DEFAULT_BACKGROUND_URL } from '../../constants/constants.js';
+import { DEFAULT_AVATAR_URL } from '../../constants/constants.js';
+import {
+    formatUserBackgroundPresetValue,
+    getDefaultUserBackgroundStoredValue,
+    isUserBackgroundPresetId,
+} from '../../constants/userBackgroundPresets.js';
 
 function pickUrlOrDefault(value, defaultUrl) {
   if (value == null || String(value).trim() === '') return defaultUrl;
   return String(value).trim();
+}
+
+function resolveRegisterBackground(presetId) {
+  const id = presetId == null ? '' : String(presetId).trim();
+  if (id === '') return getDefaultUserBackgroundStoredValue();
+  if (!isUserBackgroundPresetId(id)) {
+    return getDefaultUserBackgroundStoredValue();
+  }
+  return formatUserBackgroundPresetValue(id);
 }
 
 /** Регистрация по email + пароль и опциональные поля профиля. POST /auth/register */
@@ -17,7 +31,7 @@ export const registerUserController = async (req, res) => {
       userName,
       phoneNumber,
       avatarUrl,
-      backgroundUrl,
+      backgroundPresetId,
       userBirthDate,
       userGender,
       notificationsEnabled,
@@ -45,7 +59,7 @@ export const registerUserController = async (req, res) => {
       userName: normalizedUserName,
       userPhoneNumber,
       userAvatarUrl: pickUrlOrDefault(avatarUrl, DEFAULT_AVATAR_URL),
-      userBackgroundUrl: pickUrlOrDefault(backgroundUrl, DEFAULT_BACKGROUND_URL),
+      userBackgroundUrl: resolveRegisterBackground(backgroundPresetId),
       ...(userBirthDate ? { userBirthDate: new Date(userBirthDate) } : {}),
       ...(userGender ? { userGender } : {}),
       ...(req.verifiedDeliveryAddress
