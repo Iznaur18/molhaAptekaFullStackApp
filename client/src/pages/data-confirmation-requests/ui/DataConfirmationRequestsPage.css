@@ -1,0 +1,17 @@
+.data-confirmation-requests-page__list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.data-confirmation-requests-page__state {
+  margin: 1rem 0;
+  color: #64748b;
+}
+
+.data-confirmation-requests-page__state_error {
+  color: #b91c1c;
+}

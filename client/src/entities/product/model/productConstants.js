@@ -137,6 +137,24 @@ export const CATALOG_SORT_OPTIONS_MY_PRODUCTS = [
   CATALOG_SORT_PURCHASES,
 ];
 
+/** Фильтр статуса модерации в «Мои товары» (query `moderationStatus`). */
+export const MY_PRODUCTS_MODERATION_FILTER_ALL = "";
+export const MY_PRODUCTS_MODERATION_FILTER_PENDING = "pending";
+export const MY_PRODUCTS_MODERATION_FILTER_REJECTED = "rejected";
+
+export const MY_PRODUCTS_MODERATION_FILTER_OPTIONS = [
+  MY_PRODUCTS_MODERATION_FILTER_ALL,
+  MY_PRODUCTS_MODERATION_FILTER_PENDING,
+  MY_PRODUCTS_MODERATION_FILTER_REJECTED,
+];
+
+/** @type {Record<string, string>} */
+export const MY_PRODUCTS_MODERATION_FILTER_LABEL_RU = {
+  [MY_PRODUCTS_MODERATION_FILTER_ALL]: "Все",
+  [MY_PRODUCTS_MODERATION_FILTER_PENDING]: "На проверке",
+  [MY_PRODUCTS_MODERATION_FILTER_REJECTED]: "Отклонены",
+};
+
 /** @type {Record<string, string>} */
 export const CATALOG_SORT_LABEL_RU = {
   [CATALOG_SORT_NEWEST]: "Новинки",

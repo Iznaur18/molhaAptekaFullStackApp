@@ -19,3 +19,12 @@
 .my-orders-page__state_error {
   color: #b42318;
 }
+
+.my-orders-page__loyalty-flash {
+  margin: 0 0 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  background: #ecfdf3;
+  color: #027a48;
+  font-size: 0.95rem;
+}

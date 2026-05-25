@@ -36,6 +36,7 @@ export const patchMyProductValidation = [
       body("productImageUrls").exists(),
       body("productImageUrl").exists(),
       body("productIsAvailable").exists(),
+      body("productAuctionEnabled").exists(),
     ],
     { message: "Укажите хотя бы одно поле для обновления" },
   ),
@@ -103,5 +104,9 @@ export const patchMyProductValidation = [
     .optional()
     .isBoolean()
     .withMessage("productIsAvailable должно быть true или false"),
+  body("productAuctionEnabled")
+    .optional()
+    .isBoolean()
+    .withMessage("productAuctionEnabled должно быть true или false"),
   handleValidationByExpressErrors,
 ];

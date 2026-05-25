@@ -25,6 +25,11 @@ const OrderLineItemSchema = new mongoose.Schema(
             required: true,
             min: 0,
         },
+        productNameAtOrder: {
+            type: String,
+            required: true,
+            trim: true,
+        },
         status: {
             type: String,
             required: true,
@@ -48,6 +53,15 @@ const OrderLineItemSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
             default: null,
+        },
+        loyaltyPointsAwarded: {
+            type: Boolean,
+            default: false,
+        },
+        loyaltyPointsEarned: {
+            type: Number,
+            default: 0,
+            min: 0,
         },
     },
     { _id: true },
@@ -103,6 +117,11 @@ const OrderSchema = new mongoose.Schema(
             type: Number,
             required: true,
             default: ORDER_SCHEMA_VERSION,
+        },
+        priceOfferId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'ProductPriceOffer',
+            default: null,
         },
     },
     { timestamps: true },

@@ -29,3 +29,17 @@ export function assertAtMostWords(
     );
   }
 }
+
+/**
+ * @param {unknown} value
+ * @param {string} fieldLabelRu
+ * @param {number} minWords
+ */
+export function assertMinWords(value, fieldLabelRu, minWords) {
+  const n = countWords(value);
+  if (n < minWords) {
+    throw new Error(
+      `${fieldLabelRu}: не меньше ${minWords} слов (сейчас ${n})`,
+    );
+  }
+}

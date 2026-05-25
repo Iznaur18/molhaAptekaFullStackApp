@@ -1,4 +1,5 @@
 import { PRODUCT_SELLER_PUBLIC_FIELD_NAMES } from '../constants/productSellerPublicFields.js';
+import { enrichProductWithAuctionFields } from './productAuction.js';
 import { getSellerListedProductCountByIds } from './sellerListedProductCount.js';
 
 /**
@@ -42,7 +43,7 @@ export const attachProductSellerSnapshots = async (products) => {
     return products.map((product) => {
         const seller = product.productSeller;
         if (seller == null || typeof seller !== 'object' || seller._id == null) {
-            return product;
+            return enrichProductWithAuctionFields(product);
         }
 
         const sellerId = String(seller._id);
@@ -51,10 +52,10 @@ export const attachProductSellerSnapshots = async (products) => {
             sellerListedProductCount: listedCounts[sellerId] ?? 0,
         });
 
-        return {
+        return enrichProductWithAuctionFields({
             ...product,
             productSeller: snapshot,
-        };
+        });
     });
 };
 
@@ -67,5 +68,5 @@ export const attachProductSellerSnapshot = async (product) => {
     }
 
     const [enriched] = await attachProductSellerSnapshots([product]);
-    return enriched;
+    return enriched ?? enrichProductWithAuctionFields(product);
 };

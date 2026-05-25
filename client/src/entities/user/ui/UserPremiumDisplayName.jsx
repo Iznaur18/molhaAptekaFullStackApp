@@ -1,11 +1,17 @@
-import { USER_PREMIUM_UI } from "../../../shared/config/appUiCopy.js";
+import {
+  USER_DATA_CONFIRMED_UI,
+  USER_PREMIUM_UI,
+} from "../../../shared/config/appUiCopy.js";
+import { UserDataConfirmedBadge } from "./UserDataConfirmedBadge.jsx";
 import { UserPremiumVerifiedBadge } from "./UserPremiumVerifiedBadge.jsx";
 
 import "./UserPremiumUi.css";
+
 /**
  * @param {{
  *   name: string;
  *   isPremium?: boolean;
+ *   isUserDataConfirmed?: boolean;
  *   className?: string;
  *   textClassName?: string;
  * }} props
@@ -13,6 +19,7 @@ import "./UserPremiumUi.css";
 export function UserPremiumDisplayName({
   name,
   isPremium = false,
+  isUserDataConfirmed = false,
   className = "",
   textClassName = "user-premium-name__text",
 }) {
@@ -28,6 +35,15 @@ export function UserPremiumDisplayName({
           title={USER_PREMIUM_UI.CHECK_TITLE}
         >
           <UserPremiumVerifiedBadge size={18} />
+        </span>
+      ) : null}
+      {isUserDataConfirmed ? (
+        <span
+          className="user-data-confirmed-check"
+          aria-label={USER_DATA_CONFIRMED_UI.BADGE_ARIA}
+          title={USER_DATA_CONFIRMED_UI.BADGE_TITLE}
+        >
+          <UserDataConfirmedBadge size={18} />
         </span>
       ) : null}
     </span>

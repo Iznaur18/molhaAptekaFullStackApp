@@ -27,6 +27,15 @@
   line-height: 0;
 }
 
-.user-premium-verified-badge {
+.user-premium-verified-badge,
+.user-data-confirmed-badge {
   display: block;
+}
+
+.user-data-confirmed-check {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
 }

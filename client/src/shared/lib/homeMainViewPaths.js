@@ -3,12 +3,13 @@
  * проксирует `/cart` и `/user/...` на Express (см. vite.config.js).
  * Путь `/user-list` ок: не совпадает с API `/user` (иначе F5 → 404 JSON).
  *
- * @typedef {'catalog' | 'users' | 'cart' | 'my-sales' | 'my-orders' | 'admin-orders' | 'product-moderation'} HomeMainView
+ * @typedef {'catalog' | 'my-products' | 'users' | 'cart' | 'my-sales' | 'my-orders' | 'admin-orders' | 'product-moderation' | 'product-reports' | 'data-confirmation-requests'} HomeMainView
  */
 
 /** @type {Record<HomeMainView, string>} */
 export const HOME_MAIN_VIEW_PATH = {
   catalog: "/",
+  "my-products": "/my-products",
   /** Список пользователей; не `/users` — путается с API и при F5 на :4444. */
   users: "/user-list",
   /** UI корзины; не `/cart` из‑за proxy в Vite. */
@@ -17,6 +18,8 @@ export const HOME_MAIN_VIEW_PATH = {
   "my-orders": "/my-orders",
   "admin-orders": "/admin-orders",
   "product-moderation": "/moderation-products",
+  "product-reports": "/product-reports",
+  "data-confirmation-requests": "/data-confirmation-requests",
 };
 
 /** @type {Map<string, HomeMainView>} */
@@ -58,4 +61,20 @@ export function pathnameToMainView(pathname) {
  */
 export function mainViewToPathname(view) {
   return HOME_MAIN_VIEW_PATH[view] ?? "/";
+}
+
+/**
+ * @param {HomeMainView} view
+ */
+export function isMyProductsMainView(view) {
+  return view === "my-products";
+}
+
+/**
+ * Каталог и «Мои товары» — одна оболочка (поиск, сетка, подгрузка).
+ *
+ * @param {HomeMainView} view
+ */
+export function isCatalogShellMainView(view) {
+  return view === "catalog" || view === "my-products";
 }

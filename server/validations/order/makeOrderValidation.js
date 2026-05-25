@@ -28,5 +28,9 @@ export const makeOrderValidation = [
     body('paymentMethod')
         .isIn(ORDER_PAYMENT_METHODS)
         .withMessage(`paymentMethod должен быть одним из: ${ORDER_PAYMENT_METHODS.join(', ')}`),
+    body('priceOfferId')
+        .optional()
+        .isMongoId()
+        .withMessage('priceOfferId должен быть валидным ObjectId'),
     handleValidationByExpressErrors,
 ];

@@ -23,6 +23,7 @@ import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
  *   isCatalogLoadingMore: boolean;
  *   catalogLoadMoreError: string | null;
  *   onRetryCatalogLoadMore: () => void;
+ *   myProductsModerationFilter?: string;
  * }} props
  */
 export function HomeCatalogGrid({
@@ -46,11 +47,15 @@ export function HomeCatalogGrid({
   isCatalogLoadingMore,
   catalogLoadMoreError,
   onRetryCatalogLoadMore,
+  myProductsModerationFilter = "",
 }) {
   const emptyMessage = (() => {
     if (products.length > 0) return "";
     if (hasQuery) return HOME_PAGE_UI.EMPTY_BY_QUERY;
     if (isMineMode) {
+      if (myProductsModerationFilter) {
+        return HOME_PAGE_UI.EMPTY_MY_BY_MODERATION_STATUS;
+      }
       return selectedProductCategory
         ? HOME_PAGE_UI.EMPTY_MY_FILTERED
         : HOME_PAGE_UI.EMPTY_MY_PRODUCTS;

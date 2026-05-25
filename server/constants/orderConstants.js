@@ -27,3 +27,6 @@ export const ORDER_LINE_ITEM_QUANTITY_MIN = 1;
 
 /** Версия схемы документа заказа для безопасных миграций. */
 export const ORDER_SCHEMA_VERSION = 2;
+
+/** Подпись позиции заказа, если товар удалён и снимка названия нет. */
+export const ORDER_LINE_ITEM_DELETED_PRODUCT_NAME = 'Товар удалён';

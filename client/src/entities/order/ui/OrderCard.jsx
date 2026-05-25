@@ -9,6 +9,10 @@ import {
   COMMON_UI,
   ORDER_CARD_UI,
 } from "../../../shared/config/appUiCopy.js";
+import {
+  isOrderLineItemProductClickable,
+  resolveOrderLineItemProductName,
+} from "../lib/resolveOrderLineItemProductName.js";
 import { formatIsoDateTime } from "../../../shared/lib/formatIsoDateTime.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 
@@ -52,11 +56,6 @@ function renderBuyerValue(buyer, onBuyerNameClick) {
   }
   return label;
 }
-
-const formatProductName = (productId) => {
-  if (productId == null || typeof productId === "string") return COMMON_UI.EM_DASH;
-  return productId.productName?.trim() || COMMON_UI.EM_DASH;
-};
 
 /**
  * @param {{
@@ -142,17 +141,17 @@ export function OrderCard({
             className="order-card__item"
             role="listitem"
           >
-            {item.productId != null && typeof item.productId === "object" ? (
+            {isOrderLineItemProductClickable(item) ? (
               <button
                 type="button"
                 className="order-card__item-name-button"
                 onClick={() => onProductClick?.(item.productId)}
               >
-                {formatProductName(item.productId)}
+                {resolveOrderLineItemProductName(item)}
               </button>
             ) : (
               <span className="order-card__item-name">
-                {formatProductName(item.productId)}
+                {resolveOrderLineItemProductName(item)}
               </span>
             )}
             <span className="order-card__item-quantity">×{item.quantity}</span>

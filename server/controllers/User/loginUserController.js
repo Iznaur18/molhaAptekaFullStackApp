@@ -20,6 +20,8 @@ import {
     backgroundValueAfterPremiumChange,
     normalizeUserBackgroundForSave,
 } from '../../utils/userBackgroundValue.js';
+import { getUnreadInAppNotificationsForUser } from '../../utils/userInAppNotifications.js';
+import { rejectPendingDataConfirmationForUser } from '../../utils/userDataConfirmationHelpers.js';
 
 /** Вход по email + пароль. POST /auth/login */
 export const loginUserController = async (req, res) => { // обработчик входа по email + пароль
@@ -76,7 +78,11 @@ export const userMeController = async (req, res) => {
             return errorRes(res, 404, 'Пользователь не найден');
         }
 
-        return successRes(res, { user: userIdServer });
+        const inAppNotifications = await getUnreadInAppNotificationsForUser(
+            userIdClient,
+        );
+
+        return successRes(res, { user: userIdServer, inAppNotifications });
         
     } catch (error) {
         console.error('userMe error:', error);
@@ -244,7 +250,7 @@ export const userUpdateProfileController = async (req, res) => {
         }
 
         const targetUserBeforeUpdate = await UserModel.findById(targetUserId)
-            .select('isPremiumUser userBackgroundUrl')
+            .select('isPremiumUser userBackgroundUrl isUserDataConfirmed')
             .lean();
 
         if (!targetUserBeforeUpdate) {
@@ -277,6 +283,29 @@ export const userUpdateProfileController = async (req, res) => {
                     res,
                     400,
                     e instanceof Error ? e.message : 'Некорректный фон профиля',
+                );
+            }
+        }
+
+        const wasDataConfirmed = Boolean(
+            targetUserBeforeUpdate.isUserDataConfirmed,
+        );
+        const nextDataConfirmed =
+            updateData.isUserDataConfirmed !== undefined
+                ? Boolean(updateData.isUserDataConfirmed)
+                : wasDataConfirmed;
+
+        if (wasDataConfirmed && !nextDataConfirmed) {
+            try {
+                await rejectPendingDataConfirmationForUser(
+                    targetUserId,
+                    undefined,
+                    isCurrentUserStaff ? currentUserId : null,
+                );
+            } catch (rejectError) {
+                console.error(
+                    'rejectPendingDataConfirmationForUser error:',
+                    rejectError,
                 );
             }
         }

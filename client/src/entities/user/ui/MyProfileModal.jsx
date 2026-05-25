@@ -2,7 +2,13 @@ import { useEffect, useState } from "react";
 
 import { UserDetailsModal } from "./UserDetailsModal.jsx";
 
-import { MY_PROFILE_MODAL_UI } from "../../../shared/config/appUiCopy.js";
+import {
+  DATA_CONFIRMATION_PAGE_UI,
+  IN_APP_NOTIFICATIONS_UI,
+  MY_PROFILE_MODAL_UI,
+  PRODUCT_REPORTS_PAGE_UI,
+} from "../../../shared/config/appUiCopy.js";
+import { markInAppNotificationsRead } from "../api/markInAppNotificationsRead.js";
 
 import "./MyProfileModal.css";
 
@@ -20,6 +26,13 @@ import "./MyProfileModal.css";
  * onMyOrdersClick?: () => void;
  * onAdminOrdersClick?: () => void;
  * onProductModerationClick?: () => void;
+ * onProductReportsClick?: () => void;
+ * onDataConfirmationQueueClick?: () => void;
+ * onDataConfirmationClick?: () => void;
+ * pendingProductReportsCount?: number;
+ * pendingDataConfirmationCount?: number;
+ * inAppNotifications?: import('../../product-report/model/types.js').UserInAppNotification[];
+ * onNotificationsRead?: () => void;
  * }} props
  */
 export function MyProfileModal({
@@ -35,6 +48,13 @@ export function MyProfileModal({
   onMyOrdersClick,
   onAdminOrdersClick,
   onProductModerationClick,
+  onProductReportsClick,
+  onDataConfirmationQueueClick,
+  onDataConfirmationClick,
+  pendingProductReportsCount = 0,
+  pendingDataConfirmationCount = 0,
+  inAppNotifications = [],
+  onNotificationsRead,
 }) {
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
 
@@ -42,10 +62,47 @@ export function MyProfileModal({
     if (!isOpen) setIsLogoutConfirmOpen(false);
   }, [isOpen]);
 
+  useEffect(() => {
+    if (!isOpen || inAppNotifications.length === 0) return undefined;
+    void (async () => {
+      try {
+        await markInAppNotificationsRead();
+        onNotificationsRead?.();
+      } catch {
+        // не блокируем профиль
+      }
+    })();
+    return undefined;
+  }, [isOpen, inAppNotifications.length, onNotificationsRead]);
+
   const showLogoutBlock = !isLoading;
   const isProfileReady = Boolean(user) && !isLoading && !errorMessage;
   const showEditProfile =
     isProfileReady && typeof onEditProfileClick === "function";
+  const canUseMyProducts = isProfileReady && Boolean(onMyProductsClick);
+  const canUseMySales = isProfileReady && Boolean(onMySalesClick);
+  const canUseMyOrders = isProfileReady && Boolean(onMyOrdersClick);
+  const canUseAdminOrders =
+    isProfileReady && Boolean(onAdminOrdersClick) && user?.userRole === "admin";
+  const canUseProductModeration =
+    isProfileReady && Boolean(onProductModerationClick);
+  const canUseProductReports =
+    isProfileReady && Boolean(onProductReportsClick);
+  const canUseDataConfirmationQueue =
+    isProfileReady && Boolean(onDataConfirmationQueueClick);
+  const canUseDataConfirmation =
+    isProfileReady &&
+    Boolean(onDataConfirmationClick) &&
+    user?.isUserDataConfirmed !== true;
+  const isProfileTabActive = !isLoading;
+  const reportsBadge =
+    pendingProductReportsCount > 0
+      ? PRODUCT_REPORTS_PAGE_UI.TAB_BADGE(pendingProductReportsCount)
+      : null;
+  const dataConfirmationBadge =
+    pendingDataConfirmationCount > 0
+      ? DATA_CONFIRMATION_PAGE_UI.TAB_BADGE(pendingDataConfirmationCount)
+      : null;
 
   const footer = showLogoutBlock ? (
     <div className="my-profile-modal__footer-row">
@@ -56,6 +113,15 @@ export function MyProfileModal({
           onClick={onEditProfileClick}
         >
           {MY_PROFILE_MODAL_UI.EDIT_PROFILE}
+        </button>
+      ) : null}
+      {canUseDataConfirmation ? (
+        <button
+          type="button"
+          className="my-profile-modal__edit-profile"
+          onClick={() => onDataConfirmationClick?.()}
+        >
+          {MY_PROFILE_MODAL_UI.DATA_CONFIRMATION}
         </button>
       ) : null}
       <div className="my-profile-modal__logout">
@@ -96,15 +162,6 @@ export function MyProfileModal({
       </div>
     </div>
   ) : null;
-
-  const canUseMyProducts = isProfileReady && Boolean(onMyProductsClick);
-  const canUseMySales = isProfileReady && Boolean(onMySalesClick);
-  const canUseMyOrders = isProfileReady && Boolean(onMyOrdersClick);
-  const canUseAdminOrders =
-    isProfileReady && Boolean(onAdminOrdersClick) && user?.userRole === "admin";
-  const canUseProductModeration =
-    isProfileReady && Boolean(onProductModerationClick);
-  const isProfileTabActive = !isLoading;
 
   const profileTitleClassName = [
     "my-profile-modal__header-action",
@@ -170,8 +227,53 @@ export function MyProfileModal({
           {MY_PROFILE_MODAL_UI.TAB_PRODUCT_MODERATION}
         </button>
       ) : null}
+      {canUseProductReports ? (
+        <button
+          type="button"
+          className="my-profile-modal__header-action my-profile-modal__header-action_badge"
+          onClick={() => onProductReportsClick?.()}
+        >
+          {MY_PROFILE_MODAL_UI.TAB_PRODUCT_REPORTS}
+          {reportsBadge ? (
+            <span className="my-profile-modal__badge" aria-hidden="true">
+              {reportsBadge}
+            </span>
+          ) : null}
+        </button>
+      ) : null}
+      {canUseDataConfirmationQueue ? (
+        <button
+          type="button"
+          className="my-profile-modal__header-action my-profile-modal__header-action_badge"
+          onClick={() => onDataConfirmationQueueClick?.()}
+        >
+          {MY_PROFILE_MODAL_UI.TAB_DATA_CONFIRMATION}
+          {dataConfirmationBadge ? (
+            <span className="my-profile-modal__badge" aria-hidden="true">
+              {dataConfirmationBadge}
+            </span>
+          ) : null}
+        </button>
+      ) : null}
     </div>
   );
+
+  const notificationsSlot =
+    inAppNotifications.length > 0 ? (
+      <div
+        className="my-profile-modal__notifications"
+        role="region"
+        aria-label={IN_APP_NOTIFICATIONS_UI.SECTION_ARIA}
+      >
+        <ul className="my-profile-modal__notifications-list" role="list">
+          {inAppNotifications.map((item) => (
+            <li key={item._id} role="listitem">
+              {item.message}
+            </li>
+          ))}
+        </ul>
+      </div>
+    ) : null;
 
   return (
     <UserDetailsModal
@@ -183,6 +285,7 @@ export function MyProfileModal({
       titleOverride=""
       titleSlot={titleSlot}
       titleAccessory={titleAccessory}
+      notificationsSlot={notificationsSlot}
       footer={footer}
       layoutVariant="register"
       showAdminRole={user?.userRole === "admin"}

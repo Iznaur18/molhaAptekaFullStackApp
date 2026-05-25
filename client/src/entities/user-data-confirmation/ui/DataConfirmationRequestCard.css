@@ -1,0 +1,86 @@
+.data-confirmation-card {
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.data-confirmation-card__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.data-confirmation-card__meta {
+  font-size: 0.8125rem;
+  color: #64748b;
+}
+
+.data-confirmation-card__link {
+  margin: 0 0 0.75rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #2563eb;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.data-confirmation-card__passport h4 {
+  margin: 0 0 0.5rem;
+  font-size: 0.875rem;
+}
+
+.data-confirmation-card__passport-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 0.5rem 1rem;
+  margin: 0;
+}
+
+.data-confirmation-card__passport-grid dt {
+  margin: 0;
+  font-size: 0.6875rem;
+  color: #64748b;
+}
+
+.data-confirmation-card__passport-grid dd {
+  margin: 0.15rem 0 0;
+  font-size: 0.875rem;
+}
+
+.data-confirmation-card__note {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.75rem;
+  font-size: 0.8125rem;
+}
+
+.data-confirmation-card__note textarea {
+  font: inherit;
+  padding: 0.5rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+}
+
+.data-confirmation-card__error {
+  margin: 0.5rem 0 0;
+  color: #b91c1c;
+  font-size: 0.8125rem;
+}
+
+.data-confirmation-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.data-confirmation-card__reject {
+  color: #b45309;
+}

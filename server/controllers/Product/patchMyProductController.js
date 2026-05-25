@@ -12,6 +12,10 @@ import {
 } from "../../utils/productOrderLocks.js";
 import { PRODUCT_SELLER_PUBLIC_SELECT } from "../../constants/productSellerPublicFields.js";
 import { attachProductSellerSnapshot } from "../../utils/attachProductSellerSnapshots.js";
+import { rejectAllPendingOffersForProduct } from "../../utils/productPriceOfferHelpers.js";
+import {
+    notifySellerAuctionToggledByAdmin,
+} from "../../utils/productAuction.js";
 import { errorRes, successRes } from "../../utils/index.js";
 
 const PENDING_EDIT_BLOCK_MESSAGE =
@@ -65,11 +69,24 @@ export const patchMyProductController = async (req, res) => {
         }
 
         if (!isAdmin) {
-            if (existing.productModerationStatus === PRODUCT_MODERATION_PENDING) {
+            const pendingAuctionOnly =
+                existing.productModerationStatus === PRODUCT_MODERATION_PENDING &&
+                Object.prototype.hasOwnProperty.call(
+                    body,
+                    "productAuctionEnabled",
+                ) &&
+                !touchesContent &&
+                !Object.prototype.hasOwnProperty.call(body, "productIsAvailable");
+
+            if (
+                existing.productModerationStatus === PRODUCT_MODERATION_PENDING &&
+                !pendingAuctionOnly
+            ) {
                 return errorRes(res, 409, PENDING_EDIT_BLOCK_MESSAGE);
             }
 
             const resubmitForModeration =
+                !pendingAuctionOnly &&
                 touchesContent &&
                 existing.productModerationStatus !== PRODUCT_MODERATION_PENDING;
 
@@ -93,6 +110,21 @@ export const patchMyProductController = async (req, res) => {
             $set.productIsAvailable = Boolean(body.productIsAvailable);
         }
 
+        let auctionEnabledChanged = false;
+        let nextAuctionEnabled = existing.productAuctionEnabled === true;
+
+        if (Object.prototype.hasOwnProperty.call(body, "productAuctionEnabled")) {
+            nextAuctionEnabled = Boolean(body.productAuctionEnabled);
+            auctionEnabledChanged =
+                nextAuctionEnabled !==
+                (existing.productAuctionEnabled === true);
+            $set.productAuctionEnabled = nextAuctionEnabled;
+
+            if (nextAuctionEnabled) {
+                $set.productAuctionCompletedOnce = false;
+            }
+        }
+
         if (Object.keys($set).length === 0) {
             return errorRes(res, 400, "Нет полей для обновления");
         }
@@ -111,6 +143,30 @@ export const patchMyProductController = async (req, res) => {
                 404,
                 "Товар не найден или нет прав на изменение",
             );
+        }
+
+        if (product.productIsAvailable === false) {
+            await rejectAllPendingOffersForProduct(productId, {
+                notifyBuyers: true,
+            });
+        }
+
+        if (auctionEnabledChanged && !nextAuctionEnabled) {
+            await rejectAllPendingOffersForProduct(productId, {
+                notifyBuyers: true,
+            });
+        }
+
+        if (auctionEnabledChanged && isAdmin) {
+            const sellerId = product.productSeller?._id ?? product.productSeller;
+            if (sellerId != null) {
+                await notifySellerAuctionToggledByAdmin({
+                    productId,
+                    sellerUserId: sellerId,
+                    actorUserId: userId,
+                    enabled: nextAuctionEnabled,
+                });
+            }
         }
 
         const productWithSeller = await attachProductSellerSnapshot(product);

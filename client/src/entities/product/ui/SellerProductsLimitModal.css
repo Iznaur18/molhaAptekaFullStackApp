@@ -1,0 +1,57 @@
+.seller-products-limit-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1350;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.seller-products-limit-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(17, 24, 39, 0.55);
+  cursor: pointer;
+}
+
+.seller-products-limit-modal__card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 22rem;
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  box-shadow: 0 20px 45px rgba(17, 24, 39, 0.28);
+}
+
+.seller-products-limit-modal__title {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.seller-products-limit-modal__body {
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+  color: #4b5563;
+  line-height: 1.45;
+}
+
+.seller-products-limit-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.seller-products-limit-modal__btn {
+  padding: 0.45rem 0.85rem;
+  border-radius: 0.4rem;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  color: #111827;
+  font: inherit;
+  cursor: pointer;
+}

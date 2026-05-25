@@ -7,7 +7,10 @@ import {
     ORDER_BUYER_PUBLIC_FIELDS,
     ORDER_ITEMS_POPULATE,
 } from './orderQueries.js';
-import { normalizeOrderItemsForRuntime } from './orderStatus.js';
+import {
+    buildOrderStatusFromItems,
+    normalizeOrderItemsForRuntime,
+} from './orderStatus.js';
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 20;
@@ -160,6 +163,7 @@ export const getMySalesController = async (req, res) => {
                     ...order,
                     items: sellerItems,
                     totalAmount: calculateTotalAmount(sellerItems),
+                    status: buildOrderStatusFromItems(sellerItems),
                 };
             })
             .filter(Boolean);

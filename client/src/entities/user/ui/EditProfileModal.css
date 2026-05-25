@@ -65,13 +65,12 @@
 .edit-profile-modal__body {
   display: flex;
   flex-direction: column;
-  flex: 1;
   min-height: 0;
 }
 
 .edit-profile-modal__scroll {
-  flex: 1;
-  min-height: 0;
+  flex: 0 1 auto;
+  max-height: calc(min(90vh, 720px) - 8.5rem);
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -118,7 +117,7 @@
   padding: 0.5rem 0.625rem;
   font: inherit;
   font-size: 0.9375rem;
-  resize: vertical;
+  resize: none;
 }
 
 .edit-profile-modal__background-block {

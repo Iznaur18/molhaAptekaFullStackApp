@@ -1,0 +1,110 @@
+.data-confirmation-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgb(15 23 42 / 0.45);
+}
+
+.data-confirmation-modal {
+  width: min(100%, 32rem);
+  max-height: min(90vh, 40rem);
+  overflow: auto;
+  padding: 1rem 1.25rem 1.25rem;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 12px 40px rgb(15 23 42 / 0.2);
+}
+
+.data-confirmation-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.data-confirmation-modal__header h2 {
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+.data-confirmation-modal__close {
+  border: none;
+  background: transparent;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.data-confirmation-modal__intro {
+  margin: 0 0 0.75rem;
+  font-size: 0.875rem;
+  color: #475569;
+}
+
+.data-confirmation-modal__status {
+  margin: 0 0 1rem;
+  font-weight: 600;
+}
+
+.data-confirmation-modal__status_ok {
+  color: #0d9488;
+}
+
+.data-confirmation-modal__status_reject {
+  color: #b45309;
+}
+
+.data-confirmation-modal__staff-note {
+  margin: 0 0 1rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  background: #fff7ed;
+  font-size: 0.875rem;
+}
+
+.data-confirmation-modal__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem 0.75rem;
+}
+
+.data-confirmation-modal__field_wide {
+  grid-column: 1 / -1;
+}
+
+.data-confirmation-modal__grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: #334155;
+}
+
+.data-confirmation-modal__grid input,
+.data-confirmation-modal__grid textarea {
+  font: inherit;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+}
+
+.data-confirmation-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.data-confirmation-modal__state,
+.data-confirmation-modal__state_error {
+  margin: 0.5rem 0;
+  font-size: 0.875rem;
+}
+
+.data-confirmation-modal__state_error {
+  color: #b91c1c;
+}

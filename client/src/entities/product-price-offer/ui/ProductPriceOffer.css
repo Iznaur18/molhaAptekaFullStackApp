@@ -1,0 +1,145 @@
+.product-price-offer {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.product-price-offer__heading {
+  margin: 0 0 0.5rem;
+  font-size: 0.9375rem;
+}
+
+.product-price-offer__top-list {
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.product-price-offer__top-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0;
+}
+
+.product-price-offer__top-rank {
+  width: 1.25rem;
+  font-size: 0.8125rem;
+  color: #64748b;
+}
+
+.product-price-offer__top-price {
+  margin-left: auto;
+  font-weight: 600;
+}
+
+.product-price-offer__buyer-link {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.product-price-offer__form {
+  margin-top: 0.75rem;
+}
+
+.product-price-offer__label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.8125rem;
+}
+
+.product-price-offer__label input {
+  font: inherit;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  max-width: 10rem;
+}
+
+.product-price-offer__actions,
+.product-price-offer__seller-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.product-price-offer__reject-btn {
+  color: #b45309;
+}
+
+.product-price-offer__status {
+  margin: 0.5rem 0 0;
+  font-weight: 600;
+  color: #0f766e;
+}
+
+.product-price-offer__hint,
+.product-price-offer__empty {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.product-price-offer__error {
+  margin: 0.5rem 0 0;
+  color: #b91c1c;
+  font-size: 0.875rem;
+}
+
+.product-price-offer__pay {
+  margin-top: 0.75rem;
+}
+
+.product-price-offer__seller-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.product-price-offer__seller-row {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.product-price-offer__seller-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.product-price-offer__seller-price {
+  font-weight: 700;
+}
+
+.product-price-offer__seller-meta {
+  margin: 0.25rem 0 0;
+  font-size: 0.8125rem;
+  color: #64748b;
+}
+
+.product-details-modal__tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.product-details-modal__tab {
+  padding: 0.35rem 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.product-details-modal__tab_active {
+  border-color: #2563eb;
+  background: #eff6ff;
+}

@@ -1,5 +1,11 @@
 import { Router } from 'express';
-import { registerUserController, loginUserController, authTelegramController, userMeController } from '../controllers/index.js';
+import {
+    registerUserController,
+    loginUserController,
+    authTelegramController,
+    userMeController,
+    markInAppNotificationsReadController,
+} from '../controllers/index.js';
 import { registerUserValidation, loginUserValidation, telegramAuthValidation } from '../validations/index.js';
 import { checkAuthMW, authRateLimiter } from '../middlewares/index.js';
 
@@ -7,6 +13,11 @@ const router = Router();
 
 // путь в index.js начинается с /auth
 router.get('/me', checkAuthMW, userMeController);
+router.patch(
+    '/me/in-app-notifications/read',
+    checkAuthMW,
+    markInAppNotificationsReadController,
+);
 
 // Rate limiting для авторизации (защита от брутфорса)
 router.post('/register', authRateLimiter, registerUserValidation, registerUserController);

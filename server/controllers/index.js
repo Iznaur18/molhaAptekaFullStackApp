@@ -26,6 +26,32 @@ import {
     approveProductModerationController,
     rejectProductModerationController,
 } from './Product/productModerationControllers.js';
+import {
+    submitProductReportController,
+    getMyProductReportStatusController,
+    getPendingProductReportsController,
+    getPendingProductReportsCountController,
+    resolveProductReportsForProductController,
+} from './Product/productReportControllers.js';
+import {
+    submitProductPriceOfferController,
+    patchMyProductPriceOfferController,
+    cancelMyProductPriceOfferController,
+    getMyProductPriceOfferController,
+    getTopProductPriceOffersController,
+    getSellerProductPriceOffersController,
+    acceptProductPriceOfferController,
+    rejectProductPriceOfferController,
+    getSellerProductPriceOfferArchiveController,
+} from './Product/productPriceOfferControllers.js';
+import { markInAppNotificationsReadController } from './User/markInAppNotificationsReadController.js';
+import {
+    submitDataConfirmationRequestController,
+    getMyDataConfirmationRequestController,
+    getPendingDataConfirmationRequestsController,
+    getPendingDataConfirmationRequestsCountController,
+    resolveDataConfirmationRequestController,
+} from './User/userDataConfirmationControllers.js';
 import { getMyCartController } from './Cart/getMyCartController.js';
 import { replaceMyCartController } from './Cart/replaceMyCartController.js';
 
@@ -61,6 +87,26 @@ export {
     getPendingModerationProductsController,
     approveProductModerationController,
     rejectProductModerationController,
+    submitProductReportController,
+    getMyProductReportStatusController,
+    getPendingProductReportsController,
+    getPendingProductReportsCountController,
+    resolveProductReportsForProductController,
+    submitProductPriceOfferController,
+    patchMyProductPriceOfferController,
+    cancelMyProductPriceOfferController,
+    getMyProductPriceOfferController,
+    getTopProductPriceOffersController,
+    getSellerProductPriceOffersController,
+    acceptProductPriceOfferController,
+    rejectProductPriceOfferController,
+    getSellerProductPriceOfferArchiveController,
+    markInAppNotificationsReadController,
+    submitDataConfirmationRequestController,
+    getMyDataConfirmationRequestController,
+    getPendingDataConfirmationRequestsController,
+    getPendingDataConfirmationRequestsCountController,
+    resolveDataConfirmationRequestController,
     getMyCartController,
     replaceMyCartController,
 };

@@ -1,0 +1,124 @@
+.report-product-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.report-product-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(17, 24, 39, 0.55);
+  cursor: pointer;
+}
+
+.report-product-modal__card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 28rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  padding: 1rem;
+  box-shadow: 0 20px 45px rgba(17, 24, 39, 0.28);
+}
+
+.report-product-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.report-product-modal__title {
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+.report-product-modal__close {
+  border: 0;
+  background: transparent;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #6b7280;
+}
+
+.report-product-modal__product-name {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  color: #4b5563;
+}
+
+.report-product-modal__already {
+  margin: 0.5rem 0 0;
+  color: #6b7280;
+}
+
+.report-product-modal__label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+}
+
+.report-product-modal__textarea {
+  resize: none;
+  min-height: 5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.625rem;
+  font: inherit;
+}
+
+.report-product-modal__meter {
+  font-size: 0.78rem;
+  color: #6b7280;
+}
+
+.report-product-modal__meter_overflow {
+  color: #b42318;
+  font-weight: 600;
+}
+
+.report-product-modal__error {
+  margin: 0.5rem 0 0;
+  color: #b42318;
+  font-size: 0.875rem;
+}
+
+.report-product-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.report-product-modal__cancel,
+.report-product-modal__submit {
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.85rem;
+  font-size: 0.9375rem;
+  cursor: pointer;
+}
+
+.report-product-modal__cancel {
+  border: 1px solid #d1d5db;
+  background: #fff;
+}
+
+.report-product-modal__submit {
+  border: 1px solid #1f6feb;
+  background: #1f6feb;
+  color: #fff;
+}
+
+.report-product-modal__submit:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

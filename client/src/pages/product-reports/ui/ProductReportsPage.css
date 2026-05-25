@@ -1,0 +1,17 @@
+.product-reports-page__list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.product-reports-page__state {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.product-reports-page__state_error {
+  color: #b42318;
+}

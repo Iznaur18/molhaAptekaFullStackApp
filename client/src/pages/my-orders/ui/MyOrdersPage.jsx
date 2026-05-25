@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
+import { useRefetchOnVisible } from "../../../shared/lib/useRefetchOnVisible.js";
+
 import { fetchMyOrders } from "../../../entities/order/api/fetchMyOrders.js";
 import { confirmOrderItem } from "../../../entities/order/api/updateOrderItemStatus.js";
 import { ORDER_STATUS_CONFIRMED } from "../../../entities/order/model/constants.js";
@@ -27,11 +29,31 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick }) {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [pendingActionKey, setPendingActionKey] = useState(null);
   const [itemActionErrors, setItemActionErrors] = useState({});
+  const [loyaltyFlash, setLoyaltyFlash] = useState("");
 
-  const reloadOrders = async () => {
-    const list = await fetchMyOrders();
-    setOrders(list);
-  };
+  const reloadOrders = useCallback(async () => {
+    try {
+      const list = await fetchMyOrders();
+      setOrders(list);
+      setPhase("success");
+      setError("");
+    } catch (e) {
+      setError(
+        e instanceof Error
+          ? e.message
+          : API_CLIENT_UI.FETCH_MY_ORDERS_FALLBACK,
+      );
+      setPhase("error");
+    }
+  }, []);
+
+  useRefetchOnVisible(reloadOrders, phase === "success");
+
+  useEffect(() => {
+    if (!loyaltyFlash) return undefined;
+    const timerId = window.setTimeout(() => setLoyaltyFlash(""), 4000);
+    return () => window.clearTimeout(timerId);
+  }, [loyaltyFlash]);
 
   useEffect(() => {
     let isCancelled = false;
@@ -77,7 +99,13 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick }) {
     );
 
     try {
-      const updatedOrder = await confirmOrderItem(orderId, itemIndex);
+      const { order: updatedOrder, pointsEarned } = await confirmOrderItem(
+        orderId,
+        itemIndex,
+      );
+      if (pointsEarned > 0) {
+        setLoyaltyFlash(MY_ORDERS_PAGE_UI.LOYALTY_POINTS_EARNED(pointsEarned));
+      }
       setOrders((prev) =>
         prev.map((order) => (order._id === orderId ? updatedOrder : order)),
       );
@@ -119,6 +147,11 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick }) {
 
   return (
     <>
+      {loyaltyFlash ? (
+        <p className="my-orders-page__loyalty-flash" role="status">
+          {loyaltyFlash}
+        </p>
+      ) : null}
       <ul className="my-orders-page__list" role="list">
         {orders.map((order) => (
           <li

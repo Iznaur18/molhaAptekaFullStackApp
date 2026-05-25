@@ -36,6 +36,9 @@
  * @property {ProductSellerPopulated|string} productSeller
  * @property {ProductCategory} productCategory
  * @property {boolean} productIsAvailable
+ * @property {boolean} [productAuctionEnabled]
+ * @property {boolean} [productAuctionCompletedOnce]
+ * @property {boolean} [auctionActive] — enabled && approved && available
  * @property {'pending'|'approved'|'rejected'} [productModerationStatus]
  * @property {string} [productModerationComment]
  * @property {boolean} [hasOpenSales] — незавершённые продажи (`GET /product/my`, для admin — `GET /product`)

@@ -1,11 +1,14 @@
-import { OrderModel } from '../../models/index.js';
 import {
     ORDER_STATUS_CONFIRMED,
     ORDER_STATUS_DELIVERED,
     ORDER_STATUS_PENDING,
     ORDER_STATUS_SHIPPED,
 } from '../../constants/orderConstants.js';
+import { OrderModel, UserModel } from '../../models/index.js';
 import { errorRes, successRes } from '../../utils/index.js';
+import { prepareLoyaltyPointsForConfirmedOrderItem } from '../../utils/loyaltyPoints.js';
+import { finalizeOffersAfterOrderConfirmed } from '../../utils/productPriceOfferHelpers.js';
+import { closeProductAuction } from '../../utils/productAuction.js';
 
 import {
     ORDER_BUYER_PUBLIC_FIELDS,
@@ -144,11 +147,58 @@ export const confirmOrderItemByBuyerController = async (req, res) => {
         targetItem.confirmedAt = new Date();
         targetItem.confirmedBy = req.userId;
 
+        const buyer = await UserModel.findById(buyerId)
+            .select('isPremiumUser')
+            .lean();
+        const pointsEarned = prepareLoyaltyPointsForConfirmedOrderItem({
+            order,
+            itemIndex,
+            isPremiumUser: Boolean(buyer?.isPremiumUser),
+        });
+
         order.status = buildOrderStatusFromItems(order.items);
         await order.save();
+
+        if (targetItem.productId) {
+            const productId =
+                typeof targetItem.productId === 'object'
+                    ? targetItem.productId._id
+                    : targetItem.productId;
+            try {
+                if (order.priceOfferId) {
+                    await finalizeOffersAfterOrderConfirmed(
+                        productId,
+                        order.priceOfferId,
+                    );
+                } else {
+                    const productDoc =
+                        typeof targetItem.productId === 'object'
+                            ? targetItem.productId
+                            : null;
+                    if (productDoc?.productAuctionEnabled === true) {
+                        await closeProductAuction(productId, {
+                            markCompletedOnce: true,
+                        });
+                    }
+                }
+            } catch (finalizeError) {
+                console.error(
+                    'finalizeOffersAfterOrderConfirmed error:',
+                    finalizeError,
+                );
+            }
+        }
+
+        if (pointsEarned > 0) {
+            await UserModel.updateOne(
+                { _id: buyerId },
+                { $inc: { userLoyaltyPoints: pointsEarned } },
+            );
+        }
+
         await populateOrderForResponse(order);
 
-        return successRes(res, { order });
+        return successRes(res, { order, pointsEarned });
     } catch (error) {
         console.error('confirmOrderItemByBuyerController error:', error);
         return errorRes(res, 500, 'Ошибка при подтверждении позиции');

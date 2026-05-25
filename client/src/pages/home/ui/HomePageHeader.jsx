@@ -5,14 +5,19 @@ import {
   CATALOG_SORT_LABEL_RU,
   CATALOG_SORT_OPTIONS,
   CATALOG_SORT_OPTIONS_MY_PRODUCTS,
+  MY_PRODUCTS_MODERATION_FILTER_OPTIONS,
+  MY_PRODUCTS_MODERATION_FILTER_LABEL_RU,
   PRODUCT_CATEGORIES,
   PRODUCT_CATEGORY_LABEL_RU,
 } from "../../../entities/product/model/productConstants.js";
 import { HeaderCartButton } from "../../../widgets/header-cart-button/ui/HeaderCartButton.jsx";
 import {
+  DATA_CONFIRMATION_PAGE_UI,
   HOME_PAGE_UI,
+  PRODUCT_REPORTS_PAGE_UI,
   PRODUCT_SEARCH_INPUT_UI,
 } from "../../../shared/config/appUiCopy.js";
+import { isCatalogShellMainView } from "../../../shared/lib/homeMainViewPaths.js";
 import { SearchInput } from "../../../shared/ui/SearchInput/SearchInput.jsx";
 
 const PRODUCT_CATEGORY_FILTER_LIST_ID =
@@ -25,6 +30,8 @@ const NON_CATALOG_VIEW_TITLES = {
   "my-orders": HOME_PAGE_UI.TITLE_MY_ORDERS,
   "admin-orders": HOME_PAGE_UI.TITLE_ADMIN_ORDERS,
   "product-moderation": HOME_PAGE_UI.TITLE_PRODUCT_MODERATION,
+  "product-reports": HOME_PAGE_UI.TITLE_PRODUCT_REPORTS,
+  "data-confirmation-requests": HOME_PAGE_UI.TITLE_DATA_CONFIRMATION,
 };
 
 /**
@@ -53,8 +60,10 @@ const NON_CATALOG_VIEW_TITLES = {
  *   onShowHiddenCatalogProductsChange: (next: boolean) => void;
  *   myProductsTotal: number | null;
  *   sellerProductsLimit: number | null;
- *   isPlaceProductDisabled: boolean;
- *   placeProductDisabledTitle: string;
+ *   pendingProductReportsCount?: number;
+ *   pendingDataConfirmationCount?: number;
+ *   myProductsModerationFilter?: string;
+ *   onMyProductsModerationFilterChange?: (value: string) => void;
  * }} props
  */
 export function HomePageHeader({
@@ -82,8 +91,10 @@ export function HomePageHeader({
   onShowHiddenCatalogProductsChange,
   myProductsTotal,
   sellerProductsLimit,
-  isPlaceProductDisabled,
-  placeProductDisabledTitle,
+  pendingProductReportsCount = 0,
+  pendingDataConfirmationCount = 0,
+  myProductsModerationFilter = "",
+  onMyProductsModerationFilterChange,
 }) {
   /** @type {import('react').RefObject<HTMLDivElement | null>} */
   const productCategoryFilterRef = useRef(null);
@@ -115,7 +126,24 @@ export function HomePageHeader({
     };
   }, [isProductCategoryListOpen]);
 
-  const isCatalogView = mainView === "catalog";
+  const isCatalogView = isCatalogShellMainView(mainView);
+
+  const nonCatalogTitle = (() => {
+    const base = NON_CATALOG_VIEW_TITLES[mainView] ?? "";
+    if (
+      mainView === "product-reports" &&
+      pendingProductReportsCount > 0
+    ) {
+      return `${base} (${PRODUCT_REPORTS_PAGE_UI.TAB_BADGE(pendingProductReportsCount)})`;
+    }
+    if (
+      mainView === "data-confirmation-requests" &&
+      pendingDataConfirmationCount > 0
+    ) {
+      return `${base} (${DATA_CONFIRMATION_PAGE_UI.TAB_BADGE(pendingDataConfirmationCount)})`;
+    }
+    return base;
+  })();
 
   return (
     <header className="home-page__header">
@@ -130,7 +158,7 @@ export function HomePageHeader({
               {HOME_PAGE_UI.NAV_TO_CATALOG}
             </button>
             <h1 className="home-page__title home-page__title_inline">
-              {NON_CATALOG_VIEW_TITLES[mainView]}
+              {nonCatalogTitle}
             </h1>
           </div>
         ) : (
@@ -158,8 +186,10 @@ export function HomePageHeader({
             }
             myProductsTotal={myProductsTotal}
             sellerProductsLimit={sellerProductsLimit}
-            isPlaceProductDisabled={isPlaceProductDisabled}
-            placeProductDisabledTitle={placeProductDisabledTitle}
+            myProductsModerationFilter={myProductsModerationFilter}
+            onMyProductsModerationFilterChange={
+              onMyProductsModerationFilterChange
+            }
           />
         )}
       </div>
@@ -168,12 +198,6 @@ export function HomePageHeader({
         <button
           type="button"
           className="home-page__list-product-button"
-          disabled={isAuthorized && isPlaceProductDisabled}
-          title={
-            isAuthorized && isPlaceProductDisabled
-              ? placeProductDisabledTitle
-              : undefined
-          }
           onClick={() =>
             isAuthorized ? onPlaceProductClick() : onLoginClick()
           }
@@ -233,8 +257,8 @@ function CatalogTitleAndFilters({
   onShowHiddenCatalogProductsChange,
   myProductsTotal,
   sellerProductsLimit,
-  isPlaceProductDisabled,
-  placeProductDisabledTitle,
+  myProductsModerationFilter = "",
+  onMyProductsModerationFilterChange,
 }) {
   const showAdminHiddenToggle = isAdmin && !isMineMode;
   const showProductsQuota =
@@ -354,6 +378,26 @@ function CatalogTitleAndFilters({
           </select>
           </label>
         </div>
+        {isMineMode && typeof onMyProductsModerationFilterChange === "function" ? (
+          <div className="home-page__sort">
+            <label className="home-page__sort-label">
+              <span>{HOME_PAGE_UI.MODERATION_STATUS_FILTER_LABEL}</span>
+              <select
+                className="home-page__sort-control"
+                value={myProductsModerationFilter}
+                onChange={(event) =>
+                  onMyProductsModerationFilterChange(event.target.value)
+                }
+              >
+                {MY_PRODUCTS_MODERATION_FILTER_OPTIONS.map((filterKey) => (
+                  <option key={filterKey || "all"} value={filterKey}>
+                    {MY_PRODUCTS_MODERATION_FILTER_LABEL_RU[filterKey]}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+        ) : null}
         {showAdminHiddenToggle ? (
           <label className="home-page__hidden-toggle">
             <input
@@ -385,8 +429,6 @@ function CatalogTitleAndFilters({
           <button
             type="button"
             className="home-page__create-product-button"
-            disabled={isPlaceProductDisabled}
-            title={isPlaceProductDisabled ? placeProductDisabledTitle : undefined}
             onClick={onPlaceProductClick}
           >
             {HOME_PAGE_UI.LIST_PRODUCT_BUTTON}

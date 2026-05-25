@@ -30,10 +30,12 @@ function isAbsoluteHttpUrl(value) {
  * @param {import('react').ReactNode} [props.titleSlot]
  * @param {import('react').ReactNode} [props.titleAccessory]
  * @param {import('react').ReactNode} [props.footer]
+ * @param {import('react').ReactNode} [props.notificationsSlot]
  * @param {'default'|'register'} [props.layoutVariant]
  * @param {boolean} [props.showAdminRole]
  * @param {string | null} [props.currentUserId]
  * @param {boolean} [props.isAuthorized]
+ * @param {boolean} [props.viewerCanSeeOtherUserPurchases]
  * @param {(product: import('../../product/model/types.js').ProductFromApi) => void} [props.onPurchaseProductClick]
  */
 export function UserDetailsModal({
@@ -46,10 +48,12 @@ export function UserDetailsModal({
   titleSlot = null,
   titleAccessory = null,
   footer = null,
+  notificationsSlot = null,
   layoutVariant = "default",
   showAdminRole = false,
   currentUserId = null,
   isAuthorized = false,
+  viewerCanSeeOtherUserPurchases = false,
   onPurchaseProductClick,
 }) {
   const photoUrl = user ? pickUserProfilePhotoUrl(user) : null;
@@ -82,6 +86,7 @@ export function UserDetailsModal({
   if (!isOpen) return null;
 
   const isPremiumUser = Boolean(user?.isPremiumUser);
+  const isUserDataConfirmed = Boolean(user?.isUserDataConfirmed);
 
   const titleText = titleOverride
     ? titleOverride
@@ -101,6 +106,8 @@ export function UserDetailsModal({
     currentUserId != null &&
     String(user._id) !== String(currentUserId) &&
     layoutVariant !== "register";
+  const showOtherUserPurchases =
+    showOtherUserProfileLists && viewerCanSeeOtherUserPurchases;
 
   const canShowBackground =
     Boolean(profileBackground) &&
@@ -157,6 +164,7 @@ export function UserDetailsModal({
                     <UserPremiumDisplayName
                       name={String(user?.userName ?? "").trim()}
                       isPremium={isPremiumUser}
+                      isUserDataConfirmed={isUserDataConfirmed}
                     />
                   </>
                 )}
@@ -231,16 +239,19 @@ export function UserDetailsModal({
                 ) : null}
                 {showOtherUserProfileLists ? (
                   <>
-                    <UserProfilePurchasesList
-                      targetUserId={String(user._id)}
-                      onProductClick={onPurchaseProductClick}
-                    />
+                    {showOtherUserPurchases ? (
+                      <UserProfilePurchasesList
+                        targetUserId={String(user._id)}
+                        onProductClick={onPurchaseProductClick}
+                      />
+                    ) : null}
                     <UserProfileProductsList
                       targetUserId={String(user._id)}
                       onProductClick={onPurchaseProductClick}
                     />
                   </>
                 ) : null}
+                {notificationsSlot}
                 <dl className="user-details-modal__list">
                   {rows.map((row) => (
                     <div key={row.id} className="user-details-modal__row">

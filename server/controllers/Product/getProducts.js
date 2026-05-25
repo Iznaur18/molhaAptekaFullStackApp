@@ -1,4 +1,7 @@
-import { PRODUCT_MODERATION_APPROVED } from '../../constants/productModerationConstants.js';
+import {
+    MY_PRODUCTS_MODERATION_FILTER_VALUES,
+    PRODUCT_MODERATION_APPROVED,
+} from '../../constants/productModerationConstants.js';
 import {
     PRODUCT_SORT_CONFIRMED,
     PRODUCT_SORT_PREMIUM,
@@ -121,14 +124,25 @@ export const getProductsController = async (req, res) => {
     }
 };
 
+const moderationStatusFromQuery = (query) => {
+    const raw = query?.moderationStatus;
+    if (raw == null || String(raw).trim() === '') {
+        return null;
+    }
+    const value = String(raw).trim();
+    return MY_PRODUCTS_MODERATION_FILTER_VALUES.includes(value) ? value : null;
+};
+
 export const getMyProductsController = async (req, res) => {
     try {
         const { page, limit, skip } = parsePagination(req.query);
         const category = categoryFromQuery(req.query);
         const sort = parseProductSortFromQuery(req.query);
+        const moderationStatus = moderationStatusFromQuery(req.query);
         const productsQuery = buildProductsQuery(req.query.search, {
             productSeller: req.userId,
             ...(category ? { productCategory: category } : {}),
+            ...(moderationStatus ? { productModerationStatus: moderationStatus } : {}),
         });
 
         const [products, total] = await Promise.all([

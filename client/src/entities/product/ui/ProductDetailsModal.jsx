@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { AddToCartButton } from "../../../features/cart-add/ui/AddToCartButton.jsx";
@@ -21,8 +21,17 @@ import {
 } from "../model/productConstants.js";
 import { ProductImageLightbox } from "./ProductImageLightbox.jsx";
 import { ProductDetailsSellerPreview } from "./ProductDetailsSellerPreview.jsx";
+import { fetchCurrentUserProfile } from "../../user/api/fetchCurrentUserProfile.js";
+import { isCurrentUserProductSeller } from "../lib/isCurrentUserProductSeller.js";
+import { fetchTopPriceOffers } from "../../product-price-offer/api/fetchTopPriceOffers.js";
+import { ProductPriceOfferBuyerBlock } from "../../product-price-offer/ui/ProductPriceOfferBuyerBlock.jsx";
+import { ProductPriceOfferSellerTab } from "../../product-price-offer/ui/ProductPriceOfferSellerTab.jsx";
+import { ProductPriceOfferSellerArchive } from "../../product-price-offer/ui/ProductPriceOfferSellerArchive.jsx";
+import { resolveAuctionUiState } from "../lib/resolveAuctionUiState.js";
+import { PRODUCT_PRICE_OFFER_UI } from "../../../shared/config/appUiCopy.js";
 
 import "./ProductDetailsModal.css";
+import "../../product-price-offer/ui/ProductPriceOffer.css";
 
 const PRODUCT_DETAILS_STAT_FIELD_KEYS = new Set([
   "productCategory",
@@ -148,6 +157,8 @@ function renderFieldRows(product, keys, handlers) {
  *   showStaffDetails?: boolean;
  *   showAddToCart?: boolean;
  *   onRequestLogin?: () => void;
+ *   secondaryFooter?: import('react').ReactNode;
+ *   currentUserId?: string | null;
  * }} props
  */
 export function ProductDetailsModal({
@@ -158,9 +169,11 @@ export function ProductDetailsModal({
   isAuthorized = false,
   onProductStatsUpdate,
   adminFooter = null,
+  secondaryFooter = null,
   showStaffDetails = false,
   showAddToCart = false,
   onRequestLogin = () => {},
+  currentUserId = null,
 }) {
   const imageUrls = useMemo(
     () => (product ? resolveProductImageUrls(product) : []),
@@ -168,11 +181,71 @@ export function ProductDetailsModal({
   );
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [detailsTab, setDetailsTab] = useState(
+    /** @type {'details' | 'auction'} */ ("details"),
+  );
+  const [topOffers, setTopOffers] = useState(
+    /** @type {import('../../product-price-offer/model/types.js').PriceOfferTopEntry[]} */ ([]),
+  );
+  const [isUserDataConfirmed, setIsUserDataConfirmed] = useState(false);
+
+  const isOwnProduct =
+    product != null && isCurrentUserProductSeller(product, currentUserId);
+  const isSellerView = isOwnProduct;
+
+  const auctionUi = useMemo(
+    () => resolveAuctionUiState(product),
+    [product],
+  );
+
+  const reloadTopOffers = useCallback(async () => {
+    if (!product?._id || !auctionUi.auctionActive) {
+      setTopOffers([]);
+      return;
+    }
+    try {
+      const top = await fetchTopPriceOffers(String(product._id));
+      setTopOffers(top);
+    } catch {
+      setTopOffers([]);
+    }
+  }, [product?._id, auctionUi.auctionActive]);
 
   useEffect(() => {
     setActiveImageIndex(0);
     setLightboxOpen(false);
+    setDetailsTab("details");
   }, [product?._id]);
+
+  useEffect(() => {
+    if (!isOpen || !product?._id || !auctionUi.auctionActive) {
+      setTopOffers([]);
+      return undefined;
+    }
+    void reloadTopOffers();
+    return undefined;
+  }, [isOpen, product?._id, auctionUi.auctionActive, reloadTopOffers]);
+
+  useEffect(() => {
+    if (!isOpen || !isAuthorized) {
+      setIsUserDataConfirmed(false);
+      return undefined;
+    }
+    let isCancelled = false;
+    void (async () => {
+      try {
+        const { user } = await fetchCurrentUserProfile();
+        if (!isCancelled) {
+          setIsUserDataConfirmed(user?.isUserDataConfirmed === true);
+        }
+      } catch {
+        if (!isCancelled) setIsUserDataConfirmed(false);
+      }
+    })();
+    return () => {
+      isCancelled = true;
+    };
+  }, [isOpen, isAuthorized]);
 
   useEffect(() => {
     if (!isOpen || !product?._id || !isAuthorized) return undefined;
@@ -304,6 +377,47 @@ export function ProductDetailsModal({
           </header>
 
           <div className="product-details-modal__body">
+            {isSellerView && auctionUi.showSellerAuctionTab ? (
+              <div className="product-details-modal__tabs" role="tablist">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={detailsTab === "details"}
+                  className={
+                    detailsTab === "details"
+                      ? "product-details-modal__tab product-details-modal__tab_active"
+                      : "product-details-modal__tab"
+                  }
+                  onClick={() => setDetailsTab("details")}
+                >
+                  {PRODUCT_PRICE_OFFER_UI.TAB_DETAILS}
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={detailsTab === "auction"}
+                  className={
+                    detailsTab === "auction"
+                      ? "product-details-modal__tab product-details-modal__tab_active"
+                      : "product-details-modal__tab"
+                  }
+                  onClick={() => setDetailsTab("auction")}
+                >
+                  {PRODUCT_PRICE_OFFER_UI.TAB_AUCTION}
+                </button>
+              </div>
+            ) : null}
+
+            {detailsTab === "auction" &&
+            isSellerView &&
+            auctionUi.showSellerAuctionTab ? (
+              <ProductPriceOfferSellerTab
+                productId={String(product._id)}
+                onOpenBuyer={handleOpenSellerProfile}
+                onChanged={() => void reloadTopOffers()}
+              />
+            ) : (
+              <>
             <div className="product-details-modal__row-top">
               <div className="product-details-modal__image-aside">
                 <div
@@ -470,7 +584,42 @@ export function ProductDetailsModal({
                 ) : null}
               </section>
             )}
+
+            {isSellerView && auctionUi.showSellerArchive ? (
+              <ProductPriceOfferSellerArchive
+                productId={String(product._id)}
+                onOpenBuyer={handleOpenSellerProfile}
+              />
+            ) : null}
+
+            {product._id && !isSellerView ? (
+              auctionUi.auctionActive ? (
+                <ProductPriceOfferBuyerBlock
+                  productId={String(product._id)}
+                  isAuthorized={isAuthorized}
+                  isUserDataConfirmed={isUserDataConfirmed}
+                  isOwnProduct={isOwnProduct}
+                  top={topOffers}
+                  onOpenBuyer={handleOpenSellerProfile}
+                  onRequestLogin={onRequestLogin}
+                  onOffersChanged={() => void reloadTopOffers()}
+                />
+              ) : auctionUi.buyerMessage ? (
+                <p className="product-price-offer__hint">
+                  {auctionUi.buyerMessage === "ended"
+                    ? PRODUCT_PRICE_OFFER_UI.AUCTION_ENDED
+                    : PRODUCT_PRICE_OFFER_UI.AUCTION_NOT_HELD}
+                </p>
+              ) : null
+            ) : null}
+              </>
+            )}
           </div>
+          {secondaryFooter ? (
+            <footer className="product-details-modal__footer">
+              {secondaryFooter}
+            </footer>
+          ) : null}
           {adminFooter ? (
             <footer className="product-details-modal__footer">{adminFooter}</footer>
           ) : null}

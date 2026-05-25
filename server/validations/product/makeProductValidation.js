@@ -90,5 +90,9 @@ export const makeProductValidation = [
     .withMessage("Доступность продукта обязательна")
     .isBoolean()
     .withMessage("Доступность продукта должна быть булевым значением"),
+  body("productAuctionEnabled")
+    .optional()
+    .isBoolean()
+    .withMessage("productAuctionEnabled должно быть true или false"),
   handleValidationByExpressErrors,
 ];

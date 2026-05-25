@@ -47,6 +47,57 @@ export const API_CLIENT_UI = {
   FETCH_MODERATION_QUEUE_FALLBACK: "Не удалось загрузить очередь модерации",
   APPROVE_PRODUCT_MODERATION_FALLBACK: "Не удалось одобрить товар",
   REJECT_PRODUCT_MODERATION_FALLBACK: "Не удалось отклонить товар",
+  SUBMIT_PRODUCT_REPORT_FALLBACK: "Не удалось отправить жалобу",
+  FETCH_PRODUCT_REPORT_STATUS_FALLBACK: "Не удалось проверить жалобу",
+  FETCH_PRODUCT_REPORTS_FALLBACK: "Не удалось загрузить жалобы",
+  FETCH_PRODUCT_REPORTS_COUNT_FALLBACK: "Не удалось загрузить счётчик жалоб",
+  RESOLVE_PRODUCT_REPORTS_FALLBACK: "Не удалось обработать жалобы",
+  MARK_NOTIFICATIONS_READ_FALLBACK: "Не удалось обновить уведомления",
+  SUBMIT_DATA_CONFIRMATION_FALLBACK: "Не удалось отправить заявку",
+  FETCH_DATA_CONFIRMATION_STATUS_FALLBACK:
+    "Не удалось загрузить статус заявки",
+  FETCH_DATA_CONFIRMATION_QUEUE_FALLBACK: "Не удалось загрузить заявки",
+  FETCH_DATA_CONFIRMATION_COUNT_FALLBACK:
+    "Не удалось загрузить счётчик заявок",
+  RESOLVE_DATA_CONFIRMATION_FALLBACK: "Не удалось рассмотреть заявку",
+  SUBMIT_PRICE_OFFER_FALLBACK: "Не удалось отправить предложение цены",
+  FETCH_PRICE_OFFER_FALLBACK: "Не удалось загрузить предложение цены",
+  FETCH_PRICE_OFFERS_TOP_FALLBACK: "Не удалось загрузить ставки",
+  FETCH_SELLER_PRICE_OFFERS_FALLBACK: "Не удалось загрузить аукцион",
+  ACCEPT_PRICE_OFFER_FALLBACK: "Не удалось принять предложение",
+  REJECT_PRICE_OFFER_FALLBACK: "Не удалось отклонить предложение",
+};
+
+/** Предложения цены (аукцион) */
+export const PRODUCT_PRICE_OFFER_UI = {
+  SECTION_TOP_TITLE: "Топ ставок",
+  SECTION_FORM_TITLE: "Ваша цена",
+  TAB_DETAILS: "О товаре",
+  TAB_AUCTION: "Аукцион",
+  LABEL_PRICE: "Ваша цена, ₽",
+  SUBMIT: "Предложить цену",
+  UPDATE: "Изменить цену",
+  CANCEL: "Отменить предложение",
+  SUBMIT_LOADING: "Отправка…",
+  STATUS_PENDING: "Ожидает решения продавца",
+  STATUS_ACCEPTED: "Принято — оформите оплату",
+  STATUS_REJECTED: "Отклонено",
+  PAY_BUTTON: "Оплатить по принятой цене",
+  PAY_ORDER_PLACED: "Заказ по принятой цене оформлен",
+  PAY_MODAL_TITLE: "Оплата по ставке",
+  CONFIRMED_DATA_REQUIRED:
+    "Доступно только пользователям с подтверждёнными данными",
+  EMPTY_TOP: "Ставок пока нет",
+  SELLER_EMPTY: "Предложений пока нет",
+  SELLER_LOADING: "Загрузка…",
+  AUCTION_NOT_HELD: "Аукцион не проводится",
+  AUCTION_ENDED: "Аукцион завершён",
+  ARCHIVE_SECTION_TITLE: "История ставок",
+  ARCHIVE_EMPTY: "Архив пуст",
+  ACTION_ACCEPT: "Принять",
+  ACTION_REJECT: "Отклонить",
+  ACTION_PENDING: "Сохраняем…",
+  ACCEPTED_BADGE: "Ожидает оплаты",
 };
 
 /** Поиск пользователей (`GET /user/search`) */
@@ -96,6 +147,8 @@ export const HOME_PAGE_UI = {
   TITLE_MY_SALES: "Мои продажи",
   TITLE_ADMIN_ORDERS: "Все заказы",
   TITLE_PRODUCT_MODERATION: "На модерации",
+  TITLE_PRODUCT_REPORTS: "Жалобы",
+  TITLE_DATA_CONFIRMATION: "Подтверждение данных",
   NAV_TO_CATALOG: "← Каталог товаров",
   NAV_TO_USERS: "Пользователи",
   NAV_TO_CART: "Корзина",
@@ -103,9 +156,11 @@ export const HOME_PAGE_UI = {
   NAV_TO_ADMIN_ORDERS: "Все заказы",
   FILTER_BUTTON: "Фильтр",
   SORT_LABEL: "Сортировка",
+  MODERATION_STATUS_FILTER_LABEL: "Статус",
   SHOW_HIDDEN_PRODUCTS: "Показывать скрытые товары",
   CATEGORY_ALL: "Все категории",
   SUBTITLE_MY_ONLY: "Показаны только ваши товары.",
+  EMPTY_MY_BY_MODERATION_STATUS: "Нет товаров с выбранным статусом.",
   MY_PRODUCTS_QUOTA_LABEL: "Товаров",
   LIST_PRODUCT_BUTTON: "Разместить товар",
   LOGIN_TO_LIST_PRODUCT: "Войти, чтобы разместить",
@@ -194,6 +249,7 @@ export const ORDER_CARD_UI = {
   ACTION_DELIVERED: "Доставлен",
   ACTION_CONFIRM: "Подтвердить",
   ACTION_PENDING: "Сохраняем…",
+  DELETED_PRODUCT_NAME: "Товар удалён",
 };
 
 /** Страница «Мои покупки» */
@@ -201,6 +257,8 @@ export const MY_ORDERS_PAGE_UI = {
   TITLE: "Мои покупки",
   LOADING: "Загрузка покупок…",
   EMPTY: "У вас пока нет покупок.",
+  /** @param {number} points */
+  LOYALTY_POINTS_EARNED: (points) => `+${points} баллов лояльности`,
 };
 
 /** Очередь модерации товаров (admin / moderator) */
@@ -219,6 +277,88 @@ export const PRODUCT_MODERATION_PAGE_UI = {
   SELLER_LABEL: "Продавец",
   CREATED_LABEL: "Создан",
   REJECTION_COMMENT_PREFIX: "Комментарий модератора:",
+};
+
+/** Жалобы на товары (staff) */
+export const PRODUCT_REPORTS_PAGE_UI = {
+  LOADING: "Загрузка жалоб…",
+  EMPTY: "Нет необработанных жалоб.",
+  REPORTS_COUNT_LABEL: (count) => `Жалоб: ${count}`,
+  REPORT_ITEM_META: (userName, dateText) => `${userName} · ${dateText}`,
+  STAFF_NOTE_LABEL: "Комментарий staff",
+  STAFF_NOTE_PLACEHOLDER: "Обязательный комментарий…",
+  ACTION_DISMISS: "Отклонить жалобы",
+  ACTION_HIDE: "Скрыть товар",
+  ACTION_REJECT: "Отклонить товар",
+  ACTION_PENDING: "Сохраняем…",
+  OPEN_PRODUCT: "Открыть товар",
+  OPEN_SELLER: "Продавец",
+  OPEN_REPORTER: "Жалобщик",
+  /** @param {number} n */
+  TAB_BADGE: (n) => (n > 99 ? "99+" : String(n)),
+};
+
+/** Заявки на подтверждение данных (staff) */
+export const DATA_CONFIRMATION_PAGE_UI = {
+  LOADING: "Загрузка заявок…",
+  EMPTY: "Нет заявок на рассмотрении.",
+  SUBMITTED_LABEL: "Подана",
+  OPEN_APPLICANT: "Профиль заявителя",
+  PASSPORT_SECTION: "Паспортные данные",
+  STAFF_NOTE_LABEL: "Комментарий при отклонении",
+  STAFF_NOTE_PLACEHOLDER: "Не меньше 3 слов…",
+  STAFF_NOTE_MIN_WORDS: 3,
+  ACTION_APPROVE: "Подтвердить",
+  ACTION_REJECT: "Отклонить",
+  ACTION_PENDING: "Сохраняем…",
+  /** @param {number} n */
+  TAB_BADGE: (n) => (n > 99 ? "99+" : String(n)),
+};
+
+/** Подача заявки на подтверждение данных */
+export const DATA_CONFIRMATION_MODAL_UI = {
+  ARIA_DIALOG: "Подтверждение данных",
+  TITLE: "Подтверждение данных",
+  INTRO:
+    "Заполните паспортные данные. После проверки модератором у вас появится значок подтверждённого продавца.",
+  STATUS_PENDING: "Заявка на рассмотрении",
+  STATUS_CONFIRMED: "Данные подтверждены",
+  STATUS_REJECTED_TITLE: "Заявка отклонена",
+  LABEL_LAST_NAME: "Фамилия",
+  LABEL_FIRST_NAME: "Имя",
+  LABEL_MIDDLE_NAME: "Отчество",
+  LABEL_BIRTH_DATE: "Дата рождения",
+  LABEL_SERIES: "Серия",
+  LABEL_NUMBER: "Номер",
+  LABEL_ISSUED_BY: "Кем выдан",
+  LABEL_ISSUED_AT: "Дата выдачи",
+  LABEL_DEPARTMENT_CODE: "Код подразделения",
+  PLACEHOLDER_DEPARTMENT_CODE: "000-000",
+  SUBMIT: "Отправить заявку",
+  SUBMIT_LOADING: "Отправка…",
+  CANCEL: "Отмена",
+  OPEN_BUTTON: "Подтверждение данных",
+  SUCCESS: "Заявка принята",
+};
+
+/** Подача жалобы на товар */
+export const PRODUCT_REPORT_MODAL_UI = {
+  ARIA_DIALOG: "Жалоба на товар",
+  TITLE: "Пожаловаться на товар",
+  LABEL_TEXT: "Опишите причину",
+  PLACEHOLDER: "Текст жалобы…",
+  SUBMIT: "Отправить",
+  SUBMIT_LOADING: "Отправка…",
+  CANCEL: "Отмена",
+  ALREADY_REPORTED: "Вы уже жаловались",
+  SUCCESS: "Жалоба принята",
+  REPORT_BUTTON: "Пожаловаться",
+  WORDS_USED: (current, max) => `${current} / ${max} слов`,
+};
+
+/** In-app уведомления в профиле */
+export const IN_APP_NOTIFICATIONS_UI = {
+  SECTION_ARIA: "Уведомления",
 };
 
 /** Страница «Мои продажи» */
@@ -313,6 +453,11 @@ export const USER_PREMIUM_UI = {
   CHECK_TITLE: "Премиум",
 };
 
+export const USER_DATA_CONFIRMED_UI = {
+  BADGE_ARIA: "Данные подтверждены",
+  BADGE_TITLE: "Данные подтверждены",
+};
+
 /** Строка каталога пользователей */
 export const USER_LIST_ROW_UI = {
   BADGE_PREMIUM: "Премиум",
@@ -324,6 +469,17 @@ export const USER_LIST_ROW_UI = {
   TOTAL_PURCHASES_LABEL: "Покупок на сумму",
   RATING_LABEL: "Рейтинг",
   USER_DATA_CONFIRMED_LABEL: "Пользователь подтверждён",
+};
+
+/** Модалка при достижении лимита товаров продавца */
+export const SELLER_PRODUCTS_LIMIT_MODAL_UI = {
+  TITLE: "Лимит товаров",
+  BODY_REGULAR: (limit, premiumLimit) =>
+    `Достигнут лимит размещения товаров (${limit}). Увеличить лимит до ${premiumLimit} можно, оформив премиум.`,
+  BODY_PREMIUM: (limit) =>
+    `Достигнут максимальный лимит премиум (${limit} товаров). Чтобы разместить новый товар, удалите один из существующих.`,
+  CLOSE: "Понятно",
+  ARIA_CLOSE_BACKDROP: "Закрыть",
 };
 
 /** Модалка создания товара (`POST /product`) */
@@ -346,6 +502,7 @@ export const CREATE_PRODUCT_MODAL_UI = {
   LABEL_PRICE: "Цена",
   LABEL_CATEGORY: "Категория",
   LABEL_AVAILABLE: "Товар в наличии",
+  LABEL_AUCTION: "Проводить аукцион (предложения цены)",
   SUBMIT_IDLE: "Создать",
   SUBMIT_LOADING: "Создаём…",
   SUBMIT_EDIT_IDLE: "Сохранить",
@@ -498,6 +655,9 @@ export const MY_PROFILE_MODAL_UI = {
   TAB_MY_ORDERS: "Мои покупки",
   TAB_ADMIN_ORDERS: "Все заказы",
   TAB_PRODUCT_MODERATION: "На модерации",
+  TAB_PRODUCT_REPORTS: "Жалобы",
+  TAB_DATA_CONFIRMATION: "Подтверждение",
+  DATA_CONFIRMATION: "Подтверждение данных",
   EDIT_PROFILE: "Изменить профиль",
   LOGOUT: "Выйти",
   LOGOUT_CONFIRM: "Вы точно хотите выйти?",

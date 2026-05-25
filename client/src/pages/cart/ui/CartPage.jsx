@@ -71,7 +71,7 @@ const useCurrentUserAddress = (isAuthorized) => {
 
     void (async () => {
       try {
-        const me = await fetchCurrentUserProfile();
+        const { user: me } = await fetchCurrentUserProfile();
         if (isCancelled) return;
         setAddress({
           userAddress: me?.userAddress,

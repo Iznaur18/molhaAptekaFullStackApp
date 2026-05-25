@@ -3,7 +3,17 @@ import { checkAuthMW } from './checkAuthMW.js';
 import { checkOptionalAuthMW } from './checkOptionalAuthMW.js';
 import { checkAdminMW } from './checkAdminMW.js';
 import { checkProductModeratorMW } from './checkProductModeratorMW.js';
-import { generalRateLimiter, authRateLimiter, updateProfileRateLimiter, voteRateLimiter, uploadRateLimiter, cartReplaceRateLimiter } from './rateLimitMW.js';
+import {
+    generalRateLimiter,
+    authRateLimiter,
+    updateProfileRateLimiter,
+    voteRateLimiter,
+    uploadRateLimiter,
+    cartReplaceRateLimiter,
+    productReportRateLimiter,
+    userDataConfirmationRateLimiter,
+    productPriceOfferRateLimiter,
+} from './rateLimitMW.js';
 import { errorHandler, notFoundHandler, asyncHandler, AppError } from './errorHandlerMW.js';
 
 export { 
@@ -18,6 +28,9 @@ export {
     voteRateLimiter,
     uploadRateLimiter,
     cartReplaceRateLimiter,
+    productReportRateLimiter,
+    userDataConfirmationRateLimiter,
+    productPriceOfferRateLimiter,
     errorHandler,
     notFoundHandler,
     asyncHandler,

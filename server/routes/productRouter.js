@@ -9,11 +9,27 @@ import {
     getPendingModerationProductsController,
     approveProductModerationController,
     rejectProductModerationController,
+    submitProductReportController,
+    getMyProductReportStatusController,
+    getPendingProductReportsController,
+    getPendingProductReportsCountController,
+    resolveProductReportsForProductController,
+    submitProductPriceOfferController,
+    patchMyProductPriceOfferController,
+    cancelMyProductPriceOfferController,
+    getMyProductPriceOfferController,
+    getTopProductPriceOffersController,
+    getSellerProductPriceOffersController,
+    acceptProductPriceOfferController,
+    rejectProductPriceOfferController,
+    getSellerProductPriceOfferArchiveController,
 } from '../controllers/index.js';
 import {
     checkAuthMW,
     checkOptionalAuthMW,
     checkProductModeratorMW,
+    productReportRateLimiter,
+    productPriceOfferRateLimiter,
 } from '../middlewares/index.js';
 import {
     makeProductValidation,
@@ -21,6 +37,11 @@ import {
     productsSearchValidation,
     patchMyProductValidation,
     rejectProductModerationValidation,
+    submitProductReportValidation,
+    resolveProductReportsValidation,
+    submitProductPriceOfferValidation,
+    patchProductPriceOfferValidation,
+    productPriceOfferIdParamValidation,
 } from '../validations/index.js';
 
 const router = Router();
@@ -34,6 +55,99 @@ router.get(
     checkProductModeratorMW,
     productsSearchValidation,
     getPendingModerationProductsController,
+);
+router.get(
+    '/reports/pending/count',
+    checkAuthMW,
+    checkProductModeratorMW,
+    getPendingProductReportsCountController,
+);
+router.get(
+    '/reports/pending',
+    checkAuthMW,
+    checkProductModeratorMW,
+    getPendingProductReportsController,
+);
+router.patch(
+    '/reports/product/:productId/resolve',
+    checkAuthMW,
+    checkProductModeratorMW,
+    productIdParamValidation,
+    resolveProductReportsValidation,
+    resolveProductReportsForProductController,
+);
+router.get(
+    '/:productId/price-offers/top',
+    productIdParamValidation,
+    getTopProductPriceOffersController,
+);
+router.get(
+    '/:productId/price-offers/me',
+    checkAuthMW,
+    productIdParamValidation,
+    getMyProductPriceOfferController,
+);
+router.get(
+    '/:productId/price-offers/archive',
+    checkAuthMW,
+    productIdParamValidation,
+    getSellerProductPriceOfferArchiveController,
+);
+router.get(
+    '/:productId/price-offers',
+    checkAuthMW,
+    productIdParamValidation,
+    getSellerProductPriceOffersController,
+);
+router.post(
+    '/:productId/price-offers',
+    checkAuthMW,
+    productPriceOfferRateLimiter,
+    productIdParamValidation,
+    submitProductPriceOfferValidation,
+    submitProductPriceOfferController,
+);
+router.patch(
+    '/:productId/price-offers/me',
+    checkAuthMW,
+    productPriceOfferRateLimiter,
+    productIdParamValidation,
+    patchProductPriceOfferValidation,
+    patchMyProductPriceOfferController,
+);
+router.delete(
+    '/:productId/price-offers/me',
+    checkAuthMW,
+    productIdParamValidation,
+    cancelMyProductPriceOfferController,
+);
+router.patch(
+    '/:productId/price-offers/:offerId/accept',
+    checkAuthMW,
+    productIdParamValidation,
+    productPriceOfferIdParamValidation,
+    acceptProductPriceOfferController,
+);
+router.patch(
+    '/:productId/price-offers/:offerId/reject',
+    checkAuthMW,
+    productIdParamValidation,
+    productPriceOfferIdParamValidation,
+    rejectProductPriceOfferController,
+);
+router.get(
+    '/:productId/report/me',
+    checkAuthMW,
+    productIdParamValidation,
+    getMyProductReportStatusController,
+);
+router.post(
+    '/:productId/report',
+    checkAuthMW,
+    productReportRateLimiter,
+    productIdParamValidation,
+    submitProductReportValidation,
+    submitProductReportController,
 );
 router.post(
     '/:productId/view',

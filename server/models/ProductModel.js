@@ -42,6 +42,14 @@ const ProductSchema = new Schema(
       type: Boolean,
       default: true,
     },
+    productAuctionEnabled: {
+      type: Boolean,
+      default: false,
+    },
+    productAuctionCompletedOnce: {
+      type: Boolean,
+      default: false,
+    },
     productModerationStatus: {
       type: String,
       enum: PRODUCT_MODERATION_STATUSES,

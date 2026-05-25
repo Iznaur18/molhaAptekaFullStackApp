@@ -15,6 +15,8 @@ const ITEM_RUNTIME_DEFAULTS = Object.freeze({
     confirmedAt: null,
     deliveredBy: null,
     confirmedBy: null,
+    loyaltyPointsAwarded: false,
+    loyaltyPointsEarned: 0,
 });
 
 /** Подкладывает обязательные поля адреса для заказов, созданных до `deliveryAddressFlat`. */
@@ -48,8 +50,20 @@ export const normalizeOrderItemsForRuntime = (items) => {
         item.confirmedAt = item.confirmedAt ?? ITEM_RUNTIME_DEFAULTS.confirmedAt;
         item.deliveredBy = item.deliveredBy ?? ITEM_RUNTIME_DEFAULTS.deliveredBy;
         item.confirmedBy = item.confirmedBy ?? ITEM_RUNTIME_DEFAULTS.confirmedBy;
+        item.loyaltyPointsAwarded =
+            item.loyaltyPointsAwarded ?? ITEM_RUNTIME_DEFAULTS.loyaltyPointsAwarded;
+        item.loyaltyPointsEarned =
+            item.loyaltyPointsEarned ?? ITEM_RUNTIME_DEFAULTS.loyaltyPointsEarned;
         if (item.itemIndex === undefined) {
             item.itemIndex = itemIndex;
+        }
+        if (
+            typeof item.productNameAtOrder !== 'string' ||
+            item.productNameAtOrder.trim() === ''
+        ) {
+            item.productNameAtOrder = '';
+        } else {
+            item.productNameAtOrder = item.productNameAtOrder.trim();
         }
     }
 
@@ -81,4 +95,19 @@ export const buildOrderStatusFromItems = (items) => {
         return ORDER_STATUS_CANCELLED;
     }
     return ORDER_STATUS_PENDING;
+};
+
+/**
+ * Актуализирует `order.status` по позициям (ответ API / legacy-документы).
+ *
+ * @param {Record<string, unknown> | null | undefined} order
+ */
+export const syncOrderStatusFromItems = (order) => {
+    if (!order || typeof order !== 'object') {
+        return order;
+    }
+    normalizeOrderDocumentForRuntime(order);
+    const items = normalizeOrderItemsForRuntime(order.items);
+    order.status = buildOrderStatusFromItems(items);
+    return order;
 };

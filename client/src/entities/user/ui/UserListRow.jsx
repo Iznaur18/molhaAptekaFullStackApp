@@ -78,6 +78,7 @@ export function UserListRow({ user, onRowClick }) {
         <UserPremiumDisplayName
           name={displayName}
           isPremium={Boolean(user.isPremiumUser)}
+          isUserDataConfirmed={isUserDataConfirmed}
           className="user-list-row__name"
           textClassName="user-list-row__name-text"
         />

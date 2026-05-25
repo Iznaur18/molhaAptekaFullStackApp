@@ -119,6 +119,7 @@ export function ProductDetailsSellerPreview({ seller, onOpenProfile }) {
       <UserPremiumDisplayName
         name={displayName}
         isPremium={isPremium}
+        isUserDataConfirmed={isConfirmed}
         className="product-details-seller-preview__name"
         textClassName="product-details-seller-preview__name-text"
       />

@@ -1,9 +1,17 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-const LOCAL_API_HOST = "127.0.0.1";
+/**
+ * LAN-доступ (вариант C): см. `client/docs/LAN-dev-access.md`
+ *
+ * Откат к «только этот ПК»:
+ * - DEV_SERVER_HOST = "127.0.0.1"
+ * - (опционально) убери "/address" из DEV_API_PROXY_PREFIXES
+ */
+const DEV_SERVER_HOST = true;
+const LOCAL_API_PROXY_TARGET = "127.0.0.1";
 const LOCAL_API_PORT = 4444;
-const LOCAL_API_ORIGIN = `http://${LOCAL_API_HOST}:${LOCAL_API_PORT}`;
+const LOCAL_API_ORIGIN = `http://${LOCAL_API_PROXY_TARGET}:${LOCAL_API_PORT}`;
 
 /** Префиксы путей Express (порядок: /uploads раньше /upload). */
 const DEV_API_PROXY_PREFIXES = [
@@ -13,6 +21,7 @@ const DEV_API_PROXY_PREFIXES = [
   "/vote",
   "/order",
   "/product",
+  "/address",
   "/uploads",
   "/upload",
 ];
@@ -45,14 +54,14 @@ const devApiProxy = Object.fromEntries(
 export default defineConfig({
   plugins: [react()],
   server: {
-    host: LOCAL_API_HOST,
+    host: DEV_SERVER_HOST,
     port: 5173,
     strictPort: true,
     open: true,
     proxy: devApiProxy,
   },
   preview: {
-    host: LOCAL_API_HOST,
+    host: DEV_SERVER_HOST,
     port: 4173,
     strictPort: false,
     proxy: devApiProxy,

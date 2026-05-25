@@ -58,7 +58,7 @@ export async function markOrderItemShipped(orderId, itemIndex) {
  *
  * @param {string} orderId
  * @param {number} itemIndex
- * @returns {Promise<import("../model/types.js").Order>}
+ * @returns {Promise<import("../model/types.js").ConfirmOrderItemResult>}
  */
 export async function confirmOrderItem(orderId, itemIndex) {
   try {
@@ -69,7 +69,11 @@ export async function confirmOrderItem(orderId, itemIndex) {
     if (!data?.success || !data.data?.order) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
-    return data.data.order;
+    const pointsEarned = Number(data.data.pointsEarned);
+    return {
+      order: data.data.order,
+      pointsEarned: Number.isFinite(pointsEarned) ? pointsEarned : 0,
+    };
   } catch (e) {
     const message =
       e?.response?.data?.message ??

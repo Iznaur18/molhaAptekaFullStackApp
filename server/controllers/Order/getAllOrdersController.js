@@ -5,7 +5,7 @@ import {
     ORDER_BUYER_PUBLIC_FIELDS,
     ORDER_ITEMS_POPULATE,
 } from './orderQueries.js';
-import { normalizeOrderItemsForRuntime } from './orderStatus.js';
+import { syncOrderStatusFromItems } from './orderStatus.js';
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 20;
@@ -36,7 +36,7 @@ export const getAllOrdersController = async (req, res) => {
                 .lean(),
             OrderModel.countDocuments(ordersQuery),
         ]);
-        orders.forEach((order) => normalizeOrderItemsForRuntime(order.items));
+        orders.forEach((order) => syncOrderStatusFromItems(order));
 
         return successRes(res, { orders, total, page, limit });
     } catch (error) {

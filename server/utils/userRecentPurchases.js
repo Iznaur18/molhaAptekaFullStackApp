@@ -4,22 +4,10 @@ import {
     isProductViewableForProfile,
     PURCHASE_PRODUCT_PUBLIC_SELECT,
 } from './isProductViewableForProfile.js';
+import { resolveOrderLineItemProductName } from './orderLineItemDisplay.js';
 import { attachSoldQuantityToPurchaseItems } from './productSoldQuantity.js';
 
 export const USER_RECENT_PURCHASES_LIMIT = 5;
-
-/**
- * @param {unknown} productRef
- */
-const resolveProductName = (productRef) => {
-    if (productRef != null && typeof productRef === 'object') {
-        const name = productRef.productName;
-        if (typeof name === 'string' && name.trim() !== '') {
-            return name.trim();
-        }
-    }
-    return 'Товар без названия';
-};
 
 /**
  * @param {unknown} productRef
@@ -70,7 +58,7 @@ export const getUserRecentUniquePurchases = async (
             const productPayload = resolveProductPayload(rawRef);
             items.push({
                 productId,
-                productName: resolveProductName(rawRef),
+                productName: resolveOrderLineItemProductName(line),
                 viewable: isProductViewableForProfile(productPayload),
                 product: productPayload,
             });

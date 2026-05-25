@@ -2,7 +2,7 @@ import { OrderModel } from '../../models/index.js';
 import { errorRes, successRes } from '../../utils/index.js';
 
 import { ORDER_ITEMS_POPULATE } from './orderQueries.js';
-import { normalizeOrderItemsForRuntime } from './orderStatus.js';
+import { syncOrderStatusFromItems } from './orderStatus.js';
 
 /** `GET /order` — список своих заказов (по `req.userId`), сортировка по дате. */
 export const getMyOrdersController = async (req, res) => {
@@ -11,7 +11,7 @@ export const getMyOrdersController = async (req, res) => {
             .sort({ createdAt: -1 })
             .populate(ORDER_ITEMS_POPULATE)
             .lean();
-        orders.forEach((order) => normalizeOrderItemsForRuntime(order.items));
+        orders.forEach((order) => syncOrderStatusFromItems(order));
 
         return successRes(res, { orders });
     } catch (error) {

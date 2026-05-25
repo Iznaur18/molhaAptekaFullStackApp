@@ -3,6 +3,10 @@ import { errorRes, successRes } from '../../utils/index.js';
 import { getOptionalViewerFromRequest } from '../../utils/optionalViewerFromRequest.js';
 import { sanitizeUserProfileForViewer } from '../../utils/userProfileVisibility.js';
 import { getUserRecentUniquePurchases } from '../../utils/userRecentPurchases.js';
+import {
+    canViewerSeeOtherUserPurchases,
+    OTHER_USER_PURCHASES_PREMIUM_ONLY_MESSAGE,
+} from '../../utils/userPurchasesVisibility.js';
 
 /** `GET /user/:userIdClient/purchases` — последние уникальные покупки (JWT). */
 export const getUserPurchasesController = async (req, res) => {
@@ -26,6 +30,20 @@ export const getUserPurchasesController = async (req, res) => {
 
         if (!publicUser) {
             return errorRes(res, 404, 'Пользователь не найден');
+        }
+
+        const viewerId = String(req.userId);
+        if (viewerId !== String(targetUserId)) {
+            const viewerRecord = await UserModel.findById(viewerId)
+                .select('userRole isBlockedUser isPremiumUser')
+                .lean();
+            if (!canViewerSeeOtherUserPurchases(viewerRecord)) {
+                return errorRes(
+                    res,
+                    403,
+                    OTHER_USER_PURCHASES_PREMIUM_ONLY_MESSAGE,
+                );
+            }
         }
 
         const items = await getUserRecentUniquePurchases(targetUserId);

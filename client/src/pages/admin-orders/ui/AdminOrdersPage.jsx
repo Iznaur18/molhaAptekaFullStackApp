@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+
+import { useRefetchOnVisible } from "../../../shared/lib/useRefetchOnVisible.js";
 
 import { fetchAllOrders } from "../../../entities/order/api/fetchAllOrders.js";
 import { updateOrderStatus } from "../../../entities/order/api/updateOrderStatus.js";
@@ -23,6 +25,27 @@ const useAllOrders = (statusFilter) => {
     /** @type {import('../../../entities/order/model/types.js').Order[]} */ ([]),
   );
   const [error, setError] = useState("");
+
+  const reloadOrders = useCallback(async () => {
+    try {
+      const { orders: list } = await fetchAllOrders({
+        limit: ADMIN_ORDERS_PAGE_UI.PAGE_LIMIT,
+        ...(statusFilter ? { status: statusFilter } : {}),
+      });
+      setOrders(list);
+      setPhase("success");
+      setError("");
+    } catch (e) {
+      setError(
+        e instanceof Error
+          ? e.message
+          : API_CLIENT_UI.FETCH_ALL_ORDERS_FALLBACK,
+      );
+      setPhase("error");
+    }
+  }, [statusFilter]);
+
+  useRefetchOnVisible(reloadOrders, phase === "success");
 
   useEffect(() => {
     let isCancelled = false;

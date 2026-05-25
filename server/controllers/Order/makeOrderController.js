@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
 
 import { PRODUCT_MODERATION_APPROVED } from '../../constants/productModerationConstants.js';
-import { CartModel, OrderModel, ProductModel, UserModel } from '../../models/index.js';
+import { CartModel, OrderModel, ProductModel, ProductPriceOfferModel, UserModel } from '../../models/index.js';
+import { resolveAcceptedOfferForOrder } from '../../utils/productPriceOfferHelpers.js';
 import { errorRes, successRes } from '../../utils/index.js';
 
 import {
@@ -16,25 +17,37 @@ const calculateTotalAmount = (items, priceById) =>
         return sum + (price ?? 0) * item.quantity;
     }, 0);
 
-const buildItemsWithPriceSnapshot = (items, priceById) =>
-    items.map((item) => ({
-        productId: item.productId,
-        quantity: item.quantity,
-        unitPriceAtOrder: priceById[String(item.productId)],
-    }));
+const buildItemsWithPriceSnapshot = (items, productById) =>
+    items.map((item) => {
+        const snapshot = productById[String(item.productId)];
+        return {
+            productId: item.productId,
+            quantity: item.quantity,
+            unitPriceAtOrder: snapshot.price,
+            productNameAtOrder: snapshot.name,
+        };
+    });
 
-const fetchAvailableProductPrices = async (productIds) => {
+const fetchAvailableProductsForOrder = async (productIds) => {
     const products = await ProductModel.find({
         _id: { $in: productIds },
         productModerationStatus: PRODUCT_MODERATION_APPROVED,
         productIsAvailable: { $ne: false },
     })
-        .select('_id productPrice')
+        .select('_id productPrice productName')
         .lean();
 
-    return Object.fromEntries(
-        products.map((p) => [String(p._id), p.productPrice]),
-    );
+    /** @type {Record<string, { price: number; name: string }>} */
+    const byId = {};
+    for (const product of products) {
+        const id = String(product._id);
+        const name = String(product.productName ?? '').trim();
+        byId[id] = {
+            price: product.productPrice,
+            name: name.length > 0 ? name : 'Товар без названия',
+        };
+    }
+    return byId;
 };
 
 const appendOrderToBuyList = async (userId, orderId) => {
@@ -54,23 +67,64 @@ const appendOrderToBuyList = async (userId, orderId) => {
 export const makeOrderController = async (req, res) => {
     try {
         const userId = req.userId;
-        const { items, paymentMethod } = req.body;
+        const { items, paymentMethod, priceOfferId } = req.body;
         const verified = req.verifiedDeliveryAddress;
 
         const uniqueProductIds = [
             ...new Set(items.map((item) => String(item.productId))),
         ];
-        const priceById = await fetchAvailableProductPrices(uniqueProductIds);
 
-        if (Object.keys(priceById).length !== uniqueProductIds.length) {
-            return errorRes(
-                res,
-                400,
-                'Один или несколько товаров не найдены или недоступны',
-            );
+        /** @type {Record<string, { price: number; name: string }>} */
+        let productById = {};
+        let linkedPriceOfferId = null;
+
+        if (priceOfferId) {
+            if (items.length !== 1 || items[0].quantity !== 1) {
+                return errorRes(
+                    res,
+                    400,
+                    'Заказ по предложению цены — одна позиция, количество 1',
+                );
+            }
+
+            const productId = String(items[0].productId);
+
+            try {
+                const resolved = await resolveAcceptedOfferForOrder(
+                    priceOfferId,
+                    userId,
+                    productId,
+                );
+                productById[productId] = {
+                    price: resolved.price,
+                    name: resolved.name,
+                };
+                linkedPriceOfferId = priceOfferId;
+            } catch (e) {
+                return errorRes(
+                    res,
+                    400,
+                    e instanceof Error
+                        ? e.message
+                        : 'Нельзя оформить заказ по предложению',
+                );
+            }
+        } else {
+            productById = await fetchAvailableProductsForOrder(uniqueProductIds);
+
+            if (Object.keys(productById).length !== uniqueProductIds.length) {
+                return errorRes(
+                    res,
+                    400,
+                    'Один или несколько товаров не найдены или недоступны',
+                );
+            }
         }
 
-        const itemsWithPrice = buildItemsWithPriceSnapshot(items, priceById);
+        const itemsWithPrice = buildItemsWithPriceSnapshot(items, productById);
+        const priceById = Object.fromEntries(
+            Object.entries(productById).map(([id, row]) => [id, row.price]),
+        );
         const totalAmount = calculateTotalAmount(itemsWithPrice, priceById);
         const status = buildOrderStatusFromItems(itemsWithPrice);
 
@@ -83,7 +137,14 @@ export const makeOrderController = async (req, res) => {
             deliveryAddressFiasId: verified.fiasId,
             paymentMethod,
             status,
+            priceOfferId: linkedPriceOfferId,
         });
+
+        if (linkedPriceOfferId) {
+            await ProductPriceOfferModel.findByIdAndUpdate(linkedPriceOfferId, {
+                $set: { orderId: order._id },
+            });
+        }
 
         const isUserUpdated = await appendOrderToBuyList(userId, order._id);
         if (!isUserUpdated) {

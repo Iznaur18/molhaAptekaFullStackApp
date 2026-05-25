@@ -20,6 +20,7 @@ import {
   MY_SALES_PAGE_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { useDebouncedValue } from "../../../shared/lib/useDebouncedValue.js";
+import { useRefetchOnVisible } from "../../../shared/lib/useRefetchOnVisible.js";
 import { SearchInput } from "../../../shared/ui/SearchInput/SearchInput.jsx";
 
 import "./MySalesPage.css";
@@ -71,9 +72,22 @@ export function MySalesPage({ isAuthorized, onSellerNameClick }) {
   ]);
 
   const reloadSales = useCallback(async () => {
-    const list = await fetchMySales(getSalesParams());
-    setOrders(list);
+    try {
+      const list = await fetchMySales(getSalesParams());
+      setOrders(list);
+      setPhase("success");
+      setError("");
+    } catch (e) {
+      setError(
+        e instanceof Error
+          ? e.message
+          : API_CLIENT_UI.FETCH_MY_SALES_FALLBACK,
+      );
+      setPhase("error");
+    }
   }, [getSalesParams]);
+
+  useRefetchOnVisible(reloadSales, phase === "success");
 
   const sortedCatalogProducts = useMemo(
     () =>

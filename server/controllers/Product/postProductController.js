@@ -19,6 +19,7 @@ export const postProductController = async (req, res) => {
       productPrice,
       productCategory,
       productIsAvailable,
+      productAuctionEnabled,
     } = req.body;
 
     const user = await UserModel.findById(userId);
@@ -51,6 +52,8 @@ export const postProductController = async (req, res) => {
       productSeller: userId,
       productCategory,
       productIsAvailable: listedInCatalog,
+      productAuctionEnabled: productAuctionEnabled === true,
+      productAuctionCompletedOnce: false,
       productModerationStatus,
       productModerationComment: "",
     });

@@ -29,6 +29,7 @@ const INITIAL_FORM = {
   productPrice: "",
   productCategory: PRODUCT_CATEGORY_ELECTRONICS,
   productIsAvailable: true,
+  productAuctionEnabled: false,
 };
 
 /**
@@ -48,6 +49,7 @@ function formStateFromProduct(product) {
     productPrice: priceStr,
     productCategory: product.productCategory ?? PRODUCT_CATEGORY_ELECTRONICS,
     productIsAvailable: product.productIsAvailable !== false,
+    productAuctionEnabled: product.productAuctionEnabled === true,
   };
 }
 
@@ -107,6 +109,11 @@ export function CreateProductModal({
     setForm((prev) => ({ ...prev, productIsAvailable: checked }));
   };
 
+  const handleAuctionChange = (event) => {
+    const checked = event.target.checked;
+    setForm((prev) => ({ ...prev, productAuctionEnabled: checked }));
+  };
+
   const handleClose = () => {
     setStatus({ kind: "idle", message: "" });
     onClose();
@@ -160,6 +167,7 @@ export function CreateProductModal({
         if (showCatalogAvailabilityToggle) {
           patchBody.productIsAvailable = form.productIsAvailable;
         }
+        patchBody.productAuctionEnabled = form.productAuctionEnabled;
         product = await patchMyProduct(String(productToEdit._id), patchBody);
       } else {
         product = await createProduct({
@@ -169,6 +177,7 @@ export function CreateProductModal({
           productPrice,
           productCategory: form.productCategory,
           productIsAvailable: form.productIsAvailable,
+          productAuctionEnabled: form.productAuctionEnabled,
         });
       }
 
@@ -291,6 +300,15 @@ export function CreateProductModal({
                 {CREATE_PRODUCT_MODAL_UI.LABEL_AVAILABLE}
               </label>
             ) : null}
+            <label className="create-product-modal__check">
+              <input
+                type="checkbox"
+                checked={form.productAuctionEnabled}
+                onChange={handleAuctionChange}
+                disabled={isSubmitting}
+              />
+              {CREATE_PRODUCT_MODAL_UI.LABEL_AUCTION}
+            </label>
             {status.kind === "error" ? (
               <p
                 className="create-product-modal__message create-product-modal__message_error"

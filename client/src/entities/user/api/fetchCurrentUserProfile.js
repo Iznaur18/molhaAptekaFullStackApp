@@ -4,7 +4,10 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 /**
  * Текущий авторизованный пользователь: `GET /auth/me`.
  *
- * @returns {Promise<import('../model/types.js').UserPublicProfile>}
+ * @returns {Promise<{
+ *   user: import('../model/types.js').UserPublicProfile;
+ *   inAppNotifications: import('../../product-report/model/types.js').UserInAppNotification[];
+ * }>}
  */
 export async function fetchCurrentUserProfile() {
   try {
@@ -14,7 +17,14 @@ export async function fetchCurrentUserProfile() {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
 
-    return data.data.user;
+    const notifications = Array.isArray(data.data.inAppNotifications)
+      ? data.data.inAppNotifications
+      : [];
+
+    return {
+      user: data.data.user,
+      inAppNotifications: notifications,
+    };
   } catch (e) {
     const message =
       e?.response?.data?.message ??

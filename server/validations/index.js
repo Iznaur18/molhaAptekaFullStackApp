@@ -6,11 +6,20 @@ import { voteValidation, voteTargetIdParamValidation } from './user/voteValidati
 import { ratingUserIdParamValidation } from './user/ratingValidation.js';
 import { userSearchValidation } from './user/userSearchValidation.js';
 import { userSellerProductsValidation } from './user/userSellerProductsValidation.js';
+import { submitDataConfirmationValidation } from './user/submitDataConfirmationValidation.js';
+import { resolveDataConfirmationValidation } from './user/resolveDataConfirmationValidation.js';
 import { makeProductValidation } from './product/makeProductValidation.js';
 import { productIdParamValidation } from './product/productIdParamValidation.js';
 import { productsSearchValidation } from './product/productsSearchValidation.js';
 import { patchMyProductValidation } from './product/patchMyProductValidation.js';
 import { rejectProductModerationValidation } from './product/rejectProductModerationValidation.js';
+import { submitProductReportValidation } from './product/submitProductReportValidation.js';
+import { resolveProductReportsValidation } from './product/resolveProductReportsValidation.js';
+import {
+    submitProductPriceOfferValidation,
+    patchProductPriceOfferValidation,
+    productPriceOfferIdParamValidation,
+} from './product/productPriceOfferValidation.js';
 import { makeOrderValidation } from './order/makeOrderValidation.js';
 import { updateOrderStatusValidation } from './order/updateOrderStatusValidation.js';
 import { getAllOrdersValidation } from './order/getAllOrdersValidation.js';
@@ -29,11 +38,18 @@ export {
     ratingUserIdParamValidation,
     userSearchValidation,
     userSellerProductsValidation,
+    submitDataConfirmationValidation,
+    resolveDataConfirmationValidation,
     makeProductValidation,
     productIdParamValidation,
     productsSearchValidation,
     patchMyProductValidation,
     rejectProductModerationValidation,
+    submitProductReportValidation,
+    resolveProductReportsValidation,
+    submitProductPriceOfferValidation,
+    patchProductPriceOfferValidation,
+    productPriceOfferIdParamValidation,
     makeOrderValidation,
     updateOrderStatusValidation,
     getAllOrdersValidation,

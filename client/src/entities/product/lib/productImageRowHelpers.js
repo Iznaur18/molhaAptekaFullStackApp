@@ -2,12 +2,20 @@
  * @typedef {{ id: string; url: string }} ProductImageRow
  */
 
+/** @returns {string} */
+function createRowId() {
+  if (typeof crypto?.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return `row-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+}
+
 /**
  * @returns {ProductImageRow}
  */
 export function createImageRow(url = "") {
   return {
-    id: crypto.randomUUID(),
+    id: createRowId(),
     url,
   };
 }

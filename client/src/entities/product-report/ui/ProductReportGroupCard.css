@@ -1,0 +1,131 @@
+.product-report-group-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  background: #fff;
+}
+
+.product-report-group-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.product-report-group-card__title {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.product-report-group-card__count {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #b42318;
+  white-space: nowrap;
+}
+
+.product-report-group-card__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.product-report-group-card__link {
+  border: 0;
+  background: transparent;
+  color: #1f6feb;
+  font-size: 0.875rem;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.product-report-group-card__reports {
+  margin: 0 0 0.75rem;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.product-report-group-card__report {
+  padding: 0.5rem 0.65rem;
+  border-radius: 0.5rem;
+  background: #f9fafb;
+}
+
+.product-report-group-card__report-meta {
+  margin: 0 0 0.25rem;
+  font-size: 0.8rem;
+  color: #6b7280;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.product-report-group-card__reporter-link {
+  border: 0;
+  background: transparent;
+  color: #1f6feb;
+  font-size: 0.78rem;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.product-report-group-card__report-text {
+  margin: 0;
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+}
+
+.product-report-group-card__staff-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.product-report-group-card__staff-note {
+  resize: none;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  font: inherit;
+}
+
+.product-report-group-card__error {
+  margin: 0 0 0.5rem;
+  color: #b42318;
+  font-size: 0.875rem;
+}
+
+.product-report-group-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.product-report-group-card__action {
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background: #fff;
+  padding: 0.45rem 0.7rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.product-report-group-card__action_reject {
+  border-color: #b42318;
+  color: #b42318;
+}
+
+.product-report-group-card__action:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

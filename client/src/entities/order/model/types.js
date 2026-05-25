@@ -6,12 +6,21 @@
  * @property {string | { _id: string; productName?: string; productPrice?: number; productImageUrls?: string[]; productImageUrl?: string; productSeller?: { _id: string; userName?: string } | string }} productId
  * @property {number} quantity
  * @property {number} unitPriceAtOrder
+ * @property {string} [productNameAtOrder] — снимок названия на момент заказа
  * @property {number} [itemIndex]
  * @property {import('./constants.js').ORDER_STATUSES[number]} status
  * @property {string | null} [deliveredAt]
  * @property {string | null} [confirmedAt]
  * @property {string | null | { _id: string; userName?: string }} [deliveredBy]
  * @property {string | null | { _id: string; userName?: string }} [confirmedBy]
+ * @property {boolean} [loyaltyPointsAwarded]
+ * @property {number} [loyaltyPointsEarned]
+ */
+
+/**
+ * @typedef {object} ConfirmOrderItemResult
+ * @property {Order} order
+ * @property {number} pointsEarned
  */
 
 /**

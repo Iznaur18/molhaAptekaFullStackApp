@@ -5,6 +5,14 @@ import {
     hasProductOpenSales,
     OPEN_SALES_BLOCK_MESSAGE,
 } from '../../utils/productOrderLocks.js';
+import { dismissPendingReportsForProduct } from '../../utils/productReportHelpers.js';
+import { rejectAllPendingOffersForProduct } from '../../utils/productPriceOfferHelpers.js';
+import { ProductPriceOfferModel } from '../../models/index.js';
+import {
+    PRICE_OFFER_STATUS_ACCEPTED,
+    PRICE_OFFER_STATUS_PENDING,
+    PRICE_OFFER_STATUS_REJECTED,
+} from '../../constants/productPriceOfferConstants.js';
 import { errorRes, successRes } from '../../utils/index.js';
 
 /** Удаление своего товара или любого (admin). DELETE /product/:productId */
@@ -27,6 +35,21 @@ export const deleteMyProductController = async (req, res) => {
               };
 
         const deleted = await ProductModel.findOneAndDelete(ownerFilter).lean();
+
+        if (deleted) {
+            await dismissPendingReportsForProduct(productId);
+            await rejectAllPendingOffersForProduct(productId);
+            const now = new Date();
+            await ProductPriceOfferModel.updateMany(
+                { productId, status: PRICE_OFFER_STATUS_ACCEPTED },
+                {
+                    $set: {
+                        status: PRICE_OFFER_STATUS_REJECTED,
+                        reviewedAt: now,
+                    },
+                },
+            );
+        }
 
         if (!deleted) {
             if (!isAdmin) {

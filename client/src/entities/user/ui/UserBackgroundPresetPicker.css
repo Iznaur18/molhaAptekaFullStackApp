@@ -19,6 +19,7 @@
 }
 
 .user-background-presets__option {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -36,6 +37,14 @@
 
 .user-background-presets__input {
   position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
   opacity: 0;
   pointer-events: none;
 }

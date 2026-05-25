@@ -2,6 +2,7 @@ import { query } from 'express-validator';
 
 import { PRODUCT_SORT_VALUES } from '../../constants/productCatalogSort.js';
 import { PRODUCT_CATEGORY_VALUES } from '../../constants/productConstants.js';
+import { MY_PRODUCTS_MODERATION_FILTER_VALUES } from '../../constants/productModerationConstants.js';
 import { handleValidationByExpressErrors } from '../handleValidationByExpressErrors.js';
 
 /**
@@ -42,5 +43,12 @@ export const productsSearchValidation = [
         .optional()
         .isIn(['true', 'false'])
         .withMessage('includeHidden должен быть true или false'),
+    query('moderationStatus')
+        .optional()
+        .isString()
+        .withMessage('moderationStatus должен быть строкой')
+        .trim()
+        .isIn(MY_PRODUCTS_MODERATION_FILTER_VALUES)
+        .withMessage('moderationStatus должен быть pending или rejected'),
     handleValidationByExpressErrors,
 ];
