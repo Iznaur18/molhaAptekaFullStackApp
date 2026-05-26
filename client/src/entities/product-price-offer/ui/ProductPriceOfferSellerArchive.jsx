@@ -10,6 +10,8 @@ import {
   USER_LIST_ROW_UI,
 } from "../../../shared/config/appUiCopy.js";
 
+import { ProductPriceOfferSectionTitle } from "./ProductPriceOfferSectionTitle.jsx";
+
 import "./ProductPriceOffer.css";
 
 /**
@@ -72,9 +74,10 @@ export function ProductPriceOfferSellerArchive({ productId, onOpenBuyer }) {
 
   return (
     <section className="product-price-offer">
-      <h3 className="product-price-offer__heading">
+      <ProductPriceOfferSectionTitle />
+      <h2 className="product-price-offer__heading">
         {PRODUCT_PRICE_OFFER_UI.ARCHIVE_SECTION_TITLE}
-      </h3>
+      </h2>
       <ul className="product-price-offer__seller-list" role="list">
         {offers.map((row) => {
           const buyer = row.buyer ?? row.buyerUserId;

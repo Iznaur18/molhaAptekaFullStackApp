@@ -1,6 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { getUserProfileRows } from "../lib/getUserProfileRows.js";
+import {
+  formatProfileImageObjectPosition,
+  getUserAvatarFocus,
+  getUserBackgroundFocus,
+} from "../lib/profileImageFocus.js";
 import { resolveUserProfileBackgroundFromUser } from "../lib/userBackgroundValue.js";
 import { pickUserProfilePhotoUrl } from "../lib/pickUserProfilePhotoUrl.js";
 import { UserProfilePurchasesList } from "./UserProfilePurchasesList.jsx";
@@ -14,10 +19,6 @@ import {
 } from "../../../shared/config/appUiCopy.js";
 
 import "./UserDetailsModal.css";
-
-function isAbsoluteHttpUrl(value) {
-  return typeof value === "string" && /^https?:\/\//i.test(value);
-}
 
 /**
  * @param {object} props
@@ -57,6 +58,14 @@ export function UserDetailsModal({
   onPurchaseProductClick,
 }) {
   const photoUrl = user ? pickUserProfilePhotoUrl(user) : null;
+  const avatarObjectPosition = useMemo(
+    () => formatProfileImageObjectPosition(getUserAvatarFocus(user)),
+    [user],
+  );
+  const backgroundObjectPosition = useMemo(
+    () => formatProfileImageObjectPosition(getUserBackgroundFocus(user)),
+    [user],
+  );
   const profileBackground = user
     ? resolveUserProfileBackgroundFromUser(user)
     : null;
@@ -98,7 +107,9 @@ export function UserDetailsModal({
           ? null
           : USER_DETAILS_MODAL_UI.TITLE_FALLBACK;
 
-  const rows = user ? getUserProfileRows(user, { showAdminRole }) : [];
+  const rows = user
+    ? getUserProfileRows(user, { showAdminRole, hideMediaUrls: true })
+    : [];
 
   const showOtherUserProfileLists =
     Boolean(user?._id) &&
@@ -216,6 +227,7 @@ export function UserDetailsModal({
                         decoding="async"
                         loading="lazy"
                         referrerPolicy="no-referrer"
+                        style={{ objectPosition: backgroundObjectPosition }}
                         onError={() => setBackgroundLoadFailed(true)}
                       />
                     ) : null}
@@ -231,6 +243,7 @@ export function UserDetailsModal({
                         className="user-details-modal__avatar user-details-modal__avatar_lead user-details-modal__avatar_on-banner"
                         src={photoUrl}
                         isPremium={isPremiumUser}
+                        objectPosition={avatarObjectPosition}
                         decoding="async"
                         onError={() => setAvatarLoadFailed(true)}
                       />
@@ -256,15 +269,7 @@ export function UserDetailsModal({
                   {rows.map((row) => (
                     <div key={row.id} className="user-details-modal__row">
                       <dt className="user-details-modal__label">{row.label}</dt>
-                      <dd className="user-details-modal__value">
-                        {isAbsoluteHttpUrl(row.value) ? (
-                          <a href={row.value} target="_blank" rel="noreferrer">
-                            {row.value}
-                          </a>
-                        ) : (
-                          row.value
-                        )}
-                      </dd>
+                      <dd className="user-details-modal__value">{row.value}</dd>
                     </div>
                   ))}
                 </dl>

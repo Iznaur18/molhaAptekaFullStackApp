@@ -6,6 +6,7 @@ import "./UserPremiumUi.css";
  *   alt?: string;
  *   className?: string;
  *   isPremium?: boolean;
+ *   objectPosition?: string;
  *   onError?: () => void;
  *   loading?: "lazy" | "eager";
  *   decoding?: "async" | "sync" | "auto";
@@ -19,6 +20,7 @@ export function UserPremiumAvatar({
   alt = "",
   className = "",
   isPremium = false,
+  objectPosition,
   onError,
   loading,
   decoding,
@@ -33,11 +35,17 @@ export function UserPremiumAvatar({
     .filter(Boolean)
     .join(" ");
 
+  const imgStyle =
+    objectPosition != null && objectPosition !== ""
+      ? { objectPosition }
+      : undefined;
+
   return (
     <img
       className={imgClass}
       src={src}
       alt={alt}
+      style={imgStyle}
       decoding={decoding}
       loading={loading}
       referrerPolicy={referrerPolicy}

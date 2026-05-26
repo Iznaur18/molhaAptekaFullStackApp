@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { AddToCartButton } from "../../../features/cart-add/ui/AddToCartButton.jsx";
@@ -25,10 +25,16 @@ import { fetchCurrentUserProfile } from "../../user/api/fetchCurrentUserProfile.
 import { isCurrentUserProductSeller } from "../lib/isCurrentUserProductSeller.js";
 import { fetchTopPriceOffers } from "../../product-price-offer/api/fetchTopPriceOffers.js";
 import { ProductPriceOfferBuyerBlock } from "../../product-price-offer/ui/ProductPriceOfferBuyerBlock.jsx";
+import { ProductPriceOfferHintMessage } from "../../product-price-offer/ui/ProductPriceOfferHintMessage.jsx";
 import { ProductPriceOfferSellerTab } from "../../product-price-offer/ui/ProductPriceOfferSellerTab.jsx";
 import { ProductPriceOfferSellerArchive } from "../../product-price-offer/ui/ProductPriceOfferSellerArchive.jsx";
 import { resolveAuctionUiState } from "../lib/resolveAuctionUiState.js";
-import { PRODUCT_PRICE_OFFER_UI } from "../../../shared/config/appUiCopy.js";
+import { PRODUCT_MODERATION_APPROVED } from "../model/productModerationConstants.js";
+import { ProductReviewsSection } from "../../product-review/ui/ProductReviewsSection.jsx";
+import {
+  PRODUCT_PRICE_OFFER_UI,
+  PRODUCT_REVIEW_UI,
+} from "../../../shared/config/appUiCopy.js";
 
 import "./ProductDetailsModal.css";
 import "../../product-price-offer/ui/ProductPriceOffer.css";
@@ -151,7 +157,11 @@ function renderFieldRows(product, keys, handlers) {
  *   isAuthorized?: boolean;
  *   onProductStatsUpdate?: (
  *     productId: string,
- *     stats: { uniqueViewerCount: number },
+ *     stats: {
+ *       uniqueViewerCount?: number;
+ *       averageRating?: number;
+ *       reviewCount?: number;
+ *     },
  *   ) => void;
  *   adminFooter?: import('react').ReactNode;
  *   showStaffDetails?: boolean;
@@ -182,12 +192,13 @@ export function ProductDetailsModal({
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [detailsTab, setDetailsTab] = useState(
-    /** @type {'details' | 'auction'} */ ("details"),
+    /** @type {'details' | 'auction' | 'reviews'} */ ("details"),
   );
   const [topOffers, setTopOffers] = useState(
     /** @type {import('../../product-price-offer/model/types.js').PriceOfferTopEntry[]} */ ([]),
   );
   const [isUserDataConfirmed, setIsUserDataConfirmed] = useState(false);
+  const modalBodyRef = useRef(/** @type {HTMLDivElement | null} */ (null));
 
   const isOwnProduct =
     product != null && isCurrentUserProductSeller(product, currentUserId);
@@ -211,11 +222,54 @@ export function ProductDetailsModal({
     }
   }, [product?._id, auctionUi.auctionActive]);
 
+  const handleReviewStatsChange = useCallback(
+    (stats) => {
+      if (!product?._id) {
+        return;
+      }
+      onProductStatsUpdate?.(String(product._id), stats);
+    },
+    [onProductStatsUpdate, product?._id],
+  );
+
+  const handleAuctionShortcutClick = useCallback(() => {
+    if (!auctionUi.auctionActive) {
+      return;
+    }
+    setDetailsTab("auction");
+  }, [auctionUi.auctionActive]);
+
   useEffect(() => {
     setActiveImageIndex(0);
     setLightboxOpen(false);
     setDetailsTab("details");
   }, [product?._id]);
+
+  useEffect(() => {
+    if (!isOpen || !product) {
+      return;
+    }
+    const showReviews =
+      product._id != null &&
+      (product.productModerationStatus === PRODUCT_MODERATION_APPROVED ||
+        isOwnProduct);
+    const showAuction =
+      product._id != null && product.productAuctionEnabled === true;
+    if (detailsTab === "reviews" && !showReviews) {
+      setDetailsTab("details");
+    }
+    if (detailsTab === "auction" && !showAuction) {
+      setDetailsTab("details");
+    }
+  }, [
+    detailsTab,
+    isOpen,
+    isOwnProduct,
+    product,
+    product?.productAuctionEnabled,
+    product?.productModerationStatus,
+    product?._id,
+  ]);
 
   useEffect(() => {
     if (!isOpen || !product?._id || !auctionUi.auctionActive) {
@@ -339,6 +393,25 @@ export function ProductDetailsModal({
   const canShowAddToCart =
     showAddToCart && product._id != null && !adminFooter && !showStaffDetails;
 
+  const showReviewsTab =
+    product._id != null &&
+    (product.productModerationStatus === PRODUCT_MODERATION_APPROVED ||
+      isSellerView);
+
+  const showAuctionTab =
+    product._id != null &&
+    (isSellerView
+      ? auctionUi.showSellerAuctionTab
+      : product.productAuctionEnabled === true);
+
+  const showProductDetailsTabs = showAuctionTab || showReviewsTab;
+
+  const reviewCount = Number(product.reviewCount) || 0;
+  const reviewsTabLabel =
+    reviewCount > 0
+      ? PRODUCT_REVIEW_UI.TAB_REVIEWS_WITH_COUNT(reviewCount)
+      : PRODUCT_REVIEW_UI.TAB_REVIEWS;
+
   const title = product.productName?.trim() || "Товар";
   const displayUrls =
     imageUrls.length > 0 ? imageUrls : [PRODUCT_IMAGE_PLACEHOLDER_URL];
@@ -376,8 +449,8 @@ export function ProductDetailsModal({
             </button>
           </header>
 
-          <div className="product-details-modal__body">
-            {isSellerView && auctionUi.showSellerAuctionTab ? (
+          <div ref={modalBodyRef} className="product-details-modal__body">
+            {showProductDetailsTabs ? (
               <div className="product-details-modal__tabs" role="tablist">
                 <button
                   type="button"
@@ -392,30 +465,84 @@ export function ProductDetailsModal({
                 >
                   {PRODUCT_PRICE_OFFER_UI.TAB_DETAILS}
                 </button>
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={detailsTab === "auction"}
-                  className={
-                    detailsTab === "auction"
-                      ? "product-details-modal__tab product-details-modal__tab_active"
-                      : "product-details-modal__tab"
-                  }
-                  onClick={() => setDetailsTab("auction")}
-                >
-                  {PRODUCT_PRICE_OFFER_UI.TAB_AUCTION}
-                </button>
+                {showAuctionTab ? (
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={detailsTab === "auction"}
+                    className={
+                      detailsTab === "auction"
+                        ? "product-details-modal__tab product-details-modal__tab_active"
+                        : "product-details-modal__tab"
+                    }
+                    onClick={() => setDetailsTab("auction")}
+                  >
+                    {PRODUCT_PRICE_OFFER_UI.TAB_AUCTION}
+                  </button>
+                ) : null}
+                {showReviewsTab ? (
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={detailsTab === "reviews"}
+                    className={
+                      detailsTab === "reviews"
+                        ? "product-details-modal__tab product-details-modal__tab_active"
+                        : "product-details-modal__tab"
+                    }
+                    onClick={() => setDetailsTab("reviews")}
+                  >
+                    {reviewsTabLabel}
+                  </button>
+                ) : null}
               </div>
             ) : null}
 
-            {detailsTab === "auction" &&
-            isSellerView &&
-            auctionUi.showSellerAuctionTab ? (
-              <ProductPriceOfferSellerTab
+            {detailsTab === "reviews" && showReviewsTab ? (
+              <ProductReviewsSection
                 productId={String(product._id)}
-                onOpenBuyer={handleOpenSellerProfile}
-                onChanged={() => void reloadTopOffers()}
+                isAuthorized={isAuthorized}
+                isUserDataConfirmed={isUserDataConfirmed}
+                isOwnProduct={isOwnProduct}
+                embeddedInTab
+                onRequestLogin={onRequestLogin}
+                onStatsChange={handleReviewStatsChange}
               />
+            ) : detailsTab === "auction" && showAuctionTab ? (
+              isSellerView ? (
+                <ProductPriceOfferSellerTab
+                  productId={String(product._id)}
+                  onOpenBuyer={handleOpenSellerProfile}
+                  onChanged={() => void reloadTopOffers()}
+                />
+              ) : (
+                <section
+                  id="product-details-auction"
+                  className="product-details-modal__auction-section"
+                  aria-label={PRODUCT_PRICE_OFFER_UI.TAB_AUCTION}
+                >
+                  {auctionUi.auctionActive ? (
+                    <ProductPriceOfferBuyerBlock
+                      productId={String(product._id)}
+                      isAuthorized={isAuthorized}
+                      isUserDataConfirmed={isUserDataConfirmed}
+                      isOwnProduct={isOwnProduct}
+                      top={topOffers}
+                      onOpenBuyer={handleOpenSellerProfile}
+                      onRequestLogin={onRequestLogin}
+                      onOffersChanged={() => void reloadTopOffers()}
+                    />
+                  ) : auctionUi.buyerMessage === "ended" ? (
+                    <p className="product-price-offer__hint">
+                      {PRODUCT_PRICE_OFFER_UI.AUCTION_ENDED}
+                    </p>
+                  ) : auctionUi.buyerMessage === "notHeld" ? (
+                    <ProductPriceOfferHintMessage>
+                      {PRODUCT_PRICE_OFFER_UI.AUCTION_NOT_HELD}
+                    </ProductPriceOfferHintMessage>
+                  ) : null}
+                </section>
+              )
             ) : (
               <>
             <div className="product-details-modal__row-top">
@@ -532,13 +659,36 @@ export function ProductDetailsModal({
                         fieldHandlers,
                       )}
                     </dl>
-                    {canShowAddToCart ? (
-                      <AddToCartButton
-                        productId={String(product._id)}
-                        isAuthorized={isAuthorized}
-                        onRequestLogin={onRequestLogin}
-                      />
-                    ) : null}
+                    <div
+                      className={
+                        canShowAddToCart
+                          ? "product-details-modal__price-actions"
+                          : "product-details-modal__price-actions product-details-modal__price-actions--no-cart"
+                      }
+                    >
+                      {canShowAddToCart ? (
+                        <div className="product-details-modal__price-actions-cart">
+                          <AddToCartButton
+                            productId={String(product._id)}
+                            isAuthorized={isAuthorized}
+                            onRequestLogin={onRequestLogin}
+                          />
+                        </div>
+                      ) : null}
+                      <button
+                        type="button"
+                        className={
+                          auctionUi.auctionActive
+                            ? "product-details-modal__auction-btn"
+                            : "product-details-modal__auction-btn product-details-modal__auction-btn--inactive"
+                        }
+                        disabled={!auctionUi.auctionActive}
+                        aria-disabled={!auctionUi.auctionActive}
+                        onClick={handleAuctionShortcutClick}
+                      >
+                        {PRODUCT_PRICE_OFFER_UI.AUCTION_SHORTCUT}
+                      </button>
+                    </div>
                   </div>
                 ) : null}
                 {topStatFieldKeys.length > 0 ? (
@@ -592,26 +742,6 @@ export function ProductDetailsModal({
               />
             ) : null}
 
-            {product._id && !isSellerView ? (
-              auctionUi.auctionActive ? (
-                <ProductPriceOfferBuyerBlock
-                  productId={String(product._id)}
-                  isAuthorized={isAuthorized}
-                  isUserDataConfirmed={isUserDataConfirmed}
-                  isOwnProduct={isOwnProduct}
-                  top={topOffers}
-                  onOpenBuyer={handleOpenSellerProfile}
-                  onRequestLogin={onRequestLogin}
-                  onOffersChanged={() => void reloadTopOffers()}
-                />
-              ) : auctionUi.buyerMessage ? (
-                <p className="product-price-offer__hint">
-                  {auctionUi.buyerMessage === "ended"
-                    ? PRODUCT_PRICE_OFFER_UI.AUCTION_ENDED
-                    : PRODUCT_PRICE_OFFER_UI.AUCTION_NOT_HELD}
-                </p>
-              ) : null
-            ) : null}
               </>
             )}
           </div>

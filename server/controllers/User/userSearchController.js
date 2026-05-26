@@ -6,9 +6,10 @@ import {
     sanitizeUsersSearchList,
 } from '../../utils/userProfileVisibility.js';
 import { attachUserListCommerceStats } from '../../utils/attachUserListCommerceStats.js';
+import { attachFollowersCountToUsers } from '../../utils/userFollowHelpers.js';
 
 const USER_PUBLIC_LIST_FIELDS =
-    '_id userName userPhoneNumber email userRole isPremiumUser isUserDataConfirmed isActiveUser isBlockedUser userAvatarUrl telegramPhotoUrl userLoyaltyPoints userRatingByVotes';
+    '_id userName userPhoneNumber email userRole isPremiumUser isUserDataConfirmed isActiveUser isBlockedUser userAvatarUrl userAvatarFocus telegramPhotoUrl userLoyaltyPoints userRatingByVotes';
 const USER_SEARCH_FIELDS = ['userName', 'userPhoneNumber', 'email'];
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 10;
@@ -112,7 +113,8 @@ export const userSearchController = async (req, res) => {
         ]);
 
         const usersSanitized = sanitizeUsersSearchList(usersRaw, { viewer });
-        const users = await attachUserListCommerceStats(usersSanitized);
+        const usersWithCommerce = await attachUserListCommerceStats(usersSanitized);
+        const users = await attachFollowersCountToUsers(usersWithCommerce);
 
         return successRes(res, { users, total, page, limit });
     } catch (error) {

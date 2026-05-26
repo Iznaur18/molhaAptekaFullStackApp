@@ -18,6 +18,7 @@ import {
 } from './Order/updateOrderItemStatusController.js';
 import { postProductController } from './Product/postProductController.js';
 import { getProductsController, getMyProductsController } from './Product/getProducts.js';
+import { getCatalogProductByIdController } from './Product/getCatalogProductByIdController.js';
 import { deleteMyProductController } from './Product/deleteMyProductController.js';
 import { patchMyProductController } from './Product/patchMyProductController.js';
 import { recordProductViewController } from './Product/recordProductViewController.js';
@@ -44,6 +45,13 @@ import {
     rejectProductPriceOfferController,
     getSellerProductPriceOfferArchiveController,
 } from './Product/productPriceOfferControllers.js';
+import {
+    listProductReviewsController,
+    getProductReviewSummaryController,
+    submitProductReviewController,
+    patchMyProductReviewController,
+    deleteMyProductReviewController,
+} from './Product/productReviewControllers.js';
 import { markInAppNotificationsReadController } from './User/markInAppNotificationsReadController.js';
 import {
     submitDataConfirmationRequestController,
@@ -52,6 +60,12 @@ import {
     getPendingDataConfirmationRequestsCountController,
     resolveDataConfirmationRequestController,
 } from './User/userDataConfirmationControllers.js';
+import {
+    followUserController,
+    unfollowUserController,
+    listMyFollowingController,
+    listMyFollowersController,
+} from './User/userFollowControllers.js';
 import { getMyCartController } from './Cart/getMyCartController.js';
 import { replaceMyCartController } from './Cart/replaceMyCartController.js';
 
@@ -81,6 +95,7 @@ export {
     postProductController,
     getProductsController,
     getMyProductsController,
+    getCatalogProductByIdController,
     deleteMyProductController,
     patchMyProductController,
     recordProductViewController,
@@ -101,12 +116,21 @@ export {
     acceptProductPriceOfferController,
     rejectProductPriceOfferController,
     getSellerProductPriceOfferArchiveController,
+    listProductReviewsController,
+    getProductReviewSummaryController,
+    submitProductReviewController,
+    patchMyProductReviewController,
+    deleteMyProductReviewController,
     markInAppNotificationsReadController,
     submitDataConfirmationRequestController,
     getMyDataConfirmationRequestController,
     getPendingDataConfirmationRequestsController,
     getPendingDataConfirmationRequestsCountController,
     resolveDataConfirmationRequestController,
+    followUserController,
+    unfollowUserController,
+    listMyFollowingController,
+    listMyFollowersController,
     getMyCartController,
     replaceMyCartController,
 };

@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { AUTH_TOKEN_STORAGE_KEY } from "../../../shared/api/index.js";
 import { COMMON_UI, LOGIN_MODAL_UI } from "../../../shared/config/appUiCopy.js";
+import { FormFieldLabel } from "../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
 import { loginUser } from "../api/loginUser.js";
 
 import "./LoginModal.css";
@@ -16,9 +17,10 @@ const INITIAL_FORM = {
  * isOpen: boolean;
  * onClose: () => void;
  * onSuccess?: () => void;
+ * onRegisterClick?: () => void;
  * }} props
  */
-export function LoginModal({ isOpen, onClose, onSuccess }) {
+export function LoginModal({ isOpen, onClose, onSuccess, onRegisterClick }) {
   const [form, setForm] = useState(INITIAL_FORM);
   const [status, setStatus] = useState({ kind: "idle", message: "" });
 
@@ -51,6 +53,11 @@ export function LoginModal({ isOpen, onClose, onSuccess }) {
     onClose();
   };
 
+  const handleRegisterClick = () => {
+    setStatus({ kind: "idle", message: "" });
+    onRegisterClick?.();
+  };
+
   return (
     <div
       className="login-modal"
@@ -77,7 +84,7 @@ export function LoginModal({ isOpen, onClose, onSuccess }) {
         </div>
         <form className="login-modal__form" onSubmit={handleSubmit}>
           <label className="login-modal__label">
-            {LOGIN_MODAL_UI.LABEL_EMAIL}
+            <FormFieldLabel required>{LOGIN_MODAL_UI.LABEL_EMAIL}</FormFieldLabel>
             <input
               className="login-modal__input"
               type="email"
@@ -89,7 +96,7 @@ export function LoginModal({ isOpen, onClose, onSuccess }) {
             />
           </label>
           <label className="login-modal__label">
-            {LOGIN_MODAL_UI.LABEL_PASSWORD}
+            <FormFieldLabel required>{LOGIN_MODAL_UI.LABEL_PASSWORD}</FormFieldLabel>
             <input
               className="login-modal__input"
               type="password"
@@ -123,6 +130,16 @@ export function LoginModal({ isOpen, onClose, onSuccess }) {
               ? LOGIN_MODAL_UI.SUBMIT_LOADING
               : LOGIN_MODAL_UI.SUBMIT_IDLE}
           </button>
+          {typeof onRegisterClick === "function" ? (
+            <button
+              type="button"
+              className="login-modal__register"
+              disabled={status.kind === "loading"}
+              onClick={handleRegisterClick}
+            >
+              {LOGIN_MODAL_UI.REGISTER_BUTTON}
+            </button>
+          ) : null}
         </form>
       </div>
     </div>

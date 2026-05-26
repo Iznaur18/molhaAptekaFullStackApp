@@ -10,6 +10,7 @@ import {
     attachProductSellerSnapshots,
 } from '../../utils/attachProductSellerSnapshots.js';
 import { isUserAdmin } from '../../utils/adminUserGuard.js';
+import { notifyFollowersOfSellerNewCatalogProduct } from '../../utils/userFollowHelpers.js';
 import { errorRes, successRes } from '../../utils/index.js';
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 20;
@@ -74,6 +75,15 @@ export const approveProductModerationController = async (req, res) => {
         await product.populate('productSeller', PRODUCT_SELLER_PUBLIC_SELECT);
 
         const enriched = await attachProductSellerSnapshot(product.toObject());
+
+        try {
+            await notifyFollowersOfSellerNewCatalogProduct(enriched);
+        } catch (notifyError) {
+            console.error(
+                'notifyFollowersOfSellerNewCatalogProduct error:',
+                notifyError,
+            );
+        }
 
         return successRes(res, {
             message: 'Товар одобрен и опубликован в каталоге',

@@ -3,7 +3,7 @@
  * проксирует `/cart` и `/user/...` на Express (см. vite.config.js).
  * Путь `/user-list` ок: не совпадает с API `/user` (иначе F5 → 404 JSON).
  *
- * @typedef {'catalog' | 'my-products' | 'users' | 'cart' | 'my-sales' | 'my-orders' | 'admin-orders' | 'product-moderation' | 'product-reports' | 'data-confirmation-requests'} HomeMainView
+ * @typedef {'catalog' | 'my-products' | 'users' | 'subscriptions' | 'cart' | 'my-sales' | 'my-orders' | 'admin-orders' | 'product-moderation' | 'product-reports' | 'data-confirmation-requests'} HomeMainView
  */
 
 /** @type {Record<HomeMainView, string>} */
@@ -12,6 +12,7 @@ export const HOME_MAIN_VIEW_PATH = {
   "my-products": "/my-products",
   /** Список пользователей; не `/users` — путается с API и при F5 на :4444. */
   users: "/user-list",
+  subscriptions: "/subscriptions",
   /** UI корзины; не `/cart` из‑за proxy в Vite. */
   cart: "/basket",
   "my-sales": "/my-sales",
@@ -77,4 +78,14 @@ export function isMyProductsMainView(view) {
  */
 export function isCatalogShellMainView(view) {
   return view === "catalog" || view === "my-products";
+}
+
+/** Экраны, для которых нужна загруженная роль (admin / moderator). */
+export function isRoleRestrictedMainView(view) {
+  return (
+    view === "admin-orders" ||
+    view === "product-moderation" ||
+    view === "product-reports" ||
+    view === "data-confirmation-requests"
+  );
 }

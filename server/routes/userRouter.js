@@ -11,6 +11,10 @@ import {
     getPendingDataConfirmationRequestsController,
     getPendingDataConfirmationRequestsCountController,
     resolveDataConfirmationRequestController,
+    followUserController,
+    unfollowUserController,
+    listMyFollowingController,
+    listMyFollowersController,
 } from '../controllers/index.js';
 import {
     checkAuthMW,
@@ -25,11 +29,25 @@ import {
     userSellerProductsValidation,
     submitDataConfirmationValidation,
     resolveDataConfirmationValidation,
+    userFollowListValidation,
 } from '../validations/index.js';
 
 const router = Router();
 
 router.get('/search', userSearchValidation, userSearchController);
+
+router.get(
+    '/me/following',
+    checkAuthMW,
+    userFollowListValidation,
+    listMyFollowingController,
+);
+router.get(
+    '/me/followers',
+    checkAuthMW,
+    userFollowListValidation,
+    listMyFollowersController,
+);
 
 router.get(
     '/data-confirmation-requests/pending',
@@ -77,6 +95,21 @@ router.get(
     userSellerProductsValidation,
     getUserProductsController,
 );
+router.post(
+    '/:userIdClient/follow',
+    checkAuthMW,
+    updateProfileRateLimiter,
+    userIdParamValidation,
+    followUserController,
+);
+router.delete(
+    '/:userIdClient/follow',
+    checkAuthMW,
+    updateProfileRateLimiter,
+    userIdParamValidation,
+    unfollowUserController,
+);
+
 router.get('/:userIdClient', userIdParamValidation, userGetProfileController);
 
 router.patch(

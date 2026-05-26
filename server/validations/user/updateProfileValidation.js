@@ -12,6 +12,7 @@ import { assertAtMostWords } from '../../utils/maxWordsText.js';
 import { ruDeliveryAddressBodyValidation } from '../address/ruDeliveryAddressValidation.js';
 import { parseUserBackgroundPresetId } from '../../constants/userBackgroundPresets.js';
 import { isHttpBackgroundImageUrl } from '../../utils/userBackgroundValue.js';
+import { assertProfileImageFocus } from '../../utils/profileImageFocus.js';
 
 /**
  * Валидация параметра userId в URL
@@ -103,6 +104,20 @@ export const updateProfileValidation = [
             } catch {
                 throw new Error('URL аватара должен быть валидным URL');
             }
+        }),
+
+    body('userAvatarFocus')
+        .optional({ nullable: true })
+        .custom((value) => {
+            assertProfileImageFocus(value, 'Фокус аватара');
+            return true;
+        }),
+
+    body('userBackgroundFocus')
+        .optional({ nullable: true })
+        .custom((value) => {
+            assertProfileImageFocus(value, 'Фокус фона');
+            return true;
         }),
     
     body('userBackgroundUrl')

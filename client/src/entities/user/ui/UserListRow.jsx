@@ -2,6 +2,10 @@ import { useMemo, useState } from "react";
 
 import { formatSearchRowRating } from "../lib/formatSearchRowRating.js";
 import { formatSearchRowTotalSales } from "../lib/formatSearchRowTotalSales.js";
+import {
+  formatProfileImageObjectPosition,
+  getUserAvatarFocus,
+} from "../lib/profileImageFocus.js";
 import { pickUserProfilePhotoUrl } from "../lib/pickUserProfilePhotoUrl.js";
 import { UserPremiumAvatar } from "./UserPremiumAvatar.jsx";
 import { UserPremiumDisplayName } from "./UserPremiumDisplayName.jsx";
@@ -11,10 +15,7 @@ import {
   USER_ROLE_ADMIN,
   USER_ROLE_USER,
 } from "../model/userConstants.js";
-import {
-  FORMAT_BOOLEAN_RU,
-  USER_LIST_ROW_UI,
-} from "../../../shared/config/appUiCopy.js";
+import { USER_LIST_ROW_UI } from "../../../shared/config/appUiCopy.js";
 
 import "./UserListRow.css";
 
@@ -31,6 +32,9 @@ export function UserListRow({ user, onRowClick }) {
   const userName = user.userName?.trim() ?? "";
   const email = user.email?.trim() ?? "";
   const displayName = userName || USER_LIST_ROW_UI.MISSING_NAME;
+  const avatarObjectPosition = formatProfileImageObjectPosition(
+    getUserAvatarFocus(user),
+  );
   const showEmail = email.length > 0 && email !== userName;
   const ratingText = useMemo(
     () => formatSearchRowRating(user.userRatingByVotes),
@@ -45,9 +49,10 @@ export function UserListRow({ user, onRowClick }) {
     [user.totalPurchasesAmount],
   );
   const isUserDataConfirmed = user.isUserDataConfirmed === true;
-  const confirmedText = isUserDataConfirmed
-    ? FORMAT_BOOLEAN_RU.YES
-    : FORMAT_BOOLEAN_RU.NO;
+  const followersText = useMemo(() => {
+    const n = Number(user.followersCount);
+    return Number.isFinite(n) ? String(Math.max(0, Math.floor(n))) : "0";
+  }, [user.followersCount]);
   const metaBadges = useMemo(() => {
     const items = [];
     if (
@@ -72,6 +77,7 @@ export function UserListRow({ user, onRowClick }) {
           className="user-list-row__avatar"
           src={src}
           isPremium={Boolean(user.isPremiumUser)}
+          objectPosition={avatarObjectPosition}
           decoding="async"
           onError={() => setImgFailed(true)}
         />
@@ -131,18 +137,12 @@ export function UserListRow({ user, onRowClick }) {
             {totalPurchasesText}
           </span>
         </span>
-        <span className="user-list-row__metric user-list-row__metric_confirmed">
-          <span className="user-list-row__metric-label user-list-row__metric-label_long">
-            {USER_LIST_ROW_UI.USER_DATA_CONFIRMED_LABEL}
+        <span className="user-list-row__metric user-list-row__metric_followers">
+          <span className="user-list-row__metric-label">
+            {USER_LIST_ROW_UI.FOLLOWERS_LABEL}
           </span>
-          <span
-            className={
-              isUserDataConfirmed
-                ? "user-list-row__metric-value user-list-row__metric-value_confirmed-yes"
-                : "user-list-row__metric-value user-list-row__metric-value_confirmed-no"
-            }
-          >
-            {confirmedText}
+          <span className="user-list-row__metric-value user-list-row__metric-value_amount">
+            {followersText}
           </span>
         </span>
       </span>

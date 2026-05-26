@@ -1,0 +1,23 @@
+.product-seller-manage {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.product-seller-manage__error {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.4;
+  color: #b42318;
+}
+
+.product-seller-manage__toggle {
+  flex-shrink: 0;
+}
+
+.product-seller-manage__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}

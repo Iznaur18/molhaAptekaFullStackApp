@@ -16,6 +16,8 @@ import {
   USER_LIST_ROW_UI,
 } from "../../../shared/config/appUiCopy.js";
 
+import { ProductPriceOfferSectionTitle } from "./ProductPriceOfferSectionTitle.jsx";
+
 import "./ProductPriceOffer.css";
 
 /**
@@ -86,30 +88,44 @@ export function ProductPriceOfferSellerTab({
 
   if (phase === "loading") {
     return (
-      <p className="product-price-offer__empty">
-        {PRODUCT_PRICE_OFFER_UI.SELLER_LOADING}
-      </p>
+      <section className="product-price-offer">
+        <ProductPriceOfferSectionTitle />
+        <p className="product-price-offer__empty">
+          {PRODUCT_PRICE_OFFER_UI.SELLER_LOADING}
+        </p>
+      </section>
     );
   }
 
   if (phase === "error" && offers.length === 0) {
     return (
-      <p className="product-price-offer__error" role="alert">
-        {error}
-      </p>
+      <section className="product-price-offer">
+        <ProductPriceOfferSectionTitle />
+        <p className="product-price-offer__error" role="alert">
+          {error}
+        </p>
+      </section>
     );
   }
 
   if (offers.length === 0) {
     return (
-      <p className="product-price-offer__empty">
-        {PRODUCT_PRICE_OFFER_UI.SELLER_EMPTY}
-      </p>
+      <section className="product-price-offer">
+        <ProductPriceOfferSectionTitle />
+        <p className="product-price-offer__empty">
+          {PRODUCT_PRICE_OFFER_UI.SELLER_EMPTY}
+        </p>
+      </section>
     );
   }
 
   return (
-    <ul className="product-price-offer__seller-list" role="list">
+    <section className="product-price-offer">
+      <ProductPriceOfferSectionTitle />
+      <h2 className="product-price-offer__heading">
+        {PRODUCT_PRICE_OFFER_UI.SECTION_TOP_TITLE}
+      </h2>
+      <ul className="product-price-offer__seller-list" role="list">
       {error ? (
         <li className="product-price-offer__error" role="alert">
           {error}
@@ -162,6 +178,7 @@ export function ProductPriceOfferSellerTab({
               <div className="product-price-offer__seller-actions">
                 <button
                   type="button"
+                  className="product-price-offer__btn product-price-offer__btn--primary"
                   disabled={isRowBusy}
                   onClick={() => void handleAccept(String(row._id))}
                 >
@@ -171,7 +188,7 @@ export function ProductPriceOfferSellerTab({
                 </button>
                 <button
                   type="button"
-                  className="product-price-offer__reject-btn"
+                  className="product-price-offer__btn product-price-offer__btn--reject"
                   disabled={isRowBusy}
                   onClick={() => void handleReject(String(row._id))}
                 >
@@ -182,6 +199,7 @@ export function ProductPriceOfferSellerTab({
           </li>
         );
       })}
-    </ul>
+      </ul>
+    </section>
   );
 }

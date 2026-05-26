@@ -86,7 +86,7 @@ export const parseProductSortFromQuery = (query) => {
     return PRODUCT_SORT_NEWEST;
 };
 
-const soldQuantityLookupStage = () => ({
+export const soldQuantityLookupStage = () => ({
     $lookup: {
         from: 'orders',
         let: { productId: '$_id' },
@@ -111,7 +111,7 @@ const soldQuantityLookupStage = () => ({
     },
 });
 
-const soldQuantityAddFieldsStage = () => ({
+export const soldQuantityAddFieldsStage = () => ({
     $addFields: {
         soldQuantity: {
             $ifNull: [

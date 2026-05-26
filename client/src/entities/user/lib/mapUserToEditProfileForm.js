@@ -1,4 +1,8 @@
 import { addressValueFromUser } from "../../address/lib/addressValueFromUser.js";
+import {
+  getUserAvatarFocus,
+  getUserBackgroundFocus,
+} from "./profileImageFocus.js";
 import { parseUserBackgroundFormFields } from "./userBackgroundValue.js";
 import {
   DEFAULT_USER_AVATAR_URL,
@@ -15,7 +19,9 @@ import {
  * @property {import('../../address/model/types.js').RuDeliveryAddressValue} deliveryAddress
  * @property {string} userPhoneNumber
  * @property {string} userAvatarUrl
+ * @property {{ x: number; y: number }} userAvatarFocus
  * @property {string} backgroundPresetId
+ * @property {{ x: number; y: number }} userBackgroundFocus
  * @property {string} backgroundImageUrl
  * @property {boolean} notificationsEnabled
  * @property {string} notesAboutUser
@@ -49,8 +55,10 @@ export function mapUserToEditProfileForm(user) {
     deliveryAddress: addressValueFromUser(user),
     userPhoneNumber: user.userPhoneNumber ?? "",
     userAvatarUrl: user.userAvatarUrl ?? DEFAULT_USER_AVATAR_URL,
+    userAvatarFocus: getUserAvatarFocus(user),
     backgroundPresetId: presetId || DEFAULT_USER_BACKGROUND_PRESET_ID,
     backgroundImageUrl: imageUrl,
+    userBackgroundFocus: getUserBackgroundFocus(user),
     notificationsEnabled: Boolean(user.notificationsEnabled),
     notesAboutUser: user.notesAboutUser ?? "",
     userRole: user.userRole ?? USER_ROLE_USER,

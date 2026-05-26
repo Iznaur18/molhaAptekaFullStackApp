@@ -16,6 +16,11 @@ import {
   MY_PRODUCTS_MODERATION_FILTER_ALL,
 } from "../../../entities/product/model/productConstants.js";
 import { isCurrentUserProductSeller } from "../../../entities/product/lib/isCurrentUserProductSeller.js";
+import {
+  canSellerDeleteProduct,
+  canSellerEditProduct,
+  canSellerToggleCatalogVisibility,
+} from "../../../entities/product/lib/getProductModerationUi.js";
 import { getSellerProductsLimit } from "../../../entities/product/lib/sellerProductsLimit.js";
 import { CreateProductModal } from "../../../entities/product/ui/CreateProductModal.jsx";
 import { SellerProductsLimitModal } from "../../../entities/product/ui/SellerProductsLimitModal.jsx";
@@ -52,6 +57,12 @@ import { CartPage } from "../../cart/ui/CartPage.jsx";
 import { MyOrdersPage } from "../../my-orders/ui/MyOrdersPage.jsx";
 import { MySalesPage } from "../../my-sales/ui/MySalesPage.jsx";
 import { UsersPage } from "../../users/ui/UsersPage.jsx";
+import { SubscriptionsPage } from "../../subscriptions/ui/SubscriptionsPage.jsx";
+import { UserFollowButton } from "../../../entities/user-follow/ui/UserFollowButton.jsx";
+import {
+  IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_NEW_PRODUCT,
+  IN_APP_NOTIFICATION_KIND_NEW_FOLLOWER,
+} from "../../../entities/user-follow/model/constants.js";
 import { AUTH_TOKEN_STORAGE_KEY } from "../../../shared/api/index.js";
 import {
   API_CLIENT_UI,
@@ -62,10 +73,20 @@ import {
 import {
   isCatalogShellMainView,
   isMyProductsMainView,
+  isRoleRestrictedMainView,
   mainViewToPathname,
   pathnameToMainView,
 } from "../../../shared/lib/homeMainViewPaths.js";
+import { getHomePageVariantClass } from "../lib/homeHeaderVariant.js";
 import { useDebouncedValue } from "../../../shared/lib/useDebouncedValue.js";
+import {
+  CATALOG_FILTER_AUCTION_ONLY,
+  CATALOG_FILTER_FOLLOWING_ONLY,
+} from "../../../entities/product/model/productConstants.js";
+import {
+  getCatalogSelectValue,
+  isCatalogFilterSelectValue,
+} from "../lib/catalogSelect.js";
 
 import { HomeCatalogGrid } from "./HomeCatalogGrid.jsx";
 import { HomePageHeader } from "./HomePageHeader.jsx";
@@ -74,7 +95,7 @@ import "./HomePage.css";
 
 /** @typedef {import('../../../entities/product/model/types.js').ProductFromApi} ProductFromApi */
 /** @typedef {{ open: boolean; phase: 'idle'|'loading'|'success'|'error'; user: import('../../../entities/user/model/types.js').UserPublicProfile | null; error: string }} ProfileModalState */
-/** @typedef {'catalog' | 'my-products' | 'users' | 'cart' | 'my-sales' | 'my-orders' | 'admin-orders' | 'product-moderation' | 'product-reports' | 'data-confirmation-requests'} HomeMainView */
+/** @typedef {'catalog' | 'my-products' | 'users' | 'subscriptions' | 'cart' | 'my-sales' | 'my-orders' | 'admin-orders' | 'product-moderation' | 'product-reports' | 'data-confirmation-requests'} HomeMainView */
 
 const EMPTY_PROFILE_MODAL = Object.freeze({
   open: false,
@@ -89,14 +110,18 @@ const useCurrentUserSession = (isAuthorized) => {
     /** @type {'user'|'admin'|'moderator'|null} */ (null),
   );
   const [isPremiumUser, setIsPremiumUser] = useState(false);
+  const [isSessionReady, setIsSessionReady] = useState(() => !isAuthorized);
 
   useEffect(() => {
     if (!isAuthorized) {
       setCurrentUserId(null);
       setCurrentUserRole(null);
       setIsPremiumUser(false);
+      setIsSessionReady(true);
       return undefined;
     }
+
+    setIsSessionReady(false);
     let isCancelled = false;
 
     void (async () => {
@@ -113,6 +138,10 @@ const useCurrentUserSession = (isAuthorized) => {
           setCurrentUserRole(null);
           setIsPremiumUser(false);
         }
+      } finally {
+        if (!isCancelled) {
+          setIsSessionReady(true);
+        }
       }
     })();
 
@@ -121,7 +150,13 @@ const useCurrentUserSession = (isAuthorized) => {
     };
   }, [isAuthorized]);
 
-  return [currentUserId, currentUserRole, isPremiumUser, setCurrentUserId];
+  return [
+    currentUserId,
+    currentUserRole,
+    isPremiumUser,
+    setCurrentUserId,
+    isSessionReady,
+  ];
 };
 
 export function HomePage() {
@@ -182,8 +217,13 @@ export function HomePage() {
   const [productToEdit, setProductToEdit] = useState(null);
   const [usersListTick, setUsersListTick] = useState(0);
   const [catalogRefreshTick, setCatalogRefreshTick] = useState(0);
-  const [currentUserId, currentUserRole, isPremiumUser, setCurrentUserId] =
-    useCurrentUserSession(isAuthorized);
+  const [
+    currentUserId,
+    currentUserRole,
+    isPremiumUser,
+    setCurrentUserId,
+    isSessionReady,
+  ] = useCurrentUserSession(isAuthorized);
   const [myProductsTotal, setMyProductsTotal] = useState(
     /** @type {number | null} */ (null),
   );
@@ -201,6 +241,9 @@ export function HomePage() {
     currentUserRole === USER_ROLE_MODERATOR;
 
   useEffect(() => {
+    if (!isSessionReady) {
+      return;
+    }
     if (mainView === "admin-orders" && !isAdmin) {
       goToMainView("catalog");
       return;
@@ -211,11 +254,18 @@ export function HomePage() {
     }
     if (mainView === "product-reports" && !canModerateProducts) {
       goToMainView("catalog");
+      return;
     }
     if (mainView === "data-confirmation-requests" && !canModerateProducts) {
       goToMainView("catalog");
     }
-  }, [mainView, isAdmin, canModerateProducts, goToMainView]);
+  }, [
+    mainView,
+    isAdmin,
+    canModerateProducts,
+    goToMainView,
+    isSessionReady,
+  ]);
 
   const refreshPendingProductReportsCount = useCallback(async () => {
     if (!canModerateProducts || !isAuthorized) {
@@ -253,6 +303,8 @@ export function HomePage() {
 
   const [showHiddenCatalogProducts, setShowHiddenCatalogProducts] =
     useState(false);
+  const [catalogFollowingOnly, setCatalogFollowingOnly] = useState(false);
+  const [catalogAuctionOnly, setCatalogAuctionOnly] = useState(false);
   const [isAdminEditUserOpen, setIsAdminEditUserOpen] = useState(false);
   const [isAdminDeleteUserOpen, setIsAdminDeleteUserOpen] = useState(false);
   /** @type {[ProductFromApi | null, import('react').Dispatch<import('react').SetStateAction<ProductFromApi | null>>]} */
@@ -286,6 +338,41 @@ export function HomePage() {
     productSearchTerm,
     PRODUCT_SEARCH_UI.DEBOUNCE_MS,
   );
+
+  const catalogSelectValue = useMemo(
+    () =>
+      getCatalogSelectValue({
+        catalogSort,
+        catalogFollowingOnly,
+        catalogAuctionOnly,
+      }),
+    [catalogSort, catalogFollowingOnly, catalogAuctionOnly],
+  );
+
+  const handleCatalogSelectChange = useCallback(
+    (value) => {
+      if (value === CATALOG_FILTER_FOLLOWING_ONLY) {
+        if (!isAuthorized) {
+          setIsLoginModalOpen(true);
+          return;
+        }
+        setCatalogFollowingOnly(true);
+        setCatalogAuctionOnly(false);
+        return;
+      }
+      if (value === CATALOG_FILTER_AUCTION_ONLY) {
+        setCatalogFollowingOnly(false);
+        setCatalogAuctionOnly(true);
+        return;
+      }
+      if (!isCatalogFilterSelectValue(value)) {
+        setCatalogFollowingOnly(false);
+        setCatalogAuctionOnly(false);
+        setCatalogSort(value);
+      }
+    },
+    [isAuthorized],
+  );
   const isProductSearchPending =
     productSearchTerm !== debouncedProductSearchTerm;
   const hasProductSearchQuery = debouncedProductSearchTerm.trim() !== "";
@@ -302,6 +389,26 @@ export function HomePage() {
     }
     return !isCurrentUserProductSeller(catalogProductDetails, currentUserId);
   }, [isAuthorized, catalogProductDetails, currentUserId]);
+
+  const showCatalogProductManageFooter = useMemo(() => {
+    const product = catalogProductDetails;
+    if (!product || !isAuthorized || !currentUserId) {
+      return false;
+    }
+    if (isAdmin) {
+      return true;
+    }
+    if (isMineMode) {
+      return false;
+    }
+    return isCurrentUserProductSeller(product, currentUserId);
+  }, [
+    catalogProductDetails,
+    isAuthorized,
+    currentUserId,
+    isAdmin,
+    isMineMode,
+  ]);
 
   const catalogDetailsShowAddToCart = useMemo(() => {
     const product = catalogProductDetails;
@@ -324,15 +431,19 @@ export function HomePage() {
   ]);
 
   useEffect(() => {
+    if (!isSessionReady) {
+      return;
+    }
     if (!isAuthorized) {
       setMyProductsCatalogError("");
       setMyProductsTotal(null);
       setMyProductsModerationFilter(MY_PRODUCTS_MODERATION_FILTER_ALL);
+      setCatalogFollowingOnly(false);
       if (isMyProductsMainView(mainView)) {
         goToMainView("catalog");
       }
     }
-  }, [isAuthorized, mainView, goToMainView]);
+  }, [isAuthorized, mainView, goToMainView, isSessionReady]);
 
   useEffect(() => {
     if (!isMineMode) {
@@ -403,6 +514,8 @@ export function HomePage() {
         sort: catalogSort,
         includeHidden:
           isAdmin && !isMineMode && showHiddenCatalogProducts,
+        followingOnly: !isMineMode && catalogFollowingOnly,
+        auctionOnly: !isMineMode && catalogAuctionOnly,
       });
     },
     [
@@ -413,6 +526,8 @@ export function HomePage() {
       myProductsModerationFilter,
       isAdmin,
       showHiddenCatalogProducts,
+      catalogFollowingOnly,
+      catalogAuctionOnly,
     ],
   );
 
@@ -462,6 +577,8 @@ export function HomePage() {
     catalogSort,
     myProductsModerationFilter,
     showHiddenCatalogProducts,
+    catalogFollowingOnly,
+    catalogAuctionOnly,
     loadCatalogPage,
     catalogRefreshTick,
   ]);
@@ -625,6 +742,96 @@ export function HomePage() {
     goToMainView("catalog");
     setSelectedProductCategory(null);
     setIsProductCategoryListOpen(false);
+  };
+
+  const handleSubscriptionsFromProfile = () => {
+    closeMyProfileModal();
+    goToMainView("subscriptions");
+  };
+
+  /**
+   * @param {import('../../product-report/model/types.js').UserInAppNotification} item
+   */
+  const handleInAppNotificationClick = (item) => {
+    if (item.kind === IN_APP_NOTIFICATION_KIND_NEW_FOLLOWER && item.actorUserId) {
+      closeMyProfileModal();
+      handleSellerNameClick(item.actorUserId);
+      return;
+    }
+    if (
+      item.kind === IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_NEW_PRODUCT &&
+      item.productId
+    ) {
+      closeMyProfileModal();
+      goToMainView("catalog");
+      const inList = products.find(
+        (p) => String(p._id) === String(item.productId),
+      );
+      if (inList) {
+        setCatalogProductDetails(inList);
+        return;
+      }
+      void (async () => {
+        try {
+          const { products: pageProducts } = await fetchCatalogProductsPage({
+            page: 1,
+            limit: 100,
+          });
+          const found = pageProducts.find(
+            (p) => String(p._id) === String(item.productId),
+          );
+          if (found) setCatalogProductDetails(found);
+        } catch {
+          // каталог открыт без модалки
+        }
+      })();
+    }
+  };
+
+  /**
+   * @param {{
+   *   isFollowing: boolean;
+   *   followersCount?: number;
+   *   followingCount?: number;
+   * }} patch
+   */
+  const handleSellerFollowChange = (patch) => {
+    setSellerModal((prev) => {
+      if (prev.phase !== "success" || !prev.user) return prev;
+      return {
+        ...prev,
+        user: {
+          ...prev.user,
+          isFollowing: patch.isFollowing,
+          ...(patch.followersCount != null
+            ? { followersCount: patch.followersCount }
+            : {}),
+          ...(patch.followingCount != null
+            ? { followingCount: patch.followingCount }
+            : {}),
+        },
+      };
+    });
+  };
+
+  const renderSellerFollowAccessory = () => {
+    if (sellerModal.phase !== "success" || !sellerModal.user) return null;
+    if (
+      !currentUserId ||
+      String(sellerModal.user._id) === String(currentUserId)
+    ) {
+      return null;
+    }
+    return (
+      <UserFollowButton
+        targetUserId={String(sellerModal.user._id)}
+        isFollowing={sellerModal.user.isFollowing === true}
+        isAuthorized={isAuthorized}
+        isSelf={false}
+        onRequestLogin={() => setIsLoginModalOpen(true)}
+        onFollowChange={handleSellerFollowChange}
+      />
+    );
   };
 
   const handleMyProductsFromProfile = () => {
@@ -884,12 +1091,31 @@ export function HomePage() {
   };
 
   const renderMainContent = () => {
+    if (
+      isAuthorized &&
+      !isSessionReady &&
+      isRoleRestrictedMainView(mainView)
+    ) {
+      return (
+        <p className="home-page__state">{HOME_PAGE_UI.LOADING_SESSION}</p>
+      );
+    }
+
     if (mainView === "users") {
       return (
         <UsersPage
           key={usersListTick}
           onUserRowClick={handleSellerNameClick}
           isAdminViewer={isAdmin}
+        />
+      );
+    }
+    if (mainView === "subscriptions") {
+      return (
+        <SubscriptionsPage
+          isAuthorized={isAuthorized}
+          onRequestLogin={() => setIsLoginModalOpen(true)}
+          onUserClick={handleSellerNameClick}
         />
       );
     }
@@ -905,16 +1131,23 @@ export function HomePage() {
       );
     }
     if (mainView === "my-orders") {
-      return <MyOrdersPage
-        isAuthorized={isAuthorized}
-        onSellerNameClick={handleSellerNameClick}
-      />;
+      return (
+        <MyOrdersPage
+          isAuthorized={isAuthorized}
+          currentUserId={currentUserId}
+          onSellerNameClick={handleSellerNameClick}
+          onRequestLogin={() => setIsLoginModalOpen(true)}
+        />
+      );
     }
     if (mainView === "my-sales") {
-      return <MySalesPage
-        isAuthorized={isAuthorized}
-        onSellerNameClick={handleSellerNameClick}
-      />;
+      return (
+        <MySalesPage
+          isAuthorized={isAuthorized}
+          currentUserId={currentUserId}
+          onSellerNameClick={handleSellerNameClick}
+        />
+      );
     }
     if (mainView === "admin-orders") {
       if (!isAdmin) return null;
@@ -979,12 +1212,14 @@ export function HomePage() {
         catalogLoadMoreError={catalogLoadMoreError}
         onRetryCatalogLoadMore={handleRetryCatalogLoadMore}
         myProductsModerationFilter={myProductsModerationFilter}
+        catalogFollowingOnly={catalogFollowingOnly}
+        catalogAuctionOnly={catalogAuctionOnly}
       />
     );
   };
 
   return (
-    <div className="home-page">
+    <div className={`home-page ${getHomePageVariantClass()}`}>
       <CartServerSync isAuthorized={isAuthorized} />
       <HomePageHeader
         mainView={mainView}
@@ -1012,8 +1247,8 @@ export function HomePage() {
         onNavigateToFullCatalogFromBreadcrumb={
           handleNavigateToFullCatalogFromBreadcrumb
         }
-        catalogSort={catalogSort}
-        onCatalogSortChange={setCatalogSort}
+        catalogSelectValue={catalogSelectValue}
+        onCatalogSelectChange={handleCatalogSelectChange}
         isAdmin={isAdmin}
         showHiddenCatalogProducts={showHiddenCatalogProducts}
         onShowHiddenCatalogProductsChange={setShowHiddenCatalogProducts}
@@ -1029,6 +1264,7 @@ export function HomePage() {
         user={sellerModal.phase === "success" ? sellerModal.user : null}
         isLoading={sellerModal.phase === "loading"}
         errorMessage={sellerModal.phase === "error" ? sellerModal.error : null}
+        titleAccessory={renderSellerFollowAccessory()}
         currentUserId={currentUserId}
         isAuthorized={isAuthorized}
         viewerCanSeeOtherUserPurchases={
@@ -1122,6 +1358,10 @@ export function HomePage() {
         onDataConfirmationClick={
           isAuthorized ? handleDataConfirmationFromProfile : undefined
         }
+        onSubscriptionsClick={
+          isAuthorized ? handleSubscriptionsFromProfile : undefined
+        }
+        onInAppNotificationClick={handleInAppNotificationClick}
         pendingProductReportsCount={pendingProductReportsCount}
         pendingDataConfirmationCount={pendingDataConfirmationCount}
         inAppNotifications={inAppNotifications}
@@ -1205,6 +1445,10 @@ export function HomePage() {
           setIsAuthorized(true);
           setIsLoginModalOpen(false);
         }}
+        onRegisterClick={() => {
+          setIsLoginModalOpen(false);
+          setIsRegisterModalOpen(true);
+        }}
       />
       <RegisterModal
         isOpen={isRegisterModalOpen}
@@ -1269,7 +1513,7 @@ export function HomePage() {
           ) : null
         }
         adminFooter={
-          isAdmin && catalogProductDetails ? (
+          showCatalogProductManageFooter && catalogProductDetails ? (
             <ProductDetailsAdminFooter
               product={catalogProductDetails}
               onEdit={handleAdminOpenEditProductFromDetails}
@@ -1283,6 +1527,16 @@ export function HomePage() {
                 String(catalogProductDetails._id)
               }
               errorMessage={productDetailsAdminError}
+              canEdit={
+                isAdmin || canSellerEditProduct(catalogProductDetails)
+              }
+              canDelete={
+                isAdmin || canSellerDeleteProduct(catalogProductDetails)
+              }
+              canToggleVisibility={
+                isAdmin ||
+                canSellerToggleCatalogVisibility(catalogProductDetails)
+              }
             />
           ) : null
         }

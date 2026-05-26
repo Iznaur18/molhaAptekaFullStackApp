@@ -23,6 +23,11 @@ const UserInAppNotificationSchema = new mongoose.Schema(
             ref: 'Product',
             default: null,
         },
+        actorUserId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            default: null,
+        },
         readAt: {
             type: Date,
             default: null,

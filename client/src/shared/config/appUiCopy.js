@@ -8,6 +8,7 @@ export const COMMON_UI = {
   EM_DASH: "—",
   MODAL_CLOSE_GLYPH: "×",
   LOCALE_RU: "ru-RU",
+  REQUIRED_FIELD_HINT: "Обязательно",
 };
 
 /** Да / нет в интерфейсе (карточка товара, профиль и т.д.) */
@@ -28,6 +29,7 @@ export const API_CLIENT_UI = {
   FETCH_USER_PRODUCTS_FALLBACK: "Не удалось загрузить товары",
   FETCH_USERS_SEARCH_FALLBACK: "Не удалось загрузить пользователей",
   FETCH_MY_PRODUCTS_FALLBACK: "Не удалось загрузить ваши товары",
+  FETCH_CATALOG_PRODUCT_FALLBACK: "Не удалось загрузить карточку товара",
   DELETE_MY_PRODUCT_FALLBACK: "Не удалось удалить товар",
   PATCH_MY_PRODUCT_FALLBACK: "Не удалось обновить товар",
   CREATE_PRODUCT_FALLBACK: "Не удалось создать товар",
@@ -66,6 +68,44 @@ export const API_CLIENT_UI = {
   FETCH_SELLER_PRICE_OFFERS_FALLBACK: "Не удалось загрузить аукцион",
   ACCEPT_PRICE_OFFER_FALLBACK: "Не удалось принять предложение",
   REJECT_PRICE_OFFER_FALLBACK: "Не удалось отклонить предложение",
+  FOLLOW_USER_FALLBACK: "Не удалось подписаться",
+  UNFOLLOW_USER_FALLBACK: "Не удалось отписаться",
+  FETCH_MY_FOLLOWING_FALLBACK: "Не удалось загрузить подписки",
+  FETCH_PRODUCT_REVIEW_SUMMARY_FALLBACK: "Не удалось загрузить отзывы",
+  FETCH_PRODUCT_REVIEWS_FALLBACK: "Не удалось загрузить список отзывов",
+  SUBMIT_PRODUCT_REVIEW_FALLBACK: "Не удалось опубликовать отзыв",
+  PATCH_PRODUCT_REVIEW_FALLBACK: "Не удалось обновить отзыв",
+  DELETE_PRODUCT_REVIEW_FALLBACK: "Не удалось удалить отзыв",
+};
+
+/** Отзывы на товар */
+export const PRODUCT_REVIEW_UI = {
+  TAB_REVIEWS: "Отзывы",
+  /** @param {number} count */
+  TAB_REVIEWS_WITH_COUNT: (count) => `Отзывы (${count})`,
+  SECTION_TITLE: "Отзывы",
+  RATING_LINE: "★ {rating} · {count} отзывов",
+  NO_REVIEWS: "Отзывов пока нет",
+  YOUR_REVIEW: "Ваш отзыв",
+  LEAVE_REVIEW: "Оставить отзыв",
+  LABEL_RATING: "Оценка",
+  LABEL_TEXT: "Текст отзыва (необязательно)",
+  TEXT_PLACEHOLDER: "Что понравилось или не понравилось — по желанию",
+  /** @param {number} current @param {number} max */
+  TEXT_CHARS_USED: (current, max) => `${current} / ${max}`,
+  SUBMIT: "Опубликовать отзыв",
+  SAVE: "Сохранить",
+  EDIT: "Изменить",
+  CANCEL_EDIT: "Отмена",
+  DELETE: "Удалить отзыв",
+  LOAD_MORE: "Показать ещё",
+  LOADING: "Загрузка…",
+  LOGIN_TO_REVIEW: "Войдите, чтобы оставить отзыв",
+  CONFIRMED_DATA_REQUIRED:
+    "Отзыв доступен только пользователям с подтверждёнными данными",
+  NOT_DELIVERED: "Отзыв можно оставить после получения товара",
+  STAR_ARIA: "Оценка {value} из 5",
+  DELETE_CONFIRM: "Удалить отзыв?",
 };
 
 /** Предложения цены (аукцион) */
@@ -74,6 +114,7 @@ export const PRODUCT_PRICE_OFFER_UI = {
   SECTION_FORM_TITLE: "Ваша цена",
   TAB_DETAILS: "О товаре",
   TAB_AUCTION: "Аукцион",
+  AUCTION_SHORTCUT: "В аукцион",
   LABEL_PRICE: "Ваша цена, ₽",
   SUBMIT: "Предложить цену",
   UPDATE: "Изменить цену",
@@ -131,16 +172,18 @@ export const PRODUCT_SEARCH_INPUT_UI = {
 export const HOME_PAGE_UI = {
   PRODUCT_CATEGORY_FILTER_LIST_ID: "home-product-category-filter-list",
   LOADING_CATALOG: "Загрузка каталога…",
+  LOADING_SESSION: "Загрузка…",
   FETCH_PRODUCTS_FALLBACK: "Не удалось загрузить товары",
   FETCH_PROFILE_FALLBACK: "Не удалось загрузить профиль",
   FETCH_MY_PROFILE_FALLBACK: "Не удалось загрузить мой профиль",
   // TITLE_CATALOG: "Каталог товаров",
   TITLE_CATALOG: "iziBuy — покупай и продавай",
   BREADCRUMB_HOME: "Главная",
+  NAV_TO_HOME: "Главная",
   BREADCRUMB_MY_PROFILE: "Мой профиль",
   BREADCRUMB_MY_PRODUCTS: "Мои товары",
   BREADCRUMB_SEPARATOR: " > ",
-  ARIA_MY_PRODUCTS_CRUMB: "Главная, Мой профиль, Мои товары",
+  ARIA_MY_PRODUCTS_CRUMB: "Мой профиль, Мои товары",
   TITLE_USERS: "Пользователи",
   TITLE_CART: "Корзина",
   TITLE_MY_ORDERS: "Мои покупки",
@@ -150,7 +193,15 @@ export const HOME_PAGE_UI = {
   TITLE_PRODUCT_REPORTS: "Жалобы",
   TITLE_DATA_CONFIRMATION: "Подтверждение данных",
   NAV_TO_CATALOG: "← Каталог товаров",
+  NAV_AUTH_ARIA: "Действия аккаунта",
+  NAV_SECTIONS_ARIA: "Навигация по разделам",
   NAV_TO_USERS: "Пользователи",
+  NAV_TO_SUBSCRIPTIONS: "Подписки",
+  TITLE_SUBSCRIPTIONS: "Подписки",
+  FILTER_FOLLOWING_ONLY: "Только от подписок",
+  FILTER_AUCTION_ONLY: "Только с аукционом",
+  EMPTY_FOLLOWING_FILTER: "Нет товаров от ваших подписок с текущими фильтрами.",
+  LOGIN_FOR_FOLLOWING_FILTER: "Войдите, чтобы включить фильтр «только от подписок».",
   NAV_TO_CART: "Корзина",
   NAV_TO_MY_ORDERS: "Мои покупки",
   NAV_TO_ADMIN_ORDERS: "Все заказы",
@@ -164,7 +215,6 @@ export const HOME_PAGE_UI = {
   MY_PRODUCTS_QUOTA_LABEL: "Товаров",
   LIST_PRODUCT_BUTTON: "Разместить товар",
   LOGIN_TO_LIST_PRODUCT: "Войти, чтобы разместить",
-  SUBTITLE_ALL_PRODUCTS: "Все позиции из каталога",
   AUTH_MY_PROFILE: "Мой профиль",
   AUTH_LOGIN: "Войти",
   AUTH_REGISTER: "Зарегистрироваться",
@@ -256,6 +306,7 @@ export const ORDER_CARD_UI = {
 export const MY_ORDERS_PAGE_UI = {
   TITLE: "Мои покупки",
   LOADING: "Загрузка покупок…",
+  PRODUCT_DETAILS_LOADING: "Открываем карточку товара…",
   EMPTY: "У вас пока нет покупок.",
   /** @param {number} points */
   LOYALTY_POINTS_EARNED: (points) => `+${points} баллов лояльности`,
@@ -361,6 +412,21 @@ export const IN_APP_NOTIFICATIONS_UI = {
   SECTION_ARIA: "Уведомления",
 };
 
+export const USER_FOLLOW_BUTTON_UI = {
+  FOLLOW: "Подписаться",
+  UNFOLLOW: "Отписаться",
+  LOADING: "…",
+  ERROR: "Не удалось изменить подписку",
+};
+
+export const SUBSCRIPTIONS_PAGE_UI = {
+  LOADING: "Загрузка подписок…",
+  EMPTY: "Вы ни на кого не подписаны. Найдите продавцов в разделе «Пользователи».",
+  FETCH_FALLBACK: "Не удалось загрузить подписки",
+  LOGIN_HINT: "Войдите, чтобы видеть список подписок.",
+  LOGIN_BUTTON: "Войти",
+};
+
 /** Страница «Мои продажи» */
 export const MY_SALES_PAGE_UI = {
   TITLE: "Мои продажи",
@@ -373,9 +439,6 @@ export const MY_SALES_PAGE_UI = {
   SEARCH_LABEL: "Поиск покупателя",
   SEARCH_PLACEHOLDER: "Имя, email или телефон покупателя…",
   SEARCH_DEBOUNCE_MS: 350,
-  PRODUCT_FILTER_LABEL: "Товары",
-  PRODUCT_FILTER_EMPTY_CATALOG: "В каталоге нет товаров — фильтр по позициям недоступен.",
-  EMPTY_BY_PRODUCT_FILTER: "По выбранным товарам продаж не найдено.",
 };
 
 /** Страница «Все заказы» (админ) */
@@ -469,6 +532,7 @@ export const USER_LIST_ROW_UI = {
   TOTAL_PURCHASES_LABEL: "Покупок на сумму",
   RATING_LABEL: "Рейтинг",
   USER_DATA_CONFIRMED_LABEL: "Пользователь подтверждён",
+  FOLLOWERS_LABEL: "Подписчики",
 };
 
 /** Модалка при достижении лимита товаров продавца */
@@ -537,6 +601,8 @@ export const PRODUCT_CARD_UI = {
   HIDE_FROM_CATALOG: "Скрыть от покупателей",
   SHOW_IN_CATALOG: "Показать в каталоге",
   AVAILABILITY_TOGGLE_PENDING: "Обновление…",
+  MANAGE_PRODUCT_TOGGLE: "Редактировать",
+  MANAGE_PRODUCT_COLLAPSE: "Свернуть",
   EDIT_PRODUCT: "Изменить",
   DELETE_PRODUCT: "Удалить товар",
   DELETE_PRODUCT_PENDING: "Удаление…",
@@ -563,6 +629,7 @@ export const LOGIN_MODAL_UI = {
   LABEL_PASSWORD: "Пароль",
   SUBMIT_IDLE: "Войти",
   SUBMIT_LOADING: "Входим…",
+  REGISTER_BUTTON: "Зарегистрироваться",
   SUCCESS: "Вы успешно вошли в аккаунт",
   ERROR_GENERIC: "Ошибка при входе",
   PASSWORD_MIN_LENGTH: 6,
@@ -657,6 +724,7 @@ export const MY_PROFILE_MODAL_UI = {
   TAB_PRODUCT_MODERATION: "На модерации",
   TAB_PRODUCT_REPORTS: "Жалобы",
   TAB_DATA_CONFIRMATION: "Подтверждение",
+  TAB_SUBSCRIPTIONS: "Подписки",
   DATA_CONFIRMATION: "Подтверждение данных",
   EDIT_PROFILE: "Изменить профиль",
   LOGOUT: "Выйти",
@@ -692,6 +760,11 @@ export const EDIT_PROFILE_MODAL_UI = {
   CANCEL: "Отмена",
 };
 
+export const PROFILE_IMAGE_FOCUS_EDITOR_UI = {
+  HINT_AVATAR: "Кликните или перетащите картинку, чтобы выбрать область",
+  HINT_BACKGROUND: "Кликните или перетащите картинку, чтобы выбрать область",
+};
+
 /** Подписи полей профиля в `dl` и форматирование */
 export const USER_PROFILE_COPY = {
   LABELS: {
@@ -715,6 +788,8 @@ export const USER_PROFILE_COPY = {
     notesAboutUser: "Заметки",
     userLoyaltyPoints: "Баллы лояльности",
     userRatingByVotes: "Рейтинг по голосам",
+    followersCount: "Подписчики",
+    followingCount: "Подписки",
     telegramUserId: "Telegram user id",
     telegramUsername: "Telegram username",
     telegramPhotoUrl: "Telegram photo URL",
@@ -722,6 +797,7 @@ export const USER_PROFILE_COPY = {
     updatedAt: "Обновлён",
   },
   RATING_NONE: "Нет оценок",
+  BACKGROUND_CUSTOM_IMAGE: "Своё изображение",
   DATE_FORMAT_OPTIONS: { dateStyle: "short", timeStyle: "short" },
 };
 

@@ -43,6 +43,14 @@ export const productsSearchValidation = [
         .optional()
         .isIn(['true', 'false'])
         .withMessage('includeHidden должен быть true или false'),
+    query('followingOnly')
+        .optional()
+        .isIn(['true', 'false'])
+        .withMessage('followingOnly должен быть true или false'),
+    query('auctionOnly')
+        .optional()
+        .isIn(['true', 'false'])
+        .withMessage('auctionOnly должен быть true или false'),
     query('moderationStatus')
         .optional()
         .isString()

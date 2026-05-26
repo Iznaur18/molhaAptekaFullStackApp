@@ -1,14 +1,15 @@
 import "./UserPremiumUi.css";
 
-const VERIFIED_BADGE_BLUE = "#1d9bf0";
+/** Пятиконечная звезда, скругление через stroke-linejoin (viewBox 40×40). */
+const PREMIUM_STAR_PATH =
+  "M20 6.15 24.05 14.75 33.35 14.75 26.15 20.55 29.15 30.05 20 24.95 10.85 30.05 13.85 20.55 6.65 14.75 15.95 14.75 20 6.15Z";
+
+const PREMIUM_STAR_FILL = "#ffa200";
 
 /**
- * @param {{ size?: number; className?: string; title?: string }} props
+ * @param {{ size?: number; className?: string }} props
  */
-export function UserPremiumVerifiedBadge({
-  size = 18,
-  className = "",
-}) {
+export function UserPremiumVerifiedBadge({ size = 18, className = "" }) {
   const svgClass = ["user-premium-verified-badge", className]
     .filter(Boolean)
     .join(" ");
@@ -23,16 +24,12 @@ export function UserPremiumVerifiedBadge({
       focusable="false"
     >
       <path
-        fill={VERIFIED_BADGE_BLUE}
-        d="M19.998 3.094 14.638 0l-2.972 5.15H5.455v6.354L0 14.64 3.094 20 0 25.359l5.455 3.137v6.354h6.211L14.638 40l5.36-3.094L25.358 40l3.097-5.15h6.211v-6.354L40 25.359 36.905 20 40 14.641l-5.334-3.137V5.15h-6.74L25.358 0l-5.36 3.094Z"
-      />
-      <path
-        fill="none"
-        stroke="#fff"
-        strokeWidth="3.5"
-        strokeLinecap="round"
+        d={PREMIUM_STAR_PATH}
+        fill={PREMIUM_STAR_FILL}
+        stroke={PREMIUM_STAR_FILL}
+        strokeWidth="5.75"
         strokeLinejoin="round"
-        d="M12 20.5 17.2 25.5 28 14.5"
+        strokeLinecap="round"
       />
     </svg>
   );

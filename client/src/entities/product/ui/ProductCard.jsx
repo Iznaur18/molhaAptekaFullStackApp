@@ -16,6 +16,7 @@ import {
   getProductModerationBadgeLabel,
 } from "../lib/getProductModerationUi.js";
 import { PRODUCT_MODERATION_REJECTED } from "../model/productModerationConstants.js";
+import { formatProductReviewRatingLine } from "../../product-review/lib/formatProductReviewRatingLine.js";
 import {
   PRODUCT_CARD_MODERATION_PREVIEW_FIELD_KEYS,
   PRODUCT_CARD_PREVIEW_FIELD_KEYS,
@@ -23,6 +24,7 @@ import {
   PRODUCT_IMAGE_PLACEHOLDER_URL,
 } from "../model/productConstants.js";
 import { ProductModerationDetailsFooter } from "./ProductModerationDetailsFooter.jsx";
+import { ProductSellerManageActions } from "./ProductSellerManageActions.jsx";
 import { PRODUCT_MODERATION_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
 import "./ProductCard.css";
@@ -86,8 +88,6 @@ export function ProductCard({
   }, [galleryUrls, cardImageIndex]);
   const [imageLoadFailed, setImageLoadFailed] = useState(false);
   const [useFallbackImage, setUseFallbackImage] = useState(false);
-  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
-
   useEffect(() => {
     setCardImageIndex(0);
   }, [product._id]);
@@ -103,14 +103,6 @@ export function ProductCard({
     setUseFallbackImage(primaryImageUrl == null);
   }, [primaryImageUrl, product._id]);
 
-  useEffect(() => {
-    setIsDeleteConfirmOpen(false);
-  }, [product._id]);
-
-  useEffect(() => {
-    if (onDeleteProduct == null) setIsDeleteConfirmOpen(false);
-  }, [onDeleteProduct]);
-
   const imageUrl = useFallbackImage
     ? PRODUCT_IMAGE_PLACEHOLDER_URL
     : primaryImageUrl;
@@ -123,64 +115,16 @@ export function ProductCard({
     setImageLoadFailed(true);
   };
 
-  const handleDeleteIntentClick = () => {
-    if (hasOpenSalesLocked) return;
-    setIsDeleteConfirmOpen(true);
-  };
-
-  const handleDeleteConfirmCancel = () => {
-    setIsDeleteConfirmOpen(false);
-  };
-
-  const handleDeleteConfirmYes = () => {
-    if (onDeleteProduct == null || product._id == null) return;
-    void onDeleteProduct(String(product._id));
-  };
-
-  const isListedForOthers = product.productIsAvailable !== false;
-  const hasOpenSalesLocked = product.hasOpenSales === true;
   const sellerCanEdit = !isMineMode || canSellerEditProduct(product);
   const sellerCanDelete = !isMineMode || canSellerDeleteProduct(product);
   const sellerCanToggleVisibility =
     !isMineMode || canSellerToggleCatalogVisibility(product);
-  const ownerActionsLocked =
-    isDeletePending ||
-    isAvailabilityTogglePending ||
-    isDeleteConfirmOpen ||
-    hasOpenSalesLocked ||
-    !sellerCanEdit;
   const rejectionComment =
     isMineMode &&
     product.productModerationStatus === PRODUCT_MODERATION_REJECTED &&
     String(product.productModerationComment ?? "").trim() !== ""
       ? String(product.productModerationComment).trim()
       : "";
-
-  const handleEditClick = (event) => {
-    event.stopPropagation();
-    if (onEditProduct == null || product._id == null) return;
-    onEditProduct(product);
-  };
-
-  const renderEditButton = () => {
-    if (onEditProduct == null) return null;
-    return (
-      <button
-        type="button"
-        className="product-card__edit"
-        onClick={handleEditClick}
-        disabled={ownerActionsLocked}
-      >
-        {PRODUCT_CARD_UI.EDIT_PRODUCT}
-      </button>
-    );
-  };
-
-  const handleAvailabilityToggle = () => {
-    if (onSetProductAvailability == null || product._id == null) return;
-    if (ownerActionsLocked) return;
-    void onSetProductAvailability(String(product._id), !isListedForOthers);
-  };
 
   const renderModerationBadge = () => {
     if (!isMineMode && !isModerationQueue) return null;
@@ -196,43 +140,6 @@ export function ProductCard({
           </p>
         ) : null}
       </>
-    );
-  };
-
-  const renderOwnerCatalogVisibility = () => {
-    if (onSetProductAvailability == null || !sellerCanToggleVisibility) {
-      return null;
-    }
-
-    if (isAvailabilityTogglePending) {
-      return (
-        <p
-          className="product-card__availability-pending"
-          aria-live="polite"
-        >
-          {PRODUCT_CARD_UI.AVAILABILITY_TOGGLE_PENDING}
-        </p>
-      );
-    }
-
-    return (
-      <div className="product-card__availability">
-        <p className="product-card__availability-status">
-          {isListedForOthers
-            ? PRODUCT_CARD_UI.AVAILABILITY_STATUS_VISIBLE
-            : PRODUCT_CARD_UI.AVAILABILITY_STATUS_HIDDEN}
-        </p>
-        <button
-          type="button"
-          className="product-card__availability-toggle"
-          onClick={handleAvailabilityToggle}
-          disabled={ownerActionsLocked}
-        >
-          {isListedForOthers
-            ? PRODUCT_CARD_UI.HIDE_FROM_CATALOG
-            : PRODUCT_CARD_UI.SHOW_IN_CATALOG}
-        </button>
-      </div>
     );
   };
 
@@ -279,66 +186,10 @@ export function ProductCard({
     setCardImageIndex((i) => (i + 1) % n);
   };
 
-  const renderDeleteFooter = () => {
-    if (onDeleteProduct == null || !sellerCanDelete) return null;
-
-    if (isDeletePending) {
-      return (
-        <p
-          className="product-card__delete-pending"
-          aria-live="polite"
-        >
-          {PRODUCT_CARD_UI.DELETE_PRODUCT_PENDING}
-        </p>
-      );
-    }
-
-    if (isDeleteConfirmOpen) {
-      return (
-        <div className="product-card__delete-confirm">
-          <p className="product-card__delete-confirm-question">
-            {PRODUCT_CARD_UI.DELETE_CONFIRM_QUESTION}
-          </p>
-          <div className="product-card__delete-confirm-actions">
-            <button
-              type="button"
-              className="product-card__delete-confirm-yes"
-              onClick={handleDeleteConfirmYes}
-            >
-              {PRODUCT_CARD_UI.DELETE_CONFIRM_YES}
-            </button>
-            <button
-              type="button"
-              className="product-card__delete-confirm-cancel"
-              onClick={handleDeleteConfirmCancel}
-            >
-              {PRODUCT_CARD_UI.DELETE_CONFIRM_CANCEL}
-            </button>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <button
-        type="button"
-        className="product-card__delete"
-        onClick={handleDeleteIntentClick}
-        disabled={hasOpenSalesLocked}
-      >
-        {PRODUCT_CARD_UI.DELETE_PRODUCT}
-      </button>
-    );
-  };
-
-  const renderOpenSalesHint = () => {
-    if (onDeleteProduct == null || !hasOpenSalesLocked) return null;
-    return (
-      <p className="product-card__open-sales-hint">
-        {PRODUCT_CARD_UI.OPEN_SALES_LOCKED_HINT}
-      </p>
-    );
-  };
+  const reviewRatingLine = formatProductReviewRatingLine(
+    product.averageRating ?? 0,
+    product.reviewCount ?? 0,
+  );
 
   const detailsSurfaceLabel = `${PRODUCT_CARD_UI.OPEN_DETAILS_ARIA} ${heading}`;
   const bodyClassName = isModerationQueue
@@ -407,6 +258,11 @@ export function ProductCard({
           </div>
         ) : null}
         <h2 className="product-card__heading">{heading}</h2>
+        {reviewRatingLine && !isModerationQueue ? (
+          <p className="product-card__rating" aria-label={reviewRatingLine}>
+            {reviewRatingLine}
+          </p>
+        ) : null}
         {renderModerationBadge()}
         {!isMineMode && !isModerationQueue && product.productIsAvailable === false ? (
           <p className="product-card__hidden-badge" role="status">
@@ -471,12 +327,21 @@ export function ProductCard({
             errorMessage={moderationActions.errorMessage}
           />
         ) : onDeleteProduct ? (
-          <>
-            {renderOpenSalesHint()}
-            {renderOwnerCatalogVisibility()}
-            {renderEditButton()}
-            {renderDeleteFooter()}
-          </>
+          <ProductSellerManageActions
+            product={product}
+            onEdit={() => {
+              if (onEditProduct == null || product._id == null) return;
+              onEditProduct(product);
+            }}
+            onDelete={onDeleteProduct}
+            onSetAvailability={onSetProductAvailability}
+            isDeletePending={isDeletePending}
+            isAvailabilityTogglePending={isAvailabilityTogglePending}
+            canEdit={sellerCanEdit}
+            canDelete={sellerCanDelete}
+            canToggleVisibility={sellerCanToggleVisibility}
+            stopPropagationOnEdit
+          />
         ) : product.productIsAvailable !== false && product._id != null ? (
           <AddToCartButton
             productId={String(product._id)}

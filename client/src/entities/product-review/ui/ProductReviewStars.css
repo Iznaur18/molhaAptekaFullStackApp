@@ -1,0 +1,34 @@
+.product-review-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.product-review-stars__star {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #cbd5e1;
+  line-height: 1;
+}
+
+.product-review-stars--md .product-review-stars__star {
+  font-size: 1.35rem;
+}
+
+.product-review-stars--sm .product-review-stars__star {
+  font-size: 1rem;
+}
+
+.product-review-stars__star--filled {
+  color: #eab308;
+}
+
+.product-review-stars--interactive .product-review-stars__star {
+  cursor: pointer;
+}
+
+.product-review-stars--interactive .product-review-stars__star:hover {
+  color: #facc15;
+}

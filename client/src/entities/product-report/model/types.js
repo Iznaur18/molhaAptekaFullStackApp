@@ -25,6 +25,7 @@
  * @property {string} kind
  * @property {string} message
  * @property {string | null} productId
+ * @property {string | null} [actorUserId]
  * @property {string} createdAt
  */
 

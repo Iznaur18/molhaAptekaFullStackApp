@@ -1,3 +1,4 @@
+import { formatProfileImageObjectPosition } from "../lib/profileImageFocus.js";
 import { resolveUserProfileBackground } from "../lib/userBackgroundValue.js";
 
 import "./UserBackgroundPreview.css";
@@ -7,9 +8,10 @@ import "./UserBackgroundPreview.css";
  *   presetId: string;
  *   imageUrl: string;
  *   mode: 'preset' | 'image' | 'admin';
+ *   focus?: import('../lib/profileImageFocus.js').ProfileImageFocus;
  * }} props
  */
-export function UserBackgroundPreview({ presetId, imageUrl, mode }) {
+export function UserBackgroundPreview({ presetId, imageUrl, mode, focus }) {
   let resolved;
   try {
     if (mode === "image") {
@@ -46,6 +48,9 @@ export function UserBackgroundPreview({ presetId, imageUrl, mode }) {
           alt=""
           loading="lazy"
           decoding="async"
+          style={{
+            objectPosition: formatProfileImageObjectPosition(focus),
+          }}
         />
       </div>
     );

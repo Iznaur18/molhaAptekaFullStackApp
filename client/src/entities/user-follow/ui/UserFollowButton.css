@@ -1,0 +1,36 @@
+.user-follow-button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+}
+
+.user-follow-button__btn {
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-accent, #2563eb);
+  background: var(--color-accent, #2563eb);
+  color: #fff;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.user-follow-button__btn:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.user-follow-button__btn:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.user-follow-button__btn_following {
+  background: transparent;
+  color: var(--color-accent, #2563eb);
+}
+
+.user-follow-button__error {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #b91c1c;
+}

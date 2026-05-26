@@ -27,6 +27,8 @@ import {
   EDIT_PROFILE_MODAL_UI,
   USER_DETAILS_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
+import { isHttpProfileImageUrl } from "../lib/profileImageFocus.js";
+import { ProfileImageFocusEditor } from "./ProfileImageFocusEditor.jsx";
 import { UserBackgroundPresetPicker } from "./UserBackgroundPresetPicker.jsx";
 import { UserBackgroundPreview } from "./UserBackgroundPreview.jsx";
 
@@ -97,6 +99,18 @@ export function EditProfileModal({
     : isPremiumUser
       ? "image"
       : "preset";
+
+  const avatarFocusImageUrl = useMemo(() => {
+    const url = String(form.userAvatarUrl ?? "").trim();
+    return isHttpProfileImageUrl(url) ? url : "";
+  }, [form.userAvatarUrl]);
+
+  const backgroundFocusImageUrl = useMemo(() => {
+    const url = String(form.backgroundImageUrl ?? "").trim();
+    if (!isHttpProfileImageUrl(url)) return "";
+    if (backgroundMode === "image" || backgroundMode === "admin") return url;
+    return "";
+  }, [backgroundMode, form.backgroundImageUrl]);
 
   const isSubmitting = feedback.kind === "loading";
 
@@ -264,51 +278,88 @@ export function EditProfileModal({
                 autoComplete="off"
               />
             </label>
-            <div className="edit-profile-modal__background-block">
-              <p className="edit-profile-modal__background-label">
-                {EDIT_PROFILE_MODAL_UI.LABEL_BG_PREVIEW}
-              </p>
-              <UserBackgroundPreview
-                presetId={form.backgroundPresetId}
-                imageUrl={form.backgroundImageUrl}
-                mode={backgroundMode}
-              />
-            </div>
-            {backgroundMode === "preset" ? (
-              <UserBackgroundPresetPicker
-                value={form.backgroundPresetId}
-                onChange={(presetId) =>
-                  setForm((prev) => ({ ...prev, backgroundPresetId: presetId }))
+            {avatarFocusImageUrl ? (
+              <ProfileImageFocusEditor
+                imageUrl={avatarFocusImageUrl}
+                variant="avatar"
+                value={form.userAvatarFocus}
+                onChange={(userAvatarFocus) =>
+                  setForm((prev) => ({ ...prev, userAvatarFocus }))
                 }
                 disabled={isSubmitting}
-                legend={EDIT_PROFILE_MODAL_UI.LABEL_BG_PRESET}
               />
+            ) : null}
+            {backgroundMode === "preset" ? (
+              <>
+                <div className="edit-profile-modal__background-block">
+                  <p className="edit-profile-modal__background-label">
+                    {EDIT_PROFILE_MODAL_UI.LABEL_BG_PREVIEW}
+                  </p>
+                  <UserBackgroundPreview
+                    presetId={form.backgroundPresetId}
+                    imageUrl=""
+                    mode="preset"
+                  />
+                </div>
+                <UserBackgroundPresetPicker
+                  value={form.backgroundPresetId}
+                  onChange={(presetId) =>
+                    setForm((prev) => ({ ...prev, backgroundPresetId: presetId }))
+                  }
+                  disabled={isSubmitting}
+                  legend={EDIT_PROFILE_MODAL_UI.LABEL_BG_PRESET}
+                />
+              </>
             ) : null}
             {backgroundMode === "image" || backgroundMode === "admin" ? (
-              <label className="edit-profile-modal__label">
-                {backgroundMode === "admin"
-                  ? EDIT_PROFILE_MODAL_UI.LABEL_BG_URL_ADMIN
-                  : EDIT_PROFILE_MODAL_UI.LABEL_BG_URL}
-                <input
-                  className="edit-profile-modal__input"
-                  type="url"
-                  name="backgroundImageUrl"
-                  value={form.backgroundImageUrl}
-                  onChange={handleChange}
-                  placeholder={EDIT_PROFILE_MODAL_UI.PLACEHOLDER_HTTPS}
-                  autoComplete="off"
-                />
-              </label>
-            ) : null}
-            {backgroundMode === "admin" ? (
-              <UserBackgroundPresetPicker
-                value={form.backgroundPresetId}
-                onChange={(presetId) =>
-                  setForm((prev) => ({ ...prev, backgroundPresetId: presetId }))
-                }
-                disabled={isSubmitting}
-                legend={EDIT_PROFILE_MODAL_UI.LABEL_BG_PRESET}
-              />
+              <>
+                <label className="edit-profile-modal__label">
+                  {backgroundMode === "admin"
+                    ? EDIT_PROFILE_MODAL_UI.LABEL_BG_URL_ADMIN
+                    : EDIT_PROFILE_MODAL_UI.LABEL_BG_URL}
+                  <input
+                    className="edit-profile-modal__input"
+                    type="url"
+                    name="backgroundImageUrl"
+                    value={form.backgroundImageUrl}
+                    onChange={handleChange}
+                    placeholder={EDIT_PROFILE_MODAL_UI.PLACEHOLDER_HTTPS}
+                    autoComplete="off"
+                  />
+                </label>
+                {backgroundFocusImageUrl ? (
+                  <ProfileImageFocusEditor
+                    imageUrl={backgroundFocusImageUrl}
+                    variant="background"
+                    value={form.userBackgroundFocus}
+                    onChange={(userBackgroundFocus) =>
+                      setForm((prev) => ({ ...prev, userBackgroundFocus }))
+                    }
+                    disabled={isSubmitting}
+                  />
+                ) : backgroundMode === "admin" ? (
+                  <div className="edit-profile-modal__background-block">
+                    <p className="edit-profile-modal__background-label">
+                      {EDIT_PROFILE_MODAL_UI.LABEL_BG_PREVIEW}
+                    </p>
+                    <UserBackgroundPreview
+                      presetId={form.backgroundPresetId}
+                      imageUrl=""
+                      mode="preset"
+                    />
+                  </div>
+                ) : null}
+                {backgroundMode === "admin" ? (
+                  <UserBackgroundPresetPicker
+                    value={form.backgroundPresetId}
+                    onChange={(presetId) =>
+                      setForm((prev) => ({ ...prev, backgroundPresetId: presetId }))
+                    }
+                    disabled={isSubmitting}
+                    legend={EDIT_PROFILE_MODAL_UI.LABEL_BG_PRESET}
+                  />
+                ) : null}
+              </>
             ) : null}
             <label className="edit-profile-modal__label edit-profile-modal__label_row">
               <input

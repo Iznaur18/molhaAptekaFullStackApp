@@ -1,3 +1,4 @@
+import { USER_PROFILE_COPY } from "../../../shared/config/appUiCopy.js";
 import {
   DEFAULT_USER_BACKGROUND_PRESET_ID,
   formatUserBackgroundPresetValue,
@@ -126,7 +127,7 @@ export function formatUserBackgroundForDisplay(stored) {
     return getUserBackgroundPresetById(presetId)?.labelRu ?? presetId;
   }
   if (isHttpBackgroundImageUrl(stored)) {
-    return String(stored).trim();
+    return USER_PROFILE_COPY.BACKGROUND_CUSTOM_IMAGE;
   }
   return "—";
 }

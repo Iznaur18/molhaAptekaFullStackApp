@@ -8,6 +8,7 @@ import { userSearchValidation } from './user/userSearchValidation.js';
 import { userSellerProductsValidation } from './user/userSellerProductsValidation.js';
 import { submitDataConfirmationValidation } from './user/submitDataConfirmationValidation.js';
 import { resolveDataConfirmationValidation } from './user/resolveDataConfirmationValidation.js';
+import { userFollowListValidation } from './user/userFollowListValidation.js';
 import { makeProductValidation } from './product/makeProductValidation.js';
 import { productIdParamValidation } from './product/productIdParamValidation.js';
 import { productsSearchValidation } from './product/productsSearchValidation.js';
@@ -20,6 +21,11 @@ import {
     patchProductPriceOfferValidation,
     productPriceOfferIdParamValidation,
 } from './product/productPriceOfferValidation.js';
+import {
+    submitProductReviewValidation,
+    patchProductReviewValidation,
+    productReviewsListValidation,
+} from './product/productReviewValidation.js';
 import { makeOrderValidation } from './order/makeOrderValidation.js';
 import { updateOrderStatusValidation } from './order/updateOrderStatusValidation.js';
 import { getAllOrdersValidation } from './order/getAllOrdersValidation.js';
@@ -40,6 +46,7 @@ export {
     userSellerProductsValidation,
     submitDataConfirmationValidation,
     resolveDataConfirmationValidation,
+    userFollowListValidation,
     makeProductValidation,
     productIdParamValidation,
     productsSearchValidation,
@@ -50,6 +57,9 @@ export {
     submitProductPriceOfferValidation,
     patchProductPriceOfferValidation,
     productPriceOfferIdParamValidation,
+    submitProductReviewValidation,
+    patchProductReviewValidation,
+    productReviewsListValidation,
     makeOrderValidation,
     updateOrderStatusValidation,
     getAllOrdersValidation,

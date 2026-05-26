@@ -22,6 +22,7 @@ import {
   COMMON_UI,
   REGISTER_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
+import { FormFieldLabel } from "../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
 
 import "./RegisterModal.css";
 
@@ -203,7 +204,7 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
                 invalidFields,
               )}
             >
-              {REGISTER_MODAL_UI.LABEL_EMAIL}
+              <FormFieldLabel required>{REGISTER_MODAL_UI.LABEL_EMAIL}</FormFieldLabel>
               <input
                 className={withInvalidFieldClass(
                   "register-modal__input",
@@ -226,7 +227,9 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
                 invalidFields,
               )}
             >
-              {REGISTER_MODAL_UI.LABEL_PASSWORD}
+              <FormFieldLabel required>
+                {REGISTER_MODAL_UI.LABEL_PASSWORD}
+              </FormFieldLabel>
               <input
                 className={withInvalidFieldClass(
                   "register-modal__input",
@@ -249,7 +252,9 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
                 invalidFields,
               )}
             >
-              {REGISTER_MODAL_UI.LABEL_PASSWORD_CONFIRM}
+              <FormFieldLabel required>
+                {REGISTER_MODAL_UI.LABEL_PASSWORD_CONFIRM}
+              </FormFieldLabel>
               <input
                 className={withInvalidFieldClass(
                   "register-modal__input",
@@ -272,7 +277,9 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
                 invalidFields,
               )}
             >
-              {REGISTER_MODAL_UI.LABEL_USERNAME}
+              <FormFieldLabel required>
+                {REGISTER_MODAL_UI.LABEL_USERNAME}
+              </FormFieldLabel>
               <input
                 className={withInvalidFieldClass(
                   "register-modal__input",

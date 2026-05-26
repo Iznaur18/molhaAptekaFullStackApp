@@ -12,6 +12,8 @@ import { CATALOG_PAGE_SIZE } from "../model/productConstants.js";
  *   productCategory?: string;
  *   sort?: string;
  *   includeHidden?: boolean;
+ *   followingOnly?: boolean;
+ *   auctionOnly?: boolean;
  * }} [options]
  * @returns {Promise<{
  *   products: import('../model/types.js').ProductFromApi[];
@@ -25,6 +27,8 @@ export async function fetchCatalogProductsPage({
   productCategory,
   sort,
   includeHidden = false,
+  followingOnly = false,
+  auctionOnly = false,
 } = {}) {
   try {
     const { data } = await apiClient.get("/product", {
@@ -35,6 +39,8 @@ export async function fetchCatalogProductsPage({
         ...(productCategory ? { productCategory } : {}),
         ...(sort ? { sort } : {}),
         ...(includeHidden ? { includeHidden: "true" } : {}),
+        ...(followingOnly ? { followingOnly: "true" } : {}),
+        ...(auctionOnly ? { auctionOnly: "true" } : {}),
       },
     });
 

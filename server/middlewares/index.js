@@ -13,6 +13,7 @@ import {
     productReportRateLimiter,
     userDataConfirmationRateLimiter,
     productPriceOfferRateLimiter,
+    productReviewRateLimiter,
 } from './rateLimitMW.js';
 import { errorHandler, notFoundHandler, asyncHandler, AppError } from './errorHandlerMW.js';
 
@@ -31,6 +32,7 @@ export {
     productReportRateLimiter,
     userDataConfirmationRateLimiter,
     productPriceOfferRateLimiter,
+    productReviewRateLimiter,
     errorHandler,
     notFoundHandler,
     asyncHandler,

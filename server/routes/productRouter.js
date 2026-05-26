@@ -3,6 +3,7 @@ import {
     postProductController,
     getProductsController,
     getMyProductsController,
+    getCatalogProductByIdController,
     deleteMyProductController,
     patchMyProductController,
     recordProductViewController,
@@ -23,6 +24,11 @@ import {
     acceptProductPriceOfferController,
     rejectProductPriceOfferController,
     getSellerProductPriceOfferArchiveController,
+    listProductReviewsController,
+    getProductReviewSummaryController,
+    submitProductReviewController,
+    patchMyProductReviewController,
+    deleteMyProductReviewController,
 } from '../controllers/index.js';
 import {
     checkAuthMW,
@@ -30,6 +36,7 @@ import {
     checkProductModeratorMW,
     productReportRateLimiter,
     productPriceOfferRateLimiter,
+    productReviewRateLimiter,
 } from '../middlewares/index.js';
 import {
     makeProductValidation,
@@ -42,6 +49,9 @@ import {
     submitProductPriceOfferValidation,
     patchProductPriceOfferValidation,
     productPriceOfferIdParamValidation,
+    submitProductReviewValidation,
+    patchProductReviewValidation,
+    productReviewsListValidation,
 } from '../validations/index.js';
 
 const router = Router();
@@ -134,6 +144,46 @@ router.patch(
     productIdParamValidation,
     productPriceOfferIdParamValidation,
     rejectProductPriceOfferController,
+);
+router.get(
+    '/:productId/catalog',
+    productIdParamValidation,
+    checkOptionalAuthMW,
+    getCatalogProductByIdController,
+);
+router.get(
+    '/:productId/reviews/summary',
+    productIdParamValidation,
+    checkOptionalAuthMW,
+    getProductReviewSummaryController,
+);
+router.get(
+    '/:productId/reviews',
+    productIdParamValidation,
+    productReviewsListValidation,
+    listProductReviewsController,
+);
+router.post(
+    '/:productId/reviews',
+    checkAuthMW,
+    productReviewRateLimiter,
+    productIdParamValidation,
+    submitProductReviewValidation,
+    submitProductReviewController,
+);
+router.patch(
+    '/:productId/reviews/me',
+    checkAuthMW,
+    productReviewRateLimiter,
+    productIdParamValidation,
+    patchProductReviewValidation,
+    patchMyProductReviewController,
+);
+router.delete(
+    '/:productId/reviews/me',
+    checkAuthMW,
+    productIdParamValidation,
+    deleteMyProductReviewController,
 );
 router.get(
     '/:productId/report/me',

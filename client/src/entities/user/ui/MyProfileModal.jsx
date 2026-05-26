@@ -33,6 +33,8 @@ import "./MyProfileModal.css";
  * pendingDataConfirmationCount?: number;
  * inAppNotifications?: import('../../product-report/model/types.js').UserInAppNotification[];
  * onNotificationsRead?: () => void;
+ * onSubscriptionsClick?: () => void;
+ * onInAppNotificationClick?: (item: import('../../product-report/model/types.js').UserInAppNotification) => void;
  * }} props
  */
 export function MyProfileModal({
@@ -55,6 +57,8 @@ export function MyProfileModal({
   pendingDataConfirmationCount = 0,
   inAppNotifications = [],
   onNotificationsRead,
+  onSubscriptionsClick,
+  onInAppNotificationClick,
 }) {
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
 
@@ -209,6 +213,15 @@ export function MyProfileModal({
       >
         {MY_PROFILE_MODAL_UI.TAB_MY_ORDERS}
       </button>
+      {onSubscriptionsClick ? (
+        <button
+          type="button"
+          className="my-profile-modal__header-action"
+          onClick={() => onSubscriptionsClick()}
+        >
+          {MY_PROFILE_MODAL_UI.TAB_SUBSCRIPTIONS}
+        </button>
+      ) : null}
       {canUseAdminOrders ? (
         <button
           type="button"
@@ -268,7 +281,17 @@ export function MyProfileModal({
         <ul className="my-profile-modal__notifications-list" role="list">
           {inAppNotifications.map((item) => (
             <li key={item._id} role="listitem">
-              {item.message}
+              {typeof onInAppNotificationClick === "function" ? (
+                <button
+                  type="button"
+                  className="my-profile-modal__notification-btn"
+                  onClick={() => onInAppNotificationClick(item)}
+                >
+                  {item.message}
+                </button>
+              ) : (
+                item.message
+              )}
             </li>
           ))}
         </ul>

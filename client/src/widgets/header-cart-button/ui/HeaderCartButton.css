@@ -20,6 +20,18 @@
   background: rgba(31, 111, 235, 0.08);
 }
 
+.header-cart-button--active,
+.header-cart-button--active:hover {
+  border-color: #1f6feb;
+  background: #1f6feb;
+  color: #fff;
+}
+
+.header-cart-button--active .header-cart-button__badge {
+  background: #fff;
+  color: #1f6feb;
+}
+
 .header-cart-button__badge {
   display: inline-flex;
   align-items: center;

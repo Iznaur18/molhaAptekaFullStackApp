@@ -52,6 +52,7 @@ const devApiProxy = Object.fromEntries(
 
 // https://vite.dev/config/
 export default defineConfig({
+  appType: "spa",
   plugins: [react()],
   server: {
     host: DEV_SERVER_HOST,

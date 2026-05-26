@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
 import { UserModel, UserVoteRatingModel } from '../../models/index.js';
+import { deleteAllFollowsForUser } from '../../utils/userFollowHelpers.js';
 import { sendUserWithToken, errorRes, successRes } from '../../utils/index.js';
 import {
     USER_DATA,
@@ -16,10 +17,15 @@ import {
 import { deleteSellerProductsAndRelatedData } from '../../utils/deleteUserCascade.js';
 import { getOptionalViewerFromRequest } from '../../utils/optionalViewerFromRequest.js';
 import { sanitizeUserProfileForViewer } from '../../utils/userProfileVisibility.js';
+import { attachFollowFieldsToPublicProfile } from '../../utils/userFollowHelpers.js';
 import {
     backgroundValueAfterPremiumChange,
     normalizeUserBackgroundForSave,
 } from '../../utils/userBackgroundValue.js';
+import {
+    normalizeUserAvatarFocus,
+    normalizeUserBackgroundFocus,
+} from '../../utils/profileImageFocus.js';
 import { getUnreadInAppNotificationsForUser } from '../../utils/userInAppNotifications.js';
 import { rejectPendingDataConfirmationForUser } from '../../utils/userDataConfirmationHelpers.js';
 
@@ -78,11 +84,16 @@ export const userMeController = async (req, res) => {
             return errorRes(res, 404, 'Пользователь не найден');
         }
 
+        const userWithFollow = await attachFollowFieldsToPublicProfile(
+            userIdServer,
+            { viewerId: userIdClient },
+        );
+
         const inAppNotifications = await getUnreadInAppNotificationsForUser(
             userIdClient,
         );
 
-        return successRes(res, { user: userIdServer, inAppNotifications });
+        return successRes(res, { user: userWithFollow, inAppNotifications });
         
     } catch (error) {
         console.error('userMe error:', error);
@@ -121,7 +132,12 @@ export const userGetProfileController = async (req, res) => {
             return errorRes(res, 404, 'Пользователь не найден');
         }
 
-        return successRes(res, { user: publicUser });
+        const userWithFollow = await attachFollowFieldsToPublicProfile(
+            publicUser,
+            { viewerId: viewer?._id ?? null },
+        );
+
+        return successRes(res, { user: userWithFollow });
         
     } catch (error) {
         console.error('userGetProfile error:', error);
@@ -188,6 +204,10 @@ export const userUpdateProfileController = async (req, res) => {
                     updateData[field] = typeof value === 'string' ? value.trim() : value;
                 } else if (field === 'userAddressGeo') {
                     updateData[field] = value;
+                } else if (field === 'userAvatarFocus') {
+                    updateData[field] = normalizeUserAvatarFocus(value);
+                } else if (field === 'userBackgroundFocus') {
+                    updateData[field] = normalizeUserBackgroundFocus(value);
                 } else {
                     // Для остальных полей (userGender, userRole, URL поля, булевы) - просто присваиваем (валидация уже выполнена в middleware)
                     updateData[field] = value;
@@ -422,6 +442,11 @@ export const userDeleteProfileController = async (req, res) => {
             ]
         });
         console.log(`[DELETE PROFILE] Deleted ${deletedVotes.deletedCount} vote records for user ${targetUserId}`);
+
+        await deleteAllFollowsForUser(targetUserId);
+        console.log(
+            `[DELETE PROFILE] Deleted follow records for user ${targetUserId}`,
+        );
 
         // Удаление профиля пользователя
         const deletedUser = await UserModel.findByIdAndDelete(targetUserId);

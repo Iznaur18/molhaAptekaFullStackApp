@@ -24,6 +24,8 @@ import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
  *   catalogLoadMoreError: string | null;
  *   onRetryCatalogLoadMore: () => void;
  *   myProductsModerationFilter?: string;
+ *   catalogFollowingOnly?: boolean;
+ *   catalogAuctionOnly?: boolean;
  * }} props
  */
 export function HomeCatalogGrid({
@@ -48,10 +50,15 @@ export function HomeCatalogGrid({
   catalogLoadMoreError,
   onRetryCatalogLoadMore,
   myProductsModerationFilter = "",
+  catalogFollowingOnly = false,
+  catalogAuctionOnly = false,
 }) {
   const emptyMessage = (() => {
     if (products.length > 0) return "";
     if (hasQuery) return HOME_PAGE_UI.EMPTY_BY_QUERY;
+    if (!isMineMode && (catalogFollowingOnly || catalogAuctionOnly)) {
+      return HOME_PAGE_UI.EMPTY_FOLLOWING_FILTER;
+    }
     if (isMineMode) {
       if (myProductsModerationFilter) {
         return HOME_PAGE_UI.EMPTY_MY_BY_MODERATION_STATUS;

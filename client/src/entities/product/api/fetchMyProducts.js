@@ -70,7 +70,7 @@ export async function fetchMyProductsPage({
 }
 
 /**
- * Все товары продавца (цикл страниц). Для экранов, где нужен полный список id (фильтр в «Мои продажи»).
+ * Все товары продавца (цикл страниц).
  *
  * @param {{ search?: string; productCategory?: string }} [options]
  * @returns {Promise<import('../model/types.js').ProductFromApi[]>}

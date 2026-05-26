@@ -8,6 +8,7 @@ import { attachProductSellerSnapshot } from "../../utils/attachProductSellerSnap
 import { isUserAdmin } from "../../utils/adminUserGuard.js";
 import { mergeProductImageUrlsFromBody } from "../../utils/mergeProductImageUrlsFromBody.js";
 import { assertSellerCanCreateProduct } from "../../utils/sellerProductsLimit.js";
+import { notifyFollowersOfSellerNewCatalogProduct } from "../../utils/userFollowHelpers.js";
 import { errorRes, successRes } from "../../utils/index.js";
 
 export const postProductController = async (req, res) => {
@@ -60,6 +61,17 @@ export const postProductController = async (req, res) => {
 
     await product.populate("productSeller", PRODUCT_SELLER_PUBLIC_SELECT);
     const productPayload = await attachProductSellerSnapshot(product.toObject());
+
+    if (productModerationStatus === PRODUCT_MODERATION_APPROVED) {
+      try {
+        await notifyFollowersOfSellerNewCatalogProduct(productPayload);
+      } catch (notifyError) {
+        console.error(
+          "notifyFollowersOfSellerNewCatalogProduct error:",
+          notifyError,
+        );
+      }
+    }
 
     return successRes(
         res,

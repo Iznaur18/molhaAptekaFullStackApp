@@ -19,6 +19,7 @@ import {
   COMMON_UI,
   CREATE_PRODUCT_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
+import { FormFieldLabel } from "../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
 
 import "./CreateProductModal.css";
 
@@ -236,7 +237,9 @@ export function CreateProductModal({
         <div className="create-product-modal__body">
           <form className="create-product-modal__form" onSubmit={handleSubmit}>
             <label className="create-product-modal__label">
-              {CREATE_PRODUCT_MODAL_UI.LABEL_NAME}
+              <FormFieldLabel required>
+                {CREATE_PRODUCT_MODAL_UI.LABEL_NAME}
+              </FormFieldLabel>
               <input
                 className="create-product-modal__input"
                 type="text"
@@ -250,7 +253,9 @@ export function CreateProductModal({
               />
             </label>
             <label className="create-product-modal__label">
-              {CREATE_PRODUCT_MODAL_UI.LABEL_DESCRIPTION}
+              <FormFieldLabel required>
+                {CREATE_PRODUCT_MODAL_UI.LABEL_DESCRIPTION}
+              </FormFieldLabel>
               <textarea
                 className="create-product-modal__textarea"
                 name="productDescription"
@@ -269,7 +274,9 @@ export function CreateProductModal({
               disabled={isSubmitting}
             />
             <label className="create-product-modal__label">
-              {CREATE_PRODUCT_MODAL_UI.LABEL_PRICE}
+              <FormFieldLabel required>
+                {CREATE_PRODUCT_MODAL_UI.LABEL_PRICE}
+              </FormFieldLabel>
               <input
                 className="create-product-modal__input"
                 type="text"

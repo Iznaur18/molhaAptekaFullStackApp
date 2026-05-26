@@ -6,6 +6,8 @@ import { fetchMyOrders } from "../../../entities/order/api/fetchMyOrders.js";
 import { confirmOrderItem } from "../../../entities/order/api/updateOrderItemStatus.js";
 import { ORDER_STATUS_CONFIRMED } from "../../../entities/order/model/constants.js";
 import { OrderCard } from "../../../entities/order/ui/OrderCard.jsx";
+import { isCurrentUserProductSeller } from "../../../entities/product/lib/isCurrentUserProductSeller.js";
+import { useCatalogProductDetailsOpener } from "../../../entities/product/lib/useCatalogProductDetailsOpener.js";
 import { ProductDetailsModal } from "../../../entities/product/ui/ProductDetailsModal.jsx";
 import {
   API_CLIENT_UI,
@@ -17,19 +19,34 @@ import "./MyOrdersPage.css";
 /**
  * @param {{
  *   isAuthorized: boolean;
+ *   currentUserId?: string | null;
  *   onSellerNameClick?: (userId: string) => void;
+ *   onRequestLogin?: () => void;
  * }} props
  */
-export function MyOrdersPage({ isAuthorized, onSellerNameClick }) {
+export function MyOrdersPage({
+  isAuthorized,
+  currentUserId = null,
+  onSellerNameClick,
+  onRequestLogin = () => {},
+}) {
   const [phase, setPhase] = useState("loading");
   const [orders, setOrders] = useState(
     /** @type {import('../../../entities/order/model/types.js').Order[]} */ ([]),
   );
   const [error, setError] = useState("");
-  const [selectedProduct, setSelectedProduct] = useState(null);
   const [pendingActionKey, setPendingActionKey] = useState(null);
   const [itemActionErrors, setItemActionErrors] = useState({});
   const [loyaltyFlash, setLoyaltyFlash] = useState("");
+
+  const {
+    catalogProduct,
+    catalogProductPhase,
+    catalogProductError,
+    openCatalogProductFromOrderLine,
+    closeCatalogProduct,
+    patchCatalogProduct,
+  } = useCatalogProductDetailsOpener();
 
   const reloadOrders = useCallback(async () => {
     try {
@@ -120,11 +137,9 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick }) {
     }
   };
 
-  const handleProductStatsUpdate = useCallback((productId, stats) => {
-    setSelectedProduct((prev) =>
-      prev && String(prev._id) === productId ? { ...prev, ...stats } : prev,
-    );
-  }, []);
+  const productDetailsShowAddToCart =
+    catalogProduct != null &&
+    !isCurrentUserProductSeller(catalogProduct, currentUserId);
 
   if (phase === "loading") {
     return <p className="my-orders-page__state">{MY_ORDERS_PAGE_UI.LOADING}</p>;
@@ -161,7 +176,7 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick }) {
           >
             <OrderCard
               order={order}
-              onProductClick={setSelectedProduct}
+              onProductClick={openCatalogProductFromOrderLine}
               onConfirmDelivered={handleConfirmDelivered}
               pendingActionKey={pendingActionKey}
               itemActionErrors={itemActionErrors}
@@ -169,13 +184,26 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick }) {
           </li>
         ))}
       </ul>
+      {catalogProductPhase === "loading" ? (
+        <p className="my-orders-page__product-loading" role="status">
+          {MY_ORDERS_PAGE_UI.PRODUCT_DETAILS_LOADING}
+        </p>
+      ) : null}
+      {catalogProductPhase === "error" ? (
+        <p className="my-orders-page__product-error" role="alert">
+          {catalogProductError}
+        </p>
+      ) : null}
       <ProductDetailsModal
-        isOpen={selectedProduct != null}
-        product={selectedProduct}
-        onClose={() => setSelectedProduct(null)}
+        isOpen={catalogProduct != null}
+        product={catalogProduct}
+        onClose={closeCatalogProduct}
         onSellerNameClick={onSellerNameClick}
         isAuthorized={isAuthorized}
-        onProductStatsUpdate={handleProductStatsUpdate}
+        onProductStatsUpdate={patchCatalogProduct}
+        showAddToCart={productDetailsShowAddToCart}
+        onRequestLogin={onRequestLogin}
+        currentUserId={currentUserId}
       />
     </>
   );

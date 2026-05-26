@@ -6,7 +6,7 @@ import { getDefaultUserBackgroundStoredValue } from './userBackgroundPresets.js'
 export const DEFAULT_BACKGROUND_URL = getDefaultUserBackgroundStoredValue();
 
 /** Поля пользователя для отображения на клиенте (GET /me, GET /user/:id). Строка для .select() — без passwordHash */
-export const USER_DATA = '_id userName email userAvatarUrl userBackgroundUrl userBirthDate userGender userAddress userAddressFlat userAddressFiasId userAddressGeo userPhoneNumber userRole userDiscountPercent userLoyaltyPoints isPremiumUser isUserDataConfirmed notificationsEnabled userRatingByVotes telegramUserId telegramUsername telegramPhotoUrl isActiveUser isBlockedUser createdAt updatedAt userLastLoginAt notesAboutUser buyList';
+export const USER_DATA = '_id userName email userAvatarUrl userAvatarFocus userBackgroundUrl userBackgroundFocus userBirthDate userGender userAddress userAddressFlat userAddressFiasId userAddressGeo userPhoneNumber userRole userDiscountPercent userLoyaltyPoints isPremiumUser isUserDataConfirmed notificationsEnabled userRatingByVotes telegramUserId telegramUsername telegramPhotoUrl isActiveUser isBlockedUser createdAt updatedAt userLastLoginAt notesAboutUser buyList';
 
 /** Поля пользователя для отображения на клиенте (GET /me/rating). Строка для .select() — без passwordHash */
 export const USER_ME_RAITING =  "_id userRatingByVotes userName email userAvatarUrl";
@@ -19,8 +19,12 @@ export const ALLOWED_FIELDS_FOR_USER = [
     'userAddressFiasId',
     'userAddressGeo',
     'userPhoneNumber',
-    'userAvatarUrl', 
-    'userBackgroundUrl', 'notificationsEnabled', "notesAboutUser"
+    'userAvatarUrl',
+    'userAvatarFocus',
+    'userBackgroundUrl',
+    'userBackgroundFocus',
+    'notificationsEnabled',
+    'notesAboutUser',
   ];
 
 /** Разрешённые поля для модератора при редактировании чужого профиля */

@@ -20,6 +20,8 @@ import {
   markPriceOfferPayFlowOpened,
 } from "../lib/priceOfferPayFlowStorage.js";
 
+import { ProductPriceOfferHintMessage } from "./ProductPriceOfferHintMessage.jsx";
+import { ProductPriceOfferSectionTitle } from "./ProductPriceOfferSectionTitle.jsx";
 import { ProductPriceOfferTopList } from "./ProductPriceOfferTopList.jsx";
 
 import "./ProductPriceOffer.css";
@@ -221,22 +223,24 @@ export function ProductPriceOfferBuyerBlock({
 
   return (
     <section className="product-price-offer">
-      <h3 className="product-price-offer__heading">
+      <ProductPriceOfferSectionTitle />
+      <h2 className="product-price-offer__heading">
         {PRODUCT_PRICE_OFFER_UI.SECTION_TOP_TITLE}
-      </h3>
+      </h2>
       <ProductPriceOfferTopList top={top} onOpenBuyer={onOpenBuyer} />
 
       {!isOwnProduct ? (
         <>
           {showForm ? (
             <div className="product-price-offer__form">
-              <h3 className="product-price-offer__heading">
+              <h2 className="product-price-offer__heading">
                 {PRODUCT_PRICE_OFFER_UI.SECTION_FORM_TITLE}
-              </h3>
+              </h2>
               <label className="product-price-offer__label">
                 {PRODUCT_PRICE_OFFER_UI.LABEL_PRICE}
                 <input
                   type="number"
+                  className="product-price-offer__input"
                   min={1}
                   step={1}
                   value={priceInput}
@@ -247,6 +251,7 @@ export function ProductPriceOfferBuyerBlock({
               <div className="product-price-offer__actions">
                 <button
                   type="button"
+                  className="product-price-offer__btn product-price-offer__btn--primary"
                   disabled={isBusy}
                   onClick={() => void handleSubmitOffer()}
                 >
@@ -259,6 +264,7 @@ export function ProductPriceOfferBuyerBlock({
                 {myOffer?.status === PRICE_OFFER_STATUS_PENDING ? (
                   <button
                     type="button"
+                    className="product-price-offer__btn product-price-offer__btn--secondary"
                     disabled={isBusy}
                     onClick={() => void handleCancel()}
                   >
@@ -272,7 +278,7 @@ export function ProductPriceOfferBuyerBlock({
           {!isAuthorized ? (
             <button
               type="button"
-              className="product-price-offer__login-hint"
+              className="product-price-offer__btn product-price-offer__btn--primary"
               onClick={() => onRequestLogin?.()}
             >
               {PRODUCT_PRICE_OFFER_UI.SUBMIT}
@@ -280,18 +286,37 @@ export function ProductPriceOfferBuyerBlock({
           ) : null}
 
           {isAuthorized && !isUserDataConfirmed && !isOwnProduct ? (
-            <p className="product-price-offer__hint">
+            <ProductPriceOfferHintMessage>
               {PRODUCT_PRICE_OFFER_UI.CONFIRMED_DATA_REQUIRED}
-            </p>
+            </ProductPriceOfferHintMessage>
           ) : null}
 
           {statusText ? (
-            <p className="product-price-offer__status">{statusText}</p>
+            <p
+              className={[
+                "product-price-offer__status",
+                myOffer?.status === PRICE_OFFER_STATUS_PENDING
+                  ? "product-price-offer__status--pending"
+                  : myOffer?.status === PRICE_OFFER_STATUS_ACCEPTED
+                    ? "product-price-offer__status--accepted"
+                    : myOffer?.status === "rejected"
+                      ? "product-price-offer__status--rejected"
+                      : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+            >
+              {statusText}
+            </p>
           ) : null}
 
           {showPayButton ? (
             <div className="product-price-offer__pay">
-              <button type="button" onClick={handleOpenPay}>
+              <button
+                type="button"
+                className="product-price-offer__btn product-price-offer__btn--primary"
+                onClick={handleOpenPay}
+              >
                 {PRODUCT_PRICE_OFFER_UI.PAY_BUTTON} (
                 {formatPriceRub(myOffer.offerPrice)})
               </button>

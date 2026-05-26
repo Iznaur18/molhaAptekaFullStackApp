@@ -62,7 +62,7 @@ function renderBuyerValue(buyer, onBuyerNameClick) {
  *   order: import('../model/types.js').Order;
  *   showBuyer?: boolean;
  *   statusSlot?: import('react').ReactNode;
- *   onProductClick?: (product: import('../../product/model/types.js').ProductFromApi) => void;
+ *   onProductClick?: (item: import('../model/types.js').OrderLineItem) => void;
  *   onMarkShipped?: (ctx: { orderId: string; itemIndex: number }) => void | Promise<void>;
  *   onMarkDelivered?: (ctx: { orderId: string; itemIndex: number }) => void | Promise<void>;
  *   onConfirmDelivered?: (ctx: { orderId: string; itemIndex: number }) => void | Promise<void>;
@@ -145,7 +145,7 @@ export function OrderCard({
               <button
                 type="button"
                 className="order-card__item-name-button"
-                onClick={() => onProductClick?.(item.productId)}
+                onClick={() => onProductClick?.(item)}
               >
                 {resolveOrderLineItemProductName(item)}
               </button>

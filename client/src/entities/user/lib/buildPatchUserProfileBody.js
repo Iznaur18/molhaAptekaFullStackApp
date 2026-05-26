@@ -1,5 +1,9 @@
 import { appendRuAddressToPayload } from "../../address/lib/appendRuAddressToPayload.js";
 import { normalizeRuPhoneInput } from "./ruPhone.js";
+import {
+  getUserAvatarFocus,
+  getUserBackgroundFocus,
+} from "./profileImageFocus.js";
 import { serializeUserBackgroundForForm } from "./userBackgroundValue.js";
 import { DEFAULT_USER_AVATAR_URL } from "../model/userConstants.js";
 
@@ -46,6 +50,9 @@ export function buildPatchUserProfileBody(form, options = {}) {
 
   const av = String(form.userAvatarUrl).trim();
   body.userAvatarUrl = av === "" ? DEFAULT_USER_AVATAR_URL : av;
+  body.userAvatarFocus = getUserAvatarFocus({
+    userAvatarFocus: form.userAvatarFocus,
+  });
 
   if (backgroundMode === "image") {
     const imageUrl = String(form.backgroundImageUrl ?? "").trim();
@@ -61,6 +68,10 @@ export function buildPatchUserProfileBody(form, options = {}) {
       imageUrl: form.backgroundImageUrl,
     });
   }
+
+  body.userBackgroundFocus = getUserBackgroundFocus({
+    userBackgroundFocus: form.userBackgroundFocus,
+  });
 
   body.notificationsEnabled = Boolean(form.notificationsEnabled);
 

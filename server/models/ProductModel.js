@@ -66,6 +66,16 @@ const ProductSchema = new Schema(
       default: 0,
       min: 0,
     },
+    averageRating: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    reviewCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
   },
   { timestamps: true },
 );

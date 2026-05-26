@@ -122,12 +122,23 @@ export const CATALOG_SORT_PURCHASES = "purchases";
 export const CATALOG_SORT_PREMIUM = "premium";
 export const CATALOG_SORT_CONFIRMED = "confirmed";
 
+/** Значения `<select>` каталога (не уходят в query `sort`). */
+export const CATALOG_FILTER_FOLLOWING_ONLY = "__following_only__";
+export const CATALOG_FILTER_AUCTION_ONLY = "__auction_only__";
+
 export const CATALOG_SORT_OPTIONS = [
   CATALOG_SORT_NEWEST,
   CATALOG_SORT_VIEWS,
   CATALOG_SORT_PURCHASES,
   CATALOG_SORT_PREMIUM,
   CATALOG_SORT_CONFIRMED,
+];
+
+/** Публичный каталог: сортировка + фильтры в одном меню. */
+export const CATALOG_SELECT_OPTIONS = [
+  ...CATALOG_SORT_OPTIONS,
+  CATALOG_FILTER_FOLLOWING_ONLY,
+  CATALOG_FILTER_AUCTION_ONLY,
 ];
 
 /** Сортировки в «Мои товары» (без фильтра только премиум). */
@@ -162,6 +173,8 @@ export const CATALOG_SORT_LABEL_RU = {
   [CATALOG_SORT_PURCHASES]: "Больше всего купили",
   [CATALOG_SORT_PREMIUM]: "Только премиум",
   [CATALOG_SORT_CONFIRMED]: "Подтверждённые продавцы",
+  [CATALOG_FILTER_FOLLOWING_ONLY]: "Только от подписок",
+  [CATALOG_FILTER_AUCTION_ONLY]: "Только с аукционом",
 };
 
 /**

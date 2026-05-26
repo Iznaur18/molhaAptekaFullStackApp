@@ -1,0 +1,70 @@
+.subscriptions-page__hint {
+  margin: 0 0 1rem;
+  color: var(--color-text-muted, #64748b);
+}
+
+.subscriptions-page__login {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-accent, #2563eb);
+  background: var(--color-accent, #2563eb);
+  color: #fff;
+  cursor: pointer;
+}
+
+.subscriptions-page__state {
+  margin: 1rem 0;
+  color: var(--color-text-muted, #64748b);
+}
+
+.subscriptions-page__state_error {
+  color: #b91c1c;
+}
+
+.subscriptions-page__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.subscription-user-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid color-mix(in srgb, CanvasText 12%, transparent);
+  border-radius: 10px;
+  background: Canvas;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.subscription-user-row:hover {
+  background: color-mix(in srgb, CanvasText 4%, Canvas);
+}
+
+.subscription-user-row__avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.subscription-user-row__name {
+  flex: 1;
+  min-width: 0;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.subscription-user-row__name-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

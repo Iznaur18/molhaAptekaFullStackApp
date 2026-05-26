@@ -96,3 +96,23 @@
   opacity: 0.7;
   cursor: default;
 }
+
+.login-modal__register {
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background: #fff;
+  color: #111827;
+  padding: 0.55rem 0.85rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.login-modal__register:hover:not(:disabled) {
+  background: #f9fafb;
+}
+
+.login-modal__register:disabled {
+  opacity: 0.7;
+  cursor: default;
+}

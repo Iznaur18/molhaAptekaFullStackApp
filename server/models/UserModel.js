@@ -1,5 +1,29 @@
 import mongoose from 'mongoose';
 import { DEFAULT_AVATAR_URL, DEFAULT_BACKGROUND_URL } from '../constants/constants.js';
+import {
+    DEFAULT_USER_AVATAR_FOCUS,
+    DEFAULT_USER_BACKGROUND_FOCUS,
+    PROFILE_IMAGE_FOCUS_MAX,
+    PROFILE_IMAGE_FOCUS_MIN,
+} from '../constants/profileImageFocusConstants.js';
+
+const profileImageFocusSchema = new mongoose.Schema(
+    {
+        x: {
+            type: Number,
+            default: DEFAULT_USER_AVATAR_FOCUS.x,
+            min: PROFILE_IMAGE_FOCUS_MIN,
+            max: PROFILE_IMAGE_FOCUS_MAX,
+        },
+        y: {
+            type: Number,
+            default: DEFAULT_USER_AVATAR_FOCUS.y,
+            min: PROFILE_IMAGE_FOCUS_MIN,
+            max: PROFILE_IMAGE_FOCUS_MAX,
+        },
+    },
+    { _id: false },
+);
 
 const UserSchema = new mongoose.Schema(
   {
@@ -79,6 +103,14 @@ const UserSchema = new mongoose.Schema(
     userBackgroundUrl: {
       type: String,
       default: DEFAULT_BACKGROUND_URL, // значение по умолчанию
+    },
+    userAvatarFocus: {
+      type: profileImageFocusSchema,
+      default: () => ({ ...DEFAULT_USER_AVATAR_FOCUS }),
+    },
+    userBackgroundFocus: {
+      type: profileImageFocusSchema,
+      default: () => ({ ...DEFAULT_USER_BACKGROUND_FOCUS }),
     },
     isActiveUser: { // активен ли пользователь
       type: Boolean,

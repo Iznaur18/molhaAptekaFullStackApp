@@ -74,6 +74,7 @@
 
 .product-details-modal__body {
   overflow: auto;
+  scroll-behavior: smooth;
   padding: 1rem;
   display: flex;
   flex-direction: column;
@@ -259,6 +260,65 @@
 
 .product-details-modal__price-dl {
   margin: 0;
+}
+
+.product-details-modal__price-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 3fr);
+  gap: 0.5rem;
+  align-items: stretch;
+  width: 100%;
+}
+
+.product-details-modal__price-actions--no-cart {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.product-details-modal__price-actions-cart {
+  min-width: 0;
+}
+
+.product-details-modal__price-actions-cart .add-to-cart,
+.product-details-modal__price-actions-cart .add-to-cart__stepper {
+  width: 100%;
+}
+
+.product-details-modal__auction-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0.45rem 0.5rem;
+  border: 1px solid #eab308;
+  border-radius: 0.5rem;
+  background: #eab308;
+  color: #fff;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.product-details-modal__auction-btn:hover:not(:disabled) {
+  background: #ca8a04;
+  border-color: #ca8a04;
+}
+
+.product-details-modal__auction-btn--inactive,
+.product-details-modal__auction-btn:disabled {
+  border-color: #e2e8f0;
+  background: #f1f5f9;
+  color: #94a3b8;
+  cursor: default;
+}
+
+.product-details-modal__auction-section {
+  scroll-margin-top: 0.75rem;
 }
 
 .product-details-modal__stats-grid {
