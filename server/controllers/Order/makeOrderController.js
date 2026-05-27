@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { PRODUCT_MODERATION_APPROVED } from '../../constants/productModerationConstants.js';
 import { CartModel, OrderModel, ProductModel, ProductPriceOfferModel, UserModel } from '../../models/index.js';
 import { resolveAcceptedOfferForOrder } from '../../utils/productPriceOfferHelpers.js';
+import { assertOrderItemsWithinAvailableStock } from '../../utils/productStock.js';
 import { errorRes, successRes } from '../../utils/index.js';
 
 import {
@@ -28,11 +29,16 @@ const buildItemsWithPriceSnapshot = (items, productById) =>
         };
     });
 
+/**
+ * @param {string[]} productIds
+ * @param {import('mongoose').Types.ObjectId | string} buyerUserId
+ */
 const fetchAvailableProductsForOrder = async (productIds) => {
     const products = await ProductModel.find({
         _id: { $in: productIds },
         productModerationStatus: PRODUCT_MODERATION_APPROVED,
         productIsAvailable: { $ne: false },
+        productStockQuantity: { $gt: 0 },
     })
         .select('_id productPrice productName')
         .lean();
@@ -90,6 +96,7 @@ export const makeOrderController = async (req, res) => {
             const productId = String(items[0].productId);
 
             try {
+                await assertOrderItemsWithinAvailableStock(items, userId);
                 const resolved = await resolveAcceptedOfferForOrder(
                     priceOfferId,
                     userId,
@@ -110,8 +117,15 @@ export const makeOrderController = async (req, res) => {
                 );
             }
         } else {
-            productById = await fetchAvailableProductsForOrder(uniqueProductIds);
+            try {
+                await assertOrderItemsWithinAvailableStock(items, userId);
+            } catch (e) {
+                const message =
+                    e instanceof Error ? e.message : 'Нельзя оформить заказ';
+                return errorRes(res, 400, message);
+            }
 
+            productById = await fetchAvailableProductsForOrder(uniqueProductIds);
             if (Object.keys(productById).length !== uniqueProductIds.length) {
                 return errorRes(
                     res,

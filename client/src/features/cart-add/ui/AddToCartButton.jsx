@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 import { useCart } from "../../../entities/cart/model/useCart.js";
 import { ADD_TO_CART_UI } from "../../../shared/config/appUiCopy.js";
 
@@ -11,11 +13,28 @@ import "./AddToCartButton.css";
  *   productId: string;
  *   isAuthorized: boolean;
  *   onRequestLogin: () => void;
+ *   maxQuantity?: number;
  * }} props
  */
-export function AddToCartButton({ productId, isAuthorized, onRequestLogin }) {
+export function AddToCartButton({
+  productId,
+  isAuthorized,
+  onRequestLogin,
+  maxQuantity,
+}) {
   const { items, addItem, setItemQuantity, removeItem } = useCart();
   const quantity = items[productId] ?? 0;
+  const purchaseLimit =
+    maxQuantity != null
+      ? Math.max(0, Math.floor(Number(maxQuantity)) || 0)
+      : null;
+
+  useEffect(() => {
+    if (purchaseLimit == null || quantity <= purchaseLimit) {
+      return;
+    }
+    setItemQuantity(productId, purchaseLimit);
+  }, [productId, purchaseLimit, quantity, setItemQuantity]);
 
   if (!isAuthorized) {
     return (
@@ -34,7 +53,11 @@ export function AddToCartButton({ productId, isAuthorized, onRequestLogin }) {
       <button
         type="button"
         className="add-to-cart"
-        onClick={() => addItem(productId, 1)}
+        onClick={() => {
+          if (purchaseLimit != null && purchaseLimit < 1) return;
+          addItem(productId, 1);
+        }}
+        disabled={purchaseLimit != null && purchaseLimit < 1}
       >
         {ADD_TO_CART_UI.ADD}
       </button>
@@ -50,6 +73,9 @@ export function AddToCartButton({ productId, isAuthorized, onRequestLogin }) {
   };
 
   const handleIncrease = () => {
+    if (purchaseLimit != null && quantity >= purchaseLimit) {
+      return;
+    }
     setItemQuantity(productId, quantity + 1);
   };
 
@@ -73,6 +99,7 @@ export function AddToCartButton({ productId, isAuthorized, onRequestLogin }) {
         type="button"
         className="add-to-cart__step-button"
         onClick={handleIncrease}
+        disabled={purchaseLimit != null && quantity >= purchaseLimit}
         aria-label={ADD_TO_CART_UI.INCREASE_ARIA}
       >
         +

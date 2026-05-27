@@ -1,4 +1,5 @@
 import { useCart } from "../../../entities/cart/model/useCart.js";
+import { getProductPurchaseLimit } from "../../../entities/product/lib/getProductPurchaseLimit.js";
 import { resolveProductImageUrls } from "../../../entities/product/lib/resolveProductImageUrls.js";
 import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../../../entities/product/model/productConstants.js";
 import {
@@ -37,8 +38,14 @@ export function CartLineItem({ line, onProductClick }) {
     setItemQuantity(line.productId, line.quantity - 1);
   };
 
-  const handleIncrease = () =>
+  const purchaseLimit = getProductPurchaseLimit(product);
+
+  const handleIncrease = () => {
+    if (purchaseLimit > 0 && line.quantity >= purchaseLimit) {
+      return;
+    }
     setItemQuantity(line.productId, line.quantity + 1);
+  };
 
   const handleRemove = () => removeItem(line.productId);
 

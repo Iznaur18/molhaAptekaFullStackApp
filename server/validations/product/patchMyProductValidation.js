@@ -104,6 +104,11 @@ export const patchMyProductValidation = [
     .optional()
     .isBoolean()
     .withMessage("productIsAvailable должно быть true или false"),
+  body("productStockQuantity")
+    .optional()
+    .isInt({ min: 0, max: 9999 })
+    .withMessage("productStockQuantity — целое число от 0 до 9999")
+    .toInt(),
   body("productAuctionEnabled")
     .optional()
     .isBoolean()

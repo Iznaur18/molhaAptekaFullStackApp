@@ -1,0 +1,31 @@
+.raffle-products-page__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+}
+
+.raffle-products-page__back {
+  align-self: flex-start;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #1f6feb;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.raffle-products-page__title {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.raffle-products-page__state {
+  margin: 0;
+}
+
+.raffle-products-page__state_error {
+  color: #b91c1c;
+}

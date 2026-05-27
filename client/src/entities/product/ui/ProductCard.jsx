@@ -4,9 +4,16 @@ import { AddToCartButton } from "../../../features/cart-add/ui/AddToCartButton.j
 import {
   COMMON_UI,
   PRODUCT_CARD_UI,
+  PRODUCT_REVIEW_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { formatProductFieldForDisplay } from "../lib/formatProductFieldForDisplay.js";
+import { isCurrentUserProductSeller } from "../lib/isCurrentUserProductSeller.js";
+import { getProductPurchaseLimit } from "../lib/getProductPurchaseLimit.js";
+import { isProductRaffleParticipant } from "../../raffle/lib/isProductRaffleParticipant.js";
 import { shouldShowPremiumProductCardChrome } from "../lib/isPremiumSellerProduct.js";
+import {
+  isCatalogPromotionActive,
+} from "../lib/productPromotionStatus.js";
 import { resolveProductImageUrls } from "../lib/resolveProductImageUrls.js";
 import {
   canSellerDeleteProduct,
@@ -24,7 +31,6 @@ import {
   PRODUCT_IMAGE_PLACEHOLDER_URL,
 } from "../model/productConstants.js";
 import { ProductModerationDetailsFooter } from "./ProductModerationDetailsFooter.jsx";
-import { ProductSellerManageActions } from "./ProductSellerManageActions.jsx";
 import { PRODUCT_MODERATION_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
 import "./ProductCard.css";
@@ -41,11 +47,21 @@ function isAbsoluteHttpUrl(value) {
  * @param {(product: import('../model/types.js').ProductFromApi) => void} [props.onEditProduct]
  * @param {boolean} [props.isDeletePending]
  * @param {(productId: string, productIsAvailable: boolean) => void | Promise<void>} [props.onSetProductAvailability]
+ * @param {(productId: string, productAuctionEnabled: boolean) => void | Promise<void>} [props.onSetProductAuction]
  * @param {boolean} [props.isAvailabilityTogglePending]
+ * @param {boolean} [props.isAuctionTogglePending]
+ * @param {(product: import('../model/types.js').ProductFromApi) => void} [props.onPromoteProduct]
+ * @param {boolean} [props.sellerRaffleActive]
+ * @param {(product: import('../model/types.js').ProductFromApi, enabled: boolean) => void} [props.onToggleRaffleParticipation]
+ * @param {boolean} [props.isRaffleParticipationPending]
  * @param {(product: import('../model/types.js').ProductFromApi) => void} [props.onOpenDetails]
  * @param {boolean} [props.isAuthorized]
+ * @param {string | null} [props.currentUserId]
  * @param {() => void} [props.onRequestLoginAddToCart]
  * @param {boolean} [props.isMineMode]
+ * @param {boolean} [props.isPromotionPending]
+ * @param {boolean} [props.highlightCatalogPromotion]
+ * @param {boolean} [props.highlightRaffleProduct]
  * @param {boolean} [props.isModerationQueue]
  * @param {{
  *   rejectComment: string;
@@ -63,11 +79,21 @@ export function ProductCard({
   onEditProduct,
   isDeletePending = false,
   onSetProductAvailability,
+  onSetProductAuction,
   isAvailabilityTogglePending = false,
+  isAuctionTogglePending = false,
+  onPromoteProduct,
+  sellerRaffleActive = false,
+  onToggleRaffleParticipation,
+  isRaffleParticipationPending = false,
   onOpenDetails,
   isAuthorized = false,
+  currentUserId = null,
   onRequestLoginAddToCart = () => {},
   isMineMode = false,
+  isPromotionPending = false,
+  highlightCatalogPromotion = false,
+  highlightRaffleProduct = false,
   isModerationQueue = false,
   moderationActions = null,
 }) {
@@ -125,6 +151,7 @@ export function ProductCard({
     String(product.productModerationComment ?? "").trim() !== ""
       ? String(product.productModerationComment).trim()
       : "";
+  const isPromotionActive = isCatalogPromotionActive(product);
 
   const renderModerationBadge = () => {
     if (!isMineMode && !isModerationQueue) return null;
@@ -190,6 +217,52 @@ export function ProductCard({
     product.averageRating ?? 0,
     product.reviewCount ?? 0,
   );
+  const hasReviewRating = reviewRatingLine.length > 0;
+
+  const purchaseLimit = getProductPurchaseLimit(product);
+
+  const renderStatusSlot = () => {
+    if (
+      isMineMode &&
+      !isModerationQueue &&
+      (product.productIsAvailable === false || purchaseLimit === 0)
+    ) {
+      return (
+        <p className="product-card__hidden-badge" role="status">
+          {PRODUCT_CARD_UI.HIDDEN_FROM_CATALOG_BADGE}
+        </p>
+      );
+    }
+    if (
+      !isMineMode &&
+      !isModerationQueue &&
+      product.productIsAvailable === false
+    ) {
+      return (
+        <p className="product-card__hidden-badge" role="status">
+          {PRODUCT_CARD_UI.HIDDEN_FROM_CATALOG_BADGE}
+        </p>
+      );
+    }
+    if (isMineMode && isPromotionPending && !isPromotionActive) {
+      return (
+        <p
+          className="product-card__promotion-badge product-card__promotion-badge_pending"
+          role="status"
+        >
+          {PRODUCT_CARD_UI.PROMOTION_PENDING_BADGE}
+        </p>
+      );
+    }
+    if (isPromotionActive) {
+      return (
+        <p className="product-card__promotion-badge" role="status">
+          {PRODUCT_CARD_UI.PROMOTED_BADGE}
+        </p>
+      );
+    }
+    return null;
+  };
 
   const detailsSurfaceLabel = `${PRODUCT_CARD_UI.OPEN_DETAILS_ARIA} ${heading}`;
   const bodyClassName = isModerationQueue
@@ -200,8 +273,25 @@ export function ProductCard({
     isMineMode,
     isModerationQueue,
   });
+  const showPromotionChrome =
+    highlightCatalogPromotion &&
+    !isMineMode &&
+    !isModerationQueue &&
+    isPromotionActive;
+  const showRaffleBadge =
+    !isModerationQueue && isProductRaffleParticipant(product);
+  const showRaffleParticipantChrome =
+    (highlightRaffleProduct || showRaffleBadge) &&
+    !isMineMode &&
+    !isModerationQueue;
+  const cardClassName = [
+    "product-card",
+    showRaffleParticipantChrome ? "product-card--raffle-participant" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
   const card = (
-    <article className="product-card">
+    <article className={cardClassName}>
       <div
         className={bodyClassName}
         {...(isModerationQueue
@@ -258,17 +348,35 @@ export function ProductCard({
           </div>
         ) : null}
         <h2 className="product-card__heading">{heading}</h2>
-        {reviewRatingLine && !isModerationQueue ? (
-          <p className="product-card__rating" aria-label={reviewRatingLine}>
-            {reviewRatingLine}
-          </p>
+        {!isModerationQueue ? (
+          <div className="product-card__meta-strip">
+            <p
+              className={
+                hasReviewRating
+                  ? "product-card__rating"
+                  : "product-card__rating product-card__rating--placeholder"
+              }
+              aria-label={
+                hasReviewRating
+                  ? reviewRatingLine
+                  : PRODUCT_REVIEW_UI.NO_REVIEWS
+              }
+            >
+              {hasReviewRating
+                ? reviewRatingLine
+                : PRODUCT_REVIEW_UI.NO_REVIEWS}
+            </p>
+            <div className="product-card__status-badges-row">
+              {renderStatusSlot()}
+              {showRaffleBadge ? (
+                <p className="product-card__raffle-badge" role="status">
+                  {PRODUCT_CARD_UI.RAFFLE_BADGE}
+                </p>
+              ) : null}
+            </div>
+          </div>
         ) : null}
         {renderModerationBadge()}
-        {!isMineMode && !isModerationQueue && product.productIsAvailable === false ? (
-          <p className="product-card__hidden-badge" role="status">
-            {PRODUCT_CARD_UI.HIDDEN_FROM_CATALOG_BADGE}
-          </p>
-        ) : null}
         <dl className="product-card__fields product-card__fields--preview">
           {previewFieldKeys.map((key) => {
             const raw = product[key];
@@ -327,35 +435,63 @@ export function ProductCard({
             errorMessage={moderationActions.errorMessage}
           />
         ) : onDeleteProduct ? (
-          <ProductSellerManageActions
-            product={product}
-            onEdit={() => {
-              if (onEditProduct == null || product._id == null) return;
-              onEditProduct(product);
-            }}
-            onDelete={onDeleteProduct}
-            onSetAvailability={onSetProductAvailability}
-            isDeletePending={isDeletePending}
-            isAvailabilityTogglePending={isAvailabilityTogglePending}
-            canEdit={sellerCanEdit}
-            canDelete={sellerCanDelete}
-            canToggleVisibility={sellerCanToggleVisibility}
-            stopPropagationOnEdit
-          />
-        ) : product.productIsAvailable !== false && product._id != null ? (
+          <div className="product-card__seller-toolbar">
+            {onPromoteProduct ? (
+              <button
+                type="button"
+                className="product-card__promote"
+                disabled={
+                  product.productIsAvailable === false ||
+                  isDeletePending ||
+                  isAvailabilityTogglePending ||
+                  isAuctionTogglePending
+                }
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onPromoteProduct(product);
+                }}
+              >
+                {PRODUCT_CARD_UI.PROMOTION_BUTTON}
+              </button>
+            ) : null}
+            {onEditProduct && sellerCanEdit ? (
+              <button
+                type="button"
+                className="product-card__edit"
+                disabled={isDeletePending}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onEditProduct(product);
+                }}
+              >
+                {PRODUCT_CARD_UI.EDIT_PRODUCT}
+              </button>
+            ) : null}
+          </div>
+        ) : product.productIsAvailable !== false &&
+          product._id != null &&
+          !isCurrentUserProductSeller(product, currentUserId) ? (
           <AddToCartButton
             productId={String(product._id)}
             isAuthorized={isAuthorized}
             onRequestLogin={onRequestLoginAddToCart}
+            maxQuantity={purchaseLimit}
           />
         ) : null}
       </div>
     </article>
   );
 
-  if (!showPremiumChrome) {
+  if (!showPromotionChrome && !showPremiumChrome) {
     return card;
   }
 
-  return <div className="product-card-premium-frame">{card}</div>;
+  const frameClassName = [
+    showPromotionChrome ? "product-card-promotion-frame" : "",
+    showPremiumChrome ? "product-card-premium-frame" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  return <div className={frameClassName}>{card}</div>;
 }

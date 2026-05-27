@@ -43,3 +43,9 @@ export const ALLOWED_FIELDS_FOR_ADMIN = [
     'userRole',
     'userDiscountPercent',
 ];
+
+/** Собственный профиль администратора (без смены роли и блокировок). */
+export const ALLOWED_FIELDS_FOR_ADMIN_SELF = [
+    ...ALLOWED_FIELDS_FOR_USER,
+    'isPremiumUser',
+];

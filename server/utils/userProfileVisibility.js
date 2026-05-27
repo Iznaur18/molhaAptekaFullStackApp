@@ -9,20 +9,9 @@ export function isPrivilegedAdminViewer(viewer) {
     );
 }
 
-/**
- * @param {{ userRole?: string; _id?: unknown }} targetUser
- * @param {{ viewer?: { userRole?: string; isBlockedUser?: boolean; _id?: string } | null; viewerId?: string | null }} ctx
- */
-export function shouldHideAdminProfile(targetUser, ctx) {
-    if (!targetUser || targetUser.userRole !== ADMIN_ROLE) {
-        return false;
-    }
-    const targetId = String(targetUser._id ?? '');
-    const viewerId = ctx.viewerId ? String(ctx.viewerId) : '';
-    if (viewerId && viewerId === targetId) {
-        return false;
-    }
-    return !isPrivilegedAdminViewer(ctx.viewer);
+/** Админы видны в каталоге пользователей наравне с user. */
+export function shouldHideAdminProfile() {
+    return false;
 }
 
 /**
@@ -31,7 +20,7 @@ export function shouldHideAdminProfile(targetUser, ctx) {
  * @returns {Record<string, unknown> | null} null → ответ 404
  */
 export function sanitizeUserProfileForViewer(user, ctx) {
-    if (shouldHideAdminProfile(user, ctx)) {
+    if (shouldHideAdminProfile()) {
         return null;
     }
 
@@ -56,24 +45,11 @@ export function sanitizeUserProfileForViewer(user, ctx) {
  * @param {{ viewer?: { userRole?: string; isBlockedUser?: boolean } | null; roleFilter?: string }} ctx
  */
 export function applyAdminVisibilityToUsersSearchQuery(usersQuery, ctx) {
-    const { viewer, roleFilter } = ctx;
-
-    if (roleFilter === ADMIN_ROLE) {
-        if (!isPrivilegedAdminViewer(viewer)) {
-            usersQuery.userRole = ADMIN_ROLE;
-            usersQuery._id = { $exists: false };
-            return;
-        }
-        usersQuery.userRole = ADMIN_ROLE;
-        return;
-    }
+    const { roleFilter } = ctx;
 
     if (roleFilter) {
         usersQuery.userRole = roleFilter;
-        return;
     }
-
-    usersQuery.userRole = { $ne: ADMIN_ROLE };
 }
 
 /**

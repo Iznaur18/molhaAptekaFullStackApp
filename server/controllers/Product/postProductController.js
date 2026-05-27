@@ -9,6 +9,7 @@ import { isUserAdmin } from "../../utils/adminUserGuard.js";
 import { mergeProductImageUrlsFromBody } from "../../utils/mergeProductImageUrlsFromBody.js";
 import { assertSellerCanCreateProduct } from "../../utils/sellerProductsLimit.js";
 import { notifyFollowersOfSellerNewCatalogProduct } from "../../utils/userFollowHelpers.js";
+import { resolveProductStockQuantityForWrite } from "../../utils/productStock.js";
 import { errorRes, successRes } from "../../utils/index.js";
 
 export const postProductController = async (req, res) => {
@@ -41,9 +42,24 @@ export const postProductController = async (req, res) => {
     const productModerationStatus = isAdmin
       ? PRODUCT_MODERATION_APPROVED
       : PRODUCT_MODERATION_PENDING;
-    const listedInCatalog = isAdmin
-      ? productIsAvailable !== false
-      : false;
+    const wantsStockListed = productIsAvailable === true;
+    let productStockQuantity;
+    try {
+      productStockQuantity = resolveProductStockQuantityForWrite(
+        wantsStockListed,
+        req.body.productStockQuantity,
+      );
+    } catch (stockError) {
+      return errorRes(
+        res,
+        400,
+        stockError instanceof Error
+          ? stockError.message
+          : "Некорректное количество в наличии",
+      );
+    }
+
+    const visibleInCatalog = isAdmin && productStockQuantity > 0;
 
     const product = await ProductModel.create({
       productName,
@@ -52,7 +68,8 @@ export const postProductController = async (req, res) => {
       productPrice,
       productSeller: userId,
       productCategory,
-      productIsAvailable: listedInCatalog,
+      productIsAvailable: visibleInCatalog,
+      productStockQuantity,
       productAuctionEnabled: productAuctionEnabled === true,
       productAuctionCompletedOnce: false,
       productModerationStatus,

@@ -7,6 +7,7 @@ import {
     USER_DATA,
     ALLOWED_FIELDS_FOR_USER,
     ALLOWED_FIELDS_FOR_ADMIN,
+    ALLOWED_FIELDS_FOR_ADMIN_SELF,
     ALLOWED_FIELDS_FOR_MODERATOR,
 } from '../../constants/constants.js';
 import { isStaffRole } from '../../utils/adminUserGuard.js';
@@ -169,7 +170,9 @@ export const userUpdateProfileController = async (req, res) => {
 
         const updateData = {};
         const allowedFields = isCurrentUserOwner
-            ? ALLOWED_FIELDS_FOR_USER
+            ? isCurrentUserAdmin
+                ? ALLOWED_FIELDS_FOR_ADMIN_SELF
+                : ALLOWED_FIELDS_FOR_USER
             : isCurrentUserAdmin
               ? ALLOWED_FIELDS_FOR_ADMIN
               : ALLOWED_FIELDS_FOR_MODERATOR;
@@ -252,6 +255,10 @@ export const userUpdateProfileController = async (req, res) => {
 
         if (updateData.userDiscountPercent !== undefined && !isCurrentUserAdmin) {
             return errorRes(res, 403, 'Только администратор может менять скидку');
+        }
+
+        if (updateData.isPremiumUser !== undefined && !isCurrentUserAdmin) {
+            return errorRes(res, 403, 'Только администратор может менять премиум');
         }
 
         // 5. Проверка уникальности userName и userPhoneNumber перед обновлением

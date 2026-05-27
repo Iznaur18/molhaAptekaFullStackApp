@@ -7,8 +7,11 @@ export function isCurrentUserProductSeller(product, currentUserId) {
     return false;
   }
   const seller = product.productSeller;
-  if (seller == null || typeof seller !== "object" || seller._id == null) {
+  if (seller == null) {
     return false;
   }
-  return String(seller._id) === String(currentUserId);
+  if (typeof seller === "object" && seller._id != null) {
+    return String(seller._id) === String(currentUserId);
+  }
+  return String(seller) === String(currentUserId);
 }

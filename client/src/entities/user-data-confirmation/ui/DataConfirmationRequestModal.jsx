@@ -289,7 +289,11 @@ export function DataConfirmationRequestModal({
                 <button type="button" onClick={onClose}>
                   {DATA_CONFIRMATION_MODAL_UI.CANCEL}
                 </button>
-                <button type="submit" disabled={isSubmitting}>
+                <button
+                  type="submit"
+                  className="app-btn app-btn--primary"
+                  disabled={isSubmitting}
+                >
                   {isSubmitting
                     ? DATA_CONFIRMATION_MODAL_UI.SUBMIT_LOADING
                     : DATA_CONFIRMATION_MODAL_UI.SUBMIT}

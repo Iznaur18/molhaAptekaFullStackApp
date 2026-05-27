@@ -11,12 +11,17 @@ import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
  *   onSellerNameClick: (userId: string) => void;
  *   onDeleteMyProduct: (productId: string) => void;
  *   onEditMyProduct?: (product: import('../../../entities/product/model/types.js').ProductFromApi) => void;
+ *   onPromoteMyProduct?: (product: import('../../../entities/product/model/types.js').ProductFromApi) => void;
+ *   pendingPromotionProductIds?: Set<string>;
  *   myProductsCatalogError: string;
  *   myProductsCatalogNotice?: string;
  *   onOpenProductDetails: (product: import('../../../entities/product/model/types.js').ProductFromApi) => void;
  *   onSetMyProductAvailability?: (productId: string, productIsAvailable: boolean) => void | Promise<void>;
+ *   onSetMyProductAuction?: (productId: string, productAuctionEnabled: boolean) => void | Promise<void>;
  *   togglingAvailabilityProductId: string | null;
+ *   togglingAuctionProductId?: string | null;
  *   isAuthorized: boolean;
+ *   currentUserId?: string | null;
  *   onRequestLoginAddToCart: () => void;
  *   catalogSentinelRef: import('react').RefObject<HTMLDivElement | null>;
  *   catalogHasMore: boolean;
@@ -26,6 +31,13 @@ import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
  *   myProductsModerationFilter?: string;
  *   catalogFollowingOnly?: boolean;
  *   catalogAuctionOnly?: boolean;
+ *   highlightRaffleProducts?: boolean;
+ *   sellerRaffleActive?: boolean;
+ *   onToggleRaffleParticipation?: (
+ *     product: import('../../../entities/product/model/types.js').ProductFromApi,
+ *     enabled: boolean,
+ *   ) => void;
+ *   raffleParticipationPendingProductId?: string | null;
  * }} props
  */
 export function HomeCatalogGrid({
@@ -37,12 +49,17 @@ export function HomeCatalogGrid({
   onSellerNameClick,
   onDeleteMyProduct,
   onEditMyProduct,
+  onPromoteMyProduct,
+  pendingPromotionProductIds,
   myProductsCatalogError,
   myProductsCatalogNotice = "",
   onOpenProductDetails,
   onSetMyProductAvailability,
+  onSetMyProductAuction,
   togglingAvailabilityProductId,
+  togglingAuctionProductId = null,
   isAuthorized,
+  currentUserId = null,
   onRequestLoginAddToCart,
   catalogSentinelRef,
   catalogHasMore,
@@ -52,7 +69,13 @@ export function HomeCatalogGrid({
   myProductsModerationFilter = "",
   catalogFollowingOnly = false,
   catalogAuctionOnly = false,
+  highlightRaffleProducts = false,
+  sellerRaffleActive = false,
+  onToggleRaffleParticipation,
+  raffleParticipationPendingProductId = null,
 }) {
+  const pendingIds = pendingPromotionProductIds ?? new Set();
+
   const emptyMessage = (() => {
     if (products.length > 0) return "";
     if (hasQuery) return HOME_PAGE_UI.EMPTY_BY_QUERY;
@@ -103,13 +126,37 @@ export function HomeCatalogGrid({
                   onSetProductAvailability={
                     isMineMode ? onSetMyProductAvailability : undefined
                   }
+                  onSetProductAuction={
+                    isMineMode ? onSetMyProductAuction : undefined
+                  }
+                  onPromoteProduct={isMineMode ? onPromoteMyProduct : undefined}
                   isAvailabilityTogglePending={
                     togglingAvailabilityProductId === String(product._id)
                   }
+                  isAuctionTogglePending={
+                    togglingAuctionProductId === String(product._id)
+                  }
                   onOpenDetails={onOpenProductDetails}
                   isAuthorized={isAuthorized}
+                  currentUserId={currentUserId}
                   onRequestLoginAddToCart={onRequestLoginAddToCart}
                   isMineMode={isMineMode}
+                  highlightCatalogPromotion={!isMineMode}
+                  isPromotionPending={
+                    isMineMode &&
+                    product._id != null &&
+                    pendingIds.has(String(product._id))
+                  }
+                  highlightRaffleProduct={highlightRaffleProducts}
+                  sellerRaffleActive={isMineMode ? sellerRaffleActive : false}
+                  onToggleRaffleParticipation={
+                    isMineMode ? onToggleRaffleParticipation : undefined
+                  }
+                  isRaffleParticipationPending={
+                    isMineMode &&
+                    product._id != null &&
+                    raffleParticipationPendingProductId === String(product._id)
+                  }
                 />
               </div>
             ))}

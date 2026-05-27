@@ -22,35 +22,6 @@ export const userSearchValidation = [
         .isInt({ min: 1, max: 100 })
         .withMessage('limit должен быть целым числом от 1 до 100')
         .toInt(),
-    query('isPremiumUser')
-        .optional()
-        .isIn(['true', 'false'])
-        .withMessage('isPremiumUser должен быть true или false'),
-    query('isUserDataConfirmed')
-        .optional()
-        .isIn(['true', 'false'])
-        .withMessage('isUserDataConfirmed должен быть true или false'),
-    query('isActiveUser')
-        .optional()
-        .isIn(['true', 'false'])
-        .withMessage('isActiveUser должен быть true или false'),
-    query('isBlockedUser')
-        .optional()
-        .isIn(['true', 'false'])
-        .withMessage('isBlockedUser должен быть true или false'),
-    query('sort')
-        .optional()
-        .isIn(['name', 'rating'])
-        .withMessage('sort должен быть name или rating'),
-    query('minRating')
-        .optional()
-        .isFloat({ min: 1, max: 10 })
-        .withMessage('minRating должен быть числом от 1 до 10')
-        .toFloat(),
-    query('onlyRated')
-        .optional()
-        .isIn(['true', 'false'])
-        .withMessage('onlyRated должен быть true или false'),
     query('userRole')
         .optional()
         .isIn(['user', 'admin', 'moderator'])

@@ -9,14 +9,6 @@ import {
  *   page?: number;
  *   limit?: number;
  *   search?: string;
- *   sort?: 'name' | 'rating';
- *   minRating?: number;
- *   onlyRated?: boolean;
- *   userRole?: 'user' | 'admin' | 'moderator';
- *   isPremiumUser?: boolean;
- *   isBlockedUser?: boolean;
- *   isActiveUser?: boolean;
- *   isUserDataConfirmed?: boolean | 'not';
  * }} [params]
  * @returns {Promise<{ users: import('../model/types.js').UserSearchListItem[]; total: number; page: number; limit: number }>}
  */
@@ -29,23 +21,6 @@ export async function fetchUsersSearchPage(params = {}) {
         limit: Math.min(maxLimit, Math.max(1, params.limit ?? maxLimit)),
         ...(params.search != null && params.search !== ""
           ? { search: params.search }
-          : {}),
-        ...(params.sort != null && params.sort !== ""
-          ? { sort: params.sort }
-          : {}),
-        ...(params.minRating != null && params.minRating > 0
-          ? { minRating: params.minRating }
-          : {}),
-        ...(params.onlyRated === true ? { onlyRated: "true" } : {}),
-        ...(params.userRole ? { userRole: params.userRole } : {}),
-        ...(params.isPremiumUser === true ? { isPremiumUser: "true" } : {}),
-        ...(params.isBlockedUser === true ? { isBlockedUser: "true" } : {}),
-        ...(params.isActiveUser === false ? { isActiveUser: "false" } : {}),
-        ...(params.isUserDataConfirmed === true
-          ? { isUserDataConfirmed: "true" }
-          : {}),
-        ...(params.isUserDataConfirmed === "not"
-          ? { isUserDataConfirmed: "false" }
           : {}),
       },
     });

@@ -9,12 +9,7 @@ import {
 import { pickUserProfilePhotoUrl } from "../lib/pickUserProfilePhotoUrl.js";
 import { UserPremiumAvatar } from "./UserPremiumAvatar.jsx";
 import { UserPremiumDisplayName } from "./UserPremiumDisplayName.jsx";
-import {
-  DEFAULT_USER_AVATAR_URL,
-  USER_ROLE_LABEL_RU,
-  USER_ROLE_ADMIN,
-  USER_ROLE_USER,
-} from "../model/userConstants.js";
+import { DEFAULT_USER_AVATAR_URL } from "../model/userConstants.js";
 import { USER_LIST_ROW_UI } from "../../../shared/config/appUiCopy.js";
 
 import "./UserListRow.css";
@@ -54,17 +49,11 @@ export function UserListRow({ user, onRowClick }) {
     return Number.isFinite(n) ? String(Math.max(0, Math.floor(n))) : "0";
   }, [user.followersCount]);
   const metaBadges = useMemo(() => {
-    const items = [];
-    if (
-      user.userRole &&
-      user.userRole !== USER_ROLE_USER &&
-      user.userRole !== USER_ROLE_ADMIN
-    ) {
-      items.push(USER_ROLE_LABEL_RU[user.userRole] ?? user.userRole);
+    if (!user.isBlockedUser) {
+      return [];
     }
-    if (user.isBlockedUser) items.push(USER_LIST_ROW_UI.BADGE_BLOCKED);
-    return items;
-  }, [user]);
+    return [USER_LIST_ROW_UI.BADGE_BLOCKED];
+  }, [user.isBlockedUser]);
 
   const handleClick = () => {
     onRowClick?.(user._id);

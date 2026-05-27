@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { isProductRaffleParticipant } from "../../raffle/lib/isProductRaffleParticipant.js";
 import { PRODUCT_CARD_UI } from "../../../shared/config/appUiCopy.js";
 
 import "./ProductSellerManageActions.css";
@@ -10,12 +11,21 @@ import "./ProductSellerManageActions.css";
  *   onEdit: () => void;
  *   onDelete: (productId: string) => void | Promise<void>;
  *   onSetAvailability?: (productId: string, productIsAvailable: boolean) => void | Promise<void>;
+ *   onSetAuction?: (productId: string, productAuctionEnabled: boolean) => void | Promise<void>;
  *   isDeletePending?: boolean;
  *   isAvailabilityTogglePending?: boolean;
+ *   isAuctionTogglePending?: boolean;
  *   errorMessage?: string;
  *   canEdit?: boolean;
  *   canDelete?: boolean;
  *   canToggleVisibility?: boolean;
+ *   onPromote?: (product: import("../model/types.js").ProductFromApi) => void;
+ *   sellerRaffleActive?: boolean;
+ *   onToggleRaffleParticipation?: (
+ *     product: import("../model/types.js").ProductFromApi,
+ *     enabled: boolean,
+ *   ) => void;
+ *   isRaffleParticipationPending?: boolean;
  *   stopPropagationOnEdit?: boolean;
  *   className?: string;
  * }} props
@@ -25,12 +35,18 @@ export function ProductSellerManageActions({
   onEdit,
   onDelete,
   onSetAvailability,
+  onSetAuction,
   isDeletePending = false,
   isAvailabilityTogglePending = false,
+  isAuctionTogglePending = false,
   errorMessage = "",
   canEdit = true,
   canDelete = true,
   canToggleVisibility = true,
+  onPromote,
+  sellerRaffleActive = false,
+  onToggleRaffleParticipation,
+  isRaffleParticipationPending = false,
   stopPropagationOnEdit = false,
   className = "",
 }) {
@@ -40,12 +56,19 @@ export function ProductSellerManageActions({
   const isListedForOthers = product.productIsAvailable !== false;
   const hasOpenSalesLocked = product.hasOpenSales === true;
   const showVisibility = typeof onSetAvailability === "function" && canToggleVisibility;
+  const showAuctionToggle = typeof onSetAuction === "function" && canEdit;
+  const isAuctionEnabled = product.productAuctionEnabled === true;
   const showEdit = canEdit;
   const showDelete = canDelete;
+  const showPromote = typeof onPromote === "function";
+  const showRaffleToggle =
+    sellerRaffleActive && typeof onToggleRaffleParticipation === "function";
+  const isRaffleParticipant = isProductRaffleParticipant(product);
 
   const actionsLocked =
     isDeletePending ||
     isAvailabilityTogglePending ||
+    isAuctionTogglePending ||
     isDeleteConfirmOpen ||
     hasOpenSalesLocked ||
     !canEdit;
@@ -56,10 +79,20 @@ export function ProductSellerManageActions({
   }, [product._id]);
 
   useEffect(() => {
-    if (isDeleteConfirmOpen || isDeletePending || isAvailabilityTogglePending) {
+    if (
+      isDeleteConfirmOpen ||
+      isDeletePending ||
+      isAvailabilityTogglePending ||
+      isAuctionTogglePending
+    ) {
       setIsManageOpen(true);
     }
-  }, [isDeleteConfirmOpen, isDeletePending, isAvailabilityTogglePending]);
+  }, [
+    isDeleteConfirmOpen,
+    isDeletePending,
+    isAvailabilityTogglePending,
+    isAuctionTogglePending,
+  ]);
 
   const handleToggleManage = () => {
     setIsManageOpen((open) => !open);
@@ -98,19 +131,39 @@ export function ProductSellerManageActions({
           {PRODUCT_CARD_UI.OPEN_SALES_LOCKED_HINT}
         </p>
       ) : null}
-      <button
-        type="button"
-        className="product-seller-manage__toggle product-card__edit"
-        aria-expanded={isManageOpen}
-        aria-controls={
-          isManageOpen ? `product-seller-manage-panel-${product._id}` : undefined
-        }
-        onClick={handleToggleManage}
-      >
-        {isManageOpen
-          ? PRODUCT_CARD_UI.MANAGE_PRODUCT_COLLAPSE
-          : PRODUCT_CARD_UI.MANAGE_PRODUCT_TOGGLE}
-      </button>
+      <div className="product-seller-manage__toolbar">
+        <button
+          type="button"
+          className="product-seller-manage__toggle product-card__edit"
+          aria-expanded={isManageOpen}
+          aria-controls={
+            isManageOpen ? `product-seller-manage-panel-${product._id}` : undefined
+          }
+          onClick={handleToggleManage}
+        >
+          {isManageOpen
+            ? PRODUCT_CARD_UI.MANAGE_PRODUCT_COLLAPSE
+            : PRODUCT_CARD_UI.MANAGE_PRODUCT_TOGGLE}
+        </button>
+        {showPromote ? (
+          <button
+            type="button"
+            className="product-card__promote"
+            disabled={
+              !isListedForOthers ||
+              isDeletePending ||
+              isAvailabilityTogglePending ||
+              isAuctionTogglePending
+            }
+            onClick={(event) => {
+              event.stopPropagation();
+              onPromote?.(product);
+            }}
+          >
+            {PRODUCT_CARD_UI.PROMOTION_BUTTON}
+          </button>
+        ) : null}
+      </div>
       {isManageOpen ? (
         <div
           id={`product-seller-manage-panel-${product._id}`}
@@ -149,6 +202,58 @@ export function ProductSellerManageActions({
                 </button>
               </div>
             )
+          ) : null}
+          {showAuctionToggle ? (
+            isAuctionTogglePending ? (
+              <p
+                className="product-card__availability-pending"
+                aria-live="polite"
+              >
+                {PRODUCT_CARD_UI.AUCTION_TOGGLE_PENDING}
+              </p>
+            ) : (
+              <div className="product-card__availability">
+                <p className="product-card__availability-status">
+                  {isAuctionEnabled
+                    ? PRODUCT_CARD_UI.AUCTION_STATUS_ON
+                    : PRODUCT_CARD_UI.AUCTION_STATUS_OFF}
+                </p>
+                <button
+                  type="button"
+                  className="product-card__auction-toggle product-card__availability-toggle"
+                  disabled={actionsLocked}
+                  onClick={() => {
+                    if (product._id == null || actionsLocked) return;
+                    void onSetAuction(String(product._id), !isAuctionEnabled);
+                  }}
+                >
+                  {isAuctionEnabled
+                    ? PRODUCT_CARD_UI.AUCTION_TOGGLE_OFF
+                    : PRODUCT_CARD_UI.AUCTION_TOGGLE_ON}
+                </button>
+              </div>
+            )
+          ) : null}
+          {showRaffleToggle ? (
+            <button
+              type="button"
+              className="product-card__raffle-toggle"
+              disabled={
+                isRaffleParticipationPending ||
+                isDeletePending ||
+                isAvailabilityTogglePending ||
+                isAuctionTogglePending
+              }
+              onClick={() => {
+                onToggleRaffleParticipation?.(product, !isRaffleParticipant);
+              }}
+            >
+              {isRaffleParticipationPending
+                ? PRODUCT_CARD_UI.RAFFLE_PARTICIPATION_PENDING
+                : isRaffleParticipant
+                  ? PRODUCT_CARD_UI.RAFFLE_PARTICIPATION_ON
+                  : PRODUCT_CARD_UI.RAFFLE_PARTICIPATION_OFF}
+            </button>
           ) : null}
           {showEdit ? (
             <button

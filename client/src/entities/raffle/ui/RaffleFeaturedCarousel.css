@@ -1,0 +1,43 @@
+.raffle-featured-carousel {
+  --raffle-carousel-slide-gap: 0.75rem;
+
+  position: relative;
+  margin: 0 0 1.25rem;
+}
+
+.raffle-featured-carousel__viewport {
+  overflow: hidden;
+}
+
+.raffle-featured-carousel__track {
+  display: flex;
+  gap: var(--raffle-carousel-slide-gap);
+}
+
+.raffle-featured-carousel__slide {
+  flex: 0 0 100%;
+  min-width: 0;
+}
+
+.raffle-featured-carousel__slide .raffle-featured-banner {
+  margin: 0;
+}
+
+.raffle-featured-carousel .raffle-featured-banner__visual_carousel-drag {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.raffle-featured-carousel
+  .raffle-featured-banner__visual_carousel-dragging {
+  cursor: grabbing;
+}
+
+.raffle-featured-carousel .raffle-featured-banner__visual_carousel-drag img {
+  pointer-events: none;
+}
+
+.raffle-featured-carousel .raffle-featured-banner__badge {
+  pointer-events: none;
+}

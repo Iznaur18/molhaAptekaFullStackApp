@@ -1,6 +1,6 @@
 import { UserInAppNotificationModel } from '../models/index.js';
 
-const NOTIFICATION_LIST_LIMIT = 20;
+const NOTIFICATION_LIST_LIMIT = 50;
 
 /**
  * @param {{

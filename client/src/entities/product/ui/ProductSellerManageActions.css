@@ -12,6 +12,38 @@
   color: #b42318;
 }
 
+.product-card__raffle-toggle {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid #c4b5fd;
+  border-radius: 10px;
+  background: #f5f3ff;
+  color: #5b21b6;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.product-card__raffle-toggle:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.product-seller-manage__toolbar {
+  display: flex;
+  gap: 0.45rem;
+  width: 100%;
+}
+
+.product-seller-manage__toolbar .product-seller-manage__toggle,
+.product-seller-manage__toolbar .product-card__promote {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
 .product-seller-manage__toggle {
   flex-shrink: 0;
 }

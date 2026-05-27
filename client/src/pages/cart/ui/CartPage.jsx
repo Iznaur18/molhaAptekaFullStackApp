@@ -4,6 +4,7 @@ import { selectCartLines } from "../../../entities/cart/lib/selectCartLines.js";
 import { useCart } from "../../../entities/cart/model/useCart.js";
 import { createOrder } from "../../../entities/order/api/createOrder.js";
 import { fetchAllProducts } from "../../../entities/product/api/fetchAllProducts.js";
+import { isCurrentUserProductSeller } from "../../../entities/product/lib/isCurrentUserProductSeller.js";
 import { ProductDetailsModal } from "../../../entities/product/ui/ProductDetailsModal.jsx";
 import { fetchCurrentUserProfile } from "../../../entities/user/api/fetchCurrentUserProfile.js";
 import {
@@ -95,6 +96,7 @@ const useCurrentUserAddress = (isAuthorized) => {
 /**
  * @param {{
  *   isAuthorized: boolean;
+ *   currentUserId?: string | null;
  *   onRequestLogin: () => void;
  *   onGoToCatalog: () => void;
  *   onCheckoutSuccess: () => void;
@@ -103,6 +105,7 @@ const useCurrentUserAddress = (isAuthorized) => {
  */
 export function CartPage({
   isAuthorized,
+  currentUserId = null,
   onRequestLogin,
   onGoToCatalog,
   onCheckoutSuccess,
@@ -133,9 +136,12 @@ export function CartPage({
   const purchasableLines = useMemo(
     () =>
       lines.filter(
-        (line) => !line.isMissing && line.product?.productIsAvailable !== false,
+        (line) =>
+          !line.isMissing &&
+          line.product?.productIsAvailable !== false &&
+          !isCurrentUserProductSeller(line.product, currentUserId),
       ),
-    [lines],
+    [lines, currentUserId],
   );
 
   const isCartEmpty = lines.length === 0;
@@ -251,7 +257,13 @@ export function CartPage({
         onClose={() => setSelectedProduct(null)}
         onSellerNameClick={onSellerNameClick}
         isAuthorized={isAuthorized}
+        currentUserId={currentUserId}
         onProductStatsUpdate={handleProductStatsUpdate}
+        showAddToCart={
+          selectedProduct != null &&
+          !isCurrentUserProductSeller(selectedProduct, currentUserId)
+        }
+        onRequestLogin={onRequestLogin}
       />
     </div>
   );

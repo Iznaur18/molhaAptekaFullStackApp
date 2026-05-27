@@ -8,6 +8,7 @@ import {
     patchMyProductController,
     recordProductViewController,
     getPendingModerationProductsController,
+    getPendingModerationProductsCountController,
     approveProductModerationController,
     rejectProductModerationController,
     submitProductReportController,
@@ -29,6 +30,30 @@ import {
     submitProductReviewController,
     patchMyProductReviewController,
     deleteMyProductReviewController,
+    getProductPromotionTariffsController,
+    requestProductPromotionController,
+    getMyProductPromotionsController,
+    getPendingProductPromotionsController,
+    getPendingProductPromotionsCountController,
+    approveProductPromotionController,
+    rejectProductPromotionController,
+    cancelProductPromotionByStaffController,
+    extendProductPromotionByStaffController,
+    getFeaturedRaffleController,
+    getRaffleByIdController,
+    getRaffleProductsController,
+    createRaffleController,
+    getMyRaffleController,
+    patchMyRaffleController,
+    patchRaffleByStaffController,
+    deleteMyRaffleController,
+    deleteRaffleByStaffController,
+    pauseMyRaffleController,
+    setProductRaffleParticipationController,
+    getPendingRafflesController,
+    getPendingRafflesCountController,
+    approveRaffleController,
+    rejectRaffleController,
 } from '../controllers/index.js';
 import {
     checkAuthMW,
@@ -52,6 +77,15 @@ import {
     submitProductReviewValidation,
     patchProductReviewValidation,
     productReviewsListValidation,
+    requestProductPromotionValidation,
+    promotionIdParamValidation,
+    myProductPromotionsValidation,
+    createRaffleValidation,
+    patchRaffleValidation,
+    raffleIdParamValidation,
+    rejectRaffleValidation,
+    raffleProductsValidation,
+    setProductRaffleParticipationValidation,
 } from '../validations/index.js';
 
 const router = Router();
@@ -59,6 +93,139 @@ const router = Router();
 router.post('/', checkAuthMW, makeProductValidation, postProductController);
 router.get('/', productsSearchValidation, checkOptionalAuthMW, getProductsController);
 router.get('/my', checkAuthMW, productsSearchValidation, getMyProductsController);
+router.get('/raffles/featured', getFeaturedRaffleController);
+router.get('/raffles/my', checkAuthMW, getMyRaffleController);
+router.get(
+    '/raffles/pending/count',
+    checkAuthMW,
+    checkProductModeratorMW,
+    getPendingRafflesCountController,
+);
+router.get(
+    '/raffles/pending',
+    checkAuthMW,
+    checkProductModeratorMW,
+    getPendingRafflesController,
+);
+router.post('/raffles', checkAuthMW, createRaffleValidation, createRaffleController);
+router.get(
+    '/raffles/:raffleId/products',
+    raffleProductsValidation,
+    getRaffleProductsController,
+);
+router.get('/raffles/:raffleId', raffleIdParamValidation, getRaffleByIdController);
+router.delete(
+    '/raffles/my/:raffleId',
+    checkAuthMW,
+    raffleIdParamValidation,
+    deleteMyRaffleController,
+);
+router.patch(
+    '/raffles/:raffleId',
+    checkAuthMW,
+    patchRaffleValidation,
+    patchMyRaffleController,
+);
+router.patch(
+    '/raffles/:raffleId/staff',
+    checkAuthMW,
+    checkProductModeratorMW,
+    patchRaffleValidation,
+    patchRaffleByStaffController,
+);
+router.delete(
+    '/raffles/:raffleId',
+    checkAuthMW,
+    checkProductModeratorMW,
+    raffleIdParamValidation,
+    deleteRaffleByStaffController,
+);
+router.patch(
+    '/raffles/:raffleId/pause',
+    checkAuthMW,
+    raffleIdParamValidation,
+    pauseMyRaffleController,
+);
+router.patch(
+    '/raffles/:raffleId/approve',
+    checkAuthMW,
+    checkProductModeratorMW,
+    raffleIdParamValidation,
+    approveRaffleController,
+);
+router.patch(
+    '/raffles/:raffleId/reject',
+    checkAuthMW,
+    checkProductModeratorMW,
+    rejectRaffleValidation,
+    rejectRaffleController,
+);
+router.patch(
+    '/:productId/raffle-participation',
+    checkAuthMW,
+    setProductRaffleParticipationValidation,
+    setProductRaffleParticipationController,
+);
+router.get('/promotions/tariffs', getProductPromotionTariffsController);
+router.get(
+    '/promotions/my',
+    checkAuthMW,
+    myProductPromotionsValidation,
+    getMyProductPromotionsController,
+);
+router.get(
+    '/promotions/pending/count',
+    checkAuthMW,
+    checkProductModeratorMW,
+    getPendingProductPromotionsCountController,
+);
+router.get(
+    '/promotions/pending',
+    checkAuthMW,
+    checkProductModeratorMW,
+    getPendingProductPromotionsController,
+);
+router.patch(
+    '/promotions/:promotionId/approve',
+    checkAuthMW,
+    checkProductModeratorMW,
+    promotionIdParamValidation,
+    approveProductPromotionController,
+);
+router.patch(
+    '/promotions/:promotionId/reject',
+    checkAuthMW,
+    checkProductModeratorMW,
+    promotionIdParamValidation,
+    rejectProductPromotionController,
+);
+router.patch(
+    '/promotions/:promotionId/cancel',
+    checkAuthMW,
+    checkProductModeratorMW,
+    promotionIdParamValidation,
+    cancelProductPromotionByStaffController,
+);
+router.patch(
+    '/promotions/:promotionId/extend',
+    checkAuthMW,
+    checkProductModeratorMW,
+    promotionIdParamValidation,
+    extendProductPromotionByStaffController,
+);
+router.post(
+    '/:productId/promotions/request',
+    checkAuthMW,
+    productIdParamValidation,
+    requestProductPromotionValidation,
+    requestProductPromotionController,
+);
+router.get(
+    '/moderation/pending/count',
+    checkAuthMW,
+    checkProductModeratorMW,
+    getPendingModerationProductsCountController,
+);
 router.get(
     '/moderation/pending',
     checkAuthMW,

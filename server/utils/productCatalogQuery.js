@@ -151,7 +151,13 @@ const sortStageForCatalog = (sort) => {
     if (sort === PRODUCT_SORT_VIEWS) {
         return { $sort: { uniqueViewerCount: -1, createdAt: -1 } };
     }
-    return { $sort: { createdAt: -1 } };
+    return {
+        $sort: {
+            catalogPromotionActivatedAt: -1,
+            catalogPromotionExpiresAt: -1,
+            createdAt: -1,
+        },
+    };
 };
 
 /**

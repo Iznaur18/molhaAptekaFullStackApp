@@ -6,6 +6,8 @@ import { up as userDataConfirmedUp } from "./20260523-user-data-confirmed.js";
 import { up as orderLineProductNameUp } from "./20260525-order-line-product-name.js";
 import { up as orderLineLoyaltyPointsUp } from "./20260526-order-line-loyalty-points.js";
 import { up as productAuctionUp } from "./20260527-product-auction.js";
+import { up as adminCatalogProductsUp } from "./20260528-admin-catalog-products.js";
+import { up as productStockQuantityUp } from "./20260529-product-stock-quantity.js";
 
 export const MIGRATIONS = [
   {
@@ -47,5 +49,15 @@ export const MIGRATIONS = [
     id: "20260527-product-auction",
     description: "Backfill productAuctionEnabled and productAuctionCompletedOnce",
     up: productAuctionUp,
+  },
+  {
+    id: "20260528-admin-catalog-products",
+    description: "List admin seller products in public catalog",
+    up: adminCatalogProductsUp,
+  },
+  {
+    id: "20260529-product-stock-quantity",
+    description: "Backfill productStockQuantity for existing products",
+    up: productStockQuantityUp,
   },
 ];

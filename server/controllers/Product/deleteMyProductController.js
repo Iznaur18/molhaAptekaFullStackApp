@@ -1,4 +1,4 @@
-import { ProductModel } from '../../models/index.js';
+import { ProductModel, ProductPromotionModel } from '../../models/index.js';
 import { PRODUCT_MODERATION_APPROVED } from '../../constants/productModerationConstants.js';
 import { isUserAdmin } from '../../utils/adminUserGuard.js';
 import {
@@ -10,9 +10,13 @@ import { rejectAllPendingOffersForProduct } from '../../utils/productPriceOfferH
 import { ProductPriceOfferModel } from '../../models/index.js';
 import {
     PRICE_OFFER_STATUS_ACCEPTED,
-    PRICE_OFFER_STATUS_PENDING,
     PRICE_OFFER_STATUS_REJECTED,
 } from '../../constants/productPriceOfferConstants.js';
+import {
+    PRODUCT_PROMOTION_STATUS_ACTIVE,
+    PRODUCT_PROMOTION_STATUS_CANCELLED_BY_ADMIN,
+    PRODUCT_PROMOTION_STATUS_PENDING_STAFF,
+} from '../../constants/productPromotionConstants.js';
 import { errorRes, successRes } from '../../utils/index.js';
 
 /** Удаление своего товара или любого (admin). DELETE /product/:productId */
@@ -39,6 +43,23 @@ export const deleteMyProductController = async (req, res) => {
         if (deleted) {
             await dismissPendingReportsForProduct(productId);
             await rejectAllPendingOffersForProduct(productId);
+            await ProductPromotionModel.updateMany(
+                {
+                    productId,
+                    status: {
+                        $in: [
+                            PRODUCT_PROMOTION_STATUS_PENDING_STAFF,
+                            PRODUCT_PROMOTION_STATUS_ACTIVE,
+                        ],
+                    },
+                },
+                {
+                    $set: {
+                        status: PRODUCT_PROMOTION_STATUS_CANCELLED_BY_ADMIN,
+                        cancelledAt: new Date(),
+                    },
+                },
+            );
             const now = new Date();
             await ProductPriceOfferModel.updateMany(
                 { productId, status: PRICE_OFFER_STATUS_ACCEPTED },

@@ -12,6 +12,8 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
  * @property {number} productPrice
  * @property {import('../model/types.js').ProductCategory} productCategory
  * @property {boolean} productIsAvailable
+ * @property {number} [productStockQuantity]
+ * @property {boolean} [productAuctionEnabled]
  */
 
 /**
@@ -29,6 +31,12 @@ export async function createProduct(body) {
       productCategory: body.productCategory,
       productIsAvailable: body.productIsAvailable,
     };
+    if (body.productIsAvailable === true) {
+      payload.productStockQuantity = body.productStockQuantity;
+    }
+    if (body.productAuctionEnabled != null) {
+      payload.productAuctionEnabled = body.productAuctionEnabled === true;
+    }
     const urls = Array.isArray(body.productImageUrls)
       ? body.productImageUrls.map((s) => String(s).trim()).filter(Boolean)
       : [];

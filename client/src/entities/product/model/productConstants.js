@@ -219,6 +219,7 @@ export const PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS = [
   "productPrice",
   "productCategory",
   "productIsAvailable",
+  "productStockQuantity",
   "soldQuantity",
   "uniqueViewerCount",
 ];
@@ -227,6 +228,7 @@ export const PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS = [
 export const PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS_ADMIN = [
   "productPrice",
   "productCategory",
+  "productStockQuantity",
   "soldQuantity",
   "uniqueViewerCount",
 ];
@@ -258,6 +260,7 @@ export const PRODUCT_FIELD_LABEL_RU = {
   productSeller: "Продавец",
   productCategory: "Категория",
   productIsAvailable: "В наличии",
+  productStockQuantity: "В наличии (шт.)",
   productModerationStatus: "Статус модерации",
   productModerationComment: "Комментарий модератора",
   uniqueViewerCount: "Уникальные просмотры",

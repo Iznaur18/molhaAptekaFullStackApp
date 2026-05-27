@@ -29,6 +29,10 @@ import { ProductPriceOfferHintMessage } from "../../product-price-offer/ui/Produ
 import { ProductPriceOfferSellerTab } from "../../product-price-offer/ui/ProductPriceOfferSellerTab.jsx";
 import { ProductPriceOfferSellerArchive } from "../../product-price-offer/ui/ProductPriceOfferSellerArchive.jsx";
 import { resolveAuctionUiState } from "../lib/resolveAuctionUiState.js";
+import {
+  getProductPurchaseLimit,
+  shouldShowProductRemainingStock,
+} from "../lib/getProductPurchaseLimit.js";
 import { PRODUCT_MODERATION_APPROVED } from "../model/productModerationConstants.js";
 import { ProductReviewsSection } from "../../product-review/ui/ProductReviewsSection.jsx";
 import {
@@ -199,6 +203,8 @@ export function ProductDetailsModal({
   );
   const [isUserDataConfirmed, setIsUserDataConfirmed] = useState(false);
   const modalBodyRef = useRef(/** @type {HTMLDivElement | null} */ (null));
+  const tabPanelRef = useRef(/** @type {HTMLDivElement | null} */ (null));
+  const [tabPanelMinHeight, setTabPanelMinHeight] = useState(0);
 
   const isOwnProduct =
     product != null && isCurrentUserProductSeller(product, currentUserId);
@@ -208,6 +214,16 @@ export function ProductDetailsModal({
     () => resolveAuctionUiState(product),
     [product],
   );
+  const showReviewsTab =
+    product?._id != null &&
+    (product.productModerationStatus === PRODUCT_MODERATION_APPROVED ||
+      isSellerView);
+  const showAuctionTab =
+    product?._id != null &&
+    (isSellerView
+      ? auctionUi.showSellerAuctionTab
+      : product.productAuctionEnabled === true);
+  const showProductDetailsTabs = showAuctionTab || showReviewsTab;
 
   const reloadTopOffers = useCallback(async () => {
     if (!product?._id || !auctionUi.auctionActive) {
@@ -243,6 +259,7 @@ export function ProductDetailsModal({
     setActiveImageIndex(0);
     setLightboxOpen(false);
     setDetailsTab("details");
+    setTabPanelMinHeight(0);
   }, [product?._id]);
 
   useEffect(() => {
@@ -351,6 +368,17 @@ export function ProductDetailsModal({
     };
   }, [isOpen, onClose, lightboxOpen, imageUrls.length]);
 
+  useEffect(() => {
+    if (!isOpen || !showProductDetailsTabs) return undefined;
+    const panel = tabPanelRef.current;
+    if (!panel) return undefined;
+    const nextHeight = panel.scrollHeight;
+    if (nextHeight > tabPanelMinHeight) {
+      setTabPanelMinHeight(nextHeight);
+    }
+    return undefined;
+  }, [isOpen, showProductDetailsTabs, detailsTab, tabPanelMinHeight, product?._id]);
+
   const handleSliderPrev = (event) => {
     event.stopPropagation();
     const len = imageUrls.length;
@@ -390,21 +418,11 @@ export function ProductDetailsModal({
   const bottomMetaFieldKeys = bottomRowFieldKeys.filter((key) =>
     PRODUCT_DETAILS_META_FIELD_KEYS.has(key),
   );
+  const purchaseLimit = getProductPurchaseLimit(product);
+  const showRemainingStock =
+    !isOwnProduct && !showStaffDetails && shouldShowProductRemainingStock(product);
   const canShowAddToCart =
-    showAddToCart && product._id != null && !adminFooter && !showStaffDetails;
-
-  const showReviewsTab =
-    product._id != null &&
-    (product.productModerationStatus === PRODUCT_MODERATION_APPROVED ||
-      isSellerView);
-
-  const showAuctionTab =
-    product._id != null &&
-    (isSellerView
-      ? auctionUi.showSellerAuctionTab
-      : product.productAuctionEnabled === true);
-
-  const showProductDetailsTabs = showAuctionTab || showReviewsTab;
+    showAddToCart && product._id != null && !isOwnProduct && purchaseLimit > 0;
 
   const reviewCount = Number(product.reviewCount) || 0;
   const reviewsTabLabel =
@@ -498,53 +516,62 @@ export function ProductDetailsModal({
               </div>
             ) : null}
 
-            {detailsTab === "reviews" && showReviewsTab ? (
-              <ProductReviewsSection
-                productId={String(product._id)}
-                isAuthorized={isAuthorized}
-                isUserDataConfirmed={isUserDataConfirmed}
-                isOwnProduct={isOwnProduct}
-                embeddedInTab
-                onRequestLogin={onRequestLogin}
-                onStatsChange={handleReviewStatsChange}
-              />
-            ) : detailsTab === "auction" && showAuctionTab ? (
-              isSellerView ? (
-                <ProductPriceOfferSellerTab
+            <div
+              ref={tabPanelRef}
+              className="product-details-modal__tab-panel"
+              style={
+                showProductDetailsTabs && tabPanelMinHeight > 0
+                  ? { minHeight: `${tabPanelMinHeight}px` }
+                  : undefined
+              }
+            >
+              {detailsTab === "reviews" && showReviewsTab ? (
+                <ProductReviewsSection
                   productId={String(product._id)}
-                  onOpenBuyer={handleOpenSellerProfile}
-                  onChanged={() => void reloadTopOffers()}
+                  isAuthorized={isAuthorized}
+                  isUserDataConfirmed={isUserDataConfirmed}
+                  isOwnProduct={isOwnProduct}
+                  embeddedInTab
+                  onRequestLogin={onRequestLogin}
+                  onStatsChange={handleReviewStatsChange}
                 />
+              ) : detailsTab === "auction" && showAuctionTab ? (
+                isSellerView ? (
+                  <ProductPriceOfferSellerTab
+                    productId={String(product._id)}
+                    onOpenBuyer={handleOpenSellerProfile}
+                    onChanged={() => void reloadTopOffers()}
+                  />
+                ) : (
+                  <section
+                    id="product-details-auction"
+                    className="product-details-modal__auction-section"
+                    aria-label={PRODUCT_PRICE_OFFER_UI.TAB_AUCTION}
+                  >
+                    {auctionUi.auctionActive ? (
+                      <ProductPriceOfferBuyerBlock
+                        productId={String(product._id)}
+                        isAuthorized={isAuthorized}
+                        isUserDataConfirmed={isUserDataConfirmed}
+                        isOwnProduct={isOwnProduct}
+                        top={topOffers}
+                        onOpenBuyer={handleOpenSellerProfile}
+                        onRequestLogin={onRequestLogin}
+                        onOffersChanged={() => void reloadTopOffers()}
+                      />
+                    ) : auctionUi.buyerMessage === "ended" ? (
+                      <p className="product-price-offer__hint">
+                        {PRODUCT_PRICE_OFFER_UI.AUCTION_ENDED}
+                      </p>
+                    ) : auctionUi.buyerMessage === "notHeld" ? (
+                      <ProductPriceOfferHintMessage>
+                        {PRODUCT_PRICE_OFFER_UI.AUCTION_NOT_HELD}
+                      </ProductPriceOfferHintMessage>
+                    ) : null}
+                  </section>
+                )
               ) : (
-                <section
-                  id="product-details-auction"
-                  className="product-details-modal__auction-section"
-                  aria-label={PRODUCT_PRICE_OFFER_UI.TAB_AUCTION}
-                >
-                  {auctionUi.auctionActive ? (
-                    <ProductPriceOfferBuyerBlock
-                      productId={String(product._id)}
-                      isAuthorized={isAuthorized}
-                      isUserDataConfirmed={isUserDataConfirmed}
-                      isOwnProduct={isOwnProduct}
-                      top={topOffers}
-                      onOpenBuyer={handleOpenSellerProfile}
-                      onRequestLogin={onRequestLogin}
-                      onOffersChanged={() => void reloadTopOffers()}
-                    />
-                  ) : auctionUi.buyerMessage === "ended" ? (
-                    <p className="product-price-offer__hint">
-                      {PRODUCT_PRICE_OFFER_UI.AUCTION_ENDED}
-                    </p>
-                  ) : auctionUi.buyerMessage === "notHeld" ? (
-                    <ProductPriceOfferHintMessage>
-                      {PRODUCT_PRICE_OFFER_UI.AUCTION_NOT_HELD}
-                    </ProductPriceOfferHintMessage>
-                  ) : null}
-                </section>
-              )
-            ) : (
-              <>
+                <>
             <div className="product-details-modal__row-top">
               <div className="product-details-modal__image-aside">
                 <div
@@ -658,6 +685,14 @@ export function ProductDetailsModal({
                         ["productPrice"],
                         fieldHandlers,
                       )}
+                      {showRemainingStock ? (
+                        <div className="product-details-modal__row product-details-modal__row--stat">
+                          <dt className="product-details-modal__dt">Остаток</dt>
+                          <dd className="product-details-modal__dd">
+                            {PRODUCT_CARD_UI.REMAINING_STOCK(purchaseLimit)}
+                          </dd>
+                        </div>
+                      ) : null}
                     </dl>
                     <div
                       className={
@@ -672,6 +707,7 @@ export function ProductDetailsModal({
                             productId={String(product._id)}
                             isAuthorized={isAuthorized}
                             onRequestLogin={onRequestLogin}
+                            maxQuantity={purchaseLimit}
                           />
                         </div>
                       ) : null}
@@ -742,8 +778,9 @@ export function ProductDetailsModal({
               />
             ) : null}
 
-              </>
-            )}
+                </>
+              )}
+            </div>
           </div>
           {secondaryFooter ? (
             <footer className="product-details-modal__footer">

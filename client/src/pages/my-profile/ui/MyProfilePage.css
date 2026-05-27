@@ -1,0 +1,222 @@
+.my-profile-page {
+  --modal-avatar-lead-size: 4.5rem;
+  --modal-profile-banner-height-mult: 3;
+  --modal-banner-avatar-inset: 0.75rem;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.my-profile-page__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.my-profile-page__title {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.my-profile-page__body {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  background: #fff;
+  padding: 0.9rem;
+}
+
+.my-profile-page__state {
+  margin: 0;
+}
+
+.my-profile-page__state_error {
+  color: #b42318;
+}
+
+.my-profile-page__footer {
+  display: flex;
+}
+
+.my-profile-page__header-action_create-raffle {
+  border-color: #c4b5fd;
+  background: #ede9fe;
+  color: #5b21b6;
+  font-weight: 700;
+}
+
+.my-profile-page__header-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.my-profile-page__header-action {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, CanvasText 20%, transparent);
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+.my-profile-page__header-action:hover:not(:disabled) {
+  background: color-mix(in srgb, CanvasText 6%, transparent);
+}
+
+.my-profile-page__header-action_active {
+  border-color: #1f6feb;
+  background: rgba(31, 111, 235, 0.12);
+  color: #1f6feb;
+}
+
+.my-profile-page__header-action_active:hover:not(:disabled) {
+  background: rgba(31, 111, 235, 0.2);
+}
+
+.my-profile-page__header-action_badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.my-profile-page__header-action:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.my-profile-page__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: #b42318;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.my-profile-page__notifications {
+  margin: 0 0 0.75rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.5rem;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+}
+
+.my-profile-page__notifications-list {
+  margin: 0;
+  padding: 0 0 0 1rem;
+  font-size: 0.875rem;
+  color: #1e3a8a;
+}
+
+.my-profile-page__notification-btn {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.my-profile-page__tab-content {
+  margin-top: 0.5rem;
+}
+
+.my-profile-page__tab-content_lead {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+}
+
+.my-profile-page__banner-edit {
+  position: absolute;
+  top: var(--modal-banner-avatar-inset);
+  right: var(--modal-banner-avatar-inset);
+  z-index: 2;
+  margin: 0;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.92);
+  color: #111827;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.my-profile-page__banner-edit:hover {
+  background: #fff;
+}
+
+.my-profile-page__logout-trigger {
+  align-self: flex-start;
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, #b42318 35%, CanvasText 20%);
+  background: color-mix(in srgb, #b42318 8%, transparent);
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+}
+
+.my-profile-page__logout-trigger:hover {
+  background: color-mix(in srgb, #b42318 14%, transparent);
+}
+
+.my-profile-page__logout-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.my-profile-page__logout-question {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.my-profile-page__logout-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.my-profile-page__logout-yes,
+.my-profile-page__logout-cancel {
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.my-profile-page__logout-yes {
+  border: 1px solid color-mix(in srgb, #b42318 45%, transparent);
+  background: color-mix(in srgb, #b42318 12%, transparent);
+  color: inherit;
+}
+
+.my-profile-page__logout-yes:hover {
+  background: color-mix(in srgb, #b42318 20%, transparent);
+}
+
+.my-profile-page__logout-cancel {
+  border: 1px solid color-mix(in srgb, CanvasText 20%, transparent);
+  background: transparent;
+  color: inherit;
+}
+
+.my-profile-page__logout-cancel:hover {
+  background: color-mix(in srgb, CanvasText 6%, transparent);
+}

@@ -1,4 +1,4 @@
-import { ProductModel } from "../../models/index.js";
+import { ProductModel, ProductPromotionModel } from "../../models/index.js";
 import {
     PRODUCT_MODERATION_APPROVED,
     PRODUCT_MODERATION_PENDING,
@@ -16,6 +16,12 @@ import { rejectAllPendingOffersForProduct } from "../../utils/productPriceOfferH
 import {
     notifySellerAuctionToggledByAdmin,
 } from "../../utils/productAuction.js";
+import { PRODUCT_PROMOTION_STATUS_ACTIVE, PRODUCT_PROMOTION_STATUS_CANCELLED_BY_ADMIN, PRODUCT_PROMOTION_STATUS_PENDING_STAFF } from "../../constants/productPromotionConstants.js";
+import { clearProductPromotionForProduct } from "../../utils/productPromotionHelpers.js";
+import {
+    assertProductStockPatchAllowed,
+    syncProductCatalogAfterStockChange,
+} from "../../utils/productStock.js";
 import { errorRes, successRes } from "../../utils/index.js";
 
 const PENDING_EDIT_BLOCK_MESSAGE =
@@ -110,6 +116,31 @@ export const patchMyProductController = async (req, res) => {
             $set.productIsAvailable = Boolean(body.productIsAvailable);
         }
 
+        if (Object.prototype.hasOwnProperty.call(body, "productStockQuantity")) {
+            try {
+                const nextStock = await assertProductStockPatchAllowed(
+                    productId,
+                    body.productStockQuantity,
+                );
+                $set.productStockQuantity = nextStock;
+                if (nextStock === 0) {
+                    $set.productIsAvailable = false;
+                } else if (
+                    existing.productModerationStatus === PRODUCT_MODERATION_APPROVED
+                ) {
+                    $set.productIsAvailable = true;
+                }
+            } catch (stockError) {
+                return errorRes(
+                    res,
+                    400,
+                    stockError instanceof Error
+                        ? stockError.message
+                        : "Некорректное количество в наличии",
+                );
+            }
+        }
+
         let auctionEnabledChanged = false;
         let nextAuctionEnabled = existing.productAuctionEnabled === true;
 
@@ -149,6 +180,24 @@ export const patchMyProductController = async (req, res) => {
             await rejectAllPendingOffersForProduct(productId, {
                 notifyBuyers: true,
             });
+            await ProductPromotionModel.updateMany(
+                {
+                    productId,
+                    status: {
+                        $in: [
+                            PRODUCT_PROMOTION_STATUS_PENDING_STAFF,
+                            PRODUCT_PROMOTION_STATUS_ACTIVE,
+                        ],
+                    },
+                },
+                {
+                    $set: {
+                        status: PRODUCT_PROMOTION_STATUS_CANCELLED_BY_ADMIN,
+                        cancelledAt: new Date(),
+                    },
+                },
+            );
+            await clearProductPromotionForProduct(productId);
         }
 
         if (auctionEnabledChanged && !nextAuctionEnabled) {
@@ -169,7 +218,15 @@ export const patchMyProductController = async (req, res) => {
             }
         }
 
-        const productWithSeller = await attachProductSellerSnapshot(product);
+        if (Object.prototype.hasOwnProperty.call($set, "productStockQuantity")) {
+            await syncProductCatalogAfterStockChange(productId);
+        }
+
+        const productWithSeller = await attachProductSellerSnapshot(
+            await ProductModel.findById(productId)
+                .populate("productSeller", PRODUCT_SELLER_PUBLIC_SELECT)
+                .lean(),
+        );
 
         return successRes(res, {
             message: "Товар обновлён",

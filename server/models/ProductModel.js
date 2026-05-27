@@ -42,6 +42,12 @@ const ProductSchema = new Schema(
       type: Boolean,
       default: true,
     },
+    productStockQuantity: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 9999,
+    },
     productAuctionEnabled: {
       type: Boolean,
       default: false,
@@ -75,6 +81,24 @@ const ProductSchema = new Schema(
       type: Number,
       default: 0,
       min: 0,
+    },
+    catalogPromotionActivatedAt: {
+      type: Date,
+      default: null,
+    },
+    catalogPromotionExpiresAt: {
+      type: Date,
+      default: null,
+    },
+    activeRaffleId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Raffle',
+      default: null,
+      index: true,
+    },
+    raffleParticipationEnabledAt: {
+      type: Date,
+      default: null,
     },
   },
   { timestamps: true },

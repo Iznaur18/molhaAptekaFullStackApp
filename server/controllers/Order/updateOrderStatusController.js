@@ -6,10 +6,15 @@ import {
     ORDER_ITEMS_POPULATE,
 } from './orderQueries.js';
 import {
+    ORDER_STATUS_CANCELLED,
     ORDER_STATUS_CONFIRMED,
     ORDER_STATUS_DELIVERED,
 } from '../../constants/orderConstants.js';
-import { normalizeOrderDocumentForRuntime } from './orderStatus.js';
+import {
+    decrementProductStockOnItemConfirmed,
+    restoreProductStockOnItemCancelled,
+} from '../../utils/productStock.js';
+import { normalizeOrderDocumentForRuntime, normalizeOrderItemsForRuntime } from './orderStatus.js';
 
 /** `PATCH /order/:orderId/status` — смена статуса заказа (только админ). */
 export const updateOrderStatusController = async (req, res) => {
@@ -22,8 +27,43 @@ export const updateOrderStatusController = async (req, res) => {
             return errorRes(res, 404, 'Заказ не найден');
         }
         normalizeOrderDocumentForRuntime(order);
+        normalizeOrderItemsForRuntime(order.items);
 
         const now = new Date();
+        for (const item of order.items) {
+            const previousStatus = item.status;
+            const productId = item.productId;
+            if (productId == null) {
+                continue;
+            }
+            if (
+                status === ORDER_STATUS_CANCELLED &&
+                previousStatus !== ORDER_STATUS_CANCELLED
+            ) {
+                try {
+                    await restoreProductStockOnItemCancelled(
+                        productId,
+                        item.quantity,
+                        previousStatus,
+                    );
+                } catch (stockError) {
+                    console.error('restoreProductStockOnItemCancelled error:', stockError);
+                }
+            } else if (
+                status === ORDER_STATUS_CONFIRMED &&
+                previousStatus !== ORDER_STATUS_CONFIRMED
+            ) {
+                try {
+                    await decrementProductStockOnItemConfirmed(
+                        productId,
+                        item.quantity,
+                    );
+                } catch (stockError) {
+                    console.error('decrementProductStockOnItemConfirmed error:', stockError);
+                }
+            }
+        }
+
         order.items.forEach((item) => {
             item.status = status;
             if (status !== ORDER_STATUS_DELIVERED) {

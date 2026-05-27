@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { DEFAULT_RAFFLE_PRIZE_IMAGE_FOCUS } from "../../raffle/lib/rafflePrizeImageFocus.js";
 import {
   DEFAULT_USER_AVATAR_FOCUS,
   DEFAULT_USER_BACKGROUND_FOCUS,
@@ -13,7 +14,7 @@ import "./ProfileImageFocusEditor.css";
 /**
  * @param {{
  *   imageUrl: string;
- *   variant: 'avatar' | 'background';
+ *   variant: 'avatar' | 'background' | 'raffle-prize';
  *   value: import('../lib/profileImageFocus.js').ProfileImageFocus;
  *   onChange: (next: import('../lib/profileImageFocus.js').ProfileImageFocus) => void;
  *   disabled?: boolean;
@@ -31,7 +32,11 @@ export function ProfileImageFocusEditor({
   const dragStartRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const fallbackFocus =
-    variant === "avatar" ? DEFAULT_USER_AVATAR_FOCUS : DEFAULT_USER_BACKGROUND_FOCUS;
+    variant === "avatar"
+      ? DEFAULT_USER_AVATAR_FOCUS
+      : variant === "raffle-prize"
+        ? DEFAULT_RAFFLE_PRIZE_IMAGE_FOCUS
+        : DEFAULT_USER_BACKGROUND_FOCUS;
   const focus = normalizeProfileImageFocus(value, fallbackFocus);
   const objectPosition = formatProfileImageObjectPosition(focus);
 
@@ -133,12 +138,16 @@ export function ProfileImageFocusEditor({
   const frameClass =
     variant === "avatar"
       ? "profile-image-focus-editor__frame profile-image-focus-editor__frame_avatar"
-      : "profile-image-focus-editor__frame profile-image-focus-editor__frame_background";
+      : variant === "raffle-prize"
+        ? "profile-image-focus-editor__frame profile-image-focus-editor__frame_raffle-prize"
+        : "profile-image-focus-editor__frame profile-image-focus-editor__frame_background";
 
   const hint =
     variant === "avatar"
       ? PROFILE_IMAGE_FOCUS_EDITOR_UI.HINT_AVATAR
-      : PROFILE_IMAGE_FOCUS_EDITOR_UI.HINT_BACKGROUND;
+      : variant === "raffle-prize"
+        ? PROFILE_IMAGE_FOCUS_EDITOR_UI.HINT_RAFFLE_PRIZE
+        : PROFILE_IMAGE_FOCUS_EDITOR_UI.HINT_BACKGROUND;
 
   return (
     <div className="profile-image-focus-editor">

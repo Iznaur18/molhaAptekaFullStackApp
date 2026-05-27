@@ -55,6 +55,20 @@ export const getPendingModerationProductsController = async (req, res) => {
     }
 };
 
+/** `GET /product/moderation/pending/count` */
+export const getPendingModerationProductsCountController = async (req, res) => {
+    try {
+        const totalPending = await ProductModel.countDocuments({
+            productModerationStatus: PRODUCT_MODERATION_PENDING,
+        });
+
+        return successRes(res, { totalPending });
+    } catch (error) {
+        console.error('getPendingModerationProductsCountController error:', error);
+        return errorRes(res, 500, 'Ошибка при получении счётчика модерации');
+    }
+};
+
 /** `PATCH /product/:productId/moderation/approve` */
 export const approveProductModerationController = async (req, res) => {
     try {
@@ -70,7 +84,11 @@ export const approveProductModerationController = async (req, res) => {
 
         product.productModerationStatus = PRODUCT_MODERATION_APPROVED;
         product.productModerationComment = '';
-        product.productIsAvailable = true;
+        const stock = Math.max(0, Math.floor(Number(product.productStockQuantity) || 0));
+        product.productIsAvailable = stock > 0;
+        if (stock === 0) {
+            product.productStockQuantity = 0;
+        }
         await product.save();
         await product.populate('productSeller', PRODUCT_SELLER_PUBLIC_SELECT);
 

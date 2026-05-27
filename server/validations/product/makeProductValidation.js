@@ -5,6 +5,10 @@ import {
   PRODUCT_DESCRIPTION_MAX_WORDS,
   PRODUCT_IMAGE_URLS_MAX,
 } from "../../constants/productConstants.js";
+import {
+  PRODUCT_STOCK_QUANTITY_MAX,
+  PRODUCT_STOCK_QUANTITY_MIN,
+} from "../../constants/productStockConstants.js";
 import { assertAtMostWords } from "../../utils/maxWordsText.js";
 import { handleValidationByExpressErrors } from "../handleValidationByExpressErrors.js";
 
@@ -90,6 +94,16 @@ export const makeProductValidation = [
     .withMessage("Доступность продукта обязательна")
     .isBoolean()
     .withMessage("Доступность продукта должна быть булевым значением"),
+  body("productStockQuantity")
+    .optional()
+    .isInt({
+      min: PRODUCT_STOCK_QUANTITY_MIN,
+      max: PRODUCT_STOCK_QUANTITY_MAX,
+    })
+    .withMessage(
+      `Количество в наличии — целое число от ${PRODUCT_STOCK_QUANTITY_MIN} до ${PRODUCT_STOCK_QUANTITY_MAX}`,
+    )
+    .toInt(),
   body("productAuctionEnabled")
     .optional()
     .isBoolean()

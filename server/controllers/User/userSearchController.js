@@ -8,13 +8,26 @@ import {
 import { attachUserListCommerceStats } from '../../utils/attachUserListCommerceStats.js';
 import { attachFollowersCountToUsers } from '../../utils/userFollowHelpers.js';
 
-const USER_PUBLIC_LIST_FIELDS =
-    '_id userName userPhoneNumber email userRole isPremiumUser isUserDataConfirmed isActiveUser isBlockedUser userAvatarUrl userAvatarFocus telegramPhotoUrl userLoyaltyPoints userRatingByVotes';
 const USER_SEARCH_FIELDS = ['userName', 'userPhoneNumber', 'email'];
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 10;
 const MAX_LIMIT = 100;
-const TRUE_FLAG = 'true';
+const USER_PUBLIC_LIST_PROJECTION = {
+    _id: 1,
+    userName: 1,
+    userPhoneNumber: 1,
+    email: 1,
+    userRole: 1,
+    isPremiumUser: 1,
+    isUserDataConfirmed: 1,
+    isActiveUser: 1,
+    isBlockedUser: 1,
+    userAvatarUrl: 1,
+    userAvatarFocus: 1,
+    telegramPhotoUrl: 1,
+    userLoyaltyPoints: 1,
+    userRatingByVotes: 1,
+};
 
 const parsePagination = (query) => {
     const page = Math.max(1, parseInt(query.page, 10) || DEFAULT_PAGE);
@@ -26,67 +39,15 @@ const parsePagination = (query) => {
     return { page, limit, skip };
 };
 
-const buildUsersQuery = ({
-    search,
-    isPremiumUser,
-    isUserDataConfirmed,
-    isActiveUser,
-    isBlockedUser,
-    minRating,
-    onlyRated,
-}) => {
+const buildUsersQuery = ({ search }) => {
     const usersQuery = {};
     const searchCondition = buildRegexSearchOr(search, USER_SEARCH_FIELDS);
 
     if (searchCondition) Object.assign(usersQuery, searchCondition);
-    if (isPremiumUser === TRUE_FLAG) usersQuery.isPremiumUser = true;
-    if (isUserDataConfirmed === TRUE_FLAG) {
-        usersQuery.isUserDataConfirmed = true;
-    } else if (isUserDataConfirmed === 'false') {
-        usersQuery.isUserDataConfirmed = { $ne: true };
-    }
-    if (isActiveUser === TRUE_FLAG) {
-        usersQuery.isActiveUser = true;
-    } else if (isActiveUser === 'false') {
-        usersQuery.isActiveUser = false;
-    } else {
-        usersQuery.isActiveUser = { $ne: false };
-    }
-    if (isBlockedUser === TRUE_FLAG) {
-        usersQuery.isBlockedUser = true;
-    } else {
-        usersQuery.isBlockedUser = { $ne: true };
-    }
-    const hasMinRating = typeof minRating === 'number' && !Number.isNaN(minRating);
-    if (onlyRated === TRUE_FLAG || hasMinRating) {
-        usersQuery['userRatingByVotes.countVotes'] = { $gte: 1 };
-    }
-    if (hasMinRating) {
-        usersQuery.$expr = {
-            $gte: [
-                {
-                    $divide: [
-                        '$userRatingByVotes.totalRating',
-                        '$userRatingByVotes.countVotes',
-                    ],
-                },
-                minRating,
-            ],
-        };
-    }
+    usersQuery.isActiveUser = { $ne: false };
+    usersQuery.isBlockedUser = { $ne: true };
 
     return usersQuery;
-};
-
-const resolveSort = (sortParam) => {
-    if (sortParam === 'rating') {
-        return {
-            'userRatingByVotes.countVotes': -1,
-            'userRatingByVotes.totalRating': -1,
-            userName: 1,
-        };
-    }
-    return { userName: 1 };
 };
 
 export const userSearchController = async (req, res) => {
@@ -100,17 +61,36 @@ export const userSearchController = async (req, res) => {
             roleFilter: req.query.userRole,
         });
 
-        const sort = resolveSort(req.query.sort);
-
-        const [usersRaw, total] = await Promise.all([
-            UserModel.find(usersQuery)
-                .select(USER_PUBLIC_LIST_FIELDS)
-                .sort(sort)
-                .skip(skip)
-                .limit(limit)
-                .lean(),
-            UserModel.countDocuments(usersQuery),
+        const usersRaw = await UserModel.aggregate([
+            { $match: usersQuery },
+            {
+                $addFields: {
+                    ratingAvg: {
+                        $cond: [
+                            { $gt: ['$userRatingByVotes.countVotes', 0] },
+                            {
+                                $divide: [
+                                    '$userRatingByVotes.totalRating',
+                                    '$userRatingByVotes.countVotes',
+                                ],
+                            },
+                            0,
+                        ],
+                    },
+                },
+            },
+            {
+                $sort: {
+                    ratingAvg: -1,
+                    'userRatingByVotes.countVotes': -1,
+                    userName: 1,
+                },
+            },
+            { $skip: skip },
+            { $limit: limit },
+            { $project: USER_PUBLIC_LIST_PROJECTION },
         ]);
+        const total = await UserModel.countDocuments(usersQuery);
 
         const usersSanitized = sanitizeUsersSearchList(usersRaw, { viewer });
         const usersWithCommerce = await attachUserListCommerceStats(usersSanitized);

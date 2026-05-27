@@ -485,6 +485,22 @@
   color: #fff;
 }
 
+.home-page--header-v1 .header-notifications-button {
+  border-color: #e2e8f0;
+  background: #fff;
+}
+
+.home-page--header-v1 .header-notifications-button:hover {
+  border-color: #1f6feb;
+  background: rgba(31, 111, 235, 0.06);
+}
+
+.home-page--header-v1 .header-notifications-button--active,
+.home-page--header-v1 .header-notifications-button--active:hover {
+  border-color: #1f6feb;
+  background: rgba(31, 111, 235, 0.1);
+}
+
 .home-page--header-v1 .home-page__auth-button {
   border-width: 1px;
   box-shadow: none;

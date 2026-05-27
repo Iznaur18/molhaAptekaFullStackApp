@@ -3,16 +3,18 @@
  * проксирует `/cart` и `/user/...` на Express (см. vite.config.js).
  * Путь `/user-list` ок: не совпадает с API `/user` (иначе F5 → 404 JSON).
  *
- * @typedef {'catalog' | 'my-products' | 'users' | 'subscriptions' | 'cart' | 'my-sales' | 'my-orders' | 'admin-orders' | 'product-moderation' | 'product-reports' | 'data-confirmation-requests'} HomeMainView
+ * @typedef {'catalog' | 'my-profile' | 'my-products' | 'users' | 'subscriptions' | 'notifications' | 'cart' | 'my-sales' | 'my-orders' | 'admin-orders' | 'product-moderation' | 'product-reports' | 'data-confirmation-requests'} HomeMainView
  */
 
 /** @type {Record<HomeMainView, string>} */
 export const HOME_MAIN_VIEW_PATH = {
   catalog: "/",
+  "my-profile": "/me",
   "my-products": "/my-products",
   /** Список пользователей; не `/users` — путается с API и при F5 на :4444. */
   users: "/user-list",
   subscriptions: "/subscriptions",
+  notifications: "/notifications",
   /** UI корзины; не `/cart` из‑за proxy в Vite. */
   cart: "/basket",
   "my-sales": "/my-sales",

@@ -80,6 +80,7 @@ export const filterCartItemsToPurchasableProducts = async (items) => {
         _id: { $in: oids },
         productModerationStatus: PRODUCT_MODERATION_APPROVED,
         productIsAvailable: { $ne: false },
+        productStockQuantity: { $gt: 0 },
     })
         .select('_id')
         .lean();

@@ -1,0 +1,78 @@
+.notifications-page {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 0.5rem 0 2rem;
+}
+
+.notifications-page__toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.75rem;
+}
+
+.notifications-page__clear {
+  margin: 0;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid rgba(31, 111, 235, 0.45);
+  border-radius: 0.5rem;
+  background: transparent;
+  color: #1f6feb;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.notifications-page__clear:hover:not(:disabled) {
+  border-color: #1f6feb;
+  background: rgba(31, 111, 235, 0.08);
+}
+
+.notifications-page__clear:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.notifications-page__error {
+  margin: 0 0 0.75rem;
+  color: #b42318;
+  font-size: 0.875rem;
+}
+
+.notifications-page__empty {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.9375rem;
+}
+
+.notifications-page__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.notifications-page__item {
+  margin: 0;
+}
+
+.notifications-page__item-btn {
+  width: 100%;
+  margin: 0;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid #bfdbfe;
+  border-radius: 0.5rem;
+  background: #eff6ff;
+  color: #1e3a8a;
+  font: inherit;
+  font-size: 0.875rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.notifications-page__item-btn:hover {
+  background: #dbeafe;
+  border-color: #93c5fd;
+}

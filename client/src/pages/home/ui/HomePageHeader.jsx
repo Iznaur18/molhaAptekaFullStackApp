@@ -11,9 +11,11 @@ import {
   PRODUCT_CATEGORY_LABEL_RU,
 } from "../../../entities/product/model/productConstants.js";
 import { HeaderCartButton } from "../../../widgets/header-cart-button/ui/HeaderCartButton.jsx";
+import { HeaderNotificationsButton } from "../../../widgets/header-notifications-button/ui/HeaderNotificationsButton.jsx";
 import {
   DATA_CONFIRMATION_PAGE_UI,
   HOME_PAGE_UI,
+  PRODUCT_MODERATION_PAGE_UI,
   PRODUCT_REPORTS_PAGE_UI,
   PRODUCT_SEARCH_INPUT_UI,
 } from "../../../shared/config/appUiCopy.js";
@@ -40,6 +42,7 @@ function headerNavButtonClassName(isActive) {
 const HEADER_VIEW_TITLE_HIDDEN_VIEWS = new Set(["users", "cart"]);
 
 const NON_CATALOG_VIEW_TITLES = {
+  "my-profile": HOME_PAGE_UI.AUTH_MY_PROFILE,
   users: HOME_PAGE_UI.TITLE_USERS,
   subscriptions: HOME_PAGE_UI.TITLE_SUBSCRIPTIONS,
   cart: HOME_PAGE_UI.TITLE_CART,
@@ -49,6 +52,7 @@ const NON_CATALOG_VIEW_TITLES = {
   "product-moderation": HOME_PAGE_UI.TITLE_PRODUCT_MODERATION,
   "product-reports": HOME_PAGE_UI.TITLE_PRODUCT_REPORTS,
   "data-confirmation-requests": HOME_PAGE_UI.TITLE_DATA_CONFIRMATION,
+  notifications: HOME_PAGE_UI.TITLE_NOTIFICATIONS,
 };
 
 /**
@@ -67,6 +71,8 @@ const NON_CATALOG_VIEW_TITLES = {
  *   onProductSearchTermChange: (next: string) => void;
  *   onPlaceProductClick: () => void;
  *   onMyProfileClick: () => void;
+ *   onNotificationsClick: () => void;
+ *   unreadNotificationsCount?: number;
  *   onLoginClick: () => void;
  *   onRegisterClick: () => void;
  *   onNavigateToFullCatalogFromBreadcrumb: () => void;
@@ -77,6 +83,7 @@ const NON_CATALOG_VIEW_TITLES = {
  *   onShowHiddenCatalogProductsChange: (next: boolean) => void;
  *   myProductsTotal: number | null;
  *   sellerProductsLimit: number | null;
+ *   pendingModerationCount?: number;
  *   pendingProductReportsCount?: number;
  *   pendingDataConfirmationCount?: number;
  *   myProductsModerationFilter?: string;
@@ -98,6 +105,8 @@ export function HomePageHeader({
   onProductSearchTermChange,
   onPlaceProductClick,
   onMyProfileClick,
+  onNotificationsClick,
+  unreadNotificationsCount = 0,
   onLoginClick,
   onRegisterClick,
   onNavigateToFullCatalogFromBreadcrumb,
@@ -108,6 +117,7 @@ export function HomePageHeader({
   onShowHiddenCatalogProductsChange,
   myProductsTotal,
   sellerProductsLimit,
+  pendingModerationCount = 0,
   pendingProductReportsCount = 0,
   pendingDataConfirmationCount = 0,
   myProductsModerationFilter = "",
@@ -147,9 +157,17 @@ export function HomePageHeader({
   const isHomeNavActive = mainView === "catalog";
   const isUsersNavActive = mainView === "users";
   const isCartNavActive = mainView === "cart";
+  const isMyProfileNavActive = mainView === "my-profile";
+  const isNotificationsNavActive = mainView === "notifications";
 
   const nonCatalogTitle = (() => {
     const base = NON_CATALOG_VIEW_TITLES[mainView] ?? "";
+    if (
+      mainView === "product-moderation" &&
+      pendingModerationCount > 0
+    ) {
+      return `${base} (${PRODUCT_MODERATION_PAGE_UI.TAB_BADGE(pendingModerationCount)})`;
+    }
     if (
       mainView === "product-reports" &&
       pendingProductReportsCount > 0
@@ -209,13 +227,27 @@ export function HomePageHeader({
               : HOME_PAGE_UI.LOGIN_TO_LIST_PRODUCT}
           </button>
           {isAuthorized ? (
-            <button
-              type="button"
-              className="home-page__auth-button home-page__auth-button_secondary"
-              onClick={onMyProfileClick}
-            >
-              {HOME_PAGE_UI.AUTH_MY_PROFILE}
-            </button>
+            <>
+              <button
+                type="button"
+                className={[
+                  "home-page__auth-button",
+                  "home-page__auth-button_secondary",
+                  isMyProfileNavActive ? "home-page__header-nav-button--active" : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                onClick={onMyProfileClick}
+                aria-current={isMyProfileNavActive ? "page" : undefined}
+              >
+                {HOME_PAGE_UI.AUTH_MY_PROFILE}
+              </button>
+              <HeaderNotificationsButton
+                isActive={isNotificationsNavActive}
+                unreadCount={unreadNotificationsCount}
+                onClick={onNotificationsClick}
+              />
+            </>
           ) : (
             <>
               <button

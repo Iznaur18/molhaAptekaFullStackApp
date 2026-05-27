@@ -2,8 +2,10 @@ import mongoose from 'mongoose';
 
 import {
     buildFollowedSellerNewProductMessage,
+    buildFollowedSellerRaffleCompletedMessage,
     buildNewFollowerNotificationMessage,
     IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_NEW_PRODUCT,
+    IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_RAFFLE_COMPLETED,
     IN_APP_NOTIFICATION_KIND_NEW_FOLLOWER,
     USER_FOLLOW_MAX_LIST_LIMIT,
 } from '../constants/userFollowConstants.js';
@@ -239,6 +241,37 @@ export async function notifyFollowersOfSellerNewCatalogProduct(product) {
                 kind: IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_NEW_PRODUCT,
                 message,
                 productId,
+                actorUserId: String(sellerId),
+            }),
+        ),
+    );
+}
+
+/**
+ * @param {Record<string, unknown>} raffle
+ */
+export async function notifyFollowersOfSellerRaffleCompleted(raffle) {
+    const sellerId = raffle.sellerId;
+    if (!sellerId) return;
+
+    const followerRows = await UserFollowModel.find({ followingId: sellerId })
+        .select('followerId')
+        .lean();
+
+    if (followerRows.length === 0) return;
+
+    const seller = await UserModel.findById(sellerId).select('userName').lean();
+    const message = buildFollowedSellerRaffleCompletedMessage(
+        seller?.userName,
+        raffle.title,
+    );
+
+    await Promise.all(
+        followerRows.map((row) =>
+            createUserInAppNotification({
+                userId: row.followerId,
+                kind: IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_RAFFLE_COMPLETED,
+                message,
                 actorUserId: String(sellerId),
             }),
         ),

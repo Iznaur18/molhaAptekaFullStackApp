@@ -1,0 +1,192 @@
+.raffle-featured-banner {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0 0 1.25rem;
+}
+
+.raffle-featured-banner__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1rem 1.25rem;
+  height: 184px;
+  padding: 12px 14px;
+  border: 2px solid #c4b5fd;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #faf5ff 0%, #f8f4ff 55%, Canvas 100%);
+  box-shadow: 0 8px 24px rgb(124 58 237 / 12%);
+}
+
+.raffle-featured-banner__visual {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  height: 184px;
+  background: color-mix(in srgb, currentColor 6%, transparent);
+}
+
+.raffle-featured-banner__prize-image {
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  object-fit: cover;
+  object-position: center center;
+}
+
+.raffle-featured-banner__badge {
+  position: absolute;
+  top: 0.45rem;
+  left: 0.45rem;
+  padding: 0.18rem 0.45rem;
+  border-radius: 0.35rem;
+  background: #7c3aed;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.raffle-featured-banner__title {
+  margin: 0 0 0.35rem;
+  font-size: 1.25rem;
+  line-height: 1.25;
+}
+
+.raffle-featured-banner__description {
+  margin: 0 0 0.65rem;
+  padding: 0;
+  border: none;
+  width: 100%;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  text-align: left;
+  opacity: 0.88;
+  cursor: pointer;
+  display: -webkit-box;
+  line-clamp: 3;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.raffle-featured-banner__description:hover {
+  opacity: 1;
+}
+
+.raffle-featured-banner__body {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.raffle-featured-banner__progress-wrap {
+  margin-bottom: 0.75rem;
+}
+
+.raffle-featured-banner__progress-bar {
+  height: 0.55rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, #7c3aed 12%, transparent);
+  overflow: hidden;
+}
+
+.raffle-featured-banner__progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #a78bfa, #7c3aed);
+  transition: width 0.2s ease;
+}
+
+.raffle-featured-banner__progress-label {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.raffle-featured-banner__manage {
+  margin-bottom: 0.65rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid color-mix(in srgb, #7c3aed 18%, transparent);
+}
+
+.raffle-featured-banner__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: auto;
+}
+
+.raffle-featured-banner__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.45rem 0.75rem;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.raffle-featured-banner__btn_primary {
+  border: 1px solid #7c3aed;
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+.raffle-featured-banner__btn_instagram {
+  border: 1px solid #db2777;
+  background: #fce7f3;
+  color: #9d174d;
+}
+
+.raffle-featured-banner__completed {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #15803d;
+}
+
+.raffle-featured-banner_completed .raffle-featured-banner__inner {
+  border-color: #86efac;
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 55%, Canvas 100%);
+  box-shadow: 0 8px 24px rgb(22 163 74 / 12%);
+}
+
+.raffle-featured-banner_completed .raffle-featured-banner__badge {
+  background: #15803d;
+}
+
+.raffle-featured-banner_completed .raffle-featured-banner__progress-bar {
+  background: color-mix(in srgb, #22c55e 16%, transparent);
+}
+
+.raffle-featured-banner_completed .raffle-featured-banner__progress-fill {
+  background: linear-gradient(90deg, #86efac, #16a34a);
+}
+
+.raffle-featured-banner_completed .raffle-featured-banner__manage {
+  border-bottom-color: color-mix(in srgb, #16a34a 20%, transparent);
+}
+
+.raffle-featured-banner_completed .raffle-featured-banner__btn_primary {
+  border-color: #16a34a;
+  background: #dcfce7;
+  color: #166534;
+}
+
+@media (max-width: 640px) {
+  .raffle-featured-banner__inner {
+    grid-template-columns: 1fr;
+  }
+
+  .raffle-featured-banner__visual {
+    max-width: 220px;
+    margin: 0 auto;
+  }
+}

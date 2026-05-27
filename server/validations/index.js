@@ -26,6 +26,19 @@ import {
     patchProductReviewValidation,
     productReviewsListValidation,
 } from './product/productReviewValidation.js';
+import {
+    requestProductPromotionValidation,
+    promotionIdParamValidation,
+    myProductPromotionsValidation,
+} from './product/productPromotionValidation.js';
+import {
+    createRaffleValidation,
+    patchRaffleValidation,
+    raffleIdParamValidation,
+    rejectRaffleValidation,
+    raffleProductsValidation,
+    setProductRaffleParticipationValidation,
+} from './raffle/raffleValidation.js';
 import { makeOrderValidation } from './order/makeOrderValidation.js';
 import { updateOrderStatusValidation } from './order/updateOrderStatusValidation.js';
 import { getAllOrdersValidation } from './order/getAllOrdersValidation.js';
@@ -60,6 +73,15 @@ export {
     submitProductReviewValidation,
     patchProductReviewValidation,
     productReviewsListValidation,
+    requestProductPromotionValidation,
+    promotionIdParamValidation,
+    myProductPromotionsValidation,
+    createRaffleValidation,
+    patchRaffleValidation,
+    raffleIdParamValidation,
+    rejectRaffleValidation,
+    raffleProductsValidation,
+    setProductRaffleParticipationValidation,
     makeOrderValidation,
     updateOrderStatusValidation,
     getAllOrdersValidation,

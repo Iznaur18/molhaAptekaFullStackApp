@@ -1,4 +1,5 @@
 import {
+    DEFAULT_RAFFLE_PRIZE_IMAGE_FOCUS,
     DEFAULT_USER_AVATAR_FOCUS,
     DEFAULT_USER_BACKGROUND_FOCUS,
     PROFILE_IMAGE_FOCUS_MAX,
@@ -71,4 +72,8 @@ export function normalizeUserAvatarFocus(raw) {
 
 export function normalizeUserBackgroundFocus(raw) {
     return normalizeProfileImageFocus(raw, DEFAULT_USER_BACKGROUND_FOCUS);
+}
+
+export function normalizeRafflePrizeImageFocus(raw) {
+    return normalizeProfileImageFocus(raw, DEFAULT_RAFFLE_PRIZE_IMAGE_FOCUS);
 }

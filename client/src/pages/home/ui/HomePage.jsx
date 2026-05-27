@@ -8,6 +8,7 @@ import { deleteMyProduct } from "../../../entities/product/api/deleteMyProduct.j
 import { patchMyProduct } from "../../../entities/product/api/patchMyProduct.js";
 import { fetchCatalogProductsPage } from "../../../entities/product/api/fetchCatalogProductsPage.js";
 import { fetchMyProductsPage } from "../../../entities/product/api/fetchMyProducts.js";
+import { fetchProductPromotionTariffs } from "../../../entities/product/api/fetchProductPromotionTariffs.js";
 import {
   CATALOG_PAGE_SIZE,
   CATALOG_SORT_NEWEST,
@@ -26,10 +27,28 @@ import { CreateProductModal } from "../../../entities/product/ui/CreateProductMo
 import { SellerProductsLimitModal } from "../../../entities/product/ui/SellerProductsLimitModal.jsx";
 import { ProductDetailsAdminFooter } from "../../../entities/product/ui/ProductDetailsAdminFooter.jsx";
 import { ProductDetailsModal } from "../../../entities/product/ui/ProductDetailsModal.jsx";
+import { ProductPromotionModal } from "../../../entities/product/ui/ProductPromotionModal.jsx";
+import { requestProductPromotion } from "../../../entities/product/api/requestProductPromotion.js";
+import { fetchMyProductPromotions } from "../../../entities/product/api/fetchMyProductPromotions.js";
+import { fetchPendingProductPromotionsCount } from "../../../entities/product/api/fetchPendingProductPromotionsCount.js";
+import { deleteMyRaffle } from "../../../entities/raffle/api/deleteMyRaffle.js";
+import { deleteRaffleByStaff } from "../../../entities/raffle/api/deleteRaffleByStaff.js";
+import { fetchFeaturedRaffles } from "../../../entities/raffle/api/fetchFeaturedRaffle.js";
+import { fetchMyRaffle } from "../../../entities/raffle/api/fetchMyRaffle.js";
+import { fetchPendingRafflesCount } from "../../../entities/raffle/api/fetchPendingRafflesCount.js";
+import { pauseMyRaffle } from "../../../entities/raffle/api/pauseMyRaffle.js";
+import { setProductRaffleParticipation } from "../../../entities/raffle/api/setProductRaffleParticipation.js";
+import { canSellerEditRaffle } from "../../../entities/raffle/lib/canSellerEditRaffle.js";
+import { CreateRaffleModal } from "../../../entities/raffle/ui/CreateRaffleModal.jsx";
+import { RaffleFeaturedCarousel } from "../../../entities/raffle/ui/RaffleFeaturedCarousel.jsx";
+import { RaffleSellerOverview } from "../../../entities/raffle/ui/RaffleSellerOverview.jsx";
+import { RafflesStaffPage } from "../../raffles-staff/ui/RafflesStaffPage.jsx";
+import { RaffleProductsPage } from "../../raffle/ui/RaffleProductsPage.jsx";
+import { ProductPromotionsStaffPage } from "../../product-promotions/ui/ProductPromotionsStaffPage.jsx";
 import { fetchCurrentUserProfile } from "../../../entities/user/api/fetchCurrentUserProfile.js";
+import { markInAppNotificationsRead } from "../../../entities/user/api/markInAppNotificationsRead.js";
 import { fetchUserProfileById } from "../../../entities/user/api/fetchUserProfileById.js";
 import { LoginModal } from "../../../entities/user/ui/LoginModal.jsx";
-import { MyProfileModal } from "../../../entities/user/ui/MyProfileModal.jsx";
 import { AdminDeleteUserConfirmModal } from "../../../entities/user/ui/AdminDeleteUserConfirmModal.jsx";
 import { AdminUserModalFooter } from "../../../entities/user/ui/AdminUserModalFooter.jsx";
 import { EditProfileModal } from "../../../entities/user/ui/EditProfileModal.jsx";
@@ -46,6 +65,7 @@ import {
 import { ProductModerationPage } from "../../product-moderation/ui/ProductModerationPage.jsx";
 import { ProductReportsPage } from "../../product-reports/ui/ProductReportsPage.jsx";
 import { DataConfirmationRequestsPage } from "../../data-confirmation-requests/ui/DataConfirmationRequestsPage.jsx";
+import { fetchPendingModerationProductsCount } from "../../../entities/product/api/fetchPendingModerationProductsCount.js";
 import { fetchPendingProductReportsCount } from "../../../entities/product-report/api/fetchPendingProductReportsCount.js";
 import { fetchPendingDataConfirmationCount } from "../../../entities/user-data-confirmation/api/fetchPendingDataConfirmationCount.js";
 import { DataConfirmationRequestModal } from "../../../entities/user-data-confirmation/ui/DataConfirmationRequestModal.jsx";
@@ -55,9 +75,25 @@ import { UserVoteRatingForm } from "../../../entities/user-vote-rating/ui/UserVo
 import { AdminOrdersPage } from "../../admin-orders/ui/AdminOrdersPage.jsx";
 import { CartPage } from "../../cart/ui/CartPage.jsx";
 import { MyOrdersPage } from "../../my-orders/ui/MyOrdersPage.jsx";
+import {
+  normalizeProfileTab,
+  PROFILE_TAB_ADMIN_ORDERS,
+  PROFILE_TAB_DATA_CONFIRMATION_REQUESTS,
+  PROFILE_TAB_MY_ORDERS,
+  PROFILE_TAB_MY_PRODUCTS,
+  PROFILE_TAB_MY_SALES,
+  PROFILE_TAB_OVERVIEW,
+  PROFILE_TAB_PRODUCT_MODERATION,
+  PROFILE_TAB_PRODUCT_REPORTS,
+  PROFILE_TAB_PRODUCT_PROMOTIONS,
+  PROFILE_TAB_RAFFLES,
+  PROFILE_TAB_SUBSCRIPTIONS,
+} from "../../my-profile/lib/profileTabs.js";
+import { MyProfilePage } from "../../my-profile/ui/MyProfilePage.jsx";
 import { MySalesPage } from "../../my-sales/ui/MySalesPage.jsx";
 import { UsersPage } from "../../users/ui/UsersPage.jsx";
 import { SubscriptionsPage } from "../../subscriptions/ui/SubscriptionsPage.jsx";
+import { NotificationsPage } from "../../notifications/ui/NotificationsPage.jsx";
 import { UserFollowButton } from "../../../entities/user-follow/ui/UserFollowButton.jsx";
 import {
   IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_NEW_PRODUCT,
@@ -69,15 +105,21 @@ import {
   HOME_PAGE_UI,
   PRODUCT_REPORT_MODAL_UI,
   PRODUCT_SEARCH_UI,
+  RAFFLE_MANAGE_UI,
 } from "../../../shared/config/appUiCopy.js";
 import {
-  isCatalogShellMainView,
   isMyProductsMainView,
   isRoleRestrictedMainView,
   mainViewToPathname,
   pathnameToMainView,
 } from "../../../shared/lib/homeMainViewPaths.js";
+import {
+  buildRafflePath,
+  isRaffleProductsPath,
+  parseRaffleIdFromPathname,
+} from "../../../shared/lib/rafflePaths.js";
 import { getHomePageVariantClass } from "../lib/homeHeaderVariant.js";
+import { useInAppNotificationsPoll } from "../lib/useInAppNotificationsPoll.js";
 import { useDebouncedValue } from "../../../shared/lib/useDebouncedValue.js";
 import {
   CATALOG_FILTER_AUCTION_ONLY,
@@ -95,10 +137,15 @@ import "./HomePage.css";
 
 /** @typedef {import('../../../entities/product/model/types.js').ProductFromApi} ProductFromApi */
 /** @typedef {{ open: boolean; phase: 'idle'|'loading'|'success'|'error'; user: import('../../../entities/user/model/types.js').UserPublicProfile | null; error: string }} ProfileModalState */
-/** @typedef {'catalog' | 'my-products' | 'users' | 'subscriptions' | 'cart' | 'my-sales' | 'my-orders' | 'admin-orders' | 'product-moderation' | 'product-reports' | 'data-confirmation-requests'} HomeMainView */
+/** @typedef {'catalog' | 'my-profile' | 'my-products' | 'users' | 'subscriptions' | 'notifications' | 'cart' | 'my-sales' | 'my-orders' | 'admin-orders' | 'product-moderation' | 'product-reports' | 'data-confirmation-requests'} HomeMainView */
 
 const EMPTY_PROFILE_MODAL = Object.freeze({
   open: false,
+  phase: "idle",
+  user: null,
+  error: "",
+});
+const EMPTY_MY_PROFILE_PAGE = Object.freeze({
   phase: "idle",
   user: null,
   error: "",
@@ -174,9 +221,33 @@ export function HomePage() {
     },
     [navigate],
   );
+  const activeProfileTab = useMemo(
+    () => normalizeProfileTab(new URLSearchParams(location.search).get("tab")),
+    [location.search],
+  );
+  const isProfileMyProductsTab =
+    mainView === "my-profile" && activeProfileTab === PROFILE_TAB_MY_PRODUCTS;
+  const isCatalogShellView = mainView === "catalog" || isMyProductsMainView(mainView) || isProfileMyProductsTab;
+
+  const setMyProfileTab = useCallback(
+    (tab) => {
+      const normalizedTab = normalizeProfileTab(tab);
+      const nextSearch =
+        normalizedTab === PROFILE_TAB_OVERVIEW ? "" : `?tab=${normalizedTab}`;
+      navigate(`${mainViewToPathname("my-profile")}${nextSearch}`);
+    },
+    [navigate],
+  );
+
+  const raffleRouteId = useMemo(
+    () => parseRaffleIdFromPathname(location.pathname),
+    [location.pathname],
+  );
+  const isRaffleRoute = raffleRouteId != null;
 
   useEffect(() => {
     if (pathnameToMainView(location.pathname) !== null) return undefined;
+    if (isRaffleProductsPath(location.pathname)) return undefined;
     navigate("/", { replace: true });
     return undefined;
   }, [location.pathname, navigate]);
@@ -197,7 +268,7 @@ export function HomePage() {
   /** @type {import('react').MutableRefObject<number>} */
   const sellerFetchSeq = useRef(0);
   const [sellerModal, setSellerModal] = useState(EMPTY_PROFILE_MODAL);
-  const [myProfileModal, setMyProfileModal] = useState(EMPTY_PROFILE_MODAL);
+  const [myProfilePage, setMyProfilePage] = useState(EMPTY_MY_PROFILE_PAGE);
   const [isProductCategoryListOpen, setIsProductCategoryListOpen] =
     useState(false);
   const [selectedProductCategory, setSelectedProductCategory] = useState(null);
@@ -208,6 +279,8 @@ export function HomePage() {
   const [myProductsCatalogNotice, setMyProductsCatalogNotice] = useState("");
   const [deletingProductId, setDeletingProductId] = useState(null);
   const [togglingAvailabilityProductId, setTogglingAvailabilityProductId] =
+    useState(null);
+  const [togglingAuctionProductId, setTogglingAuctionProductId] =
     useState(null);
   const [isCreateProductModalOpen, setIsCreateProductModalOpen] =
     useState(false);
@@ -267,6 +340,23 @@ export function HomePage() {
     isSessionReady,
   ]);
 
+  const refreshPendingModerationCount = useCallback(async () => {
+    if (!canModerateProducts || !isAuthorized) {
+      setPendingModerationCount(0);
+      return;
+    }
+    try {
+      const count = await fetchPendingModerationProductsCount();
+      setPendingModerationCount(count);
+    } catch {
+      setPendingModerationCount(0);
+    }
+  }, [canModerateProducts, isAuthorized]);
+
+  useEffect(() => {
+    void refreshPendingModerationCount();
+  }, [refreshPendingModerationCount, mainView]);
+
   const refreshPendingProductReportsCount = useCallback(async () => {
     if (!canModerateProducts || !isAuthorized) {
       setPendingProductReportsCount(0);
@@ -311,19 +401,278 @@ export function HomePage() {
   const [catalogProductDetails, setCatalogProductDetails] = useState(null);
   const [productDetailsAdminError, setProductDetailsAdminError] = useState("");
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+  const [pendingModerationCount, setPendingModerationCount] = useState(0);
   const [pendingProductReportsCount, setPendingProductReportsCount] =
     useState(0);
   const [pendingDataConfirmationCount, setPendingDataConfirmationCount] =
     useState(0);
+  const [pendingProductPromotionsCount, setPendingProductPromotionsCount] =
+    useState(0);
+  const [pendingRafflesCount, setPendingRafflesCount] = useState(0);
+  const [featuredRaffles, setFeaturedRaffles] = useState(
+    /** @type {import('../../../entities/raffle/model/types.js').RaffleFromApi[]} */ ([]),
+  );
+  const [featuredRaffleIndex, setFeaturedRaffleIndex] = useState(0);
+  const [sellerRaffleActive, setSellerRaffleActive] = useState(false);
+  const [raffleParticipationPendingProductId, setRaffleParticipationPendingProductId] =
+    useState(null);
+  const [raffleModal, setRaffleModal] = useState(
+    /** @type {{ mode: 'create' } | { mode: 'edit', raffle: import('../../../entities/raffle/model/types.js').RaffleFromApi, useStaffApi: boolean } | null} */ (null),
+  );
+  const [raffleRefreshTick, setRaffleRefreshTick] = useState(0);
+  const [isFeaturedRaffleBusy, setIsFeaturedRaffleBusy] = useState(false);
+  const [pendingPromotionProductIds, setPendingPromotionProductIds] = useState(
+    /** @type {Set<string>} */ (() => new Set()),
+  );
+
+  const refreshPendingProductPromotionsCount = useCallback(async () => {
+    if (!canModerateProducts || !isAuthorized) {
+      setPendingProductPromotionsCount(0);
+      return;
+    }
+    try {
+      const count = await fetchPendingProductPromotionsCount();
+      setPendingProductPromotionsCount(count);
+    } catch {
+      setPendingProductPromotionsCount(0);
+    }
+  }, [canModerateProducts, isAuthorized]);
+
+  useEffect(() => {
+    void refreshPendingProductPromotionsCount();
+  }, [refreshPendingProductPromotionsCount, mainView]);
+
+  const refreshPendingRafflesCount = useCallback(async () => {
+    if (!canModerateProducts || !isAuthorized) {
+      setPendingRafflesCount(0);
+      return;
+    }
+    try {
+      const count = await fetchPendingRafflesCount();
+      setPendingRafflesCount(count);
+    } catch {
+      setPendingRafflesCount(0);
+    }
+  }, [canModerateProducts, isAuthorized]);
+
+  useEffect(() => {
+    void refreshPendingRafflesCount();
+  }, [refreshPendingRafflesCount, mainView]);
+
+  const refreshFeaturedRaffle = useCallback(async () => {
+    if (mainView !== "catalog" || isRaffleRoute) {
+      setFeaturedRaffles([]);
+      setFeaturedRaffleIndex(0);
+      return;
+    }
+    try {
+      const raffles = await fetchFeaturedRaffles();
+      setFeaturedRaffles(raffles);
+      setFeaturedRaffleIndex(0);
+    } catch {
+      setFeaturedRaffles([]);
+      setFeaturedRaffleIndex(0);
+    }
+  }, [mainView, isRaffleRoute]);
+
+  useEffect(() => {
+    void refreshFeaturedRaffle();
+  }, [refreshFeaturedRaffle, catalogRefreshTick, raffleRefreshTick]);
+
+  const refreshSellerRaffleState = useCallback(async () => {
+    if (!isAuthorized) {
+      setSellerRaffleActive(false);
+      return;
+    }
+    try {
+      const { raffle } = await fetchMyRaffle();
+      setSellerRaffleActive(raffle?.status === "active");
+    } catch {
+      setSellerRaffleActive(false);
+    }
+  }, [isAuthorized]);
+
+  const handleFeaturedRaffleEdit = useCallback(
+    (raffle) => {
+      if (!raffle) {
+        return;
+      }
+      const isOwner =
+        currentUserId != null &&
+        String(raffle.sellerId) === String(currentUserId);
+      setRaffleModal({
+        mode: "edit",
+        raffle,
+        useStaffApi: canModerateProducts && !isOwner,
+      });
+    },
+    [canModerateProducts, currentUserId],
+  );
+
+  const handleFeaturedRaffleDelete = useCallback(async (raffle) => {
+    if (!raffle?._id) {
+      return;
+    }
+    const isOwner =
+      currentUserId != null &&
+      String(raffle.sellerId) === String(currentUserId);
+    const confirmMessage = isOwner
+      ? RAFFLE_MANAGE_UI.DELETE_CONFIRM_OWNER
+      : RAFFLE_MANAGE_UI.DELETE_CONFIRM_STAFF;
+    if (!window.confirm(confirmMessage)) {
+      return;
+    }
+    try {
+      setIsFeaturedRaffleBusy(true);
+      if (isOwner) {
+        await deleteMyRaffle(raffle._id);
+      } else {
+        await deleteRaffleByStaff(raffle._id);
+      }
+      setRaffleRefreshTick((n) => n + 1);
+      void refreshFeaturedRaffle();
+      void refreshSellerRaffleState();
+      void refreshPendingRafflesCount();
+    } catch (e) {
+      setCatalogStatus({
+        kind: "error",
+        message:
+          e instanceof Error ? e.message : API_CLIENT_UI.DELETE_RAFFLE_FALLBACK,
+      });
+    } finally {
+      setIsFeaturedRaffleBusy(false);
+    }
+  }, [
+    currentUserId,
+    refreshFeaturedRaffle,
+    refreshPendingRafflesCount,
+    refreshSellerRaffleState,
+  ]);
+
+  const handleFeaturedRafflePause = useCallback(async (raffle) => {
+    if (!raffle?._id) {
+      return;
+    }
+    const isOwner =
+      currentUserId != null &&
+      String(raffle.sellerId) === String(currentUserId);
+    if (!isOwner) {
+      return;
+    }
+    try {
+      setIsFeaturedRaffleBusy(true);
+      await pauseMyRaffle(raffle._id);
+      setRaffleRefreshTick((n) => n + 1);
+      void refreshFeaturedRaffle();
+      void refreshSellerRaffleState();
+    } catch (e) {
+      setCatalogStatus({
+        kind: "error",
+        message:
+          e instanceof Error ? e.message : API_CLIENT_UI.PAUSE_RAFFLE_FALLBACK,
+      });
+    } finally {
+      setIsFeaturedRaffleBusy(false);
+    }
+  }, [currentUserId, refreshFeaturedRaffle, refreshSellerRaffleState]);
+
+  const getFeaturedRaffleManage = useCallback(
+    (raffle) => {
+      if (!raffle) {
+        return null;
+      }
+      const isOwner =
+        currentUserId != null &&
+        String(raffle.sellerId) === String(currentUserId);
+      const canManage = isOwner || canModerateProducts;
+      if (!canManage) {
+        return null;
+      }
+      return {
+        showEdit: isOwner
+          ? canSellerEditRaffle(raffle)
+          : canModerateProducts,
+        showDelete: true,
+        showPause: isOwner && raffle.status === "active",
+        onEdit: () => handleFeaturedRaffleEdit(raffle),
+        onDelete: () => void handleFeaturedRaffleDelete(raffle),
+        onPause: () => void handleFeaturedRafflePause(raffle),
+        busy: isFeaturedRaffleBusy,
+      };
+    },
+    [
+      canModerateProducts,
+      currentUserId,
+      handleFeaturedRaffleDelete,
+      handleFeaturedRaffleEdit,
+      handleFeaturedRafflePause,
+      isFeaturedRaffleBusy,
+    ],
+  );
+
+  useEffect(() => {
+    if (
+      mainView === "my-products" ||
+      activeProfileTab === PROFILE_TAB_MY_PRODUCTS ||
+      mainView === "my-profile"
+    ) {
+      void refreshSellerRaffleState();
+    }
+  }, [
+    mainView,
+    activeProfileTab,
+    refreshSellerRaffleState,
+    raffleRefreshTick,
+    isAuthorized,
+  ]);
+
+  const refreshMyPromotionPendingIds = useCallback(async () => {
+    if (!isAuthorized) {
+      setPendingPromotionProductIds(new Set());
+      return;
+    }
+    try {
+      const { promotions } = await fetchMyProductPromotions({
+        status: "pending_staff",
+        limit: 200,
+      });
+      setPendingPromotionProductIds(
+        new Set(promotions.map((row) => String(row.productId))),
+      );
+    } catch {
+      setPendingPromotionProductIds(new Set());
+    }
+  }, [isAuthorized]);
+
+  useEffect(() => {
+    if (
+      mainView === "my-products" ||
+      activeProfileTab === PROFILE_TAB_MY_PRODUCTS
+    ) {
+      void refreshMyPromotionPendingIds();
+    }
+  }, [mainView, activeProfileTab, refreshMyPromotionPendingIds, catalogRefreshTick]);
+
   const [isDataConfirmationModalOpen, setIsDataConfirmationModalOpen] =
     useState(false);
   const [inAppNotifications, setInAppNotifications] = useState(
+    /** @type {import('../../../entities/product-report/model/types.js').UserInAppNotification[]} */ ([]),
+  );
+  const [notificationsPageItems, setNotificationsPageItems] = useState(
     /** @type {import('../../../entities/product-report/model/types.js').UserInAppNotification[]} */ ([]),
   );
   const [isReportProductModalOpen, setIsReportProductModalOpen] =
     useState(false);
   const [catalogProductHasPendingReport, setCatalogProductHasPendingReport] =
     useState(false);
+  const [promotionProduct, setPromotionProduct] = useState(
+    /** @type {ProductFromApi | null} */ (null),
+  );
+  const [promotionTariffs, setPromotionTariffs] = useState(
+    /** @type {Array<{ code: string; title: string; durationHours: number; priceRub: number }>} */ ([]),
+  );
+  const [promotionModalError, setPromotionModalError] = useState("");
+  const [isPromotionSubmitPending, setIsPromotionSubmitPending] = useState(false);
 
   const catalogFetchSeq = useRef(0);
   const catalogPageRef = useRef(0);
@@ -376,7 +725,8 @@ export function HomePage() {
   const isProductSearchPending =
     productSearchTerm !== debouncedProductSearchTerm;
   const hasProductSearchQuery = debouncedProductSearchTerm.trim() !== "";
-  const isMineMode = isMyProductsMainView(mainView);
+  const isMyProductsRoute = isMyProductsMainView(mainView);
+  const isMineMode = isMyProductsRoute || isProfileMyProductsTab;
   const canReportCatalogProduct = useMemo(() => {
     if (!isAuthorized || !catalogProductDetails || !currentUserId) {
       return false;
@@ -415,35 +765,131 @@ export function HomePage() {
     if (!product) {
       return false;
     }
-    if (isMineMode || canModerateProducts || isAdmin) {
+    if (isMineMode) {
       return false;
     }
     if (isCurrentUserProductSeller(product, currentUserId)) {
       return false;
     }
     return true;
-  }, [
-    catalogProductDetails,
-    isMineMode,
-    canModerateProducts,
-    isAdmin,
-    currentUserId,
-  ]);
+  }, [catalogProductDetails, isMineMode, currentUserId]);
 
   useEffect(() => {
     if (!isSessionReady) {
       return;
     }
     if (!isAuthorized) {
+      setMyProfilePage(EMPTY_MY_PROFILE_PAGE);
+      setInAppNotifications([]);
       setMyProductsCatalogError("");
       setMyProductsTotal(null);
       setMyProductsModerationFilter(MY_PRODUCTS_MODERATION_FILTER_ALL);
       setCatalogFollowingOnly(false);
+      if (mainView === "my-profile" || mainView === "notifications") {
+        setIsLoginModalOpen(true);
+        goToMainView("catalog");
+      }
       if (isMyProductsMainView(mainView)) {
         goToMainView("catalog");
       }
     }
   }, [isAuthorized, mainView, goToMainView, isSessionReady]);
+
+  const refreshInAppNotifications = useCallback(async () => {
+    if (!isAuthorized) {
+      setInAppNotifications([]);
+      return;
+    }
+    try {
+      const { inAppNotifications: notifications } = await fetchCurrentUserProfile();
+      setInAppNotifications(notifications);
+    } catch {
+      setInAppNotifications([]);
+    }
+  }, [isAuthorized]);
+
+  useInAppNotificationsPoll({
+    isAuthorized,
+    mainView,
+    refreshInAppNotifications,
+  });
+
+  useEffect(() => {
+    if (mainView !== "notifications" || !isAuthorized) {
+      setNotificationsPageItems([]);
+      return undefined;
+    }
+
+    let isCancelled = false;
+    void (async () => {
+      try {
+        const { inAppNotifications: list } = await fetchCurrentUserProfile();
+        if (isCancelled) {
+          return;
+        }
+        setNotificationsPageItems(list);
+        if (list.length > 0) {
+          await markInAppNotificationsRead();
+        }
+        if (!isCancelled) {
+          setInAppNotifications([]);
+        }
+      } catch {
+        if (!isCancelled) {
+          setNotificationsPageItems([]);
+          setInAppNotifications([]);
+        }
+      }
+    })();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [mainView, isAuthorized]);
+
+  useEffect(() => {
+    if (mainView !== "my-profile" || !isAuthorized) {
+      return undefined;
+    }
+    let isCancelled = false;
+    setMyProfilePage({ phase: "loading", user: null, error: "" });
+    void (async () => {
+      try {
+        const { user } = await fetchCurrentUserProfile();
+        if (isCancelled) return;
+        setMyProfilePage({ phase: "success", user, error: "" });
+      } catch (e) {
+        if (isCancelled) return;
+        const error =
+          e instanceof Error ? e.message : HOME_PAGE_UI.FETCH_MY_PROFILE_FALLBACK;
+        setMyProfilePage({ phase: "error", user: null, error });
+      }
+    })();
+    return () => {
+      isCancelled = true;
+    };
+  }, [mainView, isAuthorized]);
+
+  useEffect(() => {
+    if (!isSessionReady || mainView !== "my-profile") return;
+    const requiresAdminTab = activeProfileTab === PROFILE_TAB_ADMIN_ORDERS;
+    const requiresStaffTab =
+      activeProfileTab === PROFILE_TAB_PRODUCT_MODERATION ||
+      activeProfileTab === PROFILE_TAB_PRODUCT_REPORTS ||
+      activeProfileTab === PROFILE_TAB_PRODUCT_PROMOTIONS ||
+      activeProfileTab === PROFILE_TAB_RAFFLES ||
+      activeProfileTab === PROFILE_TAB_DATA_CONFIRMATION_REQUESTS;
+    if ((requiresAdminTab && !isAdmin) || (requiresStaffTab && !canModerateProducts)) {
+      setMyProfileTab(PROFILE_TAB_OVERVIEW);
+    }
+  }, [
+    mainView,
+    activeProfileTab,
+    canModerateProducts,
+    isAdmin,
+    isSessionReady,
+    setMyProfileTab,
+  ]);
 
   useEffect(() => {
     if (!isMineMode) {
@@ -532,7 +978,7 @@ export function HomePage() {
   );
 
   useEffect(() => {
-    if (!isCatalogShellMainView(mainView)) {
+    if (!isCatalogShellView) {
       return undefined;
     }
 
@@ -570,7 +1016,7 @@ export function HomePage() {
       }
     })();
   }, [
-    mainView,
+    isCatalogShellView,
     isMineMode,
     debouncedProductSearchTerm,
     selectedProductCategory,
@@ -626,7 +1072,7 @@ export function HomePage() {
   ]);
 
   useEffect(() => {
-    if (!isCatalogShellMainView(mainView)) return undefined;
+    if (!isCatalogShellView) return undefined;
     if (catalogStatus.kind !== "idle") return undefined;
     if (!catalogHasMore || catalogLoadMoreError) return undefined;
 
@@ -645,7 +1091,7 @@ export function HomePage() {
     observer.observe(el);
     return () => observer.disconnect();
   }, [
-    mainView,
+    isCatalogShellView,
     catalogStatus.kind,
     catalogHasMore,
     catalogLoadMoreError,
@@ -664,11 +1110,6 @@ export function HomePage() {
     setIsAdminDeleteUserOpen(false);
   };
 
-  const closeMyProfileModal = () => {
-    setMyProfileModal(EMPTY_PROFILE_MODAL);
-    setIsEditProfileOpen(false);
-  };
-
   const handleLogout = async () => {
     await flushRemoteCart();
     try {
@@ -679,7 +1120,9 @@ export function HomePage() {
     }
     setCurrentUserId(null);
     setIsAuthorized(false);
-    closeMyProfileModal();
+    setMyProfilePage(EMPTY_MY_PROFILE_PAGE);
+    setIsEditProfileOpen(false);
+    setInAppNotifications([]);
     navigate("/", { replace: true });
   };
 
@@ -718,25 +1161,6 @@ export function HomePage() {
     );
   }, []);
 
-  const handleMyProfileClick = () => {
-    setMyProfileModal({ open: true, phase: "loading", user: null, error: "" });
-
-    void (async () => {
-      try {
-        const { user, inAppNotifications: notifications } =
-          await fetchCurrentUserProfile();
-        setInAppNotifications(notifications);
-        setMyProfileModal({ open: true, phase: "success", user, error: "" });
-      } catch (e) {
-        const error =
-          e instanceof Error
-            ? e.message
-            : HOME_PAGE_UI.FETCH_MY_PROFILE_FALLBACK;
-        setMyProfileModal({ open: true, phase: "error", user: null, error });
-      }
-    })();
-  };
-
   const handleNavigateToFullCatalogFromBreadcrumb = () => {
     setMyProductsCatalogError("");
     goToMainView("catalog");
@@ -745,8 +1169,20 @@ export function HomePage() {
   };
 
   const handleSubscriptionsFromProfile = () => {
-    closeMyProfileModal();
-    goToMainView("subscriptions");
+    setMyProfileTab(PROFILE_TAB_SUBSCRIPTIONS);
+  };
+
+  const handleNotificationsClick = () => {
+    if (!isAuthorized) {
+      setIsLoginModalOpen(true);
+      return;
+    }
+    goToMainView("notifications");
+  };
+
+  const handleNotificationsCleared = () => {
+    setInAppNotifications([]);
+    setNotificationsPageItems([]);
   };
 
   /**
@@ -754,7 +1190,6 @@ export function HomePage() {
    */
   const handleInAppNotificationClick = (item) => {
     if (item.kind === IN_APP_NOTIFICATION_KIND_NEW_FOLLOWER && item.actorUserId) {
-      closeMyProfileModal();
       handleSellerNameClick(item.actorUserId);
       return;
     }
@@ -762,7 +1197,6 @@ export function HomePage() {
       item.kind === IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_NEW_PRODUCT &&
       item.productId
     ) {
-      closeMyProfileModal();
       goToMainView("catalog");
       const inList = products.find(
         (p) => String(p._id) === String(item.productId),
@@ -835,44 +1269,65 @@ export function HomePage() {
   };
 
   const handleMyProductsFromProfile = () => {
-    if (myProfileModal.phase !== "success" || !myProfileModal.user?._id) return;
+    if (myProfilePage.phase !== "success" || !myProfilePage.user?._id) return;
     setMyProductsCatalogError("");
-    goToMainView("my-products");
-    closeMyProfileModal();
+    setMyProfileTab(PROFILE_TAB_MY_PRODUCTS);
   };
 
   const handleMyOrdersFromProfile = () => {
-    goToMainView("my-orders");
-    closeMyProfileModal();
+    setMyProfileTab(PROFILE_TAB_MY_ORDERS);
   };
 
   const handleMySalesFromProfile = () => {
-    goToMainView("my-sales");
-    closeMyProfileModal();
+    setMyProfileTab(PROFILE_TAB_MY_SALES);
   };
 
   const handleAdminOrdersFromProfile = () => {
-    goToMainView("admin-orders");
-    closeMyProfileModal();
+    setMyProfileTab(PROFILE_TAB_ADMIN_ORDERS);
   };
 
   const handleProductModerationFromProfile = () => {
-    goToMainView("product-moderation");
-    closeMyProfileModal();
+    setMyProfileTab(PROFILE_TAB_PRODUCT_MODERATION);
   };
 
   const handleProductReportsFromProfile = () => {
-    goToMainView("product-reports");
-    closeMyProfileModal();
+    setMyProfileTab(PROFILE_TAB_PRODUCT_REPORTS);
+  };
+
+  const handleProductPromotionsFromProfile = () => {
+    setMyProfileTab(PROFILE_TAB_PRODUCT_PROMOTIONS);
+  };
+
+  const handleRafflesFromProfile = () => {
+    setMyProfileTab(PROFILE_TAB_RAFFLES);
+  };
+
+  const handleToggleRaffleParticipation = async (product, enabled) => {
+    if (product._id == null) return;
+    const productId = String(product._id);
+    setRaffleParticipationPendingProductId(productId);
+    try {
+      const updated = await setProductRaffleParticipation(productId, enabled);
+      setProducts((prev) =>
+        prev.map((row) => (String(row._id) === productId ? updated : row)),
+      );
+      syncProductEditModalState(updated);
+      setRaffleRefreshTick((n) => n + 1);
+      void refreshFeaturedRaffle();
+    } catch (e) {
+      setMyProductsCatalogError(
+        e instanceof Error ? e.message : API_CLIENT_UI.SET_RAFFLE_PARTICIPATION_FALLBACK,
+      );
+    } finally {
+      setRaffleParticipationPendingProductId(null);
+    }
   };
 
   const handleDataConfirmationQueueFromProfile = () => {
-    goToMainView("data-confirmation-requests");
-    closeMyProfileModal();
+    setMyProfileTab(PROFILE_TAB_DATA_CONFIRMATION_REQUESTS);
   };
 
   const handleDataConfirmationFromProfile = () => {
-    closeMyProfileModal();
     setIsDataConfirmationModalOpen(true);
   };
 
@@ -940,6 +1395,16 @@ export function HomePage() {
   };
 
   /** @param {import('../../../entities/product/model/types.js').ProductFromApi} product */
+  const syncProductEditModalState = (product) => {
+    const id = String(product._id);
+    setProductToEdit((prev) =>
+      prev && String(prev._id) === id
+        ? { ...product, hasOpenSales: prev.hasOpenSales ?? product.hasOpenSales }
+        : prev,
+    );
+  };
+
+  /** @param {import('../../../entities/product/model/types.js').ProductFromApi} product */
   const syncCatalogProductState = (product) => {
     const id = String(product._id);
     setCatalogProductDetails((prev) =>
@@ -999,13 +1464,8 @@ export function HomePage() {
       const updated = await patchMyProduct(productId, {
         productIsAvailable,
       });
-      setProducts((prev) =>
-        prev.map((p) =>
-          String(p._id) === productId
-            ? { ...updated, hasOpenSales: p.hasOpenSales }
-            : p,
-        ),
-      );
+      syncCatalogProductState(updated);
+      syncProductEditModalState(updated);
     } catch (e) {
       const message =
         e instanceof Error
@@ -1014,6 +1474,38 @@ export function HomePage() {
       setMyProductsCatalogError(message);
     } finally {
       setTogglingAvailabilityProductId(null);
+    }
+  };
+
+  /**
+   * @param {string} productId
+   * @param {boolean} productAuctionEnabled
+   */
+  const handleSetProductAuction = async (productId, productAuctionEnabled) => {
+    try {
+      setTogglingAuctionProductId(productId);
+      setMyProductsCatalogError("");
+      setProductDetailsAdminError("");
+      const updated = await patchMyProduct(productId, {
+        productAuctionEnabled,
+      });
+      syncCatalogProductState(updated);
+      syncProductEditModalState(updated);
+    } catch (e) {
+      const message =
+        e instanceof Error
+          ? e.message
+          : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK;
+      if (
+        catalogProductDetails &&
+        String(catalogProductDetails._id) === productId
+      ) {
+        setProductDetailsAdminError(message);
+      } else {
+        setMyProductsCatalogError(message);
+      }
+    } finally {
+      setTogglingAuctionProductId(null);
     }
   };
 
@@ -1026,6 +1518,12 @@ export function HomePage() {
       setProducts((prev) => prev.filter((p) => String(p._id) !== productId));
       setMyProductsTotal((prev) =>
         prev != null && prev > 0 ? prev - 1 : prev,
+      );
+      setProductToEdit((prev) =>
+        prev && String(prev._id) === productId ? null : prev,
+      );
+      setCatalogProductDetails((prev) =>
+        prev && String(prev._id) === productId ? null : prev,
       );
     } catch (e) {
       const message =
@@ -1046,6 +1544,9 @@ export function HomePage() {
       await deleteMyProduct(productId);
       setProducts((prev) => prev.filter((p) => String(p._id) !== productId));
       setCatalogProductDetails((prev) =>
+        prev && String(prev._id) === productId ? null : prev,
+      );
+      setProductToEdit((prev) =>
         prev && String(prev._id) === productId ? null : prev,
       );
     } catch (e) {
@@ -1076,9 +1577,13 @@ export function HomePage() {
       if (!productIsAvailable && !showHiddenCatalogProducts) {
         setProducts((prev) => prev.filter((p) => String(p._id) !== productId));
         setCatalogProductDetails(null);
+        setProductToEdit((prev) =>
+          prev && String(prev._id) === productId ? null : prev,
+        );
         return;
       }
       syncCatalogProductState(updated);
+      syncProductEditModalState(updated);
     } catch (e) {
       const message =
         e instanceof Error
@@ -1090,14 +1595,294 @@ export function HomePage() {
     }
   };
 
+  /**
+   * @param {ProductFromApi} product
+   */
+  const handleOpenPromotionModal = async (product) => {
+    setPromotionProduct(product);
+    setPromotionModalError("");
+    try {
+      const tariffs = await fetchProductPromotionTariffs();
+      setPromotionTariffs(tariffs);
+    } catch (e) {
+      const message =
+        e instanceof Error
+          ? e.message
+          : API_CLIENT_UI.FETCH_PRODUCT_PROMOTION_TARIFFS_FALLBACK;
+      setPromotionModalError(message);
+      setPromotionTariffs([]);
+    }
+  };
+
+  const handleClosePromotionModal = () => {
+    setPromotionProduct(null);
+    setPromotionTariffs([]);
+    setPromotionModalError("");
+  };
+
+  const handleSubmitPromotionRequest = async (tariffCode) => {
+    if (!promotionProduct?._id) {
+      return;
+    }
+    setIsPromotionSubmitPending(true);
+    setPromotionModalError("");
+    try {
+      await requestProductPromotion(String(promotionProduct._id), { tariffCode });
+      setMyProductsCatalogNotice("Заявка на продвижение отправлена staff-команде.");
+      void refreshMyPromotionPendingIds();
+      handleClosePromotionModal();
+    } catch (e) {
+      const message =
+        e instanceof Error ? e.message : API_CLIENT_UI.REQUEST_PRODUCT_PROMOTION_FALLBACK;
+      setPromotionModalError(message);
+    } finally {
+      setIsPromotionSubmitPending(false);
+    }
+  };
+
+  const renderCatalogContent = () => {
+    if (catalogStatus.kind === "loading" && products.length === 0) {
+      return <p className="home-page__state">{HOME_PAGE_UI.LOADING_CATALOG}</p>;
+    }
+    if (catalogStatus.kind === "error") {
+      return (
+        <p className="home-page__state home-page__state_error" role="alert">
+          {catalogStatus.message}
+        </p>
+      );
+    }
+    return (
+      <>
+        {mainView === "catalog" && featuredRaffles.length > 0 ? (
+          <RaffleFeaturedCarousel
+            raffles={featuredRaffles}
+            activeIndex={featuredRaffleIndex}
+            onActiveIndexChange={setFeaturedRaffleIndex}
+            onOpenProducts={(raffleId) => navigate(buildRafflePath(raffleId))}
+            getManage={getFeaturedRaffleManage}
+          />
+        ) : null}
+        <HomeCatalogGrid
+        products={products}
+        selectedProductCategory={selectedProductCategory}
+        hasQuery={hasProductSearchQuery}
+        isMineMode={isMineMode}
+        deletingProductId={deletingProductId}
+        onSellerNameClick={handleSellerNameClick}
+        onDeleteMyProduct={handleDeleteMyProduct}
+        onEditMyProduct={handleOpenEditMyProduct}
+        onPromoteMyProduct={handleOpenPromotionModal}
+        pendingPromotionProductIds={pendingPromotionProductIds}
+        myProductsCatalogError={myProductsCatalogError}
+        myProductsCatalogNotice={myProductsCatalogNotice}
+        onOpenProductDetails={setCatalogProductDetails}
+        onSetMyProductAvailability={handleSetMyProductAvailability}
+        onSetMyProductAuction={handleSetProductAuction}
+        togglingAvailabilityProductId={togglingAvailabilityProductId}
+        togglingAuctionProductId={togglingAuctionProductId}
+        isAuthorized={isAuthorized}
+        currentUserId={currentUserId}
+        onRequestLoginAddToCart={() => setIsLoginModalOpen(true)}
+        catalogSentinelRef={catalogSentinelRef}
+        catalogHasMore={catalogHasMore}
+        isCatalogLoadingMore={isCatalogLoadingMore}
+        catalogLoadMoreError={catalogLoadMoreError}
+        onRetryCatalogLoadMore={handleRetryCatalogLoadMore}
+        myProductsModerationFilter={myProductsModerationFilter}
+        catalogFollowingOnly={catalogFollowingOnly}
+        catalogAuctionOnly={catalogAuctionOnly}
+        sellerRaffleActive={sellerRaffleActive}
+        onToggleRaffleParticipation={handleToggleRaffleParticipation}
+        raffleParticipationPendingProductId={raffleParticipationPendingProductId}
+      />
+      </>
+    );
+  };
+
   const renderMainContent = () => {
+    if (isRaffleRoute && raffleRouteId) {
+      return (
+        <RaffleProductsPage
+          raffleId={raffleRouteId}
+          isAuthorized={isAuthorized}
+          currentUserId={currentUserId}
+          onRequestLoginAddToCart={() => setIsLoginModalOpen(true)}
+          onSellerNameClick={handleSellerNameClick}
+          onOpenProductDetails={setCatalogProductDetails}
+          onBackToCatalog={() => goToMainView("catalog")}
+        />
+      );
+    }
+
+    const isProfileRoleRestrictedTab =
+      mainView === "my-profile" &&
+      (activeProfileTab === PROFILE_TAB_ADMIN_ORDERS ||
+        activeProfileTab === PROFILE_TAB_PRODUCT_MODERATION ||
+        activeProfileTab === PROFILE_TAB_PRODUCT_REPORTS ||
+        activeProfileTab === PROFILE_TAB_PRODUCT_PROMOTIONS ||
+        activeProfileTab === PROFILE_TAB_RAFFLES ||
+        activeProfileTab === PROFILE_TAB_DATA_CONFIRMATION_REQUESTS);
+
     if (
       isAuthorized &&
       !isSessionReady &&
-      isRoleRestrictedMainView(mainView)
+      (isRoleRestrictedMainView(mainView) || isProfileRoleRestrictedTab)
     ) {
       return (
         <p className="home-page__state">{HOME_PAGE_UI.LOADING_SESSION}</p>
+      );
+    }
+
+    if (mainView === "my-profile") {
+      const profileTabContent = (() => {
+        if (activeProfileTab === PROFILE_TAB_MY_PRODUCTS) {
+          return renderCatalogContent();
+        }
+        if (activeProfileTab === PROFILE_TAB_MY_ORDERS) {
+          return (
+            <MyOrdersPage
+              isAuthorized={isAuthorized}
+              currentUserId={currentUserId}
+              onSellerNameClick={handleSellerNameClick}
+              onRequestLogin={() => setIsLoginModalOpen(true)}
+            />
+          );
+        }
+        if (activeProfileTab === PROFILE_TAB_MY_SALES) {
+          return (
+            <MySalesPage
+              isAuthorized={isAuthorized}
+              currentUserId={currentUserId}
+              onSellerNameClick={handleSellerNameClick}
+            />
+          );
+        }
+        if (activeProfileTab === PROFILE_TAB_SUBSCRIPTIONS) {
+          return (
+            <SubscriptionsPage
+              isAuthorized={isAuthorized}
+              onRequestLogin={() => setIsLoginModalOpen(true)}
+              onUserClick={handleSellerNameClick}
+            />
+          );
+        }
+        if (activeProfileTab === PROFILE_TAB_ADMIN_ORDERS && isAdmin) {
+          return <AdminOrdersPage />;
+        }
+        if (activeProfileTab === PROFILE_TAB_PRODUCT_MODERATION && canModerateProducts) {
+          return (
+            <ProductModerationPage
+              onSellerNameClick={handleSellerNameClick}
+              onQueueChanged={() => void refreshPendingModerationCount()}
+            />
+          );
+        }
+        if (activeProfileTab === PROFILE_TAB_PRODUCT_REPORTS && canModerateProducts) {
+          return (
+            <ProductReportsPage
+              onSellerNameClick={handleSellerNameClick}
+              onProductClick={(product) => setCatalogProductDetails(product)}
+              onQueueChanged={() => void refreshPendingProductReportsCount()}
+            />
+          );
+        }
+        if (activeProfileTab === PROFILE_TAB_PRODUCT_PROMOTIONS && canModerateProducts) {
+          return (
+            <ProductPromotionsStaffPage
+              onQueueChanged={() => {
+                void refreshPendingProductPromotionsCount();
+                setCatalogRefreshTick((n) => n + 1);
+              }}
+            />
+          );
+        }
+        if (activeProfileTab === PROFILE_TAB_RAFFLES && canModerateProducts) {
+          return (
+            <RafflesStaffPage
+              refreshTick={raffleRefreshTick}
+              onQueueChanged={() => {
+                void refreshPendingRafflesCount();
+                setRaffleRefreshTick((n) => n + 1);
+                setCatalogRefreshTick((n) => n + 1);
+                void refreshFeaturedRaffle();
+              }}
+              onEditRaffle={(raffle) =>
+                setRaffleModal({ mode: "edit", raffle, useStaffApi: true })
+              }
+            />
+          );
+        }
+        if (
+          activeProfileTab === PROFILE_TAB_DATA_CONFIRMATION_REQUESTS &&
+          canModerateProducts
+        ) {
+          return (
+            <DataConfirmationRequestsPage
+              onApplicantClick={handleSellerNameClick}
+              onQueueChanged={() => void refreshPendingDataConfirmationCount()}
+            />
+          );
+        }
+        return (
+          <RaffleSellerOverview
+            refreshTick={raffleRefreshTick}
+            onChanged={() => {
+              setRaffleRefreshTick((n) => n + 1);
+              void refreshFeaturedRaffle();
+              void refreshSellerRaffleState();
+            }}
+            onEditRaffle={(raffle) =>
+              setRaffleModal({ mode: "edit", raffle, useStaffApi: false })
+            }
+          />
+        );
+      })();
+
+      return (
+        <MyProfilePage
+          user={myProfilePage.phase === "success" ? myProfilePage.user : null}
+          isLoading={myProfilePage.phase === "loading"}
+          errorMessage={myProfilePage.phase === "error" ? myProfilePage.error : null}
+          onLogout={handleLogout}
+          onEditProfileClick={() => setIsEditProfileOpen(true)}
+          onMyProductsClick={handleMyProductsFromProfile}
+          onMySalesClick={handleMySalesFromProfile}
+          onMyOrdersClick={handleMyOrdersFromProfile}
+          onAdminOrdersClick={isAdmin ? handleAdminOrdersFromProfile : undefined}
+          onProductModerationClick={
+            canModerateProducts ? handleProductModerationFromProfile : undefined
+          }
+          onProductReportsClick={
+            canModerateProducts ? handleProductReportsFromProfile : undefined
+          }
+          onProductPromotionsClick={
+            canModerateProducts ? handleProductPromotionsFromProfile : undefined
+          }
+          onRafflesClick={canModerateProducts ? handleRafflesFromProfile : undefined}
+          onCreateRaffleClick={
+            myProfilePage.phase === "success" &&
+            myProfilePage.user?.isUserDataConfirmed === true
+              ? () => setRaffleModal({ mode: "create" })
+              : undefined
+          }
+          pendingRafflesCount={pendingRafflesCount}
+          onDataConfirmationQueueClick={
+            canModerateProducts ? handleDataConfirmationQueueFromProfile : undefined
+          }
+          onDataConfirmationClick={
+            isAuthorized ? handleDataConfirmationFromProfile : undefined
+          }
+          onSubscriptionsClick={
+            isAuthorized ? handleSubscriptionsFromProfile : undefined
+          }
+          pendingModerationCount={pendingModerationCount}
+          pendingProductReportsCount={pendingProductReportsCount}
+          pendingProductPromotionsCount={pendingProductPromotionsCount}
+          pendingDataConfirmationCount={pendingDataConfirmationCount}
+          activeTab={activeProfileTab}
+          onTabChange={setMyProfileTab}
+          tabContent={profileTabContent}
+        />
       );
     }
 
@@ -1119,10 +1904,23 @@ export function HomePage() {
         />
       );
     }
+    if (mainView === "notifications") {
+      if (!isAuthorized) {
+        return null;
+      }
+      return (
+        <NotificationsPage
+          notifications={notificationsPageItems}
+          onNotificationClick={handleInAppNotificationClick}
+          onCleared={handleNotificationsCleared}
+        />
+      );
+    }
     if (mainView === "cart") {
       return (
         <CartPage
           isAuthorized={isAuthorized}
+          currentUserId={currentUserId}
           onRequestLogin={() => setIsLoginModalOpen(true)}
           onGoToCatalog={() => goToMainView("catalog")}
           onCheckoutSuccess={() => goToMainView("my-orders")}
@@ -1156,7 +1954,10 @@ export function HomePage() {
     if (mainView === "product-moderation") {
       if (!canModerateProducts) return null;
       return (
-        <ProductModerationPage onSellerNameClick={handleSellerNameClick} />
+        <ProductModerationPage
+          onSellerNameClick={handleSellerNameClick}
+          onQueueChanged={() => void refreshPendingModerationCount()}
+        />
       );
     }
     if (mainView === "product-reports") {
@@ -1179,43 +1980,7 @@ export function HomePage() {
       );
     }
 
-    if (catalogStatus.kind === "loading" && products.length === 0) {
-      return <p className="home-page__state">{HOME_PAGE_UI.LOADING_CATALOG}</p>;
-    }
-    if (catalogStatus.kind === "error") {
-      return (
-        <p className="home-page__state home-page__state_error" role="alert">
-          {catalogStatus.message}
-        </p>
-      );
-    }
-    return (
-      <HomeCatalogGrid
-        products={products}
-        selectedProductCategory={selectedProductCategory}
-        hasQuery={hasProductSearchQuery}
-        isMineMode={isMineMode}
-        deletingProductId={deletingProductId}
-        onSellerNameClick={handleSellerNameClick}
-        onDeleteMyProduct={handleDeleteMyProduct}
-        onEditMyProduct={handleOpenEditMyProduct}
-        myProductsCatalogError={myProductsCatalogError}
-        myProductsCatalogNotice={myProductsCatalogNotice}
-        onOpenProductDetails={setCatalogProductDetails}
-        onSetMyProductAvailability={handleSetMyProductAvailability}
-        togglingAvailabilityProductId={togglingAvailabilityProductId}
-        isAuthorized={isAuthorized}
-        onRequestLoginAddToCart={() => setIsLoginModalOpen(true)}
-        catalogSentinelRef={catalogSentinelRef}
-        catalogHasMore={catalogHasMore}
-        isCatalogLoadingMore={isCatalogLoadingMore}
-        catalogLoadMoreError={catalogLoadMoreError}
-        onRetryCatalogLoadMore={handleRetryCatalogLoadMore}
-        myProductsModerationFilter={myProductsModerationFilter}
-        catalogFollowingOnly={catalogFollowingOnly}
-        catalogAuctionOnly={catalogAuctionOnly}
-      />
-    );
+    return renderCatalogContent();
   };
 
   return (
@@ -1223,7 +1988,7 @@ export function HomePage() {
       <CartServerSync isAuthorized={isAuthorized} />
       <HomePageHeader
         mainView={mainView}
-        isMineMode={isMineMode}
+        isMineMode={isMyProductsRoute}
         selectedProductCategory={selectedProductCategory}
         isProductCategoryListOpen={isProductCategoryListOpen}
         productSearchTerm={productSearchTerm}
@@ -1239,9 +2004,12 @@ export function HomePage() {
         onPlaceProductClick={handlePlaceProductClick}
         myProductsTotal={myProductsTotal}
         sellerProductsLimit={sellerProductsLimit}
+        pendingModerationCount={pendingModerationCount}
         pendingProductReportsCount={pendingProductReportsCount}
         pendingDataConfirmationCount={pendingDataConfirmationCount}
-        onMyProfileClick={handleMyProfileClick}
+        onMyProfileClick={() => goToMainView("my-profile")}
+        onNotificationsClick={handleNotificationsClick}
+        unreadNotificationsCount={inAppNotifications.length}
         onLoginClick={() => setIsLoginModalOpen(true)}
         onRegisterClick={() => setIsRegisterModalOpen(true)}
         onNavigateToFullCatalogFromBreadcrumb={
@@ -1330,43 +2098,6 @@ export function HomePage() {
           ) : null
         }
       />
-      <MyProfileModal
-        isOpen={myProfileModal.open}
-        onClose={closeMyProfileModal}
-        user={myProfileModal.phase === "success" ? myProfileModal.user : null}
-        isLoading={myProfileModal.phase === "loading"}
-        errorMessage={
-          myProfileModal.phase === "error" ? myProfileModal.error : null
-        }
-        onLogout={handleLogout}
-        onEditProfileClick={() => setIsEditProfileOpen(true)}
-        onMyProductsClick={handleMyProductsFromProfile}
-        onMySalesClick={handleMySalesFromProfile}
-        onMyOrdersClick={handleMyOrdersFromProfile}
-        onAdminOrdersClick={isAdmin ? handleAdminOrdersFromProfile : undefined}
-        onProductModerationClick={
-          canModerateProducts ? handleProductModerationFromProfile : undefined
-        }
-        onProductReportsClick={
-          canModerateProducts ? handleProductReportsFromProfile : undefined
-        }
-        onDataConfirmationQueueClick={
-          canModerateProducts
-            ? handleDataConfirmationQueueFromProfile
-            : undefined
-        }
-        onDataConfirmationClick={
-          isAuthorized ? handleDataConfirmationFromProfile : undefined
-        }
-        onSubscriptionsClick={
-          isAuthorized ? handleSubscriptionsFromProfile : undefined
-        }
-        onInAppNotificationClick={handleInAppNotificationClick}
-        pendingProductReportsCount={pendingProductReportsCount}
-        pendingDataConfirmationCount={pendingDataConfirmationCount}
-        inAppNotifications={inAppNotifications}
-        onNotificationsRead={() => setInAppNotifications([])}
-      />
       <DataConfirmationRequestModal
         isOpen={isDataConfirmationModalOpen}
         onClose={() => setIsDataConfirmationModalOpen(false)}
@@ -1377,12 +2108,11 @@ export function HomePage() {
       <EditProfileModal
         isOpen={isEditProfileOpen}
         onClose={() => setIsEditProfileOpen(false)}
-        user={
-          myProfileModal.phase === "success" ? myProfileModal.user : null
-        }
+        allowSelfPremiumToggle={isAdmin}
+        user={myProfilePage.phase === "success" ? myProfilePage.user : null}
         onSaved={(updatedUser) => {
-          setMyProfileModal((prev) =>
-            prev.open && prev.phase === "success" && prev.user
+          setMyProfilePage((prev) =>
+            prev.phase === "success" && prev.user
               ? { ...prev, user: { ...prev.user, ...updatedUser } }
               : prev,
           );
@@ -1475,6 +2205,68 @@ export function HomePage() {
         onSuccess={handleEditProductSuccess}
         mode="edit"
         productToEdit={productToEdit}
+        manageProduct={productToEdit}
+        onDeleteProduct={handleDeleteMyProduct}
+        onSetProductAvailability={handleSetMyProductAvailability}
+        onSetProductAuction={handleSetProductAuction}
+        isDeletePending={
+          productToEdit?._id != null &&
+          deletingProductId === String(productToEdit._id)
+        }
+        isAvailabilityTogglePending={
+          productToEdit?._id != null &&
+          togglingAvailabilityProductId === String(productToEdit._id)
+        }
+        isAuctionTogglePending={
+          productToEdit?._id != null &&
+          togglingAuctionProductId === String(productToEdit._id)
+        }
+        manageErrorMessage={myProductsCatalogError || productDetailsAdminError}
+        canManageEdit={
+          productToEdit != null &&
+          (isAdmin || canSellerEditProduct(productToEdit))
+        }
+        canManageDelete={
+          productToEdit != null &&
+          (isAdmin || canSellerDeleteProduct(productToEdit))
+        }
+        canManageToggleVisibility={
+          productToEdit != null &&
+          (isAdmin || canSellerToggleCatalogVisibility(productToEdit))
+        }
+        sellerRaffleActive={sellerRaffleActive}
+        onToggleRaffleParticipation={handleToggleRaffleParticipation}
+        isRaffleParticipationPending={
+          productToEdit?._id != null &&
+          raffleParticipationPendingProductId === String(productToEdit._id)
+        }
+      />
+      <ProductPromotionModal
+        isOpen={promotionProduct != null}
+        productName={promotionProduct?.productName ?? ""}
+        tariffs={promotionTariffs}
+        errorMessage={promotionModalError}
+        isSubmitting={isPromotionSubmitPending}
+        onClose={handleClosePromotionModal}
+        onSubmit={handleSubmitPromotionRequest}
+      />
+      <CreateRaffleModal
+        isOpen={raffleModal != null}
+        mode={raffleModal?.mode ?? "create"}
+        raffleToEdit={
+          raffleModal?.mode === "edit" ? raffleModal.raffle : null
+        }
+        useStaffApi={raffleModal?.mode === "edit" ? raffleModal.useStaffApi : false}
+        onClose={() => setRaffleModal(null)}
+        onSuccess={() => {
+          setRaffleRefreshTick((n) => n + 1);
+          void refreshFeaturedRaffle();
+          void refreshSellerRaffleState();
+          void refreshPendingRafflesCount();
+          if (raffleModal?.mode === "create") {
+            setMyProductsCatalogNotice("Розыгрыш отправлен на модерацию.");
+          }
+        }}
       />
       <ProductDetailsModal
         isOpen={catalogProductDetails != null}
@@ -1515,27 +2307,12 @@ export function HomePage() {
         adminFooter={
           showCatalogProductManageFooter && catalogProductDetails ? (
             <ProductDetailsAdminFooter
-              product={catalogProductDetails}
               onEdit={handleAdminOpenEditProductFromDetails}
-              onDelete={handleAdminDeleteCatalogProduct}
-              onSetAvailability={handleAdminCatalogProductAvailability}
-              isDeletePending={
-                deletingProductId === String(catalogProductDetails._id)
-              }
-              isAvailabilityTogglePending={
-                togglingAvailabilityProductId ===
-                String(catalogProductDetails._id)
-              }
-              errorMessage={productDetailsAdminError}
               canEdit={
                 isAdmin || canSellerEditProduct(catalogProductDetails)
               }
-              canDelete={
-                isAdmin || canSellerDeleteProduct(catalogProductDetails)
-              }
-              canToggleVisibility={
-                isAdmin ||
-                canSellerToggleCatalogVisibility(catalogProductDetails)
+              isDeletePending={
+                deletingProductId === String(catalogProductDetails._id)
               }
             />
           ) : null

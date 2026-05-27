@@ -1,5 +1,4 @@
 import { UserModel } from '../models/index.js';
-import { ADMIN_ROLE } from './adminUserGuard.js';
 
 /**
  * @returns {Promise<import('mongoose').Types.ObjectId[]>}
@@ -7,7 +6,6 @@ import { ADMIN_ROLE } from './adminUserGuard.js';
 export async function getPremiumSellerIds() {
     const rows = await UserModel.find({
         isPremiumUser: true,
-        userRole: { $ne: ADMIN_ROLE },
         isBlockedUser: { $ne: true },
         isActiveUser: { $ne: false },
     })

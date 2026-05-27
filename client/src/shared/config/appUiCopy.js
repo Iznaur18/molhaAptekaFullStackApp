@@ -47,6 +47,7 @@ export const API_CLIENT_UI = {
   UPDATE_ORDER_STATUS_FALLBACK: "Не удалось обновить статус заказа",
   DELETE_USER_FALLBACK: "Не удалось удалить пользователя",
   FETCH_MODERATION_QUEUE_FALLBACK: "Не удалось загрузить очередь модерации",
+  FETCH_MODERATION_COUNT_FALLBACK: "Не удалось загрузить счётчик модерации",
   APPROVE_PRODUCT_MODERATION_FALLBACK: "Не удалось одобрить товар",
   REJECT_PRODUCT_MODERATION_FALLBACK: "Не удалось отклонить товар",
   SUBMIT_PRODUCT_REPORT_FALLBACK: "Не удалось отправить жалобу",
@@ -76,6 +77,26 @@ export const API_CLIENT_UI = {
   SUBMIT_PRODUCT_REVIEW_FALLBACK: "Не удалось опубликовать отзыв",
   PATCH_PRODUCT_REVIEW_FALLBACK: "Не удалось обновить отзыв",
   DELETE_PRODUCT_REVIEW_FALLBACK: "Не удалось удалить отзыв",
+  FETCH_PRODUCT_PROMOTION_TARIFFS_FALLBACK: "Не удалось загрузить пакеты продвижения",
+  REQUEST_PRODUCT_PROMOTION_FALLBACK: "Не удалось отправить заявку на продвижение",
+  FETCH_MY_PRODUCT_PROMOTIONS_FALLBACK: "Не удалось загрузить продвижения",
+  FETCH_PRODUCT_PROMOTIONS_QUEUE_FALLBACK: "Не удалось загрузить очередь продвижения",
+  FETCH_PRODUCT_PROMOTIONS_COUNT_FALLBACK: "Не удалось загрузить счётчик продвижения",
+  APPROVE_PRODUCT_PROMOTION_FALLBACK: "Не удалось одобрить продвижение",
+  REJECT_PRODUCT_PROMOTION_FALLBACK: "Не удалось отклонить продвижение",
+  FETCH_FEATURED_RAFFLE_FALLBACK: "Не удалось загрузить розыгрыш",
+  FETCH_RAFFLE_FALLBACK: "Не удалось загрузить розыгрыш",
+  FETCH_RAFFLE_PRODUCTS_FALLBACK: "Не удалось загрузить товары розыгрыша",
+  CREATE_RAFFLE_FALLBACK: "Не удалось создать розыгрыш",
+  FETCH_MY_RAFFLE_FALLBACK: "Не удалось загрузить ваш розыгрыш",
+  PATCH_RAFFLE_FALLBACK: "Не удалось сохранить розыгрыш",
+  DELETE_RAFFLE_FALLBACK: "Не удалось удалить розыгрыш",
+  PAUSE_RAFFLE_FALLBACK: "Не удалось снять розыгрыш с витрины",
+  SET_RAFFLE_PARTICIPATION_FALLBACK: "Не удалось обновить участие в розыгрыше",
+  FETCH_RAFFLES_QUEUE_FALLBACK: "Не удалось загрузить очередь розыгрышей",
+  FETCH_RAFFLES_COUNT_FALLBACK: "Не удалось загрузить счётчик розыгрышей",
+  APPROVE_RAFFLE_FALLBACK: "Не удалось одобрить розыгрыш",
+  REJECT_RAFFLE_FALLBACK: "Не удалось отклонить розыгрыш",
 };
 
 /** Отзывы на товар */
@@ -198,6 +219,7 @@ export const HOME_PAGE_UI = {
   NAV_TO_USERS: "Пользователи",
   NAV_TO_SUBSCRIPTIONS: "Подписки",
   TITLE_SUBSCRIPTIONS: "Подписки",
+  TITLE_NOTIFICATIONS: "Уведомления",
   FILTER_FOLLOWING_ONLY: "Только от подписок",
   FILTER_AUCTION_ONLY: "Только с аукционом",
   EMPTY_FOLLOWING_FILTER: "Нет товаров от ваших подписок с текущими фильтрами.",
@@ -328,6 +350,8 @@ export const PRODUCT_MODERATION_PAGE_UI = {
   SELLER_LABEL: "Продавец",
   CREATED_LABEL: "Создан",
   REJECTION_COMMENT_PREFIX: "Комментарий модератора:",
+  /** @param {number} n */
+  TAB_BADGE: (n) => (n > 99 ? "99+" : String(n)),
 };
 
 /** Жалобы на товары (staff) */
@@ -407,9 +431,23 @@ export const PRODUCT_REPORT_MODAL_UI = {
   WORDS_USED: (current, max) => `${current} / ${max} слов`,
 };
 
-/** In-app уведомления в профиле */
+/** In-app уведомления */
 export const IN_APP_NOTIFICATIONS_UI = {
   SECTION_ARIA: "Уведомления",
+};
+
+export const NOTIFICATIONS_PAGE_UI = {
+  EMPTY: "Нет новых уведомлений.",
+  CLEAR: "Очистить",
+  CLEAR_PENDING: "Очищаем…",
+  CLEAR_ARIA: "Отметить все уведомления прочитанными",
+};
+
+export const HEADER_NOTIFICATIONS_BUTTON_UI = {
+  ARIA: "Уведомления",
+  COUNT_ARIA: "Непрочитанных уведомлений",
+  /** @param {number} n */
+  BADGE: (n) => (n > 99 ? "99+" : String(n)),
 };
 
 export const USER_FOLLOW_BUTTON_UI = {
@@ -465,27 +503,6 @@ export const USERS_PAGE_UI = {
   LOADING: "Загрузка пользователей…",
   EMPTY: "Пользователей пока нет.",
   EMPTY_BY_QUERY: "Никого не нашли по этому запросу.",
-  EMPTY_BY_FILTERS: "Никого не нашли с такими фильтрами.",
-  SORT_LABEL: "Сортировка",
-  SORT_NAME: "По имени",
-  SORT_RATING: "По рейтингу",
-  MIN_RATING_LABEL: "Средняя оценка от",
-  MIN_RATING_ANY: "Любая",
-  FILTER_ROLE_LABEL: "Роль",
-  FILTER_ROLE_ANY: "Любая",
-  FILTER_PREMIUM_LABEL: "Премиум",
-  FILTER_PREMIUM_ANY: "Все",
-  FILTER_PREMIUM_ONLY: "Только премиум",
-  FILTER_BLOCKED_LABEL: "Блокировка",
-  FILTER_BLOCKED_ANY: "Не заблокированные",
-  FILTER_BLOCKED_ONLY: "Только заблокированные",
-  FILTER_ACTIVE_LABEL: "Учётка",
-  FILTER_ACTIVE_ANY: "Активные",
-  FILTER_ACTIVE_INACTIVE: "Отключённые",
-  FILTER_CONFIRMED_LABEL: "Подтверждение данных",
-  FILTER_CONFIRMED_ANY: "Все",
-  FILTER_CONFIRMED_ONLY: "Только подтверждённые",
-  FILTER_CONFIRMED_NOT: "Не подтверждённые",
 };
 
 /** Админ: редактирование чужого профиля */
@@ -566,6 +583,10 @@ export const CREATE_PRODUCT_MODAL_UI = {
   LABEL_PRICE: "Цена",
   LABEL_CATEGORY: "Категория",
   LABEL_AVAILABLE: "Товар в наличии",
+  LABEL_STOCK_QUANTITY: "Количество в наличии (шт.)",
+  ERROR_STOCK: "Укажите количество от 1 до 9999",
+  MANAGE_SECTION_TITLE: "Управление товаром",
+  MANAGE_SECTION_ARIA: "Дополнительные действия с товаром",
   LABEL_AUCTION: "Проводить аукцион (предложения цены)",
   SUBMIT_IDLE: "Создать",
   SUBMIT_LOADING: "Создаём…",
@@ -604,6 +625,7 @@ export const PRODUCT_CARD_UI = {
   MANAGE_PRODUCT_TOGGLE: "Редактировать",
   MANAGE_PRODUCT_COLLAPSE: "Свернуть",
   EDIT_PRODUCT: "Изменить",
+  PROMOTION_BUTTON: "Продвигать",
   DELETE_PRODUCT: "Удалить товар",
   DELETE_PRODUCT_PENDING: "Удаление…",
   DELETE_CONFIRM_QUESTION: "Вы уверены, что хотите удалить этот товар?",
@@ -612,12 +634,147 @@ export const PRODUCT_CARD_UI = {
   OPEN_SALES_LOCKED_HINT:
     "Скрыть или удалить можно, когда все покупки по товару подтверждены покупателями (или отменены).",
   HIDDEN_FROM_CATALOG_BADGE: "Скрыт от покупателей",
+  /** @param {number} count */
+  REMAINING_STOCK: (count) => `Осталось: ${count} шт.`,
   IMAGE_LIGHTBOX_OPEN_LABEL: "Показать изображение в полном размере",
   IMAGE_LIGHTBOX_CLOSE: "Закрыть просмотр изображения",
   IMAGE_LIGHTBOX_DIALOG_LABEL: "Изображение товара",
   IMAGE_LIGHTBOX_DIALOG_LABEL_GALLERY: "Фотографии товара",
   GALLERY_PREV: "Предыдущее фото",
   GALLERY_NEXT: "Следующее фото",
+  PROMOTED_BADGE: "Продвигаемый товар",
+  /** @param {string} until */
+  PROMOTED_UNTIL: (until) => `В продвижении до ${until}`,
+  PROMOTION_PENDING_BADGE: "Ожидает подтверждения staff",
+  RAFFLE_BADGE: "Розыгрыш",
+  RAFFLE_PARTICIPATION_ON: "Участвует в розыгрыше",
+  RAFFLE_PARTICIPATION_OFF: "Добавить в розыгрыш",
+  RAFFLE_PARTICIPATION_PENDING: "Сохраняем…",
+  AUCTION_STATUS_ON: "Проводится аукцион (предложения цены)",
+  AUCTION_STATUS_OFF: "Аукцион не проводится",
+  AUCTION_TOGGLE_ON: "Проводить аукцион (предложения цены)",
+  AUCTION_TOGGLE_OFF: "Выключить аукцион",
+  AUCTION_TOGGLE_PENDING: "Обновление…",
+};
+
+export const CREATE_RAFFLE_MODAL_UI = {
+  ARIA_DIALOG: "Создание розыгрыша",
+  ARIA_DIALOG_EDIT: "Редактирование розыгрыша",
+  ARIA_CLOSE: "Закрыть",
+  TITLE: "Создать розыгрыш",
+  TITLE_EDIT: "Изменить розыгрыш",
+  LABEL_TITLE: "Название",
+  LABEL_DESCRIPTION: "Описание",
+  LABEL_PRIZE_IMAGE: "Фото приза (URL)",
+  LABEL_TARGET: "Цель продаж",
+  LABEL_INSTAGRAM: "Ссылка Instagram",
+  SUBMIT: "Отправить на модерацию",
+  SUBMIT_EDIT: "Сохранить",
+  SUBMIT_LOADING: "Отправляем…",
+  SUBMIT_EDIT_LOADING: "Сохраняем…",
+  HINT: "После одобрения staff включите участие на своих товарах в «Мои товары».",
+  HINT_EDIT_ACTIVE:
+    "Изменения цели продаж пересчитают прогресс для активного розыгрыша.",
+};
+
+export const RAFFLE_FEATURED_CAROUSEL_UI = {
+  PREV: "Предыдущий розыгрыш",
+  NEXT: "Следующий розыгрыш",
+  /** @param {number} index @param {number} total */
+  SLIDE_ARIA: (index, total) => `Слайд ${index} из ${total}`,
+  AUTOPLAY_MS: 6000,
+};
+
+export const RAFFLE_FEATURED_BANNER_UI = {
+  BADGE: "Розыгрыш",
+  /** @param {number} progress @param {number} target */
+  PROGRESS: (progress, target) => `${progress} / ${target} продаж`,
+  REMAINING: (left) => `Осталось ${left}`,
+  COMPLETED: "Завершён",
+  OPEN_PRODUCTS: "Товары розыгрыша",
+  OPEN_INSTAGRAM: "Итоги в Instagram",
+  DESCRIPTION_MODAL_TITLE: "Описание",
+  DESCRIPTION_OPEN_ARIA: "Открыть полное описание розыгрыша",
+  CLOSE: "Закрыть",
+};
+
+export const RAFFLE_MANAGE_UI = {
+  GROUP_LABEL: "Управление розыгрышем",
+  EDIT: "Изменить",
+  DELETE: "Удалить",
+  PAUSE: "Снять с витрины",
+  DELETE_CONFIRM_OWNER:
+    "Удалить розыгрыш? Участие товаров будет снято, восстановить нельзя.",
+  DELETE_CONFIRM_STAFF: "Удалить розыгрыш без возможности восстановления?",
+  LIVE_SECTION_TITLE: "Розыгрыш на главной",
+};
+
+export const RAFFLE_SELLER_PANEL_UI = {
+  TITLE: "Ваш розыгрыш",
+  EMPTY: "Активного розыгрыша нет.",
+  STATUS_PENDING: "На модерации",
+  STATUS_ACTIVE: "На главной",
+  STATUS_PAUSED: "Снят с витрины",
+  STATUS_COMPLETED: "Завершён",
+  STATUS_REJECTED: "Отклонён",
+  PAUSE: "Снять с витрины",
+  EDIT: "Изменить",
+  DELETE: "Удалить",
+  DELETE_CONFIRM:
+    "Удалить розыгрыш? Участие товаров будет снято, восстановить нельзя.",
+  ARCHIVE_TITLE: "Архив",
+  REJECTION_PREFIX: "Причина:",
+};
+
+export const RAFFLES_STAFF_PAGE_UI = {
+  TITLE: "Розыгрыши",
+  QUEUE_TITLE: "Заявки на модерацию",
+  EMPTY: "Нет заявок на розыгрыш.",
+  LOADING: "Загрузка…",
+  APPROVE: "Одобрить",
+  REJECT: "Отклонить",
+  EDIT: "Изменить",
+  DELETE: "Удалить",
+  DELETE_CONFIRM: "Удалить розыгрыш без возможности восстановления?",
+  PENDING: "Сохраняем…",
+  /** @param {number} count */
+  TAB_BADGE: (count) => (count > 99 ? "99+" : String(count)),
+  ROW_SELLER: "Продавец",
+  ROW_TARGET: "Цель",
+};
+
+export const RAFFLE_PRODUCTS_PAGE_UI = {
+  TITLE: "Товары розыгрыша",
+  LOADING: "Загрузка…",
+  EMPTY: "Нет товаров в этом розыгрыше.",
+  BACK_CATALOG: "В каталог",
+};
+
+export const PRODUCT_PROMOTIONS_STAFF_PAGE_UI = {
+  TITLE: "Продвижение товаров",
+  EMPTY: "Нет заявок на продвижение.",
+  LOADING: "Загрузка…",
+  APPROVE: "Одобрить",
+  REJECT: "Отклонить",
+  PENDING: "Сохраняем…",
+  /** @param {number} count */
+  TAB_BADGE: (count) => (count > 99 ? "99+" : String(count)),
+  ROW_PRODUCT: "Товар",
+  ROW_TARIFF: "Пакет",
+  ROW_PRICE: "Сумма",
+};
+
+export const PRODUCT_PROMOTION_UI = {
+  MODAL_TITLE: "Продвижение товара",
+  MODAL_SUBTITLE: (productName) => `Товар: ${productName || "Без названия"}`,
+  PAYMENT_PLACEHOLDER: "Оплата подключится позже, заявка отправится staff-команде.",
+  TARIFF_LABEL: "Пакет продвижения",
+  TARIFF_OPTION: (title, priceRub) => `${title} — ${priceRub} ₽`,
+  TARIFF_DURATION: (durationHours) => `Срок действия: ${durationHours} ч.`,
+  SUBMIT: "Отправить на подтверждение",
+  SUBMIT_PENDING: "Отправка…",
+  CANCEL: "Отмена",
+  CLOSE: "Закрыть",
 };
 
 /** Модалка входа */
@@ -715,14 +872,17 @@ export const USER_PROFILE_PRODUCTS_UI = {
 };
 
 /** «Мой профиль» в шапке модалки и выход */
-export const MY_PROFILE_MODAL_UI = {
+export const MY_PROFILE_PAGE_UI = {
   TAB_TITLE: "Мой профиль",
+  TAB_CREATE_RAFFLE: "Создать розыгрыш",
   TAB_MY_PRODUCTS: "Мои товары",
   TAB_MY_SALES: "Мои продажи",
   TAB_MY_ORDERS: "Мои покупки",
   TAB_ADMIN_ORDERS: "Все заказы",
   TAB_PRODUCT_MODERATION: "На модерации",
   TAB_PRODUCT_REPORTS: "Жалобы",
+  TAB_PRODUCT_PROMOTIONS: "Продвижение",
+  TAB_RAFFLES: "Розыгрыши",
   TAB_DATA_CONFIRMATION: "Подтверждение",
   TAB_SUBSCRIPTIONS: "Подписки",
   DATA_CONFIRMATION: "Подтверждение данных",
@@ -763,6 +923,7 @@ export const EDIT_PROFILE_MODAL_UI = {
 export const PROFILE_IMAGE_FOCUS_EDITOR_UI = {
   HINT_AVATAR: "Кликните или перетащите картинку, чтобы выбрать область",
   HINT_BACKGROUND: "Кликните или перетащите картинку, чтобы выбрать область",
+  HINT_RAFFLE_PRIZE: "Кликните или перетащите фото приза, чтобы выбрать область",
 };
 
 /** Подписи полей профиля в `dl` и форматирование */

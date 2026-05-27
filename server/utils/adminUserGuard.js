@@ -72,11 +72,7 @@ export async function getBlockedUserIds() {
 /** Продавцы, чьи товары не показываем в публичном каталоге. */
 export async function getHiddenSellerIds() {
     const rows = await UserModel.find({
-        $or: [
-            { isBlockedUser: true },
-            { isActiveUser: false },
-            { userRole: ADMIN_ROLE },
-        ],
+        $or: [{ isBlockedUser: true }, { isActiveUser: false }],
     })
         .select('_id')
         .lean();

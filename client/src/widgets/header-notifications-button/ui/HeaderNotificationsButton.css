@@ -1,0 +1,55 @@
+.header-notifications-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  margin: 0;
+  padding: 0;
+  border: 1px solid rgba(31, 111, 235, 0.35);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: none;
+  color: #1f6feb;
+  cursor: pointer;
+}
+
+.header-notifications-button:hover {
+  border-color: #1f6feb;
+  background: rgba(31, 111, 235, 0.06);
+  color: #1d4ed8;
+}
+
+.header-notifications-button--active,
+.header-notifications-button--active:hover {
+  border-color: #1f6feb;
+  background: rgba(31, 111, 235, 0.1);
+  color: #1d4ed8;
+}
+
+.header-notifications-button__icon {
+  display: block;
+  width: 1.15rem;
+  height: 1.15rem;
+  transform: scaleY(1.12);
+}
+
+.header-notifications-button__badge {
+  position: absolute;
+  top: -0.2rem;
+  right: -0.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: #b42318;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1;
+}

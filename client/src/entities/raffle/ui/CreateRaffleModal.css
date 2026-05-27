@@ -1,0 +1,92 @@
+.create-raffle-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgb(0 0 0 / 45%);
+}
+
+.create-raffle-modal {
+  box-sizing: border-box;
+  width: min(100%, 28rem);
+  max-height: min(92vh, 40rem);
+  overflow: auto;
+  padding: 1rem 1.1rem 1.15rem;
+  border-radius: 14px;
+  background: Canvas;
+  color: CanvasText;
+}
+
+.create-raffle-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.create-raffle-modal__header h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.create-raffle-modal__close {
+  border: none;
+  background: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.create-raffle-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.create-raffle-modal__form input,
+.create-raffle-modal__form textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  border-radius: 8px;
+  font: inherit;
+}
+
+.create-raffle-modal__hint {
+  margin: 0;
+  font-size: 0.8rem;
+  opacity: 0.75;
+  line-height: 1.4;
+}
+
+.create-raffle-modal__error {
+  margin: 0;
+  color: #b91c1c;
+  font-size: 0.85rem;
+}
+
+.create-raffle-modal__actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-top: 0.35rem;
+}
+
+.create-raffle-modal__actions button {
+  padding: 0.45rem 0.75rem;
+  border-radius: 8px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.create-raffle-modal__actions button[type="submit"] {
+  border: 1px solid #7c3aed;
+  background: #ede9fe;
+  color: #5b21b6;
+  font-weight: 600;
+}

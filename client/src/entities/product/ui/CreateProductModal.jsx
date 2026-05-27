@@ -11,9 +11,14 @@ import {
   PRODUCT_CATEGORY_ELECTRONICS,
 } from "../model/productConstants.js";
 import { PRODUCT_MODERATION_APPROVED } from "../model/productModerationConstants.js";
+import {
+  PRODUCT_STOCK_QUANTITY_MAX,
+  PRODUCT_STOCK_QUANTITY_MIN,
+} from "../model/productStockConstants.js";
 import { CreateProductCategorySelect } from "./CreateProductCategorySelect.jsx";
 import { urlsFromImageRows } from "../lib/productImageRowHelpers.js";
 import { validateProductDescription } from "../lib/validateProductDescription.js";
+import { ProductEditManageSection } from "./ProductEditManageSection.jsx";
 import { ProductImageUrlSortableList } from "./ProductImageUrlSortableList.jsx";
 import {
   COMMON_UI,
@@ -30,6 +35,7 @@ const INITIAL_FORM = {
   productPrice: "",
   productCategory: PRODUCT_CATEGORY_ELECTRONICS,
   productIsAvailable: true,
+  productStockQuantity: "1",
   productAuctionEnabled: false,
 };
 
@@ -50,6 +56,11 @@ function formStateFromProduct(product) {
     productPrice: priceStr,
     productCategory: product.productCategory ?? PRODUCT_CATEGORY_ELECTRONICS,
     productIsAvailable: product.productIsAvailable !== false,
+    productStockQuantity:
+      product.productIsAvailable !== false &&
+      product.productStockQuantity != null
+        ? String(Math.max(0, Math.floor(Number(product.productStockQuantity))))
+        : "1",
     productAuctionEnabled: product.productAuctionEnabled === true,
   };
 }
@@ -61,6 +72,29 @@ function formStateFromProduct(product) {
  *   onSuccess?: (product: import('../model/types.js').ProductFromApi) => void;
  *   mode?: 'create' | 'edit';
  *   productToEdit?: import('../model/types.js').ProductFromApi | null;
+ *   manageProduct?: import('../model/types.js').ProductFromApi | null;
+ *   onDeleteProduct?: (productId: string) => void | Promise<void>;
+ *   onSetProductAvailability?: (
+ *     productId: string,
+ *     productIsAvailable: boolean,
+ *   ) => void | Promise<void>;
+ *   onSetProductAuction?: (
+ *     productId: string,
+ *     productAuctionEnabled: boolean,
+ *   ) => void | Promise<void>;
+ *   isDeletePending?: boolean;
+ *   isAvailabilityTogglePending?: boolean;
+ *   isAuctionTogglePending?: boolean;
+ *   manageErrorMessage?: string;
+ *   canManageEdit?: boolean;
+ *   canManageDelete?: boolean;
+ *   canManageToggleVisibility?: boolean;
+ *   sellerRaffleActive?: boolean;
+ *   onToggleRaffleParticipation?: (
+ *     product: import('../model/types.js').ProductFromApi,
+ *     enabled: boolean,
+ *   ) => void;
+ *   isRaffleParticipationPending?: boolean;
  * }} props
  */
 export function CreateProductModal({
@@ -69,15 +103,32 @@ export function CreateProductModal({
   onSuccess,
   mode = "create",
   productToEdit = null,
+  manageProduct = null,
+  onDeleteProduct,
+  onSetProductAvailability,
+  onSetProductAuction,
+  isDeletePending = false,
+  isAvailabilityTogglePending = false,
+  isAuctionTogglePending = false,
+  manageErrorMessage = "",
+  canManageEdit = true,
+  canManageDelete = true,
+  canManageToggleVisibility = true,
+  sellerRaffleActive = false,
+  onToggleRaffleParticipation,
+  isRaffleParticipationPending = false,
 }) {
   const [form, setForm] = useState(INITIAL_FORM);
   const [status, setStatus] = useState({ kind: "idle", message: "" });
   const isEdit = mode === "edit";
   const isSubmitting = status.kind === "loading";
+  const showManageSection =
+    isEdit && manageProduct != null && typeof onDeleteProduct === "function";
   const showCatalogAvailabilityToggle =
-    !isEdit ||
-    (productToEdit?.productModerationStatus ?? PRODUCT_MODERATION_APPROVED) ===
-      PRODUCT_MODERATION_APPROVED;
+    !showManageSection &&
+    (!isEdit ||
+      (productToEdit?.productModerationStatus ?? PRODUCT_MODERATION_APPROVED) ===
+        PRODUCT_MODERATION_APPROVED);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -107,7 +158,14 @@ export function CreateProductModal({
 
   const handleAvailableChange = (event) => {
     const checked = event.target.checked;
-    setForm((prev) => ({ ...prev, productIsAvailable: checked }));
+    setForm((prev) => ({
+      ...prev,
+      productIsAvailable: checked,
+      productStockQuantity:
+        checked && !String(prev.productStockQuantity).trim()
+          ? "1"
+          : prev.productStockQuantity,
+    }));
   };
 
   const handleAuctionChange = (event) => {
@@ -149,6 +207,33 @@ export function CreateProductModal({
 
       const urls = urlsFromImageRows(form.productImageRows);
 
+      const stockParsed = Math.floor(Number(form.productStockQuantity));
+      const listedInCatalog = form.productIsAvailable === true;
+      const stockRequired =
+        listedInCatalog || (isEdit && !showCatalogAvailabilityToggle);
+      let productStockQuantity = 0;
+      if (stockRequired) {
+        if (
+          !Number.isFinite(stockParsed) ||
+          stockParsed < PRODUCT_STOCK_QUANTITY_MIN ||
+          stockParsed > PRODUCT_STOCK_QUANTITY_MAX
+        ) {
+          setStatus({
+            kind: "error",
+            message: CREATE_PRODUCT_MODAL_UI.ERROR_STOCK,
+          });
+          return;
+        }
+        productStockQuantity = stockParsed;
+      } else if (
+        isEdit &&
+        Number.isFinite(stockParsed) &&
+        stockParsed >= 0 &&
+        stockParsed <= PRODUCT_STOCK_QUANTITY_MAX
+      ) {
+        productStockQuantity = stockParsed;
+      }
+
       let product;
       if (isEdit) {
         if (productToEdit?._id == null) {
@@ -168,7 +253,9 @@ export function CreateProductModal({
         if (showCatalogAvailabilityToggle) {
           patchBody.productIsAvailable = form.productIsAvailable;
         }
-        patchBody.productAuctionEnabled = form.productAuctionEnabled;
+        if (isEdit || showCatalogAvailabilityToggle) {
+          patchBody.productStockQuantity = productStockQuantity;
+        }
         product = await patchMyProduct(String(productToEdit._id), patchBody);
       } else {
         product = await createProduct({
@@ -178,6 +265,7 @@ export function CreateProductModal({
           productPrice,
           productCategory: form.productCategory,
           productIsAvailable: form.productIsAvailable,
+          productStockQuantity,
           productAuctionEnabled: form.productAuctionEnabled,
         });
       }
@@ -307,15 +395,60 @@ export function CreateProductModal({
                 {CREATE_PRODUCT_MODAL_UI.LABEL_AVAILABLE}
               </label>
             ) : null}
-            <label className="create-product-modal__check">
-              <input
-                type="checkbox"
-                checked={form.productAuctionEnabled}
-                onChange={handleAuctionChange}
+            {form.productIsAvailable || isEdit ? (
+              <label className="create-product-modal__label">
+                <FormFieldLabel
+                  required={form.productIsAvailable || !showCatalogAvailabilityToggle}
+                >
+                  {CREATE_PRODUCT_MODAL_UI.LABEL_STOCK_QUANTITY}
+                </FormFieldLabel>
+                <input
+                  className="create-product-modal__input"
+                  type="number"
+                  name="productStockQuantity"
+                  value={form.productStockQuantity}
+                  onChange={handleChange}
+                  min={PRODUCT_STOCK_QUANTITY_MIN}
+                  max={PRODUCT_STOCK_QUANTITY_MAX}
+                  step={1}
+                  inputMode="numeric"
+                  disabled={isSubmitting}
+                  required={
+                    form.productIsAvailable || !showCatalogAvailabilityToggle
+                  }
+                />
+              </label>
+            ) : null}
+            {!isEdit ? (
+              <label className="create-product-modal__check">
+                <input
+                  type="checkbox"
+                  checked={form.productAuctionEnabled}
+                  onChange={handleAuctionChange}
+                  disabled={isSubmitting}
+                />
+                {CREATE_PRODUCT_MODAL_UI.LABEL_AUCTION}
+              </label>
+            ) : null}
+            {showManageSection && manageProduct ? (
+              <ProductEditManageSection
+                product={manageProduct}
+                onDelete={onDeleteProduct}
+                onSetAvailability={onSetProductAvailability}
+                onSetAuction={onSetProductAuction}
+                isDeletePending={isDeletePending}
+                isAvailabilityTogglePending={isAvailabilityTogglePending}
+                isAuctionTogglePending={isAuctionTogglePending}
+                errorMessage={manageErrorMessage}
+                canEdit={canManageEdit}
+                canDelete={canManageDelete}
+                canToggleVisibility={canManageToggleVisibility}
+                sellerRaffleActive={sellerRaffleActive}
+                onToggleRaffleParticipation={onToggleRaffleParticipation}
+                isRaffleParticipationPending={isRaffleParticipationPending}
                 disabled={isSubmitting}
               />
-              {CREATE_PRODUCT_MODAL_UI.LABEL_AUCTION}
-            </label>
+            ) : null}
             {status.kind === "error" ? (
               <p
                 className="create-product-modal__message create-product-modal__message_error"

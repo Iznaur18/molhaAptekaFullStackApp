@@ -1,0 +1,66 @@
+.raffle-description-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(8, 16, 30, 0.5);
+}
+
+.raffle-description-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: min(100%, 32rem);
+  max-height: min(80vh, 28rem);
+  padding: 1rem 1.1rem;
+  border: 2px solid #c4b5fd;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #faf5ff 0%, #fff 55%, #fff 100%);
+  box-shadow: 0 12px 38px rgb(124 58 237 / 22%);
+}
+
+.raffle-description-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.raffle-description-modal__header h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.25;
+  color: #5b21b6;
+}
+
+.raffle-description-modal__close {
+  flex-shrink: 0;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid #7c3aed;
+  border-radius: 8px;
+  background: #ede9fe;
+  color: #5b21b6;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.raffle-description-modal__raffle-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.raffle-description-modal__text {
+  margin: 0;
+  overflow-y: auto;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  opacity: 0.92;
+}

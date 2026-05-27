@@ -219,10 +219,6 @@ export function getUserProfileRows(user, options = {}) {
     if (!role || role === USER_ROLE_USER) {
       return false;
     }
-    if (role === USER_ROLE_ADMIN) {
-      return showAdminRole;
-    }
-
-    return true;
+    return showAdminRole && role === USER_ROLE_ADMIN;
   });
 }

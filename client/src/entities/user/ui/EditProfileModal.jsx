@@ -50,6 +50,7 @@ const ROLE_OPTIONS = [USER_ROLE_USER, USER_ROLE_MODERATOR, USER_ROLE_ADMIN];
  *   onSaved: (user: import('../model/types.js').UserPublicProfile) => void;
  *   adminMode?: boolean;
  *   staffCanEditRole?: boolean;
+ *   allowSelfPremiumToggle?: boolean;
  * }} props
  */
 export function EditProfileModal({
@@ -59,6 +60,7 @@ export function EditProfileModal({
   onSaved,
   adminMode = false,
   staffCanEditRole = false,
+  allowSelfPremiumToggle = false,
 }) {
   const [form, setForm] = useState(() => mapUserToEditProfileForm({ _id: "" }));
   const [feedback, setFeedback] = useState({ kind: "idle", message: "" });
@@ -93,12 +95,13 @@ export function EditProfileModal({
     [form.notesAboutUser],
   );
 
-  const isPremiumUser = Boolean(user?.isPremiumUser);
-  const backgroundMode = adminMode
-    ? "admin"
-    : isPremiumUser
-      ? "image"
-      : "preset";
+  const isPremiumUser = Boolean(form.isPremiumUser);
+  const backgroundMode =
+    adminMode || allowSelfPremiumToggle
+      ? "admin"
+      : isPremiumUser
+        ? "image"
+        : "preset";
 
   const avatarFocusImageUrl = useMemo(() => {
     const url = String(form.userAvatarUrl ?? "").trim();
@@ -149,7 +152,10 @@ export function EditProfileModal({
     try {
       const body = adminMode
         ? buildAdminPatchUserProfileBody(form)
-        : buildPatchUserProfileBody(form, { backgroundMode });
+        : buildPatchUserProfileBody(form, {
+            backgroundMode,
+            includePremium: allowSelfPremiumToggle,
+          });
       const updated = await patchUserProfile(String(user._id), body);
       onSaved(updated);
     } catch (e) {
@@ -370,6 +376,17 @@ export function EditProfileModal({
               />
               {EDIT_PROFILE_MODAL_UI.LABEL_NOTIFICATIONS}
             </label>
+            {allowSelfPremiumToggle ? (
+              <label className="edit-profile-modal__label edit-profile-modal__label_row">
+                <input
+                  type="checkbox"
+                  name="isPremiumUser"
+                  checked={form.isPremiumUser}
+                  onChange={handleChange}
+                />
+                {ADMIN_EDIT_USER_UI.LABEL_PREMIUM}
+              </label>
+            ) : null}
             {adminMode ? (
               <fieldset className="edit-profile-modal__fieldset">
                 <legend className="edit-profile-modal__legend">

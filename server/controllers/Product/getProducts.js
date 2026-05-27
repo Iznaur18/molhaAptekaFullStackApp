@@ -20,6 +20,8 @@ import {
 } from '../../utils/productCatalogQuery.js';
 import { USER_FOLLOW_FOLLOWING_ONLY_AUTH_MESSAGE } from '../../constants/userFollowConstants.js';
 import { getVisibleFollowingSellerIds } from '../../utils/userFollowHelpers.js';
+import { expireProductPromotionsAndSendNotifications } from '../../utils/productPromotionHelpers.js';
+import { attachProductAvailablePurchaseQuantity } from '../../utils/productStock.js';
 import { buildRegexSearchOr, errorRes, successRes } from '../../utils/index.js';
 
 const parseTruthyQueryFlag = (raw) =>
@@ -57,6 +59,7 @@ const buildPagination = (page, limit, total) => ({
 
 export const getProductsController = async (req, res) => {
     try {
+        await expireProductPromotionsAndSendNotifications();
         const { page, limit, skip } = parsePagination(req.query);
         const category = categoryFromQuery(req.query);
         const premiumOnly = req.query.sort === PRODUCT_SORT_PREMIUM;
@@ -84,6 +87,7 @@ export const getProductsController = async (req, res) => {
         }
         if (!includeHidden) {
             catalogBaseQuery.productIsAvailable = { $ne: false };
+            catalogBaseQuery.productStockQuantity = { $gt: 0 };
         }
 
         if (premiumOnly) {
@@ -153,12 +157,12 @@ export const getProductsController = async (req, res) => {
             countProducts(productsQuery),
         ]);
 
-        let productsPayload = products;
+        let productsPayload = await attachProductAvailablePurchaseQuantity(products);
         if (isAdmin) {
             const openSalesIds = await getProductIdsWithOpenSales(
                 products.map((p) => String(p._id)),
             );
-            productsPayload = products.map((product) => ({
+            productsPayload = productsPayload.map((product) => ({
                 ...product,
                 hasOpenSales: openSalesIds.has(String(product._id)),
             }));
@@ -203,10 +207,12 @@ export const getMyProductsController = async (req, res) => {
         const openSalesIds = await getProductIdsWithOpenSales(
             products.map((p) => String(p._id)),
         );
-        const productsWithSalesFlags = products.map((product) => ({
-            ...product,
-            hasOpenSales: openSalesIds.has(String(product._id)),
-        }));
+        const productsWithSalesFlags = await attachProductAvailablePurchaseQuantity(
+            products.map((product) => ({
+                ...product,
+                hasOpenSales: openSalesIds.has(String(product._id)),
+            })),
+        );
 
         return successRes(res, {
             products: productsWithSalesFlags,

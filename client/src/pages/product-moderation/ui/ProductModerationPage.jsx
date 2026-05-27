@@ -14,9 +14,10 @@ import "./ProductModerationPage.css";
 /**
  * @param {{
  *   onSellerNameClick?: (userId: string) => void;
+ *   onQueueChanged?: () => void;
  * }} props
  */
-export function ProductModerationPage({ onSellerNameClick }) {
+export function ProductModerationPage({ onSellerNameClick, onQueueChanged }) {
   const [phase, setPhase] = useState("loading");
   const [products, setProducts] = useState(
     /** @type {import('../../../entities/product/model/types.js').ProductFromApi[]} */ ([]),
@@ -39,6 +40,7 @@ export function ProductModerationPage({ onSellerNameClick }) {
       });
       setProducts(list);
       setPhase("success");
+      onQueueChanged?.();
     } catch (e) {
       setError(
         e instanceof Error
@@ -47,7 +49,7 @@ export function ProductModerationPage({ onSellerNameClick }) {
       );
       setPhase("error");
     }
-  }, []);
+  }, [onQueueChanged]);
 
   useEffect(() => {
     void loadQueue();
@@ -74,6 +76,7 @@ export function ProductModerationPage({ onSellerNameClick }) {
       setCardErrors((prev) => ({ ...prev, [productId]: "" }));
       await approveProductModeration(productId);
       removeFromQueue(productId);
+      onQueueChanged?.();
     } catch (e) {
       const message =
         e instanceof Error
@@ -94,6 +97,7 @@ export function ProductModerationPage({ onSellerNameClick }) {
       const comment = rejectComments[productId] ?? "";
       await rejectProductModeration(productId, comment);
       removeFromQueue(productId);
+      onQueueChanged?.();
     } catch (e) {
       const message =
         e instanceof Error

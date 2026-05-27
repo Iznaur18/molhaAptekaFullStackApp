@@ -109,7 +109,7 @@ async function createAdminUser({ email, password, userName }) {
 }
 
 async function promoteExistingUser(user, { password, resetPassword }) {
-  const update = { userRole: ADMIN_ROLE };
+  const update = { userRole: ADMIN_ROLE, isActiveUser: true, isBlockedUser: false };
 
   if (resetPassword) {
     update.passwordHash = await hashPassword(password);

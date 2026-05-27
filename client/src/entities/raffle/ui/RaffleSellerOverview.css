@@ -1,0 +1,59 @@
+.raffle-seller-overview {
+  margin: 0 0 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid color-mix(in srgb, #7c3aed 28%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, #ede9fe 40%, transparent);
+}
+
+.raffle-seller-overview__title {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+}
+
+.raffle-seller-overview__empty,
+.raffle-seller-overview__state {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.raffle-seller-overview__state_error {
+  color: #b91c1c;
+}
+
+.raffle-seller-overview__name {
+  margin: 0 0 0.2rem;
+  font-weight: 700;
+}
+
+.raffle-seller-overview__status {
+  margin: 0 0 0.5rem;
+  font-size: 0.82rem;
+}
+
+.raffle-seller-overview__comment {
+  margin: 0 0 0.5rem;
+  font-size: 0.8rem;
+  color: #b45309;
+}
+
+.raffle-seller-overview__actions {
+  margin-top: 0.5rem;
+}
+
+.raffle-seller-overview__archive {
+  margin-top: 0.75rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.raffle-seller-overview__archive h4 {
+  margin: 0 0 0.35rem;
+  font-size: 0.82rem;
+}
+
+.raffle-seller-overview__archive ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.8rem;
+}
