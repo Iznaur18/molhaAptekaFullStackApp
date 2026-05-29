@@ -10,6 +10,7 @@ import {
     ORDER_STATUS_CONFIRMED,
     ORDER_STATUS_DELIVERED,
 } from '../../constants/orderConstants.js';
+import { syncRaffleProgressForProductSale } from '../../utils/raffleHelpers.js';
 import {
     decrementProductStockOnItemConfirmed,
     restoreProductStockOnItemCancelled,
@@ -48,6 +49,16 @@ export const updateOrderStatusController = async (req, res) => {
                     );
                 } catch (stockError) {
                     console.error('restoreProductStockOnItemCancelled error:', stockError);
+                }
+                if (previousStatus === ORDER_STATUS_CONFIRMED) {
+                    try {
+                        await syncRaffleProgressForProductSale(productId);
+                    } catch (raffleSyncError) {
+                        console.error(
+                            'syncRaffleProgressForProductSale error:',
+                            raffleSyncError,
+                        );
+                    }
                 }
             } else if (
                 status === ORDER_STATUS_CONFIRMED &&

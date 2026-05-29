@@ -8,6 +8,7 @@ import { up as orderLineLoyaltyPointsUp } from "./20260526-order-line-loyalty-po
 import { up as productAuctionUp } from "./20260527-product-auction.js";
 import { up as adminCatalogProductsUp } from "./20260528-admin-catalog-products.js";
 import { up as productStockQuantityUp } from "./20260529-product-stock-quantity.js";
+import { up as raffleSalesConfirmedOnlyUp } from "./20260530-raffle-sales-confirmed-only.js";
 
 export const MIGRATIONS = [
   {
@@ -59,5 +60,10 @@ export const MIGRATIONS = [
     id: "20260529-product-stock-quantity",
     description: "Backfill productStockQuantity for existing products",
     up: productStockQuantityUp,
+  },
+  {
+    id: "20260530-raffle-sales-confirmed-only",
+    description: "Recalculate active raffle salesProgress (confirmed sales only)",
+    up: raffleSalesConfirmedOnlyUp,
   },
 ];

@@ -23,11 +23,14 @@ import {
 } from "../model/userConstants.js";
 import {
   ADMIN_EDIT_USER_UI,
-  COMMON_UI,
   EDIT_PROFILE_MODAL_UI,
   USER_DETAILS_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { isHttpProfileImageUrl } from "../lib/profileImageFocus.js";
+import { resolveImageUrlForDisplay } from "../../../shared/lib/resolveUploadedImageUrl.js";
+import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
+import { ImageUrlField } from "../../../shared/ui/ImageUrlField/ImageUrlField.jsx";
+import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
 import { ProfileImageFocusEditor } from "./ProfileImageFocusEditor.jsx";
 import { UserBackgroundPresetPicker } from "./UserBackgroundPresetPicker.jsx";
 import { UserBackgroundPreview } from "./UserBackgroundPreview.jsx";
@@ -72,14 +75,7 @@ export function EditProfileModal({
     return undefined;
   }, [isOpen, user]);
 
-  useEffect(() => {
-    if (!isOpen) return undefined;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [isOpen]);
+  useScrollLock(isOpen);
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -104,12 +100,12 @@ export function EditProfileModal({
         : "preset";
 
   const avatarFocusImageUrl = useMemo(() => {
-    const url = String(form.userAvatarUrl ?? "").trim();
+    const url = resolveImageUrlForDisplay(form.userAvatarUrl ?? "");
     return isHttpProfileImageUrl(url) ? url : "";
   }, [form.userAvatarUrl]);
 
   const backgroundFocusImageUrl = useMemo(() => {
-    const url = String(form.backgroundImageUrl ?? "").trim();
+    const url = resolveImageUrlForDisplay(form.backgroundImageUrl ?? "");
     if (!isHttpProfileImageUrl(url)) return "";
     if (backgroundMode === "image" || backgroundMode === "admin") return url;
     return "";
@@ -193,7 +189,7 @@ export function EditProfileModal({
             onClick={handleClose}
             aria-label={USER_DETAILS_MODAL_UI.ARIA_CLOSE}
           >
-            {COMMON_UI.MODAL_CLOSE_GLYPH}
+            <ModalCloseIcon />
           </button>
         </div>
         <form className="edit-profile-modal__body" onSubmit={handleSubmit}>
@@ -274,14 +270,15 @@ export function EditProfileModal({
             />
             <label className="edit-profile-modal__label">
               {EDIT_PROFILE_MODAL_UI.LABEL_AVATAR_URL}
-              <input
-                className="edit-profile-modal__input"
-                type="url"
+              <ImageUrlField
                 name="userAvatarUrl"
                 value={form.userAvatarUrl}
-                onChange={handleChange}
+                onChange={(userAvatarUrl) =>
+                  setForm((prev) => ({ ...prev, userAvatarUrl }))
+                }
+                disabled={isSubmitting}
+                inputClassName="edit-profile-modal__input"
                 placeholder={EDIT_PROFILE_MODAL_UI.PLACEHOLDER_HTTPS}
-                autoComplete="off"
               />
             </label>
             {avatarFocusImageUrl ? (
@@ -323,14 +320,15 @@ export function EditProfileModal({
                   {backgroundMode === "admin"
                     ? EDIT_PROFILE_MODAL_UI.LABEL_BG_URL_ADMIN
                     : EDIT_PROFILE_MODAL_UI.LABEL_BG_URL}
-                  <input
-                    className="edit-profile-modal__input"
-                    type="url"
+                  <ImageUrlField
                     name="backgroundImageUrl"
                     value={form.backgroundImageUrl}
-                    onChange={handleChange}
+                    onChange={(backgroundImageUrl) =>
+                      setForm((prev) => ({ ...prev, backgroundImageUrl }))
+                    }
+                    disabled={isSubmitting}
+                    inputClassName="edit-profile-modal__input"
                     placeholder={EDIT_PROFILE_MODAL_UI.PLACEHOLDER_HTTPS}
-                    autoComplete="off"
                   />
                 </label>
                 {backgroundFocusImageUrl ? (

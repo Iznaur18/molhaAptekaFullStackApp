@@ -1,6 +1,4 @@
-function isHttpUrl(value) {
-  return typeof value === "string" && /^https?:\/\//i.test(value.trim());
-}
+import { resolveImageUrlForDisplay, isHttpImageUrl } from "../../../shared/lib/resolveUploadedImageUrl.js";
 
 /**
  * @param {import('../model/types.js').UserPublicProfile | null | undefined} user
@@ -8,6 +6,8 @@ function isHttpUrl(value) {
  */
 export function pickUserProfileBackgroundUrl(user) {
   if (!user) return null;
-  if (isHttpUrl(user.userBackgroundUrl)) return user.userBackgroundUrl.trim();
+  if (isHttpImageUrl(user.userBackgroundUrl)) {
+    return resolveImageUrlForDisplay(user.userBackgroundUrl);
+  }
   return null;
 }

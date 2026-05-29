@@ -18,13 +18,15 @@ import {
 import { CreateProductCategorySelect } from "./CreateProductCategorySelect.jsx";
 import { urlsFromImageRows } from "../lib/productImageRowHelpers.js";
 import { validateProductDescription } from "../lib/validateProductDescription.js";
+import { resolveUploadedImageUrl } from "../../../shared/lib/resolveUploadedImageUrl.js";
+import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import { ProductEditManageSection } from "./ProductEditManageSection.jsx";
 import { ProductImageUrlSortableList } from "./ProductImageUrlSortableList.jsx";
 import {
-  COMMON_UI,
   CREATE_PRODUCT_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { FormFieldLabel } from "../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
+import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
 
 import "./CreateProductModal.css";
 
@@ -140,14 +142,7 @@ export function CreateProductModal({
     setStatus({ kind: "idle", message: "" });
   }, [isOpen, isEdit, productToEdit?._id]);
 
-  useEffect(() => {
-    if (!isOpen) return undefined;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [isOpen]);
+  useScrollLock(isOpen);
 
   if (!isOpen) return null;
 
@@ -205,7 +200,9 @@ export function CreateProductModal({
         return;
       }
 
-      const urls = urlsFromImageRows(form.productImageRows);
+      const urls = urlsFromImageRows(form.productImageRows).map((url) =>
+        resolveUploadedImageUrl(url),
+      );
 
       const stockParsed = Math.floor(Number(form.productStockQuantity));
       const listedInCatalog = form.productIsAvailable === true;
@@ -319,7 +316,7 @@ export function CreateProductModal({
             className="create-product-modal__close"
             onClick={handleClose}
           >
-            {COMMON_UI.MODAL_CLOSE_GLYPH}
+            <ModalCloseIcon />
           </button>
         </div>
         <div className="create-product-modal__body">

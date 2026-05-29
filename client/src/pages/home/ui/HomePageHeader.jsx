@@ -10,8 +10,11 @@ import {
   PRODUCT_CATEGORIES,
   PRODUCT_CATEGORY_LABEL_RU,
 } from "../../../entities/product/model/productConstants.js";
+import { CatalogCategoryFilterButton } from "../../../widgets/catalog-category-filter-button/ui/CatalogCategoryFilterButton.jsx";
 import { HeaderCartButton } from "../../../widgets/header-cart-button/ui/HeaderCartButton.jsx";
 import { HeaderNotificationsButton } from "../../../widgets/header-notifications-button/ui/HeaderNotificationsButton.jsx";
+import { HeaderPlaceProductButton } from "../../../widgets/header-place-product-button/ui/HeaderPlaceProductButton.jsx";
+import { HeaderProfileButton } from "../../../widgets/header-profile-button/ui/HeaderProfileButton.jsx";
 import {
   DATA_CONFIRMATION_PAGE_UI,
   HOME_PAGE_UI,
@@ -22,6 +25,7 @@ import {
 import { getHomeHeaderVariantClass } from "../lib/homeHeaderVariant.js";
 import { isCatalogShellMainView } from "../../../shared/lib/homeMainViewPaths.js";
 import { SearchInput } from "../../../shared/ui/SearchInput/SearchInput.jsx";
+import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 
 const PRODUCT_CATEGORY_FILTER_LIST_ID =
   HOME_PAGE_UI.PRODUCT_CATEGORY_FILTER_LIST_ID;
@@ -144,14 +148,7 @@ export function HomePageHeader({
     return () => document.removeEventListener("pointerdown", handlePointerDown);
   }, [isProductCategoryListOpen, onCloseProductCategoryFilter]);
 
-  useEffect(() => {
-    if (!isProductCategoryListOpen) return undefined;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [isProductCategoryListOpen]);
+  useScrollLock(isProductCategoryListOpen);
 
   const isCatalogView = isCatalogShellMainView(mainView);
   const isHomeNavActive = mainView === "catalog";
@@ -215,33 +212,18 @@ export function HomePageHeader({
             isActive={isCartNavActive}
             onClick={() => onSetMainView("cart")}
           />
-          <button
-            type="button"
-            className="home-page__list-product-button"
+          <HeaderPlaceProductButton
+            isLoginRequired={!isAuthorized}
             onClick={() =>
               isAuthorized ? onPlaceProductClick() : onLoginClick()
             }
-          >
-            {isAuthorized
-              ? HOME_PAGE_UI.LIST_PRODUCT_BUTTON
-              : HOME_PAGE_UI.LOGIN_TO_LIST_PRODUCT}
-          </button>
+          />
           {isAuthorized ? (
             <>
-              <button
-                type="button"
-                className={[
-                  "home-page__auth-button",
-                  "home-page__auth-button_secondary",
-                  isMyProfileNavActive ? "home-page__header-nav-button--active" : "",
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
+              <HeaderProfileButton
+                isActive={isMyProfileNavActive}
                 onClick={onMyProfileClick}
-                aria-current={isMyProfileNavActive ? "page" : undefined}
-              >
-                {HOME_PAGE_UI.AUTH_MY_PROFILE}
-              </button>
+              />
               <HeaderNotificationsButton
                 isActive={isNotificationsNavActive}
                 unreadCount={unreadNotificationsCount}
@@ -446,18 +428,12 @@ function CatalogToolbar({
           />
         </div>
         <div className="home-page__filter" ref={productCategoryFilterRef}>
-          <button
-            type="button"
-            className="home-page__filter-button"
-            aria-expanded={isProductCategoryListOpen}
-            aria-controls={PRODUCT_CATEGORY_FILTER_LIST_ID}
+          <CatalogCategoryFilterButton
+            isOpen={isProductCategoryListOpen}
+            selectedProductCategory={selectedProductCategory}
+            listId={PRODUCT_CATEGORY_FILTER_LIST_ID}
             onClick={onProductCategoryFilterToggle}
-          >
-            {HOME_PAGE_UI.FILTER_BUTTON}
-            {selectedProductCategory
-              ? `: ${PRODUCT_CATEGORY_LABEL_RU[selectedProductCategory]}`
-              : ""}
-          </button>
+          />
           {isProductCategoryListOpen ? (
             <ul
               id={PRODUCT_CATEGORY_FILTER_LIST_ID}

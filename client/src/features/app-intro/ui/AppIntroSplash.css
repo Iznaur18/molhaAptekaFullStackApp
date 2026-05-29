@@ -1,0 +1,128 @@
+.app-intro-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  box-sizing: border-box;
+  background: #0f172a;
+  color: #f8fafc;
+  opacity: 1;
+  transition: opacity 550ms ease;
+}
+
+.app-intro-splash_closing {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.app-intro-splash__media {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-height: calc(100vh - 5rem);
+  min-height: 0;
+}
+
+.app-intro-splash__video {
+  max-width: min(100%, 960px);
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  border-radius: 0.75rem;
+  object-fit: contain;
+  background: #020617;
+}
+
+.app-intro-splash__fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: min(100%, 22rem);
+  aspect-ratio: 16 / 9;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 55%, #db2777 100%);
+  animation: app-intro-splash-pulse 2.4s ease-in-out infinite;
+}
+
+.app-intro-splash__fallback-title {
+  margin: 0;
+  font-size: clamp(2rem, 8vw, 3rem);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.app-intro-splash__fallback-hint {
+  margin: 0;
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+@keyframes app-intro-splash-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.02);
+    filter: brightness(1.08);
+  }
+}
+
+.app-intro-splash__actions {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.65rem;
+}
+
+.app-intro-splash__btn {
+  margin: 0;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.app-intro-splash__btn_primary {
+  border: 1px solid #f8fafc;
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.app-intro-splash__btn_secondary {
+  border: 1px solid rgb(248 250 252 / 45%);
+  background: transparent;
+  color: #f8fafc;
+}
+
+.app-intro-splash__btn:hover:not(:disabled) {
+  opacity: 0.92;
+}
+
+.app-intro-splash__btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-intro-splash {
+    transition: none;
+  }
+
+  .app-intro-splash__fallback {
+    animation: none;
+  }
+}

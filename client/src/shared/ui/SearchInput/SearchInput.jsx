@@ -1,3 +1,5 @@
+import { ModalCloseIcon } from "../icon/index.js";
+
 import "./SearchInput.css";
 
 /**
@@ -45,7 +47,7 @@ export function SearchInput({
           onClick={handleClear}
           aria-label={clearAriaLabel}
         >
-          ×
+          <ModalCloseIcon size="lg" />
         </button>
       ) : null}
       {isPending ? (

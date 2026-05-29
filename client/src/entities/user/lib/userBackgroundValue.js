@@ -1,4 +1,5 @@
 import { USER_PROFILE_COPY } from "../../../shared/config/appUiCopy.js";
+import { resolveImageUrlForDisplay } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import {
   DEFAULT_USER_BACKGROUND_PRESET_ID,
   formatUserBackgroundPresetValue,
@@ -47,7 +48,7 @@ export function resolveUserProfileBackground(input) {
   if (input.kind === "image") {
     const url = input.imageUrl.trim();
     if (isHttpBackgroundImageUrl(url)) {
-      return { kind: "image", url };
+      return { kind: "image", url: resolveImageUrlForDisplay(url) };
     }
   }
   const preset =

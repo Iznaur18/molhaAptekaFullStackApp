@@ -19,9 +19,14 @@ import { CSS } from "@dnd-kit/utilities";
 import { createImageRow } from "../lib/productImageRowHelpers.js";
 import { PRODUCT_IMAGE_URLS_MAX } from "../model/productConstants.js";
 import {
-  COMMON_UI,
   CREATE_PRODUCT_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
+import {
+  isHttpImageUrl,
+  resolveImageUrlForDisplay,
+} from "../../../shared/lib/resolveUploadedImageUrl.js";
+import { ImageUrlField } from "../../../shared/ui/ImageUrlField/ImageUrlField.jsx";
+import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
 
 import "./ProductImageUrlSortableList.css";
 
@@ -30,11 +35,19 @@ import "./ProductImageUrlSortableList.css";
  *   row: import('../lib/productImageRowHelpers.js').ProductImageRow;
  *   index: number;
  *   canRemove: boolean;
+ *   disabled?: boolean;
  *   onUrlChange: (id: string, url: string) => void;
  *   onRemove: (id: string) => void;
  * }} props
  */
-function SortableImageRow({ row, index, canRemove, onUrlChange, onRemove }) {
+function SortableImageRow({
+  row,
+  index,
+  canRemove,
+  disabled = false,
+  onUrlChange,
+  onRemove,
+}) {
   const [previewFailed, setPreviewFailed] = useState(false);
   const {
     attributes,
@@ -51,8 +64,9 @@ function SortableImageRow({ row, index, canRemove, onUrlChange, onRemove }) {
   };
 
   const trimmed = row.url.trim();
+  const displayUrl = resolveImageUrlForDisplay(trimmed);
   const showPreview =
-    trimmed !== "" && /^https?:\/\//i.test(trimmed) && !previewFailed;
+    displayUrl !== "" && isHttpImageUrl(displayUrl) && !previewFailed;
 
   return (
     <li
@@ -79,7 +93,7 @@ function SortableImageRow({ row, index, canRemove, onUrlChange, onRemove }) {
       <div className="product-image-sortable__preview" aria-hidden={!showPreview}>
         {showPreview ? (
           <img
-            src={trimmed}
+            src={displayUrl}
             alt=""
             decoding="async"
             onError={() => setPreviewFailed(true)}
@@ -88,17 +102,15 @@ function SortableImageRow({ row, index, canRemove, onUrlChange, onRemove }) {
           <span className="product-image-sortable__preview-placeholder">—</span>
         )}
       </div>
-      <input
-        className="product-image-sortable__input"
-        type="url"
+      <ImageUrlField
+        compact
         value={row.url}
-        onChange={(event) => {
+        onChange={(url) => {
           setPreviewFailed(false);
-          onUrlChange(row.id, event.target.value);
+          onUrlChange(row.id, url);
         }}
-        placeholder="https://"
-        autoComplete="off"
-        aria-label={`${CREATE_PRODUCT_MODAL_UI.IMAGE_ROW_ARIA_PREFIX} ${index + 1}`}
+        disabled={disabled}
+        ariaLabel={`${CREATE_PRODUCT_MODAL_UI.IMAGE_ROW_ARIA_PREFIX} ${index + 1}`}
       />
       {canRemove ? (
         <button
@@ -107,7 +119,7 @@ function SortableImageRow({ row, index, canRemove, onUrlChange, onRemove }) {
           onClick={() => onRemove(row.id)}
           aria-label={CREATE_PRODUCT_MODAL_UI.REMOVE_IMAGE_ROW_ARIA}
         >
-          {COMMON_UI.MODAL_CLOSE_GLYPH}
+          <ModalCloseIcon size="sm" />
         </button>
       ) : null}
     </li>
@@ -189,6 +201,7 @@ export function ProductImageUrlSortableList({
                 row={row}
                 index={index}
                 canRemove={rows.length > 1}
+                disabled={disabled}
                 onUrlChange={handleUrlChange}
                 onRemove={handleRemove}
               />

@@ -196,7 +196,7 @@ export const PRODUCT_MODEL_FIELD_KEYS = [
   "updatedAt",
 ];
 
-/** Поля превью на карточке каталога (остальное — в модалке, в т.ч. soldQuantity и productIsAvailable). */
+/** Поля превью на карточке каталога (остальное — в модалке). */
 export const PRODUCT_CARD_PREVIEW_FIELD_KEYS = [
   "productPrice",
   "productCategory",
@@ -218,7 +218,6 @@ export const PRODUCT_CARD_MODERATION_PREVIEW_FIELD_KEYS = [
 export const PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS = [
   "productPrice",
   "productCategory",
-  "productIsAvailable",
   "productStockQuantity",
   "soldQuantity",
   "uniqueViewerCount",
@@ -263,7 +262,7 @@ export const PRODUCT_FIELD_LABEL_RU = {
   productStockQuantity: "В наличии (шт.)",
   productModerationStatus: "Статус модерации",
   productModerationComment: "Комментарий модератора",
-  uniqueViewerCount: "Уникальные просмотры",
+  uniqueViewerCount: "Просмотры",
   soldQuantity: "Продано",
   createdAt: "Создан",
   updatedAt: "Обновлён",

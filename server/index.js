@@ -14,6 +14,9 @@ import {
     addressRouter,
 } from './routes/index.js';
 import { generalRateLimiter, errorHandler, notFoundHandler } from './middlewares/index.js';
+import { UPLOADS_DIR, ensureUploadsDir } from './utils/uploadsDir.js';
+
+ensureUploadsDir();
 
 if (!process.env.JWT_SECRET) {
   console.error('JWT_SECRET не задан в .env'); // выводим ошибку в консоль
@@ -37,7 +40,14 @@ app.use(helmet()); // защита от некоторых типов атак
 app.use(generalRateLimiter);
 
 // раздача загруженных файлов по URL /uploads/...
-app.use('/uploads', express.static('uploads')); // раздаем загруженные файлы по URL /uploads/...
+app.use(
+  '/uploads',
+  (_req, res, next) => {
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    next();
+  },
+  express.static(UPLOADS_DIR),
+);
 
 // роут загрузки файла: POST /upload
 app.use('/upload', uploadRouter); // Это префикс, который будет использоваться для загрузки файла.

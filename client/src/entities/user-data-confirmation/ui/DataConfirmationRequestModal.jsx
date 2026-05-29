@@ -11,11 +11,12 @@ import {
   USER_DATA_CONFIRMATION_STATUS_REJECTED,
 } from "../model/constants.js";
 import {
-  COMMON_UI,
   DATA_CONFIRMATION_MODAL_UI,
   DATA_CONFIRMATION_PAGE_UI,
   USER_DETAILS_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
+import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
+import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
 
 import "./DataConfirmationRequestModal.css";
 
@@ -73,14 +74,7 @@ export function DataConfirmationRequestModal({
     };
   }, [isOpen]);
 
-  useEffect(() => {
-    if (!isOpen) return undefined;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [isOpen]);
+  useScrollLock(isOpen);
 
   if (!isOpen) return null;
 
@@ -145,7 +139,7 @@ export function DataConfirmationRequestModal({
             onClick={onClose}
             aria-label={USER_DETAILS_MODAL_UI.ARIA_CLOSE}
           >
-            {COMMON_UI.MODAL_CLOSE_GLYPH}
+            <ModalCloseIcon />
           </button>
         </header>
 

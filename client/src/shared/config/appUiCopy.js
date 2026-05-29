@@ -6,9 +6,21 @@
 /** Общие символы и подписи */
 export const COMMON_UI = {
   EM_DASH: "—",
-  MODAL_CLOSE_GLYPH: "×",
   LOCALE_RU: "ru-RU",
   REQUIRED_FIELD_HINT: "Обязательно",
+};
+
+/** Поле URL изображения с загрузкой файла (`POST /upload`) */
+export const IMAGE_URL_FIELD_UI = {
+  UPLOAD_BUTTON: "Выбрать файл",
+  UPLOAD_LOADING: "Загрузка…",
+  UPLOAD_HINT: "JPEG, PNG или WebP, до 5 МБ. Можно также вставить ссылку.",
+  UPLOAD_DISABLED_HINT: "Загрузка файла доступна после входа в аккаунт",
+  ERROR_TYPE: "Допустимы только JPEG, PNG и WebP",
+  ERROR_SIZE: "Файл не больше 5 МБ",
+  ERROR_GENERIC: "Не удалось загрузить файл",
+  ERROR_AUTH: "Войдите в аккаунт, чтобы загрузить файл",
+  FILE_INPUT_ARIA: "Выбрать изображение с устройства",
 };
 
 /** Да / нет в интерфейсе (карточка товара, профиль и т.д.) */
@@ -189,6 +201,18 @@ export const PRODUCT_SEARCH_INPUT_UI = {
   PENDING_ARIA: "Идёт поиск",
 };
 
+/** Intro при первом заходе на сайт */
+export const APP_INTRO_UI = {
+  SKIP: "Пропустить",
+  ENABLE_SOUND: "Включить звук",
+  DISABLE_SOUND: "Выключить звук",
+  FALLBACK_TITLE: "iziBuy",
+  FALLBACK_HINT: "Добро пожаловать",
+  REPLAY_LINK: "Посмотреть intro",
+  ARIA_OVERLAY: "Заставка при открытии сайта",
+  VIDEO_ARIA: "Intro-ролик",
+};
+
 /** Главная страница каталога */
 export const HOME_PAGE_UI = {
   PRODUCT_CATEGORY_FILTER_LIST_ID: "home-product-category-filter-list",
@@ -198,7 +222,7 @@ export const HOME_PAGE_UI = {
   FETCH_PROFILE_FALLBACK: "Не удалось загрузить профиль",
   FETCH_MY_PROFILE_FALLBACK: "Не удалось загрузить мой профиль",
   // TITLE_CATALOG: "Каталог товаров",
-  TITLE_CATALOG: "iziBuy — покупай и продавай",
+  TITLE_CATALOG: "iziBuy",
   BREADCRUMB_HOME: "Главная",
   NAV_TO_HOME: "Главная",
   BREADCRUMB_MY_PROFILE: "Мой профиль",
@@ -227,7 +251,9 @@ export const HOME_PAGE_UI = {
   NAV_TO_CART: "Корзина",
   NAV_TO_MY_ORDERS: "Мои покупки",
   NAV_TO_ADMIN_ORDERS: "Все заказы",
-  FILTER_BUTTON: "Фильтр",
+  FILTER_BUTTON_ARIA: "Фильтр по категории",
+  FILTER_BUTTON_ARIA_SELECTED: (categoryLabel) =>
+    `Фильтр по категории: ${categoryLabel}`,
   SORT_LABEL: "Сортировка",
   MODERATION_STATUS_FILTER_LABEL: "Статус",
   SHOW_HIDDEN_PRODUCTS: "Показывать скрытые товары",
@@ -261,9 +287,19 @@ export const ADD_TO_CART_UI = {
 
 /** Кнопка корзины в шапке */
 export const HEADER_CART_BUTTON_UI = {
-  LABEL: "Корзина",
   ARIA: "Открыть корзину",
   COUNT_ARIA: "Товаров в корзине",
+};
+
+/** Кнопка «Разместить товар» в шапке */
+export const HEADER_PLACE_PRODUCT_BUTTON_UI = {
+  ARIA: "Разместить товар",
+  ARIA_LOGIN_REQUIRED: "Войти, чтобы разместить товар",
+};
+
+/** Кнопка «Мой профиль» в шапке */
+export const HEADER_PROFILE_BUTTON_UI = {
+  ARIA: "Мой профиль",
 };
 
 /** Страница «Корзина» */
@@ -574,7 +610,7 @@ export const CREATE_PRODUCT_MODAL_UI = {
   LABEL_NAME: "Название",
   LABEL_DESCRIPTION: "Описание (до 100 слов)",
   LABEL_IMAGE_URLS:
-    "Ссылки на изображения (необязательно, до 5 URL с http/https)",
+    "Изображения (необязательно, до 5 — ссылка или файл)",
   IMAGE_ORDER_HINT: "Перетащите за ⋮⋮ — порядок в каталоге (1 — главное фото).",
   DRAG_HANDLE_ARIA: "Перетащить для смены порядка",
   ADD_IMAGE_ROW: "Добавить ещё фото",
@@ -634,19 +670,18 @@ export const PRODUCT_CARD_UI = {
   OPEN_SALES_LOCKED_HINT:
     "Скрыть или удалить можно, когда все покупки по товару подтверждены покупателями (или отменены).",
   HIDDEN_FROM_CATALOG_BADGE: "Скрыт от покупателей",
-  /** @param {number} count */
-  REMAINING_STOCK: (count) => `Осталось: ${count} шт.`,
   IMAGE_LIGHTBOX_OPEN_LABEL: "Показать изображение в полном размере",
   IMAGE_LIGHTBOX_CLOSE: "Закрыть просмотр изображения",
   IMAGE_LIGHTBOX_DIALOG_LABEL: "Изображение товара",
   IMAGE_LIGHTBOX_DIALOG_LABEL_GALLERY: "Фотографии товара",
   GALLERY_PREV: "Предыдущее фото",
   GALLERY_NEXT: "Следующее фото",
-  PROMOTED_BADGE: "Продвигаемый товар",
+  PROMOTED_BADGE: "Буст",
   /** @param {string} until */
   PROMOTED_UNTIL: (until) => `В продвижении до ${until}`,
   PROMOTION_PENDING_BADGE: "Ожидает подтверждения staff",
   RAFFLE_BADGE: "Розыгрыш",
+  AUCTION_BADGE: "Аукцион",
   RAFFLE_PARTICIPATION_ON: "Участвует в розыгрыше",
   RAFFLE_PARTICIPATION_OFF: "Добавить в розыгрыш",
   RAFFLE_PARTICIPATION_PENDING: "Сохраняем…",
@@ -665,7 +700,7 @@ export const CREATE_RAFFLE_MODAL_UI = {
   TITLE_EDIT: "Изменить розыгрыш",
   LABEL_TITLE: "Название",
   LABEL_DESCRIPTION: "Описание",
-  LABEL_PRIZE_IMAGE: "Фото приза (URL)",
+  LABEL_PRIZE_IMAGE: "Фото приза (ссылка или файл)",
   LABEL_TARGET: "Цель продаж",
   LABEL_INSTAGRAM: "Ссылка Instagram",
   SUBMIT: "Отправить на модерацию",
@@ -807,7 +842,7 @@ export const REGISTER_MODAL_UI = {
   LABEL_BIRTH: "Дата рождения (userBirthDate)",
   LABEL_GENDER: "Пол (userGender)",
   LABEL_ADDRESS: "Адрес (userAddress)",
-  LABEL_AVATAR_URL: "URL аватара (avatarUrl → userAvatarUrl)",
+  LABEL_AVATAR_URL: "Аватар (ссылка или файл)",
   LABEL_BG_PRESET: "Цвет фона профиля",
   LABEL_BG_PREVIEW: "Предпросмотр фона",
   LABEL_NOTIFICATIONS: "Уведомления (notificationsEnabled)",
@@ -906,11 +941,11 @@ export const EDIT_PROFILE_MODAL_UI = {
   LABEL_BIRTH: "Дата рождения",
   LABEL_GENDER: "Пол",
   LABEL_ADDRESS: "Адрес",
-  LABEL_AVATAR_URL: "URL аватара",
+  LABEL_AVATAR_URL: "Аватар (ссылка или файл)",
   LABEL_BG_PRESET: "Цвет фона",
-  LABEL_BG_URL: "URL фона (премиум)",
+  LABEL_BG_URL: "Фон — изображение (премиум, ссылка или файл)",
   LABEL_BG_PREVIEW: "Предпросмотр",
-  LABEL_BG_URL_ADMIN: "URL фона (приоритет над цветом)",
+  LABEL_BG_URL_ADMIN: "Фон — изображение (приоритет над цветом, ссылка или файл)",
   LABEL_NOTIFICATIONS: "Уведомления по email",
   LABEL_NOTES: "Заметки о себе",
   WORDS_USED: (n, max) => `Слов: ${n} / ${max}`,

@@ -1,5 +1,4 @@
 import {
-    ORDER_STATUS_CANCELLED,
     ORDER_STATUS_CONFIRMED,
     ORDER_STATUS_DELIVERED,
     ORDER_STATUS_PENDING,
@@ -11,10 +10,7 @@ import { prepareLoyaltyPointsForConfirmedOrderItem } from '../../utils/loyaltyPo
 import { finalizeOffersAfterOrderConfirmed } from '../../utils/productPriceOfferHelpers.js';
 import { closeProductAuction } from '../../utils/productAuction.js';
 import { syncRaffleProgressForProductSale } from '../../utils/raffleHelpers.js';
-import {
-    decrementProductStockOnItemConfirmed,
-    restoreProductStockOnItemCancelled,
-} from '../../utils/productStock.js';
+import { decrementProductStockOnItemConfirmed } from '../../utils/productStock.js';
 
 import {
     ORDER_BUYER_PUBLIC_FIELDS,
@@ -75,18 +71,6 @@ export const markOrderItemDeliveredBySellerController = async (req, res) => {
 
         order.status = buildOrderStatusFromItems(order.items);
         await order.save();
-
-        if (targetItem.productId) {
-            const productId =
-                typeof targetItem.productId === 'object'
-                    ? targetItem.productId._id
-                    : targetItem.productId;
-            try {
-                await syncRaffleProgressForProductSale(productId);
-            } catch (raffleSyncError) {
-                console.error('syncRaffleProgressForProductSale error:', raffleSyncError);
-            }
-        }
 
         await populateOrderForResponse(order);
 

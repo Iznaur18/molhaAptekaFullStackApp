@@ -1,6 +1,4 @@
-function isHttpUrl(value) {
-  return typeof value === "string" && /^https?:\/\//i.test(value.trim());
-}
+import { resolveImageUrlForDisplay, isHttpImageUrl } from "../../../shared/lib/resolveUploadedImageUrl.js";
 
 /**
  * URL фото для аватара: основной аватар профиля, иначе фото из Telegram.
@@ -10,7 +8,11 @@ function isHttpUrl(value) {
  */
 export function pickUserProfilePhotoUrl(user) {
   if (!user) return null;
-  if (isHttpUrl(user.userAvatarUrl)) return user.userAvatarUrl.trim();
-  if (isHttpUrl(user.telegramPhotoUrl)) return user.telegramPhotoUrl.trim();
+  if (isHttpImageUrl(user.userAvatarUrl)) {
+    return resolveImageUrlForDisplay(user.userAvatarUrl);
+  }
+  if (isHttpImageUrl(user.telegramPhotoUrl)) {
+    return user.telegramPhotoUrl.trim();
+  }
   return null;
 }

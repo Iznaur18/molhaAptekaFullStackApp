@@ -10,6 +10,7 @@ import { formatProductFieldForDisplay } from "../lib/formatProductFieldForDispla
 import { isCurrentUserProductSeller } from "../lib/isCurrentUserProductSeller.js";
 import { getProductPurchaseLimit } from "../lib/getProductPurchaseLimit.js";
 import { isProductRaffleParticipant } from "../../raffle/lib/isProductRaffleParticipant.js";
+import { resolveAuctionUiState } from "../lib/resolveAuctionUiState.js";
 import { shouldShowPremiumProductCardChrome } from "../lib/isPremiumSellerProduct.js";
 import {
   isCatalogPromotionActive,
@@ -30,6 +31,7 @@ import {
   PRODUCT_FIELD_LABEL_RU,
   PRODUCT_IMAGE_PLACEHOLDER_URL,
 } from "../model/productConstants.js";
+import { UserPremiumDisplayName } from "../../user/ui/UserPremiumDisplayName.jsx";
 import { ProductModerationDetailsFooter } from "./ProductModerationDetailsFooter.jsx";
 import { PRODUCT_MODERATION_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
@@ -280,6 +282,48 @@ export function ProductCard({
     isPromotionActive;
   const showRaffleBadge =
     !isModerationQueue && isProductRaffleParticipant(product);
+  const showAuctionBadge =
+    !isModerationQueue && resolveAuctionUiState(product).auctionActive;
+
+  /**
+   * @param {import('../model/types.js').ProductFromApi['productSeller']} raw
+   * @param {string} display
+   */
+  const renderProductSellerValue = (raw, display) => {
+    const isPopulatedSeller =
+      raw != null && typeof raw === "object" && raw._id != null;
+    if (!isPopulatedSeller || display === COMMON_UI.EM_DASH) {
+      return display;
+    }
+
+    const canOpenSellerProfile =
+      typeof onSellerNameClick === "function" && display !== COMMON_UI.EM_DASH;
+
+    const nameNode = (
+      <UserPremiumDisplayName
+        name={display}
+        isPremium={raw.isPremiumUser === true}
+        isUserDataConfirmed={raw.isUserDataConfirmed === true}
+        className="product-card__seller-display-name"
+        textClassName="product-card__seller-display-name__text"
+      />
+    );
+
+    if (canOpenSellerProfile) {
+      return (
+        <button
+          type="button"
+          className="product-card__seller-name"
+          onClick={handleSellerClick}
+        >
+          {nameNode}
+        </button>
+      );
+    }
+
+    return nameNode;
+  };
+
   const showRaffleParticipantChrome =
     (highlightRaffleProduct || showRaffleBadge) &&
     !isMineMode &&
@@ -368,6 +412,11 @@ export function ProductCard({
             </p>
             <div className="product-card__status-badges-row">
               {renderStatusSlot()}
+              {showAuctionBadge ? (
+                <p className="product-card__auction-badge" role="status">
+                  {PRODUCT_CARD_UI.AUCTION_BADGE}
+                </p>
+              ) : null}
               {showRaffleBadge ? (
                 <p className="product-card__raffle-badge" role="status">
                   {PRODUCT_CARD_UI.RAFFLE_BADGE}
@@ -381,19 +430,26 @@ export function ProductCard({
           {previewFieldKeys.map((key) => {
             const raw = product[key];
             const display = formatProductFieldForDisplay(key, product);
-            const canOpenSellerProfile =
-              key === "productSeller" &&
-              typeof onSellerNameClick === "function" &&
-              raw != null &&
-              typeof raw === "object" &&
-              raw._id != null &&
-              display !== COMMON_UI.EM_DASH;
             const rowClass = ["product-card__row"];
             if (key === "productPrice") rowClass.push("product-card__row--price");
             if (key === "productCategory")
               rowClass.push("product-card__row--category");
             if (key === "productDescription")
               rowClass.push("product-card__row--description");
+            if (key === "productSeller") rowClass.push("product-card__row--seller");
+
+            if (key === "productSeller") {
+              return (
+                <div key={key} className={rowClass.join(" ")}>
+                  <dt className="product-card__key product-card__key--seller-inline">
+                    {PRODUCT_FIELD_LABEL_RU.productSeller}:
+                  </dt>
+                  <dd className="product-card__value product-card__value--seller-inline">
+                    {renderProductSellerValue(raw, display)}
+                  </dd>
+                </div>
+              );
+            }
 
             return (
               <div key={key} className={rowClass.join(" ")}>
@@ -407,17 +463,7 @@ export function ProductCard({
                       : "product-card__value"
                   }
                 >
-                  {canOpenSellerProfile ? (
-                    <button
-                      type="button"
-                      className="product-card__seller-name"
-                      onClick={handleSellerClick}
-                    >
-                      {display}
-                    </button>
-                  ) : (
-                    display
-                  )}
+                  {display}
                 </dd>
               </div>
             );

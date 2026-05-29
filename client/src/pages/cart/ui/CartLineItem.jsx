@@ -7,6 +7,7 @@ import {
   COMMON_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
+import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
 
 import "./CartLineItem.css";
 
@@ -102,7 +103,7 @@ export function CartLineItem({ line, onProductClick }) {
         onClick={handleRemove}
         aria-label={CART_PAGE_UI.REMOVE_LINE_ARIA}
       >
-        ×
+        <ModalCloseIcon size="lg" />
       </button>
     </article>
   );

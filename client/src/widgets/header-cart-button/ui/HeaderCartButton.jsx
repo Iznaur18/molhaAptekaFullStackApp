@@ -1,7 +1,7 @@
 import { useCart } from "../../../entities/cart/model/useCart.js";
 import { HEADER_CART_BUTTON_UI } from "../../../shared/config/appUiCopy.js";
-
-import "./HeaderCartButton.css";
+import { HeaderCircleIconButton } from "../../../shared/ui/HeaderCircleIconButton/index.js";
+import { ShoppingCart } from "../../../shared/ui/icon/index.js";
 
 /**
  * Кнопка-индикатор корзины в шапке. Показывает бейдж с числом позиций.
@@ -11,30 +11,16 @@ import "./HeaderCartButton.css";
 export function HeaderCartButton({ onClick, isActive = false }) {
   const { totalCount } = useCart();
   const hasItems = totalCount > 0;
-  const className = [
-    "header-cart-button",
-    isActive && "header-cart-button--active",
-  ]
-    .filter(Boolean)
-    .join(" ");
 
   return (
-    <button
-      type="button"
-      className={className}
+    <HeaderCircleIconButton
       onClick={onClick}
-      aria-label={HEADER_CART_BUTTON_UI.ARIA}
-      aria-current={isActive ? "page" : undefined}
-    >
-      <span aria-hidden="true">{HEADER_CART_BUTTON_UI.LABEL}</span>
-      {hasItems ? (
-        <span
-          className="header-cart-button__badge"
-          aria-label={HEADER_CART_BUTTON_UI.COUNT_ARIA}
-        >
-          {totalCount}
-        </span>
-      ) : null}
-    </button>
+      isActive={isActive}
+      ariaLabel={HEADER_CART_BUTTON_UI.ARIA}
+      icon={ShoppingCart}
+      badgeContent={hasItems ? totalCount : null}
+      badgeAriaLabel={hasItems ? HEADER_CART_BUTTON_UI.COUNT_ARIA : undefined}
+      badgeVariant="count"
+    />
   );
 }

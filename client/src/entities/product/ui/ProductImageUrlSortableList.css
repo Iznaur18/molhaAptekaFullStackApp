@@ -36,7 +36,7 @@
 
 .product-image-sortable__row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.35rem;
   padding: 0.35rem;
   border: 1px solid #e5e7eb;

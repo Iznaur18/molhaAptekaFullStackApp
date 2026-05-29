@@ -4,6 +4,10 @@ import { createRaffle } from "../api/createRaffle.js";
 import { patchMyRaffle } from "../api/patchMyRaffle.js";
 import { patchRaffleByStaff } from "../api/patchRaffleByStaff.js";
 import { isHttpProfileImageUrl } from "../../user/lib/profileImageFocus.js";
+import {
+  resolveImageUrlForDisplay,
+  resolveUploadedImageUrl,
+} from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { ProfileImageFocusEditor } from "../../user/ui/ProfileImageFocusEditor.jsx";
 import {
   DEFAULT_RAFFLE_PRIZE_IMAGE_FOCUS,
@@ -14,6 +18,8 @@ import {
   CREATE_RAFFLE_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { FormFieldLabel } from "../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
+import { ImageUrlField } from "../../../shared/ui/ImageUrlField/ImageUrlField.jsx";
+import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
 
 import "./CreateRaffleModal.css";
 
@@ -69,7 +75,7 @@ export function CreateRaffleModal({
   }, [isOpen, isEdit, raffleToEdit]);
 
   const prizeFocusImageUrl = useMemo(() => {
-    const url = String(form.prizeImageUrl ?? "").trim();
+    const url = resolveImageUrlForDisplay(form.prizeImageUrl ?? "");
     return isHttpProfileImageUrl(url) ? url : "";
   }, [form.prizeImageUrl]);
 
@@ -107,7 +113,7 @@ export function CreateRaffleModal({
     const body = {
       title: form.title.trim(),
       description: form.description.trim(),
-      prizeImageUrl: form.prizeImageUrl.trim(),
+      prizeImageUrl: resolveUploadedImageUrl(form.prizeImageUrl.trim()),
       prizeImageFocus: form.prizeImageFocus,
       targetSales,
       instagramUrl: form.instagramUrl.trim(),
@@ -159,7 +165,7 @@ export function CreateRaffleModal({
             aria-label={CREATE_RAFFLE_MODAL_UI.ARIA_CLOSE}
             onClick={onClose}
           >
-            ×
+            <ModalCloseIcon />
           </button>
         </header>
         <form className="create-raffle-modal__form" onSubmit={handleSubmit}>
@@ -184,31 +190,27 @@ export function CreateRaffleModal({
               }
             />
           </FormFieldLabel>
-          <FormFieldLabel
-            label={CREATE_RAFFLE_MODAL_UI.LABEL_PRIZE_IMAGE}
-            required
-          >
-            <input
-              type="url"
-              value={form.prizeImageUrl}
-              required
-              placeholder="https://"
-              onChange={(e) => {
-                const nextUrl = e.target.value;
-                setForm((prev) => {
-                  const urlChanged =
-                    nextUrl.trim() !== String(prev.prizeImageUrl ?? "").trim();
-                  return {
-                    ...prev,
-                    prizeImageUrl: nextUrl,
-                    prizeImageFocus: urlChanged
-                      ? { ...DEFAULT_RAFFLE_PRIZE_IMAGE_FOCUS }
-                      : prev.prizeImageFocus,
-                  };
-                });
-              }}
-            />
+          <FormFieldLabel required>
+            {CREATE_RAFFLE_MODAL_UI.LABEL_PRIZE_IMAGE}
           </FormFieldLabel>
+          <ImageUrlField
+            value={form.prizeImageUrl}
+            required
+            onChange={(nextUrl) => {
+              setForm((prev) => {
+                const urlChanged =
+                  nextUrl.trim() !== String(prev.prizeImageUrl ?? "").trim();
+                return {
+                  ...prev,
+                  prizeImageUrl: nextUrl,
+                  prizeImageFocus: urlChanged
+                    ? { ...DEFAULT_RAFFLE_PRIZE_IMAGE_FOCUS }
+                    : prev.prizeImageFocus,
+                };
+              });
+            }}
+            disabled={isSubmitting}
+          />
           {prizeFocusImageUrl ? (
             <ProfileImageFocusEditor
               imageUrl={prizeFocusImageUrl}

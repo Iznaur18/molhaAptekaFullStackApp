@@ -29,23 +29,22 @@ import { ProductPriceOfferHintMessage } from "../../product-price-offer/ui/Produ
 import { ProductPriceOfferSellerTab } from "../../product-price-offer/ui/ProductPriceOfferSellerTab.jsx";
 import { ProductPriceOfferSellerArchive } from "../../product-price-offer/ui/ProductPriceOfferSellerArchive.jsx";
 import { resolveAuctionUiState } from "../lib/resolveAuctionUiState.js";
-import {
-  getProductPurchaseLimit,
-  shouldShowProductRemainingStock,
-} from "../lib/getProductPurchaseLimit.js";
+import { getProductPurchaseLimit } from "../lib/getProductPurchaseLimit.js";
 import { PRODUCT_MODERATION_APPROVED } from "../model/productModerationConstants.js";
 import { ProductReviewsSection } from "../../product-review/ui/ProductReviewsSection.jsx";
 import {
   PRODUCT_PRICE_OFFER_UI,
   PRODUCT_REVIEW_UI,
 } from "../../../shared/config/appUiCopy.js";
+import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
+import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
 
 import "./ProductDetailsModal.css";
 import "../../product-price-offer/ui/ProductPriceOffer.css";
 
 const PRODUCT_DETAILS_STAT_FIELD_KEYS = new Set([
   "productCategory",
-  "productIsAvailable",
+  "productStockQuantity",
   "soldQuantity",
   "uniqueViewerCount",
 ]);
@@ -206,6 +205,8 @@ export function ProductDetailsModal({
   const tabPanelRef = useRef(/** @type {HTMLDivElement | null} */ (null));
   const [tabPanelMinHeight, setTabPanelMinHeight] = useState(0);
 
+  useScrollLock(isOpen);
+
   const isOwnProduct =
     product != null && isCurrentUserProductSeller(product, currentUserId);
   const isSellerView = isOwnProduct;
@@ -340,9 +341,6 @@ export function ProductDetailsModal({
   useEffect(() => {
     if (!isOpen) return undefined;
 
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
     const len = imageUrls.length;
     const onKeyDown = (event) => {
       if (lightboxOpen) return;
@@ -364,7 +362,6 @@ export function ProductDetailsModal({
     document.addEventListener("keydown", onKeyDown);
     return () => {
       document.removeEventListener("keydown", onKeyDown);
-      document.body.style.overflow = previousOverflow;
     };
   }, [isOpen, onClose, lightboxOpen, imageUrls.length]);
 
@@ -419,8 +416,6 @@ export function ProductDetailsModal({
     PRODUCT_DETAILS_META_FIELD_KEYS.has(key),
   );
   const purchaseLimit = getProductPurchaseLimit(product);
-  const showRemainingStock =
-    !isOwnProduct && !showStaffDetails && shouldShowProductRemainingStock(product);
   const canShowAddToCart =
     showAddToCart && product._id != null && !isOwnProduct && purchaseLimit > 0;
 
@@ -463,7 +458,7 @@ export function ProductDetailsModal({
               onClick={onClose}
               aria-label={USER_DETAILS_MODAL_UI.ARIA_CLOSE}
             >
-              {COMMON_UI.MODAL_CLOSE_GLYPH}
+              <ModalCloseIcon />
             </button>
           </header>
 
@@ -685,14 +680,6 @@ export function ProductDetailsModal({
                         ["productPrice"],
                         fieldHandlers,
                       )}
-                      {showRemainingStock ? (
-                        <div className="product-details-modal__row product-details-modal__row--stat">
-                          <dt className="product-details-modal__dt">Остаток</dt>
-                          <dd className="product-details-modal__dd">
-                            {PRODUCT_CARD_UI.REMAINING_STOCK(purchaseLimit)}
-                          </dd>
-                        </div>
-                      ) : null}
                     </dl>
                     <div
                       className={

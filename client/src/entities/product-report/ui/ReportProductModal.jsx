@@ -5,9 +5,10 @@ import { countWords } from "../../user/lib/countWords.js";
 import { PROFILE_FIELD_MAX_WORDS } from "../../user/model/userConstants.js";
 import { submitProductReport } from "../api/submitProductReport.js";
 import {
-  COMMON_UI,
   PRODUCT_REPORT_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
+import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
+import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
 
 import "./ReportProductModal.css";
 
@@ -41,14 +42,7 @@ export function ReportProductModal({
     }
   }, [isOpen]);
 
-  useEffect(() => {
-    if (!isOpen) return undefined;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [isOpen]);
+  useScrollLock(isOpen);
 
   const words = useMemo(() => countWords(reportText), [reportText]);
   const isOverLimit = words > PROFILE_FIELD_MAX_WORDS;
@@ -97,7 +91,7 @@ export function ReportProductModal({
             onClick={onClose}
             aria-label={PRODUCT_REPORT_MODAL_UI.CANCEL}
           >
-            {COMMON_UI.MODAL_CLOSE_GLYPH}
+            <ModalCloseIcon />
           </button>
         </div>
         {productName ? (

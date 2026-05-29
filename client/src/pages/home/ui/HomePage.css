@@ -161,25 +161,6 @@
   color: #111827;
 }
 
-.home-page__filter-button {
-  display: inline-flex;
-  align-items: center;
-  margin: 0;
-  padding: 0.4rem 0.75rem;
-  border: 1px solid rgba(31, 111, 235, 0.45);
-  border-radius: 0.5rem;
-  background: transparent;
-  color: #1f6feb;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.home-page__filter-button:hover {
-  border-color: #1f6feb;
-  background: rgba(31, 111, 235, 0.08);
-}
-
 .home-page__category-list {
   position: absolute;
   left: 0;
@@ -438,7 +419,6 @@
   font-weight: 700;
 }
 
-.home-page--header-v1 .home-page__filter-button,
 .home-page--header-v1 .home-page__list-product-button {
   border-color: color-mix(in srgb, #1f6feb 28%, #e5e7eb);
   border-radius: 999px;
@@ -446,7 +426,6 @@
   box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
 }
 
-.home-page--header-v1 .home-page__filter-button:hover,
 .home-page--header-v1 .home-page__list-product-button:hover:not(:disabled) {
   border-color: #1f6feb;
   background: color-mix(in srgb, #1f6feb 9%, #fff);
@@ -473,30 +452,22 @@
 }
 
 .home-page--header-v1 .home-page__auth-button,
-.home-page--header-v1 .home-page__list-product-button,
-.home-page--header-v1 .header-cart-button {
+.home-page--header-v1 .home-page__list-product-button {
   border-radius: 999px;
 }
 
-.home-page--header-v1 .header-cart-button--active,
-.home-page--header-v1 .header-cart-button--active:hover {
-  border-color: #1d4ed8;
-  background: linear-gradient(180deg, #3b82f6 0%, #1f6feb 100%);
-  color: #fff;
-}
-
-.home-page--header-v1 .header-notifications-button {
+.home-page--header-v1 .header-circle-button {
   border-color: #e2e8f0;
   background: #fff;
 }
 
-.home-page--header-v1 .header-notifications-button:hover {
+.home-page--header-v1 .header-circle-button:hover {
   border-color: #1f6feb;
   background: rgba(31, 111, 235, 0.06);
 }
 
-.home-page--header-v1 .header-notifications-button--active,
-.home-page--header-v1 .header-notifications-button--active:hover {
+.home-page--header-v1 .header-circle-button--active,
+.home-page--header-v1 .header-circle-button--active:hover {
   border-color: #1f6feb;
   background: rgba(31, 111, 235, 0.1);
 }
@@ -576,5 +547,9 @@
   .home-page--header-v1 .home-page__auth-actions > * {
     flex: 1 1 auto;
     justify-content: center;
+  }
+
+  .home-page--header-v1 .home-page__auth-actions > .header-circle-button {
+    flex: 0 0 auto;
   }
 }

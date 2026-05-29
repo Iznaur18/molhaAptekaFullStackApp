@@ -1,8 +1,9 @@
 import { useState } from "react";
 
 import { AUTH_TOKEN_STORAGE_KEY } from "../../../shared/api/index.js";
-import { COMMON_UI, LOGIN_MODAL_UI } from "../../../shared/config/appUiCopy.js";
+import { LOGIN_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { FormFieldLabel } from "../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
+import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
 import { loginUser } from "../api/loginUser.js";
 
 import "./LoginModal.css";
@@ -79,7 +80,7 @@ export function LoginModal({ isOpen, onClose, onSuccess, onRegisterClick }) {
             className="login-modal__close"
             onClick={handleClose}
           >
-            {COMMON_UI.MODAL_CLOSE_GLYPH}
+            <ModalCloseIcon />
           </button>
         </div>
         <form className="login-modal__form" onSubmit={handleSubmit}>

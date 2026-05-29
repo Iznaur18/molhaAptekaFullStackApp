@@ -1,4 +1,4 @@
-.header-notifications-button {
+.header-circle-button {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -16,27 +16,25 @@
   cursor: pointer;
 }
 
-.header-notifications-button:hover {
+.header-circle-button:hover {
   border-color: #1f6feb;
   background: rgba(31, 111, 235, 0.06);
   color: #1d4ed8;
 }
 
-.header-notifications-button--active,
-.header-notifications-button--active:hover {
+.header-circle-button--active,
+.header-circle-button--active:hover {
   border-color: #1f6feb;
   background: rgba(31, 111, 235, 0.1);
   color: #1d4ed8;
 }
 
-.header-notifications-button__icon {
+.header-circle-button__icon {
   display: block;
-  width: 1.15rem;
-  height: 1.15rem;
-  transform: scaleY(1.12);
+  flex-shrink: 0;
 }
 
-.header-notifications-button__badge {
+.header-circle-button__badge {
   position: absolute;
   top: -0.2rem;
   right: -0.2rem;
@@ -47,9 +45,22 @@
   height: 1.25rem;
   padding: 0 0.35rem;
   border-radius: 999px;
-  background: #b42318;
-  color: #fff;
   font-size: 0.68rem;
   font-weight: 700;
   line-height: 1;
+}
+
+.header-circle-button__badge_count {
+  background: #1f6feb;
+  color: #fff;
+}
+
+.header-circle-button--active .header-circle-button__badge_count {
+  background: #fff;
+  color: #1f6feb;
+}
+
+.header-circle-button__badge_alert {
+  background: #b42318;
+  color: #fff;
 }

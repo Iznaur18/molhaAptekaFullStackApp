@@ -72,6 +72,7 @@ import { DataConfirmationRequestModal } from "../../../entities/user-data-confir
 import { fetchMyProductReportStatus } from "../../../entities/product-report/api/fetchMyProductReportStatus.js";
 import { ReportProductModal } from "../../../entities/product-report/ui/ReportProductModal.jsx";
 import { UserVoteRatingForm } from "../../../entities/user-vote-rating/ui/UserVoteRatingForm.jsx";
+import { SiteFooter } from "../../../widgets/site-footer/ui/SiteFooter.jsx";
 import { AdminOrdersPage } from "../../admin-orders/ui/AdminOrdersPage.jsx";
 import { CartPage } from "../../cart/ui/CartPage.jsx";
 import { MyOrdersPage } from "../../my-orders/ui/MyOrdersPage.jsx";
@@ -2025,6 +2026,8 @@ export function HomePage() {
       />
 
       {renderMainContent()}
+
+      <SiteFooter />
 
       <UserDetailsModal
         isOpen={sellerModal.open}

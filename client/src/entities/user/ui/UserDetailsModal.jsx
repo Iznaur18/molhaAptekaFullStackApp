@@ -14,9 +14,10 @@ import { UserPremiumAvatar } from "./UserPremiumAvatar.jsx";
 import { UserPremiumDisplayName } from "./UserPremiumDisplayName.jsx";
 
 import {
-  COMMON_UI,
   USER_DETAILS_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
+import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
+import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
 
 import "./UserDetailsModal.css";
 
@@ -78,17 +79,16 @@ export function UserDetailsModal({
     setBackgroundLoadFailed(false);
   }, [user?._id]);
 
+  useScrollLock(isOpen);
+
   useEffect(() => {
     if (!isOpen) return undefined;
     const onKeyDown = (e) => {
       if (e.key === "Escape") onClose();
     };
     document.addEventListener("keydown", onKeyDown);
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
     return () => {
       document.removeEventListener("keydown", onKeyDown);
-      document.body.style.overflow = prevOverflow;
     };
   }, [isOpen, onClose]);
 
@@ -189,9 +189,7 @@ export function UserDetailsModal({
             onClick={onClose}
             aria-label={USER_DETAILS_MODAL_UI.ARIA_CLOSE}
           >
-            {isRegisterLayout
-              ? COMMON_UI.MODAL_CLOSE_GLYPH
-              : USER_DETAILS_MODAL_UI.CLOSE_TEXT}
+            {isRegisterLayout ? <ModalCloseIcon /> : USER_DETAILS_MODAL_UI.CLOSE_TEXT}
           </button>
         </header>
         <div className="user-details-modal__main">

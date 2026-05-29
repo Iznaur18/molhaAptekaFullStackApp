@@ -1,9 +1,6 @@
 import mongoose from 'mongoose';
 
-import {
-    ORDER_STATUS_CONFIRMED,
-    ORDER_STATUS_DELIVERED,
-} from '../constants/orderConstants.js';
+import { ORDER_STATUS_CONFIRMED } from '../constants/orderConstants.js';
 import {
     RAFFLE_STATUS_ACTIVE,
     RAFFLE_STATUS_COMPLETED,
@@ -17,7 +14,7 @@ import { createUserInAppNotification } from './userInAppNotifications.js';
 import { notifyFollowersOfSellerRaffleCompleted } from './userFollowHelpers.js';
 import { normalizeRafflePrizeImageFocus } from './profileImageFocus.js';
 
-const SALE_COUNT_ITEM_STATUSES = [ORDER_STATUS_DELIVERED, ORDER_STATUS_CONFIRMED];
+const RAFFLE_SALE_COUNT_ITEM_STATUSES = [ORDER_STATUS_CONFIRMED];
 
 export const RAFFLE_NOTIFICATION_KIND_GOAL_REACHED = 'raffle_goal_reached';
 export const RAFFLE_NOTIFICATION_KIND_COMPLETED = 'raffle_completed';
@@ -35,19 +32,12 @@ const countRaffleSalesForProductSince = async (productId, participationStartAt) 
         {
             $match: {
                 'items.productId': objectId,
-                'items.status': { $in: SALE_COUNT_ITEM_STATUSES },
-            },
-        },
-        {
-            $addFields: {
-                saleAt: {
-                    $ifNull: ['$items.confirmedAt', '$items.deliveredAt'],
-                },
+                'items.status': { $in: RAFFLE_SALE_COUNT_ITEM_STATUSES },
             },
         },
         {
             $match: {
-                saleAt: { $ne: null, $gte: participationStartAt },
+                'items.confirmedAt': { $ne: null, $gte: participationStartAt },
             },
         },
         {

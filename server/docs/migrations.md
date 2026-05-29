@@ -37,3 +37,5 @@
 
 - `20260508-order-items-status`
   - Проставляет `items[].status` и аудит-поля (`deliveredAt`, `confirmedAt`, `deliveredBy`, `confirmedBy`) для старых заказов.
+- `20260530-raffle-sales-confirmed-only`
+  - Пересчитывает `salesProgress` активных розыгрышей (учитываются только позиции со статусом `confirmed`).

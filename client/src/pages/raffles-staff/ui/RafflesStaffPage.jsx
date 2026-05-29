@@ -6,6 +6,7 @@ import { fetchFeaturedRaffles } from "../../../entities/raffle/api/fetchFeatured
 import { fetchPendingRaffles } from "../../../entities/raffle/api/fetchPendingRaffles.js";
 import { rejectRaffle } from "../../../entities/raffle/api/rejectRaffle.js";
 import { formatRafflePrizeImageObjectPosition } from "../../../entities/raffle/lib/rafflePrizeImageFocus.js";
+import { resolveRafflePrizeImageUrl } from "../../../entities/raffle/lib/resolveRafflePrizeImageUrl.js";
 import { RaffleManageActions } from "../../../entities/raffle/ui/RaffleManageActions.jsx";
 import {
   API_CLIENT_UI,
@@ -164,7 +165,7 @@ export function RafflesStaffPage({
           <div className="raffles-staff-page__row raffles-staff-page__row_live">
             <div className="raffles-staff-page__row-main">
               <img
-                src={liveRaffle.prizeImageUrl}
+                src={resolveRafflePrizeImageUrl(liveRaffle)}
                 alt=""
                 className="raffles-staff-page__thumb"
                 style={{
@@ -218,7 +219,7 @@ export function RafflesStaffPage({
               <li key={raffle._id} className="raffles-staff-page__row">
                 <div className="raffles-staff-page__row-main">
                   <img
-                    src={raffle.prizeImageUrl}
+                    src={resolveRafflePrizeImageUrl(raffle)}
                     alt=""
                     className="raffles-staff-page__thumb"
                     style={{

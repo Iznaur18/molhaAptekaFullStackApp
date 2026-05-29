@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
-import { COMMON_UI, PRODUCT_CARD_UI } from "../../../shared/config/appUiCopy.js";
+import { PRODUCT_CARD_UI } from "../../../shared/config/appUiCopy.js";
+import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
+import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
 
 import "./ProductImageLightbox.css";
 
@@ -44,13 +46,7 @@ export function ProductImageLightbox({ onClose, imageUrls, startIndex = 0 }) {
     setIndex((i) => (i + 1) % len);
   }, [len]);
 
-  useEffect(() => {
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, []);
+  useScrollLock(true);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -103,7 +99,7 @@ export function ProductImageLightbox({ onClose, imageUrls, startIndex = 0 }) {
           aria-label={PRODUCT_CARD_UI.IMAGE_LIGHTBOX_CLOSE}
           onClick={onClose}
         >
-          {COMMON_UI.MODAL_CLOSE_GLYPH}
+          <ModalCloseIcon />
         </button>
         <div
           className={

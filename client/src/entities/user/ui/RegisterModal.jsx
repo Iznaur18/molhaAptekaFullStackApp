@@ -19,10 +19,11 @@ import {
 import { UserBackgroundPresetPicker } from "./UserBackgroundPresetPicker.jsx";
 import { UserBackgroundPreview } from "./UserBackgroundPreview.jsx";
 import {
-  COMMON_UI,
   REGISTER_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { FormFieldLabel } from "../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
+import { ImageUrlField } from "../../../shared/ui/ImageUrlField/ImageUrlField.jsx";
+import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
 
 import "./RegisterModal.css";
 
@@ -188,7 +189,7 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
             className="register-modal__close"
             onClick={handleClose}
           >
-            {COMMON_UI.MODAL_CLOSE_GLYPH}
+            <ModalCloseIcon />
           </button>
         </div>
         <form
@@ -347,12 +348,15 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
             />
             <label className="register-modal__label">
               {REGISTER_MODAL_UI.LABEL_AVATAR_URL}
-              <input
-                className="register-modal__input"
-                type="url"
+              <ImageUrlField
                 name="avatarUrl"
                 value={form.avatarUrl}
-                onChange={handleChange}
+                onChange={(avatarUrl) =>
+                  setForm((prev) => ({ ...prev, avatarUrl }))
+                }
+                canUpload={false}
+                disabled={status.kind === "loading"}
+                inputClassName="register-modal__input"
                 placeholder={REGISTER_MODAL_UI.PLACEHOLDER_HTTPS}
               />
             </label>

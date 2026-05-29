@@ -1,0 +1,92 @@
+.image-url-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.image-url-field__row {
+  display: flex;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.image-url-field__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.image-url-field__upload-btn {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #93c5fd;
+  border-radius: 0.5rem;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.image-url-field__upload-btn:hover:not(:disabled) {
+  background: #dbeafe;
+}
+
+.image-url-field__upload-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.image-url-field__hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #6b7280;
+  line-height: 1.35;
+}
+
+.image-url-field__error {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #b91c1c;
+  line-height: 1.35;
+}
+
+.image-url-field__file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.image-url-field_compact {
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 0.2rem;
+}
+
+.image-url-field_compact .image-url-field__row {
+  gap: 0.35rem;
+}
+
+.image-url-field_compact .image-url-field__upload-btn {
+  padding: 0.5rem 0.55rem;
+  font-size: 0.75rem;
+}
+
+.image-url-field_compact .image-url-field__hint {
+  font-size: 0.7rem;
+}
+
+.image-url-field_compact .image-url-field__input {
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.625rem;
+  font-size: 1rem;
+}
