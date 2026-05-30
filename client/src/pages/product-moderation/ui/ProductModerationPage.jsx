@@ -40,7 +40,6 @@ export function ProductModerationPage({ onSellerNameClick, onQueueChanged }) {
       });
       setProducts(list);
       setPhase("success");
-      onQueueChanged?.();
     } catch (e) {
       setError(
         e instanceof Error
@@ -49,7 +48,7 @@ export function ProductModerationPage({ onSellerNameClick, onQueueChanged }) {
       );
       setPhase("error");
     }
-  }, [onQueueChanged]);
+  }, []);
 
   useEffect(() => {
     void loadQueue();

@@ -9,6 +9,8 @@ import { Menu } from "../../../shared/ui/icon/index.js";
  *   selectedProductCategory: import("../../../entities/product/model/types.js").ProductCategory | null;
  *   listId: string;
  *   onClick: () => void;
+ *   isFilterActive?: boolean;
+ *   mode?: "category" | "catalog";
  * }} props
  */
 export function CatalogCategoryFilterButton({
@@ -16,17 +18,28 @@ export function CatalogCategoryFilterButton({
   selectedProductCategory,
   listId,
   onClick,
+  isFilterActive = false,
+  mode = "category",
 }) {
-  const ariaLabel = selectedProductCategory
-    ? HOME_PAGE_UI.FILTER_BUTTON_ARIA_SELECTED(
+  const ariaLabel = (() => {
+    if (mode === "catalog") {
+      if (isFilterActive) {
+        return HOME_PAGE_UI.CATALOG_FILTER_BUTTON_ARIA_ACTIVE;
+      }
+      return HOME_PAGE_UI.CATALOG_FILTER_BUTTON_ARIA;
+    }
+    if (selectedProductCategory) {
+      return HOME_PAGE_UI.FILTER_BUTTON_ARIA_SELECTED(
         PRODUCT_CATEGORY_LABEL_RU[selectedProductCategory],
-      )
-    : HOME_PAGE_UI.FILTER_BUTTON_ARIA;
+      );
+    }
+    return HOME_PAGE_UI.FILTER_BUTTON_ARIA;
+  })();
 
   return (
     <HeaderCircleIconButton
       onClick={onClick}
-      isActive={isOpen || selectedProductCategory != null}
+      isActive={isOpen || isFilterActive || selectedProductCategory != null}
       ariaLabel={ariaLabel}
       icon={Menu}
       ariaExpanded={isOpen}

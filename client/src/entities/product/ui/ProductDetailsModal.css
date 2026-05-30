@@ -267,6 +267,10 @@
   background: linear-gradient(165deg, #f8fafc 0%, #f1f5f9 100%);
 }
 
+.product-details-modal__price-display {
+  margin: 0;
+}
+
 .product-details-modal__price-dl {
   margin: 0;
 }

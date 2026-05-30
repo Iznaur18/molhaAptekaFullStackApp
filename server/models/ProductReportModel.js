@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import {
     PRODUCT_REPORT_STATUSES,
     PRODUCT_REPORT_STATUS_PENDING,
+    PRODUCT_REPORT_TEXT_MAX_CHARS,
 } from '../constants/productReportConstants.js';
 
 const ProductReportSchema = new mongoose.Schema(
@@ -21,7 +22,7 @@ const ProductReportSchema = new mongoose.Schema(
             type: String,
             required: true,
             trim: true,
-            maxlength: 2000,
+            maxlength: PRODUCT_REPORT_TEXT_MAX_CHARS,
         },
         status: {
             type: String,

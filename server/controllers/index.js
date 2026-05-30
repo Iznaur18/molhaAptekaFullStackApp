@@ -14,6 +14,7 @@ import { updateOrderStatusController } from './Order/updateOrderStatusController
 import {
     markOrderItemShippedBySellerController,
     markOrderItemDeliveredBySellerController,
+    markOrderItemCancelledBySellerController,
     confirmOrderItemByBuyerController,
 } from './Order/updateOrderItemStatusController.js';
 import { postProductController } from './Product/postProductController.js';
@@ -120,6 +121,7 @@ export {
     updateOrderStatusController,
     markOrderItemShippedBySellerController,
     markOrderItemDeliveredBySellerController,
+    markOrderItemCancelledBySellerController,
     confirmOrderItemByBuyerController,
     postProductController,
     getProductsController,

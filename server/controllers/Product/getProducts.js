@@ -22,6 +22,7 @@ import { USER_FOLLOW_FOLLOWING_ONLY_AUTH_MESSAGE } from '../../constants/userFol
 import { getVisibleFollowingSellerIds } from '../../utils/userFollowHelpers.js';
 import { expireProductPromotionsAndSendNotifications } from '../../utils/productPromotionHelpers.js';
 import { attachProductAvailablePurchaseQuantity } from '../../utils/productStock.js';
+import { buildProductSaleOnlyMatch } from '../../utils/productDiscount.js';
 import { buildRegexSearchOr, errorRes, successRes } from '../../utils/index.js';
 
 const parseTruthyQueryFlag = (raw) =>
@@ -67,6 +68,7 @@ export const getProductsController = async (req, res) => {
         const sort = parseProductSortFromQuery(req.query);
         const followingOnly = parseTruthyQueryFlag(req.query.followingOnly);
         const auctionOnly = parseTruthyQueryFlag(req.query.auctionOnly);
+        const saleOnly = parseTruthyQueryFlag(req.query.saleOnly);
 
         if (followingOnly && !req.userId) {
             return errorRes(res, 401, USER_FOLLOW_FOLLOWING_ONLY_AUTH_MESSAGE);
@@ -84,6 +86,9 @@ export const getProductsController = async (req, res) => {
 
         if (auctionOnly) {
             catalogBaseQuery.productAuctionEnabled = true;
+        }
+        if (saleOnly) {
+            Object.assign(catalogBaseQuery, buildProductSaleOnlyMatch());
         }
         if (!includeHidden) {
             catalogBaseQuery.productIsAvailable = { $ne: false };

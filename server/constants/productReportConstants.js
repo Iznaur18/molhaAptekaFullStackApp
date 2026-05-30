@@ -18,6 +18,9 @@ export const PRODUCT_REPORT_RESOLUTIONS = [
     PRODUCT_REPORT_RESOLUTION_REJECT,
 ];
 
+/** Макс. символов в тексте жалобы (`reportText`). */
+export const PRODUCT_REPORT_TEXT_MAX_CHARS = 1000;
+
 /** Макс. жалоб с одного аккаунта за час (rate limit). */
 export const PRODUCT_REPORT_RATE_LIMIT_PER_HOUR = 10;
 

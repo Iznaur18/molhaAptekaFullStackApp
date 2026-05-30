@@ -31,6 +31,9 @@ export const updateOrderStatusController = async (req, res) => {
         normalizeOrderItemsForRuntime(order.items);
 
         const now = new Date();
+        /** @type {{ productId: import('mongoose').Types.ObjectId; quantity: number }[]} */
+        const itemsPendingConfirmStock = [];
+
         for (const item of order.items) {
             const previousStatus = item.status;
             const productId = item.productId;
@@ -64,14 +67,10 @@ export const updateOrderStatusController = async (req, res) => {
                 status === ORDER_STATUS_CONFIRMED &&
                 previousStatus !== ORDER_STATUS_CONFIRMED
             ) {
-                try {
-                    await decrementProductStockOnItemConfirmed(
-                        productId,
-                        item.quantity,
-                    );
-                } catch (stockError) {
-                    console.error('decrementProductStockOnItemConfirmed error:', stockError);
-                }
+                itemsPendingConfirmStock.push({
+                    productId,
+                    quantity: item.quantity,
+                });
             }
         }
 
@@ -92,6 +91,23 @@ export const updateOrderStatusController = async (req, res) => {
         });
         order.status = status;
         await order.save();
+
+        for (const { productId, quantity } of itemsPendingConfirmStock) {
+            try {
+                await syncRaffleProgressForProductSale(productId);
+            } catch (raffleSyncError) {
+                console.error(
+                    'syncRaffleProgressForProductSale error:',
+                    raffleSyncError,
+                );
+            }
+            try {
+                await decrementProductStockOnItemConfirmed(productId, quantity);
+            } catch (stockError) {
+                console.error('decrementProductStockOnItemConfirmed error:', stockError);
+            }
+        }
+
         await order.populate('userBuyerId', ORDER_BUYER_PUBLIC_FIELDS);
         await order.populate(ORDER_ITEMS_POPULATE);
 

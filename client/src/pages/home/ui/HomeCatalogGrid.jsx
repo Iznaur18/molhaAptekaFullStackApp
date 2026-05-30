@@ -23,6 +23,7 @@ import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
  *   isAuthorized: boolean;
  *   currentUserId?: string | null;
  *   onRequestLoginAddToCart: () => void;
+ *   showAddToCartOnCard?: boolean;
  *   catalogSentinelRef: import('react').RefObject<HTMLDivElement | null>;
  *   catalogHasMore: boolean;
  *   isCatalogLoadingMore: boolean;
@@ -31,6 +32,7 @@ import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
  *   myProductsModerationFilter?: string;
  *   catalogFollowingOnly?: boolean;
  *   catalogAuctionOnly?: boolean;
+ *   catalogSaleOnly?: boolean;
  *   highlightRaffleProducts?: boolean;
  *   sellerRaffleActive?: boolean;
  *   onToggleRaffleParticipation?: (
@@ -61,6 +63,7 @@ export function HomeCatalogGrid({
   isAuthorized,
   currentUserId = null,
   onRequestLoginAddToCart,
+  showAddToCartOnCard = true,
   catalogSentinelRef,
   catalogHasMore,
   isCatalogLoadingMore,
@@ -69,6 +72,7 @@ export function HomeCatalogGrid({
   myProductsModerationFilter = "",
   catalogFollowingOnly = false,
   catalogAuctionOnly = false,
+  catalogSaleOnly = false,
   highlightRaffleProducts = false,
   sellerRaffleActive = false,
   onToggleRaffleParticipation,
@@ -79,6 +83,9 @@ export function HomeCatalogGrid({
   const emptyMessage = (() => {
     if (products.length > 0) return "";
     if (hasQuery) return HOME_PAGE_UI.EMPTY_BY_QUERY;
+    if (!isMineMode && catalogSaleOnly) {
+      return HOME_PAGE_UI.EMPTY_SALE_FILTER;
+    }
     if (!isMineMode && (catalogFollowingOnly || catalogAuctionOnly)) {
       return HOME_PAGE_UI.EMPTY_FOLLOWING_FILTER;
     }
@@ -140,6 +147,7 @@ export function HomeCatalogGrid({
                   isAuthorized={isAuthorized}
                   currentUserId={currentUserId}
                   onRequestLoginAddToCart={onRequestLoginAddToCart}
+                  showAddToCartOnCard={showAddToCartOnCard}
                   isMineMode={isMineMode}
                   highlightCatalogPromotion={!isMineMode}
                   isPromotionPending={

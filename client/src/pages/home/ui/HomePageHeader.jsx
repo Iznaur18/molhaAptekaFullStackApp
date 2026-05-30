@@ -2,8 +2,8 @@ import { useEffect, useRef } from "react";
 
 import { formatSellerProductsQuota } from "../../../entities/product/lib/sellerProductsLimit.js";
 import {
-  CATALOG_SELECT_OPTIONS,
   CATALOG_SORT_LABEL_RU,
+  CATALOG_SORT_NEWEST,
   CATALOG_SORT_OPTIONS_MY_PRODUCTS,
   MY_PRODUCTS_MODERATION_FILTER_OPTIONS,
   MY_PRODUCTS_MODERATION_FILTER_LABEL_RU,
@@ -11,10 +11,12 @@ import {
   PRODUCT_CATEGORY_LABEL_RU,
 } from "../../../entities/product/model/productConstants.js";
 import { CatalogCategoryFilterButton } from "../../../widgets/catalog-category-filter-button/ui/CatalogCategoryFilterButton.jsx";
+import { CatalogFilterDropdown } from "../../../widgets/catalog-filter-dropdown/ui/CatalogFilterDropdown.jsx";
 import { HeaderCartButton } from "../../../widgets/header-cart-button/ui/HeaderCartButton.jsx";
 import { HeaderNotificationsButton } from "../../../widgets/header-notifications-button/ui/HeaderNotificationsButton.jsx";
 import { HeaderPlaceProductButton } from "../../../widgets/header-place-product-button/ui/HeaderPlaceProductButton.jsx";
 import { HeaderProfileButton } from "../../../widgets/header-profile-button/ui/HeaderProfileButton.jsx";
+import { HeaderUsersButton } from "../../../widgets/header-users-button/ui/HeaderUsersButton.jsx";
 import {
   DATA_CONFIRMATION_PAGE_UI,
   HOME_PAGE_UI,
@@ -29,18 +31,6 @@ import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 
 const PRODUCT_CATEGORY_FILTER_LIST_ID =
   HOME_PAGE_UI.PRODUCT_CATEGORY_FILTER_LIST_ID;
-
-/**
- * @param {boolean} isActive
- */
-function headerNavButtonClassName(isActive) {
-  return [
-    "home-page__list-product-button",
-    isActive && "home-page__header-nav-button--active",
-  ]
-    .filter(Boolean)
-    .join(" ");
-}
 
 /** Разделы с подписью в кнопках шапки — без дублирующего view-title. */
 const HEADER_VIEW_TITLE_HIDDEN_VIEWS = new Set(["users", "cart"]);
@@ -80,8 +70,14 @@ const NON_CATALOG_VIEW_TITLES = {
  *   onLoginClick: () => void;
  *   onRegisterClick: () => void;
  *   onNavigateToFullCatalogFromBreadcrumb: () => void;
- *   catalogSelectValue: string;
- *   onCatalogSelectChange: (value: string) => void;
+ *   catalogSort: string;
+ *   onCatalogSortChange: (value: string) => void;
+ *   catalogFollowingOnly: boolean;
+ *   catalogAuctionOnly: boolean;
+ *   catalogSaleOnly: boolean;
+ *   onCatalogFollowingOnlyToggle: () => void;
+ *   onCatalogAuctionOnlyToggle: () => void;
+ *   onCatalogSaleOnlyToggle: () => void;
  *   isAdmin: boolean;
  *   showHiddenCatalogProducts: boolean;
  *   onShowHiddenCatalogProductsChange: (next: boolean) => void;
@@ -114,8 +110,14 @@ export function HomePageHeader({
   onLoginClick,
   onRegisterClick,
   onNavigateToFullCatalogFromBreadcrumb,
-  catalogSelectValue,
-  onCatalogSelectChange,
+  catalogSort,
+  onCatalogSortChange,
+  catalogFollowingOnly,
+  catalogAuctionOnly,
+  catalogSaleOnly,
+  onCatalogFollowingOnlyToggle,
+  onCatalogAuctionOnlyToggle,
+  onCatalogSaleOnlyToggle,
   isAdmin,
   showHiddenCatalogProducts,
   onShowHiddenCatalogProductsChange,
@@ -151,7 +153,6 @@ export function HomePageHeader({
   useScrollLock(isProductCategoryListOpen);
 
   const isCatalogView = isCatalogShellMainView(mainView);
-  const isHomeNavActive = mainView === "catalog";
   const isUsersNavActive = mainView === "users";
   const isCartNavActive = mainView === "cart";
   const isMyProfileNavActive = mainView === "my-profile";
@@ -194,20 +195,100 @@ export function HomePageHeader({
         <div className="home-page__header-main">
           <HomeHeaderTitleRow
             isCatalogView={isCatalogView}
-            isHomeNavActive={isHomeNavActive}
-            isUsersNavActive={isUsersNavActive}
             isMineMode={isMineMode}
             headerViewTitle={headerViewTitle}
-            onSetMainView={onSetMainView}
             onNavigateToFullCatalogFromBreadcrumb={
               onNavigateToFullCatalogFromBreadcrumb
             }
           />
+          {isCatalogView ? (
+            <>
+              <div
+                className="home-page__header-filter"
+                ref={productCategoryFilterRef}
+              >
+                <CatalogCategoryFilterButton
+                  isOpen={isProductCategoryListOpen}
+                  selectedProductCategory={selectedProductCategory}
+                  listId={PRODUCT_CATEGORY_FILTER_LIST_ID}
+                  onClick={onProductCategoryFilterToggle}
+                  mode={isMineMode ? "category" : "catalog"}
+                  isFilterActive={
+                    !isMineMode &&
+                    (selectedProductCategory != null ||
+                      catalogFollowingOnly ||
+                      catalogAuctionOnly ||
+                      catalogSaleOnly ||
+                      catalogSort !== CATALOG_SORT_NEWEST)
+                  }
+                />
+                {isProductCategoryListOpen && !isMineMode ? (
+                  <CatalogFilterDropdown
+                    panelId={PRODUCT_CATEGORY_FILTER_LIST_ID}
+                    selectedProductCategory={selectedProductCategory}
+                    catalogSort={catalogSort}
+                    catalogFollowingOnly={catalogFollowingOnly}
+                    catalogAuctionOnly={catalogAuctionOnly}
+                    catalogSaleOnly={catalogSaleOnly}
+                    onProductCategorySelect={onProductCategorySelect}
+                    onCatalogSortChange={onCatalogSortChange}
+                    onCatalogFollowingOnlyToggle={onCatalogFollowingOnlyToggle}
+                    onCatalogAuctionOnlyToggle={onCatalogAuctionOnlyToggle}
+                    onCatalogSaleOnlyToggle={onCatalogSaleOnlyToggle}
+                  />
+                ) : null}
+                {isProductCategoryListOpen && isMineMode ? (
+                  <ul
+                    id={PRODUCT_CATEGORY_FILTER_LIST_ID}
+                    className="home-page__category-list"
+                    role="list"
+                    onWheel={(event) => event.stopPropagation()}
+                  >
+                    <li className="home-page__category-item">
+                      <button
+                        type="button"
+                        className="home-page__category-option"
+                        onClick={() => onProductCategorySelect(null)}
+                      >
+                        {HOME_PAGE_UI.CATEGORY_ALL}
+                      </button>
+                    </li>
+                    {PRODUCT_CATEGORIES.map((category) => (
+                      <li key={category} className="home-page__category-item">
+                        <button
+                          type="button"
+                          className="home-page__category-option"
+                          onClick={() => onProductCategorySelect(category)}
+                        >
+                          {PRODUCT_CATEGORY_LABEL_RU[category]}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+              <div className="home-page__header-search">
+                <SearchInput
+                  value={productSearchTerm}
+                  onChange={onProductSearchTermChange}
+                  placeholder={PRODUCT_SEARCH_INPUT_UI.PLACEHOLDER}
+                  ariaLabel={PRODUCT_SEARCH_INPUT_UI.ARIA_LABEL}
+                  clearAriaLabel={PRODUCT_SEARCH_INPUT_UI.CLEAR_ARIA}
+                  pendingAriaLabel={PRODUCT_SEARCH_INPUT_UI.PENDING_ARIA}
+                  isPending={isProductSearchPending}
+                />
+              </div>
+            </>
+          ) : null}
         </div>
         <nav
           className="home-page__auth-actions"
           aria-label={HOME_PAGE_UI.NAV_AUTH_ARIA}
         >
+          <HeaderUsersButton
+            isActive={isUsersNavActive}
+            onClick={() => onSetMainView("users")}
+          />
           <HeaderCartButton
             isActive={isCartNavActive}
             onClick={() => onSetMainView("cart")}
@@ -253,17 +334,9 @@ export function HomePageHeader({
       {isCatalogView ? (
         <CatalogToolbar
           isMineMode={isMineMode}
-          selectedProductCategory={selectedProductCategory}
-          isProductCategoryListOpen={isProductCategoryListOpen}
-          productSearchTerm={productSearchTerm}
-          isProductSearchPending={isProductSearchPending}
-          productCategoryFilterRef={productCategoryFilterRef}
-          onProductCategorySelect={onProductCategorySelect}
-          onProductCategoryFilterToggle={onProductCategoryFilterToggle}
-          onProductSearchTermChange={onProductSearchTermChange}
           onPlaceProductClick={onPlaceProductClick}
-          catalogSelectValue={catalogSelectValue}
-          onCatalogSelectChange={onCatalogSelectChange}
+          catalogSort={catalogSort}
+          onCatalogSortChange={onCatalogSortChange}
           isAdmin={isAdmin}
           showHiddenCatalogProducts={showHiddenCatalogProducts}
           onShowHiddenCatalogProductsChange={
@@ -283,81 +356,37 @@ export function HomePageHeader({
 
 /**
  * @param {{
- *   isHomeNavActive: boolean;
- *   isUsersNavActive: boolean;
- *   showUsersNav: boolean;
- *   onHomeClick: () => void;
- *   onUsersClick: () => void;
- * }} props
- */
-function HomeSectionNav({
-  isHomeNavActive,
-  isUsersNavActive,
-  showUsersNav,
-  onHomeClick,
-  onUsersClick,
-}) {
-  return (
-    <nav
-      className="home-page__auth-actions"
-      aria-label={HOME_PAGE_UI.NAV_SECTIONS_ARIA}
-    >
-      <button
-        type="button"
-        className={headerNavButtonClassName(isHomeNavActive)}
-        onClick={onHomeClick}
-        aria-current={isHomeNavActive ? "page" : undefined}
-      >
-        {HOME_PAGE_UI.NAV_TO_HOME}
-      </button>
-      {showUsersNav ? (
-        <button
-          type="button"
-          className={headerNavButtonClassName(isUsersNavActive)}
-          onClick={onUsersClick}
-          aria-current={isUsersNavActive ? "page" : undefined}
-        >
-          {HOME_PAGE_UI.NAV_TO_USERS}
-        </button>
-      ) : null}
-    </nav>
-  );
-}
-
-/**
- * @param {{
  *   isCatalogView: boolean;
- *   isHomeNavActive: boolean;
- *   isUsersNavActive: boolean;
  *   isMineMode: boolean;
  *   headerViewTitle: string;
- *   onSetMainView: (view: import('./HomePage.jsx').HomeMainView) => void;
  *   onNavigateToFullCatalogFromBreadcrumb: () => void;
  * }} props
  */
 function HomeHeaderTitleRow({
   isCatalogView,
-  isHomeNavActive,
-  isUsersNavActive,
   isMineMode,
   headerViewTitle,
-  onSetMainView,
   onNavigateToFullCatalogFromBreadcrumb,
 }) {
-  const showUsersNav = !isMineMode;
-
   return (
     <div className="home-page__title-row">
       <h1 className="home-page__title home-page__title_inline">
-        {HOME_PAGE_UI.TITLE_CATALOG}
+        <button
+          type="button"
+          className="home-page__brand-button"
+          onClick={onNavigateToFullCatalogFromBreadcrumb}
+          aria-label={HOME_PAGE_UI.NAV_TO_HOME}
+        >
+          <img
+            className="home-page__logo"
+            src={HOME_PAGE_UI.LOGO_SRC}
+            alt={HOME_PAGE_UI.LOGO_ALT}
+            width={120}
+            height={40}
+            decoding="async"
+          />
+        </button>
       </h1>
-      <HomeSectionNav
-        isHomeNavActive={isHomeNavActive}
-        isUsersNavActive={isUsersNavActive}
-        showUsersNav={showUsersNav}
-        onHomeClick={onNavigateToFullCatalogFromBreadcrumb}
-        onUsersClick={() => onSetMainView("users")}
-      />
       {isCatalogView && isMineMode ? (
         <span
           className="home-page__breadcrumb"
@@ -383,17 +412,9 @@ function HomeHeaderTitleRow({
 
 function CatalogToolbar({
   isMineMode,
-  selectedProductCategory,
-  isProductCategoryListOpen,
-  productSearchTerm,
-  isProductSearchPending,
-  productCategoryFilterRef,
-  onProductCategorySelect,
-  onProductCategoryFilterToggle,
-  onProductSearchTermChange,
   onPlaceProductClick,
-  catalogSelectValue,
-  onCatalogSelectChange,
+  catalogSort,
+  onCatalogSortChange,
   isAdmin,
   showHiddenCatalogProducts,
   onShowHiddenCatalogProductsChange,
@@ -409,96 +430,53 @@ function CatalogToolbar({
     showProductsQuota && sellerProductsLimit != null
       ? formatSellerProductsQuota(myProductsTotal, sellerProductsLimit)
       : null;
-  const catalogSelectOptions = isMineMode
-    ? CATALOG_SORT_OPTIONS_MY_PRODUCTS
-    : CATALOG_SELECT_OPTIONS;
+  const showCatalogFiltersRow = isMineMode || showAdminHiddenToggle;
 
   return (
     <>
+      {showCatalogFiltersRow ? (
       <div className="home-page__catalog-filters-row">
-        <div className="home-page__catalog-search">
-          <SearchInput
-            value={productSearchTerm}
-            onChange={onProductSearchTermChange}
-            placeholder={PRODUCT_SEARCH_INPUT_UI.PLACEHOLDER}
-            ariaLabel={PRODUCT_SEARCH_INPUT_UI.ARIA_LABEL}
-            clearAriaLabel={PRODUCT_SEARCH_INPUT_UI.CLEAR_ARIA}
-            pendingAriaLabel={PRODUCT_SEARCH_INPUT_UI.PENDING_ARIA}
-            isPending={isProductSearchPending}
-          />
-        </div>
-        <div className="home-page__filter" ref={productCategoryFilterRef}>
-          <CatalogCategoryFilterButton
-            isOpen={isProductCategoryListOpen}
-            selectedProductCategory={selectedProductCategory}
-            listId={PRODUCT_CATEGORY_FILTER_LIST_ID}
-            onClick={onProductCategoryFilterToggle}
-          />
-          {isProductCategoryListOpen ? (
-            <ul
-              id={PRODUCT_CATEGORY_FILTER_LIST_ID}
-              className="home-page__category-list"
-              role="list"
-              onWheel={(event) => event.stopPropagation()}
-            >
-              <li className="home-page__category-item">
-                <button
-                  type="button"
-                  className="home-page__category-option"
-                  onClick={() => onProductCategorySelect(null)}
+        {isMineMode ? (
+          <>
+            <div className="home-page__sort">
+              <label className="home-page__sort-label">
+                <span>{HOME_PAGE_UI.SORT_LABEL}</span>
+                <select
+                  className="home-page__sort-control"
+                  value={catalogSort}
+                  onChange={(event) =>
+                    onCatalogSortChange(event.target.value)
+                  }
                 >
-                  {HOME_PAGE_UI.CATEGORY_ALL}
-                </button>
-              </li>
-              {PRODUCT_CATEGORIES.map((category) => (
-                <li key={category} className="home-page__category-item">
-                  <button
-                    type="button"
-                    className="home-page__category-option"
-                    onClick={() => onProductCategorySelect(category)}
+                  {CATALOG_SORT_OPTIONS_MY_PRODUCTS.map((optionKey) => (
+                    <option key={optionKey} value={optionKey}>
+                      {CATALOG_SORT_LABEL_RU[optionKey]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            {typeof onMyProductsModerationFilterChange === "function" ? (
+              <div className="home-page__sort">
+                <label className="home-page__sort-label">
+                  <span>{HOME_PAGE_UI.MODERATION_STATUS_FILTER_LABEL}</span>
+                  <select
+                    className="home-page__sort-control"
+                    value={myProductsModerationFilter}
+                    onChange={(event) =>
+                      onMyProductsModerationFilterChange(event.target.value)
+                    }
                   >
-                    {PRODUCT_CATEGORY_LABEL_RU[category]}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : null}
-        </div>
-        <div className="home-page__sort">
-        <label className="home-page__sort-label">
-          <span>{HOME_PAGE_UI.SORT_LABEL}</span>
-          <select
-            className="home-page__sort-control"
-            value={catalogSelectValue}
-            onChange={(event) => onCatalogSelectChange(event.target.value)}
-          >
-            {catalogSelectOptions.map((optionKey) => (
-              <option key={optionKey} value={optionKey}>
-                {CATALOG_SORT_LABEL_RU[optionKey]}
-              </option>
-            ))}
-          </select>
-          </label>
-        </div>
-        {isMineMode && typeof onMyProductsModerationFilterChange === "function" ? (
-          <div className="home-page__sort">
-            <label className="home-page__sort-label">
-              <span>{HOME_PAGE_UI.MODERATION_STATUS_FILTER_LABEL}</span>
-              <select
-                className="home-page__sort-control"
-                value={myProductsModerationFilter}
-                onChange={(event) =>
-                  onMyProductsModerationFilterChange(event.target.value)
-                }
-              >
-                {MY_PRODUCTS_MODERATION_FILTER_OPTIONS.map((filterKey) => (
-                  <option key={filterKey || "all"} value={filterKey}>
-                    {MY_PRODUCTS_MODERATION_FILTER_LABEL_RU[filterKey]}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
+                    {MY_PRODUCTS_MODERATION_FILTER_OPTIONS.map((filterKey) => (
+                      <option key={filterKey || "all"} value={filterKey}>
+                        {MY_PRODUCTS_MODERATION_FILTER_LABEL_RU[filterKey]}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+            ) : null}
+          </>
         ) : null}
         {showAdminHiddenToggle ? (
           <label className="home-page__hidden-toggle">
@@ -513,6 +491,7 @@ function CatalogToolbar({
           </label>
         ) : null}
       </div>
+      ) : null}
 
       {isMineMode ? (
         <div className="home-page__my-products-subtitle-row">

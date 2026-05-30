@@ -9,5 +9,6 @@ export {
   ShoppingCart,
   Trash2,
   User,
+  Users,
   X,
 } from "lucide-react";

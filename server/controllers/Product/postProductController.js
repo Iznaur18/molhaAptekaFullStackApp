@@ -9,7 +9,13 @@ import { isUserAdmin } from "../../utils/adminUserGuard.js";
 import { mergeProductImageUrlsFromBody } from "../../utils/mergeProductImageUrlsFromBody.js";
 import { assertSellerCanCreateProduct } from "../../utils/sellerProductsLimit.js";
 import { notifyFollowersOfSellerNewCatalogProduct } from "../../utils/userFollowHelpers.js";
+import { notifyFollowersOfSellerProductDiscount } from "../../utils/productDiscount.js";
 import { resolveProductStockQuantityForWrite } from "../../utils/productStock.js";
+import {
+    assertProductOldPricePair,
+    normalizeProductOldPriceRub,
+    normalizeProductPriceRub,
+} from "../../utils/productDiscount.js";
 import { errorRes, successRes } from "../../utils/index.js";
 
 export const postProductController = async (req, res) => {
@@ -18,11 +24,25 @@ export const postProductController = async (req, res) => {
     const {
       productName,
       productDescription,
-      productPrice,
+      productPrice: rawProductPrice,
       productCategory,
       productIsAvailable,
       productAuctionEnabled,
     } = req.body;
+
+    let productPrice;
+    let productOldPrice;
+    try {
+      productPrice = normalizeProductPriceRub(rawProductPrice);
+      productOldPrice = normalizeProductOldPriceRub(req.body?.productOldPrice);
+      assertProductOldPricePair(productOldPrice, productPrice);
+    } catch (priceError) {
+      return errorRes(
+        res,
+        400,
+        priceError instanceof Error ? priceError.message : "Некорректная цена",
+      );
+    }
 
     const user = await UserModel.findById(userId);
 
@@ -66,6 +86,7 @@ export const postProductController = async (req, res) => {
       productDescription,
       productImageUrls,
       productPrice,
+      productOldPrice,
       productSeller: userId,
       productCategory,
       productIsAvailable: visibleInCatalog,
@@ -85,6 +106,14 @@ export const postProductController = async (req, res) => {
       } catch (notifyError) {
         console.error(
           "notifyFollowersOfSellerNewCatalogProduct error:",
+          notifyError,
+        );
+      }
+      try {
+        await notifyFollowersOfSellerProductDiscount(productPayload, null);
+      } catch (notifyError) {
+        console.error(
+          "notifyFollowersOfSellerProductDiscount error:",
           notifyError,
         );
       }

@@ -28,6 +28,17 @@ const ProductSchema = new Schema(
       },
     },
     productPrice: { type: Number, required: true },
+    productOldPrice: {
+      type: Number,
+      default: null,
+      min: 0,
+    },
+    productLastApprovedDiscountPercent: {
+      type: Number,
+      default: null,
+      min: 0,
+      max: 100,
+    },
     productSeller: {
       type: Schema.Types.ObjectId,
       ref: "User",

@@ -1,0 +1,56 @@
+.product-price-display {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.3rem 0.45rem;
+  margin: 0.05rem 0 0;
+  line-height: 1.2;
+}
+
+.product-price-display__label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: color-mix(in srgb, currentColor 58%, transparent);
+}
+
+.product-price-display__label::after {
+  content: ":";
+}
+
+.product-price-display__current {
+  font-size: 1.08rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  color: #1d4ed8;
+}
+
+.product-price-display__old {
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in srgb, currentColor 52%, transparent);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
+.product-price-display--inline .product-price-display__current {
+  font-size: 1rem;
+}
+
+.product-discount-badge {
+  margin: 0;
+  padding: 0.2rem 0.5rem;
+  width: fit-content;
+  border-radius: 0.35rem;
+  border: 1px solid #f87171;
+  background: #fee2e2;
+  color: #991b1b;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.product-card__status-badges-row > .product-discount-badge {
+  margin: 0;
+}

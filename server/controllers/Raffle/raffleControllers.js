@@ -404,12 +404,12 @@ export const setProductRaffleParticipationController = async (req, res) => {
                 return errorRes(res, 403, 'Нет доступа');
             }
             const previousRaffleId = product.activeRaffleId;
-            product.activeRaffleId = null;
-            product.raffleParticipationEnabledAt = null;
-            await product.save();
             if (previousRaffleId) {
                 await recalculateRaffleSalesProgress(previousRaffleId);
             }
+            product.activeRaffleId = null;
+            product.raffleParticipationEnabledAt = null;
+            await product.save();
             const [payload] = await attachProductSellerSnapshots([
                 product.toObject(),
             ]);

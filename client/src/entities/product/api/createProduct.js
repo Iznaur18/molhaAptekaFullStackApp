@@ -10,6 +10,7 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
  * @property {string[]} [productImageUrls]
  * @property {string} [productImageUrl]
  * @property {number} productPrice
+ * @property {number | null} [productOldPrice]
  * @property {import('../model/types.js').ProductCategory} productCategory
  * @property {boolean} productIsAvailable
  * @property {number} [productStockQuantity]
@@ -28,6 +29,7 @@ export async function createProduct(body) {
       productName: body.productName.trim(),
       productDescription: body.productDescription.trim(),
       productPrice: body.productPrice,
+      productOldPrice: body.productOldPrice ?? null,
       productCategory: body.productCategory,
       productIsAvailable: body.productIsAvailable,
     };

@@ -3,8 +3,8 @@ import { PRODUCT_MODERATION_APPROVED } from '../../constants/productModerationCo
 import {
     PRODUCT_REPORT_ALREADY_MESSAGE,
     PRODUCT_REPORT_STATUS_PENDING,
+    PRODUCT_REPORT_TEXT_MAX_CHARS,
 } from '../../constants/productReportConstants.js';
-import { assertAtMostWords } from '../../utils/maxWordsText.js';
 import {
     dismissPendingReportsForProduct,
     getPendingProductReportGroups,
@@ -26,15 +26,11 @@ export const submitProductReportController = async (req, res) => {
             return errorRes(res, 400, 'Укажите текст жалобы');
         }
 
-        try {
-            assertAtMostWords(reportText, 'Текст жалобы');
-        } catch (validationError) {
+        if (reportText.length > PRODUCT_REPORT_TEXT_MAX_CHARS) {
             return errorRes(
                 res,
                 400,
-                validationError instanceof Error
-                    ? validationError.message
-                    : 'Некорректный текст жалобы',
+                `Текст жалобы: не больше ${PRODUCT_REPORT_TEXT_MAX_CHARS} символов`,
             );
         }
 

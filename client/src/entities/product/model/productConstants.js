@@ -125,6 +125,7 @@ export const CATALOG_SORT_CONFIRMED = "confirmed";
 /** Значения `<select>` каталога (не уходят в query `sort`). */
 export const CATALOG_FILTER_FOLLOWING_ONLY = "__following_only__";
 export const CATALOG_FILTER_AUCTION_ONLY = "__auction_only__";
+export const CATALOG_FILTER_SALE_ONLY = "__sale_only__";
 
 export const CATALOG_SORT_OPTIONS = [
   CATALOG_SORT_NEWEST,
@@ -134,11 +135,18 @@ export const CATALOG_SORT_OPTIONS = [
   CATALOG_SORT_CONFIRMED,
 ];
 
-/** Публичный каталог: сортировка + фильтры в одном меню. */
+/** Публичный каталог: категории + сортировка + фильтры в одном списке. */
 export const CATALOG_SELECT_OPTIONS = [
   ...CATALOG_SORT_OPTIONS,
   CATALOG_FILTER_FOLLOWING_ONLY,
   CATALOG_FILTER_AUCTION_ONLY,
+];
+
+/** Переключатели фильтров публичного каталога (не query `sort`). */
+export const CATALOG_PUBLIC_FILTER_TOGGLE_KEYS = [
+  CATALOG_FILTER_FOLLOWING_ONLY,
+  CATALOG_FILTER_AUCTION_ONLY,
+  CATALOG_FILTER_SALE_ONLY,
 ];
 
 /** Сортировки в «Мои товары» (без фильтра только премиум). */
@@ -175,6 +183,7 @@ export const CATALOG_SORT_LABEL_RU = {
   [CATALOG_SORT_CONFIRMED]: "Подтверждённые продавцы",
   [CATALOG_FILTER_FOLLOWING_ONLY]: "Только от подписок",
   [CATALOG_FILTER_AUCTION_ONLY]: "Только с аукционом",
+  [CATALOG_FILTER_SALE_ONLY]: "Распродажа",
 };
 
 /**
@@ -199,14 +208,12 @@ export const PRODUCT_MODEL_FIELD_KEYS = [
 /** Поля превью на карточке каталога (остальное — в модалке). */
 export const PRODUCT_CARD_PREVIEW_FIELD_KEYS = [
   "productPrice",
-  "productCategory",
   "productSeller",
 ];
 
 /** Поля на карточке в очереди «На модерации» (как каталог + описание и дата). */
 export const PRODUCT_CARD_MODERATION_PREVIEW_FIELD_KEYS = [
   "productPrice",
-  "productCategory",
   "productSeller",
   "productDescription",
   "createdAt",
@@ -256,6 +263,7 @@ export const PRODUCT_FIELD_LABEL_RU = {
   productDescription: "Описание",
   productImageUrls: "Фото (URL)",
   productPrice: "Цена",
+  productOldPrice: "Старая цена",
   productSeller: "Продавец",
   productCategory: "Категория",
   productIsAvailable: "В наличии",

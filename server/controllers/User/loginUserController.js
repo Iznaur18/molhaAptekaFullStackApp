@@ -28,6 +28,7 @@ import {
     normalizeUserBackgroundFocus,
 } from '../../utils/profileImageFocus.js';
 import { getUnreadInAppNotificationsForUser } from '../../utils/userInAppNotifications.js';
+import { buildUserProfileMongoUpdate } from '../../utils/buildUserProfileMongoUpdate.js';
 import { rejectPendingDataConfirmationForUser } from '../../utils/userDataConfirmationHelpers.js';
 
 /** Вход по email + пароль. POST /auth/login */
@@ -338,7 +339,13 @@ export const userUpdateProfileController = async (req, res) => {
         }
 
         // 6. Логирование изменений (для аудита)
-        console.log(`[UPDATE PROFILE] User ${currentUserId} updating profile ${targetUserId}. Fields: ${Object.keys(updateData).join(', ')}`);
+        const mongoUpdate = buildUserProfileMongoUpdate(updateData);
+        if (Object.keys(mongoUpdate).length === 0) {
+            return errorRes(res, 400, 'Нет данных для обновления. Укажите хотя бы одно разрешенное поле');
+        }
+        console.log(
+            `[UPDATE PROFILE] User ${currentUserId} updating profile ${targetUserId}. Update: ${JSON.stringify(mongoUpdate)}`,
+        );
 
         // 7. Обновление профиля пользователя
         const selectFields = isCurrentUserStaff && !isCurrentUserOwner
@@ -346,9 +353,11 @@ export const userUpdateProfileController = async (req, res) => {
             : allowedFields.join(' ');
         const userDataUpdated = await UserModel.findByIdAndUpdate(
             targetUserId,
-            updateData,
+            mongoUpdate,
             { returnDocument: 'after', runValidators: true },
-        ).select(selectFields);
+        )
+            .select(selectFields)
+            .lean();
 
         if (!userDataUpdated) {
             return errorRes(res, 404, 'Пользователь не найден или не удалось обновить');

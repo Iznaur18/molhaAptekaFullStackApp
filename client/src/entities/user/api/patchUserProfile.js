@@ -15,11 +15,18 @@ export async function patchUserProfile(userId, body) {
       body,
     );
 
-    if (!data?.success || !data.data?.user) {
+    if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
 
-    return data.data.user;
+    const payload = data.data;
+    const user = payload?.user ?? (payload?._id ? payload : null);
+
+    if (!user) {
+      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
+    }
+
+    return user;
   } catch (e) {
     const message =
       e?.response?.data?.message ??

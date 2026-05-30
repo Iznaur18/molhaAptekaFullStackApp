@@ -16,7 +16,8 @@ import {
     PRODUCT_STOCK_REQUIRED_WHEN_AVAILABLE_MESSAGE,
 } from '../constants/productStockConstants.js';
 import { PRODUCT_MODERATION_APPROVED } from '../constants/productModerationConstants.js';
-import { OrderModel, ProductModel } from '../models/index.js';
+import { OrderModel, ProductModel, RaffleModel } from '../models/index.js';
+import { RAFFLE_STATUS_COMPLETED } from '../constants/raffleConstants.js';
 import { recalculateRaffleSalesProgress } from './raffleHelpers.js';
 
 export const STOCK_RESERVATION_ITEM_STATUSES = [
@@ -188,12 +189,20 @@ export const clearProductRaffleParticipation = async (productId) => {
         return;
     }
     const previousRaffleId = product.activeRaffleId;
+
+    if (previousRaffleId) {
+        await recalculateRaffleSalesProgress(previousRaffleId);
+        const raffleAfter = await RaffleModel.findById(previousRaffleId)
+            .select('status')
+            .lean();
+        if (raffleAfter?.status === RAFFLE_STATUS_COMPLETED) {
+            return;
+        }
+    }
+
     product.activeRaffleId = null;
     product.raffleParticipationEnabledAt = null;
     await product.save();
-    if (previousRaffleId) {
-        await recalculateRaffleSalesProgress(previousRaffleId);
-    }
 };
 
 /**

@@ -21,6 +21,7 @@ import {
 } from "../model/productConstants.js";
 import { ProductImageLightbox } from "./ProductImageLightbox.jsx";
 import { ProductDetailsSellerPreview } from "./ProductDetailsSellerPreview.jsx";
+import { ProductPriceDisplay } from "./ProductPriceDisplay.jsx";
 import { fetchCurrentUserProfile } from "../../user/api/fetchCurrentUserProfile.js";
 import { isCurrentUserProductSeller } from "../lib/isCurrentUserProductSeller.js";
 import { fetchTopPriceOffers } from "../../product-price-offer/api/fetchTopPriceOffers.js";
@@ -674,13 +675,10 @@ export function ProductDetailsModal({
               <div className="product-details-modal__spec">
                 {topRowFieldKeys.includes("productPrice") ? (
                   <div className="product-details-modal__price-block">
-                    <dl className="product-details-modal__price-dl">
-                      {renderFieldRows(
-                        product,
-                        ["productPrice"],
-                        fieldHandlers,
-                      )}
-                    </dl>
+                    <ProductPriceDisplay
+                      product={product}
+                      className="product-details-modal__price-display"
+                    />
                     <div
                       className={
                         canShowAddToCart

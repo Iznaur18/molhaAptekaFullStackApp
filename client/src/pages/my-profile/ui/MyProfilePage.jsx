@@ -19,6 +19,7 @@ import {
   PRODUCT_REPORTS_PAGE_UI,
   USER_DETAILS_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
+import { PROFILE_TAB_OVERVIEW } from "../lib/profileTabs.js";
 
 import "../../../entities/user/ui/UserDetailsModal.css";
 import "./MyProfilePage.css";
@@ -164,6 +165,12 @@ export function MyProfilePage({
     setAvatarLoadFailed(false);
     setBackgroundLoadFailed(false);
   }, [user?._id]);
+
+  useEffect(() => {
+    if (activeTab !== PROFILE_TAB_OVERVIEW) {
+      setIsLogoutConfirmOpen(false);
+    }
+  }, [activeTab]);
 
   const tabButtonClassName = (tab) =>
     [
@@ -426,42 +433,44 @@ export function MyProfilePage({
           <div className="my-profile-page__tab-content">{tabContent}</div>
         ) : null}
       </div>
-      <footer className="my-profile-page__footer">
-        {!isLogoutConfirmOpen ? (
-          <button
-            type="button"
-            className="my-profile-page__logout-trigger"
-            onClick={() => setIsLogoutConfirmOpen(true)}
-          >
-            {MY_PROFILE_PAGE_UI.LOGOUT}
-          </button>
-        ) : (
-          <div className="my-profile-page__logout-confirm">
-            <p className="my-profile-page__logout-question">
-              {MY_PROFILE_PAGE_UI.LOGOUT_CONFIRM}
-            </p>
-            <div className="my-profile-page__logout-actions">
-              <button
-                type="button"
-                className="my-profile-page__logout-yes"
-                onClick={() => {
-                  void onLogout();
-                  setIsLogoutConfirmOpen(false);
-                }}
-              >
-                {MY_PROFILE_PAGE_UI.LOGOUT_YES}
-              </button>
-              <button
-                type="button"
-                className="my-profile-page__logout-cancel"
-                onClick={() => setIsLogoutConfirmOpen(false)}
-              >
-                {MY_PROFILE_PAGE_UI.LOGOUT_CANCEL}
-              </button>
+      {activeTab === PROFILE_TAB_OVERVIEW ? (
+        <footer className="my-profile-page__footer">
+          {!isLogoutConfirmOpen ? (
+            <button
+              type="button"
+              className="my-profile-page__logout-trigger"
+              onClick={() => setIsLogoutConfirmOpen(true)}
+            >
+              {MY_PROFILE_PAGE_UI.LOGOUT}
+            </button>
+          ) : (
+            <div className="my-profile-page__logout-confirm">
+              <p className="my-profile-page__logout-question">
+                {MY_PROFILE_PAGE_UI.LOGOUT_CONFIRM}
+              </p>
+              <div className="my-profile-page__logout-actions">
+                <button
+                  type="button"
+                  className="my-profile-page__logout-yes"
+                  onClick={() => {
+                    void onLogout();
+                    setIsLogoutConfirmOpen(false);
+                  }}
+                >
+                  {MY_PROFILE_PAGE_UI.LOGOUT_YES}
+                </button>
+                <button
+                  type="button"
+                  className="my-profile-page__logout-cancel"
+                  onClick={() => setIsLogoutConfirmOpen(false)}
+                >
+                  {MY_PROFILE_PAGE_UI.LOGOUT_CANCEL}
+                </button>
+              </div>
             </div>
-          </div>
-        )}
-      </footer>
+          )}
+        </footer>
+      ) : null}
     </section>
   );
 }

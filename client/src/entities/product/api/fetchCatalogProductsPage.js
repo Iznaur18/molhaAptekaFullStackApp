@@ -14,6 +14,7 @@ import { CATALOG_PAGE_SIZE } from "../model/productConstants.js";
  *   includeHidden?: boolean;
  *   followingOnly?: boolean;
  *   auctionOnly?: boolean;
+ *   saleOnly?: boolean;
  * }} [options]
  * @returns {Promise<{
  *   products: import('../model/types.js').ProductFromApi[];
@@ -29,6 +30,7 @@ export async function fetchCatalogProductsPage({
   includeHidden = false,
   followingOnly = false,
   auctionOnly = false,
+  saleOnly = false,
 } = {}) {
   try {
     const { data } = await apiClient.get("/product", {
@@ -41,6 +43,7 @@ export async function fetchCatalogProductsPage({
         ...(includeHidden ? { includeHidden: "true" } : {}),
         ...(followingOnly ? { followingOnly: "true" } : {}),
         ...(auctionOnly ? { auctionOnly: "true" } : {}),
+        ...(saleOnly ? { saleOnly: "true" } : {}),
       },
     });
 

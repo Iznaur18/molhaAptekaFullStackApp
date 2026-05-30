@@ -33,6 +33,8 @@
  * @property {string[]} [productImageUrls]
  * @property {string} [productImageUrl]
  * @property {number} productPrice
+ * @property {number | null} [productOldPrice]
+ * @property {number | null} [discountPercent]
  * @property {ProductSellerPopulated|string} productSeller
  * @property {ProductCategory} productCategory
  * @property {boolean} productIsAvailable

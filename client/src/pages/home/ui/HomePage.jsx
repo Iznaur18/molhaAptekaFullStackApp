@@ -14,6 +14,7 @@ import {
   CATALOG_SORT_NEWEST,
   CATALOG_SORT_PREMIUM,
   CATALOG_SORT_CONFIRMED,
+  CATALOG_SORT_VIEWS,
   MY_PRODUCTS_MODERATION_FILTER_ALL,
 } from "../../../entities/product/model/productConstants.js";
 import { isCurrentUserProductSeller } from "../../../entities/product/lib/isCurrentUserProductSeller.js";
@@ -98,6 +99,7 @@ import { NotificationsPage } from "../../notifications/ui/NotificationsPage.jsx"
 import { UserFollowButton } from "../../../entities/user-follow/ui/UserFollowButton.jsx";
 import {
   IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_NEW_PRODUCT,
+  IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_PRODUCT_DISCOUNT,
   IN_APP_NOTIFICATION_KIND_NEW_FOLLOWER,
 } from "../../../entities/user-follow/model/constants.js";
 import { AUTH_TOKEN_STORAGE_KEY } from "../../../shared/api/index.js";
@@ -123,13 +125,10 @@ import { getHomePageVariantClass } from "../lib/homeHeaderVariant.js";
 import { useInAppNotificationsPoll } from "../lib/useInAppNotificationsPoll.js";
 import { useDebouncedValue } from "../../../shared/lib/useDebouncedValue.js";
 import {
-  CATALOG_FILTER_AUCTION_ONLY,
-  CATALOG_FILTER_FOLLOWING_ONLY,
-} from "../../../entities/product/model/productConstants.js";
-import {
-  getCatalogSelectValue,
-  isCatalogFilterSelectValue,
-} from "../lib/catalogSelect.js";
+  areCatalogSearchParamsEqual,
+  buildCatalogSearchParams,
+  parseCatalogQueryFromSearchParams,
+} from "../lib/catalogCatalogQuery.js";
 
 import { HomeCatalogGrid } from "./HomeCatalogGrid.jsx";
 import { HomePageHeader } from "./HomePageHeader.jsx";
@@ -151,6 +150,22 @@ const EMPTY_MY_PROFILE_PAGE = Object.freeze({
   user: null,
   error: "",
 });
+
+/**
+ * @returns {ReturnType<typeof parseCatalogQueryFromSearchParams> | null}
+ */
+const readInitialCatalogQuery = () => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+  const path = window.location.pathname.replace(/\/+$/, "") || "/";
+  if (path !== "/") {
+    return null;
+  }
+  return parseCatalogQueryFromSearchParams(
+    new URLSearchParams(window.location.search),
+  );
+};
 
 const useCurrentUserSession = (isAuthorized) => {
   const [currentUserId, setCurrentUserId] = useState(null);
@@ -272,8 +287,13 @@ export function HomePage() {
   const [myProfilePage, setMyProfilePage] = useState(EMPTY_MY_PROFILE_PAGE);
   const [isProductCategoryListOpen, setIsProductCategoryListOpen] =
     useState(false);
-  const [selectedProductCategory, setSelectedProductCategory] = useState(null);
-  const [catalogSort, setCatalogSort] = useState(CATALOG_SORT_NEWEST);
+  const initialCatalogQuery = useMemo(() => readInitialCatalogQuery(), []);
+  const [selectedProductCategory, setSelectedProductCategory] = useState(
+    () => initialCatalogQuery?.category ?? null,
+  );
+  const [catalogSort, setCatalogSort] = useState(
+    () => initialCatalogQuery?.sort ?? CATALOG_SORT_NEWEST,
+  );
   const [myProductsModerationFilter, setMyProductsModerationFilter] =
     useState(MY_PRODUCTS_MODERATION_FILTER_ALL);
   const [myProductsCatalogError, setMyProductsCatalogError] = useState("");
@@ -394,8 +414,15 @@ export function HomePage() {
 
   const [showHiddenCatalogProducts, setShowHiddenCatalogProducts] =
     useState(false);
-  const [catalogFollowingOnly, setCatalogFollowingOnly] = useState(false);
-  const [catalogAuctionOnly, setCatalogAuctionOnly] = useState(false);
+  const [catalogFollowingOnly, setCatalogFollowingOnly] = useState(
+    () => initialCatalogQuery?.followingOnly ?? false,
+  );
+  const [catalogAuctionOnly, setCatalogAuctionOnly] = useState(
+    () => initialCatalogQuery?.auctionOnly ?? false,
+  );
+  const [catalogSaleOnly, setCatalogSaleOnly] = useState(
+    () => initialCatalogQuery?.saleOnly ?? false,
+  );
   const [isAdminEditUserOpen, setIsAdminEditUserOpen] = useState(false);
   const [isAdminDeleteUserOpen, setIsAdminDeleteUserOpen] = useState(false);
   /** @type {[ProductFromApi | null, import('react').Dispatch<import('react').SetStateAction<ProductFromApi | null>>]} */
@@ -689,45 +716,108 @@ export function HomePage() {
     PRODUCT_SEARCH_UI.DEBOUNCE_MS,
   );
 
-  const catalogSelectValue = useMemo(
-    () =>
-      getCatalogSelectValue({
-        catalogSort,
-        catalogFollowingOnly,
-        catalogAuctionOnly,
-      }),
-    [catalogSort, catalogFollowingOnly, catalogAuctionOnly],
+  const handleCatalogSortChange = useCallback(
+    (value) => {
+      if (catalogAuctionOnly && value === CATALOG_SORT_VIEWS) {
+        setCatalogAuctionOnly(false);
+      }
+      setCatalogSort(value);
+    },
+    [catalogAuctionOnly],
   );
 
-  const handleCatalogSelectChange = useCallback(
-    (value) => {
-      if (value === CATALOG_FILTER_FOLLOWING_ONLY) {
-        if (!isAuthorized) {
-          setIsLoginModalOpen(true);
-          return;
-        }
-        setCatalogFollowingOnly(true);
+  const handleCatalogFollowingOnlyToggle = useCallback(() => {
+    if (!isAuthorized) {
+      setIsLoginModalOpen(true);
+      return;
+    }
+    setCatalogFollowingOnly((prev) => {
+      const next = !prev;
+      if (next) {
         setCatalogAuctionOnly(false);
-        return;
       }
-      if (value === CATALOG_FILTER_AUCTION_ONLY) {
+      return next;
+    });
+  }, [isAuthorized]);
+
+  const handleCatalogAuctionOnlyToggle = useCallback(() => {
+    setCatalogAuctionOnly((prev) => {
+      const next = !prev;
+      if (next) {
         setCatalogFollowingOnly(false);
-        setCatalogAuctionOnly(true);
-        return;
+        setCatalogSort((currentSort) =>
+          currentSort === CATALOG_SORT_VIEWS
+            ? CATALOG_SORT_NEWEST
+            : currentSort,
+        );
       }
-      if (!isCatalogFilterSelectValue(value)) {
-        setCatalogFollowingOnly(false);
-        setCatalogAuctionOnly(false);
-        setCatalogSort(value);
-      }
-    },
-    [isAuthorized],
-  );
+      return next;
+    });
+  }, []);
+
+  const handleCatalogSaleOnlyToggle = useCallback(() => {
+    setCatalogSaleOnly((prev) => !prev);
+  }, []);
   const isProductSearchPending =
     productSearchTerm !== debouncedProductSearchTerm;
   const hasProductSearchQuery = debouncedProductSearchTerm.trim() !== "";
   const isMyProductsRoute = isMyProductsMainView(mainView);
   const isMineMode = isMyProductsRoute || isProfileMyProductsTab;
+
+  useEffect(() => {
+    if (mainView !== "catalog") {
+      return;
+    }
+    const parsed = parseCatalogQueryFromSearchParams(
+      new URLSearchParams(location.search),
+    );
+    setCatalogSort((prev) => (prev === parsed.sort ? prev : parsed.sort));
+    setSelectedProductCategory((prev) =>
+      prev === parsed.category ? prev : parsed.category,
+    );
+    setCatalogFollowingOnly((prev) =>
+      prev === parsed.followingOnly ? prev : parsed.followingOnly,
+    );
+    setCatalogAuctionOnly((prev) =>
+      prev === parsed.auctionOnly ? prev : parsed.auctionOnly,
+    );
+    setCatalogSaleOnly((prev) =>
+      prev === parsed.saleOnly ? prev : parsed.saleOnly,
+    );
+  }, [location.search, mainView]);
+
+  useEffect(() => {
+    if (mainView !== "catalog") {
+      return;
+    }
+    const built = buildCatalogSearchParams({
+      sort: catalogSort,
+      category: selectedProductCategory,
+      followingOnly: catalogFollowingOnly,
+      auctionOnly: catalogAuctionOnly,
+      saleOnly: catalogSaleOnly,
+    });
+    const current = new URLSearchParams(location.search);
+    if (areCatalogSearchParamsEqual(built, current)) {
+      return;
+    }
+    const search = built.toString();
+    navigate(
+      { pathname: location.pathname, search: search ? `?${search}` : "" },
+      { replace: true },
+    );
+  }, [
+    mainView,
+    catalogSort,
+    selectedProductCategory,
+    catalogFollowingOnly,
+    catalogAuctionOnly,
+    catalogSaleOnly,
+    location.pathname,
+    location.search,
+    navigate,
+  ]);
+
   const canReportCatalogProduct = useMemo(() => {
     if (!isAuthorized || !catalogProductDetails || !currentUserId) {
       return false;
@@ -963,6 +1053,7 @@ export function HomePage() {
           isAdmin && !isMineMode && showHiddenCatalogProducts,
         followingOnly: !isMineMode && catalogFollowingOnly,
         auctionOnly: !isMineMode && catalogAuctionOnly,
+        saleOnly: !isMineMode && catalogSaleOnly,
       });
     },
     [
@@ -975,6 +1066,7 @@ export function HomePage() {
       showHiddenCatalogProducts,
       catalogFollowingOnly,
       catalogAuctionOnly,
+      catalogSaleOnly,
     ],
   );
 
@@ -1026,6 +1118,7 @@ export function HomePage() {
     showHiddenCatalogProducts,
     catalogFollowingOnly,
     catalogAuctionOnly,
+    catalogSaleOnly,
     loadCatalogPage,
     catalogRefreshTick,
   ]);
@@ -1195,7 +1288,9 @@ export function HomePage() {
       return;
     }
     if (
-      item.kind === IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_NEW_PRODUCT &&
+      (item.kind === IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_NEW_PRODUCT ||
+        item.kind ===
+          IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_PRODUCT_DISCOUNT) &&
       item.productId
     ) {
       goToMainView("catalog");
@@ -1684,6 +1779,7 @@ export function HomePage() {
         isAuthorized={isAuthorized}
         currentUserId={currentUserId}
         onRequestLoginAddToCart={() => setIsLoginModalOpen(true)}
+        showAddToCartOnCard={false}
         catalogSentinelRef={catalogSentinelRef}
         catalogHasMore={catalogHasMore}
         isCatalogLoadingMore={isCatalogLoadingMore}
@@ -1692,6 +1788,7 @@ export function HomePage() {
         myProductsModerationFilter={myProductsModerationFilter}
         catalogFollowingOnly={catalogFollowingOnly}
         catalogAuctionOnly={catalogAuctionOnly}
+        catalogSaleOnly={catalogSaleOnly}
         sellerRaffleActive={sellerRaffleActive}
         onToggleRaffleParticipation={handleToggleRaffleParticipation}
         raffleParticipationPendingProductId={raffleParticipationPendingProductId}
@@ -1774,7 +1871,7 @@ export function HomePage() {
           return (
             <ProductModerationPage
               onSellerNameClick={handleSellerNameClick}
-              onQueueChanged={() => void refreshPendingModerationCount()}
+              onQueueChanged={refreshPendingModerationCount}
             />
           );
         }
@@ -1957,7 +2054,7 @@ export function HomePage() {
       return (
         <ProductModerationPage
           onSellerNameClick={handleSellerNameClick}
-          onQueueChanged={() => void refreshPendingModerationCount()}
+          onQueueChanged={refreshPendingModerationCount}
         />
       );
     }
@@ -1989,7 +2086,7 @@ export function HomePage() {
       <CartServerSync isAuthorized={isAuthorized} />
       <HomePageHeader
         mainView={mainView}
-        isMineMode={isMyProductsRoute}
+        isMineMode={isMineMode}
         selectedProductCategory={selectedProductCategory}
         isProductCategoryListOpen={isProductCategoryListOpen}
         productSearchTerm={productSearchTerm}
@@ -2016,8 +2113,14 @@ export function HomePage() {
         onNavigateToFullCatalogFromBreadcrumb={
           handleNavigateToFullCatalogFromBreadcrumb
         }
-        catalogSelectValue={catalogSelectValue}
-        onCatalogSelectChange={handleCatalogSelectChange}
+        catalogSort={catalogSort}
+        onCatalogSortChange={handleCatalogSortChange}
+        catalogFollowingOnly={catalogFollowingOnly}
+        catalogAuctionOnly={catalogAuctionOnly}
+        catalogSaleOnly={catalogSaleOnly}
+        onCatalogFollowingOnlyToggle={handleCatalogFollowingOnlyToggle}
+        onCatalogAuctionOnlyToggle={handleCatalogAuctionOnlyToggle}
+        onCatalogSaleOnlyToggle={handleCatalogSaleOnlyToggle}
         isAdmin={isAdmin}
         showHiddenCatalogProducts={showHiddenCatalogProducts}
         onShowHiddenCatalogProductsChange={setShowHiddenCatalogProducts}
@@ -2119,8 +2222,9 @@ export function HomePage() {
               ? { ...prev, user: { ...prev.user, ...updatedUser } }
               : prev,
           );
-          setIsPremiumUser(Boolean(updatedUser.isPremiumUser));
-          setIsEditProfileOpen(false);
+          if (updatedUser.isPremiumUser !== undefined) {
+            setIsPremiumUser(Boolean(updatedUser.isPremiumUser));
+          }
         }}
       />
       <EditProfileModal
@@ -2136,7 +2240,6 @@ export function HomePage() {
               : prev,
           );
           setUsersListTick((n) => n + 1);
-          setIsAdminEditUserOpen(false);
         }}
       />
       <AdminDeleteUserConfirmModal

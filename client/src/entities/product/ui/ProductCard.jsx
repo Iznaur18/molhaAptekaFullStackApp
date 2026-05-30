@@ -32,7 +32,12 @@ import {
   PRODUCT_IMAGE_PLACEHOLDER_URL,
 } from "../model/productConstants.js";
 import { UserPremiumDisplayName } from "../../user/ui/UserPremiumDisplayName.jsx";
+import { resolveProductDiscountPercent } from "../lib/computeProductDiscountPercent.js";
 import { ProductModerationDetailsFooter } from "./ProductModerationDetailsFooter.jsx";
+import {
+  ProductDiscountBadge,
+  ProductPriceDisplay,
+} from "./ProductPriceDisplay.jsx";
 import { PRODUCT_MODERATION_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
 import "./ProductCard.css";
@@ -60,6 +65,7 @@ function isAbsoluteHttpUrl(value) {
  * @param {boolean} [props.isAuthorized]
  * @param {string | null} [props.currentUserId]
  * @param {() => void} [props.onRequestLoginAddToCart]
+ * @param {boolean} [props.showAddToCartOnCard]
  * @param {boolean} [props.isMineMode]
  * @param {boolean} [props.isPromotionPending]
  * @param {boolean} [props.highlightCatalogPromotion]
@@ -92,6 +98,7 @@ export function ProductCard({
   isAuthorized = false,
   currentUserId = null,
   onRequestLoginAddToCart = () => {},
+  showAddToCartOnCard = true,
   isMineMode = false,
   isPromotionPending = false,
   highlightCatalogPromotion = false,
@@ -220,6 +227,12 @@ export function ProductCard({
     product.reviewCount ?? 0,
   );
   const hasReviewRating = reviewRatingLine.length > 0;
+  const discountPercent = resolveProductDiscountPercent(product);
+  const showDiscountBadge = discountPercent != null && discountPercent > 0;
+  const previewFieldKeysWithoutPrice = useMemo(
+    () => previewFieldKeys.filter((key) => key !== "productPrice"),
+    [previewFieldKeys],
+  );
 
   const purchaseLimit = getProductPurchaseLimit(product);
 
@@ -392,6 +405,7 @@ export function ProductCard({
           </div>
         ) : null}
         <h2 className="product-card__heading">{heading}</h2>
+        <ProductPriceDisplay product={product} className="product-card__price" />
         {!isModerationQueue ? (
           <div className="product-card__meta-strip">
             <p
@@ -422,18 +436,18 @@ export function ProductCard({
                   {PRODUCT_CARD_UI.RAFFLE_BADGE}
                 </p>
               ) : null}
+              {showDiscountBadge ? (
+                <ProductDiscountBadge discountPercent={discountPercent} />
+              ) : null}
             </div>
           </div>
         ) : null}
         {renderModerationBadge()}
         <dl className="product-card__fields product-card__fields--preview">
-          {previewFieldKeys.map((key) => {
+          {previewFieldKeysWithoutPrice.map((key) => {
             const raw = product[key];
             const display = formatProductFieldForDisplay(key, product);
             const rowClass = ["product-card__row"];
-            if (key === "productPrice") rowClass.push("product-card__row--price");
-            if (key === "productCategory")
-              rowClass.push("product-card__row--category");
             if (key === "productDescription")
               rowClass.push("product-card__row--description");
             if (key === "productSeller") rowClass.push("product-card__row--seller");
@@ -514,7 +528,8 @@ export function ProductCard({
               </button>
             ) : null}
           </div>
-        ) : product.productIsAvailable !== false &&
+        ) : showAddToCartOnCard &&
+          product.productIsAvailable !== false &&
           product._id != null &&
           !isCurrentUserProductSeller(product, currentUserId) ? (
           <AddToCartButton

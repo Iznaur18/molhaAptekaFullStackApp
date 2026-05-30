@@ -1,9 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
-import { countWords } from "../../user/lib/countWords.js";
-import { PROFILE_FIELD_MAX_WORDS } from "../../user/model/userConstants.js";
 import { submitProductReport } from "../api/submitProductReport.js";
+import { PRODUCT_REPORT_TEXT_MAX_CHARS } from "../model/constants.js";
 import {
   PRODUCT_REPORT_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
@@ -44,8 +43,8 @@ export function ReportProductModal({
 
   useScrollLock(isOpen);
 
-  const words = useMemo(() => countWords(reportText), [reportText]);
-  const isOverLimit = words > PROFILE_FIELD_MAX_WORDS;
+  const charCount = reportText.length;
+  const isOverLimit = charCount > PRODUCT_REPORT_TEXT_MAX_CHARS;
   const isSubmitting = phase === "loading";
   const isBlocked = hasPendingReport || !productId;
 
@@ -120,9 +119,9 @@ export function ReportProductModal({
                     : "report-product-modal__meter"
                 }
               >
-                {PRODUCT_REPORT_MODAL_UI.WORDS_USED(
-                  words,
-                  PROFILE_FIELD_MAX_WORDS,
+                {PRODUCT_REPORT_MODAL_UI.CHARS_USED(
+                  charCount,
+                  PRODUCT_REPORT_TEXT_MAX_CHARS,
                 )}
               </span>
             </label>

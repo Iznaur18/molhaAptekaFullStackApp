@@ -1,4 +1,5 @@
 import {
+    ORDER_STATUS_CANCELLED,
     ORDER_STATUS_CONFIRMED,
     ORDER_STATUS_DELIVERED,
     ORDER_STATUS_PENDING,
@@ -78,6 +79,48 @@ export const markOrderItemDeliveredBySellerController = async (req, res) => {
     } catch (error) {
         console.error('markOrderItemDeliveredBySellerController error:', error);
         return errorRes(res, 500, 'Ошибка при обновлении статуса позиции');
+    }
+};
+
+/** `PATCH /order/:orderId/items/:itemIndex/cancelled` — продавец отменяет позицию в обработке. */
+export const markOrderItemCancelledBySellerController = async (req, res) => {
+    try {
+        const { orderId, itemIndex: rawItemIndex } = req.params;
+        const sellerId = String(req.userId);
+        const itemIndex = parseItemIndex(rawItemIndex);
+
+        const order = await OrderModel.findById(orderId).populate(ORDER_ITEMS_POPULATE);
+        if (!order) return errorRes(res, 404, 'Заказ не найден');
+        normalizeOrderDocumentForRuntime(order);
+        normalizeOrderItemsForRuntime(order.items);
+
+        const targetItem = getOrderItemByIndex(order, itemIndex);
+        if (!targetItem) return errorRes(res, 404, 'Позиция заказа не найдена');
+
+        if (!targetItem.productId || typeof targetItem.productId === 'string') {
+            return errorRes(res, 400, 'Товар позиции не найден');
+        }
+
+        const itemSellerId = normalizeId(
+            targetItem.productId.productSeller?._id ?? targetItem.productId.productSeller,
+        );
+        if (itemSellerId !== sellerId) {
+            return errorRes(res, 403, 'Можно обновлять только свои продажи');
+        }
+
+        if (targetItem.status !== ORDER_STATUS_PENDING) {
+            return errorRes(res, 409, 'Позицию можно отменить только из статуса "В обработке"');
+        }
+
+        targetItem.status = ORDER_STATUS_CANCELLED;
+        order.status = buildOrderStatusFromItems(order.items);
+        await order.save();
+        await populateOrderForResponse(order);
+
+        return successRes(res, { order });
+    } catch (error) {
+        console.error('markOrderItemCancelledBySellerController error:', error);
+        return errorRes(res, 500, 'Ошибка при отмене позиции');
     }
 };
 
@@ -168,6 +211,11 @@ export const confirmOrderItemByBuyerController = async (req, res) => {
                     ? targetItem.productId._id
                     : targetItem.productId;
             try {
+                await syncRaffleProgressForProductSale(productId);
+            } catch (raffleSyncError) {
+                console.error('syncRaffleProgressForProductSale error:', raffleSyncError);
+            }
+            try {
                 await decrementProductStockOnItemConfirmed(
                     productId,
                     targetItem.quantity,
@@ -197,11 +245,6 @@ export const confirmOrderItemByBuyerController = async (req, res) => {
                     'finalizeOffersAfterOrderConfirmed error:',
                     finalizeError,
                 );
-            }
-            try {
-                await syncRaffleProgressForProductSale(productId);
-            } catch (raffleSyncError) {
-                console.error('syncRaffleProgressForProductSale error:', raffleSyncError);
             }
         }
 

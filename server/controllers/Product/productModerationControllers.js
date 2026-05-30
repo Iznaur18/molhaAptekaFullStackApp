@@ -9,8 +9,11 @@ import {
     attachProductSellerSnapshot,
     attachProductSellerSnapshots,
 } from '../../utils/attachProductSellerSnapshots.js';
-import { isUserAdmin } from '../../utils/adminUserGuard.js';
 import { notifyFollowersOfSellerNewCatalogProduct } from '../../utils/userFollowHelpers.js';
+import {
+    computeProductDiscountPercent,
+    notifyFollowersOfSellerProductDiscount,
+} from '../../utils/productDiscount.js';
 import { errorRes, successRes } from '../../utils/index.js';
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 20;
@@ -82,6 +85,9 @@ export const approveProductModerationController = async (req, res) => {
             return errorRes(res, 409, 'Товар не ожидает модерации');
         }
 
+        const previousApprovedDiscountPercent =
+            product.productLastApprovedDiscountPercent;
+
         product.productModerationStatus = PRODUCT_MODERATION_APPROVED;
         product.productModerationComment = '';
         const stock = Math.max(0, Math.floor(Number(product.productStockQuantity) || 0));
@@ -89,6 +95,10 @@ export const approveProductModerationController = async (req, res) => {
         if (stock === 0) {
             product.productStockQuantity = 0;
         }
+        product.productLastApprovedDiscountPercent = computeProductDiscountPercent(
+            product.productOldPrice,
+            product.productPrice,
+        );
         await product.save();
         await product.populate('productSeller', PRODUCT_SELLER_PUBLIC_SELECT);
 
@@ -99,6 +109,18 @@ export const approveProductModerationController = async (req, res) => {
         } catch (notifyError) {
             console.error(
                 'notifyFollowersOfSellerNewCatalogProduct error:',
+                notifyError,
+            );
+        }
+
+        try {
+            await notifyFollowersOfSellerProductDiscount(
+                enriched,
+                previousApprovedDiscountPercent,
+            );
+        } catch (notifyError) {
+            console.error(
+                'notifyFollowersOfSellerProductDiscount error:',
                 notifyError,
             );
         }

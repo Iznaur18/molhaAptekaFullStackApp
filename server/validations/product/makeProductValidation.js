@@ -10,6 +10,7 @@ import {
   PRODUCT_STOCK_QUANTITY_MIN,
 } from "../../constants/productStockConstants.js";
 import { assertAtMostWords } from "../../utils/maxWordsText.js";
+import { assertProductOldPricePair, normalizeProductOldPriceRub, normalizeProductPriceRub } from "../../utils/productDiscount.js";
 import { handleValidationByExpressErrors } from "../handleValidationByExpressErrors.js";
 
 const assertHttpImageUrl = (raw, label) => {
@@ -80,9 +81,23 @@ export const makeProductValidation = [
   body("productPrice")
     .notEmpty()
     .withMessage("Цена продукта обязательна")
-    .isFloat({ min: 0 })
-    .withMessage("Цена продукта должна быть положительным числом")
-    .toFloat(),
+    .isInt({ min: 0 })
+    .withMessage("Цена продукта должна быть целым числом не меньше 0")
+    .toInt(),
+  body("productOldPrice")
+    .optional({ nullable: true })
+    .custom((value, { req }) => {
+      try {
+        const productOldPrice = normalizeProductOldPriceRub(value);
+        const productPrice = normalizeProductPriceRub(req.body?.productPrice);
+        assertProductOldPricePair(productOldPrice, productPrice);
+      } catch (e) {
+        throw new Error(
+          e instanceof Error ? e.message : "Некорректная старая цена",
+        );
+      }
+      return true;
+    }),
   body("productCategory")
     .notEmpty()
     .withMessage("Категория продукта обязательна")

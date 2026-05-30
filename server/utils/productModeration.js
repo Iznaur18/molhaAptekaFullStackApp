@@ -11,6 +11,7 @@ const CONTENT_PATCH_KEYS = new Set([
     'productName',
     'productDescription',
     'productPrice',
+    'productOldPrice',
     'productCategory',
     'productImageUrls',
     'productImageUrl',

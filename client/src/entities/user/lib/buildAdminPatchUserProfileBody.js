@@ -9,10 +9,14 @@ const ALLOWED_ROLES = [USER_ROLE_USER, USER_ROLE_ADMIN, USER_ROLE_MODERATOR];
 
 /**
  * @param {import('./mapUserToEditProfileForm.js').EditProfileFormState} form
+ * @param {{ initialPhoneNumber?: string | null }} [options]
  * @returns {Record<string, unknown>}
  */
-export function buildAdminPatchUserProfileBody(form) {
-  const body = buildPatchUserProfileBody(form, { backgroundMode: "admin" });
+export function buildAdminPatchUserProfileBody(form, options = {}) {
+  const body = buildPatchUserProfileBody(form, {
+    backgroundMode: "admin",
+    ...options,
+  });
 
   const role = form.userRole;
   if (ALLOWED_ROLES.includes(role)) {

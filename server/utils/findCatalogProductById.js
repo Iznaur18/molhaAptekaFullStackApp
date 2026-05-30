@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 import { ProductModel } from '../models/index.js';
 import { attachProductSellerSnapshots } from './attachProductSellerSnapshots.js';
-import { enrichProductWithAuctionFields } from './productAuction.js';
+import { enrichProductApiFields } from './productDiscount.js';
 import {
     soldQuantityAddFieldsStage,
     soldQuantityLookupStage,
@@ -51,5 +51,5 @@ export const findCatalogProductById = async (productId) => {
     }
 
     const [withSellerSnapshots] = await attachProductSellerSnapshots([row]);
-    return enrichProductWithAuctionFields(withSellerSnapshots);
+    return enrichProductApiFields(withSellerSnapshots);
 };

@@ -12,11 +12,15 @@ import { DEFAULT_USER_AVATAR_URL } from "../model/userConstants.js";
  * Тело `PATCH /user/:id` (только разрешённые пользователю поля).
  *
  * @param {import('./mapUserToEditProfileForm.js').EditProfileFormState} form
- * @param {{ backgroundMode?: 'preset' | 'image' | 'admin'; includePremium?: boolean }} [options]
+ * @param {{ backgroundMode?: 'preset' | 'image' | 'admin'; includePremium?: boolean; initialPhoneNumber?: string | null }} [options]
  * @returns {Record<string, unknown>}
  */
 export function buildPatchUserProfileBody(form, options = {}) {
-  const { backgroundMode = "preset", includePremium = false } = options;
+  const {
+    backgroundMode = "preset",
+    includePremium = false,
+    initialPhoneNumber = "",
+  } = options;
   const body = {};
 
   const rawName = String(form.userName).trim().toLowerCase();
@@ -43,10 +47,11 @@ export function buildPatchUserProfileBody(form, options = {}) {
   }
 
   const phoneRaw = String(form.userPhoneNumber).trim();
-  if (phoneRaw === "") {
-    body.userPhoneNumber = null;
-  } else {
+  const initialPhone = String(initialPhoneNumber ?? "").trim();
+  if (phoneRaw !== "") {
     body.userPhoneNumber = normalizeRuPhoneInput(phoneRaw);
+  } else if (initialPhone !== "") {
+    body.userPhoneNumber = null;
   }
 
   const av = resolveUploadedImageUrl(String(form.userAvatarUrl).trim());

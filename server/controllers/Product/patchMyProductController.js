@@ -22,6 +22,11 @@ import {
     assertProductStockPatchAllowed,
     syncProductCatalogAfterStockChange,
 } from "../../utils/productStock.js";
+import {
+    assertProductOldPricePair,
+    normalizeProductOldPriceRub,
+    normalizeProductPriceRub,
+} from "../../utils/productDiscount.js";
 import { errorRes, successRes } from "../../utils/index.js";
 
 const PENDING_EDIT_BLOCK_MESSAGE =
@@ -62,7 +67,63 @@ export const patchMyProductController = async (req, res) => {
             $set.productDescription = String(body.productDescription).trim();
         }
         if (Object.prototype.hasOwnProperty.call(body, "productPrice")) {
-            $set.productPrice = body.productPrice;
+            try {
+                $set.productPrice = normalizeProductPriceRub(body.productPrice);
+            } catch (priceError) {
+                return errorRes(
+                    res,
+                    400,
+                    priceError instanceof Error
+                        ? priceError.message
+                        : "Некорректная цена",
+                );
+            }
+        }
+        if (Object.prototype.hasOwnProperty.call(body, "productOldPrice")) {
+            try {
+                $set.productOldPrice = normalizeProductOldPriceRub(
+                    body.productOldPrice,
+                );
+            } catch (priceError) {
+                return errorRes(
+                    res,
+                    400,
+                    priceError instanceof Error
+                        ? priceError.message
+                        : "Некорректная старая цена",
+                );
+            }
+        }
+
+        if (
+            Object.prototype.hasOwnProperty.call($set, "productPrice") ||
+            Object.prototype.hasOwnProperty.call($set, "productOldPrice")
+        ) {
+            try {
+                const nextPrice = Object.prototype.hasOwnProperty.call(
+                    $set,
+                    "productPrice",
+                )
+                    ? $set.productPrice
+                    : Math.floor(Number(existing.productPrice));
+                const nextOldPrice = Object.prototype.hasOwnProperty.call(
+                    $set,
+                    "productOldPrice",
+                )
+                    ? $set.productOldPrice
+                    : existing.productOldPrice == null
+                      ? null
+                      : Math.floor(Number(existing.productOldPrice));
+                assertProductOldPricePair(nextOldPrice, nextPrice);
+            } catch (priceError) {
+                return errorRes(
+                    res,
+                    400,
+                    priceError instanceof Error
+                        ? priceError.message
+                        : "Некорректная цена",
+                );
+            }
         }
         if (Object.prototype.hasOwnProperty.call(body, "productCategory")) {
             $set.productCategory = String(body.productCategory).trim();

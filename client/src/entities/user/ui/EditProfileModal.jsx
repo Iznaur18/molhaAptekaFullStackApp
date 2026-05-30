@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { patchUserProfile } from "../api/patchUserProfile.js";
@@ -67,9 +67,16 @@ export function EditProfileModal({
 }) {
   const [form, setForm] = useState(() => mapUserToEditProfileForm({ _id: "" }));
   const [feedback, setFeedback] = useState({ kind: "idle", message: "" });
+  const wasOpenRef = useRef(false);
 
   useEffect(() => {
-    if (!isOpen || !user) return undefined;
+    const didOpen = isOpen && !wasOpenRef.current;
+    wasOpenRef.current = isOpen;
+
+    if (!didOpen || !user) {
+      return undefined;
+    }
+
     setForm(mapUserToEditProfileForm(user));
     setFeedback({ kind: "idle", message: "" });
     return undefined;
@@ -146,13 +153,18 @@ export function EditProfileModal({
     setFeedback({ kind: "loading", message: "" });
 
     try {
+      const profilePatchOptions = {
+        initialPhoneNumber: user.userPhoneNumber,
+      };
       const body = adminMode
-        ? buildAdminPatchUserProfileBody(form)
+        ? buildAdminPatchUserProfileBody(form, profilePatchOptions)
         : buildPatchUserProfileBody(form, {
             backgroundMode,
             includePremium: allowSelfPremiumToggle,
+            ...profilePatchOptions,
           });
       const updated = await patchUserProfile(String(user._id), body);
+      handleClose();
       onSaved(updated);
     } catch (e) {
       const message =

@@ -179,6 +179,13 @@
   color: #b42318;
 }
 
+.create-product-modal__discount-preview {
+  margin: -0.35rem 0 0.15rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #991b1b;
+}
+
 .create-product-modal__submit {
   margin-top: 0.25rem;
   border: 1px solid #1f6feb;

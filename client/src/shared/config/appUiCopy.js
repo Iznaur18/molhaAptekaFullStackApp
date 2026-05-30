@@ -223,6 +223,8 @@ export const HOME_PAGE_UI = {
   FETCH_MY_PROFILE_FALLBACK: "Не удалось загрузить мой профиль",
   // TITLE_CATALOG: "Каталог товаров",
   TITLE_CATALOG: "iziBuy",
+  LOGO_SRC: "/logo-izibuy.png",
+  LOGO_ALT: "iziBuy",
   BREADCRUMB_HOME: "Главная",
   NAV_TO_HOME: "Главная",
   BREADCRUMB_MY_PROFILE: "Мой профиль",
@@ -246,11 +248,17 @@ export const HOME_PAGE_UI = {
   TITLE_NOTIFICATIONS: "Уведомления",
   FILTER_FOLLOWING_ONLY: "Только от подписок",
   FILTER_AUCTION_ONLY: "Только с аукционом",
+  CATALOG_FILTERS_PANEL_ARIA: "Фильтры каталога",
+  CATEGORY_FILTER_LABEL: "Категория",
+  CATALOG_FILTERS_SECTION_LABEL: "Фильтры",
   EMPTY_FOLLOWING_FILTER: "Нет товаров от ваших подписок с текущими фильтрами.",
+  EMPTY_SALE_FILTER: "Нет товаров в распродаже от 50%.",
   LOGIN_FOR_FOLLOWING_FILTER: "Войдите, чтобы включить фильтр «только от подписок».",
   NAV_TO_CART: "Корзина",
   NAV_TO_MY_ORDERS: "Мои покупки",
   NAV_TO_ADMIN_ORDERS: "Все заказы",
+  CATALOG_FILTER_BUTTON_ARIA: "Фильтры каталога",
+  CATALOG_FILTER_BUTTON_ARIA_ACTIVE: "Фильтры каталога: выбраны параметры",
   FILTER_BUTTON_ARIA: "Фильтр по категории",
   FILTER_BUTTON_ARIA_SELECTED: (categoryLabel) =>
     `Фильтр по категории: ${categoryLabel}`,
@@ -300,6 +308,11 @@ export const HEADER_PLACE_PRODUCT_BUTTON_UI = {
 /** Кнопка «Мой профиль» в шапке */
 export const HEADER_PROFILE_BUTTON_UI = {
   ARIA: "Мой профиль",
+};
+
+/** Кнопка «Пользователи» в шапке */
+export const HEADER_USERS_BUTTON_UI = {
+  ARIA: "Пользователи",
 };
 
 /** Страница «Корзина» */
@@ -356,7 +369,9 @@ export const ORDER_CARD_UI = {
   ACTION_SHIPPED: "Отправлен",
   ACTION_DELIVERED: "Доставлен",
   ACTION_CONFIRM: "Подтвердить",
+  ACTION_CANCEL: "Отменить",
   ACTION_PENDING: "Сохраняем…",
+  CANCEL_CONFIRM: "Отменить заказ покупателя?",
   DELETED_PRODUCT_NAME: "Товар удалён",
 };
 
@@ -464,7 +479,7 @@ export const PRODUCT_REPORT_MODAL_UI = {
   ALREADY_REPORTED: "Вы уже жаловались",
   SUCCESS: "Жалоба принята",
   REPORT_BUTTON: "Пожаловаться",
-  WORDS_USED: (current, max) => `${current} / ${max} слов`,
+  CHARS_USED: (current, max) => `${current} / ${max} символов`,
 };
 
 /** In-app уведомления */
@@ -617,6 +632,9 @@ export const CREATE_PRODUCT_MODAL_UI = {
   REMOVE_IMAGE_ROW_ARIA: "Удалить поле ссылки на изображение",
   IMAGE_ROW_ARIA_PREFIX: "Ссылка на изображение",
   LABEL_PRICE: "Цена",
+  LABEL_OLD_PRICE: "Старая цена (необязательно)",
+  LABEL_DISCOUNT_PREVIEW: "Скидка",
+  ERROR_OLD_PRICE: "Старая цена должна быть больше текущей",
   LABEL_CATEGORY: "Категория",
   LABEL_AVAILABLE: "Товар в наличии",
   LABEL_STOCK_QUANTITY: "Количество в наличии (шт.)",

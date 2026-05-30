@@ -2,10 +2,12 @@ import { useCallback, useEffect, useState } from "react";
 
 import { fetchMySales } from "../../../entities/order/api/fetchMySales.js";
 import {
+  markOrderItemCancelled,
   markOrderItemDelivered,
   markOrderItemShipped,
 } from "../../../entities/order/api/updateOrderItemStatus.js";
 import {
+  ORDER_STATUS_CANCELLED,
   ORDER_STATUS_SHIPPED,
   ORDER_STATUS_DELIVERED,
   ORDER_STATUSES,
@@ -17,6 +19,7 @@ import { ProductDetailsModal } from "../../../entities/product/ui/ProductDetails
 import {
   API_CLIENT_UI,
   MY_SALES_PAGE_UI,
+  ORDER_CARD_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { useDebouncedValue } from "../../../shared/lib/useDebouncedValue.js";
 import { useRefetchOnVisible } from "../../../shared/lib/useRefetchOnVisible.js";
@@ -110,6 +113,50 @@ export function MySalesPage({
       isCancelled = true;
     };
   }, [getSalesParams]);
+
+  const handleCancelItem = async ({ orderId, itemIndex }) => {
+    if (!window.confirm(ORDER_CARD_UI.CANCEL_CONFIRM)) {
+      return;
+    }
+
+    const actionKey = `${orderId}:${itemIndex}`;
+    setPendingActionKey(actionKey);
+    setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
+
+    setOrders((prev) =>
+      prev.map((order) => {
+        if (order._id !== orderId) return order;
+        const nextItems = order.items.map((item, index) => {
+          const currentItemIndex =
+            typeof item.itemIndex === "number" ? item.itemIndex : index;
+          if (currentItemIndex !== itemIndex) return item;
+          return { ...item, status: ORDER_STATUS_CANCELLED };
+        });
+        return { ...order, items: nextItems };
+      }),
+    );
+
+    try {
+      const updatedOrder = await markOrderItemCancelled(orderId, itemIndex);
+      setOrders((prev) =>
+        prev.map((order) => (order._id === orderId ? updatedOrder : order)),
+      );
+      void reloadSales();
+    } catch (e) {
+      const message =
+        e instanceof Error
+          ? e.message
+          : API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK;
+      setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
+      try {
+        await reloadSales();
+      } catch {
+        /* откат списка не критичен при 429 после серии ошибок */
+      }
+    } finally {
+      setPendingActionKey(null);
+    }
+  };
 
   const handleMarkDelivered = async ({ orderId, itemIndex }) => {
     const actionKey = `${orderId}:${itemIndex}`;
@@ -243,6 +290,7 @@ export function MySalesPage({
               onProductClick={openCatalogProductFromOrderLine}
               onMarkShipped={handleMarkShipped}
               onMarkDelivered={handleMarkDelivered}
+              onCancelItem={handleCancelItem}
               pendingActionKey={pendingActionKey}
               itemActionErrors={itemActionErrors}
             />

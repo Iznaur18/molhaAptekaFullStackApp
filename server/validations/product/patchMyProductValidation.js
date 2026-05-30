@@ -6,6 +6,7 @@ import {
   PRODUCT_IMAGE_URLS_MAX,
 } from "../../constants/productConstants.js";
 import { assertAtMostWords } from "../../utils/maxWordsText.js";
+import { assertProductOldPricePair, normalizeProductOldPriceRub, normalizeProductPriceRub } from "../../utils/productDiscount.js";
 import { handleValidationByExpressErrors } from "../handleValidationByExpressErrors.js";
 
 const assertHttpImageUrl = (raw, label) => {
@@ -32,6 +33,7 @@ export const patchMyProductValidation = [
       body("productName").exists(),
       body("productDescription").exists(),
       body("productPrice").exists(),
+      body("productOldPrice").exists(),
       body("productCategory").exists(),
       body("productImageUrls").exists(),
       body("productImageUrl").exists(),
@@ -90,9 +92,33 @@ export const patchMyProductValidation = [
     .trim(),
   body("productPrice")
     .optional()
-    .isFloat({ min: 0 })
-    .withMessage("Цена продукта должна быть положительным числом")
-    .toFloat(),
+    .isInt({ min: 0 })
+    .withMessage("Цена продукта должна быть целым числом не меньше 0")
+    .toInt(),
+  body("productOldPrice")
+    .optional({ nullable: true })
+    .custom((value, { req }) => {
+      try {
+        const productOldPrice = normalizeProductOldPriceRub(value);
+        const productPrice = Object.prototype.hasOwnProperty.call(
+          req.body ?? {},
+          "productPrice",
+        )
+          ? normalizeProductPriceRub(req.body.productPrice)
+          : 0;
+        if (
+          !Object.prototype.hasOwnProperty.call(req.body ?? {}, "productPrice")
+        ) {
+          return true;
+        }
+        assertProductOldPricePair(productOldPrice, productPrice);
+      } catch (e) {
+        throw new Error(
+          e instanceof Error ? e.message : "Некорректная старая цена",
+        );
+      }
+      return true;
+    }),
   body("productCategory")
     .optional()
     .notEmpty()

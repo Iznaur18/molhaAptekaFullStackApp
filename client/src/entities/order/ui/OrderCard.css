@@ -173,8 +173,18 @@
   color: #6b7280;
 }
 
-.order-card__item-action-button {
+.order-card__item-actions {
   grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.order-card__item > .order-card__item-action-button {
+  grid-column: 1 / -1;
+}
+
+.order-card__item-action-button {
   justify-self: start;
   margin: 0;
   padding: 0.32rem 0.72rem;
@@ -196,6 +206,18 @@
 .order-card__item-action-button:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+.order-card__item-action-button_cancel {
+  border-color: #b42318;
+  background: #fff;
+  color: #b42318;
+}
+
+.order-card__item-action-button_cancel:hover:not(:disabled) {
+  border-color: #912018;
+  background: rgba(180, 35, 24, 0.06);
+  color: #912018;
 }
 
 .order-card__item-action-error {

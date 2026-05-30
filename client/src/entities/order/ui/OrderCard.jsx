@@ -65,6 +65,7 @@ function renderBuyerValue(buyer, onBuyerNameClick) {
  *   onProductClick?: (item: import('../model/types.js').OrderLineItem) => void;
  *   onMarkShipped?: (ctx: { orderId: string; itemIndex: number }) => void | Promise<void>;
  *   onMarkDelivered?: (ctx: { orderId: string; itemIndex: number }) => void | Promise<void>;
+ *   onCancelItem?: (ctx: { orderId: string; itemIndex: number }) => void | Promise<void>;
  *   onConfirmDelivered?: (ctx: { orderId: string; itemIndex: number }) => void | Promise<void>;
  *   pendingActionKey?: string | null;
  *   itemActionErrors?: Record<string, string>;
@@ -78,6 +79,7 @@ export function OrderCard({
   onProductClick,
   onMarkShipped,
   onMarkDelivered,
+  onCancelItem,
   onConfirmDelivered,
   pendingActionKey = null,
   itemActionErrors = {},
@@ -171,19 +173,37 @@ export function OrderCard({
                 {ORDER_CARD_UI.ITEM_CONFIRMED_AT_LABEL}: {confirmedAtText}
               </span>
             ) : null}
-            {canMarkShipped && onMarkShipped ? (
-              <button
-                type="button"
-                className="order-card__item-action-button"
-                onClick={() =>
-                  onMarkShipped({ orderId: order._id, itemIndex })
-                }
-                disabled={isActionPending}
-              >
-                {isActionPending
-                  ? ORDER_CARD_UI.ACTION_PENDING
-                  : ORDER_CARD_UI.ACTION_SHIPPED}
-              </button>
+            {canMarkShipped && (onMarkShipped || onCancelItem) ? (
+              <div className="order-card__item-actions">
+                {onMarkShipped ? (
+                  <button
+                    type="button"
+                    className="order-card__item-action-button"
+                    onClick={() =>
+                      onMarkShipped({ orderId: order._id, itemIndex })
+                    }
+                    disabled={isActionPending}
+                  >
+                    {isActionPending
+                      ? ORDER_CARD_UI.ACTION_PENDING
+                      : ORDER_CARD_UI.ACTION_SHIPPED}
+                  </button>
+                ) : null}
+                {onCancelItem ? (
+                  <button
+                    type="button"
+                    className="order-card__item-action-button order-card__item-action-button_cancel"
+                    onClick={() =>
+                      onCancelItem({ orderId: order._id, itemIndex })
+                    }
+                    disabled={isActionPending}
+                  >
+                    {isActionPending
+                      ? ORDER_CARD_UI.ACTION_PENDING
+                      : ORDER_CARD_UI.ACTION_CANCEL}
+                  </button>
+                ) : null}
+              </div>
             ) : null}
             {canMarkDelivered && onMarkDelivered ? (
               <button

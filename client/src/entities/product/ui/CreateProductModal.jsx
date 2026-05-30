@@ -17,6 +17,11 @@ import {
 } from "../model/productStockConstants.js";
 import { CreateProductCategorySelect } from "./CreateProductCategorySelect.jsx";
 import { urlsFromImageRows } from "../lib/productImageRowHelpers.js";
+import {
+  computeProductDiscountPercent,
+  parseProductPriceInput,
+  validateProductOldPricePair,
+} from "../lib/computeProductDiscountPercent.js";
 import { validateProductDescription } from "../lib/validateProductDescription.js";
 import { resolveUploadedImageUrl } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
@@ -35,6 +40,7 @@ const INITIAL_FORM = {
   productDescription: "",
   productImageRows: [createImageRow("")],
   productPrice: "",
+  productOldPrice: "",
   productCategory: PRODUCT_CATEGORY_ELECTRONICS,
   productIsAvailable: true,
   productStockQuantity: "1",
@@ -51,11 +57,17 @@ function formStateFromProduct(product) {
     priceRaw != null && Number.isFinite(Number(priceRaw))
       ? String(priceRaw)
       : "";
+  const oldPriceRaw = product.productOldPrice;
+  const oldPriceStr =
+    oldPriceRaw != null && Number.isFinite(Number(oldPriceRaw))
+      ? String(Math.floor(Number(oldPriceRaw)))
+      : "";
   return {
     productName: product.productName?.trim() ?? "",
     productDescription: product.productDescription?.trim() ?? "",
     productImageRows: imageRowsFromUrls(urls),
     productPrice: priceStr,
+    productOldPrice: oldPriceStr,
     productCategory: product.productCategory ?? PRODUCT_CATEGORY_ELECTRONICS,
     productIsAvailable: product.productIsAvailable !== false,
     productStockQuantity:
@@ -173,10 +185,12 @@ export function CreateProductModal({
     onClose();
   };
 
-  const parsePrice = (raw) => {
-    const normalized = String(raw).trim().replace(",", ".");
-    return Number(normalized);
-  };
+  const parsePrice = (raw) => parseProductPriceInput(raw);
+
+  const discountPreviewPercent = computeProductDiscountPercent(
+    parsePrice(form.productOldPrice),
+    parsePrice(form.productPrice),
+  );
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -184,10 +198,23 @@ export function CreateProductModal({
 
     try {
       const productPrice = parsePrice(form.productPrice);
-      if (!Number.isFinite(productPrice) || productPrice < 0) {
+      if (productPrice == null) {
         setStatus({
           kind: "error",
           message: CREATE_PRODUCT_MODAL_UI.ERROR_PRICE,
+        });
+        return;
+      }
+
+      const productOldPrice = parsePrice(form.productOldPrice);
+      const oldPriceError = validateProductOldPricePair(
+        productOldPrice,
+        productPrice,
+      );
+      if (oldPriceError) {
+        setStatus({
+          kind: "error",
+          message: CREATE_PRODUCT_MODAL_UI.ERROR_OLD_PRICE,
         });
         return;
       }
@@ -245,6 +272,7 @@ export function CreateProductModal({
           productDescription: form.productDescription.trim(),
           productImageUrls: urls,
           productPrice,
+          productOldPrice,
           productCategory: form.productCategory,
         };
         if (showCatalogAvailabilityToggle) {
@@ -260,6 +288,7 @@ export function CreateProductModal({
           productDescription: form.productDescription,
           productImageUrls: urls.length > 0 ? urls : undefined,
           productPrice,
+          productOldPrice,
           productCategory: form.productCategory,
           productIsAvailable: form.productIsAvailable,
           productStockQuantity,
@@ -374,6 +403,27 @@ export function CreateProductModal({
                 disabled={isSubmitting}
               />
             </label>
+            <label className="create-product-modal__label">
+              <FormFieldLabel>
+                {CREATE_PRODUCT_MODAL_UI.LABEL_OLD_PRICE}
+              </FormFieldLabel>
+              <input
+                className="create-product-modal__input"
+                type="text"
+                name="productOldPrice"
+                value={form.productOldPrice}
+                onChange={handleChange}
+                inputMode="numeric"
+                autoComplete="off"
+                disabled={isSubmitting}
+              />
+            </label>
+            {discountPreviewPercent != null ? (
+              <p className="create-product-modal__discount-preview">
+                {CREATE_PRODUCT_MODAL_UI.LABEL_DISCOUNT_PREVIEW}: −
+                {discountPreviewPercent}%
+              </p>
+            ) : null}
             <CreateProductCategorySelect
               value={form.productCategory}
               disabled={isSubmitting}

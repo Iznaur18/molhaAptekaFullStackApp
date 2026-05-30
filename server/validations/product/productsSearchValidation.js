@@ -51,6 +51,10 @@ export const productsSearchValidation = [
         .optional()
         .isIn(['true', 'false'])
         .withMessage('auctionOnly должен быть true или false'),
+    query('saleOnly')
+        .optional()
+        .isIn(['true', 'false'])
+        .withMessage('saleOnly должен быть true или false'),
     query('moderationStatus')
         .optional()
         .isString()

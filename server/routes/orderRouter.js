@@ -8,6 +8,7 @@ import {
     updateOrderStatusController,
     markOrderItemShippedBySellerController,
     markOrderItemDeliveredBySellerController,
+    markOrderItemCancelledBySellerController,
     confirmOrderItemByBuyerController,
 } from '../controllers/index.js';
 import { checkAuthMW, checkAdminMW } from '../middlewares/index.js';
@@ -37,6 +38,12 @@ router.patch(
     checkAuthMW,
     orderItemActionValidation,
     markOrderItemShippedBySellerController,
+);
+router.patch(
+    '/:orderId/items/:itemIndex/cancelled',
+    checkAuthMW,
+    orderItemActionValidation,
+    markOrderItemCancelledBySellerController,
 );
 router.patch(
     '/:orderId/items/:itemIndex/delivered',
