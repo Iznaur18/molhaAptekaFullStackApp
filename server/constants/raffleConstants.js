@@ -19,6 +19,14 @@ export const RAFFLE_TITLE_MAX_LENGTH = 120;
 export const RAFFLE_DESCRIPTION_MAX_LENGTH = 4000;
 export const RAFFLE_INSTAGRAM_URL_MAX_LENGTH = 500;
 
+export const RAFFLE_PRIZE_MEDIA_TYPE_IMAGE = 'image';
+export const RAFFLE_PRIZE_MEDIA_TYPE_VIDEO = 'video';
+
+export const RAFFLE_PRIZE_MEDIA_TYPES = [
+    RAFFLE_PRIZE_MEDIA_TYPE_IMAGE,
+    RAFFLE_PRIZE_MEDIA_TYPE_VIDEO,
+];
+
 /** Макс. одновременно active на витрине (карусель) */
 export const SITE_RAFFLES_ACTIVE_VITRINE_MAX = 10;
 

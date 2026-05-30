@@ -2,14 +2,15 @@ import { body } from "express-validator";
 
 import {
   PRODUCT_CATEGORY_VALUES,
-  PRODUCT_DESCRIPTION_MAX_WORDS,
+  PRODUCT_DESCRIPTION_MAX_CHARS,
+  PRODUCT_DESCRIPTION_MIN_CHARS,
   PRODUCT_IMAGE_URLS_MAX,
 } from "../../constants/productConstants.js";
 import {
   PRODUCT_STOCK_QUANTITY_MAX,
   PRODUCT_STOCK_QUANTITY_MIN,
 } from "../../constants/productStockConstants.js";
-import { assertAtMostWords } from "../../utils/maxWordsText.js";
+import { assertAtMostChars } from "../../utils/maxWordsText.js";
 import { assertProductOldPricePair, normalizeProductOldPriceRub, normalizeProductPriceRub } from "../../utils/productDiscount.js";
 import { handleValidationByExpressErrors } from "../handleValidationByExpressErrors.js";
 
@@ -41,15 +42,17 @@ export const makeProductValidation = [
   body("productDescription")
     .notEmpty()
     .withMessage("Описание продукта обязательно")
-    .isLength({ min: 10 })
-    .withMessage("Описание продукта должно быть не менее 10 символов")
+    .isLength({ min: PRODUCT_DESCRIPTION_MIN_CHARS })
+    .withMessage(
+      `Описание продукта должно быть не менее ${PRODUCT_DESCRIPTION_MIN_CHARS} символов`,
+    )
     .trim()
     .custom((value) => {
       try {
-        assertAtMostWords(
+        assertAtMostChars(
           value,
           "Описание товара",
-          PRODUCT_DESCRIPTION_MAX_WORDS,
+          PRODUCT_DESCRIPTION_MAX_CHARS,
         );
       } catch (e) {
         throw new Error(

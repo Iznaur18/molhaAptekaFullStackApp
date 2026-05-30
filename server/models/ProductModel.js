@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 import {
   PRODUCT_CATEGORY_VALUES,
+  PRODUCT_DESCRIPTION_MAX_CHARS,
   PRODUCT_IMAGE_URLS_MAX,
 } from "../constants/productConstants.js";
 import {
@@ -14,7 +15,11 @@ const Schema = mongoose.Schema;
 const ProductSchema = new Schema(
   {
     productName: { type: String, required: true },
-    productDescription: String,
+    productDescription: {
+      type: String,
+      trim: true,
+      maxlength: PRODUCT_DESCRIPTION_MAX_CHARS,
+    },
     productImageUrls: {
       type: [String],
       default: [],

@@ -13,6 +13,10 @@ import { OrderModel, ProductModel, RaffleModel, UserModel } from '../models/inde
 import { createUserInAppNotification } from './userInAppNotifications.js';
 import { notifyFollowersOfSellerRaffleCompleted } from './userFollowHelpers.js';
 import { normalizeRafflePrizeImageFocus } from './profileImageFocus.js';
+import {
+    applyRafflePrizeMediaFields,
+    normalizePrizeMediaType,
+} from './rafflePrizeMedia.js';
 
 const RAFFLE_SALE_COUNT_ITEM_STATUSES = [ORDER_STATUS_CONFIRMED];
 
@@ -168,25 +172,9 @@ export const syncRaffleProgressForProductSale = async (productId) => {
     await recalculateRaffleSalesProgress(product.activeRaffleId);
 };
 
-/**
- * @param {Record<string, unknown>} raffle
- */
-/**
- * @param {import('mongoose').Document} raffle
- * @param {Record<string, unknown>} body
- */
-export const applyRafflePrizeImageFields = (raffle, body) => {
-    if (body.prizeImageUrl !== undefined) {
-        const nextUrl = String(body.prizeImageUrl).trim();
-        const urlChanged = nextUrl !== raffle.prizeImageUrl;
-        raffle.prizeImageUrl = nextUrl;
-        if (urlChanged && body.prizeImageFocus === undefined) {
-            raffle.prizeImageFocus = normalizeRafflePrizeImageFocus(null);
-        }
-    }
-    if (body.prizeImageFocus !== undefined) {
-        raffle.prizeImageFocus = normalizeRafflePrizeImageFocus(body.prizeImageFocus);
-    }
+export {
+    applyRafflePrizeMediaFields,
+    applyRafflePrizeMediaFields as applyRafflePrizeImageFields,
 };
 
 export const toPublicRafflePayload = (raffle, options = {}) => {
@@ -202,7 +190,9 @@ export const toPublicRafflePayload = (raffle, options = {}) => {
         sellerId: String(raffle.sellerId),
         title: raffle.title,
         description: raffle.description ?? '',
-        prizeImageUrl: raffle.prizeImageUrl,
+        prizeImageUrl: raffle.prizeImageUrl ?? '',
+        prizeMediaType: normalizePrizeMediaType(raffle.prizeMediaType),
+        prizeVideoUrl: raffle.prizeVideoUrl ?? '',
         prizeImageFocus: normalizeRafflePrizeImageFocus(raffle.prizeImageFocus),
         targetSales: Number(raffle.targetSales) || 0,
         salesProgress: Number(raffle.salesProgress) || 0,

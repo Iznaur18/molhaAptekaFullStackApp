@@ -5,6 +5,8 @@ import {
     RAFFLE_STATUS_PENDING_STAFF,
     RAFFLE_TARGET_SALES_MAX,
     RAFFLE_TARGET_SALES_MIN,
+    RAFFLE_PRIZE_MEDIA_TYPES,
+    RAFFLE_PRIZE_MEDIA_TYPE_IMAGE,
 } from '../constants/raffleConstants.js';
 import {
     DEFAULT_RAFFLE_PRIZE_IMAGE_FOCUS,
@@ -54,7 +56,17 @@ const RaffleSchema = new Schema(
         },
         prizeImageUrl: {
             type: String,
-            required: true,
+            default: '',
+            trim: true,
+        },
+        prizeMediaType: {
+            type: String,
+            enum: RAFFLE_PRIZE_MEDIA_TYPES,
+            default: RAFFLE_PRIZE_MEDIA_TYPE_IMAGE,
+        },
+        prizeVideoUrl: {
+            type: String,
+            default: '',
             trim: true,
         },
         prizeImageFocus: {

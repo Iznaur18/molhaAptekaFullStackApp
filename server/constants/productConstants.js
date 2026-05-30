@@ -11,8 +11,11 @@ export const SELLER_PRODUCTS_LIMIT_PREMIUM = 30;
 export const SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE =
     'Достигнут лимит товаров: 15 для обычных пользователей, 30 для премиум.';
 
-/** Максимум слов в описании товара (валидация POST/PATCH /product). */
-export const PRODUCT_DESCRIPTION_MAX_WORDS = 100;
+/** Максимум символов в описании товара (валидация POST/PATCH /product). */
+export const PRODUCT_DESCRIPTION_MAX_CHARS = 2000;
+
+/** Минимум символов в описании товара. */
+export const PRODUCT_DESCRIPTION_MIN_CHARS = 10;
 
 /**
  * Slug категории товара. Совпадает с клиентом `client/.../productConstants.js`.

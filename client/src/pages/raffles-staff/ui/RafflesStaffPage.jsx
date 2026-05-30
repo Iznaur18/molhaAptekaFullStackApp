@@ -5,9 +5,8 @@ import { deleteRaffleByStaff } from "../../../entities/raffle/api/deleteRaffleBy
 import { fetchFeaturedRaffles } from "../../../entities/raffle/api/fetchFeaturedRaffle.js";
 import { fetchPendingRaffles } from "../../../entities/raffle/api/fetchPendingRaffles.js";
 import { rejectRaffle } from "../../../entities/raffle/api/rejectRaffle.js";
-import { formatRafflePrizeImageObjectPosition } from "../../../entities/raffle/lib/rafflePrizeImageFocus.js";
-import { resolveRafflePrizeImageUrl } from "../../../entities/raffle/lib/resolveRafflePrizeImageUrl.js";
 import { RaffleManageActions } from "../../../entities/raffle/ui/RaffleManageActions.jsx";
+import { RafflePrizeMedia } from "../../../entities/raffle/ui/RafflePrizeMedia.jsx";
 import {
   API_CLIENT_UI,
   RAFFLE_MANAGE_UI,
@@ -164,13 +163,11 @@ export function RafflesStaffPage({
           </h3>
           <div className="raffles-staff-page__row raffles-staff-page__row_live">
             <div className="raffles-staff-page__row-main">
-              <img
-                src={resolveRafflePrizeImageUrl(liveRaffle)}
-                alt=""
+              <RafflePrizeMedia
+                raffle={liveRaffle}
                 className="raffles-staff-page__thumb"
-                style={{
-                  objectPosition: formatRafflePrizeImageObjectPosition(liveRaffle),
-                }}
+                imageClassName="raffles-staff-page__thumb"
+                videoClassName="raffles-staff-page__thumb raffles-staff-page__thumb_video"
               />
               <div>
                 <p className="raffles-staff-page__title">{liveRaffle.title}</p>
@@ -218,13 +215,11 @@ export function RafflesStaffPage({
             return (
               <li key={raffle._id} className="raffles-staff-page__row">
                 <div className="raffles-staff-page__row-main">
-                  <img
-                    src={resolveRafflePrizeImageUrl(raffle)}
-                    alt=""
+                  <RafflePrizeMedia
+                    raffle={raffle}
                     className="raffles-staff-page__thumb"
-                    style={{
-                      objectPosition: formatRafflePrizeImageObjectPosition(raffle),
-                    }}
+                    imageClassName="raffles-staff-page__thumb"
+                    videoClassName="raffles-staff-page__thumb raffles-staff-page__thumb_video"
                   />
                   <div>
                     <p className="raffles-staff-page__title">{raffle.title}</p>

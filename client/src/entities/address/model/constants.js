@@ -1,5 +1,5 @@
 /** Как `server/constants/dadataConstants.js`. */
-export const ADDRESS_LINE_MAX_LENGTH = 30;
+export const ADDRESS_LINE_MAX_LENGTH = 100;
 
 export const ADDRESS_FLAT_MAX_LENGTH = 20;
 

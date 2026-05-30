@@ -2,9 +2,13 @@ import { body, param, query } from 'express-validator';
 
 import { handleValidationByExpressErrors } from '../handleValidationByExpressErrors.js';
 import { assertProfileImageFocus } from '../../utils/profileImageFocus.js';
+import { assertRaffleCreatePrizeMedia, normalizePrizeMediaType } from '../../utils/rafflePrizeMedia.js';
 import {
     RAFFLE_DESCRIPTION_MAX_LENGTH,
     RAFFLE_INSTAGRAM_URL_MAX_LENGTH,
+    RAFFLE_PRIZE_MEDIA_TYPE_IMAGE,
+    RAFFLE_PRIZE_MEDIA_TYPE_VIDEO,
+    RAFFLE_PRIZE_MEDIA_TYPES,
     RAFFLE_TARGET_SALES_MAX,
     RAFFLE_TARGET_SALES_MIN,
     RAFFLE_TITLE_MAX_LENGTH,
@@ -28,12 +32,44 @@ export const createRaffleValidation = [
         .optional({ values: 'null' })
         .isString()
         .isLength({ max: RAFFLE_DESCRIPTION_MAX_LENGTH }),
+    body('prizeMediaType')
+        .optional()
+        .isIn(RAFFLE_PRIZE_MEDIA_TYPES)
+        .withMessage('Тип медиа приза: image или video'),
     body('prizeImageUrl')
+        .optional({ values: 'falsy' })
         .trim()
-        .notEmpty()
-        .withMessage('Добавьте фото приза')
-        .custom(isHttpUrl)
-        .withMessage('Укажите корректную ссылку на изображение'),
+        .custom((value, { req }) => {
+            const type = normalizePrizeMediaType(req.body?.prizeMediaType);
+            if (type !== RAFFLE_PRIZE_MEDIA_TYPE_IMAGE) {
+                return true;
+            }
+            const url = String(value ?? '').trim();
+            if (!url) {
+                throw new Error('Добавьте фото приза');
+            }
+            if (!isHttpUrl(url)) {
+                throw new Error('Укажите корректную ссылку на изображение');
+            }
+            return true;
+        }),
+    body('prizeVideoUrl')
+        .optional({ values: 'falsy' })
+        .trim()
+        .custom((value, { req }) => {
+            const type = normalizePrizeMediaType(req.body?.prizeMediaType);
+            if (type !== RAFFLE_PRIZE_MEDIA_TYPE_VIDEO) {
+                return true;
+            }
+            const url = String(value ?? '').trim();
+            if (!url) {
+                throw new Error('Добавьте видео приза');
+            }
+            if (!isHttpUrl(url)) {
+                throw new Error('Укажите корректную ссылку на видео');
+            }
+            return true;
+        }),
     body('prizeImageFocus')
         .optional({ nullable: true })
         .custom((value) => {
@@ -50,6 +86,10 @@ export const createRaffleValidation = [
         .isLength({ max: RAFFLE_INSTAGRAM_URL_MAX_LENGTH })
         .custom(isHttpUrl)
         .withMessage('Укажите корректную ссылку Instagram'),
+    body().custom((_, { req }) => {
+        assertRaffleCreatePrizeMedia(req.body ?? {});
+        return true;
+    }),
     validationDone,
 ];
 
@@ -64,11 +104,35 @@ export const patchRaffleValidation = [
         .optional({ values: 'null' })
         .isString()
         .isLength({ max: RAFFLE_DESCRIPTION_MAX_LENGTH }),
-    body('prizeImageUrl')
+    body('prizeMediaType')
         .optional()
+        .isIn(RAFFLE_PRIZE_MEDIA_TYPES),
+    body('prizeImageUrl')
+        .optional({ values: 'falsy' })
         .trim()
-        .notEmpty()
-        .custom(isHttpUrl),
+        .custom((value) => {
+            const url = String(value ?? '').trim();
+            if (url === '') {
+                return true;
+            }
+            if (!isHttpUrl(url)) {
+                throw new Error('Укажите корректную ссылку на изображение');
+            }
+            return true;
+        }),
+    body('prizeVideoUrl')
+        .optional({ values: 'falsy' })
+        .trim()
+        .custom((value) => {
+            const url = String(value ?? '').trim();
+            if (url === '') {
+                return true;
+            }
+            if (!isHttpUrl(url)) {
+                throw new Error('Укажите корректную ссылку на видео');
+            }
+            return true;
+        }),
     body('prizeImageFocus')
         .optional({ nullable: true })
         .custom((value) => {

@@ -6,7 +6,8 @@ export const SELLER_PRODUCTS_LIMIT_PREMIUM = 30;
 export const SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE =
   "Достигнут лимит товаров: 15 для обычных пользователей, 30 для премиум.";
 
-export const PRODUCT_DESCRIPTION_MAX_WORDS = 100;
+export const PRODUCT_DESCRIPTION_MAX_CHARS = 2000;
+export const PRODUCT_DESCRIPTION_MIN_CHARS = 10;
 
 export const PRODUCT_CATEGORY_GROCERY = "grocery";
 export const PRODUCT_CATEGORY_ELECTRONICS = "electronics";

@@ -5,7 +5,9 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
  * @param {{
  *   title: string;
  *   description?: string;
- *   prizeImageUrl: string;
+ *   prizeMediaType?: 'image' | 'video';
+ *   prizeImageUrl?: string;
+ *   prizeVideoUrl?: string;
  *   prizeImageFocus?: { x: number; y: number };
  *   targetSales: number;
  *   instagramUrl: string;

@@ -8,7 +8,9 @@ import {
   assertUserNameFormat,
   normalizeUserNameInput,
 } from './userNameRules.js';
-import { assertAtMostWords } from '../../utils/maxWordsText.js';
+import {
+    assertAtMostChars,
+} from '../../utils/maxWordsText.js';
 import { ruDeliveryAddressBodyValidation } from '../address/ruDeliveryAddressValidation.js';
 import { parseUserBackgroundPresetId } from '../../constants/userBackgroundPresets.js';
 import { isHttpBackgroundImageUrl } from '../../utils/userBackgroundValue.js';
@@ -183,7 +185,7 @@ export const updateProfileValidation = [
                 throw new Error('Заметки должны быть строкой');
             }
             try {
-                assertAtMostWords(value, 'Заметки о пользователе');
+                assertAtMostChars(value, 'Заметки о пользователе');
             } catch (e) {
                 throw new Error(e instanceof Error ? e.message : 'Слишком длинный текст');
             }

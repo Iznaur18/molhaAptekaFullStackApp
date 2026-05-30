@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 
+import { ADDRESS_LINE_MAX_LENGTH } from '../constants/dadataConstants.js';
+
 import {
     ORDER_LINE_ITEM_QUANTITY_MIN,
     ORDER_PAYMENT_METHODS,
@@ -91,6 +93,7 @@ const OrderSchema = new mongoose.Schema(
             type: String,
             required: true,
             trim: true,
+            maxlength: ADDRESS_LINE_MAX_LENGTH,
         },
         deliveryAddressFlat: {
             type: String,

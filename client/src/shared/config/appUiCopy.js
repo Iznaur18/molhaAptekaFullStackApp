@@ -23,6 +23,18 @@ export const IMAGE_URL_FIELD_UI = {
   FILE_INPUT_ARIA: "Выбрать изображение с устройства",
 };
 
+/** Поле URL видео с загрузкой файла (`POST /upload/video`) */
+export const VIDEO_URL_FIELD_UI = {
+  UPLOAD_BUTTON: "Выбрать файл",
+  UPLOAD_LOADING: "Загрузка…",
+  UPLOAD_HINT: "MP4 или WebM, до 5 МБ. Можно также вставить прямую ссылку.",
+  ERROR_TYPE: "Допустимы только MP4 и WebM",
+  ERROR_SIZE: "Файл не больше 5 МБ",
+  ERROR_GENERIC: "Не удалось загрузить видео",
+  ERROR_AUTH: "Войдите в аккаунт, чтобы загрузить файл",
+  FILE_INPUT_ARIA: "Выбрать видео с устройства",
+};
+
 /** Да / нет в интерфейсе (карточка товара, профиль и т.д.) */
 export const FORMAT_BOOLEAN_RU = {
   YES: "Да",
@@ -623,7 +635,8 @@ export const CREATE_PRODUCT_MODAL_UI = {
   TITLE: "Новый товар",
   TITLE_EDIT: "Редактирование товара",
   LABEL_NAME: "Название",
-  LABEL_DESCRIPTION: "Описание (до 100 слов)",
+  LABEL_DESCRIPTION: "Описание (до 2000 символов)",
+  CHARS_USED: (n, max) => `Символов: ${n} / ${max}`,
   LABEL_IMAGE_URLS:
     "Изображения (необязательно, до 5 — ссылка или файл)",
   IMAGE_ORDER_HINT: "Перетащите за ⋮⋮ — порядок в каталоге (1 — главное фото).",
@@ -718,7 +731,12 @@ export const CREATE_RAFFLE_MODAL_UI = {
   TITLE_EDIT: "Изменить розыгрыш",
   LABEL_TITLE: "Название",
   LABEL_DESCRIPTION: "Описание",
+  LABEL_PRIZE_MEDIA: "Медиа приза (фото или видео)",
+  LABEL_PRIZE_MEDIA_TYPE_IMAGE: "Фото",
+  LABEL_PRIZE_MEDIA_TYPE_VIDEO: "Видео",
   LABEL_PRIZE_IMAGE: "Фото приза (ссылка или файл)",
+  LABEL_PRIZE_VIDEO: "Видео приза (ссылка или файл)",
+  PREVIEW_LABEL: "Превью",
   LABEL_TARGET: "Цель продаж",
   LABEL_INSTAGRAM: "Ссылка Instagram",
   SUBMIT: "Отправить на модерацию",
@@ -967,6 +985,7 @@ export const EDIT_PROFILE_MODAL_UI = {
   LABEL_NOTIFICATIONS: "Уведомления по email",
   LABEL_NOTES: "Заметки о себе",
   WORDS_USED: (n, max) => `Слов: ${n} / ${max}`,
+  CHARS_USED: (n, max) => `Символов: ${n} / ${max}`,
   PLACEHOLDER_HTTPS: "https://…",
   SUBMIT_IDLE: "Сохранить",
   SUBMIT_LOADING: "Сохранение…",

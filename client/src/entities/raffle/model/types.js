@@ -15,6 +15,8 @@
  * @property {string} title
  * @property {string} description
  * @property {string} prizeImageUrl
+ * @property {'image' | 'video'} [prizeMediaType]
+ * @property {string} [prizeVideoUrl]
  * @property {{ x?: number; y?: number }} [prizeImageFocus]
  * @property {number} targetSales
  * @property {number} salesProgress

@@ -1,7 +1,7 @@
-import { countWords } from "../../user/lib/countWords.js";
-import { PRODUCT_DESCRIPTION_MAX_WORDS } from "../model/productConstants.js";
-
-const DESCRIPTION_MIN_CHARS = 10;
+import {
+  PRODUCT_DESCRIPTION_MAX_CHARS,
+  PRODUCT_DESCRIPTION_MIN_CHARS,
+} from "../model/productConstants.js";
 
 /**
  * @param {unknown} raw
@@ -9,12 +9,11 @@ const DESCRIPTION_MIN_CHARS = 10;
  */
 export function validateProductDescription(raw) {
   const trimmed = String(raw ?? "").trim();
-  if (trimmed.length < DESCRIPTION_MIN_CHARS) {
-    return `Описание: не короче ${DESCRIPTION_MIN_CHARS} символов`;
+  if (trimmed.length < PRODUCT_DESCRIPTION_MIN_CHARS) {
+    return `Описание: не короче ${PRODUCT_DESCRIPTION_MIN_CHARS} символов`;
   }
-  const words = countWords(trimmed);
-  if (words > PRODUCT_DESCRIPTION_MAX_WORDS) {
-    return `Описание: не больше ${PRODUCT_DESCRIPTION_MAX_WORDS} слов (сейчас ${words})`;
+  if (trimmed.length > PRODUCT_DESCRIPTION_MAX_CHARS) {
+    return `Описание: не больше ${PRODUCT_DESCRIPTION_MAX_CHARS} символов`;
   }
   return null;
 }

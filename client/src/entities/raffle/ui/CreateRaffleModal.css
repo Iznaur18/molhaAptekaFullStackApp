@@ -90,3 +90,45 @@
   color: #5b21b6;
   font-weight: 600;
 }
+
+.create-raffle-modal__media-type {
+  margin: 0;
+  padding: 0;
+  border: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+}
+
+.create-raffle-modal__media-type legend {
+  width: 100%;
+  margin-bottom: 0.15rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.create-raffle-modal__media-type-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+}
+
+.create-raffle-modal__preview {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.create-raffle-modal__preview-label {
+  font-size: 0.8rem;
+  opacity: 0.75;
+}
+
+.create-raffle-modal__preview-frame {
+  position: relative;
+  height: 9rem;
+  border-radius: 10px;
+  overflow: hidden;
+  background: color-mix(in srgb, currentColor 8%, transparent);
+}

@@ -16,8 +16,11 @@ export const RU_PHONE_MAX_DIGITS = 11;
 export const USER_NAME_MIN_LENGTH = 3;
 export const USER_NAME_MAX_LENGTH = 30;
 
-/** Как `MAX_TEXT_FIELD_WORDS` в `server/utils/maxWordsText.js` (адрес, заметки). */
-export const PROFILE_FIELD_MAX_WORDS = 10;
+/** Как `ADDRESS_LINE_MAX_LENGTH` в `server/constants/dadataConstants.js`. */
+export { ADDRESS_LINE_MAX_LENGTH as USER_ADDRESS_MAX_CHARS } from "../../address/model/constants.js";
+
+/** Как `NOTES_ABOUT_USER_MAX_CHARS` в `server/utils/maxWordsText.js`. */
+export const NOTES_ABOUT_USER_MAX_CHARS = 500;
 
 /** Как в `server/models/UserModel.js` — `userRole.enum`. */
 export const USER_ROLE_USER = "user";

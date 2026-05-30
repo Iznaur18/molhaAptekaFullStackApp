@@ -202,3 +202,13 @@
   opacity: 0.7;
   cursor: default;
 }
+
+.create-product-modal__char-meter {
+  font-size: 0.78rem;
+  color: #6b7280;
+}
+
+.create-product-modal__char-meter_overflow {
+  color: #b42318;
+  font-weight: 600;
+}

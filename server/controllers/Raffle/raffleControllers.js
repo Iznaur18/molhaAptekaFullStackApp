@@ -26,6 +26,10 @@ import {
     toPublicRafflePayload,
 } from '../../utils/raffleHelpers.js';
 import { normalizeRafflePrizeImageFocus } from '../../utils/profileImageFocus.js';
+import {
+    assertRafflePrizeMediaComplete,
+    normalizePrizeMediaType,
+} from '../../utils/rafflePrizeMedia.js';
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 20;
@@ -156,11 +160,15 @@ export const createRaffleController = async (req, res) => {
             return errorRes(res, 403, access.message);
         }
 
+        const prizeMediaType = normalizePrizeMediaType(req.body.prizeMediaType);
+
         const raffle = await RaffleModel.create({
             sellerId,
             title: String(req.body.title).trim(),
             description: String(req.body.description ?? '').trim(),
-            prizeImageUrl: String(req.body.prizeImageUrl).trim(),
+            prizeMediaType,
+            prizeImageUrl: String(req.body.prizeImageUrl ?? '').trim(),
+            prizeVideoUrl: String(req.body.prizeVideoUrl ?? '').trim(),
             prizeImageFocus: normalizeRafflePrizeImageFocus(req.body.prizeImageFocus),
             targetSales: Number(req.body.targetSales),
             instagramUrl: String(req.body.instagramUrl).trim(),
@@ -249,6 +257,18 @@ export const patchMyRaffleController = async (req, res) => {
             raffle.instagramUrl = String(req.body.instagramUrl).trim();
         }
 
+        try {
+            assertRafflePrizeMediaComplete(raffle);
+        } catch (validationError) {
+            return errorRes(
+                res,
+                400,
+                validationError instanceof Error
+                    ? validationError.message
+                    : 'Некорректное медиа приза',
+            );
+        }
+
         if (raffle.status === RAFFLE_STATUS_PENDING_STAFF) {
             await raffle.save();
             return successRes(res, {
@@ -302,6 +322,18 @@ export const patchRaffleByStaffController = async (req, res) => {
         }
         if (req.body.instagramUrl !== undefined) {
             raffle.instagramUrl = String(req.body.instagramUrl).trim();
+        }
+
+        try {
+            assertRafflePrizeMediaComplete(raffle);
+        } catch (validationError) {
+            return errorRes(
+                res,
+                400,
+                validationError instanceof Error
+                    ? validationError.message
+                    : 'Некорректное медиа приза',
+            );
         }
 
         await raffle.save();

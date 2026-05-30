@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { ADDRESS_LINE_MAX_LENGTH } from '../constants/dadataConstants.js';
 import { DEFAULT_AVATAR_URL, DEFAULT_BACKGROUND_URL } from '../constants/constants.js';
 import {
     DEFAULT_USER_AVATAR_FOCUS,
@@ -57,6 +58,7 @@ const UserSchema = new mongoose.Schema(
       trim: true, // убирает пробелы в начале и в конце строки
       required: false,
       default: '',
+      maxlength: ADDRESS_LINE_MAX_LENGTH,
     },
     userAddressFlat: {
       type: String,
@@ -145,9 +147,11 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    notesAboutUser: { // заметки о пользователе
+    notesAboutUser: {
       type: String,
       default: '',
+      trim: true,
+      maxlength: 500,
     },
     userLoyaltyPoints: { // количество баллов лояльности
       type: Number,

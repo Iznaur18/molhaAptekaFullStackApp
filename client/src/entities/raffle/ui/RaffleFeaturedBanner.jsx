@@ -1,10 +1,9 @@
 import { useMemo, useState } from "react";
 
-import { formatRafflePrizeImageObjectPosition } from "../lib/rafflePrizeImageFocus.js";
-import { resolveRafflePrizeImageUrl } from "../lib/resolveRafflePrizeImageUrl.js";
 import { RAFFLE_FEATURED_BANNER_UI } from "../../../shared/config/appUiCopy.js";
 import { RaffleDescriptionModal } from "./RaffleDescriptionModal.jsx";
 import { RaffleManageActions } from "./RaffleManageActions.jsx";
+import { RafflePrizeMedia } from "./RafflePrizeMedia.jsx";
 
 import "./RaffleFeaturedBanner.css";
 
@@ -50,12 +49,17 @@ export function RaffleFeaturedBanner({
   const sectionClassName = isCompleted
     ? "raffle-featured-banner raffle-featured-banner_completed"
     : "raffle-featured-banner";
-  const prizeImageSrc = useMemo(
-    () => resolveRafflePrizeImageUrl(raffle),
-    [raffle],
-  );
-  const prizeImageObjectPosition = useMemo(
-    () => formatRafflePrizeImageObjectPosition(raffle),
+
+  const prizeMedia = useMemo(
+    () => (
+      <RafflePrizeMedia
+        raffle={raffle}
+        className="raffle-featured-banner__prize-image"
+        imageClassName="raffle-featured-banner__prize-image"
+        videoClassName="raffle-featured-banner__prize-image raffle-featured-banner__prize-video"
+        autoplayVideo
+      />
+    ),
     [raffle],
   );
 
@@ -79,13 +83,7 @@ export function RaffleFeaturedBanner({
           onPointerUp={carouselVisualDrag?.onPointerUp}
           onPointerCancel={carouselVisualDrag?.onPointerCancel}
         >
-          <img
-            src={prizeImageSrc}
-            alt=""
-            className="raffle-featured-banner__prize-image"
-            loading="lazy"
-            style={{ objectPosition: prizeImageObjectPosition }}
-          />
+          {prizeMedia}
           <span className="raffle-featured-banner__badge">
             {RAFFLE_FEATURED_BANNER_UI.BADGE}
           </span>

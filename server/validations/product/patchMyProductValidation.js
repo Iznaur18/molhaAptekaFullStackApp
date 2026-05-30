@@ -2,10 +2,11 @@ import { body, oneOf } from "express-validator";
 
 import {
   PRODUCT_CATEGORY_VALUES,
-  PRODUCT_DESCRIPTION_MAX_WORDS,
+  PRODUCT_DESCRIPTION_MAX_CHARS,
+  PRODUCT_DESCRIPTION_MIN_CHARS,
   PRODUCT_IMAGE_URLS_MAX,
 } from "../../constants/productConstants.js";
-import { assertAtMostWords } from "../../utils/maxWordsText.js";
+import { assertAtMostChars } from "../../utils/maxWordsText.js";
 import { assertProductOldPricePair, normalizeProductOldPriceRub, normalizeProductPriceRub } from "../../utils/productDiscount.js";
 import { handleValidationByExpressErrors } from "../handleValidationByExpressErrors.js";
 
@@ -53,15 +54,17 @@ export const patchMyProductValidation = [
     .optional()
     .notEmpty()
     .withMessage("Описание продукта не может быть пустым")
-    .isLength({ min: 10 })
-    .withMessage("Описание продукта должно быть не менее 10 символов")
+    .isLength({ min: PRODUCT_DESCRIPTION_MIN_CHARS })
+    .withMessage(
+      `Описание продукта должно быть не менее ${PRODUCT_DESCRIPTION_MIN_CHARS} символов`,
+    )
     .trim()
     .custom((value) => {
       try {
-        assertAtMostWords(
+        assertAtMostChars(
           value,
           "Описание товара",
-          PRODUCT_DESCRIPTION_MAX_WORDS,
+          PRODUCT_DESCRIPTION_MAX_CHARS,
         );
       } catch (e) {
         throw new Error(

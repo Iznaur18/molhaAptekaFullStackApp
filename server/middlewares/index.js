@@ -1,4 +1,5 @@
 import { uploadMW } from './uploadMW.js';
+import { uploadVideoMW } from './uploadVideoMW.js';
 import { checkAuthMW } from './checkAuthMW.js';
 import { checkOptionalAuthMW } from './checkOptionalAuthMW.js';
 import { checkAdminMW } from './checkAdminMW.js';
@@ -18,7 +19,8 @@ import {
 import { errorHandler, notFoundHandler, asyncHandler, AppError } from './errorHandlerMW.js';
 
 export { 
-    uploadMW, 
+    uploadMW,
+    uploadVideoMW,
     checkAuthMW,
     checkOptionalAuthMW,
     checkAdminMW,

@@ -14,11 +14,19 @@ import {
   getRafflePrizeImageFocus,
 } from "../lib/rafflePrizeImageFocus.js";
 import {
+  normalizeRafflePrizeMediaType,
+  RAFFLE_PRIZE_MEDIA_TYPE_IMAGE,
+  RAFFLE_PRIZE_MEDIA_TYPE_VIDEO,
+} from "../lib/isRafflePrizeVideo.js";
+import { resolveRafflePrizeVideoUrl } from "../lib/resolveRafflePrizeVideoUrl.js";
+import { RafflePrizeMedia } from "./RafflePrizeMedia.jsx";
+import {
   API_CLIENT_UI,
   CREATE_RAFFLE_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { FormFieldLabel } from "../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
 import { ImageUrlField } from "../../../shared/ui/ImageUrlField/ImageUrlField.jsx";
+import { VideoUrlField } from "../../../shared/ui/VideoUrlField/VideoUrlField.jsx";
 import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
 
 import "./CreateRaffleModal.css";
@@ -26,7 +34,9 @@ import "./CreateRaffleModal.css";
 const INITIAL_FORM = {
   title: "",
   description: "",
+  prizeMediaType: RAFFLE_PRIZE_MEDIA_TYPE_IMAGE,
   prizeImageUrl: "",
+  prizeVideoUrl: "",
   prizeImageFocus: { ...DEFAULT_RAFFLE_PRIZE_IMAGE_FOCUS },
   targetSales: "",
   instagramUrl: "",
@@ -36,10 +46,13 @@ const INITIAL_FORM = {
  * @param {import('../model/types.js').RaffleFromApi} raffle
  */
 function formFromRaffle(raffle) {
+  const prizeMediaType = normalizeRafflePrizeMediaType(raffle.prizeMediaType);
   return {
     title: raffle.title ?? "",
     description: raffle.description ?? "",
+    prizeMediaType,
     prizeImageUrl: raffle.prizeImageUrl ?? "",
+    prizeVideoUrl: raffle.prizeVideoUrl ?? "",
     prizeImageFocus: getRafflePrizeImageFocus(raffle),
     targetSales: String(raffle.targetSales ?? ""),
     instagramUrl: raffle.instagramUrl ?? "",
@@ -74,10 +87,34 @@ export function CreateRaffleModal({
     setStatus({ kind: "idle", message: "" });
   }, [isOpen, isEdit, raffleToEdit]);
 
+  const isVideoMedia = form.prizeMediaType === RAFFLE_PRIZE_MEDIA_TYPE_VIDEO;
+
   const prizeFocusImageUrl = useMemo(() => {
     const url = resolveImageUrlForDisplay(form.prizeImageUrl ?? "");
     return isHttpProfileImageUrl(url) ? url : "";
   }, [form.prizeImageUrl]);
+
+  const previewRaffle = useMemo(
+    () => ({
+      prizeMediaType: form.prizeMediaType,
+      prizeImageUrl: resolveUploadedImageUrl(form.prizeImageUrl.trim()),
+      prizeVideoUrl: resolveUploadedImageUrl(form.prizeVideoUrl.trim()),
+      prizeImageFocus: form.prizeImageFocus,
+    }),
+    [
+      form.prizeImageFocus,
+      form.prizeImageUrl,
+      form.prizeMediaType,
+      form.prizeVideoUrl,
+    ],
+  );
+
+  const showPreview = useMemo(() => {
+    if (isVideoMedia) {
+      return Boolean(resolveRafflePrizeVideoUrl(previewRaffle));
+    }
+    return Boolean(prizeFocusImageUrl || form.prizeImageUrl.trim());
+  }, [form.prizeImageUrl, isVideoMedia, previewRaffle, prizeFocusImageUrl]);
 
   if (!isOpen) return null;
 
@@ -102,6 +139,21 @@ export function CreateRaffleModal({
         ? null
         : CREATE_RAFFLE_MODAL_UI.HINT;
 
+  const handleMediaTypeChange = (prizeMediaType) => {
+    setForm((prev) => ({
+      ...prev,
+      prizeMediaType,
+      prizeImageUrl:
+        prizeMediaType === RAFFLE_PRIZE_MEDIA_TYPE_VIDEO ? "" : prev.prizeImageUrl,
+      prizeVideoUrl:
+        prizeMediaType === RAFFLE_PRIZE_MEDIA_TYPE_IMAGE ? "" : prev.prizeVideoUrl,
+      prizeImageFocus:
+        prizeMediaType === RAFFLE_PRIZE_MEDIA_TYPE_VIDEO
+          ? { ...DEFAULT_RAFFLE_PRIZE_IMAGE_FOCUS }
+          : prev.prizeImageFocus,
+    }));
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const targetSales = Number(form.targetSales);
@@ -113,7 +165,9 @@ export function CreateRaffleModal({
     const body = {
       title: form.title.trim(),
       description: form.description.trim(),
+      prizeMediaType: form.prizeMediaType,
       prizeImageUrl: resolveUploadedImageUrl(form.prizeImageUrl.trim()),
+      prizeVideoUrl: resolveUploadedImageUrl(form.prizeVideoUrl.trim()),
       prizeImageFocus: form.prizeImageFocus,
       targetSales,
       instagramUrl: form.instagramUrl.trim(),
@@ -190,28 +244,74 @@ export function CreateRaffleModal({
               }
             />
           </FormFieldLabel>
-          <FormFieldLabel required>
-            {CREATE_RAFFLE_MODAL_UI.LABEL_PRIZE_IMAGE}
-          </FormFieldLabel>
-          <ImageUrlField
-            value={form.prizeImageUrl}
-            required
-            onChange={(nextUrl) => {
-              setForm((prev) => {
-                const urlChanged =
-                  nextUrl.trim() !== String(prev.prizeImageUrl ?? "").trim();
-                return {
-                  ...prev,
-                  prizeImageUrl: nextUrl,
-                  prizeImageFocus: urlChanged
-                    ? { ...DEFAULT_RAFFLE_PRIZE_IMAGE_FOCUS }
-                    : prev.prizeImageFocus,
-                };
-              });
-            }}
-            disabled={isSubmitting}
-          />
-          {prizeFocusImageUrl ? (
+          <fieldset className="create-raffle-modal__media-type">
+            <legend>{CREATE_RAFFLE_MODAL_UI.LABEL_PRIZE_MEDIA}</legend>
+            <label className="create-raffle-modal__media-type-option">
+              <input
+                type="radio"
+                name="prizeMediaType"
+                value={RAFFLE_PRIZE_MEDIA_TYPE_IMAGE}
+                checked={form.prizeMediaType === RAFFLE_PRIZE_MEDIA_TYPE_IMAGE}
+                onChange={() =>
+                  handleMediaTypeChange(RAFFLE_PRIZE_MEDIA_TYPE_IMAGE)
+                }
+                disabled={isSubmitting}
+              />
+              {CREATE_RAFFLE_MODAL_UI.LABEL_PRIZE_MEDIA_TYPE_IMAGE}
+            </label>
+            <label className="create-raffle-modal__media-type-option">
+              <input
+                type="radio"
+                name="prizeMediaType"
+                value={RAFFLE_PRIZE_MEDIA_TYPE_VIDEO}
+                checked={form.prizeMediaType === RAFFLE_PRIZE_MEDIA_TYPE_VIDEO}
+                onChange={() =>
+                  handleMediaTypeChange(RAFFLE_PRIZE_MEDIA_TYPE_VIDEO)
+                }
+                disabled={isSubmitting}
+              />
+              {CREATE_RAFFLE_MODAL_UI.LABEL_PRIZE_MEDIA_TYPE_VIDEO}
+            </label>
+          </fieldset>
+          {isVideoMedia ? (
+            <FormFieldLabel required>
+              {CREATE_RAFFLE_MODAL_UI.LABEL_PRIZE_VIDEO}
+            </FormFieldLabel>
+          ) : (
+            <FormFieldLabel required>
+              {CREATE_RAFFLE_MODAL_UI.LABEL_PRIZE_IMAGE}
+            </FormFieldLabel>
+          )}
+          {isVideoMedia ? (
+            <VideoUrlField
+              value={form.prizeVideoUrl}
+              required
+              onChange={(nextUrl) =>
+                setForm((prev) => ({ ...prev, prizeVideoUrl: nextUrl }))
+              }
+              disabled={isSubmitting}
+            />
+          ) : (
+            <ImageUrlField
+              value={form.prizeImageUrl}
+              required
+              onChange={(nextUrl) => {
+                setForm((prev) => {
+                  const urlChanged =
+                    nextUrl.trim() !== String(prev.prizeImageUrl ?? "").trim();
+                  return {
+                    ...prev,
+                    prizeImageUrl: nextUrl,
+                    prizeImageFocus: urlChanged
+                      ? { ...DEFAULT_RAFFLE_PRIZE_IMAGE_FOCUS }
+                      : prev.prizeImageFocus,
+                  };
+                });
+              }}
+              disabled={isSubmitting}
+            />
+          )}
+          {!isVideoMedia && prizeFocusImageUrl ? (
             <ProfileImageFocusEditor
               imageUrl={prizeFocusImageUrl}
               variant="raffle-prize"
@@ -221,6 +321,21 @@ export function CreateRaffleModal({
               }
               disabled={isSubmitting}
             />
+          ) : null}
+          {showPreview ? (
+            <div className="create-raffle-modal__preview">
+              <span className="create-raffle-modal__preview-label">
+                {CREATE_RAFFLE_MODAL_UI.PREVIEW_LABEL}
+              </span>
+              <div className="create-raffle-modal__preview-frame">
+                <RafflePrizeMedia
+                  raffle={previewRaffle}
+                  className="raffle-prize-media"
+                  videoClassName="raffle-prize-media raffle-prize-media_video"
+                  imageClassName="raffle-prize-media"
+                />
+              </div>
+            </div>
           ) : null}
           <FormFieldLabel label={CREATE_RAFFLE_MODAL_UI.LABEL_TARGET} required>
             <input

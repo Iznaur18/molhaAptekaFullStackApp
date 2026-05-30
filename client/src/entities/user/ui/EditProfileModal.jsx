@@ -5,12 +5,11 @@ import { patchUserProfile } from "../api/patchUserProfile.js";
 import { buildAdminPatchUserProfileBody } from "../lib/buildAdminPatchUserProfileBody.js";
 import { buildPatchUserProfileBody } from "../lib/buildPatchUserProfileBody.js";
 import { AddressDeliveryFields } from "../../address/ui/AddressDeliveryFields.jsx";
-import { countWords } from "../lib/countWords.js";
 import { mapUserToEditProfileForm } from "../lib/mapUserToEditProfileForm.js";
 import { limitRuPhoneInput } from "../lib/ruPhone.js";
 import { validateEditProfileForm } from "../lib/validateEditProfileForm.js";
 import {
-  PROFILE_FIELD_MAX_WORDS,
+  NOTES_ABOUT_USER_MAX_CHARS,
   USER_GENDER_FEMALE,
   USER_GENDER_MALE,
   USER_GENDER_LABEL_RU,
@@ -93,8 +92,8 @@ export function EditProfileModal({
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [isOpen, onClose]);
 
-  const notesWords = useMemo(
-    () => countWords(form.notesAboutUser),
+  const notesChars = useMemo(
+    () => String(form.notesAboutUser ?? "").length,
     [form.notesAboutUser],
   );
 
@@ -480,17 +479,18 @@ export function EditProfileModal({
                 value={form.notesAboutUser}
                 onChange={handleChange}
                 rows={3}
+                maxLength={NOTES_ABOUT_USER_MAX_CHARS}
               />
               <span
                 className={
-                  notesWords > PROFILE_FIELD_MAX_WORDS
+                  notesChars > NOTES_ABOUT_USER_MAX_CHARS
                     ? "edit-profile-modal__word-meter edit-profile-modal__word-meter_overflow"
                     : "edit-profile-modal__word-meter"
                 }
               >
-                {EDIT_PROFILE_MODAL_UI.WORDS_USED(
-                  notesWords,
-                  PROFILE_FIELD_MAX_WORDS,
+                {EDIT_PROFILE_MODAL_UI.CHARS_USED(
+                  notesChars,
+                  NOTES_ABOUT_USER_MAX_CHARS,
                 )}
               </span>
             </label>

@@ -1,0 +1,11 @@
+.raffle-prize-media {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+}
+
+.raffle-prize-media_video {
+  background: #000;
+}

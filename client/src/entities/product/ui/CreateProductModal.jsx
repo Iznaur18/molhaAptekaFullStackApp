@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { createProduct } from "../api/createProduct.js";
 import { patchMyProduct } from "../api/patchMyProduct.js";
@@ -9,6 +9,8 @@ import {
 } from "../lib/productImageRowHelpers.js";
 import {
   PRODUCT_CATEGORY_ELECTRONICS,
+  PRODUCT_DESCRIPTION_MAX_CHARS,
+  PRODUCT_DESCRIPTION_MIN_CHARS,
 } from "../model/productConstants.js";
 import { PRODUCT_MODERATION_APPROVED } from "../model/productModerationConstants.js";
 import {
@@ -155,6 +157,11 @@ export function CreateProductModal({
   }, [isOpen, isEdit, productToEdit?._id]);
 
   useScrollLock(isOpen);
+
+  const descriptionChars = useMemo(
+    () => String(form.productDescription ?? "").length,
+    [form.productDescription],
+  );
 
   if (!isOpen) return null;
 
@@ -376,9 +383,22 @@ export function CreateProductModal({
                 value={form.productDescription}
                 onChange={handleChange}
                 required
-                minLength={10}
+                minLength={PRODUCT_DESCRIPTION_MIN_CHARS}
+                maxLength={PRODUCT_DESCRIPTION_MAX_CHARS}
                 disabled={isSubmitting}
               />
+              <span
+                className={
+                  descriptionChars > PRODUCT_DESCRIPTION_MAX_CHARS
+                    ? "create-product-modal__char-meter create-product-modal__char-meter_overflow"
+                    : "create-product-modal__char-meter"
+                }
+              >
+                {CREATE_PRODUCT_MODAL_UI.CHARS_USED(
+                  descriptionChars,
+                  PRODUCT_DESCRIPTION_MAX_CHARS,
+                )}
+              </span>
             </label>
             <ProductImageUrlSortableList
               rows={form.productImageRows}

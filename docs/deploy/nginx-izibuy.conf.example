@@ -1,0 +1,169 @@
+# Izibuy — вариант A: один домен, SPA + API за nginx
+#
+# 1. Скопируй и отредактируй:
+#    sudo cp docs/deploy/nginx-izibuy.conf.example /etc/nginx/sites-available/izibuy
+# 2. Пути:
+#    - root → каталог client/dist после npm run build
+#    - upstream → Express на 127.0.0.1:4444
+# 3. SSL: certbot --nginx -d izibuy.ru -d www.izibuy.ru
+#
+# server/.env для этого варианта:
+#   FRONTEND_URL=https://izibuy.ru
+#   PUBLIC_UPLOAD_BASE_URL=https://izibuy.ru
+#   PORT=4444
+#
+# client: собирать БЕЗ VITE_API_URL (запросы на тот же origin)
+
+upstream izibuy_api {
+    server 127.0.0.1:4444;
+    keepalive 32;
+}
+
+# Редирект HTTP → HTTPS (раскомментируй после certbot или настрой вручную)
+# server {
+#     listen 80;
+#     listen [::]:80;
+#     server_name izibuy.ru www.izibuy.ru;
+#     return 301 https://izibuy.ru$request_uri;
+# }
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name izibuy.ru www.izibuy.ru;
+
+    # После certbot замени на listen 443 ssl http2; и добавь ssl_certificate*
+
+    root /var/www/izibuy/client/dist;
+    index index.html;
+
+    # Фото 5 МБ, видео розыгрыша 5 МБ + запас
+    client_max_body_size 6m;
+
+    # --- Раздача загрузок через Express (или alias на server/uploads, см. ниже) ---
+
+    location /uploads/ {
+        proxy_pass http://izibuy_api;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        expires 7d;
+        add_header Cache-Control "public, max-age=604800";
+    }
+
+    # POST /upload и POST /upload/video (поле image / video)
+    location /upload {
+        proxy_pass http://izibuy_api;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_request_buffering off;
+    }
+
+    # --- API (как в client/vite.config.js DEV_API_PROXY_PREFIXES) ---
+
+    location /auth/ {
+        proxy_pass http://izibuy_api;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /cart/ {
+        proxy_pass http://izibuy_api;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Только /user и /user/... — НЕ /user-list (SPA, см. homeMainViewPaths.js)
+    location ~ ^/user(/|$) {
+        proxy_pass http://izibuy_api;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /vote/ {
+        proxy_pass http://izibuy_api;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /order/ {
+        proxy_pass http://izibuy_api;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /product/ {
+        proxy_pass http://izibuy_api;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /address/ {
+        proxy_pass http://izibuy_api;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # --- Статика Vite (immutable hash) ---
+
+    location /assets/ {
+        try_files $uri =404;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        access_log off;
+    }
+
+    # intro и прочие файлы из public/
+    location /intro/ {
+        try_files $uri =404;
+        expires 7d;
+        add_header Cache-Control "public, max-age=604800";
+    }
+
+    # --- SPA (React Router) ---
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    gzip on;
+    gzip_types text/plain text/css application/javascript application/json image/svg+xml;
+    gzip_min_length 256;
+}
+
+# --- Опционально: отдавать /uploads напрямую с диска (быстрее, без Node) ---
+# Замени блок location /uploads/ выше на:
+#
+# location /uploads/ {
+#     alias /var/www/izibuy/server/uploads/;
+#     expires 7d;
+#     add_header Cache-Control "public, max-age=604800";
+#     add_header Cross-Origin-Resource-Policy cross-origin;
+# }
