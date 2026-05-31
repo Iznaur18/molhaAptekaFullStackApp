@@ -24,6 +24,10 @@ import {
   API_CLIENT_UI,
   CREATE_RAFFLE_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
+import {
+  INTEGER_INPUT_FIELD_PROPS,
+  keepDigitsOnly,
+} from "../../../shared/lib/numericInput.js";
 import { FormFieldLabel } from "../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
 import { ImageUrlField } from "../../../shared/ui/ImageUrlField/ImageUrlField.jsx";
 import { VideoUrlField } from "../../../shared/ui/VideoUrlField/VideoUrlField.jsx";
@@ -339,12 +343,14 @@ export function CreateRaffleModal({
           ) : null}
           <FormFieldLabel label={CREATE_RAFFLE_MODAL_UI.LABEL_TARGET} required>
             <input
-              type="number"
-              min={1}
+              {...INTEGER_INPUT_FIELD_PROPS}
               value={form.targetSales}
               required
               onChange={(e) =>
-                setForm((prev) => ({ ...prev, targetSales: e.target.value }))
+                setForm((prev) => ({
+                  ...prev,
+                  targetSales: keepDigitsOnly(e.target.value),
+                }))
               }
             />
           </FormFieldLabel>

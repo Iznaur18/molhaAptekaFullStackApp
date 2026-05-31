@@ -9,6 +9,7 @@ import {
     ALLOWED_FIELDS_FOR_ADMIN,
     ALLOWED_FIELDS_FOR_ADMIN_SELF,
     ALLOWED_FIELDS_FOR_MODERATOR,
+    ALLOWED_FIELDS_FOR_MODERATOR_SELF,
 } from '../../constants/constants.js';
 import { isStaffRole } from '../../utils/adminUserGuard.js';
 import {
@@ -173,7 +174,9 @@ export const userUpdateProfileController = async (req, res) => {
         const allowedFields = isCurrentUserOwner
             ? isCurrentUserAdmin
                 ? ALLOWED_FIELDS_FOR_ADMIN_SELF
-                : ALLOWED_FIELDS_FOR_USER
+                : editorRole === 'moderator'
+                  ? ALLOWED_FIELDS_FOR_MODERATOR_SELF
+                  : ALLOWED_FIELDS_FOR_USER
             : isCurrentUserAdmin
               ? ALLOWED_FIELDS_FOR_ADMIN
               : ALLOWED_FIELDS_FOR_MODERATOR;
@@ -194,6 +197,11 @@ export const userUpdateProfileController = async (req, res) => {
                 } else if (field === 'userDiscountPercent') {
                     // Конвертация в число (валидация диапазона уже выполнена в middleware)
                     updateData[field] = Number(value);
+                } else if (field === 'userLoyaltyPoints') {
+                    const points = Math.floor(Number(value));
+                    updateData[field] = Number.isFinite(points)
+                        ? Math.max(0, points)
+                        : 0;
                 } else if (field === 'userName') {
                     updateData[field] =
                         typeof value === 'string' ? value.trim().toLowerCase() : value;
@@ -260,6 +268,10 @@ export const userUpdateProfileController = async (req, res) => {
 
         if (updateData.isPremiumUser !== undefined && !isCurrentUserAdmin) {
             return errorRes(res, 403, 'Только администратор может менять премиум');
+        }
+
+        if (updateData.userLoyaltyPoints !== undefined && !isCurrentUserStaff) {
+            return errorRes(res, 403, 'Только staff может менять баллы лояльности');
         }
 
         // 5. Проверка уникальности userName и userPhoneNumber перед обновлением

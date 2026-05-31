@@ -1,3 +1,4 @@
+import { PRODUCT_CARD_UI } from "../../../shared/config/appUiCopy.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 import { PRODUCT_FIELD_LABEL_RU } from "../model/productConstants.js";
 import {
@@ -62,22 +63,35 @@ export function ProductPriceDisplay({
 }
 
 /**
- * @param {{ discountPercent: number | null | undefined; className?: string }} props
+ * @param {{
+ *   discountPercent: number | null | undefined;
+ *   className?: string;
+ *   variant?: "inline" | "overlay";
+ * }} props
  */
-export function ProductDiscountBadge({ discountPercent, className = "" }) {
+export function ProductDiscountBadge({
+  discountPercent,
+  className = "",
+  variant = "inline",
+}) {
   if (discountPercent == null || discountPercent < 1) {
     return null;
   }
 
-  const badgeText = `−${Math.floor(discountPercent)}%`;
+  const percent = Math.floor(discountPercent);
+  const badgeText = PRODUCT_CARD_UI.DISCOUNT_BADGE(percent);
+
+  const rootClassName = [
+    "product-discount-badge",
+    variant === "overlay" ? "product-discount-badge--overlay" : "",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
-    <p
-      className={["product-discount-badge", className].filter(Boolean).join(" ")}
-      role="status"
-      aria-label={`Скидка ${Math.floor(discountPercent)} процентов`}
-    >
+    <span className={rootClassName} role="status" aria-label={badgeText}>
       {badgeText}
-    </p>
+    </span>
   );
 }

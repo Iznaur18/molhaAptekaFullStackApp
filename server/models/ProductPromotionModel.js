@@ -1,5 +1,9 @@
 import mongoose from 'mongoose';
-import { PRODUCT_PROMOTION_STATUSES } from '../constants/productPromotionConstants.js';
+import {
+    PRODUCT_PROMOTION_PAYMENT_METHODS,
+    PRODUCT_PROMOTION_PAYMENT_METHOD_RUB,
+    PRODUCT_PROMOTION_STATUSES,
+} from '../constants/productPromotionConstants.js';
 
 const ProductPromotionSchema = new mongoose.Schema(
     {
@@ -37,6 +41,33 @@ const ProductPromotionSchema = new mongoose.Schema(
             type: Number,
             required: true,
             min: 0,
+        },
+        paymentMethod: {
+            type: String,
+            enum: PRODUCT_PROMOTION_PAYMENT_METHODS,
+            default: PRODUCT_PROMOTION_PAYMENT_METHOD_RUB,
+            required: true,
+        },
+        amountPoints: {
+            type: Number,
+            default: null,
+            min: 0,
+        },
+        pointsChargedAt: {
+            type: Date,
+            default: null,
+        },
+        pointsRefundedAt: {
+            type: Date,
+            default: null,
+        },
+        rubChargedAt: {
+            type: Date,
+            default: null,
+        },
+        rubRefundedAt: {
+            type: Date,
+            default: null,
         },
         approvedByUserId: {
             type: mongoose.Schema.Types.ObjectId,

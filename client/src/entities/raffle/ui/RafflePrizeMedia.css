@@ -9,3 +9,41 @@
 .raffle-prize-media_video {
   background: #000;
 }
+
+.raffle-prize-media__video-wrap {
+  position: relative;
+  overflow: hidden;
+}
+
+.raffle-prize-media__video-wrap .raffle-prize-media {
+  position: absolute;
+  inset: 0;
+}
+
+.raffle-prize-media__sound-btn {
+  position: absolute;
+  right: 0.45rem;
+  bottom: 0.45rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: rgb(15 23 42 / 72%);
+  color: #fff;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+}
+
+.raffle-prize-media__sound-btn:hover {
+  background: rgb(15 23 42 / 88%);
+}
+
+.raffle-prize-media__sound-btn:focus-visible {
+  outline: 2px solid #c4b5fd;
+  outline-offset: 2px;
+}

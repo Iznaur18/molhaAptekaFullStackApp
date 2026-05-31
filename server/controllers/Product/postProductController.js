@@ -7,6 +7,10 @@ import {
 import { attachProductSellerSnapshot } from "../../utils/attachProductSellerSnapshots.js";
 import { isUserAdmin } from "../../utils/adminUserGuard.js";
 import { mergeProductImageUrlsFromBody } from "../../utils/mergeProductImageUrlsFromBody.js";
+import {
+    assertProductPreviewVideoRequiresPhotos,
+    normalizeProductPreviewVideoUrl,
+} from "../../utils/productPreviewVideo.js";
 import { assertSellerCanCreateProduct } from "../../utils/sellerProductsLimit.js";
 import { notifyFollowersOfSellerNewCatalogProduct } from "../../utils/userFollowHelpers.js";
 import { notifyFollowersOfSellerProductDiscount } from "../../utils/productDiscount.js";
@@ -59,6 +63,23 @@ export const postProductController = async (req, res) => {
     }
 
     const productImageUrls = mergeProductImageUrlsFromBody(req.body);
+    const productPreviewVideoUrl = normalizeProductPreviewVideoUrl(
+        req.body?.productPreviewVideoUrl,
+    );
+    try {
+        assertProductPreviewVideoRequiresPhotos(
+            productPreviewVideoUrl,
+            productImageUrls,
+        );
+    } catch (previewVideoError) {
+        return errorRes(
+            res,
+            400,
+            previewVideoError instanceof Error
+                ? previewVideoError.message
+                : "Некорректное превью-видео",
+        );
+    }
     const productModerationStatus = isAdmin
       ? PRODUCT_MODERATION_APPROVED
       : PRODUCT_MODERATION_PENDING;
@@ -85,6 +106,7 @@ export const postProductController = async (req, res) => {
       productName,
       productDescription,
       productImageUrls,
+      productPreviewVideoUrl,
       productPrice,
       productOldPrice,
       productSeller: userId,

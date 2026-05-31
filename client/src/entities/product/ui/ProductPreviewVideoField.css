@@ -1,0 +1,21 @@
+.product-preview-video-field__hint {
+  margin: 0.35rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted, #6b7280);
+}
+
+.product-preview-video-field__clear {
+  margin-top: 0.5rem;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 0.875rem;
+  color: var(--color-link, #2563eb);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.product-preview-video-field__clear:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

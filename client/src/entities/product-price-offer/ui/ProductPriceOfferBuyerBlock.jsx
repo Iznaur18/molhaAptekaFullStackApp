@@ -12,7 +12,13 @@ import {
   PRICE_OFFER_STATUS_ACCEPTED,
   PRICE_OFFER_STATUS_PENDING,
 } from "../model/constants.js";
+import { getProductPriceRubMaxError } from "../../product/lib/productPriceRubValidation.js";
+import { PRODUCT_PRICE_RUB_MAX } from "../../product/model/productConstants.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
+import {
+  INTEGER_INPUT_FIELD_PROPS,
+  keepDigitsOnly,
+} from "../../../shared/lib/numericInput.js";
 import { PRODUCT_PRICE_OFFER_UI } from "../../../shared/config/appUiCopy.js";
 import {
   clearPriceOfferPayFlowOpened,
@@ -124,6 +130,11 @@ export function ProductPriceOfferBuyerBlock({
     const price = Math.floor(Number(priceInput));
     if (!Number.isFinite(price) || price < 1) {
       setError("Укажите целую цену больше 0");
+      return;
+    }
+    const priceMaxError = getProductPriceRubMaxError(price);
+    if (priceMaxError) {
+      setError(PRODUCT_PRICE_OFFER_UI.ERROR_PRICE_MAX);
       return;
     }
 
@@ -239,12 +250,13 @@ export function ProductPriceOfferBuyerBlock({
               <label className="product-price-offer__label">
                 {PRODUCT_PRICE_OFFER_UI.LABEL_PRICE}
                 <input
-                  type="number"
+                  {...INTEGER_INPUT_FIELD_PROPS}
                   className="product-price-offer__input"
-                  min={1}
-                  step={1}
+                  maxLength={String(PRODUCT_PRICE_RUB_MAX).length}
                   value={priceInput}
-                  onChange={(e) => setPriceInput(e.target.value)}
+                  onChange={(e) =>
+                    setPriceInput(keepDigitsOnly(e.target.value))
+                  }
                   disabled={isBusy}
                 />
               </label>

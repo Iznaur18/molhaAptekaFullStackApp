@@ -1,9 +1,8 @@
-const LOCAL_API_UPLOAD_ORIGIN_RE =
-  /^https?:\/\/127\.0\.0\.1:4444(\/uploads\/.+)$/i;
+const UPLOAD_ASSET_PATH_RE = /(\/uploads\/[^?#]+)/i;
 
 /**
  * Превращает ответ upload в URL, который браузер грузит с того же origin, что и SPA.
- * Нужно для LAN dev (192.168.x.x:5173) и Vite proxy.
+ * Нужно для LAN dev (192.168.x.x:5173), Vite proxy и prod после сохранения URL с чужим origin.
  *
  * @param {string} raw
  * @returns {string}
@@ -16,9 +15,9 @@ export function resolveUploadedImageUrl(raw) {
     return url;
   }
 
-  const legacyMatch = url.match(LOCAL_API_UPLOAD_ORIGIN_RE);
-  if (legacyMatch) {
-    return `${window.location.origin}${legacyMatch[1]}`;
+  const uploadPathMatch = url.match(UPLOAD_ASSET_PATH_RE);
+  if (uploadPathMatch) {
+    return `${window.location.origin}${uploadPathMatch[1]}`;
   }
 
   if (url.startsWith("/")) {
@@ -34,6 +33,22 @@ export function resolveUploadedImageUrl(raw) {
  */
 export function isHttpImageUrl(raw) {
   return typeof raw === "string" && /^https?:\/\//i.test(raw.trim());
+}
+
+/**
+ * URL с сервера uploads или внешний http(s) — можно показать через resolveImageUrlForDisplay.
+ *
+ * @param {unknown} raw
+ */
+export function isStoredUploadOrHttpImageUrl(raw) {
+  const url = String(raw ?? "").trim();
+  if (!url) {
+    return false;
+  }
+  if (isHttpImageUrl(url)) {
+    return true;
+  }
+  return url.startsWith("/uploads/") || UPLOAD_ASSET_PATH_RE.test(url);
 }
 
 /**

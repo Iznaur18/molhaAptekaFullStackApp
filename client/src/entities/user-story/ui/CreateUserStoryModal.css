@@ -1,0 +1,119 @@
+.create-user-story-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgb(0 0 0 / 55%);
+}
+
+.create-user-story-modal {
+  width: min(420px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--color-surface, #fff);
+  box-shadow: 0 12px 40px rgb(0 0 0 / 20%);
+}
+
+.create-user-story-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.create-user-story-modal__title {
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+.create-user-story-modal__close {
+  border: none;
+  background: transparent;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.create-user-story-modal__preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 9 / 16;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #111;
+}
+
+.create-user-story-modal__media {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.create-user-story-modal__placeholder {
+  margin: 0;
+  padding: 12px;
+  color: #ccc;
+  text-align: center;
+}
+
+.create-user-story-modal__pickers {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.create-user-story-modal__pick,
+.create-user-story-modal__submit {
+  border: none;
+  border-radius: 999px;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+
+.create-user-story-modal__pick {
+  flex: 1;
+  background: #eef2ff;
+  color: #1e3a8a;
+}
+
+.create-user-story-modal__submit {
+  width: 100%;
+  margin-top: 8px;
+  background: #2563eb;
+  color: #fff;
+}
+
+.create-user-story-modal__pick:disabled,
+.create-user-story-modal__submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.create-user-story-modal__caption-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.875rem;
+}
+
+.create-user-story-modal__caption {
+  resize: vertical;
+  min-height: 56px;
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+}
+
+.create-user-story-modal__error {
+  margin: 8px 0 0;
+  color: #b91c1c;
+  font-size: 0.875rem;
+}

@@ -7,6 +7,7 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
  *   title: string;
  *   durationHours: number;
  *   priceRub: number;
+ *   pricePoints: number;
  * }>>}
  */
 export async function fetchProductPromotionTariffs() {
@@ -15,7 +16,10 @@ export async function fetchProductPromotionTariffs() {
     if (!data?.success || !Array.isArray(data?.data?.tariffs)) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
-    return data.data.tariffs;
+    return data.data.tariffs.map((tariff) => ({
+      ...tariff,
+      pricePoints: Number(tariff.pricePoints),
+    }));
   } catch (e) {
     const message =
       e?.response?.data?.message ??

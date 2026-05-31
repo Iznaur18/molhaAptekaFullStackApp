@@ -168,6 +168,11 @@ export const updateProfileValidation = [
         .optional({ nullable: true })
         .isFloat({ min: 0, max: 100 })
         .withMessage('Процент скидки должен быть числом от 0 до 100'),
+
+    body('userLoyaltyPoints')
+        .optional({ nullable: true })
+        .isInt({ min: 0 })
+        .withMessage('Баллы лояльности должны быть целым числом не меньше 0'),
     
     body('isPremiumUser')
         .optional({ nullable: true })

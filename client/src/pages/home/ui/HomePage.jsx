@@ -68,6 +68,9 @@ import { ProductReportsPage } from "../../product-reports/ui/ProductReportsPage.
 import { DataConfirmationRequestsPage } from "../../data-confirmation-requests/ui/DataConfirmationRequestsPage.jsx";
 import { fetchPendingModerationProductsCount } from "../../../entities/product/api/fetchPendingModerationProductsCount.js";
 import { fetchPendingProductReportsCount } from "../../../entities/product-report/api/fetchPendingProductReportsCount.js";
+import { fetchPendingUserStoryReportsCount } from "../../../entities/user-story/api/fetchPendingUserStoryReportsCount.js";
+import { fetchUserStoriesFeed } from "../../../entities/user-story/api/fetchUserStoriesFeed.js";
+import { UserStoriesStrip } from "../../../entities/user-story/ui/UserStoriesStrip.jsx";
 import { fetchPendingDataConfirmationCount } from "../../../entities/user-data-confirmation/api/fetchPendingDataConfirmationCount.js";
 import { DataConfirmationRequestModal } from "../../../entities/user-data-confirmation/ui/DataConfirmationRequestModal.jsx";
 import { fetchMyProductReportStatus } from "../../../entities/product-report/api/fetchMyProductReportStatus.js";
@@ -173,6 +176,8 @@ const useCurrentUserSession = (isAuthorized) => {
     /** @type {'user'|'admin'|'moderator'|null} */ (null),
   );
   const [isPremiumUser, setIsPremiumUser] = useState(false);
+  const [loyaltyPoints, setLoyaltyPoints] = useState(0);
+  const [rubBalance, setRubBalance] = useState(0);
   const [isSessionReady, setIsSessionReady] = useState(() => !isAuthorized);
 
   useEffect(() => {
@@ -180,6 +185,8 @@ const useCurrentUserSession = (isAuthorized) => {
       setCurrentUserId(null);
       setCurrentUserRole(null);
       setIsPremiumUser(false);
+      setLoyaltyPoints(0);
+      setRubBalance(0);
       setIsSessionReady(true);
       return undefined;
     }
@@ -194,12 +201,16 @@ const useCurrentUserSession = (isAuthorized) => {
           setCurrentUserId(String(me._id));
           setCurrentUserRole(me.userRole ?? "user");
           setIsPremiumUser(Boolean(me.isPremiumUser));
+          setLoyaltyPoints(Number(me.userLoyaltyPoints) || 0);
+          setRubBalance(Number(me.userRubBalance) || 0);
         }
       } catch {
         if (!isCancelled) {
           setCurrentUserId(null);
           setCurrentUserRole(null);
           setIsPremiumUser(false);
+          setLoyaltyPoints(0);
+          setRubBalance(0);
         }
       } finally {
         if (!isCancelled) {
@@ -217,6 +228,10 @@ const useCurrentUserSession = (isAuthorized) => {
     currentUserId,
     currentUserRole,
     isPremiumUser,
+    loyaltyPoints,
+    setLoyaltyPoints,
+    rubBalance,
+    setRubBalance,
     setCurrentUserId,
     isSessionReady,
   ];
@@ -315,6 +330,10 @@ export function HomePage() {
     currentUserId,
     currentUserRole,
     isPremiumUser,
+    loyaltyPoints,
+    setLoyaltyPoints,
+    rubBalance,
+    setRubBalance,
     setCurrentUserId,
     isSessionReady,
   ] = useCurrentUserSession(isAuthorized);
@@ -384,8 +403,11 @@ export function HomePage() {
       return;
     }
     try {
-      const count = await fetchPendingProductReportsCount();
-      setPendingProductReportsCount(count);
+      const [productCount, storyCount] = await Promise.all([
+        fetchPendingProductReportsCount(),
+        fetchPendingUserStoryReportsCount(),
+      ]);
+      setPendingProductReportsCount(productCount + storyCount);
     } catch {
       setPendingProductReportsCount(0);
     }
@@ -441,6 +463,14 @@ export function HomePage() {
     /** @type {import('../../../entities/raffle/model/types.js').RaffleFromApi[]} */ ([]),
   );
   const [featuredRaffleIndex, setFeaturedRaffleIndex] = useState(0);
+  const [userStoriesFeed, setUserStoriesFeed] = useState(
+    /** @type {import('../../../entities/user-story/model/types.js').UserStoriesFeedFromApi} */ ({
+      rings: [],
+      canPublish: false,
+      showStrip: false,
+    }),
+  );
+  const [userStoriesRefreshTick, setUserStoriesRefreshTick] = useState(0);
   const [sellerRaffleActive, setSellerRaffleActive] = useState(false);
   const [raffleParticipationPendingProductId, setRaffleParticipationPendingProductId] =
     useState(null);
@@ -506,6 +536,35 @@ export function HomePage() {
   useEffect(() => {
     void refreshFeaturedRaffle();
   }, [refreshFeaturedRaffle, catalogRefreshTick, raffleRefreshTick]);
+
+  const refreshUserStoriesFeed = useCallback(async () => {
+    if (mainView !== "catalog" || isRaffleRoute) {
+      setUserStoriesFeed({
+        rings: [],
+        canPublish: false,
+        showStrip: false,
+      });
+      return;
+    }
+    try {
+      const feed = await fetchUserStoriesFeed();
+      setUserStoriesFeed(feed);
+    } catch {
+      setUserStoriesFeed({
+        rings: [],
+        canPublish: false,
+        showStrip: false,
+      });
+    }
+  }, [mainView, isRaffleRoute]);
+
+  useEffect(() => {
+    void refreshUserStoriesFeed();
+  }, [refreshUserStoriesFeed, userStoriesRefreshTick, catalogRefreshTick, isAuthorized]);
+
+  const handleUserStoriesRefresh = useCallback(() => {
+    setUserStoriesRefreshTick((value) => value + 1);
+  }, []);
 
   const refreshSellerRaffleState = useCallback(async () => {
     if (!isAuthorized) {
@@ -1716,16 +1775,29 @@ export function HomePage() {
     setPromotionModalError("");
   };
 
-  const handleSubmitPromotionRequest = async (tariffCode) => {
+  const handleSubmitPromotionRequest = async (tariffCode, paymentMethod) => {
     if (!promotionProduct?._id) {
       return;
     }
     setIsPromotionSubmitPending(true);
     setPromotionModalError("");
     try {
-      await requestProductPromotion(String(promotionProduct._id), { tariffCode });
-      setMyProductsCatalogNotice("Заявка на продвижение отправлена staff-команде.");
+      const { loyaltyPointsBalance, rubBalance: nextRubBalance, message } =
+        await requestProductPromotion(String(promotionProduct._id), {
+          tariffCode,
+          paymentMethod,
+        });
+      if (loyaltyPointsBalance != null) {
+        setLoyaltyPoints(loyaltyPointsBalance);
+      }
+      if (nextRubBalance != null) {
+        setRubBalance(nextRubBalance);
+      }
+      setMyProductsCatalogNotice(
+        message ?? "Заявка на продвижение отправлена.",
+      );
       void refreshMyPromotionPendingIds();
+      setCatalogRefreshTick((n) => n + 1);
       handleClosePromotionModal();
     } catch (e) {
       const message =
@@ -1758,6 +1830,17 @@ export function HomePage() {
             getManage={getFeaturedRaffleManage}
           />
         ) : null}
+        {mainView === "catalog" && userStoriesFeed.showStrip ? (
+          <UserStoriesStrip
+            rings={userStoriesFeed.rings}
+            canPublish={userStoriesFeed.canPublish}
+            showStrip={userStoriesFeed.showStrip}
+            isAuthorized={isAuthorized}
+            currentUserId={currentUserId}
+            onRefresh={handleUserStoriesRefresh}
+            onOpenProfile={handleSellerNameClick}
+          />
+        ) : null}
         <HomeCatalogGrid
         products={products}
         selectedProductCategory={selectedProductCategory}
@@ -1777,6 +1860,7 @@ export function HomePage() {
         togglingAvailabilityProductId={togglingAvailabilityProductId}
         togglingAuctionProductId={togglingAuctionProductId}
         isAuthorized={isAuthorized}
+        isPremiumUser={isPremiumUser}
         currentUserId={currentUserId}
         onRequestLoginAddToCart={() => setIsLoginModalOpen(true)}
         showAddToCartOnCard={false}
@@ -2215,6 +2299,7 @@ export function HomePage() {
         isOpen={isEditProfileOpen}
         onClose={() => setIsEditProfileOpen(false)}
         allowSelfPremiumToggle={isAdmin}
+        allowStaffLoyaltyEdit={canModerateProducts}
         user={myProfilePage.phase === "success" ? myProfilePage.user : null}
         onSaved={(updatedUser) => {
           setMyProfilePage((prev) =>
@@ -2224,6 +2309,9 @@ export function HomePage() {
           );
           if (updatedUser.isPremiumUser !== undefined) {
             setIsPremiumUser(Boolean(updatedUser.isPremiumUser));
+          }
+          if (updatedUser.userLoyaltyPoints != null) {
+            setLoyaltyPoints(Number(updatedUser.userLoyaltyPoints) || 0);
           }
         }}
       />
@@ -2351,6 +2439,8 @@ export function HomePage() {
         isOpen={promotionProduct != null}
         productName={promotionProduct?.productName ?? ""}
         tariffs={promotionTariffs}
+        loyaltyPoints={loyaltyPoints}
+        rubBalance={rubBalance}
         errorMessage={promotionModalError}
         isSubmitting={isPromotionSubmitPending}
         onClose={handleClosePromotionModal}

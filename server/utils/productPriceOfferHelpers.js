@@ -26,6 +26,7 @@ import {
     closeProductAuction,
     computeAuctionActive,
 } from './productAuction.js';
+import { assertProductPriceRubWithinMax } from './productDiscount.js';
 
 const BUYER_PUBLIC_SELECT = '_id userName isPremiumUser isUserDataConfirmed';
 const TOP_BUYER_SELECT = '_id userName';
@@ -215,6 +216,7 @@ export const normalizeOfferPrice = (raw) => {
     if (!Number.isFinite(price) || price < 1) {
         throw new Error('Цена должна быть целым числом больше 0');
     }
+    assertProductPriceRubWithinMax(price);
     return price;
 };
 

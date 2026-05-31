@@ -16,6 +16,9 @@ import {
   isCatalogPromotionActive,
 } from "../lib/productPromotionStatus.js";
 import { resolveProductImageUrls } from "../lib/resolveProductImageUrls.js";
+import { buildProductMediaSlides } from "../lib/buildProductMediaSlides.js";
+import { resolveProductPreviewVideoUrl } from "../lib/resolveProductPreviewVideoUrl.js";
+import { ProductMediaSlideContent } from "./ProductMediaSlideContent.jsx";
 import {
   canSellerDeleteProduct,
   canSellerEditProduct,
@@ -38,13 +41,10 @@ import {
   ProductDiscountBadge,
   ProductPriceDisplay,
 } from "./ProductPriceDisplay.jsx";
+import { ProductLoyaltyPointsBadge } from "./ProductLoyaltyPointsBadge.jsx";
 import { PRODUCT_MODERATION_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
 import "./ProductCard.css";
-
-function isAbsoluteHttpUrl(value) {
-  return typeof value === "string" && /^https?:\/\//i.test(value.trim());
-}
 
 /**
  * @param {object} props
@@ -63,6 +63,7 @@ function isAbsoluteHttpUrl(value) {
  * @param {boolean} [props.isRaffleParticipationPending]
  * @param {(product: import('../model/types.js').ProductFromApi) => void} [props.onOpenDetails]
  * @param {boolean} [props.isAuthorized]
+ * @param {boolean} [props.isPremiumUser]
  * @param {string | null} [props.currentUserId]
  * @param {() => void} [props.onRequestLoginAddToCart]
  * @param {boolean} [props.showAddToCartOnCard]
@@ -96,6 +97,7 @@ export function ProductCard({
   isRaffleParticipationPending = false,
   onOpenDetails,
   isAuthorized = false,
+  isPremiumUser = false,
   currentUserId = null,
   onRequestLoginAddToCart = () => {},
   showAddToCartOnCard = true,
@@ -108,6 +110,10 @@ export function ProductCard({
 }) {
   const heading = product.productName?.trim() || PRODUCT_CARD_UI.DEFAULT_TITLE;
   const galleryUrls = useMemo(() => resolveProductImageUrls(product), [product]);
+  const previewVideoUrl = useMemo(
+    () => resolveProductPreviewVideoUrl(product),
+    [product],
+  );
   const previewFieldKeys = useMemo(() => {
     if (isModerationQueue) return PRODUCT_CARD_MODERATION_PREVIEW_FIELD_KEYS;
     if (isMineMode) {
@@ -115,32 +121,47 @@ export function ProductCard({
     }
     return PRODUCT_CARD_PREVIEW_FIELD_KEYS;
   }, [isMineMode, isModerationQueue]);
-  const [cardImageIndex, setCardImageIndex] = useState(0);
-
-  const primaryImageUrl = useMemo(() => {
-    const url = galleryUrls[cardImageIndex];
-    return isAbsoluteHttpUrl(url) ? url.trim() : null;
-  }, [galleryUrls, cardImageIndex]);
+  const [cardSlideIndex, setCardSlideIndex] = useState(0);
+  const [previewVideoFailed, setPreviewVideoFailed] = useState(false);
   const [imageLoadFailed, setImageLoadFailed] = useState(false);
   const [useFallbackImage, setUseFallbackImage] = useState(false);
+
+  const mediaSlides = useMemo(() => {
+    const videoUrl =
+      previewVideoUrl != null && !previewVideoFailed ? previewVideoUrl : null;
+    return buildProductMediaSlides({
+      previewVideoUrl: videoUrl,
+      imageUrls: galleryUrls,
+    });
+  }, [galleryUrls, previewVideoUrl, previewVideoFailed]);
+
+  const activeSlide = mediaSlides[cardSlideIndex] ?? null;
+
   useEffect(() => {
-    setCardImageIndex(0);
+    setCardSlideIndex(0);
   }, [product._id]);
 
   useEffect(() => {
-    setCardImageIndex((i) =>
-      Math.min(i, Math.max(0, galleryUrls.length - 1)),
+    setPreviewVideoFailed(false);
+  }, [product._id, previewVideoUrl]);
+
+  useEffect(() => {
+    setCardSlideIndex((i) =>
+      Math.min(i, Math.max(0, mediaSlides.length - 1)),
     );
-  }, [galleryUrls.length]);
+  }, [mediaSlides.length]);
 
   useEffect(() => {
     setImageLoadFailed(false);
-    setUseFallbackImage(primaryImageUrl == null);
-  }, [primaryImageUrl, product._id]);
+    setUseFallbackImage(false);
+  }, [activeSlide, product._id]);
 
-  const imageUrl = useFallbackImage
-    ? PRODUCT_IMAGE_PLACEHOLDER_URL
-    : primaryImageUrl;
+  const hasSlideMedia =
+    activeSlide != null &&
+    !(
+      activeSlide.type === "image" &&
+      (imageLoadFailed || (useFallbackImage && activeSlide.url == null))
+    );
 
   const handleImageError = () => {
     if (!useFallbackImage) {
@@ -207,19 +228,19 @@ export function ProductCard({
   };
 
   /** @param {import('react').MouseEvent<HTMLButtonElement>} event */
-  const handleCardImagePrev = (event) => {
+  const handleCardSlidePrev = (event) => {
     event.stopPropagation();
-    const n = galleryUrls.length;
+    const n = mediaSlides.length;
     if (n <= 1) return;
-    setCardImageIndex((i) => (i - 1 + n) % n);
+    setCardSlideIndex((i) => (i - 1 + n) % n);
   };
 
   /** @param {import('react').MouseEvent<HTMLButtonElement>} event */
-  const handleCardImageNext = (event) => {
+  const handleCardSlideNext = (event) => {
     event.stopPropagation();
-    const n = galleryUrls.length;
+    const n = mediaSlides.length;
     if (n <= 1) return;
-    setCardImageIndex((i) => (i + 1) % n);
+    setCardSlideIndex((i) => (i + 1) % n);
   };
 
   const reviewRatingLine = formatProductReviewRatingLine(
@@ -227,8 +248,10 @@ export function ProductCard({
     product.reviewCount ?? 0,
   );
   const hasReviewRating = reviewRatingLine.length > 0;
+  const { auctionActive } = resolveAuctionUiState(product);
   const discountPercent = resolveProductDiscountPercent(product);
-  const showDiscountBadge = discountPercent != null && discountPercent > 0;
+  const showDiscountBadge =
+    !auctionActive && discountPercent != null && discountPercent > 0;
   const previewFieldKeysWithoutPrice = useMemo(
     () => previewFieldKeys.filter((key) => key !== "productPrice"),
     [previewFieldKeys],
@@ -295,8 +318,7 @@ export function ProductCard({
     isPromotionActive;
   const showRaffleBadge =
     !isModerationQueue && isProductRaffleParticipant(product);
-  const showAuctionBadge =
-    !isModerationQueue && resolveAuctionUiState(product).auctionActive;
+  const showAuctionBadge = !isModerationQueue && auctionActive;
 
   /**
    * @param {import('../model/types.js').ProductFromApi['productSeller']} raw
@@ -360,52 +382,78 @@ export function ProductCard({
               onKeyDown: handleDetailsSurfaceKeyDown,
             })}
       >
-        {imageUrl && !imageLoadFailed ? (
-          <div
-            className={
-              galleryUrls.length > 1
-                ? "product-card__image-frame product-card__image-frame--gallery"
-                : "product-card__image-frame"
-            }
-          >
-            <img
-              className="product-card__image"
-              src={imageUrl}
-              alt=""
-              loading="lazy"
-              decoding="async"
-              onError={handleImageError}
-              draggable={false}
+        <div
+          className={[
+            "product-card__image-frame",
+            mediaSlides.length > 1 ? "product-card__image-frame--gallery" : "",
+            hasSlideMedia ? "" : "product-card__image-frame--empty",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        >
+          {hasSlideMedia ? (
+            <ProductMediaSlideContent
+              slide={
+                activeSlide.type === "image" && useFallbackImage
+                  ? { type: "image", url: PRODUCT_IMAGE_PLACEHOLDER_URL }
+                  : activeSlide
+              }
+              imageClassName="product-card__image"
+              onImageError={handleImageError}
+              onVideoFailed={() => setPreviewVideoFailed(true)}
             />
-            {galleryUrls.length > 1 ? (
-              <>
-                <div className="product-card__image-nav">
-                  <button
-                    type="button"
-                    className="product-card__image-nav-btn"
-                    aria-label={PRODUCT_CARD_UI.GALLERY_PREV}
-                    onClick={handleCardImagePrev}
-                  >
-                    ‹
-                  </button>
-                  <button
-                    type="button"
-                    className="product-card__image-nav-btn"
-                    aria-label={PRODUCT_CARD_UI.GALLERY_NEXT}
-                    onClick={handleCardImageNext}
-                  >
-                    ›
-                  </button>
-                </div>
-                <span className="product-card__image-counter" aria-live="polite">
-                  {cardImageIndex + 1} / {galleryUrls.length}
-                </span>
-              </>
+          ) : (
+            <div
+              className="product-card__image-placeholder"
+              aria-hidden="true"
+            />
+          )}
+          {mediaSlides.length > 1 ? (
+            <>
+              <div className="product-card__image-nav">
+                <button
+                  type="button"
+                  className="product-card__image-nav-btn"
+                  aria-label={PRODUCT_CARD_UI.GALLERY_PREV}
+                  onClick={handleCardSlidePrev}
+                >
+                  ‹
+                </button>
+                <button
+                  type="button"
+                  className="product-card__image-nav-btn"
+                  aria-label={PRODUCT_CARD_UI.GALLERY_NEXT}
+                  onClick={handleCardSlideNext}
+                >
+                  ›
+                </button>
+              </div>
+              <span className="product-card__image-counter" aria-live="polite">
+                {cardSlideIndex + 1} / {mediaSlides.length}
+              </span>
+            </>
+          ) : null}
+          <div className="product-card__image-badges">
+            {showDiscountBadge ? (
+              <ProductDiscountBadge
+                discountPercent={discountPercent}
+                variant="overlay"
+              />
             ) : null}
+            <ProductLoyaltyPointsBadge
+              product={product}
+              isAuthorized={isAuthorized}
+              isPremiumUser={isPremiumUser}
+              variant="overlay"
+            />
           </div>
-        ) : null}
+        </div>
         <h2 className="product-card__heading">{heading}</h2>
-        <ProductPriceDisplay product={product} className="product-card__price" />
+        <ProductPriceDisplay
+          product={product}
+          className="product-card__price"
+          showLabel={false}
+        />
         {!isModerationQueue ? (
           <div className="product-card__meta-strip">
             <p
@@ -435,9 +483,6 @@ export function ProductCard({
                 <p className="product-card__raffle-badge" role="status">
                   {PRODUCT_CARD_UI.RAFFLE_BADGE}
                 </p>
-              ) : null}
-              {showDiscountBadge ? (
-                <ProductDiscountBadge discountPercent={discountPercent} />
               ) : null}
             </div>
           </div>

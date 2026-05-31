@@ -1,0 +1,136 @@
+.user-story-report-group-card {
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.user-story-report-group-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.user-story-report-group-card__title {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.user-story-report-group-card__count {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.user-story-report-group-card__preview {
+  position: relative;
+  width: min(220px, 100%);
+  aspect-ratio: 9 / 16;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #111;
+}
+
+.user-story-report-group-card__media {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-story-report-group-card__caption {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  margin: 0;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: rgb(0 0 0 / 55%);
+  color: #fff;
+  font-size: 0.8rem;
+}
+
+.user-story-report-group-card__links {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.user-story-report-group-card__link,
+.user-story-report-group-card__reporter-link {
+  border: none;
+  background: transparent;
+  color: #2563eb;
+  cursor: pointer;
+  padding: 0;
+}
+
+.user-story-report-group-card__reports {
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.user-story-report-group-card__report {
+  padding: 10px 0;
+  border-top: 1px solid #f3f4f6;
+}
+
+.user-story-report-group-card__report-meta {
+  margin: 0 0 6px;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.user-story-report-group-card__report-text {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.user-story-report-group-card__staff-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.875rem;
+}
+
+.user-story-report-group-card__staff-note {
+  min-height: 56px;
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  resize: vertical;
+}
+
+.user-story-report-group-card__error {
+  margin: 8px 0 0;
+  color: #b91c1c;
+}
+
+.user-story-report-group-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.user-story-report-group-card__action {
+  border: none;
+  border-radius: 999px;
+  padding: 10px 14px;
+  background: #eef2ff;
+  color: #1e3a8a;
+  cursor: pointer;
+}
+
+.user-story-report-group-card__action_hide {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.user-story-report-group-card__action:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

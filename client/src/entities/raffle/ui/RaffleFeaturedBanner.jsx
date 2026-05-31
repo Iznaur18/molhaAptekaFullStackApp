@@ -58,6 +58,7 @@ export function RaffleFeaturedBanner({
         imageClassName="raffle-featured-banner__prize-image"
         videoClassName="raffle-featured-banner__prize-image raffle-featured-banner__prize-video"
         autoplayVideo
+        showSoundToggle
       />
     ),
     [raffle],

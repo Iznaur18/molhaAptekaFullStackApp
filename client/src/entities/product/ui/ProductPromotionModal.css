@@ -27,9 +27,37 @@
 }
 
 .product-promotion-modal__subtitle,
+.product-promotion-modal__balance,
 .product-promotion-modal__hint,
 .product-promotion-modal__summary {
   margin: 0;
+}
+
+.product-promotion-modal__balance {
+  font-weight: 600;
+}
+
+.product-promotion-modal__payment-methods {
+  margin: 0;
+  padding: 0;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.product-promotion-modal__payment-methods legend {
+  font-size: 0.88rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.product-promotion-modal__payment-option {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.9rem;
+  cursor: pointer;
 }
 
 .product-promotion-modal__hint {

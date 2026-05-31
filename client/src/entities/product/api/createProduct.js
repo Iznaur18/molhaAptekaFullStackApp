@@ -9,6 +9,7 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
  * @property {string} productDescription
  * @property {string[]} [productImageUrls]
  * @property {string} [productImageUrl]
+ * @property {string} [productPreviewVideoUrl]
  * @property {number} productPrice
  * @property {number | null} [productOldPrice]
  * @property {import('../model/types.js').ProductCategory} productCategory
@@ -44,6 +45,10 @@ export async function createProduct(body) {
       : [];
     if (urls.length > 0) {
       payload.productImageUrls = urls;
+    }
+    const previewVideo = body.productPreviewVideoUrl?.trim();
+    if (previewVideo) {
+      payload.productPreviewVideoUrl = previewVideo;
     }
     const legacy = body.productImageUrl?.trim();
     if (legacy && urls.length === 0) {

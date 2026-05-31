@@ -15,8 +15,11 @@ import {
 } from './routes/index.js';
 import { generalRateLimiter, errorHandler, notFoundHandler } from './middlewares/index.js';
 import { UPLOADS_DIR, ensureUploadsDir } from './utils/uploadsDir.js';
+import { expireStaleUserStories } from './utils/userStoryHelpers.js';
 
 ensureUploadsDir();
+
+const USER_STORY_CLEANUP_INTERVAL_MS = 15 * 60 * 1000;
 
 if (!process.env.JWT_SECRET) {
   console.error('JWT_SECRET не задан в .env'); // выводим ошибку в консоль
@@ -80,6 +83,12 @@ async function start() {
   try {
     await mongoose.connect(process.env.MONGO_URI);
     console.log('Connected to MongoDB');
+
+    setInterval(() => {
+        void expireStaleUserStories().catch((error) => {
+            console.error('expireStaleUserStories error:', error);
+        });
+    }, USER_STORY_CLEANUP_INTERVAL_MS);
 
     app
       .listen(PORT, () => {

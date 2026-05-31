@@ -184,6 +184,14 @@ export function getUserProfileRows(user, options = {}) {
           : String(user.userLoyaltyPoints),
     },
     {
+      id: "userRubBalance",
+      label: L.userRubBalance,
+      value:
+        user.userRubBalance == null
+          ? COMMON_UI.EM_DASH
+          : `${user.userRubBalance} ₽`,
+    },
+    {
       id: "userRatingByVotes",
       label: L.userRatingByVotes,
       value: formatRating(rating),

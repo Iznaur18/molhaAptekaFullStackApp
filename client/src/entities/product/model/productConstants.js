@@ -1,6 +1,9 @@
 /** Совпадает с `server/constants/productConstants.js`. */
 export const PRODUCT_IMAGE_URLS_MAX = 5;
 
+/** Максимальная длительность превью-видео на карточке товара (сек). */
+export const PRODUCT_PREVIEW_VIDEO_MAX_DURATION_SEC = 3;
+
 export const SELLER_PRODUCTS_LIMIT_REGULAR = 15;
 export const SELLER_PRODUCTS_LIMIT_PREMIUM = 30;
 export const SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE =
@@ -8,6 +11,12 @@ export const SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE =
 
 export const PRODUCT_DESCRIPTION_MAX_CHARS = 2000;
 export const PRODUCT_DESCRIPTION_MIN_CHARS = 10;
+
+/** Максимум цены товара / предложения (9 цифр, ₽). Совпадает с server/constants/productConstants.js */
+export const PRODUCT_PRICE_RUB_MAX = 999_999_999;
+
+export const PRODUCT_PRICE_RUB_MAX_ERROR_MESSAGE =
+  "Цена не может превышать 999 999 999 ₽";
 
 export const PRODUCT_CATEGORY_GROCERY = "grocery";
 export const PRODUCT_CATEGORY_ELECTRONICS = "electronics";
@@ -263,6 +272,7 @@ export const PRODUCT_FIELD_LABEL_RU = {
   productName: "Название",
   productDescription: "Описание",
   productImageUrls: "Фото (URL)",
+  productPreviewVideoUrl: "Превью-видео (URL)",
   productPrice: "Цена",
   productOldPrice: "Старая цена",
   productSeller: "Продавец",

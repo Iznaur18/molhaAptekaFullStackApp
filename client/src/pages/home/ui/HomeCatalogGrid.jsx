@@ -21,6 +21,7 @@ import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
  *   togglingAvailabilityProductId: string | null;
  *   togglingAuctionProductId?: string | null;
  *   isAuthorized: boolean;
+ *   isPremiumUser?: boolean;
  *   currentUserId?: string | null;
  *   onRequestLoginAddToCart: () => void;
  *   showAddToCartOnCard?: boolean;
@@ -61,6 +62,7 @@ export function HomeCatalogGrid({
   togglingAvailabilityProductId,
   togglingAuctionProductId = null,
   isAuthorized,
+  isPremiumUser = false,
   currentUserId = null,
   onRequestLoginAddToCart,
   showAddToCartOnCard = true,
@@ -145,6 +147,7 @@ export function HomeCatalogGrid({
                   }
                   onOpenDetails={onOpenProductDetails}
                   isAuthorized={isAuthorized}
+                  isPremiumUser={isPremiumUser}
                   currentUserId={currentUserId}
                   onRequestLoginAddToCart={onRequestLoginAddToCart}
                   showAddToCartOnCard={showAddToCartOnCard}

@@ -1,4 +1,8 @@
-import { resolveImageUrlForDisplay, isHttpImageUrl } from "../../../shared/lib/resolveUploadedImageUrl.js";
+import {
+  resolveImageUrlForDisplay,
+  isHttpImageUrl,
+  isStoredUploadOrHttpImageUrl,
+} from "../../../shared/lib/resolveUploadedImageUrl.js";
 
 /**
  * URL фото для аватара: основной аватар профиля, иначе фото из Telegram.
@@ -8,11 +12,15 @@ import { resolveImageUrlForDisplay, isHttpImageUrl } from "../../../shared/lib/r
  */
 export function pickUserProfilePhotoUrl(user) {
   if (!user) return null;
-  if (isHttpImageUrl(user.userAvatarUrl)) {
-    return resolveImageUrlForDisplay(user.userAvatarUrl);
+
+  const avatarUrl = String(user.userAvatarUrl ?? "").trim();
+  if (avatarUrl && isStoredUploadOrHttpImageUrl(avatarUrl)) {
+    return resolveImageUrlForDisplay(avatarUrl);
   }
+
   if (isHttpImageUrl(user.telegramPhotoUrl)) {
     return user.telegramPhotoUrl.trim();
   }
+
   return null;
 }

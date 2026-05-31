@@ -31,5 +31,9 @@ export function buildAdminPatchUserProfileBody(form, options = {}) {
   body.isUserDataConfirmed = Boolean(form.isUserDataConfirmed);
   body.isBlockedUser = Boolean(form.isBlockedUser);
 
+  const loyaltyPoints = Math.floor(Number(String(form.userLoyaltyPoints).trim()));
+  body.userLoyaltyPoints =
+    Number.isFinite(loyaltyPoints) && loyaltyPoints >= 0 ? loyaltyPoints : 0;
+
   return body;
 }

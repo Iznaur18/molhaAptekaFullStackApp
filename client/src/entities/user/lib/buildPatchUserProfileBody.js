@@ -12,13 +12,14 @@ import { DEFAULT_USER_AVATAR_URL } from "../model/userConstants.js";
  * Тело `PATCH /user/:id` (только разрешённые пользователю поля).
  *
  * @param {import('./mapUserToEditProfileForm.js').EditProfileFormState} form
- * @param {{ backgroundMode?: 'preset' | 'image' | 'admin'; includePremium?: boolean; initialPhoneNumber?: string | null }} [options]
+ * @param {{ backgroundMode?: 'preset' | 'image' | 'admin'; includePremium?: boolean; includeLoyaltyPoints?: boolean; initialPhoneNumber?: string | null }} [options]
  * @returns {Record<string, unknown>}
  */
 export function buildPatchUserProfileBody(form, options = {}) {
   const {
     backgroundMode = "preset",
     includePremium = false,
+    includeLoyaltyPoints = false,
     initialPhoneNumber = "",
   } = options;
   const body = {};
@@ -88,6 +89,14 @@ export function buildPatchUserProfileBody(form, options = {}) {
 
   if (includePremium) {
     body.isPremiumUser = Boolean(form.isPremiumUser);
+  }
+
+  if (includeLoyaltyPoints) {
+    const loyaltyPoints = Math.floor(
+      Number(String(form.userLoyaltyPoints).trim()),
+    );
+    body.userLoyaltyPoints =
+      Number.isFinite(loyaltyPoints) && loyaltyPoints >= 0 ? loyaltyPoints : 0;
   }
 
   return body;

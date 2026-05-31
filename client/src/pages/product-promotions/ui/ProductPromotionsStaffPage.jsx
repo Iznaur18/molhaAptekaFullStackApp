@@ -7,6 +7,7 @@ import {
   API_CLIENT_UI,
   PRODUCT_PROMOTIONS_STAFF_PAGE_UI,
 } from "../../../shared/config/appUiCopy.js";
+import { PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS } from "../../../entities/product/model/productPromotionPaymentConstants.js";
 
 import "./ProductPromotionsStaffPage.css";
 
@@ -16,7 +17,7 @@ import "./ProductPromotionsStaffPage.css";
 export function ProductPromotionsStaffPage({ onQueueChanged }) {
   const [phase, setPhase] = useState("loading");
   const [promotions, setPromotions] = useState(
-    /** @type {Array<{ _id: string; productId: string; productName?: string | null; tariffTitle: string; amountRub: number }>} */ ([]),
+    /** @type {Array<{ _id: string; productId: string; productName?: string | null; tariffTitle: string; amountRub: number; amountPoints?: number | null; paymentMethod?: string }>} */ ([]),
   );
   const [error, setError] = useState("");
   const [pendingId, setPendingId] = useState(null);
@@ -132,8 +133,22 @@ export function ProductPromotionsStaffPage({ onQueueChanged }) {
               {row.tariffTitle}
             </p>
             <p>
+              <strong>{PRODUCT_PROMOTIONS_STAFF_PAGE_UI.ROW_PAYMENT}:</strong>{" "}
+              {row.paymentMethod === PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS
+                ? PRODUCT_PROMOTIONS_STAFF_PAGE_UI.PAYMENT_POINTS
+                : PRODUCT_PROMOTIONS_STAFF_PAGE_UI.PAYMENT_RUB}
+            </p>
+            <p>
               <strong>{PRODUCT_PROMOTIONS_STAFF_PAGE_UI.ROW_PRICE}:</strong>{" "}
               {row.amountRub} ₽
+            </p>
+            <p>
+              <strong>{PRODUCT_PROMOTIONS_STAFF_PAGE_UI.ROW_POINTS}:</strong>{" "}
+              {row.paymentMethod === PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS &&
+              row.amountPoints != null &&
+              row.amountPoints > 0
+                ? `${row.amountPoints} баллов`
+                : "—"}
             </p>
           </div>
           {rowErrors[row._id] ? (

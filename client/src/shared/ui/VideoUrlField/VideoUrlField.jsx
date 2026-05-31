@@ -14,6 +14,7 @@ import "../ImageUrlField/ImageUrlField.css";
  *   disabled?: boolean;
  *   canUpload?: boolean;
  *   required?: boolean;
+ *   validateFile?: (file: File) => Promise<string | null> | string | null;
  * }} props
  */
 export function VideoUrlField({
@@ -22,6 +23,7 @@ export function VideoUrlField({
   disabled = false,
   canUpload = true,
   required = false,
+  validateFile = validateUploadVideoFile,
 }) {
   const fileInputRef = useRef(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -40,7 +42,7 @@ export function VideoUrlField({
     event.target.value = "";
     if (!file) return;
 
-    const validationError = validateUploadVideoFile(file);
+    const validationError = await Promise.resolve(validateFile(file));
     if (validationError) {
       setUploadError(validationError);
       return;

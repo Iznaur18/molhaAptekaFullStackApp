@@ -3,20 +3,35 @@ import {
     PRODUCT_MODERATION_APPROVED,
 } from '../../constants/productModerationConstants.js';
 import {
+    calculateProductPromotionPointsCost,
+    PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS,
+    PRODUCT_PROMOTION_PAYMENT_METHOD_RUB,
+    PRODUCT_PROMOTION_PAYMENT_METHODS,
     PRODUCT_PROMOTION_STATUS_ACTIVE,
     PRODUCT_PROMOTION_STATUS_CANCELLED_BY_ADMIN,
     PRODUCT_PROMOTION_STATUS_PENDING_STAFF,
     PRODUCT_PROMOTION_STATUS_REJECTED,
 } from '../../constants/productPromotionConstants.js';
 import {
+    activateProductPromotionRecord,
     clearProductPromotionForProduct,
     expireProductPromotionsAndSendNotifications,
     getActiveProductPromotionTariffs,
-    PRODUCT_PROMOTION_NOTIFICATION_KIND_APPROVED,
     PRODUCT_PROMOTION_NOTIFICATION_KIND_CANCELLED,
     PRODUCT_PROMOTION_NOTIFICATION_KIND_REJECTED,
+    refundProductPromotionPaymentIfNeeded,
     setProductPromotionForProduct,
 } from '../../utils/productPromotionHelpers.js';
+import {
+    deductLoyaltyPoints,
+    InsufficientLoyaltyPointsError,
+    refundLoyaltyPoints,
+} from '../../utils/loyaltyPointsSpend.js';
+import {
+    deductRubBalance,
+    InsufficientRubBalanceError,
+    refundRubBalance,
+} from '../../utils/rubBalanceSpend.js';
 import { createUserInAppNotification } from '../../utils/userInAppNotifications.js';
 import { errorRes, successRes } from '../../utils/index.js';
 
@@ -40,6 +55,12 @@ const toPromotionPayload = (row) => ({
     tariffTitle: row.tariffTitle,
     durationHours: row.durationHours,
     amountRub: row.amountRub,
+    paymentMethod: row.paymentMethod ?? PRODUCT_PROMOTION_PAYMENT_METHOD_RUB,
+    amountPoints: row.amountPoints ?? null,
+    pointsChargedAt: row.pointsChargedAt ?? null,
+    pointsRefundedAt: row.pointsRefundedAt ?? null,
+    rubChargedAt: row.rubChargedAt ?? null,
+    rubRefundedAt: row.rubRefundedAt ?? null,
     productName: row.productName ?? null,
     approvedByUserId: row.approvedByUserId ? String(row.approvedByUserId) : null,
     activatedAt: row.activatedAt,
@@ -58,6 +79,7 @@ export const getProductPromotionTariffsController = async (req, res) => {
                 title: tariff.title,
                 durationHours: tariff.durationHours,
                 priceRub: tariff.priceRub,
+                pricePoints: calculateProductPromotionPointsCost(tariff.priceRub),
             })),
         });
     } catch (error) {
@@ -68,12 +90,17 @@ export const getProductPromotionTariffsController = async (req, res) => {
 
 export const requestProductPromotionController = async (req, res) => {
     try {
+        await expireProductPromotionsAndSendNotifications();
         const userId = String(req.userId);
         const { productId } = req.params;
         const tariffCode = String(req.body?.tariffCode || '').trim();
+        const paymentMethod = String(req.body?.paymentMethod || '').trim();
 
         if (!tariffCode) {
             return errorRes(res, 400, 'Выберите пакет продвижения');
+        }
+        if (!PRODUCT_PROMOTION_PAYMENT_METHODS.includes(paymentMethod)) {
+            return errorRes(res, 400, 'Выберите способ оплаты: рубли или баллы');
         }
 
         const [product, tariffs] = await Promise.all([
@@ -98,20 +125,101 @@ export const requestProductPromotionController = async (req, res) => {
             return errorRes(res, 400, 'Пакет продвижения не найден');
         }
 
-        const promotion = await ProductPromotionModel.create({
+        const existingPending = await ProductPromotionModel.findOne({
             productId,
             sellerId: userId,
             status: PRODUCT_PROMOTION_STATUS_PENDING_STAFF,
-            tariffCode: tariff.code,
-            tariffTitle: tariff.title,
-            durationHours: tariff.durationHours,
-            amountRub: tariff.priceRub,
-        });
+        }).lean();
+        if (existingPending) {
+            return errorRes(res, 409, 'Уже есть заявка на продвижение этого товара');
+        }
 
-        return successRes(res, {
-            message: 'Заявка отправлена на подтверждение',
-            promotion: toPromotionPayload(promotion.toObject()),
-        });
+        const chargedAt = new Date();
+        const isPointsPayment =
+            paymentMethod === PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS;
+        const amountPoints = isPointsPayment
+            ? calculateProductPromotionPointsCost(tariff.priceRub)
+            : null;
+        const amountRub = Math.ceil(Number(tariff.priceRub));
+
+        let loyaltyPointsBalance;
+        let rubBalance;
+        let paymentDeducted = false;
+
+        try {
+            if (isPointsPayment) {
+                loyaltyPointsBalance = await deductLoyaltyPoints({
+                    userId,
+                    amount: amountPoints,
+                });
+            } else {
+                rubBalance = await deductRubBalance({
+                    userId,
+                    amount: amountRub,
+                });
+            }
+            paymentDeducted = true;
+
+            const promotion = await ProductPromotionModel.create({
+                productId,
+                sellerId: userId,
+                status: PRODUCT_PROMOTION_STATUS_PENDING_STAFF,
+                tariffCode: tariff.code,
+                tariffTitle: tariff.title,
+                durationHours: tariff.durationHours,
+                amountRub: tariff.priceRub,
+                paymentMethod,
+                amountPoints: isPointsPayment ? amountPoints : null,
+                pointsChargedAt: isPointsPayment ? chargedAt : null,
+                rubChargedAt: isPointsPayment ? null : chargedAt,
+            });
+
+            if (isPointsPayment) {
+                await activateProductPromotionRecord(promotion, {
+                    approvedByUserId: null,
+                    notificationMessage: 'Продвижение товара активировано',
+                    actorUserId: null,
+                });
+                return successRes(res, {
+                    message: 'Продвижение активировано. Баллы списаны.',
+                    promotion: toPromotionPayload(promotion.toObject()),
+                    loyaltyPointsBalance: loyaltyPointsBalance ?? null,
+                    rubBalance: rubBalance ?? null,
+                });
+            }
+
+            return successRes(res, {
+                message:
+                    'Заявка отправлена. Оплата в рублях списана с баланса, ожидает подтверждения staff.',
+                promotion: toPromotionPayload(promotion.toObject()),
+                loyaltyPointsBalance: loyaltyPointsBalance ?? null,
+                rubBalance: rubBalance ?? null,
+            });
+        } catch (error) {
+            if (paymentDeducted) {
+                if (isPointsPayment) {
+                    await refundLoyaltyPoints({ userId, amount: amountPoints });
+                } else {
+                    await refundRubBalance({ userId, amount: amountRub });
+                }
+            }
+            if (error instanceof InsufficientLoyaltyPointsError) {
+                return errorRes(
+                    res,
+                    409,
+                    `Недостаточно баллов. Нужно: ${error.required}, у вас: ${error.available}`,
+                );
+            }
+            if (error instanceof InsufficientRubBalanceError) {
+                return errorRes(
+                    res,
+                    409,
+                    `Недостаточно средств на балансе. Нужно: ${error.required} ₽, у вас: ${error.available} ₽`,
+                );
+            }
+            console.error('requestProductPromotionController error:', error);
+            return errorRes(res, 500, 'Ошибка при создании заявки на продвижение');
+        }
     } catch (error) {
         console.error('requestProductPromotionController error:', error);
         return errorRes(res, 500, 'Ошибка при создании заявки на продвижение');
@@ -221,26 +329,8 @@ export const approveProductPromotionController = async (req, res) => {
             return errorRes(res, 409, 'Заявка уже обработана');
         }
 
-        const activatedAt = new Date();
-        const activeUntil = new Date(
-            activatedAt.getTime() + promotion.durationHours * 60 * 60 * 1000,
-        );
-        promotion.status = PRODUCT_PROMOTION_STATUS_ACTIVE;
-        promotion.approvedByUserId = req.userId;
-        promotion.activatedAt = activatedAt;
-        promotion.activeUntil = activeUntil;
-        await promotion.save();
-
-        await setProductPromotionForProduct({
-            productId: promotion.productId,
-            activatedAt,
-            activeUntil,
-        });
-        await createUserInAppNotification({
-            userId: promotion.sellerId,
-            kind: PRODUCT_PROMOTION_NOTIFICATION_KIND_APPROVED,
-            message: 'Продвижение товара одобрено и уже активно',
-            productId: promotion.productId,
+        await activateProductPromotionRecord(promotion, {
+            approvedByUserId: req.userId,
             actorUserId: req.userId,
         });
 
@@ -268,10 +358,11 @@ export const rejectProductPromotionController = async (req, res) => {
         promotion.status = PRODUCT_PROMOTION_STATUS_REJECTED;
         promotion.approvedByUserId = req.userId;
         await promotion.save();
+        await refundProductPromotionPaymentIfNeeded(promotion._id);
         await createUserInAppNotification({
             userId: promotion.sellerId,
             kind: PRODUCT_PROMOTION_NOTIFICATION_KIND_REJECTED,
-            message: 'Заявка на продвижение отклонена staff-командой',
+            message: 'Заявка на продвижение отклонена. Оплата возвращена на счёт.',
             productId: promotion.productId,
             actorUserId: req.userId,
         });
@@ -300,16 +391,25 @@ export const cancelProductPromotionByStaffController = async (req, res) => {
             return errorRes(res, 409, 'Продвижение уже завершено');
         }
 
+        const wasPending =
+            promotion.status === PRODUCT_PROMOTION_STATUS_PENDING_STAFF;
+
         promotion.status = PRODUCT_PROMOTION_STATUS_CANCELLED_BY_ADMIN;
         promotion.cancelledAt = new Date();
         promotion.approvedByUserId = req.userId;
         await promotion.save();
 
+        if (wasPending) {
+            await refundProductPromotionPaymentIfNeeded(promotion._id);
+        }
+
         await clearProductPromotionForProduct(promotion.productId);
         await createUserInAppNotification({
             userId: promotion.sellerId,
             kind: PRODUCT_PROMOTION_NOTIFICATION_KIND_CANCELLED,
-            message: 'Продвижение товара снято staff-командой',
+            message: wasPending
+                ? 'Заявка на продвижение отменена. Баллы возвращены на счёт.'
+                : 'Продвижение товара снято staff-командой',
             productId: promotion.productId,
             actorUserId: req.userId,
         });

@@ -1,0 +1,2 @@
+export const PRODUCT_PROMOTION_PAYMENT_METHOD_RUB = "rub";
+export const PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS = "points";

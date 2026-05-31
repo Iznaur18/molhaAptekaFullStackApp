@@ -7,6 +7,10 @@ import { buildPatchUserProfileBody } from "../lib/buildPatchUserProfileBody.js";
 import { AddressDeliveryFields } from "../../address/ui/AddressDeliveryFields.jsx";
 import { mapUserToEditProfileForm } from "../lib/mapUserToEditProfileForm.js";
 import { limitRuPhoneInput } from "../lib/ruPhone.js";
+import {
+  INTEGER_INPUT_FIELD_PROPS,
+  keepDigitsOnly,
+} from "../../../shared/lib/numericInput.js";
 import { validateEditProfileForm } from "../lib/validateEditProfileForm.js";
 import {
   NOTES_ABOUT_USER_MAX_CHARS,
@@ -53,6 +57,7 @@ const ROLE_OPTIONS = [USER_ROLE_USER, USER_ROLE_MODERATOR, USER_ROLE_ADMIN];
  *   adminMode?: boolean;
  *   staffCanEditRole?: boolean;
  *   allowSelfPremiumToggle?: boolean;
+ *   allowStaffLoyaltyEdit?: boolean;
  * }} props
  */
 export function EditProfileModal({
@@ -63,6 +68,7 @@ export function EditProfileModal({
   adminMode = false,
   staffCanEditRole = false,
   allowSelfPremiumToggle = false,
+  allowStaffLoyaltyEdit = false,
 }) {
   const [form, setForm] = useState(() => mapUserToEditProfileForm({ _id: "" }));
   const [feedback, setFeedback] = useState({ kind: "idle", message: "" });
@@ -128,6 +134,12 @@ export function EditProfileModal({
     if (name === "userPhoneNumber" && typeof nextValue === "string") {
       nextValue = limitRuPhoneInput(nextValue);
     }
+    if (
+      (name === "userLoyaltyPoints" || name === "userDiscountPercent") &&
+      typeof nextValue === "string"
+    ) {
+      nextValue = keepDigitsOnly(nextValue);
+    }
     setForm((prev) => ({ ...prev, [name]: nextValue }));
   };
 
@@ -140,8 +152,10 @@ export function EditProfileModal({
     event.preventDefault();
     if (!user?._id) return;
 
+    const canEditLoyaltyPoints = adminMode || allowStaffLoyaltyEdit;
     const clientError = validateEditProfileForm(form, {
       includeAdmin: adminMode,
+      includeLoyaltyPoints: canEditLoyaltyPoints,
       backgroundMode,
     });
     if (clientError) {
@@ -160,6 +174,7 @@ export function EditProfileModal({
         : buildPatchUserProfileBody(form, {
             backgroundMode,
             includePremium: allowSelfPremiumToggle,
+            includeLoyaltyPoints: allowStaffLoyaltyEdit,
             ...profilePatchOptions,
           });
       const updated = await patchUserProfile(String(user._id), body);
@@ -396,6 +411,18 @@ export function EditProfileModal({
                 {ADMIN_EDIT_USER_UI.LABEL_PREMIUM}
               </label>
             ) : null}
+            {adminMode || allowStaffLoyaltyEdit ? (
+              <label className="edit-profile-modal__label">
+                {ADMIN_EDIT_USER_UI.LABEL_LOYALTY_POINTS}
+                <input
+                  {...INTEGER_INPUT_FIELD_PROPS}
+                  className="edit-profile-modal__input"
+                  name="userLoyaltyPoints"
+                  value={form.userLoyaltyPoints}
+                  onChange={handleChange}
+                />
+              </label>
+            ) : null}
             {adminMode ? (
               <fieldset className="edit-profile-modal__fieldset">
                 <legend className="edit-profile-modal__legend">
@@ -421,12 +448,10 @@ export function EditProfileModal({
                     <label className="edit-profile-modal__label">
                       {ADMIN_EDIT_USER_UI.LABEL_DISCOUNT}
                       <input
+                        {...INTEGER_INPUT_FIELD_PROPS}
                         className="edit-profile-modal__input"
-                        type="number"
                         name="userDiscountPercent"
-                        min={0}
-                        max={100}
-                        step={1}
+                        maxLength={3}
                         value={form.userDiscountPercent}
                         onChange={handleChange}
                       />

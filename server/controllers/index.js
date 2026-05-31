@@ -99,6 +99,17 @@ import {
 } from './User/userFollowControllers.js';
 import { getMyCartController } from './Cart/getMyCartController.js';
 import { replaceMyCartController } from './Cart/replaceMyCartController.js';
+import {
+    getUserStoriesFeedController,
+    getUserStoriesByAuthorController,
+    createUserStoryController,
+    deleteUserStoryController,
+    markUserStoryViewedController,
+    submitUserStoryReportController,
+    getPendingUserStoryReportsController,
+    getPendingUserStoryReportsCountController,
+    resolveUserStoryReportsController,
+} from './User/userStoryControllers.js';
 
 export {
     uploadController,
@@ -191,4 +202,13 @@ export {
     listMyFollowersController,
     getMyCartController,
     replaceMyCartController,
+    getUserStoriesFeedController,
+    getUserStoriesByAuthorController,
+    createUserStoryController,
+    deleteUserStoryController,
+    markUserStoryViewedController,
+    submitUserStoryReportController,
+    getPendingUserStoryReportsController,
+    getPendingUserStoryReportsCountController,
+    resolveUserStoryReportsController,
 };

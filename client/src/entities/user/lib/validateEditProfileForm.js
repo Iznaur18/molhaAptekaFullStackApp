@@ -21,11 +21,15 @@ const USER_NAME_PATTERN = /^[a-z0-9]+$/;
 
 /**
  * @param {import('./mapUserToEditProfileForm.js').EditProfileFormState} form
- * @param {{ includeAdmin?: boolean; backgroundMode?: 'preset' | 'image' | 'admin' }} [options]
+ * @param {{ includeAdmin?: boolean; includeLoyaltyPoints?: boolean; backgroundMode?: 'preset' | 'image' | 'admin' }} [options]
  * @returns {string | null} сообщение об ошибке или null
  */
 export function validateEditProfileForm(form, options = {}) {
-  const { includeAdmin = false, backgroundMode = "preset" } = options;
+  const {
+    includeAdmin = false,
+    includeLoyaltyPoints = false,
+    backgroundMode = "preset",
+  } = options;
   const name = String(form.userName).trim().toLowerCase();
   if (name.length > 0) {
     if (name.length < USER_NAME_MIN_LENGTH || name.length > USER_NAME_MAX_LENGTH) {
@@ -82,6 +86,15 @@ export function validateEditProfileForm(form, options = {}) {
     gender !== USER_GENDER_NO_SELECTED
   ) {
     return "Некорректное значение поля «пол»";
+  }
+
+  if (includeLoyaltyPoints || includeAdmin) {
+    const loyaltyPoints = Math.floor(
+      Number(String(form.userLoyaltyPoints).trim()),
+    );
+    if (!Number.isFinite(loyaltyPoints) || loyaltyPoints < 0) {
+      return "Баллы лояльности: целое число не меньше 0";
+    }
   }
 
   if (includeAdmin) {

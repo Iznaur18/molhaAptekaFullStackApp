@@ -1,10 +1,15 @@
 import { ProductModel, ProductPromotionModel, ProductPromotionTariffModel } from '../models/index.js';
 import {
     PRODUCT_PROMOTION_DEFAULT_TARIFFS,
+    PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS,
+    PRODUCT_PROMOTION_PAYMENT_METHOD_RUB,
     PRODUCT_PROMOTION_REMINDER_HOURS,
     PRODUCT_PROMOTION_STATUS_ACTIVE,
+    PRODUCT_PROMOTION_STATUS_CANCELLED_BY_ADMIN,
     PRODUCT_PROMOTION_STATUS_EXPIRED,
 } from '../constants/productPromotionConstants.js';
+import { refundLoyaltyPoints } from './loyaltyPointsSpend.js';
+import { refundRubBalance } from './rubBalanceSpend.js';
 import { createUserInAppNotification } from './userInAppNotifications.js';
 
 export const PRODUCT_PROMOTION_NOTIFICATION_KIND_REMINDER = 'product_promotion_expiring_soon';
@@ -54,6 +59,148 @@ export const setProductPromotionForProduct = async ({
             },
         },
     );
+};
+
+/**
+ * Возврат баллов за заявку, если продвижение не было активировано.
+ * @param {import('mongoose').Types.ObjectId | string} promotionId
+ */
+export const refundProductPromotionPointsIfNeeded = async (promotionId) => {
+    const now = new Date();
+    const promotion = await ProductPromotionModel.findOneAndUpdate(
+        {
+            _id: promotionId,
+            paymentMethod: PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS,
+            pointsChargedAt: { $ne: null },
+            pointsRefundedAt: null,
+            activatedAt: null,
+            amountPoints: { $gt: 0 },
+        },
+        { $set: { pointsRefundedAt: now } },
+    ).lean();
+
+    if (!promotion) {
+        return false;
+    }
+
+    await refundLoyaltyPoints({
+        userId: String(promotion.sellerId),
+        amount: promotion.amountPoints,
+    });
+    return true;
+};
+
+/**
+ * @param {import('mongoose').Types.ObjectId | string} promotionId
+ */
+export const refundProductPromotionRubIfNeeded = async (promotionId) => {
+    const now = new Date();
+    const promotion = await ProductPromotionModel.findOneAndUpdate(
+        {
+            _id: promotionId,
+            paymentMethod: PRODUCT_PROMOTION_PAYMENT_METHOD_RUB,
+            rubChargedAt: { $ne: null },
+            rubRefundedAt: null,
+            activatedAt: null,
+            amountRub: { $gt: 0 },
+        },
+        { $set: { rubRefundedAt: now } },
+    ).lean();
+
+    if (!promotion) {
+        return false;
+    }
+
+    await refundRubBalance({
+        userId: String(promotion.sellerId),
+        amount: promotion.amountRub,
+    });
+    return true;
+};
+
+/**
+ * @param {import('mongoose').Types.ObjectId | string} promotionId
+ */
+export const refundProductPromotionPaymentIfNeeded = async (promotionId) => {
+    await refundProductPromotionPointsIfNeeded(promotionId);
+    await refundProductPromotionRubIfNeeded(promotionId);
+};
+
+/**
+ * Активирует заявку: статус active, даты на товаре, уведомление продавцу.
+ * @param {import('mongoose').Document} promotion
+ * @param {{
+ *   approvedByUserId?: import('mongoose').Types.ObjectId | string | null;
+ *   notificationMessage?: string;
+ *   actorUserId?: import('mongoose').Types.ObjectId | string | null;
+ * }} [options]
+ */
+export const activateProductPromotionRecord = async (promotion, options = {}) => {
+    const {
+        approvedByUserId = null,
+        notificationMessage = 'Продвижение товара одобрено и уже активно',
+        actorUserId = approvedByUserId,
+    } = options;
+
+    const activatedAt = new Date();
+    const activeUntil = new Date(
+        activatedAt.getTime() + promotion.durationHours * 60 * 60 * 1000,
+    );
+
+    promotion.status = PRODUCT_PROMOTION_STATUS_ACTIVE;
+    promotion.approvedByUserId = approvedByUserId ?? null;
+    promotion.activatedAt = activatedAt;
+    promotion.activeUntil = activeUntil;
+    await promotion.save();
+
+    await setProductPromotionForProduct({
+        productId: promotion.productId,
+        activatedAt,
+        activeUntil,
+    });
+
+    await createUserInAppNotification({
+        userId: promotion.sellerId,
+        kind: PRODUCT_PROMOTION_NOTIFICATION_KIND_APPROVED,
+        message: notificationMessage,
+        productId: promotion.productId,
+        ...(actorUserId ? { actorUserId } : {}),
+    });
+
+    return { activatedAt, activeUntil };
+};
+
+/**
+ * @param {{ productId: string; statuses: string[] }} params
+ */
+export const cancelProductPromotionsForProduct = async ({ productId, statuses }) => {
+    const rows = await ProductPromotionModel.find({
+        productId,
+        status: { $in: statuses },
+    }).lean();
+
+    if (rows.length === 0) {
+        return;
+    }
+
+    const now = new Date();
+    const rowIds = rows.map((row) => row._id);
+    await ProductPromotionModel.updateMany(
+        { _id: { $in: rowIds } },
+        {
+            $set: {
+                status: PRODUCT_PROMOTION_STATUS_CANCELLED_BY_ADMIN,
+                cancelledAt: now,
+            },
+        },
+    );
+
+    const hadActive = rows.some((row) => row.status === PRODUCT_PROMOTION_STATUS_ACTIVE);
+    if (hadActive) {
+        await clearProductPromotionForProduct(productId);
+    }
+
+    await Promise.all(rowIds.map((id) => refundProductPromotionPaymentIfNeeded(id)));
 };
 
 export const expireProductPromotionsAndSendNotifications = async () => {

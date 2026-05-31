@@ -1,3 +1,12 @@
+.product-reports-page__section + .product-reports-page__section {
+  margin-top: 1.5rem;
+}
+
+.product-reports-page__section-title {
+  margin: 0 0 0.75rem;
+  font-size: 1.125rem;
+}
+
 .product-reports-page__list {
   display: flex;
   flex-direction: column;

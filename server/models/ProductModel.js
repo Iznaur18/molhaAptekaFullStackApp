@@ -32,6 +32,11 @@ const ProductSchema = new Schema(
         message: `Не более ${PRODUCT_IMAGE_URLS_MAX} изображений`,
       },
     },
+    productPreviewVideoUrl: {
+      type: String,
+      default: "",
+      trim: true,
+    },
     productPrice: { type: Number, required: true },
     productOldPrice: {
       type: Number,

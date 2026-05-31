@@ -35,6 +35,17 @@ export const VIDEO_URL_FIELD_UI = {
   FILE_INPUT_ARIA: "Выбрать видео с устройства",
 };
 
+/** Превью-видео на карточке товара (до 3 с, loop в каталоге). */
+export const PRODUCT_PREVIEW_VIDEO_UI = {
+  LABEL: "Превью-видео (до 3 с, необязательно)",
+  HINT: "MP4 или WebM, не длиннее 3 секунд. Нужно хотя бы одно фото товара.",
+  CLEAR_BUTTON: "Убрать видео",
+  ERROR_DURATION: "Видео не длиннее 3 секунд",
+  ERROR_READ: "Не удалось прочитать видео",
+  ERROR_REQUIRES_PHOTO:
+    "Добавьте хотя бы одно фото — превью-видео не заменяет фотографии",
+};
+
 /** Да / нет в интерфейсе (карточка товара, профиль и т.д.) */
 export const FORMAT_BOOLEAN_RU = {
   YES: "Да",
@@ -161,6 +172,7 @@ export const PRODUCT_PRICE_OFFER_UI = {
   TAB_AUCTION: "Аукцион",
   AUCTION_SHORTCUT: "В аукцион",
   LABEL_PRICE: "Ваша цена, ₽",
+  ERROR_PRICE_MAX: "Цена не может превышать 999 999 999 ₽",
   SUBMIT: "Предложить цену",
   UPDATE: "Изменить цену",
   CANCEL: "Отменить предложение",
@@ -421,6 +433,8 @@ export const PRODUCT_MODERATION_PAGE_UI = {
 export const PRODUCT_REPORTS_PAGE_UI = {
   LOADING: "Загрузка жалоб…",
   EMPTY: "Нет необработанных жалоб.",
+  SECTION_PRODUCTS: "Товары",
+  SECTION_STORIES: "Сторисы",
   REPORTS_COUNT_LABEL: (count) => `Жалоб: ${count}`,
   REPORT_ITEM_META: (userName, dateText) => `${userName} · ${dateText}`,
   STAFF_NOTE_LABEL: "Комментарий staff",
@@ -434,6 +448,46 @@ export const PRODUCT_REPORTS_PAGE_UI = {
   OPEN_REPORTER: "Жалобщик",
   /** @param {number} n */
   TAB_BADGE: (n) => (n > 99 ? "99+" : String(n)),
+};
+
+/** Сторисы пользователей на главной */
+export const USER_STORY_UI = {
+  ADD_LABEL: "Ваша история",
+  LOADING: "Загрузка…",
+  CREATE_TITLE: "Новый сторис",
+  CAPTION_LABEL: "Текст (необязательно)",
+  CAPTION_PLACEHOLDER: "До 150 символов…",
+  PICK_PHOTO: "Фото",
+  PICK_VIDEO: "Видео",
+  PUBLISH: "Опубликовать",
+  PUBLISHING: "Публикуем…",
+  DELETE: "Удалить",
+  DELETING: "Удаляем…",
+  REPORT: "Пожаловаться",
+  CLOSE: "Закрыть",
+  ERROR_GENERIC: "Не удалось выполнить действие",
+  ERROR_VIDEO_TYPE: "Видео: только MP4 или WebM",
+  ERROR_VIDEO_SIZE: "Видео: не больше 5 МБ",
+  ERROR_VIDEO_DURATION: "Видео: не дольше 10 секунд",
+  ERROR_VIDEO_ASPECT: "Видео: только вертикальный формат 9:16",
+  ERROR_VIDEO_READ: "Не удалось прочитать видео",
+  ERROR_IMAGE: "Не удалось обработать фото",
+  ERROR_CAPTION: "Текст: не больше 150 символов",
+  ERROR_MEDIA_REQUIRED: "Выберите фото или видео",
+  STORY_REPORT_TITLE: "Жалоба на сторис",
+  STORY_REPORT_SUBMIT: "Отправить жалобу",
+  STORY_REPORT_PENDING: "Отправляем…",
+  STORY_REPORT_TEXT_LABEL: "Опишите проблему",
+  STORY_REPORT_TEXT_PLACEHOLDER: "Текст жалобы…",
+  STORY_REPORTS_COUNT_LABEL: (count) => `Жалоб: ${count}`,
+  STORY_REPORTS_OPEN_AUTHOR: "Автор",
+  STORY_REPORTS_ACTION_DISMISS: "Отклонить жалобы",
+  STORY_REPORTS_ACTION_HIDE: "Скрыть сторис",
+  STORY_REPORTS_STAFF_NOTE_LABEL: "Комментарий staff",
+  STORY_REPORTS_STAFF_NOTE_PLACEHOLDER: "Обязательный комментарий…",
+  STORY_REPORTS_ACTION_PENDING: "Сохраняем…",
+  PREV_STORY: "Предыдущий",
+  NEXT_STORY: "Следующий",
 };
 
 /** Заявки на подтверждение данных (staff) */
@@ -574,6 +628,7 @@ export const ADMIN_EDIT_USER_UI = {
   SECTION_ADMIN: "Администрирование",
   LABEL_ROLE: "Роль",
   LABEL_DISCOUNT: "Скидка, %",
+  LABEL_LOYALTY_POINTS: "Баллы лояльности",
   LABEL_PREMIUM: "Премиум",
   LABEL_ACCOUNT_ACTIVE: "Учётка активна",
   LABEL_BLOCKED: "Заблокирован",
@@ -660,8 +715,11 @@ export const CREATE_PRODUCT_MODAL_UI = {
   SUBMIT_EDIT_IDLE: "Сохранить",
   SUBMIT_EDIT_LOADING: "Сохраняем…",
   ERROR_PRICE: "Укажите корректную цену (число ≥ 0)",
+  ERROR_PRICE_MAX: "Цена не может превышать 999 999 999 ₽",
   ERROR_GENERIC: "Не удалось создать товар",
   ERROR_EDIT_GENERIC: "Не удалось сохранить изменения",
+  ERROR_PREVIEW_VIDEO_REQUIRES_PHOTO:
+    "При превью-видео нужно хотя бы одно фото товара",
 };
 
 /** Модалка карточки товара в каталоге */
@@ -713,6 +771,15 @@ export const PRODUCT_CARD_UI = {
   PROMOTION_PENDING_BADGE: "Ожидает подтверждения staff",
   RAFFLE_BADGE: "Розыгрыш",
   AUCTION_BADGE: "Аукцион",
+  LOYALTY_POINTS_TOOLTIP: "Начисляются премиум-покупателю",
+  /** @param {number} percent */
+  DISCOUNT_BADGE: (percent) => `скидка -${percent}%`,
+  /** @param {number} points */
+  LOYALTY_POINTS_PREMIUM: (points) => `+${points} баллов`,
+  /** @param {number} points */
+  LOYALTY_POINTS_WITH_PREMIUM: (points) => `С премиум: +${points} баллов`,
+  /** @param {number} points */
+  LOYALTY_POINTS_GUEST: (points) => `До +${points} баллов с премиум`,
   RAFFLE_PARTICIPATION_ON: "Участвует в розыгрыше",
   RAFFLE_PARTICIPATION_OFF: "Добавить в розыгрыш",
   RAFFLE_PARTICIPATION_PENDING: "Сохраняем…",
@@ -767,6 +834,12 @@ export const RAFFLE_FEATURED_BANNER_UI = {
   DESCRIPTION_MODAL_TITLE: "Описание",
   DESCRIPTION_OPEN_ARIA: "Открыть полное описание розыгрыша",
   CLOSE: "Закрыть",
+};
+
+export const RAFFLE_PRIZE_MEDIA_UI = {
+  /** @param {boolean} muted */
+  SOUND_TOGGLE_ARIA: (muted) =>
+    muted ? "Включить звук видео розыгрыша" : "Выключить звук видео розыгрыша",
 };
 
 export const RAFFLE_MANAGE_UI = {
@@ -832,17 +905,41 @@ export const PRODUCT_PROMOTIONS_STAFF_PAGE_UI = {
   TAB_BADGE: (count) => (count > 99 ? "99+" : String(count)),
   ROW_PRODUCT: "Товар",
   ROW_TARIFF: "Пакет",
-  ROW_PRICE: "Сумма",
+  ROW_PRICE: "Тариф (₽)",
+  ROW_POINTS: "Оплата баллами",
+  ROW_PAYMENT: "Способ оплаты",
+  PAYMENT_RUB: "Рубли",
+  PAYMENT_POINTS: "Баллы",
 };
 
 export const PRODUCT_PROMOTION_UI = {
   MODAL_TITLE: "Продвижение товара",
   MODAL_SUBTITLE: (productName) => `Товар: ${productName || "Без названия"}`,
-  PAYMENT_PLACEHOLDER: "Оплата подключится позже, заявка отправится staff-команде.",
+  PAYMENT_METHOD_LABEL: "Способ оплаты",
+  PAYMENT_METHOD_RUB: "Рубли",
+  PAYMENT_METHOD_POINTS: "Баллы (×2 к цене в ₽)",
+  /** @param {number} balance */
+  BALANCE_POINTS: (balance) => `Баланс баллов: ${balance}`,
+  /** @param {number} balance */
+  BALANCE_RUB: (balance) => `Баланс: ${balance} ₽`,
+  PAYMENT_HINT_RUB:
+    "Списание сразу. Staff подтверждает заявку; при отклонении рубли возвращаются на баланс.",
+  PAYMENT_HINT_POINTS:
+    "Списание сразу. Продвижение включается автоматически, без подтверждения staff.",
   TARIFF_LABEL: "Пакет продвижения",
-  TARIFF_OPTION: (title, priceRub) => `${title} — ${priceRub} ₽`,
+  /** @param {string} title @param {number} priceRub */
+  TARIFF_OPTION_RUB: (title, priceRub) => `${title} — ${priceRub} ₽`,
+  /** @param {string} title @param {number} priceRub @param {number} pricePoints */
+  TARIFF_OPTION_POINTS: (title, priceRub, pricePoints) =>
+    `${title} — ${pricePoints} баллов (${priceRub} ₽ ×2)`,
   TARIFF_DURATION: (durationHours) => `Срок действия: ${durationHours} ч.`,
-  SUBMIT: "Отправить на подтверждение",
+  INSUFFICIENT_POINTS: (required, balance) =>
+    `Недостаточно баллов: нужно ${required}, у вас ${balance}.`,
+  /** @param {number} required @param {number} balance */
+  INSUFFICIENT_RUB: (required, balance) =>
+    `Недостаточно средств: нужно ${required} ₽, у вас ${balance} ₽.`,
+  SUBMIT_RUB: "Оплатить рублями и отправить",
+  SUBMIT_POINTS: "Оплатить баллами и включить",
   SUBMIT_PENDING: "Отправка…",
   CANCEL: "Отмена",
   CLOSE: "Закрыть",
@@ -1020,6 +1117,7 @@ export const USER_PROFILE_COPY = {
     isPremiumUser: "Премиум",
     notesAboutUser: "Заметки",
     userLoyaltyPoints: "Баллы лояльности",
+    userRubBalance: "Баланс (₽)",
     userRatingByVotes: "Рейтинг по голосам",
     followersCount: "Подписчики",
     followingCount: "Подписки",

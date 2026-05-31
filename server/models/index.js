@@ -13,6 +13,9 @@ import ProductReviewModel from './ProductReviewModel.js';
 import ProductPromotionModel from './ProductPromotionModel.js';
 import ProductPromotionTariffModel from './ProductPromotionTariffModel.js';
 import RaffleModel from './RaffleModel.js';
+import UserStoryModel from './UserStoryModel.js';
+import UserStoryViewModel from './UserStoryViewModel.js';
+import UserStoryReportModel from './UserStoryReportModel.js';
 
 export {
     UserModel,
@@ -30,4 +33,7 @@ export {
     ProductPromotionModel,
     ProductPromotionTariffModel,
     RaffleModel,
+    UserStoryModel,
+    UserStoryViewModel,
+    UserStoryReportModel,
 };

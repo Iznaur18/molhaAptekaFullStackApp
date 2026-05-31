@@ -76,6 +76,7 @@
  * @property {boolean} [isPremiumUser]
  * @property {string} [notesAboutUser]
  * @property {number} [userLoyaltyPoints]
+ * @property {number} [userRubBalance]
  * @property {string[]} [buyList]
  * @property {UserRatingByVotes} [userRatingByVotes]
  * @property {number} [followersCount]

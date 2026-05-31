@@ -5,6 +5,7 @@ import {
   PRODUCT_DESCRIPTION_MAX_CHARS,
   PRODUCT_DESCRIPTION_MIN_CHARS,
   PRODUCT_IMAGE_URLS_MAX,
+  PRODUCT_PRICE_RUB_MAX,
 } from "../../constants/productConstants.js";
 import {
   PRODUCT_STOCK_QUANTITY_MAX,
@@ -81,11 +82,20 @@ export const makeProductValidation = [
     .isURL({ require_protocol: true })
     .withMessage("Ссылка на картинку должна быть валидным URL с http/https")
     .trim(),
+  body("productPreviewVideoUrl")
+    .optional({ values: "falsy" })
+    .custom((value) => {
+      if (value == null || String(value).trim() === "") return true;
+      assertHttpImageUrl(value, "Превью-видео");
+      return true;
+    }),
   body("productPrice")
     .notEmpty()
     .withMessage("Цена продукта обязательна")
-    .isInt({ min: 0 })
-    .withMessage("Цена продукта должна быть целым числом не меньше 0")
+    .isInt({ min: 0, max: PRODUCT_PRICE_RUB_MAX })
+    .withMessage(
+      `Цена продукта — целое число от 0 до ${PRODUCT_PRICE_RUB_MAX}`,
+    )
     .toInt(),
   body("productOldPrice")
     .optional({ nullable: true })

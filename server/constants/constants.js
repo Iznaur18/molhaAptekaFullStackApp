@@ -6,7 +6,7 @@ import { getDefaultUserBackgroundStoredValue } from './userBackgroundPresets.js'
 export const DEFAULT_BACKGROUND_URL = getDefaultUserBackgroundStoredValue();
 
 /** Поля пользователя для отображения на клиенте (GET /me, GET /user/:id). Строка для .select() — без passwordHash */
-export const USER_DATA = '_id userName email userAvatarUrl userAvatarFocus userBackgroundUrl userBackgroundFocus userBirthDate userGender userAddress userAddressFlat userAddressFiasId userAddressGeo userPhoneNumber userRole userDiscountPercent userLoyaltyPoints isPremiumUser isUserDataConfirmed notificationsEnabled userRatingByVotes telegramUserId telegramUsername telegramPhotoUrl isActiveUser isBlockedUser createdAt updatedAt userLastLoginAt notesAboutUser buyList';
+export const USER_DATA = '_id userName email userAvatarUrl userAvatarFocus userBackgroundUrl userBackgroundFocus userBirthDate userGender userAddress userAddressFlat userAddressFiasId userAddressGeo userPhoneNumber userRole userDiscountPercent userLoyaltyPoints userRubBalance isPremiumUser isUserDataConfirmed notificationsEnabled userRatingByVotes telegramUserId telegramUsername telegramPhotoUrl isActiveUser isBlockedUser createdAt updatedAt userLastLoginAt notesAboutUser buyList';
 
 /** Поля пользователя для отображения на клиенте (GET /me/rating). Строка для .select() — без passwordHash */
 export const USER_ME_RAITING =  "_id userRatingByVotes userName email userAvatarUrl";
@@ -35,6 +35,13 @@ export const ALLOWED_FIELDS_FOR_MODERATOR = [
     'isPremiumUser',
     'isUserDataConfirmed',
     'notesAboutUser',
+    'userLoyaltyPoints',
+];
+
+/** Собственный профиль модератора (без блокировок и роли). */
+export const ALLOWED_FIELDS_FOR_MODERATOR_SELF = [
+    ...ALLOWED_FIELDS_FOR_USER,
+    'userLoyaltyPoints',
 ];
 
 /** Разрешённые поля для администратора */
@@ -46,6 +53,6 @@ export const ALLOWED_FIELDS_FOR_ADMIN = [
 
 /** Собственный профиль администратора (без смены роли и блокировок). */
 export const ALLOWED_FIELDS_FOR_ADMIN_SELF = [
-    ...ALLOWED_FIELDS_FOR_USER,
+    ...ALLOWED_FIELDS_FOR_MODERATOR_SELF,
     'isPremiumUser',
 ];

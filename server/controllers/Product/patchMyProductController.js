@@ -1,10 +1,15 @@
-import { ProductModel, ProductPromotionModel } from "../../models/index.js";
+import { ProductModel } from "../../models/index.js";
 import {
     PRODUCT_MODERATION_APPROVED,
     PRODUCT_MODERATION_PENDING,
 } from "../../constants/productModerationConstants.js";
 import { isUserAdmin } from "../../utils/adminUserGuard.js";
 import { mergeProductImageUrlsFromBody } from "../../utils/mergeProductImageUrlsFromBody.js";
+import { deleteUploadFileByUrl } from "../../utils/deleteUploadFileByUrl.js";
+import {
+    assertProductPreviewVideoRequiresPhotos,
+    normalizeProductPreviewVideoUrl,
+} from "../../utils/productPreviewVideo.js";
 import { patchBodyTouchesModerationContent } from "../../utils/productModeration.js";
 import {
     hasProductOpenSales,
@@ -16,8 +21,8 @@ import { rejectAllPendingOffersForProduct } from "../../utils/productPriceOfferH
 import {
     notifySellerAuctionToggledByAdmin,
 } from "../../utils/productAuction.js";
-import { PRODUCT_PROMOTION_STATUS_ACTIVE, PRODUCT_PROMOTION_STATUS_CANCELLED_BY_ADMIN, PRODUCT_PROMOTION_STATUS_PENDING_STAFF } from "../../constants/productPromotionConstants.js";
-import { clearProductPromotionForProduct } from "../../utils/productPromotionHelpers.js";
+import { PRODUCT_PROMOTION_STATUS_ACTIVE, PRODUCT_PROMOTION_STATUS_PENDING_STAFF } from "../../constants/productPromotionConstants.js";
+import { cancelProductPromotionsForProduct } from "../../utils/productPromotionHelpers.js";
 import {
     assertProductStockPatchAllowed,
     syncProductCatalogAfterStockChange,
@@ -135,6 +140,65 @@ export const patchMyProductController = async (req, res) => {
             $set.productImageUrls = mergeProductImageUrlsFromBody(body);
         }
 
+        if (Object.prototype.hasOwnProperty.call(body, "productPreviewVideoUrl")) {
+            const nextPreviewVideoUrl = normalizeProductPreviewVideoUrl(
+                body.productPreviewVideoUrl,
+            );
+            const nextImageUrls = Object.prototype.hasOwnProperty.call(
+                $set,
+                "productImageUrls",
+            )
+                ? $set.productImageUrls
+                : Array.isArray(existing.productImageUrls)
+                  ? existing.productImageUrls
+                  : [];
+            try {
+                assertProductPreviewVideoRequiresPhotos(
+                    nextPreviewVideoUrl,
+                    nextImageUrls,
+                );
+            } catch (previewVideoError) {
+                return errorRes(
+                    res,
+                    400,
+                    previewVideoError instanceof Error
+                        ? previewVideoError.message
+                        : "Некорректное превью-видео",
+                );
+            }
+
+            const prevPreviewVideoUrl = normalizeProductPreviewVideoUrl(
+                existing.productPreviewVideoUrl,
+            );
+            if (
+                prevPreviewVideoUrl &&
+                prevPreviewVideoUrl !== nextPreviewVideoUrl
+            ) {
+                await deleteUploadFileByUrl(prevPreviewVideoUrl);
+            }
+            $set.productPreviewVideoUrl = nextPreviewVideoUrl;
+        } else if (
+            Object.prototype.hasOwnProperty.call($set, "productImageUrls")
+        ) {
+            const existingPreviewVideoUrl = normalizeProductPreviewVideoUrl(
+                existing.productPreviewVideoUrl,
+            );
+            try {
+                assertProductPreviewVideoRequiresPhotos(
+                    existingPreviewVideoUrl,
+                    $set.productImageUrls,
+                );
+            } catch (previewVideoError) {
+                return errorRes(
+                    res,
+                    400,
+                    previewVideoError instanceof Error
+                        ? previewVideoError.message
+                        : "Некорректное превью-видео",
+                );
+            }
+        }
+
         if (!isAdmin) {
             const pendingAuctionOnly =
                 existing.productModerationStatus === PRODUCT_MODERATION_PENDING &&
@@ -241,24 +305,13 @@ export const patchMyProductController = async (req, res) => {
             await rejectAllPendingOffersForProduct(productId, {
                 notifyBuyers: true,
             });
-            await ProductPromotionModel.updateMany(
-                {
-                    productId,
-                    status: {
-                        $in: [
-                            PRODUCT_PROMOTION_STATUS_PENDING_STAFF,
-                            PRODUCT_PROMOTION_STATUS_ACTIVE,
-                        ],
-                    },
-                },
-                {
-                    $set: {
-                        status: PRODUCT_PROMOTION_STATUS_CANCELLED_BY_ADMIN,
-                        cancelledAt: new Date(),
-                    },
-                },
-            );
-            await clearProductPromotionForProduct(productId);
+            await cancelProductPromotionsForProduct({
+                productId,
+                statuses: [
+                    PRODUCT_PROMOTION_STATUS_PENDING_STAFF,
+                    PRODUCT_PROMOTION_STATUS_ACTIVE,
+                ],
+            });
         }
 
         if (auctionEnabledChanged && !nextAuctionEnabled) {

@@ -17,6 +17,12 @@ export const PRODUCT_DESCRIPTION_MAX_CHARS = 2000;
 /** Минимум символов в описании товара. */
 export const PRODUCT_DESCRIPTION_MIN_CHARS = 10;
 
+/** Максимум цены товара / предложения цены (9 цифр, ₽). Совпадает с клиентом. */
+export const PRODUCT_PRICE_RUB_MAX = 999_999_999;
+
+export const PRODUCT_PRICE_RUB_MAX_ERROR_MESSAGE =
+    'Цена не может превышать 999 999 999 ₽';
+
 /**
  * Slug категории товара. Совпадает с клиентом `client/.../productConstants.js`.
  * `food`, `figures` — устаревшие значения enum до расширения списка (могут остаться в БД).

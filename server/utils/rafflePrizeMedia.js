@@ -3,6 +3,7 @@ import {
   RAFFLE_PRIZE_MEDIA_TYPE_VIDEO,
   RAFFLE_PRIZE_MEDIA_TYPES,
 } from '../constants/raffleConstants.js';
+import { normalizeStoredUploadUrl } from './buildPublicUploadUrl.js';
 import { normalizeRafflePrizeImageFocus } from './profileImageFocus.js';
 
 const isHttpUrl = (value) => {
@@ -10,6 +11,13 @@ const isHttpUrl = (value) => {
   const trimmed = value.trim();
   return /^https?:\/\/.+/i.test(trimmed);
 };
+
+const isUploadAssetUrl = (value) => {
+  if (typeof value !== 'string') return false;
+  return value.trim().startsWith('/uploads/');
+};
+
+const isMediaUrl = (value) => isHttpUrl(value) || isUploadAssetUrl(value);
 
 /**
  * @param {unknown} raw
@@ -26,7 +34,7 @@ export function normalizePrizeMediaType(raw) {
  * @param {unknown} value
  */
 export function assertDirectVideoUrl(value) {
-  if (!isHttpUrl(value)) {
+  if (!isMediaUrl(value)) {
     throw new Error('Укажите корректную ссылку на видео (http/https)');
   }
   const trimmed = String(value).trim();
@@ -48,7 +56,7 @@ export function assertRaffleCreatePrizeMedia(body) {
     if (!url) {
       throw new Error('Добавьте фото приза');
     }
-    if (!isHttpUrl(url)) {
+    if (!isMediaUrl(url)) {
       throw new Error('Укажите корректную ссылку на изображение');
     }
     return;
@@ -71,7 +79,7 @@ export function assertRafflePrizeMediaComplete(raffle) {
     if (!url) {
       throw new Error('Добавьте фото приза');
     }
-    if (!isHttpUrl(url)) {
+    if (!isMediaUrl(url)) {
       throw new Error('Укажите корректную ссылку на изображение');
     }
     return;
@@ -94,7 +102,7 @@ export function applyRafflePrizeMediaFields(raffle, body) {
   }
 
   if (body.prizeImageUrl !== undefined) {
-    const nextUrl = String(body.prizeImageUrl).trim();
+    const nextUrl = normalizeStoredUploadUrl(String(body.prizeImageUrl).trim());
     const urlChanged = nextUrl !== raffle.prizeImageUrl;
     raffle.prizeImageUrl = nextUrl;
     if (urlChanged && body.prizeImageFocus === undefined) {
@@ -103,7 +111,7 @@ export function applyRafflePrizeMediaFields(raffle, body) {
   }
 
   if (body.prizeVideoUrl !== undefined) {
-    raffle.prizeVideoUrl = String(body.prizeVideoUrl).trim();
+    raffle.prizeVideoUrl = normalizeStoredUploadUrl(String(body.prizeVideoUrl).trim());
   }
 
   if (body.prizeImageFocus !== undefined) {

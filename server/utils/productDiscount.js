@@ -1,4 +1,8 @@
 import {
+    PRODUCT_PRICE_RUB_MAX,
+    PRODUCT_PRICE_RUB_MAX_ERROR_MESSAGE,
+} from '../constants/productConstants.js';
+import {
     IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_PRODUCT_DISCOUNT,
     PRODUCT_SALE_FILTER_MIN_DISCOUNT_PERCENT,
     buildFollowedSellerProductDiscountMessage,
@@ -9,6 +13,15 @@ import { createUserInAppNotification } from './userInAppNotifications.js';
 import { enrichProductWithAuctionFields } from './productAuction.js';
 
 /**
+ * @param {number} price
+ */
+export const assertProductPriceRubWithinMax = (price) => {
+    if (price > PRODUCT_PRICE_RUB_MAX) {
+        throw new Error(PRODUCT_PRICE_RUB_MAX_ERROR_MESSAGE);
+    }
+};
+
+/**
  * @param {unknown} raw
  * @returns {number}
  */
@@ -17,6 +30,7 @@ export const normalizeProductPriceRub = (raw) => {
     if (!Number.isFinite(price) || price < 0) {
         throw new Error('Цена должна быть целым числом не меньше 0');
     }
+    assertProductPriceRubWithinMax(price);
     return price;
 };
 
@@ -32,6 +46,7 @@ export const normalizeProductOldPriceRub = (raw) => {
     if (!Number.isFinite(price) || price < 0) {
         throw new Error('Старая цена должна быть целым числом не меньше 0');
     }
+    assertProductPriceRubWithinMax(price);
     return price;
 };
 

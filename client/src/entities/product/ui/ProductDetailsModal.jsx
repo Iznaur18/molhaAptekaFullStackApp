@@ -12,6 +12,12 @@ import {
 import { formatProductFieldForDisplay } from "../lib/formatProductFieldForDisplay.js";
 import { resolveProductImageUrls } from "../lib/resolveProductImageUrls.js";
 import {
+  buildProductMediaSlides,
+  resolveProductImageIndexForLightbox,
+} from "../lib/buildProductMediaSlides.js";
+import { resolveProductPreviewVideoUrl } from "../lib/resolveProductPreviewVideoUrl.js";
+import { ProductMediaSlideContent } from "./ProductMediaSlideContent.jsx";
+import {
   PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS,
   PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS_STAFF,
   PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS,
@@ -193,7 +199,12 @@ export function ProductDetailsModal({
     () => (product ? resolveProductImageUrls(product) : []),
     [product],
   );
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const previewVideoUrl = useMemo(
+    () => (product ? resolveProductPreviewVideoUrl(product) : null),
+    [product],
+  );
+  const [previewVideoFailed, setPreviewVideoFailed] = useState(false);
+  const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [detailsTab, setDetailsTab] = useState(
     /** @type {'details' | 'auction' | 'reviews'} */ ("details"),
@@ -257,12 +268,35 @@ export function ProductDetailsModal({
     setDetailsTab("auction");
   }, [auctionUi.auctionActive]);
 
+  const mediaSlides = useMemo(() => {
+    const videoUrl =
+      previewVideoUrl != null && !previewVideoFailed ? previewVideoUrl : null;
+    const slides = buildProductMediaSlides({
+      previewVideoUrl: videoUrl,
+      imageUrls,
+    });
+    return slides.length > 0
+      ? slides
+      : [{ type: "image", url: PRODUCT_IMAGE_PLACEHOLDER_URL }];
+  }, [imageUrls, previewVideoUrl, previewVideoFailed]);
+
   useEffect(() => {
-    setActiveImageIndex(0);
+    setActiveSlideIndex(0);
     setLightboxOpen(false);
     setDetailsTab("details");
     setTabPanelMinHeight(0);
+    setPreviewVideoFailed(false);
   }, [product?._id]);
+
+  useEffect(() => {
+    setActiveSlideIndex((i) =>
+      Math.min(i, Math.max(0, mediaSlides.length - 1)),
+    );
+  }, [mediaSlides.length]);
+
+  useEffect(() => {
+    setPreviewVideoFailed(false);
+  }, [previewVideoUrl]);
 
   useEffect(() => {
     if (!isOpen || !product) {
@@ -342,7 +376,7 @@ export function ProductDetailsModal({
   useEffect(() => {
     if (!isOpen) return undefined;
 
-    const len = imageUrls.length;
+    const len = mediaSlides.length;
     const onKeyDown = (event) => {
       if (lightboxOpen) return;
       if (event.key === "Escape") {
@@ -352,11 +386,11 @@ export function ProductDetailsModal({
       if (len <= 1) return;
       if (event.key === "ArrowLeft") {
         event.preventDefault();
-        setActiveImageIndex((i) => (i - 1 + len) % len);
+        setActiveSlideIndex((i) => (i - 1 + len) % len);
       }
       if (event.key === "ArrowRight") {
         event.preventDefault();
-        setActiveImageIndex((i) => (i + 1) % len);
+        setActiveSlideIndex((i) => (i + 1) % len);
       }
     };
 
@@ -364,7 +398,7 @@ export function ProductDetailsModal({
     return () => {
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [isOpen, onClose, lightboxOpen, imageUrls.length]);
+  }, [isOpen, onClose, lightboxOpen, mediaSlides.length]);
 
   useEffect(() => {
     if (!isOpen || !showProductDetailsTabs) return undefined;
@@ -379,16 +413,16 @@ export function ProductDetailsModal({
 
   const handleSliderPrev = (event) => {
     event.stopPropagation();
-    const len = imageUrls.length;
+    const len = mediaSlides.length;
     if (len <= 1) return;
-    setActiveImageIndex((i) => (i - 1 + len) % len);
+    setActiveSlideIndex((i) => (i - 1 + len) % len);
   };
 
   const handleSliderNext = (event) => {
     event.stopPropagation();
-    const len = imageUrls.length;
+    const len = mediaSlides.length;
     if (len <= 1) return;
-    setActiveImageIndex((i) => (i + 1) % len);
+    setActiveSlideIndex((i) => (i + 1) % len);
   };
 
   if (!isOpen || !product) return null;
@@ -427,10 +461,15 @@ export function ProductDetailsModal({
       : PRODUCT_REVIEW_UI.TAB_REVIEWS;
 
   const title = product.productName?.trim() || "Товар";
-  const displayUrls =
-    imageUrls.length > 0 ? imageUrls : [PRODUCT_IMAGE_PLACEHOLDER_URL];
-  const safeIndex = Math.min(activeImageIndex, displayUrls.length - 1);
-  const mainSrc = displayUrls[safeIndex];
+  const safeSlideIndex = Math.min(
+    activeSlideIndex,
+    Math.max(0, mediaSlides.length - 1),
+  );
+  const activeSlide = mediaSlides[safeSlideIndex] ?? null;
+  const lightboxStartIndex =
+    activeSlide?.type === "image"
+      ? resolveProductImageIndexForLightbox(mediaSlides, safeSlideIndex)
+      : 0;
 
   return createPortal(
     <>
@@ -572,11 +611,11 @@ export function ProductDetailsModal({
               <div className="product-details-modal__image-aside">
                 <div
                   className={
-                    imageUrls.length > 1
+                    mediaSlides.length > 1
                       ? "product-details-modal__hero product-details-modal__hero--multi"
                       : "product-details-modal__hero"
                   }
-                  {...(imageUrls.length > 1
+                  {...(mediaSlides.length > 1
                     ? {
                         role: "region",
                         "aria-label":
@@ -584,7 +623,7 @@ export function ProductDetailsModal({
                       }
                     : {})}
                 >
-                  {imageUrls.length > 1 ? (
+                  {mediaSlides.length > 1 ? (
                     <>
                       <div className="product-details-modal__slider-nav">
                         <button
@@ -608,11 +647,11 @@ export function ProductDetailsModal({
                         className="product-details-modal__slider-counter"
                         aria-live="polite"
                       >
-                        {safeIndex + 1} / {imageUrls.length}
+                        {safeSlideIndex + 1} / {mediaSlides.length}
                       </span>
                     </>
                   ) : null}
-                  {imageUrls.length > 0 ? (
+                  {activeSlide?.type === "image" ? (
                     <button
                       type="button"
                       className="product-details-modal__image-zoom"
@@ -624,49 +663,56 @@ export function ProductDetailsModal({
                         PRODUCT_DETAILS_MODAL_UI.OPEN_GALLERY_FULLSCREEN
                       }
                     >
-                      <img
-                        className="product-details-modal__image"
-                        src={mainSrc}
-                        alt=""
-                        loading="lazy"
-                        decoding="async"
+                      <ProductMediaSlideContent
+                        slide={activeSlide}
+                        playVideoWhenVisible={false}
+                        imageClassName="product-details-modal__image"
+                        onVideoFailed={() => setPreviewVideoFailed(true)}
                       />
                     </button>
                   ) : (
-                    <img
-                      className="product-details-modal__image product-details-modal__image--fill-hero"
-                      src={mainSrc}
-                      alt=""
-                      loading="lazy"
-                      decoding="async"
+                    <ProductMediaSlideContent
+                      slide={activeSlide}
+                      playVideoWhenVisible={false}
+                      imageClassName="product-details-modal__image product-details-modal__image--fill-hero"
+                      onVideoFailed={() => setPreviewVideoFailed(true)}
                     />
                   )}
                 </div>
-                {imageUrls.length > 1 ? (
+                {mediaSlides.length > 1 ? (
                   <div
                     className="product-details-modal__thumbs"
                     role="tablist"
                     aria-label={PRODUCT_DETAILS_MODAL_UI.GALLERY_THUMBS_ARIA}
                   >
-                    {imageUrls.map((url, index) => (
+                    {mediaSlides.map((slide, index) => (
                       <button
-                        key={`${index}-${url}`}
+                        key={`${slide.type}-${index}-${slide.url}`}
                         type="button"
                         role="tab"
-                        aria-selected={index === safeIndex}
+                        aria-selected={index === safeSlideIndex}
                         className={
-                          index === safeIndex
+                          index === safeSlideIndex
                             ? "product-details-modal__thumb product-details-modal__thumb--active"
                             : "product-details-modal__thumb"
                         }
-                        onClick={() => setActiveImageIndex(index)}
+                        onClick={() => setActiveSlideIndex(index)}
                       >
-                        <img
-                          src={url}
-                          alt=""
-                          loading="lazy"
-                          decoding="async"
-                        />
+                        {slide.type === "video" ? (
+                          <span
+                            className="product-details-modal__thumb-video"
+                            aria-hidden="true"
+                          >
+                            ▶
+                          </span>
+                        ) : (
+                          <img
+                            src={slide.url}
+                            alt=""
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        )}
                       </button>
                     ))}
                   </div>
@@ -780,7 +826,7 @@ export function ProductDetailsModal({
       {lightboxOpen && imageUrls.length > 0 ? (
         <ProductImageLightbox
           imageUrls={imageUrls}
-          startIndex={safeIndex}
+          startIndex={lightboxStartIndex}
           onClose={() => setLightboxOpen(false)}
         />
       ) : null}

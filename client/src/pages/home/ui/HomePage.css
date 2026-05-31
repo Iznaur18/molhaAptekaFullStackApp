@@ -359,8 +359,38 @@
   align-items: stretch;
 }
 
+/* до ~904px: всегда 3 карточки в ряд (~667px, ~900px и т.д.) */
+@media (max-width: 903px) {
+  .home-page__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.65rem;
+  }
+}
+
+/* узкий мобильный: плотнее отступы и компактные карточки */
+@media (max-width: 667px) {
+  .home-page {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .home-page__grid {
+    gap: 0.5rem;
+  }
+}
+
 .home-page__cell {
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.home-page__cell > .product-card,
+.home-page__cell > .product-card-promotion-frame,
+.home-page__cell > .product-card-premium-frame {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 100%;
 }
 
 .home-page__state {

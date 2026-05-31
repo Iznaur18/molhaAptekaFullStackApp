@@ -15,6 +15,10 @@ import {
   DATA_CONFIRMATION_PAGE_UI,
   USER_DETAILS_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
+import {
+  INTEGER_INPUT_FIELD_PROPS,
+  keepDigitsOnly,
+} from "../../../shared/lib/numericInput.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
 
@@ -225,24 +229,22 @@ export function DataConfirmationRequestModal({
                 <label>
                   {DATA_CONFIRMATION_MODAL_UI.LABEL_SERIES}
                   <input
-                    type="text"
-                    inputMode="numeric"
+                    {...INTEGER_INPUT_FIELD_PROPS}
                     maxLength={4}
                     value={form.series}
                     onChange={(e) =>
-                      updateField("series", e.target.value.replace(/\D/g, ""))
+                      updateField("series", keepDigitsOnly(e.target.value))
                     }
                   />
                 </label>
                 <label>
                   {DATA_CONFIRMATION_MODAL_UI.LABEL_NUMBER}
                   <input
-                    type="text"
-                    inputMode="numeric"
+                    {...INTEGER_INPUT_FIELD_PROPS}
                     maxLength={6}
                     value={form.number}
                     onChange={(e) =>
-                      updateField("number", e.target.value.replace(/\D/g, ""))
+                      updateField("number", keepDigitsOnly(e.target.value))
                     }
                   />
                 </label>

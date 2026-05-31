@@ -11,6 +11,19 @@
   align-items: stretch;
 }
 
+@media (max-width: 903px) {
+  .users-page__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.65rem;
+  }
+}
+
+@media (max-width: 667px) {
+  .users-page__grid {
+    gap: 0.5rem;
+  }
+}
+
 .users-page__cell {
   min-width: 0;
   display: flex;

@@ -32,6 +32,7 @@
  * @property {string} [productDescription]
  * @property {string[]} [productImageUrls]
  * @property {string} [productImageUrl]
+ * @property {string} [productPreviewVideoUrl]
  * @property {number} productPrice
  * @property {number | null} [productOldPrice]
  * @property {number | null} [discountPercent]

@@ -1,5 +1,9 @@
 import { USER_PROFILE_COPY } from "../../../shared/config/appUiCopy.js";
-import { resolveImageUrlForDisplay } from "../../../shared/lib/resolveUploadedImageUrl.js";
+import {
+  resolveImageUrlForDisplay,
+  isHttpImageUrl,
+  isStoredUploadOrHttpImageUrl,
+} from "../../../shared/lib/resolveUploadedImageUrl.js";
 import {
   DEFAULT_USER_BACKGROUND_PRESET_ID,
   formatUserBackgroundPresetValue,
@@ -29,7 +33,7 @@ export function parseUserBackgroundFormFields(stored) {
       imageUrl: "",
     };
   }
-  if (isHttpBackgroundImageUrl(stored)) {
+  if (isStoredUploadOrHttpImageUrl(stored)) {
     return {
       presetId: DEFAULT_USER_BACKGROUND_PRESET_ID,
       imageUrl: String(stored).trim(),
@@ -47,7 +51,7 @@ export function parseUserBackgroundFormFields(stored) {
 export function resolveUserProfileBackground(input) {
   if (input.kind === "image") {
     const url = input.imageUrl.trim();
-    if (isHttpBackgroundImageUrl(url)) {
+    if (isStoredUploadOrHttpImageUrl(url)) {
       return { kind: "image", url: resolveImageUrlForDisplay(url) };
     }
   }
@@ -72,7 +76,7 @@ export function resolveUserProfileBackgroundFromUser(user) {
   if (presetId) {
     return resolveUserProfileBackground({ kind: "preset", presetId });
   }
-  if (isHttpBackgroundImageUrl(stored)) {
+  if (isStoredUploadOrHttpImageUrl(stored)) {
     return resolveUserProfileBackground({
       kind: "image",
       imageUrl: String(stored).trim(),
@@ -92,10 +96,10 @@ export function serializeUserBackgroundForForm(mode, form) {
   if (mode === "admin") {
     const imageUrl = String(form.imageUrl ?? "").trim();
     if (imageUrl !== "") {
-      if (!isHttpBackgroundImageUrl(imageUrl)) {
+      if (!isStoredUploadOrHttpImageUrl(imageUrl)) {
         throw new Error("Некорректный URL фона");
       }
-      return imageUrl;
+      return resolveImageUrlForDisplay(imageUrl);
     }
     const presetId = String(form.presetId ?? "").trim();
     if (isUserBackgroundPresetId(presetId)) {
@@ -106,10 +110,10 @@ export function serializeUserBackgroundForForm(mode, form) {
 
   if (mode === "image") {
     const imageUrl = String(form.imageUrl ?? "").trim();
-    if (!isHttpBackgroundImageUrl(imageUrl)) {
+    if (!isStoredUploadOrHttpImageUrl(imageUrl)) {
       throw new Error("Некорректный URL фона");
     }
-    return imageUrl;
+    return resolveImageUrlForDisplay(imageUrl);
   }
 
   const presetId = String(form.presetId ?? "").trim();
@@ -127,7 +131,7 @@ export function formatUserBackgroundForDisplay(stored) {
   if (presetId) {
     return getUserBackgroundPresetById(presetId)?.labelRu ?? presetId;
   }
-  if (isHttpBackgroundImageUrl(stored)) {
+  if (isStoredUploadOrHttpImageUrl(stored)) {
     return USER_PROFILE_COPY.BACKGROUND_CUSTOM_IMAGE;
   }
   return "—";

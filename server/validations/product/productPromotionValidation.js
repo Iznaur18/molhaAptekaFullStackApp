@@ -1,5 +1,6 @@
 import { body, param, query } from 'express-validator';
 import {
+    PRODUCT_PROMOTION_PAYMENT_METHODS,
     PRODUCT_PROMOTION_STATUS_ACTIVE,
     PRODUCT_PROMOTION_STATUS_CANCELLED_BY_ADMIN,
     PRODUCT_PROMOTION_STATUS_EXPIRED,
@@ -25,6 +26,16 @@ export const requestProductPromotionValidation = [
         .withMessage('tariffCode обязателен')
         .isLength({ max: 40 })
         .withMessage('Слишком длинный tariffCode'),
+    body('paymentMethod')
+        .isString()
+        .withMessage('paymentMethod обязателен')
+        .trim()
+        .notEmpty()
+        .withMessage('paymentMethod обязателен')
+        .custom((value) => PRODUCT_PROMOTION_PAYMENT_METHODS.includes(String(value)))
+        .withMessage(
+            `paymentMethod должен быть одним из: ${PRODUCT_PROMOTION_PAYMENT_METHODS.join(', ')}`,
+        ),
     handleValidationByExpressErrors,
 ];
 

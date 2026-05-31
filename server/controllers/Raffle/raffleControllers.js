@@ -8,6 +8,7 @@ import {
 } from '../../constants/raffleConstants.js';
 import { PRODUCT_MODERATION_APPROVED } from '../../constants/productModerationConstants.js';
 import { buildRegexSearchOr, errorRes, successRes } from '../../utils/index.js';
+import { normalizeStoredUploadUrl } from '../../utils/buildPublicUploadUrl.js';
 import {
     countProducts,
     findProductsPage,
@@ -167,8 +168,12 @@ export const createRaffleController = async (req, res) => {
             title: String(req.body.title).trim(),
             description: String(req.body.description ?? '').trim(),
             prizeMediaType,
-            prizeImageUrl: String(req.body.prizeImageUrl ?? '').trim(),
-            prizeVideoUrl: String(req.body.prizeVideoUrl ?? '').trim(),
+            prizeImageUrl: normalizeStoredUploadUrl(
+                String(req.body.prizeImageUrl ?? '').trim(),
+            ),
+            prizeVideoUrl: normalizeStoredUploadUrl(
+                String(req.body.prizeVideoUrl ?? '').trim(),
+            ),
             prizeImageFocus: normalizeRafflePrizeImageFocus(req.body.prizeImageFocus),
             targetSales: Number(req.body.targetSales),
             instagramUrl: String(req.body.instagramUrl).trim(),

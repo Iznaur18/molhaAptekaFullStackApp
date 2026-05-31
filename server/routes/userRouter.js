@@ -15,12 +15,24 @@ import {
     unfollowUserController,
     listMyFollowingController,
     listMyFollowersController,
+    getUserStoriesFeedController,
+    getUserStoriesByAuthorController,
+    createUserStoryController,
+    deleteUserStoryController,
+    markUserStoryViewedController,
+    submitUserStoryReportController,
+    getPendingUserStoryReportsController,
+    getPendingUserStoryReportsCountController,
+    resolveUserStoryReportsController,
 } from '../controllers/index.js';
 import {
     checkAuthMW,
+    checkOptionalAuthMW,
     checkProductModeratorMW,
     updateProfileRateLimiter,
     userDataConfirmationRateLimiter,
+    userStoryCreateRateLimiter,
+    userStoryReportRateLimiter,
 } from '../middlewares/index.js';
 import {
     userIdParamValidation,
@@ -30,11 +42,70 @@ import {
     submitDataConfirmationValidation,
     resolveDataConfirmationValidation,
     userFollowListValidation,
+    userStoryIdParamValidation,
+    createUserStoryValidation,
+    submitUserStoryReportValidation,
+    resolveUserStoryReportsValidation,
 } from '../validations/index.js';
 
 const router = Router();
 
 router.get('/search', userSearchValidation, userSearchController);
+
+router.get('/stories/feed', checkOptionalAuthMW, getUserStoriesFeedController);
+router.get(
+    '/stories/reports/pending',
+    checkAuthMW,
+    checkProductModeratorMW,
+    getPendingUserStoryReportsController,
+);
+router.get(
+    '/stories/reports/pending/count',
+    checkAuthMW,
+    checkProductModeratorMW,
+    getPendingUserStoryReportsCountController,
+);
+router.patch(
+    '/stories/reports/story/:storyId/resolve',
+    checkAuthMW,
+    checkProductModeratorMW,
+    userStoryIdParamValidation,
+    resolveUserStoryReportsValidation,
+    resolveUserStoryReportsController,
+);
+router.post(
+    '/stories',
+    checkAuthMW,
+    userStoryCreateRateLimiter,
+    createUserStoryValidation,
+    createUserStoryController,
+);
+router.get(
+    '/stories/author/:userIdClient',
+    checkOptionalAuthMW,
+    userIdParamValidation,
+    getUserStoriesByAuthorController,
+);
+router.delete(
+    '/stories/:storyId',
+    checkAuthMW,
+    userStoryIdParamValidation,
+    deleteUserStoryController,
+);
+router.post(
+    '/stories/:storyId/view',
+    checkAuthMW,
+    userStoryIdParamValidation,
+    markUserStoryViewedController,
+);
+router.post(
+    '/stories/:storyId/report',
+    checkAuthMW,
+    userStoryReportRateLimiter,
+    userStoryIdParamValidation,
+    submitUserStoryReportValidation,
+    submitUserStoryReportController,
+);
 
 router.get(
     '/me/following',

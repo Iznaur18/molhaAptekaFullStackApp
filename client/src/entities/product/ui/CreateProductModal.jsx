@@ -24,13 +24,21 @@ import {
   parseProductPriceInput,
   validateProductOldPricePair,
 } from "../lib/computeProductDiscountPercent.js";
+import { getProductPriceRubMaxError } from "../lib/productPriceRubValidation.js";
+import { PRODUCT_PRICE_RUB_MAX } from "../model/productConstants.js";
 import { validateProductDescription } from "../lib/validateProductDescription.js";
+import {
+  INTEGER_INPUT_FIELD_PROPS,
+  keepDigitsOnly,
+} from "../../../shared/lib/numericInput.js";
 import { resolveUploadedImageUrl } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import { ProductEditManageSection } from "./ProductEditManageSection.jsx";
 import { ProductImageUrlSortableList } from "./ProductImageUrlSortableList.jsx";
+import { ProductPreviewVideoField } from "./ProductPreviewVideoField.jsx";
 import {
   CREATE_PRODUCT_MODAL_UI,
+  PRODUCT_PREVIEW_VIDEO_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { FormFieldLabel } from "../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
 import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
@@ -41,6 +49,7 @@ const INITIAL_FORM = {
   productName: "",
   productDescription: "",
   productImageRows: [createImageRow("")],
+  productPreviewVideoUrl: "",
   productPrice: "",
   productOldPrice: "",
   productCategory: PRODUCT_CATEGORY_ELECTRONICS,
@@ -68,6 +77,7 @@ function formStateFromProduct(product) {
     productName: product.productName?.trim() ?? "",
     productDescription: product.productDescription?.trim() ?? "",
     productImageRows: imageRowsFromUrls(urls),
+    productPreviewVideoUrl: product.productPreviewVideoUrl?.trim() ?? "",
     productPrice: priceStr,
     productOldPrice: oldPriceStr,
     productCategory: product.productCategory ?? PRODUCT_CATEGORY_ELECTRONICS,
@@ -167,7 +177,12 @@ export function CreateProductModal({
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    const isIntegerField =
+      name === "productPrice" ||
+      name === "productOldPrice" ||
+      name === "productStockQuantity";
+    const nextValue = isIntegerField ? keepDigitsOnly(value) : value;
+    setForm((prev) => ({ ...prev, [name]: nextValue }));
   };
 
   const handleAvailableChange = (event) => {
@@ -212,8 +227,26 @@ export function CreateProductModal({
         });
         return;
       }
+      const productPriceMaxError = getProductPriceRubMaxError(productPrice);
+      if (productPriceMaxError) {
+        setStatus({
+          kind: "error",
+          message: CREATE_PRODUCT_MODAL_UI.ERROR_PRICE_MAX,
+        });
+        return;
+      }
 
       const productOldPrice = parsePrice(form.productOldPrice);
+      if (productOldPrice != null) {
+        const oldPriceMaxError = getProductPriceRubMaxError(productOldPrice);
+        if (oldPriceMaxError) {
+          setStatus({
+            kind: "error",
+            message: CREATE_PRODUCT_MODAL_UI.ERROR_PRICE_MAX,
+          });
+          return;
+        }
+      }
       const oldPriceError = validateProductOldPricePair(
         productOldPrice,
         productPrice,
@@ -237,6 +270,16 @@ export function CreateProductModal({
       const urls = urlsFromImageRows(form.productImageRows).map((url) =>
         resolveUploadedImageUrl(url),
       );
+      const previewVideoUrl = resolveUploadedImageUrl(
+        form.productPreviewVideoUrl.trim(),
+      );
+      if (previewVideoUrl && urls.length === 0) {
+        setStatus({
+          kind: "error",
+          message: CREATE_PRODUCT_MODAL_UI.ERROR_PREVIEW_VIDEO_REQUIRES_PHOTO,
+        });
+        return;
+      }
 
       const stockParsed = Math.floor(Number(form.productStockQuantity));
       const listedInCatalog = form.productIsAvailable === true;
@@ -278,6 +321,7 @@ export function CreateProductModal({
           productName: form.productName.trim(),
           productDescription: form.productDescription.trim(),
           productImageUrls: urls,
+          productPreviewVideoUrl: previewVideoUrl,
           productPrice,
           productOldPrice,
           productCategory: form.productCategory,
@@ -294,6 +338,7 @@ export function CreateProductModal({
           productName: form.productName,
           productDescription: form.productDescription,
           productImageUrls: urls.length > 0 ? urls : undefined,
+          productPreviewVideoUrl: previewVideoUrl || undefined,
           productPrice,
           productOldPrice,
           productCategory: form.productCategory,
@@ -407,19 +452,30 @@ export function CreateProductModal({
               }
               disabled={isSubmitting}
             />
+            <div className="create-product-modal__label">
+              <FormFieldLabel>
+                {PRODUCT_PREVIEW_VIDEO_UI.LABEL}
+              </FormFieldLabel>
+              <ProductPreviewVideoField
+                value={form.productPreviewVideoUrl}
+                onChange={(productPreviewVideoUrl) =>
+                  setForm((prev) => ({ ...prev, productPreviewVideoUrl }))
+                }
+                disabled={isSubmitting}
+              />
+            </div>
             <label className="create-product-modal__label">
               <FormFieldLabel required>
                 {CREATE_PRODUCT_MODAL_UI.LABEL_PRICE}
               </FormFieldLabel>
               <input
+                {...INTEGER_INPUT_FIELD_PROPS}
                 className="create-product-modal__input"
-                type="text"
                 name="productPrice"
                 value={form.productPrice}
                 onChange={handleChange}
                 required
-                inputMode="decimal"
-                autoComplete="off"
+                maxLength={String(PRODUCT_PRICE_RUB_MAX).length}
                 disabled={isSubmitting}
               />
             </label>
@@ -428,13 +484,12 @@ export function CreateProductModal({
                 {CREATE_PRODUCT_MODAL_UI.LABEL_OLD_PRICE}
               </FormFieldLabel>
               <input
+                {...INTEGER_INPUT_FIELD_PROPS}
                 className="create-product-modal__input"
-                type="text"
                 name="productOldPrice"
                 value={form.productOldPrice}
                 onChange={handleChange}
-                inputMode="numeric"
-                autoComplete="off"
+                maxLength={String(PRODUCT_PRICE_RUB_MAX).length}
                 disabled={isSubmitting}
               />
             </label>
@@ -470,15 +525,12 @@ export function CreateProductModal({
                   {CREATE_PRODUCT_MODAL_UI.LABEL_STOCK_QUANTITY}
                 </FormFieldLabel>
                 <input
+                  {...INTEGER_INPUT_FIELD_PROPS}
                   className="create-product-modal__input"
-                  type="number"
                   name="productStockQuantity"
                   value={form.productStockQuantity}
                   onChange={handleChange}
-                  min={PRODUCT_STOCK_QUANTITY_MIN}
-                  max={PRODUCT_STOCK_QUANTITY_MAX}
-                  step={1}
-                  inputMode="numeric"
+                  maxLength={String(PRODUCT_STOCK_QUANTITY_MAX).length}
                   disabled={isSubmitting}
                   required={
                     form.productIsAvailable || !showCatalogAvailabilityToggle

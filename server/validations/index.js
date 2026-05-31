@@ -45,6 +45,12 @@ import { getAllOrdersValidation } from './order/getAllOrdersValidation.js';
 import { getMySalesValidation } from './order/getMySalesValidation.js';
 import { orderItemActionValidation } from './order/orderItemActionValidation.js';
 import { replaceMyCartValidation } from './cart/replaceMyCartValidation.js';
+import {
+    userStoryIdParamValidation,
+    createUserStoryValidation,
+    submitUserStoryReportValidation,
+    resolveUserStoryReportsValidation,
+} from './user/userStoryValidation.js';
 
 export { 
     loginUserValidation, 
@@ -88,4 +94,8 @@ export {
     getMySalesValidation,
     orderItemActionValidation,
     replaceMyCartValidation,
+    userStoryIdParamValidation,
+    createUserStoryValidation,
+    submitUserStoryReportValidation,
+    resolveUserStoryReportsValidation,
 };

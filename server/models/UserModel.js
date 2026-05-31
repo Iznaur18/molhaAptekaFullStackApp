@@ -157,6 +157,11 @@ const UserSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    userRubBalance: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
 
     // - - - Список покупок / заказов (подготовка под будущую модель) - - -
     buyList: { // список id заказов или покупок; при создании модели Order/Purchase указать ref: 'Order' или ref: 'Purchase'

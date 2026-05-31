@@ -42,6 +42,7 @@
   margin: 0;
   padding: 0.2rem 0.5rem;
   width: fit-content;
+  max-width: 100%;
   border-radius: 0.35rem;
   border: 1px solid #f87171;
   background: #fee2e2;
@@ -49,8 +50,12 @@
   font-size: 0.72rem;
   font-weight: 700;
   line-height: 1.35;
+  white-space: nowrap;
 }
 
-.product-card__status-badges-row > .product-discount-badge {
-  margin: 0;
+.product-discount-badge--overlay {
+  box-shadow: 0 1px 6px rgb(0 0 0 / 28%);
+  white-space: normal;
+  max-width: min(100%, 9.5rem);
+  text-align: left;
 }

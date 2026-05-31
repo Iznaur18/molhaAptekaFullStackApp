@@ -1,6 +1,7 @@
 import rateLimit from 'express-rate-limit';
 
 import { PRODUCT_REPORT_RATE_LIMIT_PER_HOUR } from '../constants/productReportConstants.js';
+import { USER_STORY_RATE_LIMIT_PER_HOUR } from '../constants/userStoryConstants.js';
 import { USER_DATA_CONFIRMATION_RATE_LIMIT_PER_HOUR } from '../constants/userDataConfirmationConstants.js';
 import { PRICE_OFFER_RATE_LIMIT_PER_HOUR } from '../constants/productPriceOfferConstants.js';
 import { PRODUCT_REVIEW_RATE_LIMIT_PER_HOUR } from '../constants/productReviewConstants.js';
@@ -100,6 +101,32 @@ export const productReportRateLimiter = rateLimit({
     message: {
         success: false,
         message: 'Слишком много жалоб. Попробуйте позже',
+    },
+    keyGenerator: (req) => String(req.userId ?? req.ip ?? 'unknown'),
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+/** Лимит жалоб на сторис с одного аккаунта. */
+export const userStoryReportRateLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: USER_STORY_RATE_LIMIT_PER_HOUR,
+    message: {
+        success: false,
+        message: 'Слишком много жалоб. Попробуйте позже',
+    },
+    keyGenerator: (req) => String(req.userId ?? req.ip ?? 'unknown'),
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+/** Лимит публикаций сторис с одного аккаунта. */
+export const userStoryCreateRateLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: 30,
+    message: {
+        success: false,
+        message: 'Слишком много публикаций сторис. Попробуйте позже',
     },
     keyGenerator: (req) => String(req.userId ?? req.ip ?? 'unknown'),
     standardHeaders: true,
