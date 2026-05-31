@@ -115,10 +115,23 @@ import {
 } from "../../../shared/config/appUiCopy.js";
 import {
   isMyProductsMainView,
+  isCatalogBrowserMainView,
   isRoleRestrictedMainView,
   mainViewToPathname,
   pathnameToMainView,
 } from "../../../shared/lib/homeMainViewPaths.js";
+import { fetchProductCategoryDisplays } from "../../../entities/product-category-display/api/fetchProductCategoryDisplays.js";
+import { buildCatalogBrowserLocation } from "../../../entities/product-category-display/lib/catalogBrowserPaths.js";
+import { isCatalogBrowserLandingSearch } from "../../../entities/product-category-display/lib/catalogBrowserLanding.js";
+import { buildQueryForCatalogFeedTile } from "../../../entities/product-category-display/lib/buildQueryForCatalogFeedTile.js";
+import { resolveActiveCatalogFeedLabel } from "../../../entities/product-category-display/lib/resolveActiveCatalogFeedLabel.js";
+import {
+  resolveProductCategoryDisplay,
+} from "../../../entities/product-category-display/lib/resolveProductCategoryDisplay.js";
+import { CatalogBrowserLanding } from "../../../entities/product-category-display/ui/CatalogBrowserLanding.jsx";
+import { EditProductCategoryDisplayModal } from "../../../entities/product-category-display/ui/EditProductCategoryDisplayModal.jsx";
+import "../../../entities/product-category-display/ui/CatalogCategoriesGrid.css";
+import "../../../entities/product-category-display/ui/CatalogFeedTilesGrid.css";
 import {
   buildRafflePath,
   isRaffleProductsPath,
@@ -130,6 +143,7 @@ import { useDebouncedValue } from "../../../shared/lib/useDebouncedValue.js";
 import {
   areCatalogSearchParamsEqual,
   buildCatalogSearchParams,
+  CATALOG_QUERY_PARAM_CATEGORY,
   parseCatalogQueryFromSearchParams,
 } from "../lib/catalogCatalogQuery.js";
 
@@ -140,7 +154,7 @@ import "./HomePage.css";
 
 /** @typedef {import('../../../entities/product/model/types.js').ProductFromApi} ProductFromApi */
 /** @typedef {{ open: boolean; phase: 'idle'|'loading'|'success'|'error'; user: import('../../../entities/user/model/types.js').UserPublicProfile | null; error: string }} ProfileModalState */
-/** @typedef {'catalog' | 'my-profile' | 'my-products' | 'users' | 'subscriptions' | 'notifications' | 'cart' | 'my-sales' | 'my-orders' | 'admin-orders' | 'product-moderation' | 'product-reports' | 'data-confirmation-requests'} HomeMainView */
+/** @typedef {'catalog' | 'catalog-browser' | 'my-profile' | 'my-products' | 'users' | 'subscriptions' | 'notifications' | 'cart' | 'my-sales' | 'my-orders' | 'admin-orders' | 'product-moderation' | 'product-reports' | 'data-confirmation-requests'} HomeMainView */
 
 const EMPTY_PROFILE_MODAL = Object.freeze({
   open: false,
@@ -162,12 +176,23 @@ const readInitialCatalogQuery = () => {
     return null;
   }
   const path = window.location.pathname.replace(/\/+$/, "") || "/";
-  if (path !== "/") {
+  if (path !== "/" && path !== "/catalog") {
     return null;
   }
   return parseCatalogQueryFromSearchParams(
     new URLSearchParams(window.location.search),
   );
+};
+
+const readInitialCatalogCategory = () => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+  const path = window.location.pathname.replace(/\/+$/, "") || "/";
+  if (path !== "/catalog") {
+    return null;
+  }
+  return readInitialCatalogQuery()?.category ?? null;
 };
 
 const useCurrentUserSession = (isAuthorized) => {
@@ -256,9 +281,19 @@ export function HomePage() {
     () => normalizeProfileTab(new URLSearchParams(location.search).get("tab")),
     [location.search],
   );
+  const raffleRouteId = useMemo(
+    () => parseRaffleIdFromPathname(location.pathname),
+    [location.pathname],
+  );
+  const isRaffleRoute = raffleRouteId != null;
   const isProfileMyProductsTab =
     mainView === "my-profile" && activeProfileTab === PROFILE_TAB_MY_PRODUCTS;
-  const isCatalogShellView = mainView === "catalog" || isMyProductsMainView(mainView) || isProfileMyProductsTab;
+  const isHomeCatalogMainView = mainView === "catalog" && !isRaffleRoute;
+  const isCatalogBrowserMainViewActive = isCatalogBrowserMainView(mainView);
+  const isCatalogShellView =
+    isHomeCatalogMainView ||
+    isMyProductsMainView(mainView) ||
+    isProfileMyProductsTab;
 
   const setMyProfileTab = useCallback(
     (tab) => {
@@ -269,12 +304,6 @@ export function HomePage() {
     },
     [navigate],
   );
-
-  const raffleRouteId = useMemo(
-    () => parseRaffleIdFromPathname(location.pathname),
-    [location.pathname],
-  );
-  const isRaffleRoute = raffleRouteId != null;
 
   useEffect(() => {
     if (pathnameToMainView(location.pathname) !== null) return undefined;
@@ -302,9 +331,19 @@ export function HomePage() {
   const [myProfilePage, setMyProfilePage] = useState(EMPTY_MY_PROFILE_PAGE);
   const [isProductCategoryListOpen, setIsProductCategoryListOpen] =
     useState(false);
+  const [categoryDisplays, setCategoryDisplays] = useState(
+    /** @type {import('../../../entities/product-category-display/model/types.js').ProductCategoryDisplayFromApi[]} */ ([]),
+  );
+  const [categoryDisplaysStatus, setCategoryDisplaysStatus] = useState({
+    kind: "idle",
+    message: "",
+  });
+  const [editingCategorySlug, setEditingCategorySlug] = useState(
+    /** @type {import('../../../entities/product/model/types.js').ProductCategory | null} */ (null),
+  );
   const initialCatalogQuery = useMemo(() => readInitialCatalogQuery(), []);
   const [selectedProductCategory, setSelectedProductCategory] = useState(
-    () => initialCatalogQuery?.category ?? null,
+    () => readInitialCatalogCategory(),
   );
   const [catalogSort, setCatalogSort] = useState(
     () => initialCatalogQuery?.sort ?? CATALOG_SORT_NEWEST,
@@ -518,7 +557,7 @@ export function HomePage() {
   }, [refreshPendingRafflesCount, mainView]);
 
   const refreshFeaturedRaffle = useCallback(async () => {
-    if (mainView !== "catalog" || isRaffleRoute) {
+    if (!isHomeCatalogMainView) {
       setFeaturedRaffles([]);
       setFeaturedRaffleIndex(0);
       return;
@@ -531,14 +570,14 @@ export function HomePage() {
       setFeaturedRaffles([]);
       setFeaturedRaffleIndex(0);
     }
-  }, [mainView, isRaffleRoute]);
+  }, [isHomeCatalogMainView]);
 
   useEffect(() => {
     void refreshFeaturedRaffle();
   }, [refreshFeaturedRaffle, catalogRefreshTick, raffleRefreshTick]);
 
   const refreshUserStoriesFeed = useCallback(async () => {
-    if (mainView !== "catalog" || isRaffleRoute) {
+    if (!isHomeCatalogMainView) {
       setUserStoriesFeed({
         rings: [],
         canPublish: false,
@@ -556,7 +595,7 @@ export function HomePage() {
         showStrip: false,
       });
     }
-  }, [mainView, isRaffleRoute]);
+  }, [isHomeCatalogMainView]);
 
   useEffect(() => {
     void refreshUserStoriesFeed();
@@ -775,6 +814,14 @@ export function HomePage() {
     PRODUCT_SEARCH_UI.DEBOUNCE_MS,
   );
 
+  const catalogQueryFromUrl = useMemo(
+    () =>
+      parseCatalogQueryFromSearchParams(
+        new URLSearchParams(location.search),
+      ),
+    [location.search],
+  );
+
   const handleCatalogSortChange = useCallback(
     (value) => {
       if (catalogAuctionOnly && value === CATALOG_SORT_VIEWS) {
@@ -784,6 +831,10 @@ export function HomePage() {
     },
     [catalogAuctionOnly],
   );
+
+  const handleShowHiddenCatalogProductsToggle = useCallback(() => {
+    setShowHiddenCatalogProducts((prev) => !prev);
+  }, []);
 
   const handleCatalogFollowingOnlyToggle = useCallback(() => {
     if (!isAuthorized) {
@@ -822,18 +873,48 @@ export function HomePage() {
   const hasProductSearchQuery = debouncedProductSearchTerm.trim() !== "";
   const isMyProductsRoute = isMyProductsMainView(mainView);
   const isMineMode = isMyProductsRoute || isProfileMyProductsTab;
+  const activeCatalogBrowserCategory =
+    mainView === "catalog-browser" ? catalogQueryFromUrl.category : null;
+  const isCatalogBrowserLanding =
+    isCatalogBrowserMainViewActive &&
+    isCatalogBrowserLandingSearch(location.search, hasProductSearchQuery);
+  const isCatalogBrowserProductsView =
+    isCatalogBrowserMainViewActive && !isCatalogBrowserLanding;
+  const isCatalogProductsView =
+    isCatalogShellView || isCatalogBrowserProductsView;
 
   useEffect(() => {
     if (mainView !== "catalog") {
+      return;
+    }
+    const params = new URLSearchParams(location.search);
+    if (!params.has(CATALOG_QUERY_PARAM_CATEGORY)) {
+      return;
+    }
+    const parsed = parseCatalogQueryFromSearchParams(params);
+    const built = buildCatalogSearchParams(parsed);
+    const search = built.toString();
+    navigate(
+      `${mainViewToPathname("catalog-browser")}${search ? `?${search}` : ""}`,
+      { replace: true },
+    );
+  }, [mainView, location.search, navigate]);
+
+  useEffect(() => {
+    if (mainView !== "catalog" && mainView !== "catalog-browser") {
       return;
     }
     const parsed = parseCatalogQueryFromSearchParams(
       new URLSearchParams(location.search),
     );
     setCatalogSort((prev) => (prev === parsed.sort ? prev : parsed.sort));
-    setSelectedProductCategory((prev) =>
-      prev === parsed.category ? prev : parsed.category,
-    );
+    if (mainView === "catalog-browser") {
+      setSelectedProductCategory((prev) =>
+        prev === parsed.category ? prev : parsed.category,
+      );
+    } else {
+      setSelectedProductCategory(null);
+    }
     setCatalogFollowingOnly((prev) =>
       prev === parsed.followingOnly ? prev : parsed.followingOnly,
     );
@@ -846,12 +927,13 @@ export function HomePage() {
   }, [location.search, mainView]);
 
   useEffect(() => {
-    if (mainView !== "catalog") {
+    if (mainView !== "catalog" && mainView !== "catalog-browser") {
       return;
     }
     const built = buildCatalogSearchParams({
       sort: catalogSort,
-      category: selectedProductCategory,
+      category:
+        mainView === "catalog-browser" ? selectedProductCategory : null,
       followingOnly: catalogFollowingOnly,
       auctionOnly: catalogAuctionOnly,
       saleOnly: catalogSaleOnly,
@@ -862,7 +944,10 @@ export function HomePage() {
     }
     const search = built.toString();
     navigate(
-      { pathname: location.pathname, search: search ? `?${search}` : "" },
+      {
+        pathname: mainViewToPathname(mainView),
+        search: search ? `?${search}` : "",
+      },
       { replace: true },
     );
   }, [
@@ -872,10 +957,32 @@ export function HomePage() {
     catalogFollowingOnly,
     catalogAuctionOnly,
     catalogSaleOnly,
-    location.pathname,
-    location.search,
     navigate,
   ]);
+
+  const refreshCategoryDisplays = useCallback(async () => {
+    if (!isCatalogBrowserMainViewActive) {
+      return;
+    }
+    setCategoryDisplaysStatus({ kind: "loading", message: "" });
+    try {
+      const { displays } = await fetchProductCategoryDisplays();
+      setCategoryDisplays(displays);
+      setCategoryDisplaysStatus({ kind: "idle", message: "" });
+    } catch (error) {
+      setCategoryDisplaysStatus({
+        kind: "error",
+        message:
+          error instanceof Error
+            ? error.message
+            : API_CLIENT_UI.FETCH_CATEGORY_DISPLAYS_FALLBACK,
+      });
+    }
+  }, [isCatalogBrowserMainViewActive]);
+
+  useEffect(() => {
+    void refreshCategoryDisplays();
+  }, [refreshCategoryDisplays]);
 
   const canReportCatalogProduct = useMemo(() => {
     if (!isAuthorized || !catalogProductDetails || !currentUserId) {
@@ -1083,15 +1190,19 @@ export function HomePage() {
   }, [isAuthorized, isAdmin]);
 
   useEffect(() => {
-    if (!isAdmin) {
+    if (!canModerateProducts) {
       setShowHiddenCatalogProducts(false);
     }
-  }, [isAdmin]);
+  }, [canModerateProducts]);
 
   const loadCatalogPage = useCallback(
     async (pageNum) => {
       const search = debouncedProductSearchTerm.trim();
-      const productCategory = selectedProductCategory ?? undefined;
+      const productCategory = isMineMode
+        ? selectedProductCategory ?? undefined
+        : isCatalogBrowserMainViewActive
+          ? activeCatalogBrowserCategory ?? undefined
+          : undefined;
       if (isMineMode) {
         return fetchMyProductsPage({
           page: pageNum,
@@ -1107,21 +1218,24 @@ export function HomePage() {
         limit: CATALOG_PAGE_SIZE,
         search: search || undefined,
         productCategory,
-        sort: catalogSort,
+        sort: catalogQueryFromUrl.sort,
         includeHidden:
-          isAdmin && !isMineMode && showHiddenCatalogProducts,
-        followingOnly: !isMineMode && catalogFollowingOnly,
-        auctionOnly: !isMineMode && catalogAuctionOnly,
-        saleOnly: !isMineMode && catalogSaleOnly,
+          canModerateProducts && !isMineMode && showHiddenCatalogProducts,
+        followingOnly: catalogQueryFromUrl.followingOnly,
+        auctionOnly: catalogQueryFromUrl.auctionOnly,
+        saleOnly: catalogQueryFromUrl.saleOnly,
       });
     },
     [
       isMineMode,
+      isCatalogBrowserMainViewActive,
+      activeCatalogBrowserCategory,
+      catalogQueryFromUrl,
       debouncedProductSearchTerm,
       selectedProductCategory,
       catalogSort,
       myProductsModerationFilter,
-      isAdmin,
+      canModerateProducts,
       showHiddenCatalogProducts,
       catalogFollowingOnly,
       catalogAuctionOnly,
@@ -1130,7 +1244,7 @@ export function HomePage() {
   );
 
   useEffect(() => {
-    if (!isCatalogShellView) {
+    if (!isCatalogProductsView) {
       return undefined;
     }
 
@@ -1168,10 +1282,12 @@ export function HomePage() {
       }
     })();
   }, [
-    isCatalogShellView,
+    isCatalogProductsView,
     isMineMode,
     debouncedProductSearchTerm,
     selectedProductCategory,
+    activeCatalogBrowserCategory,
+    catalogQueryFromUrl,
     catalogSort,
     myProductsModerationFilter,
     showHiddenCatalogProducts,
@@ -1225,7 +1341,7 @@ export function HomePage() {
   ]);
 
   useEffect(() => {
-    if (!isCatalogShellView) return undefined;
+    if (!isCatalogProductsView) return undefined;
     if (catalogStatus.kind !== "idle") return undefined;
     if (!catalogHasMore || catalogLoadMoreError) return undefined;
 
@@ -1244,7 +1360,7 @@ export function HomePage() {
     observer.observe(el);
     return () => observer.disconnect();
   }, [
-    isCatalogShellView,
+    isCatalogProductsView,
     catalogStatus.kind,
     catalogHasMore,
     catalogLoadMoreError,
@@ -1316,10 +1432,83 @@ export function HomePage() {
 
   const handleNavigateToFullCatalogFromBreadcrumb = () => {
     setMyProductsCatalogError("");
-    goToMainView("catalog");
     setSelectedProductCategory(null);
     setIsProductCategoryListOpen(false);
+    setCatalogSort(CATALOG_SORT_NEWEST);
+    setCatalogFollowingOnly(false);
+    setCatalogAuctionOnly(false);
+    setCatalogSaleOnly(false);
+    navigate(mainViewToPathname("catalog"), { replace: true });
   };
+
+  const handleCatalogMenuClick = useCallback(() => {
+    setIsProductCategoryListOpen(false);
+    navigate(mainViewToPathname("catalog-browser"), { replace: true });
+  }, [navigate]);
+
+  const handleCatalogCategoryGridClick = useCallback(
+    (categorySlug) => {
+      navigate(
+        buildCatalogBrowserLocation({
+          sort: CATALOG_SORT_NEWEST,
+          category: categorySlug,
+          followingOnly: false,
+          auctionOnly: false,
+          saleOnly: false,
+        }),
+      );
+    },
+    [navigate],
+  );
+
+  const handleCatalogFeedTileClick = useCallback(
+    (tile) => {
+      const nextQuery = buildQueryForCatalogFeedTile(tile);
+      if (
+        nextQuery.followingOnly &&
+        !isAuthorized
+      ) {
+        setIsLoginModalOpen(true);
+        return;
+      }
+      navigate(buildCatalogBrowserLocation(nextQuery));
+    },
+    [isAuthorized, navigate],
+  );
+
+  const handleBackToCatalogLanding = useCallback(() => {
+    navigate(mainViewToPathname("catalog-browser"));
+  }, [navigate]);
+
+  const handleCategoryDisplaySaved = useCallback((display) => {
+    setCategoryDisplays((prev) => {
+      const next = prev.filter(
+        (row) => row.categorySlug !== display.categorySlug,
+      );
+      return [...next, display];
+    });
+  }, []);
+
+  const selectedCategoryLabel = useMemo(() => {
+    if (!activeCatalogBrowserCategory) {
+      return null;
+    }
+    return resolveProductCategoryDisplay(
+      activeCatalogBrowserCategory,
+      new Map(categoryDisplays.map((row) => [row.categorySlug, row])),
+    ).label;
+  }, [activeCatalogBrowserCategory, categoryDisplays]);
+
+  const activeCatalogFeedLabel = useMemo(() => {
+    if (!isCatalogBrowserProductsView || activeCatalogBrowserCategory) {
+      return null;
+    }
+    return resolveActiveCatalogFeedLabel(catalogQueryFromUrl);
+  }, [
+    isCatalogBrowserProductsView,
+    activeCatalogBrowserCategory,
+    catalogQueryFromUrl,
+  ]);
 
   const handleSubscriptionsFromProfile = () => {
     setMyProfileTab(PROFILE_TAB_SUBSCRIPTIONS);
@@ -1808,6 +1997,66 @@ export function HomePage() {
     }
   };
 
+  const renderCatalogBrowserContent = () => {
+    if (isCatalogBrowserLanding) {
+      return (
+        <CatalogBrowserLanding
+          displays={categoryDisplays}
+          isAdmin={isAdmin}
+          isLoading={categoryDisplaysStatus.kind === "loading"}
+          errorMessage={
+            categoryDisplaysStatus.kind === "error"
+              ? categoryDisplaysStatus.message
+              : null
+          }
+          onFeedTileClick={handleCatalogFeedTileClick}
+          onCategoryClick={handleCatalogCategoryGridClick}
+          onEditCategoryClick={setEditingCategorySlug}
+        />
+      );
+    }
+
+    const breadcrumbCurrentLabel =
+      selectedCategoryLabel ?? activeCatalogFeedLabel;
+
+    return (
+      <>
+        <div className="catalog-categories-browser__toolbar">
+          <nav
+            className="catalog-categories-browser__breadcrumb"
+            aria-label={HOME_PAGE_UI.BREADCRUMB_CATALOG}
+          >
+            <button
+              type="button"
+              className="catalog-categories-browser__breadcrumb-link"
+              onClick={handleBackToCatalogLanding}
+            >
+              {HOME_PAGE_UI.BREADCRUMB_CATALOG}
+            </button>
+            {breadcrumbCurrentLabel ? (
+              <>
+                <span className="home-page__breadcrumb-sep" aria-hidden="true">
+                  {HOME_PAGE_UI.BREADCRUMB_SEPARATOR}
+                </span>
+                <span className="catalog-categories-browser__breadcrumb-current">
+                  {breadcrumbCurrentLabel}
+                </span>
+              </>
+            ) : null}
+          </nav>
+          <button
+            type="button"
+            className="catalog-categories-browser__all-button"
+            onClick={handleBackToCatalogLanding}
+          >
+            {HOME_PAGE_UI.BACK_TO_CATALOG_LANDING}
+          </button>
+        </div>
+        {renderCatalogContent()}
+      </>
+    );
+  };
+
   const renderCatalogContent = () => {
     if (catalogStatus.kind === "loading" && products.length === 0) {
       return <p className="home-page__state">{HOME_PAGE_UI.LOADING_CATALOG}</p>;
@@ -1821,7 +2070,7 @@ export function HomePage() {
     }
     return (
       <>
-        {mainView === "catalog" && featuredRaffles.length > 0 ? (
+        {isHomeCatalogMainView && featuredRaffles.length > 0 ? (
           <RaffleFeaturedCarousel
             raffles={featuredRaffles}
             activeIndex={featuredRaffleIndex}
@@ -1830,7 +2079,7 @@ export function HomePage() {
             getManage={getFeaturedRaffleManage}
           />
         ) : null}
-        {mainView === "catalog" && userStoriesFeed.showStrip ? (
+        {isHomeCatalogMainView && userStoriesFeed.showStrip ? (
           <UserStoriesStrip
             rings={userStoriesFeed.rings}
             canPublish={userStoriesFeed.canPublish}
@@ -1843,7 +2092,11 @@ export function HomePage() {
         ) : null}
         <HomeCatalogGrid
         products={products}
-        selectedProductCategory={selectedProductCategory}
+        selectedProductCategory={
+          mainView === "catalog-browser"
+            ? activeCatalogBrowserCategory
+            : selectedProductCategory
+        }
         hasQuery={hasProductSearchQuery}
         isMineMode={isMineMode}
         deletingProductId={deletingProductId}
@@ -2162,6 +2415,10 @@ export function HomePage() {
       );
     }
 
+    if (mainView === "catalog-browser") {
+      return renderCatalogBrowserContent();
+    }
+
     return renderCatalogContent();
   };
 
@@ -2171,8 +2428,14 @@ export function HomePage() {
       <HomePageHeader
         mainView={mainView}
         isMineMode={isMineMode}
-        selectedProductCategory={selectedProductCategory}
+        selectedProductCategory={
+          mainView === "catalog-browser"
+            ? activeCatalogBrowserCategory
+            : selectedProductCategory
+        }
         isProductCategoryListOpen={isProductCategoryListOpen}
+        onCatalogMenuClick={handleCatalogMenuClick}
+        isCatalogMenuActive={isCatalogBrowserLanding}
         productSearchTerm={productSearchTerm}
         isProductSearchPending={isProductSearchPending}
         isAuthorized={isAuthorized}
@@ -2206,8 +2469,9 @@ export function HomePage() {
         onCatalogAuctionOnlyToggle={handleCatalogAuctionOnlyToggle}
         onCatalogSaleOnlyToggle={handleCatalogSaleOnlyToggle}
         isAdmin={isAdmin}
+        canModerateProducts={canModerateProducts}
         showHiddenCatalogProducts={showHiddenCatalogProducts}
-        onShowHiddenCatalogProductsChange={setShowHiddenCatalogProducts}
+        onShowHiddenCatalogProductsToggle={handleShowHiddenCatalogProductsToggle}
         myProductsModerationFilter={myProductsModerationFilter}
         onMyProductsModerationFilterChange={setMyProductsModerationFilter}
       />
@@ -2527,6 +2791,13 @@ export function HomePage() {
         onSubmitted={() => {
           setCatalogProductHasPendingReport(true);
         }}
+      />
+      <EditProductCategoryDisplayModal
+        isOpen={editingCategorySlug != null}
+        categorySlug={editingCategorySlug}
+        displays={categoryDisplays}
+        onClose={() => setEditingCategorySlug(null)}
+        onSaved={handleCategoryDisplaySaved}
       />
     </div>
   );

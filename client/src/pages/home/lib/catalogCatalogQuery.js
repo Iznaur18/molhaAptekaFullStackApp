@@ -86,6 +86,43 @@ export function buildCatalogSearchParams({
 }
 
 /**
+ * Query для `/catalog` с явным `sort` (в т.ч. `newest` для ленты «Новинки»).
+ *
+ * @param {{
+ *   sort: string;
+ *   category: import("../../../entities/product/model/types.js").ProductCategory | null;
+ *   followingOnly: boolean;
+ *   auctionOnly: boolean;
+ *   saleOnly: boolean;
+ * }} query
+ */
+export function buildCatalogBrowserSearchParams({
+  sort,
+  category,
+  followingOnly,
+  auctionOnly,
+  saleOnly,
+}) {
+  const params = new URLSearchParams();
+  params.set(CATALOG_QUERY_PARAM_SORT, sort);
+
+  if (category) {
+    params.set(CATALOG_QUERY_PARAM_CATEGORY, category);
+  }
+  if (followingOnly) {
+    params.set(CATALOG_QUERY_PARAM_FOLLOWING_ONLY, "true");
+  }
+  if (auctionOnly) {
+    params.set(CATALOG_QUERY_PARAM_AUCTION_ONLY, "true");
+  }
+  if (saleOnly) {
+    params.set(CATALOG_QUERY_PARAM_SALE_ONLY, "true");
+  }
+
+  return params;
+}
+
+/**
  * @param {URLSearchParams} a
  * @param {URLSearchParams} b
  */

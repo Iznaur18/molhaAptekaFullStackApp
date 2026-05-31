@@ -3,12 +3,13 @@
  * проксирует `/cart` и `/user/...` на Express (см. vite.config.js).
  * Путь `/user-list` ок: не совпадает с API `/user` (иначе F5 → 404 JSON).
  *
- * @typedef {'catalog' | 'my-profile' | 'my-products' | 'users' | 'subscriptions' | 'notifications' | 'cart' | 'my-sales' | 'my-orders' | 'admin-orders' | 'product-moderation' | 'product-reports' | 'data-confirmation-requests'} HomeMainView
+ * @typedef {'catalog' | 'catalog-browser' | 'my-profile' | 'my-products' | 'users' | 'subscriptions' | 'notifications' | 'cart' | 'my-sales' | 'my-orders' | 'admin-orders' | 'product-moderation' | 'product-reports' | 'data-confirmation-requests'} HomeMainView
  */
 
 /** @type {Record<HomeMainView, string>} */
 export const HOME_MAIN_VIEW_PATH = {
   catalog: "/",
+  "catalog-browser": "/catalog",
   "my-profile": "/me",
   "my-products": "/my-products",
   /** Список пользователей; не `/users` — путается с API и при F5 на :4444. */
@@ -74,12 +75,28 @@ export function isMyProductsMainView(view) {
 }
 
 /**
+ * @param {HomeMainView} view
+ */
+export function isCatalogBrowserMainView(view) {
+  return view === "catalog-browser";
+}
+
+/**
  * Каталог и «Мои товары» — одна оболочка (поиск, сетка, подгрузка).
  *
  * @param {HomeMainView} view
  */
 export function isCatalogShellMainView(view) {
   return view === "catalog" || view === "my-products";
+}
+
+/**
+ * Шапка с поиском и фильтрами каталога.
+ *
+ * @param {HomeMainView} view
+ */
+export function isCatalogHeaderMainView(view) {
+  return isCatalogShellMainView(view) || isCatalogBrowserMainView(view);
 }
 
 /** Экраны, для которых нужна загруженная роль (admin / moderator). */

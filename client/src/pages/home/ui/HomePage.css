@@ -38,6 +38,12 @@
   flex-shrink: 0;
 }
 
+.home-page__header-filter--public {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
 .home-page--header-v1 .home-page__header-filter .header-circle-button {
   width: 2.625rem;
   height: 2.625rem;

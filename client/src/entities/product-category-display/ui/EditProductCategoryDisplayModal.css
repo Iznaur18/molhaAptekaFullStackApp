@@ -1,0 +1,108 @@
+.edit-category-display-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgb(15 23 42 / 45%);
+}
+
+.edit-category-display-modal {
+  box-sizing: border-box;
+  width: min(100%, 28rem);
+  max-height: min(90vh, 40rem);
+  overflow: auto;
+  padding: 1.25rem;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 20px 40px rgb(15 23 42 / 18%);
+}
+
+.edit-category-display-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.edit-category-display-modal__title {
+  margin: 0;
+  font-size: 1.125rem;
+  line-height: 1.35;
+}
+
+.edit-category-display-modal__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: #f1f5f9;
+  cursor: pointer;
+}
+
+.edit-category-display-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.edit-category-display-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.9375rem;
+}
+
+.edit-category-display-modal__input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font: inherit;
+}
+
+.edit-category-display-modal__hint {
+  color: #64748b;
+  font-size: 0.8125rem;
+}
+
+.edit-category-display-modal__error {
+  margin: 0;
+  color: #b91c1c;
+  font-size: 0.875rem;
+}
+
+.edit-category-display-modal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.edit-category-display-modal__button {
+  padding: 0.625rem 1rem;
+  border: none;
+  border-radius: 8px;
+  background: #4f46e5;
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.edit-category-display-modal__button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.edit-category-display-modal__button_secondary {
+  background: #e2e8f0;
+  color: #0f172a;
+}

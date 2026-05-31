@@ -6,7 +6,7 @@ import {
     PRODUCT_SORT_CONFIRMED,
     PRODUCT_SORT_PREMIUM,
 } from '../../constants/productCatalogSort.js';
-import { getHiddenSellerIds, isUserAdmin } from '../../utils/adminUserGuard.js';
+import { getHiddenSellerIds, isUserStaff } from '../../utils/adminUserGuard.js';
 import { getConfirmedSellerIds } from '../../utils/confirmedSellerCatalog.js';
 import {
     filterSellerIdsExcludingHidden,
@@ -75,9 +75,9 @@ export const getProductsController = async (req, res) => {
         }
 
         const hiddenSellerIds = await getHiddenSellerIds();
-        const isAdmin = await isUserAdmin(req.userId);
+        const isStaff = await isUserStaff(req.userId);
         const includeHidden =
-            isAdmin && String(req.query.includeHidden).toLowerCase() === 'true';
+            isStaff && String(req.query.includeHidden).toLowerCase() === 'true';
 
         const catalogBaseQuery = {
             productModerationStatus: PRODUCT_MODERATION_APPROVED,
@@ -163,7 +163,7 @@ export const getProductsController = async (req, res) => {
         ]);
 
         let productsPayload = await attachProductAvailablePurchaseQuantity(products);
-        if (isAdmin) {
+        if (isStaff) {
             const openSalesIds = await getProductIdsWithOpenSales(
                 products.map((p) => String(p._id)),
             );

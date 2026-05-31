@@ -3,6 +3,8 @@ import {
     postProductController,
     getProductsController,
     getMyProductsController,
+    getProductCategoryDisplaysController,
+    patchProductCategoryDisplayController,
     getCatalogProductByIdController,
     deleteMyProductController,
     patchMyProductController,
@@ -58,6 +60,7 @@ import {
 import {
     checkAuthMW,
     checkOptionalAuthMW,
+    checkAdminMW,
     checkProductModeratorMW,
     productReportRateLimiter,
     productPriceOfferRateLimiter,
@@ -86,12 +89,23 @@ import {
     rejectRaffleValidation,
     raffleProductsValidation,
     setProductRaffleParticipationValidation,
+    productCategorySlugParamValidation,
+    patchProductCategoryDisplayValidation,
 } from '../validations/index.js';
 
 const router = Router();
 
 router.post('/', checkAuthMW, makeProductValidation, postProductController);
 router.get('/', productsSearchValidation, checkOptionalAuthMW, getProductsController);
+router.get('/category-displays', getProductCategoryDisplaysController);
+router.patch(
+    '/category-displays/:categorySlug',
+    checkAuthMW,
+    checkAdminMW,
+    productCategorySlugParamValidation,
+    patchProductCategoryDisplayValidation,
+    patchProductCategoryDisplayController,
+);
 router.get('/my', checkAuthMW, productsSearchValidation, getMyProductsController);
 router.get('/raffles/featured', getFeaturedRaffleController);
 router.get('/raffles/my', checkAuthMW, getMyRaffleController);

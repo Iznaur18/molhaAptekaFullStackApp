@@ -16,6 +16,7 @@ import RaffleModel from './RaffleModel.js';
 import UserStoryModel from './UserStoryModel.js';
 import UserStoryViewModel from './UserStoryViewModel.js';
 import UserStoryReportModel from './UserStoryReportModel.js';
+import ProductCategoryDisplayModel from './ProductCategoryDisplayModel.js';
 
 export {
     UserModel,
@@ -36,4 +37,5 @@ export {
     UserStoryModel,
     UserStoryViewModel,
     UserStoryReportModel,
+    ProductCategoryDisplayModel,
 };

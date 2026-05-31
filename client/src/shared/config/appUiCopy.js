@@ -126,6 +126,8 @@ export const API_CLIENT_UI = {
   FETCH_MY_RAFFLE_FALLBACK: "Не удалось загрузить ваш розыгрыш",
   PATCH_RAFFLE_FALLBACK: "Не удалось сохранить розыгрыш",
   DELETE_RAFFLE_FALLBACK: "Не удалось удалить розыгрыш",
+  FETCH_CATEGORY_DISPLAYS_FALLBACK: "Не удалось загрузить категории",
+  PATCH_CATEGORY_DISPLAY_FALLBACK: "Не удалось сохранить категорию",
   PAUSE_RAFFLE_FALLBACK: "Не удалось снять розыгрыш с витрины",
   SET_RAFFLE_PARTICIPATION_FALLBACK: "Не удалось обновить участие в розыгрыше",
   FETCH_RAFFLES_QUEUE_FALLBACK: "Не удалось загрузить очередь розыгрышей",
@@ -283,6 +285,10 @@ export const HOME_PAGE_UI = {
   NAV_TO_ADMIN_ORDERS: "Все заказы",
   CATALOG_FILTER_BUTTON_ARIA: "Фильтры каталога",
   CATALOG_FILTER_BUTTON_ARIA_ACTIVE: "Фильтры каталога: выбраны параметры",
+  CATALOG_MENU_BUTTON_ARIA: "Каталог категорий",
+  BREADCRUMB_CATALOG: "Каталог",
+  CATEGORY_ALL_BUTTON: "Все категории",
+  BACK_TO_CATALOG_LANDING: "Назад в каталог",
   FILTER_BUTTON_ARIA: "Фильтр по категории",
   FILTER_BUTTON_ARIA_SELECTED: (categoryLabel) =>
     `Фильтр по категории: ${categoryLabel}`,
@@ -306,6 +312,27 @@ export const HOME_PAGE_UI = {
   CATALOG_LOAD_MORE_FAIL: "Не удалось подгрузить ещё товары",
   CATALOG_LOAD_MORE_RETRY: "Повторить",
   CATALOG_LOADING_MORE: "Подгружаем…",
+};
+
+/** Сетка категорий `/catalog` */
+export const PRODUCT_CATEGORY_DISPLAY_UI = {
+  GRID_ARIA: "Категории товаров",
+  FEED_GRID_ARIA: "Разделы каталога",
+  FEED_SECTION_TITLE: "Подборки",
+  CATEGORIES_SECTION_TITLE: "Категории",
+  LOADING: "Загрузка категорий…",
+  EDIT_TITLE: (label) => `Категория: ${label}`,
+  EDIT_ARIA: (label) => `Редактировать категорию «${label}»`,
+  CLOSE_ARIA: "Закрыть",
+  LABEL_FIELD: "Название",
+  LABEL_PLACEHOLDER: (defaultLabel) => defaultLabel,
+  LABEL_HINT: "Пустое поле — стандартное название из списка.",
+  IMAGE_FIELD: "Картинка",
+  IMAGE_HINT: "JPEG, PNG или WebP. Пустое поле — стандартная иконка.",
+  SAVE_BUTTON: "Сохранить",
+  SAVING: "Сохранение…",
+  SAVE_FALLBACK: "Не удалось сохранить категорию",
+  RESET_BUTTON: "Сбросить к дефолту",
 };
 
 /** Кнопка добавления товара в корзину */
@@ -337,6 +364,12 @@ export const HEADER_PROFILE_BUTTON_UI = {
 /** Кнопка «Пользователи» в шапке */
 export const HEADER_USERS_BUTTON_UI = {
   ARIA: "Пользователи",
+};
+
+/** Кнопка «Показывать скрытые товары» в шапке (staff) */
+export const HEADER_SHOW_HIDDEN_PRODUCTS_BUTTON_UI = {
+  ARIA: "Показывать скрытые товары",
+  ARIA_ACTIVE: "Скрытые товары показаны",
 };
 
 /** Страница «Корзина» */

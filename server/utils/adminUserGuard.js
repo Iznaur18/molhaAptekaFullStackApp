@@ -20,6 +20,16 @@ export async function isUserAdmin(userId) {
     return user?.userRole === ADMIN_ROLE;
 }
 
+/**
+ * @param {string | undefined | null} userId
+ * @returns {Promise<boolean>}
+ */
+export async function isUserStaff(userId) {
+    if (!userId) return false;
+    const user = await UserModel.findById(userId).select('userRole').lean();
+    return isStaffRole(user?.userRole);
+}
+
 export async function countAdminUsers(excludeUserId = null) {
     const query = { userRole: ADMIN_ROLE };
     if (excludeUserId) {

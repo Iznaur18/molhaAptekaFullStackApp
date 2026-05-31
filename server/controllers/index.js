@@ -18,6 +18,10 @@ import {
     markOrderItemCancelledBySellerController,
     confirmOrderItemByBuyerController,
 } from './Order/updateOrderItemStatusController.js';
+import {
+    getProductCategoryDisplaysController,
+    patchProductCategoryDisplayController,
+} from './Product/productCategoryDisplayControllers.js';
 import { postProductController } from './Product/postProductController.js';
 import { getProductsController, getMyProductsController } from './Product/getProducts.js';
 import { getCatalogProductByIdController } from './Product/getCatalogProductByIdController.js';
@@ -136,6 +140,8 @@ export {
     markOrderItemDeliveredBySellerController,
     markOrderItemCancelledBySellerController,
     confirmOrderItemByBuyerController,
+    getProductCategoryDisplaysController,
+    patchProductCategoryDisplayController,
     postProductController,
     getProductsController,
     getMyProductsController,

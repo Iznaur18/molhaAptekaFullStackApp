@@ -52,6 +52,11 @@ import {
     resolveUserStoryReportsValidation,
 } from './user/userStoryValidation.js';
 
+import {
+    productCategorySlugParamValidation,
+    patchProductCategoryDisplayValidation,
+} from './product/productCategoryDisplayValidation.js';
+
 export { 
     loginUserValidation, 
     registerUserValidation, 
@@ -98,4 +103,6 @@ export {
     createUserStoryValidation,
     submitUserStoryReportValidation,
     resolveUserStoryReportsValidation,
+    productCategorySlugParamValidation,
+    patchProductCategoryDisplayValidation,
 };
