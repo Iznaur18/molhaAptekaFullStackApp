@@ -21,8 +21,6 @@ export const USER_STORY_TTL_MS = 12 * 60 * 60 * 1000;
 
 export const USER_STORY_CAPTION_MAX_CHARS = 150;
 
-export const USER_STORY_VIDEO_MAX_DURATION_SEC = 10;
-
 export const USER_STORY_REPORT_STATUS_PENDING = 'pending';
 export const USER_STORY_REPORT_STATUS_DISMISSED = 'dismissed';
 export const USER_STORY_REPORT_STATUS_RESOLVED = 'resolved';

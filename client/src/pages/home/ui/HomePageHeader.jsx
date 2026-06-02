@@ -20,6 +20,7 @@ import { HeaderUsersButton } from "../../../widgets/header-users-button/ui/Heade
 import {
   DATA_CONFIRMATION_PAGE_UI,
   HOME_PAGE_UI,
+  INSTALLMENT_UI,
   PRODUCT_MODERATION_PAGE_UI,
   PRODUCT_REPORTS_PAGE_UI,
   PRODUCT_SEARCH_INPUT_UI,
@@ -50,6 +51,10 @@ const NON_CATALOG_VIEW_TITLES = {
   "product-moderation": HOME_PAGE_UI.TITLE_PRODUCT_MODERATION,
   "product-reports": HOME_PAGE_UI.TITLE_PRODUCT_REPORTS,
   "data-confirmation-requests": HOME_PAGE_UI.TITLE_DATA_CONFIRMATION,
+  "installment-payments": HOME_PAGE_UI.TITLE_INSTALLMENT_PAYMENTS,
+  "installment-sales": HOME_PAGE_UI.TITLE_INSTALLMENT_SALES,
+  "installment-moderation": HOME_PAGE_UI.TITLE_INSTALLMENT_MODERATION,
+  "installment-disputes": HOME_PAGE_UI.TITLE_INSTALLMENT_DISPUTES,
   notifications: HOME_PAGE_UI.TITLE_NOTIFICATIONS,
 };
 
@@ -80,9 +85,11 @@ const NON_CATALOG_VIEW_TITLES = {
  *   onCatalogSortChange: (value: string) => void;
  *   catalogFollowingOnly: boolean;
  *   catalogAuctionOnly: boolean;
+ *   catalogInstallmentOnly: boolean;
  *   catalogSaleOnly: boolean;
  *   onCatalogFollowingOnlyToggle: () => void;
  *   onCatalogAuctionOnlyToggle: () => void;
+ *   onCatalogInstallmentOnlyToggle: () => void;
  *   onCatalogSaleOnlyToggle: () => void;
  *   isAdmin: boolean;
  *   canModerateProducts?: boolean;
@@ -91,6 +98,8 @@ const NON_CATALOG_VIEW_TITLES = {
  *   myProductsTotal: number | null;
  *   sellerProductsLimit: number | null;
  *   pendingModerationCount?: number;
+ *   pendingInstallmentModerationCount?: number;
+ *   pendingInstallmentDisputesCount?: number;
  *   pendingProductReportsCount?: number;
  *   pendingDataConfirmationCount?: number;
  *   myProductsModerationFilter?: string;
@@ -123,9 +132,11 @@ export function HomePageHeader({
   onCatalogSortChange,
   catalogFollowingOnly,
   catalogAuctionOnly,
+  catalogInstallmentOnly,
   catalogSaleOnly,
   onCatalogFollowingOnlyToggle,
   onCatalogAuctionOnlyToggle,
+  onCatalogInstallmentOnlyToggle,
   onCatalogSaleOnlyToggle,
   isAdmin,
   canModerateProducts = false,
@@ -134,6 +145,8 @@ export function HomePageHeader({
   myProductsTotal,
   sellerProductsLimit,
   pendingModerationCount = 0,
+  pendingInstallmentModerationCount = 0,
+  pendingInstallmentDisputesCount = 0,
   pendingProductReportsCount = 0,
   pendingDataConfirmationCount = 0,
   myProductsModerationFilter = "",
@@ -189,6 +202,18 @@ export function HomePageHeader({
       pendingDataConfirmationCount > 0
     ) {
       return `${base} (${DATA_CONFIRMATION_PAGE_UI.TAB_BADGE(pendingDataConfirmationCount)})`;
+    }
+    if (
+      mainView === "installment-moderation" &&
+      pendingInstallmentModerationCount > 0
+    ) {
+      return `${base} (${INSTALLMENT_UI.TAB_BADGE(pendingInstallmentModerationCount)})`;
+    }
+    if (
+      mainView === "installment-disputes" &&
+      pendingInstallmentDisputesCount > 0
+    ) {
+      return `${base} (${INSTALLMENT_UI.TAB_BADGE(pendingInstallmentDisputesCount)})`;
     }
     return base;
   })();

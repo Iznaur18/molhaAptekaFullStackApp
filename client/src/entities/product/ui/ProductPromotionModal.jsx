@@ -98,13 +98,12 @@ export function ProductPromotionModal({
   }
 
   return (
-    <div className="product-promotion-modal__backdrop" onClick={onClose}>
+    <div className="product-promotion-modal__backdrop" role="presentation">
       <section
         className="product-promotion-modal"
         role="dialog"
         aria-modal="true"
         aria-label={PRODUCT_PROMOTION_UI.MODAL_TITLE}
-        onClick={(event) => event.stopPropagation()}
       >
         <header className="product-promotion-modal__header">
           <h3>{PRODUCT_PROMOTION_UI.MODAL_TITLE}</h3>

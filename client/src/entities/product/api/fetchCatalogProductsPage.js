@@ -14,6 +14,7 @@ import { CATALOG_PAGE_SIZE } from "../model/productConstants.js";
  *   includeHidden?: boolean;
  *   followingOnly?: boolean;
  *   auctionOnly?: boolean;
+ *   installmentOnly?: boolean;
  *   saleOnly?: boolean;
  * }} [options]
  * @returns {Promise<{
@@ -30,6 +31,7 @@ export async function fetchCatalogProductsPage({
   includeHidden = false,
   followingOnly = false,
   auctionOnly = false,
+  installmentOnly = false,
   saleOnly = false,
 } = {}) {
   try {
@@ -43,6 +45,7 @@ export async function fetchCatalogProductsPage({
         ...(includeHidden ? { includeHidden: "true" } : {}),
         ...(followingOnly ? { followingOnly: "true" } : {}),
         ...(auctionOnly ? { auctionOnly: "true" } : {}),
+        ...(installmentOnly ? { installmentOnly: "true" } : {}),
         ...(saleOnly ? { saleOnly: "true" } : {}),
       },
     });

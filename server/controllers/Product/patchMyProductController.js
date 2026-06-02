@@ -288,7 +288,7 @@ export const patchMyProductController = async (req, res) => {
         const product = await ProductModel.findOneAndUpdate(
             ownerFilter,
             { $set },
-            { new: true, runValidators: true },
+            { returnDocument: 'after', runValidators: true },
         )
             .populate("productSeller", PRODUCT_SELLER_PUBLIC_SELECT)
             .lean();

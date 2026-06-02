@@ -126,6 +126,11 @@ const OrderSchema = new mongoose.Schema(
             ref: 'ProductPriceOffer',
             default: null,
         },
+        installmentContractId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'InstallmentContract',
+            default: null,
+        },
     },
     { timestamps: true },
 );

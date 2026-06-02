@@ -10,6 +10,10 @@ import { getUserProductsController } from './User/getUserProductsController.js';
 import { makeOrderController } from './Order/makeOrderController.js';
 import { getMyOrdersController } from './Order/getMyOrdersController.js';
 import { getMySalesController } from './Order/getMySalesController.js';
+import {
+    getMyOrdersActionCountController,
+    getMySalesActionCountController,
+} from './Order/orderActionCountControllers.js';
 import { getAllOrdersController } from './Order/getAllOrdersController.js';
 import { updateOrderStatusController } from './Order/updateOrderStatusController.js';
 import {
@@ -52,6 +56,11 @@ import {
     rejectProductPriceOfferController,
     getSellerProductPriceOfferArchiveController,
 } from './Product/productPriceOfferControllers.js';
+import {
+    getIncomingPriceOffersController,
+    getIncomingPriceOffersPendingCountController,
+    getMyPriceOfferBidsController,
+} from './Product/priceOfferDashboardControllers.js';
 import {
     listProductReviewsController,
     getProductReviewSummaryController,
@@ -114,6 +123,34 @@ import {
     getPendingUserStoryReportsCountController,
     resolveUserStoryReportsController,
 } from './User/userStoryControllers.js';
+import {
+    getProductInstallmentProgramController,
+    upsertProductInstallmentProgramController,
+    getPendingInstallmentModerationController,
+    getPendingInstallmentModerationCountController,
+    approveInstallmentModerationController,
+    rejectInstallmentModerationController,
+} from './Product/productInstallmentControllers.js';
+import {
+    createInstallmentContractController,
+    getMyInstallmentContractsController,
+    getMyInstallmentSalesController,
+    getInstallmentBuyerActionCountController,
+    getInstallmentSellerActionCountController,
+    markInstallmentPaymentPaidController,
+    confirmInstallmentPaymentController,
+    rejectInstallmentPaymentController,
+    markInstallmentEarlyPayoffController,
+    rejectInstallmentEarlyPayoffController,
+    cancelInstallmentEarlyPayoffController,
+    confirmInstallmentEarlyPayoffController,
+    cancelInstallmentContractController,
+    sendInstallmentSellerMessageController,
+    openInstallmentDisputeController,
+    getPendingInstallmentDisputesController,
+    getPendingInstallmentDisputesCountController,
+    resolveInstallmentDisputeController,
+} from './Installment/installmentContractControllers.js';
 
 export {
     uploadController,
@@ -134,6 +171,8 @@ export {
     makeOrderController,
     getMyOrdersController,
     getMySalesController,
+    getMyOrdersActionCountController,
+    getMySalesActionCountController,
     getAllOrdersController,
     updateOrderStatusController,
     markOrderItemShippedBySellerController,
@@ -167,6 +206,9 @@ export {
     acceptProductPriceOfferController,
     rejectProductPriceOfferController,
     getSellerProductPriceOfferArchiveController,
+    getMyPriceOfferBidsController,
+    getIncomingPriceOffersController,
+    getIncomingPriceOffersPendingCountController,
     listProductReviewsController,
     getProductReviewSummaryController,
     submitProductReviewController,
@@ -217,4 +259,28 @@ export {
     getPendingUserStoryReportsController,
     getPendingUserStoryReportsCountController,
     resolveUserStoryReportsController,
+    getProductInstallmentProgramController,
+    upsertProductInstallmentProgramController,
+    getPendingInstallmentModerationController,
+    getPendingInstallmentModerationCountController,
+    approveInstallmentModerationController,
+    rejectInstallmentModerationController,
+    createInstallmentContractController,
+    getMyInstallmentContractsController,
+    getMyInstallmentSalesController,
+    getInstallmentBuyerActionCountController,
+    getInstallmentSellerActionCountController,
+    markInstallmentPaymentPaidController,
+    confirmInstallmentPaymentController,
+    rejectInstallmentPaymentController,
+    markInstallmentEarlyPayoffController,
+    rejectInstallmentEarlyPayoffController,
+    cancelInstallmentEarlyPayoffController,
+    confirmInstallmentEarlyPayoffController,
+    cancelInstallmentContractController,
+    sendInstallmentSellerMessageController,
+    openInstallmentDisputeController,
+    getPendingInstallmentDisputesController,
+    getPendingInstallmentDisputesCountController,
+    resolveInstallmentDisputeController,
 };

@@ -86,12 +86,7 @@ export function ProductImageLightbox({ onClose, imageUrls, startIndex = 0 }) {
           : PRODUCT_CARD_UI.IMAGE_LIGHTBOX_DIALOG_LABEL
       }
     >
-      <button
-        type="button"
-        className="product-image-lightbox__backdrop"
-        aria-label={PRODUCT_CARD_UI.IMAGE_LIGHTBOX_CLOSE}
-        onClick={onClose}
-      />
+      <div className="product-image-lightbox__backdrop" aria-hidden="true" />
       <div className="product-image-lightbox__surface">
         <button
           type="button"

@@ -17,6 +17,9 @@ import UserStoryModel from './UserStoryModel.js';
 import UserStoryViewModel from './UserStoryViewModel.js';
 import UserStoryReportModel from './UserStoryReportModel.js';
 import ProductCategoryDisplayModel from './ProductCategoryDisplayModel.js';
+import ProductInstallmentProgramModel from './ProductInstallmentProgramModel.js';
+import InstallmentContractModel from './InstallmentContractModel.js';
+import InstallmentDisputeModel from './InstallmentDisputeModel.js';
 
 export {
     UserModel,
@@ -38,4 +41,7 @@ export {
     UserStoryViewModel,
     UserStoryReportModel,
     ProductCategoryDisplayModel,
+    ProductInstallmentProgramModel,
+    InstallmentContractModel,
+    InstallmentDisputeModel,
 };

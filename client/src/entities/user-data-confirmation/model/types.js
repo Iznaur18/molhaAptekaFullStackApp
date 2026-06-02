@@ -16,6 +16,7 @@
  * @property {string} _id
  * @property {string} userId
  * @property {PassportSnapshot} passport
+ * @property {string} passportSelfiePhotoUrl
  * @property {'pending' | 'approved' | 'rejected'} status
  * @property {string} [staffNote]
  * @property {string} [createdAt]

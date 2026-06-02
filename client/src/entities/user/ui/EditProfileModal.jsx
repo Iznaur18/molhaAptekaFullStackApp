@@ -198,12 +198,7 @@ export function EditProfileModal({
         adminMode ? ADMIN_EDIT_USER_UI.TITLE : EDIT_PROFILE_MODAL_UI.ARIA_DIALOG
       }
     >
-      <button
-        type="button"
-        className="edit-profile-modal__backdrop"
-        aria-label={EDIT_PROFILE_MODAL_UI.ARIA_CLOSE_BACKDROP}
-        onClick={handleClose}
-      />
+      <div className="edit-profile-modal__backdrop" aria-hidden="true" />
       <div className="edit-profile-modal__card">
         <div className="edit-profile-modal__header">
           <h2 className="edit-profile-modal__title">

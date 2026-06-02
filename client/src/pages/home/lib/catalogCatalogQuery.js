@@ -8,6 +8,7 @@ export const CATALOG_QUERY_PARAM_SORT = "sort";
 export const CATALOG_QUERY_PARAM_CATEGORY = "category";
 export const CATALOG_QUERY_PARAM_FOLLOWING_ONLY = "followingOnly";
 export const CATALOG_QUERY_PARAM_AUCTION_ONLY = "auctionOnly";
+export const CATALOG_QUERY_PARAM_INSTALLMENT_ONLY = "installmentOnly";
 export const CATALOG_QUERY_PARAM_SALE_ONLY = "saleOnly";
 
 /**
@@ -43,9 +44,11 @@ export function parseCatalogQueryFromSearchParams(searchParams) {
     searchParams.get(CATALOG_QUERY_PARAM_FOLLOWING_ONLY) === "true";
   const auctionOnly =
     searchParams.get(CATALOG_QUERY_PARAM_AUCTION_ONLY) === "true";
+  const installmentOnly =
+    searchParams.get(CATALOG_QUERY_PARAM_INSTALLMENT_ONLY) === "true";
   const saleOnly = searchParams.get(CATALOG_QUERY_PARAM_SALE_ONLY) === "true";
 
-  return { sort, category, followingOnly, auctionOnly, saleOnly };
+  return { sort, category, followingOnly, auctionOnly, installmentOnly, saleOnly };
 }
 
 /**
@@ -54,6 +57,7 @@ export function parseCatalogQueryFromSearchParams(searchParams) {
  *   category: import("../../../entities/product/model/types.js").ProductCategory | null;
  *   followingOnly: boolean;
  *   auctionOnly: boolean;
+ *   installmentOnly: boolean;
  *   saleOnly: boolean;
  * }}
  */
@@ -62,6 +66,7 @@ export function buildCatalogSearchParams({
   category,
   followingOnly,
   auctionOnly,
+  installmentOnly,
   saleOnly,
 }) {
   const params = new URLSearchParams();
@@ -78,6 +83,9 @@ export function buildCatalogSearchParams({
   if (auctionOnly) {
     params.set(CATALOG_QUERY_PARAM_AUCTION_ONLY, "true");
   }
+  if (installmentOnly) {
+    params.set(CATALOG_QUERY_PARAM_INSTALLMENT_ONLY, "true");
+  }
   if (saleOnly) {
     params.set(CATALOG_QUERY_PARAM_SALE_ONLY, "true");
   }
@@ -93,6 +101,7 @@ export function buildCatalogSearchParams({
  *   category: import("../../../entities/product/model/types.js").ProductCategory | null;
  *   followingOnly: boolean;
  *   auctionOnly: boolean;
+ *   installmentOnly: boolean;
  *   saleOnly: boolean;
  * }} query
  */
@@ -101,6 +110,7 @@ export function buildCatalogBrowserSearchParams({
   category,
   followingOnly,
   auctionOnly,
+  installmentOnly,
   saleOnly,
 }) {
   const params = new URLSearchParams();
@@ -114,6 +124,9 @@ export function buildCatalogBrowserSearchParams({
   }
   if (auctionOnly) {
     params.set(CATALOG_QUERY_PARAM_AUCTION_ONLY, "true");
+  }
+  if (installmentOnly) {
+    params.set(CATALOG_QUERY_PARAM_INSTALLMENT_ONLY, "true");
   }
   if (saleOnly) {
     params.set(CATALOG_QUERY_PARAM_SALE_ONLY, "true");

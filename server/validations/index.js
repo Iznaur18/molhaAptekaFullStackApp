@@ -56,8 +56,24 @@ import {
     productCategorySlugParamValidation,
     patchProductCategoryDisplayValidation,
 } from './product/productCategoryDisplayValidation.js';
+import {
+    upsertProductInstallmentProgramValidation,
+    rejectInstallmentModerationValidation,
+    createInstallmentContractValidation,
+    installmentContractIdParamValidation,
+    installmentPaymentIndexParamValidation,
+    installmentSellerMessageValidation,
+    installmentDisputeValidation,
+    installmentDisputeIdParamValidation,
+    resolveInstallmentDisputeValidation,
+    installmentCancelValidation,
+} from './product/installmentValidation.js';
+import {
+    getMyInstallmentContractsListValidation,
+    getMyInstallmentSalesValidation,
+} from './product/getMyInstallmentSalesValidation.js';
 
-export { 
+export {
     loginUserValidation, 
     registerUserValidation, 
     telegramAuthValidation,
@@ -105,4 +121,16 @@ export {
     resolveUserStoryReportsValidation,
     productCategorySlugParamValidation,
     patchProductCategoryDisplayValidation,
+    upsertProductInstallmentProgramValidation,
+    rejectInstallmentModerationValidation,
+    createInstallmentContractValidation,
+    installmentContractIdParamValidation,
+    installmentPaymentIndexParamValidation,
+    installmentSellerMessageValidation,
+    installmentDisputeValidation,
+    installmentDisputeIdParamValidation,
+    resolveInstallmentDisputeValidation,
+    installmentCancelValidation,
+    getMyInstallmentContractsListValidation,
+    getMyInstallmentSalesValidation,
 };

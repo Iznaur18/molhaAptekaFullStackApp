@@ -1,6 +1,7 @@
 import {
   CATALOG_FILTER_AUCTION_ONLY,
   CATALOG_FILTER_FOLLOWING_ONLY,
+  CATALOG_FILTER_INSTALLMENT_ONLY,
   CATALOG_FILTER_SALE_ONLY,
   CATALOG_PUBLIC_FILTER_TOGGLE_KEYS,
   CATALOG_SORT_LABEL_RU,
@@ -29,7 +30,11 @@ import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
  *   | {
  *       type: 'filter';
  *       key: string;
- *       value: typeof CATALOG_FILTER_FOLLOWING_ONLY | typeof CATALOG_FILTER_AUCTION_ONLY | typeof CATALOG_FILTER_SALE_ONLY;
+ *       value:
+ *         | typeof CATALOG_FILTER_FOLLOWING_ONLY
+ *         | typeof CATALOG_FILTER_AUCTION_ONLY
+ *         | typeof CATALOG_FILTER_INSTALLMENT_ONLY
+ *         | typeof CATALOG_FILTER_SALE_ONLY;
  *       label: string;
  *     }
  * )} CatalogFilterDropdownItem
@@ -75,6 +80,7 @@ export function buildCatalogFilterDropdownItems() {
  *   catalogSort: string;
  *   catalogFollowingOnly: boolean;
  *   catalogAuctionOnly: boolean;
+ *   catalogInstallmentOnly: boolean;
  *   catalogSaleOnly: boolean;
  * }} state
  */
@@ -86,6 +92,7 @@ export function isCatalogFilterDropdownItemSelected(item, state) {
     return (
       !state.catalogFollowingOnly &&
       !state.catalogAuctionOnly &&
+      !state.catalogInstallmentOnly &&
       !state.catalogSaleOnly &&
       state.catalogSort === item.value
     );
@@ -95,6 +102,9 @@ export function isCatalogFilterDropdownItemSelected(item, state) {
   }
   if (item.value === CATALOG_FILTER_SALE_ONLY) {
     return state.catalogSaleOnly;
+  }
+  if (item.value === CATALOG_FILTER_INSTALLMENT_ONLY) {
+    return state.catalogInstallmentOnly;
   }
   return state.catalogAuctionOnly;
 }

@@ -1,0 +1,226 @@
+.auction-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.auction-dashboard__section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.auction-dashboard__section-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.auction-dashboard__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.auction-dashboard__state {
+  margin: 0;
+  font-size: 1rem;
+  color: #4b5563;
+}
+
+.auction-dashboard__state_error {
+  color: #b42318;
+}
+
+.auction-dashboard-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.6rem;
+  background: #fff;
+}
+
+.auction-dashboard-row__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.auction-dashboard-row__thumb {
+  flex: 0 0 auto;
+  width: 3.25rem;
+  height: 3.25rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.45rem;
+  object-fit: cover;
+  background: #f3f4f6;
+}
+
+.auction-dashboard-row__thumb_placeholder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  font-size: 0.7rem;
+}
+
+.auction-dashboard-row__main {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.auction-dashboard-row__title {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #1d4ed8;
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.auction-dashboard-row__title:hover {
+  text-decoration: underline;
+}
+
+.auction-dashboard-row__title_static {
+  margin: 0;
+  font-weight: 600;
+  color: #111827;
+}
+
+.auction-dashboard-row__meta {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.auction-dashboard-row__price {
+  flex: 0 0 auto;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+  white-space: nowrap;
+}
+
+.auction-dashboard-row__status {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.auction-dashboard-row__status_pending {
+  color: #92400e;
+}
+
+.auction-dashboard-row__status_accepted {
+  color: #047857;
+}
+
+.auction-dashboard-row__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.45rem 0.55rem;
+}
+
+.auction-dashboard-row__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin: 0;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.auction-dashboard-row__input {
+  width: 100%;
+  max-width: 12rem;
+  padding: 0.4rem 0.55rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.4rem;
+  font: inherit;
+  font-size: 0.875rem;
+  line-height: 1.25;
+  box-sizing: border-box;
+}
+
+.auction-dashboard-row__btn {
+  flex: 0 0 auto;
+  align-self: flex-end;
+  margin: 0;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.4rem;
+  background: #fff;
+  color: #111827;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.auction-dashboard-row__btn:hover:not(:disabled) {
+  background: #f9fafb;
+}
+
+.auction-dashboard-row__btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.auction-dashboard-row__btn_primary {
+  border-color: #1d4ed8;
+  background: #2563eb;
+  color: #fff;
+}
+
+.auction-dashboard-row__btn_primary:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.auction-dashboard-row__btn_reject {
+  border-color: #fecaca;
+  color: #b42318;
+}
+
+.auction-dashboard-row__btn_reject:hover:not(:disabled) {
+  background: #fef2f2;
+}
+
+.auction-dashboard-row__error {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #b42318;
+}
+
+.auction-dashboard-row__buyer-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #1d4ed8;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auction-dashboard-row__buyer-link:hover {
+  text-decoration: underline;
+}
+
+.auction-dashboard-row__checkout {
+  margin-top: 0.25rem;
+}

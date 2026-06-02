@@ -1,0 +1,9 @@
+.auction-page__state {
+  margin: 0;
+  font-size: 1rem;
+  color: #4b5563;
+}
+
+.auction-page__state_error {
+  color: #b42318;
+}

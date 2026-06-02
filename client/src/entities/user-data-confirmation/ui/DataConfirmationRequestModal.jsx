@@ -10,16 +10,20 @@ import {
   USER_DATA_CONFIRMATION_STATUS_PENDING,
   USER_DATA_CONFIRMATION_STATUS_REJECTED,
 } from "../model/constants.js";
+import { uploadImage } from "../../../shared/api/uploadImage.js";
 import {
   DATA_CONFIRMATION_MODAL_UI,
   DATA_CONFIRMATION_PAGE_UI,
   USER_DETAILS_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
+import { UPLOAD_FILE_INPUT_ACCEPT } from "../../../shared/config/uploadConstants.js";
 import {
   INTEGER_INPUT_FIELD_PROPS,
   keepDigitsOnly,
 } from "../../../shared/lib/numericInput.js";
+import { resolveImageUrlForDisplay } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
+import { validateUploadImageFile } from "../../../shared/lib/validateUploadImageFile.js";
 import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
 
 import "./DataConfirmationRequestModal.css";
@@ -43,8 +47,24 @@ export function DataConfirmationRequestModal({
   );
   const [staffNote, setStaffNote] = useState("");
   const [form, setForm] = useState(emptyPassportForm);
+  const [selfieFile, setSelfieFile] = useState(/** @type {File | null} */ (null));
+  const [selfiePreviewUrl, setSelfiePreviewUrl] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!selfieFile) {
+      setSelfiePreviewUrl("");
+      return undefined;
+    }
+
+    const objectUrl = URL.createObjectURL(selfieFile);
+    setSelfiePreviewUrl(objectUrl);
+
+    return () => {
+      URL.revokeObjectURL(objectUrl);
+    };
+  }, [selfieFile]);
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -52,6 +72,7 @@ export function DataConfirmationRequestModal({
     let isCancelled = false;
     setPhase("loading");
     setError("");
+    setSelfieFile(null);
 
     void (async () => {
       try {
@@ -93,19 +114,43 @@ export function DataConfirmationRequestModal({
       setError(validationError);
       return;
     }
+    if (!selfieFile) {
+      setError(DATA_CONFIRMATION_MODAL_UI.ERROR_PASSPORT_SELFIE_REQUIRED);
+      return;
+    }
+
+    const fileError = validateUploadImageFile(selfieFile);
+    if (fileError) {
+      setError(fileError);
+      return;
+    }
 
     setIsSubmitting(true);
     setError("");
     try {
+      let passportSelfiePhotoUrl;
+      try {
+        passportSelfiePhotoUrl = await uploadImage(selfieFile);
+      } catch (uploadError) {
+        throw new Error(
+          uploadError instanceof Error
+            ? uploadError.message
+            : DATA_CONFIRMATION_MODAL_UI.ERROR_PASSPORT_SELFIE_UPLOAD,
+        );
+      }
+
       await submitDataConfirmationRequest({
-        ...form,
-        lastName: form.lastName.trim(),
-        firstName: form.firstName.trim(),
-        middleName: form.middleName.trim(),
-        series: form.series.trim(),
-        number: form.number.trim(),
-        issuedBy: form.issuedBy.trim(),
-        departmentCode: form.departmentCode.trim(),
+        passport: {
+          ...form,
+          lastName: form.lastName.trim(),
+          firstName: form.firstName.trim(),
+          middleName: form.middleName.trim(),
+          series: form.series.trim(),
+          number: form.number.trim(),
+          issuedBy: form.issuedBy.trim(),
+          departmentCode: form.departmentCode.trim(),
+        },
+        passportSelfiePhotoUrl,
       });
       onSubmitted?.();
       onClose();
@@ -120,18 +165,35 @@ export function DataConfirmationRequestModal({
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
+  const handleSelfieFileChange = (event) => {
+    const file = event.target.files?.[0] ?? null;
+    event.target.value = "";
+    if (!file) {
+      setSelfieFile(null);
+      return;
+    }
+
+    const fileError = validateUploadImageFile(file);
+    if (fileError) {
+      setError(fileError);
+      setSelfieFile(null);
+      return;
+    }
+
+    setError("");
+    setSelfieFile(file);
+  };
+
   return createPortal(
     <div
       className="data-confirmation-modal__backdrop"
       role="presentation"
-      onClick={onClose}
     >
       <div
         className="data-confirmation-modal"
         role="dialog"
         aria-modal="true"
         aria-labelledby="data-confirmation-modal-title"
-        onClick={(e) => e.stopPropagation()}
       >
         <header className="data-confirmation-modal__header">
           <h2 id="data-confirmation-modal-title">
@@ -276,6 +338,27 @@ export function DataConfirmationRequestModal({
                   />
                 </label>
               </div>
+
+              <label className="data-confirmation-modal__selfie">
+                <span>{DATA_CONFIRMATION_MODAL_UI.LABEL_PASSPORT_SELFIE}</span>
+                <span className="data-confirmation-modal__selfie-hint">
+                  {DATA_CONFIRMATION_MODAL_UI.HINT_PASSPORT_SELFIE}
+                </span>
+                <input
+                  type="file"
+                  accept={UPLOAD_FILE_INPUT_ACCEPT}
+                  onChange={handleSelfieFileChange}
+                  disabled={isSubmitting}
+                />
+                {selfiePreviewUrl ? (
+                  <img
+                    className="data-confirmation-modal__selfie-preview"
+                    src={resolveImageUrlForDisplay(selfiePreviewUrl)}
+                    alt=""
+                  />
+                ) : null}
+              </label>
+
               {error ? (
                 <p className="data-confirmation-modal__state_error" role="alert">
                   {error}

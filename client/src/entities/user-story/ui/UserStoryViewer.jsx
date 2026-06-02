@@ -8,6 +8,8 @@ import {
   resolveUserStoryAvatarUrl,
   resolveUserStoryMediaUrl,
 } from "../lib/resolveUserStoryMedia.js";
+import { useUserStoryMediaLoadState } from "../lib/useUserStoryMediaLoadState.js";
+import { useUserStoryVideoPlayback } from "../lib/useUserStoryVideoPlayback.js";
 import { USER_STORY_MEDIA_TYPE_IMAGE, USER_STORY_MEDIA_TYPE_VIDEO, USER_STORY_IMAGE_VIEW_DURATION_MS } from "../model/constants.js";
 import { ReportUserStoryModal } from "./ReportUserStoryModal.jsx";
 
@@ -47,6 +49,40 @@ export function UserStoryViewer({
   const authorId = String(author._id);
   const isOwn = currentUserId != null && authorId === String(currentUserId);
   const activeStory = stories[activeIndex] ?? null;
+  const advanceStoryOrClose = useCallback(() => {
+    if (activeIndex < stories.length - 1) {
+      setActiveIndex((index) => index + 1);
+      return;
+    }
+    onClose();
+  }, [activeIndex, onClose, stories.length]);
+
+  const isStoryMediaActive = isOpen && phase === "ready" && activeStory != null && !isReportOpen;
+  const {
+    isMediaLoading,
+    hasMediaError,
+    isMediaReady,
+    markMediaLoading,
+    markMediaReady,
+    markMediaError,
+    handleImageLoad,
+    handleImageError,
+  } = useUserStoryMediaLoadState({
+    storyId: activeStory?._id,
+    mediaType: activeStory?.mediaType,
+    isActive: isStoryMediaActive,
+  });
+
+  const isVideoStoryReady =
+    isStoryMediaActive && activeStory?.mediaType === USER_STORY_MEDIA_TYPE_VIDEO;
+  const { videoRef, resumeIfPaused } = useUserStoryVideoPlayback({
+    enabled: isVideoStoryReady,
+    storyId: activeStory?._id,
+    onEnded: advanceStoryOrClose,
+    onMediaLoading: markMediaLoading,
+    onMediaReady: markMediaReady,
+    onMediaError: markMediaError,
+  });
 
   const loadStories = useCallback(async () => {
     setPhase("loading");
@@ -83,30 +119,24 @@ export function UserStoryViewer({
       phase !== "ready" ||
       !activeStory ||
       isReportOpen ||
-      activeStory.mediaType !== USER_STORY_MEDIA_TYPE_IMAGE
+      activeStory.mediaType !== USER_STORY_MEDIA_TYPE_IMAGE ||
+      !isMediaReady
     ) {
       return;
     }
 
-    const timerId = window.setTimeout(() => {
-      if (activeIndex < stories.length - 1) {
-        setActiveIndex((index) => index + 1);
-        return;
-      }
-      onClose();
-    }, USER_STORY_IMAGE_VIEW_DURATION_MS);
+    const timerId = window.setTimeout(advanceStoryOrClose, USER_STORY_IMAGE_VIEW_DURATION_MS);
 
     return () => {
       window.clearTimeout(timerId);
     };
   }, [
-    activeIndex,
     activeStory,
+    advanceStoryOrClose,
+    isMediaReady,
     isOpen,
     isReportOpen,
-    onClose,
     phase,
-    stories.length,
   ]);
 
   const handlePrev = () => {
@@ -173,7 +203,10 @@ export function UserStoryViewer({
               />
             ) : null}
 
-            <div className="user-story-viewer__frame">
+            <div
+              className="user-story-viewer__frame"
+              onPointerDown={isVideoStoryReady ? resumeIfPaused : undefined}
+            >
               <button
                 type="button"
                 className="user-story-viewer__close"
@@ -204,19 +237,48 @@ export function UserStoryViewer({
                 </button>
               </header>
 
+              {isMediaLoading ? (
+                <div className="user-story-viewer__media-state" aria-live="polite">
+                  <span className="user-story-viewer__spinner" aria-hidden />
+                  <p className="user-story-viewer__media-state-text">
+                    {USER_STORY_UI.MEDIA_LOADING}
+                  </p>
+                </div>
+              ) : null}
+
+              {hasMediaError ? (
+                <div
+                  className="user-story-viewer__media-state user-story-viewer__media-state_error"
+                  role="alert"
+                >
+                  <p className="user-story-viewer__media-state-text">
+                    {USER_STORY_UI.MEDIA_LOAD_ERROR}
+                  </p>
+                </div>
+              ) : null}
+
               {activeStory.mediaType === USER_STORY_MEDIA_TYPE_VIDEO ? (
                 <video
-                  className="user-story-viewer__media"
+                  ref={videoRef}
+                  className={
+                    isMediaLoading
+                      ? "user-story-viewer__media user-story-viewer__media_hidden"
+                      : "user-story-viewer__media"
+                  }
                   src={resolveUserStoryMediaUrl(activeStory.mediaUrl)}
-                  autoPlay
                   playsInline
-                  controls
                 />
               ) : (
                 <img
-                  className="user-story-viewer__media"
+                  className={
+                    isMediaLoading
+                      ? "user-story-viewer__media user-story-viewer__media_hidden"
+                      : "user-story-viewer__media"
+                  }
                   src={resolveUserStoryMediaUrl(activeStory.mediaUrl)}
                   alt=""
+                  onLoad={handleImageLoad}
+                  onError={handleImageError}
                 />
               )}
 

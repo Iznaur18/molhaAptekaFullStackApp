@@ -21,6 +21,8 @@ const DEV_API_PROXY_PREFIXES = [
   "/vote",
   "/order",
   "/product",
+  "/installment",
+  "/price-offers",
   "/address",
   "/uploads",
   "/upload",

@@ -22,6 +22,7 @@ import "./MyOrdersPage.css";
  *   currentUserId?: string | null;
  *   onSellerNameClick?: (userId: string) => void;
  *   onRequestLogin?: () => void;
+ *   onQueueChanged?: () => void;
  * }} props
  */
 export function MyOrdersPage({
@@ -29,6 +30,7 @@ export function MyOrdersPage({
   currentUserId = null,
   onSellerNameClick,
   onRequestLogin = () => {},
+  onQueueChanged,
 }) {
   const [phase, setPhase] = useState("loading");
   const [orders, setOrders] = useState(
@@ -126,6 +128,7 @@ export function MyOrdersPage({
       setOrders((prev) =>
         prev.map((order) => (order._id === orderId ? updatedOrder : order)),
       );
+      onQueueChanged?.();
       void reloadOrders();
     } catch (e) {
       const message =

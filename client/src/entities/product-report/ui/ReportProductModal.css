@@ -12,9 +12,7 @@
 .report-product-modal__backdrop {
   position: absolute;
   inset: 0;
-  border: 0;
   background: rgba(17, 24, 39, 0.55);
-  cursor: pointer;
 }
 
 .report-product-modal__card {

@@ -9,6 +9,7 @@ import { mainViewToPathname } from "../../../shared/lib/homeMainViewPaths.js";
  *   category: import("../../product/model/types.js").ProductCategory | null;
  *   followingOnly: boolean;
  *   auctionOnly: boolean;
+ *   installmentOnly?: boolean;
  *   saleOnly: boolean;
  * }} query
  */

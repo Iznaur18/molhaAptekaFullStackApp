@@ -421,10 +421,14 @@ export const userDeleteProfileController = async (req, res) => {
             return errorRes(res, 404, 'Пользователь для удаления не найден');
         }
 
-        const isCurrentUserOwner = String(currentUserId) === String(targetUserId); // текущий пользователь является владельцем удаляемого профиля
-        const isCurrentUserAdmin = currentUserRole.userRole === 'admin'; // текущий пользователь является администратором
+        const isCurrentUserOwner = String(currentUserId) === String(targetUserId);
+        const isCurrentUserAdmin = currentUserRole.userRole === 'admin';
 
-        if (!isCurrentUserOwner && !isCurrentUserAdmin) {
+        if (isCurrentUserOwner) {
+            return errorRes(res, 403, 'Нельзя удалить свой аккаунт');
+        }
+
+        if (!isCurrentUserAdmin) {
             return errorRes(res, 403, 'У вас нет прав на удаление этого профиля');
         }
 

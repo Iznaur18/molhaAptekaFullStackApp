@@ -7,6 +7,7 @@ import { CART_STORAGE_KEY } from "../../../entities/order/model/constants.js";
 import { deleteMyProduct } from "../../../entities/product/api/deleteMyProduct.js";
 import { patchMyProduct } from "../../../entities/product/api/patchMyProduct.js";
 import { fetchCatalogProductsPage } from "../../../entities/product/api/fetchCatalogProductsPage.js";
+import { fetchCatalogProductById } from "../../../entities/product/api/fetchCatalogProductById.js";
 import { fetchMyProductsPage } from "../../../entities/product/api/fetchMyProducts.js";
 import { fetchProductPromotionTariffs } from "../../../entities/product/api/fetchProductPromotionTariffs.js";
 import {
@@ -66,6 +67,20 @@ import {
 import { ProductModerationPage } from "../../product-moderation/ui/ProductModerationPage.jsx";
 import { ProductReportsPage } from "../../product-reports/ui/ProductReportsPage.jsx";
 import { DataConfirmationRequestsPage } from "../../data-confirmation-requests/ui/DataConfirmationRequestsPage.jsx";
+import { InstallmentPaymentsPage } from "../../installment-payments/ui/InstallmentPaymentsPage.jsx";
+import { InstallmentSalesPage } from "../../installment-sales/ui/InstallmentSalesPage.jsx";
+import { InstallmentModerationPage } from "../../installment-moderation/ui/InstallmentModerationPage.jsx";
+import { InstallmentDisputesPage } from "../../installment-disputes/ui/InstallmentDisputesPage.jsx";
+import { AuctionPage } from "../../auction/ui/AuctionPage.jsx";
+import { fetchIncomingPriceOffersPendingCount } from "../../../entities/product-price-offer/api/fetchIncomingPriceOffersPendingCount.js";
+import {
+  fetchPendingInstallmentDisputesCount,
+  fetchPendingInstallmentModerationCount,
+  fetchInstallmentBuyerActionCount,
+  fetchInstallmentSellerActionCount,
+} from "../../../entities/installment/api/installmentApi.js";
+import { fetchMyOrdersActionCount } from "../../../entities/order/api/fetchMyOrdersActionCount.js";
+import { fetchMySalesActionCount } from "../../../entities/order/api/fetchMySalesActionCount.js";
 import { fetchPendingModerationProductsCount } from "../../../entities/product/api/fetchPendingModerationProductsCount.js";
 import { fetchPendingProductReportsCount } from "../../../entities/product-report/api/fetchPendingProductReportsCount.js";
 import { fetchPendingUserStoryReportsCount } from "../../../entities/user-story/api/fetchPendingUserStoryReportsCount.js";
@@ -85,6 +100,7 @@ import {
   PROFILE_TAB_ADMIN_ORDERS,
   PROFILE_TAB_DATA_CONFIRMATION_REQUESTS,
   PROFILE_TAB_MY_ORDERS,
+  PROFILE_TAB_AUCTION,
   PROFILE_TAB_MY_PRODUCTS,
   PROFILE_TAB_MY_SALES,
   PROFILE_TAB_OVERVIEW,
@@ -93,6 +109,10 @@ import {
   PROFILE_TAB_PRODUCT_PROMOTIONS,
   PROFILE_TAB_RAFFLES,
   PROFILE_TAB_SUBSCRIPTIONS,
+  PROFILE_TAB_INSTALLMENT_PAYMENTS,
+  PROFILE_TAB_INSTALLMENT_SALES,
+  PROFILE_TAB_INSTALLMENT_MODERATION,
+  PROFILE_TAB_INSTALLMENT_DISPUTES,
 } from "../../my-profile/lib/profileTabs.js";
 import { MyProfilePage } from "../../my-profile/ui/MyProfilePage.jsx";
 import { MySalesPage } from "../../my-sales/ui/MySalesPage.jsx";
@@ -154,7 +174,7 @@ import "./HomePage.css";
 
 /** @typedef {import('../../../entities/product/model/types.js').ProductFromApi} ProductFromApi */
 /** @typedef {{ open: boolean; phase: 'idle'|'loading'|'success'|'error'; user: import('../../../entities/user/model/types.js').UserPublicProfile | null; error: string }} ProfileModalState */
-/** @typedef {'catalog' | 'catalog-browser' | 'my-profile' | 'my-products' | 'users' | 'subscriptions' | 'notifications' | 'cart' | 'my-sales' | 'my-orders' | 'admin-orders' | 'product-moderation' | 'product-reports' | 'data-confirmation-requests'} HomeMainView */
+/** @typedef {'catalog' | 'catalog-browser' | 'my-profile' | 'my-products' | 'users' | 'subscriptions' | 'notifications' | 'cart' | 'my-sales' | 'my-orders' | 'admin-orders' | 'product-moderation' | 'product-reports' | 'data-confirmation-requests' | 'installment-payments' | 'installment-sales' | 'installment-moderation' | 'installment-disputes'} HomeMainView */
 
 const EMPTY_PROFILE_MODAL = Object.freeze({
   open: false,
@@ -410,6 +430,14 @@ export function HomePage() {
     }
     if (mainView === "data-confirmation-requests" && !canModerateProducts) {
       goToMainView("catalog");
+      return;
+    }
+    if (mainView === "installment-moderation" && !canModerateProducts) {
+      goToMainView("catalog");
+      return;
+    }
+    if (mainView === "installment-disputes" && !canModerateProducts) {
+      goToMainView("catalog");
     }
   }, [
     mainView,
@@ -481,6 +509,9 @@ export function HomePage() {
   const [catalogAuctionOnly, setCatalogAuctionOnly] = useState(
     () => initialCatalogQuery?.auctionOnly ?? false,
   );
+  const [catalogInstallmentOnly, setCatalogInstallmentOnly] = useState(
+    () => initialCatalogQuery?.installmentOnly ?? false,
+  );
   const [catalogSaleOnly, setCatalogSaleOnly] = useState(
     () => initialCatalogQuery?.saleOnly ?? false,
   );
@@ -488,6 +519,8 @@ export function HomePage() {
   const [isAdminDeleteUserOpen, setIsAdminDeleteUserOpen] = useState(false);
   /** @type {[ProductFromApi | null, import('react').Dispatch<import('react').SetStateAction<ProductFromApi | null>>]} */
   const [catalogProductDetails, setCatalogProductDetails] = useState(null);
+  const [catalogProductDetailsTab, setCatalogProductDetailsTab] =
+    useState(/** @type {'details' | 'auction' | 'reviews' | 'installment'} */ ("details"));
   const [productDetailsAdminError, setProductDetailsAdminError] = useState("");
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [pendingModerationCount, setPendingModerationCount] = useState(0);
@@ -498,6 +531,19 @@ export function HomePage() {
   const [pendingProductPromotionsCount, setPendingProductPromotionsCount] =
     useState(0);
   const [pendingRafflesCount, setPendingRafflesCount] = useState(0);
+  const [pendingInstallmentModerationCount, setPendingInstallmentModerationCount] =
+    useState(0);
+  const [pendingInstallmentDisputesCount, setPendingInstallmentDisputesCount] =
+    useState(0);
+  const [pendingIncomingPriceOffersCount, setPendingIncomingPriceOffersCount] =
+    useState(0);
+  const [pendingMySalesActionCount, setPendingMySalesActionCount] = useState(0);
+  const [pendingMyOrdersActionCount, setPendingMyOrdersActionCount] =
+    useState(0);
+  const [pendingInstallmentBuyerActionCount, setPendingInstallmentBuyerActionCount] =
+    useState(0);
+  const [pendingInstallmentSellerActionCount, setPendingInstallmentSellerActionCount] =
+    useState(0);
   const [featuredRaffles, setFeaturedRaffles] = useState(
     /** @type {import('../../../entities/raffle/model/types.js').RaffleFromApi[]} */ ([]),
   );
@@ -555,6 +601,81 @@ export function HomePage() {
   useEffect(() => {
     void refreshPendingRafflesCount();
   }, [refreshPendingRafflesCount, mainView]);
+
+  const refreshPendingInstallmentModerationCount = useCallback(async () => {
+    if (!canModerateProducts || !isAuthorized) {
+      setPendingInstallmentModerationCount(0);
+      return;
+    }
+    try {
+      const count = await fetchPendingInstallmentModerationCount();
+      setPendingInstallmentModerationCount(count);
+    } catch {
+      setPendingInstallmentModerationCount(0);
+    }
+  }, [canModerateProducts, isAuthorized]);
+
+  useEffect(() => {
+    void refreshPendingInstallmentModerationCount();
+  }, [refreshPendingInstallmentModerationCount, mainView]);
+
+  const refreshPendingInstallmentDisputesCount = useCallback(async () => {
+    if (!canModerateProducts || !isAuthorized) {
+      setPendingInstallmentDisputesCount(0);
+      return;
+    }
+    try {
+      const count = await fetchPendingInstallmentDisputesCount();
+      setPendingInstallmentDisputesCount(count);
+    } catch {
+      setPendingInstallmentDisputesCount(0);
+    }
+  }, [canModerateProducts, isAuthorized]);
+
+  useEffect(() => {
+    void refreshPendingInstallmentDisputesCount();
+  }, [refreshPendingInstallmentDisputesCount, mainView]);
+
+  const refreshUserProfileActionBadgeCounts = useCallback(async () => {
+    if (!isAuthorized) {
+      setPendingIncomingPriceOffersCount(0);
+      setPendingMySalesActionCount(0);
+      setPendingMyOrdersActionCount(0);
+      setPendingInstallmentBuyerActionCount(0);
+      setPendingInstallmentSellerActionCount(0);
+      return;
+    }
+    try {
+      const [
+        auctionCount,
+        mySalesCount,
+        myOrdersCount,
+        installmentBuyerCount,
+        installmentSellerCount,
+      ] = await Promise.all([
+        fetchIncomingPriceOffersPendingCount(),
+        fetchMySalesActionCount(),
+        fetchMyOrdersActionCount(),
+        fetchInstallmentBuyerActionCount(),
+        fetchInstallmentSellerActionCount(),
+      ]);
+      setPendingIncomingPriceOffersCount(auctionCount);
+      setPendingMySalesActionCount(mySalesCount);
+      setPendingMyOrdersActionCount(myOrdersCount);
+      setPendingInstallmentBuyerActionCount(installmentBuyerCount);
+      setPendingInstallmentSellerActionCount(installmentSellerCount);
+    } catch {
+      setPendingIncomingPriceOffersCount(0);
+      setPendingMySalesActionCount(0);
+      setPendingMyOrdersActionCount(0);
+      setPendingInstallmentBuyerActionCount(0);
+      setPendingInstallmentSellerActionCount(0);
+    }
+  }, [isAuthorized]);
+
+  useEffect(() => {
+    void refreshUserProfileActionBadgeCounts();
+  }, [refreshUserProfileActionBadgeCounts, mainView, isAuthorized]);
 
   const refreshFeaturedRaffle = useCallback(async () => {
     if (!isHomeCatalogMainView) {
@@ -868,6 +989,10 @@ export function HomePage() {
   const handleCatalogSaleOnlyToggle = useCallback(() => {
     setCatalogSaleOnly((prev) => !prev);
   }, []);
+
+  const handleCatalogInstallmentOnlyToggle = useCallback(() => {
+    setCatalogInstallmentOnly((prev) => !prev);
+  }, []);
   const isProductSearchPending =
     productSearchTerm !== debouncedProductSearchTerm;
   const hasProductSearchQuery = debouncedProductSearchTerm.trim() !== "";
@@ -921,6 +1046,9 @@ export function HomePage() {
     setCatalogAuctionOnly((prev) =>
       prev === parsed.auctionOnly ? prev : parsed.auctionOnly,
     );
+    setCatalogInstallmentOnly((prev) =>
+      prev === parsed.installmentOnly ? prev : parsed.installmentOnly,
+    );
     setCatalogSaleOnly((prev) =>
       prev === parsed.saleOnly ? prev : parsed.saleOnly,
     );
@@ -936,6 +1064,7 @@ export function HomePage() {
         mainView === "catalog-browser" ? selectedProductCategory : null,
       followingOnly: catalogFollowingOnly,
       auctionOnly: catalogAuctionOnly,
+      installmentOnly: catalogInstallmentOnly,
       saleOnly: catalogSaleOnly,
     });
     const current = new URLSearchParams(location.search);
@@ -956,6 +1085,7 @@ export function HomePage() {
     selectedProductCategory,
     catalogFollowingOnly,
     catalogAuctionOnly,
+    catalogInstallmentOnly,
     catalogSaleOnly,
     navigate,
   ]);
@@ -1135,7 +1265,9 @@ export function HomePage() {
       activeProfileTab === PROFILE_TAB_PRODUCT_REPORTS ||
       activeProfileTab === PROFILE_TAB_PRODUCT_PROMOTIONS ||
       activeProfileTab === PROFILE_TAB_RAFFLES ||
-      activeProfileTab === PROFILE_TAB_DATA_CONFIRMATION_REQUESTS;
+      activeProfileTab === PROFILE_TAB_DATA_CONFIRMATION_REQUESTS ||
+      activeProfileTab === PROFILE_TAB_INSTALLMENT_MODERATION ||
+      activeProfileTab === PROFILE_TAB_INSTALLMENT_DISPUTES;
     if ((requiresAdminTab && !isAdmin) || (requiresStaffTab && !canModerateProducts)) {
       setMyProfileTab(PROFILE_TAB_OVERVIEW);
     }
@@ -1223,6 +1355,7 @@ export function HomePage() {
           canModerateProducts && !isMineMode && showHiddenCatalogProducts,
         followingOnly: catalogQueryFromUrl.followingOnly,
         auctionOnly: catalogQueryFromUrl.auctionOnly,
+        installmentOnly: catalogQueryFromUrl.installmentOnly,
         saleOnly: catalogQueryFromUrl.saleOnly,
       });
     },
@@ -1239,6 +1372,7 @@ export function HomePage() {
       showHiddenCatalogProducts,
       catalogFollowingOnly,
       catalogAuctionOnly,
+      catalogInstallmentOnly,
       catalogSaleOnly,
     ],
   );
@@ -1414,6 +1548,29 @@ export function HomePage() {
     })();
   };
 
+  /** @param {string} productId */
+  const handleCatalogProductClick = (productId) => {
+    setCatalogProductDetailsTab("details");
+    const inList = products.find((row) => String(row._id) === String(productId));
+    if (inList) {
+      setCatalogProductDetails(inList);
+      return;
+    }
+
+    void (async () => {
+      try {
+        const product = await fetchCatalogProductById(productId);
+        setCatalogProductDetails(product);
+      } catch {
+        // модалка не открывается
+      }
+    })();
+  };
+
+  const handleAuctionFromProfile = () => {
+    setMyProfileTab(PROFILE_TAB_AUCTION);
+  };
+
   const handleProductCategorySelect = (category) => {
     setSelectedProductCategory(category);
     setIsProductCategoryListOpen(false);
@@ -1454,6 +1611,7 @@ export function HomePage() {
           category: categorySlug,
           followingOnly: false,
           auctionOnly: false,
+          installmentOnly: false,
           saleOnly: false,
         }),
       );
@@ -1624,6 +1782,22 @@ export function HomePage() {
 
   const handleMySalesFromProfile = () => {
     setMyProfileTab(PROFILE_TAB_MY_SALES);
+  };
+
+  const handleInstallmentPaymentsFromProfile = () => {
+    setMyProfileTab(PROFILE_TAB_INSTALLMENT_PAYMENTS);
+  };
+
+  const handleInstallmentSalesFromProfile = () => {
+    setMyProfileTab(PROFILE_TAB_INSTALLMENT_SALES);
+  };
+
+  const handleInstallmentModerationFromProfile = () => {
+    setMyProfileTab(PROFILE_TAB_INSTALLMENT_MODERATION);
+  };
+
+  const handleInstallmentDisputesFromProfile = () => {
+    setMyProfileTab(PROFILE_TAB_INSTALLMENT_DISPUTES);
   };
 
   const handleAdminOrdersFromProfile = () => {
@@ -2125,6 +2299,7 @@ export function HomePage() {
         myProductsModerationFilter={myProductsModerationFilter}
         catalogFollowingOnly={catalogFollowingOnly}
         catalogAuctionOnly={catalogAuctionOnly}
+        catalogInstallmentOnly={catalogInstallmentOnly}
         catalogSaleOnly={catalogSaleOnly}
         sellerRaffleActive={sellerRaffleActive}
         onToggleRaffleParticipation={handleToggleRaffleParticipation}
@@ -2156,7 +2331,9 @@ export function HomePage() {
         activeProfileTab === PROFILE_TAB_PRODUCT_REPORTS ||
         activeProfileTab === PROFILE_TAB_PRODUCT_PROMOTIONS ||
         activeProfileTab === PROFILE_TAB_RAFFLES ||
-        activeProfileTab === PROFILE_TAB_DATA_CONFIRMATION_REQUESTS);
+        activeProfileTab === PROFILE_TAB_DATA_CONFIRMATION_REQUESTS ||
+        activeProfileTab === PROFILE_TAB_INSTALLMENT_MODERATION ||
+        activeProfileTab === PROFILE_TAB_INSTALLMENT_DISPUTES);
 
     if (
       isAuthorized &&
@@ -2180,6 +2357,22 @@ export function HomePage() {
               currentUserId={currentUserId}
               onSellerNameClick={handleSellerNameClick}
               onRequestLogin={() => setIsLoginModalOpen(true)}
+              onQueueChanged={refreshUserProfileActionBadgeCounts}
+            />
+          );
+        }
+        if (activeProfileTab === PROFILE_TAB_AUCTION) {
+          return (
+            <AuctionPage
+              isAuthorized={isAuthorized}
+              isUserDataConfirmed={
+                myProfilePage.phase === "success" &&
+                myProfilePage.user?.isUserDataConfirmed === true
+              }
+              onRequestLogin={() => setIsLoginModalOpen(true)}
+              onProductClick={handleCatalogProductClick}
+              onBuyerClick={handleSellerNameClick}
+              onQueueChanged={refreshUserProfileActionBadgeCounts}
             />
           );
         }
@@ -2189,6 +2382,29 @@ export function HomePage() {
               isAuthorized={isAuthorized}
               currentUserId={currentUserId}
               onSellerNameClick={handleSellerNameClick}
+              onQueueChanged={refreshUserProfileActionBadgeCounts}
+            />
+          );
+        }
+        if (activeProfileTab === PROFILE_TAB_INSTALLMENT_PAYMENTS) {
+          return (
+            <InstallmentPaymentsPage
+              isAuthorized={isAuthorized}
+              onRequestLogin={() => setIsLoginModalOpen(true)}
+              onCounterpartyClick={handleSellerNameClick}
+              onProductClick={handleCatalogProductClick}
+              onQueueChanged={refreshUserProfileActionBadgeCounts}
+            />
+          );
+        }
+        if (activeProfileTab === PROFILE_TAB_INSTALLMENT_SALES) {
+          return (
+            <InstallmentSalesPage
+              isAuthorized={isAuthorized}
+              onRequestLogin={() => setIsLoginModalOpen(true)}
+              onCounterpartyClick={handleSellerNameClick}
+              onProductClick={handleCatalogProductClick}
+              onQueueChanged={refreshUserProfileActionBadgeCounts}
             />
           );
         }
@@ -2258,6 +2474,26 @@ export function HomePage() {
             />
           );
         }
+        if (
+          activeProfileTab === PROFILE_TAB_INSTALLMENT_MODERATION &&
+          canModerateProducts
+        ) {
+          return (
+            <InstallmentModerationPage
+              onQueueChanged={refreshPendingInstallmentModerationCount}
+            />
+          );
+        }
+        if (
+          activeProfileTab === PROFILE_TAB_INSTALLMENT_DISPUTES &&
+          canModerateProducts
+        ) {
+          return (
+            <InstallmentDisputesPage
+              onQueueChanged={refreshPendingInstallmentDisputesCount}
+            />
+          );
+        }
         return (
           <RaffleSellerOverview
             refreshTick={raffleRefreshTick}
@@ -2282,7 +2518,20 @@ export function HomePage() {
           onEditProfileClick={() => setIsEditProfileOpen(true)}
           onMyProductsClick={handleMyProductsFromProfile}
           onMySalesClick={handleMySalesFromProfile}
+          onInstallmentPaymentsClick={
+            isAuthorized ? handleInstallmentPaymentsFromProfile : undefined
+          }
+          onInstallmentSalesClick={
+            isAuthorized ? handleInstallmentSalesFromProfile : undefined
+          }
+          onInstallmentModerationClick={
+            canModerateProducts ? handleInstallmentModerationFromProfile : undefined
+          }
+          onInstallmentDisputesClick={
+            canModerateProducts ? handleInstallmentDisputesFromProfile : undefined
+          }
           onMyOrdersClick={handleMyOrdersFromProfile}
+          onAuctionClick={isAuthorized ? handleAuctionFromProfile : undefined}
           onAdminOrdersClick={isAdmin ? handleAdminOrdersFromProfile : undefined}
           onProductModerationClick={
             canModerateProducts ? handleProductModerationFromProfile : undefined
@@ -2311,6 +2560,13 @@ export function HomePage() {
             isAuthorized ? handleSubscriptionsFromProfile : undefined
           }
           pendingModerationCount={pendingModerationCount}
+          pendingIncomingPriceOffersCount={pendingIncomingPriceOffersCount}
+          pendingMySalesActionCount={pendingMySalesActionCount}
+          pendingMyOrdersActionCount={pendingMyOrdersActionCount}
+          pendingInstallmentBuyerActionCount={pendingInstallmentBuyerActionCount}
+          pendingInstallmentSellerActionCount={pendingInstallmentSellerActionCount}
+          pendingInstallmentModerationCount={pendingInstallmentModerationCount}
+          pendingInstallmentDisputesCount={pendingInstallmentDisputesCount}
           pendingProductReportsCount={pendingProductReportsCount}
           pendingProductPromotionsCount={pendingProductPromotionsCount}
           pendingDataConfirmationCount={pendingDataConfirmationCount}
@@ -2358,7 +2614,10 @@ export function HomePage() {
           currentUserId={currentUserId}
           onRequestLogin={() => setIsLoginModalOpen(true)}
           onGoToCatalog={() => goToMainView("catalog")}
-          onCheckoutSuccess={() => goToMainView("my-orders")}
+          onCheckoutSuccess={() => {
+            void refreshUserProfileActionBadgeCounts();
+            goToMainView("my-orders");
+          }}
           onSellerNameClick={handleSellerNameClick}
         />
       );
@@ -2370,6 +2629,7 @@ export function HomePage() {
           currentUserId={currentUserId}
           onSellerNameClick={handleSellerNameClick}
           onRequestLogin={() => setIsLoginModalOpen(true)}
+          onQueueChanged={refreshUserProfileActionBadgeCounts}
         />
       );
     }
@@ -2414,6 +2674,42 @@ export function HomePage() {
         />
       );
     }
+    if (mainView === "installment-payments") {
+      return (
+        <InstallmentPaymentsPage
+          isAuthorized={isAuthorized}
+          onRequestLogin={() => setIsLoginModalOpen(true)}
+          onCounterpartyClick={handleSellerNameClick}
+          onProductClick={handleCatalogProductClick}
+        />
+      );
+    }
+    if (mainView === "installment-sales") {
+      return (
+        <InstallmentSalesPage
+          isAuthorized={isAuthorized}
+          onRequestLogin={() => setIsLoginModalOpen(true)}
+          onCounterpartyClick={handleSellerNameClick}
+          onProductClick={handleCatalogProductClick}
+        />
+      );
+    }
+    if (mainView === "installment-moderation") {
+      if (!canModerateProducts) return null;
+      return (
+        <InstallmentModerationPage
+          onQueueChanged={refreshPendingInstallmentModerationCount}
+        />
+      );
+    }
+    if (mainView === "installment-disputes") {
+      if (!canModerateProducts) return null;
+      return (
+        <InstallmentDisputesPage
+          onQueueChanged={refreshPendingInstallmentDisputesCount}
+        />
+      );
+    }
 
     if (mainView === "catalog-browser") {
       return renderCatalogBrowserContent();
@@ -2450,6 +2746,8 @@ export function HomePage() {
         myProductsTotal={myProductsTotal}
         sellerProductsLimit={sellerProductsLimit}
         pendingModerationCount={pendingModerationCount}
+        pendingInstallmentModerationCount={pendingInstallmentModerationCount}
+        pendingInstallmentDisputesCount={pendingInstallmentDisputesCount}
         pendingProductReportsCount={pendingProductReportsCount}
         pendingDataConfirmationCount={pendingDataConfirmationCount}
         onMyProfileClick={() => goToMainView("my-profile")}
@@ -2464,9 +2762,11 @@ export function HomePage() {
         onCatalogSortChange={handleCatalogSortChange}
         catalogFollowingOnly={catalogFollowingOnly}
         catalogAuctionOnly={catalogAuctionOnly}
+        catalogInstallmentOnly={catalogInstallmentOnly}
         catalogSaleOnly={catalogSaleOnly}
         onCatalogFollowingOnlyToggle={handleCatalogFollowingOnlyToggle}
         onCatalogAuctionOnlyToggle={handleCatalogAuctionOnlyToggle}
+        onCatalogInstallmentOnlyToggle={handleCatalogInstallmentOnlyToggle}
         onCatalogSaleOnlyToggle={handleCatalogSaleOnlyToggle}
         isAdmin={isAdmin}
         canModerateProducts={canModerateProducts}
@@ -2733,6 +3033,7 @@ export function HomePage() {
         product={catalogProductDetails}
         onClose={() => {
           setCatalogProductDetails(null);
+          setCatalogProductDetailsTab("details");
           setProductDetailsAdminError("");
         }}
         onSellerNameClick={handleSellerNameClick}
@@ -2741,6 +3042,9 @@ export function HomePage() {
         showAddToCart={catalogDetailsShowAddToCart}
         onRequestLogin={() => setIsLoginModalOpen(true)}
         currentUserId={currentUserId}
+        initialDetailsTab={catalogProductDetailsTab}
+        isPremiumUser={isPremiumUser}
+        onProfileActionBadgesChanged={refreshUserProfileActionBadgeCounts}
         showStaffDetails={
           canModerateProducts && catalogProductDetails != null
         }

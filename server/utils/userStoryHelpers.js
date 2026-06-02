@@ -314,7 +314,7 @@ export async function markUserStoryAuthorViewed(
             $max: { viewedAt: publishedAt },
             $setOnInsert: { viewerUserId, authorUserId },
         },
-        { upsert: true, new: true },
+        { upsert: true, returnDocument: 'after' },
     );
 }
 

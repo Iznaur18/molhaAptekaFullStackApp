@@ -144,6 +144,16 @@ export function CreateUserStoryModal({ isOpen, onClose, onPublished }) {
     }
   };
 
+  const handlePreviewVideoRef = useCallback((node) => {
+    if (!node) {
+      return;
+    }
+
+    node.muted = false;
+    node.loop = true;
+    void node.play().catch(() => {});
+  }, []);
+
   if (!isOpen) {
     return null;
   }
@@ -174,10 +184,11 @@ export function CreateUserStoryModal({ isOpen, onClose, onPublished }) {
           {previewUrl ? (
             mediaType === USER_STORY_MEDIA_TYPE_VIDEO ? (
               <video
+                ref={handlePreviewVideoRef}
                 className="create-user-story-modal__media"
                 src={previewUrl}
-                controls
                 playsInline
+                loop
               />
             ) : (
               <img

@@ -24,6 +24,16 @@
  */
 
 /**
+ * Снимок плана рассрочки для заказа (продажи продавца).
+ *
+ * @typedef {object} OrderInstallmentContractSummary
+ * @property {string} planTitle
+ * @property {number} monthsCount
+ * @property {number} monthlyPaymentRub
+ * @property {number} totalAmountRub
+ */
+
+/**
  * Заказ из API. Соответствует `Order` в `server/models/OrderModel.js` после populate.
  *
  * @typedef {object} Order
@@ -34,6 +44,9 @@
  * @property {string} deliveryAddress
  * @property {import('./constants.js').ORDER_PAYMENT_METHODS[number]} paymentMethod
  * @property {import('./constants.js').ORDER_STATUSES[number]} status
+ * @property {string | null} [priceOfferId]
+ * @property {string | null} [installmentContractId]
+ * @property {OrderInstallmentContractSummary | null} [installmentContract]
  * @property {string} createdAt
  * @property {string} updatedAt
  */

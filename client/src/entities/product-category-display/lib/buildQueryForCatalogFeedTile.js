@@ -1,9 +1,9 @@
 import {
   CATALOG_FILTER_AUCTION_ONLY,
   CATALOG_FILTER_FOLLOWING_ONLY,
+  CATALOG_FILTER_INSTALLMENT_ONLY,
   CATALOG_FILTER_SALE_ONLY,
   CATALOG_SORT_NEWEST,
-  CATALOG_SORT_VIEWS,
 } from "../../product/model/productConstants.js";
 
 /**
@@ -13,6 +13,7 @@ import {
  *   category: null;
  *   followingOnly: boolean;
  *   auctionOnly: boolean;
+ *   installmentOnly: boolean;
  *   saleOnly: boolean;
  * }}
  */
@@ -23,6 +24,7 @@ export function buildQueryForCatalogFeedTile(tile) {
       category: null,
       followingOnly: false,
       auctionOnly: false,
+      installmentOnly: false,
       saleOnly: false,
     };
   }
@@ -33,6 +35,7 @@ export function buildQueryForCatalogFeedTile(tile) {
       category: null,
       followingOnly: true,
       auctionOnly: false,
+      installmentOnly: false,
       saleOnly: false,
     };
   }
@@ -43,6 +46,18 @@ export function buildQueryForCatalogFeedTile(tile) {
       category: null,
       followingOnly: false,
       auctionOnly: true,
+      installmentOnly: false,
+      saleOnly: false,
+    };
+  }
+
+  if (tile.value === CATALOG_FILTER_INSTALLMENT_ONLY) {
+    return {
+      sort: CATALOG_SORT_NEWEST,
+      category: null,
+      followingOnly: false,
+      auctionOnly: false,
+      installmentOnly: true,
       saleOnly: false,
     };
   }
@@ -53,6 +68,7 @@ export function buildQueryForCatalogFeedTile(tile) {
       category: null,
       followingOnly: false,
       auctionOnly: false,
+      installmentOnly: false,
       saleOnly: true,
     };
   }
@@ -62,6 +78,7 @@ export function buildQueryForCatalogFeedTile(tile) {
     category: null,
     followingOnly: false,
     auctionOnly: false,
+    installmentOnly: false,
     saleOnly: false,
   };
 }
@@ -71,6 +88,7 @@ export function buildQueryForCatalogFeedTile(tile) {
  * @param {string} sort
  * @param {boolean} followingOnly
  * @param {boolean} auctionOnly
+ * @param {boolean} installmentOnly
  * @param {boolean} saleOnly
  */
 export function isCatalogFeedTileActive(
@@ -78,6 +96,7 @@ export function isCatalogFeedTileActive(
   sort,
   followingOnly,
   auctionOnly,
+  installmentOnly,
   saleOnly,
 ) {
   if (tile.kind === "sort") {
@@ -85,6 +104,7 @@ export function isCatalogFeedTileActive(
       sort === tile.value &&
       !followingOnly &&
       !auctionOnly &&
+      !installmentOnly &&
       !saleOnly
     );
   }
@@ -95,6 +115,10 @@ export function isCatalogFeedTileActive(
 
   if (tile.value === CATALOG_FILTER_AUCTION_ONLY) {
     return auctionOnly;
+  }
+
+  if (tile.value === CATALOG_FILTER_INSTALLMENT_ONLY) {
+    return installmentOnly;
   }
 
   if (tile.value === CATALOG_FILTER_SALE_ONLY) {

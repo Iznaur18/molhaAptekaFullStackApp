@@ -26,7 +26,7 @@ export const deductLoyaltyPoints = async ({ userId, amount, session }) => {
     const updated = await UserModel.findOneAndUpdate(
         { _id: userId, userLoyaltyPoints: { $gte: normalizedAmount } },
         { $inc: { userLoyaltyPoints: -normalizedAmount } },
-        { new: true, session: session ?? undefined },
+        { returnDocument: 'after', session: session ?? undefined },
     ).lean();
 
     if (!updated) {

@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 
 import { OrderModel, ProductModel, UserModel } from '../../models/index.js';
 import { buildRegexSearchOr, errorRes, successRes } from '../../utils/index.js';
+import { loadInstallmentPlanSummariesByIds } from '../../utils/installmentHelpers.js';
 
 import {
     ORDER_BUYER_PUBLIC_FIELDS,
@@ -168,7 +169,32 @@ export const getMySalesController = async (req, res) => {
             })
             .filter(Boolean);
 
-        return successRes(res, { orders, total, page, limit });
+        const contractIds = orders
+            .map((order) => order.installmentContractId)
+            .filter(Boolean);
+        const planSummaryByContractId =
+            await loadInstallmentPlanSummariesByIds(contractIds);
+
+        const ordersWithInstallment = orders.map((order) => {
+            const contractId = order.installmentContractId
+                ? String(order.installmentContractId)
+                : null;
+            const installmentContract =
+                contractId != null
+                    ? (planSummaryByContractId[contractId] ?? null)
+                    : null;
+
+            return installmentContract
+                ? { ...order, installmentContract }
+                : order;
+        });
+
+        return successRes(res, {
+            orders: ordersWithInstallment,
+            total,
+            page,
+            limit,
+        });
     } catch (error) {
         console.error('getMySalesController error:', error);
         return errorRes(res, 500, 'Ошибка при получении продаж');

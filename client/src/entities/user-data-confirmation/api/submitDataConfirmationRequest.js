@@ -2,13 +2,16 @@ import { apiClient } from "../../../shared/api/index.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 
 /**
- * @param {import('../model/types.js').PassportSnapshot} passport
+ * @param {{
+ *   passport: import('../model/types.js').PassportSnapshot;
+ *   passportSelfiePhotoUrl: string;
+ * }} body
  */
-export async function submitDataConfirmationRequest(passport) {
+export async function submitDataConfirmationRequest(body) {
   try {
     const { data } = await apiClient.post(
       "/user/me/data-confirmation-request",
-      { passport },
+      body,
     );
 
     if (!data?.success) {

@@ -83,7 +83,7 @@ export async function patchProductCategoryDisplayController(req, res) {
         const saved = await ProductCategoryDisplayModel.findOneAndUpdate(
             { categorySlug },
             { $set: update },
-            { upsert: true, new: true, runValidators: true },
+            { upsert: true, returnDocument: 'after', runValidators: true },
         ).lean();
 
         successRes(res, {

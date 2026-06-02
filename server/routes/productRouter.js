@@ -56,6 +56,13 @@ import {
     getPendingRafflesCountController,
     approveRaffleController,
     rejectRaffleController,
+    getProductInstallmentProgramController,
+    upsertProductInstallmentProgramController,
+    getPendingInstallmentModerationController,
+    getPendingInstallmentModerationCountController,
+    approveInstallmentModerationController,
+    rejectInstallmentModerationController,
+    createInstallmentContractController,
 } from '../controllers/index.js';
 import {
     checkAuthMW,
@@ -91,6 +98,9 @@ import {
     setProductRaffleParticipationValidation,
     productCategorySlugParamValidation,
     patchProductCategoryDisplayValidation,
+    upsertProductInstallmentProgramValidation,
+    rejectInstallmentModerationValidation,
+    createInstallmentContractValidation,
 } from '../validations/index.js';
 
 const router = Router();
@@ -266,6 +276,53 @@ router.patch(
     productIdParamValidation,
     resolveProductReportsValidation,
     resolveProductReportsForProductController,
+);
+router.get(
+    '/installment/moderation/pending/count',
+    checkAuthMW,
+    checkProductModeratorMW,
+    getPendingInstallmentModerationCountController,
+);
+router.get(
+    '/installment/moderation/pending',
+    checkAuthMW,
+    checkProductModeratorMW,
+    getPendingInstallmentModerationController,
+);
+router.get(
+    '/:productId/installment-program',
+    checkOptionalAuthMW,
+    productIdParamValidation,
+    getProductInstallmentProgramController,
+);
+router.put(
+    '/:productId/installment-program',
+    checkAuthMW,
+    productIdParamValidation,
+    upsertProductInstallmentProgramValidation,
+    upsertProductInstallmentProgramController,
+);
+router.post(
+    '/:productId/installment-contracts',
+    checkAuthMW,
+    productIdParamValidation,
+    createInstallmentContractValidation,
+    createInstallmentContractController,
+);
+router.patch(
+    '/:productId/installment/moderation/approve',
+    checkAuthMW,
+    checkProductModeratorMW,
+    productIdParamValidation,
+    approveInstallmentModerationController,
+);
+router.patch(
+    '/:productId/installment/moderation/reject',
+    checkAuthMW,
+    checkProductModeratorMW,
+    productIdParamValidation,
+    rejectInstallmentModerationValidation,
+    rejectInstallmentModerationController,
 );
 router.get(
     '/:productId/price-offers/top',

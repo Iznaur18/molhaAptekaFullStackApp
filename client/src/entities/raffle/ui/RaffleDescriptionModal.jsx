@@ -40,7 +40,6 @@ export function RaffleDescriptionModal({
   return (
     <div
       className="raffle-description-modal__backdrop"
-      onClick={onClose}
       role="presentation"
     >
       <section
@@ -48,7 +47,6 @@ export function RaffleDescriptionModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="raffle-description-modal-title"
-        onClick={(event) => event.stopPropagation()}
       >
         <header className="raffle-description-modal__header">
           <h3 id="raffle-description-modal-title">

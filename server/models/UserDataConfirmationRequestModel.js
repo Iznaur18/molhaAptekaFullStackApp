@@ -36,6 +36,12 @@ const UserDataConfirmationRequestSchema = new mongoose.Schema(
             type: PassportSnapshotSchema,
             required: true,
         },
+        passportSelfiePhotoUrl: {
+            type: String,
+            required: true,
+            trim: true,
+            maxlength: 500,
+        },
         status: {
             type: String,
             enum: USER_DATA_CONFIRMATION_STATUSES,

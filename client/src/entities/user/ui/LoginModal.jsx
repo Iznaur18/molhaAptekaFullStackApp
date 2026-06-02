@@ -66,12 +66,7 @@ export function LoginModal({ isOpen, onClose, onSuccess, onRegisterClick }) {
       aria-modal="true"
       aria-label={LOGIN_MODAL_UI.ARIA_DIALOG}
     >
-      <button
-        type="button"
-        className="login-modal__backdrop"
-        aria-label={LOGIN_MODAL_UI.ARIA_CLOSE_BACKDROP}
-        onClick={handleClose}
-      />
+      <div className="login-modal__backdrop" aria-hidden="true" />
       <div className="login-modal__card">
         <div className="login-modal__header">
           <h2 className="login-modal__title">{LOGIN_MODAL_UI.TITLE}</h2>

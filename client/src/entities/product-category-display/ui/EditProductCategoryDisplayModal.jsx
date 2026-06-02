@@ -138,14 +138,12 @@ export function EditProductCategoryDisplayModal({
     <div
       className="edit-category-display-modal__backdrop"
       role="presentation"
-      onClick={onClose}
     >
       <div
         className="edit-category-display-modal"
         role="dialog"
         aria-modal="true"
         aria-labelledby="edit-category-display-modal-title"
-        onClick={(event) => event.stopPropagation()}
       >
         <div className="edit-category-display-modal__header">
           <h2

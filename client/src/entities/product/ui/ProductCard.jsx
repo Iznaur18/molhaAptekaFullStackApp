@@ -319,6 +319,8 @@ export function ProductCard({
   const showRaffleBadge =
     !isModerationQueue && isProductRaffleParticipant(product);
   const showAuctionBadge = !isModerationQueue && auctionActive;
+  const showInstallmentBadge =
+    !isModerationQueue && product.productInstallmentEnabled === true;
 
   /**
    * @param {import('../model/types.js').ProductFromApi['productSeller']} raw
@@ -477,6 +479,11 @@ export function ProductCard({
               {showAuctionBadge ? (
                 <p className="product-card__auction-badge" role="status">
                   {PRODUCT_CARD_UI.AUCTION_BADGE}
+                </p>
+              ) : null}
+              {showInstallmentBadge ? (
+                <p className="product-card__installment-badge" role="status">
+                  {PRODUCT_CARD_UI.INSTALLMENT_BADGE}
                 </p>
               ) : null}
               {showRaffleBadge ? (

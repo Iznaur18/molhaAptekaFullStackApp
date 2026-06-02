@@ -1,0 +1,309 @@
+.installment-program-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgb(8 16 30 / 50%);
+}
+
+.installment-program-modal {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 28rem);
+  max-height: min(90vh, 640px);
+  overflow: hidden;
+  border-radius: 0.85rem;
+  background: #fff;
+  box-shadow: 0 12px 38px rgb(6 20 42 / 26%);
+}
+
+.installment-program-modal__header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1rem 0.75rem;
+  border-bottom: 1px solid #e8edf5;
+}
+
+.installment-program-modal__title {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.35;
+}
+
+.installment-program-modal__close {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.installment-program-modal__close:hover {
+  color: #0f172a;
+}
+
+.installment-program-modal__loading {
+  margin: 0;
+  padding: 1rem;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.installment-program-modal__form {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.installment-program-modal__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.installment-program-modal__toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #dbeafe;
+  border-radius: 0.65rem;
+  background: #eff6ff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1e3a8a;
+  cursor: pointer;
+}
+
+.installment-program-modal__toggle input {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  accent-color: #2563eb;
+  cursor: pointer;
+}
+
+.installment-program-modal__plans {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.installment-program-modal__plan {
+  margin: 0;
+  padding: 0;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.65rem;
+  background: #f8fafc;
+  overflow: hidden;
+}
+
+.installment-program-modal__plan-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid #e2e8f0;
+  background: #fff;
+}
+
+.installment-program-modal__plan-name {
+  margin: 0;
+  padding: 0;
+  border: none;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #475569;
+}
+
+.installment-program-modal__plan-remove {
+  margin: 0;
+  padding: 0.2rem 0.45rem;
+  border: 1px solid #fecaca;
+  border-radius: 0.4rem;
+  background: #fff;
+  color: #b42318;
+  font: inherit;
+  font-size: 0.78rem;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.installment-program-modal__plan-remove:hover:not(:disabled) {
+  background: #fef2f2;
+}
+
+.installment-program-modal__plan-remove:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.installment-program-modal__plan-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.65rem 0.75rem 0.75rem;
+}
+
+.installment-program-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.82rem;
+  color: #334155;
+}
+
+.installment-program-modal__label {
+  font-weight: 600;
+}
+
+.installment-program-modal__field input[type="text"],
+.installment-program-modal__field input[type="number"] {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.45rem;
+  background: #fff;
+  font: inherit;
+}
+
+.installment-program-modal__field input:focus {
+  outline: 2px solid rgb(37 99 235 / 25%);
+  border-color: #2563eb;
+}
+
+.installment-program-modal__row {
+  display: grid;
+  grid-template-columns: minmax(5rem, 0.35fr) minmax(0, 1fr);
+  gap: 0.55rem;
+}
+
+.installment-program-modal__plan-total {
+  margin: 0;
+  padding: 0.45rem 0.55rem;
+  border-radius: 0.45rem;
+  background: #fff;
+  border: 1px dashed #cbd5e1;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.installment-program-modal__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  font-size: 0.82rem;
+  color: #334155;
+  cursor: pointer;
+}
+
+.installment-program-modal__checkbox input {
+  width: 0.95rem;
+  height: 0.95rem;
+  margin: 0;
+  accent-color: #2563eb;
+  cursor: pointer;
+}
+
+.installment-program-modal__footer {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem 1rem;
+  border-top: 1px solid #e8edf5;
+  background: #fff;
+}
+
+.installment-program-modal__footer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-left: auto;
+}
+
+.installment-program-modal__btn {
+  margin: 0;
+  padding: 0.45rem 0.85rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.45rem;
+  background: #fff;
+  font: inherit;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.installment-program-modal__btn:hover:not(:disabled) {
+  background: #f8fafc;
+}
+
+.installment-program-modal__btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.installment-program-modal__btn_primary {
+  border-color: #2563eb;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 600;
+}
+
+.installment-program-modal__btn_primary:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.installment-program-modal__btn_add {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+.installment-program-modal__max-hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.installment-program-modal__feedback {
+  padding: 0 1rem 0.75rem;
+}
+
+.installment-program-modal__error {
+  margin: 0;
+  color: #b42318;
+  font-size: 0.85rem;
+}
+
+.installment-program-modal__success {
+  margin: 0;
+  color: #047857;
+  font-size: 0.85rem;
+}

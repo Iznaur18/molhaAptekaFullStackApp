@@ -12,9 +12,7 @@
 .register-modal__backdrop {
   position: absolute;
   inset: 0;
-  border: 0;
   background: rgba(0, 0, 0, 0.5);
-  cursor: pointer;
 }
 
 .register-modal__card {

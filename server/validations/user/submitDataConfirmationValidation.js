@@ -11,6 +11,7 @@ export const submitDataConfirmationValidation = [
     body('passport.departmentCode').optional().isString().trim(),
     body('passport.birthDate').optional(),
     body('passport.issuedAt').optional(),
+    body('passportSelfiePhotoUrl').optional().isString().trim(),
     body('lastName').optional().isString().trim(),
     body('firstName').optional().isString().trim(),
     handleValidationByExpressErrors,

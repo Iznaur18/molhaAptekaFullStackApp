@@ -68,6 +68,7 @@ export const getProductsController = async (req, res) => {
         const sort = parseProductSortFromQuery(req.query);
         const followingOnly = parseTruthyQueryFlag(req.query.followingOnly);
         const auctionOnly = parseTruthyQueryFlag(req.query.auctionOnly);
+        const installmentOnly = parseTruthyQueryFlag(req.query.installmentOnly);
         const saleOnly = parseTruthyQueryFlag(req.query.saleOnly);
 
         if (followingOnly && !req.userId) {
@@ -86,6 +87,9 @@ export const getProductsController = async (req, res) => {
 
         if (auctionOnly) {
             catalogBaseQuery.productAuctionEnabled = true;
+        }
+        if (installmentOnly) {
+            catalogBaseQuery.productInstallmentEnabled = true;
         }
         if (saleOnly) {
             Object.assign(catalogBaseQuery, buildProductSaleOnlyMatch());

@@ -1,0 +1,70 @@
+.installment-moderation-page__state {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.installment-moderation-page__state_error {
+  color: #b42318;
+}
+
+.installment-moderation-page__card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  background: #fff;
+}
+
+.installment-moderation-page__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.installment-moderation-page__plans {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.installment-moderation-page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.installment-moderation-page__btn {
+  padding: 0.45rem 0.85rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.4rem;
+  background: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.installment-moderation-page__btn_primary {
+  border-color: #059669;
+  background: #059669;
+  color: #fff;
+}
+
+.installment-moderation-page__btn_danger {
+  border-color: #dc2626;
+  color: #dc2626;
+}
+
+.installment-moderation-page__textarea {
+  width: 100%;
+  min-height: 3.5rem;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.4rem;
+  font: inherit;
+}
+
+.installment-moderation-page__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}

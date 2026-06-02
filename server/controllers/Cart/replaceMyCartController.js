@@ -26,7 +26,7 @@ export const replaceMyCartController = async (req, res) => {
         await CartModel.findOneAndUpdate(
             { userId },
             { $set: { items: purchasable } },
-            { upsert: true, new: true },
+            { upsert: true, returnDocument: 'after' },
         );
 
         return successRes(res, { items: purchasable });

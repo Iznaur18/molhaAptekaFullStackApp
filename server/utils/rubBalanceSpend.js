@@ -26,7 +26,7 @@ export const deductRubBalance = async ({ userId, amount, session }) => {
     const updated = await UserModel.findOneAndUpdate(
         { _id: userId, userRubBalance: { $gte: normalizedAmount } },
         { $inc: { userRubBalance: -normalizedAmount } },
-        { new: true, session: session ?? undefined },
+        { returnDocument: 'after', session: session ?? undefined },
     ).lean();
 
     if (!updated) {

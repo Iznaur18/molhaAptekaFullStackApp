@@ -7,6 +7,7 @@ import {
 import {
     getLatestDataConfirmationRequestForUser,
     getPendingDataConfirmationRequests,
+    normalizePassportSelfiePhotoUrl,
     resolveDataConfirmationRequest,
 } from '../../utils/userDataConfirmationHelpers.js';
 import { normalizePassportPayload } from '../../utils/validatePassportPayload.js';
@@ -65,9 +66,25 @@ export const submitDataConfirmationRequestController = async (req, res) => {
             );
         }
 
+        let passportSelfiePhotoUrl;
+        try {
+            passportSelfiePhotoUrl = normalizePassportSelfiePhotoUrl(
+                req.body?.passportSelfiePhotoUrl,
+            );
+        } catch (validationError) {
+            return errorRes(
+                res,
+                400,
+                validationError instanceof Error
+                    ? validationError.message
+                    : 'Некорректное фото',
+            );
+        }
+
         await UserDataConfirmationRequestModel.create({
             userId,
             passport,
+            passportSelfiePhotoUrl,
         });
 
         return successRes(res, { message: 'Заявка принята' });

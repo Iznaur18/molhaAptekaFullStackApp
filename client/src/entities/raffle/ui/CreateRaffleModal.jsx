@@ -205,7 +205,6 @@ export function CreateRaffleModal({
     <div
       className="create-raffle-modal__backdrop"
       role="presentation"
-      onClick={onClose}
     >
       <div
         className="create-raffle-modal"
@@ -213,7 +212,6 @@ export function CreateRaffleModal({
         aria-modal="true"
         aria-label={ariaDialog}
         aria-labelledby="create-raffle-modal-title"
-        onClick={(event) => event.stopPropagation()}
       >
         <header className="create-raffle-modal__header">
           <h2 id="create-raffle-modal-title">{modalTitle}</h2>

@@ -3,6 +3,8 @@
  * Не хранит динамические ответы сервера — только дефолты и шаблоны.
  */
 
+import { pluralizeRuBall } from "../lib/pluralizeRuBall.js";
+
 /** Общие символы и подписи */
 export const COMMON_UI = {
   EM_DASH: "—",
@@ -102,6 +104,9 @@ export const API_CLIENT_UI = {
   FETCH_PRICE_OFFER_FALLBACK: "Не удалось загрузить предложение цены",
   FETCH_PRICE_OFFERS_TOP_FALLBACK: "Не удалось загрузить ставки",
   FETCH_SELLER_PRICE_OFFERS_FALLBACK: "Не удалось загрузить аукцион",
+  FETCH_MY_PRICE_OFFER_BIDS_FALLBACK: "Не удалось загрузить ваши ставки",
+  FETCH_INCOMING_PRICE_OFFERS_FALLBACK: "Не удалось загрузить входящие ставки",
+  FETCH_INCOMING_PRICE_OFFERS_COUNT_FALLBACK: "Не удалось загрузить счётчик ставок",
   ACCEPT_PRICE_OFFER_FALLBACK: "Не удалось принять предложение",
   REJECT_PRICE_OFFER_FALLBACK: "Не удалось отклонить предложение",
   FOLLOW_USER_FALLBACK: "Не удалось подписаться",
@@ -200,6 +205,21 @@ export const PRODUCT_PRICE_OFFER_UI = {
   ACCEPTED_BADGE: "Ожидает оплаты",
 };
 
+/** Вкладка «Аукцион» в профиле */
+export const AUCTION_PAGE_UI = {
+  LOADING: "Загрузка аукциона…",
+  ERROR_GENERIC: "Не удалось выполнить действие",
+  BUYER_SECTION_TITLE: "Мои ставки",
+  SELLER_SECTION_TITLE: "Ставки покупателей",
+  BUYER_EMPTY: "У вас пока нет активных ставок",
+  SELLER_EMPTY: "Входящих ставок пока нет",
+  BOTH_EMPTY: "Активных ставок пока нет",
+  /** @param {number} count */
+  TAB_BADGE: (count) => (count > 99 ? "99+" : String(count)),
+  PAY_DEADLINE_LABEL: "Оплатить до",
+  EDIT_PRICE_LABEL: "Новая цена, ₽",
+};
+
 /** Поиск пользователей (`GET /user/search`) */
 export const USER_SEARCH_UI = {
   API_PAGE_LIMIT: 100,
@@ -265,6 +285,10 @@ export const HOME_PAGE_UI = {
   TITLE_PRODUCT_MODERATION: "На модерации",
   TITLE_PRODUCT_REPORTS: "Жалобы",
   TITLE_DATA_CONFIRMATION: "Подтверждение данных",
+  TITLE_INSTALLMENT_PAYMENTS: "Мои рассрочки",
+  TITLE_INSTALLMENT_SALES: "Продажи в рассрочку",
+  TITLE_INSTALLMENT_MODERATION: "Рассрочка — модерация",
+  TITLE_INSTALLMENT_DISPUTES: "Споры по рассрочке",
   NAV_TO_CATALOG: "← Каталог товаров",
   NAV_AUTH_ARIA: "Действия аккаунта",
   NAV_SECTIONS_ARIA: "Навигация по разделам",
@@ -274,11 +298,13 @@ export const HOME_PAGE_UI = {
   TITLE_NOTIFICATIONS: "Уведомления",
   FILTER_FOLLOWING_ONLY: "Только от подписок",
   FILTER_AUCTION_ONLY: "Только с аукционом",
+  FILTER_INSTALLMENT_ONLY: "Только в рассрочку",
   CATALOG_FILTERS_PANEL_ARIA: "Фильтры каталога",
   CATEGORY_FILTER_LABEL: "Категория",
   CATALOG_FILTERS_SECTION_LABEL: "Фильтры",
   EMPTY_FOLLOWING_FILTER: "Нет товаров от ваших подписок с текущими фильтрами.",
   EMPTY_SALE_FILTER: "Нет товаров в распродаже от 50%.",
+  EMPTY_INSTALLMENT_FILTER: "Нет товаров с рассрочкой с текущими фильтрами.",
   LOGIN_FOR_FOLLOWING_FILTER: "Войдите, чтобы включить фильтр «только от подписок».",
   NAV_TO_CART: "Корзина",
   NAV_TO_MY_ORDERS: "Мои покупки",
@@ -439,7 +465,8 @@ export const MY_ORDERS_PAGE_UI = {
   PRODUCT_DETAILS_LOADING: "Открываем карточку товара…",
   EMPTY: "У вас пока нет покупок.",
   /** @param {number} points */
-  LOYALTY_POINTS_EARNED: (points) => `+${points} баллов лояльности`,
+  LOYALTY_POINTS_EARNED: (points) =>
+    `+${points} ${pluralizeRuBall(points)} лояльности`,
 };
 
 /** Очередь модерации товаров (admin / moderator) */
@@ -487,6 +514,8 @@ export const PRODUCT_REPORTS_PAGE_UI = {
 export const USER_STORY_UI = {
   ADD_LABEL: "Ваша история",
   LOADING: "Загрузка…",
+  MEDIA_LOADING: "Загружаем медиа…",
+  MEDIA_LOAD_ERROR: "Не удалось загрузить фото или видео",
   CREATE_TITLE: "Новый сторис",
   CAPTION_LABEL: "Текст (необязательно)",
   CAPTION_PLACEHOLDER: "До 150 символов…",
@@ -501,7 +530,6 @@ export const USER_STORY_UI = {
   ERROR_GENERIC: "Не удалось выполнить действие",
   ERROR_VIDEO_TYPE: "Видео: только MP4 или WebM",
   ERROR_VIDEO_SIZE: "Видео: не больше 5 МБ",
-  ERROR_VIDEO_DURATION: "Видео: не дольше 10 секунд",
   ERROR_VIDEO_ASPECT: "Видео: только вертикальный формат 9:16",
   ERROR_VIDEO_READ: "Не удалось прочитать видео",
   ERROR_IMAGE: "Не удалось обработать фото",
@@ -530,6 +558,9 @@ export const DATA_CONFIRMATION_PAGE_UI = {
   SUBMITTED_LABEL: "Подана",
   OPEN_APPLICANT: "Профиль заявителя",
   PASSPORT_SECTION: "Паспортные данные",
+  PASSPORT_SELFIE_SECTION: "Фото с паспортом в руках",
+  PASSPORT_SELFIE_MISSING: "Фото не приложено",
+  PASSPORT_SELFIE_OPEN: "Открыть фото в полном размере",
   STAFF_NOTE_LABEL: "Комментарий при отклонении",
   STAFF_NOTE_PLACEHOLDER: "Не меньше 3 слов…",
   STAFF_NOTE_MIN_WORDS: 3,
@@ -545,7 +576,11 @@ export const DATA_CONFIRMATION_MODAL_UI = {
   ARIA_DIALOG: "Подтверждение данных",
   TITLE: "Подтверждение данных",
   INTRO:
-    "Заполните паспортные данные. После проверки модератором у вас появится значок подтверждённого продавца.",
+    "Заполните паспортные данные и приложите фото с паспортом в руках. После проверки модератором у вас появится значок подтверждённого продавца.",
+  LABEL_PASSPORT_SELFIE: "Ваше фото с паспортом в руках",
+  HINT_PASSPORT_SELFIE: "JPEG, PNG или WebP, до 5 МБ",
+  ERROR_PASSPORT_SELFIE_REQUIRED: "Приложите фото с паспортом в руках",
+  ERROR_PASSPORT_SELFIE_UPLOAD: "Не удалось загрузить фото",
   STATUS_PENDING: "Заявка на рассмотрении",
   STATUS_CONFIRMED: "Данные подтверждены",
   STATUS_REJECTED_TITLE: "Заявка отклонена",
@@ -808,11 +843,13 @@ export const PRODUCT_CARD_UI = {
   /** @param {number} percent */
   DISCOUNT_BADGE: (percent) => `скидка -${percent}%`,
   /** @param {number} points */
-  LOYALTY_POINTS_PREMIUM: (points) => `+${points} баллов`,
+  LOYALTY_POINTS_PREMIUM: (points) => `+${points} ${pluralizeRuBall(points)}`,
   /** @param {number} points */
-  LOYALTY_POINTS_WITH_PREMIUM: (points) => `С премиум: +${points} баллов`,
+  LOYALTY_POINTS_WITH_PREMIUM: (points) =>
+    `С премиум: +${points} ${pluralizeRuBall(points)}`,
   /** @param {number} points */
-  LOYALTY_POINTS_GUEST: (points) => `До +${points} баллов с премиум`,
+  LOYALTY_POINTS_GUEST: (points) =>
+    `До +${points} ${pluralizeRuBall(points)} с премиум`,
   RAFFLE_PARTICIPATION_ON: "Участвует в розыгрыше",
   RAFFLE_PARTICIPATION_OFF: "Добавить в розыгрыш",
   RAFFLE_PARTICIPATION_PENDING: "Сохраняем…",
@@ -821,6 +858,119 @@ export const PRODUCT_CARD_UI = {
   AUCTION_TOGGLE_ON: "Проводить аукцион (предложения цены)",
   AUCTION_TOGGLE_OFF: "Выключить аукцион",
   AUCTION_TOGGLE_PENDING: "Обновление…",
+  INSTALLMENT_BADGE: "Рассрочка",
+  INSTALLMENT_SELL_BUTTON: "Продать в рассрочку",
+};
+
+/** Рассрочка */
+export const INSTALLMENT_UI = {
+  BADGE: "Рассрочка",
+  TAB: "Рассрочка",
+  SHORTCUT: "В рассрочку",
+  BUYER_HINT:
+    "Оформление рассрочки доступно пользователям с подтверждёнными данными.",
+  BUYER_REQUIRES_CONFIRMED:
+    "Рассрочка доступна только пользователям с подтверждёнными данными.",
+  PLANS_LABEL: "План рассрочки",
+  FIRST_PAYMENT_LATER: "первый платёж позже",
+  QUANTITY_LABEL: "Количество",
+  MONTHLY_LABEL: "Ежемесячно",
+  TOTAL_LABEL: "Итого по договору",
+  PAYMENT_METHOD_LABEL: "Способ оплаты",
+  SUBMIT: "Оформить рассрочку",
+  SUBMITTING: "Оформляем…",
+  SELECT_PLAN: "Выберите план рассрочки",
+  CONTRACT_SUCCESS: "Рассрочка оформлена. Следите за графиком платежей.",
+  ERROR_GENERIC: "Не удалось выполнить действие",
+  MODERATION_PENDING: "Программа на модерации",
+  MODERATION_REJECTED: "Программа отклонена",
+  MODERATION_APPROVED: "Рассрочка активна",
+  SELLER_TAB_HINT:
+    "Настройте планы в «Изменить товар» → «Продать в рассрочку».",
+  PROGRAM_MODAL_TITLE: "Рассрочка на товар",
+  PROGRAM_MODAL_ENABLED: "Включить рассрочку",
+  PROGRAM_MODAL_PLAN_NUMBER: (n) => `План ${n}`,
+  PROGRAM_MODAL_PLAN_TITLE: "Название плана",
+  PROGRAM_MODAL_MONTHS: "Месяцев",
+  PROGRAM_MODAL_MONTHLY: "Платёж, ₽",
+  PROGRAM_MODAL_PLAN_TOTAL: (formatted) => `Итого ${formatted}`,
+  PROGRAM_MODAL_FIRST_NOW: "Первый платёж сразу",
+  PROGRAM_MODAL_ADD_PLAN: "Добавить план",
+  PROGRAM_MODAL_REMOVE_PLAN: "Удалить",
+  PROGRAM_MODAL_SAVE: "Сохранить",
+  PROGRAM_MODAL_SAVING: "Сохраняем…",
+  PROGRAM_MODAL_MAX_PLANS: (max) => `Не больше ${max} планов`,
+  PROGRAM_MODAL_SUCCESS: "Программа сохранена",
+  OVERDUE_BADGE: "Просрочка",
+  CONTRACT_PRODUCT: "Товар",
+  SELLER_LABEL: "Продавец",
+  BUYER_LABEL: "Покупатель",
+  CONTRACT_PLAN: "План",
+  CONTRACT_STATUS: "Статус",
+  CONTRACT_PAID: "Оплачено",
+  CONTRACT_REMAINING: "Осталось",
+  CONTRACT_DAYS_LEFT: (days) => `Дней до конца: ${days}`,
+  PAYMENTS_HEADING: "График платежей",
+  PAYMENT_DUE: "Срок",
+  PAYMENT_AMOUNT: "Сумма",
+  MARK_PAID: "Я оплатил",
+  CONFIRM_PAYMENT: "Подтвердить оплату",
+  REJECT_PAYMENT: "Отклонить оплату",
+  REJECT_EARLY_PAYOFF: "Отклонить досрочное погашение",
+  EARLY_PAYOFF: "Досрочное погашение",
+  CANCEL_EARLY_PAYOFF: "Отменить досрочное погашение",
+  CONFIRM_EARLY_PAYOFF: "Подтвердить досрочное погашение",
+  OPEN_DISPUTE: "Открыть спор",
+  DISPUTE_REASON_PLACEHOLDER: "Причина спора…",
+  SEND_MESSAGE: "Написать продавцу",
+  MESSAGE_PLACEHOLDER: "Сообщение…",
+  ACTION_PENDING: "Сохраняем…",
+  PAYMENTS_PAGE_TITLE: "Мои рассрочки",
+  PAYMENTS_PAGE_LOADING: "Загрузка рассрочек…",
+  PAYMENTS_PAGE_EMPTY: "У вас пока нет рассрочек.",
+  PAYMENTS_PAGE_EMPTY_BY_FILTER: "По выбранному статусу рассрочек нет.",
+  SALES_PAGE_TITLE: "Продажи в рассрочку",
+  SALES_PAGE_LOADING: "Загрузка продаж…",
+  SALES_PAGE_EMPTY: "Продаж в рассрочку пока нет.",
+  SALES_PAGE_EMPTY_BY_FILTER: "По выбранному статусу продаж нет.",
+  CONTRACT_STATUS_FILTER_LABEL: "Статус",
+  CONTRACT_STATUS_FILTER_ALL: "Все",
+  CONTRACT_STATUS_FILTER_IN_PROGRESS: "Активные",
+  CONTRACT_STATUS_FILTER_COMPLETED: "Завершённые",
+  CONTRACT_STATUS_FILTER_DEFAULTED: "Просрочена",
+  CONTRACT_STATUS_FILTER_CANCELLED: "Отменённые",
+  MODERATION_PAGE_TITLE: "Рассрочка — модерация",
+  MODERATION_PAGE_LOADING: "Загрузка очереди…",
+  MODERATION_PAGE_EMPTY: "Нет программ на модерации.",
+  MODERATION_APPROVE: "Одобрить",
+  MODERATION_REJECT: "Отклонить",
+  MODERATION_REJECT_COMMENT: "Комментарий (необязательно)",
+  DISPUTES_PAGE_TITLE: "Споры по рассрочке",
+  DISPUTES_PAGE_LOADING: "Загрузка споров…",
+  DISPUTES_PAGE_EMPTY: "Нет открытых споров.",
+  DISPUTE_RESOLVE_NOTE: "Комментарий staff",
+  DISPUTE_ACTION_CLOSE: "Закрыть договор",
+  DISPUTE_ACTION_CANCEL: "Отменить договор",
+  DISPUTE_ACTION_ADJUST: "Сдвинуть график",
+  DISPUTE_ACTION_REFUND: "Частичный возврат",
+  DISPUTE_PARTIAL_AMOUNT: "Сумма возврата, ₽",
+  DISPUTE_RESOLVE: "Рассмотреть",
+  /** @param {number} n */
+  TAB_BADGE: (n) => (n > 99 ? "99+" : String(n)),
+  CONTRACT_STATUS_LABEL: {
+    pending_first_payment: "Ожидает первый платёж",
+    active: "Активна",
+    completed: "Завершена",
+    defaulted: "Просрочена",
+    cancelled: "Отменена",
+  },
+  PAYMENT_STATUS_LABEL: {
+    scheduled: "Запланирован",
+    due: "К оплате",
+    overdue: "Просрочен",
+    pending_confirmation: "Ожидает подтверждения",
+    paid: "Оплачен",
+  },
 };
 
 export const CREATE_RAFFLE_MODAL_UI = {
@@ -1079,12 +1229,19 @@ export const MY_PROFILE_PAGE_UI = {
   TAB_MY_PRODUCTS: "Мои товары",
   TAB_MY_SALES: "Мои продажи",
   TAB_MY_ORDERS: "Мои покупки",
+  TAB_AUCTION: "Аукцион",
+  /** @param {number} count */
+  TAB_BADGE: (count) => (count > 99 ? "99+" : String(count)),
   TAB_ADMIN_ORDERS: "Все заказы",
   TAB_PRODUCT_MODERATION: "На модерации",
   TAB_PRODUCT_REPORTS: "Жалобы",
   TAB_PRODUCT_PROMOTIONS: "Продвижение",
   TAB_RAFFLES: "Розыгрыши",
   TAB_DATA_CONFIRMATION: "Подтверждение",
+  TAB_INSTALLMENT_PAYMENTS: "Мои рассрочки",
+  TAB_INSTALLMENT_SALES: "Рассрочка — продажи",
+  TAB_INSTALLMENT_MODERATION: "Рассрочка — модерация",
+  TAB_INSTALLMENT_DISPUTES: "Споры",
   TAB_SUBSCRIPTIONS: "Подписки",
   DATA_CONFIRMATION: "Подтверждение данных",
   EDIT_PROFILE: "Изменить профиль",

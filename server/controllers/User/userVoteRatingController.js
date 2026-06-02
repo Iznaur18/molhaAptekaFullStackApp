@@ -107,7 +107,7 @@ export const userVoteRatingController = async (req, res) => {
                         'userRatingByVotes.totalRating': userVoteValue,
                     },
                 },
-                { new: true },
+                { returnDocument: 'after' },
             )
                 .select(VOTE_RESPONSE_USER_FIELDS)
                 .lean();

@@ -420,3 +420,226 @@ export const assertSellerOwnsProduct = async (productId, sellerUserId) => {
 
     return product;
 };
+
+const DASHBOARD_PRODUCT_SELECT =
+    'productName productImageUrls productImageUrl productSeller productAuctionEnabled productModerationStatus productIsAvailable';
+
+/**
+ * @param {Record<string, unknown> | null | undefined} product
+ */
+const buildDashboardProductSnapshot = (product) => {
+    if (product == null || typeof product !== 'object') {
+        return null;
+    }
+
+    const urls = Array.isArray(product.productImageUrls)
+        ? product.productImageUrls
+        : [];
+    const imageUrl =
+        urls.length > 0
+            ? String(urls[0])
+            : product.productImageUrl != null
+              ? String(product.productImageUrl)
+              : null;
+
+    return {
+        _id: String(product._id),
+        productName: String(product.productName ?? '').trim() || 'Товар без названия',
+        productImageUrl: imageUrl,
+        auctionActive: computeAuctionActive(product),
+    };
+};
+
+/**
+ * @param {Record<string, unknown>} row
+ */
+const mapBuyerPublic = (row) =>
+    row != null && typeof row === 'object'
+        ? {
+              _id: String(row._id),
+              userName: row.userName ?? '',
+              isPremiumUser: row.isPremiumUser === true,
+              isUserDataConfirmed: row.isUserDataConfirmed === true,
+          }
+        : null;
+
+/**
+ * @param {Array<Record<string, unknown>>} rows
+ */
+const sortBuyerDashboardBids = (rows) => {
+    const accepted = rows
+        .filter((row) => row.status === PRICE_OFFER_STATUS_ACCEPTED)
+        .sort((a, b) => {
+            const aDeadline = a.paymentDeadlineAt
+                ? new Date(a.paymentDeadlineAt).getTime()
+                : Number.MAX_SAFE_INTEGER;
+            const bDeadline = b.paymentDeadlineAt
+                ? new Date(b.paymentDeadlineAt).getTime()
+                : Number.MAX_SAFE_INTEGER;
+            return aDeadline - bDeadline;
+        });
+    const pending = rows
+        .filter((row) => row.status === PRICE_OFFER_STATUS_PENDING)
+        .sort((a, b) => {
+            if (b.offerPrice !== a.offerPrice) {
+                return b.offerPrice - a.offerPrice;
+            }
+            return (
+                new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+        });
+
+    return [...accepted, ...pending];
+};
+
+/**
+ * @param {Array<Record<string, unknown>>} rows
+ */
+const sortIncomingDashboardOffers = (rows) => {
+    const pending = rows
+        .filter((row) => row.status === PRICE_OFFER_STATUS_PENDING)
+        .sort((a, b) => {
+            if (b.offerPrice !== a.offerPrice) {
+                return b.offerPrice - a.offerPrice;
+            }
+            return (
+                new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+        });
+    const accepted = rows
+        .filter((row) => row.status === PRICE_OFFER_STATUS_ACCEPTED)
+        .sort((a, b) => b.offerPrice - a.offerPrice);
+
+    return [...pending, ...accepted];
+};
+
+/**
+ * @param {import('mongoose').Types.ObjectId | string} buyerUserId
+ */
+export const getMyPriceOfferBids = async (buyerUserId) => {
+    await releaseExpiredAcceptedOffers();
+
+    const rows = await ProductPriceOfferModel.find({
+        buyerUserId,
+        status: {
+            $in: [PRICE_OFFER_STATUS_PENDING, PRICE_OFFER_STATUS_ACCEPTED],
+        },
+        orderId: null,
+    })
+        .sort({ createdAt: -1 })
+        .populate('productId', DASHBOARD_PRODUCT_SELECT)
+        .lean();
+
+    const mapped = rows
+        .filter((row) => row.productId != null)
+        .map((row) => ({
+            _id: String(row._id),
+            productId: String(row.productId._id ?? row.productId),
+            product: buildDashboardProductSnapshot(
+                typeof row.productId === 'object' ? row.productId : null,
+            ),
+            offerPrice: row.offerPrice,
+            status: row.status,
+            createdAt: row.createdAt,
+            paymentDeadlineAt: row.paymentDeadlineAt,
+        }));
+
+    return sortBuyerDashboardBids(mapped);
+};
+
+/**
+ * @param {import('mongoose').Types.ObjectId | string} sellerUserId
+ */
+const loadActiveAuctionProductIdsForSeller = async (sellerUserId) => {
+    const products = await ProductModel.find({
+        productSeller: sellerUserId,
+        productAuctionEnabled: true,
+        productModerationStatus: PRODUCT_MODERATION_APPROVED,
+        productIsAvailable: { $ne: false },
+    })
+        .select(DASHBOARD_PRODUCT_SELECT)
+        .lean();
+
+    return products.filter((product) => computeAuctionActive(product));
+};
+
+/**
+ * @param {import('mongoose').Types.ObjectId | string} sellerUserId
+ */
+export const getIncomingPriceOffersForSeller = async (sellerUserId) => {
+    await releaseExpiredAcceptedOffers();
+
+    const activeProducts = await loadActiveAuctionProductIdsForSeller(
+        sellerUserId,
+    );
+    if (activeProducts.length === 0) {
+        return [];
+    }
+
+    const productById = new Map(
+        activeProducts.map((product) => [String(product._id), product]),
+    );
+    const productIds = activeProducts.map((product) => product._id);
+
+    const rows = await ProductPriceOfferModel.find({
+        productId: { $in: productIds },
+        status: {
+            $in: [PRICE_OFFER_STATUS_PENDING, PRICE_OFFER_STATUS_ACCEPTED],
+        },
+        orderId: null,
+    })
+        .sort({ offerPrice: -1, createdAt: 1 })
+        .populate('buyerUserId', BUYER_PUBLIC_SELECT)
+        .lean();
+
+    const mapped = rows.map((row) => ({
+        _id: String(row._id),
+        productId: String(row.productId),
+        product: buildDashboardProductSnapshot(
+            productById.get(String(row.productId)) ?? null,
+        ),
+        offerPrice: row.offerPrice,
+        status: row.status,
+        createdAt: row.createdAt,
+        paymentDeadlineAt: row.paymentDeadlineAt,
+        buyer: mapBuyerPublic(
+            typeof row.buyerUserId === 'object' ? row.buyerUserId : null,
+        ),
+    }));
+
+    return sortIncomingDashboardOffers(mapped);
+};
+
+/**
+ * @param {import('mongoose').Types.ObjectId | string} sellerUserId
+ */
+export const countIncomingPendingPriceOffersForSeller = async (
+    sellerUserId,
+) => {
+    await releaseExpiredAcceptedOffers();
+
+    const activeProducts = await loadActiveAuctionProductIdsForSeller(
+        sellerUserId,
+    );
+    if (activeProducts.length === 0) {
+        return 0;
+    }
+
+    return ProductPriceOfferModel.countDocuments({
+        productId: { $in: activeProducts.map((product) => product._id) },
+        status: PRICE_OFFER_STATUS_PENDING,
+        orderId: null,
+    });
+};
+
+/**
+ * @param {import('mongoose').Types.ObjectId | string} userId
+ */
+export const countAuctionTabActionItems = async (userId) => {
+    await releaseExpiredAcceptedOffers();
+    const [bids, offers] = await Promise.all([
+        getMyPriceOfferBids(userId),
+        getIncomingPriceOffersForSeller(userId),
+    ]);
+    return bids.length + offers.length;
+};

@@ -1,0 +1,265 @@
+.installment-contract-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  background: #fff;
+}
+
+.installment-contract-card_completed {
+  border-color: #86efac;
+  background: #f0fdf4;
+}
+
+.installment-contract-card_completed .installment-contract-card__amount {
+  color: #166534;
+}
+
+.installment-contract-card__header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.installment-contract-card__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  min-width: 0;
+}
+
+.installment-contract-card__title_link {
+  padding: 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  color: #1f6feb;
+  text-align: left;
+  cursor: pointer;
+}
+
+.installment-contract-card__title_link:hover {
+  text-decoration: underline;
+}
+
+.installment-contract-card__overdue {
+  margin: 0;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.35rem;
+  background: #fef2f2;
+  color: #b42318;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.installment-contract-card__meta {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+.installment-contract-card__meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15rem 0.35rem;
+}
+
+.installment-contract-card__meta-row dt {
+  margin: 0;
+  flex: 0 0 auto;
+  color: #6b7280;
+}
+
+.installment-contract-card__meta-row dd {
+  display: inline;
+  flex: 1 1 auto;
+  margin: 0;
+  min-width: 0;
+  color: #111827;
+}
+
+.installment-contract-card__amount {
+  font: inherit;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #111827;
+  line-height: inherit;
+}
+
+.installment-contract-card__amount_total {
+  font: inherit;
+  font-weight: 700;
+}
+
+.installment-contract-card__amount-separator {
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+.installment-contract-card__payments {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.installment-contract-card__payments-title {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.installment-contract-card__payment {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #f3f4f6;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.35;
+}
+
+.installment-contract-card__payment-main {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  gap: 0.5rem 0.75rem;
+  align-items: center;
+  flex: 1;
+  min-width: 12rem;
+}
+
+.installment-contract-card__payment-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  height: 1.5rem;
+  padding: 0 0.45rem;
+  border-radius: 999px;
+  background: rgba(17, 24, 39, 0.08);
+  font-size: inherit;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #111827;
+  line-height: 1;
+}
+
+.installment-contract-card__amount_payment {
+  font: inherit;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.installment-contract-card__payment-meta {
+  color: #6b7280;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.installment-contract-card__payment_remaining {
+  border-color: #d1d5db;
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.installment-contract-card__payment_remaining
+  .installment-contract-card__payment-index {
+  background: rgba(55, 65, 81, 0.12);
+}
+
+.installment-contract-card__payment_overdue {
+  border-color: #fecaca;
+  background: #fff7f7;
+}
+
+.installment-contract-card__payment_pending {
+  border-color: #fde047;
+  background: #fefce8;
+}
+
+.installment-contract-card__payment_paid {
+  border-color: #86efac;
+  background: #f0fdf4;
+}
+
+.installment-contract-card__payment_paid .installment-contract-card__amount {
+  color: #166534;
+}
+
+.installment-contract-card__payment_overdue .installment-contract-card__amount {
+  color: #b42318;
+}
+
+.installment-contract-card__payment_pending .installment-contract-card__amount {
+  color: #854d0e;
+}
+
+.installment-contract-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.installment-contract-card__btn {
+  padding: 0.4rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.4rem;
+  background: #fff;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.installment-contract-card__btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.installment-contract-card__btn_primary {
+  border-color: #2563eb;
+  background: #2563eb;
+  color: #fff;
+}
+
+.installment-contract-card__btn_danger {
+  border-color: #f87171;
+  background: #fff;
+  color: #b42318;
+}
+
+.installment-contract-card__payment-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.installment-contract-card__error {
+  margin: 0;
+  color: #b42318;
+  font-size: 0.85rem;
+}
+
+.installment-contract-card__dispute-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.installment-contract-card__textarea {
+  width: 100%;
+  min-height: 4rem;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.4rem;
+  font: inherit;
+  resize: vertical;
+}

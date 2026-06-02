@@ -42,6 +42,7 @@
  * @property {number} [productStockQuantity]
  * @property {number} [productAvailableQuantity] — остаток с учётом резерва в заказах
  * @property {boolean} [productAuctionEnabled]
+ * @property {boolean} [productInstallmentEnabled]
  * @property {boolean} [productAuctionCompletedOnce]
  * @property {boolean} [auctionActive] — enabled && approved && available
  * @property {'pending'|'approved'|'rejected'} [productModerationStatus]

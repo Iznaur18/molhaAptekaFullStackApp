@@ -241,7 +241,7 @@ export const decrementProductStockOnItemConfirmed = async (productId, quantity) 
     const updated = await ProductModel.findByIdAndUpdate(
         productId,
         { $inc: { productStockQuantity: -qty } },
-        { new: true },
+        { returnDocument: 'after' },
     ).select('productStockQuantity');
 
     if (!updated) {

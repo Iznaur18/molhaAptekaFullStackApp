@@ -34,11 +34,13 @@ import {
 import { resolveUploadedImageUrl } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import { ProductEditManageSection } from "./ProductEditManageSection.jsx";
+import { InstallmentProgramModal } from "../../installment/ui/InstallmentProgramModal.jsx";
 import { ProductImageUrlSortableList } from "./ProductImageUrlSortableList.jsx";
 import { ProductPreviewVideoField } from "./ProductPreviewVideoField.jsx";
 import {
   CREATE_PRODUCT_MODAL_UI,
   PRODUCT_PREVIEW_VIDEO_UI,
+  PRODUCT_CARD_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { FormFieldLabel } from "../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
 import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
@@ -146,6 +148,7 @@ export function CreateProductModal({
 }) {
   const [form, setForm] = useState(INITIAL_FORM);
   const [status, setStatus] = useState({ kind: "idle", message: "" });
+  const [isInstallmentProgramOpen, setIsInstallmentProgramOpen] = useState(false);
   const isEdit = mode === "edit";
   const isSubmitting = status.kind === "loading";
   const showManageSection =
@@ -363,9 +366,6 @@ export function CreateProductModal({
   const dialogAria = isEdit
     ? CREATE_PRODUCT_MODAL_UI.ARIA_DIALOG_EDIT
     : CREATE_PRODUCT_MODAL_UI.ARIA_DIALOG;
-  const backdropAria = isEdit
-    ? CREATE_PRODUCT_MODAL_UI.ARIA_CLOSE_BACKDROP_EDIT
-    : CREATE_PRODUCT_MODAL_UI.ARIA_CLOSE_BACKDROP;
   const title = isEdit
     ? CREATE_PRODUCT_MODAL_UI.TITLE_EDIT
     : CREATE_PRODUCT_MODAL_UI.TITLE;
@@ -383,12 +383,7 @@ export function CreateProductModal({
       aria-modal="true"
       aria-label={dialogAria}
     >
-      <button
-        type="button"
-        className="create-product-modal__backdrop"
-        aria-label={backdropAria}
-        onClick={handleClose}
-      />
+      <div className="create-product-modal__backdrop" aria-hidden="true" />
       <div className="create-product-modal__card">
         <div className="create-product-modal__header">
           <h2 className="create-product-modal__title">{title}</h2>
@@ -550,23 +545,37 @@ export function CreateProductModal({
               </label>
             ) : null}
             {showManageSection && manageProduct ? (
-              <ProductEditManageSection
-                product={manageProduct}
-                onDelete={onDeleteProduct}
-                onSetAvailability={onSetProductAvailability}
-                onSetAuction={onSetProductAuction}
-                isDeletePending={isDeletePending}
-                isAvailabilityTogglePending={isAvailabilityTogglePending}
-                isAuctionTogglePending={isAuctionTogglePending}
-                errorMessage={manageErrorMessage}
-                canEdit={canManageEdit}
-                canDelete={canManageDelete}
-                canToggleVisibility={canManageToggleVisibility}
-                sellerRaffleActive={sellerRaffleActive}
-                onToggleRaffleParticipation={onToggleRaffleParticipation}
-                isRaffleParticipationPending={isRaffleParticipationPending}
-                disabled={isSubmitting}
-              />
+              <>
+                <button
+                  type="button"
+                  className="product-card__availability-toggle"
+                  disabled={
+                    isSubmitting ||
+                    manageProduct.productModerationStatus !==
+                      PRODUCT_MODERATION_APPROVED
+                  }
+                  onClick={() => setIsInstallmentProgramOpen(true)}
+                >
+                  {PRODUCT_CARD_UI.INSTALLMENT_SELL_BUTTON}
+                </button>
+                <ProductEditManageSection
+                  product={manageProduct}
+                  onDelete={onDeleteProduct}
+                  onSetAvailability={onSetProductAvailability}
+                  onSetAuction={onSetProductAuction}
+                  isDeletePending={isDeletePending}
+                  isAvailabilityTogglePending={isAvailabilityTogglePending}
+                  isAuctionTogglePending={isAuctionTogglePending}
+                  errorMessage={manageErrorMessage}
+                  canEdit={canManageEdit}
+                  canDelete={canManageDelete}
+                  canToggleVisibility={canManageToggleVisibility}
+                  sellerRaffleActive={sellerRaffleActive}
+                  onToggleRaffleParticipation={onToggleRaffleParticipation}
+                  isRaffleParticipationPending={isRaffleParticipationPending}
+                  disabled={isSubmitting}
+                />
+              </>
             ) : null}
             {status.kind === "error" ? (
               <p
@@ -586,6 +595,19 @@ export function CreateProductModal({
           </form>
         </div>
       </div>
+      {manageProduct?._id != null ? (
+        <InstallmentProgramModal
+          isOpen={isInstallmentProgramOpen}
+          productId={String(manageProduct._id)}
+          productName={manageProduct.productName}
+          onClose={() => setIsInstallmentProgramOpen(false)}
+          onSaved={() => {
+            if (manageProduct?._id != null) {
+              onSuccess?.(manageProduct);
+            }
+          }}
+        />
+      ) : null}
     </div>
   );
 }

@@ -1,0 +1,65 @@
+.installment-disputes-page__state {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.installment-disputes-page__state_error {
+  color: #b42318;
+}
+
+.installment-disputes-page__card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  background: #fff;
+}
+
+.installment-disputes-page__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.installment-disputes-page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.installment-disputes-page__btn {
+  padding: 0.45rem 0.85rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.4rem;
+  background: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.installment-disputes-page__btn_primary {
+  border-color: #2563eb;
+  background: #2563eb;
+  color: #fff;
+}
+
+.installment-disputes-page__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.installment-disputes-page__textarea,
+.installment-disputes-page__input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.4rem;
+  font: inherit;
+}
+
+.installment-disputes-page__textarea {
+  min-height: 3.5rem;
+  resize: vertical;
+}

@@ -4,6 +4,8 @@ import {
     makeOrderController,
     getMyOrdersController,
     getMySalesController,
+    getMyOrdersActionCountController,
+    getMySalesActionCountController,
     getAllOrdersController,
     updateOrderStatusController,
     markOrderItemShippedBySellerController,
@@ -23,7 +25,9 @@ import {
 const router = Router();
 
 router.get('/all', checkAuthMW, checkAdminMW, getAllOrdersValidation, getAllOrdersController);
+router.get('/action-count', checkAuthMW, getMyOrdersActionCountController);
 router.get('/', checkAuthMW, getMyOrdersController);
+router.get('/sales/action-count', checkAuthMW, getMySalesActionCountController);
 router.get('/sales', checkAuthMW, getMySalesValidation, getMySalesController);
 router.post('/', checkAuthMW, makeOrderValidation, makeOrderController);
 router.patch(

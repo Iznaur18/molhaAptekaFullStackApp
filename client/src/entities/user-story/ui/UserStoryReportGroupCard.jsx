@@ -68,7 +68,6 @@ export function UserStoryReportGroupCard({ group, onResolved, onOpenUser }) {
           <video
             className="user-story-report-group-card__media"
             src={mediaUrl}
-            controls
             playsInline
           />
         ) : (

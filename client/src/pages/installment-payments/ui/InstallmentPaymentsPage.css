@@ -1,0 +1,48 @@
+.installment-list-page {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.installment-list-page__filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.installment-list-page__filter-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: #4b5563;
+}
+
+.installment-list-page__filter-control {
+  padding: 0.4rem 0.65rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.4rem;
+  background: #fff;
+  font: inherit;
+  font-size: 0.9rem;
+  color: #111827;
+}
+
+.installment-list-page__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.installment-list-page__state {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.installment-list-page__state_error {
+  color: #b42318;
+}

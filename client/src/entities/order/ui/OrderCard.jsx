@@ -7,7 +7,9 @@ import {
 } from "../model/constants.js";
 import {
   COMMON_UI,
+  INSTALLMENT_UI,
   ORDER_CARD_UI,
+  PRODUCT_CARD_UI,
 } from "../../../shared/config/appUiCopy.js";
 import {
   isOrderLineItemProductClickable,
@@ -85,12 +87,27 @@ export function OrderCard({
   itemActionErrors = {},
   onBuyerNameClick,
 }) {
+  const isInstallmentOrder = Boolean(order.installmentContractId);
+  const isAuctionOrder = Boolean(order.priceOfferId);
+
   return (
     <article className="order-card">
       <header className="order-card__header">
-        <span className={`order-card__status order-card__status_${order.status}`}>
-          {formatStatus(order.status)}
-        </span>
+        <div className="order-card__header-badges">
+          <span className={`order-card__status order-card__status_${order.status}`}>
+            {formatStatus(order.status)}
+          </span>
+          {isAuctionOrder ? (
+            <span className="order-card__auction-badge">
+              {PRODUCT_CARD_UI.AUCTION_BADGE}
+            </span>
+          ) : null}
+          {isInstallmentOrder ? (
+            <span className="order-card__installment-badge">
+              {INSTALLMENT_UI.BADGE}
+            </span>
+          ) : null}
+        </div>
         <span className="order-card__total">
           {formatPriceRub(order.totalAmount)}
         </span>
@@ -115,6 +132,16 @@ export function OrderCard({
           <dt>{ORDER_CARD_UI.PAYMENT_LABEL}</dt>
           <dd>{formatPaymentMethod(order.paymentMethod)}</dd>
         </div>
+        {isInstallmentOrder && order.installmentContract ? (
+          <div className="order-card__meta-row">
+            <dt>{INSTALLMENT_UI.CONTRACT_PLAN}</dt>
+            <dd>
+              {order.installmentContract.planTitle} ·{" "}
+              {order.installmentContract.monthsCount} мес ×{" "}
+              {formatPriceRub(order.installmentContract.monthlyPaymentRub)}
+            </dd>
+          </div>
+        ) : null}
       </dl>
 
       <h3 className="order-card__items-heading">

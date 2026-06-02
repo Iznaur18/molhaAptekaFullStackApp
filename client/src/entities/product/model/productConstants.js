@@ -135,6 +135,7 @@ export const CATALOG_SORT_CONFIRMED = "confirmed";
 /** Значения `<select>` каталога (не уходят в query `sort`). */
 export const CATALOG_FILTER_FOLLOWING_ONLY = "__following_only__";
 export const CATALOG_FILTER_AUCTION_ONLY = "__auction_only__";
+export const CATALOG_FILTER_INSTALLMENT_ONLY = "__installment_only__";
 export const CATALOG_FILTER_SALE_ONLY = "__sale_only__";
 
 export const CATALOG_SORT_OPTIONS = [
@@ -156,6 +157,7 @@ export const CATALOG_SELECT_OPTIONS = [
 export const CATALOG_PUBLIC_FILTER_TOGGLE_KEYS = [
   CATALOG_FILTER_FOLLOWING_ONLY,
   CATALOG_FILTER_AUCTION_ONLY,
+  CATALOG_FILTER_INSTALLMENT_ONLY,
   CATALOG_FILTER_SALE_ONLY,
 ];
 
@@ -193,6 +195,7 @@ export const CATALOG_SORT_LABEL_RU = {
   [CATALOG_SORT_CONFIRMED]: "Подтверждённые продавцы",
   [CATALOG_FILTER_FOLLOWING_ONLY]: "Только от подписок",
   [CATALOG_FILTER_AUCTION_ONLY]: "Только с аукционом",
+  [CATALOG_FILTER_INSTALLMENT_ONLY]: "Только в рассрочку",
   [CATALOG_FILTER_SALE_ONLY]: "Распродажа",
 };
 

@@ -150,13 +150,12 @@ export function UserDetailsModal({
     .join(" ");
 
   return (
-    <div className={backdropClassName} role="presentation" onClick={onClose}>
+    <div className={backdropClassName} role="presentation">
       <div
         className={modalClassName}
         role="dialog"
         aria-modal="true"
         aria-labelledby="user-details-modal-title"
-        onClick={(e) => e.stopPropagation()}
       >
         <header className="user-details-modal__header">
           <div className="user-details-modal__title-cluster">

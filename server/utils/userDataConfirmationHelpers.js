@@ -15,8 +15,22 @@ import {
     UserDataConfirmationRequestModel,
     UserModel,
 } from '../models/index.js';
+import { normalizeStoredUploadUrl } from './buildPublicUploadUrl.js';
 import { createUserInAppNotification } from './userInAppNotifications.js';
 import { assertMinWords } from './maxWordsText.js';
+
+const UPLOAD_PATH_PREFIX = '/uploads/';
+
+/**
+ * @param {unknown} value
+ */
+export const normalizePassportSelfiePhotoUrl = (value) => {
+    const url = normalizeStoredUploadUrl(String(value ?? '').trim());
+    if (!url.includes(UPLOAD_PATH_PREFIX)) {
+        throw new Error('Загрузите фото с паспортом в руках');
+    }
+    return url;
+};
 
 const PENDING_USER_SELECT =
     '_id userName userAvatarUrl telegramPhotoUrl isPremiumUser createdAt';

@@ -1,0 +1,173 @@
+import { useState } from "react";
+
+import { UserPremiumDisplayName } from "../../user/ui/UserPremiumDisplayName.jsx";
+import { acceptPriceOffer } from "../api/acceptPriceOffer.js";
+import { rejectPriceOffer } from "../api/rejectPriceOffer.js";
+import {
+  PRICE_OFFER_STATUS_ACCEPTED,
+  PRICE_OFFER_STATUS_PENDING,
+} from "../model/constants.js";
+import { formatIsoDateTime } from "../../../shared/lib/formatIsoDateTime.js";
+import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
+import {
+  AUCTION_PAGE_UI,
+  PRODUCT_PRICE_OFFER_UI,
+  USER_LIST_ROW_UI,
+} from "../../../shared/config/appUiCopy.js";
+
+import "./AuctionDashboard.css";
+
+/**
+ * @param {{
+ *   offer: import('../model/types.js').PriceOfferIncomingRow;
+ *   onProductClick?: (productId: string) => void;
+ *   onBuyerClick?: (userId: string) => void;
+ *   onChanged?: () => void;
+ * }} props
+ */
+export function AuctionSellerOfferRow({
+  offer,
+  onProductClick,
+  onBuyerClick,
+  onChanged,
+}) {
+  const [error, setError] = useState("");
+  const [isBusy, setIsBusy] = useState(false);
+
+  const productName = offer.product?.productName ?? "Товар";
+  const imageUrl = offer.product?.productImageUrl ?? null;
+  const buyer = offer.buyer;
+  const buyerId = buyer?._id != null ? String(buyer._id) : null;
+  const buyerName =
+    buyer?.userName?.trim() || USER_LIST_ROW_UI.MISSING_NAME;
+  const isPending = offer.status === PRICE_OFFER_STATUS_PENDING;
+  const isAccepted = offer.status === PRICE_OFFER_STATUS_ACCEPTED;
+
+  const handleAccept = async () => {
+    setIsBusy(true);
+    setError("");
+    try {
+      await acceptPriceOffer(offer.productId, offer._id);
+      onChanged?.();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : AUCTION_PAGE_UI.ERROR_GENERIC);
+    } finally {
+      setIsBusy(false);
+    }
+  };
+
+  const handleReject = async () => {
+    setIsBusy(true);
+    setError("");
+    try {
+      await rejectPriceOffer(offer.productId, offer._id);
+      onChanged?.();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : AUCTION_PAGE_UI.ERROR_GENERIC);
+    } finally {
+      setIsBusy(false);
+    }
+  };
+
+  return (
+    <article className="auction-dashboard-row">
+      <div className="auction-dashboard-row__head">
+        {imageUrl ? (
+          <img
+            className="auction-dashboard-row__thumb"
+            src={imageUrl}
+            alt=""
+            loading="lazy"
+          />
+        ) : (
+          <span className="auction-dashboard-row__thumb auction-dashboard-row__thumb_placeholder">
+            —
+          </span>
+        )}
+        <div className="auction-dashboard-row__main">
+          {typeof onProductClick === "function" ? (
+            <button
+              type="button"
+              className="auction-dashboard-row__title"
+              onClick={() => onProductClick(offer.productId)}
+            >
+              {productName}
+            </button>
+          ) : (
+            <p className="auction-dashboard-row__title_static">{productName}</p>
+          )}
+          <p className="auction-dashboard-row__meta">
+            {buyerId && typeof onBuyerClick === "function" ? (
+              <button
+                type="button"
+                className="auction-dashboard-row__buyer-link"
+                onClick={() => onBuyerClick(buyerId)}
+              >
+                <UserPremiumDisplayName
+                  name={buyerName}
+                  isPremium={buyer?.isPremiumUser === true}
+                  isUserDataConfirmed={buyer?.isUserDataConfirmed === true}
+                />
+              </button>
+            ) : (
+              <UserPremiumDisplayName
+                name={buyerName}
+                isPremium={buyer?.isPremiumUser === true}
+                isUserDataConfirmed={buyer?.isUserDataConfirmed === true}
+              />
+            )}
+            {" · "}
+            {formatIsoDateTime(offer.createdAt)}
+            {isAccepted ? ` · ${PRODUCT_PRICE_OFFER_UI.ACCEPTED_BADGE}` : ""}
+          </p>
+          <p
+            className={[
+              "auction-dashboard-row__status",
+              isPending
+                ? "auction-dashboard-row__status_pending"
+                : isAccepted
+                  ? "auction-dashboard-row__status_accepted"
+                  : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+          >
+            {isPending ? PRODUCT_PRICE_OFFER_UI.STATUS_PENDING : null}
+          </p>
+        </div>
+        <span className="auction-dashboard-row__price">
+          {formatPriceRub(offer.offerPrice)}
+        </span>
+      </div>
+
+      {isPending ? (
+        <div className="auction-dashboard-row__actions">
+          <button
+            type="button"
+            className="auction-dashboard-row__btn auction-dashboard-row__btn_primary"
+            disabled={isBusy}
+            onClick={() => void handleAccept()}
+          >
+            {isBusy
+              ? PRODUCT_PRICE_OFFER_UI.ACTION_PENDING
+              : PRODUCT_PRICE_OFFER_UI.ACTION_ACCEPT}
+          </button>
+          <button
+            type="button"
+            className="auction-dashboard-row__btn auction-dashboard-row__btn_reject"
+            disabled={isBusy}
+            onClick={() => void handleReject()}
+          >
+            {PRODUCT_PRICE_OFFER_UI.ACTION_REJECT}
+          </button>
+        </div>
+      ) : null}
+
+      {error ? (
+        <p className="auction-dashboard-row__error" role="alert">
+          {error}
+        </p>
+      ) : null}
+    </article>
+  );
+}

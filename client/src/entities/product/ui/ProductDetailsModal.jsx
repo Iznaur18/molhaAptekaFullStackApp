@@ -36,12 +36,20 @@ import { ProductPriceOfferHintMessage } from "../../product-price-offer/ui/Produ
 import { ProductPriceOfferSellerTab } from "../../product-price-offer/ui/ProductPriceOfferSellerTab.jsx";
 import { ProductPriceOfferSellerArchive } from "../../product-price-offer/ui/ProductPriceOfferSellerArchive.jsx";
 import { resolveAuctionUiState } from "../lib/resolveAuctionUiState.js";
+import { resolveInstallmentUiState } from "../../installment/lib/resolveInstallmentUiState.js";
+import { fetchProductInstallmentProgram } from "../../installment/api/installmentApi.js";
+import { InstallmentBuyerBlock } from "../../installment/ui/InstallmentBuyerBlock.jsx";
+import {
+  INSTALLMENT_MODERATION_PENDING,
+  INSTALLMENT_MODERATION_REJECTED,
+} from "../../installment/model/constants.js";
 import { getProductPurchaseLimit } from "../lib/getProductPurchaseLimit.js";
 import { PRODUCT_MODERATION_APPROVED } from "../model/productModerationConstants.js";
 import { ProductReviewsSection } from "../../product-review/ui/ProductReviewsSection.jsx";
 import {
   PRODUCT_PRICE_OFFER_UI,
   PRODUCT_REVIEW_UI,
+  INSTALLMENT_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
@@ -179,6 +187,9 @@ function renderFieldRows(product, keys, handlers) {
  *   onRequestLogin?: () => void;
  *   secondaryFooter?: import('react').ReactNode;
  *   currentUserId?: string | null;
+ *   initialDetailsTab?: 'details' | 'auction' | 'reviews' | 'installment';
+ *   isPremiumUser?: boolean;
+ *   onProfileActionBadgesChanged?: () => void;
  * }} props
  */
 export function ProductDetailsModal({
@@ -194,6 +205,9 @@ export function ProductDetailsModal({
   showAddToCart = false,
   onRequestLogin = () => {},
   currentUserId = null,
+  initialDetailsTab = "details",
+  isPremiumUser = false,
+  onProfileActionBadgesChanged,
 }) {
   const imageUrls = useMemo(
     () => (product ? resolveProductImageUrls(product) : []),
@@ -207,8 +221,17 @@ export function ProductDetailsModal({
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [detailsTab, setDetailsTab] = useState(
-    /** @type {'details' | 'auction' | 'reviews'} */ ("details"),
+    /** @type {'details' | 'auction' | 'reviews' | 'installment'} */ (
+      initialDetailsTab
+    ),
   );
+  const [installmentProgram, setInstallmentProgram] = useState(
+    /** @type {import('../../installment/model/types.js').InstallmentProgramFromApi | null} */ (
+      null
+    ),
+  );
+  const [isInstallmentProgramLoading, setIsInstallmentProgramLoading] =
+    useState(false);
   const [topOffers, setTopOffers] = useState(
     /** @type {import('../../product-price-offer/model/types.js').PriceOfferTopEntry[]} */ ([]),
   );
@@ -227,6 +250,10 @@ export function ProductDetailsModal({
     () => resolveAuctionUiState(product),
     [product],
   );
+  const installmentUi = useMemo(
+    () => resolveInstallmentUiState(product, installmentProgram),
+    [product, installmentProgram],
+  );
   const showReviewsTab =
     product?._id != null &&
     (product.productModerationStatus === PRODUCT_MODERATION_APPROVED ||
@@ -236,7 +263,14 @@ export function ProductDetailsModal({
     (isSellerView
       ? auctionUi.showSellerAuctionTab
       : product.productAuctionEnabled === true);
-  const showProductDetailsTabs = showAuctionTab || showReviewsTab;
+  const showInstallmentTab =
+    product?._id != null &&
+    (isSellerView
+      ? installmentUi.showInstallmentTab
+      : product.productInstallmentEnabled === true ||
+        installmentUi.installmentActive);
+  const showProductDetailsTabs =
+    showAuctionTab || showReviewsTab || showInstallmentTab;
 
   const reloadTopOffers = useCallback(async () => {
     if (!product?._id || !auctionUi.auctionActive) {
@@ -268,6 +302,29 @@ export function ProductDetailsModal({
     setDetailsTab("auction");
   }, [auctionUi.auctionActive]);
 
+  const handleInstallmentShortcutClick = useCallback(() => {
+    if (!installmentUi.installmentActive) {
+      return;
+    }
+    setDetailsTab("installment");
+  }, [installmentUi.installmentActive]);
+
+  const reloadInstallmentProgram = useCallback(async () => {
+    if (!product?._id) {
+      setInstallmentProgram(null);
+      return;
+    }
+    setIsInstallmentProgramLoading(true);
+    try {
+      const program = await fetchProductInstallmentProgram(String(product._id));
+      setInstallmentProgram(program);
+    } catch {
+      setInstallmentProgram(null);
+    } finally {
+      setIsInstallmentProgramLoading(false);
+    }
+  }, [product?._id]);
+
   const mediaSlides = useMemo(() => {
     const videoUrl =
       previewVideoUrl != null && !previewVideoFailed ? previewVideoUrl : null;
@@ -283,10 +340,11 @@ export function ProductDetailsModal({
   useEffect(() => {
     setActiveSlideIndex(0);
     setLightboxOpen(false);
-    setDetailsTab("details");
+    setDetailsTab(initialDetailsTab);
     setTabPanelMinHeight(0);
     setPreviewVideoFailed(false);
-  }, [product?._id]);
+    setInstallmentProgram(null);
+  }, [product?._id, initialDetailsTab]);
 
   useEffect(() => {
     setActiveSlideIndex((i) =>
@@ -308,10 +366,17 @@ export function ProductDetailsModal({
         isOwnProduct);
     const showAuction =
       product._id != null && product.productAuctionEnabled === true;
+    const showInstallment =
+      product._id != null &&
+      (product.productInstallmentEnabled === true ||
+        installmentUi.installmentActive);
     if (detailsTab === "reviews" && !showReviews) {
       setDetailsTab("details");
     }
     if (detailsTab === "auction" && !showAuction) {
+      setDetailsTab("details");
+    }
+    if (detailsTab === "installment" && !showInstallment) {
       setDetailsTab("details");
     }
   }, [
@@ -320,9 +385,20 @@ export function ProductDetailsModal({
     isOwnProduct,
     product,
     product?.productAuctionEnabled,
+    product?.productInstallmentEnabled,
     product?.productModerationStatus,
     product?._id,
+    installmentUi.installmentActive,
   ]);
+
+  useEffect(() => {
+    if (!isOpen || !product?._id || !showInstallmentTab) {
+      setInstallmentProgram(null);
+      return undefined;
+    }
+    void reloadInstallmentProgram();
+    return undefined;
+  }, [isOpen, product?._id, showInstallmentTab, reloadInstallmentProgram]);
 
   useEffect(() => {
     if (!isOpen || !product?._id || !auctionUi.auctionActive) {
@@ -476,14 +552,12 @@ export function ProductDetailsModal({
       <div
         className="product-details-modal__backdrop"
         role="presentation"
-        onClick={onClose}
       >
         <div
           className="product-details-modal"
           role="dialog"
           aria-modal="true"
           aria-labelledby="product-details-modal-title"
-          onClick={(event) => event.stopPropagation()}
         >
           <header className="product-details-modal__header">
             <h2
@@ -533,6 +607,21 @@ export function ProductDetailsModal({
                     {PRODUCT_PRICE_OFFER_UI.TAB_AUCTION}
                   </button>
                 ) : null}
+                {showInstallmentTab ? (
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={detailsTab === "installment"}
+                    className={
+                      detailsTab === "installment"
+                        ? "product-details-modal__tab product-details-modal__tab_active"
+                        : "product-details-modal__tab"
+                    }
+                    onClick={() => setDetailsTab("installment")}
+                  >
+                    {INSTALLMENT_UI.TAB}
+                  </button>
+                ) : null}
                 {showReviewsTab ? (
                   <button
                     type="button"
@@ -575,7 +664,10 @@ export function ProductDetailsModal({
                   <ProductPriceOfferSellerTab
                     productId={String(product._id)}
                     onOpenBuyer={handleOpenSellerProfile}
-                    onChanged={() => void reloadTopOffers()}
+                    onChanged={() => {
+                      void reloadTopOffers();
+                      onProfileActionBadgesChanged?.();
+                    }}
                   />
                 ) : (
                   <section
@@ -592,7 +684,10 @@ export function ProductDetailsModal({
                         top={topOffers}
                         onOpenBuyer={handleOpenSellerProfile}
                         onRequestLogin={onRequestLogin}
-                        onOffersChanged={() => void reloadTopOffers()}
+                        onOffersChanged={() => {
+                          void reloadTopOffers();
+                          onProfileActionBadgesChanged?.();
+                        }}
                       />
                     ) : auctionUi.buyerMessage === "ended" ? (
                       <p className="product-price-offer__hint">
@@ -604,6 +699,40 @@ export function ProductDetailsModal({
                       </ProductPriceOfferHintMessage>
                     ) : null}
                   </section>
+                )
+              ) : detailsTab === "installment" && showInstallmentTab ? (
+                isSellerView ? (
+                  <section className="product-details-modal__installment-section">
+                    {isInstallmentProgramLoading ? (
+                      <p>{INSTALLMENT_UI.ACTION_PENDING}</p>
+                    ) : installmentProgram?.moderationStatus ===
+                      INSTALLMENT_MODERATION_PENDING ? (
+                      <p>{INSTALLMENT_UI.MODERATION_PENDING}</p>
+                    ) : installmentProgram?.moderationStatus ===
+                      INSTALLMENT_MODERATION_REJECTED ? (
+                      <p>{INSTALLMENT_UI.MODERATION_REJECTED}</p>
+                    ) : installmentUi.installmentActive ? (
+                      <p>{INSTALLMENT_UI.MODERATION_APPROVED}</p>
+                    ) : (
+                      <p>{INSTALLMENT_UI.SELLER_TAB_HINT}</p>
+                    )}
+                  </section>
+                ) : installmentUi.installmentActive && installmentProgram ? (
+                  <InstallmentBuyerBlock
+                    product={product}
+                    program={installmentProgram}
+                    isAuthorized={isAuthorized}
+                    isUserDataConfirmed={isUserDataConfirmed}
+                    onRequestLogin={onRequestLogin}
+                    onSuccess={() => {
+                      void reloadInstallmentProgram();
+                      onProfileActionBadgesChanged?.();
+                    }}
+                  />
+                ) : isInstallmentProgramLoading ? (
+                  <p>{INSTALLMENT_UI.ACTION_PENDING}</p>
+                ) : (
+                  <p>{INSTALLMENT_UI.MODERATION_PENDING}</p>
                 )
               ) : (
                 <>
@@ -754,6 +883,19 @@ export function ProductDetailsModal({
                         onClick={handleAuctionShortcutClick}
                       >
                         {PRODUCT_PRICE_OFFER_UI.AUCTION_SHORTCUT}
+                      </button>
+                      <button
+                        type="button"
+                        className={
+                          installmentUi.installmentActive
+                            ? "product-details-modal__auction-btn"
+                            : "product-details-modal__auction-btn product-details-modal__auction-btn--inactive"
+                        }
+                        disabled={!installmentUi.installmentActive}
+                        aria-disabled={!installmentUi.installmentActive}
+                        onClick={handleInstallmentShortcutClick}
+                      >
+                        {INSTALLMENT_UI.SHORTCUT}
                       </button>
                     </div>
                   </div>

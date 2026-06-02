@@ -1,6 +1,7 @@
 import {
   CATALOG_FILTER_AUCTION_ONLY,
   CATALOG_FILTER_FOLLOWING_ONLY,
+  CATALOG_FILTER_INSTALLMENT_ONLY,
   CATALOG_FILTER_SALE_ONLY,
 } from "../../../entities/product/model/productConstants.js";
 import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
@@ -16,6 +17,7 @@ import {
  *   catalogSort: string;
  *   catalogFollowingOnly: boolean;
  *   catalogAuctionOnly: boolean;
+ *   catalogInstallmentOnly: boolean;
  *   catalogSaleOnly: boolean;
  *   onProductCategorySelect: (
  *     category: import("../../../entities/product/model/types.js").ProductCategory | null,
@@ -23,6 +25,7 @@ import {
  *   onCatalogSortChange: (sort: string) => void;
  *   onCatalogFollowingOnlyToggle: () => void;
  *   onCatalogAuctionOnlyToggle: () => void;
+ *   onCatalogInstallmentOnlyToggle: () => void;
  *   onCatalogSaleOnlyToggle: () => void;
  * }} props
  */
@@ -32,11 +35,13 @@ export function CatalogFilterDropdown({
   catalogSort,
   catalogFollowingOnly,
   catalogAuctionOnly,
+  catalogInstallmentOnly,
   catalogSaleOnly,
   onProductCategorySelect,
   onCatalogSortChange,
   onCatalogFollowingOnlyToggle,
   onCatalogAuctionOnlyToggle,
+  onCatalogInstallmentOnlyToggle,
   onCatalogSaleOnlyToggle,
 }) {
   const listItems = buildCatalogFilterDropdownItems();
@@ -45,6 +50,7 @@ export function CatalogFilterDropdown({
     catalogSort,
     catalogFollowingOnly,
     catalogAuctionOnly,
+    catalogInstallmentOnly,
     catalogSaleOnly,
   };
 
@@ -63,6 +69,10 @@ export function CatalogFilterDropdown({
     }
     if (item.value === CATALOG_FILTER_AUCTION_ONLY) {
       onCatalogAuctionOnlyToggle();
+      return;
+    }
+    if (item.value === CATALOG_FILTER_INSTALLMENT_ONLY) {
+      onCatalogInstallmentOnlyToggle();
       return;
     }
     if (item.value === CATALOG_FILTER_SALE_ONLY) {

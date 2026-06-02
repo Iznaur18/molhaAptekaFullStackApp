@@ -32,12 +32,14 @@ import "./MySalesPage.css";
  *   isAuthorized: boolean;
  *   currentUserId?: string | null;
  *   onSellerNameClick?: (userId: string) => void;
+ *   onQueueChanged?: () => void;
  * }} props
  */
 export function MySalesPage({
   isAuthorized,
   currentUserId = null,
   onSellerNameClick,
+  onQueueChanged,
 }) {
   const [statusFilter, setStatusFilter] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -141,6 +143,7 @@ export function MySalesPage({
       setOrders((prev) =>
         prev.map((order) => (order._id === orderId ? updatedOrder : order)),
       );
+      onQueueChanged?.();
       void reloadSales();
     } catch (e) {
       const message =
@@ -181,6 +184,7 @@ export function MySalesPage({
       setOrders((prev) =>
         prev.map((order) => (order._id === orderId ? updatedOrder : order)),
       );
+      onQueueChanged?.();
       void reloadSales();
     } catch (e) {
       const message =
@@ -221,6 +225,7 @@ export function MySalesPage({
       setOrders((prev) =>
         prev.map((order) => (order._id === orderId ? updatedOrder : order)),
       );
+      onQueueChanged?.();
       void reloadSales();
     } catch (e) {
       const message =

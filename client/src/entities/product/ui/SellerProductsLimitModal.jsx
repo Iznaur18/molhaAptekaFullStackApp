@@ -39,18 +39,15 @@ export function SellerProductsLimitModal({
 
   return (
     <div className="seller-products-limit-modal" role="presentation">
-      <button
-        type="button"
+      <div
         className="seller-products-limit-modal__backdrop"
-        aria-label={SELLER_PRODUCTS_LIMIT_MODAL_UI.ARIA_CLOSE_BACKDROP}
-        onClick={onClose}
+        aria-hidden="true"
       />
       <div
         className="seller-products-limit-modal__card"
         role="dialog"
         aria-modal="true"
         aria-labelledby="seller-products-limit-modal-title"
-        onClick={(event) => event.stopPropagation()}
       >
         <h2
           id="seller-products-limit-modal-title"

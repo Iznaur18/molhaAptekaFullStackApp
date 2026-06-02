@@ -3,7 +3,7 @@
  * проксирует `/cart` и `/user/...` на Express (см. vite.config.js).
  * Путь `/user-list` ок: не совпадает с API `/user` (иначе F5 → 404 JSON).
  *
- * @typedef {'catalog' | 'catalog-browser' | 'my-profile' | 'my-products' | 'users' | 'subscriptions' | 'notifications' | 'cart' | 'my-sales' | 'my-orders' | 'admin-orders' | 'product-moderation' | 'product-reports' | 'data-confirmation-requests'} HomeMainView
+ * @typedef {'catalog' | 'catalog-browser' | 'my-profile' | 'my-products' | 'users' | 'subscriptions' | 'notifications' | 'cart' | 'my-sales' | 'my-orders' | 'admin-orders' | 'product-moderation' | 'product-reports' | 'data-confirmation-requests' | 'installment-payments' | 'installment-sales' | 'installment-moderation' | 'installment-disputes'} HomeMainView
  */
 
 /** @type {Record<HomeMainView, string>} */
@@ -24,6 +24,10 @@ export const HOME_MAIN_VIEW_PATH = {
   "product-moderation": "/moderation-products",
   "product-reports": "/product-reports",
   "data-confirmation-requests": "/data-confirmation-requests",
+  "installment-payments": "/installment-payments",
+  "installment-sales": "/installment-sales",
+  "installment-moderation": "/installment-moderation",
+  "installment-disputes": "/installment-disputes",
 };
 
 /** @type {Map<string, HomeMainView>} */
@@ -105,6 +109,8 @@ export function isRoleRestrictedMainView(view) {
     view === "admin-orders" ||
     view === "product-moderation" ||
     view === "product-reports" ||
-    view === "data-confirmation-requests"
+    view === "data-confirmation-requests" ||
+    view === "installment-moderation" ||
+    view === "installment-disputes"
   );
 }

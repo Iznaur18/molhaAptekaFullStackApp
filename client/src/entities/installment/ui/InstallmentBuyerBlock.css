@@ -1,0 +1,247 @@
+.installment-buyer-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.installment-buyer-block__hint {
+  margin: 0;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #dbeafe;
+  border-radius: 0.65rem;
+  background: #eff6ff;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: #1e3a8a;
+}
+
+.installment-buyer-block__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 0.85rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  background: #f8fafc;
+}
+
+.installment-buyer-block__legend,
+.installment-buyer-block__label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.installment-buyer-block__plans {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.installment-buyer-block__plan-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.45rem;
+}
+
+.installment-buyer-block__plan-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    "input title"
+    "input meta"
+    "input note";
+  column-gap: 0.55rem;
+  row-gap: 0.15rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.6rem;
+  background: #fff;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.installment-buyer-block__plan-card:hover {
+  border-color: #93c5fd;
+}
+
+.installment-buyer-block__plan-card_selected {
+  border-color: #2563eb;
+  background: #eff6ff;
+  box-shadow: 0 0 0 2px rgb(37 99 235 / 12%);
+}
+
+.installment-buyer-block__plan-input {
+  grid-area: input;
+  width: 1rem;
+  height: 1rem;
+  margin: 0.15rem 0 0;
+  accent-color: #2563eb;
+  cursor: pointer;
+}
+
+.installment-buyer-block__plan-title {
+  grid-area: title;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.installment-buyer-block__plan-meta {
+  grid-area: meta;
+  font-size: 0.84rem;
+  color: #475569;
+}
+
+.installment-buyer-block__plan-note {
+  grid-area: note;
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.installment-buyer-block__row {
+  display: grid;
+  grid-template-columns: minmax(5rem, 0.35fr) minmax(0, 1fr);
+  gap: 0.65rem;
+  align-items: start;
+}
+
+.installment-buyer-block__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.installment-buyer-block__input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.45rem;
+  background: #fff;
+  font: inherit;
+  font-size: 0.9rem;
+  color: #0f172a;
+}
+
+.installment-buyer-block__input:focus {
+  outline: 2px solid rgb(37 99 235 / 22%);
+  border-color: #2563eb;
+}
+
+.installment-buyer-block__input:disabled {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.installment-buyer-block__select {
+  cursor: pointer;
+}
+
+.installment-buyer-block__totals {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.installment-buyer-block__total-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.55rem 0.65rem;
+  border: 1px dashed #cbd5e1;
+  border-radius: 0.45rem;
+  background: #fff;
+}
+
+.installment-buyer-block__total-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.installment-buyer-block__total-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.installment-buyer-block__section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.6rem;
+  background: #fff;
+}
+
+.installment-buyer-block__address .address-delivery-fields {
+  gap: 0.55rem;
+}
+
+.installment-buyer-block__address .address-delivery-fields label > span:first-child {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.installment-buyer-block__error {
+  margin: 0;
+  padding: 0.55rem 0.65rem;
+  border-radius: 0.45rem;
+  background: #fef2f2;
+  color: #b42318;
+  font-size: 0.85rem;
+}
+
+.installment-buyer-block__success {
+  margin: 0;
+  padding: 0.55rem 0.65rem;
+  border-radius: 0.45rem;
+  background: #ecfdf5;
+  color: #047857;
+  font-size: 0.85rem;
+}
+
+.installment-buyer-block__submit {
+  width: 100%;
+  margin: 0;
+  padding: 0.65rem 1rem;
+  border: 1px solid #2563eb;
+  border-radius: 0.5rem;
+  background: #2563eb;
+  color: #fff;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.installment-buyer-block__submit:hover:not(:disabled) {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.installment-buyer-block__submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 520px) {
+  .installment-buyer-block__row {
+    grid-template-columns: 1fr;
+  }
+
+  .installment-buyer-block__totals {
+    grid-template-columns: 1fr;
+  }
+}

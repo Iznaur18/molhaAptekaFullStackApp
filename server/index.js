@@ -12,10 +12,14 @@ import {
     productRouter,
     cartRouter,
     addressRouter,
+    installmentRouter,
+    priceOfferRouter,
 } from './routes/index.js';
 import { generalRateLimiter, errorHandler, notFoundHandler } from './middlewares/index.js';
 import { UPLOADS_DIR, ensureUploadsDir } from './utils/uploadsDir.js';
 import { expireStaleUserStories } from './utils/userStoryHelpers.js';
+import { processInstallmentCronTasks } from './utils/installmentHelpers.js';
+import { INSTALLMENT_CRON_INTERVAL_MS } from './constants/installmentConstants.js';
 
 ensureUploadsDir();
 
@@ -71,6 +75,10 @@ app.use('/product', productRouter);
 
 app.use('/address', addressRouter);
 
+app.use('/installment', installmentRouter);
+
+app.use('/price-offers', priceOfferRouter);
+
 // Обработчик несуществующих маршрутов (404) - должен быть перед errorHandler
 app.use(notFoundHandler);
 
@@ -89,6 +97,12 @@ async function start() {
             console.error('expireStaleUserStories error:', error);
         });
     }, USER_STORY_CLEANUP_INTERVAL_MS);
+
+    setInterval(() => {
+        void processInstallmentCronTasks().catch((error) => {
+            console.error('processInstallmentCronTasks error:', error);
+        });
+    }, INSTALLMENT_CRON_INTERVAL_MS);
 
     app
       .listen(PORT, () => {

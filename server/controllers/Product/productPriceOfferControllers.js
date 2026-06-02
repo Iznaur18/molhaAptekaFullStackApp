@@ -150,7 +150,7 @@ export const cancelMyProductPriceOfferController = async (req, res) => {
                 status: PRICE_OFFER_STATUS_PENDING,
             },
             { $set: { status: PRICE_OFFER_STATUS_CANCELLED } },
-            { new: true },
+            { returnDocument: 'after' },
         );
 
         if (!offer) {

@@ -77,18 +77,12 @@ export function AdminDeleteUserConfirmModal({
 
   return (
     <div className="admin-delete-user" role="presentation">
-      <button
-        type="button"
-        className="admin-delete-user__backdrop"
-        aria-label={ADMIN_EDIT_USER_UI.DELETE_CANCEL}
-        onClick={onClose}
-      />
+      <div className="admin-delete-user__backdrop" aria-hidden="true" />
       <div
         className="admin-delete-user__card"
         role="dialog"
         aria-modal="true"
         aria-labelledby="admin-delete-user-title"
-        onClick={(e) => e.stopPropagation()}
       >
         <h2 id="admin-delete-user-title" className="admin-delete-user__title">
           {ADMIN_EDIT_USER_UI.DELETE_CONFIRM_TITLE}

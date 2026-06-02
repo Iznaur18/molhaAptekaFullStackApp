@@ -1,0 +1,39 @@
+.installment-contract-counterparty {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.75rem;
+  align-items: center;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.35;
+  color: #4b5563;
+}
+
+.installment-contract-counterparty__label {
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.installment-contract-counterparty__name {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  color: #2563eb;
+  cursor: pointer;
+  text-align: left;
+}
+
+.installment-contract-counterparty__name:hover {
+  text-decoration: underline;
+}
+
+span.installment-contract-counterparty__name {
+  color: #111827;
+  cursor: default;
+}
+
+.installment-contract-counterparty__detail {
+  color: #6b7280;
+}

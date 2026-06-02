@@ -73,12 +73,7 @@ export function ReportProductModal({
       aria-modal="true"
       aria-label={PRODUCT_REPORT_MODAL_UI.ARIA_DIALOG}
     >
-      <button
-        type="button"
-        className="report-product-modal__backdrop"
-        aria-label={PRODUCT_REPORT_MODAL_UI.CANCEL}
-        onClick={onClose}
-      />
+      <div className="report-product-modal__backdrop" aria-hidden="true" />
       <div className="report-product-modal__card">
         <div className="report-product-modal__header">
           <h2 className="report-product-modal__title">

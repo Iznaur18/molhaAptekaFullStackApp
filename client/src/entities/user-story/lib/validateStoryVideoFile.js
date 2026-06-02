@@ -1,9 +1,6 @@
 import { UPLOAD_VIDEO_MAX_BYTES, UPLOAD_VIDEO_MIME_TYPES } from "../../../shared/config/uploadConstants.js";
 import { USER_STORY_UI } from "../../../shared/config/appUiCopy.js";
-import {
-  USER_STORY_ASPECT_RATIO,
-  USER_STORY_VIDEO_MAX_DURATION_SEC,
-} from "../model/constants.js";
+import { USER_STORY_ASPECT_RATIO } from "../model/constants.js";
 
 const ASPECT_TOLERANCE = 0.06;
 
@@ -22,10 +19,6 @@ export async function validateStoryVideoFile(file) {
 
   try {
     const metadata = await readVideoMetadata(file);
-    if (metadata.duration > USER_STORY_VIDEO_MAX_DURATION_SEC + 0.25) {
-      return USER_STORY_UI.ERROR_VIDEO_DURATION;
-    }
-
     const ratio = metadata.width / metadata.height;
     if (Math.abs(ratio - USER_STORY_ASPECT_RATIO) > ASPECT_TOLERANCE) {
       return USER_STORY_UI.ERROR_VIDEO_ASPECT;
@@ -49,7 +42,6 @@ function readVideoMetadata(file) {
     video.onloadedmetadata = () => {
       URL.revokeObjectURL(objectUrl);
       resolve({
-        duration: Number(video.duration) || 0,
         width: video.videoWidth,
         height: video.videoHeight,
       });

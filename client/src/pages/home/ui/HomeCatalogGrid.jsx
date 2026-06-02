@@ -33,6 +33,7 @@ import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
  *   myProductsModerationFilter?: string;
  *   catalogFollowingOnly?: boolean;
  *   catalogAuctionOnly?: boolean;
+ *   catalogInstallmentOnly?: boolean;
  *   catalogSaleOnly?: boolean;
  *   highlightRaffleProducts?: boolean;
  *   sellerRaffleActive?: boolean;
@@ -74,6 +75,7 @@ export function HomeCatalogGrid({
   myProductsModerationFilter = "",
   catalogFollowingOnly = false,
   catalogAuctionOnly = false,
+  catalogInstallmentOnly = false,
   catalogSaleOnly = false,
   highlightRaffleProducts = false,
   sellerRaffleActive = false,
@@ -87,6 +89,9 @@ export function HomeCatalogGrid({
     if (hasQuery) return HOME_PAGE_UI.EMPTY_BY_QUERY;
     if (!isMineMode && catalogSaleOnly) {
       return HOME_PAGE_UI.EMPTY_SALE_FILTER;
+    }
+    if (!isMineMode && catalogInstallmentOnly) {
+      return HOME_PAGE_UI.EMPTY_INSTALLMENT_FILTER;
     }
     if (!isMineMode && (catalogFollowingOnly || catalogAuctionOnly)) {
       return HOME_PAGE_UI.EMPTY_FOLLOWING_FILTER;

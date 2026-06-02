@@ -175,12 +175,7 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
       aria-modal="true"
       aria-label={REGISTER_MODAL_UI.ARIA_DIALOG}
     >
-      <button
-        type="button"
-        className="register-modal__backdrop"
-        aria-label={REGISTER_MODAL_UI.ARIA_CLOSE_BACKDROP}
-        onClick={handleClose}
-      />
+      <div className="register-modal__backdrop" aria-hidden="true" />
       <div className="register-modal__card">
         <div className="register-modal__header">
           <h2 className="register-modal__title">{REGISTER_MODAL_UI.TITLE}</h2>

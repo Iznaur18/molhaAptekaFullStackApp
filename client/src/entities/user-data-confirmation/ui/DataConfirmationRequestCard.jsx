@@ -12,6 +12,7 @@ import {
   USER_DATA_CONFIRMATION_RESOLUTION_REJECT,
 } from "../model/constants.js";
 import { formatIsoDateTime } from "../../../shared/lib/formatIsoDateTime.js";
+import { resolveImageUrlForDisplay } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import {
   DATA_CONFIRMATION_PAGE_UI,
   USER_LIST_ROW_UI,
@@ -39,6 +40,10 @@ export function DataConfirmationRequestCard({
   const displayName =
     applicant?.userName?.trim() || USER_LIST_ROW_UI.MISSING_NAME;
   const passport = request.passport;
+  const selfiePhotoUrl = request.passportSelfiePhotoUrl?.trim() ?? "";
+  const selfieDisplayUrl = selfiePhotoUrl
+    ? resolveImageUrlForDisplay(selfiePhotoUrl)
+    : "";
 
   const handleResolve = async (resolution) => {
     if (resolution === USER_DATA_CONFIRMATION_RESOLUTION_REJECT) {
@@ -123,6 +128,28 @@ export function DataConfirmationRequestCard({
             <dd>{passport.departmentCode}</dd>
           </div>
         </dl>
+      </section>
+      <section className="data-confirmation-card__selfie">
+        <h4>{DATA_CONFIRMATION_PAGE_UI.PASSPORT_SELFIE_SECTION}</h4>
+        {selfieDisplayUrl ? (
+          <a
+            className="data-confirmation-card__selfie-link"
+            href={selfieDisplayUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              className="data-confirmation-card__selfie-image"
+              src={selfieDisplayUrl}
+              alt={DATA_CONFIRMATION_PAGE_UI.PASSPORT_SELFIE_SECTION}
+            />
+            <span>{DATA_CONFIRMATION_PAGE_UI.PASSPORT_SELFIE_OPEN}</span>
+          </a>
+        ) : (
+          <p className="data-confirmation-card__selfie-missing">
+            {DATA_CONFIRMATION_PAGE_UI.PASSPORT_SELFIE_MISSING}
+          </p>
+        )}
       </section>
       <label className="data-confirmation-card__note">
         {DATA_CONFIRMATION_PAGE_UI.STAFF_NOTE_LABEL}
