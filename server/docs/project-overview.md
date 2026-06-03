@@ -9,7 +9,7 @@ npm run start:dev
 
 ## Что это за проект
 
-Backend приложения Rassro (API): пользователи, авторизация (email и Telegram), профили, рейтинг по голосам, загрузка файлов. Фронтенд подключается по API; статика и загрузки отдаются с этого же сервера.
+Backend приложения Rassro (API): пользователи, авторизация по email, профили, рейтинг по голосам, загрузка файлов. Фронтенд подключается по API; статика и загрузки отдаются с этого же сервера.
 
 ---
 
@@ -75,10 +75,10 @@ rateLimiter (опц.) → checkAuthMW (JWT) → param/body validation → contro
 
 ### User (UserModel)
 
-- **Вход:** email + password (хеш в `passwordHash`) или Telegram (`telegramUserId`, опционально `telegramUsername`, `telegramPhotoUrl`).
+- **Вход:** email + password (хеш в `passwordHash`).
 - **Профиль:** имя, дата рождения, пол, адрес, телефон, аватар, фон, роль (`user`, `admin`, `pharmacist`), скидка, премиум, заметки, активность/блокировка.
 - **Рейтинг:** вложенный объект `userRatingByVotes` (countVotes, totalRating) — обновляется при голосовании.
-- **Индексы:** email, userName, telegramUserId, userPhoneNumber (sparse/unique где нужно), составные для роли/активности, рейтинга, последнего входа, премиума.
+- **Индексы:** email, userName, userPhoneNumber (sparse/unique где нужно), составные для роли/активности, рейтинга, последнего входа, премиума.
 
 ### UserVoteRating (UserVoteRatingModel)
 
@@ -104,7 +104,6 @@ rateLimiter (опц.) → checkAuthMW (JWT) → param/body validation → contro
 | GET    | `/product/my` | Мои продукты (JWT) | лично созданные
 | POST   | `/auth/register` | Регистрация (email, password, опц. userName, phoneNumber, avatarUrl) |
 | POST   | `/auth/login` | Вход по email + password |
-| POST   | `/auth/telegram` | Вход/регистрация по Telegram (body: telegramUserId) |
 | POST   | `/vote/:userVoteTargetIdClient` | Поставить/обновить оценку 1–10 (JWT) |
 | POST   | `/upload` | Загрузка изображения (JWT, multipart, поле `image`) |
 | POST   | `/order` | Создать заказ (JWT) |
@@ -118,7 +117,7 @@ rateLimiter (опц.) → checkAuthMW (JWT) → param/body validation → contro
 
 ## Авторизация
 
-- **JWT:** после успешного login/register/telegram клиент получает `token` в ответе; дальше в заголовке: `Authorization: Bearer <token>`.
+- **JWT:** после успешного login/register клиент получает `token` в ответе; дальше в заголовке: `Authorization: Bearer <token>`.
 - **checkAuthMW:** читает токен из заголовка, проверяет через `jwt.verify(JWT_SECRET)`, кладёт `req.userId` (ObjectId). При отсутствии/невалидном токене — 401.
 - Срок жизни токена задаётся в `sendUserWithToken` (например 30 дней).
 
@@ -143,7 +142,7 @@ rateLimiter (опц.) → checkAuthMW (JWT) → param/body validation → contro
 
 ## Важные нюансы
 
-- **Два способа входа:** email+пароль и Telegram; у одного пользователя может быть только один из вариантов (email или telegramUserId), поля optional/sparse в схеме.
+- **Вход:** email + пароль; email и userName — sparse/unique в схеме.
 - **Рейтинг:** хранится и в User (`userRatingByVotes`), и в отдельной коллекции голосов (UserVoteRating) для истории и пересчёта.
 - **Загрузки:** файлы сохраняются на диск (multer), раздача через `express.static('uploads')` по пути `/uploads/...`; в профиле хранятся URL (например после загрузки).
 - **Валидация:** все правила в папке `validations`, в конце цепочки — `handleValidationByExpressErrors`; опциональные поля и поддержка `null` для очистки описаны в `validation-guide.md`.
@@ -154,7 +153,6 @@ rateLimiter (опц.) → checkAuthMW (JWT) → param/body validation → contro
 
 - `aboutDependencies.md` — зависимости
 - `aboutRouter.md` — маршруты
-- `userController.md` — пользовательский API
 - `validation-guide.md` — как писать валидации
 - `improvements.md` — индексы, rate limit, error handler, валидации
 - `project-check-report.md` — отчёт о проверке проекта

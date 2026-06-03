@@ -4,7 +4,6 @@ Auth (префикс /auth)
 GET /auth/me — текущий пользователь (JWT)
 POST /auth/register — регистрация
 POST /auth/login — вход
-POST /auth/telegram — вход через Telegram
 User (префикс /user)
 GET /user/search — поиск пользователей
 GET /user/:userIdClient — профиль по id (публичный)

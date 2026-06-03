@@ -1,14 +1,14 @@
 import jwt from 'jsonwebtoken';
 
 import { UserModel } from '../models/index.js';
+import { getAuthTokenFromRequest } from './authCookie.js';
 
 /**
  * @param {import('express').Request} req
  * @returns {Promise<{ _id: string; userRole: string; isBlockedUser?: boolean; isPremiumUser?: boolean } | null>}
  */
 export async function getOptionalViewerFromRequest(req) {
-    const authHeader = req.headers.authorization || '';
-    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+    const token = getAuthTokenFromRequest(req);
     if (!token || !process.env.JWT_SECRET) return null;
 
     try {

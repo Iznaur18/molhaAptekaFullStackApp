@@ -39,14 +39,7 @@
    - Ускоряет поиск по имени пользователя
    - Используется при проверке уникальности
 
-3. **Индекс для telegramUserId**
-   ```javascript
-   UserSchema.index({ telegramUserId: 1 }, { sparse: true });
-   ```
-   - Ускоряет поиск пользователей Telegram
-   - Используется при авторизации через Telegram
-
-4. **Индекс для userPhoneNumber**
+3. **Индекс для userPhoneNumber**
    ```javascript
    UserSchema.index({ userPhoneNumber: 1 }, { sparse: true });
    ```
@@ -142,7 +135,7 @@
    ```
    - Защита от брутфорса паролей
    - Защита от массовой регистрации
-   - Применяется к `/auth/login`, `/auth/register`, `/auth/telegram`
+   - Применяется к `/auth/login`, `/auth/register`
 
 3. **Лимитер обновления профиля (`updateProfileRateLimiter`)**
    ```javascript
@@ -174,7 +167,6 @@
 ```javascript
 router.post('/register', authRateLimiter, registerUserValidation, registerUserController);
 router.post('/login', authRateLimiter, loginUserValidation, loginUserController);
-router.post('/telegram', authRateLimiter, telegramAuthValidation, authTelegramController);
 ```
 
 #### `routes/userRouter.js`

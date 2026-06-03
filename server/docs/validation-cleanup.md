@@ -23,22 +23,7 @@ if (!email || !password) {
 
 ---
 
-### 2. `authTelegramController.js`
-
-**Удалено:**
-```javascript
-// БЫЛО:
-if (!telegramUserId) {
-    return errorRes(res, 400, 'Укажите telegramUserId');
-}
-```
-
-**Причина:** Валидация выполняется в middleware `telegramAuthValidation`:
-- `telegramUserId` - проверка на непустое значение
-
----
-
-### 3. `userVoteRatingController.js`
+### 2. `userVoteRatingController.js`
 
 **Удалено:**
 ```javascript
@@ -170,6 +155,5 @@ if (Number.isNaN(userVoteValue) || userVoteValue < 1 || userVoteValue > 10) {
 
 **Файлы изменены:**
 - `server/controllers/loginUserController.js`
-- `server/controllers/authTelegramController.js`
 - `server/controllers/userVoteRatingController.js`
 - `server/validations/updateProfileValidation.js` (улучшена поддержка null)

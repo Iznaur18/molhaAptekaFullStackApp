@@ -7,7 +7,7 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --test --test-concurrency=1 tests/**/*.test.js",
     "start:dev": "nodemon index.js",
     "migrate": "node scripts/runMigrations.js",
     "migrate:dry": "node scripts/runMigrations.js",
@@ -15,8 +15,12 @@
     "migrate:order-items-status": "node scripts/migrateOrderItemsStatus.js",
     "create-admin": "node scripts/createAdmin.js"
   },
+  "devDependencies": {
+    "mongodb-memory-server": "^10.1.4"
+  },
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",

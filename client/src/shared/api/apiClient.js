@@ -2,26 +2,21 @@ import axios from "axios";
 
 import { API_BASE_URL } from "../config/apiBaseUrl.js";
 
-const BEARER_PREFIX = "Bearer";
-
-/** Ключ в `localStorage` для JWT после логина (сервер: `Authorization: Bearer`). */
-export const AUTH_TOKEN_STORAGE_KEY = "rassro_auth_token";
-
 export const apiClient = axios.create({
   baseURL: API_BASE_URL || undefined,
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true,
 });
 
-apiClient.interceptors.request.use((config) => {
+/** Удаляет legacy JWT из localStorage после перехода на httpOnly cookie. */
+export const clearLegacyAuthTokenStorage = () => {
   try {
-    const token = localStorage.getItem(AUTH_TOKEN_STORAGE_KEY);
-    if (token) {
-      config.headers.Authorization = `${BEARER_PREFIX} ${token}`;
-    }
+    localStorage.removeItem("rassro_auth_token");
   } catch {
-    // storage недоступен (SSR / режим инкогнито с ограничениями)
+    // storage недоступен
   }
-  return config;
-});
+};
+
+clearLegacyAuthTokenStorage();

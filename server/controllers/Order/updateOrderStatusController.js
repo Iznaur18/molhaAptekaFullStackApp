@@ -1,5 +1,6 @@
 import { OrderModel } from '../../models/index.js';
 import { errorRes, successRes } from '../../utils/index.js';
+import { runInTransaction } from '../../utils/mongoTransaction.js';
 
 import {
     ORDER_BUYER_PUBLIC_FIELDS,
@@ -79,34 +80,47 @@ export const updateOrderStatusController = async (req, res) => {
         }
 
         if (status === ORDER_STATUS_CANCELLED) {
-            for (const item of order.items) {
-                if (item.status !== ORDER_STATUS_CANCELLED) {
-                    markOrderLineLoyaltyReserveReleased(item);
+            await runInTransaction(async (session) => {
+                for (const item of order.items) {
+                    if (item.status !== ORDER_STATUS_CANCELLED) {
+                        markOrderLineLoyaltyReserveReleased(item);
+                    }
                 }
-            }
-        }
 
-        order.items.forEach((item) => {
-            item.status = status;
-            if (status !== ORDER_STATUS_DELIVERED) {
-                item.deliveredAt = null;
-                item.deliveredBy = null;
-            } else {
-                item.deliveredAt = item.deliveredAt ?? now;
-            }
-            if (status !== ORDER_STATUS_CONFIRMED) {
-                item.confirmedAt = null;
-                item.confirmedBy = null;
-            } else {
-                item.confirmedAt = item.confirmedAt ?? now;
-            }
-        });
-        order.status = status;
-        await order.save();
+                order.items.forEach((item) => {
+                    item.status = status;
+                    item.deliveredAt = null;
+                    item.deliveredBy = null;
+                    item.confirmedAt = null;
+                    item.confirmedBy = null;
+                });
+                order.status = status;
+                await order.save({ session });
 
-        if (status === ORDER_STATUS_CANCELLED) {
-            await order.populate(ORDER_ITEMS_POPULATE);
-            await releaseUnawardedLoyaltyReservesForOrder(order.items);
+                await order.populate(ORDER_ITEMS_POPULATE);
+                await releaseUnawardedLoyaltyReservesForOrder(
+                    order.items,
+                    session,
+                );
+            });
+        } else {
+            order.items.forEach((item) => {
+                item.status = status;
+                if (status !== ORDER_STATUS_DELIVERED) {
+                    item.deliveredAt = null;
+                    item.deliveredBy = null;
+                } else {
+                    item.deliveredAt = item.deliveredAt ?? now;
+                }
+                if (status !== ORDER_STATUS_CONFIRMED) {
+                    item.confirmedAt = null;
+                    item.confirmedBy = null;
+                } else {
+                    item.confirmedAt = item.confirmedAt ?? now;
+                }
+            });
+            order.status = status;
+            await order.save();
         }
 
         for (const { productId, quantity } of itemsPendingConfirmStock) {

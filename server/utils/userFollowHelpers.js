@@ -15,7 +15,7 @@ import { createUserInAppNotification } from './userInAppNotifications.js';
 import { getHiddenSellerIds } from './adminUserGuard.js';
 
 const USER_LIST_SELECT =
-    'userName userAvatarUrl userAvatarFocus telegramPhotoUrl isPremiumUser isUserDataConfirmed userRatingByVotes';
+    'userName userAvatarUrl userAvatarFocus isPremiumUser isUserDataConfirmed userRatingByVotes';
 
 /**
  * @param {string} followerId

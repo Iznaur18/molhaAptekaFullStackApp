@@ -21,8 +21,8 @@ import { ORDER_STATUS_PENDING } from '../../constants/orderConstants.js';
 import {
     buildOrderLineLoyaltySnapshot,
     reserveLoyaltyPointsForNewOrder,
-    releaseUnawardedLoyaltyReservesForOrder,
 } from '../../utils/orderLoyaltyPoints.js';
+import { runInTransaction, withMongoSession } from '../../utils/mongoTransaction.js';
 import { PRODUCT_MODERATION_APPROVED } from '../../constants/productModerationConstants.js';
 import {
     InstallmentContractModel,
@@ -66,14 +66,14 @@ const ACTIVE_STATUSES = [
     INSTALLMENT_CONTRACT_STATUS_ACTIVE,
 ];
 
-const appendOrderToBuyList = async (userId, orderId) => {
-    const user = await UserModel.findById(userId);
+const appendOrderToBuyList = async (userId, orderId, session) => {
+    const user = await UserModel.findById(userId).session(session);
     if (!user) return false;
     const safeBuyList = Array.isArray(user.buyList)
         ? user.buyList.filter((id) => mongoose.isValidObjectId(id))
         : [];
     user.buyList = [...safeBuyList, orderId];
-    await user.save({ validateBeforeSave: false });
+    await user.save({ validateBeforeSave: false, session });
     return true;
 };
 
@@ -148,28 +148,6 @@ export const createInstallmentContractController = async (req, res) => {
 
         const startsActive = !firstPaymentRequiredNow;
 
-        const contract = await InstallmentContractModel.create({
-            productId,
-            programId: program._id,
-            planId: plan._id,
-            buyerUserId,
-            sellerUserId: product.productSeller,
-            quantity,
-            planTitle: plan.title,
-            monthsCount: plan.monthsCount,
-            monthlyPaymentRub: schedule.monthlyPaymentRub,
-            totalAmountRub: schedule.totalAmountRub,
-            paidAmountRub: 0,
-            productNameAtContract: product.productName,
-            productUnitPriceAtContract: product.productPrice,
-            status: startsActive
-                ? INSTALLMENT_CONTRACT_STATUS_ACTIVE
-                : INSTALLMENT_CONTRACT_STATUS_PENDING_FIRST_PAYMENT,
-            payments: schedule.payments,
-            finalDueAt: schedule.finalDueAt,
-            nextPaymentDueAt: schedule.nextPaymentDueAt,
-        });
-
         const loyaltyLine = buildOrderLineLoyaltySnapshot({
             loyaltyPointsPerUnit: product.loyaltyPointsPerUnit,
             quantity,
@@ -190,42 +168,81 @@ export const createInstallmentContractController = async (req, res) => {
             },
         ];
 
-        try {
-            await reserveLoyaltyPointsForNewOrder(itemsForReserve);
-        } catch (reserveError) {
-            await InstallmentContractModel.findByIdAndDelete(contract._id);
-            return errorRes(
-                res,
-                400,
-                reserveError instanceof Error
-                    ? reserveError.message
-                    : 'Недостаточно баллов у продавца',
-            );
-        }
-
+        let contract;
         let order;
+
         try {
-            order = await OrderModel.create({
-                userBuyerId: buyerUserId,
-                items: orderItems,
-                totalAmount: product.productPrice * quantity,
-                deliveryAddress: verified.displayAddress,
-                deliveryAddressFlat: verified.flat,
-                deliveryAddressFiasId: verified.fiasId,
-                paymentMethod,
-                status: ORDER_STATUS_PENDING,
-                installmentContractId: contract._id,
-            });
-        } catch (orderError) {
-            await releaseUnawardedLoyaltyReservesForOrder(itemsForReserve);
-            await InstallmentContractModel.findByIdAndDelete(contract._id);
-            throw orderError;
+            ({ contract, order } = await runInTransaction(async (session) => {
+                await reserveLoyaltyPointsForNewOrder(itemsForReserve, session);
+
+                const [createdContract] = await InstallmentContractModel.create(
+                    [
+                        {
+                            productId,
+                            programId: program._id,
+                            planId: plan._id,
+                            buyerUserId,
+                            sellerUserId: product.productSeller,
+                            quantity,
+                            planTitle: plan.title,
+                            monthsCount: plan.monthsCount,
+                            monthlyPaymentRub: schedule.monthlyPaymentRub,
+                            totalAmountRub: schedule.totalAmountRub,
+                            paidAmountRub: 0,
+                            productNameAtContract: product.productName,
+                            productUnitPriceAtContract: product.productPrice,
+                            status: startsActive
+                                ? INSTALLMENT_CONTRACT_STATUS_ACTIVE
+                                : INSTALLMENT_CONTRACT_STATUS_PENDING_FIRST_PAYMENT,
+                            payments: schedule.payments,
+                            finalDueAt: schedule.finalDueAt,
+                            nextPaymentDueAt: schedule.nextPaymentDueAt,
+                        },
+                    ],
+                    withMongoSession({}, session),
+                );
+
+                const [createdOrder] = await OrderModel.create(
+                    [
+                        {
+                            userBuyerId: buyerUserId,
+                            items: orderItems,
+                            totalAmount: product.productPrice * quantity,
+                            deliveryAddress: verified.displayAddress,
+                            deliveryAddressFlat: verified.flat,
+                            deliveryAddressFiasId: verified.fiasId,
+                            paymentMethod,
+                            status: ORDER_STATUS_PENDING,
+                            installmentContractId: createdContract._id,
+                        },
+                    ],
+                    withMongoSession({}, session),
+                );
+
+                createdContract.orderId = createdOrder._id;
+                await createdContract.save({ session });
+
+                const isUserUpdated = await appendOrderToBuyList(
+                    buyerUserId,
+                    createdOrder._id,
+                    session,
+                );
+                if (!isUserUpdated) {
+                    throw new Error('USER_NOT_FOUND');
+                }
+
+                return { contract: createdContract, order: createdOrder };
+            }));
+        } catch (txError) {
+            if (txError instanceof Error && txError.message === 'USER_NOT_FOUND') {
+                return errorRes(res, 404, 'Пользователь не найден');
+            }
+            const message =
+                txError instanceof Error
+                    ? txError.message
+                    : 'Недостаточно баллов у продавца';
+            return errorRes(res, 400, message);
         }
-
-        contract.orderId = order._id;
-        await contract.save();
-
-        await appendOrderToBuyList(buyerUserId, order._id);
         await notifySellerNewInstallmentContract(
             String(product.productSeller),
             productId,

@@ -2,11 +2,11 @@ import { Router } from 'express';
 import {
     registerUserController,
     loginUserController,
-    authTelegramController,
+    logoutUserController,
     userMeController,
     markInAppNotificationsReadController,
 } from '../controllers/index.js';
-import { registerUserValidation, loginUserValidation, telegramAuthValidation } from '../validations/index.js';
+import { registerUserValidation, loginUserValidation } from '../validations/index.js';
 import { checkAuthMW, authRateLimiter } from '../middlewares/index.js';
 
 const router = Router();
@@ -22,6 +22,6 @@ router.patch(
 // Rate limiting для авторизации (защита от брутфорса)
 router.post('/register', authRateLimiter, registerUserValidation, registerUserController);
 router.post('/login', authRateLimiter, loginUserValidation, loginUserController);
-router.post('/telegram', authRateLimiter, telegramAuthValidation, authTelegramController);
+router.post('/logout', logoutUserController);
 
 export { router as authRouter };

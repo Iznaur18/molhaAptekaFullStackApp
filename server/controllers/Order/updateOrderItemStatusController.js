@@ -7,6 +7,7 @@ import {
 } from '../../constants/orderConstants.js';
 import { OrderModel, UserModel } from '../../models/index.js';
 import { errorRes, successRes } from '../../utils/index.js';
+import { runInTransaction } from '../../utils/mongoTransaction.js';
 import { prepareLoyaltyPointsForConfirmedOrderItem } from '../../utils/loyaltyPoints.js';
 import {
     markOrderLineLoyaltyReserveReleased,
@@ -118,13 +119,19 @@ export const markOrderItemCancelledBySellerController = async (req, res) => {
             return errorRes(res, 409, 'Позицию можно отменить только из статуса "В обработке"');
         }
 
-        targetItem.status = ORDER_STATUS_CANCELLED;
-        markOrderLineLoyaltyReserveReleased(targetItem);
-        order.status = buildOrderStatusFromItems(order.items);
-        await order.save();
-        await releaseUnawardedLoyaltyReservesForOrder([
-            { ...targetItem.toObject?.() ?? targetItem, productId: targetItem.productId },
-        ]);
+        const releaseLine = {
+            ...(targetItem.toObject?.() ?? targetItem),
+            productId: targetItem.productId,
+        };
+
+        await runInTransaction(async (session) => {
+            targetItem.status = ORDER_STATUS_CANCELLED;
+            markOrderLineLoyaltyReserveReleased(targetItem);
+            order.status = buildOrderStatusFromItems(order.items);
+            await order.save({ session });
+            await releaseUnawardedLoyaltyReservesForOrder([releaseLine], session);
+        });
+
         await populateOrderForResponse(order);
 
         return successRes(res, { order });
@@ -199,19 +206,17 @@ export const confirmOrderItemByBuyerController = async (req, res) => {
             return errorRes(res, 409, 'Подтверждение доступно только для статуса "Доставлен"');
         }
 
-        targetItem.status = ORDER_STATUS_CONFIRMED;
-        targetItem.confirmedAt = new Date();
-        targetItem.confirmedBy = req.userId;
+        if (targetItem.loyaltyPointsAwarded) {
+            return successRes(res, {
+                order: await populateOrderForResponse(order),
+                pointsEarned: Number(targetItem.loyaltyPointsEarned) || 0,
+            });
+        }
 
         const buyer = await UserModel.findById(buyerId)
             .select('isPremiumUser premiumExpiresAt')
             .lean();
         const isPremiumUser = isPremiumActive(buyer);
-        const pointsEarned = prepareLoyaltyPointsForConfirmedOrderItem({
-            order,
-            itemIndex,
-            isPremiumUser,
-        });
 
         const itemSellerId = normalizeId(
             targetItem.productId?.productSeller?._id ??
@@ -221,38 +226,66 @@ export const confirmOrderItemByBuyerController = async (req, res) => {
             Number(targetItem.loyaltyPointsReservedTotal) || 0,
         );
 
-        if (pointsEarned > 0) {
-            if (!itemSellerId) {
+        let pointsEarned = 0;
+
+        try {
+            pointsEarned = await runInTransaction(async (session) => {
+                const earned = prepareLoyaltyPointsForConfirmedOrderItem({
+                    order,
+                    itemIndex,
+                    isPremiumUser,
+                });
+
+                if (earned > 0) {
+                    if (!itemSellerId) {
+                        throw new Error('ITEM_SELLER_NOT_FOUND');
+                    }
+                    await settleLoyaltyPointsReservation({
+                        sellerId: itemSellerId,
+                        buyerId,
+                        amount: earned,
+                        session,
+                    });
+                    markOrderLineLoyaltyReserveReleased(targetItem);
+                } else if (
+                    reservedTotal > 0 &&
+                    !targetItem.loyaltyPointsReserveReleased &&
+                    itemSellerId
+                ) {
+                    await releaseUnawardedLoyaltyReservesForOrder(
+                        [
+                            {
+                                ...(targetItem.toObject?.() ?? targetItem),
+                                productId: targetItem.productId,
+                            },
+                        ],
+                        session,
+                    );
+                    markOrderLineLoyaltyReserveReleased(targetItem);
+                }
+
+                targetItem.status = ORDER_STATUS_CONFIRMED;
+                targetItem.confirmedAt = new Date();
+                targetItem.confirmedBy = req.userId;
+                order.status = buildOrderStatusFromItems(order.items);
+                await order.save({ session });
+
+                return earned;
+            });
+        } catch (txError) {
+            if (
+                txError instanceof Error &&
+                txError.message === 'ITEM_SELLER_NOT_FOUND'
+            ) {
                 return errorRes(res, 400, 'Продавец позиции не найден');
             }
-            try {
-                await settleLoyaltyPointsReservation({
-                    sellerId: itemSellerId,
-                    buyerId,
-                    amount: pointsEarned,
-                });
-            } catch (settleError) {
-                console.error('settleLoyaltyPointsReservation error:', settleError);
-                return errorRes(
-                    res,
-                    409,
-                    'Не удалось начислить баллы: у продавца недостаточно замороженных баллов',
-                );
-            }
-            markOrderLineLoyaltyReserveReleased(targetItem);
-        } else if (
-            reservedTotal > 0 &&
-            !targetItem.loyaltyPointsReserveReleased &&
-            itemSellerId
-        ) {
-            await releaseUnawardedLoyaltyReservesForOrder([
-                { ...targetItem.toObject?.() ?? targetItem, productId: targetItem.productId },
-            ]);
-            markOrderLineLoyaltyReserveReleased(targetItem);
+            console.error('confirmOrderItemByBuyer transaction error:', txError);
+            return errorRes(
+                res,
+                409,
+                'Не удалось начислить баллы: у продавца недостаточно замороженных баллов',
+            );
         }
-
-        order.status = buildOrderStatusFromItems(order.items);
-        await order.save();
 
         if (targetItem.productId) {
             const productId =

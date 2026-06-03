@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { UserModel, UserVoteRatingModel } from '../../models/index.js';
 import { deleteAllFollowsForUser } from '../../utils/userFollowHelpers.js';
 import { sendUserWithToken, errorRes, successRes } from '../../utils/index.js';
+import { clearAuthCookie } from '../../utils/authCookie.js';
 import {
     USER_DATA,
     ALLOWED_FIELDS_FOR_USER,
@@ -74,7 +75,18 @@ export const loginUserController = async (req, res) => { // обработчик
     }
 };
 
-/** Получение данных текущего пользователя. GET /auth/me (требует Authorization: Bearer <token>) */
+/** Выход: очистка httpOnly cookie. POST /auth/logout */
+export const logoutUserController = async (req, res) => {
+    try {
+        clearAuthCookie(res);
+        return successRes(res, { message: 'Вы вышли из аккаунта' });
+    } catch (error) {
+        console.error('logoutUserController error:', error);
+        return errorRes(res, 500, 'Ошибка при выходе');
+    }
+};
+
+/** Получение данных текущего пользователя. GET /auth/me (JWT в httpOnly cookie) */
 export const userMeController = async (req, res) => {
     try {
         // 1. id текущего пользователя из auth middleware (JWT)

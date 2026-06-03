@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-import { AUTH_TOKEN_STORAGE_KEY } from "../../../shared/api/index.js";
 import { LOGIN_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { FormFieldLabel } from "../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
 import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
@@ -37,8 +36,7 @@ export function LoginModal({ isOpen, onClose, onSuccess, onRegisterClick }) {
     setStatus({ kind: "loading", message: "" });
 
     try {
-      const { token } = await loginUser(form);
-      localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, token);
+      await loginUser(form);
       setForm(INITIAL_FORM);
       setStatus({ kind: "success", message: LOGIN_MODAL_UI.SUCCESS });
       onSuccess?.();

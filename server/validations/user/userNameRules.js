@@ -37,14 +37,3 @@ export function normalizeUserNameInput(raw) {
   if (trimmed === '') return undefined;
   return trimmed.toLowerCase();
 }
-
-/**
- * Автогенерация ника для Telegram (только a–z и 0–9).
- * @param {string|number} telegramUserId
- */
-export function defaultTelegramUserName(telegramUserId) {
-  const id = String(telegramUserId).replace(/\D/g, '') || '0';
-  const base = `tg${id}`;
-  assertUserNameFormat(base);
-  return base;
-}

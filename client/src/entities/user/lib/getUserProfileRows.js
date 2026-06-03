@@ -61,11 +61,7 @@ function formatRating(value) {
 const L = USER_PROFILE_COPY.LABELS;
 
 /** Не показывать в `dl` профиля — медиа уже в шапке модалки. */
-const HIDDEN_MEDIA_URL_ROW_IDS = new Set([
-  "userAvatarUrl",
-  "userBackgroundUrl",
-  "telegramPhotoUrl",
-]);
+const HIDDEN_MEDIA_URL_ROW_IDS = new Set(["userAvatarUrl", "userBackgroundUrl"]);
 
 const INTERNAL_ROW_IDS = new Set([
   "isActiveUser",
@@ -188,16 +184,6 @@ export function getUserProfileRows(user, options = {}) {
       id: "userRatingByVotes",
       label: L.userRatingByVotes,
       value: formatRating(rating),
-    },
-    {
-      id: "telegramUserId",
-      label: L.telegramUserId,
-      value: dashIfEmpty(user.telegramUserId),
-    },
-    {
-      id: "telegramUsername",
-      label: L.telegramUsername,
-      value: dashIfEmpty(user.telegramUsername),
     },
     { id: "createdAt", label: L.createdAt, value: formatIso(user.createdAt) },
     { id: "updatedAt", label: L.updatedAt, value: formatIso(user.updatedAt) },

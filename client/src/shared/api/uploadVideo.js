@@ -3,12 +3,9 @@ import axios from "axios";
 import { resolveUploadedImageUrl } from "../lib/resolveUploadedImageUrl.js";
 import { API_BASE_URL } from "../config/apiBaseUrl.js";
 import { VIDEO_URL_FIELD_UI } from "../config/appUiCopy.js";
-import { AUTH_TOKEN_STORAGE_KEY } from "./apiClient.js";
-
-const BEARER_PREFIX = "Bearer";
 
 /**
- * `POST /upload/video` — загрузка видео (Bearer, multipart, поле `video`).
+ * `POST /upload/video` — загрузка видео (cookie auth, multipart, поле `video`).
  *
  * @param {File} file
  * @returns {Promise<string>}
@@ -18,20 +15,10 @@ export async function uploadVideo(file) {
     const formData = new FormData();
     formData.append("video", file);
 
-    const headers = {};
-    try {
-      const token = localStorage.getItem(AUTH_TOKEN_STORAGE_KEY);
-      if (token) {
-        headers.Authorization = `${BEARER_PREFIX} ${token}`;
-      }
-    } catch {
-      // storage недоступен
-    }
-
     const { data } = await axios.post(
       `${API_BASE_URL || ""}/upload/video`,
       formData,
-      { headers },
+      { withCredentials: true },
     );
 
     if (!data?.success || typeof data.data?.url !== "string") {

@@ -1,13 +1,15 @@
 import { UserModel } from '../models/index.js';
 
 import { InsufficientLoyaltyPointsError } from './loyaltyPointsSpend.js';
+import { withMongoSession } from './mongoTransaction.js';
 import { getSellerLoyaltyPointsAvailable } from './loyaltyPointsSeller.js';
 
 /**
  * @param {string} userId
  * @param {number} amount
+ * @param {import('mongoose').ClientSession | null} [session]
  */
-export const reserveLoyaltyPoints = async ({ userId, amount }) => {
+export const reserveLoyaltyPoints = async ({ userId, amount, session = null }) => {
     const normalizedAmount = Math.ceil(Number(amount));
     if (normalizedAmount <= 0) {
         return;
@@ -29,7 +31,7 @@ export const reserveLoyaltyPoints = async ({ userId, amount }) => {
             },
         },
         { $inc: { userLoyaltyPointsReserved: normalizedAmount } },
-        { returnDocument: 'after' },
+        withMongoSession({ returnDocument: 'after' }, session),
     ).lean();
 
     if (!updated) {
@@ -44,8 +46,13 @@ export const reserveLoyaltyPoints = async ({ userId, amount }) => {
 /**
  * @param {string} userId
  * @param {number} amount
+ * @param {import('mongoose').ClientSession | null} [session]
  */
-export const releaseLoyaltyPointsReservation = async ({ userId, amount }) => {
+export const releaseLoyaltyPointsReservation = async ({
+    userId,
+    amount,
+    session = null,
+}) => {
     const normalizedAmount = Math.ceil(Number(amount));
     if (normalizedAmount <= 0) {
         return;
@@ -57,16 +64,18 @@ export const releaseLoyaltyPointsReservation = async ({ userId, amount }) => {
             userLoyaltyPointsReserved: { $gte: normalizedAmount },
         },
         { $inc: { userLoyaltyPointsReserved: -normalizedAmount } },
+        withMongoSession({}, session),
     );
 };
 
 /**
- * @param {{ sellerId: string; buyerId: string; amount: number }} params
+ * @param {{ sellerId: string; buyerId: string; amount: number; session?: import('mongoose').ClientSession | null }} params
  */
 export const settleLoyaltyPointsReservation = async ({
     sellerId,
     buyerId,
     amount,
+    session = null,
 }) => {
     const normalizedAmount = Math.ceil(Number(amount));
     if (normalizedAmount <= 0) {
@@ -85,13 +94,16 @@ export const settleLoyaltyPointsReservation = async ({
                 userLoyaltyPointsReserved: -normalizedAmount,
             },
         },
-        { returnDocument: 'after' },
+        withMongoSession({ returnDocument: 'after' }, session),
     ).lean();
 
     if (!sellerUpdated) {
-        const user = await UserModel.findById(sellerId)
-            .select('userLoyaltyPoints userLoyaltyPointsReserved')
-            .lean();
+        const sellerLookup = UserModel.findById(sellerId)
+            .select('userLoyaltyPoints userLoyaltyPointsReserved');
+        if (session) {
+            sellerLookup.session(session);
+        }
+        const user = await sellerLookup.lean();
         const available = getSellerLoyaltyPointsAvailable(user);
         throw new InsufficientLoyaltyPointsError(normalizedAmount, available);
     }
@@ -99,13 +111,15 @@ export const settleLoyaltyPointsReservation = async ({
     await UserModel.updateOne(
         { _id: buyerId },
         { $inc: { userLoyaltyPoints: normalizedAmount } },
+        withMongoSession({}, session),
     );
 };
 
 /**
  * @param {{ sellerId: string; amount: number }[]} totals
+ * @param {import('mongoose').ClientSession | null} [session]
  */
-export const reserveLoyaltyPointsBySellerTotals = async (totals) => {
+export const reserveLoyaltyPointsBySellerTotals = async (totals, session = null) => {
     /** @type {{ sellerId: string; amount: number }[]} */
     const applied = [];
 
@@ -115,24 +129,30 @@ export const reserveLoyaltyPointsBySellerTotals = async (totals) => {
             if (amount <= 0) {
                 continue;
             }
-            await reserveLoyaltyPoints({ userId: row.sellerId, amount });
+            await reserveLoyaltyPoints({
+                userId: row.sellerId,
+                amount,
+                session,
+            });
             applied.push({ sellerId: row.sellerId, amount });
         }
     } catch (error) {
-        await releaseLoyaltyPointsBySellerTotals(applied);
+        await releaseLoyaltyPointsBySellerTotals(applied, session);
         throw error;
     }
 };
 
 /**
  * @param {{ sellerId: string; amount: number }[]} totals
+ * @param {import('mongoose').ClientSession | null} [session]
  */
-export const releaseLoyaltyPointsBySellerTotals = async (totals) => {
+export const releaseLoyaltyPointsBySellerTotals = async (totals, session = null) => {
     for (const row of totals) {
         try {
             await releaseLoyaltyPointsReservation({
                 userId: row.sellerId,
                 amount: row.amount,
+                session,
             });
         } catch (releaseError) {
             console.error('releaseLoyaltyPointsBySellerTotals error:', releaseError);

@@ -34,12 +34,6 @@
 ```
 
 - `GET /auth/me` (нужен Bearer token)
-- `POST /auth/telegram`
-```json
-{
-  "telegramUserId": "123456789"
-}
-```
 
 ### Users
 

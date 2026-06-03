@@ -1,8 +1,7 @@
 import { uploadController } from './User/uploadController.js';
 import { uploadVideoController } from './User/uploadVideoController.js';
 import { registerUserController } from './User/registerUserController.js';
-import { loginUserController, userGetProfileController, userMeController, userUpdateProfileController, userDeleteProfileController } from './User/loginUserController.js';
-import { authTelegramController } from './User/authTelegramController.js';
+import { loginUserController, logoutUserController, userGetProfileController, userMeController, userUpdateProfileController, userDeleteProfileController } from './User/loginUserController.js';
 import { userVoteRatingController, userGetRatingController, getMyVoteForTargetController } from './User/userVoteRatingController.js';
 import { userSearchController } from './User/userSearchController.js';
 import { getUserPurchasesController } from './User/getUserPurchasesController.js';
@@ -162,7 +161,7 @@ export {
     uploadVideoController,
     registerUserController,
     loginUserController,
-    authTelegramController,
+    logoutUserController,
     userVoteRatingController,
     userGetRatingController,
     getMyVoteForTargetController,

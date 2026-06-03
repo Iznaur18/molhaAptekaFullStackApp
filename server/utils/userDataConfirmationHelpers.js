@@ -16,6 +16,7 @@ import {
     UserModel,
 } from '../models/index.js';
 import { normalizeStoredUploadUrl } from './buildPublicUploadUrl.js';
+import { sanitizeDataConfirmationRequestForBuyer } from './maskPassportForApi.js';
 import { createUserInAppNotification } from './userInAppNotifications.js';
 import { assertMinWords } from './maxWordsText.js';
 
@@ -33,7 +34,7 @@ export const normalizePassportSelfiePhotoUrl = (value) => {
 };
 
 const PENDING_USER_SELECT =
-    '_id userName userAvatarUrl telegramPhotoUrl isPremiumUser createdAt';
+    '_id userName userAvatarUrl isPremiumUser createdAt';
 
 /**
  * @param {import('mongoose').Types.ObjectId | string} userId
@@ -195,7 +196,7 @@ export const getLatestDataConfirmationRequestForUser = async (userId) => {
         return null;
     }
 
-    const out = { ...row };
+    const out = sanitizeDataConfirmationRequestForBuyer(row);
     if (row.status !== USER_DATA_CONFIRMATION_STATUS_REJECTED) {
         delete out.staffNote;
     }

@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-import { AUTH_TOKEN_STORAGE_KEY } from "../../../shared/api/index.js";
 import { registerUser } from "../api/registerUser.js";
 import { AddressDeliveryFields } from "../../address/ui/AddressDeliveryFields.jsx";
 import { validateRuDeliveryAddressForm } from "../../address/lib/validateRuDeliveryAddressForm.js";
@@ -147,8 +146,7 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
 
     try {
       const payload = buildRegisterUserPayload(form);
-      const { token } = await registerUser(payload);
-      localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, token);
+      await registerUser(payload);
       setForm(INITIAL_FORM);
       setInvalidFields(new Set());
       setStatus({ kind: "success", message: REGISTER_MODAL_UI.SUCCESS });

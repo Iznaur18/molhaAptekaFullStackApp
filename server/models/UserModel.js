@@ -31,7 +31,7 @@ const UserSchema = new mongoose.Schema(
     // - - - Поля для входа - - -
     email: { // email пользователя
       type: String,
-      required: false, // обязателен только при регистрации по email; при входе через Telegram не заполняется
+      required: false,
       unique: true, // значение должно быть уникальным
       lowercase: true, // значение должно быть в нижнем регистре
       sparse: true, // уникальность только среди непустых; несколько null допустимы
@@ -39,7 +39,7 @@ const UserSchema = new mongoose.Schema(
     },
     passwordHash: { // хеш пароля
       type: String,
-      required: false, // только для входа по email; при входе через Telegram не заполняется
+      required: false,
       select: false, // не отдавать по умолчанию при find()
     },
 
@@ -84,7 +84,7 @@ const UserSchema = new mongoose.Schema(
       type: String,
       trim: true,
       unique: true,
-      required: false, // при Telegram заполняется как tg_<telegramUserId>
+      required: false,
       sparse: true,
     },
     userPhoneNumber: { // номер телефона пользователя (строка — сохраняются ведущие нули)
@@ -193,28 +193,13 @@ const UserSchema = new mongoose.Schema(
         default: 0,
       },
     },
-
-    // - - - Поля для входа через Telegram Web App - - -
-    telegramUserId: { // telegramUserId пользователя
-      type: String,
-      required: false,
-      unique: true,
-      sparse: true,
-    },
-    telegramUsername: { // telegramUsername пользователя
-      type: String,
-      trim: true,
-    },
-    telegramPhotoUrl: { // telegramPhotoUrl пользователя
-      type: String,
-    },
   },
   {
     timestamps: true, // createdAt, updatedAt
   }
 );
 
-// Индексы для производительности (email, userName, telegramUserId, userPhoneNumber уже индексируются через unique: true в полях)
+// Индексы для производительности (email, userName, userPhoneNumber уже индексируются через unique: true в полях)
 // Составной индекс для фильтрации активных пользователей по роли (для админ-панели)
 UserSchema.index({ userRole: 1, isActiveUser: 1, isBlockedUser: 1 });
 

@@ -5,11 +5,11 @@ import { CartModel, OrderModel, ProductModel, ProductPriceOfferModel, UserModel 
 import { resolveAcceptedOfferForOrder } from '../../utils/productPriceOfferHelpers.js';
 import { assertOrderItemsWithinAvailableStock } from '../../utils/productStock.js';
 import { errorRes, successRes } from '../../utils/index.js';
+import { runInTransaction, withMongoSession } from '../../utils/mongoTransaction.js';
 import { normalizeProductLoyaltyPointsPerUnit } from '../../utils/loyaltyPointsSeller.js';
 import {
     buildOrderLineLoyaltySnapshot,
     reserveLoyaltyPointsForNewOrder,
-    releaseUnawardedLoyaltyReservesForOrder,
 } from '../../utils/orderLoyaltyPoints.js';
 
 import {
@@ -80,8 +80,8 @@ const fetchAvailableProductsForOrder = async (productIds) => {
     return byId;
 };
 
-const appendOrderToBuyList = async (userId, orderId) => {
-    const user = await UserModel.findById(userId);
+const appendOrderToBuyList = async (userId, orderId, session) => {
+    const user = await UserModel.findById(userId).session(session);
     if (!user) return false;
 
     const safeBuyList = Array.isArray(user.buyList)
@@ -89,7 +89,7 @@ const appendOrderToBuyList = async (userId, orderId) => {
         : [];
 
     user.buyList = [...safeBuyList, orderId];
-    await user.save({ validateBeforeSave: false });
+    await user.save({ validateBeforeSave: false, session });
     return true;
 };
 
@@ -183,56 +183,66 @@ export const makeOrderController = async (req, res) => {
             },
         }));
 
-        try {
-            await reserveLoyaltyPointsForNewOrder(itemsForReserve);
-        } catch (reserveError) {
-            return errorRes(
-                res,
-                400,
-                reserveError instanceof Error
-                    ? reserveError.message
-                    : 'Недостаточно баллов у продавца',
-            );
-        }
-
         let order;
         try {
-            order = await OrderModel.create({
-                userBuyerId: userId,
-                items: itemsWithPrice,
-                totalAmount,
-                deliveryAddress: verified.displayAddress,
-                deliveryAddressFlat: verified.flat,
-                deliveryAddressFiasId: verified.fiasId,
-                paymentMethod,
-                status,
-                priceOfferId: linkedPriceOfferId,
-            });
-        } catch (createError) {
-            await releaseUnawardedLoyaltyReservesForOrder(itemsForReserve);
-            throw createError;
-        }
+            order = await runInTransaction(async (session) => {
+                await reserveLoyaltyPointsForNewOrder(itemsForReserve, session);
 
-        if (linkedPriceOfferId) {
-            await ProductPriceOfferModel.findByIdAndUpdate(linkedPriceOfferId, {
-                $set: { orderId: order._id },
-            });
-        }
+                const [created] = await OrderModel.create(
+                    [
+                        {
+                            userBuyerId: userId,
+                            items: itemsWithPrice,
+                            totalAmount,
+                            deliveryAddress: verified.displayAddress,
+                            deliveryAddressFlat: verified.flat,
+                            deliveryAddressFiasId: verified.fiasId,
+                            paymentMethod,
+                            status,
+                            priceOfferId: linkedPriceOfferId,
+                        },
+                    ],
+                    withMongoSession({}, session),
+                );
 
-        const isUserUpdated = await appendOrderToBuyList(userId, order._id);
-        if (!isUserUpdated) {
-            await releaseUnawardedLoyaltyReservesForOrder(itemsForReserve);
-            return errorRes(res, 404, 'Пользователь не найден');
+                if (linkedPriceOfferId) {
+                    await ProductPriceOfferModel.findByIdAndUpdate(
+                        linkedPriceOfferId,
+                        { $set: { orderId: created._id } },
+                        withMongoSession({}, session),
+                    );
+                }
+
+                const isUserUpdated = await appendOrderToBuyList(
+                    userId,
+                    created._id,
+                    session,
+                );
+                if (!isUserUpdated) {
+                    throw new Error('USER_NOT_FOUND');
+                }
+
+                await CartModel.findOneAndUpdate(
+                    { userId: new mongoose.Types.ObjectId(String(userId)) },
+                    { $set: { items: {} } },
+                    withMongoSession({ upsert: true }, session),
+                );
+
+                return created;
+            });
+        } catch (txError) {
+            if (txError instanceof Error && txError.message === 'USER_NOT_FOUND') {
+                return errorRes(res, 404, 'Пользователь не найден');
+            }
+            const message =
+                txError instanceof Error
+                    ? txError.message
+                    : 'Недостаточно баллов у продавца';
+            return errorRes(res, 400, message);
         }
 
         await order.populate('userBuyerId', ORDER_BUYER_PUBLIC_FIELDS);
         await order.populate(ORDER_ITEMS_POPULATE);
-
-        await CartModel.findOneAndUpdate(
-            { userId: new mongoose.Types.ObjectId(String(userId)) },
-            { $set: { items: {} } },
-            { upsert: true },
-        );
 
         return successRes(res, { message: 'Заказ успешно создан', order });
     } catch (error) {

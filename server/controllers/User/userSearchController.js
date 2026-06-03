@@ -24,7 +24,6 @@ const USER_PUBLIC_LIST_PROJECTION = {
     isBlockedUser: 1,
     userAvatarUrl: 1,
     userAvatarFocus: 1,
-    telegramPhotoUrl: 1,
     userLoyaltyPoints: 1,
     userRatingByVotes: 1,
 };

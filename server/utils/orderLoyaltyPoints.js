@@ -38,14 +38,17 @@ export const buildOrderLineLoyaltySnapshot = ({
 /**
  * @param {Array<Record<string, unknown>>} items
  */
-export const reserveLoyaltyPointsForNewOrder = async (items) => {
+export const reserveLoyaltyPointsForNewOrder = async (
+    items,
+    session = null,
+) => {
     const totals = buildSellerReserveTotalsFromOrderItems(items);
     if (totals.length === 0) {
         return;
     }
 
     try {
-        await reserveLoyaltyPointsBySellerTotals(totals);
+        await reserveLoyaltyPointsBySellerTotals(totals, session);
     } catch (error) {
         if (error instanceof InsufficientLoyaltyPointsError) {
             throw new Error(
@@ -59,12 +62,15 @@ export const reserveLoyaltyPointsForNewOrder = async (items) => {
 /**
  * @param {Array<Record<string, unknown>>} items
  */
-export const releaseUnawardedLoyaltyReservesForOrder = async (items) => {
+export const releaseUnawardedLoyaltyReservesForOrder = async (
+    items,
+    session = null,
+) => {
     const totals = buildSellerReserveTotalsFromOrderItems(items);
     if (totals.length === 0) {
         return;
     }
-    await releaseLoyaltyPointsBySellerTotals(totals);
+    await releaseLoyaltyPointsBySellerTotals(totals, session);
 };
 
 /**

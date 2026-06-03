@@ -6,7 +6,7 @@ import { getDefaultUserBackgroundStoredValue } from './userBackgroundPresets.js'
 export const DEFAULT_BACKGROUND_URL = getDefaultUserBackgroundStoredValue();
 
 /** Поля пользователя для отображения на клиенте (GET /me, GET /user/:id). Строка для .select() — без passwordHash */
-export const USER_DATA = '_id userName email userAvatarUrl userAvatarFocus userBackgroundUrl userBackgroundFocus userBirthDate userGender userAddress userAddressFlat userAddressFiasId userAddressGeo userPhoneNumber userRole userDiscountPercent userLoyaltyPoints isPremiumUser premiumExpiresAt isUserDataConfirmed notificationsEnabled userRatingByVotes telegramUserId telegramUsername telegramPhotoUrl isActiveUser isBlockedUser createdAt updatedAt userLastLoginAt notesAboutUser buyList';
+export const USER_DATA = '_id userName email userAvatarUrl userAvatarFocus userBackgroundUrl userBackgroundFocus userBirthDate userGender userAddress userAddressFlat userAddressFiasId userAddressGeo userPhoneNumber userRole userDiscountPercent userLoyaltyPoints isPremiumUser premiumExpiresAt isUserDataConfirmed notificationsEnabled userRatingByVotes isActiveUser isBlockedUser createdAt updatedAt userLastLoginAt notesAboutUser buyList';
 
 /** Поля пользователя для отображения на клиенте (GET /me/rating). Строка для .select() — без passwordHash */
 export const USER_ME_RAITING =  "_id userRatingByVotes userName email userAvatarUrl";

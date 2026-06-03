@@ -7,7 +7,6 @@ import {
 } from "react";
 
 import { replaceMyCart } from "../api/replaceMyCart.js";
-import { AUTH_TOKEN_STORAGE_KEY } from "../../../shared/api/index.js";
 import {
   CART_ACTION_ADD,
   CART_ACTION_CLEAR,
@@ -55,16 +54,9 @@ export function CartProvider({ children }) {
     [],
   );
 
-  /** Сохранить текущую корзину на сервер, пока в storage ещё есть JWT (например перед выходом). */
+  /** Сохранить текущую корзину на сервер (cookie auth). */
   const flushRemoteCart = useCallback(async () => {
     try {
-      let token = null;
-      try {
-        token = localStorage.getItem(AUTH_TOKEN_STORAGE_KEY);
-      } catch {
-        return;
-      }
-      if (!token) return;
       await replaceMyCart(itemsRef.current);
     } catch {
       // выход не блокируем

@@ -12,6 +12,7 @@ import { up as raffleSalesConfirmedOnlyUp } from "./20260530-raffle-sales-confir
 import { up as userPhoneNumberUnsetNullUp } from "./20260531-user-phone-number-unset-null.js";
 import { up as userPremiumExpiresUp } from "./20260603-user-premium-expires.js";
 import { up as productLoyaltyPointsPerUnitUp } from "./20260603-product-loyalty-points-per-unit.js";
+import { removeTelegramUserFieldsUp } from "./20260604-remove-telegram-user-fields.js";
 
 export const MIGRATIONS = [
   {
@@ -83,5 +84,10 @@ export const MIGRATIONS = [
     id: "20260603-product-loyalty-points-per-unit",
     description: "Product loyaltyPointsPerUnit and order line reserve fields",
     up: productLoyaltyPointsPerUnitUp,
+  },
+  {
+    id: "20260604-remove-telegram-user-fields",
+    description: "Remove telegramUserId, telegramUsername, telegramPhotoUrl from users",
+    up: removeTelegramUserFieldsUp,
   },
 ];

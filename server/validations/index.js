@@ -1,6 +1,5 @@
 import { loginUserValidation } from './user/loginUserValidation.js';
 import { registerUserValidation } from './user/registerUserValidation.js';
-import { telegramAuthValidation } from './user/telegramAuthValidation.js';
 import { updateProfileValidation, userIdParamValidation } from './user/updateProfileValidation.js';
 import { voteValidation, voteTargetIdParamValidation } from './user/voteValidation.js';
 import { ratingUserIdParamValidation } from './user/ratingValidation.js';
@@ -75,8 +74,7 @@ import {
 
 export {
     loginUserValidation, 
-    registerUserValidation, 
-    telegramAuthValidation,
+    registerUserValidation,
     updateProfileValidation,
     userIdParamValidation,
     voteValidation,

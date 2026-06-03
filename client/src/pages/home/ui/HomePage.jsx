@@ -48,6 +48,7 @@ import { RafflesStaffPage } from "../../raffles-staff/ui/RafflesStaffPage.jsx";
 import { RaffleProductsPage } from "../../raffle/ui/RaffleProductsPage.jsx";
 import { ProductPromotionsStaffPage } from "../../product-promotions/ui/ProductPromotionsStaffPage.jsx";
 import { fetchCurrentUserProfile } from "../../../entities/user/api/fetchCurrentUserProfile.js";
+import { logoutUser } from "../../../entities/user/api/logoutUser.js";
 import { markInAppNotificationsRead } from "../../../entities/user/api/markInAppNotificationsRead.js";
 import { fetchUserProfileById } from "../../../entities/user/api/fetchUserProfileById.js";
 import { LoginModal } from "../../../entities/user/ui/LoginModal.jsx";
@@ -129,7 +130,6 @@ import {
   IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_PRODUCT_DISCOUNT,
   IN_APP_NOTIFICATION_KIND_NEW_FOLLOWER,
 } from "../../../entities/user-follow/model/constants.js";
-import { AUTH_TOKEN_STORAGE_KEY } from "../../../shared/api/index.js";
 import {
   API_CLIENT_UI,
   HOME_PAGE_UI,
@@ -219,7 +219,7 @@ const readInitialCatalogCategory = () => {
   return readInitialCatalogQuery()?.category ?? null;
 };
 
-const useCurrentUserSession = (isAuthorized) => {
+const useCurrentUserSession = (isAuthorized, isAuthReady) => {
   const [currentUserId, setCurrentUserId] = useState(null);
   const [currentUserRole, setCurrentUserRole] = useState(
     /** @type {'user'|'admin'|'moderator'|null} */ (null),
@@ -227,9 +227,14 @@ const useCurrentUserSession = (isAuthorized) => {
   const [isPremiumUser, setIsPremiumUser] = useState(false);
   const [loyaltyPoints, setLoyaltyPoints] = useState(0);
   const [loyaltyPointsReserved, setLoyaltyPointsReserved] = useState(0);
-  const [isSessionReady, setIsSessionReady] = useState(() => !isAuthorized);
+  const [isSessionReady, setIsSessionReady] = useState(false);
 
   useEffect(() => {
+    if (!isAuthReady) {
+      setIsSessionReady(false);
+      return undefined;
+    }
+
     if (!isAuthorized) {
       setCurrentUserId(null);
       setCurrentUserRole(null);
@@ -271,7 +276,7 @@ const useCurrentUserSession = (isAuthorized) => {
     return () => {
       isCancelled = true;
     };
-  }, [isAuthorized]);
+  }, [isAuthorized, isAuthReady]);
 
   return [
     currentUserId,
@@ -341,13 +346,8 @@ export function HomePage() {
   const [productSearchTerm, setProductSearchTerm] = useState("");
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
-  const [isAuthorized, setIsAuthorized] = useState(() => {
-    try {
-      return Boolean(localStorage.getItem(AUTH_TOKEN_STORAGE_KEY));
-    } catch {
-      return false;
-    }
-  });
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isAuthReady, setIsAuthReady] = useState(false);
   const [catalogStatus, setCatalogStatus] = useState({ kind: "loading" });
   /** @type {import('react').MutableRefObject<number>} */
   const sellerFetchSeq = useRef(0);
@@ -399,7 +399,32 @@ export function HomePage() {
     setLoyaltyPointsReserved,
     setCurrentUserId,
     isSessionReady,
-  ] = useCurrentUserSession(isAuthorized);
+  ] = useCurrentUserSession(isAuthorized, isAuthReady);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    void (async () => {
+      try {
+        await fetchCurrentUserProfile();
+        if (!isCancelled) {
+          setIsAuthorized(true);
+        }
+      } catch {
+        if (!isCancelled) {
+          setIsAuthorized(false);
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsAuthReady(true);
+        }
+      }
+    })();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
   const [myProductsTotal, setMyProductsTotal] = useState(
     /** @type {number | null} */ (null),
   );
@@ -1519,8 +1544,8 @@ export function HomePage() {
 
   const handleLogout = async () => {
     await flushRemoteCart();
+    await logoutUser();
     try {
-      localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
       localStorage.removeItem(CART_STORAGE_KEY);
     } catch {
       // storage недоступен

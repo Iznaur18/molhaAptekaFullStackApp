@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import {
     uploadRouter,
@@ -36,12 +37,30 @@ if (!process.env.MONGO_URI) { // если MONGO_URI не задан в .env, т�
     process.exit(1); // выход из программы с кодом 1 (ошибка)
 }
 
+const isProduction = process.env.NODE_ENV === 'production';
+if (isProduction && !process.env.FRONTEND_URL) {
+    console.error(
+        'FRONTEND_URL не задан в production — CORS будет открыт для всех доменов. Задайте FRONTEND_URL в .env',
+    );
+    process.exit(1);
+}
+if (!isProduction && !process.env.FRONTEND_URL) {
+    console.warn(
+        'FRONTEND_URL не задан — CORS разрешён для всех origin (только для dev)',
+    );
+}
+
 const app = express(); // создаем экземпляр express
 // Один hop прокси (Vite dev `server.proxy`, nginx и т.п.) — иначе `express-rate-limit` v7
 // может кинуть ValidationError из‑за `X-Forwarded-For` при `trust proxy === false`.
 app.set('trust proxy', 1);
-app.use(express.json()); // middleware для парсинга JSON в теле запроса
-app.use(process.env.FRONTEND_URL ? cors({ origin: process.env.FRONTEND_URL }) : cors()); // разрешаем запросы только с определенного домена если FRONTEND_URL задан в .env
+app.use(express.json());
+app.use(cookieParser());
+app.use(
+    process.env.FRONTEND_URL
+        ? cors({ origin: process.env.FRONTEND_URL, credentials: true })
+        : cors({ origin: true, credentials: true }),
+);
 app.use(helmet()); // защита от некоторых типов атак
 
 // Общий rate limiting для всех API запросов (защита от DDoS)
@@ -61,7 +80,7 @@ app.use(
 // роут загрузки файла: POST /upload
 app.use('/upload', uploadRouter); // Это префикс, который будет использоваться для загрузки файла.
 
-// авторизация: POST /auth/register, POST /auth/login, POST /auth/telegram
+// авторизация: POST /auth/register, POST /auth/login
 app.use('/auth', authRouter); // Это префикс для маршрутов авторизации.
 
 // голосование за пользователя: POST /vote/:userVoteTargetIdClient (body: userVoteValueClient 1–10)

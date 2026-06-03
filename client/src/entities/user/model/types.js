@@ -13,7 +13,6 @@
  * @property {string} [email]
  * @property {string} [userAvatarUrl]
  * @property {{ x?: number; y?: number }} [userAvatarFocus]
- * @property {string} [telegramPhotoUrl]
  * @property {number} [userLoyaltyPoints]
  * @property {number} [userLoyaltyPointsReserved] — только GET /auth/me
  * @property {UserRatingByVotes} [userRatingByVotes]
@@ -85,9 +84,6 @@
  * @property {number} [followersCount]
  * @property {number} [followingCount]
  * @property {boolean} [isFollowing]
- * @property {string} [telegramUserId]
- * @property {string} [telegramUsername]
- * @property {string} [telegramPhotoUrl]
  * @property {string} [createdAt]
  * @property {string} [updatedAt]
  */

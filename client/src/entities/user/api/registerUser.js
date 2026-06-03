@@ -2,20 +2,17 @@ import { apiClient } from "../../../shared/api/index.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 
 /**
- * Регистрация. Тело — как у `POST /auth/register` (см. валидацию на сервере).
+ * Регистрация. JWT ставится сервером в httpOnly cookie.
  *
  * @param {import('../model/types.js').RegisterUserPayload} payload
- * @returns {Promise<{ token: string }>}
  */
 export async function registerUser(payload) {
   try {
     const { data } = await apiClient.post("/auth/register", payload);
 
-    if (!data?.success || !data?.data?.token) {
+    if (!data?.success || !data?.data?._id) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
-
-    return { token: data.data.token };
   } catch (e) {
     const message =
       e?.response?.data?.message ??
