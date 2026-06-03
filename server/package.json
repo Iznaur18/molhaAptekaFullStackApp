@@ -14,6 +14,7 @@
     "migrate:apply": "node scripts/runMigrations.js --apply",
     "migrate:order-items-status": "node scripts/migrateOrderItemsStatus.js",
     "validate:prod": "node scripts/validateProdEnv.js",
+    "test:smtp": "node scripts/testSmtp.js",
     "create-admin": "node scripts/createAdmin.js"
   },
   "devDependencies": {

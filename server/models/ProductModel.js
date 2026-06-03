@@ -6,6 +6,10 @@ import {
   PRODUCT_IMAGE_URLS_MAX,
 } from "../constants/productConstants.js";
 import {
+  PRODUCT_CHARACTERISTIC_KEY_MAX_CHARS,
+  PRODUCT_CHARACTERISTIC_VALUE_MAX_CHARS,
+} from "../constants/productCharacteristicsConstants.js";
+import {
   PRODUCT_MODERATION_APPROVED,
   PRODUCT_MODERATION_STATUSES,
 } from "../constants/productModerationConstants.js";
@@ -19,6 +23,25 @@ const ProductSchema = new Schema(
       type: String,
       trim: true,
       maxlength: PRODUCT_DESCRIPTION_MAX_CHARS,
+    },
+    productCharacteristics: {
+      type: [
+        {
+          key: {
+            type: String,
+            required: true,
+            trim: true,
+            maxlength: PRODUCT_CHARACTERISTIC_KEY_MAX_CHARS,
+          },
+          value: {
+            type: String,
+            required: true,
+            trim: true,
+            maxlength: PRODUCT_CHARACTERISTIC_VALUE_MAX_CHARS,
+          },
+        },
+      ],
+      default: [],
     },
     productImageUrls: {
       type: [String],

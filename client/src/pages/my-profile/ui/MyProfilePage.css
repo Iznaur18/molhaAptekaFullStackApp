@@ -169,6 +169,33 @@
   margin-bottom: 0.75rem;
 }
 
+.my-profile-page__catalog-shell {
+  width: 100%;
+  min-width: 0;
+}
+
+.my-profile-page--my-products-tab .my-profile-page__catalog-shell .home-page__cell {
+  display: flex;
+  flex-direction: column;
+}
+
+.my-profile-page--my-products-tab
+  .my-profile-page__catalog-shell
+  .home-page__cell
+  > .product-card,
+.my-profile-page--my-products-tab
+  .my-profile-page__catalog-shell
+  .home-page__cell
+  > .product-card-promotion-frame,
+.my-profile-page--my-products-tab
+  .my-profile-page__catalog-shell
+  .home-page__cell
+  > .product-card-premium-frame {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 100%;
+}
+
 .my-profile-page__banner-edit {
   position: absolute;
   top: var(--modal-banner-avatar-inset);

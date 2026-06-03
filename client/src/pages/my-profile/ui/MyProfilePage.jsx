@@ -15,7 +15,7 @@ import {
   MY_PROFILE_PAGE_UI,
   USER_DETAILS_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
-import { PROFILE_TAB_OVERVIEW } from "../lib/profileTabs.js";
+import { PROFILE_TAB_MY_PRODUCTS, PROFILE_TAB_OVERVIEW } from "../lib/profileTabs.js";
 import { ProfileTabBadge } from "./ProfileTabBadge.jsx";
 
 import "../../../entities/user/ui/UserDetailsModal.css";
@@ -164,6 +164,7 @@ export function MyProfilePage({
   const canUseInstallmentDisputes =
     !isRegularUser && isProfileReady && Boolean(onInstallmentDisputesClick);
   const canUseSubscriptions = isProfileReady && Boolean(onSubscriptionsClick);
+  const isMyProductsTab = activeTab === PROFILE_TAB_MY_PRODUCTS;
   const tabButtonClassName = (tab, withBadge = false) =>
     [
       "my-profile-page__header-action",
@@ -195,7 +196,14 @@ export function MyProfilePage({
   }, [activeTab]);
 
   return (
-    <section className="my-profile-page">
+    <section
+      className={[
+        "my-profile-page",
+        isMyProductsTab ? "my-profile-page--my-products-tab" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
       <header className="my-profile-page__header">
         <h2 className="my-profile-page__title">{MY_PROFILE_PAGE_UI.TAB_TITLE}</h2>
         <div className="my-profile-page__header-actions">
@@ -471,6 +479,24 @@ export function MyProfilePage({
         </div>
       </header>
 
+      {isMyProductsTab ? (
+        <div className="my-profile-page__catalog-shell">
+          {isLoading ? (
+            <p className="my-profile-page__state">
+              {USER_DETAILS_MODAL_UI.LOADING_BODY}
+            </p>
+          ) : null}
+          {errorMessage && !isLoading ? (
+            <p
+              className="my-profile-page__state my-profile-page__state_error"
+              role="alert"
+            >
+              {errorMessage}
+            </p>
+          ) : null}
+          {isProfileReady ? tabContent : null}
+        </div>
+      ) : (
       <div className="my-profile-page__body">
         {isLoading ? (
           <p className="my-profile-page__state">{USER_DETAILS_MODAL_UI.LOADING_BODY}</p>
@@ -549,6 +575,7 @@ export function MyProfilePage({
           <div className="my-profile-page__tab-content">{tabContent}</div>
         ) : null}
       </div>
+      )}
       <footer className="my-profile-page__footer">
         {activeTab === PROFILE_TAB_OVERVIEW ? (
           !isLogoutConfirmOpen ? (

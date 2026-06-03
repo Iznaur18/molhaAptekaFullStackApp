@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useAuthBootstrap } from "./useAuthBootstrap.js";
 import { useCurrentUserSession } from "./useCurrentUserSession.js";
@@ -54,6 +54,15 @@ export function useHomePageShellState(location, navigate) {
     useState(MY_PRODUCTS_MODERATION_FILTER_ALL);
   const [myProductsCatalogError, setMyProductsCatalogError] = useState("");
   const [myProductsCatalogNotice, setMyProductsCatalogNotice] = useState("");
+  const [staffActionNotice, setStaffActionNotice] = useState("");
+
+  useEffect(() => {
+    if (!staffActionNotice) {
+      return undefined;
+    }
+    const timerId = window.setTimeout(() => setStaffActionNotice(""), 4000);
+    return () => window.clearTimeout(timerId);
+  }, [staffActionNotice]);
   const [deletingProductId, setDeletingProductId] = useState(null);
   const [togglingAvailabilityProductId, setTogglingAvailabilityProductId] =
     useState(null);
@@ -83,7 +92,7 @@ export function useHomePageShellState(location, navigate) {
     isSessionReady,
   } = useCurrentUserSession(isAuthorized, isAuthReady);
 
-  useHomeEmailVerifiedRedirect({
+  const emailVerificationRedirect = useHomeEmailVerifiedRedirect({
     location,
     navigate,
     isAuthorized,
@@ -208,6 +217,8 @@ export function useHomePageShellState(location, navigate) {
     setMyProductsCatalogError,
     myProductsCatalogNotice,
     setMyProductsCatalogNotice,
+    staffActionNotice,
+    setStaffActionNotice,
     deletingProductId,
     setDeletingProductId,
     togglingAvailabilityProductId,
@@ -274,5 +285,6 @@ export function useHomePageShellState(location, navigate) {
     setPromotionModalError,
     isPromotionSubmitPending,
     setIsPromotionSubmitPending,
+    ...emailVerificationRedirect,
   };
 }

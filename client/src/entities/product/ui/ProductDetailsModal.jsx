@@ -27,6 +27,7 @@ import {
 } from "../model/productConstants.js";
 import { ProductImageLightbox } from "./ProductImageLightbox.jsx";
 import { ProductDetailsSellerPreview } from "./ProductDetailsSellerPreview.jsx";
+import { ProductCharacteristicsDetails } from "./ProductCharacteristicsDetails.jsx";
 import { ProductPriceDisplay } from "./ProductPriceDisplay.jsx";
 import { fetchCurrentUserProfile } from "../../user/api/fetchCurrentUserProfile.js";
 import { isCurrentUserProductSeller } from "../lib/isCurrentUserProductSeller.js";
@@ -918,7 +919,9 @@ export function ProductDetailsModal({
             />
 
             {(bottomBlockFieldKeys.length > 0 ||
-              bottomMetaFieldKeys.length > 0) && (
+              bottomMetaFieldKeys.length > 0 ||
+              (Array.isArray(product.productCharacteristics) &&
+                product.productCharacteristics.length > 0)) && (
               <section
                 className="product-details-modal__details"
                 aria-label={PRODUCT_DETAILS_MODAL_UI.DETAILS_SECTION_ARIA}
@@ -932,6 +935,9 @@ export function ProductDetailsModal({
                     )}
                   </dl>
                 ) : null}
+                <ProductCharacteristicsDetails
+                  items={product.productCharacteristics}
+                />
                 {bottomMetaFieldKeys.length > 0 ? (
                   <dl className="product-details-modal__meta-grid">
                     {renderFieldRows(

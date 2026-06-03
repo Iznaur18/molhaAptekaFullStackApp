@@ -11,6 +11,9 @@ export const isSmtpConfigured = () =>
 const createSmtpTransport = () => {
     const port = Number(process.env.SMTP_PORT) || SMTP_DEFAULT_PORT;
     const secure = port === 465;
+    const rejectUnauthorized =
+        String(process.env.SMTP_TLS_REJECT_UNAUTHORIZED ?? 'true').toLowerCase() !==
+        'false';
 
     return nodemailer.createTransport({
         host: process.env.SMTP_HOST,
@@ -20,6 +23,8 @@ const createSmtpTransport = () => {
             user: process.env.SMTP_USER,
             pass: process.env.SMTP_PASS,
         },
+        ...(port === 587 ? { requireTLS: true } : {}),
+        tls: { rejectUnauthorized },
     });
 };
 

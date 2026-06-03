@@ -18,7 +18,11 @@ export const PREMIUM_PURCHASE_SUCCESS_MESSAGE = 'Премиум активиро
 
 export const IN_APP_NOTIFICATION_KIND_PREMIUM_EXPIRING_SOON = 'premium_expiring_soon';
 export const IN_APP_NOTIFICATION_KIND_PREMIUM_EXPIRED = 'premium_expired';
+export const IN_APP_NOTIFICATION_KIND_PREMIUM_REVOKED_BY_STAFF =
+    'premium_revoked_by_staff';
 
 export const IN_APP_NOTIFICATION_MESSAGE_PREMIUM_EXPIRING_SOON =
     'Премиум закончится примерно через 3 дня';
 export const IN_APP_NOTIFICATION_MESSAGE_PREMIUM_EXPIRED = 'Премиум закончился';
+export const IN_APP_NOTIFICATION_MESSAGE_PREMIUM_REVOKED_BY_STAFF =
+    'Премиум отключён модератором';

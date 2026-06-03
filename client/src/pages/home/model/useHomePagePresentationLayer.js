@@ -260,6 +260,7 @@ export function useHomePagePresentationLayer(ctx) {
     refreshSellerRaffleState: ctx.refreshSellerRaffleState,
     refreshPendingRafflesCount: ctx.refreshPendingRafflesCount,
     setMyProductsCatalogNotice: ctx.setMyProductsCatalogNotice,
+    setStaffActionNotice: ctx.setStaffActionNotice,
     catalogProductDetails: ctx.catalogProductDetails,
     setCatalogProductDetailsTab: ctx.setCatalogProductDetailsTab,
     setProductDetailsAdminError: ctx.setProductDetailsAdminError,

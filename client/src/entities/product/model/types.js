@@ -24,12 +24,21 @@
  */
 
 /**
+ * Пара «ключ — значение» в карточке товара.
+ *
+ * @typedef {object} ProductCharacteristic
+ * @property {string} key
+ * @property {string} value
+ */
+
+/**
  * Товар из `GET /product` (lean + populate).
  *
  * @typedef {object} ProductFromApi
  * @property {string} _id
  * @property {string} productName
  * @property {string} [productDescription]
+ * @property {ProductCharacteristic[]} [productCharacteristics]
  * @property {string[]} [productImageUrls]
  * @property {string} [productImageUrl]
  * @property {string} [productPreviewVideoUrl]

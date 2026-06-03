@@ -2,8 +2,10 @@ import { UserModel } from '../models/index.js';
 import {
     IN_APP_NOTIFICATION_KIND_PREMIUM_EXPIRED,
     IN_APP_NOTIFICATION_KIND_PREMIUM_EXPIRING_SOON,
+    IN_APP_NOTIFICATION_KIND_PREMIUM_REVOKED_BY_STAFF,
     IN_APP_NOTIFICATION_MESSAGE_PREMIUM_EXPIRED,
     IN_APP_NOTIFICATION_MESSAGE_PREMIUM_EXPIRING_SOON,
+    IN_APP_NOTIFICATION_MESSAGE_PREMIUM_REVOKED_BY_STAFF,
     PREMIUM_DURATION_CALENDAR_MONTHS,
     PREMIUM_EXPIRY_REMINDER_DAYS,
     PREMIUM_PRICE_POINTS,
@@ -209,6 +211,17 @@ export const resolvePremiumFlagsFromExpiry = (premiumExpiresAt) => {
  *   updateData: Record<string, unknown>;
  * }} params
  */
+/**
+ * @param {string} userId
+ */
+export const notifyPremiumRevokedByStaff = async (userId) => {
+    await createUserInAppNotification({
+        userId,
+        kind: IN_APP_NOTIFICATION_KIND_PREMIUM_REVOKED_BY_STAFF,
+        message: IN_APP_NOTIFICATION_MESSAGE_PREMIUM_REVOKED_BY_STAFF,
+    });
+};
+
 export const applyPremiumExpiryAdminUpdate = ({
     wasPremium,
     nextPremium,

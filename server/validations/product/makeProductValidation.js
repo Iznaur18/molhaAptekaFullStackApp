@@ -13,6 +13,7 @@ import {
 } from "../../constants/productStockConstants.js";
 import { assertAtMostChars } from "../../utils/maxWordsText.js";
 import { assertProductOldPricePair, normalizeProductOldPriceRub, normalizeProductPriceRub } from "../../utils/productDiscount.js";
+import { normalizeProductCharacteristics } from "../../utils/normalizeProductCharacteristics.js";
 import { handleValidationByExpressErrors } from "../handleValidationByExpressErrors.js";
 
 const assertHttpImageUrl = (raw, label) => {
@@ -141,5 +142,11 @@ export const makeProductValidation = [
     .isInt({ min: 0 })
     .withMessage("Баллы за покупку — целое число не меньше 0")
     .toInt(),
+  body("productCharacteristics")
+    .optional()
+    .custom((value) => {
+      normalizeProductCharacteristics(value);
+      return true;
+    }),
   handleValidationByExpressErrors,
 ];

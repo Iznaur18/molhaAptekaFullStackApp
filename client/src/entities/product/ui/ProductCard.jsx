@@ -118,11 +118,8 @@ export function ProductCard({
   );
   const previewFieldKeys = useMemo(() => {
     if (isModerationQueue) return PRODUCT_CARD_MODERATION_PREVIEW_FIELD_KEYS;
-    if (isMineMode) {
-      return [...PRODUCT_CARD_PREVIEW_FIELD_KEYS, "uniqueViewerCount"];
-    }
     return PRODUCT_CARD_PREVIEW_FIELD_KEYS;
-  }, [isMineMode, isModerationQueue]);
+  }, [isModerationQueue]);
   const [cardSlideIndex, setCardSlideIndex] = useState(0);
   const [previewVideoFailed, setPreviewVideoFailed] = useState(false);
   const [imageLoadFailed, setImageLoadFailed] = useState(false);

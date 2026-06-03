@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import { patchUserProfile } from "../api/patchUserProfile.js";
 import { buildAdminPatchUserProfileBody } from "../lib/buildAdminPatchUserProfileBody.js";
 import { buildPatchUserProfileBody } from "../lib/buildPatchUserProfileBody.js";
+import { willFormDisablePremium } from "../lib/willFormDisablePremium.js";
 import { AddressDeliveryFields } from "../../address/ui/AddressDeliveryFields.jsx";
 import { mapUserToEditProfileForm } from "../lib/mapUserToEditProfileForm.js";
 import { limitRuPhoneInput } from "../lib/ruPhone.js";
@@ -56,8 +57,10 @@ const ROLE_OPTIONS = [USER_ROLE_USER, USER_ROLE_MODERATOR, USER_ROLE_ADMIN];
  *   onSaved: (user: import('../model/types.js').UserPublicProfile) => void;
  *   adminMode?: boolean;
  *   staffCanEditRole?: boolean;
+ *   staffCanEditPremium?: boolean;
  *   allowSelfPremiumToggle?: boolean;
  *   allowStaffLoyaltyEdit?: boolean;
+ *   onPremiumRevoked?: () => void;
  * }} props
  */
 export function EditProfileModal({
@@ -67,8 +70,10 @@ export function EditProfileModal({
   onSaved,
   adminMode = false,
   staffCanEditRole = false,
+  staffCanEditPremium = false,
   allowSelfPremiumToggle = false,
   allowStaffLoyaltyEdit = false,
+  onPremiumRevoked,
 }) {
   const [form, setForm] = useState(() => mapUserToEditProfileForm({ _id: "" }));
   const [feedback, setFeedback] = useState({ kind: "idle", message: "" });
@@ -170,6 +175,16 @@ export function EditProfileModal({
       return;
     }
 
+    const premiumWillBeDisabled =
+      ((adminMode && staffCanEditPremium) || allowSelfPremiumToggle) &&
+      willFormDisablePremium(user, form);
+    if (premiumWillBeDisabled) {
+      const userName = String(user.userName ?? "").trim() || "пользователя";
+      if (!window.confirm(ADMIN_EDIT_USER_UI.DISABLE_PREMIUM_CONFIRM(userName))) {
+        return;
+      }
+    }
+
     setFeedback({ kind: "loading", message: "" });
 
     try {
@@ -177,7 +192,10 @@ export function EditProfileModal({
         initialPhoneNumber: user.userPhoneNumber,
       };
       const body = adminMode
-        ? buildAdminPatchUserProfileBody(form, profilePatchOptions)
+        ? buildAdminPatchUserProfileBody(form, {
+            ...profilePatchOptions,
+            includePremium: staffCanEditPremium,
+          })
         : buildPatchUserProfileBody(form, {
             backgroundMode,
             includePremium: allowSelfPremiumToggle,
@@ -185,6 +203,9 @@ export function EditProfileModal({
             ...profilePatchOptions,
           });
       const updated = await patchUserProfile(String(user._id), body);
+      if (premiumWillBeDisabled) {
+        onPremiumRevoked?.();
+      }
       handleClose();
       onSaved(updated);
     } catch (e) {
@@ -474,20 +495,22 @@ export function EditProfileModal({
                   />
                   {ADMIN_EDIT_USER_UI.LABEL_USER_DATA_CONFIRMED}
                 </label>
-                <label className="edit-profile-modal__label">
-                  {ADMIN_EDIT_USER_UI.LABEL_PREMIUM_EXPIRES_AT}
-                  <input
-                    type="datetime-local"
-                    className="edit-profile-modal__input"
-                    name="premiumExpiresAt"
-                    value={form.premiumExpiresAt}
-                    onChange={handleChange}
-                    disabled={isSubmitting}
-                  />
-                  <span className="edit-profile-modal__hint">
-                    {ADMIN_EDIT_USER_UI.LABEL_PREMIUM_EXPIRES_HINT}
-                  </span>
-                </label>
+                {staffCanEditPremium ? (
+                  <label className="edit-profile-modal__label">
+                    {ADMIN_EDIT_USER_UI.LABEL_PREMIUM_EXPIRES_AT}
+                    <input
+                      type="datetime-local"
+                      className="edit-profile-modal__input"
+                      name="premiumExpiresAt"
+                      value={form.premiumExpiresAt}
+                      onChange={handleChange}
+                      disabled={isSubmitting}
+                    />
+                    <span className="edit-profile-modal__hint">
+                      {ADMIN_EDIT_USER_UI.LABEL_PREMIUM_EXPIRES_HINT}
+                    </span>
+                  </label>
+                ) : null}
                 <label className="edit-profile-modal__label edit-profile-modal__label_row">
                   <input
                     type="checkbox"

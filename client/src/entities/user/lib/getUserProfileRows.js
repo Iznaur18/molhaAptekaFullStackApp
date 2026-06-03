@@ -63,12 +63,7 @@ const L = USER_PROFILE_COPY.LABELS;
 /** Не показывать в `dl` профиля — медиа уже в шапке модалки. */
 const HIDDEN_MEDIA_URL_ROW_IDS = new Set(["userAvatarUrl", "userBackgroundUrl"]);
 
-const INTERNAL_ROW_IDS = new Set([
-  "isActiveUser",
-  "isBlockedUser",
-  "userDiscountPercent",
-  "notesAboutUser",
-]);
+const INTERNAL_ROW_IDS = new Set(["notesAboutUser"]);
 
 /**
  * @param {import('../model/types.js').UserPublicProfile} user
@@ -124,11 +119,6 @@ export function getUserProfileRows(user, options = {}) {
       value: dashIfEmpty(user.userPhoneNumber),
     },
     {
-      id: "userLastLoginAt",
-      label: L.userLastLoginAt,
-      value: formatIso(user.userLastLoginAt),
-    },
-    {
       id: "isUserDataConfirmed",
       label: L.isUserDataConfirmed,
       value: formatBooleanRu(user.isUserDataConfirmed === true),
@@ -138,25 +128,7 @@ export function getUserProfileRows(user, options = {}) {
       label: L.userBackgroundUrl,
       value: formatUserBackgroundForDisplay(user.userBackgroundUrl),
     },
-    {
-      id: "isActiveUser",
-      label: L.isActiveUser,
-      value: formatBooleanRu(user.isActiveUser),
-    },
-    {
-      id: "isBlockedUser",
-      label: L.isBlockedUser,
-      value: formatBooleanRu(user.isBlockedUser),
-    },
     { id: "userRole", label: L.userRole, value: formatRole(user.userRole) },
-    {
-      id: "userDiscountPercent",
-      label: L.userDiscountPercent,
-      value:
-        user.userDiscountPercent == null
-          ? COMMON_UI.EM_DASH
-          : String(user.userDiscountPercent),
-    },
     {
       id: "notificationsEnabled",
       label: L.notificationsEnabled,
@@ -186,7 +158,6 @@ export function getUserProfileRows(user, options = {}) {
       value: formatRating(rating),
     },
     { id: "createdAt", label: L.createdAt, value: formatIso(user.createdAt) },
-    { id: "updatedAt", label: L.updatedAt, value: formatIso(user.updatedAt) },
   ];
 
   return rows.filter((row) => {

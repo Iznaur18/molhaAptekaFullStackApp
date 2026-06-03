@@ -28,6 +28,11 @@ import { getProductPriceRubMaxError } from "../lib/productPriceRubValidation.js"
 import { PRODUCT_PRICE_RUB_MAX } from "../model/productConstants.js";
 import { validateProductDescription } from "../lib/validateProductDescription.js";
 import {
+  validateProductCharacteristicsRows,
+  productCharacteristicsFromRows,
+} from "../lib/validateProductCharacteristicsRows.js";
+import { characteristicRowsFromApi } from "../lib/characteristicRowsFromApi.js";
+import {
   INTEGER_INPUT_FIELD_PROPS,
   keepDigitsOnly,
 } from "../../../shared/lib/numericInput.js";
@@ -39,6 +44,7 @@ import { ProductEditManageSection } from "./ProductEditManageSection.jsx";
 import { InstallmentProgramModal } from "../../installment/ui/InstallmentProgramModal.jsx";
 import { ProductImageUrlSortableList } from "./ProductImageUrlSortableList.jsx";
 import { ProductPreviewVideoField } from "./ProductPreviewVideoField.jsx";
+import { ProductCharacteristicsEditor } from "./ProductCharacteristicsEditor.jsx";
 import {
   CREATE_PRODUCT_MODAL_UI,
   PRODUCT_PREVIEW_VIDEO_UI,
@@ -60,6 +66,7 @@ const INITIAL_FORM = {
   productStockQuantity: "1",
   productAuctionEnabled: false,
   loyaltyPointsPerUnit: "0",
+  productCharacteristicRows: [],
 };
 
 /**
@@ -93,6 +100,9 @@ function formStateFromProduct(product) {
         : "1",
     productAuctionEnabled: product.productAuctionEnabled === true,
     loyaltyPointsPerUnit: String(resolveProductLoyaltyPointsPerUnit(product)),
+    productCharacteristicRows: characteristicRowsFromApi(
+      product.productCharacteristics,
+    ),
   };
 }
 
@@ -302,6 +312,18 @@ export function CreateProductModal({
         return;
       }
 
+      const characteristicsError = validateProductCharacteristicsRows(
+        form.productCharacteristicRows,
+      );
+      if (characteristicsError) {
+        setStatus({ kind: "error", message: characteristicsError });
+        return;
+      }
+
+      const productCharacteristics = productCharacteristicsFromRows(
+        form.productCharacteristicRows,
+      );
+
       const urls = urlsFromImageRows(form.productImageRows).map((url) =>
         resolveUploadedImageUrl(url),
       );
@@ -377,6 +399,7 @@ export function CreateProductModal({
           productOldPrice,
           productCategory: form.productCategory,
           loyaltyPointsPerUnit,
+          productCharacteristics,
         };
         if (showCatalogAvailabilityToggle) {
           patchBody.productIsAvailable = form.productIsAvailable;
@@ -398,6 +421,7 @@ export function CreateProductModal({
           productStockQuantity,
           productAuctionEnabled: form.productAuctionEnabled,
           loyaltyPointsPerUnit,
+          productCharacteristics,
         });
       }
 
@@ -490,6 +514,13 @@ export function CreateProductModal({
                 )}
               </span>
             </label>
+            <ProductCharacteristicsEditor
+              rows={form.productCharacteristicRows}
+              onRowsChange={(productCharacteristicRows) =>
+                setForm((prev) => ({ ...prev, productCharacteristicRows }))
+              }
+              disabled={isSubmitting}
+            />
             <ProductImageUrlSortableList
               rows={form.productImageRows}
               onRowsChange={(productImageRows) =>

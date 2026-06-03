@@ -275,6 +275,7 @@ export const EMAIL_VERIFICATION_UI = {
   RESEND_ERROR: "Не удалось отправить письмо",
   VERIFIED_SUCCESS: "Email подтверждён",
   VERIFIED_ERROR: "Не удалось подтвердить email",
+  DISMISS_NOTICE: "Закрыть уведомление",
 };
 
 /** Главная страница каталога */
@@ -723,6 +724,12 @@ export const ADMIN_EDIT_USER_UI = {
   LABEL_PREMIUM_EXPIRES_AT: "Премиум до (дата и время)",
   LABEL_PREMIUM_EXPIRES_HINT:
     "Пусто или прошедшая дата — премиум выключен. Будущая дата — премиум активен.",
+  /** @param {string} userName */
+  DISABLE_PREMIUM_CONFIRM: (userName) =>
+    `Отключить премиум у «${userName}»?`,
+  PREMIUM_REVOKED_TOAST: "Премиум отключён",
+  PREMIUM_MODERATOR_CANNOT_EDIT_ADMIN:
+    "Модератор не может менять премиум администратора",
   LABEL_ACCOUNT_ACTIVE: "Учётка активна",
   LABEL_BLOCKED: "Заблокирован",
   LABEL_USER_DATA_CONFIRMED: "Данные подтверждены",
@@ -836,6 +843,24 @@ export const CREATE_PRODUCT_MODAL_UI = {
   ERROR_EDIT_GENERIC: "Не удалось сохранить изменения",
   ERROR_PREVIEW_VIDEO_REQUIRES_PHOTO:
     "При превью-видео нужно хотя бы одно фото товара",
+  LABEL_CHARACTERISTICS: "Характеристики (необязательно)",
+  CHARACTERISTICS_SECTION_ARIA: "Характеристики товара",
+  HINT_CHARACTERISTICS: (max) =>
+    `До ${max} пар «ключ — значение». Пустые строки не сохраняются.`,
+  PLACEHOLDER_CHARACTERISTIC_KEY: "Ключ",
+  PLACEHOLDER_CHARACTERISTIC_VALUE: "Значение",
+  ADD_CHARACTERISTIC_ROW: "+ Характеристика",
+  CHARACTERISTIC_ROW_ARIA: (index) => `Характеристика ${index}`,
+  REMOVE_CHARACTERISTIC_ROW_ARIA: (index) => `Удалить характеристику ${index}`,
+  ERROR_CHARACTERISTIC_PAIR:
+    "У каждой характеристики должны быть и ключ, и значение",
+  ERROR_CHARACTERISTIC_KEY_MAX: (max) =>
+    `Ключ характеристики не длиннее ${max} символов`,
+  ERROR_CHARACTERISTIC_VALUE_MAX: (max) =>
+    `Значение характеристики не длиннее ${max} символов`,
+  ERROR_CHARACTERISTIC_DUPLICATE_KEY: (key) =>
+    `Дубликат ключа характеристики: «${key}»`,
+  ERROR_CHARACTERISTICS_MAX: (max) => `Не более ${max} характеристик`,
 };
 
 /** Модалка карточки товара в каталоге */
@@ -844,6 +869,8 @@ export const PRODUCT_DETAILS_MODAL_UI = {
   OPEN_GALLERY_FULLSCREEN: "Просмотреть все фото в полном экране",
   SLIDER_REGION_ARIA: "Слайдер фотографий товара",
   DETAILS_SECTION_ARIA: "Описание и служебная информация о товаре",
+  CHARACTERISTICS_TITLE: "Характеристики",
+  CHARACTERISTICS_SECTION_ARIA: "Характеристики товара",
 };
 
 /** Превью продавца в модалке товара */

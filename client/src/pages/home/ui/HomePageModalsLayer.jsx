@@ -21,8 +21,10 @@ import { CreateRaffleModal } from "../../../entities/raffle/ui/CreateRaffleModal
 import { ReportProductModal } from "../../../entities/product-report/ui/ReportProductModal.jsx";
 import { EditProductCategoryDisplayModal } from "../../../entities/product-category-display/ui/EditProductCategoryDisplayModal.jsx";
 import {
+  ADMIN_EDIT_USER_UI,
   PRODUCT_REPORT_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
+import { canStaffEditTargetUserPremium } from "../../../entities/user/lib/canStaffEditTargetUserPremium.js";
 
 /** @typedef {import('../../../entities/product/model/types.js').ProductFromApi} ProductFromApi */
 
@@ -97,6 +99,7 @@ import {
  *   refreshSellerRaffleState: () => void | Promise<void>;
  *   refreshPendingRafflesCount: () => void | Promise<void>;
  *   setMyProductsCatalogNotice: (message: string) => void;
+ *   setStaffActionNotice: (message: string) => void;
  *   catalogProductDetails: ProductFromApi | null;
  *   setCatalogProductDetailsTab: (tab: string) => void;
  *   setProductDetailsAdminError: (message: string) => void;
@@ -187,6 +190,7 @@ export function HomePageModalsLayer({
   refreshSellerRaffleState,
   refreshPendingRafflesCount,
   setMyProductsCatalogNotice,
+  setStaffActionNotice,
   catalogProductDetails,
   setCatalogProductDetailsTab,
   setProductDetailsAdminError,
@@ -207,6 +211,15 @@ export function HomePageModalsLayer({
   categoryDisplays,
   handleCategoryDisplaySaved,
 }) {
+  const adminEditUser =
+    sellerModal.phase === "success" ? sellerModal.user : null;
+  const staffCanEditPremium =
+    adminEditUser != null &&
+    canStaffEditTargetUserPremium({
+      editorRole: isAdmin ? "admin" : "moderator",
+      targetRole: adminEditUser.userRole,
+    });
+
   return (
     <>
       <UserDetailsModal
@@ -292,6 +305,9 @@ export function HomePageModalsLayer({
         allowSelfPremiumToggle={isAdmin}
         allowStaffLoyaltyEdit={canModerateProducts}
         user={myProfilePage.phase === "success" ? myProfilePage.user : null}
+        onPremiumRevoked={() =>
+          setStaffActionNotice(ADMIN_EDIT_USER_UI.PREMIUM_REVOKED_TOAST)
+        }
         onSaved={(updatedUser) => {
           setMyProfilePage((prev) =>
             prev.phase === "success" && prev.user
@@ -311,7 +327,11 @@ export function HomePageModalsLayer({
         onClose={() => setIsAdminEditUserOpen(false)}
         adminMode
         staffCanEditRole={isAdmin}
-        user={sellerModal.phase === "success" ? sellerModal.user : null}
+        staffCanEditPremium={staffCanEditPremium}
+        user={adminEditUser}
+        onPremiumRevoked={() =>
+          setStaffActionNotice(ADMIN_EDIT_USER_UI.PREMIUM_REVOKED_TOAST)
+        }
         onSaved={(updatedUser) => {
           setSellerModal((prev) =>
             prev.open && prev.phase === "success" && prev.user

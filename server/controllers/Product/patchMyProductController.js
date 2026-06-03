@@ -33,6 +33,7 @@ import {
     normalizeProductPriceRub,
 } from "../../utils/productDiscount.js";
 import { assertSellerCanSetProductLoyaltyPointsPerUnit } from "../../utils/assertProductLoyaltyPointsPerUnit.js";
+import { normalizeProductCharacteristics } from "../../utils/normalizeProductCharacteristics.js";
 import { errorRes, successRes } from "../../utils/index.js";
 
 const PENDING_EDIT_BLOCK_MESSAGE =
@@ -71,6 +72,23 @@ export const patchMyProductController = async (req, res) => {
         }
         if (Object.prototype.hasOwnProperty.call(body, "productDescription")) {
             $set.productDescription = String(body.productDescription).trim();
+        }
+        if (
+            Object.prototype.hasOwnProperty.call(body, "productCharacteristics")
+        ) {
+            try {
+                $set.productCharacteristics = normalizeProductCharacteristics(
+                    body.productCharacteristics,
+                );
+            } catch (characteristicsError) {
+                return errorRes(
+                    res,
+                    400,
+                    characteristicsError instanceof Error
+                        ? characteristicsError.message
+                        : "Некорректные характеристики товара",
+                );
+            }
         }
         if (Object.prototype.hasOwnProperty.call(body, "productPrice")) {
             try {

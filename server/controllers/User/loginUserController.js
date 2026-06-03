@@ -35,9 +35,11 @@ import { rejectPendingDataConfirmationForUser } from '../../utils/userDataConfir
 import {
     applyPremiumExpiryAdminUpdate,
     isPremiumActive,
+    notifyPremiumRevokedByStaff,
     resolvePremiumFlagsFromExpiry,
     syncPremiumExpiryForUser,
 } from '../../utils/premiumAccess.js';
+import { canStaffManageTargetPremium } from '../../utils/premiumStaffAccess.js';
 
 /** Вход по email + пароль. POST /auth/login */
 export const loginUserController = async (req, res) => { // обработчик входа по email + пароль
@@ -293,12 +295,43 @@ export const userUpdateProfileController = async (req, res) => {
             return errorRes(res, 403, 'Только администратор может менять скидку');
         }
 
-        if (
-            (updateData.isPremiumUser !== undefined ||
-                updateData.premiumExpiresAt !== undefined) &&
-            !isCurrentUserAdmin
-        ) {
-            return errorRes(res, 403, 'Только администратор может менять премиум');
+        const targetUserBeforeUpdate = await UserModel.findById(targetUserId)
+            .select(
+                'isPremiumUser premiumExpiresAt userBackgroundUrl isUserDataConfirmed userRole',
+            )
+            .lean();
+
+        if (!targetUserBeforeUpdate) {
+            return errorRes(res, 404, 'Пользователь не найден');
+        }
+
+        const isPremiumFieldUpdate =
+            updateData.isPremiumUser !== undefined ||
+            updateData.premiumExpiresAt !== undefined;
+
+        if (isPremiumFieldUpdate) {
+            if (isCurrentUserOwner) {
+                if (!isCurrentUserAdmin) {
+                    return errorRes(
+                        res,
+                        403,
+                        'Только администратор может менять свой премиум',
+                    );
+                }
+            } else if (!isCurrentUserStaff) {
+                return errorRes(res, 403, 'Нет прав на изменение премиума');
+            } else if (
+                !canStaffManageTargetPremium({
+                    editorRole,
+                    targetRole: targetUserBeforeUpdate.userRole,
+                })
+            ) {
+                return errorRes(
+                    res,
+                    403,
+                    'Модератор не может менять премиум администратора',
+                );
+            }
         }
 
         if (updateData.userLoyaltyPoints !== undefined && !isCurrentUserStaff) {
@@ -320,19 +353,19 @@ export const userUpdateProfileController = async (req, res) => {
             }
         }
 
-        const targetUserBeforeUpdate = await UserModel.findById(targetUserId)
-            .select(
-                'isPremiumUser premiumExpiresAt userBackgroundUrl isUserDataConfirmed',
-            )
-            .lean();
-
-        if (!targetUserBeforeUpdate) {
-            return errorRes(res, 404, 'Пользователь не найден');
-        }
-
         const wasPremium = isPremiumActive(targetUserBeforeUpdate);
 
-        if (updateData.premiumExpiresAt !== undefined && isCurrentUserAdmin) {
+        const canResolvePremiumExpiry =
+            updateData.premiumExpiresAt !== undefined &&
+            ((isCurrentUserOwner && isCurrentUserAdmin) ||
+                (!isCurrentUserOwner &&
+                    isCurrentUserStaff &&
+                    canStaffManageTargetPremium({
+                        editorRole,
+                        targetRole: targetUserBeforeUpdate.userRole,
+                    })));
+
+        if (canResolvePremiumExpiry) {
             try {
                 const resolved = resolvePremiumFlagsFromExpiry(
                     updateData.premiumExpiresAt,
@@ -426,6 +459,20 @@ export const userUpdateProfileController = async (req, res) => {
 
         if (!userDataUpdated) {
             return errorRes(res, 404, 'Пользователь не найден или не удалось обновить');
+        }
+
+        const premiumRevokedByStaff =
+            !isCurrentUserOwner &&
+            isCurrentUserStaff &&
+            wasPremium &&
+            !isPremiumActive(userDataUpdated);
+
+        if (premiumRevokedByStaff) {
+            try {
+                await notifyPremiumRevokedByStaff(String(targetUserId));
+            } catch (notifyError) {
+                console.error('notifyPremiumRevokedByStaff error:', notifyError);
+            }
         }
 
         return successRes(res, { user: userDataUpdated, message: 'Профиль успешно обновлен' });

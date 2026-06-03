@@ -9,6 +9,7 @@ import {
 } from "../../constants/productConstants.js";
 import { assertAtMostChars } from "../../utils/maxWordsText.js";
 import { assertProductOldPricePair, normalizeProductOldPriceRub, normalizeProductPriceRub } from "../../utils/productDiscount.js";
+import { normalizeProductCharacteristics } from "../../utils/normalizeProductCharacteristics.js";
 import { handleValidationByExpressErrors } from "../handleValidationByExpressErrors.js";
 
 const assertHttpImageUrl = (raw, label) => {
@@ -43,6 +44,7 @@ export const patchMyProductValidation = [
       body("productIsAvailable").exists(),
       body("productAuctionEnabled").exists(),
       body("loyaltyPointsPerUnit").exists(),
+      body("productCharacteristics").exists(),
     ],
     { message: "Укажите хотя бы одно поле для обновления" },
   ),
@@ -159,5 +161,11 @@ export const patchMyProductValidation = [
     .isInt({ min: 0 })
     .withMessage("Баллы за покупку — целое число не меньше 0")
     .toInt(),
+  body("productCharacteristics")
+    .optional()
+    .custom((value) => {
+      normalizeProductCharacteristics(value);
+      return true;
+    }),
   handleValidationByExpressErrors,
 ];

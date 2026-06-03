@@ -21,6 +21,7 @@ import {
     normalizeProductPriceRub,
 } from "../../utils/productDiscount.js";
 import { assertSellerCanSetProductLoyaltyPointsPerUnit } from "../../utils/assertProductLoyaltyPointsPerUnit.js";
+import { normalizeProductCharacteristics } from "../../utils/normalizeProductCharacteristics.js";
 import { errorRes, successRes } from "../../utils/index.js";
 
 export const postProductController = async (req, res) => {
@@ -119,6 +120,21 @@ export const postProductController = async (req, res) => {
         );
     }
 
+    let productCharacteristics = [];
+    try {
+        productCharacteristics = normalizeProductCharacteristics(
+            req.body?.productCharacteristics,
+        );
+    } catch (characteristicsError) {
+        return errorRes(
+            res,
+            400,
+            characteristicsError instanceof Error
+                ? characteristicsError.message
+                : "Некорректные характеристики товара",
+        );
+    }
+
     const product = await ProductModel.create({
       productName,
       productDescription,
@@ -135,6 +151,7 @@ export const postProductController = async (req, res) => {
       productModerationStatus,
       productModerationComment: "",
       loyaltyPointsPerUnit,
+      productCharacteristics,
     });
 
     await product.populate("productSeller", PRODUCT_SELLER_PUBLIC_SELECT);

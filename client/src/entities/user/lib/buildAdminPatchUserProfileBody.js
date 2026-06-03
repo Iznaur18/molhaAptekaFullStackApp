@@ -9,13 +9,14 @@ const ALLOWED_ROLES = [USER_ROLE_USER, USER_ROLE_ADMIN, USER_ROLE_MODERATOR];
 
 /**
  * @param {import('./mapUserToEditProfileForm.js').EditProfileFormState} form
- * @param {{ initialPhoneNumber?: string | null }} [options]
+ * @param {{ initialPhoneNumber?: string | null; includePremium?: boolean }} [options]
  * @returns {Record<string, unknown>}
  */
 export function buildAdminPatchUserProfileBody(form, options = {}) {
+  const { includePremium = true, initialPhoneNumber = null } = options;
   const body = buildPatchUserProfileBody(form, {
     backgroundMode: "admin",
-    ...options,
+    initialPhoneNumber,
   });
 
   const role = form.userRole;
@@ -26,9 +27,13 @@ export function buildAdminPatchUserProfileBody(form, options = {}) {
   const discount = Number(String(form.userDiscountPercent).trim());
   body.userDiscountPercent = Number.isFinite(discount) ? discount : 0;
 
-  const premiumExpiresAtRaw = String(form.premiumExpiresAt ?? "").trim();
-  body.premiumExpiresAt =
-    premiumExpiresAtRaw === "" ? null : new Date(premiumExpiresAtRaw).toISOString();
+  if (includePremium) {
+    const premiumExpiresAtRaw = String(form.premiumExpiresAt ?? "").trim();
+    body.premiumExpiresAt =
+      premiumExpiresAtRaw === ""
+        ? null
+        : new Date(premiumExpiresAtRaw).toISOString();
+  }
   body.isActiveUser = Boolean(form.isActiveUser);
   body.isUserDataConfirmed = Boolean(form.isUserDataConfirmed);
   body.isBlockedUser = Boolean(form.isBlockedUser);

@@ -17,6 +17,7 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
  * @property {number} [productStockQuantity]
  * @property {boolean} [productAuctionEnabled]
  * @property {number} [loyaltyPointsPerUnit]
+ * @property {{ key: string; value: string }[]} [productCharacteristics]
  */
 
 /**
@@ -54,6 +55,9 @@ export async function createProduct(body) {
     const previewVideo = body.productPreviewVideoUrl?.trim();
     if (previewVideo) {
       payload.productPreviewVideoUrl = previewVideo;
+    }
+    if (Array.isArray(body.productCharacteristics)) {
+      payload.productCharacteristics = body.productCharacteristics;
     }
     const legacy = body.productImageUrl?.trim();
     if (legacy && urls.length === 0) {
