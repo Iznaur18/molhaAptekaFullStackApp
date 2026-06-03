@@ -105,6 +105,11 @@ import {
     resolveDataConfirmationRequestController,
 } from './User/userDataConfirmationControllers.js';
 import {
+    getMyPremiumStatusController,
+    purchasePremiumController,
+} from './User/premiumControllers.js';
+import { getMyLoyaltyPointsStatusController } from './User/loyaltyPointsPurchaseControllers.js';
+import {
     followUserController,
     unfollowUserController,
     listMyFollowingController,
@@ -244,6 +249,9 @@ export {
     getPendingDataConfirmationRequestsController,
     getPendingDataConfirmationRequestsCountController,
     resolveDataConfirmationRequestController,
+    getMyPremiumStatusController,
+    purchasePremiumController,
+    getMyLoyaltyPointsStatusController,
     followUserController,
     unfollowUserController,
     listMyFollowingController,

@@ -36,6 +36,8 @@
 
 .my-profile-page__footer {
   display: flex;
+  align-items: flex-start;
+  min-height: 2.75rem;
 }
 
 .my-profile-page__header-action_create-raffle {
@@ -45,10 +47,38 @@
   font-weight: 700;
 }
 
+.my-profile-page__header-action_premium {
+  border-color: #d4a017;
+  background: #fff8e6;
+  color: #7a5a00;
+  font-weight: 700;
+}
+
+.my-profile-page__notice {
+  margin: 0 0 0.75rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #86efac;
+  background: #ecfdf5;
+  color: #047857;
+  font-size: 0.9rem;
+}
+
 .my-profile-page__header-actions {
-  display: inline-flex;
-  flex-wrap: wrap;
+  display: flex;
+  flex-direction: column;
   gap: 0.4rem;
+  width: 100%;
+}
+
+.my-profile-page__header-tabs-row,
+.my-profile-page__header-account-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.4rem;
+  width: 100%;
 }
 
 .my-profile-page__header-action {

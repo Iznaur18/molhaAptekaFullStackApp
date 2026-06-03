@@ -5,8 +5,6 @@ import {
 import {
     calculateProductPromotionPointsCost,
     PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS,
-    PRODUCT_PROMOTION_PAYMENT_METHOD_RUB,
-    PRODUCT_PROMOTION_PAYMENT_METHODS,
     PRODUCT_PROMOTION_STATUS_ACTIVE,
     PRODUCT_PROMOTION_STATUS_CANCELLED_BY_ADMIN,
     PRODUCT_PROMOTION_STATUS_PENDING_STAFF,
@@ -27,11 +25,6 @@ import {
     InsufficientLoyaltyPointsError,
     refundLoyaltyPoints,
 } from '../../utils/loyaltyPointsSpend.js';
-import {
-    deductRubBalance,
-    InsufficientRubBalanceError,
-    refundRubBalance,
-} from '../../utils/rubBalanceSpend.js';
 import { createUserInAppNotification } from '../../utils/userInAppNotifications.js';
 import { errorRes, successRes } from '../../utils/index.js';
 
@@ -94,13 +87,9 @@ export const requestProductPromotionController = async (req, res) => {
         const userId = String(req.userId);
         const { productId } = req.params;
         const tariffCode = String(req.body?.tariffCode || '').trim();
-        const paymentMethod = String(req.body?.paymentMethod || '').trim();
 
         if (!tariffCode) {
             return errorRes(res, 400, 'Выберите пакет продвижения');
-        }
-        if (!PRODUCT_PROMOTION_PAYMENT_METHODS.includes(paymentMethod)) {
-            return errorRes(res, 400, 'Выберите способ оплаты: рубли или баллы');
         }
 
         const [product, tariffs] = await Promise.all([
@@ -135,29 +124,16 @@ export const requestProductPromotionController = async (req, res) => {
         }
 
         const chargedAt = new Date();
-        const isPointsPayment =
-            paymentMethod === PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS;
-        const amountPoints = isPointsPayment
-            ? calculateProductPromotionPointsCost(tariff.priceRub)
-            : null;
-        const amountRub = Math.ceil(Number(tariff.priceRub));
+        const amountPoints = calculateProductPromotionPointsCost(tariff.priceRub);
 
         let loyaltyPointsBalance;
-        let rubBalance;
         let paymentDeducted = false;
 
         try {
-            if (isPointsPayment) {
-                loyaltyPointsBalance = await deductLoyaltyPoints({
-                    userId,
-                    amount: amountPoints,
-                });
-            } else {
-                rubBalance = await deductRubBalance({
-                    userId,
-                    amount: amountRub,
-                });
-            }
+            loyaltyPointsBalance = await deductLoyaltyPoints({
+                userId,
+                amount: amountPoints,
+            });
             paymentDeducted = true;
 
             const promotion = await ProductPromotionModel.create({
@@ -168,53 +144,31 @@ export const requestProductPromotionController = async (req, res) => {
                 tariffTitle: tariff.title,
                 durationHours: tariff.durationHours,
                 amountRub: tariff.priceRub,
-                paymentMethod,
-                amountPoints: isPointsPayment ? amountPoints : null,
-                pointsChargedAt: isPointsPayment ? chargedAt : null,
-                rubChargedAt: isPointsPayment ? null : chargedAt,
+                paymentMethod: PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS,
+                amountPoints,
+                pointsChargedAt: chargedAt,
+                rubChargedAt: null,
             });
 
-            if (isPointsPayment) {
-                await activateProductPromotionRecord(promotion, {
-                    approvedByUserId: null,
-                    notificationMessage: 'Продвижение товара активировано',
-                    actorUserId: null,
-                });
-                return successRes(res, {
-                    message: 'Продвижение активировано. Баллы списаны.',
-                    promotion: toPromotionPayload(promotion.toObject()),
-                    loyaltyPointsBalance: loyaltyPointsBalance ?? null,
-                    rubBalance: rubBalance ?? null,
-                });
-            }
-
+            await activateProductPromotionRecord(promotion, {
+                approvedByUserId: null,
+                notificationMessage: 'Продвижение товара активировано',
+                actorUserId: null,
+            });
             return successRes(res, {
-                message:
-                    'Заявка отправлена. Оплата в рублях списана с баланса, ожидает подтверждения staff.',
+                message: 'Продвижение активировано. Баллы списаны.',
                 promotion: toPromotionPayload(promotion.toObject()),
                 loyaltyPointsBalance: loyaltyPointsBalance ?? null,
-                rubBalance: rubBalance ?? null,
             });
         } catch (error) {
             if (paymentDeducted) {
-                if (isPointsPayment) {
-                    await refundLoyaltyPoints({ userId, amount: amountPoints });
-                } else {
-                    await refundRubBalance({ userId, amount: amountRub });
-                }
+                await refundLoyaltyPoints({ userId, amount: amountPoints });
             }
             if (error instanceof InsufficientLoyaltyPointsError) {
                 return errorRes(
                     res,
                     409,
                     `Недостаточно баллов. Нужно: ${error.required}, у вас: ${error.available}`,
-                );
-            }
-            if (error instanceof InsufficientRubBalanceError) {
-                return errorRes(
-                    res,
-                    409,
-                    `Недостаточно средств на балансе. Нужно: ${error.required} ₽, у вас: ${error.available} ₽`,
                 );
             }
             console.error('requestProductPromotionController error:', error);

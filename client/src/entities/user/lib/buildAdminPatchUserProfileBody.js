@@ -26,7 +26,9 @@ export function buildAdminPatchUserProfileBody(form, options = {}) {
   const discount = Number(String(form.userDiscountPercent).trim());
   body.userDiscountPercent = Number.isFinite(discount) ? discount : 0;
 
-  body.isPremiumUser = Boolean(form.isPremiumUser);
+  const premiumExpiresAtRaw = String(form.premiumExpiresAt ?? "").trim();
+  body.premiumExpiresAt =
+    premiumExpiresAtRaw === "" ? null : new Date(premiumExpiresAtRaw).toISOString();
   body.isActiveUser = Boolean(form.isActiveUser);
   body.isUserDataConfirmed = Boolean(form.isUserDataConfirmed);
   body.isBlockedUser = Boolean(form.isBlockedUser);

@@ -136,5 +136,10 @@ export const makeProductValidation = [
     .optional()
     .isBoolean()
     .withMessage("productAuctionEnabled должно быть true или false"),
+  body("loyaltyPointsPerUnit")
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage("Баллы за покупку — целое число не меньше 0")
+    .toInt(),
   handleValidationByExpressErrors,
 ];

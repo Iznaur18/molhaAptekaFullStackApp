@@ -1,3 +1,5 @@
+import { isPremiumActive } from "../../user/lib/isPremiumActive.js";
+
 /**
  * @param {import('../model/types.js').ProductFromApi} product
  */
@@ -6,7 +8,7 @@ export function isPremiumSellerProduct(product) {
   if (seller == null || typeof seller !== "object") {
     return false;
   }
-  return Boolean(seller.isPremiumUser);
+  return isPremiumActive(seller);
 }
 
 /**

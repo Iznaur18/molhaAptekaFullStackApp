@@ -187,6 +187,16 @@ export function OrderCard({
             <span className="order-card__item-price">
               {formatPriceRub(item.unitPriceAtOrder)}
             </span>
+            {Math.floor(Number(item.loyaltyPointsPerUnitAtOrder)) > 0 ? (
+              <span className="order-card__item-loyalty">
+                {ORDER_CARD_UI.LOYALTY_POINTS_LINE(
+                  Math.floor(Number(item.loyaltyPointsPerUnitAtOrder)),
+                )}
+                {item.quantity > 1
+                  ? ` · всего ${Math.floor(Number(item.loyaltyPointsReservedTotal) || 0)}`
+                  : ""}
+              </span>
+            ) : null}
             <span className="order-card__item-status">
               {ORDER_CARD_UI.ITEM_STATUS_LABEL}: {formatStatus(item.status)}
             </span>

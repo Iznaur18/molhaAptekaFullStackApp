@@ -15,6 +15,9 @@
  * @property {string | null | { _id: string; userName?: string }} [confirmedBy]
  * @property {boolean} [loyaltyPointsAwarded]
  * @property {number} [loyaltyPointsEarned]
+ * @property {number} [loyaltyPointsPerUnitAtOrder]
+ * @property {number} [loyaltyPointsReservedTotal]
+ * @property {boolean} [loyaltyPointsReserveReleased]
  */
 
 /**

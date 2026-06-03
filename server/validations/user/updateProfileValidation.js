@@ -173,11 +173,24 @@ export const updateProfileValidation = [
         .optional({ nullable: true })
         .isInt({ min: 0 })
         .withMessage('Баллы лояльности должны быть целым числом не меньше 0'),
-    
+
     body('isPremiumUser')
         .optional({ nullable: true })
         .isBoolean()
         .withMessage('isPremiumUser должен быть булевым значением'),
+
+    body('premiumExpiresAt')
+        .optional({ nullable: true })
+        .custom((value) => {
+            if (value === null || value === '') {
+                return true;
+            }
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) {
+                throw new Error('premiumExpiresAt: некорректная дата');
+            }
+            return true;
+        }),
     
     body('notesAboutUser')
         .optional({ nullable: true })

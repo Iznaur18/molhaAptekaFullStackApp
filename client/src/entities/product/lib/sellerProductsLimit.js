@@ -1,13 +1,14 @@
+import { isPremiumActive } from "../../user/lib/isPremiumActive.js";
 import {
   SELLER_PRODUCTS_LIMIT_PREMIUM,
   SELLER_PRODUCTS_LIMIT_REGULAR,
 } from "../model/productConstants.js";
 
 /**
- * @param {{ isPremiumUser?: boolean } | null | undefined} user
+ * @param {{ isPremiumUser?: boolean; premiumExpiresAt?: string | Date | null } | null | undefined} user
  */
 export function getSellerProductsLimit(user) {
-  return user?.isPremiumUser
+  return isPremiumActive(user)
     ? SELLER_PRODUCTS_LIMIT_PREMIUM
     : SELLER_PRODUCTS_LIMIT_REGULAR;
 }

@@ -88,7 +88,9 @@ export function buildPatchUserProfileBody(form, options = {}) {
   body.notesAboutUser = notes === "" ? null : notes;
 
   if (includePremium) {
-    body.isPremiumUser = Boolean(form.isPremiumUser);
+    const premiumExpiresAtRaw = String(form.premiumExpiresAt ?? "").trim();
+    body.premiumExpiresAt =
+      premiumExpiresAtRaw === "" ? null : new Date(premiumExpiresAtRaw).toISOString();
   }
 
   if (includeLoyaltyPoints) {

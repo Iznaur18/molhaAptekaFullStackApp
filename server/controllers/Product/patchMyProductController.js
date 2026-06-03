@@ -32,6 +32,7 @@ import {
     normalizeProductOldPriceRub,
     normalizeProductPriceRub,
 } from "../../utils/productDiscount.js";
+import { assertSellerCanSetProductLoyaltyPointsPerUnit } from "../../utils/assertProductLoyaltyPointsPerUnit.js";
 import { errorRes, successRes } from "../../utils/index.js";
 
 const PENDING_EDIT_BLOCK_MESSAGE =
@@ -132,6 +133,24 @@ export const patchMyProductController = async (req, res) => {
         }
         if (Object.prototype.hasOwnProperty.call(body, "productCategory")) {
             $set.productCategory = String(body.productCategory).trim();
+        }
+        if (Object.prototype.hasOwnProperty.call(body, "loyaltyPointsPerUnit")) {
+            try {
+                $set.loyaltyPointsPerUnit =
+                    await assertSellerCanSetProductLoyaltyPointsPerUnit(
+                        String(existing.productSeller),
+                        body.loyaltyPointsPerUnit,
+                        { excludeProductId: String(productId) },
+                    );
+            } catch (loyaltyError) {
+                return errorRes(
+                    res,
+                    400,
+                    loyaltyError instanceof Error
+                        ? loyaltyError.message
+                        : "Некорректное количество баллов за покупку",
+                );
+            }
         }
         if (
             Object.prototype.hasOwnProperty.call(body, "productImageUrls") ||

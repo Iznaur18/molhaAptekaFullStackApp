@@ -147,6 +147,14 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    premiumExpiresAt: {
+      type: Date,
+      default: null,
+    },
+    premiumExpiryReminderSentAt: {
+      type: Date,
+      default: null,
+    },
     notesAboutUser: {
       type: String,
       default: '',
@@ -156,6 +164,11 @@ const UserSchema = new mongoose.Schema(
     userLoyaltyPoints: { // количество баллов лояльности
       type: Number,
       default: 0,
+    },
+    userLoyaltyPointsReserved: {
+      type: Number,
+      default: 0,
+      min: 0,
     },
     userRubBalance: {
       type: Number,
@@ -213,5 +226,6 @@ UserSchema.index({ userLastLoginAt: -1 });
 
 // Индекс для поиска премиум пользователей
 UserSchema.index({ isPremiumUser: 1 });
+UserSchema.index({ isPremiumUser: 1, premiumExpiresAt: 1 });
 
 export const UserModel = mongoose.model('User', UserSchema); // Модель пользователя для MongoDB

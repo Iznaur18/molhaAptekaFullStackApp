@@ -1,11 +1,12 @@
 import { isStaffRole } from './adminUserGuard.js';
+import { isPremiumActive } from './premiumAccess.js';
 
 /** Ответ при попытке посмотреть чужие покупки без премиум / staff. */
 export const OTHER_USER_PURCHASES_PREMIUM_ONLY_MESSAGE =
     'Список покупок других пользователей доступен с премиум';
 
 /**
- * @param {{ userRole?: string; isBlockedUser?: boolean; isPremiumUser?: boolean } | null | undefined} viewer
+ * @param {{ userRole?: string; isBlockedUser?: boolean; isPremiumUser?: boolean; premiumExpiresAt?: Date | string | null } | null | undefined} viewer
  */
 export function canViewerSeeOtherUserPurchases(viewer) {
     if (!viewer || viewer.isBlockedUser) {
@@ -14,5 +15,5 @@ export function canViewerSeeOtherUserPurchases(viewer) {
     if (isStaffRole(viewer.userRole)) {
         return true;
     }
-    return Boolean(viewer.isPremiumUser);
+    return isPremiumActive(viewer);
 }

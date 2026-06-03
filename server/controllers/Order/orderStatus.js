@@ -17,6 +17,9 @@ const ITEM_RUNTIME_DEFAULTS = Object.freeze({
     confirmedBy: null,
     loyaltyPointsAwarded: false,
     loyaltyPointsEarned: 0,
+    loyaltyPointsPerUnitAtOrder: 0,
+    loyaltyPointsReservedTotal: 0,
+    loyaltyPointsReserveReleased: false,
 });
 
 /** Подкладывает обязательные поля адреса для заказов, созданных до `deliveryAddressFlat`. */
@@ -54,6 +57,15 @@ export const normalizeOrderItemsForRuntime = (items) => {
             item.loyaltyPointsAwarded ?? ITEM_RUNTIME_DEFAULTS.loyaltyPointsAwarded;
         item.loyaltyPointsEarned =
             item.loyaltyPointsEarned ?? ITEM_RUNTIME_DEFAULTS.loyaltyPointsEarned;
+        item.loyaltyPointsPerUnitAtOrder =
+            item.loyaltyPointsPerUnitAtOrder ??
+            ITEM_RUNTIME_DEFAULTS.loyaltyPointsPerUnitAtOrder;
+        item.loyaltyPointsReservedTotal =
+            item.loyaltyPointsReservedTotal ??
+            ITEM_RUNTIME_DEFAULTS.loyaltyPointsReservedTotal;
+        item.loyaltyPointsReserveReleased =
+            item.loyaltyPointsReserveReleased ??
+            ITEM_RUNTIME_DEFAULTS.loyaltyPointsReserveReleased;
         if (item.itemIndex === undefined) {
             item.itemIndex = itemIndex;
         }

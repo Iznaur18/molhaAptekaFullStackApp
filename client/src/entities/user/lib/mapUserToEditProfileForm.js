@@ -4,6 +4,7 @@ import {
   getUserBackgroundFocus,
 } from "./profileImageFocus.js";
 import { parseUserBackgroundFormFields } from "./userBackgroundValue.js";
+import { formatPremiumExpiresAtForInput } from "./formatPremiumExpiresAtForInput.js";
 import {
   DEFAULT_USER_AVATAR_URL,
   DEFAULT_USER_BACKGROUND_PRESET_ID,
@@ -28,7 +29,7 @@ import {
  * @property {'user'|'admin'|'moderator'} userRole
  * @property {string} userDiscountPercent
  * @property {string} userLoyaltyPoints
- * @property {boolean} isPremiumUser
+ * @property {string} premiumExpiresAt
  * @property {boolean} isActiveUser
  * @property {boolean} isUserDataConfirmed
  * @property {boolean} isBlockedUser
@@ -67,7 +68,7 @@ export function mapUserToEditProfileForm(user) {
       user.userDiscountPercent != null ? String(user.userDiscountPercent) : "0",
     userLoyaltyPoints:
       user.userLoyaltyPoints != null ? String(user.userLoyaltyPoints) : "0",
-    isPremiumUser: Boolean(user.isPremiumUser),
+    premiumExpiresAt: formatPremiumExpiresAtForInput(user.premiumExpiresAt),
     isActiveUser: user.isActiveUser !== false,
     isUserDataConfirmed: user.isUserDataConfirmed === true,
     isBlockedUser: Boolean(user.isBlockedUser),

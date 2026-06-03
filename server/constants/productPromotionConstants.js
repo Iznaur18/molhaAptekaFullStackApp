@@ -1,3 +1,5 @@
+import { LOYALTY_POINTS_PER_RUBLE, rublesToLoyaltyPoints } from './loyaltyPointsConstants.js';
+
 export const PRODUCT_PROMOTION_STATUS_PENDING_STAFF = 'pending_staff';
 export const PRODUCT_PROMOTION_STATUS_ACTIVE = 'active';
 export const PRODUCT_PROMOTION_STATUS_EXPIRED = 'expired';
@@ -20,8 +22,8 @@ export const PRODUCT_PROMOTION_DEFAULT_TARIFFS = [
 
 export const PRODUCT_PROMOTION_REMINDER_HOURS = 1;
 
-/** Оплата продвижения баллами: 1 ₽ тарифа = N баллов (×2 дороже номинала в рублях). */
-export const PRODUCT_PROMOTION_POINTS_PER_RUBLE = 2;
+/** @deprecated Используйте LOYALTY_POINTS_PER_RUBLE */
+export const PRODUCT_PROMOTION_POINTS_PER_RUBLE = LOYALTY_POINTS_PER_RUBLE;
 
 export const PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS = 'points';
 export const PRODUCT_PROMOTION_PAYMENT_METHOD_RUB = 'rub';
@@ -34,10 +36,4 @@ export const PRODUCT_PROMOTION_PAYMENT_METHODS = [
 /**
  * @param {number} priceRub
  */
-export const calculateProductPromotionPointsCost = (priceRub) => {
-    const rub = Number(priceRub);
-    if (!Number.isFinite(rub) || rub < 0) {
-        return 0;
-    }
-    return Math.ceil(rub * PRODUCT_PROMOTION_POINTS_PER_RUBLE);
-};
+export const calculateProductPromotionPointsCost = rublesToLoyaltyPoints;

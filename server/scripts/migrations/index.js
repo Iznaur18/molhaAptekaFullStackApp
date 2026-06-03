@@ -10,6 +10,8 @@ import { up as adminCatalogProductsUp } from "./20260528-admin-catalog-products.
 import { up as productStockQuantityUp } from "./20260529-product-stock-quantity.js";
 import { up as raffleSalesConfirmedOnlyUp } from "./20260530-raffle-sales-confirmed-only.js";
 import { up as userPhoneNumberUnsetNullUp } from "./20260531-user-phone-number-unset-null.js";
+import { up as userPremiumExpiresUp } from "./20260603-user-premium-expires.js";
+import { up as productLoyaltyPointsPerUnitUp } from "./20260603-product-loyalty-points-per-unit.js";
 
 export const MIGRATIONS = [
   {
@@ -71,5 +73,15 @@ export const MIGRATIONS = [
     id: "20260531-user-phone-number-unset-null",
     description: "Remove null/empty userPhoneNumber (sparse unique index safe)",
     up: userPhoneNumberUnsetNullUp,
+  },
+  {
+    id: "20260603-user-premium-expires",
+    description: "Backfill premiumExpiresAt and legacy premium users",
+    up: userPremiumExpiresUp,
+  },
+  {
+    id: "20260603-product-loyalty-points-per-unit",
+    description: "Product loyaltyPointsPerUnit and order line reserve fields",
+    up: productLoyaltyPointsPerUnitUp,
   },
 ];

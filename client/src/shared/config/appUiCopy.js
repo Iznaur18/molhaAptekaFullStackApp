@@ -100,6 +100,12 @@ export const API_CLIENT_UI = {
   FETCH_DATA_CONFIRMATION_COUNT_FALLBACK:
     "Не удалось загрузить счётчик заявок",
   RESOLVE_DATA_CONFIRMATION_FALLBACK: "Не удалось рассмотреть заявку",
+  FETCH_PREMIUM_STATUS_FALLBACK: "Не удалось загрузить статус премиума",
+  PURCHASE_PREMIUM_FALLBACK: "Не удалось купить премиум",
+  PREMIUM_PURCHASE_SUCCESS: "Премиум активирован",
+  FETCH_LOYALTY_POINTS_STATUS_FALLBACK: "Не удалось загрузить раздел баллов",
+  PURCHASE_LOYALTY_POINTS_FALLBACK: "Не удалось купить баллы",
+  LOYALTY_POINTS_PURCHASE_SUCCESS: "Баллы зачислены",
   SUBMIT_PRICE_OFFER_FALLBACK: "Не удалось отправить предложение цены",
   FETCH_PRICE_OFFER_FALLBACK: "Не удалось загрузить предложение цены",
   FETCH_PRICE_OFFERS_TOP_FALLBACK: "Не удалось загрузить ставки",
@@ -456,6 +462,9 @@ export const ORDER_CARD_UI = {
   ACTION_PENDING: "Сохраняем…",
   CANCEL_CONFIRM: "Отменить заказ покупателя?",
   DELETED_PRODUCT_NAME: "Товар удалён",
+  /** @param {number} points */
+  LOYALTY_POINTS_LINE: (points) =>
+    `+${points} баллов за шт. (премиум-покупателю)`,
 };
 
 /** Страница «Мои покупки» */
@@ -698,6 +707,10 @@ export const ADMIN_EDIT_USER_UI = {
   LABEL_DISCOUNT: "Скидка, %",
   LABEL_LOYALTY_POINTS: "Баллы лояльности",
   LABEL_PREMIUM: "Премиум",
+  /** @param {number} price */
+  LABEL_PREMIUM_EXPIRES_AT: "Премиум до (дата и время)",
+  LABEL_PREMIUM_EXPIRES_HINT:
+    "Пусто или прошедшая дата — премиум выключен. Будущая дата — премиум активен.",
   LABEL_ACCOUNT_ACTIVE: "Учётка активна",
   LABEL_BLOCKED: "Заблокирован",
   LABEL_USER_DATA_CONFIRMED: "Данные подтверждены",
@@ -778,6 +791,29 @@ export const CREATE_PRODUCT_MODAL_UI = {
   MANAGE_SECTION_TITLE: "Управление товаром",
   MANAGE_SECTION_ARIA: "Дополнительные действия с товаром",
   LABEL_AUCTION: "Проводить аукцион (предложения цены)",
+  LABEL_LOYALTY_POINTS_PER_UNIT: "Баллов за 1 шт. покупателю",
+  /**
+   * @param {number} available
+   * @param {number} catalogCommitted
+   * @param {number} maxPerUnit
+   */
+  HINT_LOYALTY_POINTS_PER_UNIT: (available, catalogCommitted, maxPerUnit) => {
+    const base = `Списание при подтверждении покупки. Свободно: ${available}`;
+    if (catalogCommitted > 0) {
+      return `${base}; на других товарах уже ${catalogCommitted} за штуку — для этого не больше ${maxPerUnit}. 0 — не давать баллов.`;
+    }
+    return `${base}; для этого товара не больше ${maxPerUnit}. 0 — не давать баллов.`;
+  },
+  HINT_LOYALTY_POINTS_ZERO_BALANCE:
+    "Недостаточно свободных баллов (учтены другие товары и заказы в работе). Пополните баллы или уменьшите бонус на других товарах.",
+  /**
+   * @param {number} max
+   * @param {number} catalogCommitted
+   */
+  ERROR_LOYALTY_POINTS_MAX: (max, catalogCommitted = 0) =>
+    catalogCommitted > 0
+      ? `Не больше ${max} (на других товарах уже закреплено ${catalogCommitted} за штуку)`
+      : `Не больше ${max} (доступно на счёте)`,
   SUBMIT_IDLE: "Создать",
   SUBMIT_LOADING: "Создаём…",
   SUBMIT_EDIT_IDLE: "Сохранить",
@@ -839,7 +875,7 @@ export const PRODUCT_CARD_UI = {
   PROMOTION_PENDING_BADGE: "Ожидает подтверждения staff",
   RAFFLE_BADGE: "Розыгрыш",
   AUCTION_BADGE: "Аукцион",
-  LOYALTY_POINTS_TOOLTIP: "Начисляются премиум-покупателю",
+  LOYALTY_POINTS_TOOLTIP: "Даёт продавец; получает премиум-покупатель",
   /** @param {number} percent */
   DISCOUNT_BADGE: (percent) => `скидка -${percent}%`,
   /** @param {number} points */
@@ -850,6 +886,8 @@ export const PRODUCT_CARD_UI = {
   /** @param {number} points */
   LOYALTY_POINTS_GUEST: (points) =>
     `До +${points} ${pluralizeRuBall(points)} с премиум`,
+  LOYALTY_POINTS_OVERCOMMITTED_BADGE:
+    "Бонус выше доступного остатка баллов",
   RAFFLE_PARTICIPATION_ON: "Участвует в розыгрыше",
   RAFFLE_PARTICIPATION_OFF: "Добавить в розыгрыш",
   RAFFLE_PARTICIPATION_PENDING: "Сохраняем…",
@@ -1098,30 +1136,17 @@ export const PRODUCT_PROMOTIONS_STAFF_PAGE_UI = {
 export const PRODUCT_PROMOTION_UI = {
   MODAL_TITLE: "Продвижение товара",
   MODAL_SUBTITLE: (productName) => `Товар: ${productName || "Без названия"}`,
-  PAYMENT_METHOD_LABEL: "Способ оплаты",
-  PAYMENT_METHOD_RUB: "Рубли",
-  PAYMENT_METHOD_POINTS: "Баллы (×2 к цене в ₽)",
   /** @param {number} balance */
   BALANCE_POINTS: (balance) => `Баланс баллов: ${balance}`,
-  /** @param {number} balance */
-  BALANCE_RUB: (balance) => `Баланс: ${balance} ₽`,
-  PAYMENT_HINT_RUB:
-    "Списание сразу. Staff подтверждает заявку; при отклонении рубли возвращаются на баланс.",
   PAYMENT_HINT_POINTS:
-    "Списание сразу. Продвижение включается автоматически, без подтверждения staff.",
+    "Оплата только баллами. Списание сразу, продвижение включается автоматически.",
   TARIFF_LABEL: "Пакет продвижения",
-  /** @param {string} title @param {number} priceRub */
-  TARIFF_OPTION_RUB: (title, priceRub) => `${title} — ${priceRub} ₽`,
-  /** @param {string} title @param {number} priceRub @param {number} pricePoints */
-  TARIFF_OPTION_POINTS: (title, priceRub, pricePoints) =>
-    `${title} — ${pricePoints} баллов (${priceRub} ₽ ×2)`,
+  /** @param {string} title @param {number} pricePoints */
+  TARIFF_OPTION_POINTS: (title, pricePoints) =>
+    `${title} — ${pricePoints} баллов`,
   TARIFF_DURATION: (durationHours) => `Срок действия: ${durationHours} ч.`,
   INSUFFICIENT_POINTS: (required, balance) =>
     `Недостаточно баллов: нужно ${required}, у вас ${balance}.`,
-  /** @param {number} required @param {number} balance */
-  INSUFFICIENT_RUB: (required, balance) =>
-    `Недостаточно средств: нужно ${required} ₽, у вас ${balance} ₽.`,
-  SUBMIT_RUB: "Оплатить рублями и отправить",
   SUBMIT_POINTS: "Оплатить баллами и включить",
   SUBMIT_PENDING: "Отправка…",
   CANCEL: "Отмена",
@@ -1222,6 +1247,67 @@ export const USER_PROFILE_PRODUCTS_UI = {
   UNAVAILABLE: "Товар недоступен или удален",
 };
 
+/** Раздел «Баллы» в профиле */
+export const LOYALTY_POINTS_PAGE_UI = {
+  PAGE_ARIA: "Баллы",
+  LOGIN_HINT: "Войдите, чтобы посмотреть баллы.",
+  LOGIN_BUTTON: "Войти",
+  LOADING: "Загрузка…",
+  FETCH_FALLBACK: "Не удалось загрузить баллы",
+  /** @param {number} balance */
+  BALANCE_POINTS: (balance) =>
+    `Ваш баланс: ${balance} ${pluralizeRuBall(balance)}`,
+  INFO: "1 балл = 1 ₽. Продавец задаёт бонус за покупку; премиум-покупатель получает баллы после подтверждения получения.",
+  PURCHASE_SECTION: "Пополнение",
+  PURCHASE_AMOUNT_LABEL: "Сумма, ₽",
+  PURCHASE_AMOUNT_HINT: "1 ₽ = 1 балл. Укажите, сколько хотите купить.",
+  /** @param {number} points */
+  PURCHASE_POINTS_PREVIEW: (points) => `Получите ${points} баллов`,
+  PURCHASE_AMOUNT_MIN: (min) => `Минимум ${min} ₽`,
+  PURCHASE_AMOUNT_MAX: (max) => `Не больше ${max} ₽`,
+  BUY: "Купить",
+  COMING_SOON: "Пополнение картой и по QR — скоро.",
+  /** @param {number} rub @param {number} points */
+  COMING_SOON_AMOUNT: (rub, points) =>
+    `Пополнение на ${rub} ₽ (${points} баллов) картой и по QR — скоро.`,
+  USES: [
+    "Оплата премиум-подписки",
+    "Продвижение товаров в каталоге",
+    "Бонус за покупку у продавца (поле на товаре)",
+  ],
+};
+
+/** Раздел «Премиум» в профиле */
+export const PREMIUM_PAGE_UI = {
+  PAGE_ARIA: "Премиум",
+  LOGIN_HINT: "Войдите, чтобы оформить премиум.",
+  LOGIN_BUTTON: "Войти",
+  LOADING: "Загрузка…",
+  FETCH_FALLBACK: "Не удалось загрузить премиум",
+  PURCHASE_FALLBACK: "Не удалось оформить премиум",
+  PLAN_TITLE: "Премиум",
+  /** @param {number} price */
+  PLAN_PRICE: (price) => `${price} баллов`,
+  PLAN_PERIOD: "Срок: 1 календарный месяц",
+  PLAN_BENEFITS: [
+    "До 30 товаров в каталоге (вместо 15)",
+    "Баллы лояльности за покупки",
+    "Золотая обводка и галочка у имени",
+    "Сторис и фон профиля по ссылке",
+    "Рассрочка для продавца (нужны подтверждённые данные)",
+    "Товары в фильтре «Только премиум»",
+    "Просмотр покупок других пользователей",
+  ],
+  /** @param {number} balance */
+  BALANCE: (balance) => `Ваш баланс: ${balance} баллов`,
+  ACTIVE: "Премиум уже активен. Продление будет доступно после окончания срока.",
+  /** @param {number} required @param {number} balance */
+  INSUFFICIENT_POINTS: (required, balance) =>
+    `Недостаточно баллов: нужно ${required}, у вас ${balance}.`,
+  SUBMIT: "Оформить премиум",
+  SUBMIT_PENDING: "Оформляем…",
+};
+
 /** «Мой профиль» в шапке модалки и выход */
 export const MY_PROFILE_PAGE_UI = {
   TAB_TITLE: "Мой профиль",
@@ -1244,6 +1330,8 @@ export const MY_PROFILE_PAGE_UI = {
   TAB_INSTALLMENT_DISPUTES: "Споры",
   TAB_SUBSCRIPTIONS: "Подписки",
   DATA_CONFIRMATION: "Подтверждение данных",
+  TAB_PREMIUM: "Премиум",
+  TAB_LOYALTY_POINTS: "Баллы",
   EDIT_PROFILE: "Изменить профиль",
   LOGOUT: "Выйти",
   LOGOUT_CONFIRM: "Вы точно хотите выйти?",
@@ -1307,7 +1395,6 @@ export const USER_PROFILE_COPY = {
     isPremiumUser: "Премиум",
     notesAboutUser: "Заметки",
     userLoyaltyPoints: "Баллы лояльности",
-    userRubBalance: "Баланс (₽)",
     userRatingByVotes: "Рейтинг по голосам",
     followersCount: "Подписчики",
     followingCount: "Подписки",

@@ -18,6 +18,11 @@ import {
     IN_APP_NOTIFICATION_KIND_INSTALLMENT_SELLER_MESSAGE,
 } from '../../constants/installmentConstants.js';
 import { ORDER_STATUS_PENDING } from '../../constants/orderConstants.js';
+import {
+    buildOrderLineLoyaltySnapshot,
+    reserveLoyaltyPointsForNewOrder,
+    releaseUnawardedLoyaltyReservesForOrder,
+} from '../../utils/orderLoyaltyPoints.js';
 import { PRODUCT_MODERATION_APPROVED } from '../../constants/productModerationConstants.js';
 import {
     InstallmentContractModel,
@@ -165,24 +170,57 @@ export const createInstallmentContractController = async (req, res) => {
             nextPaymentDueAt: schedule.nextPaymentDueAt,
         });
 
-        const order = await OrderModel.create({
-            userBuyerId: buyerUserId,
-            items: [
-                {
-                    productId,
-                    quantity,
-                    unitPriceAtOrder: product.productPrice,
-                    productNameAtOrder: product.productName,
-                },
-            ],
-            totalAmount: product.productPrice * quantity,
-            deliveryAddress: verified.displayAddress,
-            deliveryAddressFlat: verified.flat,
-            deliveryAddressFiasId: verified.fiasId,
-            paymentMethod,
-            status: ORDER_STATUS_PENDING,
-            installmentContractId: contract._id,
+        const loyaltyLine = buildOrderLineLoyaltySnapshot({
+            loyaltyPointsPerUnit: product.loyaltyPointsPerUnit,
+            quantity,
         });
+        const orderItems = [
+            {
+                productId,
+                quantity,
+                unitPriceAtOrder: product.productPrice,
+                productNameAtOrder: product.productName,
+                ...loyaltyLine,
+            },
+        ];
+        const itemsForReserve = [
+            {
+                ...orderItems[0],
+                productId: { productSeller: product.productSeller },
+            },
+        ];
+
+        try {
+            await reserveLoyaltyPointsForNewOrder(itemsForReserve);
+        } catch (reserveError) {
+            await InstallmentContractModel.findByIdAndDelete(contract._id);
+            return errorRes(
+                res,
+                400,
+                reserveError instanceof Error
+                    ? reserveError.message
+                    : 'Недостаточно баллов у продавца',
+            );
+        }
+
+        let order;
+        try {
+            order = await OrderModel.create({
+                userBuyerId: buyerUserId,
+                items: orderItems,
+                totalAmount: product.productPrice * quantity,
+                deliveryAddress: verified.displayAddress,
+                deliveryAddressFlat: verified.flat,
+                deliveryAddressFiasId: verified.fiasId,
+                paymentMethod,
+                status: ORDER_STATUS_PENDING,
+                installmentContractId: contract._id,
+            });
+        } catch (orderError) {
+            await releaseUnawardedLoyaltyReservesForOrder(itemsForReserve);
+            await InstallmentContractModel.findByIdAndDelete(contract._id);
+            throw orderError;
+        }
 
         contract.orderId = order._id;
         await contract.save();

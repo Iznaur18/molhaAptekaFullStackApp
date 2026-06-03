@@ -4,6 +4,8 @@ export const PROFILE_TAB_MY_SALES = "my-sales";
 export const PROFILE_TAB_MY_ORDERS = "my-orders";
 export const PROFILE_TAB_AUCTION = "auction";
 export const PROFILE_TAB_SUBSCRIPTIONS = "subscriptions";
+export const PROFILE_TAB_PREMIUM = "premium";
+export const PROFILE_TAB_LOYALTY_POINTS = "loyalty-points";
 export const PROFILE_TAB_ADMIN_ORDERS = "admin-orders";
 export const PROFILE_TAB_PRODUCT_MODERATION = "product-moderation";
 export const PROFILE_TAB_PRODUCT_REPORTS = "product-reports";
@@ -22,6 +24,8 @@ export const PROFILE_TAB_VALUES = [
   PROFILE_TAB_MY_ORDERS,
   PROFILE_TAB_AUCTION,
   PROFILE_TAB_SUBSCRIPTIONS,
+  PROFILE_TAB_PREMIUM,
+  PROFILE_TAB_LOYALTY_POINTS,
   PROFILE_TAB_ADMIN_ORDERS,
   PROFILE_TAB_PRODUCT_MODERATION,
   PROFILE_TAB_PRODUCT_REPORTS,

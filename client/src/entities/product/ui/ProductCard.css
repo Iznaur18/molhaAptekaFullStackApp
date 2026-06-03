@@ -111,6 +111,19 @@
   color: #5b21b6;
 }
 
+.product-card__loyalty-overcommitted-badge {
+  margin: 0.2rem 0 0;
+  padding: 0.2rem 0.5rem;
+  width: fit-content;
+  border-radius: 0.35rem;
+  border: 1px solid color-mix(in srgb, #dc2626 40%, transparent);
+  background: #fee2e2;
+  color: #991b1b;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
 .product-card--raffle-participant {
   border-color: color-mix(in srgb, #edc93a 45%, transparent);
   background: linear-gradient(
@@ -590,6 +603,25 @@
 }
 
 .product-card__auction-toggle:disabled {
+  border-color: #e2e8f0;
+  background: #f1f5f9;
+  color: #94a3b8;
+  opacity: 1;
+}
+
+.product-card__installment-toggle {
+  border-color: color-mix(in srgb, #059669 40%, transparent);
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.product-card__installment-toggle:hover:not(:disabled) {
+  border-color: #059669;
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.product-card__installment-toggle:disabled {
   border-color: #e2e8f0;
   background: #f1f5f9;
   color: #94a3b8;

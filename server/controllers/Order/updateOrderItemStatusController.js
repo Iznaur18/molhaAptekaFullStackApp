@@ -8,6 +8,12 @@ import {
 import { OrderModel, UserModel } from '../../models/index.js';
 import { errorRes, successRes } from '../../utils/index.js';
 import { prepareLoyaltyPointsForConfirmedOrderItem } from '../../utils/loyaltyPoints.js';
+import {
+    markOrderLineLoyaltyReserveReleased,
+    releaseUnawardedLoyaltyReservesForOrder,
+} from '../../utils/orderLoyaltyPoints.js';
+import { settleLoyaltyPointsReservation } from '../../utils/loyaltyPointsReserve.js';
+import { isPremiumActive } from '../../utils/premiumAccess.js';
 import { finalizeOffersAfterOrderConfirmed } from '../../utils/productPriceOfferHelpers.js';
 import { closeProductAuction } from '../../utils/productAuction.js';
 import { syncRaffleProgressForProductSale } from '../../utils/raffleHelpers.js';
@@ -113,8 +119,12 @@ export const markOrderItemCancelledBySellerController = async (req, res) => {
         }
 
         targetItem.status = ORDER_STATUS_CANCELLED;
+        markOrderLineLoyaltyReserveReleased(targetItem);
         order.status = buildOrderStatusFromItems(order.items);
         await order.save();
+        await releaseUnawardedLoyaltyReservesForOrder([
+            { ...targetItem.toObject?.() ?? targetItem, productId: targetItem.productId },
+        ]);
         await populateOrderForResponse(order);
 
         return successRes(res, { order });
@@ -194,13 +204,52 @@ export const confirmOrderItemByBuyerController = async (req, res) => {
         targetItem.confirmedBy = req.userId;
 
         const buyer = await UserModel.findById(buyerId)
-            .select('isPremiumUser')
+            .select('isPremiumUser premiumExpiresAt')
             .lean();
+        const isPremiumUser = isPremiumActive(buyer);
         const pointsEarned = prepareLoyaltyPointsForConfirmedOrderItem({
             order,
             itemIndex,
-            isPremiumUser: Boolean(buyer?.isPremiumUser),
+            isPremiumUser,
         });
+
+        const itemSellerId = normalizeId(
+            targetItem.productId?.productSeller?._id ??
+                targetItem.productId?.productSeller,
+        );
+        const reservedTotal = Math.ceil(
+            Number(targetItem.loyaltyPointsReservedTotal) || 0,
+        );
+
+        if (pointsEarned > 0) {
+            if (!itemSellerId) {
+                return errorRes(res, 400, 'Продавец позиции не найден');
+            }
+            try {
+                await settleLoyaltyPointsReservation({
+                    sellerId: itemSellerId,
+                    buyerId,
+                    amount: pointsEarned,
+                });
+            } catch (settleError) {
+                console.error('settleLoyaltyPointsReservation error:', settleError);
+                return errorRes(
+                    res,
+                    409,
+                    'Не удалось начислить баллы: у продавца недостаточно замороженных баллов',
+                );
+            }
+            markOrderLineLoyaltyReserveReleased(targetItem);
+        } else if (
+            reservedTotal > 0 &&
+            !targetItem.loyaltyPointsReserveReleased &&
+            itemSellerId
+        ) {
+            await releaseUnawardedLoyaltyReservesForOrder([
+                { ...targetItem.toObject?.() ?? targetItem, productId: targetItem.productId },
+            ]);
+            markOrderLineLoyaltyReserveReleased(targetItem);
+        }
 
         order.status = buildOrderStatusFromItems(order.items);
         await order.save();
@@ -246,13 +295,6 @@ export const confirmOrderItemByBuyerController = async (req, res) => {
                     finalizeError,
                 );
             }
-        }
-
-        if (pointsEarned > 0) {
-            await UserModel.updateOne(
-                { _id: buyerId },
-                { $inc: { userLoyaltyPoints: pointsEarned } },
-            );
         }
 
         await populateOrderForResponse(order);

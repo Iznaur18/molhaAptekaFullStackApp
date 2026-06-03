@@ -32,6 +32,8 @@ import {
   keepDigitsOnly,
 } from "../../../shared/lib/numericInput.js";
 import { resolveUploadedImageUrl } from "../../../shared/lib/resolveUploadedImageUrl.js";
+import { resolveProductLoyaltyPointsPerUnit } from "../lib/resolveProductLoyaltyPointsPerUnit.js";
+import { resolveSellerMaxLoyaltyPointsPerUnit } from "../lib/resolveSellerMaxLoyaltyPointsPerUnit.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import { ProductEditManageSection } from "./ProductEditManageSection.jsx";
 import { InstallmentProgramModal } from "../../installment/ui/InstallmentProgramModal.jsx";
@@ -40,7 +42,6 @@ import { ProductPreviewVideoField } from "./ProductPreviewVideoField.jsx";
 import {
   CREATE_PRODUCT_MODAL_UI,
   PRODUCT_PREVIEW_VIDEO_UI,
-  PRODUCT_CARD_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { FormFieldLabel } from "../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
 import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
@@ -58,6 +59,7 @@ const INITIAL_FORM = {
   productIsAvailable: true,
   productStockQuantity: "1",
   productAuctionEnabled: false,
+  loyaltyPointsPerUnit: "0",
 };
 
 /**
@@ -90,6 +92,7 @@ function formStateFromProduct(product) {
         ? String(Math.max(0, Math.floor(Number(product.productStockQuantity))))
         : "1",
     productAuctionEnabled: product.productAuctionEnabled === true,
+    loyaltyPointsPerUnit: String(resolveProductLoyaltyPointsPerUnit(product)),
   };
 }
 
@@ -123,12 +126,18 @@ function formStateFromProduct(product) {
  *     enabled: boolean,
  *   ) => void;
  *   isRaffleParticipationPending?: boolean;
+ *   sellerLoyaltyPointsBalance?: number;
+ *   sellerLoyaltyPointsReserved?: number;
+ *   sellerProducts?: import('../model/types.js').ProductFromApi[];
  * }} props
  */
 export function CreateProductModal({
   isOpen,
   onClose,
   onSuccess,
+  sellerLoyaltyPointsBalance = 0,
+  sellerLoyaltyPointsReserved = 0,
+  sellerProducts = [],
   mode = "create",
   productToEdit = null,
   manageProduct = null,
@@ -159,6 +168,28 @@ export function CreateProductModal({
       (productToEdit?.productModerationStatus ?? PRODUCT_MODERATION_APPROVED) ===
         PRODUCT_MODERATION_APPROVED);
 
+  const editingProductId =
+    isEdit && productToEdit?._id != null ? String(productToEdit._id) : null;
+
+  const sellerLoyaltyBudget = useMemo(
+    () =>
+      resolveSellerMaxLoyaltyPointsPerUnit({
+        loyaltyPointsBalance: sellerLoyaltyPointsBalance,
+        loyaltyPointsReserved: sellerLoyaltyPointsReserved,
+        sellerProducts,
+        editingProductId,
+      }),
+    [
+      sellerLoyaltyPointsBalance,
+      sellerLoyaltyPointsReserved,
+      sellerProducts,
+      editingProductId,
+    ],
+  );
+
+  const sellerPointsMaxPerUnit = sellerLoyaltyBudget.maxPerUnit;
+  const loyaltyFieldDisabled = sellerPointsMaxPerUnit <= 0;
+
   useEffect(() => {
     if (!isOpen) return;
     if (isEdit && productToEdit) {
@@ -183,7 +214,8 @@ export function CreateProductModal({
     const isIntegerField =
       name === "productPrice" ||
       name === "productOldPrice" ||
-      name === "productStockQuantity";
+      name === "productStockQuantity" ||
+      name === "loyaltyPointsPerUnit";
     const nextValue = isIntegerField ? keepDigitsOnly(value) : value;
     setForm((prev) => ({ ...prev, [name]: nextValue }));
   };
@@ -311,6 +343,22 @@ export function CreateProductModal({
         productStockQuantity = stockParsed;
       }
 
+      const loyaltyParsed = Math.floor(Number(form.loyaltyPointsPerUnit));
+      const loyaltyPointsPerUnit =
+        Number.isFinite(loyaltyParsed) && loyaltyParsed >= 0
+          ? loyaltyParsed
+          : 0;
+      if (loyaltyPointsPerUnit > sellerPointsMaxPerUnit) {
+        setStatus({
+          kind: "error",
+          message: CREATE_PRODUCT_MODAL_UI.ERROR_LOYALTY_POINTS_MAX(
+            sellerPointsMaxPerUnit,
+            sellerLoyaltyBudget.catalogCommitted,
+          ),
+        });
+        return;
+      }
+
       let product;
       if (isEdit) {
         if (productToEdit?._id == null) {
@@ -328,6 +376,7 @@ export function CreateProductModal({
           productPrice,
           productOldPrice,
           productCategory: form.productCategory,
+          loyaltyPointsPerUnit,
         };
         if (showCatalogAvailabilityToggle) {
           patchBody.productIsAvailable = form.productIsAvailable;
@@ -348,6 +397,7 @@ export function CreateProductModal({
           productIsAvailable: form.productIsAvailable,
           productStockQuantity,
           productAuctionEnabled: form.productAuctionEnabled,
+          loyaltyPointsPerUnit,
         });
       }
 
@@ -533,6 +583,29 @@ export function CreateProductModal({
                 />
               </label>
             ) : null}
+            <label className="create-product-modal__label">
+              <FormFieldLabel>
+                {CREATE_PRODUCT_MODAL_UI.LABEL_LOYALTY_POINTS_PER_UNIT}
+              </FormFieldLabel>
+              <input
+                {...INTEGER_INPUT_FIELD_PROPS}
+                className="create-product-modal__input"
+                name="loyaltyPointsPerUnit"
+                value={form.loyaltyPointsPerUnit}
+                onChange={handleChange}
+                disabled={isSubmitting || loyaltyFieldDisabled}
+                maxLength={8}
+              />
+              <p className="create-product-modal__hint">
+                {loyaltyFieldDisabled
+                  ? CREATE_PRODUCT_MODAL_UI.HINT_LOYALTY_POINTS_ZERO_BALANCE
+                  : CREATE_PRODUCT_MODAL_UI.HINT_LOYALTY_POINTS_PER_UNIT(
+                      sellerLoyaltyBudget.available,
+                      sellerLoyaltyBudget.catalogCommitted,
+                      sellerPointsMaxPerUnit,
+                    )}
+              </p>
+            </label>
             {!isEdit ? (
               <label className="create-product-modal__check">
                 <input
@@ -545,37 +618,28 @@ export function CreateProductModal({
               </label>
             ) : null}
             {showManageSection && manageProduct ? (
-              <>
-                <button
-                  type="button"
-                  className="product-card__availability-toggle"
-                  disabled={
-                    isSubmitting ||
-                    manageProduct.productModerationStatus !==
-                      PRODUCT_MODERATION_APPROVED
-                  }
-                  onClick={() => setIsInstallmentProgramOpen(true)}
-                >
-                  {PRODUCT_CARD_UI.INSTALLMENT_SELL_BUTTON}
-                </button>
-                <ProductEditManageSection
-                  product={manageProduct}
-                  onDelete={onDeleteProduct}
-                  onSetAvailability={onSetProductAvailability}
-                  onSetAuction={onSetProductAuction}
-                  isDeletePending={isDeletePending}
-                  isAvailabilityTogglePending={isAvailabilityTogglePending}
-                  isAuctionTogglePending={isAuctionTogglePending}
-                  errorMessage={manageErrorMessage}
-                  canEdit={canManageEdit}
-                  canDelete={canManageDelete}
-                  canToggleVisibility={canManageToggleVisibility}
-                  sellerRaffleActive={sellerRaffleActive}
-                  onToggleRaffleParticipation={onToggleRaffleParticipation}
-                  isRaffleParticipationPending={isRaffleParticipationPending}
-                  disabled={isSubmitting}
-                />
-              </>
+              <ProductEditManageSection
+                product={manageProduct}
+                onDelete={onDeleteProduct}
+                onSetAvailability={onSetProductAvailability}
+                onSetAuction={onSetProductAuction}
+                isDeletePending={isDeletePending}
+                isAvailabilityTogglePending={isAvailabilityTogglePending}
+                isAuctionTogglePending={isAuctionTogglePending}
+                errorMessage={manageErrorMessage}
+                canEdit={canManageEdit}
+                canDelete={canManageDelete}
+                canToggleVisibility={canManageToggleVisibility}
+                sellerRaffleActive={sellerRaffleActive}
+                onToggleRaffleParticipation={onToggleRaffleParticipation}
+                isRaffleParticipationPending={isRaffleParticipationPending}
+                disabled={isSubmitting}
+                onOpenInstallmentProgram={() => setIsInstallmentProgramOpen(true)}
+                canOpenInstallmentProgram={
+                  manageProduct.productModerationStatus ===
+                  PRODUCT_MODERATION_APPROVED
+                }
+              />
             ) : null}
             {status.kind === "error" ? (
               <p

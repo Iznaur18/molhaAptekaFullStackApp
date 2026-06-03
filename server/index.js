@@ -19,7 +19,9 @@ import { generalRateLimiter, errorHandler, notFoundHandler } from './middlewares
 import { UPLOADS_DIR, ensureUploadsDir } from './utils/uploadsDir.js';
 import { expireStaleUserStories } from './utils/userStoryHelpers.js';
 import { processInstallmentCronTasks } from './utils/installmentHelpers.js';
+import { processPremiumCronTasks } from './utils/premiumAccess.js';
 import { INSTALLMENT_CRON_INTERVAL_MS } from './constants/installmentConstants.js';
+import { PREMIUM_CRON_INTERVAL_MS } from './constants/premiumConstants.js';
 
 ensureUploadsDir();
 
@@ -103,6 +105,12 @@ async function start() {
             console.error('processInstallmentCronTasks error:', error);
         });
     }, INSTALLMENT_CRON_INTERVAL_MS);
+
+    setInterval(() => {
+        void processPremiumCronTasks().catch((error) => {
+            console.error('processPremiumCronTasks error:', error);
+        });
+    }, PREMIUM_CRON_INTERVAL_MS);
 
     app
       .listen(PORT, () => {

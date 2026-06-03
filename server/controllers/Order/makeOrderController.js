@@ -5,6 +5,12 @@ import { CartModel, OrderModel, ProductModel, ProductPriceOfferModel, UserModel 
 import { resolveAcceptedOfferForOrder } from '../../utils/productPriceOfferHelpers.js';
 import { assertOrderItemsWithinAvailableStock } from '../../utils/productStock.js';
 import { errorRes, successRes } from '../../utils/index.js';
+import { normalizeProductLoyaltyPointsPerUnit } from '../../utils/loyaltyPointsSeller.js';
+import {
+    buildOrderLineLoyaltySnapshot,
+    reserveLoyaltyPointsForNewOrder,
+    releaseUnawardedLoyaltyReservesForOrder,
+} from '../../utils/orderLoyaltyPoints.js';
 
 import {
     ORDER_BUYER_PUBLIC_FIELDS,
@@ -18,20 +24,34 @@ const calculateTotalAmount = (items, priceById) =>
         return sum + (price ?? 0) * item.quantity;
     }, 0);
 
+/**
+ * @param {Array<{ productId: unknown; quantity: number }>} items
+ * @param {Record<string, {
+ *   price: number;
+ *   name: string;
+ *   loyaltyPointsPerUnit: number;
+ *   sellerId: string;
+ * }>} productById
+ */
 const buildItemsWithPriceSnapshot = (items, productById) =>
     items.map((item) => {
         const snapshot = productById[String(item.productId)];
+        const loyalty = buildOrderLineLoyaltySnapshot({
+            loyaltyPointsPerUnit: snapshot.loyaltyPointsPerUnit,
+            quantity: item.quantity,
+        });
+
         return {
             productId: item.productId,
             quantity: item.quantity,
             unitPriceAtOrder: snapshot.price,
             productNameAtOrder: snapshot.name,
+            ...loyalty,
         };
     });
 
 /**
  * @param {string[]} productIds
- * @param {import('mongoose').Types.ObjectId | string} buyerUserId
  */
 const fetchAvailableProductsForOrder = async (productIds) => {
     const products = await ProductModel.find({
@@ -40,10 +60,10 @@ const fetchAvailableProductsForOrder = async (productIds) => {
         productIsAvailable: { $ne: false },
         productStockQuantity: { $gt: 0 },
     })
-        .select('_id productPrice productName')
+        .select('_id productPrice productName loyaltyPointsPerUnit productSeller')
         .lean();
 
-    /** @type {Record<string, { price: number; name: string }>} */
+    /** @type {Record<string, { price: number; name: string; loyaltyPointsPerUnit: number; sellerId: string }>} */
     const byId = {};
     for (const product of products) {
         const id = String(product._id);
@@ -51,6 +71,10 @@ const fetchAvailableProductsForOrder = async (productIds) => {
         byId[id] = {
             price: product.productPrice,
             name: name.length > 0 ? name : 'Товар без названия',
+            loyaltyPointsPerUnit: normalizeProductLoyaltyPointsPerUnit(
+                product.loyaltyPointsPerUnit,
+            ),
+            sellerId: String(product.productSeller),
         };
     }
     return byId;
@@ -80,7 +104,7 @@ export const makeOrderController = async (req, res) => {
             ...new Set(items.map((item) => String(item.productId))),
         ];
 
-        /** @type {Record<string, { price: number; name: string }>} */
+        /** @type {Record<string, { price: number; name: string; loyaltyPointsPerUnit: number; sellerId: string }>} */
         let productById = {};
         let linkedPriceOfferId = null;
 
@@ -102,9 +126,19 @@ export const makeOrderController = async (req, res) => {
                     userId,
                     productId,
                 );
+                const product = await ProductModel.findById(productId)
+                    .select('loyaltyPointsPerUnit productSeller')
+                    .lean();
+                if (!product) {
+                    return errorRes(res, 400, 'Товар не найден');
+                }
                 productById[productId] = {
                     price: resolved.price,
                     name: resolved.name,
+                    loyaltyPointsPerUnit: normalizeProductLoyaltyPointsPerUnit(
+                        product.loyaltyPointsPerUnit,
+                    ),
+                    sellerId: String(product.productSeller),
                 };
                 linkedPriceOfferId = priceOfferId;
             } catch (e) {
@@ -142,17 +176,42 @@ export const makeOrderController = async (req, res) => {
         const totalAmount = calculateTotalAmount(itemsWithPrice, priceById);
         const status = buildOrderStatusFromItems(itemsWithPrice);
 
-        const order = await OrderModel.create({
-            userBuyerId: userId,
-            items: itemsWithPrice,
-            totalAmount,
-            deliveryAddress: verified.displayAddress,
-            deliveryAddressFlat: verified.flat,
-            deliveryAddressFiasId: verified.fiasId,
-            paymentMethod,
-            status,
-            priceOfferId: linkedPriceOfferId,
-        });
+        const itemsForReserve = itemsWithPrice.map((line, index) => ({
+            ...line,
+            productId: {
+                productSeller: productById[String(items[index].productId)]?.sellerId,
+            },
+        }));
+
+        try {
+            await reserveLoyaltyPointsForNewOrder(itemsForReserve);
+        } catch (reserveError) {
+            return errorRes(
+                res,
+                400,
+                reserveError instanceof Error
+                    ? reserveError.message
+                    : 'Недостаточно баллов у продавца',
+            );
+        }
+
+        let order;
+        try {
+            order = await OrderModel.create({
+                userBuyerId: userId,
+                items: itemsWithPrice,
+                totalAmount,
+                deliveryAddress: verified.displayAddress,
+                deliveryAddressFlat: verified.flat,
+                deliveryAddressFiasId: verified.fiasId,
+                paymentMethod,
+                status,
+                priceOfferId: linkedPriceOfferId,
+            });
+        } catch (createError) {
+            await releaseUnawardedLoyaltyReservesForOrder(itemsForReserve);
+            throw createError;
+        }
 
         if (linkedPriceOfferId) {
             await ProductPriceOfferModel.findByIdAndUpdate(linkedPriceOfferId, {
@@ -162,6 +221,7 @@ export const makeOrderController = async (req, res) => {
 
         const isUserUpdated = await appendOrderToBuyList(userId, order._id);
         if (!isUserUpdated) {
+            await releaseUnawardedLoyaltyReservesForOrder(itemsForReserve);
             return errorRes(res, 404, 'Пользователь не найден');
         }
 

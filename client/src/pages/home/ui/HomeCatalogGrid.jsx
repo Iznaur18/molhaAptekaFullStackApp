@@ -1,3 +1,4 @@
+import { isSellerProductLoyaltyPointsOvercommitted } from "../../../entities/product/lib/isSellerProductLoyaltyPointsOvercommitted.js";
 import { ProductCard } from "../../../entities/product/ui/ProductCard.jsx";
 import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
@@ -42,6 +43,8 @@ import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
  *     enabled: boolean,
  *   ) => void;
  *   raffleParticipationPendingProductId?: string | null;
+ *   sellerLoyaltyPointsBalance?: number;
+ *   sellerLoyaltyPointsReserved?: number;
  * }} props
  */
 export function HomeCatalogGrid({
@@ -81,6 +84,8 @@ export function HomeCatalogGrid({
   sellerRaffleActive = false,
   onToggleRaffleParticipation,
   raffleParticipationPendingProductId = null,
+  sellerLoyaltyPointsBalance = 0,
+  sellerLoyaltyPointsReserved = 0,
 }) {
   const pendingIds = pendingPromotionProductIds ?? new Set();
 
@@ -172,6 +177,14 @@ export function HomeCatalogGrid({
                     isMineMode &&
                     product._id != null &&
                     raffleParticipationPendingProductId === String(product._id)
+                  }
+                  isLoyaltyPointsOvercommitted={
+                    isMineMode &&
+                    isSellerProductLoyaltyPointsOvercommitted(product, {
+                      loyaltyPointsBalance: sellerLoyaltyPointsBalance,
+                      loyaltyPointsReserved: sellerLoyaltyPointsReserved,
+                      sellerProducts: products,
+                    })
                   }
                 />
               </div>

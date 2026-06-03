@@ -1,10 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { PRODUCT_PROMOTION_UI } from "../../../shared/config/appUiCopy.js";
 import { calculateProductPromotionPointsCost } from "../lib/calculateProductPromotionPointsCost.js";
-import {
-  PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS,
-  PRODUCT_PROMOTION_PAYMENT_METHOD_RUB,
-} from "../model/productPromotionPaymentConstants.js";
 
 import "./ProductPromotionModal.css";
 
@@ -20,11 +16,10 @@ import "./ProductPromotionModal.css";
  *     pricePoints?: number;
  *   }>;
  *   loyaltyPoints: number;
- *   rubBalance: number;
  *   isSubmitting?: boolean;
  *   errorMessage?: string;
  *   onClose: () => void;
- *   onSubmit: (tariffCode: string, paymentMethod: string) => void | Promise<void>;
+ *   onSubmit: (tariffCode: string) => void | Promise<void>;
  * }} props
  */
 export function ProductPromotionModal({
@@ -32,7 +27,6 @@ export function ProductPromotionModal({
   productName,
   tariffs,
   loyaltyPoints,
-  rubBalance,
   isSubmitting = false,
   errorMessage = "",
   onClose,
@@ -40,22 +34,15 @@ export function ProductPromotionModal({
 }) {
   const defaultTariff = tariffs[0]?.code ?? "";
   const [selectedTariffCode, setSelectedTariffCode] = useState(defaultTariff);
-  const [paymentMethod, setPaymentMethod] = useState(
-    PRODUCT_PROMOTION_PAYMENT_METHOD_RUB,
-  );
 
   useEffect(() => {
     setSelectedTariffCode(defaultTariff);
-    setPaymentMethod(PRODUCT_PROMOTION_PAYMENT_METHOD_RUB);
   }, [defaultTariff, isOpen]);
 
   const selectedTariff = useMemo(
     () => tariffs.find((item) => item.code === selectedTariffCode) ?? null,
     [selectedTariffCode, tariffs],
   );
-
-  const isPointsPayment =
-    paymentMethod === PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS;
 
   const selectedPricePoints = useMemo(() => {
     if (!selectedTariff) {
@@ -68,30 +55,15 @@ export function ProductPromotionModal({
     return calculateProductPromotionPointsCost(selectedTariff.priceRub);
   }, [selectedTariff]);
 
-  const selectedPriceRub = selectedTariff
-    ? Math.ceil(Number(selectedTariff.priceRub))
-    : 0;
+  const hasEnoughFunds = loyaltyPoints >= selectedPricePoints;
 
-  const hasEnoughFunds = isPointsPayment
-    ? loyaltyPoints >= selectedPricePoints
-    : rubBalance >= selectedPriceRub;
-
-  const insufficientMessage = (() => {
-    if (!selectedTariff || hasEnoughFunds) {
-      return "";
-    }
-    if (isPointsPayment) {
-      return PRODUCT_PROMOTION_UI.INSUFFICIENT_POINTS(
-        selectedPricePoints,
-        loyaltyPoints,
-      );
-    }
-    return PRODUCT_PROMOTION_UI.INSUFFICIENT_RUB(selectedPriceRub, rubBalance);
-  })();
-
-  const submitLabel = isPointsPayment
-    ? PRODUCT_PROMOTION_UI.SUBMIT_POINTS
-    : PRODUCT_PROMOTION_UI.SUBMIT_RUB;
+  const insufficientMessage =
+    selectedTariff && !hasEnoughFunds
+      ? PRODUCT_PROMOTION_UI.INSUFFICIENT_POINTS(
+          selectedPricePoints,
+          loyaltyPoints,
+        )
+      : "";
 
   if (!isOpen) {
     return null;
@@ -120,48 +92,11 @@ export function ProductPromotionModal({
           {PRODUCT_PROMOTION_UI.MODAL_SUBTITLE(productName)}
         </p>
         <p className="product-promotion-modal__balance">
-          {PRODUCT_PROMOTION_UI.BALANCE_RUB(rubBalance)}
-        </p>
-        <p className="product-promotion-modal__balance">
           {PRODUCT_PROMOTION_UI.BALANCE_POINTS(loyaltyPoints)}
         </p>
         <p className="product-promotion-modal__hint">
-          {paymentMethod === PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS
-            ? PRODUCT_PROMOTION_UI.PAYMENT_HINT_POINTS
-            : PRODUCT_PROMOTION_UI.PAYMENT_HINT_RUB}
+          {PRODUCT_PROMOTION_UI.PAYMENT_HINT_POINTS}
         </p>
-
-        <fieldset className="product-promotion-modal__payment-methods">
-          <legend>{PRODUCT_PROMOTION_UI.PAYMENT_METHOD_LABEL}</legend>
-          <label className="product-promotion-modal__payment-option">
-            <input
-              type="radio"
-              name="promotion-payment-method"
-              value={PRODUCT_PROMOTION_PAYMENT_METHOD_RUB}
-              checked={paymentMethod === PRODUCT_PROMOTION_PAYMENT_METHOD_RUB}
-              disabled={isSubmitting}
-              onChange={() =>
-                setPaymentMethod(PRODUCT_PROMOTION_PAYMENT_METHOD_RUB)
-              }
-            />
-            {PRODUCT_PROMOTION_UI.PAYMENT_METHOD_RUB}
-          </label>
-          <label className="product-promotion-modal__payment-option">
-            <input
-              type="radio"
-              name="promotion-payment-method"
-              value={PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS}
-              checked={
-                paymentMethod === PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS
-              }
-              disabled={isSubmitting}
-              onChange={() =>
-                setPaymentMethod(PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS)
-              }
-            />
-            {PRODUCT_PROMOTION_UI.PAYMENT_METHOD_POINTS}
-          </label>
-        </fieldset>
 
         <label className="product-promotion-modal__field">
           <span>{PRODUCT_PROMOTION_UI.TARIFF_LABEL}</span>
@@ -175,19 +110,12 @@ export function ProductPromotionModal({
                 Number(tariff.pricePoints) > 0
                   ? Number(tariff.pricePoints)
                   : calculateProductPromotionPointsCost(tariff.priceRub);
-              const label = isPointsPayment
-                ? PRODUCT_PROMOTION_UI.TARIFF_OPTION_POINTS(
-                    tariff.title,
-                    tariff.priceRub,
-                    pricePoints,
-                  )
-                : PRODUCT_PROMOTION_UI.TARIFF_OPTION_RUB(
-                    tariff.title,
-                    tariff.priceRub,
-                  );
               return (
                 <option key={tariff.code} value={tariff.code}>
-                  {label}
+                  {PRODUCT_PROMOTION_UI.TARIFF_OPTION_POINTS(
+                    tariff.title,
+                    pricePoints,
+                  )}
                 </option>
               );
             })}
@@ -218,13 +146,12 @@ export function ProductPromotionModal({
             className="app-btn app-btn--primary"
             disabled={!selectedTariff || isSubmitting || !hasEnoughFunds}
             onClick={() =>
-              selectedTariff &&
-              void onSubmit(selectedTariff.code, paymentMethod)
+              selectedTariff && void onSubmit(selectedTariff.code)
             }
           >
             {isSubmitting
               ? PRODUCT_PROMOTION_UI.SUBMIT_PENDING
-              : submitLabel}
+              : PRODUCT_PROMOTION_UI.SUBMIT_POINTS}
           </button>
         </footer>
       </section>

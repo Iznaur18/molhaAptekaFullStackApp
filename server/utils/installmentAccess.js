@@ -3,18 +3,19 @@ import {
     INSTALLMENT_SELLER_REQUIRES_PREMIUM_MESSAGE,
 } from '../constants/installmentConstants.js';
 import { UserModel } from '../models/index.js';
+import { isPremiumActive } from './premiumAccess.js';
 
 /**
  * @param {unknown} userId
  */
 export const assertUserCanManageInstallmentAsSeller = async (userId) => {
     const user = await UserModel.findById(userId)
-        .select('isPremiumUser isUserDataConfirmed isBlockedUser')
+        .select('isPremiumUser premiumExpiresAt isUserDataConfirmed isBlockedUser')
         .lean();
     if (!user || user.isBlockedUser) {
         throw new Error('Пользователь не найден');
     }
-    if (user.isPremiumUser !== true || user.isUserDataConfirmed !== true) {
+    if (!isPremiumActive(user) || user.isUserDataConfirmed !== true) {
         throw new Error(INSTALLMENT_SELLER_REQUIRES_PREMIUM_MESSAGE);
     }
     return user;

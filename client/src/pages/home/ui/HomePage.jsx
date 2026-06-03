@@ -113,8 +113,12 @@ import {
   PROFILE_TAB_INSTALLMENT_SALES,
   PROFILE_TAB_INSTALLMENT_MODERATION,
   PROFILE_TAB_INSTALLMENT_DISPUTES,
+  PROFILE_TAB_PREMIUM,
+  PROFILE_TAB_LOYALTY_POINTS,
 } from "../../my-profile/lib/profileTabs.js";
 import { MyProfilePage } from "../../my-profile/ui/MyProfilePage.jsx";
+import { PremiumPage } from "../../premium/ui/PremiumPage.jsx";
+import { LoyaltyPointsPage } from "../../loyalty-points/ui/LoyaltyPointsPage.jsx";
 import { MySalesPage } from "../../my-sales/ui/MySalesPage.jsx";
 import { UsersPage } from "../../users/ui/UsersPage.jsx";
 import { SubscriptionsPage } from "../../subscriptions/ui/SubscriptionsPage.jsx";
@@ -222,7 +226,7 @@ const useCurrentUserSession = (isAuthorized) => {
   );
   const [isPremiumUser, setIsPremiumUser] = useState(false);
   const [loyaltyPoints, setLoyaltyPoints] = useState(0);
-  const [rubBalance, setRubBalance] = useState(0);
+  const [loyaltyPointsReserved, setLoyaltyPointsReserved] = useState(0);
   const [isSessionReady, setIsSessionReady] = useState(() => !isAuthorized);
 
   useEffect(() => {
@@ -231,7 +235,7 @@ const useCurrentUserSession = (isAuthorized) => {
       setCurrentUserRole(null);
       setIsPremiumUser(false);
       setLoyaltyPoints(0);
-      setRubBalance(0);
+      setLoyaltyPointsReserved(0);
       setIsSessionReady(true);
       return undefined;
     }
@@ -247,7 +251,7 @@ const useCurrentUserSession = (isAuthorized) => {
           setCurrentUserRole(me.userRole ?? "user");
           setIsPremiumUser(Boolean(me.isPremiumUser));
           setLoyaltyPoints(Number(me.userLoyaltyPoints) || 0);
-          setRubBalance(Number(me.userRubBalance) || 0);
+          setLoyaltyPointsReserved(Number(me.userLoyaltyPointsReserved) || 0);
         }
       } catch {
         if (!isCancelled) {
@@ -255,7 +259,7 @@ const useCurrentUserSession = (isAuthorized) => {
           setCurrentUserRole(null);
           setIsPremiumUser(false);
           setLoyaltyPoints(0);
-          setRubBalance(0);
+          setLoyaltyPointsReserved(0);
         }
       } finally {
         if (!isCancelled) {
@@ -274,9 +278,9 @@ const useCurrentUserSession = (isAuthorized) => {
     currentUserRole,
     isPremiumUser,
     loyaltyPoints,
+    loyaltyPointsReserved,
     setLoyaltyPoints,
-    rubBalance,
-    setRubBalance,
+    setLoyaltyPointsReserved,
     setCurrentUserId,
     isSessionReady,
   ];
@@ -390,9 +394,9 @@ export function HomePage() {
     currentUserRole,
     isPremiumUser,
     loyaltyPoints,
+    loyaltyPointsReserved,
     setLoyaltyPoints,
-    rubBalance,
-    setRubBalance,
+    setLoyaltyPointsReserved,
     setCurrentUserId,
     isSessionReady,
   ] = useCurrentUserSession(isAuthorized);
@@ -1849,6 +1853,24 @@ export function HomePage() {
     setIsDataConfirmationModalOpen(true);
   };
 
+  const handlePremiumFromProfile = () => {
+    setMyProfileTab(PROFILE_TAB_PREMIUM);
+  };
+
+  const handleLoyaltyPointsFromProfile = () => {
+    setMyProfileTab(PROFILE_TAB_LOYALTY_POINTS);
+  };
+
+  const handlePremiumPurchased = async ({ loyaltyPointsBalance }) => {
+    setLoyaltyPoints(loyaltyPointsBalance);
+    try {
+      const { user } = await fetchCurrentUserProfile();
+      setMyProfilePage({ phase: "success", user, error: "" });
+    } catch {
+      /* профиль обновится при следующем заходе */
+    }
+  };
+
   useEffect(() => {
     if (!catalogProductDetails?._id || !isAuthorized) {
       setCatalogProductHasPendingReport(false);
@@ -2138,23 +2160,19 @@ export function HomePage() {
     setPromotionModalError("");
   };
 
-  const handleSubmitPromotionRequest = async (tariffCode, paymentMethod) => {
+  const handleSubmitPromotionRequest = async (tariffCode) => {
     if (!promotionProduct?._id) {
       return;
     }
     setIsPromotionSubmitPending(true);
     setPromotionModalError("");
     try {
-      const { loyaltyPointsBalance, rubBalance: nextRubBalance, message } =
-        await requestProductPromotion(String(promotionProduct._id), {
-          tariffCode,
-          paymentMethod,
-        });
+      const { loyaltyPointsBalance, message } = await requestProductPromotion(
+        String(promotionProduct._id),
+        { tariffCode },
+      );
       if (loyaltyPointsBalance != null) {
         setLoyaltyPoints(loyaltyPointsBalance);
-      }
-      if (nextRubBalance != null) {
-        setRubBalance(nextRubBalance);
       }
       setMyProductsCatalogNotice(
         message ?? "Заявка на продвижение отправлена.",
@@ -2289,6 +2307,8 @@ export function HomePage() {
         isAuthorized={isAuthorized}
         isPremiumUser={isPremiumUser}
         currentUserId={currentUserId}
+        sellerLoyaltyPointsBalance={loyaltyPoints}
+        sellerLoyaltyPointsReserved={loyaltyPointsReserved}
         onRequestLoginAddToCart={() => setIsLoginModalOpen(true)}
         showAddToCartOnCard={false}
         catalogSentinelRef={catalogSentinelRef}
@@ -2414,6 +2434,23 @@ export function HomePage() {
               isAuthorized={isAuthorized}
               onRequestLogin={() => setIsLoginModalOpen(true)}
               onUserClick={handleSellerNameClick}
+            />
+          );
+        }
+        if (activeProfileTab === PROFILE_TAB_PREMIUM) {
+          return (
+            <PremiumPage
+              isAuthorized={isAuthorized}
+              onRequestLogin={() => setIsLoginModalOpen(true)}
+              onPurchased={handlePremiumPurchased}
+            />
+          );
+        }
+        if (activeProfileTab === PROFILE_TAB_LOYALTY_POINTS) {
+          return (
+            <LoyaltyPointsPage
+              isAuthorized={isAuthorized}
+              onRequestLogin={() => setIsLoginModalOpen(true)}
             />
           );
         }
@@ -2555,6 +2592,12 @@ export function HomePage() {
           }
           onDataConfirmationClick={
             isAuthorized ? handleDataConfirmationFromProfile : undefined
+          }
+          onPremiumClick={
+            isAuthorized ? handlePremiumFromProfile : undefined
+          }
+          onLoyaltyPointsClick={
+            isAuthorized ? handleLoyaltyPointsFromProfile : undefined
           }
           onSubscriptionsClick={
             isAuthorized ? handleSubscriptionsFromProfile : undefined
@@ -2956,12 +2999,18 @@ export function HomePage() {
         isOpen={isCreateProductModalOpen}
         onClose={() => setIsCreateProductModalOpen(false)}
         onSuccess={handleCreateProductSuccess}
+        sellerLoyaltyPointsBalance={loyaltyPoints}
+        sellerLoyaltyPointsReserved={loyaltyPointsReserved}
+        sellerProducts={isMineMode ? products : []}
       />
       <CreateProductModal
         isOpen={productToEdit != null}
         onClose={handleCloseEditProductModal}
         onSuccess={handleEditProductSuccess}
         mode="edit"
+        sellerLoyaltyPointsBalance={loyaltyPoints}
+        sellerLoyaltyPointsReserved={loyaltyPointsReserved}
+        sellerProducts={isMineMode ? products : []}
         productToEdit={productToEdit}
         manageProduct={productToEdit}
         onDeleteProduct={handleDeleteMyProduct}
@@ -3004,7 +3053,6 @@ export function HomePage() {
         productName={promotionProduct?.productName ?? ""}
         tariffs={promotionTariffs}
         loyaltyPoints={loyaltyPoints}
-        rubBalance={rubBalance}
         errorMessage={promotionModalError}
         isSubmitting={isPromotionSubmitPending}
         onClose={handleClosePromotionModal}

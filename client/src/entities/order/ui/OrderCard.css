@@ -191,6 +191,13 @@
   white-space: nowrap;
 }
 
+.order-card__item-loyalty {
+  grid-column: 1 / -1;
+  font-size: 0.82rem;
+  color: #1e40af;
+  font-weight: 600;
+}
+
 .order-card__item-status {
   grid-column: 1 / -1;
   font-size: 0.82rem;

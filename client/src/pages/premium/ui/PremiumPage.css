@@ -1,0 +1,105 @@
+.premium-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.premium-page__state {
+  margin: 0;
+  color: #64748b;
+}
+
+.premium-page__state_error {
+  color: #b42318;
+}
+
+.premium-page__hint {
+  margin: 0;
+  color: #64748b;
+}
+
+.premium-page__login {
+  align-self: flex-start;
+}
+
+.premium-page__plan {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1rem;
+  border: 1px solid #e8d48a;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #fffbeb 0%, #fff 55%);
+}
+
+.premium-page__plan-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #7a5a00;
+}
+
+.premium-page__plan-price {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.premium-page__plan-period {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.premium-page__benefits {
+  margin: 0;
+  padding-left: 1.15rem;
+  color: #334155;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.premium-page__balance {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #64748b;
+}
+
+.premium-page__active {
+  margin: 0;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #86efac;
+  background: #ecfdf5;
+  color: #047857;
+  font-size: 0.9rem;
+}
+
+.premium-page__error {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #b42318;
+}
+
+.premium-page__submit {
+  align-self: flex-start;
+  margin: 0;
+  padding: 0.55rem 1.1rem;
+  border: 1px solid #d4a017;
+  border-radius: 10px;
+  background: #fff8e6;
+  color: #7a5a00;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.premium-page__submit:hover:not(:disabled) {
+  background: #ffefb8;
+}
+
+.premium-page__submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}

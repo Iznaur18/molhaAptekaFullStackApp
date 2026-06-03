@@ -3,11 +3,10 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 
 /**
  * @param {string} productId
- * @param {{ tariffCode: string; paymentMethod: string }} body
+ * @param {{ tariffCode: string }} body
  * @returns {Promise<{
  *   promotion: Record<string, unknown>;
  *   loyaltyPointsBalance: number | null;
- *   rubBalance: number | null;
  *   message: string | null;
  * }>}
  */
@@ -21,13 +20,11 @@ export async function requestProductPromotion(productId, body) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
     const pointsBalance = Number(data.data.loyaltyPointsBalance);
-    const rubBalance = Number(data.data.rubBalance);
     return {
       promotion: data.data.promotion,
       loyaltyPointsBalance: Number.isFinite(pointsBalance)
         ? pointsBalance
         : null,
-      rubBalance: Number.isFinite(rubBalance) ? rubBalance : null,
       message: typeof data.data.message === "string" ? data.data.message : null,
     };
   } catch (e) {

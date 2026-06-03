@@ -65,6 +65,20 @@ const OrderLineItemSchema = new mongoose.Schema(
             default: 0,
             min: 0,
         },
+        loyaltyPointsPerUnitAtOrder: {
+            type: Number,
+            default: 0,
+            min: 0,
+        },
+        loyaltyPointsReservedTotal: {
+            type: Number,
+            default: 0,
+            min: 0,
+        },
+        loyaltyPointsReserveReleased: {
+            type: Boolean,
+            default: false,
+        },
     },
     { _id: true },
 );

@@ -71,6 +71,7 @@ import "./ProductCard.css";
  * @param {boolean} [props.isPromotionPending]
  * @param {boolean} [props.highlightCatalogPromotion]
  * @param {boolean} [props.highlightRaffleProduct]
+ * @param {boolean} [props.isLoyaltyPointsOvercommitted]
  * @param {boolean} [props.isModerationQueue]
  * @param {{
  *   rejectComment: string;
@@ -105,6 +106,7 @@ export function ProductCard({
   isPromotionPending = false,
   highlightCatalogPromotion = false,
   highlightRaffleProduct = false,
+  isLoyaltyPointsOvercommitted = false,
   isModerationQueue = false,
   moderationActions = null,
 }) {
@@ -296,6 +298,16 @@ export function ProductCard({
       return (
         <p className="product-card__promotion-badge" role="status">
           {PRODUCT_CARD_UI.PROMOTED_BADGE}
+        </p>
+      );
+    }
+    if (isMineMode && isLoyaltyPointsOvercommitted) {
+      return (
+        <p
+          className="product-card__loyalty-overcommitted-badge"
+          role="alert"
+        >
+          {PRODUCT_CARD_UI.LOYALTY_POINTS_OVERCOMMITTED_BADGE}
         </p>
       );
     }

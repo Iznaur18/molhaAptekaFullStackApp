@@ -56,6 +56,7 @@
  * @property {string | null} [catalogPromotionExpiresAt]
  * @property {string | null} [activeRaffleId]
  * @property {string | null} [raffleParticipationEnabledAt]
+ * @property {number} [loyaltyPointsPerUnit] — баллов продавца за 1 шт. премиум-покупателю
  * @property {string} createdAt
  * @property {string} updatedAt
  */

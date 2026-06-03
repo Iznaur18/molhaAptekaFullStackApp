@@ -31,6 +31,12 @@ import {
 import { getUnreadInAppNotificationsForUser } from '../../utils/userInAppNotifications.js';
 import { buildUserProfileMongoUpdate } from '../../utils/buildUserProfileMongoUpdate.js';
 import { rejectPendingDataConfirmationForUser } from '../../utils/userDataConfirmationHelpers.js';
+import {
+    applyPremiumExpiryAdminUpdate,
+    isPremiumActive,
+    resolvePremiumFlagsFromExpiry,
+    syncPremiumExpiryForUser,
+} from '../../utils/premiumAccess.js';
 
 /** Вход по email + пароль. POST /auth/login */
 export const loginUserController = async (req, res) => { // обработчик входа по email + пароль
@@ -79,8 +85,10 @@ export const userMeController = async (req, res) => {
         }
 
         // 2. Ищем пользователя в БД по id
+        await syncPremiumExpiryForUser(userIdClient);
+
         const userIdServer = await UserModel.findById(userIdClient)
-            .select(USER_DATA) // Клиент получит всё что в select()
+            .select(`${USER_DATA} userLoyaltyPointsReserved`)
             .lean();
 
         if (!userIdServer) {
@@ -202,6 +210,12 @@ export const userUpdateProfileController = async (req, res) => {
                     updateData[field] = Number.isFinite(points)
                         ? Math.max(0, points)
                         : 0;
+                } else if (field === 'premiumExpiresAt') {
+                    if (value === null || value === '') {
+                        updateData.premiumExpiresAt = null;
+                    } else {
+                        updateData.premiumExpiresAt = new Date(value);
+                    }
                 } else if (field === 'userName') {
                     updateData[field] =
                         typeof value === 'string' ? value.trim().toLowerCase() : value;
@@ -266,7 +280,11 @@ export const userUpdateProfileController = async (req, res) => {
             return errorRes(res, 403, 'Только администратор может менять скидку');
         }
 
-        if (updateData.isPremiumUser !== undefined && !isCurrentUserAdmin) {
+        if (
+            (updateData.isPremiumUser !== undefined ||
+                updateData.premiumExpiresAt !== undefined) &&
+            !isCurrentUserAdmin
+        ) {
             return errorRes(res, 403, 'Только администратор может менять премиум');
         }
 
@@ -290,26 +308,48 @@ export const userUpdateProfileController = async (req, res) => {
         }
 
         const targetUserBeforeUpdate = await UserModel.findById(targetUserId)
-            .select('isPremiumUser userBackgroundUrl isUserDataConfirmed')
+            .select(
+                'isPremiumUser premiumExpiresAt userBackgroundUrl isUserDataConfirmed',
+            )
             .lean();
 
         if (!targetUserBeforeUpdate) {
             return errorRes(res, 404, 'Пользователь не найден');
         }
 
-        const wasPremium = Boolean(targetUserBeforeUpdate.isPremiumUser);
+        const wasPremium = isPremiumActive(targetUserBeforeUpdate);
+
+        if (updateData.premiumExpiresAt !== undefined && isCurrentUserAdmin) {
+            try {
+                const resolved = resolvePremiumFlagsFromExpiry(
+                    updateData.premiumExpiresAt,
+                );
+                updateData.premiumExpiresAt = resolved.premiumExpiresAt;
+                updateData.isPremiumUser = resolved.isPremiumUser;
+            } catch (e) {
+                return errorRes(
+                    res,
+                    400,
+                    e instanceof Error ? e.message : 'Некорректная дата премиума',
+                );
+            }
+        }
+
         const nextPremium =
             updateData.isPremiumUser !== undefined
                 ? Boolean(updateData.isPremiumUser)
-                : wasPremium;
+                : updateData.premiumExpiresAt !== undefined
+                  ? Boolean(updateData.isPremiumUser)
+                  : wasPremium;
 
-        if (wasPremium && !nextPremium) {
-            updateData.userBackgroundUrl = backgroundValueAfterPremiumChange(
-                wasPremium,
-                nextPremium,
-                targetUserBeforeUpdate.userBackgroundUrl,
-            );
-        } else if (updateData.userBackgroundUrl !== undefined) {
+        applyPremiumExpiryAdminUpdate({
+            wasPremium,
+            nextPremium,
+            currentBackground: targetUserBeforeUpdate.userBackgroundUrl,
+            updateData,
+        });
+
+        if (updateData.userBackgroundUrl !== undefined) {
             try {
                 updateData.userBackgroundUrl = normalizeUserBackgroundForSave(
                     updateData.userBackgroundUrl,

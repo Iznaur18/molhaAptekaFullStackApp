@@ -1,6 +1,5 @@
 import { PRODUCT_CARD_UI } from "../../../shared/config/appUiCopy.js";
-import { calculateLoyaltyPointsForLineAmount } from "../../../shared/lib/calculateLoyaltyPointsForLineAmount.js";
-import { resolveProductCatalogPriceRub } from "../lib/resolveProductCatalogPriceRub.js";
+import { resolveProductLoyaltyPointsPerUnit } from "../lib/resolveProductLoyaltyPointsPerUnit.js";
 import { shouldShowProductLoyaltyPointsBadge } from "../lib/shouldShowProductLoyaltyPointsBadge.js";
 
 import "./ProductLoyaltyPointsBadge.css";
@@ -23,12 +22,7 @@ export function ProductLoyaltyPointsBadge({
     return null;
   }
 
-  const priceRub = resolveProductCatalogPriceRub(product);
-  if (priceRub == null) {
-    return null;
-  }
-
-  const points = calculateLoyaltyPointsForLineAmount(priceRub);
+  const points = resolveProductLoyaltyPointsPerUnit(product);
   const label = (() => {
     if (!isAuthorized) {
       return PRODUCT_CARD_UI.LOYALTY_POINTS_GUEST(points);

@@ -103,7 +103,14 @@ export function EditProfileModal({
     [form.notesAboutUser],
   );
 
-  const isPremiumUser = Boolean(form.isPremiumUser);
+  const isPremiumUser = (() => {
+    const raw = String(form.premiumExpiresAt ?? "").trim();
+    if (!raw) {
+      return false;
+    }
+    const expiresAt = new Date(raw).getTime();
+    return Number.isFinite(expiresAt) && expiresAt > Date.now();
+  })();
   const backgroundMode =
     adminMode || allowSelfPremiumToggle
       ? "admin"
@@ -396,14 +403,19 @@ export function EditProfileModal({
               {EDIT_PROFILE_MODAL_UI.LABEL_NOTIFICATIONS}
             </label>
             {allowSelfPremiumToggle ? (
-              <label className="edit-profile-modal__label edit-profile-modal__label_row">
+              <label className="edit-profile-modal__label">
+                {ADMIN_EDIT_USER_UI.LABEL_PREMIUM_EXPIRES_AT}
                 <input
-                  type="checkbox"
-                  name="isPremiumUser"
-                  checked={form.isPremiumUser}
+                  type="datetime-local"
+                  className="edit-profile-modal__input"
+                  name="premiumExpiresAt"
+                  value={form.premiumExpiresAt}
                   onChange={handleChange}
+                  disabled={isSubmitting}
                 />
-                {ADMIN_EDIT_USER_UI.LABEL_PREMIUM}
+                <span className="edit-profile-modal__hint">
+                  {ADMIN_EDIT_USER_UI.LABEL_PREMIUM_EXPIRES_HINT}
+                </span>
               </label>
             ) : null}
             {adminMode || allowStaffLoyaltyEdit ? (
@@ -462,14 +474,19 @@ export function EditProfileModal({
                   />
                   {ADMIN_EDIT_USER_UI.LABEL_USER_DATA_CONFIRMED}
                 </label>
-                <label className="edit-profile-modal__label edit-profile-modal__label_row">
+                <label className="edit-profile-modal__label">
+                  {ADMIN_EDIT_USER_UI.LABEL_PREMIUM_EXPIRES_AT}
                   <input
-                    type="checkbox"
-                    name="isPremiumUser"
-                    checked={form.isPremiumUser}
+                    type="datetime-local"
+                    className="edit-profile-modal__input"
+                    name="premiumExpiresAt"
+                    value={form.premiumExpiresAt}
                     onChange={handleChange}
+                    disabled={isSubmitting}
                   />
-                  {ADMIN_EDIT_USER_UI.LABEL_PREMIUM}
+                  <span className="edit-profile-modal__hint">
+                    {ADMIN_EDIT_USER_UI.LABEL_PREMIUM_EXPIRES_HINT}
+                  </span>
                 </label>
                 <label className="edit-profile-modal__label edit-profile-modal__label_row">
                   <input

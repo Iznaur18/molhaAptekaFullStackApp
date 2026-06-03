@@ -9,6 +9,7 @@ import {
 } from "../../../entities/user/lib/profileImageFocus.js";
 import { resolveUserProfileBackgroundFromUser } from "../../../entities/user/lib/userBackgroundValue.js";
 import { pickUserProfilePhotoUrl } from "../../../entities/user/lib/pickUserProfilePhotoUrl.js";
+import { isPremiumActive } from "../../../entities/user/lib/isPremiumActive.js";
 import { USER_ROLE_USER } from "../../../entities/user/model/userConstants.js";
 import {
   MY_PROFILE_PAGE_UI,
@@ -43,6 +44,8 @@ import "./MyProfilePage.css";
  * onCreateRaffleClick?: () => void;
  * onDataConfirmationQueueClick?: () => void;
  * onDataConfirmationClick?: () => void;
+ * onPremiumClick?: () => void;
+ * onLoyaltyPointsClick?: () => void;
  * pendingModerationCount?: number;
  * pendingIncomingPriceOffersCount?: number;
  * pendingMySalesActionCount?: number;
@@ -82,6 +85,8 @@ export function MyProfilePage({
   onCreateRaffleClick,
   onDataConfirmationQueueClick,
   onDataConfirmationClick,
+  onPremiumClick,
+  onLoyaltyPointsClick,
   pendingModerationCount = 0,
   pendingIncomingPriceOffersCount = 0,
   pendingMySalesActionCount = 0,
@@ -138,6 +143,8 @@ export function MyProfilePage({
     user?.userRole === "admin" &&
     Boolean(onAdminOrdersClick);
   const canUseDataConfirmation = isProfileReady && user?.isUserDataConfirmed !== true;
+  const canUsePremium = isProfileReady && Boolean(onPremiumClick);
+  const canUseLoyaltyPoints = isProfileReady && Boolean(onLoyaltyPointsClick);
   const canUseProductModeration =
     !isRegularUser && isProfileReady && Boolean(onProductModerationClick);
   const canUseProductReports =
@@ -176,8 +183,6 @@ export function MyProfilePage({
     canUseEditProfile &&
     activeTab === "overview" &&
     showProfileBanner;
-  const showEditInHeader = canUseEditProfile && !showEditOnBanner;
-
   useEffect(() => {
     setAvatarLoadFailed(false);
     setBackgroundLoadFailed(false);
@@ -194,6 +199,7 @@ export function MyProfilePage({
       <header className="my-profile-page__header">
         <h2 className="my-profile-page__title">{MY_PROFILE_PAGE_UI.TAB_TITLE}</h2>
         <div className="my-profile-page__header-actions">
+          <div className="my-profile-page__header-tabs-row">
           {canUseCreateRaffle ? (
             <button
               type="button"
@@ -284,15 +290,6 @@ export function MyProfilePage({
             >
               {MY_PROFILE_PAGE_UI.TAB_INSTALLMENT_SALES}
               <ProfileTabBadge count={pendingInstallmentSellerActionCount} />
-            </button>
-          ) : null}
-          {showEditInHeader ? (
-            <button
-              type="button"
-              className="my-profile-page__header-action"
-              onClick={() => onEditProfileClick?.()}
-            >
-              {MY_PROFILE_PAGE_UI.EDIT_PROFILE}
             </button>
           ) : null}
           {canUseProductModeration ? (
@@ -416,25 +413,61 @@ export function MyProfilePage({
               {MY_PROFILE_PAGE_UI.TAB_ADMIN_ORDERS}
             </button>
           ) : null}
-          <button
-            type="button"
-            className={tabButtonClassName("subscriptions")}
-            disabled={!canUseSubscriptions}
-            onClick={() => {
-              onTabChange?.("subscriptions");
-              onSubscriptionsClick?.();
-            }}
-          >
-            {MY_PROFILE_PAGE_UI.TAB_SUBSCRIPTIONS}
-          </button>
-          <button
-            type="button"
-            className="my-profile-page__header-action"
-            disabled={!canUseDataConfirmation}
-            onClick={() => onDataConfirmationClick?.()}
-          >
-            {MY_PROFILE_PAGE_UI.DATA_CONFIRMATION}
-          </button>
+          </div>
+          <div className="my-profile-page__header-account-row">
+            <button
+              type="button"
+              className={tabButtonClassName("subscriptions")}
+              disabled={!canUseSubscriptions}
+              onClick={() => {
+                onTabChange?.("subscriptions");
+                onSubscriptionsClick?.();
+              }}
+            >
+              {MY_PROFILE_PAGE_UI.TAB_SUBSCRIPTIONS}
+            </button>
+            <button
+              type="button"
+              className="my-profile-page__header-action"
+              disabled={!canUseDataConfirmation}
+              onClick={() => onDataConfirmationClick?.()}
+            >
+              {MY_PROFILE_PAGE_UI.DATA_CONFIRMATION}
+            </button>
+            {canUsePremium ? (
+              <button
+                type="button"
+                className={tabButtonClassName("premium")}
+                onClick={() => {
+                  onTabChange?.("premium");
+                  onPremiumClick?.();
+                }}
+              >
+                {MY_PROFILE_PAGE_UI.TAB_PREMIUM}
+              </button>
+            ) : null}
+            {canUseLoyaltyPoints ? (
+              <button
+                type="button"
+                className={tabButtonClassName("loyalty-points")}
+                onClick={() => {
+                  onTabChange?.("loyalty-points");
+                  onLoyaltyPointsClick?.();
+                }}
+              >
+                {MY_PROFILE_PAGE_UI.TAB_LOYALTY_POINTS}
+              </button>
+            ) : null}
+            {canUseEditProfile && !showEditOnBanner ? (
+              <button
+                type="button"
+                className="my-profile-page__header-action"
+                onClick={() => onEditProfileClick?.()}
+              >
+                {MY_PROFILE_PAGE_UI.EDIT_PROFILE}
+              </button>
+            ) : null}
+          </div>
         </div>
       </header>
 
@@ -480,7 +513,7 @@ export function MyProfilePage({
                   <UserPremiumAvatar
                     className="user-details-modal__avatar user-details-modal__avatar_lead user-details-modal__avatar_on-banner"
                     src={photoUrl}
-                    isPremium={Boolean(user?.isPremiumUser)}
+                    isPremium={isPremiumActive(user)}
                     objectPosition={avatarObjectPosition}
                     decoding="async"
                     onError={() => setAvatarLoadFailed(true)}
@@ -516,9 +549,9 @@ export function MyProfilePage({
           <div className="my-profile-page__tab-content">{tabContent}</div>
         ) : null}
       </div>
-      {activeTab === PROFILE_TAB_OVERVIEW ? (
-        <footer className="my-profile-page__footer">
-          {!isLogoutConfirmOpen ? (
+      <footer className="my-profile-page__footer">
+        {activeTab === PROFILE_TAB_OVERVIEW ? (
+          !isLogoutConfirmOpen ? (
             <button
               type="button"
               className="my-profile-page__logout-trigger"
@@ -551,9 +584,9 @@ export function MyProfilePage({
                 </button>
               </div>
             </div>
-          )}
-        </footer>
-      ) : null}
+          )
+        ) : null}
+      </footer>
     </section>
   );
 }

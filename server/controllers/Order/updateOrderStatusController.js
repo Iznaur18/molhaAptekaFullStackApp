@@ -15,6 +15,10 @@ import {
     decrementProductStockOnItemConfirmed,
     restoreProductStockOnItemCancelled,
 } from '../../utils/productStock.js';
+import {
+    markOrderLineLoyaltyReserveReleased,
+    releaseUnawardedLoyaltyReservesForOrder,
+} from '../../utils/orderLoyaltyPoints.js';
 import { normalizeOrderDocumentForRuntime, normalizeOrderItemsForRuntime } from './orderStatus.js';
 
 /** `PATCH /order/:orderId/status` — смена статуса заказа (только админ). */
@@ -74,6 +78,14 @@ export const updateOrderStatusController = async (req, res) => {
             }
         }
 
+        if (status === ORDER_STATUS_CANCELLED) {
+            for (const item of order.items) {
+                if (item.status !== ORDER_STATUS_CANCELLED) {
+                    markOrderLineLoyaltyReserveReleased(item);
+                }
+            }
+        }
+
         order.items.forEach((item) => {
             item.status = status;
             if (status !== ORDER_STATUS_DELIVERED) {
@@ -91,6 +103,11 @@ export const updateOrderStatusController = async (req, res) => {
         });
         order.status = status;
         await order.save();
+
+        if (status === ORDER_STATUS_CANCELLED) {
+            await order.populate(ORDER_ITEMS_POPULATE);
+            await releaseUnawardedLoyaltyReservesForOrder(order.items);
+        }
 
         for (const { productId, quantity } of itemsPendingConfirmStock) {
             try {

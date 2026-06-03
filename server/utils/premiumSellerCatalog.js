@@ -4,8 +4,10 @@ import { UserModel } from '../models/index.js';
  * @returns {Promise<import('mongoose').Types.ObjectId[]>}
  */
 export async function getPremiumSellerIds() {
+    const now = new Date();
     const rows = await UserModel.find({
         isPremiumUser: true,
+        premiumExpiresAt: { $gt: now },
         isBlockedUser: { $ne: true },
         isActiveUser: { $ne: false },
     })

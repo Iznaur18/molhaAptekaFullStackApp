@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import {
     PRODUCT_PROMOTION_PAYMENT_METHODS,
-    PRODUCT_PROMOTION_PAYMENT_METHOD_RUB,
+    PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS,
     PRODUCT_PROMOTION_STATUSES,
 } from '../constants/productPromotionConstants.js';
 
@@ -45,7 +45,7 @@ const ProductPromotionSchema = new mongoose.Schema(
         paymentMethod: {
             type: String,
             enum: PRODUCT_PROMOTION_PAYMENT_METHODS,
-            default: PRODUCT_PROMOTION_PAYMENT_METHOD_RUB,
+            default: PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS,
             required: true,
         },
         amountPoints: {

@@ -11,6 +11,7 @@ import {
   USER_ROLE_USER,
 } from "../model/userConstants.js";
 import { formatUserBackgroundForDisplay } from "./userBackgroundValue.js";
+import { isPremiumActive } from "./isPremiumActive.js";
 
 const DATE_TIME_FORMAT = new Intl.DateTimeFormat(
   COMMON_UI.LOCALE_RU,
@@ -168,7 +169,7 @@ export function getUserProfileRows(user, options = {}) {
     {
       id: "isPremiumUser",
       label: L.isPremiumUser,
-      value: formatBooleanRu(user.isPremiumUser),
+      value: formatBooleanRu(isPremiumActive(user)),
     },
     {
       id: "notesAboutUser",
@@ -182,14 +183,6 @@ export function getUserProfileRows(user, options = {}) {
         user.userLoyaltyPoints == null
           ? COMMON_UI.EM_DASH
           : String(user.userLoyaltyPoints),
-    },
-    {
-      id: "userRubBalance",
-      label: L.userRubBalance,
-      value:
-        user.userRubBalance == null
-          ? COMMON_UI.EM_DASH
-          : `${user.userRubBalance} ₽`,
     },
     {
       id: "userRatingByVotes",

@@ -20,6 +20,7 @@ import {
     normalizeProductOldPriceRub,
     normalizeProductPriceRub,
 } from "../../utils/productDiscount.js";
+import { assertSellerCanSetProductLoyaltyPointsPerUnit } from "../../utils/assertProductLoyaltyPointsPerUnit.js";
 import { errorRes, successRes } from "../../utils/index.js";
 
 export const postProductController = async (req, res) => {
@@ -102,6 +103,22 @@ export const postProductController = async (req, res) => {
 
     const visibleInCatalog = isAdmin && productStockQuantity > 0;
 
+    let loyaltyPointsPerUnit = 0;
+    try {
+        loyaltyPointsPerUnit = await assertSellerCanSetProductLoyaltyPointsPerUnit(
+            String(userId),
+            req.body?.loyaltyPointsPerUnit,
+        );
+    } catch (loyaltyError) {
+        return errorRes(
+            res,
+            400,
+            loyaltyError instanceof Error
+                ? loyaltyError.message
+                : "Некорректное количество баллов за покупку",
+        );
+    }
+
     const product = await ProductModel.create({
       productName,
       productDescription,
@@ -117,6 +134,7 @@ export const postProductController = async (req, res) => {
       productAuctionCompletedOnce: false,
       productModerationStatus,
       productModerationComment: "",
+      loyaltyPointsPerUnit,
     });
 
     await product.populate("productSeller", PRODUCT_SELLER_PUBLIC_SELECT);

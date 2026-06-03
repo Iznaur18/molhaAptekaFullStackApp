@@ -28,6 +28,8 @@ import "./ProductSellerManageActions.css";
  *   ) => void;
  *   isRaffleParticipationPending?: boolean;
  *   disabled?: boolean;
+ *   onOpenInstallmentProgram?: () => void;
+ *   canOpenInstallmentProgram?: boolean;
  * }} props
  */
 export function ProductEditManageSection({
@@ -46,6 +48,8 @@ export function ProductEditManageSection({
   onToggleRaffleParticipation,
   isRaffleParticipationPending = false,
   disabled = false,
+  onOpenInstallmentProgram,
+  canOpenInstallmentProgram = true,
 }) {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
@@ -57,6 +61,7 @@ export function ProductEditManageSection({
   const showDelete = canDelete;
   const showRaffleToggle =
     sellerRaffleActive && typeof onToggleRaffleParticipation === "function";
+  const showInstallmentButton = typeof onOpenInstallmentProgram === "function";
   const isRaffleParticipant = isProductRaffleParticipant(product);
 
   const actionsLocked =
@@ -168,6 +173,23 @@ export function ProductEditManageSection({
             : isRaffleParticipant
               ? PRODUCT_CARD_UI.RAFFLE_PARTICIPATION_ON
               : PRODUCT_CARD_UI.RAFFLE_PARTICIPATION_OFF}
+        </button>
+      ) : null}
+      {showInstallmentButton ? (
+        <button
+          type="button"
+          className="product-card__availability-toggle product-card__installment-toggle"
+          disabled={
+            disabled ||
+            isDeletePending ||
+            isAvailabilityTogglePending ||
+            isAuctionTogglePending ||
+            isRaffleParticipationPending ||
+            !canOpenInstallmentProgram
+          }
+          onClick={() => onOpenInstallmentProgram?.()}
+        >
+          {PRODUCT_CARD_UI.INSTALLMENT_SELL_BUTTON}
         </button>
       ) : null}
       {showDelete ? (

@@ -1,3 +1,4 @@
+import { isPremiumActive } from './premiumAccess.js';
 import {
     IN_APP_NOTIFICATION_KIND_STORY_HIDDEN,
     IN_APP_NOTIFICATION_MESSAGE_STORY_HIDDEN,
@@ -38,7 +39,7 @@ export function canPublishUserStory(user) {
     if (canModerateProductsRole(user.userRole)) {
         return true;
     }
-    return Boolean(user.isPremiumUser);
+    return isPremiumActive(user);
 }
 
 /**

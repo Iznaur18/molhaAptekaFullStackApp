@@ -24,6 +24,9 @@ import {
     getPendingUserStoryReportsController,
     getPendingUserStoryReportsCountController,
     resolveUserStoryReportsController,
+    getMyPremiumStatusController,
+    purchasePremiumController,
+    getMyLoyaltyPointsStatusController,
 } from '../controllers/index.js';
 import {
     checkAuthMW,
@@ -151,6 +154,15 @@ router.post(
     userDataConfirmationRateLimiter,
     submitDataConfirmationValidation,
     submitDataConfirmationRequestController,
+);
+
+router.get('/me/premium/status', checkAuthMW, getMyPremiumStatusController);
+router.post('/me/premium/purchase', checkAuthMW, purchasePremiumController);
+
+router.get(
+    '/me/loyalty-points/status',
+    checkAuthMW,
+    getMyLoyaltyPointsStatusController,
 );
 
 router.get(
