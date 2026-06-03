@@ -5,6 +5,8 @@ import {
     EMAIL_VERIFICATION_INVALID_TOKEN_MESSAGE,
     EMAIL_VERIFICATION_TOKEN_TTL_MS,
 } from '../constants/emailVerificationConstants.js';
+import { EMAIL_VERIFICATION_SUBJECT } from '../constants/smtpConstants.js';
+import { isSmtpConfigured, sendSmtpMail } from './smtpMail.js';
 
 const hashEmailVerificationToken = (rawToken) =>
     crypto.createHash('sha256').update(String(rawToken)).digest('hex');
@@ -95,17 +97,23 @@ export const deliverEmailVerification = async ({ email, userName, rawToken }) =>
     ).replace(/\/$/, '');
     const verifyUrl = `${frontendUrl}/auth/verify-email?token=${encodeURIComponent(rawToken)}`;
 
-    if (
-        process.env.SMTP_HOST &&
-        process.env.SMTP_USER &&
-        process.env.SMTP_PASS
-    ) {
-        // v2: nodemailer — пока только dev-log
-        console.info(
-            `[email-verify] SMTP задан, но отправка не настроена в v1. URL для ${email}:`,
-            verifyUrl,
-        );
-        return;
+    if (isSmtpConfigured()) {
+        try {
+            const greeting = userName ? `Здравствуйте, ${userName}!` : 'Здравствуйте!';
+            const text = `${greeting}\n\nПодтвердите email по ссылке:\n${verifyUrl}\n\nСсылка действует ограниченное время.`;
+            await sendSmtpMail({
+                to: email,
+                subject: EMAIL_VERIFICATION_SUBJECT,
+                text,
+                html: `<p>${greeting}</p><p><a href="${verifyUrl}">Подтвердить email</a></p><p>Или скопируйте ссылку:</p><p>${verifyUrl}</p>`,
+            });
+            console.info(`[email-verify] Письмо отправлено на ${email}`);
+            return;
+        } catch (error) {
+            console.error('[email-verify] SMTP send error:', error);
+            console.info(`[email-verify] Fallback URL для ${email}:`, verifyUrl);
+            return;
+        }
     }
 
     console.info(

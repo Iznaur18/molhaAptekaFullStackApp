@@ -120,17 +120,8 @@ cd ../client && npm ci && npm run build
 
 ## 6. SMTP (email verify)
 
-Пока SMTP не настроен — ссылка только в логах сервера.
-
-```env
-SMTP_HOST=smtp.example.com
-SMTP_PORT=587
-SMTP_USER=
-SMTP_PASS=
-SMTP_FROM=noreply@example.com
-```
-
-> Отправка через nodemailer — v2 (env уже зарезервированы в `emailVerification.js`).
+Nodemailer включён: при заданных `SMTP_*` письмо уходит на реальный email.  
+Иначе — ссылка в логах `[email-verify]`.
 
 ---
 
