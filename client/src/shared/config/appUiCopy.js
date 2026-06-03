@@ -265,6 +265,18 @@ export const APP_INTRO_UI = {
   VIDEO_ARIA: "Intro-ролик",
 };
 
+/** Подтверждение email */
+export const EMAIL_VERIFICATION_UI = {
+  BANNER_TEXT:
+    "Подтвердите email — без этого нельзя оформить заказ или рассрочку. Проверьте почту или отправьте письмо повторно.",
+  RESEND_BUTTON: "Отправить письмо повторно",
+  RESEND_LOADING: "Отправка…",
+  RESENT: "Письмо отправлено. Проверьте почту.",
+  RESEND_ERROR: "Не удалось отправить письмо",
+  VERIFIED_SUCCESS: "Email подтверждён",
+  VERIFIED_ERROR: "Не удалось подтвердить email",
+};
+
 /** Главная страница каталога */
 export const HOME_PAGE_UI = {
   PRODUCT_CATEGORY_FILTER_LIST_ID: "home-product-category-filter-list",

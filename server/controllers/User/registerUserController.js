@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import { UserModel } from '../../models/index.js';
 import { sendUserWithToken, errorRes } from '../../utils/index.js';
+import { sendEmailVerificationForUser } from '../../utils/emailVerification.js';
 import { DEFAULT_AVATAR_URL } from '../../constants/constants.js';
 import {
     formatUserBackgroundPresetValue,
@@ -74,6 +75,12 @@ export const registerUserController = async (req, res) => {
     });
 
     const user = await doc.save();
+
+    try {
+        await sendEmailVerificationForUser(user._id);
+    } catch (verificationError) {
+        console.error('sendEmailVerificationForUser error:', verificationError);
+    }
 
     return sendUserWithToken(user, res);
   } catch (error) {

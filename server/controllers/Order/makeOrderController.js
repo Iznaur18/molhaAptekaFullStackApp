@@ -5,6 +5,7 @@ import { CartModel, OrderModel, ProductModel, ProductPriceOfferModel, UserModel 
 import { resolveAcceptedOfferForOrder } from '../../utils/productPriceOfferHelpers.js';
 import { assertOrderItemsWithinAvailableStock } from '../../utils/productStock.js';
 import { errorRes, successRes } from '../../utils/index.js';
+import { checkUserEmailVerified } from '../../utils/assertEmailVerified.js';
 import { runInTransaction, withMongoSession } from '../../utils/mongoTransaction.js';
 import { normalizeProductLoyaltyPointsPerUnit } from '../../utils/loyaltyPointsSeller.js';
 import {
@@ -99,6 +100,11 @@ export const makeOrderController = async (req, res) => {
         const userId = req.userId;
         const { items, paymentMethod, priceOfferId } = req.body;
         const verified = req.verifiedDeliveryAddress;
+
+        const emailCheck = await checkUserEmailVerified(userId);
+        if (!emailCheck.ok) {
+            return errorRes(res, 403, emailCheck.message);
+        }
 
         const uniqueProductIds = [
             ...new Set(items.map((item) => String(item.productId))),

@@ -2,6 +2,10 @@ import { uploadController } from './User/uploadController.js';
 import { uploadVideoController } from './User/uploadVideoController.js';
 import { registerUserController } from './User/registerUserController.js';
 import { loginUserController, logoutUserController, userGetProfileController, userMeController, userUpdateProfileController, userDeleteProfileController } from './User/loginUserController.js';
+import {
+    resendEmailVerificationController,
+    verifyEmailController,
+} from './User/emailVerificationControllers.js';
 import { userVoteRatingController, userGetRatingController, getMyVoteForTargetController } from './User/userVoteRatingController.js';
 import { userSearchController } from './User/userSearchController.js';
 import { getUserPurchasesController } from './User/getUserPurchasesController.js';
@@ -162,6 +166,8 @@ export {
     registerUserController,
     loginUserController,
     logoutUserController,
+    verifyEmailController,
+    resendEmailVerificationController,
     userVoteRatingController,
     userGetRatingController,
     getMyVoteForTargetController,

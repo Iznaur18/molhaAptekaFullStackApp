@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
+import { useAuthBootstrap } from "../model/useAuthBootstrap.js";
+import { useCurrentUserSession } from "../model/useCurrentUserSession.js";
+
 import { useCart } from "../../../entities/cart/model/useCart.js";
 import { CartServerSync } from "../../../entities/cart/ui/CartServerSync.jsx";
 import { CART_STORAGE_KEY } from "../../../entities/order/model/constants.js";
@@ -49,6 +52,7 @@ import { RaffleProductsPage } from "../../raffle/ui/RaffleProductsPage.jsx";
 import { ProductPromotionsStaffPage } from "../../product-promotions/ui/ProductPromotionsStaffPage.jsx";
 import { fetchCurrentUserProfile } from "../../../entities/user/api/fetchCurrentUserProfile.js";
 import { logoutUser } from "../../../entities/user/api/logoutUser.js";
+import { EmailVerificationBanner } from "../../../entities/user/ui/EmailVerificationBanner.jsx";
 import { markInAppNotificationsRead } from "../../../entities/user/api/markInAppNotificationsRead.js";
 import { fetchUserProfileById } from "../../../entities/user/api/fetchUserProfileById.js";
 import { LoginModal } from "../../../entities/user/ui/LoginModal.jsx";
@@ -219,78 +223,6 @@ const readInitialCatalogCategory = () => {
   return readInitialCatalogQuery()?.category ?? null;
 };
 
-const useCurrentUserSession = (isAuthorized, isAuthReady) => {
-  const [currentUserId, setCurrentUserId] = useState(null);
-  const [currentUserRole, setCurrentUserRole] = useState(
-    /** @type {'user'|'admin'|'moderator'|null} */ (null),
-  );
-  const [isPremiumUser, setIsPremiumUser] = useState(false);
-  const [loyaltyPoints, setLoyaltyPoints] = useState(0);
-  const [loyaltyPointsReserved, setLoyaltyPointsReserved] = useState(0);
-  const [isSessionReady, setIsSessionReady] = useState(false);
-
-  useEffect(() => {
-    if (!isAuthReady) {
-      setIsSessionReady(false);
-      return undefined;
-    }
-
-    if (!isAuthorized) {
-      setCurrentUserId(null);
-      setCurrentUserRole(null);
-      setIsPremiumUser(false);
-      setLoyaltyPoints(0);
-      setLoyaltyPointsReserved(0);
-      setIsSessionReady(true);
-      return undefined;
-    }
-
-    setIsSessionReady(false);
-    let isCancelled = false;
-
-    void (async () => {
-      try {
-        const { user: me } = await fetchCurrentUserProfile();
-        if (!isCancelled) {
-          setCurrentUserId(String(me._id));
-          setCurrentUserRole(me.userRole ?? "user");
-          setIsPremiumUser(Boolean(me.isPremiumUser));
-          setLoyaltyPoints(Number(me.userLoyaltyPoints) || 0);
-          setLoyaltyPointsReserved(Number(me.userLoyaltyPointsReserved) || 0);
-        }
-      } catch {
-        if (!isCancelled) {
-          setCurrentUserId(null);
-          setCurrentUserRole(null);
-          setIsPremiumUser(false);
-          setLoyaltyPoints(0);
-          setLoyaltyPointsReserved(0);
-        }
-      } finally {
-        if (!isCancelled) {
-          setIsSessionReady(true);
-        }
-      }
-    })();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [isAuthorized, isAuthReady]);
-
-  return [
-    currentUserId,
-    currentUserRole,
-    isPremiumUser,
-    loyaltyPoints,
-    loyaltyPointsReserved,
-    setLoyaltyPoints,
-    setLoyaltyPointsReserved,
-    setCurrentUserId,
-    isSessionReady,
-  ];
-};
-
 export function HomePage() {
   const { flushRemoteCart } = useCart();
   const location = useLocation();
@@ -346,8 +278,7 @@ export function HomePage() {
   const [productSearchTerm, setProductSearchTerm] = useState("");
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
-  const [isAuthorized, setIsAuthorized] = useState(false);
-  const [isAuthReady, setIsAuthReady] = useState(false);
+  const [{ isAuthorized, isAuthReady }, setIsAuthorized] = useAuthBootstrap();
   const [catalogStatus, setCatalogStatus] = useState({ kind: "loading" });
   /** @type {import('react').MutableRefObject<number>} */
   const sellerFetchSeq = useRef(0);
@@ -389,42 +320,44 @@ export function HomePage() {
   const [productToEdit, setProductToEdit] = useState(null);
   const [usersListTick, setUsersListTick] = useState(0);
   const [catalogRefreshTick, setCatalogRefreshTick] = useState(0);
-  const [
+  const {
     currentUserId,
     currentUserRole,
     isPremiumUser,
+    isEmailVerified,
     loyaltyPoints,
     loyaltyPointsReserved,
     setLoyaltyPoints,
     setLoyaltyPointsReserved,
     setCurrentUserId,
+    setIsEmailVerified,
     isSessionReady,
-  ] = useCurrentUserSession(isAuthorized, isAuthReady);
+  } = useCurrentUserSession(isAuthorized, isAuthReady);
 
   useEffect(() => {
-    let isCancelled = false;
+    const params = new URLSearchParams(location.search);
+    const verified = params.get("emailVerified");
+    if (!verified) {
+      return undefined;
+    }
 
-    void (async () => {
-      try {
-        await fetchCurrentUserProfile();
-        if (!isCancelled) {
-          setIsAuthorized(true);
-        }
-      } catch {
-        if (!isCancelled) {
-          setIsAuthorized(false);
-        }
-      } finally {
-        if (!isCancelled) {
-          setIsAuthReady(true);
-        }
-      }
-    })();
+    if (verified === "1" && isAuthorized) {
+      void fetchCurrentUserProfile()
+        .then(({ user }) => {
+          setIsEmailVerified(user.isEmailVerified !== false);
+        })
+        .catch(() => {});
+    }
 
-    return () => {
-      isCancelled = true;
-    };
-  }, []);
+    navigate(location.pathname, { replace: true });
+    return undefined;
+  }, [
+    isAuthorized,
+    location.pathname,
+    location.search,
+    navigate,
+    setIsEmailVerified,
+  ]);
   const [myProductsTotal, setMyProductsTotal] = useState(
     /** @type {number | null} */ (null),
   );
@@ -2843,6 +2776,10 @@ export function HomePage() {
         myProductsModerationFilter={myProductsModerationFilter}
         onMyProductsModerationFilterChange={setMyProductsModerationFilter}
       />
+
+      {isAuthorized && isSessionReady && !isEmailVerified ? (
+        <EmailVerificationBanner />
+      ) : null}
 
       {renderMainContent()}
 

@@ -42,6 +42,20 @@ const UserSchema = new mongoose.Schema(
       required: false,
       select: false, // не отдавать по умолчанию при find()
     },
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
+    },
+    emailVerificationTokenHash: {
+      type: String,
+      select: false,
+      default: null,
+    },
+    emailVerificationExpiresAt: {
+      type: Date,
+      select: false,
+      default: null,
+    },
 
     // - - - Информация о пользователе - - -
     userBirthDate: { // дата рождения

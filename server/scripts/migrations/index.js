@@ -13,6 +13,7 @@ import { up as userPhoneNumberUnsetNullUp } from "./20260531-user-phone-number-u
 import { up as userPremiumExpiresUp } from "./20260603-user-premium-expires.js";
 import { up as productLoyaltyPointsPerUnitUp } from "./20260603-product-loyalty-points-per-unit.js";
 import { removeTelegramUserFieldsUp } from "./20260604-remove-telegram-user-fields.js";
+import { up as userEmailVerifiedUp } from "./20260605-user-email-verified.js";
 
 export const MIGRATIONS = [
   {
@@ -89,5 +90,10 @@ export const MIGRATIONS = [
     id: "20260604-remove-telegram-user-fields",
     description: "Remove telegramUserId, telegramUsername, telegramPhotoUrl from users",
     up: removeTelegramUserFieldsUp,
+  },
+  {
+    id: "20260605-user-email-verified",
+    description: "Backfill isEmailVerified=true for existing users with email",
+    up: userEmailVerifiedUp,
   },
 ];

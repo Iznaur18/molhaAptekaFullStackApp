@@ -3,6 +3,7 @@ import rateLimit from 'express-rate-limit';
 import { PRODUCT_REPORT_RATE_LIMIT_PER_HOUR } from '../constants/productReportConstants.js';
 import { USER_STORY_RATE_LIMIT_PER_HOUR } from '../constants/userStoryConstants.js';
 import { USER_DATA_CONFIRMATION_RATE_LIMIT_PER_HOUR } from '../constants/userDataConfirmationConstants.js';
+import { EMAIL_VERIFICATION_RESEND_RATE_LIMIT_PER_HOUR } from '../constants/emailVerificationConstants.js';
 import { PRICE_OFFER_RATE_LIMIT_PER_HOUR } from '../constants/productPriceOfferConstants.js';
 import { PRODUCT_REVIEW_RATE_LIMIT_PER_HOUR } from '../constants/productReviewConstants.js';
 
@@ -152,6 +153,18 @@ export const userDataConfirmationRateLimiter = rateLimit({
     message: {
         success: false,
         message: 'Слишком много заявок. Попробуйте позже',
+    },
+    keyGenerator: (req) => String(req.userId ?? req.ip ?? 'unknown'),
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+export const emailVerificationResendRateLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: EMAIL_VERIFICATION_RESEND_RATE_LIMIT_PER_HOUR,
+    message: {
+        success: false,
+        message: 'Слишком много запросов на отправку письма. Попробуйте позже',
     },
     keyGenerator: (req) => String(req.userId ?? req.ip ?? 'unknown'),
     standardHeaders: true,

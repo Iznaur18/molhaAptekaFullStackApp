@@ -56,6 +56,7 @@
  * @property {string} _id
  * @property {string} [userName]
  * @property {string} [email]
+ * @property {boolean} [isEmailVerified]
  * @property {string|null} [userBirthDate]
  * @property {'male'|'female'|'noSelected'} [userGender]
  * @property {string} [userAddress]

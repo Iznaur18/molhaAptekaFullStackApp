@@ -34,6 +34,7 @@ import {
 } from '../../models/index.js';
 import { isUserAdmin, isUserStaff } from '../../utils/adminUserGuard.js';
 import { assertUserCanBuyInstallment } from '../../utils/installmentAccess.js';
+import { checkUserEmailVerified } from '../../utils/assertEmailVerified.js';
 import {
     applyConfirmedInstallmentPayment,
     buildInstallmentPaymentSchedule,
@@ -93,6 +94,11 @@ export const createInstallmentContractController = async (req, res) => {
                 403,
                 e instanceof Error ? e.message : 'Нет прав',
             );
+        }
+
+        const emailCheck = await checkUserEmailVerified(buyerUserId);
+        if (!emailCheck.ok) {
+            return errorRes(res, 403, emailCheck.message);
         }
 
         const program = await ProductInstallmentProgramModel.findOne({

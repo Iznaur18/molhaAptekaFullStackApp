@@ -67,6 +67,15 @@ app.use(helmet()); // защита от некоторых типов атак
 // Применяется ко всем маршрутам, кроме статических файлов
 app.use(generalRateLimiter);
 
+app.get('/health', (_req, res) => {
+    const mongoReady = mongoose.connection.readyState === 1;
+    res.status(mongoReady ? 200 : 503).json({
+        status: mongoReady ? 'ok' : 'degraded',
+        mongo: mongoReady ? 'connected' : 'disconnected',
+        uptimeSec: Math.floor(process.uptime()),
+    });
+});
+
 // раздача загруженных файлов по URL /uploads/...
 app.use(
   '/uploads',

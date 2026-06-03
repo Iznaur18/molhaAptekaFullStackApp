@@ -5,9 +5,15 @@ import {
     logoutUserController,
     userMeController,
     markInAppNotificationsReadController,
+    verifyEmailController,
+    resendEmailVerificationController,
 } from '../controllers/index.js';
 import { registerUserValidation, loginUserValidation } from '../validations/index.js';
-import { checkAuthMW, authRateLimiter } from '../middlewares/index.js';
+import {
+    checkAuthMW,
+    authRateLimiter,
+    emailVerificationResendRateLimiter,
+} from '../middlewares/index.js';
 
 const router = Router();
 
@@ -23,5 +29,12 @@ router.patch(
 router.post('/register', authRateLimiter, registerUserValidation, registerUserController);
 router.post('/login', authRateLimiter, loginUserValidation, loginUserController);
 router.post('/logout', logoutUserController);
+router.get('/verify-email', verifyEmailController);
+router.post(
+    '/resend-verification',
+    checkAuthMW,
+    emailVerificationResendRateLimiter,
+    resendEmailVerificationController,
+);
 
 export { router as authRouter };
