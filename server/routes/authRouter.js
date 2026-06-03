@@ -13,6 +13,7 @@ import { registerUserValidation, loginUserValidation } from '../validations/inde
 import {
     checkAuthMW,
     authRateLimiter,
+    refreshAuthRateLimiter,
     emailVerificationResendRateLimiter,
 } from '../middlewares/index.js';
 
@@ -30,7 +31,7 @@ router.patch(
 router.post('/register', authRateLimiter, registerUserValidation, registerUserController);
 router.post('/login', authRateLimiter, loginUserValidation, loginUserController);
 router.post('/logout', logoutUserController);
-router.post('/refresh', refreshAuthController);
+router.post('/refresh', refreshAuthRateLimiter, refreshAuthController);
 router.get('/verify-email', verifyEmailController);
 router.post(
     '/resend-verification',

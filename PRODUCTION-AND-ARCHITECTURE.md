@@ -70,14 +70,16 @@ molhaAptekaFullStackApp/
 
 ---
 
-## 4. Авторизация
+## 4. Авторизация (httpOnly cookie + refresh)
 
-1. `POST /auth/login` или `/auth/register` → JWT в ответе.
-2. Клиент кладёт токен в `localStorage`.
-3. `apiClient` (axios) шлёт `Authorization: Bearer <token>`.
-4. `checkAuthMW` на сервере проверяет JWT (`JWT_SECRET`).
+1. `POST /auth/login` или `/auth/register` → httpOnly cookie `access_token` (1 ч) и `refresh_token` (30 д).
+2. Клиент (`apiClient.js`): `withCredentials: true`, без `localStorage`.
+3. При 401 → `POST /auth/refresh` → повтор запроса.
+4. `checkAuthMW` проверяет access JWT (`JWT_SECRET`).
 
-**Prod:** `JWT_SECRET` — длинная случайная строка, не значение из `.env.example`.
+**Prod:** `JWT_SECRET` — длинная случайная строка; при cross-domain — `COOKIE_CROSS_SITE=true` + HTTPS.
+
+Подробнее: `server/docs/auth-session.md`.
 
 ---
 
@@ -284,6 +286,7 @@ SSL: `certbot --nginx -d izibuy.ru -d www.izibuy.ru`
 | `client/docs/связка-клиента-с-сервером.md` | dev proxy |
 | `client/docs/LAN-dev-access.md` | доступ по Wi‑Fi |
 | `server/.env.example` | шаблон env |
+| `server/docs/production-checklist.md` | чеклист перед деплоем |
 | `client/.env.example` | `VITE_API_URL` |
 | `docs/deploy/nginx-izibuy.conf.example` | nginx вариант A |
 

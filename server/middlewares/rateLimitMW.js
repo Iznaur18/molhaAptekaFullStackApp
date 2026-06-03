@@ -28,12 +28,24 @@ export const generalRateLimiter = rateLimit({
  */
 export const authRateLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 минут
-    max: 55, // максимум 5 попыток входа/регистрации за 15 минут
+    max: 55, // максимум 55 попыток входа/регистрации за 15 минут
     message: {
         success: false,
         message: 'Слишком много попыток входа. Попробуйте через 15 минут'
     },
     skipSuccessfulRequests: true, // Не учитывать успешные запросы
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+/** Защита POST /auth/refresh от перебора refresh cookie. */
+export const refreshAuthRateLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 120,
+    message: {
+        success: false,
+        message: 'Слишком много запросов обновления сессии. Попробуйте позже',
+    },
     standardHeaders: true,
     legacyHeaders: false,
 });

@@ -67,6 +67,13 @@ server {
 
     # --- API (как в client/vite.config.js DEV_API_PROXY_PREFIXES) ---
 
+    location /health {
+        proxy_pass http://izibuy_api;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        access_log off;
+    }
+
     location /auth/ {
         proxy_pass http://izibuy_api;
         proxy_http_version 1.1;

@@ -7,6 +7,7 @@ import { checkProductModeratorMW } from './checkProductModeratorMW.js';
 import {
     generalRateLimiter,
     authRateLimiter,
+    refreshAuthRateLimiter,
     updateProfileRateLimiter,
     voteRateLimiter,
     uploadRateLimiter,
@@ -30,6 +31,7 @@ export {
     checkProductModeratorMW,
     generalRateLimiter,
     authRateLimiter,
+    refreshAuthRateLimiter,
     updateProfileRateLimiter,
     voteRateLimiter,
     uploadRateLimiter,

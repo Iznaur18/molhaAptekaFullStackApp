@@ -13,6 +13,7 @@
     "migrate:dry": "node scripts/runMigrations.js",
     "migrate:apply": "node scripts/runMigrations.js --apply",
     "migrate:order-items-status": "node scripts/migrateOrderItemsStatus.js",
+    "validate:prod": "node scripts/validateProdEnv.js",
     "create-admin": "node scripts/createAdmin.js"
   },
   "devDependencies": {

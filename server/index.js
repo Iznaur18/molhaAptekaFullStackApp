@@ -2,6 +2,7 @@ import 'dotenv/config';
 import mongoose from 'mongoose';
 
 import { createApp } from './createApp.js';
+import { assertProductionEnv } from './utils/assertProductionEnv.js';
 import { ensureUploadsDir } from './utils/uploadsDir.js';
 import { expireStaleUserStories } from './utils/userStoryHelpers.js';
 import { processInstallmentCronTasks } from './utils/installmentHelpers.js';
@@ -23,13 +24,19 @@ if (!process.env.MONGO_URI) {
 }
 
 const isProduction = process.env.NODE_ENV === 'production';
-if (isProduction && !process.env.FRONTEND_URL) {
-    console.error(
-        'FRONTEND_URL не задан в production — CORS будет открыт для всех доменов. Задайте FRONTEND_URL в .env',
-    );
-    process.exit(1);
-}
-if (!isProduction && !process.env.FRONTEND_URL) {
+
+if (isProduction) {
+    const { ok, errors, warnings } = assertProductionEnv();
+    for (const message of warnings) {
+        console.warn(`[prod-env] ${message}`);
+    }
+    if (!ok) {
+        for (const message of errors) {
+            console.error(`[prod-env] ${message}`);
+        }
+        process.exit(1);
+    }
+} else if (!process.env.FRONTEND_URL) {
     console.warn(
         'FRONTEND_URL не задан — CORS разрешён для всех origin (только для dev)',
     );

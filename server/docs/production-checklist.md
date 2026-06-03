@@ -1,49 +1,189 @@
 # Production checklist
 
-## Обязательно перед деплоем
+Пошаговый чеклист перед выкладкой Izibuy в production.  
+Архитектура и nginx: [`PRODUCTION-AND-ARCHITECTURE.md`](../../PRODUCTION-AND-ARCHITECTURE.md).
 
-| Переменная | Зачем |
-|------------|--------|
-| `NODE_ENV=production` | Secure cookie, скрытие деталей ошибок |
-| `JWT_SECRET` | `crypto.randomBytes(32).toString('hex')` |
-| `MONGO_URI` | Atlas / replica set (**обязателен для транзакций**) |
-| `FRONTEND_URL` | CORS + redirect после verify email |
+---
 
-## MongoDB
+## 0. Быстрая проверка env (локально на сервере)
 
-- **Replica set** — без него MongoDB transactions (баллы заказа) не работают
-- Регулярные бэкапы (Atlas continuous backup или `mongodump` cron)
-- Индексы: `npm run migrate:apply` после деплоя
+```bash
+cd server
+# скопируй и заполни .env (см. .env.example)
+npm run validate:prod
+```
 
-## Проверки после деплоя
+Скрипт проверяет `JWT_SECRET`, `MONGO_URI`, `FRONTEND_URL`, предупреждает про replica set и SMTP.
 
-1. `GET /health` → `{ status: "ok", mongo: "connected" }`
-2. Login → cookie `access_token` (httpOnly, Secure)
-3. Logout → `/auth/me` → 401
-4. Register → ссылка verify в логах/SMTP
-5. Заказ без verify email → 403
+---
 
-## Безопасность
+## 1. Обязательные переменные (`server/.env`)
 
-- Не логировать passport, password, JWT
-- `FRONTEND_URL` — один origin, без `*`
-- Rate limits включены (см. `rateLimitMW.js`)
-- Uploads: лимит размера, проверка MIME
+| Переменная | Production | Зачем |
+|------------|------------|--------|
+| `NODE_ENV` | `production` | Secure cookie, скрытие деталей 5xx |
+| `JWT_SECRET` | ≥32 символов, `crypto.randomBytes(32).hex` | подпись access/refresh JWT |
+| `MONGO_URI` | **Atlas или replica set** | без RS транзакции баллов/заказов не работают |
+| `FRONTEND_URL` | `https://ваш-домен.ru` | CORS + ссылки verify email |
+| `PUBLIC_UPLOAD_BASE_URL` | `https://ваш-домен.ru` | полные URL фото/видео в БД (вариант A) |
+| `PORT` | `4444` (за nginx) | порт Express |
 
-## Мониторинг (рекомендация v2)
+**Вариант B** (фронт и API на разных доменах):
 
-- Sentry / аналог для 5xx
-- Uptime ping на `/health`
-- Алерт при `mongo: disconnected`
+| Переменная | Значение |
+|------------|----------|
+| `FRONTEND_URL` | origin SPA, напр. `https://app.example.com` |
+| `PUBLIC_UPLOAD_BASE_URL` | origin API, напр. `https://api.example.com` |
+| `COOKIE_CROSS_SITE` | `true` |
+| Client build | `VITE_API_URL=https://api.example.com` |
 
-## SMTP (email verify v2)
+Генерация секрета:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+---
+
+## 2. MongoDB
+
+- [ ] **Replica set** — Atlas M0+ или `mongod --replSet rs0` на VPS
+- [ ] После первого деплоя: `cd server && npm run migrate:apply`
+- [ ] Бэкапы: Atlas Continuous Backup или cron `mongodump`
+- [ ] IP whitelist (Atlas) или firewall (VPS)
+
+Проверка транзакций: integration-тесты в CI (`npm test`) используют memory-server с RS.
+
+---
+
+## 3. Сборка и деплой (вариант A — один домен)
+
+```bash
+# на сервере
+git pull
+cd server && npm ci && npm run validate:prod && npm run migrate:apply
+cd ../client && npm ci && npm run build
+# dist → /var/www/izibuy/client/dist
+# server → /var/www/izibuy/server (uploads/ — persistent volume!)
+```
+
+**Процесс API:**
+
+- systemd: [`docs/deploy/systemd-izibuy.service.example`](../../docs/deploy/systemd-izibuy.service.example)
+- или pm2: `NODE_ENV=production pm2 start index.js --name izibuy-api`
+
+**Nginx:**
+
+- [`docs/deploy/nginx-izibuy.conf.example`](../../docs/deploy/nginx-izibuy.conf.example)
+- SSL: `certbot --nginx -d ваш-домен.ru`
+- `client_max_body_size 6m` — upload до 5 МБ
+
+**Клиент (вариант A):** собирать **без** `VITE_API_URL`.
+
+---
+
+## 4. Проверки после деплоя
+
+### API
+
+| # | Проверка | Ожидание |
+|---|----------|----------|
+| 1 | `GET https://домен/health` | `{ "status": "ok", "mongo": "connected" }` |
+| 2 | Register / Login | cookie `access_token` + `refresh_token`, httpOnly, Secure |
+| 3 | `GET /auth/me` с cookie | 200 + user |
+| 4 | `POST /auth/logout` → `GET /auth/me` | 401 |
+| 5 | Register | ссылка verify в SMTP или логах `[email-verify]` |
+| 6 | Заказ без verify email | 403 |
+| 7 | Upload фото товара → URL в новой вкладке | 200, не 404 |
+| 8 | Staff: модерация товара | очередь открывается |
+
+### Auth v2 (refresh)
+
+| # | Проверка | Ожидание |
+|---|----------|----------|
+| 9 | Подождать истечение access (1 ч) или удалить только `access_token` | следующий API-запрос → auto refresh → 200 |
+| 10 | `POST /auth/refresh` без cookie | 401 |
+
+---
+
+## 5. Безопасность
+
+- [ ] `JWT_SECRET` не из `.env.example`
+- [ ] `FRONTEND_URL` — один origin, CORS без `*`
+- [ ] Не логировать passport, password, JWT (см. `pii-passport-handling.md`)
+- [ ] Rate limits: `rateLimitMW.js` (auth, refresh, upload, …)
+- [ ] Helmet включён (`createApp.js`)
+- [ ] Uploads: лимит 5 МБ, MIME jpeg/png/webp/mp4/webm
+- [ ] `server/uploads/` на persistent disk (не терять при redeploy)
+
+---
+
+## 6. SMTP (email verify)
+
+Пока SMTP не настроен — ссылка только в логах сервера.
 
 ```env
-SMTP_HOST=
+SMTP_HOST=smtp.example.com
 SMTP_PORT=587
 SMTP_USER=
 SMTP_PASS=
 SMTP_FROM=noreply@example.com
 ```
 
-Пока SMTP не настроен — ссылка verify в server console (`[email-verify]`).
+> Отправка через nodemailer — v2 (env уже зарезервированы в `emailVerification.js`).
+
+---
+
+## 7. Мониторинг (рекомендация)
+
+- [ ] Uptime ping на `/health` каждые 1–5 мин
+- [ ] Алерт при `mongo: disconnected` или status ≠ ok
+- [ ] Sentry / аналог для 5xx (v2)
+- [ ] `journalctl -u izibuy-api -f` или pm2 logs
+
+---
+
+## 8. Первый админ
+
+```bash
+cd server
+npm run create-admin -- admin@example.com YourPassword123 adminNick
+```
+
+---
+
+## 9. Smoke после каждого релиза
+
+```bash
+cd server && npm test
+cd ../client && npm run build
+```
+
+На prod вручную: login → каталог → корзина → заказ → upload → logout.
+
+---
+
+## 10. Частые ошибки
+
+| Симптом | Причина |
+|---------|---------|
+| CORS error | неверный `FRONTEND_URL` |
+| Cookie не ставится | нет HTTPS / `COOKIE_CROSS_SITE` / разные домены |
+| 404 на `/uploads/...` | nginx не проксирует uploads или нет `PUBLIC_UPLOAD_BASE_URL` |
+| 413 на upload | `client_max_body_size` в nginx |
+| Баллы «зависли» | Mongo без replica set — транзакции не commit |
+| Файлы пропали | redeploy без persistent `uploads/` |
+| F5 на `/user-list` → JSON | nginx проксирует `/user-list` в API (нужен regex `^/user(/|$)`) |
+
+---
+
+## Связанные файлы
+
+| Файл | Содержание |
+|------|------------|
+| `PRODUCTION-AND-ARCHITECTURE.md` | архитектура, варианты A/B/C |
+| `server/.env.example` | шаблон env |
+| `client/.env.example` | `VITE_API_URL` для варианта B |
+| `server/docs/auth-session.md` | JWT refresh flow |
+| `docs/deploy/nginx-izibuy.conf.example` | nginx |
+| `docs/deploy/systemd-izibuy.service.example` | systemd unit |

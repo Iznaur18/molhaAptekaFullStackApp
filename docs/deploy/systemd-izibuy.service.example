@@ -1,0 +1,32 @@
+# Izibuy API — systemd unit (вариант A, VPS)
+#
+# 1. Скопируй и отредактируй пути:
+#    sudo cp docs/deploy/systemd-izibuy.service.example /etc/systemd/system/izibuy-api.service
+# 2. Env-файл: /var/www/izibuy/server/.env (chmod 600)
+# 3. Persistent uploads: /var/www/izibuy/server/uploads
+#
+# sudo systemctl daemon-reload
+# sudo systemctl enable izibuy-api
+# sudo systemctl start izibuy-api
+# sudo systemctl status izibuy-api
+
+[Unit]
+Description=Izibuy Express API
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/izibuy/server
+EnvironmentFile=/var/www/izibuy/server/.env
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node index.js
+Restart=on-failure
+RestartSec=5
+
+# Лимиты (опционально)
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target
