@@ -16,6 +16,7 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
  * @property {boolean} productIsAvailable
  * @property {number} [productStockQuantity]
  * @property {boolean} [productAuctionEnabled]
+ * @property {number} [loyaltyPointsPerUnit]
  */
 
 /**
@@ -39,6 +40,10 @@ export async function createProduct(body) {
     }
     if (body.productAuctionEnabled != null) {
       payload.productAuctionEnabled = body.productAuctionEnabled === true;
+    }
+    const loyaltyParsed = Math.floor(Number(body.loyaltyPointsPerUnit));
+    if (Number.isFinite(loyaltyParsed) && loyaltyParsed >= 0) {
+      payload.loyaltyPointsPerUnit = loyaltyParsed;
     }
     const urls = Array.isArray(body.productImageUrls)
       ? body.productImageUrls.map((s) => String(s).trim()).filter(Boolean)
