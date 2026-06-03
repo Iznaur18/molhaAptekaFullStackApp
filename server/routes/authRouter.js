@@ -3,6 +3,7 @@ import {
     registerUserController,
     loginUserController,
     logoutUserController,
+    refreshAuthController,
     userMeController,
     markInAppNotificationsReadController,
     verifyEmailController,
@@ -29,6 +30,7 @@ router.patch(
 router.post('/register', authRateLimiter, registerUserValidation, registerUserController);
 router.post('/login', authRateLimiter, loginUserValidation, loginUserController);
 router.post('/logout', logoutUserController);
+router.post('/refresh', refreshAuthController);
 router.get('/verify-email', verifyEmailController);
 router.post(
     '/resend-verification',

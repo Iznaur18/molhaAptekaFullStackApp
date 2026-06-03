@@ -23,26 +23,7 @@
 
 ## Обязательный порядок работ
 
-### 1. Telegram-авторизация (P0 — блокер)
-
-Сейчас `POST /auth/telegram` принимает `telegramUserId` из body без проверки подписи Telegram
-(`server/validations/user/telegramAuthValidation.js`, `server/controllers/User/authTelegramController.js`).
-
-Сделай:
-- Верификацию данных Telegram Login / Web App `initData` на сервере по официальной схеме (HMAC-SHA256 с BOT_TOKEN).
-- Env: `TELEGRAM_BOT_TOKEN` (обязателен, если включён роут; без токена — 503 или отключение роута с явной ошибкой в лог).
-- Отклонять запросы с невалидной/просроченной подписью (401/403, без утечки деталей).
-- `telegramUserId`, `telegramUsername`, `telegramPhotoUrl` брать ТОЛЬКО из проверенного payload, не доверять сырому body.
-- Обновить `server/.env.example` с инструкцией.
-- Клиент: если есть вызов `/auth/telegram` — передавать `initData`/hash как требует выбранный flow (найди в client и поправь).
-
-Критерий приёмки:
-- Нельзя войти, подставив чужой `telegramUserId` в curl/Postman.
-- Существующие email-пользователи не ломаются.
-
----
-
-### 2. Целостность баллов и заказов — MongoDB transactions (P0)
+### 1. Целостность баллов и заказов — MongoDB transactions (P0)
 
 Сейчас резерв/списание баллов (`userLoyaltyPointsReserved`, `loyaltyPointsReserve.js`,
 `makeOrderController`, `updateOrderItemStatusController` confirm) — несколько `updateOne` без транзакций.
@@ -62,7 +43,7 @@
 
 ---
 
-### 3. Паспортные данные (PII) — минимизация экспозиции (P0)
+### 2. Паспортные данные (PII) — минимизация экспозиции (P0)
 
 `UserDataConfirmationRequest` хранит полный паспорт + selfie URL.
 
@@ -79,21 +60,14 @@
 
 ---
 
-### 4. JWT и сессия (P1 — если уложится в объём; иначе отдельный PR)
+### 3. JWT и сессия — ✅ v2 (refresh + короткий access)
 
-Сейчас JWT в `localStorage` (`client/src/shared/api/apiClient.js`).
-
-Сделай v1 (выбери один путь и доведи до конца):
-- Вариант A (предпочтительно): httpOnly Secure cookie для access token, SameSite=Lax/Strict, API с `credentials`, CORS `credentials: true` + жёсткий `FRONTEND_URL`.
-- Вариант B (быстрее): оставить localStorage, но: короткий TTL access (например 1h), refresh token в httpOnly cookie, endpoint refresh — только если успеешь без ломания всего клиента.
-
-Обязательно в любом случае:
-- Убрать из `server/.env.example` слабый пример `JWT_SECRET=iznaur2000` → placeholder «сгенерируй crypto.randomBytes(32)».
-- В production без `FRONTEND_URL` — warn при старте или fail (не открытый CORS).
-
-Критерий приёмки:
-- Документирован flow входа/выхода.
-- Logout очищает сессию полностью.
+- Access JWT 1 ч в `access_token`, refresh JWT 30 д в `refresh_token` (`server/utils/authTokens.js`).
+- `POST /auth/refresh` — ротация обоих cookie.
+- `checkAuthMW` принимает только access (legacy без `typ` — ок).
+- Клиент: interceptor 401 → refresh → retry (`client/src/shared/api/apiClient.js`).
+- Cross-site: `COOKIE_CROSS_SITE=true` → `SameSite=None; Secure`.
+- Документация: `server/docs/auth-session.md`.
 
 ---
 
@@ -105,7 +79,6 @@
 - Не коммитить без явной просьбы пользователя.
 - После изменений: прогнать миграции не нужно, если схема не менялась; если менялась — добавить migration + index.js.
 - Добавить тесты ТОЛЬКО на критичное (минимум):
-  - telegram: invalid signature → 401;
   - loyalty reserve rollback при failed order create (можно integration с mongodb-memory-server или unit с моками — что проще в репо).
 
 ---
@@ -117,10 +90,10 @@
 3. Чеклист ручной проверки (5–8 пунктов, русский).
 4. Команды для запуска (`server` migrate, dev smoke).
 
-Начни с чтения кода по путям выше, затем реализуй по порядку 1→2→3→4.
-Если пункт 4 не влезает — явно напиши «отложен» и заверши 1–3 полностью.
+Начни с чтения кода по путям выше, затем реализуй по порядку 1→2→3.
+Если пункт 3 не влезает — явно напиши «отложен» и заверши 1–2 полностью.
 
 Как использовать?
 Один заход: весь промпт в Agent mode.
 Два PR: обрезать блок 4 и в конце написать «сделай только пункты 1–3».
-После выполнения: отдельный промпт «напиши integration-тесты на транзакции заказа и telegram auth».
+После выполнения: отдельный промпт «напиши integration-тесты на транзакции заказа».

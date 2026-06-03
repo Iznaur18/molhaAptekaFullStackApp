@@ -8,10 +8,10 @@ import {
     PREMIUM_EXPIRY_REMINDER_DAYS,
     PREMIUM_PRICE_POINTS,
 } from '../constants/premiumConstants.js';
+import { runInTransaction } from './mongoTransaction.js';
 import {
     deductLoyaltyPoints,
     InsufficientLoyaltyPointsError,
-    refundLoyaltyPoints,
 } from './loyaltyPointsSpend.js';
 import { backgroundValueAfterPremiumChange } from './userBackgroundValue.js';
 import { createUserInAppNotification } from './userInAppNotifications.js';
@@ -160,15 +160,12 @@ export const purchasePremiumSubscription = async (userId) => {
         throw new PremiumAlreadyActiveError();
     }
 
-    let loyaltyPointsBalance;
-    let pointsDeducted = false;
-
-    try {
-        loyaltyPointsBalance = await deductLoyaltyPoints({
+    return runInTransaction(async (session) => {
+        const loyaltyPointsBalance = await deductLoyaltyPoints({
             userId,
             amount: PREMIUM_PRICE_POINTS,
+            session,
         });
-        pointsDeducted = true;
 
         const premiumExpiresAt = addCalendarMonth(new Date());
         await UserModel.updateOne(
@@ -180,15 +177,11 @@ export const purchasePremiumSubscription = async (userId) => {
                     premiumExpiryReminderSentAt: null,
                 },
             },
+            { session },
         );
 
         return { loyaltyPointsBalance, premiumExpiresAt };
-    } catch (error) {
-        if (pointsDeducted) {
-            await refundLoyaltyPoints({ userId, amount: PREMIUM_PRICE_POINTS });
-        }
-        throw error;
-    }
+    });
 };
 
 /**

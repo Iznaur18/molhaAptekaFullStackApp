@@ -5,6 +5,7 @@ import {
 import {
     calculateProductPromotionPointsCost,
     PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS,
+    PRODUCT_PROMOTION_PAYMENT_METHOD_RUB,
     PRODUCT_PROMOTION_STATUS_ACTIVE,
     PRODUCT_PROMOTION_STATUS_CANCELLED_BY_ADMIN,
     PRODUCT_PROMOTION_STATUS_PENDING_STAFF,
@@ -15,6 +16,7 @@ import {
     clearProductPromotionForProduct,
     expireProductPromotionsAndSendNotifications,
     getActiveProductPromotionTariffs,
+    PRODUCT_PROMOTION_NOTIFICATION_KIND_APPROVED,
     PRODUCT_PROMOTION_NOTIFICATION_KIND_CANCELLED,
     PRODUCT_PROMOTION_NOTIFICATION_KIND_REJECTED,
     refundProductPromotionPaymentIfNeeded,
@@ -23,8 +25,8 @@ import {
 import {
     deductLoyaltyPoints,
     InsufficientLoyaltyPointsError,
-    refundLoyaltyPoints,
 } from '../../utils/loyaltyPointsSpend.js';
+import { runInTransaction, withMongoSession } from '../../utils/mongoTransaction.js';
 import { createUserInAppNotification } from '../../utils/userInAppNotifications.js';
 import { errorRes, successRes } from '../../utils/index.js';
 
@@ -125,45 +127,61 @@ export const requestProductPromotionController = async (req, res) => {
 
         const chargedAt = new Date();
         const amountPoints = calculateProductPromotionPointsCost(tariff.priceRub);
-
-        let loyaltyPointsBalance;
-        let paymentDeducted = false;
+        const promotionMessage = 'Продвижение товара активировано';
 
         try {
-            loyaltyPointsBalance = await deductLoyaltyPoints({
-                userId,
-                amount: amountPoints,
-            });
-            paymentDeducted = true;
+            const { promotion, loyaltyPointsBalance } = await runInTransaction(
+                async (session) => {
+                    const loyaltyPointsBalance = await deductLoyaltyPoints({
+                        userId,
+                        amount: amountPoints,
+                        session,
+                    });
 
-            const promotion = await ProductPromotionModel.create({
-                productId,
-                sellerId: userId,
-                status: PRODUCT_PROMOTION_STATUS_PENDING_STAFF,
-                tariffCode: tariff.code,
-                tariffTitle: tariff.title,
-                durationHours: tariff.durationHours,
-                amountRub: tariff.priceRub,
-                paymentMethod: PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS,
-                amountPoints,
-                pointsChargedAt: chargedAt,
-                rubChargedAt: null,
+                    const [promotion] = await ProductPromotionModel.create(
+                        [
+                            {
+                                productId,
+                                sellerId: userId,
+                                status: PRODUCT_PROMOTION_STATUS_PENDING_STAFF,
+                                tariffCode: tariff.code,
+                                tariffTitle: tariff.title,
+                                durationHours: tariff.durationHours,
+                                amountRub: tariff.priceRub,
+                                paymentMethod: PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS,
+                                amountPoints,
+                                pointsChargedAt: chargedAt,
+                                rubChargedAt: null,
+                            },
+                        ],
+                        withMongoSession({}, session),
+                    );
+
+                    await activateProductPromotionRecord(promotion, {
+                        approvedByUserId: null,
+                        notificationMessage: promotionMessage,
+                        actorUserId: null,
+                        session,
+                        skipNotification: true,
+                    });
+
+                    return { promotion, loyaltyPointsBalance };
+                },
+            );
+
+            await createUserInAppNotification({
+                userId: promotion.sellerId,
+                kind: PRODUCT_PROMOTION_NOTIFICATION_KIND_APPROVED,
+                message: promotionMessage,
+                productId: promotion.productId,
             });
 
-            await activateProductPromotionRecord(promotion, {
-                approvedByUserId: null,
-                notificationMessage: 'Продвижение товара активировано',
-                actorUserId: null,
-            });
             return successRes(res, {
                 message: 'Продвижение активировано. Баллы списаны.',
                 promotion: toPromotionPayload(promotion.toObject()),
                 loyaltyPointsBalance: loyaltyPointsBalance ?? null,
             });
         } catch (error) {
-            if (paymentDeducted) {
-                await refundLoyaltyPoints({ userId, amount: amountPoints });
-            }
             if (error instanceof InsufficientLoyaltyPointsError) {
                 return errorRes(
                     res,

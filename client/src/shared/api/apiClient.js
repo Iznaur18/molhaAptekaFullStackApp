@@ -20,3 +20,50 @@ export const clearLegacyAuthTokenStorage = () => {
 };
 
 clearLegacyAuthTokenStorage();
+
+let refreshSessionPromise = null;
+
+const shouldSkipAuthRefresh = (url) => {
+  const path = String(url ?? "");
+  return (
+    path.includes("/auth/refresh") ||
+    path.includes("/auth/login") ||
+    path.includes("/auth/register") ||
+    path.includes("/auth/logout")
+  );
+};
+
+const refreshAuthSession = () => {
+  if (!refreshSessionPromise) {
+    refreshSessionPromise = apiClient
+      .post("/auth/refresh")
+      .finally(() => {
+        refreshSessionPromise = null;
+      });
+  }
+  return refreshSessionPromise;
+};
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    if (
+      error.response?.status !== 401 ||
+      !originalRequest ||
+      originalRequest._authRefreshAttempted ||
+      shouldSkipAuthRefresh(originalRequest.url)
+    ) {
+      return Promise.reject(error);
+    }
+
+    originalRequest._authRefreshAttempted = true;
+
+    try {
+      await refreshAuthSession();
+      return apiClient(originalRequest);
+    } catch {
+      return Promise.reject(error);
+    }
+  },
+);

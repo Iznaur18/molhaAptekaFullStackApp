@@ -2,6 +2,7 @@ import { uploadController } from './User/uploadController.js';
 import { uploadVideoController } from './User/uploadVideoController.js';
 import { registerUserController } from './User/registerUserController.js';
 import { loginUserController, logoutUserController, userGetProfileController, userMeController, userUpdateProfileController, userDeleteProfileController } from './User/loginUserController.js';
+import { refreshAuthController } from './User/refreshAuthController.js';
 import {
     resendEmailVerificationController,
     verifyEmailController,
@@ -166,6 +167,7 @@ export {
     registerUserController,
     loginUserController,
     logoutUserController,
+    refreshAuthController,
     verifyEmailController,
     resendEmailVerificationController,
     userVoteRatingController,

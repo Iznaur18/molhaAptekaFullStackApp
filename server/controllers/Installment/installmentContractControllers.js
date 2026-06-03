@@ -22,6 +22,7 @@ import {
     buildOrderLineLoyaltySnapshot,
     reserveLoyaltyPointsForNewOrder,
 } from '../../utils/orderLoyaltyPoints.js';
+import { cancelLinkedOrderForInstallmentContract } from '../../utils/cancelLinkedOrderForInstallmentContract.js';
 import { runInTransaction, withMongoSession } from '../../utils/mongoTransaction.js';
 import { PRODUCT_MODERATION_APPROVED } from '../../constants/productModerationConstants.js';
 import {
@@ -657,11 +658,14 @@ export const cancelInstallmentContractController = async (req, res) => {
             return errorRes(res, 409, 'Контракт уже отменён');
         }
 
-        contract.status = INSTALLMENT_CONTRACT_STATUS_CANCELLED;
-        contract.cancelledAt = new Date();
-        contract.cancelledByUserId = req.userId;
-        contract.cancellationReason = reason;
-        await contract.save();
+        await runInTransaction(async (session) => {
+            contract.status = INSTALLMENT_CONTRACT_STATUS_CANCELLED;
+            contract.cancelledAt = new Date();
+            contract.cancelledByUserId = req.userId;
+            contract.cancellationReason = reason;
+            await contract.save({ session });
+            await cancelLinkedOrderForInstallmentContract(contract.orderId, session);
+        });
 
         return successRes(res, {
             message: 'Контракт отменён',
@@ -845,47 +849,53 @@ export const resolveInstallmentDisputeController = async (req, res) => {
             return errorRes(res, 404, 'Контракт не найден');
         }
 
-        if (action === 'cancel') {
-            contract.status = INSTALLMENT_CONTRACT_STATUS_CANCELLED;
-            contract.cancelledAt = new Date();
-            contract.cancelledByUserId = req.userId;
-            contract.cancellationReason = resolutionNote ?? '';
-            await contract.save();
-        } else if (action === 'close') {
-            contract.status = INSTALLMENT_CONTRACT_STATUS_COMPLETED;
-            contract.completedAt = new Date();
-            contract.nextPaymentDueAt = null;
-            contract.hasOverduePayment = false;
-            await contract.save();
-        } else if (action === 'partial_refund') {
-            const amount = Math.floor(Number(partialRefundRub));
-            if (!Number.isFinite(amount) || amount <= 0) {
-                return errorRes(res, 400, 'Укажите сумму частичного возврата');
-            }
-            contract.totalAmountRub = Math.max(
-                contract.paidAmountRub,
-                (Number(contract.totalAmountRub) || 0) - amount,
-            );
-            resolveContractStatusAfterPayment(contract);
-            await contract.save();
-        } else if (action === 'adjust_schedule') {
-            const nextDue = contract.payments.find(
-                (payment) => payment.status !== INSTALLMENT_PAYMENT_STATUS_PAID,
-            );
-            if (nextDue) {
-                nextDue.dueAt = new Date(
-                    nextDue.dueAt.getTime() + 30 * 24 * 60 * 60 * 1000,
+        await runInTransaction(async (session) => {
+            if (action === 'cancel') {
+                contract.status = INSTALLMENT_CONTRACT_STATUS_CANCELLED;
+                contract.cancelledAt = new Date();
+                contract.cancelledByUserId = req.userId;
+                contract.cancellationReason = resolutionNote ?? '';
+                await contract.save({ session });
+                await cancelLinkedOrderForInstallmentContract(
+                    contract.orderId,
+                    session,
                 );
+            } else if (action === 'close') {
+                contract.status = INSTALLMENT_CONTRACT_STATUS_COMPLETED;
+                contract.completedAt = new Date();
+                contract.nextPaymentDueAt = null;
+                contract.hasOverduePayment = false;
+                await contract.save({ session });
+            } else if (action === 'partial_refund') {
+                const amount = Math.floor(Number(partialRefundRub));
+                if (!Number.isFinite(amount) || amount <= 0) {
+                    throw new Error('INVALID_PARTIAL_REFUND');
+                }
+                contract.totalAmountRub = Math.max(
+                    contract.paidAmountRub,
+                    (Number(contract.totalAmountRub) || 0) - amount,
+                );
+                resolveContractStatusAfterPayment(contract);
+                await contract.save({ session });
+            } else if (action === 'adjust_schedule') {
+                const nextDue = contract.payments.find(
+                    (payment) => payment.status !== INSTALLMENT_PAYMENT_STATUS_PAID,
+                );
+                if (nextDue) {
+                    nextDue.dueAt = new Date(
+                        nextDue.dueAt.getTime() + 30 * 24 * 60 * 60 * 1000,
+                    );
+                }
+                recomputeContractOverdueFlags(contract);
+                await contract.save({ session });
             }
-            recomputeContractOverdueFlags(contract);
-            await contract.save();
-        }
 
-        dispute.status = INSTALLMENT_DISPUTE_STATUS_RESOLVED;
-        dispute.resolutionNote = String(resolutionNote ?? '').trim();
-        dispute.resolvedByUserId = req.userId;
-        dispute.resolvedAt = new Date();
-        await dispute.save();
+            dispute.status = INSTALLMENT_DISPUTE_STATUS_RESOLVED;
+            dispute.resolutionNote = String(resolutionNote ?? '').trim();
+            dispute.resolvedByUserId = req.userId;
+            dispute.resolvedAt = new Date();
+            await dispute.save({ session });
+        });
 
         return successRes(res, {
             message: 'Спор рассмотрен',
@@ -897,6 +907,9 @@ export const resolveInstallmentDisputeController = async (req, res) => {
             contract: await buildInstallmentContractPayload(contract),
         });
     } catch (error) {
+        if (error instanceof Error && error.message === 'INVALID_PARTIAL_REFUND') {
+            return errorRes(res, 400, 'Укажите сумму частичного возврата');
+        }
         console.error('resolveInstallmentDisputeController error:', error);
         return errorRes(res, 500, 'Ошибка');
     }

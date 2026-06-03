@@ -8,6 +8,7 @@ import {
     PRODUCT_PROMOTION_STATUS_CANCELLED_BY_ADMIN,
     PRODUCT_PROMOTION_STATUS_EXPIRED,
 } from '../constants/productPromotionConstants.js';
+import { withMongoSession } from './mongoTransaction.js';
 import { refundLoyaltyPoints } from './loyaltyPointsSpend.js';
 import { refundRubBalance } from './rubBalanceSpend.js';
 import { createUserInAppNotification } from './userInAppNotifications.js';
@@ -49,6 +50,7 @@ export const setProductPromotionForProduct = async ({
     productId,
     activatedAt,
     activeUntil,
+    session = null,
 }) => {
     await ProductModel.updateOne(
         { _id: productId },
@@ -58,6 +60,7 @@ export const setProductPromotionForProduct = async ({
                 catalogPromotionExpiresAt: activeUntil,
             },
         },
+        withMongoSession({}, session),
     );
 };
 
@@ -133,6 +136,8 @@ export const refundProductPromotionPaymentIfNeeded = async (promotionId) => {
  *   approvedByUserId?: import('mongoose').Types.ObjectId | string | null;
  *   notificationMessage?: string;
  *   actorUserId?: import('mongoose').Types.ObjectId | string | null;
+ *   session?: import('mongoose').ClientSession | null;
+ *   skipNotification?: boolean;
  * }} [options]
  */
 export const activateProductPromotionRecord = async (promotion, options = {}) => {
@@ -140,6 +145,8 @@ export const activateProductPromotionRecord = async (promotion, options = {}) =>
         approvedByUserId = null,
         notificationMessage = 'Продвижение товара одобрено и уже активно',
         actorUserId = approvedByUserId,
+        session = null,
+        skipNotification = false,
     } = options;
 
     const activatedAt = new Date();
@@ -151,21 +158,24 @@ export const activateProductPromotionRecord = async (promotion, options = {}) =>
     promotion.approvedByUserId = approvedByUserId ?? null;
     promotion.activatedAt = activatedAt;
     promotion.activeUntil = activeUntil;
-    await promotion.save();
+    await promotion.save({ session: session ?? undefined });
 
     await setProductPromotionForProduct({
         productId: promotion.productId,
         activatedAt,
         activeUntil,
+        session,
     });
 
-    await createUserInAppNotification({
-        userId: promotion.sellerId,
-        kind: PRODUCT_PROMOTION_NOTIFICATION_KIND_APPROVED,
-        message: notificationMessage,
-        productId: promotion.productId,
-        ...(actorUserId ? { actorUserId } : {}),
-    });
+    if (!skipNotification) {
+        await createUserInAppNotification({
+            userId: promotion.sellerId,
+            kind: PRODUCT_PROMOTION_NOTIFICATION_KIND_APPROVED,
+            message: notificationMessage,
+            productId: promotion.productId,
+            ...(actorUserId ? { actorUserId } : {}),
+        });
+    }
 
     return { activatedAt, activeUntil };
 };

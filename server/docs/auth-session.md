@@ -2,37 +2,43 @@
 
 ## Flow
 
-1. `POST /auth/login` или `POST /auth/register` → JSON `{ success, data: user }`, JWT в **httpOnly** cookie `access_token`.
-2. Клиент: `axios` с `withCredentials: true` — cookie отправляется автоматически, **без** `Authorization` header.
-3. `GET /auth/me` — читает JWT из cookie (`checkAuthMW`).
-4. `POST /auth/logout` — `clearCookie`, клиент сбрасывает state.
+1. `POST /auth/login` или `POST /auth/register` → JSON `{ success, data: user }`, два httpOnly cookie:
+   - `access_token` (1 ч)
+   - `refresh_token` (30 д)
+2. Клиент: `axios` с `withCredentials: true` — cookie отправляется автоматически.
+3. `GET /auth/me` — читает access JWT из cookie (`checkAuthMW`).
+4. При **401** клиент один раз вызывает `POST /auth/refresh` и повторяет запрос.
+5. `POST /auth/logout` — очищает оба cookie.
 
 ## Cookie
 
-| Параметр | Значение |
-|----------|----------|
-| Имя | `access_token` |
-| httpOnly | да |
-| Secure | да в `NODE_ENV=production` |
-| SameSite | `lax` |
-| maxAge | 30 дней (как JWT `expiresIn`) |
-| path | `/` |
+| Cookie | TTL | typ в JWT |
+|--------|-----|-----------|
+| `access_token` | 1 ч | `access` |
+| `refresh_token` | 30 д | `refresh` |
+
+Общие параметры: httpOnly, path `/`, Secure в production (или при `COOKIE_CROSS_SITE=true`).
+
+| SameSite | Когда |
+|----------|-------|
+| `lax` | dev, same-origin proxy |
+| `none` | `COOKIE_CROSS_SITE=true` |
 
 ## Dev
 
 - `FRONTEND_URL=http://127.0.0.1:5173` в `server/.env`
-- Vite proxy `/auth` → `127.0.0.1:4444` (same-site для cookie)
+- Vite proxy `/auth` → `127.0.0.1:4444`
 - Legacy `localStorage.rassro_auth_token` удаляется при загрузке `apiClient.js`
 
 ## Insomnia / API tools
 
-Поддерживается fallback: `Authorization: Bearer <token>` (cookie не обязателен).
+Fallback: `Authorization: Bearer <access_token>`.
 
 ## Production
 
 - `NODE_ENV=production` + `FRONTEND_URL` обязателен
 - HTTPS → `Secure` cookie активен
 
-## Отложено (v2)
+## Legacy токены
 
-- Refresh token + короткий TTL access
+Access JWT без поля `typ` принимается `checkAuthMW` (обратная совместимость до истечения старых 30d cookie).

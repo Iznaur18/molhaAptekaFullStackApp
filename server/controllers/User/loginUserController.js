@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import { UserModel, UserVoteRatingModel } from '../../models/index.js';
 import { deleteAllFollowsForUser } from '../../utils/userFollowHelpers.js';
 import { sendUserWithToken, errorRes, successRes } from '../../utils/index.js';
-import { clearAuthCookie } from '../../utils/authCookie.js';
+import { clearAuthCookie, clearRefreshCookie } from '../../utils/authCookie.js';
 import {
     USER_DATA,
     ALLOWED_FIELDS_FOR_USER,
@@ -79,6 +79,7 @@ export const loginUserController = async (req, res) => { // обработчик
 export const logoutUserController = async (req, res) => {
     try {
         clearAuthCookie(res);
+        clearRefreshCookie(res);
         return successRes(res, { message: 'Вы вышли из аккаунта' });
     } catch (error) {
         console.error('logoutUserController error:', error);

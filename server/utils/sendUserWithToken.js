@@ -1,20 +1,13 @@
-import jwt from 'jsonwebtoken';
-import { successRes } from './successRes.js';
-import { setAuthCookie } from './authCookie.js';
-
-const TOKEN_OPTIONS = { expiresIn: '30d' };
+import { setAuthCookie, setRefreshCookie } from './authCookie.js';
+import { signAccessToken, signRefreshToken } from './authTokens.js';
 
 /**
- * Ответ login/register: user в JSON, JWT в httpOnly cookie.
- *
- * @param {object} user - документ пользователя (mongoose)
- * @param {object} res - объект response Express
+ * @param {import('mongoose').Document} user
+ * @param {import('express').Response} res
  */
-export function sendUserWithToken(user, res) {
-    const { passwordHash, ...userData } = user._doc;
-
-    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, TOKEN_OPTIONS);
-    setAuthCookie(res, token);
-
-    return successRes(res, userData);
-}
+export const sendUserWithToken = (user, res) => {
+    const userId = user._id.toString();
+    setAuthCookie(res, signAccessToken(userId));
+    setRefreshCookie(res, signRefreshToken(userId));
+    return res.status(200).json({ success: true, data: user });
+};

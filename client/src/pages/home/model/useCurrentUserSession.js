@@ -79,6 +79,7 @@ export const useCurrentUserSession = (isAuthorized, isAuthReady) => {
     setLoyaltyPoints,
     setLoyaltyPointsReserved,
     setCurrentUserId,
+    setIsPremiumUser,
     setIsEmailVerified,
     isSessionReady,
   };

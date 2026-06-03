@@ -18,7 +18,7 @@ import { isPremiumActive } from '../../utils/premiumAccess.js';
 import { finalizeOffersAfterOrderConfirmed } from '../../utils/productPriceOfferHelpers.js';
 import { closeProductAuction } from '../../utils/productAuction.js';
 import { syncRaffleProgressForProductSale } from '../../utils/raffleHelpers.js';
-import { decrementProductStockOnItemConfirmed } from '../../utils/productStock.js';
+import { decrementProductStockOnItemConfirmed, syncProductCatalogAfterStockChange } from '../../utils/productStock.js';
 
 import {
     ORDER_BUYER_PUBLIC_FIELDS,
@@ -228,6 +228,12 @@ export const confirmOrderItemByBuyerController = async (req, res) => {
 
         let pointsEarned = 0;
 
+        const productId = targetItem.productId
+            ? typeof targetItem.productId === 'object'
+                ? targetItem.productId._id
+                : targetItem.productId
+            : null;
+
         try {
             pointsEarned = await runInTransaction(async (session) => {
                 const earned = prepareLoyaltyPointsForConfirmedOrderItem({
@@ -270,6 +276,14 @@ export const confirmOrderItemByBuyerController = async (req, res) => {
                 order.status = buildOrderStatusFromItems(order.items);
                 await order.save({ session });
 
+                if (productId) {
+                    await decrementProductStockOnItemConfirmed(
+                        productId,
+                        targetItem.quantity,
+                        session,
+                    );
+                }
+
                 return earned;
             });
         } catch (txError) {
@@ -287,23 +301,16 @@ export const confirmOrderItemByBuyerController = async (req, res) => {
             );
         }
 
-        if (targetItem.productId) {
-            const productId =
-                typeof targetItem.productId === 'object'
-                    ? targetItem.productId._id
-                    : targetItem.productId;
+        if (productId) {
+            try {
+                await syncProductCatalogAfterStockChange(productId);
+            } catch (stockSyncError) {
+                console.error('syncProductCatalogAfterStockChange error:', stockSyncError);
+            }
             try {
                 await syncRaffleProgressForProductSale(productId);
             } catch (raffleSyncError) {
                 console.error('syncRaffleProgressForProductSale error:', raffleSyncError);
-            }
-            try {
-                await decrementProductStockOnItemConfirmed(
-                    productId,
-                    targetItem.quantity,
-                );
-            } catch (stockError) {
-                console.error('decrementProductStockOnItemConfirmed error:', stockError);
             }
             try {
                 if (order.priceOfferId) {

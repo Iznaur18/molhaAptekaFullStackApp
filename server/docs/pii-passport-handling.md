@@ -10,7 +10,7 @@
 | Актор | Доступ |
 |-------|--------|
 | Покупатель (`GET /user/me/data-confirmation-request`) | Статус заявки, `staffNote` при отклонении. **Без** `passport` и `passportSelfiePhotoUrl`. |
-| Staff / модератор (`GET /user/data-confirmation-requests/pending`, resolve) | Полный паспорт и selfie — только с `checkProductModeratorMW`. |
+| Staff / модератор (`GET /user/data-confirmation-requests/pending`, resolve) | Маскированные серия/номер, остальные поля паспорта и selfie — только с `checkProductModeratorMW`. |
 | Продавец, заказы, рассрочка | Паспорт **не** отдаётся в API ответах. |
 
 ## Срок хранения (рекомендация v1)
@@ -27,4 +27,4 @@
 ## Маскирование в API
 
 - Покупатель: поля паспорта не возвращаются (`sanitizeDataConfirmationRequestForBuyer`).
-- Staff-очередь: полные данные (нужны для проверки в UI).
+- Staff-очередь: серия и номер маскируются (`maskPassportForBuyerApi`); ФИО, даты, кем выдан и selfie URL — для проверки в UI.

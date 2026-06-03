@@ -231,17 +231,23 @@ export const syncProductCatalogAfterStockChange = async (productId) => {
 /**
  * @param {import('mongoose').Types.ObjectId | string} productId
  * @param {number} quantity
+ * @param {import('mongoose').ClientSession | null} [session]
  */
-export const decrementProductStockOnItemConfirmed = async (productId, quantity) => {
+export const decrementProductStockOnItemConfirmed = async (
+    productId,
+    quantity,
+    session = null,
+) => {
     const qty = Math.max(0, Math.floor(Number(quantity)) || 0);
     if (qty === 0) {
         return;
     }
 
+    const updateOptions = { returnDocument: 'after', ...(session ? { session } : {}) };
     const updated = await ProductModel.findByIdAndUpdate(
         productId,
         { $inc: { productStockQuantity: -qty } },
-        { returnDocument: 'after' },
+        updateOptions,
     ).select('productStockQuantity');
 
     if (!updated) {
@@ -252,10 +258,13 @@ export const decrementProductStockOnItemConfirmed = async (productId, quantity) 
         await ProductModel.updateOne(
             { _id: productId },
             { $set: { productStockQuantity: 0 } },
+            session ? { session } : {},
         );
     }
 
-    await syncProductCatalogAfterStockChange(productId);
+    if (!session) {
+        await syncProductCatalogAfterStockChange(productId);
+    }
 };
 
 /**

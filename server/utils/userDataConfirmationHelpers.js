@@ -16,7 +16,11 @@ import {
     UserModel,
 } from '../models/index.js';
 import { normalizeStoredUploadUrl } from './buildPublicUploadUrl.js';
-import { sanitizeDataConfirmationRequestForBuyer } from './maskPassportForApi.js';
+import { runInTransaction } from './mongoTransaction.js';
+import {
+    maskPassportForBuyerApi,
+    sanitizeDataConfirmationRequestForBuyer,
+} from './maskPassportForApi.js';
 import { createUserInAppNotification } from './userInAppNotifications.js';
 import { assertMinWords } from './maxWordsText.js';
 
@@ -96,6 +100,9 @@ export const getPendingDataConfirmationRequests = async () => {
 
     const requests = rows.map((row) => ({
         ...row,
+        _id: String(row._id),
+        userId: String(row.userId),
+        passport: maskPassportForBuyerApi(row.passport),
         user: userById.get(String(row.userId)) ?? null,
     }));
 
@@ -158,17 +165,25 @@ export const resolveDataConfirmationRequest = async (
     }
 
     if (resolution === USER_DATA_CONFIRMATION_RESOLUTION_APPROVE) {
-        await UserDataConfirmationRequestModel.findByIdAndUpdate(requestId, {
-            $set: {
-                status: USER_DATA_CONFIRMATION_STATUS_APPROVED,
-                staffNote: String(staffNote ?? '').trim(),
-                reviewedBy: staffUserId,
-                reviewedAt: now,
-            },
-        });
+        await runInTransaction(async (session) => {
+            await UserDataConfirmationRequestModel.findByIdAndUpdate(
+                requestId,
+                {
+                    $set: {
+                        status: USER_DATA_CONFIRMATION_STATUS_APPROVED,
+                        staffNote: String(staffNote ?? '').trim(),
+                        reviewedBy: staffUserId,
+                        reviewedAt: now,
+                    },
+                },
+                { session },
+            );
 
-        await UserModel.findByIdAndUpdate(applicantId, {
-            $set: { isUserDataConfirmed: true },
+            await UserModel.findByIdAndUpdate(
+                applicantId,
+                { $set: { isUserDataConfirmed: true } },
+                { session },
+            );
         });
 
         await createUserInAppNotification({

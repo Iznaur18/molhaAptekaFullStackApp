@@ -1,5 +1,5 @@
-import jwt from 'jsonwebtoken';
 import { getAuthTokenFromRequest } from '../utils/authCookie.js';
+import { verifyAccessToken } from '../utils/authTokens.js';
 import { errorRes } from '../utils/index.js';
 
 export const checkAuthMW = (req, res, next) => {
@@ -10,7 +10,7 @@ export const checkAuthMW = (req, res, next) => {
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = verifyAccessToken(token);
         req.userId = decoded._id;
         next();
     } catch {
