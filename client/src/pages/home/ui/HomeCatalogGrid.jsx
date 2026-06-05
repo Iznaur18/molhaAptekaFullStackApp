@@ -1,6 +1,7 @@
 import { useMemo, useRef } from "react";
 
 import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import { isProductTier3BannerPromotion } from "../../../entities/product/lib/isProductTier3BannerPromotion.js";
 import { CATALOG_VIRTUALIZATION_MIN_ITEM_COUNT } from "../lib/catalogGridVirtualizationConstants.js";
 import { useCatalogGridColumnCount } from "../model/useCatalogGridColumnCount.js";
 import { useCatalogGridVirtualizer } from "../model/useCatalogGridVirtualizer.js";
@@ -17,7 +18,6 @@ import { CatalogGridProductCard } from "./CatalogGridProductCard.jsx";
  *   onDeleteMyProduct: (productId: string) => void;
  *   onEditMyProduct?: (product: import('../../../entities/product/model/types.js').ProductFromApi) => void;
  *   onPromoteMyProduct?: (product: import('../../../entities/product/model/types.js').ProductFromApi) => void;
- *   pendingPromotionProductIds?: Set<string>;
  *   myProductsCatalogError: string;
  *   myProductsCatalogNotice?: string;
  *   onOpenProductDetails: (product: import('../../../entities/product/model/types.js').ProductFromApi) => void;
@@ -40,6 +40,7 @@ import { CatalogGridProductCard } from "./CatalogGridProductCard.jsx";
  *   catalogAuctionOnly?: boolean;
  *   catalogInstallmentOnly?: boolean;
  *   catalogSaleOnly?: boolean;
+ *   showFullWidthTier3Banners?: boolean;
  *   highlightRaffleProducts?: boolean;
  *   sellerRaffleActive?: boolean;
  *   onToggleRaffleParticipation?: (
@@ -61,7 +62,6 @@ export function HomeCatalogGrid({
   onDeleteMyProduct,
   onEditMyProduct,
   onPromoteMyProduct,
-  pendingPromotionProductIds,
   myProductsCatalogError,
   myProductsCatalogNotice = "",
   onOpenProductDetails,
@@ -84,6 +84,7 @@ export function HomeCatalogGrid({
   catalogAuctionOnly = false,
   catalogInstallmentOnly = false,
   catalogSaleOnly = false,
+  showFullWidthTier3Banners = false,
   highlightRaffleProducts = false,
   sellerRaffleActive = false,
   onToggleRaffleParticipation,
@@ -91,35 +92,43 @@ export function HomeCatalogGrid({
   sellerLoyaltyPointsBalance = 0,
   sellerLoyaltyPointsReserved = 0,
 }) {
-  const pendingIds = pendingPromotionProductIds ?? new Set();
   const virtualHostRef = useRef(/** @type {HTMLDivElement | null} */ (null));
   const virtualGridRef = useRef(/** @type {HTMLDivElement | null} */ (null));
-  const shouldVirtualize = products.length > CATALOG_VIRTUALIZATION_MIN_ITEM_COUNT;
+
+  const { tier3BannerProducts, gridProducts } = useMemo(() => {
+    if (!showFullWidthTier3Banners || isMineMode) {
+      return { tier3BannerProducts: [], gridProducts: products };
+    }
+    const banners = products.filter((product) => isProductTier3BannerPromotion(product));
+    const rest = products.filter((product) => !isProductTier3BannerPromotion(product));
+    return { tier3BannerProducts: banners, gridProducts: rest };
+  }, [isMineMode, products, showFullWidthTier3Banners]);
+
+  const shouldVirtualize = gridProducts.length > CATALOG_VIRTUALIZATION_MIN_ITEM_COUNT;
   const columnCount = useCatalogGridColumnCount(virtualHostRef, shouldVirtualize);
   const virtualWindow = useCatalogGridVirtualizer({
     enabled: shouldVirtualize,
     hostRef: virtualHostRef,
     gridRef: virtualGridRef,
-    itemCount: products.length,
+    itemCount: gridProducts.length,
     columnCount,
   });
 
   const visibleProducts = useMemo(() => {
     if (!shouldVirtualize) {
-      return products;
+      return gridProducts;
     }
-    return products.slice(virtualWindow.startIndex, virtualWindow.endIndex + 1);
-  }, [products, shouldVirtualize, virtualWindow.endIndex, virtualWindow.startIndex]);
+    return gridProducts.slice(virtualWindow.startIndex, virtualWindow.endIndex + 1);
+  }, [gridProducts, shouldVirtualize, virtualWindow.endIndex, virtualWindow.startIndex]);
 
   const cardProps = {
-    products,
+    products: gridProducts,
     isMineMode,
     deletingProductId,
     onSellerNameClick,
     onDeleteMyProduct,
     onEditMyProduct,
     onPromoteMyProduct,
-    pendingPromotionProductIds: pendingIds,
     onOpenProductDetails,
     onSetMyProductAvailability,
     onSetMyProductAuction,
@@ -162,9 +171,19 @@ export function HomeCatalogGrid({
     return HOME_PAGE_UI.EMPTY_NO_PRODUCTS;
   })();
 
-  const gridNodes = visibleProducts.map((product) => (
-    <CatalogGridProductCard key={product._id} product={product} {...cardProps} />
-  ));
+  const renderProductCard = (product, { promotionFullWidth = false } = {}) => (
+    <CatalogGridProductCard
+      key={product._id}
+      product={product}
+      promotionFullWidth={promotionFullWidth}
+      {...cardProps}
+    />
+  );
+
+  const gridNodes = visibleProducts.map((product) => renderProductCard(product));
+  const tier3BannerNodes = tier3BannerProducts.map((product) =>
+    renderProductCard(product, { promotionFullWidth: true }),
+  );
 
   return (
     <>
@@ -182,6 +201,15 @@ export function HomeCatalogGrid({
         <p className="home-page__state">{emptyMessage}</p>
       ) : (
         <>
+          {tier3BannerNodes.length > 0 ? (
+            <div
+              className="home-page__grid home-page__grid--tier3-banners"
+              role="list"
+              aria-label={HOME_PAGE_UI.CATALOG_PROMOTED_BANNERS_ARIA}
+            >
+              {tier3BannerNodes}
+            </div>
+          ) : null}
           {shouldVirtualize ? (
             <div
               ref={virtualHostRef}

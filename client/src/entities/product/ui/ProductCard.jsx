@@ -13,7 +13,15 @@ import { getProductPurchaseLimit } from "../lib/getProductPurchaseLimit.js";
 import { isProductRaffleParticipant } from "../../raffle/lib/isProductRaffleParticipant.js";
 import { resolveAuctionUiState } from "../lib/resolveAuctionUiState.js";
 import { shouldShowPremiumProductCardChrome } from "../lib/isPremiumSellerProduct.js";
-import { isCatalogPromotionActive } from "../lib/productPromotionStatus.js";
+import {
+  formatPromotionExpiresAt,
+  isCatalogPromotionActive,
+} from "../lib/productPromotionStatus.js";
+import {
+  getProductPromotionTierLabel,
+  PRODUCT_PROMOTION_TIER_BANNER,
+  PRODUCT_PROMOTION_TIER_TOP,
+} from "../lib/calculateProductPromotionPointsCost.js";
 import { resolveProductImageUrls } from "../lib/resolveProductImageUrls.js";
 import { buildProductMediaSlides } from "../lib/buildProductMediaSlides.js";
 import { resolveProductPreviewVideoUrl } from "../lib/resolveProductPreviewVideoUrl.js";
@@ -66,8 +74,8 @@ import "./ProductCard.css";
  * @param {() => void} [props.onRequestLoginAddToCart]
  * @param {boolean} [props.showAddToCartOnCard]
  * @param {boolean} [props.isMineMode]
- * @param {boolean} [props.isPromotionPending]
  * @param {boolean} [props.highlightCatalogPromotion]
+ * @param {boolean} [props.promotionFullWidth]
  * @param {boolean} [props.highlightRaffleProduct]
  * @param {boolean} [props.isLoyaltyPointsOvercommitted]
  * @param {boolean} [props.isModerationQueue]
@@ -101,8 +109,8 @@ export function ProductCard({
   onRequestLoginAddToCart = () => {},
   showAddToCartOnCard = true,
   isMineMode = false,
-  isPromotionPending = false,
   highlightCatalogPromotion = false,
+  promotionFullWidth = false,
   highlightRaffleProduct = false,
   isLoyaltyPointsOvercommitted = false,
   isModerationQueue = false,
@@ -183,6 +191,7 @@ export function ProductCard({
       ? String(product.productModerationComment).trim()
       : "";
   const isPromotionActive = isCatalogPromotionActive(product);
+  const promotionTier = Number(product.catalogPromotionTier) || 0;
 
   const renderModerationBadge = () => {
     if (!isMineMode && !isModerationQueue) return null;
@@ -283,20 +292,12 @@ export function ProductCard({
         </p>
       );
     }
-    if (isMineMode && isPromotionPending && !isPromotionActive) {
-      return (
-        <p
-          className="product-card__promotion-badge product-card__promotion-badge_pending"
-          role="status"
-        >
-          {PRODUCT_CARD_UI.PROMOTION_PENDING_BADGE}
-        </p>
-      );
-    }
-    if (isPromotionActive) {
+    if (isMineMode && isPromotionActive) {
+      const tierLabel = getProductPromotionTierLabel(promotionTier);
+      const until = formatPromotionExpiresAt(product.catalogPromotionExpiresAt);
       return (
         <p className="product-card__promotion-badge" role="status">
-          {PRODUCT_CARD_UI.PROMOTED_BADGE}
+          {PRODUCT_CARD_UI.PROMOTED_TIER_UNTIL(tierLabel, until)}
         </p>
       );
     }
@@ -320,7 +321,15 @@ export function ProductCard({
     isModerationQueue,
   });
   const showPromotionChrome =
-    highlightCatalogPromotion && !isMineMode && !isModerationQueue && isPromotionActive;
+    highlightCatalogPromotion &&
+    !isMineMode &&
+    !isModerationQueue &&
+    isPromotionActive &&
+    promotionTier > 0;
+  const showPromotionTopBadge =
+    showPromotionChrome && promotionTier === PRODUCT_PROMOTION_TIER_TOP;
+  const showPromotionBannerBadge =
+    showPromotionChrome && promotionTier === PRODUCT_PROMOTION_TIER_BANNER;
   const showRaffleBadge = !isModerationQueue && isProductRaffleParticipant(product);
   const showAuctionBadge = !isModerationQueue && auctionActive;
   const showInstallmentBadge =
@@ -370,6 +379,9 @@ export function ProductCard({
   const cardClassName = [
     "product-card",
     showRaffleParticipantChrome ? "product-card--raffle-participant" : "",
+    promotionFullWidth && promotionTier === PRODUCT_PROMOTION_TIER_BANNER
+      ? "product-card--banner-layout"
+      : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -497,6 +509,16 @@ export function ProductCard({
               {...statusBadgesDragScrollProps}
             >
               {renderStatusSlot()}
+              {showPromotionTopBadge ? (
+                <p className="product-card__promotion-top-badge" role="status">
+                  {PRODUCT_CARD_UI.PROMOTION_TOP_BADGE}
+                </p>
+              ) : null}
+              {showPromotionBannerBadge ? (
+                <p className="product-card__promotion-banner-badge" role="status">
+                  {PRODUCT_CARD_UI.PROMOTION_BANNER_BADGE}
+                </p>
+              ) : null}
               {showAuctionBadge ? (
                 <p className="product-card__auction-badge" role="status">
                   {PRODUCT_CARD_UI.AUCTION_BADGE}
@@ -581,6 +603,7 @@ export function ProductCard({
                 className="product-card__promote"
                 disabled={
                   product.productIsAvailable === false ||
+                  isPromotionActive ||
                   isDeletePending ||
                   isAvailabilityTogglePending ||
                   isAuctionTogglePending
@@ -628,6 +651,10 @@ export function ProductCard({
 
   const frameClassName = [
     showPromotionChrome ? "product-card-promotion-frame" : "",
+    showPromotionChrome && promotionTier === 1 ? "product-card-promotion-frame--tier-1" : "",
+    showPromotionChrome && promotionTier === 2 ? "product-card-promotion-frame--tier-2" : "",
+    showPromotionChrome && promotionTier === 3 ? "product-card-promotion-frame--tier-3" : "",
+    promotionFullWidth ? "product-card-promotion-frame--full-width" : "",
     showPremiumChrome ? "product-card-premium-frame" : "",
   ]
     .filter(Boolean)

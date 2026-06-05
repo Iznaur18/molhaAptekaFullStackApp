@@ -35,7 +35,6 @@ import { HomeCatalogGrid } from "./HomeCatalogGrid.jsx";
  *   onDeleteMyProduct: (productId: string) => void;
  *   onEditMyProduct: (product: ProductFromApi) => void;
  *   onPromoteMyProduct: (product: ProductFromApi) => void;
- *   pendingPromotionProductIds: Set<string>;
  *   myProductsCatalogError: string;
  *   myProductsCatalogNotice: string;
  *   onOpenProductDetails: (product: ProductFromApi) => void;
@@ -84,7 +83,6 @@ export function HomePageCatalogGridSection({
   onDeleteMyProduct,
   onEditMyProduct,
   onPromoteMyProduct,
-  pendingPromotionProductIds,
   myProductsCatalogError,
   myProductsCatalogNotice,
   onOpenProductDetails,
@@ -160,7 +158,6 @@ export function HomePageCatalogGridSection({
         onDeleteMyProduct={onDeleteMyProduct}
         onEditMyProduct={onEditMyProduct}
         onPromoteMyProduct={onPromoteMyProduct}
-        pendingPromotionProductIds={pendingPromotionProductIds}
         myProductsCatalogError={myProductsCatalogError}
         myProductsCatalogNotice={myProductsCatalogNotice}
         onOpenProductDetails={onOpenProductDetails}

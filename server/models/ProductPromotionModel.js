@@ -22,6 +22,12 @@ const ProductPromotionSchema = new mongoose.Schema(
       enum: PRODUCT_PROMOTION_STATUSES,
       required: true,
     },
+    tier: {
+      type: Number,
+      required: true,
+      min: 1,
+      max: 3,
+    },
     tariffCode: {
       type: String,
       required: true,

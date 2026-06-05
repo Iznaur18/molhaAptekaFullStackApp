@@ -34,7 +34,6 @@ import {
 } from "./product/productReviewValidation.js";
 import {
   requestProductPromotionValidation,
-  promotionIdParamValidation,
   myProductPromotionsValidation,
 } from "./product/productPromotionValidation.js";
 import {
@@ -126,7 +125,6 @@ export {
   patchProductReviewValidation,
   productReviewsListValidation,
   requestProductPromotionValidation,
-  promotionIdParamValidation,
   myProductPromotionsValidation,
   createRaffleValidation,
   patchRaffleValidation,

@@ -190,8 +190,11 @@ export function useHomePageShellState(location, navigate) {
   const [promotionProduct, setPromotionProduct] = useState(
     /** @type {ProductFromApi | null} */ (null),
   );
-  const [promotionTariffs, setPromotionTariffs] = useState(
-    /** @type {Array<{ code: string; title: string; durationHours: number; priceRub: number }>} */ ([]),
+  const [promotionConfig, setPromotionConfig] = useState(
+    /** @type {{ tiers: Array<{ tier: number; title: string; description: string }>; durations: Array<{ code: string; title: string; durationHours: number; durationMult: number }> }} */ ({
+      tiers: [],
+      durations: [],
+    }),
   );
   const [promotionModalError, setPromotionModalError] = useState("");
   const [isPromotionSubmitPending, setIsPromotionSubmitPending] = useState(false);
@@ -303,8 +306,8 @@ export function useHomePageShellState(location, navigate) {
     setIsReportProductModalOpen,
     promotionProduct,
     setPromotionProduct,
-    promotionTariffs,
-    setPromotionTariffs,
+    promotionConfig,
+    setPromotionConfig,
     promotionModalError,
     setPromotionModalError,
     isPromotionSubmitPending,

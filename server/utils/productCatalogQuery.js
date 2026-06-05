@@ -7,6 +7,10 @@ import { ProductModel } from "../models/index.js";
 import mongoose from "mongoose";
 
 import { attachProductSellerSnapshots } from "./attachProductSellerSnapshots.js";
+import {
+  buildCatalogPromotionSortStage,
+  catalogPromotionSortBoostAddFieldsStage,
+} from "./productCatalogPromotionSort.js";
 
 const { ObjectId } = mongoose.Types;
 
@@ -97,48 +101,21 @@ const sellerLookupStages = () => [
 ];
 
 const sortStageForCatalog = (sort, searchRank) => {
-  if (searchRank?.escapedRegexPattern) {
-    if (sort === PRODUCT_SORT_PURCHASES) {
-      return {
-        $sort: {
-          _searchRank: -1,
-          soldQuantity: -1,
-          createdAt: -1,
-        },
-      };
-    }
-    if (sort === PRODUCT_SORT_VIEWS) {
-      return {
-        $sort: {
-          _searchRank: -1,
-          uniqueViewerCount: -1,
-          createdAt: -1,
-        },
-      };
-    }
-    return {
-      $sort: {
-        _searchRank: -1,
-        catalogPromotionActivatedAt: -1,
-        catalogPromotionExpiresAt: -1,
-        createdAt: -1,
-      },
-    };
+  const useSearchRank = Boolean(searchRank?.escapedRegexPattern);
+  const stages = [];
+
+  if (!useSearchRank && sort === PRODUCT_SORT_NEWEST) {
+    stages.push(catalogPromotionSortBoostAddFieldsStage);
   }
 
-  if (sort === PRODUCT_SORT_PURCHASES) {
-    return { $sort: { soldQuantity: -1, createdAt: -1 } };
-  }
-  if (sort === PRODUCT_SORT_VIEWS) {
-    return { $sort: { uniqueViewerCount: -1, createdAt: -1 } };
-  }
-  return {
-    $sort: {
-      catalogPromotionActivatedAt: -1,
-      catalogPromotionExpiresAt: -1,
-      createdAt: -1,
-    },
-  };
+  stages.push(
+    buildCatalogPromotionSortStage(sort, {
+      useSearchRank,
+      searchScoreField: "_searchRank",
+    }),
+  );
+
+  return stages.length === 1 ? stages[0] : stages;
 };
 
 /**
@@ -194,14 +171,17 @@ export const findProductsPage = async (
     ? [searchRankAddFieldsStage(searchRank)]
     : [];
 
+  const sortStages = sortStageForCatalog(sort, searchRank);
+  const sortPipeline = Array.isArray(sortStages) ? sortStages : [sortStages];
+
   const products = await ProductModel.aggregate([
     { $match: normalizeProductsQueryForAggregate(productsQuery) },
     ...rankStage,
-    sortStageForCatalog(sort, searchRank),
+    ...sortPipeline,
     { $skip: skip },
     { $limit: limit },
     ...sellerLookupStages(),
-    { $project: { _searchRank: 0 } },
+    { $project: { _searchRank: 0, _promotionSortTier: 0 } },
   ]);
 
   return attachProductSellerSnapshots(products);

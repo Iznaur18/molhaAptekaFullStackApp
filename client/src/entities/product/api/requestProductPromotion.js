@@ -3,7 +3,7 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 
 /**
  * @param {string} productId
- * @param {{ tariffCode: string }} body
+ * @param {{ tier: number; tariffCode: string }} body
  * @returns {Promise<{
  *   promotion: Record<string, unknown>;
  *   loyaltyPointsBalance: number | null;

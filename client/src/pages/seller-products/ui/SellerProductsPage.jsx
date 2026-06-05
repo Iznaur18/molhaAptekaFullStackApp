@@ -1,11 +1,13 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { fetchUserProfileById } from "../../../entities/user/api/fetchUserProfileById.js";
 import { pickUserProfilePhotoUrl } from "../../../entities/user/lib/pickUserProfilePhotoUrl.js";
 import {
   formatProfileImageObjectPosition,
   getUserAvatarFocus,
+  getUserBackgroundFocus,
 } from "../../../entities/user/lib/profileImageFocus.js";
+import { resolveUserProfileBackgroundFromUser } from "../../../entities/user/lib/userBackgroundValue.js";
 import { UserFollowButton } from "../../../entities/user-follow/ui/UserFollowButton.jsx";
 import { UserPremiumAvatar } from "../../../entities/user/ui/UserPremiumAvatar.jsx";
 import { UserPremiumDisplayName } from "../../../entities/user/ui/UserPremiumDisplayName.jsx";
@@ -13,6 +15,7 @@ import { HomeCatalogGrid } from "../../home/ui/HomeCatalogGrid.jsx";
 import { useSellerProductsCatalog } from "../model/useSellerProductsCatalog.js";
 import { SELLER_PRODUCTS_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
+import "../../../entities/user/ui/UserDetailsModal.css";
 import "./SellerProductsPage.css";
 
 /**
@@ -50,6 +53,8 @@ export function SellerProductsPage({
     ),
   );
   const [profileError, setProfileError] = useState("");
+  const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
+  const [backgroundLoadFailed, setBackgroundLoadFailed] = useState(false);
 
   const catalogEnabled = isAuthorized && isSessionReady;
   const {
@@ -88,6 +93,28 @@ export function SellerProductsPage({
   useEffect(() => {
     void loadProfile();
   }, [loadProfile]);
+
+  useEffect(() => {
+    setAvatarLoadFailed(false);
+    setBackgroundLoadFailed(false);
+  }, [seller?._id]);
+
+  const photoUrl = pickUserProfilePhotoUrl(seller);
+  const avatarObjectPosition = useMemo(
+    () => formatProfileImageObjectPosition(getUserAvatarFocus(seller)),
+    [seller],
+  );
+  const backgroundObjectPosition = useMemo(
+    () => formatProfileImageObjectPosition(getUserBackgroundFocus(seller)),
+    [seller],
+  );
+  const profileBackground = seller ? resolveUserProfileBackgroundFromUser(seller) : null;
+  const canShowBackground =
+    Boolean(profileBackground) &&
+    (profileBackground.kind === "preset" ||
+      (profileBackground.kind === "image" && !backgroundLoadFailed));
+  const showProfileBanner =
+    Boolean(seller) && (canShowBackground || (Boolean(photoUrl) && !avatarLoadFailed));
 
   const handleFollowChange = useCallback(
     (/** @type {{ isFollowing: boolean }} */ patch) => {
@@ -131,10 +158,6 @@ export function SellerProductsPage({
   }
 
   const sellerName = String(seller?.userName ?? "").trim() || "продавца";
-  const photoUrl = pickUserProfilePhotoUrl(seller);
-  const avatarObjectPosition = formatProfileImageObjectPosition(
-    getUserAvatarFocus(seller),
-  );
   const isSelf = currentUserId != null && String(sellerId) === String(currentUserId);
 
   const pageTitle = SELLER_PRODUCTS_PAGE_UI.TITLE(sellerName);
@@ -178,32 +201,64 @@ export function SellerProductsPage({
         <h2 className="seller-products-page__title">{pageTitle}</h2>
         {seller ? (
           <div className="seller-products-page__seller">
-            {photoUrl ? (
-              <UserPremiumAvatar
-                className="seller-products-page__avatar"
-                src={photoUrl}
-                isPremium={Boolean(seller.isPremiumUser)}
-                objectPosition={avatarObjectPosition}
-                decoding="async"
-              />
+            {showProfileBanner ? (
+              <div
+                className={
+                  canShowBackground
+                    ? "user-details-modal__banner user-details-modal__banner_has-bg"
+                    : "user-details-modal__banner"
+                }
+              >
+                {canShowBackground && profileBackground?.kind === "image" ? (
+                  <img
+                    className="user-details-modal__banner-image"
+                    src={profileBackground.url}
+                    alt=""
+                    decoding="async"
+                    loading="lazy"
+                    referrerPolicy="no-referrer"
+                    style={{ objectPosition: backgroundObjectPosition }}
+                    onError={() => setBackgroundLoadFailed(true)}
+                  />
+                ) : null}
+                {canShowBackground && profileBackground?.kind === "preset" ? (
+                  <div
+                    className="user-details-modal__banner-color"
+                    style={{ backgroundColor: profileBackground.color }}
+                    aria-hidden="true"
+                  />
+                ) : null}
+                {photoUrl && !avatarLoadFailed ? (
+                  <UserPremiumAvatar
+                    className="user-details-modal__avatar user-details-modal__avatar_lead user-details-modal__avatar_on-banner"
+                    src={photoUrl}
+                    isPremium={Boolean(seller.isPremiumUser)}
+                    objectPosition={avatarObjectPosition}
+                    decoding="async"
+                    onError={() => setAvatarLoadFailed(true)}
+                  />
+                ) : null}
+              </div>
             ) : null}
-            <p className="seller-products-page__seller-name">
-              <UserPremiumDisplayName
-                name={sellerName}
-                isPremium={Boolean(seller.isPremiumUser)}
-                isUserDataConfirmed={Boolean(seller.isUserDataConfirmed)}
-              />
-            </p>
-            {!isSelf ? (
-              <UserFollowButton
-                targetUserId={String(seller._id)}
-                isFollowing={seller.isFollowing === true}
-                isAuthorized={isAuthorized}
-                isSelf={false}
-                onRequestLogin={onRequestLogin}
-                onFollowChange={handleFollowChange}
-              />
-            ) : null}
+            <div className="seller-products-page__seller-meta">
+              <p className="seller-products-page__seller-name">
+                <UserPremiumDisplayName
+                  name={sellerName}
+                  isPremium={Boolean(seller.isPremiumUser)}
+                  isUserDataConfirmed={Boolean(seller.isUserDataConfirmed)}
+                />
+              </p>
+              {!isSelf ? (
+                <UserFollowButton
+                  targetUserId={String(seller._id)}
+                  isFollowing={seller.isFollowing === true}
+                  isAuthorized={isAuthorized}
+                  isSelf={false}
+                  onRequestLogin={onRequestLogin}
+                  onFollowChange={handleFollowChange}
+                />
+              ) : null}
+            </div>
           </div>
         ) : null}
       </header>

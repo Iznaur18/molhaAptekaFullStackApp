@@ -33,12 +33,11 @@ export const useHomeProductActions = ({
   setTogglingAuctionProductId,
   setMyProductsCatalogError,
   setPromotionProduct,
-  setPromotionTariffs,
+  setPromotionConfig,
   setPromotionModalError,
   setIsPromotionSubmitPending,
   promotionProduct,
   setLoyaltyPoints,
-  refreshMyPromotionPendingIds,
   setCatalogRefreshTick,
   setRaffleRefreshTick,
   refreshFeaturedRaffle,
@@ -262,28 +261,28 @@ export const useHomeProductActions = ({
       setPromotionProduct(product);
       setPromotionModalError("");
       try {
-        const tariffs = await fetchProductPromotionTariffs();
-        setPromotionTariffs(tariffs);
+        const config = await fetchProductPromotionTariffs();
+        setPromotionConfig(config);
       } catch (e) {
         setPromotionModalError(
           e instanceof Error
             ? e.message
             : API_CLIENT_UI.FETCH_PRODUCT_PROMOTION_TARIFFS_FALLBACK,
         );
-        setPromotionTariffs([]);
+        setPromotionConfig({ tiers: [], durations: [] });
       }
     },
-    [setPromotionModalError, setPromotionProduct, setPromotionTariffs],
+    [setPromotionModalError, setPromotionProduct, setPromotionConfig],
   );
 
   const handleClosePromotionModal = useCallback(() => {
     setPromotionProduct(null);
-    setPromotionTariffs([]);
+    setPromotionConfig({ tiers: [], durations: [] });
     setPromotionModalError("");
-  }, [setPromotionModalError, setPromotionProduct, setPromotionTariffs]);
+  }, [setPromotionModalError, setPromotionProduct, setPromotionConfig]);
 
   const handleSubmitPromotionRequest = useCallback(
-    async (tariffCode) => {
+    async (tier, tariffCode) => {
       if (!promotionProduct?._id) {
         return;
       }
@@ -292,13 +291,12 @@ export const useHomeProductActions = ({
       try {
         const { loyaltyPointsBalance, message } = await requestProductPromotion(
           String(promotionProduct._id),
-          { tariffCode },
+          { tier, tariffCode },
         );
         if (loyaltyPointsBalance != null) {
           setLoyaltyPoints(loyaltyPointsBalance);
         }
-        setMyProductsCatalogNotice(message ?? "Заявка на продвижение отправлена.");
-        void refreshMyPromotionPendingIds();
+        setMyProductsCatalogNotice(message ?? "Продвижение активировано.");
         setCatalogRefreshTick((n) => n + 1);
         handleClosePromotionModal();
       } catch (e) {
@@ -314,7 +312,6 @@ export const useHomeProductActions = ({
     [
       handleClosePromotionModal,
       promotionProduct,
-      refreshMyPromotionPendingIds,
       setCatalogRefreshTick,
       setIsPromotionSubmitPending,
       setLoyaltyPoints,

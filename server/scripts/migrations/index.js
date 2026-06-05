@@ -21,6 +21,7 @@ import { up as productCategoryIdUp } from "./20260609-product-category-id.js";
 import { up as productSearchSynonymsUp } from "./20260610-product-search-synonyms.js";
 import { up as catalogModerationOrderIndexesUp } from "./20260611-catalog-moderation-order-indexes.js";
 import { up as productSoldQuantityDenormUp } from "./20260612-product-sold-quantity-denorm.js";
+import { up as productPromotionTiersResetUp } from "./20260613-product-promotion-tiers-reset.js";
 
 export const MIGRATIONS = [
   {
@@ -137,5 +138,10 @@ export const MIGRATIONS = [
     id: "20260612-product-sold-quantity-denorm",
     description: "Denorm Product.soldQuantity from orders + catalog sort index",
     up: productSoldQuantityDenormUp,
+  },
+  {
+    id: "20260613-product-promotion-tiers-reset",
+    description: "Reset legacy product promotions before tier-based promotion v2",
+    up: productPromotionTiersResetUp,
   },
 ];

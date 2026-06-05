@@ -70,3 +70,12 @@ export function profileTabToMainView(tab) {
 export function mainViewToProfileTab(view) {
   return MAIN_VIEW_TO_PROFILE_TAB.get(view) ?? null;
 }
+
+/**
+ * Экраны личного кабинета с вкладками MyProfilePage.
+ *
+ * @param {HomeMainView} view
+ */
+export function isProfileTabMainView(view) {
+  return MAIN_VIEW_TO_PROFILE_TAB.has(view);
+}

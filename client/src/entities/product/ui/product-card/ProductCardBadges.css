@@ -67,6 +67,34 @@
   line-height: 1.35;
 }
 
+.product-card__promotion-top-badge {
+  margin: 0;
+  padding: 0.2rem 0.55rem;
+  width: fit-content;
+  border-radius: 0.35rem;
+  border: 1px solid color-mix(in srgb, #7c3aed 45%, transparent);
+  background: #ede9fe;
+  color: #5b21b6;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.product-card__promotion-banner-badge {
+  margin: 0;
+  padding: 0.2rem 0.55rem;
+  width: fit-content;
+  border-radius: 0.35rem;
+  border: 1px solid color-mix(in srgb, #ea580c 45%, transparent);
+  background: #ffedd5;
+  color: #c2410c;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
 .product-card__raffle-badge {
   margin: 0.2rem 0 0;
   padding: 0.2rem 0.5rem;
@@ -119,6 +147,8 @@
   user-select: none;
 }
 
+.product-card__status-badges-row > .product-card__promotion-top-badge,
+.product-card__status-badges-row > .product-card__promotion-banner-badge,
 .product-card__status-badges-row > .product-card__promotion-badge,
 .product-card__status-badges-row > .product-card__promotion-badge_pending,
 .product-card__status-badges-row > .product-card__hidden-badge,

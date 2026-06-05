@@ -357,6 +357,7 @@ export const HOME_PAGE_UI = {
   CATALOG_LOAD_MORE_RETRY: "Повторить",
   CATALOG_LOADING_MORE: "Подгружаем…",
   CATALOG_PRODUCTS_LIST_ARIA: "Список товаров каталога",
+  CATALOG_PROMOTED_BANNERS_ARIA: "Продвигаемые товары баннером",
 };
 
 /** Сетка категорий `/catalog` */
@@ -980,9 +981,11 @@ export const PRODUCT_CARD_UI = {
   GALLERY_PREV: "Предыдущее фото",
   GALLERY_NEXT: "Следующее фото",
   PROMOTED_BADGE: "Буст",
-  /** @param {string} until */
-  PROMOTED_UNTIL: (until) => `В продвижении до ${until}`,
-  PROMOTION_PENDING_BADGE: "Ожидает подтверждения staff",
+  /** @param {string} tierLabel @param {string} until */
+  PROMOTED_TIER_UNTIL: (tierLabel, until) =>
+    `Продвижение «${tierLabel}» до ${until}`,
+  PROMOTION_TOP_BADGE: "ТОП",
+  PROMOTION_BANNER_BADGE: "Баннер",
   RAFFLE_BADGE: "Розыгрыш",
   AUCTION_BADGE: "Аукцион",
   LOYALTY_POINTS_TOOLTIP: "Даёт продавец; получает премиум-покупатель",
@@ -1256,9 +1259,12 @@ export const PRODUCT_PROMOTION_UI = {
   BALANCE_POINTS: (balance) => `Баланс баллов: ${balance}`,
   PAYMENT_HINT_POINTS:
     "Оплата только баллами. Списание сразу, продвижение включается автоматически.",
-  TARIFF_LABEL: "Пакет продвижения",
+  TIER_LABEL: "Уровень продвижения",
+  /** @param {string} title @param {string} description */
+  TIER_OPTION: (title, description) => `${title} — ${description}`,
+  DURATION_LABEL: "Срок",
   /** @param {string} title @param {number} pricePoints */
-  TARIFF_OPTION_POINTS: (title, pricePoints) => `${title} — ${pricePoints} баллов`,
+  DURATION_OPTION_POINTS: (title, pricePoints) => `${title} — ${pricePoints} баллов`,
   TARIFF_DURATION: (durationHours) => `Срок действия: ${durationHours} ч.`,
   INSUFFICIENT_POINTS: (required, balance) =>
     `Недостаточно баллов: нужно ${required}, у вас ${balance}.`,

@@ -1,39 +1,27 @@
-import { body, param, query } from "express-validator";
+import { body, query } from "express-validator";
 import {
-  PRODUCT_PROMOTION_STATUS_ACTIVE,
-  PRODUCT_PROMOTION_STATUS_CANCELLED_BY_ADMIN,
-  PRODUCT_PROMOTION_STATUS_EXPIRED,
-  PRODUCT_PROMOTION_STATUS_PENDING_STAFF,
-  PRODUCT_PROMOTION_STATUS_REJECTED,
+  PRODUCT_PROMOTION_DURATION_OPTIONS,
+  PRODUCT_PROMOTION_STATUSES,
+  PRODUCT_PROMOTION_TIERS,
 } from "../../constants/productPromotionConstants.js";
 import { handleValidationByExpressErrors } from "../handleValidationByExpressErrors.js";
 
-const PROMOTION_STATUSES = [
-  PRODUCT_PROMOTION_STATUS_PENDING_STAFF,
-  PRODUCT_PROMOTION_STATUS_ACTIVE,
-  PRODUCT_PROMOTION_STATUS_EXPIRED,
-  PRODUCT_PROMOTION_STATUS_REJECTED,
-  PRODUCT_PROMOTION_STATUS_CANCELLED_BY_ADMIN,
-];
+const DURATION_CODES = PRODUCT_PROMOTION_DURATION_OPTIONS.map((item) => item.code);
 
 export const requestProductPromotionValidation = [
+  body("tier")
+    .isInt({ min: 1, max: 3 })
+    .withMessage("tier обязателен")
+    .custom((value) => PRODUCT_PROMOTION_TIERS.includes(Number(value)))
+    .withMessage("Неверный уровень продвижения"),
   body("tariffCode")
     .isString()
     .withMessage("tariffCode обязателен")
     .trim()
     .notEmpty()
     .withMessage("tariffCode обязателен")
-    .isLength({ max: 40 })
-    .withMessage("Слишком длинный tariffCode"),
-  handleValidationByExpressErrors,
-];
-
-export const promotionIdParamValidation = [
-  param("promotionId")
-    .notEmpty()
-    .withMessage("ID продвижения обязателен")
-    .isMongoId()
-    .withMessage("Неверный формат ID продвижения"),
+    .custom((value) => DURATION_CODES.includes(String(value)))
+    .withMessage("Неверный срок продвижения"),
   handleValidationByExpressErrors,
 ];
 
@@ -42,7 +30,7 @@ export const myProductPromotionsValidation = [
     .optional()
     .isString()
     .withMessage("status должен быть строкой")
-    .custom((value) => PROMOTION_STATUSES.includes(String(value)))
-    .withMessage(`status должен быть одним из: ${PROMOTION_STATUSES.join(", ")}`),
+    .custom((value) => PRODUCT_PROMOTION_STATUSES.includes(String(value)))
+    .withMessage(`status должен быть одним из: ${PRODUCT_PROMOTION_STATUSES.join(", ")}`),
   handleValidationByExpressErrors,
 ];

@@ -125,6 +125,7 @@ export default defineConfig({
     host: DEV_SERVER_HOST,
     port: 5173,
     strictPort: true,
+    allowedHosts: [".loca.lt", ".ngrok-free.app", ".ngrok.io"],
     open: true,
     proxy: devApiProxy,
   },
@@ -132,6 +133,7 @@ export default defineConfig({
     host: DEV_SERVER_HOST,
     port: 4173,
     strictPort: false,
+    allowedHosts: [".loca.lt", ".ngrok-free.app", ".ngrok.io"],
     proxy: devApiProxy,
   },
 });

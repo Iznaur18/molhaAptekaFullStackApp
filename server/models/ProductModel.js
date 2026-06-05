@@ -150,6 +150,12 @@ const ProductSchema = new Schema(
       default: 0,
       min: 0,
     },
+    catalogPromotionTier: {
+      type: Number,
+      default: null,
+      min: 1,
+      max: 3,
+    },
     catalogPromotionActivatedAt: {
       type: Date,
       default: null,

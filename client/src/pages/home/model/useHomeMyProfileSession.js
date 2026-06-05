@@ -5,10 +5,8 @@ import { fetchCurrentUserProfile } from "../../../entities/user/api/fetchCurrent
 import { isAuthSessionError } from "../../../shared/lib/isAuthSessionError.js";
 import { MY_PRODUCTS_MODERATION_FILTER_ALL } from "../../../entities/product/model/productConstants.js";
 import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
-import {
-  isMyProductsMainView,
-  isRoleRestrictedMainView,
-} from "../../../shared/lib/homeMainViewPaths.js";
+import { isRoleRestrictedMainView } from "../../../shared/lib/homeMainViewPaths.js";
+import { isProfileTabMainView } from "../../my-profile/lib/profileTabToMainView.js";
 import { EMPTY_MY_PROFILE_PAGE } from "../lib/homePageConstants.js";
 
 /**
@@ -41,11 +39,8 @@ export const useHomeMyProfileSession = ({
       setMyProductsTotal(null);
       setMyProductsModerationFilter(MY_PRODUCTS_MODERATION_FILTER_ALL);
       resetCatalogFollowingOnLogout();
-      if (mainView === "my-profile" || mainView === "notifications") {
+      if (isProfileTabMainView(mainView) || mainView === "notifications") {
         setIsLoginModalOpen(true);
-        goToMainView("catalog");
-      }
-      if (isMyProductsMainView(mainView)) {
         goToMainView("catalog");
       }
     }
@@ -64,7 +59,7 @@ export const useHomeMyProfileSession = ({
   ]);
 
   useEffect(() => {
-    if (mainView !== "my-profile" || !isAuthorized) {
+    if (!isProfileTabMainView(mainView) || !isAuthorized) {
       return undefined;
     }
     let isCancelled = false;

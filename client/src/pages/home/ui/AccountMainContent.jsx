@@ -1,92 +1,20 @@
 import { RaffleSellerOverview } from "../../../entities/raffle/ui/RaffleSellerOverview.jsx";
+import { renderProfileTabPanel } from "../../my-profile/lib/renderProfileTabPanel.jsx";
+import { isProfileTabMainView } from "../../my-profile/lib/profileTabToMainView.js";
 import {
-  LazyAuctionPage,
-  LazyDataConfirmationPage,
-  LazyInstallmentPaymentsPage,
-  LazyInstallmentSalesPage,
-  LazyLoyaltyPointsPage,
-  LazyMyOrdersPage,
   LazyMyProfilePage,
-  LazyMySalesPage,
   LazyNotificationsPage,
-  LazyPremiumPage,
-  LazySubscriptionsPage,
   LazyUsersPage,
 } from "../lib/lazyHomePages.js";
 import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { isRoleRestrictedMainView } from "../../../shared/lib/homeMainViewPaths.js";
+import { isStaffMainViewAllowed } from "../../../shared/lib/staffMainViews.js";
 
 /** @typedef {import('../../../entities/product/model/types.js').ProductFromApi} ProductFromApi */
 
 /**
- * @param {{
- *   isRaffleRoute: boolean;
- *   raffleRouteId: string | null;
- *   isSellerRoute: boolean;
- *   sellerRouteId: string | null;
- *   isAuthorized: boolean;
- *   isSessionReady: boolean;
- *   mainView: string;
- *   activeProfileTab: string;
- *   currentUserId: string | null;
- *   isAdmin: boolean;
- *   canModerateProducts: boolean;
- *   myProfilePage: { phase: string; user?: object | null; error?: string };
- *   usersListTick: number;
- *   notificationsPageItems: import('../../../entities/product-report/model/types.js').UserInAppNotification[];
- *   raffleRefreshTick: number;
- *   pendingRafflesCount: number;
- *   pendingModerationCount: number;
- *   pendingIncomingPriceOffersCount: number;
- *   pendingMySalesActionCount: number;
- *   pendingMyOrdersActionCount: number;
- *   pendingInstallmentBuyerActionCount: number;
- *   pendingInstallmentSellerActionCount: number;
- *   pendingInstallmentModerationCount: number;
- *   pendingInstallmentDisputesCount: number;
- *   pendingProductReportsCount: number;
- *   pendingProductPromotionsCount: number;
- *   pendingDataConfirmationCount: number;
- *   onRequestLogin: () => void;
- *   onSellerNameClick: (userId: string) => void;
- *   onCatalogProductClick: (product: ProductFromApi) => void;
- *   goToMainView: (view: string) => void;
- *   setMyProfileTab: (tab: string) => void;
- *   handleLogout: () => void;
- *   onEditProfileClick: () => void;
- *   handleMyProductsFromProfile: () => void;
- *   handleMySalesFromProfile: () => void;
- *   handleInstallmentPaymentsFromProfile: () => void;
- *   handleInstallmentSalesFromProfile: () => void;
- *   handleInstallmentModerationFromProfile: () => void;
- *   handleInstallmentDisputesFromProfile: () => void;
- *   handleMyOrdersFromProfile: () => void;
- *   handleAuctionFromProfile: () => void;
- *   handleAdminOrdersFromProfile: () => void;
- *   handleSearchSynonymsAdminFromProfile: () => void;
- *   handleCategoryTreeAdminFromProfile: () => void;
- *   handleProductModerationFromProfile: () => void;
- *   handleProductReportsFromProfile: () => void;
- *   handleProductPromotionsFromProfile: () => void;
- *   handleRafflesFromProfile: () => void;
- *   onCreateRaffleClick: () => void;
- *   handleDataConfirmationQueueFromProfile: () => void;
- *   handleDataConfirmationFromProfile: () => void;
- *   setIsDataConfirmationModalOpen: (open: boolean) => void;
- *   dataConfirmationStatusRefreshTick: number;
- *   handlePremiumFromProfile: () => void;
- *   handlePremiumPurchased: () => void;
- *   handleLoyaltyPointsFromProfile: () => void;
- *   handleSubscriptionsFromProfile: () => void;
- *   refreshUserProfileActionBadgeCounts: () => void | Promise<void>;
- *   refreshFeaturedRaffle: () => void | Promise<void>;
- *   refreshSellerRaffleState: () => void | Promise<void>;
- *   setRaffleRefreshTick: import('react').Dispatch<import('react').SetStateAction<number>>;
- *   setCatalogRefreshTick: import('react').Dispatch<import('react').SetStateAction<number>>;
- *   setRaffleModal: import('react').Dispatch<import('react').SetStateAction<object | null>>;
- *   handleInAppNotificationClick: (notification: import('../../../entities/product-report/model/types.js').UserInAppNotification) => void;
- *   handleNotificationsCleared: () => void;
- * }} props
+ * @param {object} props
+ * @param {import('react').ReactNode} [props.myProductsCatalogSection]
  */
 export function AccountMainContent({
   isRaffleRoute,
@@ -114,7 +42,6 @@ export function AccountMainContent({
   pendingInstallmentModerationCount,
   pendingInstallmentDisputesCount,
   pendingProductReportsCount,
-  pendingProductPromotionsCount,
   pendingDataConfirmationCount,
   onRequestLogin,
   onSellerNameClick,
@@ -136,7 +63,6 @@ export function AccountMainContent({
   handleCategoryTreeAdminFromProfile,
   handleProductModerationFromProfile,
   handleProductReportsFromProfile,
-  handleProductPromotionsFromProfile,
   handleRafflesFromProfile,
   onCreateRaffleClick,
   handleDataConfirmationQueueFromProfile,
@@ -148,6 +74,12 @@ export function AccountMainContent({
   handleLoyaltyPointsFromProfile,
   handleSubscriptionsFromProfile,
   refreshUserProfileActionBadgeCounts,
+  refreshPendingModerationCount,
+  refreshPendingProductReportsCount,
+  refreshPendingRafflesCount,
+  refreshPendingDataConfirmationCount,
+  refreshPendingInstallmentModerationCount,
+  refreshPendingInstallmentDisputesCount,
   refreshFeaturedRaffle,
   refreshSellerRaffleState,
   setRaffleRefreshTick,
@@ -155,12 +87,47 @@ export function AccountMainContent({
   setRaffleModal,
   handleInAppNotificationClick,
   handleNotificationsCleared,
+  onOpenProductDetails,
+  myProductsCatalogSection = null,
 }) {
   if (isAuthorized && !isSessionReady && isRoleRestrictedMainView(mainView)) {
     return <p className="home-page__state">{HOME_PAGE_UI.LOADING_SESSION}</p>;
   }
 
-  if (mainView === "my-profile") {
+  if (isProfileTabMainView(mainView)) {
+    if (
+      isSessionReady &&
+      !isStaffMainViewAllowed(mainView, { isAdmin, canModerateProducts })
+    ) {
+      return null;
+    }
+
+    const profileTabPanelProps = {
+      isAuthorized,
+      currentUserId,
+      onRequestLogin,
+      onSellerNameClick,
+      onCatalogProductClick,
+      onOpenProductDetails,
+      refreshUserProfileActionBadgeCounts,
+      myProfilePage,
+      handlePremiumPurchased,
+      setIsDataConfirmationModalOpen,
+      dataConfirmationStatusRefreshTick,
+      myProductsCatalogSection,
+      raffleRefreshTick,
+      refreshPendingModerationCount,
+      refreshPendingProductReportsCount,
+      refreshPendingRafflesCount,
+      refreshPendingDataConfirmationCount,
+      refreshPendingInstallmentModerationCount,
+      refreshPendingInstallmentDisputesCount,
+      refreshFeaturedRaffle,
+      setRaffleRefreshTick,
+      setCatalogRefreshTick,
+      setRaffleModal,
+    };
+
     const profileOverviewContent = (
       <RaffleSellerOverview
         refreshTick={raffleRefreshTick}
@@ -174,6 +141,11 @@ export function AccountMainContent({
         }
       />
     );
+
+    const tabContent =
+      mainView === "my-profile"
+        ? profileOverviewContent
+        : renderProfileTabPanel(mainView, profileTabPanelProps);
 
     return (
       <LazyMyProfilePage
@@ -211,9 +183,6 @@ export function AccountMainContent({
         onProductReportsClick={
           canModerateProducts ? handleProductReportsFromProfile : undefined
         }
-        onProductPromotionsClick={
-          canModerateProducts ? handleProductPromotionsFromProfile : undefined
-        }
         onRafflesClick={canModerateProducts ? handleRafflesFromProfile : undefined}
         onCreateRaffleClick={onCreateRaffleClick}
         pendingRafflesCount={pendingRafflesCount}
@@ -235,54 +204,10 @@ export function AccountMainContent({
         pendingInstallmentModerationCount={pendingInstallmentModerationCount}
         pendingInstallmentDisputesCount={pendingInstallmentDisputesCount}
         pendingProductReportsCount={pendingProductReportsCount}
-        pendingProductPromotionsCount={pendingProductPromotionsCount}
         pendingDataConfirmationCount={pendingDataConfirmationCount}
         activeTab={activeProfileTab}
         onTabChange={setMyProfileTab}
-        tabContent={profileOverviewContent}
-      />
-    );
-  }
-
-  if (mainView === "auction") {
-    return (
-      <LazyAuctionPage
-        isAuthorized={isAuthorized}
-        isUserDataConfirmed={
-          myProfilePage.phase === "success" &&
-          myProfilePage.user?.isUserDataConfirmed === true
-        }
-        onRequestLogin={onRequestLogin}
-        onProductClick={onCatalogProductClick}
-        onBuyerClick={onSellerNameClick}
-        onQueueChanged={refreshUserProfileActionBadgeCounts}
-      />
-    );
-  }
-  if (mainView === "data-confirmation") {
-    return (
-      <LazyDataConfirmationPage
-        isAuthorized={isAuthorized}
-        onRequestLogin={onRequestLogin}
-        onOpenRequest={() => setIsDataConfirmationModalOpen(true)}
-        statusRefreshTick={dataConfirmationStatusRefreshTick}
-      />
-    );
-  }
-  if (mainView === "premium") {
-    return (
-      <LazyPremiumPage
-        isAuthorized={isAuthorized}
-        onRequestLogin={onRequestLogin}
-        onPurchased={handlePremiumPurchased}
-      />
-    );
-  }
-  if (mainView === "loyalty-points") {
-    return (
-      <LazyLoyaltyPointsPage
-        isAuthorized={isAuthorized}
-        onRequestLogin={onRequestLogin}
+        tabContent={tabContent}
       />
     );
   }
@@ -296,15 +221,7 @@ export function AccountMainContent({
       />
     );
   }
-  if (mainView === "subscriptions") {
-    return (
-      <LazySubscriptionsPage
-        isAuthorized={isAuthorized}
-        onRequestLogin={onRequestLogin}
-        onUserClick={onSellerNameClick}
-      />
-    );
-  }
+
   if (mainView === "notifications") {
     if (!isAuthorized) {
       return null;
@@ -314,49 +231,6 @@ export function AccountMainContent({
         notifications={notificationsPageItems}
         onNotificationClick={handleInAppNotificationClick}
         onCleared={handleNotificationsCleared}
-      />
-    );
-  }
-  if (mainView === "my-orders") {
-    return (
-      <LazyMyOrdersPage
-        isAuthorized={isAuthorized}
-        currentUserId={currentUserId}
-        onSellerNameClick={onSellerNameClick}
-        onRequestLogin={onRequestLogin}
-        onQueueChanged={refreshUserProfileActionBadgeCounts}
-      />
-    );
-  }
-  if (mainView === "my-sales") {
-    return (
-      <LazyMySalesPage
-        isAuthorized={isAuthorized}
-        currentUserId={currentUserId}
-        onSellerNameClick={onSellerNameClick}
-        onQueueChanged={refreshUserProfileActionBadgeCounts}
-      />
-    );
-  }
-  if (mainView === "installment-payments") {
-    return (
-      <LazyInstallmentPaymentsPage
-        isAuthorized={isAuthorized}
-        onRequestLogin={onRequestLogin}
-        onCounterpartyClick={onSellerNameClick}
-        onProductClick={onCatalogProductClick}
-        onQueueChanged={refreshUserProfileActionBadgeCounts}
-      />
-    );
-  }
-  if (mainView === "installment-sales") {
-    return (
-      <LazyInstallmentSalesPage
-        isAuthorized={isAuthorized}
-        onRequestLogin={onRequestLogin}
-        onCounterpartyClick={onSellerNameClick}
-        onProductClick={onCatalogProductClick}
-        onQueueChanged={refreshUserProfileActionBadgeCounts}
       />
     );
   }

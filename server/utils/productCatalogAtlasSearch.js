@@ -8,6 +8,10 @@ import { ProductModel } from "../models/index.js";
 import { attachProductSellerSnapshots } from "./attachProductSellerSnapshots.js";
 import { buildProductAtlasSearchStage } from "./buildProductAtlasSearchStage.js";
 import { normalizeProductsQueryForAggregate } from "./productCatalogQuery.js";
+import {
+  buildCatalogPromotionSortStage,
+  catalogPromotionSortBoostAddFieldsStage,
+} from "./productCatalogPromotionSort.js";
 
 const sellerLookupStages = () => [
   {
@@ -33,33 +37,18 @@ const sellerLookupStages = () => [
 /**
  * @param {string} sort
  */
-const sortStageForAtlasCatalog = (sort) => {
-  if (sort === PRODUCT_SORT_PURCHASES) {
-    return {
-      $sort: {
-        _searchScore: -1,
-        soldQuantity: -1,
-        createdAt: -1,
-      },
-    };
+const sortStagesForAtlasCatalog = (sort) => {
+  const stages = [];
+  if (sort === PRODUCT_SORT_NEWEST) {
+    stages.push(catalogPromotionSortBoostAddFieldsStage);
   }
-  if (sort === PRODUCT_SORT_VIEWS) {
-    return {
-      $sort: {
-        _searchScore: -1,
-        uniqueViewerCount: -1,
-        createdAt: -1,
-      },
-    };
-  }
-  return {
-    $sort: {
-      _searchScore: -1,
-      catalogPromotionActivatedAt: -1,
-      catalogPromotionExpiresAt: -1,
-      createdAt: -1,
-    },
-  };
+  stages.push(
+    buildCatalogPromotionSortStage(sort, {
+      useSearchRank: true,
+      searchScoreField: "_searchScore",
+    }),
+  );
+  return stages;
 };
 
 /**
@@ -77,11 +66,11 @@ export const findCatalogProductsPageAtlas = async (searchResult, sort, skip, lim
     buildProductAtlasSearchStage(searchResult.atlasSearch),
     { $addFields: { _searchScore: { $meta: "searchScore" } } },
     { $match: normalizeProductsQueryForAggregate(searchResult.baseQuery) },
-    sortStageForAtlasCatalog(sort),
+    ...sortStagesForAtlasCatalog(sort),
     { $skip: skip },
     { $limit: limit },
     ...sellerLookupStages(),
-    { $project: { _searchScore: 0 } },
+    { $project: { _searchScore: 0, _promotionSortTier: 0 } },
   ]);
 
   return attachProductSellerSnapshots(products);

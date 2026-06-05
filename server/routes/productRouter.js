@@ -48,12 +48,6 @@ import {
   getProductPromotionTariffsController,
   requestProductPromotionController,
   getMyProductPromotionsController,
-  getPendingProductPromotionsController,
-  getPendingProductPromotionsCountController,
-  approveProductPromotionController,
-  rejectProductPromotionController,
-  cancelProductPromotionByStaffController,
-  extendProductPromotionByStaffController,
   getFeaturedRaffleController,
   getRaffleByIdController,
   getRaffleProductsController,
@@ -101,7 +95,6 @@ import {
   patchProductReviewValidation,
   productReviewsListValidation,
   requestProductPromotionValidation,
-  promotionIdParamValidation,
   myProductPromotionsValidation,
   createRaffleValidation,
   patchRaffleValidation,
@@ -298,46 +291,6 @@ router.get(
   checkAuthMW,
   myProductPromotionsValidation,
   getMyProductPromotionsController,
-);
-router.get(
-  "/promotions/pending/count",
-  checkAuthMW,
-  checkProductModeratorMW,
-  getPendingProductPromotionsCountController,
-);
-router.get(
-  "/promotions/pending",
-  checkAuthMW,
-  checkProductModeratorMW,
-  getPendingProductPromotionsController,
-);
-router.patch(
-  "/promotions/:promotionId/approve",
-  checkAuthMW,
-  checkProductModeratorMW,
-  promotionIdParamValidation,
-  approveProductPromotionController,
-);
-router.patch(
-  "/promotions/:promotionId/reject",
-  checkAuthMW,
-  checkProductModeratorMW,
-  promotionIdParamValidation,
-  rejectProductPromotionController,
-);
-router.patch(
-  "/promotions/:promotionId/cancel",
-  checkAuthMW,
-  checkProductModeratorMW,
-  promotionIdParamValidation,
-  cancelProductPromotionByStaffController,
-);
-router.patch(
-  "/promotions/:promotionId/extend",
-  checkAuthMW,
-  checkProductModeratorMW,
-  promotionIdParamValidation,
-  extendProductPromotionByStaffController,
 );
 router.post(
   "/:productId/promotions/request",

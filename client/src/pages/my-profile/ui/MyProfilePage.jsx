@@ -41,7 +41,6 @@ import "./MyProfilePage.css";
  * onCategoryTreeAdminClick?: () => void;
  * onProductModerationClick?: () => void;
  * onProductReportsClick?: () => void;
- * onProductPromotionsClick?: () => void;
  * onRafflesClick?: () => void;
  * onCreateRaffleClick?: () => void;
  * onDataConfirmationQueueClick?: () => void;
@@ -57,7 +56,6 @@ import "./MyProfilePage.css";
  * pendingInstallmentModerationCount?: number;
  * pendingInstallmentDisputesCount?: number;
  * pendingProductReportsCount?: number;
- * pendingProductPromotionsCount?: number;
  * pendingDataConfirmationCount?: number;
  * onSubscriptionsClick?: () => void;
  * activeTab?: string;
@@ -84,7 +82,6 @@ export function MyProfilePage({
   onCategoryTreeAdminClick,
   onProductModerationClick,
   onProductReportsClick,
-  onProductPromotionsClick,
   onRafflesClick,
   onCreateRaffleClick,
   onDataConfirmationQueueClick,
@@ -100,7 +97,6 @@ export function MyProfilePage({
   pendingInstallmentModerationCount = 0,
   pendingInstallmentDisputesCount = 0,
   pendingProductReportsCount = 0,
-  pendingProductPromotionsCount = 0,
   pendingRafflesCount = 0,
   pendingDataConfirmationCount = 0,
   onSubscriptionsClick,
@@ -160,8 +156,6 @@ export function MyProfilePage({
     !isRegularUser && isProfileReady && Boolean(onProductModerationClick);
   const canUseProductReports =
     !isRegularUser && isProfileReady && Boolean(onProductReportsClick);
-  const canUseProductPromotions =
-    !isRegularUser && isProfileReady && Boolean(onProductPromotionsClick);
   const canUseRaffles = !isRegularUser && isProfileReady && Boolean(onRafflesClick);
   const canUseCreateRaffle =
     isProfileReady &&
@@ -340,22 +334,6 @@ export function MyProfilePage({
               >
                 {MY_PROFILE_PAGE_UI.TAB_PRODUCT_REPORTS}
                 <ProfileTabBadge count={pendingProductReportsCount} />
-              </button>
-            ) : null}
-            {canUseProductPromotions ? (
-              <button
-                type="button"
-                className={tabButtonClassName(
-                  "product-promotions",
-                  pendingProductPromotionsCount > 0,
-                )}
-                onClick={() => {
-                  onTabChange?.("product-promotions");
-                  onProductPromotionsClick?.();
-                }}
-              >
-                {MY_PROFILE_PAGE_UI.TAB_PRODUCT_PROMOTIONS}
-                <ProfileTabBadge count={pendingProductPromotionsCount} />
               </button>
             ) : null}
             {canUseRaffles ? (

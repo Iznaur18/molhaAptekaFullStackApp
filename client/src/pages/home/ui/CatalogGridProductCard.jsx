@@ -11,7 +11,6 @@ import { ProductCard } from "../../../entities/product/ui/ProductCard.jsx";
  *   onDeleteMyProduct: (productId: string) => void;
  *   onEditMyProduct?: (product: import('../../../entities/product/model/types.js').ProductFromApi) => void;
  *   onPromoteMyProduct?: (product: import('../../../entities/product/model/types.js').ProductFromApi) => void;
- *   pendingPromotionProductIds: Set<string>;
  *   onOpenProductDetails: (product: import('../../../entities/product/model/types.js').ProductFromApi) => void;
  *   onSetMyProductAvailability?: (productId: string, productIsAvailable: boolean) => void | Promise<void>;
  *   onSetMyProductAuction?: (productId: string, productAuctionEnabled: boolean) => void | Promise<void>;
@@ -22,6 +21,7 @@ import { ProductCard } from "../../../entities/product/ui/ProductCard.jsx";
  *   currentUserId: string | null;
  *   onRequestLoginAddToCart: () => void;
  *   showAddToCartOnCard: boolean;
+ *   promotionFullWidth?: boolean;
  *   highlightRaffleProducts: boolean;
  *   sellerRaffleActive: boolean;
  *   onToggleRaffleParticipation?: (
@@ -42,7 +42,6 @@ export function CatalogGridProductCard({
   onDeleteMyProduct,
   onEditMyProduct,
   onPromoteMyProduct,
-  pendingPromotionProductIds,
   onOpenProductDetails,
   onSetMyProductAvailability,
   onSetMyProductAuction,
@@ -53,6 +52,7 @@ export function CatalogGridProductCard({
   currentUserId,
   onRequestLoginAddToCart,
   showAddToCartOnCard,
+  promotionFullWidth = false,
   highlightRaffleProducts,
   sellerRaffleActive,
   onToggleRaffleParticipation,
@@ -63,7 +63,12 @@ export function CatalogGridProductCard({
   const productId = product._id != null ? String(product._id) : "";
 
   return (
-    <div className="home-page__cell" role="listitem">
+    <div
+      className={
+        promotionFullWidth ? "home-page__cell home-page__cell--tier3-full-width" : "home-page__cell"
+      }
+      role="listitem"
+    >
       <ProductCard
         product={product}
         onSellerNameClick={onSellerNameClick}
@@ -83,9 +88,7 @@ export function CatalogGridProductCard({
         showAddToCartOnCard={showAddToCartOnCard}
         isMineMode={isMineMode}
         highlightCatalogPromotion={!isMineMode}
-        isPromotionPending={
-          isMineMode && product._id != null && pendingPromotionProductIds.has(productId)
-        }
+        promotionFullWidth={promotionFullWidth}
         highlightRaffleProduct={highlightRaffleProducts}
         sellerRaffleActive={isMineMode ? sellerRaffleActive : false}
         onToggleRaffleParticipation={isMineMode ? onToggleRaffleParticipation : undefined}

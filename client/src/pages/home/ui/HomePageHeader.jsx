@@ -26,6 +26,7 @@ import {
   PRODUCT_SEARCH_INPUT_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { getHomeHeaderVariantClass } from "../lib/homeHeaderVariant.js";
+import { isProfileTabMainView } from "../../my-profile/lib/profileTabToMainView.js";
 import {
   isCatalogBrowserMainView,
   isCatalogHeaderMainView,
@@ -38,6 +39,10 @@ const PRODUCT_CATEGORY_FILTER_LIST_ID = HOME_PAGE_UI.PRODUCT_CATEGORY_FILTER_LIS
 
 /** Разделы с подписью в кнопках шапки — без дублирующего view-title. */
 const HEADER_VIEW_TITLE_HIDDEN_VIEWS = new Set(["users", "cart"]);
+
+function isHeaderViewTitleHidden(mainView) {
+  return HEADER_VIEW_TITLE_HIDDEN_VIEWS.has(mainView) || isProfileTabMainView(mainView);
+}
 
 const NON_CATALOG_VIEW_TITLES = {
   "my-profile": HOME_PAGE_UI.AUTH_MY_PROFILE,
@@ -175,7 +180,7 @@ export function HomePageHeader({
   const isPublicCatalogHeader = !isMineMode && isCatalogHeaderView;
   const isUsersNavActive = mainView === "users";
   const isCartNavActive = mainView === "cart";
-  const isMyProfileNavActive = mainView === "my-profile";
+  const isMyProfileNavActive = isProfileTabMainView(mainView);
   const isNotificationsNavActive = mainView === "notifications";
 
   const nonCatalogTitle = (() => {
@@ -201,9 +206,7 @@ export function HomePageHeader({
     return base;
   })();
 
-  const headerViewTitle = HEADER_VIEW_TITLE_HIDDEN_VIEWS.has(mainView)
-    ? ""
-    : nonCatalogTitle;
+  const headerViewTitle = isHeaderViewTitleHidden(mainView) ? "" : nonCatalogTitle;
 
   const headerClassName = ["home-page__header", getHomeHeaderVariantClass()]
     .filter(Boolean)

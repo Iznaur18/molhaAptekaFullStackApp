@@ -10,7 +10,6 @@ import { fetchMyOrdersActionCount } from "../../../entities/order/api/fetchMyOrd
 import { fetchMySalesActionCount } from "../../../entities/order/api/fetchMySalesActionCount.js";
 import { fetchIncomingPriceOffersPendingCount } from "../../../entities/product-price-offer/api/fetchIncomingPriceOffersPendingCount.js";
 import { fetchPendingModerationProductsCount } from "../../../entities/product/api/fetchPendingModerationProductsCount.js";
-import { fetchPendingProductPromotionsCount } from "../../../entities/product/api/fetchPendingProductPromotionsCount.js";
 import { fetchPendingProductReportsCount } from "../../../entities/product-report/api/fetchPendingProductReportsCount.js";
 import { fetchPendingUserStoryReportsCount } from "../../../entities/user-story/api/fetchPendingUserStoryReportsCount.js";
 import { fetchPendingDataConfirmationCount } from "../../../entities/user-data-confirmation/api/fetchPendingDataConfirmationCount.js";
@@ -31,7 +30,6 @@ export const useHomeStaffBadgeCounts = ({
   const [pendingModerationCount, setPendingModerationCount] = useState(0);
   const [pendingProductReportsCount, setPendingProductReportsCount] = useState(0);
   const [pendingDataConfirmationCount, setPendingDataConfirmationCount] = useState(0);
-  const [pendingProductPromotionsCount, setPendingProductPromotionsCount] = useState(0);
   const [pendingRafflesCount, setPendingRafflesCount] = useState(0);
   const [pendingInstallmentModerationCount, setPendingInstallmentModerationCount] =
     useState(0);
@@ -99,23 +97,6 @@ export const useHomeStaffBadgeCounts = ({
   useEffect(() => {
     void refreshPendingDataConfirmationCount();
   }, [refreshPendingDataConfirmationCount, mainView]);
-
-  const refreshPendingProductPromotionsCount = useCallback(async () => {
-    if (!canModerateProducts || !isAuthorized) {
-      setPendingProductPromotionsCount(0);
-      return;
-    }
-    try {
-      const count = await fetchPendingProductPromotionsCount();
-      setPendingProductPromotionsCount(count);
-    } catch {
-      setPendingProductPromotionsCount(0);
-    }
-  }, [canModerateProducts, isAuthorized]);
-
-  useEffect(() => {
-    void refreshPendingProductPromotionsCount();
-  }, [refreshPendingProductPromotionsCount, mainView]);
 
   const refreshPendingRafflesCount = useCallback(async () => {
     if (!canModerateProducts || !isAuthorized) {
@@ -213,7 +194,6 @@ export const useHomeStaffBadgeCounts = ({
     pendingModerationCount,
     pendingProductReportsCount,
     pendingDataConfirmationCount,
-    pendingProductPromotionsCount,
     pendingRafflesCount,
     pendingInstallmentModerationCount,
     pendingInstallmentDisputesCount,
@@ -225,7 +205,6 @@ export const useHomeStaffBadgeCounts = ({
     refreshPendingModerationCount,
     refreshPendingProductReportsCount,
     refreshPendingDataConfirmationCount,
-    refreshPendingProductPromotionsCount,
     refreshPendingRafflesCount,
     refreshPendingInstallmentModerationCount,
     refreshPendingInstallmentDisputesCount,

@@ -109,7 +109,7 @@ export function isCatalogHeaderMainView(view) {
   return isCatalogShellMainView(view) || isCatalogBrowserMainView(view);
 }
 
-/** Standalone staff URL (guard в `StaffRouteGuard`). */
+/** Staff/admin URL (guard в AccountMainContent). */
 export function isRoleRestrictedMainView(view) {
   return isStaffStandaloneMainView(view);
 }

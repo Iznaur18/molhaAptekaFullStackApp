@@ -26,6 +26,10 @@
   height: 100%;
 }
 
+.product-card-promotion-frame--full-width {
+  grid-column: 1 / -1;
+}
+
 .product-card-promotion-frame > .product-card {
   --product-card-promotion-accent: #d97706;
   --product-card-promotion-accent-soft: #fbbf24;
@@ -41,6 +45,58 @@
     0 0 0 1px
       color-mix(in srgb, var(--product-card-promotion-accent-soft) 32%, transparent),
     0 2px 12px color-mix(in srgb, var(--product-card-promotion-accent) 14%, transparent);
+}
+
+.product-card-promotion-frame--tier-2 > .product-card {
+  --product-card-promotion-accent: #7c3aed;
+  --product-card-promotion-accent-soft: #c4b5fd;
+
+  background: linear-gradient(
+    165deg,
+    color-mix(in srgb, #f5f3ff 92%, var(--product-card-promotion-accent-soft)),
+    color-mix(in srgb, Canvas 88%, #ede9fe)
+  );
+}
+
+.product-card-promotion-frame--tier-3 > .product-card {
+  --product-card-promotion-accent: #ea580c;
+  --product-card-promotion-accent-soft: #fdba74;
+
+  background: linear-gradient(
+    165deg,
+    color-mix(in srgb, #fff7ed 92%, var(--product-card-promotion-accent-soft)),
+    color-mix(in srgb, Canvas 88%, #ffedd5)
+  );
+  box-shadow:
+    0 0 0 1px
+      color-mix(in srgb, var(--product-card-promotion-accent-soft) 40%, transparent),
+    0 6px 24px color-mix(in srgb, var(--product-card-promotion-accent) 18%, transparent);
+}
+
+.product-card--banner-layout {
+  flex-direction: row;
+  gap: 1rem;
+}
+
+.product-card--banner-layout .product-card__image-frame {
+  flex: 0 0 min(42%, 220px);
+  max-width: 220px;
+}
+
+.product-card--banner-layout .product-card__details-surface {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+@media (max-width: 667px) {
+  .product-card--banner-layout {
+    flex-direction: column;
+  }
+
+  .product-card--banner-layout .product-card__image-frame {
+    flex-basis: auto;
+    max-width: none;
+  }
 }
 
 .product-card-promotion-frame > .product-card:hover {

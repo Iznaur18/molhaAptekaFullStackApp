@@ -27,7 +27,6 @@ export const useHomeCatalogGridProps = ({
   handleDeleteMyProduct,
   handleOpenEditMyProduct,
   handleOpenPromotionModal,
-  pendingPromotionProductIds,
   myProductsCatalogError,
   myProductsCatalogNotice,
   setCatalogProductDetails,
@@ -76,7 +75,6 @@ export const useHomeCatalogGridProps = ({
       onDeleteMyProduct: handleDeleteMyProduct,
       onEditMyProduct: handleOpenEditMyProduct,
       onPromoteMyProduct: handleOpenPromotionModal,
-      pendingPromotionProductIds,
       myProductsCatalogError,
       myProductsCatalogNotice,
       onOpenProductDetails: setCatalogProductDetails,
@@ -98,8 +96,15 @@ export const useHomeCatalogGridProps = ({
       catalogAuctionOnly,
       catalogInstallmentOnly,
       catalogSaleOnly,
+      showFullWidthTier3Banners:
+        !isMineMode &&
+        !selectedProductCategory &&
+        !hasProductSearchQuery &&
+        !catalogFollowingOnly &&
+        !catalogAuctionOnly &&
+        !catalogInstallmentOnly &&
+        !catalogSaleOnly,
       sellerRaffleActive,
-      onToggleRaffleParticipation: handleToggleRaffleParticipation,
       raffleParticipationPendingProductId,
     }),
     [
@@ -124,7 +129,6 @@ export const useHomeCatalogGridProps = ({
       handleDeleteMyProduct,
       handleOpenEditMyProduct,
       handleOpenPromotionModal,
-      pendingPromotionProductIds,
       myProductsCatalogError,
       myProductsCatalogNotice,
       setCatalogProductDetails,

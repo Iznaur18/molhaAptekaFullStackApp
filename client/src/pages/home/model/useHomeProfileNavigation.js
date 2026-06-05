@@ -118,10 +118,6 @@ export const useHomeProfileNavigation = ({
     navigateFromProfileTab(PROFILE_TAB_PRODUCT_REPORTS);
   }, [navigateFromProfileTab]);
 
-  const handleProductPromotionsFromProfile = useCallback(() => {
-    navigateFromProfileTab(PROFILE_TAB_PRODUCT_PROMOTIONS);
-  }, [navigateFromProfileTab]);
-
   const handleRafflesFromProfile = useCallback(() => {
     navigateFromProfileTab(PROFILE_TAB_RAFFLES);
   }, [navigateFromProfileTab]);
@@ -190,8 +186,6 @@ export const useHomeProfileNavigation = ({
     handleProductModerationFromProfile,
 
     handleProductReportsFromProfile,
-
-    handleProductPromotionsFromProfile,
 
     handleRafflesFromProfile,
 

@@ -7,7 +7,6 @@ import { fetchMyRaffle } from "../../../entities/raffle/api/fetchMyRaffle.js";
 import { pauseMyRaffle } from "../../../entities/raffle/api/pauseMyRaffle.js";
 import { canSellerEditRaffle } from "../../../entities/raffle/lib/canSellerEditRaffle.js";
 import { fetchUserStoriesFeed } from "../../../entities/user-story/api/fetchUserStoriesFeed.js";
-import { fetchMyProductPromotions } from "../../../entities/product/api/fetchMyProductPromotions.js";
 import { API_CLIENT_UI, RAFFLE_MANAGE_UI } from "../../../shared/config/appUiCopy.js";
 /**
  * @param {{
@@ -57,9 +56,6 @@ export function useHomeFeaturedContent({
   const [userStoriesRefreshTick, setUserStoriesRefreshTick] = useState(0);
   const [sellerRaffleActive, setSellerRaffleActive] = useState(false);
   const [isFeaturedRaffleBusy, setIsFeaturedRaffleBusy] = useState(false);
-  const [pendingPromotionProductIds, setPendingPromotionProductIds] = useState(
-    /** @type {Set<string>} */ (() => new Set()),
-  );
 
   const refreshFeaturedRaffle = useCallback(async () => {
     if (!isHomeCatalogMainView) {
@@ -256,30 +252,6 @@ export function useHomeFeaturedContent({
     }
   }, [mainView, refreshSellerRaffleState, raffleRefreshTick, isAuthorized]);
 
-  const refreshMyPromotionPendingIds = useCallback(async () => {
-    if (!isAuthorized) {
-      setPendingPromotionProductIds(new Set());
-      return;
-    }
-    try {
-      const { promotions } = await fetchMyProductPromotions({
-        status: "pending_staff",
-        limit: 200,
-      });
-      setPendingPromotionProductIds(
-        new Set(promotions.map((row) => String(row.productId))),
-      );
-    } catch {
-      setPendingPromotionProductIds(new Set());
-    }
-  }, [isAuthorized]);
-
-  useEffect(() => {
-    if (mainView === "my-products") {
-      void refreshMyPromotionPendingIds();
-    }
-  }, [mainView, refreshMyPromotionPendingIds, catalogRefreshTick]);
-
   return {
     featuredRaffles,
     featuredRaffleIndex,
@@ -288,9 +260,7 @@ export function useHomeFeaturedContent({
     handleUserStoriesRefresh,
     sellerRaffleActive,
     getFeaturedRaffleManage,
-    pendingPromotionProductIds,
     refreshFeaturedRaffle,
     refreshSellerRaffleState,
-    refreshMyPromotionPendingIds,
   };
 }

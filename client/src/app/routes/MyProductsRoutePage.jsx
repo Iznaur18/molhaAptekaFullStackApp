@@ -1,7 +1,14 @@
+import { AccountMainContent } from "../../pages/home/ui/AccountMainContent.jsx";
 import { useAppShell } from "../model/AppShellContext.jsx";
 
-/** `/my-products` — та же сетка, что в профиле (isMineMode). */
+/** `/my-products` — каталог в оболочке MyProfilePage. */
 export function MyProductsRoutePage() {
-  const { catalogContentProps } = useAppShell();
-  return catalogContentProps.catalogGridSection;
+  const { accountContentProps, catalogContentProps } = useAppShell();
+
+  return (
+    <AccountMainContent
+      {...accountContentProps}
+      myProductsCatalogSection={catalogContentProps.catalogGridSection}
+    />
+  );
 }

@@ -1,10 +1,5 @@
+import { ProductModel, ProductPromotionModel } from "../models/index.js";
 import {
-  ProductModel,
-  ProductPromotionModel,
-  ProductPromotionTariffModel,
-} from "../models/index.js";
-import {
-  PRODUCT_PROMOTION_DEFAULT_TARIFFS,
   PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS,
   PRODUCT_PROMOTION_PAYMENT_METHOD_RUB,
   PRODUCT_PROMOTION_REMINDER_HOURS,
@@ -27,35 +22,22 @@ export const PRODUCT_PROMOTION_NOTIFICATION_KIND_REJECTED =
 export const PRODUCT_PROMOTION_NOTIFICATION_KIND_CANCELLED =
   "product_promotion_cancelled";
 
-export const ensureProductPromotionTariffs = async () => {
-  const count = await ProductPromotionTariffModel.countDocuments({});
-  if (count > 0) {
-    return;
-  }
-  await ProductPromotionTariffModel.insertMany(
-    PRODUCT_PROMOTION_DEFAULT_TARIFFS.map((item, index) => ({
-      ...item,
-      order: index,
-    })),
-  );
-};
-
-export const getActiveProductPromotionTariffs = async () => {
-  await ensureProductPromotionTariffs();
-  return ProductPromotionTariffModel.find({ isActive: true })
-    .sort({ order: 1, durationHours: 1 })
-    .lean();
-};
-
 export const clearProductPromotionForProduct = async (productId) => {
   await ProductModel.updateOne(
     { _id: productId },
-    { $set: { catalogPromotionActivatedAt: null, catalogPromotionExpiresAt: null } },
+    {
+      $set: {
+        catalogPromotionTier: null,
+        catalogPromotionActivatedAt: null,
+        catalogPromotionExpiresAt: null,
+      },
+    },
   );
 };
 
 export const setProductPromotionForProduct = async ({
   productId,
+  tier,
   activatedAt,
   activeUntil,
   session = null,
@@ -64,6 +46,7 @@ export const setProductPromotionForProduct = async ({
     { _id: productId },
     {
       $set: {
+        catalogPromotionTier: tier,
         catalogPromotionActivatedAt: activatedAt,
         catalogPromotionExpiresAt: activeUntil,
       },
@@ -138,10 +121,9 @@ export const refundProductPromotionPaymentIfNeeded = async (promotionId) => {
 };
 
 /**
- * Активирует заявку: статус active, даты на товаре, уведомление продавцу.
+ * Активирует заявку: статус active, даты и tier на товаре, уведомление продавцу.
  * @param {import('mongoose').Document} promotion
  * @param {{
- *   approvedByUserId?: import('mongoose').Types.ObjectId | string | null;
  *   notificationMessage?: string;
  *   actorUserId?: import('mongoose').Types.ObjectId | string | null;
  *   session?: import('mongoose').ClientSession | null;
@@ -150,9 +132,8 @@ export const refundProductPromotionPaymentIfNeeded = async (promotionId) => {
  */
 export const activateProductPromotionRecord = async (promotion, options = {}) => {
   const {
-    approvedByUserId = null,
-    notificationMessage = "Продвижение товара одобрено и уже активно",
-    actorUserId = approvedByUserId,
+    notificationMessage = "Продвижение товара активировано",
+    actorUserId = null,
     session = null,
     skipNotification = false,
   } = options;
@@ -163,13 +144,13 @@ export const activateProductPromotionRecord = async (promotion, options = {}) =>
   );
 
   promotion.status = PRODUCT_PROMOTION_STATUS_ACTIVE;
-  promotion.approvedByUserId = approvedByUserId ?? null;
   promotion.activatedAt = activatedAt;
   promotion.activeUntil = activeUntil;
   await promotion.save({ session: session ?? undefined });
 
   await setProductPromotionForProduct({
     productId: promotion.productId,
+    tier: promotion.tier,
     activatedAt,
     activeUntil,
     session,
@@ -279,4 +260,11 @@ export const expireProductPromotionsAndSendNotifications = async () => {
       }),
     ),
   );
+};
+
+export const isProductCatalogPromotionActive = (product) => {
+  if (!product?.catalogPromotionExpiresAt) {
+    return false;
+  }
+  return new Date(product.catalogPromotionExpiresAt).getTime() > Date.now();
 };

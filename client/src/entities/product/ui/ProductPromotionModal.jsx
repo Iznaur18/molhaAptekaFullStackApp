@@ -8,57 +8,63 @@ import "./ProductPromotionModal.css";
  * @param {{
  *   isOpen: boolean;
  *   productName: string;
- *   tariffs: Array<{
- *     code: string;
- *     title: string;
- *     durationHours: number;
- *     priceRub: number;
- *     pricePoints?: number;
- *   }>;
+ *   productPrice: number;
+ *   tiers: Array<{ tier: number; title: string; description: string }>;
+ *   durations: Array<{ code: string; title: string; durationHours: number; durationMult: number }>;
  *   loyaltyPoints: number;
  *   isSubmitting?: boolean;
  *   errorMessage?: string;
  *   onClose: () => void;
- *   onSubmit: (tariffCode: string) => void | Promise<void>;
+ *   onSubmit: (tier: number, tariffCode: string) => void | Promise<void>;
  * }} props
  */
 export function ProductPromotionModal({
   isOpen,
   productName,
-  tariffs,
+  productPrice,
+  tiers,
+  durations,
   loyaltyPoints,
   isSubmitting = false,
   errorMessage = "",
   onClose,
   onSubmit,
 }) {
-  const defaultTariff = tariffs[0]?.code ?? "";
-  const [selectedTariffCode, setSelectedTariffCode] = useState(defaultTariff);
+  const defaultTier = tiers[0]?.tier ?? 1;
+  const defaultDuration = durations[0]?.code ?? "";
+  const [selectedTier, setSelectedTier] = useState(defaultTier);
+  const [selectedDurationCode, setSelectedDurationCode] = useState(defaultDuration);
 
   useEffect(() => {
-    setSelectedTariffCode(defaultTariff);
-  }, [defaultTariff, isOpen]);
+    setSelectedTier(defaultTier);
+    setSelectedDurationCode(defaultDuration);
+  }, [defaultDuration, defaultTier, isOpen]);
 
-  const selectedTariff = useMemo(
-    () => tariffs.find((item) => item.code === selectedTariffCode) ?? null,
-    [selectedTariffCode, tariffs],
+  const selectedTierMeta = useMemo(
+    () => tiers.find((item) => item.tier === selectedTier) ?? null,
+    [selectedTier, tiers],
+  );
+
+  const selectedDuration = useMemo(
+    () => durations.find((item) => item.code === selectedDurationCode) ?? null,
+    [durations, selectedDurationCode],
   );
 
   const selectedPricePoints = useMemo(() => {
-    if (!selectedTariff) {
+    if (!selectedDuration) {
       return 0;
     }
-    const fromApi = Number(selectedTariff.pricePoints);
-    if (Number.isFinite(fromApi) && fromApi > 0) {
-      return fromApi;
-    }
-    return calculateProductPromotionPointsCost(selectedTariff.priceRub);
-  }, [selectedTariff]);
+    return calculateProductPromotionPointsCost({
+      productPrice,
+      tier: selectedTier,
+      durationCode: selectedDuration.code,
+    });
+  }, [productPrice, selectedDuration, selectedTier]);
 
   const hasEnoughFunds = loyaltyPoints >= selectedPricePoints;
 
   const insufficientMessage =
-    selectedTariff && !hasEnoughFunds
+    selectedDuration && !hasEnoughFunds
       ? PRODUCT_PROMOTION_UI.INSUFFICIENT_POINTS(selectedPricePoints, loyaltyPoints)
       : "";
 
@@ -92,30 +98,57 @@ export function ProductPromotionModal({
         </p>
 
         <label className="product-promotion-modal__field">
-          <span>{PRODUCT_PROMOTION_UI.TARIFF_LABEL}</span>
+          <span>{PRODUCT_PROMOTION_UI.TIER_LABEL}</span>
           <select
-            value={selectedTariffCode}
-            disabled={isSubmitting || tariffs.length === 0}
-            onChange={(event) => setSelectedTariffCode(event.target.value)}
+            value={selectedTier}
+            disabled={isSubmitting || tiers.length === 0}
+            onChange={(event) => setSelectedTier(Number(event.target.value))}
           >
-            {tariffs.map((tariff) => {
-              const pricePoints =
-                Number(tariff.pricePoints) > 0
-                  ? Number(tariff.pricePoints)
-                  : calculateProductPromotionPointsCost(tariff.priceRub);
+            {tiers.map((tier) => (
+              <option key={tier.tier} value={tier.tier}>
+                {PRODUCT_PROMOTION_UI.TIER_OPTION(tier.title, tier.description)}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        {selectedTierMeta ? (
+          <p className="product-promotion-modal__summary">
+            {selectedTierMeta.description}
+          </p>
+        ) : null}
+
+        <label className="product-promotion-modal__field">
+          <span>{PRODUCT_PROMOTION_UI.DURATION_LABEL}</span>
+          <select
+            value={selectedDurationCode}
+            disabled={isSubmitting || durations.length === 0}
+            onChange={(event) => setSelectedDurationCode(event.target.value)}
+          >
+            {durations.map((duration) => {
+              const pricePoints = calculateProductPromotionPointsCost({
+                productPrice,
+                tier: selectedTier,
+                durationCode: duration.code,
+              });
               return (
-                <option key={tariff.code} value={tariff.code}>
-                  {PRODUCT_PROMOTION_UI.TARIFF_OPTION_POINTS(tariff.title, pricePoints)}
+                <option key={duration.code} value={duration.code}>
+                  {PRODUCT_PROMOTION_UI.DURATION_OPTION_POINTS(
+                    duration.title,
+                    pricePoints,
+                  )}
                 </option>
               );
             })}
           </select>
         </label>
-        {selectedTariff ? (
+
+        {selectedDuration ? (
           <p className="product-promotion-modal__summary">
-            {PRODUCT_PROMOTION_UI.TARIFF_DURATION(selectedTariff.durationHours)}
+            {PRODUCT_PROMOTION_UI.TARIFF_DURATION(selectedDuration.durationHours)}
           </p>
         ) : null}
+
         {insufficientMessage ? (
           <p className="product-promotion-modal__error" role="alert">
             {insufficientMessage}
@@ -134,8 +167,13 @@ export function ProductPromotionModal({
           <button
             type="button"
             className="app-btn app-btn--primary"
-            disabled={!selectedTariff || isSubmitting || !hasEnoughFunds}
-            onClick={() => selectedTariff && void onSubmit(selectedTariff.code)}
+            disabled={
+              !selectedDuration || isSubmitting || !hasEnoughFunds || tiers.length === 0
+            }
+            onClick={() =>
+              selectedDuration &&
+              void onSubmit(selectedTier, selectedDuration.code)
+            }
           >
             {isSubmitting
               ? PRODUCT_PROMOTION_UI.SUBMIT_PENDING

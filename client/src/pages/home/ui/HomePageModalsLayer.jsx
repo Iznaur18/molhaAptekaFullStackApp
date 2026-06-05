@@ -89,7 +89,7 @@ import { canStaffEditTargetUserPremium } from "../../../entities/user/lib/canSta
  *   handleToggleRaffleParticipation: (productId: string, participate: boolean) => void;
  *   raffleParticipationPendingProductId: string | null;
  *   promotionProduct: ProductFromApi | null;
- *   promotionTariffs: import('../../../entities/product/model/types.js').ProductPromotionTariff[];
+ *   promotionConfig: { tiers: Array<{ tier: number; title: string; description: string }>; durations: Array<{ code: string; title: string; durationHours: number; durationMult: number }> };
  *   promotionModalError: string;
  *   isPromotionSubmitPending: boolean;
  *   handleClosePromotionModal: () => void;
@@ -186,7 +186,7 @@ export function HomePageModalsLayer({
   handleToggleRaffleParticipation,
   raffleParticipationPendingProductId,
   promotionProduct,
-  promotionTariffs,
+  promotionConfig,
   promotionModalError,
   isPromotionSubmitPending,
   handleClosePromotionModal,
@@ -467,7 +467,9 @@ export function HomePageModalsLayer({
       <ProductPromotionModal
         isOpen={promotionProduct != null}
         productName={promotionProduct?.productName ?? ""}
-        tariffs={promotionTariffs}
+        productPrice={Number(promotionProduct?.productPrice) || 0}
+        tiers={promotionConfig.tiers}
+        durations={promotionConfig.durations}
         loyaltyPoints={loyaltyPoints}
         errorMessage={promotionModalError}
         isSubmitting={isPromotionSubmitPending}
