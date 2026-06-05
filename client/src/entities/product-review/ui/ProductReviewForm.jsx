@@ -49,11 +49,7 @@ export function ProductReviewForm({
     <form className="product-review-form" onSubmit={handleSubmit}>
       <label className="product-review-form__label">
         {PRODUCT_REVIEW_UI.LABEL_RATING}
-        <ProductReviewStars
-          value={rating}
-          onChange={setRating}
-          disabled={isBusy}
-        />
+        <ProductReviewStars value={rating} onChange={setRating} disabled={isBusy} />
       </label>
       <label className="product-review-form__label">
         {PRODUCT_REVIEW_UI.LABEL_TEXT}

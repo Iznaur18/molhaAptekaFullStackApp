@@ -1,0 +1,35 @@
+name: Contract smoke
+
+on:
+  push:
+    paths:
+      - "contract/**"
+      - ".github/workflows/contract.yml"
+  pull_request:
+    paths:
+      - "contract/**"
+      - ".github/workflows/contract.yml"
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: contract
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: contract/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Smoke tests
+        run: npm test

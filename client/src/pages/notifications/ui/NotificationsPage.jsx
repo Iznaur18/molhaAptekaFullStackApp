@@ -15,11 +15,7 @@ import "./NotificationsPage.css";
  *   onCleared: () => void;
  * }} props
  */
-export function NotificationsPage({
-  notifications,
-  onNotificationClick,
-  onCleared,
-}) {
+export function NotificationsPage({ notifications, onNotificationClick, onCleared }) {
   const [isClearing, setIsClearing] = useState(false);
   const [clearError, setClearError] = useState("");
 
@@ -34,9 +30,7 @@ export function NotificationsPage({
       onCleared();
     } catch (e) {
       setClearError(
-        e instanceof Error
-          ? e.message
-          : API_CLIENT_UI.MARK_NOTIFICATIONS_READ_FALLBACK,
+        e instanceof Error ? e.message : API_CLIENT_UI.MARK_NOTIFICATIONS_READ_FALLBACK,
       );
     } finally {
       setIsClearing(false);

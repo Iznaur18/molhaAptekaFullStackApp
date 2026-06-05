@@ -1,68 +1,12 @@
-.create-product-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-}
-
-.create-product-modal__backdrop {
-  position: absolute;
-  inset: 0;
-  margin: 0;
-  padding: 0;
-  background: rgba(0, 0, 0, 0.5);
-}
-
-.create-product-modal__card {
-  position: relative;
-  z-index: 1;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  max-width: 480px;
-  max-height: min(90vh, 640px);
-  overflow: hidden;
-  border-radius: 0.75rem;
+.create-product-modal__panel {
   border: 1px solid #e5e7eb;
-  background: #fff;
-  box-shadow: 0 20px 45px rgba(17, 24, 39, 0.28);
-  padding: 1rem;
-}
-
-.create-product-modal__header {
-  display: flex;
-  flex-shrink: 0;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.75rem;
+  max-height: min(90vh, 640px);
 }
 
 .create-product-modal__body {
-  flex: 1;
-  min-height: 0;
+  padding: 0 1rem 1rem;
   overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior: contain;
   scrollbar-gutter: stable;
-}
-
-.create-product-modal__title {
-  margin: 0;
-  font-size: 1.125rem;
-}
-
-.create-product-modal__close {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  font-size: 1.5rem;
-  line-height: 1;
-  cursor: pointer;
 }
 
 .create-product-modal__form {

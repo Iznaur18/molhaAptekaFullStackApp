@@ -10,9 +10,7 @@ const PREMIUM_STAR_FILL = "#ffa200";
  * @param {{ size?: number; className?: string }} props
  */
 export function UserPremiumVerifiedBadge({ size = 18, className = "" }) {
-  const svgClass = ["user-premium-verified-badge", className]
-    .filter(Boolean)
-    .join(" ");
+  const svgClass = ["user-premium-verified-badge", className].filter(Boolean).join(" ");
 
   return (
     <svg

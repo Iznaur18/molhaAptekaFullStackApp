@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ES2022",
+    "jsx": "react-jsx",
+    "checkJs": true,
+    "strict": false,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@molha/api-contract": ["../contract/src/index.js"],
+      "@molha/api-contract/types": ["../contract/src/apiTypes.js"]
+    }
+  },
+  "include": ["src/**/*.js", "src/**/*.jsx", "e2e/**/*.js"],
+  "exclude": ["dist", "node_modules"]
+}

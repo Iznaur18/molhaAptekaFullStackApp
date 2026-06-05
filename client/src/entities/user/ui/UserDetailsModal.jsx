@@ -13,9 +13,7 @@ import { UserProfileProductsList } from "./UserProfileProductsList.jsx";
 import { UserPremiumAvatar } from "./UserPremiumAvatar.jsx";
 import { UserPremiumDisplayName } from "./UserPremiumDisplayName.jsx";
 
-import {
-  USER_DETAILS_MODAL_UI,
-} from "../../../shared/config/appUiCopy.js";
+import { USER_DETAILS_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
 
@@ -39,6 +37,7 @@ import "./UserDetailsModal.css";
  * @param {boolean} [props.isAuthorized]
  * @param {boolean} [props.viewerCanSeeOtherUserPurchases]
  * @param {(product: import('../../product/model/types.js').ProductFromApi) => void} [props.onPurchaseProductClick]
+ * @param {() => void} [props.onViewAllSellerProducts]
  */
 export function UserDetailsModal({
   isOpen,
@@ -57,6 +56,7 @@ export function UserDetailsModal({
   isAuthorized = false,
   viewerCanSeeOtherUserPurchases = false,
   onPurchaseProductClick,
+  onViewAllSellerProducts,
 }) {
   const photoUrl = user ? pickUserProfilePhotoUrl(user) : null;
   const avatarObjectPosition = useMemo(
@@ -67,9 +67,7 @@ export function UserDetailsModal({
     () => formatProfileImageObjectPosition(getUserBackgroundFocus(user)),
     [user],
   );
-  const profileBackground = user
-    ? resolveUserProfileBackgroundFromUser(user)
-    : null;
+  const profileBackground = user ? resolveUserProfileBackgroundFromUser(user) : null;
   const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
   const [backgroundLoadFailed, setBackgroundLoadFailed] = useState(false);
   const isRegisterLayout = layoutVariant === "register";
@@ -125,8 +123,7 @@ export function UserDetailsModal({
     (profileBackground.kind === "preset" ||
       (profileBackground.kind === "image" && !backgroundLoadFailed));
   const showProfileBanner =
-    Boolean(user) &&
-    (canShowBackground || (Boolean(photoUrl) && !avatarLoadFailed));
+    Boolean(user) && (canShowBackground || (Boolean(photoUrl) && !avatarLoadFailed));
 
   const backdropClassName = [
     "user-details-modal__backdrop",
@@ -162,10 +159,7 @@ export function UserDetailsModal({
             {titleSlot ? (
               titleSlot
             ) : (
-              <h2
-                id="user-details-modal-title"
-                className="user-details-modal__title"
-              >
+              <h2 id="user-details-modal-title" className="user-details-modal__title">
                 {titleText != null ? (
                   titleText
                 ) : (
@@ -258,6 +252,7 @@ export function UserDetailsModal({
                     <UserProfileProductsList
                       targetUserId={String(user._id)}
                       onProductClick={onPurchaseProductClick}
+                      onViewAllProducts={onViewAllSellerProducts}
                     />
                   </>
                 ) : null}

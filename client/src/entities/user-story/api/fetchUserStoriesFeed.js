@@ -19,9 +19,7 @@ export async function fetchUserStoriesFeed() {
     };
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      "Не удалось загрузить сторисы";
+      e?.response?.data?.message ?? e?.message ?? "Не удалось загрузить сторисы";
     throw new Error(message);
   }
 }

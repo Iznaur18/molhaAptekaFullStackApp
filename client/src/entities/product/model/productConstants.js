@@ -199,93 +199,19 @@ export const CATALOG_SORT_LABEL_RU = {
   [CATALOG_FILTER_SALE_ONLY]: "Распродажа",
 };
 
-/**
- * Поля lean-документа Product: схема `server/models/ProductModel.js` + `timestamps`.
- * Порядок — для единообразного UI.
- */
-export const PRODUCT_MODEL_FIELD_KEYS = [
-  "_id",
-  "productName",
-  "productDescription",
-  "productImageUrls",
-  "productPrice",
-  "productSeller",
-  "productCategory",
-  "productIsAvailable",
-  "uniqueViewerCount",
-  "soldQuantity",
-  "createdAt",
-  "updatedAt",
-];
-
-/** Поля превью на карточке каталога (остальное — в модалке). */
-export const PRODUCT_CARD_PREVIEW_FIELD_KEYS = [
-  "productPrice",
-  "productSeller",
-];
-
-/** Поля на карточке в очереди «На модерации» (как каталог + описание и дата). */
-export const PRODUCT_CARD_MODERATION_PREVIEW_FIELD_KEYS = [
-  "productPrice",
-  "productSeller",
-  "productDescription",
-  "createdAt",
-];
-
-/**
- * Верхний ряд модалки товара: слева квадратное фото, справа — эти поля.
- */
-export const PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS = [
-  "productPrice",
-  "productCategory",
-  "productStockQuantity",
-  "soldQuantity",
-  "uniqueViewerCount",
-];
-
-/** Верхний ряд модалки для admin / moderator (расширенный набор полей). */
-export const PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS_ADMIN = [
-  "productPrice",
-  "productCategory",
-  "productStockQuantity",
-  "soldQuantity",
-  "uniqueViewerCount",
-];
-
-/** Нижний ряд модалки: на всю ширину под верхним блоком. */
-export const PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS = [
-  "productDescription",
-  "_id",
-  "createdAt",
-  "updatedAt",
-];
-
-/** Нижний ряд для admin / moderator: описание, ссылки на фото, служебные даты. */
-export const PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS_STAFF = [
-  "productDescription",
-  "productImageUrls",
-  "_id",
-  "createdAt",
-  "updatedAt",
-];
-
-/** Подписи полей в UI (модалка и таблица на карточке). */
-export const PRODUCT_FIELD_LABEL_RU = {
-  _id: "ID",
-  productName: "Название",
-  productDescription: "Описание",
-  productImageUrls: "Фото (URL)",
-  productPreviewVideoUrl: "Превью-видео (URL)",
-  productPrice: "Цена",
-  productOldPrice: "Старая цена",
-  productSeller: "Продавец",
-  productCategory: "Категория",
-  productIsAvailable: "В наличии",
-  productStockQuantity: "В наличии (шт.)",
-  productModerationStatus: "Статус модерации",
-  productModerationComment: "Комментарий модератора",
-  uniqueViewerCount: "Просмотры",
-  soldQuantity: "Продано",
-  createdAt: "Создан",
-  updatedAt: "Обновлён",
-};
+export {
+  PRODUCT_CARD_MODERATION_PREVIEW_FIELD_KEYS,
+  PRODUCT_CARD_PREVIEW_FIELD_KEYS,
+  PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS,
+  PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS_STAFF,
+  PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS,
+  PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS_ADMIN,
+  PRODUCT_FIELD_LABEL_RU,
+  PRODUCT_FIELD_REGISTRY,
+  PRODUCT_MODEL_FIELD_KEYS,
+  getProductFieldEditKind,
+  getProductFieldEditLabel,
+  getProductFieldLabel,
+  getProductFieldReadLayout,
+  getProductFieldRegistryEntry,
+} from "../lib/productFieldRegistry.js";

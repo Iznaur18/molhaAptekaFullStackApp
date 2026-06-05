@@ -18,9 +18,7 @@ export async function fetchUserStoriesByAuthor(authorUserId) {
     return data.data.stories;
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      "Не удалось загрузить сторисы автора";
+      e?.response?.data?.message ?? e?.message ?? "Не удалось загрузить сторисы автора";
     throw new Error(message);
   }
 }

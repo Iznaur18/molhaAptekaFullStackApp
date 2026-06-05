@@ -1,10 +1,10 @@
-import { body } from 'express-validator';
+import { body } from "express-validator";
 
 import {
   ADDRESS_FLAT_MAX_LENGTH,
   ADDRESS_LINE_MAX_LENGTH,
-} from '../../constants/dadataConstants.js';
-import { verifyRuDeliveryAddress } from '../../utils/dadata/verifyRuDeliveryAddress.js';
+} from "../../constants/dadataConstants.js";
+import { verifyRuDeliveryAddress } from "../../utils/dadata/verifyRuDeliveryAddress.js";
 /**
  * @param {{
  *   lineField?: string;
@@ -14,22 +14,22 @@ import { verifyRuDeliveryAddress } from '../../utils/dadata/verifyRuDeliveryAddr
  */
 export function ruDeliveryAddressBodyValidation(options = {}) {
   const {
-    lineField = 'userAddress',
-    flatField = 'userAddressFlat',
+    lineField = "userAddress",
+    flatField = "userAddressFlat",
     lineRequired = false,
   } = options;
 
   const lineRules = lineRequired
     ? body(lineField)
         .isString()
-        .withMessage('Адрес должен быть строкой')
+        .withMessage("Адрес должен быть строкой")
         .trim()
         .notEmpty()
-        .withMessage('Адрес доставки обязателен')
+        .withMessage("Адрес доставки обязателен")
         .isLength({ max: ADDRESS_LINE_MAX_LENGTH })
         .withMessage(`Адрес не длиннее ${ADDRESS_LINE_MAX_LENGTH} символов`)
     : body(lineField)
-        .optional({ values: 'falsy', nullable: true })
+        .optional({ values: "falsy", nullable: true })
         .trim()
         .isLength({ max: ADDRESS_LINE_MAX_LENGTH })
         .withMessage(`Адрес не длиннее ${ADDRESS_LINE_MAX_LENGTH} символов`);
@@ -37,14 +37,14 @@ export function ruDeliveryAddressBodyValidation(options = {}) {
   const flatRules = lineRequired
     ? body(flatField)
         .isString()
-        .withMessage('Квартира должна быть строкой')
+        .withMessage("Квартира должна быть строкой")
         .trim()
         .notEmpty()
-        .withMessage('Укажите номер квартиры')
+        .withMessage("Укажите номер квартиры")
         .isLength({ max: ADDRESS_FLAT_MAX_LENGTH })
         .withMessage(`Квартира: не более ${ADDRESS_FLAT_MAX_LENGTH} символов`)
     : body(flatField)
-        .optional({ values: 'falsy', nullable: true })
+        .optional({ values: "falsy", nullable: true })
         .trim()
         .isLength({ max: ADDRESS_FLAT_MAX_LENGTH })
         .withMessage(`Квартира: не более ${ADDRESS_FLAT_MAX_LENGTH} символов`);
@@ -60,31 +60,31 @@ export function ruDeliveryAddressBodyValidation(options = {}) {
       const hasFlat = flatRaw !== undefined;
       if (!hasLine && !hasFlat) {
         if (lineRequired) {
-          throw new Error('Адрес доставки обязателен');
+          throw new Error("Адрес доставки обязателен");
         }
         return true;
       }
 
       const line =
-        lineRaw === null || lineRaw === undefined ? '' : String(lineRaw).trim();
+        lineRaw === null || lineRaw === undefined ? "" : String(lineRaw).trim();
       const flat =
-        flatRaw === null || flatRaw === undefined ? '' : String(flatRaw).trim();
+        flatRaw === null || flatRaw === undefined ? "" : String(flatRaw).trim();
 
-      if (line === '' && flat === '') {
+      if (line === "" && flat === "") {
         req.verifiedDeliveryAddress = null;
         return true;
       }
 
-      if (lineRequired && line === '') {
-        throw new Error('Адрес доставки обязателен');
+      if (lineRequired && line === "") {
+        throw new Error("Адрес доставки обязателен");
       }
 
-      if (line === '' && flat !== '') {
-        throw new Error('Сначала выберите адрес из подсказок');
+      if (line === "" && flat !== "") {
+        throw new Error("Сначала выберите адрес из подсказок");
       }
 
-      if (line !== '' && flat === '') {
-        throw new Error('Укажите номер квартиры');
+      if (line !== "" && flat === "") {
+        throw new Error("Укажите номер квартиры");
       }
 
       const verified = await verifyRuDeliveryAddress({

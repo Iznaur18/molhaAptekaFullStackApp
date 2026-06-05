@@ -135,10 +135,7 @@ export function EditProductCategoryDisplayModal({
   }
 
   return createPortal(
-    <div
-      className="edit-category-display-modal__backdrop"
-      role="presentation"
-    >
+    <div className="edit-category-display-modal__backdrop" role="presentation">
       <div
         className="edit-category-display-modal"
         role="dialog"

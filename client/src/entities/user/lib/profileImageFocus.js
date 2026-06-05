@@ -63,10 +63,7 @@ export function formatProfileImageObjectPosition(focus) {
  * @returns {ProfileImageFocus}
  */
 export function getUserAvatarFocus(user) {
-  return normalizeProfileImageFocus(
-    user?.userAvatarFocus,
-    DEFAULT_USER_AVATAR_FOCUS,
-  );
+  return normalizeProfileImageFocus(user?.userAvatarFocus, DEFAULT_USER_AVATAR_FOCUS);
 }
 
 /**

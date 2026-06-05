@@ -3,8 +3,8 @@ import {
   ADDRESS_LINE_MAX_LENGTH,
   DADATA_QC_COMPLETE_MAX,
   DADATA_QC_GEO_MAX,
-} from '../../constants/dadataConstants.js';
-import { cleanRuAddress, isDadataConfigured } from './dadataClient.js';
+} from "../../constants/dadataConstants.js";
+import { cleanRuAddress, isDadataConfigured } from "./dadataClient.js";
 
 /**
  * @param {string} line
@@ -25,7 +25,7 @@ function pickFlatFromCleaned(cleaned) {
   const flat = cleaned.flat;
   if (flat == null) return null;
   const text = String(flat).trim();
-  return text === '' ? null : text;
+  return text === "" ? null : text;
 }
 
 /**
@@ -38,17 +38,17 @@ function pickFlatFromCleaned(cleaned) {
  * }>}
  */
 export async function verifyRuDeliveryAddress({ addressLine, flat }) {
-  const line = String(addressLine ?? '').trim();
-  const flatInput = String(flat ?? '').trim();
+  const line = String(addressLine ?? "").trim();
+  const flatInput = String(flat ?? "").trim();
 
   if (line.length === 0) {
-    throw new Error('Укажите адрес из подсказок');
+    throw new Error("Укажите адрес из подсказок");
   }
   if (line.length > ADDRESS_LINE_MAX_LENGTH) {
     throw new Error(`Адрес не длиннее ${ADDRESS_LINE_MAX_LENGTH} символов`);
   }
   if (flatInput.length === 0) {
-    throw new Error('Укажите номер квартиры');
+    throw new Error("Укажите номер квартиры");
   }
   if (flatInput.length > ADDRESS_FLAT_MAX_LENGTH) {
     throw new Error(`Квартира: не более ${ADDRESS_FLAT_MAX_LENGTH} символов`);
@@ -58,7 +58,7 @@ export async function verifyRuDeliveryAddress({ addressLine, flat }) {
     return {
       displayAddress: line,
       flat: flatInput,
-      fiasId: '',
+      fiasId: "",
       geo: null,
     };
   }
@@ -67,34 +67,33 @@ export async function verifyRuDeliveryAddress({ addressLine, flat }) {
   const cleanedFlat = pickFlatFromCleaned(cleaned);
 
   if (!cleanedFlat) {
-    throw new Error('Укажите номер квартиры для доставки');
+    throw new Error("Укажите номер квартиры для доставки");
   }
 
   const qcComplete = Number(cleaned.qc_complete ?? 10);
   if (Number.isNaN(qcComplete) || qcComplete > DADATA_QC_COMPLETE_MAX) {
-    throw new Error('Адрес неполный — выберите вариант из подсказок DaData');
+    throw new Error("Адрес неполный — выберите вариант из подсказок DaData");
   }
 
   const qcGeo = Number(cleaned.qc_geo ?? 10);
   if (Number.isNaN(qcGeo) || qcGeo > DADATA_QC_GEO_MAX) {
-    throw new Error('Уточните адрес до дома (улица и номер дома)');
+    throw new Error("Уточните адрес до дома (улица и номер дома)");
   }
 
   const fiasIdRaw = cleaned.house_fias_id ?? cleaned.fias_id;
-  const fiasId = fiasIdRaw != null ? String(fiasIdRaw).trim() : '';
+  const fiasId = fiasIdRaw != null ? String(fiasIdRaw).trim() : "";
   if (!fiasId) {
-    throw new Error('Не удалось определить дом по адресу');
+    throw new Error("Не удалось определить дом по адресу");
   }
 
   const displayAddress =
-    typeof cleaned.result === 'string' && cleaned.result.trim() !== ''
+    typeof cleaned.result === "string" && cleaned.result.trim() !== ""
       ? cleaned.result.trim()
       : buildAddressQueryForClean(line, cleanedFlat);
 
   const lat = Number(cleaned.geo_lat);
   const lon = Number(cleaned.geo_lon);
-  const geo =
-    Number.isFinite(lat) && Number.isFinite(lon) ? { lat, lon } : null;
+  const geo = Number.isFinite(lat) && Number.isFinite(lon) ? { lat, lon } : null;
 
   return {
     displayAddress,

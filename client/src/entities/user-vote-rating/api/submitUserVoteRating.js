@@ -10,10 +10,9 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
  */
 export async function submitUserVoteRating(targetUserId, userVoteValueClient) {
   try {
-    const { data } = await apiClient.post(
-      `/vote/${encodeURIComponent(targetUserId)}`,
-      { userVoteValueClient },
-    );
+    const { data } = await apiClient.post(`/vote/${encodeURIComponent(targetUserId)}`, {
+      userVoteValueClient,
+    });
 
     if (!data?.success || data.data?.user == null) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
@@ -25,9 +24,7 @@ export async function submitUserVoteRating(targetUserId, userVoteValueClient) {
     };
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      API_CLIENT_UI.VOTE_SUBMIT_FALLBACK;
+      e?.response?.data?.message ?? e?.message ?? API_CLIENT_UI.VOTE_SUBMIT_FALLBACK;
     throw new Error(message);
   }
 }

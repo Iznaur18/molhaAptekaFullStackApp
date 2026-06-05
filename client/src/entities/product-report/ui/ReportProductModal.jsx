@@ -3,9 +3,7 @@ import { createPortal } from "react-dom";
 
 import { submitProductReport } from "../api/submitProductReport.js";
 import { PRODUCT_REPORT_TEXT_MAX_CHARS } from "../model/constants.js";
-import {
-  PRODUCT_REPORT_MODAL_UI,
-} from "../../../shared/config/appUiCopy.js";
+import { PRODUCT_REPORT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
 
@@ -137,11 +135,7 @@ export function ReportProductModal({
               <button
                 type="submit"
                 className="report-product-modal__submit"
-                disabled={
-                  isSubmitting ||
-                  reportText.trim().length === 0 ||
-                  isOverLimit
-                }
+                disabled={isSubmitting || reportText.trim().length === 0 || isOverLimit}
               >
                 {isSubmitting
                   ? PRODUCT_REPORT_MODAL_UI.SUBMIT_LOADING

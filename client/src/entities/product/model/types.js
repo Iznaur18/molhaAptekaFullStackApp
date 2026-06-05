@@ -32,42 +32,9 @@
  */
 
 /**
- * Товар из `GET /product` (lean + populate).
+ * Товар из `GET /product` — `productFromApiSchema` (Zod) + passthrough с API.
  *
- * @typedef {object} ProductFromApi
- * @property {string} _id
- * @property {string} productName
- * @property {string} [productDescription]
- * @property {ProductCharacteristic[]} [productCharacteristics]
- * @property {string[]} [productImageUrls]
- * @property {string} [productImageUrl]
- * @property {string} [productPreviewVideoUrl]
- * @property {number} productPrice
- * @property {number | null} [productOldPrice]
- * @property {number | null} [discountPercent]
- * @property {ProductSellerPopulated|string} productSeller
- * @property {ProductCategory} productCategory
- * @property {boolean} productIsAvailable
- * @property {number} [productStockQuantity]
- * @property {number} [productAvailableQuantity] — остаток с учётом резерва в заказах
- * @property {boolean} [productAuctionEnabled]
- * @property {boolean} [productInstallmentEnabled]
- * @property {boolean} [productAuctionCompletedOnce]
- * @property {boolean} [auctionActive] — enabled && approved && available
- * @property {'pending'|'approved'|'rejected'} [productModerationStatus]
- * @property {string} [productModerationComment]
- * @property {boolean} [hasOpenSales] — незавершённые продажи (`GET /product/my`, для admin — `GET /product`)
- * @property {number} [uniqueViewerCount]
- * @property {number} [soldQuantity] — сумма `quantity` по позициям `confirmed`/`delivered`
- * @property {number} [averageRating]
- * @property {number} [reviewCount]
- * @property {string | null} [catalogPromotionActivatedAt]
- * @property {string | null} [catalogPromotionExpiresAt]
- * @property {string | null} [activeRaffleId]
- * @property {string | null} [raffleParticipationEnabledAt]
- * @property {number} [loyaltyPointsPerUnit] — баллов продавца за 1 шт. премиум-покупателю
- * @property {string} createdAt
- * @property {string} updatedAt
+ * @typedef {import('@molha/api-contract/types').ProductFromApiContract} ProductFromApi
  */
 
 export {};

@@ -15,10 +15,7 @@ import "./DataConfirmationRequestsPage.css";
  *   onQueueChanged?: () => void;
  * }} props
  */
-export function DataConfirmationRequestsPage({
-  onApplicantClick,
-  onQueueChanged,
-}) {
+export function DataConfirmationRequestsPage({ onApplicantClick, onQueueChanged }) {
   const [phase, setPhase] = useState("loading");
   const [requests, setRequests] = useState(
     /** @type {import('../../../entities/user-data-confirmation/model/types.js').DataConfirmationRequest[]} */ ([]),

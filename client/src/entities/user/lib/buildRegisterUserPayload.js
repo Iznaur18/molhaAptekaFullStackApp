@@ -56,11 +56,7 @@ export function buildRegisterUserPayload(form) {
   appendRuAddressToPayload(payload, form.deliveryAddress);
   if (userBirthDate) payload.userBirthDate = userBirthDate;
 
-  const allowedGender = [
-    USER_GENDER_MALE,
-    USER_GENDER_FEMALE,
-    USER_GENDER_NO_SELECTED,
-  ];
+  const allowedGender = [USER_GENDER_MALE, USER_GENDER_FEMALE, USER_GENDER_NO_SELECTED];
   if (allowedGender.includes(form.userGender)) {
     payload.userGender = form.userGender;
   }

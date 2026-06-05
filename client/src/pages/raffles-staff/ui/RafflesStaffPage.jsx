@@ -24,21 +24,21 @@ const LIVE_SITE_STATUSES = new Set(["active", "paused", "completed"]);
  *   onEditRaffle?: (raffle: import('../../../entities/raffle/model/types.js').RaffleFromApi) => void;
  * }} props
  */
-export function RafflesStaffPage({
-  refreshTick = 0,
-  onQueueChanged,
-  onEditRaffle,
-}) {
+export function RafflesStaffPage({ refreshTick = 0, onQueueChanged, onEditRaffle }) {
   const [phase, setPhase] = useState("loading");
   const [raffles, setRaffles] = useState(
     /** @type {import('../../../entities/raffle/model/types.js').RaffleFromApi[]} */ ([]),
   );
   const [liveRaffle, setLiveRaffle] = useState(
-    /** @type {import('../../../entities/raffle/model/types.js').RaffleFromApi | null} */ (null),
+    /** @type {import('../../../entities/raffle/model/types.js').RaffleFromApi | null} */ (
+      null
+    ),
   );
   const [error, setError] = useState("");
   const [pendingId, setPendingId] = useState(null);
-  const [rowErrors, setRowErrors] = useState(/** @type {Record<string, string>} */ ({}));
+  const [rowErrors, setRowErrors] = useState(
+    /** @type {Record<string, string>} */ ({}),
+  );
 
   const loadQueue = useCallback(async () => {
     setPhase("loading");
@@ -139,14 +139,15 @@ export function RafflesStaffPage({
   };
 
   if (phase === "loading") {
-    return (
-      <p className="raffles-staff-page__state">{RAFFLES_STAFF_PAGE_UI.LOADING}</p>
-    );
+    return <p className="raffles-staff-page__state">{RAFFLES_STAFF_PAGE_UI.LOADING}</p>;
   }
 
   if (phase === "error") {
     return (
-      <p className="raffles-staff-page__state raffles-staff-page__state_error" role="alert">
+      <p
+        className="raffles-staff-page__state raffles-staff-page__state_error"
+        role="alert"
+      >
         {error}
       </p>
     );
@@ -192,9 +193,7 @@ export function RafflesStaffPage({
               className="raffles-staff-page__manage"
               showEdit={Boolean(onEditRaffle)}
               showDelete
-              onEdit={
-                onEditRaffle ? () => onEditRaffle(liveRaffle) : undefined
-              }
+              onEdit={onEditRaffle ? () => onEditRaffle(liveRaffle) : undefined}
               onDelete={() => void handleDelete(liveRaffle._id, { clearLive: true })}
               busy={liveBusy}
             />
@@ -244,7 +243,9 @@ export function RafflesStaffPage({
                     disabled={busy}
                     onClick={() => void handleApprove(raffle._id)}
                   >
-                    {busy ? RAFFLES_STAFF_PAGE_UI.PENDING : RAFFLES_STAFF_PAGE_UI.APPROVE}
+                    {busy
+                      ? RAFFLES_STAFF_PAGE_UI.PENDING
+                      : RAFFLES_STAFF_PAGE_UI.APPROVE}
                   </button>
                   <button
                     type="button"

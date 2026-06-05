@@ -1,56 +1,64 @@
 import { useEffect } from "react";
 
-import { pathnameToMainView } from "../../../shared/lib/homeMainViewPaths.js";
+import {
+  pathnameToMainView,
+  isRoleRestrictedMainView,
+} from "../../../shared/lib/homeMainViewPaths.js";
+
 import { isRaffleProductsPath } from "../../../shared/lib/rafflePaths.js";
 
+import { isSellerProductsPath } from "../../../shared/lib/sellerPaths.js";
+
 /**
+
  * @param {object} params
+
  */
+
 export const useHomeRouteGuards = ({
   location,
+
   navigate,
+
   mainView,
+
   goToMainView,
+
   isSessionReady,
+
   isAdmin,
+
   canModerateProducts,
 }) => {
   useEffect(() => {
     if (pathnameToMainView(location.pathname) !== null) {
       return undefined;
     }
+
     if (isRaffleProductsPath(location.pathname)) {
       return undefined;
     }
+
+    if (isSellerProductsPath(location.pathname)) {
+      return undefined;
+    }
+
     navigate("/", { replace: true });
+
     return undefined;
   }, [location.pathname, navigate]);
 
   useEffect(() => {
-    if (!isSessionReady) {
+    if (!isSessionReady || !isRoleRestrictedMainView(mainView)) {
       return;
     }
-    if (mainView === "admin-orders" && !isAdmin) {
-      goToMainView("catalog");
-      return;
-    }
-    if (mainView === "product-moderation" && !canModerateProducts) {
-      goToMainView("catalog");
-      return;
-    }
-    if (mainView === "product-reports" && !canModerateProducts) {
-      goToMainView("catalog");
-      return;
-    }
-    if (mainView === "data-confirmation-requests" && !canModerateProducts) {
-      goToMainView("catalog");
-      return;
-    }
-    if (mainView === "installment-moderation" && !canModerateProducts) {
-      goToMainView("catalog");
-      return;
-    }
-    if (mainView === "installment-disputes" && !canModerateProducts) {
+
+    const requiresAdmin =
+      mainView === "admin-orders" ||
+      mainView === "search-synonyms-admin" ||
+      mainView === "category-tree-admin";
+
+    if ((requiresAdmin && !isAdmin) || (!requiresAdmin && !canModerateProducts)) {
       goToMainView("catalog");
     }
   }, [mainView, isAdmin, canModerateProducts, goToMainView, isSessionReady]);

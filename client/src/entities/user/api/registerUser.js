@@ -15,9 +15,7 @@ export async function registerUser(payload) {
     }
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      API_CLIENT_UI.REGISTER_FALLBACK;
+      e?.response?.data?.message ?? e?.message ?? API_CLIENT_UI.REGISTER_FALLBACK;
     throw new Error(message);
   }
 }

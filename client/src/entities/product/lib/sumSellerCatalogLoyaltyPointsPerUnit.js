@@ -12,8 +12,7 @@ export function sumSellerCatalogLoyaltyPointsPerUnit(
     return 0;
   }
 
-  const exclude =
-    excludeProductId != null ? String(excludeProductId) : null;
+  const exclude = excludeProductId != null ? String(excludeProductId) : null;
 
   return products.reduce((sum, product) => {
     if (exclude != null && String(product?._id) === exclude) {

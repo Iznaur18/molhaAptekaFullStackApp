@@ -37,6 +37,8 @@ import "./MyProfilePage.css";
  * onMyOrdersClick?: () => void;
  * onAuctionClick?: () => void;
  * onAdminOrdersClick?: () => void;
+ * onSearchSynonymsAdminClick?: () => void;
+ * onCategoryTreeAdminClick?: () => void;
  * onProductModerationClick?: () => void;
  * onProductReportsClick?: () => void;
  * onProductPromotionsClick?: () => void;
@@ -78,6 +80,8 @@ export function MyProfilePage({
   onMyOrdersClick,
   onAuctionClick,
   onAdminOrdersClick,
+  onSearchSynonymsAdminClick,
+  onCategoryTreeAdminClick,
   onProductModerationClick,
   onProductReportsClick,
   onProductPromotionsClick,
@@ -117,9 +121,7 @@ export function MyProfilePage({
     () => formatProfileImageObjectPosition(getUserBackgroundFocus(user)),
     [user],
   );
-  const profileBackground = user
-    ? resolveUserProfileBackgroundFromUser(user)
-    : null;
+  const profileBackground = user ? resolveUserProfileBackgroundFromUser(user) : null;
   const rows = useMemo(
     () =>
       user
@@ -131,8 +133,7 @@ export function MyProfilePage({
   const canUseMySales = isProfileReady && Boolean(onMySalesClick);
   const canUseInstallmentPayments =
     isProfileReady && Boolean(onInstallmentPaymentsClick);
-  const canUseInstallmentSales =
-    isProfileReady && Boolean(onInstallmentSalesClick);
+  const canUseInstallmentSales = isProfileReady && Boolean(onInstallmentSalesClick);
   const canUseMyOrders = isProfileReady && Boolean(onMyOrdersClick);
   const canUseAuction = isProfileReady && Boolean(onAuctionClick);
   const canUseEditProfile = isProfileReady && Boolean(onEditProfileClick);
@@ -142,7 +143,17 @@ export function MyProfilePage({
     isProfileReady &&
     user?.userRole === "admin" &&
     Boolean(onAdminOrdersClick);
-  const canUseDataConfirmation = isProfileReady && user?.isUserDataConfirmed !== true;
+  const canUseSearchSynonymsAdmin =
+    !isRegularUser &&
+    isProfileReady &&
+    user?.userRole === "admin" &&
+    Boolean(onSearchSynonymsAdminClick);
+  const canUseCategoryTreeAdmin =
+    !isRegularUser &&
+    isProfileReady &&
+    user?.userRole === "admin" &&
+    Boolean(onCategoryTreeAdminClick);
+  const canUseDataConfirmation = isProfileReady && Boolean(onDataConfirmationClick);
   const canUsePremium = isProfileReady && Boolean(onPremiumClick);
   const canUseLoyaltyPoints = isProfileReady && Boolean(onLoyaltyPointsClick);
   const canUseProductModeration =
@@ -151,8 +162,7 @@ export function MyProfilePage({
     !isRegularUser && isProfileReady && Boolean(onProductReportsClick);
   const canUseProductPromotions =
     !isRegularUser && isProfileReady && Boolean(onProductPromotionsClick);
-  const canUseRaffles =
-    !isRegularUser && isProfileReady && Boolean(onRafflesClick);
+  const canUseRaffles = !isRegularUser && isProfileReady && Boolean(onRafflesClick);
   const canUseCreateRaffle =
     isProfileReady &&
     user?.isUserDataConfirmed === true &&
@@ -180,10 +190,7 @@ export function MyProfilePage({
   const showProfileBanner =
     Boolean(user) && (canShowBackground || (Boolean(photoUrl) && !avatarLoadFailed));
   const showEditOnBanner =
-    isRegularUser &&
-    canUseEditProfile &&
-    activeTab === "overview" &&
-    showProfileBanner;
+    isRegularUser && canUseEditProfile && activeTab === "overview" && showProfileBanner;
   useEffect(() => {
     setAvatarLoadFailed(false);
     setBackgroundLoadFailed(false);
@@ -208,219 +215,246 @@ export function MyProfilePage({
         <h2 className="my-profile-page__title">{MY_PROFILE_PAGE_UI.TAB_TITLE}</h2>
         <div className="my-profile-page__header-actions">
           <div className="my-profile-page__header-tabs-row">
-          {canUseCreateRaffle ? (
+            {canUseCreateRaffle ? (
+              <button
+                type="button"
+                className="my-profile-page__header-action my-profile-page__header-action_create-raffle"
+                onClick={() => onCreateRaffleClick?.()}
+              >
+                {MY_PROFILE_PAGE_UI.TAB_CREATE_RAFFLE}
+              </button>
+            ) : null}
             <button
               type="button"
-              className="my-profile-page__header-action my-profile-page__header-action_create-raffle"
-              onClick={() => onCreateRaffleClick?.()}
+              className={tabButtonClassName("my-products")}
+              disabled={!canUseMyProducts}
+              onClick={() => {
+                onTabChange?.("my-products");
+                onMyProductsClick?.();
+              }}
             >
-              {MY_PROFILE_PAGE_UI.TAB_CREATE_RAFFLE}
+              {MY_PROFILE_PAGE_UI.TAB_MY_PRODUCTS}
             </button>
-          ) : null}
-          <button
-            type="button"
-            className={tabButtonClassName("my-products")}
-            disabled={!canUseMyProducts}
-            onClick={() => {
-              onTabChange?.("my-products");
-              onMyProductsClick?.();
-            }}
-          >
-            {MY_PROFILE_PAGE_UI.TAB_MY_PRODUCTS}
-          </button>
-          <button
-            type="button"
-            className={tabButtonClassName("my-sales", pendingMySalesActionCount > 0)}
-            disabled={!canUseMySales}
-            onClick={() => {
-              onTabChange?.("my-sales");
-              onMySalesClick?.();
-            }}
-          >
-            {MY_PROFILE_PAGE_UI.TAB_MY_SALES}
-            <ProfileTabBadge count={pendingMySalesActionCount} />
-          </button>
-          <button
-            type="button"
-            className={tabButtonClassName("my-orders", pendingMyOrdersActionCount > 0)}
-            disabled={!canUseMyOrders}
-            onClick={() => {
-              onTabChange?.("my-orders");
-              onMyOrdersClick?.();
-            }}
-          >
-            {MY_PROFILE_PAGE_UI.TAB_MY_ORDERS}
-            <ProfileTabBadge count={pendingMyOrdersActionCount} />
-          </button>
-          {canUseAuction ? (
+            <button
+              type="button"
+              className={tabButtonClassName("my-sales", pendingMySalesActionCount > 0)}
+              disabled={!canUseMySales}
+              onClick={() => {
+                onTabChange?.("my-sales");
+                onMySalesClick?.();
+              }}
+            >
+              {MY_PROFILE_PAGE_UI.TAB_MY_SALES}
+              <ProfileTabBadge count={pendingMySalesActionCount} />
+            </button>
             <button
               type="button"
               className={tabButtonClassName(
-                "auction",
-                pendingIncomingPriceOffersCount > 0,
+                "my-orders",
+                pendingMyOrdersActionCount > 0,
               )}
+              disabled={!canUseMyOrders}
               onClick={() => {
-                onTabChange?.("auction");
-                onAuctionClick?.();
+                onTabChange?.("my-orders");
+                onMyOrdersClick?.();
               }}
             >
-              {MY_PROFILE_PAGE_UI.TAB_AUCTION}
-              <ProfileTabBadge count={pendingIncomingPriceOffersCount} />
+              {MY_PROFILE_PAGE_UI.TAB_MY_ORDERS}
+              <ProfileTabBadge count={pendingMyOrdersActionCount} />
             </button>
-          ) : null}
-          {canUseInstallmentPayments ? (
-            <button
-              type="button"
-              className={tabButtonClassName(
-                "installment-payments",
-                pendingInstallmentBuyerActionCount > 0,
-              )}
-              onClick={() => {
-                onTabChange?.("installment-payments");
-                onInstallmentPaymentsClick?.();
-              }}
-            >
-              {MY_PROFILE_PAGE_UI.TAB_INSTALLMENT_PAYMENTS}
-              <ProfileTabBadge count={pendingInstallmentBuyerActionCount} />
-            </button>
-          ) : null}
-          {canUseInstallmentSales ? (
-            <button
-              type="button"
-              className={tabButtonClassName(
-                "installment-sales",
-                pendingInstallmentSellerActionCount > 0,
-              )}
-              onClick={() => {
-                onTabChange?.("installment-sales");
-                onInstallmentSalesClick?.();
-              }}
-            >
-              {MY_PROFILE_PAGE_UI.TAB_INSTALLMENT_SALES}
-              <ProfileTabBadge count={pendingInstallmentSellerActionCount} />
-            </button>
-          ) : null}
-          {canUseProductModeration ? (
-            <button
-              type="button"
-              className={tabButtonClassName(
-                "product-moderation",
-                pendingModerationCount > 0,
-              )}
-              onClick={() => {
-                onTabChange?.("product-moderation");
-                onProductModerationClick?.();
-              }}
-            >
-              {MY_PROFILE_PAGE_UI.TAB_PRODUCT_MODERATION}
-              <ProfileTabBadge count={pendingModerationCount} />
-            </button>
-          ) : null}
-          {canUseProductReports ? (
-            <button
-              type="button"
-              className={tabButtonClassName(
-                "product-reports",
-                pendingProductReportsCount > 0,
-              )}
-              onClick={() => {
-                onTabChange?.("product-reports");
-                onProductReportsClick?.();
-              }}
-            >
-              {MY_PROFILE_PAGE_UI.TAB_PRODUCT_REPORTS}
-              <ProfileTabBadge count={pendingProductReportsCount} />
-            </button>
-          ) : null}
-          {canUseProductPromotions ? (
-            <button
-              type="button"
-              className={tabButtonClassName(
-                "product-promotions",
-                pendingProductPromotionsCount > 0,
-              )}
-              onClick={() => {
-                onTabChange?.("product-promotions");
-                onProductPromotionsClick?.();
-              }}
-            >
-              {MY_PROFILE_PAGE_UI.TAB_PRODUCT_PROMOTIONS}
-              <ProfileTabBadge count={pendingProductPromotionsCount} />
-            </button>
-          ) : null}
-          {canUseRaffles ? (
-            <button
-              type="button"
-              className={tabButtonClassName("raffles", pendingRafflesCount > 0)}
-              onClick={() => {
-                onTabChange?.("raffles");
-                onRafflesClick?.();
-              }}
-            >
-              {MY_PROFILE_PAGE_UI.TAB_RAFFLES}
-              <ProfileTabBadge count={pendingRafflesCount} />
-            </button>
-          ) : null}
-          {canUseDataConfirmationQueue ? (
-            <button
-              type="button"
-              className={tabButtonClassName(
-                "data-confirmation-requests",
-                pendingDataConfirmationCount > 0,
-              )}
-              onClick={() => {
-                onTabChange?.("data-confirmation-requests");
-                onDataConfirmationQueueClick?.();
-              }}
-            >
-              {MY_PROFILE_PAGE_UI.TAB_DATA_CONFIRMATION}
-              <ProfileTabBadge count={pendingDataConfirmationCount} />
-            </button>
-          ) : null}
-          {canUseInstallmentModeration ? (
-            <button
-              type="button"
-              className={tabButtonClassName(
-                "installment-moderation",
-                pendingInstallmentModerationCount > 0,
-              )}
-              onClick={() => {
-                onTabChange?.("installment-moderation");
-                onInstallmentModerationClick?.();
-              }}
-            >
-              {MY_PROFILE_PAGE_UI.TAB_INSTALLMENT_MODERATION}
-              <ProfileTabBadge count={pendingInstallmentModerationCount} />
-            </button>
-          ) : null}
-          {canUseInstallmentDisputes ? (
-            <button
-              type="button"
-              className={tabButtonClassName(
-                "installment-disputes",
-                pendingInstallmentDisputesCount > 0,
-              )}
-              onClick={() => {
-                onTabChange?.("installment-disputes");
-                onInstallmentDisputesClick?.();
-              }}
-            >
-              {MY_PROFILE_PAGE_UI.TAB_INSTALLMENT_DISPUTES}
-              <ProfileTabBadge count={pendingInstallmentDisputesCount} />
-            </button>
-          ) : null}
-          {canUseAdminOrders ? (
-            <button
-              type="button"
-              className={tabButtonClassName("admin-orders")}
-              onClick={() => {
-                onTabChange?.("admin-orders");
-                onAdminOrdersClick?.();
-              }}
-            >
-              {MY_PROFILE_PAGE_UI.TAB_ADMIN_ORDERS}
-            </button>
-          ) : null}
+            {canUseAuction ? (
+              <button
+                type="button"
+                className={tabButtonClassName(
+                  "auction",
+                  pendingIncomingPriceOffersCount > 0,
+                )}
+                onClick={() => {
+                  onTabChange?.("auction");
+                  onAuctionClick?.();
+                }}
+              >
+                {MY_PROFILE_PAGE_UI.TAB_AUCTION}
+                <ProfileTabBadge count={pendingIncomingPriceOffersCount} />
+              </button>
+            ) : null}
+            {canUseInstallmentPayments ? (
+              <button
+                type="button"
+                className={tabButtonClassName(
+                  "installment-payments",
+                  pendingInstallmentBuyerActionCount > 0,
+                )}
+                onClick={() => {
+                  onTabChange?.("installment-payments");
+                  onInstallmentPaymentsClick?.();
+                }}
+              >
+                {MY_PROFILE_PAGE_UI.TAB_INSTALLMENT_PAYMENTS}
+                <ProfileTabBadge count={pendingInstallmentBuyerActionCount} />
+              </button>
+            ) : null}
+            {canUseInstallmentSales ? (
+              <button
+                type="button"
+                className={tabButtonClassName(
+                  "installment-sales",
+                  pendingInstallmentSellerActionCount > 0,
+                )}
+                onClick={() => {
+                  onTabChange?.("installment-sales");
+                  onInstallmentSalesClick?.();
+                }}
+              >
+                {MY_PROFILE_PAGE_UI.TAB_INSTALLMENT_SALES}
+                <ProfileTabBadge count={pendingInstallmentSellerActionCount} />
+              </button>
+            ) : null}
+            {canUseProductModeration ? (
+              <button
+                type="button"
+                className={tabButtonClassName(
+                  "product-moderation",
+                  pendingModerationCount > 0,
+                )}
+                onClick={() => {
+                  onTabChange?.("product-moderation");
+                  onProductModerationClick?.();
+                }}
+              >
+                {MY_PROFILE_PAGE_UI.TAB_PRODUCT_MODERATION}
+                <ProfileTabBadge count={pendingModerationCount} />
+              </button>
+            ) : null}
+            {canUseProductReports ? (
+              <button
+                type="button"
+                className={tabButtonClassName(
+                  "product-reports",
+                  pendingProductReportsCount > 0,
+                )}
+                onClick={() => {
+                  onTabChange?.("product-reports");
+                  onProductReportsClick?.();
+                }}
+              >
+                {MY_PROFILE_PAGE_UI.TAB_PRODUCT_REPORTS}
+                <ProfileTabBadge count={pendingProductReportsCount} />
+              </button>
+            ) : null}
+            {canUseProductPromotions ? (
+              <button
+                type="button"
+                className={tabButtonClassName(
+                  "product-promotions",
+                  pendingProductPromotionsCount > 0,
+                )}
+                onClick={() => {
+                  onTabChange?.("product-promotions");
+                  onProductPromotionsClick?.();
+                }}
+              >
+                {MY_PROFILE_PAGE_UI.TAB_PRODUCT_PROMOTIONS}
+                <ProfileTabBadge count={pendingProductPromotionsCount} />
+              </button>
+            ) : null}
+            {canUseRaffles ? (
+              <button
+                type="button"
+                className={tabButtonClassName("raffles", pendingRafflesCount > 0)}
+                onClick={() => {
+                  onTabChange?.("raffles");
+                  onRafflesClick?.();
+                }}
+              >
+                {MY_PROFILE_PAGE_UI.TAB_RAFFLES}
+                <ProfileTabBadge count={pendingRafflesCount} />
+              </button>
+            ) : null}
+            {canUseDataConfirmationQueue ? (
+              <button
+                type="button"
+                className={tabButtonClassName(
+                  "data-confirmation-requests",
+                  pendingDataConfirmationCount > 0,
+                )}
+                onClick={() => {
+                  onTabChange?.("data-confirmation-requests");
+                  onDataConfirmationQueueClick?.();
+                }}
+              >
+                {MY_PROFILE_PAGE_UI.TAB_DATA_CONFIRMATION}
+                <ProfileTabBadge count={pendingDataConfirmationCount} />
+              </button>
+            ) : null}
+            {canUseInstallmentModeration ? (
+              <button
+                type="button"
+                className={tabButtonClassName(
+                  "installment-moderation",
+                  pendingInstallmentModerationCount > 0,
+                )}
+                onClick={() => {
+                  onTabChange?.("installment-moderation");
+                  onInstallmentModerationClick?.();
+                }}
+              >
+                {MY_PROFILE_PAGE_UI.TAB_INSTALLMENT_MODERATION}
+                <ProfileTabBadge count={pendingInstallmentModerationCount} />
+              </button>
+            ) : null}
+            {canUseInstallmentDisputes ? (
+              <button
+                type="button"
+                className={tabButtonClassName(
+                  "installment-disputes",
+                  pendingInstallmentDisputesCount > 0,
+                )}
+                onClick={() => {
+                  onTabChange?.("installment-disputes");
+                  onInstallmentDisputesClick?.();
+                }}
+              >
+                {MY_PROFILE_PAGE_UI.TAB_INSTALLMENT_DISPUTES}
+                <ProfileTabBadge count={pendingInstallmentDisputesCount} />
+              </button>
+            ) : null}
+            {canUseAdminOrders ? (
+              <button
+                type="button"
+                className={tabButtonClassName("admin-orders")}
+                onClick={() => {
+                  onTabChange?.("admin-orders");
+                  onAdminOrdersClick?.();
+                }}
+              >
+                {MY_PROFILE_PAGE_UI.TAB_ADMIN_ORDERS}
+              </button>
+            ) : null}
+            {canUseSearchSynonymsAdmin ? (
+              <button
+                type="button"
+                className={tabButtonClassName("search-synonyms-admin")}
+                onClick={() => {
+                  onTabChange?.("search-synonyms-admin");
+                  onSearchSynonymsAdminClick?.();
+                }}
+              >
+                {MY_PROFILE_PAGE_UI.TAB_SEARCH_SYNONYMS_ADMIN}
+              </button>
+            ) : null}
+            {canUseCategoryTreeAdmin ? (
+              <button
+                type="button"
+                className={tabButtonClassName("category-tree-admin")}
+                onClick={() => {
+                  onTabChange?.("category-tree-admin");
+                  onCategoryTreeAdminClick?.();
+                }}
+              >
+                {MY_PROFILE_PAGE_UI.TAB_CATEGORY_TREE_ADMIN}
+              </button>
+            ) : null}
           </div>
           <div className="my-profile-page__header-account-row">
             <button
@@ -434,14 +468,18 @@ export function MyProfilePage({
             >
               {MY_PROFILE_PAGE_UI.TAB_SUBSCRIPTIONS}
             </button>
-            <button
-              type="button"
-              className="my-profile-page__header-action"
-              disabled={!canUseDataConfirmation}
-              onClick={() => onDataConfirmationClick?.()}
-            >
-              {MY_PROFILE_PAGE_UI.DATA_CONFIRMATION}
-            </button>
+            {canUseDataConfirmation ? (
+              <button
+                type="button"
+                className={tabButtonClassName("data-confirmation")}
+                onClick={() => {
+                  onTabChange?.("data-confirmation");
+                  onDataConfirmationClick?.();
+                }}
+              >
+                {MY_PROFILE_PAGE_UI.TAB_DATA_CONFIRMATION}
+              </button>
+            ) : null}
             {canUsePremium ? (
               <button
                 type="button"
@@ -497,84 +535,89 @@ export function MyProfilePage({
           {isProfileReady ? tabContent : null}
         </div>
       ) : (
-      <div className="my-profile-page__body">
-        {isLoading ? (
-          <p className="my-profile-page__state">{USER_DETAILS_MODAL_UI.LOADING_BODY}</p>
-        ) : null}
-        {errorMessage && !isLoading ? (
-          <p className="my-profile-page__state my-profile-page__state_error" role="alert">
-            {errorMessage}
-          </p>
-        ) : null}
-        {isProfileReady && activeTab === "overview" ? (
-          <>
-            {showProfileBanner ? (
-              <div
-                className={
-                  canShowBackground
-                    ? "user-details-modal__banner user-details-modal__banner_has-bg"
-                    : "user-details-modal__banner"
-                }
-              >
-                {canShowBackground && profileBackground?.kind === "image" ? (
-                  <img
-                    className="user-details-modal__banner-image"
-                    src={profileBackground.url}
-                    alt=""
-                    decoding="async"
-                    loading="lazy"
-                    referrerPolicy="no-referrer"
-                    style={{ objectPosition: backgroundObjectPosition }}
-                    onError={() => setBackgroundLoadFailed(true)}
-                  />
-                ) : null}
-                {canShowBackground && profileBackground?.kind === "preset" ? (
-                  <div
-                    className="user-details-modal__banner-color"
-                    style={{ backgroundColor: profileBackground.color }}
-                    aria-hidden="true"
-                  />
-                ) : null}
-                {photoUrl && !avatarLoadFailed ? (
-                  <UserPremiumAvatar
-                    className="user-details-modal__avatar user-details-modal__avatar_lead user-details-modal__avatar_on-banner"
-                    src={photoUrl}
-                    isPremium={isPremiumActive(user)}
-                    objectPosition={avatarObjectPosition}
-                    decoding="async"
-                    onError={() => setAvatarLoadFailed(true)}
-                  />
-                ) : null}
-                {showEditOnBanner ? (
-                  <button
-                    type="button"
-                    className="my-profile-page__banner-edit"
-                    onClick={() => onEditProfileClick?.()}
-                  >
-                    {MY_PROFILE_PAGE_UI.EDIT_PROFILE}
-                  </button>
-                ) : null}
-              </div>
-            ) : null}
-            {tabContent ? (
-              <div className="my-profile-page__tab-content my-profile-page__tab-content_lead">
-                {tabContent}
-              </div>
-            ) : null}
-            <dl className="user-details-modal__list">
-              {rows.map((row) => (
-                <div key={row.id} className="user-details-modal__row">
-                  <dt className="user-details-modal__label">{row.label}</dt>
-                  <dd className="user-details-modal__value">{row.value}</dd>
+        <div className="my-profile-page__body">
+          {isLoading ? (
+            <p className="my-profile-page__state">
+              {USER_DETAILS_MODAL_UI.LOADING_BODY}
+            </p>
+          ) : null}
+          {errorMessage && !isLoading ? (
+            <p
+              className="my-profile-page__state my-profile-page__state_error"
+              role="alert"
+            >
+              {errorMessage}
+            </p>
+          ) : null}
+          {isProfileReady && activeTab === "overview" ? (
+            <>
+              {showProfileBanner ? (
+                <div
+                  className={
+                    canShowBackground
+                      ? "user-details-modal__banner user-details-modal__banner_has-bg"
+                      : "user-details-modal__banner"
+                  }
+                >
+                  {canShowBackground && profileBackground?.kind === "image" ? (
+                    <img
+                      className="user-details-modal__banner-image"
+                      src={profileBackground.url}
+                      alt=""
+                      decoding="async"
+                      loading="lazy"
+                      referrerPolicy="no-referrer"
+                      style={{ objectPosition: backgroundObjectPosition }}
+                      onError={() => setBackgroundLoadFailed(true)}
+                    />
+                  ) : null}
+                  {canShowBackground && profileBackground?.kind === "preset" ? (
+                    <div
+                      className="user-details-modal__banner-color"
+                      style={{ backgroundColor: profileBackground.color }}
+                      aria-hidden="true"
+                    />
+                  ) : null}
+                  {photoUrl && !avatarLoadFailed ? (
+                    <UserPremiumAvatar
+                      className="user-details-modal__avatar user-details-modal__avatar_lead user-details-modal__avatar_on-banner"
+                      src={photoUrl}
+                      isPremium={isPremiumActive(user)}
+                      objectPosition={avatarObjectPosition}
+                      decoding="async"
+                      onError={() => setAvatarLoadFailed(true)}
+                    />
+                  ) : null}
+                  {showEditOnBanner ? (
+                    <button
+                      type="button"
+                      className="my-profile-page__banner-edit"
+                      onClick={() => onEditProfileClick?.()}
+                    >
+                      {MY_PROFILE_PAGE_UI.EDIT_PROFILE}
+                    </button>
+                  ) : null}
                 </div>
-              ))}
-            </dl>
-          </>
-        ) : null}
-        {isProfileReady && activeTab !== "overview" ? (
-          <div className="my-profile-page__tab-content">{tabContent}</div>
-        ) : null}
-      </div>
+              ) : null}
+              {tabContent ? (
+                <div className="my-profile-page__tab-content my-profile-page__tab-content_lead">
+                  {tabContent}
+                </div>
+              ) : null}
+              <dl className="user-details-modal__list">
+                {rows.map((row) => (
+                  <div key={row.id} className="user-details-modal__row">
+                    <dt className="user-details-modal__label">{row.label}</dt>
+                    <dd className="user-details-modal__value">{row.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </>
+          ) : null}
+          {isProfileReady && activeTab !== "overview" ? (
+            <div className="my-profile-page__tab-content">{tabContent}</div>
+          ) : null}
+        </div>
       )}
       <footer className="my-profile-page__footer">
         {activeTab === PROFILE_TAB_OVERVIEW ? (

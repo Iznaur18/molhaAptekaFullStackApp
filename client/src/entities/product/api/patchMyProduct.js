@@ -1,4 +1,5 @@
 import { apiClient } from "../../../shared/api/index.js";
+import { parsePatchMyProductData } from "../../../shared/api/parseApiContract.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 
 /**
@@ -11,12 +12,8 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 export async function patchMyProduct(productId, body) {
   try {
     const { data } = await apiClient.patch(`/product/${productId}`, body);
-
-    if (!data?.success || data.data?.product == null) {
-      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
-    }
-
-    return data.data.product;
+    const parsed = parsePatchMyProductData(data);
+    return parsed.product;
   } catch (e) {
     const message =
       e?.response?.data?.message ??

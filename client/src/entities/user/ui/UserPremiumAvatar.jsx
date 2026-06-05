@@ -28,17 +28,12 @@ export function UserPremiumAvatar({
   width,
   height,
 }) {
-  const imgClass = [
-    className,
-    isPremium ? "user-premium-avatar" : "",
-  ]
+  const imgClass = [className, isPremium ? "user-premium-avatar" : ""]
     .filter(Boolean)
     .join(" ");
 
   const imgStyle =
-    objectPosition != null && objectPosition !== ""
-      ? { objectPosition }
-      : undefined;
+    objectPosition != null && objectPosition !== "" ? { objectPosition } : undefined;
 
   return (
     <img

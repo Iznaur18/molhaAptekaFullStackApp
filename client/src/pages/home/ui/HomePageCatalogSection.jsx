@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { RaffleFeaturedCarousel } from "../../../entities/raffle/ui/RaffleFeaturedCarousel.jsx";
 import { UserStoriesStrip } from "../../../entities/user-story/ui/UserStoriesStrip.jsx";
 import { CatalogBrowserLanding } from "../../../entities/product-category-display/ui/CatalogBrowserLanding.jsx";
+import { IS_CATALOG_BROWSER_SUBCATEGORY_FILTER_ENABLED } from "../../../entities/product-category-tree/lib/isCatalogBrowserSubcategoryFilterEnabled.js";
+import { CatalogBrowserTreeFilter } from "../../../entities/product-category-tree/ui/CatalogBrowserTreeFilter.jsx";
 import { buildRafflePath } from "../../../shared/lib/rafflePaths.js";
 import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
@@ -24,7 +26,7 @@ import { HomeCatalogGrid } from "./HomeCatalogGrid.jsx";
  *   currentUserId: string | null;
  *   onUserStoriesRefresh: () => void;
  *   onSellerNameClick: (userId: string) => void;
- *   mainView: string;
+ *   catalogMainView: string;
  *   activeCatalogBrowserCategory: string | null;
  *   selectedProductCategory: string | null;
  *   hasProductSearchQuery: boolean;
@@ -73,7 +75,7 @@ export function HomePageCatalogGridSection({
   currentUserId,
   onUserStoriesRefresh,
   onSellerNameClick,
-  mainView,
+  catalogMainView,
   activeCatalogBrowserCategory,
   selectedProductCategory,
   hasProductSearchQuery,
@@ -147,7 +149,7 @@ export function HomePageCatalogGridSection({
       <HomeCatalogGrid
         products={products}
         selectedProductCategory={
-          mainView === "catalog-browser"
+          catalogMainView === "catalog-browser"
             ? activeCatalogBrowserCategory
             : selectedProductCategory
         }
@@ -195,12 +197,17 @@ export function HomePageCatalogGridSection({
  * @param {{
  *   isCatalogBrowserLanding: boolean;
  *   categoryDisplays: import('../../../entities/product-category-display/model/types.js').ProductCategoryDisplayFromApi[];
+ *   feedTileDisplays: import('../../../entities/product-category-display/model/types.js').ProductCatalogFeedTileDisplayFromApi[];
  *   isAdmin: boolean;
  *   categoryDisplaysStatus: { kind: string; message?: string };
- *   onFeedTileClick: (tile: import('../../../entities/product-category-display/model/types.js').CatalogFeedTile) => void;
+ *   onFeedTileClick: (tile: import('../../../entities/product-category-display/lib/buildCatalogFeedTiles.js').CatalogFeedTile) => void;
  *   onCategoryClick: (slug: import('../../../entities/product/model/types.js').ProductCategory) => void;
  *   onEditCategoryClick: (slug: import('../../../entities/product/model/types.js').ProductCategory) => void;
+ *   onEditFeedTileClick: (tileKey: string) => void;
+ *   activeCatalogBrowserCategoryId: string | null;
  *   selectedCategoryLabel: string | null;
+ *   onCatalogCategoryTreeSelect: (payload: { categoryId: string; categoryLabel: string }) => void;
+ *   onClearCatalogCategoryTreeFilter: () => void;
  *   activeCatalogFeedLabel: string | null;
  *   onBackToCatalogLanding: () => void;
  *   catalogGridSectionProps: import('./HomePageCatalogGridSection.jsx').HomePageCatalogGridSection extends never ? never : Parameters<typeof HomePageCatalogGridSection>[0];
@@ -209,12 +216,17 @@ export function HomePageCatalogGridSection({
 export function HomePageCatalogSection({
   isCatalogBrowserLanding,
   categoryDisplays,
+  feedTileDisplays,
   isAdmin,
   categoryDisplaysStatus,
   onFeedTileClick,
   onCategoryClick,
   onEditCategoryClick,
+  onEditFeedTileClick,
+  activeCatalogBrowserCategoryId,
   selectedCategoryLabel,
+  onCatalogCategoryTreeSelect,
+  onClearCatalogCategoryTreeFilter,
   activeCatalogFeedLabel,
   onBackToCatalogLanding,
   catalogGridSectionProps,
@@ -223,6 +235,7 @@ export function HomePageCatalogSection({
     return (
       <CatalogBrowserLanding
         displays={categoryDisplays}
+        feedTileDisplays={feedTileDisplays}
         isAdmin={isAdmin}
         isLoading={categoryDisplaysStatus.kind === "loading"}
         errorMessage={
@@ -233,45 +246,55 @@ export function HomePageCatalogSection({
         onFeedTileClick={onFeedTileClick}
         onCategoryClick={onCategoryClick}
         onEditCategoryClick={onEditCategoryClick}
+        onEditFeedTileClick={onEditFeedTileClick}
       />
     );
   }
 
-  const breadcrumbCurrentLabel =
-    selectedCategoryLabel ?? activeCatalogFeedLabel;
+  const breadcrumbCurrentLabel = selectedCategoryLabel ?? activeCatalogFeedLabel;
 
   return (
     <>
       <div className="catalog-categories-browser__toolbar">
-        <nav
-          className="catalog-categories-browser__breadcrumb"
-          aria-label={HOME_PAGE_UI.BREADCRUMB_CATALOG}
-        >
+        <div className="catalog-categories-browser__toolbar-main">
+          <nav
+            className="catalog-categories-browser__breadcrumb"
+            aria-label={HOME_PAGE_UI.BREADCRUMB_CATALOG}
+          >
+            <button
+              type="button"
+              className="catalog-categories-browser__breadcrumb-link"
+              onClick={onBackToCatalogLanding}
+            >
+              {HOME_PAGE_UI.BREADCRUMB_CATALOG}
+            </button>
+            {breadcrumbCurrentLabel ? (
+              <>
+                <span className="home-page__breadcrumb-sep" aria-hidden="true">
+                  {HOME_PAGE_UI.BREADCRUMB_SEPARATOR}
+                </span>
+                <span className="catalog-categories-browser__breadcrumb-current">
+                  {breadcrumbCurrentLabel}
+                </span>
+              </>
+            ) : null}
+          </nav>
           <button
             type="button"
-            className="catalog-categories-browser__breadcrumb-link"
+            className="catalog-categories-browser__all-button"
             onClick={onBackToCatalogLanding}
           >
-            {HOME_PAGE_UI.BREADCRUMB_CATALOG}
+            {HOME_PAGE_UI.BACK_TO_CATALOG_LANDING}
           </button>
-          {breadcrumbCurrentLabel ? (
-            <>
-              <span className="home-page__breadcrumb-sep" aria-hidden="true">
-                {HOME_PAGE_UI.BREADCRUMB_SEPARATOR}
-              </span>
-              <span className="catalog-categories-browser__breadcrumb-current">
-                {breadcrumbCurrentLabel}
-              </span>
-            </>
-          ) : null}
-        </nav>
-        <button
-          type="button"
-          className="catalog-categories-browser__all-button"
-          onClick={onBackToCatalogLanding}
-        >
-          {HOME_PAGE_UI.BACK_TO_CATALOG_LANDING}
-        </button>
+        </div>
+        {IS_CATALOG_BROWSER_SUBCATEGORY_FILTER_ENABLED ? (
+          <CatalogBrowserTreeFilter
+            categoryId={activeCatalogBrowserCategoryId}
+            categoryLabel={selectedCategoryLabel}
+            onSelect={onCatalogCategoryTreeSelect}
+            onClear={onClearCatalogCategoryTreeFilter}
+          />
+        ) : null}
       </div>
       <HomePageCatalogGridSection {...catalogGridSectionProps} />
     </>

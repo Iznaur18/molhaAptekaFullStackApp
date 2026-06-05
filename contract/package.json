@@ -1,0 +1,17 @@
+{
+  "name": "@molha/api-contract",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js",
+    "./types": "./src/apiTypes.js",
+    "./openapi.yaml": "./openapi.yaml"
+  },
+  "scripts": {
+    "test": "node --test --test-concurrency=1 tests/**/*.test.js"
+  },
+  "dependencies": {
+    "zod": "^3.24.2"
+  }
+}

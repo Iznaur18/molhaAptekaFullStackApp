@@ -22,8 +22,12 @@ function AppIntroSplashContent({ onDismiss }) {
   const openedAtRef = useRef(0);
   const closingRef = useRef(false);
   const dismissedRef = useRef(false);
-  const minTimerRef = useRef(/** @type {ReturnType<typeof setTimeout> | null} */ (null));
-  const maxTimerRef = useRef(/** @type {ReturnType<typeof setTimeout> | null} */ (null));
+  const minTimerRef = useRef(
+    /** @type {ReturnType<typeof setTimeout> | null} */ (null),
+  );
+  const maxTimerRef = useRef(
+    /** @type {ReturnType<typeof setTimeout> | null} */ (null),
+  );
 
   const [isMuted, setIsMuted] = useState(true);
   const [videoFailed, setVideoFailed] = useState(false);
@@ -87,10 +91,7 @@ function AppIntroSplashContent({ onDismiss }) {
 
   useEffect(() => {
     if (!isClosing) return undefined;
-    const fallbackTimer = setTimeout(
-      completeDismiss,
-      APP_INTRO_FADE_OUT_MS + 80,
-    );
+    const fallbackTimer = setTimeout(completeDismiss, APP_INTRO_FADE_OUT_MS + 80);
     return () => clearTimeout(fallbackTimer);
   }, [completeDismiss, isClosing]);
 

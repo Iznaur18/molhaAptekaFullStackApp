@@ -8,10 +8,7 @@ import { Eye } from "../../../shared/ui/icon/index.js";
  *   onClick: () => void;
  * }} props
  */
-export function HeaderShowHiddenProductsButton({
-  isActive = false,
-  onClick,
-}) {
+export function HeaderShowHiddenProductsButton({ isActive = false, onClick }) {
   const ariaLabel = isActive
     ? HEADER_SHOW_HIDDEN_PRODUCTS_BUTTON_UI.ARIA_ACTIVE
     : HEADER_SHOW_HIDDEN_PRODUCTS_BUTTON_UI.ARIA;

@@ -13,9 +13,7 @@ export async function resendEmailVerification() {
     return data.message ?? "";
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      "Не удалось отправить письмо";
+      e?.response?.data?.message ?? e?.message ?? "Не удалось отправить письмо";
     throw new Error(message);
   }
 }

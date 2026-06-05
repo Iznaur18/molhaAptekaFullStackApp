@@ -1,10 +1,10 @@
-import multer from 'multer';
+import multer from "multer";
 
 import {
   UPLOAD_VIDEO_MAX_BYTES,
   UPLOAD_VIDEO_MIME_TYPES,
-} from '../constants/uploadConstants.js';
-import { storage } from './uploadStorage.js';
+} from "../constants/uploadConstants.js";
+import { storage } from "./uploadStorage.js";
 
 const videoMimeSet = new Set(UPLOAD_VIDEO_MIME_TYPES);
 

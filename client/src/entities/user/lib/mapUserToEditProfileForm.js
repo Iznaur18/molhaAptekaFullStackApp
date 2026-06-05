@@ -1,8 +1,5 @@
 import { addressValueFromUser } from "../../address/lib/addressValueFromUser.js";
-import {
-  getUserAvatarFocus,
-  getUserBackgroundFocus,
-} from "./profileImageFocus.js";
+import { getUserAvatarFocus, getUserBackgroundFocus } from "./profileImageFocus.js";
 import { parseUserBackgroundFormFields } from "./userBackgroundValue.js";
 import { formatPremiumExpiresAtForInput } from "./formatPremiumExpiresAtForInput.js";
 import {
@@ -42,13 +39,9 @@ import {
 export function mapUserToEditProfileForm(user) {
   const birth = user.userBirthDate;
   const birthInput =
-    typeof birth === "string" && birth.length >= 10
-      ? birth.slice(0, 10)
-      : "";
+    typeof birth === "string" && birth.length >= 10 ? birth.slice(0, 10) : "";
 
-  const { presetId, imageUrl } = parseUserBackgroundFormFields(
-    user.userBackgroundUrl,
-  );
+  const { presetId, imageUrl } = parseUserBackgroundFormFields(user.userBackgroundUrl);
 
   return {
     userName: user.userName ?? "",

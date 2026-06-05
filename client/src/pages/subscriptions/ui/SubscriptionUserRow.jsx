@@ -20,8 +20,7 @@ export function SubscriptionUserRow({ user, onRowClick }) {
   const [imgFailed, setImgFailed] = useState(false);
   const picked = pickUserProfilePhotoUrl(user);
   const src = !imgFailed && picked ? picked : DEFAULT_USER_AVATAR_URL;
-  const displayName =
-    user.userName?.trim() || USER_LIST_ROW_UI.MISSING_NAME;
+  const displayName = user.userName?.trim() || USER_LIST_ROW_UI.MISSING_NAME;
   const avatarObjectPosition = formatProfileImageObjectPosition(
     getUserAvatarFocus(user),
   );
@@ -33,11 +32,7 @@ export function SubscriptionUserRow({ user, onRowClick }) {
   };
 
   return (
-    <button
-      type="button"
-      className="subscription-user-row"
-      onClick={handleClick}
-    >
+    <button type="button" className="subscription-user-row" onClick={handleClick}>
       <UserPremiumAvatar
         className="subscription-user-row__avatar"
         src={src}

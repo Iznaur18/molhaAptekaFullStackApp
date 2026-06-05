@@ -46,9 +46,7 @@ export function UserBackgroundPresetPicker({
                 style={{ backgroundColor: preset.hex }}
                 aria-hidden="true"
               />
-              <span className="user-background-presets__label">
-                {preset.labelRu}
-              </span>
+              <span className="user-background-presets__label">{preset.labelRu}</span>
             </label>
           );
         })}

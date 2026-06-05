@@ -1,27 +1,29 @@
 import { ProductModel, UserModel } from "../../models/index.js";
 import { PRODUCT_SELLER_PUBLIC_SELECT } from "../../constants/productSellerPublicFields.js";
 import {
-    PRODUCT_MODERATION_APPROVED,
-    PRODUCT_MODERATION_PENDING,
+  PRODUCT_MODERATION_APPROVED,
+  PRODUCT_MODERATION_PENDING,
 } from "../../constants/productModerationConstants.js";
 import { attachProductSellerSnapshot } from "../../utils/attachProductSellerSnapshots.js";
 import { isUserAdmin } from "../../utils/adminUserGuard.js";
 import { mergeProductImageUrlsFromBody } from "../../utils/mergeProductImageUrlsFromBody.js";
 import {
-    assertProductPreviewVideoRequiresPhotos,
-    normalizeProductPreviewVideoUrl,
+  assertProductPreviewVideoRequiresPhotos,
+  normalizeProductPreviewVideoUrl,
 } from "../../utils/productPreviewVideo.js";
 import { assertSellerCanCreateProduct } from "../../utils/sellerProductsLimit.js";
 import { notifyFollowersOfSellerNewCatalogProduct } from "../../utils/userFollowHelpers.js";
 import { notifyFollowersOfSellerProductDiscount } from "../../utils/productDiscount.js";
 import { resolveProductStockQuantityForWrite } from "../../utils/productStock.js";
 import {
-    assertProductOldPricePair,
-    normalizeProductOldPriceRub,
-    normalizeProductPriceRub,
+  assertProductOldPricePair,
+  normalizeProductOldPriceRub,
+  normalizeProductPriceRub,
 } from "../../utils/productDiscount.js";
 import { assertSellerCanSetProductLoyaltyPointsPerUnit } from "../../utils/assertProductLoyaltyPointsPerUnit.js";
 import { normalizeProductCharacteristics } from "../../utils/normalizeProductCharacteristics.js";
+import { buildProductSearchBlobFromFields } from "../../utils/buildProductSearchBlob.js";
+import { resolveProductCategoryWriteFromBody } from "../../utils/resolveProductCategoryWrite.js";
 import { errorRes, successRes } from "../../utils/index.js";
 
 export const postProductController = async (req, res) => {
@@ -31,7 +33,6 @@ export const postProductController = async (req, res) => {
       productName,
       productDescription,
       productPrice: rawProductPrice,
-      productCategory,
       productIsAvailable,
       productAuctionEnabled,
     } = req.body;
@@ -66,21 +67,18 @@ export const postProductController = async (req, res) => {
 
     const productImageUrls = mergeProductImageUrlsFromBody(req.body);
     const productPreviewVideoUrl = normalizeProductPreviewVideoUrl(
-        req.body?.productPreviewVideoUrl,
+      req.body?.productPreviewVideoUrl,
     );
     try {
-        assertProductPreviewVideoRequiresPhotos(
-            productPreviewVideoUrl,
-            productImageUrls,
-        );
+      assertProductPreviewVideoRequiresPhotos(productPreviewVideoUrl, productImageUrls);
     } catch (previewVideoError) {
-        return errorRes(
-            res,
-            400,
-            previewVideoError instanceof Error
-                ? previewVideoError.message
-                : "Некорректное превью-видео",
-        );
+      return errorRes(
+        res,
+        400,
+        previewVideoError instanceof Error
+          ? previewVideoError.message
+          : "Некорректное превью-видео",
+      );
     }
     const productModerationStatus = isAdmin
       ? PRODUCT_MODERATION_APPROVED
@@ -106,44 +104,71 @@ export const postProductController = async (req, res) => {
 
     let loyaltyPointsPerUnit = 0;
     try {
-        loyaltyPointsPerUnit = await assertSellerCanSetProductLoyaltyPointsPerUnit(
-            String(userId),
-            req.body?.loyaltyPointsPerUnit,
-        );
+      loyaltyPointsPerUnit = await assertSellerCanSetProductLoyaltyPointsPerUnit(
+        String(userId),
+        req.body?.loyaltyPointsPerUnit,
+      );
     } catch (loyaltyError) {
-        return errorRes(
-            res,
-            400,
-            loyaltyError instanceof Error
-                ? loyaltyError.message
-                : "Некорректное количество баллов за покупку",
-        );
+      return errorRes(
+        res,
+        400,
+        loyaltyError instanceof Error
+          ? loyaltyError.message
+          : "Некорректное количество баллов за покупку",
+      );
     }
 
     let productCharacteristics = [];
     try {
-        productCharacteristics = normalizeProductCharacteristics(
-            req.body?.productCharacteristics,
-        );
+      productCharacteristics = normalizeProductCharacteristics(
+        req.body?.productCharacteristics,
+      );
     } catch (characteristicsError) {
-        return errorRes(
-            res,
-            400,
-            characteristicsError instanceof Error
-                ? characteristicsError.message
-                : "Некорректные характеристики товара",
-        );
+      return errorRes(
+        res,
+        400,
+        characteristicsError instanceof Error
+          ? characteristicsError.message
+          : "Некорректные характеристики товара",
+      );
     }
+
+    let categoryWrite;
+    try {
+      categoryWrite = await resolveProductCategoryWriteFromBody(req.body);
+    } catch (categoryError) {
+      return errorRes(
+        res,
+        400,
+        categoryError instanceof Error
+          ? categoryError.message
+          : "Некорректная категория товара",
+      );
+    }
+
+    const productSearchBlob = buildProductSearchBlobFromFields({
+      productName,
+      productDescription,
+      productCharacteristics,
+      productCategory: categoryWrite.productCategory,
+      categoryBreadcrumbRu: categoryWrite.categoryBreadcrumbRu,
+      categoryPathLabelRu: categoryWrite.categoryPathLabelRu,
+      categorySearchKeywords: categoryWrite.categorySearchKeywords,
+    });
 
     const product = await ProductModel.create({
       productName,
       productDescription,
+      productSearchBlob,
       productImageUrls,
       productPreviewVideoUrl,
       productPrice,
       productOldPrice,
       productSeller: userId,
-      productCategory,
+      productCategory: categoryWrite.productCategory,
+      productCategoryId: categoryWrite.productCategoryId,
+      categoryPathIds: categoryWrite.categoryPathIds,
+      categoryBreadcrumbRu: categoryWrite.categoryBreadcrumbRu,
       productIsAvailable: visibleInCatalog,
       productStockQuantity,
       productAuctionEnabled: productAuctionEnabled === true,
@@ -161,25 +186,19 @@ export const postProductController = async (req, res) => {
       try {
         await notifyFollowersOfSellerNewCatalogProduct(productPayload);
       } catch (notifyError) {
-        console.error(
-          "notifyFollowersOfSellerNewCatalogProduct error:",
-          notifyError,
-        );
+        console.error("notifyFollowersOfSellerNewCatalogProduct error:", notifyError);
       }
       try {
         await notifyFollowersOfSellerProductDiscount(productPayload, null);
       } catch (notifyError) {
-        console.error(
-          "notifyFollowersOfSellerProductDiscount error:",
-          notifyError,
-        );
+        console.error("notifyFollowersOfSellerProductDiscount error:", notifyError);
       }
     }
 
     return successRes(
-        res,
-        { message: "Продукт успешно создан", product: productPayload },
-        201,
+      res,
+      { message: "Продукт успешно создан", product: productPayload },
+      201,
     );
   } catch (error) {
     console.error(error);

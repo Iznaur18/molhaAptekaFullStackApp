@@ -19,6 +19,11 @@ const Schema = mongoose.Schema;
 const ProductSchema = new Schema(
   {
     productName: { type: String, required: true },
+    productSearchBlob: {
+      type: String,
+      default: "",
+      trim: true,
+    },
     productDescription: {
       type: String,
       trim: true,
@@ -48,9 +53,7 @@ const ProductSchema = new Schema(
       default: [],
       validate: {
         validator(value) {
-          return (
-            Array.isArray(value) && value.length <= PRODUCT_IMAGE_URLS_MAX
-          );
+          return Array.isArray(value) && value.length <= PRODUCT_IMAGE_URLS_MAX;
         },
         message: `Не более ${PRODUCT_IMAGE_URLS_MAX} изображений`,
       },
@@ -81,6 +84,22 @@ const ProductSchema = new Schema(
       type: String,
       enum: PRODUCT_CATEGORY_VALUES,
       required: true,
+    },
+    productCategoryId: {
+      type: Schema.Types.ObjectId,
+      ref: "ProductCategory",
+      default: null,
+      index: true,
+    },
+    categoryPathIds: {
+      type: [Schema.Types.ObjectId],
+      default: [],
+    },
+    categoryBreadcrumbRu: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: 500,
     },
     productIsAvailable: {
       type: Boolean,
@@ -116,6 +135,11 @@ const ProductSchema = new Schema(
       default: 0,
       min: 0,
     },
+    soldQuantity: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
     averageRating: {
       type: Number,
       default: 0,
@@ -136,7 +160,7 @@ const ProductSchema = new Schema(
     },
     activeRaffleId: {
       type: Schema.Types.ObjectId,
-      ref: 'Raffle',
+      ref: "Raffle",
       default: null,
       index: true,
     },
@@ -155,6 +179,57 @@ const ProductSchema = new Schema(
     },
   },
   { timestamps: true },
+);
+
+ProductSchema.index({ productSearchBlob: 1 });
+ProductSchema.index({ categoryPathIds: 1 });
+
+/** GET /product — одобренные, в наличии, сортировка по дате / бусту. */
+ProductSchema.index(
+  {
+    productModerationStatus: 1,
+    productIsAvailable: 1,
+    productStockQuantity: 1,
+    catalogPromotionActivatedAt: -1,
+    catalogPromotionExpiresAt: -1,
+    createdAt: -1,
+  },
+  { name: "catalog_approved_list" },
+);
+
+/** Каталог по подкатегории (`productCategoryId` $in). */
+ProductSchema.index(
+  {
+    productModerationStatus: 1,
+    productCategoryId: 1,
+    productIsAvailable: 1,
+    createdAt: -1,
+  },
+  { name: "catalog_approved_category" },
+);
+
+/** GET /product/moderation/pending — FIFO. */
+ProductSchema.index(
+  { productModerationStatus: 1, createdAt: 1 },
+  { name: "moderation_status_created_asc" },
+);
+
+/** GET /product/my — товары продавца. */
+ProductSchema.index(
+  { productSeller: 1, productModerationStatus: 1, createdAt: -1 },
+  { name: "seller_moderation_created" },
+);
+
+/** Каталог sort=purchases — без $lookup orders. */
+ProductSchema.index(
+  {
+    productModerationStatus: 1,
+    productIsAvailable: 1,
+    productStockQuantity: 1,
+    soldQuantity: -1,
+    createdAt: -1,
+  },
+  { name: "catalog_approved_sold_quantity" },
 );
 
 export default mongoose.model("Product", ProductSchema);

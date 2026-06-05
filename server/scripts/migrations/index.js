@@ -15,6 +15,12 @@ import { up as productLoyaltyPointsPerUnitUp } from "./20260603-product-loyalty-
 import { removeTelegramUserFieldsUp } from "./20260604-remove-telegram-user-fields.js";
 import { up as userEmailVerifiedUp } from "./20260605-user-email-verified.js";
 import { up as productCharacteristicsUp } from "./20260606-product-characteristics.js";
+import { up as productSearchBlobUp } from "./20260607-product-search-blob.js";
+import { up as productCategoryTreeUp } from "./20260608-product-category-tree.js";
+import { up as productCategoryIdUp } from "./20260609-product-category-id.js";
+import { up as productSearchSynonymsUp } from "./20260610-product-search-synonyms.js";
+import { up as catalogModerationOrderIndexesUp } from "./20260611-catalog-moderation-order-indexes.js";
+import { up as productSoldQuantityDenormUp } from "./20260612-product-sold-quantity-denorm.js";
 
 export const MIGRATIONS = [
   {
@@ -101,5 +107,35 @@ export const MIGRATIONS = [
     id: "20260606-product-characteristics",
     description: "Backfill productCharacteristics=[] for existing products",
     up: productCharacteristicsUp,
+  },
+  {
+    id: "20260607-product-search-blob",
+    description: "Backfill productSearchBlob for smart catalog search",
+    up: productSearchBlobUp,
+  },
+  {
+    id: "20260608-product-category-tree",
+    description: "Seed pilot ProductCategory tree (electronics phones branch)",
+    up: productCategoryTreeUp,
+  },
+  {
+    id: "20260609-product-category-id",
+    description: "Backfill productCategoryId and category denorm on products",
+    up: productCategoryIdUp,
+  },
+  {
+    id: "20260610-product-search-synonyms",
+    description: "Seed ProductSearchSynonym rows from static dictionary",
+    up: productSearchSynonymsUp,
+  },
+  {
+    id: "20260611-catalog-moderation-order-indexes",
+    description: "Indexes for catalog, moderation queue, seller products, order sales",
+    up: catalogModerationOrderIndexesUp,
+  },
+  {
+    id: "20260612-product-sold-quantity-denorm",
+    description: "Denorm Product.soldQuantity from orders + catalog sort index",
+    up: productSoldQuantityDenormUp,
   },
 ];

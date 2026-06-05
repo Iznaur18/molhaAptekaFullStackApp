@@ -89,9 +89,7 @@ export function validateEditProfileForm(form, options = {}) {
   }
 
   if (includeLoyaltyPoints || includeAdmin) {
-    const loyaltyPoints = Math.floor(
-      Number(String(form.userLoyaltyPoints).trim()),
-    );
+    const loyaltyPoints = Math.floor(Number(String(form.userLoyaltyPoints).trim()));
     if (!Number.isFinite(loyaltyPoints) || loyaltyPoints < 0) {
       return "Баллы лояльности: целое число не меньше 0";
     }

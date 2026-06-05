@@ -38,13 +38,11 @@ export function RaffleFeaturedBanner({
   const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
   const progress = Number(raffle.salesProgress) || 0;
   const target = Number(raffle.targetSales) || 0;
-  const percent =
-    target > 0 ? Math.min(100, Math.round((progress / target) * 100)) : 0;
+  const percent = target > 0 ? Math.min(100, Math.round((progress / target) * 100)) : 0;
   const isCompleted = raffle.status === "completed";
   const remaining = Math.max(0, target - progress);
   const hasManage =
-    manage &&
-    (manage.showEdit || manage.showDelete || manage.showPause);
+    manage && (manage.showEdit || manage.showDelete || manage.showPause);
 
   const sectionClassName = isCompleted
     ? "raffle-featured-banner raffle-featured-banner_completed"
@@ -70,9 +68,7 @@ export function RaffleFeaturedBanner({
         <div
           className={[
             "raffle-featured-banner__visual",
-            carouselVisualDrag
-              ? "raffle-featured-banner__visual_carousel-drag"
-              : "",
+            carouselVisualDrag ? "raffle-featured-banner__visual_carousel-drag" : "",
             carouselVisualDrag?.isDragging
               ? "raffle-featured-banner__visual_carousel-dragging"
               : "",

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 
 import { AddToCartButton } from "../../../features/cart-add/ui/AddToCartButton.jsx";
 import {
@@ -6,15 +6,14 @@ import {
   PRODUCT_CARD_UI,
   PRODUCT_REVIEW_UI,
 } from "../../../shared/config/appUiCopy.js";
+import { useHorizontalPointerDragScroll } from "../../../shared/lib/useHorizontalPointerDragScroll.js";
 import { formatProductFieldForDisplay } from "../lib/formatProductFieldForDisplay.js";
 import { isCurrentUserProductSeller } from "../lib/isCurrentUserProductSeller.js";
 import { getProductPurchaseLimit } from "../lib/getProductPurchaseLimit.js";
 import { isProductRaffleParticipant } from "../../raffle/lib/isProductRaffleParticipant.js";
 import { resolveAuctionUiState } from "../lib/resolveAuctionUiState.js";
 import { shouldShowPremiumProductCardChrome } from "../lib/isPremiumSellerProduct.js";
-import {
-  isCatalogPromotionActive,
-} from "../lib/productPromotionStatus.js";
+import { isCatalogPromotionActive } from "../lib/productPromotionStatus.js";
 import { resolveProductImageUrls } from "../lib/resolveProductImageUrls.js";
 import { buildProductMediaSlides } from "../lib/buildProductMediaSlides.js";
 import { resolveProductPreviewVideoUrl } from "../lib/resolveProductPreviewVideoUrl.js";
@@ -31,16 +30,15 @@ import { formatProductReviewRatingLine } from "../../product-review/lib/formatPr
 import {
   PRODUCT_CARD_MODERATION_PREVIEW_FIELD_KEYS,
   PRODUCT_CARD_PREVIEW_FIELD_KEYS,
-  PRODUCT_FIELD_LABEL_RU,
   PRODUCT_IMAGE_PLACEHOLDER_URL,
 } from "../model/productConstants.js";
+import { getProductFieldLabel } from "../lib/productFieldRegistry.js";
 import { UserPremiumDisplayName } from "../../user/ui/UserPremiumDisplayName.jsx";
 import { resolveProductDiscountPercent } from "../lib/computeProductDiscountPercent.js";
+import { resolveProductCardHeadingId } from "../lib/resolveProductCardHeadingId.js";
+import { shouldShowProductLoyaltyPointsBadge } from "../lib/shouldShowProductLoyaltyPointsBadge.js";
 import { ProductModerationDetailsFooter } from "./ProductModerationDetailsFooter.jsx";
-import {
-  ProductDiscountBadge,
-  ProductPriceDisplay,
-} from "./ProductPriceDisplay.jsx";
+import { ProductDiscountBadge, ProductPriceDisplay } from "./ProductPriceDisplay.jsx";
 import { ProductLoyaltyPointsBadge } from "./ProductLoyaltyPointsBadge.jsx";
 import { PRODUCT_MODERATION_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
@@ -110,7 +108,11 @@ export function ProductCard({
   isModerationQueue = false,
   moderationActions = null,
 }) {
+  const fallbackHeadingId = useId();
   const heading = product.productName?.trim() || PRODUCT_CARD_UI.DEFAULT_TITLE;
+  const headingId =
+    resolveProductCardHeadingId(product._id) ?? fallbackHeadingId;
+  const isDetailsSurfaceInteractive = !isModerationQueue && onOpenDetails != null;
   const galleryUrls = useMemo(() => resolveProductImageUrls(product), [product]);
   const previewVideoUrl = useMemo(
     () => resolveProductPreviewVideoUrl(product),
@@ -124,6 +126,8 @@ export function ProductCard({
   const [previewVideoFailed, setPreviewVideoFailed] = useState(false);
   const [imageLoadFailed, setImageLoadFailed] = useState(false);
   const [useFallbackImage, setUseFallbackImage] = useState(false);
+  const { ref: statusBadgesRowRef, dragScrollProps: statusBadgesDragScrollProps } =
+    useHorizontalPointerDragScroll();
 
   const mediaSlides = useMemo(() => {
     const videoUrl =
@@ -145,9 +149,7 @@ export function ProductCard({
   }, [product._id, previewVideoUrl]);
 
   useEffect(() => {
-    setCardSlideIndex((i) =>
-      Math.min(i, Math.max(0, mediaSlides.length - 1)),
-    );
+    setCardSlideIndex((i) => Math.min(i, Math.max(0, mediaSlides.length - 1)));
   }, [mediaSlides.length]);
 
   useEffect(() => {
@@ -186,13 +188,16 @@ export function ProductCard({
     if (!isMineMode && !isModerationQueue) return null;
     return (
       <>
-        <span className={getProductModerationBadgeClassName(product)}>
+        <span
+          className={getProductModerationBadgeClassName(product)}
+          role="status"
+          aria-label={getProductModerationBadgeLabel(product)}
+        >
           {getProductModerationBadgeLabel(product)}
         </span>
         {rejectionComment ? (
           <p className="product-card__moderation-comment">
-            {PRODUCT_MODERATION_PAGE_UI.REJECTION_COMMENT_PREFIX}{" "}
-            {rejectionComment}
+            {PRODUCT_MODERATION_PAGE_UI.REJECTION_COMMENT_PREFIX} {rejectionComment}
           </p>
         ) : null}
       </>
@@ -249,8 +254,9 @@ export function ProductCard({
   const hasReviewRating = reviewRatingLine.length > 0;
   const { auctionActive } = resolveAuctionUiState(product);
   const discountPercent = resolveProductDiscountPercent(product);
-  const showDiscountBadge =
-    !auctionActive && discountPercent != null && discountPercent > 0;
+  const showDiscountBadge = discountPercent != null && discountPercent > 0;
+  const showLoyaltyPointsBadge = shouldShowProductLoyaltyPointsBadge(product);
+  const showImageOverlayBadges = showDiscountBadge || showLoyaltyPointsBadge;
   const previewFieldKeysWithoutPrice = useMemo(
     () => previewFieldKeys.filter((key) => key !== "productPrice"),
     [previewFieldKeys],
@@ -270,11 +276,7 @@ export function ProductCard({
         </p>
       );
     }
-    if (
-      !isMineMode &&
-      !isModerationQueue &&
-      product.productIsAvailable === false
-    ) {
+    if (!isMineMode && !isModerationQueue && product.productIsAvailable === false) {
       return (
         <p className="product-card__hidden-badge" role="status">
           {PRODUCT_CARD_UI.HIDDEN_FROM_CATALOG_BADGE}
@@ -300,10 +302,7 @@ export function ProductCard({
     }
     if (isMineMode && isLoyaltyPointsOvercommitted) {
       return (
-        <p
-          className="product-card__loyalty-overcommitted-badge"
-          role="alert"
-        >
+        <p className="product-card__loyalty-overcommitted-badge" role="alert">
           {PRODUCT_CARD_UI.LOYALTY_POINTS_OVERCOMMITTED_BADGE}
         </p>
       );
@@ -321,12 +320,8 @@ export function ProductCard({
     isModerationQueue,
   });
   const showPromotionChrome =
-    highlightCatalogPromotion &&
-    !isMineMode &&
-    !isModerationQueue &&
-    isPromotionActive;
-  const showRaffleBadge =
-    !isModerationQueue && isProductRaffleParticipant(product);
+    highlightCatalogPromotion && !isMineMode && !isModerationQueue && isPromotionActive;
+  const showRaffleBadge = !isModerationQueue && isProductRaffleParticipant(product);
   const showAuctionBadge = !isModerationQueue && auctionActive;
   const showInstallmentBadge =
     !isModerationQueue && product.productInstallmentEnabled === true;
@@ -336,8 +331,7 @@ export function ProductCard({
    * @param {string} display
    */
   const renderProductSellerValue = (raw, display) => {
-    const isPopulatedSeller =
-      raw != null && typeof raw === "object" && raw._id != null;
+    const isPopulatedSeller = raw != null && typeof raw === "object" && raw._id != null;
     if (!isPopulatedSeller || display === COMMON_UI.EM_DASH) {
       return display;
     }
@@ -360,6 +354,7 @@ export function ProductCard({
         <button
           type="button"
           className="product-card__seller-name"
+          aria-label={PRODUCT_CARD_UI.SELLER_PROFILE_ARIA(display)}
           onClick={handleSellerClick}
         >
           {nameNode}
@@ -371,9 +366,7 @@ export function ProductCard({
   };
 
   const showRaffleParticipantChrome =
-    (highlightRaffleProduct || showRaffleBadge) &&
-    !isMineMode &&
-    !isModerationQueue;
+    (highlightRaffleProduct || showRaffleBadge) && !isMineMode && !isModerationQueue;
   const cardClassName = [
     "product-card",
     showRaffleParticipantChrome ? "product-card--raffle-participant" : "",
@@ -381,17 +374,18 @@ export function ProductCard({
     .filter(Boolean)
     .join(" ");
   const card = (
-    <article className={cardClassName}>
+    <article className={cardClassName} aria-labelledby={headingId}>
       <div
         className={bodyClassName}
-        {...(isModerationQueue
-          ? {}
-          : {
+        {...(isDetailsSurfaceInteractive
+          ? {
+              role: "button",
               tabIndex: 0,
               "aria-label": detailsSurfaceLabel,
               onClick: handleOpenDetails,
               onKeyDown: handleDetailsSurfaceKeyDown,
-            })}
+            }
+          : {})}
       >
         <div
           className={[
@@ -401,6 +395,12 @@ export function ProductCard({
           ]
             .filter(Boolean)
             .join(" ")}
+          {...(mediaSlides.length > 1
+            ? {
+                role: "region",
+                "aria-label": PRODUCT_CARD_UI.GALLERY_REGION_ARIA,
+              }
+            : {})}
         >
           {hasSlideMedia ? (
             <ProductMediaSlideContent
@@ -414,11 +414,26 @@ export function ProductCard({
               onVideoFailed={() => setPreviewVideoFailed(true)}
             />
           ) : (
-            <div
-              className="product-card__image-placeholder"
-              aria-hidden="true"
-            />
+            <div className="product-card__image-placeholder" aria-hidden="true" />
           )}
+          {showImageOverlayBadges ? (
+            <div className="product-card__image-badges" aria-hidden="true">
+              {showDiscountBadge ? (
+                <ProductDiscountBadge
+                  discountPercent={discountPercent}
+                  variant="overlay"
+                />
+              ) : null}
+              {showLoyaltyPointsBadge ? (
+                <ProductLoyaltyPointsBadge
+                  product={product}
+                  isAuthorized={isAuthorized}
+                  isPremiumUser={isPremiumUser}
+                  variant="overlay"
+                />
+              ) : null}
+            </div>
+          ) : null}
           {mediaSlides.length > 1 ? (
             <>
               <div className="product-card__image-nav">
@@ -439,27 +454,22 @@ export function ProductCard({
                   ›
                 </button>
               </div>
-              <span className="product-card__image-counter" aria-live="polite">
+              <span
+                className="product-card__image-counter"
+                aria-live="polite"
+                aria-label={PRODUCT_CARD_UI.GALLERY_COUNTER_ARIA(
+                  cardSlideIndex + 1,
+                  mediaSlides.length,
+                )}
+              >
                 {cardSlideIndex + 1} / {mediaSlides.length}
               </span>
             </>
           ) : null}
-          <div className="product-card__image-badges">
-            {showDiscountBadge ? (
-              <ProductDiscountBadge
-                discountPercent={discountPercent}
-                variant="overlay"
-              />
-            ) : null}
-            <ProductLoyaltyPointsBadge
-              product={product}
-              isAuthorized={isAuthorized}
-              isPremiumUser={isPremiumUser}
-              variant="overlay"
-            />
-          </div>
         </div>
-        <h2 className="product-card__heading">{heading}</h2>
+        <h2 id={headingId} className="product-card__heading">
+          {heading}
+        </h2>
         <ProductPriceDisplay
           product={product}
           className="product-card__price"
@@ -474,16 +484,18 @@ export function ProductCard({
                   : "product-card__rating product-card__rating--placeholder"
               }
               aria-label={
-                hasReviewRating
-                  ? reviewRatingLine
-                  : PRODUCT_REVIEW_UI.NO_REVIEWS
+                hasReviewRating ? reviewRatingLine : PRODUCT_REVIEW_UI.NO_REVIEWS
               }
             >
-              {hasReviewRating
-                ? reviewRatingLine
-                : PRODUCT_REVIEW_UI.NO_REVIEWS}
+              {hasReviewRating ? reviewRatingLine : PRODUCT_REVIEW_UI.NO_REVIEWS}
             </p>
-            <div className="product-card__status-badges-row">
+            <div
+              ref={statusBadgesRowRef}
+              className="product-card__status-badges-row"
+              role="group"
+              aria-label={PRODUCT_CARD_UI.STATUS_BADGES_ARIA}
+              {...statusBadgesDragScrollProps}
+            >
               {renderStatusSlot()}
               {showAuctionBadge ? (
                 <p className="product-card__auction-badge" role="status">
@@ -504,7 +516,10 @@ export function ProductCard({
           </div>
         ) : null}
         {renderModerationBadge()}
-        <dl className="product-card__fields product-card__fields--preview">
+        <dl
+          className="product-card__fields product-card__fields--preview"
+          aria-label={PRODUCT_CARD_UI.PREVIEW_FIELDS_ARIA}
+        >
           {previewFieldKeysWithoutPrice.map((key) => {
             const raw = product[key];
             const display = formatProductFieldForDisplay(key, product);
@@ -517,7 +532,7 @@ export function ProductCard({
               return (
                 <div key={key} className={rowClass.join(" ")}>
                   <dt className="product-card__key product-card__key--seller-inline">
-                    {PRODUCT_FIELD_LABEL_RU.productSeller}:
+                    {getProductFieldLabel("productSeller")}:
                   </dt>
                   <dd className="product-card__value product-card__value--seller-inline">
                     {renderProductSellerValue(raw, display)}
@@ -529,7 +544,7 @@ export function ProductCard({
             return (
               <div key={key} className={rowClass.join(" ")}>
                 <dt className="product-card__key">
-                  {PRODUCT_FIELD_LABEL_RU[key] ?? key}
+                  {getProductFieldLabel(key)}
                 </dt>
                 <dd
                   className={
@@ -545,7 +560,10 @@ export function ProductCard({
           })}
         </dl>
       </div>
-      <div className="product-card__footer-actions">
+      <div
+        className="product-card__footer-actions"
+        aria-label={PRODUCT_CARD_UI.FOOTER_ACTIONS_ARIA}
+      >
         {isModerationQueue && moderationActions ? (
           <ProductModerationDetailsFooter
             rejectComment={moderationActions.rejectComment}

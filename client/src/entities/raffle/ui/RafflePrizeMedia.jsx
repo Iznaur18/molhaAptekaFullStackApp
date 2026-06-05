@@ -60,9 +60,7 @@ export function RafflePrizeMedia({
   };
 
   if (isVideo && videoSrc) {
-    const videoClassNames = [className, videoClassName]
-      .filter(Boolean)
-      .join(" ");
+    const videoClassNames = [className, videoClassName].filter(Boolean).join(" ");
 
     if (!showSoundToggle) {
       return (

@@ -21,9 +21,7 @@ export function HeaderNotificationsButton({
       badgeContent={
         hasUnread ? HEADER_NOTIFICATIONS_BUTTON_UI.BADGE(unreadCount) : null
       }
-      badgeAriaLabel={
-        hasUnread ? HEADER_NOTIFICATIONS_BUTTON_UI.COUNT_ARIA : undefined
-      }
+      badgeAriaLabel={hasUnread ? HEADER_NOTIFICATIONS_BUTTON_UI.COUNT_ARIA : undefined}
       badgeVariant="alert"
     />
   );

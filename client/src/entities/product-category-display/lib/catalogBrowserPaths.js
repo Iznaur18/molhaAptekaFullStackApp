@@ -1,6 +1,4 @@
-import {
-  buildCatalogBrowserSearchParams,
-} from "../../../pages/home/lib/catalogCatalogQuery.js";
+import { buildCatalogBrowserSearchParams } from "../../../pages/home/lib/catalogCatalogQuery.js";
 import { mainViewToPathname } from "../../../shared/lib/homeMainViewPaths.js";
 
 /**
@@ -12,9 +10,10 @@ import { mainViewToPathname } from "../../../shared/lib/homeMainViewPaths.js";
  *   installmentOnly?: boolean;
  *   saleOnly: boolean;
  * }} query
+ * @param {{ omitDefaultSort?: boolean }} [options]
  */
-export function buildCatalogBrowserLocation(query) {
-  const params = buildCatalogBrowserSearchParams(query);
+export function buildCatalogBrowserLocation(query, options) {
+  const params = buildCatalogBrowserSearchParams(query, options);
   const search = params.toString();
   return `${mainViewToPathname("catalog-browser")}${search ? `?${search}` : ""}`;
 }

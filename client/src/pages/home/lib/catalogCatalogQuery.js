@@ -6,6 +6,7 @@ import {
 
 export const CATALOG_QUERY_PARAM_SORT = "sort";
 export const CATALOG_QUERY_PARAM_CATEGORY = "category";
+export const CATALOG_QUERY_PARAM_CATEGORY_ID = "categoryId";
 export const CATALOG_QUERY_PARAM_FOLLOWING_ONLY = "followingOnly";
 export const CATALOG_QUERY_PARAM_AUCTION_ONLY = "auctionOnly";
 export const CATALOG_QUERY_PARAM_INSTALLMENT_ONLY = "installmentOnly";
@@ -33,28 +34,49 @@ const parseCatalogCategory = (raw) => {
 };
 
 /**
+ * @param {string | null | undefined} raw
+ * @returns {string | null}
+ */
+const parseCatalogCategoryId = (raw) => {
+  const value = raw?.trim();
+  if (!value || !/^[a-f\d]{24}$/i.test(value)) {
+    return null;
+  }
+  return value;
+};
+
+/**
  * @param {URLSearchParams} searchParams
  */
 export function parseCatalogQueryFromSearchParams(searchParams) {
   const sort = parseCatalogSort(searchParams.get(CATALOG_QUERY_PARAM_SORT));
-  const category = parseCatalogCategory(
-    searchParams.get(CATALOG_QUERY_PARAM_CATEGORY),
-  );
-  const followingOnly =
-    searchParams.get(CATALOG_QUERY_PARAM_FOLLOWING_ONLY) === "true";
-  const auctionOnly =
-    searchParams.get(CATALOG_QUERY_PARAM_AUCTION_ONLY) === "true";
+  const category = parseCatalogCategory(searchParams.get(CATALOG_QUERY_PARAM_CATEGORY));
+  const followingOnly = searchParams.get(CATALOG_QUERY_PARAM_FOLLOWING_ONLY) === "true";
+  const auctionOnly = searchParams.get(CATALOG_QUERY_PARAM_AUCTION_ONLY) === "true";
   const installmentOnly =
     searchParams.get(CATALOG_QUERY_PARAM_INSTALLMENT_ONLY) === "true";
   const saleOnly = searchParams.get(CATALOG_QUERY_PARAM_SALE_ONLY) === "true";
 
-  return { sort, category, followingOnly, auctionOnly, installmentOnly, saleOnly };
+  const categoryId = parseCatalogCategoryId(
+    searchParams.get(CATALOG_QUERY_PARAM_CATEGORY_ID),
+  );
+
+  return {
+    sort,
+    category: categoryId ? null : category,
+    categoryId,
+    followingOnly,
+    auctionOnly,
+    installmentOnly,
+    saleOnly,
+  };
 }
 
 /**
  * @param {{
  *   sort: string;
  *   category: import("../../../entities/product/model/types.js").ProductCategory | null;
+ *   categoryId: string | null;
  *   followingOnly: boolean;
  *   auctionOnly: boolean;
  *   installmentOnly: boolean;
@@ -64,6 +86,7 @@ export function parseCatalogQueryFromSearchParams(searchParams) {
 export function buildCatalogSearchParams({
   sort,
   category,
+  categoryId,
   followingOnly,
   auctionOnly,
   installmentOnly,
@@ -74,7 +97,9 @@ export function buildCatalogSearchParams({
   if (sort !== CATALOG_SORT_NEWEST) {
     params.set(CATALOG_QUERY_PARAM_SORT, sort);
   }
-  if (category) {
+  if (categoryId) {
+    params.set(CATALOG_QUERY_PARAM_CATEGORY_ID, categoryId);
+  } else if (category) {
     params.set(CATALOG_QUERY_PARAM_CATEGORY, category);
   }
   if (followingOnly) {
@@ -94,29 +119,34 @@ export function buildCatalogSearchParams({
 }
 
 /**
- * Query для `/catalog` с явным `sort` (в т.ч. `newest` для ленты «Новинки»).
+ * Query для `/catalog`.
+ * По умолчанию `sort=newest` не пишется — лендинг (`/catalog` без query).
+ * `omitDefaultSort: false` — явная лента «Новинки» (`/catalog?sort=newest`).
  *
  * @param {{
  *   sort: string;
  *   category: import("../../../entities/product/model/types.js").ProductCategory | null;
+ *   categoryId: string | null;
  *   followingOnly: boolean;
  *   auctionOnly: boolean;
  *   installmentOnly: boolean;
  *   saleOnly: boolean;
  * }} query
+ * @param {{ omitDefaultSort?: boolean }} [options]
  */
-export function buildCatalogBrowserSearchParams({
-  sort,
-  category,
-  followingOnly,
-  auctionOnly,
-  installmentOnly,
-  saleOnly,
-}) {
+export function buildCatalogBrowserSearchParams(
+  { sort, category, categoryId, followingOnly, auctionOnly, installmentOnly, saleOnly },
+  { omitDefaultSort = true } = {},
+) {
   const params = new URLSearchParams();
-  params.set(CATALOG_QUERY_PARAM_SORT, sort);
 
-  if (category) {
+  if (sort !== CATALOG_SORT_NEWEST || !omitDefaultSort) {
+    params.set(CATALOG_QUERY_PARAM_SORT, sort);
+  }
+
+  if (categoryId) {
+    params.set(CATALOG_QUERY_PARAM_CATEGORY_ID, categoryId);
+  } else if (category) {
     params.set(CATALOG_QUERY_PARAM_CATEGORY, category);
   }
   if (followingOnly) {

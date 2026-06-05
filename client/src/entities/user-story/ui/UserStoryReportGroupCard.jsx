@@ -71,11 +71,7 @@ export function UserStoryReportGroupCard({ group, onResolved, onOpenUser }) {
             playsInline
           />
         ) : (
-          <img
-            className="user-story-report-group-card__media"
-            src={mediaUrl}
-            alt=""
-          />
+          <img className="user-story-report-group-card__media" src={mediaUrl} alt="" />
         )}
         {group.story.captionText ? (
           <p className="user-story-report-group-card__caption">
@@ -96,8 +92,7 @@ export function UserStoryReportGroupCard({ group, onResolved, onOpenUser }) {
 
       <ul className="user-story-report-group-card__reports" role="list">
         {group.reports.map((report) => {
-          const reporterName =
-            report.reporter?.userName?.trim() || report.reporter._id;
+          const reporterName = report.reporter?.userName?.trim() || report.reporter._id;
           return (
             <li key={report._id} className="user-story-report-group-card__report">
               <p className="user-story-report-group-card__report-meta">
@@ -144,9 +139,7 @@ export function UserStoryReportGroupCard({ group, onResolved, onOpenUser }) {
           type="button"
           className="user-story-report-group-card__action user-story-report-group-card__action_dismiss"
           disabled={isBusy}
-          onClick={() =>
-            void handleResolve(USER_STORY_REPORT_RESOLUTION_DISMISS)
-          }
+          onClick={() => void handleResolve(USER_STORY_REPORT_RESOLUTION_DISMISS)}
         >
           {isBusy
             ? USER_STORY_UI.STORY_REPORTS_ACTION_PENDING

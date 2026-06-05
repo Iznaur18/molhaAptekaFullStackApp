@@ -59,9 +59,7 @@ export function UserProfilePurchasesList({ targetUserId, onProductClick }) {
       } catch (e) {
         if (cancelled) return;
         setError(
-          e instanceof Error
-            ? e.message
-            : API_CLIENT_UI.FETCH_USER_PURCHASES_FALLBACK,
+          e instanceof Error ? e.message : API_CLIENT_UI.FETCH_USER_PURCHASES_FALLBACK,
         );
         setPhase("error");
       }
@@ -133,9 +131,7 @@ export function UserProfilePurchasesList({ targetUserId, onProductClick }) {
                   type="button"
                   className={[
                     "user-profile-purchases__row",
-                    isUnavailable
-                      ? "user-profile-purchases__row_unavailable"
-                      : "",
+                    isUnavailable ? "user-profile-purchases__row_unavailable" : "",
                   ]
                     .filter(Boolean)
                     .join(" ")}

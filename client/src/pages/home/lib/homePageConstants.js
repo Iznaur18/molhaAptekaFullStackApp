@@ -26,9 +26,7 @@ export const readInitialCatalogQuery = () => {
   if (path !== "/" && path !== "/catalog") {
     return null;
   }
-  return parseCatalogQueryFromSearchParams(
-    new URLSearchParams(window.location.search),
-  );
+  return parseCatalogQueryFromSearchParams(new URLSearchParams(window.location.search));
 };
 
 export const readInitialCatalogCategory = () => {

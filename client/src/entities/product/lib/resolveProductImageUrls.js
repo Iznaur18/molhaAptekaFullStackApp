@@ -1,5 +1,8 @@
 import { PRODUCT_IMAGE_URLS_MAX } from "../model/productConstants.js";
-import { resolveImageUrlForDisplay, isHttpImageUrl } from "../../../shared/lib/resolveUploadedImageUrl.js";
+import {
+  resolveImageUrlForDisplay,
+  isHttpImageUrl,
+} from "../../../shared/lib/resolveUploadedImageUrl.js";
 
 /**
  * Нормализованный список URL изображений (новое поле + legacy `productImageUrl`).

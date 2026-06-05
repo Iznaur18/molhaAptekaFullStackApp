@@ -9,11 +9,7 @@ import "./AdminUserModalFooter.css";
  *   children?: import('react').ReactNode;
  * }} props
  */
-export function AdminUserModalFooter({
-  onEditClick,
-  onDeleteClick,
-  children = null,
-}) {
+export function AdminUserModalFooter({ onEditClick, onDeleteClick, children = null }) {
   return (
     <div className="admin-user-modal-footer">
       <div className="admin-user-modal-footer__admin">

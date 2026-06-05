@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { establishAuthSession } from "../api/fetchCurrentUserProfile.js";
 import { registerUser } from "../api/registerUser.js";
 import { AddressDeliveryFields } from "../../address/ui/AddressDeliveryFields.jsx";
 import { validateRuDeliveryAddressForm } from "../../address/lib/validateRuDeliveryAddressForm.js";
@@ -17,14 +18,15 @@ import {
 } from "../model/userConstants.js";
 import { UserBackgroundPresetPicker } from "./UserBackgroundPresetPicker.jsx";
 import { UserBackgroundPreview } from "./UserBackgroundPreview.jsx";
-import {
-  REGISTER_MODAL_UI,
-} from "../../../shared/config/appUiCopy.js";
+import { LOGIN_MODAL_UI, REGISTER_MODAL_UI } from "../../../shared/config/appUiCopy.js";
+import { isAuthSessionError } from "../../../shared/lib/isAuthSessionError.js";
 import { FormFieldLabel } from "../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
 import { ImageUrlField } from "../../../shared/ui/ImageUrlField/ImageUrlField.jsx";
-import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
+import { ProductModalShell } from "../../../shared/ui/ProductModalShell/ProductModalShell.jsx";
 
 import "./RegisterModal.css";
+
+const REGISTER_MODAL_TITLE_ID = "register-modal-title";
 
 const INITIAL_FORM = {
   email: "",
@@ -46,11 +48,7 @@ const INITIAL_FORM = {
   notificationsEnabled: false,
 };
 
-const GENDER_OPTIONS = [
-  USER_GENDER_MALE,
-  USER_GENDER_FEMALE,
-  USER_GENDER_NO_SELECTED,
-];
+const GENDER_OPTIONS = [USER_GENDER_MALE, USER_GENDER_FEMALE, USER_GENDER_NO_SELECTED];
 
 /**
  * @param {string} baseClass
@@ -73,8 +71,6 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
   const [invalidFields, setInvalidFields] = useState(
     /** @type {Set<string>} */ (() => new Set()),
   );
-
-  if (!isOpen) return null;
 
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;
@@ -108,10 +104,7 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
     }
     setInvalidFields(new Set());
 
-    const passwordError = validatePasswordConfirm(
-      form.password,
-      form.passwordConfirm,
-    );
+    const passwordError = validatePasswordConfirm(form.password, form.passwordConfirm);
     if (passwordError) {
       setInvalidFields(new Set(["password", "passwordConfirm"]));
       setStatus({ kind: "error", message: passwordError });
@@ -147,15 +140,18 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
     try {
       const payload = buildRegisterUserPayload(form);
       await registerUser(payload);
+      await establishAuthSession();
       setForm(INITIAL_FORM);
       setInvalidFields(new Set());
       setStatus({ kind: "success", message: REGISTER_MODAL_UI.SUCCESS });
       onSuccess?.();
     } catch (error) {
       const message =
-        error instanceof Error
-          ? error.message
-          : REGISTER_MODAL_UI.ERROR_GENERIC;
+        error instanceof Error && isAuthSessionError(error)
+          ? LOGIN_MODAL_UI.SESSION_VERIFY_FALLBACK
+          : error instanceof Error
+            ? error.message
+            : REGISTER_MODAL_UI.ERROR_GENERIC;
       setStatus({ kind: "error", message });
     }
   };
@@ -167,29 +163,17 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
   };
 
   return (
-    <div
-      className="register-modal"
-      role="dialog"
-      aria-modal="true"
-      aria-label={REGISTER_MODAL_UI.ARIA_DIALOG}
+    <ProductModalShell
+      isOpen={isOpen}
+      onClose={handleClose}
+      title={REGISTER_MODAL_UI.TITLE}
+      titleId={REGISTER_MODAL_TITLE_ID}
+      ariaLabel={REGISTER_MODAL_UI.ARIA_DIALOG}
+      size="lg"
+      panelClassName="register-modal__panel"
+      bodyClassName="register-modal__shell-body"
     >
-      <div className="register-modal__backdrop" aria-hidden="true" />
-      <div className="register-modal__card">
-        <div className="register-modal__header">
-          <h2 className="register-modal__title">{REGISTER_MODAL_UI.TITLE}</h2>
-          <button
-            type="button"
-            className="register-modal__close"
-            onClick={handleClose}
-          >
-            <ModalCloseIcon />
-          </button>
-        </div>
-        <form
-          className="register-modal__body"
-          onSubmit={handleSubmit}
-          noValidate
-        >
+      <form className="register-modal__body" onSubmit={handleSubmit} noValidate>
           <div className="register-modal__scroll">
             <label
               className={withInvalidFieldClass(
@@ -344,9 +328,7 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
               <ImageUrlField
                 name="avatarUrl"
                 value={form.avatarUrl}
-                onChange={(avatarUrl) =>
-                  setForm((prev) => ({ ...prev, avatarUrl }))
-                }
+                onChange={(avatarUrl) => setForm((prev) => ({ ...prev, avatarUrl }))}
                 canUpload={false}
                 disabled={status.kind === "loading"}
                 inputClassName="register-modal__input"
@@ -407,8 +389,7 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
                 : REGISTER_MODAL_UI.SUBMIT_IDLE}
             </button>
           </div>
-        </form>
-      </div>
-    </div>
+      </form>
+    </ProductModalShell>
   );
 }

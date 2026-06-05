@@ -26,51 +26,68 @@
 #### Добавленные индексы:
 
 1. **Индекс для email** (уже был unique, добавлен явно для ясности)
+
    ```javascript
    UserSchema.index({ email: 1 }, { sparse: true });
    ```
+
    - Ускоряет поиск пользователей по email
    - Используется при авторизации и регистрации
 
 2. **Индекс для userName**
+
    ```javascript
    UserSchema.index({ userName: 1 }, { sparse: true });
    ```
+
    - Ускоряет поиск по имени пользователя
    - Используется при проверке уникальности
 
 3. **Индекс для userPhoneNumber**
+
    ```javascript
    UserSchema.index({ userPhoneNumber: 1 }, { sparse: true });
    ```
+
    - Ускоряет поиск по номеру телефона
    - Используется при проверке уникальности
 
-5. **Составной индекс для фильтрации пользователей**
+4. **Составной индекс для фильтрации пользователей**
+
    ```javascript
    UserSchema.index({ userRole: 1, isActiveUser: 1, isBlockedUser: 1 });
    ```
+
    - Ускоряет запросы для админ-панели
    - Используется при фильтрации по роли и статусу
 
-6. **Индекс для сортировки по рейтингу**
+5. **Индекс для сортировки по рейтингу**
+
    ```javascript
-   UserSchema.index({ 'userRatingByVotes.countVotes': -1, 'userRatingByVotes.totalRating': -1 });
+   UserSchema.index({
+     "userRatingByVotes.countVotes": -1,
+     "userRatingByVotes.totalRating": -1,
+   });
    ```
+
    - Ускоряет получение топ пользователей
    - Используется при сортировке по рейтингу
 
-7. **Индекс для даты последнего входа**
+6. **Индекс для даты последнего входа**
+
    ```javascript
    UserSchema.index({ userLastLoginAt: -1 });
    ```
+
    - Ускоряет аналитические запросы
    - Используется для статистики активности
 
-8. **Индекс для премиум пользователей**
+7. **Индекс для премиум пользователей**
+
    ```javascript
    UserSchema.index({ isPremiumUser: 1 });
    ```
+
    - Ускоряет поиск премиум пользователей
    - Используется для маркетинговых запросов
 
@@ -79,23 +96,29 @@
 #### Добавленные индексы:
 
 1. **Индекс для поиска голосов за пользователя**
+
    ```javascript
    UserVoteRatingSchema.index({ userVoteTarget: 1, createdAt: -1 });
    ```
+
    - Ускоряет получение списка голосовавших за пользователя
    - Используется в `/auth/me?includeVoters=true`
 
 2. **Индекс для истории голосований пользователя**
+
    ```javascript
    UserVoteRatingSchema.index({ userVoter: 1, createdAt: -1 });
    ```
+
    - Ускоряет получение истории голосований пользователя
    - Используется для аналитики
 
 3. **Индекс для сортировки по значению голоса**
+
    ```javascript
    UserVoteRatingSchema.index({ userVoteTarget: 1, userVoteValue: -1 });
    ```
+
    - Ускоряет сортировку голосов по оценке
    - Используется для получения лучших/худших оценок
 
@@ -119,69 +142,108 @@
 #### Реализованные лимитеры:
 
 1. **Общий лимитер (`generalRateLimiter`)**
+
    ```javascript
    windowMs: 15 * 60 * 1000, // 15 минут
    max: 100 // максимум 100 запросов
    ```
+
    - Применяется ко всем API запросам
    - Защита от DDoS атак
    - Использование: `app.use('/api', generalRateLimiter)`
 
 2. **Лимитер авторизации (`authRateLimiter`)**
+
    ```javascript
    windowMs: 15 * 60 * 1000, // 15 минут
    max: 5 // максимум 5 попыток
    skipSuccessfulRequests: true // не учитывать успешные запросы
    ```
+
    - Защита от брутфорса паролей
    - Защита от массовой регистрации
    - Применяется к `/auth/login`, `/auth/register`
 
 3. **Лимитер обновления профиля (`updateProfileRateLimiter`)**
+
    ```javascript
    windowMs: 60 * 60 * 1000, // 1 час
    max: 20 // максимум 20 обновлений
    ```
+
    - Защита от массовых изменений профиля
    - Применяется к `PATCH /user/:userId`
 
 4. **Лимитер голосований (`voteRateLimiter`)**
+
    ```javascript
    windowMs: 60 * 60 * 1000, // 1 час
    max: 10 // максимум 10 голосов
    ```
+
    - Защита от накрутки рейтинга
    - Применяется к `POST /vote/:userVoteTargetIdClient`
 
 5. **Лимитер загрузки файлов (`uploadRateLimiter`)**
+
    ```javascript
    windowMs: 60 * 60 * 1000, // 1 час
    max: 10 // максимум 10 загрузок
    ```
+
    - Защита от перегрузки сервера
    - Применяется к `POST /upload`
 
 ### Интеграция в роуты
 
 #### `routes/authRouter.js`
+
 ```javascript
-router.post('/register', authRateLimiter, registerUserValidation, registerUserController);
-router.post('/login', authRateLimiter, loginUserValidation, loginUserController);
+router.post(
+  "/register",
+  authRateLimiter,
+  registerUserValidation,
+  registerUserController,
+);
+router.post("/login", authRateLimiter, loginUserValidation, loginUserController);
 ```
 
 #### `routes/userRouter.js`
+
 ```javascript
-router.patch('/:userIdClient', updateProfileRateLimiter, checkAuthMW, userIdParamValidation, updateProfileValidation, userUpdateProfileController);
+router.patch(
+  "/:userIdClient",
+  updateProfileRateLimiter,
+  checkAuthMW,
+  userIdParamValidation,
+  updateProfileValidation,
+  userUpdateProfileController,
+);
 ```
 
 #### `routes/voteRouter.js`
+
 ```javascript
-router.post('/:userVoteTargetIdClient', voteRateLimiter, checkAuthMW, voteTargetIdParamValidation, voteValidation, userVoteRatingController);
+router.post(
+  "/:userVoteTargetIdClient",
+  voteRateLimiter,
+  checkAuthMW,
+  voteTargetIdParamValidation,
+  voteValidation,
+  userVoteRatingController,
+);
 ```
 
 #### `routes/uploadRouter.js`
+
 ```javascript
-router.post('/', uploadRateLimiter, checkAuthMW, uploadMW.single('image'), uploadController);
+router.post(
+  "/",
+  uploadRateLimiter,
+  checkAuthMW,
+  uploadMW.single("image"),
+  uploadController,
+);
 ```
 
 ### Формат ответа при превышении лимита
@@ -216,11 +278,13 @@ HTTP статус: `429 Too Many Requests`
 #### Компоненты:
 
 1. **Класс `AppError`**
+
    ```javascript
    class AppError extends Error {
      constructor(statusCode, message, isOperational = true)
    }
    ```
+
    - Кастомный класс для ошибок приложения
    - Позволяет создавать ошибки с указанием HTTP статуса
 
@@ -234,6 +298,7 @@ HTTP статус: `429 Too Many Requests`
    - Возвращает 404 ошибку
 
 4. **Wrapper `asyncHandler`**
+
    ```javascript
    const asyncHandler = (fn) => {
      return (req, res, next) => {
@@ -241,6 +306,7 @@ HTTP статус: `429 Too Many Requests`
      };
    };
    ```
+
    - Автоматически обрабатывает ошибки в async функциях
    - Упрощает код контроллеров
 
@@ -300,22 +366,25 @@ app.use(errorHandler);
 ### Пример использования AppError
 
 ```javascript
-import { AppError } from '../middlewares/index.js';
+import { AppError } from "../middlewares/index.js";
 
 if (!user) {
-  throw new AppError(404, 'Пользователь не найден');
+  throw new AppError(404, "Пользователь не найден");
 }
 ```
 
 ### Пример использования asyncHandler
 
 ```javascript
-import { asyncHandler } from '../middlewares/index.js';
+import { asyncHandler } from "../middlewares/index.js";
 
-router.get('/path', asyncHandler(async (req, res) => {
-  const data = await SomeModel.find();
-  res.json(data);
-}));
+router.get(
+  "/path",
+  asyncHandler(async (req, res) => {
+    const data = await SomeModel.find();
+    res.json(data);
+  }),
+);
 ```
 
 ### Формат ответа об ошибке
@@ -378,16 +447,41 @@ router.get('/path', asyncHandler(async (req, res) => {
 ### Интеграция в роуты
 
 #### `routes/userRouter.js`
+
 ```javascript
-router.get('/:userIdClient', userIdParamValidation, userGetProfileController);
-router.patch('/:userIdClient', updateProfileRateLimiter, checkAuthMW, userIdParamValidation, updateProfileValidation, userUpdateProfileController);
-router.delete('/:userIdClient', checkAuthMW, userIdParamValidation, userDeleteProfileController);
+router.get("/:userIdClient", userIdParamValidation, userGetProfileController);
+router.patch(
+  "/:userIdClient",
+  updateProfileRateLimiter,
+  checkAuthMW,
+  userIdParamValidation,
+  updateProfileValidation,
+  userUpdateProfileController,
+);
+router.delete(
+  "/:userIdClient",
+  checkAuthMW,
+  userIdParamValidation,
+  userDeleteProfileController,
+);
 ```
 
 #### `routes/voteRouter.js`
+
 ```javascript
-router.get('/rating/:userIdClient', ratingUserIdParamValidation, userGetRatingController);
-router.post('/:userVoteTargetIdClient', voteRateLimiter, checkAuthMW, voteTargetIdParamValidation, voteValidation, userVoteRatingController);
+router.get(
+  "/rating/:userIdClient",
+  ratingUserIdParamValidation,
+  userGetRatingController,
+);
+router.post(
+  "/:userVoteTargetIdClient",
+  voteRateLimiter,
+  checkAuthMW,
+  voteTargetIdParamValidation,
+  voteValidation,
+  userVoteRatingController,
+);
 ```
 
 ### Валидируемые поля обновления профиля
@@ -452,38 +546,42 @@ npm install
 
 ```javascript
 router.METHOD(
-  '/path',
-  rateLimiter,           // 1. Rate limiting (защита от атак)
-  checkAuthMW,           // 2. Авторизация (если требуется)
-  paramValidation,       // 3. Валидация параметров URL
-  bodyValidation,        // 4. Валидация тела запроса
-  controller             // 5. Контроллер (бизнес-логика)
+  "/path",
+  rateLimiter, // 1. Rate limiting (защита от атак)
+  checkAuthMW, // 2. Авторизация (если требуется)
+  paramValidation, // 3. Валидация параметров URL
+  bodyValidation, // 4. Валидация тела запроса
+  controller, // 5. Контроллер (бизнес-логика)
 );
 ```
 
 ### Пример полного роута
 
 ```javascript
-import { Router } from 'express';
-import { updateProfileRateLimiter, checkAuthMW } from '../middlewares/index.js';
-import { userIdParamValidation, updateProfileValidation } from '../validations/index.js';
-import { userUpdateProfileController } from '../controllers/index.js';
+import { Router } from "express";
+import { updateProfileRateLimiter, checkAuthMW } from "../middlewares/index.js";
+import {
+  userIdParamValidation,
+  updateProfileValidation,
+} from "../validations/index.js";
+import { userUpdateProfileController } from "../controllers/index.js";
 
 const router = Router();
 
 router.patch(
-  '/:userIdClient',
-  updateProfileRateLimiter,      // Защита от массовых изменений
-  checkAuthMW,                    // Проверка авторизации
-  userIdParamValidation,          // Валидация ID в URL
-  updateProfileValidation,         // Валидация данных в теле запроса
-  userUpdateProfileController     // Обработка запроса
+  "/:userIdClient",
+  updateProfileRateLimiter, // Защита от массовых изменений
+  checkAuthMW, // Проверка авторизации
+  userIdParamValidation, // Валидация ID в URL
+  updateProfileValidation, // Валидация данных в теле запроса
+  userUpdateProfileController, // Обработка запроса
 );
 ```
 
 ### Обработка ошибок в контроллерах
 
 #### Старый способ (все еще работает):
+
 ```javascript
 export const someController = async (req, res) => {
   try {
@@ -495,13 +593,14 @@ export const someController = async (req, res) => {
 ```
 
 #### Новый способ с asyncHandler:
+
 ```javascript
-import { asyncHandler } from '../middlewares/index.js';
+import { asyncHandler } from "../middlewares/index.js";
 
 export const someController = asyncHandler(async (req, res) => {
   // код - ошибки обрабатываются автоматически
   if (!data) {
-    throw new AppError(404, 'Данные не найдены');
+    throw new AppError(404, "Данные не найдены");
   }
   return successRes(res, { data });
 });
@@ -513,29 +612,29 @@ export const someController = asyncHandler(async (req, res) => {
 
 ### Производительность
 
-| Операция | До | После | Улучшение |
-|----------|-----|-------|-----------|
-| Поиск по email | Полное сканирование | Индекс | ~100x быстрее |
-| Получение голосов | Полное сканирование | Индекс | ~50x быстрее |
-| Сортировка по рейтингу | Сортировка без индекса | Индекс | ~30x быстрее |
+| Операция               | До                     | После  | Улучшение     |
+| ---------------------- | ---------------------- | ------ | ------------- |
+| Поиск по email         | Полное сканирование    | Индекс | ~100x быстрее |
+| Получение голосов      | Полное сканирование    | Индекс | ~50x быстрее  |
+| Сортировка по рейтингу | Сортировка без индекса | Индекс | ~30x быстрее  |
 
 ### Безопасность
 
-| Атака | До | После |
-|-------|-----|-------|
-| DDoS | ❌ Нет защиты | ✅ Rate limiting |
-| Брутфорс паролей | ❌ Нет защиты | ✅ 5 попыток/15 мин |
-| Накрутка рейтинга | ❌ Нет защиты | ✅ 10 голосов/час |
+| Атака              | До            | После                |
+| ------------------ | ------------- | -------------------- |
+| DDoS               | ❌ Нет защиты | ✅ Rate limiting     |
+| Брутфорс паролей   | ❌ Нет защиты | ✅ 5 попыток/15 мин  |
+| Накрутка рейтинга  | ❌ Нет защиты | ✅ 10 голосов/час    |
 | Массовые изменения | ❌ Нет защиты | ✅ 20 обновлений/час |
 
 ### Качество кода
 
-| Аспект | До | После |
-|--------|-----|-------|
-| Обработка ошибок | Разрозненная | ✅ Централизованная |
-| Валидация | Смешана с логикой | ✅ Отдельные middleware |
-| Формат ошибок | Разный | ✅ Единый формат |
-| Логирование ошибок | Частичное | ✅ Полное |
+| Аспект             | До                | После                   |
+| ------------------ | ----------------- | ----------------------- |
+| Обработка ошибок   | Разрозненная      | ✅ Централизованная     |
+| Валидация          | Смешана с логикой | ✅ Отдельные middleware |
+| Формат ошибок      | Разный            | ✅ Единый формат        |
+| Логирование ошибок | Частичное         | ✅ Полное               |
 
 ---
 
@@ -543,16 +642,20 @@ export const someController = asyncHandler(async (req, res) => {
 
 ### Логирование ошибок
 
-Все ошибки логируются с контекстом:
+Все ошибки логируются одной JSON-строкой (`logServerHttpError`, см. `docs/OBSERVABILITY.md`):
 
-```javascript
+```json
 {
-  message: "Описание ошибки",
-  stack: "Стек вызовов",
-  url: "/user/123",
-  method: "PATCH",
-  ip: "127.0.0.1",
-  timestamp: "2026-02-12T10:30:00.000Z"
+  "level": "error",
+  "time": "2026-06-04T10:30:00.000Z",
+  "event": "http_error",
+  "requestId": "550e8400-e29b-41d4-a716-446655440000",
+  "statusCode": 500,
+  "method": "PATCH",
+  "path": "/user/123",
+  "ip": "127.0.0.1",
+  "message": "…",
+  "stack": "…"
 }
 ```
 
@@ -570,10 +673,10 @@ RateLimit-Reset: 1644672000
 
 ```javascript
 // Проверить индексы коллекции users
-db.users.getIndexes()
+db.users.getIndexes();
 
 // Проверить использование индексов
-db.users.find({ email: "test@example.com" }).explain("executionStats")
+db.users.find({ email: "test@example.com" }).explain("executionStats");
 ```
 
 ---

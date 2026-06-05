@@ -50,16 +50,12 @@ async function run() {
         continue;
       }
 
-      console.log(
-        `[migrate] START ${migration.id} (${isApply ? "APPLY" : "DRY-RUN"})`,
-      );
+      console.log(`[migrate] START ${migration.id} (${isApply ? "APPLY" : "DRY-RUN"})`);
       const startedAt = new Date();
       const result = await migration.up({ db, isApply });
       const finishedAt = new Date();
 
-      console.log(
-        `[migrate] DONE ${migration.id}: ${JSON.stringify(result ?? {})}`,
-      );
+      console.log(`[migrate] DONE ${migration.id}: ${JSON.stringify(result ?? {})}`);
 
       if (isApply) {
         await metaCollection.insertOne({

@@ -18,7 +18,9 @@ export async function fetchProductCategoryDisplays() {
   } catch (error) {
     const message =
       error?.response?.data?.message ??
-      (error instanceof Error ? error.message : API_CLIENT_UI.FETCH_CATEGORY_DISPLAYS_FALLBACK);
+      (error instanceof Error
+        ? error.message
+        : API_CLIENT_UI.FETCH_CATEGORY_DISPLAYS_FALLBACK);
     throw new Error(message);
   }
 }

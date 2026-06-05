@@ -47,16 +47,10 @@ export function ProfileImageFocusEditor({
     if (rect.width <= 0 || rect.height <= 0) return null;
     return {
       x: Math.round(
-        Math.min(
-          100,
-          Math.max(0, ((clientX - rect.left) / rect.width) * 100),
-        ),
+        Math.min(100, Math.max(0, ((clientX - rect.left) / rect.width) * 100)),
       ),
       y: Math.round(
-        Math.min(
-          100,
-          Math.max(0, ((clientY - rect.top) / rect.height) * 100),
-        ),
+        Math.min(100, Math.max(0, ((clientY - rect.top) / rect.height) * 100)),
       ),
     };
   }, []);

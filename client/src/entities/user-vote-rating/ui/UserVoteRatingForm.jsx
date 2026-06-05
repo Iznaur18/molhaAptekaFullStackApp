@@ -95,7 +95,11 @@ export function UserVoteRatingForm({
       try {
         const v = await fetchMyVoteForTarget(String(targetUser._id));
         if (cancelled) return;
-        if (v != null && v >= USER_VOTE_RATING_VALUE_MIN && v <= USER_VOTE_RATING_VALUE_MAX) {
+        if (
+          v != null &&
+          v >= USER_VOTE_RATING_VALUE_MIN &&
+          v <= USER_VOTE_RATING_VALUE_MAX
+        ) {
           setScore(v);
           setVoteSubmitted(true);
         }
@@ -133,8 +137,7 @@ export function UserVoteRatingForm({
       setVoteSubmitted(true);
       setFlash(USER_VOTE_RATING_UI.SUCCESS);
     } catch (e) {
-      const msg =
-        e instanceof Error ? e.message : API_CLIENT_UI.VOTE_SUBMIT_FALLBACK;
+      const msg = e instanceof Error ? e.message : API_CLIENT_UI.VOTE_SUBMIT_FALLBACK;
       setError(msg);
     } finally {
       setPending(false);
@@ -144,16 +147,18 @@ export function UserVoteRatingForm({
   if (!isAuthorized) {
     return (
       <VoteRatingCollapsible>
-      <div className="user-vote-rating-form user-vote-rating-form_guest">
-        <p className="user-vote-rating-form__hint">{USER_VOTE_RATING_UI.LOGIN_HINT}</p>
-        <button
-          type="button"
-          className="user-vote-rating-form__login"
-          onClick={onRequestLogin}
-        >
-          {USER_VOTE_RATING_UI.LOGIN_BUTTON}
-        </button>
-      </div>
+        <div className="user-vote-rating-form user-vote-rating-form_guest">
+          <p className="user-vote-rating-form__hint">
+            {USER_VOTE_RATING_UI.LOGIN_HINT}
+          </p>
+          <button
+            type="button"
+            className="user-vote-rating-form__login"
+            onClick={onRequestLogin}
+          >
+            {USER_VOTE_RATING_UI.LOGIN_BUTTON}
+          </button>
+        </div>
       </VoteRatingCollapsible>
     );
   }
@@ -174,9 +179,7 @@ export function UserVoteRatingForm({
     return (
       <VoteRatingCollapsible>
         <div className="user-vote-rating-form user-vote-rating-form_self">
-          <p className="user-vote-rating-form__hint">
-            {USER_VOTE_RATING_UI.SELF_HINT}
-          </p>
+          <p className="user-vote-rating-form__hint">{USER_VOTE_RATING_UI.SELF_HINT}</p>
         </div>
       </VoteRatingCollapsible>
     );
@@ -186,16 +189,16 @@ export function UserVoteRatingForm({
     return (
       <VoteRatingCollapsible>
         <div className="user-vote-rating-form" aria-busy="true">
-        <h3 className="user-vote-rating-form__title">{USER_VOTE_RATING_UI.TITLE}</h3>
-        <p className="user-vote-rating-form__aggregate">
-          <span className="user-vote-rating-form__aggregate-label">
-            {USER_VOTE_RATING_UI.CURRENT_AGGREGATE}:{" "}
-          </span>
-          {aggregateText}
-        </p>
-        <p className="user-vote-rating-form__hint">
-          {USER_VOTE_RATING_UI.MY_VOTE_RESOLVING}
-        </p>
+          <h3 className="user-vote-rating-form__title">{USER_VOTE_RATING_UI.TITLE}</h3>
+          <p className="user-vote-rating-form__aggregate">
+            <span className="user-vote-rating-form__aggregate-label">
+              {USER_VOTE_RATING_UI.CURRENT_AGGREGATE}:{" "}
+            </span>
+            {aggregateText}
+          </p>
+          <p className="user-vote-rating-form__hint">
+            {USER_VOTE_RATING_UI.MY_VOTE_RESOLVING}
+          </p>
         </div>
       </VoteRatingCollapsible>
     );
@@ -205,58 +208,56 @@ export function UserVoteRatingForm({
     <VoteRatingCollapsible>
       <div className="user-vote-rating-form">
         <h3 className="user-vote-rating-form__title">{USER_VOTE_RATING_UI.TITLE}</h3>
-      <p className="user-vote-rating-form__aggregate">
-        <span className="user-vote-rating-form__aggregate-label">
-          {USER_VOTE_RATING_UI.CURRENT_AGGREGATE}:{" "}
-        </span>
-        {aggregateText}
-      </p>
-      <label className="user-vote-rating-form__range-label">
-        <span className="user-vote-rating-form__range-caption">
-          {USER_VOTE_RATING_UI.RANGE_LABEL}:{" "}
-          <strong className="user-vote-rating-form__score">{score}</strong>
-        </span>
-        <input
-          className="user-vote-rating-form__range"
-          type="range"
-          min={USER_VOTE_RATING_VALUE_MIN}
-          max={USER_VOTE_RATING_VALUE_MAX}
-          step={1}
-          value={score}
-          disabled={pending || voteSubmitted}
-          onChange={(e) => setScore(Number(e.target.value))}
-        />
-      </label>
-      {error ? (
-        <p className="user-vote-rating-form__error" role="alert">
-          {error}
+        <p className="user-vote-rating-form__aggregate">
+          <span className="user-vote-rating-form__aggregate-label">
+            {USER_VOTE_RATING_UI.CURRENT_AGGREGATE}:{" "}
+          </span>
+          {aggregateText}
         </p>
-      ) : null}
-      {flash ? (
-        <p className="user-vote-rating-form__flash" role="status">
-          {flash}
-        </p>
-      ) : null}
-      {voteSubmitted ? (
-        <button
-          type="button"
-          className="user-vote-rating-form__submit user-vote-rating-form__submit_done"
-          disabled
-        >
-          {USER_VOTE_RATING_UI.ALREADY_RATED}
-        </button>
-      ) : (
-        <button
-          type="button"
-          className="user-vote-rating-form__submit"
-          disabled={pending}
-          onClick={() => void handleSubmit()}
-        >
-          {pending
-            ? USER_VOTE_RATING_UI.SUBMIT_LOADING
-            : USER_VOTE_RATING_UI.SUBMIT}
-        </button>
-      )}
+        <label className="user-vote-rating-form__range-label">
+          <span className="user-vote-rating-form__range-caption">
+            {USER_VOTE_RATING_UI.RANGE_LABEL}:{" "}
+            <strong className="user-vote-rating-form__score">{score}</strong>
+          </span>
+          <input
+            className="user-vote-rating-form__range"
+            type="range"
+            min={USER_VOTE_RATING_VALUE_MIN}
+            max={USER_VOTE_RATING_VALUE_MAX}
+            step={1}
+            value={score}
+            disabled={pending || voteSubmitted}
+            onChange={(e) => setScore(Number(e.target.value))}
+          />
+        </label>
+        {error ? (
+          <p className="user-vote-rating-form__error" role="alert">
+            {error}
+          </p>
+        ) : null}
+        {flash ? (
+          <p className="user-vote-rating-form__flash" role="status">
+            {flash}
+          </p>
+        ) : null}
+        {voteSubmitted ? (
+          <button
+            type="button"
+            className="user-vote-rating-form__submit user-vote-rating-form__submit_done"
+            disabled
+          >
+            {USER_VOTE_RATING_UI.ALREADY_RATED}
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="user-vote-rating-form__submit"
+            disabled={pending}
+            onClick={() => void handleSubmit()}
+          >
+            {pending ? USER_VOTE_RATING_UI.SUBMIT_LOADING : USER_VOTE_RATING_UI.SUBMIT}
+          </button>
+        )}
       </div>
     </VoteRatingCollapsible>
   );

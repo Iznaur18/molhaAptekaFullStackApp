@@ -29,8 +29,7 @@
   user-select: none;
 }
 
-.raffle-featured-carousel
-  .raffle-featured-banner__visual_carousel-dragging {
+.raffle-featured-carousel .raffle-featured-banner__visual_carousel-dragging {
   cursor: grabbing;
 }
 

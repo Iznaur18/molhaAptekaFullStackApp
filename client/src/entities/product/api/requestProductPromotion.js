@@ -22,9 +22,7 @@ export async function requestProductPromotion(productId, body) {
     const pointsBalance = Number(data.data.loyaltyPointsBalance);
     return {
       promotion: data.data.promotion,
-      loyaltyPointsBalance: Number.isFinite(pointsBalance)
-        ? pointsBalance
-        : null,
+      loyaltyPointsBalance: Number.isFinite(pointsBalance) ? pointsBalance : null,
       message: typeof data.data.message === "string" ? data.data.message : null,
     };
   } catch (e) {

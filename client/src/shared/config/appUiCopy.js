@@ -94,11 +94,9 @@ export const API_CLIENT_UI = {
   RESOLVE_PRODUCT_REPORTS_FALLBACK: "Не удалось обработать жалобы",
   MARK_NOTIFICATIONS_READ_FALLBACK: "Не удалось обновить уведомления",
   SUBMIT_DATA_CONFIRMATION_FALLBACK: "Не удалось отправить заявку",
-  FETCH_DATA_CONFIRMATION_STATUS_FALLBACK:
-    "Не удалось загрузить статус заявки",
+  FETCH_DATA_CONFIRMATION_STATUS_FALLBACK: "Не удалось загрузить статус заявки",
   FETCH_DATA_CONFIRMATION_QUEUE_FALLBACK: "Не удалось загрузить заявки",
-  FETCH_DATA_CONFIRMATION_COUNT_FALLBACK:
-    "Не удалось загрузить счётчик заявок",
+  FETCH_DATA_CONFIRMATION_COUNT_FALLBACK: "Не удалось загрузить счётчик заявок",
   RESOLVE_DATA_CONFIRMATION_FALLBACK: "Не удалось рассмотреть заявку",
   FETCH_PREMIUM_STATUS_FALLBACK: "Не удалось загрузить статус премиума",
   PURCHASE_PREMIUM_FALLBACK: "Не удалось купить премиум",
@@ -139,6 +137,8 @@ export const API_CLIENT_UI = {
   DELETE_RAFFLE_FALLBACK: "Не удалось удалить розыгрыш",
   FETCH_CATEGORY_DISPLAYS_FALLBACK: "Не удалось загрузить категории",
   PATCH_CATEGORY_DISPLAY_FALLBACK: "Не удалось сохранить категорию",
+  FETCH_CATALOG_FEED_DISPLAYS_FALLBACK: "Не удалось загрузить подборки",
+  PATCH_CATALOG_FEED_DISPLAY_FALLBACK: "Не удалось сохранить подборку",
   PAUSE_RAFFLE_FALLBACK: "Не удалось снять розыгрыш с витрины",
   SET_RAFFLE_PARTICIPATION_FALLBACK: "Не удалось обновить участие в розыгрыше",
   FETCH_RAFFLES_QUEUE_FALLBACK: "Не удалось загрузить очередь розыгрышей",
@@ -196,8 +196,7 @@ export const PRODUCT_PRICE_OFFER_UI = {
   PAY_BUTTON: "Оплатить по принятой цене",
   PAY_ORDER_PLACED: "Заказ по принятой цене оформлен",
   PAY_MODAL_TITLE: "Оплата по ставке",
-  CONFIRMED_DATA_REQUIRED:
-    "Доступно только пользователям с подтверждёнными данными",
+  CONFIRMED_DATA_REQUIRED: "Доступно только пользователям с подтверждёнными данными",
   EMPTY_TOP: "Ставок пока нет",
   SELLER_EMPTY: "Предложений пока нет",
   SELLER_LOADING: "Загрузка…",
@@ -357,6 +356,7 @@ export const HOME_PAGE_UI = {
   CATALOG_LOAD_MORE_FAIL: "Не удалось подгрузить ещё товары",
   CATALOG_LOAD_MORE_RETRY: "Повторить",
   CATALOG_LOADING_MORE: "Подгружаем…",
+  CATALOG_PRODUCTS_LIST_ARIA: "Список товаров каталога",
 };
 
 /** Сетка категорий `/catalog` */
@@ -378,6 +378,10 @@ export const PRODUCT_CATEGORY_DISPLAY_UI = {
   SAVING: "Сохранение…",
   SAVE_FALLBACK: "Не удалось сохранить категорию",
   RESET_BUTTON: "Сбросить к дефолту",
+  FEED_EDIT_TITLE: (label) => `Подборка: ${label}`,
+  FEED_EDIT_ARIA: (label) => `Редактировать подборку «${label}»`,
+  FEED_LABEL_HINT: "Пустое поле — стандартное название из списка.",
+  FEED_SAVE_FALLBACK: "Не удалось сохранить подборку",
 };
 
 /** Кнопка добавления товара в корзину */
@@ -476,8 +480,7 @@ export const ORDER_CARD_UI = {
   CANCEL_CONFIRM: "Отменить заказ покупателя?",
   DELETED_PRODUCT_NAME: "Товар удалён",
   /** @param {number} points */
-  LOYALTY_POINTS_LINE: (points) =>
-    `+${points} баллов за шт. (премиум-покупателю)`,
+  LOYALTY_POINTS_LINE: (points) => `+${points} баллов за шт. (премиум-покупателю)`,
 };
 
 /** Страница «Мои покупки» */
@@ -487,8 +490,7 @@ export const MY_ORDERS_PAGE_UI = {
   PRODUCT_DETAILS_LOADING: "Открываем карточку товара…",
   EMPTY: "У вас пока нет покупок.",
   /** @param {number} points */
-  LOYALTY_POINTS_EARNED: (points) =>
-    `+${points} ${pluralizeRuBall(points)} лояльности`,
+  LOYALTY_POINTS_EARNED: (points) => `+${points} ${pluralizeRuBall(points)} лояльности`,
 };
 
 /** Очередь модерации товаров (admin / moderator) */
@@ -507,6 +509,7 @@ export const PRODUCT_MODERATION_PAGE_UI = {
   SELLER_LABEL: "Продавец",
   CREATED_LABEL: "Создан",
   REJECTION_COMMENT_PREFIX: "Комментарий модератора:",
+  PRODUCTS_LIST_ARIA: "Очередь товаров на модерации",
   /** @param {number} n */
   TAB_BADGE: (n) => (n > 99 ? "99+" : String(n)),
 };
@@ -591,6 +594,34 @@ export const DATA_CONFIRMATION_PAGE_UI = {
   ACTION_PENDING: "Сохраняем…",
   /** @param {number} n */
   TAB_BADGE: (n) => (n > 99 ? "99+" : String(n)),
+};
+
+/** Раздел «Подтверждение данных» в профиле */
+export const USER_DATA_CONFIRMATION_PROFILE_PAGE_UI = {
+  PAGE_ARIA: "Подтверждение данных",
+  LOGIN_HINT: "Войдите, чтобы подать заявку на подтверждение.",
+  LOGIN_BUTTON: "Войти",
+  LOADING: "Загрузка…",
+  FETCH_FALLBACK: "Не удалось загрузить статус",
+  PLAN_TITLE: "Подтверждение данных",
+  PLAN_INTRO:
+    "После проверки паспорта модератором появится значок подтверждённого аккаунта.",
+  PLAN_BENEFITS: [
+    "Отзывы на товары после подтверждённой покупки",
+    "Ставки на аукционе (предложение цены)",
+    "Покупка в рассрочку",
+    "Создание розыгрыша (для продавца)",
+    "Товары в фильтре «Подтверждённые продавцы»",
+    "Бейдж подтверждения у имени в каталоге",
+  ],
+  PLAN_NOTE:
+    "Не заменяет премиум: баллы за покупки, 30 товаров и золотая обводка — отдельно.",
+  STATUS_CONFIRMED: "Данные уже подтверждены.",
+  STATUS_PENDING: "Заявка на рассмотрении. Дождитесь решения модератора.",
+  /** @param {string} note */
+  STATUS_REJECTED: (note) =>
+    note ? `Заявка отклонена: ${note}` : "Заявка отклонена. Можно отправить новую.",
+  OPEN_REQUEST: "Подать заявку",
 };
 
 /** Подача заявки на подтверждение данных */
@@ -720,13 +751,24 @@ export const ADMIN_EDIT_USER_UI = {
   LABEL_DISCOUNT: "Скидка, %",
   LABEL_LOYALTY_POINTS: "Баллы лояльности",
   LABEL_PREMIUM: "Премиум",
-  /** @param {number} price */
+  PREMIUM_CARD_TITLE: "Премиум",
+  PREMIUM_TOGGLE_LABEL: "Премиум включён",
+  /** @param {string} dateText */
+  PREMIUM_STATUS_ACTIVE: (dateText) => `Активен до ${dateText}`,
+  PREMIUM_STATUS_OFF: "Выключен",
+  PREMIUM_EXTEND_HINT:
+    "Срок добавляется к текущей дате окончания, если премиум уже активен.",
+  PREMIUM_PRESETS_ARIA: "Срок премиума",
+  /** @param {number} months */
+  PREMIUM_PRESET_MONTHS: (months) => `${months} мес.`,
+  PREMIUM_CUSTOM_DATE_LABEL: "Своя дата окончания",
+  /** @deprecated используйте блок AdminPremiumStaffControl */
   LABEL_PREMIUM_EXPIRES_AT: "Премиум до (дата и время)",
+  /** @deprecated */
   LABEL_PREMIUM_EXPIRES_HINT:
     "Пусто или прошедшая дата — премиум выключен. Будущая дата — премиум активен.",
   /** @param {string} userName */
-  DISABLE_PREMIUM_CONFIRM: (userName) =>
-    `Отключить премиум у «${userName}»?`,
+  DISABLE_PREMIUM_CONFIRM: (userName) => `Отключить премиум у «${userName}»?`,
   PREMIUM_REVOKED_TOAST: "Премиум отключён",
   PREMIUM_MODERATOR_CANNOT_EDIT_ADMIN:
     "Модератор не может менять премиум администратора",
@@ -736,8 +778,7 @@ export const ADMIN_EDIT_USER_UI = {
   EDIT_BUTTON: "Редактировать",
   DELETE_BUTTON: "Удалить пользователя",
   DELETE_CONFIRM_TITLE: "Удалить пользователя?",
-  DELETE_CONFIRM_HINT: (token) =>
-    `Введите «${token}» для подтверждения`,
+  DELETE_CONFIRM_HINT: (token) => `Введите «${token}» для подтверждения`,
   DELETE_CONFIRM_PLACEHOLDER: "Подтверждение",
   DELETE_SUBMIT: "Удалить",
   DELETE_CANCEL: "Отмена",
@@ -792,8 +833,7 @@ export const CREATE_PRODUCT_MODAL_UI = {
   LABEL_NAME: "Название",
   LABEL_DESCRIPTION: "Описание (до 2000 символов)",
   CHARS_USED: (n, max) => `Символов: ${n} / ${max}`,
-  LABEL_IMAGE_URLS:
-    "Изображения (необязательно, до 5 — ссылка или файл)",
+  LABEL_IMAGE_URLS: "Изображения (необязательно, до 5 — ссылка или файл)",
   IMAGE_ORDER_HINT: "Перетащите за ⋮⋮ — порядок в каталоге (1 — главное фото).",
   DRAG_HANDLE_ARIA: "Перетащить для смены порядка",
   ADD_IMAGE_ROW: "Добавить ещё фото",
@@ -804,6 +844,7 @@ export const CREATE_PRODUCT_MODAL_UI = {
   LABEL_DISCOUNT_PREVIEW: "Скидка",
   ERROR_OLD_PRICE: "Старая цена должна быть больше текущей",
   LABEL_CATEGORY: "Категория",
+  ERROR_CATEGORY_LEAF: "Выберите конечную подкатегорию в дереве категорий",
   LABEL_AVAILABLE: "Товар в наличии",
   LABEL_STOCK_QUANTITY: "Количество в наличии (шт.)",
   ERROR_STOCK: "Укажите количество от 1 до 9999",
@@ -841,8 +882,7 @@ export const CREATE_PRODUCT_MODAL_UI = {
   ERROR_PRICE_MAX: "Цена не может превышать 999 999 999 ₽",
   ERROR_GENERIC: "Не удалось создать товар",
   ERROR_EDIT_GENERIC: "Не удалось сохранить изменения",
-  ERROR_PREVIEW_VIDEO_REQUIRES_PHOTO:
-    "При превью-видео нужно хотя бы одно фото товара",
+  ERROR_PREVIEW_VIDEO_REQUIRES_PHOTO: "При превью-видео нужно хотя бы одно фото товара",
   LABEL_CHARACTERISTICS: "Характеристики (необязательно)",
   CHARACTERISTICS_SECTION_ARIA: "Характеристики товара",
   HINT_CHARACTERISTICS: (max) =>
@@ -852,8 +892,7 @@ export const CREATE_PRODUCT_MODAL_UI = {
   ADD_CHARACTERISTIC_ROW: "+ Характеристика",
   CHARACTERISTIC_ROW_ARIA: (index) => `Характеристика ${index}`,
   REMOVE_CHARACTERISTIC_ROW_ARIA: (index) => `Удалить характеристику ${index}`,
-  ERROR_CHARACTERISTIC_PAIR:
-    "У каждой характеристики должны быть и ключ, и значение",
+  ERROR_CHARACTERISTIC_PAIR: "У каждой характеристики должны быть и ключ, и значение",
   ERROR_CHARACTERISTIC_KEY_MAX: (max) =>
     `Ключ характеристики не длиннее ${max} символов`,
   ERROR_CHARACTERISTIC_VALUE_MAX: (max) =>
@@ -861,6 +900,30 @@ export const CREATE_PRODUCT_MODAL_UI = {
   ERROR_CHARACTERISTIC_DUPLICATE_KEY: (key) =>
     `Дубликат ключа характеристики: «${key}»`,
   ERROR_CHARACTERISTICS_MAX: (max) => `Не более ${max} характеристик`,
+};
+
+export const PRODUCT_CATEGORY_TREE_UI = {
+  WIZARD_HINT: "Дойдите до конечной подкатегории (пункт с пометкой «конечная»).",
+  STEP_ROOT: "Раздел каталога",
+  BACK: "Назад",
+  CHANGE_CATEGORY: "Изменить категорию",
+  PICK_SUBCATEGORY: "Выбрать подкатегорию",
+  SELECTED_PREFIX: "Выбрано:",
+  LEAF_BADGE: "конечная",
+  LOADING: "Загрузка категорий…",
+  LOAD_ERROR: "Не удалось загрузить категории",
+  SWITCH_TO_LEGACY: "Общий список категорий",
+  SWITCH_TO_TREE: "Выбрать по подрубрикам",
+  TRAIL_ARIA: "Путь по категориям",
+  CATALOG_FILTER_OPEN: "Фильтр по подкатегориям",
+  CATALOG_FILTER_HINT:
+    "Выберите раздел или дойдите до конечной подкатегории для фильтра ленты.",
+  CATALOG_FILTER_HINT_SHORT: "Дойдите до конечной подкатегории",
+  FILTER_PREFIX: "Фильтр:",
+  PICK_LEAF: "Выбрать",
+  EMPTY_LEVEL: "Нет подкатегорий на этом уровне",
+  CLEAR_FILTER: "Сбросить фильтр",
+  CLOSE: "Закрыть",
 };
 
 /** Модалка карточки товара в каталоге */
@@ -885,6 +948,14 @@ export const PRODUCT_SELLER_PREVIEW_UI = {
 export const PRODUCT_CARD_UI = {
   DEFAULT_TITLE: "Товар",
   OPEN_DETAILS_ARIA: "Подробнее о товаре:",
+  GALLERY_REGION_ARIA: "Галерея фото товара",
+  /** @param {number} current @param {number} total */
+  GALLERY_COUNTER_ARIA: (current, total) => `Фото ${current} из ${total}`,
+  PREVIEW_FIELDS_ARIA: "Краткая информация о товаре",
+  FOOTER_ACTIONS_ARIA: "Действия с товаром",
+  STATUS_BADGES_ARIA: "Статусы товара",
+  /** @param {string} sellerName */
+  SELLER_PROFILE_ARIA: (sellerName) => `Профиль продавца: ${sellerName}`,
   AVAILABILITY_STATUS_VISIBLE: "В каталоге для всех",
   AVAILABILITY_STATUS_HIDDEN: "Скрыт от покупателей",
   HIDE_FROM_CATALOG: "Скрыть от покупателей",
@@ -920,13 +991,11 @@ export const PRODUCT_CARD_UI = {
   /** @param {number} points */
   LOYALTY_POINTS_PREMIUM: (points) => `+${points} ${pluralizeRuBall(points)}`,
   /** @param {number} points */
-  LOYALTY_POINTS_WITH_PREMIUM: (points) =>
-    `С премиум: +${points} ${pluralizeRuBall(points)}`,
+  LOYALTY_POINTS_WITH_PREMIUM: (points) => `+${points} ${pluralizeRuBall(points)}`,
   /** @param {number} points */
   LOYALTY_POINTS_GUEST: (points) =>
     `До +${points} ${pluralizeRuBall(points)} с премиум`,
-  LOYALTY_POINTS_OVERCOMMITTED_BADGE:
-    "Бонус выше доступного остатка баллов",
+  LOYALTY_POINTS_OVERCOMMITTED_BADGE: "Бонус выше доступного остатка баллов",
   RAFFLE_PARTICIPATION_ON: "Участвует в розыгрыше",
   RAFFLE_PARTICIPATION_OFF: "Добавить в розыгрыш",
   RAFFLE_PARTICIPATION_PENDING: "Сохраняем…",
@@ -944,8 +1013,7 @@ export const INSTALLMENT_UI = {
   BADGE: "Рассрочка",
   TAB: "Рассрочка",
   SHORTCUT: "В рассрочку",
-  BUYER_HINT:
-    "Оформление рассрочки доступно пользователям с подтверждёнными данными.",
+  BUYER_HINT: "Оформление рассрочки доступно пользователям с подтверждёнными данными.",
   BUYER_REQUIRES_CONFIRMED:
     "Рассрочка доступна только пользователям с подтверждёнными данными.",
   PLANS_LABEL: "План рассрочки",
@@ -962,8 +1030,7 @@ export const INSTALLMENT_UI = {
   MODERATION_PENDING: "Программа на модерации",
   MODERATION_REJECTED: "Программа отклонена",
   MODERATION_APPROVED: "Рассрочка активна",
-  SELLER_TAB_HINT:
-    "Настройте планы в «Изменить товар» → «Продать в рассрочку».",
+  SELLER_TAB_HINT: "Настройте планы в «Изменить товар» → «Продать в рассрочку».",
   PROGRAM_MODAL_TITLE: "Рассрочка на товар",
   PROGRAM_MODAL_ENABLED: "Включить рассрочку",
   PROGRAM_MODAL_PLAN_NUMBER: (n) => `План ${n}`,
@@ -1124,8 +1191,7 @@ export const RAFFLE_SELLER_PANEL_UI = {
   PAUSE: "Снять с витрины",
   EDIT: "Изменить",
   DELETE: "Удалить",
-  DELETE_CONFIRM:
-    "Удалить розыгрыш? Участие товаров будет снято, восстановить нельзя.",
+  DELETE_CONFIRM: "Удалить розыгрыш? Участие товаров будет снято, восстановить нельзя.",
   ARCHIVE_TITLE: "Архив",
   REJECTION_PREFIX: "Причина:",
 };
@@ -1152,6 +1218,17 @@ export const RAFFLE_PRODUCTS_PAGE_UI = {
   LOADING: "Загрузка…",
   EMPTY: "Нет товаров в этом розыгрыше.",
   BACK_CATALOG: "В каталог",
+};
+
+export const SELLER_PRODUCTS_PAGE_UI = {
+  LOADING: "Загрузка…",
+  BACK_CATALOG: "В каталог",
+  LOGIN_HINT: "Войдите, чтобы посмотреть товары продавца.",
+  LOGIN_BUTTON: "Войти",
+  FETCH_PROFILE_FALLBACK: "Не удалось загрузить профиль продавца",
+  EMPTY: "У продавца пока нет товаров в каталоге.",
+  /** @param {string} userName */
+  TITLE: (userName) => `Товары ${userName}`,
 };
 
 export const PRODUCT_PROMOTIONS_STAFF_PAGE_UI = {
@@ -1181,8 +1258,7 @@ export const PRODUCT_PROMOTION_UI = {
     "Оплата только баллами. Списание сразу, продвижение включается автоматически.",
   TARIFF_LABEL: "Пакет продвижения",
   /** @param {string} title @param {number} pricePoints */
-  TARIFF_OPTION_POINTS: (title, pricePoints) =>
-    `${title} — ${pricePoints} баллов`,
+  TARIFF_OPTION_POINTS: (title, pricePoints) => `${title} — ${pricePoints} баллов`,
   TARIFF_DURATION: (durationHours) => `Срок действия: ${durationHours} ч.`,
   INSUFFICIENT_POINTS: (required, balance) =>
     `Недостаточно баллов: нужно ${required}, у вас ${balance}.`,
@@ -1204,6 +1280,8 @@ export const LOGIN_MODAL_UI = {
   REGISTER_BUTTON: "Зарегистрироваться",
   SUCCESS: "Вы успешно вошли в аккаунт",
   ERROR_GENERIC: "Ошибка при входе",
+  SESSION_VERIFY_FALLBACK:
+    "Вход выполнен, но сессия не сохранилась. Обновите страницу и войдите снова.",
   PASSWORD_MIN_LENGTH: 6,
 };
 
@@ -1278,6 +1356,7 @@ export const USER_PROFILE_PURCHASES_UI = {
 /** Блок товаров продавца в чужом профиле (авторизованный зритель). */
 export const USER_PROFILE_PRODUCTS_UI = {
   HEADING: "Список товаров",
+  VIEW_ALL: "Все товары",
   LOADING: "Загрузка товаров…",
   EMPTY: "Товаров нет",
   SHOW_MORE: "Показать ещё",
@@ -1294,8 +1373,7 @@ export const LOYALTY_POINTS_PAGE_UI = {
   LOADING: "Загрузка…",
   FETCH_FALLBACK: "Не удалось загрузить баллы",
   /** @param {number} balance */
-  BALANCE_POINTS: (balance) =>
-    `Ваш баланс: ${balance} ${pluralizeRuBall(balance)}`,
+  BALANCE_POINTS: (balance) => `Ваш баланс: ${balance} ${pluralizeRuBall(balance)}`,
   INFO: "1 балл = 1 ₽. Продавец задаёт бонус за покупку; премиум-покупатель получает баллы после подтверждения получения.",
   PURCHASE_SECTION: "Пополнение",
   PURCHASE_AMOUNT_LABEL: "Сумма, ₽",
@@ -1358,6 +1436,8 @@ export const MY_PROFILE_PAGE_UI = {
   /** @param {number} count */
   TAB_BADGE: (count) => (count > 99 ? "99+" : String(count)),
   TAB_ADMIN_ORDERS: "Все заказы",
+  TAB_SEARCH_SYNONYMS_ADMIN: "Синонимы поиска",
+  TAB_CATEGORY_TREE_ADMIN: "Категории",
   TAB_PRODUCT_MODERATION: "На модерации",
   TAB_PRODUCT_REPORTS: "Жалобы",
   TAB_PRODUCT_PROMOTIONS: "Продвижение",
@@ -1443,6 +1523,86 @@ export const USER_PROFILE_COPY = {
   RATING_NONE: "Нет оценок",
   BACKGROUND_CUSTOM_IMAGE: "Своё изображение",
   DATE_FORMAT_OPTIONS: { dateStyle: "short", timeStyle: "short" },
+};
+
+/** Общий каркас админ-вкладок в профиле */
+export const ADMIN_PANEL_UI = {
+  LOADING: "Загрузка…",
+  REFRESH: "Обновить",
+  SHOW_CREATE: "+ Добавить",
+  HIDE_CREATE: "Скрыть форму",
+  SEARCH_CLEAR: "Очистить поиск",
+  SEARCH_PENDING: "Поиск…",
+  /** @param {number} n */
+  COUNT: (n) => `${n} записей`,
+  /** @param {number} shown @param {number} total */
+  COUNT_FILTERED: (shown, total) => `${shown} из ${total}`,
+};
+
+/** Админка: синонимы умного поиска */
+export const SEARCH_SYNONYMS_ADMIN_PAGE_UI = {
+  TITLE: "Синонимы поиска",
+  HINT: "Токен в запросе расширяет выдачу по legacy-категориям. Изменения в каталоге — сразу после сохранения.",
+  SEARCH_PLACEHOLDER: "Токен или категория…",
+  LOADING: "Загрузка…",
+  LOAD_ERROR: "Не удалось загрузить синонимы",
+  SAVE_ERROR: "Не удалось сохранить",
+  DELETE_ERROR: "Не удалось удалить",
+  EMPTY: "Синонимов нет",
+  EMPTY_FILTER: "Ничего не найдено",
+  CREATE_HEADING: "Новый синоним",
+  LABEL_TOKEN: "Токен запроса",
+  LABEL_CATEGORIES: "Категории",
+  CATEGORIES_HINT: "Выберите одну или несколько",
+  CREATE_BUTTON: "Добавить",
+  COL_TOKEN: "Токен",
+  COL_CATEGORIES: "Категории",
+  COL_ACTIONS: "Действия",
+  EDIT_BUTTON: "Изменить",
+  SAVE_BUTTON: "Сохранить",
+  CANCEL_BUTTON: "Отмена",
+  DELETE_BUTTON: "Удалить",
+  DELETE_CONFIRM: "Удалить синоним?",
+};
+
+/** Админка: дерево ProductCategory */
+export const CATEGORY_TREE_ADMIN_PAGE_UI = {
+  TITLE: "Дерево категорий",
+  HINT: "Узлы визарда и фильтра каталога. Смена родителя или slug пересчитывает пути у потомков.",
+  SEARCH_PLACEHOLDER: "Название, slug, ключевые слова…",
+  LOADING: "Загрузка…",
+  LOAD_ERROR: "Не удалось загрузить категории",
+  SAVE_ERROR: "Не удалось сохранить",
+  DELETE_ERROR: "Не удалось удалить",
+  EMPTY: "Категорий нет — миграция дерева или новый узел",
+  EMPTY_FILTER: "Ничего не найдено",
+  CREATE_HEADING: "Новая категория",
+  LABEL_SLUG: "Slug",
+  SLUG_HINT: "Только a–z, 0–9 и дефис. Пример: electronics-headphones. Не кириллица.",
+  SLUG_INVALID: "Slug: только латиница, цифры и дефис (минимум 2 символа)",
+  LABEL_NAME: "Название (RU)",
+  LABEL_PARENT: "Родитель",
+  PARENT_ROOT: "Корень",
+  LABEL_LEAF: "Конечная (лист)",
+  LABEL_KEYWORDS: "Ключевые слова поиска",
+  KEYWORDS_PLACEHOLDER: "телефон, смартфон",
+  LABEL_LEGACY: "Legacy productCategory",
+  LEGACY_NONE: "—",
+  CREATE_BUTTON: "Создать",
+  COL_PATH: "Путь",
+  COL_SLUG: "Slug",
+  COL_KEYWORDS: "Ключевые слова",
+  COL_LEAF: "Лист",
+  COL_ACTIONS: "Действия",
+  YES: "Да",
+  NO: "Нет",
+  LEAF_BADGE: "Лист",
+  BRANCH_BADGE: "Ветка",
+  EDIT_BUTTON: "Изменить",
+  SAVE_BUTTON: "Сохранить",
+  CANCEL_BUTTON: "Отмена",
+  DELETE_BUTTON: "Удалить",
+  DELETE_CONFIRM: "Удалить категорию? Должны отсутствовать дочерние узлы и товары.",
 };
 
 /**

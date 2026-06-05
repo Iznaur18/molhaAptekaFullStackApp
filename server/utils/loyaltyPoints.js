@@ -9,27 +9,27 @@
  * @returns {number}
  */
 export const prepareLoyaltyPointsForConfirmedOrderItem = ({
-    order,
-    itemIndex,
-    isPremiumUser,
+  order,
+  itemIndex,
+  isPremiumUser,
 }) => {
-    const targetItem = order.items[itemIndex];
-    if (!targetItem) {
-        return 0;
-    }
+  const targetItem = order.items[itemIndex];
+  if (!targetItem) {
+    return 0;
+  }
 
-    if (targetItem.loyaltyPointsAwarded) {
-        return Number(targetItem.loyaltyPointsEarned) || 0;
-    }
+  if (targetItem.loyaltyPointsAwarded) {
+    return Number(targetItem.loyaltyPointsEarned) || 0;
+  }
 
-    const reserved = Math.ceil(Number(targetItem.loyaltyPointsReservedTotal) || 0);
-    const points =
-        isPremiumUser && reserved > 0 && !targetItem.loyaltyPointsReserveReleased
-            ? reserved
-            : 0;
+  const reserved = Math.ceil(Number(targetItem.loyaltyPointsReservedTotal) || 0);
+  const points =
+    isPremiumUser && reserved > 0 && !targetItem.loyaltyPointsReserveReleased
+      ? reserved
+      : 0;
 
-    targetItem.loyaltyPointsAwarded = true;
-    targetItem.loyaltyPointsEarned = points;
+  targetItem.loyaltyPointsAwarded = true;
+  targetItem.loyaltyPointsEarned = points;
 
-    return points;
+  return points;
 };

@@ -3,12 +3,15 @@ import { useCallback, useRef, useState } from "react";
 import { fetchUserProfileById } from "../../../entities/user/api/fetchUserProfileById.js";
 import { UserFollowButton } from "../../../entities/user-follow/ui/UserFollowButton.jsx";
 import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import { buildSellerProductsPath } from "../../../shared/lib/sellerPaths.js";
 import { EMPTY_PROFILE_MODAL } from "../lib/homePageConstants.js";
 
 /**
  * @param {{
  *   currentUserId: string | null;
  *   isAuthorized: boolean;
+ *   navigate: import('react-router-dom').NavigateFunction;
+ *   goToMainView: (view: import('../../../shared/lib/homeMainViewPaths.js').HomeMainView) => void;
  *   setIsLoginModalOpen: (open: boolean) => void;
  *   setIsAdminEditUserOpen: (open: boolean) => void;
  *   setIsAdminDeleteUserOpen: (open: boolean) => void;
@@ -17,6 +20,8 @@ import { EMPTY_PROFILE_MODAL } from "../lib/homePageConstants.js";
 export const useHomeSellerModal = ({
   currentUserId,
   isAuthorized,
+  navigate,
+  goToMainView,
   setIsLoginModalOpen,
   setIsAdminEditUserOpen,
   setIsAdminDeleteUserOpen,
@@ -32,27 +37,58 @@ export const useHomeSellerModal = ({
   }, [setIsAdminDeleteUserOpen, setIsAdminEditUserOpen]);
 
   /** @param {string} userId */
-  const handleSellerNameClick = useCallback((userId) => {
-    const seq = ++sellerFetchSeq.current;
-    setSellerModal({ open: true, phase: "loading", user: null, error: "" });
+  const goToSellerProducts = useCallback(
+    (userId) => {
+      sellerFetchSeq.current += 1;
+      setSellerModal(EMPTY_PROFILE_MODAL);
+      setIsAdminEditUserOpen(false);
+      setIsAdminDeleteUserOpen(false);
 
-    void (async () => {
-      try {
-        const user = await fetchUserProfileById(userId);
-        if (seq !== sellerFetchSeq.current) {
-          return;
-        }
-        setSellerModal({ open: true, phase: "success", user, error: "" });
-      } catch (e) {
-        if (seq !== sellerFetchSeq.current) {
-          return;
-        }
-        const error =
-          e instanceof Error ? e.message : HOME_PAGE_UI.FETCH_PROFILE_FALLBACK;
-        setSellerModal({ open: true, phase: "error", user: null, error });
+      if (currentUserId != null && String(userId) === String(currentUserId)) {
+        goToMainView("my-products");
+        return;
       }
-    })();
-  }, []);
+      navigate(buildSellerProductsPath(userId));
+    },
+    [
+      currentUserId,
+      goToMainView,
+      navigate,
+      setIsAdminDeleteUserOpen,
+      setIsAdminEditUserOpen,
+    ],
+  );
+
+  /** @param {string} userId */
+  const handleSellerNameClick = useCallback(
+    (userId) => {
+      if (currentUserId != null && String(userId) === String(currentUserId)) {
+        goToMainView("my-products");
+        return;
+      }
+
+      const seq = ++sellerFetchSeq.current;
+      setSellerModal({ open: true, phase: "loading", user: null, error: "" });
+
+      void (async () => {
+        try {
+          const user = await fetchUserProfileById(userId);
+          if (seq !== sellerFetchSeq.current) {
+            return;
+          }
+          setSellerModal({ open: true, phase: "success", user, error: "" });
+        } catch (e) {
+          if (seq !== sellerFetchSeq.current) {
+            return;
+          }
+          const error =
+            e instanceof Error ? e.message : HOME_PAGE_UI.FETCH_PROFILE_FALLBACK;
+          setSellerModal({ open: true, phase: "error", user: null, error });
+        }
+      })();
+    },
+    [currentUserId, goToMainView],
+  );
 
   /**
    * @param {{
@@ -86,10 +122,7 @@ export const useHomeSellerModal = ({
     if (sellerModal.phase !== "success" || !sellerModal.user) {
       return null;
     }
-    if (
-      !currentUserId ||
-      String(sellerModal.user._id) === String(currentUserId)
-    ) {
+    if (!currentUserId || String(sellerModal.user._id) === String(currentUserId)) {
       return null;
     }
     return (
@@ -114,6 +147,7 @@ export const useHomeSellerModal = ({
     sellerModal,
     setSellerModal,
     closeSellerModal,
+    goToSellerProducts,
     handleSellerNameClick,
     renderSellerFollowAccessory,
   };

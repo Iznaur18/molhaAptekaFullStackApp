@@ -412,10 +412,30 @@
   color: #067647;
 }
 
+.home-page__grid-virtual-host {
+  position: relative;
+  width: 100%;
+}
+
+.home-page__grid--virtual-window {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100%;
+}
+
 .home-page__catalog-sentinel {
   min-height: 4rem;
   margin-top: 0.5rem;
   pointer-events: none;
+}
+
+.home-page__catalog-sentinel_virtual {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin-top: 0;
 }
 
 .home-page__catalog-more {
@@ -579,7 +599,6 @@
   border-radius: 8px;
   border-color: #e2e8f0;
 }
-
 
 .home-page--header-v1 .home-page__category-list {
   border-radius: 12px;

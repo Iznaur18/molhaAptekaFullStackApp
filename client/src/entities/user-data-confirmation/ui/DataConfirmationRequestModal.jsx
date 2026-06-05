@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { countWords } from "../../user/lib/countWords.js";
@@ -14,6 +14,7 @@ import { uploadImage } from "../../../shared/api/uploadImage.js";
 import {
   DATA_CONFIRMATION_MODAL_UI,
   DATA_CONFIRMATION_PAGE_UI,
+  IMAGE_URL_FIELD_UI,
   USER_DETAILS_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { UPLOAD_FILE_INPUT_ACCEPT } from "../../../shared/config/uploadConstants.js";
@@ -35,11 +36,7 @@ import "./DataConfirmationRequestModal.css";
  *   onSubmitted?: () => void;
  * }} props
  */
-export function DataConfirmationRequestModal({
-  isOpen,
-  onClose,
-  onSubmitted,
-}) {
+export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
   const [phase, setPhase] = useState("loading");
   const [isUserDataConfirmed, setIsUserDataConfirmed] = useState(false);
   const [requestStatus, setRequestStatus] = useState(
@@ -51,6 +48,7 @@ export function DataConfirmationRequestModal({
   const [selfiePreviewUrl, setSelfiePreviewUrl] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const selfieFileInputRef = useRef(/** @type {HTMLInputElement | null} */ (null));
 
   useEffect(() => {
     if (!selfieFile) {
@@ -104,8 +102,7 @@ export function DataConfirmationRequestModal({
   if (!isOpen) return null;
 
   const canSubmit =
-    !isUserDataConfirmed &&
-    requestStatus !== USER_DATA_CONFIRMATION_STATUS_PENDING;
+    !isUserDataConfirmed && requestStatus !== USER_DATA_CONFIRMATION_STATUS_PENDING;
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -184,11 +181,15 @@ export function DataConfirmationRequestModal({
     setSelfieFile(file);
   };
 
+  const handlePickSelfieFile = () => {
+    if (isSubmitting) {
+      return;
+    }
+    selfieFileInputRef.current?.click();
+  };
+
   return createPortal(
-    <div
-      className="data-confirmation-modal__backdrop"
-      role="presentation"
-    >
+    <div className="data-confirmation-modal__backdrop" role="presentation">
       <div
         className="data-confirmation-modal"
         role="dialog"
@@ -196,9 +197,7 @@ export function DataConfirmationRequestModal({
         aria-labelledby="data-confirmation-modal-title"
       >
         <header className="data-confirmation-modal__header">
-          <h2 id="data-confirmation-modal-title">
-            {DATA_CONFIRMATION_MODAL_UI.TITLE}
-          </h2>
+          <h2 id="data-confirmation-modal-title">{DATA_CONFIRMATION_MODAL_UI.TITLE}</h2>
           <button
             type="button"
             className="data-confirmation-modal__close"
@@ -330,9 +329,7 @@ export function DataConfirmationRequestModal({
                   {DATA_CONFIRMATION_MODAL_UI.LABEL_DEPARTMENT_CODE}
                   <input
                     type="text"
-                    placeholder={
-                      DATA_CONFIRMATION_MODAL_UI.PLACEHOLDER_DEPARTMENT_CODE
-                    }
+                    placeholder={DATA_CONFIRMATION_MODAL_UI.PLACEHOLDER_DEPARTMENT_CODE}
                     value={form.departmentCode}
                     onChange={(e) => updateField("departmentCode", e.target.value)}
                   />
@@ -344,9 +341,28 @@ export function DataConfirmationRequestModal({
                 <span className="data-confirmation-modal__selfie-hint">
                   {DATA_CONFIRMATION_MODAL_UI.HINT_PASSPORT_SELFIE}
                 </span>
+                <div className="data-confirmation-modal__selfie-upload">
+                  <button
+                    type="button"
+                    className="data-confirmation-modal__file-btn"
+                    onClick={handlePickSelfieFile}
+                    disabled={isSubmitting}
+                  >
+                    {IMAGE_URL_FIELD_UI.UPLOAD_BUTTON}
+                  </button>
+                  {selfieFile ? (
+                    <span className="data-confirmation-modal__file-name">
+                      {selfieFile.name}
+                    </span>
+                  ) : null}
+                </div>
                 <input
+                  ref={selfieFileInputRef}
+                  className="data-confirmation-modal__file-input"
                   type="file"
                   accept={UPLOAD_FILE_INPUT_ACCEPT}
+                  aria-label={IMAGE_URL_FIELD_UI.FILE_INPUT_ARIA}
+                  tabIndex={-1}
                   onChange={handleSelfieFileChange}
                   disabled={isSubmitting}
                 />

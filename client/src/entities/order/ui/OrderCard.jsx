@@ -42,8 +42,7 @@ function renderBuyerValue(buyer, onBuyerNameClick) {
     return COMMON_UI.EM_DASH;
   }
   const label = formatBuyer(buyer);
-  const canLink =
-    typeof onBuyerNameClick === "function" && buyer._id != null;
+  const canLink = typeof onBuyerNameClick === "function" && buyer._id != null;
 
   if (canLink) {
     return (
@@ -108,9 +107,7 @@ export function OrderCard({
             </span>
           ) : null}
         </div>
-        <span className="order-card__total">
-          {formatPriceRub(order.totalAmount)}
-        </span>
+        <span className="order-card__total">{formatPriceRub(order.totalAmount)}</span>
       </header>
 
       <dl className="order-card__meta">
@@ -144,13 +141,10 @@ export function OrderCard({
         ) : null}
       </dl>
 
-      <h3 className="order-card__items-heading">
-        {ORDER_CARD_UI.ITEMS_HEADING}
-      </h3>
+      <h3 className="order-card__items-heading">{ORDER_CARD_UI.ITEMS_HEADING}</h3>
       <ul className="order-card__items" role="list">
         {order.items.map((item, index) => {
-          const itemIndex =
-            typeof item.itemIndex === "number" ? item.itemIndex : index;
+          const itemIndex = typeof item.itemIndex === "number" ? item.itemIndex : index;
           const actionKey = `${order._id}:${itemIndex}`;
           const isActionPending = pendingActionKey === actionKey;
           const actionError = itemActionErrors[actionKey] ?? "";
@@ -165,124 +159,114 @@ export function OrderCard({
             : "";
 
           return (
-          <li
-            key={`${order._id}-${index}`}
-            className="order-card__item"
-            role="listitem"
-          >
-            {isOrderLineItemProductClickable(item) ? (
-              <button
-                type="button"
-                className="order-card__item-name-button"
-                onClick={() => onProductClick?.(item)}
-              >
-                {resolveOrderLineItemProductName(item)}
-              </button>
-            ) : (
-              <span className="order-card__item-name">
-                {resolveOrderLineItemProductName(item)}
+            <li
+              key={`${order._id}-${index}`}
+              className="order-card__item"
+              role="listitem"
+            >
+              {isOrderLineItemProductClickable(item) ? (
+                <button
+                  type="button"
+                  className="order-card__item-name-button"
+                  onClick={() => onProductClick?.(item)}
+                >
+                  {resolveOrderLineItemProductName(item)}
+                </button>
+              ) : (
+                <span className="order-card__item-name">
+                  {resolveOrderLineItemProductName(item)}
+                </span>
+              )}
+              <span className="order-card__item-quantity">×{item.quantity}</span>
+              <span className="order-card__item-price">
+                {formatPriceRub(item.unitPriceAtOrder)}
               </span>
-            )}
-            <span className="order-card__item-quantity">×{item.quantity}</span>
-            <span className="order-card__item-price">
-              {formatPriceRub(item.unitPriceAtOrder)}
-            </span>
-            {Math.floor(Number(item.loyaltyPointsPerUnitAtOrder)) > 0 ? (
-              <span className="order-card__item-loyalty">
-                {ORDER_CARD_UI.LOYALTY_POINTS_LINE(
-                  Math.floor(Number(item.loyaltyPointsPerUnitAtOrder)),
-                )}
-                {item.quantity > 1
-                  ? ` · всего ${Math.floor(Number(item.loyaltyPointsReservedTotal) || 0)}`
-                  : ""}
+              {Math.floor(Number(item.loyaltyPointsPerUnitAtOrder)) > 0 ? (
+                <span className="order-card__item-loyalty">
+                  {ORDER_CARD_UI.LOYALTY_POINTS_LINE(
+                    Math.floor(Number(item.loyaltyPointsPerUnitAtOrder)),
+                  )}
+                  {item.quantity > 1
+                    ? ` · всего ${Math.floor(Number(item.loyaltyPointsReservedTotal) || 0)}`
+                    : ""}
+                </span>
+              ) : null}
+              <span className="order-card__item-status">
+                {ORDER_CARD_UI.ITEM_STATUS_LABEL}: {formatStatus(item.status)}
               </span>
-            ) : null}
-            <span className="order-card__item-status">
-              {ORDER_CARD_UI.ITEM_STATUS_LABEL}: {formatStatus(item.status)}
-            </span>
-            {deliveredAtText ? (
-              <span className="order-card__item-timestamp">
-                {ORDER_CARD_UI.ITEM_DELIVERED_AT_LABEL}: {deliveredAtText}
-              </span>
-            ) : null}
-            {confirmedAtText ? (
-              <span className="order-card__item-timestamp">
-                {ORDER_CARD_UI.ITEM_CONFIRMED_AT_LABEL}: {confirmedAtText}
-              </span>
-            ) : null}
-            {canMarkShipped && (onMarkShipped || onCancelItem) ? (
-              <div className="order-card__item-actions">
-                {onMarkShipped ? (
-                  <button
-                    type="button"
-                    className="order-card__item-action-button"
-                    onClick={() =>
-                      onMarkShipped({ orderId: order._id, itemIndex })
-                    }
-                    disabled={isActionPending}
-                  >
-                    {isActionPending
-                      ? ORDER_CARD_UI.ACTION_PENDING
-                      : ORDER_CARD_UI.ACTION_SHIPPED}
-                  </button>
-                ) : null}
-                {onCancelItem ? (
-                  <button
-                    type="button"
-                    className="order-card__item-action-button order-card__item-action-button_cancel"
-                    onClick={() =>
-                      onCancelItem({ orderId: order._id, itemIndex })
-                    }
-                    disabled={isActionPending}
-                  >
-                    {isActionPending
-                      ? ORDER_CARD_UI.ACTION_PENDING
-                      : ORDER_CARD_UI.ACTION_CANCEL}
-                  </button>
-                ) : null}
-              </div>
-            ) : null}
-            {canMarkDelivered && onMarkDelivered ? (
-              <button
-                type="button"
-                className="order-card__item-action-button"
-                onClick={() =>
-                  onMarkDelivered({ orderId: order._id, itemIndex })
-                }
-                disabled={isActionPending}
-              >
-                {isActionPending
-                  ? ORDER_CARD_UI.ACTION_PENDING
-                  : ORDER_CARD_UI.ACTION_DELIVERED}
-              </button>
-            ) : null}
-            {canConfirmDelivered && onConfirmDelivered ? (
-              <button
-                type="button"
-                className="order-card__item-action-button"
-                onClick={() =>
-                  onConfirmDelivered({ orderId: order._id, itemIndex })
-                }
-                disabled={isActionPending}
-              >
-                {isActionPending
-                  ? ORDER_CARD_UI.ACTION_PENDING
-                  : ORDER_CARD_UI.ACTION_CONFIRM}
-              </button>
-            ) : null}
-            {actionError ? (
-              <span className="order-card__item-action-error" role="alert">
-                {actionError}
-              </span>
-            ) : null}
-          </li>
+              {deliveredAtText ? (
+                <span className="order-card__item-timestamp">
+                  {ORDER_CARD_UI.ITEM_DELIVERED_AT_LABEL}: {deliveredAtText}
+                </span>
+              ) : null}
+              {confirmedAtText ? (
+                <span className="order-card__item-timestamp">
+                  {ORDER_CARD_UI.ITEM_CONFIRMED_AT_LABEL}: {confirmedAtText}
+                </span>
+              ) : null}
+              {canMarkShipped && (onMarkShipped || onCancelItem) ? (
+                <div className="order-card__item-actions">
+                  {onMarkShipped ? (
+                    <button
+                      type="button"
+                      className="order-card__item-action-button"
+                      onClick={() => onMarkShipped({ orderId: order._id, itemIndex })}
+                      disabled={isActionPending}
+                    >
+                      {isActionPending
+                        ? ORDER_CARD_UI.ACTION_PENDING
+                        : ORDER_CARD_UI.ACTION_SHIPPED}
+                    </button>
+                  ) : null}
+                  {onCancelItem ? (
+                    <button
+                      type="button"
+                      className="order-card__item-action-button order-card__item-action-button_cancel"
+                      onClick={() => onCancelItem({ orderId: order._id, itemIndex })}
+                      disabled={isActionPending}
+                    >
+                      {isActionPending
+                        ? ORDER_CARD_UI.ACTION_PENDING
+                        : ORDER_CARD_UI.ACTION_CANCEL}
+                    </button>
+                  ) : null}
+                </div>
+              ) : null}
+              {canMarkDelivered && onMarkDelivered ? (
+                <button
+                  type="button"
+                  className="order-card__item-action-button"
+                  onClick={() => onMarkDelivered({ orderId: order._id, itemIndex })}
+                  disabled={isActionPending}
+                >
+                  {isActionPending
+                    ? ORDER_CARD_UI.ACTION_PENDING
+                    : ORDER_CARD_UI.ACTION_DELIVERED}
+                </button>
+              ) : null}
+              {canConfirmDelivered && onConfirmDelivered ? (
+                <button
+                  type="button"
+                  className="order-card__item-action-button"
+                  onClick={() => onConfirmDelivered({ orderId: order._id, itemIndex })}
+                  disabled={isActionPending}
+                >
+                  {isActionPending
+                    ? ORDER_CARD_UI.ACTION_PENDING
+                    : ORDER_CARD_UI.ACTION_CONFIRM}
+                </button>
+              ) : null}
+              {actionError ? (
+                <span className="order-card__item-action-error" role="alert">
+                  {actionError}
+                </span>
+              ) : null}
+            </li>
           );
         })}
       </ul>
 
-      {statusSlot ? (
-        <footer className="order-card__footer">{statusSlot}</footer>
-      ) : null}
+      {statusSlot ? <footer className="order-card__footer">{statusSlot}</footer> : null}
     </article>
   );
 }

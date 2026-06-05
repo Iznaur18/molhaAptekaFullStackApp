@@ -31,9 +31,7 @@ export async function fetchMySales(params = {}) {
     return data.data.orders;
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      API_CLIENT_UI.FETCH_MY_SALES_FALLBACK;
+      e?.response?.data?.message ?? e?.message ?? API_CLIENT_UI.FETCH_MY_SALES_FALLBACK;
     throw new Error(message);
   }
 }

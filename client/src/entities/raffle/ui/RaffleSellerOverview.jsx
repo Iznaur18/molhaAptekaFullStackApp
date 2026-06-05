@@ -28,11 +28,7 @@ const STATUS_LABEL = {
  *   onEditRaffle?: (raffle: import('../model/types.js').RaffleFromApi) => void;
  * }} props
  */
-export function RaffleSellerOverview({
-  refreshTick = 0,
-  onChanged,
-  onEditRaffle,
-}) {
+export function RaffleSellerOverview({ refreshTick = 0, onChanged, onEditRaffle }) {
   const [phase, setPhase] = useState("loading");
   const [raffle, setRaffle] = useState(
     /** @type {import('../model/types.js').RaffleFromApi | null} */ (null),
@@ -53,9 +49,7 @@ export function RaffleSellerOverview({
       setArchive(data.archive);
       setPhase("success");
     } catch (e) {
-      setError(
-        e instanceof Error ? e.message : API_CLIENT_UI.FETCH_MY_RAFFLE_FALLBACK,
-      );
+      setError(e instanceof Error ? e.message : API_CLIENT_UI.FETCH_MY_RAFFLE_FALLBACK);
       setPhase("error");
     }
   }, []);
@@ -72,9 +66,7 @@ export function RaffleSellerOverview({
       onChanged?.();
       await load();
     } catch (e) {
-      setError(
-        e instanceof Error ? e.message : API_CLIENT_UI.PAUSE_RAFFLE_FALLBACK,
-      );
+      setError(e instanceof Error ? e.message : API_CLIENT_UI.PAUSE_RAFFLE_FALLBACK);
     } finally {
       setIsPausing(false);
     }
@@ -89,9 +81,7 @@ export function RaffleSellerOverview({
       onChanged?.();
       await load();
     } catch (e) {
-      setError(
-        e instanceof Error ? e.message : API_CLIENT_UI.DELETE_RAFFLE_FALLBACK,
-      );
+      setError(e instanceof Error ? e.message : API_CLIENT_UI.DELETE_RAFFLE_FALLBACK);
     } finally {
       setIsDeleting(false);
     }

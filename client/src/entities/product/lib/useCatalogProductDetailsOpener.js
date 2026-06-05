@@ -36,9 +36,7 @@ export function useCatalogProductDetailsOpener() {
         setCatalogProductPhase("ready");
       } catch (e) {
         setCatalogProductError(
-          e instanceof Error
-            ? e.message
-            : API_CLIENT_UI.FETCH_CATALOG_PRODUCT_FALLBACK,
+          e instanceof Error ? e.message : API_CLIENT_UI.FETCH_CATALOG_PRODUCT_FALLBACK,
         );
         setCatalogProductPhase("error");
       }

@@ -45,9 +45,7 @@ export function InstallmentModerationPage({ onQueueChanged }) {
   }, [loadQueue]);
 
   const removeFromQueue = (productId) => {
-    setPrograms((prev) =>
-      prev.filter((row) => String(row.productId) !== productId),
-    );
+    setPrograms((prev) => prev.filter((row) => String(row.productId) !== productId));
   };
 
   const handleApprove = async (productId) => {
@@ -66,10 +64,7 @@ export function InstallmentModerationPage({ onQueueChanged }) {
   const handleReject = async (productId) => {
     try {
       setPendingProductId(productId);
-      await rejectInstallmentModeration(
-        productId,
-        rejectComments[productId] ?? "",
-      );
+      await rejectInstallmentModeration(productId, rejectComments[productId] ?? "");
       removeFromQueue(productId);
       onQueueChanged?.();
     } catch (e) {
@@ -152,7 +147,9 @@ export function InstallmentModerationPage({ onQueueChanged }) {
                   disabled={isBusy}
                   onClick={() => void handleApprove(productId)}
                 >
-                  {isBusy ? INSTALLMENT_UI.ACTION_PENDING : INSTALLMENT_UI.MODERATION_APPROVE}
+                  {isBusy
+                    ? INSTALLMENT_UI.ACTION_PENDING
+                    : INSTALLMENT_UI.MODERATION_APPROVE}
                 </button>
                 <button
                   type="button"
@@ -160,7 +157,9 @@ export function InstallmentModerationPage({ onQueueChanged }) {
                   disabled={isBusy}
                   onClick={() => void handleReject(productId)}
                 >
-                  {isBusy ? INSTALLMENT_UI.ACTION_PENDING : INSTALLMENT_UI.MODERATION_REJECT}
+                  {isBusy
+                    ? INSTALLMENT_UI.ACTION_PENDING
+                    : INSTALLMENT_UI.MODERATION_REJECT}
                 </button>
               </div>
             </article>

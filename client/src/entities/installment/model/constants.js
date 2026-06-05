@@ -21,8 +21,7 @@ export const INSTALLMENT_SALES_LIST_FILTERS = [
 export const INSTALLMENT_PAYMENT_STATUS_SCHEDULED = "scheduled";
 export const INSTALLMENT_PAYMENT_STATUS_DUE = "due";
 export const INSTALLMENT_PAYMENT_STATUS_OVERDUE = "overdue";
-export const INSTALLMENT_PAYMENT_STATUS_PENDING_CONFIRMATION =
-  "pending_confirmation";
+export const INSTALLMENT_PAYMENT_STATUS_PENDING_CONFIRMATION = "pending_confirmation";
 export const INSTALLMENT_PAYMENT_STATUS_PAID = "paid";
 
 export const INSTALLMENT_PLANS_MAX = 5;

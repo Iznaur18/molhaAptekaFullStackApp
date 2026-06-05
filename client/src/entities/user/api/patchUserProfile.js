@@ -10,10 +10,7 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
  */
 export async function patchUserProfile(userId, body) {
   try {
-    const { data } = await apiClient.patch(
-      `/user/${encodeURIComponent(userId)}`,
-      body,
-    );
+    const { data } = await apiClient.patch(`/user/${encodeURIComponent(userId)}`, body);
 
     if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
@@ -29,9 +26,7 @@ export async function patchUserProfile(userId, body) {
     return user;
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      API_CLIENT_UI.UPDATE_PROFILE_FALLBACK;
+      e?.response?.data?.message ?? e?.message ?? API_CLIENT_UI.UPDATE_PROFILE_FALLBACK;
     throw new Error(message);
   }
 }

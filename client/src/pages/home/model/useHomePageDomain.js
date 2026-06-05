@@ -14,10 +14,9 @@ import { useHomeProfileNavigation } from "./useHomeProfileNavigation.js";
  */
 export function useHomePageDomain(shell, flushRemoteCart, location, navigate) {
   const profileNavigation = useHomeProfileNavigation({
-    setMyProfileTab: shell.setMyProfileTab,
+    goToMainView: shell.goToMainView,
     setMyProductsCatalogError: shell.setMyProductsCatalogError,
     myProfilePage: shell.myProfilePage,
-    setIsDataConfirmationModalOpen: shell.setIsDataConfirmationModalOpen,
     setLoyaltyPoints: shell.setLoyaltyPoints,
     setMyProfilePage: shell.setMyProfilePage,
   });
@@ -25,8 +24,8 @@ export function useHomePageDomain(shell, flushRemoteCart, location, navigate) {
   const catalogLoader = useHomeCatalogLoader({
     location,
     navigate,
-    mainView: shell.mainView,
-    isProfileMyProductsTab: shell.isProfileMyProductsTab,
+    catalogMainView: shell.catalogMainView,
+    isMyProductsRoute: shell.isMyProductsRoute,
     isHomeCatalogMainView: shell.isHomeCatalogMainView,
     isCatalogBrowserMainViewActive: shell.isCatalogBrowserMainViewActive,
     isCatalogShellView: shell.isCatalogShellView,
@@ -44,6 +43,7 @@ export function useHomePageDomain(shell, flushRemoteCart, location, navigate) {
     setMyProductsTotal: shell.setMyProductsTotal,
     setMyProductsCatalogError: shell.setMyProductsCatalogError,
     setIsProductCategoryListOpen: shell.setIsProductCategoryListOpen,
+    setProductSearchTerm: shell.setProductSearchTerm,
     initialCatalogQuery: shell.initialCatalogQuery,
   });
 
@@ -76,7 +76,8 @@ export function useHomePageDomain(shell, flushRemoteCart, location, navigate) {
     setCatalogRefreshTick: shell.setCatalogRefreshTick,
     setRaffleRefreshTick: shell.setRaffleRefreshTick,
     refreshFeaturedRaffle: shell.refreshFeaturedRaffle,
-    setRaffleParticipationPendingProductId: shell.setRaffleParticipationPendingProductId,
+    setRaffleParticipationPendingProductId:
+      shell.setRaffleParticipationPendingProductId,
   });
 
   const catalogProductDetailsState = useHomeCatalogProductDetails({
@@ -88,6 +89,10 @@ export function useHomePageDomain(shell, flushRemoteCart, location, navigate) {
     setProducts: shell.setProducts,
     catalogProductDetails: shell.catalogProductDetails,
     setCatalogProductDetails: shell.setCatalogProductDetails,
+    onBeforeOpenDetails: () => {
+      shell.setProductToEdit(null);
+      shell.setIsCreateProductModalOpen(false);
+    },
   });
 
   const notifications = useHomeNotifications({
@@ -104,7 +109,6 @@ export function useHomePageDomain(shell, flushRemoteCart, location, navigate) {
     isAuthorized: shell.isAuthorized,
     isSessionReady: shell.isSessionReady,
     mainView: shell.mainView,
-    activeProfileTab: shell.activeProfileTab,
     isAdmin: shell.isAdmin,
     canModerateProducts: shell.canModerateProducts,
     goToMainView: shell.goToMainView,
@@ -115,7 +119,7 @@ export function useHomePageDomain(shell, flushRemoteCart, location, navigate) {
     setMyProductsModerationFilter: shell.setMyProductsModerationFilter,
     resetCatalogFollowingOnLogout: catalogLoader.resetCatalogFollowingOnLogout,
     clearInAppNotifications: notifications.clearInAppNotifications,
-    setMyProfileTab: shell.setMyProfileTab,
+    setIsAuthorized: shell.setIsAuthorized,
   });
 
   const handleLogout = useHomeLogout({

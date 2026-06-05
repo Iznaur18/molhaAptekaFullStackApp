@@ -1,0 +1,31 @@
+import {
+  CATALOG_GRID_COLUMN_BREAKPOINT_PX,
+  CATALOG_GRID_GAP_PX,
+  CATALOG_GRID_MIN_COLUMN_PX,
+  CATALOG_GRID_MOBILE_COLUMNS,
+} from "./catalogGridVirtualizationConstants.js";
+
+/**
+ * Число колонок для `grid-template-columns: repeat(auto-fill, minmax(280px, 1fr))`
+ * и фиксированных 3 колонок на узких экранах.
+ *
+ * @param {number} containerWidth
+ * @returns {number}
+ */
+export function getCatalogGridColumnCount(containerWidth) {
+  if (!Number.isFinite(containerWidth) || containerWidth <= 0) {
+    return 1;
+  }
+
+  if (containerWidth <= CATALOG_GRID_COLUMN_BREAKPOINT_PX) {
+    return CATALOG_GRID_MOBILE_COLUMNS;
+  }
+
+  return Math.max(
+    1,
+    Math.floor(
+      (containerWidth + CATALOG_GRID_GAP_PX) /
+        (CATALOG_GRID_MIN_COLUMN_PX + CATALOG_GRID_GAP_PX),
+    ),
+  );
+}

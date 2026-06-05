@@ -171,10 +171,7 @@ export function ProductSellerManageActions({
         >
           {showVisibility ? (
             isAvailabilityTogglePending ? (
-              <p
-                className="product-card__availability-pending"
-                aria-live="polite"
-              >
+              <p className="product-card__availability-pending" aria-live="polite">
                 {PRODUCT_CARD_UI.AVAILABILITY_TOGGLE_PENDING}
               </p>
             ) : (
@@ -190,10 +187,7 @@ export function ProductSellerManageActions({
                   disabled={actionsLocked}
                   onClick={() => {
                     if (product._id == null || actionsLocked) return;
-                    void onSetAvailability(
-                      String(product._id),
-                      !isListedForOthers,
-                    );
+                    void onSetAvailability(String(product._id), !isListedForOthers);
                   }}
                 >
                   {isListedForOthers
@@ -205,10 +199,7 @@ export function ProductSellerManageActions({
           ) : null}
           {showAuctionToggle ? (
             isAuctionTogglePending ? (
-              <p
-                className="product-card__availability-pending"
-                aria-live="polite"
-              >
+              <p className="product-card__availability-pending" aria-live="polite">
                 {PRODUCT_CARD_UI.AUCTION_TOGGLE_PENDING}
               </p>
             ) : (

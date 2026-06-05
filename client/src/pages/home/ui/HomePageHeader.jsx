@@ -34,8 +34,7 @@ import {
 import { SearchInput } from "../../../shared/ui/SearchInput/SearchInput.jsx";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 
-const PRODUCT_CATEGORY_FILTER_LIST_ID =
-  HOME_PAGE_UI.PRODUCT_CATEGORY_FILTER_LIST_ID;
+const PRODUCT_CATEGORY_FILTER_LIST_ID = HOME_PAGE_UI.PRODUCT_CATEGORY_FILTER_LIST_ID;
 
 /** Разделы с подписью в кнопках шапки — без дублирующего view-title. */
 const HEADER_VIEW_TITLE_HIDDEN_VIEWS = new Set(["users", "cart"]);
@@ -160,11 +159,7 @@ export function HomePageHeader({
 
     const handlePointerDown = (event) => {
       const root = productCategoryFilterRef.current;
-      if (
-        root &&
-        event.target instanceof Node &&
-        !root.contains(event.target)
-      ) {
+      if (root && event.target instanceof Node && !root.contains(event.target)) {
         onCloseProductCategoryFilter();
       }
     };
@@ -185,22 +180,13 @@ export function HomePageHeader({
 
   const nonCatalogTitle = (() => {
     const base = NON_CATALOG_VIEW_TITLES[mainView] ?? "";
-    if (
-      mainView === "product-moderation" &&
-      pendingModerationCount > 0
-    ) {
+    if (mainView === "product-moderation" && pendingModerationCount > 0) {
       return `${base} (${PRODUCT_MODERATION_PAGE_UI.TAB_BADGE(pendingModerationCount)})`;
     }
-    if (
-      mainView === "product-reports" &&
-      pendingProductReportsCount > 0
-    ) {
+    if (mainView === "product-reports" && pendingProductReportsCount > 0) {
       return `${base} (${PRODUCT_REPORTS_PAGE_UI.TAB_BADGE(pendingProductReportsCount)})`;
     }
-    if (
-      mainView === "data-confirmation-requests" &&
-      pendingDataConfirmationCount > 0
-    ) {
+    if (mainView === "data-confirmation-requests" && pendingDataConfirmationCount > 0) {
       return `${base} (${DATA_CONFIRMATION_PAGE_UI.TAB_BADGE(pendingDataConfirmationCount)})`;
     }
     if (
@@ -209,10 +195,7 @@ export function HomePageHeader({
     ) {
       return `${base} (${INSTALLMENT_UI.TAB_BADGE(pendingInstallmentModerationCount)})`;
     }
-    if (
-      mainView === "installment-disputes" &&
-      pendingInstallmentDisputesCount > 0
-    ) {
+    if (mainView === "installment-disputes" && pendingInstallmentDisputesCount > 0) {
       return `${base} (${INSTALLMENT_UI.TAB_BADGE(pendingInstallmentDisputesCount)})`;
     }
     return base;
@@ -330,9 +313,7 @@ export function HomePageHeader({
           />
           <HeaderPlaceProductButton
             isLoginRequired={!isAuthorized}
-            onClick={() =>
-              isAuthorized ? onPlaceProductClick() : onLoginClick()
-            }
+            onClick={() => (isAuthorized ? onPlaceProductClick() : onLoginClick())}
           />
           {isAuthorized ? (
             <>
@@ -366,7 +347,7 @@ export function HomePageHeader({
           )}
         </nav>
       </div>
-      {(isCatalogShellView || isCatalogBrowserMainView(mainView)) ? (
+      {isCatalogShellView || isCatalogBrowserMainView(mainView) ? (
         <CatalogToolbar
           isMineMode={isMineMode}
           onPlaceProductClick={onPlaceProductClick}
@@ -376,9 +357,7 @@ export function HomePageHeader({
           myProductsTotal={myProductsTotal}
           sellerProductsLimit={sellerProductsLimit}
           myProductsModerationFilter={myProductsModerationFilter}
-          onMyProductsModerationFilterChange={
-            onMyProductsModerationFilterChange
-          }
+          onMyProductsModerationFilterChange={onMyProductsModerationFilterChange}
         />
       ) : null}
     </header>
@@ -454,8 +433,7 @@ function CatalogToolbar({
   myProductsModerationFilter = "",
   onMyProductsModerationFilterChange,
 }) {
-  const showProductsQuota =
-    isMineMode && sellerProductsLimit != null && !isAdmin;
+  const showProductsQuota = isMineMode && sellerProductsLimit != null && !isAdmin;
   const productsQuotaText =
     showProductsQuota && sellerProductsLimit != null
       ? formatSellerProductsQuota(myProductsTotal, sellerProductsLimit)
@@ -465,50 +443,48 @@ function CatalogToolbar({
   return (
     <>
       {showCatalogFiltersRow ? (
-      <div className="home-page__catalog-filters-row">
-        {isMineMode ? (
-          <>
-            <div className="home-page__sort">
-              <label className="home-page__sort-label">
-                <span>{HOME_PAGE_UI.SORT_LABEL}</span>
-                <select
-                  className="home-page__sort-control"
-                  value={catalogSort}
-                  onChange={(event) =>
-                    onCatalogSortChange(event.target.value)
-                  }
-                >
-                  {CATALOG_SORT_OPTIONS_MY_PRODUCTS.map((optionKey) => (
-                    <option key={optionKey} value={optionKey}>
-                      {CATALOG_SORT_LABEL_RU[optionKey]}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-            {typeof onMyProductsModerationFilterChange === "function" ? (
+        <div className="home-page__catalog-filters-row">
+          {isMineMode ? (
+            <>
               <div className="home-page__sort">
                 <label className="home-page__sort-label">
-                  <span>{HOME_PAGE_UI.MODERATION_STATUS_FILTER_LABEL}</span>
+                  <span>{HOME_PAGE_UI.SORT_LABEL}</span>
                   <select
                     className="home-page__sort-control"
-                    value={myProductsModerationFilter}
-                    onChange={(event) =>
-                      onMyProductsModerationFilterChange(event.target.value)
-                    }
+                    value={catalogSort}
+                    onChange={(event) => onCatalogSortChange(event.target.value)}
                   >
-                    {MY_PRODUCTS_MODERATION_FILTER_OPTIONS.map((filterKey) => (
-                      <option key={filterKey || "all"} value={filterKey}>
-                        {MY_PRODUCTS_MODERATION_FILTER_LABEL_RU[filterKey]}
+                    {CATALOG_SORT_OPTIONS_MY_PRODUCTS.map((optionKey) => (
+                      <option key={optionKey} value={optionKey}>
+                        {CATALOG_SORT_LABEL_RU[optionKey]}
                       </option>
                     ))}
                   </select>
                 </label>
               </div>
-            ) : null}
-          </>
-        ) : null}
-      </div>
+              {typeof onMyProductsModerationFilterChange === "function" ? (
+                <div className="home-page__sort">
+                  <label className="home-page__sort-label">
+                    <span>{HOME_PAGE_UI.MODERATION_STATUS_FILTER_LABEL}</span>
+                    <select
+                      className="home-page__sort-control"
+                      value={myProductsModerationFilter}
+                      onChange={(event) =>
+                        onMyProductsModerationFilterChange(event.target.value)
+                      }
+                    >
+                      {MY_PRODUCTS_MODERATION_FILTER_OPTIONS.map((filterKey) => (
+                        <option key={filterKey || "all"} value={filterKey}>
+                          {MY_PRODUCTS_MODERATION_FILTER_LABEL_RU[filterKey]}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+              ) : null}
+            </>
+          ) : null}
+        </div>
       ) : null}
 
       {isMineMode ? (

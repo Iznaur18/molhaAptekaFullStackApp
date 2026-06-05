@@ -1,0 +1,25 @@
+{
+  "name": "product_catalog",
+  "database": "REPLACE_WITH_YOUR_DB_NAME",
+  "collectionName": "products",
+  "mappings": {
+    "dynamic": false,
+    "fields": {
+      "productName": {
+        "type": "string",
+        "analyzer": "lucene.standard"
+      },
+      "productSearchBlob": {
+        "type": "string",
+        "analyzer": "lucene.standard"
+      },
+      "productCategory": {
+        "type": "string",
+        "analyzer": "lucene.standard"
+      },
+      "productCategoryId": {
+        "type": "objectId"
+      }
+    }
+  }
+}

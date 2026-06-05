@@ -14,9 +14,7 @@ export async function fetchRaffleById(raffleId) {
     return data.data.raffle;
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      API_CLIENT_UI.FETCH_RAFFLE_FALLBACK;
+      e?.response?.data?.message ?? e?.message ?? API_CLIENT_UI.FETCH_RAFFLE_FALLBACK;
     throw new Error(message);
   }
 }

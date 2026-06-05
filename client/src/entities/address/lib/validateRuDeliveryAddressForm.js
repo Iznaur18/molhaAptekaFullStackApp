@@ -1,4 +1,7 @@
-import { ADDRESS_FLAT_MAX_LENGTH, ADDRESS_LINE_MAX_LENGTH } from "../model/constants.js";
+import {
+  ADDRESS_FLAT_MAX_LENGTH,
+  ADDRESS_LINE_MAX_LENGTH,
+} from "../model/constants.js";
 
 /** Временно: не требовать выбор адреса из DaData-подсказок на клиенте. */
 const REQUIRE_SELECTED_FROM_SUGGEST = false;

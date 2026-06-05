@@ -12,12 +12,17 @@ export const useHomeCatalogSections = ({
   catalogGridSectionProps,
   isCatalogBrowserLanding,
   categoryDisplays,
+  feedTileDisplays,
   isAdmin,
   categoryDisplaysStatus,
   handleCatalogFeedTileClick,
   handleCatalogCategoryGridClick,
-  setEditingCategorySlug,
+  handleCatalogCategoryTreeSelect,
+  handleClearCatalogCategoryTreeFilter,
+  activeCatalogBrowserCategoryId,
   selectedCategoryLabel,
+  setEditingCategorySlug,
+  setEditingFeedTileKey,
   activeCatalogFeedLabel,
   handleBackToCatalogLanding,
 }) => {
@@ -31,12 +36,17 @@ export const useHomeCatalogSections = ({
       <HomePageCatalogSection
         isCatalogBrowserLanding={isCatalogBrowserLanding}
         categoryDisplays={categoryDisplays}
+        feedTileDisplays={feedTileDisplays}
         isAdmin={isAdmin}
         categoryDisplaysStatus={categoryDisplaysStatus}
         onFeedTileClick={handleCatalogFeedTileClick}
         onCategoryClick={handleCatalogCategoryGridClick}
         onEditCategoryClick={setEditingCategorySlug}
+        onEditFeedTileClick={setEditingFeedTileKey}
+        activeCatalogBrowserCategoryId={activeCatalogBrowserCategoryId}
         selectedCategoryLabel={selectedCategoryLabel}
+        onCatalogCategoryTreeSelect={handleCatalogCategoryTreeSelect}
+        onClearCatalogCategoryTreeFilter={handleClearCatalogCategoryTreeFilter}
         activeCatalogFeedLabel={activeCatalogFeedLabel}
         onBackToCatalogLanding={handleBackToCatalogLanding}
         catalogGridSectionProps={catalogGridSectionProps}
@@ -45,12 +55,17 @@ export const useHomeCatalogSections = ({
     [
       isCatalogBrowserLanding,
       categoryDisplays,
+      feedTileDisplays,
       isAdmin,
       categoryDisplaysStatus,
       handleCatalogFeedTileClick,
       handleCatalogCategoryGridClick,
-      setEditingCategorySlug,
+      handleCatalogCategoryTreeSelect,
+      handleClearCatalogCategoryTreeFilter,
+      activeCatalogBrowserCategoryId,
       selectedCategoryLabel,
+      setEditingCategorySlug,
+      setEditingFeedTileKey,
       activeCatalogFeedLabel,
       handleBackToCatalogLanding,
       catalogGridSectionProps,

@@ -1,6 +1,9 @@
 import { apiClient } from "../../../shared/api/index.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
-import { CATALOG_PAGE_SIZE, PRODUCTS_FETCH_PAGE_LIMIT } from "../model/productConstants.js";
+import {
+  CATALOG_PAGE_SIZE,
+  PRODUCTS_FETCH_PAGE_LIMIT,
+} from "../model/productConstants.js";
 
 /**
  * Одна страница `GET /product/my`.

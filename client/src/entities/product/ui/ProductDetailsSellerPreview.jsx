@@ -44,6 +44,16 @@ function formatOptionalText(value) {
  * }} props
  */
 export function ProductDetailsSellerPreview({ seller, onOpenProfile }) {
+  const ratingText = useMemo(
+    () =>
+      formatSearchRowRating(
+        seller != null && typeof seller === "object"
+          ? seller.userRatingByVotes
+          : undefined,
+      ),
+    [seller],
+  );
+
   if (seller == null || typeof seller !== "object" || seller._id == null) {
     return null;
   }
@@ -53,11 +63,6 @@ export function ProductDetailsSellerPreview({ seller, onOpenProfile }) {
   const isPremium = seller.isPremiumUser === true;
   const isConfirmed = seller.isUserDataConfirmed === true;
   const canOpenProfile = typeof onOpenProfile === "function";
-
-  const ratingText = useMemo(
-    () => formatSearchRowRating(seller.userRatingByVotes),
-    [seller.userRatingByVotes],
-  );
   const listedCount = Number(seller.sellerListedProductCount);
   const listedProductsText = Number.isFinite(listedCount)
     ? String(Math.max(0, Math.floor(listedCount)))
@@ -126,9 +131,7 @@ export function ProductDetailsSellerPreview({ seller, onOpenProfile }) {
       <dl className="product-details-seller-preview__metrics">
         {metrics.map((row) => (
           <div key={row.key} className="product-details-seller-preview__metric">
-            <dt className="product-details-seller-preview__metric-key">
-              {row.label}
-            </dt>
+            <dt className="product-details-seller-preview__metric-key">{row.label}</dt>
             <dd className="product-details-seller-preview__metric-value">
               {row.value}
             </dd>

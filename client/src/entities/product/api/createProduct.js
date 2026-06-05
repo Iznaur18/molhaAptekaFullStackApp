@@ -1,24 +1,8 @@
 import { apiClient } from "../../../shared/api/index.js";
+import { parseCreateProductData } from "../../../shared/api/parseApiContract.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 
-/**
- * Тело для `POST /product` (совпадает с `makeProductValidation`).
- *
- * @typedef {object} CreateProductBody
- * @property {string} productName
- * @property {string} productDescription
- * @property {string[]} [productImageUrls]
- * @property {string} [productImageUrl]
- * @property {string} [productPreviewVideoUrl]
- * @property {number} productPrice
- * @property {number | null} [productOldPrice]
- * @property {import('../model/types.js').ProductCategory} productCategory
- * @property {boolean} productIsAvailable
- * @property {number} [productStockQuantity]
- * @property {boolean} [productAuctionEnabled]
- * @property {number} [loyaltyPointsPerUnit]
- * @property {{ key: string; value: string }[]} [productCharacteristics]
- */
+/** @typedef {import('@molha/api-contract/types').CreateProductBodyContract} CreateProductBody */
 
 /**
  * `POST /product` — создать товар (Bearer).
@@ -33,9 +17,14 @@ export async function createProduct(body) {
       productDescription: body.productDescription.trim(),
       productPrice: body.productPrice,
       productOldPrice: body.productOldPrice ?? null,
-      productCategory: body.productCategory,
       productIsAvailable: body.productIsAvailable,
     };
+    if (body.productCategoryId) {
+      payload.productCategoryId = body.productCategoryId;
+    }
+    if (body.productCategory) {
+      payload.productCategory = body.productCategory;
+    }
     if (body.productIsAvailable === true) {
       payload.productStockQuantity = body.productStockQuantity;
     }
@@ -65,17 +54,11 @@ export async function createProduct(body) {
     }
 
     const { data } = await apiClient.post("/product", payload);
-
-    if (!data?.success || data.data?.product == null) {
-      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
-    }
-
-    return data.data.product;
+    const parsed = parseCreateProductData(data);
+    return parsed.product;
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      API_CLIENT_UI.CREATE_PRODUCT_FALLBACK;
+      e?.response?.data?.message ?? e?.message ?? API_CLIENT_UI.CREATE_PRODUCT_FALLBACK;
     throw new Error(message);
   }
 }

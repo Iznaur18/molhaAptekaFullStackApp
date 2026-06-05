@@ -147,7 +147,11 @@ export function AddressDeliveryFields({
           aria-controls={listId}
         />
         {showList ? (
-          <ul className="address-delivery-fields__suggestions" id={listId} role="listbox">
+          <ul
+            className="address-delivery-fields__suggestions"
+            id={listId}
+            role="listbox"
+          >
             {suggestions.map((item) => (
               <li key={item.unrestrictedValue ?? item.value} role="option">
                 <button

@@ -5,6 +5,7 @@ import {
   PRODUCT_CHARACTERISTICS_MAX_ITEMS,
 } from "../model/productCharacteristicsConstants.js";
 import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
+import { getProductFieldEditLabel } from "../lib/productFieldRegistry.js";
 
 import "./ProductCharacteristicsEditor.css";
 
@@ -20,9 +21,7 @@ export function ProductCharacteristicsEditor({ rows, onRowsChange, disabled }) {
 
   const handleFieldChange = (rowId, field, nextValue) => {
     onRowsChange(
-      rows.map((row) =>
-        row.id === rowId ? { ...row, [field]: nextValue } : row,
-      ),
+      rows.map((row) => (row.id === rowId ? { ...row, [field]: nextValue } : row)),
     );
   };
 
@@ -35,10 +34,7 @@ export function ProductCharacteristicsEditor({ rows, onRowsChange, disabled }) {
       return;
     }
 
-    onRowsChange([
-      ...rows,
-      createCharacteristicRow(),
-    ]);
+    onRowsChange([...rows, createCharacteristicRow()]);
   };
 
   return (
@@ -48,7 +44,7 @@ export function ProductCharacteristicsEditor({ rows, onRowsChange, disabled }) {
       aria-label={CREATE_PRODUCT_MODAL_UI.CHARACTERISTICS_SECTION_ARIA}
     >
       <legend className="product-characteristics-editor__legend">
-        {CREATE_PRODUCT_MODAL_UI.LABEL_CHARACTERISTICS}
+        {getProductFieldEditLabel("productCharacteristics")}
       </legend>
       <p className="product-characteristics-editor__hint">
         {CREATE_PRODUCT_MODAL_UI.HINT_CHARACTERISTICS(
@@ -61,9 +57,7 @@ export function ProductCharacteristicsEditor({ rows, onRowsChange, disabled }) {
             <li
               key={row.id}
               className="product-characteristics-editor__row"
-              aria-label={CREATE_PRODUCT_MODAL_UI.CHARACTERISTIC_ROW_ARIA(
-                index + 1,
-              )}
+              aria-label={CREATE_PRODUCT_MODAL_UI.CHARACTERISTIC_ROW_ARIA(index + 1)}
             >
               <input
                 className="product-characteristics-editor__input"

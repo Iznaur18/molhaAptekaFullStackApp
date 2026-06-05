@@ -1,6 +1,6 @@
 import { PRODUCT_CARD_UI } from "../../../shared/config/appUiCopy.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
-import { PRODUCT_FIELD_LABEL_RU } from "../model/productConstants.js";
+import { getProductFieldLabel } from "../lib/productFieldRegistry.js";
 import {
   hasProductCatalogDiscount,
   resolveProductDiscountPercent,
@@ -28,12 +28,8 @@ export function ProductPriceDisplay({
 }) {
   const discountPercent = resolveProductDiscountPercent(product);
   const hasDiscount = hasProductCatalogDiscount(product);
-  const currentPriceText = formatPriceRub(
-    Math.floor(Number(product.productPrice)),
-  );
-  const oldPriceText = formatPriceRub(
-    Math.floor(Number(product.productOldPrice)),
-  );
+  const currentPriceText = formatPriceRub(Math.floor(Number(product.productPrice)));
+  const oldPriceText = formatPriceRub(Math.floor(Number(product.productOldPrice)));
 
   const ariaLabel = hasDiscount
     ? `Цена ${currentPriceText}, было ${oldPriceText}, скидка ${discountPercent} процентов`
@@ -51,7 +47,7 @@ export function ProductPriceDisplay({
     <p className={rootClassName} aria-label={ariaLabel}>
       {showLabel ? (
         <span className="product-price-display__label">
-          {PRODUCT_FIELD_LABEL_RU.productPrice}
+          {getProductFieldLabel("productPrice")}
         </span>
       ) : null}
       <span className="product-price-display__current">{currentPriceText}</span>

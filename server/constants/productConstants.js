@@ -9,7 +9,7 @@ export const SELLER_PRODUCTS_LIMIT_PREMIUM = 30;
 
 /** Ответ при попытке создать товар сверх лимита. */
 export const SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE =
-    'Достигнут лимит товаров: 15 для обычных пользователей, 30 для премиум.';
+  "Достигнут лимит товаров: 15 для обычных пользователей, 30 для премиум.";
 
 /** Максимум символов в описании товара (валидация POST/PATCH /product). */
 export const PRODUCT_DESCRIPTION_MAX_CHARS = 2000;
@@ -21,7 +21,7 @@ export const PRODUCT_DESCRIPTION_MIN_CHARS = 10;
 export const PRODUCT_PRICE_RUB_MAX = 999_999_999;
 
 export const PRODUCT_PRICE_RUB_MAX_ERROR_MESSAGE =
-    'Цена не может превышать 999 999 999 ₽';
+  "Цена не может превышать 999 999 999 ₽";
 
 /**
  * Slug категории товара. Совпадает с клиентом `client/.../productConstants.js`.

@@ -79,9 +79,7 @@ export function AuctionPage({
   }
 
   if (phase === "loading") {
-    return (
-      <p className="auction-page__state">{AUCTION_PAGE_UI.LOADING}</p>
-    );
+    return <p className="auction-page__state">{AUCTION_PAGE_UI.LOADING}</p>;
   }
 
   if (phase === "error") {
@@ -96,9 +94,7 @@ export function AuctionPage({
   const showSellerSection = sellerOffers.length > 0;
 
   if (!showBuyerSection && !showSellerSection) {
-    return (
-      <p className="auction-page__state">{AUCTION_PAGE_UI.BOTH_EMPTY}</p>
-    );
+    return <p className="auction-page__state">{AUCTION_PAGE_UI.BOTH_EMPTY}</p>;
   }
 
   return (

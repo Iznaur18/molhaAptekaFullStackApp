@@ -34,9 +34,14 @@ function getThumbSrc(item) {
  *   onProductClick?: (
  *     product: import('../../product/model/types.js').ProductFromApi,
  *   ) => void;
+ *   onViewAllProducts?: () => void;
  * }} props
  */
-export function UserProfileProductsList({ targetUserId, onProductClick }) {
+export function UserProfileProductsList({
+  targetUserId,
+  onProductClick,
+  onViewAllProducts,
+}) {
   const [phase, setPhase] = useState("loading");
   const [items, setItems] = useState(
     /** @type {import('../model/userProfileProductThumbTypes.js').UserProfileProductThumbItem[]} */ ([]),
@@ -76,9 +81,7 @@ export function UserProfileProductsList({ targetUserId, onProductClick }) {
       } catch (e) {
         if (cancelled) return;
         setError(
-          e instanceof Error
-            ? e.message
-            : API_CLIENT_UI.FETCH_USER_PRODUCTS_FALLBACK,
+          e instanceof Error ? e.message : API_CLIENT_UI.FETCH_USER_PRODUCTS_FALLBACK,
         );
         setPhase("error");
       }
@@ -90,10 +93,7 @@ export function UserProfileProductsList({ targetUserId, onProductClick }) {
   }, [targetUserId, loadFirstPage]);
 
   const visibleItems = useMemo(
-    () =>
-      isExpanded
-        ? items
-        : items.slice(0, USER_PROFILE_PRODUCTS_PAGE_SIZE),
+    () => (isExpanded ? items : items.slice(0, USER_PROFILE_PRODUCTS_PAGE_SIZE)),
     [isExpanded, items],
   );
 
@@ -116,9 +116,7 @@ export function UserProfileProductsList({ targetUserId, onProductClick }) {
       setIsExpanded(true);
     } catch (e) {
       setError(
-        e instanceof Error
-          ? e.message
-          : API_CLIENT_UI.FETCH_USER_PRODUCTS_FALLBACK,
+        e instanceof Error ? e.message : API_CLIENT_UI.FETCH_USER_PRODUCTS_FALLBACK,
       );
     } finally {
       setIsLoadingAll(false);
@@ -154,11 +152,35 @@ export function UserProfileProductsList({ targetUserId, onProductClick }) {
     });
   };
 
+  const showViewAll =
+    typeof onViewAllProducts === "function" && phase === "success" && total > 0;
+
   return (
     <div className="user-profile-purchases">
-      <h3 className="user-profile-purchases__heading">
-        {USER_PROFILE_PRODUCTS_UI.HEADING}
-      </h3>
+      <div className="user-profile-purchases__heading-row">
+        {showViewAll ? (
+          <button
+            type="button"
+            className="user-profile-purchases__heading user-profile-purchases__heading_action"
+            onClick={onViewAllProducts}
+          >
+            {USER_PROFILE_PRODUCTS_UI.HEADING}
+          </button>
+        ) : (
+          <h3 className="user-profile-purchases__heading">
+            {USER_PROFILE_PRODUCTS_UI.HEADING}
+          </h3>
+        )}
+        {showViewAll ? (
+          <button
+            type="button"
+            className="user-profile-purchases__view-all"
+            onClick={onViewAllProducts}
+          >
+            {USER_PROFILE_PRODUCTS_UI.VIEW_ALL}
+          </button>
+        ) : null}
+      </div>
       {phase === "loading" ? (
         <p className="user-profile-purchases__state">
           {USER_PROFILE_PRODUCTS_UI.LOADING}
@@ -191,9 +213,7 @@ export function UserProfileProductsList({ targetUserId, onProductClick }) {
                   type="button"
                   className={[
                     "user-profile-purchases__row",
-                    isUnavailable
-                      ? "user-profile-purchases__row_unavailable"
-                      : "",
+                    isUnavailable ? "user-profile-purchases__row_unavailable" : "",
                   ]
                     .filter(Boolean)
                     .join(" ")}

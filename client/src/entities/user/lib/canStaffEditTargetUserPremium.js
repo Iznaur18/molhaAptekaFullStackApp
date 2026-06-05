@@ -1,7 +1,4 @@
-import {
-  USER_ROLE_ADMIN,
-  USER_ROLE_MODERATOR,
-} from "../model/userConstants.js";
+import { USER_ROLE_ADMIN, USER_ROLE_MODERATOR } from "../model/userConstants.js";
 
 /**
  * @param {{ editorRole?: string | null; targetRole?: string | null }} params

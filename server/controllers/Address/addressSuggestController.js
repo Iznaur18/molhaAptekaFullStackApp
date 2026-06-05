@@ -1,5 +1,8 @@
-import { errorRes, successRes } from '../../utils/index.js';
-import { isDadataConfigured, suggestRuAddresses } from '../../utils/dadata/dadataClient.js';
+import { errorRes, successRes } from "../../utils/index.js";
+import {
+  isDadataConfigured,
+  suggestRuAddresses,
+} from "../../utils/dadata/dadataClient.js";
 
 /** POST /address/suggest — подсказки DaData (до дома, РФ). */
 export const addressSuggestController = async (req, res) => {
@@ -8,11 +11,11 @@ export const addressSuggestController = async (req, res) => {
       return errorRes(
         res,
         503,
-        'Подсказки адресов недоступны: задайте DADATA_API_KEY и DADATA_SECRET_KEY',
+        "Подсказки адресов недоступны: задайте DADATA_API_KEY и DADATA_SECRET_KEY",
       );
     }
 
-    const query = String(req.body.query ?? '').trim();
+    const query = String(req.body.query ?? "").trim();
     const suggestions = await suggestRuAddresses(query);
 
     return successRes(res, {
@@ -23,7 +26,7 @@ export const addressSuggestController = async (req, res) => {
       })),
     });
   } catch (error) {
-    console.error('addressSuggest error:', error);
-    return errorRes(res, 502, 'Не удалось получить подсказки адреса');
+    console.error("addressSuggest error:", error);
+    return errorRes(res, 502, "Не удалось получить подсказки адреса");
   }
 };

@@ -42,7 +42,10 @@ export function CatalogCategoriesGrid({
       </p>
     );
     return showSectionShell ? (
-      <section className="catalog-categories-grid" aria-label={PRODUCT_CATEGORY_DISPLAY_UI.GRID_ARIA}>
+      <section
+        className="catalog-categories-grid"
+        aria-label={PRODUCT_CATEGORY_DISPLAY_UI.GRID_ARIA}
+      >
         {loading}
       </section>
     ) : (
@@ -52,12 +55,18 @@ export function CatalogCategoriesGrid({
 
   if (errorMessage) {
     const error = (
-      <p className="catalog-categories-grid__state catalog-categories-grid__state_error" role="alert">
+      <p
+        className="catalog-categories-grid__state catalog-categories-grid__state_error"
+        role="alert"
+      >
         {errorMessage}
       </p>
     );
     return showSectionShell ? (
-      <section className="catalog-categories-grid" aria-label={PRODUCT_CATEGORY_DISPLAY_UI.GRID_ARIA}>
+      <section
+        className="catalog-categories-grid"
+        aria-label={PRODUCT_CATEGORY_DISPLAY_UI.GRID_ARIA}
+      >
         {error}
       </section>
     ) : (
@@ -67,50 +76,48 @@ export function CatalogCategoriesGrid({
 
   const grid = (
     <ul className="catalog-categories-grid__list">
-        {items.map((item) => {
-          const imageSrc = item.imageUrl
-            ? resolveUploadedImageUrl(item.imageUrl)
-            : PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE;
+      {items.map((item) => {
+        const imageSrc = item.imageUrl
+          ? resolveUploadedImageUrl(item.imageUrl)
+          : PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE;
 
-          return (
-            <li key={item.categorySlug} className="catalog-categories-grid__item">
-              <div className="catalog-categories-grid__card-wrap">
+        return (
+          <li key={item.categorySlug} className="catalog-categories-grid__item">
+            <div className="catalog-categories-grid__card-wrap">
+              <button
+                type="button"
+                className="catalog-categories-grid__card"
+                onClick={() => onCategoryClick(item.categorySlug)}
+              >
+                <span className="catalog-categories-grid__image-wrap">
+                  <img
+                    className="catalog-categories-grid__image"
+                    src={imageSrc}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </span>
+                <span className="catalog-categories-grid__label">{item.label}</span>
+              </button>
+              {isAdmin ? (
                 <button
                   type="button"
-                  className="catalog-categories-grid__card"
-                  onClick={() => onCategoryClick(item.categorySlug)}
+                  className="catalog-categories-grid__edit"
+                  aria-label={PRODUCT_CATEGORY_DISPLAY_UI.EDIT_ARIA(item.label)}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onEditCategoryClick(item.categorySlug);
+                  }}
                 >
-                  <span className="catalog-categories-grid__image-wrap">
-                    <img
-                      className="catalog-categories-grid__image"
-                      src={imageSrc}
-                      alt=""
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </span>
-                  <span className="catalog-categories-grid__label">
-                    {item.label}
-                  </span>
+                  <Pencil size={16} aria-hidden="true" />
                 </button>
-                {isAdmin ? (
-                  <button
-                    type="button"
-                    className="catalog-categories-grid__edit"
-                    aria-label={PRODUCT_CATEGORY_DISPLAY_UI.EDIT_ARIA(item.label)}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      onEditCategoryClick(item.categorySlug);
-                    }}
-                  >
-                    <Pencil size={16} aria-hidden="true" />
-                  </button>
-                ) : null}
-              </div>
-            </li>
-          );
-        })}
-      </ul>
+              ) : null}
+            </div>
+          </li>
+        );
+      })}
+    </ul>
   );
 
   if (!showSectionShell) {

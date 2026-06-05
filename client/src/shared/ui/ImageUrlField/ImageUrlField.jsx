@@ -77,10 +77,7 @@ export function ImageUrlField({
     onChange(event.target.value);
   };
 
-  const rootClass = [
-    "image-url-field",
-    compact ? "image-url-field_compact" : "",
-  ]
+  const rootClass = ["image-url-field", compact ? "image-url-field_compact" : ""]
     .filter(Boolean)
     .join(" ");
 
@@ -122,9 +119,7 @@ export function ImageUrlField({
           {IMAGE_URL_FIELD_UI.UPLOAD_DISABLED_HINT}
         </p>
       ) : compact ? null : (
-        <p className="image-url-field__hint">
-          {IMAGE_URL_FIELD_UI.UPLOAD_HINT}
-        </p>
+        <p className="image-url-field__hint">{IMAGE_URL_FIELD_UI.UPLOAD_HINT}</p>
       )}
       {uploadError ? (
         <p className="image-url-field__error" role="alert">

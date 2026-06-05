@@ -59,10 +59,7 @@ export function ProductPromotionModal({
 
   const insufficientMessage =
     selectedTariff && !hasEnoughFunds
-      ? PRODUCT_PROMOTION_UI.INSUFFICIENT_POINTS(
-          selectedPricePoints,
-          loyaltyPoints,
-        )
+      ? PRODUCT_PROMOTION_UI.INSUFFICIENT_POINTS(selectedPricePoints, loyaltyPoints)
       : "";
 
   if (!isOpen) {
@@ -79,11 +76,7 @@ export function ProductPromotionModal({
       >
         <header className="product-promotion-modal__header">
           <h3>{PRODUCT_PROMOTION_UI.MODAL_TITLE}</h3>
-          <button
-            type="button"
-            className="app-btn app-btn--ghost"
-            onClick={onClose}
-          >
+          <button type="button" className="app-btn app-btn--ghost" onClick={onClose}>
             {PRODUCT_PROMOTION_UI.CLOSE}
           </button>
         </header>
@@ -112,10 +105,7 @@ export function ProductPromotionModal({
                   : calculateProductPromotionPointsCost(tariff.priceRub);
               return (
                 <option key={tariff.code} value={tariff.code}>
-                  {PRODUCT_PROMOTION_UI.TARIFF_OPTION_POINTS(
-                    tariff.title,
-                    pricePoints,
-                  )}
+                  {PRODUCT_PROMOTION_UI.TARIFF_OPTION_POINTS(tariff.title, pricePoints)}
                 </option>
               );
             })}
@@ -145,9 +135,7 @@ export function ProductPromotionModal({
             type="button"
             className="app-btn app-btn--primary"
             disabled={!selectedTariff || isSubmitting || !hasEnoughFunds}
-            onClick={() =>
-              selectedTariff && void onSubmit(selectedTariff.code)
-            }
+            onClick={() => selectedTariff && void onSubmit(selectedTariff.code)}
           >
             {isSubmitting
               ? PRODUCT_PROMOTION_UI.SUBMIT_PENDING

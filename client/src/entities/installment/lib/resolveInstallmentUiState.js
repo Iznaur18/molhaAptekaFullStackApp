@@ -35,7 +35,6 @@ export function getInstallmentRemainingDays(contract) {
 export function getInstallmentRemainingAmountRub(contract) {
   return Math.max(
     0,
-    (Number(contract.totalAmountRub) || 0) -
-      (Number(contract.paidAmountRub) || 0),
+    (Number(contract.totalAmountRub) || 0) - (Number(contract.paidAmountRub) || 0),
   );
 }

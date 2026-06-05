@@ -15,10 +15,7 @@ export function resolveSellerMaxLoyaltyPointsPerUnit({
   editingProductId = null,
 }) {
   const balance = Math.max(0, Math.floor(Number(loyaltyPointsBalance)) || 0);
-  const reserved = Math.max(
-    0,
-    Math.floor(Number(loyaltyPointsReserved)) || 0,
-  );
+  const reserved = Math.max(0, Math.floor(Number(loyaltyPointsReserved)) || 0);
   const available = Math.max(0, balance - reserved);
   const catalogCommitted = sumSellerCatalogLoyaltyPointsPerUnit(
     sellerProducts,

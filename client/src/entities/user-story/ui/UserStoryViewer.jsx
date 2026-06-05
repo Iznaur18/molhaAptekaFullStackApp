@@ -10,7 +10,11 @@ import {
 } from "../lib/resolveUserStoryMedia.js";
 import { useUserStoryMediaLoadState } from "../lib/useUserStoryMediaLoadState.js";
 import { useUserStoryVideoPlayback } from "../lib/useUserStoryVideoPlayback.js";
-import { USER_STORY_MEDIA_TYPE_IMAGE, USER_STORY_MEDIA_TYPE_VIDEO, USER_STORY_IMAGE_VIEW_DURATION_MS } from "../model/constants.js";
+import {
+  USER_STORY_MEDIA_TYPE_IMAGE,
+  USER_STORY_MEDIA_TYPE_VIDEO,
+  USER_STORY_IMAGE_VIEW_DURATION_MS,
+} from "../model/constants.js";
 import { ReportUserStoryModal } from "./ReportUserStoryModal.jsx";
 
 import "./UserStoryViewer.css";
@@ -57,7 +61,8 @@ export function UserStoryViewer({
     onClose();
   }, [activeIndex, onClose, stories.length]);
 
-  const isStoryMediaActive = isOpen && phase === "ready" && activeStory != null && !isReportOpen;
+  const isStoryMediaActive =
+    isOpen && phase === "ready" && activeStory != null && !isReportOpen;
   const {
     isMediaLoading,
     hasMediaError,
@@ -125,19 +130,15 @@ export function UserStoryViewer({
       return;
     }
 
-    const timerId = window.setTimeout(advanceStoryOrClose, USER_STORY_IMAGE_VIEW_DURATION_MS);
+    const timerId = window.setTimeout(
+      advanceStoryOrClose,
+      USER_STORY_IMAGE_VIEW_DURATION_MS,
+    );
 
     return () => {
       window.clearTimeout(timerId);
     };
-  }, [
-    activeStory,
-    advanceStoryOrClose,
-    isMediaReady,
-    isOpen,
-    isReportOpen,
-    phase,
-  ]);
+  }, [activeStory, advanceStoryOrClose, isMediaReady, isOpen, isReportOpen, phase]);
 
   const handlePrev = () => {
     setActiveIndex((index) => Math.max(0, index - 1));
@@ -170,8 +171,7 @@ export function UserStoryViewer({
 
   const avatarUrl = resolveUserStoryAvatarUrl(author);
   const authorName = author.userName?.trim() || authorId;
-  const canReport =
-    isAuthorized && !isOwn && activeStory != null && phase === "ready";
+  const canReport = isAuthorized && !isOwn && activeStory != null && phase === "ready";
   const hasMultiple = stories.length > 1;
 
   return (
@@ -182,7 +182,10 @@ export function UserStoryViewer({
         ) : null}
 
         {phase === "error" ? (
-          <p className="user-story-viewer__state user-story-viewer__state_error" role="alert">
+          <p
+            className="user-story-viewer__state user-story-viewer__state_error"
+            role="alert"
+          >
             {error}
           </p>
         ) : null}
@@ -223,11 +226,7 @@ export function UserStoryViewer({
                   onClick={() => onOpenProfile(authorId)}
                 >
                   {avatarUrl ? (
-                    <img
-                      className="user-story-viewer__avatar"
-                      src={avatarUrl}
-                      alt=""
-                    />
+                    <img className="user-story-viewer__avatar" src={avatarUrl} alt="" />
                   ) : (
                     <span className="user-story-viewer__avatar-fallback" aria-hidden>
                       {authorName.slice(0, 1).toUpperCase()}
@@ -296,26 +295,26 @@ export function UserStoryViewer({
 
               {isOwn || canReport ? (
                 <footer className="user-story-viewer__footer">
-                {isOwn ? (
-                  <button
-                    type="button"
-                    className="user-story-viewer__action user-story-viewer__action_delete"
-                    disabled={isDeleting}
-                    onClick={() => void handleDelete()}
-                  >
-                    {isDeleting ? USER_STORY_UI.DELETING : USER_STORY_UI.DELETE}
-                  </button>
-                ) : null}
-                {canReport ? (
-                  <button
-                    type="button"
-                    className="user-story-viewer__action"
-                    onClick={() => setIsReportOpen(true)}
-                  >
-                    {USER_STORY_UI.REPORT}
-                  </button>
-                ) : null}
-              </footer>
+                  {isOwn ? (
+                    <button
+                      type="button"
+                      className="user-story-viewer__action user-story-viewer__action_delete"
+                      disabled={isDeleting}
+                      onClick={() => void handleDelete()}
+                    >
+                      {isDeleting ? USER_STORY_UI.DELETING : USER_STORY_UI.DELETE}
+                    </button>
+                  ) : null}
+                  {canReport ? (
+                    <button
+                      type="button"
+                      className="user-story-viewer__action"
+                      onClick={() => setIsReportOpen(true)}
+                    >
+                      {USER_STORY_UI.REPORT}
+                    </button>
+                  ) : null}
+                </footer>
               ) : null}
             </div>
 

@@ -19,9 +19,7 @@ export async function createUserStory(payload) {
     return data.data;
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      "Не удалось опубликовать сторис";
+      e?.response?.data?.message ?? e?.message ?? "Не удалось опубликовать сторис";
     throw new Error(message);
   }
 }

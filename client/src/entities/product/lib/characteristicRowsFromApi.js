@@ -8,7 +8,5 @@ export function characteristicRowsFromApi(items) {
     return [];
   }
 
-  return items.map((item) =>
-    createCharacteristicRow(item.key ?? "", item.value ?? ""),
-  );
+  return items.map((item) => createCharacteristicRow(item.key ?? "", item.value ?? ""));
 }

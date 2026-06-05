@@ -7,10 +7,7 @@ export async function up({ db, isApply }) {
   const products = db.collection("products");
   const filter = {
     productImageUrl: { $exists: true, $nin: [null, ""] },
-    $or: [
-      { productImageUrls: { $exists: false } },
-      { productImageUrls: { $eq: [] } },
-    ],
+    $or: [{ productImageUrls: { $exists: false } }, { productImageUrls: { $eq: [] } }],
   };
 
   const matched = await products.countDocuments(filter);

@@ -37,9 +37,7 @@ const useAllOrders = (statusFilter) => {
       setError("");
     } catch (e) {
       setError(
-        e instanceof Error
-          ? e.message
-          : API_CLIENT_UI.FETCH_ALL_ORDERS_FALLBACK,
+        e instanceof Error ? e.message : API_CLIENT_UI.FETCH_ALL_ORDERS_FALLBACK,
       );
       setPhase("error");
     }
@@ -63,9 +61,7 @@ const useAllOrders = (statusFilter) => {
       } catch (e) {
         if (isCancelled) return;
         setError(
-          e instanceof Error
-            ? e.message
-            : API_CLIENT_UI.FETCH_ALL_ORDERS_FALLBACK,
+          e instanceof Error ? e.message : API_CLIENT_UI.FETCH_ALL_ORDERS_FALLBACK,
         );
         setPhase("error");
       }
@@ -96,9 +92,7 @@ export function AdminOrdersPage() {
       );
     } catch (e) {
       const message =
-        e instanceof Error
-          ? e.message
-          : API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK;
+        e instanceof Error ? e.message : API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK;
       setStatusError((prev) => ({ ...prev, [orderId]: message }));
     } finally {
       setPendingOrderId(null);
@@ -161,9 +155,7 @@ function AdminOrdersBody({
   onStatusChange,
 }) {
   if (phase === "loading") {
-    return (
-      <p className="admin-orders-page__state">{ADMIN_ORDERS_PAGE_UI.LOADING}</p>
-    );
+    return <p className="admin-orders-page__state">{ADMIN_ORDERS_PAGE_UI.LOADING}</p>;
   }
 
   if (phase === "error") {
@@ -190,11 +182,7 @@ function AdminOrdersBody({
   return (
     <ul className="admin-orders-page__list" role="list">
       {orders.map((order) => (
-        <li
-          key={order._id}
-          className="admin-orders-page__item"
-          role="listitem"
-        >
+        <li key={order._id} className="admin-orders-page__item" role="listitem">
           <OrderCard
             order={order}
             showBuyer

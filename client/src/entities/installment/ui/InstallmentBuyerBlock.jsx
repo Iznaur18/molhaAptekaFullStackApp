@@ -39,16 +39,12 @@ export function InstallmentBuyerBlock({
   onSuccess,
   onRequestLogin,
 }) {
-  const [selectedPlanId, setSelectedPlanId] = useState(
-    program.plans[0]?._id ?? "",
-  );
+  const [selectedPlanId, setSelectedPlanId] = useState(program.plans[0]?._id ?? "");
   const [quantity, setQuantity] = useState(1);
   const [deliveryAddress, setDeliveryAddress] = useState(() =>
     addressValueFromUser(defaultDeliveryAddress),
   );
-  const [paymentMethod, setPaymentMethod] = useState(
-    ORDER_PAYMENT_METHOD_CARD_PREPAID,
-  );
+  const [paymentMethod, setPaymentMethod] = useState(ORDER_PAYMENT_METHOD_CARD_PREPAID);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");

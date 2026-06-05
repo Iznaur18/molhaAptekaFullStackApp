@@ -29,12 +29,9 @@ export const useHomeStaffBadgeCounts = ({
   mainView,
 }) => {
   const [pendingModerationCount, setPendingModerationCount] = useState(0);
-  const [pendingProductReportsCount, setPendingProductReportsCount] =
-    useState(0);
-  const [pendingDataConfirmationCount, setPendingDataConfirmationCount] =
-    useState(0);
-  const [pendingProductPromotionsCount, setPendingProductPromotionsCount] =
-    useState(0);
+  const [pendingProductReportsCount, setPendingProductReportsCount] = useState(0);
+  const [pendingDataConfirmationCount, setPendingDataConfirmationCount] = useState(0);
+  const [pendingProductPromotionsCount, setPendingProductPromotionsCount] = useState(0);
   const [pendingRafflesCount, setPendingRafflesCount] = useState(0);
   const [pendingInstallmentModerationCount, setPendingInstallmentModerationCount] =
     useState(0);
@@ -43,8 +40,7 @@ export const useHomeStaffBadgeCounts = ({
   const [pendingIncomingPriceOffersCount, setPendingIncomingPriceOffersCount] =
     useState(0);
   const [pendingMySalesActionCount, setPendingMySalesActionCount] = useState(0);
-  const [pendingMyOrdersActionCount, setPendingMyOrdersActionCount] =
-    useState(0);
+  const [pendingMyOrdersActionCount, setPendingMyOrdersActionCount] = useState(0);
   const [pendingInstallmentBuyerActionCount, setPendingInstallmentBuyerActionCount] =
     useState(0);
   const [pendingInstallmentSellerActionCount, setPendingInstallmentSellerActionCount] =

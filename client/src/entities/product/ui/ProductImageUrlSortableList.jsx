@@ -18,9 +18,8 @@ import { CSS } from "@dnd-kit/utilities";
 
 import { createImageRow } from "../lib/productImageRowHelpers.js";
 import { PRODUCT_IMAGE_URLS_MAX } from "../model/productConstants.js";
-import {
-  CREATE_PRODUCT_MODAL_UI,
-} from "../../../shared/config/appUiCopy.js";
+import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
+import { getProductFieldEditLabel } from "../lib/productFieldRegistry.js";
 import {
   isHttpImageUrl,
   resolveImageUrlForDisplay,
@@ -49,14 +48,8 @@ function SortableImageRow({
   onRemove,
 }) {
   const [previewFailed, setPreviewFailed] = useState(false);
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: row.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: row.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -65,8 +58,7 @@ function SortableImageRow({
 
   const trimmed = row.url.trim();
   const displayUrl = resolveImageUrlForDisplay(trimmed);
-  const showPreview =
-    displayUrl !== "" && isHttpImageUrl(displayUrl) && !previewFailed;
+  const showPreview = displayUrl !== "" && isHttpImageUrl(displayUrl) && !previewFailed;
 
   return (
     <li
@@ -133,11 +125,7 @@ function SortableImageRow({
  *   disabled?: boolean;
  * }} props
  */
-export function ProductImageUrlSortableList({
-  rows,
-  onRowsChange,
-  disabled = false,
-}) {
+export function ProductImageUrlSortableList({ rows, onRowsChange, disabled = false }) {
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(KeyboardSensor, {
@@ -157,9 +145,7 @@ export function ProductImageUrlSortableList({
   };
 
   const handleUrlChange = (id, url) => {
-    onRowsChange(
-      rows.map((row) => (row.id === id ? { ...row, url } : row)),
-    );
+    onRowsChange(rows.map((row) => (row.id === id ? { ...row, url } : row)));
   };
 
   const handleRemove = (id) => {
@@ -178,12 +164,9 @@ export function ProductImageUrlSortableList({
   const rowIds = rows.map((row) => row.id);
 
   return (
-    <fieldset
-      className="product-image-sortable"
-      disabled={disabled}
-    >
+    <fieldset className="product-image-sortable" disabled={disabled}>
       <legend className="product-image-sortable__legend">
-        {CREATE_PRODUCT_MODAL_UI.LABEL_IMAGE_URLS}
+        {getProductFieldEditLabel("productImageUrls")}
       </legend>
       <p className="product-image-sortable__hint">
         {CREATE_PRODUCT_MODAL_UI.IMAGE_ORDER_HINT}

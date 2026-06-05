@@ -122,11 +122,15 @@ export const useHomeProductActions = ({
       setIsSellerProductsLimitModalOpen(true);
       return;
     }
+    setCatalogProductDetails(null);
+    setProductToEdit(null);
     setIsCreateProductModalOpen(true);
   }, [
     isAtSellerProductsLimit,
+    setCatalogProductDetails,
     setIsCreateProductModalOpen,
     setIsSellerProductsLimitModalOpen,
+    setProductToEdit,
   ]);
 
   const handleOpenEditMyProduct = useCallback(
@@ -134,9 +138,10 @@ export const useHomeProductActions = ({
       if (product.productModerationStatus === PRODUCT_MODERATION_PENDING) {
         return;
       }
+      setCatalogProductDetails(null);
       setProductToEdit(product);
     },
-    [setProductToEdit],
+    [setCatalogProductDetails, setProductToEdit],
   );
 
   const handleCloseEditProductModal = useCallback(() => {
@@ -201,10 +206,7 @@ export const useHomeProductActions = ({
       } catch (e) {
         const message =
           e instanceof Error ? e.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK;
-        if (
-          catalogProductDetails &&
-          String(catalogProductDetails._id) === productId
-        ) {
+        if (catalogProductDetails && String(catalogProductDetails._id) === productId) {
           setProductDetailsAdminError(message);
         } else {
           setMyProductsCatalogError(message);
@@ -236,9 +238,7 @@ export const useHomeProductActions = ({
         setCatalogProductDetails((prev) =>
           prev && String(prev._id) === productId ? null : prev,
         );
-        setMyProductsTotal((prev) =>
-          prev != null && prev > 0 ? prev - 1 : prev,
-        );
+        setMyProductsTotal((prev) => (prev != null && prev > 0 ? prev - 1 : prev));
       } catch (e) {
         setMyProductsCatalogError(
           e instanceof Error ? e.message : API_CLIENT_UI.DELETE_MY_PRODUCT_FALLBACK,
@@ -297,9 +297,7 @@ export const useHomeProductActions = ({
         if (loyaltyPointsBalance != null) {
           setLoyaltyPoints(loyaltyPointsBalance);
         }
-        setMyProductsCatalogNotice(
-          message ?? "Заявка на продвижение отправлена.",
-        );
+        setMyProductsCatalogNotice(message ?? "Заявка на продвижение отправлена.");
         void refreshMyPromotionPendingIds();
         setCatalogRefreshTick((n) => n + 1);
         handleClosePromotionModal();

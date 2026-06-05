@@ -12,17 +12,17 @@
 
 ## Cookie
 
-| Cookie | TTL | typ в JWT |
-|--------|-----|-----------|
-| `access_token` | 1 ч | `access` |
+| Cookie          | TTL  | typ в JWT |
+| --------------- | ---- | --------- |
+| `access_token`  | 1 ч  | `access`  |
 | `refresh_token` | 30 д | `refresh` |
 
 Общие параметры: httpOnly, path `/`, Secure в production (или при `COOKIE_CROSS_SITE=true`).
 
-| SameSite | Когда |
-|----------|-------|
-| `lax` | dev, same-origin proxy |
-| `none` | `COOKIE_CROSS_SITE=true` |
+| SameSite | Когда                    |
+| -------- | ------------------------ |
+| `lax`    | dev, same-origin proxy   |
+| `none`   | `COOKIE_CROSS_SITE=true` |
 
 ## Dev
 

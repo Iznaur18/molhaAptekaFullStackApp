@@ -22,9 +22,7 @@ export async function createRaffle(body) {
     return data.data.raffle;
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      API_CLIENT_UI.CREATE_RAFFLE_FALLBACK;
+      e?.response?.data?.message ?? e?.message ?? API_CLIENT_UI.CREATE_RAFFLE_FALLBACK;
     throw new Error(message);
   }
 }

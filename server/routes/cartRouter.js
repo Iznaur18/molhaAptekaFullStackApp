@@ -1,21 +1,18 @@
-import { Router } from 'express';
+import { Router } from "express";
 
-import {
-    getMyCartController,
-    replaceMyCartController,
-} from '../controllers/index.js';
-import { cartReplaceRateLimiter, checkAuthMW } from '../middlewares/index.js';
-import { replaceMyCartValidation } from '../validations/index.js';
+import { getMyCartController, replaceMyCartController } from "../controllers/index.js";
+import { cartReplaceRateLimiter, checkAuthMW } from "../middlewares/index.js";
+import { replaceMyCartValidationZod } from "../validations/index.js";
 
 const router = Router();
 
-router.get('/', checkAuthMW, getMyCartController);
+router.get("/", checkAuthMW, getMyCartController);
 router.put(
-    '/',
-    checkAuthMW,
-    cartReplaceRateLimiter,
-    replaceMyCartValidation,
-    replaceMyCartController,
+  "/",
+  checkAuthMW,
+  cartReplaceRateLimiter,
+  replaceMyCartValidationZod,
+  replaceMyCartController,
 );
 
 export { router as cartRouter };

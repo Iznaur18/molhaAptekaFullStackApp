@@ -11,10 +11,9 @@ export async function rejectProductModeration(
   productModerationComment = "",
 ) {
   try {
-    const { data } = await apiClient.patch(
-      `/product/${productId}/moderation/reject`,
-      { productModerationComment },
-    );
+    const { data } = await apiClient.patch(`/product/${productId}/moderation/reject`, {
+      productModerationComment,
+    });
 
     if (!data?.success || !data.data?.product) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);

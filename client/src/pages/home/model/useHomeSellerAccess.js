@@ -16,8 +16,7 @@ export const useHomeSellerAccess = ({
 }) => {
   const isAdmin = currentUserRole === USER_ROLE_ADMIN;
   const canModerateProducts =
-    currentUserRole === USER_ROLE_ADMIN ||
-    currentUserRole === USER_ROLE_MODERATOR;
+    currentUserRole === USER_ROLE_ADMIN || currentUserRole === USER_ROLE_MODERATOR;
 
   const sellerProductsLimit = useMemo(() => {
     if (isAdmin) {

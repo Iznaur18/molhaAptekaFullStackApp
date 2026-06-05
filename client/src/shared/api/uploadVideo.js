@@ -15,11 +15,9 @@ export async function uploadVideo(file) {
     const formData = new FormData();
     formData.append("video", file);
 
-    const { data } = await axios.post(
-      `${API_BASE_URL || ""}/upload/video`,
-      formData,
-      { withCredentials: true },
-    );
+    const { data } = await axios.post(`${API_BASE_URL || ""}/upload/video`, formData, {
+      withCredentials: true,
+    });
 
     if (!data?.success || typeof data.data?.url !== "string") {
       throw new Error(VIDEO_URL_FIELD_UI.ERROR_GENERIC);

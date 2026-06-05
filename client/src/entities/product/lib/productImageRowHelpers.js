@@ -34,7 +34,5 @@ export function imageRowsFromUrls(urls) {
  * @returns {string[]}
  */
 export function urlsFromImageRows(rows) {
-  return rows
-    .map((row) => String(row.url).trim())
-    .filter(Boolean);
+  return rows.map((row) => String(row.url).trim()).filter(Boolean);
 }

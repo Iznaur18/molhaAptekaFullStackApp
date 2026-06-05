@@ -42,9 +42,7 @@ export function ProductModerationPage({ onSellerNameClick, onQueueChanged }) {
       setPhase("success");
     } catch (e) {
       setError(
-        e instanceof Error
-          ? e.message
-          : API_CLIENT_UI.FETCH_MODERATION_QUEUE_FALLBACK,
+        e instanceof Error ? e.message : API_CLIENT_UI.FETCH_MODERATION_QUEUE_FALLBACK,
       );
       setPhase("error");
     }
@@ -146,7 +144,11 @@ export function ProductModerationPage({ onSellerNameClick, onQueueChanged }) {
           {error}
         </p>
       ) : null}
-      <div className="home-page__grid" role="list">
+      <div
+        className="home-page__grid"
+        role="list"
+        aria-label={PRODUCT_MODERATION_PAGE_UI.PRODUCTS_LIST_ARIA}
+      >
         {products.map((product) => {
           const id = String(product._id);
           const isBusy = pendingProductId === id;

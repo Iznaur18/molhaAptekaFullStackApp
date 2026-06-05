@@ -78,10 +78,7 @@ export function CatalogFiltersDropdown({
       onWheel={(event) => event.stopPropagation()}
     >
       {listItems.map((item) => {
-        const isSelected = isCatalogFiltersDropdownItemSelected(
-          item,
-          selectionState,
-        );
+        const isSelected = isCatalogFiltersDropdownItemSelected(item, selectionState);
 
         return (
           <li key={item.key} className="home-page__category-item">

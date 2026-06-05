@@ -1,10 +1,7 @@
 import { appendRuAddressToPayload } from "../../address/lib/appendRuAddressToPayload.js";
 import { resolveUploadedImageUrl } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { normalizeRuPhoneInput } from "./ruPhone.js";
-import {
-  getUserAvatarFocus,
-  getUserBackgroundFocus,
-} from "./profileImageFocus.js";
+import { getUserAvatarFocus, getUserBackgroundFocus } from "./profileImageFocus.js";
 import { serializeUserBackgroundForForm } from "./userBackgroundValue.js";
 import { DEFAULT_USER_AVATAR_URL } from "../model/userConstants.js";
 
@@ -94,9 +91,7 @@ export function buildPatchUserProfileBody(form, options = {}) {
   }
 
   if (includeLoyaltyPoints) {
-    const loyaltyPoints = Math.floor(
-      Number(String(form.userLoyaltyPoints).trim()),
-    );
+    const loyaltyPoints = Math.floor(Number(String(form.userLoyaltyPoints).trim()));
     body.userLoyaltyPoints =
       Number.isFinite(loyaltyPoints) && loyaltyPoints >= 0 ? loyaltyPoints : 0;
   }

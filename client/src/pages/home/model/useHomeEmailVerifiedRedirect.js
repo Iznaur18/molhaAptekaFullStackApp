@@ -45,13 +45,7 @@ export const useHomeEmailVerifiedRedirect = ({
 
     navigate(location.pathname, { replace: true });
     return undefined;
-  }, [
-    isAuthorized,
-    location.pathname,
-    location.search,
-    navigate,
-    setIsEmailVerified,
-  ]);
+  }, [isAuthorized, location.pathname, location.search, navigate, setIsEmailVerified]);
 
   useEffect(() => {
     if (!emailVerificationNotice) {

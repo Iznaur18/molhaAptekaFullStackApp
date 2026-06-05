@@ -9,10 +9,7 @@ import { OrderCard } from "../../../entities/order/ui/OrderCard.jsx";
 import { isCurrentUserProductSeller } from "../../../entities/product/lib/isCurrentUserProductSeller.js";
 import { useCatalogProductDetailsOpener } from "../../../entities/product/lib/useCatalogProductDetailsOpener.js";
 import { ProductDetailsModal } from "../../../entities/product/ui/ProductDetailsModal.jsx";
-import {
-  API_CLIENT_UI,
-  MY_ORDERS_PAGE_UI,
-} from "../../../shared/config/appUiCopy.js";
+import { API_CLIENT_UI, MY_ORDERS_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
 import "./MyOrdersPage.css";
 
@@ -57,11 +54,7 @@ export function MyOrdersPage({
       setPhase("success");
       setError("");
     } catch (e) {
-      setError(
-        e instanceof Error
-          ? e.message
-          : API_CLIENT_UI.FETCH_MY_ORDERS_FALLBACK,
-      );
+      setError(e instanceof Error ? e.message : API_CLIENT_UI.FETCH_MY_ORDERS_FALLBACK);
       setPhase("error");
     }
   }, []);
@@ -85,9 +78,7 @@ export function MyOrdersPage({
       } catch (e) {
         if (isCancelled) return;
         setError(
-          e instanceof Error
-            ? e.message
-            : API_CLIENT_UI.FETCH_MY_ORDERS_FALLBACK,
+          e instanceof Error ? e.message : API_CLIENT_UI.FETCH_MY_ORDERS_FALLBACK,
         );
         setPhase("error");
       }
@@ -150,10 +141,7 @@ export function MyOrdersPage({
 
   if (phase === "error") {
     return (
-      <p
-        className="my-orders-page__state my-orders-page__state_error"
-        role="alert"
-      >
+      <p className="my-orders-page__state my-orders-page__state_error" role="alert">
         {error}
       </p>
     );
@@ -172,11 +160,7 @@ export function MyOrdersPage({
       ) : null}
       <ul className="my-orders-page__list" role="list">
         {orders.map((order) => (
-          <li
-            key={order._id}
-            className="my-orders-page__item"
-            role="listitem"
-          >
+          <li key={order._id} className="my-orders-page__item" role="listitem">
             <OrderCard
               order={order}
               onProductClick={openCatalogProductFromOrderLine}

@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import { patchUserProfile } from "../api/patchUserProfile.js";
 import { buildAdminPatchUserProfileBody } from "../lib/buildAdminPatchUserProfileBody.js";
 import { buildPatchUserProfileBody } from "../lib/buildPatchUserProfileBody.js";
+import { isPremiumExpiresAtInputActive } from "../lib/computeStaffPremiumExpiry.js";
 import { willFormDisablePremium } from "../lib/willFormDisablePremium.js";
 import { AddressDeliveryFields } from "../../address/ui/AddressDeliveryFields.jsx";
 import { mapUserToEditProfileForm } from "../lib/mapUserToEditProfileForm.js";
@@ -38,14 +39,11 @@ import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
 import { ProfileImageFocusEditor } from "./ProfileImageFocusEditor.jsx";
 import { UserBackgroundPresetPicker } from "./UserBackgroundPresetPicker.jsx";
 import { UserBackgroundPreview } from "./UserBackgroundPreview.jsx";
+import { AdminPremiumStaffControl } from "./AdminPremiumStaffControl.jsx";
 
 import "./EditProfileModal.css";
 
-const GENDER_OPTIONS = [
-  USER_GENDER_MALE,
-  USER_GENDER_FEMALE,
-  USER_GENDER_NO_SELECTED,
-];
+const GENDER_OPTIONS = [USER_GENDER_MALE, USER_GENDER_FEMALE, USER_GENDER_NO_SELECTED];
 
 const ROLE_OPTIONS = [USER_ROLE_USER, USER_ROLE_MODERATOR, USER_ROLE_ADMIN];
 
@@ -58,7 +56,6 @@ const ROLE_OPTIONS = [USER_ROLE_USER, USER_ROLE_MODERATOR, USER_ROLE_ADMIN];
  *   adminMode?: boolean;
  *   staffCanEditRole?: boolean;
  *   staffCanEditPremium?: boolean;
- *   allowSelfPremiumToggle?: boolean;
  *   allowStaffLoyaltyEdit?: boolean;
  *   onPremiumRevoked?: () => void;
  * }} props
@@ -71,7 +68,6 @@ export function EditProfileModal({
   adminMode = false,
   staffCanEditRole = false,
   staffCanEditPremium = false,
-  allowSelfPremiumToggle = false,
   allowStaffLoyaltyEdit = false,
   onPremiumRevoked,
 }) {
@@ -108,20 +104,8 @@ export function EditProfileModal({
     [form.notesAboutUser],
   );
 
-  const isPremiumUser = (() => {
-    const raw = String(form.premiumExpiresAt ?? "").trim();
-    if (!raw) {
-      return false;
-    }
-    const expiresAt = new Date(raw).getTime();
-    return Number.isFinite(expiresAt) && expiresAt > Date.now();
-  })();
-  const backgroundMode =
-    adminMode || allowSelfPremiumToggle
-      ? "admin"
-      : isPremiumUser
-        ? "image"
-        : "preset";
+  const isPremiumUser = isPremiumExpiresAtInputActive(form.premiumExpiresAt);
+  const backgroundMode = adminMode ? "admin" : isPremiumUser ? "image" : "preset";
 
   const avatarFocusImageUrl = useMemo(() => {
     const url = resolveImageUrlForDisplay(form.userAvatarUrl ?? "");
@@ -176,8 +160,7 @@ export function EditProfileModal({
     }
 
     const premiumWillBeDisabled =
-      ((adminMode && staffCanEditPremium) || allowSelfPremiumToggle) &&
-      willFormDisablePremium(user, form);
+      adminMode && staffCanEditPremium && willFormDisablePremium(user, form);
     if (premiumWillBeDisabled) {
       const userName = String(user.userName ?? "").trim() || "пользователя";
       if (!window.confirm(ADMIN_EDIT_USER_UI.DISABLE_PREMIUM_CONFIRM(userName))) {
@@ -198,7 +181,6 @@ export function EditProfileModal({
           })
         : buildPatchUserProfileBody(form, {
             backgroundMode,
-            includePremium: allowSelfPremiumToggle,
             includeLoyaltyPoints: allowStaffLoyaltyEdit,
             ...profilePatchOptions,
           });
@@ -423,22 +405,6 @@ export function EditProfileModal({
               />
               {EDIT_PROFILE_MODAL_UI.LABEL_NOTIFICATIONS}
             </label>
-            {allowSelfPremiumToggle ? (
-              <label className="edit-profile-modal__label">
-                {ADMIN_EDIT_USER_UI.LABEL_PREMIUM_EXPIRES_AT}
-                <input
-                  type="datetime-local"
-                  className="edit-profile-modal__input"
-                  name="premiumExpiresAt"
-                  value={form.premiumExpiresAt}
-                  onChange={handleChange}
-                  disabled={isSubmitting}
-                />
-                <span className="edit-profile-modal__hint">
-                  {ADMIN_EDIT_USER_UI.LABEL_PREMIUM_EXPIRES_HINT}
-                </span>
-              </label>
-            ) : null}
             {adminMode || allowStaffLoyaltyEdit ? (
               <label className="edit-profile-modal__label">
                 {ADMIN_EDIT_USER_UI.LABEL_LOYALTY_POINTS}
@@ -496,20 +462,14 @@ export function EditProfileModal({
                   {ADMIN_EDIT_USER_UI.LABEL_USER_DATA_CONFIRMED}
                 </label>
                 {staffCanEditPremium ? (
-                  <label className="edit-profile-modal__label">
-                    {ADMIN_EDIT_USER_UI.LABEL_PREMIUM_EXPIRES_AT}
-                    <input
-                      type="datetime-local"
-                      className="edit-profile-modal__input"
-                      name="premiumExpiresAt"
-                      value={form.premiumExpiresAt}
-                      onChange={handleChange}
-                      disabled={isSubmitting}
-                    />
-                    <span className="edit-profile-modal__hint">
-                      {ADMIN_EDIT_USER_UI.LABEL_PREMIUM_EXPIRES_HINT}
-                    </span>
-                  </label>
+                  <AdminPremiumStaffControl
+                    user={user}
+                    premiumExpiresAt={form.premiumExpiresAt}
+                    onPremiumExpiresAtChange={(premiumExpiresAt) =>
+                      setForm((prev) => ({ ...prev, premiumExpiresAt }))
+                    }
+                    disabled={isSubmitting}
+                  />
                 ) : null}
                 <label className="edit-profile-modal__label edit-profile-modal__label_row">
                   <input

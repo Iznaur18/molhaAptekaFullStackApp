@@ -16,9 +16,7 @@ import "./ProductPriceOffer.css";
 export function ProductPriceOfferTopList({ top, onOpenBuyer }) {
   if (top.length === 0) {
     return (
-      <p className="product-price-offer__empty">
-        {PRODUCT_PRICE_OFFER_UI.EMPTY_TOP}
-      </p>
+      <p className="product-price-offer__empty">{PRODUCT_PRICE_OFFER_UI.EMPTY_TOP}</p>
     );
   }
 

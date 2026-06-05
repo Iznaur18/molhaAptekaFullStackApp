@@ -1,0 +1,659 @@
+openapi: 3.1.0
+info:
+  title: Molha Apteka API (v1 contract)
+  version: 1.0.0
+  description: |
+    Контракт синхронизирован с Zod-схемами в `contract/src/`.
+    Срез v1: каталог, корзина, заказ, auth/me, создание и редактирование товара.
+
+servers:
+  - url: /
+    description: API origin (nginx → Express)
+
+tags:
+  - name: catalog
+    description: Публичный каталог
+  - name: cart
+    description: Корзина покупателя
+  - name: order
+    description: Заказы
+  - name: auth
+    description: Сессия и профиль
+  - name: product-write
+    description: Создание и редактирование товара продавцом
+
+paths:
+  /product:
+    get:
+      tags: [catalog]
+      summary: Каталог товаров
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, minimum: 1, default: 1 }
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, maximum: 100, default: 10 }
+        - in: query
+          name: search
+          schema: { type: string, maxLength: 50 }
+        - in: query
+          name: productCategory
+          schema: { $ref: "#/components/schemas/LegacyProductCategory" }
+        - in: query
+          name: categoryId
+          schema: { $ref: "#/components/schemas/MongoId" }
+        - in: query
+          name: sort
+          schema:
+            type: string
+            enum: [newest, views, purchases, premium, confirmed]
+        - in: query
+          name: includeHidden
+          schema: { type: boolean }
+        - in: query
+          name: followingOnly
+          schema: { type: boolean }
+        - in: query
+          name: auctionOnly
+          schema: { type: boolean }
+        - in: query
+          name: installmentOnly
+          schema: { type: boolean }
+        - in: query
+          name: saleOnly
+          schema: { type: boolean }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CatalogProductsSuccess"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    post:
+      tags: [product-write]
+      summary: Создать товар (продавец)
+      security:
+        - accessTokenCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProductBody"
+      responses:
+        "200":
+          description: Товар создан (модерация pending)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductWriteSuccess"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /product/{productId}:
+    patch:
+      tags: [product-write]
+      summary: Обновить свой товар
+      security:
+        - accessTokenCookie: []
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema: { $ref: "#/components/schemas/MongoId" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchProductBody"
+      responses:
+        "200":
+          description: Товар обновлён
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductWriteSuccess"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /user/{userId}/products:
+    get:
+      tags: [catalog]
+      summary: Товары продавца в каталоге
+      security:
+        - accessTokenCookie: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema: { $ref: "#/components/schemas/MongoId" }
+        - in: query
+          name: page
+          schema: { type: integer, minimum: 1, default: 1 }
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, maximum: 20, default: 5 }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSellerProductsSuccess"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /cart:
+    get:
+      tags: [cart]
+      summary: Корзина текущего пользователя
+      security:
+        - accessTokenCookie: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CartSuccess"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    put:
+      tags: [cart]
+      summary: Заменить содержимое корзины
+      security:
+        - accessTokenCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReplaceCartBody"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CartSuccess"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+
+  /order:
+    post:
+      tags: [order]
+      summary: Создать заказ из корзины / позиций
+      security:
+        - accessTokenCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOrderBody"
+      responses:
+        "200":
+          description: Заказ создан
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateOrderSuccess"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+
+  /auth/me:
+    get:
+      tags: [auth]
+      summary: Текущий пользователь и in-app уведомления
+      security:
+        - accessTokenCookie: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthMeSuccess"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+components:
+  securitySchemes:
+    accessTokenCookie:
+      type: apiKey
+      in: cookie
+      name: access_token
+      description: JWT access token (httpOnly cookie)
+
+  responses:
+    BadRequest:
+      description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiErrorEnvelope"
+    Unauthorized:
+      description: Не авторизован
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiErrorEnvelope"
+    Forbidden:
+      description: Доступ запрещён
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiErrorEnvelope"
+    NotFound:
+      description: Не найдено
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiErrorEnvelope"
+    TooManyRequests:
+      description: Rate limit
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiErrorEnvelope"
+
+  schemas:
+    MongoId:
+      type: string
+      pattern: "^[a-f0-9]{24}$"
+      description: MongoDB ObjectId (24 hex)
+
+    ApiSuccessEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, const: true }
+        data: { type: object }
+
+    ApiErrorEnvelope:
+      type: object
+      required: [success, message]
+      properties:
+        success: { type: boolean, const: false }
+        message: { type: string }
+        requestId: { type: string }
+
+    Pagination:
+      type: object
+      required: [page, limit, total, totalPages]
+      properties:
+        page: { type: integer }
+        limit: { type: integer }
+        total: { type: integer }
+        totalPages: { type: integer }
+        hasMore: { type: boolean }
+
+    LegacyProductCategory:
+      type: string
+      enum:
+        - grocery
+        - electronics
+        - clothing
+        - footwear
+        - home_garden
+        - kids
+        - beauty_health
+        - appliances
+        - sport_leisure
+        - construction
+        - pharmacy
+        - pets
+        - books
+        - tourism_outdoors
+        - auto_parts
+        - furniture
+        - hobby_crafts
+        - accessories
+        - jewelry
+        - music_video
+        - stationery
+        - antiques
+        - digital
+        - household_care
+        - games
+        - automobiles
+        - travel_services
+        - food
+        - figures
+
+    ProductModerationStatus:
+      type: string
+      enum: [pending, approved, rejected]
+
+    ProductCharacteristic:
+      type: object
+      required: [key, value]
+      properties:
+        key: { type: string, minLength: 1, maxLength: 50 }
+        value: { type: string, minLength: 1, maxLength: 200 }
+
+    CreateProductBody:
+      type: object
+      required: [productName, productDescription, productPrice, productIsAvailable]
+      properties:
+        productName: { type: string, minLength: 3 }
+        productDescription:
+          type: string
+          minLength: 10
+          maxLength: 2000
+        productImageUrls:
+          type: array
+          maxItems: 5
+          items: { type: string, format: uri }
+        productImageUrl: { type: string, format: uri }
+        productPreviewVideoUrl:
+          oneOf:
+            - { type: string, format: uri }
+            - { type: string, enum: [""] }
+        productPrice:
+          type: integer
+          minimum: 0
+          maximum: 999999999
+        productOldPrice:
+          type: integer
+          minimum: 0
+          nullable: true
+        productCategoryId: { $ref: "#/components/schemas/MongoId" }
+        productCategory: { $ref: "#/components/schemas/LegacyProductCategory" }
+        productIsAvailable: { type: boolean }
+        productStockQuantity:
+          type: integer
+          minimum: 1
+          maximum: 9999
+        productAuctionEnabled: { type: boolean }
+        loyaltyPointsPerUnit: { type: integer, minimum: 0 }
+        productCharacteristics:
+          type: array
+          maxItems: 10
+          items: { $ref: "#/components/schemas/ProductCharacteristic" }
+      description: Требуется productCategoryId или productCategory
+
+    PatchProductBody:
+      type: object
+      minProperties: 1
+      properties:
+        productName: { type: string, minLength: 3 }
+        productDescription:
+          type: string
+          minLength: 10
+          maxLength: 2000
+        productImageUrls:
+          type: array
+          maxItems: 5
+          items: { type: string, format: uri }
+        productImageUrl: { type: string, format: uri }
+        productPreviewVideoUrl:
+          oneOf:
+            - { type: string, format: uri }
+            - { type: string, enum: [""] }
+        productPrice:
+          type: integer
+          minimum: 0
+          maximum: 999999999
+        productOldPrice:
+          type: integer
+          minimum: 0
+          nullable: true
+        productCategoryId: { $ref: "#/components/schemas/MongoId" }
+        productCategory: { $ref: "#/components/schemas/LegacyProductCategory" }
+        productIsAvailable: { type: boolean }
+        productStockQuantity:
+          type: integer
+          minimum: 0
+          maximum: 9999
+        productAuctionEnabled: { type: boolean }
+        loyaltyPointsPerUnit: { type: integer, minimum: 0 }
+        productCharacteristics:
+          type: array
+          maxItems: 10
+          items: { $ref: "#/components/schemas/ProductCharacteristic" }
+
+    ProductFromApi:
+      type: object
+      required: [_id]
+      properties:
+        _id: { type: string }
+        productName: { type: string }
+        productPrice: { type: number }
+        productModerationStatus: { $ref: "#/components/schemas/ProductModerationStatus" }
+        productModerationComment: { type: string }
+        productIsAvailable: { type: boolean }
+      additionalProperties: true
+
+    ProductWriteData:
+      type: object
+      required: [message, product]
+      properties:
+        message: { type: string }
+        product: { $ref: "#/components/schemas/ProductFromApi" }
+
+    ProductWriteSuccess:
+      allOf:
+        - $ref: "#/components/schemas/ApiSuccessEnvelope"
+        - type: object
+          properties:
+            data: { $ref: "#/components/schemas/ProductWriteData" }
+
+    CatalogProductsSuccess:
+      allOf:
+        - $ref: "#/components/schemas/ApiSuccessEnvelope"
+        - type: object
+          properties:
+            data:
+              type: object
+              required: [products, pagination]
+              properties:
+                products:
+                  type: array
+                  items: { $ref: "#/components/schemas/ProductFromApi" }
+                pagination:
+                  $ref: "#/components/schemas/Pagination"
+
+    UserSellerProductsSuccess:
+      allOf:
+        - $ref: "#/components/schemas/ApiSuccessEnvelope"
+        - type: object
+          properties:
+            data:
+              type: object
+              required: [items, pagination]
+              properties:
+                items:
+                  type: array
+                  items:
+                    type: object
+                    required: [productId, productName, viewable]
+                    properties:
+                      productId: { type: string }
+                      productName: { type: string }
+                      viewable: { type: boolean }
+                      product:
+                        $ref: "#/components/schemas/ProductFromApi"
+                        nullable: true
+                pagination:
+                  $ref: "#/components/schemas/Pagination"
+
+    CartItemsRecord:
+      type: object
+      additionalProperties:
+        type: integer
+        minimum: 1
+        maximum: 99
+      description: productId (MongoId) → quantity; не более 30 ключей
+      maxProperties: 30
+
+    ReplaceCartBody:
+      type: object
+      required: [items]
+      properties:
+        items: { $ref: "#/components/schemas/CartItemsRecord" }
+
+    CartData:
+      type: object
+      required: [items]
+      properties:
+        items: { $ref: "#/components/schemas/CartItemsRecord" }
+
+    CartSuccess:
+      allOf:
+        - $ref: "#/components/schemas/ApiSuccessEnvelope"
+        - type: object
+          properties:
+            data: { $ref: "#/components/schemas/CartData" }
+
+    OrderPaymentMethod:
+      type: string
+      enum: [cashOnDelivery, cardPrepaid]
+
+    OrderStatus:
+      type: string
+      enum: [pending, confirmed, shipped, delivered, cancelled]
+
+    OrderLineItemInput:
+      type: object
+      required: [productId, quantity]
+      properties:
+        productId: { $ref: "#/components/schemas/MongoId" }
+        quantity:
+          type: integer
+          minimum: 1
+          maximum: 999
+
+    CreateOrderBody:
+      type: object
+      required: [items, deliveryAddress, deliveryAddressFlat, paymentMethod]
+      properties:
+        items:
+          type: array
+          minItems: 1
+          maxItems: 100
+          items: { $ref: "#/components/schemas/OrderLineItemInput" }
+        deliveryAddress:
+          type: string
+          minLength: 1
+          maxLength: 100
+        deliveryAddressFlat:
+          type: string
+          minLength: 1
+          maxLength: 20
+        paymentMethod: { $ref: "#/components/schemas/OrderPaymentMethod" }
+        priceOfferId: { $ref: "#/components/schemas/MongoId" }
+
+    OrderLineItem:
+      type: object
+      properties:
+        _id: { type: string }
+        productId: {}
+        quantity: { type: number }
+        unitPriceAtOrder: { type: number }
+        productNameAtOrder: { type: string }
+        status: { $ref: "#/components/schemas/OrderStatus" }
+      additionalProperties: true
+
+    OrderFromApi:
+      type: object
+      required: [_id, items, totalAmount, deliveryAddress, paymentMethod, status]
+      properties:
+        _id: { type: string }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/OrderLineItem" }
+        totalAmount: { type: number }
+        deliveryAddress: { type: string }
+        paymentMethod: { $ref: "#/components/schemas/OrderPaymentMethod" }
+        status: { $ref: "#/components/schemas/OrderStatus" }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+      additionalProperties: true
+
+    CreateOrderData:
+      type: object
+      required: [message, order]
+      properties:
+        message: { type: string }
+        order: { $ref: "#/components/schemas/OrderFromApi" }
+
+    CreateOrderSuccess:
+      allOf:
+        - $ref: "#/components/schemas/ApiSuccessEnvelope"
+        - type: object
+          properties:
+            data: { $ref: "#/components/schemas/CreateOrderData" }
+
+    UserPublicProfile:
+      type: object
+      required: [_id]
+      properties:
+        _id: { type: string }
+        userName: { type: string }
+        email: { type: string }
+        isEmailVerified: { type: boolean }
+        userRole:
+          type: string
+          enum: [user, admin, moderator]
+        isPremiumUser: { type: boolean }
+        isUserDataConfirmed: { type: boolean }
+        isBlockedUser: { type: boolean }
+        isActiveUser: { type: boolean }
+        userLoyaltyPoints: { type: number }
+        userLoyaltyPointsReserved: { type: number }
+      additionalProperties: true
+
+    InAppNotification:
+      type: object
+      required: [_id, kind, message, createdAt]
+      properties:
+        _id: { type: string }
+        kind: { type: string }
+        message: { type: string }
+        productId: { type: string, nullable: true }
+        actorUserId: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+      additionalProperties: true
+
+    AuthMeData:
+      type: object
+      required: [user, inAppNotifications]
+      properties:
+        user: { $ref: "#/components/schemas/UserPublicProfile" }
+        inAppNotifications:
+          type: array
+          items: { $ref: "#/components/schemas/InAppNotification" }
+
+    AuthMeSuccess:
+      allOf:
+        - $ref: "#/components/schemas/ApiSuccessEnvelope"
+        - type: object
+          properties:
+            data: { $ref: "#/components/schemas/AuthMeData" }

@@ -1,4 +1,7 @@
-import { resolveImageUrlForDisplay, isHttpImageUrl } from "../../../shared/lib/resolveUploadedImageUrl.js";
+import {
+  resolveImageUrlForDisplay,
+  isHttpImageUrl,
+} from "../../../shared/lib/resolveUploadedImageUrl.js";
 
 /**
  * @param {import('../model/types.js').UserPublicProfile | null | undefined} user

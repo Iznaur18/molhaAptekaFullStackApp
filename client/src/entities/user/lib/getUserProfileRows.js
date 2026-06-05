@@ -75,7 +75,6 @@ export function getUserProfileRows(user, options = {}) {
   const rating = user.userRatingByVotes;
 
   const rows = [
-    { id: "_id", label: L._id, value: dashIfEmpty(user._id) },
     { id: "userName", label: L.userName, value: dashIfEmpty(user.userName) },
     {
       id: "followersCount",

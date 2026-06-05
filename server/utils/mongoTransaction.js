@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 /** @type {boolean | null} null = ещё не проверяли */
 let mongoTransactionsEnabled = null;
@@ -7,35 +7,33 @@ let mongoTransactionsEnabled = null;
  * @param {unknown} error
  */
 const isMongoTransactionUnsupportedError = (error) => {
-    const codes = new Set([20, 263]);
-    const candidates = [
-        error,
-        /** @type {{ originalError?: unknown; errorResponse?: { originalError?: unknown } }} */ (
-            error
-        )?.originalError,
-        /** @type {{ errorResponse?: { originalError?: unknown } }} */ (error)
-            ?.errorResponse?.originalError,
-    ];
+  const codes = new Set([20, 263]);
+  const candidates = [
+    error,
+    /** @type {{ originalError?: unknown; errorResponse?: { originalError?: unknown } }} */ (
+      error
+    )?.originalError,
+    /** @type {{ errorResponse?: { originalError?: unknown } }} */ (error)
+      ?.errorResponse?.originalError,
+  ];
 
-    for (const candidate of candidates) {
-        if (
-            candidate &&
-            typeof candidate === 'object' &&
-            'code' in candidate &&
-            codes.has(Number(candidate.code))
-        ) {
-            return true;
-        }
+  for (const candidate of candidates) {
+    if (
+      candidate &&
+      typeof candidate === "object" &&
+      "code" in candidate &&
+      codes.has(Number(candidate.code))
+    ) {
+      return true;
     }
+  }
 
-    const message = String(
-        /** @type {{ message?: string }} */ (error)?.message ?? error,
-    );
-    return (
-        message.includes('replica set') ||
-        message.includes('retryable writes') ||
-        message.includes('Transaction numbers')
-    );
+  const message = String(/** @type {{ message?: string }} */ (error)?.message ?? error);
+  return (
+    message.includes("replica set") ||
+    message.includes("retryable writes") ||
+    message.includes("Transaction numbers")
+  );
 };
 
 /**
@@ -44,35 +42,35 @@ const isMongoTransactionUnsupportedError = (error) => {
  * @returns {Promise<T>}
  */
 export const runInTransaction = async (callback) => {
-    if (mongoTransactionsEnabled === false) {
-        return callback(null);
-    }
+  if (mongoTransactionsEnabled === false) {
+    return callback(null);
+  }
 
-    const session = await mongoose.startSession();
+  const session = await mongoose.startSession();
 
-    try {
-        let result;
-        await session.withTransaction(async () => {
-            result = await callback(session);
-        });
-        mongoTransactionsEnabled = true;
-        return /** @type {T} */ (result);
-    } catch (error) {
-        if (
-            mongoTransactionsEnabled !== true &&
-            isMongoTransactionUnsupportedError(error) &&
-            process.env.NODE_ENV !== 'production'
-        ) {
-            mongoTransactionsEnabled = false;
-            console.warn(
-                '[mongo] Replica set недоступен — операции без транзакции (только dev). Для prod: Atlas или rs0.',
-            );
-            return callback(null);
-        }
-        throw error;
-    } finally {
-        await session.endSession();
+  try {
+    let result;
+    await session.withTransaction(async () => {
+      result = await callback(session);
+    });
+    mongoTransactionsEnabled = true;
+    return /** @type {T} */ (result);
+  } catch (error) {
+    if (
+      mongoTransactionsEnabled !== true &&
+      isMongoTransactionUnsupportedError(error) &&
+      process.env.NODE_ENV !== "production"
+    ) {
+      mongoTransactionsEnabled = false;
+      console.warn(
+        "[mongo] Replica set недоступен — операции без транзакции (только dev). Для prod: Atlas или rs0.",
+      );
+      return callback(null);
     }
+    throw error;
+  } finally {
+    await session.endSession();
+  }
 };
 
 /**
@@ -80,9 +78,9 @@ export const runInTransaction = async (callback) => {
  * @param {import('mongoose').ClientSession | null | undefined} session
  */
 export const withMongoSession = (options = {}, session = null) =>
-    session ? { ...options, session } : options;
+  session ? { ...options, session } : options;
 
 /** @internal сброс кэша между тестами fallback */
 export const resetMongoTransactionSupportForTests = () => {
-    mongoTransactionsEnabled = null;
+  mongoTransactionsEnabled = null;
 };

@@ -1,8 +1,8 @@
-import { DADATA_SUGGEST_COUNT } from '../../constants/dadataConstants.js';
+import { DADATA_SUGGEST_COUNT } from "../../constants/dadataConstants.js";
 
 const SUGGEST_URL =
-  'https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address';
-const CLEAN_URL = 'https://cleaner.dadata.ru/api/v1/clean/address';
+  "https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address";
+const CLEAN_URL = "https://cleaner.dadata.ru/api/v1/clean/address";
 
 export function isDadataConfigured() {
   return Boolean(
@@ -12,18 +12,18 @@ export function isDadataConfigured() {
 
 function getSuggestHeaders() {
   return {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
+    "Content-Type": "application/json",
+    Accept: "application/json",
     Authorization: `Token ${process.env.DADATA_API_KEY.trim()}`,
   };
 }
 
 function getCleanHeaders() {
   return {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
+    "Content-Type": "application/json",
+    Accept: "application/json",
     Authorization: `Token ${process.env.DADATA_API_KEY.trim()}`,
-    'X-Secret': process.env.DADATA_SECRET_KEY.trim(),
+    "X-Secret": process.env.DADATA_SECRET_KEY.trim(),
   };
 }
 
@@ -33,14 +33,14 @@ function getCleanHeaders() {
  */
 export async function suggestRuAddresses(query) {
   const response = await fetch(SUGGEST_URL, {
-    method: 'POST',
+    method: "POST",
     headers: getSuggestHeaders(),
     body: JSON.stringify({
       query,
       count: DADATA_SUGGEST_COUNT,
-      from_bound: { value: 'city' },
-      to_bound: { value: 'house' },
-      locations: [{ country: 'Россия' }],
+      from_bound: { value: "city" },
+      to_bound: { value: "house" },
+      locations: [{ country: "Россия" }],
     }),
   });
 
@@ -58,7 +58,7 @@ export async function suggestRuAddresses(query) {
  */
 export async function cleanRuAddress(addressLine) {
   const response = await fetch(CLEAN_URL, {
-    method: 'POST',
+    method: "POST",
     headers: getCleanHeaders(),
     body: JSON.stringify([addressLine]),
   });
@@ -69,8 +69,8 @@ export async function cleanRuAddress(addressLine) {
 
   const json = await response.json();
   const row = Array.isArray(json) ? json[0] : null;
-  if (!row || typeof row !== 'object') {
-    throw new Error('DaData clean: пустой ответ');
+  if (!row || typeof row !== "object") {
+    throw new Error("DaData clean: пустой ответ");
   }
   return row;
 }

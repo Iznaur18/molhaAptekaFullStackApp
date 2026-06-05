@@ -9,11 +9,7 @@ import "./ProductCharacteristicsDetails.css";
  */
 export function ProductCharacteristicsDetails({ items }) {
   const rows = Array.isArray(items)
-    ? items.filter(
-        (item) =>
-          item?.key?.trim() &&
-          item?.value?.trim(),
-      )
+    ? items.filter((item) => item?.key?.trim() && item?.value?.trim())
     : [];
 
   if (rows.length === 0) {
@@ -30,16 +26,9 @@ export function ProductCharacteristicsDetails({ items }) {
       </h3>
       <dl className="product-characteristics-details__list">
         {rows.map((item) => (
-          <div
-            key={item.key}
-            className="product-characteristics-details__row"
-          >
-            <dt className="product-characteristics-details__key">
-              {item.key}
-            </dt>
-            <dd className="product-characteristics-details__value">
-              {item.value}
-            </dd>
+          <div key={item.key} className="product-characteristics-details__row">
+            <dt className="product-characteristics-details__key">{item.key}</dt>
+            <dd className="product-characteristics-details__value">{item.value}</dd>
           </div>
         ))}
       </dl>

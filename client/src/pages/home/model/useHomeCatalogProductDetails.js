@@ -9,6 +9,7 @@ import { fetchMyProductReportStatus } from "../../../entities/product-report/api
 
 /**
  * @param {object} params
+ * @param {() => void} [params.onBeforeOpenDetails] — закрыть edit/create overlay
  */
 export const useHomeCatalogProductDetails = ({
   isAuthorized,
@@ -19,9 +20,11 @@ export const useHomeCatalogProductDetails = ({
   setProducts,
   catalogProductDetails,
   setCatalogProductDetails,
+  onBeforeOpenDetails,
 }) => {
-  const [catalogProductDetailsTab, setCatalogProductDetailsTab] =
-    useState(/** @type {'details' | 'auction' | 'reviews' | 'installment'} */ ("details"));
+  const [catalogProductDetailsTab, setCatalogProductDetailsTab] = useState(
+    /** @type {'details' | 'auction' | 'reviews' | 'installment'} */ ("details"),
+  );
   const [catalogProductHasPendingReport, setCatalogProductHasPendingReport] =
     useState(false);
 
@@ -29,10 +32,7 @@ export const useHomeCatalogProductDetails = ({
     if (!isAuthorized || !catalogProductDetails || !currentUserId) {
       return false;
     }
-    if (
-      catalogProductDetails.productModerationStatus !==
-      PRODUCT_MODERATION_APPROVED
-    ) {
+    if (catalogProductDetails.productModerationStatus !== PRODUCT_MODERATION_APPROVED) {
       return false;
     }
     return !isCurrentUserProductSeller(catalogProductDetails, currentUserId);
@@ -69,10 +69,9 @@ export const useHomeCatalogProductDetails = ({
   /** @param {string} productId */
   const handleCatalogProductClick = useCallback(
     (productId) => {
+      onBeforeOpenDetails?.();
       setCatalogProductDetailsTab("details");
-      const inList = products.find(
-        (row) => String(row._id) === String(productId),
-      );
+      const inList = products.find((row) => String(row._id) === String(productId));
       if (inList) {
         setCatalogProductDetails(inList);
         return;
@@ -87,7 +86,7 @@ export const useHomeCatalogProductDetails = ({
         }
       })();
     },
-    [products, setCatalogProductDetails],
+    [onBeforeOpenDetails, products, setCatalogProductDetails],
   );
 
   const handleProductStatsUpdate = useCallback(
@@ -96,9 +95,7 @@ export const useHomeCatalogProductDetails = ({
         prev && String(prev._id) === productId ? { ...prev, ...stats } : prev,
       );
       setProducts((prev) =>
-        prev.map((p) =>
-          String(p._id) === productId ? { ...p, ...stats } : p,
-        ),
+        prev.map((p) => (String(p._id) === productId ? { ...p, ...stats } : p)),
       );
     },
     [setCatalogProductDetails, setProducts],

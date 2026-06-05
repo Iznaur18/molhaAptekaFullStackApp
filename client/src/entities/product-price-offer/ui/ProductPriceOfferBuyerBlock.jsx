@@ -223,14 +223,10 @@ export function ProductPriceOfferBuyerBlock({
           : null;
 
   const showPayButton =
-    myOffer?.status === PRICE_OFFER_STATUS_ACCEPTED &&
-    !hasLinkedOrder &&
-    !showPay;
+    myOffer?.status === PRICE_OFFER_STATUS_ACCEPTED && !hasLinkedOrder && !showPay;
 
   const showPayCheckout =
-    myOffer?.status === PRICE_OFFER_STATUS_ACCEPTED &&
-    !hasLinkedOrder &&
-    showPay;
+    myOffer?.status === PRICE_OFFER_STATUS_ACCEPTED && !hasLinkedOrder && showPay;
 
   return (
     <section className="product-price-offer">
@@ -254,9 +250,7 @@ export function ProductPriceOfferBuyerBlock({
                   className="product-price-offer__input"
                   maxLength={String(PRODUCT_PRICE_RUB_MAX).length}
                   value={priceInput}
-                  onChange={(e) =>
-                    setPriceInput(keepDigitsOnly(e.target.value))
-                  }
+                  onChange={(e) => setPriceInput(keepDigitsOnly(e.target.value))}
                   disabled={isBusy}
                 />
               </label>

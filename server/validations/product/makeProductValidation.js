@@ -1,7 +1,6 @@
 import { body } from "express-validator";
 
 import {
-  PRODUCT_CATEGORY_VALUES,
   PRODUCT_DESCRIPTION_MAX_CHARS,
   PRODUCT_DESCRIPTION_MIN_CHARS,
   PRODUCT_IMAGE_URLS_MAX,
@@ -12,9 +11,18 @@ import {
   PRODUCT_STOCK_QUANTITY_MIN,
 } from "../../constants/productStockConstants.js";
 import { assertAtMostChars } from "../../utils/maxWordsText.js";
-import { assertProductOldPricePair, normalizeProductOldPriceRub, normalizeProductPriceRub } from "../../utils/productDiscount.js";
+import {
+  assertProductOldPricePair,
+  normalizeProductOldPriceRub,
+  normalizeProductPriceRub,
+} from "../../utils/productDiscount.js";
 import { normalizeProductCharacteristics } from "../../utils/normalizeProductCharacteristics.js";
 import { handleValidationByExpressErrors } from "../handleValidationByExpressErrors.js";
+import {
+  productCategoryIdBodyValidation,
+  productCategoryLegacyBodyValidation,
+  requireProductCategoryIdOrLegacyValidation,
+} from "./productCategoryBodyValidation.js";
 
 const assertHttpImageUrl = (raw, label) => {
   if (raw == null || String(raw).trim() === "") return;
@@ -22,9 +30,7 @@ const assertHttpImageUrl = (raw, label) => {
   try {
     const u = new URL(s);
     if (u.protocol !== "http:" && u.protocol !== "https:") {
-      throw new Error(
-        `${label}: URL должен начинаться с http:// или https://`,
-      );
+      throw new Error(`${label}: URL должен начинаться с http:// или https://`);
     }
   } catch (e) {
     if (e instanceof TypeError) {
@@ -51,15 +57,9 @@ export const makeProductValidation = [
     .trim()
     .custom((value) => {
       try {
-        assertAtMostChars(
-          value,
-          "Описание товара",
-          PRODUCT_DESCRIPTION_MAX_CHARS,
-        );
+        assertAtMostChars(value, "Описание товара", PRODUCT_DESCRIPTION_MAX_CHARS);
       } catch (e) {
-        throw new Error(
-          e instanceof Error ? e.message : "Слишком длинное описание",
-        );
+        throw new Error(e instanceof Error ? e.message : "Слишком длинное описание");
       }
       return true;
     }),
@@ -94,9 +94,7 @@ export const makeProductValidation = [
     .notEmpty()
     .withMessage("Цена продукта обязательна")
     .isInt({ min: 0, max: PRODUCT_PRICE_RUB_MAX })
-    .withMessage(
-      `Цена продукта — целое число от 0 до ${PRODUCT_PRICE_RUB_MAX}`,
-    )
+    .withMessage(`Цена продукта — целое число от 0 до ${PRODUCT_PRICE_RUB_MAX}`)
     .toInt(),
   body("productOldPrice")
     .optional({ nullable: true })
@@ -106,18 +104,13 @@ export const makeProductValidation = [
         const productPrice = normalizeProductPriceRub(req.body?.productPrice);
         assertProductOldPricePair(productOldPrice, productPrice);
       } catch (e) {
-        throw new Error(
-          e instanceof Error ? e.message : "Некорректная старая цена",
-        );
+        throw new Error(e instanceof Error ? e.message : "Некорректная старая цена");
       }
       return true;
     }),
-  body("productCategory")
-    .notEmpty()
-    .withMessage("Категория продукта обязательна")
-    .isIn(PRODUCT_CATEGORY_VALUES)
-    .withMessage("Указана неизвестная категория товара")
-    .trim(),
+  requireProductCategoryIdOrLegacyValidation,
+  productCategoryIdBodyValidation,
+  productCategoryLegacyBodyValidation,
   body("productIsAvailable")
     .notEmpty()
     .withMessage("Доступность продукта обязательна")

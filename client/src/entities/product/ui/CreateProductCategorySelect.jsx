@@ -5,7 +5,7 @@ import {
   PRODUCT_CATEGORY_LABEL_RU,
 } from "../model/productConstants.js";
 
-import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
+import { getProductFieldEditLabel } from "../lib/productFieldRegistry.js";
 
 import "./CreateProductCategorySelect.css";
 
@@ -19,11 +19,7 @@ import "./CreateProductCategorySelect.css";
  *   disabled?: boolean;
  * }} props
  */
-export function CreateProductCategorySelect({
-  value,
-  onChange,
-  disabled = false,
-}) {
+export function CreateProductCategorySelect({ value, onChange, disabled = false }) {
   const [isOpen, setIsOpen] = useState(false);
   const rootRef = useRef(null);
 
@@ -32,11 +28,7 @@ export function CreateProductCategorySelect({
 
     const handlePointerDown = (event) => {
       const root = rootRef.current;
-      if (
-        root &&
-        event.target instanceof Node &&
-        !root.contains(event.target)
-      ) {
+      if (root && event.target instanceof Node && !root.contains(event.target)) {
         setIsOpen(false);
       }
     };
@@ -70,7 +62,7 @@ export function CreateProductCategorySelect({
   return (
     <div className="create-product-category-select" ref={rootRef}>
       <span className="create-product-category-select__legend">
-        {CREATE_PRODUCT_MODAL_UI.LABEL_CATEGORY}
+        {getProductFieldEditLabel("productCategory")}
       </span>
       <button
         type="button"

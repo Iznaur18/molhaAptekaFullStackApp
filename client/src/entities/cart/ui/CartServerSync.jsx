@@ -7,9 +7,7 @@ import { useCart } from "../model/useCart.js";
 const DEBOUNCE_MS = 450;
 
 const packItems = (obj) =>
-  JSON.stringify(
-    Object.entries(obj).sort(([a], [b]) => a.localeCompare(b)),
-  );
+  JSON.stringify(Object.entries(obj).sort(([a], [b]) => a.localeCompare(b)));
 
 /**
  * Синхронизирует корзину с сервером: загрузка после входа, debounced PUT при изменениях, очистка после выхода.

@@ -1,0 +1,61 @@
+.seller-products-page__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.seller-products-page__back {
+  align-self: flex-start;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #1f6feb;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.seller-products-page__title {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.seller-products-page__seller {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem 1rem;
+}
+
+.seller-products-page__avatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.seller-products-page__seller-name {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.seller-products-page__state {
+  margin: 0;
+}
+
+.seller-products-page__state_error {
+  color: #b91c1c;
+}
+
+.seller-products-page__login {
+  margin-top: 0.5rem;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid color-mix(in srgb, CanvasText 20%, transparent);
+  border-radius: 8px;
+  background: Canvas;
+  font: inherit;
+  cursor: pointer;
+}

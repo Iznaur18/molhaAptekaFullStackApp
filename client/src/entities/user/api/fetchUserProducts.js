@@ -1,4 +1,5 @@
 import { apiClient } from "../../../shared/api/index.js";
+import { parseUserSellerProductsPageData } from "../../../shared/api/parseApiContract.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 
 export const USER_PROFILE_PRODUCTS_PAGE_SIZE = 5;
@@ -22,17 +23,10 @@ export async function fetchUserProducts(userId, params = {}) {
       { params: { page, limit } },
     );
 
-    if (
-      !data?.success ||
-      !Array.isArray(data.data?.items) ||
-      data.data?.pagination == null
-    ) {
-      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
-    }
-
+    const parsed = parseUserSellerProductsPageData(data);
     return {
-      items: data.data.items,
-      pagination: data.data.pagination,
+      items: parsed.items,
+      pagination: parsed.pagination,
     };
   } catch (e) {
     const message =

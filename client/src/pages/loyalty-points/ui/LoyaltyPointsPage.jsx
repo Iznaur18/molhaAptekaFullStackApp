@@ -90,17 +90,13 @@ export function LoyaltyPointsPage({ isAuthorized, onRequestLogin }) {
     }
     if (purchaseAmountRub < LOYALTY_POINTS_PURCHASE_MIN_RUB) {
       setPurchaseValidationError(
-        LOYALTY_POINTS_PAGE_UI.PURCHASE_AMOUNT_MIN(
-          LOYALTY_POINTS_PURCHASE_MIN_RUB,
-        ),
+        LOYALTY_POINTS_PAGE_UI.PURCHASE_AMOUNT_MIN(LOYALTY_POINTS_PURCHASE_MIN_RUB),
       );
       return;
     }
     if (purchaseAmountRub > LOYALTY_POINTS_PURCHASE_MAX_RUB) {
       setPurchaseValidationError(
-        LOYALTY_POINTS_PAGE_UI.PURCHASE_AMOUNT_MAX(
-          LOYALTY_POINTS_PURCHASE_MAX_RUB,
-        ),
+        LOYALTY_POINTS_PAGE_UI.PURCHASE_AMOUNT_MAX(LOYALTY_POINTS_PURCHASE_MAX_RUB),
       );
       return;
     }
@@ -117,9 +113,7 @@ export function LoyaltyPointsPage({ isAuthorized, onRequestLogin }) {
   if (!isAuthorized) {
     return (
       <section className="loyalty-points-page">
-        <p className="loyalty-points-page__hint">
-          {LOYALTY_POINTS_PAGE_UI.LOGIN_HINT}
-        </p>
+        <p className="loyalty-points-page__hint">{LOYALTY_POINTS_PAGE_UI.LOGIN_HINT}</p>
         <button
           type="button"
           className="loyalty-points-page__login app-btn app-btn--primary"

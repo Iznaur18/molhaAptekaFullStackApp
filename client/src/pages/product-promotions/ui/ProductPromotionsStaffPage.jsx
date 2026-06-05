@@ -21,7 +21,9 @@ export function ProductPromotionsStaffPage({ onQueueChanged }) {
   );
   const [error, setError] = useState("");
   const [pendingId, setPendingId] = useState(null);
-  const [rowErrors, setRowErrors] = useState(/** @type {Record<string, string>} */ ({}));
+  const [rowErrors, setRowErrors] = useState(
+    /** @type {Record<string, string>} */ ({}),
+  );
 
   const loadQueue = useCallback(async () => {
     setPhase("loading");
@@ -105,7 +107,10 @@ export function ProductPromotionsStaffPage({ onQueueChanged }) {
 
   if (phase === "error") {
     return (
-      <p className="product-promotions-staff-page__state product-promotions-staff-page__state_error" role="alert">
+      <p
+        className="product-promotions-staff-page__state product-promotions-staff-page__state_error"
+        role="alert"
+      >
         {error}
       </p>
     );
@@ -122,7 +127,11 @@ export function ProductPromotionsStaffPage({ onQueueChanged }) {
   return (
     <ul className="product-promotions-staff-page__list" role="list">
       {promotions.map((row) => (
-        <li key={row._id} className="product-promotions-staff-page__item" role="listitem">
+        <li
+          key={row._id}
+          className="product-promotions-staff-page__item"
+          role="listitem"
+        >
           <div className="product-promotions-staff-page__meta">
             <p>
               <strong>{PRODUCT_PROMOTIONS_STAFF_PAGE_UI.ROW_PRODUCT}:</strong>{" "}

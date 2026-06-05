@@ -74,9 +74,9 @@ SMTP_FROM=your@gmail.com
 
 ## Ошибки
 
-| Симптом | Что проверить |
-|---------|----------------|
-| `Invalid login` | пароль приложения, не обычный пароль |
-| Письмо в spam | нормально для dev; `SMTP_FROM` = тот же ящик |
-| Всё ещё лог `[email-verify]` без «Письмо отправлено» | перезапуск сервера, все 3 поля HOST/USER/PASS |
-| `self signed certificate` | только dev: `SMTP_TLS_REJECT_UNAUTHORIZED=false` |
+| Симптом                                              | Что проверить                                    |
+| ---------------------------------------------------- | ------------------------------------------------ |
+| `Invalid login`                                      | пароль приложения, не обычный пароль             |
+| Письмо в spam                                        | нормально для dev; `SMTP_FROM` = тот же ящик     |
+| Всё ещё лог `[email-verify]` без «Письмо отправлено» | перезапуск сервера, все 3 поля HOST/USER/PASS    |
+| `self signed certificate`                            | только dev: `SMTP_TLS_REJECT_UNAUTHORIZED=false` |

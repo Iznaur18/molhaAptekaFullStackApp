@@ -1,4 +1,5 @@
 import { apiClient } from "../../../shared/api/index.js";
+import { parseCatalogProductsPageData } from "../../../shared/api/parseApiContract.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 import { CATALOG_PAGE_SIZE } from "../model/productConstants.js";
 
@@ -10,6 +11,7 @@ import { CATALOG_PAGE_SIZE } from "../model/productConstants.js";
  *   limit?: number;
  *   search?: string;
  *   productCategory?: string;
+ *   categoryId?: string;
  *   sort?: string;
  *   includeHidden?: boolean;
  *   followingOnly?: boolean;
@@ -27,6 +29,7 @@ export async function fetchCatalogProductsPage({
   limit = CATALOG_PAGE_SIZE,
   search,
   productCategory,
+  categoryId,
   sort,
   includeHidden = false,
   followingOnly = false,
@@ -40,6 +43,7 @@ export async function fetchCatalogProductsPage({
         page,
         limit,
         ...(search ? { search } : {}),
+        ...(categoryId ? { categoryId } : {}),
         ...(productCategory ? { productCategory } : {}),
         ...(sort ? { sort } : {}),
         ...(includeHidden ? { includeHidden: "true" } : {}),
@@ -50,34 +54,19 @@ export async function fetchCatalogProductsPage({
       },
     });
 
-    if (!data?.success || !data.data) {
-      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
-    }
-
-    const { products = [], pagination } = data.data;
-
-    if (
-      !pagination ||
-      typeof pagination.totalPages !== "number" ||
-      typeof pagination.page !== "number"
-    ) {
-      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
-    }
-
+    const parsed = parseCatalogProductsPageData(data);
     return {
-      products,
+      products: parsed.products,
       pagination: {
-        page: pagination.page,
-        limit: pagination.limit,
-        total: pagination.total,
-        totalPages: pagination.totalPages,
+        page: parsed.pagination.page,
+        limit: parsed.pagination.limit,
+        total: parsed.pagination.total,
+        totalPages: parsed.pagination.totalPages,
       },
     };
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      API_CLIENT_UI.FETCH_PRODUCTS_FALLBACK;
+      e?.response?.data?.message ?? e?.message ?? API_CLIENT_UI.FETCH_PRODUCTS_FALLBACK;
     throw new Error(message);
   }
 }

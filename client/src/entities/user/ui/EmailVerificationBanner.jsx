@@ -23,9 +23,7 @@ export function EmailVerificationBanner() {
       setStatus({
         kind: "error",
         message:
-          error instanceof Error
-            ? error.message
-            : EMAIL_VERIFICATION_UI.RESEND_ERROR,
+          error instanceof Error ? error.message : EMAIL_VERIFICATION_UI.RESEND_ERROR,
       });
     }
   };

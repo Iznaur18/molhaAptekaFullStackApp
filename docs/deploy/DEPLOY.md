@@ -1,0 +1,182 @@
+# Первый production-деплой (VPS + nginx)
+
+Линейный сценарий для **варианта A**: один домен `https://izibuy.ru` → SPA + API + uploads.
+
+| Документ | Когда |
+| -------- | ----- |
+| Этот файл | первый выклад |
+| [`PROD-S3-CDN.md`](PROD-S3-CDN.md) | медиа на R2 вместо диска |
+| [`../../server/docs/production-checklist.md`](../../server/docs/production-checklist.md) | smoke после деплоя |
+| [`../../server/docs/RUNBOOK.md`](../../server/docs/RUNBOOK.md) | бэкап, rollback |
+
+---
+
+## 0. Что нужно заранее
+
+- VPS (Ubuntu 22+), домен → A-запись на IP VPS
+- **MongoDB Atlas** (M0+, replica set) или свой `mongod --replSet`
+- Node.js **20 LTS** на VPS
+- nginx + certbot
+
+---
+
+## 1. Подготовка env (локально или на VPS)
+
+```bash
+cd server
+cp .env.production.example .env
+# заполни JWT_SECRET, MONGO_URI, FRONTEND_URL, PUBLIC_UPLOAD_BASE_URL
+```
+
+Секрет:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+Проверка **до** выкладки (нужен доступ к Mongo из твоей сети / Atlas IP whitelist):
+
+```bash
+cd server
+npm run preflight:prod
+```
+
+---
+
+## 2. Установка на VPS (один раз)
+
+```bash
+sudo apt update
+sudo apt install -y nginx certbot python3-certbot-nginx
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y nodejs
+
+sudo mkdir -p /var/www/izibuy
+sudo chown -R $USER:$USER /var/www/izibuy
+```
+
+Клон репо (или `git pull` при обновлениях):
+
+```bash
+cd /var/www/izibuy
+git clone <your-repo-url> .
+```
+
+---
+
+## 3. Сборка на VPS
+
+```bash
+cd /var/www/izibuy/contract && npm ci
+cd /var/www/izibuy/server && npm ci
+cp .env.production.example .env   # если ещё нет — отредактируй
+npm run preflight:prod
+npm run migrate:apply
+
+cd /var/www/izibuy/client && npm ci
+# Вариант A: НЕ задавай VITE_API_URL
+npm run build
+```
+
+**Persistent uploads (disk):**
+
+```bash
+mkdir -p /var/www/izibuy/server/uploads
+# не удалять при git pull
+```
+
+---
+
+## 4. systemd (API)
+
+```bash
+sudo cp /var/www/izibuy/docs/deploy/systemd-izibuy.service.example \
+  /etc/systemd/system/izibuy-api.service
+# отредактируй User/пути при необходимости
+sudo systemctl daemon-reload
+sudo systemctl enable izibuy-api
+sudo systemctl start izibuy-api
+sudo systemctl status izibuy-api
+```
+
+Логи: `journalctl -u izibuy-api -f`
+
+---
+
+## 5. nginx + SSL
+
+```bash
+sudo cp /var/www/izibuy/docs/deploy/nginx-izibuy.conf.example \
+  /etc/nginx/sites-available/izibuy
+# root → /var/www/izibuy/client/dist
+sudo ln -sf /etc/nginx/sites-available/izibuy /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
+
+sudo certbot --nginx -d izibuy.ru -d www.izibuy.ru
+```
+
+---
+
+## 6. Первый админ
+
+```bash
+cd /var/www/izibuy/server
+npm run create-admin -- admin@yourdomain.ru 'StrongPassword123!' AdminName
+```
+
+---
+
+## 7. Smoke (5 минут)
+
+```bash
+curl -sS https://izibuy.ru/health
+```
+
+В браузере:
+
+1. Register / Login (cookie httpOnly)
+2. Каталог открывается
+3. Upload фото товара → URL открывается в новой вкладке
+4. Корзина → заказ (нужен verify email или SMTP)
+
+Полный список: `server/docs/production-checklist.md` §4.
+
+---
+
+## 8. Обновление (каждый релиз)
+
+```bash
+cd /var/www/izibuy && git pull
+cd contract && npm ci
+cd server && npm ci && npm run migrate:apply
+cd ../client && npm ci && npm run build
+sudo systemctl restart izibuy-api
+sudo nginx -t && sudo systemctl reload nginx
+curl -sS https://izibuy.ru/health
+```
+
+Откат: `server/docs/RUNBOOK.md` §3.
+
+---
+
+## 9. S3/CDN (опционально, после стабильного disk-prod)
+
+См. [`PROD-S3-CDN.md`](PROD-S3-CDN.md) — не смешивай с первым днём, если не готов R2.
+
+---
+
+## 10. С Windows (подготовка без VPS)
+
+На своём ПК можно проверить только env + Mongo:
+
+```powershell
+cd server
+copy .env.production.example .env
+# заполни MONGO_URI (Atlas), JWT_SECRET, FRONTEND_URL
+npm run preflight:prod
+cd ..\client
+npm run build
+```
+
+Артефакт `client/dist/` копируешь на VPS или собираешь прямо на сервере (предпочтительно).

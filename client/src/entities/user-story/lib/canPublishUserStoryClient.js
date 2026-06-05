@@ -14,10 +14,7 @@ export function canPublishUserStoryClient(user) {
     return false;
   }
 
-  if (
-    user.userRole === USER_ROLE_ADMIN ||
-    user.userRole === USER_ROLE_MODERATOR
-  ) {
+  if (user.userRole === USER_ROLE_ADMIN || user.userRole === USER_ROLE_MODERATOR) {
     return true;
   }
 

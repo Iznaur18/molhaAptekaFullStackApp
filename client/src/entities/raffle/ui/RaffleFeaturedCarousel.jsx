@@ -53,8 +53,7 @@ export function RaffleFeaturedCarousel({
       if (slideCount === 0) {
         return;
       }
-      const normalized =
-        ((nextIndex % slideCount) + slideCount) % slideCount;
+      const normalized = ((nextIndex % slideCount) + slideCount) % slideCount;
       onActiveIndexChange(normalized);
     },
     [onActiveIndexChange, slideCount],

@@ -1,31 +1,24 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 
 import { AddToCartButton } from "../../../features/cart-add/ui/AddToCartButton.jsx";
 import { recordProductView } from "../api/recordProductView.js";
-import {
-  COMMON_UI,
-  PRODUCT_CARD_UI,
-  PRODUCT_DETAILS_MODAL_UI,
-  USER_DETAILS_MODAL_UI,
-} from "../../../shared/config/appUiCopy.js";
+import { COMMON_UI, PRODUCT_DETAILS_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { formatProductFieldForDisplay } from "../lib/formatProductFieldForDisplay.js";
 import { resolveProductImageUrls } from "../lib/resolveProductImageUrls.js";
-import {
-  buildProductMediaSlides,
-  resolveProductImageIndexForLightbox,
-} from "../lib/buildProductMediaSlides.js";
 import { resolveProductPreviewVideoUrl } from "../lib/resolveProductPreviewVideoUrl.js";
-import { ProductMediaSlideContent } from "./ProductMediaSlideContent.jsx";
 import {
   PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS,
   PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS_STAFF,
   PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS,
   PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS_ADMIN,
-  PRODUCT_FIELD_LABEL_RU,
-  PRODUCT_IMAGE_PLACEHOLDER_URL,
 } from "../model/productConstants.js";
-import { ProductImageLightbox } from "./ProductImageLightbox.jsx";
+import {
+  getProductDetailsModalRowClassName,
+  getProductDetailsModalValueClassName,
+  getProductFieldLabel,
+  getProductFieldReadLayout,
+} from "../lib/productFieldRegistry.js";
+import { ProductMediaGalleryReadonly } from "./ProductMediaGalleryReadonly.jsx";
 import { ProductDetailsSellerPreview } from "./ProductDetailsSellerPreview.jsx";
 import { ProductCharacteristicsDetails } from "./ProductCharacteristicsDetails.jsx";
 import { ProductPriceDisplay } from "./ProductPriceDisplay.jsx";
@@ -52,47 +45,10 @@ import {
   PRODUCT_REVIEW_UI,
   INSTALLMENT_UI,
 } from "../../../shared/config/appUiCopy.js";
-import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
-import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
+import { ProductModalShell } from "../../../shared/ui/ProductModalShell/ProductModalShell.jsx";
 
 import "./ProductDetailsModal.css";
 import "../../product-price-offer/ui/ProductPriceOffer.css";
-
-const PRODUCT_DETAILS_STAT_FIELD_KEYS = new Set([
-  "productCategory",
-  "productStockQuantity",
-  "soldQuantity",
-  "uniqueViewerCount",
-]);
-
-const PRODUCT_DETAILS_BLOCK_FIELD_KEYS = new Set([
-  "productDescription",
-  "productModerationComment",
-  "productImageUrls",
-]);
-
-const PRODUCT_DETAILS_META_FIELD_KEYS = new Set([
-  "_id",
-  "createdAt",
-  "updatedAt",
-]);
-
-/**
- * @param {string} key
- */
-function getProductDetailsRowClassName(key) {
-  const classes = ["product-details-modal__row"];
-  if (key === "productPrice") {
-    classes.push("product-details-modal__row--price");
-  } else if (PRODUCT_DETAILS_STAT_FIELD_KEYS.has(key)) {
-    classes.push("product-details-modal__row--stat");
-  } else if (PRODUCT_DETAILS_BLOCK_FIELD_KEYS.has(key)) {
-    classes.push("product-details-modal__row--block");
-  } else if (PRODUCT_DETAILS_META_FIELD_KEYS.has(key)) {
-    classes.push("product-details-modal__row--meta");
-  }
-  return classes.join(" ");
-}
 
 /**
  * @param {import("../model/types.js").ProductFromApi} product
@@ -114,12 +70,7 @@ function renderFieldRows(product, keys, handlers) {
       raw._id != null &&
       display !== COMMON_UI.EM_DASH;
 
-    const ddClass =
-      key === "productDescription" ||
-      key === "productModerationComment" ||
-      key === "productImageUrls"
-        ? "product-details-modal__value product-details-modal__value--multiline"
-        : "product-details-modal__value";
+    const ddClass = getProductDetailsModalValueClassName(key);
 
     let valueNode;
     if (canOpenSellerProfile) {
@@ -157,10 +108,8 @@ function renderFieldRows(product, keys, handlers) {
     }
 
     return (
-      <div key={key} className={getProductDetailsRowClassName(key)}>
-        <dt className="product-details-modal__key">
-          {PRODUCT_FIELD_LABEL_RU[key] ?? key}
-        </dt>
+      <div key={key} className={getProductDetailsModalRowClassName(key)}>
+        <dt className="product-details-modal__key">{getProductFieldLabel(key)}</dt>
         <dd className={ddClass}>{valueNode}</dd>
       </div>
     );
@@ -218,9 +167,7 @@ export function ProductDetailsModal({
     () => (product ? resolveProductPreviewVideoUrl(product) : null),
     [product],
   );
-  const [previewVideoFailed, setPreviewVideoFailed] = useState(false);
-  const [activeSlideIndex, setActiveSlideIndex] = useState(0);
-  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [galleryLightboxOpen, setGalleryLightboxOpen] = useState(false);
   const [detailsTab, setDetailsTab] = useState(
     /** @type {'details' | 'auction' | 'reviews' | 'installment'} */ (
       initialDetailsTab
@@ -231,8 +178,7 @@ export function ProductDetailsModal({
       null
     ),
   );
-  const [isInstallmentProgramLoading, setIsInstallmentProgramLoading] =
-    useState(false);
+  const [isInstallmentProgramLoading, setIsInstallmentProgramLoading] = useState(false);
   const [topOffers, setTopOffers] = useState(
     /** @type {import('../../product-price-offer/model/types.js').PriceOfferTopEntry[]} */ ([]),
   );
@@ -241,24 +187,18 @@ export function ProductDetailsModal({
   const tabPanelRef = useRef(/** @type {HTMLDivElement | null} */ (null));
   const [tabPanelMinHeight, setTabPanelMinHeight] = useState(0);
 
-  useScrollLock(isOpen);
-
   const isOwnProduct =
     product != null && isCurrentUserProductSeller(product, currentUserId);
   const isSellerView = isOwnProduct;
 
-  const auctionUi = useMemo(
-    () => resolveAuctionUiState(product),
-    [product],
-  );
+  const auctionUi = useMemo(() => resolveAuctionUiState(product), [product]);
   const installmentUi = useMemo(
     () => resolveInstallmentUiState(product, installmentProgram),
     [product, installmentProgram],
   );
   const showReviewsTab =
     product?._id != null &&
-    (product.productModerationStatus === PRODUCT_MODERATION_APPROVED ||
-      isSellerView);
+    (product.productModerationStatus === PRODUCT_MODERATION_APPROVED || isSellerView);
   const showAuctionTab =
     product?._id != null &&
     (isSellerView
@@ -268,10 +208,8 @@ export function ProductDetailsModal({
     product?._id != null &&
     (isSellerView
       ? installmentUi.showInstallmentTab
-      : product.productInstallmentEnabled === true ||
-        installmentUi.installmentActive);
-  const showProductDetailsTabs =
-    showAuctionTab || showReviewsTab || showInstallmentTab;
+      : product.productInstallmentEnabled === true || installmentUi.installmentActive);
+  const showProductDetailsTabs = showAuctionTab || showReviewsTab || showInstallmentTab;
 
   const reloadTopOffers = useCallback(async () => {
     if (!product?._id || !auctionUi.auctionActive) {
@@ -326,36 +264,12 @@ export function ProductDetailsModal({
     }
   }, [product?._id]);
 
-  const mediaSlides = useMemo(() => {
-    const videoUrl =
-      previewVideoUrl != null && !previewVideoFailed ? previewVideoUrl : null;
-    const slides = buildProductMediaSlides({
-      previewVideoUrl: videoUrl,
-      imageUrls,
-    });
-    return slides.length > 0
-      ? slides
-      : [{ type: "image", url: PRODUCT_IMAGE_PLACEHOLDER_URL }];
-  }, [imageUrls, previewVideoUrl, previewVideoFailed]);
-
   useEffect(() => {
-    setActiveSlideIndex(0);
-    setLightboxOpen(false);
+    setGalleryLightboxOpen(false);
     setDetailsTab(initialDetailsTab);
     setTabPanelMinHeight(0);
-    setPreviewVideoFailed(false);
     setInstallmentProgram(null);
   }, [product?._id, initialDetailsTab]);
-
-  useEffect(() => {
-    setActiveSlideIndex((i) =>
-      Math.min(i, Math.max(0, mediaSlides.length - 1)),
-    );
-  }, [mediaSlides.length]);
-
-  useEffect(() => {
-    setPreviewVideoFailed(false);
-  }, [previewVideoUrl]);
 
   useEffect(() => {
     if (!isOpen || !product) {
@@ -363,14 +277,11 @@ export function ProductDetailsModal({
     }
     const showReviews =
       product._id != null &&
-      (product.productModerationStatus === PRODUCT_MODERATION_APPROVED ||
-        isOwnProduct);
-    const showAuction =
-      product._id != null && product.productAuctionEnabled === true;
+      (product.productModerationStatus === PRODUCT_MODERATION_APPROVED || isOwnProduct);
+    const showAuction = product._id != null && product.productAuctionEnabled === true;
     const showInstallment =
       product._id != null &&
-      (product.productInstallmentEnabled === true ||
-        installmentUi.installmentActive);
+      (product.productInstallmentEnabled === true || installmentUi.installmentActive);
     if (detailsTab === "reviews" && !showReviews) {
       setDetailsTab("details");
     }
@@ -436,9 +347,7 @@ export function ProductDetailsModal({
     let cancelled = false;
     void (async () => {
       try {
-        const { uniqueViewerCount } = await recordProductView(
-          String(product._id),
-        );
+        const { uniqueViewerCount } = await recordProductView(String(product._id));
         if (cancelled) return;
         onProductStatsUpdate?.(String(product._id), { uniqueViewerCount });
       } catch {
@@ -451,23 +360,13 @@ export function ProductDetailsModal({
   }, [isOpen, product?._id, isAuthorized, onProductStatsUpdate]);
 
   useEffect(() => {
-    if (!isOpen) return undefined;
+    if (!isOpen || galleryLightboxOpen) {
+      return undefined;
+    }
 
-    const len = mediaSlides.length;
     const onKeyDown = (event) => {
-      if (lightboxOpen) return;
       if (event.key === "Escape") {
         onClose();
-        return;
-      }
-      if (len <= 1) return;
-      if (event.key === "ArrowLeft") {
-        event.preventDefault();
-        setActiveSlideIndex((i) => (i - 1 + len) % len);
-      }
-      if (event.key === "ArrowRight") {
-        event.preventDefault();
-        setActiveSlideIndex((i) => (i + 1) % len);
       }
     };
 
@@ -475,7 +374,7 @@ export function ProductDetailsModal({
     return () => {
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [isOpen, onClose, lightboxOpen, mediaSlides.length]);
+  }, [galleryLightboxOpen, isOpen, onClose]);
 
   useEffect(() => {
     if (!isOpen || !showProductDetailsTabs) return undefined;
@@ -487,20 +386,6 @@ export function ProductDetailsModal({
     }
     return undefined;
   }, [isOpen, showProductDetailsTabs, detailsTab, tabPanelMinHeight, product?._id]);
-
-  const handleSliderPrev = (event) => {
-    event.stopPropagation();
-    const len = mediaSlides.length;
-    if (len <= 1) return;
-    setActiveSlideIndex((i) => (i - 1 + len) % len);
-  };
-
-  const handleSliderNext = (event) => {
-    event.stopPropagation();
-    const len = mediaSlides.length;
-    if (len <= 1) return;
-    setActiveSlideIndex((i) => (i + 1) % len);
-  };
 
   if (!isOpen || !product) return null;
 
@@ -518,14 +403,12 @@ export function ProductDetailsModal({
           onSellerNameClick(userId);
         }
       : undefined;
-  const topStatFieldKeys = topRowFieldKeys.filter(
-    (key) => key !== "productPrice",
+  const topStatFieldKeys = topRowFieldKeys.filter((key) => key !== "productPrice");
+  const bottomBlockFieldKeys = bottomRowFieldKeys.filter(
+    (key) => getProductFieldReadLayout(key) === "block",
   );
-  const bottomBlockFieldKeys = bottomRowFieldKeys.filter((key) =>
-    PRODUCT_DETAILS_BLOCK_FIELD_KEYS.has(key),
-  );
-  const bottomMetaFieldKeys = bottomRowFieldKeys.filter((key) =>
-    PRODUCT_DETAILS_META_FIELD_KEYS.has(key),
+  const bottomMetaFieldKeys = bottomRowFieldKeys.filter(
+    (key) => getProductFieldReadLayout(key) === "meta",
   );
   const purchaseLimit = getProductPurchaseLimit(product);
   const canShowAddToCart =
@@ -538,46 +421,30 @@ export function ProductDetailsModal({
       : PRODUCT_REVIEW_UI.TAB_REVIEWS;
 
   const title = product.productName?.trim() || "Товар";
-  const safeSlideIndex = Math.min(
-    activeSlideIndex,
-    Math.max(0, mediaSlides.length - 1),
-  );
-  const activeSlide = mediaSlides[safeSlideIndex] ?? null;
-  const lightboxStartIndex =
-    activeSlide?.type === "image"
-      ? resolveProductImageIndexForLightbox(mediaSlides, safeSlideIndex)
-      : 0;
 
-  return createPortal(
+  const modalFooter =
+    secondaryFooter || adminFooter ? (
+      <>
+        {secondaryFooter}
+        {adminFooter}
+      </>
+    ) : null;
+
+  return (
     <>
-      <div
-        className="product-details-modal__backdrop"
-        role="presentation"
+      <ProductModalShell
+        isOpen={isOpen}
+        onClose={onClose}
+        title={title}
+        titleId="product-details-modal-title"
+        size="lg"
+        panelClassName="product-details-modal"
+        bodyClassName="product-details-modal__body"
+        bodyRef={modalBodyRef}
+        footer={modalFooter}
+        footerClassName="product-details-modal__footer"
+        closeOnEscape={false}
       >
-        <div
-          className="product-details-modal"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="product-details-modal-title"
-        >
-          <header className="product-details-modal__header">
-            <h2
-              id="product-details-modal-title"
-              className="product-details-modal__title"
-            >
-              {title}
-            </h2>
-            <button
-              type="button"
-              className="product-details-modal__close"
-              onClick={onClose}
-              aria-label={USER_DETAILS_MODAL_UI.ARIA_CLOSE}
-            >
-              <ModalCloseIcon />
-            </button>
-          </header>
-
-          <div ref={modalBodyRef} className="product-details-modal__body">
             {showProductDetailsTabs ? (
               <div className="product-details-modal__tabs" role="tablist">
                 <button
@@ -737,248 +604,118 @@ export function ProductDetailsModal({
                 )
               ) : (
                 <>
-            <div className="product-details-modal__row-top">
-              <div className="product-details-modal__image-aside">
-                <div
-                  className={
-                    mediaSlides.length > 1
-                      ? "product-details-modal__hero product-details-modal__hero--multi"
-                      : "product-details-modal__hero"
-                  }
-                  {...(mediaSlides.length > 1
-                    ? {
-                        role: "region",
-                        "aria-label":
-                          PRODUCT_DETAILS_MODAL_UI.SLIDER_REGION_ARIA,
-                      }
-                    : {})}
-                >
-                  {mediaSlides.length > 1 ? (
-                    <>
-                      <div className="product-details-modal__slider-nav">
-                        <button
-                          type="button"
-                          className="product-details-modal__slider-btn"
-                          aria-label={PRODUCT_CARD_UI.GALLERY_PREV}
-                          onClick={handleSliderPrev}
-                        >
-                          ‹
-                        </button>
-                        <button
-                          type="button"
-                          className="product-details-modal__slider-btn"
-                          aria-label={PRODUCT_CARD_UI.GALLERY_NEXT}
-                          onClick={handleSliderNext}
-                        >
-                          ›
-                        </button>
-                      </div>
-                      <span
-                        className="product-details-modal__slider-counter"
-                        aria-live="polite"
-                      >
-                        {safeSlideIndex + 1} / {mediaSlides.length}
-                      </span>
-                    </>
-                  ) : null}
-                  {activeSlide?.type === "image" ? (
-                    <button
-                      type="button"
-                      className="product-details-modal__image-zoom"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        setLightboxOpen(true);
-                      }}
-                      aria-label={
-                        PRODUCT_DETAILS_MODAL_UI.OPEN_GALLERY_FULLSCREEN
-                      }
-                    >
-                      <ProductMediaSlideContent
-                        slide={activeSlide}
-                        playVideoWhenVisible={false}
-                        imageClassName="product-details-modal__image"
-                        onVideoFailed={() => setPreviewVideoFailed(true)}
-                      />
-                    </button>
-                  ) : (
-                    <ProductMediaSlideContent
-                      slide={activeSlide}
-                      playVideoWhenVisible={false}
-                      imageClassName="product-details-modal__image product-details-modal__image--fill-hero"
-                      onVideoFailed={() => setPreviewVideoFailed(true)}
+                  <div className="product-details-modal__row-top">
+                    <ProductMediaGalleryReadonly
+                      imageUrls={imageUrls}
+                      previewVideoUrl={previewVideoUrl}
+                      isActive={isOpen}
+                      resetToken={product._id}
+                      onLightboxOpenChange={setGalleryLightboxOpen}
                     />
-                  )}
-                </div>
-                {mediaSlides.length > 1 ? (
-                  <div
-                    className="product-details-modal__thumbs"
-                    role="tablist"
-                    aria-label={PRODUCT_DETAILS_MODAL_UI.GALLERY_THUMBS_ARIA}
-                  >
-                    {mediaSlides.map((slide, index) => (
-                      <button
-                        key={`${slide.type}-${index}-${slide.url}`}
-                        type="button"
-                        role="tab"
-                        aria-selected={index === safeSlideIndex}
-                        className={
-                          index === safeSlideIndex
-                            ? "product-details-modal__thumb product-details-modal__thumb--active"
-                            : "product-details-modal__thumb"
-                        }
-                        onClick={() => setActiveSlideIndex(index)}
-                      >
-                        {slide.type === "video" ? (
-                          <span
-                            className="product-details-modal__thumb-video"
-                            aria-hidden="true"
+                    <div className="product-details-modal__spec">
+                      {topRowFieldKeys.includes("productPrice") ? (
+                        <div className="product-details-modal__price-block">
+                          <ProductPriceDisplay
+                            product={product}
+                            className="product-details-modal__price-display"
+                          />
+                          <div
+                            className={
+                              canShowAddToCart
+                                ? "product-details-modal__price-actions"
+                                : "product-details-modal__price-actions product-details-modal__price-actions--no-cart"
+                            }
                           >
-                            ▶
-                          </span>
-                        ) : (
-                          <img
-                            src={slide.url}
-                            alt=""
-                            loading="lazy"
-                            decoding="async"
-                          />
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                ) : null}
-              </div>
-              <div className="product-details-modal__spec">
-                {topRowFieldKeys.includes("productPrice") ? (
-                  <div className="product-details-modal__price-block">
-                    <ProductPriceDisplay
-                      product={product}
-                      className="product-details-modal__price-display"
-                    />
-                    <div
-                      className={
-                        canShowAddToCart
-                          ? "product-details-modal__price-actions"
-                          : "product-details-modal__price-actions product-details-modal__price-actions--no-cart"
-                      }
-                    >
-                      {canShowAddToCart ? (
-                        <div className="product-details-modal__price-actions-cart">
-                          <AddToCartButton
-                            productId={String(product._id)}
-                            isAuthorized={isAuthorized}
-                            onRequestLogin={onRequestLogin}
-                            maxQuantity={purchaseLimit}
-                          />
+                            {canShowAddToCart ? (
+                              <div className="product-details-modal__price-actions-cart">
+                                <AddToCartButton
+                                  productId={String(product._id)}
+                                  isAuthorized={isAuthorized}
+                                  onRequestLogin={onRequestLogin}
+                                  maxQuantity={purchaseLimit}
+                                />
+                              </div>
+                            ) : null}
+                            <button
+                              type="button"
+                              className={
+                                auctionUi.auctionActive
+                                  ? "product-details-modal__auction-btn"
+                                  : "product-details-modal__auction-btn product-details-modal__auction-btn--inactive"
+                              }
+                              disabled={!auctionUi.auctionActive}
+                              aria-disabled={!auctionUi.auctionActive}
+                              onClick={handleAuctionShortcutClick}
+                            >
+                              {PRODUCT_PRICE_OFFER_UI.AUCTION_SHORTCUT}
+                            </button>
+                            <button
+                              type="button"
+                              className={
+                                installmentUi.installmentActive
+                                  ? "product-details-modal__auction-btn"
+                                  : "product-details-modal__auction-btn product-details-modal__auction-btn--inactive"
+                              }
+                              disabled={!installmentUi.installmentActive}
+                              aria-disabled={!installmentUi.installmentActive}
+                              onClick={handleInstallmentShortcutClick}
+                            >
+                              {INSTALLMENT_UI.SHORTCUT}
+                            </button>
+                          </div>
                         </div>
                       ) : null}
-                      <button
-                        type="button"
-                        className={
-                          auctionUi.auctionActive
-                            ? "product-details-modal__auction-btn"
-                            : "product-details-modal__auction-btn product-details-modal__auction-btn--inactive"
-                        }
-                        disabled={!auctionUi.auctionActive}
-                        aria-disabled={!auctionUi.auctionActive}
-                        onClick={handleAuctionShortcutClick}
-                      >
-                        {PRODUCT_PRICE_OFFER_UI.AUCTION_SHORTCUT}
-                      </button>
-                      <button
-                        type="button"
-                        className={
-                          installmentUi.installmentActive
-                            ? "product-details-modal__auction-btn"
-                            : "product-details-modal__auction-btn product-details-modal__auction-btn--inactive"
-                        }
-                        disabled={!installmentUi.installmentActive}
-                        aria-disabled={!installmentUi.installmentActive}
-                        onClick={handleInstallmentShortcutClick}
-                      >
-                        {INSTALLMENT_UI.SHORTCUT}
-                      </button>
+                      {topStatFieldKeys.length > 0 ? (
+                        <dl className="product-details-modal__stats-grid">
+                          {renderFieldRows(product, topStatFieldKeys, fieldHandlers)}
+                        </dl>
+                      ) : null}
                     </div>
                   </div>
-                ) : null}
-                {topStatFieldKeys.length > 0 ? (
-                  <dl className="product-details-modal__stats-grid">
-                    {renderFieldRows(
-                      product,
-                      topStatFieldKeys,
-                      fieldHandlers,
-                    )}
-                  </dl>
-                ) : null}
-              </div>
-            </div>
 
-            <ProductDetailsSellerPreview
-              seller={product.productSeller}
-              onOpenProfile={handleOpenSellerProfile}
-            />
+                  <ProductDetailsSellerPreview
+                    seller={product.productSeller}
+                    onOpenProfile={handleOpenSellerProfile}
+                  />
 
-            {(bottomBlockFieldKeys.length > 0 ||
-              bottomMetaFieldKeys.length > 0 ||
-              (Array.isArray(product.productCharacteristics) &&
-                product.productCharacteristics.length > 0)) && (
-              <section
-                className="product-details-modal__details"
-                aria-label={PRODUCT_DETAILS_MODAL_UI.DETAILS_SECTION_ARIA}
-              >
-                {bottomBlockFieldKeys.length > 0 ? (
-                  <dl className="product-details-modal__blocks">
-                    {renderFieldRows(
-                      product,
-                      bottomBlockFieldKeys,
-                      fieldHandlers,
-                    )}
-                  </dl>
-                ) : null}
-                <ProductCharacteristicsDetails
-                  items={product.productCharacteristics}
-                />
-                {bottomMetaFieldKeys.length > 0 ? (
-                  <dl className="product-details-modal__meta-grid">
-                    {renderFieldRows(
-                      product,
-                      bottomMetaFieldKeys,
-                      fieldHandlers,
-                    )}
-                  </dl>
-                ) : null}
-              </section>
-            )}
+                  {(bottomBlockFieldKeys.length > 0 ||
+                    bottomMetaFieldKeys.length > 0 ||
+                    (Array.isArray(product.productCharacteristics) &&
+                      product.productCharacteristics.length > 0)) && (
+                    <section
+                      className="product-details-modal__details"
+                      aria-label={PRODUCT_DETAILS_MODAL_UI.DETAILS_SECTION_ARIA}
+                    >
+                      {bottomBlockFieldKeys.length > 0 ? (
+                        <dl className="product-details-modal__blocks">
+                          {renderFieldRows(
+                            product,
+                            bottomBlockFieldKeys,
+                            fieldHandlers,
+                          )}
+                        </dl>
+                      ) : null}
+                      <ProductCharacteristicsDetails
+                        items={product.productCharacteristics}
+                      />
+                      {bottomMetaFieldKeys.length > 0 ? (
+                        <dl className="product-details-modal__meta-grid">
+                          {renderFieldRows(product, bottomMetaFieldKeys, fieldHandlers)}
+                        </dl>
+                      ) : null}
+                    </section>
+                  )}
 
-            {isSellerView && auctionUi.showSellerArchive ? (
-              <ProductPriceOfferSellerArchive
-                productId={String(product._id)}
-                onOpenBuyer={handleOpenSellerProfile}
-              />
-            ) : null}
-
+                  {isSellerView && auctionUi.showSellerArchive ? (
+                    <ProductPriceOfferSellerArchive
+                      productId={String(product._id)}
+                      onOpenBuyer={handleOpenSellerProfile}
+                    />
+                  ) : null}
                 </>
               )}
             </div>
-          </div>
-          {secondaryFooter ? (
-            <footer className="product-details-modal__footer">
-              {secondaryFooter}
-            </footer>
-          ) : null}
-          {adminFooter ? (
-            <footer className="product-details-modal__footer">{adminFooter}</footer>
-          ) : null}
-        </div>
-      </div>
-      {lightboxOpen && imageUrls.length > 0 ? (
-        <ProductImageLightbox
-          imageUrls={imageUrls}
-          startIndex={lightboxStartIndex}
-          onClose={() => setLightboxOpen(false)}
-        />
-      ) : null}
-    </>,
-    document.body,
+      </ProductModalShell>
+    </>
   );
 }

@@ -5,5 +5,10 @@
  * @param {string} message - текст ошибки для клиента
  */
 export function errorRes(res, status, message) {
-  return res.status(status).json({ message });
+  /** @type {{ message: string; requestId?: string }} */
+  const payload = { message };
+  if (res.locals?.requestId) {
+    payload.requestId = res.locals.requestId;
+  }
+  return res.status(status).json(payload);
 }

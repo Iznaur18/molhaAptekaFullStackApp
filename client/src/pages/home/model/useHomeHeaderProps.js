@@ -5,6 +5,7 @@ import { useCallback, useMemo } from "react";
  */
 export const useHomeHeaderProps = ({
   mainView,
+  catalogMainView,
   isMineMode,
   activeCatalogBrowserCategory,
   selectedProductCategory,
@@ -73,7 +74,7 @@ export const useHomeHeaderProps = ({
       mainView,
       isMineMode,
       selectedProductCategory:
-        mainView === "catalog-browser"
+        catalogMainView === "catalog-browser"
           ? activeCatalogBrowserCategory
           : selectedProductCategory,
       isProductCategoryListOpen,
@@ -100,8 +101,7 @@ export const useHomeHeaderProps = ({
       unreadNotificationsCount: inAppNotificationsCount,
       onLoginClick: handleLoginClick,
       onRegisterClick: handleRegisterClick,
-      onNavigateToFullCatalogFromBreadcrumb:
-        handleNavigateToFullCatalogFromBreadcrumb,
+      onNavigateToFullCatalogFromBreadcrumb: handleNavigateToFullCatalogFromBreadcrumb,
       catalogSort,
       onCatalogSortChange: handleCatalogSortChange,
       catalogFollowingOnly,
@@ -121,6 +121,7 @@ export const useHomeHeaderProps = ({
     }),
     [
       mainView,
+      catalogMainView,
       isMineMode,
       activeCatalogBrowserCategory,
       selectedProductCategory,

@@ -13,9 +13,7 @@ export async function deleteRaffleByStaff(raffleId) {
     return data.data;
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      API_CLIENT_UI.DELETE_RAFFLE_FALLBACK;
+      e?.response?.data?.message ?? e?.message ?? API_CLIENT_UI.DELETE_RAFFLE_FALLBACK;
     throw new Error(message);
   }
 }

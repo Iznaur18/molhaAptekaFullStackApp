@@ -2,10 +2,7 @@ import { useCart } from "../../../entities/cart/model/useCart.js";
 import { getProductPurchaseLimit } from "../../../entities/product/lib/getProductPurchaseLimit.js";
 import { resolveProductImageUrls } from "../../../entities/product/lib/resolveProductImageUrls.js";
 import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../../../entities/product/model/productConstants.js";
-import {
-  CART_PAGE_UI,
-  COMMON_UI,
-} from "../../../shared/config/appUiCopy.js";
+import { CART_PAGE_UI, COMMON_UI } from "../../../shared/config/appUiCopy.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
 
@@ -72,9 +69,7 @@ export function CartLineItem({ line, onProductClick }) {
           <h3 className="cart-line__heading">{heading}</h3>
         )}
         {line.isMissing ? (
-          <p className="cart-line__missing">
-            {CART_PAGE_UI.PRODUCT_DELETED_OR_HIDDEN}
-          </p>
+          <p className="cart-line__missing">{CART_PAGE_UI.PRODUCT_DELETED_OR_HIDDEN}</p>
         ) : (
           <p className="cart-line__unit-price">{unitPriceText}</p>
         )}

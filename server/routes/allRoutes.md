@@ -21,5 +21,5 @@ GET /product — список товаров (пагинация: ?page=&limit=)
 GET /product/my — мои товары (JWT)
 POST /product — создать товар (JWT)
 Статика
-GET /uploads/* — раздача файлов из папки uploads
+GET /uploads/\* — раздача файлов из папки uploads
 (JWT = нужен заголовок Authorization: Bearer <token>.)

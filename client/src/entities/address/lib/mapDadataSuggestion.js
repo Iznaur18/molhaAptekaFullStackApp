@@ -9,8 +9,7 @@ export function mapDadataSuggestion(suggestion) {
 
   const lat = Number(data.geo_lat);
   const lon = Number(data.geo_lon);
-  const geo =
-    Number.isFinite(lat) && Number.isFinite(lon) ? { lat, lon } : null;
+  const geo = Number.isFinite(lat) && Number.isFinite(lon) ? { lat, lon } : null;
 
   return {
     line: suggestion.value?.trim() ?? "",

@@ -105,12 +105,7 @@ export function CreateRaffleModal({
       prizeVideoUrl: resolveUploadedImageUrl(form.prizeVideoUrl.trim()),
       prizeImageFocus: form.prizeImageFocus,
     }),
-    [
-      form.prizeImageFocus,
-      form.prizeImageUrl,
-      form.prizeMediaType,
-      form.prizeVideoUrl,
-    ],
+    [form.prizeImageFocus, form.prizeImageUrl, form.prizeMediaType, form.prizeVideoUrl],
   );
 
   const showPreview = useMemo(() => {
@@ -202,10 +197,7 @@ export function CreateRaffleModal({
   };
 
   return (
-    <div
-      className="create-raffle-modal__backdrop"
-      role="presentation"
-    >
+    <div className="create-raffle-modal__backdrop" role="presentation">
       <div
         className="create-raffle-modal"
         role="dialog"
@@ -231,9 +223,7 @@ export function CreateRaffleModal({
               value={form.title}
               required
               maxLength={120}
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, title: e.target.value }))
-              }
+              onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
             />
           </FormFieldLabel>
           <FormFieldLabel label={CREATE_RAFFLE_MODAL_UI.LABEL_DESCRIPTION}>
@@ -254,9 +244,7 @@ export function CreateRaffleModal({
                 name="prizeMediaType"
                 value={RAFFLE_PRIZE_MEDIA_TYPE_IMAGE}
                 checked={form.prizeMediaType === RAFFLE_PRIZE_MEDIA_TYPE_IMAGE}
-                onChange={() =>
-                  handleMediaTypeChange(RAFFLE_PRIZE_MEDIA_TYPE_IMAGE)
-                }
+                onChange={() => handleMediaTypeChange(RAFFLE_PRIZE_MEDIA_TYPE_IMAGE)}
                 disabled={isSubmitting}
               />
               {CREATE_RAFFLE_MODAL_UI.LABEL_PRIZE_MEDIA_TYPE_IMAGE}
@@ -267,9 +255,7 @@ export function CreateRaffleModal({
                 name="prizeMediaType"
                 value={RAFFLE_PRIZE_MEDIA_TYPE_VIDEO}
                 checked={form.prizeMediaType === RAFFLE_PRIZE_MEDIA_TYPE_VIDEO}
-                onChange={() =>
-                  handleMediaTypeChange(RAFFLE_PRIZE_MEDIA_TYPE_VIDEO)
-                }
+                onChange={() => handleMediaTypeChange(RAFFLE_PRIZE_MEDIA_TYPE_VIDEO)}
                 disabled={isSubmitting}
               />
               {CREATE_RAFFLE_MODAL_UI.LABEL_PRIZE_MEDIA_TYPE_VIDEO}
@@ -352,10 +338,7 @@ export function CreateRaffleModal({
               }
             />
           </FormFieldLabel>
-          <FormFieldLabel
-            label={CREATE_RAFFLE_MODAL_UI.LABEL_INSTAGRAM}
-            required
-          >
+          <FormFieldLabel label={CREATE_RAFFLE_MODAL_UI.LABEL_INSTAGRAM} required>
             <input
               type="url"
               value={form.instagramUrl}
@@ -366,9 +349,7 @@ export function CreateRaffleModal({
               }
             />
           </FormFieldLabel>
-          {hintText ? (
-            <p className="create-raffle-modal__hint">{hintText}</p>
-          ) : null}
+          {hintText ? <p className="create-raffle-modal__hint">{hintText}</p> : null}
           {status.kind === "error" ? (
             <p className="create-raffle-modal__error" role="alert">
               {status.message}

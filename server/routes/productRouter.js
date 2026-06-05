@@ -1,475 +1,577 @@
-import { Router } from 'express';
+import { Router } from "express";
 import {
-    postProductController,
-    getProductsController,
-    getMyProductsController,
-    getProductCategoryDisplaysController,
-    patchProductCategoryDisplayController,
-    getCatalogProductByIdController,
-    deleteMyProductController,
-    patchMyProductController,
-    recordProductViewController,
-    getPendingModerationProductsController,
-    getPendingModerationProductsCountController,
-    approveProductModerationController,
-    rejectProductModerationController,
-    submitProductReportController,
-    getMyProductReportStatusController,
-    getPendingProductReportsController,
-    getPendingProductReportsCountController,
-    resolveProductReportsForProductController,
-    submitProductPriceOfferController,
-    patchMyProductPriceOfferController,
-    cancelMyProductPriceOfferController,
-    getMyProductPriceOfferController,
-    getTopProductPriceOffersController,
-    getSellerProductPriceOffersController,
-    acceptProductPriceOfferController,
-    rejectProductPriceOfferController,
-    getSellerProductPriceOfferArchiveController,
-    listProductReviewsController,
-    getProductReviewSummaryController,
-    submitProductReviewController,
-    patchMyProductReviewController,
-    deleteMyProductReviewController,
-    getProductPromotionTariffsController,
-    requestProductPromotionController,
-    getMyProductPromotionsController,
-    getPendingProductPromotionsController,
-    getPendingProductPromotionsCountController,
-    approveProductPromotionController,
-    rejectProductPromotionController,
-    cancelProductPromotionByStaffController,
-    extendProductPromotionByStaffController,
-    getFeaturedRaffleController,
-    getRaffleByIdController,
-    getRaffleProductsController,
-    createRaffleController,
-    getMyRaffleController,
-    patchMyRaffleController,
-    patchRaffleByStaffController,
-    deleteMyRaffleController,
-    deleteRaffleByStaffController,
-    pauseMyRaffleController,
-    setProductRaffleParticipationController,
-    getPendingRafflesController,
-    getPendingRafflesCountController,
-    approveRaffleController,
-    rejectRaffleController,
-    getProductInstallmentProgramController,
-    upsertProductInstallmentProgramController,
-    getPendingInstallmentModerationController,
-    getPendingInstallmentModerationCountController,
-    approveInstallmentModerationController,
-    rejectInstallmentModerationController,
-    createInstallmentContractController,
-} from '../controllers/index.js';
+  postProductController,
+  getProductsController,
+  getMyProductsController,
+  getProductCategoryDisplaysController,
+  patchProductCategoryDisplayController,
+  getProductCategoryRootsController,
+  getProductCategoryChildrenController,
+  getProductCategoryBreadcrumbController,
+  listProductCategoriesAdminController,
+  createProductCategoryAdminController,
+  patchProductCategoryAdminController,
+  deleteProductCategoryAdminController,
+  listProductSearchSynonymsAdminController,
+  createProductSearchSynonymAdminController,
+  patchProductSearchSynonymAdminController,
+  deleteProductSearchSynonymAdminController,
+  getProductCatalogFeedTileDisplaysController,
+  patchProductCatalogFeedTileDisplayController,
+  getCatalogProductByIdController,
+  deleteMyProductController,
+  patchMyProductController,
+  recordProductViewController,
+  getPendingModerationProductsController,
+  getPendingModerationProductsCountController,
+  approveProductModerationController,
+  rejectProductModerationController,
+  submitProductReportController,
+  getMyProductReportStatusController,
+  getPendingProductReportsController,
+  getPendingProductReportsCountController,
+  resolveProductReportsForProductController,
+  submitProductPriceOfferController,
+  patchMyProductPriceOfferController,
+  cancelMyProductPriceOfferController,
+  getMyProductPriceOfferController,
+  getTopProductPriceOffersController,
+  getSellerProductPriceOffersController,
+  acceptProductPriceOfferController,
+  rejectProductPriceOfferController,
+  getSellerProductPriceOfferArchiveController,
+  listProductReviewsController,
+  getProductReviewSummaryController,
+  submitProductReviewController,
+  patchMyProductReviewController,
+  deleteMyProductReviewController,
+  getProductPromotionTariffsController,
+  requestProductPromotionController,
+  getMyProductPromotionsController,
+  getPendingProductPromotionsController,
+  getPendingProductPromotionsCountController,
+  approveProductPromotionController,
+  rejectProductPromotionController,
+  cancelProductPromotionByStaffController,
+  extendProductPromotionByStaffController,
+  getFeaturedRaffleController,
+  getRaffleByIdController,
+  getRaffleProductsController,
+  createRaffleController,
+  getMyRaffleController,
+  patchMyRaffleController,
+  patchRaffleByStaffController,
+  deleteMyRaffleController,
+  deleteRaffleByStaffController,
+  pauseMyRaffleController,
+  setProductRaffleParticipationController,
+  getPendingRafflesController,
+  getPendingRafflesCountController,
+  approveRaffleController,
+  rejectRaffleController,
+  getProductInstallmentProgramController,
+  upsertProductInstallmentProgramController,
+  getPendingInstallmentModerationController,
+  getPendingInstallmentModerationCountController,
+  approveInstallmentModerationController,
+  rejectInstallmentModerationController,
+  createInstallmentContractController,
+} from "../controllers/index.js";
 import {
-    checkAuthMW,
-    checkOptionalAuthMW,
-    checkAdminMW,
-    checkProductModeratorMW,
-    productReportRateLimiter,
-    productPriceOfferRateLimiter,
-    productReviewRateLimiter,
-} from '../middlewares/index.js';
+  checkAuthMW,
+  checkOptionalAuthMW,
+  checkAdminMW,
+  checkProductModeratorMW,
+  productReportRateLimiter,
+  productPriceOfferRateLimiter,
+  productReviewRateLimiter,
+} from "../middlewares/index.js";
 import {
-    makeProductValidation,
-    productIdParamValidation,
-    productsSearchValidation,
-    patchMyProductValidation,
-    rejectProductModerationValidation,
-    submitProductReportValidation,
-    resolveProductReportsValidation,
-    submitProductPriceOfferValidation,
-    patchProductPriceOfferValidation,
-    productPriceOfferIdParamValidation,
-    submitProductReviewValidation,
-    patchProductReviewValidation,
-    productReviewsListValidation,
-    requestProductPromotionValidation,
-    promotionIdParamValidation,
-    myProductPromotionsValidation,
-    createRaffleValidation,
-    patchRaffleValidation,
-    raffleIdParamValidation,
-    rejectRaffleValidation,
-    raffleProductsValidation,
-    setProductRaffleParticipationValidation,
-    productCategorySlugParamValidation,
-    patchProductCategoryDisplayValidation,
-    upsertProductInstallmentProgramValidation,
-    rejectInstallmentModerationValidation,
-    createInstallmentContractValidation,
-} from '../validations/index.js';
+  makeProductValidationZod,
+  productIdParamValidation,
+  productsSearchValidationZod,
+  patchMyProductValidationZod,
+  rejectProductModerationValidation,
+  submitProductReportValidation,
+  resolveProductReportsValidation,
+  submitProductPriceOfferValidation,
+  patchProductPriceOfferValidation,
+  productPriceOfferIdParamValidation,
+  submitProductReviewValidation,
+  patchProductReviewValidation,
+  productReviewsListValidation,
+  requestProductPromotionValidation,
+  promotionIdParamValidation,
+  myProductPromotionsValidation,
+  createRaffleValidation,
+  patchRaffleValidation,
+  raffleIdParamValidation,
+  rejectRaffleValidation,
+  raffleProductsValidation,
+  setProductRaffleParticipationValidation,
+  productCategorySlugParamValidation,
+  productCategoryIdParamValidation,
+  createProductCategoryAdminValidation,
+  patchProductCategoryAdminValidation,
+  productSearchSynonymIdParamValidation,
+  createProductSearchSynonymValidation,
+  patchProductSearchSynonymValidation,
+  patchProductCategoryDisplayValidation,
+  catalogFeedTileKeyParamValidation,
+  patchProductCatalogFeedTileDisplayValidation,
+  upsertProductInstallmentProgramValidation,
+  rejectInstallmentModerationValidation,
+  createInstallmentContractValidation,
+} from "../validations/index.js";
 
 const router = Router();
 
-router.post('/', checkAuthMW, makeProductValidation, postProductController);
-router.get('/', productsSearchValidation, checkOptionalAuthMW, getProductsController);
-router.get('/category-displays', getProductCategoryDisplaysController);
-router.patch(
-    '/category-displays/:categorySlug',
-    checkAuthMW,
-    checkAdminMW,
-    productCategorySlugParamValidation,
-    patchProductCategoryDisplayValidation,
-    patchProductCategoryDisplayController,
-);
-router.get('/my', checkAuthMW, productsSearchValidation, getMyProductsController);
-router.get('/raffles/featured', getFeaturedRaffleController);
-router.get('/raffles/my', checkAuthMW, getMyRaffleController);
+router.post("/", checkAuthMW, makeProductValidationZod, postProductController);
 router.get(
-    '/raffles/pending/count',
-    checkAuthMW,
-    checkProductModeratorMW,
-    getPendingRafflesCountController,
+  "/",
+  productsSearchValidationZod,
+  checkOptionalAuthMW,
+  getProductsController,
+);
+router.get("/category-displays", getProductCategoryDisplaysController);
+router.get("/categories/roots", getProductCategoryRootsController);
+router.get(
+  "/categories/:categoryId/children",
+  productCategoryIdParamValidation,
+  getProductCategoryChildrenController,
 );
 router.get(
-    '/raffles/pending',
-    checkAuthMW,
-    checkProductModeratorMW,
-    getPendingRafflesController,
-);
-router.post('/raffles', checkAuthMW, createRaffleValidation, createRaffleController);
-router.get(
-    '/raffles/:raffleId/products',
-    raffleProductsValidation,
-    getRaffleProductsController,
-);
-router.get('/raffles/:raffleId', raffleIdParamValidation, getRaffleByIdController);
-router.delete(
-    '/raffles/my/:raffleId',
-    checkAuthMW,
-    raffleIdParamValidation,
-    deleteMyRaffleController,
-);
-router.patch(
-    '/raffles/:raffleId',
-    checkAuthMW,
-    patchRaffleValidation,
-    patchMyRaffleController,
-);
-router.patch(
-    '/raffles/:raffleId/staff',
-    checkAuthMW,
-    checkProductModeratorMW,
-    patchRaffleValidation,
-    patchRaffleByStaffController,
-);
-router.delete(
-    '/raffles/:raffleId',
-    checkAuthMW,
-    checkProductModeratorMW,
-    raffleIdParamValidation,
-    deleteRaffleByStaffController,
-);
-router.patch(
-    '/raffles/:raffleId/pause',
-    checkAuthMW,
-    raffleIdParamValidation,
-    pauseMyRaffleController,
-);
-router.patch(
-    '/raffles/:raffleId/approve',
-    checkAuthMW,
-    checkProductModeratorMW,
-    raffleIdParamValidation,
-    approveRaffleController,
-);
-router.patch(
-    '/raffles/:raffleId/reject',
-    checkAuthMW,
-    checkProductModeratorMW,
-    rejectRaffleValidation,
-    rejectRaffleController,
-);
-router.patch(
-    '/:productId/raffle-participation',
-    checkAuthMW,
-    setProductRaffleParticipationValidation,
-    setProductRaffleParticipationController,
-);
-router.get('/promotions/tariffs', getProductPromotionTariffsController);
-router.get(
-    '/promotions/my',
-    checkAuthMW,
-    myProductPromotionsValidation,
-    getMyProductPromotionsController,
+  "/categories/:categoryId/breadcrumb",
+  productCategoryIdParamValidation,
+  getProductCategoryBreadcrumbController,
 );
 router.get(
-    '/promotions/pending/count',
-    checkAuthMW,
-    checkProductModeratorMW,
-    getPendingProductPromotionsCountController,
-);
-router.get(
-    '/promotions/pending',
-    checkAuthMW,
-    checkProductModeratorMW,
-    getPendingProductPromotionsController,
-);
-router.patch(
-    '/promotions/:promotionId/approve',
-    checkAuthMW,
-    checkProductModeratorMW,
-    promotionIdParamValidation,
-    approveProductPromotionController,
-);
-router.patch(
-    '/promotions/:promotionId/reject',
-    checkAuthMW,
-    checkProductModeratorMW,
-    promotionIdParamValidation,
-    rejectProductPromotionController,
-);
-router.patch(
-    '/promotions/:promotionId/cancel',
-    checkAuthMW,
-    checkProductModeratorMW,
-    promotionIdParamValidation,
-    cancelProductPromotionByStaffController,
-);
-router.patch(
-    '/promotions/:promotionId/extend',
-    checkAuthMW,
-    checkProductModeratorMW,
-    promotionIdParamValidation,
-    extendProductPromotionByStaffController,
+  "/admin/search-synonyms",
+  checkAuthMW,
+  checkAdminMW,
+  listProductSearchSynonymsAdminController,
 );
 router.post(
-    '/:productId/promotions/request',
-    checkAuthMW,
-    productIdParamValidation,
-    requestProductPromotionValidation,
-    requestProductPromotionController,
-);
-router.get(
-    '/moderation/pending/count',
-    checkAuthMW,
-    checkProductModeratorMW,
-    getPendingModerationProductsCountController,
-);
-router.get(
-    '/moderation/pending',
-    checkAuthMW,
-    checkProductModeratorMW,
-    productsSearchValidation,
-    getPendingModerationProductsController,
-);
-router.get(
-    '/reports/pending/count',
-    checkAuthMW,
-    checkProductModeratorMW,
-    getPendingProductReportsCountController,
-);
-router.get(
-    '/reports/pending',
-    checkAuthMW,
-    checkProductModeratorMW,
-    getPendingProductReportsController,
+  "/admin/search-synonyms",
+  checkAuthMW,
+  checkAdminMW,
+  createProductSearchSynonymValidation,
+  createProductSearchSynonymAdminController,
 );
 router.patch(
-    '/reports/product/:productId/resolve',
-    checkAuthMW,
-    checkProductModeratorMW,
-    productIdParamValidation,
-    resolveProductReportsValidation,
-    resolveProductReportsForProductController,
+  "/admin/search-synonyms/:synonymId",
+  checkAuthMW,
+  checkAdminMW,
+  productSearchSynonymIdParamValidation,
+  patchProductSearchSynonymValidation,
+  patchProductSearchSynonymAdminController,
+);
+router.delete(
+  "/admin/search-synonyms/:synonymId",
+  checkAuthMW,
+  checkAdminMW,
+  productSearchSynonymIdParamValidation,
+  deleteProductSearchSynonymAdminController,
 );
 router.get(
-    '/installment/moderation/pending/count',
-    checkAuthMW,
-    checkProductModeratorMW,
-    getPendingInstallmentModerationCountController,
+  "/admin/categories",
+  checkAuthMW,
+  checkAdminMW,
+  listProductCategoriesAdminController,
+);
+router.post(
+  "/admin/categories",
+  checkAuthMW,
+  checkAdminMW,
+  createProductCategoryAdminValidation,
+  createProductCategoryAdminController,
+);
+router.patch(
+  "/admin/categories/:categoryId",
+  checkAuthMW,
+  checkAdminMW,
+  productCategoryIdParamValidation,
+  patchProductCategoryAdminValidation,
+  patchProductCategoryAdminController,
+);
+router.delete(
+  "/admin/categories/:categoryId",
+  checkAuthMW,
+  checkAdminMW,
+  productCategoryIdParamValidation,
+  deleteProductCategoryAdminController,
+);
+router.patch(
+  "/category-displays/:categorySlug",
+  checkAuthMW,
+  checkAdminMW,
+  productCategorySlugParamValidation,
+  patchProductCategoryDisplayValidation,
+  patchProductCategoryDisplayController,
+);
+router.get("/catalog-feed-displays", getProductCatalogFeedTileDisplaysController);
+router.patch(
+  "/catalog-feed-displays/:tileKey",
+  checkAuthMW,
+  checkAdminMW,
+  catalogFeedTileKeyParamValidation,
+  patchProductCatalogFeedTileDisplayValidation,
+  patchProductCatalogFeedTileDisplayController,
+);
+router.get("/my", checkAuthMW, productsSearchValidationZod, getMyProductsController);
+router.get("/raffles/featured", getFeaturedRaffleController);
+router.get("/raffles/my", checkAuthMW, getMyRaffleController);
+router.get(
+  "/raffles/pending/count",
+  checkAuthMW,
+  checkProductModeratorMW,
+  getPendingRafflesCountController,
 );
 router.get(
-    '/installment/moderation/pending',
-    checkAuthMW,
-    checkProductModeratorMW,
-    getPendingInstallmentModerationController,
+  "/raffles/pending",
+  checkAuthMW,
+  checkProductModeratorMW,
+  getPendingRafflesController,
+);
+router.post("/raffles", checkAuthMW, createRaffleValidation, createRaffleController);
+router.get(
+  "/raffles/:raffleId/products",
+  raffleProductsValidation,
+  getRaffleProductsController,
+);
+router.get("/raffles/:raffleId", raffleIdParamValidation, getRaffleByIdController);
+router.delete(
+  "/raffles/my/:raffleId",
+  checkAuthMW,
+  raffleIdParamValidation,
+  deleteMyRaffleController,
+);
+router.patch(
+  "/raffles/:raffleId",
+  checkAuthMW,
+  patchRaffleValidation,
+  patchMyRaffleController,
+);
+router.patch(
+  "/raffles/:raffleId/staff",
+  checkAuthMW,
+  checkProductModeratorMW,
+  patchRaffleValidation,
+  patchRaffleByStaffController,
+);
+router.delete(
+  "/raffles/:raffleId",
+  checkAuthMW,
+  checkProductModeratorMW,
+  raffleIdParamValidation,
+  deleteRaffleByStaffController,
+);
+router.patch(
+  "/raffles/:raffleId/pause",
+  checkAuthMW,
+  raffleIdParamValidation,
+  pauseMyRaffleController,
+);
+router.patch(
+  "/raffles/:raffleId/approve",
+  checkAuthMW,
+  checkProductModeratorMW,
+  raffleIdParamValidation,
+  approveRaffleController,
+);
+router.patch(
+  "/raffles/:raffleId/reject",
+  checkAuthMW,
+  checkProductModeratorMW,
+  rejectRaffleValidation,
+  rejectRaffleController,
+);
+router.patch(
+  "/:productId/raffle-participation",
+  checkAuthMW,
+  setProductRaffleParticipationValidation,
+  setProductRaffleParticipationController,
+);
+router.get("/promotions/tariffs", getProductPromotionTariffsController);
+router.get(
+  "/promotions/my",
+  checkAuthMW,
+  myProductPromotionsValidation,
+  getMyProductPromotionsController,
 );
 router.get(
-    '/:productId/installment-program',
-    checkOptionalAuthMW,
-    productIdParamValidation,
-    getProductInstallmentProgramController,
+  "/promotions/pending/count",
+  checkAuthMW,
+  checkProductModeratorMW,
+  getPendingProductPromotionsCountController,
+);
+router.get(
+  "/promotions/pending",
+  checkAuthMW,
+  checkProductModeratorMW,
+  getPendingProductPromotionsController,
+);
+router.patch(
+  "/promotions/:promotionId/approve",
+  checkAuthMW,
+  checkProductModeratorMW,
+  promotionIdParamValidation,
+  approveProductPromotionController,
+);
+router.patch(
+  "/promotions/:promotionId/reject",
+  checkAuthMW,
+  checkProductModeratorMW,
+  promotionIdParamValidation,
+  rejectProductPromotionController,
+);
+router.patch(
+  "/promotions/:promotionId/cancel",
+  checkAuthMW,
+  checkProductModeratorMW,
+  promotionIdParamValidation,
+  cancelProductPromotionByStaffController,
+);
+router.patch(
+  "/promotions/:promotionId/extend",
+  checkAuthMW,
+  checkProductModeratorMW,
+  promotionIdParamValidation,
+  extendProductPromotionByStaffController,
+);
+router.post(
+  "/:productId/promotions/request",
+  checkAuthMW,
+  productIdParamValidation,
+  requestProductPromotionValidation,
+  requestProductPromotionController,
+);
+router.get(
+  "/moderation/pending/count",
+  checkAuthMW,
+  checkProductModeratorMW,
+  getPendingModerationProductsCountController,
+);
+router.get(
+  "/moderation/pending",
+  checkAuthMW,
+  checkProductModeratorMW,
+  productsSearchValidationZod,
+  getPendingModerationProductsController,
+);
+router.get(
+  "/reports/pending/count",
+  checkAuthMW,
+  checkProductModeratorMW,
+  getPendingProductReportsCountController,
+);
+router.get(
+  "/reports/pending",
+  checkAuthMW,
+  checkProductModeratorMW,
+  getPendingProductReportsController,
+);
+router.patch(
+  "/reports/product/:productId/resolve",
+  checkAuthMW,
+  checkProductModeratorMW,
+  productIdParamValidation,
+  resolveProductReportsValidation,
+  resolveProductReportsForProductController,
+);
+router.get(
+  "/installment/moderation/pending/count",
+  checkAuthMW,
+  checkProductModeratorMW,
+  getPendingInstallmentModerationCountController,
+);
+router.get(
+  "/installment/moderation/pending",
+  checkAuthMW,
+  checkProductModeratorMW,
+  getPendingInstallmentModerationController,
+);
+router.get(
+  "/:productId/installment-program",
+  checkOptionalAuthMW,
+  productIdParamValidation,
+  getProductInstallmentProgramController,
 );
 router.put(
-    '/:productId/installment-program',
-    checkAuthMW,
-    productIdParamValidation,
-    upsertProductInstallmentProgramValidation,
-    upsertProductInstallmentProgramController,
+  "/:productId/installment-program",
+  checkAuthMW,
+  productIdParamValidation,
+  upsertProductInstallmentProgramValidation,
+  upsertProductInstallmentProgramController,
 );
 router.post(
-    '/:productId/installment-contracts',
-    checkAuthMW,
-    productIdParamValidation,
-    createInstallmentContractValidation,
-    createInstallmentContractController,
+  "/:productId/installment-contracts",
+  checkAuthMW,
+  productIdParamValidation,
+  createInstallmentContractValidation,
+  createInstallmentContractController,
 );
 router.patch(
-    '/:productId/installment/moderation/approve',
-    checkAuthMW,
-    checkProductModeratorMW,
-    productIdParamValidation,
-    approveInstallmentModerationController,
+  "/:productId/installment/moderation/approve",
+  checkAuthMW,
+  checkProductModeratorMW,
+  productIdParamValidation,
+  approveInstallmentModerationController,
 );
 router.patch(
-    '/:productId/installment/moderation/reject',
-    checkAuthMW,
-    checkProductModeratorMW,
-    productIdParamValidation,
-    rejectInstallmentModerationValidation,
-    rejectInstallmentModerationController,
+  "/:productId/installment/moderation/reject",
+  checkAuthMW,
+  checkProductModeratorMW,
+  productIdParamValidation,
+  rejectInstallmentModerationValidation,
+  rejectInstallmentModerationController,
 );
 router.get(
-    '/:productId/price-offers/top',
-    productIdParamValidation,
-    getTopProductPriceOffersController,
+  "/:productId/price-offers/top",
+  productIdParamValidation,
+  getTopProductPriceOffersController,
 );
 router.get(
-    '/:productId/price-offers/me',
-    checkAuthMW,
-    productIdParamValidation,
-    getMyProductPriceOfferController,
+  "/:productId/price-offers/me",
+  checkAuthMW,
+  productIdParamValidation,
+  getMyProductPriceOfferController,
 );
 router.get(
-    '/:productId/price-offers/archive',
-    checkAuthMW,
-    productIdParamValidation,
-    getSellerProductPriceOfferArchiveController,
+  "/:productId/price-offers/archive",
+  checkAuthMW,
+  productIdParamValidation,
+  getSellerProductPriceOfferArchiveController,
 );
 router.get(
-    '/:productId/price-offers',
-    checkAuthMW,
-    productIdParamValidation,
-    getSellerProductPriceOffersController,
+  "/:productId/price-offers",
+  checkAuthMW,
+  productIdParamValidation,
+  getSellerProductPriceOffersController,
 );
 router.post(
-    '/:productId/price-offers',
-    checkAuthMW,
-    productPriceOfferRateLimiter,
-    productIdParamValidation,
-    submitProductPriceOfferValidation,
-    submitProductPriceOfferController,
+  "/:productId/price-offers",
+  checkAuthMW,
+  productPriceOfferRateLimiter,
+  productIdParamValidation,
+  submitProductPriceOfferValidation,
+  submitProductPriceOfferController,
 );
 router.patch(
-    '/:productId/price-offers/me',
-    checkAuthMW,
-    productPriceOfferRateLimiter,
-    productIdParamValidation,
-    patchProductPriceOfferValidation,
-    patchMyProductPriceOfferController,
+  "/:productId/price-offers/me",
+  checkAuthMW,
+  productPriceOfferRateLimiter,
+  productIdParamValidation,
+  patchProductPriceOfferValidation,
+  patchMyProductPriceOfferController,
 );
 router.delete(
-    '/:productId/price-offers/me',
-    checkAuthMW,
-    productIdParamValidation,
-    cancelMyProductPriceOfferController,
+  "/:productId/price-offers/me",
+  checkAuthMW,
+  productIdParamValidation,
+  cancelMyProductPriceOfferController,
 );
 router.patch(
-    '/:productId/price-offers/:offerId/accept',
-    checkAuthMW,
-    productIdParamValidation,
-    productPriceOfferIdParamValidation,
-    acceptProductPriceOfferController,
+  "/:productId/price-offers/:offerId/accept",
+  checkAuthMW,
+  productIdParamValidation,
+  productPriceOfferIdParamValidation,
+  acceptProductPriceOfferController,
 );
 router.patch(
-    '/:productId/price-offers/:offerId/reject',
-    checkAuthMW,
-    productIdParamValidation,
-    productPriceOfferIdParamValidation,
-    rejectProductPriceOfferController,
+  "/:productId/price-offers/:offerId/reject",
+  checkAuthMW,
+  productIdParamValidation,
+  productPriceOfferIdParamValidation,
+  rejectProductPriceOfferController,
 );
 router.get(
-    '/:productId/catalog',
-    productIdParamValidation,
-    checkOptionalAuthMW,
-    getCatalogProductByIdController,
+  "/:productId/catalog",
+  productIdParamValidation,
+  checkOptionalAuthMW,
+  getCatalogProductByIdController,
 );
 router.get(
-    '/:productId/reviews/summary',
-    productIdParamValidation,
-    checkOptionalAuthMW,
-    getProductReviewSummaryController,
+  "/:productId/reviews/summary",
+  productIdParamValidation,
+  checkOptionalAuthMW,
+  getProductReviewSummaryController,
 );
 router.get(
-    '/:productId/reviews',
-    productIdParamValidation,
-    productReviewsListValidation,
-    listProductReviewsController,
+  "/:productId/reviews",
+  productIdParamValidation,
+  productReviewsListValidation,
+  listProductReviewsController,
 );
 router.post(
-    '/:productId/reviews',
-    checkAuthMW,
-    productReviewRateLimiter,
-    productIdParamValidation,
-    submitProductReviewValidation,
-    submitProductReviewController,
+  "/:productId/reviews",
+  checkAuthMW,
+  productReviewRateLimiter,
+  productIdParamValidation,
+  submitProductReviewValidation,
+  submitProductReviewController,
 );
 router.patch(
-    '/:productId/reviews/me',
-    checkAuthMW,
-    productReviewRateLimiter,
-    productIdParamValidation,
-    patchProductReviewValidation,
-    patchMyProductReviewController,
+  "/:productId/reviews/me",
+  checkAuthMW,
+  productReviewRateLimiter,
+  productIdParamValidation,
+  patchProductReviewValidation,
+  patchMyProductReviewController,
 );
 router.delete(
-    '/:productId/reviews/me',
-    checkAuthMW,
-    productIdParamValidation,
-    deleteMyProductReviewController,
+  "/:productId/reviews/me",
+  checkAuthMW,
+  productIdParamValidation,
+  deleteMyProductReviewController,
 );
 router.get(
-    '/:productId/report/me',
-    checkAuthMW,
-    productIdParamValidation,
-    getMyProductReportStatusController,
+  "/:productId/report/me",
+  checkAuthMW,
+  productIdParamValidation,
+  getMyProductReportStatusController,
 );
 router.post(
-    '/:productId/report',
-    checkAuthMW,
-    productReportRateLimiter,
-    productIdParamValidation,
-    submitProductReportValidation,
-    submitProductReportController,
+  "/:productId/report",
+  checkAuthMW,
+  productReportRateLimiter,
+  productIdParamValidation,
+  submitProductReportValidation,
+  submitProductReportController,
 );
 router.post(
-    '/:productId/view',
-    checkAuthMW,
-    productIdParamValidation,
-    recordProductViewController,
+  "/:productId/view",
+  checkAuthMW,
+  productIdParamValidation,
+  recordProductViewController,
 );
 router.patch(
-    '/:productId/moderation/approve',
-    checkAuthMW,
-    checkProductModeratorMW,
-    productIdParamValidation,
-    approveProductModerationController,
+  "/:productId/moderation/approve",
+  checkAuthMW,
+  checkProductModeratorMW,
+  productIdParamValidation,
+  approveProductModerationController,
 );
 router.patch(
-    '/:productId/moderation/reject',
-    checkAuthMW,
-    checkProductModeratorMW,
-    productIdParamValidation,
-    rejectProductModerationValidation,
-    rejectProductModerationController,
+  "/:productId/moderation/reject",
+  checkAuthMW,
+  checkProductModeratorMW,
+  productIdParamValidation,
+  rejectProductModerationValidation,
+  rejectProductModerationController,
 );
 router.patch(
-    '/:productId',
-    checkAuthMW,
-    productIdParamValidation,
-    patchMyProductValidation,
-    patchMyProductController,
+  "/:productId",
+  checkAuthMW,
+  productIdParamValidation,
+  patchMyProductValidationZod,
+  patchMyProductController,
 );
 router.delete(
-    '/:productId',
-    checkAuthMW,
-    productIdParamValidation,
-    deleteMyProductController,
+  "/:productId",
+  checkAuthMW,
+  productIdParamValidation,
+  deleteMyProductController,
 );
 
 export { router as productRouter };

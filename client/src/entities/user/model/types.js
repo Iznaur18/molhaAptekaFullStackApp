@@ -49,44 +49,9 @@
  */
 
 /**
- * Публичное представление пользователя (как документ User без `passwordHash`).
- * Совпадает с полями из `USER_DATA` в `server/constants/constants.js`.
+ * Публичное представление пользователя — `userPublicProfileSchema` (Zod) + passthrough.
  *
- * @typedef {object} UserPublicProfile
- * @property {string} _id
- * @property {string} [userName]
- * @property {string} [email]
- * @property {boolean} [isEmailVerified]
- * @property {string|null} [userBirthDate]
- * @property {'male'|'female'|'noSelected'} [userGender]
- * @property {string} [userAddress]
- * @property {string} [userAddressFlat]
- * @property {string} [userAddressFiasId]
- * @property {{ lat?: number; lon?: number } | null} [userAddressGeo]
- * @property {string} [userPhoneNumber]
- * @property {string|null} [userLastLoginAt]
- * @property {string} [userAvatarUrl]
- * @property {{ x?: number; y?: number }} [userAvatarFocus]
- * @property {string} [userBackgroundUrl]
- * @property {{ x?: number; y?: number }} [userBackgroundFocus]
- * @property {boolean} [isActiveUser]
- * @property {boolean} [isUserDataConfirmed]
- * @property {boolean} [isBlockedUser]
- * @property {'user'|'admin'|'moderator'} [userRole]
- * @property {number} [userDiscountPercent]
- * @property {boolean} [notificationsEnabled]
- * @property {boolean} [isPremiumUser]
- * @property {string | null} [premiumExpiresAt]
- * @property {string} [notesAboutUser]
- * @property {number} [userLoyaltyPoints]
- * @property {number} [userLoyaltyPointsReserved] — только GET /auth/me
- * @property {string[]} [buyList]
- * @property {UserRatingByVotes} [userRatingByVotes]
- * @property {number} [followersCount]
- * @property {number} [followingCount]
- * @property {boolean} [isFollowing]
- * @property {string} [createdAt]
- * @property {string} [updatedAt]
+ * @typedef {import('@molha/api-contract/types').UserPublicProfileContract} UserPublicProfile
  */
 
 export {};

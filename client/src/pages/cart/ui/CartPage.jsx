@@ -7,10 +7,7 @@ import { fetchAllProducts } from "../../../entities/product/api/fetchAllProducts
 import { isCurrentUserProductSeller } from "../../../entities/product/lib/isCurrentUserProductSeller.js";
 import { ProductDetailsModal } from "../../../entities/product/ui/ProductDetailsModal.jsx";
 import { fetchCurrentUserProfile } from "../../../entities/user/api/fetchCurrentUserProfile.js";
-import {
-  CART_PAGE_UI,
-  CHECKOUT_FORM_UI,
-} from "../../../shared/config/appUiCopy.js";
+import { CART_PAGE_UI, CHECKOUT_FORM_UI } from "../../../shared/config/appUiCopy.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 
 import { CartLineItem } from "./CartLineItem.jsx";
@@ -27,9 +24,7 @@ const useCatalogProducts = () => {
 
   const patchProductStats = useCallback((productId, patch) => {
     setProducts((prev) =>
-      prev.map((p) =>
-        String(p._id) === productId ? { ...p, ...patch } : p,
-      ),
+      prev.map((p) => (String(p._id) === productId ? { ...p, ...patch } : p)),
     );
   }, []);
 
@@ -121,12 +116,15 @@ export function CartPage({
   });
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  const handleProductStatsUpdate = useCallback((productId, stats) => {
-    patchProductStats(productId, stats);
-    setSelectedProduct((prev) =>
-      prev && String(prev._id) === productId ? { ...prev, ...stats } : prev,
-    );
-  }, [patchProductStats]);
+  const handleProductStatsUpdate = useCallback(
+    (productId, stats) => {
+      patchProductStats(productId, stats);
+      setSelectedProduct((prev) =>
+        prev && String(prev._id) === productId ? { ...prev, ...stats } : prev,
+      );
+    },
+    [patchProductStats],
+  );
 
   const { lines, total } = useMemo(
     () => selectCartLines(items, products),
@@ -217,15 +215,9 @@ export function CartPage({
       </ul>
 
       <div className="cart-page__summary">
-        <span className="cart-page__total-label">
-          {CART_PAGE_UI.TOTAL_LABEL}
-        </span>
+        <span className="cart-page__total-label">{CART_PAGE_UI.TOTAL_LABEL}</span>
         <span className="cart-page__total-value">{formatPriceRub(total)}</span>
-        <button
-          type="button"
-          className="cart-page__clear-button"
-          onClick={clearCart}
-        >
+        <button type="button" className="cart-page__clear-button" onClick={clearCart}>
           {CART_PAGE_UI.CLEAR_ALL}
         </button>
       </div>

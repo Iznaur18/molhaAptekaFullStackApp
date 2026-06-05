@@ -1,0 +1,81 @@
+﻿.product-card {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  height: 100%;
+  padding: 0.55rem 0.75rem 0.65rem;
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  border-radius: var(--product-card-radius);
+  overflow: hidden;
+  text-align: left;
+  background: #fff;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.product-card:hover {
+  border-color: color-mix(in srgb, currentColor 24%, transparent);
+  box-shadow: 0 4px 14px color-mix(in srgb, CanvasText 6%, transparent);
+}
+
+.product-card-promotion-frame,
+.product-card-premium-frame {
+  box-sizing: border-box;
+  height: 100%;
+}
+
+.product-card-promotion-frame > .product-card {
+  --product-card-promotion-accent: #d97706;
+  --product-card-promotion-accent-soft: #fbbf24;
+
+  border: 2px solid
+    color-mix(in srgb, var(--product-card-promotion-accent) 68%, transparent);
+  background: linear-gradient(
+    165deg,
+    color-mix(in srgb, #fffbeb 90%, var(--product-card-promotion-accent-soft)),
+    color-mix(in srgb, Canvas 86%, #fffbeb)
+  );
+  box-shadow:
+    0 0 0 1px
+      color-mix(in srgb, var(--product-card-promotion-accent-soft) 32%, transparent),
+    0 2px 12px color-mix(in srgb, var(--product-card-promotion-accent) 14%, transparent);
+}
+
+.product-card-promotion-frame > .product-card:hover {
+  border-color: var(--product-card-promotion-accent);
+  box-shadow:
+    0 0 0 1px
+      color-mix(in srgb, var(--product-card-promotion-accent-soft) 48%, transparent),
+    0 8px 22px color-mix(in srgb, var(--product-card-promotion-accent) 24%, transparent);
+}
+
+.product-card-premium-frame > .product-card {
+  border: 2px solid #d4af37;
+  background: Canvas;
+  box-shadow: none;
+}
+
+.product-card-premium-frame > .product-card:hover {
+  border-color: #d4af37;
+  box-shadow: 0 4px 14px color-mix(in srgb, CanvasText 6%, transparent);
+}
+
+.product-card-promotion-frame.product-card-premium-frame > .product-card {
+  border-color: var(--product-card-promotion-accent);
+  background: linear-gradient(
+    165deg,
+    color-mix(in srgb, #ffefaf 88%, var(--product-card-promotion-accent-soft)),
+    color-mix(in srgb, Canvas 84%, #fff1ba)
+  );
+}
+
+.product-card--raffle-participant {
+  border-color: color-mix(in srgb, #edc93a 45%, transparent);
+  background: linear-gradient(
+    165deg,
+    color-mix(in srgb, #f5f3ff 88%, Canvas),
+    color-mix(in srgb, Canvas 90%, #faf5ff)
+  );
+}

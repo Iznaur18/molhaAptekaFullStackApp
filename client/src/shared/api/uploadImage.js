@@ -15,11 +15,9 @@ export async function uploadImage(file) {
     const formData = new FormData();
     formData.append("image", file);
 
-    const { data } = await axios.post(
-      `${API_BASE_URL || ""}/upload`,
-      formData,
-      { withCredentials: true },
-    );
+    const { data } = await axios.post(`${API_BASE_URL || ""}/upload`, formData, {
+      withCredentials: true,
+    });
 
     if (!data?.success || typeof data.data?.url !== "string") {
       throw new Error(IMAGE_URL_FIELD_UI.ERROR_GENERIC);

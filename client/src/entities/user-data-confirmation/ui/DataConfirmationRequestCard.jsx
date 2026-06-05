@@ -27,18 +27,13 @@ import "./DataConfirmationRequestCard.css";
  *   onOpenUser: (userId: string) => void;
  * }} props
  */
-export function DataConfirmationRequestCard({
-  request,
-  onResolved,
-  onOpenUser,
-}) {
+export function DataConfirmationRequestCard({ request, onResolved, onOpenUser }) {
   const [staffNote, setStaffNote] = useState("");
   const [isBusy, setIsBusy] = useState(false);
   const [error, setError] = useState("");
 
   const applicant = request.user;
-  const displayName =
-    applicant?.userName?.trim() || USER_LIST_ROW_UI.MISSING_NAME;
+  const displayName = applicant?.userName?.trim() || USER_LIST_ROW_UI.MISSING_NAME;
   const passport = request.passport;
   const selfiePhotoUrl = request.passportSelfiePhotoUrl?.trim() ?? "";
   const selfieDisplayUrl = selfiePhotoUrl
@@ -48,9 +43,7 @@ export function DataConfirmationRequestCard({
   const handleResolve = async (resolution) => {
     if (resolution === USER_DATA_CONFIRMATION_RESOLUTION_REJECT) {
       const note = staffNote.trim();
-      if (
-        countWords(note) < DATA_CONFIRMATION_PAGE_UI.STAFF_NOTE_MIN_WORDS
-      ) {
+      if (countWords(note) < DATA_CONFIRMATION_PAGE_UI.STAFF_NOTE_MIN_WORDS) {
         setError(
           `Комментарий: не меньше ${DATA_CONFIRMATION_PAGE_UI.STAFF_NOTE_MIN_WORDS} слов`,
         );
@@ -170,9 +163,7 @@ export function DataConfirmationRequestCard({
         <button
           type="button"
           disabled={isBusy}
-          onClick={() =>
-            void handleResolve(USER_DATA_CONFIRMATION_RESOLUTION_APPROVE)
-          }
+          onClick={() => void handleResolve(USER_DATA_CONFIRMATION_RESOLUTION_APPROVE)}
         >
           {isBusy
             ? DATA_CONFIRMATION_PAGE_UI.ACTION_PENDING
@@ -182,9 +173,7 @@ export function DataConfirmationRequestCard({
           type="button"
           className="data-confirmation-card__reject"
           disabled={isBusy}
-          onClick={() =>
-            void handleResolve(USER_DATA_CONFIRMATION_RESOLUTION_REJECT)
-          }
+          onClick={() => void handleResolve(USER_DATA_CONFIRMATION_RESOLUTION_REJECT)}
         >
           {DATA_CONFIRMATION_PAGE_UI.ACTION_REJECT}
         </button>

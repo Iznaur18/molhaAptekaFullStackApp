@@ -1,49 +1,5 @@
-.login-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.login-modal__body {
   padding: 1rem;
-}
-
-.login-modal__backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-}
-
-.login-modal__card {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  max-width: 420px;
-  border-radius: 0.75rem;
-  border: 1px solid #e5e7eb;
-  background: #fff;
-  box-shadow: 0 20px 45px rgba(17, 24, 39, 0.28);
-  padding: 1rem;
-}
-
-.login-modal__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.75rem;
-}
-
-.login-modal__title {
-  margin: 0;
-  font-size: 1.125rem;
-}
-
-.login-modal__close {
-  border: 0;
-  background: transparent;
-  font-size: 1.5rem;
-  line-height: 1;
-  cursor: pointer;
 }
 
 .login-modal__form {

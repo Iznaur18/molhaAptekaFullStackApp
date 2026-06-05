@@ -16,11 +16,7 @@ import "./PremiumPage.css";
  *   }) => void | Promise<void>;
  * }} props
  */
-export function PremiumPage({
-  isAuthorized,
-  onRequestLogin,
-  onPurchased,
-}) {
+export function PremiumPage({ isAuthorized, onRequestLogin, onPurchased }) {
   const [phase, setPhase] = useState("loading");
   const [isActive, setIsActive] = useState(false);
   const [canPurchase, setCanPurchase] = useState(false);
@@ -46,9 +42,7 @@ export function PremiumPage({
       setLoyaltyPointsBalance(status.loyaltyPointsBalance);
       setPhase("success");
     } catch (e) {
-      setErrorMessage(
-        e instanceof Error ? e.message : PREMIUM_PAGE_UI.FETCH_FALLBACK,
-      );
+      setErrorMessage(e instanceof Error ? e.message : PREMIUM_PAGE_UI.FETCH_FALLBACK);
       setPhase("error");
     }
   }, [isAuthorized]);
@@ -158,9 +152,7 @@ export function PremiumPage({
             disabled={isSubmitting || !hasEnoughPoints}
             onClick={() => void handlePurchase()}
           >
-            {isSubmitting
-              ? PREMIUM_PAGE_UI.SUBMIT_PENDING
-              : PREMIUM_PAGE_UI.SUBMIT}
+            {isSubmitting ? PREMIUM_PAGE_UI.SUBMIT_PENDING : PREMIUM_PAGE_UI.SUBMIT}
           </button>
         </>
       ) : null}

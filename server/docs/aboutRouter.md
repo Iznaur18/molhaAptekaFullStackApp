@@ -15,7 +15,7 @@
 3. Подключаются общие middleware: `express.json()`, `cors()`, раздача папки `uploads`.
 4. Выполняется строка:
    ```js
-   app.use('/upload', uploadRouter);
+   app.use("/upload", uploadRouter);
    ```
    Здесь **uploadRouter** — это роутер из файла `routes/uploadRouter.js`. Мы «вешаем» его на путь **/upload**. То есть все маршруты этого роутера будут начинаться с `/upload`.
 5. Сервер вызывает `app.listen(PORT)` и начинает слушать порт 4444.
@@ -29,19 +29,19 @@
 В `index.js` написано:
 
 ```js
-import { uploadRouter } from './routes/index.js';
+import { uploadRouter } from "./routes/index.js";
 ```
 
 - Это **особенность ES-модулей (JavaScript)**: мы импортируем имя из другого файла.
 - Файл `routes/index.js` не создаёт маршруты сам, а только реэкспортирует роутер:
   ```js
-  import { uploadRouter } from './uploadRouter.js';
+  import { uploadRouter } from "./uploadRouter.js";
   export { uploadRouter };
   ```
 - В `routes/uploadRouter.js` создаётся роутер и экспортируется под именем **uploadRouter**:
   ```js
   const router = Router();
-  router.post('/', uploadMW.single('image'), uploadController);
+  router.post("/", uploadMW.single("image"), uploadController);
   export { router as uploadRouter };
   ```
 
@@ -57,7 +57,7 @@ import { uploadRouter } from './routes/index.js';
 2. Express смотрит: путь начинается с `/upload` → запрос передаётся в **uploadRouter** (мы это настроили через `app.use('/upload', uploadRouter)`).
 3. Внутри uploadRouter путь считается **относительно префикса**. Мы зарегистрировали:
    ```js
-   router.post('/', uploadMW.single('image'), uploadController);
+   router.post("/", uploadMW.single("image"), uploadController);
    ```
    Путь в роутере — это `'/'`. Вместе с префиксом получается: `/upload` + `'/'` = **/upload**. Поэтому срабатывает именно этот обработчик.
 4. Выполняются по порядку:
@@ -104,7 +104,7 @@ import { uploadRouter } from './routes/index.js';
 Если бы было так:
 
 ```js
-app.use('/api/upload', uploadRouter);
+app.use("/api/upload", uploadRouter);
 ```
 
 то тот же `router.post('/', ...)` дал бы маршрут **POST /api/upload**.
@@ -151,18 +151,17 @@ router.post('/image', ...);
 
 ```js
 // routes/uploadRouter.js
-import { Router } from 'express';
-import { uploadController } from '../controllers/uploadController.js';
+import { Router } from "express";
+import { uploadController } from "../controllers/uploadController.js";
 
 // а внутри uploadController.js, например:
 export function uploadController(req, res) {
   // здесь обработка запроса
 }
 
-
 const router = Router();
 
-router.delete('/:filename', uploadController.deleteFile);
+router.delete("/:filename", uploadController.deleteFile);
 
 export { router as uploadRouter };
 ```
@@ -174,12 +173,12 @@ export { router as uploadRouter };
 1. Создать файл **routes/authRouter.js**:
 
    ```js
-   import { Router } from 'express';
-   import { authController } from '../controllers/authController.js';
+   import { Router } from "express";
+   import { authController } from "../controllers/authController.js";
 
    const router = Router();
-   router.post('/login', authController.login);
-   router.post('/register', authController.register);
+   router.post("/login", authController.login);
+   router.post("/register", authController.register);
 
    export { router as authRouter };
    ```
@@ -188,8 +187,8 @@ export { router as uploadRouter };
 3. В **index.js** добавить:
 
    ```js
-   import { authRouter } from './routes/index.js'; // или из authRouter.js
-   app.use('/auth', authRouter);
+   import { authRouter } from "./routes/index.js"; // или из authRouter.js
+   app.use("/auth", authRouter);
    ```
 
 Получатся маршруты **POST /auth/login** и **POST /auth/register**.
@@ -199,7 +198,7 @@ export { router as uploadRouter };
 Порядок важен: сначала проверка прав, потом действие.
 
 ```js
-router.get('/profile', checkAuth, profileController.get);
+router.get("/profile", checkAuth, profileController.get);
 ```
 
 Сначала выполнится **checkAuth** (проверка JWT), потом **profileController.get**. Это **особенность Express**: обработчики вызываются по очереди; каждый может вызвать `next()` или отправить ответ и не вызывать `next()`.
@@ -208,13 +207,13 @@ router.get('/profile', checkAuth, profileController.get);
 
 ## 6. Что закон, что особенность
 
-| Что | Тип | Кратко |
-|-----|-----|--------|
-| Префикс в `app.use(префикс, роутер)` + путь в `router.post(путь, ...)` = полный URL | **Закон Express** | Так устроен Express. |
-| В файле роута используется `router`, а не `app` | **Архитектурное решение** | app один раз в index.js; в остальных файлах — роутеры. |
-| Один файл — одна «тема» маршрутов (upload, auth, products) | **Соглашение проекта** | Удобно поддерживать. |
-| `import` / `export` для роутеров и контроллеров | **Особенность JavaScript (ES-модули)** | Без этого роутер не попадёт в index.js. |
-| Обработчики в `router.post(path, mw1, mw2, controller)` вызываются по порядку | **Закон Express** | Сначала mw1, потом mw2, потом controller. |
+| Что                                                                                 | Тип                                    | Кратко                                                 |
+| ----------------------------------------------------------------------------------- | -------------------------------------- | ------------------------------------------------------ |
+| Префикс в `app.use(префикс, роутер)` + путь в `router.post(путь, ...)` = полный URL | **Закон Express**                      | Так устроен Express.                                   |
+| В файле роута используется `router`, а не `app`                                     | **Архитектурное решение**              | app один раз в index.js; в остальных файлах — роутеры. |
+| Один файл — одна «тема» маршрутов (upload, auth, products)                          | **Соглашение проекта**                 | Удобно поддерживать.                                   |
+| `import` / `export` для роутеров и контроллеров                                     | **Особенность JavaScript (ES-модули)** | Без этого роутер не попадёт в index.js.                |
+| Обработчики в `router.post(path, mw1, mw2, controller)` вызываются по порядку       | **Закон Express**                      | Сначала mw1, потом mw2, потом controller.              |
 
 ---
 

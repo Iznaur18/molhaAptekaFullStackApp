@@ -1,55 +1,22 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-import { ProductModel } from '../models/index.js';
-import { attachProductSellerSnapshots } from './attachProductSellerSnapshots.js';
-import { enrichProductApiFields } from './productDiscount.js';
-import {
-    soldQuantityAddFieldsStage,
-    soldQuantityLookupStage,
-} from './productCatalogQuery.js';
-
-const sellerLookupStages = () => [
-    {
-        $lookup: {
-            from: 'users',
-            localField: 'productSeller',
-            foreignField: '_id',
-            as: 'productSellerArr',
-        },
-    },
-    {
-        $addFields: {
-            productSeller: { $arrayElemAt: ['$productSellerArr', 0] },
-        },
-    },
-    {
-        $project: {
-            productSellerArr: 0,
-            salesStats: 0,
-        },
-    },
-];
+import { ProductModel } from "../models/index.js";
+import { attachProductSellerSnapshots } from "./attachProductSellerSnapshots.js";
+import { enrichProductApiFields } from "./productDiscount.js";
 
 /**
  * @param {string} productId
  */
 export const findCatalogProductById = async (productId) => {
-    if (!mongoose.isValidObjectId(productId)) {
-        return null;
-    }
+  if (!mongoose.isValidObjectId(productId)) {
+    return null;
+  }
 
-    const rows = await ProductModel.aggregate([
-        { $match: { _id: new mongoose.Types.ObjectId(productId) } },
-        soldQuantityLookupStage(),
-        soldQuantityAddFieldsStage(),
-        ...sellerLookupStages(),
-    ]);
+  const product = await ProductModel.findById(productId).lean();
+  if (!product) {
+    return null;
+  }
 
-    const row = rows[0];
-    if (!row) {
-        return null;
-    }
-
-    const [withSellerSnapshots] = await attachProductSellerSnapshots([row]);
-    return enrichProductApiFields(withSellerSnapshots);
+  const [withSellerSnapshots] = await attachProductSellerSnapshots([product]);
+  return enrichProductApiFields(withSellerSnapshots);
 };

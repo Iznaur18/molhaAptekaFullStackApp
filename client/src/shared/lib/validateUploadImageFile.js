@@ -1,6 +1,4 @@
-import {
-  IMAGE_URL_FIELD_UI,
-} from "../config/appUiCopy.js";
+import { IMAGE_URL_FIELD_UI } from "../config/appUiCopy.js";
 import {
   UPLOAD_ALLOWED_MIME_TYPES,
   UPLOAD_MAX_BYTES,

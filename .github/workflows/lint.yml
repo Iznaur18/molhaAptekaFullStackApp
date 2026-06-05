@@ -1,0 +1,48 @@
+name: Lint
+
+on:
+  push:
+    paths:
+      - "client/**"
+      - "server/**"
+      - "contract/**"
+      - "package.json"
+      - "package-lock.json"
+      - "eslint.config.js"
+      - "prettier.config.js"
+      - ".prettierignore"
+      - ".github/workflows/lint.yml"
+  pull_request:
+    paths:
+      - "client/**"
+      - "server/**"
+      - "contract/**"
+      - "package.json"
+      - "package-lock.json"
+      - "eslint.config.js"
+      - "prettier.config.js"
+      - ".prettierignore"
+      - ".github/workflows/lint.yml"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install root tooling
+        run: npm ci
+
+      - name: Prettier check
+        run: npm run format:check
+
+      - name: ESLint
+        run: npm run lint

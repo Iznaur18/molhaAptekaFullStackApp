@@ -132,10 +132,7 @@ export function InstallmentProgramModal({
   };
 
   return (
-    <div
-      className="installment-program-modal__backdrop"
-      role="presentation"
-    >
+    <div className="installment-program-modal__backdrop" role="presentation">
       <div
         className="installment-program-modal"
         role="dialog"
@@ -143,7 +140,10 @@ export function InstallmentProgramModal({
         aria-labelledby="installment-program-modal-title"
       >
         <header className="installment-program-modal__header">
-          <h2 id="installment-program-modal-title" className="installment-program-modal__title">
+          <h2
+            id="installment-program-modal-title"
+            className="installment-program-modal__title"
+          >
             {INSTALLMENT_UI.PROGRAM_MODAL_TITLE}
             {productName ? `: ${productName}` : ""}
           </h2>

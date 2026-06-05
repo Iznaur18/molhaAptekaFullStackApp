@@ -13,20 +13,29 @@ import "./CatalogFeedTilesGrid.css";
  *   onFeedTileClick: (tile: import('../lib/buildCatalogFeedTiles.js').CatalogFeedTile) => void;
  *   onCategoryClick: (categorySlug: import('../../product/model/types.js').ProductCategory) => void;
  *   onEditCategoryClick: (categorySlug: import('../../product/model/types.js').ProductCategory) => void;
+ *   feedTileDisplays: import('../model/types.js').ProductCatalogFeedTileDisplayFromApi[];
+ *   onEditFeedTileClick: (tileKey: string) => void;
  * }} props
  */
 export function CatalogBrowserLanding({
   displays,
+  feedTileDisplays,
   isAdmin,
   isLoading,
   errorMessage,
   onFeedTileClick,
   onCategoryClick,
   onEditCategoryClick,
+  onEditFeedTileClick,
 }) {
   return (
     <div className="catalog-browser-landing">
-      <CatalogFeedTilesGrid onFeedTileClick={onFeedTileClick} />
+      <CatalogFeedTilesGrid
+        feedTileDisplays={feedTileDisplays}
+        isAdmin={isAdmin}
+        onFeedTileClick={onFeedTileClick}
+        onEditFeedTileClick={onEditFeedTileClick}
+      />
       <section
         className="catalog-browser-landing__categories"
         aria-label={PRODUCT_CATEGORY_DISPLAY_UI.GRID_ARIA}

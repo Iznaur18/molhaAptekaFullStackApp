@@ -88,8 +88,7 @@ export function ProductReportGroupCard({
       </div>
       <ul className="product-report-group-card__reports" role="list">
         {group.reports.map((report) => {
-          const reporterName =
-            report.reporter?.userName?.trim() || report.reporter._id;
+          const reporterName = report.reporter?.userName?.trim() || report.reporter._id;
           return (
             <li key={report._id} className="product-report-group-card__report">
               <p className="product-report-group-card__report-meta">

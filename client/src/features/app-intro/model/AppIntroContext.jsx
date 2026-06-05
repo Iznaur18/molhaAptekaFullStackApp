@@ -44,9 +44,7 @@ export function AppIntroProvider({ children }) {
     [dismissIntro, isIntroVisible, replayIntro],
   );
 
-  return (
-    <AppIntroContext.Provider value={value}>{children}</AppIntroContext.Provider>
-  );
+  return <AppIntroContext.Provider value={value}>{children}</AppIntroContext.Provider>;
 }
 
 export function useAppIntro() {

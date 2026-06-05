@@ -26,7 +26,9 @@ export async function patchProductCategoryDisplay(categorySlug, body) {
   } catch (error) {
     const message =
       error?.response?.data?.message ??
-      (error instanceof Error ? error.message : API_CLIENT_UI.PATCH_CATEGORY_DISPLAY_FALLBACK);
+      (error instanceof Error
+        ? error.message
+        : API_CLIENT_UI.PATCH_CATEGORY_DISPLAY_FALLBACK);
     throw new Error(message);
   }
 }

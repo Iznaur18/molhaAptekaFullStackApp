@@ -6,9 +6,7 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
  */
 export async function rejectProductPromotion(promotionId) {
   try {
-    const { data } = await apiClient.patch(
-      `/product/promotions/${promotionId}/reject`,
-    );
+    const { data } = await apiClient.patch(`/product/promotions/${promotionId}/reject`);
     if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }

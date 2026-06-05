@@ -6,9 +6,7 @@ const VERIFIED_BADGE_BLUE = "#1d9bf0";
  * @param {{ size?: number; className?: string }} props
  */
 export function UserDataConfirmedBadge({ size = 18, className = "" }) {
-  const svgClass = ["user-data-confirmed-badge", className]
-    .filter(Boolean)
-    .join(" ");
+  const svgClass = ["user-data-confirmed-badge", className].filter(Boolean).join(" ");
 
   return (
     <svg

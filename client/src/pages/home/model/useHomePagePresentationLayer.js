@@ -1,3 +1,4 @@
+import { useCatalogMainContentProps } from "./useCatalogMainContentProps.js";
 import { useHomeCatalogGridProps } from "./useHomeCatalogGridProps.js";
 import { useHomeCatalogSections } from "./useHomeCatalogSections.jsx";
 import { useHomeHeaderProps } from "./useHomeHeaderProps.js";
@@ -22,7 +23,7 @@ export function useHomePagePresentationLayer(ctx) {
     currentUserId: ctx.currentUserId,
     handleUserStoriesRefresh: ctx.handleUserStoriesRefresh,
     handleSellerNameClick: ctx.handleSellerNameClick,
-    mainView: ctx.mainView,
+    catalogMainView: ctx.catalogMainView,
     activeCatalogBrowserCategory: ctx.activeCatalogBrowserCategory,
     selectedProductCategory: ctx.selectedProductCategory,
     hasProductSearchQuery: ctx.hasProductSearchQuery,
@@ -62,11 +63,16 @@ export function useHomePagePresentationLayer(ctx) {
     catalogGridSectionProps,
     isCatalogBrowserLanding: ctx.isCatalogBrowserLanding,
     categoryDisplays: ctx.categoryDisplays,
+    feedTileDisplays: ctx.feedTileDisplays,
     isAdmin: ctx.isAdmin,
     categoryDisplaysStatus: ctx.categoryDisplaysStatus,
     handleCatalogFeedTileClick: ctx.handleCatalogFeedTileClick,
     handleCatalogCategoryGridClick: ctx.handleCatalogCategoryGridClick,
+    handleCatalogCategoryTreeSelect: ctx.handleCatalogCategoryTreeSelect,
+    handleClearCatalogCategoryTreeFilter: ctx.handleClearCatalogCategoryTreeFilter,
+    activeCatalogBrowserCategoryId: ctx.activeCatalogBrowserCategoryId,
     setEditingCategorySlug: ctx.setEditingCategorySlug,
+    setEditingFeedTileKey: ctx.setEditingFeedTileKey,
     selectedCategoryLabel: ctx.selectedCategoryLabel,
     activeCatalogFeedLabel: ctx.activeCatalogFeedLabel,
     handleBackToCatalogLanding: ctx.handleBackToCatalogLanding,
@@ -74,6 +80,7 @@ export function useHomePagePresentationLayer(ctx) {
 
   const headerProps = useHomeHeaderProps({
     mainView: ctx.mainView,
+    catalogMainView: ctx.catalogMainView,
     isMineMode: ctx.isMineMode,
     activeCatalogBrowserCategory: ctx.activeCatalogBrowserCategory,
     selectedProductCategory: ctx.selectedProductCategory,
@@ -122,6 +129,8 @@ export function useHomePagePresentationLayer(ctx) {
   const mainContentProps = useHomeMainContentProps({
     isRaffleRoute: ctx.isRaffleRoute,
     raffleRouteId: ctx.raffleRouteId,
+    isSellerRoute: ctx.isSellerRoute,
+    sellerRouteId: ctx.sellerRouteId,
     isAuthorized: ctx.isAuthorized,
     isSessionReady: ctx.isSessionReady,
     mainView: ctx.mainView,
@@ -146,7 +155,6 @@ export function useHomePagePresentationLayer(ctx) {
     pendingProductPromotionsCount: ctx.pendingProductPromotionsCount,
     pendingDataConfirmationCount: ctx.pendingDataConfirmationCount,
     catalogGridSection,
-    catalogBrowserSection,
     setIsLoginModalOpen: ctx.setIsLoginModalOpen,
     handleSellerNameClick: ctx.handleSellerNameClick,
     handleCatalogProductClick: ctx.handleCatalogProductClick,
@@ -164,6 +172,8 @@ export function useHomePagePresentationLayer(ctx) {
     handleMyOrdersFromProfile: ctx.handleMyOrdersFromProfile,
     handleAuctionFromProfile: ctx.handleAuctionFromProfile,
     handleAdminOrdersFromProfile: ctx.handleAdminOrdersFromProfile,
+    handleSearchSynonymsAdminFromProfile: ctx.handleSearchSynonymsAdminFromProfile,
+    handleCategoryTreeAdminFromProfile: ctx.handleCategoryTreeAdminFromProfile,
     handleProductModerationFromProfile: ctx.handleProductModerationFromProfile,
     handleProductReportsFromProfile: ctx.handleProductReportsFromProfile,
     handleProductPromotionsFromProfile: ctx.handleProductPromotionsFromProfile,
@@ -171,6 +181,8 @@ export function useHomePagePresentationLayer(ctx) {
     setRaffleModal: ctx.setRaffleModal,
     handleDataConfirmationQueueFromProfile: ctx.handleDataConfirmationQueueFromProfile,
     handleDataConfirmationFromProfile: ctx.handleDataConfirmationFromProfile,
+    setIsDataConfirmationModalOpen: ctx.setIsDataConfirmationModalOpen,
+    dataConfirmationStatusRefreshTick: ctx.dataConfirmationStatusRefreshTick,
     handlePremiumFromProfile: ctx.handlePremiumFromProfile,
     handlePremiumPurchased: ctx.handlePremiumPurchased,
     handleLoyaltyPointsFromProfile: ctx.handleLoyaltyPointsFromProfile,
@@ -181,7 +193,8 @@ export function useHomePagePresentationLayer(ctx) {
     refreshPendingProductPromotionsCount: ctx.refreshPendingProductPromotionsCount,
     refreshPendingRafflesCount: ctx.refreshPendingRafflesCount,
     refreshPendingDataConfirmationCount: ctx.refreshPendingDataConfirmationCount,
-    refreshPendingInstallmentModerationCount: ctx.refreshPendingInstallmentModerationCount,
+    refreshPendingInstallmentModerationCount:
+      ctx.refreshPendingInstallmentModerationCount,
     refreshPendingInstallmentDisputesCount: ctx.refreshPendingInstallmentDisputesCount,
     refreshFeaturedRaffle: ctx.refreshFeaturedRaffle,
     refreshSellerRaffleState: ctx.refreshSellerRaffleState,
@@ -207,6 +220,7 @@ export function useHomePagePresentationLayer(ctx) {
     setIsLoginModalOpen: ctx.setIsLoginModalOpen,
     isDataConfirmationModalOpen: ctx.isDataConfirmationModalOpen,
     setIsDataConfirmationModalOpen: ctx.setIsDataConfirmationModalOpen,
+    setDataConfirmationStatusRefreshTick: ctx.setDataConfirmationStatusRefreshTick,
     refreshPendingDataConfirmationCount: ctx.refreshPendingDataConfirmationCount,
     isEditProfileOpen: ctx.isEditProfileOpen,
     setIsEditProfileOpen: ctx.setIsEditProfileOpen,
@@ -265,6 +279,7 @@ export function useHomePagePresentationLayer(ctx) {
     setCatalogProductDetailsTab: ctx.setCatalogProductDetailsTab,
     setProductDetailsAdminError: ctx.setProductDetailsAdminError,
     handleSellerNameClick: ctx.handleSellerNameClick,
+    goToSellerProducts: ctx.goToSellerProducts,
     handleProductStatsUpdate: ctx.handleProductStatsUpdate,
     catalogDetailsShowAddToCart: ctx.catalogDetailsShowAddToCart,
     catalogProductDetailsTab: ctx.catalogProductDetailsTab,
@@ -278,9 +293,25 @@ export function useHomePagePresentationLayer(ctx) {
     setCatalogProductHasPendingReport: ctx.setCatalogProductHasPendingReport,
     editingCategorySlug: ctx.editingCategorySlug,
     setEditingCategorySlug: ctx.setEditingCategorySlug,
+    editingFeedTileKey: ctx.editingFeedTileKey,
+    setEditingFeedTileKey: ctx.setEditingFeedTileKey,
     categoryDisplays: ctx.categoryDisplays,
+    feedTileDisplays: ctx.feedTileDisplays,
     handleCategoryDisplaySaved: ctx.handleCategoryDisplaySaved,
+    handleFeedTileDisplaySaved: ctx.handleFeedTileDisplaySaved,
   });
 
-  return { headerProps, mainContentProps, modalsLayerProps };
+  const catalogContentProps = useCatalogMainContentProps({
+    catalogMainView: ctx.catalogMainView,
+    catalogGridSection,
+    catalogBrowserSection,
+  });
+
+  return {
+    headerProps,
+    catalogContentProps,
+    accountContentProps: mainContentProps,
+    mainContentProps,
+    modalsLayerProps,
+  };
 }

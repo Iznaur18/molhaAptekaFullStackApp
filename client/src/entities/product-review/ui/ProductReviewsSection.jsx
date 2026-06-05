@@ -111,9 +111,7 @@ export function ProductReviewsSection({
       applyStats(data.averageRating, data.reviewCount);
       await reloadAll();
     } catch (e) {
-      setErrorMessage(
-        e instanceof Error ? e.message : PRODUCT_REVIEW_UI.SUBMIT,
-      );
+      setErrorMessage(e instanceof Error ? e.message : PRODUCT_REVIEW_UI.SUBMIT);
     } finally {
       setIsSubmitting(false);
     }
@@ -145,9 +143,7 @@ export function ProductReviewsSection({
       setIsEditingMyReview(false);
       await reloadAll();
     } catch (e) {
-      setErrorMessage(
-        e instanceof Error ? e.message : PRODUCT_REVIEW_UI.DELETE,
-      );
+      setErrorMessage(e instanceof Error ? e.message : PRODUCT_REVIEW_UI.DELETE);
     } finally {
       setIsSubmitting(false);
     }
@@ -168,8 +164,7 @@ export function ProductReviewsSection({
     }
 
     if (summary?.myReview) {
-      const showEditForm =
-        summary.myReview.canEdit && isEditingMyReview;
+      const showEditForm = summary.myReview.canEdit && isEditingMyReview;
 
       return (
         <div className="product-reviews-section__composer">
@@ -316,9 +311,7 @@ export function ProductReviewsSection({
               disabled={isLoadingMore}
               onClick={() => void handleLoadMore()}
             >
-              {isLoadingMore
-                ? PRODUCT_REVIEW_UI.LOADING
-                : PRODUCT_REVIEW_UI.LOAD_MORE}
+              {isLoadingMore ? PRODUCT_REVIEW_UI.LOADING : PRODUCT_REVIEW_UI.LOAD_MORE}
             </button>
           ) : null}
         </>

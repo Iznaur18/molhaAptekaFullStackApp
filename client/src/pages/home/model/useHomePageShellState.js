@@ -4,7 +4,8 @@ import { useAuthBootstrap } from "./useAuthBootstrap.js";
 import { useCurrentUserSession } from "./useCurrentUserSession.js";
 import { useHomeEmailVerifiedRedirect } from "./useHomeEmailVerifiedRedirect.js";
 import { useHomeFeaturedContent } from "./useHomeFeaturedContent.js";
-import { useHomeMainView } from "./useHomeMainView.js";
+import { useCatalogMainView } from "../../catalog/model/useCatalogMainView.js";
+import { useAppShellNavigation } from "./useAppShellNavigation.js";
 import { useHomeRouteGuards } from "./useHomeRouteGuards.js";
 import { useHomeSellerAccess } from "./useHomeSellerAccess.js";
 import { useHomeSellerModal } from "./useHomeSellerModal.jsx";
@@ -29,12 +30,20 @@ export function useHomePageShellState(location, navigate) {
     activeProfileTab,
     raffleRouteId,
     isRaffleRoute,
-    isProfileMyProductsTab,
+    sellerRouteId,
+    isSellerRoute,
+    isMyProductsRoute,
+    setMyProfileTab,
+  } = useAppShellNavigation(location, navigate);
+
+  const {
+    catalogMainView,
+    isCatalogRoute,
     isHomeCatalogMainView,
     isCatalogBrowserMainViewActive,
-    isCatalogShellView,
-    setMyProfileTab,
-  } = useHomeMainView(location, navigate);
+  } = useCatalogMainView(location);
+
+  const isCatalogShellView = isCatalogRoute || isMyProductsRoute;
 
   /** @type {[ProductFromApi[], import('react').Dispatch<import('react').SetStateAction<ProductFromApi[]>>]} */
   const [products, setProducts] = useState([]);
@@ -44,14 +53,19 @@ export function useHomePageShellState(location, navigate) {
   const [{ isAuthorized, isAuthReady }, setIsAuthorized] = useAuthBootstrap();
   const [catalogStatus, setCatalogStatus] = useState({ kind: "loading" });
   const [myProfilePage, setMyProfilePage] = useState(EMPTY_MY_PROFILE_PAGE);
-  const [isProductCategoryListOpen, setIsProductCategoryListOpen] =
-    useState(false);
+  const [isProductCategoryListOpen, setIsProductCategoryListOpen] = useState(false);
+  const [editingFeedTileKey, setEditingFeedTileKey] = useState(
+    /** @type {string | null} */ (null),
+  );
   const [editingCategorySlug, setEditingCategorySlug] = useState(
-    /** @type {import('../../../entities/product/model/types.js').ProductCategory | null} */ (null),
+    /** @type {import('../../../entities/product/model/types.js').ProductCategory | null} */ (
+      null
+    ),
   );
   const initialCatalogQuery = useMemo(() => readInitialCatalogQuery(), []);
-  const [myProductsModerationFilter, setMyProductsModerationFilter] =
-    useState(MY_PRODUCTS_MODERATION_FILTER_ALL);
+  const [myProductsModerationFilter, setMyProductsModerationFilter] = useState(
+    MY_PRODUCTS_MODERATION_FILTER_ALL,
+  );
   const [myProductsCatalogError, setMyProductsCatalogError] = useState("");
   const [myProductsCatalogNotice, setMyProductsCatalogNotice] = useState("");
   const [staffActionNotice, setStaffActionNotice] = useState("");
@@ -66,10 +80,8 @@ export function useHomePageShellState(location, navigate) {
   const [deletingProductId, setDeletingProductId] = useState(null);
   const [togglingAvailabilityProductId, setTogglingAvailabilityProductId] =
     useState(null);
-  const [togglingAuctionProductId, setTogglingAuctionProductId] =
-    useState(null);
-  const [isCreateProductModalOpen, setIsCreateProductModalOpen] =
-    useState(false);
+  const [togglingAuctionProductId, setTogglingAuctionProductId] = useState(null);
+  const [isCreateProductModalOpen, setIsCreateProductModalOpen] = useState(false);
   const [isSellerProductsLimitModalOpen, setIsSellerProductsLimitModalOpen] =
     useState(false);
   /** @type {[ProductFromApi | null, import('react').Dispatch<import('react').SetStateAction<ProductFromApi | null>>]} */
@@ -132,6 +144,8 @@ export function useHomePageShellState(location, navigate) {
   const sellerModalState = useHomeSellerModal({
     currentUserId,
     isAuthorized,
+    navigate,
+    goToMainView,
     setIsLoginModalOpen,
     setIsAdminEditUserOpen,
     setIsAdminDeleteUserOpen,
@@ -144,7 +158,9 @@ export function useHomePageShellState(location, navigate) {
   const [raffleParticipationPendingProductId, setRaffleParticipationPendingProductId] =
     useState(null);
   const [raffleModal, setRaffleModal] = useState(
-    /** @type {{ mode: 'create' } | { mode: 'edit', raffle: import('../../../entities/raffle/model/types.js').RaffleFromApi, useStaffApi: boolean } | null} */ (null),
+    /** @type {{ mode: 'create' } | { mode: 'edit', raffle: import('../../../entities/raffle/model/types.js').RaffleFromApi, useStaffApi: boolean } | null} */ (
+      null
+    ),
   );
   const [raffleRefreshTick, setRaffleRefreshTick] = useState(0);
 
@@ -167,10 +183,10 @@ export function useHomePageShellState(location, navigate) {
     refreshPendingRafflesCount: staffBadges.refreshPendingRafflesCount,
   });
 
-  const [isDataConfirmationModalOpen, setIsDataConfirmationModalOpen] =
-    useState(false);
-  const [isReportProductModalOpen, setIsReportProductModalOpen] =
-    useState(false);
+  const [isDataConfirmationModalOpen, setIsDataConfirmationModalOpen] = useState(false);
+  const [dataConfirmationStatusRefreshTick, setDataConfirmationStatusRefreshTick] =
+    useState(0);
+  const [isReportProductModalOpen, setIsReportProductModalOpen] = useState(false);
   const [promotionProduct, setPromotionProduct] = useState(
     /** @type {ProductFromApi | null} */ (null),
   );
@@ -182,11 +198,15 @@ export function useHomePageShellState(location, navigate) {
 
   return {
     mainView,
+    catalogMainView,
     goToMainView,
     activeProfileTab,
     raffleRouteId,
     isRaffleRoute,
-    isProfileMyProductsTab,
+    sellerRouteId,
+    isSellerRoute,
+    isMyProductsRoute,
+    isCatalogRoute,
     isHomeCatalogMainView,
     isCatalogBrowserMainViewActive,
     isCatalogShellView,
@@ -208,6 +228,8 @@ export function useHomePageShellState(location, navigate) {
     setMyProfilePage,
     isProductCategoryListOpen,
     setIsProductCategoryListOpen,
+    editingFeedTileKey,
+    setEditingFeedTileKey,
     editingCategorySlug,
     setEditingCategorySlug,
     initialCatalogQuery,
@@ -275,6 +297,8 @@ export function useHomePageShellState(location, navigate) {
     ...featuredContent,
     isDataConfirmationModalOpen,
     setIsDataConfirmationModalOpen,
+    dataConfirmationStatusRefreshTick,
+    setDataConfirmationStatusRefreshTick,
     isReportProductModalOpen,
     setIsReportProductModalOpen,
     promotionProduct,

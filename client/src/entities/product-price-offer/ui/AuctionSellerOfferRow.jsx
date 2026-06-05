@@ -38,8 +38,7 @@ export function AuctionSellerOfferRow({
   const imageUrl = offer.product?.productImageUrl ?? null;
   const buyer = offer.buyer;
   const buyerId = buyer?._id != null ? String(buyer._id) : null;
-  const buyerName =
-    buyer?.userName?.trim() || USER_LIST_ROW_UI.MISSING_NAME;
+  const buyerName = buyer?.userName?.trim() || USER_LIST_ROW_UI.MISSING_NAME;
   const isPending = offer.status === PRICE_OFFER_STATUS_PENDING;
   const isAccepted = offer.status === PRICE_OFFER_STATUS_ACCEPTED;
 

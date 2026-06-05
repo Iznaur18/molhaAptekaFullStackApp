@@ -1,9 +1,11 @@
+import { isStaffStandaloneMainView } from "./staffMainViews.js";
+
 /**
  * Пути экранов главной SPA. Не использовать `/cart` и `/users`: в dev Vite
  * проксирует `/cart` и `/user/...` на Express (см. vite.config.js).
  * Путь `/user-list` ок: не совпадает с API `/user` (иначе F5 → 404 JSON).
  *
- * @typedef {'catalog' | 'catalog-browser' | 'my-profile' | 'my-products' | 'users' | 'subscriptions' | 'notifications' | 'cart' | 'my-sales' | 'my-orders' | 'admin-orders' | 'product-moderation' | 'product-reports' | 'data-confirmation-requests' | 'installment-payments' | 'installment-sales' | 'installment-moderation' | 'installment-disputes'} HomeMainView
+ * @typedef {'catalog' | 'catalog-browser' | 'my-profile' | 'my-products' | 'users' | 'subscriptions' | 'notifications' | 'cart' | 'my-sales' | 'my-orders' | 'auction' | 'data-confirmation' | 'premium' | 'loyalty-points' | 'admin-orders' | 'search-synonyms-admin' | 'category-tree-admin' | 'product-moderation' | 'product-reports' | 'product-promotions' | 'staff-raffles' | 'data-confirmation-requests' | 'installment-payments' | 'installment-sales' | 'installment-moderation' | 'installment-disputes'} HomeMainView
  */
 
 /** @type {Record<HomeMainView, string>} */
@@ -20,9 +22,17 @@ export const HOME_MAIN_VIEW_PATH = {
   cart: "/basket",
   "my-sales": "/my-sales",
   "my-orders": "/my-orders",
+  auction: "/auction",
+  "data-confirmation": "/data-confirmation",
+  premium: "/premium",
+  "loyalty-points": "/loyalty-points",
   "admin-orders": "/admin-orders",
+  "search-synonyms-admin": "/search-synonyms-admin",
+  "category-tree-admin": "/category-tree-admin",
   "product-moderation": "/moderation-products",
   "product-reports": "/product-reports",
+  "product-promotions": "/product-promotions",
+  "staff-raffles": "/staff-raffles",
   "data-confirmation-requests": "/data-confirmation-requests",
   "installment-payments": "/installment-payments",
   "installment-sales": "/installment-sales",
@@ -56,11 +66,7 @@ function normalizePathname(pathname) {
  */
 export function pathnameToMainView(pathname) {
   const normalized = normalizePathname(pathname);
-  return (
-    PATH_TO_VIEW.get(normalized) ??
-    LEGACY_PATH_TO_VIEW.get(normalized) ??
-    null
-  );
+  return PATH_TO_VIEW.get(normalized) ?? LEGACY_PATH_TO_VIEW.get(normalized) ?? null;
 }
 
 /**
@@ -103,14 +109,7 @@ export function isCatalogHeaderMainView(view) {
   return isCatalogShellMainView(view) || isCatalogBrowserMainView(view);
 }
 
-/** Экраны, для которых нужна загруженная роль (admin / moderator). */
+/** Standalone staff URL (guard в `StaffRouteGuard`). */
 export function isRoleRestrictedMainView(view) {
-  return (
-    view === "admin-orders" ||
-    view === "product-moderation" ||
-    view === "product-reports" ||
-    view === "data-confirmation-requests" ||
-    view === "installment-moderation" ||
-    view === "installment-disputes"
-  );
+  return isStaffStandaloneMainView(view);
 }

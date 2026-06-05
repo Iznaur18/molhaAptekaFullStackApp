@@ -1,7 +1,4 @@
-import {
-  USER_NAME_MAX_LENGTH,
-  USER_NAME_MIN_LENGTH,
-} from "../model/userConstants.js";
+import { USER_NAME_MAX_LENGTH, USER_NAME_MIN_LENGTH } from "../model/userConstants.js";
 
 const USER_NAME_PATTERN = /^[a-z0-9]+$/;
 
@@ -12,7 +9,9 @@ const USER_NAME_PATTERN = /^[a-z0-9]+$/;
  */
 export function validateUserNameField(raw, options = {}) {
   const { required = false } = options;
-  const name = String(raw ?? "").trim().toLowerCase();
+  const name = String(raw ?? "")
+    .trim()
+    .toLowerCase();
 
   if (name === "") {
     return required ? "Никнейм обязателен" : null;

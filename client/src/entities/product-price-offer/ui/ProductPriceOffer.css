@@ -107,7 +107,9 @@
   font-size: 0.95rem;
   color: #111827;
   outline: none;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .product-price-offer__input:focus {

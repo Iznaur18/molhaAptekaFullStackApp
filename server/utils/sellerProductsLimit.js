@@ -1,18 +1,18 @@
-import { ProductModel } from '../models/index.js';
+import { ProductModel } from "../models/index.js";
 import {
-    SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE,
-    SELLER_PRODUCTS_LIMIT_PREMIUM,
-    SELLER_PRODUCTS_LIMIT_REGULAR,
-} from '../constants/productConstants.js';
-import { isPremiumActive } from './premiumAccess.js';
+  SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE,
+  SELLER_PRODUCTS_LIMIT_PREMIUM,
+  SELLER_PRODUCTS_LIMIT_REGULAR,
+} from "../constants/productConstants.js";
+import { isPremiumActive } from "./premiumAccess.js";
 
 /**
  * @param {{ isPremiumUser?: boolean; premiumExpiresAt?: Date | string | null } | null | undefined} user
  */
 export function getSellerProductsLimit(user) {
-    return isPremiumActive(user)
-        ? SELLER_PRODUCTS_LIMIT_PREMIUM
-        : SELLER_PRODUCTS_LIMIT_REGULAR;
+  return isPremiumActive(user)
+    ? SELLER_PRODUCTS_LIMIT_PREMIUM
+    : SELLER_PRODUCTS_LIMIT_REGULAR;
 }
 
 /**
@@ -20,7 +20,7 @@ export function getSellerProductsLimit(user) {
  * @returns {Promise<number>}
  */
 export async function countSellerProducts(sellerId) {
-    return ProductModel.countDocuments({ productSeller: sellerId });
+  return ProductModel.countDocuments({ productSeller: sellerId });
 }
 
 /**
@@ -28,7 +28,7 @@ export async function countSellerProducts(sellerId) {
  * @param {number} currentCount
  */
 export function isSellerProductsLimitReached(user, currentCount) {
-    return currentCount >= getSellerProductsLimit(user);
+  return currentCount >= getSellerProductsLimit(user);
 }
 
 /**
@@ -37,9 +37,9 @@ export function isSellerProductsLimitReached(user, currentCount) {
  * @returns {Promise<{ ok: true } | { ok: false; message: string }>}
  */
 export async function assertSellerCanCreateProduct(sellerId, user) {
-    const count = await countSellerProducts(sellerId);
-    if (isSellerProductsLimitReached(user, count)) {
-        return { ok: false, message: SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE };
-    }
-    return { ok: true };
+  const count = await countSellerProducts(sellerId);
+  if (isSellerProductsLimitReached(user, count)) {
+    return { ok: false, message: SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE };
+  }
+  return { ok: true };
 }

@@ -13,12 +13,7 @@ import "./SellerProductsLimitModal.css";
  *   limit: number | null;
  * }} props
  */
-export function SellerProductsLimitModal({
-  isOpen,
-  onClose,
-  isPremiumUser,
-  limit,
-}) {
+export function SellerProductsLimitModal({ isOpen, onClose, isPremiumUser, limit }) {
   useEffect(() => {
     if (!isOpen) return undefined;
     const onKeyDown = (event) => {
@@ -32,17 +27,11 @@ export function SellerProductsLimitModal({
 
   const body = isPremiumUser
     ? SELLER_PRODUCTS_LIMIT_MODAL_UI.BODY_PREMIUM(limit)
-    : SELLER_PRODUCTS_LIMIT_MODAL_UI.BODY_REGULAR(
-        limit,
-        SELLER_PRODUCTS_LIMIT_PREMIUM,
-      );
+    : SELLER_PRODUCTS_LIMIT_MODAL_UI.BODY_REGULAR(limit, SELLER_PRODUCTS_LIMIT_PREMIUM);
 
   return (
     <div className="seller-products-limit-modal" role="presentation">
-      <div
-        className="seller-products-limit-modal__backdrop"
-        aria-hidden="true"
-      />
+      <div className="seller-products-limit-modal__backdrop" aria-hidden="true" />
       <div
         className="seller-products-limit-modal__card"
         role="dialog"

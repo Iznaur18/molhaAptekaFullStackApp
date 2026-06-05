@@ -23,9 +23,7 @@ export const normalizeProductCharacteristics = (raw) => {
 
   for (const item of raw) {
     if (item == null || typeof item !== "object") {
-      throw new Error(
-        "Каждая характеристика должна быть объектом с key и value",
-      );
+      throw new Error("Каждая характеристика должна быть объектом с key и value");
     }
 
     const key = item.key == null ? "" : String(item.key).trim();
@@ -63,9 +61,7 @@ export const normalizeProductCharacteristics = (raw) => {
   }
 
   if (result.length > PRODUCT_CHARACTERISTICS_MAX_ITEMS) {
-    throw new Error(
-      `Не более ${PRODUCT_CHARACTERISTICS_MAX_ITEMS} характеристик`,
-    );
+    throw new Error(`Не более ${PRODUCT_CHARACTERISTICS_MAX_ITEMS} характеристик`);
   }
 
   return result;

@@ -15,18 +15,18 @@ Backend приложения Rassro (API): пользователи, автор�
 
 ## Стек технологий
 
-| Технология | Назначение |
-|------------|------------|
-| **Node.js** | Среда выполнения |
-| **Express 5** | HTTP-сервер, маршруты, middleware |
-| **MongoDB + Mongoose** | БД и ODM |
+| Технология             | Назначение                                                      |
+| ---------------------- | --------------------------------------------------------------- |
+| **Node.js**            | Среда выполнения                                                |
+| **Express 5**          | HTTP-сервер, маршруты, middleware                               |
+| **MongoDB + Mongoose** | БД и ODM                                                        |
 | **JWT (jsonwebtoken)** | Авторизация (токен в заголовке `Authorization: Bearer <token>`) |
-| **bcrypt** | Хеширование паролей |
-| **express-validator** | Валидация тела/параметров запросов |
-| **express-rate-limit** | Ограничение частоты запросов (защита от брутфорса и DDoS) |
-| **multer** | Загрузка файлов (изображения) |
-| **dotenv** | Переменные окружения (.env) |
-| **cors** | Доступ с фронтенда (опционально по `FRONTEND_URL`) |
+| **bcrypt**             | Хеширование паролей                                             |
+| **express-validator**  | Валидация тела/параметров запросов                              |
+| **express-rate-limit** | Ограничение частоты запросов (защита от брутфорса и DDoS)       |
+| **multer**             | Загрузка файлов (изображения)                                   |
+| **dotenv**             | Переменные окружения (.env)                                     |
+| **cors**               | Доступ с фронтенда (опционально по `FRONTEND_URL`)              |
 
 ---
 
@@ -92,24 +92,24 @@ rateLimiter (опц.) → checkAuthMW (JWT) → param/body validation → contro
 
 ## API (кратко)
 
-| Метод  | Путь | Описание |
-|--------|------|----------|
-| GET    | `/auth/me` | Текущий пользователь (нужен JWT) |
-| GET    | `/user/search` | Поиск пользователей (query по валидации `userSearchValidation`) |
-| GET    | `/user/:userIdClient` | Публичный профиль по ID |
-| GET    | `/vote/rating/:userIdClient` | Рейтинг пользователя по голосам | свой и чужой
-| GET    | `/order/all` | Все заказы от всех (в коде сейчас без `checkAuthMW`; в комментарии — задумка «только админ») |
-| GET    | `/order` | Мои заказы (JWT) | то что я заказал
-| GET    | `/product` | Список всех продуктов | от всех юзеров
-| GET    | `/product/my` | Мои продукты (JWT) | лично созданные
-| POST   | `/auth/register` | Регистрация (email, password, опц. userName, phoneNumber, avatarUrl) |
-| POST   | `/auth/login` | Вход по email + password |
-| POST   | `/vote/:userVoteTargetIdClient` | Поставить/обновить оценку 1–10 (JWT) |
-| POST   | `/upload` | Загрузка изображения (JWT, multipart, поле `image`) |
-| POST   | `/order` | Создать заказ (JWT) |
-| POST   | `/product` | Создать продукт (JWT, body по `makeProductValidation`) |
-| PATCH  | `/user/:userIdClient` | Обновление профиля (JWT; свои поля или админ — все разрешённые) |
-| DELETE | `/user/:userIdClient` | Удаление пользователя (JWT; себя или админ) |
+| Метод  | Путь                            | Описание                                                                                     |
+| ------ | ------------------------------- | -------------------------------------------------------------------------------------------- | ---------------- |
+| GET    | `/auth/me`                      | Текущий пользователь (нужен JWT)                                                             |
+| GET    | `/user/search`                  | Поиск пользователей (query по валидации `userSearchValidation`)                              |
+| GET    | `/user/:userIdClient`           | Публичный профиль по ID                                                                      |
+| GET    | `/vote/rating/:userIdClient`    | Рейтинг пользователя по голосам                                                              | свой и чужой     |
+| GET    | `/order/all`                    | Все заказы от всех (в коде сейчас без `checkAuthMW`; в комментарии — задумка «только админ») |
+| GET    | `/order`                        | Мои заказы (JWT)                                                                             | то что я заказал |
+| GET    | `/product`                      | Список всех продуктов                                                                        | от всех юзеров   |
+| GET    | `/product/my`                   | Мои продукты (JWT)                                                                           | лично созданные  |
+| POST   | `/auth/register`                | Регистрация (email, password, опц. userName, phoneNumber, avatarUrl)                         |
+| POST   | `/auth/login`                   | Вход по email + password                                                                     |
+| POST   | `/vote/:userVoteTargetIdClient` | Поставить/обновить оценку 1–10 (JWT)                                                         |
+| POST   | `/upload`                       | Загрузка изображения (JWT, multipart, поле `image`)                                          |
+| POST   | `/order`                        | Создать заказ (JWT)                                                                          |
+| POST   | `/product`                      | Создать продукт (JWT, body по `makeProductValidation`)                                       |
+| PATCH  | `/user/:userIdClient`           | Обновление профиля (JWT; свои поля или админ — все разрешённые)                              |
+| DELETE | `/user/:userIdClient`           | Удаление пользователя (JWT; себя или админ)                                                  |
 
 Статика загрузок: `GET /uploads/<filename>`.
 
@@ -160,4 +160,4 @@ rateLimiter (опц.) → checkAuthMW (JWT) → param/body validation → contro
 
 ---
 
-*Краткий обзор: стек, структура, связи, модели, API, авторизация, безопасность и где искать детали.*
+_Краткий обзор: стек, структура, связи, модели, API, авторизация, безопасность и где искать детали._

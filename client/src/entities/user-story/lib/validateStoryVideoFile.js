@@ -1,4 +1,7 @@
-import { UPLOAD_VIDEO_MAX_BYTES, UPLOAD_VIDEO_MIME_TYPES } from "../../../shared/config/uploadConstants.js";
+import {
+  UPLOAD_VIDEO_MAX_BYTES,
+  UPLOAD_VIDEO_MIME_TYPES,
+} from "../../../shared/config/uploadConstants.js";
 import { USER_STORY_UI } from "../../../shared/config/appUiCopy.js";
 import { USER_STORY_ASPECT_RATIO } from "../model/constants.js";
 

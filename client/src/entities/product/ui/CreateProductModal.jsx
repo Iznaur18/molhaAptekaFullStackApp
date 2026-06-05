@@ -3,10 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createProduct } from "../api/createProduct.js";
 import { patchMyProduct } from "../api/patchMyProduct.js";
 import { resolveProductImageUrls } from "../lib/resolveProductImageUrls.js";
-import {
-  createImageRow,
-  imageRowsFromUrls,
-} from "../lib/productImageRowHelpers.js";
+import { createImageRow, imageRowsFromUrls } from "../lib/productImageRowHelpers.js";
 import {
   PRODUCT_CATEGORY_ELECTRONICS,
   PRODUCT_DESCRIPTION_MAX_CHARS,
@@ -17,7 +14,7 @@ import {
   PRODUCT_STOCK_QUANTITY_MAX,
   PRODUCT_STOCK_QUANTITY_MIN,
 } from "../model/productStockConstants.js";
-import { CreateProductCategorySelect } from "./CreateProductCategorySelect.jsx";
+import { CreateProductCategoryPicker } from "../../product-category-tree/ui/CreateProductCategoryPicker.jsx";
 import { urlsFromImageRows } from "../lib/productImageRowHelpers.js";
 import {
   computeProductDiscountPercent,
@@ -39,7 +36,7 @@ import {
 import { resolveUploadedImageUrl } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { resolveProductLoyaltyPointsPerUnit } from "../lib/resolveProductLoyaltyPointsPerUnit.js";
 import { resolveSellerMaxLoyaltyPointsPerUnit } from "../lib/resolveSellerMaxLoyaltyPointsPerUnit.js";
-import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
+import { ProductModalShell } from "../../../shared/ui/ProductModalShell/ProductModalShell.jsx";
 import { ProductEditManageSection } from "./ProductEditManageSection.jsx";
 import { InstallmentProgramModal } from "../../installment/ui/InstallmentProgramModal.jsx";
 import { ProductImageUrlSortableList } from "./ProductImageUrlSortableList.jsx";
@@ -49,9 +46,8 @@ import {
   CREATE_PRODUCT_MODAL_UI,
   PRODUCT_PREVIEW_VIDEO_UI,
 } from "../../../shared/config/appUiCopy.js";
+import { getProductFieldEditLabel } from "../lib/productFieldRegistry.js";
 import { FormFieldLabel } from "../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
-import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
-
 import "./CreateProductModal.css";
 
 const INITIAL_FORM = {
@@ -62,6 +58,8 @@ const INITIAL_FORM = {
   productPrice: "",
   productOldPrice: "",
   productCategory: PRODUCT_CATEGORY_ELECTRONICS,
+  productCategoryId: null,
+  categoryBreadcrumbRu: "",
   productIsAvailable: true,
   productStockQuantity: "1",
   productAuctionEnabled: false,
@@ -76,9 +74,7 @@ function formStateFromProduct(product) {
   const urls = resolveProductImageUrls(product);
   const priceRaw = product.productPrice;
   const priceStr =
-    priceRaw != null && Number.isFinite(Number(priceRaw))
-      ? String(priceRaw)
-      : "";
+    priceRaw != null && Number.isFinite(Number(priceRaw)) ? String(priceRaw) : "";
   const oldPriceRaw = product.productOldPrice;
   const oldPriceStr =
     oldPriceRaw != null && Number.isFinite(Number(oldPriceRaw))
@@ -92,10 +88,11 @@ function formStateFromProduct(product) {
     productPrice: priceStr,
     productOldPrice: oldPriceStr,
     productCategory: product.productCategory ?? PRODUCT_CATEGORY_ELECTRONICS,
+    productCategoryId: product.productCategoryId ?? null,
+    categoryBreadcrumbRu: product.categoryBreadcrumbRu?.trim() ?? "",
     productIsAvailable: product.productIsAvailable !== false,
     productStockQuantity:
-      product.productIsAvailable !== false &&
-      product.productStockQuantity != null
+      product.productIsAvailable !== false && product.productStockQuantity != null
         ? String(Math.max(0, Math.floor(Number(product.productStockQuantity))))
         : "1",
     productAuctionEnabled: product.productAuctionEnabled === true,
@@ -210,8 +207,6 @@ export function CreateProductModal({
     setStatus({ kind: "idle", message: "" });
   }, [isOpen, isEdit, productToEdit?._id]);
 
-  useScrollLock(isOpen);
-
   const descriptionChars = useMemo(
     () => String(form.productDescription ?? "").length,
     [form.productDescription],
@@ -292,10 +287,7 @@ export function CreateProductModal({
           return;
         }
       }
-      const oldPriceError = validateProductOldPricePair(
-        productOldPrice,
-        productPrice,
-      );
+      const oldPriceError = validateProductOldPricePair(productOldPrice, productPrice);
       if (oldPriceError) {
         setStatus({
           kind: "error",
@@ -304,9 +296,7 @@ export function CreateProductModal({
         return;
       }
 
-      const descriptionError = validateProductDescription(
-        form.productDescription,
-      );
+      const descriptionError = validateProductDescription(form.productDescription);
       if (descriptionError) {
         setStatus({ kind: "error", message: descriptionError });
         return;
@@ -367,9 +357,7 @@ export function CreateProductModal({
 
       const loyaltyParsed = Math.floor(Number(form.loyaltyPointsPerUnit));
       const loyaltyPointsPerUnit =
-        Number.isFinite(loyaltyParsed) && loyaltyParsed >= 0
-          ? loyaltyParsed
-          : 0;
+        Number.isFinite(loyaltyParsed) && loyaltyParsed >= 0 ? loyaltyParsed : 0;
       if (loyaltyPointsPerUnit > sellerPointsMaxPerUnit) {
         setStatus({
           kind: "error",
@@ -377,6 +365,14 @@ export function CreateProductModal({
             sellerPointsMaxPerUnit,
             sellerLoyaltyBudget.catalogCommitted,
           ),
+        });
+        return;
+      }
+
+      if (!form.productCategoryId && !form.productCategory) {
+        setStatus({
+          kind: "error",
+          message: CREATE_PRODUCT_MODAL_UI.ERROR_CATEGORY_LEAF,
         });
         return;
       }
@@ -397,10 +393,14 @@ export function CreateProductModal({
           productPreviewVideoUrl: previewVideoUrl,
           productPrice,
           productOldPrice,
-          productCategory: form.productCategory,
           loyaltyPointsPerUnit,
           productCharacteristics,
         };
+        if (form.productCategoryId) {
+          patchBody.productCategoryId = form.productCategoryId;
+        } else {
+          patchBody.productCategory = form.productCategory;
+        }
         if (showCatalogAvailabilityToggle) {
           patchBody.productIsAvailable = form.productIsAvailable;
         }
@@ -416,7 +416,9 @@ export function CreateProductModal({
           productPreviewVideoUrl: previewVideoUrl || undefined,
           productPrice,
           productOldPrice,
-          productCategory: form.productCategory,
+          ...(form.productCategoryId
+            ? { productCategoryId: form.productCategoryId }
+            : { productCategory: form.productCategory }),
           productIsAvailable: form.productIsAvailable,
           productStockQuantity,
           productAuctionEnabled: form.productAuctionEnabled,
@@ -431,8 +433,7 @@ export function CreateProductModal({
       const fallback = isEdit
         ? CREATE_PRODUCT_MODAL_UI.ERROR_EDIT_GENERIC
         : CREATE_PRODUCT_MODAL_UI.ERROR_GENERIC;
-      const message =
-        error instanceof Error ? error.message : fallback;
+      const message = error instanceof Error ? error.message : fallback;
       setStatus({ kind: "error", message });
     }
   };
@@ -451,29 +452,21 @@ export function CreateProductModal({
     : CREATE_PRODUCT_MODAL_UI.SUBMIT_LOADING;
 
   return (
-    <div
-      className="create-product-modal"
-      role="dialog"
-      aria-modal="true"
-      aria-label={dialogAria}
-    >
-      <div className="create-product-modal__backdrop" aria-hidden="true" />
-      <div className="create-product-modal__card">
-        <div className="create-product-modal__header">
-          <h2 className="create-product-modal__title">{title}</h2>
-          <button
-            type="button"
-            className="create-product-modal__close"
-            onClick={handleClose}
-          >
-            <ModalCloseIcon />
-          </button>
-        </div>
-        <div className="create-product-modal__body">
-          <form className="create-product-modal__form" onSubmit={handleSubmit}>
+    <>
+      <ProductModalShell
+        isOpen={isOpen}
+        onClose={handleClose}
+        title={title}
+        titleId="create-product-modal-title"
+        ariaLabel={dialogAria}
+        size="md"
+        panelClassName="create-product-modal__panel"
+        bodyClassName="create-product-modal__body"
+      >
+        <form className="create-product-modal__form" onSubmit={handleSubmit}>
             <label className="create-product-modal__label">
               <FormFieldLabel required>
-                {CREATE_PRODUCT_MODAL_UI.LABEL_NAME}
+                {getProductFieldEditLabel("productName")}
               </FormFieldLabel>
               <input
                 className="create-product-modal__input"
@@ -489,7 +482,7 @@ export function CreateProductModal({
             </label>
             <label className="create-product-modal__label">
               <FormFieldLabel required>
-                {CREATE_PRODUCT_MODAL_UI.LABEL_DESCRIPTION}
+                {getProductFieldEditLabel("productDescription")}
               </FormFieldLabel>
               <textarea
                 className="create-product-modal__textarea"
@@ -529,9 +522,7 @@ export function CreateProductModal({
               disabled={isSubmitting}
             />
             <div className="create-product-modal__label">
-              <FormFieldLabel>
-                {PRODUCT_PREVIEW_VIDEO_UI.LABEL}
-              </FormFieldLabel>
+              <FormFieldLabel>{PRODUCT_PREVIEW_VIDEO_UI.LABEL}</FormFieldLabel>
               <ProductPreviewVideoField
                 value={form.productPreviewVideoUrl}
                 onChange={(productPreviewVideoUrl) =>
@@ -542,7 +533,7 @@ export function CreateProductModal({
             </div>
             <label className="create-product-modal__label">
               <FormFieldLabel required>
-                {CREATE_PRODUCT_MODAL_UI.LABEL_PRICE}
+                {getProductFieldEditLabel("productPrice")}
               </FormFieldLabel>
               <input
                 {...INTEGER_INPUT_FIELD_PROPS}
@@ -556,9 +547,7 @@ export function CreateProductModal({
               />
             </label>
             <label className="create-product-modal__label">
-              <FormFieldLabel>
-                {CREATE_PRODUCT_MODAL_UI.LABEL_OLD_PRICE}
-              </FormFieldLabel>
+              <FormFieldLabel>{getProductFieldEditLabel("productOldPrice")}</FormFieldLabel>
               <input
                 {...INTEGER_INPUT_FIELD_PROPS}
                 className="create-product-modal__input"
@@ -575,11 +564,24 @@ export function CreateProductModal({
                 {discountPreviewPercent}%
               </p>
             ) : null}
-            <CreateProductCategorySelect
-              value={form.productCategory}
+            <CreateProductCategoryPicker
+              value={{
+                productCategoryId: form.productCategoryId,
+                categoryBreadcrumbRu: form.categoryBreadcrumbRu,
+                productCategory: form.productCategory,
+              }}
               disabled={isSubmitting}
-              onChange={(productCategory) =>
-                setForm((prev) => ({ ...prev, productCategory }))
+              onChange={({
+                productCategoryId,
+                categoryBreadcrumbRu,
+                productCategory,
+              }) =>
+                setForm((prev) => ({
+                  ...prev,
+                  productCategoryId,
+                  categoryBreadcrumbRu,
+                  productCategory,
+                }))
               }
             />
             {showCatalogAvailabilityToggle ? (
@@ -590,7 +592,7 @@ export function CreateProductModal({
                   onChange={handleAvailableChange}
                   disabled={isSubmitting}
                 />
-                {CREATE_PRODUCT_MODAL_UI.LABEL_AVAILABLE}
+                {getProductFieldEditLabel("productIsAvailable")}
               </label>
             ) : null}
             {form.productIsAvailable || isEdit ? (
@@ -598,7 +600,7 @@ export function CreateProductModal({
                 <FormFieldLabel
                   required={form.productIsAvailable || !showCatalogAvailabilityToggle}
                 >
-                  {CREATE_PRODUCT_MODAL_UI.LABEL_STOCK_QUANTITY}
+                  {getProductFieldEditLabel("productStockQuantity")}
                 </FormFieldLabel>
                 <input
                   {...INTEGER_INPUT_FIELD_PROPS}
@@ -608,15 +610,13 @@ export function CreateProductModal({
                   onChange={handleChange}
                   maxLength={String(PRODUCT_STOCK_QUANTITY_MAX).length}
                   disabled={isSubmitting}
-                  required={
-                    form.productIsAvailable || !showCatalogAvailabilityToggle
-                  }
+                  required={form.productIsAvailable || !showCatalogAvailabilityToggle}
                 />
               </label>
             ) : null}
             <label className="create-product-modal__label">
               <FormFieldLabel>
-                {CREATE_PRODUCT_MODAL_UI.LABEL_LOYALTY_POINTS_PER_UNIT}
+                {getProductFieldEditLabel("loyaltyPointsPerUnit")}
               </FormFieldLabel>
               <input
                 {...INTEGER_INPUT_FIELD_PROPS}
@@ -645,7 +645,7 @@ export function CreateProductModal({
                   onChange={handleAuctionChange}
                   disabled={isSubmitting}
                 />
-                {CREATE_PRODUCT_MODAL_UI.LABEL_AUCTION}
+                {getProductFieldEditLabel("productAuctionEnabled")}
               </label>
             ) : null}
             {showManageSection && manageProduct ? (
@@ -667,8 +667,7 @@ export function CreateProductModal({
                 disabled={isSubmitting}
                 onOpenInstallmentProgram={() => setIsInstallmentProgramOpen(true)}
                 canOpenInstallmentProgram={
-                  manageProduct.productModerationStatus ===
-                  PRODUCT_MODERATION_APPROVED
+                  manageProduct.productModerationStatus === PRODUCT_MODERATION_APPROVED
                 }
               />
             ) : null}
@@ -687,9 +686,8 @@ export function CreateProductModal({
             >
               {isSubmitting ? submitLoading : submitIdle}
             </button>
-          </form>
-        </div>
-      </div>
+        </form>
+      </ProductModalShell>
       {manageProduct?._id != null ? (
         <InstallmentProgramModal
           isOpen={isInstallmentProgramOpen}
@@ -703,6 +701,6 @@ export function CreateProductModal({
           }}
         />
       ) : null}
-    </div>
+    </>
   );
 }

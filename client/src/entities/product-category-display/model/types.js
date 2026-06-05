@@ -16,3 +16,20 @@
  * @property {boolean} isCustomLabel
  * @property {boolean} isCustomImage
  */
+
+/**
+ * @typedef {Object} ProductCatalogFeedTileDisplayFromApi
+ * @property {string} tileKey
+ * @property {string | null} customLabel
+ * @property {string | null} imageUrl
+ * @property {string | null} [updatedAt]
+ */
+
+/**
+ * @typedef {Object} ResolvedCatalogFeedTileDisplay
+ * @property {string} tileKey
+ * @property {string} label
+ * @property {string | null} imageUrl
+ * @property {boolean} isCustomLabel
+ * @property {boolean} isCustomImage
+ */

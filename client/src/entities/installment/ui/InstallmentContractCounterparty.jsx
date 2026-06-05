@@ -19,11 +19,7 @@ function formatDisplayName(counterparty) {
  *   onUserClick?: (userId: string) => void;
  * }} props
  */
-export function InstallmentContractCounterparty({
-  label,
-  counterparty,
-  onUserClick,
-}) {
+export function InstallmentContractCounterparty({ label, counterparty, onUserClick }) {
   if (!counterparty?._id) {
     return null;
   }
@@ -43,9 +39,7 @@ export function InstallmentContractCounterparty({
           {displayName}
         </button>
       ) : (
-        <span className="installment-contract-counterparty__name">
-          {displayName}
-        </span>
+        <span className="installment-contract-counterparty__name">{displayName}</span>
       )}
       {counterparty.userPhoneNumber ? (
         <span className="installment-contract-counterparty__detail">

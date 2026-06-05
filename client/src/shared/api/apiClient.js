@@ -35,11 +35,9 @@ const shouldSkipAuthRefresh = (url) => {
 
 const refreshAuthSession = () => {
   if (!refreshSessionPromise) {
-    refreshSessionPromise = apiClient
-      .post("/auth/refresh")
-      .finally(() => {
-        refreshSessionPromise = null;
-      });
+    refreshSessionPromise = apiClient.post("/auth/refresh").finally(() => {
+      refreshSessionPromise = null;
+    });
   }
   return refreshSessionPromise;
 };

@@ -1,12 +1,12 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 import {
-    CART_LINE_ITEM_QUANTITY_MAX,
-    CART_LINE_ITEM_QUANTITY_MIN,
-    CART_MAX_DISTINCT_PRODUCTS,
-} from '../../constants/cartConstants.js';
-import { PRODUCT_MODERATION_APPROVED } from '../../constants/productModerationConstants.js';
-import { ProductModel } from '../../models/index.js';
+  CART_LINE_ITEM_QUANTITY_MAX,
+  CART_LINE_ITEM_QUANTITY_MIN,
+  CART_MAX_DISTINCT_PRODUCTS,
+} from "../../constants/cartConstants.js";
+import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
+import { ProductModel } from "../../models/index.js";
 
 /**
  * Приводит сырые данные из БД/тела к объекту productId -> quantity.
@@ -14,21 +14,18 @@ import { ProductModel } from '../../models/index.js';
  * @returns {Record<string, number>}
  */
 export const normalizeStoredCartItems = (raw) => {
-    if (raw == null || typeof raw !== 'object' || Array.isArray(raw)) {
-        return {};
+  if (raw == null || typeof raw !== "object" || Array.isArray(raw)) {
+    return {};
+  }
+  return Object.entries(raw).reduce((acc, [productId, quantity]) => {
+    if (!mongoose.isValidObjectId(productId)) return acc;
+    const q = Math.floor(Number(quantity));
+    if (q < CART_LINE_ITEM_QUANTITY_MIN || q > CART_LINE_ITEM_QUANTITY_MAX) {
+      return acc;
     }
-    return Object.entries(raw).reduce((acc, [productId, quantity]) => {
-        if (!mongoose.isValidObjectId(productId)) return acc;
-        const q = Math.floor(Number(quantity));
-        if (
-            q < CART_LINE_ITEM_QUANTITY_MIN ||
-            q > CART_LINE_ITEM_QUANTITY_MAX
-        ) {
-            return acc;
-        }
-        acc[String(productId)] = q;
-        return acc;
-    }, {});
+    acc[String(productId)] = q;
+    return acc;
+  }, {});
 };
 
 /**
@@ -37,33 +34,28 @@ export const normalizeStoredCartItems = (raw) => {
  * @returns {{ ok: true; items: Record<string, number> } | { ok: false; message: string }}
  */
 export const parseReplaceCartBodyItems = (raw) => {
-    if (raw == null || typeof raw !== 'object' || Array.isArray(raw)) {
-        return { ok: false, message: 'items должен быть объектом' };
+  if (raw == null || typeof raw !== "object" || Array.isArray(raw)) {
+    return { ok: false, message: "items должен быть объектом" };
+  }
+  const entries = Object.entries(raw).filter(([k]) => mongoose.isValidObjectId(k));
+  if (entries.length > CART_MAX_DISTINCT_PRODUCTS) {
+    return {
+      ok: false,
+      message: `Не более ${CART_MAX_DISTINCT_PRODUCTS} разных товаров в корзине`,
+    };
+  }
+  const items = {};
+  for (const [productId, quantity] of entries) {
+    const q = Math.floor(Number(quantity));
+    if (q < CART_LINE_ITEM_QUANTITY_MIN || q > CART_LINE_ITEM_QUANTITY_MAX) {
+      return {
+        ok: false,
+        message: `Количество по каждой позиции от ${CART_LINE_ITEM_QUANTITY_MIN} до ${CART_LINE_ITEM_QUANTITY_MAX}`,
+      };
     }
-    const entries = Object.entries(raw).filter(([k]) =>
-        mongoose.isValidObjectId(k),
-    );
-    if (entries.length > CART_MAX_DISTINCT_PRODUCTS) {
-        return {
-            ok: false,
-            message: `Не более ${CART_MAX_DISTINCT_PRODUCTS} разных товаров в корзине`,
-        };
-    }
-    const items = {};
-    for (const [productId, quantity] of entries) {
-        const q = Math.floor(Number(quantity));
-        if (
-            q < CART_LINE_ITEM_QUANTITY_MIN ||
-            q > CART_LINE_ITEM_QUANTITY_MAX
-        ) {
-            return {
-                ok: false,
-                message: `Количество по каждой позиции от ${CART_LINE_ITEM_QUANTITY_MIN} до ${CART_LINE_ITEM_QUANTITY_MAX}`,
-            };
-        }
-        items[String(productId)] = q;
-    }
-    return { ok: true, items };
+    items[String(productId)] = q;
+  }
+  return { ok: true, items };
 };
 
 /**
@@ -72,21 +64,21 @@ export const parseReplaceCartBodyItems = (raw) => {
  * @returns {Promise<Record<string, number>>}
  */
 export const filterCartItemsToPurchasableProducts = async (items) => {
-    const ids = Object.keys(items);
-    if (ids.length === 0) return {};
+  const ids = Object.keys(items);
+  if (ids.length === 0) return {};
 
-    const oids = ids.map((id) => new mongoose.Types.ObjectId(id));
-    const alive = await ProductModel.find({
-        _id: { $in: oids },
-        productModerationStatus: PRODUCT_MODERATION_APPROVED,
-        productIsAvailable: { $ne: false },
-        productStockQuantity: { $gt: 0 },
-    })
-        .select('_id')
-        .lean();
+  const oids = ids.map((id) => new mongoose.Types.ObjectId(id));
+  const alive = await ProductModel.find({
+    _id: { $in: oids },
+    productModerationStatus: PRODUCT_MODERATION_APPROVED,
+    productIsAvailable: { $ne: false },
+    productStockQuantity: { $gt: 0 },
+  })
+    .select("_id")
+    .lean();
 
-    const allowed = new Set(alive.map((p) => String(p._id)));
-    return Object.fromEntries(
-        Object.entries(items).filter(([productId]) => allowed.has(productId)),
-    );
+  const allowed = new Set(alive.map((p) => String(p._id)));
+  return Object.fromEntries(
+    Object.entries(items).filter(([productId]) => allowed.has(productId)),
+  );
 };

@@ -23,19 +23,13 @@ function deleteConfirmToken(user) {
  *   onDeleted: () => void;
  * }} props
  */
-export function AdminDeleteUserConfirmModal({
-  isOpen,
-  user,
-  onClose,
-  onDeleted,
-}) {
+export function AdminDeleteUserConfirmModal({ isOpen, user, onClose, onDeleted }) {
   const [confirmText, setConfirmText] = useState("");
   const [phase, setPhase] = useState(/** @type {'idle'|'loading'|'error'} */ ("idle"));
   const [error, setError] = useState("");
 
   const token = user ? deleteConfirmToken(user) : "";
-  const canSubmit =
-    Boolean(user) && token.length > 0 && confirmText.trim() === token;
+  const canSubmit = Boolean(user) && token.length > 0 && confirmText.trim() === token;
 
   useEffect(() => {
     if (!isOpen) {
@@ -69,9 +63,7 @@ export function AdminDeleteUserConfirmModal({
       onClose();
     } catch (e) {
       setPhase("error");
-      setError(
-        e instanceof Error ? e.message : ADMIN_EDIT_USER_UI.DELETE_SUBMIT,
-      );
+      setError(e instanceof Error ? e.message : ADMIN_EDIT_USER_UI.DELETE_SUBMIT);
     }
   };
 

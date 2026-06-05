@@ -25,9 +25,7 @@ export function AddToCartButton({
   const { items, addItem, setItemQuantity, removeItem } = useCart();
   const quantity = items[productId] ?? 0;
   const purchaseLimit =
-    maxQuantity != null
-      ? Math.max(0, Math.floor(Number(maxQuantity)) || 0)
-      : null;
+    maxQuantity != null ? Math.max(0, Math.floor(Number(maxQuantity)) || 0) : null;
 
   useEffect(() => {
     if (purchaseLimit == null || quantity <= purchaseLimit) {
@@ -89,10 +87,7 @@ export function AddToCartButton({
       >
         −
       </button>
-      <span
-        className="add-to-cart__quantity"
-        aria-label={ADD_TO_CART_UI.QUANTITY_ARIA}
-      >
+      <span className="add-to-cart__quantity" aria-label={ADD_TO_CART_UI.QUANTITY_ARIA}>
         {quantity}
       </span>
       <button

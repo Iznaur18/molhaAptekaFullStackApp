@@ -7,10 +7,7 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
  */
 export async function patchMyProductReview(productId, payload) {
   try {
-    const { data } = await apiClient.patch(
-      `/product/${productId}/reviews/me`,
-      payload,
-    );
+    const { data } = await apiClient.patch(`/product/${productId}/reviews/me`, payload);
 
     if (!data?.success || data.data?.review == null) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);

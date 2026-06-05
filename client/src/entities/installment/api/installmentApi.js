@@ -6,18 +6,14 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
  */
 export async function fetchProductInstallmentProgram(productId) {
   try {
-    const { data } = await apiClient.get(
-      `/product/${productId}/installment-program`,
-    );
+    const { data } = await apiClient.get(`/product/${productId}/installment-program`);
     if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
     return data.data?.program ?? null;
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      "Не удалось загрузить рассрочку";
+      e?.response?.data?.message ?? e?.message ?? "Не удалось загрузить рассрочку";
     throw new Error(message);
   }
 }
@@ -38,9 +34,7 @@ export async function upsertProductInstallmentProgram(productId, body) {
     return data.data;
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      "Не удалось сохранить рассрочку";
+      e?.response?.data?.message ?? e?.message ?? "Не удалось сохранить рассрочку";
     throw new Error(message);
   }
 }
@@ -67,17 +61,14 @@ export async function createInstallmentContract(productId, body) {
     return data.data;
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      "Не удалось оформить рассрочку";
+      e?.response?.data?.message ?? e?.message ?? "Не удалось оформить рассрочку";
     throw new Error(message);
   }
 }
 
 export async function fetchMyInstallmentContracts(params = {}) {
   try {
-    const status =
-      typeof params.status === "string" ? params.status.trim() : "";
+    const status = typeof params.status === "string" ? params.status.trim() : "";
     const { data } = await apiClient.get("/installment/contracts/my", {
       params: status ? { status } : undefined,
     });
@@ -87,17 +78,14 @@ export async function fetchMyInstallmentContracts(params = {}) {
     return data.data.contracts;
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      "Не удалось загрузить рассрочки";
+      e?.response?.data?.message ?? e?.message ?? "Не удалось загрузить рассрочки";
     throw new Error(message);
   }
 }
 
 export async function fetchMyInstallmentSales(params = {}) {
   try {
-    const status =
-      typeof params.status === "string" ? params.status.trim() : "";
+    const status = typeof params.status === "string" ? params.status.trim() : "";
     const { data } = await apiClient.get("/installment/contracts/sales", {
       params: status ? { status } : undefined,
     });
@@ -128,8 +116,7 @@ export async function markInstallmentPaymentPaid(contractId, paymentIndex) {
     }
     return data.data;
   } catch (e) {
-    const message =
-      e?.response?.data?.message ?? e?.message ?? "Ошибка";
+    const message = e?.response?.data?.message ?? e?.message ?? "Ошибка";
     throw new Error(message);
   }
 }
@@ -148,8 +135,7 @@ export async function rejectInstallmentPayment(contractId, paymentIndex) {
     }
     return data.data;
   } catch (e) {
-    const message =
-      e?.response?.data?.message ?? e?.message ?? "Ошибка";
+    const message = e?.response?.data?.message ?? e?.message ?? "Ошибка";
     throw new Error(message);
   }
 }
@@ -164,8 +150,7 @@ export async function confirmInstallmentPayment(contractId, paymentIndex) {
     }
     return data.data;
   } catch (e) {
-    const message =
-      e?.response?.data?.message ?? e?.message ?? "Ошибка";
+    const message = e?.response?.data?.message ?? e?.message ?? "Ошибка";
     throw new Error(message);
   }
 }
@@ -183,8 +168,7 @@ export async function markInstallmentEarlyPayoff(contractId) {
     }
     return data.data;
   } catch (e) {
-    const message =
-      e?.response?.data?.message ?? e?.message ?? "Ошибка";
+    const message = e?.response?.data?.message ?? e?.message ?? "Ошибка";
     throw new Error(message);
   }
 }
@@ -202,8 +186,7 @@ export async function rejectInstallmentEarlyPayoff(contractId) {
     }
     return data.data;
   } catch (e) {
-    const message =
-      e?.response?.data?.message ?? e?.message ?? "Ошибка";
+    const message = e?.response?.data?.message ?? e?.message ?? "Ошибка";
     throw new Error(message);
   }
 }
@@ -218,8 +201,7 @@ export async function cancelInstallmentEarlyPayoff(contractId) {
     }
     return data.data;
   } catch (e) {
-    const message =
-      e?.response?.data?.message ?? e?.message ?? "Ошибка";
+    const message = e?.response?.data?.message ?? e?.message ?? "Ошибка";
     throw new Error(message);
   }
 }
@@ -234,8 +216,7 @@ export async function confirmInstallmentEarlyPayoff(contractId) {
     }
     return data.data;
   } catch (e) {
-    const message =
-      e?.response?.data?.message ?? e?.message ?? "Ошибка";
+    const message = e?.response?.data?.message ?? e?.message ?? "Ошибка";
     throw new Error(message);
   }
 }
@@ -255,8 +236,7 @@ export async function sendInstallmentSellerMessage(contractId, messageText) {
     }
     return data.data;
   } catch (e) {
-    const message =
-      e?.response?.data?.message ?? e?.message ?? "Ошибка";
+    const message = e?.response?.data?.message ?? e?.message ?? "Ошибка";
     throw new Error(message);
   }
 }
@@ -276,24 +256,20 @@ export async function openInstallmentDispute(contractId, reason) {
     }
     return data.data;
   } catch (e) {
-    const message =
-      e?.response?.data?.message ?? e?.message ?? "Ошибка";
+    const message = e?.response?.data?.message ?? e?.message ?? "Ошибка";
     throw new Error(message);
   }
 }
 
 export async function fetchPendingInstallmentModeration() {
   try {
-    const { data } = await apiClient.get(
-      "/product/installment/moderation/pending",
-    );
+    const { data } = await apiClient.get("/product/installment/moderation/pending");
     if (!data?.success || !Array.isArray(data.data?.programs)) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
     return data.data;
   } catch (e) {
-    const message =
-      e?.response?.data?.message ?? e?.message ?? "Ошибка";
+    const message = e?.response?.data?.message ?? e?.message ?? "Ошибка";
     throw new Error(message);
   }
 }
@@ -348,8 +324,7 @@ export async function fetchPendingInstallmentDisputes() {
     }
     return data.data.disputes;
   } catch (e) {
-    const message =
-      e?.response?.data?.message ?? e?.message ?? "Ошибка";
+    const message = e?.response?.data?.message ?? e?.message ?? "Ошибка";
     throw new Error(message);
   }
 }
@@ -380,9 +355,7 @@ export async function fetchInstallmentBuyerActionCount() {
 
 export async function fetchInstallmentSellerActionCount() {
   try {
-    const { data } = await apiClient.get(
-      "/installment/contracts/sales/action-count",
-    );
+    const { data } = await apiClient.get("/installment/contracts/sales/action-count");
     if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }

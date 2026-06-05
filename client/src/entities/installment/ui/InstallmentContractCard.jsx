@@ -84,9 +84,7 @@ export function InstallmentContractCard({
     const payments = contract.payments ?? [];
     return (
       payments.length > 0 &&
-      payments.every(
-        (payment) => payment.status === INSTALLMENT_PAYMENT_STATUS_PAID,
-      )
+      payments.every((payment) => payment.status === INSTALLMENT_PAYMENT_STATUS_PAID)
     );
   }, [contract.status, contract.payments]);
 
@@ -124,9 +122,7 @@ export function InstallmentContractCard({
   };
 
   const handleEarlyPayoff = () => {
-    void runAction("early", () =>
-      markInstallmentEarlyPayoff(String(contract._id)),
-    );
+    void runAction("early", () => markInstallmentEarlyPayoff(String(contract._id)));
   };
 
   const handleConfirmEarlyPayoff = () => {
@@ -250,17 +246,13 @@ export function InstallmentContractCard({
         </h4>
         {contract.payments.map((payment) => {
           const paymentLabel =
-            INSTALLMENT_UI.PAYMENT_STATUS_LABEL[payment.status] ??
-            payment.status;
+            INSTALLMENT_UI.PAYMENT_STATUS_LABEL[payment.status] ?? payment.status;
           const dueDate = new Date(payment.dueAt).toLocaleDateString("ru-RU");
-          const isOverdue =
-            payment.status === INSTALLMENT_PAYMENT_STATUS_OVERDUE;
+          const isOverdue = payment.status === INSTALLMENT_PAYMENT_STATUS_OVERDUE;
           const isPendingConfirmation =
-            payment.status ===
-            INSTALLMENT_PAYMENT_STATUS_PENDING_CONFIRMATION;
+            payment.status === INSTALLMENT_PAYMENT_STATUS_PENDING_CONFIRMATION;
           const isPaid = payment.status === INSTALLMENT_PAYMENT_STATUS_PAID;
-          const isRemaining =
-            !isPaid && !isOverdue && !isPendingConfirmation;
+          const isRemaining = !isPaid && !isOverdue && !isPendingConfirmation;
 
           return (
             <div
@@ -270,8 +262,7 @@ export function InstallmentContractCard({
                 isPaid && "installment-contract-card__payment_paid",
                 isRemaining && "installment-contract-card__payment_remaining",
                 isOverdue && "installment-contract-card__payment_overdue",
-                isPendingConfirmation &&
-                  "installment-contract-card__payment_pending",
+                isPendingConfirmation && "installment-contract-card__payment_pending",
               ]
                 .filter(Boolean)
                 .join(" ")}
@@ -303,8 +294,7 @@ export function InstallmentContractCard({
               ) : null}
               {role === "seller" &&
               !earlyPayoffPending &&
-              payment.status ===
-                INSTALLMENT_PAYMENT_STATUS_PENDING_CONFIRMATION ? (
+              payment.status === INSTALLMENT_PAYMENT_STATUS_PENDING_CONFIRMATION ? (
                 <span className="installment-contract-card__payment-actions">
                   <button
                     type="button"
@@ -353,9 +343,7 @@ export function InstallmentContractCard({
                 : INSTALLMENT_UI.CANCEL_EARLY_PAYOFF}
             </button>
           ) : null}
-          {role === "buyer" &&
-          !earlyPayoffPending &&
-          nextPayablePayment != null ? (
+          {role === "buyer" && !earlyPayoffPending && nextPayablePayment != null ? (
             <button
               type="button"
               className="installment-contract-card__btn"

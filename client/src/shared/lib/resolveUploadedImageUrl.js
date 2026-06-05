@@ -1,30 +1,61 @@
 const UPLOAD_ASSET_PATH_RE = /(\/uploads\/[^?#]+)/i;
 
 /**
- * Превращает ответ upload в URL, который браузер грузит с того же origin, что и SPA.
- * Нужно для LAN dev (192.168.x.x:5173), Vite proxy и prod после сохранения URL с чужим origin.
+ * Логика отображения upload URL в браузере (тестируется без window).
+ *
+ * @param {string} raw
+ * @param {string} pageOrigin — window.location.origin
+ * @returns {string}
+ */
+export function resolveUploadedImageUrlForBrowser(raw, pageOrigin) {
+  const url = String(raw ?? "").trim();
+  if (!url) {
+    return "";
+  }
+
+  if (/^https?:\/\//i.test(url)) {
+    try {
+      const parsed = new URL(url);
+      const pathMatch = parsed.pathname.match(UPLOAD_ASSET_PATH_RE);
+      if (pathMatch && parsed.origin === pageOrigin) {
+        return `${pageOrigin}${pathMatch[1]}`;
+      }
+      return url;
+    } catch {
+      return url;
+    }
+  }
+
+  const uploadPathMatch = url.match(UPLOAD_ASSET_PATH_RE);
+  if (uploadPathMatch) {
+    return `${pageOrigin}${uploadPathMatch[1]}`;
+  }
+
+  if (url.startsWith("/")) {
+    return `${pageOrigin}${url}`;
+  }
+
+  return url;
+}
+
+/**
+ * Превращает ответ upload в URL для <img>/<video>.
+ * CDN (`https://cdn.../uploads/...`) не переписывается на origin SPA.
  *
  * @param {string} raw
  * @returns {string}
  */
 export function resolveUploadedImageUrl(raw) {
   const url = String(raw ?? "").trim();
-  if (!url) return "";
+  if (!url) {
+    return "";
+  }
 
   if (typeof window === "undefined") {
     return url;
   }
 
-  const uploadPathMatch = url.match(UPLOAD_ASSET_PATH_RE);
-  if (uploadPathMatch) {
-    return `${window.location.origin}${uploadPathMatch[1]}`;
-  }
-
-  if (url.startsWith("/")) {
-    return `${window.location.origin}${url}`;
-  }
-
-  return url;
+  return resolveUploadedImageUrlForBrowser(url, window.location.origin);
 }
 
 /**

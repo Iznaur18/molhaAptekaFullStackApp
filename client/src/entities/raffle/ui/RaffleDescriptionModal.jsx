@@ -12,12 +12,7 @@ import "./RaffleDescriptionModal.css";
  *   onClose: () => void;
  * }} props
  */
-export function RaffleDescriptionModal({
-  isOpen,
-  title,
-  description,
-  onClose,
-}) {
+export function RaffleDescriptionModal({ isOpen, title, description, onClose }) {
   useEffect(() => {
     if (!isOpen) {
       return undefined;
@@ -38,10 +33,7 @@ export function RaffleDescriptionModal({
   }
 
   return (
-    <div
-      className="raffle-description-modal__backdrop"
-      role="presentation"
-    >
+    <div className="raffle-description-modal__backdrop" role="presentation">
       <section
         className="raffle-description-modal"
         role="dialog"

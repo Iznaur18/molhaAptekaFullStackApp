@@ -1,15 +1,12 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 import {
-    ORDER_STATUS_CONFIRMED,
-    ORDER_STATUS_DELIVERED,
-} from '../constants/orderConstants.js';
-import { OrderModel } from '../models/index.js';
+  ORDER_STATUS_CONFIRMED,
+  ORDER_STATUS_DELIVERED,
+} from "../constants/orderConstants.js";
+import { OrderModel } from "../models/index.js";
 
-const PURCHASE_COUNT_ITEM_STATUSES = [
-    ORDER_STATUS_DELIVERED,
-    ORDER_STATUS_CONFIRMED,
-];
+const PURCHASE_COUNT_ITEM_STATUSES = [ORDER_STATUS_DELIVERED, ORDER_STATUS_CONFIRMED];
 
 /**
  * Сумма `quantity * unitPriceAtOrder` по купленным позициям (confirmed/delivered).
@@ -18,68 +15,60 @@ const PURCHASE_COUNT_ITEM_STATUSES = [
  * @returns {Promise<Record<string, number>>}
  */
 export const getTotalPurchasesAmountByBuyerIds = async (buyerIds) => {
-    const ids = [
-        ...new Set(
-            buyerIds
-                .map((id) => String(id))
-                .filter((id) => mongoose.isValidObjectId(id)),
-        ),
-    ];
+  const ids = [
+    ...new Set(
+      buyerIds.map((id) => String(id)).filter((id) => mongoose.isValidObjectId(id)),
+    ),
+  ];
 
-    if (ids.length === 0) {
-        return {};
-    }
+  if (ids.length === 0) {
+    return {};
+  }
 
-    const objectIds = ids.map((id) => new mongoose.Types.ObjectId(id));
-    const rows = await OrderModel.aggregate([
-        {
-            $match: {
-                userBuyerId: { $in: objectIds },
-            },
+  const objectIds = ids.map((id) => new mongoose.Types.ObjectId(id));
+  const rows = await OrderModel.aggregate([
+    {
+      $match: {
+        userBuyerId: { $in: objectIds },
+      },
+    },
+    { $unwind: "$items" },
+    {
+      $match: {
+        "items.status": { $in: PURCHASE_COUNT_ITEM_STATUSES },
+      },
+    },
+    {
+      $group: {
+        _id: "$userBuyerId",
+        totalPurchasesAmount: {
+          $sum: {
+            $multiply: ["$items.quantity", "$items.unitPriceAtOrder"],
+          },
         },
-        { $unwind: '$items' },
-        {
-            $match: {
-                'items.status': { $in: PURCHASE_COUNT_ITEM_STATUSES },
-            },
-        },
-        {
-            $group: {
-                _id: '$userBuyerId',
-                totalPurchasesAmount: {
-                    $sum: {
-                        $multiply: [
-                            '$items.quantity',
-                            '$items.unitPriceAtOrder',
-                        ],
-                    },
-                },
-            },
-        },
-    ]);
+      },
+    },
+  ]);
 
-    return Object.fromEntries(
-        rows.map((row) => [
-            String(row._id),
-            Number(row.totalPurchasesAmount) || 0,
-        ]),
-    );
+  return Object.fromEntries(
+    rows.map((row) => [String(row._id), Number(row.totalPurchasesAmount) || 0]),
+  );
 };
 
 /**
  * @param {Record<string, unknown>[]} users
  */
 export const attachTotalPurchasesAmountToUsers = async (users) => {
-    if (!Array.isArray(users) || users.length === 0) {
-        return users;
-    }
+  if (!Array.isArray(users) || users.length === 0) {
+    return users;
+  }
 
-    const purchasesByBuyer = await getTotalPurchasesAmountByBuyerIds(
-        users.map((user) => String(user._id)),
-    );
+  const purchasesByBuyer = await getTotalPurchasesAmountByBuyerIds(
+    users.map((user) => String(user._id)),
+  );
 
-    return users.map((user) => ({
-        ...user,
-        totalPurchasesAmount: purchasesByBuyer[String(user._id)] ?? 0,
-    }));
+  return users.map((user) => ({
+    ...user,
+    totalPurchasesAmount: purchasesByBuyer[String(user._id)] ?? 0,
+  }));
 };

@@ -30,9 +30,7 @@ export function buildAdminPatchUserProfileBody(form, options = {}) {
   if (includePremium) {
     const premiumExpiresAtRaw = String(form.premiumExpiresAt ?? "").trim();
     body.premiumExpiresAt =
-      premiumExpiresAtRaw === ""
-        ? null
-        : new Date(premiumExpiresAtRaw).toISOString();
+      premiumExpiresAtRaw === "" ? null : new Date(premiumExpiresAtRaw).toISOString();
   }
   body.isActiveUser = Boolean(form.isActiveUser);
   body.isUserDataConfirmed = Boolean(form.isUserDataConfirmed);

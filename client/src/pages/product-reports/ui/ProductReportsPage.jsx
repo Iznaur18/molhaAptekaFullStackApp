@@ -46,9 +46,7 @@ export function ProductReportsPage({
       onQueueChanged?.();
     } catch (e) {
       setError(
-        e instanceof Error
-          ? e.message
-          : API_CLIENT_UI.FETCH_PRODUCT_REPORTS_FALLBACK,
+        e instanceof Error ? e.message : API_CLIENT_UI.FETCH_PRODUCT_REPORTS_FALLBACK,
       );
       setPhase("error");
     }
@@ -62,9 +60,7 @@ export function ProductReportsPage({
 
   if (phase === "loading") {
     return (
-      <p className="product-reports-page__state">
-        {PRODUCT_REPORTS_PAGE_UI.LOADING}
-      </p>
+      <p className="product-reports-page__state">{PRODUCT_REPORTS_PAGE_UI.LOADING}</p>
     );
   }
 
@@ -81,9 +77,7 @@ export function ProductReportsPage({
 
   if (isEmpty) {
     return (
-      <p className="product-reports-page__state">
-        {PRODUCT_REPORTS_PAGE_UI.EMPTY}
-      </p>
+      <p className="product-reports-page__state">{PRODUCT_REPORTS_PAGE_UI.EMPTY}</p>
     );
   }
 

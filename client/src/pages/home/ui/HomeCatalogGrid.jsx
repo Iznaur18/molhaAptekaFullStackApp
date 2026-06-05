@@ -1,6 +1,10 @@
-import { isSellerProductLoyaltyPointsOvercommitted } from "../../../entities/product/lib/isSellerProductLoyaltyPointsOvercommitted.js";
-import { ProductCard } from "../../../entities/product/ui/ProductCard.jsx";
+import { useMemo, useRef } from "react";
+
 import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import { CATALOG_VIRTUALIZATION_MIN_ITEM_COUNT } from "../lib/catalogGridVirtualizationConstants.js";
+import { useCatalogGridColumnCount } from "../model/useCatalogGridColumnCount.js";
+import { useCatalogGridVirtualizer } from "../model/useCatalogGridVirtualizer.js";
+import { CatalogGridProductCard } from "./CatalogGridProductCard.jsx";
 
 /**
  * @param {{
@@ -88,6 +92,51 @@ export function HomeCatalogGrid({
   sellerLoyaltyPointsReserved = 0,
 }) {
   const pendingIds = pendingPromotionProductIds ?? new Set();
+  const virtualHostRef = useRef(/** @type {HTMLDivElement | null} */ (null));
+  const virtualGridRef = useRef(/** @type {HTMLDivElement | null} */ (null));
+  const shouldVirtualize = products.length > CATALOG_VIRTUALIZATION_MIN_ITEM_COUNT;
+  const columnCount = useCatalogGridColumnCount(virtualHostRef, shouldVirtualize);
+  const virtualWindow = useCatalogGridVirtualizer({
+    enabled: shouldVirtualize,
+    hostRef: virtualHostRef,
+    gridRef: virtualGridRef,
+    itemCount: products.length,
+    columnCount,
+  });
+
+  const visibleProducts = useMemo(() => {
+    if (!shouldVirtualize) {
+      return products;
+    }
+    return products.slice(virtualWindow.startIndex, virtualWindow.endIndex + 1);
+  }, [products, shouldVirtualize, virtualWindow.endIndex, virtualWindow.startIndex]);
+
+  const cardProps = {
+    products,
+    isMineMode,
+    deletingProductId,
+    onSellerNameClick,
+    onDeleteMyProduct,
+    onEditMyProduct,
+    onPromoteMyProduct,
+    pendingPromotionProductIds: pendingIds,
+    onOpenProductDetails,
+    onSetMyProductAvailability,
+    onSetMyProductAuction,
+    togglingAvailabilityProductId,
+    togglingAuctionProductId,
+    isAuthorized,
+    isPremiumUser,
+    currentUserId,
+    onRequestLoginAddToCart,
+    showAddToCartOnCard,
+    highlightRaffleProducts,
+    sellerRaffleActive,
+    onToggleRaffleParticipation,
+    raffleParticipationPendingProductId,
+    sellerLoyaltyPointsBalance,
+    sellerLoyaltyPointsReserved,
+  };
 
   const emptyMessage = (() => {
     if (products.length > 0) return "";
@@ -113,6 +162,10 @@ export function HomeCatalogGrid({
     return HOME_PAGE_UI.EMPTY_NO_PRODUCTS;
   })();
 
+  const gridNodes = visibleProducts.map((product) => (
+    <CatalogGridProductCard key={product._id} product={product} {...cardProps} />
+  ));
+
   return (
     <>
       {myProductsCatalogNotice ? (
@@ -129,67 +182,38 @@ export function HomeCatalogGrid({
         <p className="home-page__state">{emptyMessage}</p>
       ) : (
         <>
-          <div className="home-page__grid" role="list">
-            {products.map((product) => (
+          {shouldVirtualize ? (
+            <div
+              ref={virtualHostRef}
+              className="home-page__grid-virtual-host"
+              style={{ height: `${virtualWindow.totalHeight}px` }}
+            >
               <div
-                key={product._id}
-                className="home-page__cell"
-                role="listitem"
+                ref={virtualGridRef}
+                className="home-page__grid home-page__grid--virtual-window"
+                role="list"
+                aria-label={HOME_PAGE_UI.CATALOG_PRODUCTS_LIST_ARIA}
+                style={{ top: `${virtualWindow.offsetTop}px` }}
               >
-                <ProductCard
-                  product={product}
-                  onSellerNameClick={onSellerNameClick}
-                  onDeleteProduct={isMineMode ? onDeleteMyProduct : undefined}
-                  onEditProduct={isMineMode ? onEditMyProduct : undefined}
-                  isDeletePending={deletingProductId === String(product._id)}
-                  onSetProductAvailability={
-                    isMineMode ? onSetMyProductAvailability : undefined
-                  }
-                  onSetProductAuction={
-                    isMineMode ? onSetMyProductAuction : undefined
-                  }
-                  onPromoteProduct={isMineMode ? onPromoteMyProduct : undefined}
-                  isAvailabilityTogglePending={
-                    togglingAvailabilityProductId === String(product._id)
-                  }
-                  isAuctionTogglePending={
-                    togglingAuctionProductId === String(product._id)
-                  }
-                  onOpenDetails={onOpenProductDetails}
-                  isAuthorized={isAuthorized}
-                  isPremiumUser={isPremiumUser}
-                  currentUserId={currentUserId}
-                  onRequestLoginAddToCart={onRequestLoginAddToCart}
-                  showAddToCartOnCard={showAddToCartOnCard}
-                  isMineMode={isMineMode}
-                  highlightCatalogPromotion={!isMineMode}
-                  isPromotionPending={
-                    isMineMode &&
-                    product._id != null &&
-                    pendingIds.has(String(product._id))
-                  }
-                  highlightRaffleProduct={highlightRaffleProducts}
-                  sellerRaffleActive={isMineMode ? sellerRaffleActive : false}
-                  onToggleRaffleParticipation={
-                    isMineMode ? onToggleRaffleParticipation : undefined
-                  }
-                  isRaffleParticipationPending={
-                    isMineMode &&
-                    product._id != null &&
-                    raffleParticipationPendingProductId === String(product._id)
-                  }
-                  isLoyaltyPointsOvercommitted={
-                    isMineMode &&
-                    isSellerProductLoyaltyPointsOvercommitted(product, {
-                      loyaltyPointsBalance: sellerLoyaltyPointsBalance,
-                      loyaltyPointsReserved: sellerLoyaltyPointsReserved,
-                      sellerProducts: products,
-                    })
-                  }
-                />
+                {gridNodes}
               </div>
-            ))}
-          </div>
+              {catalogHasMore && !catalogLoadMoreError ? (
+                <div
+                  ref={catalogSentinelRef}
+                  className="home-page__catalog-sentinel home-page__catalog-sentinel_virtual"
+                  aria-hidden
+                />
+              ) : null}
+            </div>
+          ) : (
+            <div
+              className="home-page__grid"
+              role="list"
+              aria-label={HOME_PAGE_UI.CATALOG_PRODUCTS_LIST_ARIA}
+            >
+              {gridNodes}
+            </div>
+          )}
           {isCatalogLoadingMore ? (
             <p className="home-page__catalog-more home-page__state">
               {HOME_PAGE_UI.CATALOG_LOADING_MORE}
@@ -209,7 +233,7 @@ export function HomeCatalogGrid({
               </button>
             </div>
           ) : null}
-          {catalogHasMore && !catalogLoadMoreError ? (
+          {!shouldVirtualize && catalogHasMore && !catalogLoadMoreError ? (
             <div
               ref={catalogSentinelRef}
               className="home-page__catalog-sentinel"

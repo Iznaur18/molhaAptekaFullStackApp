@@ -7,9 +7,7 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
  */
 export async function approveProductModeration(productId) {
   try {
-    const { data } = await apiClient.patch(
-      `/product/${productId}/moderation/approve`,
-    );
+    const { data } = await apiClient.patch(`/product/${productId}/moderation/approve`);
 
     if (!data?.success || !data.data?.product) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);

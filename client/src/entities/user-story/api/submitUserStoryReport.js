@@ -19,9 +19,7 @@ export async function submitUserStoryReport(storyId, payload) {
     return data.data;
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      "Не удалось отправить жалобу";
+      e?.response?.data?.message ?? e?.message ?? "Не удалось отправить жалобу";
     throw new Error(message);
   }
 }

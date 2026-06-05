@@ -27,9 +27,7 @@ export function assertAtMostWords(
 ) {
   const n = countWords(value);
   if (n > maxWords) {
-    throw new Error(
-      `${fieldLabelRu}: не больше ${maxWords} слов (сейчас ${n})`,
-    );
+    throw new Error(`${fieldLabelRu}: не больше ${maxWords} слов (сейчас ${n})`);
   }
 }
 
@@ -41,9 +39,7 @@ export function assertAtMostWords(
 export function assertMinWords(value, fieldLabelRu, minWords) {
   const n = countWords(value);
   if (n < minWords) {
-    throw new Error(
-      `${fieldLabelRu}: не меньше ${minWords} слов (сейчас ${n})`,
-    );
+    throw new Error(`${fieldLabelRu}: не меньше ${minWords} слов (сейчас ${n})`);
   }
 }
 

@@ -28,11 +28,11 @@ npm run dev
 
 ## Что изменено в проекте
 
-| Файл | Смысл |
-|------|--------|
-| `client/vite.config.js` | `DEV_SERVER_HOST = true` — Vite слушает все интерфейсы |
+| Файл                    | Смысл                                                                 |
+| ----------------------- | --------------------------------------------------------------------- |
+| `client/vite.config.js` | `DEV_SERVER_HOST = true` — Vite слушает все интерфейсы                |
 | `client/vite.config.js` | `LOCAL_API_PROXY_TARGET = "127.0.0.1"` — прокси API на этой же машине |
-| `client/vite.config.js` | в прокси добавлен `/address` (подсказки адресов с телефона) |
+| `client/vite.config.js` | в прокси добавлен `/address` (подсказки адресов с телефона)           |
 
 Сервер Express менять не нужно: `listen(PORT)` уже доступен в LAN.
 

@@ -78,11 +78,7 @@ export function MySalesPage({
       setPhase("success");
       setError("");
     } catch (e) {
-      setError(
-        e instanceof Error
-          ? e.message
-          : API_CLIENT_UI.FETCH_MY_SALES_FALLBACK,
-      );
+      setError(e instanceof Error ? e.message : API_CLIENT_UI.FETCH_MY_SALES_FALLBACK);
       setPhase("error");
     }
   }, [getSalesParams]);
@@ -102,9 +98,7 @@ export function MySalesPage({
       } catch (e) {
         if (isCancelled) return;
         setError(
-          e instanceof Error
-            ? e.message
-            : API_CLIENT_UI.FETCH_MY_SALES_FALLBACK,
+          e instanceof Error ? e.message : API_CLIENT_UI.FETCH_MY_SALES_FALLBACK,
         );
         setPhase("error");
       }
@@ -147,9 +141,7 @@ export function MySalesPage({
       void reloadSales();
     } catch (e) {
       const message =
-        e instanceof Error
-          ? e.message
-          : API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK;
+        e instanceof Error ? e.message : API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK;
       setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
       try {
         await reloadSales();
@@ -188,9 +180,7 @@ export function MySalesPage({
       void reloadSales();
     } catch (e) {
       const message =
-        e instanceof Error
-          ? e.message
-          : API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK;
+        e instanceof Error ? e.message : API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK;
       setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
       try {
         await reloadSales();
@@ -229,9 +219,7 @@ export function MySalesPage({
       void reloadSales();
     } catch (e) {
       const message =
-        e instanceof Error
-          ? e.message
-          : API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK;
+        e instanceof Error ? e.message : API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK;
       setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
       try {
         await reloadSales();

@@ -17,9 +17,7 @@ export async function followUser(userId) {
     return data.data;
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      API_CLIENT_UI.FOLLOW_USER_FALLBACK;
+      e?.response?.data?.message ?? e?.message ?? API_CLIENT_UI.FOLLOW_USER_FALLBACK;
     throw new Error(message);
   }
 }

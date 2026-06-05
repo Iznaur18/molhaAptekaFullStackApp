@@ -17,6 +17,7 @@
 ### Auth
 
 - `POST /auth/register`
+
 ```json
 {
   "email": "test@example.com",
@@ -26,6 +27,7 @@
 ```
 
 - `POST /auth/login`
+
 ```json
 {
   "email": "test@example.com",
@@ -40,12 +42,14 @@
 - `GET /user/search?search=test&page=1&limit=10`
 - `GET /user/:userIdClient`
 - `PATCH /user/:userIdClient` (нужен Bearer token)
+
 ```json
 {
   "userName": "newName",
   "userPhoneNumber": "+79990000000"
 }
 ```
+
 - `DELETE /user/:userIdClient` (нужен Bearer token)
 
 ### Products
@@ -53,14 +57,12 @@
 - `GET /product`
 - `GET /product/my` (нужен Bearer token)
 - `POST /product` (нужен Bearer token)
+
 ```json
 {
   "productName": "Aspirin",
   "productDescription": "Pain relief tablets, 20 pcs",
-  "productImageUrls": [
-    "https://example.com/a.jpg",
-    "https://example.com/b.jpg"
-  ],
+  "productImageUrls": ["https://example.com/a.jpg", "https://example.com/b.jpg"],
   "productPrice": 199.99,
   "productCategory": "food",
   "productIsAvailable": true
@@ -72,11 +74,10 @@
 - `GET /order` (нужен Bearer token)
 - `GET /order/all`
 - `POST /order` (нужен Bearer token)
+
 ```json
 {
-  "items": [
-    { "productId": "PUT_PRODUCT_ID_HERE", "quantity": 2 }
-  ],
+  "items": [{ "productId": "PUT_PRODUCT_ID_HERE", "quantity": 2 }],
   "deliveryAddress": "Moscow, Tverskaya 1",
   "paymentMethod": "card"
 }
@@ -86,6 +87,7 @@
 
 - `GET /vote/rating/:userIdClient`
 - `POST /vote/:userVoteTargetIdClient` (нужен Bearer token)
+
 ```json
 {
   "userVoteValueClient": 8

@@ -81,11 +81,9 @@ export function ProductPriceOfferSellerArchive({ productId, onOpenBuyer }) {
       <ul className="product-price-offer__seller-list" role="list">
         {offers.map((row) => {
           const buyer = row.buyer ?? row.buyerUserId;
-          const buyerObj =
-            buyer != null && typeof buyer === "object" ? buyer : null;
+          const buyerObj = buyer != null && typeof buyer === "object" ? buyer : null;
           const userId = buyerObj?._id != null ? String(buyerObj._id) : null;
-          const name =
-            buyerObj?.userName?.trim() || USER_LIST_ROW_UI.MISSING_NAME;
+          const name = buyerObj?.userName?.trim() || USER_LIST_ROW_UI.MISSING_NAME;
 
           return (
             <li key={String(row._id)} className="product-price-offer__seller-row">
@@ -99,18 +97,14 @@ export function ProductPriceOfferSellerArchive({ productId, onOpenBuyer }) {
                     <UserPremiumDisplayName
                       name={name}
                       isPremium={buyerObj?.isPremiumUser === true}
-                      isUserDataConfirmed={
-                        buyerObj?.isUserDataConfirmed === true
-                      }
+                      isUserDataConfirmed={buyerObj?.isUserDataConfirmed === true}
                     />
                   </button>
                 ) : (
                   <UserPremiumDisplayName
                     name={name}
                     isPremium={buyerObj?.isPremiumUser === true}
-                    isUserDataConfirmed={
-                      buyerObj?.isUserDataConfirmed === true
-                    }
+                    isUserDataConfirmed={buyerObj?.isUserDataConfirmed === true}
                   />
                 )}
                 <span className="product-price-offer__seller-price">
@@ -118,8 +112,7 @@ export function ProductPriceOfferSellerArchive({ productId, onOpenBuyer }) {
                 </span>
               </div>
               <p className="product-price-offer__seller-meta">
-                {formatIsoDateTime(row.updatedAt ?? row.createdAt)} ·{" "}
-                {row.status}
+                {formatIsoDateTime(row.updatedAt ?? row.createdAt)} · {row.status}
               </p>
             </li>
           );

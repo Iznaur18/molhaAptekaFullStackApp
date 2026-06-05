@@ -28,10 +28,7 @@ export function resolveProductDiscountPercent(product) {
     const fromApi = Math.floor(Number(product.discountPercent));
     return fromApi > 0 ? fromApi : null;
   }
-  return computeProductDiscountPercent(
-    product.productOldPrice,
-    product.productPrice,
-  );
+  return computeProductDiscountPercent(product.productOldPrice, product.productPrice);
 }
 
 /**

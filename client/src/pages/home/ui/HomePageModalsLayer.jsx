@@ -19,6 +19,7 @@ import {
 } from "../../../entities/product/lib/getProductModerationUi.js";
 import { CreateRaffleModal } from "../../../entities/raffle/ui/CreateRaffleModal.jsx";
 import { ReportProductModal } from "../../../entities/product-report/ui/ReportProductModal.jsx";
+import { EditProductCatalogFeedTileDisplayModal } from "../../../entities/product-category-display/ui/EditProductCatalogFeedTileDisplayModal.jsx";
 import { EditProductCategoryDisplayModal } from "../../../entities/product-category-display/ui/EditProductCategoryDisplayModal.jsx";
 import {
   ADMIN_EDIT_USER_UI,
@@ -45,6 +46,7 @@ import { canStaffEditTargetUserPremium } from "../../../entities/user/lib/canSta
  *   setIsLoginModalOpen: (open: boolean) => void;
  *   isDataConfirmationModalOpen: boolean;
  *   setIsDataConfirmationModalOpen: (open: boolean) => void;
+ *   setDataConfirmationStatusRefreshTick: import('react').Dispatch<import('react').SetStateAction<number>>;
  *   refreshPendingDataConfirmationCount: () => void | Promise<void>;
  *   isEditProfileOpen: boolean;
  *   setIsEditProfileOpen: (open: boolean) => void;
@@ -104,6 +106,7 @@ import { canStaffEditTargetUserPremium } from "../../../entities/user/lib/canSta
  *   setCatalogProductDetailsTab: (tab: string) => void;
  *   setProductDetailsAdminError: (message: string) => void;
  *   handleSellerNameClick: (userId: string) => void;
+ *   goToSellerProducts: (userId: string) => void;
  *   handleProductStatsUpdate: (product: ProductFromApi) => void;
  *   catalogDetailsShowAddToCart: boolean;
  *   catalogProductDetailsTab: string;
@@ -119,6 +122,10 @@ import { canStaffEditTargetUserPremium } from "../../../entities/user/lib/canSta
  *   setEditingCategorySlug: (slug: string | null) => void;
  *   categoryDisplays: import('../../../entities/product-category-display/model/types.js').ProductCategoryDisplayFromApi[];
  *   handleCategoryDisplaySaved: () => void;
+ *   editingFeedTileKey: string | null;
+ *   setEditingFeedTileKey: (tileKey: string | null) => void;
+ *   feedTileDisplays: import('../../../entities/product-category-display/model/types.js').ProductCatalogFeedTileDisplayFromApi[];
+ *   handleFeedTileDisplaySaved: (display: import('../../../entities/product-category-display/model/types.js').ProductCatalogFeedTileDisplayFromApi) => void;
  * }} props
  */
 export function HomePageModalsLayer({
@@ -137,6 +144,7 @@ export function HomePageModalsLayer({
   setIsLoginModalOpen,
   isDataConfirmationModalOpen,
   setIsDataConfirmationModalOpen,
+  setDataConfirmationStatusRefreshTick,
   refreshPendingDataConfirmationCount,
   isEditProfileOpen,
   setIsEditProfileOpen,
@@ -195,6 +203,7 @@ export function HomePageModalsLayer({
   setCatalogProductDetailsTab,
   setProductDetailsAdminError,
   handleSellerNameClick,
+  goToSellerProducts,
   handleProductStatsUpdate,
   catalogDetailsShowAddToCart,
   catalogProductDetailsTab,
@@ -210,9 +219,12 @@ export function HomePageModalsLayer({
   setEditingCategorySlug,
   categoryDisplays,
   handleCategoryDisplaySaved,
+  editingFeedTileKey,
+  setEditingFeedTileKey,
+  feedTileDisplays,
+  handleFeedTileDisplaySaved,
 }) {
-  const adminEditUser =
-    sellerModal.phase === "success" ? sellerModal.user : null;
+  const adminEditUser = sellerModal.phase === "success" ? sellerModal.user : null;
   const staffCanEditPremium =
     adminEditUser != null &&
     canStaffEditTargetUserPremium({
@@ -233,6 +245,11 @@ export function HomePageModalsLayer({
         isAuthorized={isAuthorized}
         viewerCanSeeOtherUserPurchases={isPremiumUser || canModerateProducts}
         onPurchaseProductClick={(product) => setCatalogProductDetails(product)}
+        onViewAllSellerProducts={
+          sellerModal.phase === "success" && sellerModal.user?._id != null
+            ? () => goToSellerProducts(String(sellerModal.user._id))
+            : undefined
+        }
         footer={
           sellerModal.phase === "success" && sellerModal.user ? (
             canModerateProducts ? (
@@ -257,8 +274,7 @@ export function HomePageModalsLayer({
                         user: {
                           ...prev.user,
                           userRatingByVotes:
-                            snapshot.userRatingByVotes ??
-                            prev.user.userRatingByVotes,
+                            snapshot.userRatingByVotes ?? prev.user.userRatingByVotes,
                         },
                       };
                     });
@@ -281,8 +297,7 @@ export function HomePageModalsLayer({
                       user: {
                         ...prev.user,
                         userRatingByVotes:
-                          snapshot.userRatingByVotes ??
-                          prev.user.userRatingByVotes,
+                          snapshot.userRatingByVotes ?? prev.user.userRatingByVotes,
                       },
                     };
                   });
@@ -296,13 +311,13 @@ export function HomePageModalsLayer({
         isOpen={isDataConfirmationModalOpen}
         onClose={() => setIsDataConfirmationModalOpen(false)}
         onSubmitted={() => {
+          setDataConfirmationStatusRefreshTick((tick) => tick + 1);
           void refreshPendingDataConfirmationCount();
         }}
       />
       <EditProfileModal
         isOpen={isEditProfileOpen}
         onClose={() => setIsEditProfileOpen(false)}
-        allowSelfPremiumToggle={isAdmin}
         allowStaffLoyaltyEdit={canModerateProducts}
         user={myProfilePage.phase === "success" ? myProfilePage.user : null}
         onPremiumRevoked={() =>
@@ -421,8 +436,7 @@ export function HomePageModalsLayer({
         onSetProductAvailability={handleSetMyProductAvailability}
         onSetProductAuction={handleSetProductAuction}
         isDeletePending={
-          productToEdit?._id != null &&
-          deletingProductId === String(productToEdit._id)
+          productToEdit?._id != null && deletingProductId === String(productToEdit._id)
         }
         isAvailabilityTogglePending={
           productToEdit?._id != null &&
@@ -434,12 +448,10 @@ export function HomePageModalsLayer({
         }
         manageErrorMessage={myProductsCatalogError || productDetailsAdminError}
         canManageEdit={
-          productToEdit != null &&
-          (isAdmin || canSellerEditProduct(productToEdit))
+          productToEdit != null && (isAdmin || canSellerEditProduct(productToEdit))
         }
         canManageDelete={
-          productToEdit != null &&
-          (isAdmin || canSellerDeleteProduct(productToEdit))
+          productToEdit != null && (isAdmin || canSellerDeleteProduct(productToEdit))
         }
         canManageToggleVisibility={
           productToEdit != null &&
@@ -466,9 +478,7 @@ export function HomePageModalsLayer({
         isOpen={raffleModal != null}
         mode={raffleModal?.mode ?? "create"}
         raffleToEdit={raffleModal?.mode === "edit" ? raffleModal.raffle : null}
-        useStaffApi={
-          raffleModal?.mode === "edit" ? raffleModal.useStaffApi : false
-        }
+        useStaffApi={raffleModal?.mode === "edit" ? raffleModal.useStaffApi : false}
         onClose={() => setRaffleModal(null)}
         onSuccess={() => {
           setRaffleRefreshTick((n) => n + 1);
@@ -522,12 +532,8 @@ export function HomePageModalsLayer({
           showCatalogProductManageFooter && catalogProductDetails ? (
             <ProductDetailsAdminFooter
               onEdit={handleAdminOpenEditProductFromDetails}
-              canEdit={
-                isAdmin || canSellerEditProduct(catalogProductDetails)
-              }
-              isDeletePending={
-                deletingProductId === String(catalogProductDetails._id)
-              }
+              canEdit={isAdmin || canSellerEditProduct(catalogProductDetails)}
+              isDeletePending={deletingProductId === String(catalogProductDetails._id)}
             />
           ) : null
         }
@@ -535,9 +541,7 @@ export function HomePageModalsLayer({
       <ReportProductModal
         isOpen={isReportProductModalOpen}
         productId={
-          catalogProductDetails?._id != null
-            ? String(catalogProductDetails._id)
-            : null
+          catalogProductDetails?._id != null ? String(catalogProductDetails._id) : null
         }
         productName={catalogProductDetails?.productName ?? ""}
         hasPendingReport={catalogProductHasPendingReport}
@@ -552,6 +556,13 @@ export function HomePageModalsLayer({
         displays={categoryDisplays}
         onClose={() => setEditingCategorySlug(null)}
         onSaved={handleCategoryDisplaySaved}
+      />
+      <EditProductCatalogFeedTileDisplayModal
+        isOpen={editingFeedTileKey != null}
+        tileKey={editingFeedTileKey}
+        displays={feedTileDisplays}
+        onClose={() => setEditingFeedTileKey(null)}
+        onSaved={handleFeedTileDisplaySaved}
       />
     </>
   );

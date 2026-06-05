@@ -1,20 +1,32 @@
-# E2E smoke (Playwright)
+# E2E (Playwright)
 
-Требования: MongoDB локально (как для `server` dev), Node 20+.
+Требования: MongoDB (локально или CI service), Node 20+.
 
 ```bash
-# один раз — браузер Chromium
+# один раз — Chromium
 cd client
 npx playwright install chromium
 
+# миграции + фикстуры (если сервер не поднимает globalSetup сам)
+cd ../server
+npm run migrate:apply
+npm run e2e:seed
+
 # тесты (поднимут server + client, если ещё не запущены)
+cd ../client
 npm run test:e2e
 ```
 
-Проверяет:
+## Сценарии
 
-1. `GET /health` — mongo connected  
-2. Главная — кнопка «Войти»  
-3. `GET /product` — публичный каталог  
+| Spec                            | Что проверяет                                                   |
+| ------------------------------- | --------------------------------------------------------------- |
+| `smoke.spec.js`                 | health, кнопка «Войти», `GET /product`                          |
+| `catalog-cart.spec.js`          | вход → карточка в ленте → «В корзину» → `/basket`               |
+| `seller-create-product.spec.js` | вход продавца → «Разместить товар» → дерево категорий → создать |
 
-Если dev-серверы уже работают — `reuseExistingServer: true` их переиспользует.
+Фикстуры: `server/scripts/e2ePlaywrightSeed.js` (buyer, seller, approved товар в каталоге).
+
+CI: `.github/workflows/e2e-playwright.yml` (Mongo 7 + migrate + Playwright).
+
+`SKIP_E2E_SEED=1` — не пересоздавать фикстуры (если уже засеяли вручную).

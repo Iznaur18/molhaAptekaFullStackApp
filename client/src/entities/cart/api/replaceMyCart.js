@@ -1,4 +1,5 @@
 import { apiClient } from "../../../shared/api/index.js";
+import { parseReplaceCartData } from "../../../shared/api/parseApiContract.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 import { coerceCartItemsFromApi } from "../lib/coerceCartItemsFromApi.js";
 
@@ -12,22 +13,15 @@ export async function replaceMyCart(items) {
   try {
     const { data } = await apiClient.put("/cart", { items });
 
-    const rawItems = data.data?.items;
-    if (
-      !data?.success ||
-      rawItems === null ||
-      typeof rawItems !== "object" ||
-      Array.isArray(rawItems)
-    ) {
+    if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
 
-    return coerceCartItemsFromApi(rawItems);
+    const parsed = parseReplaceCartData(data);
+    return coerceCartItemsFromApi(parsed.items);
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      API_CLIENT_UI.REPLACE_CART_FALLBACK;
+      e?.response?.data?.message ?? e?.message ?? API_CLIENT_UI.REPLACE_CART_FALLBACK;
     throw new Error(message);
   }
 }

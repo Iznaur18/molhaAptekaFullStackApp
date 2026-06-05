@@ -13,10 +13,7 @@ export const CART_ACTION_HYDRATE = "cart/hydrate";
 const clampLineQuantity = (value) =>
   Math.min(
     CART_LINE_ITEM_QUANTITY_MAX,
-    Math.max(
-      ORDER_LINE_ITEM_QUANTITY_MIN,
-      Math.floor(Number(value) || 0),
-    ),
+    Math.max(ORDER_LINE_ITEM_QUANTITY_MIN, Math.floor(Number(value) || 0)),
   );
 
 const removeKey = (items, productId) => {

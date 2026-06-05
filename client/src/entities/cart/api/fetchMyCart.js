@@ -24,9 +24,7 @@ export async function fetchMyCart() {
     return coerceCartItemsFromApi(rawItems);
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      API_CLIENT_UI.FETCH_CART_FALLBACK;
+      e?.response?.data?.message ?? e?.message ?? API_CLIENT_UI.FETCH_CART_FALLBACK;
     throw new Error(message);
   }
 }

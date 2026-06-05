@@ -3,7 +3,10 @@ import { useCallback, useRef, useState } from "react";
 import { uploadImage } from "../../../shared/api/uploadImage.js";
 import { uploadVideo } from "../../../shared/api/uploadVideo.js";
 import { USER_STORY_UI } from "../../../shared/config/appUiCopy.js";
-import { UPLOAD_FILE_INPUT_ACCEPT, UPLOAD_VIDEO_FILE_INPUT_ACCEPT } from "../../../shared/config/uploadConstants.js";
+import {
+  UPLOAD_FILE_INPUT_ACCEPT,
+  UPLOAD_VIDEO_FILE_INPUT_ACCEPT,
+} from "../../../shared/config/uploadConstants.js";
 import { validateUploadImageFile } from "../../../shared/lib/validateUploadImageFile.js";
 import { createUserStory } from "../api/createUserStory.js";
 import { cropImageToAspectRatio } from "../lib/cropImageToAspectRatio.js";
@@ -191,11 +194,7 @@ export function CreateUserStoryModal({ isOpen, onClose, onPublished }) {
                 loop
               />
             ) : (
-              <img
-                className="create-user-story-modal__media"
-                src={previewUrl}
-                alt=""
-              />
+              <img className="create-user-story-modal__media" src={previewUrl} alt="" />
             )
           ) : (
             <p className="create-user-story-modal__placeholder">

@@ -13,11 +13,7 @@ import "./SubscriptionsPage.css";
  *   onUserClick: (userId: string) => void;
  * }} props
  */
-export function SubscriptionsPage({
-  isAuthorized,
-  onRequestLogin,
-  onUserClick,
-}) {
+export function SubscriptionsPage({ isAuthorized, onRequestLogin, onUserClick }) {
   const [users, setUsers] = useState(
     /** @type {import('../../../entities/user/model/types.js').UserSearchListItem[]} */ ([]),
   );
@@ -54,7 +50,11 @@ export function SubscriptionsPage({
     return (
       <section className="subscriptions-page">
         <p className="subscriptions-page__hint">{SUBSCRIPTIONS_PAGE_UI.LOGIN_HINT}</p>
-        <button type="button" className="subscriptions-page__login" onClick={onRequestLogin}>
+        <button
+          type="button"
+          className="subscriptions-page__login"
+          onClick={onRequestLogin}
+        >
           {SUBSCRIPTIONS_PAGE_UI.LOGIN_BUTTON}
         </button>
       </section>
@@ -62,23 +62,22 @@ export function SubscriptionsPage({
   }
 
   if (status.kind === "loading") {
-    return (
-      <p className="subscriptions-page__state">{SUBSCRIPTIONS_PAGE_UI.LOADING}</p>
-    );
+    return <p className="subscriptions-page__state">{SUBSCRIPTIONS_PAGE_UI.LOADING}</p>;
   }
 
   if (status.kind === "error") {
     return (
-      <p className="subscriptions-page__state subscriptions-page__state_error" role="alert">
+      <p
+        className="subscriptions-page__state subscriptions-page__state_error"
+        role="alert"
+      >
         {status.message}
       </p>
     );
   }
 
   if (users.length === 0) {
-    return (
-      <p className="subscriptions-page__state">{SUBSCRIPTIONS_PAGE_UI.EMPTY}</p>
-    );
+    return <p className="subscriptions-page__state">{SUBSCRIPTIONS_PAGE_UI.EMPTY}</p>;
   }
 
   return (

@@ -42,9 +42,7 @@ export function CheckoutForm({
   const [deliveryAddress, setDeliveryAddress] = useState(() =>
     addressValueFromUser(defaultDeliveryAddress),
   );
-  const [paymentMethod, setPaymentMethod] = useState(
-    ORDER_PAYMENT_METHOD_CARD_PREPAID,
-  );
+  const [paymentMethod, setPaymentMethod] = useState(ORDER_PAYMENT_METHOD_CARD_PREPAID);
   const [localError, setLocalError] = useState("");
 
   useEffect(() => {
@@ -69,8 +67,7 @@ export function CheckoutForm({
   };
 
   const isAddressValid =
-    validateRuDeliveryAddressForm(deliveryAddress, { required: true }) ===
-    null;
+    validateRuDeliveryAddressForm(deliveryAddress, { required: true }) === null;
   const isFormDisabled = isDisabled || isSubmitting || !isAddressValid;
   const displayError = localError || submitError;
 
@@ -119,14 +116,8 @@ export function CheckoutForm({
         </p>
       ) : null}
 
-      <button
-        type="submit"
-        className="checkout-form__submit"
-        disabled={isFormDisabled}
-      >
-        {isSubmitting
-          ? CHECKOUT_FORM_UI.SUBMIT_LOADING
-          : CHECKOUT_FORM_UI.SUBMIT_IDLE}
+      <button type="submit" className="checkout-form__submit" disabled={isFormDisabled}>
+        {isSubmitting ? CHECKOUT_FORM_UI.SUBMIT_LOADING : CHECKOUT_FORM_UI.SUBMIT_IDLE}
       </button>
     </form>
   );

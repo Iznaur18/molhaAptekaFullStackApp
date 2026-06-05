@@ -9,10 +9,7 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
  */
 export async function submitDataConfirmationRequest(body) {
   try {
-    const { data } = await apiClient.post(
-      "/user/me/data-confirmation-request",
-      body,
-    );
+    const { data } = await apiClient.post("/user/me/data-confirmation-request", body);
 
     if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);

@@ -1,0 +1,72 @@
+import {
+  normalizeProfileTab,
+  PROFILE_TAB_ADMIN_ORDERS,
+  PROFILE_TAB_AUCTION,
+  PROFILE_TAB_CATEGORY_TREE_ADMIN,
+  PROFILE_TAB_DATA_CONFIRMATION,
+  PROFILE_TAB_DATA_CONFIRMATION_REQUESTS,
+  PROFILE_TAB_INSTALLMENT_DISPUTES,
+  PROFILE_TAB_INSTALLMENT_MODERATION,
+  PROFILE_TAB_INSTALLMENT_PAYMENTS,
+  PROFILE_TAB_INSTALLMENT_SALES,
+  PROFILE_TAB_LOYALTY_POINTS,
+  PROFILE_TAB_MY_ORDERS,
+  PROFILE_TAB_MY_PRODUCTS,
+  PROFILE_TAB_MY_SALES,
+  PROFILE_TAB_OVERVIEW,
+  PROFILE_TAB_PREMIUM,
+  PROFILE_TAB_PRODUCT_MODERATION,
+  PROFILE_TAB_PRODUCT_PROMOTIONS,
+  PROFILE_TAB_PRODUCT_REPORTS,
+  PROFILE_TAB_RAFFLES,
+  PROFILE_TAB_SEARCH_SYNONYMS_ADMIN,
+  PROFILE_TAB_SUBSCRIPTIONS,
+} from "./profileTabs.js";
+
+/** @typedef {import("../../../shared/lib/homeMainViewPaths.js").HomeMainView} HomeMainView */
+
+/** @type {Record<string, HomeMainView>} */
+export const PROFILE_TAB_TO_MAIN_VIEW = {
+  [PROFILE_TAB_OVERVIEW]: "my-profile",
+  [PROFILE_TAB_MY_PRODUCTS]: "my-products",
+  [PROFILE_TAB_MY_SALES]: "my-sales",
+  [PROFILE_TAB_MY_ORDERS]: "my-orders",
+  [PROFILE_TAB_AUCTION]: "auction",
+  [PROFILE_TAB_SUBSCRIPTIONS]: "subscriptions",
+  [PROFILE_TAB_DATA_CONFIRMATION]: "data-confirmation",
+  [PROFILE_TAB_PREMIUM]: "premium",
+  [PROFILE_TAB_LOYALTY_POINTS]: "loyalty-points",
+  [PROFILE_TAB_ADMIN_ORDERS]: "admin-orders",
+  [PROFILE_TAB_SEARCH_SYNONYMS_ADMIN]: "search-synonyms-admin",
+  [PROFILE_TAB_CATEGORY_TREE_ADMIN]: "category-tree-admin",
+  [PROFILE_TAB_PRODUCT_MODERATION]: "product-moderation",
+  [PROFILE_TAB_PRODUCT_REPORTS]: "product-reports",
+  [PROFILE_TAB_PRODUCT_PROMOTIONS]: "product-promotions",
+  [PROFILE_TAB_RAFFLES]: "staff-raffles",
+  [PROFILE_TAB_DATA_CONFIRMATION_REQUESTS]: "data-confirmation-requests",
+  [PROFILE_TAB_INSTALLMENT_PAYMENTS]: "installment-payments",
+  [PROFILE_TAB_INSTALLMENT_SALES]: "installment-sales",
+  [PROFILE_TAB_INSTALLMENT_MODERATION]: "installment-moderation",
+  [PROFILE_TAB_INSTALLMENT_DISPUTES]: "installment-disputes",
+};
+
+/** @type {Map<HomeMainView, string>} */
+const MAIN_VIEW_TO_PROFILE_TAB = new Map(
+  Object.entries(PROFILE_TAB_TO_MAIN_VIEW).map(([tab, view]) => [view, tab]),
+);
+
+/**
+ * @param {string} tab
+ * @returns {HomeMainView}
+ */
+export function profileTabToMainView(tab) {
+  return PROFILE_TAB_TO_MAIN_VIEW[normalizeProfileTab(tab)] ?? "my-profile";
+}
+
+/**
+ * @param {HomeMainView} view
+ * @returns {string | null}
+ */
+export function mainViewToProfileTab(view) {
+  return MAIN_VIEW_TO_PROFILE_TAB.get(view) ?? null;
+}

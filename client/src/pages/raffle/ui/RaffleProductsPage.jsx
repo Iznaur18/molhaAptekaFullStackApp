@@ -32,7 +32,9 @@ export function RaffleProductsPage({
 }) {
   const [phase, setPhase] = useState("loading");
   const [raffle, setRaffle] = useState(
-    /** @type {import('../../../entities/raffle/model/types.js').RaffleFromApi | null} */ (null),
+    /** @type {import('../../../entities/raffle/model/types.js').RaffleFromApi | null} */ (
+      null
+    ),
   );
   const [products, setProducts] = useState(
     /** @type {import('../../../entities/product/model/types.js').ProductFromApi[]} */ ([]),
@@ -52,9 +54,7 @@ export function RaffleProductsPage({
       setPhase("success");
     } catch (e) {
       setError(
-        e instanceof Error
-          ? e.message
-          : API_CLIENT_UI.FETCH_RAFFLE_PRODUCTS_FALLBACK,
+        e instanceof Error ? e.message : API_CLIENT_UI.FETCH_RAFFLE_PRODUCTS_FALLBACK,
       );
       setPhase("error");
     }
@@ -65,12 +65,17 @@ export function RaffleProductsPage({
   }, [load]);
 
   if (phase === "loading") {
-    return <p className="raffle-products-page__state">{RAFFLE_PRODUCTS_PAGE_UI.LOADING}</p>;
+    return (
+      <p className="raffle-products-page__state">{RAFFLE_PRODUCTS_PAGE_UI.LOADING}</p>
+    );
   }
 
   if (phase === "error") {
     return (
-      <p className="raffle-products-page__state raffle-products-page__state_error" role="alert">
+      <p
+        className="raffle-products-page__state raffle-products-page__state_error"
+        role="alert"
+      >
         {error}
       </p>
     );
@@ -79,7 +84,11 @@ export function RaffleProductsPage({
   return (
     <div className="raffle-products-page">
       <header className="raffle-products-page__header">
-        <button type="button" className="raffle-products-page__back" onClick={onBackToCatalog}>
+        <button
+          type="button"
+          className="raffle-products-page__back"
+          onClick={onBackToCatalog}
+        >
           ← {RAFFLE_PRODUCTS_PAGE_UI.BACK_CATALOG}
         </button>
         <h2 className="raffle-products-page__title">

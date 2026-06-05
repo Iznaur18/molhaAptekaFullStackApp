@@ -1,4 +1,3 @@
-import { resolveAuctionUiState } from "./resolveAuctionUiState.js";
 import { resolveProductCatalogPriceRub } from "./resolveProductCatalogPriceRub.js";
 import { resolveProductLoyaltyPointsPerUnit } from "./resolveProductLoyaltyPointsPerUnit.js";
 
@@ -7,11 +6,6 @@ import { resolveProductLoyaltyPointsPerUnit } from "./resolveProductLoyaltyPoint
  */
 export function shouldShowProductLoyaltyPointsBadge(product) {
   if (!product) {
-    return false;
-  }
-
-  const { auctionActive } = resolveAuctionUiState(product);
-  if (auctionActive) {
     return false;
   }
 

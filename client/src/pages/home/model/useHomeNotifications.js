@@ -37,8 +37,7 @@ export const useHomeNotifications = ({
       return;
     }
     try {
-      const { inAppNotifications: notifications } =
-        await fetchCurrentUserProfile();
+      const { inAppNotifications: notifications } = await fetchCurrentUserProfile();
       setInAppNotifications(notifications);
     } catch {
       setInAppNotifications([]);
@@ -106,23 +105,17 @@ export const useHomeNotifications = ({
    */
   const handleInAppNotificationClick = useCallback(
     (item) => {
-      if (
-        item.kind === IN_APP_NOTIFICATION_KIND_NEW_FOLLOWER &&
-        item.actorUserId
-      ) {
+      if (item.kind === IN_APP_NOTIFICATION_KIND_NEW_FOLLOWER && item.actorUserId) {
         handleSellerNameClick(item.actorUserId);
         return;
       }
       if (
         (item.kind === IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_NEW_PRODUCT ||
-          item.kind ===
-            IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_PRODUCT_DISCOUNT) &&
+          item.kind === IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_PRODUCT_DISCOUNT) &&
         item.productId
       ) {
         goToMainView("catalog");
-        const inList = products.find(
-          (p) => String(p._id) === String(item.productId),
-        );
+        const inList = products.find((p) => String(p._id) === String(item.productId));
         if (inList) {
           setCatalogProductDetails(inList);
           return;
@@ -145,12 +138,7 @@ export const useHomeNotifications = ({
         })();
       }
     },
-    [
-      goToMainView,
-      handleSellerNameClick,
-      products,
-      setCatalogProductDetails,
-    ],
+    [goToMainView, handleSellerNameClick, products, setCatalogProductDetails],
   );
 
   return {

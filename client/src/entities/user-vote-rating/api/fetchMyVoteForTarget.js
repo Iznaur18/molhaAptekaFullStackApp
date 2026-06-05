@@ -23,9 +23,7 @@ export async function fetchMyVoteForTarget(targetUserId) {
     return Number.isFinite(n) ? n : null;
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      API_CLIENT_UI.FETCH_MY_VOTE_FALLBACK;
+      e?.response?.data?.message ?? e?.message ?? API_CLIENT_UI.FETCH_MY_VOTE_FALLBACK;
     throw new Error(message);
   }
 }

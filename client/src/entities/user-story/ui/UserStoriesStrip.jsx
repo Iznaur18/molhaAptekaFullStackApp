@@ -29,7 +29,9 @@ export function UserStoriesStrip({
 }) {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [viewerAuthor, setViewerAuthor] = useState(
-    /** @type {import('../model/types.js').UserStoryRingFromApi['author'] | null} */ (null),
+    /** @type {import('../model/types.js').UserStoryRingFromApi['author'] | null} */ (
+      null
+    ),
   );
 
   const sortedRings = useMemo(
@@ -74,9 +76,10 @@ export function UserStoriesStrip({
             const authorId = String(ring.author._id);
             const avatarUrl = resolveUserStoryAvatarUrl(ring.author);
             const authorName = ring.author.userName?.trim() || authorId;
-            const ringClassName = ring.isOwn || ring.isViewed
-              ? "user-stories-strip__ring user-stories-strip__ring_viewed"
-              : "user-stories-strip__ring";
+            const ringClassName =
+              ring.isOwn || ring.isViewed
+                ? "user-stories-strip__ring user-stories-strip__ring_viewed"
+                : "user-stories-strip__ring";
 
             return (
               <button

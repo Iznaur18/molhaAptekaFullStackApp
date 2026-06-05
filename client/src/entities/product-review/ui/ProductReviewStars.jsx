@@ -14,16 +14,15 @@ import "./ProductReviewStars.css";
  *   size?: 'sm' | 'md';
  * }} props
  */
-export function ProductReviewStars({
-  value,
-  onChange,
-  disabled = false,
-  size = "md",
-}) {
+export function ProductReviewStars({ value, onChange, disabled = false, size = "md" }) {
   const interactive = typeof onChange === "function" && !disabled;
   const stars = [];
 
-  for (let star = PRODUCT_REVIEW_RATING_MIN; star <= PRODUCT_REVIEW_RATING_MAX; star += 1) {
+  for (
+    let star = PRODUCT_REVIEW_RATING_MIN;
+    star <= PRODUCT_REVIEW_RATING_MAX;
+    star += 1
+  ) {
     const filled = star <= value;
     if (interactive) {
       stars.push(

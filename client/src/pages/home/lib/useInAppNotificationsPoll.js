@@ -34,16 +34,12 @@ export function useInAppNotificationsPoll({
     }
 
     const onVisibilityChange = () => {
-      if (
-        document.visibilityState === "visible" &&
-        mainView !== "notifications"
-      ) {
+      if (document.visibilityState === "visible" && mainView !== "notifications") {
         void refreshInAppNotifications();
       }
     };
 
     document.addEventListener("visibilitychange", onVisibilityChange);
-    return () =>
-      document.removeEventListener("visibilitychange", onVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", onVisibilityChange);
   }, [isAuthorized, mainView, refreshInAppNotifications]);
 }

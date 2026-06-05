@@ -1,0 +1,9 @@
+﻿/** Токены карточки каталога (layout — в ProductCardFrame.css). */
+.product-card {
+  --product-card-delete-accent: #c62828;
+  --product-card-radius: 14px;
+  --product-card-image-bleed-x: 0.5rem;
+  --product-card-image-bleed-top: 0.38rem;
+  --product-card-promotion-accent: #d97706;
+  --product-card-promotion-accent-soft: #fbbf24;
+}

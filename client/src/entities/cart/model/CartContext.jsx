@@ -1,10 +1,4 @@
-import {
-  createContext,
-  useCallback,
-  useMemo,
-  useReducer,
-  useRef,
-} from "react";
+import { createContext, useCallback, useMemo, useReducer, useRef } from "react";
 
 import { replaceMyCart } from "../api/replaceMyCart.js";
 import {
@@ -20,10 +14,7 @@ import {
 export const CartContext = createContext(null);
 
 const sumQuantities = (items) =>
-  Object.values(items).reduce(
-    (sum, qty) => sum + Math.floor(Number(qty) || 0),
-    0,
-  );
+  Object.values(items).reduce((sum, qty) => sum + Math.floor(Number(qty) || 0), 0);
 
 export function CartProvider({ children }) {
   const [items, dispatch] = useReducer(cartReducer, {});

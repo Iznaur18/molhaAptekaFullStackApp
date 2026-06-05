@@ -1,0 +1,10 @@
+/** Максимальная глубина дерева (0 = корень). */
+export const PRODUCT_CATEGORY_TREE_MAX_DEPTH = 4;
+
+export const PRODUCT_CATEGORY_SLUG_MAX_LENGTH = 80;
+
+export const PRODUCT_CATEGORY_LABEL_RU_MAX_LENGTH = 120;
+
+export const PRODUCT_CATEGORY_SEARCH_KEYWORD_MAX_LENGTH = 40;
+
+export const PRODUCT_CATEGORY_SEARCH_KEYWORDS_MAX_COUNT = 30;

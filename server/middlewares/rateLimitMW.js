@@ -1,197 +1,319 @@
-import rateLimit from 'express-rate-limit';
+import rateLimit from "express-rate-limit";
 
-import { PRODUCT_REPORT_RATE_LIMIT_PER_HOUR } from '../constants/productReportConstants.js';
-import { USER_STORY_RATE_LIMIT_PER_HOUR } from '../constants/userStoryConstants.js';
-import { USER_DATA_CONFIRMATION_RATE_LIMIT_PER_HOUR } from '../constants/userDataConfirmationConstants.js';
-import { EMAIL_VERIFICATION_RESEND_RATE_LIMIT_PER_HOUR } from '../constants/emailVerificationConstants.js';
-import { PRICE_OFFER_RATE_LIMIT_PER_HOUR } from '../constants/productPriceOfferConstants.js';
-import { PRODUCT_REVIEW_RATE_LIMIT_PER_HOUR } from '../constants/productReviewConstants.js';
+import { PRODUCT_REPORT_RATE_LIMIT_PER_HOUR } from "../constants/productReportConstants.js";
+import { USER_STORY_RATE_LIMIT_PER_HOUR } from "../constants/userStoryConstants.js";
+import { USER_DATA_CONFIRMATION_RATE_LIMIT_PER_HOUR } from "../constants/userDataConfirmationConstants.js";
+import { EMAIL_VERIFICATION_RESEND_RATE_LIMIT_PER_HOUR } from "../constants/emailVerificationConstants.js";
+import { PRICE_OFFER_RATE_LIMIT_PER_HOUR } from "../constants/productPriceOfferConstants.js";
+import { PRODUCT_REVIEW_RATE_LIMIT_PER_HOUR } from "../constants/productReviewConstants.js";
+import {
+  ORDER_CREATE_RATE_LIMIT_PER_HOUR,
+  ORDER_ITEM_ACTION_RATE_LIMIT_PER_15_MIN,
+} from "../constants/orderRateLimitConstants.js";
 
-/**
- * Общий rate limiter для всех API запросов
- * Ограничивает количество запросов с одного IP адреса
- */
-export const generalRateLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 минут
-    max: 10_000, // максимум 10 000 запросов за 15 минут
-    message: {
-        success: false,
-        message: 'Слишком много запросов с этого IP, попробуйте позже'
-    },
-    standardHeaders: true, // Возвращает информацию о лимитах в заголовках `RateLimit-*`
-    legacyHeaders: false, // Отключает заголовки `X-RateLimit-*`
-});
+/** @type {Record<string, import('express').RequestHandler>} */
+const handlers = {};
 
-/**
- * Строгий rate limiter для авторизации и регистрации
- * Защита от брутфорса и массовой регистрации
- */
-export const authRateLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 минут
-    max: 55, // максимум 55 попыток входа/регистрации за 15 минут
-    message: {
-        success: false,
-        message: 'Слишком много попыток входа. Попробуйте через 15 минут'
-    },
-    skipSuccessfulRequests: true, // Не учитывать успешные запросы
-    standardHeaders: true,
-    legacyHeaders: false,
-});
+/** @param {import('express').Request} req */
+function rateLimitKeyByUserOrIp(req) {
+  return String(req.userId ?? req.ip ?? "unknown");
+}
 
-/** Защита POST /auth/refresh от перебора refresh cookie. */
-export const refreshAuthRateLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 120,
-    message: {
-        success: false,
-        message: 'Слишком много запросов обновления сессии. Попробуйте позже',
-    },
-    standardHeaders: true,
-    legacyHeaders: false,
-});
+const RATE_LIMIT_DEFAULTS = {
+  standardHeaders: true,
+  legacyHeaders: false,
+};
 
 /**
- * Rate limiter для операций обновления профиля
- * Защита от массовых изменений
+ * @param {import('express-rate-limit').Options} options
+ * @param {import('express-rate-limit').Store | undefined} store
  */
-export const updateProfileRateLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000, // 1 час
-    max: 120, // максимум 20 обновлений профиля в час
-    message: {
-        success: false,
-        message: 'Слишком много обновлений профиля. Попробуйте позже'
-    },
-    standardHeaders: true,
-    legacyHeaders: false,
-});
+function buildLimiter(options, store) {
+  return rateLimit(store ? { ...options, store } : options);
+}
 
 /**
- * Rate limiter для голосований
- * Защита от накрутки рейтинга
+ * @param {import('express-rate-limit').Store} [store]
  */
-export const voteRateLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000, // 1 час
-    max: 110, // максимум 10 голосов в час
-    message: {
+export function initRateLimitMiddlewares(store) {
+  handlers.general = buildLimiter(
+    {
+      ...RATE_LIMIT_DEFAULTS,
+      windowMs: 15 * 60 * 1000,
+      max: 10_000,
+      message: {
         success: false,
-        message: 'Слишком много голосований. Попробуйте позже'
+        message: "Слишком много запросов с этого IP, попробуйте позже",
+      },
     },
-    standardHeaders: true,
-    legacyHeaders: false,
-});
+    store,
+  );
 
-/**
- * Rate limiter для загрузки файлов
- * Защита от перегрузки сервера
- */
-export const uploadRateLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000, // 1 час
-    max: 110, // максимум 10 загрузок в час
-    message: {
+  handlers.auth = buildLimiter(
+    {
+      ...RATE_LIMIT_DEFAULTS,
+      windowMs: 15 * 60 * 1000,
+      max: 55,
+      message: {
         success: false,
-        message: 'Слишком много загрузок файлов. Попробуйте позже'
+        message: "Слишком много попыток входа. Попробуйте через 15 минут",
+      },
+      skipSuccessfulRequests: true,
     },
-    standardHeaders: true,
-    legacyHeaders: false,
-});
+    store,
+  );
 
-/** Лимит на полную замену корзины (частые debounce-сейвы с клиента). */
-export const cartReplaceRateLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 400,
-    message: {
+  handlers.refreshAuth = buildLimiter(
+    {
+      ...RATE_LIMIT_DEFAULTS,
+      windowMs: 15 * 60 * 1000,
+      max: 120,
+      message: {
         success: false,
-        message: 'Слишком много обновлений корзины. Попробуйте позже',
+        message: "Слишком много запросов обновления сессии. Попробуйте позже",
+      },
     },
-    standardHeaders: true,
-    legacyHeaders: false,
-});
+    store,
+  );
 
-/** Лимит жалоб на товары с одного аккаунта. */
-export const productReportRateLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000,
-    max: PRODUCT_REPORT_RATE_LIMIT_PER_HOUR,
-    message: {
+  handlers.updateProfile = buildLimiter(
+    {
+      ...RATE_LIMIT_DEFAULTS,
+      windowMs: 60 * 60 * 1000,
+      max: 120,
+      message: {
         success: false,
-        message: 'Слишком много жалоб. Попробуйте позже',
+        message: "Слишком много обновлений профиля. Попробуйте позже",
+      },
     },
-    keyGenerator: (req) => String(req.userId ?? req.ip ?? 'unknown'),
-    standardHeaders: true,
-    legacyHeaders: false,
-});
+    store,
+  );
 
-/** Лимит жалоб на сторис с одного аккаунта. */
-export const userStoryReportRateLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000,
-    max: USER_STORY_RATE_LIMIT_PER_HOUR,
-    message: {
+  handlers.vote = buildLimiter(
+    {
+      ...RATE_LIMIT_DEFAULTS,
+      windowMs: 60 * 60 * 1000,
+      max: 110,
+      message: {
         success: false,
-        message: 'Слишком много жалоб. Попробуйте позже',
+        message: "Слишком много голосований. Попробуйте позже",
+      },
     },
-    keyGenerator: (req) => String(req.userId ?? req.ip ?? 'unknown'),
-    standardHeaders: true,
-    legacyHeaders: false,
-});
+    store,
+  );
 
-/** Лимит публикаций сторис с одного аккаунта. */
-export const userStoryCreateRateLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000,
-    max: 30,
-    message: {
+  handlers.upload = buildLimiter(
+    {
+      ...RATE_LIMIT_DEFAULTS,
+      windowMs: 60 * 60 * 1000,
+      max: 110,
+      message: {
         success: false,
-        message: 'Слишком много публикаций сторис. Попробуйте позже',
+        message: "Слишком много загрузок файлов. Попробуйте позже",
+      },
+      keyGenerator: rateLimitKeyByUserOrIp,
     },
-    keyGenerator: (req) => String(req.userId ?? req.ip ?? 'unknown'),
-    standardHeaders: true,
-    legacyHeaders: false,
-});
+    store,
+  );
 
-/** Лимит заявок на подтверждение данных. */
-export const productPriceOfferRateLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000,
-    max: PRICE_OFFER_RATE_LIMIT_PER_HOUR,
-    message: {
+  handlers.orderCreate = buildLimiter(
+    {
+      ...RATE_LIMIT_DEFAULTS,
+      windowMs: 60 * 60 * 1000,
+      max: ORDER_CREATE_RATE_LIMIT_PER_HOUR,
+      message: {
         success: false,
-        message: 'Слишком много предложений цены. Попробуйте позже',
+        message: "Слишком много заказов. Попробуйте позже",
+      },
+      keyGenerator: rateLimitKeyByUserOrIp,
     },
-    keyGenerator: (req) => String(req.userId ?? req.ip ?? 'unknown'),
-    standardHeaders: true,
-    legacyHeaders: false,
-});
+    store,
+  );
 
-export const userDataConfirmationRateLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000,
-    max: USER_DATA_CONFIRMATION_RATE_LIMIT_PER_HOUR,
-    message: {
+  handlers.orderItemAction = buildLimiter(
+    {
+      ...RATE_LIMIT_DEFAULTS,
+      windowMs: 15 * 60 * 1000,
+      max: ORDER_ITEM_ACTION_RATE_LIMIT_PER_15_MIN,
+      message: {
         success: false,
-        message: 'Слишком много заявок. Попробуйте позже',
+        message: "Слишком много действий по заказу. Попробуйте позже",
+      },
+      keyGenerator: rateLimitKeyByUserOrIp,
     },
-    keyGenerator: (req) => String(req.userId ?? req.ip ?? 'unknown'),
-    standardHeaders: true,
-    legacyHeaders: false,
-});
+    store,
+  );
 
-export const emailVerificationResendRateLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000,
-    max: EMAIL_VERIFICATION_RESEND_RATE_LIMIT_PER_HOUR,
-    message: {
+  handlers.cartReplace = buildLimiter(
+    {
+      ...RATE_LIMIT_DEFAULTS,
+      windowMs: 15 * 60 * 1000,
+      max: 400,
+      message: {
         success: false,
-        message: 'Слишком много запросов на отправку письма. Попробуйте позже',
+        message: "Слишком много обновлений корзины. Попробуйте позже",
+      },
     },
-    keyGenerator: (req) => String(req.userId ?? req.ip ?? 'unknown'),
-    standardHeaders: true,
-    legacyHeaders: false,
-});
+    store,
+  );
 
-/** Лимит отзывов на товары с одного аккаунта. */
-export const productReviewRateLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000,
-    max: PRODUCT_REVIEW_RATE_LIMIT_PER_HOUR,
-    message: {
+  handlers.productReport = buildLimiter(
+    {
+      ...RATE_LIMIT_DEFAULTS,
+      windowMs: 60 * 60 * 1000,
+      max: PRODUCT_REPORT_RATE_LIMIT_PER_HOUR,
+      message: {
         success: false,
-        message: 'Слишком много отзывов. Попробуйте позже',
+        message: "Слишком много жалоб. Попробуйте позже",
+      },
+      keyGenerator: rateLimitKeyByUserOrIp,
     },
-    keyGenerator: (req) => String(req.userId ?? req.ip ?? 'unknown'),
-    standardHeaders: true,
-    legacyHeaders: false,
-});
+    store,
+  );
+
+  handlers.userStoryReport = buildLimiter(
+    {
+      ...RATE_LIMIT_DEFAULTS,
+      windowMs: 60 * 60 * 1000,
+      max: USER_STORY_RATE_LIMIT_PER_HOUR,
+      message: {
+        success: false,
+        message: "Слишком много жалоб. Попробуйте позже",
+      },
+      keyGenerator: rateLimitKeyByUserOrIp,
+    },
+    store,
+  );
+
+  handlers.userStoryCreate = buildLimiter(
+    {
+      ...RATE_LIMIT_DEFAULTS,
+      windowMs: 60 * 60 * 1000,
+      max: 30,
+      message: {
+        success: false,
+        message: "Слишком много публикаций сторис. Попробуйте позже",
+      },
+      keyGenerator: rateLimitKeyByUserOrIp,
+    },
+    store,
+  );
+
+  handlers.productPriceOffer = buildLimiter(
+    {
+      ...RATE_LIMIT_DEFAULTS,
+      windowMs: 60 * 60 * 1000,
+      max: PRICE_OFFER_RATE_LIMIT_PER_HOUR,
+      message: {
+        success: false,
+        message: "Слишком много предложений цены. Попробуйте позже",
+      },
+      keyGenerator: rateLimitKeyByUserOrIp,
+    },
+    store,
+  );
+
+  handlers.userDataConfirmation = buildLimiter(
+    {
+      ...RATE_LIMIT_DEFAULTS,
+      windowMs: 60 * 60 * 1000,
+      max: USER_DATA_CONFIRMATION_RATE_LIMIT_PER_HOUR,
+      message: {
+        success: false,
+        message: "Слишком много заявок. Попробуйте позже",
+      },
+      keyGenerator: rateLimitKeyByUserOrIp,
+    },
+    store,
+  );
+
+  handlers.emailVerificationResend = buildLimiter(
+    {
+      ...RATE_LIMIT_DEFAULTS,
+      windowMs: 60 * 60 * 1000,
+      max: EMAIL_VERIFICATION_RESEND_RATE_LIMIT_PER_HOUR,
+      message: {
+        success: false,
+        message: "Слишком много запросов на отправку письма. Попробуйте позже",
+      },
+      keyGenerator: rateLimitKeyByUserOrIp,
+    },
+    store,
+  );
+
+  handlers.productReview = buildLimiter(
+    {
+      ...RATE_LIMIT_DEFAULTS,
+      windowMs: 60 * 60 * 1000,
+      max: PRODUCT_REVIEW_RATE_LIMIT_PER_HOUR,
+      message: {
+        success: false,
+        message: "Слишком много отзывов. Попробуйте позже",
+      },
+      keyGenerator: rateLimitKeyByUserOrIp,
+    },
+    store,
+  );
+}
+
+/** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
+export const generalRateLimiter = (req, res, next) => handlers.general(req, res, next);
+
+/** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
+export const authRateLimiter = (req, res, next) => handlers.auth(req, res, next);
+
+/** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
+export const refreshAuthRateLimiter = (req, res, next) =>
+  handlers.refreshAuth(req, res, next);
+
+/** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
+export const updateProfileRateLimiter = (req, res, next) =>
+  handlers.updateProfile(req, res, next);
+
+/** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
+export const voteRateLimiter = (req, res, next) => handlers.vote(req, res, next);
+
+/** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
+export const uploadRateLimiter = (req, res, next) => handlers.upload(req, res, next);
+
+/** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
+export const orderCreateRateLimiter = (req, res, next) =>
+  handlers.orderCreate(req, res, next);
+
+/** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
+export const orderItemActionRateLimiter = (req, res, next) =>
+  handlers.orderItemAction(req, res, next);
+
+/** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
+export const cartReplaceRateLimiter = (req, res, next) =>
+  handlers.cartReplace(req, res, next);
+
+/** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
+export const productReportRateLimiter = (req, res, next) =>
+  handlers.productReport(req, res, next);
+
+/** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
+export const userStoryReportRateLimiter = (req, res, next) =>
+  handlers.userStoryReport(req, res, next);
+
+/** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
+export const userStoryCreateRateLimiter = (req, res, next) =>
+  handlers.userStoryCreate(req, res, next);
+
+/** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
+export const productPriceOfferRateLimiter = (req, res, next) =>
+  handlers.productPriceOffer(req, res, next);
+
+/** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
+export const userDataConfirmationRateLimiter = (req, res, next) =>
+  handlers.userDataConfirmation(req, res, next);
+
+/** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
+export const emailVerificationResendRateLimiter = (req, res, next) =>
+  handlers.emailVerificationResend(req, res, next);
+
+/** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
+export const productReviewRateLimiter = (req, res, next) =>
+  handlers.productReview(req, res, next);
+
+initRateLimitMiddlewares();

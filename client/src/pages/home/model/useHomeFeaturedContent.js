@@ -8,14 +8,7 @@ import { pauseMyRaffle } from "../../../entities/raffle/api/pauseMyRaffle.js";
 import { canSellerEditRaffle } from "../../../entities/raffle/lib/canSellerEditRaffle.js";
 import { fetchUserStoriesFeed } from "../../../entities/user-story/api/fetchUserStoriesFeed.js";
 import { fetchMyProductPromotions } from "../../../entities/product/api/fetchMyProductPromotions.js";
-import {
-  API_CLIENT_UI,
-  RAFFLE_MANAGE_UI,
-} from "../../../shared/config/appUiCopy.js";
-import {
-  PROFILE_TAB_MY_PRODUCTS,
-} from "../../my-profile/lib/profileTabs.js";
-
+import { API_CLIENT_UI, RAFFLE_MANAGE_UI } from "../../../shared/config/appUiCopy.js";
 /**
  * @param {{
  *   isHomeCatalogMainView: boolean;
@@ -141,8 +134,7 @@ export function useHomeFeaturedContent({
         return;
       }
       const isOwner =
-        currentUserId != null &&
-        String(raffle.sellerId) === String(currentUserId);
+        currentUserId != null && String(raffle.sellerId) === String(currentUserId);
       setRaffleModal({
         mode: "edit",
         raffle,
@@ -158,8 +150,7 @@ export function useHomeFeaturedContent({
         return;
       }
       const isOwner =
-        currentUserId != null &&
-        String(raffle.sellerId) === String(currentUserId);
+        currentUserId != null && String(raffle.sellerId) === String(currentUserId);
       const confirmMessage = isOwner
         ? RAFFLE_MANAGE_UI.DELETE_CONFIRM_OWNER
         : RAFFLE_MANAGE_UI.DELETE_CONFIRM_STAFF;
@@ -201,8 +192,7 @@ export function useHomeFeaturedContent({
         return;
       }
       const isOwner =
-        currentUserId != null &&
-        String(raffle.sellerId) === String(currentUserId);
+        currentUserId != null && String(raffle.sellerId) === String(currentUserId);
       if (!isOwner) {
         return;
       }
@@ -235,16 +225,13 @@ export function useHomeFeaturedContent({
         return null;
       }
       const isOwner =
-        currentUserId != null &&
-        String(raffle.sellerId) === String(currentUserId);
+        currentUserId != null && String(raffle.sellerId) === String(currentUserId);
       const canManage = isOwner || canModerateProducts;
       if (!canManage) {
         return null;
       }
       return {
-        showEdit: isOwner
-          ? canSellerEditRaffle(raffle)
-          : canModerateProducts,
+        showEdit: isOwner ? canSellerEditRaffle(raffle) : canModerateProducts,
         showDelete: true,
         showPause: isOwner && raffle.status === "active",
         onEdit: () => handleFeaturedRaffleEdit(raffle),
@@ -264,20 +251,10 @@ export function useHomeFeaturedContent({
   );
 
   useEffect(() => {
-    if (
-      mainView === "my-products" ||
-      activeProfileTab === PROFILE_TAB_MY_PRODUCTS ||
-      mainView === "my-profile"
-    ) {
+    if (mainView === "my-products" || mainView === "my-profile") {
       void refreshSellerRaffleState();
     }
-  }, [
-    mainView,
-    activeProfileTab,
-    refreshSellerRaffleState,
-    raffleRefreshTick,
-    isAuthorized,
-  ]);
+  }, [mainView, refreshSellerRaffleState, raffleRefreshTick, isAuthorized]);
 
   const refreshMyPromotionPendingIds = useCallback(async () => {
     if (!isAuthorized) {
@@ -298,13 +275,10 @@ export function useHomeFeaturedContent({
   }, [isAuthorized]);
 
   useEffect(() => {
-    if (
-      mainView === "my-products" ||
-      activeProfileTab === PROFILE_TAB_MY_PRODUCTS
-    ) {
+    if (mainView === "my-products") {
       void refreshMyPromotionPendingIds();
     }
-  }, [mainView, activeProfileTab, refreshMyPromotionPendingIds, catalogRefreshTick]);
+  }, [mainView, refreshMyPromotionPendingIds, catalogRefreshTick]);
 
   return {
     featuredRaffles,

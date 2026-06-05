@@ -1,8 +1,5 @@
 import { apiClient } from "../../../shared/api/index.js";
-import {
-  API_CLIENT_UI,
-  USER_SEARCH_UI,
-} from "../../../shared/config/appUiCopy.js";
+import { API_CLIENT_UI, USER_SEARCH_UI } from "../../../shared/config/appUiCopy.js";
 
 /**
  * @param {{

@@ -17,9 +17,7 @@ export async function deleteUserStory(storyId) {
     return data.data;
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      "Не удалось удалить сторис";
+      e?.response?.data?.message ?? e?.message ?? "Не удалось удалить сторис";
     throw new Error(message);
   }
 }

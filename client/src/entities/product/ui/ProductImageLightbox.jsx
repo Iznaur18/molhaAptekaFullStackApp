@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { PRODUCT_CARD_UI } from "../../../shared/config/appUiCopy.js";
+import { useDialogFocusTrap } from "../../../shared/lib/useDialogFocusTrap.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
 
@@ -9,9 +10,7 @@ import "./ProductImageLightbox.css";
 
 function filterHttpImageUrls(imageUrls) {
   if (!Array.isArray(imageUrls)) return [];
-  return imageUrls
-    .map((s) => String(s).trim())
-    .filter((u) => /^https?:\/\//i.test(u));
+  return imageUrls.map((s) => String(s).trim()).filter((u) => /^https?:\/\//i.test(u));
 }
 
 /**
@@ -24,6 +23,8 @@ function filterHttpImageUrls(imageUrls) {
  * }} props
  */
 export function ProductImageLightbox({ onClose, imageUrls, startIndex = 0 }) {
+  const dialogRef = useRef(/** @type {HTMLDivElement | null} */ (null));
+  const closeButtonRef = useRef(/** @type {HTMLButtonElement | null} */ (null));
   const urls = useMemo(() => filterHttpImageUrls(imageUrls), [imageUrls]);
   const [index, setIndex] = useState(0);
 
@@ -47,6 +48,10 @@ export function ProductImageLightbox({ onClose, imageUrls, startIndex = 0 }) {
   }, [len]);
 
   useScrollLock(true);
+  useDialogFocusTrap(dialogRef, {
+    active: len > 0,
+    initialFocusRef: closeButtonRef,
+  });
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -77,6 +82,7 @@ export function ProductImageLightbox({ onClose, imageUrls, startIndex = 0 }) {
 
   return createPortal(
     <div
+      ref={dialogRef}
       className="product-image-lightbox"
       role="dialog"
       aria-modal="true"
@@ -89,6 +95,7 @@ export function ProductImageLightbox({ onClose, imageUrls, startIndex = 0 }) {
       <div className="product-image-lightbox__backdrop" aria-hidden="true" />
       <div className="product-image-lightbox__surface">
         <button
+          ref={closeButtonRef}
           type="button"
           className="product-image-lightbox__close"
           aria-label={PRODUCT_CARD_UI.IMAGE_LIGHTBOX_CLOSE}

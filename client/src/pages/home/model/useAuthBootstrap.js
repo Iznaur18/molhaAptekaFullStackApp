@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { fetchCurrentUserProfile } from "../../../entities/user/api/fetchCurrentUserProfile.js";
+import { establishAuthSession } from "../../../entities/user/api/fetchCurrentUserProfile.js";
 
 /**
  * @returns {[{ isAuthorized: boolean; isAuthReady: boolean }, (value: boolean) => void]}
@@ -14,7 +14,7 @@ export const useAuthBootstrap = () => {
 
     void (async () => {
       try {
-        await fetchCurrentUserProfile();
+        await establishAuthSession();
         if (!isCancelled) {
           setIsAuthorized(true);
         }

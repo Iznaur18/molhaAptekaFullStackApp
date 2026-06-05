@@ -38,9 +38,7 @@ export function normalizeRuPhoneInput(raw) {
 
   let digits = trimmed.replace(/\D/g, "");
   if (digits.length > RU_PHONE_MAX_DIGITS) {
-    throw new Error(
-      `Номер не может содержать больше ${RU_PHONE_MAX_DIGITS} цифр`,
-    );
+    throw new Error(`Номер не может содержать больше ${RU_PHONE_MAX_DIGITS} цифр`);
   }
   if (digits === "") {
     throw new Error("Номер телефона должен содержать цифры");

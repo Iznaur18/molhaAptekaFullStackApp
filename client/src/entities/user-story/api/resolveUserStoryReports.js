@@ -19,9 +19,7 @@ export async function resolveUserStoryReports(storyId, payload) {
     return data.data;
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      "Не удалось обработать жалобы";
+      e?.response?.data?.message ?? e?.message ?? "Не удалось обработать жалобы";
     throw new Error(message);
   }
 }

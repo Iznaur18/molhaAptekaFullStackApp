@@ -1,6 +1,8 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
+import { buildSpaContentSecurityPolicy } from "../server/utils/buildSpaContentSecurityPolicy.js";
+
 /**
  * LAN-доступ (вариант C): см. `client/docs/LAN-dev-access.md`
  *
@@ -36,12 +38,26 @@ const shouldProxyToApi = (prefix, pathname) => {
   return pathname === prefix || pathname.startsWith(`${prefix}/`);
 };
 
+/** В dev по HTTP браузер не сохраняет Secure-cookie с API — снимаем при прокси. */
+const stripSecureFromProxySetCookie = (proxy) => {
+  proxy.on("proxyRes", (proxyRes) => {
+    const setCookie = proxyRes.headers["set-cookie"];
+    if (!setCookie) {
+      return;
+    }
+    proxyRes.headers["set-cookie"] = setCookie.map((cookie) =>
+      cookie.replace(/;\s*Secure/gi, "").replace(/;\s*Domain=[^;]+/gi, ""),
+    );
+  });
+};
+
 const devApiProxy = Object.fromEntries(
   DEV_API_PROXY_PREFIXES.map((prefix) => [
     prefix,
     {
       target: LOCAL_API_ORIGIN,
       changeOrigin: true,
+      configure: stripSecureFromProxySetCookie,
       bypass(req) {
         const pathname = (req.url ?? "").split("?")[0];
         if (!shouldProxyToApi(prefix, pathname)) {
@@ -52,10 +68,59 @@ const devApiProxy = Object.fromEntries(
   ]),
 );
 
+/** CSP как в prod nginx — только preview, не dev (HMR). */
+function spaCspPreviewPlugin() {
+  return {
+    name: "spa-csp-preview",
+    configurePreviewServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const pathname = (req.url ?? "").split("?")[0];
+        if (!pathname.startsWith("/assets/")) {
+          res.setHeader(
+            "Content-Security-Policy",
+            buildSpaContentSecurityPolicy({
+              frontendOrigin: process.env.FRONTEND_URL ?? "http://127.0.0.1:4173",
+            }),
+          );
+        }
+        next();
+      });
+    },
+  };
+}
+
 // https://vite.dev/config/
 export default defineConfig({
   appType: "spa",
-  plugins: [react()],
+  plugins: [react(), spaCspPreviewPlugin()],
+  build: {
+    sourcemap: "hidden",
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes("node_modules")) {
+            return undefined;
+          }
+          if (id.includes("react-router")) {
+            return "vendor-router";
+          }
+          if (id.includes("react-dom") || id.includes("/react/")) {
+            return "vendor-react";
+          }
+          if (id.includes("axios")) {
+            return "vendor-axios";
+          }
+          if (id.includes("@dnd-kit")) {
+            return "vendor-dnd";
+          }
+          if (id.includes("lucide-react")) {
+            return "vendor-icons";
+          }
+          return "vendor-misc";
+        },
+      },
+    },
+  },
   server: {
     host: DEV_SERVER_HOST,
     port: 5173,

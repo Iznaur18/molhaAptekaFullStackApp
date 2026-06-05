@@ -4,8 +4,8 @@
  * @param {string} input
  * @returns {string}
  */
-const escapeRegexSpecialCharsInUserInput = (input) =>
-    input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+export const escapeRegexSpecialCharsInUserInput = (input) =>
+  input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 /**
  * Собирает условие $or с regex по заданным полям. Если term пустой — возвращает null.
@@ -15,15 +15,15 @@ const escapeRegexSpecialCharsInUserInput = (input) =>
  * @returns {Record<string, unknown> | null}
  */
 export const buildRegexSearchOr = (rawTerm, fieldNames) => {
-    if (typeof rawTerm !== 'string') return null;
+  if (typeof rawTerm !== "string") return null;
 
-    const trimmedTerm = rawTerm.trim();
-    if (!trimmedTerm || fieldNames.length === 0) return null;
+  const trimmedTerm = rawTerm.trim();
+  if (!trimmedTerm || fieldNames.length === 0) return null;
 
-    const escapedTerm = escapeRegexSpecialCharsInUserInput(trimmedTerm);
-    const regexCondition = { $regex: escapedTerm, $options: 'i' };
+  const escapedTerm = escapeRegexSpecialCharsInUserInput(trimmedTerm);
+  const regexCondition = { $regex: escapedTerm, $options: "i" };
 
-    return {
-        $or: fieldNames.map((fieldName) => ({ [fieldName]: regexCondition })),
-    };
+  return {
+    $or: fieldNames.map((fieldName) => ({ [fieldName]: regexCondition })),
+  };
 };

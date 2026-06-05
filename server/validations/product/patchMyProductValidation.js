@@ -1,16 +1,23 @@
 import { body, oneOf } from "express-validator";
 
 import {
-  PRODUCT_CATEGORY_VALUES,
   PRODUCT_DESCRIPTION_MAX_CHARS,
   PRODUCT_DESCRIPTION_MIN_CHARS,
   PRODUCT_IMAGE_URLS_MAX,
   PRODUCT_PRICE_RUB_MAX,
 } from "../../constants/productConstants.js";
 import { assertAtMostChars } from "../../utils/maxWordsText.js";
-import { assertProductOldPricePair, normalizeProductOldPriceRub, normalizeProductPriceRub } from "../../utils/productDiscount.js";
+import {
+  assertProductOldPricePair,
+  normalizeProductOldPriceRub,
+  normalizeProductPriceRub,
+} from "../../utils/productDiscount.js";
 import { normalizeProductCharacteristics } from "../../utils/normalizeProductCharacteristics.js";
 import { handleValidationByExpressErrors } from "../handleValidationByExpressErrors.js";
+import {
+  productCategoryIdBodyValidation,
+  productCategoryLegacyBodyValidation,
+} from "./productCategoryBodyValidation.js";
 
 const assertHttpImageUrl = (raw, label) => {
   if (raw == null || String(raw).trim() === "") return;
@@ -18,9 +25,7 @@ const assertHttpImageUrl = (raw, label) => {
   try {
     const u = new URL(s);
     if (u.protocol !== "http:" && u.protocol !== "https:") {
-      throw new Error(
-        `${label}: URL должен начинаться с http:// или https://`,
-      );
+      throw new Error(`${label}: URL должен начинаться с http:// или https://`);
     }
   } catch (e) {
     if (e instanceof TypeError) {
@@ -38,6 +43,7 @@ export const patchMyProductValidation = [
       body("productPrice").exists(),
       body("productOldPrice").exists(),
       body("productCategory").exists(),
+      body("productCategoryId").exists(),
       body("productImageUrls").exists(),
       body("productImageUrl").exists(),
       body("productPreviewVideoUrl").exists(),
@@ -66,15 +72,9 @@ export const patchMyProductValidation = [
     .trim()
     .custom((value) => {
       try {
-        assertAtMostChars(
-          value,
-          "Описание товара",
-          PRODUCT_DESCRIPTION_MAX_CHARS,
-        );
+        assertAtMostChars(value, "Описание товара", PRODUCT_DESCRIPTION_MAX_CHARS);
       } catch (e) {
-        throw new Error(
-          e instanceof Error ? e.message : "Слишком длинное описание",
-        );
+        throw new Error(e instanceof Error ? e.message : "Слишком длинное описание");
       }
       return true;
     }),
@@ -108,9 +108,7 @@ export const patchMyProductValidation = [
   body("productPrice")
     .optional()
     .isInt({ min: 0, max: PRODUCT_PRICE_RUB_MAX })
-    .withMessage(
-      `Цена продукта — целое число от 0 до ${PRODUCT_PRICE_RUB_MAX}`,
-    )
+    .withMessage(`Цена продукта — целое число от 0 до ${PRODUCT_PRICE_RUB_MAX}`)
     .toInt(),
   body("productOldPrice")
     .optional({ nullable: true })
@@ -123,26 +121,17 @@ export const patchMyProductValidation = [
         )
           ? normalizeProductPriceRub(req.body.productPrice)
           : 0;
-        if (
-          !Object.prototype.hasOwnProperty.call(req.body ?? {}, "productPrice")
-        ) {
+        if (!Object.prototype.hasOwnProperty.call(req.body ?? {}, "productPrice")) {
           return true;
         }
         assertProductOldPricePair(productOldPrice, productPrice);
       } catch (e) {
-        throw new Error(
-          e instanceof Error ? e.message : "Некорректная старая цена",
-        );
+        throw new Error(e instanceof Error ? e.message : "Некорректная старая цена");
       }
       return true;
     }),
-  body("productCategory")
-    .optional()
-    .notEmpty()
-    .withMessage("Категория продукта не может быть пустой")
-    .isIn(PRODUCT_CATEGORY_VALUES)
-    .withMessage("Указана неизвестная категория товара")
-    .trim(),
+  productCategoryIdBodyValidation,
+  productCategoryLegacyBodyValidation,
   body("productIsAvailable")
     .optional()
     .isBoolean()
