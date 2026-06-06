@@ -34,8 +34,9 @@ export const createOrderBodySchema = z.object({
   deliveryAddressFlat: z
     .string()
     .trim()
-    .min(1, "Укажите номер квартиры")
-    .max(ORDER_DELIVERY_FLAT_MAX_LENGTH),
+    .max(ORDER_DELIVERY_FLAT_MAX_LENGTH)
+    .optional()
+    .default(""),
   paymentMethod: z.enum(ORDER_PAYMENT_METHODS),
   priceOfferId: mongoIdSchema.optional(),
 });

@@ -13,6 +13,7 @@ export const useCurrentUserSession = (isAuthorized, isAuthReady) => {
   );
   const [isPremiumUser, setIsPremiumUser] = useState(false);
   const [isEmailVerified, setIsEmailVerified] = useState(true);
+  const [currentUserEmail, setCurrentUserEmail] = useState("");
   const [loyaltyPoints, setLoyaltyPoints] = useState(0);
   const [loyaltyPointsReserved, setLoyaltyPointsReserved] = useState(0);
   const [isSessionReady, setIsSessionReady] = useState(false);
@@ -28,6 +29,7 @@ export const useCurrentUserSession = (isAuthorized, isAuthReady) => {
       setCurrentUserRole(null);
       setIsPremiumUser(false);
       setIsEmailVerified(true);
+      setCurrentUserEmail("");
       setLoyaltyPoints(0);
       setLoyaltyPointsReserved(0);
       setIsSessionReady(true);
@@ -45,6 +47,7 @@ export const useCurrentUserSession = (isAuthorized, isAuthReady) => {
           setCurrentUserRole(me.userRole ?? "user");
           setIsPremiumUser(Boolean(me.isPremiumUser));
           setIsEmailVerified(me.isEmailVerified !== false);
+          setCurrentUserEmail(String(me.email ?? "").trim());
           setLoyaltyPoints(Number(me.userLoyaltyPoints) || 0);
           setLoyaltyPointsReserved(Number(me.userLoyaltyPointsReserved) || 0);
         }
@@ -54,6 +57,7 @@ export const useCurrentUserSession = (isAuthorized, isAuthReady) => {
           setCurrentUserRole(null);
           setIsPremiumUser(false);
           setIsEmailVerified(true);
+          setCurrentUserEmail("");
           setLoyaltyPoints(0);
           setLoyaltyPointsReserved(0);
         }
@@ -74,6 +78,7 @@ export const useCurrentUserSession = (isAuthorized, isAuthReady) => {
     currentUserRole,
     isPremiumUser,
     isEmailVerified,
+    currentUserEmail,
     loyaltyPoints,
     loyaltyPointsReserved,
     setLoyaltyPoints,

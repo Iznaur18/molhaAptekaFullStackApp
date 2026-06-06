@@ -10,18 +10,18 @@ import { splitAddressForForm } from "./splitAddressForForm.js";
  * @returns {import('../model/types.js').RuDeliveryAddressValue}
  */
 export function addressValueFromUser(user) {
-  const { line, flat } = splitAddressForForm(user.userAddress, user.userAddressFlat);
+  const { line } = splitAddressForForm(user.userAddress, user.userAddressFlat);
   const fiasId = String(user.userAddressFiasId ?? "").trim();
   const geoRaw = user.userAddressGeo;
   const lat = Number(geoRaw?.lat);
   const lon = Number(geoRaw?.lon);
   const geo = Number.isFinite(lat) && Number.isFinite(lon) ? { lat, lon } : null;
 
-  const hasSaved = line.length > 0 && (flat.length > 0 || fiasId.length > 0);
+  const hasSaved = line.length > 0;
 
   return {
     line,
-    flat,
+    flat: "",
     fiasId,
     geo,
     selectedFromSuggest: hasSaved,

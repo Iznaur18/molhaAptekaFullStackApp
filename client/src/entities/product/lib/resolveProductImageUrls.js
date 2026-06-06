@@ -1,7 +1,6 @@
 import { PRODUCT_IMAGE_URLS_MAX } from "../model/productConstants.js";
 import {
   resolveImageUrlForDisplay,
-  isHttpImageUrl,
 } from "../../../shared/lib/resolveUploadedImageUrl.js";
 
 /**
@@ -17,12 +16,15 @@ export function resolveProductImageUrls(product) {
     : [];
   const cleaned = fromArr
     .map((s) => resolveImageUrlForDisplay(String(s).trim()))
-    .filter((u) => isHttpImageUrl(u))
+    .filter((u) => u.length > 0 && /^https?:\/\//i.test(u))
     .slice(0, PRODUCT_IMAGE_URLS_MAX);
   if (cleaned.length > 0) return cleaned;
   const leg = product.productImageUrl;
-  if (typeof leg === "string" && isHttpImageUrl(leg.trim())) {
-    return [resolveImageUrlForDisplay(leg.trim())];
+  if (typeof leg === "string" && leg.trim()) {
+    const resolved = resolveImageUrlForDisplay(leg.trim());
+    if (resolved.length > 0 && /^https?:\/\//i.test(resolved)) {
+      return [resolved];
+    }
   }
   return [];
 }

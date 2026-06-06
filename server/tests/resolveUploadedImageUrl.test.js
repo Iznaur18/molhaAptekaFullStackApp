@@ -29,3 +29,13 @@ test("resolveUploadedImageUrlForBrowser: relative /uploads", () => {
     "https://izibuy.ru/uploads/x.png",
   );
 });
+
+test("resolveUploadedImageUrlForBrowser: legacy dev LAN IP → текущий origin", () => {
+  assert.equal(
+    resolveUploadedImageUrlForBrowser(
+      "http://192.168.1.222:5173/uploads/photo.jpeg",
+      "http://127.0.0.1:5173",
+    ),
+    "http://127.0.0.1:5173/uploads/photo.jpeg",
+  );
+});

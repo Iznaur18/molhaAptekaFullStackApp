@@ -1,8 +1,9 @@
 import { useMemo, useRef } from "react";
 
 import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
-import { isProductTier3BannerPromotion } from "../../../entities/product/lib/isProductTier3BannerPromotion.js";
+import { shouldShowProductTier3BannerFullWidth } from "../../../entities/product/lib/shouldShowProductTier3BannerFullWidth.js";
 import { CATALOG_VIRTUALIZATION_MIN_ITEM_COUNT } from "../lib/catalogGridVirtualizationConstants.js";
+import { interleaveCatalogTier3Banners } from "../lib/interleaveCatalogTier3Banners.js";
 import { useCatalogGridColumnCount } from "../model/useCatalogGridColumnCount.js";
 import { useCatalogGridVirtualizer } from "../model/useCatalogGridVirtualizer.js";
 import { CatalogGridProductCard } from "./CatalogGridProductCard.jsx";
@@ -94,35 +95,58 @@ export function HomeCatalogGrid({
 }) {
   const virtualHostRef = useRef(/** @type {HTMLDivElement | null} */ (null));
   const virtualGridRef = useRef(/** @type {HTMLDivElement | null} */ (null));
+  const gridMeasureRef = useRef(/** @type {HTMLDivElement | null} */ (null));
 
-  const { tier3BannerProducts, gridProducts } = useMemo(() => {
-    if (!showFullWidthTier3Banners || isMineMode) {
-      return { tier3BannerProducts: [], gridProducts: products };
-    }
-    const banners = products.filter((product) => isProductTier3BannerPromotion(product));
-    const rest = products.filter((product) => !isProductTier3BannerPromotion(product));
-    return { tier3BannerProducts: banners, gridProducts: rest };
-  }, [isMineMode, products, showFullWidthTier3Banners]);
+  const shouldInterleaveTier3Banners = showFullWidthTier3Banners && !isMineMode;
 
-  const shouldVirtualize = gridProducts.length > CATALOG_VIRTUALIZATION_MIN_ITEM_COUNT;
-  const columnCount = useCatalogGridColumnCount(virtualHostRef, shouldVirtualize);
+  const hasTier3BannerInFeed = useMemo(
+    () =>
+      products.some((product) =>
+        shouldShowProductTier3BannerFullWidth(product, {
+          isMineMode,
+          showFullWidthTier3Banners,
+        }),
+      ),
+    [isMineMode, products, showFullWidthTier3Banners],
+  );
+
+  const shouldVirtualize =
+    !hasTier3BannerInFeed && products.length > CATALOG_VIRTUALIZATION_MIN_ITEM_COUNT;
+  const shouldMeasureGridColumns = shouldVirtualize || shouldInterleaveTier3Banners;
+  const gridColumnMeasureRef = shouldVirtualize ? virtualHostRef : gridMeasureRef;
+  const columnCount = useCatalogGridColumnCount(
+    gridColumnMeasureRef,
+    shouldMeasureGridColumns,
+  );
+  const displayProducts = useMemo(
+    () =>
+      interleaveCatalogTier3Banners(products, columnCount, {
+        enabled: shouldInterleaveTier3Banners,
+      }),
+    [columnCount, products, shouldInterleaveTier3Banners],
+  );
   const virtualWindow = useCatalogGridVirtualizer({
     enabled: shouldVirtualize,
     hostRef: virtualHostRef,
     gridRef: virtualGridRef,
-    itemCount: gridProducts.length,
+    itemCount: displayProducts.length,
     columnCount,
   });
 
   const visibleProducts = useMemo(() => {
     if (!shouldVirtualize) {
-      return gridProducts;
+      return displayProducts;
     }
-    return gridProducts.slice(virtualWindow.startIndex, virtualWindow.endIndex + 1);
-  }, [gridProducts, shouldVirtualize, virtualWindow.endIndex, virtualWindow.startIndex]);
+    return displayProducts.slice(virtualWindow.startIndex, virtualWindow.endIndex + 1);
+  }, [
+    displayProducts,
+    shouldVirtualize,
+    virtualWindow.endIndex,
+    virtualWindow.startIndex,
+  ]);
 
   const cardProps = {
-    products: gridProducts,
+    products,
     isMineMode,
     deletingProductId,
     onSellerNameClick,
@@ -171,19 +195,19 @@ export function HomeCatalogGrid({
     return HOME_PAGE_UI.EMPTY_NO_PRODUCTS;
   })();
 
-  const renderProductCard = (product, { promotionFullWidth = false } = {}) => (
+  const renderProductCard = (product) => (
     <CatalogGridProductCard
       key={product._id}
       product={product}
-      promotionFullWidth={promotionFullWidth}
+      promotionFullWidth={shouldShowProductTier3BannerFullWidth(product, {
+        isMineMode,
+        showFullWidthTier3Banners,
+      })}
       {...cardProps}
     />
   );
 
   const gridNodes = visibleProducts.map((product) => renderProductCard(product));
-  const tier3BannerNodes = tier3BannerProducts.map((product) =>
-    renderProductCard(product, { promotionFullWidth: true }),
-  );
 
   return (
     <>
@@ -201,15 +225,6 @@ export function HomeCatalogGrid({
         <p className="home-page__state">{emptyMessage}</p>
       ) : (
         <>
-          {tier3BannerNodes.length > 0 ? (
-            <div
-              className="home-page__grid home-page__grid--tier3-banners"
-              role="list"
-              aria-label={HOME_PAGE_UI.CATALOG_PROMOTED_BANNERS_ARIA}
-            >
-              {tier3BannerNodes}
-            </div>
-          ) : null}
           {shouldVirtualize ? (
             <div
               ref={virtualHostRef}
@@ -235,6 +250,7 @@ export function HomeCatalogGrid({
             </div>
           ) : (
             <div
+              ref={gridMeasureRef}
               className="home-page__grid"
               role="list"
               aria-label={HOME_PAGE_UI.CATALOG_PRODUCTS_LIST_ARIA}

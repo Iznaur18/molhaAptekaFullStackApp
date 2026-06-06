@@ -48,9 +48,3 @@
 .address-delivery-fields__hint_error {
   color: var(--color-danger, #d92d20);
 }
-
-.address-delivery-fields__flat-row {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { deleteUserProfile } from "../api/deleteUserProfile.js";
 import { ADMIN_EDIT_USER_UI } from "../../../shared/config/appUiCopy.js";
+import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 
 import "./AdminDeleteUserConfirmModal.css";
 
@@ -30,6 +31,8 @@ export function AdminDeleteUserConfirmModal({ isOpen, user, onClose, onDeleted }
 
   const token = user ? deleteConfirmToken(user) : "";
   const canSubmit = Boolean(user) && token.length > 0 && confirmText.trim() === token;
+
+  useScrollLock(isOpen);
 
   useEffect(() => {
     if (!isOpen) {

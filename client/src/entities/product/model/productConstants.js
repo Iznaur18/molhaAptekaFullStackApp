@@ -83,8 +83,12 @@ export const PRODUCT_CATEGORIES = [
   PRODUCT_CATEGORY_FIGURES,
 ];
 
+/** Inline SVG — без сети, мгновенно в <img>. */
 export const PRODUCT_IMAGE_PLACEHOLDER_URL =
-  "https://i.pinimg.com/1200x/cf/31/72/cf31727d3087cab8733545c4c4bbd566.jpg";
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23dbeafe'/%3E%3Cdefs%3E%3Cpattern id='d' width='20' height='20' patternUnits='userSpaceOnUse'%3E%3Ccircle cx='10' cy='10' r='2.5' fill='%2360a5fa' opacity='.55'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='400' height='300' fill='url(%23d)'/%3E%3C/svg%3E";
+
+/** Первые N карточек каталога — eager, остальные lazy. */
+export const CATALOG_ABOVE_FOLD_EAGER_IMAGE_COUNT = 8;
 
 /** Подписи для UI (сервер отдаёт только ключ enum). */
 export const PRODUCT_CATEGORY_LABEL_RU = {

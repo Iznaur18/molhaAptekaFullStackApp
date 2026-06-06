@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 import {
   fetchProductInstallmentProgram,
@@ -12,6 +13,8 @@ import {
 } from "../model/constants.js";
 import { INSTALLMENT_UI } from "../../../shared/config/appUiCopy.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
+import { getTopModalFocusLayer } from "../../../shared/lib/modalFocusStack.js";
+import { useDialogFocusTrap } from "../../../shared/lib/useDialogFocusTrap.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 
 import "./InstallmentProgramModal.css";
@@ -45,8 +48,38 @@ export function InstallmentProgramModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const panelRef = useRef(/** @type {HTMLDivElement | null} */ (null));
+  const closeButtonRef = useRef(/** @type {HTMLButtonElement | null} */ (null));
 
   useScrollLock(isOpen);
+  useDialogFocusTrap(panelRef, {
+    active: isOpen,
+    initialFocusRef: closeButtonRef,
+  });
+
+  useEffect(() => {
+    if (!isOpen) {
+      return undefined;
+    }
+
+    const onKeyDown = (event) => {
+      if (event.key !== "Escape") {
+        return;
+      }
+      const topLayer = getTopModalFocusLayer();
+      if (!topLayer || topLayer.container !== panelRef.current) {
+        return;
+      }
+      event.preventDefault();
+      event.stopPropagation();
+      onClose();
+    };
+
+    document.addEventListener("keydown", onKeyDown, true);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown, true);
+    };
+  }, [isOpen, onClose]);
 
   useEffect(() => {
     if (!isOpen || !productId) return;
@@ -131,9 +164,10 @@ export function InstallmentProgramModal({
     }
   };
 
-  return (
+  return createPortal(
     <div className="installment-program-modal__backdrop" role="presentation">
       <div
+        ref={panelRef}
         className="installment-program-modal"
         role="dialog"
         aria-modal="true"
@@ -148,6 +182,7 @@ export function InstallmentProgramModal({
             {productName ? `: ${productName}` : ""}
           </h2>
           <button
+            ref={closeButtonRef}
             type="button"
             className="installment-program-modal__close"
             onClick={onClose}
@@ -327,6 +362,7 @@ export function InstallmentProgramModal({
           </form>
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

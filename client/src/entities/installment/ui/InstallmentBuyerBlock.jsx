@@ -95,7 +95,7 @@ export function InstallmentBuyerBlock({
         planId: String(selectedPlanId),
         quantity,
         deliveryAddress: deliveryAddress.line,
-        deliveryAddressFlat: deliveryAddress.flat,
+        deliveryAddressFlat: "",
         paymentMethod,
       });
       setSuccess(INSTALLMENT_UI.CONTRACT_SUCCESS);
@@ -200,7 +200,6 @@ export function InstallmentBuyerBlock({
               onChange={setDeliveryAddress}
               disabled={isSubmitting}
               lineInputClassName="installment-buyer-block__input"
-              flatInputClassName="installment-buyer-block__input"
             />
           </div>
 

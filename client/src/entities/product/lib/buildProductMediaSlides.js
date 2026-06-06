@@ -1,3 +1,5 @@
+import { isDisplayableProductImageUrl } from "../../../shared/lib/resolveUploadedImageUrl.js";
+
 /**
  * @typedef {{ type: 'video', url: string } | { type: 'image', url: string }} ProductMediaSlide
  */
@@ -20,7 +22,7 @@ export function buildProductMediaSlides({ previewVideoUrl, imageUrls }) {
   }
   for (const raw of imageUrls) {
     const url = String(raw ?? "").trim();
-    if (/^https?:\/\//i.test(url)) {
+    if (isDisplayableProductImageUrl(url)) {
       slides.push({ type: "image", url });
     }
   }

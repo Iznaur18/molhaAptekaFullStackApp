@@ -62,7 +62,7 @@ export function ProductPriceDisplay({
  * @param {{
  *   discountPercent: number | null | undefined;
  *   className?: string;
- *   variant?: "inline" | "overlay";
+ *   variant?: "inline" | "overlay" | "banner";
  * }} props
  */
 export function ProductDiscountBadge({
@@ -75,18 +75,21 @@ export function ProductDiscountBadge({
   }
 
   const percent = Math.floor(discountPercent);
-  const badgeText = PRODUCT_CARD_UI.DISCOUNT_BADGE(percent);
+  const badgeText =
+    variant === "banner" ? `-${percent}%` : PRODUCT_CARD_UI.DISCOUNT_BADGE(percent);
+  const ariaLabel = PRODUCT_CARD_UI.DISCOUNT_BADGE(percent);
 
   const rootClassName = [
     "product-discount-badge",
     variant === "overlay" ? "product-discount-badge--overlay" : "",
+    variant === "banner" ? "product-discount-badge--banner" : "",
     className,
   ]
     .filter(Boolean)
     .join(" ");
 
   return (
-    <span className={rootClassName} role="status" aria-label={badgeText}>
+    <span className={rootClassName} role="status" aria-label={ariaLabel}>
       {badgeText}
     </span>
   );

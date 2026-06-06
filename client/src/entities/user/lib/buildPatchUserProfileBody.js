@@ -36,8 +36,7 @@ export function buildPatchUserProfileBody(form, options = {}) {
   body.userGender = form.userGender;
 
   const line = String(form.deliveryAddress.line ?? "").trim();
-  const flat = String(form.deliveryAddress.flat ?? "").trim();
-  if (line === "" && flat === "") {
+  if (line === "") {
     body.userAddress = null;
     body.userAddressFlat = null;
   } else {

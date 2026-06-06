@@ -1,4 +1,4 @@
-﻿.product-card__heading {
+.product-card__heading {
   margin: 0;
   min-width: 0;
   font-size: 0.98rem;
@@ -43,7 +43,7 @@
   gap: 0.32rem;
   flex: 1 1 auto;
   min-height: 0;
-  border-radius: 10px;
+  border-radius: var(--product-card-inner-radius);
 }
 
 .product-card__details-surface {

@@ -5,22 +5,36 @@
 }
 
 .raffle-featured-banner__inner {
+  --product-card-radius: calc(14px * 1.2);
+  --product-card-inner-radius: calc(var(--product-card-radius) * 10 / 14);
+  --product-card-image-bleed-x: 0.5rem;
+  --product-card-image-bleed-top: 0.38rem;
+
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 1rem 1.25rem;
-  height: 184px;
-  padding: 12px 14px;
+  align-items: stretch;
+  min-height: 11.5rem;
+  padding: 0.55rem 0.75rem 0.65rem;
   border: 2px solid #c4b5fd;
   border-radius: 16px;
+  overflow: hidden;
   background: linear-gradient(135deg, #faf5ff 0%, #f8f4ff 55%, Canvas 100%);
   box-shadow: 0 8px 24px rgb(124 58 237 / 12%);
 }
 
 .raffle-featured-banner__visual {
   position: relative;
-  border-radius: 12px;
+  box-sizing: border-box;
+  align-self: stretch;
+  width: calc(100% + var(--product-card-image-bleed-x));
+  min-height: 10rem;
+  margin-top: calc(-1 * var(--product-card-image-bleed-top));
+  margin-left: calc(-1 * var(--product-card-image-bleed-x));
+  margin-bottom: calc(-1 * var(--product-card-image-bleed-top));
+  border-radius: calc(var(--product-card-radius) - 2px) var(--product-card-inner-radius)
+    var(--product-card-inner-radius) calc(var(--product-card-radius) - 2px);
   overflow: hidden;
-  height: 184px;
   background: color-mix(in srgb, currentColor 6%, transparent);
 }
 
@@ -190,7 +204,22 @@
   }
 
   .raffle-featured-banner__visual {
-    max-width: 220px;
-    margin: 0 auto;
+    width: calc(100% + 2 * var(--product-card-image-bleed-x));
+    max-width: none;
+    margin-top: calc(-1 * var(--product-card-image-bleed-top));
+    margin-left: calc(-1 * var(--product-card-image-bleed-x));
+    margin-right: calc(-1 * var(--product-card-image-bleed-x));
+    margin-bottom: 0;
+    border-radius: calc(var(--product-card-radius) - 1px) calc(var(--product-card-radius) - 1px)
+      calc(var(--product-card-radius) * 0.8) calc(var(--product-card-radius) * 0.8);
+  }
+}
+
+@media (max-width: 667px) {
+  .raffle-featured-banner__inner {
+    --product-card-radius: calc(10px * 1.2);
+    --product-card-image-bleed-x: 0.3rem;
+    --product-card-image-bleed-top: 0.22rem;
+    padding: 0.32rem 0.4rem 0.38rem;
   }
 }

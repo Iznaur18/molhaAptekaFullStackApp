@@ -6,10 +6,9 @@
 export function appendRuAddressToPayload(payload, value, options = {}) {
   const { lineKey = "userAddress", flatKey = "userAddressFlat" } = options;
   const line = String(value.line ?? "").trim();
-  const flat = String(value.flat ?? "").trim();
 
-  if (line === "" && flat === "") return;
+  if (line === "") return;
 
   payload[lineKey] = line;
-  payload[flatKey] = flat;
+  payload[flatKey] = "";
 }

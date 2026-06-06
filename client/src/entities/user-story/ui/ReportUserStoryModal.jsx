@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { USER_STORY_UI } from "../../../shared/config/appUiCopy.js";
+import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import { PRODUCT_REPORT_TEXT_MAX_CHARS } from "../../product-report/model/constants.js";
 import { submitUserStoryReport } from "../api/submitUserStoryReport.js";
 
@@ -18,6 +19,8 @@ export function ReportUserStoryModal({ isOpen, storyId, onClose }) {
   const [isBusy, setIsBusy] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+
+  useScrollLock(isOpen);
 
   const handleClose = () => {
     setReportText("");

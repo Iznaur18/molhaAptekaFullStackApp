@@ -111,8 +111,9 @@ const OrderSchema = new mongoose.Schema(
     },
     deliveryAddressFlat: {
       type: String,
-      required: true,
       trim: true,
+      required: false,
+      default: "",
     },
     deliveryAddressFiasId: {
       type: String,

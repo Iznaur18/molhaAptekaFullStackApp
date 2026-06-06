@@ -56,6 +56,7 @@ import { HomeCatalogGrid } from "./HomeCatalogGrid.jsx";
  *   catalogAuctionOnly: boolean;
  *   catalogInstallmentOnly: boolean;
  *   catalogSaleOnly: boolean;
+ *   showFullWidthTier3Banners?: boolean;
  *   sellerRaffleActive: boolean;
  *   onToggleRaffleParticipation: (productId: string, participate: boolean) => void;
  *   raffleParticipationPendingProductId: string | null;
@@ -104,6 +105,7 @@ export function HomePageCatalogGridSection({
   catalogAuctionOnly,
   catalogInstallmentOnly,
   catalogSaleOnly,
+  showFullWidthTier3Banners = false,
   sellerRaffleActive,
   onToggleRaffleParticipation,
   raffleParticipationPendingProductId,
@@ -182,6 +184,7 @@ export function HomePageCatalogGridSection({
         catalogAuctionOnly={catalogAuctionOnly}
         catalogInstallmentOnly={catalogInstallmentOnly}
         catalogSaleOnly={catalogSaleOnly}
+        showFullWidthTier3Banners={showFullWidthTier3Banners}
         sellerRaffleActive={sellerRaffleActive}
         onToggleRaffleParticipation={onToggleRaffleParticipation}
         raffleParticipationPendingProductId={raffleParticipationPendingProductId}

@@ -1,6 +1,7 @@
-﻿@import "./productImageTokens.css";
+@import "./productImageTokens.css";
 @import "./product-card/productCardTokens.css";
 @import "./product-card/ProductCardFrame.css";
+@import "./product-card/ProductCardBannerLayout.css";
 @import "./product-card/ProductCardBadges.css";
 @import "./product-card/ProductCardContent.css";
 @import "./product-card/ProductCardMedia.css";

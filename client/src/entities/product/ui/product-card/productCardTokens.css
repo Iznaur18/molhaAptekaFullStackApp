@@ -1,9 +1,22 @@
-﻿/** Токены карточки каталога (layout — в ProductCardFrame.css). */
+/** Токены карточки каталога (layout — в ProductCardFrame.css). */
 .product-card {
   --product-card-delete-accent: #c62828;
-  --product-card-radius: 14px;
+  --product-card-radius: calc(14px * 1.2);
+  --product-card-inner-radius: calc(var(--product-card-radius) * 10 / 14);
   --product-card-image-bleed-x: 0.5rem;
   --product-card-image-bleed-top: 0.38rem;
   --product-card-promotion-accent: #d97706;
   --product-card-promotion-accent-soft: #fbbf24;
+  --product-card-banner-min-height: 12.5rem;
+  --product-card-banner-image-min-height: 11.5rem;
+  --product-card-banner-image-flex-basis: 50%;
+  --product-card-banner-accent: #dc2626;
+  --product-card-banner-accent-soft: #fecaca;
+  --product-card-banner-gradient-end: #fef2f2;
+  --product-card-banner-action: var(--product-card-banner-accent);
+  --product-card-banner-action-hover: #b91c1c;
+  --product-card-banner-badge-text: #991b1b;
+  --product-card-banner-content-padding-block-start: 0.95rem;
+  --product-card-banner-content-padding-block-end: 0.85rem;
+  --product-card-banner-content-padding-inline: 0.75rem;
 }

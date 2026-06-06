@@ -1,6 +1,33 @@
 const UPLOAD_ASSET_PATH_RE = /(\/uploads\/[^?#]+)/i;
 
 /**
+ * Dev SPA (Vite): другой LAN IP / localhost в БД — файлы на том же API через proxy.
+ *
+ * @param {string} origin
+ */
+function isDevSpaUploadOrigin(origin) {
+  try {
+    const parsed = new URL(origin);
+    if (parsed.port === "5173" || parsed.port === "4173") {
+      return true;
+    }
+    const host = parsed.hostname.toLowerCase();
+    if (host === "localhost" || host === "127.0.0.1") {
+      return true;
+    }
+    if (/^192\.168\./.test(host) || /^10\./.test(host)) {
+      return true;
+    }
+    if (/^172\.(1[6-9]|2\d|3[0-1])\./.test(host)) {
+      return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Логика отображения upload URL в браузере (тестируется без window).
  *
  * @param {string} raw
@@ -17,8 +44,10 @@ export function resolveUploadedImageUrlForBrowser(raw, pageOrigin) {
     try {
       const parsed = new URL(url);
       const pathMatch = parsed.pathname.match(UPLOAD_ASSET_PATH_RE);
-      if (pathMatch && parsed.origin === pageOrigin) {
-        return `${pageOrigin}${pathMatch[1]}`;
+      if (pathMatch) {
+        if (parsed.origin === pageOrigin || isDevSpaUploadOrigin(parsed.origin)) {
+          return `${pageOrigin}${pathMatch[1]}`;
+        }
       }
       return url;
     } catch {
@@ -64,6 +93,25 @@ export function resolveUploadedImageUrl(raw) {
  */
 export function isHttpImageUrl(raw) {
   return typeof raw === "string" && /^https?:\/\//i.test(raw.trim());
+}
+
+/**
+ * URL для слайда/`<img>`: http(s), data:image, /uploads.
+ *
+ * @param {unknown} raw
+ */
+export function isDisplayableProductImageUrl(raw) {
+  const url = String(raw ?? "").trim();
+  if (!url) {
+    return false;
+  }
+  if (/^data:image\//i.test(url)) {
+    return true;
+  }
+  if (isHttpImageUrl(url)) {
+    return true;
+  }
+  return url.startsWith("/uploads/") || UPLOAD_ASSET_PATH_RE.test(url);
 }
 
 /**

@@ -8,8 +8,10 @@ import {
   markInAppNotificationsReadController,
   verifyEmailController,
   resendEmailVerificationController,
+  verifyEmailWithCodeController,
 } from "../controllers/index.js";
 import { registerUserValidation, loginUserValidation } from "../validations/index.js";
+import { verifyEmailWithCodeValidation } from "../validations/user/verifyEmailWithCodeValidation.js";
 import {
   checkAuthMW,
   authRateLimiter,
@@ -38,6 +40,12 @@ router.post("/login", authRateLimiter, loginUserValidation, loginUserController)
 router.post("/logout", logoutUserController);
 router.post("/refresh", refreshAuthRateLimiter, refreshAuthController);
 router.get("/verify-email", verifyEmailController);
+router.post(
+  "/verify-email",
+  checkAuthMW,
+  verifyEmailWithCodeValidation,
+  verifyEmailWithCodeController,
+);
 router.post(
   "/resend-verification",
   checkAuthMW,

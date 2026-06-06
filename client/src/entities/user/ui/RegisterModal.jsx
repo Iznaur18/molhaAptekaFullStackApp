@@ -2,26 +2,13 @@ import { useState } from "react";
 
 import { establishAuthSession } from "../api/fetchCurrentUserProfile.js";
 import { registerUser } from "../api/registerUser.js";
-import { AddressDeliveryFields } from "../../address/ui/AddressDeliveryFields.jsx";
-import { validateRuDeliveryAddressForm } from "../../address/lib/validateRuDeliveryAddressForm.js";
 import { buildRegisterUserPayload } from "../lib/buildRegisterUserPayload.js";
 import { getRegisterEmptyRequiredFieldKeys } from "../lib/getRegisterEmptyRequiredFieldKeys.js";
-import { limitRuPhoneInput, validateRuPhoneField } from "../lib/ruPhone.js";
 import { validatePasswordConfirm } from "../lib/validatePasswordConfirm.js";
 import { validateUserNameField } from "../lib/validateUserName.js";
-import {
-  DEFAULT_USER_BACKGROUND_PRESET_ID,
-  USER_GENDER_FEMALE,
-  USER_GENDER_MALE,
-  USER_GENDER_NO_SELECTED,
-  USER_GENDER_LABEL_RU,
-} from "../model/userConstants.js";
-import { UserBackgroundPresetPicker } from "./UserBackgroundPresetPicker.jsx";
-import { UserBackgroundPreview } from "./UserBackgroundPreview.jsx";
 import { LOGIN_MODAL_UI, REGISTER_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { isAuthSessionError } from "../../../shared/lib/isAuthSessionError.js";
 import { FormFieldLabel } from "../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
-import { ImageUrlField } from "../../../shared/ui/ImageUrlField/ImageUrlField.jsx";
 import { ProductModalShell } from "../../../shared/ui/ProductModalShell/ProductModalShell.jsx";
 
 import "./RegisterModal.css";
@@ -33,22 +20,7 @@ const INITIAL_FORM = {
   password: "",
   passwordConfirm: "",
   userName: "",
-  phoneNumber: "",
-  avatarUrl: "",
-  backgroundPresetId: DEFAULT_USER_BACKGROUND_PRESET_ID,
-  userBirthDate: "",
-  userGender: USER_GENDER_NO_SELECTED,
-  deliveryAddress: {
-    line: "",
-    flat: "",
-    fiasId: "",
-    geo: null,
-    selectedFromSuggest: false,
-  },
-  notificationsEnabled: false,
 };
-
-const GENDER_OPTIONS = [USER_GENDER_MALE, USER_GENDER_FEMALE, USER_GENDER_NO_SELECTED];
 
 /**
  * @param {string} baseClass
@@ -73,13 +45,10 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
   );
 
   const handleChange = (event) => {
-    const { name, value, type, checked } = event.target;
-    let nextValue = type === "checkbox" ? checked : value;
+    const { name, value } = event.target;
+    let nextValue = value;
     if (name === "userName" && typeof nextValue === "string") {
       nextValue = nextValue.toLowerCase().replace(/[^a-z0-9]/g, "");
-    }
-    if (name === "phoneNumber" && typeof nextValue === "string") {
-      nextValue = limitRuPhoneInput(nextValue);
     }
     setForm((prev) => ({ ...prev, [name]: nextValue }));
     setInvalidFields((prev) => {
@@ -118,23 +87,6 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
       return;
     }
 
-    const phoneError = validateRuPhoneField(form.phoneNumber);
-    if (phoneError) {
-      setStatus({ kind: "error", message: phoneError });
-      return;
-    }
-
-    const addressLine = String(form.deliveryAddress.line ?? "").trim();
-    const addressFlat = String(form.deliveryAddress.flat ?? "").trim();
-    const addressError =
-      addressLine || addressFlat
-        ? validateRuDeliveryAddressForm(form.deliveryAddress)
-        : null;
-    if (addressError) {
-      setStatus({ kind: "error", message: addressError });
-      return;
-    }
-
     setStatus({ kind: "loading", message: "" });
 
     try {
@@ -143,7 +95,7 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
       await establishAuthSession();
       setForm(INITIAL_FORM);
       setInvalidFields(new Set());
-      setStatus({ kind: "success", message: REGISTER_MODAL_UI.SUCCESS });
+      setStatus({ kind: "idle", message: "" });
       onSuccess?.();
     } catch (error) {
       const message =
@@ -169,226 +121,133 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
       title={REGISTER_MODAL_UI.TITLE}
       titleId={REGISTER_MODAL_TITLE_ID}
       ariaLabel={REGISTER_MODAL_UI.ARIA_DIALOG}
-      size="lg"
+      size="md"
       panelClassName="register-modal__panel"
       bodyClassName="register-modal__shell-body"
     >
       <form className="register-modal__body" onSubmit={handleSubmit} noValidate>
-          <div className="register-modal__scroll">
-            <label
+        <div className="register-modal__scroll">
+          <label
+            className={withInvalidFieldClass(
+              "register-modal__label",
+              "email",
+              invalidFields,
+            )}
+          >
+            <FormFieldLabel required>{REGISTER_MODAL_UI.LABEL_EMAIL}</FormFieldLabel>
+            <input
               className={withInvalidFieldClass(
-                "register-modal__label",
+                "register-modal__input",
                 "email",
                 invalidFields,
               )}
-            >
-              <FormFieldLabel required>{REGISTER_MODAL_UI.LABEL_EMAIL}</FormFieldLabel>
-              <input
-                className={withInvalidFieldClass(
-                  "register-modal__input",
-                  "email",
-                  invalidFields,
-                )}
-                type="email"
-                name="email"
-                value={form.email}
-                onChange={handleChange}
-                aria-required="true"
-                aria-invalid={invalidFields.has("email")}
-                autoComplete="email"
-              />
-            </label>
-            <label
+              type="email"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              aria-required="true"
+              aria-invalid={invalidFields.has("email")}
+              autoComplete="email"
+            />
+          </label>
+          <label
+            className={withInvalidFieldClass(
+              "register-modal__label",
+              "password",
+              invalidFields,
+            )}
+          >
+            <FormFieldLabel required>{REGISTER_MODAL_UI.LABEL_PASSWORD}</FormFieldLabel>
+            <input
               className={withInvalidFieldClass(
-                "register-modal__label",
+                "register-modal__input",
                 "password",
                 invalidFields,
               )}
-            >
-              <FormFieldLabel required>
-                {REGISTER_MODAL_UI.LABEL_PASSWORD}
-              </FormFieldLabel>
-              <input
-                className={withInvalidFieldClass(
-                  "register-modal__input",
-                  "password",
-                  invalidFields,
-                )}
-                type="password"
-                name="password"
-                value={form.password}
-                onChange={handleChange}
-                aria-required="true"
-                aria-invalid={invalidFields.has("password")}
-                autoComplete="new-password"
-              />
-            </label>
-            <label
+              type="password"
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              aria-required="true"
+              aria-invalid={invalidFields.has("password")}
+              autoComplete="new-password"
+            />
+          </label>
+          <label
+            className={withInvalidFieldClass(
+              "register-modal__label",
+              "passwordConfirm",
+              invalidFields,
+            )}
+          >
+            <FormFieldLabel required>
+              {REGISTER_MODAL_UI.LABEL_PASSWORD_CONFIRM}
+            </FormFieldLabel>
+            <input
               className={withInvalidFieldClass(
-                "register-modal__label",
+                "register-modal__input",
                 "passwordConfirm",
                 invalidFields,
               )}
-            >
-              <FormFieldLabel required>
-                {REGISTER_MODAL_UI.LABEL_PASSWORD_CONFIRM}
-              </FormFieldLabel>
-              <input
-                className={withInvalidFieldClass(
-                  "register-modal__input",
-                  "passwordConfirm",
-                  invalidFields,
-                )}
-                type="password"
-                name="passwordConfirm"
-                value={form.passwordConfirm}
-                onChange={handleChange}
-                aria-required="true"
-                aria-invalid={invalidFields.has("passwordConfirm")}
-                autoComplete="new-password"
-              />
-            </label>
-            <label
+              type="password"
+              name="passwordConfirm"
+              value={form.passwordConfirm}
+              onChange={handleChange}
+              aria-required="true"
+              aria-invalid={invalidFields.has("passwordConfirm")}
+              autoComplete="new-password"
+            />
+          </label>
+          <label
+            className={withInvalidFieldClass(
+              "register-modal__label",
+              "userName",
+              invalidFields,
+            )}
+          >
+            <FormFieldLabel required>{REGISTER_MODAL_UI.LABEL_USERNAME}</FormFieldLabel>
+            <input
               className={withInvalidFieldClass(
-                "register-modal__label",
+                "register-modal__input",
                 "userName",
                 invalidFields,
               )}
-            >
-              <FormFieldLabel required>
-                {REGISTER_MODAL_UI.LABEL_USERNAME}
-              </FormFieldLabel>
-              <input
-                className={withInvalidFieldClass(
-                  "register-modal__input",
-                  "userName",
-                  invalidFields,
-                )}
-                type="text"
-                name="userName"
-                value={form.userName}
-                onChange={handleChange}
-                aria-required="true"
-                aria-invalid={invalidFields.has("userName")}
-                minLength={REGISTER_MODAL_UI.USERNAME_MIN_LENGTH}
-                maxLength={REGISTER_MODAL_UI.USERNAME_MAX_LENGTH}
-                title={REGISTER_MODAL_UI.USERNAME_HINT}
-                placeholder="nickname123"
-                autoComplete="username"
-              />
-            </label>
-            <label className="register-modal__label">
-              {REGISTER_MODAL_UI.LABEL_PHONE}
-              <input
-                className="register-modal__input"
-                type="tel"
-                name="phoneNumber"
-                value={form.phoneNumber}
-                onChange={handleChange}
-                autoComplete="tel"
-                inputMode="tel"
-              />
-            </label>
-            <label className="register-modal__label">
-              {REGISTER_MODAL_UI.LABEL_BIRTH}
-              <input
-                className="register-modal__input"
-                type="date"
-                name="userBirthDate"
-                value={form.userBirthDate}
-                onChange={handleChange}
-              />
-            </label>
-            <label className="register-modal__label">
-              {REGISTER_MODAL_UI.LABEL_GENDER}
-              <select
-                className="register-modal__input"
-                name="userGender"
-                value={form.userGender}
-                onChange={handleChange}
+              type="text"
+              name="userName"
+              value={form.userName}
+              onChange={handleChange}
+              aria-required="true"
+              aria-invalid={invalidFields.has("userName")}
+              minLength={REGISTER_MODAL_UI.USERNAME_MIN_LENGTH}
+              maxLength={REGISTER_MODAL_UI.USERNAME_MAX_LENGTH}
+              title={REGISTER_MODAL_UI.USERNAME_HINT}
+              placeholder="nickname123"
+              autoComplete="username"
+            />
+            <span className="register-modal__hint">{REGISTER_MODAL_UI.USERNAME_HINT}</span>
+          </label>
+        </div>
+        <div className="register-modal__footer">
+          <div className="register-modal__feedback" aria-live="polite">
+            {status.kind === "error" ? (
+              <p
+                className="register-modal__message register-modal__message_error"
+                role="alert"
               >
-                {GENDER_OPTIONS.map((value) => (
-                  <option key={value} value={value}>
-                    {USER_GENDER_LABEL_RU[value]}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <AddressDeliveryFields
-              value={form.deliveryAddress}
-              onChange={(deliveryAddress) =>
-                setForm((prev) => ({ ...prev, deliveryAddress }))
-              }
-              lineInputClassName="register-modal__input"
-              flatInputClassName="register-modal__input"
-              labels={{ line: REGISTER_MODAL_UI.LABEL_ADDRESS }}
-            />
-            <label className="register-modal__label">
-              {REGISTER_MODAL_UI.LABEL_AVATAR_URL}
-              <ImageUrlField
-                name="avatarUrl"
-                value={form.avatarUrl}
-                onChange={(avatarUrl) => setForm((prev) => ({ ...prev, avatarUrl }))}
-                canUpload={false}
-                disabled={status.kind === "loading"}
-                inputClassName="register-modal__input"
-                placeholder={REGISTER_MODAL_UI.PLACEHOLDER_HTTPS}
-              />
-            </label>
-            <div className="register-modal__background-block">
-              <p className="register-modal__background-label">
-                {REGISTER_MODAL_UI.LABEL_BG_PREVIEW}
+                {status.message}
               </p>
-              <UserBackgroundPreview
-                presetId={form.backgroundPresetId}
-                imageUrl=""
-                mode="preset"
-              />
-            </div>
-            <UserBackgroundPresetPicker
-              value={form.backgroundPresetId}
-              onChange={(presetId) =>
-                setForm((prev) => ({ ...prev, backgroundPresetId: presetId }))
-              }
-              disabled={status.kind === "loading"}
-              legend={REGISTER_MODAL_UI.LABEL_BG_PRESET}
-            />
-            <label className="register-modal__label register-modal__label_row">
-              <input
-                type="checkbox"
-                name="notificationsEnabled"
-                checked={form.notificationsEnabled}
-                onChange={handleChange}
-              />
-              {REGISTER_MODAL_UI.LABEL_NOTIFICATIONS}
-            </label>
+            ) : null}
           </div>
-          <div className="register-modal__footer">
-            <div className="register-modal__feedback" aria-live="polite">
-              {status.kind === "error" ? (
-                <p
-                  className="register-modal__message register-modal__message_error"
-                  role="alert"
-                >
-                  {status.message}
-                </p>
-              ) : null}
-              {status.kind === "success" ? (
-                <p className="register-modal__message register-modal__message_success">
-                  {status.message}
-                </p>
-              ) : null}
-            </div>
-            <button
-              type="submit"
-              className="register-modal__submit"
-              disabled={status.kind === "loading"}
-            >
-              {status.kind === "loading"
-                ? REGISTER_MODAL_UI.SUBMIT_LOADING
-                : REGISTER_MODAL_UI.SUBMIT_IDLE}
-            </button>
-          </div>
+          <button
+            type="submit"
+            className="register-modal__submit"
+            disabled={status.kind === "loading"}
+          >
+            {status.kind === "loading"
+              ? REGISTER_MODAL_UI.SUBMIT_LOADING
+              : REGISTER_MODAL_UI.SUBMIT_IDLE}
+          </button>
+        </div>
       </form>
     </ProductModalShell>
   );

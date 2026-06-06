@@ -3,13 +3,23 @@ import { useCallback, useEffect, useState } from "react";
 import { useRefetchOnVisible } from "../../../shared/lib/useRefetchOnVisible.js";
 
 import { fetchMyOrders } from "../../../entities/order/api/fetchMyOrders.js";
-import { confirmOrderItem } from "../../../entities/order/api/updateOrderItemStatus.js";
-import { ORDER_STATUS_CONFIRMED } from "../../../entities/order/model/constants.js";
+import {
+  confirmOrderItem,
+  markOrderItemCancelled,
+} from "../../../entities/order/api/updateOrderItemStatus.js";
+import {
+  ORDER_STATUS_CANCELLED,
+  ORDER_STATUS_CONFIRMED,
+} from "../../../entities/order/model/constants.js";
 import { OrderCard } from "../../../entities/order/ui/OrderCard.jsx";
 import { isCurrentUserProductSeller } from "../../../entities/product/lib/isCurrentUserProductSeller.js";
 import { useCatalogProductDetailsOpener } from "../../../entities/product/lib/useCatalogProductDetailsOpener.js";
 import { ProductDetailsModal } from "../../../entities/product/ui/ProductDetailsModal.jsx";
-import { API_CLIENT_UI, MY_ORDERS_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import {
+  API_CLIENT_UI,
+  MY_ORDERS_PAGE_UI,
+  ORDER_CARD_UI,
+} from "../../../shared/config/appUiCopy.js";
 
 import "./MyOrdersPage.css";
 
@@ -131,6 +141,45 @@ export function MyOrdersPage({
     }
   };
 
+  const handleCancelItem = async ({ orderId, itemIndex }) => {
+    if (!window.confirm(ORDER_CARD_UI.BUYER_CANCEL_CONFIRM)) {
+      return;
+    }
+
+    const actionKey = `${orderId}:${itemIndex}`;
+    setPendingActionKey(actionKey);
+    setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
+
+    setOrders((prev) =>
+      prev.map((order) => {
+        if (order._id !== orderId) return order;
+        const nextItems = order.items.map((item, index) => {
+          const currentItemIndex =
+            typeof item.itemIndex === "number" ? item.itemIndex : index;
+          if (currentItemIndex !== itemIndex) return item;
+          return { ...item, status: ORDER_STATUS_CANCELLED };
+        });
+        return { ...order, items: nextItems };
+      }),
+    );
+
+    try {
+      const updatedOrder = await markOrderItemCancelled(orderId, itemIndex);
+      setOrders((prev) =>
+        prev.map((order) => (order._id === orderId ? updatedOrder : order)),
+      );
+      onQueueChanged?.();
+      void reloadOrders();
+    } catch (e) {
+      const message =
+        e instanceof Error ? e.message : API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK;
+      setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
+      void reloadOrders();
+    } finally {
+      setPendingActionKey(null);
+    }
+  };
+
   const productDetailsShowAddToCart =
     catalogProduct != null &&
     !isCurrentUserProductSeller(catalogProduct, currentUserId);
@@ -165,6 +214,7 @@ export function MyOrdersPage({
               order={order}
               onProductClick={openCatalogProductFromOrderLine}
               onConfirmDelivered={handleConfirmDelivered}
+              onCancelItem={handleCancelItem}
               pendingActionKey={pendingActionKey}
               itemActionErrors={itemActionErrors}
             />

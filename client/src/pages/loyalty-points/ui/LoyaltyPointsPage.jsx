@@ -4,7 +4,8 @@ import { fetchMyLoyaltyPointsStatus } from "../../../entities/user/api/fetchMyLo
 import { LOYALTY_POINTS_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import {
   INTEGER_INPUT_FIELD_PROPS,
-  keepDigitsOnly,
+  formatRubPriceInput,
+  parseRubPriceInput,
 } from "../../../shared/lib/numericInput.js";
 import { rublesToLoyaltyPoints } from "../../../shared/config/loyaltyPointsConstants.js";
 import {
@@ -18,12 +19,7 @@ import "./LoyaltyPointsPage.css";
  * @param {string} raw
  */
 function parsePurchaseAmountRub(raw) {
-  const digits = keepDigitsOnly(raw);
-  if (!digits) {
-    return null;
-  }
-  const value = Math.floor(Number(digits));
-  return Number.isFinite(value) ? value : null;
+  return parseRubPriceInput(raw);
 }
 
 /**
@@ -77,7 +73,7 @@ export function LoyaltyPointsPage({ isAuthorized, onRequestLogin }) {
   }, [loadStatus]);
 
   const handlePurchaseAmountChange = (event) => {
-    setPurchaseAmountInput(keepDigitsOnly(event.target.value));
+    setPurchaseAmountInput(formatRubPriceInput(event.target.value));
     setPurchaseValidationError("");
     setComingSoonMessage("");
   };

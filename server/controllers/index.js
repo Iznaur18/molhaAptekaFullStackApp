@@ -13,6 +13,7 @@ import { refreshAuthController } from "./User/refreshAuthController.js";
 import {
   resendEmailVerificationController,
   verifyEmailController,
+  verifyEmailWithCodeController,
 } from "./User/emailVerificationControllers.js";
 import {
   userVoteRatingController,
@@ -199,6 +200,7 @@ export {
   refreshAuthController,
   verifyEmailController,
   resendEmailVerificationController,
+  verifyEmailWithCodeController,
   userVoteRatingController,
   userGetRatingController,
   getMyVoteForTargetController,

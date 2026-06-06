@@ -4,16 +4,34 @@ import {
   PRODUCT_SORT_VIEWS,
 } from "../constants/productCatalogSort.js";
 
+/** L1 — только оформление; поднятие в ленте с tier >= 2. */
+const catalogPromotionTierHasCatalogBoost = {
+  $gte: [{ $ifNull: ["$catalogPromotionTier", 0] }, 2],
+};
+
 export const catalogPromotionSortBoostAddFieldsStage = {
   $addFields: {
     _promotionSortTier: {
       $cond: [
-        { $gte: [{ $ifNull: ["$catalogPromotionTier", 0] }, 2] },
+        catalogPromotionTierHasCatalogBoost,
         { $ifNull: ["$catalogPromotionTier", 0] },
         0,
       ],
     },
+    _promotionSortActivatedAt: {
+      $cond: [
+        catalogPromotionTierHasCatalogBoost,
+        "$catalogPromotionActivatedAt",
+        null,
+      ],
+    },
   },
+};
+
+export const catalogPromotionNewestSortKeys = {
+  _promotionSortTier: -1,
+  _promotionSortActivatedAt: -1,
+  createdAt: -1,
 };
 
 /**
@@ -45,9 +63,7 @@ export const buildCatalogPromotionSortStage = (sort, options = {}) => {
     return {
       $sort: {
         [searchScoreField]: -1,
-        catalogPromotionTier: -1,
-        catalogPromotionActivatedAt: -1,
-        createdAt: -1,
+        ...catalogPromotionNewestSortKeys,
       },
     };
   }
@@ -62,11 +78,5 @@ export const buildCatalogPromotionSortStage = (sort, options = {}) => {
     return { $sort: { createdAt: -1 } };
   }
 
-  return {
-    $sort: {
-      _promotionSortTier: -1,
-      catalogPromotionActivatedAt: -1,
-      createdAt: -1,
-    },
-  };
+  return { $sort: catalogPromotionNewestSortKeys };
 };

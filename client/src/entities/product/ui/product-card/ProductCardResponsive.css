@@ -1,6 +1,6 @@
-﻿@media (max-width: 667px) {
+@media (max-width: 667px) {
   .product-card {
-    --product-card-radius: 10px;
+    --product-card-radius: calc(10px * 1.2);
     --product-card-image-bleed-x: 0.3rem;
     --product-card-image-bleed-top: 0.22rem;
 
@@ -11,7 +11,9 @@
 
   .product-card__image-frame {
     border-radius: calc(var(--product-card-radius) - 1px)
-      calc(var(--product-card-radius) - 1px) 8px 8px;
+      calc(var(--product-card-radius) - 1px)
+      calc(var(--product-card-radius) * 0.8)
+      calc(var(--product-card-radius) * 0.8);
   }
 
   .product-card__heading {

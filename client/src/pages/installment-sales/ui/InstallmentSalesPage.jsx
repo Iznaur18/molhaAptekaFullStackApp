@@ -5,6 +5,11 @@ import { INSTALLMENT_CONTRACT_STATUS_FILTER_OPTIONS } from "../../../entities/in
 import { InstallmentContractCard } from "../../../entities/installment/ui/InstallmentContractCard.jsx";
 import { INSTALLMENT_UI } from "../../../shared/config/appUiCopy.js";
 import { useRefetchOnVisible } from "../../../shared/lib/useRefetchOnVisible.js";
+import {
+  ListPageFilter,
+  ListPageFilterBar,
+  ListPageFilterSelect,
+} from "../../../shared/ui/ListPageFilterBar/ListPageFilterBar.jsx";
 
 import "./InstallmentSalesPage.css";
 
@@ -92,11 +97,9 @@ export function InstallmentSalesPage({
 
   return (
     <div className="installment-list-page">
-      <div className="installment-list-page__filters">
-        <label className="installment-list-page__filter-label">
-          <span>{INSTALLMENT_UI.CONTRACT_STATUS_FILTER_LABEL}</span>
-          <select
-            className="installment-list-page__filter-control"
+      <ListPageFilterBar className="installment-list-page__filters">
+        <ListPageFilter label={INSTALLMENT_UI.CONTRACT_STATUS_FILTER_LABEL}>
+          <ListPageFilterSelect
             value={statusFilter}
             onChange={(event) => setStatusFilter(event.target.value)}
           >
@@ -105,9 +108,9 @@ export function InstallmentSalesPage({
                 {option.label}
               </option>
             ))}
-          </select>
-        </label>
-      </div>
+          </ListPageFilterSelect>
+        </ListPageFilter>
+      </ListPageFilterBar>
 
       {contracts.length === 0 ? (
         <p className="installment-list-page__state">{emptyMessage}</p>

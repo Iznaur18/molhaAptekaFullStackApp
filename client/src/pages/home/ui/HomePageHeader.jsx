@@ -1,11 +1,6 @@
 import { useEffect, useRef } from "react";
 
-import { formatSellerProductsQuota } from "../../../entities/product/lib/sellerProductsLimit.js";
 import {
-  CATALOG_SORT_LABEL_RU,
-  CATALOG_SORT_OPTIONS_MY_PRODUCTS,
-  MY_PRODUCTS_MODERATION_FILTER_OPTIONS,
-  MY_PRODUCTS_MODERATION_FILTER_LABEL_RU,
   PRODUCT_CATEGORIES,
   PRODUCT_CATEGORY_LABEL_RU,
 } from "../../../entities/product/model/productConstants.js";
@@ -28,7 +23,6 @@ import {
 import { getHomeHeaderVariantClass } from "../lib/homeHeaderVariant.js";
 import { isProfileTabMainView } from "../../my-profile/lib/profileTabToMainView.js";
 import {
-  isCatalogBrowserMainView,
   isCatalogHeaderMainView,
   isCatalogShellMainView,
 } from "../../../shared/lib/homeMainViewPaths.js";
@@ -350,19 +344,6 @@ export function HomePageHeader({
           )}
         </nav>
       </div>
-      {isCatalogShellView || isCatalogBrowserMainView(mainView) ? (
-        <CatalogToolbar
-          isMineMode={isMineMode}
-          onPlaceProductClick={onPlaceProductClick}
-          catalogSort={catalogSort}
-          onCatalogSortChange={onCatalogSortChange}
-          isAdmin={isAdmin}
-          myProductsTotal={myProductsTotal}
-          sellerProductsLimit={sellerProductsLimit}
-          myProductsModerationFilter={myProductsModerationFilter}
-          onMyProductsModerationFilterChange={onMyProductsModerationFilterChange}
-        />
-      ) : null}
     </header>
   );
 }
@@ -422,99 +403,5 @@ function HomeHeaderTitleRow({
         <span className="home-page__view-title">{headerViewTitle}</span>
       ) : null}
     </div>
-  );
-}
-
-function CatalogToolbar({
-  isMineMode,
-  onPlaceProductClick,
-  catalogSort,
-  onCatalogSortChange,
-  isAdmin,
-  myProductsTotal,
-  sellerProductsLimit,
-  myProductsModerationFilter = "",
-  onMyProductsModerationFilterChange,
-}) {
-  const showProductsQuota = isMineMode && sellerProductsLimit != null && !isAdmin;
-  const productsQuotaText =
-    showProductsQuota && sellerProductsLimit != null
-      ? formatSellerProductsQuota(myProductsTotal, sellerProductsLimit)
-      : null;
-  const showCatalogFiltersRow = isMineMode;
-
-  return (
-    <>
-      {showCatalogFiltersRow ? (
-        <div className="home-page__catalog-filters-row">
-          {isMineMode ? (
-            <>
-              <div className="home-page__sort">
-                <label className="home-page__sort-label">
-                  <span>{HOME_PAGE_UI.SORT_LABEL}</span>
-                  <select
-                    className="home-page__sort-control"
-                    value={catalogSort}
-                    onChange={(event) => onCatalogSortChange(event.target.value)}
-                  >
-                    {CATALOG_SORT_OPTIONS_MY_PRODUCTS.map((optionKey) => (
-                      <option key={optionKey} value={optionKey}>
-                        {CATALOG_SORT_LABEL_RU[optionKey]}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-              {typeof onMyProductsModerationFilterChange === "function" ? (
-                <div className="home-page__sort">
-                  <label className="home-page__sort-label">
-                    <span>{HOME_PAGE_UI.MODERATION_STATUS_FILTER_LABEL}</span>
-                    <select
-                      className="home-page__sort-control"
-                      value={myProductsModerationFilter}
-                      onChange={(event) =>
-                        onMyProductsModerationFilterChange(event.target.value)
-                      }
-                    >
-                      {MY_PRODUCTS_MODERATION_FILTER_OPTIONS.map((filterKey) => (
-                        <option key={filterKey || "all"} value={filterKey}>
-                          {MY_PRODUCTS_MODERATION_FILTER_LABEL_RU[filterKey]}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                </div>
-              ) : null}
-            </>
-          ) : null}
-        </div>
-      ) : null}
-
-      {isMineMode ? (
-        <div className="home-page__my-products-subtitle-row">
-          <button
-            type="button"
-            className="home-page__create-product-button"
-            onClick={onPlaceProductClick}
-          >
-            {HOME_PAGE_UI.LIST_PRODUCT_BUTTON}
-          </button>
-          {productsQuotaText ? (
-            <p
-              className="home-page__my-products-quota"
-              aria-label={`${HOME_PAGE_UI.MY_PRODUCTS_QUOTA_LABEL}: ${productsQuotaText}`}
-            >
-              <span className="home-page__my-products-quota-label">
-                {HOME_PAGE_UI.MY_PRODUCTS_QUOTA_LABEL}:
-              </span>{" "}
-              <span className="home-page__my-products-quota-value">
-                {productsQuotaText}
-              </span>
-            </p>
-          ) : null}
-          <p className="home-page__subtitle">{HOME_PAGE_UI.SUBTITLE_MY_ONLY}</p>
-        </div>
-      ) : null}
-    </>
   );
 }

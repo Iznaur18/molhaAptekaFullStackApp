@@ -58,6 +58,12 @@ const UserSchema = new mongoose.Schema(
       select: false,
       default: null,
     },
+    emailVerificationAttemptCount: {
+      type: Number,
+      select: false,
+      default: 0,
+      min: 0,
+    },
 
     // - - - Информация о пользователе - - -
     userBirthDate: {

@@ -1,5 +1,6 @@
 import { useHomeCatalogLoader } from "./useHomeCatalogLoader.js";
 import { useHomeCatalogProductDetails } from "./useHomeCatalogProductDetails.js";
+import { useEmailVerificationGate } from "./useEmailVerificationGate.js";
 import { useHomeLogout } from "./useHomeLogout.js";
 import { useHomeMyProfileSession } from "./useHomeMyProfileSession.js";
 import { useHomeNotifications } from "./useHomeNotifications.js";
@@ -131,6 +132,13 @@ export function useHomePageDomain(shell, flushRemoteCart, location, navigate) {
     clearInAppNotifications: notifications.clearInAppNotifications,
   });
 
+  const emailVerificationGate = useEmailVerificationGate({
+    isAuthorized: shell.isAuthorized,
+    isSessionReady: shell.isSessionReady,
+    isEmailVerified: shell.isEmailVerified,
+    handleLogout,
+  });
+
   return {
     ...profileNavigation,
     ...catalogLoader,
@@ -138,5 +146,6 @@ export function useHomePageDomain(shell, flushRemoteCart, location, navigate) {
     ...catalogProductDetailsState,
     ...notifications,
     handleLogout,
+    ...emailVerificationGate,
   };
 }

@@ -2,35 +2,46 @@ import crypto from "crypto";
 
 import { UserModel } from "../models/index.js";
 import {
+  EMAIL_VERIFICATION_ALREADY_VERIFIED_MESSAGE,
+  EMAIL_VERIFICATION_ATTEMPTS_EXCEEDED_MESSAGE,
+  EMAIL_VERIFICATION_CODE_LENGTH,
+  EMAIL_VERIFICATION_INVALID_CODE_MESSAGE,
   EMAIL_VERIFICATION_INVALID_TOKEN_MESSAGE,
+  EMAIL_VERIFICATION_MAX_ATTEMPTS,
   EMAIL_VERIFICATION_TOKEN_TTL_MS,
 } from "../constants/emailVerificationConstants.js";
 import { EMAIL_VERIFICATION_SUBJECT } from "../constants/smtpConstants.js";
 import { isSmtpConfigured, sendSmtpMail } from "./smtpMail.js";
 
-const hashEmailVerificationToken = (rawToken) =>
-  crypto.createHash("sha256").update(String(rawToken)).digest("hex");
+const EMAIL_VERIFICATION_CODE_PATTERN = new RegExp(`^\\d{${EMAIL_VERIFICATION_CODE_LENGTH}}$`);
+
+const hashEmailVerificationSecret = (rawSecret) =>
+  crypto.createHash("sha256").update(String(rawSecret)).digest("hex");
 
 export const generateEmailVerificationToken = () =>
   crypto.randomBytes(32).toString("hex");
 
+export const generateEmailVerificationCode = () =>
+  String(crypto.randomInt(10 ** (EMAIL_VERIFICATION_CODE_LENGTH - 1), 10 ** EMAIL_VERIFICATION_CODE_LENGTH));
+
 /**
  * @param {import('mongoose').Types.ObjectId | string} userId
- * @returns {Promise<string>} raw token for link
+ * @returns {Promise<string>} raw 6-digit code for email
  */
-export const issueEmailVerificationToken = async (userId) => {
-  const rawToken = generateEmailVerificationToken();
-  const tokenHash = hashEmailVerificationToken(rawToken);
+export const issueEmailVerificationCode = async (userId) => {
+  const rawCode = generateEmailVerificationCode();
+  const tokenHash = hashEmailVerificationSecret(rawCode);
   const expiresAt = new Date(Date.now() + EMAIL_VERIFICATION_TOKEN_TTL_MS);
 
   await UserModel.findByIdAndUpdate(userId, {
     $set: {
       emailVerificationTokenHash: tokenHash,
       emailVerificationExpiresAt: expiresAt,
+      emailVerificationAttemptCount: 0,
     },
   });
 
-  return rawToken;
+  return rawCode;
 };
 
 /**
@@ -42,6 +53,9 @@ export const clearEmailVerificationToken = async (userId) => {
       emailVerificationTokenHash: "",
       emailVerificationExpiresAt: "",
     },
+    $set: {
+      emailVerificationAttemptCount: 0,
+    },
   });
 };
 
@@ -50,7 +64,7 @@ export const clearEmailVerificationToken = async (userId) => {
  */
 export const markUserEmailVerified = async (userId) => {
   await UserModel.findByIdAndUpdate(userId, {
-    $set: { isEmailVerified: true },
+    $set: { isEmailVerified: true, emailVerificationAttemptCount: 0 },
     $unset: {
       emailVerificationTokenHash: "",
       emailVerificationExpiresAt: "",
@@ -67,7 +81,7 @@ export const verifyEmailByToken = async (rawToken) => {
     throw new Error(EMAIL_VERIFICATION_INVALID_TOKEN_MESSAGE);
   }
 
-  const tokenHash = hashEmailVerificationToken(token);
+  const tokenHash = hashEmailVerificationSecret(token);
   const now = new Date();
 
   const user = await UserModel.findOne({
@@ -89,37 +103,75 @@ export const verifyEmailByToken = async (rawToken) => {
 };
 
 /**
- * @param {{ email: string; userName?: string; rawToken: string }} params
+ * @param {import('mongoose').Types.ObjectId | string} userId
+ * @param {unknown} rawCode
  */
-export const deliverEmailVerification = async ({ email, userName, rawToken }) => {
-  const frontendUrl = (process.env.FRONTEND_URL ?? "http://127.0.0.1:5173").replace(
-    /\/$/,
-    "",
-  );
-  const verifyUrl = `${frontendUrl}/auth/verify-email?token=${encodeURIComponent(rawToken)}`;
+export const verifyEmailByCodeForUser = async (userId, rawCode) => {
+  const code = String(rawCode ?? "").trim();
+  if (!EMAIL_VERIFICATION_CODE_PATTERN.test(code)) {
+    throw new Error(EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
+  }
 
+  const user = await UserModel.findById(userId).select(
+    "isEmailVerified emailVerificationTokenHash emailVerificationExpiresAt emailVerificationAttemptCount",
+  );
+
+  if (!user) {
+    throw new Error(EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
+  }
+
+  if (user.isEmailVerified === true) {
+    await clearEmailVerificationToken(user._id);
+    return user;
+  }
+
+  if ((user.emailVerificationAttemptCount ?? 0) >= EMAIL_VERIFICATION_MAX_ATTEMPTS) {
+    throw new Error(EMAIL_VERIFICATION_ATTEMPTS_EXCEEDED_MESSAGE);
+  }
+
+  const now = new Date();
+  if (!user.emailVerificationExpiresAt || user.emailVerificationExpiresAt <= now) {
+    throw new Error(EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
+  }
+
+  const codeHash = hashEmailVerificationSecret(code);
+  if (user.emailVerificationTokenHash !== codeHash) {
+    await UserModel.findByIdAndUpdate(userId, {
+      $inc: { emailVerificationAttemptCount: 1 },
+    });
+    throw new Error(EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
+  }
+
+  await markUserEmailVerified(userId);
+  return user;
+};
+
+/**
+ * @param {{ email: string; userName?: string; code: string }} params
+ */
+export const deliverEmailVerification = async ({ email, userName, code }) => {
   if (isSmtpConfigured()) {
     try {
       const greeting = userName ? `Здравствуйте, ${userName}!` : "Здравствуйте!";
-      const text = `${greeting}\n\nПодтвердите email по ссылке:\n${verifyUrl}\n\nСсылка действует ограниченное время.`;
+      const text = `${greeting}\n\nКод подтверждения email: ${code}\n\nКод действует 24 часа.`;
       await sendSmtpMail({
         to: email,
         subject: EMAIL_VERIFICATION_SUBJECT,
         text,
-        html: `<p>${greeting}</p><p><a href="${verifyUrl}">Подтвердить email</a></p><p>Или скопируйте ссылку:</p><p>${verifyUrl}</p>`,
+        html: `<p>${greeting}</p><p>Код подтверждения email:</p><p><strong>${code}</strong></p><p>Код действует 24 часа.</p>`,
       });
-      console.info(`[email-verify] Письмо отправлено на ${email}`);
+      console.info(`[email-verify] Письмо с кодом отправлено на ${email}`);
       return;
     } catch (error) {
       console.error("[email-verify] SMTP send error:", error);
-      console.info(`[email-verify] Fallback URL для ${email}:`, verifyUrl);
+      console.info(`[email-verify] Fallback код для ${email}:`, code);
       return;
     }
   }
 
   console.info(
-    `[email-verify] Подтверждение для ${email}${userName ? ` (${userName})` : ""}:`,
-    verifyUrl,
+    `[email-verify] Код для ${email}${userName ? ` (${userName})` : ""}:`,
+    code,
   );
 };
 
@@ -135,14 +187,14 @@ export const sendEmailVerificationForUser = async (userId) => {
     throw new Error("У пользователя нет email");
   }
   if (user.isEmailVerified === true) {
-    throw new Error("Email уже подтверждён");
+    throw new Error(EMAIL_VERIFICATION_ALREADY_VERIFIED_MESSAGE);
   }
 
-  const rawToken = await issueEmailVerificationToken(userId);
+  const code = await issueEmailVerificationCode(userId);
   await deliverEmailVerification({
     email: user.email,
     userName: user.userName,
-    rawToken,
+    code,
   });
 
   return { email: user.email };

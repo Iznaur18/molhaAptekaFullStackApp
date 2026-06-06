@@ -7,12 +7,13 @@ import { CheckoutForm } from "../../../pages/cart/ui/CheckoutForm.jsx";
 import { cancelMyPriceOffer } from "../api/cancelMyPriceOffer.js";
 import { patchMyPriceOffer } from "../api/patchMyPriceOffer.js";
 import { getProductPriceRubMaxError } from "../../product/lib/productPriceRubValidation.js";
-import { PRODUCT_PRICE_RUB_MAX } from "../../product/model/productConstants.js";
 import { formatIsoDateTime } from "../../../shared/lib/formatIsoDateTime.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 import {
   INTEGER_INPUT_FIELD_PROPS,
-  keepDigitsOnly,
+  formatIntegerGroupRu,
+  formatRubPriceInput,
+  parseRubPriceInput,
 } from "../../../shared/lib/numericInput.js";
 import {
   AUCTION_PAGE_UI,
@@ -39,7 +40,9 @@ export function AuctionBuyerBidRow({
   onProductClick,
   onChanged,
 }) {
-  const [priceInput, setPriceInput] = useState(String(bid.offerPrice ?? ""));
+  const [priceInput, setPriceInput] = useState(() =>
+    formatIntegerGroupRu(bid.offerPrice ?? ""),
+  );
   const [error, setError] = useState("");
   const [isBusy, setIsBusy] = useState(false);
   const [showPay, setShowPay] = useState(false);
@@ -54,7 +57,7 @@ export function AuctionBuyerBidRow({
   const isAccepted = bid.status === PRICE_OFFER_STATUS_ACCEPTED;
 
   useEffect(() => {
-    setPriceInput(String(bid.offerPrice ?? ""));
+    setPriceInput(formatIntegerGroupRu(bid.offerPrice ?? ""));
   }, [bid.offerPrice, bid._id]);
 
   useEffect(() => {
@@ -76,8 +79,8 @@ export function AuctionBuyerBidRow({
   }, [showPay]);
 
   const handleUpdate = async () => {
-    const price = Math.floor(Number(priceInput));
-    if (!Number.isFinite(price) || price < 1) {
+    const price = parseRubPriceInput(priceInput);
+    if (price == null || price < 1) {
       setError("Укажите целую цену больше 0");
       return;
     }
@@ -203,9 +206,8 @@ export function AuctionBuyerBidRow({
             <input
               {...INTEGER_INPUT_FIELD_PROPS}
               className="auction-dashboard-row__input"
-              maxLength={String(PRODUCT_PRICE_RUB_MAX).length}
               value={priceInput}
-              onChange={(e) => setPriceInput(keepDigitsOnly(e.target.value))}
+              onChange={(e) => setPriceInput(formatRubPriceInput(e.target.value))}
               disabled={isBusy}
             />
           </label>

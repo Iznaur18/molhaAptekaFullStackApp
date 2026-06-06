@@ -61,7 +61,7 @@ export function CheckoutForm({
     setLocalError("");
     void onSubmit({
       deliveryAddress: deliveryAddress.line.trim(),
-      deliveryAddressFlat: deliveryAddress.flat.trim(),
+      deliveryAddressFlat: "",
       paymentMethod,
     });
   };
@@ -80,7 +80,6 @@ export function CheckoutForm({
         onChange={setDeliveryAddress}
         disabled={isDisabled || isSubmitting}
         lineInputClassName="checkout-form__input"
-        flatInputClassName="checkout-form__input"
         labels={{
           line: CHECKOUT_FORM_UI.LABEL_DELIVERY_ADDRESS,
         }}

@@ -42,16 +42,18 @@ export function hasProductCatalogDiscount(product) {
   return resolveProductDiscountPercent(product) != null;
 }
 
+import { keepDigitsOnly } from "../../../shared/lib/numericInput.js";
+
 /**
  * @param {string} raw
  * @returns {number | null}
  */
 export function parseProductPriceInput(raw) {
-  const normalized = String(raw).trim().replace(",", ".");
-  if (normalized === "") {
+  const digits = keepDigitsOnly(raw);
+  if (digits === "") {
     return null;
   }
-  const value = Math.floor(Number(normalized));
+  const value = Math.floor(Number(digits));
   if (!Number.isFinite(value) || value < 0) {
     return null;
   }

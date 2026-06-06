@@ -3,7 +3,6 @@ import { useEffect, useId, useRef, useState } from "react";
 import { fetchAddressSuggestions } from "../api/fetchAddressSuggestions.js";
 import { mapDadataSuggestion } from "../lib/mapDadataSuggestion.js";
 import {
-  ADDRESS_FLAT_MAX_LENGTH,
   ADDRESS_LINE_MAX_LENGTH,
   ADDRESS_SUGGEST_DEBOUNCE_MS,
   ADDRESS_SUGGEST_MIN_QUERY_LENGTH,
@@ -26,8 +25,7 @@ const EMPTY_VALUE = {
  *   onChange: (next: import('../model/types.js').RuDeliveryAddressValue) => void;
  *   disabled?: boolean;
  *   lineInputClassName?: string;
- *   flatInputClassName?: string;
- *   labels?: { line?: string; flat?: string };
+ *   labels?: { line?: string };
  * }} props
  */
 export function AddressDeliveryFields({
@@ -35,7 +33,6 @@ export function AddressDeliveryFields({
   onChange,
   disabled = false,
   lineInputClassName = "",
-  flatInputClassName = "",
   labels = {},
 }) {
   const listId = useId();
@@ -43,11 +40,8 @@ export function AddressDeliveryFields({
   const [suggestions, setSuggestions] = useState(
     /** @type {import('../model/types.js').AddressSuggestionDto[]} */ ([]),
   );
-  const [suggestPhase, setSuggestPhase] = useState("idle");
-  const [suggestError, setSuggestError] = useState("");
 
   const lineLabel = labels.line ?? ADDRESS_DELIVERY_UI.LABEL_LINE;
-  const flatLabel = labels.flat ?? ADDRESS_DELIVERY_UI.LABEL_FLAT;
 
   useEffect(() => {
     const onDocClick = (event) => {
@@ -63,27 +57,19 @@ export function AddressDeliveryFields({
     const query = value.line.trim();
     if (query.length < ADDRESS_SUGGEST_MIN_QUERY_LENGTH || value.selectedFromSuggest) {
       setSuggestions([]);
-      setSuggestPhase("idle");
       return undefined;
     }
 
     let isCancelled = false;
     const timer = setTimeout(() => {
-      setSuggestPhase("loading");
-      setSuggestError("");
       void (async () => {
         try {
           const list = await fetchAddressSuggestions(query);
           if (isCancelled) return;
           setSuggestions(list);
-          setSuggestPhase("success");
-        } catch (e) {
+        } catch {
           if (isCancelled) return;
           setSuggestions([]);
-          setSuggestPhase("error");
-          setSuggestError(
-            e instanceof Error ? e.message : ADDRESS_DELIVERY_UI.SUGGEST_ERROR,
-          );
         }
       })();
     }, ADDRESS_SUGGEST_DEBOUNCE_MS);
@@ -95,7 +81,7 @@ export function AddressDeliveryFields({
   }, [value.line, value.selectedFromSuggest]);
 
   const patch = (patchValue) => {
-    onChange({ ...EMPTY_VALUE, ...value, ...patchValue });
+    onChange({ ...EMPTY_VALUE, ...value, ...patchValue, flat: "" });
   };
 
   const handleLineChange = (event) => {
@@ -107,10 +93,6 @@ export function AddressDeliveryFields({
     });
   };
 
-  const handleFlatChange = (event) => {
-    patch({ flat: event.target.value });
-  };
-
   const handlePickSuggestion = (suggestion) => {
     const mapped = mapDadataSuggestion(suggestion);
     patch({
@@ -120,7 +102,6 @@ export function AddressDeliveryFields({
       selectedFromSuggest: true,
     });
     setSuggestions([]);
-    setSuggestPhase("idle");
   };
 
   const showList =
@@ -166,35 +147,6 @@ export function AddressDeliveryFields({
             ))}
           </ul>
         ) : null}
-        <span className="address-delivery-fields__hint">
-          {suggestPhase === "loading"
-            ? ADDRESS_DELIVERY_UI.SUGGEST_LOADING
-            : ADDRESS_DELIVERY_UI.HINT_LINE}
-        </span>
-        {suggestError ? (
-          <span className="address-delivery-fields__hint address-delivery-fields__hint_error">
-            {suggestError}
-          </span>
-        ) : null}
-      </label>
-
-      <label className="address-delivery-fields__flat-row">
-        <span>{flatLabel}</span>
-        <input
-          type="text"
-          className={flatInputClassName}
-          value={value.flat}
-          onChange={handleFlatChange}
-          disabled={disabled}
-          maxLength={ADDRESS_FLAT_MAX_LENGTH}
-          placeholder={ADDRESS_DELIVERY_UI.PLACEHOLDER_FLAT}
-          autoComplete="off"
-          inputMode="text"
-          required={value.line.trim().length > 0}
-        />
-        <span className="address-delivery-fields__hint">
-          {ADDRESS_DELIVERY_UI.HINT_FLAT}
-        </span>
       </label>
     </div>
   );

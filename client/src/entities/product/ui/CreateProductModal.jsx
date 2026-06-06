@@ -15,6 +15,7 @@ import {
   PRODUCT_STOCK_QUANTITY_MIN,
 } from "../model/productStockConstants.js";
 import { CreateProductCategoryPicker } from "../../product-category-tree/ui/CreateProductCategoryPicker.jsx";
+import { IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED } from "../../product-category-tree/lib/isProductCategoryTreePickerEnabled.js";
 import { urlsFromImageRows } from "../lib/productImageRowHelpers.js";
 import {
   computeProductDiscountPercent,
@@ -22,7 +23,6 @@ import {
   validateProductOldPricePair,
 } from "../lib/computeProductDiscountPercent.js";
 import { getProductPriceRubMaxError } from "../lib/productPriceRubValidation.js";
-import { PRODUCT_PRICE_RUB_MAX } from "../model/productConstants.js";
 import { validateProductDescription } from "../lib/validateProductDescription.js";
 import {
   validateProductCharacteristicsRows,
@@ -31,6 +31,8 @@ import {
 import { characteristicRowsFromApi } from "../lib/characteristicRowsFromApi.js";
 import {
   INTEGER_INPUT_FIELD_PROPS,
+  formatIntegerGroupRu,
+  formatRubPriceInput,
   keepDigitsOnly,
 } from "../../../shared/lib/numericInput.js";
 import { resolveUploadedImageUrl } from "../../../shared/lib/resolveUploadedImageUrl.js";
@@ -62,7 +64,6 @@ const INITIAL_FORM = {
   categoryBreadcrumbRu: "",
   productIsAvailable: true,
   productStockQuantity: "1",
-  productAuctionEnabled: false,
   loyaltyPointsPerUnit: "0",
   productCharacteristicRows: [],
 };
@@ -85,8 +86,8 @@ function formStateFromProduct(product) {
     productDescription: product.productDescription?.trim() ?? "",
     productImageRows: imageRowsFromUrls(urls),
     productPreviewVideoUrl: product.productPreviewVideoUrl?.trim() ?? "",
-    productPrice: priceStr,
-    productOldPrice: oldPriceStr,
+    productPrice: priceStr ? formatIntegerGroupRu(priceStr) : "",
+    productOldPrice: oldPriceStr ? formatIntegerGroupRu(oldPriceStr) : "",
     productCategory: product.productCategory ?? PRODUCT_CATEGORY_ELECTRONICS,
     productCategoryId: product.productCategoryId ?? null,
     categoryBreadcrumbRu: product.categoryBreadcrumbRu?.trim() ?? "",
@@ -95,7 +96,6 @@ function formStateFromProduct(product) {
       product.productIsAvailable !== false && product.productStockQuantity != null
         ? String(Math.max(0, Math.floor(Number(product.productStockQuantity))))
         : "1",
-    productAuctionEnabled: product.productAuctionEnabled === true,
     loyaltyPointsPerUnit: String(resolveProductLoyaltyPointsPerUnit(product)),
     productCharacteristicRows: characteristicRowsFromApi(
       product.productCharacteristics,
@@ -198,7 +198,10 @@ export function CreateProductModal({
   const loyaltyFieldDisabled = sellerPointsMaxPerUnit <= 0;
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {
+      setIsInstallmentProgramOpen(false);
+      return;
+    }
     if (isEdit && productToEdit) {
       setForm(formStateFromProduct(productToEdit));
     } else {
@@ -216,12 +219,15 @@ export function CreateProductModal({
 
   const handleChange = (event) => {
     const { name, value } = event.target;
+    const isPriceField = name === "productPrice" || name === "productOldPrice";
     const isIntegerField =
-      name === "productPrice" ||
-      name === "productOldPrice" ||
-      name === "productStockQuantity" ||
-      name === "loyaltyPointsPerUnit";
-    const nextValue = isIntegerField ? keepDigitsOnly(value) : value;
+      name === "productStockQuantity" || name === "loyaltyPointsPerUnit";
+    let nextValue = value;
+    if (isPriceField) {
+      nextValue = formatRubPriceInput(value);
+    } else if (isIntegerField) {
+      nextValue = keepDigitsOnly(value);
+    }
     setForm((prev) => ({ ...prev, [name]: nextValue }));
   };
 
@@ -237,13 +243,9 @@ export function CreateProductModal({
     }));
   };
 
-  const handleAuctionChange = (event) => {
-    const checked = event.target.checked;
-    setForm((prev) => ({ ...prev, productAuctionEnabled: checked }));
-  };
-
   const handleClose = () => {
     setStatus({ kind: "idle", message: "" });
+    setIsInstallmentProgramOpen(false);
     onClose();
   };
 
@@ -369,7 +371,15 @@ export function CreateProductModal({
         return;
       }
 
-      if (!form.productCategoryId && !form.productCategory) {
+      if (IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED) {
+        if (!form.productCategoryId && !form.productCategory) {
+          setStatus({
+            kind: "error",
+            message: CREATE_PRODUCT_MODAL_UI.ERROR_CATEGORY_LEAF,
+          });
+          return;
+        }
+      } else if (!form.productCategory) {
         setStatus({
           kind: "error",
           message: CREATE_PRODUCT_MODAL_UI.ERROR_CATEGORY_LEAF,
@@ -396,7 +406,7 @@ export function CreateProductModal({
           loyaltyPointsPerUnit,
           productCharacteristics,
         };
-        if (form.productCategoryId) {
+        if (IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED && form.productCategoryId) {
           patchBody.productCategoryId = form.productCategoryId;
         } else {
           patchBody.productCategory = form.productCategory;
@@ -416,12 +426,11 @@ export function CreateProductModal({
           productPreviewVideoUrl: previewVideoUrl || undefined,
           productPrice,
           productOldPrice,
-          ...(form.productCategoryId
+          ...(IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED && form.productCategoryId
             ? { productCategoryId: form.productCategoryId }
             : { productCategory: form.productCategory }),
           productIsAvailable: form.productIsAvailable,
           productStockQuantity,
-          productAuctionEnabled: form.productAuctionEnabled,
           loyaltyPointsPerUnit,
           productCharacteristics,
         });
@@ -542,7 +551,6 @@ export function CreateProductModal({
                 value={form.productPrice}
                 onChange={handleChange}
                 required
-                maxLength={String(PRODUCT_PRICE_RUB_MAX).length}
                 disabled={isSubmitting}
               />
             </label>
@@ -554,7 +562,6 @@ export function CreateProductModal({
                 name="productOldPrice"
                 value={form.productOldPrice}
                 onChange={handleChange}
-                maxLength={String(PRODUCT_PRICE_RUB_MAX).length}
                 disabled={isSubmitting}
               />
             </label>
@@ -637,17 +644,6 @@ export function CreateProductModal({
                     )}
               </p>
             </label>
-            {!isEdit ? (
-              <label className="create-product-modal__check">
-                <input
-                  type="checkbox"
-                  checked={form.productAuctionEnabled}
-                  onChange={handleAuctionChange}
-                  disabled={isSubmitting}
-                />
-                {getProductFieldEditLabel("productAuctionEnabled")}
-              </label>
-            ) : null}
             {showManageSection && manageProduct ? (
               <ProductEditManageSection
                 product={manageProduct}

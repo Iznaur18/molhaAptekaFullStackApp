@@ -3,6 +3,7 @@ import { useCallback, useRef, useState } from "react";
 import { uploadImage } from "../../../shared/api/uploadImage.js";
 import { uploadVideo } from "../../../shared/api/uploadVideo.js";
 import { USER_STORY_UI } from "../../../shared/config/appUiCopy.js";
+import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import {
   UPLOAD_FILE_INPUT_ACCEPT,
   UPLOAD_VIDEO_FILE_INPUT_ACCEPT,
@@ -37,6 +38,8 @@ export function CreateUserStoryModal({ isOpen, onClose, onPublished }) {
   const [selectedFile, setSelectedFile] = useState(/** @type {File | null} */ (null));
   const [isBusy, setIsBusy] = useState(false);
   const [error, setError] = useState("");
+
+  useScrollLock(isOpen);
 
   const resetForm = useCallback(() => {
     if (previewUrl.startsWith("blob:")) {

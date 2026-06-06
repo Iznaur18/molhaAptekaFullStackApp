@@ -296,7 +296,6 @@ export function EditProfileModal({
               }
               disabled={isSubmitting}
               lineInputClassName="edit-profile-modal__input"
-              flatInputClassName="edit-profile-modal__input"
               labels={{ line: EDIT_PROFILE_MODAL_UI.LABEL_ADDRESS }}
             />
             <label className="edit-profile-modal__label">

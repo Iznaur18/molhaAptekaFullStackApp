@@ -15,6 +15,12 @@ import {
   API_CLIENT_UI,
 } from "../../../shared/config/appUiCopy.js";
 
+import {
+  ListPageFilter,
+  ListPageFilterBar,
+  ListPageFilterSelect,
+} from "../../../shared/ui/ListPageFilterBar/ListPageFilterBar.jsx";
+
 import "./AdminOrdersPage.css";
 
 const ALL_STATUSES = "";
@@ -101,11 +107,9 @@ export function AdminOrdersPage() {
 
   return (
     <div className="admin-orders-page">
-      <div className="admin-orders-page__filter">
-        <label className="admin-orders-page__filter-label">
-          <span>{ADMIN_ORDERS_PAGE_UI.STATUS_FILTER_LABEL}</span>
-          <select
-            className="admin-orders-page__filter-control"
+      <ListPageFilterBar>
+        <ListPageFilter label={ADMIN_ORDERS_PAGE_UI.STATUS_FILTER_LABEL}>
+          <ListPageFilterSelect
             value={statusFilter}
             onChange={(event) => setStatusFilter(event.target.value)}
           >
@@ -117,9 +121,9 @@ export function AdminOrdersPage() {
                 {ORDER_STATUS_LABEL_RU[status]}
               </option>
             ))}
-          </select>
-        </label>
-      </div>
+          </ListPageFilterSelect>
+        </ListPageFilter>
+      </ListPageFilterBar>
 
       <AdminOrdersBody
         phase={phase}

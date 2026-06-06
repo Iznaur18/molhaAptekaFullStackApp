@@ -1,5 +1,6 @@
 import {
   EMAIL_VERIFICATION_ALREADY_VERIFIED_MESSAGE,
+  EMAIL_VERIFICATION_INVALID_CODE_MESSAGE,
   EMAIL_VERIFICATION_INVALID_TOKEN_MESSAGE,
   EMAIL_VERIFICATION_SENT_MESSAGE,
   EMAIL_VERIFICATION_SUCCESS_MESSAGE,
@@ -7,6 +8,7 @@ import {
 import { errorRes, successRes } from "../../utils/index.js";
 import {
   sendEmailVerificationForUser,
+  verifyEmailByCodeForUser,
   verifyEmailByToken,
 } from "../../utils/emailVerification.js";
 
@@ -59,6 +61,31 @@ export const resendEmailVerificationController = async (req, res) => {
   } catch (error) {
     console.error("resendEmailVerificationController error:", error);
     return errorRes(res, 500, "Ошибка при отправке письма");
+  }
+};
+
+/** `POST /auth/verify-email` — подтверждение email кодом из письма (auth). */
+export const verifyEmailWithCodeController = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const code = req.body?.code;
+
+    try {
+      await verifyEmailByCodeForUser(userId, code);
+    } catch (verificationError) {
+      return errorRes(
+        res,
+        400,
+        verificationError instanceof Error
+          ? verificationError.message
+          : EMAIL_VERIFICATION_INVALID_CODE_MESSAGE,
+      );
+    }
+
+    return successRes(res, { message: EMAIL_VERIFICATION_SUCCESS_MESSAGE });
+  } catch (error) {
+    console.error("verifyEmailWithCodeController error:", error);
+    return errorRes(res, 500, "Ошибка при подтверждении email");
   }
 };
 

@@ -1,6 +1,7 @@
 import { AdminDeleteUserConfirmModal } from "../../../entities/user/ui/AdminDeleteUserConfirmModal.jsx";
 import { AdminUserModalFooter } from "../../../entities/user/ui/AdminUserModalFooter.jsx";
 import { EditProfileModal } from "../../../entities/user/ui/EditProfileModal.jsx";
+import { EmailVerificationModal } from "../../../entities/user/ui/EmailVerificationModal.jsx";
 import { LoginModal } from "../../../entities/user/ui/LoginModal.jsx";
 import { RegisterModal } from "../../../entities/user/ui/RegisterModal.jsx";
 import { UserDetailsModal } from "../../../entities/user/ui/UserDetailsModal.jsx";
@@ -23,6 +24,7 @@ import { EditProductCatalogFeedTileDisplayModal } from "../../../entities/produc
 import { EditProductCategoryDisplayModal } from "../../../entities/product-category-display/ui/EditProductCategoryDisplayModal.jsx";
 import {
   ADMIN_EDIT_USER_UI,
+  EMAIL_VERIFICATION_UI,
   PRODUCT_REPORT_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { canStaffEditTargetUserPremium } from "../../../entities/user/lib/canStaffEditTargetUserPremium.js";
@@ -64,6 +66,10 @@ import { canStaffEditTargetUserPremium } from "../../../entities/user/lib/canSta
  *   setIsAuthorized: (value: boolean) => void;
  *   isRegisterModalOpen: boolean;
  *   setIsRegisterModalOpen: (open: boolean) => void;
+ *   isEmailVerificationModalOpen: boolean;
+ *   currentUserEmail: string;
+ *   handleEmailVerificationModalClose: () => void;
+ *   setIsEmailVerified: (value: boolean) => void;
  *   isSellerProductsLimitModalOpen: boolean;
  *   setIsSellerProductsLimitModalOpen: (open: boolean) => void;
  *   sellerProductsLimit: number | null;
@@ -161,6 +167,10 @@ export function HomePageModalsLayer({
   setIsAuthorized,
   isRegisterModalOpen,
   setIsRegisterModalOpen,
+  isEmailVerificationModalOpen,
+  currentUserEmail,
+  handleEmailVerificationModalClose,
+  setIsEmailVerified,
   isSellerProductsLimitModalOpen,
   setIsSellerProductsLimitModalOpen,
   sellerProductsLimit,
@@ -406,6 +416,15 @@ export function HomePageModalsLayer({
         onSuccess={() => {
           setIsAuthorized(true);
           setIsRegisterModalOpen(false);
+        }}
+      />
+      <EmailVerificationModal
+        isOpen={isEmailVerificationModalOpen}
+        email={currentUserEmail}
+        onClose={handleEmailVerificationModalClose}
+        onVerified={() => {
+          setIsEmailVerified(true);
+          setStaffActionNotice(EMAIL_VERIFICATION_UI.VERIFIED_SUCCESS);
         }}
       />
       <SellerProductsLimitModal

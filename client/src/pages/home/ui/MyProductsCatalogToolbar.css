@@ -1,0 +1,32 @@
+.my-products-catalog-toolbar {
+  width: 100%;
+  min-width: 0;
+}
+
+.my-products-catalog-toolbar__quota {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1f6feb;
+  white-space: nowrap;
+}
+
+.my-products-catalog-toolbar__quota-label {
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+@media (max-width: 640px) {
+  .my-products-catalog-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .my-products-catalog-toolbar .list-page-filter-bar__label {
+    width: 100%;
+  }
+
+  .my-products-catalog-toolbar .list-page-filter-bar__control {
+    width: 100%;
+  }
+}

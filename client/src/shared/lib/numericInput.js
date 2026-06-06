@@ -1,3 +1,5 @@
+import { COMMON_UI } from "../config/appUiCopy.js";
+
 /** Разрешённые нецифровые клавиши (навигация, редактирование). */
 const NON_CHAR_KEYS_ALLOWED = new Set([
   "Backspace",
@@ -20,6 +22,59 @@ const NON_CHAR_KEYS_ALLOWED = new Set([
  */
 export function keepDigitsOnly(raw) {
   return String(raw ?? "").replace(/\D/g, "");
+}
+
+const INTEGER_GROUP_FORMAT = new Intl.NumberFormat(COMMON_UI.LOCALE_RU, {
+  maximumFractionDigits: 0,
+});
+
+/** Максимум значащих цифр для цены в ₽ (совпадает с PRODUCT_PRICE_RUB_MAX). */
+export const RUB_PRICE_INPUT_MAX_DIGITS = 9;
+
+/**
+ * Форматирует целое число с группировкой разрядов (ru-RU): `1000000` → `1 000 000`.
+ * @param {unknown} raw
+ * @returns {string}
+ */
+export function formatIntegerGroupRu(raw) {
+  const digits = keepDigitsOnly(raw);
+  if (!digits) {
+    return "";
+  }
+  const value = Number(digits);
+  if (!Number.isFinite(value)) {
+    return "";
+  }
+  return INTEGER_GROUP_FORMAT.format(value);
+}
+
+/**
+ * @param {unknown} raw
+ * @param {number} [maxDigits]
+ * @returns {string}
+ */
+export function formatRubPriceInput(raw, maxDigits = RUB_PRICE_INPUT_MAX_DIGITS) {
+  let digits = keepDigitsOnly(raw);
+  if (maxDigits > 0 && digits.length > maxDigits) {
+    digits = digits.slice(0, maxDigits);
+  }
+  return formatIntegerGroupRu(digits);
+}
+
+/**
+ * @param {unknown} raw
+ * @returns {number | null}
+ */
+export function parseRubPriceInput(raw) {
+  const digits = keepDigitsOnly(raw);
+  if (!digits) {
+    return null;
+  }
+  const value = Math.floor(Number(digits));
+  if (!Number.isFinite(value) || value < 0) {
+    return null;
+  }
+  return value;
 }
 
 /**

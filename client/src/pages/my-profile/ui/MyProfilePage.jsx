@@ -16,6 +16,7 @@ import {
   USER_DETAILS_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { PROFILE_TAB_MY_PRODUCTS, PROFILE_TAB_OVERVIEW } from "../lib/profileTabs.js";
+import { MyProductsCatalogToolbar } from "../../home/ui/MyProductsCatalogToolbar.jsx";
 import { ProfileTabBadge } from "./ProfileTabBadge.jsx";
 
 import "../../../entities/user/ui/UserDetailsModal.css";
@@ -61,6 +62,7 @@ import "./MyProfilePage.css";
  * activeTab?: string;
  * onTabChange?: (tab: string) => void;
  * tabContent?: import('react').ReactNode;
+ * myProductsCatalogToolbarProps?: import('../../home/ui/MyProductsCatalogToolbar.jsx').MyProductsCatalogToolbar extends (props: infer P) => unknown ? P : never;
  * }} props
  */
 export function MyProfilePage({
@@ -103,6 +105,7 @@ export function MyProfilePage({
   activeTab = "overview",
   onTabChange,
   tabContent = null,
+  myProductsCatalogToolbarProps = null,
 }) {
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
   const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
@@ -496,7 +499,11 @@ export function MyProfilePage({
       </header>
 
       {isMyProductsTab ? (
-        <div className="my-profile-page__catalog-shell">
+        <>
+          {myProductsCatalogToolbarProps ? (
+            <MyProductsCatalogToolbar {...myProductsCatalogToolbarProps} />
+          ) : null}
+          <div className="my-profile-page__catalog-shell">
           {isLoading ? (
             <p className="my-profile-page__state">
               {USER_DETAILS_MODAL_UI.LOADING_BODY}
@@ -511,7 +518,8 @@ export function MyProfilePage({
             </p>
           ) : null}
           {isProfileReady ? tabContent : null}
-        </div>
+          </div>
+        </>
       ) : (
         <div className="my-profile-page__body">
           {isLoading ? (

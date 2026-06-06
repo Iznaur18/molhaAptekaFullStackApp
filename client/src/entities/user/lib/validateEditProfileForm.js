@@ -44,8 +44,7 @@ export function validateEditProfileForm(form, options = {}) {
   if (phoneError) return phoneError;
 
   const addressLine = String(form.deliveryAddress.line ?? "").trim();
-  const addressFlat = String(form.deliveryAddress.flat ?? "").trim();
-  if (addressLine || addressFlat) {
+  if (addressLine) {
     const addressError = validateRuDeliveryAddressForm(form.deliveryAddress);
     if (addressError) return addressError;
   }

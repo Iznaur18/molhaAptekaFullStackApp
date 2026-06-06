@@ -20,6 +20,7 @@ import {
 import {
   getProductPromotionTierLabel,
   PRODUCT_PROMOTION_TIER_BANNER,
+  PRODUCT_PROMOTION_TIER_GOLD,
   PRODUCT_PROMOTION_TIER_TOP,
 } from "../lib/calculateProductPromotionPointsCost.js";
 import { resolveProductImageUrls } from "../lib/resolveProductImageUrls.js";
@@ -132,7 +133,6 @@ export function ProductCard({
   }, [isModerationQueue]);
   const [cardSlideIndex, setCardSlideIndex] = useState(0);
   const [previewVideoFailed, setPreviewVideoFailed] = useState(false);
-  const [imageLoadFailed, setImageLoadFailed] = useState(false);
   const [useFallbackImage, setUseFallbackImage] = useState(false);
   const { ref: statusBadgesRowRef, dragScrollProps: statusBadgesDragScrollProps } =
     useHorizontalPointerDragScroll();
@@ -140,10 +140,14 @@ export function ProductCard({
   const mediaSlides = useMemo(() => {
     const videoUrl =
       previewVideoUrl != null && !previewVideoFailed ? previewVideoUrl : null;
-    return buildProductMediaSlides({
+    const slides = buildProductMediaSlides({
       previewVideoUrl: videoUrl,
       imageUrls: galleryUrls,
     });
+    if (!slides.some((slide) => slide.type === "image")) {
+      slides.push({ type: "image", url: PRODUCT_IMAGE_PLACEHOLDER_URL });
+    }
+    return slides;
   }, [galleryUrls, previewVideoUrl, previewVideoFailed]);
 
   const activeSlide = mediaSlides[cardSlideIndex] ?? null;
@@ -161,24 +165,21 @@ export function ProductCard({
   }, [mediaSlides.length]);
 
   useEffect(() => {
-    setImageLoadFailed(false);
     setUseFallbackImage(false);
   }, [activeSlide, product._id]);
 
-  const hasSlideMedia =
-    activeSlide != null &&
-    !(
-      activeSlide.type === "image" &&
-      (imageLoadFailed || (useFallbackImage && activeSlide.url == null))
-    );
+  const hasSlideMedia = activeSlide != null;
 
   const handleImageError = () => {
     if (!useFallbackImage) {
       setUseFallbackImage(true);
-      return;
     }
-    setImageLoadFailed(true);
   };
+
+  const renderedSlide =
+    activeSlide?.type === "image" && useFallbackImage
+      ? { type: "image", url: PRODUCT_IMAGE_PLACEHOLDER_URL }
+      : activeSlide;
 
   const sellerCanEdit = !isMineMode || canSellerEditProduct(product);
   const sellerCanDelete = !isMineMode || canSellerDeleteProduct(product);
@@ -265,7 +266,6 @@ export function ProductCard({
   const discountPercent = resolveProductDiscountPercent(product);
   const showDiscountBadge = discountPercent != null && discountPercent > 0;
   const showLoyaltyPointsBadge = shouldShowProductLoyaltyPointsBadge(product);
-  const showImageOverlayBadges = showDiscountBadge || showLoyaltyPointsBadge;
   const previewFieldKeysWithoutPrice = useMemo(
     () => previewFieldKeys.filter((key) => key !== "productPrice"),
     [previewFieldKeys],
@@ -320,16 +320,26 @@ export function ProductCard({
     isMineMode,
     isModerationQueue,
   });
-  const showPromotionChrome =
-    highlightCatalogPromotion &&
-    !isMineMode &&
-    !isModerationQueue &&
+  const showTier3BannerPreview =
+    isMineMode &&
+    promotionFullWidth &&
     isPromotionActive &&
-    promotionTier > 0;
+    promotionTier === PRODUCT_PROMOTION_TIER_BANNER;
+  const showPromotionChrome =
+    (highlightCatalogPromotion &&
+      !isMineMode &&
+      !isModerationQueue &&
+      isPromotionActive &&
+      promotionTier > 0) ||
+    showTier3BannerPreview;
+  const showPromotionBoostBadge =
+    showPromotionChrome && promotionTier === PRODUCT_PROMOTION_TIER_GOLD;
   const showPromotionTopBadge =
     showPromotionChrome && promotionTier === PRODUCT_PROMOTION_TIER_TOP;
   const showPromotionBannerBadge =
-    showPromotionChrome && promotionTier === PRODUCT_PROMOTION_TIER_BANNER;
+    showPromotionChrome &&
+    promotionTier === PRODUCT_PROMOTION_TIER_BANNER &&
+    !(isMineMode && isPromotionActive);
   const showRaffleBadge = !isModerationQueue && isProductRaffleParticipant(product);
   const showAuctionBadge = !isModerationQueue && auctionActive;
   const showInstallmentBadge =
@@ -374,17 +384,233 @@ export function ProductCard({
     return nameNode;
   };
 
+  const showBannerLayout =
+    promotionFullWidth &&
+    isPromotionActive &&
+    promotionTier === PRODUCT_PROMOTION_TIER_BANNER;
+  const showImageOverlayBadges =
+    !showBannerLayout && (showDiscountBadge || showLoyaltyPointsBadge);
   const showRaffleParticipantChrome =
     (highlightRaffleProduct || showRaffleBadge) && !isMineMode && !isModerationQueue;
   const cardClassName = [
     "product-card",
     showRaffleParticipantChrome ? "product-card--raffle-participant" : "",
-    promotionFullWidth && promotionTier === PRODUCT_PROMOTION_TIER_BANNER
-      ? "product-card--banner-layout"
-      : "",
+    showBannerLayout ? "product-card--banner-layout" : "",
   ]
     .filter(Boolean)
     .join(" ");
+
+  const cardDetailsContent = (
+    <>
+      <h2 id={headingId} className="product-card__heading">
+        {heading}
+      </h2>
+      <ProductPriceDisplay
+        product={product}
+        className="product-card__price"
+        showLabel={false}
+      />
+      {!isModerationQueue ? (
+        <div className="product-card__meta-strip">
+          <p
+            className={
+              hasReviewRating
+                ? "product-card__rating"
+                : "product-card__rating product-card__rating--placeholder"
+            }
+            aria-label={
+              hasReviewRating ? reviewRatingLine : PRODUCT_REVIEW_UI.NO_REVIEWS
+            }
+          >
+            {hasReviewRating ? reviewRatingLine : PRODUCT_REVIEW_UI.NO_REVIEWS}
+          </p>
+          <div
+            ref={statusBadgesRowRef}
+            className="product-card__status-badges-row"
+            role="group"
+            aria-label={PRODUCT_CARD_UI.STATUS_BADGES_ARIA}
+            {...statusBadgesDragScrollProps}
+          >
+            {renderStatusSlot()}
+            {showPromotionBoostBadge ? (
+              <p className="product-card__promotion-boost-badge" role="status">
+                {PRODUCT_CARD_UI.PROMOTED_BADGE}
+              </p>
+            ) : null}
+            {showPromotionTopBadge ? (
+              <p className="product-card__promotion-top-badge" role="status">
+                {PRODUCT_CARD_UI.PROMOTION_TOP_BADGE}
+              </p>
+            ) : null}
+            {showPromotionBannerBadge ? (
+              <p className="product-card__promotion-banner-badge" role="status">
+                {PRODUCT_CARD_UI.PROMOTION_BANNER_BADGE}
+              </p>
+            ) : null}
+            {showAuctionBadge ? (
+              <p className="product-card__auction-badge" role="status">
+                {PRODUCT_CARD_UI.AUCTION_BADGE}
+              </p>
+            ) : null}
+            {showInstallmentBadge ? (
+              <p className="product-card__installment-badge" role="status">
+                {PRODUCT_CARD_UI.INSTALLMENT_BADGE}
+              </p>
+            ) : null}
+            {showRaffleBadge ? (
+              <p className="product-card__raffle-badge" role="status">
+                {PRODUCT_CARD_UI.RAFFLE_BADGE}
+              </p>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
+      {!showBannerLayout ? renderModerationBadge() : null}
+      <dl
+        className="product-card__fields product-card__fields--preview"
+        aria-label={PRODUCT_CARD_UI.PREVIEW_FIELDS_ARIA}
+      >
+        {previewFieldKeysWithoutPrice.map((key) => {
+          const raw = product[key];
+          const display = formatProductFieldForDisplay(key, product);
+          const rowClass = ["product-card__row"];
+          if (key === "productDescription") {
+            rowClass.push("product-card__row--description");
+          }
+          if (key === "productSeller") {
+            rowClass.push("product-card__row--seller");
+          }
+
+          if (key === "productSeller") {
+            return (
+              <div key={key} className={rowClass.join(" ")}>
+                <dt className="product-card__key product-card__key--seller-inline">
+                  {getProductFieldLabel("productSeller")}:
+                </dt>
+                <dd className="product-card__value product-card__value--seller-inline">
+                  {renderProductSellerValue(raw, display)}
+                </dd>
+              </div>
+            );
+          }
+
+          return (
+            <div key={key} className={rowClass.join(" ")}>
+              <dt className="product-card__key">{getProductFieldLabel(key)}</dt>
+              <dd
+                className={
+                  key === "productDescription"
+                    ? "product-card__value product-card__value--multiline"
+                    : "product-card__value"
+                }
+              >
+                {display}
+              </dd>
+            </div>
+          );
+        })}
+      </dl>
+    </>
+  );
+
+  const sellerDisplayName = formatProductFieldForDisplay("productSeller", product);
+
+  const bannerCatalogContent = (
+    <>
+      <p className="product-card__banner-tier-badge" role="status">
+        {PRODUCT_CARD_UI.PROMOTION_BANNER_BADGE}
+      </p>
+      <h2 id={headingId} className="product-card__heading product-card__heading--banner">
+        {heading}
+      </h2>
+      <div className="product-card__banner-price-row">
+        <ProductPriceDisplay
+          product={product}
+          className="product-card__price product-card__price--banner"
+          showLabel={false}
+        />
+        {showDiscountBadge ? (
+          <ProductDiscountBadge discountPercent={discountPercent} variant="banner" />
+        ) : null}
+      </div>
+      {!isModerationQueue ? (
+        <p className="product-card__banner-meta">
+          <span className="product-card__banner-meta-item">
+            {getProductFieldLabel("productSeller")}:{" "}
+            {renderProductSellerValue(product.productSeller, sellerDisplayName)}
+          </span>
+          {hasReviewRating ? (
+            <>
+              <span className="product-card__banner-meta-sep" aria-hidden="true">
+                |
+              </span>
+              <span className="product-card__banner-meta-item product-card__banner-meta-item--rating">
+                {reviewRatingLine}
+              </span>
+            </>
+          ) : null}
+        </p>
+      ) : null}
+      {isMineMode ? renderStatusSlot() : null}
+    </>
+  );
+
+  /** @param {import('react').SyntheticEvent} event */
+  const stopCardDetailsActivation = (event) => {
+    event.stopPropagation();
+  };
+
+  const sellerToolbarNode =
+    onDeleteProduct != null ? (
+      <div className="product-card__seller-toolbar">
+        {onPromoteProduct ? (
+          <button
+            type="button"
+            className="product-card__promote"
+            disabled={
+              product.productIsAvailable === false ||
+              isPromotionActive ||
+              isDeletePending ||
+              isAvailabilityTogglePending ||
+              isAuctionTogglePending
+            }
+            onClick={(event) => {
+              event.stopPropagation();
+              onPromoteProduct(product);
+            }}
+          >
+            {PRODUCT_CARD_UI.PROMOTION_BUTTON}
+          </button>
+        ) : null}
+        {onEditProduct && sellerCanEdit ? (
+          <button
+            type="button"
+            className="product-card__edit"
+            disabled={isDeletePending}
+            onClick={(event) => {
+              event.stopPropagation();
+              onEditProduct(product);
+            }}
+          >
+            {PRODUCT_CARD_UI.EDIT_PRODUCT}
+          </button>
+        ) : null}
+      </div>
+    ) : null;
+
+  const showAddToCartButton =
+    (showAddToCartOnCard || showBannerLayout) &&
+    product.productIsAvailable !== false &&
+    product._id != null &&
+    !isCurrentUserProductSeller(product, currentUserId);
+
+  const showFooterActions =
+    (isModerationQueue && moderationActions != null) ||
+    (!showBannerLayout && sellerToolbarNode != null) ||
+    (showAddToCartButton && !showBannerLayout);
+  const showBannerActions =
+    showBannerLayout && (showAddToCartButton || sellerToolbarNode != null);
+
   const card = (
     <article className={cardClassName} aria-labelledby={headingId}>
       <div
@@ -416,11 +642,7 @@ export function ProductCard({
         >
           {hasSlideMedia ? (
             <ProductMediaSlideContent
-              slide={
-                activeSlide.type === "image" && useFallbackImage
-                  ? { type: "image", url: PRODUCT_IMAGE_PLACEHOLDER_URL }
-                  : activeSlide
-              }
+              slide={renderedSlide}
               imageClassName="product-card__image"
               onImageError={handleImageError}
               onVideoFailed={() => setPreviewVideoFailed(true)}
@@ -479,169 +701,58 @@ export function ProductCard({
             </>
           ) : null}
         </div>
-        <h2 id={headingId} className="product-card__heading">
-          {heading}
-        </h2>
-        <ProductPriceDisplay
-          product={product}
-          className="product-card__price"
-          showLabel={false}
-        />
-        {!isModerationQueue ? (
-          <div className="product-card__meta-strip">
-            <p
-              className={
-                hasReviewRating
-                  ? "product-card__rating"
-                  : "product-card__rating product-card__rating--placeholder"
-              }
-              aria-label={
-                hasReviewRating ? reviewRatingLine : PRODUCT_REVIEW_UI.NO_REVIEWS
-              }
-            >
-              {hasReviewRating ? reviewRatingLine : PRODUCT_REVIEW_UI.NO_REVIEWS}
-            </p>
-            <div
-              ref={statusBadgesRowRef}
-              className="product-card__status-badges-row"
-              role="group"
-              aria-label={PRODUCT_CARD_UI.STATUS_BADGES_ARIA}
-              {...statusBadgesDragScrollProps}
-            >
-              {renderStatusSlot()}
-              {showPromotionTopBadge ? (
-                <p className="product-card__promotion-top-badge" role="status">
-                  {PRODUCT_CARD_UI.PROMOTION_TOP_BADGE}
-                </p>
-              ) : null}
-              {showPromotionBannerBadge ? (
-                <p className="product-card__promotion-banner-badge" role="status">
-                  {PRODUCT_CARD_UI.PROMOTION_BANNER_BADGE}
-                </p>
-              ) : null}
-              {showAuctionBadge ? (
-                <p className="product-card__auction-badge" role="status">
-                  {PRODUCT_CARD_UI.AUCTION_BADGE}
-                </p>
-              ) : null}
-              {showInstallmentBadge ? (
-                <p className="product-card__installment-badge" role="status">
-                  {PRODUCT_CARD_UI.INSTALLMENT_BADGE}
-                </p>
-              ) : null}
-              {showRaffleBadge ? (
-                <p className="product-card__raffle-badge" role="status">
-                  {PRODUCT_CARD_UI.RAFFLE_BADGE}
-                </p>
-              ) : null}
-            </div>
-          </div>
-        ) : null}
-        {renderModerationBadge()}
-        <dl
-          className="product-card__fields product-card__fields--preview"
-          aria-label={PRODUCT_CARD_UI.PREVIEW_FIELDS_ARIA}
-        >
-          {previewFieldKeysWithoutPrice.map((key) => {
-            const raw = product[key];
-            const display = formatProductFieldForDisplay(key, product);
-            const rowClass = ["product-card__row"];
-            if (key === "productDescription")
-              rowClass.push("product-card__row--description");
-            if (key === "productSeller") rowClass.push("product-card__row--seller");
-
-            if (key === "productSeller") {
-              return (
-                <div key={key} className={rowClass.join(" ")}>
-                  <dt className="product-card__key product-card__key--seller-inline">
-                    {getProductFieldLabel("productSeller")}:
-                  </dt>
-                  <dd className="product-card__value product-card__value--seller-inline">
-                    {renderProductSellerValue(raw, display)}
-                  </dd>
-                </div>
-              );
-            }
-
-            return (
-              <div key={key} className={rowClass.join(" ")}>
-                <dt className="product-card__key">
-                  {getProductFieldLabel(key)}
-                </dt>
-                <dd
-                  className={
-                    key === "productDescription"
-                      ? "product-card__value product-card__value--multiline"
-                      : "product-card__value"
-                  }
-                >
-                  {display}
-                </dd>
+        {showBannerLayout ? (
+          <div className="product-card__banner-content">
+            {bannerCatalogContent}
+            {showBannerActions ? (
+              <div
+                className="product-card__banner-actions"
+                aria-label={PRODUCT_CARD_UI.FOOTER_ACTIONS_ARIA}
+                onClick={stopCardDetailsActivation}
+                onKeyDown={stopCardDetailsActivation}
+              >
+                {showAddToCartButton ? (
+                  <AddToCartButton
+                    productId={String(product._id)}
+                    isAuthorized={isAuthorized}
+                    onRequestLogin={onRequestLoginAddToCart}
+                    maxQuantity={purchaseLimit}
+                  />
+                ) : null}
+                {sellerToolbarNode}
               </div>
-            );
-          })}
-        </dl>
-      </div>
-      <div
-        className="product-card__footer-actions"
-        aria-label={PRODUCT_CARD_UI.FOOTER_ACTIONS_ARIA}
-      >
-        {isModerationQueue && moderationActions ? (
-          <ProductModerationDetailsFooter
-            rejectComment={moderationActions.rejectComment}
-            onRejectCommentChange={moderationActions.onRejectCommentChange}
-            onApprove={moderationActions.onApprove}
-            onReject={moderationActions.onReject}
-            isBusy={moderationActions.isBusy}
-            errorMessage={moderationActions.errorMessage}
-          />
-        ) : onDeleteProduct ? (
-          <div className="product-card__seller-toolbar">
-            {onPromoteProduct ? (
-              <button
-                type="button"
-                className="product-card__promote"
-                disabled={
-                  product.productIsAvailable === false ||
-                  isPromotionActive ||
-                  isDeletePending ||
-                  isAvailabilityTogglePending ||
-                  isAuctionTogglePending
-                }
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onPromoteProduct(product);
-                }}
-              >
-                {PRODUCT_CARD_UI.PROMOTION_BUTTON}
-              </button>
-            ) : null}
-            {onEditProduct && sellerCanEdit ? (
-              <button
-                type="button"
-                className="product-card__edit"
-                disabled={isDeletePending}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onEditProduct(product);
-                }}
-              >
-                {PRODUCT_CARD_UI.EDIT_PRODUCT}
-              </button>
             ) : null}
           </div>
-        ) : showAddToCartOnCard &&
-          product.productIsAvailable !== false &&
-          product._id != null &&
-          !isCurrentUserProductSeller(product, currentUserId) ? (
-          <AddToCartButton
-            productId={String(product._id)}
-            isAuthorized={isAuthorized}
-            onRequestLogin={onRequestLoginAddToCart}
-            maxQuantity={purchaseLimit}
-          />
-        ) : null}
+        ) : (
+          cardDetailsContent
+        )}
       </div>
+      {showFooterActions ? (
+        <div
+          className="product-card__footer-actions"
+          aria-label={PRODUCT_CARD_UI.FOOTER_ACTIONS_ARIA}
+        >
+          {isModerationQueue && moderationActions ? (
+            <ProductModerationDetailsFooter
+              rejectComment={moderationActions.rejectComment}
+              onRejectCommentChange={moderationActions.onRejectCommentChange}
+              onApprove={moderationActions.onApprove}
+              onReject={moderationActions.onReject}
+              isBusy={moderationActions.isBusy}
+              errorMessage={moderationActions.errorMessage}
+            />
+          ) : null}
+          {!showBannerLayout ? sellerToolbarNode : null}
+          {showAddToCartButton ? (
+            <AddToCartButton
+              productId={String(product._id)}
+              isAuthorized={isAuthorized}
+              onRequestLogin={onRequestLoginAddToCart}
+              maxQuantity={purchaseLimit}
+            />
+          ) : null}
+        </div>
+      ) : null}
     </article>
   );
 

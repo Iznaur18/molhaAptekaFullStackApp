@@ -199,7 +199,7 @@ export const makeOrderController = async (req, res) => {
               items: itemsWithPrice,
               totalAmount,
               deliveryAddress: verified.displayAddress,
-              deliveryAddressFlat: verified.flat,
+              deliveryAddressFlat: verified.flat ?? "",
               deliveryAddressFiasId: verified.fiasId,
               paymentMethod,
               status,

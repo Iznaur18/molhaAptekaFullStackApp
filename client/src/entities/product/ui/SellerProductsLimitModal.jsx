@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 
 import { SELLER_PRODUCTS_LIMIT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
+import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import { SELLER_PRODUCTS_LIMIT_PREMIUM } from "../model/productConstants.js";
 
 import "./SellerProductsLimitModal.css";
@@ -14,6 +15,8 @@ import "./SellerProductsLimitModal.css";
  * }} props
  */
 export function SellerProductsLimitModal({ isOpen, onClose, isPremiumUser, limit }) {
+  useScrollLock(isOpen);
+
   useEffect(() => {
     if (!isOpen) return undefined;
     const onKeyDown = (event) => {

@@ -5,9 +5,14 @@ import {
   ORDER_STATUS_PENDING,
   ORDER_STATUS_SHIPPED,
 } from "../../constants/orderConstants.js";
-import { OrderModel, UserModel } from "../../models/index.js";
+import {
+  INSTALLMENT_CONTRACT_STATUS_CANCELLED,
+  INSTALLMENT_CONTRACT_STATUS_COMPLETED,
+} from "../../constants/installmentConstants.js";
+import { InstallmentContractModel, OrderModel, UserModel } from "../../models/index.js";
 import { errorRes, successRes } from "../../utils/index.js";
 import { runInTransaction } from "../../utils/mongoTransaction.js";
+import { cancelLinkedOrderForInstallmentContract } from "../../utils/cancelLinkedOrderForInstallmentContract.js";
 import { prepareLoyaltyPointsForConfirmedOrderItem } from "../../utils/loyaltyPoints.js";
 import {
   markOrderLineLoyaltyReserveReleased,
@@ -106,11 +111,11 @@ export const markOrderItemDeliveredBySellerController = async (req, res) => {
   }
 };
 
-/** `PATCH /order/:orderId/items/:itemIndex/cancelled` — продавец отменяет позицию в обработке. */
-export const markOrderItemCancelledBySellerController = async (req, res) => {
+/** `PATCH /order/:orderId/items/:itemIndex/cancelled` — покупатель или продавец отменяет позицию в обработке. */
+export const markOrderItemCancelledController = async (req, res) => {
   try {
     const { orderId, itemIndex: rawItemIndex } = req.params;
-    const sellerId = String(req.userId);
+    const requestUserId = String(req.userId);
     const itemIndex = parseItemIndex(rawItemIndex);
 
     const order = await OrderModel.findById(orderId).populate(ORDER_ITEMS_POPULATE);
@@ -125,11 +130,15 @@ export const markOrderItemCancelledBySellerController = async (req, res) => {
       return errorRes(res, 400, "Товар позиции не найден");
     }
 
+    const buyerId = normalizeId(order.userBuyerId?._id ?? order.userBuyerId);
     const itemSellerId = normalizeId(
       targetItem.productId.productSeller?._id ?? targetItem.productId.productSeller,
     );
-    if (itemSellerId !== sellerId) {
-      return errorRes(res, 403, "Можно обновлять только свои продажи");
+    const isBuyer = buyerId === requestUserId;
+    const isSeller = itemSellerId === requestUserId;
+
+    if (!isBuyer && !isSeller) {
+      return errorRes(res, 403, "Нет прав на отмену позиции");
     }
 
     if (targetItem.status !== ORDER_STATUS_PENDING) {
@@ -140,27 +149,65 @@ export const markOrderItemCancelledBySellerController = async (req, res) => {
       );
     }
 
-    const releaseLine = {
-      ...(targetItem.toObject?.() ?? targetItem),
-      productId: targetItem.productId,
-    };
+    if (isBuyer && order.installmentContractId) {
+      const cancellationReason =
+        String(req.body?.reason ?? "Отменено покупателем").trim() ||
+        "Отменено покупателем";
 
-    await runInTransaction(async (session) => {
-      targetItem.status = ORDER_STATUS_CANCELLED;
-      markOrderLineLoyaltyReserveReleased(targetItem);
-      order.status = buildOrderStatusFromItems(order.items);
-      await order.save({ session });
-      await releaseUnawardedLoyaltyReservesForOrder([releaseLine], session);
-    });
+      await runInTransaction(async (session) => {
+        const contract = await InstallmentContractModel.findById(
+          order.installmentContractId,
+        ).session(session);
+        if (!contract) {
+          throw new Error("INSTALLMENT_CONTRACT_NOT_FOUND");
+        }
+        if (contract.status === INSTALLMENT_CONTRACT_STATUS_COMPLETED) {
+          throw new Error("INSTALLMENT_CONTRACT_COMPLETED");
+        }
+        if (contract.status !== INSTALLMENT_CONTRACT_STATUS_CANCELLED) {
+          contract.status = INSTALLMENT_CONTRACT_STATUS_CANCELLED;
+          contract.cancelledAt = new Date();
+          contract.cancelledByUserId = req.userId;
+          contract.cancellationReason = cancellationReason;
+          await contract.save({ session });
+        }
+        await cancelLinkedOrderForInstallmentContract(order._id, session);
+      });
+    } else {
+      const releaseLine = {
+        ...(targetItem.toObject?.() ?? targetItem),
+        productId: targetItem.productId,
+      };
 
-    await populateOrderForResponse(order);
+      await runInTransaction(async (session) => {
+        targetItem.status = ORDER_STATUS_CANCELLED;
+        markOrderLineLoyaltyReserveReleased(targetItem);
+        order.status = buildOrderStatusFromItems(order.items);
+        await order.save({ session });
+        await releaseUnawardedLoyaltyReservesForOrder([releaseLine], session);
+      });
+    }
 
-    return successRes(res, { order });
+    const updatedOrder = await OrderModel.findById(orderId).populate(ORDER_ITEMS_POPULATE);
+    if (!updatedOrder) return errorRes(res, 404, "Заказ не найден");
+    normalizeOrderDocumentForRuntime(updatedOrder);
+    normalizeOrderItemsForRuntime(updatedOrder.items);
+    await populateOrderForResponse(updatedOrder);
+
+    return successRes(res, { order: updatedOrder });
   } catch (error) {
-    console.error("markOrderItemCancelledBySellerController error:", error);
+    if (error instanceof Error && error.message === "INSTALLMENT_CONTRACT_NOT_FOUND") {
+      return errorRes(res, 404, "Контракт рассрочки не найден");
+    }
+    if (error instanceof Error && error.message === "INSTALLMENT_CONTRACT_COMPLETED") {
+      return errorRes(res, 409, "Контракт рассрочки уже закрыт");
+    }
+    console.error("markOrderItemCancelledController error:", error);
     return errorRes(res, 500, "Ошибка при отмене позиции");
   }
 };
+
+export const markOrderItemCancelledBySellerController = markOrderItemCancelledController;
 
 /** `PATCH /order/:orderId/items/:itemIndex/shipped` — продавец помечает позицию как отправленную. */
 export const markOrderItemShippedBySellerController = async (req, res) => {

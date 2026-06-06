@@ -1,5 +1,11 @@
-/** Срок действия токена подтверждения email (24 ч). */
+/** Срок действия кода подтверждения email (24 ч). */
 export const EMAIL_VERIFICATION_TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
+
+/** Длина цифрового кода подтверждения email. */
+export const EMAIL_VERIFICATION_CODE_LENGTH = 6;
+
+/** Максимум неверных попыток ввода кода до повторной отправки. */
+export const EMAIL_VERIFICATION_MAX_ATTEMPTS = 10;
 
 /** Лимит повторной отправки письма с одного аккаунта в час. */
 export const EMAIL_VERIFICATION_RESEND_RATE_LIMIT_PER_HOUR = 5;
@@ -11,6 +17,12 @@ export const EMAIL_VERIFICATION_ALREADY_VERIFIED_MESSAGE = "Email уже под�
 
 export const EMAIL_VERIFICATION_INVALID_TOKEN_MESSAGE =
   "Ссылка подтверждения недействительна или устарела";
+
+export const EMAIL_VERIFICATION_INVALID_CODE_MESSAGE =
+  "Неверный или устаревший код подтверждения";
+
+export const EMAIL_VERIFICATION_ATTEMPTS_EXCEEDED_MESSAGE =
+  "Превышено число попыток. Отправьте письмо повторно";
 
 export const EMAIL_VERIFICATION_SENT_MESSAGE = "Письмо с подтверждением отправлено";
 

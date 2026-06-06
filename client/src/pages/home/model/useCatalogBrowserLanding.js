@@ -158,8 +158,8 @@ export function useCatalogBrowserLanding({
 
   const handleCatalogMenuClick = useCallback(() => {
     setIsProductCategoryListOpen(false);
+    navigate(buildCatalogBrowserLocation(CATALOG_LANDING_QUERY), { replace: true });
     applyCatalogQueryState(CATALOG_LANDING_QUERY);
-    navigate(catalogMainViewToPathname("catalog-browser"), { replace: true });
   }, [applyCatalogQueryState, navigate, setIsProductCategoryListOpen]);
 
   const handleCatalogCategoryGridClick = useCallback(
@@ -248,8 +248,8 @@ export function useCatalogBrowserLanding({
   );
 
   const handleBackToCatalogLanding = useCallback(() => {
+    navigate(buildCatalogBrowserLocation(CATALOG_LANDING_QUERY), { replace: true });
     applyCatalogQueryState(CATALOG_LANDING_QUERY);
-    navigate(catalogMainViewToPathname("catalog-browser"), { replace: true });
   }, [applyCatalogQueryState, navigate]);
 
   const handleCategoryDisplaySaved = useCallback((display) => {

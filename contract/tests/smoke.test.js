@@ -65,15 +65,14 @@ test("replaceCartBodySchema validates items map", () => {
   assert.equal(parsed.items[productId], 2);
 });
 
-test("createOrderBodySchema requires delivery flat", () => {
-  assert.throws(() => {
-    createOrderBodySchema.parse({
-      items: [{ productId: "507f1f77bcf86cd799439011", quantity: 1 }],
-      deliveryAddress: "Москва, Тверская 1",
-      deliveryAddressFlat: "",
-      paymentMethod: "cashOnDelivery",
-    });
+test("createOrderBodySchema allows empty delivery flat", () => {
+  const parsed = createOrderBodySchema.parse({
+    items: [{ productId: "507f1f77bcf86cd799439011", quantity: 1 }],
+    deliveryAddress: "Москва, Тверская 1",
+    deliveryAddressFlat: "",
+    paymentMethod: "cashOnDelivery",
   });
+  assert.equal(parsed.deliveryAddressFlat, "");
 });
 
 test("parseApiSuccess validates auth me payload", () => {

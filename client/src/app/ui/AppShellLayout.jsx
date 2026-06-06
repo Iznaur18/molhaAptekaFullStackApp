@@ -1,7 +1,6 @@
 import { Outlet, useLocation } from "react-router-dom";
 
 import { CartServerSync } from "../../entities/cart/ui/CartServerSync.jsx";
-import { EmailVerificationBanner } from "../../entities/user/ui/EmailVerificationBanner.jsx";
 import { EmailVerificationNotice } from "../../entities/user/ui/EmailVerificationNotice.jsx";
 import { SiteFooter } from "../../widgets/site-footer/ui/SiteFooter.jsx";
 import { getHomePageVariantClass } from "../../pages/home/lib/homeHeaderVariant.js";
@@ -17,8 +16,6 @@ export function AppShellLayout() {
   const location = useLocation();
   const {
     isAuthorized,
-    isSessionReady,
-    isEmailVerified,
     emailVerificationNotice,
     dismissEmailVerificationNotice,
     staffActionNotice,
@@ -35,10 +32,6 @@ export function AppShellLayout() {
         notice={emailVerificationNotice}
         onDismiss={dismissEmailVerificationNotice}
       />
-
-      {isAuthorized && isSessionReady && !isEmailVerified ? (
-        <EmailVerificationBanner />
-      ) : null}
 
       {staffActionNotice ? (
         <p className="home-page__state home-page__state_notice" role="status">

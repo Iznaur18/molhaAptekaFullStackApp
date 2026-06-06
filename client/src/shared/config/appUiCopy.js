@@ -266,8 +266,18 @@ export const APP_INTRO_UI = {
 
 /** Подтверждение email */
 export const EMAIL_VERIFICATION_UI = {
-  BANNER_TEXT:
-    "Подтвердите email — без этого нельзя оформить заказ или рассрочку. Проверьте почту или отправьте письмо повторно.",
+  MODAL_TITLE: "Подтвердите email",
+  MODAL_ARIA: "Подтверждение email",
+  MODAL_EMAIL_FALLBACK: "ваш email",
+  MODAL_TEXT: (email) =>
+    `Мы отправили 6-значный код на ${email}. Введите код ниже — без этого нельзя оформить заказ или рассрочку.`,
+  LABEL_CODE: "Код из письма",
+  CODE_PLACEHOLDER: "000000",
+  CODE_REQUIRED: "Введите 6-значный код из письма",
+  CONFIRM_BUTTON: "Подтвердить",
+  CONFIRM_LOADING: "Проверка…",
+  CONFIRM_ERROR: "Не удалось подтвердить email",
+  MODAL_CLOSE: "Продолжить как гость",
   RESEND_BUTTON: "Отправить письмо повторно",
   RESEND_LOADING: "Отправка…",
   RESENT: "Письмо отправлено. Проверьте почту.",
@@ -340,7 +350,6 @@ export const HOME_PAGE_UI = {
   MODERATION_STATUS_FILTER_LABEL: "Статус",
   SHOW_HIDDEN_PRODUCTS: "Показывать скрытые товары",
   CATEGORY_ALL: "Все категории",
-  SUBTITLE_MY_ONLY: "Показаны только ваши товары.",
   EMPTY_MY_BY_MODERATION_STATUS: "Нет товаров с выбранным статусом.",
   MY_PRODUCTS_QUOTA_LABEL: "Товаров",
   LIST_PRODUCT_BUTTON: "Разместить товар",
@@ -436,14 +445,11 @@ export const CART_PAGE_UI = {
   PRODUCT_DELETED_OR_HIDDEN: "Товар недоступен",
 };
 
-/** DaData: адрес до дома + квартира */
+/** DaData: адрес до дома */
 export const ADDRESS_DELIVERY_UI = {
   LABEL_LINE: "Адрес (город, улица, дом)",
-  LABEL_FLAT: "Квартира / офис",
   PLACEHOLDER_LINE: "Начните вводить и выберите из списка",
-  PLACEHOLDER_FLAT: "12",
   HINT_LINE: "Выберите вариант из подсказок DaData",
-  HINT_FLAT: "Обязательно для доставки",
   SUGGEST_LOADING: "Ищем адреса…",
   SUGGEST_ERROR: "Подсказки недоступны",
 };
@@ -452,7 +458,7 @@ export const ADDRESS_DELIVERY_UI = {
 export const CHECKOUT_FORM_UI = {
   HEADING: "Оформление заказа",
   LABEL_DELIVERY_ADDRESS: "Адрес доставки",
-  PLACEHOLDER_DELIVERY_ADDRESS: "Город, улица, дом, квартира",
+  PLACEHOLDER_DELIVERY_ADDRESS: "Город, улица, дом",
   LABEL_PAYMENT_METHOD: "Способ оплаты",
   SUBMIT_IDLE: "Оформить заказ",
   SUBMIT_LOADING: "Оформляем…",
@@ -479,6 +485,7 @@ export const ORDER_CARD_UI = {
   ACTION_CANCEL: "Отменить",
   ACTION_PENDING: "Сохраняем…",
   CANCEL_CONFIRM: "Отменить заказ покупателя?",
+  BUYER_CANCEL_CONFIRM: "Отменить заказ?",
   DELETED_PRODUCT_NAME: "Товар удалён",
   /** @param {number} points */
   LOYALTY_POINTS_LINE: (points) => `+${points} баллов за шт. (премиум-покупателю)`,
@@ -984,7 +991,7 @@ export const PRODUCT_CARD_UI = {
   /** @param {string} tierLabel @param {string} until */
   PROMOTED_TIER_UNTIL: (tierLabel, until) =>
     `Продвижение «${tierLabel}» до ${until}`,
-  PROMOTION_TOP_BADGE: "ТОП",
+  PROMOTION_TOP_BADGE: "Топ",
   PROMOTION_BANNER_BADGE: "Баннер",
   RAFFLE_BADGE: "Розыгрыш",
   AUCTION_BADGE: "Аукцион",
@@ -1255,17 +1262,27 @@ export const PRODUCT_PROMOTIONS_STAFF_PAGE_UI = {
 export const PRODUCT_PROMOTION_UI = {
   MODAL_TITLE: "Продвижение товара",
   MODAL_SUBTITLE: (productName) => `Товар: ${productName || "Без названия"}`,
+  BALANCE_LABEL: "Ваш баланс",
   /** @param {number} balance */
-  BALANCE_POINTS: (balance) => `Баланс баллов: ${balance}`,
+  BALANCE_POINTS: (balance) => `${balance} баллов`,
   PAYMENT_HINT_POINTS:
     "Оплата только баллами. Списание сразу, продвижение включается автоматически.",
   TIER_LABEL: "Уровень продвижения",
+  /** @param {string} percent */
+  TIER_RATE_HINT: (percent) => `${percent}% от цены товара`,
   /** @param {string} title @param {string} description */
   TIER_OPTION: (title, description) => `${title} — ${description}`,
   DURATION_LABEL: "Срок",
+  /** @param {number} pricePoints */
+  DURATION_PRICE_POINTS: (pricePoints) => `${pricePoints} б.`,
   /** @param {string} title @param {number} pricePoints */
   DURATION_OPTION_POINTS: (title, pricePoints) => `${title} — ${pricePoints} баллов`,
-  TARIFF_DURATION: (durationHours) => `Срок действия: ${durationHours} ч.`,
+  SUMMARY_TIER: "Уровень",
+  SUMMARY_DURATION: "Срок действия",
+  TOTAL_LABEL: "К оплате",
+  /** @param {number} pricePoints */
+  TOTAL_POINTS: (pricePoints) => `${pricePoints} баллов`,
+  TARIFF_DURATION: (durationHours) => `${durationHours} ч.`,
   INSUFFICIENT_POINTS: (required, balance) =>
     `Недостаточно баллов: нужно ${required}, у вас ${balance}.`,
   SUBMIT_POINTS: "Оплатить баллами и включить",
@@ -1302,18 +1319,8 @@ export const REGISTER_MODAL_UI = {
   LABEL_USERNAME: "Никнейм",
   USERNAME_HINT:
     "Только a–z и 0–9, без пробелов, 3–30 символов (как одно слово в нижнем регистре).",
-  LABEL_PHONE: "Телефон (phoneNumber → userPhoneNumber)",
-  LABEL_BIRTH: "Дата рождения (userBirthDate)",
-  LABEL_GENDER: "Пол (userGender)",
-  LABEL_ADDRESS: "Адрес (userAddress)",
-  LABEL_AVATAR_URL: "Аватар (ссылка или файл)",
-  LABEL_BG_PRESET: "Цвет фона профиля",
-  LABEL_BG_PREVIEW: "Предпросмотр фона",
-  LABEL_NOTIFICATIONS: "Уведомления (notificationsEnabled)",
-  PLACEHOLDER_HTTPS: "https://…",
   SUBMIT_IDLE: "Зарегистрироваться",
   SUBMIT_LOADING: "Регистрация…",
-  SUCCESS: "Регистрация прошла успешно",
   ERROR_GENERIC: "Ошибка при регистрации",
   ERROR_REQUIRED_FIELDS: "Заполните обязательные поля",
   ERROR_PASSWORD_MISMATCH: "Пароли не совпадают",

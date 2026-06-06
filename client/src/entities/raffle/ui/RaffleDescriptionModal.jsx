@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 
 import { RAFFLE_FEATURED_BANNER_UI } from "../../../shared/config/appUiCopy.js";
+import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 
 import "./RaffleDescriptionModal.css";
 
@@ -13,6 +14,8 @@ import "./RaffleDescriptionModal.css";
  * }} props
  */
 export function RaffleDescriptionModal({ isOpen, title, description, onClose }) {
+  useScrollLock(isOpen);
+
   useEffect(() => {
     if (!isOpen) {
       return undefined;

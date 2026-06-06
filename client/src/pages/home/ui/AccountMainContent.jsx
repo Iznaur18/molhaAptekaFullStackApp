@@ -15,6 +15,7 @@ import { isStaffMainViewAllowed } from "../../../shared/lib/staffMainViews.js";
 /**
  * @param {object} props
  * @param {import('react').ReactNode} [props.myProductsCatalogSection]
+ * @param {import('../ui/MyProductsCatalogToolbar.jsx').MyProductsCatalogToolbar extends (props: infer P) => unknown ? P : never} [props.myProductsCatalogToolbarProps]
  */
 export function AccountMainContent({
   isRaffleRoute,
@@ -89,6 +90,7 @@ export function AccountMainContent({
   handleNotificationsCleared,
   onOpenProductDetails,
   myProductsCatalogSection = null,
+  myProductsCatalogToolbarProps = null,
 }) {
   if (isAuthorized && !isSessionReady && isRoleRestrictedMainView(mainView)) {
     return <p className="home-page__state">{HOME_PAGE_UI.LOADING_SESSION}</p>;
@@ -208,6 +210,7 @@ export function AccountMainContent({
         activeTab={activeProfileTab}
         onTabChange={setMyProfileTab}
         tabContent={tabContent}
+        myProductsCatalogToolbarProps={myProductsCatalogToolbarProps}
       />
     );
   }

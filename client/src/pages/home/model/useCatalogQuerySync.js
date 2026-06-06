@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import { isCatalogBrowserLandingSearch } from "../../../entities/product-category-display/lib/catalogBrowserLanding.js";
+import { isExplicitCatalogNewestFeedSearch } from "../../../entities/product-category-display/lib/catalogBrowserLanding.js";
 import { findCategoryRootIdForLegacySlug } from "../../../entities/product-category-tree/lib/findCategoryRootIdForLegacySlug.js";
 import { IS_CATALOG_BROWSER_SUBCATEGORY_FILTER_ENABLED } from "../../../entities/product-category-tree/lib/isCatalogBrowserSubcategoryFilterEnabled.js";
 import { CATALOG_SORT_NEWEST } from "../../../entities/product/model/productConstants.js";
@@ -20,7 +20,6 @@ export function useCatalogQuerySync({
   catalogMainView,
   location,
   navigate,
-  hasProductSearchQuery,
   catalogSort,
   selectedProductCategory,
   selectedCategoryId,
@@ -114,10 +113,9 @@ export function useCatalogQuerySync({
       !catalogAuctionOnly &&
       !catalogInstallmentOnly &&
       !catalogSaleOnly;
-    const isLandingUrl = isCatalogBrowserLandingSearch(
-      location.search,
-      hasProductSearchQuery,
-    );
+    const omitDefaultSort =
+      isDefaultNewestFeed &&
+      !isExplicitCatalogNewestFeedSearch(location.search);
     const built =
       catalogMainView === "catalog-browser"
         ? buildCatalogBrowserSearchParams(
@@ -130,7 +128,7 @@ export function useCatalogQuerySync({
               installmentOnly: catalogInstallmentOnly,
               saleOnly: catalogSaleOnly,
             },
-            { omitDefaultSort: isLandingUrl && isDefaultNewestFeed },
+            { omitDefaultSort },
           )
         : buildCatalogSearchParams({
             sort: catalogSort,
@@ -163,7 +161,6 @@ export function useCatalogQuerySync({
     catalogSaleOnly,
     navigate,
     location.search,
-    hasProductSearchQuery,
   ]);
 
   useEffect(() => {

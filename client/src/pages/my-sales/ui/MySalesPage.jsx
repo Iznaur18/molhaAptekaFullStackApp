@@ -23,6 +23,11 @@ import {
 } from "../../../shared/config/appUiCopy.js";
 import { useDebouncedValue } from "../../../shared/lib/useDebouncedValue.js";
 import { useRefetchOnVisible } from "../../../shared/lib/useRefetchOnVisible.js";
+import {
+  ListPageFilter,
+  ListPageFilterBar,
+  ListPageFilterSelect,
+} from "../../../shared/ui/ListPageFilterBar/ListPageFilterBar.jsx";
 import { SearchInput } from "../../../shared/ui/SearchInput/SearchInput.jsx";
 
 import "./MySalesPage.css";
@@ -320,11 +325,9 @@ function SalesFilters({
   isSearchPending,
 }) {
   return (
-    <div className="my-sales-page__filters">
-      <label className="my-sales-page__filter-label">
-        <span>{MY_SALES_PAGE_UI.STATUS_FILTER_LABEL}</span>
-        <select
-          className="my-sales-page__filter-control"
+    <ListPageFilterBar className="my-sales-page__filters">
+      <ListPageFilter label={MY_SALES_PAGE_UI.STATUS_FILTER_LABEL}>
+        <ListPageFilterSelect
           value={statusFilter}
           onChange={(event) => onStatusFilterChange(event.target.value)}
         >
@@ -334,8 +337,8 @@ function SalesFilters({
               {ORDER_STATUS_LABEL_RU[status]}
             </option>
           ))}
-        </select>
-      </label>
+        </ListPageFilterSelect>
+      </ListPageFilter>
 
       <div className="my-sales-page__search">
         <SearchInput
@@ -348,6 +351,6 @@ function SalesFilters({
           isPending={isSearchPending}
         />
       </div>
-    </div>
+    </ListPageFilterBar>
   );
 }

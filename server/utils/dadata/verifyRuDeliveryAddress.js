@@ -29,7 +29,7 @@ function pickFlatFromCleaned(cleaned) {
 }
 
 /**
- * @param {{ addressLine: string; flat: string }} params
+ * @param {{ addressLine: string; flat?: string }} params
  * @returns {Promise<{
  *   displayAddress: string;
  *   flat: string;
@@ -37,7 +37,7 @@ function pickFlatFromCleaned(cleaned) {
  *   geo: { lat: number; lon: number } | null;
  * }>}
  */
-export async function verifyRuDeliveryAddress({ addressLine, flat }) {
+export async function verifyRuDeliveryAddress({ addressLine, flat = "" }) {
   const line = String(addressLine ?? "").trim();
   const flatInput = String(flat ?? "").trim();
 
@@ -46,9 +46,6 @@ export async function verifyRuDeliveryAddress({ addressLine, flat }) {
   }
   if (line.length > ADDRESS_LINE_MAX_LENGTH) {
     throw new Error(`Адрес не длиннее ${ADDRESS_LINE_MAX_LENGTH} символов`);
-  }
-  if (flatInput.length === 0) {
-    throw new Error("Укажите номер квартиры");
   }
   if (flatInput.length > ADDRESS_FLAT_MAX_LENGTH) {
     throw new Error(`Квартира: не более ${ADDRESS_FLAT_MAX_LENGTH} символов`);
@@ -64,11 +61,7 @@ export async function verifyRuDeliveryAddress({ addressLine, flat }) {
   }
 
   const cleaned = await cleanRuAddress(buildAddressQueryForClean(line, flatInput));
-  const cleanedFlat = pickFlatFromCleaned(cleaned);
-
-  if (!cleanedFlat) {
-    throw new Error("Укажите номер квартиры для доставки");
-  }
+  const cleanedFlat = pickFlatFromCleaned(cleaned) ?? flatInput;
 
   const qcComplete = Number(cleaned.qc_complete ?? 10);
   if (Number.isNaN(qcComplete) || qcComplete > DADATA_QC_COMPLETE_MAX) {

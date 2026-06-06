@@ -75,7 +75,6 @@ export const useHomeCatalogLoader = ({
     catalogMainView,
     location,
     navigate,
-    hasProductSearchQuery: filters.hasProductSearchQuery,
     catalogSort: filters.catalogSort,
     selectedProductCategory: filters.selectedProductCategory,
     selectedCategoryId: filters.selectedCategoryId,

@@ -32,6 +32,7 @@ import { FormFieldLabel } from "../../../shared/ui/FormFieldLabel/FormFieldLabel
 import { ImageUrlField } from "../../../shared/ui/ImageUrlField/ImageUrlField.jsx";
 import { VideoUrlField } from "../../../shared/ui/VideoUrlField/VideoUrlField.jsx";
 import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
+import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 
 import "./CreateRaffleModal.css";
 
@@ -84,6 +85,8 @@ export function CreateRaffleModal({
   const isEdit = mode === "edit" && raffleToEdit != null;
   const [form, setForm] = useState(INITIAL_FORM);
   const [status, setStatus] = useState({ kind: "idle", message: "" });
+
+  useScrollLock(isOpen);
 
   useEffect(() => {
     if (!isOpen) return;

@@ -1,0 +1,108 @@
+.email-verification-modal__body {
+  padding: 1rem;
+}
+
+.email-verification-modal__content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.email-verification-modal__text {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: #374151;
+}
+
+.email-verification-modal__message {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.35;
+}
+
+.email-verification-modal__message_success {
+  color: #067647;
+}
+
+.email-verification-modal__message_error {
+  color: #b42318;
+}
+
+.email-verification-modal__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.email-verification-modal__label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.email-verification-modal__input {
+  box-sizing: border-box;
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.625rem;
+  font-size: 1.125rem;
+  letter-spacing: 0.2em;
+  text-align: center;
+  font-weight: 600;
+}
+
+.email-verification-modal__confirm {
+  border: 1px solid #1f6feb;
+  border-radius: 0.5rem;
+  background: #1f6feb;
+  color: #fff;
+  padding: 0.55rem 0.85rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.email-verification-modal__confirm:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.email-verification-modal__resend {
+  border: 1px solid #1f6feb;
+  border-radius: 0.5rem;
+  background: #1f6feb;
+  color: #fff;
+  padding: 0.55rem 0.85rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.email-verification-modal__resend:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.email-verification-modal__close {
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background: #fff;
+  color: #374151;
+  padding: 0.55rem 0.85rem;
+  font-size: 0.9375rem;
+  cursor: pointer;
+}
+
+.email-verification-modal__close:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.email-verification-modal__close:hover:not(:disabled) {
+  background: #f9fafb;
+}

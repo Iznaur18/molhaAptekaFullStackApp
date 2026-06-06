@@ -1,4 +1,4 @@
-﻿.product-card__footer-actions {
+.product-card__footer-actions {
   margin-top: auto;
   padding-top: 0.35rem;
   display: flex;
@@ -45,7 +45,7 @@
   margin: 0;
   padding: 0.45rem 0.65rem;
   border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
-  border-radius: 10px;
+  border-radius: var(--product-card-inner-radius);
   background: color-mix(in srgb, currentColor 5%, transparent);
   color: inherit;
   font: inherit;
@@ -105,7 +105,7 @@
   margin: 0;
   width: 100%;
   padding: 0.45rem 0.65rem;
-  border-radius: 10px;
+  border-radius: var(--product-card-inner-radius);
   border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
   background: color-mix(in srgb, currentColor 4%, transparent);
   font: inherit;
@@ -121,7 +121,7 @@
   margin: 0;
   padding: 0.45rem 0.65rem;
   border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
-  border-radius: 10px;
+  border-radius: var(--product-card-inner-radius);
   background: color-mix(in srgb, currentColor 6%, transparent);
   color: inherit;
   font: inherit;
@@ -145,7 +145,7 @@
   margin: 0;
   padding: 0.45rem 0.65rem;
   border: 1px solid #93c5fd;
-  border-radius: 10px;
+  border-radius: var(--product-card-inner-radius);
   background: #dbeafe;
   color: #1d4ed8;
   font: inherit;
@@ -163,6 +163,29 @@
   cursor: not-allowed;
 }
 
+.product-card--banner-layout .product-card__banner-actions .product-card__promote {
+  border-color: color-mix(in srgb, var(--product-card-banner-accent) 45%, transparent);
+  background: color-mix(in srgb, var(--product-card-banner-accent-soft) 72%, #fff);
+  color: var(--product-card-banner-badge-text);
+}
+
+.product-card--banner-layout .product-card__banner-actions .product-card__promote:hover:not(:disabled) {
+  border-color: var(--product-card-banner-accent);
+  background: var(--product-card-banner-accent-soft);
+  color: var(--product-card-banner-badge-text);
+}
+
+.product-card-promotion-frame--tier-3 > .product-card .product-card__promote {
+  border-color: color-mix(in srgb, var(--product-card-banner-accent) 45%, transparent);
+  background: color-mix(in srgb, var(--product-card-banner-accent-soft) 72%, #fff);
+  color: var(--product-card-banner-badge-text);
+}
+
+.product-card-promotion-frame--tier-3 > .product-card .product-card__promote:hover:not(:disabled) {
+  border-color: var(--product-card-banner-accent);
+  background: var(--product-card-banner-accent-soft);
+}
+
 .product-card__delete {
   box-sizing: border-box;
   width: 100%;
@@ -170,7 +193,7 @@
   padding: 0.45rem 0.65rem;
   border: 1px solid
     color-mix(in srgb, var(--product-card-delete-accent) 55%, transparent);
-  border-radius: 10px;
+  border-radius: var(--product-card-inner-radius);
   background: color-mix(in srgb, var(--product-card-delete-accent) 12%, transparent);
   color: inherit;
   font: inherit;
@@ -192,7 +215,7 @@
   margin: 0;
   width: 100%;
   padding: 0.45rem 0.65rem;
-  border-radius: 10px;
+  border-radius: var(--product-card-inner-radius);
   border: 1px solid
     color-mix(in srgb, var(--product-card-delete-accent) 40%, transparent);
   background: color-mix(in srgb, var(--product-card-delete-accent) 8%, transparent);
@@ -230,7 +253,7 @@
   min-width: 6rem;
   margin: 0;
   padding: 0.45rem 0.55rem;
-  border-radius: 10px;
+  border-radius: var(--product-card-inner-radius);
   font: inherit;
   font-size: 0.78rem;
   font-weight: 600;
@@ -256,5 +279,52 @@
 
 .product-card__delete-confirm-cancel:hover {
   background: color-mix(in srgb, currentColor 6%, transparent);
+}
+
+.product-card-promotion-frame--tier-3
+  > .product-card:not(.product-card--banner-layout)
+  .product-card__footer-actions
+  .add-to-cart,
+.product-card-promotion-frame--tier-3
+  > .product-card:not(.product-card--banner-layout)
+  .product-card__footer-actions
+  .add-to-cart--login {
+  border-color: var(--product-card-banner-action);
+  background: var(--product-card-banner-action);
+}
+
+.product-card-promotion-frame--tier-3
+  > .product-card:not(.product-card--banner-layout)
+  .product-card__footer-actions
+  .add-to-cart:hover,
+.product-card-promotion-frame--tier-3
+  > .product-card:not(.product-card--banner-layout)
+  .product-card__footer-actions
+  .add-to-cart--login:hover {
+  border-color: var(--product-card-banner-action-hover);
+  background: var(--product-card-banner-action-hover);
+}
+
+.product-card-promotion-frame--tier-3
+  > .product-card:not(.product-card--banner-layout)
+  .product-card__footer-actions
+  .add-to-cart__stepper {
+  border-color: var(--product-card-banner-action);
+  background: color-mix(in srgb, var(--product-card-banner-accent-soft) 72%, #fff);
+}
+
+.product-card-promotion-frame--tier-3
+  > .product-card:not(.product-card--banner-layout)
+  .product-card__footer-actions
+  .add-to-cart__step-button {
+  color: var(--product-card-banner-action-hover);
+}
+
+.product-card-promotion-frame--tier-3
+  > .product-card:not(.product-card--banner-layout)
+  .product-card__footer-actions
+  .add-to-cart__step-button:hover {
+  background: var(--product-card-banner-action);
+  color: #fff;
 }
 
