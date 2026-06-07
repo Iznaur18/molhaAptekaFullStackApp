@@ -6,7 +6,7 @@ import {
   CATALOG_QUERY_PARAM_INSTALLMENT_ONLY,
   CATALOG_QUERY_PARAM_SALE_ONLY,
   CATALOG_QUERY_PARAM_SORT,
-} from "../../../pages/home/lib/catalogCatalogQuery.js";
+} from "../../product/lib/catalogCatalogQuery.js";
 import { CATALOG_SORT_NEWEST } from "../../product/model/productConstants.js";
 
 /**

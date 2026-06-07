@@ -1,6 +1,6 @@
 import { createContext, useCallback, useMemo, useReducer, useRef } from "react";
 
-import { replaceMyCart } from "../api/replaceMyCart.js";
+import { useReplaceMyCartMutation } from "./useReplaceMyCartMutation.js";
 import {
   CART_ACTION_ADD,
   CART_ACTION_CLEAR,
@@ -20,6 +20,7 @@ export function CartProvider({ children }) {
   const [items, dispatch] = useReducer(cartReducer, {});
   const itemsRef = useRef(items);
   itemsRef.current = items;
+  const replaceCartMutation = useReplaceMyCartMutation();
 
   const addItem = useCallback((productId, quantity = 1) => {
     dispatch({ type: CART_ACTION_ADD, productId, quantity });
@@ -48,11 +49,11 @@ export function CartProvider({ children }) {
   /** Сохранить текущую корзину на сервер (cookie auth). */
   const flushRemoteCart = useCallback(async () => {
     try {
-      await replaceMyCart(itemsRef.current);
+      await replaceCartMutation.mutateAsync(itemsRef.current);
     } catch {
       // выход не блокируем
     }
-  }, []);
+  }, [replaceCartMutation]);
 
   const totalCount = useMemo(() => sumQuantities(items), [items]);
 

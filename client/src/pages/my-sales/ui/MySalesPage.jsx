@@ -1,11 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useMemo, useState } from "react";
 
-import { fetchMySales } from "../../../entities/order/api/fetchMySales.js";
-import {
-  markOrderItemCancelled,
-  markOrderItemDelivered,
-  markOrderItemShipped,
-} from "../../../entities/order/api/updateOrderItemStatus.js";
+import { orderQueryKeys } from "../../../entities/order/model/orderQueryKeys.js";
+import { useMySalesQuery } from "../../../entities/order/model/useMySalesQuery.js";
+import { useOrderMutations } from "../../../entities/order/model/useOrderMutations.js";
 import {
   ORDER_STATUS_CANCELLED,
   ORDER_STATUS_SHIPPED,
@@ -55,11 +53,8 @@ export function MySalesPage({
   const isSearchPending = searchTerm !== debouncedSearchTerm;
   const hasSearchQuery = debouncedSearchTerm.trim() !== "";
 
-  const [phase, setPhase] = useState("loading");
-  const [orders, setOrders] = useState(
-    /** @type {import('../../../entities/order/model/types.js').Order[]} */ ([]),
-  );
-  const [error, setError] = useState("");
+  const queryClient = useQueryClient();
+  const { cancelItemMutation, shipItemMutation, deliverItemMutation } = useOrderMutations();
   const {
     catalogProduct,
     openCatalogProductFromOrderLine,
@@ -69,51 +64,56 @@ export function MySalesPage({
   const [pendingActionKey, setPendingActionKey] = useState(null);
   const [itemActionErrors, setItemActionErrors] = useState({});
 
-  const getSalesParams = useCallback(() => {
-    return {
+  const salesParams = useMemo(
+    () => ({
       ...(statusFilter ? { status: statusFilter } : {}),
       ...(hasSearchQuery ? { search: debouncedSearchTerm.trim() } : {}),
-    };
-  }, [statusFilter, hasSearchQuery, debouncedSearchTerm]);
+    }),
+    [statusFilter, hasSearchQuery, debouncedSearchTerm],
+  );
+
+  const salesQuery = useMySalesQuery({
+    status: salesParams.status,
+    search: salesParams.search,
+    enabled: isAuthorized,
+  });
+  const orders = salesQuery.data?.orders ?? [];
+  const phase = salesQuery.isPending
+    ? "loading"
+    : salesQuery.isError
+      ? "error"
+      : "success";
+  const error =
+    salesQuery.error instanceof Error
+      ? salesQuery.error.message
+      : API_CLIENT_UI.FETCH_MY_SALES_FALLBACK;
 
   const reloadSales = useCallback(async () => {
-    try {
-      const list = await fetchMySales(getSalesParams());
-      setOrders(list);
-      setPhase("success");
-      setError("");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : API_CLIENT_UI.FETCH_MY_SALES_FALLBACK);
-      setPhase("error");
-    }
-  }, [getSalesParams]);
+    await salesQuery.refetch();
+  }, [salesQuery]);
 
   useRefetchOnVisible(reloadSales, phase === "success");
 
-  useEffect(() => {
-    let isCancelled = false;
-    setPhase("loading");
+  const patchOrders = useCallback(
+    (/** @type {(orders: import('../../../entities/order/model/types.js').Order[]) => import('../../../entities/order/model/types.js').Order[]} */ updater) => {
+      queryClient.setQueryData(orderQueryKeys.sales(salesParams), (old) => {
+        const page = Array.isArray(old)
+          ? {
+              orders: old,
+              total: old.length,
+              page: 1,
+              limit: old.length || 20,
+            }
+          : (old ?? { orders: [], total: 0, page: 1, limit: 20 });
 
-    const load = async () => {
-      try {
-        const list = await fetchMySales(getSalesParams());
-        if (isCancelled) return;
-        setOrders(list);
-        setPhase("success");
-      } catch (e) {
-        if (isCancelled) return;
-        setError(
-          e instanceof Error ? e.message : API_CLIENT_UI.FETCH_MY_SALES_FALLBACK,
-        );
-        setPhase("error");
-      }
-    };
-
-    void load();
-    return () => {
-      isCancelled = true;
-    };
-  }, [getSalesParams]);
+        return {
+          ...page,
+          orders: updater(page.orders),
+        };
+      });
+    },
+    [queryClient, salesParams],
+  );
 
   const handleCancelItem = async ({ orderId, itemIndex }) => {
     if (!window.confirm(ORDER_CARD_UI.CANCEL_CONFIRM)) {
@@ -124,7 +124,7 @@ export function MySalesPage({
     setPendingActionKey(actionKey);
     setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
 
-    setOrders((prev) =>
+    patchOrders((prev) =>
       prev.map((order) => {
         if (order._id !== orderId) return order;
         const nextItems = order.items.map((item, index) => {
@@ -138,8 +138,8 @@ export function MySalesPage({
     );
 
     try {
-      const updatedOrder = await markOrderItemCancelled(orderId, itemIndex);
-      setOrders((prev) =>
+      const updatedOrder = await cancelItemMutation.mutateAsync({ orderId, itemIndex });
+      patchOrders((prev) =>
         prev.map((order) => (order._id === orderId ? updatedOrder : order)),
       );
       onQueueChanged?.();
@@ -163,7 +163,7 @@ export function MySalesPage({
     setPendingActionKey(actionKey);
     setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
 
-    setOrders((prev) =>
+    patchOrders((prev) =>
       prev.map((order) => {
         if (order._id !== orderId) return order;
         const nextItems = order.items.map((item, index) => {
@@ -177,8 +177,8 @@ export function MySalesPage({
     );
 
     try {
-      const updatedOrder = await markOrderItemDelivered(orderId, itemIndex);
-      setOrders((prev) =>
+      const updatedOrder = await deliverItemMutation.mutateAsync({ orderId, itemIndex });
+      patchOrders((prev) =>
         prev.map((order) => (order._id === orderId ? updatedOrder : order)),
       );
       onQueueChanged?.();
@@ -202,7 +202,7 @@ export function MySalesPage({
     setPendingActionKey(actionKey);
     setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
 
-    setOrders((prev) =>
+    patchOrders((prev) =>
       prev.map((order) => {
         if (order._id !== orderId) return order;
         const nextItems = order.items.map((item, index) => {
@@ -216,8 +216,8 @@ export function MySalesPage({
     );
 
     try {
-      const updatedOrder = await markOrderItemShipped(orderId, itemIndex);
-      setOrders((prev) =>
+      const updatedOrder = await shipItemMutation.mutateAsync({ orderId, itemIndex });
+      patchOrders((prev) =>
         prev.map((order) => (order._id === orderId ? updatedOrder : order)),
       );
       onQueueChanged?.();

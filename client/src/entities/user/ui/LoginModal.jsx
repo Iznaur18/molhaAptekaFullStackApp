@@ -4,8 +4,7 @@ import { LOGIN_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { isAuthSessionError } from "../../../shared/lib/isAuthSessionError.js";
 import { FormFieldLabel } from "../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
 import { ProductModalShell } from "../../../shared/ui/ProductModalShell/ProductModalShell.jsx";
-import { establishAuthSession } from "../api/fetchCurrentUserProfile.js";
-import { loginUser } from "../api/loginUser.js";
+import { useLoginMutation } from "../model/useLoginMutation.js";
 
 import "./LoginModal.css";
 
@@ -26,7 +25,22 @@ const INITIAL_FORM = {
  */
 export function LoginModal({ isOpen, onClose, onSuccess, onRegisterClick }) {
   const [form, setForm] = useState(INITIAL_FORM);
-  const [status, setStatus] = useState({ kind: "idle", message: "" });
+  const loginMutation = useLoginMutation();
+  const status = loginMutation.isPending
+    ? { kind: "loading", message: "" }
+    : loginMutation.isError
+      ? {
+          kind: "error",
+          message:
+            loginMutation.error instanceof Error && isAuthSessionError(loginMutation.error)
+              ? LOGIN_MODAL_UI.SESSION_VERIFY_FALLBACK
+              : loginMutation.error instanceof Error
+                ? loginMutation.error.message
+                : LOGIN_MODAL_UI.ERROR_GENERIC,
+        }
+      : loginMutation.isSuccess
+        ? { kind: "success", message: LOGIN_MODAL_UI.SUCCESS }
+        : { kind: "idle", message: "" };
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -35,32 +49,22 @@ export function LoginModal({ isOpen, onClose, onSuccess, onRegisterClick }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setStatus({ kind: "loading", message: "" });
-
     try {
-      await loginUser(form);
-      await establishAuthSession();
+      await loginMutation.mutateAsync(form);
       setForm(INITIAL_FORM);
-      setStatus({ kind: "success", message: LOGIN_MODAL_UI.SUCCESS });
       onSuccess?.();
-    } catch (error) {
-      const message =
-        error instanceof Error && isAuthSessionError(error)
-          ? LOGIN_MODAL_UI.SESSION_VERIFY_FALLBACK
-          : error instanceof Error
-            ? error.message
-            : LOGIN_MODAL_UI.ERROR_GENERIC;
-      setStatus({ kind: "error", message });
+    } catch {
+      // status derived from mutation
     }
   };
 
   const handleClose = () => {
-    setStatus({ kind: "idle", message: "" });
+    loginMutation.reset();
     onClose();
   };
 
   const handleRegisterClick = () => {
-    setStatus({ kind: "idle", message: "" });
+    loginMutation.reset();
     onRegisterClick?.();
   };
 

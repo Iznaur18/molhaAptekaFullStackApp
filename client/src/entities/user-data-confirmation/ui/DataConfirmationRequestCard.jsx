@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { countWords } from "../../user/lib/countWords.js";
 import { UserPremiumDisplayName } from "../../user/ui/UserPremiumDisplayName.jsx";
-import { resolveDataConfirmationRequest } from "../api/resolveDataConfirmationRequest.js";
+import { useResolveDataConfirmationRequestMutation } from "../model/useResolveDataConfirmationRequestMutation.js";
 import {
   formatPassportDate,
   formatPassportFullName,
@@ -28,8 +28,9 @@ import "./DataConfirmationRequestCard.css";
  * }} props
  */
 export function DataConfirmationRequestCard({ request, onResolved, onOpenUser }) {
+  const resolveRequestMutation = useResolveDataConfirmationRequestMutation();
   const [staffNote, setStaffNote] = useState("");
-  const [isBusy, setIsBusy] = useState(false);
+  const isBusy = resolveRequestMutation.isPending;
   const [error, setError] = useState("");
 
   const applicant = request.user;
@@ -51,21 +52,21 @@ export function DataConfirmationRequestCard({ request, onResolved, onOpenUser })
       }
     }
 
-    setIsBusy(true);
     setError("");
     try {
-      await resolveDataConfirmationRequest(String(request._id), {
-        resolution,
-        staffNote:
-          resolution === USER_DATA_CONFIRMATION_RESOLUTION_REJECT
-            ? staffNote.trim()
-            : "",
+      await resolveRequestMutation.mutateAsync({
+        requestId: String(request._id),
+        body: {
+          resolution,
+          staffNote:
+            resolution === USER_DATA_CONFIRMATION_RESOLUTION_REJECT
+              ? staffNote.trim()
+              : "",
+        },
       });
       onResolved();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Ошибка");
-    } finally {
-      setIsBusy(false);
     }
   };
 

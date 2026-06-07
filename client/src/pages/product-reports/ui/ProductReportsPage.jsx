@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 
-import { fetchPendingProductReports } from "../../../entities/product-report/api/fetchPendingProductReports.js";
+import { usePendingProductReportsQuery } from "../../../entities/product-report/model/usePendingProductReportsQuery.js";
 import { ProductReportGroupCard } from "../../../entities/product-report/ui/ProductReportGroupCard.jsx";
-import { fetchPendingUserStoryReports } from "../../../entities/user-story/api/fetchPendingUserStoryReports.js";
+import { usePendingUserStoryReportsQuery } from "../../../entities/user-story/model/usePendingUserStoryReportsQuery.js";
 import { UserStoryReportGroupCard } from "../../../entities/user-story/ui/UserStoryReportGroupCard.jsx";
 import {
   API_CLIENT_UI,
@@ -23,38 +23,26 @@ export function ProductReportsPage({
   onProductClick,
   onQueueChanged,
 }) {
-  const [phase, setPhase] = useState("loading");
-  const [productGroups, setProductGroups] = useState(
-    /** @type {import('../../../entities/product-report/model/types.js').ProductReportGroup[]} */ ([]),
-  );
-  const [storyGroups, setStoryGroups] = useState(
-    /** @type {import('../../../entities/user-story/model/types.js').UserStoryReportGroup[]} */ ([]),
-  );
-  const [error, setError] = useState("");
+  const productReportsQuery = usePendingProductReportsQuery();
+  const storyReportsQuery = usePendingUserStoryReportsQuery();
 
-  const loadQueue = useCallback(async () => {
-    setPhase("loading");
-    setError("");
-    try {
-      const [productResult, storyResult] = await Promise.all([
-        fetchPendingProductReports(),
-        fetchPendingUserStoryReports(),
-      ]);
-      setProductGroups(productResult.groups);
-      setStoryGroups(storyResult.groups);
-      setPhase("success");
-      onQueueChanged?.();
-    } catch (e) {
-      setError(
-        e instanceof Error ? e.message : API_CLIENT_UI.FETCH_PRODUCT_REPORTS_FALLBACK,
-      );
-      setPhase("error");
+  const productGroups = productReportsQuery.data?.groups ?? [];
+  const storyGroups = storyReportsQuery.data?.groups ?? [];
+  const isLoading = productReportsQuery.isPending || storyReportsQuery.isPending;
+  const queryError = productReportsQuery.error ?? storyReportsQuery.error;
+  const error =
+    queryError instanceof Error
+      ? queryError.message
+      : API_CLIENT_UI.FETCH_PRODUCT_REPORTS_FALLBACK;
+  const phase = isLoading ? "loading" : queryError ? "error" : "success";
+
+  const reloadQueue = useCallback(async () => {
+    if (onQueueChanged) {
+      await onQueueChanged();
+      return;
     }
-  }, [onQueueChanged]);
-
-  useEffect(() => {
-    void loadQueue();
-  }, [loadQueue]);
+    await Promise.all([productReportsQuery.refetch(), storyReportsQuery.refetch()]);
+  }, [onQueueChanged, productReportsQuery, storyReportsQuery]);
 
   const isEmpty = productGroups.length === 0 && storyGroups.length === 0;
 
@@ -83,7 +71,7 @@ export function ProductReportsPage({
 
   return (
     <div className="product-reports-page">
-      {error ? (
+      {error && !isEmpty ? (
         <p
           className="product-reports-page__state product-reports-page__state_error"
           role="alert"
@@ -102,7 +90,7 @@ export function ProductReportsPage({
               <li key={String(group.product._id)} role="listitem">
                 <ProductReportGroupCard
                   group={group}
-                  onResolved={() => void loadQueue()}
+                  onResolved={() => void reloadQueue()}
                   onOpenProduct={(product) => onProductClick?.(product)}
                   onOpenUser={(userId) => onSellerNameClick?.(userId)}
                 />
@@ -122,7 +110,7 @@ export function ProductReportsPage({
               <li key={String(group.story._id)} role="listitem">
                 <UserStoryReportGroupCard
                   group={group}
-                  onResolved={() => void loadQueue()}
+                  onResolved={() => void reloadQueue()}
                   onOpenUser={(userId) => onSellerNameClick?.(userId)}
                 />
               </li>

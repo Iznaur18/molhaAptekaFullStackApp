@@ -10,17 +10,17 @@
   align-items: center;
   gap: 0.4rem;
   font-size: 0.85rem;
-  color: #4b5563;
+  color: var(--iz-color-text-tertiary);
 }
 
 .order-status-select__control {
   padding: 0.35rem 0.6rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--iz-color-border);
   border-radius: 0.4rem;
-  background: #fff;
+  background: var(--iz-color-surface);
   font: inherit;
   font-size: 0.9rem;
-  color: #111827;
+  color: var(--iz-color-text);
 }
 
 .order-status-select__control:disabled {
@@ -30,10 +30,10 @@
 
 .order-status-select__pending {
   font-size: 0.8rem;
-  color: #6b7280;
+  color: var(--iz-color-text-muted);
 }
 
 .order-status-select__error {
   font-size: 0.8rem;
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
 }

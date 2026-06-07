@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { mongoIdSchema } from "./mongoId.js";
+import { optionalLimitQuery, optionalPageQuery, optionalTrimmedString } from "./queryHelpers.js";
 
 /** Синхрон с `server/constants/orderConstants.js`. */
 export const ORDER_PAYMENT_METHODS = ["cashOnDelivery", "cardPrepaid"];
@@ -69,4 +70,68 @@ export const orderFromApiSchema = z
 export const createOrderDataSchema = z.object({
   message: z.string(),
   order: orderFromApiSchema,
+});
+
+export const orderIdParamsSchema = z.object({
+  orderId: mongoIdSchema,
+});
+
+export const orderItemActionParamsSchema = z.object({
+  orderId: mongoIdSchema,
+  itemIndex: z.coerce.number().int().min(0, "itemIndex должен быть целым числом >= 0"),
+});
+
+export const updateOrderStatusBodySchema = z.object({
+  status: z.enum(ORDER_STATUSES),
+});
+
+/** Query `GET /order/all`. */
+export const getAllOrdersQuerySchema = z.object({
+  page: optionalPageQuery,
+  limit: optionalLimitQuery,
+  status: z.enum(ORDER_STATUSES).optional(),
+});
+
+/** Синхрон с `server/validations/order/getMySalesValidation.js`. */
+export const MY_SALES_SEARCH_MAX_LENGTH = 100;
+export const MY_SALES_PRODUCT_IDS_QUERY_MAX_LENGTH = 2800;
+export const MY_SALES_MAX_PRODUCT_IDS_IN_FILTER = 50;
+
+/** Query `GET /order/sales`. */
+export const getMySalesQuerySchema = z.object({
+  page: optionalPageQuery,
+  limit: optionalLimitQuery,
+  status: z.enum(ORDER_STATUSES).optional(),
+  search: optionalTrimmedString.refine(
+    (value) => value === undefined || value.length <= MY_SALES_SEARCH_MAX_LENGTH,
+    `search не более ${MY_SALES_SEARCH_MAX_LENGTH} символов`,
+  ),
+  productIds: optionalTrimmedString
+    .refine(
+      (value) => value === undefined || value.length <= MY_SALES_PRODUCT_IDS_QUERY_MAX_LENGTH,
+      `productIds не длиннее ${MY_SALES_PRODUCT_IDS_QUERY_MAX_LENGTH} символов`,
+    )
+    .superRefine((value, ctx) => {
+      if (value === undefined) return;
+      const parts = value
+        .split(",")
+        .map((part) => part.trim())
+        .filter(Boolean);
+      if (parts.length > MY_SALES_MAX_PRODUCT_IDS_IN_FILTER) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `не более ${MY_SALES_MAX_PRODUCT_IDS_IN_FILTER} товаров в фильтре`,
+        });
+        return;
+      }
+      for (const id of parts) {
+        if (!/^[a-f\d]{24}$/i.test(id)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "неверный идентификатор товара в productIds",
+          });
+          return;
+        }
+      }
+    }),
 });

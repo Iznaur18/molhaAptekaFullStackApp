@@ -13,10 +13,10 @@
 .notifications-page__clear {
   margin: 0;
   padding: 0.4rem 0.85rem;
-  border: 1px solid rgba(31, 111, 235, 0.45);
+  border: 1px solid var(--iz-color-action-border-strong);
   border-radius: 0.5rem;
   background: transparent;
-  color: #1f6feb;
+  color: var(--iz-color-action);
   font: inherit;
   font-size: 0.875rem;
   font-weight: 500;
@@ -24,8 +24,8 @@
 }
 
 .notifications-page__clear:hover:not(:disabled) {
-  border-color: #1f6feb;
-  background: rgba(31, 111, 235, 0.08);
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action-bg-hover);
 }
 
 .notifications-page__clear:disabled {
@@ -35,13 +35,13 @@
 
 .notifications-page__error {
   margin: 0 0 0.75rem;
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
   font-size: 0.875rem;
 }
 
 .notifications-page__empty {
   margin: 0;
-  color: #6b7280;
+  color: var(--iz-color-text-muted);
   font-size: 0.9375rem;
 }
 
@@ -62,10 +62,10 @@
   width: 100%;
   margin: 0;
   padding: 0.75rem 0.85rem;
-  border: 1px solid #bfdbfe;
+  border: 1px solid var(--iz-color-info-muted);
   border-radius: 0.5rem;
-  background: #eff6ff;
-  color: #1e3a8a;
+  background: var(--iz-color-action-soft);
+  color: var(--iz-color-info-navy);
   font: inherit;
   font-size: 0.875rem;
   text-align: left;
@@ -73,6 +73,6 @@
 }
 
 .notifications-page__item-btn:hover {
-  background: #dbeafe;
-  border-color: #93c5fd;
+  background: var(--iz-color-action-border);
+  border-color: var(--iz-color-action-light);
 }

@@ -10,8 +10,8 @@
 }
 
 .raffles-staff-page__row_live {
-  border-color: color-mix(in srgb, #7c3aed 35%, transparent);
-  background: color-mix(in srgb, #ede9fe 45%, transparent);
+  border-color: color-mix(in srgb, var(--iz-color-accent-purple) 35%, transparent);
+  background: color-mix(in srgb, var(--iz-color-accent-purple-soft) 45%, transparent);
 }
 
 .raffles-staff-page__manage {
@@ -24,7 +24,7 @@
 }
 
 .raffles-staff-page__state_error {
-  color: #b91c1c;
+  color: var(--iz-color-danger-deep);
 }
 
 .raffles-staff-page__list {
@@ -57,7 +57,7 @@
 }
 
 .raffles-staff-page__thumb_video {
-  background: #000;
+  background: var(--iz-color-black);
 }
 
 .raffles-staff-page__title {
@@ -74,7 +74,7 @@
 .raffles-staff-page__row-error {
   margin: 0.45rem 0 0;
   font-size: 0.8rem;
-  color: #b91c1c;
+  color: var(--iz-color-danger-deep);
 }
 
 .raffles-staff-page__actions {
@@ -94,14 +94,14 @@
 
 .raffles-staff-page__reject,
 .raffles-staff-page__delete {
-  border: 1px solid #f87171;
-  background: #fee2e2;
-  color: #991b1b;
+  border: 1px solid var(--iz-color-danger-border);
+  background: var(--iz-color-danger-soft);
+  color: var(--iz-color-danger-text);
 }
 
 .raffles-staff-page__edit {
-  border: 1px solid #7c3aed;
-  background: #ede9fe;
-  color: #5b21b6;
+  border: 1px solid var(--iz-color-accent-purple);
+  background: var(--iz-color-accent-purple-soft);
+  color: var(--iz-color-accent-purple-text);
   font-weight: 700;
 }

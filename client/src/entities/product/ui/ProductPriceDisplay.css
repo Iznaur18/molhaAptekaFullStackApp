@@ -22,7 +22,7 @@
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
-  color: #1d4ed8;
+  color: var(--iz-color-link-hover);
 }
 
 .product-price-display__old {
@@ -44,9 +44,9 @@
   width: fit-content;
   max-width: 100%;
   border-radius: 0.35rem;
-  border: 1px solid #f87171;
-  background: #fee2e2;
-  color: #991b1b;
+  border: 1px solid var(--iz-color-danger-border);
+  background: var(--iz-color-danger-soft);
+  color: var(--iz-color-danger-text);
   font-size: 0.72rem;
   font-weight: 700;
   line-height: 1.35;
@@ -54,7 +54,7 @@
 }
 
 .product-discount-badge--overlay {
-  box-shadow: 0 1px 6px rgb(0 0 0 / 28%);
+  box-shadow: 0 1px 6px var(--iz-shadow-badge);
   white-space: normal;
   max-width: min(100%, 9.5rem);
   text-align: left;

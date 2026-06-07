@@ -9,7 +9,7 @@
   border-radius: var(--product-card-radius);
   overflow: hidden;
   text-align: left;
-  background: #fff;
+  background: var(--iz-color-surface);
   transition:
     border-color 0.15s ease,
     box-shadow 0.15s ease;
@@ -17,7 +17,7 @@
 
 .product-card:hover {
   border-color: color-mix(in srgb, currentColor 24%, transparent);
-  box-shadow: 0 4px 14px color-mix(in srgb, CanvasText 6%, transparent);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--iz-color-canvas-text) 6%, transparent);
 }
 
 .product-card-promotion-frame,
@@ -32,15 +32,15 @@
 }
 
 .product-card-promotion-frame--tier-1 > .product-card {
-  --product-card-promotion-accent: #d97706;
-  --product-card-promotion-accent-soft: #fbbf24;
+  --product-card-promotion-accent: var(--iz-color-warning);
+  --product-card-promotion-accent-soft: var(--iz-color-warning-soft);
 
   border: 2px solid
     color-mix(in srgb, var(--product-card-promotion-accent) 68%, transparent);
   background: linear-gradient(
     165deg,
-    color-mix(in srgb, #fffbeb 90%, var(--product-card-promotion-accent-soft)),
-    color-mix(in srgb, Canvas 86%, #fffbeb)
+    color-mix(in srgb, var(--iz-color-promotion-boost-bg) 90%, var(--product-card-promotion-accent-soft)),
+    color-mix(in srgb, var(--iz-color-canvas) 86%, var(--iz-color-promotion-boost-bg))
   );
   box-shadow:
     0 0 0 1px
@@ -49,14 +49,14 @@
 }
 
 .product-card-promotion-frame--tier-2 > .product-card {
-  --product-card-promotion-accent: #7c3aed;
-  --product-card-promotion-accent-soft: #c4b5fd;
+  --product-card-promotion-accent: var(--iz-color-accent-purple);
+  --product-card-promotion-accent-soft: var(--iz-color-premium-purple-muted);
 
   border: 2px solid color-mix(in srgb, var(--product-card-promotion-accent) 78%, transparent);
   background: linear-gradient(
     165deg,
-    color-mix(in srgb, #ede9fe 94%, #7c3aed),
-    color-mix(in srgb, #f5f3ff 88%, #ddd6fe)
+    color-mix(in srgb, var(--iz-color-accent-purple-soft) 94%, var(--iz-color-accent-purple)),
+    color-mix(in srgb, var(--iz-color-premium-purple-soft) 88%, var(--iz-color-accent-purple-hover))
   );
   box-shadow:
     0 0 0 1px color-mix(in srgb, var(--product-card-promotion-accent-soft) 52%, transparent),
@@ -72,7 +72,7 @@
   background: linear-gradient(
     165deg,
     color-mix(in srgb, var(--product-card-banner-gradient-end) 92%, var(--product-card-banner-accent-soft)),
-    color-mix(in srgb, Canvas 88%, var(--product-card-banner-accent-soft))
+    color-mix(in srgb, var(--iz-color-canvas) 88%, var(--product-card-banner-accent-soft))
   );
   box-shadow:
     0 0 0 1px
@@ -91,14 +91,14 @@
 }
 
 .product-card-premium-frame > .product-card {
-  border: 2px solid #d4af37;
-  background: Canvas;
+  border: 2px solid var(--iz-color-gold);
+  background: var(--iz-color-canvas);
   box-shadow: none;
 }
 
 .product-card-premium-frame > .product-card:hover {
-  border-color: #d4af37;
-  box-shadow: 0 4px 14px color-mix(in srgb, CanvasText 6%, transparent);
+  border-color: var(--iz-color-gold);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--iz-color-canvas-text) 6%, transparent);
 }
 
 .product-card-promotion-frame.product-card-premium-frame.product-card-promotion-frame--tier-1
@@ -106,36 +106,36 @@
   border-color: var(--product-card-promotion-accent);
   background: linear-gradient(
     165deg,
-    color-mix(in srgb, #ffefaf 88%, var(--product-card-promotion-accent-soft)),
-    color-mix(in srgb, Canvas 84%, #fff1ba)
+    color-mix(in srgb, var(--iz-color-gold-highlight) 88%, var(--product-card-promotion-accent-soft)),
+    color-mix(in srgb, var(--iz-color-canvas) 84%, var(--iz-color-promotion-boost-bg-alt))
   );
 }
 
 .product-card-promotion-frame.product-card-premium-frame.product-card-promotion-frame--tier-2
   > .product-card {
-  border-color: color-mix(in srgb, #7c3aed 82%, #d4af37);
+  border-color: color-mix(in srgb, var(--iz-color-accent-purple) 82%, var(--iz-color-gold));
   background: linear-gradient(
     165deg,
-    color-mix(in srgb, #ede9fe 92%, #7c3aed),
-    color-mix(in srgb, #f5f3ff 86%, #ddd6fe)
+    color-mix(in srgb, var(--iz-color-accent-purple-soft) 92%, var(--iz-color-accent-purple)),
+    color-mix(in srgb, var(--iz-color-premium-purple-soft) 86%, var(--iz-color-accent-purple-hover))
   );
 }
 
 .product-card-promotion-frame.product-card-premium-frame.product-card-promotion-frame--tier-3
   > .product-card {
-  border-color: color-mix(in srgb, var(--product-card-banner-accent) 68%, #d4af37);
+  border-color: color-mix(in srgb, var(--product-card-banner-accent) 68%, var(--iz-color-gold));
   background: linear-gradient(
     165deg,
     color-mix(in srgb, var(--product-card-banner-gradient-end) 88%, var(--product-card-banner-accent-soft)),
-    color-mix(in srgb, Canvas 84%, var(--product-card-banner-accent-soft))
+    color-mix(in srgb, var(--iz-color-canvas) 84%, var(--product-card-banner-accent-soft))
   );
 }
 
 .product-card--raffle-participant {
-  border-color: color-mix(in srgb, #edc93a 45%, transparent);
+  border-color: color-mix(in srgb, var(--iz-color-star) 45%, transparent);
   background: linear-gradient(
     165deg,
-    color-mix(in srgb, #f5f3ff 88%, Canvas),
-    color-mix(in srgb, Canvas 90%, #faf5ff)
+    color-mix(in srgb, var(--iz-color-premium-purple-soft) 88%, var(--iz-color-canvas)),
+    color-mix(in srgb, var(--iz-color-canvas) 90%, var(--iz-color-accent-pink-surface))
   );
 }

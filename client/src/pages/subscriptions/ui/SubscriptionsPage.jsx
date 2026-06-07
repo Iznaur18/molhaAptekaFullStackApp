@@ -1,6 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
-
-import { fetchMyFollowing } from "../../../entities/user-follow/api/fetchMyFollowing.js";
+import { useMyFollowingQuery } from "../../../entities/user-follow/model/useMyFollowingQuery.js";
 import { SubscriptionUserRow } from "./SubscriptionUserRow.jsx";
 import { SUBSCRIPTIONS_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
@@ -14,37 +12,21 @@ import "./SubscriptionsPage.css";
  * }} props
  */
 export function SubscriptionsPage({ isAuthorized, onRequestLogin, onUserClick }) {
-  const [users, setUsers] = useState(
-    /** @type {import('../../../entities/user/model/types.js').UserSearchListItem[]} */ ([]),
-  );
-  const [status, setStatus] = useState(
-    /** @type {{ kind: 'idle' | 'loading' | 'error'; message?: string }} */ ({
-      kind: "loading",
-    }),
-  );
-
-  const load = useCallback(async () => {
-    if (!isAuthorized) {
-      setUsers([]);
-      setStatus({ kind: "idle" });
-      return;
-    }
-
-    setStatus({ kind: "loading" });
-    try {
-      const { users: rows } = await fetchMyFollowing({ page: 1, limit: 50 });
-      setUsers(rows);
-      setStatus({ kind: "idle" });
-    } catch (e) {
-      const message =
-        e instanceof Error ? e.message : SUBSCRIPTIONS_PAGE_UI.FETCH_FALLBACK;
-      setStatus({ kind: "error", message });
-    }
-  }, [isAuthorized]);
-
-  useEffect(() => {
-    void load();
-  }, [load]);
+  const followingQuery = useMyFollowingQuery({ enabled: isAuthorized });
+  const users = followingQuery.data?.users ?? [];
+  const status = !isAuthorized
+    ? { kind: "idle" }
+    : followingQuery.isPending
+      ? { kind: "loading" }
+      : followingQuery.isError
+        ? {
+            kind: "error",
+            message:
+              followingQuery.error instanceof Error
+                ? followingQuery.error.message
+                : SUBSCRIPTIONS_PAGE_UI.FETCH_FALLBACK,
+          }
+        : { kind: "idle" };
 
   if (!isAuthorized) {
     return (

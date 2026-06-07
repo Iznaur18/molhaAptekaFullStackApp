@@ -1,7 +1,6 @@
 import { useState } from "react";
 
-import { establishAuthSession } from "../api/fetchCurrentUserProfile.js";
-import { registerUser } from "../api/registerUser.js";
+import { useRegisterMutation } from "../model/useRegisterMutation.js";
 import { buildRegisterUserPayload } from "../lib/buildRegisterUserPayload.js";
 import { getRegisterEmptyRequiredFieldKeys } from "../lib/getRegisterEmptyRequiredFieldKeys.js";
 import { validatePasswordConfirm } from "../lib/validatePasswordConfirm.js";
@@ -39,6 +38,7 @@ const withInvalidFieldClass = (baseClass, fieldKey, invalidFields) =>
  */
 export function RegisterModal({ isOpen, onClose, onSuccess }) {
   const [form, setForm] = useState(INITIAL_FORM);
+  const registerMutation = useRegisterMutation();
   const [status, setStatus] = useState({ kind: "idle", message: "" });
   const [invalidFields, setInvalidFields] = useState(
     /** @type {Set<string>} */ (() => new Set()),
@@ -91,8 +91,7 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
 
     try {
       const payload = buildRegisterUserPayload(form);
-      await registerUser(payload);
-      await establishAuthSession();
+      await registerMutation.mutateAsync(payload);
       setForm(INITIAL_FORM);
       setInvalidFields(new Set());
       setStatus({ kind: "idle", message: "" });
@@ -111,6 +110,7 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
   const handleClose = () => {
     setStatus({ kind: "idle", message: "" });
     setInvalidFields(new Set());
+    registerMutation.reset();
     onClose();
   };
 

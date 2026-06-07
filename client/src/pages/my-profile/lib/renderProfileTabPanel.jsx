@@ -17,7 +17,7 @@ import {
   LazyRafflesStaffPage,
   LazySearchSynonymsAdminPage,
   LazySubscriptionsPage,
-} from "../../home/lib/lazyHomePages.js";
+} from "../../../app/lib/lazyAppShellPages.js";
 
 /**
  * Контент вкладки профиля (без оболочки MyProfilePage).
@@ -38,18 +38,15 @@ export function renderProfileTabPanel(mainView, props) {
     myProfilePage,
     handlePremiumPurchased,
     setIsDataConfirmationModalOpen,
-    dataConfirmationStatusRefreshTick,
     myProductsCatalogSection,
-    raffleRefreshTick,
     refreshPendingModerationCount,
     refreshPendingProductReportsCount,
     refreshPendingRafflesCount,
     refreshPendingDataConfirmationCount,
     refreshPendingInstallmentModerationCount,
     refreshPendingInstallmentDisputesCount,
-    refreshFeaturedRaffle,
-    setRaffleRefreshTick,
-    setCatalogRefreshTick,
+    refreshRaffleSurfaces,
+    refreshCatalogFeed,
     setRaffleModal,
   } = props;
 
@@ -76,7 +73,6 @@ export function renderProfileTabPanel(mainView, props) {
           isAuthorized={isAuthorized}
           onRequestLogin={onRequestLogin}
           onOpenRequest={() => setIsDataConfirmationModalOpen(true)}
-          statusRefreshTick={dataConfirmationStatusRefreshTick}
         />
       );
     case "premium":
@@ -165,12 +161,10 @@ export function renderProfileTabPanel(mainView, props) {
     case "staff-raffles":
       return (
         <LazyRafflesStaffPage
-          refreshTick={raffleRefreshTick}
           onQueueChanged={() => {
             void refreshPendingRafflesCount();
-            setRaffleRefreshTick((n) => n + 1);
-            setCatalogRefreshTick((n) => n + 1);
-            void refreshFeaturedRaffle();
+            void refreshRaffleSurfaces();
+            void refreshCatalogFeed();
           }}
           onEditRaffle={(raffle) =>
             setRaffleModal({ mode: "edit", raffle, useStaffApi: true })

@@ -7,7 +7,7 @@
   font-size: 0.875rem;
   font-weight: 600;
   line-height: 1.4;
-  color: #1f6feb;
+  color: var(--iz-color-action);
   list-style: none;
   user-select: none;
 }
@@ -79,29 +79,29 @@
 
 .user-vote-rating-form__range {
   width: 100%;
-  accent-color: #1f6feb;
+  accent-color: var(--iz-color-action);
 }
 
 .user-vote-rating-form__error {
   margin: 0;
   font-size: 0.84rem;
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
 }
 
 .user-vote-rating-form__flash {
   margin: 0;
   font-size: 0.84rem;
-  color: #067647;
+  color: var(--iz-color-success-strong);
 }
 
 .user-vote-rating-form__submit {
   align-self: flex-start;
   margin-top: 0.15rem;
   padding: 0.45rem 0.85rem;
-  border: 1px solid #1f6feb;
+  border: 1px solid var(--iz-color-action);
   border-radius: 0.5rem;
-  background: #1f6feb;
-  color: #fff;
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast);
   font: inherit;
   font-size: 0.875rem;
   font-weight: 600;
@@ -114,8 +114,8 @@
 }
 
 .user-vote-rating-form__submit_done {
-  border-color: color-mix(in srgb, CanvasText 22%, transparent);
-  background: color-mix(in srgb, CanvasText 8%, transparent);
+  border-color: color-mix(in srgb, var(--iz-color-canvas-text) 22%, transparent);
+  background: color-mix(in srgb, var(--iz-color-canvas-text) 8%, transparent);
   color: inherit;
   cursor: default;
 }
@@ -133,10 +133,10 @@
 
 .user-vote-rating-form__login {
   padding: 0.4rem 0.8rem;
-  border: 1px solid rgba(31, 111, 235, 0.45);
+  border: 1px solid var(--iz-color-action-border-strong);
   border-radius: 0.5rem;
   background: transparent;
-  color: #1f6feb;
+  color: var(--iz-color-action);
   font: inherit;
   font-size: 0.875rem;
   font-weight: 600;
@@ -144,5 +144,5 @@
 }
 
 .user-vote-rating-form__login:hover {
-  background: rgba(31, 111, 235, 0.08);
+  background: var(--iz-color-action-bg-hover);
 }

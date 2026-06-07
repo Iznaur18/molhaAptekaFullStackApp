@@ -19,6 +19,8 @@
  * @typedef {import('zod').infer<typeof import('./authMe.js').userPublicProfileSchema>} UserPublicProfileContract
  * @typedef {import('zod').infer<typeof import('./authMe.js').inAppNotificationSchema>} InAppNotificationContract
  * @typedef {import('zod').infer<typeof import('./authMe.js').authMeDataSchema>} AuthMeDataContract
+ * @typedef {import('zod').infer<typeof import('./authCredentials.js').loginBodySchema>} LoginBodyContract
+ * @typedef {import('zod').infer<typeof import('./authCredentials.js').registerBodySchema>} RegisterBodyContract
  */
 
 export {};

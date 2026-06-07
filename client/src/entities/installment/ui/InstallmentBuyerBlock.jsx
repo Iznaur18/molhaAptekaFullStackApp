@@ -8,7 +8,7 @@ import {
   ORDER_PAYMENT_METHODS,
   ORDER_PAYMENT_METHOD_LABEL_RU,
 } from "../../order/model/constants.js";
-import { createInstallmentContract } from "../api/installmentApi.js";
+import { useInstallmentMutations } from "../model/useInstallmentMutations.js";
 import { INSTALLMENT_UI } from "../../../shared/config/appUiCopy.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 import { getProductPurchaseLimit } from "../../product/lib/getProductPurchaseLimit.js";
@@ -39,13 +39,14 @@ export function InstallmentBuyerBlock({
   onSuccess,
   onRequestLogin,
 }) {
+  const { createContractMutation } = useInstallmentMutations();
   const [selectedPlanId, setSelectedPlanId] = useState(program.plans[0]?._id ?? "");
   const [quantity, setQuantity] = useState(1);
   const [deliveryAddress, setDeliveryAddress] = useState(() =>
     addressValueFromUser(defaultDeliveryAddress),
   );
   const [paymentMethod, setPaymentMethod] = useState(ORDER_PAYMENT_METHOD_CARD_PREPAID);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isSubmitting = createContractMutation.isPending;
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -89,21 +90,21 @@ export function InstallmentBuyerBlock({
       return;
     }
 
-    setIsSubmitting(true);
     try {
-      await createInstallmentContract(String(product._id), {
-        planId: String(selectedPlanId),
-        quantity,
-        deliveryAddress: deliveryAddress.line,
-        deliveryAddressFlat: "",
-        paymentMethod,
+      await createContractMutation.mutateAsync({
+        productId: String(product._id),
+        body: {
+          planId: String(selectedPlanId),
+          quantity,
+          deliveryAddress: deliveryAddress.line,
+          deliveryAddressFlat: "",
+          paymentMethod,
+        },
       });
       setSuccess(INSTALLMENT_UI.CONTRACT_SUCCESS);
       onSuccess?.();
     } catch (e) {
       setError(e instanceof Error ? e.message : INSTALLMENT_UI.ERROR_GENERIC);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 

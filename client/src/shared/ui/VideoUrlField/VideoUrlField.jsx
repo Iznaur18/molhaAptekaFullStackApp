@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 
-import { uploadVideo } from "../../api/uploadVideo.js";
+import { useUploadAssetMutations } from "../../model/useUploadAssetMutations.js";
 import { validateUploadVideoFile } from "../../lib/validateUploadVideoFile.js";
 import { VIDEO_URL_FIELD_UI } from "../../config/appUiCopy.js";
 import { UPLOAD_VIDEO_FILE_INPUT_ACCEPT } from "../../config/uploadConstants.js";
@@ -25,9 +25,11 @@ export function VideoUrlField({
   required = false,
   validateFile = validateUploadVideoFile,
 }) {
+  const { uploadVideoMutation } = useUploadAssetMutations();
   const fileInputRef = useRef(null);
-  const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
+
+  const isUploading = uploadVideoMutation.isPending;
 
   const isDisabled = disabled || isUploading;
   const uploadEnabled = canUpload && !disabled;
@@ -49,16 +51,13 @@ export function VideoUrlField({
     }
 
     setUploadError("");
-    setIsUploading(true);
     try {
-      const url = await uploadVideo(file);
+      const url = await uploadVideoMutation.mutateAsync(file);
       onChange(url);
     } catch (error) {
       const message =
         error instanceof Error ? error.message : VIDEO_URL_FIELD_UI.ERROR_GENERIC;
       setUploadError(message);
-    } finally {
-      setIsUploading(false);
     }
   };
 

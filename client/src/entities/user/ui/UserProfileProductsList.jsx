@@ -1,12 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
+import { USER_PROFILE_PRODUCTS_PAGE_SIZE } from "../api/fetchUserProducts.js";
+import { useUserProfileProductsAllPagesQuery } from "../model/useUserProfileProductsAllPagesQuery.js";
+import { useUserProfileProductsQuery } from "../model/useUserProfileProductsQuery.js";
 import { resolveProductImageUrls } from "../../product/lib/resolveProductImageUrls.js";
 import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../../product/model/productConstants.js";
-import {
-  fetchAllUserProducts,
-  fetchUserProducts,
-  USER_PROFILE_PRODUCTS_PAGE_SIZE,
-} from "../api/fetchUserProducts.js";
 import {
   API_CLIENT_UI,
   USER_PROFILE_PRODUCTS_UI,
@@ -42,55 +40,60 @@ export function UserProfileProductsList({
   onProductClick,
   onViewAllProducts,
 }) {
-  const [phase, setPhase] = useState("loading");
-  const [items, setItems] = useState(
-    /** @type {import('../model/userProfileProductThumbTypes.js').UserProfileProductThumbItem[]} */ ([]),
-  );
-  const [total, setTotal] = useState(0);
+  const previewQuery = useUserProfileProductsQuery({ userId: targetUserId });
+  const [loadAllPages, setLoadAllPages] = useState(false);
+  const allPagesQuery = useUserProfileProductsAllPagesQuery({
+    userId: targetUserId,
+    enabled: loadAllPages,
+  });
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isLoadingAll, setIsLoadingAll] = useState(false);
   const [error, setError] = useState("");
   const [unavailableHint, setUnavailableHint] = useState("");
   const [failedThumbIds, setFailedThumbIds] = useState(
     /** @type {Set<string>} */ () => new Set(),
   );
 
-  const loadFirstPage = useCallback(async () => {
-    const result = await fetchUserProducts(targetUserId, {
-      page: 1,
-      limit: USER_PROFILE_PRODUCTS_PAGE_SIZE,
-    });
-    setItems(result.items);
-    setTotal(result.pagination?.total ?? result.items.length);
-  }, [targetUserId]);
-
   useEffect(() => {
-    let cancelled = false;
-    setPhase("loading");
+    setIsExpanded(false);
+    setLoadAllPages(false);
     setError("");
     setUnavailableHint("");
     setFailedThumbIds(new Set());
-    setIsExpanded(false);
-    setTotal(0);
+  }, [targetUserId]);
 
-    void (async () => {
-      try {
-        await loadFirstPage();
-        if (cancelled) return;
-        setPhase("success");
-      } catch (e) {
-        if (cancelled) return;
-        setError(
-          e instanceof Error ? e.message : API_CLIENT_UI.FETCH_USER_PRODUCTS_FALLBACK,
-        );
-        setPhase("error");
-      }
-    })();
+  useEffect(() => {
+    if (allPagesQuery.isSuccess && loadAllPages) {
+      setIsExpanded(true);
+    }
+  }, [allPagesQuery.isSuccess, loadAllPages]);
 
-    return () => {
-      cancelled = true;
-    };
-  }, [targetUserId, loadFirstPage]);
+  useEffect(() => {
+    if (allPagesQuery.isError) {
+      setError(
+        allPagesQuery.error instanceof Error
+          ? allPagesQuery.error.message
+          : API_CLIENT_UI.FETCH_USER_PRODUCTS_FALLBACK,
+      );
+    }
+  }, [allPagesQuery.error, allPagesQuery.isError]);
+
+  const previewItems = previewQuery.data?.items ?? [];
+  const previewTotal = previewQuery.data?.pagination?.total ?? previewItems.length;
+  const expandedItems = allPagesQuery.data?.items ?? previewItems;
+  const expandedTotal = allPagesQuery.data?.pagination?.total ?? previewTotal;
+  const items = isExpanded ? expandedItems : previewItems;
+  const total = isExpanded ? expandedTotal : previewTotal;
+
+  const phase = previewQuery.isPending
+    ? "loading"
+    : previewQuery.isError && previewItems.length === 0
+      ? "error"
+      : "success";
+  const fetchError =
+    previewQuery.error instanceof Error
+      ? previewQuery.error.message
+      : API_CLIENT_UI.FETCH_USER_PRODUCTS_FALLBACK;
+  const displayError = error || (phase === "error" ? fetchError : "");
 
   const visibleItems = useMemo(
     () => (isExpanded ? items : items.slice(0, USER_PROFILE_PRODUCTS_PAGE_SIZE)),
@@ -101,26 +104,16 @@ export function UserProfileProductsList({
   const showMore = !isExpanded && canExpand;
   const showLess = isExpanded && canExpand;
 
-  const handleShowMore = async () => {
-    if (!canExpand || isLoadingAll) return;
-    setIsLoadingAll(true);
-    setError("");
-    try {
-      if (items.length >= total) {
-        setIsExpanded(true);
-        return;
-      }
-      const result = await fetchAllUserProducts(targetUserId);
-      setItems(result.items);
-      setTotal(result.pagination.total);
-      setIsExpanded(true);
-    } catch (e) {
-      setError(
-        e instanceof Error ? e.message : API_CLIENT_UI.FETCH_USER_PRODUCTS_FALLBACK,
-      );
-    } finally {
-      setIsLoadingAll(false);
+  const handleShowMore = () => {
+    if (!canExpand || allPagesQuery.isFetching) {
+      return;
     }
+    setError("");
+    if (previewItems.length >= previewTotal) {
+      setIsExpanded(true);
+      return;
+    }
+    setLoadAllPages(true);
   };
 
   const handleShowLess = () => {
@@ -191,7 +184,7 @@ export function UserProfileProductsList({
           className="user-profile-purchases__state user-profile-purchases__state_error"
           role="alert"
         >
-          {error}
+          {displayError}
         </p>
       ) : null}
       {phase === "success" && items.length === 0 ? (
@@ -242,9 +235,9 @@ export function UserProfileProductsList({
           type="button"
           className="user-profile-purchases__more"
           onClick={() => void handleShowMore()}
-          disabled={isLoadingAll}
+          disabled={allPagesQuery.isFetching}
         >
-          {isLoadingAll
+          {allPagesQuery.isFetching
             ? USER_PROFILE_PRODUCTS_UI.LOADING_MORE
             : USER_PROFILE_PRODUCTS_UI.SHOW_MORE}
         </button>
@@ -258,12 +251,12 @@ export function UserProfileProductsList({
           {USER_PROFILE_PRODUCTS_UI.SHOW_LESS}
         </button>
       ) : null}
-      {error && items.length > 0 ? (
+      {displayError && items.length > 0 ? (
         <p
           className="user-profile-purchases__state user-profile-purchases__state_error"
           role="alert"
         >
-          {error}
+          {displayError}
         </p>
       ) : null}
       {unavailableHint ? (

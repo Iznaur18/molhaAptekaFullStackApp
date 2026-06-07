@@ -1,40 +1,27 @@
-import { useLocation, useNavigate } from "react-router-dom";
-
-import { useCart } from "../../entities/cart/model/useCart.js";
-import { useHomePageDomain } from "../../pages/home/model/useHomePageDomain.js";
-import { useHomePagePresentationLayer } from "../../pages/home/model/useHomePagePresentationLayer.js";
-import { useHomePageShellState } from "../../pages/home/model/useHomePageShellState.js";
+import { useAppShellStateContext } from "./AppShellStateContext.jsx";
+import { useAppShellPresentationLayer } from "./useAppShellPresentationLayer.js";
 
 /**
  * @typedef {ReturnType<typeof useAppShellController>} AppShellControllerValue
  */
 
 export function useAppShellController() {
-  const { flushRemoteCart } = useCart();
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  const shell = useHomePageShellState(location, navigate);
-  const domain = useHomePageDomain(shell, flushRemoteCart, location, navigate);
-
+  const ctx = useAppShellStateContext();
   const {
     headerProps,
     catalogContentProps,
     accountContentProps,
     mainContentProps,
     modalsLayerProps,
-  } = useHomePagePresentationLayer({
-    ...shell,
-    ...domain,
-  });
+  } = useAppShellPresentationLayer();
 
   return {
-    isAuthorized: shell.isAuthorized,
-    isSessionReady: shell.isSessionReady,
-    isEmailVerified: shell.isEmailVerified,
-    emailVerificationNotice: shell.emailVerificationNotice,
-    dismissEmailVerificationNotice: shell.dismissEmailVerificationNotice,
-    staffActionNotice: shell.staffActionNotice,
+    isAuthorized: ctx.isAuthorized,
+    isSessionReady: ctx.isSessionReady,
+    isEmailVerified: ctx.isEmailVerified,
+    emailVerificationNotice: ctx.emailVerificationNotice,
+    dismissEmailVerificationNotice: ctx.dismissEmailVerificationNotice,
+    staffActionNotice: ctx.staffActionNotice,
     headerProps,
     catalogContentProps,
     accountContentProps,

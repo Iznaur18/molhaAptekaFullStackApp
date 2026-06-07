@@ -11,7 +11,7 @@
   padding: 0;
   border: none;
   background: none;
-  color: #1f6feb;
+  color: var(--iz-color-action);
   font: inherit;
   cursor: pointer;
   text-decoration: underline;
@@ -27,5 +27,5 @@
 }
 
 .raffle-products-page__state_error {
-  color: #b91c1c;
+  color: var(--iz-color-danger-deep);
 }

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-import { patchUserProfile } from "../api/patchUserProfile.js";
+import { useUserProfileMutations } from "../model/useUserProfileMutations.js";
 import { buildAdminPatchUserProfileBody } from "../lib/buildAdminPatchUserProfileBody.js";
 import { buildPatchUserProfileBody } from "../lib/buildPatchUserProfileBody.js";
 import { isPremiumExpiresAtInputActive } from "../lib/computeStaffPremiumExpiry.js";
@@ -71,6 +71,7 @@ export function EditProfileModal({
   allowStaffLoyaltyEdit = false,
   onPremiumRevoked,
 }) {
+  const { patchMutation } = useUserProfileMutations();
   const [form, setForm] = useState(() => mapUserToEditProfileForm({ _id: "" }));
   const [feedback, setFeedback] = useState({ kind: "idle", message: "" });
   const wasOpenRef = useRef(false);
@@ -184,7 +185,10 @@ export function EditProfileModal({
             includeLoyaltyPoints: allowStaffLoyaltyEdit,
             ...profilePatchOptions,
           });
-      const updated = await patchUserProfile(String(user._id), body);
+      const updated = await patchMutation.mutateAsync({
+        userId: String(user._id),
+        body,
+      });
       if (premiumWillBeDisabled) {
         onPremiumRevoked?.();
       }

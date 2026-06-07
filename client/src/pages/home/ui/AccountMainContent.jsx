@@ -5,7 +5,7 @@ import {
   LazyMyProfilePage,
   LazyNotificationsPage,
   LazyUsersPage,
-} from "../lib/lazyHomePages.js";
+} from "../../../app/lib/lazyAppShellPages.js";
 import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { isRoleRestrictedMainView } from "../../../shared/lib/homeMainViewPaths.js";
 import { isStaffMainViewAllowed } from "../../../shared/lib/staffMainViews.js";
@@ -30,9 +30,7 @@ export function AccountMainContent({
   isAdmin,
   canModerateProducts,
   myProfilePage,
-  usersListTick,
   notificationsPageItems,
-  raffleRefreshTick,
   pendingRafflesCount,
   pendingModerationCount,
   pendingIncomingPriceOffersCount,
@@ -69,7 +67,6 @@ export function AccountMainContent({
   handleDataConfirmationQueueFromProfile,
   handleDataConfirmationFromProfile,
   setIsDataConfirmationModalOpen,
-  dataConfirmationStatusRefreshTick,
   handlePremiumFromProfile,
   handlePremiumPurchased,
   handleLoyaltyPointsFromProfile,
@@ -81,10 +78,8 @@ export function AccountMainContent({
   refreshPendingDataConfirmationCount,
   refreshPendingInstallmentModerationCount,
   refreshPendingInstallmentDisputesCount,
-  refreshFeaturedRaffle,
-  refreshSellerRaffleState,
-  setRaffleRefreshTick,
-  setCatalogRefreshTick,
+  refreshRaffleSurfaces,
+  refreshCatalogFeed,
   setRaffleModal,
   handleInAppNotificationClick,
   handleNotificationsCleared,
@@ -93,7 +88,7 @@ export function AccountMainContent({
   myProductsCatalogToolbarProps = null,
 }) {
   if (isAuthorized && !isSessionReady && isRoleRestrictedMainView(mainView)) {
-    return <p className="home-page__state">{HOME_PAGE_UI.LOADING_SESSION}</p>;
+    return <p className="app-shell__state">{HOME_PAGE_UI.LOADING_SESSION}</p>;
   }
 
   if (isProfileTabMainView(mainView)) {
@@ -115,28 +110,22 @@ export function AccountMainContent({
       myProfilePage,
       handlePremiumPurchased,
       setIsDataConfirmationModalOpen,
-      dataConfirmationStatusRefreshTick,
       myProductsCatalogSection,
-      raffleRefreshTick,
       refreshPendingModerationCount,
       refreshPendingProductReportsCount,
       refreshPendingRafflesCount,
       refreshPendingDataConfirmationCount,
       refreshPendingInstallmentModerationCount,
       refreshPendingInstallmentDisputesCount,
-      refreshFeaturedRaffle,
-      setRaffleRefreshTick,
-      setCatalogRefreshTick,
+      refreshRaffleSurfaces,
+      refreshCatalogFeed,
       setRaffleModal,
     };
 
     const profileOverviewContent = (
       <RaffleSellerOverview
-        refreshTick={raffleRefreshTick}
         onChanged={() => {
-          setRaffleRefreshTick((n) => n + 1);
-          void refreshFeaturedRaffle();
-          void refreshSellerRaffleState();
+          void refreshRaffleSurfaces();
         }}
         onEditRaffle={(raffle) =>
           setRaffleModal({ mode: "edit", raffle, useStaffApi: false })
@@ -218,7 +207,6 @@ export function AccountMainContent({
   if (mainView === "users") {
     return (
       <LazyUsersPage
-        key={usersListTick}
         onUserRowClick={onSellerNameClick}
         isAdminViewer={isAdmin}
       />

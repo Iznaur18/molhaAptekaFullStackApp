@@ -7,7 +7,7 @@
 }
 
 .raffle-prize-media_video {
-  background: #000;
+  background: var(--iz-color-black);
 }
 
 .raffle-prize-media__video-wrap {
@@ -33,17 +33,17 @@
   padding: 0;
   border: none;
   border-radius: 999px;
-  background: rgb(15 23 42 / 72%);
-  color: #fff;
+  background: var(--iz-color-overlay-ink-strong);
+  color: var(--iz-color-on-contrast);
   cursor: pointer;
   backdrop-filter: blur(4px);
 }
 
 .raffle-prize-media__sound-btn:hover {
-  background: rgb(15 23 42 / 88%);
+  background: var(--iz-color-overlay-ink-heavy);
 }
 
 .raffle-prize-media__sound-btn:focus-visible {
-  outline: 2px solid #c4b5fd;
+  outline: 2px solid var(--iz-color-premium-purple-muted);
   outline-offset: 2px;
 }

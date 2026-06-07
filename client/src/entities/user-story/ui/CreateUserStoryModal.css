@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: center;
   padding: 16px;
-  background: rgb(0 0 0 / 55%);
+  background: var(--iz-color-overlay-dark-strong);
 }
 
 .create-user-story-modal {
@@ -15,8 +15,8 @@
   overflow: auto;
   padding: 16px;
   border-radius: 16px;
-  background: var(--color-surface, #fff);
-  box-shadow: 0 12px 40px rgb(0 0 0 / 20%);
+  background: var(--iz-color-surface);
+  box-shadow: 0 12px 40px var(--iz-shadow-story);
 }
 
 .create-user-story-modal__header {
@@ -48,7 +48,7 @@
   margin-bottom: 12px;
   border-radius: 12px;
   overflow: hidden;
-  background: #111;
+  background: var(--iz-color-near-black);
 }
 
 .create-user-story-modal__media {
@@ -60,7 +60,7 @@
 .create-user-story-modal__placeholder {
   margin: 0;
   padding: 12px;
-  color: #ccc;
+  color: var(--iz-color-neutral-disabled);
   text-align: center;
 }
 
@@ -80,15 +80,15 @@
 
 .create-user-story-modal__pick {
   flex: 1;
-  background: #eef2ff;
-  color: #1e3a8a;
+  background: var(--iz-color-premium-indigo-soft);
+  color: var(--iz-color-info-navy);
 }
 
 .create-user-story-modal__submit {
   width: 100%;
   margin-top: 8px;
-  background: #2563eb;
-  color: #fff;
+  background: var(--iz-color-link);
+  color: var(--iz-color-on-contrast);
 }
 
 .create-user-story-modal__pick:disabled,
@@ -108,12 +108,12 @@
   resize: vertical;
   min-height: 56px;
   padding: 8px 10px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--iz-color-border-strong);
   border-radius: 8px;
 }
 
 .create-user-story-modal__error {
   margin: 8px 0 0;
-  color: #b91c1c;
+  color: var(--iz-color-danger-deep);
   font-size: 0.875rem;
 }

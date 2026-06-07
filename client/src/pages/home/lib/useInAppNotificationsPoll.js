@@ -1,4 +1,8 @@
-import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+
+import { fetchCurrentUserProfile } from "../../../entities/user/api/fetchCurrentUserProfile.js";
+import { authMeQueryKeys } from "../../../entities/user/model/authMeQueryKeys.js";
+import { AUTH_ME_STALE_TIME_MS } from "../../../shared/api/queryClient.js";
 
 export const IN_APP_NOTIFICATIONS_POLL_MS = 30_000;
 
@@ -6,40 +10,17 @@ export const IN_APP_NOTIFICATIONS_POLL_MS = 30_000;
  * @param {{
  *   isAuthorized: boolean;
  *   mainView: string;
- *   refreshInAppNotifications: () => Promise<void>;
  * }} params
  */
-export function useInAppNotificationsPoll({
-  isAuthorized,
-  mainView,
-  refreshInAppNotifications,
-}) {
-  useEffect(() => {
-    if (!isAuthorized || mainView === "notifications") {
-      return undefined;
-    }
+export function useInAppNotificationsPoll({ isAuthorized, mainView }) {
+  const pollEnabled = isAuthorized && mainView !== "notifications";
 
-    void refreshInAppNotifications();
-
-    const intervalId = window.setInterval(() => {
-      void refreshInAppNotifications();
-    }, IN_APP_NOTIFICATIONS_POLL_MS);
-
-    return () => window.clearInterval(intervalId);
-  }, [isAuthorized, mainView, refreshInAppNotifications]);
-
-  useEffect(() => {
-    if (!isAuthorized) {
-      return undefined;
-    }
-
-    const onVisibilityChange = () => {
-      if (document.visibilityState === "visible" && mainView !== "notifications") {
-        void refreshInAppNotifications();
-      }
-    };
-
-    document.addEventListener("visibilitychange", onVisibilityChange);
-    return () => document.removeEventListener("visibilitychange", onVisibilityChange);
-  }, [isAuthorized, mainView, refreshInAppNotifications]);
+  useQuery({
+    queryKey: authMeQueryKeys.all,
+    queryFn: fetchCurrentUserProfile,
+    enabled: pollEnabled,
+    staleTime: AUTH_ME_STALE_TIME_MS,
+    refetchInterval: pollEnabled ? IN_APP_NOTIFICATIONS_POLL_MS : false,
+    refetchIntervalInBackground: false,
+  });
 }

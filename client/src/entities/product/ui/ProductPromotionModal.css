@@ -17,9 +17,9 @@
   margin: 0;
   padding: 0.65rem 0.75rem;
   border-radius: 0.55rem;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  color: #334155;
+  background: var(--iz-color-surface-elevated);
+  border: 1px solid var(--iz-color-border-subtle);
+  color: var(--iz-color-slate);
   font-size: 0.9rem;
   line-height: 1.4;
   overflow-wrap: anywhere;
@@ -36,30 +36,30 @@
 }
 
 .product-promotion-modal__balance-card_ok {
-  background: #ecfdf5;
-  border-color: color-mix(in srgb, #059669 28%, transparent);
+  background: var(--iz-color-success-soft);
+  border-color: color-mix(in srgb, var(--iz-color-success-bright) 28%, transparent);
 }
 
 .product-promotion-modal__balance-card_low {
-  background: #fef2f2;
-  border-color: color-mix(in srgb, #dc2626 28%, transparent);
+  background: var(--iz-color-danger-surface);
+  border-color: color-mix(in srgb, var(--iz-color-danger-accent) 28%, transparent);
 }
 
 .product-promotion-modal__balance-label {
   font-size: 0.82rem;
-  color: #475569;
+  color: var(--iz-color-slate-muted);
 }
 
 .product-promotion-modal__balance-value {
   font-size: 1rem;
-  color: #0f172a;
+  color: var(--iz-color-ink);
 }
 
 .product-promotion-modal__hint {
   margin: 0;
   font-size: 0.84rem;
   line-height: 1.45;
-  color: #64748b;
+  color: var(--iz-color-text-subtle);
 }
 
 .product-promotion-modal__section {
@@ -73,7 +73,7 @@
   margin: 0 0 0.55rem;
   font-size: 0.88rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--iz-color-text);
 }
 
 .product-promotion-modal__tier-grid {
@@ -88,8 +88,8 @@
   gap: 0.2rem;
   padding: 0.75rem 0.85rem 0.75rem 2.35rem;
   border-radius: 0.65rem;
-  border: 1.5px solid #e2e8f0;
-  background: #fff;
+  border: 1.5px solid var(--iz-color-border-subtle);
+  background: var(--iz-color-surface);
   cursor: pointer;
   transition:
     border-color 0.15s ease,
@@ -105,8 +105,8 @@
   width: 1rem;
   height: 1rem;
   border-radius: 50%;
-  border: 2px solid #cbd5e1;
-  background: #fff;
+  border: 2px solid var(--iz-color-border-muted);
+  background: var(--iz-color-surface);
   transform: translateY(-50%);
   transition:
     border-color 0.15s ease,
@@ -115,45 +115,45 @@
 
 .product-promotion-modal__tier-card_selected::before {
   border-color: currentColor;
-  box-shadow: inset 0 0 0 3px #fff;
+  box-shadow: inset 0 0 0 3px var(--iz-color-on-contrast);
   background: currentColor;
 }
 
 .product-promotion-modal__tier-card--tier-1 {
-  --promotion-tier-accent: #d97706;
-  --promotion-tier-soft: #fef3c7;
+  --promotion-tier-accent: var(--iz-color-warning);
+  --promotion-tier-soft: var(--iz-color-gold-soft);
 }
 
 .product-promotion-modal__tier-card--tier-2 {
-  --promotion-tier-accent: #7c3aed;
-  --promotion-tier-soft: #ede9fe;
+  --promotion-tier-accent: var(--iz-color-accent-purple);
+  --promotion-tier-soft: var(--iz-color-accent-purple-soft);
 }
 
 .product-promotion-modal__tier-card--tier-3 {
-  --promotion-tier-accent: #dc2626;
-  --promotion-tier-soft: #fef2f2;
+  --promotion-tier-accent: var(--iz-color-danger-accent);
+  --promotion-tier-soft: var(--iz-color-danger-surface);
 }
 
 .product-promotion-modal__tier-card--tier-3:hover:not(:has(input:disabled)) {
   border-color: color-mix(in srgb, var(--promotion-tier-accent) 35%, transparent);
-  background: color-mix(in srgb, var(--promotion-tier-soft) 42%, #fff);
+  background: color-mix(in srgb, var(--promotion-tier-soft) 42%, var(--iz-color-on-contrast));
 }
 
 .product-promotion-modal__tier-card--tier-1.product-promotion-modal__tier-card_selected {
   border-color: color-mix(in srgb, var(--promotion-tier-accent) 55%, transparent);
-  background: color-mix(in srgb, var(--promotion-tier-soft) 72%, #fff);
+  background: color-mix(in srgb, var(--promotion-tier-soft) 72%, var(--iz-color-on-contrast));
   color: var(--promotion-tier-accent);
 }
 
 .product-promotion-modal__tier-card--tier-2.product-promotion-modal__tier-card_selected {
   border-color: color-mix(in srgb, var(--promotion-tier-accent) 55%, transparent);
-  background: color-mix(in srgb, var(--promotion-tier-soft) 78%, #fff);
+  background: color-mix(in srgb, var(--promotion-tier-soft) 78%, var(--iz-color-on-contrast));
   color: var(--promotion-tier-accent);
 }
 
 .product-promotion-modal__tier-card--tier-3.product-promotion-modal__tier-card_selected {
   border-color: color-mix(in srgb, var(--promotion-tier-accent) 55%, transparent);
-  background: color-mix(in srgb, var(--promotion-tier-soft) 78%, #fff);
+  background: color-mix(in srgb, var(--promotion-tier-soft) 78%, var(--iz-color-on-contrast));
   color: var(--promotion-tier-accent);
 }
 
@@ -170,49 +170,49 @@
 
 .product-promotion-modal__tier-card--tier-1 .product-promotion-modal__tier-badge {
   background: var(--promotion-tier-soft);
-  color: #92400e;
+  color: var(--iz-color-warning-text);
 }
 
 .product-promotion-modal__tier-card--tier-2 .product-promotion-modal__tier-badge {
   background: var(--promotion-tier-soft);
-  color: #5b21b6;
+  color: var(--iz-color-accent-purple-text);
 }
 
 .product-promotion-modal__tier-card--tier-3 .product-promotion-modal__tier-badge {
   background: var(--promotion-tier-soft);
-  color: #991b1b;
+  color: var(--iz-color-danger-text);
 }
 
 .product-promotion-modal--tier-3 .product-promotion-modal__duration-chip_selected {
-  border-color: #dc2626;
-  background: #fef2f2;
-  box-shadow: 0 0 0 1px color-mix(in srgb, #dc2626 18%, transparent);
+  border-color: var(--iz-color-danger-accent);
+  background: var(--iz-color-danger-surface);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--iz-color-danger-accent) 18%, transparent);
 }
 
 .product-promotion-modal--tier-3 .product-promotion-modal__duration-price {
-  color: #dc2626;
+  color: var(--iz-color-danger-accent);
 }
 
 .product-promotion-modal--tier-3 .product-promotion-modal__summary-row_total strong {
-  color: #dc2626;
+  color: var(--iz-color-danger-accent);
 }
 
 .product-promotion-modal__tier-title {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--iz-color-text);
 }
 
 .product-promotion-modal__tier-rate {
   font-size: 0.78rem;
   font-weight: 600;
-  color: #64748b;
+  color: var(--iz-color-text-subtle);
 }
 
 .product-promotion-modal__tier-description {
   font-size: 0.82rem;
   line-height: 1.4;
-  color: #475569;
+  color: var(--iz-color-slate-muted);
 }
 
 .product-promotion-modal__duration-row {
@@ -228,8 +228,8 @@
   gap: 0.15rem;
   padding: 0.55rem 0.35rem;
   border-radius: 0.55rem;
-  border: 1.5px solid #e2e8f0;
-  background: #fff;
+  border: 1.5px solid var(--iz-color-border-subtle);
+  background: var(--iz-color-surface);
   cursor: pointer;
   transition:
     border-color 0.15s ease,
@@ -238,26 +238,26 @@
 }
 
 .product-promotion-modal__duration-chip:hover:not(:disabled) {
-  border-color: #cbd5e1;
-  background: #f8fafc;
+  border-color: var(--iz-color-border-muted);
+  background: var(--iz-color-surface-elevated);
 }
 
 .product-promotion-modal__duration-chip_selected {
-  border-color: #2563eb;
-  background: #eff6ff;
-  box-shadow: 0 0 0 1px color-mix(in srgb, #2563eb 18%, transparent);
+  border-color: var(--iz-color-link);
+  background: var(--iz-color-action-soft);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--iz-color-link) 18%, transparent);
 }
 
 .product-promotion-modal__duration-title {
   font-size: 0.82rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--iz-color-text);
 }
 
 .product-promotion-modal__duration-price {
   font-size: 0.76rem;
   font-weight: 700;
-  color: #2563eb;
+  color: var(--iz-color-link);
 }
 
 .product-promotion-modal__summary {
@@ -266,8 +266,8 @@
   gap: 0.45rem;
   padding: 0.75rem 0.85rem;
   border-radius: 0.65rem;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--iz-color-surface-elevated);
+  border: 1px solid var(--iz-color-border-subtle);
 }
 
 .product-promotion-modal__summary-row {
@@ -276,32 +276,32 @@
   justify-content: space-between;
   gap: 0.75rem;
   font-size: 0.84rem;
-  color: #475569;
+  color: var(--iz-color-slate-muted);
 }
 
 .product-promotion-modal__summary-row strong {
-  color: #111827;
+  color: var(--iz-color-text);
   text-align: right;
 }
 
 .product-promotion-modal__summary-row_total {
   padding-top: 0.45rem;
-  border-top: 1px dashed #cbd5e1;
+  border-top: 1px dashed var(--iz-color-border-muted);
   font-size: 0.9rem;
 }
 
 .product-promotion-modal__summary-row_total strong {
   font-size: 1rem;
-  color: #1d4ed8;
+  color: var(--iz-color-link-hover);
 }
 
 .product-promotion-modal__error {
   margin: 0;
   padding: 0.55rem 0.65rem;
   border-radius: 0.5rem;
-  background: #fef2f2;
-  border: 1px solid color-mix(in srgb, #dc2626 25%, transparent);
-  color: #b42318;
+  background: var(--iz-color-danger-surface);
+  border: 1px solid color-mix(in srgb, var(--iz-color-danger-accent) 25%, transparent);
+  color: var(--iz-color-danger-strong);
   font-size: 0.84rem;
   line-height: 1.4;
 }

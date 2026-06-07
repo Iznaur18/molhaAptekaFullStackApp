@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 
 import { CreateProductCategorySelect } from "../../product/ui/CreateProductCategorySelect.jsx";
 import { IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED } from "../lib/isProductCategoryTreePickerEnabled.js";
 import { PRODUCT_CATEGORY_ELECTRONICS } from "../../product/model/productConstants.js";
-import { fetchProductCategoryChildren } from "../api/fetchProductCategoryChildren.js";
-import { fetchProductCategoryRoots } from "../api/fetchProductCategoryRoots.js";
 import { buildCategoryBreadcrumbFromNode } from "../lib/buildCategoryBreadcrumbFromNode.js";
+import { useProductCategoryLevelQuery } from "../model/useProductCategoryLevelQuery.js";
+import { useProductCategoryRootsQuery } from "../model/useProductCategoryRootsQuery.js";
 import { PRODUCT_CATEGORY_TREE_UI } from "../../../shared/config/appUiCopy.js";
 import { getProductFieldEditLabel } from "../../product/lib/productFieldRegistry.js";
 
@@ -67,77 +67,30 @@ function ProductCategoryTreePicker({ value, onChange, disabled = false }) {
   const [useLegacyList, setUseLegacyList] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [trail, setTrail] = useState([]);
-  const [options, setOptions] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [loadError, setLoadError] = useState("");
 
-  const loadRoots = useCallback(async () => {
-    try {
-      setLoading(true);
-      setLoadError("");
-      const { categories } = await fetchProductCategoryRoots();
-      setOptions(categories);
-    } catch (error) {
-      setLoadError(
-        error instanceof Error ? error.message : PRODUCT_CATEGORY_TREE_UI.LOAD_ERROR,
-      );
-      setOptions([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const initRootsQuery = useProductCategoryRootsQuery({
+    enabled: !value.productCategoryId,
+  });
+  const activeParentId = trail.length === 0 ? null : trail[trail.length - 1].id;
+  const levelQuery = useProductCategoryLevelQuery({
+    parentId: activeParentId,
+    enabled: pickerOpen,
+  });
 
-  const loadChildren = useCallback(async (parentId) => {
-    try {
-      setLoading(true);
-      setLoadError("");
-      const { categories } = await fetchProductCategoryChildren(parentId);
-      setOptions(categories);
-    } catch (error) {
-      setLoadError(
-        error instanceof Error ? error.message : PRODUCT_CATEGORY_TREE_UI.LOAD_ERROR,
-      );
-      setOptions([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const init = async () => {
-      try {
-        const { categories } = await fetchProductCategoryRoots();
-        if (cancelled) return;
-        const treeAvailable = categories.length > 0;
-        setHasTree(treeAvailable);
-
-        if (!treeAvailable) {
-          setUseLegacyList(true);
-          return;
-        }
-
-        if (value.productCategoryId) {
-          setPickerOpen(false);
-          return;
-        }
-
-        setPickerOpen(true);
-        setOptions(categories);
-      } catch {
-        if (cancelled) return;
-        setHasTree(false);
-        setUseLegacyList(true);
-      }
-    };
-
-    void init();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [value.productCategoryId]);
+  const hasTree =
+    initRootsQuery.isLoading || initRootsQuery.isFetching
+      ? null
+      : (initRootsQuery.data?.length ?? 0) > 0;
+  const options = levelQuery.categories;
+  const loading = levelQuery.isLoading;
+  const loadError =
+    initRootsQuery.error instanceof Error
+      ? initRootsQuery.error.message
+      : levelQuery.error instanceof Error
+        ? levelQuery.error.message
+        : initRootsQuery.isError || levelQuery.isError
+          ? PRODUCT_CATEGORY_TREE_UI.LOAD_ERROR
+          : "";
 
   const resolveLegacySlug = (node, nextTrail) => {
     if (
@@ -163,38 +116,28 @@ function ProductCategoryTreePicker({ value, onChange, disabled = false }) {
       });
       setPickerOpen(false);
       setTrail([]);
-      setOptions([]);
       return;
     }
 
-    const nextTrail = [
-      ...trail,
+    setTrail((prev) => [
+      ...prev,
       {
         id: node.id,
         labelRu: node.labelRu,
         legacyProductCategory: node.legacyProductCategory ?? null,
       },
-    ];
-    setTrail(nextTrail);
-    void loadChildren(node.id);
+    ]);
   };
 
   const handleBack = () => {
     if (trail.length === 0) return;
-    const nextTrail = trail.slice(0, -1);
-    setTrail(nextTrail);
-    if (nextTrail.length === 0) {
-      void loadRoots();
-      return;
-    }
-    void loadChildren(nextTrail[nextTrail.length - 1].id);
+    setTrail((prev) => prev.slice(0, -1));
   };
 
   const openPicker = () => {
     setPickerOpen(true);
     setTrail([]);
     setUseLegacyList(false);
-    void loadRoots();
   };
 
   const switchToLegacy = () => {
@@ -217,7 +160,6 @@ function ProductCategoryTreePicker({ value, onChange, disabled = false }) {
       categoryBreadcrumbRu: "",
       productCategory: value.productCategory ?? PRODUCT_CATEGORY_ELECTRONICS,
     });
-    void loadRoots();
   };
 
   if (hasTree === null) {

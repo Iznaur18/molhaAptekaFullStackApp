@@ -11,11 +11,11 @@ import {
 } from "../../../entities/product/model/productConstants.js";
 import { PRODUCT_SEARCH_UI } from "../../../shared/config/appUiCopy.js";
 import { useDebouncedValue } from "../../../shared/lib/useDebouncedValue.js";
-import { parseCatalogQueryFromSearchParams } from "../lib/catalogCatalogQuery.js";
+import { parseCatalogQueryFromSearchParams } from "../../../entities/product/lib/catalogCatalogQuery.js";
 import {
   readInitialCatalogCategory,
   readInitialCatalogQuery,
-} from "../lib/homePageConstants.js";
+} from "../lib/catalogShellConstants.js";
 
 /**
  * @param {object} params

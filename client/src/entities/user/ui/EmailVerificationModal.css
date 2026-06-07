@@ -12,7 +12,7 @@
   margin: 0;
   font-size: 0.9375rem;
   line-height: 1.45;
-  color: #374151;
+  color: var(--iz-color-text-secondary);
 }
 
 .email-verification-modal__message {
@@ -22,11 +22,11 @@
 }
 
 .email-verification-modal__message_success {
-  color: #067647;
+  color: var(--iz-color-success-strong);
 }
 
 .email-verification-modal__message_error {
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
 }
 
 .email-verification-modal__actions {
@@ -41,13 +41,13 @@
   gap: 0.25rem;
   font-size: 0.875rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--iz-color-text-secondary);
 }
 
 .email-verification-modal__input {
   box-sizing: border-box;
   width: 100%;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--iz-color-border-strong);
   border-radius: 0.5rem;
   padding: 0.5rem 0.625rem;
   font-size: 1.125rem;
@@ -57,10 +57,10 @@
 }
 
 .email-verification-modal__confirm {
-  border: 1px solid #1f6feb;
+  border: 1px solid var(--iz-color-action);
   border-radius: 0.5rem;
-  background: #1f6feb;
-  color: #fff;
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast);
   padding: 0.55rem 0.85rem;
   font-size: 0.9375rem;
   font-weight: 500;
@@ -73,10 +73,10 @@
 }
 
 .email-verification-modal__resend {
-  border: 1px solid #1f6feb;
+  border: 1px solid var(--iz-color-action);
   border-radius: 0.5rem;
-  background: #1f6feb;
-  color: #fff;
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast);
   padding: 0.55rem 0.85rem;
   font-size: 0.9375rem;
   font-weight: 500;
@@ -89,10 +89,10 @@
 }
 
 .email-verification-modal__close {
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--iz-color-border-strong);
   border-radius: 0.5rem;
-  background: #fff;
-  color: #374151;
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text-secondary);
   padding: 0.55rem 0.85rem;
   font-size: 0.9375rem;
   cursor: pointer;
@@ -104,5 +104,5 @@
 }
 
 .email-verification-modal__close:hover:not(:disabled) {
-  background: #f9fafb;
+  background: var(--iz-color-surface-muted);
 }

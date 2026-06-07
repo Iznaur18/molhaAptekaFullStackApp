@@ -1,6 +1,8 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { fetchUserProfileById } from "../../../entities/user/api/fetchUserProfileById.js";
+import { userProfileQueryKeys } from "../../../entities/user/model/userProfileQueryKeys.js";
+import { useUserProfileQuery } from "../../../entities/user/model/useUserProfileQuery.js";
 import { pickUserProfilePhotoUrl } from "../../../entities/user/lib/pickUserProfilePhotoUrl.js";
 import {
   formatProfileImageObjectPosition,
@@ -46,17 +48,25 @@ export function SellerProductsPage({
   onBackToCatalog,
   onGoToMyProducts,
 }) {
-  const [profilePhase, setProfilePhase] = useState("idle");
-  const [seller, setSeller] = useState(
-    /** @type {import('../../../entities/user/model/types.js').UserPublicProfile | null} */ (
-      null
-    ),
-  );
-  const [profileError, setProfileError] = useState("");
+  const queryClient = useQueryClient();
   const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
   const [backgroundLoadFailed, setBackgroundLoadFailed] = useState(false);
 
   const catalogEnabled = isAuthorized && isSessionReady;
+  const profileQuery = useUserProfileQuery({ userId: sellerId, enabled: catalogEnabled });
+  const seller = profileQuery.data ?? null;
+  const profilePhase = !catalogEnabled
+    ? "idle"
+    : profileQuery.isPending
+      ? "loading"
+      : profileQuery.isError
+        ? "error"
+        : "success";
+  const profileError =
+    profileQuery.error instanceof Error
+      ? profileQuery.error.message
+      : SELLER_PRODUCTS_PAGE_UI.FETCH_PROFILE_FALLBACK;
+
   const {
     phase: catalogPhase,
     products,
@@ -68,31 +78,11 @@ export function SellerProductsPage({
     retryLoadMore,
   } = useSellerProductsCatalog({ sellerId, enabled: catalogEnabled });
 
-  const loadProfile = useCallback(async () => {
-    if (!catalogEnabled) return;
-    setProfilePhase("loading");
-    setProfileError("");
-    try {
-      const user = await fetchUserProfileById(sellerId);
-      setSeller(user);
-      setProfilePhase("success");
-    } catch (e) {
-      setProfileError(
-        e instanceof Error ? e.message : SELLER_PRODUCTS_PAGE_UI.FETCH_PROFILE_FALLBACK,
-      );
-      setProfilePhase("error");
-    }
-  }, [catalogEnabled, sellerId]);
-
   useEffect(() => {
     if (currentUserId != null && String(sellerId) === String(currentUserId)) {
       onGoToMyProducts();
     }
   }, [currentUserId, onGoToMyProducts, sellerId]);
-
-  useEffect(() => {
-    void loadProfile();
-  }, [loadProfile]);
 
   useEffect(() => {
     setAvatarLoadFailed(false);
@@ -118,11 +108,14 @@ export function SellerProductsPage({
 
   const handleFollowChange = useCallback(
     (/** @type {{ isFollowing: boolean }} */ patch) => {
-      setSeller((prev) =>
-        prev == null ? prev : { ...prev, isFollowing: patch.isFollowing },
-      );
+      queryClient.setQueryData(userProfileQueryKeys.byId(sellerId), (old) => {
+        if (!old) {
+          return old;
+        }
+        return { ...old, isFollowing: patch.isFollowing };
+      });
     },
-    [],
+    [queryClient, sellerId],
   );
 
   if (!isSessionReady) {

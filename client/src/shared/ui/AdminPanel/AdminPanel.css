@@ -1,10 +1,10 @@
 .admin-panel {
-  --admin-panel-accent: #5b21b6;
-  --admin-panel-accent-soft: #ede9fe;
-  --admin-panel-border: #e5e7eb;
-  --admin-panel-surface: #fff;
-  --admin-panel-muted: #64748b;
-  --admin-panel-danger: #b91c1c;
+  --admin-panel-accent: var(--iz-color-accent-purple-text);
+  --admin-panel-accent-soft: var(--iz-color-accent-purple-soft);
+  --admin-panel-border: var(--iz-color-border);
+  --admin-panel-surface: var(--iz-color-surface);
+  --admin-panel-muted: var(--iz-color-text-subtle);
+  --admin-panel-danger: var(--iz-color-danger-deep);
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -66,14 +66,14 @@
 }
 
 .admin-panel__alert_error {
-  border: 1px solid #fecaca;
-  background: #fef2f2;
+  border: 1px solid var(--iz-color-danger-border);
+  background: var(--iz-color-danger-surface);
   color: var(--admin-panel-danger);
 }
 
 .admin-panel__alert_info {
-  border: 1px solid #e5e7eb;
-  background: #f8fafc;
+  border: 1px solid var(--iz-color-border);
+  background: var(--iz-color-surface-elevated);
   color: var(--admin-panel-muted);
 }
 
@@ -82,7 +82,7 @@
   border: 1px solid var(--admin-panel-border);
   border-radius: 0.75rem;
   background: var(--admin-panel-surface);
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  box-shadow: var(--iz-shadow-card-subtle);
 }
 
 .admin-panel__create[hidden] {
@@ -122,7 +122,7 @@
   gap: 0.3rem;
   font-size: 0.8125rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--iz-color-text-secondary);
 }
 
 .admin-panel__field input,
@@ -133,19 +133,19 @@
   padding: 0.5rem 0.65rem;
   border: 1px solid var(--admin-panel-border);
   border-radius: 0.5rem;
-  background: #fff;
+  background: var(--iz-color-surface);
   font: inherit;
   font-size: 0.875rem;
   font-weight: 400;
-  color: #111827;
+  color: var(--iz-color-text);
 }
 
 .admin-panel__field input:focus,
 .admin-panel__field select:focus,
 .admin-panel__field textarea:focus {
   outline: none;
-  border-color: #7c3aed;
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+  border-color: var(--iz-color-accent-purple);
+  box-shadow: 0 0 0 3px var(--iz-color-status-purple-soft);
 }
 
 .admin-panel__field-hint {
@@ -193,15 +193,15 @@
   border: 1px solid var(--admin-panel-border);
   border-radius: 0.75rem;
   background: var(--admin-panel-surface);
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  box-shadow: var(--iz-shadow-card-subtle);
   transition:
     border-color 0.15s ease,
     box-shadow 0.15s ease;
 }
 
 .admin-panel__card_editing {
-  border-color: #c4b5fd;
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+  border-color: var(--iz-color-premium-purple-muted);
+  box-shadow: 0 0 0 3px var(--iz-color-accent-purple-ring-soft);
 }
 
 .admin-panel__card-body {
@@ -258,8 +258,8 @@
   max-width: 100%;
   padding: 0.15rem 0.5rem;
   border-radius: 999px;
-  background: #f1f5f9;
-  color: #334155;
+  background: var(--iz-color-surface-alt);
+  color: var(--iz-color-slate);
   font-size: 0.75rem;
   line-height: 1.35;
   word-break: break-word;
@@ -271,13 +271,13 @@
 }
 
 .admin-panel__chip_leaf {
-  background: #dcfce7;
-  color: #166534;
+  background: var(--iz-color-success-pale);
+  color: var(--iz-color-success-muted);
 }
 
 .admin-panel__chip_branch {
-  background: #e0f2fe;
-  color: #0369a1;
+  background: var(--iz-color-info-soft);
+  color: var(--iz-color-info);
 }
 
 .admin-panel__keywords {
@@ -329,7 +329,7 @@
   flex: 0 0 auto;
   width: 3px;
   border-radius: 999px;
-  background: linear-gradient(180deg, #c4b5fd, #e9d5ff);
+  background: var(--iz-gradient-admin-accent);
 }
 
 .admin-panel__category-chips {
@@ -342,7 +342,7 @@
   padding: 0.25rem 0.55rem;
   border: 1px solid var(--admin-panel-border);
   border-radius: 999px;
-  background: #fff;
+  background: var(--iz-color-surface);
   font: inherit;
   font-size: 0.75rem;
   cursor: pointer;
@@ -352,7 +352,7 @@
 }
 
 .admin-panel__category-chip-btn_selected {
-  border-color: #7c3aed;
+  border-color: var(--iz-color-accent-purple);
   background: var(--admin-panel-accent-soft);
   color: var(--admin-panel-accent);
   font-weight: 600;

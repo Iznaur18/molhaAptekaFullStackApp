@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { fetchMyInstallmentContracts } from "../../../entities/installment/api/installmentApi.js";
+import { useMyInstallmentContractsQuery } from "../../../entities/installment/model/useMyInstallmentContractsQuery.js";
 import { INSTALLMENT_CONTRACT_STATUS_FILTER_OPTIONS } from "../../../entities/installment/lib/installmentContractStatusFilters.js";
 import { InstallmentContractCard } from "../../../entities/installment/ui/InstallmentContractCard.jsx";
 import { INSTALLMENT_UI } from "../../../shared/config/appUiCopy.js";
@@ -30,43 +30,35 @@ export function InstallmentPaymentsPage({
   onQueueChanged,
 }) {
   const [statusFilter, setStatusFilter] = useState("");
-  const [phase, setPhase] = useState("loading");
-  const [contracts, setContracts] = useState(
-    /** @type {import('../../../entities/installment/model/types.js').InstallmentContractFromApi[]} */ ([]),
-  );
-  const [error, setError] = useState("");
+  const contractsQuery = useMyInstallmentContractsQuery({
+    status: statusFilter,
+    enabled: isAuthorized,
+  });
+
+  const contracts = contractsQuery.data ?? [];
+  const phase = !isAuthorized
+    ? "success"
+    : contractsQuery.isPending
+      ? "loading"
+      : contractsQuery.isError
+        ? "error"
+        : "success";
+  const error =
+    contractsQuery.error instanceof Error
+      ? contractsQuery.error.message
+      : INSTALLMENT_UI.ERROR_GENERIC;
 
   const reload = useCallback(async () => {
-    if (!isAuthorized) {
-      setContracts([]);
-      setPhase("success");
-      return;
-    }
-    try {
-      const list = await fetchMyInstallmentContracts({
-        status: statusFilter,
-      });
-      setContracts(list);
-      setPhase("success");
-      setError("");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : INSTALLMENT_UI.ERROR_GENERIC);
-      setPhase("error");
-    }
-  }, [isAuthorized, statusFilter]);
+    await contractsQuery.refetch();
+  }, [contractsQuery]);
 
   useRefetchOnVisible(reload, phase === "success" && isAuthorized);
 
   useEffect(() => {
     if (!isAuthorized) {
       onRequestLogin?.();
-      setPhase("success");
-      setContracts([]);
-      return;
     }
-    setPhase("loading");
-    void reload();
-  }, [isAuthorized, onRequestLogin, reload]);
+  }, [isAuthorized, onRequestLogin]);
 
   if (!isAuthorized) {
     return null;

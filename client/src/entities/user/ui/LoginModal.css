@@ -16,7 +16,7 @@
 }
 
 .login-modal__input {
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--iz-color-border-strong);
   border-radius: 0.5rem;
   padding: 0.5rem 0.625rem;
   font-size: 0.9375rem;
@@ -28,18 +28,18 @@
 }
 
 .login-modal__message_error {
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
 }
 
 .login-modal__message_success {
-  color: #067647;
+  color: var(--iz-color-success-strong);
 }
 
 .login-modal__submit {
-  border: 1px solid #1f6feb;
+  border: 1px solid var(--iz-color-action);
   border-radius: 0.5rem;
-  background: #1f6feb;
-  color: #fff;
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast);
   padding: 0.55rem 0.85rem;
   font-size: 0.9375rem;
   font-weight: 500;
@@ -52,10 +52,10 @@
 }
 
 .login-modal__register {
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--iz-color-border-strong);
   border-radius: 0.5rem;
-  background: #fff;
-  color: #111827;
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
   padding: 0.55rem 0.85rem;
   font-size: 0.9375rem;
   font-weight: 500;
@@ -63,7 +63,7 @@
 }
 
 .login-modal__register:hover:not(:disabled) {
-  background: #f9fafb;
+  background: var(--iz-color-surface-muted);
 }
 
 .login-modal__register:disabled {

@@ -1,7 +1,9 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 
-import { fetchMyVoteForTarget } from "../api/fetchMyVoteForTarget.js";
-import { submitUserVoteRating } from "../api/submitUserVoteRating.js";
+import { useSubmitUserVoteRatingMutation } from "../model/useSubmitUserVoteRatingMutation.js";
+import { useMyVoteForTargetQuery } from "../model/useMyVoteForTargetQuery.js";
+import { userVoteQueryKeys } from "../model/userVoteQueryKeys.js";
 import {
   USER_VOTE_RATING_VALUE_MAX,
   USER_VOTE_RATING_VALUE_MIN,
@@ -59,12 +61,13 @@ export function UserVoteRatingForm({
   onRequestLogin,
   onVotePersisted,
 }) {
+  const queryClient = useQueryClient();
+  const submitVoteMutation = useSubmitUserVoteRatingMutation();
   const [score, setScore] = useState(DEFAULT_SCORE);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const [flash, setFlash] = useState("");
   const [voteSubmitted, setVoteSubmitted] = useState(false);
-  const [myVoteResolved, setMyVoteResolved] = useState(false);
 
   const aggregateText = useMemo(
     () => formatAggregateLine(targetUser.userRatingByVotes),
@@ -74,6 +77,14 @@ export function UserVoteRatingForm({
   const isSelf =
     currentUserId != null && String(currentUserId) === String(targetUser._id);
 
+  const myVoteQuery = useMyVoteForTargetQuery({
+    targetUserId: String(targetUser._id),
+    enabled: isAuthorized && currentUserId != null && !isSelf,
+  });
+
+  const myVoteResolved =
+    !isAuthorized || currentUserId == null || isSelf || !myVoteQuery.isLoading;
+
   useEffect(() => {
     setError("");
     setFlash("");
@@ -81,39 +92,35 @@ export function UserVoteRatingForm({
     if (!isAuthorized || currentUserId == null || isSelf) {
       setScore(DEFAULT_SCORE);
       setVoteSubmitted(false);
-      setMyVoteResolved(true);
+      return undefined;
+    }
+
+    if (myVoteQuery.isLoading) {
+      return undefined;
+    }
+
+    const voteValue = myVoteQuery.data;
+    if (
+      voteValue != null &&
+      voteValue >= USER_VOTE_RATING_VALUE_MIN &&
+      voteValue <= USER_VOTE_RATING_VALUE_MAX
+    ) {
+      setScore(voteValue);
+      setVoteSubmitted(true);
       return undefined;
     }
 
     setScore(DEFAULT_SCORE);
     setVoteSubmitted(false);
-    setMyVoteResolved(false);
-
-    let cancelled = false;
-
-    void (async () => {
-      try {
-        const v = await fetchMyVoteForTarget(String(targetUser._id));
-        if (cancelled) return;
-        if (
-          v != null &&
-          v >= USER_VOTE_RATING_VALUE_MIN &&
-          v <= USER_VOTE_RATING_VALUE_MAX
-        ) {
-          setScore(v);
-          setVoteSubmitted(true);
-        }
-      } catch {
-        if (!cancelled) setVoteSubmitted(false);
-      } finally {
-        if (!cancelled) setMyVoteResolved(true);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [targetUser._id, isAuthorized, currentUserId, isSelf]);
+    return undefined;
+  }, [
+    currentUserId,
+    isAuthorized,
+    isSelf,
+    myVoteQuery.data,
+    myVoteQuery.isLoading,
+    targetUser._id,
+  ]);
 
   useEffect(() => {
     if (!flash) return undefined;
@@ -128,12 +135,13 @@ export function UserVoteRatingForm({
     try {
       setError("");
       setPending(true);
-      const { user: snapshot } = await submitUserVoteRating(
-        String(targetUser._id),
+      const { user: snapshot } = await submitVoteMutation.mutateAsync({
+        targetUserId: String(targetUser._id),
         score,
-      );
+      });
       onRated(snapshot);
       onVotePersisted?.();
+      queryClient.setQueryData(userVoteQueryKeys.myForTarget(String(targetUser._id)), score);
       setVoteSubmitted(true);
       setFlash(USER_VOTE_RATING_UI.SUCCESS);
     } catch (e) {

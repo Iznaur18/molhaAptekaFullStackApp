@@ -7,7 +7,7 @@
   margin: 0;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #1f6feb;
+  color: var(--iz-color-action);
   white-space: nowrap;
 }
 

@@ -1,8 +1,8 @@
 .product-report-group-card {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--iz-color-border);
   border-radius: 0.75rem;
   padding: 1rem;
-  background: #fff;
+  background: var(--iz-color-surface);
 }
 
 .product-report-group-card__header {
@@ -21,7 +21,7 @@
 .product-report-group-card__count {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
   white-space: nowrap;
 }
 
@@ -35,7 +35,7 @@
 .product-report-group-card__link {
   border: 0;
   background: transparent;
-  color: #1f6feb;
+  color: var(--iz-color-action);
   font-size: 0.875rem;
   cursor: pointer;
   padding: 0;
@@ -54,13 +54,13 @@
 .product-report-group-card__report {
   padding: 0.5rem 0.65rem;
   border-radius: 0.5rem;
-  background: #f9fafb;
+  background: var(--iz-color-surface-muted);
 }
 
 .product-report-group-card__report-meta {
   margin: 0 0 0.25rem;
   font-size: 0.8rem;
-  color: #6b7280;
+  color: var(--iz-color-text-muted);
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem;
@@ -70,7 +70,7 @@
 .product-report-group-card__reporter-link {
   border: 0;
   background: transparent;
-  color: #1f6feb;
+  color: var(--iz-color-action);
   font-size: 0.78rem;
   cursor: pointer;
   padding: 0;
@@ -93,7 +93,7 @@
 
 .product-report-group-card__staff-note {
   resize: none;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--iz-color-border-strong);
   border-radius: 0.5rem;
   padding: 0.5rem;
   font: inherit;
@@ -101,7 +101,7 @@
 
 .product-report-group-card__error {
   margin: 0 0 0.5rem;
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
   font-size: 0.875rem;
 }
 
@@ -112,17 +112,17 @@
 }
 
 .product-report-group-card__action {
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--iz-color-border-strong);
   border-radius: 0.5rem;
-  background: #fff;
+  background: var(--iz-color-surface);
   padding: 0.45rem 0.7rem;
   font-size: 0.875rem;
   cursor: pointer;
 }
 
 .product-report-group-card__action_reject {
-  border-color: #b42318;
-  color: #b42318;
+  border-color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger-strong);
 }
 
 .product-report-group-card__action:disabled {

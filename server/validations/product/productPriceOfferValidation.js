@@ -1,25 +1,12 @@
-import { body, param } from "express-validator";
+import { offerIdParamsSchema, productPriceOfferBodySchema } from "@molha/api-contract";
 
-import { PRODUCT_PRICE_RUB_MAX } from "../../constants/productConstants.js";
-import { handleValidationByExpressErrors } from "../handleValidationByExpressErrors.js";
+import { validateBodyZod } from "../../middlewares/validateBodyZod.js";
+import { validateParamsZod } from "../../middlewares/validateParamsZod.js";
 
-export const productPriceOfferIdParamValidation = [
-  param("offerId").isMongoId().withMessage("Некорректный id предложения"),
-  handleValidationByExpressErrors,
-];
+export const productPriceOfferIdParamValidation = [validateParamsZod(offerIdParamsSchema)];
 
 export const submitProductPriceOfferValidation = [
-  body("offerPrice")
-    .isInt({ min: 1, max: PRODUCT_PRICE_RUB_MAX })
-    .withMessage(`offerPrice — целое число от 1 до ${PRODUCT_PRICE_RUB_MAX}`)
-    .toInt(),
-  handleValidationByExpressErrors,
+  validateBodyZod(productPriceOfferBodySchema),
 ];
 
-export const patchProductPriceOfferValidation = [
-  body("offerPrice")
-    .isInt({ min: 1, max: PRODUCT_PRICE_RUB_MAX })
-    .withMessage(`offerPrice — целое число от 1 до ${PRODUCT_PRICE_RUB_MAX}`)
-    .toInt(),
-  handleValidationByExpressErrors,
-];
+export const patchProductPriceOfferValidation = [validateBodyZod(productPriceOfferBodySchema)];

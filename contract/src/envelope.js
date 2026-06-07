@@ -45,3 +45,8 @@ export function formatZodQueryError(error) {
 export function formatZodBodyError(error) {
   return formatZodFieldError(error, "Некорректное тело запроса");
 }
+
+/** @param {import('zod').ZodError} error */
+export function formatZodParamError(error) {
+  return formatZodFieldError(error, "Некорректные параметры URL");
+}

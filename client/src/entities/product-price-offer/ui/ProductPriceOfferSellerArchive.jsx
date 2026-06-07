@@ -1,7 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
-
+import { useSellerPriceOfferArchiveQuery } from "../model/useSellerPriceOfferArchiveQuery.js";
 import { UserPremiumDisplayName } from "../../user/ui/UserPremiumDisplayName.jsx";
-import { fetchSellerPriceOfferArchive } from "../api/fetchSellerPriceOfferArchive.js";
 import { formatIsoDateTime } from "../../../shared/lib/formatIsoDateTime.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 import {
@@ -21,32 +19,18 @@ import "./ProductPriceOffer.css";
  * }} props
  */
 export function ProductPriceOfferSellerArchive({ productId, onOpenBuyer }) {
-  const [offers, setOffers] = useState(
-    /** @type {import('../model/types.js').PriceOfferRow[]} */ ([]),
-  );
-  const [phase, setPhase] = useState("loading");
-  const [error, setError] = useState("");
+  const offersQuery = useSellerPriceOfferArchiveQuery({ productId });
 
-  const load = useCallback(async () => {
-    setPhase("loading");
-    setError("");
-    try {
-      const list = await fetchSellerPriceOfferArchive(productId);
-      setOffers(list);
-      setPhase("success");
-    } catch (e) {
-      setError(
-        e instanceof Error
-          ? e.message
-          : API_CLIENT_UI.FETCH_SELLER_PRICE_OFFERS_FALLBACK,
-      );
-      setPhase("error");
-    }
-  }, [productId]);
-
-  useEffect(() => {
-    void load();
-  }, [load]);
+  const offers = offersQuery.data ?? [];
+  const phase = offersQuery.isPending
+    ? "loading"
+    : offersQuery.isError && offers.length === 0
+      ? "error"
+      : "success";
+  const error =
+    offersQuery.error instanceof Error
+      ? offersQuery.error.message
+      : API_CLIENT_UI.FETCH_SELLER_PRICE_OFFERS_FALLBACK;
 
   if (phase === "loading") {
     return (

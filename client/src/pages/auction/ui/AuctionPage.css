@@ -1,9 +1,9 @@
 .auction-page__state {
   margin: 0;
   font-size: 1rem;
-  color: #4b5563;
+  color: var(--iz-color-text-tertiary);
 }
 
 .auction-page__state_error {
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
 }

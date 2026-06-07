@@ -1,7 +1,9 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
-import { fetchMyCart } from "../api/fetchMyCart.js";
-import { replaceMyCart } from "../api/replaceMyCart.js";
+import { cartQueryKeys } from "../model/cartQueryKeys.js";
+import { useMyCartQuery } from "../model/useMyCartQuery.js";
+import { useReplaceMyCartMutation } from "../model/useReplaceMyCartMutation.js";
 import { useCart } from "../model/useCart.js";
 
 const DEBOUNCE_MS = 450;
@@ -15,41 +17,52 @@ const packItems = (obj) =>
  * @param {{ isAuthorized: boolean }} props
  */
 export function CartServerSync({ isAuthorized }) {
+  const queryClient = useQueryClient();
   const { items, clearCart, hydrateCart } = useCart();
   const [remoteReady, setRemoteReady] = useState(false);
+  const cartQuery = useMyCartQuery({ enabled: isAuthorized });
+  const { mutate: replaceCart } = useReplaceMyCartMutation();
 
   useEffect(() => {
     if (!isAuthorized) {
       setRemoteReady(false);
       clearCart();
+      queryClient.removeQueries({ queryKey: cartQueryKeys.my() });
       return undefined;
     }
 
-    let cancelled = false;
     setRemoteReady(false);
+    return undefined;
+  }, [clearCart, isAuthorized, queryClient]);
 
-    void (async () => {
-      try {
-        const nextItems = await fetchMyCart();
-        if (cancelled) return;
-        hydrateCart(nextItems);
-      } catch (e) {
-        if (cancelled) return;
-        if (import.meta.env.DEV) {
-          console.warn("[cart] fetchMyCart failed", e);
-        }
-        hydrateCart({});
-      } finally {
-        if (!cancelled) {
-          setRemoteReady(true);
-        }
+  useEffect(() => {
+    if (!isAuthorized) {
+      return undefined;
+    }
+
+    if (cartQuery.isSuccess) {
+      hydrateCart(cartQuery.data);
+      setRemoteReady(true);
+      return undefined;
+    }
+
+    if (cartQuery.isError) {
+      if (import.meta.env.DEV) {
+        console.warn("[cart] fetchMyCart failed", cartQuery.error);
       }
-    })();
+      hydrateCart({});
+      setRemoteReady(true);
+    }
 
-    return () => {
-      cancelled = true;
-    };
-  }, [isAuthorized, clearCart, hydrateCart]);
+    return undefined;
+  }, [
+    cartQuery.data,
+    cartQuery.error,
+    cartQuery.isError,
+    cartQuery.isSuccess,
+    hydrateCart,
+    isAuthorized,
+  ]);
 
   useEffect(() => {
     if (!isAuthorized || !remoteReady) {
@@ -57,24 +70,24 @@ export function CartServerSync({ isAuthorized }) {
     }
 
     const timerId = window.setTimeout(() => {
-      void (async () => {
-        try {
-          const saved = await replaceMyCart(items);
+      replaceCart(items, {
+        onSuccess: (saved) => {
           if (packItems(saved) !== packItems(items)) {
             hydrateCart(saved);
           }
-        } catch (e) {
+        },
+        onError: (e) => {
           if (import.meta.env.DEV) {
             console.warn("[cart] replaceMyCart failed", e);
           }
-        }
-      })();
+        },
+      });
     }, DEBOUNCE_MS);
 
     return () => {
       window.clearTimeout(timerId);
     };
-  }, [items, isAuthorized, remoteReady, hydrateCart]);
+  }, [hydrateCart, isAuthorized, items, remoteReady, replaceCart]);
 
   return null;
 }

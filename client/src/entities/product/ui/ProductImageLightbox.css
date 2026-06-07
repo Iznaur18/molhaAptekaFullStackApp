@@ -1,7 +1,7 @@
 @import "./productImageTokens.css";
 
 .product-image-lightbox {
-  --product-image-lightbox-backdrop: rgb(0 0 0 / 72%);
+  --product-image-lightbox-backdrop: var(--iz-color-overlay-media-strong);
   --product-image-lightbox-padding: 1rem;
   --product-image-lightbox-z: 1400;
 
@@ -38,10 +38,10 @@
   flex-shrink: 0;
   margin: 0;
   padding: 0.25rem 0.55rem;
-  border: 1px solid color-mix(in srgb, CanvasText 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--iz-color-canvas-text) 18%, transparent);
   border-radius: 8px;
-  background: Canvas;
-  color: CanvasText;
+  background: var(--iz-color-canvas);
+  color: var(--iz-color-canvas-text);
   font: inherit;
   font-size: 1.25rem;
   line-height: 1;
@@ -49,7 +49,7 @@
 }
 
 .product-image-lightbox__close:hover {
-  background: color-mix(in srgb, CanvasText 8%, Canvas);
+  background: color-mix(in srgb, var(--iz-color-canvas-text) 8%, var(--iz-color-canvas));
 }
 
 .product-image-lightbox__stage {
@@ -89,10 +89,10 @@
   height: 2.25rem;
   margin: 0;
   padding: 0;
-  border: 1px solid color-mix(in srgb, CanvasText 20%, transparent);
+  border: 1px solid color-mix(in srgb, var(--iz-color-canvas-text) 20%, transparent);
   border-radius: 50%;
-  background: color-mix(in srgb, Canvas 92%, transparent);
-  color: CanvasText;
+  background: color-mix(in srgb, var(--iz-color-canvas) 92%, transparent);
+  color: var(--iz-color-canvas-text);
   font-size: 1.35rem;
   font-weight: 700;
   line-height: 1;
@@ -100,7 +100,7 @@
 }
 
 .product-image-lightbox__nav:hover {
-  background: Canvas;
+  background: var(--iz-color-canvas);
 }
 
 .product-image-lightbox__img {
@@ -112,7 +112,7 @@
   object-fit: contain;
   object-position: center;
   border-radius: 10px;
-  box-shadow: 0 12px 40px rgb(0 0 0 / 35%);
+  box-shadow: 0 12px 40px var(--iz-shadow-focus-neutral);
 }
 
 .product-image-lightbox__counter {
@@ -120,6 +120,6 @@
   align-self: center;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #f9fafb;
-  text-shadow: 0 1px 2px rgb(0 0 0 / 80%);
+  color: var(--iz-color-surface-muted);
+  text-shadow: 0 1px 2px var(--iz-text-shadow-strong);
 }

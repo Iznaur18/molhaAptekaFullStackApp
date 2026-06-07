@@ -1,15 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { USER_STORY_UI } from "../../../shared/config/appUiCopy.js";
-import { deleteUserStory } from "../api/deleteUserStory.js";
-import { fetchUserStoriesByAuthor } from "../api/fetchUserStoriesByAuthor.js";
-import { markUserStoryViewed } from "../api/markUserStoryViewed.js";
+import { useUserStoryMutations } from "../model/useUserStoryMutations.js";
 import {
   resolveUserStoryAvatarUrl,
   resolveUserStoryMediaUrl,
 } from "../lib/resolveUserStoryMedia.js";
 import { useUserStoryMediaLoadState } from "../lib/useUserStoryMediaLoadState.js";
 import { useUserStoryVideoPlayback } from "../lib/useUserStoryVideoPlayback.js";
+import { useUserStoriesByAuthorQuery } from "../model/useUserStoriesByAuthorQuery.js";
 import {
   USER_STORY_MEDIA_TYPE_IMAGE,
   USER_STORY_MEDIA_TYPE_VIDEO,
@@ -41,17 +40,41 @@ export function UserStoryViewer({
   onStoryDeleted,
   onStoryViewed,
 }) {
-  const [stories, setStories] = useState(
-    /** @type {import('../model/types.js').UserStoryFromApi[]} */ ([]),
-  );
+  const { deleteMutation, markViewedMutation } = useUserStoryMutations();
   const [activeIndex, setActiveIndex] = useState(0);
-  const [phase, setPhase] = useState("idle");
-  const [error, setError] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
+  const [actionError, setActionError] = useState("");
 
   const authorId = String(author._id);
   const isOwn = currentUserId != null && authorId === String(currentUserId);
+
+  const storiesQuery = useUserStoriesByAuthorQuery({
+    authorId,
+    enabled: isOpen,
+  });
+
+  const stories = storiesQuery.data ?? [];
+  const phase = !isOpen
+    ? "idle"
+    : storiesQuery.isLoading
+      ? "loading"
+      : storiesQuery.isError
+        ? "error"
+        : stories.length > 0
+          ? "ready"
+          : "empty";
+  const error =
+    storiesQuery.error instanceof Error
+      ? storiesQuery.error.message
+      : USER_STORY_UI.ERROR_GENERIC;
+
+  useEffect(() => {
+    if (isOpen) {
+      setActiveIndex(0);
+    }
+  }, [authorId, isOpen]);
+
   const activeStory = stories[activeIndex] ?? null;
   const advanceStoryOrClose = useCallback(() => {
     if (activeIndex < stories.length - 1) {
@@ -89,34 +112,13 @@ export function UserStoryViewer({
     onMediaError: markMediaError,
   });
 
-  const loadStories = useCallback(async () => {
-    setPhase("loading");
-    setError("");
-    try {
-      const list = await fetchUserStoriesByAuthor(authorId);
-      setStories(list);
-      setActiveIndex(0);
-      setPhase(list.length > 0 ? "ready" : "empty");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : USER_STORY_UI.ERROR_GENERIC);
-      setPhase("error");
-    }
-  }, [authorId]);
-
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-    void loadStories();
-  }, [isOpen, loadStories]);
-
   useEffect(() => {
     if (!isOpen || !activeStory || !isAuthorized) {
       return;
     }
-    void markUserStoryViewed(activeStory._id);
+    void markViewedMutation.mutate(activeStory._id);
     onStoryViewed?.();
-  }, [activeStory?._id, isAuthorized, isOpen, onStoryViewed]);
+  }, [activeStory?._id, isAuthorized, isOpen, markViewedMutation, onStoryViewed]);
 
   useEffect(() => {
     if (
@@ -154,12 +156,13 @@ export function UserStoryViewer({
     }
 
     setIsDeleting(true);
+    setActionError("");
     try {
-      await deleteUserStory(activeStory._id);
+      await deleteMutation.mutateAsync(activeStory._id);
       onStoryDeleted?.();
       onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : USER_STORY_UI.ERROR_GENERIC);
+      setActionError(e instanceof Error ? e.message : USER_STORY_UI.ERROR_GENERIC);
     } finally {
       setIsDeleting(false);
     }
@@ -173,6 +176,7 @@ export function UserStoryViewer({
   const authorName = author.userName?.trim() || authorId;
   const canReport = isAuthorized && !isOwn && activeStory != null && phase === "ready";
   const hasMultiple = stories.length > 1;
+  const displayError = actionError || (phase === "error" ? error : "");
 
   return (
     <>
@@ -181,12 +185,12 @@ export function UserStoryViewer({
           <p className="user-story-viewer__state">{USER_STORY_UI.LOADING}</p>
         ) : null}
 
-        {phase === "error" ? (
+        {displayError ? (
           <p
             className="user-story-viewer__state user-story-viewer__state_error"
             role="alert"
           >
-            {error}
+            {displayError}
           </p>
         ) : null}
 

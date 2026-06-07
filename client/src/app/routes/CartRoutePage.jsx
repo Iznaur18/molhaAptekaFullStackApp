@@ -1,4 +1,4 @@
-import { LazyCartPage } from "../../pages/home/lib/lazyHomePages.js";
+import { LazyCartPage } from "../lib/lazyAppShellPages.js";
 import { useAppShell } from "../model/AppShellContext.jsx";
 
 /** UI корзины — путь `/basket` (не `/cart`: proxy Vite → API). */

@@ -22,6 +22,34 @@ export async function loginAndGetCookieHeader(request, { email, password }) {
 }
 
 /**
+ * @param {string} cookieHeader
+ */
+export function parseCookieHeaderForPlaywright(cookieHeader) {
+  return cookieHeader.split("; ").map((chunk) => {
+    const separatorIndex = chunk.indexOf("=");
+    const name = chunk.slice(0, separatorIndex);
+    const value = chunk.slice(separatorIndex + 1);
+
+    return {
+      name,
+      value,
+      domain: "127.0.0.1",
+      path: "/",
+    };
+  });
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {import('@playwright/test').APIRequestContext} request
+ * @param {{ email: string; password: string }} credentials
+ */
+export async function loginViaApiCookies(page, request, credentials) {
+  const cookieHeader = await loginAndGetCookieHeader(request, credentials);
+  await page.context().addCookies(parseCookieHeaderForPlaywright(cookieHeader));
+}
+
+/**
  * @param {import('@playwright/test').APIRequestContext} request
  * @param {string} cookieHeader
  */

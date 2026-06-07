@@ -12,7 +12,7 @@
 .admin-delete-user__backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(17, 24, 39, 0.55);
+  background: var(--iz-color-overlay-backdrop);
 }
 
 .admin-delete-user__card {
@@ -22,9 +22,9 @@
   max-width: 22rem;
   padding: 1.25rem;
   border-radius: 0.75rem;
-  border: 1px solid #e5e7eb;
-  background: #fff;
-  box-shadow: 0 20px 45px rgba(17, 24, 39, 0.28);
+  border: 1px solid var(--iz-color-border);
+  background: var(--iz-color-surface);
+  box-shadow: 0 20px 45px var(--iz-shadow-dialog);
 }
 
 .admin-delete-user__title {
@@ -35,7 +35,7 @@
 .admin-delete-user__hint {
   margin: 0 0 0.75rem;
   font-size: 0.9rem;
-  color: #4b5563;
+  color: var(--iz-color-text-tertiary);
 }
 
 .admin-delete-user__form {
@@ -48,7 +48,7 @@
   width: 100%;
   box-sizing: border-box;
   padding: 0.5rem 0.65rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--iz-color-border);
   border-radius: 0.4rem;
   font: inherit;
 }
@@ -56,7 +56,7 @@
 .admin-delete-user__error {
   margin: 0;
   font-size: 0.85rem;
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
 }
 
 .admin-delete-user__actions {
@@ -74,14 +74,14 @@
 }
 
 .admin-delete-user__btn_secondary {
-  border-color: #e5e7eb;
-  background: #fff;
-  color: #111827;
+  border-color: var(--iz-color-border);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
 }
 
 .admin-delete-user__btn_danger {
-  background: #b42318;
-  color: #fff;
+  background: var(--iz-color-danger-strong);
+  color: var(--iz-color-on-contrast);
 }
 
 .admin-delete-user__btn:disabled {

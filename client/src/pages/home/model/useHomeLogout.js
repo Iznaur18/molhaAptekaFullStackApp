@@ -1,8 +1,8 @@
 import { useCallback } from "react";
 
 import { CART_STORAGE_KEY } from "../../../entities/order/model/constants.js";
-import { logoutUser } from "../../../entities/user/api/logoutUser.js";
-import { EMPTY_MY_PROFILE_PAGE } from "../lib/homePageConstants.js";
+import { useLogoutMutation } from "../../../entities/user/model/useLogoutMutation.js";
+import { EMPTY_MY_PROFILE_PAGE } from "../lib/catalogShellConstants.js";
 
 /**
  * @param {object} params
@@ -10,32 +10,32 @@ import { EMPTY_MY_PROFILE_PAGE } from "../lib/homePageConstants.js";
 export const useHomeLogout = ({
   flushRemoteCart,
   navigate,
-  setCurrentUserId,
-  setIsAuthorized,
+  clearAuthSession,
   setMyProfilePage,
   setIsEditProfileOpen,
   clearInAppNotifications,
 }) => {
+  const logoutMutation = useLogoutMutation();
+
   return useCallback(async () => {
     await flushRemoteCart();
-    await logoutUser();
+    await logoutMutation.mutateAsync();
     try {
       localStorage.removeItem(CART_STORAGE_KEY);
     } catch {
       // storage недоступен
     }
-    setCurrentUserId(null);
-    setIsAuthorized(false);
+    clearAuthSession();
     setMyProfilePage(EMPTY_MY_PROFILE_PAGE);
     setIsEditProfileOpen(false);
     clearInAppNotifications();
     navigate("/", { replace: true });
   }, [
+    clearAuthSession,
     clearInAppNotifications,
     flushRemoteCart,
+    logoutMutation,
     navigate,
-    setCurrentUserId,
-    setIsAuthorized,
     setIsEditProfileOpen,
     setMyProfilePage,
   ]);

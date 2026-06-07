@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { deleteUserProfile } from "../api/deleteUserProfile.js";
+import { useUserProfileMutations } from "../model/useUserProfileMutations.js";
 import { ADMIN_EDIT_USER_UI } from "../../../shared/config/appUiCopy.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 
@@ -25,6 +25,7 @@ function deleteConfirmToken(user) {
  * }} props
  */
 export function AdminDeleteUserConfirmModal({ isOpen, user, onClose, onDeleted }) {
+  const { deleteMutation } = useUserProfileMutations();
   const [confirmText, setConfirmText] = useState("");
   const [phase, setPhase] = useState(/** @type {'idle'|'loading'|'error'} */ ("idle"));
   const [error, setError] = useState("");
@@ -61,7 +62,7 @@ export function AdminDeleteUserConfirmModal({ isOpen, user, onClose, onDeleted }
     setError("");
 
     try {
-      await deleteUserProfile(String(user._id));
+      await deleteMutation.mutateAsync(String(user._id));
       onDeleted();
       onClose();
     } catch (e) {

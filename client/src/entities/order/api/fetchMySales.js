@@ -10,7 +10,12 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
  *   status?: import('../model/constants.js').ORDER_STATUSES[number] | "";
  *   search?: string;
  * }} [params]
- * @returns {Promise<import('../model/types.js').Order[]>}
+ * @returns {Promise<{
+ *   orders: import('../model/types.js').Order[];
+ *   total: number;
+ *   page: number;
+ *   limit: number;
+ * }>}
  */
 export async function fetchMySales(params = {}) {
   try {
@@ -28,7 +33,12 @@ export async function fetchMySales(params = {}) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
 
-    return data.data.orders;
+    return {
+      orders: data.data.orders,
+      total: Number(data.data.total) || 0,
+      page: Number(data.data.page) || page || 1,
+      limit: Number(data.data.limit) || limit || 20,
+    };
   } catch (e) {
     const message =
       e?.response?.data?.message ?? e?.message ?? API_CLIENT_UI.FETCH_MY_SALES_FALLBACK;

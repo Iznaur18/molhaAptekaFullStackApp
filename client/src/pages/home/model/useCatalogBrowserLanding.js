@@ -1,15 +1,17 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
-import { fetchProductCategoryBreadcrumb } from "../../../entities/product-category-tree/api/fetchProductCategoryBreadcrumb.js";
-import { fetchProductCategoryRoots } from "../../../entities/product-category-tree/api/fetchProductCategoryRoots.js";
-import { findCategoryRootIdForLegacySlug } from "../../../entities/product-category-tree/lib/findCategoryRootIdForLegacySlug.js";
-import { IS_CATALOG_BROWSER_SUBCATEGORY_FILTER_ENABLED } from "../../../entities/product-category-tree/lib/isCatalogBrowserSubcategoryFilterEnabled.js";
-import { fetchProductCatalogFeedTileDisplays } from "../../../entities/product-category-display/api/fetchProductCatalogFeedTileDisplays.js";
-import { fetchProductCategoryDisplays } from "../../../entities/product-category-display/api/fetchProductCategoryDisplays.js";
+import { productCategoryDisplayQueryKeys } from "../../../entities/product-category-display/model/productCategoryDisplayQueryKeys.js";
+import { useProductCatalogFeedTileDisplaysQuery } from "../../../entities/product-category-display/model/useProductCatalogFeedTileDisplaysQuery.js";
+import { useProductCategoryDisplaysQuery } from "../../../entities/product-category-display/model/useProductCategoryDisplaysQuery.js";
 import { buildCatalogBrowserLocation } from "../../../entities/product-category-display/lib/catalogBrowserPaths.js";
 import { buildQueryForCatalogFeedTile } from "../../../entities/product-category-display/lib/buildQueryForCatalogFeedTile.js";
 import { resolveActiveCatalogFeedLabel } from "../../../entities/product-category-display/lib/resolveActiveCatalogFeedLabel.js";
 import { resolveProductCategoryDisplay } from "../../../entities/product-category-display/lib/resolveProductCategoryDisplay.js";
+import { findCategoryRootIdForLegacySlug } from "../../../entities/product-category-tree/lib/findCategoryRootIdForLegacySlug.js";
+import { IS_CATALOG_BROWSER_SUBCATEGORY_FILTER_ENABLED } from "../../../entities/product-category-tree/lib/isCatalogBrowserSubcategoryFilterEnabled.js";
+import { useProductCategoryBreadcrumbQuery } from "../../../entities/product-category-tree/model/useProductCategoryBreadcrumbQuery.js";
+import { useProductCategoryRootsQuery } from "../../../entities/product-category-tree/model/useProductCategoryRootsQuery.js";
 import { CATALOG_SORT_NEWEST } from "../../../entities/product/model/productConstants.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 import { catalogMainViewToPathname } from "../../../shared/lib/catalogMainViewPaths.js";
@@ -39,105 +41,86 @@ export function useCatalogBrowserLanding({
   setIsProductCategoryListOpen,
   setProductSearchTerm,
 }) {
+  const queryClient = useQueryClient();
   const categoryRootsRef = useRef(
     /** @type {import('../../../entities/product-category-tree/model/types.js').ProductCategoryNode[]} */ ([]),
   );
-  const [categoryDisplays, setCategoryDisplays] = useState(
-    /** @type {import('../../../entities/product-category-display/model/types.js').ProductCategoryDisplayFromApi[]} */ ([]),
-  );
-  const [feedTileDisplays, setFeedTileDisplays] = useState(
-    /** @type {import('../../../entities/product-category-display/model/types.js').ProductCatalogFeedTileDisplayFromApi[]} */ ([]),
-  );
-  const [categoryDisplaysStatus, setCategoryDisplaysStatus] = useState({
-    kind: "idle",
-    message: "",
+
+  const displaysEnabled = isCatalogBrowserMainViewActive;
+  const rootsEnabled = isCatalogBrowserMainViewActive;
+  const breadcrumbEnabled =
+    IS_CATALOG_BROWSER_SUBCATEGORY_FILTER_ENABLED &&
+    Boolean(activeCatalogBrowserCategoryId);
+
+  const categoryDisplaysQuery = useProductCategoryDisplaysQuery({
+    enabled: displaysEnabled,
+  });
+  const feedTileDisplaysQuery = useProductCatalogFeedTileDisplaysQuery({
+    enabled: displaysEnabled,
+  });
+  const categoryRootsQuery = useProductCategoryRootsQuery({ enabled: rootsEnabled });
+  const breadcrumbQuery = useProductCategoryBreadcrumbQuery({
+    categoryId: activeCatalogBrowserCategoryId,
+    enabled: breadcrumbEnabled,
   });
 
-  const refreshCategoryDisplays = useCallback(async () => {
-    if (!isCatalogBrowserMainViewActive) {
+  const categoryDisplays = categoryDisplaysQuery.data ?? [];
+  const feedTileDisplays = feedTileDisplaysQuery.data ?? [];
+
+  const categoryDisplaysStatus = useMemo(() => {
+    const isLoading =
+      displaysEnabled &&
+      (categoryDisplaysQuery.isPending || feedTileDisplaysQuery.isPending);
+    if (isLoading) {
+      return { kind: "loading", message: "" };
+    }
+
+    const queryError = categoryDisplaysQuery.error ?? feedTileDisplaysQuery.error;
+    if (queryError instanceof Error) {
+      return { kind: "error", message: queryError.message };
+    }
+    if (queryError) {
+      return {
+        kind: "error",
+        message: API_CLIENT_UI.FETCH_CATEGORY_DISPLAYS_FALLBACK,
+      };
+    }
+
+    return { kind: "idle", message: "" };
+  }, [
+    categoryDisplaysQuery.error,
+    categoryDisplaysQuery.isPending,
+    displaysEnabled,
+    feedTileDisplaysQuery.error,
+    feedTileDisplaysQuery.isPending,
+  ]);
+
+  useEffect(() => {
+    categoryRootsRef.current = categoryRootsQuery.data ?? [];
+  }, [categoryRootsQuery.data]);
+
+  useEffect(() => {
+    if (!breadcrumbEnabled) {
+      setCategoryTreeLabel(null);
       return;
     }
-    setCategoryDisplaysStatus({ kind: "loading", message: "" });
-    try {
-      const [{ displays }, { displays: feedDisplays }] = await Promise.all([
-        fetchProductCategoryDisplays(),
-        fetchProductCatalogFeedTileDisplays(),
-      ]);
-      setCategoryDisplays(displays);
-      setFeedTileDisplays(feedDisplays);
-      setCategoryDisplaysStatus({ kind: "idle", message: "" });
-    } catch (error) {
-      setCategoryDisplaysStatus({
-        kind: "error",
-        message:
-          error instanceof Error
-            ? error.message
-            : API_CLIENT_UI.FETCH_CATEGORY_DISPLAYS_FALLBACK,
-      });
-    }
-  }, [isCatalogBrowserMainViewActive]);
 
-  useEffect(() => {
-    void refreshCategoryDisplays();
-  }, [refreshCategoryDisplays]);
-
-  useEffect(() => {
-    if (!isCatalogBrowserMainViewActive) {
-      return undefined;
-    }
-
-    let cancelled = false;
-
-    void (async () => {
-      try {
-        const { categories } = await fetchProductCategoryRoots();
-        if (!cancelled) {
-          categoryRootsRef.current = categories;
-        }
-      } catch {
-        if (!cancelled) {
-          categoryRootsRef.current = [];
-        }
+    const breadcrumb = breadcrumbQuery.data;
+    if (!breadcrumb) {
+      if (breadcrumbQuery.isError) {
+        setCategoryTreeLabel(null);
       }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [isCatalogBrowserMainViewActive]);
-
-  useEffect(() => {
-    if (
-      !IS_CATALOG_BROWSER_SUBCATEGORY_FILTER_ENABLED ||
-      !activeCatalogBrowserCategoryId
-    ) {
-      setCategoryTreeLabel(null);
-      return undefined;
+      return;
     }
 
-    let cancelled = false;
-
-    void (async () => {
-      try {
-        const { breadcrumb } = await fetchProductCategoryBreadcrumb(
-          activeCatalogBrowserCategoryId,
-        );
-        if (cancelled) {
-          return;
-        }
-        const label = breadcrumb.items.map((item) => item.labelRu).join(" › ");
-        setCategoryTreeLabel(label || breadcrumb.labelRu);
-      } catch {
-        if (!cancelled) {
-          setCategoryTreeLabel(null);
-        }
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [activeCatalogBrowserCategoryId, setCategoryTreeLabel]);
+    const label = breadcrumb.items.map((item) => item.labelRu).join(" › ");
+    setCategoryTreeLabel(label || breadcrumb.labelRu);
+  }, [
+    breadcrumbEnabled,
+    breadcrumbQuery.data,
+    breadcrumbQuery.isError,
+    setCategoryTreeLabel,
+  ]);
 
   const handleNavigateToFullCatalogFromBreadcrumb = useCallback(() => {
     setMyProductsCatalogError("");
@@ -252,19 +235,27 @@ export function useCatalogBrowserLanding({
     applyCatalogQueryState(CATALOG_LANDING_QUERY);
   }, [applyCatalogQueryState, navigate]);
 
-  const handleCategoryDisplaySaved = useCallback((display) => {
-    setCategoryDisplays((prev) => {
-      const next = prev.filter((row) => row.categorySlug !== display.categorySlug);
-      return [...next, display];
-    });
-  }, []);
+  const handleCategoryDisplaySaved = useCallback(
+    (display) => {
+      queryClient.setQueryData(productCategoryDisplayQueryKeys.categories(), (old) => {
+        const displays = old?.displays ?? [];
+        const next = displays.filter((row) => row.categorySlug !== display.categorySlug);
+        return { displays: [...next, display] };
+      });
+    },
+    [queryClient],
+  );
 
-  const handleFeedTileDisplaySaved = useCallback((display) => {
-    setFeedTileDisplays((prev) => {
-      const next = prev.filter((row) => row.tileKey !== display.tileKey);
-      return [...next, display];
-    });
-  }, []);
+  const handleFeedTileDisplaySaved = useCallback(
+    (display) => {
+      queryClient.setQueryData(productCategoryDisplayQueryKeys.feedTiles(), (old) => {
+        const displays = old?.displays ?? [];
+        const next = displays.filter((row) => row.tileKey !== display.tileKey);
+        return { displays: [...next, display] };
+      });
+    },
+    [queryClient],
+  );
 
   const selectedCategoryLabel = useMemo(() => {
     if (activeCatalogBrowserCategoryId && categoryTreeLabel) {

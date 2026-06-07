@@ -8,13 +8,13 @@
 }
 
 .email-verification-notice_success {
-  background: #ecfdf3;
-  border: 1px solid #86efac;
+  background: var(--iz-color-success-mint);
+  border: 1px solid var(--iz-color-success-light);
 }
 
 .email-verification-notice_error {
-  background: #fef3f2;
-  border: 1px solid #fecdca;
+  background: var(--iz-color-danger-blush);
+  border: 1px solid var(--iz-color-danger-salmon-soft);
 }
 
 .email-verification-notice__text {
@@ -24,11 +24,11 @@
 }
 
 .email-verification-notice_success .email-verification-notice__text {
-  color: #1b7a3d;
+  color: var(--iz-color-success-deep);
 }
 
 .email-verification-notice_error .email-verification-notice__text {
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
 }
 
 .email-verification-notice__dismiss {

@@ -1,14 +1,12 @@
-import { body, param } from "express-validator";
-import { handleValidationByExpressErrors } from "../handleValidationByExpressErrors.js";
-import { USER_DATA_CONFIRMATION_RESOLUTIONS } from "../../constants/userDataConfirmationConstants.js";
+import {
+  dataConfirmationRequestIdParamsSchema,
+  resolveDataConfirmationBodySchema,
+} from "@molha/api-contract";
+
+import { validateBodyZod } from "../../middlewares/validateBodyZod.js";
+import { validateParamsZod } from "../../middlewares/validateParamsZod.js";
 
 export const resolveDataConfirmationValidation = [
-  param("requestId").isMongoId().withMessage("Некорректный id заявки"),
-  body("resolution")
-    .isString()
-    .trim()
-    .isIn(USER_DATA_CONFIRMATION_RESOLUTIONS)
-    .withMessage("resolution должен быть approve или reject"),
-  body("staffNote").optional().isString().trim().isLength({ max: 2000 }),
-  handleValidationByExpressErrors,
+  validateParamsZod(dataConfirmationRequestIdParamsSchema),
+  validateBodyZod(resolveDataConfirmationBodySchema),
 ];

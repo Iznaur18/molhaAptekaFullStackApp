@@ -1,0 +1,79 @@
+import { PRODUCT_PRICE_OFFER_UI } from "../../../../shared/config/appUiCopy.js";
+import { ProductPriceOfferBuyerBlock } from "../../../product-price-offer/ui/ProductPriceOfferBuyerBlock.jsx";
+import { ProductPriceOfferHintMessage } from "../../../product-price-offer/ui/ProductPriceOfferHintMessage.jsx";
+import { ProductPriceOfferSellerArchive } from "../../../product-price-offer/ui/ProductPriceOfferSellerArchive.jsx";
+import { ProductPriceOfferSellerTab } from "../../../product-price-offer/ui/ProductPriceOfferSellerTab.jsx";
+
+/**
+ * @param {{
+ *   productId: string;
+ *   isSellerView: boolean;
+ *   auctionUi: ReturnType<import('../../lib/resolveAuctionUiState.js').resolveAuctionUiState>;
+ *   topOffers: import('../../../product-price-offer/model/types.js').PriceOfferFromApi[];
+ *   isAuthorized: boolean;
+ *   isUserDataConfirmed: boolean;
+ *   isOwnProduct: boolean;
+ *   onOpenSellerProfile?: (userId: string) => void;
+ *   onRequestLogin: () => void;
+ *   onOffersChanged: () => void;
+ *   showSellerArchive: boolean;
+ * }} props
+ */
+export function ProductDetailsModalAuctionTab({
+  productId,
+  isSellerView,
+  auctionUi,
+  topOffers,
+  isAuthorized,
+  isUserDataConfirmed,
+  isOwnProduct,
+  onOpenSellerProfile,
+  onRequestLogin,
+  onOffersChanged,
+  showSellerArchive,
+}) {
+  if (isSellerView) {
+    return (
+      <>
+        <ProductPriceOfferSellerTab
+          productId={productId}
+          onOpenBuyer={onOpenSellerProfile}
+          onChanged={onOffersChanged}
+        />
+        {showSellerArchive ? (
+          <ProductPriceOfferSellerArchive
+            productId={productId}
+            onOpenBuyer={onOpenSellerProfile}
+          />
+        ) : null}
+      </>
+    );
+  }
+
+  return (
+    <section
+      id="product-details-auction"
+      className="product-details-modal__auction-section"
+      aria-label={PRODUCT_PRICE_OFFER_UI.TAB_AUCTION}
+    >
+      {auctionUi.auctionActive ? (
+        <ProductPriceOfferBuyerBlock
+          productId={productId}
+          isAuthorized={isAuthorized}
+          isUserDataConfirmed={isUserDataConfirmed}
+          isOwnProduct={isOwnProduct}
+          top={topOffers}
+          onOpenBuyer={onOpenSellerProfile}
+          onRequestLogin={onRequestLogin}
+          onOffersChanged={onOffersChanged}
+        />
+      ) : auctionUi.buyerMessage === "ended" ? (
+        <p className="product-price-offer__hint">{PRODUCT_PRICE_OFFER_UI.AUCTION_ENDED}</p>
+      ) : auctionUi.buyerMessage === "notHeld" ? (
+        <ProductPriceOfferHintMessage>
+          {PRODUCT_PRICE_OFFER_UI.AUCTION_NOT_HELD}
+        </ProductPriceOfferHintMessage>
+      ) : null}
+    </section>
+  );
+}

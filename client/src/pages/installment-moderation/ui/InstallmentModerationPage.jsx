@@ -1,10 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
-import {
-  approveInstallmentModeration,
-  fetchPendingInstallmentModeration,
-  rejectInstallmentModeration,
-} from "../../../entities/installment/api/installmentApi.js";
+import { useInstallmentMutations } from "../../../entities/installment/model/useInstallmentMutations.js";
+import { installmentQueryKeys } from "../../../entities/installment/model/installmentQueryKeys.js";
+import { usePendingInstallmentModerationQuery } from "../../../entities/installment/model/usePendingInstallmentModerationQuery.js";
 import { INSTALLMENT_UI } from "../../../shared/config/appUiCopy.js";
 
 import "./InstallmentModerationPage.css";
@@ -17,45 +16,47 @@ import "./InstallmentModerationPage.css";
  * @param {{ onQueueChanged?: () => void }} props
  */
 export function InstallmentModerationPage({ onQueueChanged }) {
-  const [phase, setPhase] = useState("loading");
-  const [programs, setPrograms] = useState(
-    /** @type {PendingInstallmentProgram[]} */ ([]),
-  );
-  const [error, setError] = useState("");
+  const queryClient = useQueryClient();
+  const { approveModerationMutation, rejectModerationMutation } = useInstallmentMutations();
+  const queueQuery = usePendingInstallmentModerationQuery();
+  const [actionError, setActionError] = useState("");
   const [pendingProductId, setPendingProductId] = useState(null);
   const [rejectComments, setRejectComments] = useState(
     /** @type {Record<string, string>} */ ({}),
   );
 
-  const loadQueue = useCallback(async () => {
-    setPhase("loading");
-    setError("");
-    try {
-      const { programs: list } = await fetchPendingInstallmentModeration();
-      setPrograms(list);
-      setPhase("success");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : INSTALLMENT_UI.ERROR_GENERIC);
-      setPhase("error");
-    }
-  }, []);
-
-  useEffect(() => {
-    void loadQueue();
-  }, [loadQueue]);
+  const programs = queueQuery.data?.programs ?? [];
+  const phase = queueQuery.isPending
+    ? "loading"
+    : queueQuery.isError && programs.length === 0
+      ? "error"
+      : "success";
+  const error =
+    queueQuery.error instanceof Error
+      ? queueQuery.error.message
+      : INSTALLMENT_UI.ERROR_GENERIC;
 
   const removeFromQueue = (productId) => {
-    setPrograms((prev) => prev.filter((row) => String(row.productId) !== productId));
+    queryClient.setQueryData(installmentQueryKeys.moderationPending(), (old) => {
+      if (!old?.programs) {
+        return old;
+      }
+      return {
+        ...old,
+        programs: old.programs.filter((row) => String(row.productId) !== productId),
+      };
+    });
   };
 
   const handleApprove = async (productId) => {
     try {
       setPendingProductId(productId);
-      await approveInstallmentModeration(productId);
+      setActionError("");
+      await approveModerationMutation.mutateAsync(productId);
       removeFromQueue(productId);
       onQueueChanged?.();
     } catch (e) {
-      setError(e instanceof Error ? e.message : INSTALLMENT_UI.ERROR_GENERIC);
+      setActionError(e instanceof Error ? e.message : INSTALLMENT_UI.ERROR_GENERIC);
     } finally {
       setPendingProductId(null);
     }
@@ -64,11 +65,15 @@ export function InstallmentModerationPage({ onQueueChanged }) {
   const handleReject = async (productId) => {
     try {
       setPendingProductId(productId);
-      await rejectInstallmentModeration(productId, rejectComments[productId] ?? "");
+      setActionError("");
+      await rejectModerationMutation.mutateAsync({
+        productId,
+        comment: rejectComments[productId] ?? "",
+      });
       removeFromQueue(productId);
       onQueueChanged?.();
     } catch (e) {
-      setError(e instanceof Error ? e.message : INSTALLMENT_UI.ERROR_GENERIC);
+      setActionError(e instanceof Error ? e.message : INSTALLMENT_UI.ERROR_GENERIC);
     } finally {
       setPendingProductId(null);
     }
@@ -103,12 +108,12 @@ export function InstallmentModerationPage({ onQueueChanged }) {
 
   return (
     <div className="installment-moderation-page">
-      {error ? (
+      {actionError ? (
         <p
           className="installment-moderation-page__state installment-moderation-page__state_error"
           role="alert"
         >
-          {error}
+          {actionError}
         </p>
       ) : null}
       <div className="installment-moderation-page__list">

@@ -1,9 +1,9 @@
 .product-price-offer {
   margin-top: 1rem;
   padding: 0.85rem 1rem;
-  border: 1px solid #eef2f7;
+  border: 1px solid var(--iz-color-neutral-gray-subtle);
   border-radius: 12px;
-  background: #f8fafc;
+  background: var(--iz-color-surface-elevated);
 }
 
 .product-price-offer__page-title {
@@ -12,7 +12,7 @@
   font-weight: 800;
   line-height: 1.2;
   letter-spacing: -0.02em;
-  color: #0f172a;
+  color: var(--iz-color-ink);
 }
 
 .product-price-offer__heading {
@@ -20,7 +20,7 @@
   font-size: 0.9375rem;
   font-weight: 700;
   line-height: 1.25;
-  color: #0f172a;
+  color: var(--iz-color-ink);
 }
 
 .product-price-offer__top-list {
@@ -37,9 +37,9 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 0.65rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--iz-color-border);
   border-radius: 8px;
-  background: #fff;
+  background: var(--iz-color-surface);
 }
 
 .product-price-offer__top-rank {
@@ -47,14 +47,14 @@
   width: 1.35rem;
   font-size: 0.8125rem;
   font-weight: 600;
-  color: #64748b;
+  color: var(--iz-color-text-subtle);
 }
 
 .product-price-offer__top-price {
   margin-left: auto;
   font-size: 0.9rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--iz-color-ink);
   white-space: nowrap;
 }
 
@@ -62,7 +62,7 @@
   padding: 0;
   border: none;
   background: none;
-  color: #1f6feb;
+  color: var(--iz-color-action);
   font: inherit;
   font-weight: 500;
   cursor: pointer;
@@ -76,9 +76,9 @@
 .product-price-offer__form {
   margin-top: 0.85rem;
   padding: 0.75rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--iz-color-border);
   border-radius: 10px;
-  background: #fff;
+  background: var(--iz-color-surface);
 }
 
 .product-price-offer__form .product-price-offer__heading {
@@ -92,7 +92,7 @@
   margin: 0;
   font-size: 0.8125rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--iz-color-text-secondary);
 }
 
 .product-price-offer__input {
@@ -100,12 +100,12 @@
   width: 100%;
   margin: 0;
   padding: 0.55rem 0.85rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--iz-color-border);
   border-radius: 0.5rem;
-  background: #fff;
+  background: var(--iz-color-surface);
   font: inherit;
   font-size: 0.95rem;
-  color: #111827;
+  color: var(--iz-color-text);
   outline: none;
   transition:
     border-color 0.15s ease,
@@ -113,8 +113,8 @@
 }
 
 .product-price-offer__input:focus {
-  border-color: #1f6feb;
-  box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.15);
+  border-color: var(--iz-color-action);
+  box-shadow: 0 0 0 3px var(--iz-color-action-focus-ring);
 }
 
 .product-price-offer__input:disabled {
@@ -153,36 +153,36 @@
 }
 
 .product-price-offer__btn--primary {
-  border: 1px solid #1f6feb;
-  background: #1f6feb;
-  color: #fff;
+  border: 1px solid var(--iz-color-action);
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast);
 }
 
 .product-price-offer__btn--primary:hover:not(:disabled) {
-  border-color: #1557b3;
-  background: #1557b3;
+  border-color: var(--iz-color-action-hover);
+  background: var(--iz-color-action-hover);
 }
 
 .product-price-offer__btn--secondary {
-  border: 1px solid rgba(31, 111, 235, 0.45);
-  background: #fff;
-  color: #1f6feb;
+  border: 1px solid var(--iz-color-action-border-strong);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-action);
 }
 
 .product-price-offer__btn--secondary:hover:not(:disabled) {
-  border-color: #1f6feb;
-  background: rgba(31, 111, 235, 0.08);
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action-bg-hover);
 }
 
 .product-price-offer__btn--reject {
-  border: 1px solid rgba(180, 83, 9, 0.45);
-  background: #fff;
-  color: #b45309;
+  border: 1px solid var(--iz-color-status-warning-border);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-warning-deep);
 }
 
 .product-price-offer__btn--reject:hover:not(:disabled) {
-  border-color: #b45309;
-  background: rgba(180, 83, 9, 0.08);
+  border-color: var(--iz-color-warning-deep);
+  background: var(--iz-color-status-warning-surface);
 }
 
 .product-price-offer__status {
@@ -196,18 +196,18 @@
 }
 
 .product-price-offer__status--pending {
-  background: #eff6ff;
-  color: #1d4ed8;
+  background: var(--iz-color-action-soft);
+  color: var(--iz-color-link-hover);
 }
 
 .product-price-offer__status--accepted {
-  background: #ecfdf5;
-  color: #0f766e;
+  background: var(--iz-color-success-soft);
+  color: var(--iz-color-success-teal);
 }
 
 .product-price-offer__status--rejected {
-  background: #fef2f2;
-  color: #b91c1c;
+  background: var(--iz-color-danger-surface);
+  color: var(--iz-color-danger-deep);
 }
 
 .product-price-offer__hint,
@@ -215,7 +215,7 @@
   margin: 0.5rem 0 0;
   font-size: 0.875rem;
   line-height: 1.4;
-  color: #64748b;
+  color: var(--iz-color-text-subtle);
 }
 
 .product-price-offer__hint--with-icon {
@@ -228,15 +228,15 @@
   display: inline-flex;
   flex-shrink: 0;
   margin-top: 0.05em;
-  color: #64748b;
+  color: var(--iz-color-text-subtle);
 }
 
 .product-price-offer__error {
   margin: 0.65rem 0 0;
   padding: 0.45rem 0.65rem;
   border-radius: 8px;
-  background: #fef2f2;
-  color: #b91c1c;
+  background: var(--iz-color-danger-surface);
+  color: var(--iz-color-danger-deep);
   font-size: 0.875rem;
   line-height: 1.4;
 }
@@ -256,9 +256,9 @@
 
 .product-price-offer__seller-row {
   padding: 0.75rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--iz-color-border);
   border-radius: 10px;
-  background: #fff;
+  background: var(--iz-color-surface);
 }
 
 .product-price-offer__seller-head {
@@ -271,7 +271,7 @@
 .product-price-offer__seller-price {
   font-size: 0.9rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--iz-color-ink);
   white-space: nowrap;
 }
 
@@ -279,39 +279,5 @@
   margin: 0.35rem 0 0;
   font-size: 0.8125rem;
   line-height: 1.35;
-  color: #64748b;
-}
-
-.product-details-modal__tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-}
-
-.product-details-modal__tab {
-  margin: 0;
-  padding: 0.4rem 0.85rem;
-  border: 1px solid rgba(31, 111, 235, 0.28);
-  border-radius: 999px;
-  background: #fff;
-  color: #1f6feb;
-  font: inherit;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition:
-    background-color 0.15s ease,
-    border-color 0.15s ease;
-}
-
-.product-details-modal__tab:hover {
-  border-color: #1f6feb;
-  background: rgba(31, 111, 235, 0.08);
-}
-
-.product-details-modal__tab_active {
-  border-color: #1f6feb;
-  background: #1f6feb;
-  color: #fff;
+  color: var(--iz-color-text-subtle);
 }

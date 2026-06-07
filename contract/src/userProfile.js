@@ -1,0 +1,247 @@
+import { z } from "zod";
+
+import {
+  ADDRESS_LINE_MAX_LENGTH,
+  USER_BACKGROUND_PRESET_IDS,
+  USER_GENDER_VALUES,
+  normalizeRuPhoneInput,
+  normalizeUserNameInput,
+  RU_PHONE_E164_REGEX,
+} from "./userFields.js";
+
+/** Синхрон с `server/constants/profileImageFocusConstants.js`. */
+export const PROFILE_IMAGE_FOCUS_MIN = 0;
+export const PROFILE_IMAGE_FOCUS_MAX = 100;
+
+/** Синхрон с `server/utils/maxWordsText.js`. */
+export const NOTES_ABOUT_USER_MAX_CHARS = 500;
+
+export const USER_ROLE_VALUES = ["user", "admin", "moderator"];
+
+export const USER_BACKGROUND_PRESET_PREFIX = "preset:";
+
+const clearableOptionalString = z
+  .union([z.string(), z.null(), z.literal("")])
+  .optional();
+
+/**
+ * @param {string} value
+ */
+function parseUserBackgroundPresetId(value) {
+  const trimmed = value.trim();
+  if (!trimmed.startsWith(USER_BACKGROUND_PRESET_PREFIX)) {
+    return null;
+  }
+  const id = trimmed.slice(USER_BACKGROUND_PRESET_PREFIX.length);
+  return USER_BACKGROUND_PRESET_IDS.includes(id) ? id : null;
+}
+
+/**
+ * @param {unknown} value
+ */
+function isHttpBackgroundImageUrl(value) {
+  return typeof value === "string" && /^https?:\/\//i.test(value.trim());
+}
+
+export const profileImageFocusSchema = z
+  .object({
+    x: z.number({ invalid_type_error: "x и y должны быть числами" }).finite(),
+    y: z.number({ invalid_type_error: "x и y должны быть числами" }).finite(),
+  })
+  .superRefine((value, ctx) => {
+    if (
+      value.x < PROFILE_IMAGE_FOCUS_MIN ||
+      value.x > PROFILE_IMAGE_FOCUS_MAX ||
+      value.y < PROFILE_IMAGE_FOCUS_MIN ||
+      value.y > PROFILE_IMAGE_FOCUS_MAX
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `x и y от ${PROFILE_IMAGE_FOCUS_MIN} до ${PROFILE_IMAGE_FOCUS_MAX}`,
+      });
+    }
+  });
+
+export const nullableProfileImageFocusSchema = z
+  .union([profileImageFocusSchema, z.null()])
+  .optional();
+
+const clearableProfileImageFocusSchema = nullableProfileImageFocusSchema;
+
+const clearableUserNameSchema = clearableOptionalString
+  .transform((value) => {
+    if (value === undefined) return undefined;
+    if (value === null || value === "") return null;
+    return normalizeUserNameInput(value);
+  })
+  .superRefine((value, ctx) => {
+    if (value === undefined || value === null) return;
+    const USER_NAME_MIN_LENGTH = 3;
+    const USER_NAME_MAX_LENGTH = 30;
+    const USER_NAME_REGEX = /^[a-z0-9]+$/;
+    if (value.length < USER_NAME_MIN_LENGTH) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Никнейм не короче ${USER_NAME_MIN_LENGTH} символов`,
+      });
+      return;
+    }
+    if (value.length > USER_NAME_MAX_LENGTH) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Никнейм не длиннее ${USER_NAME_MAX_LENGTH} символов`,
+      });
+      return;
+    }
+    if (!USER_NAME_REGEX.test(value)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          "Никнейм: только строчные латинские буквы (a–z) и цифры (0–9), без пробелов и других символов",
+      });
+    }
+  });
+
+const clearableRuPhoneSchema = clearableOptionalString
+  .transform((raw, ctx) => {
+    if (raw === undefined) return undefined;
+    if (raw === null || raw === "") return null;
+    try {
+      const normalized = normalizeRuPhoneInput(raw);
+      if (!RU_PHONE_E164_REGEX.test(normalized)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            "Номер РФ: +7 9XX XXX XX XX (можно 8…, 9XXXXXXXXX или с пробелами/скобками)",
+        });
+        return z.NEVER;
+      }
+      return normalized;
+    } catch (error) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: error instanceof Error ? error.message : "Неверный номер телефона",
+      });
+      return z.NEVER;
+    }
+  });
+
+const clearableBirthDateSchema = clearableOptionalString.superRefine((value, ctx) => {
+  if (value === undefined || value === null || value === "") return;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Дата рождения должна быть в формате ISO 8601",
+    });
+    return;
+  }
+  if (date > new Date()) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Дата рождения не может быть в будущем",
+    });
+  }
+});
+
+const clearableAvatarUrlSchema = clearableOptionalString.superRefine((value, ctx) => {
+  if (value === undefined || value === null || value === "") return;
+  try {
+    // eslint-disable-next-line no-new
+    new URL(value);
+  } catch {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "URL аватара должен быть валидным URL",
+    });
+  }
+});
+
+const clearableBackgroundUrlSchema = clearableOptionalString.superRefine((value, ctx) => {
+  if (value === undefined || value === null || value === "") return;
+  if (parseUserBackgroundPresetId(value) || isHttpBackgroundImageUrl(value)) {
+    return;
+  }
+  ctx.addIssue({
+    code: z.ZodIssueCode.custom,
+    message: "Фон: пресет preset:<id> или URL (http/https)",
+  });
+});
+
+const clearablePremiumExpiresAtSchema = clearableOptionalString.superRefine((value, ctx) => {
+  if (value === undefined || value === null || value === "") return;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "premiumExpiresAt: некорректная дата",
+    });
+  }
+});
+
+const clearableBooleanSchema = z.union([z.boolean(), z.null()]).optional();
+
+/** Тело `PATCH /user/:userIdClient` (структура; DaData — отдельно на сервере). */
+export const updateProfileBodySchema = z.object({
+  userName: clearableUserNameSchema,
+  userBirthDate: clearableBirthDateSchema,
+  userGender: z.union([z.enum(USER_GENDER_VALUES), z.null()]).optional(),
+  userPhoneNumber: clearableRuPhoneSchema,
+  userAvatarUrl: clearableAvatarUrlSchema,
+  userAvatarFocus: clearableProfileImageFocusSchema,
+  userBackgroundFocus: clearableProfileImageFocusSchema,
+  userBackgroundUrl: clearableBackgroundUrlSchema,
+  userAddress: z
+    .union([z.string(), z.null(), z.literal("")])
+    .optional()
+    .transform((value) => {
+      if (value === undefined) return undefined;
+      if (value === null || value === "") return null;
+      return String(value).trim();
+    })
+    .refine(
+      (value) => value === undefined || value === null || value.length <= ADDRESS_LINE_MAX_LENGTH,
+      `Адрес не длиннее ${ADDRESS_LINE_MAX_LENGTH} символов`,
+    ),
+  userAddressFlat: z
+    .union([z.string(), z.null(), z.literal("")])
+    .optional()
+    .transform((value) => {
+      if (value === undefined) return undefined;
+      if (value === null || value === "") return null;
+      return String(value).trim();
+    }),
+  notificationsEnabled: clearableBooleanSchema,
+  userRole: z.union([z.enum(USER_ROLE_VALUES), z.null()]).optional(),
+  isActiveUser: clearableBooleanSchema,
+  isUserDataConfirmed: clearableBooleanSchema,
+  isBlockedUser: clearableBooleanSchema,
+  userDiscountPercent: z
+    .union([z.coerce.number(), z.null()])
+    .optional()
+    .refine(
+      (value) => value === undefined || value === null || (value >= 0 && value <= 100),
+      "Процент скидки должен быть числом от 0 до 100",
+    ),
+  userLoyaltyPoints: z
+    .union([z.coerce.number().int(), z.null()])
+    .optional()
+    .refine(
+      (value) => value === undefined || value === null || value >= 0,
+      "Баллы лояльности должны быть целым числом не меньше 0",
+    ),
+  isPremiumUser: clearableBooleanSchema,
+  premiumExpiresAt: clearablePremiumExpiresAtSchema,
+  notesAboutUser: z
+    .union([z.string(), z.null(), z.literal("")])
+    .optional()
+    .transform((value) => {
+      if (value === undefined) return undefined;
+      if (value === null || value === "") return null;
+      return String(value).trim();
+    })
+    .refine(
+      (value) => value === undefined || value === null || value.length <= NOTES_ABOUT_USER_MAX_CHARS,
+      `Слишком длинный текст`,
+    ),
+});

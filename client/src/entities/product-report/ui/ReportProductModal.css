@@ -12,7 +12,7 @@
 .report-product-modal__backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(17, 24, 39, 0.55);
+  background: var(--iz-color-overlay-backdrop);
 }
 
 .report-product-modal__card {
@@ -21,10 +21,10 @@
   width: 100%;
   max-width: 28rem;
   border-radius: 0.75rem;
-  border: 1px solid #e5e7eb;
-  background: #fff;
+  border: 1px solid var(--iz-color-border);
+  background: var(--iz-color-surface);
   padding: 1rem;
-  box-shadow: 0 20px 45px rgba(17, 24, 39, 0.28);
+  box-shadow: 0 20px 45px var(--iz-shadow-dialog);
 }
 
 .report-product-modal__header {
@@ -44,18 +44,18 @@
   background: transparent;
   font-size: 1.5rem;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--iz-color-text-muted);
 }
 
 .report-product-modal__product-name {
   margin: 0 0 0.75rem;
   font-size: 0.9rem;
-  color: #4b5563;
+  color: var(--iz-color-text-tertiary);
 }
 
 .report-product-modal__already {
   margin: 0.5rem 0 0;
-  color: #6b7280;
+  color: var(--iz-color-text-muted);
 }
 
 .report-product-modal__label {
@@ -68,7 +68,7 @@
 .report-product-modal__textarea {
   resize: none;
   min-height: 5rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--iz-color-border-strong);
   border-radius: 0.5rem;
   padding: 0.5rem 0.625rem;
   font: inherit;
@@ -76,17 +76,17 @@
 
 .report-product-modal__meter {
   font-size: 0.78rem;
-  color: #6b7280;
+  color: var(--iz-color-text-muted);
 }
 
 .report-product-modal__meter_overflow {
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
   font-weight: 600;
 }
 
 .report-product-modal__error {
   margin: 0.5rem 0 0;
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
   font-size: 0.875rem;
 }
 
@@ -106,14 +106,14 @@
 }
 
 .report-product-modal__cancel {
-  border: 1px solid #d1d5db;
-  background: #fff;
+  border: 1px solid var(--iz-color-border-strong);
+  background: var(--iz-color-surface);
 }
 
 .report-product-modal__submit {
-  border: 1px solid #1f6feb;
-  background: #1f6feb;
-  color: #fff;
+  border: 1px solid var(--iz-color-action);
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast);
 }
 
 .report-product-modal__submit:disabled {

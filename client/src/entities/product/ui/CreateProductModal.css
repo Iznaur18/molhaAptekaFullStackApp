@@ -1,5 +1,5 @@
 .create-product-modal__panel {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--iz-color-border);
   max-height: min(90vh, 640px);
 }
 
@@ -47,34 +47,34 @@
   height: 2rem;
   margin: 0;
   padding: 0;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--iz-color-border-strong);
   border-radius: 0.5rem;
-  background: #f9fafb;
+  background: var(--iz-color-surface-muted);
   font-size: 1rem;
   line-height: 1;
   cursor: pointer;
 }
 
 .create-product-modal__image-remove:hover {
-  background: #fee2e2;
-  border-color: #fca5a5;
+  background: var(--iz-color-danger-soft);
+  border-color: var(--iz-color-danger-coral);
 }
 
 .create-product-modal__image-add {
   align-self: flex-start;
   margin: 0;
   padding: 0.35rem 0.65rem;
-  border: 1px dashed #93c5fd;
+  border: 1px dashed var(--iz-color-action-light);
   border-radius: 0.5rem;
-  background: #eff6ff;
-  color: #1d4ed8;
+  background: var(--iz-color-action-soft);
+  color: var(--iz-color-link-hover);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
 }
 
 .create-product-modal__image-add:hover {
-  background: #dbeafe;
+  background: var(--iz-color-action-border);
 }
 
 .create-product-modal__label {
@@ -88,7 +88,7 @@
 .create-product-modal__textarea {
   box-sizing: border-box;
   width: 100%;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--iz-color-border-strong);
   border-radius: 0.5rem;
   padding: 0.5rem 0.625rem;
   font-size: 1rem;
@@ -118,29 +118,29 @@
 }
 
 .create-product-modal__message_error {
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
 }
 
 .create-product-modal__discount-preview {
   margin: -0.35rem 0 0.15rem;
   font-size: 0.82rem;
   font-weight: 600;
-  color: #991b1b;
+  color: var(--iz-color-danger-text);
 }
 
 .create-product-modal__hint {
   margin: 0.35rem 0 0;
   font-size: 0.82rem;
-  color: #64748b;
+  color: var(--iz-color-text-subtle);
   line-height: 1.35;
 }
 
 .create-product-modal__submit {
   margin-top: 0.25rem;
-  border: 1px solid #1f6feb;
+  border: 1px solid var(--iz-color-action);
   border-radius: 0.5rem;
-  background: #1f6feb;
-  color: #fff;
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast);
   padding: 0.55rem 0.85rem;
   font-size: 1rem;
   font-weight: 500;
@@ -154,10 +154,10 @@
 
 .create-product-modal__char-meter {
   font-size: 0.78rem;
-  color: #6b7280;
+  color: var(--iz-color-text-muted);
 }
 
 .create-product-modal__char-meter_overflow {
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
   font-weight: 600;
 }

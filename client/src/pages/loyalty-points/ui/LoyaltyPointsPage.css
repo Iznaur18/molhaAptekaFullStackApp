@@ -6,16 +6,16 @@
 
 .loyalty-points-page__state {
   margin: 0;
-  color: #64748b;
+  color: var(--iz-color-text-subtle);
 }
 
 .loyalty-points-page__state_error {
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
 }
 
 .loyalty-points-page__hint {
   margin: 0;
-  color: #64748b;
+  color: var(--iz-color-text-subtle);
 }
 
 .loyalty-points-page__login {
@@ -26,13 +26,13 @@
   margin: 0;
   font-size: 1.35rem;
   font-weight: 700;
-  color: #1e40af;
+  color: var(--iz-color-info-deep);
 }
 
 .loyalty-points-page__uses {
   margin: 0;
   padding-left: 1.15rem;
-  color: #334155;
+  color: var(--iz-color-slate);
   font-size: 0.92rem;
   line-height: 1.45;
 }
@@ -42,16 +42,16 @@
   flex-direction: column;
   gap: 0.55rem;
   padding: 1rem;
-  border: 1px solid #bfdbfe;
+  border: 1px solid var(--iz-color-info-muted);
   border-radius: 12px;
-  background: linear-gradient(180deg, #f8fafc 0%, #fff 70%);
+  background: var(--iz-gradient-surface-fade);
 }
 
 .loyalty-points-page__purchase-title {
   margin: 0;
   font-size: 1rem;
   font-weight: 700;
-  color: #1e3a8a;
+  color: var(--iz-color-info-navy);
 }
 
 .loyalty-points-page__purchase-label {
@@ -60,7 +60,7 @@
   gap: 0.35rem;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #334155;
+  color: var(--iz-color-slate);
 }
 
 .loyalty-points-page__purchase-input {
@@ -68,33 +68,33 @@
   width: 100%;
   max-width: 12rem;
   padding: 0.5rem 0.65rem;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--iz-color-border-muted);
   border-radius: 8px;
   font: inherit;
 }
 
 .loyalty-points-page__purchase-input:focus {
-  outline: 2px solid #93c5fd;
+  outline: 2px solid var(--iz-color-action-light);
   outline-offset: 1px;
 }
 
 .loyalty-points-page__purchase-hint {
   margin: 0;
   font-size: 0.85rem;
-  color: #64748b;
+  color: var(--iz-color-text-subtle);
 }
 
 .loyalty-points-page__purchase-preview {
   margin: 0;
   font-size: 1.05rem;
   font-weight: 700;
-  color: #1e40af;
+  color: var(--iz-color-info-deep);
 }
 
 .loyalty-points-page__purchase-error {
   margin: 0;
   font-size: 0.88rem;
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
 }
 
 .loyalty-points-page__buy {
@@ -110,8 +110,8 @@
   margin: 0;
   padding: 0.65rem 0.75rem;
   border-radius: 8px;
-  border: 1px solid #bfdbfe;
-  background: #eff6ff;
-  color: #1e40af;
+  border: 1px solid var(--iz-color-info-muted);
+  background: var(--iz-color-action-soft);
+  color: var(--iz-color-info-deep);
   font-size: 0.9rem;
 }

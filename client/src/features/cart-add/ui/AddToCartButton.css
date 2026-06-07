@@ -4,10 +4,10 @@
   justify-content: center;
   margin: 0;
   padding: 0.45rem 1rem;
-  border: 1px solid #1f6feb;
+  border: 1px solid var(--iz-color-action);
   border-radius: 0.5rem;
-  background: #1f6feb;
-  color: #fff;
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast);
   font: inherit;
   font-size: 0.9rem;
   font-weight: 600;
@@ -18,8 +18,8 @@
 }
 
 .add-to-cart:hover {
-  background: #1557b3;
-  border-color: #1557b3;
+  background: var(--iz-color-action-hover);
+  border-color: var(--iz-color-action-hover);
 }
 
 .add-to-cart__stepper {
@@ -27,9 +27,9 @@
   align-items: center;
   gap: 0.4rem;
   padding: 0.25rem 0.4rem;
-  border: 1px solid #1f6feb;
+  border: 1px solid var(--iz-color-action);
   border-radius: 0.5rem;
-  background: rgba(31, 111, 235, 0.06);
+  background: var(--iz-color-action-bg-hover);
 }
 
 .add-to-cart__step-button {
@@ -38,8 +38,8 @@
   padding: 0;
   border: none;
   border-radius: 0.35rem;
-  background: #fff;
-  color: #1f6feb;
+  background: var(--iz-color-surface);
+  color: var(--iz-color-action);
   font: inherit;
   font-size: 1rem;
   font-weight: 700;
@@ -48,8 +48,8 @@
 }
 
 .add-to-cart__step-button:hover {
-  background: #1f6feb;
-  color: #fff;
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast);
 }
 
 .add-to-cart__quantity {
@@ -57,5 +57,5 @@
   text-align: center;
   font-weight: 600;
   font-size: 0.95rem;
-  color: #111827;
+  color: var(--iz-color-text);
 }

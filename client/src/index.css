@@ -1,11 +1,13 @@
+@import "./shared/styles/designTokens.css";
+
 html {
   scrollbar-gutter: stable;
 }
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  font-family: var(--iz-font-family);
+  line-height: var(--iz-line-height);
+  font-weight: var(--iz-font-weight);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -14,9 +16,8 @@ html {
 
 body {
   margin: 0;
-  /* background-color: #eaedef; */
-  background-color: #f5fbff;
-  color: #111827;
+  background-color: var(--iz-color-bg);
+  color: var(--iz-color-text);
   min-width: 320px;
   min-height: 100vh;
 }

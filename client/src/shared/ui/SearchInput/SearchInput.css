@@ -9,12 +9,12 @@
   box-sizing: border-box;
   width: 100%;
   padding: 0.55rem 2.4rem 0.55rem 0.85rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  background: #fff;
+  border: 1px solid var(--iz-color-border);
+  border-radius: var(--iz-radius-input);
+  background: var(--iz-color-surface);
   font: inherit;
   font-size: 0.95rem;
-  color: #111827;
+  color: var(--iz-color-text);
   outline: none;
   transition:
     border-color 0.15s ease,
@@ -22,8 +22,8 @@
 }
 
 .search-input__field:focus {
-  border-color: #1f6feb;
-  box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.15);
+  border-color: var(--iz-color-action);
+  box-shadow: 0 0 0 3px var(--iz-color-action-focus-ring);
 }
 
 .search-input__field::-webkit-search-cancel-button {
@@ -41,15 +41,15 @@
   border: none;
   border-radius: 50%;
   background: transparent;
-  color: #6b7280;
+  color: var(--iz-color-text-muted);
   font-size: 1.1rem;
   line-height: 1;
   cursor: pointer;
 }
 
 .search-input__clear:hover {
-  background: rgba(17, 24, 39, 0.06);
-  color: #111827;
+  background: var(--iz-color-overlay-subtle);
+  color: var(--iz-color-text);
 }
 
 .search-input__spinner {
@@ -59,8 +59,8 @@
   width: 0.85rem;
   height: 0.85rem;
   margin-top: -0.425rem;
-  border: 2px solid rgba(31, 111, 235, 0.25);
-  border-top-color: #1f6feb;
+  border: 2px solid var(--iz-color-action-spinner-track);
+  border-top-color: var(--iz-color-action);
   border-radius: 50%;
   animation: search-input-spin 0.7s linear infinite;
 }

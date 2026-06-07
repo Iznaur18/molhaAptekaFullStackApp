@@ -9,7 +9,7 @@
   padding: 0;
   border: none;
   background: transparent;
-  color: #cbd5e1;
+  color: var(--iz-color-border-muted);
   line-height: 1;
 }
 
@@ -22,7 +22,7 @@
 }
 
 .product-review-stars__star--filled {
-  color: #eab308;
+  color: var(--iz-color-warning-amber);
 }
 
 .product-review-stars--interactive .product-review-stars__star {
@@ -30,5 +30,5 @@
 }
 
 .product-review-stars--interactive .product-review-stars__star:hover {
-  color: #facc15;
+  color: var(--iz-color-warning-yellow);
 }

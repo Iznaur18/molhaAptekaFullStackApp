@@ -65,7 +65,7 @@ export function CatalogGridProductCard({
   return (
     <div
       className={
-        promotionFullWidth ? "home-page__cell home-page__cell--tier3-full-width" : "home-page__cell"
+        promotionFullWidth ? "app-shell__cell app-shell__cell--tier3-full-width" : "app-shell__cell"
       }
       role="listitem"
     >

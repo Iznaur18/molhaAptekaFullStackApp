@@ -20,10 +20,10 @@
   flex-shrink: 0;
   margin: 0;
   padding: 0.5rem 0.75rem;
-  border: 1px solid #93c5fd;
+  border: 1px solid var(--iz-color-action-light);
   border-radius: 0.5rem;
-  background: #eff6ff;
-  color: #1d4ed8;
+  background: var(--iz-color-action-soft);
+  color: var(--iz-color-link-hover);
   font-size: 0.875rem;
   font-weight: 500;
   white-space: nowrap;
@@ -31,7 +31,7 @@
 }
 
 .image-url-field__upload-btn:hover:not(:disabled) {
-  background: #dbeafe;
+  background: var(--iz-color-action-border);
 }
 
 .image-url-field__upload-btn:disabled {
@@ -42,14 +42,14 @@
 .image-url-field__hint {
   margin: 0;
   font-size: 0.8rem;
-  color: #6b7280;
+  color: var(--iz-color-text-muted);
   line-height: 1.35;
 }
 
 .image-url-field__error {
   margin: 0;
   font-size: 0.8rem;
-  color: #b91c1c;
+  color: var(--iz-color-danger-deep);
   line-height: 1.35;
 }
 
@@ -85,7 +85,7 @@
 }
 
 .image-url-field_compact .image-url-field__input {
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--iz-color-border-strong);
   border-radius: 0.5rem;
   padding: 0.5rem 0.625rem;
   font-size: 1rem;

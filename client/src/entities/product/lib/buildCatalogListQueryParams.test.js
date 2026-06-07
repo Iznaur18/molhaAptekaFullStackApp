@@ -1,0 +1,83 @@
+import { describe, expect, it } from "vitest";
+
+import { buildCatalogListQueryParams } from "./buildCatalogListQueryParams.js";
+
+const baseInput = {
+  isMineMode: false,
+  isCatalogBrowserMainViewActive: true,
+  activeCatalogBrowserCategory: null,
+  activeCatalogBrowserCategoryId: null,
+  catalogQueryFromUrl: {},
+  debouncedProductSearchTerm: "",
+  selectedProductCategory: null,
+  catalogSort: null,
+  myProductsModerationFilter: null,
+  canModerateProducts: false,
+  showHiddenCatalogProducts: false,
+};
+
+describe("buildCatalogListQueryParams", () => {
+  it("builds public catalog params with filters from URL", () => {
+    const params = buildCatalogListQueryParams({
+      ...baseInput,
+      debouncedProductSearchTerm: "  аспирин ",
+      catalogQueryFromUrl: {
+        sort: "price_asc",
+        auctionOnly: true,
+        followingOnly: true,
+      },
+      activeCatalogBrowserCategory: "medicines",
+    });
+
+    expect(params).toEqual({
+      scope: "catalog",
+      search: "аспирин",
+      productCategory: "medicines",
+      categoryId: null,
+      sort: "price_asc",
+      moderationStatus: null,
+      includeHidden: null,
+      followingOnly: true,
+      auctionOnly: true,
+      installmentOnly: null,
+      saleOnly: null,
+    });
+  });
+
+  it("builds mine-mode params with moderation filter", () => {
+    const params = buildCatalogListQueryParams({
+      ...baseInput,
+      isMineMode: true,
+      selectedProductCategory: "supplements",
+      catalogSort: "newest",
+      myProductsModerationFilter: "pending",
+      canModerateProducts: true,
+      showHiddenCatalogProducts: true,
+    });
+
+    expect(params).toEqual({
+      scope: "my",
+      search: null,
+      productCategory: "supplements",
+      categoryId: null,
+      sort: "newest",
+      moderationStatus: "pending",
+      includeHidden: null,
+      followingOnly: null,
+      auctionOnly: null,
+      installmentOnly: null,
+      saleOnly: null,
+    });
+  });
+
+  it("uses categoryId instead of slug when tree id is active", () => {
+    const params = buildCatalogListQueryParams({
+      ...baseInput,
+      activeCatalogBrowserCategory: "legacy-slug",
+      activeCatalogBrowserCategoryId: "64abc",
+    });
+
+    expect(params.productCategory).toBeNull();
+    expect(params.categoryId).toBe("64abc");
+  });
+});

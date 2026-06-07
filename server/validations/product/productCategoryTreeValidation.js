@@ -1,10 +1,7 @@
-import { param } from "express-validator";
+import { productCategoryIdParamsSchema } from "@molha/api-contract";
 
-import { handleValidationByExpressErrors } from "../handleValidationByExpressErrors.js";
+import { validateParamsZod } from "../../middlewares/validateParamsZod.js";
 
 export const productCategoryIdParamValidation = [
-  param("categoryId")
-    .isMongoId()
-    .withMessage("categoryId должен быть валидным ObjectId"),
-  handleValidationByExpressErrors,
+  validateParamsZod(productCategoryIdParamsSchema),
 ];

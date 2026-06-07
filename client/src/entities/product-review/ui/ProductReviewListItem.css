@@ -1,8 +1,8 @@
 .product-review-item {
   padding: 0.75rem 0.85rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--iz-color-border-subtle);
   border-radius: 0.65rem;
-  background: #fff;
+  background: var(--iz-color-surface);
 }
 
 .product-review-item__header {
@@ -23,19 +23,19 @@
 .product-review-item__name {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #0f172a;
+  color: var(--iz-color-ink);
 }
 
 .product-review-item__date {
   flex-shrink: 0;
   font-size: 0.78rem;
-  color: #64748b;
+  color: var(--iz-color-text-subtle);
 }
 
 .product-review-item__text {
   margin: 0.45rem 0 0;
   font-size: 0.875rem;
   line-height: 1.45;
-  color: #334155;
+  color: var(--iz-color-slate);
   white-space: pre-wrap;
 }

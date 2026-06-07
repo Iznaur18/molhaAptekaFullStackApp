@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 
-import { uploadImage } from "../../api/uploadImage.js";
+import { useUploadAssetMutations } from "../../model/useUploadAssetMutations.js";
 import { validateUploadImageFile } from "../../lib/validateUploadImageFile.js";
 import { IMAGE_URL_FIELD_UI } from "../../config/appUiCopy.js";
 import { UPLOAD_FILE_INPUT_ACCEPT } from "../../config/uploadConstants.js";
@@ -35,9 +35,11 @@ export function ImageUrlField({
   ariaLabel,
   required = false,
 }) {
+  const { uploadImageMutation } = useUploadAssetMutations();
   const fileInputRef = useRef(null);
-  const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
+
+  const isUploading = uploadImageMutation.isPending;
 
   const isDisabled = disabled || isUploading;
   const uploadEnabled = canUpload && !disabled;
@@ -59,16 +61,13 @@ export function ImageUrlField({
     }
 
     setUploadError("");
-    setIsUploading(true);
     try {
-      const url = await uploadImage(file);
+      const url = await uploadImageMutation.mutateAsync(file);
       onChange(url);
     } catch (error) {
       const message =
         error instanceof Error ? error.message : IMAGE_URL_FIELD_UI.ERROR_GENERIC;
       setUploadError(message);
-    } finally {
-      setIsUploading(false);
     }
   };
 

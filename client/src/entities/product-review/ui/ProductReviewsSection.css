@@ -9,27 +9,27 @@
   margin: 0;
   font-size: 1.15rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--iz-color-ink);
 }
 
 .product-reviews-section__subheading {
   margin: 0 0 0.35rem;
   font-size: 0.95rem;
   font-weight: 600;
-  color: #334155;
+  color: var(--iz-color-slate);
 }
 
 .product-reviews-section__summary {
   margin: 0;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #b45309;
+  color: var(--iz-color-warning-deep);
 }
 
 .product-reviews-section__state {
   margin: 0;
   font-size: 0.875rem;
-  color: #64748b;
+  color: var(--iz-color-text-subtle);
 }
 
 .product-reviews-section__list {
@@ -50,10 +50,10 @@
 .product-reviews-section__login {
   align-self: flex-start;
   padding: 0.45rem 1rem;
-  border: 1px solid #1f6feb;
+  border: 1px solid var(--iz-color-action);
   border-radius: 0.5rem;
-  background: #fff;
-  color: #1f6feb;
+  background: var(--iz-color-surface);
+  color: var(--iz-color-action);
   font: inherit;
   font-size: 0.9rem;
   font-weight: 600;
@@ -63,10 +63,10 @@
 .product-reviews-section__more {
   align-self: center;
   padding: 0.4rem 0.9rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--iz-color-border-subtle);
   border-radius: 0.5rem;
-  background: #fff;
-  color: #334155;
+  background: var(--iz-color-surface);
+  color: var(--iz-color-slate);
   font: inherit;
   font-size: 0.875rem;
   cursor: pointer;
@@ -95,22 +95,22 @@
 }
 
 .product-reviews-section__edit {
-  border: 1px solid #1f6feb;
-  background: #fff;
-  color: #1f6feb;
+  border: 1px solid var(--iz-color-action);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-action);
 }
 
 .product-reviews-section__delete {
-  border: 1px solid #fecaca;
-  background: #fff;
-  color: #b91c1c;
+  border: 1px solid var(--iz-color-danger-border);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-danger-deep);
 }
 
 .product-reviews-section__cancel-edit {
   align-self: flex-start;
-  border: 1px solid #e2e8f0;
-  background: #fff;
-  color: #64748b;
+  border: 1px solid var(--iz-color-border-subtle);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text-subtle);
 }
 
 .product-reviews-section__edit:disabled,

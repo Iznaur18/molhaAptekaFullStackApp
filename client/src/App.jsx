@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes } from "react-router-dom";
 
+import { AppQueryProvider } from "./shared/api/AppQueryProvider.jsx";
 import { Sentry } from "./shared/lib/initClientSentry.js";
 import { CartProvider } from "./entities/cart/model/CartContext.jsx";
 import { AppIntroProvider } from "./features/app-intro/model/AppIntroContext.jsx";
@@ -26,7 +27,9 @@ function AppRoutes() {
 function App() {
   return (
     <Sentry.ErrorBoundary fallback={<p className="app-error-fallback">Ошибка интерфейса. Обновите страницу.</p>}>
-      <AppRoutes />
+      <AppQueryProvider>
+        <AppRoutes />
+      </AppQueryProvider>
     </Sentry.ErrorBoundary>
   );
 }

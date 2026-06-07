@@ -1,10 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-import {
-  fetchProductInstallmentProgram,
-  upsertProductInstallmentProgram,
-} from "../api/installmentApi.js";
+import { useInstallmentMutations } from "../model/useInstallmentMutations.js";
+import { useProductInstallmentProgramQuery } from "../model/useProductInstallmentProgramQuery.js";
 import {
   INSTALLMENT_MONTHLY_PAYMENT_MIN_RUB,
   INSTALLMENT_MONTHS_MAX,
@@ -42,14 +40,20 @@ export function InstallmentProgramModal({
   onClose,
   onSaved,
 }) {
+  const { upsertProgramMutation } = useInstallmentMutations();
   const [isEnabled, setIsEnabled] = useState(true);
   const [plans, setPlans] = useState([{ ...EMPTY_PLAN }]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isSubmitting = upsertProgramMutation.isPending;
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const panelRef = useRef(/** @type {HTMLDivElement | null} */ (null));
   const closeButtonRef = useRef(/** @type {HTMLButtonElement | null} */ (null));
+
+  const programQuery = useProductInstallmentProgramQuery({
+    productId,
+    enabled: isOpen && Boolean(productId),
+  });
+  const isLoading = programQuery.isLoading;
 
   useScrollLock(isOpen);
   useDialogFocusTrap(panelRef, {
@@ -82,43 +86,43 @@ export function InstallmentProgramModal({
   }, [isOpen, onClose]);
 
   useEffect(() => {
-    if (!isOpen || !productId) return;
-    let cancelled = false;
-    setIsLoading(true);
+    if (!isOpen || !productId || programQuery.isLoading) {
+      return undefined;
+    }
+
     setError("");
     setSuccess("");
-    void (async () => {
-      try {
-        const program = await fetchProductInstallmentProgram(productId);
-        if (cancelled) return;
-        if (program) {
-          setIsEnabled(program.isEnabled);
-          setPlans(
-            program.plans.length > 0
-              ? program.plans.map((plan) => ({
-                  title: plan.title,
-                  monthsCount: plan.monthsCount,
-                  monthlyAmountRub: plan.monthlyAmountRub,
-                  firstPaymentRequiredNow: plan.firstPaymentRequiredNow !== false,
-                }))
-              : [{ ...EMPTY_PLAN }],
-          );
-        } else {
-          setIsEnabled(true);
-          setPlans([{ ...EMPTY_PLAN }]);
-        }
-      } catch (e) {
-        if (!cancelled) {
-          setError(e instanceof Error ? e.message : INSTALLMENT_UI.ERROR_GENERIC);
-        }
-      } finally {
-        if (!cancelled) setIsLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [isOpen, productId]);
+
+    const program = programQuery.data;
+    if (program) {
+      setIsEnabled(program.isEnabled);
+      setPlans(
+        program.plans.length > 0
+          ? program.plans.map((plan) => ({
+              title: plan.title,
+              monthsCount: plan.monthsCount,
+              monthlyAmountRub: plan.monthlyAmountRub,
+              firstPaymentRequiredNow: plan.firstPaymentRequiredNow !== false,
+            }))
+          : [{ ...EMPTY_PLAN }],
+      );
+      return undefined;
+    }
+
+    setIsEnabled(true);
+    setPlans([{ ...EMPTY_PLAN }]);
+    return undefined;
+  }, [isOpen, productId, programQuery.data, programQuery.isLoading]);
+
+  useEffect(() => {
+    if (programQuery.isError) {
+      setError(
+        programQuery.error instanceof Error
+          ? programQuery.error.message
+          : INSTALLMENT_UI.ERROR_GENERIC,
+      );
+    }
+  }, [programQuery.error, programQuery.isError]);
 
   if (!isOpen) return null;
 
@@ -144,23 +148,23 @@ export function InstallmentProgramModal({
     event.preventDefault();
     setError("");
     setSuccess("");
-    setIsSubmitting(true);
     try {
-      await upsertProductInstallmentProgram(productId, {
-        isEnabled,
-        plans: plans.map((plan) => ({
-          title: plan.title.trim(),
-          monthsCount: Number(plan.monthsCount),
-          monthlyAmountRub: Number(plan.monthlyAmountRub),
-          firstPaymentRequiredNow: plan.firstPaymentRequiredNow,
-        })),
+      await upsertProgramMutation.mutateAsync({
+        productId,
+        body: {
+          isEnabled,
+          plans: plans.map((plan) => ({
+            title: plan.title.trim(),
+            monthsCount: Number(plan.monthsCount),
+            monthlyAmountRub: Number(plan.monthlyAmountRub),
+            firstPaymentRequiredNow: plan.firstPaymentRequiredNow,
+          })),
+        },
       });
       setSuccess(INSTALLMENT_UI.PROGRAM_MODAL_SUCCESS);
       onSaved?.();
     } catch (e) {
       setError(e instanceof Error ? e.message : INSTALLMENT_UI.ERROR_GENERIC);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 

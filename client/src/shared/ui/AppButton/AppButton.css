@@ -9,9 +9,9 @@ button:not([class]) {
   align-items: center;
   justify-content: center;
   margin: 0;
-  padding: 0.45rem 0.75rem;
+  padding: 0.45rem var(--iz-space-3);
   border: 1px solid transparent;
-  border-radius: 10px;
+  border-radius: var(--iz-radius-button);
   font: inherit;
   font-size: 0.85rem;
   font-weight: 600;
@@ -37,27 +37,27 @@ button:not([class]):hover:not(:disabled) {
 }
 
 .app-btn--primary {
-  border-color: #7c3aed;
-  background: #ede9fe;
-  color: #5b21b6;
+  border-color: var(--iz-color-accent-purple);
+  background: var(--iz-color-accent-purple-soft);
+  color: var(--iz-color-accent-purple-text);
 }
 
 .app-btn--primary:hover:not(:disabled) {
-  background: #ddd6fe;
+  background: var(--iz-color-accent-purple-hover);
 }
 
 .app-btn--danger {
-  border-color: #f87171;
-  background: #fee2e2;
-  color: #991b1b;
+  border-color: var(--iz-color-danger-coral);
+  background: var(--iz-color-danger-soft);
+  color: var(--iz-color-danger-text);
 }
 
 .app-btn--danger:hover:not(:disabled) {
-  background: #fecaca;
+  background: var(--iz-color-danger-border);
 }
 
 .app-btn--ghost {
-  padding: 0.25rem 0.5rem;
+  padding: var(--iz-space-1) var(--iz-space-2);
   border-color: transparent;
   background: transparent;
   font-weight: 500;

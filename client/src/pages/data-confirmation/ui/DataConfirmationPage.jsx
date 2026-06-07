@@ -1,10 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
-
-import { fetchMyDataConfirmationStatus } from "../../../entities/user-data-confirmation/api/fetchMyDataConfirmationStatus.js";
 import {
   USER_DATA_CONFIRMATION_STATUS_PENDING,
   USER_DATA_CONFIRMATION_STATUS_REJECTED,
 } from "../../../entities/user-data-confirmation/model/constants.js";
+import { useMyDataConfirmationStatusQuery } from "../../../entities/user-data-confirmation/model/useMyDataConfirmationStatusQuery.js";
 import { USER_DATA_CONFIRMATION_PROFILE_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
 import "./DataConfirmationPage.css";
@@ -14,54 +12,14 @@ import "./DataConfirmationPage.css";
  *   isAuthorized: boolean;
  *   onRequestLogin: () => void;
  *   onOpenRequest: () => void;
- *   statusRefreshTick?: number;
  * }} props
  */
 export function DataConfirmationPage({
   isAuthorized,
   onRequestLogin,
   onOpenRequest,
-  statusRefreshTick = 0,
 }) {
-  const [phase, setPhase] = useState("loading");
-  const [isUserDataConfirmed, setIsUserDataConfirmed] = useState(false);
-  const [requestStatus, setRequestStatus] = useState(
-    /** @type {string | null} */ (null),
-  );
-  const [staffNote, setStaffNote] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-
-  const loadStatus = useCallback(async () => {
-    if (!isAuthorized) {
-      setPhase("idle");
-      return;
-    }
-
-    setPhase("loading");
-    setErrorMessage("");
-    try {
-      const status = await fetchMyDataConfirmationStatus();
-      setIsUserDataConfirmed(status.isUserDataConfirmed);
-      setRequestStatus(status.request?.status ?? null);
-      setStaffNote(
-        status.request?.status === USER_DATA_CONFIRMATION_STATUS_REJECTED
-          ? String(status.request.staffNote ?? "").trim()
-          : "",
-      );
-      setPhase("success");
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.FETCH_FALLBACK,
-      );
-      setPhase("error");
-    }
-  }, [isAuthorized]);
-
-  useEffect(() => {
-    void loadStatus();
-  }, [loadStatus, statusRefreshTick]);
+  const statusQuery = useMyDataConfirmationStatusQuery({ enabled: isAuthorized });
 
   if (!isAuthorized) {
     return (
@@ -80,7 +38,7 @@ export function DataConfirmationPage({
     );
   }
 
-  if (phase === "loading") {
+  if (statusQuery.isPending) {
     return (
       <p className="data-confirmation-page__state">
         {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.LOADING}
@@ -88,16 +46,28 @@ export function DataConfirmationPage({
     );
   }
 
-  if (phase === "error") {
+  if (statusQuery.isError) {
+    const message =
+      statusQuery.error instanceof Error
+        ? statusQuery.error.message
+        : USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.FETCH_FALLBACK;
     return (
       <p
         className="data-confirmation-page__state data-confirmation-page__state_error"
         role="alert"
       >
-        {errorMessage}
+        {message}
       </p>
     );
   }
+
+  const status = statusQuery.data;
+  const isUserDataConfirmed = status?.isUserDataConfirmed === true;
+  const requestStatus = status?.request?.status ?? null;
+  const staffNote =
+    status?.request?.status === USER_DATA_CONFIRMATION_STATUS_REJECTED
+      ? String(status.request.staffNote ?? "").trim()
+      : "";
 
   const canOpenRequest =
     !isUserDataConfirmed && requestStatus !== USER_DATA_CONFIRMATION_STATUS_PENDING;

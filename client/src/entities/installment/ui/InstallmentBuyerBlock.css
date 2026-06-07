@@ -7,12 +7,12 @@
 .installment-buyer-block__hint {
   margin: 0;
   padding: 0.65rem 0.75rem;
-  border: 1px solid #dbeafe;
+  border: 1px solid var(--iz-color-action-border);
   border-radius: 0.65rem;
-  background: #eff6ff;
+  background: var(--iz-color-action-soft);
   font-size: 0.85rem;
   line-height: 1.45;
-  color: #1e3a8a;
+  color: var(--iz-color-info-navy);
 }
 
 .installment-buyer-block__form {
@@ -20,16 +20,16 @@
   flex-direction: column;
   gap: 0.85rem;
   padding: 0.85rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--iz-color-border-subtle);
   border-radius: 0.75rem;
-  background: #f8fafc;
+  background: var(--iz-color-surface-elevated);
 }
 
 .installment-buyer-block__legend,
 .installment-buyer-block__label {
   font-size: 0.82rem;
   font-weight: 600;
-  color: #334155;
+  color: var(--iz-color-slate);
 }
 
 .installment-buyer-block__plans {
@@ -55,9 +55,9 @@
   column-gap: 0.55rem;
   row-gap: 0.15rem;
   padding: 0.65rem 0.75rem;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--iz-color-border-muted);
   border-radius: 0.6rem;
-  background: #fff;
+  background: var(--iz-color-surface);
   cursor: pointer;
   transition:
     border-color 0.15s ease,
@@ -66,13 +66,13 @@
 }
 
 .installment-buyer-block__plan-card:hover {
-  border-color: #93c5fd;
+  border-color: var(--iz-color-action-light);
 }
 
 .installment-buyer-block__plan-card_selected {
-  border-color: #2563eb;
-  background: #eff6ff;
-  box-shadow: 0 0 0 2px rgb(37 99 235 / 12%);
+  border-color: var(--iz-color-link);
+  background: var(--iz-color-action-soft);
+  box-shadow: 0 0 0 2px var(--iz-color-action-outline-soft);
 }
 
 .installment-buyer-block__plan-input {
@@ -80,7 +80,7 @@
   width: 1rem;
   height: 1rem;
   margin: 0.15rem 0 0;
-  accent-color: #2563eb;
+  accent-color: var(--iz-color-link);
   cursor: pointer;
 }
 
@@ -88,19 +88,19 @@
   grid-area: title;
   font-size: 0.92rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--iz-color-ink);
 }
 
 .installment-buyer-block__plan-meta {
   grid-area: meta;
   font-size: 0.84rem;
-  color: #475569;
+  color: var(--iz-color-slate-muted);
 }
 
 .installment-buyer-block__plan-note {
   grid-area: note;
   font-size: 0.78rem;
-  color: #64748b;
+  color: var(--iz-color-text-subtle);
 }
 
 .installment-buyer-block__row {
@@ -121,22 +121,22 @@
   box-sizing: border-box;
   width: 100%;
   padding: 0.5rem 0.6rem;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--iz-color-border-muted);
   border-radius: 0.45rem;
-  background: #fff;
+  background: var(--iz-color-surface);
   font: inherit;
   font-size: 0.9rem;
-  color: #0f172a;
+  color: var(--iz-color-ink);
 }
 
 .installment-buyer-block__input:focus {
-  outline: 2px solid rgb(37 99 235 / 22%);
-  border-color: #2563eb;
+  outline: 2px solid var(--iz-color-action-outline-muted);
+  border-color: var(--iz-color-link);
 }
 
 .installment-buyer-block__input:disabled {
-  background: #f1f5f9;
-  color: #64748b;
+  background: var(--iz-color-surface-alt);
+  color: var(--iz-color-text-subtle);
 }
 
 .installment-buyer-block__select {
@@ -154,21 +154,21 @@
   flex-direction: column;
   gap: 0.2rem;
   padding: 0.55rem 0.65rem;
-  border: 1px dashed #cbd5e1;
+  border: 1px dashed var(--iz-color-border-muted);
   border-radius: 0.45rem;
-  background: #fff;
+  background: var(--iz-color-surface);
 }
 
 .installment-buyer-block__total-label {
   font-size: 0.78rem;
   font-weight: 600;
-  color: #64748b;
+  color: var(--iz-color-text-subtle);
 }
 
 .installment-buyer-block__total-value {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--iz-color-ink);
 }
 
 .installment-buyer-block__section {
@@ -176,9 +176,9 @@
   flex-direction: column;
   gap: 0.65rem;
   padding: 0.75rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--iz-color-border-subtle);
   border-radius: 0.6rem;
-  background: #fff;
+  background: var(--iz-color-surface);
 }
 
 .installment-buyer-block__address .address-delivery-fields {
@@ -190,15 +190,15 @@
   margin-bottom: 0.3rem;
   font-size: 0.82rem;
   font-weight: 600;
-  color: #334155;
+  color: var(--iz-color-slate);
 }
 
 .installment-buyer-block__error {
   margin: 0;
   padding: 0.55rem 0.65rem;
   border-radius: 0.45rem;
-  background: #fef2f2;
-  color: #b42318;
+  background: var(--iz-color-danger-surface);
+  color: var(--iz-color-danger-strong);
   font-size: 0.85rem;
 }
 
@@ -206,8 +206,8 @@
   margin: 0;
   padding: 0.55rem 0.65rem;
   border-radius: 0.45rem;
-  background: #ecfdf5;
-  color: #047857;
+  background: var(--iz-color-success-soft);
+  color: var(--iz-color-success-strong);
   font-size: 0.85rem;
 }
 
@@ -215,10 +215,10 @@
   width: 100%;
   margin: 0;
   padding: 0.65rem 1rem;
-  border: 1px solid #2563eb;
+  border: 1px solid var(--iz-color-link);
   border-radius: 0.5rem;
-  background: #2563eb;
-  color: #fff;
+  background: var(--iz-color-link);
+  color: var(--iz-color-on-contrast);
   font: inherit;
   font-size: 0.95rem;
   font-weight: 600;
@@ -227,8 +227,8 @@
 }
 
 .installment-buyer-block__submit:hover:not(:disabled) {
-  background: #1d4ed8;
-  border-color: #1d4ed8;
+  background: var(--iz-color-link-hover);
+  border-color: var(--iz-color-link-hover);
 }
 
 .installment-buyer-block__submit:disabled {

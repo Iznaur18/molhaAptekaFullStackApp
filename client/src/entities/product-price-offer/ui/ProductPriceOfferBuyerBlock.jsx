@@ -1,13 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { createOrder } from "../../order/api/createOrder.js";
-import { fetchCurrentUserProfile } from "../../user/api/fetchCurrentUserProfile.js";
 import { addressValueFromUser } from "../../address/lib/addressValueFromUser.js";
-import { CheckoutForm } from "../../../pages/cart/ui/CheckoutForm.jsx";
-import { cancelMyPriceOffer } from "../api/cancelMyPriceOffer.js";
-import { fetchMyPriceOffer } from "../api/fetchMyPriceOffer.js";
-import { patchMyPriceOffer } from "../api/patchMyPriceOffer.js";
-import { submitPriceOffer } from "../api/submitPriceOffer.js";
+import { useCreateOrderMutation } from "../../order/model/useCreateOrderMutation.js";
+import { useAuthSession } from "../../user/model/useAuthSession.js";
+import { CheckoutForm } from "../../../shared/ui/CheckoutForm/CheckoutForm.jsx";
+import { useMyPriceOfferQuery } from "../model/useMyPriceOfferQuery.js";
+import { usePriceOfferMutations } from "../model/usePriceOfferMutations.js";
 import {
   PRICE_OFFER_STATUS_ACCEPTED,
   PRICE_OFFER_STATUS_PENDING,
@@ -55,37 +53,33 @@ export function ProductPriceOfferBuyerBlock({
   onRequestLogin,
   onOffersChanged,
 }) {
-  const [myOffer, setMyOffer] = useState(
-    /** @type {import('../model/types.js').PriceOfferRow | null} */ (null),
-  );
+  const myOfferQuery = useMyPriceOfferQuery({
+    productId,
+    enabled: isAuthorized,
+  });
+  const { submitMutation, patchMutation, cancelMutation } =
+    usePriceOfferMutations(productId);
+  const createOrderMutation = useCreateOrderMutation();
+  const myOffer = myOfferQuery.data ?? null;
   const [priceInput, setPriceInput] = useState("");
   const [error, setError] = useState("");
-  const [isBusy, setIsBusy] = useState(false);
   const [showPay, setShowPay] = useState(false);
   const [payError, setPayError] = useState("");
   const [paySuccess, setPaySuccess] = useState("");
-  const [isPaying, setIsPaying] = useState(false);
   const [defaultAddress, setDefaultAddress] = useState({});
-
-  const reloadMyOffer = useCallback(async () => {
-    if (!isAuthorized) {
-      setMyOffer(null);
-      return;
-    }
-    try {
-      const offer = await fetchMyPriceOffer(productId);
-      setMyOffer(offer);
-      if (offer?.offerPrice != null) {
-        setPriceInput(formatIntegerGroupRu(offer.offerPrice));
-      }
-    } catch {
-      setMyOffer(null);
-    }
-  }, [isAuthorized, productId]);
+  const isBusy =
+    submitMutation.isPending || patchMutation.isPending || cancelMutation.isPending;
+  const isPaying = createOrderMutation.isPending;
 
   useEffect(() => {
-    void reloadMyOffer();
-  }, [reloadMyOffer]);
+    if (myOffer?.offerPrice != null) {
+      setPriceInput(formatIntegerGroupRu(myOffer.offerPrice));
+      return;
+    }
+    if (!myOfferQuery.isLoading) {
+      setPriceInput("");
+    }
+  }, [myOffer?._id, myOffer?.offerPrice, myOfferQuery.isLoading]);
 
   const offerId = myOffer?._id != null ? String(myOffer._id) : null;
   const hasLinkedOrder =
@@ -105,23 +99,15 @@ export function ProductPriceOfferBuyerBlock({
     }
   }, [myOffer?.status, offerId, hasLinkedOrder, productId]);
 
+  const { user } = useAuthSession();
+
   useEffect(() => {
-    if (!showPay || !isAuthorized) return undefined;
-    let isCancelled = false;
-    void (async () => {
-      try {
-        const { user } = await fetchCurrentUserProfile();
-        if (!isCancelled) {
-          setDefaultAddress(addressValueFromUser(user));
-        }
-      } catch {
-        // ignore
-      }
-    })();
-    return () => {
-      isCancelled = true;
-    };
-  }, [showPay, isAuthorized]);
+    if (!showPay || !isAuthorized || !user) {
+      return undefined;
+    }
+    setDefaultAddress(addressValueFromUser(user));
+    return undefined;
+  }, [isAuthorized, showPay, user]);
 
   const handleSubmitOffer = async () => {
     if (!isAuthorized) {
@@ -139,45 +125,36 @@ export function ProductPriceOfferBuyerBlock({
       return;
     }
 
-    setIsBusy(true);
     setError("");
     try {
       if (myOffer?.status === PRICE_OFFER_STATUS_PENDING) {
-        await patchMyPriceOffer(productId, price);
+        await patchMutation.mutateAsync(price);
       } else {
-        await submitPriceOffer(productId, price);
+        await submitMutation.mutateAsync(price);
       }
-      await reloadMyOffer();
       onOffersChanged?.();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Ошибка");
-    } finally {
-      setIsBusy(false);
     }
   };
 
   const handleCancel = async () => {
-    setIsBusy(true);
     setError("");
     try {
-      await cancelMyPriceOffer(productId);
-      setMyOffer(null);
+      await cancelMutation.mutateAsync();
       setPriceInput("");
       onOffersChanged?.();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Ошибка");
-    } finally {
-      setIsBusy(false);
     }
   };
 
   const handlePay = async (payload) => {
     if (!myOffer?._id) return;
-    setIsPaying(true);
     setPayError("");
     setPaySuccess("");
     try {
-      await createOrder({
+      await createOrderMutation.mutateAsync({
         items: [{ productId, quantity: 1 }],
         priceOfferId: String(myOffer._id),
         deliveryAddress: payload.deliveryAddress,
@@ -188,12 +165,10 @@ export function ProductPriceOfferBuyerBlock({
       if (myOffer?._id != null) {
         clearPriceOfferPayFlowOpened(productId, String(myOffer._id));
       }
-      await reloadMyOffer();
       onOffersChanged?.();
+      void myOfferQuery.refetch();
     } catch (e) {
       setPayError(e instanceof Error ? e.message : "Ошибка");
-    } finally {
-      setIsPaying(false);
     }
   };
 

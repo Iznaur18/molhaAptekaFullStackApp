@@ -2,8 +2,8 @@
   margin-bottom: 1rem;
   padding: 0.75rem 1rem;
   border-radius: 8px;
-  background: color-mix(in srgb, CanvasText 4%, Canvas);
-  border: 1px solid color-mix(in srgb, CanvasText 12%, transparent);
+  background: color-mix(in srgb, var(--iz-color-canvas-text) 4%, var(--iz-color-canvas));
+  border: 1px solid color-mix(in srgb, var(--iz-color-canvas-text) 12%, transparent);
 }
 
 .user-profile-purchases__heading-row {
@@ -37,7 +37,7 @@
   padding: 0;
   border: none;
   background: none;
-  color: #1f6feb;
+  color: var(--iz-color-action);
   font: inherit;
   font-size: 0.875rem;
   cursor: pointer;
@@ -47,11 +47,11 @@
 .user-profile-purchases__state {
   margin: 0;
   font-size: 0.875rem;
-  color: color-mix(in srgb, CanvasText 70%, transparent);
+  color: color-mix(in srgb, var(--iz-color-canvas-text) 70%, transparent);
 }
 
 .user-profile-purchases__state_error {
-  color: #b91c1c;
+  color: var(--iz-color-danger-deep);
 }
 
 .user-profile-purchases__list {
@@ -80,7 +80,7 @@
 }
 
 .user-profile-purchases__row:hover .user-profile-purchases__thumb {
-  outline: 2px solid color-mix(in srgb, #2563eb 55%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--iz-color-link) 55%, transparent);
   outline-offset: 2px;
 }
 
@@ -90,8 +90,8 @@
   height: 48px;
   border-radius: 6px;
   object-fit: cover;
-  background: color-mix(in srgb, CanvasText 8%, Canvas);
-  border: 1px solid color-mix(in srgb, CanvasText 14%, transparent);
+  background: color-mix(in srgb, var(--iz-color-canvas-text) 8%, var(--iz-color-canvas));
+  border: 1px solid color-mix(in srgb, var(--iz-color-canvas-text) 14%, transparent);
 }
 
 .user-profile-purchases__row_unavailable .user-profile-purchases__thumb {
@@ -101,15 +101,15 @@
 .user-profile-purchases__hint {
   margin: 0.5rem 0 0;
   font-size: 0.8125rem;
-  color: #b45309;
+  color: var(--iz-color-warning-deep);
 }
 
 .user-profile-purchases__more {
   margin-top: 0.5rem;
   padding: 0.35rem 0.75rem;
-  border: 1px solid color-mix(in srgb, CanvasText 20%, transparent);
+  border: 1px solid color-mix(in srgb, var(--iz-color-canvas-text) 20%, transparent);
   border-radius: 6px;
-  background: color-mix(in srgb, CanvasText 4%, Canvas);
+  background: color-mix(in srgb, var(--iz-color-canvas-text) 4%, var(--iz-color-canvas));
   color: inherit;
   font: inherit;
   font-size: 0.8125rem;
@@ -117,8 +117,8 @@
 }
 
 .user-profile-purchases__more:hover:not(:disabled) {
-  border-color: #2563eb;
-  color: #2563eb;
+  border-color: var(--iz-color-link);
+  color: var(--iz-color-link);
 }
 
 .user-profile-purchases__more:disabled {

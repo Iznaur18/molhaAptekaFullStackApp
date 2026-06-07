@@ -1,9 +1,12 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useMemo, useState } from "react";
 
-import { fetchCatalogProductById } from "../../../entities/product/api/fetchCatalogProductById.js";
+import { patchProductInAllCatalogCaches } from "../../../entities/product/lib/catalogProductsQueryCache.js";
+import { useEnsureCatalogProduct } from "../../../entities/product/model/useEnsureCatalogProduct.js";
 import { isCurrentUserProductSeller } from "../../../entities/product/lib/isCurrentUserProductSeller.js";
 import { PRODUCT_MODERATION_APPROVED } from "../../../entities/product/model/productModerationConstants.js";
-import { fetchMyProductReportStatus } from "../../../entities/product-report/api/fetchMyProductReportStatus.js";
+import { useMyProductReportStatusQuery } from "../../../entities/product-report/model/useMyProductReportStatusQuery.js";
+import { productReportQueryKeys } from "../../../entities/product-report/model/productReportQueryKeys.js";
 
 /** @typedef {import('../../../entities/product/model/types.js').ProductFromApi} ProductFromApi */
 
@@ -17,16 +20,22 @@ export const useHomeCatalogProductDetails = ({
   isAdmin,
   isMineMode,
   products,
-  setProducts,
   catalogProductDetails,
   setCatalogProductDetails,
   onBeforeOpenDetails,
 }) => {
+  const queryClient = useQueryClient();
+  const ensureCatalogProduct = useEnsureCatalogProduct();
   const [catalogProductDetailsTab, setCatalogProductDetailsTab] = useState(
     /** @type {'details' | 'auction' | 'reviews' | 'installment'} */ ("details"),
   );
-  const [catalogProductHasPendingReport, setCatalogProductHasPendingReport] =
-    useState(false);
+
+  const reportStatusQuery = useMyProductReportStatusQuery({
+    productId: catalogProductDetails?._id,
+    enabled: Boolean(catalogProductDetails?._id && isAuthorized),
+  });
+  const catalogProductHasPendingReport =
+    reportStatusQuery.data?.hasPendingReport ?? false;
 
   const canReportCatalogProduct = useMemo(() => {
     if (!isAuthorized || !catalogProductDetails || !currentUserId) {
@@ -77,16 +86,15 @@ export const useHomeCatalogProductDetails = ({
         return;
       }
 
-      void (async () => {
-        try {
-          const product = await fetchCatalogProductById(productId);
+      void ensureCatalogProduct(String(productId))
+        .then((product) => {
           setCatalogProductDetails(product);
-        } catch {
+        })
+        .catch(() => {
           // модалка не открывается
-        }
-      })();
+        });
     },
-    [onBeforeOpenDetails, products, setCatalogProductDetails],
+    [ensureCatalogProduct, onBeforeOpenDetails, products, setCatalogProductDetails],
   );
 
   const handleProductStatsUpdate = useCallback(
@@ -94,39 +102,25 @@ export const useHomeCatalogProductDetails = ({
       setCatalogProductDetails((prev) =>
         prev && String(prev._id) === productId ? { ...prev, ...stats } : prev,
       );
-      setProducts((prev) =>
-        prev.map((p) => (String(p._id) === productId ? { ...p, ...stats } : p)),
-      );
+      patchProductInAllCatalogCaches(queryClient, productId, (product) => ({
+        ...product,
+        ...stats,
+      }));
     },
-    [setCatalogProductDetails, setProducts],
+    [queryClient, setCatalogProductDetails],
   );
 
-  useEffect(() => {
-    if (!catalogProductDetails?._id || !isAuthorized) {
-      setCatalogProductHasPendingReport(false);
-      return undefined;
-    }
-
-    let isCancelled = false;
-    void (async () => {
-      try {
-        const { hasPendingReport } = await fetchMyProductReportStatus(
-          String(catalogProductDetails._id),
-        );
-        if (!isCancelled) {
-          setCatalogProductHasPendingReport(hasPendingReport);
-        }
-      } catch {
-        if (!isCancelled) {
-          setCatalogProductHasPendingReport(false);
-        }
+  const setCatalogProductHasPendingReport = useCallback(
+    (value) => {
+      if (!catalogProductDetails?._id) {
+        return;
       }
-    })();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [catalogProductDetails?._id, isAuthorized]);
+      queryClient.setQueryData(productReportQueryKeys.myStatus(String(catalogProductDetails._id)), {
+        hasPendingReport: value,
+      });
+    },
+    [catalogProductDetails?._id, queryClient],
+  );
 
   return {
     catalogProductDetailsTab,

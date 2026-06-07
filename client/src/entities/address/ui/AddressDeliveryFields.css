@@ -19,10 +19,10 @@
   list-style: none;
   max-height: 12rem;
   overflow-y: auto;
-  background: var(--color-surface, #fff);
-  border: 1px solid var(--color-border, #d0d5dd);
+  background: var(--iz-color-surface);
+  border: 1px solid var(--color-border, var(--iz-color-neutral-gray-border));
   border-radius: 0.5rem;
-  box-shadow: 0 4px 12px rgb(0 0 0 / 12%);
+  box-shadow: 0 4px 12px var(--iz-shadow-suggest);
 }
 
 .address-delivery-fields__suggestion {
@@ -37,14 +37,14 @@
 
 .address-delivery-fields__suggestion:hover,
 .address-delivery-fields__suggestion:focus-visible {
-  background: var(--color-surface-muted, #f2f4f7);
+  background: var(--color-surface-muted, var(--iz-color-neutral-gray-pale));
 }
 
 .address-delivery-fields__hint {
   font-size: 0.8rem;
-  color: var(--color-text-muted, #667085);
+  color: var(--color-text-muted, var(--iz-color-neutral-gray-deep));
 }
 
 .address-delivery-fields__hint_error {
-  color: var(--color-danger, #d92d20);
+  color: var(--color-danger, var(--iz-color-danger-rose));
 }

@@ -4,9 +4,9 @@
   width: fit-content;
   max-width: 100%;
   border-radius: 0.35rem;
-  border: 1px solid color-mix(in srgb, #16a34a 45%, transparent);
-  background: #dcfce7;
-  color: #166534;
+  border: 1px solid color-mix(in srgb, var(--iz-color-success) 45%, transparent);
+  background: var(--iz-color-success-pale);
+  color: var(--iz-color-success-muted);
   font-size: 0.72rem;
   font-weight: 700;
   line-height: 1.35;
@@ -15,7 +15,7 @@
 }
 
 .product-loyalty-points-badge--overlay {
-  box-shadow: 0 1px 6px rgb(0 0 0 / 28%);
+  box-shadow: 0 1px 6px var(--iz-shadow-badge);
   white-space: normal;
   max-width: min(100%, 9.5rem);
   text-align: left;

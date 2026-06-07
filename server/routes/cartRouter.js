@@ -2,7 +2,7 @@ import { Router } from "express";
 
 import { getMyCartController, replaceMyCartController } from "../controllers/index.js";
 import { cartReplaceRateLimiter, checkAuthMW } from "../middlewares/index.js";
-import { replaceMyCartValidationZod } from "../validations/index.js";
+import { replaceMyCartValidation } from "../validations/index.js";
 
 const router = Router();
 
@@ -11,7 +11,7 @@ router.put(
   "/",
   checkAuthMW,
   cartReplaceRateLimiter,
-  replaceMyCartValidationZod,
+  replaceMyCartValidation,
   replaceMyCartController,
 );
 

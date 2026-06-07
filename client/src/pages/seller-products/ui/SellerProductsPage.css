@@ -17,7 +17,7 @@
   padding: 0;
   border: none;
   background: none;
-  color: #1f6feb;
+  color: var(--iz-color-action);
   font: inherit;
   cursor: pointer;
   text-decoration: underline;
@@ -52,15 +52,15 @@
 }
 
 .seller-products-page__state_error {
-  color: #b91c1c;
+  color: var(--iz-color-danger-deep);
 }
 
 .seller-products-page__login {
   margin-top: 0.5rem;
   padding: 0.45rem 0.9rem;
-  border: 1px solid color-mix(in srgb, CanvasText 20%, transparent);
+  border: 1px solid color-mix(in srgb, var(--iz-color-canvas-text) 20%, transparent);
   border-radius: 8px;
-  background: Canvas;
+  background: var(--iz-color-canvas);
   font: inherit;
   cursor: pointer;
 }

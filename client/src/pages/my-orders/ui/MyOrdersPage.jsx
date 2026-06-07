@@ -1,12 +1,11 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useState } from "react";
 
 import { useRefetchOnVisible } from "../../../shared/lib/useRefetchOnVisible.js";
 
-import { fetchMyOrders } from "../../../entities/order/api/fetchMyOrders.js";
-import {
-  confirmOrderItem,
-  markOrderItemCancelled,
-} from "../../../entities/order/api/updateOrderItemStatus.js";
+import { orderQueryKeys } from "../../../entities/order/model/orderQueryKeys.js";
+import { useMyOrdersQuery } from "../../../entities/order/model/useMyOrdersQuery.js";
+import { useOrderMutations } from "../../../entities/order/model/useOrderMutations.js";
 import {
   ORDER_STATUS_CANCELLED,
   ORDER_STATUS_CONFIRMED,
@@ -39,11 +38,19 @@ export function MyOrdersPage({
   onRequestLogin = () => {},
   onQueueChanged,
 }) {
-  const [phase, setPhase] = useState("loading");
-  const [orders, setOrders] = useState(
-    /** @type {import('../../../entities/order/model/types.js').Order[]} */ ([]),
-  );
-  const [error, setError] = useState("");
+  const queryClient = useQueryClient();
+  const { confirmItemMutation, cancelItemMutation } = useOrderMutations();
+  const ordersQuery = useMyOrdersQuery({ enabled: isAuthorized });
+  const orders = ordersQuery.data ?? [];
+  const phase = ordersQuery.isPending
+    ? "loading"
+    : ordersQuery.isError
+      ? "error"
+      : "success";
+  const error =
+    ordersQuery.error instanceof Error
+      ? ordersQuery.error.message
+      : API_CLIENT_UI.FETCH_MY_ORDERS_FALLBACK;
   const [pendingActionKey, setPendingActionKey] = useState(null);
   const [itemActionErrors, setItemActionErrors] = useState({});
   const [loyaltyFlash, setLoyaltyFlash] = useState("");
@@ -58,16 +65,8 @@ export function MyOrdersPage({
   } = useCatalogProductDetailsOpener();
 
   const reloadOrders = useCallback(async () => {
-    try {
-      const list = await fetchMyOrders();
-      setOrders(list);
-      setPhase("success");
-      setError("");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : API_CLIENT_UI.FETCH_MY_ORDERS_FALLBACK);
-      setPhase("error");
-    }
-  }, []);
+    await ordersQuery.refetch();
+  }, [ordersQuery]);
 
   useRefetchOnVisible(reloadOrders, phase === "success");
 
@@ -77,35 +76,24 @@ export function MyOrdersPage({
     return () => window.clearTimeout(timerId);
   }, [loyaltyFlash]);
 
-  useEffect(() => {
-    let isCancelled = false;
-    const load = async () => {
-      try {
-        const list = await fetchMyOrders();
-        if (isCancelled) return;
-        setOrders(list);
-        setPhase("success");
-      } catch (e) {
-        if (isCancelled) return;
-        setError(
-          e instanceof Error ? e.message : API_CLIENT_UI.FETCH_MY_ORDERS_FALLBACK,
-        );
-        setPhase("error");
-      }
-    };
-
-    void load();
-    return () => {
-      isCancelled = true;
-    };
-  }, []);
+  const patchOrders = useCallback(
+    (/** @type {(orders: import('../../../entities/order/model/types.js').Order[]) => import('../../../entities/order/model/types.js').Order[]} */ updater) => {
+      queryClient.setQueryData(orderQueryKeys.my(), (old) => {
+        if (!Array.isArray(old)) {
+          return old;
+        }
+        return updater(old);
+      });
+    },
+    [queryClient],
+  );
 
   const handleConfirmDelivered = async ({ orderId, itemIndex }) => {
     const actionKey = `${orderId}:${itemIndex}`;
     setPendingActionKey(actionKey);
     setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
 
-    setOrders((prev) =>
+    patchOrders((prev) =>
       prev.map((order) => {
         if (order._id !== orderId) return order;
         const nextItems = order.items.map((item, index) => {
@@ -119,14 +107,14 @@ export function MyOrdersPage({
     );
 
     try {
-      const { order: updatedOrder, pointsEarned } = await confirmOrderItem(
+      const { order: updatedOrder, pointsEarned } = await confirmItemMutation.mutateAsync({
         orderId,
         itemIndex,
-      );
+      });
       if (pointsEarned > 0) {
         setLoyaltyFlash(MY_ORDERS_PAGE_UI.LOYALTY_POINTS_EARNED(pointsEarned));
       }
-      setOrders((prev) =>
+      patchOrders((prev) =>
         prev.map((order) => (order._id === orderId ? updatedOrder : order)),
       );
       onQueueChanged?.();
@@ -150,7 +138,7 @@ export function MyOrdersPage({
     setPendingActionKey(actionKey);
     setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
 
-    setOrders((prev) =>
+    patchOrders((prev) =>
       prev.map((order) => {
         if (order._id !== orderId) return order;
         const nextItems = order.items.map((item, index) => {
@@ -164,8 +152,8 @@ export function MyOrdersPage({
     );
 
     try {
-      const updatedOrder = await markOrderItemCancelled(orderId, itemIndex);
-      setOrders((prev) =>
+      const updatedOrder = await cancelItemMutation.mutateAsync({ orderId, itemIndex });
+      patchOrders((prev) =>
         prev.map((order) => (order._id === orderId ? updatedOrder : order)),
       );
       onQueueChanged?.();

@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
-import { approveProductModeration } from "../../../entities/product/api/approveProductModeration.js";
-import { fetchPendingModerationProducts } from "../../../entities/product/api/fetchPendingModerationProducts.js";
-import { rejectProductModeration } from "../../../entities/product/api/rejectProductModeration.js";
+import { useProductModerationMutations } from "../../../entities/product/model/useProductModerationMutations.js";
+import { moderationQueryKeys } from "../../../entities/product/model/moderationQueryKeys.js";
+import { usePendingModerationProductsQuery } from "../../../entities/product/model/usePendingModerationProductsQuery.js";
 import { ProductCard } from "../../../entities/product/ui/ProductCard.jsx";
 import {
   API_CLIENT_UI,
@@ -11,6 +12,8 @@ import {
 
 import "./ProductModerationPage.css";
 
+const MODERATION_QUEUE_LIMIT = 100;
+
 /**
  * @param {{
  *   onSellerNameClick?: (userId: string) => void;
@@ -18,11 +21,10 @@ import "./ProductModerationPage.css";
  * }} props
  */
 export function ProductModerationPage({ onSellerNameClick, onQueueChanged }) {
-  const [phase, setPhase] = useState("loading");
-  const [products, setProducts] = useState(
-    /** @type {import('../../../entities/product/model/types.js').ProductFromApi[]} */ ([]),
-  );
-  const [error, setError] = useState("");
+  const queryClient = useQueryClient();
+  const { approveMutation, rejectMutation } = useProductModerationMutations();
+  const queueQuery = usePendingModerationProductsQuery({ limit: MODERATION_QUEUE_LIMIT });
+  const [actionError, setActionError] = useState("");
   const [pendingProductId, setPendingProductId] = useState(null);
   const [rejectComments, setRejectComments] = useState(
     /** @type {Record<string, string>} */ ({}),
@@ -31,29 +33,30 @@ export function ProductModerationPage({ onSellerNameClick, onQueueChanged }) {
     /** @type {Record<string, string>} */ ({}),
   );
 
-  const loadQueue = useCallback(async () => {
-    setPhase("loading");
-    setError("");
-    try {
-      const { products: list } = await fetchPendingModerationProducts({
-        limit: 100,
-      });
-      setProducts(list);
-      setPhase("success");
-    } catch (e) {
-      setError(
-        e instanceof Error ? e.message : API_CLIENT_UI.FETCH_MODERATION_QUEUE_FALLBACK,
-      );
-      setPhase("error");
-    }
-  }, []);
-
-  useEffect(() => {
-    void loadQueue();
-  }, [loadQueue]);
+  const products = queueQuery.data?.products ?? [];
+  const phase = queueQuery.isPending
+    ? "loading"
+    : queueQuery.isError && products.length === 0
+      ? "error"
+      : "success";
+  const error =
+    queueQuery.error instanceof Error
+      ? queueQuery.error.message
+      : API_CLIENT_UI.FETCH_MODERATION_QUEUE_FALLBACK;
 
   const removeFromQueue = (productId) => {
-    setProducts((prev) => prev.filter((p) => String(p._id) !== productId));
+    queryClient.setQueryData(
+      moderationQueryKeys.pending({ limit: MODERATION_QUEUE_LIMIT }),
+      (old) => {
+        if (!old?.products) {
+          return old;
+        }
+        return {
+          ...old,
+          products: old.products.filter((product) => String(product._id) !== productId),
+        };
+      },
+    );
     setRejectComments((prev) => {
       const next = { ...prev };
       delete next[productId];
@@ -69,9 +72,9 @@ export function ProductModerationPage({ onSellerNameClick, onQueueChanged }) {
   const handleApprove = async (productId) => {
     try {
       setPendingProductId(productId);
-      setError("");
+      setActionError("");
       setCardErrors((prev) => ({ ...prev, [productId]: "" }));
-      await approveProductModeration(productId);
+      await approveMutation.mutateAsync(productId);
       removeFromQueue(productId);
       onQueueChanged?.();
     } catch (e) {
@@ -79,7 +82,7 @@ export function ProductModerationPage({ onSellerNameClick, onQueueChanged }) {
         e instanceof Error
           ? e.message
           : API_CLIENT_UI.APPROVE_PRODUCT_MODERATION_FALLBACK;
-      setError(message);
+      setActionError(message);
       setCardErrors((prev) => ({ ...prev, [productId]: message }));
     } finally {
       setPendingProductId(null);
@@ -89,10 +92,10 @@ export function ProductModerationPage({ onSellerNameClick, onQueueChanged }) {
   const handleReject = async (productId) => {
     try {
       setPendingProductId(productId);
-      setError("");
+      setActionError("");
       setCardErrors((prev) => ({ ...prev, [productId]: "" }));
       const comment = rejectComments[productId] ?? "";
-      await rejectProductModeration(productId, comment);
+      await rejectMutation.mutateAsync({ productId, comment });
       removeFromQueue(productId);
       onQueueChanged?.();
     } catch (e) {
@@ -100,7 +103,7 @@ export function ProductModerationPage({ onSellerNameClick, onQueueChanged }) {
         e instanceof Error
           ? e.message
           : API_CLIENT_UI.REJECT_PRODUCT_MODERATION_FALLBACK;
-      setError(message);
+      setActionError(message);
       setCardErrors((prev) => ({ ...prev, [productId]: message }));
     } finally {
       setPendingProductId(null);
@@ -136,16 +139,16 @@ export function ProductModerationPage({ onSellerNameClick, onQueueChanged }) {
 
   return (
     <div className="product-moderation-page">
-      {error ? (
+      {actionError ? (
         <p
           className="product-moderation-page__state product-moderation-page__state_error"
           role="alert"
         >
-          {error}
+          {actionError}
         </p>
       ) : null}
       <div
-        className="home-page__grid"
+        className="app-shell__grid"
         role="list"
         aria-label={PRODUCT_MODERATION_PAGE_UI.PRODUCTS_LIST_ARIA}
       >
@@ -154,7 +157,7 @@ export function ProductModerationPage({ onSellerNameClick, onQueueChanged }) {
           const isBusy = pendingProductId === id;
 
           return (
-            <div key={id} className="home-page__cell" role="listitem">
+            <div key={id} className="app-shell__cell" role="listitem">
               <ProductCard
                 product={product}
                 onSellerNameClick={onSellerNameClick}

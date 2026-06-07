@@ -4,8 +4,8 @@
   border-radius: calc(var(--product-card-radius) * 1.08);
   background: linear-gradient(
     105deg,
-    #fff 0%,
-    color-mix(in srgb, #fff 88%, var(--product-card-banner-accent-soft)) 52%,
+    var(--iz-color-on-contrast) 0%,
+    color-mix(in srgb, var(--iz-color-on-contrast) 88%, var(--product-card-banner-accent-soft)) 52%,
     var(--product-card-banner-gradient-end) 100%
   );
   box-shadow: 0 2px 14px color-mix(in srgb, var(--product-card-banner-accent) 12%, transparent);
@@ -68,7 +68,7 @@
   border: none;
   border-radius: 999px;
   background: var(--product-card-banner-accent);
-  color: #fff;
+  color: var(--iz-color-on-contrast);
   font-size: 0.72rem;
   font-weight: 600;
   line-height: 1.2;
@@ -80,7 +80,7 @@
   font-size: 1.28rem;
   line-height: 1.22;
   font-weight: 600;
-  color: #111827;
+  color: var(--iz-color-text);
   white-space: normal;
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -103,21 +103,21 @@
 .product-card--banner-layout .product-card__price--banner .product-price-display__current {
   font-size: 1.45rem;
   font-weight: 600;
-  color: #1d4ed8;
+  color: var(--iz-color-link-hover);
   letter-spacing: -0.03em;
 }
 
 .product-card--banner-layout .product-card__price--banner .product-price-display__old {
   font-size: 0.92rem;
-  color: #9ca3af;
+  color: var(--iz-color-text-placeholder);
 }
 
 .product-card--banner-layout .product-discount-badge--banner {
   padding: 0.22rem 0.55rem;
   border: none;
   border-radius: 999px;
-  background: #fecdd3;
-  color: #be123c;
+  background: var(--iz-color-danger-pink);
+  color: var(--iz-color-danger-rose-dark);
   font-size: 0.78rem;
   font-weight: 600;
   line-height: 1.2;
@@ -132,7 +132,7 @@
   font-size: 0.82rem;
   font-weight: 400;
   line-height: 1.2;
-  color: #6b7280;
+  color: var(--iz-color-text-muted);
 }
 
 .product-card--banner-layout .product-card__banner-meta-item {
@@ -145,12 +145,12 @@
 
 .product-card--banner-layout .product-card__banner-meta-item--rating {
   align-items: center;
-  color: #4b5563;
+  color: var(--iz-color-text-tertiary);
 }
 
 .product-card--banner-layout .product-card__banner-meta-sep {
   align-self: center;
-  color: #d1d5db;
+  color: var(--iz-color-border-strong);
   font-weight: 400;
   line-height: 1;
 }
@@ -239,7 +239,7 @@
   border: 1px solid var(--product-card-banner-action);
   border-radius: calc(var(--product-card-inner-radius) * 1.05);
   background: var(--product-card-banner-action);
-  color: #fff;
+  color: var(--iz-color-on-contrast);
   font-size: 0.92rem;
   font-weight: 600;
   line-height: 1.2;
@@ -269,7 +269,7 @@
   padding: 0.4rem 0.55rem;
   border-color: var(--product-card-banner-action);
   border-radius: calc(var(--product-card-inner-radius) * 1.05);
-  background: color-mix(in srgb, var(--product-card-banner-accent-soft) 72%, #fff);
+  background: color-mix(in srgb, var(--product-card-banner-accent-soft) 72%, var(--iz-color-on-contrast));
 }
 
 .product-card--banner-layout .product-card__banner-actions .add-to-cart__step-button {
@@ -278,7 +278,7 @@
 
 .product-card--banner-layout .product-card__banner-actions .add-to-cart__step-button:hover {
   background: var(--product-card-banner-action);
-  color: #fff;
+  color: var(--iz-color-on-contrast);
 }
 
 @media (min-width: 668px) {
@@ -301,7 +301,7 @@
     aspect-ratio: unset;
     border-radius: var(--product-card-banner-outer-radius) 0 0
       var(--product-card-banner-outer-radius);
-    background: #fff;
+    background: var(--iz-color-surface);
   }
 
   .product-card--banner-layout .product-card__image {

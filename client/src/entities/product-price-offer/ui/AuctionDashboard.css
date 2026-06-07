@@ -14,7 +14,7 @@
   margin: 0;
   font-size: 1.05rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--iz-color-text);
 }
 
 .auction-dashboard__list {
@@ -29,11 +29,11 @@
 .auction-dashboard__state {
   margin: 0;
   font-size: 1rem;
-  color: #4b5563;
+  color: var(--iz-color-text-tertiary);
 }
 
 .auction-dashboard__state_error {
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
 }
 
 .auction-dashboard-row {
@@ -41,9 +41,9 @@
   flex-direction: column;
   gap: 0.65rem;
   padding: 0.85rem 1rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--iz-color-border);
   border-radius: 0.6rem;
-  background: #fff;
+  background: var(--iz-color-surface);
 }
 
 .auction-dashboard-row__head {
@@ -56,17 +56,17 @@
   flex: 0 0 auto;
   width: 3.25rem;
   height: 3.25rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--iz-color-border);
   border-radius: 0.45rem;
   object-fit: cover;
-  background: #f3f4f6;
+  background: var(--iz-color-surface-subtle);
 }
 
 .auction-dashboard-row__thumb_placeholder {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #9ca3af;
+  color: var(--iz-color-text-placeholder);
   font-size: 0.7rem;
 }
 
@@ -83,7 +83,7 @@
   padding: 0;
   border: 0;
   background: transparent;
-  color: #1d4ed8;
+  color: var(--iz-color-link-hover);
   font: inherit;
   font-weight: 600;
   text-align: left;
@@ -97,20 +97,20 @@
 .auction-dashboard-row__title_static {
   margin: 0;
   font-weight: 600;
-  color: #111827;
+  color: var(--iz-color-text);
 }
 
 .auction-dashboard-row__meta {
   margin: 0;
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--iz-color-text-muted);
 }
 
 .auction-dashboard-row__price {
   flex: 0 0 auto;
   font-size: 1rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--iz-color-text);
   white-space: nowrap;
 }
 
@@ -121,11 +121,11 @@
 }
 
 .auction-dashboard-row__status_pending {
-  color: #92400e;
+  color: var(--iz-color-warning-text);
 }
 
 .auction-dashboard-row__status_accepted {
-  color: #047857;
+  color: var(--iz-color-success-strong);
 }
 
 .auction-dashboard-row__actions {
@@ -141,14 +141,14 @@
   gap: 0.2rem;
   margin: 0;
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--iz-color-text-muted);
 }
 
 .auction-dashboard-row__input {
   width: 100%;
   max-width: 12rem;
   padding: 0.4rem 0.55rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--iz-color-border-strong);
   border-radius: 0.4rem;
   font: inherit;
   font-size: 0.875rem;
@@ -161,10 +161,10 @@
   align-self: flex-end;
   margin: 0;
   padding: 0.4rem 0.75rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--iz-color-border-strong);
   border-radius: 0.4rem;
-  background: #fff;
-  color: #111827;
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
   font: inherit;
   font-size: 0.875rem;
   font-weight: 600;
@@ -174,7 +174,7 @@
 }
 
 .auction-dashboard-row__btn:hover:not(:disabled) {
-  background: #f9fafb;
+  background: var(--iz-color-surface-muted);
 }
 
 .auction-dashboard-row__btn:disabled {
@@ -183,35 +183,35 @@
 }
 
 .auction-dashboard-row__btn_primary {
-  border-color: #1d4ed8;
-  background: #2563eb;
-  color: #fff;
+  border-color: var(--iz-color-link-hover);
+  background: var(--iz-color-link);
+  color: var(--iz-color-on-contrast);
 }
 
 .auction-dashboard-row__btn_primary:hover:not(:disabled) {
-  background: #1d4ed8;
+  background: var(--iz-color-link-hover);
 }
 
 .auction-dashboard-row__btn_reject {
-  border-color: #fecaca;
-  color: #b42318;
+  border-color: var(--iz-color-danger-border);
+  color: var(--iz-color-danger-strong);
 }
 
 .auction-dashboard-row__btn_reject:hover:not(:disabled) {
-  background: #fef2f2;
+  background: var(--iz-color-danger-surface);
 }
 
 .auction-dashboard-row__error {
   margin: 0;
   font-size: 0.85rem;
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
 }
 
 .auction-dashboard-row__buyer-link {
   padding: 0;
   border: 0;
   background: transparent;
-  color: #1d4ed8;
+  color: var(--iz-color-link-hover);
   font: inherit;
   font-weight: 600;
   cursor: pointer;

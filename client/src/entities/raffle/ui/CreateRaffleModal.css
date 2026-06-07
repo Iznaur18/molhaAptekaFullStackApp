@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  background: rgb(0 0 0 / 45%);
+  background: var(--iz-color-overlay-black-strong);
 }
 
 .create-raffle-modal {
@@ -16,8 +16,8 @@
   overflow: auto;
   padding: 1rem 1.1rem 1.15rem;
   border-radius: 14px;
-  background: Canvas;
-  color: CanvasText;
+  background: var(--iz-color-canvas);
+  color: var(--iz-color-canvas-text);
 }
 
 .create-raffle-modal__header {
@@ -66,7 +66,7 @@
 
 .create-raffle-modal__error {
   margin: 0;
-  color: #b91c1c;
+  color: var(--iz-color-danger-deep);
   font-size: 0.85rem;
 }
 
@@ -85,9 +85,9 @@
 }
 
 .create-raffle-modal__actions button[type="submit"] {
-  border: 1px solid #7c3aed;
-  background: #ede9fe;
-  color: #5b21b6;
+  border: 1px solid var(--iz-color-accent-purple);
+  background: var(--iz-color-accent-purple-soft);
+  color: var(--iz-color-accent-purple-text);
   font-weight: 600;
 }
 

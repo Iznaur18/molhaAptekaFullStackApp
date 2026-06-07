@@ -1,9 +1,9 @@
 .raffle-seller-overview {
   margin: 0 0 1rem;
   padding: 0.85rem 1rem;
-  border: 1px solid color-mix(in srgb, #7c3aed 28%, transparent);
+  border: 1px solid color-mix(in srgb, var(--iz-color-accent-purple) 28%, transparent);
   border-radius: 12px;
-  background: color-mix(in srgb, #ede9fe 40%, transparent);
+  background: color-mix(in srgb, var(--iz-color-accent-purple-soft) 40%, transparent);
 }
 
 .raffle-seller-overview__title {
@@ -18,7 +18,7 @@
 }
 
 .raffle-seller-overview__state_error {
-  color: #b91c1c;
+  color: var(--iz-color-danger-deep);
 }
 
 .raffle-seller-overview__name {
@@ -34,7 +34,7 @@
 .raffle-seller-overview__comment {
   margin: 0 0 0.5rem;
   font-size: 0.8rem;
-  color: #b45309;
+  color: var(--iz-color-warning-deep);
 }
 
 .raffle-seller-overview__actions {

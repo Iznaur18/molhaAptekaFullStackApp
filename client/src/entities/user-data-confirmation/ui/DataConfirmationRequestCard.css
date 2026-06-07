@@ -1,8 +1,8 @@
 .data-confirmation-card {
   padding: 1rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--iz-color-border-subtle);
   border-radius: 10px;
-  background: #fff;
+  background: var(--iz-color-surface);
 }
 
 .data-confirmation-card__header {
@@ -16,7 +16,7 @@
 
 .data-confirmation-card__meta {
   font-size: 0.8125rem;
-  color: #64748b;
+  color: var(--iz-color-text-subtle);
 }
 
 .data-confirmation-card__link {
@@ -24,7 +24,7 @@
   padding: 0;
   border: none;
   background: none;
-  color: #2563eb;
+  color: var(--iz-color-link);
   font: inherit;
   cursor: pointer;
   text-decoration: underline;
@@ -45,7 +45,7 @@
 .data-confirmation-card__passport-grid dt {
   margin: 0;
   font-size: 0.6875rem;
-  color: #64748b;
+  color: var(--iz-color-text-subtle);
 }
 
 .data-confirmation-card__passport-grid dd {
@@ -66,7 +66,7 @@
   display: inline-flex;
   flex-direction: column;
   gap: 0.35rem;
-  color: #2563eb;
+  color: var(--iz-color-link);
   text-decoration: none;
   font-size: 0.8125rem;
 }
@@ -76,15 +76,15 @@
   width: min(100%, 18rem);
   max-height: 14rem;
   object-fit: contain;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--iz-color-border-subtle);
   border-radius: 8px;
-  background: #f8fafc;
+  background: var(--iz-color-surface-elevated);
 }
 
 .data-confirmation-card__selfie-missing {
   margin: 0;
   font-size: 0.8125rem;
-  color: #64748b;
+  color: var(--iz-color-text-subtle);
 }
 
 .data-confirmation-card__note {
@@ -98,13 +98,13 @@
 .data-confirmation-card__note textarea {
   font: inherit;
   padding: 0.5rem;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--iz-color-border-muted);
   border-radius: 6px;
 }
 
 .data-confirmation-card__error {
   margin: 0.5rem 0 0;
-  color: #b91c1c;
+  color: var(--iz-color-danger-deep);
   font-size: 0.8125rem;
 }
 
@@ -116,5 +116,5 @@
 }
 
 .data-confirmation-card__reject {
-  color: #b45309;
+  color: var(--iz-color-warning-deep);
 }

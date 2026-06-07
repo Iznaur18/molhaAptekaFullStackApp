@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 
-import { deleteMyRaffle } from "../api/deleteMyRaffle.js";
-import { fetchMyRaffle } from "../api/fetchMyRaffle.js";
-import { pauseMyRaffle } from "../api/pauseMyRaffle.js";
 import { canSellerEditRaffle } from "../lib/canSellerEditRaffle.js";
+import { useRaffleMutations } from "../model/useRaffleMutations.js";
+import { useMyRaffleQuery } from "../model/useMyRaffleQuery.js";
 import {
   API_CLIENT_UI,
   RAFFLE_MANAGE_UI,
@@ -23,91 +22,81 @@ const STATUS_LABEL = {
 
 /**
  * @param {{
- *   refreshTick?: number;
  *   onChanged?: () => void;
  *   onEditRaffle?: (raffle: import('../model/types.js').RaffleFromApi) => void;
  * }} props
  */
-export function RaffleSellerOverview({ refreshTick = 0, onChanged, onEditRaffle }) {
-  const [phase, setPhase] = useState("loading");
-  const [raffle, setRaffle] = useState(
-    /** @type {import('../model/types.js').RaffleFromApi | null} */ (null),
-  );
-  const [archive, setArchive] = useState(
-    /** @type {import('../model/types.js').RaffleFromApi[]} */ ([]),
-  );
-  const [error, setError] = useState("");
-  const [isPausing, setIsPausing] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+export function RaffleSellerOverview({ onChanged, onEditRaffle }) {
+  const { pauseMyMutation, deleteMyMutation } = useRaffleMutations();
+  const myRaffleQuery = useMyRaffleQuery({ enabled: true });
+  const [actionError, setActionError] = useState("");
 
-  const load = useCallback(async () => {
-    setPhase("loading");
-    setError("");
-    try {
-      const data = await fetchMyRaffle();
-      setRaffle(data.raffle);
-      setArchive(data.archive);
-      setPhase("success");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : API_CLIENT_UI.FETCH_MY_RAFFLE_FALLBACK);
-      setPhase("error");
-    }
-  }, []);
-
-  useEffect(() => {
-    void load();
-  }, [load, refreshTick]);
+  const raffle = myRaffleQuery.data?.raffle ?? null;
+  const archive = myRaffleQuery.data?.archive ?? [];
 
   const handlePause = async () => {
-    if (!raffle?._id) return;
+    if (!raffle?._id) {
+      return;
+    }
     try {
-      setIsPausing(true);
-      await pauseMyRaffle(raffle._id);
+      setActionError("");
+      await pauseMyMutation.mutateAsync(raffle._id);
       onChanged?.();
-      await load();
     } catch (e) {
-      setError(e instanceof Error ? e.message : API_CLIENT_UI.PAUSE_RAFFLE_FALLBACK);
-    } finally {
-      setIsPausing(false);
+      setActionError(
+        e instanceof Error ? e.message : API_CLIENT_UI.PAUSE_RAFFLE_FALLBACK,
+      );
     }
   };
 
   const handleDelete = async () => {
-    if (!raffle?._id) return;
-    if (!window.confirm(RAFFLE_MANAGE_UI.DELETE_CONFIRM_OWNER)) return;
+    if (!raffle?._id) {
+      return;
+    }
+    if (!window.confirm(RAFFLE_MANAGE_UI.DELETE_CONFIRM_OWNER)) {
+      return;
+    }
     try {
-      setIsDeleting(true);
-      await deleteMyRaffle(raffle._id);
+      setActionError("");
+      await deleteMyMutation.mutateAsync(raffle._id);
       onChanged?.();
-      await load();
     } catch (e) {
-      setError(e instanceof Error ? e.message : API_CLIENT_UI.DELETE_RAFFLE_FALLBACK);
-    } finally {
-      setIsDeleting(false);
+      setActionError(
+        e instanceof Error ? e.message : API_CLIENT_UI.DELETE_RAFFLE_FALLBACK,
+      );
     }
   };
 
-  if (phase === "loading") {
+  if (myRaffleQuery.isPending) {
     return <p className="raffle-seller-overview__state">Загрузка…</p>;
   }
 
-  if (phase === "error") {
+  if (myRaffleQuery.isError) {
+    const message =
+      myRaffleQuery.error instanceof Error
+        ? myRaffleQuery.error.message
+        : API_CLIENT_UI.FETCH_MY_RAFFLE_FALLBACK;
     return (
       <p
         className="raffle-seller-overview__state raffle-seller-overview__state_error"
         role="alert"
       >
-        {error}
+        {message}
       </p>
     );
   }
 
-  const actionsBusy = isPausing || isDeleting;
+  const actionsBusy = pauseMyMutation.isPending || deleteMyMutation.isPending;
   const showEdit = canSellerEditRaffle(raffle) && Boolean(onEditRaffle);
 
   return (
     <div className="raffle-seller-overview">
       <h3 className="raffle-seller-overview__title">{RAFFLE_SELLER_PANEL_UI.TITLE}</h3>
+      {actionError ? (
+        <p className="raffle-seller-overview__state_error" role="alert">
+          {actionError}
+        </p>
+      ) : null}
       {!raffle ? (
         <p className="raffle-seller-overview__empty">{RAFFLE_SELLER_PANEL_UI.EMPTY}</p>
       ) : (

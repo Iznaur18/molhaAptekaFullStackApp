@@ -3,7 +3,7 @@ import { useState } from "react";
 import { USER_STORY_UI } from "../../../shared/config/appUiCopy.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import { PRODUCT_REPORT_TEXT_MAX_CHARS } from "../../product-report/model/constants.js";
-import { submitUserStoryReport } from "../api/submitUserStoryReport.js";
+import { useUserStoryMutations } from "../model/useUserStoryMutations.js";
 
 import "./ReportUserStoryModal.css";
 
@@ -15,6 +15,7 @@ import "./ReportUserStoryModal.css";
  * }} props
  */
 export function ReportUserStoryModal({ isOpen, storyId, onClose }) {
+  const { reportMutation } = useUserStoryMutations();
   const [reportText, setReportText] = useState("");
   const [isBusy, setIsBusy] = useState(false);
   const [error, setError] = useState("");
@@ -39,7 +40,7 @@ export function ReportUserStoryModal({ isOpen, storyId, onClose }) {
     setIsBusy(true);
     setError("");
     try {
-      await submitUserStoryReport(storyId, { reportText: text });
+      await reportMutation.mutateAsync({ storyId, body: { reportText: text } });
       setSuccess(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : USER_STORY_UI.ERROR_GENERIC);

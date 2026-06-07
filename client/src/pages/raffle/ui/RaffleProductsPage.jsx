@@ -1,8 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
-
+import { useRaffleByIdQuery } from "../../../entities/raffle/model/useRaffleByIdQuery.js";
+import { useRaffleProductsQuery } from "../../../entities/raffle/model/useRaffleProductsQuery.js";
 import { HomeCatalogGrid } from "../../home/ui/HomeCatalogGrid.jsx";
-import { fetchRaffleById } from "../../../entities/raffle/api/fetchRaffleById.js";
-import { fetchRaffleProducts } from "../../../entities/raffle/api/fetchRaffleProducts.js";
 import {
   API_CLIENT_UI,
   RAFFLE_PRODUCTS_PAGE_UI,
@@ -30,39 +28,18 @@ export function RaffleProductsPage({
   onOpenProductDetails,
   onBackToCatalog,
 }) {
-  const [phase, setPhase] = useState("loading");
-  const [raffle, setRaffle] = useState(
-    /** @type {import('../../../entities/raffle/model/types.js').RaffleFromApi | null} */ (
-      null
-    ),
-  );
-  const [products, setProducts] = useState(
-    /** @type {import('../../../entities/product/model/types.js').ProductFromApi[]} */ ([]),
-  );
-  const [error, setError] = useState("");
+  const raffleQuery = useRaffleByIdQuery({ raffleId });
+  const productsQuery = useRaffleProductsQuery({ raffleId });
 
-  const load = useCallback(async () => {
-    setPhase("loading");
-    setError("");
-    try {
-      const [raffleRow, productsPayload] = await Promise.all([
-        fetchRaffleById(raffleId),
-        fetchRaffleProducts(raffleId, { limit: 60 }),
-      ]);
-      setRaffle(raffleRow);
-      setProducts(productsPayload.products);
-      setPhase("success");
-    } catch (e) {
-      setError(
-        e instanceof Error ? e.message : API_CLIENT_UI.FETCH_RAFFLE_PRODUCTS_FALLBACK,
-      );
-      setPhase("error");
-    }
-  }, [raffleId]);
-
-  useEffect(() => {
-    void load();
-  }, [load]);
+  const raffle = raffleQuery.data ?? null;
+  const products = productsQuery.data?.products ?? [];
+  const isLoading = raffleQuery.isPending || productsQuery.isPending;
+  const queryError = raffleQuery.error ?? productsQuery.error;
+  const error =
+    queryError instanceof Error
+      ? queryError.message
+      : API_CLIENT_UI.FETCH_RAFFLE_PRODUCTS_FALLBACK;
+  const phase = isLoading ? "loading" : queryError ? "error" : "success";
 
   if (phase === "loading") {
     return (

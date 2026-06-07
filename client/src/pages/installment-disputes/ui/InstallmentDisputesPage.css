@@ -4,7 +4,7 @@
 }
 
 .installment-disputes-page__state_error {
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
 }
 
 .installment-disputes-page__card {
@@ -12,9 +12,9 @@
   flex-direction: column;
   gap: 0.75rem;
   padding: 1rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--iz-color-border);
   border-radius: 0.75rem;
-  background: #fff;
+  background: var(--iz-color-surface);
 }
 
 .installment-disputes-page__list {
@@ -31,17 +31,17 @@
 
 .installment-disputes-page__btn {
   padding: 0.45rem 0.85rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--iz-color-border-strong);
   border-radius: 0.4rem;
-  background: #fff;
+  background: var(--iz-color-surface);
   font: inherit;
   cursor: pointer;
 }
 
 .installment-disputes-page__btn_primary {
-  border-color: #2563eb;
-  background: #2563eb;
-  color: #fff;
+  border-color: var(--iz-color-link);
+  background: var(--iz-color-link);
+  color: var(--iz-color-on-contrast);
 }
 
 .installment-disputes-page__field {
@@ -54,7 +54,7 @@
 .installment-disputes-page__input {
   width: 100%;
   padding: 0.5rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--iz-color-border-strong);
   border-radius: 0.4rem;
   font: inherit;
 }

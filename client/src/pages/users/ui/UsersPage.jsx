@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-import { fetchUsersSearchPage } from "../../../entities/user/api/fetchUsersSearch.js";
+import { useUsersSearchQuery } from "../../../entities/user/model/useUsersSearchQuery.js";
 import { UserListRow } from "../../../entities/user/ui/UserListRow.jsx";
 import {
-  API_CLIENT_UI,
   USER_SEARCH_INPUT_UI,
   USER_SEARCH_UI,
   USERS_PAGE_UI,
@@ -18,44 +17,12 @@ import "./UsersPage.css";
  */
 export function UsersPage({ onUserRowClick }) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [users, setUsers] = useState(
-    /** @type {import('../../../entities/user/model/types.js').UserSearchListItem[]} */ ([]),
-  );
-  const [phase, setPhase] = useState("loading");
-  const [error, setError] = useState("");
-
   const debouncedSearch = useDebouncedValue(searchTerm, USER_SEARCH_UI.DEBOUNCE_MS);
   const isSearchPending = searchTerm !== debouncedSearch;
   const hasSearchQuery = debouncedSearch.trim() !== "";
   const hasActiveFilters = hasSearchQuery;
 
-  useEffect(() => {
-    let isCancelled = false;
-
-    const loadUsers = async () => {
-      setPhase("loading");
-      try {
-        const { users: list } = await fetchUsersSearchPage({
-          search: debouncedSearch.trim(),
-        });
-        if (isCancelled) return;
-        setUsers(list);
-        setPhase("success");
-      } catch (e) {
-        if (isCancelled) return;
-        setError(
-          e instanceof Error ? e.message : API_CLIENT_UI.FETCH_USERS_SEARCH_FALLBACK,
-        );
-        setPhase("error");
-      }
-    };
-
-    void loadUsers();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [debouncedSearch]);
+  const { phase, users, error } = useUsersSearchQuery({ search: debouncedSearch });
 
   return (
     <div className="users-page">

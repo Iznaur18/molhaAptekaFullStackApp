@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-import { patchProductCategoryDisplay } from "../api/patchProductCategoryDisplay.js";
+import { useProductCategoryDisplayMutations } from "../model/useProductCategoryDisplayMutations.js";
 import { resolveProductCategoryDisplay } from "../lib/resolveProductCategoryDisplay.js";
 import { PRODUCT_CATEGORY_DISPLAY_UI } from "../../../shared/config/appUiCopy.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
@@ -26,10 +26,11 @@ export function EditProductCategoryDisplayModal({
   onClose,
   onSaved,
 }) {
+  const { patchCategoryMutation } = useProductCategoryDisplayMutations();
   const [label, setLabel] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [isSaving, setIsSaving] = useState(false);
+  const isSaving = patchCategoryMutation.isPending;
   const wasOpenRef = useRef(false);
 
   useEffect(() => {
@@ -80,16 +81,18 @@ export function EditProductCategoryDisplayModal({
     }
 
     try {
-      setIsSaving(true);
       setErrorMessage("");
 
       const trimmedLabel = label.trim();
       const trimmedImage = imageUrl.trim();
-      const { display } = await patchProductCategoryDisplay(categorySlug, {
-        customLabel: trimmedLabel || null,
-        imageUrl: trimmedImage || null,
-        resetCustomLabel: trimmedLabel === "" && resolved?.isCustomLabel,
-        resetImageUrl: trimmedImage === "" && resolved?.isCustomImage,
+      const { display } = await patchCategoryMutation.mutateAsync({
+        categorySlug,
+        body: {
+          customLabel: trimmedLabel || null,
+          imageUrl: trimmedImage || null,
+          resetCustomLabel: trimmedLabel === "" && resolved?.isCustomLabel,
+          resetImageUrl: trimmedImage === "" && resolved?.isCustomImage,
+        },
       });
 
       onSaved(display);
@@ -100,8 +103,6 @@ export function EditProductCategoryDisplayModal({
           ? error.message
           : PRODUCT_CATEGORY_DISPLAY_UI.SAVE_FALLBACK,
       );
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -111,11 +112,13 @@ export function EditProductCategoryDisplayModal({
     }
 
     try {
-      setIsSaving(true);
       setErrorMessage("");
-      const { display } = await patchProductCategoryDisplay(categorySlug, {
-        resetCustomLabel: true,
-        resetImageUrl: true,
+      const { display } = await patchCategoryMutation.mutateAsync({
+        categorySlug,
+        body: {
+          resetCustomLabel: true,
+          resetImageUrl: true,
+        },
       });
       onSaved(display);
       onClose();
@@ -125,8 +128,6 @@ export function EditProductCategoryDisplayModal({
           ? error.message
           : PRODUCT_CATEGORY_DISPLAY_UI.SAVE_FALLBACK,
       );
-    } finally {
-      setIsSaving(false);
     }
   };
 

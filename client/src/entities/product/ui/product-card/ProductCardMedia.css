@@ -41,17 +41,17 @@
 .product-card__image-badges > .product-loyalty-points-badge {
   backdrop-filter: blur(4px);
   border-color: color-mix(in srgb, currentColor 18%, transparent);
-  box-shadow: 0 1px 4px rgb(0 0 0 / 18%);
+  box-shadow: 0 1px 4px var(--iz-color-overlay-black-soft);
 }
 
 .product-card__image-badges > .product-discount-badge {
-  background: color-mix(in srgb, #fee2e2 72%, transparent);
-  color: color-mix(in srgb, #991b1b 88%, transparent);
+  background: color-mix(in srgb, var(--iz-color-danger-soft) 72%, transparent);
+  color: color-mix(in srgb, var(--iz-color-danger-text) 88%, transparent);
 }
 
 .product-card__image-badges > .product-loyalty-points-badge {
-  background: color-mix(in srgb, #dcfce7 72%, transparent);
-  color: color-mix(in srgb, #166534 88%, transparent);
+  background: color-mix(in srgb, var(--iz-color-success-pale) 72%, transparent);
+  color: color-mix(in srgb, var(--iz-color-success-muted) 88%, transparent);
   pointer-events: auto;
 }
 
@@ -97,7 +97,7 @@
   padding: 0;
   border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
   border-radius: 50%;
-  background: color-mix(in srgb, Canvas 42%, transparent);
+  background: color-mix(in srgb, var(--iz-color-canvas) 42%, transparent);
   backdrop-filter: blur(4px);
   color: inherit;
   font-size: 1rem;
@@ -108,7 +108,7 @@
 }
 
 .product-card__image-nav-btn:hover {
-  background: color-mix(in srgb, Canvas 62%, transparent);
+  background: color-mix(in srgb, var(--iz-color-canvas) 62%, transparent);
   opacity: 1;
 }
 
@@ -120,14 +120,14 @@
   font-weight: 700;
   padding: 0.12rem 0.32rem;
   border-radius: 6px;
-  background: rgb(0 0 0 / 52%);
-  color: #fff;
+  background: var(--iz-color-overlay-media);
+  color: var(--iz-color-on-contrast);
   line-height: 1;
   pointer-events: none;
 }
 
 .product-card__details-surface:focus-visible {
-  outline: 2px solid color-mix(in srgb, CanvasText 55%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--iz-color-canvas-text) 55%, transparent);
   outline-offset: 2px;
   border-radius: calc(var(--product-card-radius) * 12 / 14);
 }

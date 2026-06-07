@@ -17,7 +17,9 @@ export const USER_DATA_CONFIRMATION_RESOLUTIONS = [
 ];
 
 /** Макс. заявок с одного аккаунта за час. */
-export const USER_DATA_CONFIRMATION_RATE_LIMIT_PER_HOUR = 1;
+export const USER_DATA_CONFIRMATION_RATE_LIMIT_PER_HOUR = Number(
+  process.env.USER_DATA_CONFIRMATION_RATE_LIMIT_PER_HOUR ?? 1,
+);
 
 export const USER_DATA_CONFIRMATION_ALREADY_PENDING_MESSAGE =
   "Заявка уже на рассмотрении";

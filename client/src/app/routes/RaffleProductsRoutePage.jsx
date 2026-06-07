@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 
-import { LazyRaffleProductsPage } from "../../pages/home/lib/lazyHomePages.js";
+import { LazyRaffleProductsPage } from "../lib/lazyAppShellPages.js";
 import { useAppShell } from "../model/AppShellContext.jsx";
 
 /** Товары розыгрыша — `/raffle/:raffleId`. */

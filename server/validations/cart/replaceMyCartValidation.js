@@ -1,13 +1,5 @@
-import { body } from "express-validator";
+import { replaceCartBodySchema } from "@molha/api-contract";
 
-import { handleValidationByExpressErrors } from "../handleValidationByExpressErrors.js";
+import { validateBodyZod } from "../../middlewares/validateBodyZod.js";
 
-/** Валидация тела `PUT /cart` — полная замена; детали — в контроллере. */
-export const replaceMyCartValidation = [
-  body("items")
-    .exists()
-    .withMessage("items обязателен")
-    .isObject()
-    .withMessage("items должен быть объектом"),
-  handleValidationByExpressErrors,
-];
+export const replaceMyCartValidation = [validateBodyZod(replaceCartBodySchema)];

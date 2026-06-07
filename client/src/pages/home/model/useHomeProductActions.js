@@ -1,10 +1,15 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 
-import { deleteMyProduct } from "../../../entities/product/api/deleteMyProduct.js";
-import { patchMyProduct } from "../../../entities/product/api/patchMyProduct.js";
-import { fetchProductPromotionTariffs } from "../../../entities/product/api/fetchProductPromotionTariffs.js";
-import { requestProductPromotion } from "../../../entities/product/api/requestProductPromotion.js";
-import { setProductRaffleParticipation } from "../../../entities/raffle/api/setProductRaffleParticipation.js";
+import { useEnsureProductPromotionTariffs } from "../../../entities/product/model/useEnsureProductPromotionTariffs.js";
+import { useMyProductMutations } from "../../../entities/product/model/useMyProductMutations.js";
+import { useRequestProductPromotionMutation } from "../../../entities/product/model/useRequestProductPromotionMutation.js";
+import {
+  invalidateCatalogProducts,
+  patchProductInAllCatalogCaches,
+  prependProductToAllCatalogCaches,
+} from "../../../entities/product/lib/catalogProductsQueryCache.js";
+import { useRaffleMutations } from "../../../entities/raffle/model/useRaffleMutations.js";
 import { PRODUCT_MODERATION_PENDING } from "../../../entities/product/model/productModerationConstants.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 
@@ -16,8 +21,6 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 export const useHomeProductActions = ({
   goToMainView,
   setMyProductsCatalogNotice,
-  setMyProductsTotal,
-  setProducts,
   isAtSellerProductsLimit,
   setIsSellerProductsLimitModalOpen,
   setIsCreateProductModalOpen,
@@ -38,11 +41,34 @@ export const useHomeProductActions = ({
   setIsPromotionSubmitPending,
   promotionProduct,
   setLoyaltyPoints,
-  setCatalogRefreshTick,
-  setRaffleRefreshTick,
-  refreshFeaturedRaffle,
+  refreshCatalogFeed,
+  refreshRaffleSurfaces,
   setRaffleParticipationPendingProductId,
 }) => {
+  const queryClient = useQueryClient();
+  const ensureProductPromotionTariffs = useEnsureProductPromotionTariffs();
+  const { patchMutation, deleteMutation } = useMyProductMutations();
+  const requestPromotionMutation = useRequestProductPromotionMutation();
+  const { setParticipationMutation } = useRaffleMutations();
+
+  const removeCatalogProduct = useCallback(
+    (productId) => {
+      patchProductInAllCatalogCaches(queryClient, productId, () => null);
+    },
+    [queryClient],
+  );
+
+  const updateCatalogProduct = useCallback(
+    /**
+     * @param {string} productId
+     * @param {(product: ProductFromApi) => ProductFromApi} updater
+     */
+    (productId, updater) => {
+      patchProductInAllCatalogCaches(queryClient, productId, updater);
+    },
+    [queryClient],
+  );
+
   const syncProductEditModalState = useCallback(
     (product) => {
       const id = String(product._id);
@@ -66,36 +92,36 @@ export const useHomeProductActions = ({
             }
           : prev,
       );
-      setProducts((prev) => {
-        if (
-          product.productIsAvailable === false &&
-          !isMineMode &&
-          !showHiddenCatalogProducts
-        ) {
-          return prev.filter((p) => String(p._id) !== id);
-        }
-        if (
-          selectedProductCategory &&
-          product.productCategory !== selectedProductCategory
-        ) {
-          return prev.filter((p) => String(p._id) !== id);
-        }
-        if (!prev.some((p) => String(p._id) === id)) {
-          return prev;
-        }
-        return prev.map((p) =>
-          String(p._id) === id
-            ? { ...product, hasOpenSales: p.hasOpenSales ?? product.hasOpenSales }
-            : p,
-        );
-      });
+
+      if (
+        product.productIsAvailable === false &&
+        !isMineMode &&
+        !showHiddenCatalogProducts
+      ) {
+        removeCatalogProduct(id);
+        return;
+      }
+
+      if (
+        selectedProductCategory &&
+        product.productCategory !== selectedProductCategory
+      ) {
+        removeCatalogProduct(id);
+        return;
+      }
+
+      updateCatalogProduct(id, (prev) => ({
+        ...product,
+        hasOpenSales: prev.hasOpenSales ?? product.hasOpenSales,
+      }));
     },
     [
       isMineMode,
+      removeCatalogProduct,
       selectedProductCategory,
       setCatalogProductDetails,
-      setProducts,
       showHiddenCatalogProducts,
+      updateCatalogProduct,
     ],
   );
 
@@ -107,13 +133,15 @@ export const useHomeProductActions = ({
           ? API_CLIENT_UI.CREATE_PRODUCT_PENDING_HINT
           : "",
       );
-      setMyProductsTotal((prev) => (prev != null ? prev + 1 : prev));
-      setProducts((prev) => {
-        const id = String(product._id);
-        return [product, ...prev.filter((p) => String(p._id) !== id)];
-      });
+      prependProductToAllCatalogCaches(queryClient, product);
+      void refreshCatalogFeed();
     },
-    [goToMainView, setMyProductsCatalogNotice, setMyProductsTotal, setProducts],
+    [
+      goToMainView,
+      queryClient,
+      refreshCatalogFeed,
+      setMyProductsCatalogNotice,
+    ],
   );
 
   const handlePlaceProductClick = useCallback(() => {
@@ -121,12 +149,10 @@ export const useHomeProductActions = ({
       setIsSellerProductsLimitModalOpen(true);
       return;
     }
-    setCatalogProductDetails(null);
     setProductToEdit(null);
     setIsCreateProductModalOpen(true);
   }, [
     isAtSellerProductsLimit,
-    setCatalogProductDetails,
     setIsCreateProductModalOpen,
     setIsSellerProductsLimitModalOpen,
     setProductToEdit,
@@ -134,25 +160,24 @@ export const useHomeProductActions = ({
 
   const handleOpenEditMyProduct = useCallback(
     (product) => {
-      if (product.productModerationStatus === PRODUCT_MODERATION_PENDING) {
-        return;
-      }
-      setCatalogProductDetails(null);
       setProductToEdit(product);
+      setIsCreateProductModalOpen(true);
     },
-    [setCatalogProductDetails, setProductToEdit],
+    [setIsCreateProductModalOpen, setProductToEdit],
   );
 
   const handleCloseEditProductModal = useCallback(() => {
+    setIsCreateProductModalOpen(false);
     setProductToEdit(null);
-  }, [setProductToEdit]);
+  }, [setIsCreateProductModalOpen, setProductToEdit]);
 
   const handleEditProductSuccess = useCallback(
     (product) => {
       syncCatalogProductState(product);
-      setProductToEdit(null);
+      syncProductEditModalState(product);
+      void invalidateCatalogProducts(queryClient);
     },
-    [setProductToEdit, syncCatalogProductState],
+    [queryClient, syncCatalogProductState, syncProductEditModalState],
   );
 
   const handleAdminOpenEditProductFromDetails = useCallback(() => {
@@ -160,32 +185,36 @@ export const useHomeProductActions = ({
       return;
     }
     setProductToEdit(catalogProductDetails);
-    setCatalogProductDetails(null);
-    setProductDetailsAdminError("");
-  }, [
-    catalogProductDetails,
-    setCatalogProductDetails,
-    setProductDetailsAdminError,
-    setProductToEdit,
-  ]);
+    setIsCreateProductModalOpen(true);
+  }, [catalogProductDetails, setIsCreateProductModalOpen, setProductToEdit]);
 
   const handleSetMyProductAvailability = useCallback(
-    async (productId, productIsAvailable) => {
+    async (product, isAvailable) => {
+      if (product._id == null) {
+        return;
+      }
+      const productId = String(product._id);
+      setTogglingAvailabilityProductId(productId);
+      setMyProductsCatalogError("");
       try {
-        setTogglingAvailabilityProductId(productId);
-        setMyProductsCatalogError("");
-        const updated = await patchMyProduct(productId, { productIsAvailable });
+        const updated = await patchMutation.mutateAsync({
+          productId,
+          body: { productIsAvailable: isAvailable },
+        });
         syncCatalogProductState(updated);
         syncProductEditModalState(updated);
       } catch (e) {
         setMyProductsCatalogError(
-          e instanceof Error ? e.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+          e instanceof Error
+            ? e.message
+            : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
         );
       } finally {
         setTogglingAvailabilityProductId(null);
       }
     },
     [
+      patchMutation,
       setMyProductsCatalogError,
       setTogglingAvailabilityProductId,
       syncCatalogProductState,
@@ -194,29 +223,30 @@ export const useHomeProductActions = ({
   );
 
   const handleSetProductAuction = useCallback(
-    async (productId, productAuctionEnabled) => {
+    async (product, auctionEnabled) => {
+      if (product._id == null) {
+        return;
+      }
+      const productId = String(product._id);
+      setTogglingAuctionProductId(productId);
+      setProductDetailsAdminError("");
       try {
-        setTogglingAuctionProductId(productId);
-        setMyProductsCatalogError("");
-        setProductDetailsAdminError("");
-        const updated = await patchMyProduct(productId, { productAuctionEnabled });
+        const updated = await patchMutation.mutateAsync({
+          productId,
+          body: { productAuctionEnabled: auctionEnabled },
+        });
         syncCatalogProductState(updated);
         syncProductEditModalState(updated);
       } catch (e) {
-        const message =
-          e instanceof Error ? e.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK;
-        if (catalogProductDetails && String(catalogProductDetails._id) === productId) {
-          setProductDetailsAdminError(message);
-        } else {
-          setMyProductsCatalogError(message);
-        }
+        setProductDetailsAdminError(
+          e instanceof Error ? e.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+        );
       } finally {
         setTogglingAuctionProductId(null);
       }
     },
     [
-      catalogProductDetails,
-      setMyProductsCatalogError,
+      patchMutation,
       setProductDetailsAdminError,
       setTogglingAuctionProductId,
       syncCatalogProductState,
@@ -229,15 +259,15 @@ export const useHomeProductActions = ({
       try {
         setDeletingProductId(productId);
         setMyProductsCatalogError("");
-        await deleteMyProduct(productId);
-        setProducts((prev) => prev.filter((p) => String(p._id) !== productId));
+        await deleteMutation.mutateAsync(productId);
+        removeCatalogProduct(productId);
         setProductToEdit((prev) =>
           prev && String(prev._id) === productId ? null : prev,
         );
         setCatalogProductDetails((prev) =>
           prev && String(prev._id) === productId ? null : prev,
         );
-        setMyProductsTotal((prev) => (prev != null && prev > 0 ? prev - 1 : prev));
+        void refreshCatalogFeed();
       } catch (e) {
         setMyProductsCatalogError(
           e instanceof Error ? e.message : API_CLIENT_UI.DELETE_MY_PRODUCT_FALLBACK,
@@ -247,12 +277,13 @@ export const useHomeProductActions = ({
       }
     },
     [
+      deleteMutation,
+      refreshCatalogFeed,
+      removeCatalogProduct,
       setCatalogProductDetails,
       setDeletingProductId,
       setMyProductsCatalogError,
-      setMyProductsTotal,
       setProductToEdit,
-      setProducts,
     ],
   );
 
@@ -261,7 +292,7 @@ export const useHomeProductActions = ({
       setPromotionProduct(product);
       setPromotionModalError("");
       try {
-        const config = await fetchProductPromotionTariffs();
+        const config = await ensureProductPromotionTariffs();
         setPromotionConfig(config);
       } catch (e) {
         setPromotionModalError(
@@ -272,7 +303,7 @@ export const useHomeProductActions = ({
         setPromotionConfig({ tiers: [], durations: [] });
       }
     },
-    [setPromotionModalError, setPromotionProduct, setPromotionConfig],
+    [ensureProductPromotionTariffs, setPromotionModalError, setPromotionProduct, setPromotionConfig],
   );
 
   const handleClosePromotionModal = useCallback(() => {
@@ -289,15 +320,16 @@ export const useHomeProductActions = ({
       setIsPromotionSubmitPending(true);
       setPromotionModalError("");
       try {
-        const { loyaltyPointsBalance, message } = await requestProductPromotion(
-          String(promotionProduct._id),
-          { tier, tariffCode },
-        );
+        const { loyaltyPointsBalance, message } = await requestPromotionMutation.mutateAsync({
+          productId: String(promotionProduct._id),
+          tier,
+          tariffCode,
+        });
         if (loyaltyPointsBalance != null) {
           setLoyaltyPoints(loyaltyPointsBalance);
         }
         setMyProductsCatalogNotice(message ?? "Продвижение активировано.");
-        setCatalogRefreshTick((n) => n + 1);
+        void refreshCatalogFeed();
         handleClosePromotionModal();
       } catch (e) {
         setPromotionModalError(
@@ -312,7 +344,8 @@ export const useHomeProductActions = ({
     [
       handleClosePromotionModal,
       promotionProduct,
-      setCatalogRefreshTick,
+      refreshCatalogFeed,
+      requestPromotionMutation,
       setIsPromotionSubmitPending,
       setLoyaltyPoints,
       setMyProductsCatalogNotice,
@@ -328,13 +361,13 @@ export const useHomeProductActions = ({
       const productId = String(product._id);
       setRaffleParticipationPendingProductId(productId);
       try {
-        const updated = await setProductRaffleParticipation(productId, enabled);
-        setProducts((prev) =>
-          prev.map((row) => (String(row._id) === productId ? updated : row)),
-        );
+        const updated = await setParticipationMutation.mutateAsync({
+          productId,
+          enabled,
+        });
+        updateCatalogProduct(productId, () => updated);
         syncProductEditModalState(updated);
-        setRaffleRefreshTick((n) => n + 1);
-        void refreshFeaturedRaffle();
+        void refreshRaffleSurfaces();
       } catch (e) {
         setMyProductsCatalogError(
           e instanceof Error
@@ -346,12 +379,12 @@ export const useHomeProductActions = ({
       }
     },
     [
-      refreshFeaturedRaffle,
+      refreshRaffleSurfaces,
       setMyProductsCatalogError,
-      setProducts,
+      setParticipationMutation,
       setRaffleParticipationPendingProductId,
-      setRaffleRefreshTick,
       syncProductEditModalState,
+      updateCatalogProduct,
     ],
   );
 

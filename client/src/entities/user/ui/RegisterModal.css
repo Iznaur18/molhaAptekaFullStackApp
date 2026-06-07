@@ -40,7 +40,7 @@
   gap: 0.75rem;
   margin-top: 0.75rem;
   padding: 0.75rem 0 1rem;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid var(--iz-color-surface-subtle);
 }
 
 .register-modal__feedback {
@@ -56,33 +56,33 @@
 
 .register-modal__hint {
   font-size: 0.8125rem;
-  color: #6b7280;
+  color: var(--iz-color-text-muted);
   line-height: 1.35;
 }
 
 .register-modal__input {
   box-sizing: border-box;
   width: 100%;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--iz-color-border-strong);
   border-radius: 0.5rem;
   padding: 0.5rem 0.625rem;
   font-size: 0.9375rem;
 }
 
 .register-modal__label--invalid {
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
   font-weight: 600;
 }
 
 .register-modal__input.register-modal__input--invalid {
-  border: 2px solid #d92d20;
-  background-color: #fef3f2;
-  box-shadow: 0 0 0 1px #d92d20;
+  border: 2px solid var(--iz-color-danger-rose);
+  background-color: var(--iz-color-danger-blush);
+  box-shadow: 0 0 0 1px var(--iz-color-danger-rose);
 }
 
 .register-modal__input.register-modal__input--invalid:focus {
-  border-color: #b42318;
-  outline: 2px solid #fda29b;
+  border-color: var(--iz-color-danger-strong);
+  outline: 2px solid var(--iz-color-danger-salmon);
   outline-offset: 1px;
 }
 
@@ -93,15 +93,15 @@
 }
 
 .register-modal__message_error {
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
 }
 
 .register-modal__submit {
   flex-shrink: 0;
-  border: 1px solid #1f6feb;
+  border: 1px solid var(--iz-color-action);
   border-radius: 0.5rem;
-  background: #1f6feb;
-  color: #fff;
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast);
   padding: 0.55rem 0.85rem;
   font-size: 0.9375rem;
   font-weight: 500;

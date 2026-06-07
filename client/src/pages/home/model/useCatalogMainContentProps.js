@@ -1,17 +1,12 @@
 import { useMemo } from "react";
 
-/**
- * @param {{
- *   catalogMainView: import('../../../shared/lib/catalogMainViewPaths.js').CatalogMainView | null;
- *   catalogGridSection: import('react').ReactNode;
- *   catalogBrowserSection: import('react').ReactNode;
- * }} params
- */
-export function useCatalogMainContentProps({
-  catalogMainView,
-  catalogGridSection,
-  catalogBrowserSection,
-}) {
+import { useAppShellCatalogSections } from "../../../app/model/AppShellCatalogSectionsContext.jsx";
+import { useAppShellStateContext } from "../../../app/model/AppShellStateContext.jsx";
+
+export function useCatalogMainContentProps() {
+  const { catalogGridSection, catalogBrowserSection } = useAppShellCatalogSections();
+  const { catalogMainView } = useAppShellStateContext();
+
   return useMemo(
     () => ({
       catalogMainView: catalogMainView ?? "catalog",

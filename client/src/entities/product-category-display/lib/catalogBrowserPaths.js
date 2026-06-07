@@ -1,4 +1,4 @@
-import { buildCatalogBrowserSearchParams } from "../../../pages/home/lib/catalogCatalogQuery.js";
+import { buildCatalogBrowserSearchParams } from "../../product/lib/catalogCatalogQuery.js";
 import { mainViewToPathname } from "../../../shared/lib/homeMainViewPaths.js";
 
 /**

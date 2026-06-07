@@ -1,14 +1,5 @@
-import { param } from "express-validator";
-import { handleValidationByExpressErrors } from "../handleValidationByExpressErrors.js";
+import { userIdClientParamsSchema } from "@molha/api-contract";
 
-/**
- * Валидация параметра userId в URL для получения рейтинга
- */
-export const ratingUserIdParamValidation = [
-  param("userIdClient") // userIdClient - id пользователя из URL
-    .notEmpty() // не пустой
-    .withMessage("ID пользователя обязателен") // ошибка если id пользователя не передан
-    .isMongoId() // валидный ObjectId
-    .withMessage("Неверный формат ID пользователя"), // ошибка если id пользователя не валидный ObjectId
-  handleValidationByExpressErrors, // обработка ошибок валидации
-];
+import { validateParamsZod } from "../../middlewares/validateParamsZod.js";
+
+export const ratingUserIdParamValidation = [validateParamsZod(userIdClientParamsSchema)];

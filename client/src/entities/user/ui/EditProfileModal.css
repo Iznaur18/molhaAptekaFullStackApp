@@ -12,7 +12,7 @@
 .edit-profile-modal__backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(17, 24, 39, 0.55);
+  background: var(--iz-color-overlay-backdrop);
 }
 
 .edit-profile-modal__card {
@@ -26,9 +26,9 @@
   flex-direction: column;
   overflow: hidden;
   border-radius: 0.75rem;
-  border: 1px solid #e5e7eb;
-  background: #fff;
-  box-shadow: 0 20px 45px rgba(17, 24, 39, 0.28);
+  border: 1px solid var(--iz-color-border);
+  background: var(--iz-color-surface);
+  box-shadow: 0 20px 45px var(--iz-shadow-dialog);
   padding: 1rem;
 }
 
@@ -44,7 +44,7 @@
   margin: 0;
   font-size: 1.125rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--iz-color-text);
 }
 
 .edit-profile-modal__close {
@@ -53,11 +53,11 @@
   font-size: 1.5rem;
   line-height: 1;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--iz-color-text-muted);
 }
 
 .edit-profile-modal__close:hover {
-  color: #111827;
+  color: var(--iz-color-text);
 }
 
 .edit-profile-modal__body {
@@ -95,22 +95,22 @@
 .edit-profile-modal__input {
   box-sizing: border-box;
   width: 100%;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--iz-color-border-strong);
   border-radius: 0.5rem;
   padding: 0.5rem 0.625rem;
   font-size: 0.9375rem;
 }
 
 .edit-profile-modal__input_readonly {
-  background: #f3f4f6;
-  color: #6b7280;
+  background: var(--iz-color-surface-subtle);
+  color: var(--iz-color-text-muted);
 }
 
 .edit-profile-modal__textarea {
   box-sizing: border-box;
   width: 100%;
   min-height: 4.5rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--iz-color-border-strong);
   border-radius: 0.5rem;
   padding: 0.5rem 0.625rem;
   font: inherit;
@@ -126,22 +126,22 @@
   margin: 0 0 0.35rem;
   font-size: 0.85rem;
   font-weight: 600;
-  color: color-mix(in srgb, CanvasText 72%, transparent);
+  color: color-mix(in srgb, var(--iz-color-canvas-text) 72%, transparent);
 }
 
 .edit-profile-modal__hint {
   font-size: 0.78rem;
   line-height: 1.35;
-  color: #6b7280;
+  color: var(--iz-color-text-muted);
 }
 
 .edit-profile-modal__word-meter {
   font-size: 0.78rem;
-  color: #6b7280;
+  color: var(--iz-color-text-muted);
 }
 
 .edit-profile-modal__word-meter_overflow {
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
   font-weight: 600;
 }
 
@@ -152,7 +152,7 @@
   gap: 0.75rem;
   margin-top: 0.75rem;
   padding-top: 0.75rem;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid var(--iz-color-surface-subtle);
 }
 
 .edit-profile-modal__feedback {
@@ -166,7 +166,7 @@
 }
 
 .edit-profile-modal__message_error {
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
 }
 
 .edit-profile-modal__actions {
@@ -177,10 +177,10 @@
 }
 
 .edit-profile-modal__cancel {
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--iz-color-border-strong);
   border-radius: 0.5rem;
-  background: #fff;
-  color: #374151;
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text-secondary);
   padding: 0.55rem 0.85rem;
   font-size: 0.9375rem;
   font-weight: 500;
@@ -193,10 +193,10 @@
 }
 
 .edit-profile-modal__submit {
-  border: 1px solid #1f6feb;
+  border: 1px solid var(--iz-color-action);
   border-radius: 0.5rem;
-  background: #1f6feb;
-  color: #fff;
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast);
   padding: 0.55rem 0.85rem;
   font-size: 0.9375rem;
   font-weight: 500;
@@ -211,7 +211,7 @@
 .edit-profile-modal__fieldset {
   margin: 0;
   padding: 0.75rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--iz-color-border);
   border-radius: 0.5rem;
 }
 
@@ -219,5 +219,5 @@
   padding: 0 0.35rem;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--iz-color-text-secondary);
 }

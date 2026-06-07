@@ -1,39 +1,43 @@
 import { useMemo } from "react";
 
 import {
-  HomePageCatalogGridSection,
-  HomePageCatalogSection,
-} from "../ui/HomePageCatalogSection.jsx";
+  AppShellCatalogGridSection,
+  AppShellCatalogSection,
+} from "../ui/AppShellCatalogSection.jsx";
+import { useHomeCatalogGridProps } from "./useHomeCatalogGridProps.js";
+import { useAppShellCatalogSections } from "../../../app/model/AppShellCatalogSectionsContext.jsx";
+import { useAppShellStateContext } from "../../../app/model/AppShellStateContext.jsx";
 
-/**
- * @param {object} params
- */
-export const useHomeCatalogSections = ({
-  catalogGridSectionProps,
-  isCatalogBrowserLanding,
-  categoryDisplays,
-  feedTileDisplays,
-  isAdmin,
-  categoryDisplaysStatus,
-  handleCatalogFeedTileClick,
-  handleCatalogCategoryGridClick,
-  handleCatalogCategoryTreeSelect,
-  handleClearCatalogCategoryTreeFilter,
-  activeCatalogBrowserCategoryId,
-  selectedCategoryLabel,
-  setEditingCategorySlug,
-  setEditingFeedTileKey,
-  activeCatalogFeedLabel,
-  handleBackToCatalogLanding,
-}) => {
+export const useHomeCatalogSections = () => {
+  const ctx = useAppShellStateContext();
+  const {
+    isCatalogBrowserLanding,
+    categoryDisplays,
+    feedTileDisplays,
+    isAdmin,
+    categoryDisplaysStatus,
+    handleCatalogFeedTileClick,
+    handleCatalogCategoryGridClick,
+    handleCatalogCategoryTreeSelect,
+    handleClearCatalogCategoryTreeFilter,
+    activeCatalogBrowserCategoryId,
+    setEditingCategorySlug,
+    setEditingFeedTileKey,
+    selectedCategoryLabel,
+    activeCatalogFeedLabel,
+    handleBackToCatalogLanding,
+  } = ctx;
+
+  const catalogGridSectionProps = useHomeCatalogGridProps();
+
   const catalogGridSection = useMemo(
-    () => <HomePageCatalogGridSection {...catalogGridSectionProps} />,
+    () => <AppShellCatalogGridSection {...catalogGridSectionProps} />,
     [catalogGridSectionProps],
   );
 
   const catalogBrowserSection = useMemo(
     () => (
-      <HomePageCatalogSection
+      <AppShellCatalogSection
         isCatalogBrowserLanding={isCatalogBrowserLanding}
         categoryDisplays={categoryDisplays}
         feedTileDisplays={feedTileDisplays}

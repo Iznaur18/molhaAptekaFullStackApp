@@ -9,7 +9,7 @@
   margin: 0;
   font-size: 0.84rem;
   line-height: 1.4;
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
 }
 
 .product-card__raffle-toggle {
@@ -17,10 +17,10 @@
   width: 100%;
   margin: 0;
   padding: 0.45rem 0.65rem;
-  border: 1px solid #c4b5fd;
+  border: 1px solid var(--iz-color-premium-purple-muted);
   border-radius: 10px;
-  background: #f5f3ff;
-  color: #5b21b6;
+  background: var(--iz-color-premium-purple-soft);
+  color: var(--iz-color-accent-purple-text);
   font: inherit;
   font-size: 0.82rem;
   font-weight: 600;

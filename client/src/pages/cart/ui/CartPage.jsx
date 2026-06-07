@@ -1,92 +1,21 @@
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useMemo, useState } from "react";
 
 import { selectCartLines } from "../../../entities/cart/lib/selectCartLines.js";
 import { useCart } from "../../../entities/cart/model/useCart.js";
-import { createOrder } from "../../../entities/order/api/createOrder.js";
-import { fetchAllProducts } from "../../../entities/product/api/fetchAllProducts.js";
+import { useCreateOrderMutation } from "../../../entities/order/model/useCreateOrderMutation.js";
+import { allProductsQueryKeys } from "../../../entities/product/model/allProductsQueryKeys.js";
+import { useAllProductsQuery } from "../../../entities/product/model/useAllProductsQuery.js";
 import { isCurrentUserProductSeller } from "../../../entities/product/lib/isCurrentUserProductSeller.js";
 import { ProductDetailsModal } from "../../../entities/product/ui/ProductDetailsModal.jsx";
-import { fetchCurrentUserProfile } from "../../../entities/user/api/fetchCurrentUserProfile.js";
+import { useAuthSession } from "../../../entities/user/model/useAuthSession.js";
 import { CART_PAGE_UI, CHECKOUT_FORM_UI } from "../../../shared/config/appUiCopy.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
+import { CheckoutForm } from "../../../shared/ui/CheckoutForm/CheckoutForm.jsx";
 
 import { CartLineItem } from "./CartLineItem.jsx";
-import { CheckoutForm } from "./CheckoutForm.jsx";
 
 import "./CartPage.css";
-
-const useCatalogProducts = () => {
-  const [phase, setPhase] = useState("loading");
-  const [products, setProducts] = useState(
-    /** @type {import('../../../entities/product/model/types.js').ProductFromApi[]} */ ([]),
-  );
-  const [error, setError] = useState("");
-
-  const patchProductStats = useCallback((productId, patch) => {
-    setProducts((prev) =>
-      prev.map((p) => (String(p._id) === productId ? { ...p, ...patch } : p)),
-    );
-  }, []);
-
-  useEffect(() => {
-    let isCancelled = false;
-
-    const load = async () => {
-      try {
-        const list = await fetchAllProducts();
-        if (isCancelled) return;
-        setProducts(list);
-        setPhase("success");
-      } catch (e) {
-        if (isCancelled) return;
-        setError(e instanceof Error ? e.message : CART_PAGE_UI.LOADING);
-        setPhase("error");
-      }
-    };
-
-    void load();
-    return () => {
-      isCancelled = true;
-    };
-  }, []);
-
-  return { phase, products, error, patchProductStats };
-};
-
-const useCurrentUserAddress = (isAuthorized) => {
-  const [address, setAddress] = useState(
-    /** @type {Partial<{ userAddress?: string; userAddressFlat?: string; userAddressFiasId?: string; userAddressGeo?: { lat?: number; lon?: number } | null }>} */ ({}),
-  );
-
-  useEffect(() => {
-    if (!isAuthorized) {
-      setAddress({});
-      return undefined;
-    }
-    let isCancelled = false;
-
-    void (async () => {
-      try {
-        const { user: me } = await fetchCurrentUserProfile();
-        if (isCancelled) return;
-        setAddress({
-          userAddress: me?.userAddress,
-          userAddressFlat: me?.userAddressFlat,
-          userAddressFiasId: me?.userAddressFiasId,
-          userAddressGeo: me?.userAddressGeo,
-        });
-      } catch {
-        if (!isCancelled) setAddress({});
-      }
-    })();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [isAuthorized]);
-
-  return address;
-};
 
 /**
  * @param {{
@@ -107,8 +36,47 @@ export function CartPage({
   onSellerNameClick,
 }) {
   const { items, clearCart } = useCart();
-  const { phase, products, error, patchProductStats } = useCatalogProducts();
-  const defaultAddress = useCurrentUserAddress(isAuthorized);
+  const queryClient = useQueryClient();
+  const createOrderMutation = useCreateOrderMutation();
+  const productsQuery = useAllProductsQuery();
+  const { user } = useAuthSession();
+
+  const products = productsQuery.data ?? [];
+  const phase = productsQuery.isPending
+    ? "loading"
+    : productsQuery.isError
+      ? "error"
+      : "success";
+  const error =
+    productsQuery.error instanceof Error
+      ? productsQuery.error.message
+      : CART_PAGE_UI.LOADING;
+
+  const defaultAddress = useMemo(() => {
+    if (!isAuthorized || !user) {
+      return {};
+    }
+    return {
+      userAddress: user.userAddress,
+      userAddressFlat: user.userAddressFlat,
+      userAddressFiasId: user.userAddressFiasId,
+      userAddressGeo: user.userAddressGeo,
+    };
+  }, [isAuthorized, user]);
+
+  const patchProductStats = useCallback(
+    (productId, patch) => {
+      queryClient.setQueryData(allProductsQueryKeys.list({}), (old) => {
+        if (!Array.isArray(old)) {
+          return old;
+        }
+        return old.map((product) =>
+          String(product._id) === productId ? { ...product, ...patch } : product,
+        );
+      });
+    },
+    [queryClient],
+  );
   const [submitState, setSubmitState] = useState({
     isSubmitting: false,
     error: "",
@@ -156,7 +124,7 @@ export function CartPage({
         productId: line.productId,
         quantity: line.quantity,
       }));
-      await createOrder({
+      await createOrderMutation.mutateAsync({
         items: orderItems,
         deliveryAddress,
         deliveryAddressFlat,

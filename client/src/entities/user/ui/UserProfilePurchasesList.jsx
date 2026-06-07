@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { resolveProductImageUrls } from "../../product/lib/resolveProductImageUrls.js";
 import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../../product/model/productConstants.js";
-import { fetchUserPurchases } from "../api/fetchUserPurchases.js";
+import { useUserPurchasesQuery } from "../model/useUserPurchasesQuery.js";
 import {
   API_CLIENT_UI,
   USER_PROFILE_PURCHASES_UI,
@@ -33,42 +33,22 @@ function getPurchaseThumbSrc(item) {
  * }} props
  */
 export function UserProfilePurchasesList({ targetUserId, onProductClick }) {
-  const [phase, setPhase] = useState("loading");
-  const [items, setItems] = useState(
-    /** @type {import('../model/userPurchaseTypes.js').UserPurchaseListItem[]} */ ([]),
-  );
-  const [error, setError] = useState("");
+  const purchasesQuery = useUserPurchasesQuery({ userId: targetUserId });
   const [unavailableHint, setUnavailableHint] = useState("");
   const [failedThumbIds, setFailedThumbIds] = useState(
     /** @type {Set<string>} */ () => new Set(),
   );
 
-  useEffect(() => {
-    let cancelled = false;
-    setPhase("loading");
-    setError("");
-    setUnavailableHint("");
-    setFailedThumbIds(new Set());
-
-    void (async () => {
-      try {
-        const list = await fetchUserPurchases(targetUserId);
-        if (cancelled) return;
-        setItems(list);
-        setPhase("success");
-      } catch (e) {
-        if (cancelled) return;
-        setError(
-          e instanceof Error ? e.message : API_CLIENT_UI.FETCH_USER_PURCHASES_FALLBACK,
-        );
-        setPhase("error");
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [targetUserId]);
+  const items = purchasesQuery.data ?? [];
+  const phase = purchasesQuery.isLoading
+    ? "loading"
+    : purchasesQuery.isError
+      ? "error"
+      : "success";
+  const error =
+    purchasesQuery.error instanceof Error
+      ? purchasesQuery.error.message
+      : API_CLIENT_UI.FETCH_USER_PURCHASES_FALLBACK;
 
   /** @param {import('../model/userPurchaseTypes.js').UserPurchaseListItem} item */
   const handleItemClick = (item) => {

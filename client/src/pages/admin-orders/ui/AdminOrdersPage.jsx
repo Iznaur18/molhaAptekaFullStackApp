@@ -1,9 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useState } from "react";
 
 import { useRefetchOnVisible } from "../../../shared/lib/useRefetchOnVisible.js";
 
-import { fetchAllOrders } from "../../../entities/order/api/fetchAllOrders.js";
-import { updateOrderStatus } from "../../../entities/order/api/updateOrderStatus.js";
+import { useOrderMutations } from "../../../entities/order/model/useOrderMutations.js";
+import { orderQueryKeys } from "../../../entities/order/model/orderQueryKeys.js";
+import { useAllOrdersQuery } from "../../../entities/order/model/useAllOrdersQuery.js";
 import {
   ORDER_STATUSES,
   ORDER_STATUS_LABEL_RU,
@@ -25,66 +27,32 @@ import "./AdminOrdersPage.css";
 
 const ALL_STATUSES = "";
 
-const useAllOrders = (statusFilter) => {
-  const [phase, setPhase] = useState("loading");
-  const [orders, setOrders] = useState(
-    /** @type {import('../../../entities/order/model/types.js').Order[]} */ ([]),
-  );
-  const [error, setError] = useState("");
+export function AdminOrdersPage() {
+  const queryClient = useQueryClient();
+  const { updateStatusMutation } = useOrderMutations();
+  const [statusFilter, setStatusFilter] = useState(ALL_STATUSES);
+  const queryParams = {
+    limit: ADMIN_ORDERS_PAGE_UI.PAGE_LIMIT,
+    ...(statusFilter ? { status: statusFilter } : {}),
+  };
+  const ordersQuery = useAllOrdersQuery(queryParams);
+  const orders = ordersQuery.data?.orders ?? [];
+  const phase = ordersQuery.isPending
+    ? "loading"
+    : ordersQuery.isError
+      ? "error"
+      : "success";
+  const error =
+    ordersQuery.error instanceof Error
+      ? ordersQuery.error.message
+      : API_CLIENT_UI.FETCH_ALL_ORDERS_FALLBACK;
 
   const reloadOrders = useCallback(async () => {
-    try {
-      const { orders: list } = await fetchAllOrders({
-        limit: ADMIN_ORDERS_PAGE_UI.PAGE_LIMIT,
-        ...(statusFilter ? { status: statusFilter } : {}),
-      });
-      setOrders(list);
-      setPhase("success");
-      setError("");
-    } catch (e) {
-      setError(
-        e instanceof Error ? e.message : API_CLIENT_UI.FETCH_ALL_ORDERS_FALLBACK,
-      );
-      setPhase("error");
-    }
-  }, [statusFilter]);
+    await ordersQuery.refetch();
+  }, [ordersQuery]);
 
   useRefetchOnVisible(reloadOrders, phase === "success");
 
-  useEffect(() => {
-    let isCancelled = false;
-
-    const load = async () => {
-      setPhase("loading");
-      try {
-        const { orders: list } = await fetchAllOrders({
-          limit: ADMIN_ORDERS_PAGE_UI.PAGE_LIMIT,
-          ...(statusFilter ? { status: statusFilter } : {}),
-        });
-        if (isCancelled) return;
-        setOrders(list);
-        setPhase("success");
-      } catch (e) {
-        if (isCancelled) return;
-        setError(
-          e instanceof Error ? e.message : API_CLIENT_UI.FETCH_ALL_ORDERS_FALLBACK,
-        );
-        setPhase("error");
-      }
-    };
-
-    void load();
-    return () => {
-      isCancelled = true;
-    };
-  }, [statusFilter]);
-
-  return { phase, orders, error, setOrders };
-};
-
-export function AdminOrdersPage() {
-  const [statusFilter, setStatusFilter] = useState(ALL_STATUSES);
-  const { phase, orders, error, setOrders } = useAllOrders(statusFilter);
   const [pendingOrderId, setPendingOrderId] = useState(null);
   const [statusError, setStatusError] = useState({});
 
@@ -92,10 +60,16 @@ export function AdminOrdersPage() {
     setPendingOrderId(orderId);
     setStatusError((prev) => ({ ...prev, [orderId]: "" }));
     try {
-      const updated = await updateOrderStatus(orderId, nextStatus);
-      setOrders((prev) =>
-        prev.map((order) => (order._id === orderId ? updated : order)),
-      );
+      const updated = await updateStatusMutation.mutateAsync({ orderId, status: nextStatus });
+      queryClient.setQueryData(orderQueryKeys.admin(queryParams), (old) => {
+        if (!old?.orders) {
+          return old;
+        }
+        return {
+          ...old,
+          orders: old.orders.map((order) => (order._id === orderId ? updated : order)),
+        };
+      });
     } catch (e) {
       const message =
         e instanceof Error ? e.message : API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK;

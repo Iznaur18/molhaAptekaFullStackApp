@@ -7,7 +7,7 @@
   margin: 0 0 0.75rem;
   font-size: 1rem;
   font-weight: 600;
-  color: #0f172a;
+  color: var(--iz-color-ink);
 }
 
 .catalog-feed-tiles__card {
@@ -18,22 +18,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(145deg, #eef2ff, #f8fafc);
+  background: var(--iz-gradient-feed-indigo);
 }
 
 .catalog-feed-tiles__icon-wrap_filter {
-  background: linear-gradient(145deg, #fef3c7, #fff7ed);
+  background: var(--iz-gradient-feed-gold);
 }
 
 .catalog-feed-tiles__icon-text {
-  color: #4f46e5;
+  color: var(--iz-color-link-deep);
   font-size: 1.25rem;
   font-weight: 700;
   line-height: 1;
 }
 
 .catalog-feed-tiles__icon-wrap_filter .catalog-feed-tiles__icon-text {
-  color: #d97706;
+  color: var(--iz-color-warning);
 }
 
 .catalog-browser-landing__categories {

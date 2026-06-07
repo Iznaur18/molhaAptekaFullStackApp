@@ -83,7 +83,7 @@ export function CatalogFilterDropdown({
   return (
     <ul
       id={panelId}
-      className="home-page__category-list"
+      className="app-shell__category-list"
       role="list"
       aria-label={HOME_PAGE_UI.CATALOG_FILTERS_PANEL_ARIA}
       onWheel={(event) => event.stopPropagation()}
@@ -92,12 +92,12 @@ export function CatalogFilterDropdown({
         const isSelected = isCatalogFilterDropdownItemSelected(item, selectionState);
 
         return (
-          <li key={item.key} className="home-page__category-item">
+          <li key={item.key} className="app-shell__category-item">
             <button
               type="button"
               className={[
-                "home-page__category-option",
-                isSelected && "home-page__category-option_selected",
+                "app-shell__category-option",
+                isSelected && "app-shell__category-option_selected",
               ]
                 .filter(Boolean)
                 .join(" ")}

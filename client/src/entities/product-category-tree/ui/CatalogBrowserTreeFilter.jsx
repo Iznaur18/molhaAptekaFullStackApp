@@ -1,8 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 
-import { fetchProductCategoryChildren } from "../api/fetchProductCategoryChildren.js";
-import { fetchProductCategoryRoots } from "../api/fetchProductCategoryRoots.js";
 import { buildCategoryBreadcrumbFromNode } from "../lib/buildCategoryBreadcrumbFromNode.js";
+import { useProductCategoryLevelQuery } from "../model/useProductCategoryLevelQuery.js";
 import { PRODUCT_CATEGORY_TREE_UI } from "../../../shared/config/appUiCopy.js";
 
 import "./CatalogBrowserTreeFilter.css";
@@ -25,57 +24,15 @@ export function CatalogBrowserTreeFilter({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [trail, setTrail] = useState([]);
-  const [options, setOptions] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
-  const loadRoots = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError("");
-      const { categories } = await fetchProductCategoryRoots();
-      setOptions(categories);
-    } catch (loadError) {
-      setError(
-        loadError instanceof Error
-          ? loadError.message
-          : PRODUCT_CATEGORY_TREE_UI.LOAD_ERROR,
-      );
-      setOptions([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const activeParentId = trail.length === 0 ? null : trail[trail.length - 1].id;
+  const { categories: options, isLoading: loading, error } = useProductCategoryLevelQuery({
+    parentId: activeParentId,
+    enabled: isOpen,
+  });
 
-  const loadChildren = useCallback(async (parentId) => {
-    try {
-      setLoading(true);
-      setError("");
-      const { categories } = await fetchProductCategoryChildren(parentId);
-      setOptions(categories);
-    } catch (loadError) {
-      setError(
-        loadError instanceof Error
-          ? loadError.message
-          : PRODUCT_CATEGORY_TREE_UI.LOAD_ERROR,
-      );
-      setOptions([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!isOpen) {
-      return undefined;
-    }
-    if (trail.length === 0) {
-      void loadRoots();
-      return undefined;
-    }
-    void loadChildren(trail[trail.length - 1].id);
-    return undefined;
-  }, [isOpen, trail, loadRoots, loadChildren]);
+  const errorMessage =
+    error instanceof Error ? error.message : error ? PRODUCT_CATEGORY_TREE_UI.LOAD_ERROR : "";
 
   const handlePick = (node) => {
     if (node.isLeaf) {
@@ -191,9 +148,9 @@ export function CatalogBrowserTreeFilter({
             </p>
           )}
 
-          {error ? (
+          {errorMessage ? (
             <p className="catalog-browser-tree-filter__error" role="alert">
-              {error}
+              {errorMessage}
             </p>
           ) : null}
 

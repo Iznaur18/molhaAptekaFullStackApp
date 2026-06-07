@@ -16,11 +16,11 @@
   align-items: stretch;
   min-height: 11.5rem;
   padding: 0.55rem 0.75rem 0.65rem;
-  border: 2px solid #c4b5fd;
+  border: 2px solid var(--iz-color-premium-purple-muted);
   border-radius: 16px;
   overflow: hidden;
-  background: linear-gradient(135deg, #faf5ff 0%, #f8f4ff 55%, Canvas 100%);
-  box-shadow: 0 8px 24px rgb(124 58 237 / 12%);
+  background: var(--iz-gradient-raffle-pink);
+  box-shadow: 0 8px 24px var(--iz-color-accent-purple-shadow);
 }
 
 .raffle-featured-banner__visual {
@@ -49,7 +49,7 @@
 }
 
 .raffle-featured-banner__prize-video {
-  background: #000;
+  background: var(--iz-color-black);
 }
 
 .raffle-featured-banner__badge {
@@ -58,8 +58,8 @@
   left: 0.45rem;
   padding: 0.18rem 0.45rem;
   border-radius: 0.35rem;
-  background: #7c3aed;
-  color: #fff;
+  background: var(--iz-color-accent-purple);
+  color: var(--iz-color-on-contrast);
   font-size: 0.72rem;
   font-weight: 700;
 }
@@ -107,7 +107,7 @@
 .raffle-featured-banner__progress-bar {
   height: 0.55rem;
   border-radius: 999px;
-  background: color-mix(in srgb, #7c3aed 12%, transparent);
+  background: color-mix(in srgb, var(--iz-color-accent-purple) 12%, transparent);
   overflow: hidden;
 }
 
@@ -115,7 +115,7 @@
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #a78bfa, #7c3aed);
+  background: var(--iz-gradient-purple-bar);
   transition: width 0.2s ease;
 }
 
@@ -128,7 +128,7 @@
 .raffle-featured-banner__manage {
   margin-bottom: 0.65rem;
   padding-bottom: 0.65rem;
-  border-bottom: 1px solid color-mix(in srgb, #7c3aed 18%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--iz-color-accent-purple) 18%, transparent);
 }
 
 .raffle-featured-banner__actions {
@@ -153,49 +153,49 @@
 }
 
 .raffle-featured-banner__btn_primary {
-  border: 1px solid #7c3aed;
-  background: #ede9fe;
-  color: #5b21b6;
+  border: 1px solid var(--iz-color-accent-purple);
+  background: var(--iz-color-accent-purple-soft);
+  color: var(--iz-color-accent-purple-text);
 }
 
 .raffle-featured-banner__btn_instagram {
-  border: 1px solid #db2777;
-  background: #fce7f3;
-  color: #9d174d;
+  border: 1px solid var(--iz-color-accent-pink);
+  background: var(--iz-color-accent-pink-soft);
+  color: var(--iz-color-accent-pink-deep);
 }
 
 .raffle-featured-banner__completed {
   font-size: 0.82rem;
   font-weight: 700;
-  color: #15803d;
+  color: var(--iz-color-success-deep);
 }
 
 .raffle-featured-banner_completed .raffle-featured-banner__inner {
-  border-color: #86efac;
-  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 55%, Canvas 100%);
-  box-shadow: 0 8px 24px rgb(22 163 74 / 12%);
+  border-color: var(--iz-color-success-light);
+  background: var(--iz-gradient-raffle-success);
+  box-shadow: 0 8px 24px var(--iz-color-accent-success-shadow);
 }
 
 .raffle-featured-banner_completed .raffle-featured-banner__badge {
-  background: #15803d;
+  background: var(--iz-color-success-deep);
 }
 
 .raffle-featured-banner_completed .raffle-featured-banner__progress-bar {
-  background: color-mix(in srgb, #22c55e 16%, transparent);
+  background: color-mix(in srgb, var(--iz-color-success-vivid) 16%, transparent);
 }
 
 .raffle-featured-banner_completed .raffle-featured-banner__progress-fill {
-  background: linear-gradient(90deg, #86efac, #16a34a);
+  background: var(--iz-gradient-success-bar);
 }
 
 .raffle-featured-banner_completed .raffle-featured-banner__manage {
-  border-bottom-color: color-mix(in srgb, #16a34a 20%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--iz-color-success) 20%, transparent);
 }
 
 .raffle-featured-banner_completed .raffle-featured-banner__btn_primary {
-  border-color: #16a34a;
-  background: #dcfce7;
-  color: #166534;
+  border-color: var(--iz-color-success);
+  background: var(--iz-color-success-pale);
+  color: var(--iz-color-success-muted);
 }
 
 @media (max-width: 640px) {

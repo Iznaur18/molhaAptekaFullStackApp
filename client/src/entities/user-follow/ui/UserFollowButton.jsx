@@ -1,7 +1,6 @@
 import { useState } from "react";
 
-import { followUser } from "../api/followUser.js";
-import { unfollowUser } from "../api/unfollowUser.js";
+import { useUserFollowMutations } from "../model/useUserFollowMutations.js";
 import { USER_FOLLOW_BUTTON_UI } from "../../../shared/config/appUiCopy.js";
 
 import "./UserFollowButton.css";
@@ -30,10 +29,12 @@ export function UserFollowButton({
   onRequestLogin,
   onFollowChange,
 }) {
-  const [isBusy, setIsBusy] = useState(false);
+  const { followMutation, unfollowMutation } = useUserFollowMutations();
   const [errorMessage, setErrorMessage] = useState("");
 
   if (isSelf) return null;
+
+  const isBusy = followMutation.isPending || unfollowMutation.isPending;
 
   const handleClick = async () => {
     if (!isAuthorized) {
@@ -42,13 +43,12 @@ export function UserFollowButton({
     }
     if (isBusy || disabled) return;
 
-    setIsBusy(true);
     setErrorMessage("");
 
     try {
       const result = isFollowing
-        ? await unfollowUser(targetUserId)
-        : await followUser(targetUserId);
+        ? await unfollowMutation.mutateAsync(targetUserId)
+        : await followMutation.mutateAsync(targetUserId);
       onFollowChange?.({
         isFollowing: Boolean(result.isFollowing),
         followersCount: result.followersCount,
@@ -57,8 +57,6 @@ export function UserFollowButton({
     } catch (e) {
       const message = e instanceof Error ? e.message : USER_FOLLOW_BUTTON_UI.ERROR;
       setErrorMessage(message);
-    } finally {
-      setIsBusy(false);
     }
   };
 
@@ -75,7 +73,7 @@ export function UserFollowButton({
             ? "user-follow-button__btn user-follow-button__btn_following"
             : "user-follow-button__btn"
         }
-        onClick={handleClick}
+        onClick={() => void handleClick()}
         disabled={isBusy || disabled}
         aria-pressed={isFollowing}
       >

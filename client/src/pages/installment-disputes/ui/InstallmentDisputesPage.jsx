@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
-import {
-  fetchPendingInstallmentDisputes,
-  resolveInstallmentDispute,
-} from "../../../entities/installment/api/installmentApi.js";
+import { useInstallmentMutations } from "../../../entities/installment/model/useInstallmentMutations.js";
+import { installmentQueryKeys } from "../../../entities/installment/model/installmentQueryKeys.js";
+import { usePendingInstallmentDisputesQuery } from "../../../entities/installment/model/usePendingInstallmentDisputesQuery.js";
 import { INSTALLMENT_UI } from "../../../shared/config/appUiCopy.js";
 
 import "./InstallmentDisputesPage.css";
@@ -23,11 +23,10 @@ import "./InstallmentDisputesPage.css";
  * @param {{ onQueueChanged?: () => void }} props
  */
 export function InstallmentDisputesPage({ onQueueChanged }) {
-  const [phase, setPhase] = useState("loading");
-  const [disputes, setDisputes] = useState(
-    /** @type {InstallmentDisputeFromApi[]} */ ([]),
-  );
-  const [error, setError] = useState("");
+  const queryClient = useQueryClient();
+  const { resolveDisputeMutation } = useInstallmentMutations();
+  const disputesQuery = usePendingInstallmentDisputesQuery();
+  const [actionError, setActionError] = useState("");
   const [pendingDisputeId, setPendingDisputeId] = useState(null);
   const [resolutionNotes, setResolutionNotes] = useState(
     /** @type {Record<string, string>} */ ({}),
@@ -36,41 +35,44 @@ export function InstallmentDisputesPage({ onQueueChanged }) {
     /** @type {Record<string, string>} */ ({}),
   );
 
-  const loadQueue = useCallback(async () => {
-    setPhase("loading");
-    setError("");
-    try {
-      const list = await fetchPendingInstallmentDisputes();
-      setDisputes(list);
-      setPhase("success");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : INSTALLMENT_UI.ERROR_GENERIC);
-      setPhase("error");
-    }
-  }, []);
-
-  useEffect(() => {
-    void loadQueue();
-  }, [loadQueue]);
+  const disputes = disputesQuery.data ?? [];
+  const phase = disputesQuery.isPending
+    ? "loading"
+    : disputesQuery.isError && disputes.length === 0
+      ? "error"
+      : "success";
+  const error =
+    disputesQuery.error instanceof Error
+      ? disputesQuery.error.message
+      : INSTALLMENT_UI.ERROR_GENERIC;
 
   const removeFromQueue = (disputeId) => {
-    setDisputes((prev) => prev.filter((row) => row._id !== disputeId));
+    queryClient.setQueryData(installmentQueryKeys.disputesPending(), (old) => {
+      if (!Array.isArray(old)) {
+        return old;
+      }
+      return old.filter((row) => row._id !== disputeId);
+    });
   };
 
   const handleResolve = async (disputeId, action) => {
     try {
       setPendingDisputeId(disputeId);
-      await resolveInstallmentDispute(disputeId, {
-        action,
-        resolutionNote: resolutionNotes[disputeId] ?? "",
-        ...(action === "partial_refund"
-          ? { partialRefundRub: Number(partialRefundRub[disputeId]) || 0 }
-          : {}),
+      setActionError("");
+      await resolveDisputeMutation.mutateAsync({
+        disputeId,
+        body: {
+          action,
+          resolutionNote: resolutionNotes[disputeId] ?? "",
+          ...(action === "partial_refund"
+            ? { partialRefundRub: Number(partialRefundRub[disputeId]) || 0 }
+            : {}),
+        },
       });
       removeFromQueue(disputeId);
       onQueueChanged?.();
     } catch (e) {
-      setError(e instanceof Error ? e.message : INSTALLMENT_UI.ERROR_GENERIC);
+      setActionError(e instanceof Error ? e.message : INSTALLMENT_UI.ERROR_GENERIC);
     } finally {
       setPendingDisputeId(null);
     }
@@ -97,20 +99,18 @@ export function InstallmentDisputesPage({ onQueueChanged }) {
 
   if (disputes.length === 0) {
     return (
-      <p className="installment-disputes-page__state">
-        {INSTALLMENT_UI.DISPUTES_PAGE_EMPTY}
-      </p>
+      <p className="installment-disputes-page__state">{INSTALLMENT_UI.DISPUTES_PAGE_EMPTY}</p>
     );
   }
 
   return (
     <div className="installment-disputes-page">
-      {error ? (
+      {actionError ? (
         <p
           className="installment-disputes-page__state installment-disputes-page__state_error"
           role="alert"
         >
-          {error}
+          {actionError}
         </p>
       ) : null}
       <div className="installment-disputes-page__list">

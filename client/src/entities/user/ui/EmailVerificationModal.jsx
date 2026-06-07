@@ -1,7 +1,6 @@
 import { useState } from "react";
 
-import { resendEmailVerification } from "../api/resendEmailVerification.js";
-import { verifyEmailWithCode } from "../api/verifyEmailWithCode.js";
+import { useEmailVerificationMutations } from "../model/useEmailVerificationMutations.js";
 import { EMAIL_VERIFICATION_UI } from "../../../shared/config/appUiCopy.js";
 import { keepDigitsOnly } from "../../../shared/lib/numericInput.js";
 import { ProductModalShell } from "../../../shared/ui/ProductModalShell/ProductModalShell.jsx";
@@ -20,12 +19,13 @@ const EMAIL_VERIFICATION_CODE_LENGTH = 6;
  * }} props
  */
 export function EmailVerificationModal({ isOpen, email, onClose, onVerified }) {
+  const { verifyMutation, resendMutation } = useEmailVerificationMutations();
   const [code, setCode] = useState("");
   const [submitStatus, setSubmitStatus] = useState({ kind: "idle", message: "" });
   const [resendStatus, setResendStatus] = useState({ kind: "idle", message: "" });
 
-  const isSubmitting = submitStatus.kind === "loading";
-  const isResending = resendStatus.kind === "loading";
+  const isSubmitting = submitStatus.kind === "loading" || verifyMutation.isPending;
+  const isResending = resendStatus.kind === "loading" || resendMutation.isPending;
   const isBusy = isSubmitting || isResending;
 
   const handleCodeChange = (event) => {
@@ -50,7 +50,7 @@ export function EmailVerificationModal({ isOpen, email, onClose, onVerified }) {
     setSubmitStatus({ kind: "loading", message: "" });
 
     try {
-      await verifyEmailWithCode(code);
+      await verifyMutation.mutateAsync(code);
       setCode("");
       setSubmitStatus({ kind: "idle", message: "" });
       setResendStatus({ kind: "idle", message: "" });
@@ -67,7 +67,7 @@ export function EmailVerificationModal({ isOpen, email, onClose, onVerified }) {
   const handleResend = async () => {
     setResendStatus({ kind: "loading", message: "" });
     try {
-      const message = await resendEmailVerification();
+      const message = await resendMutation.mutateAsync();
       setCode("");
       setSubmitStatus({ kind: "idle", message: "" });
       setResendStatus({

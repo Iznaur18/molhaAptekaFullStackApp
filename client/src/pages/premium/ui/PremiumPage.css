@@ -6,16 +6,16 @@
 
 .premium-page__state {
   margin: 0;
-  color: #64748b;
+  color: var(--iz-color-text-subtle);
 }
 
 .premium-page__state_error {
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
 }
 
 .premium-page__hint {
   margin: 0;
-  color: #64748b;
+  color: var(--iz-color-text-subtle);
 }
 
 .premium-page__login {
@@ -27,35 +27,35 @@
   flex-direction: column;
   gap: 0.85rem;
   padding: 1rem;
-  border: 1px solid #e8d48a;
+  border: 1px solid var(--iz-color-gold);
   border-radius: 12px;
-  background: linear-gradient(180deg, #fffbeb 0%, #fff 55%);
+  background: linear-gradient(180deg, var(--iz-color-promotion-boost-bg) 0%, var(--iz-color-surface) 55%);
 }
 
 .premium-page__plan-title {
   margin: 0;
   font-size: 1.15rem;
   font-weight: 700;
-  color: #7a5a00;
+  color: var(--iz-color-gold-muted);
 }
 
 .premium-page__plan-price {
   margin: 0;
   font-size: 1.35rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--iz-color-ink);
 }
 
 .premium-page__plan-period {
   margin: 0;
   font-size: 0.9rem;
-  color: #64748b;
+  color: var(--iz-color-text-subtle);
 }
 
 .premium-page__benefits {
   margin: 0;
   padding-left: 1.15rem;
-  color: #334155;
+  color: var(--iz-color-slate);
   font-size: 0.92rem;
   line-height: 1.45;
 }
@@ -63,40 +63,40 @@
 .premium-page__balance {
   margin: 0;
   font-size: 0.88rem;
-  color: #64748b;
+  color: var(--iz-color-text-subtle);
 }
 
 .premium-page__active {
   margin: 0;
   padding: 0.65rem 0.75rem;
   border-radius: 8px;
-  border: 1px solid #86efac;
-  background: #ecfdf5;
-  color: #047857;
+  border: 1px solid var(--iz-color-success-light);
+  background: var(--iz-color-success-soft);
+  color: var(--iz-color-success-strong);
   font-size: 0.9rem;
 }
 
 .premium-page__error {
   margin: 0;
   font-size: 0.88rem;
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
 }
 
 .premium-page__submit {
   align-self: flex-start;
   margin: 0;
   padding: 0.55rem 1.1rem;
-  border: 1px solid #d4a017;
+  border: 1px solid var(--iz-color-gold-deep);
   border-radius: 10px;
-  background: #fff8e6;
-  color: #7a5a00;
+  background: var(--iz-color-surface)8e6;
+  color: var(--iz-color-gold-muted);
   font: inherit;
   font-weight: 700;
   cursor: pointer;
 }
 
 .premium-page__submit:hover:not(:disabled) {
-  background: #ffefb8;
+  background: var(--iz-color-gold-highlight);
 }
 
 .premium-page__submit:disabled {

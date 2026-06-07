@@ -6,16 +6,16 @@
 
 .data-confirmation-page__state {
   margin: 0;
-  color: #64748b;
+  color: var(--iz-color-text-subtle);
 }
 
 .data-confirmation-page__state_error {
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
 }
 
 .data-confirmation-page__hint {
   margin: 0;
-  color: #64748b;
+  color: var(--iz-color-text-subtle);
 }
 
 .data-confirmation-page__login {
@@ -27,29 +27,29 @@
   flex-direction: column;
   gap: 0.85rem;
   padding: 1rem;
-  border: 1px solid #7dd3fc;
+  border: 1px solid var(--iz-color-info-light);
   border-radius: 12px;
-  background: linear-gradient(180deg, #f0f9ff 0%, #fff 55%);
+  background: var(--iz-gradient-info-panel);
 }
 
 .data-confirmation-page__plan-title {
   margin: 0;
   font-size: 1.15rem;
   font-weight: 700;
-  color: #0369a1;
+  color: var(--iz-color-info);
 }
 
 .data-confirmation-page__plan-intro {
   margin: 0;
   font-size: 0.9rem;
-  color: #64748b;
+  color: var(--iz-color-text-subtle);
   line-height: 1.45;
 }
 
 .data-confirmation-page__benefits {
   margin: 0;
   padding-left: 1.15rem;
-  color: #334155;
+  color: var(--iz-color-slate);
   font-size: 0.92rem;
   line-height: 1.45;
 }
@@ -57,7 +57,7 @@
 .data-confirmation-page__plan-note {
   margin: 0;
   font-size: 0.82rem;
-  color: #64748b;
+  color: var(--iz-color-text-subtle);
   line-height: 1.4;
 }
 
@@ -70,36 +70,36 @@
 }
 
 .data-confirmation-page__status_ok {
-  border: 1px solid #86efac;
-  background: #ecfdf5;
-  color: #047857;
+  border: 1px solid var(--iz-color-success-light);
+  background: var(--iz-color-success-soft);
+  color: var(--iz-color-success-strong);
 }
 
 .data-confirmation-page__status_pending {
-  border: 1px solid #fde68a;
-  background: #fffbeb;
-  color: #92400e;
+  border: 1px solid var(--iz-color-gold-border);
+  background: var(--iz-color-surface)beb;
+  color: var(--iz-color-warning-text);
 }
 
 .data-confirmation-page__status_rejected {
-  border: 1px solid #fecaca;
-  background: #fef2f2;
-  color: #b91c1c;
+  border: 1px solid var(--iz-color-danger-border);
+  background: var(--iz-color-danger-surface);
+  color: var(--iz-color-danger-deep);
 }
 
 .data-confirmation-page__submit {
   align-self: flex-start;
   margin: 0;
   padding: 0.55rem 1.1rem;
-  border: 1px solid #0284c7;
+  border: 1px solid var(--iz-color-info-sky);
   border-radius: 10px;
-  background: #e0f2fe;
-  color: #0369a1;
+  background: var(--iz-color-info-soft);
+  color: var(--iz-color-info);
   font: inherit;
   font-weight: 700;
   cursor: pointer;
 }
 
 .data-confirmation-page__submit:hover:not(:disabled) {
-  background: #bae6fd;
+  background: var(--iz-color-info-lighter);
 }

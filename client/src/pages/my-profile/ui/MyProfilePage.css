@@ -20,9 +20,9 @@
 }
 
 .my-profile-page__body {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--iz-color-border);
   border-radius: 0.75rem;
-  background: #fff;
+  background: var(--iz-color-surface);
   padding: 0.9rem;
 }
 
@@ -31,7 +31,7 @@
 }
 
 .my-profile-page__state_error {
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
 }
 
 .my-profile-page__footer {
@@ -41,16 +41,16 @@
 }
 
 .my-profile-page__header-action_create-raffle {
-  border-color: #c4b5fd;
-  background: #ede9fe;
-  color: #5b21b6;
+  border-color: var(--iz-color-premium-purple-muted);
+  background: var(--iz-color-accent-purple-soft);
+  color: var(--iz-color-accent-purple-text);
   font-weight: 700;
 }
 
 .my-profile-page__header-action_premium {
-  border-color: #d4a017;
-  background: #fff8e6;
-  color: #7a5a00;
+  border-color: var(--iz-color-gold-deep);
+  background: var(--iz-color-surface)8e6;
+  color: var(--iz-color-gold-muted);
   font-weight: 700;
 }
 
@@ -58,9 +58,9 @@
   margin: 0 0 0.75rem;
   padding: 0.55rem 0.75rem;
   border-radius: 8px;
-  border: 1px solid #86efac;
-  background: #ecfdf5;
-  color: #047857;
+  border: 1px solid var(--iz-color-success-light);
+  background: var(--iz-color-success-soft);
+  color: var(--iz-color-success-strong);
   font-size: 0.9rem;
 }
 
@@ -86,7 +86,7 @@
   margin: 0;
   padding: 0.35rem 0.75rem;
   border-radius: 8px;
-  border: 1px solid color-mix(in srgb, CanvasText 20%, transparent);
+  border: 1px solid color-mix(in srgb, var(--iz-color-canvas-text) 20%, transparent);
   background: transparent;
   cursor: pointer;
   font: inherit;
@@ -95,17 +95,17 @@
 }
 
 .my-profile-page__header-action:hover:not(:disabled) {
-  background: color-mix(in srgb, CanvasText 6%, transparent);
+  background: color-mix(in srgb, var(--iz-color-canvas-text) 6%, transparent);
 }
 
 .my-profile-page__header-action_active {
-  border-color: #1f6feb;
-  background: rgba(31, 111, 235, 0.12);
-  color: #1f6feb;
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action-bg-selected);
+  color: var(--iz-color-action);
 }
 
 .my-profile-page__header-action_active:hover:not(:disabled) {
-  background: rgba(31, 111, 235, 0.2);
+  background: var(--iz-color-action-bg-selected-strong);
 }
 
 .my-profile-page__header-action_badge {
@@ -126,8 +126,8 @@
   min-width: 1.25rem;
   padding: 0 0.35rem;
   border-radius: 999px;
-  background: #b42318;
-  color: #fff;
+  background: var(--iz-color-danger-strong);
+  color: var(--iz-color-on-contrast);
   font-size: 0.72rem;
   font-weight: 700;
   line-height: 1.4;
@@ -137,15 +137,15 @@
   margin: 0 0 0.75rem;
   padding: 0.65rem 0.75rem;
   border-radius: 0.5rem;
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
+  background: var(--iz-color-action-soft);
+  border: 1px solid var(--iz-color-info-muted);
 }
 
 .my-profile-page__notifications-list {
   margin: 0;
   padding: 0 0 0 1rem;
   font-size: 0.875rem;
-  color: #1e3a8a;
+  color: var(--iz-color-info-navy);
 }
 
 .my-profile-page__notification-btn {
@@ -174,22 +174,22 @@
   min-width: 0;
 }
 
-.my-profile-page--my-products-tab .my-profile-page__catalog-shell .home-page__cell {
+.my-profile-page--my-products-tab .my-profile-page__catalog-shell .app-shell__cell {
   display: flex;
   flex-direction: column;
 }
 
 .my-profile-page--my-products-tab
   .my-profile-page__catalog-shell
-  .home-page__cell
+  .app-shell__cell
   > .product-card,
 .my-profile-page--my-products-tab
   .my-profile-page__catalog-shell
-  .home-page__cell
+  .app-shell__cell
   > .product-card-promotion-frame,
 .my-profile-page--my-products-tab
   .my-profile-page__catalog-shell
-  .home-page__cell
+  .app-shell__cell
   > .product-card-premium-frame {
   flex: 1 1 auto;
   width: 100%;
@@ -204,9 +204,9 @@
   margin: 0;
   padding: 0.35rem 0.75rem;
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  background: rgba(255, 255, 255, 0.92);
-  color: #111827;
+  border: 1px solid var(--iz-color-overlay-white-border);
+  background: var(--iz-color-overlay-white);
+  color: var(--iz-color-text);
   font: inherit;
   font-size: 0.9rem;
   font-weight: 600;
@@ -214,22 +214,22 @@
 }
 
 .my-profile-page__banner-edit:hover {
-  background: #fff;
+  background: var(--iz-color-surface);
 }
 
 .my-profile-page__logout-trigger {
   align-self: flex-start;
   padding: 0.45rem 0.9rem;
   border-radius: 8px;
-  border: 1px solid color-mix(in srgb, #b42318 35%, CanvasText 20%);
-  background: color-mix(in srgb, #b42318 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--iz-color-danger-strong) 35%, var(--iz-color-canvas-text) 20%);
+  background: color-mix(in srgb, var(--iz-color-danger-strong) 8%, transparent);
   color: inherit;
   cursor: pointer;
   font: inherit;
 }
 
 .my-profile-page__logout-trigger:hover {
-  background: color-mix(in srgb, #b42318 14%, transparent);
+  background: color-mix(in srgb, var(--iz-color-danger-strong) 14%, transparent);
 }
 
 .my-profile-page__logout-confirm {
@@ -259,21 +259,21 @@
 }
 
 .my-profile-page__logout-yes {
-  border: 1px solid color-mix(in srgb, #b42318 45%, transparent);
-  background: color-mix(in srgb, #b42318 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--iz-color-danger-strong) 45%, transparent);
+  background: color-mix(in srgb, var(--iz-color-danger-strong) 12%, transparent);
   color: inherit;
 }
 
 .my-profile-page__logout-yes:hover {
-  background: color-mix(in srgb, #b42318 20%, transparent);
+  background: color-mix(in srgb, var(--iz-color-danger-strong) 20%, transparent);
 }
 
 .my-profile-page__logout-cancel {
-  border: 1px solid color-mix(in srgb, CanvasText 20%, transparent);
+  border: 1px solid color-mix(in srgb, var(--iz-color-canvas-text) 20%, transparent);
   background: transparent;
   color: inherit;
 }
 
 .my-profile-page__logout-cancel:hover {
-  background: color-mix(in srgb, CanvasText 6%, transparent);
+  background: color-mix(in srgb, var(--iz-color-canvas-text) 6%, transparent);
 }

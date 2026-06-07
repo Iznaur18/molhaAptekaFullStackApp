@@ -1,13 +1,5 @@
-import { body } from "express-validator";
+import { verifyEmailWithCodeBodySchema } from "@molha/api-contract";
 
-import { EMAIL_VERIFICATION_CODE_LENGTH } from "../../constants/emailVerificationConstants.js";
-import { handleValidationByExpressErrors } from "../handleValidationByExpressErrors.js";
+import { validateBodyZod } from "../../middlewares/validateBodyZod.js";
 
-export const verifyEmailWithCodeValidation = [
-  body("code")
-    .trim()
-    .matches(new RegExp(`^\\d{${EMAIL_VERIFICATION_CODE_LENGTH}}$`))
-    .withMessage(`Код должен содержать ${EMAIL_VERIFICATION_CODE_LENGTH} цифр`),
-
-  handleValidationByExpressErrors,
-];
+export const verifyEmailWithCodeValidation = [validateBodyZod(verifyEmailWithCodeBodySchema)];

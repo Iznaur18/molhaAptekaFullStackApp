@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
-import { approveRaffle } from "../../../entities/raffle/api/approveRaffle.js";
-import { deleteRaffleByStaff } from "../../../entities/raffle/api/deleteRaffleByStaff.js";
-import { fetchFeaturedRaffles } from "../../../entities/raffle/api/fetchFeaturedRaffle.js";
-import { fetchPendingRaffles } from "../../../entities/raffle/api/fetchPendingRaffles.js";
-import { rejectRaffle } from "../../../entities/raffle/api/rejectRaffle.js";
+import { useRaffleMutations } from "../../../entities/raffle/model/useRaffleMutations.js";
+import { syncRafflesStaffQueueCaches } from "../../../pages/home/lib/staffBadgeQueryCache.js";
+import { raffleQueryKeys } from "../../../entities/raffle/model/raffleQueryKeys.js";
+import { useStaffRafflesQueueQuery } from "../../../entities/raffle/model/useStaffRafflesQueueQuery.js";
 import { RaffleManageActions } from "../../../entities/raffle/ui/RaffleManageActions.jsx";
 import { RafflePrizeMedia } from "../../../entities/raffle/ui/RafflePrizeMedia.jsx";
 import {
@@ -15,64 +15,50 @@ import {
 
 import "./RafflesStaffPage.css";
 
-const LIVE_SITE_STATUSES = new Set(["active", "paused", "completed"]);
-
 /**
  * @param {{
- *   refreshTick?: number;
  *   onQueueChanged?: () => void;
  *   onEditRaffle?: (raffle: import('../../../entities/raffle/model/types.js').RaffleFromApi) => void;
  * }} props
  */
-export function RafflesStaffPage({ refreshTick = 0, onQueueChanged, onEditRaffle }) {
-  const [phase, setPhase] = useState("loading");
-  const [raffles, setRaffles] = useState(
-    /** @type {import('../../../entities/raffle/model/types.js').RaffleFromApi[]} */ ([]),
-  );
-  const [liveRaffle, setLiveRaffle] = useState(
-    /** @type {import('../../../entities/raffle/model/types.js').RaffleFromApi | null} */ (
-      null
-    ),
-  );
-  const [error, setError] = useState("");
+export function RafflesStaffPage({ onQueueChanged, onEditRaffle }) {
+  const queryClient = useQueryClient();
+  const { approveMutation, rejectMutation, deleteStaffMutation } = useRaffleMutations();
+  const queueQuery = useStaffRafflesQueueQuery();
   const [pendingId, setPendingId] = useState(null);
   const [rowErrors, setRowErrors] = useState(
     /** @type {Record<string, string>} */ ({}),
   );
+  const [clearedLiveRaffleId, setClearedLiveRaffleId] = useState(
+    /** @type {string | null} */ (null),
+  );
 
-  const loadQueue = useCallback(async () => {
-    setPhase("loading");
-    setError("");
-    try {
-      const [list, featuredList] = await Promise.all([
-        fetchPendingRaffles(),
-        fetchFeaturedRaffles(),
-      ]);
-      setRaffles(list);
-      const vitrineRaffle =
-        featuredList.find((row) => row.status === "active") ??
-        featuredList.find((row) => LIVE_SITE_STATUSES.has(row.status)) ??
-        null;
-      setLiveRaffle(
-        vitrineRaffle && LIVE_SITE_STATUSES.has(vitrineRaffle.status)
-          ? vitrineRaffle
-          : null,
-      );
-      setPhase("success");
-    } catch (e) {
-      setError(
-        e instanceof Error ? e.message : API_CLIENT_UI.FETCH_RAFFLES_QUEUE_FALLBACK,
-      );
-      setPhase("error");
-    }
-  }, []);
-
-  useEffect(() => {
-    void loadQueue();
-  }, [loadQueue, refreshTick]);
+  const raffles = queueQuery.data?.pendingRaffles ?? [];
+  const liveRaffleFromQuery = queueQuery.data?.liveRaffle ?? null;
+  const liveRaffle =
+    clearedLiveRaffleId != null &&
+    liveRaffleFromQuery?._id != null &&
+    String(liveRaffleFromQuery._id) === clearedLiveRaffleId
+      ? null
+      : liveRaffleFromQuery;
 
   const removeRow = (raffleId) => {
-    setRaffles((prev) => prev.filter((row) => String(row._id) !== raffleId));
+    queryClient.setQueryData(
+      raffleQueryKeys.staffQueue(),
+      (
+        /** @type {{ pendingRaffles: import('../../../entities/raffle/model/types.js').RaffleFromApi[]; liveRaffle: import('../../../entities/raffle/model/types.js').RaffleFromApi | null } | undefined} */ old,
+      ) => {
+        if (!old) {
+          return old;
+        }
+        return {
+          ...old,
+          pendingRaffles: old.pendingRaffles.filter(
+            (row) => String(row._id) !== raffleId,
+          ),
+        };
+      },
+    );
     setRowErrors((prev) => {
       const next = { ...prev };
       delete next[raffleId];
@@ -84,9 +70,9 @@ export function RafflesStaffPage({ refreshTick = 0, onQueueChanged, onEditRaffle
     try {
       setPendingId(raffleId);
       setRowErrors((prev) => ({ ...prev, [raffleId]: "" }));
-      await approveRaffle(raffleId);
+      await approveMutation.mutateAsync(raffleId);
       removeRow(raffleId);
-      onQueueChanged?.();
+      void syncRafflesStaffQueueCaches(queryClient);
     } catch (e) {
       setRowErrors((prev) => ({
         ...prev,
@@ -102,9 +88,9 @@ export function RafflesStaffPage({ refreshTick = 0, onQueueChanged, onEditRaffle
     try {
       setPendingId(raffleId);
       setRowErrors((prev) => ({ ...prev, [raffleId]: "" }));
-      await rejectRaffle(raffleId);
+      await rejectMutation.mutateAsync(raffleId);
       removeRow(raffleId);
-      onQueueChanged?.();
+      void syncRafflesStaffQueueCaches(queryClient);
     } catch (e) {
       setRowErrors((prev) => ({
         ...prev,
@@ -117,16 +103,18 @@ export function RafflesStaffPage({ refreshTick = 0, onQueueChanged, onEditRaffle
   };
 
   const handleDelete = async (raffleId, { clearLive = false } = {}) => {
-    if (!window.confirm(RAFFLE_MANAGE_UI.DELETE_CONFIRM_STAFF)) return;
+    if (!window.confirm(RAFFLE_MANAGE_UI.DELETE_CONFIRM_STAFF)) {
+      return;
+    }
     try {
       setPendingId(raffleId);
       setRowErrors((prev) => ({ ...prev, [raffleId]: "" }));
-      await deleteRaffleByStaff(raffleId);
+      await deleteStaffMutation.mutateAsync(raffleId);
       removeRow(raffleId);
       if (clearLive) {
-        setLiveRaffle(null);
+        setClearedLiveRaffleId(raffleId);
       }
-      onQueueChanged?.();
+      void syncRafflesStaffQueueCaches(queryClient);
     } catch (e) {
       setRowErrors((prev) => ({
         ...prev,
@@ -138,17 +126,21 @@ export function RafflesStaffPage({ refreshTick = 0, onQueueChanged, onEditRaffle
     }
   };
 
-  if (phase === "loading") {
+  if (queueQuery.isPending) {
     return <p className="raffles-staff-page__state">{RAFFLES_STAFF_PAGE_UI.LOADING}</p>;
   }
 
-  if (phase === "error") {
+  if (queueQuery.isError) {
+    const message =
+      queueQuery.error instanceof Error
+        ? queueQuery.error.message
+        : API_CLIENT_UI.FETCH_RAFFLES_QUEUE_FALLBACK;
     return (
       <p
         className="raffles-staff-page__state raffles-staff-page__state_error"
         role="alert"
       >
-        {error}
+        {message}
       </p>
     );
   }

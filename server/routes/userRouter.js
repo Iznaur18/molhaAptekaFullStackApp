@@ -41,7 +41,7 @@ import {
   userIdParamValidation,
   updateProfileValidation,
   userSearchValidation,
-  userSellerProductsValidationZod,
+  userSellerProductsValidation,
   submitDataConfirmationValidation,
   resolveDataConfirmationValidation,
   userFollowListValidation,
@@ -175,7 +175,7 @@ router.get(
   "/:userIdClient/products",
   checkAuthMW,
   userIdParamValidation,
-  userSellerProductsValidationZod,
+  userSellerProductsValidation,
   getUserProductsController,
 );
 router.post(

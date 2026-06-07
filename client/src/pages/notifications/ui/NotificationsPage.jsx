@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { markInAppNotificationsRead } from "../../../entities/user/api/markInAppNotificationsRead.js";
+import { useMarkInAppNotificationsReadMutation } from "../../../entities/user/model/useMarkInAppNotificationsReadMutation.js";
 import {
   API_CLIENT_UI,
   NOTIFICATIONS_PAGE_UI,
@@ -16,24 +16,21 @@ import "./NotificationsPage.css";
  * }} props
  */
 export function NotificationsPage({ notifications, onNotificationClick, onCleared }) {
-  const [isClearing, setIsClearing] = useState(false);
+  const markReadMutation = useMarkInAppNotificationsReadMutation();
   const [clearError, setClearError] = useState("");
 
   const handleClear = async () => {
-    if (notifications.length === 0 || isClearing) {
+    if (notifications.length === 0 || markReadMutation.isPending) {
       return;
     }
     try {
-      setIsClearing(true);
       setClearError("");
-      await markInAppNotificationsRead();
+      await markReadMutation.mutateAsync();
       onCleared();
     } catch (e) {
       setClearError(
         e instanceof Error ? e.message : API_CLIENT_UI.MARK_NOTIFICATIONS_READ_FALLBACK,
       );
-    } finally {
-      setIsClearing(false);
     }
   };
 
@@ -43,11 +40,11 @@ export function NotificationsPage({ notifications, onNotificationClick, onCleare
         <button
           type="button"
           className="notifications-page__clear"
-          disabled={notifications.length === 0 || isClearing}
+          disabled={notifications.length === 0 || markReadMutation.isPending}
           aria-label={NOTIFICATIONS_PAGE_UI.CLEAR_ARIA}
           onClick={() => void handleClear()}
         >
-          {isClearing
+          {markReadMutation.isPending
             ? NOTIFICATIONS_PAGE_UI.CLEAR_PENDING
             : NOTIFICATIONS_PAGE_UI.CLEAR}
         </button>

@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 
-import { fetchMyPremiumStatus } from "../../../entities/user/api/fetchMyPremiumStatus.js";
-import { purchasePremium } from "../../../entities/user/api/purchasePremium.js";
+import { usePurchasePremiumMutation } from "../../../entities/user/model/usePurchasePremiumMutation.js";
+import { useMyPremiumStatusQuery } from "../../../entities/user/model/useMyPremiumStatusQuery.js";
 import { PREMIUM_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
 import "./PremiumPage.css";
@@ -17,49 +17,37 @@ import "./PremiumPage.css";
  * }} props
  */
 export function PremiumPage({ isAuthorized, onRequestLogin, onPurchased }) {
-  const [phase, setPhase] = useState("loading");
-  const [isActive, setIsActive] = useState(false);
-  const [canPurchase, setCanPurchase] = useState(false);
-  const [pricePoints, setPricePoints] = useState(0);
-  const [loyaltyPointsBalance, setLoyaltyPointsBalance] = useState(0);
+  const purchasePremiumMutation = usePurchasePremiumMutation();
+  const statusQuery = useMyPremiumStatusQuery({ enabled: isAuthorized });
   const [feedback, setFeedback] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const loadStatus = useCallback(async () => {
-    if (!isAuthorized) {
-      setPhase("idle");
-      return;
-    }
+  const isSubmitting = purchasePremiumMutation.isPending;
 
-    setPhase("loading");
-    setErrorMessage("");
-    try {
-      const status = await fetchMyPremiumStatus();
-      setIsActive(status.isActive);
-      setCanPurchase(status.canPurchase);
-      setPricePoints(status.pricePoints);
-      setLoyaltyPointsBalance(status.loyaltyPointsBalance);
-      setPhase("success");
-    } catch (e) {
-      setErrorMessage(e instanceof Error ? e.message : PREMIUM_PAGE_UI.FETCH_FALLBACK);
-      setPhase("error");
-    }
-  }, [isAuthorized]);
+  const status = statusQuery.data;
+  const phase = !isAuthorized
+    ? "idle"
+    : statusQuery.isPending
+      ? "loading"
+      : statusQuery.isError
+        ? "error"
+        : "success";
 
-  useEffect(() => {
-    void loadStatus();
-  }, [loadStatus]);
+  const isActive = status?.isActive ?? false;
+  const canPurchase = status?.canPurchase ?? false;
+  const pricePoints = status?.pricePoints ?? 0;
+  const loyaltyPointsBalance = status?.loyaltyPointsBalance ?? 0;
+
+  const fetchError =
+    statusQuery.error instanceof Error
+      ? statusQuery.error.message
+      : PREMIUM_PAGE_UI.FETCH_FALLBACK;
 
   const handlePurchase = async () => {
-    setIsSubmitting(true);
     setFeedback("");
     setErrorMessage("");
     try {
-      const result = await purchasePremium();
-      setLoyaltyPointsBalance(result.loyaltyPointsBalance);
-      setIsActive(result.isActive);
-      setCanPurchase(false);
+      const result = await purchasePremiumMutation.mutateAsync();
       setFeedback(result.message);
       await onPurchased?.({
         message: result.message,
@@ -69,8 +57,6 @@ export function PremiumPage({ isAuthorized, onRequestLogin, onPurchased }) {
       setErrorMessage(
         e instanceof Error ? e.message : PREMIUM_PAGE_UI.PURCHASE_FALLBACK,
       );
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -96,7 +82,7 @@ export function PremiumPage({ isAuthorized, onRequestLogin, onPurchased }) {
   if (phase === "error" && !pricePoints) {
     return (
       <p className="premium-page__state premium-page__state_error" role="alert">
-        {errorMessage}
+        {fetchError}
       </p>
     );
   }

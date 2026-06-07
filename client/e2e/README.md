@@ -24,8 +24,11 @@ npm run test:e2e
 | `smoke.spec.js`                 | health, кнопка «Войти», `GET /product`                          |
 | `catalog-cart.spec.js`          | вход → карточка в ленте → «В корзину» → `/basket`               |
 | `seller-create-product.spec.js` | вход продавца → «Разместить товар» → дерево категорий → создать |
+| `query-profile-smoke.spec.js`   | Query-вкладки профиля + derive action-count vs list API         |
+| `query-mutations-smoke.spec.js` | checkout, moderation approve, story upload, KYC submit          |
+| `catalog-virtualizer-mobile.spec.js` | mobile/Pixel: виртуализация каталога (scroll, resize)        |
 
-Фикстуры: `server/scripts/e2ePlaywrightSeed.js` (buyer, seller, approved товар в каталоге).
+Фикстуры: `server/scripts/e2ePlaywrightSeed.js` (buyer, seller, moderator, kyc-buyer, approved + pending товары, **105 virtual catalog** для virtualizer e2e).
 
 CI: `.github/workflows/e2e-playwright.yml` (Mongo 7 + migrate + Playwright).
 

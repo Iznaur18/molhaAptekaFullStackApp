@@ -1,15 +1,6 @@
 import { useMemo, useState } from "react";
 
-import {
-  cancelInstallmentEarlyPayoff,
-  confirmInstallmentEarlyPayoff,
-  confirmInstallmentPayment,
-  rejectInstallmentEarlyPayoff,
-  rejectInstallmentPayment,
-  markInstallmentEarlyPayoff,
-  markInstallmentPaymentPaid,
-  openInstallmentDispute,
-} from "../api/installmentApi.js";
+import { useInstallmentContractMutations } from "../model/useInstallmentMutations.js";
 import {
   INSTALLMENT_CONTRACT_STATUS_ACTIVE,
   INSTALLMENT_CONTRACT_STATUS_COMPLETED,
@@ -48,6 +39,17 @@ export function InstallmentContractCard({
   onCounterpartyClick,
   onProductClick,
 }) {
+  const contractId = String(contract._id);
+  const {
+    markPaidMutation,
+    confirmPaymentMutation,
+    rejectPaymentMutation,
+    markEarlyPayoffMutation,
+    confirmEarlyPayoffMutation,
+    cancelEarlyPayoffMutation,
+    rejectEarlyPayoffMutation,
+    openDisputeMutation,
+  } = useInstallmentContractMutations(contractId);
   const [pendingKey, setPendingKey] = useState(null);
   const [error, setError] = useState("");
   const [showDisputeForm, setShowDisputeForm] = useState(false);
@@ -105,49 +107,43 @@ export function InstallmentContractCard({
 
   const handleMarkPaid = (paymentIndex) => {
     void runAction(`mark:${paymentIndex}`, () =>
-      markInstallmentPaymentPaid(String(contract._id), paymentIndex),
+      markPaidMutation.mutateAsync(paymentIndex),
     );
   };
 
   const handleConfirmPayment = (paymentIndex) => {
     void runAction(`confirm:${paymentIndex}`, () =>
-      confirmInstallmentPayment(String(contract._id), paymentIndex),
+      confirmPaymentMutation.mutateAsync(paymentIndex),
     );
   };
 
   const handleRejectPayment = (paymentIndex) => {
     void runAction(`reject:${paymentIndex}`, () =>
-      rejectInstallmentPayment(String(contract._id), paymentIndex),
+      rejectPaymentMutation.mutateAsync(paymentIndex),
     );
   };
 
   const handleEarlyPayoff = () => {
-    void runAction("early", () => markInstallmentEarlyPayoff(String(contract._id)));
+    void runAction("early", () => markEarlyPayoffMutation.mutateAsync());
   };
 
   const handleConfirmEarlyPayoff = () => {
-    void runAction("early-confirm", () =>
-      confirmInstallmentEarlyPayoff(String(contract._id)),
-    );
+    void runAction("early-confirm", () => confirmEarlyPayoffMutation.mutateAsync());
   };
 
   const handleCancelEarlyPayoff = () => {
-    void runAction("early-cancel", () =>
-      cancelInstallmentEarlyPayoff(String(contract._id)),
-    );
+    void runAction("early-cancel", () => cancelEarlyPayoffMutation.mutateAsync());
   };
 
   const handleRejectEarlyPayoff = () => {
-    void runAction("early-reject", () =>
-      rejectInstallmentEarlyPayoff(String(contract._id)),
-    );
+    void runAction("early-reject", () => rejectEarlyPayoffMutation.mutateAsync());
   };
 
   const handleOpenDispute = () => {
     const reason = disputeReason.trim();
     if (!reason) return;
     void runAction("dispute", async () => {
-      const result = await openInstallmentDispute(String(contract._id), reason);
+      const result = await openDisputeMutation.mutateAsync(reason);
       setShowDisputeForm(false);
       setDisputeReason("");
       return result;

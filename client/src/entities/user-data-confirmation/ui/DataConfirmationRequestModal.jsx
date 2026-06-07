@@ -1,16 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-import { countWords } from "../../user/lib/countWords.js";
-import { fetchMyDataConfirmationStatus } from "../api/fetchMyDataConfirmationStatus.js";
-import { submitDataConfirmationRequest } from "../api/submitDataConfirmationRequest.js";
+import { useSubmitDataConfirmationRequestMutation } from "../model/useSubmitDataConfirmationRequestMutation.js";
 import { emptyPassportForm } from "../lib/emptyPassportForm.js";
 import { validatePassportForm } from "../lib/validatePassportForm.js";
+import { useMyDataConfirmationStatusQuery } from "../model/useMyDataConfirmationStatusQuery.js";
 import {
   USER_DATA_CONFIRMATION_STATUS_PENDING,
   USER_DATA_CONFIRMATION_STATUS_REJECTED,
 } from "../model/constants.js";
-import { uploadImage } from "../../../shared/api/uploadImage.js";
+import { useUploadAssetMutations } from "../../../shared/model/useUploadAssetMutations.js";
 import {
   DATA_CONFIRMATION_MODAL_UI,
   DATA_CONFIRMATION_PAGE_UI,
@@ -37,18 +36,31 @@ import "./DataConfirmationRequestModal.css";
  * }} props
  */
 export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
-  const [phase, setPhase] = useState("loading");
-  const [isUserDataConfirmed, setIsUserDataConfirmed] = useState(false);
-  const [requestStatus, setRequestStatus] = useState(
-    /** @type {string | null} */ (null),
-  );
-  const [staffNote, setStaffNote] = useState("");
+  const submitRequestMutation = useSubmitDataConfirmationRequestMutation();
+  const { uploadImageMutation } = useUploadAssetMutations();
+  const statusQuery = useMyDataConfirmationStatusQuery({ enabled: isOpen });
   const [form, setForm] = useState(emptyPassportForm);
   const [selfieFile, setSelfieFile] = useState(/** @type {File | null} */ (null));
   const [selfiePreviewUrl, setSelfiePreviewUrl] = useState("");
   const [error, setError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isSubmitting =
+    submitRequestMutation.isPending || uploadImageMutation.isPending;
   const selfieFileInputRef = useRef(/** @type {HTMLInputElement | null} */ (null));
+
+  const status = statusQuery.data;
+  const phase = statusQuery.isPending
+    ? "loading"
+    : statusQuery.isError
+      ? "error"
+      : "ready";
+  const fetchError =
+    statusQuery.error instanceof Error ? statusQuery.error.message : "Ошибка";
+  const isUserDataConfirmed = status?.isUserDataConfirmed ?? false;
+  const requestStatus = status?.request?.status ?? null;
+  const staffNote =
+    requestStatus === USER_DATA_CONFIRMATION_STATUS_REJECTED
+      ? String(status?.request?.staffNote ?? "").trim()
+      : "";
 
   useEffect(() => {
     if (!selfieFile) {
@@ -65,37 +77,13 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
   }, [selfieFile]);
 
   useEffect(() => {
-    if (!isOpen) return undefined;
-
-    let isCancelled = false;
-    setPhase("loading");
+    if (!isOpen) {
+      return;
+    }
     setError("");
     setSelfieFile(null);
-
-    void (async () => {
-      try {
-        const status = await fetchMyDataConfirmationStatus();
-        if (isCancelled) return;
-        setIsUserDataConfirmed(status.isUserDataConfirmed);
-        setRequestStatus(status.request?.status ?? null);
-        setStaffNote(
-          status.request?.status === USER_DATA_CONFIRMATION_STATUS_REJECTED
-            ? String(status.request.staffNote ?? "").trim()
-            : "",
-        );
-        setForm(emptyPassportForm());
-        setPhase("ready");
-      } catch (e) {
-        if (isCancelled) return;
-        setError(e instanceof Error ? e.message : "Ошибка");
-        setPhase("error");
-      }
-    })();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [isOpen]);
+    setForm(emptyPassportForm());
+  }, [isOpen, statusQuery.dataUpdatedAt]);
 
   useScrollLock(isOpen);
 
@@ -103,6 +91,7 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
 
   const canSubmit =
     !isUserDataConfirmed && requestStatus !== USER_DATA_CONFIRMATION_STATUS_PENDING;
+  const displayError = error || (phase === "error" ? fetchError : "");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -122,12 +111,11 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
       return;
     }
 
-    setIsSubmitting(true);
     setError("");
     try {
       let passportSelfiePhotoUrl;
       try {
-        passportSelfiePhotoUrl = await uploadImage(selfieFile);
+        passportSelfiePhotoUrl = await uploadImageMutation.mutateAsync(selfieFile);
       } catch (uploadError) {
         throw new Error(
           uploadError instanceof Error
@@ -136,7 +124,7 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
         );
       }
 
-      await submitDataConfirmationRequest({
+      await submitRequestMutation.mutateAsync({
         passport: {
           ...form,
           lastName: form.lastName.trim(),
@@ -153,8 +141,6 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
       onClose();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Ошибка");
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -216,7 +202,7 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
 
         {phase === "error" && !canSubmit ? (
           <p className="data-confirmation-modal__state_error" role="alert">
-            {error}
+            {displayError}
           </p>
         ) : null}
 
@@ -375,9 +361,9 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
                 ) : null}
               </label>
 
-              {error ? (
+              {displayError ? (
                 <p className="data-confirmation-modal__state_error" role="alert">
-                  {error}
+                  {displayError}
                 </p>
               ) : null}
               <div className="data-confirmation-modal__actions">

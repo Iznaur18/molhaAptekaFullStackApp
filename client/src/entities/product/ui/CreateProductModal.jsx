@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { createProduct } from "../api/createProduct.js";
-import { patchMyProduct } from "../api/patchMyProduct.js";
+import { useMyProductMutations } from "../model/useMyProductMutations.js";
 import { resolveProductImageUrls } from "../lib/resolveProductImageUrls.js";
 import { createImageRow, imageRowsFromUrls } from "../lib/productImageRowHelpers.js";
 import {
@@ -162,6 +161,7 @@ export function CreateProductModal({
   onToggleRaffleParticipation,
   isRaffleParticipationPending = false,
 }) {
+  const { patchMutation, createMutation } = useMyProductMutations();
   const [form, setForm] = useState(INITIAL_FORM);
   const [status, setStatus] = useState({ kind: "idle", message: "" });
   const [isInstallmentProgramOpen, setIsInstallmentProgramOpen] = useState(false);
@@ -417,9 +417,12 @@ export function CreateProductModal({
         if (isEdit || showCatalogAvailabilityToggle) {
           patchBody.productStockQuantity = productStockQuantity;
         }
-        product = await patchMyProduct(String(productToEdit._id), patchBody);
+        product = await patchMutation.mutateAsync({
+          productId: String(productToEdit._id),
+          body: patchBody,
+        });
       } else {
-        product = await createProduct({
+        product = await createMutation.mutateAsync({
           productName: form.productName,
           productDescription: form.productDescription,
           productImageUrls: urls.length > 0 ? urls : undefined,

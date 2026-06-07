@@ -1,0 +1,84 @@
+.product-details-modal__price-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--product-details-modal-gap);
+  padding: 0.9rem var(--iz-space-4);
+  border: 1px solid var(--iz-color-border);
+  border-radius: 0.65rem;
+  background: linear-gradient(
+    165deg,
+    var(--iz-color-surface-elevated) 0%,
+    var(--iz-color-surface-alt) 100%
+  );
+}
+
+.product-details-modal__price-display {
+  margin: 0;
+}
+
+.product-details-modal__price-dl {
+  margin: 0;
+}
+
+.product-details-modal__price-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--product-details-modal-gap);
+  align-items: stretch;
+  width: 100%;
+}
+
+.product-details-modal__price-actions--no-cart {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.product-details-modal__price-actions-cart {
+  display: flex;
+  min-width: 0;
+  min-height: 100%;
+}
+
+.product-details-modal__price-actions-cart .add-to-cart,
+.product-details-modal__price-actions-cart .add-to-cart__stepper {
+  width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+.product-details-modal__price-actions-cart .add-to-cart__stepper {
+  justify-content: center;
+}
+
+.product-details-modal__auction-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0.45rem var(--iz-space-2);
+  border: 1px solid var(--iz-color-warning-amber);
+  border-radius: var(--iz-radius-input);
+  background: var(--iz-color-warning-amber);
+  color: var(--iz-color-on-contrast);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.product-details-modal__auction-btn:hover:not(:disabled) {
+  background: var(--iz-color-warning-gold);
+  border-color: var(--iz-color-warning-gold);
+}
+
+.product-details-modal__auction-btn--inactive,
+.product-details-modal__auction-btn:disabled {
+  border-color: var(--iz-color-border-subtle);
+  background: var(--iz-color-surface-alt);
+  color: var(--iz-color-neutral-gray);
+  cursor: default;
+}

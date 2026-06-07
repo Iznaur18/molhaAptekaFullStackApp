@@ -1,13 +1,9 @@
 import { useEffect } from "react";
 
-import { fetchMyProductsPage } from "../../../entities/product/api/fetchMyProducts.js";
-import { fetchCurrentUserProfile } from "../../../entities/user/api/fetchCurrentUserProfile.js";
-import { isAuthSessionError } from "../../../shared/lib/isAuthSessionError.js";
 import { MY_PRODUCTS_MODERATION_FILTER_ALL } from "../../../entities/product/model/productConstants.js";
-import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { isRoleRestrictedMainView } from "../../../shared/lib/homeMainViewPaths.js";
 import { isProfileTabMainView } from "../../my-profile/lib/profileTabToMainView.js";
-import { EMPTY_MY_PROFILE_PAGE } from "../lib/homePageConstants.js";
+import { EMPTY_MY_PROFILE_PAGE } from "../lib/catalogShellConstants.js";
 
 /**
  * @param {object} params
@@ -22,11 +18,10 @@ export const useHomeMyProfileSession = ({
   setMyProfilePage,
   setIsLoginModalOpen,
   setMyProductsCatalogError,
-  setMyProductsTotal,
   setMyProductsModerationFilter,
   resetCatalogFollowingOnLogout,
   clearInAppNotifications,
-  setIsAuthorized,
+  authUser,
 }) => {
   useEffect(() => {
     if (!isSessionReady) {
@@ -36,7 +31,6 @@ export const useHomeMyProfileSession = ({
       setMyProfilePage(EMPTY_MY_PROFILE_PAGE);
       clearInAppNotifications();
       setMyProductsCatalogError("");
-      setMyProductsTotal(null);
       setMyProductsModerationFilter(MY_PRODUCTS_MODERATION_FILTER_ALL);
       resetCatalogFollowingOnLogout();
       if (isProfileTabMainView(mainView) || mainView === "notifications") {
@@ -53,51 +47,28 @@ export const useHomeMyProfileSession = ({
     setIsLoginModalOpen,
     setMyProductsCatalogError,
     setMyProductsModerationFilter,
-    setMyProductsTotal,
     clearInAppNotifications,
     setMyProfilePage,
   ]);
 
   useEffect(() => {
-    if (!isProfileTabMainView(mainView) || !isAuthorized) {
+    if (!isProfileTabMainView(mainView)) {
       return undefined;
     }
-    let isCancelled = false;
+
+    if (!isAuthorized) {
+      setMyProfilePage(EMPTY_MY_PROFILE_PAGE);
+      return undefined;
+    }
+
+    if (authUser) {
+      setMyProfilePage({ phase: "success", user: authUser, error: "" });
+      return undefined;
+    }
+
     setMyProfilePage({ phase: "loading", user: null, error: "" });
-    void (async () => {
-      try {
-        const { user } = await fetchCurrentUserProfile();
-        if (isCancelled) {
-          return;
-        }
-        setMyProfilePage({ phase: "success", user, error: "" });
-      } catch (e) {
-        if (isCancelled) {
-          return;
-        }
-        if (isAuthSessionError(e)) {
-          setIsAuthorized(false);
-          setMyProfilePage(EMPTY_MY_PROFILE_PAGE);
-          setIsLoginModalOpen(true);
-          goToMainView("catalog");
-          return;
-        }
-        const error =
-          e instanceof Error ? e.message : HOME_PAGE_UI.FETCH_MY_PROFILE_FALLBACK;
-        setMyProfilePage({ phase: "error", user: null, error });
-      }
-    })();
-    return () => {
-      isCancelled = true;
-    };
-  }, [
-    mainView,
-    isAuthorized,
-    setMyProfilePage,
-    setIsAuthorized,
-    setIsLoginModalOpen,
-    goToMainView,
-  ]);
+    return undefined;
+  }, [authUser, isAuthorized, mainView, setMyProfilePage]);
 
   useEffect(() => {
     if (!isSessionReady || !isRoleRestrictedMainView(mainView)) {
@@ -111,29 +82,4 @@ export const useHomeMyProfileSession = ({
       goToMainView("catalog");
     }
   }, [mainView, canModerateProducts, isAdmin, isSessionReady, goToMainView]);
-
-  useEffect(() => {
-    if (!isAuthorized || isAdmin) {
-      setMyProductsTotal(null);
-      return undefined;
-    }
-
-    let isCancelled = false;
-    void (async () => {
-      try {
-        const { pagination } = await fetchMyProductsPage({ page: 1, limit: 1 });
-        if (!isCancelled) {
-          setMyProductsTotal(pagination.total);
-        }
-      } catch {
-        if (!isCancelled) {
-          setMyProductsTotal(null);
-        }
-      }
-    })();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [isAuthorized, isAdmin, setMyProductsTotal]);
 };

@@ -22,7 +22,7 @@
   margin: 0 0 0.5rem;
   font-size: 0.8rem;
   line-height: 1.35;
-  color: #6b7280;
+  color: var(--iz-color-text-muted);
 }
 
 .product-card__availability {
@@ -64,40 +64,40 @@
 }
 
 .product-card__auction-toggle {
-  border-color: #e8a317;
-  background: #ffecb8;
-  color: #8f4915;
+  border-color: var(--iz-color-gold-deep);
+  background: var(--iz-color-gold-highlight);
+  color: var(--iz-color-warning-brown-rich);
 }
 
 .product-card__auction-toggle:hover:not(:disabled) {
-  border-color: #d49212;
-  background: #e8b82e;
-  color: #422006;
+  border-color: var(--iz-color-warning-gold);
+  background: var(--iz-color-gold);
+  color: var(--iz-color-warning-brown-text);
 }
 
 .product-card__auction-toggle:disabled {
-  border-color: #e2e8f0;
-  background: #f1f5f9;
-  color: #94a3b8;
+  border-color: var(--iz-color-border-subtle);
+  background: var(--iz-color-surface-alt);
+  color: var(--iz-color-neutral-gray);
   opacity: 1;
 }
 
 .product-card__installment-toggle {
-  border-color: color-mix(in srgb, #059669 40%, transparent);
-  background: #ecfdf5;
-  color: #047857;
+  border-color: color-mix(in srgb, var(--iz-color-success-bright) 40%, transparent);
+  background: var(--iz-color-success-soft);
+  color: var(--iz-color-success-strong);
 }
 
 .product-card__installment-toggle:hover:not(:disabled) {
-  border-color: #059669;
-  background: #d1fae5;
-  color: #065f46;
+  border-color: var(--iz-color-success-bright);
+  background: var(--iz-color-success-pale);
+  color: var(--iz-color-success-forest);
 }
 
 .product-card__installment-toggle:disabled {
-  border-color: #e2e8f0;
-  background: #f1f5f9;
-  color: #94a3b8;
+  border-color: var(--iz-color-border-subtle);
+  background: var(--iz-color-surface-alt);
+  color: var(--iz-color-neutral-gray);
   opacity: 1;
 }
 
@@ -144,10 +144,10 @@
   width: 100%;
   margin: 0;
   padding: 0.45rem 0.65rem;
-  border: 1px solid #93c5fd;
+  border: 1px solid var(--iz-color-action-light);
   border-radius: var(--product-card-inner-radius);
-  background: #dbeafe;
-  color: #1d4ed8;
+  background: var(--iz-color-action-border);
+  color: var(--iz-color-link-hover);
   font: inherit;
   font-size: 0.82rem;
   font-weight: 600;
@@ -155,7 +155,7 @@
 }
 
 .product-card__promote:hover:not(:disabled) {
-  background: #bfdbfe;
+  background: var(--iz-color-info-muted);
 }
 
 .product-card__promote:disabled {
@@ -165,7 +165,7 @@
 
 .product-card--banner-layout .product-card__banner-actions .product-card__promote {
   border-color: color-mix(in srgb, var(--product-card-banner-accent) 45%, transparent);
-  background: color-mix(in srgb, var(--product-card-banner-accent-soft) 72%, #fff);
+  background: color-mix(in srgb, var(--product-card-banner-accent-soft) 72%, var(--iz-color-on-contrast));
   color: var(--product-card-banner-badge-text);
 }
 
@@ -177,7 +177,7 @@
 
 .product-card-promotion-frame--tier-3 > .product-card .product-card__promote {
   border-color: color-mix(in srgb, var(--product-card-banner-accent) 45%, transparent);
-  background: color-mix(in srgb, var(--product-card-banner-accent-soft) 72%, #fff);
+  background: color-mix(in srgb, var(--product-card-banner-accent-soft) 72%, var(--iz-color-on-contrast));
   color: var(--product-card-banner-badge-text);
 }
 
@@ -310,7 +310,7 @@
   .product-card__footer-actions
   .add-to-cart__stepper {
   border-color: var(--product-card-banner-action);
-  background: color-mix(in srgb, var(--product-card-banner-accent-soft) 72%, #fff);
+  background: color-mix(in srgb, var(--product-card-banner-accent-soft) 72%, var(--iz-color-on-contrast));
 }
 
 .product-card-promotion-frame--tier-3
@@ -325,6 +325,6 @@
   .product-card__footer-actions
   .add-to-cart__step-button:hover {
   background: var(--product-card-banner-action);
-  color: #fff;
+  color: var(--iz-color-on-contrast);
 }
 

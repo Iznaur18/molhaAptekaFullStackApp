@@ -1,9 +1,9 @@
 .user-premium-avatar {
   box-sizing: border-box;
-  border: 2px solid #d4af37 !important;
+  border: 2px solid var(--iz-color-gold) !important;
   box-shadow:
-    0 0 0 1px color-mix(in srgb, #d4af37 45%, transparent),
-    0 6px 18px rgb(15 23 42 / 0.12);
+    0 0 0 1px color-mix(in srgb, var(--iz-color-gold) 45%, transparent),
+    0 6px 18px var(--iz-shadow-card-hover);
 }
 
 .user-premium-name {

@@ -1,10 +1,12 @@
-import { useCallback, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useMemo, useState } from "react";
 
-import { fetchUserProfileById } from "../../../entities/user/api/fetchUserProfileById.js";
 import { UserFollowButton } from "../../../entities/user-follow/ui/UserFollowButton.jsx";
+import { useUserProfileQuery } from "../../../entities/user/model/useUserProfileQuery.js";
+import { userProfileQueryKeys } from "../../../entities/user/model/userProfileQueryKeys.js";
 import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { buildSellerProductsPath } from "../../../shared/lib/sellerPaths.js";
-import { EMPTY_PROFILE_MODAL } from "../lib/homePageConstants.js";
+import { EMPTY_PROFILE_MODAL } from "../lib/catalogShellConstants.js";
 
 /**
  * @param {{
@@ -26,12 +28,40 @@ export const useHomeSellerModal = ({
   setIsAdminEditUserOpen,
   setIsAdminDeleteUserOpen,
 }) => {
-  const sellerFetchSeq = useRef(0);
-  const [sellerModal, setSellerModal] = useState(EMPTY_PROFILE_MODAL);
+  const queryClient = useQueryClient();
+  const [sellerUserId, setSellerUserId] = useState(/** @type {string | null} */ (null));
+
+  const profileQuery = useUserProfileQuery({
+    userId: sellerUserId ?? "",
+    enabled: Boolean(sellerUserId),
+  });
+
+  const sellerModal = useMemo(() => {
+    if (!sellerUserId) {
+      return EMPTY_PROFILE_MODAL;
+    }
+
+    if (profileQuery.isLoading) {
+      return { open: true, phase: "loading", user: null, error: "" };
+    }
+
+    if (profileQuery.isError) {
+      const error =
+        profileQuery.error instanceof Error
+          ? profileQuery.error.message
+          : HOME_PAGE_UI.FETCH_PROFILE_FALLBACK;
+      return { open: true, phase: "error", user: null, error };
+    }
+
+    if (profileQuery.data) {
+      return { open: true, phase: "success", user: profileQuery.data, error: "" };
+    }
+
+    return { open: true, phase: "error", user: null, error: HOME_PAGE_UI.FETCH_PROFILE_FALLBACK };
+  }, [profileQuery.data, profileQuery.error, profileQuery.isError, profileQuery.isLoading, sellerUserId]);
 
   const closeSellerModal = useCallback(() => {
-    sellerFetchSeq.current += 1;
-    setSellerModal(EMPTY_PROFILE_MODAL);
+    setSellerUserId(null);
     setIsAdminEditUserOpen(false);
     setIsAdminDeleteUserOpen(false);
   }, [setIsAdminDeleteUserOpen, setIsAdminEditUserOpen]);
@@ -39,8 +69,7 @@ export const useHomeSellerModal = ({
   /** @param {string} userId */
   const goToSellerProducts = useCallback(
     (userId) => {
-      sellerFetchSeq.current += 1;
-      setSellerModal(EMPTY_PROFILE_MODAL);
+      setSellerUserId(null);
       setIsAdminEditUserOpen(false);
       setIsAdminDeleteUserOpen(false);
 
@@ -67,25 +96,7 @@ export const useHomeSellerModal = ({
         return;
       }
 
-      const seq = ++sellerFetchSeq.current;
-      setSellerModal({ open: true, phase: "loading", user: null, error: "" });
-
-      void (async () => {
-        try {
-          const user = await fetchUserProfileById(userId);
-          if (seq !== sellerFetchSeq.current) {
-            return;
-          }
-          setSellerModal({ open: true, phase: "success", user, error: "" });
-        } catch (e) {
-          if (seq !== sellerFetchSeq.current) {
-            return;
-          }
-          const error =
-            e instanceof Error ? e.message : HOME_PAGE_UI.FETCH_PROFILE_FALLBACK;
-          setSellerModal({ open: true, phase: "error", user: null, error });
-        }
-      })();
+      setSellerUserId(String(userId));
     },
     [currentUserId, goToMainView],
   );
@@ -97,26 +108,39 @@ export const useHomeSellerModal = ({
    *   followingCount?: number;
    * }} patch
    */
-  const handleSellerFollowChange = useCallback((patch) => {
-    setSellerModal((prev) => {
-      if (prev.phase !== "success" || !prev.user) {
-        return prev;
+  const handleSellerFollowChange = useCallback(
+    (patch) => {
+      if (!sellerUserId || !profileQuery.data) {
+        return;
       }
-      return {
-        ...prev,
-        user: {
-          ...prev.user,
-          isFollowing: patch.isFollowing,
-          ...(patch.followersCount != null
-            ? { followersCount: patch.followersCount }
-            : {}),
-          ...(patch.followingCount != null
-            ? { followingCount: patch.followingCount }
-            : {}),
-        },
-      };
-    });
-  }, []);
+
+      queryClient.setQueryData(userProfileQueryKeys.byId(sellerUserId), {
+        ...profileQuery.data,
+        isFollowing: patch.isFollowing,
+        ...(patch.followersCount != null
+          ? { followersCount: patch.followersCount }
+          : {}),
+        ...(patch.followingCount != null
+          ? { followingCount: patch.followingCount }
+          : {}),
+      });
+    },
+    [profileQuery.data, queryClient, sellerUserId],
+  );
+
+  const setSellerModal = useCallback(
+    (next) => {
+      if (!next.open) {
+        setSellerUserId(null);
+        return;
+      }
+      if (next.user?._id) {
+        setSellerUserId(String(next.user._id));
+        queryClient.setQueryData(userProfileQueryKeys.byId(String(next.user._id)), next.user);
+      }
+    },
+    [queryClient],
+  );
 
   const renderSellerFollowAccessory = useCallback(() => {
     if (sellerModal.phase !== "success" || !sellerModal.user) {

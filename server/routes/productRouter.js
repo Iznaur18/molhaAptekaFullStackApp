@@ -81,10 +81,10 @@ import {
   productReviewRateLimiter,
 } from "../middlewares/index.js";
 import {
-  makeProductValidationZod,
+  makeProductValidation,
   productIdParamValidation,
-  productsSearchValidationZod,
-  patchMyProductValidationZod,
+  productsSearchValidation,
+  patchMyProductValidation,
   rejectProductModerationValidation,
   submitProductReportValidation,
   resolveProductReportsValidation,
@@ -119,10 +119,10 @@ import {
 
 const router = Router();
 
-router.post("/", checkAuthMW, makeProductValidationZod, postProductController);
+router.post("/", checkAuthMW, makeProductValidation, postProductController);
 router.get(
   "/",
-  productsSearchValidationZod,
+  productsSearchValidation,
   checkOptionalAuthMW,
   getProductsController,
 );
@@ -211,7 +211,7 @@ router.patch(
   patchProductCatalogFeedTileDisplayValidation,
   patchProductCatalogFeedTileDisplayController,
 );
-router.get("/my", checkAuthMW, productsSearchValidationZod, getMyProductsController);
+router.get("/my", checkAuthMW, productsSearchValidation, getMyProductsController);
 router.get("/raffles/featured", getFeaturedRaffleController);
 router.get("/raffles/my", checkAuthMW, getMyRaffleController);
 router.get(
@@ -309,7 +309,7 @@ router.get(
   "/moderation/pending",
   checkAuthMW,
   checkProductModeratorMW,
-  productsSearchValidationZod,
+  productsSearchValidation,
   getPendingModerationProductsController,
 );
 router.get(
@@ -517,7 +517,7 @@ router.patch(
   "/:productId",
   checkAuthMW,
   productIdParamValidation,
-  patchMyProductValidationZod,
+  patchMyProductValidation,
   patchMyProductController,
 );
 router.delete(

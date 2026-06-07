@@ -8,25 +8,25 @@
   height: 2.25rem;
   margin: 0;
   padding: 0;
-  border: 1px solid rgba(31, 111, 235, 0.35);
+  border: 1px solid var(--iz-color-action-border-muted);
   border-radius: 50%;
-  background: #fff;
+  background: var(--iz-color-surface);
   box-shadow: none;
-  color: #1f6feb;
+  color: var(--iz-color-action);
   cursor: pointer;
 }
 
 .header-circle-button:hover {
-  border-color: #1f6feb;
-  background: rgba(31, 111, 235, 0.06);
-  color: #1d4ed8;
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action-bg-hover);
+  color: var(--iz-color-link-hover);
 }
 
 .header-circle-button--active,
 .header-circle-button--active:hover {
-  border-color: #1f6feb;
-  background: rgba(31, 111, 235, 0.1);
-  color: #1d4ed8;
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action-bg-active);
+  color: var(--iz-color-link-hover);
 }
 
 .header-circle-button__icon {
@@ -44,23 +44,23 @@
   min-width: 1.25rem;
   height: 1.25rem;
   padding: 0 0.35rem;
-  border-radius: 999px;
+  border-radius: var(--iz-radius-pill);
   font-size: 0.68rem;
   font-weight: 700;
   line-height: 1;
 }
 
 .header-circle-button__badge_count {
-  background: #1f6feb;
-  color: #fff;
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast);
 }
 
 .header-circle-button--active .header-circle-button__badge_count {
-  background: #fff;
-  color: #1f6feb;
+  background: var(--iz-color-surface);
+  color: var(--iz-color-action);
 }
 
 .header-circle-button__badge_alert {
-  background: #b42318;
-  color: #fff;
+  background: var(--iz-color-danger-strong);
+  color: var(--iz-color-on-contrast);
 }

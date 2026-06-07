@@ -1,12 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { ProductPriceOfferHintMessage } from "../../product-price-offer/ui/ProductPriceOfferHintMessage.jsx";
-import { deleteMyProductReview } from "../api/deleteMyProductReview.js";
-import { fetchProductReviewSummary } from "../api/fetchProductReviewSummary.js";
-import { fetchProductReviewsPage } from "../api/fetchProductReviewsPage.js";
-import { patchMyProductReview } from "../api/patchMyProductReview.js";
-import { submitProductReview } from "../api/submitProductReview.js";
 import { formatProductReviewRatingLine } from "../lib/formatProductReviewRatingLine.js";
+import { useProductReviewMutations } from "../model/useProductReviewMutations.js";
+import { useProductReviewsQuery } from "../model/useProductReviewsQuery.js";
 import { PRODUCT_REVIEW_UI } from "../../../shared/config/appUiCopy.js";
 import { ProductReviewForm } from "./ProductReviewForm.jsx";
 import { ProductReviewListItem } from "./ProductReviewListItem.jsx";
@@ -33,19 +30,23 @@ export function ProductReviewsSection({
   onStatsChange,
   embeddedInTab = false,
 }) {
-  const [summary, setSummary] = useState(
-    /** @type {import('../model/types.js').ProductReviewSummary | null} */ (null),
-  );
-  const [reviews, setReviews] = useState(
-    /** @type {import('../model/types.js').ProductReviewFromApi[]} */ ([]),
-  );
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const {
+    summaryQuery,
+    reviewsQuery,
+    reviews,
+    totalPages,
+    currentPage,
+    isLoading,
+    isLoadingMore,
+    error,
+  } = useProductReviewsQuery({ productId });
+  const { submitMutation, patchMutation, deleteMutation } =
+    useProductReviewMutations(productId);
+  const summary = summaryQuery.data ?? null;
   const [isEditingMyReview, setIsEditingMyReview] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const isSubmitting =
+    submitMutation.isPending || patchMutation.isPending || deleteMutation.isPending;
 
   const applyStats = useCallback(
     (averageRating, reviewCount) => {
@@ -57,77 +58,33 @@ export function ProductReviewsSection({
     [onStatsChange],
   );
 
-  const reloadAll = useCallback(async () => {
-    setIsLoading(true);
-    setErrorMessage("");
-    try {
-      const [nextSummary, firstPage] = await Promise.all([
-        fetchProductReviewSummary(productId),
-        fetchProductReviewsPage(productId, { page: 1 }),
-      ]);
-      setSummary(nextSummary);
-      setReviews(firstPage.reviews);
-      setPage(1);
-      setTotalPages(firstPage.pagination.totalPages);
-      applyStats(nextSummary.averageRating, nextSummary.reviewCount);
-    } catch (e) {
-      setErrorMessage(e instanceof Error ? e.message : PRODUCT_REVIEW_UI.LOADING);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [applyStats, productId]);
-
   useEffect(() => {
-    void reloadAll();
-  }, [reloadAll]);
+    if (summary) {
+      applyStats(summary.averageRating, summary.reviewCount);
+    }
+  }, [applyStats, summary]);
 
   useEffect(() => {
     setIsEditingMyReview(false);
   }, [productId]);
 
-  const handleLoadMore = async () => {
-    if (isLoadingMore || page >= totalPages) {
-      return;
-    }
-    setIsLoadingMore(true);
-    try {
-      const nextPage = page + 1;
-      const data = await fetchProductReviewsPage(productId, { page: nextPage });
-      setReviews((prev) => [...prev, ...data.reviews]);
-      setPage(nextPage);
-      setTotalPages(data.pagination.totalPages);
-    } catch (e) {
-      setErrorMessage(e instanceof Error ? e.message : PRODUCT_REVIEW_UI.LOADING);
-    } finally {
-      setIsLoadingMore(false);
-    }
-  };
-
   const handleSubmitNew = async (payload) => {
-    setIsSubmitting(true);
     setErrorMessage("");
     try {
-      const data = await submitProductReview(productId, payload);
+      const data = await submitMutation.mutateAsync(payload);
       applyStats(data.averageRating, data.reviewCount);
-      await reloadAll();
     } catch (e) {
       setErrorMessage(e instanceof Error ? e.message : PRODUCT_REVIEW_UI.SUBMIT);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
   const handleSubmitEdit = async (payload) => {
-    setIsSubmitting(true);
     setErrorMessage("");
     try {
-      const data = await patchMyProductReview(productId, payload);
+      const data = await patchMutation.mutateAsync(payload);
       applyStats(data.averageRating, data.reviewCount);
-      await reloadAll();
     } catch (e) {
       setErrorMessage(e instanceof Error ? e.message : PRODUCT_REVIEW_UI.SAVE);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -135,17 +92,24 @@ export function ProductReviewsSection({
     if (!window.confirm(PRODUCT_REVIEW_UI.DELETE_CONFIRM)) {
       return;
     }
-    setIsSubmitting(true);
     setErrorMessage("");
     try {
-      const data = await deleteMyProductReview(productId);
+      const data = await deleteMutation.mutateAsync();
       applyStats(data.averageRating, data.reviewCount);
       setIsEditingMyReview(false);
-      await reloadAll();
     } catch (e) {
       setErrorMessage(e instanceof Error ? e.message : PRODUCT_REVIEW_UI.DELETE);
-    } finally {
-      setIsSubmitting(false);
+    }
+  };
+
+  const handleLoadMore = async () => {
+    if (isLoadingMore || currentPage >= totalPages) {
+      return;
+    }
+    try {
+      await reviewsQuery.fetchNextPage();
+    } catch (e) {
+      setErrorMessage(e instanceof Error ? e.message : PRODUCT_REVIEW_UI.LOADING);
     }
   };
 
@@ -289,6 +253,10 @@ export function ProductReviewsSection({
       ) : null}
       {isLoading ? (
         <p className="product-reviews-section__state">{PRODUCT_REVIEW_UI.LOADING}</p>
+      ) : error && !summary ? (
+        <p className="product-reviews-section__state" role="alert">
+          {error instanceof Error ? error.message : PRODUCT_REVIEW_UI.LOADING}
+        </p>
       ) : (
         <>
           {renderComposer()}
@@ -304,7 +272,7 @@ export function ProductReviewsSection({
               {PRODUCT_REVIEW_UI.NO_REVIEWS}
             </p>
           ) : null}
-          {page < totalPages ? (
+          {currentPage < totalPages ? (
             <button
               type="button"
               className="product-reviews-section__more"

@@ -12,7 +12,7 @@
 .seller-products-limit-modal__backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(17, 24, 39, 0.55);
+  background: var(--iz-color-overlay-backdrop);
 }
 
 .seller-products-limit-modal__card {
@@ -22,9 +22,9 @@
   max-width: 22rem;
   padding: 1.25rem;
   border-radius: 0.75rem;
-  border: 1px solid #e5e7eb;
-  background: #fff;
-  box-shadow: 0 20px 45px rgba(17, 24, 39, 0.28);
+  border: 1px solid var(--iz-color-border);
+  background: var(--iz-color-surface);
+  box-shadow: 0 20px 45px var(--iz-shadow-dialog);
 }
 
 .seller-products-limit-modal__title {
@@ -35,7 +35,7 @@
 .seller-products-limit-modal__body {
   margin: 0 0 1rem;
   font-size: 0.9rem;
-  color: #4b5563;
+  color: var(--iz-color-text-tertiary);
   line-height: 1.45;
 }
 
@@ -47,9 +47,9 @@
 .seller-products-limit-modal__btn {
   padding: 0.45rem 0.85rem;
   border-radius: 0.4rem;
-  border: 1px solid #e5e7eb;
-  background: #fff;
-  color: #111827;
+  border: 1px solid var(--iz-color-border);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
   font: inherit;
   cursor: pointer;
 }

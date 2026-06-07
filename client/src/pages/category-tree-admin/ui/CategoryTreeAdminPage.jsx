@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useMemo, useState } from "react";
 
-import { createProductCategoryAdmin } from "../../../entities/product-category-tree/api/createProductCategoryAdmin.js";
-import { deleteProductCategoryAdmin } from "../../../entities/product-category-tree/api/deleteProductCategoryAdmin.js";
-import { fetchProductCategoriesAdmin } from "../../../entities/product-category-tree/api/fetchProductCategoriesAdmin.js";
-import { patchProductCategoryAdmin } from "../../../entities/product-category-tree/api/patchProductCategoryAdmin.js";
+import { useProductCategoryAdminMutations } from "../../../entities/product-category-tree/model/useProductCategoryAdminMutations.js";
+import { productCategoryAdminQueryKeys } from "../../../entities/product-category-tree/model/productCategoryAdminQueryKeys.js";
+import { useProductCategoriesAdminQuery } from "../../../entities/product-category-tree/model/useProductCategoriesAdminQuery.js";
 import {
   PRODUCT_CATEGORIES,
   PRODUCT_CATEGORY_LABEL_RU,
@@ -21,12 +21,25 @@ import {
 import { CategoryTreeAdminCard } from "./CategoryTreeAdminCard.jsx";
 
 export function CategoryTreeAdminPage() {
-  const [phase, setPhase] = useState("loading");
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [rows, setRows] = useState(
-    /** @type {import('../../../entities/product-category-tree/model/adminTypes.js').ProductCategoryAdminRow[]} */ ([]),
+  const queryClient = useQueryClient();
+  const { createMutation, patchMutation, deleteMutation } =
+    useProductCategoryAdminMutations();
+  const categoriesQuery = useProductCategoriesAdminQuery();
+  const rows = useMemo(
+    () => sortCategoryRows(categoriesQuery.data ?? []),
+    [categoriesQuery.data],
   );
-  const [error, setError] = useState("");
+  const phase = categoriesQuery.isPending
+    ? "loading"
+    : categoriesQuery.isError
+      ? "error"
+      : "success";
+  const isRefreshing = categoriesQuery.isFetching && !categoriesQuery.isPending;
+  const error =
+    categoriesQuery.error instanceof Error
+      ? categoriesQuery.error.message
+      : CATEGORY_TREE_ADMIN_PAGE_UI.LOAD_ERROR;
+
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [pendingId, setPendingId] = useState(null);
@@ -40,29 +53,37 @@ export function CategoryTreeAdminPage() {
   const [newIsLeaf, setNewIsLeaf] = useState(false);
   const [newKeywordsCsv, setNewKeywordsCsv] = useState("");
   const [newLegacySlug, setNewLegacySlug] = useState("");
+  const [actionError, setActionError] = useState("");
 
-  const loadRows = useCallback(async ({ silent = false } = {}) => {
-    if (silent) {
-      setIsRefreshing(true);
-    } else {
-      setPhase("loading");
-    }
-    setError("");
-    try {
-      const list = await fetchProductCategoriesAdmin();
-      setRows(sortCategoryRows(list));
-      setPhase("success");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : CATEGORY_TREE_ADMIN_PAGE_UI.LOAD_ERROR);
-      setPhase("error");
-    } finally {
-      setIsRefreshing(false);
-    }
-  }, []);
+  const updateRows = useCallback(
+    (
+      /** @type {(rows: import('../../../entities/product-category-tree/model/adminTypes.js').ProductCategoryAdminRow[]) => import('../../../entities/product-category-tree/model/adminTypes.js').ProductCategoryAdminRow[]} */ updater,
+    ) => {
+      queryClient.setQueryData(productCategoryAdminQueryKeys.all, (old) => {
+        const next = updater(old ?? []);
+        return sortCategoryRows(next);
+      });
+    },
+    [queryClient],
+  );
 
-  useEffect(() => {
-    void loadRows();
-  }, [loadRows]);
+  const reloadRows = useCallback(
+    async ({ silent = false } = {}) => {
+      if (!silent) {
+        return categoriesQuery.refetch();
+      }
+      setActionError("");
+      try {
+        await categoriesQuery.refetch();
+      } catch (e) {
+        setActionError(
+          e instanceof Error ? e.message : CATEGORY_TREE_ADMIN_PAGE_UI.LOAD_ERROR,
+        );
+      }
+      return undefined;
+    },
+    [categoriesQuery],
+  );
 
   const parentOptions = useMemo(
     () =>
@@ -99,7 +120,7 @@ export function CategoryTreeAdminPage() {
       keywordsCsv: (row.searchKeywords ?? []).join(", "),
       legacyProductCategory: row.legacyProductCategory ?? "",
     });
-    setError("");
+    setActionError("");
   }, []);
 
   const resetCreateForm = () => {
@@ -115,13 +136,13 @@ export function CategoryTreeAdminPage() {
     event.preventDefault();
     const slug = newSlug.trim().toLowerCase();
     if (!isValidCategorySlug(slug)) {
-      setError(CATEGORY_TREE_ADMIN_PAGE_UI.SLUG_INVALID);
+      setActionError(CATEGORY_TREE_ADMIN_PAGE_UI.SLUG_INVALID);
       return;
     }
     try {
       setPendingId("create");
-      setError("");
-      const created = await createProductCategoryAdmin({
+      setActionError("");
+      const created = await createMutation.mutateAsync({
         slug,
         labelRu: newLabelRu.trim(),
         parentId: newParentId.trim() || null,
@@ -129,11 +150,13 @@ export function CategoryTreeAdminPage() {
         searchKeywords: parseKeywordsCsv(newKeywordsCsv),
         legacyProductCategory: newLegacySlug.trim() || null,
       });
-      setRows((prev) => sortCategoryRows([...prev, created]));
+      updateRows((prev) => [...prev, created]);
       resetCreateForm();
       setIsCreateOpen(false);
     } catch (e) {
-      setError(e instanceof Error ? e.message : CATEGORY_TREE_ADMIN_PAGE_UI.SAVE_ERROR);
+      setActionError(
+        e instanceof Error ? e.message : CATEGORY_TREE_ADMIN_PAGE_UI.SAVE_ERROR,
+      );
     } finally {
       setPendingId(null);
     }
@@ -143,8 +166,10 @@ export function CategoryTreeAdminPage() {
     const categoryId = row._id;
     try {
       setPendingId(categoryId);
-      setError("");
-      const updated = await patchProductCategoryAdmin(categoryId, {
+      setActionError("");
+      const updated = await patchMutation.mutateAsync({
+        categoryId,
+        body: {
         slug: String(editDraft.slug ?? "").trim(),
         labelRu: String(editDraft.labelRu ?? "").trim(),
         parentId: String(editDraft.parentId ?? "").trim() || null,
@@ -152,20 +177,21 @@ export function CategoryTreeAdminPage() {
         searchKeywords: parseKeywordsCsv(String(editDraft.keywordsCsv ?? "")),
         legacyProductCategory:
           String(editDraft.legacyProductCategory ?? "").trim() || null,
+        },
       });
 
       if (isCategoryStructureChanged(row, editDraft)) {
-        await loadRows({ silent: true });
+        await reloadRows({ silent: true });
       } else {
-        setRows((prev) =>
-          sortCategoryRows(
-            prev.map((item) => (item._id === categoryId ? updated : item)),
-          ),
+        updateRows((prev) =>
+          prev.map((item) => (item._id === categoryId ? updated : item)),
         );
       }
       cancelEdit();
     } catch (e) {
-      setError(e instanceof Error ? e.message : CATEGORY_TREE_ADMIN_PAGE_UI.SAVE_ERROR);
+      setActionError(
+        e instanceof Error ? e.message : CATEGORY_TREE_ADMIN_PAGE_UI.SAVE_ERROR,
+      );
     } finally {
       setPendingId(null);
     }
@@ -177,20 +203,22 @@ export function CategoryTreeAdminPage() {
     }
     try {
       setPendingId(categoryId);
-      setError("");
-      await deleteProductCategoryAdmin(categoryId);
-      setRows((prev) => prev.filter((row) => row._id !== categoryId));
+      setActionError("");
+      await deleteMutation.mutateAsync(categoryId);
+      updateRows((prev) => prev.filter((row) => row._id !== categoryId));
       if (editingId === categoryId) {
         cancelEdit();
       }
     } catch (e) {
-      setError(
+      setActionError(
         e instanceof Error ? e.message : CATEGORY_TREE_ADMIN_PAGE_UI.DELETE_ERROR,
       );
     } finally {
       setPendingId(null);
     }
   };
+
+  const displayError = actionError || (phase === "error" ? error : "");
 
   const createPanel = (
     <form className="admin-panel__create-form" onSubmit={handleCreate}>
@@ -317,10 +345,10 @@ export function CategoryTreeAdminPage() {
       searchValue={searchQuery}
       onSearchChange={setSearchQuery}
       searchPlaceholder={CATEGORY_TREE_ADMIN_PAGE_UI.SEARCH_PLACEHOLDER}
-      onRefresh={() => void loadRows({ silent: true })}
+      onRefresh={() => void reloadRows({ silent: true })}
       isLoading={phase === "loading"}
       isRefreshing={isRefreshing}
-      error={error}
+      error={displayError}
       isCreateOpen={isCreateOpen}
       onToggleCreate={() => setIsCreateOpen((open) => !open)}
       createHeading={CATEGORY_TREE_ADMIN_PAGE_UI.CREATE_HEADING}

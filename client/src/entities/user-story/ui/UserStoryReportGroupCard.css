@@ -1,8 +1,8 @@
 .user-story-report-group-card {
   padding: 16px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--iz-color-border);
   border-radius: 12px;
-  background: #fff;
+  background: var(--iz-color-surface);
 }
 
 .user-story-report-group-card__header {
@@ -20,7 +20,7 @@
 
 .user-story-report-group-card__count {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--iz-color-text-muted);
 }
 
 .user-story-report-group-card__preview {
@@ -30,7 +30,7 @@
   margin-bottom: 12px;
   border-radius: 12px;
   overflow: hidden;
-  background: #111;
+  background: var(--iz-color-near-black);
 }
 
 .user-story-report-group-card__media {
@@ -47,8 +47,8 @@
   margin: 0;
   padding: 6px 8px;
   border-radius: 6px;
-  background: rgb(0 0 0 / 55%);
-  color: #fff;
+  background: var(--iz-color-overlay-dark-strong);
+  color: var(--iz-color-on-contrast);
   font-size: 0.8rem;
 }
 
@@ -62,7 +62,7 @@
 .user-story-report-group-card__reporter-link {
   border: none;
   background: transparent;
-  color: #2563eb;
+  color: var(--iz-color-link);
   cursor: pointer;
   padding: 0;
 }
@@ -75,13 +75,13 @@
 
 .user-story-report-group-card__report {
   padding: 10px 0;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid var(--iz-color-surface-subtle);
 }
 
 .user-story-report-group-card__report-meta {
   margin: 0 0 6px;
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--iz-color-text-muted);
 }
 
 .user-story-report-group-card__report-text {
@@ -99,14 +99,14 @@
 .user-story-report-group-card__staff-note {
   min-height: 56px;
   padding: 8px 10px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--iz-color-border-strong);
   border-radius: 8px;
   resize: vertical;
 }
 
 .user-story-report-group-card__error {
   margin: 8px 0 0;
-  color: #b91c1c;
+  color: var(--iz-color-danger-deep);
 }
 
 .user-story-report-group-card__actions {
@@ -120,14 +120,14 @@
   border: none;
   border-radius: 999px;
   padding: 10px 14px;
-  background: #eef2ff;
-  color: #1e3a8a;
+  background: var(--iz-color-premium-indigo-soft);
+  color: var(--iz-color-info-navy);
   cursor: pointer;
 }
 
 .user-story-report-group-card__action_hide {
-  background: #fee2e2;
-  color: #991b1b;
+  background: var(--iz-color-danger-soft);
+  color: var(--iz-color-danger-text);
 }
 
 .user-story-report-group-card__action:disabled {

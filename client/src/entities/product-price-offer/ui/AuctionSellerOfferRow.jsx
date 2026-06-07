@@ -1,8 +1,7 @@
 import { useState } from "react";
 
 import { UserPremiumDisplayName } from "../../user/ui/UserPremiumDisplayName.jsx";
-import { acceptPriceOffer } from "../api/acceptPriceOffer.js";
-import { rejectPriceOffer } from "../api/rejectPriceOffer.js";
+import { usePriceOfferSellerMutations } from "../model/usePriceOfferSellerMutations.js";
 import {
   PRICE_OFFER_STATUS_ACCEPTED,
   PRICE_OFFER_STATUS_PENDING,
@@ -31,8 +30,12 @@ export function AuctionSellerOfferRow({
   onBuyerClick,
   onChanged,
 }) {
+  const { acceptMutation, rejectMutation } = usePriceOfferSellerMutations(
+    String(offer.productId),
+  );
   const [error, setError] = useState("");
-  const [isBusy, setIsBusy] = useState(false);
+
+  const isBusy = acceptMutation.isPending || rejectMutation.isPending;
 
   const productName = offer.product?.productName ?? "Товар";
   const imageUrl = offer.product?.productImageUrl ?? null;
@@ -43,28 +46,22 @@ export function AuctionSellerOfferRow({
   const isAccepted = offer.status === PRICE_OFFER_STATUS_ACCEPTED;
 
   const handleAccept = async () => {
-    setIsBusy(true);
     setError("");
     try {
-      await acceptPriceOffer(offer.productId, offer._id);
+      await acceptMutation.mutateAsync(offer._id);
       onChanged?.();
     } catch (e) {
       setError(e instanceof Error ? e.message : AUCTION_PAGE_UI.ERROR_GENERIC);
-    } finally {
-      setIsBusy(false);
     }
   };
 
   const handleReject = async () => {
-    setIsBusy(true);
     setError("");
     try {
-      await rejectPriceOffer(offer.productId, offer._id);
+      await rejectMutation.mutateAsync(offer._id);
       onChanged?.();
     } catch (e) {
       setError(e instanceof Error ? e.message : AUCTION_PAGE_UI.ERROR_GENERIC);
-    } finally {
-      setIsBusy(false);
     }
   };
 

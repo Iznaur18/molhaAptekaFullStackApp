@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { createRaffle } from "../api/createRaffle.js";
-import { patchMyRaffle } from "../api/patchMyRaffle.js";
-import { patchRaffleByStaff } from "../api/patchRaffleByStaff.js";
+import { useRaffleMutations } from "../model/useRaffleMutations.js";
 import { isHttpProfileImageUrl } from "../../user/lib/profileImageFocus.js";
 import {
   resolveImageUrlForDisplay,
@@ -82,6 +80,7 @@ export function CreateRaffleModal({
   raffleToEdit = null,
   useStaffApi = false,
 }) {
+  const { createMutation, patchMyMutation, patchStaffMutation } = useRaffleMutations();
   const isEdit = mode === "edit" && raffleToEdit != null;
   const [form, setForm] = useState(INITIAL_FORM);
   const [status, setStatus] = useState({ kind: "idle", message: "" });
@@ -179,12 +178,12 @@ export function CreateRaffleModal({
       setStatus({ kind: "loading", message: "" });
       if (isEdit && raffleToEdit) {
         if (useStaffApi) {
-          await patchRaffleByStaff(raffleToEdit._id, body);
+          await patchStaffMutation.mutateAsync({ raffleId: raffleToEdit._id, body });
         } else {
-          await patchMyRaffle(raffleToEdit._id, body);
+          await patchMyMutation.mutateAsync({ raffleId: raffleToEdit._id, body });
         }
       } else {
-        await createRaffle(body);
+        await createMutation.mutateAsync(body);
       }
       onSuccess?.();
       onClose();

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-import { patchProductCatalogFeedTileDisplay } from "../api/patchProductCatalogFeedTileDisplay.js";
+import { useProductCategoryDisplayMutations } from "../model/useProductCategoryDisplayMutations.js";
 import {
   findCatalogFeedTileByKey,
   resolveCatalogFeedTileDisplay,
@@ -29,10 +29,11 @@ export function EditProductCatalogFeedTileDisplayModal({
   onClose,
   onSaved,
 }) {
+  const { patchFeedTileMutation } = useProductCategoryDisplayMutations();
   const [label, setLabel] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [isSaving, setIsSaving] = useState(false);
+  const isSaving = patchFeedTileMutation.isPending;
   const wasOpenRef = useRef(false);
 
   const tile = tileKey != null ? findCatalogFeedTileByKey(tileKey) : null;
@@ -76,16 +77,18 @@ export function EditProductCatalogFeedTileDisplayModal({
     }
 
     try {
-      setIsSaving(true);
       setErrorMessage("");
 
       const trimmedLabel = label.trim();
       const trimmedImage = imageUrl.trim();
-      const { display } = await patchProductCatalogFeedTileDisplay(tileKey, {
-        customLabel: trimmedLabel || null,
-        imageUrl: trimmedImage || null,
-        resetCustomLabel: trimmedLabel === "" && resolved.isCustomLabel,
-        resetImageUrl: trimmedImage === "" && resolved.isCustomImage,
+      const { display } = await patchFeedTileMutation.mutateAsync({
+        tileKey,
+        body: {
+          customLabel: trimmedLabel || null,
+          imageUrl: trimmedImage || null,
+          resetCustomLabel: trimmedLabel === "" && resolved.isCustomLabel,
+          resetImageUrl: trimmedImage === "" && resolved.isCustomImage,
+        },
       });
 
       onSaved(display);
@@ -96,8 +99,6 @@ export function EditProductCatalogFeedTileDisplayModal({
           ? error.message
           : PRODUCT_CATEGORY_DISPLAY_UI.FEED_SAVE_FALLBACK,
       );
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -107,11 +108,13 @@ export function EditProductCatalogFeedTileDisplayModal({
     }
 
     try {
-      setIsSaving(true);
       setErrorMessage("");
-      const { display } = await patchProductCatalogFeedTileDisplay(tileKey, {
-        resetCustomLabel: true,
-        resetImageUrl: true,
+      const { display } = await patchFeedTileMutation.mutateAsync({
+        tileKey,
+        body: {
+          resetCustomLabel: true,
+          resetImageUrl: true,
+        },
       });
       onSaved(display);
       onClose();
@@ -121,8 +124,6 @@ export function EditProductCatalogFeedTileDisplayModal({
           ? error.message
           : PRODUCT_CATEGORY_DISPLAY_UI.FEED_SAVE_FALLBACK,
       );
-    } finally {
-      setIsSaving(false);
     }
   };
 

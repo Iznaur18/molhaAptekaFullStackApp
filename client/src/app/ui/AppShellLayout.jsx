@@ -3,14 +3,15 @@ import { Outlet, useLocation } from "react-router-dom";
 import { CartServerSync } from "../../entities/cart/ui/CartServerSync.jsx";
 import { EmailVerificationNotice } from "../../entities/user/ui/EmailVerificationNotice.jsx";
 import { SiteFooter } from "../../widgets/site-footer/ui/SiteFooter.jsx";
-import { getHomePageVariantClass } from "../../pages/home/lib/homeHeaderVariant.js";
-import { HomePageHeader } from "../../pages/home/ui/HomePageHeader.jsx";
-import { HomePageModalsLayer } from "../../pages/home/ui/HomePageModalsLayer.jsx";
-import { HomePageRouteSuspense } from "../../pages/home/ui/HomePageRouteSuspense.jsx";
+import { getAppShellVariantClass } from "../lib/appShellVariant.js";
 import { buildAppShellRouteKey } from "../lib/buildAppShellRouteKey.js";
 import { useAppShell } from "../model/AppShellContext.jsx";
 
-import "../../pages/home/ui/HomePage.css";
+import { AppShellHeader } from "./AppShellHeader.jsx";
+import { AppShellModalsLayer } from "./AppShellModalsLayer.jsx";
+import { AppShellRouteSuspense } from "./AppShellRouteSuspense.jsx";
+
+import "./AppShell.css";
 
 export function AppShellLayout() {
   const location = useLocation();
@@ -24,9 +25,9 @@ export function AppShellLayout() {
   } = useAppShell();
 
   return (
-    <div className={`home-page ${getHomePageVariantClass()}`}>
+    <div className={`app-shell ${getAppShellVariantClass()}`}>
       <CartServerSync isAuthorized={isAuthorized} />
-      <HomePageHeader {...headerProps} />
+      <AppShellHeader {...headerProps} />
 
       <EmailVerificationNotice
         notice={emailVerificationNotice}
@@ -34,18 +35,18 @@ export function AppShellLayout() {
       />
 
       {staffActionNotice ? (
-        <p className="home-page__state home-page__state_notice" role="status">
+        <p className="app-shell__state app-shell__state_notice" role="status">
           {staffActionNotice}
         </p>
       ) : null}
 
-      <HomePageRouteSuspense routeKey={buildAppShellRouteKey(location)}>
+      <AppShellRouteSuspense routeKey={buildAppShellRouteKey(location)}>
         <Outlet />
-      </HomePageRouteSuspense>
+      </AppShellRouteSuspense>
 
       <SiteFooter />
 
-      <HomePageModalsLayer {...modalsLayerProps} />
+      <AppShellModalsLayer {...modalsLayerProps} />
     </div>
   );
 }

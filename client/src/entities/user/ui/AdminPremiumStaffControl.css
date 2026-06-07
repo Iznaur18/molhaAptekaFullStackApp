@@ -3,9 +3,13 @@
   flex-direction: column;
   gap: 0.65rem;
   padding: 0.75rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--iz-color-border);
   border-radius: 0.65rem;
-  background: linear-gradient(165deg, color-mix(in srgb, #fffbeb 55%, #fff), #fff);
+  background: linear-gradient(
+    165deg,
+    color-mix(in srgb, var(--iz-color-promotion-boost-bg) 55%, var(--iz-color-surface)),
+    var(--iz-color-surface)
+  );
 }
 
 .admin-premium-staff-control__header {
@@ -18,14 +22,14 @@
   margin: 0;
   font-size: 0.9rem;
   font-weight: 700;
-  color: #92400e;
+  color: var(--iz-color-warning-text);
 }
 
 .admin-premium-staff-control__status {
   margin: 0;
   font-size: 0.8rem;
   font-weight: 600;
-  color: #475569;
+  color: var(--iz-color-slate-muted);
 }
 
 .admin-premium-staff-control__toggle {
@@ -34,14 +38,14 @@
   gap: 0.5rem;
   font-size: 0.875rem;
   font-weight: 600;
-  color: #334155;
+  color: var(--iz-color-slate);
   cursor: pointer;
 }
 
 .admin-premium-staff-control__toggle input {
   width: 1rem;
   height: 1rem;
-  accent-color: #d97706;
+  accent-color: var(--iz-color-warning);
 }
 
 .admin-premium-staff-control__panel {
@@ -54,7 +58,7 @@
   margin: 0;
   font-size: 0.75rem;
   line-height: 1.35;
-  color: #64748b;
+  color: var(--iz-color-text-subtle);
 }
 
 .admin-premium-staff-control__presets {
@@ -66,10 +70,10 @@
 .admin-premium-staff-control__preset {
   margin: 0;
   padding: 0.4rem 0.65rem;
-  border: 1px solid #fcd34d;
+  border: 1px solid var(--iz-color-warning-yellow-light);
   border-radius: 999px;
-  background: #fffbeb;
-  color: #92400e;
+  background: var(--iz-color-surface)beb;
+  color: var(--iz-color-warning-text);
   font: inherit;
   font-size: 0.78rem;
   font-weight: 600;
@@ -80,14 +84,14 @@
 }
 
 .admin-premium-staff-control__preset:hover:not(:disabled) {
-  background: #fef3c7;
-  border-color: #f59e0b;
+  background: var(--iz-color-gold-soft);
+  border-color: var(--iz-color-warning-bright);
 }
 
 .admin-premium-staff-control__preset_selected {
-  border-color: #d97706;
-  background: #fde68a;
-  color: #78350f;
+  border-color: var(--iz-color-warning);
+  background: var(--iz-color-gold-border);
+  color: var(--iz-color-warning-brown);
 }
 
 .admin-premium-staff-control__preset:disabled {
@@ -100,13 +104,13 @@
   flex-direction: column;
   gap: 0.25rem;
   font-size: 0.75rem;
-  color: #334155;
+  color: var(--iz-color-slate);
 }
 
 .admin-premium-staff-control__datetime {
   box-sizing: border-box;
   width: 100%;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--iz-color-border-strong);
   border-radius: 0.5rem;
   padding: 0.45rem 0.55rem;
   font: inherit;
@@ -114,7 +118,7 @@
 }
 
 .admin-premium-staff-control__datetime:focus {
-  outline: 2px solid #f59e0b;
+  outline: 2px solid var(--iz-color-warning-bright);
   outline-offset: 1px;
-  border-color: #f59e0b;
+  border-color: var(--iz-color-warning-bright);
 }

@@ -11,7 +11,7 @@
   border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
   border-radius: 14px;
   background: color-mix(in srgb, currentColor 3.5%, transparent);
-  color: #111827;
+  color: var(--iz-color-text);
   font: inherit;
   text-align: left;
   cursor: pointer;
@@ -21,8 +21,8 @@
 }
 
 .user-list-row:hover {
-  border-color: #1f6feb;
-  box-shadow: 0 4px 14px color-mix(in srgb, CanvasText 6%, transparent);
+  border-color: var(--iz-color-action);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--iz-color-canvas-text) 6%, transparent);
 }
 
 .user-list-row__head {
@@ -41,8 +41,8 @@
   object-fit: cover;
   border: none;
   box-shadow:
-    0 6px 18px rgb(15 23 42 / 0.12),
-    0 2px 6px rgb(15 23 42 / 0.07);
+    0 6px 18px var(--iz-shadow-card-hover),
+    0 2px 6px var(--iz-shadow-lg);
 }
 
 .user-list-row__name {
@@ -66,7 +66,7 @@
 .user-list-row__email {
   font-size: 0.78rem;
   font-weight: 400;
-  color: #6b7280;
+  color: var(--iz-color-text-muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -85,8 +85,8 @@
   font-weight: 600;
   padding: 0.05rem 0.35rem;
   border-radius: 0.25rem;
-  background: #f3f4f6;
-  color: #4b5563;
+  background: var(--iz-color-surface-subtle);
+  color: var(--iz-color-text-tertiary);
 }
 
 .user-list-row__metrics {
@@ -105,13 +105,13 @@
   min-width: 0;
   padding: 0.45rem 0.5rem;
   border-radius: 0.5rem;
-  background: color-mix(in srgb, CanvasText 4%, transparent);
+  background: color-mix(in srgb, var(--iz-color-canvas-text) 4%, transparent);
 }
 
 .user-list-row__metric-label {
   font-size: 0.68rem;
   font-weight: 600;
-  color: #6b7280;
+  color: var(--iz-color-text-muted);
   line-height: 1.2;
 }
 
@@ -124,7 +124,7 @@
   font-weight: 700;
   line-height: 1.2;
   font-variant-numeric: tabular-nums;
-  color: #111827;
+  color: var(--iz-color-text);
 }
 
 .user-list-row__metric_sales {
@@ -156,11 +156,11 @@
 }
 
 .user-list-row__metric-value_confirmed-yes {
-  color: #047857;
+  color: var(--iz-color-success-strong);
 }
 
 .user-list-row__metric-value_confirmed-no {
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
 }
 
 .user-list-row__metric-value_amount {

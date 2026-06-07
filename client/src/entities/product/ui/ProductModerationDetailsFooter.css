@@ -7,7 +7,7 @@
 .product-moderation-details-footer__error {
   margin: 0;
   font-size: 0.875rem;
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
 }
 
 .product-moderation-details-footer__reject-label {
@@ -15,13 +15,13 @@
   flex-direction: column;
   gap: 0.35rem;
   font-size: 0.875rem;
-  color: #344054;
+  color: var(--iz-color-neutral-gray-dark);
 }
 
 .product-moderation-details-footer__reject-input {
   box-sizing: border-box;
   width: 100%;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--iz-color-border-strong);
   border-radius: 0.5rem;
   padding: 0.5rem 0.625rem;
   font: inherit;
@@ -44,15 +44,15 @@
 }
 
 .product-moderation-details-footer__btn_approve {
-  border: 1px solid #067647;
-  background: #067647;
-  color: #fff;
+  border: 1px solid var(--iz-color-success-strong);
+  background: var(--iz-color-success-strong);
+  color: var(--iz-color-on-contrast);
 }
 
 .product-moderation-details-footer__btn_reject {
-  border: 1px solid #b42318;
-  background: #fff;
-  color: #b42318;
+  border: 1px solid var(--iz-color-danger-strong);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-danger-strong);
 }
 
 .product-moderation-details-footer__btn:disabled {

@@ -5,7 +5,7 @@ import {
   PRODUCT_REPORTS_PAGE_UI,
   USER_STORY_UI,
 } from "../../../shared/config/appUiCopy.js";
-import { resolveUserStoryReports } from "../api/resolveUserStoryReports.js";
+import { useResolveUserStoryReportsMutation } from "../model/useResolveUserStoryReportsMutation.js";
 import { resolveUserStoryMediaUrl } from "../lib/resolveUserStoryMedia.js";
 import {
   USER_STORY_MEDIA_TYPE_VIDEO,
@@ -23,8 +23,9 @@ import "./UserStoryReportGroupCard.css";
  * }} props
  */
 export function UserStoryReportGroupCard({ group, onResolved, onOpenUser }) {
+  const resolveReportsMutation = useResolveUserStoryReportsMutation();
   const [staffNote, setStaffNote] = useState("");
-  const [isBusy, setIsBusy] = useState(false);
+  const isBusy = resolveReportsMutation.isPending;
   const [error, setError] = useState("");
 
   const storyId = String(group.story._id);
@@ -37,18 +38,18 @@ export function UserStoryReportGroupCard({ group, onResolved, onOpenUser }) {
       return;
     }
 
-    setIsBusy(true);
     setError("");
     try {
-      await resolveUserStoryReports(storyId, {
-        resolution,
-        staffNote: note,
+      await resolveReportsMutation.mutateAsync({
+        storyId,
+        body: {
+          resolution,
+          staffNote: note,
+        },
       });
       onResolved();
     } catch (e) {
       setError(e instanceof Error ? e.message : USER_STORY_UI.ERROR_GENERIC);
-    } finally {
-      setIsBusy(false);
     }
   };
 

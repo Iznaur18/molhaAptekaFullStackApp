@@ -212,28 +212,28 @@ export function HomeCatalogGrid({
   return (
     <>
       {myProductsCatalogNotice ? (
-        <p className="home-page__state home-page__state_notice" role="status">
+        <p className="app-shell__state app-shell__state_notice" role="status">
           {myProductsCatalogNotice}
         </p>
       ) : null}
       {myProductsCatalogError ? (
-        <p className="home-page__state home-page__state_error" role="alert">
+        <p className="app-shell__state app-shell__state_error" role="alert">
           {myProductsCatalogError}
         </p>
       ) : null}
       {products.length === 0 ? (
-        <p className="home-page__state">{emptyMessage}</p>
+        <p className="app-shell__state">{emptyMessage}</p>
       ) : (
         <>
           {shouldVirtualize ? (
             <div
               ref={virtualHostRef}
-              className="home-page__grid-virtual-host"
+              className="app-shell__grid-virtual-host"
               style={{ height: `${virtualWindow.totalHeight}px` }}
             >
               <div
                 ref={virtualGridRef}
-                className="home-page__grid home-page__grid--virtual-window"
+                className="app-shell__grid app-shell__grid--virtual-window"
                 role="list"
                 aria-label={HOME_PAGE_UI.CATALOG_PRODUCTS_LIST_ARIA}
                 style={{ top: `${virtualWindow.offsetTop}px` }}
@@ -243,7 +243,7 @@ export function HomeCatalogGrid({
               {catalogHasMore && !catalogLoadMoreError ? (
                 <div
                   ref={catalogSentinelRef}
-                  className="home-page__catalog-sentinel home-page__catalog-sentinel_virtual"
+                  className="app-shell__catalog-sentinel app-shell__catalog-sentinel_virtual"
                   aria-hidden
                 />
               ) : null}
@@ -251,7 +251,7 @@ export function HomeCatalogGrid({
           ) : (
             <div
               ref={gridMeasureRef}
-              className="home-page__grid"
+              className="app-shell__grid"
               role="list"
               aria-label={HOME_PAGE_UI.CATALOG_PRODUCTS_LIST_ARIA}
             >
@@ -259,18 +259,18 @@ export function HomeCatalogGrid({
             </div>
           )}
           {isCatalogLoadingMore ? (
-            <p className="home-page__catalog-more home-page__state">
+            <p className="app-shell__catalog-more app-shell__state">
               {HOME_PAGE_UI.CATALOG_LOADING_MORE}
             </p>
           ) : null}
           {catalogLoadMoreError ? (
-            <div className="home-page__catalog-more home-page__catalog-more_error">
-              <p className="home-page__state home-page__state_error" role="alert">
+            <div className="app-shell__catalog-more app-shell__catalog-more_error">
+              <p className="app-shell__state app-shell__state_error" role="alert">
                 {HOME_PAGE_UI.CATALOG_LOAD_MORE_FAIL}: {catalogLoadMoreError}
               </p>
               <button
                 type="button"
-                className="home-page__catalog-retry"
+                className="app-shell__catalog-retry"
                 onClick={onRetryCatalogLoadMore}
               >
                 {HOME_PAGE_UI.CATALOG_LOAD_MORE_RETRY}
@@ -280,7 +280,7 @@ export function HomeCatalogGrid({
           {!shouldVirtualize && catalogHasMore && !catalogLoadMoreError ? (
             <div
               ref={catalogSentinelRef}
-              className="home-page__catalog-sentinel"
+              className="app-shell__catalog-sentinel"
               aria-hidden
             />
           ) : null}

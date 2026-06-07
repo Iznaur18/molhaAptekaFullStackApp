@@ -1,7 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 
-import { uploadImage } from "../../../shared/api/uploadImage.js";
-import { uploadVideo } from "../../../shared/api/uploadVideo.js";
+import { useUploadAssetMutations } from "../../../shared/model/useUploadAssetMutations.js";
 import { USER_STORY_UI } from "../../../shared/config/appUiCopy.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import {
@@ -9,7 +8,7 @@ import {
   UPLOAD_VIDEO_FILE_INPUT_ACCEPT,
 } from "../../../shared/config/uploadConstants.js";
 import { validateUploadImageFile } from "../../../shared/lib/validateUploadImageFile.js";
-import { createUserStory } from "../api/createUserStory.js";
+import { useUserStoryMutations } from "../model/useUserStoryMutations.js";
 import { cropImageToAspectRatio } from "../lib/cropImageToAspectRatio.js";
 import { validateStoryVideoFile } from "../lib/validateStoryVideoFile.js";
 import {
@@ -28,6 +27,8 @@ import "./CreateUserStoryModal.css";
  * }} props
  */
 export function CreateUserStoryModal({ isOpen, onClose, onPublished }) {
+  const { createMutation } = useUserStoryMutations();
+  const { uploadImageMutation, uploadVideoMutation } = useUploadAssetMutations();
   const imageInputRef = useRef(/** @type {HTMLInputElement | null} */ (null));
   const videoInputRef = useRef(/** @type {HTMLInputElement | null} */ (null));
   const [captionText, setCaptionText] = useState("");
@@ -38,6 +39,12 @@ export function CreateUserStoryModal({ isOpen, onClose, onPublished }) {
   const [selectedFile, setSelectedFile] = useState(/** @type {File | null} */ (null));
   const [isBusy, setIsBusy] = useState(false);
   const [error, setError] = useState("");
+
+  const isFormBusy =
+    isBusy ||
+    uploadImageMutation.isPending ||
+    uploadVideoMutation.isPending ||
+    createMutation.isPending;
 
   useScrollLock(isOpen);
 
@@ -126,15 +133,14 @@ export function CreateUserStoryModal({ isOpen, onClose, onPublished }) {
       return;
     }
 
-    setIsBusy(true);
     setError("");
     try {
       const mediaUrl =
         mediaType === USER_STORY_MEDIA_TYPE_VIDEO
-          ? await uploadVideo(selectedFile)
-          : await uploadImage(selectedFile);
+          ? await uploadVideoMutation.mutateAsync(selectedFile)
+          : await uploadImageMutation.mutateAsync(selectedFile);
 
-      await createUserStory({
+      await createMutation.mutateAsync({
         mediaType,
         mediaUrl,
         captionText: caption,
@@ -145,8 +151,6 @@ export function CreateUserStoryModal({ isOpen, onClose, onPublished }) {
       onClose();
     } catch (e) {
       setError(e instanceof Error ? e.message : USER_STORY_UI.ERROR_GENERIC);
-    } finally {
-      setIsBusy(false);
     }
   };
 
@@ -210,7 +214,7 @@ export function CreateUserStoryModal({ isOpen, onClose, onPublished }) {
           <button
             type="button"
             className="create-user-story-modal__pick"
-            disabled={isBusy}
+            disabled={isFormBusy}
             onClick={() => imageInputRef.current?.click()}
           >
             {USER_STORY_UI.PICK_PHOTO}
@@ -218,7 +222,7 @@ export function CreateUserStoryModal({ isOpen, onClose, onPublished }) {
           <button
             type="button"
             className="create-user-story-modal__pick"
-            disabled={isBusy}
+            disabled={isFormBusy}
             onClick={() => videoInputRef.current?.click()}
           >
             {USER_STORY_UI.PICK_VIDEO}
@@ -248,7 +252,7 @@ export function CreateUserStoryModal({ isOpen, onClose, onPublished }) {
             placeholder={USER_STORY_UI.CAPTION_PLACEHOLDER}
             maxLength={USER_STORY_CAPTION_MAX_CHARS}
             rows={2}
-            disabled={isBusy}
+            disabled={isFormBusy}
           />
         </label>
 
@@ -261,10 +265,10 @@ export function CreateUserStoryModal({ isOpen, onClose, onPublished }) {
         <button
           type="button"
           className="create-user-story-modal__submit"
-          disabled={isBusy}
+          disabled={isFormBusy}
           onClick={() => void handlePublish()}
         >
-          {isBusy ? USER_STORY_UI.PUBLISHING : USER_STORY_UI.PUBLISH}
+          {isFormBusy ? USER_STORY_UI.PUBLISHING : USER_STORY_UI.PUBLISH}
         </button>
       </div>
     </div>

@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useMemo, useState } from "react";
 
-import { createProductSearchSynonymAdmin } from "../../../entities/product-search-synonym/api/createProductSearchSynonymAdmin.js";
-import { deleteProductSearchSynonymAdmin } from "../../../entities/product-search-synonym/api/deleteProductSearchSynonymAdmin.js";
-import { fetchProductSearchSynonymsAdmin } from "../../../entities/product-search-synonym/api/fetchProductSearchSynonymsAdmin.js";
-import { patchProductSearchSynonymAdmin } from "../../../entities/product-search-synonym/api/patchProductSearchSynonymAdmin.js";
+import { useProductSearchSynonymAdminMutations } from "../../../entities/product-search-synonym/model/useProductSearchSynonymAdminMutations.js";
+import { searchSynonymAdminQueryKeys } from "../../../entities/product-search-synonym/model/searchSynonymAdminQueryKeys.js";
+import { useProductSearchSynonymsAdminQuery } from "../../../entities/product-search-synonym/model/useProductSearchSynonymsAdminQuery.js";
 import { AdminPanelShell } from "../../../shared/ui/AdminPanel/AdminPanelShell.jsx";
 import { SEARCH_SYNONYMS_ADMIN_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { filterSynonymRows, sortSynonymRows } from "../lib/searchSynonymsAdminUtils.js";
@@ -11,12 +11,25 @@ import { SearchSynonymAdminCard } from "./SearchSynonymAdminCard.jsx";
 import { SynonymCategoryPicker } from "./SynonymCategoryPicker.jsx";
 
 export function SearchSynonymsAdminPage() {
-  const [phase, setPhase] = useState("loading");
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [rows, setRows] = useState(
-    /** @type {import('../../../entities/product-search-synonym/model/types.js').ProductSearchSynonymRow[]} */ ([]),
+  const queryClient = useQueryClient();
+  const { createMutation, patchMutation, deleteMutation } =
+    useProductSearchSynonymAdminMutations();
+  const synonymsQuery = useProductSearchSynonymsAdminQuery();
+  const rows = useMemo(
+    () => sortSynonymRows(synonymsQuery.data ?? []),
+    [synonymsQuery.data],
   );
-  const [error, setError] = useState("");
+  const phase = synonymsQuery.isPending
+    ? "loading"
+    : synonymsQuery.isError
+      ? "error"
+      : "success";
+  const isRefreshing = synonymsQuery.isFetching && !synonymsQuery.isPending;
+  const error =
+    synonymsQuery.error instanceof Error
+      ? synonymsQuery.error.message
+      : SEARCH_SYNONYMS_ADMIN_PAGE_UI.LOAD_ERROR;
+
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [pendingId, setPendingId] = useState(null);
@@ -25,31 +38,30 @@ export function SearchSynonymsAdminPage() {
   const [editCategories, setEditCategories] = useState(/** @type {string[]} */ ([]));
   const [newToken, setNewToken] = useState("");
   const [newCategories, setNewCategories] = useState(/** @type {string[]} */ ([]));
+  const [actionError, setActionError] = useState("");
 
-  const loadRows = useCallback(async ({ silent = false } = {}) => {
-    if (silent) {
-      setIsRefreshing(true);
-    } else {
-      setPhase("loading");
-    }
-    setError("");
+  const updateRows = useCallback(
+    (
+      /** @type {(rows: import('../../../entities/product-search-synonym/model/types.js').ProductSearchSynonymRow[]) => import('../../../entities/product-search-synonym/model/types.js').ProductSearchSynonymRow[]} */ updater,
+    ) => {
+      queryClient.setQueryData(searchSynonymAdminQueryKeys.all, (old) => {
+        const next = updater(old ?? []);
+        return sortSynonymRows(next);
+      });
+    },
+    [queryClient],
+  );
+
+  const reloadRows = useCallback(async () => {
+    setActionError("");
     try {
-      const list = await fetchProductSearchSynonymsAdmin();
-      setRows(sortSynonymRows(list));
-      setPhase("success");
+      await synonymsQuery.refetch();
     } catch (e) {
-      setError(
+      setActionError(
         e instanceof Error ? e.message : SEARCH_SYNONYMS_ADMIN_PAGE_UI.LOAD_ERROR,
       );
-      setPhase("error");
-    } finally {
-      setIsRefreshing(false);
     }
-  }, []);
-
-  useEffect(() => {
-    void loadRows();
-  }, [loadRows]);
+  }, [synonymsQuery]);
 
   const filteredRows = useMemo(
     () => filterSynonymRows(rows, searchQuery),
@@ -66,28 +78,28 @@ export function SearchSynonymsAdminPage() {
     setEditingId(row._id);
     setEditToken(row.token);
     setEditCategories(row.categories);
-    setError("");
+    setActionError("");
   }, []);
 
   const handleCreate = async (event) => {
     event.preventDefault();
     if (newCategories.length === 0) {
-      setError(SEARCH_SYNONYMS_ADMIN_PAGE_UI.SAVE_ERROR);
+      setActionError(SEARCH_SYNONYMS_ADMIN_PAGE_UI.SAVE_ERROR);
       return;
     }
     try {
       setPendingId("create");
-      setError("");
-      const created = await createProductSearchSynonymAdmin({
+      setActionError("");
+      const created = await createMutation.mutateAsync({
         token: newToken.trim(),
         categories: newCategories,
       });
-      setRows((prev) => sortSynonymRows([...prev, created]));
+      updateRows((prev) => [...prev, created]);
       setNewToken("");
       setNewCategories([]);
       setIsCreateOpen(false);
     } catch (e) {
-      setError(
+      setActionError(
         e instanceof Error ? e.message : SEARCH_SYNONYMS_ADMIN_PAGE_UI.SAVE_ERROR,
       );
     } finally {
@@ -97,22 +109,25 @@ export function SearchSynonymsAdminPage() {
 
   const handleSaveEdit = async (synonymId) => {
     if (editCategories.length === 0) {
-      setError(SEARCH_SYNONYMS_ADMIN_PAGE_UI.SAVE_ERROR);
+      setActionError(SEARCH_SYNONYMS_ADMIN_PAGE_UI.SAVE_ERROR);
       return;
     }
     try {
       setPendingId(synonymId);
-      setError("");
-      const updated = await patchProductSearchSynonymAdmin(synonymId, {
-        token: editToken.trim(),
-        categories: editCategories,
+      setActionError("");
+      const updated = await patchMutation.mutateAsync({
+        synonymId,
+        body: {
+          token: editToken.trim(),
+          categories: editCategories,
+        },
       });
-      setRows((prev) =>
-        sortSynonymRows(prev.map((row) => (row._id === synonymId ? updated : row))),
+      updateRows((prev) =>
+        prev.map((row) => (row._id === synonymId ? updated : row)),
       );
       cancelEdit();
     } catch (e) {
-      setError(
+      setActionError(
         e instanceof Error ? e.message : SEARCH_SYNONYMS_ADMIN_PAGE_UI.SAVE_ERROR,
       );
     } finally {
@@ -126,20 +141,22 @@ export function SearchSynonymsAdminPage() {
     }
     try {
       setPendingId(synonymId);
-      setError("");
-      await deleteProductSearchSynonymAdmin(synonymId);
-      setRows((prev) => prev.filter((row) => row._id !== synonymId));
+      setActionError("");
+      await deleteMutation.mutateAsync(synonymId);
+      updateRows((prev) => prev.filter((row) => row._id !== synonymId));
       if (editingId === synonymId) {
         cancelEdit();
       }
     } catch (e) {
-      setError(
+      setActionError(
         e instanceof Error ? e.message : SEARCH_SYNONYMS_ADMIN_PAGE_UI.DELETE_ERROR,
       );
     } finally {
       setPendingId(null);
     }
   };
+
+  const displayError = actionError || (phase === "error" ? error : "");
 
   const createPanel = (
     <form className="admin-panel__create-form" onSubmit={handleCreate}>
@@ -221,10 +238,10 @@ export function SearchSynonymsAdminPage() {
       searchValue={searchQuery}
       onSearchChange={setSearchQuery}
       searchPlaceholder={SEARCH_SYNONYMS_ADMIN_PAGE_UI.SEARCH_PLACEHOLDER}
-      onRefresh={() => void loadRows({ silent: true })}
+      onRefresh={() => void reloadRows()}
       isLoading={phase === "loading"}
       isRefreshing={isRefreshing}
-      error={error}
+      error={displayError}
       isCreateOpen={isCreateOpen}
       onToggleCreate={() => setIsCreateOpen((open) => !open)}
       createHeading={SEARCH_SYNONYMS_ADMIN_PAGE_UI.CREATE_HEADING}

@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
-import { fetchMyLoyaltyPointsStatus } from "../../../entities/user/api/fetchMyLoyaltyPointsStatus.js";
+import { useMyLoyaltyPointsStatusQuery } from "../../../entities/user/model/useMyLoyaltyPointsStatusQuery.js";
 import { LOYALTY_POINTS_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import {
   INTEGER_INPUT_FIELD_PROPS,
@@ -29,12 +29,23 @@ function parsePurchaseAmountRub(raw) {
  * }} props
  */
 export function LoyaltyPointsPage({ isAuthorized, onRequestLogin }) {
-  const [phase, setPhase] = useState("loading");
-  const [loyaltyPointsBalance, setLoyaltyPointsBalance] = useState(0);
-  const [errorMessage, setErrorMessage] = useState("");
+  const statusQuery = useMyLoyaltyPointsStatusQuery({ enabled: isAuthorized });
   const [purchaseAmountInput, setPurchaseAmountInput] = useState("");
   const [purchaseValidationError, setPurchaseValidationError] = useState("");
   const [comingSoonMessage, setComingSoonMessage] = useState("");
+
+  const loyaltyPointsBalance = statusQuery.data?.loyaltyPointsBalance ?? 0;
+  const phase = !isAuthorized
+    ? "idle"
+    : statusQuery.isPending
+      ? "loading"
+      : statusQuery.isError
+        ? "error"
+        : "success";
+  const errorMessage =
+    statusQuery.error instanceof Error
+      ? statusQuery.error.message
+      : LOYALTY_POINTS_PAGE_UI.FETCH_FALLBACK;
 
   const purchaseAmountRub = useMemo(
     () => parsePurchaseAmountRub(purchaseAmountInput),
@@ -47,30 +58,6 @@ export function LoyaltyPointsPage({ isAuthorized, onRequestLogin }) {
     }
     return rublesToLoyaltyPoints(purchaseAmountRub);
   }, [purchaseAmountRub]);
-
-  const loadStatus = useCallback(async () => {
-    if (!isAuthorized) {
-      setPhase("idle");
-      return;
-    }
-
-    setPhase("loading");
-    setErrorMessage("");
-    try {
-      const status = await fetchMyLoyaltyPointsStatus();
-      setLoyaltyPointsBalance(status.loyaltyPointsBalance);
-      setPhase("success");
-    } catch (e) {
-      setErrorMessage(
-        e instanceof Error ? e.message : LOYALTY_POINTS_PAGE_UI.FETCH_FALLBACK,
-      );
-      setPhase("error");
-    }
-  }, [isAuthorized]);
-
-  useEffect(() => {
-    void loadStatus();
-  }, [loadStatus]);
 
   const handlePurchaseAmountChange = (event) => {
     setPurchaseAmountInput(formatRubPriceInput(event.target.value));

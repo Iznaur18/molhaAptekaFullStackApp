@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 
-import { LazySellerProductsPage } from "../../pages/home/lib/lazyHomePages.js";
+import { LazySellerProductsPage } from "../lib/lazyAppShellPages.js";
 import { useAppShell } from "../model/AppShellContext.jsx";
 
 /** Каталог товаров продавца — `/seller/:userId`. */

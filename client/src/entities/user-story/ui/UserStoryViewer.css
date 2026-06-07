@@ -5,8 +5,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #000;
-  color: #fff;
+  background: var(--iz-color-black);
+  color: var(--iz-color-on-contrast);
 }
 
 .user-story-viewer__stage {
@@ -29,8 +29,8 @@
   max-width: 100%;
   overflow: hidden;
   border-radius: 16px;
-  background: #111;
-  box-shadow: 0 8px 32px rgb(0 0 0 / 45%);
+  background: var(--iz-color-near-black);
+  box-shadow: 0 8px 32px var(--iz-color-overlay-black-strong);
 }
 
 .user-story-viewer__close {
@@ -39,8 +39,8 @@
   right: 12px;
   z-index: 3;
   border: none;
-  background: rgb(0 0 0 / 45%);
-  color: #fff;
+  background: var(--iz-color-overlay-black-strong);
+  color: var(--iz-color-on-contrast);
   width: 40px;
   height: 40px;
   border-radius: 999px;
@@ -81,7 +81,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #374151;
+  background: var(--iz-color-text-secondary);
   font-weight: 700;
 }
 
@@ -112,12 +112,12 @@
   justify-content: center;
   gap: 12px;
   padding: 16px;
-  background: #111;
+  background: var(--iz-color-near-black);
   text-align: center;
 }
 
 .user-story-viewer__media-state_error {
-  color: #fca5a5;
+  color: var(--iz-color-danger-coral);
 }
 
 .user-story-viewer__media-state-text {
@@ -129,8 +129,8 @@
 .user-story-viewer__spinner {
   width: 36px;
   height: 36px;
-  border: 3px solid rgb(255 255 255 / 25%);
-  border-top-color: #fff;
+  border: 3px solid var(--iz-color-overlay-white-muted);
+  border-top-color: var(--iz-color-on-contrast);
   border-radius: 50%;
   animation: user-story-viewer-spin 0.7s linear infinite;
 }
@@ -150,8 +150,8 @@
   margin: 0;
   padding: 10px 12px;
   border-radius: 8px;
-  background: rgb(0 0 0 / 45%);
-  color: #fff;
+  background: var(--iz-color-overlay-black-strong);
+  color: var(--iz-color-on-contrast);
   font-size: 0.95rem;
   line-height: 1.35;
   text-align: center;
@@ -201,13 +201,13 @@
   border: none;
   border-radius: 999px;
   padding: 10px 16px;
-  background: rgb(255 255 255 / 14%);
-  color: #fff;
+  background: var(--iz-color-overlay-white-subtle);
+  color: var(--iz-color-on-contrast);
   cursor: pointer;
 }
 
 .user-story-viewer__action_delete {
-  background: rgb(220 38 38 / 85%);
+  background: var(--iz-color-status-danger-strong);
 }
 
 .user-story-viewer__state {
@@ -217,5 +217,5 @@
 }
 
 .user-story-viewer__state_error {
-  color: #fca5a5;
+  color: var(--iz-color-danger-coral);
 }

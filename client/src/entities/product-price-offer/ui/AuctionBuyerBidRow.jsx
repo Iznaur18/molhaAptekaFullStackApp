@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 
-import { createOrder } from "../../order/api/createOrder.js";
-import { fetchCurrentUserProfile } from "../../user/api/fetchCurrentUserProfile.js";
 import { addressValueFromUser } from "../../address/lib/addressValueFromUser.js";
-import { CheckoutForm } from "../../../pages/cart/ui/CheckoutForm.jsx";
-import { cancelMyPriceOffer } from "../api/cancelMyPriceOffer.js";
-import { patchMyPriceOffer } from "../api/patchMyPriceOffer.js";
+import { useCreateOrderMutation } from "../../order/model/useCreateOrderMutation.js";
+import { useAuthSession } from "../../user/model/useAuthSession.js";
+import { CheckoutForm } from "../../../shared/ui/CheckoutForm/CheckoutForm.jsx";
+import { usePriceOfferMutations } from "../model/usePriceOfferMutations.js";
 import { getProductPriceRubMaxError } from "../../product/lib/productPriceRubValidation.js";
 import { formatIsoDateTime } from "../../../shared/lib/formatIsoDateTime.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
@@ -44,11 +43,13 @@ export function AuctionBuyerBidRow({
     formatIntegerGroupRu(bid.offerPrice ?? ""),
   );
   const [error, setError] = useState("");
-  const [isBusy, setIsBusy] = useState(false);
+  const { patchMutation, cancelMutation } = usePriceOfferMutations(bid.productId);
+  const createOrderMutation = useCreateOrderMutation();
+  const isBusy = patchMutation.isPending || cancelMutation.isPending;
+  const isPaying = createOrderMutation.isPending;
   const [showPay, setShowPay] = useState(false);
   const [payError, setPayError] = useState("");
   const [paySuccess, setPaySuccess] = useState("");
-  const [isPaying, setIsPaying] = useState(false);
   const [defaultAddress, setDefaultAddress] = useState({});
 
   const productName = bid.product?.productName ?? "Товар";
@@ -60,23 +61,15 @@ export function AuctionBuyerBidRow({
     setPriceInput(formatIntegerGroupRu(bid.offerPrice ?? ""));
   }, [bid.offerPrice, bid._id]);
 
+  const { user } = useAuthSession();
+
   useEffect(() => {
-    if (!showPay) return undefined;
-    let isCancelled = false;
-    void (async () => {
-      try {
-        const { user } = await fetchCurrentUserProfile();
-        if (!isCancelled) {
-          setDefaultAddress(addressValueFromUser(user));
-        }
-      } catch {
-        // ignore
-      }
-    })();
-    return () => {
-      isCancelled = true;
-    };
-  }, [showPay]);
+    if (!showPay || !user) {
+      return undefined;
+    }
+    setDefaultAddress(addressValueFromUser(user));
+    return undefined;
+  }, [showPay, user]);
 
   const handleUpdate = async () => {
     const price = parseRubPriceInput(priceInput);
@@ -90,37 +83,30 @@ export function AuctionBuyerBidRow({
       return;
     }
 
-    setIsBusy(true);
     setError("");
     try {
-      await patchMyPriceOffer(bid.productId, price);
+      await patchMutation.mutateAsync(price);
       onChanged?.();
     } catch (e) {
       setError(e instanceof Error ? e.message : AUCTION_PAGE_UI.ERROR_GENERIC);
-    } finally {
-      setIsBusy(false);
     }
   };
 
   const handleCancel = async () => {
-    setIsBusy(true);
     setError("");
     try {
-      await cancelMyPriceOffer(bid.productId);
+      await cancelMutation.mutateAsync();
       onChanged?.();
     } catch (e) {
       setError(e instanceof Error ? e.message : AUCTION_PAGE_UI.ERROR_GENERIC);
-    } finally {
-      setIsBusy(false);
     }
   };
 
   const handlePay = async (payload) => {
-    setIsPaying(true);
     setPayError("");
     setPaySuccess("");
     try {
-      await createOrder({
+      await createOrderMutation.mutateAsync({
         items: [{ productId: bid.productId, quantity: 1 }],
         priceOfferId: bid._id,
         deliveryAddress: payload.deliveryAddress,
@@ -132,8 +118,6 @@ export function AuctionBuyerBidRow({
       onChanged?.();
     } catch (e) {
       setPayError(e instanceof Error ? e.message : AUCTION_PAGE_UI.ERROR_GENERIC);
-    } finally {
-      setIsPaying(false);
     }
   };
 

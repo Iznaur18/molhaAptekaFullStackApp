@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 
-import { fetchPendingDataConfirmationRequests } from "../../../entities/user-data-confirmation/api/fetchPendingDataConfirmationRequests.js";
+import { usePendingDataConfirmationRequestsQuery } from "../../../entities/user-data-confirmation/model/usePendingDataConfirmationRequestsQuery.js";
 import { DataConfirmationRequestCard } from "../../../entities/user-data-confirmation/ui/DataConfirmationRequestCard.jsx";
 import {
   API_CLIENT_UI,
@@ -16,33 +16,23 @@ import "./DataConfirmationRequestsPage.css";
  * }} props
  */
 export function DataConfirmationRequestsPage({ onApplicantClick, onQueueChanged }) {
-  const [phase, setPhase] = useState("loading");
-  const [requests, setRequests] = useState(
-    /** @type {import('../../../entities/user-data-confirmation/model/types.js').DataConfirmationRequest[]} */ ([]),
-  );
-  const [error, setError] = useState("");
+  const requestsQuery = usePendingDataConfirmationRequestsQuery();
 
-  const loadQueue = useCallback(async () => {
-    setPhase("loading");
-    setError("");
-    try {
-      const list = await fetchPendingDataConfirmationRequests();
-      setRequests(list);
-      setPhase("success");
-      onQueueChanged?.();
-    } catch (e) {
-      setError(
-        e instanceof Error
-          ? e.message
-          : API_CLIENT_UI.FETCH_DATA_CONFIRMATION_QUEUE_FALLBACK,
-      );
-      setPhase("error");
-    }
-  }, [onQueueChanged]);
+  const handleResolved = useCallback(() => {
+    onQueueChanged?.();
+    void requestsQuery.refetch();
+  }, [onQueueChanged, requestsQuery]);
 
-  useEffect(() => {
-    void loadQueue();
-  }, [loadQueue]);
+  const requests = requestsQuery.data ?? [];
+  const phase = requestsQuery.isPending
+    ? "loading"
+    : requestsQuery.isError && requests.length === 0
+      ? "error"
+      : "success";
+  const error =
+    requestsQuery.error instanceof Error
+      ? requestsQuery.error.message
+      : API_CLIENT_UI.FETCH_DATA_CONFIRMATION_QUEUE_FALLBACK;
 
   if (phase === "loading") {
     return (
@@ -72,26 +62,16 @@ export function DataConfirmationRequestsPage({ onApplicantClick, onQueueChanged 
   }
 
   return (
-    <div className="data-confirmation-requests-page">
-      {error ? (
-        <p
-          className="data-confirmation-requests-page__state data-confirmation-requests-page__state_error"
-          role="alert"
-        >
-          {error}
-        </p>
-      ) : null}
-      <ul className="data-confirmation-requests-page__list" role="list">
-        {requests.map((request) => (
-          <li key={request._id} role="listitem">
-            <DataConfirmationRequestCard
-              request={request}
-              onResolved={() => void loadQueue()}
-              onOpenUser={(userId) => onApplicantClick?.(userId)}
-            />
-          </li>
-        ))}
-      </ul>
-    </div>
+    <ul className="data-confirmation-requests-page__list" role="list">
+      {requests.map((request) => (
+        <li key={request._id} className="data-confirmation-requests-page__item" role="listitem">
+          <DataConfirmationRequestCard
+            request={request}
+            onOpenUser={onApplicantClick}
+            onResolved={handleResolved}
+          />
+        </li>
+      ))}
+    </ul>
   );
 }

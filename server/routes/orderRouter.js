@@ -20,7 +20,7 @@ import {
   orderItemActionRateLimiter,
 } from "../middlewares/index.js";
 import {
-  makeOrderValidationZod,
+  makeOrderValidation,
   updateOrderStatusValidation,
   getAllOrdersValidation,
   getMySalesValidation,
@@ -44,7 +44,7 @@ router.post(
   "/",
   checkAuthMW,
   orderCreateRateLimiter,
-  makeOrderValidationZod,
+  makeOrderValidation,
   makeOrderController,
 );
 router.patch(

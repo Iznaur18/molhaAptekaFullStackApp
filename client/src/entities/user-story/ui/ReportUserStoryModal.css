@@ -6,14 +6,14 @@
   align-items: center;
   justify-content: center;
   padding: 16px;
-  background: rgb(0 0 0 / 55%);
+  background: var(--iz-color-overlay-dark-strong);
 }
 
 .report-user-story-modal {
   width: min(420px, 100%);
   padding: 16px;
   border-radius: 16px;
-  background: #fff;
+  background: var(--iz-color-surface);
 }
 
 .report-user-story-modal__title {
@@ -31,7 +31,7 @@
 .report-user-story-modal__textarea {
   min-height: 96px;
   padding: 8px 10px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--iz-color-border-strong);
   border-radius: 8px;
   resize: vertical;
 }
@@ -47,23 +47,23 @@
   border: none;
   border-radius: 999px;
   padding: 10px 16px;
-  background: #2563eb;
-  color: #fff;
+  background: var(--iz-color-link);
+  color: var(--iz-color-on-contrast);
   cursor: pointer;
 }
 
 .report-user-story-modal__button_secondary {
-  background: #e5e7eb;
-  color: #111827;
+  background: var(--iz-color-border);
+  color: var(--iz-color-text);
 }
 
 .report-user-story-modal__error {
   margin: 8px 0 0;
-  color: #b91c1c;
+  color: var(--iz-color-danger-deep);
   font-size: 0.875rem;
 }
 
 .report-user-story-modal__success {
   margin: 0 0 12px;
-  color: #166534;
+  color: var(--iz-color-success-muted);
 }

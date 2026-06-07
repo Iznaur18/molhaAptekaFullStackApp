@@ -1,7 +1,7 @@
 .product-preview-video-field__hint {
   margin: 0.35rem 0 0;
   font-size: 0.8125rem;
-  color: var(--color-text-muted, #6b7280);
+  color: var(--color-text-muted, var(--iz-color-text-muted));
 }
 
 .product-preview-video-field__clear {
@@ -10,7 +10,7 @@
   border: none;
   background: none;
   font-size: 0.875rem;
-  color: var(--color-link, #2563eb);
+  color: var(--color-link, var(--iz-color-link));
   cursor: pointer;
   text-decoration: underline;
 }

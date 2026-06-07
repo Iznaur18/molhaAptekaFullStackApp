@@ -6,7 +6,7 @@ import {
   PRODUCT_REPORT_RESOLUTION_HIDE,
   PRODUCT_REPORT_RESOLUTION_REJECT,
 } from "../model/constants.js";
-import { resolveProductReports } from "../api/resolveProductReports.js";
+import { useResolveProductReportsMutation } from "../model/useResolveProductReportsMutation.js";
 import { PRODUCT_REPORTS_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
 import "./ProductReportGroupCard.css";
@@ -25,8 +25,9 @@ export function ProductReportGroupCard({
   onOpenProduct,
   onOpenUser,
 }) {
+  const resolveReportsMutation = useResolveProductReportsMutation();
   const [staffNote, setStaffNote] = useState("");
-  const [isBusy, setIsBusy] = useState(false);
+  const isBusy = resolveReportsMutation.isPending;
   const [error, setError] = useState("");
 
   const productId = String(group.product._id);
@@ -43,18 +44,18 @@ export function ProductReportGroupCard({
       return;
     }
 
-    setIsBusy(true);
     setError("");
     try {
-      await resolveProductReports(productId, {
-        resolution,
-        staffNote: note,
+      await resolveReportsMutation.mutateAsync({
+        productId,
+        body: {
+          resolution,
+          staffNote: note,
+        },
       });
       onResolved();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Ошибка");
-    } finally {
-      setIsBusy(false);
     }
   };
 

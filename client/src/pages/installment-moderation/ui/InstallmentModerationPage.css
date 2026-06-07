@@ -4,7 +4,7 @@
 }
 
 .installment-moderation-page__state_error {
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
 }
 
 .installment-moderation-page__card {
@@ -12,9 +12,9 @@
   flex-direction: column;
   gap: 0.75rem;
   padding: 1rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--iz-color-border);
   border-radius: 0.75rem;
-  background: #fff;
+  background: var(--iz-color-surface);
 }
 
 .installment-moderation-page__title {
@@ -36,29 +36,29 @@
 
 .installment-moderation-page__btn {
   padding: 0.45rem 0.85rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--iz-color-border-strong);
   border-radius: 0.4rem;
-  background: #fff;
+  background: var(--iz-color-surface);
   font: inherit;
   cursor: pointer;
 }
 
 .installment-moderation-page__btn_primary {
-  border-color: #059669;
-  background: #059669;
-  color: #fff;
+  border-color: var(--iz-color-success-bright);
+  background: var(--iz-color-success-bright);
+  color: var(--iz-color-on-contrast);
 }
 
 .installment-moderation-page__btn_danger {
-  border-color: #dc2626;
-  color: #dc2626;
+  border-color: var(--iz-color-danger-accent);
+  color: var(--iz-color-danger-accent);
 }
 
 .installment-moderation-page__textarea {
   width: 100%;
   min-height: 3.5rem;
   padding: 0.5rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--iz-color-border-strong);
   border-radius: 0.4rem;
   font: inherit;
 }

@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  background: rgb(8 16 30 / 50%);
+  background: var(--iz-color-overlay-midnight);
 }
 
 .installment-program-modal {
@@ -17,8 +17,8 @@
   max-height: min(90vh, 640px);
   overflow: hidden;
   border-radius: 0.85rem;
-  background: #fff;
-  box-shadow: 0 12px 38px rgb(6 20 42 / 26%);
+  background: var(--iz-color-surface);
+  box-shadow: 0 12px 38px var(--iz-color-accent-installment-shadow);
 }
 
 .installment-program-modal__header {
@@ -28,7 +28,7 @@
   justify-content: space-between;
   gap: 0.75rem;
   padding: 1rem 1rem 0.75rem;
-  border-bottom: 1px solid #e8edf5;
+  border-bottom: 1px solid var(--iz-color-neutral-gray-surface);
 }
 
 .installment-program-modal__title {
@@ -43,21 +43,21 @@
   padding: 0;
   border: none;
   background: transparent;
-  color: #64748b;
+  color: var(--iz-color-text-subtle);
   font-size: 1.5rem;
   line-height: 1;
   cursor: pointer;
 }
 
 .installment-program-modal__close:hover {
-  color: #0f172a;
+  color: var(--iz-color-ink);
 }
 
 .installment-program-modal__loading {
   margin: 0;
   padding: 1rem;
   font-size: 0.9rem;
-  color: #64748b;
+  color: var(--iz-color-text-subtle);
 }
 
 .installment-program-modal__form {
@@ -84,12 +84,12 @@
   gap: 0.55rem;
   margin: 0;
   padding: 0.65rem 0.75rem;
-  border: 1px solid #dbeafe;
+  border: 1px solid var(--iz-color-action-border);
   border-radius: 0.65rem;
-  background: #eff6ff;
+  background: var(--iz-color-action-soft);
   font-size: 0.9rem;
   font-weight: 600;
-  color: #1e3a8a;
+  color: var(--iz-color-info-navy);
   cursor: pointer;
 }
 
@@ -97,7 +97,7 @@
   width: 1rem;
   height: 1rem;
   margin: 0;
-  accent-color: #2563eb;
+  accent-color: var(--iz-color-link);
   cursor: pointer;
 }
 
@@ -110,9 +110,9 @@
 .installment-program-modal__plan {
   margin: 0;
   padding: 0;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--iz-color-border-subtle);
   border-radius: 0.65rem;
-  background: #f8fafc;
+  background: var(--iz-color-surface-elevated);
   overflow: hidden;
 }
 
@@ -122,8 +122,8 @@
   justify-content: space-between;
   gap: 0.5rem;
   padding: 0.55rem 0.75rem;
-  border-bottom: 1px solid #e2e8f0;
-  background: #fff;
+  border-bottom: 1px solid var(--iz-color-border-subtle);
+  background: var(--iz-color-surface);
 }
 
 .installment-program-modal__plan-name {
@@ -134,16 +134,16 @@
   font-weight: 700;
   letter-spacing: 0.02em;
   text-transform: uppercase;
-  color: #475569;
+  color: var(--iz-color-slate-muted);
 }
 
 .installment-program-modal__plan-remove {
   margin: 0;
   padding: 0.2rem 0.45rem;
-  border: 1px solid #fecaca;
+  border: 1px solid var(--iz-color-danger-border);
   border-radius: 0.4rem;
-  background: #fff;
-  color: #b42318;
+  background: var(--iz-color-surface);
+  color: var(--iz-color-danger-strong);
   font: inherit;
   font-size: 0.78rem;
   line-height: 1.2;
@@ -151,7 +151,7 @@
 }
 
 .installment-program-modal__plan-remove:hover:not(:disabled) {
-  background: #fef2f2;
+  background: var(--iz-color-danger-surface);
 }
 
 .installment-program-modal__plan-remove:disabled {
@@ -171,7 +171,7 @@
   flex-direction: column;
   gap: 0.3rem;
   font-size: 0.82rem;
-  color: #334155;
+  color: var(--iz-color-slate);
 }
 
 .installment-program-modal__label {
@@ -183,15 +183,15 @@
   box-sizing: border-box;
   width: 100%;
   padding: 0.45rem 0.55rem;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--iz-color-border-muted);
   border-radius: 0.45rem;
-  background: #fff;
+  background: var(--iz-color-surface);
   font: inherit;
 }
 
 .installment-program-modal__field input:focus {
-  outline: 2px solid rgb(37 99 235 / 25%);
-  border-color: #2563eb;
+  outline: 2px solid var(--iz-color-action-outline);
+  border-color: var(--iz-color-link);
 }
 
 .installment-program-modal__row {
@@ -204,11 +204,11 @@
   margin: 0;
   padding: 0.45rem 0.55rem;
   border-radius: 0.45rem;
-  background: #fff;
-  border: 1px dashed #cbd5e1;
+  background: var(--iz-color-surface);
+  border: 1px dashed var(--iz-color-border-muted);
   font-size: 0.82rem;
   font-weight: 600;
-  color: #0f172a;
+  color: var(--iz-color-ink);
 }
 
 .installment-program-modal__checkbox {
@@ -217,7 +217,7 @@
   gap: 0.45rem;
   margin: 0;
   font-size: 0.82rem;
-  color: #334155;
+  color: var(--iz-color-slate);
   cursor: pointer;
 }
 
@@ -225,7 +225,7 @@
   width: 0.95rem;
   height: 0.95rem;
   margin: 0;
-  accent-color: #2563eb;
+  accent-color: var(--iz-color-link);
   cursor: pointer;
 }
 
@@ -237,8 +237,8 @@
   justify-content: space-between;
   gap: 0.5rem;
   padding: 0.75rem 1rem 1rem;
-  border-top: 1px solid #e8edf5;
-  background: #fff;
+  border-top: 1px solid var(--iz-color-neutral-gray-surface);
+  background: var(--iz-color-surface);
 }
 
 .installment-program-modal__footer-actions {
@@ -251,16 +251,16 @@
 .installment-program-modal__btn {
   margin: 0;
   padding: 0.45rem 0.85rem;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--iz-color-border-muted);
   border-radius: 0.45rem;
-  background: #fff;
+  background: var(--iz-color-surface);
   font: inherit;
   font-size: 0.88rem;
   cursor: pointer;
 }
 
 .installment-program-modal__btn:hover:not(:disabled) {
-  background: #f8fafc;
+  background: var(--iz-color-surface-elevated);
 }
 
 .installment-program-modal__btn:disabled {
@@ -269,27 +269,27 @@
 }
 
 .installment-program-modal__btn_primary {
-  border-color: #2563eb;
-  background: #2563eb;
-  color: #fff;
+  border-color: var(--iz-color-link);
+  background: var(--iz-color-link);
+  color: var(--iz-color-on-contrast);
   font-weight: 600;
 }
 
 .installment-program-modal__btn_primary:hover:not(:disabled) {
-  background: #1d4ed8;
+  background: var(--iz-color-link-hover);
 }
 
 .installment-program-modal__btn_add {
-  border-color: #bfdbfe;
-  background: #eff6ff;
-  color: #1d4ed8;
+  border-color: var(--iz-color-info-muted);
+  background: var(--iz-color-action-soft);
+  color: var(--iz-color-link-hover);
   font-weight: 600;
 }
 
 .installment-program-modal__max-hint {
   margin: 0;
   font-size: 0.8rem;
-  color: #64748b;
+  color: var(--iz-color-text-subtle);
 }
 
 .installment-program-modal__feedback {
@@ -298,12 +298,12 @@
 
 .installment-program-modal__error {
   margin: 0;
-  color: #b42318;
+  color: var(--iz-color-danger-strong);
   font-size: 0.85rem;
 }
 
 .installment-program-modal__success {
   margin: 0;
-  color: #047857;
+  color: var(--iz-color-success-strong);
   font-size: 0.85rem;
 }

@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 
+import { usePriceOfferSellerMutations } from "../model/usePriceOfferSellerMutations.js";
+import { useSellerPriceOffersQuery } from "../model/useSellerPriceOffersQuery.js";
 import { UserPremiumDisplayName } from "../../user/ui/UserPremiumDisplayName.jsx";
-import { acceptPriceOffer } from "../api/acceptPriceOffer.js";
-import { fetchSellerPriceOffers } from "../api/fetchSellerPriceOffers.js";
-import { rejectPriceOffer } from "../api/rejectPriceOffer.js";
 import {
   PRICE_OFFER_STATUS_ACCEPTED,
   PRICE_OFFER_STATUS_PENDING,
@@ -28,42 +27,31 @@ import "./ProductPriceOffer.css";
  * }} props
  */
 export function ProductPriceOfferSellerTab({ productId, onOpenBuyer, onChanged }) {
-  const [offers, setOffers] = useState(
-    /** @type {import('../model/types.js').PriceOfferRow[]} */ ([]),
-  );
-  const [phase, setPhase] = useState("loading");
-  const [error, setError] = useState("");
+  const { acceptMutation, rejectMutation } = usePriceOfferSellerMutations(productId);
+  const offersQuery = useSellerPriceOffersQuery({ productId });
+  const [actionError, setActionError] = useState("");
   const [busyId, setBusyId] = useState(/** @type {string | null} */ (null));
 
-  const load = useCallback(async () => {
-    setPhase("loading");
-    setError("");
-    try {
-      const list = await fetchSellerPriceOffers(productId);
-      setOffers(list);
-      setPhase("success");
-    } catch (e) {
-      setError(
-        e instanceof Error
-          ? e.message
-          : API_CLIENT_UI.FETCH_SELLER_PRICE_OFFERS_FALLBACK,
-      );
-      setPhase("error");
-    }
-  }, [productId]);
-
-  useEffect(() => {
-    void load();
-  }, [load]);
+  const offers = offersQuery.data ?? [];
+  const phase = offersQuery.isPending
+    ? "loading"
+    : offersQuery.isError && offers.length === 0
+      ? "error"
+      : "success";
+  const error =
+    offersQuery.error instanceof Error
+      ? offersQuery.error.message
+      : API_CLIENT_UI.FETCH_SELLER_PRICE_OFFERS_FALLBACK;
+  const displayError = actionError || (phase === "error" ? error : "");
 
   const handleAccept = async (offerId) => {
     setBusyId(offerId);
+    setActionError("");
     try {
-      await acceptPriceOffer(productId, offerId);
-      await load();
+      await acceptMutation.mutateAsync(offerId);
       onChanged?.();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Ошибка");
+      setActionError(e instanceof Error ? e.message : "Ошибка");
     } finally {
       setBusyId(null);
     }
@@ -71,12 +59,12 @@ export function ProductPriceOfferSellerTab({ productId, onOpenBuyer, onChanged }
 
   const handleReject = async (offerId) => {
     setBusyId(offerId);
+    setActionError("");
     try {
-      await rejectPriceOffer(productId, offerId);
-      await load();
+      await rejectMutation.mutateAsync(offerId);
       onChanged?.();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Ошибка");
+      setActionError(e instanceof Error ? e.message : "Ошибка");
     } finally {
       setBusyId(null);
     }
@@ -98,7 +86,7 @@ export function ProductPriceOfferSellerTab({ productId, onOpenBuyer, onChanged }
       <section className="product-price-offer">
         <ProductPriceOfferSectionTitle />
         <p className="product-price-offer__error" role="alert">
-          {error}
+          {displayError}
         </p>
       </section>
     );
@@ -122,9 +110,9 @@ export function ProductPriceOfferSellerTab({ productId, onOpenBuyer, onChanged }
         {PRODUCT_PRICE_OFFER_UI.SECTION_TOP_TITLE}
       </h2>
       <ul className="product-price-offer__seller-list" role="list">
-        {error ? (
+        {displayError ? (
           <li className="product-price-offer__error" role="alert">
-            {error}
+            {displayError}
           </li>
         ) : null}
         {offers.map((row) => {

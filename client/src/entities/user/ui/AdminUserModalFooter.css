@@ -23,13 +23,13 @@
 }
 
 .admin-user-modal-footer__btn_edit {
-  border-color: #2563eb;
-  background: #eff6ff;
-  color: #1d4ed8;
+  border-color: var(--iz-color-link);
+  background: var(--iz-color-action-soft);
+  color: var(--iz-color-link-hover);
 }
 
 .admin-user-modal-footer__btn_delete {
-  border-color: #fecaca;
-  background: #fef2f2;
-  color: #b42318;
+  border-color: var(--iz-color-danger-border);
+  background: var(--iz-color-danger-surface);
+  color: var(--iz-color-danger-strong);
 }

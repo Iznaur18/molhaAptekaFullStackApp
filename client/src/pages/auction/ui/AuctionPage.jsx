@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 
-import { fetchIncomingPriceOffers } from "../../../entities/product-price-offer/api/fetchIncomingPriceOffers.js";
-import { fetchMyPriceOfferBids } from "../../../entities/product-price-offer/api/fetchMyPriceOfferBids.js";
+import { useIncomingPriceOffersQuery } from "../../../entities/product-price-offer/model/useIncomingPriceOffersQuery.js";
+import { useMyPriceOfferBidsQuery } from "../../../entities/product-price-offer/model/useMyPriceOfferBidsQuery.js";
 import { AuctionBuyerBidRow } from "../../../entities/product-price-offer/ui/AuctionBuyerBidRow.jsx";
 import { AuctionSellerOfferRow } from "../../../entities/product-price-offer/ui/AuctionSellerOfferRow.jsx";
 import { AUCTION_PAGE_UI } from "../../../shared/config/appUiCopy.js";
@@ -27,52 +27,32 @@ export function AuctionPage({
   onBuyerClick,
   onQueueChanged,
 }) {
-  const [phase, setPhase] = useState("loading");
-  const [error, setError] = useState("");
-  const [buyerBids, setBuyerBids] = useState(
-    /** @type {import('../../../entities/product-price-offer/model/types.js').PriceOfferBuyerBidRow[]} */ ([]),
-  );
-  const [sellerOffers, setSellerOffers] = useState(
-    /** @type {import('../../../entities/product-price-offer/model/types.js').PriceOfferIncomingRow[]} */ ([]),
-  );
+  const bidsQuery = useMyPriceOfferBidsQuery({ enabled: isAuthorized });
+  const offersQuery = useIncomingPriceOffersQuery({ enabled: isAuthorized });
+
+  const buyerBids = isAuthorized ? (bidsQuery.data ?? []) : [];
+  const sellerOffers = isAuthorized ? (offersQuery.data ?? []) : [];
+  const isLoading = isAuthorized && (bidsQuery.isPending || offersQuery.isPending);
+  const queryError = bidsQuery.error ?? offersQuery.error;
+  const error =
+    queryError instanceof Error ? queryError.message : AUCTION_PAGE_UI.ERROR_GENERIC;
+  const phase = isLoading ? "loading" : queryError ? "error" : "success";
 
   const reload = useCallback(async () => {
     if (!isAuthorized) {
-      setBuyerBids([]);
-      setSellerOffers([]);
-      setPhase("success");
       return;
     }
-
-    try {
-      const [bids, offers] = await Promise.all([
-        fetchMyPriceOfferBids(),
-        fetchIncomingPriceOffers(),
-      ]);
-      setBuyerBids(bids);
-      setSellerOffers(offers);
-      setPhase("success");
-      setError("");
-      onQueueChanged?.();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : AUCTION_PAGE_UI.ERROR_GENERIC);
-      setPhase("error");
-    }
-  }, [isAuthorized, onQueueChanged]);
+    await Promise.all([bidsQuery.refetch(), offersQuery.refetch()]);
+    onQueueChanged?.();
+  }, [bidsQuery, isAuthorized, offersQuery, onQueueChanged]);
 
   useRefetchOnVisible(reload, phase === "success" && isAuthorized);
 
   useEffect(() => {
     if (!isAuthorized) {
       onRequestLogin?.();
-      setPhase("success");
-      setBuyerBids([]);
-      setSellerOffers([]);
-      return;
     }
-    setPhase("loading");
-    void reload();
-  }, [isAuthorized, onRequestLogin, reload]);
+  }, [isAuthorized, onRequestLogin]);
 
   if (!isAuthorized) {
     return null;

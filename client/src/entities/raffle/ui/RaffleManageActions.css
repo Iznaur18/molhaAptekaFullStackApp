@@ -18,7 +18,7 @@
   font-weight: 700;
   line-height: 1.2;
   cursor: pointer;
-  box-shadow: 0 1px 2px rgb(15 23 42 / 8%);
+  box-shadow: 0 1px 2px var(--iz-color-overlay-hover);
 }
 
 .raffle-manage-actions__btn:disabled {
@@ -27,19 +27,19 @@
 }
 
 .raffle-manage-actions__btn_edit {
-  border-color: #7c3aed;
-  background: #ede9fe;
-  color: #5b21b6;
+  border-color: var(--iz-color-accent-purple);
+  background: var(--iz-color-accent-purple-soft);
+  color: var(--iz-color-accent-purple-text);
 }
 
 .raffle-manage-actions__btn_delete {
-  border-color: #dc2626;
-  background: #fee2e2;
-  color: #991b1b;
+  border-color: var(--iz-color-danger-accent);
+  background: var(--iz-color-danger-soft);
+  color: var(--iz-color-danger-text);
 }
 
 .raffle-manage-actions__btn_pause {
-  border-color: #d97706;
-  background: #ffedd5;
-  color: #9a3412;
+  border-color: var(--iz-color-warning);
+  background: var(--iz-color-warning-peach);
+  color: var(--iz-color-warning-brown-deep);
 }

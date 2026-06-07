@@ -15,6 +15,7 @@ const E2E_SERVER_ENV = {
   FRONTEND_URL: process.env.FRONTEND_URL ?? CLIENT_URL,
   NODE_ENV: process.env.NODE_ENV ?? "development",
   PORT: "4444",
+  USER_DATA_CONFIRMATION_RATE_LIMIT_PER_HOUR: "30",
 };
 
 export default defineConfig({
@@ -34,6 +35,26 @@ export default defineConfig({
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
+      testIgnore: /catalog-virtualizer-mobile\.spec\.js/,
+    },
+    {
+      name: "mobile-iphone",
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: devices["iPhone 13"].viewport,
+        userAgent: devices["iPhone 13"].userAgent,
+        deviceScaleFactor: devices["iPhone 13"].deviceScaleFactor,
+        isMobile: true,
+        hasTouch: true,
+      },
+      testMatch: /catalog-virtualizer-mobile\.spec\.js/,
+      grep: /mobile QA/,
+    },
+    {
+      name: "mobile-chrome",
+      use: { ...devices["Pixel 5"] },
+      testMatch: /catalog-virtualizer-mobile\.spec\.js/,
+      grep: /Android QA/,
     },
   ],
   webServer: [

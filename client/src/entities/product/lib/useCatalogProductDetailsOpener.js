@@ -1,8 +1,8 @@
 import { useCallback, useState } from "react";
 
 import { resolveOrderLineItemProductId } from "../../order/lib/resolveOrderLineItemProductId.js";
-import { fetchCatalogProductById } from "../api/fetchCatalogProductById.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
+import { useCatalogProductByIdQuery } from "../model/useCatalogProductByIdQuery.js";
 
 /**
  * @returns {{
@@ -16,31 +16,41 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
  * }}
  */
 export function useCatalogProductDetailsOpener() {
-  const [catalogProduct, setCatalogProduct] = useState(
-    /** @type {import('../model/types.js').ProductFromApi | null} */ (null),
+  const [requestedProductId, setRequestedProductId] = useState(
+    /** @type {string | null} */ (null),
   );
-  const [catalogProductPhase, setCatalogProductPhase] = useState(
-    /** @type {'idle' | 'loading' | 'ready' | 'error'} */ ("idle"),
+  const [catalogProductPatch, setCatalogProductPatch] = useState(
+    /** @type {Record<string, unknown>} */ ({}),
   );
-  const [catalogProductError, setCatalogProductError] = useState("");
+
+  const productQuery = useCatalogProductByIdQuery({
+    productId: requestedProductId,
+    enabled: Boolean(requestedProductId),
+  });
+
+  const catalogProduct =
+    productQuery.data != null ? { ...productQuery.data, ...catalogProductPatch } : null;
+
+  const catalogProductPhase = !requestedProductId
+    ? "idle"
+    : productQuery.isLoading
+      ? "loading"
+      : productQuery.isError
+        ? "error"
+        : productQuery.isSuccess
+          ? "ready"
+          : "loading";
+
+  const catalogProductError =
+    productQuery.error instanceof Error
+      ? productQuery.error.message
+      : productQuery.isError
+        ? API_CLIENT_UI.FETCH_CATALOG_PRODUCT_FALLBACK
+        : "";
 
   const openCatalogProductById = useCallback((productId) => {
-    setCatalogProductError("");
-    setCatalogProductPhase("loading");
-    setCatalogProduct(null);
-
-    void (async () => {
-      try {
-        const product = await fetchCatalogProductById(productId);
-        setCatalogProduct(product);
-        setCatalogProductPhase("ready");
-      } catch (e) {
-        setCatalogProductError(
-          e instanceof Error ? e.message : API_CLIENT_UI.FETCH_CATALOG_PRODUCT_FALLBACK,
-        );
-        setCatalogProductPhase("error");
-      }
-    })();
+    setCatalogProductPatch({});
+    setRequestedProductId(String(productId));
   }, []);
 
   const openCatalogProductFromOrderLine = useCallback(
@@ -55,16 +65,15 @@ export function useCatalogProductDetailsOpener() {
   );
 
   const closeCatalogProduct = useCallback(() => {
-    setCatalogProduct(null);
-    setCatalogProductPhase("idle");
-    setCatalogProductError("");
+    setRequestedProductId(null);
+    setCatalogProductPatch({});
   }, []);
 
   const patchCatalogProduct = useCallback((productId, patch) => {
-    setCatalogProduct((prev) =>
-      prev && String(prev._id) === productId ? { ...prev, ...patch } : prev,
-    );
-  }, []);
+    if (requestedProductId != null && String(requestedProductId) === productId) {
+      setCatalogProductPatch((prev) => ({ ...prev, ...patch }));
+    }
+  }, [requestedProductId]);
 
   return {
     catalogProduct,

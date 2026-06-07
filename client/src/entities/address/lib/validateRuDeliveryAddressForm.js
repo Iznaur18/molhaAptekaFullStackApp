@@ -1,7 +1,5 @@
+import { IS_REQUIRE_ADDRESS_FROM_DADATA_SUGGEST_ENABLED } from "../../../shared/config/featureFlags.js";
 import { ADDRESS_LINE_MAX_LENGTH } from "../model/constants.js";
-
-/** Временно: не требовать выбор адреса из DaData-подсказок на клиенте. */
-const REQUIRE_SELECTED_FROM_SUGGEST = false;
 
 /**
  * @param {import('../model/types.js').RuDeliveryAddressValue} value
@@ -16,7 +14,7 @@ export function validateRuDeliveryAddressForm(value, options = {}) {
     return required ? "Укажите адрес доставки" : null;
   }
 
-  if (REQUIRE_SELECTED_FROM_SUGGEST && !value.selectedFromSuggest) {
+  if (IS_REQUIRE_ADDRESS_FROM_DADATA_SUGGEST_ENABLED && !value.selectedFromSuggest) {
     return "Выберите адрес из списка подсказок";
   }
 

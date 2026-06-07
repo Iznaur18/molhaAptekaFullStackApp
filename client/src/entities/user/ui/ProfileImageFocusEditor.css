@@ -7,15 +7,15 @@
 .profile-image-focus-editor__label {
   margin: 0;
   font-size: 0.82rem;
-  color: color-mix(in srgb, CanvasText 62%, transparent);
+  color: color-mix(in srgb, var(--iz-color-canvas-text) 62%, transparent);
 }
 
 .profile-image-focus-editor__frame {
   position: relative;
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, CanvasText 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--iz-color-canvas-text) 14%, transparent);
   border-radius: 10px;
-  background: color-mix(in srgb, CanvasText 6%, transparent);
+  background: color-mix(in srgb, var(--iz-color-canvas-text) 6%, transparent);
   cursor: grab;
   touch-action: none;
   user-select: none;
@@ -26,7 +26,7 @@
 }
 
 .profile-image-focus-editor__frame:focus-visible {
-  outline: 2px solid color-mix(in srgb, #2563eb 75%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--iz-color-link) 75%, transparent);
   outline-offset: 2px;
 }
 
@@ -64,8 +64,8 @@
   width: 0.65rem;
   height: 0.65rem;
   margin: -0.325rem 0 0 -0.325rem;
-  border: 2px solid #fff;
+  border: 2px solid var(--iz-color-on-contrast);
   border-radius: 50%;
-  box-shadow: 0 0 0 1px rgb(0 0 0 / 35%);
+  box-shadow: 0 0 0 1px var(--iz-shadow-focus-neutral);
   pointer-events: none;
 }

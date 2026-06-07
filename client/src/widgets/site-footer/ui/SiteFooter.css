@@ -12,7 +12,7 @@
   padding: 0;
   border: none;
   background: none;
-  color: #6b7280;
+  color: var(--iz-color-text-muted);
   font: inherit;
   font-size: 0.875rem;
   text-decoration: underline;
@@ -21,5 +21,5 @@
 }
 
 .site-footer__intro-link:hover {
-  color: #1f6feb;
+  color: var(--iz-color-action);
 }

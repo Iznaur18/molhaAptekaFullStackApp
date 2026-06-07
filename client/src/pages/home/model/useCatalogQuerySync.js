@@ -11,7 +11,7 @@ import {
   buildCatalogSearchParams,
   CATALOG_QUERY_PARAM_CATEGORY,
   parseCatalogQueryFromSearchParams,
-} from "../lib/catalogCatalogQuery.js";
+} from "../../../entities/product/lib/catalogCatalogQuery.js";
 
 /**
  * @param {object} params

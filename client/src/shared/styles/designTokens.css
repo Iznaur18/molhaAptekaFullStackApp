@@ -1,0 +1,359 @@
+/**
+ * Глобальные design tokens приложения.
+ * Компонентные токены (product-card и т.д.) ссылаются на эти переменные.
+ */
+:root {
+  --iz-font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --iz-line-height: 1.5;
+  --iz-font-weight: 400;
+
+  /* Base palette */
+  --iz-color-text: #111827;
+  --iz-color-text-muted: #6b7280;
+  --iz-color-text-secondary: #374151;
+  --iz-color-text-tertiary: #4b5563;
+  --iz-color-text-subtle: #64748b;
+  --iz-color-text-placeholder: #9ca3af;
+  --iz-color-ink: #0f172a;
+  --iz-color-slate: #334155;
+  --iz-color-slate-muted: #475569;
+
+  --iz-color-bg: #f5fbff;
+  --iz-color-surface: #ffffff;
+  --iz-color-surface-muted: #f9fafb;
+  --iz-color-surface-subtle: #f3f4f6;
+  --iz-color-surface-elevated: #f8fafc;
+  --iz-color-surface-alt: #f1f5f9;
+
+  --iz-color-primary: #284b7e;
+  --iz-color-primary-bright: #3b82f6;
+  --iz-color-action: #1f6feb;
+  --iz-color-action-hover: #1557b3;
+  --iz-color-action-soft: #eff6ff;
+  --iz-color-action-border: #dbeafe;
+  --iz-color-action-light: #93c5fd;
+  --iz-color-link: #2563eb;
+  --iz-color-link-hover: #1d4ed8;
+  --iz-color-link-deep: #4f46e5;
+
+  --iz-color-danger: #c62828;
+  --iz-color-danger-strong: #b42318;
+  --iz-color-danger-deep: #b91c1c;
+  --iz-color-danger-text: #991b1b;
+  --iz-color-danger-soft: #fee2e2;
+  --iz-color-danger-border: #fecaca;
+  --iz-color-danger-accent: #dc2626;
+  --iz-color-danger-surface: #fef2f2;
+  --iz-color-danger-coral: #fca5a5;
+  --iz-color-danger-rose: #d92d20;
+  --iz-color-danger-rose-deep: #912018;
+  --iz-color-danger-rose-dark: #be123c;
+  --iz-color-danger-blush: #fef3f2;
+  --iz-color-danger-blush-deep: #fee4e2;
+  --iz-color-danger-salmon: #fda29b;
+  --iz-color-danger-salmon-soft: #fecdca;
+  --iz-color-danger-pink: #fecdd3;
+
+  --iz-color-success: #16a34a;
+  --iz-color-success-strong: #047857;
+  --iz-color-success-soft: #ecfdf5;
+  --iz-color-success-muted: #166534;
+  --iz-color-success-light: #86efac;
+  --iz-color-success-bright: #059669;
+  --iz-color-success-deep: #15803d;
+  --iz-color-success-vivid: #22c55e;
+  --iz-color-success-pale: #dcfce7;
+  --iz-color-success-badge: #dcfae6;
+  --iz-color-success-surface: #f0fdf4;
+  --iz-color-success-mint: #ecfdf3;
+  --iz-color-success-mint-deep: #027a48;
+  --iz-color-success-forest: #065f46;
+  --iz-color-success-teal: #0f766e;
+  --iz-color-success-teal-bright: #0d9488;
+
+  --iz-color-warning: #d97706;
+  --iz-color-warning-text: #92400e;
+  --iz-color-warning-soft: #fbbf24;
+  --iz-color-warning-bright: #f59e0b;
+  --iz-color-warning-amber: #eab308;
+  --iz-color-warning-deep: #b45309;
+  --iz-color-warning-gold: #ca8a04;
+  --iz-color-warning-yellow: #facc15;
+  --iz-color-warning-yellow-pale: #fde047;
+  --iz-color-warning-yellow-light: #fcd34d;
+  --iz-color-warning-yellow-soft: #fefce8;
+  --iz-color-warning-cream: #fef0c7;
+  --iz-color-promotion-boost-bg: #fffbeb;
+  --iz-color-promotion-boost-bg-alt: #fff1ba;
+  --iz-color-filter-tile-bg: #fff7ed;
+  --iz-color-warning-peach: #ffedd5;
+  --iz-color-warning-brown: #78350f;
+  --iz-color-warning-brown-deep: #93370d;
+  --iz-color-warning-brown-dark: #854d0e;
+  --iz-color-warning-brown-rich: #8f4915;
+  --iz-color-warning-brown-text: #422006;
+
+  --iz-color-accent-purple: #7c3aed;
+  --iz-color-accent-purple-soft: #ede9fe;
+  --iz-color-accent-purple-hover: #ddd6fe;
+  --iz-color-accent-purple-text: #5b21b6;
+  --iz-color-premium-purple: #6d28d9;
+  --iz-color-premium-purple-soft: #f5f3ff;
+  --iz-color-premium-purple-muted: #c4b5fd;
+  --iz-color-premium-purple-light: #a78bfa;
+  --iz-color-premium-indigo: #4338ca;
+  --iz-color-premium-indigo-soft: #eef2ff;
+  --iz-color-premium-indigo-muted: #c7d2fe;
+
+  --iz-color-accent-pink: #db2777;
+  --iz-color-accent-pink-deep: #9d174d;
+  --iz-color-accent-pink-soft: #fce7f3;
+  --iz-color-accent-pink-surface: #faf5ff;
+  --iz-color-accent-pink-lavender: #e9d5ff;
+  --iz-color-accent-pink-lilac: #f8f4ff;
+
+  --iz-color-border: #e5e7eb;
+  --iz-color-border-strong: #d1d5db;
+  --iz-color-border-subtle: #e2e8f0;
+  --iz-color-border-muted: #cbd5e1;
+
+  --iz-color-black: #000000;
+  --iz-color-near-black: #111111;
+  --iz-color-midnight: #020617;
+  --iz-color-on-contrast: #ffffff;
+  --iz-color-canvas: var(--iz-color-surface);
+  --iz-color-canvas-text: var(--iz-color-text);
+
+  --iz-gradient-surface-fade: linear-gradient(
+    180deg,
+    var(--iz-color-surface-elevated) 0%,
+    var(--iz-color-surface) 70%
+  );
+  --iz-gradient-info-panel: linear-gradient(
+    180deg,
+    var(--iz-color-info-pale) 0%,
+    var(--iz-color-surface) 55%
+  );
+  --iz-gradient-premium-panel: linear-gradient(
+    180deg,
+    var(--iz-color-promotion-boost-bg) 0%,
+    var(--iz-color-surface) 55%
+  );
+  --iz-gradient-raffle-pink: linear-gradient(
+    135deg,
+    var(--iz-color-accent-pink-surface) 0%,
+    var(--iz-color-accent-pink-lilac) 55%,
+    var(--iz-color-surface) 100%
+  );
+  --iz-gradient-raffle-success: linear-gradient(
+    135deg,
+    var(--iz-color-success-surface) 0%,
+    var(--iz-color-success-soft) 55%,
+    var(--iz-color-surface) 100%
+  );
+  --iz-gradient-raffle-modal: linear-gradient(
+    135deg,
+    var(--iz-color-accent-pink-surface) 0%,
+    var(--iz-color-surface) 55%,
+    var(--iz-color-surface) 100%
+  );
+  --iz-gradient-details-price: linear-gradient(
+    165deg,
+    var(--iz-color-surface-elevated) 0%,
+    var(--iz-color-surface-alt) 100%
+  );
+  --iz-gradient-admin-accent: linear-gradient(
+    180deg,
+    var(--iz-color-premium-purple-muted),
+    var(--iz-color-accent-pink-lavender)
+  );
+  --iz-gradient-app-intro: linear-gradient(
+    135deg,
+    var(--iz-color-info-navy) 0%,
+    var(--iz-color-accent-purple) 55%,
+    var(--iz-color-accent-pink) 100%
+  );
+  --iz-gradient-feed-indigo: linear-gradient(
+    145deg,
+    var(--iz-color-premium-indigo-soft),
+    var(--iz-color-surface-elevated)
+  );
+  --iz-gradient-feed-gold: linear-gradient(
+    145deg,
+    var(--iz-color-gold-soft),
+    var(--iz-color-filter-tile-bg)
+  );
+  --iz-gradient-purple-bar: linear-gradient(
+    90deg,
+    var(--iz-color-premium-purple-light),
+    var(--iz-color-accent-purple)
+  );
+  --iz-gradient-success-bar: linear-gradient(
+    90deg,
+    var(--iz-color-success-light),
+    var(--iz-color-success)
+  );
+  --iz-gradient-header-accent: linear-gradient(
+    90deg,
+    var(--iz-color-action) 0%,
+    var(--iz-color-action-light) 45%,
+    var(--iz-color-action) 100%
+  );
+  --iz-gradient-header-brand: linear-gradient(
+    120deg,
+    var(--iz-color-ink) 0%,
+    var(--iz-color-primary) 55%,
+    var(--iz-color-action) 100%
+  );
+  --iz-gradient-header-btn: linear-gradient(
+    180deg,
+    var(--iz-color-primary-bright) 0%,
+    var(--iz-color-action) 100%
+  );
+
+  --iz-color-overlay-backdrop: rgb(17 24 39 / 55%);
+  --iz-color-overlay-hover: rgb(17 24 39 / 8%);
+  --iz-color-overlay-subtle: rgb(17 24 39 / 6%);
+  --iz-color-action-focus-ring: rgb(31 111 235 / 15%);
+  --iz-color-action-border-muted: rgb(31 111 235 / 35%);
+  --iz-color-action-spinner-track: rgb(31 111 235 / 25%);
+  --iz-color-action-bg-hover: rgb(31 111 235 / 6%);
+  --iz-color-action-bg-active: rgb(31 111 235 / 10%);
+  --iz-color-action-border-strong: rgb(31 111 235 / 45%);
+  --iz-color-action-bg-selected: rgb(31 111 235 / 12%);
+  --iz-color-action-bg-selected-strong: rgb(31 111 235 / 20%);
+  --iz-color-action-outline: rgb(37 99 235 / 25%);
+  --iz-color-action-outline-soft: rgb(37 99 235 / 12%);
+  --iz-color-action-outline-muted: rgb(37 99 235 / 22%);
+
+  --iz-color-overlay-dark: rgb(0 0 0 / 50%);
+  --iz-color-overlay-dark-strong: rgb(0 0 0 / 55%);
+  --iz-color-overlay-media: rgb(0 0 0 / 52%);
+  --iz-color-overlay-media-strong: rgb(0 0 0 / 72%);
+  --iz-color-overlay-ink: rgb(15 23 42 / 45%);
+  --iz-color-overlay-ink-strong: rgb(15 23 42 / 72%);
+  --iz-color-overlay-ink-heavy: rgb(15 23 42 / 88%);
+  --iz-color-overlay-midnight: rgb(8 16 30 / 50%);
+  --iz-color-overlay-border: rgb(0 0 0 / 12%);
+  --iz-color-overlay-black-soft: rgb(0 0 0 / 18%);
+  --iz-color-overlay-black-medium: rgb(0 0 0 / 28%);
+  --iz-color-overlay-black-strong: rgb(0 0 0 / 45%);
+  --iz-color-overlay-white: rgb(255 255 255 / 92%);
+  --iz-color-overlay-white-border: rgb(255 255 255 / 35%);
+  --iz-color-overlay-white-muted: rgb(255 255 255 / 25%);
+  --iz-color-overlay-white-subtle: rgb(255 255 255 / 14%);
+  --iz-color-overlay-slate-border: rgb(248 250 252 / 45%);
+
+  --iz-color-status-info-soft: rgb(59 130 246 / 12%);
+  --iz-color-status-warning-soft: rgb(245 158 11 / 15%);
+  --iz-color-status-action-soft: rgb(31 111 235 / 12%);
+  --iz-color-status-purple-soft: rgb(124 58 237 / 12%);
+  --iz-color-status-success-soft: rgb(16 185 129 / 15%);
+  --iz-color-status-danger-soft: rgb(180 35 24 / 12%);
+  --iz-color-status-danger-subtle: rgb(180 35 24 / 6%);
+  --iz-color-status-danger-border: rgb(180 35 24 / 40%);
+  --iz-color-status-danger-surface: rgb(180 35 24 / 8%);
+  --iz-color-status-warning-border: rgb(180 83 9 / 45%);
+  --iz-color-status-warning-surface: rgb(180 83 9 / 8%);
+  --iz-color-status-neutral-soft: rgb(55 65 81 / 12%);
+  --iz-color-status-danger-strong: rgb(220 38 38 / 85%);
+
+  --iz-color-accent-purple-shadow: rgb(124 58 237 / 12%);
+  --iz-color-accent-purple-shadow-strong: rgb(124 58 237 / 22%);
+  --iz-color-accent-indigo-shadow: rgb(79 70 229 / 10%);
+  --iz-color-accent-success-shadow: rgb(22 163 74 / 12%);
+  --iz-color-accent-installment-shadow: rgb(6 20 42 / 26%);
+  --iz-color-accent-purple-ring: rgb(124 58 237 / 12%);
+  --iz-color-accent-purple-ring-soft: rgb(124 58 237 / 10%);
+
+  --iz-shadow-card-subtle: 0 1px 2px rgb(15 23 42 / 4%);
+  --iz-shadow-card: 0 1px 2px rgb(15 23 42 / 5%);
+  --iz-shadow-card-hover: 0 6px 18px rgb(15 23 42 / 12%);
+  --iz-shadow-dropdown: 0 4px 6px rgb(15 23 42 / 4%), 0 12px 24px rgb(15 23 42 / 10%);
+  --iz-shadow-popover: 0 4px 16px rgb(0 0 0 / 10%);
+  --iz-shadow-elevated: 0 12px 32px rgb(15 23 42 / 12%);
+  --iz-shadow-panel: 0 10px 28px rgb(15 23 42 / 14%), 0 3px 10px rgb(15 23 42 / 8%);
+  --iz-shadow-dialog: 0 20px 45px rgb(17 24 39 / 28%);
+  --iz-shadow-dialog-alt: 0 20px 40px rgb(15 23 42 / 18%);
+  --iz-shadow-dialog-dark: 0 12px 40px rgb(15 23 42 / 20%);
+  --iz-shadow-story: 0 12px 40px rgb(0 0 0 / 20%);
+  --iz-shadow-story-viewer: 0 8px 32px rgb(0 0 0 / 45%);
+  --iz-shadow-media: 0 8px 20px rgb(17 24 39 / 12%);
+  --iz-shadow-media-soft: 0 4px 14px rgb(15 23 42 / 8%);
+  --iz-shadow-chip: 0 1px 4px rgb(0 0 0 / 18%);
+  --iz-shadow-badge: 0 1px 6px rgb(0 0 0 / 28%);
+  --iz-shadow-category: 0 8px 20px rgb(79 70 229 / 10%);
+  --iz-shadow-category-soft: 0 4px 12px rgb(79 70 229 / 10%);
+  --iz-shadow-category-tile: 0 2px 8px rgb(15 23 42 / 12%);
+  --iz-shadow-select: 0 10px 28px rgb(17 24 39 / 18%);
+  --iz-shadow-lightbox: 0 12px 40px rgb(0 0 0 / 35%);
+  --iz-shadow-suggest: 0 4px 12px rgb(0 0 0 / 12%);
+  --iz-shadow-focus-neutral: 0 0 0 1px rgb(0 0 0 / 35%);
+  --iz-text-shadow-strong: 0 1px 2px rgb(0 0 0 / 80%);
+
+  --iz-color-banner-accent: #dc2626;
+  --iz-color-banner-accent-hover: #b91c1c;
+  --iz-color-banner-accent-soft: #fecaca;
+  --iz-color-banner-gradient-end: #fef2f2;
+  --iz-color-banner-badge-text: #991b1b;
+
+  --iz-color-gold: #d4af37;
+  --iz-color-gold-deep: #d4a017;
+  --iz-color-gold-muted: #7a5a00;
+  --iz-color-gold-soft: #fef3c7;
+  --iz-color-gold-border: #fde68a;
+  --iz-color-gold-highlight: #ffefb8;
+  --iz-color-star: #edc93a;
+
+  --iz-color-info: #0369a1;
+  --iz-color-info-deep: #1e40af;
+  --iz-color-info-navy: #1e3a8a;
+  --iz-color-info-bright: #0ea5e9;
+  --iz-color-info-sky: #0284c7;
+  --iz-color-info-soft: #e0f2fe;
+  --iz-color-info-muted: #bfdbfe;
+  --iz-color-info-pale: #f0f9ff;
+  --iz-color-info-light: #7dd3fc;
+  --iz-color-info-lighter: #bae6fd;
+
+  --iz-color-neutral-gray: #94a3b8;
+  --iz-color-neutral-gray-deep: #667085;
+  --iz-color-neutral-gray-dark: #344054;
+  --iz-color-neutral-gray-border: #d0d5dd;
+  --iz-color-neutral-gray-surface: #e8edf5;
+  --iz-color-neutral-gray-subtle: #eef2f7;
+  --iz-color-neutral-gray-pale: #f2f4f7;
+  --iz-color-neutral-disabled: #cccccc;
+
+  --iz-color-social-twitter: #1d9bf0;
+
+  --iz-radius-sm: 8px;
+  --iz-radius-md: 12px;
+  --iz-radius-lg: calc(14px * 1.2);
+  --iz-radius-pill: 999px;
+  --iz-radius-button: 10px;
+  --iz-radius-input: 0.5rem;
+  --iz-radius-modal: 0.75rem;
+
+  --iz-space-1: 0.25rem;
+  --iz-space-2: 0.5rem;
+  --iz-space-3: 0.75rem;
+  --iz-space-4: 1rem;
+  --iz-space-5: 1.25rem;
+  --iz-space-6: 1.5rem;
+
+  --iz-shadow-sm: 0 1px 2px rgb(17 24 39 / 8%);
+  --iz-shadow-md: 0 4px 12px rgb(17 24 39 / 10%);
+  --iz-shadow-lg: 0 10px 28px rgb(15 23 42 / 7%);
+  --iz-shadow-modal: 0 18px 40px rgb(17 24 39 / 35%);
+
+  --iz-z-dropdown: 100;
+  --iz-z-modal: 1000;
+  --iz-z-modal-shell: 1200;
+  --iz-z-toast: 1100;
+
+  --iz-catalog-grid-gap: 16px;
+  --iz-catalog-grid-min-column: 280px;
+  --iz-catalog-grid-mobile-columns: 3;
+  --iz-catalog-grid-breakpoint: 903px;
+}

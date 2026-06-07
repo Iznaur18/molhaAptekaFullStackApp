@@ -8,7 +8,7 @@
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #64748b;
+  color: var(--iz-color-text-subtle);
 }
 
 .product-characteristics-details__list {
@@ -24,7 +24,7 @@
   gap: 0.75rem;
   margin: 0;
   padding: 0.35rem 0;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--iz-color-border-subtle);
 }
 
 .product-characteristics-details__row:last-child {
@@ -39,12 +39,12 @@
 }
 
 .product-characteristics-details__key {
-  color: #475569;
+  color: var(--iz-color-slate-muted);
   font-weight: 500;
 }
 
 .product-characteristics-details__value {
-  color: #0f172a;
+  color: var(--iz-color-ink);
 }
 
 @media (max-width: 520px) {

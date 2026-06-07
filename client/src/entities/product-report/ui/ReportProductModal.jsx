@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
-import { submitProductReport } from "../api/submitProductReport.js";
+import { useSubmitProductReportMutation } from "../model/useSubmitProductReportMutation.js";
 import { PRODUCT_REPORT_TEXT_MAX_CHARS } from "../model/constants.js";
 import { PRODUCT_REPORT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
@@ -27,6 +27,7 @@ export function ReportProductModal({
   onClose,
   onSubmitted,
 }) {
+  const submitReportMutation = useSubmitProductReportMutation();
   const [reportText, setReportText] = useState("");
   const [phase, setPhase] = useState("idle");
   const [error, setError] = useState("");
@@ -53,7 +54,10 @@ export function ReportProductModal({
     setPhase("loading");
     setError("");
     try {
-      await submitProductReport(productId, reportText.trim());
+      await submitReportMutation.mutateAsync({
+        productId,
+        reportText: reportText.trim(),
+      });
       onSubmitted();
       onClose();
     } catch (e) {

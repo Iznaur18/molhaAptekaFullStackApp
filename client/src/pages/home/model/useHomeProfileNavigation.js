@@ -25,8 +25,6 @@ import {
 
 import { profileTabToMainView } from "../../my-profile/lib/profileTabToMainView.js";
 
-import { fetchCurrentUserProfile } from "../../../entities/user/api/fetchCurrentUserProfile.js";
-
 /**
 
  * @param {{
@@ -38,23 +36,15 @@ import { fetchCurrentUserProfile } from "../../../entities/user/api/fetchCurrent
  *   myProfilePage: { phase: string; user?: { _id?: string } | null };
 
  *   setLoyaltyPoints: (value: number) => void;
-
- *   setMyProfilePage: import('react').Dispatch<import('react').SetStateAction<object>>;
-
+ *   invalidateAuthMe: () => Promise<unknown>;
  * }} params
-
  */
-
 export const useHomeProfileNavigation = ({
   goToMainView,
-
   setMyProductsCatalogError,
-
   myProfilePage,
-
   setLoyaltyPoints,
-
-  setMyProfilePage,
+  invalidateAuthMe,
 }) => {
   const navigateFromProfileTab = useCallback(
     (tab) => {
@@ -149,17 +139,9 @@ export const useHomeProfileNavigation = ({
   const handlePremiumPurchased = useCallback(
     async ({ loyaltyPointsBalance }) => {
       setLoyaltyPoints(loyaltyPointsBalance);
-
-      try {
-        const { user } = await fetchCurrentUserProfile();
-
-        setMyProfilePage({ phase: "success", user, error: "" });
-      } catch {
-        /* профиль обновится при следующем заходе */
-      }
+      await invalidateAuthMe();
     },
-
-    [setLoyaltyPoints, setMyProfilePage],
+    [invalidateAuthMe, setLoyaltyPoints],
   );
 
   return {

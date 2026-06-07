@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 
-import { fetchCurrentUserProfile } from "../../../entities/user/api/fetchCurrentUserProfile.js";
 import { EMAIL_VERIFICATION_UI } from "../../../shared/config/appUiCopy.js";
 
 /**
@@ -10,7 +9,7 @@ export const useHomeEmailVerifiedRedirect = ({
   location,
   navigate,
   isAuthorized,
-  setIsEmailVerified,
+  invalidateAuthMe,
 }) => {
   const [emailVerificationNotice, setEmailVerificationNotice] = useState(null);
 
@@ -30,11 +29,7 @@ export const useHomeEmailVerifiedRedirect = ({
       });
 
       if (isAuthorized) {
-        void fetchCurrentUserProfile()
-          .then(({ user }) => {
-            setIsEmailVerified(user.isEmailVerified !== false);
-          })
-          .catch(() => {});
+        void invalidateAuthMe();
       }
     } else if (verified === "error") {
       setEmailVerificationNotice({
@@ -45,7 +40,7 @@ export const useHomeEmailVerifiedRedirect = ({
 
     navigate(location.pathname, { replace: true });
     return undefined;
-  }, [isAuthorized, location.pathname, location.search, navigate, setIsEmailVerified]);
+  }, [invalidateAuthMe, isAuthorized, location.pathname, location.search, navigate]);
 
   useEffect(() => {
     if (!emailVerificationNotice) {

@@ -2,10 +2,8 @@ import { useCallback } from "react";
 
 import { useCatalogBrowserLanding } from "./useCatalogBrowserLanding.js";
 import { useCatalogFilterState } from "./useCatalogFilterState.js";
-import { useCatalogProductsFetch } from "./useCatalogProductsFetch.js";
 import { useCatalogQuerySync } from "./useCatalogQuerySync.js";
-
-/** @typedef {import('../../../entities/product/model/types.js').ProductFromApi} ProductFromApi */
+import { useCatalogProductsInfiniteQuery } from "../../../entities/product/model/useCatalogProductsInfiniteQuery.js";
 
 /**
  * @param {object} params
@@ -22,14 +20,8 @@ export const useHomeCatalogLoader = ({
   canModerateProducts,
   setIsLoginModalOpen,
   productSearchTerm,
-  products,
-  setProducts,
-  catalogStatus,
-  setCatalogStatus,
-  catalogRefreshTick,
   myProductsModerationFilter,
   setMyProductsModerationFilter,
-  setMyProductsTotal,
   setMyProductsCatalogError,
   setIsProductCategoryListOpen,
   setProductSearchTerm,
@@ -94,7 +86,7 @@ export const useHomeCatalogLoader = ({
     categoryRootsRef: browser.categoryRootsRef,
   });
 
-  const fetch = useCatalogProductsFetch({
+  const catalogQuery = useCatalogProductsInfiniteQuery({
     isCatalogProductsView: filters.isCatalogProductsView,
     isMineMode: filters.isMineMode,
     isCatalogBrowserMainViewActive,
@@ -107,15 +99,6 @@ export const useHomeCatalogLoader = ({
     myProductsModerationFilter,
     canModerateProducts,
     showHiddenCatalogProducts: filters.showHiddenCatalogProducts,
-    catalogFollowingOnly: filters.catalogFollowingOnly,
-    catalogAuctionOnly: filters.catalogAuctionOnly,
-    catalogSaleOnly: filters.catalogSaleOnly,
-    catalogRefreshTick,
-    products,
-    setProducts,
-    catalogStatus,
-    setCatalogStatus,
-    setMyProductsTotal,
   });
 
   const handleProductCategorySelect = useCallback(
@@ -139,10 +122,12 @@ export const useHomeCatalogLoader = ({
     categoryDisplays: browser.categoryDisplays,
     feedTileDisplays: browser.feedTileDisplays,
     categoryDisplaysStatus: browser.categoryDisplaysStatus,
-    catalogSentinelRef: fetch.catalogSentinelRef,
-    catalogHasMore: fetch.catalogHasMore,
-    isCatalogLoadingMore: fetch.isCatalogLoadingMore,
-    catalogLoadMoreError: fetch.catalogLoadMoreError,
+    products: catalogQuery.products,
+    catalogStatus: catalogQuery.catalogStatus,
+    catalogSentinelRef: catalogQuery.catalogSentinelRef,
+    catalogHasMore: catalogQuery.catalogHasMore,
+    isCatalogLoadingMore: catalogQuery.isCatalogLoadingMore,
+    catalogLoadMoreError: catalogQuery.catalogLoadMoreError,
     debouncedProductSearchTerm: filters.debouncedProductSearchTerm,
     isProductSearchPending: filters.isProductSearchPending,
     hasProductSearchQuery: filters.hasProductSearchQuery,
@@ -161,7 +146,7 @@ export const useHomeCatalogLoader = ({
     handleCatalogAuctionOnlyToggle: filters.handleCatalogAuctionOnlyToggle,
     handleCatalogSaleOnlyToggle: filters.handleCatalogSaleOnlyToggle,
     handleCatalogInstallmentOnlyToggle: filters.handleCatalogInstallmentOnlyToggle,
-    handleRetryCatalogLoadMore: fetch.handleRetryCatalogLoadMore,
+    handleRetryCatalogLoadMore: catalogQuery.handleRetryCatalogLoadMore,
     handleProductCategorySelect,
     handleNavigateToFullCatalogFromBreadcrumb:
       browser.handleNavigateToFullCatalogFromBreadcrumb,

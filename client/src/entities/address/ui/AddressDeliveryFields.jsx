@@ -1,12 +1,12 @@
 import { useEffect, useId, useRef, useState } from "react";
 
-import { fetchAddressSuggestions } from "../api/fetchAddressSuggestions.js";
 import { mapDadataSuggestion } from "../lib/mapDadataSuggestion.js";
 import {
   ADDRESS_LINE_MAX_LENGTH,
   ADDRESS_SUGGEST_DEBOUNCE_MS,
   ADDRESS_SUGGEST_MIN_QUERY_LENGTH,
 } from "../model/constants.js";
+import { useAddressSuggestionsQuery } from "../model/useAddressSuggestionsQuery.js";
 import { ADDRESS_DELIVERY_UI } from "../../../shared/config/appUiCopy.js";
 
 import "./AddressDeliveryFields.css";
@@ -37,16 +37,18 @@ export function AddressDeliveryFields({
 }) {
   const listId = useId();
   const wrapRef = useRef(null);
-  const [suggestions, setSuggestions] = useState(
-    /** @type {import('../model/types.js').AddressSuggestionDto[]} */ ([]),
-  );
+  const [debouncedQuery, setDebouncedQuery] = useState("");
 
   const lineLabel = labels.line ?? ADDRESS_DELIVERY_UI.LABEL_LINE;
+  const trimmedLine = value.line.trim();
+  const suggestEnabled =
+    trimmedLine.length >= ADDRESS_SUGGEST_MIN_QUERY_LENGTH &&
+    !value.selectedFromSuggest;
 
   useEffect(() => {
     const onDocClick = (event) => {
       if (!wrapRef.current?.contains(event.target)) {
-        setSuggestions([]);
+        setDebouncedQuery("");
       }
     };
     document.addEventListener("mousedown", onDocClick);
@@ -54,31 +56,25 @@ export function AddressDeliveryFields({
   }, []);
 
   useEffect(() => {
-    const query = value.line.trim();
-    if (query.length < ADDRESS_SUGGEST_MIN_QUERY_LENGTH || value.selectedFromSuggest) {
-      setSuggestions([]);
+    if (!suggestEnabled) {
+      setDebouncedQuery("");
       return undefined;
     }
 
-    let isCancelled = false;
-    const timer = setTimeout(() => {
-      void (async () => {
-        try {
-          const list = await fetchAddressSuggestions(query);
-          if (isCancelled) return;
-          setSuggestions(list);
-        } catch {
-          if (isCancelled) return;
-          setSuggestions([]);
-        }
-      })();
+    const timer = window.setTimeout(() => {
+      setDebouncedQuery(trimmedLine);
     }, ADDRESS_SUGGEST_DEBOUNCE_MS);
 
     return () => {
-      isCancelled = true;
-      clearTimeout(timer);
+      window.clearTimeout(timer);
     };
-  }, [value.line, value.selectedFromSuggest]);
+  }, [suggestEnabled, trimmedLine]);
+
+  const suggestionsQuery = useAddressSuggestionsQuery({
+    query: debouncedQuery,
+    enabled: suggestEnabled && debouncedQuery.length >= ADDRESS_SUGGEST_MIN_QUERY_LENGTH,
+  });
+  const suggestions = suggestEnabled ? (suggestionsQuery.data ?? []) : [];
 
   const patch = (patchValue) => {
     onChange({ ...EMPTY_VALUE, ...value, ...patchValue, flat: "" });
@@ -101,7 +97,7 @@ export function AddressDeliveryFields({
       geo: mapped.geo,
       selectedFromSuggest: true,
     });
-    setSuggestions([]);
+    setDebouncedQuery("");
   };
 
   const showList =

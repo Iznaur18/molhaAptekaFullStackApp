@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { fetchMyInstallmentSales } from "../../../entities/installment/api/installmentApi.js";
+import { useMyInstallmentSalesQuery } from "../../../entities/installment/model/useMyInstallmentSalesQuery.js";
 import { INSTALLMENT_CONTRACT_STATUS_FILTER_OPTIONS } from "../../../entities/installment/lib/installmentContractStatusFilters.js";
 import { InstallmentContractCard } from "../../../entities/installment/ui/InstallmentContractCard.jsx";
 import { INSTALLMENT_UI } from "../../../shared/config/appUiCopy.js";
@@ -30,43 +30,35 @@ export function InstallmentSalesPage({
   onQueueChanged,
 }) {
   const [statusFilter, setStatusFilter] = useState("");
-  const [phase, setPhase] = useState("loading");
-  const [contracts, setContracts] = useState(
-    /** @type {import('../../../entities/installment/model/types.js').InstallmentContractFromApi[]} */ ([]),
-  );
-  const [error, setError] = useState("");
+  const salesQuery = useMyInstallmentSalesQuery({
+    status: statusFilter,
+    enabled: isAuthorized,
+  });
+
+  const contracts = salesQuery.data ?? [];
+  const phase = !isAuthorized
+    ? "success"
+    : salesQuery.isPending
+      ? "loading"
+      : salesQuery.isError
+        ? "error"
+        : "success";
+  const error =
+    salesQuery.error instanceof Error
+      ? salesQuery.error.message
+      : INSTALLMENT_UI.ERROR_GENERIC;
 
   const reload = useCallback(async () => {
-    if (!isAuthorized) {
-      setContracts([]);
-      setPhase("success");
-      return;
-    }
-    try {
-      const list = await fetchMyInstallmentSales({
-        status: statusFilter,
-      });
-      setContracts(list);
-      setPhase("success");
-      setError("");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : INSTALLMENT_UI.ERROR_GENERIC);
-      setPhase("error");
-    }
-  }, [isAuthorized, statusFilter]);
+    await salesQuery.refetch();
+  }, [salesQuery]);
 
   useRefetchOnVisible(reload, phase === "success" && isAuthorized);
 
   useEffect(() => {
     if (!isAuthorized) {
       onRequestLogin?.();
-      setPhase("success");
-      setContracts([]);
-      return;
     }
-    setPhase("loading");
-    void reload();
-  }, [isAuthorized, onRequestLogin, reload]);
+  }, [isAuthorized, onRequestLogin]);
 
   if (!isAuthorized) {
     return null;
@@ -74,9 +66,7 @@ export function InstallmentSalesPage({
 
   if (phase === "loading") {
     return (
-      <p className="installment-list-page__state">
-        {INSTALLMENT_UI.SALES_PAGE_LOADING}
-      </p>
+      <p className="installment-list-page__state">{INSTALLMENT_UI.SALES_PAGE_LOADING}</p>
     );
   }
 

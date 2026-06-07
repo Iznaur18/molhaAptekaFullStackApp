@@ -1,8 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
-import { fetchCatalogProductsPage } from "../../../entities/product/api/fetchCatalogProductsPage.js";
-import { fetchCurrentUserProfile } from "../../../entities/user/api/fetchCurrentUserProfile.js";
-import { markInAppNotificationsRead } from "../../../entities/user/api/markInAppNotificationsRead.js";
+import { useEnsureCatalogProduct } from "../../../entities/product/model/useEnsureCatalogProduct.js";
+import { useMarkInAppNotificationsReadMutation } from "../../../entities/user/model/useMarkInAppNotificationsReadMutation.js";
 import {
   IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_NEW_PRODUCT,
   IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_PRODUCT_DISCOUNT,
@@ -23,65 +22,56 @@ export const useHomeNotifications = ({
   handleSellerNameClick,
   products,
   setCatalogProductDetails,
+  inAppNotifications,
+  invalidateAuthMe,
+  patchAuthMeNotifications,
 }) => {
-  const [inAppNotifications, setInAppNotifications] = useState(
-    /** @type {import('../../../entities/product-report/model/types.js').UserInAppNotification[]} */ ([]),
-  );
-  const [notificationsPageItems, setNotificationsPageItems] = useState(
-    /** @type {import('../../../entities/product-report/model/types.js').UserInAppNotification[]} */ ([]),
-  );
+  const ensureCatalogProduct = useEnsureCatalogProduct();
+  const { mutate: markNotificationsRead } = useMarkInAppNotificationsReadMutation();
+  const isNotificationsView = mainView === "notifications" && isAuthorized;
+  const markedReadRef = useRef(false);
 
   const refreshInAppNotifications = useCallback(async () => {
     if (!isAuthorized) {
-      setInAppNotifications([]);
       return;
     }
-    try {
-      const { inAppNotifications: notifications } = await fetchCurrentUserProfile();
-      setInAppNotifications(notifications);
-    } catch {
-      setInAppNotifications([]);
-    }
-  }, [isAuthorized]);
+    await invalidateAuthMe();
+  }, [invalidateAuthMe, isAuthorized]);
 
   useInAppNotificationsPoll({
     isAuthorized,
     mainView,
-    refreshInAppNotifications,
   });
 
   useEffect(() => {
-    if (mainView !== "notifications" || !isAuthorized) {
-      setNotificationsPageItems([]);
+    markedReadRef.current = false;
+  }, [isNotificationsView]);
+
+  useEffect(() => {
+    if (!isNotificationsView || inAppNotifications.length === 0 || markedReadRef.current) {
       return undefined;
     }
 
-    let isCancelled = false;
-    void (async () => {
-      try {
-        const { inAppNotifications: list } = await fetchCurrentUserProfile();
-        if (isCancelled) {
-          return;
-        }
-        setNotificationsPageItems(list);
-        if (list.length > 0) {
-          await markInAppNotificationsRead();
-        }
-        if (!isCancelled) {
-          setInAppNotifications([]);
-        }
-      } catch {
-        if (!isCancelled) {
-          setNotificationsPageItems([]);
-          setInAppNotifications([]);
-        }
-      }
-    })();
+    markedReadRef.current = true;
 
-    return () => {
-      isCancelled = true;
-    };
-  }, [mainView, isAuthorized]);
+    markNotificationsRead(undefined, {
+      onSuccess: () => {
+        patchAuthMeNotifications([]);
+        void invalidateAuthMe();
+      },
+      onError: () => {
+        patchAuthMeNotifications([]);
+      },
+    });
+
+    return undefined;
+  }, [
+    inAppNotifications.length,
+    invalidateAuthMe,
+    isNotificationsView,
+    markNotificationsRead,
+    patchAuthMeNotifications,
+  ]);
 
   const handleNotificationsClick = useCallback(() => {
     if (!isAuthorized) {
@@ -92,13 +82,12 @@ export const useHomeNotifications = ({
   }, [goToMainView, isAuthorized, setIsLoginModalOpen]);
 
   const handleNotificationsCleared = useCallback(() => {
-    setInAppNotifications([]);
-    setNotificationsPageItems([]);
-  }, []);
+    patchAuthMeNotifications([]);
+  }, [patchAuthMeNotifications]);
 
   const clearInAppNotifications = useCallback(() => {
-    setInAppNotifications([]);
-  }, []);
+    patchAuthMeNotifications([]);
+  }, [patchAuthMeNotifications]);
 
   /**
    * @param {import('../../../entities/product-report/model/types.js').UserInAppNotification} item
@@ -120,26 +109,25 @@ export const useHomeNotifications = ({
           setCatalogProductDetails(inList);
           return;
         }
-        void (async () => {
-          try {
-            const { products: pageProducts } = await fetchCatalogProductsPage({
-              page: 1,
-              limit: 100,
-            });
-            const found = pageProducts.find(
-              (p) => String(p._id) === String(item.productId),
-            );
-            if (found) {
-              setCatalogProductDetails(found);
-            }
-          } catch {
+        void ensureCatalogProduct(String(item.productId))
+          .then((found) => {
+            setCatalogProductDetails(found);
+          })
+          .catch(() => {
             // каталог открыт без модалки
-          }
-        })();
+          });
       }
     },
-    [goToMainView, handleSellerNameClick, products, setCatalogProductDetails],
+    [
+      ensureCatalogProduct,
+      goToMainView,
+      handleSellerNameClick,
+      products,
+      setCatalogProductDetails,
+    ],
   );
+
+  const notificationsPageItems = isNotificationsView ? inAppNotifications : [];
 
   return {
     inAppNotifications,

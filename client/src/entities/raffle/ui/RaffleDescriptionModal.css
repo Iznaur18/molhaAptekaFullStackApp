@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  background: rgba(8, 16, 30, 0.5);
+  background: var(--iz-color-overlay-midnight);
 }
 
 .raffle-description-modal {
@@ -16,10 +16,10 @@
   width: min(100%, 32rem);
   max-height: min(80vh, 28rem);
   padding: 1rem 1.1rem;
-  border: 2px solid #c4b5fd;
+  border: 2px solid var(--iz-color-premium-purple-muted);
   border-radius: 16px;
-  background: linear-gradient(135deg, #faf5ff 0%, #fff 55%, #fff 100%);
-  box-shadow: 0 12px 38px rgb(124 58 237 / 22%);
+  background: var(--iz-gradient-raffle-modal);
+  box-shadow: 0 12px 38px var(--iz-color-accent-purple-shadow-strong);
 }
 
 .raffle-description-modal__header {
@@ -33,16 +33,16 @@
   margin: 0;
   font-size: 1.05rem;
   line-height: 1.25;
-  color: #5b21b6;
+  color: var(--iz-color-accent-purple-text);
 }
 
 .raffle-description-modal__close {
   flex-shrink: 0;
   padding: 0.35rem 0.65rem;
-  border: 1px solid #7c3aed;
+  border: 1px solid var(--iz-color-accent-purple);
   border-radius: 8px;
-  background: #ede9fe;
-  color: #5b21b6;
+  background: var(--iz-color-accent-purple-soft);
+  color: var(--iz-color-accent-purple-text);
   font: inherit;
   font-size: 0.82rem;
   font-weight: 600;
