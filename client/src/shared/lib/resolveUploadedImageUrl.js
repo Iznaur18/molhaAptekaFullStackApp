@@ -131,6 +131,30 @@ export function isStoredUploadOrHttpImageUrl(raw) {
 }
 
 /**
+ * Канонический путь `/uploads/...` для сохранения в БД (без origin SPA).
+ *
+ * @param {string} raw
+ * @returns {string}
+ */
+export function normalizeUploadUrlForStorage(raw) {
+  const url = String(raw ?? "").trim();
+  if (!url) {
+    return "";
+  }
+
+  const uploadPathMatch = url.match(UPLOAD_ASSET_PATH_RE);
+  if (uploadPathMatch) {
+    return uploadPathMatch[1];
+  }
+
+  if (url.startsWith("/uploads/")) {
+    return url;
+  }
+
+  return url;
+}
+
+/**
  * @param {string} raw
  * @returns {string}
  */

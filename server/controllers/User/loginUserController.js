@@ -31,6 +31,7 @@ import {
 } from "../../utils/profileImageFocus.js";
 import { getUnreadInAppNotificationsForUser } from "../../utils/userInAppNotifications.js";
 import { buildUserProfileMongoUpdate } from "../../utils/buildUserProfileMongoUpdate.js";
+import { normalizeStoredUploadUrl } from "../../utils/buildPublicUploadUrl.js";
 import { rejectPendingDataConfirmationForUser } from "../../utils/userDataConfirmationHelpers.js";
 import {
   applyPremiumExpiryAdminUpdate,
@@ -241,6 +242,10 @@ export const userUpdateProfileController = async (req, res) => {
           updateData[field] = typeof value === "string" ? value.trim() : value;
         } else if (field === "userAddressGeo") {
           updateData[field] = value;
+        } else if (field === "userAvatarUrl") {
+          const trimmed = typeof value === "string" ? value.trim() : "";
+          updateData[field] =
+            trimmed === "" ? trimmed : normalizeStoredUploadUrl(trimmed);
         } else if (field === "userAvatarFocus") {
           updateData[field] = normalizeUserAvatarFocus(value);
         } else if (field === "userBackgroundFocus") {

@@ -23,6 +23,7 @@ import { up as catalogModerationOrderIndexesUp } from "./20260611-catalog-modera
 import { up as productSoldQuantityDenormUp } from "./20260612-product-sold-quantity-denorm.js";
 import { up as productPromotionTiersResetUp } from "./20260613-product-promotion-tiers-reset.js";
 import { up as normalizeProductUploadUrlsUp } from "./20260614-normalize-product-upload-urls.js";
+import { up as productCategoryRootsUp } from "./20260615-product-category-roots.js";
 
 export const MIGRATIONS = [
   {
@@ -149,5 +150,10 @@ export const MIGRATIONS = [
     id: "20260614-normalize-product-upload-urls",
     description: "Canonicalize productImageUrls /uploads paths (strip dev LAN hosts)",
     up: normalizeProductUploadUrlsUp,
+  },
+  {
+    id: "20260615-product-category-roots",
+    description: "Seed all catalog root ProductCategory nodes + display rows",
+    up: productCategoryRootsUp,
   },
 ];

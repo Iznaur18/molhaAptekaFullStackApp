@@ -8,7 +8,7 @@ export const USER_PROFILE_PRODUCTS_PAGE_SIZE = 5;
 export const USER_PROFILE_PRODUCTS_API_LIMIT_MAX = 20;
 
 /**
- * `GET /user/:userId/products` — товары продавца в каталоге (Bearer).
+ * `GET /user/:userId/products` — товары продавца в каталоге (JWT опционален).
  *
  * @param {string} userId
  * @param {{ page?: number; limit?: number }} [params]

@@ -17,15 +17,17 @@ import {
   API_CLIENT_UI,
 } from "../../../shared/config/appUiCopy.js";
 
-import {
-  ListPageFilter,
-  ListPageFilterBar,
-  ListPageFilterSelect,
-} from "../../../shared/ui/ListPageFilterBar/ListPageFilterBar.jsx";
-
 import "./AdminOrdersPage.css";
 
 const ALL_STATUSES = "";
+
+const ADMIN_ORDERS_STATUS_FILTER_OPTIONS = [
+  { value: ALL_STATUSES, label: ADMIN_ORDERS_PAGE_UI.STATUS_FILTER_ALL },
+  ...ORDER_STATUSES.map((status) => ({
+    value: status,
+    label: ORDER_STATUS_LABEL_RU[status],
+  })),
+];
 
 export function AdminOrdersPage() {
   const queryClient = useQueryClient();
@@ -81,24 +83,11 @@ export function AdminOrdersPage() {
 
   return (
     <div className="admin-orders-page">
-      <ListPageFilterBar>
-        <ListPageFilter label={ADMIN_ORDERS_PAGE_UI.STATUS_FILTER_LABEL}>
-          <ListPageFilterSelect
-            value={statusFilter}
-            onChange={(event) => setStatusFilter(event.target.value)}
-          >
-            <option value={ALL_STATUSES}>
-              {ADMIN_ORDERS_PAGE_UI.STATUS_FILTER_ALL}
-            </option>
-            {ORDER_STATUSES.map((status) => (
-              <option key={status} value={status}>
-                {ORDER_STATUS_LABEL_RU[status]}
-              </option>
-            ))}
-          </ListPageFilterSelect>
-        </ListPageFilter>
-      </ListPageFilterBar>
-
+      <AdminOrdersToolbar
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        ordersCount={orders.length}
+      />
       <AdminOrdersBody
         phase={phase}
         orders={orders}
@@ -108,6 +97,54 @@ export function AdminOrdersPage() {
         statusError={statusError}
         onStatusChange={handleStatusChange}
       />
+    </div>
+  );
+}
+
+/**
+ * @param {{
+ *   statusFilter: string;
+ *   onStatusFilterChange: (value: string) => void;
+ *   ordersCount: number;
+ * }} props
+ */
+function AdminOrdersToolbar({ statusFilter, onStatusFilterChange, ordersCount }) {
+  return (
+    <div className="admin-orders-page__toolbar">
+      <div className="admin-orders-page__toolbar-head">
+        <h3 className="admin-orders-page__heading">{ADMIN_ORDERS_PAGE_UI.TITLE}</h3>
+        <span className="admin-orders-page__count">
+          {ADMIN_ORDERS_PAGE_UI.COUNT(ordersCount)}
+        </span>
+      </div>
+
+      <div
+        className="admin-orders-page__status-chips"
+        role="group"
+        aria-label={ADMIN_ORDERS_PAGE_UI.STATUS_FILTER_LABEL}
+      >
+        {ADMIN_ORDERS_STATUS_FILTER_OPTIONS.map((option) => {
+          const isActive = statusFilter === option.value;
+
+          return (
+            <button
+              key={option.value || "all"}
+              type="button"
+              className={[
+                "admin-orders-page__status-chip",
+                isActive ? "admin-orders-page__status-chip_active" : "",
+                option.value ? `admin-orders-page__status-chip_${option.value}` : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              aria-pressed={isActive}
+              onClick={() => onStatusFilterChange(option.value)}
+            >
+              {option.label}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -138,10 +175,7 @@ function AdminOrdersBody({
 
   if (phase === "error") {
     return (
-      <p
-        className="admin-orders-page__state admin-orders-page__state_error"
-        role="alert"
-      >
+      <p className="admin-orders-page__state admin-orders-page__state_error" role="alert">
         {error}
       </p>
     );
@@ -162,6 +196,7 @@ function AdminOrdersBody({
       {orders.map((order) => (
         <li key={order._id} className="admin-orders-page__item" role="listitem">
           <OrderCard
+            compact
             order={order}
             showBuyer
             statusSlot={

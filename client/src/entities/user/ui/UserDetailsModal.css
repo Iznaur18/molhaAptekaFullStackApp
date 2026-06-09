@@ -206,50 +206,6 @@
   opacity: 0.75;
 }
 
-.user-details-modal__list {
-  margin: 0;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.65rem;
-}
-
-.user-details-modal__row {
-  margin: 0;
-  padding: 0.7rem 0.75rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-canvas-text) 10%, transparent);
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--iz-color-canvas-text) 3%, transparent);
-}
-
-.user-details-modal_register .user-details-modal__row {
-  border-color: var(--iz-color-border);
-  background: var(--iz-color-surface-muted);
-}
-
-.user-details-modal__label {
-  margin: 0;
-  font-size: 0.8rem;
-  font-weight: 600;
-  opacity: 0.75;
-}
-
-.user-details-modal__value {
-  margin: 0.35rem 0 0;
-  font-size: 0.9rem;
-  line-height: 1.45;
-  word-break: break-word;
-}
-
-@media (max-width: 740px) {
-  .user-details-modal__list {
-    grid-template-columns: 1fr;
-  }
-}
-
-.user-details-modal__value a {
-  color: inherit;
-}
-
 .user-details-modal__state {
   margin: 0 0 0.5rem;
   font-size: 0.95rem;

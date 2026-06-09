@@ -146,9 +146,9 @@ export function CategoryTreeAdminPage() {
         slug,
         labelRu: newLabelRu.trim(),
         parentId: newParentId.trim() || null,
-        isLeaf: newIsLeaf,
-        searchKeywords: parseKeywordsCsv(newKeywordsCsv),
-        legacyProductCategory: newLegacySlug.trim() || null,
+        isLeaf: newParentId.trim() ? newIsLeaf : false,
+        searchKeywords: newParentId.trim() ? parseKeywordsCsv(newKeywordsCsv) : [],
+        legacyProductCategory: newParentId.trim() ? newLegacySlug.trim() || null : null,
       });
       updateRows((prev) => [...prev, created]);
       resetCreateForm();
@@ -220,6 +220,8 @@ export function CategoryTreeAdminPage() {
 
   const displayError = actionError || (phase === "error" ? error : "");
 
+  const isCreateRoot = !newParentId.trim();
+
   const createPanel = (
     <form className="admin-panel__create-form" onSubmit={handleCreate}>
       <div className="admin-panel__form-grid">
@@ -228,7 +230,7 @@ export function CategoryTreeAdminPage() {
           <input
             value={newSlug}
             onChange={(e) => setNewSlug(e.target.value)}
-            placeholder="electronics-headphones"
+            placeholder="automobiles"
             required
           />
           <small className="admin-panel__field-hint">
@@ -254,36 +256,40 @@ export function CategoryTreeAdminPage() {
             ))}
           </select>
         </label>
-        <label className="admin-panel__field admin-panel__field_row">
-          <input
-            type="checkbox"
-            checked={newIsLeaf}
-            onChange={(e) => setNewIsLeaf(e.target.checked)}
-          />
-          <span>{CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_LEAF}</span>
-        </label>
-        <label className="admin-panel__field admin-panel__field_full">
-          <span>{CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_KEYWORDS}</span>
-          <input
-            value={newKeywordsCsv}
-            onChange={(e) => setNewKeywordsCsv(e.target.value)}
-            placeholder={CATEGORY_TREE_ADMIN_PAGE_UI.KEYWORDS_PLACEHOLDER}
-          />
-        </label>
-        <label className="admin-panel__field">
-          <span>{CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_LEGACY}</span>
-          <select
-            value={newLegacySlug}
-            onChange={(e) => setNewLegacySlug(e.target.value)}
-          >
-            <option value="">{CATEGORY_TREE_ADMIN_PAGE_UI.LEGACY_NONE}</option>
-            {PRODUCT_CATEGORIES.map((slug) => (
-              <option key={slug} value={slug}>
-                {PRODUCT_CATEGORY_LABEL_RU[slug] ?? slug}
-              </option>
-            ))}
-          </select>
-        </label>
+        {isCreateRoot ? null : (
+          <>
+            <label className="admin-panel__field admin-panel__field_row">
+              <input
+                type="checkbox"
+                checked={newIsLeaf}
+                onChange={(e) => setNewIsLeaf(e.target.checked)}
+              />
+              <span>{CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_LEAF}</span>
+            </label>
+            <label className="admin-panel__field admin-panel__field_full">
+              <span>{CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_KEYWORDS}</span>
+              <input
+                value={newKeywordsCsv}
+                onChange={(e) => setNewKeywordsCsv(e.target.value)}
+                placeholder={CATEGORY_TREE_ADMIN_PAGE_UI.KEYWORDS_PLACEHOLDER}
+              />
+            </label>
+            <label className="admin-panel__field">
+              <span>{CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_LEGACY}</span>
+              <select
+                value={newLegacySlug}
+                onChange={(e) => setNewLegacySlug(e.target.value)}
+              >
+                <option value="">{CATEGORY_TREE_ADMIN_PAGE_UI.LEGACY_NONE}</option>
+                {PRODUCT_CATEGORIES.map((slug) => (
+                  <option key={slug} value={slug}>
+                    {PRODUCT_CATEGORY_LABEL_RU[slug] ?? slug}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </>
+        )}
       </div>
       <div className="admin-panel__create-actions">
         <button

@@ -494,9 +494,14 @@ export const ORDER_CARD_UI = {
 /** Страница «Мои покупки» */
 export const MY_ORDERS_PAGE_UI = {
   TITLE: "Мои покупки",
+  /** @param {number} count */
+  COUNT: (count) => `${count} заказов`,
+  STATUS_FILTER_LABEL: "Фильтр по статусу",
+  STATUS_FILTER_ALL: "Все статусы",
   LOADING: "Загрузка покупок…",
   PRODUCT_DETAILS_LOADING: "Открываем карточку товара…",
   EMPTY: "У вас пока нет покупок.",
+  EMPTY_BY_FILTER: "По выбранному статусу покупок нет.",
   /** @param {number} points */
   LOYALTY_POINTS_EARNED: (points) => `+${points} ${pluralizeRuBall(points)} лояльности`,
 };
@@ -524,8 +529,14 @@ export const PRODUCT_MODERATION_PAGE_UI = {
 
 /** Жалобы на товары (staff) */
 export const PRODUCT_REPORTS_PAGE_UI = {
+  TITLE: "Жалобы",
+  /** @param {number} count */
+  COUNT: (count) => `${count} групп`,
+  SECTION_FILTER_LABEL: "Раздел",
+  SECTION_FILTER_ALL: "Все",
   LOADING: "Загрузка жалоб…",
   EMPTY: "Нет необработанных жалоб.",
+  EMPTY_BY_FILTER: "В выбранном разделе жалоб нет.",
   SECTION_PRODUCTS: "Товары",
   SECTION_STORIES: "Сторисы",
   REPORTS_COUNT_LABEL: (count) => `Жалоб: ${count}`,
@@ -714,6 +725,8 @@ export const SUBSCRIPTIONS_PAGE_UI = {
 /** Страница «Мои продажи» */
 export const MY_SALES_PAGE_UI = {
   TITLE: "Мои продажи",
+  /** @param {number} count */
+  COUNT: (count) => `${count} заказов`,
   LOADING: "Загрузка продаж…",
   EMPTY: "У вас пока нет продаж.",
   EMPTY_BY_FILTER: "По выбранному статусу продаж нет.",
@@ -728,6 +741,8 @@ export const MY_SALES_PAGE_UI = {
 /** Страница «Все заказы» (админ) */
 export const ADMIN_ORDERS_PAGE_UI = {
   TITLE: "Все заказы",
+  /** @param {number} count */
+  COUNT: (count) => `${count} заказов`,
   LOADING: "Загрузка заказов…",
   EMPTY: "Заказов пока нет.",
   EMPTY_BY_FILTER: "По выбранному статусу заказов нет.",
@@ -838,6 +853,10 @@ export const CREATE_PRODUCT_MODAL_UI = {
   ARIA_CLOSE_BACKDROP_EDIT: "Закрыть окно редактирования товара",
   TITLE: "Новый товар",
   TITLE_EDIT: "Редактирование товара",
+  SECTION_BASIC: "Основное",
+  SECTION_MEDIA: "Фото и видео",
+  SECTION_COMMERCE: "Цена и продажа",
+  CANCEL: "Отмена",
   LABEL_NAME: "Название",
   LABEL_DESCRIPTION: "Описание (до 2000 символов)",
   CHARS_USED: (n, max) => `Символов: ${n} / ${max}`,
@@ -1080,6 +1099,12 @@ export const INSTALLMENT_UI = {
   MESSAGE_PLACEHOLDER: "Сообщение…",
   ACTION_PENDING: "Сохраняем…",
   PAYMENTS_PAGE_TITLE: "Мои рассрочки",
+  /** @param {number} count */
+  COUNT_CONTRACTS: (count) => `${count} договоров`,
+  /** @param {number} count */
+  COUNT_PROGRAMS: (count) => `${count} программ`,
+  /** @param {number} count */
+  COUNT_DISPUTES: (count) => `${count} споров`,
   PAYMENTS_PAGE_LOADING: "Загрузка рассрочек…",
   PAYMENTS_PAGE_EMPTY: "У вас пока нет рассрочек.",
   PAYMENTS_PAGE_EMPTY_BY_FILTER: "По выбранному статусу рассрочек нет.",
@@ -1102,6 +1127,8 @@ export const INSTALLMENT_UI = {
   DISPUTES_PAGE_TITLE: "Споры по рассрочке",
   DISPUTES_PAGE_LOADING: "Загрузка споров…",
   DISPUTES_PAGE_EMPTY: "Нет открытых споров.",
+  DISPUTE_CONTRACT_LABEL: "Контракт",
+  DISPUTE_REASON_LABEL: "Причина",
   DISPUTE_RESOLVE_NOTE: "Комментарий staff",
   DISPUTE_ACTION_CLOSE: "Закрыть договор",
   DISPUTE_ACTION_CANCEL: "Отменить договор",
@@ -1441,6 +1468,11 @@ export const PREMIUM_PAGE_UI = {
 /** «Мой профиль» в шапке модалки и выход */
 export const MY_PROFILE_PAGE_UI = {
   TAB_TITLE: "Мой профиль",
+  TAB_OVERVIEW: "Обзор",
+  NAV_ARIA: "Разделы профиля",
+  NAV_SECTION_TRADE: "Торговля",
+  NAV_SECTION_ACCOUNT: "Аккаунт",
+  NAV_SECTION_STAFF: "Модерация",
   TAB_CREATE_RAFFLE: "Создать розыгрыш",
   TAB_MY_PRODUCTS: "Мои товары",
   TAB_MY_SALES: "Мои продажи",
@@ -1581,7 +1613,7 @@ export const SEARCH_SYNONYMS_ADMIN_PAGE_UI = {
 /** Админка: дерево ProductCategory */
 export const CATEGORY_TREE_ADMIN_PAGE_UI = {
   TITLE: "Дерево категорий",
-  HINT: "Узлы визарда и фильтра каталога. Смена родителя или slug пересчитывает пути у потомков.",
+  HINT: "Корневые категории — плитки на главной каталога. Подкатегории — визард при размещении товара.",
   SEARCH_PLACEHOLDER: "Название, slug, ключевые слова…",
   LOADING: "Загрузка…",
   LOAD_ERROR: "Не удалось загрузить категории",

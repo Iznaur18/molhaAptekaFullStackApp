@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { USER_STORY_UI } from "../../../shared/config/appUiCopy.js";
 import { useUserStoryMutations } from "../model/useUserStoryMutations.js";
@@ -27,7 +27,6 @@ import "./UserStoryViewer.css";
  *   onClose: () => void;
  *   onOpenProfile: (userId: string) => void;
  *   onStoryDeleted?: () => void;
- *   onStoryViewed?: () => void;
  * }} props
  */
 export function UserStoryViewer({
@@ -38,9 +37,10 @@ export function UserStoryViewer({
   onClose,
   onOpenProfile,
   onStoryDeleted,
-  onStoryViewed,
 }) {
   const { deleteMutation, markViewedMutation } = useUserStoryMutations();
+  const markStoryViewed = markViewedMutation.mutate;
+  const markedViewedStoryIdsRef = useRef(/** @type {Set<string>} */ (new Set()));
   const [activeIndex, setActiveIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
@@ -113,12 +113,24 @@ export function UserStoryViewer({
   });
 
   useEffect(() => {
+    if (!isOpen) {
+      markedViewedStoryIdsRef.current.clear();
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
     if (!isOpen || !activeStory || !isAuthorized) {
       return;
     }
-    void markViewedMutation.mutate(activeStory._id);
-    onStoryViewed?.();
-  }, [activeStory?._id, isAuthorized, isOpen, markViewedMutation, onStoryViewed]);
+
+    const storyId = String(activeStory._id);
+    if (markedViewedStoryIdsRef.current.has(storyId)) {
+      return;
+    }
+
+    markedViewedStoryIdsRef.current.add(storyId);
+    markStoryViewed(storyId);
+  }, [activeStory?._id, isAuthorized, isOpen, markStoryViewed]);
 
   useEffect(() => {
     if (
@@ -205,7 +217,7 @@ export function UserStoryViewer({
                 type="button"
                 className="user-story-viewer__edge user-story-viewer__edge_prev"
                 aria-label={USER_STORY_UI.PREV_STORY}
-                disabled={activeIndex <= 0}
+                disabled={isReportOpen || activeIndex <= 0}
                 onClick={handlePrev}
               />
             ) : null}
@@ -327,7 +339,7 @@ export function UserStoryViewer({
                 type="button"
                 className="user-story-viewer__edge user-story-viewer__edge_next"
                 aria-label={USER_STORY_UI.NEXT_STORY}
-                disabled={activeIndex >= stories.length - 1}
+                disabled={isReportOpen || activeIndex >= stories.length - 1}
                 onClick={handleNext}
               />
             ) : null}

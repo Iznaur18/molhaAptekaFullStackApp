@@ -20,6 +20,18 @@ export const PROFILE_TAB_INSTALLMENT_SALES = "installment-sales";
 export const PROFILE_TAB_INSTALLMENT_MODERATION = "installment-moderation";
 export const PROFILE_TAB_INSTALLMENT_DISPUTES = "installment-disputes";
 
+export const PROFILE_FULL_WIDTH_CATALOG_TABS = new Set([
+  PROFILE_TAB_MY_PRODUCTS,
+  PROFILE_TAB_PRODUCT_MODERATION,
+]);
+
+/**
+ * @param {string} tab
+ */
+export function isFullWidthCatalogProfileTab(tab) {
+  return PROFILE_FULL_WIDTH_CATALOG_TABS.has(tab);
+}
+
 export const PROFILE_TAB_VALUES = [
   PROFILE_TAB_OVERVIEW,
   PROFILE_TAB_MY_PRODUCTS,

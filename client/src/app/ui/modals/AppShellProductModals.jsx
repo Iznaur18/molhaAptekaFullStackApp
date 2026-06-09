@@ -8,9 +8,12 @@ import {
   canSellerEditProduct,
   canSellerToggleCatalogVisibility,
 } from "../../../entities/product/lib/getProductModerationUi.js";
+import { Flag } from "lucide-react";
+
 import { CreateRaffleModal } from "../../../entities/raffle/ui/CreateRaffleModal.jsx";
 import { ReportProductModal } from "../../../entities/product-report/ui/ReportProductModal.jsx";
 import { PRODUCT_REPORT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
+import { AppIcon } from "../../../shared/ui/icon/index.js";
 
 /** @typedef {import('../../../entities/product/model/types.js').ProductFromApi} ProductFromApi */
 
@@ -182,7 +185,7 @@ export function AppShellProductModals({
           canReportCatalogProduct ? (
             <button
               type="button"
-              className="product-details-modal__report-btn"
+              className="product-details-modal__footer-btn product-details-modal__footer-btn--report"
               disabled={catalogProductHasPendingReport}
               onClick={() => {
                 if (!isAuthorized) {
@@ -192,6 +195,7 @@ export function AppShellProductModals({
                 setIsReportProductModalOpen(true);
               }}
             >
+              <AppIcon icon={Flag} size="sm" strokeWidth={2.15} />
               {catalogProductHasPendingReport
                 ? PRODUCT_REPORT_MODAL_UI.ALREADY_REPORTED
                 : PRODUCT_REPORT_MODAL_UI.REPORT_BUTTON}

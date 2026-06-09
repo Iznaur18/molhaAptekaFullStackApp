@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useRefetchOnVisible } from "../../../shared/lib/useRefetchOnVisible.js";
 
@@ -9,6 +9,8 @@ import { useOrderMutations } from "../../../entities/order/model/useOrderMutatio
 import {
   ORDER_STATUS_CANCELLED,
   ORDER_STATUS_CONFIRMED,
+  ORDER_STATUSES,
+  ORDER_STATUS_LABEL_RU,
 } from "../../../entities/order/model/constants.js";
 import { OrderCard } from "../../../entities/order/ui/OrderCard.jsx";
 import { isCurrentUserProductSeller } from "../../../entities/product/lib/isCurrentUserProductSeller.js";
@@ -51,9 +53,17 @@ export function MyOrdersPage({
     ordersQuery.error instanceof Error
       ? ordersQuery.error.message
       : API_CLIENT_UI.FETCH_MY_ORDERS_FALLBACK;
+  const [statusFilter, setStatusFilter] = useState("");
   const [pendingActionKey, setPendingActionKey] = useState(null);
   const [itemActionErrors, setItemActionErrors] = useState({});
   const [loyaltyFlash, setLoyaltyFlash] = useState("");
+  const filteredOrders = useMemo(() => {
+    if (!statusFilter) {
+      return orders;
+    }
+
+    return orders.filter((order) => order.status === statusFilter);
+  }, [orders, statusFilter]);
 
   const {
     catalogProduct,
@@ -184,31 +194,57 @@ export function MyOrdersPage({
     );
   }
 
+  const emptyMessage =
+    orders.length === 0
+      ? MY_ORDERS_PAGE_UI.EMPTY
+      : statusFilter
+        ? MY_ORDERS_PAGE_UI.EMPTY_BY_FILTER
+        : MY_ORDERS_PAGE_UI.EMPTY;
+
   if (orders.length === 0) {
-    return <p className="my-orders-page__state">{MY_ORDERS_PAGE_UI.EMPTY}</p>;
+    return (
+      <div className="my-orders-page">
+        <OrdersToolbar
+          statusFilter={statusFilter}
+          onStatusFilterChange={setStatusFilter}
+          ordersCount={0}
+        />
+        <p className="my-orders-page__state">{emptyMessage}</p>
+      </div>
+    );
   }
 
   return (
-    <>
+    <div className="my-orders-page">
+      <OrdersToolbar
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        ordersCount={filteredOrders.length}
+      />
       {loyaltyFlash ? (
         <p className="my-orders-page__loyalty-flash" role="status">
           {loyaltyFlash}
         </p>
       ) : null}
-      <ul className="my-orders-page__list" role="list">
-        {orders.map((order) => (
-          <li key={order._id} className="my-orders-page__item" role="listitem">
-            <OrderCard
-              order={order}
-              onProductClick={openCatalogProductFromOrderLine}
-              onConfirmDelivered={handleConfirmDelivered}
-              onCancelItem={handleCancelItem}
-              pendingActionKey={pendingActionKey}
-              itemActionErrors={itemActionErrors}
-            />
-          </li>
-        ))}
-      </ul>
+      {filteredOrders.length === 0 ? (
+        <p className="my-orders-page__state">{emptyMessage}</p>
+      ) : (
+        <ul className="my-orders-page__list" role="list">
+          {filteredOrders.map((order) => (
+            <li key={order._id} className="my-orders-page__item" role="listitem">
+              <OrderCard
+                order={order}
+                compact
+                onProductClick={openCatalogProductFromOrderLine}
+                onConfirmDelivered={handleConfirmDelivered}
+                onCancelItem={handleCancelItem}
+                pendingActionKey={pendingActionKey}
+                itemActionErrors={itemActionErrors}
+              />
+            </li>
+          ))}
+        </ul>
+      )}
       {catalogProductPhase === "loading" ? (
         <p className="my-orders-page__product-loading" role="status">
           {MY_ORDERS_PAGE_UI.PRODUCT_DETAILS_LOADING}
@@ -230,6 +266,60 @@ export function MyOrdersPage({
         onRequestLogin={onRequestLogin}
         currentUserId={currentUserId}
       />
-    </>
+    </div>
+  );
+}
+
+const ORDERS_STATUS_FILTER_OPTIONS = [
+  { value: "", label: MY_ORDERS_PAGE_UI.STATUS_FILTER_ALL },
+  ...ORDER_STATUSES.map((status) => ({
+    value: status,
+    label: ORDER_STATUS_LABEL_RU[status],
+  })),
+];
+
+/**
+ * @param {{
+ *   statusFilter: string;
+ *   onStatusFilterChange: (value: string) => void;
+ *   ordersCount: number;
+ * }} props
+ */
+function OrdersToolbar({ statusFilter, onStatusFilterChange, ordersCount }) {
+  return (
+    <div className="my-orders-page__toolbar">
+      <div className="my-orders-page__toolbar-head">
+        <h3 className="my-orders-page__heading">{MY_ORDERS_PAGE_UI.TITLE}</h3>
+        <span className="my-orders-page__count">{MY_ORDERS_PAGE_UI.COUNT(ordersCount)}</span>
+      </div>
+
+      <div
+        className="my-orders-page__status-chips"
+        role="group"
+        aria-label={MY_ORDERS_PAGE_UI.STATUS_FILTER_LABEL}
+      >
+        {ORDERS_STATUS_FILTER_OPTIONS.map((option) => {
+          const isActive = statusFilter === option.value;
+
+          return (
+            <button
+              key={option.value || "all"}
+              type="button"
+              className={[
+                "my-orders-page__status-chip",
+                isActive ? "my-orders-page__status-chip_active" : "",
+                option.value ? `my-orders-page__status-chip_${option.value}` : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              aria-pressed={isActive}
+              onClick={() => onStatusFilterChange(option.value)}
+            >
+              {option.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 }

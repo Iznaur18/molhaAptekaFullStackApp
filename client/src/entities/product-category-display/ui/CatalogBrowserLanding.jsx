@@ -11,8 +11,9 @@ import "./CatalogFeedTilesGrid.css";
  *   isLoading: boolean;
  *   errorMessage: string | null;
  *   onFeedTileClick: (tile: import('../lib/buildCatalogFeedTiles.js').CatalogFeedTile) => void;
- *   onCategoryClick: (categorySlug: import('../../product/model/types.js').ProductCategory) => void;
- *   onEditCategoryClick: (categorySlug: import('../../product/model/types.js').ProductCategory) => void;
+ *   categoryRoots: import('../../product-category-tree/model/types.js').ProductCategoryNode[];
+ *   onCategoryClick: (item: import('../model/types.js').ResolvedProductCategoryDisplay) => void;
+ *   onEditCategoryClick: (categorySlug: string) => void;
  *   feedTileDisplays: import('../model/types.js').ProductCatalogFeedTileDisplayFromApi[];
  *   onEditFeedTileClick: (tileKey: string) => void;
  * }} props
@@ -20,6 +21,7 @@ import "./CatalogFeedTilesGrid.css";
 export function CatalogBrowserLanding({
   displays,
   feedTileDisplays,
+  categoryRoots,
   isAdmin,
   isLoading,
   errorMessage,
@@ -45,6 +47,7 @@ export function CatalogBrowserLanding({
         </h2>
         <CatalogCategoriesGrid
           displays={displays}
+          categoryRoots={categoryRoots}
           isAdmin={isAdmin}
           isLoading={isLoading}
           errorMessage={errorMessage}

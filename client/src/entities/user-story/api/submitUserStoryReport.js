@@ -1,4 +1,5 @@
 import { apiClient } from "../../../shared/api/index.js";
+import { resolveApiClientErrorMessage } from "../../../shared/api/resolveApiClientErrorMessage.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 
 /**
@@ -6,9 +7,14 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
  * @param {{ reportText: string }} payload
  */
 export async function submitUserStoryReport(storyId, payload) {
+  const normalizedStoryId = String(storyId ?? "").trim();
+  if (!normalizedStoryId) {
+    throw new Error("Не удалось определить сторис");
+  }
+
   try {
     const { data } = await apiClient.post(
-      `/user/stories/${encodeURIComponent(storyId)}/report`,
+      `/user/stories/${encodeURIComponent(normalizedStoryId)}/report`,
       payload,
     );
 
@@ -18,8 +24,8 @@ export async function submitUserStoryReport(storyId, payload) {
 
     return data.data;
   } catch (e) {
-    const message =
-      e?.response?.data?.message ?? e?.message ?? "Не удалось отправить жалобу";
-    throw new Error(message);
+    throw new Error(
+      resolveApiClientErrorMessage(e, "Не удалось отправить жалобу"),
+    );
   }
 }

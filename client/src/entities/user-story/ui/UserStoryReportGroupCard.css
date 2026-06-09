@@ -134,3 +134,75 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+.user-story-report-group-card--compact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 0.55rem;
+  border-color: color-mix(in srgb, var(--iz-color-border) 85%, var(--iz-color-danger-soft));
+  background: linear-gradient(
+    180deg,
+    var(--iz-color-surface) 0%,
+    var(--iz-color-surface-muted) 100%
+  );
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--iz-color-canvas-text) 5%, transparent);
+}
+
+.user-story-report-group-card--compact .user-story-report-group-card__header {
+  gap: 0.5rem;
+  margin-bottom: 0;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--iz-color-surface-subtle);
+}
+
+.user-story-report-group-card--compact .user-story-report-group-card__preview {
+  width: min(140px, 42%);
+  margin-bottom: 0;
+  border-radius: 0.5rem;
+}
+
+.user-story-report-group-card--compact .user-story-report-group-card__links {
+  gap: 0.4rem;
+  margin-bottom: 0;
+}
+
+.user-story-report-group-card--compact .user-story-report-group-card__reports {
+  margin-bottom: 0;
+}
+
+.user-story-report-group-card--compact .user-story-report-group-card__report {
+  padding: 0.3rem 0;
+}
+
+.user-story-report-group-card--compact .user-story-report-group-card__report-meta {
+  margin: 0 0 0.15rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.user-story-report-group-card--compact .user-story-report-group-card__staff-label {
+  gap: 0.2rem;
+}
+
+.user-story-report-group-card--compact .user-story-report-group-card__staff-note {
+  min-height: 2.75rem;
+  padding: 0.4rem 0.5rem;
+}
+
+.user-story-report-group-card--compact .user-story-report-group-card__error {
+  margin: 0;
+}
+
+.user-story-report-group-card--compact .user-story-report-group-card__actions {
+  gap: 0.3rem;
+  margin-top: 0;
+}
+
+.user-story-report-group-card--compact .user-story-report-group-card__action {
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.4rem;
+}

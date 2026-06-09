@@ -17,13 +17,9 @@ const parsePageLimit = (query) => {
   return { page, limit };
 };
 
-/** `GET /user/:userIdClient/products` — товары продавца в каталоге (JWT). */
+/** `GET /user/:userIdClient/products` — товары продавца в каталоге (публично, JWT опционален). */
 export const getUserProductsController = async (req, res) => {
   try {
-    if (!req.userId) {
-      return errorRes(res, 401, "Требуется авторизация");
-    }
-
     const targetUserId = req.params.userIdClient;
     const targetUser = await UserModel.findById(targetUserId).lean();
 
@@ -34,7 +30,7 @@ export const getUserProductsController = async (req, res) => {
     const viewer = await getOptionalViewerFromRequest(req);
     const publicUser = sanitizeUserProfileForViewer(targetUser, {
       viewer,
-      viewerId: req.userId,
+      viewerId: req.userId ?? null,
     });
 
     if (!publicUser) {

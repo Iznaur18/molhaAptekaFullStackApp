@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-import { PRODUCT_CATEGORY_VALUES } from "../constants/productConstants.js";
+import { PRODUCT_CATEGORY_SLUG_MAX_LENGTH } from "../constants/productCategoryTreeConstants.js";
 
 const ProductCategoryDisplaySchema = new mongoose.Schema(
   {
@@ -9,7 +9,7 @@ const ProductCategoryDisplaySchema = new mongoose.Schema(
       required: true,
       unique: true,
       trim: true,
-      enum: PRODUCT_CATEGORY_VALUES,
+      maxlength: PRODUCT_CATEGORY_SLUG_MAX_LENGTH,
     },
     customLabel: {
       type: String,

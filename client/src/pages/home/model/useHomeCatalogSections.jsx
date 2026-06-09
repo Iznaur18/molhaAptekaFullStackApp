@@ -12,6 +12,7 @@ export const useHomeCatalogSections = () => {
   const ctx = useAppShellStateContext();
   const {
     isCatalogBrowserLanding,
+    categoryRoots,
     categoryDisplays,
     feedTileDisplays,
     isAdmin,
@@ -39,6 +40,7 @@ export const useHomeCatalogSections = () => {
     () => (
       <AppShellCatalogSection
         isCatalogBrowserLanding={isCatalogBrowserLanding}
+        categoryRoots={categoryRoots}
         categoryDisplays={categoryDisplays}
         feedTileDisplays={feedTileDisplays}
         isAdmin={isAdmin}
@@ -58,7 +60,8 @@ export const useHomeCatalogSections = () => {
     ),
     [
       isCatalogBrowserLanding,
-      categoryDisplays,
+      categoryRoots,
+    categoryDisplays,
       feedTileDisplays,
       isAdmin,
       categoryDisplaysStatus,

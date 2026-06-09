@@ -163,6 +163,7 @@ export function InstallmentProgramModal({
       });
       setSuccess(INSTALLMENT_UI.PROGRAM_MODAL_SUCCESS);
       onSaved?.();
+      onClose();
     } catch (e) {
       setError(e instanceof Error ? e.message : INSTALLMENT_UI.ERROR_GENERIC);
     }

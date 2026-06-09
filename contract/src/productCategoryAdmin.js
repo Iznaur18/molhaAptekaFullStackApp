@@ -1,8 +1,6 @@
 import { z } from "zod";
 
 import { mongoIdSchema } from "./mongoId.js";
-import { PRODUCT_CATEGORY_VALUES } from "./productWrite.js";
-
 /** Синхрон с `server/constants/productCategoryTreeConstants.js`. */
 export const PRODUCT_CATEGORY_SLUG_MAX_LENGTH = 80;
 export const PRODUCT_CATEGORY_LABEL_RU_MAX_LENGTH = 120;
@@ -34,14 +32,7 @@ const searchKeywordsFieldSchema = z
   .optional();
 
 export const productCategorySlugParamsSchema = z.object({
-  categorySlug: z
-    .string()
-    .trim()
-    .min(1, "categorySlug обязателен")
-    .refine(
-      (value) => PRODUCT_CATEGORY_VALUES.includes(value),
-      "Неизвестная категория",
-    ),
+  categorySlug: categorySlugFieldSchema,
 });
 
 export const productCategoryIdParamsSchema = z.object({
@@ -54,7 +45,7 @@ export const createProductCategoryAdminBodySchema = z.object({
   parentId: mongoIdSchema.nullable().optional(),
   isLeaf: z.boolean().optional(),
   sortOrder: z.coerce.number().int().min(0).max(9999).optional(),
-  legacyProductCategory: z.enum(PRODUCT_CATEGORY_VALUES).nullable().optional(),
+  legacyProductCategory: categorySlugFieldSchema.nullable().optional(),
   searchKeywords: searchKeywordsFieldSchema,
 });
 
@@ -65,7 +56,7 @@ export const patchProductCategoryAdminBodySchema = z.object({
   isLeaf: z.boolean().optional(),
   sortOrder: z.coerce.number().int().min(0).max(9999).optional(),
   legacyProductCategory: z
-    .union([z.enum(PRODUCT_CATEGORY_VALUES), z.literal(""), z.null()])
+    .union([categorySlugFieldSchema, z.literal(""), z.null()])
     .optional(),
   searchKeywords: searchKeywordsFieldSchema,
 });

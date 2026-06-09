@@ -20,9 +20,15 @@ import "./UserStoryReportGroupCard.css";
  *   group: import('../model/types.js').UserStoryReportGroup;
  *   onResolved: () => void;
  *   onOpenUser: (userId: string) => void;
+ *   compact?: boolean;
  * }} props
  */
-export function UserStoryReportGroupCard({ group, onResolved, onOpenUser }) {
+export function UserStoryReportGroupCard({
+  group,
+  onResolved,
+  onOpenUser,
+  compact = false,
+}) {
   const resolveReportsMutation = useResolveUserStoryReportsMutation();
   const [staffNote, setStaffNote] = useState("");
   const isBusy = resolveReportsMutation.isPending;
@@ -56,7 +62,14 @@ export function UserStoryReportGroupCard({ group, onResolved, onOpenUser }) {
   const mediaUrl = resolveUserStoryMediaUrl(group.story.mediaUrl);
 
   return (
-    <article className="user-story-report-group-card">
+    <article
+      className={[
+        "user-story-report-group-card",
+        compact ? "user-story-report-group-card--compact" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
       <header className="user-story-report-group-card__header">
         <h3 className="user-story-report-group-card__title">Сторис</h3>
         <span className="user-story-report-group-card__count">

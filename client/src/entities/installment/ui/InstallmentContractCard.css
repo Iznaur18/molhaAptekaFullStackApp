@@ -263,3 +263,117 @@
   font: inherit;
   resize: vertical;
 }
+
+.installment-contract-card--compact {
+  gap: 0.45rem;
+  padding: 0.6rem 0.7rem 0.65rem;
+  border-radius: 0.55rem;
+  border-color: color-mix(in srgb, var(--iz-color-border) 80%, var(--iz-color-link-deep));
+  border-left: 3px solid var(--iz-color-link-deep);
+  background: var(--iz-color-surface);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--iz-color-link-deep) 8%, transparent);
+}
+
+.installment-contract-card--compact.installment-contract-card_completed {
+  border-left-color: var(--iz-color-success-teal-bright);
+  background: linear-gradient(
+    180deg,
+    var(--iz-color-surface) 0%,
+    var(--iz-color-success-surface) 100%
+  );
+}
+
+.installment-contract-card__status-pill {
+  flex-shrink: 0;
+  padding: 0.12rem 0.5rem;
+  border-radius: 999px;
+  background: var(--iz-color-action-soft);
+  color: var(--iz-color-link-hover);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.installment-contract-card__status-pill_active,
+.installment-contract-card__status-pill_pending_first_payment {
+  background: var(--iz-color-status-info-soft);
+  color: var(--iz-color-link-hover);
+}
+
+.installment-contract-card__status-pill_completed {
+  background: var(--iz-color-success-pale);
+  color: var(--iz-color-success-forest);
+}
+
+.installment-contract-card__status-pill_defaulted {
+  background: var(--iz-color-danger-soft);
+  color: var(--iz-color-danger-strong);
+}
+
+.installment-contract-card__status-pill_cancelled {
+  background: var(--iz-color-surface-alt);
+  color: var(--iz-color-text-muted);
+}
+
+.installment-contract-card__progress {
+  height: 0.35rem;
+  border-radius: 999px;
+  background: var(--iz-color-surface-subtle);
+  overflow: hidden;
+}
+
+.installment-contract-card__progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    var(--iz-color-link-deep) 0%,
+    var(--iz-color-success-teal-bright) 100%
+  );
+  transition: width 0.2s ease;
+}
+
+.installment-contract-card--compact .installment-contract-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.75rem;
+  font-size: 0.9rem;
+}
+
+.installment-contract-card--compact .installment-contract-card__payments {
+  gap: 0.3rem;
+}
+
+.installment-contract-card--compact .installment-contract-card__payments-title {
+  font-size: 0.9rem;
+}
+
+.installment-contract-card--compact .installment-contract-card__payment {
+  padding: 0.35rem 0.45rem;
+  border-radius: 0.4rem;
+  font-size: 0.875rem;
+}
+
+.installment-contract-card--compact .installment-contract-card__payment-main {
+  min-width: 0;
+  gap: 0.35rem 0.5rem;
+}
+
+.installment-contract-card--compact .installment-contract-card__payment-index {
+  min-width: 1.5rem;
+  height: 1.35rem;
+  font-size: 0.82rem;
+}
+
+.installment-contract-card--compact .installment-contract-card__actions {
+  gap: 0.3rem;
+}
+
+.installment-contract-card--compact .installment-contract-card__btn {
+  padding: 0.28rem 0.65rem;
+  font-size: 0.85rem;
+  border-radius: 0.4rem;
+}
+
+.installment-contract-card--compact .installment-contract-card__textarea {
+  min-height: 2.75rem;
+}

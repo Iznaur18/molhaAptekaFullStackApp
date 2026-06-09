@@ -6,12 +6,14 @@ import {
   isUserBackgroundPresetId,
   parseUserBackgroundPresetId,
 } from "../constants/userBackgroundPresets.js";
+import { normalizeStoredUploadUrl } from "./buildPublicUploadUrl.js";
+import { isStoredBackgroundImageUrl } from "./isStoredBackgroundImageUrl.js";
 
 /**
  * @param {unknown} value
  */
 export function isHttpBackgroundImageUrl(value) {
-  return typeof value === "string" && /^https?:\/\//i.test(value.trim());
+  return isStoredBackgroundImageUrl(value);
 }
 
 /**
@@ -35,15 +37,15 @@ export function normalizeUserBackgroundForSave(stored, ctx) {
     return formatUserBackgroundPresetValue(presetId);
   }
 
-  if (!isHttpBackgroundImageUrl(raw)) {
-    throw new Error("URL фона должен начинаться с http:// или https://");
+  if (!isStoredBackgroundImageUrl(raw)) {
+    throw new Error("URL фона: http(s):// или /uploads/...");
   }
 
   if (!isPremiumUser && !isAdminEditor) {
     throw new Error("Обычным пользователям доступны только цветовые пресеты фона");
   }
 
-  return raw;
+  return normalizeStoredUploadUrl(raw);
 }
 
 /**
@@ -54,10 +56,10 @@ export function normalizeUserBackgroundForSave(stored, ctx) {
 export function resolveAdminUserBackgroundForSave(input) {
   const imageUrl = String(input.imageUrl ?? "").trim();
   if (imageUrl !== "") {
-    if (!isHttpBackgroundImageUrl(imageUrl)) {
-      throw new Error("URL фона должен начинаться с http:// или https://");
+    if (!isStoredBackgroundImageUrl(imageUrl)) {
+      throw new Error("URL фона: http(s):// или /uploads/...");
     }
-    return imageUrl;
+    return normalizeStoredUploadUrl(imageUrl);
   }
 
   const presetId = String(input.presetId ?? "").trim();

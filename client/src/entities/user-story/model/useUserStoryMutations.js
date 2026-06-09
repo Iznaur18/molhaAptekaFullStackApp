@@ -25,6 +25,9 @@ export function useUserStoryMutations() {
 
   const markViewedMutation = useMutation({
     mutationFn: markUserStoryViewed,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: userStoriesQueryKeys.feed() });
+    },
   });
 
   const reportMutation = useMutation({

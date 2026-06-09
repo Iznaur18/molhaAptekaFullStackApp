@@ -28,14 +28,16 @@ export const loadLeafProductCategoryOrThrow = async (categoryId) => {
 const resolveLegacyProductCategorySlug = async (leaf) => {
   if (
     typeof leaf.legacyProductCategory === "string" &&
-    PRODUCT_CATEGORY_VALUES.includes(leaf.legacyProductCategory)
+    leaf.legacyProductCategory.trim()
   ) {
-    return leaf.legacyProductCategory;
+    return leaf.legacyProductCategory.trim();
   }
 
   const rootId = Array.isArray(leaf.pathIds) ? leaf.pathIds[0] : null;
   if (!rootId) {
-    return PRODUCT_CATEGORY_VALUES[0];
+    return typeof leaf.slug === "string" && leaf.slug.trim()
+      ? leaf.slug.trim()
+      : PRODUCT_CATEGORY_VALUES[0];
   }
 
   const root = await ProductCategoryModel.findById(rootId)
@@ -44,13 +46,13 @@ const resolveLegacyProductCategorySlug = async (leaf) => {
 
   if (
     typeof root?.legacyProductCategory === "string" &&
-    PRODUCT_CATEGORY_VALUES.includes(root.legacyProductCategory)
+    root.legacyProductCategory.trim()
   ) {
-    return root.legacyProductCategory;
+    return root.legacyProductCategory.trim();
   }
 
-  const slug = typeof root?.slug === "string" ? root.slug : "";
-  if (PRODUCT_CATEGORY_VALUES.includes(slug)) {
+  const slug = typeof root?.slug === "string" ? root.slug.trim() : "";
+  if (slug) {
     return slug;
   }
 
@@ -90,19 +92,19 @@ export const resolveProductCategoryWriteFromId = async (categoryId) => {
  */
 export const resolveDefaultLeafIdForLegacyCategory = async (legacySlug) => {
   const normalized = String(legacySlug ?? "").trim();
-  if (!PRODUCT_CATEGORY_VALUES.includes(normalized)) {
+  if (!normalized) {
     return null;
   }
 
   const root =
     (await ProductCategoryModel.findOne({
-      legacyProductCategory: normalized,
       parentId: null,
+      $or: [{ legacyProductCategory: normalized }, { slug: normalized }],
     })
       .select("_id")
       .lean()) ??
     (await ProductCategoryModel.findOne({
-      legacyProductCategory: normalized,
+      $or: [{ legacyProductCategory: normalized }, { slug: normalized }],
     })
       .sort({ depth: 1 })
       .select("_id")
@@ -128,9 +130,20 @@ export const resolveDefaultLeafIdForLegacyCategory = async (legacySlug) => {
  *
  * @param {string} legacySlug
  */
-const resolveProductCategoryWriteFromLegacySlugOnly = (legacySlug) => {
+const resolveProductCategoryWriteFromLegacySlugOnly = async (legacySlug) => {
   const productCategory = String(legacySlug).trim();
-  if (!PRODUCT_CATEGORY_VALUES.includes(productCategory)) {
+  if (!productCategory) {
+    throw new Error("Указана неизвестная категория товара");
+  }
+
+  const root = await ProductCategoryModel.findOne({
+    parentId: null,
+    $or: [{ slug: productCategory }, { legacyProductCategory: productCategory }],
+  })
+    .select("_id")
+    .lean();
+
+  if (!root && !PRODUCT_CATEGORY_VALUES.includes(productCategory)) {
     throw new Error("Указана неизвестная категория товара");
   }
 

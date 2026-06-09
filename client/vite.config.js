@@ -12,6 +12,7 @@ import { buildSpaContentSecurityPolicy } from "../server/utils/buildSpaContentSe
  * - (опционально) убери "/address" из DEV_API_PROXY_PREFIXES
  */
 const DEV_SERVER_HOST = true;
+const DEV_CLIENT_ORIGIN = "http://127.0.0.1:5173";
 const LOCAL_API_PROXY_TARGET = "127.0.0.1";
 const LOCAL_API_PORT = 4444;
 const LOCAL_API_ORIGIN = `http://${LOCAL_API_PROXY_TARGET}:${LOCAL_API_PORT}`;
@@ -27,6 +28,7 @@ const DEV_API_PROXY_PREFIXES = [
   "/installment",
   "/price-offers",
   "/address",
+  "/health",
   "/uploads",
   "/upload",
 ];
@@ -127,7 +129,7 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
     allowedHosts: [".loca.lt", ".ngrok-free.app", ".ngrok.io"],
-    open: true,
+    open: DEV_CLIENT_ORIGIN,
     proxy: devApiProxy,
   },
   preview: {

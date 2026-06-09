@@ -196,12 +196,13 @@ export function AppShellCatalogGridSection({
 /**
  * @param {{
  *   isCatalogBrowserLanding: boolean;
+ *   categoryRoots: import('../../../entities/product-category-tree/model/types.js').ProductCategoryNode[];
  *   categoryDisplays: import('../../../entities/product-category-display/model/types.js').ProductCategoryDisplayFromApi[];
  *   feedTileDisplays: import('../../../entities/product-category-display/model/types.js').ProductCatalogFeedTileDisplayFromApi[];
  *   isAdmin: boolean;
  *   categoryDisplaysStatus: { kind: string; message?: string };
  *   onFeedTileClick: (tile: import('../../../entities/product-category-display/lib/buildCatalogFeedTiles.js').CatalogFeedTile) => void;
- *   onCategoryClick: (slug: import('../../../entities/product/model/types.js').ProductCategory) => void;
+ *   onCategoryClick: (item: import('../../../entities/product-category-display/model/types.js').ResolvedProductCategoryDisplay) => void;
  *   onEditCategoryClick: (slug: import('../../../entities/product/model/types.js').ProductCategory) => void;
  *   onEditFeedTileClick: (tileKey: string) => void;
  *   activeCatalogBrowserCategoryId: string | null;
@@ -215,6 +216,7 @@ export function AppShellCatalogGridSection({
  */
 export function AppShellCatalogSection({
   isCatalogBrowserLanding,
+  categoryRoots,
   categoryDisplays,
   feedTileDisplays,
   isAdmin,
@@ -236,6 +238,7 @@ export function AppShellCatalogSection({
       <CatalogBrowserLanding
         displays={categoryDisplays}
         feedTileDisplays={feedTileDisplays}
+        categoryRoots={categoryRoots}
         isAdmin={isAdmin}
         isLoading={categoryDisplaysStatus.kind === "loading"}
         errorMessage={

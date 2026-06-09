@@ -18,7 +18,7 @@ export function flattenCatalogProducts(data) {
   const merged = [];
 
   for (const page of data.pages) {
-    for (const product of page.products) {
+    for (const product of page.products ?? []) {
       const id = String(product._id);
       if (seen.has(id)) {
         continue;
@@ -38,8 +38,12 @@ export function flattenCatalogProducts(data) {
  * }> | undefined} data
  * @param {(page: { products: ProductFromApi[]; pagination: { page: number; limit: number; total: number; totalPages: number } }) => { products: ProductFromApi[]; pagination: { page: number; limit: number; total: number; totalPages: number } }} mapPage
  */
+function isCatalogInfiniteData(data) {
+  return Boolean(data && Array.isArray(data.pages));
+}
+
 function mapCatalogPages(data, mapPage) {
-  if (!data) {
+  if (!isCatalogInfiniteData(data)) {
     return data;
   }
 
@@ -50,40 +54,56 @@ function mapCatalogPages(data, mapPage) {
 }
 
 /**
+ * @param {ProductFromApi | import('@tanstack/react-query').InfiniteData<{ products: ProductFromApi[]; pagination: object }> | undefined} data
+ * @param {string} productId
+ * @param {(product: ProductFromApi) => ProductFromApi | null} mapProduct
+ */
+export function patchCatalogQueryData(data, productId, mapProduct) {
+  if (!data) {
+    return data;
+  }
+
+  const normalizedId = String(productId);
+
+  if (!isCatalogInfiniteData(data)) {
+    if (data._id == null || String(data._id) !== normalizedId) {
+      return data;
+    }
+
+    const mapped = mapProduct(data);
+    return mapped ?? data;
+  }
+
+  return mapCatalogPages(data, (page) => {
+    /** @type {ProductFromApi[]} */
+    const nextProducts = [];
+
+    for (const product of page.products ?? []) {
+      if (String(product._id) !== normalizedId) {
+        nextProducts.push(product);
+        continue;
+      }
+
+      const mapped = mapProduct(product);
+      if (mapped) {
+        nextProducts.push(mapped);
+      }
+    }
+
+    return { ...page, products: nextProducts };
+  });
+}
+
+/**
  * @param {import('@tanstack/react-query').QueryClient} queryClient
  * @param {(product: ProductFromApi) => ProductFromApi | null} mapProduct — null удаляет товар
  */
 export function patchProductInAllCatalogCaches(queryClient, productId, mapProduct) {
-  const normalizedId = String(productId);
-
   queryClient.setQueriesData(
     { queryKey: catalogQueryKeys.all },
     (
-      /** @type {import('@tanstack/react-query').InfiniteData<{ products: ProductFromApi[]; pagination: object }> | undefined} */ old,
-    ) => {
-      if (!old) {
-        return old;
-      }
-
-      return mapCatalogPages(old, (page) => {
-        /** @type {ProductFromApi[]} */
-        const nextProducts = [];
-
-        for (const product of page.products) {
-          if (String(product._id) !== normalizedId) {
-            nextProducts.push(product);
-            continue;
-          }
-
-          const mapped = mapProduct(product);
-          if (mapped) {
-            nextProducts.push(mapped);
-          }
-        }
-
-        return { ...page, products: nextProducts };
-      });
-    },
+      /** @type {ProductFromApi | import('@tanstack/react-query').InfiniteData<{ products: ProductFromApi[]; pagination: object }> | undefined} */ old,
+    ) => patchCatalogQueryData(old, productId, mapProduct),
   );
 }
 

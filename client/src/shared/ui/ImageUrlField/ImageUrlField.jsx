@@ -89,7 +89,8 @@ export function ImageUrlField({
       <div className="image-url-field__row">
         <input
           className={inputClass}
-          type="url"
+          type="text"
+          inputMode="url"
           name={name}
           id={id}
           value={value}

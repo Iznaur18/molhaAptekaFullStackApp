@@ -30,6 +30,7 @@ import "./InstallmentContractCard.css";
  *   onUpdated?: (contract: import("../model/types.js").InstallmentContractFromApi) => void;
  *   onCounterpartyClick?: (userId: string) => void;
  *   onProductClick?: (productId: string) => void;
+ *   compact?: boolean;
  * }} props
  */
 export function InstallmentContractCard({
@@ -38,6 +39,7 @@ export function InstallmentContractCard({
   onUpdated,
   onCounterpartyClick,
   onProductClick,
+  compact = false,
 }) {
   const contractId = String(contract._id);
   const {
@@ -59,6 +61,10 @@ export function InstallmentContractCard({
   const remainingDays = getInstallmentRemainingDays(contract);
   const statusLabel =
     INSTALLMENT_UI.CONTRACT_STATUS_LABEL[contract.status] ?? contract.status;
+  const paidPercent =
+    contract.totalAmountRub > 0
+      ? Math.min(100, Math.round((contract.paidAmountRub / contract.totalAmountRub) * 100))
+      : 0;
 
   const nextPayablePayment = useMemo(
     () =>
@@ -154,6 +160,7 @@ export function InstallmentContractCard({
     <article
       className={[
         "installment-contract-card",
+        compact ? "installment-contract-card--compact" : "",
         isFullyPaid && "installment-contract-card_completed",
       ]
         .filter(Boolean)
@@ -173,12 +180,38 @@ export function InstallmentContractCard({
             {contract.productNameAtContract}
           </h3>
         )}
+        {compact ? (
+          <span
+            className={[
+              "installment-contract-card__status-pill",
+              `installment-contract-card__status-pill_${contract.status}`,
+            ].join(" ")}
+          >
+            {statusLabel}
+          </span>
+        ) : null}
         {contract.hasOverduePayment ? (
           <p className="installment-contract-card__overdue" role="status">
             {INSTALLMENT_UI.OVERDUE_BADGE}
           </p>
         ) : null}
       </div>
+
+      {compact ? (
+        <div
+          className="installment-contract-card__progress"
+          role="progressbar"
+          aria-valuenow={paidPercent}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label={`${INSTALLMENT_UI.CONTRACT_PAID}: ${paidPercent}%`}
+        >
+          <div
+            className="installment-contract-card__progress-fill"
+            style={{ width: `${paidPercent}%` }}
+          />
+        </div>
+      ) : null}
 
       {role === "buyer" ? (
         <InstallmentContractCounterparty
@@ -230,10 +263,12 @@ export function InstallmentContractCard({
             </dd>
           </div>
         ) : null}
-        <div className="installment-contract-card__meta-row">
-          <dt>{INSTALLMENT_UI.CONTRACT_STATUS}:</dt>
-          <dd>{statusLabel}</dd>
-        </div>
+        {!compact ? (
+          <div className="installment-contract-card__meta-row">
+            <dt>{INSTALLMENT_UI.CONTRACT_STATUS}:</dt>
+            <dd>{statusLabel}</dd>
+          </div>
+        ) : null}
       </dl>
 
       <section className="installment-contract-card__payments">

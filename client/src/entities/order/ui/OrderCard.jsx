@@ -71,11 +71,13 @@ function renderBuyerValue(buyer, onBuyerNameClick) {
  *   pendingActionKey?: string | null;
  *   itemActionErrors?: Record<string, string>;
  *   onBuyerNameClick?: (userId: string) => void;
+ *   compact?: boolean;
  * }} props
  */
 export function OrderCard({
   order,
   showBuyer = false,
+  compact = false,
   statusSlot = null,
   onProductClick,
   onMarkShipped,
@@ -90,7 +92,7 @@ export function OrderCard({
   const isAuctionOrder = Boolean(order.priceOfferId);
 
   return (
-    <article className="order-card">
+    <article className={["order-card", compact ? "order-card--compact" : ""].filter(Boolean).join(" ")}>
       <header className="order-card__header">
         <div className="order-card__header-badges">
           <span className={`order-card__status order-card__status_${order.status}`}>

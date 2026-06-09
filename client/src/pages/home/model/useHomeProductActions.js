@@ -189,16 +189,16 @@ export const useHomeProductActions = ({
   }, [catalogProductDetails, setIsCreateProductModalOpen, setProductToEdit]);
 
   const handleSetMyProductAvailability = useCallback(
-    async (product, isAvailable) => {
-      if (product._id == null) {
+    async (productId, isAvailable) => {
+      const normalizedProductId = String(productId ?? "").trim();
+      if (!normalizedProductId) {
         return;
       }
-      const productId = String(product._id);
-      setTogglingAvailabilityProductId(productId);
+      setTogglingAvailabilityProductId(normalizedProductId);
       setMyProductsCatalogError("");
       try {
         const updated = await patchMutation.mutateAsync({
-          productId,
+          productId: normalizedProductId,
           body: { productIsAvailable: isAvailable },
         });
         syncCatalogProductState(updated);
@@ -223,16 +223,16 @@ export const useHomeProductActions = ({
   );
 
   const handleSetProductAuction = useCallback(
-    async (product, auctionEnabled) => {
-      if (product._id == null) {
+    async (productId, auctionEnabled) => {
+      const normalizedProductId = String(productId ?? "").trim();
+      if (!normalizedProductId) {
         return;
       }
-      const productId = String(product._id);
-      setTogglingAuctionProductId(productId);
+      setTogglingAuctionProductId(normalizedProductId);
       setProductDetailsAdminError("");
       try {
         const updated = await patchMutation.mutateAsync({
-          productId,
+          productId: normalizedProductId,
           body: { productAuctionEnabled: auctionEnabled },
         });
         syncCatalogProductState(updated);

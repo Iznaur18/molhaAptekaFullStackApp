@@ -10,7 +10,8 @@
 
 /**
  * @typedef {Object} ResolvedProductCategoryDisplay
- * @property {ProductCategory} categorySlug
+ * @property {string | null} categoryId
+ * @property {string} categorySlug
  * @property {string} label
  * @property {string | null} imageUrl
  * @property {boolean} isCustomLabel

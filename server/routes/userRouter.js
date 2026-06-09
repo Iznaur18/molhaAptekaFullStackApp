@@ -173,7 +173,7 @@ router.get(
 );
 router.get(
   "/:userIdClient/products",
-  checkAuthMW,
+  checkOptionalAuthMW,
   userIdParamValidation,
   userSellerProductsValidation,
   getUserProductsController,

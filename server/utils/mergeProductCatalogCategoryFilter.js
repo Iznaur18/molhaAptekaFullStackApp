@@ -28,10 +28,43 @@ export const mergeProductCatalogCategoryFilter = async (
   const merged = { ...baseQuery };
 
   if (categoryId) {
+    const root = await ProductCategoryModel.findById(categoryId)
+      .select("slug legacyProductCategory")
+      .lean();
     const descendantIds = await getProductCategoryDescendantIds(categoryId);
-    merged.productCategoryId = {
-      $in: descendantIds.map((id) => new Types.ObjectId(id)),
-    };
+    const legacySlugs = new Set();
+
+    if (typeof root?.slug === "string" && root.slug.trim()) {
+      legacySlugs.add(root.slug.trim());
+    }
+    if (
+      typeof root?.legacyProductCategory === "string" &&
+      root.legacyProductCategory.trim()
+    ) {
+      legacySlugs.add(root.legacyProductCategory.trim());
+    }
+
+    const categoryMatchers = [];
+
+    if (descendantIds.length > 0) {
+      categoryMatchers.push({
+        productCategoryId: {
+          $in: descendantIds.map((id) => new Types.ObjectId(id)),
+        },
+      });
+    }
+
+    if (legacySlugs.size > 0) {
+      categoryMatchers.push({
+        productCategory: { $in: [...legacySlugs] },
+      });
+    }
+
+    if (categoryMatchers.length === 1) {
+      Object.assign(merged, categoryMatchers[0]);
+    } else if (categoryMatchers.length > 1) {
+      merged.$and = [...(merged.$and ?? []), { $or: categoryMatchers }];
+    }
   }
 
   if (productCategory) {
@@ -72,8 +105,8 @@ export const findProductCategoryIdsForSearchIntent = async (intent) => {
 
   for (const legacySlug of intent.categorySlugs) {
     const root = await ProductCategoryModel.findOne({
-      legacyProductCategory: legacySlug,
       parentId: null,
+      $or: [{ legacyProductCategory: legacySlug }, { slug: legacySlug }],
     })
       .select("_id")
       .lean();

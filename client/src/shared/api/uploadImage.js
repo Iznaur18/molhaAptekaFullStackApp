@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import { resolveUploadedImageUrl } from "../lib/resolveUploadedImageUrl.js";
+import { normalizeUploadUrlForStorage } from "../lib/resolveUploadedImageUrl.js";
 import { API_BASE_URL } from "../config/apiBaseUrl.js";
 import { IMAGE_URL_FIELD_UI } from "../config/appUiCopy.js";
 
@@ -23,7 +23,7 @@ export async function uploadImage(file) {
       throw new Error(IMAGE_URL_FIELD_UI.ERROR_GENERIC);
     }
 
-    return resolveUploadedImageUrl(data.data.url);
+    return normalizeUploadUrlForStorage(data.data.url);
   } catch (error) {
     if (error?.response?.status === 401) {
       throw new Error(IMAGE_URL_FIELD_UI.ERROR_AUTH);

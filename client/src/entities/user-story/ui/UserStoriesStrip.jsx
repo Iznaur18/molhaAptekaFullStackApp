@@ -128,7 +128,6 @@ export function UserStoriesStrip({
           onClose={() => setViewerAuthor(null)}
           onOpenProfile={onOpenProfile}
           onStoryDeleted={onRefresh}
-          onStoryViewed={onRefresh}
         />
       ) : null}
     </>

@@ -2,7 +2,7 @@ import { useMemo } from "react";
 
 import {
   PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE,
-  buildResolvedProductCategoryDisplays,
+  buildResolvedProductCategoryDisplaysFromRoots,
 } from "../lib/resolveProductCategoryDisplay.js";
 import { PRODUCT_CATEGORY_DISPLAY_UI } from "../../../shared/config/appUiCopy.js";
 import { resolveUploadedImageUrl } from "../../../shared/lib/resolveUploadedImageUrl.js";
@@ -16,13 +16,15 @@ import "./CatalogCategoriesGrid.css";
  *   isAdmin: boolean;
  *   isLoading: boolean;
  *   errorMessage: string | null;
- *   onCategoryClick: (categorySlug: import('../../product/model/types.js').ProductCategory) => void;
- *   onEditCategoryClick: (categorySlug: import('../../product/model/types.js').ProductCategory) => void;
+ *   categoryRoots: import('../../product-category-tree/model/types.js').ProductCategoryNode[];
+ *   onCategoryClick: (item: import('../model/types.js').ResolvedProductCategoryDisplay) => void;
+ *   onEditCategoryClick: (categorySlug: string) => void;
  *   showSectionShell?: boolean;
  * }} props
  */
 export function CatalogCategoriesGrid({
   displays,
+  categoryRoots,
   isAdmin,
   isLoading,
   errorMessage,
@@ -31,8 +33,8 @@ export function CatalogCategoriesGrid({
   showSectionShell = true,
 }) {
   const items = useMemo(
-    () => buildResolvedProductCategoryDisplays(displays),
-    [displays],
+    () => buildResolvedProductCategoryDisplaysFromRoots(categoryRoots, displays),
+    [categoryRoots, displays],
   );
 
   if (isLoading) {
@@ -87,7 +89,7 @@ export function CatalogCategoriesGrid({
               <button
                 type="button"
                 className="catalog-categories-grid__card"
-                onClick={() => onCategoryClick(item.categorySlug)}
+                onClick={() => onCategoryClick(item)}
               >
                 <span className="catalog-categories-grid__image-wrap">
                   <img

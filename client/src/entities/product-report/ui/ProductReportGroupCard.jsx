@@ -17,6 +17,7 @@ import "./ProductReportGroupCard.css";
  *   onResolved: () => void;
  *   onOpenProduct: (product: import('../../product/model/types.js').ProductFromApi) => void;
  *   onOpenUser: (userId: string) => void;
+ *   compact?: boolean;
  * }} props
  */
 export function ProductReportGroupCard({
@@ -24,6 +25,7 @@ export function ProductReportGroupCard({
   onResolved,
   onOpenProduct,
   onOpenUser,
+  compact = false,
 }) {
   const resolveReportsMutation = useResolveProductReportsMutation();
   const [staffNote, setStaffNote] = useState("");
@@ -60,7 +62,14 @@ export function ProductReportGroupCard({
   };
 
   return (
-    <article className="product-report-group-card">
+    <article
+      className={[
+        "product-report-group-card",
+        compact ? "product-report-group-card--compact" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
       <header className="product-report-group-card__header">
         <h3 className="product-report-group-card__title">
           {group.product.productName ?? "Товар"}

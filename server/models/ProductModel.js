@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 
 import {
-  PRODUCT_CATEGORY_VALUES,
   PRODUCT_DESCRIPTION_MAX_CHARS,
   PRODUCT_IMAGE_URLS_MAX,
 } from "../constants/productConstants.js";
@@ -82,8 +81,9 @@ const ProductSchema = new Schema(
     },
     productCategory: {
       type: String,
-      enum: PRODUCT_CATEGORY_VALUES,
       required: true,
+      trim: true,
+      maxlength: 80,
     },
     productCategoryId: {
       type: Schema.Types.ObjectId,

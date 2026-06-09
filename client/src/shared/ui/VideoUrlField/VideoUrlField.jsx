@@ -71,7 +71,8 @@ export function VideoUrlField({
       <div className="image-url-field__row">
         <input
           className="image-url-field__input"
-          type="url"
+          type="text"
+          inputMode="url"
           value={value}
           onChange={handleUrlChange}
           placeholder="https://…/video.mp4"

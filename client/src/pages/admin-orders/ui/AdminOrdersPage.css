@@ -1,13 +1,108 @@
 .admin-orders-page {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.admin-orders-page__toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--iz-color-primary) 28%, var(--iz-color-border));
+  border-radius: 0.65rem;
+  background: linear-gradient(
+    135deg,
+    var(--iz-color-surface) 0%,
+    color-mix(in srgb, var(--iz-color-primary) 6%, var(--iz-color-surface-alt)) 140%
+  );
+}
+
+.admin-orders-page__toolbar-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.admin-orders-page__heading {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--iz-color-text);
+}
+
+.admin-orders-page__count {
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  color: var(--iz-color-text-muted);
+}
+
+.admin-orders-page__status-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.admin-orders-page__status-chip {
+  margin: 0;
+  padding: 0.22rem 0.55rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 999px;
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text-secondary);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.3;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.admin-orders-page__status-chip:hover {
+  border-color: color-mix(in srgb, var(--iz-color-primary) 35%, var(--iz-color-border));
+  background: var(--iz-color-surface-alt);
+}
+
+.admin-orders-page__status-chip_active {
+  border-color: var(--iz-color-primary);
+  background: var(--iz-color-primary);
+  color: var(--iz-color-on-contrast);
+}
+
+.admin-orders-page__status-chip_active.admin-orders-page__status-chip_pending {
+  border-color: var(--iz-color-warning-bright);
+  background: var(--iz-color-warning-bright);
+}
+
+.admin-orders-page__status-chip_active.admin-orders-page__status-chip_confirmed {
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action);
+}
+
+.admin-orders-page__status-chip_active.admin-orders-page__status-chip_shipped {
+  border-color: var(--iz-color-premium-purple);
+  background: var(--iz-color-premium-purple);
+}
+
+.admin-orders-page__status-chip_active.admin-orders-page__status-chip_delivered {
+  border-color: var(--iz-color-success-vivid);
+  background: var(--iz-color-success-vivid);
+}
+
+.admin-orders-page__status-chip_active.admin-orders-page__status-chip_cancelled {
+  border-color: var(--iz-color-danger-accent);
+  background: var(--iz-color-danger-accent);
 }
 
 .admin-orders-page__list {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: 0.45rem;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -24,4 +119,9 @@
 
 .admin-orders-page__state_error {
   color: var(--iz-color-danger-strong);
+}
+
+.admin-orders-page .order-card--compact .order-card__footer {
+  justify-content: flex-start;
+  padding-top: 0.35rem;
 }

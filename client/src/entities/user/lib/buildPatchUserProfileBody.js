@@ -1,5 +1,5 @@
 import { appendRuAddressToPayload } from "../../address/lib/appendRuAddressToPayload.js";
-import { resolveUploadedImageUrl } from "../../../shared/lib/resolveUploadedImageUrl.js";
+import { normalizeUploadUrlForStorage } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { normalizeRuPhoneInput } from "./ruPhone.js";
 import { getUserAvatarFocus, getUserBackgroundFocus } from "./profileImageFocus.js";
 import { serializeUserBackgroundForForm } from "./userBackgroundValue.js";
@@ -51,14 +51,14 @@ export function buildPatchUserProfileBody(form, options = {}) {
     body.userPhoneNumber = null;
   }
 
-  const av = resolveUploadedImageUrl(String(form.userAvatarUrl).trim());
+  const av = normalizeUploadUrlForStorage(String(form.userAvatarUrl).trim());
   body.userAvatarUrl = av === "" ? DEFAULT_USER_AVATAR_URL : av;
   body.userAvatarFocus = getUserAvatarFocus({
     userAvatarFocus: form.userAvatarFocus,
   });
 
   if (backgroundMode === "image") {
-    const imageUrl = resolveUploadedImageUrl(
+    const imageUrl = normalizeUploadUrlForStorage(
       String(form.backgroundImageUrl ?? "").trim(),
     );
     if (imageUrl !== "") {
@@ -70,7 +70,7 @@ export function buildPatchUserProfileBody(form, options = {}) {
   } else {
     body.userBackgroundUrl = serializeUserBackgroundForForm(backgroundMode, {
       presetId: form.backgroundPresetId,
-      imageUrl: resolveUploadedImageUrl(String(form.backgroundImageUrl ?? "").trim()),
+      imageUrl: normalizeUploadUrlForStorage(String(form.backgroundImageUrl ?? "").trim()),
     });
   }
 

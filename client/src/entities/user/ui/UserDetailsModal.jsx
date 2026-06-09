@@ -12,6 +12,7 @@ import { UserProfilePurchasesList } from "./UserProfilePurchasesList.jsx";
 import { UserProfileProductsList } from "./UserProfileProductsList.jsx";
 import { UserPremiumAvatar } from "./UserPremiumAvatar.jsx";
 import { UserPremiumDisplayName } from "./UserPremiumDisplayName.jsx";
+import { UserProfileInfoPanel } from "./UserProfileInfoPanel.jsx";
 
 import { USER_DETAILS_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
@@ -109,14 +110,14 @@ export function UserDetailsModal({
     ? getUserProfileRows(user, { showAdminRole, hideMediaUrls: true })
     : [];
 
-  const showOtherUserProfileLists =
+  const isOtherUserProfile =
     Boolean(user?._id) &&
-    isAuthorized &&
-    currentUserId != null &&
-    String(user._id) !== String(currentUserId) &&
-    layoutVariant !== "register";
+    layoutVariant !== "register" &&
+    (currentUserId == null || String(user._id) !== String(currentUserId));
+
+  const showOtherUserProducts = isOtherUserProfile;
   const showOtherUserPurchases =
-    showOtherUserProfileLists && viewerCanSeeOtherUserPurchases;
+    isOtherUserProfile && isAuthorized && viewerCanSeeOtherUserPurchases;
 
   const canShowBackground =
     Boolean(profileBackground) &&
@@ -241,7 +242,7 @@ export function UserDetailsModal({
                     ) : null}
                   </div>
                 ) : null}
-                {showOtherUserProfileLists ? (
+                {showOtherUserProducts || showOtherUserPurchases ? (
                   <>
                     {showOtherUserPurchases ? (
                       <UserProfilePurchasesList
@@ -249,22 +250,19 @@ export function UserDetailsModal({
                         onProductClick={onPurchaseProductClick}
                       />
                     ) : null}
-                    <UserProfileProductsList
-                      targetUserId={String(user._id)}
-                      onProductClick={onPurchaseProductClick}
-                      onViewAllProducts={onViewAllSellerProducts}
-                    />
+                    {showOtherUserProducts ? (
+                      <UserProfileProductsList
+                        targetUserId={String(user._id)}
+                        onProductClick={onPurchaseProductClick}
+                        onViewAllProducts={onViewAllSellerProducts}
+                      />
+                    ) : null}
                   </>
                 ) : null}
                 {notificationsSlot}
-                <dl className="user-details-modal__list">
-                  {rows.map((row) => (
-                    <div key={row.id} className="user-details-modal__row">
-                      <dt className="user-details-modal__label">{row.label}</dt>
-                      <dd className="user-details-modal__value">{row.value}</dd>
-                    </div>
-                  ))}
-                </dl>
+                <div className="user-profile-info-shell">
+                  <UserProfileInfoPanel rows={rows} />
+                </div>
               </div>
             ) : null}
           </div>

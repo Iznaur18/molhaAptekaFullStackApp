@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { resolveUploadedImageUrlForBrowser } from "../../client/src/shared/lib/resolveUploadedImageUrl.js";
+import {
+  normalizeUploadUrlForStorage,
+  resolveUploadedImageUrlForBrowser,
+} from "../../client/src/shared/lib/resolveUploadedImageUrl.js";
 
 test("resolveUploadedImageUrlForBrowser: CDN URL не подменяется на origin SPA", () => {
   assert.equal(
@@ -28,6 +31,17 @@ test("resolveUploadedImageUrlForBrowser: relative /uploads", () => {
     resolveUploadedImageUrlForBrowser("/uploads/x.png", "https://izibuy.ru"),
     "https://izibuy.ru/uploads/x.png",
   );
+});
+
+test("normalizeUploadUrlForStorage: absolute LAN → relative path", () => {
+  assert.equal(
+    normalizeUploadUrlForStorage("http://192.168.1.222:5173/uploads/photo.jpeg"),
+    "/uploads/photo.jpeg",
+  );
+});
+
+test("normalizeUploadUrlForStorage: relative path unchanged", () => {
+  assert.equal(normalizeUploadUrlForStorage("/uploads/x.png"), "/uploads/x.png");
 });
 
 test("resolveUploadedImageUrlForBrowser: legacy dev LAN IP → текущий origin", () => {

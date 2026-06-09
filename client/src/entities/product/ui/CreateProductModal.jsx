@@ -34,7 +34,7 @@ import {
   formatRubPriceInput,
   keepDigitsOnly,
 } from "../../../shared/lib/numericInput.js";
-import { resolveUploadedImageUrl } from "../../../shared/lib/resolveUploadedImageUrl.js";
+import { normalizeUploadUrlForStorage } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { resolveProductLoyaltyPointsPerUnit } from "../lib/resolveProductLoyaltyPointsPerUnit.js";
 import { resolveSellerMaxLoyaltyPointsPerUnit } from "../lib/resolveSellerMaxLoyaltyPointsPerUnit.js";
 import { ProductModalShell } from "../../../shared/ui/ProductModalShell/ProductModalShell.jsx";
@@ -50,6 +50,8 @@ import {
 import { getProductFieldEditLabel } from "../lib/productFieldRegistry.js";
 import { FormFieldLabel } from "../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
 import "./CreateProductModal.css";
+
+const CREATE_PRODUCT_FORM_ID = "create-product-form";
 
 const INITIAL_FORM = {
   productName: "",
@@ -317,9 +319,9 @@ export function CreateProductModal({
       );
 
       const urls = urlsFromImageRows(form.productImageRows).map((url) =>
-        resolveUploadedImageUrl(url),
+        normalizeUploadUrlForStorage(url),
       );
-      const previewVideoUrl = resolveUploadedImageUrl(
+      const previewVideoUrl = normalizeUploadUrlForStorage(
         form.productPreviewVideoUrl.trim(),
       );
       if (previewVideoUrl && urls.length === 0) {
@@ -471,220 +473,280 @@ export function CreateProductModal({
         title={title}
         titleId="create-product-modal-title"
         ariaLabel={dialogAria}
-        size="md"
+        size="lg"
         panelClassName="create-product-modal__panel"
         bodyClassName="create-product-modal__body"
-      >
-        <form className="create-product-modal__form" onSubmit={handleSubmit}>
-            <label className="create-product-modal__label">
-              <FormFieldLabel required>
-                {getProductFieldEditLabel("productName")}
-              </FormFieldLabel>
-              <input
-                className="create-product-modal__input"
-                type="text"
-                name="productName"
-                value={form.productName}
-                onChange={handleChange}
-                required
-                minLength={3}
-                autoComplete="off"
-                disabled={isSubmitting}
-              />
-            </label>
-            <label className="create-product-modal__label">
-              <FormFieldLabel required>
-                {getProductFieldEditLabel("productDescription")}
-              </FormFieldLabel>
-              <textarea
-                className="create-product-modal__textarea"
-                name="productDescription"
-                value={form.productDescription}
-                onChange={handleChange}
-                required
-                minLength={PRODUCT_DESCRIPTION_MIN_CHARS}
-                maxLength={PRODUCT_DESCRIPTION_MAX_CHARS}
-                disabled={isSubmitting}
-              />
-              <span
-                className={
-                  descriptionChars > PRODUCT_DESCRIPTION_MAX_CHARS
-                    ? "create-product-modal__char-meter create-product-modal__char-meter_overflow"
-                    : "create-product-modal__char-meter"
-                }
-              >
-                {CREATE_PRODUCT_MODAL_UI.CHARS_USED(
-                  descriptionChars,
-                  PRODUCT_DESCRIPTION_MAX_CHARS,
-                )}
-              </span>
-            </label>
-            <ProductCharacteristicsEditor
-              rows={form.productCharacteristicRows}
-              onRowsChange={(productCharacteristicRows) =>
-                setForm((prev) => ({ ...prev, productCharacteristicRows }))
-              }
+        footerClassName="create-product-modal__footer"
+        footer={
+          <div className="create-product-modal__footer-actions">
+            <button
+              type="button"
+              className="create-product-modal__cancel"
+              onClick={handleClose}
               disabled={isSubmitting}
-            />
-            <ProductImageUrlSortableList
-              rows={form.productImageRows}
-              onRowsChange={(productImageRows) =>
-                setForm((prev) => ({ ...prev, productImageRows }))
-              }
-              disabled={isSubmitting}
-            />
-            <div className="create-product-modal__label">
-              <FormFieldLabel>{PRODUCT_PREVIEW_VIDEO_UI.LABEL}</FormFieldLabel>
-              <ProductPreviewVideoField
-                value={form.productPreviewVideoUrl}
-                onChange={(productPreviewVideoUrl) =>
-                  setForm((prev) => ({ ...prev, productPreviewVideoUrl }))
-                }
-                disabled={isSubmitting}
-              />
-            </div>
-            <label className="create-product-modal__label">
-              <FormFieldLabel required>
-                {getProductFieldEditLabel("productPrice")}
-              </FormFieldLabel>
-              <input
-                {...INTEGER_INPUT_FIELD_PROPS}
-                className="create-product-modal__input"
-                name="productPrice"
-                value={form.productPrice}
-                onChange={handleChange}
-                required
-                disabled={isSubmitting}
-              />
-            </label>
-            <label className="create-product-modal__label">
-              <FormFieldLabel>{getProductFieldEditLabel("productOldPrice")}</FormFieldLabel>
-              <input
-                {...INTEGER_INPUT_FIELD_PROPS}
-                className="create-product-modal__input"
-                name="productOldPrice"
-                value={form.productOldPrice}
-                onChange={handleChange}
-                disabled={isSubmitting}
-              />
-            </label>
-            {discountPreviewPercent != null ? (
-              <p className="create-product-modal__discount-preview">
-                {CREATE_PRODUCT_MODAL_UI.LABEL_DISCOUNT_PREVIEW}: −
-                {discountPreviewPercent}%
-              </p>
-            ) : null}
-            <CreateProductCategoryPicker
-              value={{
-                productCategoryId: form.productCategoryId,
-                categoryBreadcrumbRu: form.categoryBreadcrumbRu,
-                productCategory: form.productCategory,
-              }}
-              disabled={isSubmitting}
-              onChange={({
-                productCategoryId,
-                categoryBreadcrumbRu,
-                productCategory,
-              }) =>
-                setForm((prev) => ({
-                  ...prev,
-                  productCategoryId,
-                  categoryBreadcrumbRu,
-                  productCategory,
-                }))
-              }
-            />
-            {showCatalogAvailabilityToggle ? (
-              <label className="create-product-modal__check">
-                <input
-                  type="checkbox"
-                  checked={form.productIsAvailable}
-                  onChange={handleAvailableChange}
-                  disabled={isSubmitting}
-                />
-                {getProductFieldEditLabel("productIsAvailable")}
-              </label>
-            ) : null}
-            {form.productIsAvailable || isEdit ? (
-              <label className="create-product-modal__label">
-                <FormFieldLabel
-                  required={form.productIsAvailable || !showCatalogAvailabilityToggle}
-                >
-                  {getProductFieldEditLabel("productStockQuantity")}
-                </FormFieldLabel>
-                <input
-                  {...INTEGER_INPUT_FIELD_PROPS}
-                  className="create-product-modal__input"
-                  name="productStockQuantity"
-                  value={form.productStockQuantity}
-                  onChange={handleChange}
-                  maxLength={String(PRODUCT_STOCK_QUANTITY_MAX).length}
-                  disabled={isSubmitting}
-                  required={form.productIsAvailable || !showCatalogAvailabilityToggle}
-                />
-              </label>
-            ) : null}
-            <label className="create-product-modal__label">
-              <FormFieldLabel>
-                {getProductFieldEditLabel("loyaltyPointsPerUnit")}
-              </FormFieldLabel>
-              <input
-                {...INTEGER_INPUT_FIELD_PROPS}
-                className="create-product-modal__input"
-                name="loyaltyPointsPerUnit"
-                value={form.loyaltyPointsPerUnit}
-                onChange={handleChange}
-                disabled={isSubmitting || loyaltyFieldDisabled}
-                maxLength={8}
-              />
-              <p className="create-product-modal__hint">
-                {loyaltyFieldDisabled
-                  ? CREATE_PRODUCT_MODAL_UI.HINT_LOYALTY_POINTS_ZERO_BALANCE
-                  : CREATE_PRODUCT_MODAL_UI.HINT_LOYALTY_POINTS_PER_UNIT(
-                      sellerLoyaltyBudget.available,
-                      sellerLoyaltyBudget.catalogCommitted,
-                      sellerPointsMaxPerUnit,
-                    )}
-              </p>
-            </label>
-            {showManageSection && manageProduct ? (
-              <ProductEditManageSection
-                product={manageProduct}
-                onDelete={onDeleteProduct}
-                onSetAvailability={onSetProductAvailability}
-                onSetAuction={onSetProductAuction}
-                isDeletePending={isDeletePending}
-                isAvailabilityTogglePending={isAvailabilityTogglePending}
-                isAuctionTogglePending={isAuctionTogglePending}
-                errorMessage={manageErrorMessage}
-                canEdit={canManageEdit}
-                canDelete={canManageDelete}
-                canToggleVisibility={canManageToggleVisibility}
-                sellerRaffleActive={sellerRaffleActive}
-                onToggleRaffleParticipation={onToggleRaffleParticipation}
-                isRaffleParticipationPending={isRaffleParticipationPending}
-                disabled={isSubmitting}
-                onOpenInstallmentProgram={() => setIsInstallmentProgramOpen(true)}
-                canOpenInstallmentProgram={
-                  manageProduct.productModerationStatus === PRODUCT_MODERATION_APPROVED
-                }
-              />
-            ) : null}
-            {status.kind === "error" ? (
-              <p
-                className="create-product-modal__message create-product-modal__message_error"
-                role="alert"
-              >
-                {status.message}
-              </p>
-            ) : null}
+            >
+              {CREATE_PRODUCT_MODAL_UI.CANCEL}
+            </button>
             <button
               type="submit"
+              form={CREATE_PRODUCT_FORM_ID}
               className="create-product-modal__submit"
               disabled={isSubmitting}
             >
               {isSubmitting ? submitLoading : submitIdle}
             </button>
+          </div>
+        }
+      >
+        <form
+          id={CREATE_PRODUCT_FORM_ID}
+          className="create-product-modal__form"
+          onSubmit={handleSubmit}
+        >
+          <section className="create-product-modal__section" aria-labelledby="create-product-section-basic">
+            <h3 id="create-product-section-basic" className="create-product-modal__section-title">
+              {CREATE_PRODUCT_MODAL_UI.SECTION_BASIC}
+            </h3>
+            <div className="create-product-modal__section-body">
+              <label className="create-product-modal__label">
+                <FormFieldLabel required>
+                  {getProductFieldEditLabel("productName")}
+                </FormFieldLabel>
+                <input
+                  className="create-product-modal__input"
+                  type="text"
+                  name="productName"
+                  value={form.productName}
+                  onChange={handleChange}
+                  required
+                  minLength={3}
+                  autoComplete="off"
+                  disabled={isSubmitting}
+                />
+              </label>
+              <label className="create-product-modal__label">
+                <FormFieldLabel required>
+                  {getProductFieldEditLabel("productDescription")}
+                </FormFieldLabel>
+                <textarea
+                  className="create-product-modal__textarea"
+                  name="productDescription"
+                  value={form.productDescription}
+                  onChange={handleChange}
+                  required
+                  minLength={PRODUCT_DESCRIPTION_MIN_CHARS}
+                  maxLength={PRODUCT_DESCRIPTION_MAX_CHARS}
+                  disabled={isSubmitting}
+                />
+                <span
+                  className={
+                    descriptionChars > PRODUCT_DESCRIPTION_MAX_CHARS
+                      ? "create-product-modal__char-meter create-product-modal__char-meter_overflow"
+                      : "create-product-modal__char-meter"
+                  }
+                >
+                  {CREATE_PRODUCT_MODAL_UI.CHARS_USED(
+                    descriptionChars,
+                    PRODUCT_DESCRIPTION_MAX_CHARS,
+                  )}
+                </span>
+              </label>
+              <ProductCharacteristicsEditor
+                rows={form.productCharacteristicRows}
+                onRowsChange={(productCharacteristicRows) =>
+                  setForm((prev) => ({ ...prev, productCharacteristicRows }))
+                }
+                disabled={isSubmitting}
+              />
+            </div>
+          </section>
+
+          <section className="create-product-modal__section" aria-labelledby="create-product-section-media">
+            <h3 id="create-product-section-media" className="create-product-modal__section-title">
+              {CREATE_PRODUCT_MODAL_UI.SECTION_MEDIA}
+            </h3>
+            <div className="create-product-modal__section-body">
+              <ProductImageUrlSortableList
+                rows={form.productImageRows}
+                onRowsChange={(productImageRows) =>
+                  setForm((prev) => ({ ...prev, productImageRows }))
+                }
+                disabled={isSubmitting}
+              />
+              <div className="create-product-modal__label">
+                <FormFieldLabel>{PRODUCT_PREVIEW_VIDEO_UI.LABEL}</FormFieldLabel>
+                <ProductPreviewVideoField
+                  value={form.productPreviewVideoUrl}
+                  onChange={(productPreviewVideoUrl) =>
+                    setForm((prev) => ({ ...prev, productPreviewVideoUrl }))
+                  }
+                  disabled={isSubmitting}
+                />
+              </div>
+            </div>
+          </section>
+
+          <section
+            className="create-product-modal__section"
+            aria-labelledby="create-product-section-commerce"
+          >
+            <h3
+              id="create-product-section-commerce"
+              className="create-product-modal__section-title"
+            >
+              {CREATE_PRODUCT_MODAL_UI.SECTION_COMMERCE}
+            </h3>
+            <div className="create-product-modal__section-body">
+              <div className="create-product-modal__price-grid">
+                <label className="create-product-modal__label">
+                  <FormFieldLabel required>
+                    {getProductFieldEditLabel("productPrice")}
+                  </FormFieldLabel>
+                  <input
+                    {...INTEGER_INPUT_FIELD_PROPS}
+                    className="create-product-modal__input create-product-modal__input_price"
+                    name="productPrice"
+                    value={form.productPrice}
+                    onChange={handleChange}
+                    required
+                    disabled={isSubmitting}
+                  />
+                </label>
+                <label className="create-product-modal__label">
+                  <FormFieldLabel>{getProductFieldEditLabel("productOldPrice")}</FormFieldLabel>
+                  <input
+                    {...INTEGER_INPUT_FIELD_PROPS}
+                    className="create-product-modal__input create-product-modal__input_price"
+                    name="productOldPrice"
+                    value={form.productOldPrice}
+                    onChange={handleChange}
+                    disabled={isSubmitting}
+                  />
+                </label>
+              </div>
+              {discountPreviewPercent != null ? (
+                <p className="create-product-modal__discount-preview">
+                  {CREATE_PRODUCT_MODAL_UI.LABEL_DISCOUNT_PREVIEW}: −{discountPreviewPercent}%
+                </p>
+              ) : null}
+              <CreateProductCategoryPicker
+                value={{
+                  productCategoryId: form.productCategoryId,
+                  categoryBreadcrumbRu: form.categoryBreadcrumbRu,
+                  productCategory: form.productCategory,
+                }}
+                disabled={isSubmitting}
+                onChange={({
+                  productCategoryId,
+                  categoryBreadcrumbRu,
+                  productCategory,
+                }) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    productCategoryId,
+                    categoryBreadcrumbRu,
+                    productCategory,
+                  }))
+                }
+              />
+              {showCatalogAvailabilityToggle ? (
+                <label className="create-product-modal__check">
+                  <input
+                    type="checkbox"
+                    checked={form.productIsAvailable}
+                    onChange={handleAvailableChange}
+                    disabled={isSubmitting}
+                  />
+                  {getProductFieldEditLabel("productIsAvailable")}
+                </label>
+              ) : null}
+              {form.productIsAvailable || isEdit ? (
+                <label className="create-product-modal__label">
+                  <FormFieldLabel
+                    required={form.productIsAvailable || !showCatalogAvailabilityToggle}
+                  >
+                    {getProductFieldEditLabel("productStockQuantity")}
+                  </FormFieldLabel>
+                  <input
+                    {...INTEGER_INPUT_FIELD_PROPS}
+                    className="create-product-modal__input"
+                    name="productStockQuantity"
+                    value={form.productStockQuantity}
+                    onChange={handleChange}
+                    maxLength={String(PRODUCT_STOCK_QUANTITY_MAX).length}
+                    disabled={isSubmitting}
+                    required={form.productIsAvailable || !showCatalogAvailabilityToggle}
+                  />
+                </label>
+              ) : null}
+              <label className="create-product-modal__label">
+                <FormFieldLabel>
+                  {getProductFieldEditLabel("loyaltyPointsPerUnit")}
+                </FormFieldLabel>
+                <input
+                  {...INTEGER_INPUT_FIELD_PROPS}
+                  className="create-product-modal__input"
+                  name="loyaltyPointsPerUnit"
+                  value={form.loyaltyPointsPerUnit}
+                  onChange={handleChange}
+                  disabled={isSubmitting || loyaltyFieldDisabled}
+                  maxLength={8}
+                />
+                <p className="create-product-modal__hint">
+                  {loyaltyFieldDisabled
+                    ? CREATE_PRODUCT_MODAL_UI.HINT_LOYALTY_POINTS_ZERO_BALANCE
+                    : CREATE_PRODUCT_MODAL_UI.HINT_LOYALTY_POINTS_PER_UNIT(
+                        sellerLoyaltyBudget.available,
+                        sellerLoyaltyBudget.catalogCommitted,
+                        sellerPointsMaxPerUnit,
+                      )}
+                </p>
+              </label>
+            </div>
+          </section>
+
+          {showManageSection && manageProduct ? (
+            <section
+              className="create-product-modal__section create-product-modal__section_manage"
+              aria-labelledby="create-product-section-manage"
+            >
+              <h3 id="create-product-section-manage" className="create-product-modal__section-title">
+                {CREATE_PRODUCT_MODAL_UI.MANAGE_SECTION_TITLE}
+              </h3>
+              <div className="create-product-modal__section-body">
+                <ProductEditManageSection
+                  product={manageProduct}
+                  onDelete={onDeleteProduct}
+                  onSetAvailability={onSetProductAvailability}
+                  onSetAuction={onSetProductAuction}
+                  isDeletePending={isDeletePending}
+                  isAvailabilityTogglePending={isAvailabilityTogglePending}
+                  isAuctionTogglePending={isAuctionTogglePending}
+                  errorMessage={manageErrorMessage}
+                  canEdit={canManageEdit}
+                  canDelete={canManageDelete}
+                  canToggleVisibility={canManageToggleVisibility}
+                  sellerRaffleActive={sellerRaffleActive}
+                  onToggleRaffleParticipation={onToggleRaffleParticipation}
+                  isRaffleParticipationPending={isRaffleParticipationPending}
+                  disabled={isSubmitting}
+                  onOpenInstallmentProgram={() => setIsInstallmentProgramOpen(true)}
+                  canOpenInstallmentProgram={
+                    manageProduct.productModerationStatus === PRODUCT_MODERATION_APPROVED
+                  }
+                />
+              </div>
+            </section>
+          ) : null}
+
+          {status.kind === "error" ? (
+            <p
+              className="create-product-modal__message create-product-modal__message_error"
+              role="alert"
+            >
+              {status.message}
+            </p>
+          ) : null}
         </form>
       </ProductModalShell>
       {manageProduct?._id != null ? (

@@ -1,7 +1,108 @@
+.my-orders-page {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.my-orders-page__toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--iz-color-action-light) 45%, var(--iz-color-border));
+  border-radius: 0.65rem;
+  background: linear-gradient(
+    135deg,
+    var(--iz-color-surface) 0%,
+    var(--iz-color-action-soft) 140%
+  );
+}
+
+.my-orders-page__toolbar-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.my-orders-page__heading {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--iz-color-text);
+}
+
+.my-orders-page__count {
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  color: var(--iz-color-text-muted);
+}
+
+.my-orders-page__status-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.my-orders-page__status-chip {
+  margin: 0;
+  padding: 0.22rem 0.55rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 999px;
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text-secondary);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.3;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.my-orders-page__status-chip:hover {
+  border-color: color-mix(in srgb, var(--iz-color-action) 35%, var(--iz-color-border));
+  background: var(--iz-color-action-soft);
+}
+
+.my-orders-page__status-chip_active {
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast);
+}
+
+.my-orders-page__status-chip_active.my-orders-page__status-chip_pending {
+  border-color: var(--iz-color-warning-bright);
+  background: var(--iz-color-warning-bright);
+}
+
+.my-orders-page__status-chip_active.my-orders-page__status-chip_confirmed {
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action);
+}
+
+.my-orders-page__status-chip_active.my-orders-page__status-chip_shipped {
+  border-color: var(--iz-color-premium-purple);
+  background: var(--iz-color-premium-purple);
+}
+
+.my-orders-page__status-chip_active.my-orders-page__status-chip_delivered {
+  border-color: var(--iz-color-success-vivid);
+  background: var(--iz-color-success-vivid);
+}
+
+.my-orders-page__status-chip_active.my-orders-page__status-chip_cancelled {
+  border-color: var(--iz-color-danger-accent);
+  background: var(--iz-color-danger-accent);
+}
+
 .my-orders-page__list {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: 0.45rem;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -21,10 +122,20 @@
 }
 
 .my-orders-page__loyalty-flash {
-  margin: 0 0 0.75rem;
+  margin: 0;
   padding: 0.5rem 0.75rem;
   border-radius: 0.5rem;
   background: var(--iz-color-success-mint);
   color: var(--iz-color-success-mint-deep);
   font-size: 0.95rem;
+}
+
+.my-orders-page__product-loading,
+.my-orders-page__product-error {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.my-orders-page__product-error {
+  color: var(--iz-color-danger-strong);
 }

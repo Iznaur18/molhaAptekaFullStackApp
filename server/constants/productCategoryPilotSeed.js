@@ -16,15 +16,6 @@
 /** @type {ProductCategorySeedNode[]} */
 export const PRODUCT_CATEGORY_PILOT_SEED = [
   {
-    slug: "electronics",
-    labelRu: "Электроника",
-    parentSlug: null,
-    isLeaf: false,
-    legacyProductCategory: "electronics",
-    searchKeywords: ["электроника", "техника", "гаджеты"],
-    sortOrder: 10,
-  },
-  {
     slug: "electronics-phones",
     labelRu: "Телефоны",
     parentSlug: "electronics",

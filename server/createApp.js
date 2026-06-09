@@ -1,5 +1,4 @@
 import express from "express";
-import cors from "cors";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import {
@@ -20,16 +19,10 @@ import {
   notFoundHandler,
   requestIdMW,
 } from "./middlewares/index.js";
-import { REQUEST_ID_HEADER } from "./constants/requestLogConstants.js";
 import { buildApiHelmetOptions } from "./utils/buildApiHelmetOptions.js";
 import { buildHealthPayload } from "./utils/buildHealthPayload.js";
+import { resolveApiCorsMiddleware } from "./utils/resolveApiCorsMiddleware.js";
 import { UPLOADS_DIR } from "./utils/uploadsDir.js";
-
-const corsOptionsWithRequestId = (origin) => ({
-  origin,
-  credentials: true,
-  exposedHeaders: [REQUEST_ID_HEADER],
-});
 
 export const createApp = () => {
   const app = express();
@@ -39,11 +32,7 @@ export const createApp = () => {
   app.use(requestIdMW);
   app.use(express.json());
   app.use(cookieParser());
-  app.use(
-    process.env.FRONTEND_URL
-      ? cors(corsOptionsWithRequestId(process.env.FRONTEND_URL))
-      : cors(corsOptionsWithRequestId(true)),
-  );
+  app.use(resolveApiCorsMiddleware(isProduction));
   app.use(helmet(buildApiHelmetOptions({ isProduction })));
 
   app.use(generalRateLimiter);

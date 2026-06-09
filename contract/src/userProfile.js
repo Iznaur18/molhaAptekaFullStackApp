@@ -8,6 +8,7 @@ import {
   normalizeUserNameInput,
   RU_PHONE_E164_REGEX,
 } from "./userFields.js";
+import { isStoredMediaUrl } from "./storedMediaUrl.js";
 
 /** Синхрон с `server/constants/profileImageFocusConstants.js`. */
 export const PROFILE_IMAGE_FOCUS_MIN = 0;
@@ -40,7 +41,7 @@ function parseUserBackgroundPresetId(value) {
  * @param {unknown} value
  */
 function isHttpBackgroundImageUrl(value) {
-  return typeof value === "string" && /^https?:\/\//i.test(value.trim());
+  return isStoredMediaUrl(value);
 }
 
 export const profileImageFocusSchema = z
@@ -146,15 +147,13 @@ const clearableBirthDateSchema = clearableOptionalString.superRefine((value, ctx
 
 const clearableAvatarUrlSchema = clearableOptionalString.superRefine((value, ctx) => {
   if (value === undefined || value === null || value === "") return;
-  try {
-    // eslint-disable-next-line no-new
-    new URL(value);
-  } catch {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "URL аватара должен быть валидным URL",
-    });
+  if (isStoredMediaUrl(value)) {
+    return;
   }
+  ctx.addIssue({
+    code: z.ZodIssueCode.custom,
+    message: "URL аватара: http(s):// или /uploads/...",
+  });
 });
 
 const clearableBackgroundUrlSchema = clearableOptionalString.superRefine((value, ctx) => {
@@ -164,7 +163,7 @@ const clearableBackgroundUrlSchema = clearableOptionalString.superRefine((value,
   }
   ctx.addIssue({
     code: z.ZodIssueCode.custom,
-    message: "Фон: пресет preset:<id> или URL (http/https)",
+    message: "Фон: пресет preset:<id> или URL (http/https, /uploads/...)",
   });
 });
 

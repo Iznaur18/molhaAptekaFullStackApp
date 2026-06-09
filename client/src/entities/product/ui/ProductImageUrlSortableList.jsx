@@ -21,7 +21,7 @@ import { PRODUCT_IMAGE_URLS_MAX } from "../model/productConstants.js";
 import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { getProductFieldEditLabel } from "../lib/productFieldRegistry.js";
 import {
-  isHttpImageUrl,
+  isDisplayableProductImageUrl,
   resolveImageUrlForDisplay,
 } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { ImageUrlField } from "../../../shared/ui/ImageUrlField/ImageUrlField.jsx";
@@ -58,7 +58,8 @@ function SortableImageRow({
 
   const trimmed = row.url.trim();
   const displayUrl = resolveImageUrlForDisplay(trimmed);
-  const showPreview = displayUrl !== "" && isHttpImageUrl(displayUrl) && !previewFailed;
+  const showPreview =
+    displayUrl !== "" && isDisplayableProductImageUrl(trimmed) && !previewFailed;
 
   return (
     <li

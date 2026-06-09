@@ -1,4 +1,5 @@
 import { validateRuDeliveryAddressForm } from "../../address/lib/validateRuDeliveryAddressForm.js";
+import { isStoredUploadOrHttpImageUrl } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { validateRuPhoneField } from "./ruPhone.js";
 import {
   NOTES_ABOUT_USER_MAX_CHARS,
@@ -11,7 +12,6 @@ import {
   USER_ROLE_MODERATOR,
   USER_ROLE_USER,
 } from "../model/userConstants.js";
-import { isHttpBackgroundImageUrl } from "./userBackgroundValue.js";
 import { isUserBackgroundPresetId } from "../model/userBackgroundPresets.js";
 
 const DISCOUNT_MIN = 0;
@@ -53,23 +53,19 @@ export function validateEditProfileForm(form, options = {}) {
   }
 
   const av = String(form.userAvatarUrl).trim();
-  if (av !== "") {
-    try {
-      void new URL(av);
-    } catch {
-      return "Некорректный URL аватара";
-    }
+  if (av !== "" && !isStoredUploadOrHttpImageUrl(av)) {
+    return "Некорректный URL аватара (http(s):// или /uploads/...)";
   }
 
   if (backgroundMode === "image") {
     const imageUrl = String(form.backgroundImageUrl ?? "").trim();
-    if (imageUrl !== "" && !isHttpBackgroundImageUrl(imageUrl)) {
-      return "Укажите корректный URL фона (http или https)";
+    if (imageUrl !== "" && !isStoredUploadOrHttpImageUrl(imageUrl)) {
+      return "Укажите корректный URL фона (http(s):// или /uploads/...)";
     }
   } else if (backgroundMode === "admin") {
     const imageUrl = String(form.backgroundImageUrl ?? "").trim();
-    if (imageUrl !== "" && !isHttpBackgroundImageUrl(imageUrl)) {
-      return "Некорректный URL фона";
+    if (imageUrl !== "" && !isStoredUploadOrHttpImageUrl(imageUrl)) {
+      return "Некорректный URL фона (http(s):// или /uploads/...)";
     }
     if (imageUrl === "" && !isUserBackgroundPresetId(form.backgroundPresetId)) {
       return "Выберите цвет фона";

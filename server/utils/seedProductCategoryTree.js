@@ -1,4 +1,5 @@
 import { PRODUCT_CATEGORY_PILOT_SEED } from "../constants/productCategoryPilotSeed.js";
+import { PRODUCT_CATEGORY_ROOTS_SEED } from "../constants/productCategoryRootsSeed.js";
 import { PRODUCT_CATEGORY_TREE_MAX_DEPTH } from "../constants/productCategoryTreeConstants.js";
 import ProductCategoryModel from "../models/ProductCategoryModel.js";
 import { normalizeProductCategorySearchKeywords } from "./normalizeProductCategorySearchKeywords.js";
@@ -6,10 +7,15 @@ import { normalizeProductCategorySearchKeywords } from "./normalizeProductCatego
 /**
  * Идемпотентный upsert пилотного дерева (родители раньше детей).
  */
+const PRODUCT_CATEGORY_TREE_SEED = [
+  ...PRODUCT_CATEGORY_ROOTS_SEED,
+  ...PRODUCT_CATEGORY_PILOT_SEED,
+];
+
 export const seedProductCategoryTree = async () => {
   const slugToId = new Map();
 
-  for (const node of PRODUCT_CATEGORY_PILOT_SEED) {
+  for (const node of PRODUCT_CATEGORY_TREE_SEED) {
     const parentId = node.parentSlug ? (slugToId.get(node.parentSlug) ?? null) : null;
 
     if (node.parentSlug && !parentId) {

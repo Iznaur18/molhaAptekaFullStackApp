@@ -75,6 +75,7 @@ export function useProductCardChromeFlags(props, currentUserId) {
     (highlightRaffleProduct || showRaffleBadge) && !isMineMode && !isModerationQueue;
 
   const showAddToCartButton =
+    !isModerationQueue &&
     (showAddToCartOnCard || showBannerLayout) &&
     product.productIsAvailable !== false &&
     product._id != null &&

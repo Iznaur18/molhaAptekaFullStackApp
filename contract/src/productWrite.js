@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { mongoIdSchema } from "./mongoId.js";
 import { PRODUCT_MODERATION_STATUSES, productFromApiSchema } from "./productFromApi.js";
+import { storedMediaUrlOrEmptySchema, storedMediaUrlSchema } from "./storedMediaUrl.js";
 
 /** Синхрон с `server/constants/productConstants.js` (legacy slug). */
 export const PRODUCT_CATEGORY_VALUES = [
@@ -44,25 +45,22 @@ export const PRODUCT_STOCK_QUANTITY_MIN = 1;
 export const PRODUCT_STOCK_QUANTITY_MAX = 9999;
 export const PRODUCT_CHARACTERISTICS_MAX_ITEMS = 10;
 
-const httpUrlSchema = z
-  .string()
-  .trim()
-  .url()
-  .refine((value) => value.startsWith("http://") || value.startsWith("https://"), {
-    message: "URL должен начинаться с http:// или https://",
-  });
+const productImageUrlsSchema = z
+  .array(storedMediaUrlSchema)
+  .max(PRODUCT_IMAGE_URLS_MAX)
+  .optional();
 
 const productCharacteristicSchema = z.object({
   key: z.string().trim().min(1).max(50),
   value: z.string().trim().min(1).max(200),
 });
 
-const productImageUrlsSchema = z
-  .array(httpUrlSchema)
-  .max(PRODUCT_IMAGE_URLS_MAX)
-  .optional();
-
-const legacyCategorySchema = z.enum(PRODUCT_CATEGORY_VALUES);
+const legacyCategorySchema = z
+  .string()
+  .trim()
+  .min(2)
+  .max(80)
+  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Некорректный slug категории");
 
 const assertCategoryIdOrLegacy = (body, ctx) => {
   const hasId =
@@ -108,8 +106,8 @@ export const createProductBodySchema = z
       .min(PRODUCT_DESCRIPTION_MIN_CHARS)
       .max(PRODUCT_DESCRIPTION_MAX_CHARS),
     productImageUrls: productImageUrlsSchema,
-    productImageUrl: httpUrlSchema.optional(),
-    productPreviewVideoUrl: z.union([httpUrlSchema, z.literal("")]).optional(),
+    productImageUrl: storedMediaUrlSchema.optional(),
+    productPreviewVideoUrl: storedMediaUrlOrEmptySchema.optional(),
     productPrice: z.coerce.number().int().min(0).max(PRODUCT_PRICE_RUB_MAX),
     productOldPrice: z.coerce.number().int().min(0).nullable().optional(),
     productCategoryId: mongoIdSchema.optional(),
@@ -140,8 +138,8 @@ const patchFieldShape = {
     .max(PRODUCT_DESCRIPTION_MAX_CHARS)
     .optional(),
   productImageUrls: productImageUrlsSchema,
-  productImageUrl: httpUrlSchema.optional(),
-  productPreviewVideoUrl: z.union([httpUrlSchema, z.literal("")]).optional(),
+  productImageUrl: storedMediaUrlSchema.optional(),
+  productPreviewVideoUrl: storedMediaUrlOrEmptySchema.optional(),
   productPrice: z.coerce.number().int().min(0).max(PRODUCT_PRICE_RUB_MAX).optional(),
   productOldPrice: z.coerce.number().int().min(0).nullable().optional(),
   productCategoryId: mongoIdSchema.optional(),

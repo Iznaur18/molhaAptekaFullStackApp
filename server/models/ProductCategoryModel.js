@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 
-import { PRODUCT_CATEGORY_VALUES } from "../constants/productConstants.js";
 import {
   PRODUCT_CATEGORY_LABEL_RU_MAX_LENGTH,
   PRODUCT_CATEGORY_SEARCH_KEYWORD_MAX_LENGTH,
@@ -73,7 +72,8 @@ const ProductCategorySchema = new Schema(
     legacyProductCategory: {
       type: String,
       trim: true,
-      enum: PRODUCT_CATEGORY_VALUES,
+      maxlength: PRODUCT_CATEGORY_SLUG_MAX_LENGTH,
+      default: null,
     },
     sortOrder: {
       type: Number,

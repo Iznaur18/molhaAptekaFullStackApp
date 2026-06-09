@@ -21,11 +21,6 @@ import {
 } from "../../../shared/config/appUiCopy.js";
 import { useDebouncedValue } from "../../../shared/lib/useDebouncedValue.js";
 import { useRefetchOnVisible } from "../../../shared/lib/useRefetchOnVisible.js";
-import {
-  ListPageFilter,
-  ListPageFilterBar,
-  ListPageFilterSelect,
-} from "../../../shared/ui/ListPageFilterBar/ListPageFilterBar.jsx";
 import { SearchInput } from "../../../shared/ui/SearchInput/SearchInput.jsx";
 
 import "./MySalesPage.css";
@@ -257,12 +252,13 @@ export function MySalesPage({
   if (orders.length === 0) {
     return (
       <div className="my-sales-page">
-        <SalesFilters
+        <SalesToolbar
           statusFilter={statusFilter}
           onStatusFilterChange={setStatusFilter}
           searchTerm={searchTerm}
           onSearchTermChange={setSearchTerm}
           isSearchPending={isSearchPending}
+          ordersCount={0}
         />
         <p className="my-sales-page__state">{emptyMessage}</p>
       </div>
@@ -271,18 +267,20 @@ export function MySalesPage({
 
   return (
     <div className="my-sales-page">
-      <SalesFilters
+      <SalesToolbar
         statusFilter={statusFilter}
         onStatusFilterChange={setStatusFilter}
         searchTerm={searchTerm}
         onSearchTermChange={setSearchTerm}
         isSearchPending={isSearchPending}
+        ordersCount={orders.length}
       />
       <ul className="my-sales-page__list" role="list">
         {orders.map((order) => (
           <li key={order._id} className="my-sales-page__item" role="listitem">
             <OrderCard
               order={order}
+              compact
               showBuyer
               onBuyerNameClick={onSellerNameClick}
               onProductClick={openCatalogProductFromOrderLine}
@@ -308,6 +306,14 @@ export function MySalesPage({
   );
 }
 
+const SALES_STATUS_FILTER_OPTIONS = [
+  { value: "", label: MY_SALES_PAGE_UI.STATUS_FILTER_ALL },
+  ...ORDER_STATUSES.map((status) => ({
+    value: status,
+    label: ORDER_STATUS_LABEL_RU[status],
+  })),
+];
+
 /**
  * @param {{
  *   statusFilter: string;
@@ -315,30 +321,51 @@ export function MySalesPage({
  *   searchTerm: string;
  *   onSearchTermChange: (value: string) => void;
  *   isSearchPending: boolean;
+ *   ordersCount: number;
  * }} props
  */
-function SalesFilters({
+function SalesToolbar({
   statusFilter,
   onStatusFilterChange,
   searchTerm,
   onSearchTermChange,
   isSearchPending,
+  ordersCount,
 }) {
   return (
-    <ListPageFilterBar className="my-sales-page__filters">
-      <ListPageFilter label={MY_SALES_PAGE_UI.STATUS_FILTER_LABEL}>
-        <ListPageFilterSelect
-          value={statusFilter}
-          onChange={(event) => onStatusFilterChange(event.target.value)}
-        >
-          <option value="">{MY_SALES_PAGE_UI.STATUS_FILTER_ALL}</option>
-          {ORDER_STATUSES.map((status) => (
-            <option key={status} value={status}>
-              {ORDER_STATUS_LABEL_RU[status]}
-            </option>
-          ))}
-        </ListPageFilterSelect>
-      </ListPageFilter>
+    <div className="my-sales-page__toolbar">
+      <div className="my-sales-page__toolbar-head">
+        <h3 className="my-sales-page__heading">{MY_SALES_PAGE_UI.TITLE}</h3>
+        <span className="my-sales-page__count">{MY_SALES_PAGE_UI.COUNT(ordersCount)}</span>
+      </div>
+
+      <div
+        className="my-sales-page__status-chips"
+        role="group"
+        aria-label={MY_SALES_PAGE_UI.STATUS_FILTER_LABEL}
+      >
+        {SALES_STATUS_FILTER_OPTIONS.map((option) => {
+          const isActive = statusFilter === option.value;
+
+          return (
+            <button
+              key={option.value || "all"}
+              type="button"
+              className={[
+                "my-sales-page__status-chip",
+                isActive ? "my-sales-page__status-chip_active" : "",
+                option.value ? `my-sales-page__status-chip_${option.value}` : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              aria-pressed={isActive}
+              onClick={() => onStatusFilterChange(option.value)}
+            >
+              {option.label}
+            </button>
+          );
+        })}
+      </div>
 
       <div className="my-sales-page__search">
         <SearchInput
@@ -351,6 +378,6 @@ function SalesFilters({
           isPending={isSearchPending}
         />
       </div>
-    </ListPageFilterBar>
+    </div>
   );
 }

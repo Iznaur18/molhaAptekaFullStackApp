@@ -52,7 +52,7 @@ export function SellerProductsPage({
   const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
   const [backgroundLoadFailed, setBackgroundLoadFailed] = useState(false);
 
-  const catalogEnabled = isAuthorized && isSessionReady;
+  const catalogEnabled = isSessionReady;
   const profileQuery = useUserProfileQuery({ userId: sellerId, enabled: catalogEnabled });
   const seller = profileQuery.data ?? null;
   const profilePhase = !catalogEnabled
@@ -121,32 +121,6 @@ export function SellerProductsPage({
   if (!isSessionReady) {
     return (
       <p className="seller-products-page__state">{SELLER_PRODUCTS_PAGE_UI.LOADING}</p>
-    );
-  }
-
-  if (!isAuthorized) {
-    return (
-      <div className="seller-products-page">
-        <header className="seller-products-page__header">
-          <button
-            type="button"
-            className="seller-products-page__back"
-            onClick={onBackToCatalog}
-          >
-            ← {SELLER_PRODUCTS_PAGE_UI.BACK_CATALOG}
-          </button>
-        </header>
-        <p className="seller-products-page__state">
-          {SELLER_PRODUCTS_PAGE_UI.LOGIN_HINT}
-        </p>
-        <button
-          type="button"
-          className="seller-products-page__login"
-          onClick={onRequestLogin}
-        >
-          {SELLER_PRODUCTS_PAGE_UI.LOGIN_BUTTON}
-        </button>
-      </div>
     );
   }
 

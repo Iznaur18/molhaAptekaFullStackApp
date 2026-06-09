@@ -1,17 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { useMyInstallmentContractsQuery } from "../../../entities/installment/model/useMyInstallmentContractsQuery.js";
 import { INSTALLMENT_CONTRACT_STATUS_FILTER_OPTIONS } from "../../../entities/installment/lib/installmentContractStatusFilters.js";
+import { useMyInstallmentContractsQuery } from "../../../entities/installment/model/useMyInstallmentContractsQuery.js";
 import { InstallmentContractCard } from "../../../entities/installment/ui/InstallmentContractCard.jsx";
+import { InstallmentPageLayout } from "../../../entities/installment/ui/InstallmentPageLayout.jsx";
 import { INSTALLMENT_UI } from "../../../shared/config/appUiCopy.js";
 import { useRefetchOnVisible } from "../../../shared/lib/useRefetchOnVisible.js";
-import {
-  ListPageFilter,
-  ListPageFilterBar,
-  ListPageFilterSelect,
-} from "../../../shared/ui/ListPageFilterBar/ListPageFilterBar.jsx";
-
-import "./InstallmentPaymentsPage.css";
 
 /**
  * @param {{
@@ -66,20 +60,33 @@ export function InstallmentPaymentsPage({
 
   if (phase === "loading") {
     return (
-      <p className="installment-list-page__state">
-        {INSTALLMENT_UI.PAYMENTS_PAGE_LOADING}
-      </p>
+      <InstallmentPageLayout
+        title={INSTALLMENT_UI.PAYMENTS_PAGE_TITLE}
+        countLabel={INSTALLMENT_UI.COUNT_CONTRACTS(0)}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        statusOptions={INSTALLMENT_CONTRACT_STATUS_FILTER_OPTIONS}
+        statusFilterAriaLabel={INSTALLMENT_UI.CONTRACT_STATUS_FILTER_LABEL}
+      >
+        <p className="installment-page__state">{INSTALLMENT_UI.PAYMENTS_PAGE_LOADING}</p>
+      </InstallmentPageLayout>
     );
   }
 
   if (phase === "error") {
     return (
-      <p
-        className="installment-list-page__state installment-list-page__state_error"
-        role="alert"
+      <InstallmentPageLayout
+        title={INSTALLMENT_UI.PAYMENTS_PAGE_TITLE}
+        countLabel={INSTALLMENT_UI.COUNT_CONTRACTS(0)}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        statusOptions={INSTALLMENT_CONTRACT_STATUS_FILTER_OPTIONS}
+        statusFilterAriaLabel={INSTALLMENT_UI.CONTRACT_STATUS_FILTER_LABEL}
       >
-        {error}
-      </p>
+        <p className="installment-page__state installment-page__state_error" role="alert">
+          {error}
+        </p>
+      </InstallmentPageLayout>
     );
   }
 
@@ -88,29 +95,22 @@ export function InstallmentPaymentsPage({
     : INSTALLMENT_UI.PAYMENTS_PAGE_EMPTY;
 
   return (
-    <div className="installment-list-page">
-      <ListPageFilterBar className="installment-list-page__filters">
-        <ListPageFilter label={INSTALLMENT_UI.CONTRACT_STATUS_FILTER_LABEL}>
-          <ListPageFilterSelect
-            value={statusFilter}
-            onChange={(event) => setStatusFilter(event.target.value)}
-          >
-            {INSTALLMENT_CONTRACT_STATUS_FILTER_OPTIONS.map((option) => (
-              <option key={option.value || "all"} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </ListPageFilterSelect>
-        </ListPageFilter>
-      </ListPageFilterBar>
-
+    <InstallmentPageLayout
+      title={INSTALLMENT_UI.PAYMENTS_PAGE_TITLE}
+      countLabel={INSTALLMENT_UI.COUNT_CONTRACTS(contracts.length)}
+      statusFilter={statusFilter}
+      onStatusFilterChange={setStatusFilter}
+      statusOptions={INSTALLMENT_CONTRACT_STATUS_FILTER_OPTIONS}
+      statusFilterAriaLabel={INSTALLMENT_UI.CONTRACT_STATUS_FILTER_LABEL}
+    >
       {contracts.length === 0 ? (
-        <p className="installment-list-page__state">{emptyMessage}</p>
+        <p className="installment-page__state">{emptyMessage}</p>
       ) : (
-        <ul className="installment-list-page__list" role="list">
+        <ul className="installment-page__list" role="list">
           {contracts.map((contract) => (
             <li key={contract._id} role="listitem">
               <InstallmentContractCard
+                compact
                 contract={contract}
                 role="buyer"
                 onCounterpartyClick={onCounterpartyClick}
@@ -124,6 +124,6 @@ export function InstallmentPaymentsPage({
           ))}
         </ul>
       )}
-    </div>
+    </InstallmentPageLayout>
   );
 }

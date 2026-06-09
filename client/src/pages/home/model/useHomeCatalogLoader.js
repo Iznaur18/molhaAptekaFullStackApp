@@ -119,6 +119,7 @@ export const useHomeCatalogLoader = ({
     catalogAuctionOnly: filters.catalogAuctionOnly,
     catalogInstallmentOnly: filters.catalogInstallmentOnly,
     catalogSaleOnly: filters.catalogSaleOnly,
+    categoryRoots: browser.categoryRoots,
     categoryDisplays: browser.categoryDisplays,
     feedTileDisplays: browser.feedTileDisplays,
     categoryDisplaysStatus: browser.categoryDisplaysStatus,

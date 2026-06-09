@@ -66,16 +66,22 @@ export function useCatalogBrowserLanding({
 
   const categoryDisplays = categoryDisplaysQuery.data ?? [];
   const feedTileDisplays = feedTileDisplaysQuery.data ?? [];
+  const categoryRoots = categoryRootsQuery.data ?? [];
 
   const categoryDisplaysStatus = useMemo(() => {
     const isLoading =
       displaysEnabled &&
-      (categoryDisplaysQuery.isPending || feedTileDisplaysQuery.isPending);
+      (categoryDisplaysQuery.isPending ||
+        feedTileDisplaysQuery.isPending ||
+        categoryRootsQuery.isPending);
     if (isLoading) {
       return { kind: "loading", message: "" };
     }
 
-    const queryError = categoryDisplaysQuery.error ?? feedTileDisplaysQuery.error;
+    const queryError =
+      categoryDisplaysQuery.error ??
+      feedTileDisplaysQuery.error ??
+      categoryRootsQuery.error;
     if (queryError instanceof Error) {
       return { kind: "error", message: queryError.message };
     }
@@ -90,6 +96,8 @@ export function useCatalogBrowserLanding({
   }, [
     categoryDisplaysQuery.error,
     categoryDisplaysQuery.isPending,
+    categoryRootsQuery.error,
+    categoryRootsQuery.isPending,
     displaysEnabled,
     feedTileDisplaysQuery.error,
     feedTileDisplaysQuery.isPending,
@@ -146,13 +154,18 @@ export function useCatalogBrowserLanding({
   }, [applyCatalogQueryState, navigate, setIsProductCategoryListOpen]);
 
   const handleCatalogCategoryGridClick = useCallback(
-    (categorySlug) => {
-      const rootId = IS_CATALOG_BROWSER_SUBCATEGORY_FILTER_ENABLED
-        ? findCategoryRootIdForLegacySlug(categoryRootsRef.current, categorySlug)
-        : null;
+    (item) => {
+      const rootId =
+        item.categoryId ??
+        (IS_CATALOG_BROWSER_SUBCATEGORY_FILTER_ENABLED
+          ? findCategoryRootIdForLegacySlug(
+              categoryRootsRef.current,
+              item.categorySlug,
+            )
+          : null);
       const nextQuery = {
         sort: CATALOG_SORT_NEWEST,
-        category: rootId ? null : categorySlug,
+        category: rootId ? null : item.categorySlug,
         categoryId: rootId,
         followingOnly: false,
         auctionOnly: false,
@@ -160,9 +173,7 @@ export function useCatalogBrowserLanding({
         saleOnly: false,
       };
       applyCatalogQueryState(nextQuery);
-      if (rootId) {
-        setCategoryTreeLabel(null);
-      }
+      setCategoryTreeLabel(null);
       navigate(buildCatalogBrowserLocation(nextQuery));
     },
     [applyCatalogQueryState, navigate, setCategoryTreeLabel],
@@ -261,6 +272,14 @@ export function useCatalogBrowserLanding({
     if (activeCatalogBrowserCategoryId && categoryTreeLabel) {
       return categoryTreeLabel;
     }
+    if (activeCatalogBrowserCategoryId) {
+      const root = categoryRoots.find(
+        (item) => item.id === activeCatalogBrowserCategoryId,
+      );
+      if (root) {
+        return root.labelRu;
+      }
+    }
     if (!activeCatalogBrowserCategory) {
       return null;
     }
@@ -272,6 +291,7 @@ export function useCatalogBrowserLanding({
     activeCatalogBrowserCategory,
     activeCatalogBrowserCategoryId,
     categoryDisplays,
+    categoryRoots,
     categoryTreeLabel,
   ]);
 
@@ -293,6 +313,7 @@ export function useCatalogBrowserLanding({
 
   return {
     categoryRootsRef,
+    categoryRoots,
     categoryDisplays,
     feedTileDisplays,
     categoryDisplaysStatus,

@@ -67,10 +67,10 @@ export function ProductDetailsModal({
   const title = product.productName?.trim() || "Товар";
   const modalFooter =
     secondaryFooter || adminFooter ? (
-      <>
-        {secondaryFooter}
+      <div className="product-details-modal__footer-actions">
         {adminFooter}
-      </>
+        {secondaryFooter}
+      </div>
     ) : null;
 
   return (

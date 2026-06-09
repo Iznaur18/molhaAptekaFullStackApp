@@ -10,6 +10,10 @@ import {
   ORDER_CREATE_RATE_LIMIT_PER_HOUR,
   ORDER_ITEM_ACTION_RATE_LIMIT_PER_15_MIN,
 } from "../constants/orderRateLimitConstants.js";
+import {
+  GENERAL_RATE_LIMIT_MAX,
+  GENERAL_RATE_LIMIT_WINDOW_MS,
+} from "../constants/rateLimitConstants.js";
 
 /** @type {Record<string, import('express').RequestHandler>} */
 const handlers = {};
@@ -17,6 +21,17 @@ const handlers = {};
 /** @param {import('express').Request} req */
 function rateLimitKeyByUserOrIp(req) {
   return String(req.userId ?? req.ip ?? "unknown");
+}
+
+/** @param {import('express').Request} req */
+function shouldSkipGeneralRateLimit(req) {
+  const path = req.path ?? "";
+  return path === "/health" || path.startsWith("/uploads");
+}
+
+/** @param {import('express').Request} req */
+function generalRateLimitKey(req) {
+  return String(req.ip ?? req.socket?.remoteAddress ?? "unknown");
 }
 
 const RATE_LIMIT_DEFAULTS = {
@@ -39,8 +54,11 @@ export function initRateLimitMiddlewares(store) {
   handlers.general = buildLimiter(
     {
       ...RATE_LIMIT_DEFAULTS,
-      windowMs: 15 * 60 * 1000,
-      max: 10_000,
+      windowMs: GENERAL_RATE_LIMIT_WINDOW_MS,
+      max: GENERAL_RATE_LIMIT_MAX,
+      skip: shouldSkipGeneralRateLimit,
+      keyGenerator: generalRateLimitKey,
+      validate: { ip: false, trustProxy: false, xForwardedForHeader: false },
       message: {
         success: false,
         message: "Слишком много запросов с этого IP, попробуйте позже",
@@ -176,6 +194,7 @@ export function initRateLimitMiddlewares(store) {
       ...RATE_LIMIT_DEFAULTS,
       windowMs: 60 * 60 * 1000,
       max: USER_STORY_RATE_LIMIT_PER_HOUR,
+      skipSuccessfulRequests: true,
       message: {
         success: false,
         message: "Слишком много жалоб. Попробуйте позже",

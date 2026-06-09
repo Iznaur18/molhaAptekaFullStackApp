@@ -1,8 +1,8 @@
 import { USER_PROFILE_COPY } from "../../../shared/config/appUiCopy.js";
 import {
-  resolveImageUrlForDisplay,
-  isHttpImageUrl,
   isStoredUploadOrHttpImageUrl,
+  normalizeUploadUrlForStorage,
+  resolveImageUrlForDisplay,
 } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import {
   DEFAULT_USER_BACKGROUND_PRESET_ID,
@@ -18,7 +18,7 @@ import {
  * @param {unknown} value
  */
 export function isHttpBackgroundImageUrl(value) {
-  return typeof value === "string" && /^https?:\/\//i.test(value.trim());
+  return isStoredUploadOrHttpImageUrl(value);
 }
 
 /**
@@ -99,7 +99,7 @@ export function serializeUserBackgroundForForm(mode, form) {
       if (!isStoredUploadOrHttpImageUrl(imageUrl)) {
         throw new Error("Некорректный URL фона");
       }
-      return resolveImageUrlForDisplay(imageUrl);
+      return normalizeUploadUrlForStorage(imageUrl);
     }
     const presetId = String(form.presetId ?? "").trim();
     if (isUserBackgroundPresetId(presetId)) {
@@ -113,7 +113,7 @@ export function serializeUserBackgroundForForm(mode, form) {
     if (!isStoredUploadOrHttpImageUrl(imageUrl)) {
       throw new Error("Некорректный URL фона");
     }
-    return resolveImageUrlForDisplay(imageUrl);
+    return normalizeUploadUrlForStorage(imageUrl);
   }
 
   const presetId = String(form.presetId ?? "").trim();

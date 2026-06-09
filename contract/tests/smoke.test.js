@@ -306,6 +306,18 @@ test("parseApiSuccess validates auth me payload", () => {
   assert.equal(data.user.userName, "tester");
 });
 
+test("createProductBodySchema accepts relative /uploads image urls", () => {
+  const parsed = createProductBodySchema.parse({
+    productName: "Test product name",
+    productDescription: "Description long enough for validation",
+    productPrice: 100,
+    productIsAvailable: true,
+    productCategory: "pharmacy",
+    productImageUrls: ["/uploads/photo.webp"],
+  });
+  assert.deepEqual(parsed.productImageUrls, ["/uploads/photo.webp"]);
+});
+
 test("createProductBodySchema requires category id or legacy slug", () => {
   assert.throws(() => {
     createProductBodySchema.parse({
