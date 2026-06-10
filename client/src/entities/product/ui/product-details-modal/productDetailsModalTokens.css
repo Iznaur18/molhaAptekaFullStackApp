@@ -1,3 +1,8 @@
 .product-details-modal {
   --product-details-modal-gap: var(--iz-space-3);
+  --product-details-modal-mobile-dock-max-height: 7.25rem;
+  --product-details-modal-mobile-scroll-padding: calc(
+    var(--product-details-modal-mobile-dock-max-height) +
+      var(--app-shell-mobile-bottom-nav-height) + env(safe-area-inset-bottom, 0px) + 0.5rem
+  );
 }

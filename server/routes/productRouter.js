@@ -5,6 +5,7 @@ import {
   getMyProductsController,
   getProductCategoryDisplaysController,
   patchProductCategoryDisplayController,
+  patchProductCategoryNodeDisplayController,
   getProductCategoryRootsController,
   getProductCategoryChildrenController,
   getProductCategoryBreadcrumbController,
@@ -110,6 +111,7 @@ import {
   createProductSearchSynonymValidation,
   patchProductSearchSynonymValidation,
   patchProductCategoryDisplayValidation,
+  patchProductCategoryNodeDisplayValidation,
   catalogFeedTileKeyParamValidation,
   patchProductCatalogFeedTileDisplayValidation,
   upsertProductInstallmentProgramValidation,
@@ -201,6 +203,13 @@ router.patch(
   productCategorySlugParamValidation,
   patchProductCategoryDisplayValidation,
   patchProductCategoryDisplayController,
+);
+router.patch(
+  "/category-node-displays/:categoryId",
+  checkAuthMW,
+  checkAdminMW,
+  patchProductCategoryNodeDisplayValidation,
+  patchProductCategoryNodeDisplayController,
 );
 router.get("/catalog-feed-displays", getProductCatalogFeedTileDisplaysController);
 router.patch(

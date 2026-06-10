@@ -21,6 +21,12 @@
  * @typedef {import('zod').infer<typeof import('./authMe.js').authMeDataSchema>} AuthMeDataContract
  * @typedef {import('zod').infer<typeof import('./authCredentials.js').loginBodySchema>} LoginBodyContract
  * @typedef {import('zod').infer<typeof import('./authCredentials.js').registerBodySchema>} RegisterBodyContract
+ * @typedef {import('zod').infer<typeof import('./introAd.js').introAdCampaignSchema>} IntroAdCampaignContract
+ * @typedef {import('zod').infer<typeof import('./introAd.js').introAdConfigDataSchema>} IntroAdConfigDataContract
+ * @typedef {import('zod').infer<typeof import('./introAd.js').myIntroAdCampaignDataSchema>} MyIntroAdCampaignDataContract
+ * @typedef {import('zod').infer<typeof import('./introAd.js').submitIntroAdCampaignDataSchema>} SubmitIntroAdCampaignDataContract
+ * @typedef {import('zod').infer<typeof import('./appIntro.js').introAdPaidIntroSchema>} IntroAdPaidIntroContract
+ * @typedef {import('zod').infer<typeof import('./appIntro.js').appIntroSettingsSchema>} AppIntroSettingsContract
  */
 
 export {};

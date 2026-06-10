@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { UserPremiumAvatar } from "../../../entities/user/ui/UserPremiumAvatar.jsx";
 import { getUserProfileRows } from "../../../entities/user/lib/getUserProfileRows.js";
@@ -22,8 +22,10 @@ import {
   PROFILE_TAB_OVERVIEW,
 } from "../lib/profileTabs.js";
 import { MyProductsCatalogToolbar } from "../../home/ui/MyProductsCatalogToolbar.jsx";
+import { getActiveProfileNavLabel } from "../lib/getActiveProfileNavLabel.js";
 import { PROFILE_NAV_ITEM_META } from "../lib/profileNavItemMeta.js";
-import { AppIcon } from "../../../shared/ui/icon/index.js";
+import { AppIcon, Menu } from "../../../shared/ui/icon/index.js";
+import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import { UserProfileInfoPanel } from "../../../entities/user/ui/UserProfileInfoPanel.jsx";
 import { ProfileSidebar } from "./ProfileSidebar.jsx";
 
@@ -48,6 +50,7 @@ import "./MyProfilePage.css";
  * onAdminOrdersClick?: () => void;
  * onSearchSynonymsAdminClick?: () => void;
  * onCategoryTreeAdminClick?: () => void;
+ * onAppIntroAdminClick?: () => void;
  * onProductModerationClick?: () => void;
  * onProductReportsClick?: () => void;
  * onRafflesClick?: () => void;
@@ -56,6 +59,11 @@ import "./MyProfilePage.css";
  * onDataConfirmationClick?: () => void;
  * onPremiumClick?: () => void;
  * onLoyaltyPointsClick?: () => void;
+ * onAdvertisingClick?: () => void;
+ * onIntroAdModerationClick?: () => void;
+ * onSellerPersonalCategoryModerationClick?: () => void;
+ * pendingIntroAdModerationCount?: number;
+ * pendingSellerPersonalCategoryModerationCount?: number;
  * pendingModerationCount?: number;
  * pendingIncomingPriceOffersCount?: number;
  * pendingMySalesActionCount?: number;
@@ -90,6 +98,7 @@ export function MyProfilePage({
   onAdminOrdersClick,
   onSearchSynonymsAdminClick,
   onCategoryTreeAdminClick,
+  onAppIntroAdminClick,
   onProductModerationClick,
   onProductReportsClick,
   onRafflesClick,
@@ -98,7 +107,12 @@ export function MyProfilePage({
   onDataConfirmationClick,
   onPremiumClick,
   onLoyaltyPointsClick,
+  onAdvertisingClick,
+  onIntroAdModerationClick,
+  onSellerPersonalCategoryModerationClick,
   pendingModerationCount = 0,
+  pendingIntroAdModerationCount = 0,
+  pendingSellerPersonalCategoryModerationCount = 0,
   pendingIncomingPriceOffersCount = 0,
   pendingMySalesActionCount = 0,
   pendingMyOrdersActionCount = 0,
@@ -116,6 +130,7 @@ export function MyProfilePage({
   myProductsCatalogToolbarProps = null,
 }) {
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
   const [backgroundLoadFailed, setBackgroundLoadFailed] = useState(false);
   const isProfileReady = Boolean(user) && !isLoading && !errorMessage;
@@ -160,10 +175,16 @@ export function MyProfilePage({
     isProfileReady &&
     user?.userRole === "admin" &&
     Boolean(onCategoryTreeAdminClick);
+  const canUseAppIntroAdmin =
+    !isRegularUser &&
+    isProfileReady &&
+    user?.userRole === "admin" &&
+    Boolean(onAppIntroAdminClick);
   const isUserDataConfirmed = user?.isUserDataConfirmed === true;
   const canUseDataConfirmation = isProfileReady && Boolean(onDataConfirmationClick);
   const canUsePremium = isProfileReady && Boolean(onPremiumClick);
   const canUseLoyaltyPoints = isProfileReady && Boolean(onLoyaltyPointsClick);
+  const canUseAdvertising = isProfileReady && Boolean(onAdvertisingClick);
   const canUseProductModeration =
     !isRegularUser && isProfileReady && Boolean(onProductModerationClick);
   const canUseProductReports =
@@ -212,11 +233,13 @@ export function MyProfilePage({
         canUseAdminOrders,
         canUseSearchSynonymsAdmin,
         canUseCategoryTreeAdmin,
+        canUseAppIntroAdmin,
         canUseSubscriptions,
         canUseDataConfirmation,
         isUserDataConfirmed,
         canUsePremium,
         canUseLoyaltyPoints,
+        canUseAdvertising,
         canUseEditProfile,
         showEditOnBanner,
         pendingMySalesActionCount,
@@ -225,6 +248,8 @@ export function MyProfilePage({
         pendingInstallmentBuyerActionCount,
         pendingInstallmentSellerActionCount,
         pendingModerationCount,
+        pendingIntroAdModerationCount,
+        pendingSellerPersonalCategoryModerationCount,
         pendingProductReportsCount,
         pendingRafflesCount,
         pendingDataConfirmationCount,
@@ -239,6 +264,8 @@ export function MyProfilePage({
         onInstallmentPaymentsClick,
         onInstallmentSalesClick,
         onProductModerationClick,
+        onIntroAdModerationClick,
+        onSellerPersonalCategoryModerationClick,
         onProductReportsClick,
         onRafflesClick,
         onDataConfirmationQueueClick,
@@ -247,15 +274,18 @@ export function MyProfilePage({
         onAdminOrdersClick,
         onSearchSynonymsAdminClick,
         onCategoryTreeAdminClick,
+        onAppIntroAdminClick,
         onSubscriptionsClick,
         onDataConfirmationClick,
         onPremiumClick,
         onLoyaltyPointsClick,
+        onAdvertisingClick,
         onEditProfileClick,
       }),
     [
       canUseAdminOrders,
       canUseAuction,
+      canUseAppIntroAdmin,
       canUseCategoryTreeAdmin,
       canUseCreateRaffle,
       canUseDataConfirmation,
@@ -267,6 +297,7 @@ export function MyProfilePage({
       canUseInstallmentPayments,
       canUseInstallmentSales,
       canUseLoyaltyPoints,
+      canUseAdvertising,
       canUseMyOrders,
       canUseMyProducts,
       canUseMySales,
@@ -278,6 +309,7 @@ export function MyProfilePage({
       canUseSubscriptions,
       onAdminOrdersClick,
       onAuctionClick,
+      onAppIntroAdminClick,
       onCategoryTreeAdminClick,
       onCreateRaffleClick,
       onDataConfirmationClick,
@@ -288,11 +320,15 @@ export function MyProfilePage({
       onInstallmentPaymentsClick,
       onInstallmentSalesClick,
       onLoyaltyPointsClick,
+      onAdvertisingClick,
+      onIntroAdModerationClick,
+      onSellerPersonalCategoryModerationClick,
       onMyOrdersClick,
       onMyProductsClick,
       onMySalesClick,
       onPremiumClick,
       onProductModerationClick,
+      onIntroAdModerationClick,
       onProductReportsClick,
       onRafflesClick,
       onSearchSynonymsAdminClick,
@@ -305,6 +341,8 @@ export function MyProfilePage({
       pendingInstallmentModerationCount,
       pendingInstallmentSellerActionCount,
       pendingModerationCount,
+      pendingIntroAdModerationCount,
+      pendingSellerPersonalCategoryModerationCount,
       pendingMyOrdersActionCount,
       pendingMySalesActionCount,
       pendingProductReportsCount,
@@ -312,6 +350,34 @@ export function MyProfilePage({
       showEditOnBanner,
     ],
   );
+  const activeNavLabel = useMemo(
+    () => getActiveProfileNavLabel(navGroups, activeTab),
+    [activeTab, navGroups],
+  );
+  const closeMobileNav = useCallback(() => setIsMobileNavOpen(false), []);
+  const openMobileNav = useCallback(() => setIsMobileNavOpen(true), []);
+
+  useScrollLock(isMobileNavOpen);
+
+  useEffect(() => {
+    closeMobileNav();
+  }, [activeTab, closeMobileNav]);
+
+  useEffect(() => {
+    if (!isMobileNavOpen) {
+      return undefined;
+    }
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        closeMobileNav();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [closeMobileNav, isMobileNavOpen]);
+
   useEffect(() => {
     setAvatarLoadFailed(false);
     setBackgroundLoadFailed(false);
@@ -333,8 +399,32 @@ export function MyProfilePage({
         .join(" ")}
     >
       <div className="my-profile-page__layout">
-        <div className="my-profile-page__sidebar-wrap">
-          <ProfileSidebar groups={navGroups} activeTab={activeTab} />
+        <button
+          type="button"
+          className={[
+            "my-profile-page__mobile-nav-backdrop",
+            isMobileNavOpen && "my-profile-page__mobile-nav-backdrop--visible",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+          aria-label={MY_PROFILE_PAGE_UI.MOBILE_NAV_CLOSE_ARIA}
+          tabIndex={isMobileNavOpen ? 0 : -1}
+          onClick={closeMobileNav}
+        />
+        <div
+          className={[
+            "my-profile-page__sidebar-wrap",
+            isMobileNavOpen && "my-profile-page__sidebar-wrap--open",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        >
+          <ProfileSidebar
+            id="my-profile-mobile-nav"
+            groups={navGroups}
+            activeTab={activeTab}
+            onItemSelect={closeMobileNav}
+          />
           <footer className="my-profile-page__sidebar-footer">
             {activeTab === PROFILE_TAB_OVERVIEW ? (
               !isLogoutConfirmOpen ? (
@@ -388,6 +478,24 @@ export function MyProfilePage({
         </div>
 
         <div className="my-profile-page__main">
+          <button
+            type="button"
+            className="my-profile-page__mobile-nav-toggle"
+            aria-label={MY_PROFILE_PAGE_UI.MOBILE_NAV_TOGGLE_ARIA}
+            aria-expanded={isMobileNavOpen}
+            aria-controls="my-profile-mobile-nav"
+            onClick={openMobileNav}
+          >
+            <span className="my-profile-page__mobile-nav-toggle-icon" aria-hidden="true">
+              <Menu size={20} strokeWidth={2.25} />
+            </span>
+            <span className="my-profile-page__mobile-nav-toggle-text">
+              <span className="my-profile-page__mobile-nav-toggle-caption">
+                {MY_PROFILE_PAGE_UI.MOBILE_NAV_CURRENT_SECTION}
+              </span>
+              <span className="my-profile-page__mobile-nav-toggle-label">{activeNavLabel}</span>
+            </span>
+          </button>
           {isFullWidthCatalogTab ? (
             <>
               {isMyProductsTab && myProductsCatalogToolbarProps ? (

@@ -2,7 +2,8 @@ import {
   COMMON_UI,
   FORMAT_BOOLEAN_RU,
   USER_PROFILE_COPY,
-  formatUserProfileRatingLine,
+  formatUserProfileRatingVotesLabel,
+  formatUserProfileRatingValue,
 } from "../../../shared/config/appUiCopy.js";
 import {
   USER_GENDER_LABEL_RU,
@@ -11,6 +12,8 @@ import {
   USER_ROLE_USER,
 } from "../model/userConstants.js";
 import { formatUserBackgroundForDisplay } from "./userBackgroundValue.js";
+import { formatSearchRowTotalSalesCount } from "./formatSearchRowTotalSalesCount.js";
+import { formatSearchRowTotalSales } from "./formatSearchRowTotalSales.js";
 import { isPremiumActive } from "./isPremiumActive.js";
 
 const DATE_TIME_FORMAT = new Intl.DateTimeFormat(
@@ -50,14 +53,6 @@ function formatRole(value) {
   return USER_ROLE_LABEL_RU[value] ?? String(value);
 }
 
-function formatRating(value) {
-  if (!value || typeof value !== "object") return COMMON_UI.EM_DASH;
-  const { countVotes = 0, totalRating = 0 } = value;
-  if (countVotes === 0) return USER_PROFILE_COPY.RATING_NONE;
-  const avg = totalRating / countVotes;
-  return formatUserProfileRatingLine(avg, countVotes, totalRating);
-}
-
 const L = USER_PROFILE_COPY.LABELS;
 
 /** Не показывать в `dl` профиля — медиа уже в шапке модалки. */
@@ -91,6 +86,21 @@ export function getUserProfileRows(user, options = {}) {
         user.followingCount == null
           ? COMMON_UI.EM_DASH
           : String(Math.max(0, user.followingCount)),
+    },
+    {
+      id: "totalSalesCount",
+      label: L.totalSalesCount,
+      value: formatSearchRowTotalSalesCount(user.totalSalesCount),
+    },
+    {
+      id: "totalSalesAmount",
+      label: L.totalSalesAmount,
+      value: formatSearchRowTotalSales(user.totalSalesAmount),
+    },
+    {
+      id: "totalPurchasesAmount",
+      label: L.totalPurchasesAmount,
+      value: formatSearchRowTotalSales(user.totalPurchasesAmount),
     },
     { id: "email", label: L.email, value: dashIfEmpty(user.email) },
     {
@@ -153,8 +163,8 @@ export function getUserProfileRows(user, options = {}) {
     },
     {
       id: "userRatingByVotes",
-      label: L.userRatingByVotes,
-      value: formatRating(rating),
+      label: formatUserProfileRatingVotesLabel(rating),
+      value: formatUserProfileRatingValue(rating),
     },
     { id: "createdAt", label: L.createdAt, value: formatIso(user.createdAt) },
   ];

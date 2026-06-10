@@ -12,7 +12,13 @@ export const PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE =
  * @returns {Map<string, import('./types.js').ProductCategoryDisplayFromApi>}
  */
 export function mapCategoryDisplaysBySlug(displays) {
-  return new Map(displays.map((row) => [row.categorySlug, row]));
+  return new Map(
+    displays
+      .filter(
+        (row) => typeof row.categorySlug === "string" && row.categorySlug.trim().length > 0,
+      )
+      .map((row) => [row.categorySlug, row]),
+  );
 }
 
 /**

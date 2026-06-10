@@ -1,0 +1,40 @@
+.catalog-city-filter-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--color-surface-muted, #f3f4f6);
+  border: 1px solid var(--color-border-subtle, #e5e7eb);
+}
+
+.catalog-city-filter-banner__text {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}
+
+.catalog-city-filter-banner__action {
+  flex-shrink: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-link, #2563eb);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.catalog-city-filter-banner__action:hover {
+  color: var(--color-link-hover, #1d4ed8);
+}
+
+@media (max-width: 640px) {
+  .catalog-city-filter-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

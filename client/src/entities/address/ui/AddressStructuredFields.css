@@ -1,0 +1,21 @@
+.address-structured-fields {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.address-structured-fields__legend {
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+}
+
+.address-structured-fields__label {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.address-structured-fields__required {
+  color: var(--color-danger, #dc2626);
+}

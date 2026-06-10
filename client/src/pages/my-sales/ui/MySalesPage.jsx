@@ -2,6 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
 
 import { orderQueryKeys } from "../../../entities/order/model/orderQueryKeys.js";
+import { normalizeTotalSalesCount } from "../../../entities/user/lib/formatSearchRowTotalSalesCount.js";
 import { useMySalesQuery } from "../../../entities/order/model/useMySalesQuery.js";
 import { useOrderMutations } from "../../../entities/order/model/useOrderMutations.js";
 import {
@@ -29,6 +30,7 @@ import "./MySalesPage.css";
  * @param {{
  *   isAuthorized: boolean;
  *   currentUserId?: string | null;
+ *   totalSalesCount?: number;
  *   onSellerNameClick?: (userId: string) => void;
  *   onQueueChanged?: () => void;
  * }} props
@@ -36,6 +38,7 @@ import "./MySalesPage.css";
 export function MySalesPage({
   isAuthorized,
   currentUserId = null,
+  totalSalesCount = 0,
   onSellerNameClick,
   onQueueChanged,
 }) {
@@ -58,6 +61,11 @@ export function MySalesPage({
   } = useCatalogProductDetailsOpener();
   const [pendingActionKey, setPendingActionKey] = useState(null);
   const [itemActionErrors, setItemActionErrors] = useState({});
+
+  const sellerTotalSalesCount = useMemo(
+    () => normalizeTotalSalesCount(totalSalesCount),
+    [totalSalesCount],
+  );
 
   const salesParams = useMemo(
     () => ({
@@ -259,6 +267,7 @@ export function MySalesPage({
           onSearchTermChange={setSearchTerm}
           isSearchPending={isSearchPending}
           ordersCount={0}
+          totalSalesCount={sellerTotalSalesCount}
         />
         <p className="my-sales-page__state">{emptyMessage}</p>
       </div>
@@ -274,6 +283,7 @@ export function MySalesPage({
         onSearchTermChange={setSearchTerm}
         isSearchPending={isSearchPending}
         ordersCount={orders.length}
+        totalSalesCount={sellerTotalSalesCount}
       />
       <ul className="my-sales-page__list" role="list">
         {orders.map((order) => (
@@ -322,6 +332,7 @@ const SALES_STATUS_FILTER_OPTIONS = [
  *   onSearchTermChange: (value: string) => void;
  *   isSearchPending: boolean;
  *   ordersCount: number;
+ *   totalSalesCount: number;
  * }} props
  */
 function SalesToolbar({
@@ -331,12 +342,18 @@ function SalesToolbar({
   onSearchTermChange,
   isSearchPending,
   ordersCount,
+  totalSalesCount,
 }) {
   return (
     <div className="my-sales-page__toolbar">
       <div className="my-sales-page__toolbar-head">
         <h3 className="my-sales-page__heading">{MY_SALES_PAGE_UI.TITLE}</h3>
-        <span className="my-sales-page__count">{MY_SALES_PAGE_UI.COUNT(ordersCount)}</span>
+        <div className="my-sales-page__toolbar-meta">
+          <span className="my-sales-page__total-sales-count">
+            {MY_SALES_PAGE_UI.TOTAL_SALES_COUNT(totalSalesCount)}
+          </span>
+          <span className="my-sales-page__count">{MY_SALES_PAGE_UI.COUNT(ordersCount)}</span>
+        </div>
       </div>
 
       <div

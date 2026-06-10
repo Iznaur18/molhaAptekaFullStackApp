@@ -37,6 +37,8 @@ import { assertSellerCanSetProductLoyaltyPointsPerUnit } from "../../utils/asser
 import { normalizeProductCharacteristics } from "../../utils/normalizeProductCharacteristics.js";
 import { applyProductSearchBlobToSet } from "../../utils/applyProductSearchBlobToProductWrite.js";
 import { resolveProductCategoryWriteFromBody } from "../../utils/resolveProductCategoryWrite.js";
+import { normalizeProductSaleCity } from "../../utils/productSaleCity.js";
+import { resolveProductSaleCityNormalized } from "../../utils/ruCityNormalized.js";
 import { errorRes, successRes } from "../../utils/index.js";
 
 const PENDING_EDIT_BLOCK_MESSAGE = "Нельзя редактировать товар, пока он на модерации";
@@ -105,6 +107,23 @@ export const patchMyProductController = async (req, res) => {
           res,
           400,
           priceError instanceof Error ? priceError.message : "Некорректная старая цена",
+        );
+      }
+    }
+
+    if (Object.prototype.hasOwnProperty.call(body, "productSaleCity")) {
+      try {
+        $set.productSaleCity = normalizeProductSaleCity(body.productSaleCity);
+        $set.productSaleCityNormalized = resolveProductSaleCityNormalized(
+          $set.productSaleCity,
+        );
+      } catch (saleCityError) {
+        return errorRes(
+          res,
+          400,
+          saleCityError instanceof Error
+            ? saleCityError.message
+            : "Некорректный город продажи",
         );
       }
     }

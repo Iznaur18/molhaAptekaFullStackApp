@@ -1,6 +1,8 @@
 import {
+  PRODUCT_SORT_CITY,
   PRODUCT_SORT_NEWEST,
   PRODUCT_SORT_PURCHASES,
+  PRODUCT_SORT_REVIEWS,
   PRODUCT_SORT_VIEWS,
 } from "../constants/productCatalogSort.js";
 import { ProductModel } from "../models/index.js";
@@ -73,7 +75,12 @@ export const normalizeProductsQueryForAggregate = (productsQuery) => {
  */
 export const parseProductSortFromQuery = (query) => {
   const raw = query?.sort;
-  if (raw === PRODUCT_SORT_VIEWS || raw === PRODUCT_SORT_PURCHASES) {
+  if (
+    raw === PRODUCT_SORT_VIEWS ||
+    raw === PRODUCT_SORT_PURCHASES ||
+    raw === PRODUCT_SORT_REVIEWS ||
+    raw === PRODUCT_SORT_CITY
+  ) {
     return raw;
   }
   return PRODUCT_SORT_NEWEST;
@@ -100,7 +107,7 @@ const sellerLookupStages = () => [
   },
 ];
 
-const sortStageForCatalog = (sort, searchRank) => {
+const sortStageForCatalog = (sort, searchRank, buyerCity = null) => {
   const useSearchRank = Boolean(searchRank?.escapedRegexPattern);
   const stages = [];
 
@@ -108,14 +115,19 @@ const sortStageForCatalog = (sort, searchRank) => {
     stages.push(catalogPromotionSortBoostAddFieldsStage);
   }
 
-  stages.push(
-    buildCatalogPromotionSortStage(sort, {
-      useSearchRank,
-      searchScoreField: "_searchRank",
-    }),
-  );
+  const sortStage = buildCatalogPromotionSortStage(sort, {
+    useSearchRank,
+    searchScoreField: "_searchRank",
+    buyerCity,
+  });
 
-  return stages.length === 1 ? stages[0] : stages;
+  if (Array.isArray(sortStage)) {
+    stages.push(...sortStage);
+  } else {
+    stages.push(sortStage);
+  }
+
+  return stages;
 };
 
 /**
@@ -159,6 +171,7 @@ const searchRankAddFieldsStage = (searchRank) => ({
  * @param {number} skip
  * @param {number} limit
  * @param {{ escapedRegexPattern: string; categorySlugs: string[] } | null} [searchRank]
+ * @param {string | null} [buyerCity]
  */
 export const findProductsPage = async (
   productsQuery,
@@ -166,13 +179,13 @@ export const findProductsPage = async (
   skip,
   limit,
   searchRank = null,
+  buyerCity = null,
 ) => {
   const rankStage = searchRank?.escapedRegexPattern
     ? [searchRankAddFieldsStage(searchRank)]
     : [];
 
-  const sortStages = sortStageForCatalog(sort, searchRank);
-  const sortPipeline = Array.isArray(sortStages) ? sortStages : [sortStages];
+  const sortPipeline = sortStageForCatalog(sort, searchRank, buyerCity);
 
   const products = await ProductModel.aggregate([
     { $match: normalizeProductsQueryForAggregate(productsQuery) },
@@ -181,7 +194,7 @@ export const findProductsPage = async (
     { $skip: skip },
     { $limit: limit },
     ...sellerLookupStages(),
-    { $project: { _searchRank: 0, _promotionSortTier: 0 } },
+    { $project: { _searchRank: 0, _promotionSortTier: 0, _citySortPriority: 0 } },
   ]);
 
   return attachProductSellerSnapshots(products);

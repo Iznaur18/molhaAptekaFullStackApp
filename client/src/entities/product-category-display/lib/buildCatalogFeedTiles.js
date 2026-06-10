@@ -8,6 +8,8 @@ import {
   CATALOG_SORT_NEWEST,
   CATALOG_SORT_PREMIUM,
   CATALOG_SORT_PURCHASES,
+  CATALOG_SORT_CITY,
+  CATALOG_SORT_REVIEWS,
   CATALOG_SORT_VIEWS,
 } from "../../product/model/productConstants.js";
 
@@ -40,6 +42,18 @@ export const CATALOG_FEED_TILES = [
     kind: "sort",
     value: CATALOG_SORT_PURCHASES,
     label: CATALOG_SORT_LABEL_RU[CATALOG_SORT_PURCHASES],
+  },
+  {
+    key: `sort:${CATALOG_SORT_CITY}`,
+    kind: "sort",
+    value: CATALOG_SORT_CITY,
+    label: CATALOG_SORT_LABEL_RU[CATALOG_SORT_CITY],
+  },
+  {
+    key: `sort:${CATALOG_SORT_REVIEWS}`,
+    kind: "sort",
+    value: CATALOG_SORT_REVIEWS,
+    label: CATALOG_SORT_LABEL_RU[CATALOG_SORT_REVIEWS],
   },
   {
     key: `sort:${CATALOG_SORT_PREMIUM}`,

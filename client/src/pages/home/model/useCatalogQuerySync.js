@@ -112,7 +112,8 @@ export function useCatalogQuerySync({
       !catalogFollowingOnly &&
       !catalogAuctionOnly &&
       !catalogInstallmentOnly &&
-      !catalogSaleOnly;
+      !catalogSaleOnly &&
+      !catalogQueryFromUrl.allCities;
     const omitDefaultSort =
       isDefaultNewestFeed &&
       !isExplicitCatalogNewestFeedSearch(location.search);
@@ -127,6 +128,7 @@ export function useCatalogQuerySync({
               auctionOnly: catalogAuctionOnly,
               installmentOnly: catalogInstallmentOnly,
               saleOnly: catalogSaleOnly,
+              allCities: catalogQueryFromUrl.allCities,
             },
             { omitDefaultSort },
           )
@@ -137,6 +139,7 @@ export function useCatalogQuerySync({
             auctionOnly: catalogAuctionOnly,
             installmentOnly: catalogInstallmentOnly,
             saleOnly: catalogSaleOnly,
+            allCities: catalogQueryFromUrl.allCities,
           });
     const current = new URLSearchParams(location.search);
     if (areCatalogSearchParamsEqual(built, current)) {
@@ -159,8 +162,8 @@ export function useCatalogQuerySync({
     catalogAuctionOnly,
     catalogInstallmentOnly,
     catalogSaleOnly,
+    catalogQueryFromUrl.allCities,
     navigate,
-    location.search,
   ]);
 
   useEffect(() => {

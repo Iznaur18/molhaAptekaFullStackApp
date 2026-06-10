@@ -23,6 +23,10 @@ import ProductCatalogFeedTileDisplayModel from "./ProductCatalogFeedTileDisplayM
 import ProductInstallmentProgramModel from "./ProductInstallmentProgramModel.js";
 import InstallmentContractModel from "./InstallmentContractModel.js";
 import InstallmentDisputeModel from "./InstallmentDisputeModel.js";
+import { AppIntroSettingsModel } from "./AppIntroSettingsModel.js";
+import { IntroAdCampaignModel } from "./IntroAdCampaignModel.js";
+import { SellerPersonalCategoryModel } from "./SellerPersonalCategoryModel.js";
+import { SellerPersonalCategoryCampaignModel } from "./SellerPersonalCategoryCampaignModel.js";
 
 export {
   UserModel,
@@ -50,4 +54,8 @@ export {
   ProductInstallmentProgramModel,
   InstallmentContractModel,
   InstallmentDisputeModel,
+  AppIntroSettingsModel,
+  IntroAdCampaignModel,
+  SellerPersonalCategoryModel,
+  SellerPersonalCategoryCampaignModel,
 };

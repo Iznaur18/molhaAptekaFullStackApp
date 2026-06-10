@@ -65,7 +65,7 @@ export function ProductCardStandardContent({ vm }) {
           </p>
           <div
             ref={vm.statusBadgesRowRef}
-            className="product-card__status-badges-row"
+            className="product-card__status-badges-row product-card__catalog-badges--web"
             role="group"
             aria-label={PRODUCT_CARD_UI.STATUS_BADGES_ARIA}
             {...vm.statusBadgesDragScrollProps}
@@ -123,16 +123,13 @@ export function ProductCardStandardContent({ vm }) {
           if (key === "productSeller") {
             return (
               <div key={key} className={rowClass.join(" ")}>
-                <dt className="product-card__key product-card__key--seller-inline">
-                  {getProductFieldLabel("productSeller")}:
-                </dt>
-                <dd className="product-card__value product-card__value--seller-inline">
+                <div className="product-card__value product-card__value--seller-inline">
                   {renderProductCardSellerValue({
                     raw,
                     display,
                     onSellerNameClick: vm.onSellerNameClick,
                   })}
-                </dd>
+                </div>
               </div>
             );
           }

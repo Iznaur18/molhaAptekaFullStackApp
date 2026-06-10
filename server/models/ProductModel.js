@@ -4,6 +4,7 @@ import {
   PRODUCT_DESCRIPTION_MAX_CHARS,
   PRODUCT_IMAGE_URLS_MAX,
 } from "../constants/productConstants.js";
+import { PRODUCT_SALE_CITY_MAX_LENGTH } from "../constants/addressStructuredConstants.js";
 import {
   PRODUCT_CHARACTERISTIC_KEY_MAX_CHARS,
   PRODUCT_CHARACTERISTIC_VALUE_MAX_CHARS,
@@ -79,6 +80,19 @@ const ProductSchema = new Schema(
       ref: "User",
       required: true,
     },
+    productSaleCity: {
+      type: String,
+      trim: true,
+      default: "",
+      maxlength: PRODUCT_SALE_CITY_MAX_LENGTH,
+      index: true,
+    },
+    productSaleCityNormalized: {
+      type: String,
+      trim: true,
+      default: "",
+      index: true,
+    },
     productCategory: {
       type: String,
       required: true,
@@ -88,6 +102,12 @@ const ProductSchema = new Schema(
     productCategoryId: {
       type: Schema.Types.ObjectId,
       ref: "ProductCategory",
+      default: null,
+      index: true,
+    },
+    sellerPersonalCategoryId: {
+      type: Schema.Types.ObjectId,
+      ref: "SellerPersonalCategory",
       default: null,
       index: true,
     },
@@ -236,6 +256,19 @@ ProductSchema.index(
     createdAt: -1,
   },
   { name: "catalog_approved_sold_quantity" },
+);
+
+/** Каталог sort=reviews — товары с отзывами по рейтингу. */
+ProductSchema.index(
+  {
+    productModerationStatus: 1,
+    productIsAvailable: 1,
+    productStockQuantity: 1,
+    averageRating: -1,
+    reviewCount: -1,
+    createdAt: -1,
+  },
+  { name: "catalog_approved_reviews" },
 );
 
 export default mongoose.model("Product", ProductSchema);

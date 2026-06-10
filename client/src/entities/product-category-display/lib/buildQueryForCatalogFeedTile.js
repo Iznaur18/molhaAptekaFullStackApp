@@ -22,6 +22,8 @@ export function buildQueryForCatalogFeedTile(tile) {
     return {
       sort: tile.value,
       category: null,
+      categoryId: null,
+      sellerPersonalCategoryId: null,
       followingOnly: false,
       auctionOnly: false,
       installmentOnly: false,
@@ -33,6 +35,8 @@ export function buildQueryForCatalogFeedTile(tile) {
     return {
       sort: CATALOG_SORT_NEWEST,
       category: null,
+      categoryId: null,
+      sellerPersonalCategoryId: null,
       followingOnly: true,
       auctionOnly: false,
       installmentOnly: false,
@@ -44,6 +48,8 @@ export function buildQueryForCatalogFeedTile(tile) {
     return {
       sort: CATALOG_SORT_NEWEST,
       category: null,
+      categoryId: null,
+      sellerPersonalCategoryId: null,
       followingOnly: false,
       auctionOnly: true,
       installmentOnly: false,
@@ -55,6 +61,8 @@ export function buildQueryForCatalogFeedTile(tile) {
     return {
       sort: CATALOG_SORT_NEWEST,
       category: null,
+      categoryId: null,
+      sellerPersonalCategoryId: null,
       followingOnly: false,
       auctionOnly: false,
       installmentOnly: true,
@@ -66,6 +74,8 @@ export function buildQueryForCatalogFeedTile(tile) {
     return {
       sort: CATALOG_SORT_NEWEST,
       category: null,
+      categoryId: null,
+      sellerPersonalCategoryId: null,
       followingOnly: false,
       auctionOnly: false,
       installmentOnly: false,
@@ -76,6 +86,8 @@ export function buildQueryForCatalogFeedTile(tile) {
   return {
     sort: CATALOG_SORT_NEWEST,
     category: null,
+    categoryId: null,
+    sellerPersonalCategoryId: null,
     followingOnly: false,
     auctionOnly: false,
     installmentOnly: false,

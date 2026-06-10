@@ -1,5 +1,4 @@
 import { PRODUCT_CARD_UI } from "../../../../shared/config/appUiCopy.js";
-import { getProductFieldLabel } from "../../lib/productFieldRegistry.js";
 import { ProductDiscountBadge, ProductPriceDisplay } from "../ProductPriceDisplay.jsx";
 
 /**
@@ -25,13 +24,15 @@ export function ProductCardBannerContent({ vm, renderSellerValue, statusSlot }) 
           showLabel={false}
         />
         {vm.showDiscountBadge ? (
-          <ProductDiscountBadge discountPercent={vm.discountPercent} variant="banner" />
+          <ProductDiscountBadge
+            discountPercent={vm.discountPercent}
+            variant="banner"
+          />
         ) : null}
       </div>
       {!vm.isModerationQueue ? (
         <p className="product-card__banner-meta">
           <span className="product-card__banner-meta-item">
-            {getProductFieldLabel("productSeller")}:{" "}
             {renderSellerValue(vm.product.productSeller, vm.sellerDisplayName)}
           </span>
           {vm.hasReviewRating ? (

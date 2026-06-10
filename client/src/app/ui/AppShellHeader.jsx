@@ -23,11 +23,16 @@ import {
 import { getAppShellHeaderVariantClass } from "../lib/appShellVariant.js";
 import { isProfileTabMainView } from "../../pages/my-profile/lib/profileTabToMainView.js";
 import {
+  isCatalogBrowserMainView,
   isCatalogHeaderMainView,
   isCatalogShellMainView,
+  isMyProductsMainView,
 } from "../../shared/lib/homeMainViewPaths.js";
-import { SearchInput } from "../../shared/ui/SearchInput/SearchInput.jsx";
+import { MobileBottomNav } from "../../widgets/mobile-bottom-nav/ui/MobileBottomNav.jsx";
+import { APP_SHELL_MOBILE_NAV_BREAKPOINT_PX } from "../lib/appShellMobileNavConstants.js";
+import { useMaxWidthMediaQuery } from "../../shared/lib/useMaxWidthMediaQuery.js";
 import { useScrollLock } from "../../shared/lib/useScrollLock.js";
+import { SearchInput } from "../../shared/ui/SearchInput/SearchInput.jsx";
 
 const PRODUCT_CATEGORY_FILTER_LIST_ID = HOME_PAGE_UI.PRODUCT_CATEGORY_FILTER_LIST_ID;
 
@@ -47,6 +52,10 @@ const NON_CATALOG_VIEW_TITLES = {
   "my-orders": HOME_PAGE_UI.TITLE_MY_ORDERS,
   "admin-orders": HOME_PAGE_UI.TITLE_ADMIN_ORDERS,
   "product-moderation": HOME_PAGE_UI.TITLE_PRODUCT_MODERATION,
+  "intro-ad-moderation": HOME_PAGE_UI.TITLE_INTRO_AD_MODERATION,
+  "seller-personal-category-moderation":
+    HOME_PAGE_UI.TITLE_SELLER_PERSONAL_CATEGORY_MODERATION,
+  advertising: HOME_PAGE_UI.TITLE_ADVERTISING,
   "product-reports": HOME_PAGE_UI.TITLE_PRODUCT_REPORTS,
   "data-confirmation-requests": HOME_PAGE_UI.TITLE_DATA_CONFIRMATION,
   "installment-payments": HOME_PAGE_UI.TITLE_INSTALLMENT_PAYMENTS,
@@ -79,6 +88,7 @@ const NON_CATALOG_VIEW_TITLES = {
  *   onLoginClick: () => void;
  *   onRegisterClick: () => void;
  *   onNavigateToFullCatalogFromBreadcrumb: () => void;
+ *   onMobileCartClick: () => void;
  *   catalogSort: string;
  *   onCatalogSortChange: (value: string) => void;
  *   catalogFollowingOnly: boolean;
@@ -126,6 +136,7 @@ export function AppShellHeader({
   onLoginClick,
   onRegisterClick,
   onNavigateToFullCatalogFromBreadcrumb,
+  onMobileCartClick,
   catalogSort,
   onCatalogSortChange,
   catalogFollowingOnly,
@@ -176,6 +187,9 @@ export function AppShellHeader({
   const isCartNavActive = mainView === "cart";
   const isMyProfileNavActive = isProfileTabMainView(mainView);
   const isNotificationsNavActive = mainView === "notifications";
+  const isHomeNavActive = mainView === "catalog";
+  const isCatalogNavActive =
+    isCatalogBrowserMainView(mainView) || isCatalogMenuActive;
 
   const nonCatalogTitle = (() => {
     const base = NON_CATALOG_VIEW_TITLES[mainView] ?? "";
@@ -202,80 +216,61 @@ export function AppShellHeader({
 
   const headerViewTitle = isHeaderViewTitleHidden(mainView) ? "" : nonCatalogTitle;
 
-  const headerClassName = ["app-shell__header", getAppShellHeaderVariantClass()]
+  const isMobileNav = useMaxWidthMediaQuery(APP_SHELL_MOBILE_NAV_BREAKPOINT_PX);
+
+  const headerClassName = [
+    "app-shell__header",
+    getAppShellHeaderVariantClass(),
+    isMyProductsMainView(mainView) && "app-shell__header--profile-catalog",
+    isMobileNav && "app-shell__header--mobile-split",
+  ]
     .filter(Boolean)
     .join(" ");
 
+  const navActionsProps = {
+    canModerateProducts,
+    showHiddenCatalogProducts,
+    onShowHiddenCatalogProductsToggle,
+    isUsersNavActive,
+    onSetMainView,
+    isCartNavActive,
+    isAuthorized,
+    onPlaceProductClick,
+    onLoginClick,
+    isMyProfileNavActive,
+    onMyProfileClick,
+    isNotificationsNavActive,
+    unreadNotificationsCount,
+    onNotificationsClick,
+    onRegisterClick,
+  };
+
+  const catalogFilterProps = {
+    isPublicCatalogHeader,
+    isCatalogMenuActive,
+    onCatalogMenuClick,
+    isProductCategoryListOpen,
+    selectedProductCategory,
+    onProductCategoryFilterToggle,
+    onProductCategorySelect,
+    productCategoryFilterRef,
+  };
+
   return (
-    <header className={headerClassName}>
-      <div className="app-shell__header-top">
-        <div className="app-shell__header-main">
-          <HomeHeaderTitleRow
-            isCatalogShellView={isCatalogShellView}
-            isCatalogHeaderView={isCatalogHeaderView}
-            isMineMode={isMineMode}
-            headerViewTitle={headerViewTitle}
-            onNavigateToFullCatalogFromBreadcrumb={
-              onNavigateToFullCatalogFromBreadcrumb
-            }
-          />
-          {isCatalogHeaderView ? (
-            <>
-              <div
-                className={[
-                  "app-shell__header-filter",
-                  isPublicCatalogHeader && "app-shell__header-filter--public",
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
-                ref={productCategoryFilterRef}
-              >
-                {isPublicCatalogHeader ? (
-                  <CatalogMenuButton
-                    isActive={isCatalogMenuActive}
-                    onClick={onCatalogMenuClick}
-                  />
-                ) : (
-                  <>
-                    <CatalogCategoryFilterButton
-                      isOpen={isProductCategoryListOpen}
-                      selectedProductCategory={selectedProductCategory}
-                      listId={PRODUCT_CATEGORY_FILTER_LIST_ID}
-                      onClick={onProductCategoryFilterToggle}
-                      mode="category"
-                    />
-                    {isProductCategoryListOpen ? (
-                      <ul
-                        id={PRODUCT_CATEGORY_FILTER_LIST_ID}
-                        className="app-shell__category-list"
-                        role="list"
-                        onWheel={(event) => event.stopPropagation()}
-                      >
-                        <li className="app-shell__category-item">
-                          <button
-                            type="button"
-                            className="app-shell__category-option"
-                            onClick={() => onProductCategorySelect(null)}
-                          >
-                            {HOME_PAGE_UI.CATEGORY_ALL}
-                          </button>
-                        </li>
-                        {PRODUCT_CATEGORIES.map((category) => (
-                          <li key={category} className="app-shell__category-item">
-                            <button
-                              type="button"
-                              className="app-shell__category-option"
-                              onClick={() => onProductCategorySelect(category)}
-                            >
-                              {PRODUCT_CATEGORY_LABEL_RU[category]}
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
-                  </>
-                )}
-              </div>
+    <>
+      <header className={headerClassName}>
+        <div className="app-shell__header-top">
+          <div className="app-shell__header-main">
+            <HomeHeaderTitleRow
+              isCatalogShellView={isCatalogShellView}
+              isCatalogHeaderView={isCatalogHeaderView}
+              isMineMode={isMineMode}
+              headerViewTitle={headerViewTitle}
+              onNavigateToFullCatalogFromBreadcrumb={
+                onNavigateToFullCatalogFromBreadcrumb
+              }
+            />
+            {isCatalogHeaderView ? (
               <div className="app-shell__header-search">
                 <SearchInput
                   value={productSearchTerm}
@@ -287,64 +282,224 @@ export function AppShellHeader({
                   isPending={isProductSearchPending}
                 />
               </div>
-            </>
-          ) : null}
+            ) : null}
+            {isCatalogHeaderView && !isMobileNav ? (
+              <CatalogHeaderFilter {...catalogFilterProps} />
+            ) : null}
+          </div>
+          <HeaderNavActions
+            {...navActionsProps}
+            variant={isMobileNav ? "mobile-top" : "desktop"}
+          />
         </div>
-        <nav
-          className="app-shell__auth-actions"
-          aria-label={HOME_PAGE_UI.NAV_AUTH_ARIA}
-        >
-          {canModerateProducts ? (
-            <HeaderShowHiddenProductsButton
-              isActive={showHiddenCatalogProducts}
-              onClick={onShowHiddenCatalogProductsToggle}
+      </header>
+      {isMobileNav ? (
+        <MobileBottomNav
+          isHomeActive={isHomeNavActive}
+          isCatalogActive={isCatalogNavActive}
+          isCartActive={isCartNavActive}
+          isProfileActive={isMyProfileNavActive}
+          isAuthorized={isAuthorized}
+          onHomeClick={onNavigateToFullCatalogFromBreadcrumb}
+          onCatalogClick={onCatalogMenuClick}
+          onPlaceProductClick={onPlaceProductClick}
+          onLoginClick={onLoginClick}
+          onCartClick={onMobileCartClick}
+          onProfileClick={onMyProfileClick}
+        />
+      ) : null}
+    </>
+  );
+}
+
+/**
+ * @param {{
+ *   isPublicCatalogHeader: boolean;
+ *   isCatalogMenuActive: boolean;
+ *   onCatalogMenuClick: () => void;
+ *   isProductCategoryListOpen: boolean;
+ *   selectedProductCategory: import('../../entities/product/model/types.js').ProductCategory | null;
+ *   onProductCategoryFilterToggle: () => void;
+ *   onProductCategorySelect: (category: import('../../entities/product/model/types.js').ProductCategory | null) => void;
+ *   productCategoryFilterRef: import('react').RefObject<HTMLDivElement | null>;
+ * }} props
+ */
+function CatalogHeaderFilter({
+  isPublicCatalogHeader,
+  isCatalogMenuActive,
+  onCatalogMenuClick,
+  isProductCategoryListOpen,
+  selectedProductCategory,
+  onProductCategoryFilterToggle,
+  onProductCategorySelect,
+  productCategoryFilterRef,
+}) {
+  return (
+    <div
+      className={[
+        "app-shell__header-filter",
+        isPublicCatalogHeader && "app-shell__header-filter--public",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      ref={productCategoryFilterRef}
+    >
+      {isPublicCatalogHeader ? (
+        <CatalogMenuButton isActive={isCatalogMenuActive} onClick={onCatalogMenuClick} />
+      ) : (
+        <>
+          <CatalogCategoryFilterButton
+            isOpen={isProductCategoryListOpen}
+            selectedProductCategory={selectedProductCategory}
+            listId={PRODUCT_CATEGORY_FILTER_LIST_ID}
+            onClick={onProductCategoryFilterToggle}
+            mode="category"
+          />
+          {isProductCategoryListOpen ? (
+            <ul
+              id={PRODUCT_CATEGORY_FILTER_LIST_ID}
+              className="app-shell__category-list"
+              role="list"
+              onWheel={(event) => event.stopPropagation()}
+            >
+              <li className="app-shell__category-item">
+                <button
+                  type="button"
+                  className="app-shell__category-option"
+                  onClick={() => onProductCategorySelect(null)}
+                >
+                  {HOME_PAGE_UI.CATEGORY_ALL}
+                </button>
+              </li>
+              {PRODUCT_CATEGORIES.map((category) => (
+                <li key={category} className="app-shell__category-item">
+                  <button
+                    type="button"
+                    className="app-shell__category-option"
+                    onClick={() => onProductCategorySelect(category)}
+                  >
+                    {PRODUCT_CATEGORY_LABEL_RU[category]}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </>
+      )}
+    </div>
+  );
+}
+
+/**
+ * @param {{
+ *   variant: "desktop" | "mobile-top";
+ *   canModerateProducts: boolean;
+ *   showHiddenCatalogProducts: boolean;
+ *   onShowHiddenCatalogProductsToggle: () => void;
+ *   isUsersNavActive: boolean;
+ *   onSetMainView: (view: import('../../shared/lib/homeMainViewPaths.js').HomeMainView) => void;
+ *   isCartNavActive: boolean;
+ *   isAuthorized: boolean;
+ *   onPlaceProductClick: () => void;
+ *   onLoginClick: () => void;
+ *   isMyProfileNavActive: boolean;
+ *   onMyProfileClick: () => void;
+ *   isNotificationsNavActive: boolean;
+ *   unreadNotificationsCount: number;
+ *   onNotificationsClick: () => void;
+ *   onRegisterClick: () => void;
+ * }} props
+ */
+function HeaderNavActions({
+  variant,
+  canModerateProducts,
+  showHiddenCatalogProducts,
+  onShowHiddenCatalogProductsToggle,
+  isUsersNavActive,
+  onSetMainView,
+  isCartNavActive,
+  isAuthorized,
+  onPlaceProductClick,
+  onLoginClick,
+  isMyProfileNavActive,
+  onMyProfileClick,
+  isNotificationsNavActive,
+  unreadNotificationsCount,
+  onNotificationsClick,
+  onRegisterClick,
+}) {
+  const navClassName = [
+    "app-shell__auth-actions",
+    variant === "mobile-top" && "app-shell__auth-actions--mobile-top",
+    variant === "desktop" && "app-shell__auth-actions--desktop",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  if (variant === "mobile-top") {
+    if (!isAuthorized) {
+      return null;
+    }
+
+    return (
+      <nav className={navClassName} aria-label={HOME_PAGE_UI.NAV_AUTH_ARIA}>
+        <HeaderUsersButton
+          isActive={isUsersNavActive}
+          onClick={() => onSetMainView("users")}
+        />
+      </nav>
+    );
+  }
+
+  const showNotifications = variant === "desktop";
+
+  return (
+    <nav className={navClassName} aria-label={HOME_PAGE_UI.NAV_AUTH_ARIA}>
+      {canModerateProducts ? (
+        <HeaderShowHiddenProductsButton
+          isActive={showHiddenCatalogProducts}
+          onClick={onShowHiddenCatalogProductsToggle}
+        />
+      ) : null}
+      <HeaderUsersButton
+        isActive={isUsersNavActive}
+        onClick={() => onSetMainView("users")}
+      />
+      <HeaderCartButton isActive={isCartNavActive} onClick={() => onSetMainView("cart")} />
+      <HeaderPlaceProductButton
+        isLoginRequired={!isAuthorized}
+        onClick={() => (isAuthorized ? onPlaceProductClick() : onLoginClick())}
+      />
+      {isAuthorized ? (
+        <>
+          <HeaderProfileButton isActive={isMyProfileNavActive} onClick={onMyProfileClick} />
+          {showNotifications ? (
+            <HeaderNotificationsButton
+              isActive={isNotificationsNavActive}
+              unreadCount={unreadNotificationsCount}
+              onClick={onNotificationsClick}
             />
           ) : null}
-          <HeaderUsersButton
-            isActive={isUsersNavActive}
-            onClick={() => onSetMainView("users")}
-          />
-          <HeaderCartButton
-            isActive={isCartNavActive}
-            onClick={() => onSetMainView("cart")}
-          />
-          <HeaderPlaceProductButton
-            isLoginRequired={!isAuthorized}
-            onClick={() => (isAuthorized ? onPlaceProductClick() : onLoginClick())}
-          />
-          {isAuthorized ? (
-            <>
-              <HeaderProfileButton
-                isActive={isMyProfileNavActive}
-                onClick={onMyProfileClick}
-              />
-              <HeaderNotificationsButton
-                isActive={isNotificationsNavActive}
-                unreadCount={unreadNotificationsCount}
-                onClick={onNotificationsClick}
-              />
-            </>
-          ) : (
-            <>
-              <button
-                type="button"
-                className="app-shell__auth-button app-shell__auth-button_secondary"
-                onClick={onLoginClick}
-              >
-                {HOME_PAGE_UI.AUTH_LOGIN}
-              </button>
-              <button
-                type="button"
-                className="app-shell__auth-button"
-                onClick={onRegisterClick}
-              >
-                {HOME_PAGE_UI.AUTH_REGISTER}
-              </button>
-            </>
-          )}
-        </nav>
-      </div>
-    </header>
+        </>
+      ) : (
+        <>
+          <button
+            type="button"
+            className="app-shell__auth-button app-shell__auth-button_secondary"
+            onClick={onLoginClick}
+          >
+            {HOME_PAGE_UI.AUTH_LOGIN}
+          </button>
+          <button
+            type="button"
+            className="app-shell__auth-button"
+            onClick={onRegisterClick}
+          >
+            {HOME_PAGE_UI.AUTH_REGISTER}
+          </button>
+        </>
+      )}
+    </nav>
   );
 }
 
@@ -384,20 +539,25 @@ function HomeHeaderTitleRow({
         </button>
       </h1>
       {isCatalogShellView && isMineMode ? (
-        <span
-          className="app-shell__breadcrumb"
-          aria-label={HOME_PAGE_UI.ARIA_MY_PRODUCTS_CRUMB}
-        >
-          <span className="app-shell__breadcrumb-text">
-            {HOME_PAGE_UI.BREADCRUMB_MY_PROFILE}
+        <>
+          <span
+            className="app-shell__breadcrumb"
+            aria-label={HOME_PAGE_UI.ARIA_MY_PRODUCTS_CRUMB}
+          >
+            <span className="app-shell__breadcrumb-text">
+              {HOME_PAGE_UI.BREADCRUMB_MY_PROFILE}
+            </span>
+            <span className="app-shell__breadcrumb-sep" aria-hidden="true">
+              {HOME_PAGE_UI.BREADCRUMB_SEPARATOR}
+            </span>
+            <span className="app-shell__breadcrumb-text">
+              {HOME_PAGE_UI.BREADCRUMB_MY_PRODUCTS}
+            </span>
           </span>
-          <span className="app-shell__breadcrumb-sep" aria-hidden="true">
-            {HOME_PAGE_UI.BREADCRUMB_SEPARATOR}
-          </span>
-          <span className="app-shell__breadcrumb-text">
+          <span className="app-shell__view-title app-shell__view-title--profile-catalog-mobile">
             {HOME_PAGE_UI.BREADCRUMB_MY_PRODUCTS}
           </span>
-        </span>
+        </>
       ) : null}
       {!isCatalogHeaderView && headerViewTitle ? (
         <span className="app-shell__view-title">{headerViewTitle}</span>

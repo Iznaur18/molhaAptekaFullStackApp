@@ -1,10 +1,11 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { UserFollowButton } from "../../../entities/user-follow/ui/UserFollowButton.jsx";
 import { useUserProfileQuery } from "../../../entities/user/model/useUserProfileQuery.js";
 import { userProfileQueryKeys } from "../../../entities/user/model/userProfileQueryKeys.js";
 import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import { OPEN_USER_PROFILE_EVENT } from "../../../shared/lib/openUserProfileEvent.js";
 import { buildSellerProductsPath } from "../../../shared/lib/sellerPaths.js";
 import { EMPTY_PROFILE_MODAL } from "../lib/catalogShellConstants.js";
 
@@ -100,6 +101,21 @@ export const useHomeSellerModal = ({
     },
     [currentUserId, goToMainView],
   );
+
+  useEffect(() => {
+    const handleOpenUserProfile = (event) => {
+      const userId = event.detail?.userId;
+      if (!userId) {
+        return;
+      }
+      handleSellerNameClick(String(userId));
+    };
+
+    window.addEventListener(OPEN_USER_PROFILE_EVENT, handleOpenUserProfile);
+    return () => {
+      window.removeEventListener(OPEN_USER_PROFILE_EVENT, handleOpenUserProfile);
+    };
+  }, [handleSellerNameClick]);
 
   /**
    * @param {{

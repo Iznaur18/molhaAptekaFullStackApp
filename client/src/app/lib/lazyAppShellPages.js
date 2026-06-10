@@ -70,6 +70,11 @@ export const LazyCategoryTreeAdminPage = lazyNamedExport(
   "CategoryTreeAdminPage",
 );
 
+export const LazyAppIntroAdminPage = lazyNamedExport(
+  () => import("../../pages/app-intro-admin/ui/AppIntroAdminPage.jsx"),
+  "AppIntroAdminPage",
+);
+
 export const LazyCartPage = lazyNamedExport(
   () => import("../../pages/cart/ui/CartPage.jsx"),
   "CartPage",
@@ -118,4 +123,20 @@ export const LazyPremiumPage = lazyNamedExport(
 export const LazyLoyaltyPointsPage = lazyNamedExport(
   () => import("../../pages/loyalty-points/ui/LoyaltyPointsPage.jsx"),
   "LoyaltyPointsPage",
+);
+
+export const LazyAdvertisingPage = lazyNamedExport(
+  () => import("../../pages/advertising/ui/AdvertisingPage.jsx"),
+  "AdvertisingPage",
+);
+
+export const LazySellerPersonalCategoryModerationPage = lazyNamedExport(
+  () =>
+    import("../../pages/seller-personal-category-moderation/ui/SellerPersonalCategoryModerationPage.jsx"),
+  "SellerPersonalCategoryModerationPage",
+);
+
+export const LazyIntroAdModerationPage = lazyNamedExport(
+  () => import("../../pages/intro-ad-moderation/ui/IntroAdModerationPage.jsx"),
+  "IntroAdModerationPage",
 );

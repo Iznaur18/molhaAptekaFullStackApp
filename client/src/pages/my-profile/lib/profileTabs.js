@@ -7,10 +7,15 @@ export const PROFILE_TAB_SUBSCRIPTIONS = "subscriptions";
 export const PROFILE_TAB_DATA_CONFIRMATION = "data-confirmation";
 export const PROFILE_TAB_PREMIUM = "premium";
 export const PROFILE_TAB_LOYALTY_POINTS = "loyalty-points";
+export const PROFILE_TAB_ADVERTISING = "advertising";
 export const PROFILE_TAB_ADMIN_ORDERS = "admin-orders";
 export const PROFILE_TAB_SEARCH_SYNONYMS_ADMIN = "search-synonyms-admin";
 export const PROFILE_TAB_CATEGORY_TREE_ADMIN = "category-tree-admin";
+export const PROFILE_TAB_APP_INTRO_ADMIN = "app-intro-admin";
 export const PROFILE_TAB_PRODUCT_MODERATION = "product-moderation";
+export const PROFILE_TAB_INTRO_AD_MODERATION = "intro-ad-moderation";
+export const PROFILE_TAB_SELLER_PERSONAL_CATEGORY_MODERATION =
+  "seller-personal-category-moderation";
 export const PROFILE_TAB_PRODUCT_REPORTS = "product-reports";
 export const PROFILE_TAB_PRODUCT_PROMOTIONS = "product-promotions";
 export const PROFILE_TAB_RAFFLES = "raffles";
@@ -42,10 +47,14 @@ export const PROFILE_TAB_VALUES = [
   PROFILE_TAB_DATA_CONFIRMATION,
   PROFILE_TAB_PREMIUM,
   PROFILE_TAB_LOYALTY_POINTS,
+  PROFILE_TAB_ADVERTISING,
   PROFILE_TAB_ADMIN_ORDERS,
   PROFILE_TAB_SEARCH_SYNONYMS_ADMIN,
   PROFILE_TAB_CATEGORY_TREE_ADMIN,
+  PROFILE_TAB_APP_INTRO_ADMIN,
   PROFILE_TAB_PRODUCT_MODERATION,
+  PROFILE_TAB_INTRO_AD_MODERATION,
+  PROFILE_TAB_SELLER_PERSONAL_CATEGORY_MODERATION,
   PROFILE_TAB_PRODUCT_REPORTS,
   PROFILE_TAB_PRODUCT_PROMOTIONS,
   PROFILE_TAB_RAFFLES,

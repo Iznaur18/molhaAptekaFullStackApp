@@ -119,12 +119,22 @@
   line-height: 1.35;
 }
 
-.product-card__meta-strip {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  min-height: 3.05rem;
-  min-width: 0;
+.product-card__catalog-badges--web {
+  display: none;
+}
+
+@media (min-width: 40.0625rem) {
+  .product-card__catalog-badges--web {
+    display: flex;
+  }
+
+  .product-card__catalog-badges--web.product-discount-badge {
+    display: inline-flex;
+  }
+
+  .product-card__meta-strip {
+    min-height: 3.05rem;
+  }
 }
 
 .product-card__meta-strip > .product-card__rating {
@@ -139,11 +149,11 @@
   gap: 6px;
   min-width: 0;
   max-width: 100%;
-  overflow-x: auto;
+  overflow-x: scroll;
   overflow-y: hidden;
   overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
-  touch-action: pan-y;
+  touch-action: pan-x pan-y;
   cursor: grab;
   scrollbar-width: none;
   -ms-overflow-style: none;

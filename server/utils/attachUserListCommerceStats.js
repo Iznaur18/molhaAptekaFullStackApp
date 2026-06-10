@@ -19,3 +19,15 @@ export const attachUserListCommerceStats = async (users) => {
     totalPurchasesAmount: withPurchases[index]?.totalPurchasesAmount ?? 0,
   }));
 };
+
+/**
+ * @param {Record<string, unknown> | null | undefined} user
+ */
+export const attachUserCommerceStatsToUser = async (user) => {
+  if (!user || user._id == null) {
+    return user;
+  }
+
+  const [withStats] = await attachUserListCommerceStats([user]);
+  return withStats;
+};

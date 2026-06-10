@@ -1,4 +1,4 @@
-﻿.product-card__fields {
+.product-card__fields {
   margin: 0;
   display: flex;
   flex-direction: column;
@@ -23,12 +23,6 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 0.15rem 0.35rem;
-}
-
-.product-card__row--seller .product-card__key--seller-inline {
-  flex: 0 0 auto;
-  margin: 0;
-  font-weight: 700;
 }
 
 .product-card__row--seller .product-card__value--seller-inline {

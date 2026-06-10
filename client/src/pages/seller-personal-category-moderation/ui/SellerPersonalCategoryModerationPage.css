@@ -1,0 +1,50 @@
+.seller-personal-category-moderation-page {
+  display: grid;
+  gap: 12px;
+}
+
+.seller-personal-category-moderation-page__list {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.seller-personal-category-moderation-page__item {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--app-border-color, #e5e7eb);
+  border-radius: 0.75rem;
+}
+
+.seller-personal-category-moderation-page__meta {
+  margin: 0;
+}
+
+.seller-personal-category-moderation-page__preview {
+  max-width: 160px;
+  border-radius: 0.5rem;
+}
+
+.seller-personal-category-moderation-page__reason {
+  width: 100%;
+  min-height: 72px;
+  box-sizing: border-box;
+}
+
+.seller-personal-category-moderation-page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.seller-personal-category-moderation-page__state {
+  margin: 0;
+}
+
+.seller-personal-category-moderation-page__state_error {
+  margin: 0;
+  color: var(--app-danger-text-color, #b91c1c);
+}

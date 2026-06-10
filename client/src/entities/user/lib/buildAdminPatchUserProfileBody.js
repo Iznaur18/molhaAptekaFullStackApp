@@ -9,14 +9,16 @@ const ALLOWED_ROLES = [USER_ROLE_USER, USER_ROLE_ADMIN, USER_ROLE_MODERATOR];
 
 /**
  * @param {import('./mapUserToEditProfileForm.js').EditProfileFormState} form
- * @param {{ initialPhoneNumber?: string | null; includePremium?: boolean }} [options]
+ * @param {{ initialPhoneNumber?: string | null; includePremium?: boolean; initialStructuredAddress?: import('../../address/model/structuredTypes.js').RuStructuredDeliveryAddressValue }} [options]
  * @returns {Record<string, unknown>}
  */
 export function buildAdminPatchUserProfileBody(form, options = {}) {
-  const { includePremium = true, initialPhoneNumber = null } = options;
+  const { includePremium = true, initialPhoneNumber = null, initialStructuredAddress } =
+    options;
   const body = buildPatchUserProfileBody(form, {
     backgroundMode: "admin",
     initialPhoneNumber,
+    initialStructuredAddress,
   });
 
   const role = form.userRole;

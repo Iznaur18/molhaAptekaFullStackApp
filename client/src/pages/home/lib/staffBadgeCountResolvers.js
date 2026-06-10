@@ -1,3 +1,5 @@
+import { introAdQueryKeys } from "../../../entities/intro-ad/model/introAdQueryKeys.js";
+import { sellerPersonalCategoryQueryKeys } from "../../../entities/seller-personal-category/model/sellerPersonalCategoryQueryKeys.js";
 import { installmentQueryKeys } from "../../../entities/installment/model/installmentQueryKeys.js";
 import {
   countMyOrdersActionItemsFromOrders,
@@ -15,6 +17,7 @@ import { userStoryReportQueryKeys } from "../../../entities/user-story/model/use
 import { STAFF_BADGE_STALE_TIME_MS } from "../../../shared/api/queryClient.js";
 
 const MODERATION_BADGE_LIST_LIMIT = 100;
+const INTRO_AD_MODERATION_BADGE_LIST_LIMIT = 50;
 const PRICE_OFFER_STATUS_PENDING = "pending";
 
 const STAFF_BADGE_COUNT_QUERY_OPTIONS = {
@@ -277,6 +280,47 @@ export function resolveInstallmentSellerActionCount(queryClient, fetchCount) {
     queryClient,
     installmentQueryKeys.sellerActionCount(),
     () => undefined,
+    fetchCount,
+  );
+}
+
+/**
+ * @param {import('@tanstack/react-query').QueryClient} queryClient
+ * @param {() => Promise<number>} fetchCount
+ */
+export function resolveIntroAdModerationStaffBadgeCount(queryClient, fetchCount) {
+  return resolveStaffBadgeCount(
+    queryClient,
+    introAdQueryKeys.moderationCount(),
+    (client) => {
+      const cached = readSuccessfulQueryData(
+        client,
+        introAdQueryKeys.moderationPending(INTRO_AD_MODERATION_BADGE_LIST_LIMIT),
+      );
+      return Array.isArray(cached?.campaigns) ? cached.campaigns.length : undefined;
+    },
+    fetchCount,
+  );
+}
+
+/**
+ * @param {import('@tanstack/react-query').QueryClient} queryClient
+ * @param {() => Promise<number>} fetchCount
+ */
+export function resolveSellerPersonalCategoryModerationStaffBadgeCount(
+  queryClient,
+  fetchCount,
+) {
+  return resolveStaffBadgeCount(
+    queryClient,
+    sellerPersonalCategoryQueryKeys.moderationCount(),
+    (client) => {
+      const cached = readSuccessfulQueryData(
+        client,
+        sellerPersonalCategoryQueryKeys.moderationPending(),
+      );
+      return Array.isArray(cached) ? cached.length : undefined;
+    },
     fetchCount,
   );
 }

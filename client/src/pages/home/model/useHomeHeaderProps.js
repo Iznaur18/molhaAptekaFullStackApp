@@ -14,6 +14,7 @@ export const useHomeHeaderProps = () => {
     setIsProductCategoryListOpen,
     handleCatalogMenuClick,
     isCatalogBrowserLanding,
+    isCatalogSubcategoryPickerActive,
     productSearchTerm,
     setProductSearchTerm,
     isProductSearchPending,
@@ -33,6 +34,7 @@ export const useHomeHeaderProps = () => {
     setIsLoginModalOpen,
     setIsRegisterModalOpen,
     handleNavigateToFullCatalogFromBreadcrumb,
+    closeCatalogProductDetails,
     catalogSort,
     handleCatalogSortChange,
     catalogFollowingOnly,
@@ -62,12 +64,34 @@ export const useHomeHeaderProps = () => {
   }, [setIsProductCategoryListOpen]);
 
   const handleMyProfileClick = useCallback(() => {
+    closeCatalogProductDetails();
     goToMainView("my-profile");
-  }, [goToMainView]);
+  }, [closeCatalogProductDetails, goToMainView]);
 
   const handleLoginClick = useCallback(() => {
+    closeCatalogProductDetails();
     setIsLoginModalOpen(true);
-  }, [setIsLoginModalOpen]);
+  }, [closeCatalogProductDetails, setIsLoginModalOpen]);
+
+  const handleMobileHomeClick = useCallback(() => {
+    closeCatalogProductDetails();
+    handleNavigateToFullCatalogFromBreadcrumb();
+  }, [closeCatalogProductDetails, handleNavigateToFullCatalogFromBreadcrumb]);
+
+  const handleMobileCatalogClick = useCallback(() => {
+    closeCatalogProductDetails();
+    handleCatalogMenuClick();
+  }, [closeCatalogProductDetails, handleCatalogMenuClick]);
+
+  const handleMobilePlaceProductClick = useCallback(() => {
+    closeCatalogProductDetails();
+    handlePlaceProductClick();
+  }, [closeCatalogProductDetails, handlePlaceProductClick]);
+
+  const handleMobileCartClick = useCallback(() => {
+    closeCatalogProductDetails();
+    goToMainView("cart");
+  }, [closeCatalogProductDetails, goToMainView]);
 
   const handleRegisterClick = useCallback(() => {
     setIsRegisterModalOpen(true);
@@ -82,8 +106,9 @@ export const useHomeHeaderProps = () => {
           ? activeCatalogBrowserCategory
           : selectedProductCategory,
       isProductCategoryListOpen,
-      onCatalogMenuClick: handleCatalogMenuClick,
-      isCatalogMenuActive: isCatalogBrowserLanding,
+      onCatalogMenuClick: handleMobileCatalogClick,
+      onMobileCartClick: handleMobileCartClick,
+      isCatalogMenuActive: isCatalogBrowserLanding && !isCatalogSubcategoryPickerActive,
       productSearchTerm,
       isProductSearchPending,
       isAuthorized,
@@ -92,7 +117,7 @@ export const useHomeHeaderProps = () => {
       onProductCategoryFilterToggle: handleProductCategoryFilterToggle,
       onCloseProductCategoryFilter: handleCloseProductCategoryFilter,
       onProductSearchTermChange: setProductSearchTerm,
-      onPlaceProductClick: handlePlaceProductClick,
+      onPlaceProductClick: handleMobilePlaceProductClick,
       myProductsTotal,
       sellerProductsLimit,
       pendingModerationCount,
@@ -105,7 +130,7 @@ export const useHomeHeaderProps = () => {
       unreadNotificationsCount: inAppNotificationsCount,
       onLoginClick: handleLoginClick,
       onRegisterClick: handleRegisterClick,
-      onNavigateToFullCatalogFromBreadcrumb: handleNavigateToFullCatalogFromBreadcrumb,
+      onNavigateToFullCatalogFromBreadcrumb: handleMobileHomeClick,
       catalogSort,
       onCatalogSortChange: handleCatalogSortChange,
       catalogFollowingOnly,
@@ -130,8 +155,12 @@ export const useHomeHeaderProps = () => {
       activeCatalogBrowserCategory,
       selectedProductCategory,
       isProductCategoryListOpen,
-      handleCatalogMenuClick,
+      handleMobileCatalogClick,
+      handleMobileHomeClick,
+      handleMobileCartClick,
+      handleMobilePlaceProductClick,
       isCatalogBrowserLanding,
+      isCatalogSubcategoryPickerActive,
       productSearchTerm,
       isProductSearchPending,
       isAuthorized,
@@ -140,7 +169,7 @@ export const useHomeHeaderProps = () => {
       handleProductCategoryFilterToggle,
       handleCloseProductCategoryFilter,
       setProductSearchTerm,
-      handlePlaceProductClick,
+      closeCatalogProductDetails,
       myProductsTotal,
       sellerProductsLimit,
       pendingModerationCount,
@@ -153,7 +182,6 @@ export const useHomeHeaderProps = () => {
       inAppNotificationsCount,
       handleLoginClick,
       handleRegisterClick,
-      handleNavigateToFullCatalogFromBreadcrumb,
       catalogSort,
       handleCatalogSortChange,
       catalogFollowingOnly,

@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 
 import { useAppShellStateContext } from "../../../app/model/AppShellStateContext.jsx";
+import { CATALOG_SORT_CITY } from "../../../entities/product/model/productConstants.js";
 
 /** @typedef {import('../../../entities/product/model/types.js').ProductFromApi} ProductFromApi */
 
@@ -49,9 +50,15 @@ export const useHomeCatalogGridProps = () => {
     catalogAuctionOnly,
     catalogInstallmentOnly,
     catalogSaleOnly,
+    catalogAllCities,
+    catalogSort,
+    authUser,
+    handleShowAllCatalogCities,
     sellerRaffleActive,
     raffleParticipationPendingProductId,
   } = ctx;
+
+  const catalogCityFilterLabel = String(authUser?.userAddressCity ?? "").trim();
 
   return useMemo(
     () => ({
@@ -97,6 +104,14 @@ export const useHomeCatalogGridProps = () => {
       catalogAuctionOnly,
       catalogInstallmentOnly,
       catalogSaleOnly,
+      showCatalogCityFilterBanner:
+        isAuthorized &&
+        !isMineMode &&
+        catalogCityFilterLabel !== "" &&
+        !catalogAllCities &&
+        catalogSort !== CATALOG_SORT_CITY,
+      catalogCityFilterLabel,
+      onShowAllCatalogCities: handleShowAllCatalogCities,
       showFullWidthTier3Banners:
         !isMineMode &&
         !selectedProductCategory &&
@@ -151,6 +166,11 @@ export const useHomeCatalogGridProps = () => {
       catalogAuctionOnly,
       catalogInstallmentOnly,
       catalogSaleOnly,
+      catalogAllCities,
+      catalogSort,
+      catalogCityFilterLabel,
+      handleShowAllCatalogCities,
+      authUser,
       sellerRaffleActive,
       raffleParticipationPendingProductId,
     ],

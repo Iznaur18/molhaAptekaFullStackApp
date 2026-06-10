@@ -61,6 +61,15 @@
   box-shadow: 0 8px 20px var(--iz-color-accent-indigo-shadow);
 }
 
+.catalog-categories-grid__card:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.catalog-categories-grid__card_pending {
+  border-color: var(--iz-color-premium-indigo-muted);
+}
+
 .catalog-categories-grid__image-wrap {
   display: block;
   aspect-ratio: 1;

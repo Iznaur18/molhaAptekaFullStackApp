@@ -29,12 +29,45 @@ function pickFlatFromCleaned(cleaned) {
 }
 
 /**
+ * @param {Record<string, unknown>} cleaned
+ * @returns {string | null}
+ */
+function pickStringField(cleaned, key) {
+  const raw = cleaned[key];
+  if (raw == null) return null;
+  const text = String(raw).trim();
+  return text === "" ? null : text;
+}
+
+/**
+ * @param {Record<string, unknown>} cleaned
+ */
+function pickStructuredFromCleaned(cleaned) {
+  const city =
+    pickStringField(cleaned, "city") ??
+    pickStringField(cleaned, "settlement") ??
+    "";
+  const district =
+    pickStringField(cleaned, "city_district") ?? pickStringField(cleaned, "area") ?? "";
+  const street =
+    pickStringField(cleaned, "street") ?? pickStringField(cleaned, "stead") ?? "";
+  const house =
+    pickStringField(cleaned, "house") ?? pickStringField(cleaned, "block") ?? "";
+
+  return { city, district, street, house };
+}
+
+/**
  * @param {{ addressLine: string; flat?: string }} params
  * @returns {Promise<{
  *   displayAddress: string;
  *   flat: string;
  *   fiasId: string;
  *   geo: { lat: number; lon: number } | null;
+ *   city: string;
+ *   district: string;
+ *   street: string;
+ *   house: string;
  * }>}
  */
 export async function verifyRuDeliveryAddress({ addressLine, flat = "" }) {
@@ -57,6 +90,10 @@ export async function verifyRuDeliveryAddress({ addressLine, flat = "" }) {
       flat: flatInput,
       fiasId: "",
       geo: null,
+      city: "",
+      district: "",
+      street: "",
+      house: "",
     };
   }
 
@@ -87,11 +124,16 @@ export async function verifyRuDeliveryAddress({ addressLine, flat = "" }) {
   const lat = Number(cleaned.geo_lat);
   const lon = Number(cleaned.geo_lon);
   const geo = Number.isFinite(lat) && Number.isFinite(lon) ? { lat, lon } : null;
+  const structured = pickStructuredFromCleaned(cleaned);
 
   return {
     displayAddress,
     flat: cleanedFlat,
     fiasId,
     geo,
+    city: structured.city,
+    district: structured.district,
+    street: structured.street,
+    house: structured.house,
   };
 }

@@ -29,9 +29,9 @@ export const IMAGE_URL_FIELD_UI = {
 export const VIDEO_URL_FIELD_UI = {
   UPLOAD_BUTTON: "Выбрать файл",
   UPLOAD_LOADING: "Загрузка…",
-  UPLOAD_HINT: "MP4 или WebM, до 5 МБ. Можно также вставить прямую ссылку.",
+  UPLOAD_HINT: "MP4 или WebM, до 10 МБ. Можно также вставить прямую ссылку.",
   ERROR_TYPE: "Допустимы только MP4 и WebM",
-  ERROR_SIZE: "Файл не больше 5 МБ",
+  ERROR_SIZE: "Файл не больше 10 МБ",
   ERROR_GENERIC: "Не удалось загрузить видео",
   ERROR_AUTH: "Войдите в аккаунт, чтобы загрузить файл",
   FILE_INPUT_ARIA: "Выбрать видео с устройства",
@@ -262,6 +262,9 @@ export const APP_INTRO_UI = {
   REPLAY_LINK: "Посмотреть intro",
   ARIA_OVERLAY: "Заставка при открытии сайта",
   VIDEO_ARIA: "Intro-ролик",
+  AD_BADGE: "Реклама",
+  AD_CTA_SELLER_PRODUCTS: "Товары продавца",
+  AD_CTA_PROFILE: "Профиль",
 };
 
 /** Подтверждение email */
@@ -291,6 +294,8 @@ export const EMAIL_VERIFICATION_UI = {
 export const HOME_PAGE_UI = {
   PRODUCT_CATEGORY_FILTER_LIST_ID: "home-product-category-filter-list",
   LOADING_CATALOG: "Загрузка каталога…",
+  CATALOG_CITY_FILTER_BANNER: (city) => `Показаны товары для ${city}`,
+  CATALOG_CITY_FILTER_SHOW_ALL: "Все города",
   LOADING_SESSION: "Загрузка…",
   FETCH_PRODUCTS_FALLBACK: "Не удалось загрузить товары",
   FETCH_PROFILE_FALLBACK: "Не удалось загрузить профиль",
@@ -311,6 +316,9 @@ export const HOME_PAGE_UI = {
   TITLE_MY_SALES: "Мои продажи",
   TITLE_ADMIN_ORDERS: "Все заказы",
   TITLE_PRODUCT_MODERATION: "На модерации",
+  TITLE_INTRO_AD_MODERATION: "Intro-реклама",
+  TITLE_SELLER_PERSONAL_CATEGORY_MODERATION: "Личные категории",
+  TITLE_ADVERTISING: "Реклама в intro",
   TITLE_PRODUCT_REPORTS: "Жалобы",
   TITLE_DATA_CONFIRMATION: "Подтверждение данных",
   TITLE_INSTALLMENT_PAYMENTS: "Мои рассрочки",
@@ -319,6 +327,13 @@ export const HOME_PAGE_UI = {
   TITLE_INSTALLMENT_DISPUTES: "Споры по рассрочке",
   NAV_TO_CATALOG: "← Каталог товаров",
   NAV_AUTH_ARIA: "Действия аккаунта",
+  NAV_MOBILE_BOTTOM_ARIA: "Основная навигация",
+  NAV_MOBILE_HOME: "Дом",
+  NAV_MOBILE_HOME_ARIA: "На главный экран",
+  NAV_MOBILE_CATALOG: "Каталог",
+  NAV_MOBILE_CREATE_PRODUCT: "Создать",
+  NAV_MOBILE_CART: "Корзина",
+  NAV_MOBILE_PROFILE: "Профиль",
   NAV_SECTIONS_ARIA: "Навигация по разделам",
   NAV_TO_USERS: "Пользователи",
   NAV_TO_SUBSCRIPTIONS: "Подписки",
@@ -392,6 +407,13 @@ export const PRODUCT_CATEGORY_DISPLAY_UI = {
   FEED_EDIT_ARIA: (label) => `Редактировать подборку «${label}»`,
   FEED_LABEL_HINT: "Пустое поле — стандартное название из списка.",
   FEED_SAVE_FALLBACK: "Не удалось сохранить подборку",
+  SUBCATEGORY_VIEW_ALL: "Посмотреть всё",
+  SUBCATEGORY_PICKER_ARIA: "Подкатегории",
+  SUBCATEGORY_BACK: "Назад",
+  SUBCATEGORY_BACK_ARIA: "Назад к предыдущему уровню категорий",
+  SUBCATEGORY_NODE_EDIT_ARIA: (label) => `Редактировать подкатегорию «${label}»`,
+  SUBCATEGORY_NODE_EDIT_TITLE: (label) => `Подкатегория: ${label}`,
+  SUBCATEGORY_NODE_LABEL_HINT: "Пустое поле — название из дерева категорий.",
 };
 
 /** Кнопка добавления товара в корзину */
@@ -443,6 +465,21 @@ export const CART_PAGE_UI = {
   AUTH_REQUIRED: "Войдите, чтобы оформить заказ.",
   AUTH_LOGIN: "Войти",
   PRODUCT_DELETED_OR_HIDDEN: "Товар недоступен",
+};
+
+/** Структурированный адрес (профиль) */
+export const ADDRESS_STRUCTURED_UI = {
+  FIELDSET_LEGEND: "Адрес",
+  LABEL_CITY: "Город",
+  LABEL_DISTRICT: "Район",
+  LABEL_STREET: "Улица",
+  LABEL_HOUSE: "Дом",
+  LABEL_FLAT: "Квартира",
+  PLACEHOLDER_CITY: "Москва",
+  PLACEHOLDER_DISTRICT: "Необязательно",
+  PLACEHOLDER_STREET: "ул. Примерная",
+  PLACEHOLDER_HOUSE: "12",
+  PLACEHOLDER_FLAT: "Необязательно",
 };
 
 /** DaData: адрес до дома */
@@ -504,6 +541,134 @@ export const MY_ORDERS_PAGE_UI = {
   EMPTY_BY_FILTER: "По выбранному статусу покупок нет.",
   /** @param {number} points */
   LOYALTY_POINTS_EARNED: (points) => `+${points} ${pluralizeRuBall(points)} лояльности`,
+};
+
+/** Очередь intro-рекламы (moderator) */
+export const INTRO_AD_MODERATION_PAGE_UI = {
+  TITLE: "Intro-реклама",
+  LOADING: "Загрузка очереди…",
+  EMPTY: "Нет заявок на intro-рекламу.",
+  APPROVE: "Одобрить",
+  REJECT: "Отклонить",
+  REJECT_REASON_LABEL: "Причина отклонения (необязательно)",
+  REJECT_REASON_PLACEHOLDER: "Комментарий для рекламодателя…",
+  ACTION_PENDING: "Сохраняем…",
+  ADVERTISER_LABEL: "Рекламодатель",
+  SUBMITTED_LABEL: "Отправлено",
+  PREVIEW: "Предпросмотр",
+  FETCH_FALLBACK: "Не удалось загрузить очередь intro-рекламы",
+  APPROVE_SUCCESS: "Заявка одобрена",
+  APPROVE_FALLBACK: "Не удалось одобрить заявку",
+  REJECT_SUCCESS: "Заявка отклонена",
+  REJECT_FALLBACK: "Не удалось отклонить заявку",
+  PENDING_TITLE: "На модерации",
+  MANAGED_TITLE: "Активные и в очереди",
+  STATUS_LABEL: "Статус",
+  STATUS_ACTIVE: "Показ активен",
+  STATUS_QUEUED: "В очереди",
+  STAFF_CANCEL: "Снять кампанию",
+  STAFF_CANCEL_SUCCESS: "Кампания снята",
+  STAFF_CANCEL_FALLBACK: "Не удалось снять кампанию",
+  MANAGED_FETCH_FALLBACK: "Не удалось загрузить активные кампании",
+  /** @param {number} n */
+  TAB_BADGE: (n) => (n > 99 ? "99+" : String(n)),
+};
+
+/** Раздел «Реклама в intro» */
+export const ADVERTISING_PAGE_UI = {
+  PAGE_TITLE: "Реклама",
+  PAGE_LEAD:
+    "Продвигайте магазин через intro-ролик при входе и личную плитку в каталоге. Оплата баллами лояльности.",
+  /** @param {number} balance */
+  BALANCE: (balance) => `${balance} баллов`,
+  BALANCE_LABEL: "Баланс",
+};
+
+export const INTRO_AD_PAGE_UI = {
+  CARD_TITLE: "Intro-ролик",
+  PAGE_ARIA: "Реклама в intro",
+  LOGIN_HINT: "Войдите, чтобы оформить рекламу в intro.",
+  LOGIN_BUTTON: "Войти",
+  LOADING: "Загрузка…",
+  FETCH_FALLBACK: "Не удалось загрузить раздел рекламы",
+  SUBMIT_FALLBACK: "Не удалось отправить заявку",
+  SUBMIT_SUCCESS: "Заявка отправлена на модерацию",
+  CANCEL_FALLBACK: "Не удалось отменить заявку",
+  CANCEL_SUCCESS: "Заявка отменена",
+  /** @param {number} price */
+  PRICE: (price) => `Стоимость: ${price} баллов`,
+  DURATION: "Срок показа: 3 дня",
+  DESCRIPTION:
+    "Ваш intro-ролик заменит заставку сайта для новых посетителей и при просмотре intro. После модерации баллы списываются, показ ставится в очередь, если слот занят.",
+  /** @param {number} balance */
+  BALANCE: (balance) => `Доступно: ${balance} баллов`,
+  STATUS_PENDING: "На модерации. Баллы зарезервированы.",
+  STATUS_QUEUED: "Одобрено. Ожидает свободного слота.",
+  STATUS_ACTIVE: "Показ активен.",
+  SUBMIT: "Отправить на модерацию",
+  CANCEL: "Отменить заявку",
+  PREVIEW: "Предпросмотр",
+  OPEN_FORM: "Оформить рекламу",
+  SECTION_TIMING: "Тайминги показа",
+  LABEL_MIN_MS: "Минимум показа, мс",
+  LABEL_MAX_MS: "Максимум показа, мс",
+  LABEL_FADE_MS: "Fade-out, мс",
+  TIMING_HINT: "Необязательно — по умолчанию как у платформенного intro.",
+};
+
+/** Личная категория продавца (вкладка «Реклама») */
+export const SELLER_PERSONAL_CATEGORY_PAGE_UI = {
+  SECTION_TITLE: "Личная категория",
+  SECTION_LEAD:
+    "Отдельная плитка в каталоге с вашим названием и картинкой. Все одобренные товары попадают и в глобальную категорию, и в личную. После модерации баллы списываются.",
+  TILES_SECTION_TITLE: "Личные категории продавцов",
+  TILES_LOADING: "Загрузка личных категорий…",
+  FETCH_TILES_FALLBACK: "Не удалось загрузить личные категории",
+  FETCH_FALLBACK: "Не удалось загрузить заявку на личную категорию",
+  SUBMIT_FALLBACK: "Не удалось отправить заявку",
+  SUBMIT_SUCCESS: "Заявка на личную категорию отправлена на модерацию",
+  CANCEL_FALLBACK: "Не удалось отменить заявку",
+  CANCEL_SUCCESS: "Заявка отменена",
+  OPEN_FORM: "Купить личную категорию",
+  SUBMIT: "Отправить на модерацию",
+  CANCEL: "Отменить заявку",
+  LABEL_NAME: "Название категории",
+  LABEL_IMAGE: "Картинка плитки",
+  LABEL_DURATION: "Срок",
+  /** @param {number} balance */
+  BALANCE: (balance) => `Доступно: ${balance} баллов`,
+  /** @param {number} price */
+  PRICE: (price) => `Стоимость: ${price} баллов`,
+  STATUS_PENDING: "На модерации. Баллы зарезервированы.",
+  STATUS_ACTIVE: "Личная категория активна в каталоге.",
+  LOADING: "Загрузка…",
+  /** @param {string | Date | null | undefined} activeUntil */
+  STATUS_ACTIVE_UNTIL: (activeUntil) => {
+    if (!activeUntil) {
+      return "";
+    }
+    const dateLabel = new Date(activeUntil).toLocaleDateString("ru-RU", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    return `Активна до ${dateLabel}`;
+  },
+};
+
+/** Очередь личных категорий (moderator) */
+export const SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI = {
+  TITLE: "Личные категории",
+  EMPTY: "Нет заявок на личные категории.",
+  SELLER_LABEL: "Продавец",
+  REJECT_REASON_PLACEHOLDER: "Комментарий для продавца…",
+  APPROVE: "Одобрить",
+  REJECT: "Отклонить",
+  FETCH_FALLBACK: "Не удалось загрузить очередь личных категорий",
+  APPROVE_FALLBACK: "Не удалось одобрить заявку",
+  REJECT_FALLBACK: "Не удалось отклонить заявку",
 };
 
 /** Очередь модерации товаров (admin / moderator) */
@@ -727,6 +892,8 @@ export const MY_SALES_PAGE_UI = {
   TITLE: "Мои продажи",
   /** @param {number} count */
   COUNT: (count) => `${count} заказов`,
+  /** @param {number} count */
+  TOTAL_SALES_COUNT: (count) => `Продаж: ${count}`,
   LOADING: "Загрузка продаж…",
   EMPTY: "У вас пока нет продаж.",
   EMPTY_BY_FILTER: "По выбранному статусу продаж нет.",
@@ -827,7 +994,9 @@ export const USER_LIST_ROW_UI = {
   BADGE_INACTIVE: "Откл.",
   MISSING_NAME: COMMON_UI.EM_DASH,
   RATING_TITLE: "Средняя оценка · число голосов",
+  RATING_SCORE_LABEL: "Оценка",
   TOTAL_SALES_LABEL: "Продаж на сумму",
+  TOTAL_SALES_COUNT_LABEL: "Продаж",
   TOTAL_PURCHASES_LABEL: "Покупок на сумму",
   RATING_LABEL: "Рейтинг",
   USER_DATA_CONFIRMED_LABEL: "Пользователь подтверждён",
@@ -871,6 +1040,10 @@ export const CREATE_PRODUCT_MODAL_UI = {
   LABEL_DISCOUNT_PREVIEW: "Скидка",
   ERROR_OLD_PRICE: "Старая цена должна быть больше текущей",
   LABEL_CATEGORY: "Категория",
+  LABEL_SALE_CITY: "Город продажи",
+  PLACEHOLDER_SALE_CITY: "Город, где продаётся товар",
+  HINT_SALE_CITY: "Пусто — товар виден во всех городах",
+  ERROR_SALE_CITY_MAX: `Город продажи не длиннее ${80} символов`,
   ERROR_CATEGORY_LEAF: "Выберите конечную подкатегорию в дереве категорий",
   LABEL_AVAILABLE: "Товар в наличии",
   LABEL_STOCK_QUANTITY: "Количество в наличии (шт.)",
@@ -955,10 +1128,12 @@ export const PRODUCT_CATEGORY_TREE_UI = {
 
 /** Модалка карточки товара в каталоге */
 export const PRODUCT_DETAILS_MODAL_UI = {
+  BACK_ARIA: "Назад",
   GALLERY_THUMBS_ARIA: "Дополнительные фотографии товара",
   OPEN_GALLERY_FULLSCREEN: "Просмотреть все фото в полном экране",
   SLIDER_REGION_ARIA: "Слайдер фотографий товара",
   DETAILS_SECTION_ARIA: "Описание и служебная информация о товаре",
+  SALE_CITY_ALL: "Во всех городах",
   CHARACTERISTICS_TITLE: "Характеристики",
   CHARACTERISTICS_SECTION_ARIA: "Характеристики товара",
 };
@@ -1057,6 +1232,11 @@ export const INSTALLMENT_UI = {
   CONTRACT_SUCCESS: "Рассрочка оформлена. Следите за графиком платежей.",
   ERROR_GENERIC: "Не удалось выполнить действие",
   MODERATION_PENDING: "Программа на модерации",
+  PROGRAM_MODAL_PENDING_HINT:
+    "Рассрочка сохранена и ждёт одобрения модератора. Покупатели увидят её после проверки.",
+  PROGRAM_MODAL_REJECTED_HINT:
+    "Программа отклонена модератором. Исправьте планы и сохраните снова.",
+  PROGRAM_MODAL_APPROVED_HINT: "Рассрочка активна — покупатели могут оформить её на этот товар.",
   MODERATION_REJECTED: "Программа отклонена",
   MODERATION_APPROVED: "Рассрочка активна",
   SELLER_TAB_HINT: "Настройте планы в «Изменить товар» → «Продать в рассрочку».",
@@ -1064,6 +1244,20 @@ export const INSTALLMENT_UI = {
   PROGRAM_MODAL_ENABLED: "Включить рассрочку",
   PROGRAM_MODAL_PLAN_NUMBER: (n) => `План ${n}`,
   PROGRAM_MODAL_PLAN_TITLE: "Название плана",
+  PROGRAM_MODAL_PLAN_TITLE_PLACEHOLDER: "Например: Стандарт",
+  PROGRAM_MODAL_ERROR_NO_PLANS: "Добавьте хотя бы один план рассрочки",
+  /** @param {number} planNumber */
+  PROGRAM_MODAL_ERROR_PLAN_TITLE: (planNumber) =>
+    `План ${planNumber}: укажите название`,
+  /** @param {number} planNumber @param {number} maxLength */
+  PROGRAM_MODAL_ERROR_PLAN_TITLE_MAX: (planNumber, maxLength) =>
+    `План ${planNumber}: название не длиннее ${maxLength} символов`,
+  /** @param {number} planNumber @param {number} min @param {number} max */
+  PROGRAM_MODAL_ERROR_PLAN_MONTHS: (planNumber, min, max) =>
+    `План ${planNumber}: срок от ${min} до ${max} мес.`,
+  /** @param {number} planNumber @param {number} minRub */
+  PROGRAM_MODAL_ERROR_PLAN_MONTHLY: (planNumber, minRub) =>
+    `План ${planNumber}: минимальный платёж ${minRub} ₽`,
   PROGRAM_MODAL_MONTHS: "Месяцев",
   PROGRAM_MODAL_MONTHLY: "Платёж, ₽",
   PROGRAM_MODAL_PLAN_TOTAL: (formatted) => `Итого ${formatted}`,
@@ -1177,6 +1371,18 @@ export const CREATE_RAFFLE_MODAL_UI = {
   HINT: "После одобрения staff включите участие на своих товарах в «Мои товары».",
   HINT_EDIT_ACTIVE:
     "Изменения цели продаж пересчитают прогресс для активного розыгрыша.",
+  HINT_TITLE: "Короткое название для баннера и карусели на главной. До 120 символов.",
+  HINT_DESCRIPTION:
+    "Условия, описание приза и другие детали для покупателей. Необязательно, до 4000 символов.",
+  HINT_PRIZE_MEDIA: "Выберите, чем показать приз в баннере розыгрыша — фото или видео.",
+  HINT_PRIZE_IMAGE:
+    "Загрузите файл или вставьте ссылку http/https либо путь /uploads/… с сервера.",
+  HINT_PRIZE_VIDEO:
+    "Прямая ссылка на MP4/WebM или видеофайл, загруженный на сервер.",
+  HINT_TARGET:
+    "Сколько подтверждённых продаж нужно для завершения розыгрыша. Целое число от 1 до 100 000.",
+  HINT_INSTAGRAM:
+    "Ссылка на ваш профиль Instagram — покупатели увидят её после завершения розыгрыша.",
 };
 
 export const RAFFLE_FEATURED_CAROUSEL_UI = {
@@ -1379,7 +1585,6 @@ export const USER_VOTE_RATING_UI = {
 export const USER_DETAILS_MODAL_UI = {
   TITLE_LOADING: "Профиль: загрузка…",
   TITLE_FALLBACK: "Профиль пользователя",
-  TITLE_WITH_NAME_PREFIX: "Профиль: ",
   LOADING_BODY: "Загрузка данных…",
   CLOSE_TEXT: "Закрыть",
   ARIA_CLOSE: "Закрыть",
@@ -1430,6 +1635,7 @@ export const LOYALTY_POINTS_PAGE_UI = {
   USES: [
     "Оплата премиум-подписки",
     "Продвижение товаров в каталоге",
+    "Реклама в intro",
     "Бонус за покупку у продавца (поле на товаре)",
   ],
 };
@@ -1483,7 +1689,10 @@ export const MY_PROFILE_PAGE_UI = {
   TAB_ADMIN_ORDERS: "Все заказы",
   TAB_SEARCH_SYNONYMS_ADMIN: "Синонимы поиска",
   TAB_CATEGORY_TREE_ADMIN: "Категории",
+  TAB_APP_INTRO_ADMIN: "Intro-ролик",
   TAB_PRODUCT_MODERATION: "На модерации",
+  TAB_INTRO_AD_MODERATION: "Intro-реклама",
+  TAB_SELLER_PERSONAL_CATEGORY_MODERATION: "Личные категории",
   TAB_PRODUCT_REPORTS: "Жалобы",
   TAB_PRODUCT_PROMOTIONS: "Продвижение",
   TAB_RAFFLES: "Розыгрыши",
@@ -1496,11 +1705,15 @@ export const MY_PROFILE_PAGE_UI = {
   DATA_CONFIRMATION: "Подтверждение данных",
   TAB_PREMIUM: "Премиум",
   TAB_LOYALTY_POINTS: "Баллы",
+  TAB_ADVERTISING: "Реклама",
   EDIT_PROFILE: "Изменить профиль",
   LOGOUT: "Выйти",
   LOGOUT_CONFIRM: "Вы точно хотите выйти?",
   LOGOUT_YES: "Да выйти",
   LOGOUT_CANCEL: "Отменить выход",
+  MOBILE_NAV_TOGGLE_ARIA: "Открыть меню разделов профиля",
+  MOBILE_NAV_CLOSE_ARIA: "Закрыть меню разделов",
+  MOBILE_NAV_CURRENT_SECTION: "Раздел",
 };
 
 /** Модалка редактирования своего профиля (`PATCH /user/:id`) */
@@ -1562,6 +1775,9 @@ export const USER_PROFILE_COPY = {
     userRatingByVotes: "Рейтинг по голосам",
     followersCount: "Подписчики",
     followingCount: "Подписки",
+    totalSalesCount: "Продаж",
+    totalSalesAmount: "Продаж на сумму",
+    totalPurchasesAmount: "Покупок на сумму",
     createdAt: "Создан",
     updatedAt: "Обновлён",
   },
@@ -1650,6 +1866,44 @@ export const CATEGORY_TREE_ADMIN_PAGE_UI = {
   DELETE_CONFIRM: "Удалить категорию? Должны отсутствовать дочерние узлы и товары.",
 };
 
+/** Админ: настройка intro-ролика в профиле */
+export const APP_INTRO_ADMIN_PAGE_UI = {
+  TITLE: "Intro-ролик",
+  HINT: "Заставка при первом заходе на сайт. Без своего MP4 используется файл /intro/intro.mp4 из репозитория.",
+  LOADING: "Загрузка настроек…",
+  LOAD_ERROR: "Не удалось загрузить настройки intro",
+  SAVE_ERROR: "Не удалось сохранить настройки intro",
+  SAVE_SUCCESS: "Сохранено",
+  WATCH_AFTER_SAVE: "Посмотреть intro",
+  PREVIEW: "Предпросмотр",
+  SAVE: "Сохранить",
+  SAVING: "Сохранение…",
+  SECTION_MEDIA: "Видео и постер",
+  SECTION_FALLBACK: "Заглушка при ошибке видео",
+  SECTION_TIMING: "Тайминги",
+  LABEL_VIDEO_MP4: "Видео MP4",
+  HINT_VIDEO_MP4: "Пустое поле — дефолтный /intro/intro.mp4",
+  LABEL_VIDEO_WEBM: "Видео WebM (опционально)",
+  LABEL_POSTER: "Постер",
+  LABEL_FALLBACK_TITLE: "Заголовок заглушки",
+  LABEL_FALLBACK_HINT: "Подзаголовок заглушки",
+  LABEL_MIN_MS: "Минимум показа, мс",
+  LABEL_MAX_MS: "Максимум показа, мс",
+  LABEL_FADE_MS: "Fade-out, мс",
+  ERROR_FALLBACK_TITLE_REQUIRED: "Укажите заголовок заглушки",
+  ERROR_FALLBACK_TITLE_TOO_LONG: "Заголовок заглушки слишком длинный",
+  ERROR_FALLBACK_HINT_REQUIRED: "Укажите подзаголовок заглушки",
+  ERROR_FALLBACK_HINT_TOO_LONG: "Подзаголовок заглушки слишком длинный",
+  ERROR_MIN_MS: "Минимум показа вне допустимого диапазона",
+  ERROR_MAX_MS: "Максимум показа вне допустимого диапазона",
+  ERROR_MAX_LT_MIN: "Максимум не может быть меньше минимума",
+  ERROR_FADE_MS: "Fade-out вне допустимого диапазона",
+  SECTION_PRIORITY: "Приоритет показа",
+  LABEL_PRIORITIZE_PLATFORM_INTRO: "Показывать intro платформы вместо рекламы",
+  HINT_PRIORITIZE_PLATFORM_INTRO:
+    "Если включено — платформенный intro имеет приоритет, оплаченные кампании ставятся на паузу.",
+};
+
 /**
  * @param {number} avg
  * @param {number} countVotes
@@ -1657,4 +1911,40 @@ export const CATEGORY_TREE_ADMIN_PAGE_UI = {
  */
 export function formatUserProfileRatingLine(avg, countVotes, totalRating) {
   return `среднее ${avg.toFixed(1)} · голосов ${countVotes} · сумма ${totalRating}`;
+}
+
+/**
+ * @param {{ countVotes?: number; totalRating?: number } | null | undefined} raw
+ * @returns {string}
+ */
+export function formatUserProfileRatingValue(raw) {
+  if (!raw || typeof raw !== "object") {
+    return "0";
+  }
+
+  const countVotes = Number(raw.countVotes) || 0;
+  const totalRating = Number(raw.totalRating) || 0;
+
+  if (countVotes === 0) {
+    return "0";
+  }
+
+  const avg = totalRating / countVotes;
+  const rounded = Math.round(avg * 10) / 10;
+
+  return String(rounded);
+}
+
+/**
+ * @param {{ countVotes?: number } | null | undefined} raw
+ * @returns {string}
+ */
+export function formatUserProfileRatingVotesLabel(raw) {
+  if (!raw || typeof raw !== "object") {
+    return "голосов 0";
+  }
+
+  const countVotes = Number(raw.countVotes) || 0;
+
+  return `голосов ${countVotes}`;
 }

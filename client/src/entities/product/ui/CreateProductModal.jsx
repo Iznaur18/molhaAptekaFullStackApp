@@ -49,9 +49,11 @@ import {
 } from "../../../shared/config/appUiCopy.js";
 import { getProductFieldEditLabel } from "../lib/productFieldRegistry.js";
 import { FormFieldLabel } from "../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
+import { PRODUCT_SALE_CITY_MAX_LENGTH } from "../../address/model/constants.js";
 import "./CreateProductModal.css";
 
 const CREATE_PRODUCT_FORM_ID = "create-product-form";
+const EDIT_PRODUCT_FORM_ID = "edit-product-form";
 
 const INITIAL_FORM = {
   productName: "",
@@ -67,6 +69,7 @@ const INITIAL_FORM = {
   productStockQuantity: "1",
   loyaltyPointsPerUnit: "0",
   productCharacteristicRows: [],
+  productSaleCity: "",
 };
 
 /**
@@ -101,6 +104,7 @@ function formStateFromProduct(product) {
     productCharacteristicRows: characteristicRowsFromApi(
       product.productCharacteristics,
     ),
+    productSaleCity: product.productSaleCity?.trim() ?? "",
   };
 }
 
@@ -204,6 +208,7 @@ export function CreateProductModal({
       setIsInstallmentProgramOpen(false);
       return;
     }
+    setIsInstallmentProgramOpen(false);
     if (isEdit && productToEdit) {
       setForm(formStateFromProduct(productToEdit));
     } else {
@@ -389,6 +394,15 @@ export function CreateProductModal({
         return;
       }
 
+      const productSaleCity = String(form.productSaleCity ?? "").trim();
+      if (productSaleCity.length > PRODUCT_SALE_CITY_MAX_LENGTH) {
+        setStatus({
+          kind: "error",
+          message: CREATE_PRODUCT_MODAL_UI.ERROR_SALE_CITY_MAX,
+        });
+        return;
+      }
+
       let product;
       if (isEdit) {
         if (productToEdit?._id == null) {
@@ -407,6 +421,7 @@ export function CreateProductModal({
           productOldPrice,
           loyaltyPointsPerUnit,
           productCharacteristics,
+          productSaleCity,
         };
         if (IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED && form.productCategoryId) {
           patchBody.productCategoryId = form.productCategoryId;
@@ -438,6 +453,7 @@ export function CreateProductModal({
           productStockQuantity,
           loyaltyPointsPerUnit,
           productCharacteristics,
+          productSaleCity: productSaleCity || undefined,
         });
       }
 
@@ -465,6 +481,12 @@ export function CreateProductModal({
     ? CREATE_PRODUCT_MODAL_UI.SUBMIT_EDIT_LOADING
     : CREATE_PRODUCT_MODAL_UI.SUBMIT_LOADING;
 
+  const formId = isEdit ? EDIT_PRODUCT_FORM_ID : CREATE_PRODUCT_FORM_ID;
+
+  const handleSaveClick = (event) => {
+    void handleSubmit(event);
+  };
+
   return (
     <>
       <ProductModalShell
@@ -488,10 +510,10 @@ export function CreateProductModal({
               {CREATE_PRODUCT_MODAL_UI.CANCEL}
             </button>
             <button
-              type="submit"
-              form={CREATE_PRODUCT_FORM_ID}
+              type="button"
               className="create-product-modal__submit"
               disabled={isSubmitting}
+              onClick={handleSaveClick}
             >
               {isSubmitting ? submitLoading : submitIdle}
             </button>
@@ -499,8 +521,9 @@ export function CreateProductModal({
         }
       >
         <form
-          id={CREATE_PRODUCT_FORM_ID}
+          id={formId}
           className="create-product-modal__form"
+          noValidate
           onSubmit={handleSubmit}
         >
           <section className="create-product-modal__section" aria-labelledby="create-product-section-basic">
@@ -518,7 +541,6 @@ export function CreateProductModal({
                   name="productName"
                   value={form.productName}
                   onChange={handleChange}
-                  required
                   minLength={3}
                   autoComplete="off"
                   disabled={isSubmitting}
@@ -533,7 +555,6 @@ export function CreateProductModal({
                   name="productDescription"
                   value={form.productDescription}
                   onChange={handleChange}
-                  required
                   minLength={PRODUCT_DESCRIPTION_MIN_CHARS}
                   maxLength={PRODUCT_DESCRIPTION_MAX_CHARS}
                   disabled={isSubmitting}
@@ -608,7 +629,6 @@ export function CreateProductModal({
                     name="productPrice"
                     value={form.productPrice}
                     onChange={handleChange}
-                    required
                     disabled={isSubmitting}
                   />
                 </label>
@@ -649,6 +669,22 @@ export function CreateProductModal({
                   }))
                 }
               />
+              <label className="create-product-modal__label">
+                <FormFieldLabel>{CREATE_PRODUCT_MODAL_UI.LABEL_SALE_CITY}</FormFieldLabel>
+                <input
+                  type="text"
+                  className="create-product-modal__input"
+                  name="productSaleCity"
+                  value={form.productSaleCity}
+                  onChange={handleChange}
+                  disabled={isSubmitting}
+                  maxLength={PRODUCT_SALE_CITY_MAX_LENGTH}
+                  placeholder={CREATE_PRODUCT_MODAL_UI.PLACEHOLDER_SALE_CITY}
+                />
+                <span className="create-product-modal__hint">
+                  {CREATE_PRODUCT_MODAL_UI.HINT_SALE_CITY}
+                </span>
+              </label>
               {showCatalogAvailabilityToggle ? (
                 <label className="create-product-modal__check">
                   <input
@@ -675,7 +711,6 @@ export function CreateProductModal({
                     onChange={handleChange}
                     maxLength={String(PRODUCT_STOCK_QUANTITY_MAX).length}
                     disabled={isSubmitting}
-                    required={form.productIsAvailable || !showCatalogAvailabilityToggle}
                   />
                 </label>
               ) : null}

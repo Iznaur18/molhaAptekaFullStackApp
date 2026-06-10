@@ -1,9 +1,11 @@
+import { ChevronLeft } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   PRODUCT_CARD_UI,
   PRODUCT_DETAILS_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
+import { ICON_SIZE_PX } from "../../../shared/ui/icon/iconSizes.js";
 import {
   buildProductMediaSlides,
   resolveProductImageIndexForLightbox,
@@ -21,6 +23,7 @@ import "./ProductMediaGalleryReadonly.css";
  *   isActive?: boolean;
  *   resetToken?: string | number | null;
  *   onLightboxOpenChange?: (open: boolean) => void;
+ *   onBack?: () => void;
  *   className?: string;
  * }} props
  */
@@ -30,6 +33,7 @@ export function ProductMediaGalleryReadonly({
   isActive = true,
   resetToken = null,
   onLightboxOpenChange,
+  onBack,
   className = "",
 }) {
   const [previewVideoFailed, setPreviewVideoFailed] = useState(false);
@@ -142,6 +146,19 @@ export function ProductMediaGalleryReadonly({
               }
             : {})}
         >
+          {typeof onBack === "function" ? (
+            <button
+              type="button"
+              className="product-media-gallery-readonly__back-btn"
+              aria-label={PRODUCT_DETAILS_MODAL_UI.BACK_ARIA}
+              onClick={(event) => {
+                event.stopPropagation();
+                onBack();
+              }}
+            >
+              <ChevronLeft size={ICON_SIZE_PX.lg} strokeWidth={2.25} aria-hidden="true" />
+            </button>
+          ) : null}
           {mediaSlides.length > 1 ? (
             <>
               <div className="product-media-gallery-readonly__slider-nav">

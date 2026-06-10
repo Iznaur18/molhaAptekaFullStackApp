@@ -19,6 +19,7 @@ import "./CatalogCategoriesGrid.css";
  *   categoryRoots: import('../../product-category-tree/model/types.js').ProductCategoryNode[];
  *   onCategoryClick: (item: import('../model/types.js').ResolvedProductCategoryDisplay) => void;
  *   onEditCategoryClick: (categorySlug: string) => void;
+ *   pendingCategoryKey?: string | null;
  *   showSectionShell?: boolean;
  * }} props
  */
@@ -30,6 +31,7 @@ export function CatalogCategoriesGrid({
   errorMessage,
   onCategoryClick,
   onEditCategoryClick,
+  pendingCategoryKey = null,
   showSectionShell = true,
 }) {
   const items = useMemo(
@@ -88,7 +90,14 @@ export function CatalogCategoriesGrid({
             <div className="catalog-categories-grid__card-wrap">
               <button
                 type="button"
-                className="catalog-categories-grid__card"
+                className={[
+                  "catalog-categories-grid__card",
+                  pendingCategoryKey === (item.categoryId ?? item.categorySlug) &&
+                    "catalog-categories-grid__card_pending",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                disabled={Boolean(pendingCategoryKey)}
                 onClick={() => onCategoryClick(item)}
               >
                 <span className="catalog-categories-grid__image-wrap">

@@ -187,7 +187,11 @@ export function ProductEditManageSection({
             isRaffleParticipationPending ||
             !canOpenInstallmentProgram
           }
-          onClick={() => onOpenInstallmentProgram?.()}
+          onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            onOpenInstallmentProgram?.();
+          }}
         >
           {PRODUCT_CARD_UI.INSTALLMENT_SELL_BUTTON}
         </button>

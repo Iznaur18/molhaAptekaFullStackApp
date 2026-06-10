@@ -79,6 +79,12 @@ export function AppShellProductModals({
   currentUserId,
   canModerateProducts,
 }) {
+  const handleCloseCatalogProductDetails = () => {
+    setCatalogProductDetails(null);
+    setCatalogProductDetailsTab("details");
+    setProductDetailsAdminError("");
+  };
+
   return (
     <>
       <SellerProductsLimitModal
@@ -166,11 +172,7 @@ export function AppShellProductModals({
       <ProductDetailsModal
         isOpen={catalogProductDetails != null}
         product={catalogProductDetails}
-        onClose={() => {
-          setCatalogProductDetails(null);
-          setCatalogProductDetailsTab("details");
-          setProductDetailsAdminError("");
-        }}
+        onClose={handleCloseCatalogProductDetails}
         onSellerNameClick={handleSellerNameClick}
         isAuthorized={isAuthorized}
         onProductStatsUpdate={handleProductStatsUpdate}

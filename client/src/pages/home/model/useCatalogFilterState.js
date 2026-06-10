@@ -138,6 +138,7 @@ export function useCatalogFilterState({
       sort,
       category,
       categoryId,
+      sellerPersonalCategoryId = null,
       followingOnly,
       auctionOnly,
       installmentOnly,
@@ -146,7 +147,7 @@ export function useCatalogFilterState({
       setCatalogSort(sort);
       setSelectedProductCategory(category);
       setSelectedCategoryId(categoryId);
-      if (!categoryId) {
+      if (!categoryId && !sellerPersonalCategoryId) {
         setCategoryTreeLabel(null);
       }
       setCatalogFollowingOnly(followingOnly);

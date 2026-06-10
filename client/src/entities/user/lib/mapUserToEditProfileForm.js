@@ -1,4 +1,4 @@
-import { addressValueFromUser } from "../../address/lib/addressValueFromUser.js";
+import { addressStructuredValueFromUser } from "../../address/lib/addressStructuredValueFromUser.js";
 import { getUserAvatarFocus, getUserBackgroundFocus } from "./profileImageFocus.js";
 import { parseUserBackgroundFormFields } from "./userBackgroundValue.js";
 import { formatPremiumExpiresAtForInput } from "./formatPremiumExpiresAtForInput.js";
@@ -14,7 +14,7 @@ import {
  * @property {string} userName
  * @property {string} userBirthDate
  * @property {'male'|'female'|'noSelected'} userGender
- * @property {import('../../address/model/types.js').RuDeliveryAddressValue} deliveryAddress
+ * @property {import('../../address/model/structuredTypes.js').RuStructuredDeliveryAddressValue} structuredAddress
  * @property {string} userPhoneNumber
  * @property {string} userAvatarUrl
  * @property {{ x: number; y: number }} userAvatarFocus
@@ -47,7 +47,7 @@ export function mapUserToEditProfileForm(user) {
     userName: user.userName ?? "",
     userBirthDate: birthInput,
     userGender: user.userGender ?? USER_GENDER_NO_SELECTED,
-    deliveryAddress: addressValueFromUser(user),
+    structuredAddress: addressStructuredValueFromUser(user),
     userPhoneNumber: user.userPhoneNumber ?? "",
     userAvatarUrl: user.userAvatarUrl ?? DEFAULT_USER_AVATAR_URL,
     userAvatarFocus: getUserAvatarFocus(user),

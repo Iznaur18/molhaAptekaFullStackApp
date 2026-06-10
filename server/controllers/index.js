@@ -41,6 +41,7 @@ import {
 import {
   getProductCategoryDisplaysController,
   patchProductCategoryDisplayController,
+  patchProductCategoryNodeDisplayController,
 } from "./Product/productCategoryDisplayControllers.js";
 import {
   getProductCatalogFeedTileDisplaysController,
@@ -224,6 +225,7 @@ export {
   confirmOrderItemByBuyerController,
   getProductCategoryDisplaysController,
   patchProductCategoryDisplayController,
+  patchProductCategoryNodeDisplayController,
   getProductCatalogFeedTileDisplaysController,
   patchProductCatalogFeedTileDisplayController,
   getProductCategoryRootsController,

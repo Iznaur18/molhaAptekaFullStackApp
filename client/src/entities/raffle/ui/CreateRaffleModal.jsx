@@ -219,25 +219,35 @@ export function CreateRaffleModal({
           </button>
         </header>
         <form className="create-raffle-modal__form" onSubmit={handleSubmit}>
-          <FormFieldLabel label={CREATE_RAFFLE_MODAL_UI.LABEL_TITLE} required>
-            <input
-              type="text"
-              value={form.title}
-              required
-              maxLength={120}
-              onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
-            />
-          </FormFieldLabel>
-          <FormFieldLabel label={CREATE_RAFFLE_MODAL_UI.LABEL_DESCRIPTION}>
-            <textarea
-              value={form.description}
-              rows={4}
-              maxLength={4000}
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, description: e.target.value }))
-              }
-            />
-          </FormFieldLabel>
+          <div className="create-raffle-modal__field">
+            <FormFieldLabel label={CREATE_RAFFLE_MODAL_UI.LABEL_TITLE} required>
+              <input
+                type="text"
+                value={form.title}
+                required
+                maxLength={120}
+                onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
+              />
+            </FormFieldLabel>
+            <p className="create-raffle-modal__field-hint">
+              {CREATE_RAFFLE_MODAL_UI.HINT_TITLE}
+            </p>
+          </div>
+          <div className="create-raffle-modal__field">
+            <FormFieldLabel label={CREATE_RAFFLE_MODAL_UI.LABEL_DESCRIPTION}>
+              <textarea
+                value={form.description}
+                rows={4}
+                maxLength={4000}
+                onChange={(e) =>
+                  setForm((prev) => ({ ...prev, description: e.target.value }))
+                }
+              />
+            </FormFieldLabel>
+            <p className="create-raffle-modal__field-hint">
+              {CREATE_RAFFLE_MODAL_UI.HINT_DESCRIPTION}
+            </p>
+          </div>
           <fieldset className="create-raffle-modal__media-type">
             <legend>{CREATE_RAFFLE_MODAL_UI.LABEL_PRIZE_MEDIA}</legend>
             <label className="create-raffle-modal__media-type-option">
@@ -262,45 +272,55 @@ export function CreateRaffleModal({
               />
               {CREATE_RAFFLE_MODAL_UI.LABEL_PRIZE_MEDIA_TYPE_VIDEO}
             </label>
+            <p className="create-raffle-modal__field-hint">
+              {CREATE_RAFFLE_MODAL_UI.HINT_PRIZE_MEDIA}
+            </p>
           </fieldset>
-          {isVideoMedia ? (
-            <FormFieldLabel required>
-              {CREATE_RAFFLE_MODAL_UI.LABEL_PRIZE_VIDEO}
-            </FormFieldLabel>
-          ) : (
-            <FormFieldLabel required>
-              {CREATE_RAFFLE_MODAL_UI.LABEL_PRIZE_IMAGE}
-            </FormFieldLabel>
-          )}
-          {isVideoMedia ? (
-            <VideoUrlField
-              value={form.prizeVideoUrl}
-              required
-              onChange={(nextUrl) =>
-                setForm((prev) => ({ ...prev, prizeVideoUrl: nextUrl }))
-              }
-              disabled={isSubmitting}
-            />
-          ) : (
-            <ImageUrlField
-              value={form.prizeImageUrl}
-              required
-              onChange={(nextUrl) => {
-                setForm((prev) => {
-                  const urlChanged =
-                    nextUrl.trim() !== String(prev.prizeImageUrl ?? "").trim();
-                  return {
-                    ...prev,
-                    prizeImageUrl: nextUrl,
-                    prizeImageFocus: urlChanged
-                      ? { ...DEFAULT_RAFFLE_PRIZE_IMAGE_FOCUS }
-                      : prev.prizeImageFocus,
-                  };
-                });
-              }}
-              disabled={isSubmitting}
-            />
-          )}
+          <div className="create-raffle-modal__field">
+            {isVideoMedia ? (
+              <FormFieldLabel required>
+                {CREATE_RAFFLE_MODAL_UI.LABEL_PRIZE_VIDEO}
+              </FormFieldLabel>
+            ) : (
+              <FormFieldLabel required>
+                {CREATE_RAFFLE_MODAL_UI.LABEL_PRIZE_IMAGE}
+              </FormFieldLabel>
+            )}
+            {isVideoMedia ? (
+              <VideoUrlField
+                value={form.prizeVideoUrl}
+                required
+                onChange={(nextUrl) =>
+                  setForm((prev) => ({ ...prev, prizeVideoUrl: nextUrl }))
+                }
+                disabled={isSubmitting}
+              />
+            ) : (
+              <ImageUrlField
+                value={form.prizeImageUrl}
+                required
+                onChange={(nextUrl) => {
+                  setForm((prev) => {
+                    const urlChanged =
+                      nextUrl.trim() !== String(prev.prizeImageUrl ?? "").trim();
+                    return {
+                      ...prev,
+                      prizeImageUrl: nextUrl,
+                      prizeImageFocus: urlChanged
+                        ? { ...DEFAULT_RAFFLE_PRIZE_IMAGE_FOCUS }
+                        : prev.prizeImageFocus,
+                    };
+                  });
+                }}
+                disabled={isSubmitting}
+              />
+            )}
+            <p className="create-raffle-modal__field-hint">
+              {isVideoMedia
+                ? CREATE_RAFFLE_MODAL_UI.HINT_PRIZE_VIDEO
+                : CREATE_RAFFLE_MODAL_UI.HINT_PRIZE_IMAGE}
+            </p>
+          </div>
           {!isVideoMedia && prizeFocusImageUrl ? (
             <ProfileImageFocusEditor
               imageUrl={prizeFocusImageUrl}
@@ -327,30 +347,40 @@ export function CreateRaffleModal({
               </div>
             </div>
           ) : null}
-          <FormFieldLabel label={CREATE_RAFFLE_MODAL_UI.LABEL_TARGET} required>
-            <input
-              {...INTEGER_INPUT_FIELD_PROPS}
-              value={form.targetSales}
-              required
-              onChange={(e) =>
-                setForm((prev) => ({
-                  ...prev,
-                  targetSales: keepDigitsOnly(e.target.value),
-                }))
-              }
-            />
-          </FormFieldLabel>
-          <FormFieldLabel label={CREATE_RAFFLE_MODAL_UI.LABEL_INSTAGRAM} required>
-            <input
-              type="url"
-              value={form.instagramUrl}
-              required
-              placeholder="https://instagram.com/..."
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, instagramUrl: e.target.value }))
-              }
-            />
-          </FormFieldLabel>
+          <div className="create-raffle-modal__field">
+            <FormFieldLabel label={CREATE_RAFFLE_MODAL_UI.LABEL_TARGET} required>
+              <input
+                {...INTEGER_INPUT_FIELD_PROPS}
+                value={form.targetSales}
+                required
+                onChange={(e) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    targetSales: keepDigitsOnly(e.target.value),
+                  }))
+                }
+              />
+            </FormFieldLabel>
+            <p className="create-raffle-modal__field-hint">
+              {CREATE_RAFFLE_MODAL_UI.HINT_TARGET}
+            </p>
+          </div>
+          <div className="create-raffle-modal__field">
+            <FormFieldLabel label={CREATE_RAFFLE_MODAL_UI.LABEL_INSTAGRAM} required>
+              <input
+                type="url"
+                value={form.instagramUrl}
+                required
+                placeholder="https://instagram.com/..."
+                onChange={(e) =>
+                  setForm((prev) => ({ ...prev, instagramUrl: e.target.value }))
+                }
+              />
+            </FormFieldLabel>
+            <p className="create-raffle-modal__field-hint">
+              {CREATE_RAFFLE_MODAL_UI.HINT_INSTAGRAM}
+            </p>
+          </div>
           {hintText ? <p className="create-raffle-modal__hint">{hintText}</p> : null}
           {status.kind === "error" ? (
             <p className="create-raffle-modal__error" role="alert">

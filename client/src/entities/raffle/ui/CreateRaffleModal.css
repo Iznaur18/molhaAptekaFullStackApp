@@ -44,7 +44,20 @@
 .create-raffle-modal__form {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: 0.75rem;
+}
+
+.create-raffle-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.create-raffle-modal__field-hint {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--iz-color-text-subtle);
+  line-height: 1.4;
 }
 
 .create-raffle-modal__form input,
@@ -97,7 +110,12 @@
   border: none;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem 1rem;
+  gap: 0.5rem 1rem;
+}
+
+.create-raffle-modal__media-type .create-raffle-modal__field-hint {
+  width: 100%;
+  margin-top: 0.1rem;
 }
 
 .create-raffle-modal__media-type legend {

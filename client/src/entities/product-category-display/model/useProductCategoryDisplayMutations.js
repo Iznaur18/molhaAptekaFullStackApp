@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { patchProductCatalogFeedTileDisplay } from "../api/patchProductCatalogFeedTileDisplay.js";
 import { patchProductCategoryDisplay } from "../api/patchProductCategoryDisplay.js";
+import { patchProductCategoryNodeDisplay } from "../api/patchProductCategoryNodeDisplay.js";
 import { invalidateAllProductCategoryDisplayQueries } from "../lib/productCategoryDisplayQueryCache.js";
 
 export function useProductCategoryDisplayMutations() {
@@ -15,6 +16,11 @@ export function useProductCategoryDisplayMutations() {
     onSuccess: invalidateDisplays,
   });
 
+  const patchCategoryNodeMutation = useMutation({
+    mutationFn: ({ categoryId, body }) => patchProductCategoryNodeDisplay(categoryId, body),
+    onSuccess: invalidateDisplays,
+  });
+
   const patchFeedTileMutation = useMutation({
     mutationFn: ({ tileKey, body }) => patchProductCatalogFeedTileDisplay(tileKey, body),
     onSuccess: invalidateDisplays,
@@ -22,6 +28,7 @@ export function useProductCategoryDisplayMutations() {
 
   return {
     patchCategoryMutation,
+    patchCategoryNodeMutation,
     patchFeedTileMutation,
   };
 }

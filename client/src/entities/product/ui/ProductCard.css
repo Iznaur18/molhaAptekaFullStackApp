@@ -8,4 +8,4 @@
 @import "./product-card/ProductCardFields.css";
 @import "./product-card/ProductCardActions.css";
 @import "./product-card/ProductCardModeration.css";
-@import "./product-card/ProductCardResponsive.css";
+@import "./product-card/ProductCardMobileCatalog.css";

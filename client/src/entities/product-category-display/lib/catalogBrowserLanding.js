@@ -5,6 +5,7 @@ import {
   CATALOG_QUERY_PARAM_FOLLOWING_ONLY,
   CATALOG_QUERY_PARAM_INSTALLMENT_ONLY,
   CATALOG_QUERY_PARAM_SALE_ONLY,
+  CATALOG_QUERY_PARAM_SELLER_PERSONAL_CATEGORY_ID,
   CATALOG_QUERY_PARAM_SORT,
 } from "../../product/lib/catalogCatalogQuery.js";
 import { CATALOG_SORT_NEWEST } from "../../product/model/productConstants.js";
@@ -22,6 +23,7 @@ export function isCatalogBrowserLandingSearch(search, hasProductSearchQuery) {
   return (
     !params.has(CATALOG_QUERY_PARAM_CATEGORY) &&
     !params.has(CATALOG_QUERY_PARAM_CATEGORY_ID) &&
+    !params.has(CATALOG_QUERY_PARAM_SELLER_PERSONAL_CATEGORY_ID) &&
     !params.has(CATALOG_QUERY_PARAM_SORT) &&
     !params.has(CATALOG_QUERY_PARAM_FOLLOWING_ONLY) &&
     !params.has(CATALOG_QUERY_PARAM_AUCTION_ONLY) &&
@@ -45,6 +47,7 @@ export function isExplicitCatalogNewestFeedSearch(search) {
   return (
     !params.has(CATALOG_QUERY_PARAM_CATEGORY) &&
     !params.has(CATALOG_QUERY_PARAM_CATEGORY_ID) &&
+    !params.has(CATALOG_QUERY_PARAM_SELLER_PERSONAL_CATEGORY_ID) &&
     !params.has(CATALOG_QUERY_PARAM_FOLLOWING_ONLY) &&
     !params.has(CATALOG_QUERY_PARAM_AUCTION_ONLY) &&
     !params.has(CATALOG_QUERY_PARAM_INSTALLMENT_ONLY) &&

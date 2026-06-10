@@ -6,7 +6,8 @@ import { buildAdminPatchUserProfileBody } from "../lib/buildAdminPatchUserProfil
 import { buildPatchUserProfileBody } from "../lib/buildPatchUserProfileBody.js";
 import { isPremiumExpiresAtInputActive } from "../lib/computeStaffPremiumExpiry.js";
 import { willFormDisablePremium } from "../lib/willFormDisablePremium.js";
-import { AddressDeliveryFields } from "../../address/ui/AddressDeliveryFields.jsx";
+import { AddressStructuredFields } from "../../address/ui/AddressStructuredFields.jsx";
+import { addressStructuredValueFromUser } from "../../address/lib/addressStructuredValueFromUser.js";
 import { mapUserToEditProfileForm } from "../lib/mapUserToEditProfileForm.js";
 import { limitRuPhoneInput } from "../lib/ruPhone.js";
 import {
@@ -75,6 +76,11 @@ export function EditProfileModal({
   const [form, setForm] = useState(() => mapUserToEditProfileForm({ _id: "" }));
   const [feedback, setFeedback] = useState({ kind: "idle", message: "" });
   const wasOpenRef = useRef(false);
+  const initialStructuredAddressRef = useRef(
+    /** @type {import('../../address/model/structuredTypes.js').RuStructuredDeliveryAddressValue | null} */ (
+      null
+    ),
+  );
 
   useEffect(() => {
     const didOpen = isOpen && !wasOpenRef.current;
@@ -85,6 +91,7 @@ export function EditProfileModal({
     }
 
     setForm(mapUserToEditProfileForm(user));
+    initialStructuredAddressRef.current = addressStructuredValueFromUser(user);
     setFeedback({ kind: "idle", message: "" });
     return undefined;
   }, [isOpen, user]);
@@ -174,6 +181,7 @@ export function EditProfileModal({
     try {
       const profilePatchOptions = {
         initialPhoneNumber: user.userPhoneNumber,
+        initialStructuredAddress: initialStructuredAddressRef.current ?? undefined,
       };
       const body = adminMode
         ? buildAdminPatchUserProfileBody(form, {
@@ -293,14 +301,13 @@ export function EditProfileModal({
                 ))}
               </select>
             </label>
-            <AddressDeliveryFields
-              value={form.deliveryAddress}
-              onChange={(deliveryAddress) =>
-                setForm((prev) => ({ ...prev, deliveryAddress }))
+            <AddressStructuredFields
+              value={form.structuredAddress}
+              onChange={(structuredAddress) =>
+                setForm((prev) => ({ ...prev, structuredAddress }))
               }
               disabled={isSubmitting}
-              lineInputClassName="edit-profile-modal__input"
-              labels={{ line: EDIT_PROFILE_MODAL_UI.LABEL_ADDRESS }}
+              inputClassName="edit-profile-modal__input"
             />
             <label className="edit-profile-modal__label">
               {EDIT_PROFILE_MODAL_UI.LABEL_AVATAR_URL}

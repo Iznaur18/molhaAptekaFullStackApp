@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { productSaleCityFieldSchema } from "./addressStructured.js";
 import { mongoIdSchema } from "./mongoId.js";
 import { PRODUCT_MODERATION_STATUSES, productFromApiSchema } from "./productFromApi.js";
 import { storedMediaUrlOrEmptySchema, storedMediaUrlSchema } from "./storedMediaUrl.js";
@@ -125,6 +126,7 @@ export const createProductBodySchema = z
       .array(productCharacteristicSchema)
       .max(PRODUCT_CHARACTERISTICS_MAX_ITEMS)
       .optional(),
+    productSaleCity: productSaleCityFieldSchema,
   })
   .superRefine(assertCategoryIdOrLegacy)
   .superRefine((body, ctx) => assertOldPricePair(body, ctx, true));
@@ -157,6 +159,7 @@ const patchFieldShape = {
     .array(productCharacteristicSchema)
     .max(PRODUCT_CHARACTERISTICS_MAX_ITEMS)
     .optional(),
+  productSaleCity: productSaleCityFieldSchema,
 };
 
 const PATCH_BODY_KEYS = Object.keys(patchFieldShape);

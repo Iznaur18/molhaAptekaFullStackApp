@@ -1,14 +1,25 @@
 import { useCallback, useEffect, useRef } from "react";
 
 const DRAG_THRESHOLD_PX = 4;
-const AUTO_SCROLL_PX_PER_SEC = 32;
+const AUTO_SCROLL_PX_PER_SEC = 16;
 const AUTO_SCROLL_RESUME_MS = 800;
+const OVERFLOW_EPSILON_PX = 2;
+
+function supportsFinePointerHover() {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  return window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+}
 
 /**
  * Горизонтальная лента бейджей: drag + плавный auto ping-pong при overflow.
  */
 export function useHorizontalPointerDragScroll() {
   const ref = useRef(null);
+  const isVisibleRef = useRef(true);
+  const observerCleanupRef = useRef(/** @type {(() => void) | null} */ (null));
   const dragStateRef = useRef(null);
   const autoScrollRef = useRef({
     direction: 1,
@@ -38,6 +49,55 @@ export function useHorizontalPointerDragScroll() {
     }, AUTO_SCROLL_RESUME_MS);
   }, [resumeAutoScroll]);
 
+  const clampScrollLeft = useCallback((el) => {
+    const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);
+    if (el.scrollLeft > maxScroll) {
+      el.scrollLeft = maxScroll;
+    }
+    if (maxScroll <= OVERFLOW_EPSILON_PX) {
+      el.scrollLeft = 0;
+      autoScrollRef.current.direction = 1;
+    }
+  }, []);
+
+  const setRef = useCallback(
+    (node) => {
+      observerCleanupRef.current?.();
+      observerCleanupRef.current = null;
+      ref.current = node;
+
+      if (!node) {
+        return;
+      }
+
+      clampScrollLeft(node);
+
+      const resizeObserver = new ResizeObserver(() => {
+        clampScrollLeft(node);
+      });
+      resizeObserver.observe(node);
+
+      const intersectionObserver = new IntersectionObserver(
+        ([entry]) => {
+          isVisibleRef.current = entry.isIntersecting;
+          if (entry.isIntersecting) {
+            resumeAutoScroll();
+          } else {
+            pauseAutoScroll();
+          }
+        },
+        { threshold: 0.01 },
+      );
+      intersectionObserver.observe(node);
+
+      observerCleanupRef.current = () => {
+        resizeObserver.disconnect();
+        intersectionObserver.disconnect();
+      };
+    },
+    [clampScrollLeft, pauseAutoScroll, resumeAutoScroll],
+  );
+
   useEffect(() => {
     const auto = autoScrollRef.current;
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -45,6 +105,11 @@ export function useHorizontalPointerDragScroll() {
     const syncMotionPreference = () => {
       if (motionQuery.matches) {
         pauseAutoScroll();
+        return;
+      }
+
+      if (isVisibleRef.current) {
+        resumeAutoScroll();
       }
     };
 
@@ -53,13 +118,13 @@ export function useHorizontalPointerDragScroll() {
 
     const tick = (timestamp) => {
       const el = ref.current;
-      if (!el) {
+      if (!el || !isVisibleRef.current) {
         auto.rafId = window.requestAnimationFrame(tick);
         return;
       }
 
       const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);
-      if (maxScroll <= 2) {
+      if (maxScroll <= OVERFLOW_EPSILON_PX) {
         el.scrollLeft = 0;
         auto.direction = 1;
         auto.lastTs = timestamp;
@@ -67,7 +132,7 @@ export function useHorizontalPointerDragScroll() {
         return;
       }
 
-      const isDragging = Boolean(dragStateRef.current?.isActive);
+      const isDragging = Boolean(dragStateRef.current?.didDrag);
       if (!auto.paused && !isDragging) {
         if (auto.lastTs != null) {
           const deltaSec = Math.min((timestamp - auto.lastTs) / 1000, 0.05);
@@ -98,26 +163,10 @@ export function useHorizontalPointerDragScroll() {
       motionQuery.removeEventListener("change", syncMotionPreference);
       window.cancelAnimationFrame(auto.rafId);
       window.clearTimeout(auto.resumeTimerId);
+      observerCleanupRef.current?.();
+      observerCleanupRef.current = null;
     };
-  }, [pauseAutoScroll]);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) {
-      return undefined;
-    }
-
-    const clampScroll = () => {
-      const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);
-      if (el.scrollLeft > maxScroll) {
-        el.scrollLeft = maxScroll;
-      }
-    };
-
-    const observer = new ResizeObserver(clampScroll);
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
+  }, [pauseAutoScroll, resumeAutoScroll]);
 
   const finishDrag = useCallback(
     (event) => {
@@ -127,7 +176,7 @@ export function useHorizontalPointerDragScroll() {
         return;
       }
 
-      if (state.pointerId === event.pointerId) {
+      if (state.didDrag && state.pointerId === event.pointerId) {
         try {
           el.releasePointerCapture(event.pointerId);
         } catch {
@@ -147,53 +196,57 @@ export function useHorizontalPointerDragScroll() {
         }
       }, 0);
 
-      scheduleAutoScrollResume();
+      if (state.didDrag) {
+        scheduleAutoScrollResume();
+      }
     },
     [scheduleAutoScrollResume],
   );
 
-  const onPointerDown = useCallback(
+  const onPointerDown = useCallback((event) => {
+    const el = ref.current;
+    if (!el || event.button !== 0) {
+      return;
+    }
+
+    dragStateRef.current = {
+      isActive: true,
+      didDrag: false,
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      scrollLeft: el.scrollLeft,
+    };
+  }, []);
+
+  const onPointerMove = useCallback(
     (event) => {
       const el = ref.current;
-      if (!el || event.button !== 0) {
+      const state = dragStateRef.current;
+      if (!el || !state?.isActive || state.pointerId !== event.pointerId) {
         return;
       }
 
-      pauseAutoScroll();
+      const deltaX = event.clientX - state.startX;
+      if (!state.didDrag && Math.abs(deltaX) < DRAG_THRESHOLD_PX) {
+        return;
+      }
 
-      dragStateRef.current = {
-        isActive: true,
-        didDrag: false,
-        pointerId: event.pointerId,
-        startX: event.clientX,
-        scrollLeft: el.scrollLeft,
-      };
+      if (!state.didDrag) {
+        state.didDrag = true;
+        pauseAutoScroll();
+        el.classList.add("is-drag-scrolling");
+        try {
+          el.setPointerCapture(event.pointerId);
+        } catch {
+          /* capture may fail on some touch targets */
+        }
+      }
 
-      el.setPointerCapture(event.pointerId);
+      event.preventDefault();
+      el.scrollLeft = state.scrollLeft - deltaX;
     },
     [pauseAutoScroll],
   );
-
-  const onPointerMove = useCallback((event) => {
-    const el = ref.current;
-    const state = dragStateRef.current;
-    if (!el || !state?.isActive || state.pointerId !== event.pointerId) {
-      return;
-    }
-
-    const deltaX = event.clientX - state.startX;
-    if (!state.didDrag && Math.abs(deltaX) < DRAG_THRESHOLD_PX) {
-      return;
-    }
-
-    if (!state.didDrag) {
-      state.didDrag = true;
-      el.classList.add("is-drag-scrolling");
-    }
-
-    event.preventDefault();
-    el.scrollLeft = state.scrollLeft - deltaX;
-  }, []);
 
   const onClickCapture = useCallback((event) => {
     if (dragStateRef.current?.didDrag) {
@@ -202,16 +255,28 @@ export function useHorizontalPointerDragScroll() {
     }
   }, []);
 
+  const onPointerEnter = useCallback(() => {
+    if (supportsFinePointerHover()) {
+      pauseAutoScroll();
+    }
+  }, [pauseAutoScroll]);
+
+  const onPointerLeave = useCallback(() => {
+    if (supportsFinePointerHover()) {
+      scheduleAutoScrollResume();
+    }
+  }, [scheduleAutoScrollResume]);
+
   return {
-    ref,
+    ref: setRef,
     dragScrollProps: {
       onPointerDown,
       onPointerMove,
       onPointerUp: finishDrag,
       onPointerCancel: finishDrag,
       onClickCapture,
-      onPointerEnter: pauseAutoScroll,
-      onPointerLeave: scheduleAutoScrollResume,
+      onPointerEnter,
+      onPointerLeave,
     },
   };
 }

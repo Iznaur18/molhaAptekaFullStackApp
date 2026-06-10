@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 
-import { formatSearchRowRating } from "../lib/formatSearchRowRating.js";
-import { formatSearchRowTotalSales } from "../lib/formatSearchRowTotalSales.js";
+import { formatSearchRowRatingCompact } from "../lib/formatSearchRowRating.js";
+import { formatSearchRowTotalSalesCount } from "../lib/formatSearchRowTotalSalesCount.js";
 import {
   formatProfileImageObjectPosition,
   getUserAvatarFocus,
@@ -32,16 +32,12 @@ export function UserListRow({ user, onRowClick }) {
   );
   const showEmail = email.length > 0 && email !== userName;
   const ratingText = useMemo(
-    () => formatSearchRowRating(user.userRatingByVotes),
+    () => formatSearchRowRatingCompact(user.userRatingByVotes),
     [user.userRatingByVotes],
   );
-  const totalSalesText = useMemo(
-    () => formatSearchRowTotalSales(user.totalSalesAmount),
-    [user.totalSalesAmount],
-  );
-  const totalPurchasesText = useMemo(
-    () => formatSearchRowTotalSales(user.totalPurchasesAmount),
-    [user.totalPurchasesAmount],
+  const totalSalesCountText = useMemo(
+    () => formatSearchRowTotalSalesCount(user.totalSalesCount),
+    [user.totalSalesCount],
   );
   const isUserDataConfirmed = user.isUserDataConfirmed === true;
   const followersText = useMemo(() => {
@@ -95,13 +91,13 @@ export function UserListRow({ user, onRowClick }) {
       <span className="user-list-row__metrics">
         <span
           className="user-list-row__metric user-list-row__metric_sales"
-          aria-label={totalSalesText}
+          aria-label={`${USER_LIST_ROW_UI.TOTAL_SALES_COUNT_LABEL} ${totalSalesCountText}`}
         >
           <span className="user-list-row__metric-label">
-            {USER_LIST_ROW_UI.TOTAL_SALES_LABEL}
+            {USER_LIST_ROW_UI.TOTAL_SALES_COUNT_LABEL}
           </span>
           <span className="user-list-row__metric-value user-list-row__metric-value_amount">
-            {totalSalesText}
+            {totalSalesCountText}
           </span>
         </span>
         <span
@@ -109,21 +105,10 @@ export function UserListRow({ user, onRowClick }) {
           title={USER_LIST_ROW_UI.RATING_TITLE}
         >
           <span className="user-list-row__metric-label">
-            {USER_LIST_ROW_UI.RATING_LABEL}
+            {USER_LIST_ROW_UI.RATING_SCORE_LABEL}
           </span>
           <span className="user-list-row__metric-value user-list-row__metric-value_muted">
             {ratingText}
-          </span>
-        </span>
-        <span
-          className="user-list-row__metric user-list-row__metric_purchases"
-          aria-label={totalPurchasesText}
-        >
-          <span className="user-list-row__metric-label">
-            {USER_LIST_ROW_UI.TOTAL_PURCHASES_LABEL}
-          </span>
-          <span className="user-list-row__metric-value user-list-row__metric-value_amount">
-            {totalPurchasesText}
           </span>
         </span>
         <span className="user-list-row__metric user-list-row__metric_followers">

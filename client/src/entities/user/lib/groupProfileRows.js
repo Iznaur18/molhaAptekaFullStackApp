@@ -6,7 +6,15 @@ const PROFILE_ROW_SECTIONS = [
   {
     id: "stats",
     title: "Статистика",
-    rowIds: ["followersCount", "followingCount", "userRatingByVotes", "userLoyaltyPoints"],
+    rowIds: [
+      "followersCount",
+      "followingCount",
+      "totalSalesCount",
+      "totalSalesAmount",
+      "totalPurchasesAmount",
+      "userRatingByVotes",
+      "userLoyaltyPoints",
+    ],
   },
   {
     id: "identity",

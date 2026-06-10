@@ -12,12 +12,14 @@ import { CATALOG_PAGE_SIZE } from "../model/productConstants.js";
  *   search?: string;
  *   productCategory?: string;
  *   categoryId?: string;
+ *   sellerPersonalCategoryId?: string;
  *   sort?: string;
  *   includeHidden?: boolean;
  *   followingOnly?: boolean;
  *   auctionOnly?: boolean;
  *   installmentOnly?: boolean;
  *   saleOnly?: boolean;
+ *   allCities?: boolean;
  * }} [options]
  * @returns {Promise<{
  *   products: import('../model/types.js').ProductFromApi[];
@@ -30,12 +32,14 @@ export async function fetchCatalogProductsPage({
   search,
   productCategory,
   categoryId,
+  sellerPersonalCategoryId,
   sort,
   includeHidden = false,
   followingOnly = false,
   auctionOnly = false,
   installmentOnly = false,
   saleOnly = false,
+  allCities = false,
 } = {}) {
   try {
     const { data } = await apiClient.get("/product", {
@@ -44,6 +48,7 @@ export async function fetchCatalogProductsPage({
         limit,
         ...(search ? { search } : {}),
         ...(categoryId ? { categoryId } : {}),
+        ...(sellerPersonalCategoryId ? { sellerPersonalCategoryId } : {}),
         ...(productCategory ? { productCategory } : {}),
         ...(sort ? { sort } : {}),
         ...(includeHidden ? { includeHidden: "true" } : {}),
@@ -51,6 +56,7 @@ export async function fetchCatalogProductsPage({
         ...(auctionOnly ? { auctionOnly: "true" } : {}),
         ...(installmentOnly ? { installmentOnly: "true" } : {}),
         ...(saleOnly ? { saleOnly: "true" } : {}),
+        ...(allCities ? { allCities: "true" } : {}),
       },
     });
 

@@ -19,6 +19,8 @@ export const useHomeCatalogSections = () => {
     categoryDisplaysStatus,
     handleCatalogFeedTileClick,
     handleCatalogCategoryGridClick,
+    handleSellerPersonalCategoryTileClick,
+    personalCategoryTiles,
     handleCatalogCategoryTreeSelect,
     handleClearCatalogCategoryTreeFilter,
     activeCatalogBrowserCategoryId,
@@ -27,6 +29,15 @@ export const useHomeCatalogSections = () => {
     selectedCategoryLabel,
     activeCatalogFeedLabel,
     handleBackToCatalogLanding,
+    isCatalogSubcategoryPickerActive,
+    subcategoryPickerTrail,
+    subcategoryPickerLoadError,
+    resolvingLandingCategoryKey,
+    resolvingPickerCategoryId,
+    handleSubcategoryPickerBack,
+    handleSubcategoryPickerViewAll,
+    handleSubcategoryPickerCategoryClick,
+    setEditingCategoryNode,
   } = ctx;
 
   const catalogGridSectionProps = useHomeCatalogGridProps();
@@ -40,6 +51,15 @@ export const useHomeCatalogSections = () => {
     () => (
       <AppShellCatalogSection
         isCatalogBrowserLanding={isCatalogBrowserLanding}
+        isCatalogSubcategoryPickerActive={isCatalogSubcategoryPickerActive}
+        subcategoryPickerTrail={subcategoryPickerTrail}
+        subcategoryPickerLoadError={subcategoryPickerLoadError}
+        resolvingLandingCategoryKey={resolvingLandingCategoryKey}
+        resolvingPickerCategoryId={resolvingPickerCategoryId}
+        onSubcategoryPickerBack={handleSubcategoryPickerBack}
+        onSubcategoryPickerViewAll={handleSubcategoryPickerViewAll}
+        onSubcategoryPickerCategoryClick={handleSubcategoryPickerCategoryClick}
+        onEditCategoryNodeClick={setEditingCategoryNode}
         categoryRoots={categoryRoots}
         categoryDisplays={categoryDisplays}
         feedTileDisplays={feedTileDisplays}
@@ -47,6 +67,8 @@ export const useHomeCatalogSections = () => {
         categoryDisplaysStatus={categoryDisplaysStatus}
         onFeedTileClick={handleCatalogFeedTileClick}
         onCategoryClick={handleCatalogCategoryGridClick}
+        personalCategoryTiles={personalCategoryTiles}
+        onPersonalCategoryClick={handleSellerPersonalCategoryTileClick}
         onEditCategoryClick={setEditingCategorySlug}
         onEditFeedTileClick={setEditingFeedTileKey}
         activeCatalogBrowserCategoryId={activeCatalogBrowserCategoryId}
@@ -60,6 +82,15 @@ export const useHomeCatalogSections = () => {
     ),
     [
       isCatalogBrowserLanding,
+      isCatalogSubcategoryPickerActive,
+      subcategoryPickerTrail,
+      subcategoryPickerLoadError,
+      resolvingLandingCategoryKey,
+      resolvingPickerCategoryId,
+      handleSubcategoryPickerBack,
+      handleSubcategoryPickerViewAll,
+      handleSubcategoryPickerCategoryClick,
+      setEditingCategoryNode,
       categoryRoots,
     categoryDisplays,
       feedTileDisplays,
@@ -67,6 +98,8 @@ export const useHomeCatalogSections = () => {
       categoryDisplaysStatus,
       handleCatalogFeedTileClick,
       handleCatalogCategoryGridClick,
+      handleSellerPersonalCategoryTileClick,
+      personalCategoryTiles,
       handleCatalogCategoryTreeSelect,
       handleClearCatalogCategoryTreeFilter,
       activeCatalogBrowserCategoryId,

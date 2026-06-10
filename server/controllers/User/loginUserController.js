@@ -18,9 +18,11 @@ import {
   assertCanSetUserRole,
 } from "../../utils/adminUserGuard.js";
 import { deleteSellerProductsAndRelatedData } from "../../utils/deleteUserCascade.js";
+import { cancelIntroAdCampaignsForAdvertiser } from "../../utils/introAdCampaignHelpers.js";
 import { getOptionalViewerFromRequest } from "../../utils/optionalViewerFromRequest.js";
 import { sanitizeUserProfileForViewer } from "../../utils/userProfileVisibility.js";
 import { attachFollowFieldsToPublicProfile } from "../../utils/userFollowHelpers.js";
+import { attachUserCommerceStatsToUser } from "../../utils/attachUserListCommerceStats.js";
 import {
   backgroundValueAfterPremiumChange,
   normalizeUserBackgroundForSave,
@@ -31,6 +33,7 @@ import {
 } from "../../utils/profileImageFocus.js";
 import { getUnreadInAppNotificationsForUser } from "../../utils/userInAppNotifications.js";
 import { buildUserProfileMongoUpdate } from "../../utils/buildUserProfileMongoUpdate.js";
+import { resolveUserAddressCityNormalized } from "../../utils/ruCityNormalized.js";
 import { normalizeStoredUploadUrl } from "../../utils/buildPublicUploadUrl.js";
 import { rejectPendingDataConfirmationForUser } from "../../utils/userDataConfirmationHelpers.js";
 import {
@@ -117,9 +120,11 @@ export const userMeController = async (req, res) => {
       viewerId: userIdClient,
     });
 
+    const userWithCommerce = await attachUserCommerceStatsToUser(userWithFollow);
+
     const inAppNotifications = await getUnreadInAppNotificationsForUser(userIdClient);
 
-    return successRes(res, { user: userWithFollow, inAppNotifications });
+    return successRes(res, { user: userWithCommerce, inAppNotifications });
   } catch (error) {
     console.error("userMe error:", error);
     return errorRes(res, 500, error.message || "Ошибка при получении своих данных");
@@ -160,7 +165,9 @@ export const userGetProfileController = async (req, res) => {
       viewerId: viewer?._id ?? null,
     });
 
-    return successRes(res, { user: userWithFollow });
+    const userWithCommerce = await attachUserCommerceStatsToUser(userWithFollow);
+
+    return successRes(res, { user: userWithCommerce });
   } catch (error) {
     console.error("userGetProfile error:", error);
     return errorRes(res, 500, error.message || "Ошибка при получении профиля");
@@ -261,15 +268,31 @@ export const userUpdateProfileController = async (req, res) => {
       if (req.verifiedDeliveryAddress === null) {
         updateData.userAddress = null;
         updateData.userAddressFlat = null;
+        updateData.userAddressCity = null;
+        updateData.userAddressDistrict = null;
+        updateData.userAddressStreet = null;
+        updateData.userAddressHouse = null;
         updateData.userAddressFiasId = null;
         updateData.userAddressGeo = null;
+        updateData.userAddressCityNormalized = "";
       } else {
         const verified = req.verifiedDeliveryAddress;
         updateData.userAddress = verified.displayAddress;
         updateData.userAddressFlat = verified.flat;
+        updateData.userAddressCity = verified.city ?? "";
+        updateData.userAddressDistrict = verified.district ?? "";
+        updateData.userAddressStreet = verified.street ?? "";
+        updateData.userAddressHouse = verified.house ?? "";
         updateData.userAddressFiasId = verified.fiasId;
         updateData.userAddressGeo = verified.geo;
+        updateData.userAddressCityNormalized = resolveUserAddressCityNormalized(
+          updateData.userAddressCity,
+        );
       }
+    } else if (Object.prototype.hasOwnProperty.call(updateData, "userAddressCity")) {
+      updateData.userAddressCityNormalized = resolveUserAddressCityNormalized(
+        updateData.userAddressCity,
+      );
     }
 
     // 4. Проверка, что есть данные для обновления
@@ -302,7 +325,7 @@ export const userUpdateProfileController = async (req, res) => {
 
     const targetUserBeforeUpdate = await UserModel.findById(targetUserId)
       .select(
-        "isPremiumUser premiumExpiresAt userBackgroundUrl isUserDataConfirmed userRole",
+        "isPremiumUser premiumExpiresAt userBackgroundUrl isUserDataConfirmed userRole isBlockedUser isActiveUser",
       )
       .lean();
 
@@ -482,6 +505,19 @@ export const userUpdateProfileController = async (req, res) => {
       }
     }
 
+    const becameBlocked =
+      updateData.isBlockedUser === true && targetUserBeforeUpdate.isBlockedUser !== true;
+    const becameInactive =
+      updateData.isActiveUser === false && targetUserBeforeUpdate.isActiveUser !== false;
+
+    if (becameBlocked || becameInactive) {
+      try {
+        await cancelIntroAdCampaignsForAdvertiser(String(targetUserId));
+      } catch (introAdCancelError) {
+        console.error("cancelIntroAdCampaignsForAdvertiser error:", introAdCancelError);
+      }
+    }
+
     return successRes(res, {
       user: userDataUpdated,
       message: "Профиль успешно обновлен",
@@ -593,6 +629,12 @@ export const userDeleteProfileController = async (req, res) => {
 
     await deleteAllFollowsForUser(targetUserId);
     console.log(`[DELETE PROFILE] Deleted follow records for user ${targetUserId}`);
+
+    try {
+      await cancelIntroAdCampaignsForAdvertiser(String(targetUserId));
+    } catch (introAdCancelError) {
+      console.error("cancelIntroAdCampaignsForAdvertiser error:", introAdCancelError);
+    }
 
     // Удаление профиля пользователя
     const deletedUser = await UserModel.findByIdAndDelete(targetUserId);

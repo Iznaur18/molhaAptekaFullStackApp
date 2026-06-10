@@ -1,6 +1,12 @@
 import { z } from "zod";
 
 import {
+  userAddressCityFieldSchema,
+  userAddressDistrictFieldSchema,
+  userAddressHouseFieldSchema,
+  userAddressStreetFieldSchema,
+} from "./addressStructured.js";
+import {
   ADDRESS_LINE_MAX_LENGTH,
   USER_BACKGROUND_PRESET_IDS,
   USER_GENDER_VALUES,
@@ -210,6 +216,10 @@ export const updateProfileBodySchema = z.object({
       if (value === null || value === "") return null;
       return String(value).trim();
     }),
+  userAddressCity: userAddressCityFieldSchema,
+  userAddressDistrict: userAddressDistrictFieldSchema,
+  userAddressStreet: userAddressStreetFieldSchema,
+  userAddressHouse: userAddressHouseFieldSchema,
   notificationsEnabled: clearableBooleanSchema,
   userRole: z.union([z.enum(USER_ROLE_VALUES), z.null()]).optional(),
   isActiveUser: clearableBooleanSchema,

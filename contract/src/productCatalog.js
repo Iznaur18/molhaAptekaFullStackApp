@@ -7,8 +7,10 @@ export const PRODUCT_CATALOG_SORT_VALUES = [
   "newest",
   "views",
   "purchases",
+  "city",
   "premium",
   "confirmed",
+  "reviews",
 ];
 
 /** Slug категории — синхрон с `server/constants/productConstants.js`. */
@@ -75,6 +77,10 @@ export const catalogProductsQuerySchema = z.object({
   categoryId: optionalTrimmedString.refine(
     (id) => id === undefined || /^[a-f\d]{24}$/i.test(id),
     { message: "categoryId должен быть валидным ObjectId" },
+  ),
+  sellerPersonalCategoryId: optionalTrimmedString.refine(
+    (id) => id === undefined || /^[a-f\d]{24}$/i.test(id),
+    { message: "sellerPersonalCategoryId должен быть валидным ObjectId" },
   ),
   sort: z.enum(PRODUCT_CATALOG_SORT_VALUES).optional(),
   includeHidden: optionalTruthyFlag,

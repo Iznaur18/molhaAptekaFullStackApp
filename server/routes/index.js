@@ -18,6 +18,10 @@ import { installmentRouter } from "./installmentRouter.js";
 
 import { priceOfferRouter } from "./priceOfferRouter.js";
 
+import { appIntroRouter } from "./appIntroRouter.js";
+import { introAdRouter } from "./introAdRouter.js";
+import { sellerPersonalCategoryRouter } from "./sellerPersonalCategoryRouter.js";
+
 export {
   uploadRouter,
   authRouter,
@@ -29,4 +33,7 @@ export {
   addressRouter,
   installmentRouter,
   priceOfferRouter,
+  appIntroRouter,
+  introAdRouter,
+  sellerPersonalCategoryRouter,
 };

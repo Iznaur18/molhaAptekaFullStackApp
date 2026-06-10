@@ -160,8 +160,8 @@ export const useHomeProductActions = ({
 
   const handleOpenEditMyProduct = useCallback(
     (product) => {
+      setIsCreateProductModalOpen(false);
       setProductToEdit(product);
-      setIsCreateProductModalOpen(true);
     },
     [setIsCreateProductModalOpen, setProductToEdit],
   );
@@ -184,8 +184,8 @@ export const useHomeProductActions = ({
     if (!catalogProductDetails) {
       return;
     }
+    setIsCreateProductModalOpen(false);
     setProductToEdit(catalogProductDetails);
-    setIsCreateProductModalOpen(true);
   }, [catalogProductDetails, setIsCreateProductModalOpen, setProductToEdit]);
 
   const handleSetMyProductAvailability = useCallback(

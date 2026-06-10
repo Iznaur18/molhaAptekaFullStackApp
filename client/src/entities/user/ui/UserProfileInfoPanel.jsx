@@ -66,12 +66,14 @@ function ProfileStatsSection({ sectionId, rows }) {
 
         return (
           <article key={row.id} className="user-profile-info__stat-card">
-            {icon ? (
-              <span className="user-profile-info__stat-icon" aria-hidden="true">
-                <AppIcon icon={icon} size="sm" strokeWidth={2.1} />
-              </span>
-            ) : null}
-            <p className="user-profile-info__stat-value">{row.value}</p>
+            <div className="user-profile-info__stat-head">
+              {icon ? (
+                <span className="user-profile-info__stat-icon" aria-hidden="true">
+                  <AppIcon icon={icon} size="sm" strokeWidth={2.1} />
+                </span>
+              ) : null}
+              <p className="user-profile-info__stat-value">{row.value}</p>
+            </div>
             <p className="user-profile-info__stat-label">{row.label}</p>
           </article>
         );

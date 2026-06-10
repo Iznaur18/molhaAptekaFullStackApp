@@ -15,6 +15,9 @@ export function useShellUiState() {
       null
     ),
   );
+  const [editingCategoryNode, setEditingCategoryNode] = useState(
+    /** @type {{ categoryId: string; fallbackLabel: string } | null} */ (null),
+  );
   const [myProductsCatalogError, setMyProductsCatalogError] = useState("");
   const [myProductsCatalogNotice, setMyProductsCatalogNotice] = useState("");
   const [staffActionNotice, setStaffActionNotice] = useState("");
@@ -80,6 +83,8 @@ export function useShellUiState() {
     setEditingFeedTileKey,
     editingCategorySlug,
     setEditingCategorySlug,
+    editingCategoryNode,
+    setEditingCategoryNode,
     myProductsCatalogError,
     setMyProductsCatalogError,
     myProductsCatalogNotice,

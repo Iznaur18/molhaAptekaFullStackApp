@@ -21,6 +21,35 @@
   background: var(--iz-color-surface-subtle);
 }
 
+.product-media-gallery-readonly__back-btn {
+  position: absolute;
+  top: 0.45rem;
+  left: 0.45rem;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--iz-color-canvas) 88%, transparent);
+  color: var(--iz-color-canvas-text);
+  box-shadow: 0 1px 4px color-mix(in srgb, var(--iz-color-ink) 14%, transparent);
+  cursor: pointer;
+}
+
+.product-media-gallery-readonly__back-btn:hover {
+  background: var(--iz-color-canvas);
+}
+
+.product-media-gallery-readonly__back-btn:focus-visible {
+  outline: 2px solid var(--iz-color-link);
+  outline-offset: 2px;
+}
+
 .product-media-gallery-readonly__slider-nav {
   position: absolute;
   left: 0;

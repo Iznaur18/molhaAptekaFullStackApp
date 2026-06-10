@@ -50,6 +50,9 @@ export function useProductCardViewModel(props) {
     isLoyaltyPointsOvercommitted = false,
   } = props;
 
+  const { ref: statusBadgesRowRef, dragScrollProps: statusBadgesDragScrollProps } =
+    useHorizontalPointerDragScroll();
+
   const fallbackHeadingId = useId();
   const heading = product.productName?.trim() || PRODUCT_CARD_UI.DEFAULT_TITLE;
   const headingId = resolveProductCardHeadingId(product._id) ?? fallbackHeadingId;
@@ -57,9 +60,6 @@ export function useProductCardViewModel(props) {
 
   const media = useProductCardMediaState(product);
   const chrome = useProductCardChromeFlags(props, currentUserId);
-
-  const { ref: statusBadgesRowRef, dragScrollProps: statusBadgesDragScrollProps } =
-    useHorizontalPointerDragScroll();
 
   const previewFieldKeys = useMemo(() => {
     if (isModerationQueue) return PRODUCT_CARD_MODERATION_PREVIEW_FIELD_KEYS;
@@ -109,8 +109,6 @@ export function useProductCardViewModel(props) {
     headingId,
     isDetailsSurfaceInteractive,
     ...media,
-    statusBadgesRowRef,
-    statusBadgesDragScrollProps,
     sellerCanEdit,
     sellerCanDelete,
     sellerCanToggleVisibility,
@@ -129,6 +127,8 @@ export function useProductCardViewModel(props) {
     onSetProductAvailability,
     onSetProductAuction,
     isLoyaltyPointsOvercommitted,
+    statusBadgesRowRef,
+    statusBadgesDragScrollProps,
     getPromotionTierLabel: () => getProductPromotionTierLabel(chrome.promotionTier),
     getPromotionUntil: () => formatPromotionExpiresAt(product.catalogPromotionExpiresAt),
     ...chrome,

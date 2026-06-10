@@ -36,18 +36,26 @@ const sellerLookupStages = () => [
 
 /**
  * @param {string} sort
+ * @param {string | null} [buyerCity]
  */
-const sortStagesForAtlasCatalog = (sort) => {
+const sortStagesForAtlasCatalog = (sort, buyerCity = null) => {
   const stages = [];
   if (sort === PRODUCT_SORT_NEWEST) {
     stages.push(catalogPromotionSortBoostAddFieldsStage);
   }
-  stages.push(
-    buildCatalogPromotionSortStage(sort, {
-      useSearchRank: true,
-      searchScoreField: "_searchScore",
-    }),
-  );
+
+  const sortStage = buildCatalogPromotionSortStage(sort, {
+    useSearchRank: true,
+    searchScoreField: "_searchScore",
+    buyerCity,
+  });
+
+  if (Array.isArray(sortStage)) {
+    stages.push(...sortStage);
+  } else {
+    stages.push(sortStage);
+  }
+
   return stages;
 };
 
@@ -56,8 +64,15 @@ const sortStagesForAtlasCatalog = (sort) => {
  * @param {string} sort
  * @param {number} skip
  * @param {number} limit
+ * @param {string | null} [buyerCity]
  */
-export const findCatalogProductsPageAtlas = async (searchResult, sort, skip, limit) => {
+export const findCatalogProductsPageAtlas = async (
+  searchResult,
+  sort,
+  skip,
+  limit,
+  buyerCity = null,
+) => {
   if (!searchResult.atlasSearch) {
     throw new Error("findCatalogProductsPageAtlas requires atlasSearch");
   }
@@ -66,11 +81,11 @@ export const findCatalogProductsPageAtlas = async (searchResult, sort, skip, lim
     buildProductAtlasSearchStage(searchResult.atlasSearch),
     { $addFields: { _searchScore: { $meta: "searchScore" } } },
     { $match: normalizeProductsQueryForAggregate(searchResult.baseQuery) },
-    ...sortStagesForAtlasCatalog(sort),
+    ...sortStagesForAtlasCatalog(sort, buyerCity),
     { $skip: skip },
     { $limit: limit },
     ...sellerLookupStages(),
-    { $project: { _searchScore: 0, _promotionSortTier: 0 } },
+    { $project: { _searchScore: 0, _promotionSortTier: 0, _citySortPriority: 0 } },
   ]);
 
   return attachProductSellerSnapshots(products);

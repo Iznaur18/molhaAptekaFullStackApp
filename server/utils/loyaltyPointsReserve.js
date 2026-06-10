@@ -8,11 +8,12 @@ import { getSellerLoyaltyPointsAvailable } from "./loyaltyPointsSeller.js";
  * @param {string} userId
  * @param {number} amount
  * @param {import('mongoose').ClientSession | null} [session]
+ * @returns {Promise<number>}
  */
 export const reserveLoyaltyPoints = async ({ userId, amount, session = null }) => {
   const normalizedAmount = Math.ceil(Number(amount));
   if (normalizedAmount <= 0) {
-    return;
+    return 0;
   }
 
   const updated = await UserModel.findOneAndUpdate(
@@ -41,6 +42,8 @@ export const reserveLoyaltyPoints = async ({ userId, amount, session = null }) =
     const available = getSellerLoyaltyPointsAvailable(user);
     throw new InsufficientLoyaltyPointsError(normalizedAmount, available);
   }
+
+  return Number(updated.userLoyaltyPoints) || 0;
 };
 
 /**
@@ -66,6 +69,50 @@ export const releaseLoyaltyPointsReservation = async ({
     { $inc: { userLoyaltyPointsReserved: -normalizedAmount } },
     withMongoSession({}, session),
   );
+};
+
+/**
+ * @param {{ userId: string; amount: number; session?: import('mongoose').ClientSession | null }} params
+ * @returns {Promise<number>}
+ */
+export const chargeReservedLoyaltyPoints = async ({
+  userId,
+  amount,
+  session = null,
+}) => {
+  const normalizedAmount = Math.ceil(Number(amount));
+  if (normalizedAmount <= 0) {
+    throw new Error("Сумма списания должна быть больше 0");
+  }
+
+  const updated = await UserModel.findOneAndUpdate(
+    {
+      _id: userId,
+      userLoyaltyPoints: { $gte: normalizedAmount },
+      userLoyaltyPointsReserved: { $gte: normalizedAmount },
+    },
+    {
+      $inc: {
+        userLoyaltyPoints: -normalizedAmount,
+        userLoyaltyPointsReserved: -normalizedAmount,
+      },
+    },
+    withMongoSession({ returnDocument: "after" }, session),
+  ).lean();
+
+  if (!updated) {
+    const userLookup = UserModel.findById(userId).select(
+      "userLoyaltyPoints userLoyaltyPointsReserved",
+    );
+    if (session) {
+      userLookup.session(session);
+    }
+    const user = await userLookup.lean();
+    const available = getSellerLoyaltyPointsAvailable(user);
+    throw new InsufficientLoyaltyPointsError(normalizedAmount, available);
+  }
+
+  return Number(updated.userLoyaltyPoints) || 0;
 };
 
 /**

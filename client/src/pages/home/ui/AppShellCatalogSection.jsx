@@ -2,7 +2,9 @@ import { useNavigate } from "react-router-dom";
 
 import { RaffleFeaturedCarousel } from "../../../entities/raffle/ui/RaffleFeaturedCarousel.jsx";
 import { UserStoriesStrip } from "../../../entities/user-story/ui/UserStoriesStrip.jsx";
+import { CatalogCityFilterBanner } from "../../../entities/product/ui/CatalogCityFilterBanner.jsx";
 import { CatalogBrowserLanding } from "../../../entities/product-category-display/ui/CatalogBrowserLanding.jsx";
+import { CatalogSubcategoryPicker } from "../../../entities/product-category-display/ui/CatalogSubcategoryPicker.jsx";
 import { IS_CATALOG_BROWSER_SUBCATEGORY_FILTER_ENABLED } from "../../../entities/product-category-tree/lib/isCatalogBrowserSubcategoryFilterEnabled.js";
 import { CatalogBrowserTreeFilter } from "../../../entities/product-category-tree/ui/CatalogBrowserTreeFilter.jsx";
 import { buildRafflePath } from "../../../shared/lib/rafflePaths.js";
@@ -56,6 +58,9 @@ import { HomeCatalogGrid } from "./HomeCatalogGrid.jsx";
  *   catalogAuctionOnly: boolean;
  *   catalogInstallmentOnly: boolean;
  *   catalogSaleOnly: boolean;
+ *   showCatalogCityFilterBanner?: boolean;
+ *   catalogCityFilterLabel?: string | null;
+ *   onShowAllCatalogCities?: () => void;
  *   showFullWidthTier3Banners?: boolean;
  *   sellerRaffleActive: boolean;
  *   onToggleRaffleParticipation: (productId: string, participate: boolean) => void;
@@ -105,6 +110,9 @@ export function AppShellCatalogGridSection({
   catalogAuctionOnly,
   catalogInstallmentOnly,
   catalogSaleOnly,
+  showCatalogCityFilterBanner = false,
+  catalogCityFilterLabel = null,
+  onShowAllCatalogCities,
   showFullWidthTier3Banners = false,
   sellerRaffleActive,
   onToggleRaffleParticipation,
@@ -144,6 +152,12 @@ export function AppShellCatalogGridSection({
           currentUserId={currentUserId}
           onRefresh={onUserStoriesRefresh}
           onOpenProfile={onSellerNameClick}
+        />
+      ) : null}
+      {showCatalogCityFilterBanner && catalogCityFilterLabel && onShowAllCatalogCities ? (
+        <CatalogCityFilterBanner
+          cityLabel={catalogCityFilterLabel}
+          onShowAllCities={onShowAllCatalogCities}
         />
       ) : null}
       <HomeCatalogGrid
@@ -196,6 +210,15 @@ export function AppShellCatalogGridSection({
 /**
  * @param {{
  *   isCatalogBrowserLanding: boolean;
+ *   isCatalogSubcategoryPickerActive: boolean;
+ *   subcategoryPickerTrail: Array<{ id: string; labelRu: string }>;
+ *   subcategoryPickerLoadError: string | null;
+ *   resolvingLandingCategoryKey: string | null;
+ *   resolvingPickerCategoryId: string | null;
+ *   onSubcategoryPickerBack: () => void;
+ *   onSubcategoryPickerViewAll: (categoryId: string) => void;
+ *   onSubcategoryPickerCategoryClick: (node: import('../../../entities/product-category-tree/model/types.js').ProductCategoryNode) => void;
+ *   onEditCategoryNodeClick: (payload: { categoryId: string; fallbackLabel: string }) => void;
  *   categoryRoots: import('../../../entities/product-category-tree/model/types.js').ProductCategoryNode[];
  *   categoryDisplays: import('../../../entities/product-category-display/model/types.js').ProductCategoryDisplayFromApi[];
  *   feedTileDisplays: import('../../../entities/product-category-display/model/types.js').ProductCatalogFeedTileDisplayFromApi[];
@@ -216,6 +239,15 @@ export function AppShellCatalogGridSection({
  */
 export function AppShellCatalogSection({
   isCatalogBrowserLanding,
+  isCatalogSubcategoryPickerActive = false,
+  subcategoryPickerTrail = [],
+  subcategoryPickerLoadError = null,
+  resolvingLandingCategoryKey = null,
+  resolvingPickerCategoryId = null,
+  onSubcategoryPickerBack,
+  onSubcategoryPickerViewAll,
+  onSubcategoryPickerCategoryClick,
+  onEditCategoryNodeClick,
   categoryRoots,
   categoryDisplays,
   feedTileDisplays,
@@ -223,6 +255,8 @@ export function AppShellCatalogSection({
   categoryDisplaysStatus,
   onFeedTileClick,
   onCategoryClick,
+  personalCategoryTiles = [],
+  onPersonalCategoryClick,
   onEditCategoryClick,
   onEditFeedTileClick,
   activeCatalogBrowserCategoryId,
@@ -233,6 +267,22 @@ export function AppShellCatalogSection({
   onBackToCatalogLanding,
   catalogGridSectionProps,
 }) {
+  if (isCatalogSubcategoryPickerActive) {
+    return (
+      <CatalogSubcategoryPicker
+        trail={subcategoryPickerTrail}
+        displays={categoryDisplays}
+        isAdmin={isAdmin}
+        loadError={subcategoryPickerLoadError}
+        resolvingCategoryId={resolvingPickerCategoryId}
+        onBack={onSubcategoryPickerBack}
+        onViewAll={onSubcategoryPickerViewAll}
+        onCategoryClick={onSubcategoryPickerCategoryClick}
+        onEditCategoryClick={onEditCategoryNodeClick}
+      />
+    );
+  }
+
   if (isCatalogBrowserLanding) {
     return (
       <CatalogBrowserLanding
@@ -248,7 +298,10 @@ export function AppShellCatalogSection({
         }
         onFeedTileClick={onFeedTileClick}
         onCategoryClick={onCategoryClick}
+        personalCategoryTiles={personalCategoryTiles}
+        onPersonalCategoryClick={onPersonalCategoryClick}
         onEditCategoryClick={onEditCategoryClick}
+        pendingCategoryKey={resolvingLandingCategoryKey}
         onEditFeedTileClick={onEditFeedTileClick}
       />
     );

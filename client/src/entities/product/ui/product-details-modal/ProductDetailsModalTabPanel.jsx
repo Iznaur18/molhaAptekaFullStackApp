@@ -8,6 +8,7 @@ import { ProductDetailsModalReviewsTab } from "./ProductDetailsModalReviewsTab.j
  *   product: import("../../model/types.js").ProductFromApi;
  *   isOpen: boolean;
  *   isAuthorized: boolean;
+ *   isPremiumUser?: boolean;
  *   onRequestLogin: () => void;
  *   ctrl: ReturnType<import('./useProductDetailsModalController.js').useProductDetailsModalController>;
  * }} props
@@ -16,6 +17,7 @@ export function ProductDetailsModalTabPanel({
   product,
   isOpen,
   isAuthorized,
+  isPremiumUser = false,
   onRequestLogin,
   ctrl,
 }) {
@@ -102,6 +104,7 @@ export function ProductDetailsModalTabPanel({
         product={product}
         isOpen={isOpen}
         isAuthorized={isAuthorized}
+        isPremiumUser={isPremiumUser}
         onRequestLogin={onRequestLogin}
         ctrl={ctrl}
       />

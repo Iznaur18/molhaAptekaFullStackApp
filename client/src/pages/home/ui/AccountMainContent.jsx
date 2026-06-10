@@ -33,6 +33,8 @@ export function AccountMainContent({
   notificationsPageItems,
   pendingRafflesCount,
   pendingModerationCount,
+  pendingIntroAdModerationCount,
+  pendingSellerPersonalCategoryModerationCount,
   pendingIncomingPriceOffersCount,
   pendingMySalesActionCount,
   pendingMyOrdersActionCount,
@@ -60,6 +62,7 @@ export function AccountMainContent({
   handleAdminOrdersFromProfile,
   handleSearchSynonymsAdminFromProfile,
   handleCategoryTreeAdminFromProfile,
+  handleAppIntroAdminFromProfile,
   handleProductModerationFromProfile,
   handleProductReportsFromProfile,
   handleRafflesFromProfile,
@@ -70,9 +73,14 @@ export function AccountMainContent({
   handlePremiumFromProfile,
   handlePremiumPurchased,
   handleLoyaltyPointsFromProfile,
+  handleAdvertisingFromProfile,
+  handleIntroAdModerationFromProfile,
+  handleSellerPersonalCategoryModerationFromProfile,
   handleSubscriptionsFromProfile,
   refreshUserProfileActionBadgeCounts,
   refreshPendingModerationCount,
+  refreshPendingIntroAdModerationCount,
+  refreshPendingSellerPersonalCategoryModerationCount,
   refreshPendingProductReportsCount,
   refreshPendingRafflesCount,
   refreshPendingDataConfirmationCount,
@@ -112,6 +120,8 @@ export function AccountMainContent({
       setIsDataConfirmationModalOpen,
       myProductsCatalogSection,
       refreshPendingModerationCount,
+      refreshPendingIntroAdModerationCount,
+      refreshPendingSellerPersonalCategoryModerationCount,
       refreshPendingProductReportsCount,
       refreshPendingRafflesCount,
       refreshPendingDataConfirmationCount,
@@ -168,6 +178,9 @@ export function AccountMainContent({
         onCategoryTreeAdminClick={
           isAdmin ? handleCategoryTreeAdminFromProfile : undefined
         }
+        onAppIntroAdminClick={
+          isAdmin ? handleAppIntroAdminFromProfile : undefined
+        }
         onProductModerationClick={
           canModerateProducts ? handleProductModerationFromProfile : undefined
         }
@@ -185,8 +198,21 @@ export function AccountMainContent({
         }
         onPremiumClick={isAuthorized ? handlePremiumFromProfile : undefined}
         onLoyaltyPointsClick={isAuthorized ? handleLoyaltyPointsFromProfile : undefined}
+        onAdvertisingClick={isAuthorized ? handleAdvertisingFromProfile : undefined}
+        onIntroAdModerationClick={
+          canModerateProducts ? handleIntroAdModerationFromProfile : undefined
+        }
+        onSellerPersonalCategoryModerationClick={
+          canModerateProducts
+            ? handleSellerPersonalCategoryModerationFromProfile
+            : undefined
+        }
         onSubscriptionsClick={isAuthorized ? handleSubscriptionsFromProfile : undefined}
         pendingModerationCount={pendingModerationCount}
+        pendingIntroAdModerationCount={pendingIntroAdModerationCount}
+        pendingSellerPersonalCategoryModerationCount={
+          pendingSellerPersonalCategoryModerationCount
+        }
         pendingIncomingPriceOffersCount={pendingIncomingPriceOffersCount}
         pendingMySalesActionCount={pendingMySalesActionCount}
         pendingMyOrdersActionCount={pendingMyOrdersActionCount}

@@ -11,10 +11,14 @@ import { fetchMyOrdersActionCount } from "../../../entities/order/api/fetchMyOrd
 import { fetchMySalesActionCount } from "../../../entities/order/api/fetchMySalesActionCount.js";
 import { fetchIncomingPriceOffersPendingCount } from "../../../entities/product-price-offer/api/fetchIncomingPriceOffersPendingCount.js";
 import { fetchPendingModerationProductsCount } from "../../../entities/product/api/fetchPendingModerationProductsCount.js";
+import { fetchPendingIntroAdCampaignsCount } from "../../../entities/intro-ad/api/introAdModerationApi.js";
+import { fetchPendingSellerPersonalCategoryCampaignsCount } from "../../../entities/seller-personal-category/api/sellerPersonalCategoryApi.js";
 import { fetchPendingProductReportsCount } from "../../../entities/product-report/api/fetchPendingProductReportsCount.js";
 import { fetchPendingUserStoryReportsCount } from "../../../entities/user-story/api/fetchPendingUserStoryReportsCount.js";
 import { fetchPendingDataConfirmationCount } from "../../../entities/user-data-confirmation/api/fetchPendingDataConfirmationCount.js";
 import { fetchPendingRafflesCount } from "../../../entities/raffle/api/fetchPendingRafflesCount.js";
+import { introAdQueryKeys } from "../../../entities/intro-ad/model/introAdQueryKeys.js";
+import { sellerPersonalCategoryQueryKeys } from "../../../entities/seller-personal-category/model/sellerPersonalCategoryQueryKeys.js";
 import { STAFF_BADGE_STALE_TIME_MS } from "../../../shared/api/queryClient.js";
 import {
   resolveDataConfirmationStaffBadgeCount,
@@ -23,6 +27,8 @@ import {
   resolveInstallmentBuyerActionCount,
   resolveInstallmentSellerActionCount,
   resolveInstallmentModerationStaffBadgeCount,
+  resolveIntroAdModerationStaffBadgeCount,
+  resolveSellerPersonalCategoryModerationStaffBadgeCount,
   resolveModerationStaffBadgeCount,
   resolveMyOrdersActionCount,
   resolveMySalesActionCount,
@@ -124,6 +130,26 @@ export function useStaffBadgeQueries({
         ...STAFF_MODERATOR_QUERY_OPTIONS,
       },
       {
+        queryKey: [...staffBadgeQueryKeys.introAdModeration, mainView],
+        queryFn: () =>
+          resolveIntroAdModerationStaffBadgeCount(
+            queryClient,
+            fetchPendingIntroAdCampaignsCount,
+          ),
+        enabled: staffEnabled,
+        ...STAFF_MODERATOR_QUERY_OPTIONS,
+      },
+      {
+        queryKey: [...staffBadgeQueryKeys.sellerPersonalCategoryModeration, mainView],
+        queryFn: () =>
+          resolveSellerPersonalCategoryModerationStaffBadgeCount(
+            queryClient,
+            fetchPendingSellerPersonalCategoryCampaignsCount,
+          ),
+        enabled: staffEnabled,
+        ...STAFF_MODERATOR_QUERY_OPTIONS,
+      },
+      {
         queryKey: [...staffBadgeQueryKeys.userProfileActions, mainView],
         queryFn: async () => {
           const [
@@ -169,6 +195,8 @@ export function useStaffBadgeQueries({
     rafflesQuery,
     installmentModerationQuery,
     installmentDisputesQuery,
+    introAdModerationQuery,
+    sellerPersonalCategoryModerationQuery,
     userProfileActionsQuery,
   ] = queries;
 
@@ -187,6 +215,12 @@ export function useStaffBadgeQueries({
   const refreshFns = useMemo(
     () => ({
       refreshPendingModerationCount: () => syncModerationQueueCaches(queryClient),
+      refreshPendingIntroAdModerationCount: () =>
+        queryClient.invalidateQueries({ queryKey: introAdQueryKeys.moderationCount() }),
+      refreshPendingSellerPersonalCategoryModerationCount: () =>
+        queryClient.invalidateQueries({
+          queryKey: sellerPersonalCategoryQueryKeys.moderationCount(),
+        }),
       refreshPendingProductReportsCount: () =>
         syncProductReportsQueueCaches(queryClient),
       refreshPendingDataConfirmationCount: () =>
@@ -204,6 +238,9 @@ export function useStaffBadgeQueries({
 
   return {
     pendingModerationCount: moderationQuery.data ?? 0,
+    pendingIntroAdModerationCount: introAdModerationQuery.data ?? 0,
+    pendingSellerPersonalCategoryModerationCount:
+      sellerPersonalCategoryModerationQuery.data ?? 0,
     pendingProductReportsCount: productReportsQuery.data ?? 0,
     pendingDataConfirmationCount: dataConfirmationQuery.data ?? 0,
     pendingRafflesCount: rafflesQuery.data ?? 0,

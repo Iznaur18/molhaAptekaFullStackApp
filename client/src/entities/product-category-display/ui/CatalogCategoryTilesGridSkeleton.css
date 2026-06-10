@@ -1,0 +1,48 @@
+.catalog-category-tiles-grid-skeleton__card {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
+  border: 1px solid var(--iz-color-border-subtle);
+  border-radius: 12px;
+  background: var(--iz-color-surface);
+}
+
+.catalog-category-tiles-grid-skeleton__image {
+  display: block;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  background: linear-gradient(
+    90deg,
+    var(--iz-color-surface-elevated) 0%,
+    var(--iz-color-border-subtle) 50%,
+    var(--iz-color-surface-elevated) 100%
+  );
+  background-size: 200% 100%;
+  animation: catalog-category-tiles-grid-skeleton-shimmer 1.2s ease-in-out infinite;
+}
+
+.catalog-category-tiles-grid-skeleton__label {
+  display: block;
+  height: 0.875rem;
+  margin: 0.625rem auto 0;
+  width: 70%;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    var(--iz-color-surface-elevated) 0%,
+    var(--iz-color-border-subtle) 50%,
+    var(--iz-color-surface-elevated) 100%
+  );
+  background-size: 200% 100%;
+  animation: catalog-category-tiles-grid-skeleton-shimmer 1.2s ease-in-out infinite;
+}
+
+@keyframes catalog-category-tiles-grid-skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}

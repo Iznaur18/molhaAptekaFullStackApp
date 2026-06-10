@@ -72,6 +72,13 @@ export const PRODUCT_FIELD_REGISTRY = {
     editKind: "category",
     detailsTop: true,
   },
+  productSaleCity: {
+    labelRu: CREATE_PRODUCT_MODAL_UI.LABEL_SALE_CITY,
+    editLabel: CREATE_PRODUCT_MODAL_UI.LABEL_SALE_CITY,
+    readLayout: "stat",
+    editKind: "text",
+    detailsTop: true,
+  },
   productIsAvailable: {
     labelRu: "В наличии",
     editLabel: CREATE_PRODUCT_MODAL_UI.LABEL_AVAILABLE,
@@ -138,6 +145,7 @@ export const PRODUCT_FIELD_REGISTRY = {
 const DETAILS_TOP_ROW_ORDER = [
   "productPrice",
   "productCategory",
+  "productSaleCity",
   "productStockQuantity",
   "soldQuantity",
   "uniqueViewerCount",
@@ -161,6 +169,7 @@ const MODEL_FIELD_ORDER = [
   "productPrice",
   "productSeller",
   "productCategory",
+  "productSaleCity",
   "productIsAvailable",
   "uniqueViewerCount",
   "soldQuantity",

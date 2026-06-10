@@ -1,4 +1,4 @@
-import { validateRuDeliveryAddressForm } from "../../address/lib/validateRuDeliveryAddressForm.js";
+import { validateRuStructuredDeliveryAddressForm } from "../../address/lib/validateRuStructuredDeliveryAddressForm.js";
 import { isStoredUploadOrHttpImageUrl } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { validateRuPhoneField } from "./ruPhone.js";
 import {
@@ -43,11 +43,8 @@ export function validateEditProfileForm(form, options = {}) {
   const phoneError = validateRuPhoneField(form.userPhoneNumber);
   if (phoneError) return phoneError;
 
-  const addressLine = String(form.deliveryAddress.line ?? "").trim();
-  if (addressLine) {
-    const addressError = validateRuDeliveryAddressForm(form.deliveryAddress);
-    if (addressError) return addressError;
-  }
+  const addressError = validateRuStructuredDeliveryAddressForm(form.structuredAddress);
+  if (addressError) return addressError;
   if (String(form.notesAboutUser).length > NOTES_ABOUT_USER_MAX_CHARS) {
     return `Заметки: не больше ${NOTES_ABOUT_USER_MAX_CHARS} символов`;
   }

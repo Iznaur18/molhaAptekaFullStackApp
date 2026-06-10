@@ -25,11 +25,13 @@ export function buildProfileNavGroups({
   canUseAdminOrders,
   canUseSearchSynonymsAdmin,
   canUseCategoryTreeAdmin,
+  canUseAppIntroAdmin,
   canUseSubscriptions,
   canUseDataConfirmation,
   isUserDataConfirmed,
   canUsePremium,
   canUseLoyaltyPoints,
+  canUseAdvertising,
   canUseEditProfile,
   showEditOnBanner,
   pendingMySalesActionCount,
@@ -38,6 +40,8 @@ export function buildProfileNavGroups({
   pendingInstallmentBuyerActionCount,
   pendingInstallmentSellerActionCount,
   pendingModerationCount,
+  pendingIntroAdModerationCount,
+  pendingSellerPersonalCategoryModerationCount,
   pendingProductReportsCount,
   pendingRafflesCount,
   pendingDataConfirmationCount,
@@ -52,6 +56,8 @@ export function buildProfileNavGroups({
   onInstallmentPaymentsClick,
   onInstallmentSalesClick,
   onProductModerationClick,
+  onIntroAdModerationClick,
+  onSellerPersonalCategoryModerationClick,
   onProductReportsClick,
   onRafflesClick,
   onDataConfirmationQueueClick,
@@ -60,10 +66,12 @@ export function buildProfileNavGroups({
   onAdminOrdersClick,
   onSearchSynonymsAdminClick,
   onCategoryTreeAdminClick,
+  onAppIntroAdminClick,
   onSubscriptionsClick,
   onDataConfirmationClick,
   onPremiumClick,
   onLoyaltyPointsClick,
+  onAdvertisingClick,
   onEditProfileClick,
 }) {
   /** @param {string} tab @param {() => void} [action] */
@@ -179,6 +187,15 @@ export function buildProfileNavGroups({
               },
             ]
           : []),
+        ...(canUseAdvertising
+          ? [
+              {
+                tab: "advertising",
+                label: MY_PROFILE_PAGE_UI.TAB_ADVERTISING,
+                onClick: () => selectTab("advertising", onAdvertisingClick),
+              },
+            ]
+          : []),
         ...(canUseEditProfile && !showEditOnBanner
           ? [
               {
@@ -210,6 +227,22 @@ export function buildProfileNavGroups({
             label: MY_PROFILE_PAGE_UI.TAB_PRODUCT_MODERATION,
             badgeCount: pendingModerationCount,
             onClick: () => selectTab("product-moderation", onProductModerationClick),
+          },
+          {
+            tab: "intro-ad-moderation",
+            label: MY_PROFILE_PAGE_UI.TAB_INTRO_AD_MODERATION,
+            badgeCount: pendingIntroAdModerationCount,
+            onClick: () => selectTab("intro-ad-moderation", onIntroAdModerationClick),
+          },
+          {
+            tab: "seller-personal-category-moderation",
+            label: MY_PROFILE_PAGE_UI.TAB_SELLER_PERSONAL_CATEGORY_MODERATION,
+            badgeCount: pendingSellerPersonalCategoryModerationCount,
+            onClick: () =>
+              selectTab(
+                "seller-personal-category-moderation",
+                onSellerPersonalCategoryModerationClick,
+              ),
           },
         ]
       : []),
@@ -289,6 +322,15 @@ export function buildProfileNavGroups({
             tab: "category-tree-admin",
             label: MY_PROFILE_PAGE_UI.TAB_CATEGORY_TREE_ADMIN,
             onClick: () => selectTab("category-tree-admin", onCategoryTreeAdminClick),
+          },
+        ]
+      : []),
+    ...(canUseAppIntroAdmin
+      ? [
+          {
+            tab: "app-intro-admin",
+            label: MY_PROFILE_PAGE_UI.TAB_APP_INTRO_ADMIN,
+            onClick: () => selectTab("app-intro-admin", onAppIntroAdminClick),
           },
         ]
       : []),

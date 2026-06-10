@@ -24,6 +24,8 @@ import { assertSellerCanSetProductLoyaltyPointsPerUnit } from "../../utils/asser
 import { normalizeProductCharacteristics } from "../../utils/normalizeProductCharacteristics.js";
 import { buildProductSearchBlobFromFields } from "../../utils/buildProductSearchBlob.js";
 import { resolveProductCategoryWriteFromBody } from "../../utils/resolveProductCategoryWrite.js";
+import { resolveActiveSellerPersonalCategoryId } from "../../utils/sellerPersonalCategoryHelpers.js";
+import { applyProductSaleCityFields } from "../../utils/ruCityNormalized.js";
 import { errorRes, successRes } from "../../utils/index.js";
 
 export const postProductController = async (req, res) => {
@@ -156,6 +158,27 @@ export const postProductController = async (req, res) => {
       categorySearchKeywords: categoryWrite.categorySearchKeywords,
     });
 
+    const sellerPersonalCategoryId =
+      productModerationStatus === PRODUCT_MODERATION_APPROVED
+        ? await resolveActiveSellerPersonalCategoryId(userId)
+        : null;
+
+    let productSaleCity = "";
+    let productSaleCityNormalized = "";
+    try {
+      ({ productSaleCity, productSaleCityNormalized } = applyProductSaleCityFields(
+        req.body?.productSaleCity,
+      ));
+    } catch (saleCityError) {
+      return errorRes(
+        res,
+        400,
+        saleCityError instanceof Error
+          ? saleCityError.message
+          : "Некорректный город продажи",
+      );
+    }
+
     const product = await ProductModel.create({
       productName,
       productDescription,
@@ -165,10 +188,13 @@ export const postProductController = async (req, res) => {
       productPrice,
       productOldPrice,
       productSeller: userId,
+      productSaleCity,
+      productSaleCityNormalized,
       productCategory: categoryWrite.productCategory,
       productCategoryId: categoryWrite.productCategoryId,
       categoryPathIds: categoryWrite.categoryPathIds,
       categoryBreadcrumbRu: categoryWrite.categoryBreadcrumbRu,
+      sellerPersonalCategoryId,
       productIsAvailable: visibleInCatalog,
       productStockQuantity,
       productAuctionEnabled: productAuctionEnabled === true,

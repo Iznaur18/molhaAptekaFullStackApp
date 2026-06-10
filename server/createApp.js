@@ -12,6 +12,9 @@ import {
   addressRouter,
   installmentRouter,
   priceOfferRouter,
+  appIntroRouter,
+  introAdRouter,
+  sellerPersonalCategoryRouter,
 } from "./routes/index.js";
 import {
   generalRateLimiter,
@@ -62,6 +65,9 @@ export const createApp = () => {
   app.use("/address", addressRouter);
   app.use("/installment", installmentRouter);
   app.use("/price-offers", priceOfferRouter);
+  app.use("/app-intro", appIntroRouter);
+  app.use("/intro-ad", introAdRouter);
+  app.use("/seller-personal-category", sellerPersonalCategoryRouter);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

@@ -17,9 +17,14 @@ export function buildCatalogListQueryParams({
   showHiddenCatalogProducts,
 }) {
   const search = debouncedProductSearchTerm.trim();
+  const sellerPersonalCategoryId = isCatalogBrowserMainViewActive
+    ? (catalogQueryFromUrl.sellerPersonalCategoryId ?? null)
+    : null;
   const productCategory = isMineMode
     ? (selectedProductCategory ?? null)
-    : isCatalogBrowserMainViewActive && !activeCatalogBrowserCategoryId
+    : isCatalogBrowserMainViewActive &&
+        !activeCatalogBrowserCategoryId &&
+        !sellerPersonalCategoryId
       ? (activeCatalogBrowserCategory ?? null)
       : null;
   const categoryId = isCatalogBrowserMainViewActive
@@ -31,6 +36,7 @@ export function buildCatalogListQueryParams({
     search: search || null,
     productCategory,
     categoryId,
+    sellerPersonalCategoryId,
     sort: isMineMode ? catalogSort || null : catalogQueryFromUrl.sort || null,
     moderationStatus: isMineMode ? myProductsModerationFilter || null : null,
     includeHidden:
@@ -39,5 +45,6 @@ export function buildCatalogListQueryParams({
     auctionOnly: catalogQueryFromUrl.auctionOnly ? true : null,
     installmentOnly: catalogQueryFromUrl.installmentOnly ? true : null,
     saleOnly: catalogQueryFromUrl.saleOnly ? true : null,
+    allCities: catalogQueryFromUrl.allCities ? true : null,
   };
 }

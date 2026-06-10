@@ -54,6 +54,7 @@ import {
 import {
   productCategorySlugParamValidation,
   patchProductCategoryDisplayValidation,
+  patchProductCategoryNodeDisplayValidation,
 } from "./product/productCategoryDisplayValidation.js";
 import { productCategoryIdParamValidation } from "./product/productCategoryTreeValidation.js";
 import {
@@ -69,6 +70,7 @@ import {
   catalogFeedTileKeyParamValidation,
   patchProductCatalogFeedTileDisplayValidation,
 } from "./product/productCatalogFeedTileDisplayValidation.js";
+import { patchAppIntroSettingsValidation } from "./appIntro/appIntroSettingsValidation.js";
 import {
   upsertProductInstallmentProgramValidation,
   rejectInstallmentModerationValidation,
@@ -132,6 +134,7 @@ export {
   resolveUserStoryReportsValidation,
   productCategorySlugParamValidation,
   patchProductCategoryDisplayValidation,
+  patchProductCategoryNodeDisplayValidation,
   productCategoryIdParamValidation,
   createProductCategoryAdminValidation,
   patchProductCategoryAdminValidation,
@@ -140,6 +143,7 @@ export {
   patchProductSearchSynonymValidation,
   catalogFeedTileKeyParamValidation,
   patchProductCatalogFeedTileDisplayValidation,
+  patchAppIntroSettingsValidation,
   upsertProductInstallmentProgramValidation,
   rejectInstallmentModerationValidation,
   createInstallmentContractValidation,

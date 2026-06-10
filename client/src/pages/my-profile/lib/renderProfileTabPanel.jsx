@@ -9,6 +9,9 @@ import {
   LazyInstallmentPaymentsPage,
   LazyInstallmentSalesPage,
   LazyLoyaltyPointsPage,
+  LazyAdvertisingPage,
+  LazyIntroAdModerationPage,
+  LazySellerPersonalCategoryModerationPage,
   LazyMyOrdersPage,
   LazyMySalesPage,
   LazyPremiumPage,
@@ -16,6 +19,7 @@ import {
   LazyProductReportsPage,
   LazyRafflesStaffPage,
   LazySearchSynonymsAdminPage,
+  LazyAppIntroAdminPage,
   LazySubscriptionsPage,
 } from "../../../app/lib/lazyAppShellPages.js";
 
@@ -40,6 +44,8 @@ export function renderProfileTabPanel(mainView, props) {
     setIsDataConfirmationModalOpen,
     myProductsCatalogSection,
     refreshPendingModerationCount,
+    refreshPendingIntroAdModerationCount,
+    refreshPendingSellerPersonalCategoryModerationCount,
     refreshPendingProductReportsCount,
     refreshPendingRafflesCount,
     refreshPendingDataConfirmationCount,
@@ -90,6 +96,13 @@ export function renderProfileTabPanel(mainView, props) {
           onRequestLogin={onRequestLogin}
         />
       );
+    case "advertising":
+      return (
+        <LazyAdvertisingPage
+          isAuthorized={isAuthorized}
+          onRequestLogin={onRequestLogin}
+        />
+      );
     case "subscriptions":
       return (
         <LazySubscriptionsPage
@@ -113,6 +126,11 @@ export function renderProfileTabPanel(mainView, props) {
         <LazyMySalesPage
           isAuthorized={isAuthorized}
           currentUserId={currentUserId}
+          totalSalesCount={
+            myProfilePage.phase === "success"
+              ? myProfilePage.user?.totalSalesCount
+              : 0
+          }
           onSellerNameClick={onSellerNameClick}
           onQueueChanged={refreshUserProfileActionBadgeCounts}
         />
@@ -143,11 +161,27 @@ export function renderProfileTabPanel(mainView, props) {
       return <LazySearchSynonymsAdminPage />;
     case "category-tree-admin":
       return <LazyCategoryTreeAdminPage />;
+    case "app-intro-admin":
+      return <LazyAppIntroAdminPage />;
     case "product-moderation":
       return (
         <LazyProductModerationPage
           onSellerNameClick={onSellerNameClick}
           onQueueChanged={refreshPendingModerationCount}
+        />
+      );
+    case "intro-ad-moderation":
+      return (
+        <LazyIntroAdModerationPage
+          onQueueChanged={refreshPendingIntroAdModerationCount}
+        />
+      );
+    case "seller-personal-category-moderation":
+      return (
+        <LazySellerPersonalCategoryModerationPage
+          refreshPendingSellerPersonalCategoryModerationCount={
+            refreshPendingSellerPersonalCategoryModerationCount
+          }
         />
       );
     case "product-reports":

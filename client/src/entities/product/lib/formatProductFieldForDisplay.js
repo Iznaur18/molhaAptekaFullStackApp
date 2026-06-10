@@ -1,4 +1,4 @@
-import { COMMON_UI, FORMAT_BOOLEAN_RU } from "../../../shared/config/appUiCopy.js";
+import { COMMON_UI, FORMAT_BOOLEAN_RU, PRODUCT_DETAILS_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { PRODUCT_CATEGORY_LABEL_RU } from "../model/productConstants.js";
 import { getProductModerationBadgeLabel } from "./getProductModerationUi.js";
 import { resolveProductImageUrls } from "./resolveProductImageUrls.js";
@@ -72,6 +72,10 @@ export function formatProductFieldForDisplay(key, product) {
       return typeof raw === "string" && raw.trim() !== ""
         ? raw.trim()
         : COMMON_UI.EM_DASH;
+    case "productSaleCity": {
+      const city = raw == null ? "" : String(raw).trim();
+      return city === "" ? PRODUCT_DETAILS_MODAL_UI.SALE_CITY_ALL : city;
+    }
     case "uniqueViewerCount": {
       const n = Number(raw);
       return Number.isFinite(n) ? String(Math.max(0, Math.floor(n))) : "0";

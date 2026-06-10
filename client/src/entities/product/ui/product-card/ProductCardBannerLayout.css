@@ -315,33 +315,3 @@
   }
 }
 
-@media (max-width: 667px) {
-  .product-card--banner-layout > .product-card__body,
-  .product-card--banner-layout > .product-card__details-surface {
-    flex-direction: column;
-    gap: 0;
-  }
-
-  .product-card--banner-layout .product-card__image-frame {
-    flex: none;
-    width: 100%;
-    max-width: none;
-    min-height: 10rem;
-    margin: 0;
-    border-radius: var(--product-card-banner-outer-radius) var(--product-card-banner-outer-radius)
-      0 0;
-  }
-
-  .product-card--banner-layout .product-card__banner-content {
-    --product-card-banner-content-padding-block-start: 0.85rem;
-    --product-card-banner-content-padding-block-end: 0.75rem;
-  }
-
-  .product-card--banner-layout .product-card__heading--banner {
-    font-size: 1.05rem;
-  }
-
-  .product-card--banner-layout .product-card__price--banner .product-price-display__current {
-    font-size: 1.2rem;
-  }
-}

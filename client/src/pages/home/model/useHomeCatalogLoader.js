@@ -4,6 +4,7 @@ import { useCatalogBrowserLanding } from "./useCatalogBrowserLanding.js";
 import { useCatalogFilterState } from "./useCatalogFilterState.js";
 import { useCatalogQuerySync } from "./useCatalogQuerySync.js";
 import { useCatalogProductsInfiniteQuery } from "../../../entities/product/model/useCatalogProductsInfiniteQuery.js";
+import { CATALOG_QUERY_PARAM_ALL_CITIES } from "../../../entities/product/lib/catalogCatalogQuery.js";
 
 /**
  * @param {object} params
@@ -26,6 +27,7 @@ export const useHomeCatalogLoader = ({
   setIsProductCategoryListOpen,
   setProductSearchTerm,
   initialCatalogQuery,
+  onCatalogError,
 }) => {
   const filters = useCatalogFilterState({
     location,
@@ -44,6 +46,7 @@ export const useHomeCatalogLoader = ({
   const browser = useCatalogBrowserLanding({
     navigate,
     isCatalogBrowserMainViewActive,
+    isCatalogBrowserLanding: filters.isCatalogBrowserLanding,
     isCatalogBrowserProductsView: filters.isCatalogBrowserProductsView,
     activeCatalogBrowserCategory: filters.activeCatalogBrowserCategory,
     activeCatalogBrowserCategoryId: filters.activeCatalogBrowserCategoryId,
@@ -61,6 +64,7 @@ export const useHomeCatalogLoader = ({
     setMyProductsCatalogError,
     setIsProductCategoryListOpen,
     setProductSearchTerm,
+    onCatalogError,
   });
 
   useCatalogQuerySync({
@@ -109,6 +113,18 @@ export const useHomeCatalogLoader = ({
     [filters.setSelectedProductCategory, setIsProductCategoryListOpen],
   );
 
+  const handleShowAllCatalogCities = useCallback(() => {
+    const params = new URLSearchParams(location.search);
+    params.set(CATALOG_QUERY_PARAM_ALL_CITIES, "true");
+    navigate(
+      {
+        pathname: location.pathname,
+        search: `?${params.toString()}`,
+      },
+      { replace: true },
+    );
+  }, [location.pathname, location.search, navigate]);
+
   return {
     selectedProductCategory: filters.selectedProductCategory,
     setSelectedProductCategory: filters.setSelectedProductCategory,
@@ -153,6 +169,8 @@ export const useHomeCatalogLoader = ({
       browser.handleNavigateToFullCatalogFromBreadcrumb,
     handleCatalogMenuClick: browser.handleCatalogMenuClick,
     handleCatalogCategoryGridClick: browser.handleCatalogCategoryGridClick,
+    handleSellerPersonalCategoryTileClick: browser.handleSellerPersonalCategoryTileClick,
+    personalCategoryTiles: browser.personalCategoryTiles,
     handleCatalogCategoryTreeSelect: browser.handleCatalogCategoryTreeSelect,
     handleClearCatalogCategoryTreeFilter: browser.handleClearCatalogCategoryTreeFilter,
     handleCatalogFeedTileClick: browser.handleCatalogFeedTileClick,
@@ -161,6 +179,16 @@ export const useHomeCatalogLoader = ({
     handleFeedTileDisplaySaved: browser.handleFeedTileDisplaySaved,
     selectedCategoryLabel: browser.selectedCategoryLabel,
     activeCatalogFeedLabel: browser.activeCatalogFeedLabel,
+    isCatalogSubcategoryPickerActive: browser.isCatalogSubcategoryPickerActive,
+    subcategoryPickerTrail: browser.subcategoryPickerTrail,
+    subcategoryPickerLoadError: browser.subcategoryPickerLoadError,
+    resolvingLandingCategoryKey: browser.resolvingLandingCategoryKey,
+    resolvingPickerCategoryId: browser.resolvingPickerCategoryId,
+    handleSubcategoryPickerBack: browser.handleSubcategoryPickerBack,
+    handleSubcategoryPickerViewAll: browser.handleSubcategoryPickerViewAll,
+    handleSubcategoryPickerCategoryClick: browser.handleSubcategoryPickerCategoryClick,
     resetCatalogFollowingOnLogout: filters.resetCatalogFollowingOnLogout,
+    catalogAllCities: filters.catalogQueryFromUrl.allCities,
+    handleShowAllCatalogCities,
   };
 };

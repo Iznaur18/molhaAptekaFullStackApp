@@ -1,6 +1,7 @@
 .app-shell {
   --app-shell-dropdown-z-index: var(--iz-z-dropdown);
   --app-shell-category-list-max-height: min(22rem, 70vh);
+  --app-shell-mobile-bottom-nav-height: 3.1rem;
 
   box-sizing: border-box;
   width: 100%;
@@ -290,19 +291,20 @@
 @media (max-width: 903px) {
   .app-shell__grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.65rem;
+    gap: 0.15rem;
   }
 }
 
-/* узкий мобильный: плотнее отступы и компактные карточки */
+/* узкий мобильный: 2 карточки в ряд, плотнее отступы */
 @media (max-width: 667px) {
   .app-shell {
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
+    padding-left: 0.35rem;
+    padding-right: 0.35rem;
   }
 
   .app-shell__grid {
-    gap: 0.5rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.1rem;
   }
 }
 
@@ -514,39 +516,98 @@
   box-shadow: 0 12px 32px var(--iz-shadow-card-hover);
 }
 
+.app-shell__view-title--profile-catalog-mobile {
+  display: none;
+}
+
 @media (max-width: 640px) {
+  .app-shell {
+    padding-bottom: calc(
+      var(--app-shell-mobile-bottom-nav-height) + env(safe-area-inset-bottom, 0px) + 1rem
+    );
+  }
+
   .app-shell__header-top {
     display: grid;
-    grid-template-columns: 1fr auto;
-    grid-template-rows: auto auto;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-rows: auto;
+    grid-template-areas: "brand search notifications";
     align-items: center;
-    gap: 0.65rem;
+    gap: 0.45rem 0.5rem;
+  }
+
+  .app-shell__header--profile-catalog .app-shell__header-top {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "brand notifications";
+  }
+
+  .app-shell__header--profile-catalog .app-shell__header-search {
+    display: none;
+  }
+
+  .app-shell__header--profile-catalog .app-shell__breadcrumb {
+    display: none;
+  }
+
+  .app-shell__header--profile-catalog .app-shell__view-title--profile-catalog-mobile {
+    display: inline;
+  }
+
+  .app-shell__header--profile-catalog .app-shell__title-row {
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+
+  .app-shell__header--profile-catalog .app-shell__view-title--profile-catalog-mobile {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
   }
 
   .app-shell__header-main {
-    grid-column: 1;
-    grid-row: 1;
-    flex-wrap: wrap;
+    display: contents;
+  }
+
+  .app-shell__title-row {
+    grid-area: brand;
     min-width: 0;
   }
 
   .app-shell__header-search {
-    flex: 1 1 8rem;
-    min-width: 0;
-    max-width: none;
-  }
-
-  .app-shell__filter,
-  .app-shell__hidden-toggle {
-    flex: 1 1 auto;
+    grid-area: search;
     width: 100%;
-    max-width: 100%;
+    min-width: 0;
   }
 
-  .app-shell__auth-actions {
-    grid-column: 2;
-    grid-row: 1;
+  .app-shell__header-search .search-input__field {
+    padding-top: 0.45rem;
+    padding-bottom: 0.45rem;
+    padding-right: 2rem;
+    font-size: 0.82rem;
+  }
+
+  .app-shell__header-search .search-input__clear {
+    right: 0.35rem;
+    width: 1.4rem;
+    height: 1.4rem;
+  }
+
+  .app-shell__auth-actions--mobile-top {
+    grid-area: notifications;
     justify-content: flex-end;
+    justify-self: end;
+  }
+
+  .app-shell__auth-actions--desktop {
+    display: none;
+  }
+
+  .app-shell__header-top:not(:has(.app-shell__header-search)) {
+    grid-template-rows: auto;
+    grid-template-areas: "brand notifications";
   }
 
   .app-shell--header-v1 .app-shell__header--v1 {
@@ -554,17 +615,18 @@
     padding: 0.75rem 0.85rem 0.9rem;
   }
 
-  .app-shell--header-v1 .app-shell__auth-actions {
-    width: 100%;
-    justify-content: stretch;
+  .app-shell--header-v1 .app-shell__auth-actions--mobile-top {
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    gap: 0.3rem;
+    padding: 0.2rem;
+    border: 1px solid var(--iz-color-border);
+    border-radius: 999px;
+    background: var(--iz-color-surface-elevated);
+    box-shadow: 0 1px 2px var(--iz-shadow-card);
   }
 
-  .app-shell--header-v1 .app-shell__auth-actions > * {
-    flex: 1 1 auto;
-    justify-content: center;
-  }
-
-  .app-shell--header-v1 .app-shell__auth-actions > .header-circle-button {
+  .app-shell--header-v1 .app-shell__auth-actions--mobile-top > .header-circle-button {
     flex: 0 0 auto;
   }
 }

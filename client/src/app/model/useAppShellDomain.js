@@ -56,8 +56,9 @@ export function useAppShellDomain(shell, flushRemoteCart, location, navigate) {
     setMyProductsModerationFilter: shell.setMyProductsModerationFilter,
     setMyProductsCatalogError: shell.setMyProductsCatalogError,
     setIsProductCategoryListOpen: shell.setIsProductCategoryListOpen,
-    setProductSearchTerm: shell.setProductSearchTerm,
+    setProductSearchTerm: shell.    setProductSearchTerm,
     initialCatalogQuery: shell.initialCatalogQuery,
+    onCatalogError: shell.onCatalogError,
   });
 
   const productActions = useHomeProductActions({
@@ -96,6 +97,7 @@ export function useAppShellDomain(shell, flushRemoteCart, location, navigate) {
     products: catalogLoader.products,
     catalogProductDetails: shell.catalogProductDetails,
     setCatalogProductDetails: shell.setCatalogProductDetails,
+    setProductDetailsAdminError: shell.setProductDetailsAdminError,
     onBeforeOpenDetails: () => {
       shell.setProductToEdit(null);
       shell.setIsCreateProductModalOpen(false);

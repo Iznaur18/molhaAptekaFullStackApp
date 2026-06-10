@@ -164,14 +164,11 @@ export function UserDetailsModal({
                 {titleText != null ? (
                   titleText
                 ) : (
-                  <>
-                    {USER_DETAILS_MODAL_UI.TITLE_WITH_NAME_PREFIX}
-                    <UserPremiumDisplayName
-                      name={String(user?.userName ?? "").trim()}
-                      isPremium={isPremiumUser}
-                      isUserDataConfirmed={isUserDataConfirmed}
-                    />
-                  </>
+                  <UserPremiumDisplayName
+                    name={String(user?.userName ?? "").trim()}
+                    isPremium={isPremiumUser}
+                    isUserDataConfirmed={isUserDataConfirmed}
+                  />
                 )}
               </h2>
             )}
@@ -260,9 +257,7 @@ export function UserDetailsModal({
                   </>
                 ) : null}
                 {notificationsSlot}
-                <div className="user-profile-info-shell">
-                  <UserProfileInfoPanel rows={rows} />
-                </div>
+                <UserProfileInfoPanel rows={rows} />
               </div>
             ) : null}
           </div>

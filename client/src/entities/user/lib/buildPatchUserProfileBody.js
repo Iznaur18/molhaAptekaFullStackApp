@@ -1,4 +1,5 @@
-import { appendRuAddressToPayload } from "../../address/lib/appendRuAddressToPayload.js";
+import { appendStructuredAddressToPayload } from "../../address/lib/appendStructuredAddressToPayload.js";
+import { isStructuredAddressEqual } from "../../address/lib/isStructuredAddressEqual.js";
 import { normalizeUploadUrlForStorage } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { normalizeRuPhoneInput } from "./ruPhone.js";
 import { getUserAvatarFocus, getUserBackgroundFocus } from "./profileImageFocus.js";
@@ -9,7 +10,7 @@ import { DEFAULT_USER_AVATAR_URL } from "../model/userConstants.js";
  * Тело `PATCH /user/:id` (только разрешённые пользователю поля).
  *
  * @param {import('./mapUserToEditProfileForm.js').EditProfileFormState} form
- * @param {{ backgroundMode?: 'preset' | 'image' | 'admin'; includePremium?: boolean; includeLoyaltyPoints?: boolean; initialPhoneNumber?: string | null }} [options]
+ * @param {{ backgroundMode?: 'preset' | 'image' | 'admin'; includePremium?: boolean; includeLoyaltyPoints?: boolean; initialPhoneNumber?: string | null; initialStructuredAddress?: import('../../address/model/structuredTypes.js').RuStructuredDeliveryAddressValue }} [options]
  * @returns {Record<string, unknown>}
  */
 export function buildPatchUserProfileBody(form, options = {}) {
@@ -18,6 +19,7 @@ export function buildPatchUserProfileBody(form, options = {}) {
     includePremium = false,
     includeLoyaltyPoints = false,
     initialPhoneNumber = "",
+    initialStructuredAddress = null,
   } = options;
   const body = {};
 
@@ -35,12 +37,15 @@ export function buildPatchUserProfileBody(form, options = {}) {
 
   body.userGender = form.userGender;
 
-  const line = String(form.deliveryAddress.line ?? "").trim();
-  if (line === "") {
-    body.userAddress = null;
-    body.userAddressFlat = null;
-  } else {
-    appendRuAddressToPayload(body, form.deliveryAddress);
+  const addressBaseline = initialStructuredAddress ?? {
+    city: "",
+    district: "",
+    street: "",
+    house: "",
+    flat: "",
+  };
+  if (!isStructuredAddressEqual(form.structuredAddress, addressBaseline)) {
+    appendStructuredAddressToPayload(body, form.structuredAddress);
   }
 
   const phoneRaw = String(form.userPhoneNumber).trim();

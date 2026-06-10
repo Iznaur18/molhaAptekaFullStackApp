@@ -4,6 +4,7 @@ import {
   PROFILE_TAB_ADMIN_ORDERS,
   PROFILE_TAB_SEARCH_SYNONYMS_ADMIN,
   PROFILE_TAB_CATEGORY_TREE_ADMIN,
+  PROFILE_TAB_APP_INTRO_ADMIN,
   PROFILE_TAB_AUCTION,
   PROFILE_TAB_DATA_CONFIRMATION,
   PROFILE_TAB_DATA_CONFIRMATION_REQUESTS,
@@ -12,11 +13,14 @@ import {
   PROFILE_TAB_INSTALLMENT_PAYMENTS,
   PROFILE_TAB_INSTALLMENT_SALES,
   PROFILE_TAB_LOYALTY_POINTS,
+  PROFILE_TAB_ADVERTISING,
   PROFILE_TAB_MY_ORDERS,
   PROFILE_TAB_MY_PRODUCTS,
   PROFILE_TAB_MY_SALES,
   PROFILE_TAB_PREMIUM,
   PROFILE_TAB_PRODUCT_MODERATION,
+  PROFILE_TAB_INTRO_AD_MODERATION,
+  PROFILE_TAB_SELLER_PERSONAL_CATEGORY_MODERATION,
   PROFILE_TAB_PRODUCT_PROMOTIONS,
   PROFILE_TAB_PRODUCT_REPORTS,
   PROFILE_TAB_RAFFLES,
@@ -100,6 +104,10 @@ export const useHomeProfileNavigation = ({
     navigateFromProfileTab(PROFILE_TAB_CATEGORY_TREE_ADMIN);
   }, [navigateFromProfileTab]);
 
+  const handleAppIntroAdminFromProfile = useCallback(() => {
+    navigateFromProfileTab(PROFILE_TAB_APP_INTRO_ADMIN);
+  }, [navigateFromProfileTab]);
+
   const handleProductModerationFromProfile = useCallback(() => {
     navigateFromProfileTab(PROFILE_TAB_PRODUCT_MODERATION);
   }, [navigateFromProfileTab]);
@@ -130,6 +138,18 @@ export const useHomeProfileNavigation = ({
 
   const handleLoyaltyPointsFromProfile = useCallback(() => {
     navigateFromProfileTab(PROFILE_TAB_LOYALTY_POINTS);
+  }, [navigateFromProfileTab]);
+
+  const handleAdvertisingFromProfile = useCallback(() => {
+    navigateFromProfileTab(PROFILE_TAB_ADVERTISING);
+  }, [navigateFromProfileTab]);
+
+  const handleIntroAdModerationFromProfile = useCallback(() => {
+    navigateFromProfileTab(PROFILE_TAB_INTRO_AD_MODERATION);
+  }, [navigateFromProfileTab]);
+
+  const handleSellerPersonalCategoryModerationFromProfile = useCallback(() => {
+    navigateFromProfileTab(PROFILE_TAB_SELLER_PERSONAL_CATEGORY_MODERATION);
   }, [navigateFromProfileTab]);
 
   const handleSubscriptionsFromProfile = useCallback(() => {
@@ -165,6 +185,8 @@ export const useHomeProfileNavigation = ({
 
     handleCategoryTreeAdminFromProfile,
 
+    handleAppIntroAdminFromProfile,
+
     handleProductModerationFromProfile,
 
     handleProductReportsFromProfile,
@@ -180,6 +202,12 @@ export const useHomeProfileNavigation = ({
     handlePremiumFromProfile,
 
     handleLoyaltyPointsFromProfile,
+
+    handleAdvertisingFromProfile,
+
+    handleIntroAdModerationFromProfile,
+
+    handleSellerPersonalCategoryModerationFromProfile,
 
     handleSubscriptionsFromProfile,
 

@@ -9,12 +9,10 @@ import { OrderModel } from "../models/index.js";
 const SALE_COUNT_ITEM_STATUSES = [ORDER_STATUS_DELIVERED, ORDER_STATUS_CONFIRMED];
 
 /**
- * Сумма `quantity * unitPriceAtOrder` по позициям товаров продавца (confirmed/delivered).
- *
  * @param {string[]} sellerIds
- * @returns {Promise<Record<string, number>>}
+ * @returns {Promise<Record<string, { totalSalesAmount: number; totalSalesCount: number }>>}
  */
-export const getTotalSalesAmountBySellerIds = async (sellerIds) => {
+export const getSellerCommerceStatsBySellerIds = async (sellerIds) => {
   const ids = [
     ...new Set(
       sellerIds.map((id) => String(id)).filter((id) => mongoose.isValidObjectId(id)),
@@ -49,18 +47,49 @@ export const getTotalSalesAmountBySellerIds = async (sellerIds) => {
     },
     {
       $group: {
-        _id: "$productDoc.productSeller",
-        totalSalesAmount: {
+        _id: {
+          sellerId: "$productDoc.productSeller",
+          orderId: "$_id",
+        },
+        orderAmount: {
           $sum: {
             $multiply: ["$items.quantity", "$items.unitPriceAtOrder"],
           },
         },
       },
     },
+    {
+      $group: {
+        _id: "$_id.sellerId",
+        totalSalesAmount: { $sum: "$orderAmount" },
+        totalSalesCount: { $sum: 1 },
+      },
+    },
   ]);
 
   return Object.fromEntries(
-    rows.map((row) => [String(row._id), Number(row.totalSalesAmount) || 0]),
+    rows.map((row) => [
+      String(row._id),
+      {
+        totalSalesAmount: Number(row.totalSalesAmount) || 0,
+        totalSalesCount: Number(row.totalSalesCount) || 0,
+      },
+    ]),
+  );
+};
+
+/**
+ * @param {string[]} sellerIds
+ * @returns {Promise<Record<string, number>>}
+ */
+export const getTotalSalesAmountBySellerIds = async (sellerIds) => {
+  const statsBySeller = await getSellerCommerceStatsBySellerIds(sellerIds);
+
+  return Object.fromEntries(
+    Object.entries(statsBySeller).map(([sellerId, stats]) => [
+      sellerId,
+      stats.totalSalesAmount,
+    ]),
   );
 };
 
@@ -72,12 +101,29 @@ export const attachTotalSalesAmountToUsers = async (users) => {
     return users;
   }
 
-  const salesBySeller = await getTotalSalesAmountBySellerIds(
+  const statsBySeller = await getSellerCommerceStatsBySellerIds(
     users.map((user) => String(user._id)),
   );
 
-  return users.map((user) => ({
-    ...user,
-    totalSalesAmount: salesBySeller[String(user._id)] ?? 0,
-  }));
+  return users.map((user) => {
+    const stats = statsBySeller[String(user._id)];
+
+    return {
+      ...user,
+      totalSalesAmount: stats?.totalSalesAmount ?? 0,
+      totalSalesCount: stats?.totalSalesCount ?? 0,
+    };
+  });
+};
+
+/**
+ * @param {Record<string, unknown> | null | undefined} user
+ */
+export const attachSellerCommerceStatsToUser = async (user) => {
+  if (!user || user._id == null) {
+    return user;
+  }
+
+  const [withStats] = await attachTotalSalesAmountToUsers([user]);
+  return withStats;
 };

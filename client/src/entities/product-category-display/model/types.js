@@ -2,7 +2,8 @@
 
 /**
  * @typedef {Object} ProductCategoryDisplayFromApi
- * @property {ProductCategory} categorySlug
+ * @property {ProductCategory | string | null} [categorySlug]
+ * @property {string | null} [categoryId]
  * @property {string | null} customLabel
  * @property {string | null} imageUrl
  * @property {string | null} [updatedAt]

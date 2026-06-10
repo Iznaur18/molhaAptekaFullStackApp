@@ -12,6 +12,11 @@ export const CATALOG_GRID_COLUMN_BREAKPOINT_PX = 903;
 
 export const CATALOG_GRID_MOBILE_COLUMNS = 3;
 
+/** Совпадает с `@media (max-width: 667px)` в `app/ui/AppShell.css`. */
+export const CATALOG_GRID_NARROW_MOBILE_BREAKPOINT_PX = 667;
+
+export const CATALOG_GRID_NARROW_MOBILE_COLUMNS = 2;
+
 export const CATALOG_GRID_MIN_COLUMN_PX = 280;
 
 export const CATALOG_GRID_GAP_PX = 16;

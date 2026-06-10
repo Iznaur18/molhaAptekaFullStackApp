@@ -3,9 +3,16 @@ import {
   PRODUCT_MODERATION_APPROVED,
 } from "../../constants/productModerationConstants.js";
 import {
+  PRODUCT_CATALOG_REVIEWS_MIN_REVIEW_COUNT,
   PRODUCT_SORT_CONFIRMED,
   PRODUCT_SORT_PREMIUM,
+  PRODUCT_SORT_REVIEWS,
+  PRODUCT_SORT_CITY,
 } from "../../constants/productCatalogSort.js";
+import {
+  buildProductSaleCityMatch,
+  resolveBuyerCityFilter,
+} from "../../utils/userCityCatalogFilter.js";
 import { getHiddenSellerIds, isUserStaff } from "../../utils/adminUserGuard.js";
 import { getConfirmedSellerIds } from "../../utils/confirmedSellerCatalog.js";
 import {
@@ -32,6 +39,8 @@ import {
   mergeProductCatalogCategoryFilter,
   parseCategoryIdFromQuery,
 } from "../../utils/mergeProductCatalogCategoryFilter.js";
+import { SellerPersonalCategoryModel } from "../../models/index.js";
+import mongoose from "mongoose";
 import { errorRes, successRes } from "../../utils/index.js";
 
 const parseTruthyQueryFlag = (raw) =>
@@ -66,8 +75,12 @@ export const getProductsController = async (req, res) => {
     const { page, limit, skip } = parsePagination(req.query);
     const category = categoryFromQuery(req.query);
     const categoryId = parseCategoryIdFromQuery(req.query.categoryId);
+    const sellerPersonalCategoryId = parseCategoryIdFromQuery(
+      req.query.sellerPersonalCategoryId,
+    );
     const premiumOnly = req.query.sort === PRODUCT_SORT_PREMIUM;
     const confirmedOnly = req.query.sort === PRODUCT_SORT_CONFIRMED;
+    const reviewsOnly = req.query.sort === PRODUCT_SORT_REVIEWS;
     const sort = parseProductSortFromQuery(req.query);
     const followingOnly = parseTruthyQueryFlag(req.query.followingOnly);
     const auctionOnly = parseTruthyQueryFlag(req.query.auctionOnly);
@@ -83,12 +96,35 @@ export const getProductsController = async (req, res) => {
     const includeHidden =
       isStaff && String(req.query.includeHidden).toLowerCase() === "true";
 
+    if (sellerPersonalCategoryId) {
+      const personalCategory = await SellerPersonalCategoryModel.findById(
+        sellerPersonalCategoryId,
+      )
+        .select("activeUntil")
+        .lean();
+      if (
+        !personalCategory?.activeUntil ||
+        new Date(personalCategory.activeUntil).getTime() <= Date.now()
+      ) {
+        return successRes(res, {
+          products: [],
+          pagination: buildPagination(page, limit, 0),
+        });
+      }
+    }
+
     const catalogBaseQuery = await mergeProductCatalogCategoryFilter(
       {
         productModerationStatus: PRODUCT_MODERATION_APPROVED,
       },
       { categoryId, productCategory: category },
     );
+
+    if (sellerPersonalCategoryId) {
+      catalogBaseQuery.sellerPersonalCategoryId = new mongoose.Types.ObjectId(
+        sellerPersonalCategoryId,
+      );
+    }
 
     if (auctionOnly) {
       catalogBaseQuery.productAuctionEnabled = true;
@@ -99,9 +135,22 @@ export const getProductsController = async (req, res) => {
     if (saleOnly) {
       Object.assign(catalogBaseQuery, buildProductSaleOnlyMatch());
     }
+    if (reviewsOnly) {
+      catalogBaseQuery.reviewCount = { $gte: PRODUCT_CATALOG_REVIEWS_MIN_REVIEW_COUNT };
+    }
     if (!includeHidden) {
       catalogBaseQuery.productIsAvailable = { $ne: false };
       catalogBaseQuery.productStockQuantity = { $gt: 0 };
+    }
+
+    const buyerCity = await resolveBuyerCityFilter(req.userId);
+    const allCities = parseTruthyQueryFlag(req.query.allCities);
+    const applyBuyerCityFilter =
+      Boolean(buyerCity) && sort !== PRODUCT_SORT_CITY && !allCities;
+    const buyerCityMatch =
+      applyBuyerCityFilter && buyerCity ? buildProductSaleCityMatch(buyerCity) : null;
+    if (buyerCityMatch) {
+      catalogBaseQuery.$and = [...(catalogBaseQuery.$and ?? []), buyerCityMatch];
     }
 
     if (premiumOnly) {
@@ -161,8 +210,10 @@ export const getProductsController = async (req, res) => {
       });
     }
 
+    const catalogSortBuyerCity = sort === PRODUCT_SORT_CITY ? buyerCity : null;
+
     const [products, total] = await Promise.all([
-      findCatalogProductsPage(catalogSearchResult, sort, skip, limit),
+      findCatalogProductsPage(catalogSearchResult, sort, skip, limit, catalogSortBuyerCity),
       countCatalogProducts(catalogSearchResult),
     ]);
 
@@ -200,6 +251,7 @@ export const getMyProductsController = async (req, res) => {
   try {
     const { page, limit, skip } = parsePagination(req.query);
     const category = categoryFromQuery(req.query);
+    const reviewsOnly = req.query.sort === PRODUCT_SORT_REVIEWS;
     const sort = parseProductSortFromQuery(req.query);
     const moderationStatus = moderationStatusFromQuery(req.query);
     const myProductsBaseQuery = await mergeProductCatalogCategoryFilter(
@@ -212,6 +264,10 @@ export const getMyProductsController = async (req, res) => {
         productCategory: category,
       },
     );
+
+    if (reviewsOnly) {
+      myProductsBaseQuery.reviewCount = { $gte: PRODUCT_CATALOG_REVIEWS_MIN_REVIEW_COUNT };
+    }
 
     const { query: productsQuery, searchRank } = await buildProductCatalogSearchQuery(
       req.query.search,

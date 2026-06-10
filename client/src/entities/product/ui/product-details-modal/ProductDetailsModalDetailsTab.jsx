@@ -1,13 +1,14 @@
-import { AddToCartButton } from "../../../../features/cart-add/ui/AddToCartButton.jsx";
-import {
-  INSTALLMENT_UI,
-  PRODUCT_DETAILS_MODAL_UI,
-  PRODUCT_PRICE_OFFER_UI,
-} from "../../../../shared/config/appUiCopy.js";
+import { PRODUCT_DETAILS_MODAL_UI } from "../../../../shared/config/appUiCopy.js";
+import { resolveProductDiscountPercent } from "../../lib/computeProductDiscountPercent.js";
 import { ProductCharacteristicsDetails } from "../ProductCharacteristicsDetails.jsx";
 import { ProductDetailsSellerPreview } from "../ProductDetailsSellerPreview.jsx";
 import { ProductMediaGalleryReadonly } from "../ProductMediaGalleryReadonly.jsx";
-import { ProductPriceDisplay } from "../ProductPriceDisplay.jsx";
+import { ProductCatalogStatusBadges } from "../ProductCatalogStatusBadges.jsx";
+import {
+  ProductDiscountBadge,
+  ProductPriceDisplay,
+} from "../ProductPriceDisplay.jsx";
+import { ProductDetailsModalPurchaseActions } from "./ProductDetailsModalPurchaseActions.jsx";
 import { renderProductDetailsFieldRows } from "./renderProductDetailsFieldRows.jsx";
 
 /**
@@ -15,6 +16,7 @@ import { renderProductDetailsFieldRows } from "./renderProductDetailsFieldRows.j
  *   product: import("../../model/types.js").ProductFromApi;
  *   isOpen: boolean;
  *   isAuthorized: boolean;
+ *   isPremiumUser?: boolean;
  *   onRequestLogin: () => void;
  *   ctrl: ReturnType<import('./useProductDetailsModalController.js').useProductDetailsModalController>;
  * }} props
@@ -23,6 +25,7 @@ export function ProductDetailsModalDetailsTab({
   product,
   isOpen,
   isAuthorized,
+  isPremiumUser = false,
   onRequestLogin,
   ctrl,
 }) {
@@ -53,58 +56,41 @@ export function ProductDetailsModalDetailsTab({
           isActive={isOpen}
           resetToken={product._id}
           onLightboxOpenChange={setGalleryLightboxOpen}
+          onBack={fieldHandlers.onClose}
         />
         <div className="product-details-modal__spec">
           {showPriceBlock ? (
-            <div className="product-details-modal__price-block">
+            <div className="product-details-modal__price-block product-details-modal__price-block--inline-actions">
+              <h3 className="product-details-modal__product-name">
+                {product.productName?.trim() || "Товар"}
+              </h3>
               <ProductPriceDisplay
                 product={product}
+                showLabel={false}
                 className="product-details-modal__price-display"
               />
-              <div
-                className={
-                  canShowAddToCart
-                    ? "product-details-modal__price-actions"
-                    : "product-details-modal__price-actions product-details-modal__price-actions--no-cart"
-                }
-              >
-                {canShowAddToCart ? (
-                  <div className="product-details-modal__price-actions-cart">
-                    <AddToCartButton
-                      productId={String(product._id)}
-                      isAuthorized={isAuthorized}
-                      onRequestLogin={onRequestLogin}
-                      maxQuantity={purchaseLimit}
-                    />
-                  </div>
-                ) : null}
-                <button
-                  type="button"
-                  className={
-                    auctionUi.auctionActive
-                      ? "product-details-modal__auction-btn"
-                      : "product-details-modal__auction-btn product-details-modal__auction-btn--inactive"
-                  }
-                  disabled={!auctionUi.auctionActive}
-                  aria-disabled={!auctionUi.auctionActive}
-                  onClick={handleAuctionShortcutClick}
-                >
-                  {PRODUCT_PRICE_OFFER_UI.AUCTION_SHORTCUT}
-                </button>
-                <button
-                  type="button"
-                  className={
-                    installmentUi.installmentActive
-                      ? "product-details-modal__auction-btn"
-                      : "product-details-modal__auction-btn product-details-modal__auction-btn--inactive"
-                  }
-                  disabled={!installmentUi.installmentActive}
-                  aria-disabled={!installmentUi.installmentActive}
-                  onClick={handleInstallmentShortcutClick}
-                >
-                  {INSTALLMENT_UI.SHORTCUT}
-                </button>
+              <div className="product-details-modal__price-badge-row">
+                <ProductDiscountBadge
+                  discountPercent={resolveProductDiscountPercent(product)}
+                  className="product-details-modal__price-discount"
+                />
+                <ProductCatalogStatusBadges
+                  product={product}
+                  isAuthorized={isAuthorized}
+                  isPremiumUser={isPremiumUser}
+                />
               </div>
+              <ProductDetailsModalPurchaseActions
+                productId={String(product._id)}
+                isAuthorized={isAuthorized}
+                onRequestLogin={onRequestLogin}
+                purchaseLimit={purchaseLimit}
+                canShowAddToCart={canShowAddToCart}
+                auctionUi={auctionUi}
+                installmentUi={installmentUi}
+                onAuctionClick={handleAuctionShortcutClick}
+                onInstallmentClick={handleInstallmentShortcutClick}
+              />
             </div>
           ) : null}
           {topStatFieldKeys.length > 0 ? (

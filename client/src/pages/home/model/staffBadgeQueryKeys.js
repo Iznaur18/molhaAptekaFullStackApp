@@ -1,4 +1,6 @@
 import { installmentQueryKeys } from "../../../entities/installment/model/installmentQueryKeys.js";
+import { introAdQueryKeys } from "../../../entities/intro-ad/model/introAdQueryKeys.js";
+import { sellerPersonalCategoryQueryKeys } from "../../../entities/seller-personal-category/model/sellerPersonalCategoryQueryKeys.js";
 import { moderationQueryKeys } from "../../../entities/product/model/moderationQueryKeys.js";
 import { pendingDataConfirmationQueryKeys } from "../../../entities/user-data-confirmation/model/pendingDataConfirmationQueryKeys.js";
 import { raffleQueryKeys } from "../../../entities/raffle/model/raffleQueryKeys.js";
@@ -16,5 +18,7 @@ export const staffBadgeQueryKeys = {
   raffles: raffleQueryKeys.staffPendingCount(),
   installmentModeration: installmentQueryKeys.moderationPendingCount(),
   installmentDisputes: installmentQueryKeys.disputesPendingCount(),
+  introAdModeration: introAdQueryKeys.moderationCount(),
+  sellerPersonalCategoryModeration: sellerPersonalCategoryQueryKeys.moderationCount(),
   userProfileActions: COMPOSITE_STAFF_BADGE_KEYS.userProfileActions,
 };

@@ -1,3 +1,8 @@
+.product-details-modal__product-name {
+  display: none;
+  margin: 0;
+}
+
 .product-details-modal__price-block {
   display: flex;
   flex-direction: column;
@@ -13,6 +18,43 @@
 }
 
 .product-details-modal__price-display {
+  margin: 0;
+}
+
+.product-details-modal__price-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.45rem;
+}
+
+/* Совпадает с APP_SHELL_MOBILE_NAV_BREAKPOINT_PX (640px): бейджи только на мобиле. */
+@media (min-width: 641px) {
+  .product-details-modal .product-details-modal__price-badge-row {
+    display: none;
+  }
+}
+
+.product-details-modal__price-badge-row .product-catalog-status-badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.45rem;
+  min-width: 0;
+}
+
+.product-details-modal__price-badge-row .product-card__promotion-boost-badge,
+.product-details-modal__price-badge-row .product-card__promotion-top-badge,
+.product-details-modal__price-badge-row .product-card__promotion-banner-badge,
+.product-details-modal__price-badge-row .product-card__promotion-badge,
+.product-details-modal__price-badge-row .product-card__promotion-badge_pending,
+.product-details-modal__price-badge-row .product-card__hidden-badge,
+.product-details-modal__price-badge-row .product-card__auction-badge,
+.product-details-modal__price-badge-row .product-card__installment-badge,
+.product-details-modal__price-badge-row .product-card__raffle-badge,
+.product-details-modal__price-badge-row .product-card__loyalty-overcommitted-badge,
+.product-details-modal__price-badge-row .product-discount-badge,
+.product-details-modal__price-badge-row .product-loyalty-points-badge {
   margin: 0;
 }
 

@@ -1,10 +1,13 @@
 import { EditProductCatalogFeedTileDisplayModal } from "../../../entities/product-category-display/ui/EditProductCatalogFeedTileDisplayModal.jsx";
 import { EditProductCategoryDisplayModal } from "../../../entities/product-category-display/ui/EditProductCategoryDisplayModal.jsx";
+import { EditProductCategoryNodeDisplayModal } from "../../../entities/product-category-display/ui/EditProductCategoryNodeDisplayModal.jsx";
 
 /**
  * @param {{
  *   editingCategorySlug: string | null;
  *   setEditingCategorySlug: (slug: string | null) => void;
+ *   editingCategoryNode: { categoryId: string; fallbackLabel: string } | null;
+ *   setEditingCategoryNode: (payload: { categoryId: string; fallbackLabel: string } | null) => void;
  *   categoryDisplays: import('../../../entities/product-category-display/model/types.js').ProductCategoryDisplayFromApi[];
  *   handleCategoryDisplaySaved: () => void;
  *   editingFeedTileKey: string | null;
@@ -16,6 +19,8 @@ import { EditProductCategoryDisplayModal } from "../../../entities/product-categ
 export function AppShellStaffDisplayModals({
   editingCategorySlug,
   setEditingCategorySlug,
+  editingCategoryNode,
+  setEditingCategoryNode,
   categoryDisplays,
   handleCategoryDisplaySaved,
   editingFeedTileKey,
@@ -30,6 +35,14 @@ export function AppShellStaffDisplayModals({
         categorySlug={editingCategorySlug}
         displays={categoryDisplays}
         onClose={() => setEditingCategorySlug(null)}
+        onSaved={handleCategoryDisplaySaved}
+      />
+      <EditProductCategoryNodeDisplayModal
+        isOpen={editingCategoryNode != null}
+        categoryId={editingCategoryNode?.categoryId ?? null}
+        fallbackLabel={editingCategoryNode?.fallbackLabel ?? null}
+        displays={categoryDisplays}
+        onClose={() => setEditingCategoryNode(null)}
         onSaved={handleCategoryDisplaySaved}
       />
       <EditProductCatalogFeedTileDisplayModal

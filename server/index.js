@@ -15,9 +15,13 @@ import { expireStaleUserStories } from "./utils/userStoryHelpers.js";
 import { processInstallmentCronTasks } from "./utils/installmentHelpers.js";
 import { processPremiumCronTasks } from "./utils/premiumAccess.js";
 import { expireProductPromotionsAndSendNotifications } from "./utils/productPromotionHelpers.js";
+import { processIntroAdCampaignCronTasks } from "./utils/introAdCampaignHelpers.js";
+import { processSellerPersonalCategoryCronTasks } from "./utils/sellerPersonalCategoryHelpers.js";
 import { INSTALLMENT_CRON_INTERVAL_MS } from "./constants/installmentConstants.js";
 import { PREMIUM_CRON_INTERVAL_MS } from "./constants/premiumConstants.js";
 import { PRODUCT_PROMOTION_CRON_INTERVAL_MS } from "./constants/productPromotionConstants.js";
+import { INTRO_AD_CRON_INTERVAL_MS } from "./constants/introAdCampaignConstants.js";
+import { SELLER_PERSONAL_CATEGORY_CRON_INTERVAL_MS } from "./constants/sellerPersonalCategoryConstants.js";
 
 if (!isObjectStorageUploadEnabled()) {
   ensureUploadsDir();
@@ -87,6 +91,18 @@ async function start() {
         console.error("expireProductPromotionsAndSendNotifications error:", error);
       });
     }, PRODUCT_PROMOTION_CRON_INTERVAL_MS);
+
+    setInterval(() => {
+      void processIntroAdCampaignCronTasks().catch((error) => {
+        console.error("processIntroAdCampaignCronTasks error:", error);
+      });
+    }, INTRO_AD_CRON_INTERVAL_MS);
+
+    setInterval(() => {
+      void processSellerPersonalCategoryCronTasks().catch((error) => {
+        console.error("processSellerPersonalCategoryCronTasks error:", error);
+      });
+    }, SELLER_PERSONAL_CATEGORY_CRON_INTERVAL_MS);
 
     app
       .listen(PORT, () => {

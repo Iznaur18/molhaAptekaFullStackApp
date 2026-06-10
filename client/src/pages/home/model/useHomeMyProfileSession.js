@@ -77,7 +77,8 @@ export const useHomeMyProfileSession = ({
     const requiresAdmin =
       mainView === "admin-orders" ||
       mainView === "search-synonyms-admin" ||
-      mainView === "category-tree-admin";
+      mainView === "category-tree-admin" ||
+      mainView === "app-intro-admin";
     if ((requiresAdmin && !isAdmin) || (!requiresAdmin && !canModerateProducts)) {
       goToMainView("catalog");
     }

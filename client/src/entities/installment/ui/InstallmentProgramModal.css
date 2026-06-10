@@ -292,6 +292,14 @@
   color: var(--iz-color-text-subtle);
 }
 
+.installment-program-modal__form > .installment-program-modal__error,
+.installment-program-modal__form > .installment-program-modal__success,
+.installment-program-modal__form > .installment-program-modal__info {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0.65rem 1rem 0;
+}
+
 .installment-program-modal__feedback {
   padding: 0 1rem 0.75rem;
 }
@@ -306,4 +314,14 @@
   margin: 0;
   color: var(--iz-color-success-strong);
   font-size: 0.85rem;
+}
+
+.installment-program-modal__info {
+  margin: 0;
+  color: var(--iz-color-text-secondary);
+  background: var(--iz-color-surface-muted, rgba(0, 0, 0, 0.04));
+  border-radius: 0.5rem;
+  padding: 0.65rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
 }

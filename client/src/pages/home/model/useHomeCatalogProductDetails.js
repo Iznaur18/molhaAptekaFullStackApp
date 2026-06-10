@@ -22,6 +22,7 @@ export const useHomeCatalogProductDetails = ({
   products,
   catalogProductDetails,
   setCatalogProductDetails,
+  setProductDetailsAdminError,
   onBeforeOpenDetails,
 }) => {
   const queryClient = useQueryClient();
@@ -110,6 +111,16 @@ export const useHomeCatalogProductDetails = ({
     [queryClient, setCatalogProductDetails],
   );
 
+  const closeCatalogProductDetails = useCallback(() => {
+    setCatalogProductDetails(null);
+    setCatalogProductDetailsTab("details");
+    setProductDetailsAdminError("");
+  }, [
+    setCatalogProductDetails,
+    setCatalogProductDetailsTab,
+    setProductDetailsAdminError,
+  ]);
+
   const setCatalogProductHasPendingReport = useCallback(
     (value) => {
       if (!catalogProductDetails?._id) {
@@ -123,6 +134,7 @@ export const useHomeCatalogProductDetails = ({
   );
 
   return {
+    closeCatalogProductDetails,
     catalogProductDetailsTab,
     setCatalogProductDetailsTab,
     catalogProductHasPendingReport,

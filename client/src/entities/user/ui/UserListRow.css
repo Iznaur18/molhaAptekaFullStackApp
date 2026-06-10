@@ -137,13 +137,8 @@
   grid-row: 1;
 }
 
-.user-list-row__metric_purchases {
-  grid-column: 1;
-  grid-row: 2;
-}
-
 .user-list-row__metric_followers {
-  grid-column: 2;
+  grid-column: 1;
   grid-row: 2;
 }
 
@@ -153,6 +148,15 @@
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+}
+
+.user-list-row__metric-label_secondary {
+  margin-top: 0.08rem;
+  font-size: 0.58rem;
+}
+
+.user-list-row__metric-value_secondary {
+  font-size: 0.76rem;
 }
 
 .user-list-row__metric-value_confirmed-yes {
@@ -179,68 +183,85 @@
   text-overflow: ellipsis;
 }
 
-@media (max-width: 667px) {
+@media (max-width: 903px) {
   .user-list-row {
-    padding: 0.45rem 0.4rem;
-    gap: 0.35rem;
+    padding: 0.5rem 0.45rem;
+    gap: 0.4rem;
     border-radius: 10px;
   }
 
+  .user-list-row__head {
+    gap: 0.4rem;
+  }
+
   .user-list-row__avatar {
-    width: 2.75rem;
-    height: 2.75rem;
+    width: 3.25rem;
+    height: 3.25rem;
+    box-shadow:
+      0 4px 12px var(--iz-shadow-card-hover),
+      0 1px 4px var(--iz-shadow-lg);
   }
 
   .user-list-row__name {
-    font-size: 0.72rem;
+    font-size: 0.82rem;
+    line-height: 1.25;
   }
 
   .user-list-row__email {
-    display: none;
+    display: block;
+    font-size: 0.66rem;
+    line-height: 1.2;
   }
 
   .user-list-row__badges {
-    gap: 0.15rem;
+    gap: 0.2rem;
   }
 
   .user-list-row__badge {
-    font-size: 0.58rem;
-    padding: 0.02rem 0.25rem;
+    font-size: 0.62rem;
+    padding: 0.04rem 0.3rem;
   }
 
   .user-list-row__metrics {
-    gap: 0.25rem;
-    padding-top: 0.35rem;
+    gap: 0.3rem;
+    padding-top: 0.4rem;
   }
 
   .user-list-row__metric {
-    padding: 0.25rem 0.3rem;
+    padding: 0.3rem 0.32rem;
+    gap: 0.1rem;
   }
 
   .user-list-row__metric-label {
-    font-size: 0.58rem;
+    font-size: 0.6rem;
+    line-height: 1.15;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    white-space: normal;
   }
 
   .user-list-row__metric-value {
-    font-size: 0.72rem;
+    font-size: 0.74rem;
   }
 
   .user-list-row__metric-value_amount {
-    font-size: 0.68rem;
+    font-size: 0.7rem;
   }
 
-  .user-list-row__metric_followers,
-  .user-list-row__metric_purchases {
-    display: none;
+  .user-list-row__metric-value_muted {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 667px) {
+  .user-list-row__avatar {
+    width: 3rem;
+    height: 3rem;
   }
 
-  .user-list-row__metric_sales {
-    grid-column: 1;
-    grid-row: 1;
-  }
-
-  .user-list-row__metric_rating {
-    grid-column: 2;
-    grid-row: 1;
+  .user-list-row__name {
+    font-size: 0.78rem;
   }
 }

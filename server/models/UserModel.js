@@ -91,6 +91,37 @@ const UserSchema = new mongoose.Schema(
       required: false,
       default: "",
     },
+    userAddressCity: {
+      type: String,
+      trim: true,
+      required: false,
+      default: "",
+    },
+    userAddressCityNormalized: {
+      type: String,
+      trim: true,
+      required: false,
+      default: "",
+      index: true,
+    },
+    userAddressDistrict: {
+      type: String,
+      trim: true,
+      required: false,
+      default: "",
+    },
+    userAddressStreet: {
+      type: String,
+      trim: true,
+      required: false,
+      default: "",
+    },
+    userAddressHouse: {
+      type: String,
+      trim: true,
+      required: false,
+      default: "",
+    },
     userAddressFiasId: {
       type: String,
       trim: true,

@@ -1,4 +1,7 @@
 .user-profile-purchases {
+  --user-profile-purchases-thumb-size: 48px;
+  --user-profile-purchases-tile-gap: 0.5rem;
+
   margin-bottom: 1rem;
   padding: 0.75rem 1rem;
   border-radius: 8px;
@@ -10,15 +13,21 @@
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  justify-content: space-between;
+  justify-content: center;
   gap: 0.35rem 0.75rem;
   margin-bottom: 0.5rem;
+}
+
+.user-profile-purchases__heading-row .user-profile-purchases__heading,
+.user-profile-purchases__heading-row .user-profile-purchases__view-all {
+  text-align: center;
 }
 
 .user-profile-purchases__heading {
   margin: 0;
   font-size: 0.95rem;
   font-weight: 600;
+  text-align: center;
 }
 
 .user-profile-purchases__heading_action {
@@ -47,6 +56,7 @@
 .user-profile-purchases__state {
   margin: 0;
   font-size: 0.875rem;
+  text-align: center;
   color: color-mix(in srgb, var(--iz-color-canvas-text) 70%, transparent);
 }
 
@@ -55,21 +65,27 @@
 }
 
 .user-profile-purchases__list {
+  width: 100%;
   margin: 0;
   padding: 0;
   list-style: none;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(var(--user-profile-purchases-thumb-size), 1fr)
+  );
+  justify-items: center;
+  gap: var(--user-profile-purchases-tile-gap);
 }
 
 .user-profile-purchases__item {
   margin: 0;
+  width: 100%;
 }
 
 .user-profile-purchases__row {
   display: block;
+  width: 100%;
   margin: 0;
   padding: 0;
   border: none;
@@ -86,8 +102,8 @@
 
 .user-profile-purchases__thumb {
   flex-shrink: 0;
-  width: 48px;
-  height: 48px;
+  width: var(--user-profile-purchases-thumb-size);
+  height: var(--user-profile-purchases-thumb-size);
   border-radius: 6px;
   object-fit: cover;
   background: color-mix(in srgb, var(--iz-color-canvas-text) 8%, var(--iz-color-canvas));
@@ -101,11 +117,15 @@
 .user-profile-purchases__hint {
   margin: 0.5rem 0 0;
   font-size: 0.8125rem;
+  text-align: center;
   color: var(--iz-color-warning-deep);
 }
 
 .user-profile-purchases__more {
+  display: block;
   margin-top: 0.5rem;
+  margin-left: auto;
+  margin-right: auto;
   padding: 0.35rem 0.75rem;
   border: 1px solid color-mix(in srgb, var(--iz-color-canvas-text) 20%, transparent);
   border-radius: 6px;

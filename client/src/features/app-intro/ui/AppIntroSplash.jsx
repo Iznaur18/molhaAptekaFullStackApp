@@ -1,23 +1,26 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useNavigate } from "react-router-dom";
 
+import { resolveAppIntroPlaybackConfig } from "../../../entities/app-intro-settings/lib/resolveAppIntroPlaybackConfig.js";
+import { useAppIntroSettingsQuery } from "../../../entities/app-intro-settings/model/useAppIntroSettingsQuery.js";
 import { useAppIntro } from "../model/AppIntroContext.jsx";
-import {
-  APP_INTRO_FADE_OUT_MS,
-  APP_INTRO_MAX_MS,
-  APP_INTRO_MIN_MS,
-  APP_INTRO_VIDEO_MP4,
-} from "../model/introConstants.js";
 import { prefersReducedMotion } from "../lib/prefersReducedMotion.js";
 import { APP_INTRO_UI } from "../../../shared/config/appUiCopy.js";
+import { dispatchOpenUserProfileEvent } from "../../../shared/lib/openUserProfileEvent.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 
 import "./AppIntroSplash.css";
 
 /**
- * @param {{ onDismiss: () => void }} props
+ * @typedef {import('../../../entities/app-intro-settings/lib/resolveAppIntroPlaybackConfig.js').AppIntroPlaybackConfig} AppIntroPlaybackConfig
  */
-function AppIntroSplashContent({ onDismiss }) {
+
+/**
+ * @param {{ config: AppIntroPlaybackConfig; onDismiss: () => void }} props
+ */
+function AppIntroSplashContent({ config, onDismiss }) {
+  const navigate = useNavigate();
   const videoRef = useRef(/** @type {HTMLVideoElement | null} */ (null));
   const openedAtRef = useRef(0);
   const closingRef = useRef(false);
@@ -69,31 +72,37 @@ function AppIntroSplashContent({ onDismiss }) {
   const dismissAfterMinDuration = useCallback(() => {
     if (closingRef.current || dismissedRef.current) return;
     const elapsed = Date.now() - openedAtRef.current;
-    const waitMs = Math.max(0, APP_INTRO_MIN_MS - elapsed);
+    const waitMs = Math.max(0, config.minMs - elapsed);
     if (waitMs === 0) {
       beginDismiss();
       return;
     }
     minTimerRef.current = setTimeout(beginDismiss, waitMs);
-  }, [beginDismiss]);
+  }, [beginDismiss, config.minMs]);
 
   useEffect(() => {
     openedAtRef.current = Date.now();
     closingRef.current = false;
     dismissedRef.current = false;
+    setVideoFailed(false);
+    setIsClosing(false);
+    setIsMuted(true);
 
-    maxTimerRef.current = setTimeout(beginDismiss, APP_INTRO_MAX_MS);
+    maxTimerRef.current = setTimeout(beginDismiss, config.maxMs);
 
     return () => {
       clearDismissTimers();
     };
-  }, [beginDismiss, clearDismissTimers]);
+  }, [beginDismiss, clearDismissTimers, config.maxMs, config.videoMp4Src]);
 
   useEffect(() => {
     if (!isClosing) return undefined;
-    const fallbackTimer = setTimeout(completeDismiss, APP_INTRO_FADE_OUT_MS + 80);
+    const fallbackTimer = setTimeout(
+      completeDismiss,
+      config.fadeOutMs + 80,
+    );
     return () => clearTimeout(fallbackTimer);
-  }, [completeDismiss, isClosing]);
+  }, [completeDismiss, config.fadeOutMs, isClosing]);
 
   const handleTransitionEnd = (event) => {
     if (event.target !== event.currentTarget) return;
@@ -105,13 +114,23 @@ function AppIntroSplashContent({ onDismiss }) {
   const handleCanPlay = () => {
     const video = videoRef.current;
     if (!video || videoFailed) return;
-    void video.play().catch(() => {
-      // autoplay может отклониться — не переключаемся на заглушку
-    });
+    void video.play().catch(() => {});
   };
 
   const handleSkip = () => {
     beginDismiss();
+  };
+
+  const handleAdvertiserClick = () => {
+    if (!config.advertiserId) {
+      return;
+    }
+    beginDismiss();
+    if (config.ctaType === "seller_products") {
+      navigate(`/seller/${config.advertiserId}`);
+      return;
+    }
+    dispatchOpenUserProfileEvent(config.advertiserId);
   };
 
   const handleToggleSound = () => {
@@ -143,42 +162,62 @@ function AppIntroSplashContent({ onDismiss }) {
     .filter(Boolean)
     .join(" ");
 
+  const closingStyle =
+    isClosing && !prefersReducedMotion()
+      ? { transitionDuration: `${config.fadeOutMs}ms` }
+      : undefined;
+
   return (
     <div
       className={rootClassName}
+      style={closingStyle}
       role="dialog"
       aria-modal="true"
       aria-label={APP_INTRO_UI.ARIA_OVERLAY}
       onTransitionEnd={handleTransitionEnd}
     >
+      {config.isPaidIntro ? (
+        <div className="app-intro-splash__ad-badge" aria-hidden="true">
+          {APP_INTRO_UI.AD_BADGE}
+        </div>
+      ) : null}
       <div className="app-intro-splash__media">
         {videoFailed ? (
           <div className="app-intro-splash__fallback" aria-hidden="true">
-            <p className="app-intro-splash__fallback-title">
-              {APP_INTRO_UI.FALLBACK_TITLE}
-            </p>
-            <p className="app-intro-splash__fallback-hint">
-              {APP_INTRO_UI.FALLBACK_HINT}
-            </p>
+            <p className="app-intro-splash__fallback-title">{config.fallbackTitle}</p>
+            <p className="app-intro-splash__fallback-hint">{config.fallbackHint}</p>
           </div>
         ) : (
           <video
+            key={config.videoMp4Src}
             ref={videoRef}
             className="app-intro-splash__video"
+            src={config.videoMp4Src}
             autoPlay
             muted
             playsInline
             preload="auto"
+            poster={config.posterSrc ?? undefined}
             aria-label={APP_INTRO_UI.VIDEO_ARIA}
             onCanPlay={handleCanPlay}
             onEnded={handleVideoEnded}
             onError={handleVideoError}
-          >
-            <source src={APP_INTRO_VIDEO_MP4} type="video/mp4" />
-          </video>
+          />
         )}
       </div>
       <div className="app-intro-splash__actions">
+        {config.isPaidIntro && config.advertiserId ? (
+          <button
+            type="button"
+            className="app-intro-splash__btn app-intro-splash__btn_secondary"
+            onClick={handleAdvertiserClick}
+            disabled={isClosing}
+          >
+            {config.ctaType === "seller_products"
+              ? APP_INTRO_UI.AD_CTA_SELLER_PRODUCTS
+              : APP_INTRO_UI.AD_CTA_PROFILE}
+          </button>
+        ) : null}
         {!videoFailed ? (
           <button
             type="button"
@@ -203,12 +242,41 @@ function AppIntroSplashContent({ onDismiss }) {
 }
 
 export function AppIntroSplash() {
-  const { isIntroVisible, dismissIntro } = useAppIntro();
+  const { isIntroVisible, previewSettings, dismissIntro } = useAppIntro();
+  const settingsQuery = useAppIntroSettingsQuery();
 
-  if (!isIntroVisible) return null;
+  const playbackConfig = useMemo(() => {
+    if (previewSettings) {
+      return resolveAppIntroPlaybackConfig(previewSettings);
+    }
+
+    const paidIntro = settingsQuery.data?.paidIntro ?? null;
+    if (paidIntro) {
+      return resolveAppIntroPlaybackConfig(paidIntro, {
+        isPaidIntro: true,
+        advertiserId: paidIntro.advertiserId,
+        ctaType: paidIntro.ctaType,
+      });
+    }
+
+    return resolveAppIntroPlaybackConfig(settingsQuery.data?.settings ?? null);
+  }, [previewSettings, settingsQuery.data]);
+
+  if (!isIntroVisible) {
+    return null;
+  }
+
+  const settingsReady =
+    previewSettings != null ||
+    settingsQuery.data != null ||
+    settingsQuery.isError;
+
+  if (!settingsReady && settingsQuery.isPending) {
+    return null;
+  }
 
   return createPortal(
-    <AppIntroSplashContent onDismiss={dismissIntro} />,
+    <AppIntroSplashContent config={playbackConfig} onDismiss={dismissIntro} />,
     document.body,
   );
 }

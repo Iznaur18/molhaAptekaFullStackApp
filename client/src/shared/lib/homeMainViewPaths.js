@@ -5,7 +5,7 @@ import { isStaffStandaloneMainView } from "./staffMainViews.js";
  * проксирует `/cart` и `/user/...` на Express (см. vite.config.js).
  * Путь `/user-list` ок: не совпадает с API `/user` (иначе F5 → 404 JSON).
  *
- * @typedef {'catalog' | 'catalog-browser' | 'my-profile' | 'my-products' | 'users' | 'subscriptions' | 'notifications' | 'cart' | 'my-sales' | 'my-orders' | 'auction' | 'data-confirmation' | 'premium' | 'loyalty-points' | 'admin-orders' | 'search-synonyms-admin' | 'category-tree-admin' | 'product-moderation' | 'product-reports' | 'product-promotions' | 'staff-raffles' | 'data-confirmation-requests' | 'installment-payments' | 'installment-sales' | 'installment-moderation' | 'installment-disputes'} HomeMainView
+ * @typedef {'catalog' | 'catalog-browser' | 'my-profile' | 'my-products' | 'users' | 'subscriptions' | 'notifications' | 'cart' | 'my-sales' | 'my-orders' | 'auction' | 'data-confirmation' | 'premium' | 'loyalty-points' | 'advertising' | 'admin-orders' | 'search-synonyms-admin' | 'category-tree-admin' | 'app-intro-admin' | 'product-moderation' | 'intro-ad-moderation' | 'seller-personal-category-moderation' | 'product-reports' | 'product-promotions' | 'staff-raffles' | 'data-confirmation-requests' | 'installment-payments' | 'installment-sales' | 'installment-moderation' | 'installment-disputes'} HomeMainView
  */
 
 /** @type {Record<HomeMainView, string>} */
@@ -26,10 +26,14 @@ export const HOME_MAIN_VIEW_PATH = {
   "data-confirmation": "/data-confirmation",
   premium: "/premium",
   "loyalty-points": "/loyalty-points",
+  advertising: "/profile/advertising",
   "admin-orders": "/admin-orders",
   "search-synonyms-admin": "/search-synonyms-admin",
   "category-tree-admin": "/category-tree-admin",
+  "app-intro-admin": "/app-intro-admin",
   "product-moderation": "/moderation-products",
+  "intro-ad-moderation": "/moderation-intro-ad",
+  "seller-personal-category-moderation": "/moderation-seller-categories",
   "product-reports": "/product-reports",
   "product-promotions": "/product-promotions",
   "staff-raffles": "/staff-raffles",

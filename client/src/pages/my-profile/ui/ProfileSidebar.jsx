@@ -29,11 +29,22 @@ import { ProfileTabBadge } from "./ProfileTabBadge.jsx";
  * @param {{
  *   groups: ProfileNavGroup[];
  *   activeTab: string;
+ *   onItemSelect?: () => void;
+ *   id?: string;
  * }} props
  */
-export function ProfileSidebar({ groups, activeTab }) {
+export function ProfileSidebar({ groups, activeTab, onItemSelect, id }) {
+  const handleItemClick = (onClick) => {
+    onClick();
+    onItemSelect?.();
+  };
+
   return (
-    <aside className="my-profile-page__sidebar" aria-label={MY_PROFILE_PAGE_UI.NAV_ARIA}>
+    <aside
+      id={id}
+      className="my-profile-page__sidebar"
+      aria-label={MY_PROFILE_PAGE_UI.NAV_ARIA}
+    >
       <div className="my-profile-page__sidebar-head">
         <h2 className="my-profile-page__title">{MY_PROFILE_PAGE_UI.TAB_TITLE}</h2>
       </div>
@@ -65,7 +76,7 @@ export function ProfileSidebar({ groups, activeTab }) {
                       data-tone={item.tone ?? "slate"}
                       disabled={item.disabled}
                       aria-current={isActive ? "page" : undefined}
-                      onClick={item.onClick}
+                      onClick={() => handleItemClick(item.onClick)}
                     >
                       <span className="my-profile-page__nav-button-main">
                         {item.icon ? (

@@ -69,6 +69,7 @@ export function useCatalogProductsInfiniteQuery({
       const search = listParams.search ?? undefined;
       const productCategory = listParams.productCategory ?? undefined;
       const categoryId = listParams.categoryId ?? undefined;
+      const sellerPersonalCategoryId = listParams.sellerPersonalCategoryId ?? undefined;
 
       if (listParams.scope === "my") {
         return fetchMyProductsPage({
@@ -87,12 +88,14 @@ export function useCatalogProductsInfiniteQuery({
         search,
         productCategory,
         categoryId,
+        sellerPersonalCategoryId,
         sort: listParams.sort ?? undefined,
         includeHidden: Boolean(listParams.includeHidden),
         followingOnly: Boolean(listParams.followingOnly),
         auctionOnly: Boolean(listParams.auctionOnly),
         installmentOnly: Boolean(listParams.installmentOnly),
         saleOnly: Boolean(listParams.saleOnly),
+        allCities: Boolean(listParams.allCities),
       });
     },
     getNextPageParam: (lastPage) => {

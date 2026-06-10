@@ -1,4 +1,8 @@
+import { APP_SHELL_MOBILE_NAV_BREAKPOINT_PX } from "../../../app/lib/appShellMobileNavConstants.js";
+import { useMaxWidthMediaQuery } from "../../../shared/lib/useMaxWidthMediaQuery.js";
+import { useSwipeRightToDismiss } from "../../../shared/lib/useSwipeRightToDismiss.js";
 import { ProductModalShell } from "../../../shared/ui/ProductModalShell/ProductModalShell.jsx";
+import { ProductDetailsModalPurchaseActions } from "./product-details-modal/ProductDetailsModalPurchaseActions.jsx";
 import { ProductDetailsModalTabPanel } from "./product-details-modal/ProductDetailsModalTabPanel.jsx";
 import { ProductDetailsModalTabs } from "./product-details-modal/ProductDetailsModalTabs.jsx";
 import { useProductDetailsModalController } from "./product-details-modal/useProductDetailsModalController.js";
@@ -62,16 +66,52 @@ export function ProductDetailsModal({
     onProfileActionBadgesChanged,
   });
 
+  const isMobileNav = useMaxWidthMediaQuery(APP_SHELL_MOBILE_NAV_BREAKPOINT_PX);
+
+  useSwipeRightToDismiss(ctrl.modalBodyRef, {
+    enabled:
+      isOpen && Boolean(product) && isMobileNav && !ctrl.galleryLightboxOpen,
+    onDismiss: onClose,
+  });
+
   if (!isOpen || !product) return null;
 
   const title = product.productName?.trim() || "Товар";
-  const modalFooter =
-    secondaryFooter || adminFooter ? (
-      <div className="product-details-modal__footer-actions">
-        {adminFooter}
-        {secondaryFooter}
-      </div>
-    ) : null;
+  const showMobilePurchaseDock =
+    isMobileNav && ctrl.detailsTab === "details" && ctrl.showPriceBlock;
+  const mobilePurchaseDock = showMobilePurchaseDock ? (
+    <ProductDetailsModalPurchaseActions
+      productId={String(product._id)}
+      isAuthorized={isAuthorized}
+      onRequestLogin={onRequestLogin}
+      purchaseLimit={ctrl.purchaseLimit}
+      canShowAddToCart={ctrl.canShowAddToCart}
+      auctionUi={ctrl.auctionUi}
+      installmentUi={ctrl.installmentUi}
+      onAuctionClick={ctrl.handleAuctionShortcutClick}
+      onInstallmentClick={ctrl.handleInstallmentShortcutClick}
+      className="product-details-modal__price-actions--mobile-dock"
+    />
+  ) : null;
+  const hasDesktopFooter = !isMobileNav && (secondaryFooter || adminFooter);
+  const modalFooter = hasDesktopFooter ? (
+    <div className="product-details-modal__footer-actions">
+      {adminFooter}
+      {secondaryFooter}
+    </div>
+  ) : null;
+  const hasMobileInlineActions =
+    isMobileNav && (secondaryFooter || adminFooter) && ctrl.detailsTab === "details";
+  const isAltDetailsTab =
+    ctrl.detailsTab === "reviews" ||
+    ctrl.detailsTab === "auction" ||
+    ctrl.detailsTab === "installment";
+  const tabPanelClassName = [
+    "product-details-modal__tab-panel",
+    isMobileNav && isAltDetailsTab ? "product-details-modal__tab-panel--inset" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <ProductModalShell
@@ -80,10 +120,17 @@ export function ProductDetailsModal({
       title={title}
       titleId="product-details-modal-title"
       size="lg"
-      panelClassName="product-details-modal"
+      hideHeader={isMobileNav}
+      panelClassName={[
+        "product-details-modal",
+        showMobilePurchaseDock ? "product-details-modal--mobile-dock-active" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
       bodyClassName="product-details-modal__body"
       bodyRef={ctrl.modalBodyRef}
       footer={modalFooter}
+      dockedFooter={mobilePurchaseDock}
       footerClassName="product-details-modal__footer"
       closeOnEscape={false}
     >
@@ -100,7 +147,7 @@ export function ProductDetailsModal({
 
       <div
         ref={ctrl.tabPanelRef}
-        className="product-details-modal__tab-panel"
+        className={tabPanelClassName}
         style={
           ctrl.showProductDetailsTabs && ctrl.tabPanelMinHeight > 0
             ? { minHeight: `${ctrl.tabPanelMinHeight}px` }
@@ -111,10 +158,18 @@ export function ProductDetailsModal({
           product={product}
           isOpen={isOpen}
           isAuthorized={isAuthorized}
+          isPremiumUser={isPremiumUser}
           onRequestLogin={onRequestLogin}
           ctrl={ctrl}
         />
       </div>
+
+      {hasMobileInlineActions ? (
+        <div className="product-details-modal__mobile-inline-actions">
+          {adminFooter}
+          {secondaryFooter}
+        </div>
+      ) : null}
     </ProductModalShell>
   );
 }

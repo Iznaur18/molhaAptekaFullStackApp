@@ -15,6 +15,7 @@ import {
   notifyFollowersOfSellerProductDiscount,
 } from "../../utils/productDiscount.js";
 import { buildProductSearchBlobFromFields } from "../../utils/buildProductSearchBlob.js";
+import { resolveActiveSellerPersonalCategoryId } from "../../utils/sellerPersonalCategoryHelpers.js";
 import {
   resolveDefaultLeafIdForLegacyCategory,
   resolveProductCategoryWriteFromId,
@@ -146,6 +147,14 @@ export const approveProductModerationController = async (req, res) => {
       categoryBreadcrumbRu: product.categoryBreadcrumbRu ?? "",
       ...categorySearchExtras,
     });
+
+    const sellerPersonalCategoryId = await resolveActiveSellerPersonalCategoryId(
+      product.productSeller,
+    );
+    if (sellerPersonalCategoryId) {
+      product.sellerPersonalCategoryId = sellerPersonalCategoryId;
+    }
+
     await product.save();
     await product.populate("productSeller", PRODUCT_SELLER_PUBLIC_SELECT);
 

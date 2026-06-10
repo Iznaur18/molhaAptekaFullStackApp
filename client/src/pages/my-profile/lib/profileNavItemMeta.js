@@ -1,4 +1,5 @@
 import {
+  Clapperboard,
   ClipboardCheck,
   CreditCard,
   Crown,
@@ -10,6 +11,7 @@ import {
   ListOrdered,
   LogOut,
   MessageSquareWarning,
+  Megaphone,
   Package,
   Pencil,
   Scale,
@@ -39,9 +41,12 @@ export const PROFILE_NAV_ITEM_META = {
   "data-confirmation": { icon: ShieldCheck, tone: "green" },
   premium: { icon: Crown, tone: "gold" },
   "loyalty-points": { icon: Sparkles, tone: "pink" },
+  advertising: { icon: Megaphone, tone: "orange" },
   "edit-profile": { icon: Pencil, tone: "slate" },
   "create-raffle": { icon: Gift, tone: "purple" },
   "product-moderation": { icon: ClipboardCheck, tone: "orange" },
+  "intro-ad-moderation": { icon: Megaphone, tone: "amber" },
+  "seller-personal-category-moderation": { icon: FolderTree, tone: "teal" },
   "product-reports": { icon: Flag, tone: "rose" },
   raffles: { icon: Ticket, tone: "fuchsia" },
   "data-confirmation-requests": { icon: UserCheck, tone: "lime" },
@@ -50,6 +55,7 @@ export const PROFILE_NAV_ITEM_META = {
   "admin-orders": { icon: ListOrdered, tone: "blue" },
   "search-synonyms-admin": { icon: Search, tone: "sky" },
   "category-tree-admin": { icon: FolderTree, tone: "emerald" },
+  "app-intro-admin": { icon: Clapperboard, tone: "violet" },
   logout: { icon: LogOut, tone: "rose" },
 };
 

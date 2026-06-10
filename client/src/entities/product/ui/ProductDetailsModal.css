@@ -1,7 +1,9 @@
 @import "./productImageTokens.css";
 @import "./product-details-modal/productDetailsModalTokens.css";
+@import "./product-card/ProductCardBadges.css";
 @import "./product-details-modal/ProductDetailsModalLayout.css";
 @import "./product-details-modal/ProductDetailsModalPrice.css";
 @import "./product-details-modal/ProductDetailsModalFields.css";
 @import "./product-details-modal/ProductDetailsModalTabs.css";
 @import "./product-details-modal/ProductDetailsModalFooter.css";
+@import "./product-details-modal/ProductDetailsModalMobile.css";

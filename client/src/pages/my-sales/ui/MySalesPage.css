@@ -26,6 +26,21 @@
   gap: 0.5rem;
 }
 
+.my-sales-page__toolbar-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.1rem;
+}
+
+.my-sales-page__total-sales-count {
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--iz-color-text);
+  font-variant-numeric: tabular-nums;
+}
+
 .my-sales-page__heading {
   margin: 0;
   font-size: 0.95rem;

@@ -1,6 +1,7 @@
 import {
   CATALOG_SORT_NEWEST,
   CATALOG_SORT_OPTIONS,
+  CATALOG_SORT_REVIEWS,
   PRODUCT_CATEGORIES,
 } from "../model/productConstants.js";
 
@@ -11,12 +12,18 @@ export const CATALOG_QUERY_PARAM_FOLLOWING_ONLY = "followingOnly";
 export const CATALOG_QUERY_PARAM_AUCTION_ONLY = "auctionOnly";
 export const CATALOG_QUERY_PARAM_INSTALLMENT_ONLY = "installmentOnly";
 export const CATALOG_QUERY_PARAM_SALE_ONLY = "saleOnly";
+export const CATALOG_QUERY_PARAM_ALL_CITIES = "allCities";
+export const CATALOG_QUERY_PARAM_SELLER_PERSONAL_CATEGORY_ID =
+  "sellerPersonalCategoryId";
 
 /**
  * @param {string | null | undefined} raw
  */
 const parseCatalogSort = (raw) => {
-  if (raw && CATALOG_SORT_OPTIONS.includes(raw)) {
+  if (
+    raw &&
+    (CATALOG_SORT_OPTIONS.includes(raw) || raw === CATALOG_SORT_REVIEWS)
+  ) {
     return raw;
   }
   return CATALOG_SORT_NEWEST;
@@ -56,19 +63,25 @@ export function parseCatalogQueryFromSearchParams(searchParams) {
   const installmentOnly =
     searchParams.get(CATALOG_QUERY_PARAM_INSTALLMENT_ONLY) === "true";
   const saleOnly = searchParams.get(CATALOG_QUERY_PARAM_SALE_ONLY) === "true";
+  const allCities = searchParams.get(CATALOG_QUERY_PARAM_ALL_CITIES) === "true";
 
   const categoryId = parseCatalogCategoryId(
     searchParams.get(CATALOG_QUERY_PARAM_CATEGORY_ID),
   );
+  const sellerPersonalCategoryId = parseCatalogCategoryId(
+    searchParams.get(CATALOG_QUERY_PARAM_SELLER_PERSONAL_CATEGORY_ID),
+  );
 
   return {
     sort,
-    category: categoryId ? null : category,
+    category: categoryId || sellerPersonalCategoryId ? null : category,
     categoryId,
+    sellerPersonalCategoryId,
     followingOnly,
     auctionOnly,
     installmentOnly,
     saleOnly,
+    allCities,
   };
 }
 
@@ -77,27 +90,36 @@ export function parseCatalogQueryFromSearchParams(searchParams) {
  *   sort: string;
  *   category: import("../model/types.js").ProductCategory | null;
  *   categoryId: string | null;
+ *   sellerPersonalCategoryId: string | null;
  *   followingOnly: boolean;
  *   auctionOnly: boolean;
  *   installmentOnly: boolean;
  *   saleOnly: boolean;
+ *   allCities: boolean;
  * }}
  */
 export function buildCatalogSearchParams({
   sort,
   category,
   categoryId,
+  sellerPersonalCategoryId,
   followingOnly,
   auctionOnly,
   installmentOnly,
   saleOnly,
+  allCities,
 }) {
   const params = new URLSearchParams();
 
   if (sort !== CATALOG_SORT_NEWEST) {
     params.set(CATALOG_QUERY_PARAM_SORT, sort);
   }
-  if (categoryId) {
+  if (sellerPersonalCategoryId) {
+    params.set(
+      CATALOG_QUERY_PARAM_SELLER_PERSONAL_CATEGORY_ID,
+      sellerPersonalCategoryId,
+    );
+  } else if (categoryId) {
     params.set(CATALOG_QUERY_PARAM_CATEGORY_ID, categoryId);
   } else if (category) {
     params.set(CATALOG_QUERY_PARAM_CATEGORY, category);
@@ -113,6 +135,9 @@ export function buildCatalogSearchParams({
   }
   if (saleOnly) {
     params.set(CATALOG_QUERY_PARAM_SALE_ONLY, "true");
+  }
+  if (allCities) {
+    params.set(CATALOG_QUERY_PARAM_ALL_CITIES, "true");
   }
 
   return params;
@@ -127,15 +152,27 @@ export function buildCatalogSearchParams({
  *   sort: string;
  *   category: import("../model/types.js").ProductCategory | null;
  *   categoryId: string | null;
+ *   sellerPersonalCategoryId: string | null;
  *   followingOnly: boolean;
  *   auctionOnly: boolean;
  *   installmentOnly: boolean;
  *   saleOnly: boolean;
+ *   allCities: boolean;
  * }} query
  * @param {{ omitDefaultSort?: boolean }} [options]
  */
 export function buildCatalogBrowserSearchParams(
-  { sort, category, categoryId, followingOnly, auctionOnly, installmentOnly, saleOnly },
+  {
+    sort,
+    category,
+    categoryId,
+    sellerPersonalCategoryId,
+    followingOnly,
+    auctionOnly,
+    installmentOnly,
+    saleOnly,
+    allCities,
+  },
   { omitDefaultSort = true } = {},
 ) {
   const params = new URLSearchParams();
@@ -144,7 +181,12 @@ export function buildCatalogBrowserSearchParams(
     params.set(CATALOG_QUERY_PARAM_SORT, sort);
   }
 
-  if (categoryId) {
+  if (sellerPersonalCategoryId) {
+    params.set(
+      CATALOG_QUERY_PARAM_SELLER_PERSONAL_CATEGORY_ID,
+      sellerPersonalCategoryId,
+    );
+  } else if (categoryId) {
     params.set(CATALOG_QUERY_PARAM_CATEGORY_ID, categoryId);
   } else if (category) {
     params.set(CATALOG_QUERY_PARAM_CATEGORY, category);
@@ -160,6 +202,9 @@ export function buildCatalogBrowserSearchParams(
   }
   if (saleOnly) {
     params.set(CATALOG_QUERY_PARAM_SALE_ONLY, "true");
+  }
+  if (allCities) {
+    params.set(CATALOG_QUERY_PARAM_ALL_CITIES, "true");
   }
 
   return params;
