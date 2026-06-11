@@ -1,0 +1,77 @@
+.curated-product-compact-card {
+  --curated-card-image-bg: var(--iz-color-surface-subtle);
+  --curated-card-price-bg: var(--iz-color-premium-indigo-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--iz-color-border-subtle, #e5e7eb);
+  border-radius: 12px;
+  background: transparent;
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+}
+
+.curated-product-compact-card__image-wrap {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: var(--curated-card-image-bg);
+  cursor: grab;
+  touch-action: pan-x;
+  user-select: none;
+}
+
+.curated-product-compact-card__image,
+.curated-product-compact-card__image-fallback {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.curated-product-compact-card__image-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.84rem;
+  color: var(--iz-color-text-secondary);
+  background: var(--curated-card-image-bg);
+}
+
+.curated-product-compact-card__price-wrap {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 2rem;
+  padding: 6px 8px;
+  border: none;
+  background: var(--curated-card-price-bg);
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+}
+
+.curated-product-compact-card__price-wrap:hover {
+  filter: brightness(0.97);
+}
+
+.curated-product-compact-card__price-wrap:focus-visible {
+  outline: 2px solid var(--iz-color-link-deep, #1e3a8a);
+  outline-offset: -2px;
+}
+
+.curated-product-compact-card__price {
+  flex-shrink: 0;
+  width: 100%;
+  font-size: 0.975rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--iz-color-link-deep, #1e3a8a);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

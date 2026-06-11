@@ -49,6 +49,13 @@ export const createProductCategoryAdminBodySchema = z.object({
   searchKeywords: searchKeywordsFieldSchema,
 });
 
+export const deleteProductCategoryAdminBodySchema = z
+  .object({
+    reassignProductCategoryId: mongoIdSchema.optional(),
+    detachProducts: z.boolean().optional(),
+  })
+  .default({});
+
 export const patchProductCategoryAdminBodySchema = z.object({
   slug: categorySlugFieldSchema.optional(),
   labelRu: categoryLabelRuFieldSchema.optional(),

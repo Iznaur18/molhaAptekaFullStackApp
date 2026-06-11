@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 
+import { invalidateCuratedProductLists } from "../../entities/curated-product-list/lib/curatedProductListQueryCache.js";
 import { invalidateCatalogProducts } from "../../entities/product/lib/catalogProductsQueryCache.js";
 import { invalidateMyProductsTotal } from "../../entities/product/lib/myProductsTotalQueryCache.js";
 import { useHomeCatalogLoader } from "../../pages/home/model/useHomeCatalogLoader.js";
@@ -10,15 +11,23 @@ import { useHomeLogout } from "../../pages/home/model/useHomeLogout.js";
 import { useHomeMyProfileSession } from "../../pages/home/model/useHomeMyProfileSession.js";
 import { useHomeNotifications } from "../../pages/home/model/useHomeNotifications.js";
 import { useHomeProductActions } from "../../pages/home/model/useHomeProductActions.js";
+import { useHomeCuratedProductLists } from "../../pages/home/model/useHomeCuratedProductLists.js";
 import { useHomeProfileNavigation } from "../../pages/home/model/useHomeProfileNavigation.js";
 
 /**
  * @param {Record<string, unknown>} shell
  * @param {() => Promise<void>} flushRemoteCart
+ * @param {() => Promise<void>} flushRemoteWishlist
  * @param {import('react-router-dom').Location} location
  * @param {import('react-router-dom').NavigateFunction} navigate
  */
-export function useAppShellDomain(shell, flushRemoteCart, location, navigate) {
+export function useAppShellDomain(
+  shell,
+  flushRemoteCart,
+  flushRemoteWishlist,
+  location,
+  navigate,
+) {
   const queryClient = useQueryClient();
   const refreshFeaturedRaffle = shell.refreshFeaturedRaffle;
   const handleUserStoriesRefresh = shell.handleUserStoriesRefresh;
@@ -27,6 +36,7 @@ export function useAppShellDomain(shell, flushRemoteCart, location, navigate) {
     await Promise.all([
       invalidateCatalogProducts(queryClient),
       invalidateMyProductsTotal(queryClient),
+      invalidateCuratedProductLists(queryClient),
     ]);
     await refreshFeaturedRaffle();
     handleUserStoriesRefresh();
@@ -59,6 +69,20 @@ export function useAppShellDomain(shell, flushRemoteCart, location, navigate) {
     setProductSearchTerm: shell.    setProductSearchTerm,
     initialCatalogQuery: shell.initialCatalogQuery,
     onCatalogError: shell.onCatalogError,
+  });
+
+  const curatedProductListsState = useHomeCuratedProductLists({
+    isHomeCatalogMainView: shell.isHomeCatalogMainView,
+    isMineMode: catalogLoader.isMineMode,
+    selectedProductCategory: catalogLoader.selectedProductCategory,
+    selectedCategoryId: catalogLoader.selectedCategoryId,
+    hasProductSearchQuery: catalogLoader.hasProductSearchQuery,
+    catalogFollowingOnly: catalogLoader.catalogFollowingOnly,
+    catalogAuctionOnly: catalogLoader.catalogAuctionOnly,
+    catalogInstallmentOnly: catalogLoader.catalogInstallmentOnly,
+    catalogSaleOnly: catalogLoader.catalogSaleOnly,
+    showHiddenCatalogProducts: catalogLoader.showHiddenCatalogProducts,
+    catalogAllCities: catalogLoader.catalogAllCities,
   });
 
   const productActions = useHomeProductActions({
@@ -135,6 +159,7 @@ export function useAppShellDomain(shell, flushRemoteCart, location, navigate) {
 
   const handleLogout = useHomeLogout({
     flushRemoteCart,
+    flushRemoteWishlist,
     navigate,
     clearAuthSession: shell.clearAuthSession,
     setMyProfilePage: shell.setMyProfilePage,
@@ -152,6 +177,7 @@ export function useAppShellDomain(shell, flushRemoteCart, location, navigate) {
   return {
     ...profileNavigation,
     ...catalogLoader,
+    ...curatedProductListsState,
     ...productActions,
     ...catalogProductDetailsState,
     ...notifications,

@@ -76,7 +76,8 @@ export function formatProductFieldForDisplay(key, product) {
       const city = raw == null ? "" : String(raw).trim();
       return city === "" ? PRODUCT_DETAILS_MODAL_UI.SALE_CITY_ALL : city;
     }
-    case "uniqueViewerCount": {
+    case "uniqueViewerCount":
+    case "productWishlistCount": {
       const n = Number(raw);
       return Number.isFinite(n) ? String(Math.max(0, Math.floor(n))) : "0";
     }

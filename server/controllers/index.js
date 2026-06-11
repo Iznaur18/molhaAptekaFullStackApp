@@ -64,6 +64,16 @@ import {
   patchProductSearchSynonymAdminController,
   deleteProductSearchSynonymAdminController,
 } from "./Product/productSearchSynonymAdminControllers.js";
+import {
+  getHomeCuratedProductListsController,
+  listCuratedProductListsAdminController,
+  createCuratedProductListAdminController,
+  reorderCuratedProductListsAdminController,
+  patchCuratedProductListAdminController,
+  deleteCuratedProductListAdminController,
+  addCuratedProductListItemAdminController,
+  removeCuratedProductListItemAdminController,
+} from "./Product/curatedProductListControllers.js";
 import { postProductController } from "./Product/postProductController.js";
 import {
   getProductsController,
@@ -152,6 +162,8 @@ import {
 } from "./User/userFollowControllers.js";
 import { getMyCartController } from "./Cart/getMyCartController.js";
 import { replaceMyCartController } from "./Cart/replaceMyCartController.js";
+import { getMyFavoritesController } from "./Favorites/getMyFavoritesController.js";
+import { replaceMyFavoritesController } from "./Favorites/replaceMyFavoritesController.js";
 import {
   getUserStoriesFeedController,
   getUserStoriesByAuthorController,
@@ -239,6 +251,14 @@ export {
   createProductSearchSynonymAdminController,
   patchProductSearchSynonymAdminController,
   deleteProductSearchSynonymAdminController,
+  getHomeCuratedProductListsController,
+  listCuratedProductListsAdminController,
+  createCuratedProductListAdminController,
+  reorderCuratedProductListsAdminController,
+  patchCuratedProductListAdminController,
+  deleteCuratedProductListAdminController,
+  addCuratedProductListItemAdminController,
+  removeCuratedProductListItemAdminController,
   postProductController,
   getProductsController,
   getMyProductsController,
@@ -305,6 +325,8 @@ export {
   listMyFollowersController,
   getMyCartController,
   replaceMyCartController,
+  getMyFavoritesController,
+  replaceMyFavoritesController,
   getUserStoriesFeedController,
   getUserStoriesByAuthorController,
   createUserStoryController,

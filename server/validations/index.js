@@ -44,6 +44,7 @@ import { getAllOrdersValidation } from "./order/getAllOrdersValidation.js";
 import { getMySalesValidation } from "./order/getMySalesValidation.js";
 import { orderItemActionValidation } from "./order/orderItemActionValidation.js";
 import { replaceMyCartValidation } from "./cart/replaceMyCartValidation.js";
+import { replaceMyFavoritesValidation } from "./favorites/replaceMyFavoritesValidation.js";
 import {
   userStoryIdParamValidation,
   createUserStoryValidation,
@@ -59,6 +60,7 @@ import {
 import { productCategoryIdParamValidation } from "./product/productCategoryTreeValidation.js";
 import {
   createProductCategoryAdminValidation,
+  deleteProductCategoryAdminValidation,
   patchProductCategoryAdminValidation,
 } from "./product/productCategoryAdminValidation.js";
 import {
@@ -66,6 +68,14 @@ import {
   createProductSearchSynonymValidation,
   patchProductSearchSynonymValidation,
 } from "./product/productSearchSynonymAdminValidation.js";
+import {
+  curatedProductListIdParamValidation,
+  curatedProductListProductIdParamValidation,
+  createCuratedProductListValidation,
+  patchCuratedProductListValidation,
+  reorderCuratedProductListsValidation,
+  addCuratedProductListItemValidation,
+} from "./product/curatedProductListValidation.js";
 import {
   catalogFeedTileKeyParamValidation,
   patchProductCatalogFeedTileDisplayValidation,
@@ -128,6 +138,7 @@ export {
   getMySalesValidation,
   orderItemActionValidation,
   replaceMyCartValidation,
+  replaceMyFavoritesValidation,
   userStoryIdParamValidation,
   createUserStoryValidation,
   submitUserStoryReportValidation,
@@ -137,10 +148,17 @@ export {
   patchProductCategoryNodeDisplayValidation,
   productCategoryIdParamValidation,
   createProductCategoryAdminValidation,
+  deleteProductCategoryAdminValidation,
   patchProductCategoryAdminValidation,
   productSearchSynonymIdParamValidation,
   createProductSearchSynonymValidation,
   patchProductSearchSynonymValidation,
+  curatedProductListIdParamValidation,
+  curatedProductListProductIdParamValidation,
+  createCuratedProductListValidation,
+  patchCuratedProductListValidation,
+  reorderCuratedProductListsValidation,
+  addCuratedProductListItemValidation,
   catalogFeedTileKeyParamValidation,
   patchProductCatalogFeedTileDisplayValidation,
   patchAppIntroSettingsValidation,

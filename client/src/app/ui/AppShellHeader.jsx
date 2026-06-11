@@ -7,6 +7,7 @@ import {
 import { CatalogCategoryFilterButton } from "../../widgets/catalog-category-filter-button/ui/CatalogCategoryFilterButton.jsx";
 import { CatalogMenuButton } from "../../widgets/catalog-menu-button/ui/CatalogMenuButton.jsx";
 import { HeaderCartButton } from "../../widgets/header-cart-button/ui/HeaderCartButton.jsx";
+import { HeaderWishlistButton } from "../../widgets/header-wishlist-button/ui/HeaderWishlistButton.jsx";
 import { HeaderNotificationsButton } from "../../widgets/header-notifications-button/ui/HeaderNotificationsButton.jsx";
 import { HeaderPlaceProductButton } from "../../widgets/header-place-product-button/ui/HeaderPlaceProductButton.jsx";
 import { HeaderProfileButton } from "../../widgets/header-profile-button/ui/HeaderProfileButton.jsx";
@@ -47,6 +48,7 @@ const NON_CATALOG_VIEW_TITLES = {
   "my-profile": HOME_PAGE_UI.AUTH_MY_PROFILE,
   users: HOME_PAGE_UI.TITLE_USERS,
   subscriptions: HOME_PAGE_UI.TITLE_SUBSCRIPTIONS,
+  wishlist: HOME_PAGE_UI.TITLE_WISHLIST,
   cart: HOME_PAGE_UI.TITLE_CART,
   "my-sales": HOME_PAGE_UI.TITLE_MY_SALES,
   "my-orders": HOME_PAGE_UI.TITLE_MY_ORDERS,
@@ -185,6 +187,7 @@ export function AppShellHeader({
   const isPublicCatalogHeader = !isMineMode && isCatalogHeaderView;
   const isUsersNavActive = mainView === "users";
   const isCartNavActive = mainView === "cart";
+  const isWishlistNavActive = mainView === "wishlist";
   const isMyProfileNavActive = isProfileTabMainView(mainView);
   const isNotificationsNavActive = mainView === "notifications";
   const isHomeNavActive = mainView === "catalog";
@@ -234,6 +237,7 @@ export function AppShellHeader({
     isUsersNavActive,
     onSetMainView,
     isCartNavActive,
+    isWishlistNavActive,
     isAuthorized,
     onPlaceProductClick,
     onLoginClick,
@@ -399,6 +403,7 @@ function CatalogHeaderFilter({
  *   isUsersNavActive: boolean;
  *   onSetMainView: (view: import('../../shared/lib/homeMainViewPaths.js').HomeMainView) => void;
  *   isCartNavActive: boolean;
+ *   isWishlistNavActive: boolean;
  *   isAuthorized: boolean;
  *   onPlaceProductClick: () => void;
  *   onLoginClick: () => void;
@@ -418,6 +423,7 @@ function HeaderNavActions({
   isUsersNavActive,
   onSetMainView,
   isCartNavActive,
+  isWishlistNavActive,
   isAuthorized,
   onPlaceProductClick,
   onLoginClick,
@@ -465,6 +471,12 @@ function HeaderNavActions({
         isActive={isUsersNavActive}
         onClick={() => onSetMainView("users")}
       />
+      {isAuthorized ? (
+        <HeaderWishlistButton
+          isActive={isWishlistNavActive}
+          onClick={() => onSetMainView("wishlist")}
+        />
+      ) : null}
       <HeaderCartButton isActive={isCartNavActive} onClick={() => onSetMainView("cart")} />
       <HeaderPlaceProductButton
         isLoginRequired={!isAuthorized}

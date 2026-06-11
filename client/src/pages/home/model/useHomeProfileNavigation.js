@@ -5,6 +5,7 @@ import {
   PROFILE_TAB_SEARCH_SYNONYMS_ADMIN,
   PROFILE_TAB_CATEGORY_TREE_ADMIN,
   PROFILE_TAB_APP_INTRO_ADMIN,
+  PROFILE_TAB_POPULAR_PRODUCTS_ADMIN,
   PROFILE_TAB_AUCTION,
   PROFILE_TAB_DATA_CONFIRMATION,
   PROFILE_TAB_DATA_CONFIRMATION_REQUESTS,
@@ -25,6 +26,7 @@ import {
   PROFILE_TAB_PRODUCT_REPORTS,
   PROFILE_TAB_RAFFLES,
   PROFILE_TAB_SUBSCRIPTIONS,
+  PROFILE_TAB_WISHLIST,
 } from "../../my-profile/lib/profileTabs.js";
 
 import { profileTabToMainView } from "../../my-profile/lib/profileTabToMainView.js";
@@ -108,6 +110,10 @@ export const useHomeProfileNavigation = ({
     navigateFromProfileTab(PROFILE_TAB_APP_INTRO_ADMIN);
   }, [navigateFromProfileTab]);
 
+  const handlePopularProductsAdminFromProfile = useCallback(() => {
+    navigateFromProfileTab(PROFILE_TAB_POPULAR_PRODUCTS_ADMIN);
+  }, [navigateFromProfileTab]);
+
   const handleProductModerationFromProfile = useCallback(() => {
     navigateFromProfileTab(PROFILE_TAB_PRODUCT_MODERATION);
   }, [navigateFromProfileTab]);
@@ -156,6 +162,10 @@ export const useHomeProfileNavigation = ({
     navigateFromProfileTab(PROFILE_TAB_SUBSCRIPTIONS);
   }, [navigateFromProfileTab]);
 
+  const handleWishlistFromProfile = useCallback(() => {
+    navigateFromProfileTab(PROFILE_TAB_WISHLIST);
+  }, [navigateFromProfileTab]);
+
   const handlePremiumPurchased = useCallback(
     async ({ loyaltyPointsBalance }) => {
       setLoyaltyPoints(loyaltyPointsBalance);
@@ -187,6 +197,8 @@ export const useHomeProfileNavigation = ({
 
     handleAppIntroAdminFromProfile,
 
+    handlePopularProductsAdminFromProfile,
+
     handleProductModerationFromProfile,
 
     handleProductReportsFromProfile,
@@ -210,6 +222,8 @@ export const useHomeProfileNavigation = ({
     handleSellerPersonalCategoryModerationFromProfile,
 
     handleSubscriptionsFromProfile,
+
+    handleWishlistFromProfile,
 
     handlePremiumPurchased,
   };

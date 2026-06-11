@@ -1,0 +1,33 @@
+.popular-products-admin__create {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.popular-products-admin__label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1 1 240px;
+  font-size: 0.875rem;
+}
+
+.popular-products-admin__input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--iz-color-border, #e5e7eb);
+  border-radius: 8px;
+  font: inherit;
+}
+
+.popular-products-admin__empty {
+  margin: 0;
+  color: var(--iz-color-text-secondary);
+}
+
+.popular-products-admin__lists {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}

@@ -1,3 +1,4 @@
+import { WishlistToggleButton } from "../../../../features/wishlist-toggle/ui/WishlistToggleButton.jsx";
 import { PRODUCT_CARD_UI } from "../../../../shared/config/appUiCopy.js";
 import { ProductMediaSlideContent } from "../ProductMediaSlideContent.jsx";
 import { ProductDiscountBadge } from "../ProductPriceDisplay.jsx";
@@ -41,6 +42,16 @@ export function ProductCardMedia({ vm }) {
       ) : (
         <div className="product-card__image-placeholder" aria-hidden="true" />
       )}
+      {vm.showWishlistToggle ? (
+        <WishlistToggleButton
+          productId={String(vm.product._id)}
+          product={vm.product}
+          isAuthorized={vm.isAuthorized}
+          onRequestLogin={vm.onRequestLoginAddToCart}
+          currentUserId={vm.currentUserId}
+          variant="card"
+        />
+      ) : null}
       {vm.showImageOverlayBadges ? (
         <div className="product-card__image-badges" aria-hidden="true">
           {vm.showDiscountBadge ? (

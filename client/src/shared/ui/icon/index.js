@@ -5,6 +5,7 @@ export {
   Bell,
   CircleAlert,
   Eye,
+  Heart,
   Menu,
   Pencil,
   Plus,

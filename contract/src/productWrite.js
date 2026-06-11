@@ -22,7 +22,6 @@ export const PRODUCT_CATEGORY_VALUES = [
   "books",
   "tourism_outdoors",
   "auto_parts",
-  "furniture",
   "hobby_crafts",
   "accessories",
   "jewelry",
@@ -35,7 +34,6 @@ export const PRODUCT_CATEGORY_VALUES = [
   "automobiles",
   "travel_services",
   "food",
-  "figures",
 ];
 
 export const PRODUCT_IMAGE_URLS_MAX = 5;

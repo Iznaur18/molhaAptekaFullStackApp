@@ -26,7 +26,9 @@ export function buildProfileNavGroups({
   canUseSearchSynonymsAdmin,
   canUseCategoryTreeAdmin,
   canUseAppIntroAdmin,
+  canUsePopularProductsAdmin,
   canUseSubscriptions,
+  canUseWishlist,
   canUseDataConfirmation,
   isUserDataConfirmed,
   canUsePremium,
@@ -67,7 +69,9 @@ export function buildProfileNavGroups({
   onSearchSynonymsAdminClick,
   onCategoryTreeAdminClick,
   onAppIntroAdminClick,
+  onPopularProductsAdminClick,
   onSubscriptionsClick,
+  onWishlistClick,
   onDataConfirmationClick,
   onPremiumClick,
   onLoyaltyPointsClick,
@@ -158,6 +162,12 @@ export function buildProfileNavGroups({
           label: MY_PROFILE_PAGE_UI.TAB_SUBSCRIPTIONS,
           disabled: !canUseSubscriptions,
           onClick: () => selectTab("subscriptions", onSubscriptionsClick),
+        },
+        {
+          tab: "wishlist",
+          label: MY_PROFILE_PAGE_UI.TAB_WISHLIST,
+          disabled: !canUseWishlist,
+          onClick: () => selectTab("wishlist", onWishlistClick),
         },
         ...(canUseDataConfirmation
           ? [
@@ -331,6 +341,16 @@ export function buildProfileNavGroups({
             tab: "app-intro-admin",
             label: MY_PROFILE_PAGE_UI.TAB_APP_INTRO_ADMIN,
             onClick: () => selectTab("app-intro-admin", onAppIntroAdminClick),
+          },
+        ]
+      : []),
+    ...(canUsePopularProductsAdmin
+      ? [
+          {
+            tab: "popular-products-admin",
+            label: MY_PROFILE_PAGE_UI.TAB_POPULAR_PRODUCTS_ADMIN,
+            onClick: () =>
+              selectTab("popular-products-admin", onPopularProductsAdminClick),
           },
         ]
       : []),

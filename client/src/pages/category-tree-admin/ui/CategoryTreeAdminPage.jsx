@@ -12,6 +12,8 @@ import { AdminPanelShell } from "../../../shared/ui/AdminPanel/AdminPanelShell.j
 import { CATEGORY_TREE_ADMIN_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import {
   filterCategoryRows,
+  findAnyLeafForReassign,
+  formatCategoryLegacyDetachLabel,
   formatCategoryPath,
   isCategoryStructureChanged,
   isValidCategorySlug,
@@ -197,22 +199,96 @@ export function CategoryTreeAdminPage() {
     }
   };
 
-  const handleDelete = async (categoryId) => {
-    if (!window.confirm(CATEGORY_TREE_ADMIN_PAGE_UI.DELETE_CONFIRM)) {
-      return;
-    }
-    try {
-      setPendingId(categoryId);
-      setActionError("");
-      await deleteMutation.mutateAsync(categoryId);
+  const removeCategoryRow = useCallback(
+    (categoryId) => {
       updateRows((prev) => prev.filter((row) => row._id !== categoryId));
       if (editingId === categoryId) {
         cancelEdit();
       }
+    },
+    [cancelEdit, editingId, updateRows],
+  );
+
+  const handleDelete = async (row) => {
+    const categoryId = row._id;
+    if (!window.confirm(CATEGORY_TREE_ADMIN_PAGE_UI.DELETE_CONFIRM)) {
+      return;
+    }
+
+    const deleteCategory = async ({
+      reassignProductCategoryId,
+      detachProducts = false,
+    } = {}) => {
+      setPendingId(categoryId);
+      setActionError("");
+      await deleteMutation.mutateAsync({
+        categoryId,
+        reassignProductCategoryId,
+        detachProducts,
+      });
+      removeCategoryRow(categoryId);
+    };
+
+    try {
+      await deleteCategory();
     } catch (e) {
-      setActionError(
-        e instanceof Error ? e.message : CATEGORY_TREE_ADMIN_PAGE_UI.DELETE_ERROR,
+      const message =
+        e instanceof Error ? e.message : CATEGORY_TREE_ADMIN_PAGE_UI.DELETE_ERROR;
+      const hasProducts = /привязаны товары/i.test(message);
+      if (!hasProducts) {
+        setActionError(message);
+        return;
+      }
+
+      const reassignLeaf = findAnyLeafForReassign(row, rows);
+      if (reassignLeaf) {
+        const targetLabel = formatCategoryPath(reassignLeaf);
+        const confirmed = window.confirm(
+          CATEGORY_TREE_ADMIN_PAGE_UI.DELETE_REASSIGN_CONFIRM.replace(
+            "{message}",
+            message,
+          ).replace("{targetLabel}", targetLabel),
+        );
+        if (!confirmed) {
+          setActionError(message);
+          return;
+        }
+
+        try {
+          await deleteCategory({
+            reassignProductCategoryId: reassignLeaf._id,
+          });
+        } catch (retryError) {
+          setActionError(
+            retryError instanceof Error
+              ? retryError.message
+              : CATEGORY_TREE_ADMIN_PAGE_UI.DELETE_ERROR,
+          );
+        }
+        return;
+      }
+
+      const legacyLabel = formatCategoryLegacyDetachLabel(row);
+      const confirmedDetach = window.confirm(
+        CATEGORY_TREE_ADMIN_PAGE_UI.DELETE_DETACH_CONFIRM.replace(
+          "{message}",
+          message,
+        ).replace("{legacyLabel}", legacyLabel),
       );
+      if (!confirmedDetach) {
+        setActionError(message);
+        return;
+      }
+
+      try {
+        await deleteCategory({ detachProducts: true });
+      } catch (retryError) {
+        setActionError(
+          retryError instanceof Error
+            ? retryError.message
+            : CATEGORY_TREE_ADMIN_PAGE_UI.DELETE_ERROR,
+        );
+      }
     } finally {
       setPendingId(null);
     }
@@ -335,7 +411,7 @@ export function CategoryTreeAdminPage() {
             onStartEdit={() => startEdit(row)}
             onCancelEdit={cancelEdit}
             onSave={() => void handleSaveEdit(row)}
-            onDelete={() => void handleDelete(row._id)}
+            onDelete={() => void handleDelete(row)}
           />
         ))}
       </ul>

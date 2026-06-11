@@ -21,9 +21,6 @@ export const useHomeCatalogSections = () => {
     handleCatalogCategoryGridClick,
     handleSellerPersonalCategoryTileClick,
     personalCategoryTiles,
-    handleCatalogCategoryTreeSelect,
-    handleClearCatalogCategoryTreeFilter,
-    activeCatalogBrowserCategoryId,
     setEditingCategorySlug,
     setEditingFeedTileKey,
     selectedCategoryLabel,
@@ -71,10 +68,7 @@ export const useHomeCatalogSections = () => {
         onPersonalCategoryClick={handleSellerPersonalCategoryTileClick}
         onEditCategoryClick={setEditingCategorySlug}
         onEditFeedTileClick={setEditingFeedTileKey}
-        activeCatalogBrowserCategoryId={activeCatalogBrowserCategoryId}
         selectedCategoryLabel={selectedCategoryLabel}
-        onCatalogCategoryTreeSelect={handleCatalogCategoryTreeSelect}
-        onClearCatalogCategoryTreeFilter={handleClearCatalogCategoryTreeFilter}
         activeCatalogFeedLabel={activeCatalogFeedLabel}
         onBackToCatalogLanding={handleBackToCatalogLanding}
         catalogGridSectionProps={catalogGridSectionProps}
@@ -100,9 +94,6 @@ export const useHomeCatalogSections = () => {
       handleCatalogCategoryGridClick,
       handleSellerPersonalCategoryTileClick,
       personalCategoryTiles,
-      handleCatalogCategoryTreeSelect,
-      handleClearCatalogCategoryTreeFilter,
-      activeCatalogBrowserCategoryId,
       selectedCategoryLabel,
       setEditingCategorySlug,
       setEditingFeedTileKey,

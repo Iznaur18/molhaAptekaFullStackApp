@@ -25,7 +25,7 @@ export const PRODUCT_PRICE_RUB_MAX_ERROR_MESSAGE =
 
 /**
  * Slug категории товара. Совпадает с клиентом `client/.../productConstants.js`.
- * `food`, `figures` — устаревшие значения enum до расширения списка (могут остаться в БД).
+ * `food` — устаревшее значение enum до расширения списка (может остаться в БД).
  */
 export const PRODUCT_CATEGORY_VALUES = [
   "grocery",
@@ -43,7 +43,6 @@ export const PRODUCT_CATEGORY_VALUES = [
   "books",
   "tourism_outdoors",
   "auto_parts",
-  "furniture",
   "hobby_crafts",
   "accessories",
   "jewelry",
@@ -56,5 +55,4 @@ export const PRODUCT_CATEGORY_VALUES = [
   "automobiles",
   "travel_services",
   "food",
-  "figures",
 ];

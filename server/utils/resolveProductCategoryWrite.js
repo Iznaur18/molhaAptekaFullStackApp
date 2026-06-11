@@ -130,7 +130,7 @@ export const resolveDefaultLeafIdForLegacyCategory = async (legacySlug) => {
  *
  * @param {string} legacySlug
  */
-const resolveProductCategoryWriteFromLegacySlugOnly = async (legacySlug) => {
+export const resolveProductCategoryWriteFromLegacySlugOnly = async (legacySlug) => {
   const productCategory = String(legacySlug).trim();
   if (!productCategory) {
     throw new Error("Указана неизвестная категория товара");

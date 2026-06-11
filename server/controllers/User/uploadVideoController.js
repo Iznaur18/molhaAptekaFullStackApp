@@ -8,7 +8,7 @@ export async function uploadVideoController(req, res) {
       return errorRes(
         res,
         400,
-        "Файл не загружен или тип не разрешён (только MP4, WebM)",
+        "Файл не загружен или тип не разрешён (только MP4, WebM, MOV, HEVC)",
       );
     }
 

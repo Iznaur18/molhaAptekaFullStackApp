@@ -1,12 +1,11 @@
 import { useNavigate } from "react-router-dom";
 
+import { HomeCuratedProductListsSection } from "../../../entities/curated-product-list/ui/HomeCuratedProductListsSection.jsx";
 import { RaffleFeaturedCarousel } from "../../../entities/raffle/ui/RaffleFeaturedCarousel.jsx";
 import { UserStoriesStrip } from "../../../entities/user-story/ui/UserStoriesStrip.jsx";
 import { CatalogCityFilterBanner } from "../../../entities/product/ui/CatalogCityFilterBanner.jsx";
 import { CatalogBrowserLanding } from "../../../entities/product-category-display/ui/CatalogBrowserLanding.jsx";
 import { CatalogSubcategoryPicker } from "../../../entities/product-category-display/ui/CatalogSubcategoryPicker.jsx";
-import { IS_CATALOG_BROWSER_SUBCATEGORY_FILTER_ENABLED } from "../../../entities/product-category-tree/lib/isCatalogBrowserSubcategoryFilterEnabled.js";
-import { CatalogBrowserTreeFilter } from "../../../entities/product-category-tree/ui/CatalogBrowserTreeFilter.jsx";
 import { buildRafflePath } from "../../../shared/lib/rafflePaths.js";
 import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
@@ -65,6 +64,8 @@ import { HomeCatalogGrid } from "./HomeCatalogGrid.jsx";
  *   sellerRaffleActive: boolean;
  *   onToggleRaffleParticipation: (productId: string, participate: boolean) => void;
  *   raffleParticipationPendingProductId: string | null;
+ *   homeCuratedProductLists: import('../../../entities/curated-product-list/model/types.js').HomeCuratedProductListFromApi[];
+ *   showCuratedProductLists: boolean;
  * }} props
  */
 export function AppShellCatalogGridSection({
@@ -117,6 +118,8 @@ export function AppShellCatalogGridSection({
   sellerRaffleActive,
   onToggleRaffleParticipation,
   raffleParticipationPendingProductId,
+  homeCuratedProductLists,
+  showCuratedProductLists,
 }) {
   const navigate = useNavigate();
 
@@ -152,6 +155,12 @@ export function AppShellCatalogGridSection({
           currentUserId={currentUserId}
           onRefresh={onUserStoriesRefresh}
           onOpenProfile={onSellerNameClick}
+        />
+      ) : null}
+      {showCuratedProductLists && homeCuratedProductLists.length > 0 ? (
+        <HomeCuratedProductListsSection
+          lists={homeCuratedProductLists}
+          onOpenProduct={onOpenProductDetails}
         />
       ) : null}
       {showCatalogCityFilterBanner && catalogCityFilterLabel && onShowAllCatalogCities ? (
@@ -228,10 +237,7 @@ export function AppShellCatalogGridSection({
  *   onCategoryClick: (item: import('../../../entities/product-category-display/model/types.js').ResolvedProductCategoryDisplay) => void;
  *   onEditCategoryClick: (slug: import('../../../entities/product/model/types.js').ProductCategory) => void;
  *   onEditFeedTileClick: (tileKey: string) => void;
- *   activeCatalogBrowserCategoryId: string | null;
  *   selectedCategoryLabel: string | null;
- *   onCatalogCategoryTreeSelect: (payload: { categoryId: string; categoryLabel: string }) => void;
- *   onClearCatalogCategoryTreeFilter: () => void;
  *   activeCatalogFeedLabel: string | null;
  *   onBackToCatalogLanding: () => void;
  *   catalogGridSectionProps: import('./AppShellCatalogSection.jsx').AppShellCatalogGridSection extends never ? never : Parameters<typeof AppShellCatalogGridSection>[0];
@@ -259,10 +265,7 @@ export function AppShellCatalogSection({
   onPersonalCategoryClick,
   onEditCategoryClick,
   onEditFeedTileClick,
-  activeCatalogBrowserCategoryId,
   selectedCategoryLabel,
-  onCatalogCategoryTreeSelect,
-  onClearCatalogCategoryTreeFilter,
   activeCatalogFeedLabel,
   onBackToCatalogLanding,
   catalogGridSectionProps,
@@ -343,14 +346,6 @@ export function AppShellCatalogSection({
             {HOME_PAGE_UI.BACK_TO_CATALOG_LANDING}
           </button>
         </div>
-        {IS_CATALOG_BROWSER_SUBCATEGORY_FILTER_ENABLED ? (
-          <CatalogBrowserTreeFilter
-            categoryId={activeCatalogBrowserCategoryId}
-            categoryLabel={selectedCategoryLabel}
-            onSelect={onCatalogCategoryTreeSelect}
-            onClear={onClearCatalogCategoryTreeFilter}
-          />
-        ) : null}
       </div>
       <AppShellCatalogGridSection {...catalogGridSectionProps} />
     </>

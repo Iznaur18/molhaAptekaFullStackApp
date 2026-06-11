@@ -189,6 +189,11 @@ export function AppShellProductModals({
               type="button"
               className="product-details-modal__footer-btn product-details-modal__footer-btn--report"
               disabled={catalogProductHasPendingReport}
+              aria-label={
+                catalogProductHasPendingReport
+                  ? PRODUCT_REPORT_MODAL_UI.ALREADY_REPORTED
+                  : PRODUCT_REPORT_MODAL_UI.REPORT_BUTTON
+              }
               onClick={() => {
                 if (!isAuthorized) {
                   setIsLoginModalOpen(true);

@@ -57,7 +57,8 @@ export const useHomeRouteGuards = ({
       mainView === "admin-orders" ||
       mainView === "search-synonyms-admin" ||
       mainView === "category-tree-admin" ||
-      mainView === "app-intro-admin";
+      mainView === "app-intro-admin" ||
+      mainView === "popular-products-admin";
 
     if ((requiresAdmin && !isAdmin) || (!requiresAdmin && !canModerateProducts)) {
       goToMainView("catalog");

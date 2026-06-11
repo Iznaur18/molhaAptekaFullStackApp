@@ -18,6 +18,8 @@ const MIME_BY_EXT = {
   ".webp": "image/webp",
   ".mp4": "video/mp4",
   ".webm": "video/webm",
+  ".mov": "video/quicktime",
+  ".m4v": "video/x-m4v",
 };
 
 /**

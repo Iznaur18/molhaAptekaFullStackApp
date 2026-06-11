@@ -1,6 +1,7 @@
 import { Outlet, useLocation } from "react-router-dom";
 
 import { CartServerSync } from "../../entities/cart/ui/CartServerSync.jsx";
+import { WishlistServerSync } from "../../entities/wishlist/ui/WishlistServerSync.jsx";
 import { EmailVerificationNotice } from "../../entities/user/ui/EmailVerificationNotice.jsx";
 import { SiteFooter } from "../../widgets/site-footer/ui/SiteFooter.jsx";
 import { getAppShellVariantClass } from "../lib/appShellVariant.js";
@@ -27,6 +28,7 @@ export function AppShellLayout() {
   return (
     <div className={`app-shell ${getAppShellVariantClass()}`}>
       <CartServerSync isAuthorized={isAuthorized} />
+      <WishlistServerSync isAuthorized={isAuthorized} />
       <AppShellHeader {...headerProps} />
 
       <EmailVerificationNotice

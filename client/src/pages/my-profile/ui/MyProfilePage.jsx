@@ -51,6 +51,7 @@ import "./MyProfilePage.css";
  * onSearchSynonymsAdminClick?: () => void;
  * onCategoryTreeAdminClick?: () => void;
  * onAppIntroAdminClick?: () => void;
+ * onPopularProductsAdminClick?: () => void;
  * onProductModerationClick?: () => void;
  * onProductReportsClick?: () => void;
  * onRafflesClick?: () => void;
@@ -75,6 +76,7 @@ import "./MyProfilePage.css";
  * pendingProductReportsCount?: number;
  * pendingDataConfirmationCount?: number;
  * onSubscriptionsClick?: () => void;
+ * onWishlistClick?: () => void;
  * activeTab?: string;
  * onTabChange?: (tab: string) => void;
  * tabContent?: import('react').ReactNode;
@@ -99,6 +101,7 @@ export function MyProfilePage({
   onSearchSynonymsAdminClick,
   onCategoryTreeAdminClick,
   onAppIntroAdminClick,
+  onPopularProductsAdminClick,
   onProductModerationClick,
   onProductReportsClick,
   onRafflesClick,
@@ -124,6 +127,7 @@ export function MyProfilePage({
   pendingRafflesCount = 0,
   pendingDataConfirmationCount = 0,
   onSubscriptionsClick,
+  onWishlistClick,
   activeTab = "overview",
   onTabChange,
   tabContent = null,
@@ -180,6 +184,11 @@ export function MyProfilePage({
     isProfileReady &&
     user?.userRole === "admin" &&
     Boolean(onAppIntroAdminClick);
+  const canUsePopularProductsAdmin =
+    !isRegularUser &&
+    isProfileReady &&
+    user?.userRole === "admin" &&
+    Boolean(onPopularProductsAdminClick);
   const isUserDataConfirmed = user?.isUserDataConfirmed === true;
   const canUseDataConfirmation = isProfileReady && Boolean(onDataConfirmationClick);
   const canUsePremium = isProfileReady && Boolean(onPremiumClick);
@@ -201,6 +210,7 @@ export function MyProfilePage({
   const canUseInstallmentDisputes =
     !isRegularUser && isProfileReady && Boolean(onInstallmentDisputesClick);
   const canUseSubscriptions = isProfileReady && Boolean(onSubscriptionsClick);
+  const canUseWishlist = isProfileReady && Boolean(onWishlistClick);
   const isMyProductsTab = activeTab === PROFILE_TAB_MY_PRODUCTS;
   const isFullWidthCatalogTab = isFullWidthCatalogProfileTab(activeTab);
   const canShowBackground =
@@ -234,7 +244,9 @@ export function MyProfilePage({
         canUseSearchSynonymsAdmin,
         canUseCategoryTreeAdmin,
         canUseAppIntroAdmin,
+        canUsePopularProductsAdmin,
         canUseSubscriptions,
+        canUseWishlist,
         canUseDataConfirmation,
         isUserDataConfirmed,
         canUsePremium,
@@ -275,7 +287,9 @@ export function MyProfilePage({
         onSearchSynonymsAdminClick,
         onCategoryTreeAdminClick,
         onAppIntroAdminClick,
+        onPopularProductsAdminClick,
         onSubscriptionsClick,
+        onWishlistClick,
         onDataConfirmationClick,
         onPremiumClick,
         onLoyaltyPointsClick,
@@ -286,6 +300,7 @@ export function MyProfilePage({
       canUseAdminOrders,
       canUseAuction,
       canUseAppIntroAdmin,
+      canUsePopularProductsAdmin,
       canUseCategoryTreeAdmin,
       canUseCreateRaffle,
       canUseDataConfirmation,
@@ -307,9 +322,11 @@ export function MyProfilePage({
       canUseRaffles,
       canUseSearchSynonymsAdmin,
       canUseSubscriptions,
+      canUseWishlist,
       onAdminOrdersClick,
       onAuctionClick,
       onAppIntroAdminClick,
+      onPopularProductsAdminClick,
       onCategoryTreeAdminClick,
       onCreateRaffleClick,
       onDataConfirmationClick,
@@ -333,6 +350,7 @@ export function MyProfilePage({
       onRafflesClick,
       onSearchSynonymsAdminClick,
       onSubscriptionsClick,
+      onWishlistClick,
       onTabChange,
       pendingDataConfirmationCount,
       pendingIncomingPriceOffersCount,

@@ -122,6 +122,12 @@ export const PRODUCT_FIELD_REGISTRY = {
     editKind: "computed",
     detailsTop: true,
   },
+  productWishlistCount: {
+    labelRu: "В желаниях",
+    readLayout: "stat",
+    editKind: "computed",
+    detailsTop: true,
+  },
   soldQuantity: {
     labelRu: "Продано",
     readLayout: "stat",
@@ -149,6 +155,7 @@ const DETAILS_TOP_ROW_ORDER = [
   "productStockQuantity",
   "soldQuantity",
   "uniqueViewerCount",
+  "productWishlistCount",
 ];
 
 const DETAILS_BOTTOM_ROW_ORDER = ["productDescription", "_id", "createdAt", "updatedAt"];

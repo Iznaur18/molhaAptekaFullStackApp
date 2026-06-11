@@ -1,3 +1,5 @@
+import path from "node:path";
+
 import express from "express";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
@@ -9,6 +11,7 @@ import {
   orderRouter,
   productRouter,
   cartRouter,
+  favoritesRouter,
   addressRouter,
   installmentRouter,
   priceOfferRouter,
@@ -25,6 +28,7 @@ import {
 import { buildApiHelmetOptions } from "./utils/buildApiHelmetOptions.js";
 import { buildHealthPayload } from "./utils/buildHealthPayload.js";
 import { resolveApiCorsMiddleware } from "./utils/resolveApiCorsMiddleware.js";
+import { resolveUploadContentType } from "./utils/resolveUploadContentType.js";
 import { UPLOADS_DIR } from "./utils/uploadsDir.js";
 
 export const createApp = () => {
@@ -48,11 +52,16 @@ export const createApp = () => {
   // Локальные файлы (UPLOAD_STORAGE=disk) и legacy после миграции на S3/CDN.
   app.use(
     "/uploads",
-    (_req, res, next) => {
-      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
-      next();
-    },
-    express.static(UPLOADS_DIR),
+    express.static(UPLOADS_DIR, {
+      setHeaders(res, filePath) {
+        res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+        res.setHeader("Accept-Ranges", "bytes");
+        res.setHeader(
+          "Content-Type",
+          resolveUploadContentType(path.basename(filePath)),
+        );
+      },
+    }),
   );
 
   app.use("/upload", uploadRouter);
@@ -61,6 +70,7 @@ export const createApp = () => {
   app.use("/user", userRouter);
   app.use("/order", orderRouter);
   app.use("/cart", cartRouter);
+  app.use("/favorites", favoritesRouter);
   app.use("/product", productRouter);
   app.use("/address", addressRouter);
   app.use("/installment", installmentRouter);

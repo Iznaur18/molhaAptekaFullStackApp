@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
 
 import { resolveAuctionUiState } from "../../lib/resolveAuctionUiState.js";
 import { resolveInstallmentUiState } from "../../../installment/lib/resolveInstallmentUiState.js";
@@ -94,16 +94,47 @@ export function useProductDetailsModalTabs({
     product,
   ]);
 
-  useEffect(() => {
-    if (!isOpen || !showProductDetailsTabs) return undefined;
+  useLayoutEffect(() => {
+    if (!isOpen || !showProductDetailsTabs) {
+      setTabPanelMinHeight(0);
+      return undefined;
+    }
+
     const panel = tabPanelRef.current;
     if (!panel) return undefined;
-    const nextHeight = panel.scrollHeight;
-    if (nextHeight > tabPanelMinHeight) {
-      setTabPanelMinHeight(nextHeight);
+
+    const measureNaturalHeight = () => {
+      const inlineMinHeight = panel.style.minHeight;
+      panel.style.removeProperty("min-height");
+      const naturalHeight = panel.scrollHeight;
+      if (inlineMinHeight) {
+        panel.style.minHeight = inlineMinHeight;
+      }
+      return naturalHeight;
+    };
+
+    const commitMaxHeight = (naturalHeight) => {
+      if (naturalHeight <= 0) {
+        return;
+      }
+      setTabPanelMinHeight((prev) => Math.max(prev, naturalHeight));
+    };
+
+    commitMaxHeight(measureNaturalHeight());
+
+    if (typeof ResizeObserver === "undefined") {
+      return undefined;
     }
-    return undefined;
-  }, [isOpen, showProductDetailsTabs, detailsTab, tabPanelMinHeight, product?._id, tabPanelRef]);
+
+    const observer = new ResizeObserver(() => {
+      commitMaxHeight(measureNaturalHeight());
+    });
+    observer.observe(panel);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [isOpen, showProductDetailsTabs, detailsTab, product?._id, tabPanelRef]);
 
   return {
     detailsTab,

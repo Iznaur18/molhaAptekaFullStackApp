@@ -7,8 +7,10 @@ import {
   FolderTree,
   Gavel,
   Gift,
+  Heart,
   LayoutDashboard,
   ListOrdered,
+  Star,
   LogOut,
   MessageSquareWarning,
   Megaphone,
@@ -38,6 +40,7 @@ export const PROFILE_NAV_ITEM_META = {
   "installment-payments": { icon: CreditCard, tone: "teal" },
   "installment-sales": { icon: Wallet, tone: "cyan" },
   subscriptions: { icon: Users, tone: "violet" },
+  wishlist: { icon: Heart, tone: "rose" },
   "data-confirmation": { icon: ShieldCheck, tone: "green" },
   premium: { icon: Crown, tone: "gold" },
   "loyalty-points": { icon: Sparkles, tone: "pink" },
@@ -56,6 +59,7 @@ export const PROFILE_NAV_ITEM_META = {
   "search-synonyms-admin": { icon: Search, tone: "sky" },
   "category-tree-admin": { icon: FolderTree, tone: "emerald" },
   "app-intro-admin": { icon: Clapperboard, tone: "violet" },
+  "popular-products-admin": { icon: Star, tone: "amber" },
   logout: { icon: LogOut, tone: "rose" },
 };
 

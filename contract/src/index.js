@@ -77,6 +77,7 @@ export {
   productCategorySlugParamsSchema,
   productCategoryIdParamsSchema,
   createProductCategoryAdminBodySchema,
+  deleteProductCategoryAdminBodySchema,
   patchProductCategoryAdminBodySchema,
 } from "./productCategoryAdmin.js";
 export {
@@ -84,6 +85,15 @@ export {
   createProductSearchSynonymBodySchema,
   patchProductSearchSynonymBodySchema,
 } from "./productSearchSynonym.js";
+export {
+  CURATED_PRODUCT_LIST_TITLE_MAX_LENGTH,
+  curatedProductListIdParamsSchema,
+  curatedProductListItemParamsSchema,
+  createCuratedProductListBodySchema,
+  patchCuratedProductListBodySchema,
+  reorderCuratedProductListsBodySchema,
+  addCuratedProductListItemBodySchema,
+} from "./curatedProductList.js";
 export { catalogFeedTileKeyParamsSchema } from "./catalogFeedTile.js";
 export {
   upsertProductInstallmentProgramBodySchema,
@@ -134,6 +144,11 @@ export {
   replaceCartBodySchema,
   replaceCartDataSchema,
 } from "./cart.js";
+export {
+  wishlistItemsRecordSchema,
+  replaceFavoritesBodySchema,
+  favoritesListDataSchema,
+} from "./favorites.js";
 export {
   ORDER_PAYMENT_METHODS,
   ORDER_STATUSES,

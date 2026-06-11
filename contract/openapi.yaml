@@ -332,7 +332,6 @@ components:
         - books
         - tourism_outdoors
         - auto_parts
-        - furniture
         - hobby_crafts
         - accessories
         - jewelry
@@ -345,7 +344,6 @@ components:
         - automobiles
         - travel_services
         - food
-        - figures
 
     ProductModerationStatus:
       type: string

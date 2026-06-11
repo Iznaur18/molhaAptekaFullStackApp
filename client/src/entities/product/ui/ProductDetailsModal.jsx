@@ -22,6 +22,7 @@ import "./ProductDetailsModal.css";
  *       uniqueViewerCount?: number;
  *       averageRating?: number;
  *       reviewCount?: number;
+ *       productWishlistCount?: number;
  *     },
  *   ) => void;
  *   adminFooter?: import('react').ReactNode;
@@ -100,8 +101,10 @@ export function ProductDetailsModal({
       {secondaryFooter}
     </div>
   ) : null;
+  const mobileReportOverlay =
+    isMobileNav && secondaryFooter && ctrl.detailsTab === "details" ? secondaryFooter : null;
   const hasMobileInlineActions =
-    isMobileNav && (secondaryFooter || adminFooter) && ctrl.detailsTab === "details";
+    isMobileNav && adminFooter && ctrl.detailsTab === "details";
   const isAltDetailsTab =
     ctrl.detailsTab === "reviews" ||
     ctrl.detailsTab === "auction" ||
@@ -160,6 +163,9 @@ export function ProductDetailsModal({
           isAuthorized={isAuthorized}
           isPremiumUser={isPremiumUser}
           onRequestLogin={onRequestLogin}
+          onProductStatsUpdate={onProductStatsUpdate}
+          currentUserId={currentUserId}
+          mobileReportOverlay={mobileReportOverlay}
           ctrl={ctrl}
         />
       </div>
@@ -167,7 +173,6 @@ export function ProductDetailsModal({
       {hasMobileInlineActions ? (
         <div className="product-details-modal__mobile-inline-actions">
           {adminFooter}
-          {secondaryFooter}
         </div>
       ) : null}
     </ProductModalShell>

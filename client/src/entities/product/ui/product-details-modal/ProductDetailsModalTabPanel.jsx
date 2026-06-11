@@ -10,6 +10,12 @@ import { ProductDetailsModalReviewsTab } from "./ProductDetailsModalReviewsTab.j
  *   isAuthorized: boolean;
  *   isPremiumUser?: boolean;
  *   onRequestLogin: () => void;
+ *   onProductStatsUpdate?: (
+ *     productId: string,
+ *     stats: { productWishlistCount?: number },
+ *   ) => void;
+ *   currentUserId?: string | null;
+ *   mobileReportOverlay?: import('react').ReactNode;
  *   ctrl: ReturnType<import('./useProductDetailsModalController.js').useProductDetailsModalController>;
  * }} props
  */
@@ -19,6 +25,9 @@ export function ProductDetailsModalTabPanel({
   isAuthorized,
   isPremiumUser = false,
   onRequestLogin,
+  onProductStatsUpdate,
+  currentUserId = null,
+  mobileReportOverlay = null,
   ctrl,
 }) {
   const {
@@ -106,6 +115,9 @@ export function ProductDetailsModalTabPanel({
         isAuthorized={isAuthorized}
         isPremiumUser={isPremiumUser}
         onRequestLogin={onRequestLogin}
+        onProductStatsUpdate={onProductStatsUpdate}
+        currentUserId={currentUserId}
+        mobileReportOverlay={mobileReportOverlay}
         ctrl={ctrl}
       />
       {isSellerView && auctionUi.showSellerArchive ? (

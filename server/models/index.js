@@ -4,6 +4,7 @@ import OrderModel from "./OrderModel.js";
 import ProductModel from "./ProductModel.js";
 import ProductViewModel from "./ProductViewModel.js";
 import CartModel from "./CartModel.js";
+import WishlistModel from "./WishlistModel.js";
 import ProductReportModel from "./ProductReportModel.js";
 import UserInAppNotificationModel from "./UserInAppNotificationModel.js";
 import UserDataConfirmationRequestModel from "./UserDataConfirmationRequestModel.js";
@@ -20,6 +21,7 @@ import ProductCategoryDisplayModel from "./ProductCategoryDisplayModel.js";
 import ProductCategoryModel from "./ProductCategoryModel.js";
 import ProductSearchSynonymModel from "./ProductSearchSynonymModel.js";
 import ProductCatalogFeedTileDisplayModel from "./ProductCatalogFeedTileDisplayModel.js";
+import CuratedProductListModel from "./CuratedProductListModel.js";
 import ProductInstallmentProgramModel from "./ProductInstallmentProgramModel.js";
 import InstallmentContractModel from "./InstallmentContractModel.js";
 import InstallmentDisputeModel from "./InstallmentDisputeModel.js";
@@ -35,6 +37,7 @@ export {
   ProductModel,
   ProductViewModel,
   CartModel,
+  WishlistModel,
   ProductReportModel,
   UserInAppNotificationModel,
   UserDataConfirmationRequestModel,
@@ -51,6 +54,7 @@ export {
   ProductCategoryModel,
   ProductSearchSynonymModel,
   ProductCatalogFeedTileDisplayModel,
+  CuratedProductListModel,
   ProductInstallmentProgramModel,
   InstallmentContractModel,
   InstallmentDisputeModel,

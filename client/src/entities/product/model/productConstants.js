@@ -33,7 +33,6 @@ export const PRODUCT_CATEGORY_PETS = "pets";
 export const PRODUCT_CATEGORY_BOOKS = "books";
 export const PRODUCT_CATEGORY_TOURISM_OUTDOORS = "tourism_outdoors";
 export const PRODUCT_CATEGORY_AUTO_PARTS = "auto_parts";
-export const PRODUCT_CATEGORY_FURNITURE = "furniture";
 export const PRODUCT_CATEGORY_HOBBY_CRAFTS = "hobby_crafts";
 export const PRODUCT_CATEGORY_ACCESSORIES = "accessories";
 export const PRODUCT_CATEGORY_JEWELRY = "jewelry";
@@ -47,8 +46,6 @@ export const PRODUCT_CATEGORY_AUTOMOBILES = "automobiles";
 export const PRODUCT_CATEGORY_TRAVEL_SERVICES = "travel_services";
 /** Устаревший slug (до расширения списка). */
 export const PRODUCT_CATEGORY_FOOD = "food";
-/** Устаревший slug (до расширения списка). */
-export const PRODUCT_CATEGORY_FIGURES = "figures";
 
 /** Порядок — для фильтра и формы создания товара. */
 export const PRODUCT_CATEGORIES = [
@@ -67,7 +64,6 @@ export const PRODUCT_CATEGORIES = [
   PRODUCT_CATEGORY_BOOKS,
   PRODUCT_CATEGORY_TOURISM_OUTDOORS,
   PRODUCT_CATEGORY_AUTO_PARTS,
-  PRODUCT_CATEGORY_FURNITURE,
   PRODUCT_CATEGORY_HOBBY_CRAFTS,
   PRODUCT_CATEGORY_ACCESSORIES,
   PRODUCT_CATEGORY_JEWELRY,
@@ -80,7 +76,6 @@ export const PRODUCT_CATEGORIES = [
   PRODUCT_CATEGORY_AUTOMOBILES,
   PRODUCT_CATEGORY_TRAVEL_SERVICES,
   PRODUCT_CATEGORY_FOOD,
-  PRODUCT_CATEGORY_FIGURES,
 ];
 
 /** Inline SVG — без сети, мгновенно в <img>. */
@@ -107,7 +102,6 @@ export const PRODUCT_CATEGORY_LABEL_RU = {
   [PRODUCT_CATEGORY_BOOKS]: "Книги",
   [PRODUCT_CATEGORY_TOURISM_OUTDOORS]: "Туризм, рыбалка, охота",
   [PRODUCT_CATEGORY_AUTO_PARTS]: "Автотовары",
-  [PRODUCT_CATEGORY_FURNITURE]: "Мебель",
   [PRODUCT_CATEGORY_HOBBY_CRAFTS]: "Хобби и творчество",
   [PRODUCT_CATEGORY_ACCESSORIES]: "Аксессуары",
   [PRODUCT_CATEGORY_JEWELRY]: "Ювелирные украшения",
@@ -120,7 +114,6 @@ export const PRODUCT_CATEGORY_LABEL_RU = {
   [PRODUCT_CATEGORY_AUTOMOBILES]: "Автомобили",
   [PRODUCT_CATEGORY_TRAVEL_SERVICES]: "Билеты, отели, туры",
   [PRODUCT_CATEGORY_FOOD]: "Продукты",
-  [PRODUCT_CATEGORY_FIGURES]: "Фигурки",
 };
 
 /** Верхняя граница `limit` в `server/controllers/Product/getProducts.js`. */

@@ -1,0 +1,52 @@
+.wishlist-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--iz-color-neutral-gray);
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.wishlist-toggle--card {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.45rem;
+  z-index: 2;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 88%);
+  box-shadow: 0 1px 4px rgb(15 23 42 / 12%);
+}
+
+.wishlist-toggle--card:hover {
+  color: var(--iz-color-danger-rose);
+  transform: scale(1.05);
+}
+
+.wishlist-toggle--inline {
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--iz-color-border-subtle);
+  border-radius: var(--iz-radius-input);
+  background: var(--iz-color-surface);
+}
+
+.wishlist-toggle--inline:hover {
+  color: var(--iz-color-danger-rose);
+  border-color: var(--iz-color-danger-rose);
+}
+
+.wishlist-toggle--active {
+  color: var(--iz-color-danger-rose);
+}
+
+.wishlist-toggle--active .wishlist-toggle__icon {
+  fill: currentColor;
+}

@@ -29,9 +29,10 @@ export const IMAGE_URL_FIELD_UI = {
 export const VIDEO_URL_FIELD_UI = {
   UPLOAD_BUTTON: "Выбрать файл",
   UPLOAD_LOADING: "Загрузка…",
-  UPLOAD_HINT: "MP4 или WebM, до 10 МБ. Можно также вставить прямую ссылку.",
-  ERROR_TYPE: "Допустимы только MP4 и WebM",
-  ERROR_SIZE: "Файл не больше 10 МБ",
+  UPLOAD_HINT:
+    "MP4, WebM, MOV или HEVC (iPhone), до 25 МБ. Можно также вставить прямую ссылку.",
+  ERROR_TYPE: "Допустимы только MP4, WebM, MOV и HEVC",
+  ERROR_SIZE: "Файл не больше 25 МБ",
   ERROR_GENERIC: "Не удалось загрузить видео",
   ERROR_AUTH: "Войдите в аккаунт, чтобы загрузить файл",
   FILE_INPUT_ARIA: "Выбрать видео с устройства",
@@ -40,7 +41,7 @@ export const VIDEO_URL_FIELD_UI = {
 /** Превью-видео на карточке товара (до 3 с, loop в каталоге). */
 export const PRODUCT_PREVIEW_VIDEO_UI = {
   LABEL: "Превью-видео (до 3 с, необязательно)",
-  HINT: "MP4 или WebM, не длиннее 3 секунд. Нужно хотя бы одно фото товара.",
+  HINT: "MP4, WebM, MOV или HEVC, не длиннее 3 секунд. Нужно хотя бы одно фото товара.",
   CLEAR_BUTTON: "Убрать видео",
   ERROR_DURATION: "Видео не длиннее 3 секунд",
   ERROR_READ: "Не удалось прочитать видео",
@@ -77,6 +78,8 @@ export const API_CLIENT_UI = {
   CREATE_ORDER_FALLBACK: "Не удалось оформить заказ",
   FETCH_CART_FALLBACK: "Не удалось загрузить корзину",
   REPLACE_CART_FALLBACK: "Не удалось сохранить корзину",
+  FETCH_WISHLIST_FALLBACK: "Не удалось загрузить список желаний",
+  REPLACE_WISHLIST_FALLBACK: "Не удалось сохранить список желаний",
   FETCH_MY_ORDERS_FALLBACK: "Не удалось загрузить ваши покупки",
   FETCH_MY_SALES_FALLBACK: "Не удалось загрузить ваши продажи",
   RECORD_PRODUCT_VIEW_FALLBACK: "Не удалось записать просмотр товара",
@@ -338,6 +341,8 @@ export const HOME_PAGE_UI = {
   NAV_TO_USERS: "Пользователи",
   NAV_TO_SUBSCRIPTIONS: "Подписки",
   TITLE_SUBSCRIPTIONS: "Подписки",
+  TITLE_WISHLIST: "Мои желания",
+  NAV_TO_WISHLIST: "Мои желания",
   TITLE_NOTIFICATIONS: "Уведомления",
   FILTER_FOLLOWING_ONLY: "Только от подписок",
   FILTER_AUCTION_ONLY: "Только с аукционом",
@@ -738,7 +743,7 @@ export const USER_STORY_UI = {
   CLOSE: "Закрыть",
   ERROR_GENERIC: "Не удалось выполнить действие",
   ERROR_VIDEO_TYPE: "Видео: только MP4 или WebM",
-  ERROR_VIDEO_SIZE: "Видео: не больше 5 МБ",
+  ERROR_VIDEO_SIZE: "Видео: не больше 25 МБ",
   ERROR_VIDEO_ASPECT: "Видео: только вертикальный формат 9:16",
   ERROR_VIDEO_READ: "Не удалось прочитать видео",
   ERROR_IMAGE: "Не удалось обработать фото",
@@ -877,6 +882,31 @@ export const USER_FOLLOW_BUTTON_UI = {
   UNFOLLOW: "Отписаться",
   LOADING: "…",
   ERROR: "Не удалось изменить подписку",
+};
+
+export const HEADER_WISHLIST_BUTTON_UI = {
+  ARIA: "Мои желания",
+  COUNT_ARIA: "Товаров в списке желаний",
+};
+
+export const WISHLIST_PAGE_UI = {
+  LOADING: "Загрузка списка…",
+  EMPTY: "Список пуст. Добавляйте товары из каталога.",
+  FETCH_FALLBACK: "Не удалось загрузить список желаний",
+  LOGIN_HINT: "Войдите, чтобы видеть «Мои желания».",
+  LOGIN_BUTTON: "Войти",
+  /** @param {string} title */
+  REMOVE_ARIA: (title) => `Убрать «${title}» из желаний`,
+};
+
+export const WISHLIST_TOGGLE_UI = {
+  ADD_ARIA: "Добавить в желания",
+  REMOVE_ARIA: "Убрать из желаний",
+};
+
+export const PRODUCT_WISHLIST_UI = {
+  /** @param {number} count */
+  PUBLIC_COUNT: (count) => `♥ ${count}`,
 };
 
 export const SUBSCRIPTIONS_PAGE_UI = {
@@ -1688,6 +1718,7 @@ export const MY_PROFILE_PAGE_UI = {
   TAB_BADGE: (count) => (count > 99 ? "99+" : String(count)),
   TAB_ADMIN_ORDERS: "Все заказы",
   TAB_SEARCH_SYNONYMS_ADMIN: "Синонимы поиска",
+  TAB_POPULAR_PRODUCTS_ADMIN: "Популярные товары",
   TAB_CATEGORY_TREE_ADMIN: "Категории",
   TAB_APP_INTRO_ADMIN: "Intro-ролик",
   TAB_PRODUCT_MODERATION: "На модерации",
@@ -1702,6 +1733,7 @@ export const MY_PROFILE_PAGE_UI = {
   TAB_INSTALLMENT_MODERATION: "Рассрочка — модерация",
   TAB_INSTALLMENT_DISPUTES: "Споры",
   TAB_SUBSCRIPTIONS: "Подписки",
+  TAB_WISHLIST: "Мои желания",
   DATA_CONFIRMATION: "Подтверждение данных",
   TAB_PREMIUM: "Премиум",
   TAB_LOYALTY_POINTS: "Баллы",
@@ -1800,6 +1832,43 @@ export const ADMIN_PANEL_UI = {
   COUNT_FILTERED: (shown, total) => `${shown} из ${total}`,
 };
 
+/** Компактная карточка в подборке на главной */
+export const CURATED_PRODUCT_COMPACT_CARD_UI = {
+  NO_IMAGE: "Нет фото",
+  /** @param {string} [name] */
+  OPEN_ARIA: (name) => `Открыть товар ${name ?? ""}`.trim(),
+};
+
+/** Админка: подборки товаров на главной */
+export const POPULAR_PRODUCTS_ADMIN_PAGE_UI = {
+  TITLE: "Популярные товары",
+  HINT: "Списки с заголовком и productId. На главной — только одобренные и доступные товары; недоступные удаляются автоматически.",
+  SEARCH_PLACEHOLDER: "Заголовок или productId…",
+  LOAD_ERROR: "Не удалось загрузить списки",
+  CREATE_ERROR: "Не удалось создать список",
+  SAVE_ERROR: "Не удалось сохранить заголовок",
+  DELETE_ERROR: "Не удалось удалить список",
+  REORDER_ERROR: "Не удалось изменить порядок",
+  ADD_ITEM_ERROR: "Не удалось добавить товар",
+  REMOVE_ITEM_ERROR: "Не удалось удалить товар",
+  EMPTY: "Списков нет — создайте первый",
+  CREATE_HEADING: "Новый список",
+  LIST_TITLE_LABEL: "Заголовок на главной",
+  TITLE_REQUIRED: "Укажите заголовок",
+  CREATE_LIST: "Создать список",
+  SAVE_TITLE: "Сохранить заголовок",
+  PRODUCT_ID_LABEL: "productId",
+  PRODUCT_ID_PLACEHOLDER: "MongoDB ObjectId товара",
+  PRODUCT_ID_REQUIRED: "Укажите productId",
+  ADD_PRODUCT: "Добавить товар",
+  REMOVE_PRODUCT: "Удалить",
+  DELETE_LIST: "Удалить список",
+  DELETE_LIST_CONFIRM: "Удалить список и все товары в нём?",
+  EMPTY_LIST: "В списке пока нет товаров",
+  MOVE_UP_ARIA: "Поднять список",
+  MOVE_DOWN_ARIA: "Опустить список",
+};
+
 /** Админка: синонимы умного поиска */
 export const SEARCH_SYNONYMS_ADMIN_PAGE_UI = {
   TITLE: "Синонимы поиска",
@@ -1864,6 +1933,10 @@ export const CATEGORY_TREE_ADMIN_PAGE_UI = {
   CANCEL_BUTTON: "Отмена",
   DELETE_BUTTON: "Удалить",
   DELETE_CONFIRM: "Удалить категорию? Должны отсутствовать дочерние узлы и товары.",
+  DELETE_REASSIGN_CONFIRM:
+    "{message}\n\nПереназначить товары на «{targetLabel}» и удалить?",
+  DELETE_DETACH_CONFIRM:
+    "{message}\n\nОтвязать товары от подкатегории (останется «{legacyLabel}») и удалить?",
 };
 
 /** Админ: настройка intro-ролика в профиле */

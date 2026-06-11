@@ -183,57 +183,6 @@ export function useCatalogBrowserLanding({
 
   const handleCatalogCategoryGridClick = subcategoryPicker.handleCatalogCategoryGridClick;
 
-  const handleCatalogCategoryTreeSelect = useCallback(
-    ({ categoryId, categoryLabel }) => {
-      const nextQuery = {
-        sort: catalogSort,
-        category: null,
-        categoryId,
-        sellerPersonalCategoryId: null,
-        followingOnly: catalogFollowingOnly,
-        auctionOnly: catalogAuctionOnly,
-        installmentOnly: catalogInstallmentOnly,
-        saleOnly: catalogSaleOnly,
-      };
-      setCategoryTreeLabel(categoryLabel);
-      applyCatalogQueryState(nextQuery);
-      navigate(buildCatalogBrowserLocation(nextQuery, { omitDefaultSort: false }));
-    },
-    [
-      applyCatalogQueryState,
-      catalogAuctionOnly,
-      catalogFollowingOnly,
-      catalogInstallmentOnly,
-      catalogSaleOnly,
-      catalogSort,
-      navigate,
-      setCategoryTreeLabel,
-    ],
-  );
-
-  const handleClearCatalogCategoryTreeFilter = useCallback(() => {
-    const nextQuery = {
-      sort: catalogSort,
-      category: null,
-      categoryId: null,
-      sellerPersonalCategoryId: null,
-      followingOnly: catalogFollowingOnly,
-      auctionOnly: catalogAuctionOnly,
-      installmentOnly: catalogInstallmentOnly,
-      saleOnly: catalogSaleOnly,
-    };
-    applyCatalogQueryState(nextQuery);
-    navigate(buildCatalogBrowserLocation(nextQuery, { omitDefaultSort: false }));
-  }, [
-    applyCatalogQueryState,
-    catalogAuctionOnly,
-    catalogFollowingOnly,
-    catalogInstallmentOnly,
-    catalogSaleOnly,
-    catalogSort,
-    navigate,
-  ]);
-
   const handleSellerPersonalCategoryTileClick = useCallback(
     (tile) => {
       if (!tile.sellerId) {
@@ -354,8 +303,6 @@ export function useCatalogBrowserLanding({
     handleCatalogCategoryGridClick,
     handleSellerPersonalCategoryTileClick,
     personalCategoryTiles,
-    handleCatalogCategoryTreeSelect,
-    handleClearCatalogCategoryTreeFilter,
     handleCatalogFeedTileClick,
     handleBackToCatalogLanding,
     handleCategoryDisplaySaved,

@@ -17,6 +17,14 @@ import {
   createProductSearchSynonymAdminController,
   patchProductSearchSynonymAdminController,
   deleteProductSearchSynonymAdminController,
+  getHomeCuratedProductListsController,
+  listCuratedProductListsAdminController,
+  createCuratedProductListAdminController,
+  reorderCuratedProductListsAdminController,
+  patchCuratedProductListAdminController,
+  deleteCuratedProductListAdminController,
+  addCuratedProductListItemAdminController,
+  removeCuratedProductListItemAdminController,
   getProductCatalogFeedTileDisplaysController,
   patchProductCatalogFeedTileDisplayController,
   getCatalogProductByIdController,
@@ -106,10 +114,17 @@ import {
   productCategorySlugParamValidation,
   productCategoryIdParamValidation,
   createProductCategoryAdminValidation,
+  deleteProductCategoryAdminValidation,
   patchProductCategoryAdminValidation,
   productSearchSynonymIdParamValidation,
   createProductSearchSynonymValidation,
   patchProductSearchSynonymValidation,
+  curatedProductListIdParamValidation,
+  curatedProductListProductIdParamValidation,
+  createCuratedProductListValidation,
+  patchCuratedProductListValidation,
+  reorderCuratedProductListsValidation,
+  addCuratedProductListItemValidation,
   patchProductCategoryDisplayValidation,
   patchProductCategoryNodeDisplayValidation,
   catalogFeedTileKeyParamValidation,
@@ -169,6 +184,59 @@ router.delete(
   deleteProductSearchSynonymAdminController,
 );
 router.get(
+  "/curated-lists/home",
+  checkOptionalAuthMW,
+  getHomeCuratedProductListsController,
+);
+router.get(
+  "/admin/curated-lists",
+  checkAuthMW,
+  checkAdminMW,
+  listCuratedProductListsAdminController,
+);
+router.post(
+  "/admin/curated-lists",
+  checkAuthMW,
+  checkAdminMW,
+  createCuratedProductListValidation,
+  createCuratedProductListAdminController,
+);
+router.patch(
+  "/admin/curated-lists/reorder",
+  checkAuthMW,
+  checkAdminMW,
+  reorderCuratedProductListsValidation,
+  reorderCuratedProductListsAdminController,
+);
+router.patch(
+  "/admin/curated-lists/:listId",
+  checkAuthMW,
+  checkAdminMW,
+  patchCuratedProductListValidation,
+  patchCuratedProductListAdminController,
+);
+router.delete(
+  "/admin/curated-lists/:listId",
+  checkAuthMW,
+  checkAdminMW,
+  curatedProductListIdParamValidation,
+  deleteCuratedProductListAdminController,
+);
+router.post(
+  "/admin/curated-lists/:listId/products",
+  checkAuthMW,
+  checkAdminMW,
+  addCuratedProductListItemValidation,
+  addCuratedProductListItemAdminController,
+);
+router.delete(
+  "/admin/curated-lists/:listId/products/:productId",
+  checkAuthMW,
+  checkAdminMW,
+  curatedProductListProductIdParamValidation,
+  removeCuratedProductListItemAdminController,
+);
+router.get(
   "/admin/categories",
   checkAuthMW,
   checkAdminMW,
@@ -194,6 +262,7 @@ router.delete(
   checkAuthMW,
   checkAdminMW,
   productCategoryIdParamValidation,
+  deleteProductCategoryAdminValidation,
   deleteProductCategoryAdminController,
 );
 router.patch(

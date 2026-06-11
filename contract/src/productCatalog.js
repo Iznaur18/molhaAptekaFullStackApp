@@ -30,7 +30,6 @@ export const PRODUCT_CATEGORY_SLUGS = [
   "books",
   "tourism_outdoors",
   "auto_parts",
-  "furniture",
   "hobby_crafts",
   "accessories",
   "jewelry",
@@ -43,7 +42,6 @@ export const PRODUCT_CATEGORY_SLUGS = [
   "automobiles",
   "travel_services",
   "food",
-  "figures",
 ];
 
 const optionalTruthyFlag = z.preprocess((value) => {

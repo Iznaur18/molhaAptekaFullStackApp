@@ -5,7 +5,6 @@ import {
   PRODUCT_CATEGORY_LABEL_RU_MAX_LENGTH,
   PRODUCT_CATEGORY_SLUG_MAX_LENGTH,
 } from "../../constants/productCategoryTreeConstants.js";
-import ProductCategoryDisplayModel from "../../models/ProductCategoryDisplayModel.js";
 import ProductCategoryModel from "../../models/ProductCategoryModel.js";
 import ProductModel from "../../models/ProductModel.js";
 import { ensureProductCategoryDisplayForSlug } from "../../utils/ensureProductCategoryDisplayForSlug.js";
@@ -13,6 +12,13 @@ import { computeProductCategoryNodePaths } from "../../utils/computeProductCateg
 import { normalizeProductCategorySearchKeywords } from "../../utils/normalizeProductCategorySearchKeywords.js";
 import { rebuildProductCategorySubtreePaths } from "../../utils/rebuildProductCategorySubtreePaths.js";
 import { syncProductsDenormForCategorySubtree } from "../../utils/syncProductsDenormForCategorySubtree.js";
+import {
+  cleanupProductCategoryDisplayForDeletedCategory,
+  detachProductsFromCategoryLeaf,
+  getProductCategoryDeleteBlocker,
+  reassignProductsFromCategoryLeaf,
+  syncParentLeafFlagAfterChildDelete,
+} from "../../utils/productCategoryDeleteHelpers.js";
 import { errorRes, successRes } from "../../utils/index.js";
 
 const CATEGORY_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -310,37 +316,51 @@ export async function deleteProductCategoryAdminController(req, res) {
       return errorRes(res, 404, "Категория не найдена");
     }
 
-    const childCount = await ProductCategoryModel.countDocuments({
-      parentId: doc._id,
-    });
-    if (childCount > 0) {
-      return errorRes(res, 400, "Сначала удалите дочерние категории");
+    const reassignProductCategoryId = String(
+      req.body?.reassignProductCategoryId ?? "",
+    ).trim();
+    const detachProducts = req.body?.detachProducts === true;
+
+    let blocker = await getProductCategoryDeleteBlocker(doc);
+    if (blocker?.code === "products" && doc.isLeaf === true) {
+      if (reassignProductCategoryId && detachProducts) {
+        return errorRes(
+          res,
+          400,
+          "Укажите либо перенос товаров, либо отвязку от дерева",
+        );
+      }
+
+      if (reassignProductCategoryId) {
+        const target = await ProductCategoryModel.findById(
+          reassignProductCategoryId,
+        ).lean();
+        if (!target || target.isLeaf !== true) {
+          return errorRes(res, 400, "Укажите конечную категорию для переноса товаров");
+        }
+        if (String(target._id) === categoryId) {
+          return errorRes(
+            res,
+            400,
+            "Категория переназначения совпадает с удаляемой",
+          );
+        }
+
+        await reassignProductsFromCategoryLeaf(categoryId, target._id);
+        blocker = await getProductCategoryDeleteBlocker(doc);
+      } else if (detachProducts) {
+        await detachProductsFromCategoryLeaf(doc);
+        blocker = await getProductCategoryDeleteBlocker(doc);
+      }
     }
 
-    const legacySlugs = new Set([doc.slug]);
-    if (typeof doc.legacyProductCategory === "string" && doc.legacyProductCategory.trim()) {
-      legacySlugs.add(doc.legacyProductCategory.trim());
-    }
-
-    const productCount = await ProductModel.countDocuments({
-      $or: [
-        { productCategoryId: doc._id },
-        ...(doc.parentId == null
-          ? [{ productCategory: { $in: [...legacySlugs] } }]
-          : []),
-      ],
-    });
-    if (productCount > 0) {
-      return errorRes(res, 400, "К категории привязаны товары");
+    if (blocker) {
+      return errorRes(res, 400, blocker.message);
     }
 
     await ProductCategoryModel.findByIdAndDelete(categoryId);
-
-    if (doc.parentId == null) {
-      await ProductCategoryDisplayModel.deleteMany({
-        categorySlug: { $in: [...legacySlugs] },
-      });
-    }
+    await cleanupProductCategoryDisplayForDeletedCategory(doc);
+    await syncParentLeafFlagAfterChildDelete(doc.parentId);
 
     successRes(res, { deletedId: categoryId });
   } catch (error) {

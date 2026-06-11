@@ -18,7 +18,6 @@ export const PRODUCT_CATEGORY_LABEL_RU = {
   books: "Книги",
   tourism_outdoors: "Туризм, рыбалка, охота",
   auto_parts: "Автотовары",
-  furniture: "Мебель",
   hobby_crafts: "Хобби и творчество",
   accessories: "Аксессуары",
   jewelry: "Ювелирные украшения",
@@ -31,7 +30,6 @@ export const PRODUCT_CATEGORY_LABEL_RU = {
   automobiles: "Автомобили",
   travel_services: "Билеты, отели, туры",
   food: "Продукты",
-  figures: "Фигурки",
 };
 
 /** Нормализованный label/slug → slug категории. */

@@ -8,6 +8,7 @@ import {
   ProductDiscountBadge,
   ProductPriceDisplay,
 } from "../ProductPriceDisplay.jsx";
+import { WishlistToggleButton } from "../../../../features/wishlist-toggle/ui/WishlistToggleButton.jsx";
 import { ProductDetailsModalPurchaseActions } from "./ProductDetailsModalPurchaseActions.jsx";
 import { renderProductDetailsFieldRows } from "./renderProductDetailsFieldRows.jsx";
 
@@ -18,6 +19,12 @@ import { renderProductDetailsFieldRows } from "./renderProductDetailsFieldRows.j
  *   isAuthorized: boolean;
  *   isPremiumUser?: boolean;
  *   onRequestLogin: () => void;
+ *   onProductStatsUpdate?: (
+ *     productId: string,
+ *     stats: { productWishlistCount?: number },
+ *   ) => void;
+ *   currentUserId?: string | null;
+ *   mobileReportOverlay?: import('react').ReactNode;
  *   ctrl: ReturnType<import('./useProductDetailsModalController.js').useProductDetailsModalController>;
  * }} props
  */
@@ -27,6 +34,9 @@ export function ProductDetailsModalDetailsTab({
   isAuthorized,
   isPremiumUser = false,
   onRequestLogin,
+  onProductStatsUpdate,
+  currentUserId = null,
+  mobileReportOverlay = null,
   ctrl,
 }) {
   const {
@@ -45,6 +55,7 @@ export function ProductDetailsModalDetailsTab({
     purchaseLimit,
     handleAuctionShortcutClick,
     handleInstallmentShortcutClick,
+    isOwnProduct,
   } = ctrl;
 
   return (
@@ -57,6 +68,26 @@ export function ProductDetailsModalDetailsTab({
           resetToken={product._id}
           onLightboxOpenChange={setGalleryLightboxOpen}
           onBack={fieldHandlers.onClose}
+          heroOverlay={
+            <>
+              {!isOwnProduct ? (
+                <WishlistToggleButton
+                  productId={String(product._id)}
+                  product={product}
+                  isAuthorized={isAuthorized}
+                  onRequestLogin={onRequestLogin}
+                  currentUserId={currentUserId}
+                  onProductStatsUpdate={onProductStatsUpdate}
+                  variant="card"
+                />
+              ) : null}
+              {mobileReportOverlay ? (
+                <div className="product-media-gallery-readonly__report-slot">
+                  {mobileReportOverlay}
+                </div>
+              ) : null}
+            </>
+          }
         />
         <div className="product-details-modal__spec">
           {showPriceBlock ? (

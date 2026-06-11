@@ -1,7 +1,6 @@
-import {
-  UPLOAD_VIDEO_MAX_BYTES,
-  UPLOAD_VIDEO_MIME_TYPES,
-} from "../../../shared/config/uploadConstants.js";
+import { UPLOAD_VIDEO_MAX_BYTES } from "../../../shared/config/uploadConstants.js";
+import { buildUploadVideoSizeError } from "../../../shared/lib/formatUploadBytesAsMb.js";
+import { isAllowedUploadVideoFile } from "../../../shared/lib/isAllowedUploadVideoFile.js";
 import { USER_STORY_UI } from "../../../shared/config/appUiCopy.js";
 import { USER_STORY_ASPECT_RATIO } from "../model/constants.js";
 
@@ -12,12 +11,12 @@ const ASPECT_TOLERANCE = 0.06;
  * @returns {Promise<string | null>}
  */
 export async function validateStoryVideoFile(file) {
-  if (!UPLOAD_VIDEO_MIME_TYPES.includes(file.type)) {
+  if (!isAllowedUploadVideoFile(file)) {
     return USER_STORY_UI.ERROR_VIDEO_TYPE;
   }
 
   if (file.size > UPLOAD_VIDEO_MAX_BYTES) {
-    return USER_STORY_UI.ERROR_VIDEO_SIZE;
+    return buildUploadVideoSizeError(file.size, UPLOAD_VIDEO_MAX_BYTES);
   }
 
   try {

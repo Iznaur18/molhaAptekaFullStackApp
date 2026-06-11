@@ -20,7 +20,7 @@ const createDiskStorage = () => {
       }
     },
     filename: (_req, file, cb) => {
-      cb(null, buildUploadFilename(file.mimetype));
+      cb(null, buildUploadFilename(file));
     },
   });
 };

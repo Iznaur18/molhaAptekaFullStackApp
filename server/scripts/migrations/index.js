@@ -25,6 +25,7 @@ import { up as productPromotionTiersResetUp } from "./20260613-product-promotion
 import { up as normalizeProductUploadUrlsUp } from "./20260614-normalize-product-upload-urls.js";
 import { up as productCategoryRootsUp } from "./20260615-product-category-roots.js";
 import { up as productCategoryDisplayNodeIndexesUp } from "./20260616-product-category-display-node-indexes.js";
+import { up as removeFurnitureFiguresCategoriesUp } from "./20260617-remove-furniture-figures-categories.js";
 
 export const MIGRATIONS = [
   {
@@ -161,5 +162,10 @@ export const MIGRATIONS = [
     id: "20260616-product-category-display-node-indexes",
     description: "Recreate sparse ProductCategoryDisplay indexes for node overrides",
     up: productCategoryDisplayNodeIndexesUp,
+  },
+  {
+    id: "20260617-remove-furniture-figures-categories",
+    description: "Remove furniture and figures from ProductCategory tree and displays",
+    up: removeFurnitureFiguresCategoriesUp,
   },
 ];

@@ -75,6 +75,11 @@ export const LazyAppIntroAdminPage = lazyNamedExport(
   "AppIntroAdminPage",
 );
 
+export const LazyPopularProductsAdminPage = lazyNamedExport(
+  () => import("../../pages/popular-products-admin/ui/PopularProductsAdminPage.jsx"),
+  "PopularProductsAdminPage",
+);
+
 export const LazyCartPage = lazyNamedExport(
   () => import("../../pages/cart/ui/CartPage.jsx"),
   "CartPage",
@@ -98,6 +103,11 @@ export const LazyUsersPage = lazyNamedExport(
 export const LazySubscriptionsPage = lazyNamedExport(
   () => import("../../pages/subscriptions/ui/SubscriptionsPage.jsx"),
   "SubscriptionsPage",
+);
+
+export const LazyWishlistPage = lazyNamedExport(
+  () => import("../../pages/wishlist/ui/WishlistPage.jsx"),
+  "WishlistPage",
 );
 
 export const LazyNotificationsPage = lazyNamedExport(

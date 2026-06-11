@@ -1,5 +1,6 @@
 import {
   createProductCategoryAdminBodySchema,
+  deleteProductCategoryAdminBodySchema,
   patchProductCategoryAdminBodySchema,
 } from "@molha/api-contract";
 
@@ -11,4 +12,8 @@ export const createProductCategoryAdminValidation = [
 
 export const patchProductCategoryAdminValidation = [
   validateBodyZod(patchProductCategoryAdminBodySchema),
+];
+
+export const deleteProductCategoryAdminValidation = [
+  validateBodyZod(deleteProductCategoryAdminBodySchema),
 ];

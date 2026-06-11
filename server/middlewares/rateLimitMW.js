@@ -175,6 +175,20 @@ export function initRateLimitMiddlewares(store) {
     store,
   );
 
+  handlers.favoritesReplace = buildLimiter(
+    {
+      ...RATE_LIMIT_DEFAULTS,
+      windowMs: 15 * 60 * 1000,
+      max: 400,
+      keyGenerator: rateLimitKeyByUserOrIp,
+      message: {
+        success: false,
+        message: "Слишком много обновлений списка желаний. Попробуйте позже",
+      },
+    },
+    store,
+  );
+
   handlers.productReport = buildLimiter(
     {
       ...RATE_LIMIT_DEFAULTS,
@@ -306,6 +320,9 @@ export const orderItemActionRateLimiter = (req, res, next) =>
 /** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
 export const cartReplaceRateLimiter = (req, res, next) =>
   handlers.cartReplace(req, res, next);
+
+export const favoritesReplaceRateLimiter = (req, res, next) =>
+  handlers.favoritesReplace(req, res, next);
 
 /** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
 export const productReportRateLimiter = (req, res, next) =>

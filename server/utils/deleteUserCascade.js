@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 
 import { normalizeStoredCartItems } from "../controllers/Cart/cartItemHelpers.js";
+import {
+  deleteUserWishlistAndDecrementCounts,
+  removeProductIdsFromAllWishlists,
+} from "../controllers/Favorites/favoritesItemHelpers.js";
 import { CartModel, ProductModel, ProductViewModel } from "../models/index.js";
 import { getProductIdsWithOpenSales } from "./productOrderLocks.js";
 
@@ -45,7 +49,7 @@ async function removeProductIdsFromAllCarts(productIds) {
  * Удаляет все товары продавца, просмотры, чистит чужие корзины и корзину продавца.
  *
  * @param {string | import('mongoose').Types.ObjectId} sellerId
- * @returns {Promise<{ deletedProductCount: number; updatedCarts: number }>}
+ * @returns {Promise<{ deletedProductCount: number; updatedCarts: number; updatedWishlists: number }>}
  */
 export async function deleteSellerProductsAndRelatedData(sellerId) {
   const sellerObjectId = new mongoose.Types.ObjectId(String(sellerId));
@@ -71,15 +75,19 @@ export async function deleteSellerProductsAndRelatedData(sellerId) {
     await ProductModel.deleteMany({ productSeller: sellerObjectId });
 
     const updatedCarts = await removeProductIdsFromAllCarts(productIds);
+    const updatedWishlists = await removeProductIdsFromAllWishlists(productIds);
     await CartModel.deleteOne({ userId: sellerObjectId });
+    await deleteUserWishlistAndDecrementCounts(sellerObjectId);
 
     return {
       deletedProductCount: productIds.length,
       updatedCarts,
+      updatedWishlists,
     };
   }
 
   await CartModel.deleteOne({ userId: sellerObjectId });
+  await deleteUserWishlistAndDecrementCounts(sellerObjectId);
 
-  return { deletedProductCount: 0, updatedCarts: 0 };
+  return { deletedProductCount: 0, updatedCarts: 0, updatedWishlists: 0 };
 }

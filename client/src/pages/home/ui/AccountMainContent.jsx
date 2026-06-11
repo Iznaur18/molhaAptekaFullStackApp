@@ -27,6 +27,7 @@ export function AccountMainContent({
   mainView,
   activeProfileTab,
   currentUserId,
+  isPremiumUser = false,
   isAdmin,
   canModerateProducts,
   myProfilePage,
@@ -63,6 +64,7 @@ export function AccountMainContent({
   handleSearchSynonymsAdminFromProfile,
   handleCategoryTreeAdminFromProfile,
   handleAppIntroAdminFromProfile,
+  handlePopularProductsAdminFromProfile,
   handleProductModerationFromProfile,
   handleProductReportsFromProfile,
   handleRafflesFromProfile,
@@ -77,6 +79,7 @@ export function AccountMainContent({
   handleIntroAdModerationFromProfile,
   handleSellerPersonalCategoryModerationFromProfile,
   handleSubscriptionsFromProfile,
+  handleWishlistFromProfile,
   refreshUserProfileActionBadgeCounts,
   refreshPendingModerationCount,
   refreshPendingIntroAdModerationCount,
@@ -110,6 +113,7 @@ export function AccountMainContent({
     const profileTabPanelProps = {
       isAuthorized,
       currentUserId,
+      isPremiumUser,
       onRequestLogin,
       onSellerNameClick,
       onCatalogProductClick,
@@ -181,6 +185,9 @@ export function AccountMainContent({
         onAppIntroAdminClick={
           isAdmin ? handleAppIntroAdminFromProfile : undefined
         }
+        onPopularProductsAdminClick={
+          isAdmin ? handlePopularProductsAdminFromProfile : undefined
+        }
         onProductModerationClick={
           canModerateProducts ? handleProductModerationFromProfile : undefined
         }
@@ -208,6 +215,7 @@ export function AccountMainContent({
             : undefined
         }
         onSubscriptionsClick={isAuthorized ? handleSubscriptionsFromProfile : undefined}
+        onWishlistClick={isAuthorized ? handleWishlistFromProfile : undefined}
         pendingModerationCount={pendingModerationCount}
         pendingIntroAdModerationCount={pendingIntroAdModerationCount}
         pendingSellerPersonalCategoryModerationCount={

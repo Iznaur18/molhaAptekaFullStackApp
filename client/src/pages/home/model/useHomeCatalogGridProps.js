@@ -56,6 +56,8 @@ export const useHomeCatalogGridProps = () => {
     handleShowAllCatalogCities,
     sellerRaffleActive,
     raffleParticipationPendingProductId,
+    homeCuratedProductLists,
+    showCuratedProductLists,
   } = ctx;
 
   const catalogCityFilterLabel = String(authUser?.userAddressCity ?? "").trim();
@@ -122,6 +124,8 @@ export const useHomeCatalogGridProps = () => {
         !catalogSaleOnly,
       sellerRaffleActive,
       raffleParticipationPendingProductId,
+      homeCuratedProductLists,
+      showCuratedProductLists,
     }),
     [
       catalogStatus,
@@ -173,6 +177,8 @@ export const useHomeCatalogGridProps = () => {
       authUser,
       sellerRaffleActive,
       raffleParticipationPendingProductId,
+      homeCuratedProductLists,
+      showCuratedProductLists,
     ],
   );
 };

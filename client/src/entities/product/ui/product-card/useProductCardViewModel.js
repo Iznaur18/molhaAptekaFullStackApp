@@ -101,6 +101,7 @@ export function useProductCardViewModel(props) {
     onOpenDetails,
     isAuthorized,
     isPremiumUser,
+    currentUserId,
     onRequestLoginAddToCart,
     isMineMode,
     isModerationQueue,

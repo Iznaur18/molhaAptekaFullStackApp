@@ -27,7 +27,6 @@ export const PRODUCT_SEARCH_SYNONYM_TOKENS_SEED = {
   ноутбук: { categories: ["electronics", "appliances"] },
   одежда: { categories: ["clothing"] },
   обувь: { categories: ["footwear"] },
-  мебель: { categories: ["furniture"] },
   книга: { categories: ["books"] },
   книги: { categories: ["books"] },
   игрушки: { categories: ["kids", "games"] },

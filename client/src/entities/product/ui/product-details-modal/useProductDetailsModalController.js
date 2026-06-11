@@ -109,7 +109,11 @@ export function useProductDetailsModalController({
           onSellerNameClick(userId);
         }
       : undefined;
-  const topStatFieldKeys = topRowFieldKeys.filter((key) => key !== "productPrice");
+  const topStatFieldKeys = topRowFieldKeys.filter(
+    (key) =>
+      key !== "productPrice" &&
+      !(tabs.isOwnProduct && key === "productWishlistCount"),
+  );
   const bottomBlockFieldKeys = bottomRowFieldKeys.filter(
     (key) => getProductFieldReadLayout(key) === "block",
   );

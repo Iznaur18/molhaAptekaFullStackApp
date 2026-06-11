@@ -19,6 +19,7 @@ import {
 import { cancelProductPromotionsForProduct } from "../../utils/productPromotionHelpers.js";
 import { deleteUploadFileByUrl } from "../../utils/deleteUploadFileByUrl.js";
 import { normalizeProductPreviewVideoUrl } from "../../utils/productPreviewVideo.js";
+import { removeProductIdsFromAllWishlists } from "../Favorites/favoritesItemHelpers.js";
 import { errorRes, successRes } from "../../utils/index.js";
 
 /** Удаление своего товара или любого (admin). DELETE /product/:productId */
@@ -43,6 +44,7 @@ export const deleteMyProductController = async (req, res) => {
     const deleted = await ProductModel.findOneAndDelete(ownerFilter).lean();
 
     if (deleted) {
+      await removeProductIdsFromAllWishlists([String(productId)]);
       const previewVideoUrl = normalizeProductPreviewVideoUrl(
         deleted.productPreviewVideoUrl,
       );

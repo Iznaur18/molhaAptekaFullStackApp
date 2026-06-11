@@ -9,6 +9,7 @@ import { EMPTY_MY_PROFILE_PAGE } from "../lib/catalogShellConstants.js";
  */
 export const useHomeLogout = ({
   flushRemoteCart,
+  flushRemoteWishlist,
   navigate,
   clearAuthSession,
   setMyProfilePage,
@@ -19,6 +20,7 @@ export const useHomeLogout = ({
 
   return useCallback(async () => {
     await flushRemoteCart();
+    await flushRemoteWishlist();
     await logoutMutation.mutateAsync();
     try {
       localStorage.removeItem(CART_STORAGE_KEY);
@@ -34,6 +36,7 @@ export const useHomeLogout = ({
     clearAuthSession,
     clearInAppNotifications,
     flushRemoteCart,
+    flushRemoteWishlist,
     logoutMutation,
     navigate,
     setIsEditProfileOpen,

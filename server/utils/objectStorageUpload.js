@@ -10,6 +10,7 @@ import {
   UPLOAD_STORAGE_S3,
 } from "../constants/uploadStorageConstants.js";
 import { buildUploadFilename } from "./buildUploadFilename.js";
+import { resolveUploadContentType } from "./resolveUploadContentType.js";
 
 /**
  * @returns {boolean}
@@ -55,7 +56,7 @@ export const resolveUploadFilename = (file) => {
   if (existing) {
     return existing;
   }
-  return buildUploadFilename(file?.mimetype);
+  return buildUploadFilename(file);
 };
 
 /**
@@ -80,7 +81,7 @@ export const persistUploadToObjectStorage = async (file) => {
       Bucket: bucket,
       Key: key,
       Body: body,
-      ContentType: file.mimetype || "application/octet-stream",
+      ContentType: resolveUploadContentType(filename, file.mimetype),
     }),
   );
 

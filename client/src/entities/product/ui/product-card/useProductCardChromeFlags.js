@@ -71,6 +71,7 @@ export function useProductCardChromeFlags(props, currentUserId) {
     promotionTier === PRODUCT_PROMOTION_TIER_BANNER;
   const showImageOverlayBadges =
     !showBannerLayout && (showDiscountBadge || showLoyaltyPointsBadge);
+  const showWishlistToggle = !isMineMode && !isModerationQueue;
   const showRaffleParticipantChrome =
     (highlightRaffleProduct || showRaffleBadge) && !isMineMode && !isModerationQueue;
 
@@ -136,6 +137,7 @@ export function useProductCardChromeFlags(props, currentUserId) {
     showInstallmentBadge,
     showBannerLayout,
     showImageOverlayBadges,
+    showWishlistToggle,
     showAddToCartButton,
     showFooterActions,
     showBannerActions,

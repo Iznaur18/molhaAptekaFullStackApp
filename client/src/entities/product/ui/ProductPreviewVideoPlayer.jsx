@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { resolvePreviewVideoMimeType } from "../../../shared/lib/resolvePreviewVideoMimeType.js";
 import { useProductPreviewVideoPlayback } from "../lib/useProductPreviewVideoPlayback.js";
 
 import "./ProductPreviewVideoPlayer.css";
@@ -43,14 +44,15 @@ export function ProductPreviewVideoPlayer({
       <video
         ref={videoRef}
         className="product-preview-video__el"
-        src={src}
         muted
         loop
         playsInline
         preload="metadata"
         aria-hidden="true"
         onError={handleError}
-      />
+      >
+        <source src={src} type={resolvePreviewVideoMimeType(src)} />
+      </video>
     </div>
   );
 }

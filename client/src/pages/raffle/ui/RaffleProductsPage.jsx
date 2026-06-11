@@ -85,6 +85,7 @@ export function RaffleProductsPage({
         isAuthorized={isAuthorized}
         currentUserId={currentUserId}
         onRequestLoginAddToCart={onRequestLoginAddToCart}
+        showAddToCartOnCard={false}
         catalogSentinelRef={{ current: null }}
         catalogHasMore={false}
         isCatalogLoadingMore={false}

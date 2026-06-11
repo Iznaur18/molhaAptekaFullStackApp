@@ -76,6 +76,50 @@
     -webkit-backdrop-filter: blur(8px);
   }
 
+  .product-details-modal .product-media-gallery-readonly__report-slot {
+    position: absolute;
+    left: 0.65rem;
+    bottom: 0.65rem;
+    z-index: 3;
+  }
+
+  .product-details-modal
+    .product-media-gallery-readonly__report-slot
+    .product-details-modal__footer-btn--report {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    flex: 0 0 auto;
+    border: none;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--iz-color-canvas) 92%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: var(--iz-color-danger-strong);
+    font-size: 0;
+    line-height: 0;
+    box-shadow: 0 1px 4px color-mix(in srgb, var(--iz-color-ink) 14%, transparent);
+  }
+
+  .product-details-modal
+    .product-media-gallery-readonly__report-slot
+    .product-details-modal__footer-btn--report:hover:not(:disabled) {
+    border: none;
+    background: var(--iz-color-canvas);
+    color: var(--iz-color-danger-strong);
+  }
+
+  .product-details-modal
+    .product-media-gallery-readonly__report-slot
+    .product-details-modal__footer-btn--report:disabled {
+    opacity: 0.55;
+  }
+
   .product-details-modal .product-media-gallery-readonly__thumbs {
     padding: 0 var(--iz-space-3);
   }
@@ -120,7 +164,7 @@
     font-size: 1.85rem;
     font-weight: 800;
     letter-spacing: -0.03em;
-    color: var(--iz-color-success-strong, var(--iz-color-link-hover));
+    color: var(--iz-color-link);
   }
 
   .product-details-modal__price-display .product-price-display__old {
@@ -173,25 +217,6 @@
     justify-content: center;
     gap: 0.45rem;
     padding: 0.25rem var(--iz-space-4) 0.75rem;
-  }
-
-  .product-details-modal__mobile-inline-actions .product-details-modal__footer-btn--report {
-    flex: 0 0 auto;
-    min-width: 0;
-    padding: 0.3rem 0.55rem;
-    border: none;
-    background: transparent;
-    font-size: 0.78rem;
-    font-weight: 500;
-    color: color-mix(in srgb, var(--iz-color-text) 52%, transparent);
-    box-shadow: none;
-  }
-
-  .product-details-modal__mobile-inline-actions
-    .product-details-modal__footer-btn--report:hover:not(:disabled) {
-    border: none;
-    background: transparent;
-    color: var(--iz-color-danger-strong);
   }
 
   .product-details-modal__mobile-inline-actions .product-details-modal__footer-btn--edit {

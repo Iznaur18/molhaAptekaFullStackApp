@@ -12,6 +12,8 @@ import { productRouter } from "./productRouter.js";
 
 import { cartRouter } from "./cartRouter.js";
 
+import { favoritesRouter } from "./favoritesRouter.js";
+
 import { addressRouter } from "./addressRouter.js";
 
 import { installmentRouter } from "./installmentRouter.js";
@@ -30,6 +32,7 @@ export {
   orderRouter,
   productRouter,
   cartRouter,
+  favoritesRouter,
   addressRouter,
   installmentRouter,
   priceOfferRouter,

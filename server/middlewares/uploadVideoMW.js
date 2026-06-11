@@ -1,19 +1,11 @@
 import multer from "multer";
 
-import {
-  UPLOAD_VIDEO_MAX_BYTES,
-  UPLOAD_VIDEO_MIME_TYPES,
-} from "../constants/uploadConstants.js";
+import { UPLOAD_VIDEO_MAX_BYTES } from "../constants/uploadConstants.js";
+import { isAllowedUploadVideoFile } from "../utils/isAllowedUploadVideoFile.js";
 import { storage } from "./uploadStorage.js";
 
-const videoMimeSet = new Set(UPLOAD_VIDEO_MIME_TYPES);
-
 export const videoFileFilter = (_req, file, cb) => {
-  if (videoMimeSet.has(file.mimetype)) {
-    cb(null, true);
-    return;
-  }
-  cb(null, false);
+  cb(null, isAllowedUploadVideoFile(file));
 };
 
 export const uploadVideoMW = multer({

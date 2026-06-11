@@ -24,7 +24,9 @@ import {
   PROFILE_TAB_RAFFLES,
   PROFILE_TAB_SEARCH_SYNONYMS_ADMIN,
   PROFILE_TAB_APP_INTRO_ADMIN,
+  PROFILE_TAB_POPULAR_PRODUCTS_ADMIN,
   PROFILE_TAB_SUBSCRIPTIONS,
+  PROFILE_TAB_WISHLIST,
 } from "./profileTabs.js";
 
 /** @typedef {import("../../../shared/lib/homeMainViewPaths.js").HomeMainView} HomeMainView */
@@ -37,6 +39,7 @@ export const PROFILE_TAB_TO_MAIN_VIEW = {
   [PROFILE_TAB_MY_ORDERS]: "my-orders",
   [PROFILE_TAB_AUCTION]: "auction",
   [PROFILE_TAB_SUBSCRIPTIONS]: "subscriptions",
+  [PROFILE_TAB_WISHLIST]: "wishlist",
   [PROFILE_TAB_DATA_CONFIRMATION]: "data-confirmation",
   [PROFILE_TAB_PREMIUM]: "premium",
   [PROFILE_TAB_LOYALTY_POINTS]: "loyalty-points",
@@ -45,6 +48,7 @@ export const PROFILE_TAB_TO_MAIN_VIEW = {
   [PROFILE_TAB_SEARCH_SYNONYMS_ADMIN]: "search-synonyms-admin",
   [PROFILE_TAB_CATEGORY_TREE_ADMIN]: "category-tree-admin",
   [PROFILE_TAB_APP_INTRO_ADMIN]: "app-intro-admin",
+  [PROFILE_TAB_POPULAR_PRODUCTS_ADMIN]: "popular-products-admin",
   [PROFILE_TAB_PRODUCT_MODERATION]: "product-moderation",
   [PROFILE_TAB_INTRO_AD_MODERATION]: "intro-ad-moderation",
   [PROFILE_TAB_SELLER_PERSONAL_CATEGORY_MODERATION]:

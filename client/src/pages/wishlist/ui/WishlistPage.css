@@ -1,0 +1,35 @@
+.wishlist-page {
+  width: 100%;
+  min-width: 0;
+}
+
+.wishlist-page__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wishlist-page__state,
+.wishlist-page__hint {
+  margin: 0;
+  padding: 0.35rem 0;
+  color: var(--iz-color-text-muted);
+}
+
+.wishlist-page__state_error {
+  color: var(--iz-color-danger-rose);
+}
+
+.wishlist-page__login {
+  margin-top: 0.5rem;
+  padding: 0.55rem 1rem;
+  border: 1px solid var(--iz-color-primary);
+  border-radius: var(--iz-radius-input);
+  background: var(--iz-color-primary);
+  color: var(--iz-color-on-contrast);
+  font: inherit;
+  cursor: pointer;
+}

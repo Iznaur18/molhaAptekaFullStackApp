@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { useCart } from "../../entities/cart/model/useCart.js";
+import { useWishlist } from "../../entities/wishlist/model/useWishlist.js";
 import { useHomeCatalogSections } from "../../pages/home/model/useHomeCatalogSections.jsx";
 import { AppShellCatalogSectionsProvider } from "../model/AppShellCatalogSectionsContext.jsx";
 import { AppShellStateProvider } from "../model/AppShellStateContext.jsx";
@@ -38,11 +39,12 @@ function AppShellCatalogSectionsBridge({ children }) {
  */
 export function AppShellRoot() {
   const { flushRemoteCart } = useCart();
+  const { flushRemoteWishlist } = useWishlist();
   const location = useLocation();
   const navigate = useNavigate();
 
   const shell = useAppShellState(location, navigate);
-  const domain = useAppShellDomain(shell, flushRemoteCart, location, navigate);
+  const domain = useAppShellDomain(shell, flushRemoteCart, flushRemoteWishlist, location, navigate);
 
   const appShellStateValue = useMemo(
     () => ({ ...shell, ...domain }),

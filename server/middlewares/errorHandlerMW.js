@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import { AppError } from "../errors/AppError.js";
 import { captureServerHttpError } from "../utils/captureServerHttpError.js";
 import { logServerHttpError } from "../utils/logServerEvent.js";
+import { UPLOAD_IMAGE_MAX_BYTES, UPLOAD_VIDEO_MAX_BYTES } from "../constants/uploadConstants.js";
+import { formatUploadBytesAsMb } from "../utils/formatUploadBytesAsMb.js";
 import { errorRes } from "../utils/index.js";
 
 export { AppError };
@@ -55,7 +57,13 @@ export const errorHandler = (err, req, res, next) => {
 
   // Обработка ошибок Multer (загрузка файлов)
   if (err.code === "LIMIT_FILE_SIZE") {
-    return errorRes(res, 413, "Файл слишком большой. Максимум 5 MB.");
+    const isVideoUpload = String(req.path ?? "").includes("/video");
+    const maxBytes = isVideoUpload ? UPLOAD_VIDEO_MAX_BYTES : UPLOAD_IMAGE_MAX_BYTES;
+    return errorRes(
+      res,
+      413,
+      `Файл слишком большой. Максимум ${formatUploadBytesAsMb(maxBytes)} МБ.`,
+    );
   }
 
   if (err.code === "LIMIT_FILE_COUNT") {

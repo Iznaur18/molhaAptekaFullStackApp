@@ -20,7 +20,9 @@ import {
   LazyRafflesStaffPage,
   LazySearchSynonymsAdminPage,
   LazyAppIntroAdminPage,
+  LazyPopularProductsAdminPage,
   LazySubscriptionsPage,
+  LazyWishlistPage,
 } from "../../../app/lib/lazyAppShellPages.js";
 
 /**
@@ -34,6 +36,7 @@ export function renderProfileTabPanel(mainView, props) {
   const {
     isAuthorized,
     currentUserId,
+    isPremiumUser = false,
     onRequestLogin,
     onSellerNameClick,
     onCatalogProductClick,
@@ -111,6 +114,15 @@ export function renderProfileTabPanel(mainView, props) {
           onUserClick={onSellerNameClick}
         />
       );
+    case "wishlist":
+      return (
+        <LazyWishlistPage
+          isAuthorized={isAuthorized}
+          currentUserId={currentUserId}
+          isPremiumUser={isPremiumUser}
+          onRequestLogin={onRequestLogin}
+        />
+      );
     case "my-orders":
       return (
         <LazyMyOrdersPage
@@ -163,6 +175,8 @@ export function renderProfileTabPanel(mainView, props) {
       return <LazyCategoryTreeAdminPage />;
     case "app-intro-admin":
       return <LazyAppIntroAdminPage />;
+    case "popular-products-admin":
+      return <LazyPopularProductsAdminPage />;
     case "product-moderation":
       return (
         <LazyProductModerationPage

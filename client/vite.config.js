@@ -21,6 +21,7 @@ const LOCAL_API_ORIGIN = `http://${LOCAL_API_PROXY_TARGET}:${LOCAL_API_PORT}`;
 const DEV_API_PROXY_PREFIXES = [
   "/auth",
   "/cart",
+  "/favorites",
   "/user",
   "/vote",
   "/order",

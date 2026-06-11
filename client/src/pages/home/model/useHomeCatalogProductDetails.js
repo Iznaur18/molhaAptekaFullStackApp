@@ -1,7 +1,10 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 import { patchProductInAllCatalogCaches } from "../../../entities/product/lib/catalogProductsQueryCache.js";
+import { isRaffleProductsPath } from "../../../shared/lib/rafflePaths.js";
+import { isSellerProductsPath } from "../../../shared/lib/sellerPaths.js";
 import { useEnsureCatalogProduct } from "../../../entities/product/model/useEnsureCatalogProduct.js";
 import { isCurrentUserProductSeller } from "../../../entities/product/lib/isCurrentUserProductSeller.js";
 import { PRODUCT_MODERATION_APPROVED } from "../../../entities/product/model/productModerationConstants.js";
@@ -26,6 +29,7 @@ export const useHomeCatalogProductDetails = ({
   onBeforeOpenDetails,
 }) => {
   const queryClient = useQueryClient();
+  const location = useLocation();
   const ensureCatalogProduct = useEnsureCatalogProduct();
   const [catalogProductDetailsTab, setCatalogProductDetailsTab] = useState(
     /** @type {'details' | 'auction' | 'reviews' | 'installment'} */ ("details"),
@@ -67,6 +71,12 @@ export const useHomeCatalogProductDetails = ({
     if (!product) {
       return false;
     }
+    if (
+      isSellerProductsPath(location.pathname) ||
+      isRaffleProductsPath(location.pathname)
+    ) {
+      return false;
+    }
     if (isMineMode) {
       return false;
     }
@@ -74,7 +84,7 @@ export const useHomeCatalogProductDetails = ({
       return false;
     }
     return true;
-  }, [catalogProductDetails, isMineMode, currentUserId]);
+  }, [catalogProductDetails, currentUserId, isMineMode, location.pathname]);
 
   /** @param {string} productId */
   const handleCatalogProductClick = useCallback(

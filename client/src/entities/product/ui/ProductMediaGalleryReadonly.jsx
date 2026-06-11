@@ -25,6 +25,7 @@ import "./ProductMediaGalleryReadonly.css";
  *   onLightboxOpenChange?: (open: boolean) => void;
  *   onBack?: () => void;
  *   className?: string;
+ *   heroOverlay?: import('react').ReactNode;
  * }} props
  */
 export function ProductMediaGalleryReadonly({
@@ -35,6 +36,7 @@ export function ProductMediaGalleryReadonly({
   onLightboxOpenChange,
   onBack,
   className = "",
+  heroOverlay = null,
 }) {
   const [previewVideoFailed, setPreviewVideoFailed] = useState(false);
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
@@ -159,6 +161,7 @@ export function ProductMediaGalleryReadonly({
               <ChevronLeft size={ICON_SIZE_PX.lg} strokeWidth={2.25} aria-hidden="true" />
             </button>
           ) : null}
+          {heroOverlay}
           {mediaSlides.length > 1 ? (
             <>
               <div className="product-media-gallery-readonly__slider-nav">
