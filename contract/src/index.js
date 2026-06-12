@@ -167,6 +167,11 @@ export {
   inAppNotificationSchema,
 } from "./authMe.js";
 export {
+  authSessionDataSchema,
+  logoutAuthBodySchema,
+  refreshAuthBodySchema,
+} from "./authSession.js";
+export {
   APP_INTRO_FADE_OUT_MS_DEFAULT,
   APP_INTRO_FADE_OUT_MS_MAX,
   APP_INTRO_FADE_OUT_MS_MIN,

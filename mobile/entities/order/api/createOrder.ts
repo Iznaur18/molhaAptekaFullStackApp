@@ -1,0 +1,26 @@
+import { apiClient, parseCreateOrderData } from "@/shared/api";
+import { API_CLIENT_UI } from "@/shared/config";
+import { formatApiErrorMessage } from "@/shared/lib";
+
+import type { OrderPaymentMethod } from "../model/constants";
+
+export type CreateOrderPayload = {
+  items: { productId: string; quantity: number }[];
+  deliveryAddress: string;
+  deliveryAddressFlat?: string;
+  paymentMethod: OrderPaymentMethod;
+  priceOfferId?: string;
+};
+
+export const createOrder = async (payload: CreateOrderPayload) => {
+  try {
+    const { data } = await apiClient.post("/order", {
+      ...payload,
+      deliveryAddressFlat: payload.deliveryAddressFlat ?? "",
+    });
+    const parsed = parseCreateOrderData(data);
+    return parsed.order;
+  } catch (error) {
+    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.CREATE_ORDER_FALLBACK));
+  }
+};

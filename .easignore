@@ -1,0 +1,8 @@
+# EAS upload (корень monorepo). contract/ нужен для file:../contract
+client/**
+server/**
+docs/**
+todo.md
+.cursor/**
+.github/**
+mobile/node_modules/**

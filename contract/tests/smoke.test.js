@@ -7,6 +7,8 @@ import test from "node:test";
 import {
   addressSuggestBodySchema,
   authMeDataSchema,
+  authSessionDataSchema,
+  refreshAuthBodySchema,
   catalogProductsQuerySchema,
   catalogFeedTileKeyParamsSchema,
   createProductCategoryAdminBodySchema,
@@ -50,6 +52,21 @@ test("loginBodySchema validates credentials", () => {
     password: "secret12",
   });
   assert.equal(parsed.email, "user@example.com");
+});
+
+test("authSessionDataSchema includes bearer tokens", () => {
+  const parsed = authSessionDataSchema.parse({
+    _id: "507f1f77bcf86cd799439011",
+    email: "user@example.com",
+    accessToken: "access.jwt.token",
+    refreshToken: "refresh.jwt.token",
+  });
+  assert.equal(parsed.accessToken, "access.jwt.token");
+  assert.equal(refreshAuthBodySchema.parse({}).refreshToken, undefined);
+  assert.equal(
+    refreshAuthBodySchema.parse({ refreshToken: "rt" }).refreshToken,
+    "rt",
+  );
 });
 
 test("registerBodySchema normalizes phone and userName", () => {

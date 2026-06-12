@@ -1,0 +1,3 @@
+export const AUTH_ME_STALE_TIME_MS = 60_000;
+export const DEFAULT_QUERY_STALE_TIME_MS = 30_000;
+export const API_REQUEST_TIMEOUT_MS = 30_000;
