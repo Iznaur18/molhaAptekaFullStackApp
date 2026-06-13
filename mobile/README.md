@@ -9,7 +9,7 @@ Roadmap: [`docs/mobile-development.md`](../docs/mobile-development.md)
 - Node.js 20+
 - Dev UI: **web** (`w` в Metro)
 - Dev native: **Samsung Android** — [`docs/SAMSUNG-ANDROID-DEV.md`](docs/SAMSUNG-ANDROID-DEV.md) (APK или USB + `npm run android:install`)
-- Expo Go на Samsung **не используем** (SDK 56)
+- Expo Go на Samsung **не используем** (SDK 54)
 - Запущенный `server/` на порту **4444**
 
 ## Установка

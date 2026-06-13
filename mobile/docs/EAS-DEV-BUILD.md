@@ -2,7 +2,7 @@
 
 APK для **Samsung** без Android Studio. Полный гайд: [`SAMSUNG-ANDROID-DEV.md`](SAMSUNG-ANDROID-DEV.md).
 
-Первый нативный smoke на **SDK 56** (Expo Go не подходит).
+Первый нативный smoke на **SDK 54** (Expo Go не подходит).
 
 ## 1. Аккаунт Expo
 

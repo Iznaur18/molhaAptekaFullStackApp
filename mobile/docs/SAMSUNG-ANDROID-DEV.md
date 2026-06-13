@@ -2,7 +2,7 @@
 
 **Web** (`w` в Metro) — быстрый UI. **Samsung** — финальная проверка: SecureStore, image-picker, expo-video, жесты, сеть LAN.
 
-Expo Go на Samsung **не используем** (SDK 56 ≠ Expo Go).
+Expo Go на Samsung **не используем** (SDK 54 ≠ Expo Go).
 
 ---
 
