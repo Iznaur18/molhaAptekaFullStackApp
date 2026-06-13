@@ -1,5 +1,35 @@
 import { ADMIN_ROLE } from "./adminUserGuard.js";
 
+/** Поля, видимые только владельцу или admin. */
+const USER_PRIVATE_PROFILE_FIELDS = [
+  "email",
+  "userPhoneNumber",
+  "userAddress",
+  "userAddressFlat",
+  "userAddressDistrict",
+  "userAddressStreet",
+  "userAddressHouse",
+  "userAddressFiasId",
+  "userAddressGeo",
+  "buyList",
+  "userBirthDate",
+  "userGender",
+  "notificationsEnabled",
+  "isEmailVerified",
+  "userLastLoginAt",
+];
+
+/**
+ * @param {Record<string, unknown>} user
+ */
+function stripPrivateProfileFields(user) {
+  const out = { ...user };
+  for (const field of USER_PRIVATE_PROFILE_FIELDS) {
+    delete out[field];
+  }
+  return out;
+}
+
 /**
  * @param {{ userRole?: string; isBlockedUser?: boolean } | null | undefined} viewer
  */
@@ -22,18 +52,20 @@ export function sanitizeUserProfileForViewer(user, ctx) {
     return null;
   }
 
-  const out = { ...user };
   const privileged = isPrivilegedAdminViewer(ctx.viewer);
   const viewerId = ctx.viewerId ? String(ctx.viewerId) : "";
   const isSelf = viewerId && viewerId === String(user._id ?? "");
 
-  if (!privileged && !isSelf) {
-    delete out.userRole;
-    delete out.isActiveUser;
-    delete out.isBlockedUser;
-    delete out.userDiscountPercent;
-    delete out.notesAboutUser;
+  if (privileged || isSelf) {
+    return { ...user };
   }
+
+  const out = stripPrivateProfileFields(user);
+  delete out.userRole;
+  delete out.isActiveUser;
+  delete out.isBlockedUser;
+  delete out.userDiscountPercent;
+  delete out.notesAboutUser;
 
   return out;
 }
@@ -60,7 +92,7 @@ export function sanitizeUsersSearchList(users, ctx) {
   }
 
   return users.map((row) => {
-    const item = { ...row };
+    const item = stripPrivateProfileFields(row);
     delete item.userRole;
     delete item.isActiveUser;
     delete item.isBlockedUser;

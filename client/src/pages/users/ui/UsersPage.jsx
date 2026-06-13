@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { USER_SEARCH_MIN_LENGTH } from "@molha/api-contract";
+
 import { useUsersSearchQuery } from "../../../entities/user/model/useUsersSearchQuery.js";
 import { UserListRow } from "../../../entities/user/ui/UserListRow.jsx";
 import {
@@ -19,7 +21,7 @@ export function UsersPage({ onUserRowClick }) {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebouncedValue(searchTerm, USER_SEARCH_UI.DEBOUNCE_MS);
   const isSearchPending = searchTerm !== debouncedSearch;
-  const hasSearchQuery = debouncedSearch.trim() !== "";
+  const hasSearchQuery = debouncedSearch.trim().length >= USER_SEARCH_MIN_LENGTH;
   const hasActiveFilters = hasSearchQuery;
 
   const { phase, users, error } = useUsersSearchQuery({ search: debouncedSearch });

@@ -6,6 +6,10 @@ import {
 } from "../../utils/authCookie.js";
 import { issueAuthSession } from "../../utils/issueAuthSession.js";
 import { verifyRefreshToken } from "../../utils/authTokens.js";
+import {
+  BLOCKED_ACCOUNT_MESSAGE,
+  DISABLED_ACCOUNT_MESSAGE,
+} from "../../middlewares/checkAuthMW.js";
 
 export const refreshAuthController = async (req, res) => {
   try {
@@ -30,6 +34,18 @@ export const refreshAuthController = async (req, res) => {
       clearAuthCookie(res);
       clearRefreshCookie(res);
       return res.status(401).json({ success: false, message: "User not found" });
+    }
+
+    if (user.isBlockedUser) {
+      clearAuthCookie(res);
+      clearRefreshCookie(res);
+      return res.status(403).json({ success: false, message: BLOCKED_ACCOUNT_MESSAGE });
+    }
+
+    if (user.isActiveUser === false) {
+      clearAuthCookie(res);
+      clearRefreshCookie(res);
+      return res.status(403).json({ success: false, message: DISABLED_ACCOUNT_MESSAGE });
     }
 
     const data = issueAuthSession(user, res);

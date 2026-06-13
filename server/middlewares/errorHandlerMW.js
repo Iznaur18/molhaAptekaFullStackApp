@@ -37,7 +37,7 @@ export const errorHandler = (err, req, res, next) => {
 
   // Обработка ошибок приведения типа (CastError)
   if (err.name === "CastError") {
-    return errorRes(res, 400, `Неверный формат данных: ${err.message}`);
+    return errorRes(res, 400, "Неверный формат данных");
   }
 
   // Обработка ошибок дубликата уникального ключа MongoDB

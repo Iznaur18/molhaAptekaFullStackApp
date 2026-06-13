@@ -27,6 +27,7 @@ import {
 } from "./middlewares/index.js";
 import { buildApiHelmetOptions } from "./utils/buildApiHelmetOptions.js";
 import { buildHealthPayload } from "./utils/buildHealthPayload.js";
+import { API_JSON_BODY_LIMIT } from "./constants/securityRateLimitConstants.js";
 import { resolveApiCorsMiddleware } from "./utils/resolveApiCorsMiddleware.js";
 import { resolveUploadContentType } from "./utils/resolveUploadContentType.js";
 import { UPLOADS_DIR } from "./utils/uploadsDir.js";
@@ -37,7 +38,7 @@ export const createApp = () => {
 
   app.set("trust proxy", 1);
   app.use(requestIdMW);
-  app.use(express.json());
+  app.use(express.json({ limit: API_JSON_BODY_LIMIT }));
   app.use(cookieParser());
   app.use(resolveApiCorsMiddleware(isProduction));
   app.use(helmet(buildApiHelmetOptions({ isProduction })));

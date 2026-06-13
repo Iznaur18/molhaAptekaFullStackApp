@@ -1,8 +1,7 @@
-import jwt from "jsonwebtoken";
-
 import { getAuthTokenFromRequest } from "../utils/authCookie.js";
+import { verifyAccessToken } from "../utils/authTokens.js";
 
-/** Кладёт `req.userId`, если передан валидный JWT; иначе идёт дальше без ошибки. */
+/** Кладёт `req.userId`, если передан валидный access JWT; иначе идёт дальше без ошибки. */
 export const checkOptionalAuthMW = (req, res, next) => {
   const token = getAuthTokenFromRequest(req);
 
@@ -11,7 +10,7 @@ export const checkOptionalAuthMW = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = verifyAccessToken(token);
     req.userId = decoded._id;
   } catch {
     // публичный каталог: невалидный токен игнорируем

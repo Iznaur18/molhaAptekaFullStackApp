@@ -22,6 +22,8 @@ import {
   emailVerificationResendRateLimiter,
   orderCreateRateLimiter,
   orderItemActionRateLimiter,
+  addressSuggestRateLimiter,
+  userSearchRateLimiter,
 } from "./rateLimitMW.js";
 import {
   errorHandler,
@@ -56,6 +58,8 @@ export {
   emailVerificationResendRateLimiter,
   orderCreateRateLimiter,
   orderItemActionRateLimiter,
+  addressSuggestRateLimiter,
+  userSearchRateLimiter,
   errorHandler,
   notFoundHandler,
   asyncHandler,

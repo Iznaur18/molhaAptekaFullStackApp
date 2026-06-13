@@ -159,6 +159,10 @@ test("userSearchQuerySchema trims search and filters role", () => {
   assert.equal(parsed.userRole, "moderator");
 });
 
+test("userSearchQuerySchema rejects short search", () => {
+  assert.throws(() => userSearchQuerySchema.parse({ search: "ab" }));
+});
+
 test("verifyEmailWithCodeBodySchema validates six-digit code", () => {
   const parsed = verifyEmailWithCodeBodySchema.parse({ code: " 123456 " });
   assert.equal(parsed.code, "123456");

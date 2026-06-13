@@ -8,24 +8,23 @@ import {
 import { attachUserListCommerceStats } from "../../utils/attachUserListCommerceStats.js";
 import { attachFollowersCountToUsers } from "../../utils/userFollowHelpers.js";
 
-const USER_SEARCH_FIELDS = ["userName", "userPhoneNumber", "email"];
+const USER_SEARCH_FIELDS = ["userName"];
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 10;
 const MAX_LIMIT = 100;
-const USER_PUBLIC_LIST_PROJECTION = {
+const USER_SEARCH_LIST_PROJECTION = {
   _id: 1,
   userName: 1,
-  userPhoneNumber: 1,
-  email: 1,
+  userAvatarUrl: 1,
+  userAvatarFocus: 1,
   userRole: 1,
   isPremiumUser: 1,
   isUserDataConfirmed: 1,
   isActiveUser: 1,
   isBlockedUser: 1,
-  userAvatarUrl: 1,
-  userAvatarFocus: 1,
   userLoyaltyPoints: 1,
   userRatingByVotes: 1,
+  userAddressCity: 1,
 };
 
 const parsePagination = (query) => {
@@ -87,7 +86,7 @@ export const userSearchController = async (req, res) => {
       },
       { $skip: skip },
       { $limit: limit },
-      { $project: USER_PUBLIC_LIST_PROJECTION },
+      { $project: USER_SEARCH_LIST_PROJECTION },
     ]);
     const total = await UserModel.countDocuments(usersQuery);
 
@@ -98,6 +97,6 @@ export const userSearchController = async (req, res) => {
     return successRes(res, { users, total, page, limit });
   } catch (error) {
     console.error("userSearchController error:", error);
-    return errorRes(res, 500, error.message || "Ошибка при получении пользователей");
+    return errorRes(res, 500, "Ошибка при получении пользователей");
   }
 };

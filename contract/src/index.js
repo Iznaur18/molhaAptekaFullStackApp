@@ -21,7 +21,11 @@ export {
   myProductPromotionsQuerySchema,
 } from "./productPromotion.js";
 export { productPriceOfferBodySchema } from "./productPriceOffer.js";
-export { userSearchQuerySchema } from "./userSearch.js";
+export {
+  userSearchQuerySchema,
+  USER_SEARCH_MIN_LENGTH,
+  USER_SEARCH_QUERY_MAX_LENGTH,
+} from "./userSearch.js";
 export { userFollowListQuerySchema } from "./userFollow.js";
 export { voteBodySchema } from "./userVote.js";
 export {

@@ -6,11 +6,19 @@ import { USER_ROLE_VALUES } from "./userProfile.js";
 /** Синхрон с `server/validations/user/userSearchValidation.js`. */
 export const USER_SEARCH_QUERY_MAX_LENGTH = 50;
 
+/** Минимум символов в search (без полного листинга пользователей). */
+export const USER_SEARCH_MIN_LENGTH = 3;
+
 export const userSearchQuerySchema = z.object({
-  search: optionalTrimmedString.refine(
-    (value) => value === undefined || value.length <= USER_SEARCH_QUERY_MAX_LENGTH,
-    `search не более ${USER_SEARCH_QUERY_MAX_LENGTH} символов`,
-  ),
+  search: optionalTrimmedString
+    .refine(
+      (value) => value === undefined || value.length >= USER_SEARCH_MIN_LENGTH,
+      `search не короче ${USER_SEARCH_MIN_LENGTH} символов`,
+    )
+    .refine(
+      (value) => value === undefined || value.length <= USER_SEARCH_QUERY_MAX_LENGTH,
+      `search не более ${USER_SEARCH_QUERY_MAX_LENGTH} символов`,
+    ),
   page: z.coerce.number().int().min(1, "page должен быть целым числом от 1").optional(),
   limit: z.coerce
     .number()
@@ -23,4 +31,12 @@ export const userSearchQuerySchema = z.object({
       errorMap: () => ({ message: "userRole должен быть user, admin или moderator" }),
     })
     .optional(),
-});
+})
+  .refine(
+    (data) =>
+      typeof data.search === "string" && data.search.length >= USER_SEARCH_MIN_LENGTH,
+    {
+      message: `search обязателен (минимум ${USER_SEARCH_MIN_LENGTH} символа)`,
+      path: ["search"],
+    },
+  );

@@ -36,6 +36,7 @@ import {
   userDataConfirmationRateLimiter,
   userStoryCreateRateLimiter,
   userStoryReportRateLimiter,
+  userSearchRateLimiter,
 } from "../middlewares/index.js";
 import {
   userIdParamValidation,
@@ -53,7 +54,13 @@ import {
 
 const router = Router();
 
-router.get("/search", userSearchValidation, userSearchController);
+router.get(
+  "/search",
+  checkAuthMW,
+  userSearchRateLimiter,
+  userSearchValidation,
+  userSearchController,
+);
 
 router.get("/stories/feed", checkOptionalAuthMW, getUserStoriesFeedController);
 router.get(
