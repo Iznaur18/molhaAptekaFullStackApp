@@ -30,7 +30,7 @@
 | Гостевой каталог | да — логин для корзины/заказа |
 | Корзина v1 | server-only (дефолт из §7) |
 
-**Текущий статус:** Фаза 4 ✅ · Фаза 5 **старт**. Натив: **Samsung Android** (`mobile/docs/SAMSUNG-ANDROID-DEV.md`). Web — быстрый UI; релиз v1 — Google Play.
+**Текущий статус:** Фазы 0–4 ✅ · **Фаза 5.1** — EAS dev APK + smoke Samsung. Web: `npm run web` (`--offline` на Node 24). SDK **54**.
 
 ---
 

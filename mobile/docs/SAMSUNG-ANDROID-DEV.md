@@ -29,8 +29,11 @@ ipconfig
 cd mobile
 npx eas-cli login          # один раз
 npx eas-cli build:configure # один раз → projectId в app.json
+$env:EAS_BUILD_AUTOCOMMIT = "1"
 npm run build:dev:android
 ```
+
+Жди в терминале: `Compressing project files` → ссылка на билд. Архив ~17 MB. Если зависло после keystore >5 мин — VPN off, Node 20 LTS.
 
 1. Скачай APK по ссылке из терминала / [expo.dev](https://expo.dev) → Builds.
 2. Перекинь на Samsung (USB / Telegram / Drive).

@@ -27,7 +27,7 @@ npm-debug.*
 yarn-debug.*
 yarn-error.*
 eas-build-debug.log
-.eas-inspect/
+.eas-inspect-test/
 
 # macOS
 .DS_Store
