@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "dependencies": {
     "@molha/api-contract": "file:../contract",
+    "@sentry/react-native": "^6.22.0",
     "@tanstack/react-query": "^5.101.0",
     "axios": "^1.17.0",
     "expo": "~54.0.0",
@@ -36,6 +37,8 @@
     "eslint": "^9.39.4",
     "eslint-config-expo": "~10.0.0",
     "eslint-config-prettier": "^10.1.8",
+    "playwright": "^1.60.0",
+    "sharp": "^0.35.1",
     "typescript": "~5.9.2"
   },
   "scripts": {
@@ -55,7 +58,10 @@
     "build:production": "eas build --platform all --profile production",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "generate:icons": "node scripts/generate-app-icons.mjs",
+    "generate:store-feature-graphic": "node scripts/generate-store-feature-graphic.mjs",
+    "capture:store-screenshots": "node scripts/capture-store-screenshots.mjs"
   },
   "private": true
 }

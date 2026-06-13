@@ -7,6 +7,7 @@
   text-align: center;
 }
 
+.site-footer__legal-link,
 .site-footer__intro-link {
   margin: 0;
   padding: 0;
@@ -20,6 +21,12 @@
   cursor: pointer;
 }
 
+.site-footer__legal-link {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+
+.site-footer__legal-link:hover,
 .site-footer__intro-link:hover {
   color: var(--iz-color-action);
 }

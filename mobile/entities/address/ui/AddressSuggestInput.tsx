@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  FlatList,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -18,14 +18,6 @@ import {
 } from "../model/constants";
 import { useAddressSuggestionsQuery } from "../model/useAddressSuggestionsQuery";
 import type { AddressSuggestionDto, RuDeliveryAddressValue } from "../model/types";
-
-const EMPTY_VALUE: RuDeliveryAddressValue = {
-  line: "",
-  flat: "",
-  fiasId: "",
-  geo: null,
-  selectedFromSuggest: false,
-};
 
 type AddressSuggestInputProps = {
   value: RuDeliveryAddressValue;
@@ -68,7 +60,7 @@ export const AddressSuggestInput = ({
   const suggestions = suggestEnabled ? (suggestionsQuery.data ?? []) : [];
 
   const patch = (patchValue: Partial<RuDeliveryAddressValue>) => {
-    onChange({ ...EMPTY_VALUE, ...value, ...patchValue, flat: "" });
+    onChange({ ...value, ...patchValue });
   };
 
   const handleLineChange = (text: string) => {
@@ -77,6 +69,7 @@ export const AddressSuggestInput = ({
       selectedFromSuggest: false,
       fiasId: "",
       geo: null,
+      flat: "",
     });
   };
 
@@ -108,17 +101,21 @@ export const AddressSuggestInput = ({
       ) : null}
 
       {suggestEnabled && suggestions.length > 0 ? (
-        <FlatList
-          data={suggestions}
-          keyExtractor={(item, index) => `${item.value}-${index}`}
+        <ScrollView
           style={styles.suggestions}
           keyboardShouldPersistTaps="handled"
-          renderItem={({ item }) => (
-            <Pressable style={styles.suggestionRow} onPress={() => handlePickSuggestion(item)}>
+          nestedScrollEnabled
+        >
+          {suggestions.map((item, index) => (
+            <Pressable
+              key={`${item.value}-${index}`}
+              style={styles.suggestionRow}
+              onPress={() => handlePickSuggestion(item)}
+            >
               <Text style={styles.suggestionText}>{item.value}</Text>
             </Pressable>
-          )}
-        />
+          ))}
+        </ScrollView>
       ) : null}
 
       {suggestEnabled &&

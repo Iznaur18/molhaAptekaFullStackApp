@@ -132,6 +132,50 @@ test("auth refresh: register → refresh → me", async () => {
   assert.equal(meData.user.email, "smoke-refresh@example.com");
 });
 
+test("auth mobile: tokens in JSON, bearer me, refresh by body", async () => {
+  const registerResponse = await request("/auth/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(registerPayload("mobile")),
+  });
+  assert.equal(registerResponse.status, 200);
+
+  const session = await parseSuccessData(registerResponse);
+  assert.equal(session.email, "smoke-mobile@example.com");
+  assert.ok(typeof session.accessToken === "string" && session.accessToken.length > 20);
+  assert.ok(typeof session.refreshToken === "string" && session.refreshToken.length > 20);
+
+  const meData = await parseSuccessData(
+    await request("/auth/me", {
+      headers: { Authorization: `Bearer ${session.accessToken}` },
+    }),
+  );
+  assert.equal(meData.user.email, "smoke-mobile@example.com");
+
+  const refreshResponse = await request("/auth/refresh", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ refreshToken: session.refreshToken }),
+  });
+  assert.equal(refreshResponse.status, 200);
+
+  const refreshedSession = await parseSuccessData(refreshResponse);
+  assert.ok(refreshedSession.accessToken);
+  assert.ok(refreshedSession.refreshToken);
+
+  const meAfterRefresh = await parseSuccessData(
+    await request("/auth/me", {
+      headers: { Authorization: `Bearer ${refreshedSession.accessToken}` },
+    }),
+  );
+  assert.equal(meAfterRefresh.user.email, "smoke-mobile@example.com");
+});
+
+test("auth refresh: без cookie и body → 401", async () => {
+  const response = await request("/auth/refresh", { method: "POST" });
+  assert.equal(response.status, 401);
+});
+
 test("product smoke: GET /product публичный, POST /product с auth", async () => {
   await ensureProductCategoryTreeSeeded();
 

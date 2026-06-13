@@ -20,6 +20,7 @@ export {
   EDIT_PROFILE_UI,
   IMAGE_UPLOAD_UI,
   EMAIL_VERIFICATION_UI,
+  LEGAL_UI,
   MY_ORDERS_PAGE_UI,
   ORDER_CARD_UI,
   PRODUCT_REPORT_TEXT_MAX_CHARS,
@@ -28,6 +29,7 @@ export {
   SCREEN_STATE_UI,
 } from "./appUiCopy";
 export { IS_REQUIRE_ADDRESS_FROM_DADATA_SUGGEST_ENABLED } from "./featureFlags";
+export { PRIVACY_POLICY_URL } from "./legalUrls";
 export {
   API_REQUEST_TIMEOUT_MS,
   AUTH_ME_STALE_TIME_MS,

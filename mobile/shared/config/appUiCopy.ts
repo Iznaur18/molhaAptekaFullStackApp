@@ -168,6 +168,14 @@ export const EMAIL_VERIFICATION_UI = {
   CLOSE: "Закрыть",
 } as const;
 
+export const LEGAL_UI = {
+  PRIVACY_TITLE: "Политика конфиденциальности",
+  PRIVACY_LINK: "Политика конфиденциальности",
+  PRIVACY_UPDATED_PREFIX: "Обновлено:",
+  PRIVACY_CONTACT_PREFIX: "Контакты:",
+  PRIVACY_OPEN_WEB: "Открыть на сайте",
+} as const;
+
 export const AUTH_UI = {
   LOGIN_TITLE: "Вход",
   REGISTER_TITLE: "Регистрация",

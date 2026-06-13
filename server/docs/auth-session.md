@@ -1,14 +1,35 @@
 # Сессия и JWT
 
-## Flow
+## Flow (web)
 
-1. `POST /auth/login` или `POST /auth/register` → JSON `{ success, data: user }`, два httpOnly cookie:
+1. `POST /auth/login` или `POST /auth/register` → JSON `{ success, data }`, два httpOnly cookie:
    - `access_token` (1 ч)
    - `refresh_token` (30 д)
 2. Клиент: `axios` с `withCredentials: true` — cookie отправляется автоматически.
 3. `GET /auth/me` — читает access JWT из cookie (`checkAuthMW`).
 4. При **401** клиент один раз вызывает `POST /auth/refresh` и повторяет запрос.
 5. `POST /auth/logout` — очищает оба cookie.
+
+## Flow (mobile / native)
+
+Mobile **не использует cookies**. Те же эндпоинты, но токены в JSON:
+
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "...",
+    "email": "...",
+    "accessToken": "<jwt>",
+    "refreshToken": "<jwt>"
+  }
+}
+```
+
+1. Login/register → сохранить `accessToken` + `refreshToken` в `expo-secure-store`.
+2. Запросы: `Authorization: Bearer <accessToken>`.
+3. `POST /auth/refresh` с body `{ "refreshToken": "..." }` (cookie — fallback для web).
+4. `POST /auth/logout` — очистка cookie на server; body `{ refreshToken }` опционально (blacklist — v2).
 
 ## Cookie
 
@@ -29,15 +50,26 @@
 - `FRONTEND_URL=http://127.0.0.1:5173` в `server/.env`
 - Vite proxy `/auth` → `127.0.0.1:4444`
 - Legacy `localStorage.rassro_auth_token` удаляется при загрузке `apiClient.js`
+- Mobile: `EXPO_PUBLIC_API_URL=http://192.168.x.x:4444` (LAN IP, не `127.0.0.1`)
 
-## Insomnia / API tools
+## Insomnia / API tools / mobile
 
-Fallback: `Authorization: Bearer <access_token>`.
+`Authorization: Bearer <access_token>` — приоритет после cookie для access.
+
+Refresh token: cookie `refresh_token` **или** body `refreshToken` (приоритет у cookie).
 
 ## Production
 
 - `NODE_ENV=production` + `FRONTEND_URL` обязателен
 - HTTPS → `Secure` cookie активен
+
+## CORS
+
+Native HTTP-клиенты (React Native) **не отправляют browser CORS preflight** — отдельный mobile origin не нужен.
+
+## Contract
+
+- `@molha/api-contract`: `authSessionDataSchema`, `refreshAuthBodySchema`, `logoutAuthBodySchema`
 
 ## Legacy токены
 

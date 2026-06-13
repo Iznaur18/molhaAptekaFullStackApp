@@ -10,6 +10,7 @@
 | ----- | --- | ------- |
 | API | `@sentry/node` | `SENTRY_DSN` в `server/.env` |
 | SPA | `@sentry/react` | `VITE_SENTRY_DSN` при **build** клиента |
+| Mobile | `@sentry/react-native` | `EXPO_PUBLIC_SENTRY_DSN` в `mobile/.env` / EAS env |
 
 ## Server
 
@@ -33,6 +34,23 @@ VITE_GIT_COMMIT_SHA=abc1234
 ```
 
 `initClientSentry()` в `main.jsx`, UI-ошибки — `Sentry.ErrorBoundary` в `App.jsx`.
+
+## Mobile
+
+```env
+# mobile/.env или eas.json env (preview/production)
+EXPO_PUBLIC_SENTRY_DSN=https://zzz@oZZZ.ingest.sentry.io/ZZZ
+EXPO_PUBLIC_SENTRY_TRACES_SAMPLE_RATE=0.1
+EXPO_PUBLIC_GIT_COMMIT_SHA=abc1234
+EXPO_PUBLIC_APP_ENV=development
+```
+
+- Init: `mobile/shared/lib/initMobileSentry.ts` (импорт в `app/_layout.tsx`)
+- Root layout обёрнут в `Sentry.wrap()`; тег `platform:mobile`, `app_platform` = ios/android/web
+- Breadcrumb: версия app + build number из `expo-constants`
+- PII: `Authorization` / `Cookie` в `beforeSend` — как на SPA
+
+Source maps для EAS: плагин `@sentry/react-native/expo` в `app.json` — при первом успешном `eas build`.
 
 ## Source maps
 

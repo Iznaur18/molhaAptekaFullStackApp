@@ -3,14 +3,9 @@ import {
   clearAuthCookie,
   clearRefreshCookie,
   getRefreshTokenFromRequest,
-  setAuthCookie,
-  setRefreshCookie,
 } from "../../utils/authCookie.js";
-import {
-  signAccessToken,
-  signRefreshToken,
-  verifyRefreshToken,
-} from "../../utils/authTokens.js";
+import { issueAuthSession } from "../../utils/issueAuthSession.js";
+import { verifyRefreshToken } from "../../utils/authTokens.js";
 
 export const refreshAuthController = async (req, res) => {
   try {
@@ -37,11 +32,8 @@ export const refreshAuthController = async (req, res) => {
       return res.status(401).json({ success: false, message: "User not found" });
     }
 
-    const userId = user._id.toString();
-    setAuthCookie(res, signAccessToken(userId));
-    setRefreshCookie(res, signRefreshToken(userId));
-
-    return res.status(200).json({ success: true, data: user });
+    const data = issueAuthSession(user, res);
+    return res.status(200).json({ success: true, data });
   } catch (error) {
     console.error("refreshAuthController error:", error);
     return res.status(500).json({ success: false, message: "Internal server error" });

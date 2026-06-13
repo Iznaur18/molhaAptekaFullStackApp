@@ -30,7 +30,7 @@
 | Гостевой каталог | да — логин для корзины/заказа |
 | Корзина v1 | server-only (дефолт из §7) |
 
-**Текущий статус:** Фазы 0–4 ✅ · **Фаза 5.1** — EAS dev APK + smoke Samsung. Web: `npm run web` (`--offline` на Node 24). SDK **54**.
+**Текущий статус:** Фазы 0–4 ✅ · Фаза 5 (EAS/APK) **отложена** · **Фаза 6** — Sentry ✅ (код). Web: `npm run web` (`--offline` на Node 24). SDK **54**.
 
 ---
 
@@ -379,7 +379,7 @@ npx eas submit --platform ios
 
 ## Фаза 3 — Mobile: экраны v1 (MVP)
 
-- [ ] Splash + иконка приложения (1024×1024)
+- [x] Splash + иконка приложения (1024×1024)
 - [x] Auth: Login, Register, Logout (`app/(auth)/`, профиль)
 - [x] Email verify: in-app код (`POST /auth/verify-email`, resend); deep link — v2
 - [x] Каталог: сетка 2 колонки, infinite scroll, pull-to-refresh, поиск, фильтр категорий
@@ -412,8 +412,8 @@ npx eas submit --platform ios
 - [ ] EAS Build: первый прогон (`eas login` → `build:configure` → `npm run build:dev:android`)
 - [ ] EAS Build: iOS `.ipa`, Android `.aab` в сторы
 - [ ] Internal testing: TestFlight + Google Internal testing
-- [ ] Privacy Policy URL (обязательно для сторов)
-- [ ] Скриншоты, описание, keywords RU/EN
+- [x] Privacy Policy URL (обязательно для сторов) — `client/public/privacy.html`, экран `mobile/app/legal/privacy.tsx`; prod URL в `EXPO_PUBLIC_PRIVACY_POLICY_URL`
+- [x] Скриншоты, описание, keywords RU/EN — `store-assets/`, `docs/STORE-SCREENSHOTS.md`, `npm run capture:store-screenshots`
 - [ ] App Store review notes: модерация UGC, кнопка «Пожаловаться»
 - [ ] `eas submit` → App Store Connect + Google Play
 - [ ] Prod API на HTTPS с публичным доменом (`PUBLIC_UPLOAD_BASE_URL`)
@@ -421,8 +421,8 @@ npx eas submit --platform ios
 
 ## Фаза 6 — Наблюдаемость
 
-- [ ] Sentry React Native (`@sentry/react-native`) — отдельный DSN или тег `platform:mobile`
-- [ ] Логирование версии app + build number в Sentry breadcrumbs
+- [x] Sentry React Native (`@sentry/react-native`) — отдельный DSN или тег `platform:mobile`
+- [x] Логирование версии app + build number в Sentry breadcrumbs
 - [ ] (Опционально) Firebase Analytics / Amplitude — воронка: install → register → order
 
 ---

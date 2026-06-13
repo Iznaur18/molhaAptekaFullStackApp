@@ -12,6 +12,8 @@ const sharedIgnores = [
   "**/playwright-report/**",
   "**/test-results/**",
   "**/.cursor/**",
+  "**/.expo/**",
+  "mobile/**",
   "package-lock.json",
 ];
 

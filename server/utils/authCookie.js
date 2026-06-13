@@ -85,5 +85,11 @@ export const getRefreshTokenFromRequest = (req) => {
   if (typeof cookieToken === "string" && cookieToken.trim()) {
     return cookieToken.trim();
   }
+
+  const bodyToken = req.body?.refreshToken;
+  if (typeof bodyToken === "string" && bodyToken.trim()) {
+    return bodyToken.trim();
+  }
+
   return null;
 };

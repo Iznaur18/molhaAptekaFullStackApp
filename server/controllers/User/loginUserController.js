@@ -83,11 +83,12 @@ export const loginUserController = async (req, res) => {
   }
 };
 
-/** Выход: очистка httpOnly cookie. POST /auth/logout */
+/** Выход: очистка cookie (web) + опциональный refreshToken в body (mobile). POST /auth/logout */
 export const logoutUserController = async (req, res) => {
   try {
     clearAuthCookie(res);
     clearRefreshCookie(res);
+    // v2: blacklist req.body?.refreshToken
     return successRes(res, { message: "Вы вышли из аккаунта" });
   } catch (error) {
     console.error("logoutUserController error:", error);

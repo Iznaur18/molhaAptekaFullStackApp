@@ -10,6 +10,7 @@ import {
   AUTH_UI,
   EDIT_PROFILE_UI,
   EMAIL_VERIFICATION_UI,
+  LEGAL_UI,
   MY_ORDERS_PAGE_UI,
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
@@ -110,6 +111,13 @@ export default function ProfileScreen() {
         </View>
       )}
 
+      <Pressable
+        style={styles.legalLink}
+        onPress={() => router.push("/legal/privacy")}
+      >
+        <Text style={styles.legalLinkText}>{LEGAL_UI.PRIVACY_LINK}</Text>
+      </Pressable>
+
       <EmailVerificationModal
         visible={emailModalVisible}
         email={user?.email ?? ""}
@@ -198,5 +206,14 @@ const styles = StyleSheet.create({
     marginTop: 12,
     color: "#c62828",
     textAlign: "center",
+  },
+  legalLink: {
+    marginTop: 32,
+    paddingVertical: 8,
+  },
+  legalLinkText: {
+    fontSize: 14,
+    color: "#1565c0",
+    textDecorationLine: "underline",
   },
 });
