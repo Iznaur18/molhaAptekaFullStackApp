@@ -4,6 +4,7 @@ import {
   Pressable,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
 
@@ -57,7 +58,7 @@ export const CheckoutForm = ({
     setLocalError("");
     void onSubmit({
       deliveryAddress: deliveryAddress.line.trim(),
-      deliveryAddressFlat: "",
+      deliveryAddressFlat: deliveryAddress.flat.trim(),
       paymentMethod,
     });
   };
@@ -76,6 +77,16 @@ export const CheckoutForm = ({
         onChange={setDeliveryAddress}
         disabled={isDisabled || isSubmitting}
         placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_DELIVERY_ADDRESS}
+      />
+
+      <Text style={styles.flatLabel}>{CHECKOUT_FORM_UI.LABEL_FLAT}</Text>
+      <TextInput
+        style={styles.flatInput}
+        value={deliveryAddress.flat}
+        onChangeText={(flat) => setDeliveryAddress((prev) => ({ ...prev, flat }))}
+        placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_FLAT}
+        editable={!isDisabled && !isSubmitting}
+        keyboardType="default"
       />
 
       <Text style={styles.legend}>{CHECKOUT_FORM_UI.LABEL_PAYMENT_METHOD}</Text>
@@ -119,6 +130,21 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
     marginBottom: 12,
+  },
+  flatLabel: {
+    fontSize: 14,
+    color: "#555",
+    marginBottom: 6,
+  },
+  flatInput: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 16,
+    fontSize: 16,
+    backgroundColor: "#fff",
   },
   legend: {
     fontSize: 14,

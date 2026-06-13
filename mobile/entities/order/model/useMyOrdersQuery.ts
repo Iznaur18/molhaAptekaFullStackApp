@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { useIsAuthorized } from "@/entities/cart/model/useIsAuthorized";
+import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { orderQueryKeys } from "@/shared/api";
 import { DEFAULT_QUERY_STALE_TIME_MS } from "@/shared/config";
 

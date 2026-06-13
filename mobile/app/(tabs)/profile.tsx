@@ -6,6 +6,7 @@ import { useLogoutMutation } from "@/entities/session/model/useLogoutMutation";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { EmailVerificationModal } from "@/features/email-verify/ui/EmailVerificationModal";
 import {
+  API_CLIENT_UI,
   AUTH_UI,
   EDIT_PROFILE_UI,
   EMAIL_VERIFICATION_UI,
@@ -65,7 +66,7 @@ export default function ProfileScreen() {
 
       {logoutMutation.isError ? (
         <Text style={styles.error}>
-          {formatApiErrorMessage(logoutMutation.error, AUTH_UI.LOGOUT_BUTTON)}
+          {formatApiErrorMessage(logoutMutation.error, API_CLIENT_UI.LOGOUT_FALLBACK)}
         </Text>
       ) : null}
 

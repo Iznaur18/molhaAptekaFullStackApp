@@ -8,6 +8,8 @@ module.exports = defineConfig([
       "dist/**",
       "node_modules/**",
       ".expo/**",
+      ".eas-inspect/**",
+      "eas-build-debug.log",
       "components/useClientOnlyValue.web.ts",
     ],
   },

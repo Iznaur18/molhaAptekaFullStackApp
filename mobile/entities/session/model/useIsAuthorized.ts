@@ -1,4 +1,4 @@
-import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
+import { useAuthSessionQuery } from "./useAuthSessionQuery";
 
 export const useIsAuthorized = (): boolean => {
   const sessionQuery = useAuthSessionQuery();

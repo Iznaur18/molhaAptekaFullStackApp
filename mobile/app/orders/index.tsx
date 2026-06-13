@@ -13,7 +13,7 @@ import {
   View,
 } from "react-native";
 
-import { useIsAuthorized } from "@/entities/cart/model/useIsAuthorized";
+import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { getOrderItemIndex } from "@/entities/order/lib/getOrderItemIndex";
 import {
   ORDER_STATUS_CANCELLED,

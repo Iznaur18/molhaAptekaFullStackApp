@@ -7,7 +7,7 @@ import { selectCartLines } from "@/entities/cart/lib/selectCartLines";
 import { selectPurchasableCartLines } from "@/entities/cart/lib/selectPurchasableCartLines";
 import { useCartActions } from "@/entities/cart/model/useCartActions";
 import { useCartProductsQuery } from "@/entities/cart/model/useCartProductsQuery";
-import { useIsAuthorized } from "@/entities/cart/model/useIsAuthorized";
+import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useMyCartQuery } from "@/entities/cart/model/useMyCartQuery";
 import { CartLineItem } from "@/entities/cart/ui/CartLineItem";
 import type { OrderPaymentMethod } from "@/entities/order/model/constants";

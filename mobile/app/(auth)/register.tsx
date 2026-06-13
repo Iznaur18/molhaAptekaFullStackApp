@@ -13,7 +13,7 @@ import {
 
 import { buildRegisterPayload } from "@/entities/session/lib/buildRegisterPayload";
 import { useRegisterMutation } from "@/entities/session/model/useRegisterMutation";
-import { AUTH_UI } from "@/shared/config";
+import { API_CLIENT_UI, AUTH_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 
 export default function RegisterScreen() {
@@ -40,7 +40,7 @@ export default function RegisterScreen() {
   };
 
   const errorMessage = registerMutation.isError
-    ? formatApiErrorMessage(registerMutation.error, AUTH_UI.REGISTER_BUTTON)
+    ? formatApiErrorMessage(registerMutation.error, API_CLIENT_UI.REGISTER_FALLBACK)
     : "";
 
   return (

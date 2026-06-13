@@ -12,7 +12,7 @@ import {
 } from "react-native";
 
 import { useLoginMutation } from "@/entities/session/model/useLoginMutation";
-import { AUTH_UI } from "@/shared/config";
+import { API_CLIENT_UI, AUTH_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 
 export default function LoginScreen() {
@@ -31,7 +31,7 @@ export default function LoginScreen() {
   };
 
   const errorMessage = loginMutation.isError
-    ? formatApiErrorMessage(loginMutation.error, AUTH_UI.LOGIN_BUTTON)
+    ? formatApiErrorMessage(loginMutation.error, API_CLIENT_UI.LOGIN_FALLBACK)
     : "";
 
   return (

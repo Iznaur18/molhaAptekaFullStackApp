@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useCartActions } from "@/entities/cart/model/useCartActions";
-import { useIsAuthorized } from "@/entities/cart/model/useIsAuthorized";
+import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useMyCartQuery } from "@/entities/cart/model/useMyCartQuery";
 import { getProductPurchaseLimit } from "@/entities/product/lib/getProductPurchaseLimit";
 import { ADD_TO_CART_UI } from "@/shared/config";

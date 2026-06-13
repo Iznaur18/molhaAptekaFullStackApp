@@ -91,6 +91,8 @@ export const CHECKOUT_FORM_UI = {
   HEADING: "Оформление заказа",
   LABEL_DELIVERY_ADDRESS: "Адрес доставки",
   PLACEHOLDER_DELIVERY_ADDRESS: "Город, улица, дом",
+  LABEL_FLAT: "Квартира / офис",
+  PLACEHOLDER_FLAT: "Необязательно",
   LABEL_PAYMENT_METHOD: "Способ оплаты",
   SUBMIT_IDLE: "Оформить заказ",
   SUBMIT_LOADING: "Оформляем…",

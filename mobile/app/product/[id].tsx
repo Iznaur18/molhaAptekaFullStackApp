@@ -2,7 +2,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { useIsAuthorized } from "@/entities/cart/model/useIsAuthorized";
+import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { getProductSellerDisplayName } from "@/entities/product/lib/getProductSellerDisplayName";
 import { resolveProductImageUrls } from "@/entities/product/lib/resolveProductImageUrls";
 import { resolveProductPreviewVideoUrl } from "@/entities/product/lib/resolveProductPreviewVideoUrl";
