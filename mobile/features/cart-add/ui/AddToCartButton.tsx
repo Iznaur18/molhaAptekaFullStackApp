@@ -1,12 +1,14 @@
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, Text, View } from "react-native";
 
 import { useCartActions } from "@/entities/cart/model/useCartActions";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useMyCartQuery } from "@/entities/cart/model/useMyCartQuery";
 import { getProductPurchaseLimit } from "@/entities/product/lib/getProductPurchaseLimit";
 import { ADD_TO_CART_UI } from "@/shared/config";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useAddToCartButtonStyles } from "@/shared/theme/uploadFieldStyles";
 
 type AddToCartButtonProps = {
   productId: string;
@@ -15,6 +17,8 @@ type AddToCartButtonProps = {
 
 export const AddToCartButton = ({ productId, product }: AddToCartButtonProps) => {
   const router = useRouter();
+  const theme = useAppTheme();
+  const styles = useAddToCartButtonStyles();
   const isAuthorized = useIsAuthorized();
   const cartQuery = useMyCartQuery();
   const { addItem, setItemQuantity, removeItem, isUpdating } = useCartActions();
@@ -52,7 +56,7 @@ export const AddToCartButton = ({ productId, product }: AddToCartButtonProps) =>
         disabled={outOfStock || isUpdating}
       >
         {isUpdating ? (
-          <ActivityIndicator color="#fff" />
+          <ActivityIndicator color={theme.colors.onContrast} />
         ) : (
           <Text style={styles.addButtonText}>{ADD_TO_CART_UI.ADD}</Text>
         )}
@@ -101,59 +105,3 @@ export const AddToCartButton = ({ productId, product }: AddToCartButtonProps) =>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  addButton: {
-    marginTop: 16,
-    backgroundColor: "#111",
-    borderRadius: 10,
-    paddingVertical: 14,
-    alignItems: "center",
-  },
-  addButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  loginButton: {
-    marginTop: 16,
-    borderRadius: 10,
-    paddingVertical: 14,
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#111",
-  },
-  loginButtonText: {
-    color: "#111",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  stepper: {
-    marginTop: 16,
-    flexDirection: "row",
-    alignItems: "center",
-    alignSelf: "flex-start",
-    gap: 12,
-  },
-  stepButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    backgroundColor: "#f0f0f0",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  stepButtonText: {
-    fontSize: 20,
-    fontWeight: "600",
-  },
-  quantity: {
-    fontSize: 18,
-    fontWeight: "600",
-    minWidth: 24,
-    textAlign: "center",
-  },
-  buttonDisabled: {
-    opacity: 0.5,
-  },
-});

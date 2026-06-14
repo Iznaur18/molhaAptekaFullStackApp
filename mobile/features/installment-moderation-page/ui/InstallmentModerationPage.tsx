@@ -1,6 +1,7 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
+import { FlatList, Pressable, Text, View } from "react-native";
+import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import type { PendingInstallmentProgram } from "@/entities/installment/api/installmentStaffApi";
 import {
@@ -8,6 +9,7 @@ import {
   usePendingInstallmentModerationQuery,
 } from "@/entities/installment/model/useInstallmentStaffMutations";
 import { INSTALLMENT_UI } from "@/shared/config";
+import { useStaffQueueStyles } from "@/shared/theme/staffQueueStyles";
 import { StaffModerationActions } from "@/shared/ui/StaffModerationActions";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
@@ -19,6 +21,7 @@ type RowProps = {
 };
 
 const ProgramRow = ({ program, onChanged, approveMutation, rejectMutation }: RowProps) => {
+  const styles = useStaffQueueStyles();
   const router = useRouter();
   const [comment, setComment] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -48,7 +51,7 @@ const ProgramRow = ({ program, onChanged, approveMutation, rejectMutation }: Row
   return (
     <View style={styles.row}>
       <Pressable onPress={() => router.push(`/product/${productId}`)}>
-        <Text style={styles.title}>{program.productName ?? INSTALLMENT_UI.CONTRACT_PRODUCT}</Text>
+        <Text style={styles.titleAccent}>{program.productName ?? INSTALLMENT_UI.CONTRACT_PRODUCT}</Text>
       </Pressable>
       <Text style={styles.meta}>
         {INSTALLMENT_UI.PLANS_LABEL}: {program.plans?.length ?? 0}
@@ -70,6 +73,7 @@ const ProgramRow = ({ program, onChanged, approveMutation, rejectMutation }: Row
 };
 
 export const InstallmentModerationPage = () => {
+  const styles = useStaffQueueStyles();
   const queueQuery = usePendingInstallmentModerationQuery();
   const { approveModerationMutation, rejectModerationMutation } = useInstallmentStaffMutations();
   const programs = queueQuery.data ?? [];
@@ -95,7 +99,7 @@ export const InstallmentModerationPage = () => {
       keyExtractor={(item) => String(item.productId)}
       contentContainerStyle={styles.list}
       refreshControl={
-        <RefreshControl refreshing={queueQuery.isFetching} onRefresh={() => void queueQuery.refetch()} />
+        <ThemedRefreshControl refreshing={queueQuery.isFetching} onRefresh={() => void queueQuery.refetch()} />
       }
       ListEmptyComponent={<Text style={styles.empty}>{INSTALLMENT_UI.MODERATION_PAGE_EMPTY}</Text>}
       renderItem={({ item }) => (
@@ -109,11 +113,3 @@ export const InstallmentModerationPage = () => {
     />
   );
 };
-
-const styles = StyleSheet.create({
-  list: { padding: 12, gap: 16 },
-  row: { gap: 8, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: "#eee" },
-  title: { fontSize: 15, fontWeight: "600", color: "#1565c0" },
-  meta: { fontSize: 13, color: "#666" },
-  empty: { textAlign: "center", color: "#666", padding: 24 },
-});

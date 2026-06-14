@@ -1,6 +1,7 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 import { PRODUCT_CARD_UI } from "@/shared/config";
+import { useProductStatusBadgeStyles } from "@/shared/theme/catalogProductStyles";
 
 import { useProductCardChromeFlags } from "../lib/useProductCardChromeFlags";
 import { resolveProductLoyaltyPointsPerUnit } from "../lib/resolveProductLoyaltyPointsPerUnit";
@@ -14,6 +15,7 @@ export const ProductCatalogStatusBadges = ({
   product,
   isPremiumUser = false,
 }: ProductCatalogStatusBadgesProps) => {
+  const styles = useProductStatusBadgeStyles();
   const flags = useProductCardChromeFlags(product);
   const loyaltyPoints = resolveProductLoyaltyPointsPerUnit(product);
 
@@ -46,22 +48,3 @@ export const ProductCatalogStatusBadges = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  root: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 6,
-  },
-  badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-    backgroundColor: "#eef4ff",
-  },
-  badgeText: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: "#1f6feb",
-  },
-});

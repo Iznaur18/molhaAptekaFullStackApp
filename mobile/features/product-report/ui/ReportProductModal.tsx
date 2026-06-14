@@ -3,7 +3,6 @@ import {
   ActivityIndicator,
   Modal,
   Pressable,
-  StyleSheet,
   Text,
   TextInput,
   View,
@@ -14,6 +13,8 @@ import {
   PRODUCT_REPORT_TEXT_MAX_CHARS,
   PRODUCT_REPORT_UI,
 } from "@/shared/config";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useBottomSheetReportModalStyles } from "@/shared/theme/modalChromeStyles";
 
 type ReportProductModalProps = {
   visible: boolean;
@@ -32,6 +33,8 @@ export const ReportProductModal = ({
   onClose,
   onSubmitted,
 }: ReportProductModalProps) => {
+  const styles = useBottomSheetReportModalStyles();
+  const theme = useAppTheme();
   const submitMutation = useSubmitProductReportMutation();
   const [reportText, setReportText] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -110,7 +113,7 @@ export const ReportProductModal = ({
                 disabled={isSubmitting || isOverLimit || !reportText.trim()}
               >
                 {isSubmitting ? (
-                  <ActivityIndicator color="#fff" />
+                  <ActivityIndicator color={theme.colors.onContrast} />
                 ) : (
                   <Text style={styles.submitButtonText}>{PRODUCT_REPORT_UI.SUBMIT}</Text>
                 )}
@@ -122,100 +125,3 @@ export const ReportProductModal = ({
     </Modal>
   );
 };
-
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.45)",
-    justifyContent: "flex-end",
-  },
-  card: {
-    backgroundColor: "#fff",
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    padding: 20,
-    paddingBottom: 32,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#111",
-  },
-  productName: {
-    marginTop: 6,
-    fontSize: 14,
-    color: "#666",
-  },
-  blocked: {
-    marginTop: 16,
-    fontSize: 14,
-    color: "#666",
-  },
-  label: {
-    marginTop: 16,
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
-  },
-  input: {
-    marginTop: 8,
-    minHeight: 100,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    padding: 12,
-    fontSize: 15,
-    color: "#111",
-  },
-  inputError: {
-    borderColor: "#c62828",
-  },
-  charCount: {
-    marginTop: 6,
-    fontSize: 12,
-    color: "#999",
-    textAlign: "right",
-  },
-  charCountError: {
-    color: "#c62828",
-  },
-  error: {
-    marginTop: 8,
-    fontSize: 13,
-    color: "#c62828",
-  },
-  actions: {
-    marginTop: 20,
-    flexDirection: "row",
-    gap: 12,
-  },
-  cancelButton: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: 10,
-    backgroundColor: "#f0f0f0",
-    alignItems: "center",
-  },
-  cancelButtonText: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#333",
-  },
-  submitButton: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: 10,
-    backgroundColor: "#111",
-    alignItems: "center",
-    justifyContent: "center",
-    minHeight: 48,
-  },
-  submitDisabled: {
-    opacity: 0.5,
-  },
-  submitButtonText: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#fff",
-  },
-});

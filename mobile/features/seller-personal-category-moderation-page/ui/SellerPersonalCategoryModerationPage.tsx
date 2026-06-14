@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { FlatList, Image, RefreshControl, StyleSheet, Text, View } from "react-native";
+import { FlatList, Image, Text, View } from "react-native";
+import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import {
   usePendingSellerPersonalCategoryCampaignsQuery,
   useSellerPersonalCategoryModerationMutations,
 } from "@/entities/seller-personal-category/model/useSellerPersonalCategoryModerationMutations";
 import { SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI } from "@/shared/config";
+import { useStaffQueueStyles } from "@/shared/theme/staffQueueStyles";
 import { StaffModerationActions } from "@/shared/ui/StaffModerationActions";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
@@ -28,6 +30,7 @@ type RowProps = {
 };
 
 const CategoryRow = ({ campaign, onChanged, approveMutation, rejectMutation }: RowProps) => {
+  const styles = useStaffQueueStyles();
   const [reason, setReason] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const campaignId = String(campaign._id);
@@ -60,7 +63,7 @@ const CategoryRow = ({ campaign, onChanged, approveMutation, rejectMutation }: R
   return (
     <View style={styles.row}>
       {campaign.tileImageUrl ? (
-        <Image source={{ uri: String(campaign.tileImageUrl) }} style={styles.image} />
+        <Image source={{ uri: String(campaign.tileImageUrl) }} style={styles.thumb} />
       ) : null}
       <Text style={styles.title}>{campaign.categoryName ?? "Категория"}</Text>
       <Text style={styles.meta}>
@@ -84,6 +87,7 @@ const CategoryRow = ({ campaign, onChanged, approveMutation, rejectMutation }: R
 };
 
 export const SellerPersonalCategoryModerationPage = () => {
+  const styles = useStaffQueueStyles();
   const queueQuery = usePendingSellerPersonalCategoryCampaignsQuery();
   const { approveMutation, rejectMutation } = useSellerPersonalCategoryModerationMutations();
   const campaigns = queueQuery.data ?? [];
@@ -111,7 +115,7 @@ export const SellerPersonalCategoryModerationPage = () => {
       keyExtractor={(item) => String(item._id)}
       contentContainerStyle={styles.list}
       refreshControl={
-        <RefreshControl refreshing={queueQuery.isFetching} onRefresh={() => void queueQuery.refetch()} />
+        <ThemedRefreshControl refreshing={queueQuery.isFetching} onRefresh={() => void queueQuery.refetch()} />
       }
       ListEmptyComponent={
         <Text style={styles.empty}>{SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.EMPTY}</Text>
@@ -127,12 +131,3 @@ export const SellerPersonalCategoryModerationPage = () => {
     />
   );
 };
-
-const styles = StyleSheet.create({
-  list: { padding: 12, gap: 16 },
-  row: { gap: 8, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: "#eee" },
-  image: { width: 72, height: 72, borderRadius: 8 },
-  title: { fontSize: 15, fontWeight: "600" },
-  meta: { fontSize: 13, color: "#666" },
-  empty: { textAlign: "center", color: "#666", padding: 24 },
-});

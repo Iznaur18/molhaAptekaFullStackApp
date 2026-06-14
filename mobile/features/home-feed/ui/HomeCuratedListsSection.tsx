@@ -1,14 +1,17 @@
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 
 import type { HomeCuratedProductList } from "@/entities/curated-product-list/api/fetchHomeCuratedProductLists";
 import { ProductCard } from "@/entities/product/ui/ProductCard";
 import { HOME_FEED_UI } from "@/shared/config";
+import { useHomeCuratedListsStyles } from "@/shared/theme/catalogProductStyles";
 
 type HomeCuratedListsSectionProps = {
   lists: HomeCuratedProductList[];
 };
 
 export const HomeCuratedListsSection = ({ lists }: HomeCuratedListsSectionProps) => {
+  const styles = useHomeCuratedListsStyles();
+
   if (lists.length === 0) {
     return null;
   }
@@ -34,23 +37,3 @@ export const HomeCuratedListsSection = ({ lists }: HomeCuratedListsSectionProps)
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  listBlock: {
-    marginBottom: 12,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#111",
-    marginHorizontal: 8,
-    marginBottom: 8,
-  },
-  row: {
-    paddingHorizontal: 6,
-    gap: 4,
-  },
-  cardWrap: {
-    width: 168,
-  },
-});

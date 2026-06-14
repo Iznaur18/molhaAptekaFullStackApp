@@ -1,14 +1,7 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import {
-  FlatList,
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { FlatList, Pressable, ScrollView, Text, View } from "react-native";
+import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { InstallmentContractCard } from "@/entities/installment/ui/InstallmentContractCard";
 import { INSTALLMENT_CONTRACT_STATUS_FILTER_OPTIONS } from "@/entities/installment/model/constants";
@@ -16,12 +9,12 @@ import { useMyInstallmentContractsQuery } from "@/entities/installment/model/use
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { INSTALLMENT_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
-import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useOrdersScreenStyles } from "@/shared/theme/commerceScreenStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 export const InstallmentPaymentsPage = () => {
   const router = useRouter();
-  const theme = useAppTheme();
+  const styles = useOrdersScreenStyles();
   const isAuthorized = useIsAuthorized();
   const [statusFilter, setStatusFilter] = useState("");
   const contractsQuery = useMyInstallmentContractsQuery({
@@ -32,13 +25,8 @@ export const InstallmentPaymentsPage = () => {
   if (!isAuthorized) {
     return (
       <View style={styles.centered}>
-        <Text style={[styles.hint, { color: theme.colors.textMuted }]}>
-          {INSTALLMENT_UI.LOGIN_HINT}
-        </Text>
-        <Pressable
-          style={[styles.button, { backgroundColor: theme.colors.nearBlack }]}
-          onPress={() => router.push("/(auth)/login")}
-        >
+        <Text style={styles.hint}>{INSTALLMENT_UI.LOGIN_HINT}</Text>
+        <Pressable style={styles.button} onPress={() => router.push("/(auth)/login")}>
           <Text style={styles.buttonText}>{INSTALLMENT_UI.LOGIN_BUTTON}</Text>
         </Pressable>
       </View>
@@ -66,7 +54,7 @@ export const InstallmentPaymentsPage = () => {
       keyExtractor={(contract) => contract._id}
       contentContainerStyle={styles.list}
       refreshControl={
-        <RefreshControl
+        <ThemedRefreshControl
           refreshing={contractsQuery.isRefetching}
           onRefresh={contractsQuery.refetch}
         />
@@ -83,18 +71,11 @@ export const InstallmentPaymentsPage = () => {
             return (
               <Pressable
                 key={filter.value || "all"}
-                style={[
-                  styles.filterChip,
-                  { borderColor: theme.colors.border },
-                  isActive && { backgroundColor: theme.colors.nearBlack },
-                ]}
+                style={[styles.filterChip, isActive && styles.filterChipActive]}
                 onPress={() => setStatusFilter(filter.value)}
               >
                 <Text
-                  style={[
-                    styles.filterChipText,
-                    { color: isActive ? "#fff" : theme.colors.text },
-                  ]}
+                  style={[styles.filterChipText, isActive && styles.filterChipTextActive]}
                 >
                   {label}
                 </Text>
@@ -105,7 +86,7 @@ export const InstallmentPaymentsPage = () => {
       }
       ListEmptyComponent={
         <View style={styles.centered}>
-          <Text style={[styles.hint, { color: theme.colors.textMuted }]}>
+          <Text style={styles.hint}>
             {statusFilter
               ? INSTALLMENT_UI.PAYMENTS_PAGE_EMPTY_BY_FILTER
               : INSTALLMENT_UI.PAYMENTS_PAGE_EMPTY}
@@ -122,46 +103,3 @@ export const InstallmentPaymentsPage = () => {
     />
   );
 };
-
-const styles = StyleSheet.create({
-  list: {
-    padding: 16,
-    flexGrow: 1,
-  },
-  filters: {
-    gap: 8,
-    paddingBottom: 12,
-  },
-  filterChip: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 999,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-  },
-  filterChipText: {
-    fontSize: 13,
-    fontWeight: "600",
-  },
-  centered: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 24,
-    gap: 16,
-  },
-  hint: {
-    fontSize: 15,
-    textAlign: "center",
-    lineHeight: 22,
-  },
-  button: {
-    borderRadius: 10,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-});

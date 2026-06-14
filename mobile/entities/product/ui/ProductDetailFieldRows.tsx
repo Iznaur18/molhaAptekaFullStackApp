@@ -1,4 +1,6 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
+
+import { useProductDetailFieldStyles } from "@/shared/theme/catalogProductStyles";
 
 import { formatProductFieldForDisplay } from "../lib/formatProductFieldForDisplay";
 import { getProductFieldLabel } from "../lib/productFieldRegistry";
@@ -8,34 +10,17 @@ type ProductDetailFieldRowsProps = {
   fieldKeys: readonly string[];
 };
 
-export const ProductDetailFieldRows = ({ product, fieldKeys }: ProductDetailFieldRowsProps) => (
-  <View style={styles.grid}>
-    {fieldKeys.map((key) => (
-      <View key={key} style={styles.row}>
-        <Text style={styles.label}>{getProductFieldLabel(key)}</Text>
-        <Text style={styles.value}>{formatProductFieldForDisplay(key, product)}</Text>
-      </View>
-    ))}
-  </View>
-);
+export const ProductDetailFieldRows = ({ product, fieldKeys }: ProductDetailFieldRowsProps) => {
+  const styles = useProductDetailFieldStyles();
 
-const styles = StyleSheet.create({
-  grid: {
-    gap: 10,
-  },
-  row: {
-    gap: 2,
-  },
-  label: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: "#666",
-    textTransform: "uppercase",
-    letterSpacing: 0.3,
-  },
-  value: {
-    fontSize: 15,
-    color: "#222",
-    lineHeight: 22,
-  },
-});
+  return (
+    <View style={styles.grid}>
+      {fieldKeys.map((key) => (
+        <View key={key} style={styles.row}>
+          <Text style={styles.label}>{getProductFieldLabel(key)}</Text>
+          <Text style={styles.value}>{formatProductFieldForDisplay(key, product)}</Text>
+        </View>
+      ))}
+    </View>
+  );
+};

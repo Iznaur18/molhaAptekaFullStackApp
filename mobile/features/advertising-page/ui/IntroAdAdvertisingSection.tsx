@@ -2,7 +2,6 @@ import { useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
-  StyleSheet,
   Text,
   TextInput,
   View,
@@ -24,6 +23,7 @@ import { ImageUrlUploadField } from "@/features/image-upload/ui/ImageUrlUploadFi
 import { VideoUrlUploadField } from "@/features/image-upload/ui/VideoUrlUploadField";
 import { INTRO_AD_PAGE_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useAdvertisingCardStyles } from "@/shared/theme/sellerFlowStyles";
 
 type IntroAdAdvertisingSectionProps = {
   loyaltyBalance: number;
@@ -38,6 +38,7 @@ const resolveStatusLabel = (status?: string | null) => {
 
 export const IntroAdAdvertisingSection = ({ loyaltyBalance }: IntroAdAdvertisingSectionProps) => {
   const theme = useAppTheme();
+  const styles = useAdvertisingCardStyles();
   const { previewIntro } = useAppIntro();
   const campaignQuery = useMyIntroAdCampaignQuery(true);
   const { submitMutation, cancelMutation } = useIntroAdMutations();
@@ -101,15 +102,15 @@ export const IntroAdAdvertisingSection = ({ loyaltyBalance }: IntroAdAdvertising
   };
 
   return (
-    <View style={[styles.card, { borderColor: theme.colors.border }]}>
-      <Text style={[styles.title, { color: theme.colors.text }]}>{INTRO_AD_PAGE_UI.CARD_TITLE}</Text>
-      <Text style={[styles.lead, { color: theme.colors.textMuted }]}>
+    <View style={styles.card}>
+      <Text style={styles.title}>{INTRO_AD_PAGE_UI.CARD_TITLE}</Text>
+      <Text style={styles.lead}>
         {INTRO_AD_PAGE_UI.DESCRIPTION}
       </Text>
-      <Text style={[styles.meta, { color: theme.colors.text }]}>
+      <Text style={styles.meta}>
         {INTRO_AD_PAGE_UI.PRICE(pricePoints)} · {INTRO_AD_PAGE_UI.DURATION}
       </Text>
-      <Text style={[styles.meta, { color: theme.colors.textMuted }]}>
+      <Text style={styles.meta}>
         {INTRO_AD_PAGE_UI.BALANCE(loyaltyBalance)}
       </Text>
 
@@ -212,7 +213,7 @@ export const IntroAdAdvertisingSection = ({ loyaltyBalance }: IntroAdAdvertising
               disabled={isSubmitting || loyaltyBalance < pricePoints}
             >
               {isSubmitting ? (
-                <ActivityIndicator color="#fff" />
+                <ActivityIndicator color={theme.colors.onContrast} />
               ) : (
                 <Text style={styles.primaryButtonText}>{INTRO_AD_PAGE_UI.SUBMIT}</Text>
               )}
@@ -226,104 +227,3 @@ export const IntroAdAdvertisingSection = ({ loyaltyBalance }: IntroAdAdvertising
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  card: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 12,
-    padding: 14,
-    gap: 8,
-    backgroundColor: "#fff",
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "700",
-  },
-  lead: {
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  meta: {
-    fontSize: 13,
-  },
-  statusPanel: {
-    gap: 8,
-    padding: 10,
-    borderRadius: 10,
-    backgroundColor: "#f7f7f7",
-  },
-  statusText: {
-    fontSize: 14,
-    color: "#333",
-  },
-  form: {
-    gap: 10,
-    marginTop: 4,
-  },
-  fieldLabel: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
-  },
-  sectionLabel: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: "#111",
-    marginTop: 4,
-  },
-  timingHint: {
-    fontSize: 12,
-    color: "#666",
-  },
-  input: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 15,
-  },
-  actions: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-    marginTop: 4,
-  },
-  primaryButton: {
-    backgroundColor: "#111",
-    borderRadius: 10,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    alignItems: "center",
-    minHeight: 44,
-    justifyContent: "center",
-  },
-  primaryButtonText: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  secondaryButton: {
-    borderRadius: 10,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#ccc",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-  },
-  secondaryButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#111",
-  },
-  disabled: {
-    opacity: 0.6,
-  },
-  error: {
-    color: "#c62828",
-    fontSize: 13,
-  },
-  success: {
-    color: "#2e7d32",
-    fontSize: 13,
-  },
-});

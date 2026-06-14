@@ -4,7 +4,6 @@ import {
   ActivityIndicator,
   Modal,
   Pressable,
-  StyleSheet,
   Text,
   View,
 } from "react-native";
@@ -17,6 +16,8 @@ import { useUserStoryMutations } from "@/entities/user-story/model/useUserStoryM
 import { useUserStoriesByAuthorQuery } from "@/entities/user-story/model/useUserStoriesByAuthorQuery";
 import { ReportUserStoryModal } from "@/features/home-feed/ui/ReportUserStoryModal";
 import { USER_STORY_UI } from "@/shared/config";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useStoryViewerModalStyles } from "@/shared/theme/modalChromeStyles";
 import { ProductPreviewVideo } from "@/shared/ui/ProductPreviewVideo";
 
 type UserStoryViewerModalProps = {
@@ -38,6 +39,8 @@ export const UserStoryViewerModal = ({
   onClose,
   onStoryDeleted,
 }: UserStoryViewerModalProps) => {
+  const styles = useStoryViewerModalStyles();
+  const theme = useAppTheme();
   const { deleteMutation } = useUserStoryMutations();
   const storiesQuery = useUserStoriesByAuthorQuery(visible ? authorId : null, visible);
   const stories = storiesQuery.data ?? [];
@@ -110,7 +113,7 @@ export const UserStoryViewerModal = ({
           <Text style={styles.author}>{authorName}</Text>
 
           {storiesQuery.isPending ? (
-            <ActivityIndicator color="#fff" size="large" />
+            <ActivityIndicator color={theme.colors.onContrast} size="large" />
           ) : null}
 
           {activeStory ? (
@@ -193,89 +196,3 @@ export const UserStoryViewerModal = ({
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    backgroundColor: "#000",
-    justifyContent: "center",
-    padding: 16,
-  },
-  closeButton: {
-    alignSelf: "flex-end",
-    padding: 8,
-  },
-  closeText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  author: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "700",
-    marginBottom: 12,
-  },
-  mediaWrap: {
-    width: "100%",
-    height: "62%",
-    borderRadius: 8,
-    overflow: "hidden",
-    backgroundColor: "#111",
-  },
-  media: {
-    width: "100%",
-    height: "100%",
-  },
-  caption: {
-    color: "#fff",
-    fontSize: 15,
-    marginTop: 12,
-    lineHeight: 22,
-  },
-  error: {
-    color: "#ff8a80",
-    fontSize: 13,
-    marginTop: 8,
-  },
-  footer: {
-    flexDirection: "row",
-    gap: 12,
-    marginTop: 16,
-  },
-  actionButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 8,
-    backgroundColor: "rgba(255,255,255,0.12)",
-  },
-  deleteButton: {
-    backgroundColor: "rgba(198,40,40,0.35)",
-  },
-  actionText: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  navRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: 16,
-  },
-  navButton: {
-    padding: 10,
-  },
-  navDisabled: {
-    opacity: 0.4,
-  },
-  navText: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  counter: {
-    color: "#ccc",
-    fontSize: 14,
-  },
-});

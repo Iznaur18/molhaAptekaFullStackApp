@@ -4,7 +4,6 @@ import {
   Modal,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   View,
@@ -19,6 +18,7 @@ import { useProductCategoryDisplayMutations } from "@/entities/product-category-
 import { ImageUrlUploadField } from "@/features/image-upload/ui/ImageUrlUploadField";
 import { PRODUCT_CATEGORY_DISPLAY_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useAdminEditModalStyles } from "@/shared/theme/modalChromeStyles";
 
 type EditFeedTileDisplayModalProps = {
   visible: boolean;
@@ -35,6 +35,7 @@ export const EditFeedTileDisplayModal = ({
   onClose,
   onSaved,
 }: EditFeedTileDisplayModalProps) => {
+  const styles = useAdminEditModalStyles();
   const theme = useAppTheme();
   const { patchFeedTileMutation } = useProductCategoryDisplayMutations();
   const [label, setLabel] = useState("");
@@ -127,25 +128,22 @@ export const EditFeedTileDisplayModal = ({
     <Modal visible={visible} animationType="slide" transparent onRequestClose={handleClose}>
       <View style={styles.overlay}>
         <ScrollView contentContainerStyle={styles.scroll}>
-          <View style={[styles.card, { backgroundColor: theme.colors.surface }]}>
-            <Text style={[styles.title, { color: theme.colors.text }]}>
+          <View style={styles.card}>
+            <Text style={styles.title}>
               {PRODUCT_CATEGORY_DISPLAY_UI.FEED_EDIT_TITLE(resolved.label)}
             </Text>
 
-            <Text style={[styles.fieldLabel, { color: theme.colors.text }]}>
+            <Text style={styles.fieldLabel}>
               {PRODUCT_CATEGORY_DISPLAY_UI.LABEL_FIELD}
             </Text>
             <TextInput
-              style={[
-                styles.input,
-                { color: theme.colors.text, borderColor: theme.colors.border },
-              ]}
+              style={styles.input}
               value={label}
               onChangeText={setLabel}
               placeholder={PRODUCT_CATEGORY_DISPLAY_UI.LABEL_PLACEHOLDER(defaultLabel)}
               maxLength={120}
             />
-            <Text style={[styles.hint, { color: theme.colors.textMuted }]}>
+            <Text style={styles.hint}>
               {PRODUCT_CATEGORY_DISPLAY_UI.FEED_LABEL_HINT}
             </Text>
 
@@ -159,21 +157,21 @@ export const EditFeedTileDisplayModal = ({
 
             <View style={styles.actions}>
               <Pressable
-                style={[styles.secondaryButton, { borderColor: theme.colors.border }]}
+                style={styles.secondaryButton}
                 onPress={() => void handleReset()}
                 disabled={isSaving}
               >
-                <Text style={{ color: theme.colors.text }}>
+                <Text style={styles.secondaryButtonText}>
                   {PRODUCT_CATEGORY_DISPLAY_UI.RESET_BUTTON}
                 </Text>
               </Pressable>
               <Pressable
-                style={[styles.primaryButton, { backgroundColor: theme.colors.nearBlack }]}
+                style={styles.primaryButton}
                 onPress={() => void handleSubmit()}
                 disabled={isSaving}
               >
                 {isSaving ? (
-                  <ActivityIndicator color="#fff" />
+                  <ActivityIndicator color={theme.colors.onContrast} />
                 ) : (
                   <Text style={styles.primaryButtonText}>
                     {PRODUCT_CATEGORY_DISPLAY_UI.SAVE_BUTTON}
@@ -183,7 +181,7 @@ export const EditFeedTileDisplayModal = ({
             </View>
 
             <Pressable onPress={handleClose} style={styles.closeLink}>
-              <Text style={{ color: theme.colors.textMuted }}>
+              <Text style={styles.closeLinkText}>
                 {PRODUCT_CATEGORY_DISPLAY_UI.CLOSE_ARIA}
               </Text>
             </Pressable>
@@ -193,72 +191,3 @@ export const EditFeedTileDisplayModal = ({
     </Modal>
   );
 };
-
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.45)",
-    justifyContent: "flex-end",
-  },
-  scroll: {
-    flexGrow: 1,
-    justifyContent: "flex-end",
-  },
-  card: {
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    padding: 20,
-    gap: 8,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "700",
-    marginBottom: 4,
-  },
-  fieldLabel: {
-    fontSize: 14,
-    fontWeight: "600",
-    marginTop: 8,
-  },
-  input: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 16,
-  },
-  hint: {
-    fontSize: 12,
-  },
-  error: {
-    color: "#dc2626",
-    fontSize: 13,
-  },
-  actions: {
-    flexDirection: "row",
-    gap: 10,
-    marginTop: 12,
-  },
-  secondaryButton: {
-    flex: 1,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 10,
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  primaryButton: {
-    flex: 1,
-    borderRadius: 10,
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  primaryButtonText: {
-    color: "#fff",
-    fontWeight: "600",
-  },
-  closeLink: {
-    alignItems: "center",
-    marginTop: 8,
-    paddingVertical: 8,
-  },
-});

@@ -1,7 +1,8 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 import { UserFollowButton } from "@/features/user-follow/ui/UserFollowButton";
 import { PRODUCT_SELLER_PREVIEW_UI } from "@/shared/config";
+import { useProductSellerPreviewStyles } from "@/shared/theme/catalogProductStyles";
 
 import { getProductSellerDisplayName } from "../lib/getProductSellerDisplayName";
 
@@ -24,6 +25,8 @@ export const ProductSellerPreview = ({
   isAuthorized,
   currentUserId,
 }: ProductSellerPreviewProps) => {
+  const styles = useProductSellerPreviewStyles();
+
   if (seller == null || typeof seller !== "object" || !("_id" in seller)) {
     return null;
   }
@@ -43,9 +46,7 @@ export const ProductSellerPreview = ({
           {PRODUCT_SELLER_PREVIEW_UI.LISTED_PRODUCTS_LABEL}: {listedCount}
         </Text>
       ) : null}
-      {sellerObj.isPremiumUser ? (
-        <Text style={styles.premium}>Premium</Text>
-      ) : null}
+      {sellerObj.isPremiumUser ? <Text style={styles.premium}>Premium</Text> : null}
       <UserFollowButton
         targetUserId={sellerId}
         isFollowing={sellerObj.isFollowing === true}
@@ -55,33 +56,3 @@ export const ProductSellerPreview = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  section: {
-    marginTop: 20,
-    padding: 14,
-    borderRadius: 12,
-    backgroundColor: "#f8fafc",
-    gap: 8,
-  },
-  heading: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#666",
-    textTransform: "uppercase",
-  },
-  name: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: "#111",
-  },
-  meta: {
-    fontSize: 14,
-    color: "#444",
-  },
-  premium: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#d97706",
-  },
-});

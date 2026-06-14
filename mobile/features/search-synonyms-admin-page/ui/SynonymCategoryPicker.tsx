@@ -1,6 +1,7 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import { PRODUCT_CATEGORIES, PRODUCT_CATEGORY_LABEL_RU } from "@/entities/product/lib/productCategoryLabels";
+import { useStaffFilterChipStyles } from "@/shared/theme/staffQueueStyles";
 
 type SynonymCategoryPickerProps = {
   selected: string[];
@@ -13,6 +14,8 @@ export const SynonymCategoryPicker = ({
   onChange,
   disabled = false,
 }: SynonymCategoryPickerProps) => {
+  const styles = useStaffFilterChipStyles();
+
   const toggleSlug = (slug: string) => {
     if (disabled) {
       return;
@@ -35,7 +38,7 @@ export const SynonymCategoryPicker = ({
             onPress={() => toggleSlug(slug)}
             disabled={disabled}
           >
-            <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>
+            <Text style={[styles.chipTextSmall, isSelected && styles.chipTextSelected]}>
               {PRODUCT_CATEGORY_LABEL_RU[slug] ?? slug}
             </Text>
           </Pressable>
@@ -44,19 +47,3 @@ export const SynonymCategoryPicker = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  wrap: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-  chip: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 16,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    backgroundColor: "#fff",
-  },
-  chipSelected: { borderColor: "#1f6feb", backgroundColor: "#e8f1ff" },
-  chipText: { fontSize: 12, color: "#333" },
-  chipTextSelected: { color: "#1f6feb", fontWeight: "600" },
-  disabled: { opacity: 0.5 },
-});

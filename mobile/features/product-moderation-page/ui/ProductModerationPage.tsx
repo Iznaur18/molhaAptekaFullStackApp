@@ -1,19 +1,14 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import {
-  FlatList,
-  Pressable,
-  RefreshControl,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { FlatList, Pressable, Text, View } from "react-native";
+import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { ProductCard } from "@/entities/product/ui/ProductCard";
 import type { ModerationProduct } from "@/entities/product/api/productModerationApi";
 import { usePendingModerationProductsQuery, useProductModerationMutations } from "@/entities/product/model/useProductModerationMutations";
 import { getProductSellerDisplayName } from "@/entities/product/lib/getProductSellerDisplayName";
 import { PRODUCT_MODERATION_PAGE_UI } from "@/shared/config";
+import { useStaffQueueStyles } from "@/shared/theme/staffQueueStyles";
 import { StaffModerationActions } from "@/shared/ui/StaffModerationActions";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
@@ -25,6 +20,7 @@ type ModerationRowProps = {
 };
 
 const ModerationRow = ({ product, onChanged, approveMutation, rejectMutation }: ModerationRowProps) => {
+  const styles = useStaffQueueStyles();
   const router = useRouter();
   const [rejectComment, setRejectComment] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -58,7 +54,7 @@ const ModerationRow = ({ product, onChanged, approveMutation, rejectMutation }: 
         {PRODUCT_MODERATION_PAGE_UI.SELLER_LABEL}: {getProductSellerDisplayName(product)}
       </Text>
       <Pressable onPress={() => router.push(`/product/${productId}`)}>
-        <Text style={styles.link}>{product.productName ?? "Товар"}</Text>
+        <Text style={styles.linkLarge}>{product.productName ?? "Товар"}</Text>
       </Pressable>
       <StaffModerationActions
         approveLabel={PRODUCT_MODERATION_PAGE_UI.APPROVE}
@@ -77,6 +73,7 @@ const ModerationRow = ({ product, onChanged, approveMutation, rejectMutation }: 
 };
 
 export const ProductModerationPage = () => {
+  const styles = useStaffQueueStyles();
   const queueQuery = usePendingModerationProductsQuery();
   const { approveMutation, rejectMutation } = useProductModerationMutations();
   const products = queueQuery.data ?? [];
@@ -100,7 +97,7 @@ export const ProductModerationPage = () => {
       keyExtractor={(item) => String(item._id)}
       contentContainerStyle={styles.list}
       refreshControl={
-        <RefreshControl refreshing={queueQuery.isFetching} onRefresh={() => void queueQuery.refetch()} />
+        <ThemedRefreshControl refreshing={queueQuery.isFetching} onRefresh={() => void queueQuery.refetch()} />
       }
       ListEmptyComponent={<Text style={styles.empty}>{PRODUCT_MODERATION_PAGE_UI.EMPTY}</Text>}
       renderItem={({ item }) => (
@@ -114,11 +111,3 @@ export const ProductModerationPage = () => {
     />
   );
 };
-
-const styles = StyleSheet.create({
-  list: { padding: 12, gap: 16 },
-  row: { gap: 8, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: "#eee" },
-  meta: { fontSize: 13, color: "#666" },
-  link: { fontSize: 15, fontWeight: "600", color: "#1565c0" },
-  empty: { textAlign: "center", color: "#666", padding: 24 },
-});

@@ -1,11 +1,14 @@
-import { FlatList, RefreshControl, StyleSheet, Text } from "react-native";
+import { FlatList, Text } from "react-native";
+import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { useAdminOrdersQuery } from "@/entities/order/model/useAdminOrdersQuery";
 import { OrderCard } from "@/entities/order/ui/OrderCard";
 import { ADMIN_ORDERS_PAGE_UI } from "@/shared/config";
+import { useStaffQueueStyles } from "@/shared/theme/staffQueueStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 export const AdminOrdersPage = () => {
+  const styles = useStaffQueueStyles();
   const ordersQuery = useAdminOrdersQuery({ limit: 50 });
   const orders = ordersQuery.data?.orders ?? [];
 
@@ -32,15 +35,10 @@ export const AdminOrdersPage = () => {
       keyExtractor={(item) => String(item._id)}
       contentContainerStyle={styles.list}
       refreshControl={
-        <RefreshControl refreshing={ordersQuery.isFetching} onRefresh={() => void ordersQuery.refetch()} />
+        <ThemedRefreshControl refreshing={ordersQuery.isFetching} onRefresh={() => void ordersQuery.refetch()} />
       }
       ListEmptyComponent={<Text style={styles.empty}>{ADMIN_ORDERS_PAGE_UI.EMPTY}</Text>}
       renderItem={({ item }) => <OrderCard order={item} />}
     />
   );
 };
-
-const styles = StyleSheet.create({
-  list: { padding: 12, gap: 12 },
-  empty: { textAlign: "center", color: "#666", padding: 24 },
-});

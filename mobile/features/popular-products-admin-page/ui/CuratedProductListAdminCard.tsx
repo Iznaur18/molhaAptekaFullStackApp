@@ -1,8 +1,9 @@
 import { useCallback, useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, Text, TextInput, View } from "react-native";
 
 import type { CuratedListAdminRow } from "@/entities/curated-product-list/api/curatedProductListAdminApi";
 import { POPULAR_PRODUCTS_ADMIN_PAGE_UI } from "@/shared/config";
+import { useStaffAdminStyles } from "@/shared/theme/staffAdminStyles";
 
 type CuratedProductListAdminCardProps = {
   list: CuratedListAdminRow;
@@ -29,6 +30,7 @@ export const CuratedProductListAdminCard = ({
   onAddProduct,
   onRemoveProduct,
 }: CuratedProductListAdminCardProps) => {
+  const styles = useStaffAdminStyles();
   const [titleDraft, setTitleDraft] = useState(list.title);
   const [productIdDraft, setProductIdDraft] = useState("");
   const [localError, setLocalError] = useState("");
@@ -77,7 +79,7 @@ export const CuratedProductListAdminCard = ({
 
   return (
     <View style={styles.card}>
-      <View style={styles.header}>
+      <View style={styles.cardHeader}>
         <View style={styles.orderRow}>
           <Pressable style={styles.orderButton} onPress={onMoveUp} disabled={isBusy || isFirst}>
             <Text>{POPULAR_PRODUCTS_ADMIN_PAGE_UI.MOVE_UP}</Text>
@@ -86,8 +88,8 @@ export const CuratedProductListAdminCard = ({
             <Text>{POPULAR_PRODUCTS_ADMIN_PAGE_UI.MOVE_DOWN}</Text>
           </Pressable>
         </View>
-        <Pressable style={styles.deleteListButton} onPress={onDeleteList} disabled={isBusy}>
-          <Text style={styles.deleteListText}>{POPULAR_PRODUCTS_ADMIN_PAGE_UI.DELETE_LIST}</Text>
+        <Pressable style={styles.deleteButtonCompact} onPress={onDeleteList} disabled={isBusy}>
+          <Text style={styles.deleteTextSmall}>{POPULAR_PRODUCTS_ADMIN_PAGE_UI.DELETE_LIST}</Text>
         </Pressable>
       </View>
 
@@ -132,64 +134,3 @@ export const CuratedProductListAdminCard = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  card: {
-    gap: 8,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: "#eee",
-    borderRadius: 10,
-    backgroundColor: "#fafafa",
-  },
-  header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  orderRow: { flexDirection: "row", gap: 8 },
-  orderButton: {
-    backgroundColor: "#eee",
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-  },
-  deleteListButton: {
-    backgroundColor: "#c62828",
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-  },
-  deleteListText: { color: "#fff", fontWeight: "600", fontSize: 12 },
-  label: { fontSize: 13, fontWeight: "600", marginTop: 4 },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    padding: 10,
-    fontSize: 14,
-    backgroundColor: "#fff",
-  },
-  primaryButton: {
-    backgroundColor: "#111",
-    borderRadius: 8,
-    paddingVertical: 10,
-    alignItems: "center",
-  },
-  primaryButtonText: { color: "#fff", fontWeight: "600" },
-  secondaryButton: {
-    backgroundColor: "#eee",
-    borderRadius: 8,
-    paddingVertical: 8,
-    alignItems: "center",
-  },
-  secondaryButtonText: { fontWeight: "600" },
-  productRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 6,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#ddd",
-  },
-  productId: { fontSize: 12, color: "#333", flex: 1, marginRight: 8 },
-  removeText: { color: "#c62828", fontSize: 12, fontWeight: "600" },
-  emptyList: { fontSize: 13, color: "#888", fontStyle: "italic" },
-  error: { color: "#c62828", fontSize: 13 },
-});

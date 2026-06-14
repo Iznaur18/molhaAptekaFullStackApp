@@ -3,16 +3,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import type { z } from "zod";
-import {
-  Alert,
-  FlatList,
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Alert, FlatList, Pressable, ScrollView, Text, View } from "react-native";
+import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { getOrderItemIndex } from "@/entities/order/lib/getOrderItemIndex";
 import {
@@ -35,7 +27,7 @@ import {
   PRODUCT_REPORT_UI,
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
-import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useOrdersScreenStyles } from "@/shared/theme/commerceScreenStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 type OrderRecord = z.infer<typeof orderFromApiSchema>;
@@ -50,7 +42,7 @@ const STATUS_FILTERS: Array<{ value: string; label: string }> = [
 
 export const MySalesPage = () => {
   const router = useRouter();
-  const theme = useAppTheme();
+  const styles = useOrdersScreenStyles();
   const queryClient = useQueryClient();
   const isAuthorized = useIsAuthorized();
   const [statusFilter, setStatusFilter] = useState("");
@@ -182,13 +174,8 @@ export const MySalesPage = () => {
   if (!isAuthorized) {
     return (
       <View style={styles.centered}>
-        <Text style={[styles.hint, { color: theme.colors.textMuted }]}>
-          {MY_SALES_PAGE_UI.LOGIN_HINT}
-        </Text>
-        <Pressable
-          style={[styles.button, { backgroundColor: theme.colors.nearBlack }]}
-          onPress={() => router.push("/(auth)/login")}
-        >
+        <Text style={styles.hint}>{MY_SALES_PAGE_UI.LOGIN_HINT}</Text>
+        <Pressable style={styles.button} onPress={() => router.push("/(auth)/login")}>
           <Text style={styles.buttonText}>{MY_SALES_PAGE_UI.LOGIN_BUTTON}</Text>
         </Pressable>
       </View>
@@ -216,7 +203,7 @@ export const MySalesPage = () => {
       keyExtractor={(order) => order._id}
       contentContainerStyle={styles.list}
       refreshControl={
-        <RefreshControl refreshing={salesQuery.isRefetching} onRefresh={salesQuery.refetch} />
+        <ThemedRefreshControl refreshing={salesQuery.isRefetching} onRefresh={salesQuery.refetch} />
       }
       ListHeaderComponent={
         <ScrollView
@@ -229,18 +216,11 @@ export const MySalesPage = () => {
             return (
               <Pressable
                 key={filter.value || "all"}
-                style={[
-                  styles.filterChip,
-                  { borderColor: theme.colors.border },
-                  isActive && { backgroundColor: theme.colors.nearBlack },
-                ]}
+                style={[styles.filterChip, isActive && styles.filterChipActive]}
                 onPress={() => setStatusFilter(filter.value)}
               >
                 <Text
-                  style={[
-                    styles.filterChipText,
-                    { color: isActive ? "#fff" : theme.colors.text },
-                  ]}
+                  style={[styles.filterChipText, isActive && styles.filterChipTextActive]}
                 >
                   {filter.label}
                 </Text>
@@ -251,7 +231,7 @@ export const MySalesPage = () => {
       }
       ListEmptyComponent={
         <View style={styles.centered}>
-          <Text style={[styles.hint, { color: theme.colors.textMuted }]}>
+          <Text style={styles.hint}>
             {statusFilter ? MY_SALES_PAGE_UI.EMPTY_BY_FILTER : MY_SALES_PAGE_UI.EMPTY}
           </Text>
         </View>
@@ -269,46 +249,3 @@ export const MySalesPage = () => {
     />
   );
 };
-
-const styles = StyleSheet.create({
-  list: {
-    padding: 16,
-    flexGrow: 1,
-  },
-  filters: {
-    gap: 8,
-    paddingBottom: 12,
-  },
-  filterChip: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 999,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-  },
-  filterChipText: {
-    fontSize: 13,
-    fontWeight: "600",
-  },
-  centered: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 24,
-    gap: 16,
-  },
-  hint: {
-    fontSize: 15,
-    textAlign: "center",
-    lineHeight: 22,
-  },
-  button: {
-    borderRadius: 10,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-});

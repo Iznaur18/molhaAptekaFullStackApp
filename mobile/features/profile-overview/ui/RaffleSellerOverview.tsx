@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import { Alert, Text, View } from "react-native";
 
 import type { MyRaffleRecord } from "@/entities/raffle/api/fetchMyRaffle";
 import { canSellerEditRaffle } from "@/entities/raffle/lib/canSellerEditRaffle";
@@ -8,7 +8,8 @@ import { useMyRaffleMutations } from "@/entities/raffle/model/useMyRaffleMutatio
 import { useMyRaffleQuery } from "@/entities/raffle/model/useMyRaffleQuery";
 import { API_CLIENT_UI, RAFFLE_SELLER_PANEL_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
-import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { createThemedStyles } from "@/shared/theme/createThemedStyles";
+import { AppButton } from "@/shared/ui/AppButton";
 import { ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 const STATUS_LABEL: Record<string, string> = {
@@ -23,9 +24,77 @@ type RaffleSellerOverviewProps = {
   enabled?: boolean;
 };
 
+const useStyles = createThemedStyles((theme) => ({
+  card: {
+    borderWidth: 1,
+    borderRadius: theme.radius.md,
+    padding: 14,
+    marginBottom: theme.spacing[4],
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: "700",
+    marginBottom: theme.spacing[2],
+    color: theme.colors.text,
+  },
+  empty: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: theme.colors.textMuted,
+  },
+  current: {
+    gap: theme.spacing[2],
+  },
+  name: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: theme.colors.text,
+  },
+  status: {
+    fontSize: 13,
+    color: theme.colors.textMuted,
+  },
+  comment: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: theme.colors.textMuted,
+  },
+  actions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: theme.spacing[2],
+    marginTop: theme.spacing[1],
+  },
+  actionButton: {
+    paddingVertical: theme.spacing[2],
+    paddingHorizontal: theme.spacing[3],
+  },
+  archive: {
+    marginTop: theme.spacing[3],
+    gap: 6,
+  },
+  archiveTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: theme.colors.text,
+  },
+  archiveItem: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: theme.colors.textMuted,
+  },
+  error: {
+    fontSize: 13,
+    marginBottom: theme.spacing[2],
+    color: theme.colors.danger,
+  },
+}));
+
 export const RaffleSellerOverview = ({ enabled = true }: RaffleSellerOverviewProps) => {
   const router = useRouter();
-  const theme = useAppTheme();
+  const styles = useStyles();
   const myRaffleQuery = useMyRaffleQuery({ enabled });
   const { pauseMyMutation, deleteMyMutation } = useMyRaffleMutations();
   const [actionError, setActionError] = useState("");
@@ -84,28 +153,24 @@ export const RaffleSellerOverview = ({ enabled = true }: RaffleSellerOverviewPro
 
   if (myRaffleQuery.isError) {
     return (
-      <Text style={[styles.error, { color: theme.colors.danger }]}>
+      <Text style={styles.error}>
         {formatApiErrorMessage(myRaffleQuery.error, API_CLIENT_UI.FETCH_MY_RAFFLE_FALLBACK)}
       </Text>
     );
   }
 
   return (
-    <View style={[styles.card, { borderColor: theme.colors.border, backgroundColor: theme.colors.surface }]}>
-      <Text style={[styles.title, { color: theme.colors.text }]}>{RAFFLE_SELLER_PANEL_UI.TITLE}</Text>
+    <View style={styles.card}>
+      <Text style={styles.title}>{RAFFLE_SELLER_PANEL_UI.TITLE}</Text>
 
-      {actionError ? (
-        <Text style={[styles.error, { color: theme.colors.danger }]}>{actionError}</Text>
-      ) : null}
+      {actionError ? <Text style={styles.error}>{actionError}</Text> : null}
 
       {!raffle ? (
-        <Text style={[styles.empty, { color: theme.colors.textMuted }]}>
-          {RAFFLE_SELLER_PANEL_UI.EMPTY}
-        </Text>
+        <Text style={styles.empty}>{RAFFLE_SELLER_PANEL_UI.EMPTY}</Text>
       ) : (
         <View style={styles.current}>
-          <Text style={[styles.name, { color: theme.colors.text }]}>{raffle.title}</Text>
-          <Text style={[styles.status, { color: theme.colors.textMuted }]}>
+          <Text style={styles.name}>{raffle.title}</Text>
+          <Text style={styles.status}>
             {STATUS_LABEL[raffle.status] ?? raffle.status}
             {raffle.status === "active" || raffle.status === "completed"
               ? ` · ${raffle.salesProgress ?? 0} / ${raffle.targetSales ?? 0}`
@@ -113,50 +178,46 @@ export const RaffleSellerOverview = ({ enabled = true }: RaffleSellerOverviewPro
           </Text>
 
           {raffle.status === "rejected" && raffle.moderationComment ? (
-            <Text style={[styles.comment, { color: theme.colors.textMuted }]}>
+            <Text style={styles.comment}>
               {RAFFLE_SELLER_PANEL_UI.REJECTION_PREFIX} {raffle.moderationComment}
             </Text>
           ) : null}
 
           <View style={styles.actions}>
             {showEdit ? (
-              <Pressable
-                style={[styles.actionButton, { backgroundColor: theme.colors.nearBlack }]}
+              <AppButton
+                label={RAFFLE_SELLER_PANEL_UI.EDIT}
+                variant="contrast"
                 onPress={() => handleEdit(raffle)}
                 disabled={actionsBusy}
-              >
-                <Text style={styles.actionButtonText}>{RAFFLE_SELLER_PANEL_UI.EDIT}</Text>
-              </Pressable>
+                style={styles.actionButton}
+              />
             ) : null}
             {raffle.status === "active" ? (
-              <Pressable
-                style={[styles.actionButtonSecondary, { borderColor: theme.colors.border }]}
+              <AppButton
+                label={RAFFLE_SELLER_PANEL_UI.PAUSE}
+                variant="secondary"
                 onPress={() => void handlePause()}
                 disabled={actionsBusy}
-              >
-                <Text style={[styles.actionButtonSecondaryText, { color: theme.colors.text }]}>
-                  {RAFFLE_SELLER_PANEL_UI.PAUSE}
-                </Text>
-              </Pressable>
+                style={styles.actionButton}
+              />
             ) : null}
-            <Pressable
-              style={[styles.actionButtonSecondary, styles.actionDanger, { borderColor: "#c62828" }]}
+            <AppButton
+              label={RAFFLE_SELLER_PANEL_UI.DELETE}
+              variant="danger"
               onPress={handleDelete}
               disabled={actionsBusy}
-            >
-              <Text style={styles.actionDangerText}>{RAFFLE_SELLER_PANEL_UI.DELETE}</Text>
-            </Pressable>
+              style={styles.actionButton}
+            />
           </View>
         </View>
       )}
 
       {archive.length > 0 ? (
         <View style={styles.archive}>
-          <Text style={[styles.archiveTitle, { color: theme.colors.text }]}>
-            {RAFFLE_SELLER_PANEL_UI.ARCHIVE_TITLE}
-          </Text>
+          <Text style={styles.archiveTitle}>{RAFFLE_SELLER_PANEL_UI.ARCHIVE_TITLE}</Text>
           {archive.map((row) => (
-            <Text key={row._id} style={[styles.archiveItem, { color: theme.colors.textMuted }]}>
+            <Text key={row._id} style={styles.archiveItem}>
               {row.title} — {STATUS_LABEL[row.status] ?? row.status}
             </Text>
           ))}
@@ -165,85 +226,3 @@ export const RaffleSellerOverview = ({ enabled = true }: RaffleSellerOverviewPro
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  card: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 12,
-    padding: 14,
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "700",
-    marginBottom: 8,
-  },
-  empty: {
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  current: {
-    gap: 8,
-  },
-  name: {
-    fontSize: 15,
-    fontWeight: "600",
-  },
-  status: {
-    fontSize: 13,
-  },
-  comment: {
-    fontSize: 13,
-    lineHeight: 18,
-  },
-  actions: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-    marginTop: 4,
-  },
-  actionButton: {
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  actionButtonText: {
-    color: "#fff",
-    fontSize: 13,
-    fontWeight: "600",
-  },
-  actionButtonSecondary: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  actionButtonSecondaryText: {
-    fontSize: 13,
-    fontWeight: "600",
-  },
-  actionDanger: {
-    backgroundColor: "#fff",
-  },
-  actionDangerText: {
-    color: "#c62828",
-    fontSize: 13,
-    fontWeight: "600",
-  },
-  archive: {
-    marginTop: 12,
-    gap: 6,
-  },
-  archiveTitle: {
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  archiveItem: {
-    fontSize: 13,
-    lineHeight: 18,
-  },
-  error: {
-    fontSize: 13,
-    marginBottom: 8,
-  },
-});

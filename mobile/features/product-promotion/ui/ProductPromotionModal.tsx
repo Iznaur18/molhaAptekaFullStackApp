@@ -4,7 +4,6 @@ import {
   Modal,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   View,
 } from "react-native";
@@ -22,6 +21,7 @@ import type {
 } from "@/entities/product/api/fetchProductPromotionTariffs";
 import { PRODUCT_CARD_UI, PRODUCT_PROMOTION_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useProductPromotionModalStyles } from "@/shared/theme/modalChromeStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 const TIER_BADGE_LABELS: Record<number, string> = {
@@ -61,6 +61,7 @@ export const ProductPromotionModal = ({
   onClose,
   onSubmit,
 }: ProductPromotionModalProps) => {
+  const styles = useProductPromotionModalStyles();
   const theme = useAppTheme();
   const defaultTier = tiers[0]?.tier ?? PRODUCT_PROMOTION_TIER_GOLD;
   const defaultDuration = durations[0]?.code ?? "";
@@ -125,34 +126,29 @@ export const ProductPromotionModal = ({
 
     return (
       <>
-        <Text style={[styles.subtitle, { color: theme.colors.textMuted }]}>
+        <Text style={styles.subtitle}>
           {PRODUCT_PROMOTION_UI.MODAL_SUBTITLE(productName)}
         </Text>
 
         <View
           style={[
             styles.balanceCard,
-            {
-              backgroundColor: hasEnoughFunds
-                ? theme.colors.surfaceMuted
-                : "#fef2f2",
-              borderColor: theme.colors.border,
-            },
+            hasEnoughFunds ? styles.balanceCardOk : styles.balanceCardInsufficient,
           ]}
         >
-          <Text style={[styles.balanceLabel, { color: theme.colors.textMuted }]}>
+          <Text style={styles.balanceLabel}>
             {PRODUCT_PROMOTION_UI.BALANCE_LABEL}
           </Text>
-          <Text style={[styles.balanceValue, { color: theme.colors.text }]}>
+          <Text style={styles.balanceValue}>
             {PRODUCT_PROMOTION_UI.BALANCE_POINTS(loyaltyPoints)}
           </Text>
         </View>
 
-        <Text style={[styles.hint, { color: theme.colors.textMuted }]}>
+        <Text style={styles.hint}>
           {PRODUCT_PROMOTION_UI.PAYMENT_HINT_POINTS}
         </Text>
 
-        <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+        <Text style={styles.sectionTitle}>
           {PRODUCT_PROMOTION_UI.TIER_LABEL}
         </Text>
         <View style={styles.tierGrid}>
@@ -162,28 +158,22 @@ export const ProductPromotionModal = ({
             return (
               <Pressable
                 key={tier.tier}
-                style={[
-                  styles.tierCard,
-                  {
-                    borderColor: isSelected ? theme.colors.nearBlack : theme.colors.border,
-                    backgroundColor: theme.colors.surface,
-                  },
-                ]}
+                style={[styles.tierCard, isSelected && styles.tierCardSelected]}
                 disabled={isSubmitting}
                 onPress={() => setSelectedTier(tier.tier)}
               >
-                <Text style={[styles.tierBadge, { color: theme.colors.text }]}>
+                <Text style={styles.tierBadge}>
                   {TIER_BADGE_LABELS[tier.tier] ?? tier.title}
                 </Text>
-                <Text style={[styles.tierTitle, { color: theme.colors.text }]}>
+                <Text style={styles.tierTitle}>
                   {tier.title}
                 </Text>
                 {ratePercent ? (
-                  <Text style={[styles.tierRate, { color: theme.colors.textMuted }]}>
+                  <Text style={styles.tierRate}>
                     {PRODUCT_PROMOTION_UI.TIER_RATE_HINT(ratePercent)}
                   </Text>
                 ) : null}
-                <Text style={[styles.tierDescription, { color: theme.colors.textMuted }]}>
+                <Text style={styles.tierDescription}>
                   {tier.description}
                 </Text>
               </Pressable>
@@ -191,7 +181,7 @@ export const ProductPromotionModal = ({
           })}
         </View>
 
-        <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+        <Text style={styles.sectionTitle}>
           {PRODUCT_PROMOTION_UI.DURATION_LABEL}
         </Text>
         <View style={styles.durationRow}>
@@ -205,20 +195,14 @@ export const ProductPromotionModal = ({
             return (
               <Pressable
                 key={duration.code}
-                style={[
-                  styles.durationChip,
-                  {
-                    borderColor: isSelected ? theme.colors.nearBlack : theme.colors.border,
-                    backgroundColor: theme.colors.surface,
-                  },
-                ]}
+                style={[styles.durationChip, isSelected && styles.durationChipSelected]}
                 disabled={isSubmitting}
                 onPress={() => setSelectedDurationCode(duration.code)}
               >
-                <Text style={[styles.durationTitle, { color: theme.colors.text }]}>
+                <Text style={styles.durationTitle}>
                   {duration.title}
                 </Text>
-                <Text style={[styles.durationPrice, { color: theme.colors.textMuted }]}>
+                <Text style={styles.durationPrice}>
                   {PRODUCT_PROMOTION_UI.DURATION_PRICE_POINTS(pricePoints)}
                 </Text>
               </Pressable>
@@ -227,28 +211,28 @@ export const ProductPromotionModal = ({
         </View>
 
         {selectedDuration && selectedTierMeta ? (
-          <View style={[styles.summary, { borderColor: theme.colors.border }]}>
+          <View style={styles.summary}>
             <View style={styles.summaryRow}>
-              <Text style={{ color: theme.colors.textMuted }}>
+              <Text style={styles.summaryLabel}>
                 {PRODUCT_PROMOTION_UI.SUMMARY_TIER}
               </Text>
-              <Text style={{ color: theme.colors.text, fontWeight: "600" }}>
+              <Text style={styles.summaryValueStrong}>
                 {selectedTierMeta.title}
               </Text>
             </View>
             <View style={styles.summaryRow}>
-              <Text style={{ color: theme.colors.textMuted }}>
+              <Text style={styles.summaryLabel}>
                 {PRODUCT_PROMOTION_UI.SUMMARY_DURATION}
               </Text>
-              <Text style={{ color: theme.colors.text, fontWeight: "600" }}>
+              <Text style={styles.summaryValueStrong}>
                 {PRODUCT_PROMOTION_UI.TARIFF_DURATION(selectedDuration.durationHours)}
               </Text>
             </View>
             <View style={styles.summaryRow}>
-              <Text style={{ color: theme.colors.text, fontWeight: "700" }}>
+              <Text style={styles.summaryValueBold}>
                 {PRODUCT_PROMOTION_UI.TOTAL_LABEL}
               </Text>
-              <Text style={{ color: theme.colors.text, fontWeight: "700" }}>
+              <Text style={styles.summaryValueBold}>
                 {PRODUCT_PROMOTION_UI.TOTAL_POINTS(selectedPricePoints)}
               </Text>
             </View>
@@ -266,8 +250,8 @@ export const ProductPromotionModal = ({
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
       <View style={styles.overlay}>
-        <View style={[styles.card, { backgroundColor: theme.colors.surface }]}>
-          <Text style={[styles.title, { color: theme.colors.text }]}>
+        <View style={styles.card}>
+          <Text style={styles.title}>
             {PRODUCT_PROMOTION_UI.MODAL_TITLE}
           </Text>
 
@@ -277,14 +261,14 @@ export const ProductPromotionModal = ({
 
           <View style={styles.actions}>
             <Pressable
-              style={[styles.secondaryButton, { borderColor: theme.colors.border }]}
+              style={styles.secondaryButton}
               onPress={onClose}
               disabled={isSubmitting}
             >
-              <Text style={{ color: theme.colors.text }}>{PRODUCT_PROMOTION_UI.CANCEL}</Text>
+              <Text style={styles.secondaryButtonText}>{PRODUCT_PROMOTION_UI.CANCEL}</Text>
             </Pressable>
             <Pressable
-              style={[styles.primaryButton, { backgroundColor: theme.colors.nearBlack }]}
+              style={styles.primaryButton}
               onPress={handleSubmit}
               disabled={
                 isTariffsLoading ||
@@ -296,7 +280,7 @@ export const ProductPromotionModal = ({
               }
             >
               {isSubmitting ? (
-                <ActivityIndicator color="#fff" />
+                <ActivityIndicator color={theme.colors.onContrast} />
               ) : (
                 <Text style={styles.primaryButtonText}>{PRODUCT_PROMOTION_UI.SUBMIT_POINTS}</Text>
               )}
@@ -307,136 +291,3 @@ export const ProductPromotionModal = ({
     </Modal>
   );
 };
-
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.45)",
-    justifyContent: "flex-end",
-  },
-  card: {
-    maxHeight: "92%",
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    padding: 20,
-    gap: 12,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "700",
-  },
-  body: {
-    paddingBottom: 8,
-    gap: 10,
-  },
-  subtitle: {
-    fontSize: 14,
-  },
-  balanceCard: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 12,
-    padding: 12,
-    gap: 4,
-  },
-  balanceLabel: {
-    fontSize: 12,
-    textTransform: "uppercase",
-    letterSpacing: 0.4,
-  },
-  balanceValue: {
-    fontSize: 20,
-    fontWeight: "700",
-  },
-  hint: {
-    fontSize: 13,
-    lineHeight: 18,
-  },
-  sectionTitle: {
-    marginTop: 4,
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  tierGrid: {
-    gap: 8,
-  },
-  tierCard: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 12,
-    padding: 12,
-    gap: 4,
-  },
-  tierBadge: {
-    fontSize: 12,
-    fontWeight: "700",
-    textTransform: "uppercase",
-  },
-  tierTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  tierRate: {
-    fontSize: 12,
-  },
-  tierDescription: {
-    fontSize: 13,
-    lineHeight: 18,
-  },
-  durationRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  durationChip: {
-    minWidth: "30%",
-    flexGrow: 1,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 10,
-    padding: 10,
-    gap: 4,
-  },
-  durationTitle: {
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  durationPrice: {
-    fontSize: 12,
-  },
-  summary: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 12,
-    padding: 12,
-    gap: 8,
-    marginTop: 4,
-  },
-  summaryRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 12,
-  },
-  error: {
-    color: "#dc2626",
-    fontSize: 13,
-  },
-  actions: {
-    flexDirection: "row",
-    gap: 10,
-    marginTop: 4,
-  },
-  secondaryButton: {
-    flex: 1,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 10,
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  primaryButton: {
-    flex: 1.4,
-    borderRadius: 10,
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  primaryButtonText: {
-    color: "#fff",
-    fontWeight: "600",
-  },
-});

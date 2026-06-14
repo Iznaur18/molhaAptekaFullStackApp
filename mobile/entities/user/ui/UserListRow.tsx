@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, Text, View } from "react-native";
 
 import { formatSearchRowRatingCompact } from "@/entities/user/lib/formatSearchRowRating";
 import { formatSearchRowTotalSalesCount } from "@/entities/user/lib/formatSearchRowTotalSales";
@@ -7,7 +7,7 @@ import { pickUserProfilePhotoUrl } from "@/entities/user/lib/pickUserProfilePhot
 import type { UserSearchListItem } from "@/entities/user/api/fetchUsersSearchPage";
 import { DEFAULT_USER_AVATAR_URL } from "@/entities/user/model/constants";
 import { USER_LIST_ROW_UI } from "@/shared/config";
-import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useUserListRowStyles } from "@/shared/theme/accountFeatureStyles";
 
 type UserListRowProps = {
   user: UserSearchListItem;
@@ -15,7 +15,7 @@ type UserListRowProps = {
 };
 
 export const UserListRow = ({ user, onPress }: UserListRowProps) => {
-  const theme = useAppTheme();
+  const styles = useUserListRowStyles();
   const [imgFailed, setImgFailed] = useState(false);
 
   const picked = pickUserProfilePhotoUrl(user);
@@ -44,92 +44,39 @@ export const UserListRow = ({ user, onPress }: UserListRowProps) => {
 
   return (
     <Pressable
-      style={({ pressed }) => [
-        styles.row,
-        { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
-        pressed && styles.rowPressed,
-      ]}
+      style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
       onPress={handlePress}
     >
       <View style={styles.head}>
         <Image source={{ uri: src }} style={styles.avatar} onError={() => setImgFailed(true)} />
-        <Text style={[styles.name, { color: theme.colors.text }]} numberOfLines={1}>
+        <Text style={styles.name} numberOfLines={1}>
           {displayName}
         </Text>
       </View>
 
       {showEmail ? (
-        <Text style={[styles.email, { color: theme.colors.textMuted }]} numberOfLines={1}>
+        <Text style={styles.email} numberOfLines={1}>
           {email}
         </Text>
       ) : null}
 
       {user.isBlockedUser === true ? (
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>{USER_LIST_ROW_UI.BADGE_BLOCKED}</Text>
+        <View style={styles.bannedBadge}>
+          <Text style={styles.bannedText}>{USER_LIST_ROW_UI.BADGE_BLOCKED}</Text>
         </View>
       ) : null}
 
       <View style={styles.metrics}>
-        <Text style={[styles.metric, { color: theme.colors.textMuted }]}>
+        <Text style={styles.metric}>
           {USER_LIST_ROW_UI.TOTAL_SALES_COUNT_LABEL}: {totalSalesCountText}
         </Text>
-        <Text style={[styles.metric, { color: theme.colors.textMuted }]}>
+        <Text style={styles.metric}>
           {USER_LIST_ROW_UI.RATING_SCORE_LABEL}: {ratingText}
         </Text>
-        <Text style={[styles.metric, { color: theme.colors.textMuted }]}>
+        <Text style={styles.metric}>
           {USER_LIST_ROW_UI.FOLLOWERS_LABEL}: {followersText}
         </Text>
       </View>
     </Pressable>
   );
 };
-
-const styles = StyleSheet.create({
-  row: {
-    borderWidth: 1,
-    borderRadius: 12,
-    padding: 12,
-    gap: 6,
-  },
-  rowPressed: {
-    opacity: 0.92,
-  },
-  head: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-  avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: "#f4f4f4",
-  },
-  name: {
-    flex: 1,
-    fontSize: 16,
-    fontWeight: "700",
-  },
-  email: {
-    fontSize: 13,
-  },
-  badge: {
-    alignSelf: "flex-start",
-    backgroundColor: "#ffebee",
-    borderRadius: 6,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-  },
-  badgeText: {
-    fontSize: 12,
-    color: "#c62828",
-    fontWeight: "600",
-  },
-  metrics: {
-    gap: 2,
-  },
-  metric: {
-    fontSize: 13,
-  },
-});

@@ -1,17 +1,12 @@
 import { useState } from "react";
-import {
-  ActivityIndicator,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { ActivityIndicator, Pressable, Text, TextInput, View } from "react-native";
 
 import { useUploadImageMutation } from "@/entities/upload/model/useUploadImageMutation";
 import { pickGalleryImageAsset } from "@/features/image-upload/lib/pickGalleryImageAsset";
 import { IMAGE_UPLOAD_UI } from "@/shared/config";
 import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useMediaUploadFieldStyles } from "@/shared/theme/uploadFieldStyles";
 import { CachedProductImage } from "@/shared/ui/CachedProductImage";
 
 type ImageUrlUploadFieldProps = {
@@ -27,6 +22,8 @@ export const ImageUrlUploadField = ({
   onChange,
   disabled = false,
 }: ImageUrlUploadFieldProps) => {
+  const theme = useAppTheme();
+  const styles = useMediaUploadFieldStyles();
   const uploadMutation = useUploadImageMutation();
   const [errorMessage, setErrorMessage] = useState("");
   const isBusy = uploadMutation.isPending;
@@ -63,6 +60,7 @@ export const ImageUrlUploadField = ({
         editable={!disabled && !isBusy}
         placeholder="https://… или /uploads/…"
         autoCapitalize="none"
+        placeholderTextColor={theme.colors.textMuted}
       />
       <Pressable
         style={[styles.button, (disabled || isBusy) && styles.buttonDisabled]}
@@ -72,7 +70,7 @@ export const ImageUrlUploadField = ({
         disabled={disabled || isBusy}
       >
         {isBusy ? (
-          <ActivityIndicator color="#111" />
+          <ActivityIndicator color={theme.colors.nearBlack} />
         ) : (
           <Text style={styles.buttonText}>{IMAGE_UPLOAD_UI.UPLOAD_BUTTON}</Text>
         )}
@@ -81,49 +79,3 @@ export const ImageUrlUploadField = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  wrap: {
-    gap: 8,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
-  },
-  preview: {
-    width: "100%",
-    height: 140,
-    borderRadius: 10,
-  },
-  input: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 15,
-  },
-  button: {
-    alignSelf: "flex-start",
-    borderRadius: 8,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#111",
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    minHeight: 40,
-    justifyContent: "center",
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  buttonText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#111",
-  },
-  error: {
-    color: "#c62828",
-    fontSize: 13,
-  },
-});

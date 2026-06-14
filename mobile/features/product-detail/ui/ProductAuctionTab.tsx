@@ -1,13 +1,6 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import {
-  ActivityIndicator,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Pressable, Text, TextInput, View } from "react-native";
 
 import { formatOfferPrice } from "@/entities/product-price-offer/api/fetchTopPriceOffers";
 import { useMyPriceOfferQuery } from "@/entities/product-price-offer/model/useMyPriceOfferQuery";
@@ -15,6 +8,9 @@ import { usePriceOfferMutations } from "@/entities/product-price-offer/model/use
 import { useTopPriceOffersQuery } from "@/entities/product-price-offer/model/useTopPriceOffersQuery";
 import { API_CLIENT_UI, PRODUCT_PRICE_OFFER_UI, PRODUCT_UI } from "@/shared/config";
 import { formatApiErrorMessage, formatPriceRub } from "@/shared/lib";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useProductDetailTabStyles } from "@/shared/theme/catalogProductStyles";
+import { AppButton } from "@/shared/ui/AppButton";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 const PRICE_OFFER_STATUS_PENDING = "pending";
@@ -50,6 +46,8 @@ export const ProductAuctionTab = ({
   isOwnProduct,
 }: ProductAuctionTabProps) => {
   const router = useRouter();
+  const theme = useAppTheme();
+  const styles = useProductDetailTabStyles();
   const offersQuery = useTopPriceOffersQuery(productId, auctionActive);
   const myOfferQuery = useMyPriceOfferQuery(productId, isAuthorized && !isOwnProduct);
   const { submitMutation, patchMutation, cancelMutation } = usePriceOfferMutations(productId);
@@ -150,10 +148,10 @@ export const ProductAuctionTab = ({
         <Text style={styles.message}>Предложений пока нет</Text>
       ) : (
         offers.map((offer) => (
-          <View key={offer._id} style={styles.offer}>
-            <Text style={styles.offerPrice}>{formatOfferPrice(offer.offerPriceRub)}</Text>
+          <View key={offer._id} style={styles.item}>
+            <Text style={styles.itemTitle}>{formatOfferPrice(offer.offerPriceRub)}</Text>
             {offer.buyerUserName ? (
-              <Text style={styles.offerBuyer}>{offer.buyerUserName}</Text>
+              <Text style={styles.itemMeta}>{offer.buyerUserName}</Text>
             ) : null}
           </View>
         ))
@@ -162,60 +160,46 @@ export const ProductAuctionTab = ({
       {!isOwnProduct ? (
         <>
           {showForm ? (
-            <View style={styles.form}>
-              <Text style={styles.formTitle}>{PRODUCT_PRICE_OFFER_UI.SECTION_FORM_TITLE}</Text>
+            <View style={styles.panel}>
+              <Text style={styles.panelTitle}>{PRODUCT_PRICE_OFFER_UI.SECTION_FORM_TITLE}</Text>
               <Text style={styles.label}>{PRODUCT_PRICE_OFFER_UI.LABEL_PRICE}</Text>
               <TextInput
-                style={styles.input}
+                style={styles.compactInput}
                 value={priceInput}
                 onChangeText={setPriceInput}
                 keyboardType="number-pad"
                 editable={!isBusy}
+                placeholderTextColor={theme.colors.textMuted}
               />
               <View style={styles.actions}>
-                <Pressable
-                  style={[styles.primaryButton, isBusy && styles.disabled]}
-                  onPress={() => {
-                    void handleSubmitOffer();
-                  }}
+                <AppButton
+                  label={
+                    myOffer?.status === PRICE_OFFER_STATUS_PENDING
+                      ? PRODUCT_PRICE_OFFER_UI.UPDATE
+                      : PRODUCT_PRICE_OFFER_UI.SUBMIT
+                  }
+                  variant="contrast"
+                  onPress={() => void handleSubmitOffer()}
                   disabled={isBusy}
-                >
-                  {isBusy ? (
-                    <ActivityIndicator color="#fff" />
-                  ) : (
-                    <Text style={styles.primaryButtonText}>
-                      {myOffer?.status === PRICE_OFFER_STATUS_PENDING
-                        ? PRODUCT_PRICE_OFFER_UI.UPDATE
-                        : PRODUCT_PRICE_OFFER_UI.SUBMIT}
-                    </Text>
-                  )}
-                </Pressable>
+                />
                 {myOffer?.status === PRICE_OFFER_STATUS_PENDING ? (
-                  <Pressable
-                    style={[styles.secondaryButton, isBusy && styles.disabled]}
-                    onPress={() => {
-                      void handleCancel();
-                    }}
+                  <AppButton
+                    label={PRODUCT_PRICE_OFFER_UI.CANCEL}
+                    variant="outline"
+                    onPress={() => void handleCancel()}
                     disabled={isBusy}
-                  >
-                    <Text style={styles.secondaryButtonText}>
-                      {PRODUCT_PRICE_OFFER_UI.CANCEL}
-                    </Text>
-                  </Pressable>
+                  />
                 ) : null}
               </View>
             </View>
           ) : null}
 
           {!isAuthorized ? (
-            <Pressable
-              style={styles.primaryButton}
+            <AppButton
+              label={PRODUCT_PRICE_OFFER_UI.LOGIN_TO_BID}
+              variant="contrast"
               onPress={() => router.push("/(auth)/login")}
-            >
-              <Text style={styles.primaryButtonText}>
-                {PRODUCT_PRICE_OFFER_UI.LOGIN_TO_BID}
-              </Text>
-            </Pressable>
+            />
           ) : null}
 
           {isAuthorized && !isUserDataConfirmed && !isOwnProduct ? (
@@ -229,106 +213,3 @@ export const ProductAuctionTab = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  root: {
-    gap: 10,
-    paddingTop: 8,
-  },
-  currentPrice: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#111",
-  },
-  message: {
-    fontSize: 15,
-    color: "#666",
-    paddingTop: 8,
-  },
-  offer: {
-    padding: 12,
-    borderRadius: 10,
-    backgroundColor: "#f8fafc",
-    gap: 4,
-  },
-  offerPrice: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#111",
-  },
-  offerBuyer: {
-    fontSize: 13,
-    color: "#666",
-  },
-  form: {
-    marginTop: 8,
-    gap: 8,
-    padding: 12,
-    borderRadius: 10,
-    backgroundColor: "#f8fafc",
-  },
-  formTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#111",
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
-  },
-  input: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 16,
-    backgroundColor: "#fff",
-  },
-  actions: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  primaryButton: {
-    backgroundColor: "#111",
-    borderRadius: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    minHeight: 40,
-    justifyContent: "center",
-  },
-  primaryButtonText: {
-    color: "#fff",
-    fontWeight: "600",
-  },
-  secondaryButton: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#111",
-    borderRadius: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-  },
-  secondaryButtonText: {
-    color: "#111",
-    fontWeight: "600",
-  },
-  disabled: {
-    opacity: 0.6,
-  },
-  hint: {
-    fontSize: 14,
-    color: "#666",
-    lineHeight: 20,
-  },
-  status: {
-    fontSize: 14,
-    color: "#2e7d32",
-    fontWeight: "600",
-  },
-  error: {
-    fontSize: 13,
-    color: "#c62828",
-  },
-});

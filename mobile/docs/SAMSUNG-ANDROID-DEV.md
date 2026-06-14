@@ -102,6 +102,19 @@ npm run start:dev
 
 Полный регресс по матрице web parity: `docs/mobile-development.md` § **WF-7.2**.
 
+**На ПК перед Samsung:**
+
+```powershell
+cd mobile
+npm run regression:wf72
+```
+
+Deep links cold-open на устройстве:
+
+```powershell
+.\scripts\wf72-adb-deep-links.ps1 -ProductId <id> -RaffleId <id> -UserId <id> -SellerId <id>
+```
+
 Минимум перед релизом:
 
 - [ ] Каталог, скролл, pull-to-refresh

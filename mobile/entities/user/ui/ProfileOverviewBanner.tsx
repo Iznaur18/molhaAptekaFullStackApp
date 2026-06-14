@@ -1,11 +1,12 @@
 import { useMemo, useState } from "react";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, View } from "react-native";
 
 import { isPremiumActive } from "@/entities/user/lib/isPremiumActive";
 import { pickUserProfilePhotoUrl } from "@/entities/user/lib/pickUserProfilePhotoUrl";
 import { resolveUserProfileBackgroundFromUser } from "@/entities/user/lib/resolveUserProfileBackgroundFromUser";
 import { MY_PROFILE_PAGE_UI } from "@/shared/config";
-import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { createThemedStyles } from "@/shared/theme/createThemedStyles";
+import { AppButton } from "@/shared/ui/AppButton";
 
 type ProfileOverviewBannerProps = {
   user: Record<string, unknown>;
@@ -13,12 +14,56 @@ type ProfileOverviewBannerProps = {
   onEditPress?: () => void;
 };
 
+const useStyles = createThemedStyles((theme) => ({
+  wrap: {
+    marginBottom: theme.spacing[4],
+  },
+  banner: {
+    minHeight: 148,
+    borderRadius: 14,
+    overflow: "hidden",
+    justifyContent: "flex-end",
+    padding: theme.spacing[4],
+  },
+  bannerImage: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+  },
+  avatarWrap: {
+    position: "absolute",
+    left: theme.spacing[4],
+    bottom: theme.spacing[4],
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    overflow: "hidden",
+    borderWidth: 2,
+    borderColor: theme.colors.surface,
+    backgroundColor: theme.colors.surfaceMuted,
+  },
+  avatarWrapPremium: {
+    borderColor: theme.colors.premium,
+  },
+  avatar: {
+    width: "100%",
+    height: "100%",
+  },
+  editButton: {
+    alignSelf: "flex-end",
+  },
+}));
+
 export const ProfileOverviewBanner = ({
   user,
   showEditButton = false,
   onEditPress,
 }: ProfileOverviewBannerProps) => {
-  const theme = useAppTheme();
+  const styles = useStyles();
   const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
   const [backgroundLoadFailed, setBackgroundLoadFailed] = useState(false);
 
@@ -69,62 +114,14 @@ export const ProfileOverviewBanner = ({
         ) : null}
 
         {showEditButton && onEditPress ? (
-          <Pressable
-            style={[styles.editButton, { backgroundColor: theme.colors.nearBlack }]}
+          <AppButton
+            label={MY_PROFILE_PAGE_UI.EDIT_PROFILE}
+            variant="contrast"
             onPress={onEditPress}
-          >
-            <Text style={styles.editButtonText}>{MY_PROFILE_PAGE_UI.EDIT_PROFILE}</Text>
-          </Pressable>
+            style={styles.editButton}
+          />
         ) : null}
       </View>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  wrap: {
-    marginBottom: 16,
-  },
-  banner: {
-    minHeight: 148,
-    borderRadius: 14,
-    overflow: "hidden",
-    justifyContent: "flex-end",
-    padding: 16,
-  },
-  bannerImage: {
-    ...StyleSheet.absoluteFillObject,
-    width: "100%",
-    height: "100%",
-  },
-  avatarWrap: {
-    position: "absolute",
-    left: 16,
-    bottom: 16,
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    overflow: "hidden",
-    borderWidth: 2,
-    borderColor: "#fff",
-    backgroundColor: "#f4f4f4",
-  },
-  avatarWrapPremium: {
-    borderColor: "#ffc107",
-  },
-  avatar: {
-    width: "100%",
-    height: "100%",
-  },
-  editButton: {
-    alignSelf: "flex-end",
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  editButtonText: {
-    color: "#fff",
-    fontSize: 13,
-    fontWeight: "600",
-  },
-});

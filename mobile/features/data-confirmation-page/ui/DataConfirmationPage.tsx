@@ -1,13 +1,17 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, ScrollView, Text, View } from "react-native";
 
 import { useMyDataConfirmationStatusQuery } from "@/entities/user-data-confirmation/model/useMyDataConfirmationStatusQuery";
 import { DataConfirmationRequestModal } from "@/features/data-confirmation-page/ui/DataConfirmationRequestModal";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { USER_DATA_CONFIRMATION_PROFILE_PAGE_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
-import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import {
+  useDataConfirmationPageStyles,
+  useFormFieldStyles,
+} from "@/shared/theme/formChromeStyles";
+import { AppButton } from "@/shared/ui/AppButton";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 const STATUS_PENDING = "pending";
@@ -15,25 +19,21 @@ const STATUS_REJECTED = "rejected";
 
 export const DataConfirmationPage = () => {
   const router = useRouter();
-  const theme = useAppTheme();
+  const pageStyles = useDataConfirmationPageStyles();
+  const fieldStyles = useFormFieldStyles();
   const isAuthorized = useIsAuthorized();
   const statusQuery = useMyDataConfirmationStatusQuery(isAuthorized);
   const [requestModalVisible, setRequestModalVisible] = useState(false);
 
   if (!isAuthorized) {
     return (
-      <View style={styles.centered}>
-        <Text style={[styles.hint, { color: theme.colors.textMuted }]}>
-          {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.LOGIN_HINT}
-        </Text>
-        <Pressable
-          style={[styles.button, { backgroundColor: theme.colors.nearBlack }]}
+      <View style={pageStyles.centered}>
+        <Text style={pageStyles.hint}>{USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.LOGIN_HINT}</Text>
+        <AppButton
+          label={USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.LOGIN_BUTTON}
+          variant="contrast"
           onPress={() => router.push("/(auth)/login")}
-        >
-          <Text style={styles.buttonText}>
-            {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.LOGIN_BUTTON}
-          </Text>
-        </Pressable>
+        />
       </View>
     );
   }
@@ -71,49 +71,41 @@ export const DataConfirmationPage = () => {
 
   return (
     <>
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text style={[styles.title, { color: theme.colors.text }]}>
-          {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.PLAN_TITLE}
-        </Text>
-        <Text style={[styles.intro, { color: theme.colors.textMuted }]}>
-          {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.PLAN_INTRO}
-        </Text>
+      <ScrollView contentContainerStyle={pageStyles.container}>
+        <Text style={pageStyles.title}>{USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.PLAN_TITLE}</Text>
+        <Text style={pageStyles.intro}>{USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.PLAN_INTRO}</Text>
         {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.PLAN_BENEFITS.map((item) => (
-          <Text key={item} style={[styles.benefit, { color: theme.colors.text }]}>
+          <Text key={item} style={pageStyles.benefit}>
             • {item}
           </Text>
         ))}
-        <Text style={[styles.note, { color: theme.colors.textMuted }]}>
-          {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.PLAN_NOTE}
-        </Text>
+        <Text style={pageStyles.note}>{USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.PLAN_NOTE}</Text>
 
         {isUserDataConfirmed ? (
-          <Text style={styles.statusOk}>
+          <Text style={[fieldStyles.statusOk, pageStyles.statusBlock]}>
             {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.STATUS_CONFIRMED}
           </Text>
         ) : null}
 
         {!isUserDataConfirmed && requestStatus === STATUS_PENDING ? (
-          <Text style={styles.statusPending}>
+          <Text style={[fieldStyles.statusPending, pageStyles.statusBlock]}>
             {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.STATUS_PENDING}
           </Text>
         ) : null}
 
         {!isUserDataConfirmed && requestStatus === STATUS_REJECTED ? (
-          <Text style={styles.statusRejected}>
+          <Text style={[fieldStyles.statusRejected, pageStyles.statusBlock]}>
             {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.STATUS_REJECTED(staffNote)}
           </Text>
         ) : null}
 
         {canOpenRequest ? (
-          <Pressable
-            style={[styles.button, { backgroundColor: theme.colors.nearBlack }]}
+          <AppButton
+            label={USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.OPEN_REQUEST}
+            variant="contrast"
             onPress={() => setRequestModalVisible(true)}
-          >
-            <Text style={styles.buttonText}>
-              {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.OPEN_REQUEST}
-            </Text>
-          </Pressable>
+            style={pageStyles.actionSpacer}
+          />
         ) : null}
       </ScrollView>
 
@@ -125,68 +117,3 @@ export const DataConfirmationPage = () => {
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    gap: 8,
-    paddingBottom: 32,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "700",
-  },
-  intro: {
-    fontSize: 15,
-    lineHeight: 22,
-  },
-  benefit: {
-    fontSize: 15,
-    lineHeight: 22,
-  },
-  note: {
-    fontSize: 13,
-    lineHeight: 20,
-    marginTop: 4,
-  },
-  statusOk: {
-    marginTop: 12,
-    color: "#2e7d32",
-    fontSize: 15,
-    fontWeight: "600",
-  },
-  statusPending: {
-    marginTop: 12,
-    color: "#f57c00",
-    fontSize: 15,
-    fontWeight: "600",
-  },
-  statusRejected: {
-    marginTop: 12,
-    color: "#c62828",
-    fontSize: 15,
-    lineHeight: 22,
-  },
-  centered: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 24,
-    gap: 16,
-  },
-  hint: {
-    fontSize: 15,
-    textAlign: "center",
-  },
-  button: {
-    marginTop: 12,
-    borderRadius: 10,
-    paddingVertical: 14,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-});

@@ -1,14 +1,6 @@
 import { useMemo, useState } from "react";
-import {
-  Alert,
-  FlatList,
-  Pressable,
-  RefreshControl,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Alert, FlatList, Pressable, Text, TextInput, View } from "react-native";
+import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import type { SearchSynonymRow } from "@/entities/product-search-synonym/api/searchSynonymAdminApi";
 import {
@@ -17,6 +9,7 @@ import {
 } from "@/entities/product-search-synonym/model/useSearchSynonymAdminMutations";
 import { SynonymCategoryPicker } from "@/features/search-synonyms-admin-page/ui/SynonymCategoryPicker";
 import { SEARCH_SYNONYMS_ADMIN_PAGE_UI } from "@/shared/config";
+import { useStaffAdminStyles } from "@/shared/theme/staffAdminStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 const sortSynonymRows = (rows: SearchSynonymRow[]) =>
@@ -35,6 +28,7 @@ const filterSynonymRows = (rows: SearchSynonymRow[], query: string) => {
 };
 
 export const SearchSynonymsAdminPage = () => {
+  const styles = useStaffAdminStyles();
   const synonymsQuery = useProductSearchSynonymsAdminQuery();
   const { createMutation, patchMutation, deleteMutation } = useProductSearchSynonymAdminMutations();
 
@@ -172,7 +166,7 @@ export const SearchSynonymsAdminPage = () => {
       keyExtractor={(item) => item._id}
       contentContainerStyle={styles.list}
       refreshControl={
-        <RefreshControl refreshing={synonymsQuery.isFetching} onRefresh={() => void synonymsQuery.refetch()} />
+        <ThemedRefreshControl refreshing={synonymsQuery.isFetching} onRefresh={() => void synonymsQuery.refetch()} />
       }
       ListHeaderComponent={
         <View style={styles.header}>
@@ -186,7 +180,7 @@ export const SearchSynonymsAdminPage = () => {
             <Text style={styles.toggleCreateText}>{SEARCH_SYNONYMS_ADMIN_PAGE_UI.ADD_CREATE}</Text>
           </Pressable>
           {isCreateOpen ? (
-            <View style={styles.createPanel}>
+            <View style={styles.panel}>
               <Text style={styles.sectionTitle}>{SEARCH_SYNONYMS_ADMIN_PAGE_UI.CREATE_HEADING}</Text>
               <Text style={styles.label}>{SEARCH_SYNONYMS_ADMIN_PAGE_UI.LABEL_TOKEN}</Text>
               <TextInput
@@ -286,59 +280,3 @@ export const SearchSynonymsAdminPage = () => {
     />
   );
 };
-
-const styles = StyleSheet.create({
-  list: { padding: 12, gap: 12, paddingBottom: 32 },
-  header: { gap: 10, marginBottom: 8 },
-  search: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    padding: 10,
-    fontSize: 14,
-    backgroundColor: "#fff",
-  },
-  toggleCreate: { alignSelf: "flex-start" },
-  toggleCreateText: { color: "#1f6feb", fontWeight: "600" },
-  createPanel: { gap: 8, padding: 12, backgroundColor: "#f8f8f8", borderRadius: 10 },
-  sectionTitle: { fontSize: 15, fontWeight: "700" },
-  label: { fontSize: 13, fontWeight: "600", color: "#444" },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    padding: 10,
-    fontSize: 14,
-    backgroundColor: "#fff",
-  },
-  row: { gap: 8, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: "#eee" },
-  token: { fontSize: 15, fontWeight: "600" },
-  meta: { fontSize: 13, color: "#666" },
-  actions: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 4 },
-  primaryButton: {
-    backgroundColor: "#111",
-    borderRadius: 8,
-    paddingVertical: 10,
-    alignItems: "center",
-    marginTop: 4,
-  },
-  primaryButtonText: { color: "#fff", fontWeight: "600" },
-  secondaryButton: {
-    backgroundColor: "#eee",
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  secondaryButtonText: { fontWeight: "600" },
-  ghostButton: { paddingVertical: 8, paddingHorizontal: 8 },
-  deleteButton: {
-    backgroundColor: "#c62828",
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  deleteText: { color: "#fff", fontWeight: "600" },
-  disabled: { opacity: 0.5 },
-  error: { color: "#c62828", fontSize: 13 },
-  empty: { textAlign: "center", color: "#666", padding: 24 },
-});

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
+import { FlatList, Text, View } from "react-native";
+import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import type { InstallmentDispute } from "@/entities/installment/api/installmentStaffApi";
 import {
@@ -8,6 +9,8 @@ import {
 } from "@/entities/installment/model/useInstallmentStaffMutations";
 import { INSTALLMENT_UI } from "@/shared/config";
 import { formatIsoDateTime } from "@/shared/lib";
+import { useStaffQueueStyles } from "@/shared/theme/staffQueueStyles";
+import { AppButton } from "@/shared/ui/AppButton";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 type RowProps = {
@@ -17,6 +20,7 @@ type RowProps = {
 };
 
 const DisputeRow = ({ dispute, onChanged, resolveMutation }: RowProps) => {
+  const styles = useStaffQueueStyles();
   const [errorMessage, setErrorMessage] = useState("");
   const isBusy = resolveMutation.isPending;
 
@@ -43,27 +47,24 @@ const DisputeRow = ({ dispute, onChanged, resolveMutation }: RowProps) => {
         <Text style={styles.meta}>{formatIsoDateTime(dispute.createdAt)}</Text>
       ) : null}
       <View style={styles.actions}>
-        <Pressable
-          style={[styles.button, styles.primaryButton, isBusy && styles.disabled]}
+        <AppButton
+          label={INSTALLMENT_UI.DISPUTE_ACTION_CLOSE}
+          variant="success"
+          disabled={isBusy}
           onPress={() => void resolve("close")}
+        />
+        <AppButton
+          label={INSTALLMENT_UI.DISPUTE_ACTION_CANCEL}
+          variant="danger"
           disabled={isBusy}
-        >
-          <Text style={styles.buttonText}>{INSTALLMENT_UI.DISPUTE_ACTION_CLOSE}</Text>
-        </Pressable>
-        <Pressable
-          style={[styles.button, styles.cancelButton, isBusy && styles.disabled]}
           onPress={() => void resolve("cancel")}
+        />
+        <AppButton
+          label={INSTALLMENT_UI.DISPUTE_ACTION_ADJUST}
+          variant="primary"
           disabled={isBusy}
-        >
-          <Text style={styles.buttonText}>{INSTALLMENT_UI.DISPUTE_ACTION_CANCEL}</Text>
-        </Pressable>
-        <Pressable
-          style={[styles.button, styles.adjustButton, isBusy && styles.disabled]}
           onPress={() => void resolve("adjust_schedule")}
-          disabled={isBusy}
-        >
-          <Text style={styles.buttonText}>{INSTALLMENT_UI.DISPUTE_ACTION_ADJUST}</Text>
-        </Pressable>
+        />
       </View>
       {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
     </View>
@@ -71,6 +72,7 @@ const DisputeRow = ({ dispute, onChanged, resolveMutation }: RowProps) => {
 };
 
 export const InstallmentDisputesPage = () => {
+  const styles = useStaffQueueStyles();
   const queueQuery = usePendingInstallmentDisputesQuery();
   const { resolveDisputeMutation } = useInstallmentStaffMutations();
   const disputes = queueQuery.data ?? [];
@@ -96,7 +98,7 @@ export const InstallmentDisputesPage = () => {
       keyExtractor={(item) => item._id}
       contentContainerStyle={styles.list}
       refreshControl={
-        <RefreshControl refreshing={queueQuery.isFetching} onRefresh={() => void queueQuery.refetch()} />
+        <ThemedRefreshControl refreshing={queueQuery.isFetching} onRefresh={() => void queueQuery.refetch()} />
       }
       ListEmptyComponent={<Text style={styles.empty}>{INSTALLMENT_UI.DISPUTES_PAGE_EMPTY}</Text>}
       renderItem={({ item }) => (
@@ -109,19 +111,3 @@ export const InstallmentDisputesPage = () => {
     />
   );
 };
-
-const styles = StyleSheet.create({
-  list: { padding: 12, gap: 16 },
-  row: { gap: 8, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: "#eee" },
-  title: { fontSize: 14, fontWeight: "600" },
-  meta: { fontSize: 13, color: "#666" },
-  actions: { gap: 8, marginTop: 8 },
-  button: { borderRadius: 8, paddingVertical: 10, alignItems: "center" },
-  primaryButton: { backgroundColor: "#2e7d32" },
-  cancelButton: { backgroundColor: "#c62828" },
-  adjustButton: { backgroundColor: "#1565c0" },
-  buttonText: { color: "#fff", fontWeight: "600", fontSize: 14 },
-  disabled: { opacity: 0.6 },
-  error: { color: "#c62828", fontSize: 13 },
-  empty: { textAlign: "center", color: "#666", padding: 24 },
-});

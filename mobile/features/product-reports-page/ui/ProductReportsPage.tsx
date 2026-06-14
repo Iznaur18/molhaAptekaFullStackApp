@@ -1,13 +1,7 @@
 import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import {
-  FlatList,
-  Pressable,
-  RefreshControl,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { FlatList, Pressable, Text, View } from "react-native";
+import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import {
   PRODUCT_REPORT_RESOLUTION_DISMISS,
@@ -22,6 +16,8 @@ import {
 import { usePendingUserStoryReportsQuery } from "@/entities/user-story/model/useUserStoryReportStaffMutations";
 import { UserStoryReportGroupRow } from "@/features/product-reports-page/ui/UserStoryReportGroupRow";
 import { PRODUCT_REPORTS_PAGE_UI } from "@/shared/config";
+import { useStaffFilterChipStyles, useStaffQueueStyles } from "@/shared/theme/staffQueueStyles";
+import { AppButton } from "@/shared/ui/AppButton";
 import { StaffModerationActions } from "@/shared/ui/StaffModerationActions";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
@@ -34,6 +30,7 @@ type RowProps = {
 };
 
 const ReportGroupRow = ({ group, onChanged, resolveMutation }: RowProps) => {
+  const styles = useStaffQueueStyles();
   const router = useRouter();
   const [staffNote, setStaffNote] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -74,13 +71,12 @@ const ReportGroupRow = ({ group, onChanged, resolveMutation }: RowProps) => {
         onReject={() => void resolve(PRODUCT_REPORT_RESOLUTION_HIDE)}
         errorMessage={errorMessage}
       />
-      <Pressable
-        style={styles.rejectProductButton}
-        onPress={() => void resolve(PRODUCT_REPORT_RESOLUTION_REJECT)}
+      <AppButton
+        label={PRODUCT_REPORTS_PAGE_UI.ACTION_REJECT}
+        variant="danger"
         disabled={isBusy}
-      >
-        <Text style={styles.rejectProductText}>{PRODUCT_REPORTS_PAGE_UI.ACTION_REJECT}</Text>
-      </Pressable>
+        onPress={() => void resolve(PRODUCT_REPORT_RESOLUTION_REJECT)}
+      />
     </View>
   );
 };
@@ -92,6 +88,8 @@ const FILTER_OPTIONS: Array<{ value: SectionFilter; label: string }> = [
 ];
 
 export const ProductReportsPage = () => {
+  const styles = useStaffQueueStyles();
+  const chipStyles = useStaffFilterChipStyles();
   const productReportsQuery = usePendingProductReportsQuery();
   const storyReportsQuery = usePendingUserStoryReportsQuery();
   const resolveMutation = useResolveProductReportsMutation();
@@ -148,9 +146,9 @@ export const ProductReportsPage = () => {
           ? `product-${String(item.group.product._id)}`
           : `story-${String(item.group.story._id)}`
       }
-      contentContainerStyle={styles.list}
+      contentContainerStyle={styles.listPadded}
       refreshControl={
-        <RefreshControl
+        <ThemedRefreshControl
           refreshing={productReportsQuery.isFetching || storyReportsQuery.isFetching}
           onRefresh={reloadQueue}
         />
@@ -159,17 +157,17 @@ export const ProductReportsPage = () => {
         <View style={styles.header}>
           <Text style={styles.heading}>{PRODUCT_REPORTS_PAGE_UI.TITLE}</Text>
           <Text style={styles.count}>{PRODUCT_REPORTS_PAGE_UI.COUNT(visibleCount)}</Text>
-          <View style={styles.chips}>
+          <View style={chipStyles.chips}>
             {FILTER_OPTIONS.map((option) => (
               <Pressable
                 key={option.value || "all"}
-                style={[styles.chip, sectionFilter === option.value && styles.chipSelected]}
+                style={[chipStyles.chip, sectionFilter === option.value && chipStyles.chipSelected]}
                 onPress={() => setSectionFilter(option.value)}
               >
                 <Text
                   style={[
-                    styles.chipText,
-                    sectionFilter === option.value && styles.chipTextSelected,
+                    chipStyles.chipText,
+                    sectionFilter === option.value && chipStyles.chipTextSelected,
                   ]}
                 >
                   {option.label}
@@ -209,34 +207,3 @@ export const ProductReportsPage = () => {
     />
   );
 };
-
-const styles = StyleSheet.create({
-  list: { padding: 12, gap: 16, paddingBottom: 32 },
-  header: { gap: 10, marginBottom: 8 },
-  heading: { fontSize: 18, fontWeight: "700" },
-  count: { fontSize: 13, color: "#666" },
-  chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-  chip: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  chipSelected: { borderColor: "#1f6feb", backgroundColor: "#e8f1ff" },
-  chipText: { fontSize: 13, color: "#333" },
-  chipTextSelected: { color: "#1f6feb", fontWeight: "600" },
-  sectionTitle: { fontSize: 15, fontWeight: "700", marginTop: 8, marginBottom: 4 },
-  row: { gap: 8, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: "#eee" },
-  title: { fontSize: 15, fontWeight: "600" },
-  meta: { fontSize: 13, color: "#666" },
-  link: { fontSize: 14, color: "#1565c0" },
-  empty: { textAlign: "center", color: "#666", padding: 24 },
-  rejectProductButton: {
-    backgroundColor: "#6d4c41",
-    borderRadius: 8,
-    paddingVertical: 10,
-    alignItems: "center",
-  },
-  rejectProductText: { color: "#fff", fontWeight: "600" },
-});

@@ -1,7 +1,8 @@
-import { ScrollView, Pressable, StyleSheet, Text, View } from "react-native";
+import { ScrollView, Pressable, Text, View } from "react-native";
 
 import type { CategoryFilterChip } from "@/entities/product-category-display/lib/buildCategoryFilterChips";
 import { CATALOG_FILTER_UI } from "@/shared/config";
+import { useCatalogFilterChipStyles } from "@/shared/theme/catalogProductStyles";
 
 type CatalogCategoryChipsProps = {
   chips: CategoryFilterChip[];
@@ -14,6 +15,8 @@ export const CatalogCategoryChips = ({
   selectedSlug,
   onSelect,
 }: CatalogCategoryChipsProps) => {
+  const styles = useCatalogFilterChipStyles();
+
   if (chips.length === 0) {
     return null;
   }
@@ -45,33 +48,3 @@ export const CatalogCategoryChips = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  wrap: {
-    paddingVertical: 8,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#e5e5e5",
-    backgroundColor: "#fff",
-  },
-  row: {
-    paddingHorizontal: 12,
-    gap: 8,
-  },
-  chip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: "#f2f2f2",
-  },
-  chipActive: {
-    backgroundColor: "#111",
-  },
-  chipText: {
-    fontSize: 14,
-    color: "#333",
-  },
-  chipTextActive: {
-    color: "#fff",
-    fontWeight: "600",
-  },
-});

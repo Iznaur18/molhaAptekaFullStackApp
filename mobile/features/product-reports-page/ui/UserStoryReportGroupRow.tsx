@@ -1,7 +1,7 @@
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import type { UserStoryReportGroup } from "@/entities/user-story/api/userStoryReportStaffApi";
 import {
@@ -11,6 +11,7 @@ import {
 } from "@/entities/user-story/model/constants";
 import { useResolveUserStoryReportsMutation } from "@/entities/user-story/model/useUserStoryReportStaffMutations";
 import { USER_STORY_UI } from "@/shared/config";
+import { useStaffQueueStyles } from "@/shared/theme/staffQueueStyles";
 import { ProductPreviewVideo } from "@/shared/ui/ProductPreviewVideo";
 import { StaffModerationActions } from "@/shared/ui/StaffModerationActions";
 
@@ -20,6 +21,7 @@ type UserStoryReportGroupRowProps = {
 };
 
 export const UserStoryReportGroupRow = ({ group, onChanged }: UserStoryReportGroupRowProps) => {
+  const styles = useStaffQueueStyles();
   const router = useRouter();
   const resolveMutation = useResolveUserStoryReportsMutation();
   const [staffNote, setStaffNote] = useState("");
@@ -83,13 +85,3 @@ export const UserStoryReportGroupRow = ({ group, onChanged }: UserStoryReportGro
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  row: { gap: 8, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: "#eee" },
-  title: { fontSize: 15, fontWeight: "600" },
-  mediaWrap: { height: 200, borderRadius: 8, overflow: "hidden", backgroundColor: "#111" },
-  media: { width: "100%", height: "100%" },
-  caption: { fontSize: 13, color: "#444" },
-  link: { fontSize: 14, color: "#1565c0" },
-  reportText: { fontSize: 12, color: "#666" },
-});

@@ -6,14 +6,86 @@ import {
   groupProfileRows,
   isBooleanProfileRow,
 } from "@/entities/user/lib/groupProfileRows";
-import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 type UserProfileInfoPanelProps = {
   rows: ProfileRow[];
 };
 
+const useStyles = createThemedStyles((theme) => ({
+  root: {
+    gap: theme.spacing[4],
+  },
+  section: {
+    gap: 10,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: theme.colors.text,
+  },
+  statsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: theme.spacing[2],
+  },
+  statCard: {
+    width: "48%",
+    minWidth: 140,
+    flexGrow: 1,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: theme.radius.button,
+    padding: theme.spacing[3],
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+  },
+  statValue: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: theme.colors.text,
+  },
+  statLabel: {
+    marginTop: theme.spacing[1],
+    fontSize: 12,
+    lineHeight: 16,
+    color: theme.colors.textMuted,
+  },
+  detailsCard: {
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: theme.radius.button,
+    overflow: "hidden",
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+  },
+  detailRow: {
+    paddingHorizontal: 14,
+    paddingVertical: theme.spacing[3],
+    gap: theme.spacing[1],
+  },
+  detailRowDivider: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: theme.colors.border,
+  },
+  detailLabel: {
+    fontSize: 12,
+    color: theme.colors.textMuted,
+  },
+  detailValue: {
+    fontSize: 15,
+    lineHeight: 21,
+    color: theme.colors.text,
+  },
+  detailValuePositive: {
+    color: theme.colors.success,
+    fontWeight: "600",
+  },
+  detailValueMuted: {
+    color: theme.colors.textMuted,
+  },
+}));
+
 export const UserProfileInfoPanel = ({ rows }: UserProfileInfoPanelProps) => {
-  const theme = useAppTheme();
+  const styles = useStyles();
   const sections = useMemo(() => groupProfileRows(rows), [rows]);
 
   if (sections.length === 0) {
@@ -24,44 +96,31 @@ export const UserProfileInfoPanel = ({ rows }: UserProfileInfoPanelProps) => {
     <View style={styles.root}>
       {sections.map((section) => (
         <View key={section.id} style={styles.section}>
-          {section.title ? (
-            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-              {section.title}
-            </Text>
-          ) : null}
+          {section.title ? <Text style={styles.sectionTitle}>{section.title}</Text> : null}
 
           {section.id === "stats" ? (
             <View style={styles.statsGrid}>
               {section.rows.map((row) => (
-                <View
-                  key={row.id}
-                  style={[styles.statCard, { borderColor: theme.colors.border, backgroundColor: theme.colors.surface }]}
-                >
-                  <Text style={[styles.statValue, { color: theme.colors.text }]}>{row.value}</Text>
-                  <Text style={[styles.statLabel, { color: theme.colors.textMuted }]}>{row.label}</Text>
+                <View key={row.id} style={styles.statCard}>
+                  <Text style={styles.statValue}>{row.value}</Text>
+                  <Text style={styles.statLabel}>{row.label}</Text>
                 </View>
               ))}
             </View>
           ) : (
-            <View style={[styles.detailsCard, { borderColor: theme.colors.border, backgroundColor: theme.colors.surface }]}>
+            <View style={styles.detailsCard}>
               {section.rows.map((row, index) => (
                 <View
                   key={row.id}
                   style={[
                     styles.detailRow,
-                    index < section.rows.length - 1 && {
-                      borderBottomWidth: StyleSheet.hairlineWidth,
-                      borderBottomColor: theme.colors.border,
-                    },
+                    index < section.rows.length - 1 && styles.detailRowDivider,
                   ]}
                 >
-                  <Text style={[styles.detailLabel, { color: theme.colors.textMuted }]}>
-                    {row.label}
-                  </Text>
+                  <Text style={styles.detailLabel}>{row.label}</Text>
                   <Text
                     style={[
                       styles.detailValue,
-                      { color: theme.colors.text },
                       isBooleanProfileRow(row.id) && row.value === "Да" && styles.detailValuePositive,
                       isBooleanProfileRow(row.id) && row.value === "Нет" && styles.detailValueMuted,
                     ]}
@@ -77,62 +136,3 @@ export const UserProfileInfoPanel = ({ rows }: UserProfileInfoPanelProps) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  root: {
-    gap: 16,
-  },
-  section: {
-    gap: 10,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-  },
-  statsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  statCard: {
-    width: "48%",
-    minWidth: 140,
-    flexGrow: 1,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 10,
-    padding: 12,
-  },
-  statValue: {
-    fontSize: 18,
-    fontWeight: "700",
-  },
-  statLabel: {
-    marginTop: 4,
-    fontSize: 12,
-    lineHeight: 16,
-  },
-  detailsCard: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 10,
-    overflow: "hidden",
-  },
-  detailRow: {
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    gap: 4,
-  },
-  detailLabel: {
-    fontSize: 12,
-  },
-  detailValue: {
-    fontSize: 15,
-    lineHeight: 21,
-  },
-  detailValuePositive: {
-    color: "#2e7d32",
-    fontWeight: "600",
-  },
-  detailValueMuted: {
-    color: "#888",
-  },
-});

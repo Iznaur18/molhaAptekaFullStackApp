@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
-  StyleSheet,
   Text,
   TextInput,
   View,
@@ -13,6 +12,7 @@ import { useSellerPersonalCategoryMutations } from "@/entities/seller-personal-c
 import { ImageUrlUploadField } from "@/features/image-upload/ui/ImageUrlUploadField";
 import { SELLER_PERSONAL_CATEGORY_PAGE_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useAdvertisingCardStyles } from "@/shared/theme/sellerFlowStyles";
 
 type PersonalCategoryAdvertisingSectionProps = {
   loyaltyBalance: number;
@@ -28,6 +28,7 @@ export const PersonalCategoryAdvertisingSection = ({
   loyaltyBalance,
 }: PersonalCategoryAdvertisingSectionProps) => {
   const theme = useAppTheme();
+  const styles = useAdvertisingCardStyles();
   const campaignQuery = useMySellerPersonalCategoryCampaignQuery(true);
   const { submitMutation, cancelMutation } = useSellerPersonalCategoryMutations();
   const [labelRu, setLabelRu] = useState("");
@@ -91,27 +92,27 @@ export const PersonalCategoryAdvertisingSection = ({
 
   if (campaignQuery.isPending) {
     return (
-      <View style={[styles.card, { borderColor: theme.colors.border }]}>
+      <View style={styles.card}>
         <Text style={styles.loading}>{SELLER_PERSONAL_CATEGORY_PAGE_UI.LOADING}</Text>
       </View>
     );
   }
 
   return (
-    <View style={[styles.card, { borderColor: theme.colors.border }]}>
-      <Text style={[styles.title, { color: theme.colors.text }]}>
+    <View style={styles.card}>
+      <Text style={styles.title}>
         {SELLER_PERSONAL_CATEGORY_PAGE_UI.SECTION_TITLE}
       </Text>
-      <Text style={[styles.lead, { color: theme.colors.textMuted }]}>
+      <Text style={styles.lead}>
         {SELLER_PERSONAL_CATEGORY_PAGE_UI.SECTION_LEAD}
       </Text>
 
       {selectedDuration ? (
-        <Text style={[styles.meta, { color: theme.colors.text }]}>
+        <Text style={styles.meta}>
           {SELLER_PERSONAL_CATEGORY_PAGE_UI.PRICE(pricePoints)} · {selectedDuration.title}
         </Text>
       ) : null}
-      <Text style={[styles.meta, { color: theme.colors.textMuted }]}>
+      <Text style={styles.meta}>
         {SELLER_PERSONAL_CATEGORY_PAGE_UI.BALANCE(loyaltyBalance)}
       </Text>
 
@@ -196,7 +197,7 @@ export const PersonalCategoryAdvertisingSection = ({
               disabled={isSubmitting || loyaltyBalance < pricePoints}
             >
               {isSubmitting ? (
-                <ActivityIndicator color="#fff" />
+                <ActivityIndicator color={theme.colors.onContrast} />
               ) : (
                 <Text style={styles.primaryButtonText}>
                   {SELLER_PERSONAL_CATEGORY_PAGE_UI.SUBMIT}
@@ -211,116 +212,3 @@ export const PersonalCategoryAdvertisingSection = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  card: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 12,
-    padding: 14,
-    gap: 8,
-    backgroundColor: "#fff",
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "700",
-  },
-  lead: {
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  meta: {
-    fontSize: 13,
-  },
-  loading: {
-    fontSize: 14,
-    color: "#666",
-  },
-  statusPanel: {
-    gap: 8,
-    padding: 10,
-    borderRadius: 10,
-    backgroundColor: "#f7f7f7",
-  },
-  statusText: {
-    fontSize: 14,
-    color: "#333",
-  },
-  form: {
-    gap: 10,
-    marginTop: 4,
-  },
-  fieldLabel: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
-  },
-  input: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 15,
-  },
-  tariffChip: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-  },
-  tariffChipActive: {
-    backgroundColor: "#111",
-    borderColor: "#111",
-  },
-  tariffText: {
-    fontSize: 14,
-    color: "#333",
-  },
-  tariffTextActive: {
-    color: "#fff",
-    fontWeight: "600",
-  },
-  actions: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  primaryButton: {
-    backgroundColor: "#111",
-    borderRadius: 10,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    alignItems: "center",
-    minHeight: 44,
-    justifyContent: "center",
-  },
-  primaryButtonText: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  secondaryButton: {
-    borderRadius: 10,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#ccc",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-  },
-  secondaryButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#111",
-  },
-  disabled: {
-    opacity: 0.6,
-  },
-  error: {
-    color: "#c62828",
-    fontSize: 13,
-  },
-  success: {
-    color: "#2e7d32",
-    fontSize: 13,
-  },
-});

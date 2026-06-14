@@ -3,6 +3,7 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "dependencies": {
+    "@expo/vector-icons": "^15.0.3",
     "@izibuy/design-tokens": "file:../packages/design-tokens",
     "@izibuy/shared-lib": "file:../packages/shared-lib",
     "@molha/api-contract": "file:../contract",
@@ -66,7 +67,8 @@
     "typecheck": "tsc --noEmit",
     "generate:icons": "node scripts/generate-app-icons.mjs",
     "generate:store-feature-graphic": "node scripts/generate-store-feature-graphic.mjs",
-    "capture:store-screenshots": "node scripts/capture-store-screenshots.mjs"
+    "capture:store-screenshots": "node scripts/capture-store-screenshots.mjs",
+    "regression:wf72": "node scripts/wf72-regression.mjs"
   },
   "private": true
 }

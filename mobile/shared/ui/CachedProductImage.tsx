@@ -1,7 +1,8 @@
 import { Image, type ImageStyle } from "expo-image";
-import { StyleSheet, Text, View, type StyleProp } from "react-native";
+import { Text, View, type StyleProp } from "react-native";
 
 import { PRODUCT_UI } from "@/shared/config";
+import { useCachedProductImageStyles } from "@/shared/theme/commerceScreenStyles";
 
 type CachedProductImageProps = {
   uri?: string | null;
@@ -14,6 +15,8 @@ export const CachedProductImage = ({
   style,
   fallbackLabel = PRODUCT_UI.NO_IMAGE,
 }: CachedProductImageProps) => {
+  const styles = useCachedProductImageStyles();
+
   if (!uri) {
     return (
       <View style={styles.fallback}>
@@ -32,22 +35,3 @@ export const CachedProductImage = ({
     />
   );
 };
-
-const styles = StyleSheet.create({
-  image: {
-    width: "100%",
-    height: "100%",
-  },
-  fallback: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#f4f4f4",
-  },
-  fallbackText: {
-    fontSize: 12,
-    color: "#999",
-    textAlign: "center",
-    padding: 8,
-  },
-});

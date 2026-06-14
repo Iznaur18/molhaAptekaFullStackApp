@@ -1,7 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 
 import { userProfileQueryKeys } from "@/entities/user/model/userProfileQueryKeys";
 import {
@@ -18,6 +18,7 @@ import {
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useUserVoteRatingStyles } from "@/shared/theme/accountFeatureStyles";
 
 const DEFAULT_SCORE = 5;
 
@@ -58,6 +59,7 @@ export const UserVoteRatingForm = ({
   onRated,
 }: UserVoteRatingFormProps) => {
   const theme = useAppTheme();
+  const styles = useUserVoteRatingStyles();
   const router = useRouter();
   const queryClient = useQueryClient();
   const submitVoteMutation = useSubmitUserVoteRatingMutation();
@@ -148,13 +150,8 @@ export const UserVoteRatingForm = ({
     if (!isAuthorized) {
       return (
         <View style={styles.body}>
-          <Text style={[styles.hint, { color: theme.colors.textMuted }]}>
-            {USER_VOTE_RATING_UI.LOGIN_HINT}
-          </Text>
-          <Pressable
-            style={[styles.button, { backgroundColor: theme.colors.nearBlack }]}
-            onPress={() => router.push("/(auth)/login")}
-          >
+          <Text style={styles.hint}>{USER_VOTE_RATING_UI.LOGIN_HINT}</Text>
+          <Pressable style={styles.button} onPress={() => router.push("/(auth)/login")}>
             <Text style={styles.buttonText}>{USER_VOTE_RATING_UI.LOGIN_BUTTON}</Text>
           </Pressable>
         </View>
@@ -162,42 +159,32 @@ export const UserVoteRatingForm = ({
     }
 
     if (currentUserId == null) {
-      return (
-        <Text style={[styles.hint, { color: theme.colors.textMuted }]}>
-          {USER_VOTE_RATING_UI.ME_LOADING}
-        </Text>
-      );
+      return <Text style={styles.hint}>{USER_VOTE_RATING_UI.ME_LOADING}</Text>;
     }
 
     if (isSelf) {
-      return (
-        <Text style={[styles.hint, { color: theme.colors.textMuted }]}>
-          {USER_VOTE_RATING_UI.SELF_HINT}
-        </Text>
-      );
+      return <Text style={styles.hint}>{USER_VOTE_RATING_UI.SELF_HINT}</Text>;
     }
 
     if (!myVoteResolved) {
       return (
         <View style={styles.body}>
-          <Text style={[styles.title, { color: theme.colors.text }]}>{USER_VOTE_RATING_UI.TITLE}</Text>
-          <Text style={[styles.aggregate, { color: theme.colors.textMuted }]}>
+          <Text style={styles.title}>{USER_VOTE_RATING_UI.TITLE}</Text>
+          <Text style={styles.aggregate}>
             {USER_VOTE_RATING_UI.CURRENT_AGGREGATE}: {aggregateText}
           </Text>
-          <Text style={[styles.hint, { color: theme.colors.textMuted }]}>
-            {USER_VOTE_RATING_UI.MY_VOTE_RESOLVING}
-          </Text>
+          <Text style={styles.hint}>{USER_VOTE_RATING_UI.MY_VOTE_RESOLVING}</Text>
         </View>
       );
     }
 
     return (
       <View style={styles.body}>
-        <Text style={[styles.title, { color: theme.colors.text }]}>{USER_VOTE_RATING_UI.TITLE}</Text>
-        <Text style={[styles.aggregate, { color: theme.colors.textMuted }]}>
+        <Text style={styles.title}>{USER_VOTE_RATING_UI.TITLE}</Text>
+        <Text style={styles.aggregate}>
           {USER_VOTE_RATING_UI.CURRENT_AGGREGATE}: {aggregateText}
         </Text>
-        <Text style={[styles.rangeLabel, { color: theme.colors.text }]}>
+        <Text style={styles.rangeLabel}>
           {USER_VOTE_RATING_UI.RANGE_LABEL}: {score}
         </Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scoreRow}>
@@ -206,17 +193,11 @@ export const UserVoteRatingForm = ({
             return (
               <Pressable
                 key={value}
-                style={[
-                  styles.scoreChip,
-                  {
-                    borderColor: theme.colors.border,
-                    backgroundColor: selected ? theme.colors.nearBlack : theme.colors.surface,
-                  },
-                ]}
+                style={[styles.scoreChip, selected && styles.scoreChipSelected]}
                 disabled={submitVoteMutation.isPending || voteSubmitted}
                 onPress={() => setScore(value)}
               >
-                <Text style={[styles.scoreChipText, { color: selected ? "#fff" : theme.colors.text }]}>
+                <Text style={[styles.scoreChipText, selected && styles.scoreChipTextSelected]}>
                   {value}
                 </Text>
               </Pressable>
@@ -231,7 +212,7 @@ export const UserVoteRatingForm = ({
           </Pressable>
         ) : (
           <Pressable
-            style={[styles.button, { backgroundColor: theme.colors.nearBlack }]}
+            style={styles.button}
             disabled={submitVoteMutation.isPending}
             onPress={() => void handleSubmit()}
           >
@@ -247,91 +228,12 @@ export const UserVoteRatingForm = ({
   };
 
   return (
-    <View style={[styles.root, { borderColor: theme.colors.border }]}>
+    <View style={styles.root}>
       <Pressable style={styles.summary} onPress={() => setExpanded((value) => !value)}>
-        <Text style={[styles.summaryText, { color: theme.colors.text }]}>
-          {USER_VOTE_RATING_UI.COLLAPSE_SUMMARY}
-        </Text>
+        <Text style={styles.summaryText}>{USER_VOTE_RATING_UI.COLLAPSE_SUMMARY}</Text>
         <Text style={{ color: theme.colors.textMuted }}>{expanded ? "▲" : "▼"}</Text>
       </Pressable>
       {expanded ? renderBody() : null}
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  root: {
-    marginTop: 16,
-    borderWidth: 1,
-    borderRadius: 12,
-    overflow: "hidden",
-  },
-  summary: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-  },
-  summaryText: {
-    fontSize: 15,
-    fontWeight: "600",
-  },
-  body: {
-    paddingHorizontal: 14,
-    paddingBottom: 14,
-    gap: 10,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "700",
-  },
-  aggregate: {
-    fontSize: 14,
-  },
-  rangeLabel: {
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  scoreRow: {
-    gap: 8,
-    paddingVertical: 4,
-  },
-  scoreChip: {
-    minWidth: 36,
-    paddingVertical: 8,
-    paddingHorizontal: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-    alignItems: "center",
-  },
-  scoreChipText: {
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  hint: {
-    fontSize: 14,
-  },
-  button: {
-    alignSelf: "flex-start",
-    borderRadius: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-  },
-  buttonDisabled: {
-    backgroundColor: "#9e9e9e",
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  error: {
-    color: "#c62828",
-    fontSize: 13,
-  },
-  flash: {
-    color: "#2e7d32",
-    fontSize: 13,
-  },
-});

@@ -30,6 +30,10 @@ export default function TabLayout() {
           backgroundColor: theme.colors.surface,
           borderTopColor: theme.colors.border,
         },
+        tabBarBadgeStyle: {
+          backgroundColor: theme.colors.danger,
+          color: theme.colors.onContrast,
+        },
         headerStyle: {
           backgroundColor: theme.colors.surface,
         },

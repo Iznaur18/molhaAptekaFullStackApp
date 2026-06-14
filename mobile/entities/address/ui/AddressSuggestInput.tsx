@@ -3,13 +3,14 @@ import {
   ActivityIndicator,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   View,
 } from "react-native";
 
 import { ADDRESS_DELIVERY_UI } from "@/shared/config";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useAddressSuggestStyles, useFormFieldStyles } from "@/shared/theme/formChromeStyles";
 
 import { mapDadataSuggestion } from "../lib/mapDadataSuggestion";
 import {
@@ -32,6 +33,9 @@ export const AddressSuggestInput = ({
   disabled = false,
   placeholder,
 }: AddressSuggestInputProps) => {
+  const theme = useAppTheme();
+  const fieldStyles = useFormFieldStyles();
+  const suggestStyles = useAddressSuggestStyles();
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const trimmedLine = value.line.trim();
   const suggestEnabled =
@@ -85,34 +89,35 @@ export const AddressSuggestInput = ({
   };
 
   return (
-    <View style={styles.wrap}>
-      <Text style={styles.label}>{ADDRESS_DELIVERY_UI.LABEL_LINE}</Text>
+    <View style={suggestStyles.wrap}>
+      <Text style={fieldStyles.label}>{ADDRESS_DELIVERY_UI.LABEL_LINE}</Text>
       <TextInput
-        style={styles.input}
+        style={[fieldStyles.input, fieldStyles.inputCompact]}
         value={value.line}
         onChangeText={handleLineChange}
         placeholder={placeholder}
+        placeholderTextColor={theme.colors.textMuted}
         editable={!disabled}
         autoCorrect={false}
       />
 
       {suggestEnabled && suggestionsQuery.isPending ? (
-        <ActivityIndicator style={styles.loader} />
+        <ActivityIndicator style={suggestStyles.loader} color={theme.colors.action} />
       ) : null}
 
       {suggestEnabled && suggestions.length > 0 ? (
         <ScrollView
-          style={styles.suggestions}
+          style={suggestStyles.suggestions}
           keyboardShouldPersistTaps="handled"
           nestedScrollEnabled
         >
           {suggestions.map((item, index) => (
             <Pressable
               key={`${item.value}-${index}`}
-              style={styles.suggestionRow}
+              style={suggestStyles.suggestionRow}
               onPress={() => handlePickSuggestion(item)}
             >
-              <Text style={styles.suggestionText}>{item.value}</Text>
+              <Text style={suggestStyles.suggestionText}>{item.value}</Text>
             </Pressable>
           ))}
         </ScrollView>
@@ -122,53 +127,8 @@ export const AddressSuggestInput = ({
       !suggestionsQuery.isPending &&
       activeQuery.length >= ADDRESS_SUGGEST_MIN_QUERY_LENGTH &&
       suggestions.length === 0 ? (
-        <Text style={styles.hint}>{ADDRESS_DELIVERY_UI.NO_SUGGESTIONS}</Text>
+        <Text style={fieldStyles.hint}>{ADDRESS_DELIVERY_UI.NO_SUGGESTIONS}</Text>
       ) : null}
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  wrap: {
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 14,
-    color: "#555",
-    marginBottom: 6,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 16,
-    backgroundColor: "#fff",
-  },
-  loader: {
-    marginTop: 8,
-  },
-  suggestions: {
-    maxHeight: 160,
-    marginTop: 8,
-    borderWidth: 1,
-    borderColor: "#eee",
-    borderRadius: 8,
-  },
-  suggestionRow: {
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#eee",
-  },
-  suggestionText: {
-    fontSize: 14,
-    color: "#222",
-  },
-  hint: {
-    marginTop: 8,
-    fontSize: 13,
-    color: "#999",
-  },
-});

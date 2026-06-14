@@ -1,6 +1,8 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, Text, TextInput, View } from "react-native";
 
 import { CATALOG_FILTER_UI } from "@/shared/config";
+import { useCatalogSearchBarStyles } from "@/shared/theme/catalogProductStyles";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 
 type CatalogSearchBarProps = {
   value: string;
@@ -8,6 +10,9 @@ type CatalogSearchBarProps = {
 };
 
 export const CatalogSearchBar = ({ value, onChange }: CatalogSearchBarProps) => {
+  const styles = useCatalogSearchBarStyles();
+  const theme = useAppTheme();
+
   return (
     <View style={styles.wrap}>
       <TextInput
@@ -15,6 +20,7 @@ export const CatalogSearchBar = ({ value, onChange }: CatalogSearchBarProps) => 
         value={value}
         onChangeText={onChange}
         placeholder={CATALOG_FILTER_UI.SEARCH_PLACEHOLDER}
+        placeholderTextColor={theme.colors.textMuted}
         autoCorrect={false}
         clearButtonMode="while-editing"
       />
@@ -26,31 +32,3 @@ export const CatalogSearchBar = ({ value, onChange }: CatalogSearchBarProps) => 
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  wrap: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    gap: 8,
-    backgroundColor: "#fff",
-  },
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 16,
-    backgroundColor: "#fafafa",
-  },
-  clear: {
-    paddingHorizontal: 4,
-  },
-  clearText: {
-    color: "#1565c0",
-    fontSize: 14,
-  },
-});

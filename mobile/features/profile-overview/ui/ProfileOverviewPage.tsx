@@ -1,6 +1,7 @@
 import { useRouter } from "expo-router";
 import { useMemo } from "react";
-import { RefreshControl, ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, View } from "react-native";
+import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { resolveUserRole } from "@izibuy/shared-lib";
 
@@ -12,12 +13,26 @@ import { UserProfileInfoPanel } from "@/entities/user/ui/UserProfileInfoPanel";
 import { RaffleSellerOverview } from "@/features/profile-overview/ui/RaffleSellerOverview";
 import { AUTH_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
-import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
+
+const useStyles = createThemedStyles((theme) => ({
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.bg,
+  },
+  content: {
+    padding: theme.spacing[4],
+    paddingBottom: theme.spacing[8],
+  },
+  section: {
+    marginBottom: theme.spacing[1],
+  },
+}));
 
 export const ProfileOverviewPage = () => {
   const router = useRouter();
-  const theme = useAppTheme();
+  const styles = useStyles();
   const sessionQuery = useAuthSessionQuery();
   const user = sessionQuery.data?.user;
 
@@ -45,10 +60,10 @@ export const ProfileOverviewPage = () => {
 
   return (
     <ScrollView
-      style={[styles.container, { backgroundColor: theme.colors.bg }]}
+      style={styles.container}
       contentContainerStyle={styles.content}
       refreshControl={
-        <RefreshControl refreshing={sessionQuery.isRefetching} onRefresh={sessionQuery.refetch} />
+        <ThemedRefreshControl refreshing={sessionQuery.isRefetching} onRefresh={sessionQuery.refetch} />
       }
     >
       <ProfileOverviewBanner
@@ -65,16 +80,3 @@ export const ProfileOverviewPage = () => {
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    padding: 16,
-    paddingBottom: 32,
-  },
-  section: {
-    marginBottom: 4,
-  },
-});

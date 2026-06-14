@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import { getOrderItemIndex } from "@/entities/order/lib/getOrderItemIndex";
 import { isOrderLineItemProductClickable } from "@/entities/order/lib/isOrderLineItemProductClickable";
@@ -14,6 +14,7 @@ import {
 } from "@/entities/order/model/constants";
 import { INSTALLMENT_UI, ORDER_CARD_UI, PRODUCT_CARD_UI } from "@/shared/config";
 import { formatIsoDateTime, formatPriceRub } from "@/shared/lib";
+import { useOrderCardStyles } from "@/shared/theme/commerceScreenStyles";
 
 type OrderItemActionContext = {
   orderId: string;
@@ -59,6 +60,7 @@ export const OrderCard = ({
   pendingActionKey = null,
   itemActionErrors = {},
 }: OrderCardProps) => {
+  const styles = useOrderCardStyles();
   const items = Array.isArray(order.items) ? order.items : [];
   const isAuctionOrder = Boolean(order.priceOfferId);
   const isInstallmentOrder = Boolean(order.installmentContractId);
@@ -258,140 +260,3 @@ export const OrderCard = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  card: {
-    padding: 14,
-    marginBottom: 12,
-    borderRadius: 12,
-    backgroundColor: "#fff",
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#e5e5e5",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 8,
-    gap: 8,
-  },
-  headerBadges: {
-    flex: 1,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "center",
-    gap: 6,
-  },
-  status: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "#111",
-  },
-  typeBadge: {
-    fontSize: 11,
-    fontWeight: "600",
-    color: "#555",
-    backgroundColor: "#f0f0f0",
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 999,
-    overflow: "hidden",
-  },
-  total: {
-    fontSize: 16,
-    fontWeight: "700",
-  },
-  meta: {
-    fontSize: 13,
-    color: "#666",
-    marginBottom: 4,
-  },
-  itemsHeading: {
-    marginTop: 8,
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#333",
-  },
-  itemBlock: {
-    marginTop: 8,
-    paddingTop: 8,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: "#eee",
-  },
-  itemTitleRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 8,
-  },
-  itemNamePressable: {
-    flex: 1,
-  },
-  itemLine: {
-    flex: 1,
-    fontSize: 14,
-    color: "#222",
-  },
-  itemNameLink: {
-    fontSize: 14,
-    color: "#1565c0",
-    fontWeight: "600",
-  },
-  itemQuantity: {
-    fontSize: 14,
-    color: "#666",
-  },
-  itemPrice: {
-    marginTop: 4,
-    fontSize: 13,
-    color: "#333",
-    fontWeight: "600",
-  },
-  itemLoyalty: {
-    marginTop: 4,
-    fontSize: 12,
-    color: "#2e7d32",
-  },
-  itemStatus: {
-    marginTop: 4,
-    fontSize: 12,
-    color: "#666",
-  },
-  itemTimestamp: {
-    marginTop: 2,
-    fontSize: 12,
-    color: "#888",
-  },
-  itemActions: {
-    marginTop: 8,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  actionButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    backgroundColor: "#111",
-  },
-  actionButtonCancel: {
-    backgroundColor: "#fff",
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#c62828",
-  },
-  actionDisabled: {
-    opacity: 0.6,
-  },
-  actionButtonText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#fff",
-  },
-  actionButtonTextCancel: {
-    color: "#c62828",
-  },
-  itemError: {
-    marginTop: 6,
-    fontSize: 12,
-    color: "#c62828",
-  },
-});

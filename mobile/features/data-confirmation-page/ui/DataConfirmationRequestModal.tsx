@@ -4,7 +4,6 @@ import {
   Modal,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   View,
@@ -31,6 +30,11 @@ import {
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import {
+  useBottomSheetFormStyles,
+  useFormFieldStyles,
+} from "@/shared/theme/formChromeStyles";
+import { AppButton } from "@/shared/ui/AppButton";
 import { ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 const keepDigitsOnly = (value: string): string => value.replace(/\D/g, "");
@@ -47,6 +51,8 @@ export const DataConfirmationRequestModal = ({
   onSubmitted,
 }: DataConfirmationRequestModalProps) => {
   const theme = useAppTheme();
+  const sheetStyles = useBottomSheetFormStyles();
+  const fieldStyles = useFormFieldStyles();
   const submitMutation = useSubmitDataConfirmationRequestMutation();
   const uploadMutation = useUploadImageMutation();
   const statusQuery = useMyDataConfirmationStatusQuery(visible);
@@ -142,16 +148,12 @@ export const DataConfirmationRequestModal = ({
 
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
-      <View style={styles.backdrop}>
-        <View style={[styles.sheet, { backgroundColor: theme.colors.surface }]}>
-          <View style={styles.header}>
-            <Text style={[styles.title, { color: theme.colors.text }]}>
-              {DATA_CONFIRMATION_MODAL_UI.TITLE}
-            </Text>
+      <View style={sheetStyles.backdrop}>
+        <View style={sheetStyles.sheet}>
+          <View style={sheetStyles.header}>
+            <Text style={sheetStyles.title}>{DATA_CONFIRMATION_MODAL_UI.TITLE}</Text>
             <Pressable onPress={onClose} hitSlop={8}>
-              <Text style={[styles.close, { color: theme.colors.link }]}>
-                {DATA_CONFIRMATION_MODAL_UI.CANCEL}
-              </Text>
+              <Text style={sheetStyles.close}>{DATA_CONFIRMATION_MODAL_UI.CANCEL}</Text>
             </Pressable>
           </View>
 
@@ -160,139 +162,113 @@ export const DataConfirmationRequestModal = ({
           ) : null}
 
           {phase === "ready" && isUserDataConfirmed ? (
-            <Text style={styles.statusOk}>{DATA_CONFIRMATION_MODAL_UI.STATUS_CONFIRMED}</Text>
+            <Text style={[fieldStyles.statusOk, sheetStyles.statusPadding]}>
+              {DATA_CONFIRMATION_MODAL_UI.STATUS_CONFIRMED}
+            </Text>
           ) : null}
 
           {phase === "ready" && requestStatus === USER_DATA_CONFIRMATION_STATUS_PENDING ? (
-            <Text style={styles.statusPending}>{DATA_CONFIRMATION_MODAL_UI.STATUS_PENDING}</Text>
+            <Text style={[fieldStyles.statusPending, sheetStyles.statusPadding]}>
+              {DATA_CONFIRMATION_MODAL_UI.STATUS_PENDING}
+            </Text>
           ) : null}
 
           {phase === "ready" && requestStatus === USER_DATA_CONFIRMATION_STATUS_REJECTED ? (
-            <View style={styles.rejectBlock}>
-              <Text style={styles.statusRejected}>
+            <View style={sheetStyles.rejectBlock}>
+              <Text style={fieldStyles.statusRejected}>
                 {DATA_CONFIRMATION_MODAL_UI.STATUS_REJECTED_TITLE}
               </Text>
-              {staffNote ? (
-                <Text style={[styles.staffNote, { color: theme.colors.textMuted }]}>
-                  {staffNote}
-                </Text>
-              ) : null}
+              {staffNote ? <Text style={sheetStyles.staffNote}>{staffNote}</Text> : null}
             </View>
           ) : null}
 
           {phase === "ready" && canSubmit ? (
-            <ScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps="handled">
-              <Text style={[styles.intro, { color: theme.colors.textMuted }]}>
-                {DATA_CONFIRMATION_MODAL_UI.INTRO}
-              </Text>
+            <ScrollView contentContainerStyle={sheetStyles.form} keyboardShouldPersistTaps="handled">
+              <Text style={sheetStyles.intro}>{DATA_CONFIRMATION_MODAL_UI.INTRO}</Text>
 
               <FormField
                 label={DATA_CONFIRMATION_MODAL_UI.LABEL_LAST_NAME}
                 value={form.lastName}
                 onChangeText={(value) => updateField("lastName", value)}
-                themeText={theme.colors.text}
-                themeBorder={theme.colors.border}
               />
               <FormField
                 label={DATA_CONFIRMATION_MODAL_UI.LABEL_FIRST_NAME}
                 value={form.firstName}
                 onChangeText={(value) => updateField("firstName", value)}
-                themeText={theme.colors.text}
-                themeBorder={theme.colors.border}
               />
               <FormField
                 label={DATA_CONFIRMATION_MODAL_UI.LABEL_MIDDLE_NAME}
                 value={form.middleName}
                 onChangeText={(value) => updateField("middleName", value)}
-                themeText={theme.colors.text}
-                themeBorder={theme.colors.border}
               />
               <FormField
                 label={DATA_CONFIRMATION_MODAL_UI.LABEL_BIRTH_DATE}
                 value={form.birthDate}
                 onChangeText={(value) => updateField("birthDate", value)}
                 placeholder="ГГГГ-ММ-ДД"
-                themeText={theme.colors.text}
-                themeBorder={theme.colors.border}
               />
               <FormField
                 label={DATA_CONFIRMATION_MODAL_UI.LABEL_SERIES}
                 value={form.series}
                 onChangeText={(value) => updateField("series", keepDigitsOnly(value).slice(0, 4))}
                 keyboardType="number-pad"
-                themeText={theme.colors.text}
-                themeBorder={theme.colors.border}
               />
               <FormField
                 label={DATA_CONFIRMATION_MODAL_UI.LABEL_NUMBER}
                 value={form.number}
                 onChangeText={(value) => updateField("number", keepDigitsOnly(value).slice(0, 6))}
                 keyboardType="number-pad"
-                themeText={theme.colors.text}
-                themeBorder={theme.colors.border}
               />
               <FormField
                 label={DATA_CONFIRMATION_MODAL_UI.LABEL_ISSUED_BY}
                 value={form.issuedBy}
                 onChangeText={(value) => updateField("issuedBy", value)}
                 multiline
-                themeText={theme.colors.text}
-                themeBorder={theme.colors.border}
               />
               <FormField
                 label={DATA_CONFIRMATION_MODAL_UI.LABEL_ISSUED_AT}
                 value={form.issuedAt}
                 onChangeText={(value) => updateField("issuedAt", value)}
                 placeholder="ГГГГ-ММ-ДД"
-                themeText={theme.colors.text}
-                themeBorder={theme.colors.border}
               />
               <FormField
                 label={DATA_CONFIRMATION_MODAL_UI.LABEL_DEPARTMENT_CODE}
                 value={form.departmentCode}
                 onChangeText={(value) => updateField("departmentCode", value)}
                 placeholder={DATA_CONFIRMATION_MODAL_UI.PLACEHOLDER_DEPARTMENT_CODE}
-                themeText={theme.colors.text}
-                themeBorder={theme.colors.border}
               />
 
-              <View style={styles.selfieSection}>
-                <Text style={[styles.fieldLabel, { color: theme.colors.text }]}>
+              <View style={sheetStyles.selfieSection}>
+                <Text style={fieldStyles.fieldLabel}>
                   {DATA_CONFIRMATION_MODAL_UI.LABEL_PASSPORT_SELFIE}
                 </Text>
-                <Text style={[styles.selfieHint, { color: theme.colors.textMuted }]}>
+                <Text style={sheetStyles.selfieHint}>
                   {DATA_CONFIRMATION_MODAL_UI.HINT_PASSPORT_SELFIE}
                 </Text>
-                <Pressable
-                  style={[styles.uploadButton, { backgroundColor: theme.colors.nearBlack }]}
+                <AppButton
+                  label={IMAGE_UPLOAD_UI.UPLOAD_BUTTON}
+                  variant="contrast"
                   onPress={() => void handlePickSelfie()}
                   disabled={isSubmitting}
-                >
-                  <Text style={styles.uploadButtonText}>{IMAGE_UPLOAD_UI.UPLOAD_BUTTON}</Text>
-                </Pressable>
+                />
+                {selfieFile ? <Text style={sheetStyles.fileName}>{selfieFile.name}</Text> : null}
                 {selfieFile ? (
-                  <Text style={[styles.fileName, { color: theme.colors.textMuted }]}>
-                    {selfieFile.name}
-                  </Text>
-                ) : null}
-                {selfieFile ? (
-                  <Image source={{ uri: selfieFile.uri }} style={styles.preview} />
+                  <Image source={{ uri: selfieFile.uri }} style={sheetStyles.preview} />
                 ) : null}
               </View>
 
-              {displayError ? <Text style={styles.error}>{displayError}</Text> : null}
+              {displayError ? <Text style={fieldStyles.error}>{displayError}</Text> : null}
 
-              <Pressable
-                style={[styles.submitButton, { backgroundColor: theme.colors.nearBlack }]}
+              <AppButton
+                label={
+                  isSubmitting
+                    ? DATA_CONFIRMATION_MODAL_UI.SUBMIT_LOADING
+                    : DATA_CONFIRMATION_MODAL_UI.SUBMIT
+                }
+                variant="contrast"
                 onPress={() => void handleSubmit()}
                 disabled={isSubmitting}
-              >
-                <Text style={styles.submitButtonText}>
-                  {isSubmitting
-                    ? DATA_CONFIRMATION_MODAL_UI.SUBMIT_LOADING
-                    : DATA_CONFIRMATION_MODAL_UI.SUBMIT}
-                </Text>
-              </Pressable>
+              />
             </ScrollView>
           ) : null}
         </View>
@@ -308,8 +284,6 @@ type FormFieldProps = {
   placeholder?: string;
   keyboardType?: "default" | "number-pad";
   multiline?: boolean;
-  themeText: string;
-  themeBorder: string;
 };
 
 const FormField = ({
@@ -319,149 +293,27 @@ const FormField = ({
   placeholder,
   keyboardType = "default",
   multiline = false,
-  themeText,
-  themeBorder,
-}: FormFieldProps) => (
-  <View style={styles.field}>
-    <Text style={[styles.fieldLabel, { color: themeText }]}>{label}</Text>
-    <TextInput
-      style={[
-        styles.input,
-        multiline && styles.inputMultiline,
-        { color: themeText, borderColor: themeBorder },
-      ]}
-      value={value}
-      onChangeText={onChangeText}
-      placeholder={placeholder}
-      keyboardType={keyboardType}
-      multiline={multiline}
-      autoCorrect={false}
-    />
-  </View>
-);
+}: FormFieldProps) => {
+  const theme = useAppTheme();
+  const fieldStyles = useFormFieldStyles();
 
-const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.45)",
-    justifyContent: "flex-end",
-  },
-  sheet: {
-    maxHeight: "92%",
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    paddingBottom: 24,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 8,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "700",
-    flex: 1,
-  },
-  close: {
-    fontSize: 15,
-    fontWeight: "600",
-  },
-  intro: {
-    fontSize: 14,
-    lineHeight: 20,
-    marginBottom: 8,
-  },
-  form: {
-    paddingHorizontal: 16,
-    paddingBottom: 24,
-    gap: 10,
-  },
-  field: {
-    gap: 4,
-  },
-  fieldLabel: {
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  input: {
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 16,
-  },
-  inputMultiline: {
-    minHeight: 72,
-    textAlignVertical: "top",
-  },
-  selfieSection: {
-    gap: 8,
-    marginTop: 4,
-  },
-  selfieHint: {
-    fontSize: 13,
-  },
-  uploadButton: {
-    alignSelf: "flex-start",
-    borderRadius: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-  },
-  uploadButtonText: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  fileName: {
-    fontSize: 13,
-  },
-  preview: {
-    width: "100%",
-    height: 180,
-    borderRadius: 8,
-    backgroundColor: "#f4f4f4",
-  },
-  error: {
-    color: "#c62828",
-    fontSize: 14,
-  },
-  submitButton: {
-    marginTop: 8,
-    borderRadius: 10,
-    paddingVertical: 14,
-    alignItems: "center",
-  },
-  submitButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  statusOk: {
-    paddingHorizontal: 16,
-    color: "#2e7d32",
-    fontSize: 15,
-    fontWeight: "600",
-  },
-  statusPending: {
-    paddingHorizontal: 16,
-    color: "#f57c00",
-    fontSize: 15,
-    fontWeight: "600",
-  },
-  rejectBlock: {
-    paddingHorizontal: 16,
-    gap: 6,
-  },
-  statusRejected: {
-    color: "#c62828",
-    fontSize: 15,
-    fontWeight: "600",
-  },
-  staffNote: {
-    fontSize: 14,
-    lineHeight: 20,
-  },
-});
+  return (
+    <View style={fieldStyles.field}>
+      <Text style={fieldStyles.fieldLabel}>{label}</Text>
+      <TextInput
+        style={[
+          fieldStyles.input,
+          fieldStyles.inputCompact,
+          multiline && fieldStyles.inputMultiline,
+        ]}
+        value={value}
+        onChangeText={onChangeText}
+        placeholder={placeholder}
+        placeholderTextColor={theme.colors.textMuted}
+        keyboardType={keyboardType}
+        multiline={multiline}
+        autoCorrect={false}
+      />
+    </View>
+  );
+};

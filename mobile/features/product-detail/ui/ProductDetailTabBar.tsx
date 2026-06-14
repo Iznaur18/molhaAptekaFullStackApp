@@ -1,6 +1,7 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import type { ProductDetailTabId } from "@/entities/product/model/useProductDetailTabs";
+import { useProductDetailTabBarStyles } from "@/shared/theme/catalogProductStyles";
 
 type ProductDetailTabBarProps = {
   tabs: { id: ProductDetailTabId; label: string }[];
@@ -13,6 +14,8 @@ export const ProductDetailTabBar = ({
   activeTab,
   onTabChange,
 }: ProductDetailTabBarProps) => {
+  const styles = useProductDetailTabBarStyles();
+
   if (tabs.length <= 1) {
     return null;
   }
@@ -34,30 +37,3 @@ export const ProductDetailTabBar = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  root: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  tab: {
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderRadius: 20,
-    backgroundColor: "#f4f4f5",
-  },
-  tabActive: {
-    backgroundColor: "#111",
-  },
-  tabText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#444",
-  },
-  tabTextActive: {
-    color: "#fff",
-  },
-});

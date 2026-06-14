@@ -1,7 +1,8 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import { THEME_SETTINGS_UI } from "@/shared/config";
-import { useAppTheme, useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
+import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
+import { useThemePreferenceToggleStyles } from "@/shared/theme/profileChromeStyles";
 import type { ThemePreference } from "@/shared/theme/themePreferenceStorage";
 
 const OPTIONS: Array<{ value: ThemePreference; label: string }> = [
@@ -11,33 +12,22 @@ const OPTIONS: Array<{ value: ThemePreference; label: string }> = [
 ];
 
 export const ThemePreferenceToggle = () => {
-  const theme = useAppTheme();
+  const styles = useThemePreferenceToggleStyles();
   const { preference, setPreference } = useAppThemeSettings();
 
   return (
     <View style={styles.root}>
-      <Text style={[styles.label, { color: theme.colors.text }]}>{THEME_SETTINGS_UI.LABEL}</Text>
+      <Text style={styles.label}>{THEME_SETTINGS_UI.LABEL}</Text>
       <View style={styles.row}>
         {OPTIONS.map((option) => {
           const isActive = preference === option.value;
           return (
             <Pressable
               key={option.value}
-              style={[
-                styles.chip,
-                {
-                  borderColor: theme.colors.borderStrong,
-                  backgroundColor: isActive ? theme.colors.action : theme.colors.surface,
-                },
-              ]}
+              style={[styles.chip, isActive ? styles.chipActive : styles.chipIdle]}
               onPress={() => setPreference(option.value)}
             >
-              <Text
-                style={[
-                  styles.chipText,
-                  { color: isActive ? theme.colors.onContrast : theme.colors.text },
-                ]}
-              >
+              <Text style={[styles.chipText, isActive ? styles.chipTextActive : styles.chipTextIdle]}>
                 {option.label}
               </Text>
             </Pressable>
@@ -47,31 +37,3 @@ export const ThemePreferenceToggle = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  root: {
-    width: "100%",
-    maxWidth: 420,
-    gap: 8,
-    marginTop: 8,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  row: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  chip: {
-    borderWidth: 1,
-    borderRadius: 999,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-  },
-  chipText: {
-    fontSize: 14,
-    fontWeight: "600",
-  },
-});

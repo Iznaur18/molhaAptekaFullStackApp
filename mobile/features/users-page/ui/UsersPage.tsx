@@ -1,15 +1,8 @@
 import { USER_SEARCH_MIN_LENGTH } from "@molha/api-contract";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import {
-  FlatList,
-  Pressable,
-  RefreshControl,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { UserListRow } from "@/entities/user/ui/UserListRow";
 import { useUsersSearchQuery } from "@/entities/user/model/useUsersSearchQuery";
@@ -81,7 +74,7 @@ export const UsersPage = () => {
           contentContainerStyle={styles.list}
           refreshControl={
             hasSearchQuery ? (
-              <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
+              <ThemedRefreshControl refreshing={isRefetching} onRefresh={refetch} />
             ) : undefined
           }
           ListEmptyComponent={

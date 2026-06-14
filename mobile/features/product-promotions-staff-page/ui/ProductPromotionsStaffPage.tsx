@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { FlatList, RefreshControl, StyleSheet, Text, View } from "react-native";
+import { FlatList, Text, View } from "react-native";
+import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import type { StaffProductPromotionRow } from "@/entities/product-promotion/api/productPromotionStaffApi";
 import {
@@ -7,6 +8,7 @@ import {
   useProductPromotionStaffMutations,
 } from "@/entities/product-promotion/model/useProductPromotionStaffMutations";
 import { PRODUCT_PROMOTIONS_STAFF_PAGE_UI } from "@/shared/config";
+import { useStaffQueueStyles } from "@/shared/theme/staffQueueStyles";
 import { StaffModerationActions } from "@/shared/ui/StaffModerationActions";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
@@ -31,6 +33,7 @@ type RowProps = {
 };
 
 const PromotionRow = ({ promotion, onChanged, approveMutation, rejectMutation }: RowProps) => {
+  const styles = useStaffQueueStyles();
   const [errorMessage, setErrorMessage] = useState("");
   const promotionId = String(promotion._id);
   const isBusy = approveMutation.isPending || rejectMutation.isPending;
@@ -78,9 +81,7 @@ const PromotionRow = ({ promotion, onChanged, approveMutation, rejectMutation }:
       <Text style={styles.meta}>
         {PRODUCT_PROMOTIONS_STAFF_PAGE_UI.ROW_PAYMENT}: {formatPaymentLabel(promotion.paymentMethod)}
       </Text>
-      <Text style={styles.meta}>
-        Продавец: {promotion.seller?.userName ?? "—"}
-      </Text>
+      <Text style={styles.meta}>Продавец: {promotion.seller?.userName ?? "—"}</Text>
       <StaffModerationActions
         approveLabel={PRODUCT_PROMOTIONS_STAFF_PAGE_UI.APPROVE}
         rejectLabel={PRODUCT_PROMOTIONS_STAFF_PAGE_UI.REJECT}
@@ -95,6 +96,7 @@ const PromotionRow = ({ promotion, onChanged, approveMutation, rejectMutation }:
 };
 
 export const ProductPromotionsStaffPage = () => {
+  const styles = useStaffQueueStyles();
   const queueQuery = usePendingProductPromotionsQuery();
   const { approveMutation, rejectMutation } = useProductPromotionStaffMutations();
   const promotions = queueQuery.data ?? [];
@@ -122,7 +124,7 @@ export const ProductPromotionsStaffPage = () => {
       keyExtractor={(item) => String(item._id)}
       contentContainerStyle={styles.list}
       refreshControl={
-        <RefreshControl refreshing={queueQuery.isFetching} onRefresh={() => void queueQuery.refetch()} />
+        <ThemedRefreshControl refreshing={queueQuery.isFetching} onRefresh={() => void queueQuery.refetch()} />
       }
       ListEmptyComponent={<Text style={styles.empty}>{PRODUCT_PROMOTIONS_STAFF_PAGE_UI.EMPTY}</Text>}
       renderItem={({ item }) => (
@@ -136,11 +138,3 @@ export const ProductPromotionsStaffPage = () => {
     />
   );
 };
-
-const styles = StyleSheet.create({
-  list: { padding: 12, gap: 16 },
-  row: { gap: 8, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: "#eee" },
-  title: { fontSize: 15, fontWeight: "600" },
-  meta: { fontSize: 13, color: "#666" },
-  empty: { textAlign: "center", color: "#666", padding: 24 },
-});

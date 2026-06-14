@@ -1,23 +1,17 @@
 import { useCallback, useMemo, useState } from "react";
-import {
-  Alert,
-  FlatList,
-  Pressable,
-  RefreshControl,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Alert, FlatList, Pressable, Text, TextInput, View } from "react-native";
+import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import type { CuratedListAdminRow } from "@/entities/curated-product-list/api/curatedProductListAdminApi";
 import { useCuratedProductListAdminMutations } from "@/entities/curated-product-list/model/useCuratedProductListAdminMutations";
 import { useCuratedProductListsAdminQuery } from "@/entities/curated-product-list/model/useCuratedProductListsAdminQuery";
 import { CuratedProductListAdminCard } from "@/features/popular-products-admin-page/ui/CuratedProductListAdminCard";
 import { POPULAR_PRODUCTS_ADMIN_PAGE_UI } from "@/shared/config";
+import { useStaffAdminStyles } from "@/shared/theme/staffAdminStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 export const PopularProductsAdminPage = () => {
+  const styles = useStaffAdminStyles();
   const listsQuery = useCuratedProductListsAdminQuery();
   const {
     createMutation,
@@ -201,7 +195,7 @@ export const PopularProductsAdminPage = () => {
       keyExtractor={(item) => item._id}
       contentContainerStyle={styles.list}
       refreshControl={
-        <RefreshControl refreshing={listsQuery.isFetching} onRefresh={() => void listsQuery.refetch()} />
+        <ThemedRefreshControl refreshing={listsQuery.isFetching} onRefresh={() => void listsQuery.refetch()} />
       }
       ListHeaderComponent={
         <View style={styles.header}>
@@ -259,38 +253,3 @@ export const PopularProductsAdminPage = () => {
     />
   );
 };
-
-const styles = StyleSheet.create({
-  list: { padding: 12, gap: 12, paddingBottom: 32 },
-  header: { gap: 10, marginBottom: 8 },
-  search: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    padding: 10,
-    fontSize: 14,
-    backgroundColor: "#fff",
-  },
-  toggleCreate: { alignSelf: "flex-start" },
-  toggleCreateText: { color: "#1f6feb", fontWeight: "600" },
-  panel: { gap: 8, padding: 12, backgroundColor: "#f8f8f8", borderRadius: 10 },
-  label: { fontSize: 13, fontWeight: "600" },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    padding: 10,
-    fontSize: 14,
-    backgroundColor: "#fff",
-  },
-  primaryButton: {
-    backgroundColor: "#111",
-    borderRadius: 8,
-    paddingVertical: 10,
-    alignItems: "center",
-  },
-  primaryButtonText: { color: "#fff", fontWeight: "600" },
-  disabled: { opacity: 0.5 },
-  error: { color: "#c62828", fontSize: 13 },
-  empty: { textAlign: "center", color: "#666", padding: 24 },
-});

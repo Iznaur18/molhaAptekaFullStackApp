@@ -4,7 +4,6 @@ import {
   ActivityIndicator,
   Modal,
   Pressable,
-  StyleSheet,
   Text,
   TextInput,
   View,
@@ -24,6 +23,8 @@ import { useUploadVideoMutation } from "@/entities/upload/model/useUploadVideoMu
 import { pickGalleryImageAsset } from "@/features/image-upload/lib/pickGalleryImageAsset";
 import { pickVideoAsset } from "@/features/image-upload/lib/pickVideoAsset";
 import { USER_STORY_UI } from "@/shared/config";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useCreateStoryModalStyles } from "@/shared/theme/modalChromeStyles";
 import { ProductPreviewVideo } from "@/shared/ui/ProductPreviewVideo";
 
 type CreateUserStoryModalProps = {
@@ -37,6 +38,8 @@ export const CreateUserStoryModal = ({
   onClose,
   onPublished,
 }: CreateUserStoryModalProps) => {
+  const styles = useCreateStoryModalStyles();
+  const theme = useAppTheme();
   const { createMutation } = useUserStoryMutations();
   const uploadImageMutation = useUploadImageMutation();
   const uploadVideoMutation = useUploadVideoMutation();
@@ -197,7 +200,7 @@ export const CreateUserStoryModal = ({
             disabled={isBusy}
           >
             {isBusy ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color={theme.colors.onContrast} />
             ) : (
               <Text style={styles.submitText}>{USER_STORY_UI.PUBLISH}</Text>
             )}
@@ -207,112 +210,3 @@ export const CreateUserStoryModal = ({
     </Modal>
   );
 };
-
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.45)",
-    justifyContent: "flex-end",
-  },
-  card: {
-    backgroundColor: "#fff",
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    padding: 20,
-    paddingBottom: 32,
-    maxHeight: "92%",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 12,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#111",
-  },
-  close: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#666",
-  },
-  preview: {
-    height: 280,
-    borderRadius: 12,
-    backgroundColor: "#111",
-    overflow: "hidden",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  previewMedia: {
-    width: "100%",
-    height: "100%",
-  },
-  placeholder: {
-    color: "#aaa",
-    fontSize: 14,
-    textAlign: "center",
-    paddingHorizontal: 16,
-  },
-  pickers: {
-    flexDirection: "row",
-    gap: 10,
-    marginTop: 14,
-  },
-  pickButton: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 10,
-    backgroundColor: "#f0f0f0",
-    alignItems: "center",
-  },
-  pickDisabled: {
-    opacity: 0.5,
-  },
-  pickText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
-  },
-  label: {
-    marginTop: 14,
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
-  },
-  caption: {
-    marginTop: 8,
-    minHeight: 64,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    padding: 12,
-    fontSize: 15,
-    color: "#111",
-    textAlignVertical: "top",
-  },
-  error: {
-    marginTop: 10,
-    fontSize: 13,
-    color: "#c62828",
-  },
-  submit: {
-    marginTop: 16,
-    paddingVertical: 14,
-    borderRadius: 10,
-    backgroundColor: "#111",
-    alignItems: "center",
-    justifyContent: "center",
-    minHeight: 48,
-  },
-  submitDisabled: {
-    opacity: 0.6,
-  },
-  submitText: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#fff",
-  },
-});

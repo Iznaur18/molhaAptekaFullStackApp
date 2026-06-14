@@ -1,10 +1,11 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import { useUserFollowMutations } from "@/entities/user-follow/model/useUserFollowMutations";
 import { USER_FOLLOW_BUTTON_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { useUserFollowButtonStyles } from "@/shared/theme/accountFeatureStyles";
 
 type UserFollowButtonProps = {
   targetUserId: string;
@@ -22,6 +23,7 @@ export const UserFollowButton = ({
   onFollowChange,
 }: UserFollowButtonProps) => {
   const router = useRouter();
+  const styles = useUserFollowButtonStyles();
   const { followMutation, unfollowMutation } = useUserFollowMutations();
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -71,34 +73,3 @@ export const UserFollowButton = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  root: {
-    marginTop: 4,
-    gap: 4,
-  },
-  button: {
-    alignSelf: "flex-start",
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderRadius: 8,
-    backgroundColor: "#1f6feb",
-  },
-  buttonFollowing: {
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#d1d5db",
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  buttonTextFollowing: {
-    color: "#374151",
-  },
-  error: {
-    fontSize: 12,
-    color: "#c62828",
-  },
-});

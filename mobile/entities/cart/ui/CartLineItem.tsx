@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import { useCartActions } from "@/entities/cart/model/useCartActions";
 import type { CartLineExclusionReason } from "@/entities/cart/lib/getCartLineExclusionReason";
@@ -7,6 +7,7 @@ import { resolveProductImageUrl } from "@/entities/product/lib/resolveProductIma
 import { getProductPurchaseLimit } from "@/entities/product/lib/getProductPurchaseLimit";
 import { CART_PAGE_UI, PRODUCT_UI } from "@/shared/config";
 import { formatPriceRub } from "@/shared/lib";
+import { useCartLineItemStyles } from "@/shared/theme/commerceScreenStyles";
 import { CachedProductImage } from "@/shared/ui/CachedProductImage";
 
 import type { CartLine } from "../lib/selectCartLines";
@@ -24,6 +25,7 @@ const EXCLUSION_COPY: Record<CartLineExclusionReason, string> = {
 
 export const CartLineItem = ({ line, exclusionReason = null }: CartLineItemProps) => {
   const router = useRouter();
+  const styles = useCartLineItemStyles();
   const { setItemQuantity, removeItem, isUpdating } = useCartActions();
 
   const product = line.product;
@@ -117,88 +119,3 @@ export const CartLineItem = ({ line, exclusionReason = null }: CartLineItemProps
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: "row",
-    paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#e5e5e5",
-    gap: 12,
-  },
-  rowUpdating: {
-    opacity: 0.7,
-  },
-  rowExcluded: {
-    opacity: 0.65,
-  },
-  imageWrap: {
-    width: 72,
-    height: 72,
-    borderRadius: 8,
-    overflow: "hidden",
-    backgroundColor: "#f4f4f4",
-  },
-  image: {
-    width: "100%",
-    height: "100%",
-  },
-  info: {
-    flex: 1,
-  },
-  name: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#111",
-  },
-  unitPrice: {
-    marginTop: 4,
-    fontSize: 13,
-    color: "#666",
-  },
-  excluded: {
-    marginTop: 4,
-    fontSize: 12,
-    color: "#c62828",
-  },
-  stepper: {
-    marginTop: 8,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  stepButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 6,
-    backgroundColor: "#f0f0f0",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  stepDisabled: {
-    opacity: 0.4,
-  },
-  stepButtonText: {
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  quantity: {
-    fontSize: 15,
-    fontWeight: "600",
-    minWidth: 20,
-    textAlign: "center",
-  },
-  actions: {
-    alignItems: "flex-end",
-    justifyContent: "space-between",
-  },
-  lineTotal: {
-    fontSize: 15,
-    fontWeight: "700",
-  },
-  remove: {
-    fontSize: 18,
-    color: "#999",
-    padding: 4,
-  },
-});

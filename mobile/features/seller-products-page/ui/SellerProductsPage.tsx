@@ -1,15 +1,8 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect } from "react";
-import {
-  ActivityIndicator,
-  FlatList,
-  Pressable,
-  RefreshControl,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
+import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { ProductCard } from "@/entities/product/ui/ProductCard";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
@@ -21,14 +14,14 @@ import { ProfileOverviewBanner } from "@/entities/user/ui/ProfileOverviewBanner"
 import { UserFollowButton } from "@/features/user-follow/ui/UserFollowButton";
 import { SELLER_PRODUCTS_PAGE_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
-import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useSellerProductsPageStyles } from "@/shared/theme/sellerFlowStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 const NUM_COLUMNS = 2;
 
 export const SellerProductsPage = () => {
   const router = useRouter();
-  const theme = useAppTheme();
+  const styles = useSellerProductsPageStyles();
   const queryClient = useQueryClient();
   const params = useLocalSearchParams<{ userId?: string }>();
   const sellerId = String(params.userId ?? "").trim();
@@ -90,14 +83,9 @@ export const SellerProductsPage = () => {
 
   if (!isAuthorized) {
     return (
-      <View style={[styles.centered, { backgroundColor: theme.colors.bg }]}>
-        <Text style={[styles.hint, { color: theme.colors.textMuted }]}>
-          {SELLER_PRODUCTS_PAGE_UI.LOGIN_HINT}
-        </Text>
-        <Pressable
-          style={[styles.button, { backgroundColor: theme.colors.nearBlack }]}
-          onPress={() => router.push("/(auth)/login")}
-        >
+      <View style={styles.centered}>
+        <Text style={styles.hint}>{SELLER_PRODUCTS_PAGE_UI.LOGIN_HINT}</Text>
+        <Pressable style={styles.button} onPress={() => router.push("/(auth)/login")}>
           <Text style={styles.buttonText}>{SELLER_PRODUCTS_PAGE_UI.LOGIN_BUTTON}</Text>
         </Pressable>
       </View>
@@ -135,7 +123,7 @@ export const SellerProductsPage = () => {
   const isFollowing = seller?.isFollowing === true;
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.bg }]}>
+    <View style={styles.container}>
       <FlatList
         data={catalogQuery.products}
         keyExtractor={(item) => String(item._id)}
@@ -144,7 +132,7 @@ export const SellerProductsPage = () => {
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.4}
         refreshControl={
-          <RefreshControl
+          <ThemedRefreshControl
             refreshing={catalogQuery.isRefetching || profileQuery.isRefetching}
             onRefresh={() => {
               void profileQuery.refetch();
@@ -154,7 +142,7 @@ export const SellerProductsPage = () => {
         }
         ListHeaderComponent={
           <View style={styles.header}>
-            <Text style={[styles.title, { color: theme.colors.text }]}>{pageTitle}</Text>
+            <Text style={styles.title}>{pageTitle}</Text>
             {seller ? <ProfileOverviewBanner user={seller} /> : null}
             <UserFollowButton
               targetUserId={sellerId}
@@ -165,11 +153,7 @@ export const SellerProductsPage = () => {
             />
           </View>
         }
-        ListEmptyComponent={
-          <Text style={[styles.hint, { color: theme.colors.textMuted }]}>
-            {SELLER_PRODUCTS_PAGE_UI.EMPTY}
-          </Text>
-        }
+        ListEmptyComponent={<Text style={styles.hint}>{SELLER_PRODUCTS_PAGE_UI.EMPTY}</Text>}
         ListFooterComponent={
           catalogQuery.isFetchingNextPage ? (
             <ActivityIndicator style={styles.footerLoader} />
@@ -184,52 +168,3 @@ export const SellerProductsPage = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  list: {
-    padding: 12,
-    paddingBottom: 32,
-    gap: 8,
-  },
-  header: {
-    marginBottom: 12,
-    gap: 8,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "700",
-  },
-  cell: {
-    flex: 1,
-    maxWidth: "50%",
-    padding: 4,
-  },
-  hint: {
-    textAlign: "center",
-    marginTop: 24,
-    fontSize: 15,
-  },
-  footerLoader: {
-    marginVertical: 16,
-  },
-  centered: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 24,
-    gap: 12,
-  },
-  button: {
-    borderRadius: 10,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 15,
-    fontWeight: "600",
-  },
-});

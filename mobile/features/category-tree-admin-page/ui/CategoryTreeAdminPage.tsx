@@ -1,15 +1,6 @@
 import { useMemo, useState } from "react";
-import {
-  Alert,
-  FlatList,
-  Pressable,
-  RefreshControl,
-  StyleSheet,
-  Switch,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Alert, FlatList, Pressable, Switch, Text, TextInput, View } from "react-native";
+import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import type { ProductCategoryAdminRow } from "@/entities/product-category-tree/model/adminTypes";
 import { useProductCategoriesAdminQuery } from "@/entities/product-category-tree/model/useProductCategoriesAdminQuery";
@@ -29,11 +20,13 @@ import {
   sortCategoryRows,
 } from "@/features/category-tree-admin-page/lib/categoryTreeAdminUtils";
 import { CATEGORY_TREE_ADMIN_PAGE_UI } from "@/shared/config";
+import { useStaffAdminStyles } from "@/shared/theme/staffAdminStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 type EditDraft = Record<string, string | boolean>;
 
 export const CategoryTreeAdminPage = () => {
+  const styles = useStaffAdminStyles();
   const categoriesQuery = useProductCategoriesAdminQuery();
   const { createMutation, patchMutation, deleteMutation } = useProductCategoryAdminMutations();
 
@@ -277,7 +270,7 @@ export const CategoryTreeAdminPage = () => {
       keyExtractor={(item) => item._id}
       contentContainerStyle={styles.list}
       refreshControl={
-        <RefreshControl
+        <ThemedRefreshControl
           refreshing={categoriesQuery.isFetching}
           onRefresh={() => void categoriesQuery.refetch()}
         />
@@ -435,7 +428,10 @@ type ParentPickerProps = {
   onChange: (value: string) => void;
 };
 
-const ParentPicker = ({ value, options, onChange }: ParentPickerProps) => (
+const ParentPicker = ({ value, options, onChange }: ParentPickerProps) => {
+  const styles = useStaffAdminStyles();
+
+  return (
   <View style={styles.pickerWrap}>
     <Pressable
       style={[styles.pickerChip, value === "" && styles.pickerChipSelected]}
@@ -455,14 +451,18 @@ const ParentPicker = ({ value, options, onChange }: ParentPickerProps) => (
       </Pressable>
     ))}
   </View>
-);
+  );
+};
 
 type LegacyPickerProps = {
   value: string;
   onChange: (value: string) => void;
 };
 
-const LegacyPicker = ({ value, onChange }: LegacyPickerProps) => (
+const LegacyPicker = ({ value, onChange }: LegacyPickerProps) => {
+  const styles = useStaffAdminStyles();
+
+  return (
   <View style={styles.pickerWrap}>
     <Pressable
       style={[styles.pickerChip, value === "" && styles.pickerChipSelected]}
@@ -480,72 +480,5 @@ const LegacyPicker = ({ value, onChange }: LegacyPickerProps) => (
       </Pressable>
     ))}
   </View>
-);
-
-const styles = StyleSheet.create({
-  list: { padding: 12, gap: 12, paddingBottom: 32 },
-  header: { gap: 10, marginBottom: 8 },
-  search: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    padding: 10,
-    fontSize: 14,
-    backgroundColor: "#fff",
-  },
-  toggleCreate: { alignSelf: "flex-start" },
-  toggleCreateText: { color: "#1f6feb", fontWeight: "600" },
-  panel: { gap: 8, padding: 12, backgroundColor: "#f8f8f8", borderRadius: 10 },
-  sectionTitle: { fontSize: 15, fontWeight: "700" },
-  label: { fontSize: 13, fontWeight: "600", color: "#444" },
-  hint: { fontSize: 11, color: "#888" },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    padding: 10,
-    fontSize: 14,
-    backgroundColor: "#fff",
-  },
-  row: { gap: 6, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: "#eee" },
-  path: { fontSize: 15, fontWeight: "600" },
-  badge: { fontSize: 11, color: "#666" },
-  switchRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  pickerWrap: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
-  pickerChip: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 14,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    maxWidth: "100%",
-  },
-  pickerChipSelected: { borderColor: "#1f6feb", backgroundColor: "#e8f1ff" },
-  pickerChipText: { fontSize: 11, color: "#333" },
-  actions: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 4 },
-  primaryButton: {
-    backgroundColor: "#111",
-    borderRadius: 8,
-    paddingVertical: 10,
-    alignItems: "center",
-  },
-  primaryButtonText: { color: "#fff", fontWeight: "600" },
-  secondaryButton: {
-    backgroundColor: "#eee",
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  secondaryButtonText: { fontWeight: "600" },
-  ghostButton: { paddingVertical: 8, paddingHorizontal: 8 },
-  deleteButton: {
-    backgroundColor: "#c62828",
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  deleteText: { color: "#fff", fontWeight: "600" },
-  disabled: { opacity: 0.5 },
-  error: { color: "#c62828", fontSize: 13 },
-  empty: { textAlign: "center", color: "#666", padding: 24 },
-});
+  );
+};

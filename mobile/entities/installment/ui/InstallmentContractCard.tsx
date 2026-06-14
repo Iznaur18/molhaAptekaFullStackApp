@@ -1,11 +1,5 @@
 import { useState } from "react";
-import {
-  ActivityIndicator,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { ActivityIndicator, Pressable, Text, View } from "react-native";
 
 import type { InstallmentContract } from "@/entities/installment/api/installmentApi";
 import {
@@ -16,6 +10,8 @@ import {
 import { useInstallmentMutations } from "@/entities/installment/model/useInstallmentMutations";
 import { INSTALLMENT_UI } from "@/shared/config";
 import { formatIsoDateTime, formatPriceRub } from "@/shared/lib";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useInstallmentContractCardStyles } from "@/shared/theme/accountFeatureStyles";
 
 type InstallmentContractCardProps = {
   contract: InstallmentContract;
@@ -28,6 +24,8 @@ export const InstallmentContractCard = ({
   role,
   onProductPress,
 }: InstallmentContractCardProps) => {
+  const theme = useAppTheme();
+  const styles = useInstallmentContractCardStyles();
   const { markPaidMutation, confirmPaymentMutation, rejectPaymentMutation } =
     useInstallmentMutations();
   const [errorMessage, setErrorMessage] = useState("");
@@ -112,7 +110,7 @@ export const InstallmentContractCard = ({
                 }}
               >
                 {pendingKey === actionKey ? (
-                  <ActivityIndicator size="small" />
+                  <ActivityIndicator size="small" color={theme.colors.onContrast} />
                 ) : (
                   <Text style={styles.actionText}>{INSTALLMENT_UI.MARK_PAID}</Text>
                 )}
@@ -136,7 +134,7 @@ export const InstallmentContractCard = ({
                   <Text style={styles.actionText}>{INSTALLMENT_UI.CONFIRM_PAYMENT}</Text>
                 </Pressable>
                 <Pressable
-                  style={styles.rejectButton}
+                  style={[styles.actionButton, styles.rejectButton]}
                   disabled={pendingKey === `${actionKey}:reject`}
                   onPress={() => {
                     void runAction(`${actionKey}:reject`, () =>
@@ -159,86 +157,3 @@ export const InstallmentContractCard = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  card: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#ddd",
-    borderRadius: 12,
-    padding: 14,
-    marginBottom: 12,
-    backgroundColor: "#fff",
-  },
-  product: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#111",
-  },
-  productLink: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#1f6feb",
-  },
-  meta: {
-    marginTop: 4,
-    fontSize: 13,
-    color: "#555",
-  },
-  paymentsTitle: {
-    marginTop: 12,
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
-  },
-  paymentRow: {
-    marginTop: 8,
-    gap: 8,
-  },
-  paymentInfo: {
-    gap: 2,
-  },
-  paymentText: {
-    fontSize: 14,
-    color: "#222",
-  },
-  paymentDue: {
-    fontSize: 12,
-    color: "#777",
-  },
-  actionButton: {
-    alignSelf: "flex-start",
-    backgroundColor: "#111",
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    minHeight: 36,
-    justifyContent: "center",
-  },
-  actionText: {
-    color: "#fff",
-    fontSize: 13,
-    fontWeight: "600",
-  },
-  sellerActions: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  rejectButton: {
-    borderRadius: 8,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#c62828",
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  rejectText: {
-    color: "#c62828",
-    fontSize: 13,
-    fontWeight: "600",
-  },
-  error: {
-    marginTop: 8,
-    color: "#c62828",
-    fontSize: 13,
-  },
-});

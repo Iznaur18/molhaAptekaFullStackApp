@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { FlatList, RefreshControl, StyleSheet, Text, View } from "react-native";
+import { FlatList, Text, View } from "react-native";
+import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import type { StaffRaffleRow } from "@/entities/raffle/api/raffleStaffApi";
 import {
@@ -7,6 +8,7 @@ import {
   useStaffRafflesQueueQuery,
 } from "@/entities/raffle/model/useRaffleStaffMutations";
 import { RAFFLES_STAFF_PAGE_UI } from "@/shared/config";
+import { useStaffQueueStyles } from "@/shared/theme/staffQueueStyles";
 import { StaffModerationActions } from "@/shared/ui/StaffModerationActions";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
@@ -18,6 +20,7 @@ type RowProps = {
 };
 
 const RaffleRow = ({ raffle, onChanged, approveMutation, rejectMutation }: RowProps) => {
+  const styles = useStaffQueueStyles();
   const [errorMessage, setErrorMessage] = useState("");
   const raffleId = String(raffle._id);
   const isBusy = approveMutation.isPending || rejectMutation.isPending;
@@ -65,6 +68,7 @@ const RaffleRow = ({ raffle, onChanged, approveMutation, rejectMutation }: RowPr
 };
 
 export const RafflesStaffPage = () => {
+  const styles = useStaffQueueStyles();
   const queueQuery = useStaffRafflesQueueQuery();
   const { approveMutation, rejectMutation } = useRaffleStaffMutations();
   const raffles = queueQuery.data?.pendingRaffles ?? [];
@@ -90,7 +94,7 @@ export const RafflesStaffPage = () => {
       keyExtractor={(item) => String(item._id)}
       contentContainerStyle={styles.list}
       refreshControl={
-        <RefreshControl refreshing={queueQuery.isFetching} onRefresh={() => void queueQuery.refetch()} />
+        <ThemedRefreshControl refreshing={queueQuery.isFetching} onRefresh={() => void queueQuery.refetch()} />
       }
       ListEmptyComponent={<Text style={styles.empty}>{RAFFLES_STAFF_PAGE_UI.EMPTY}</Text>}
       renderItem={({ item }) => (
@@ -104,11 +108,3 @@ export const RafflesStaffPage = () => {
     />
   );
 };
-
-const styles = StyleSheet.create({
-  list: { padding: 12, gap: 16 },
-  row: { gap: 8, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: "#eee" },
-  title: { fontSize: 15, fontWeight: "600" },
-  meta: { fontSize: 13, color: "#666" },
-  empty: { textAlign: "center", color: "#666", padding: 24 },
-});

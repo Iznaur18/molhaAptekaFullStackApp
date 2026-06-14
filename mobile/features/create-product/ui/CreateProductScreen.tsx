@@ -4,7 +4,6 @@ import {
   ActivityIndicator,
   Pressable,
   ScrollView,
-  StyleSheet,
   Switch,
   Text,
   TextInput,
@@ -17,6 +16,7 @@ import { pickProfileImageAsset } from "@/features/image-upload/lib/pickProfileIm
 import { CreateProductCategoryPicker } from "@/features/create-product/ui/CreateProductCategoryPicker";
 import { CREATE_PRODUCT_UI, IMAGE_UPLOAD_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useProductEditorScreenStyles } from "@/shared/theme/sellerFlowStyles";
 
 const PRODUCT_DESCRIPTION_MIN_CHARS = 10;
 const PRODUCT_STOCK_QUANTITY_MIN = 1;
@@ -30,6 +30,7 @@ const parsePositiveInt = (value: string): number | null => {
 export const CreateProductScreen = () => {
   const router = useRouter();
   const theme = useAppTheme();
+  const styles = useProductEditorScreenStyles();
   const createMutation = useCreateProductMutation();
   const uploadMutation = useUploadImageMutation();
 
@@ -120,36 +121,32 @@ export const CreateProductScreen = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-      <Text style={[styles.label, { color: theme.colors.text }]}>
+      <Text style={styles.label}>
         {CREATE_PRODUCT_UI.LABEL_NAME}
       </Text>
       <TextInput
-        style={[styles.input, { borderColor: theme.colors.border, color: theme.colors.text }]}
+        style={styles.input}
         value={productName}
         onChangeText={setProductName}
         editable={!isSubmitting}
       />
 
-      <Text style={[styles.label, { color: theme.colors.text }]}>
+      <Text style={styles.label}>
         {CREATE_PRODUCT_UI.LABEL_DESCRIPTION}
       </Text>
       <TextInput
-        style={[
-          styles.input,
-          styles.textArea,
-          { borderColor: theme.colors.border, color: theme.colors.text },
-        ]}
+        style={[styles.input, styles.textArea]}
         value={productDescription}
         onChangeText={setProductDescription}
         multiline
         editable={!isSubmitting}
       />
 
-      <Text style={[styles.label, { color: theme.colors.text }]}>
+      <Text style={styles.label}>
         {CREATE_PRODUCT_UI.LABEL_PRICE}
       </Text>
       <TextInput
-        style={[styles.input, { borderColor: theme.colors.border, color: theme.colors.text }]}
+        style={styles.input}
         value={productPrice}
         onChangeText={setProductPrice}
         keyboardType="number-pad"
@@ -166,7 +163,7 @@ export const CreateProductScreen = () => {
       />
 
       <View style={styles.switchRow}>
-        <Text style={[styles.label, { color: theme.colors.text }]}>
+        <Text style={styles.label}>
           {CREATE_PRODUCT_UI.LABEL_AVAILABLE}
         </Text>
         <Switch
@@ -178,11 +175,11 @@ export const CreateProductScreen = () => {
 
       {productIsAvailable ? (
         <>
-          <Text style={[styles.label, { color: theme.colors.text }]}>
+          <Text style={styles.label}>
             {CREATE_PRODUCT_UI.LABEL_STOCK}
           </Text>
           <TextInput
-            style={[styles.input, { borderColor: theme.colors.border, color: theme.colors.text }]}
+            style={styles.input}
             value={productStockQuantity}
             onChangeText={setProductStockQuantity}
             keyboardType="number-pad"
@@ -191,20 +188,20 @@ export const CreateProductScreen = () => {
         </>
       ) : null}
 
-      <Text style={[styles.label, { color: theme.colors.text }]}>
+      <Text style={styles.label}>
         {CREATE_PRODUCT_UI.LABEL_IMAGE}
       </Text>
       <Pressable
-        style={[styles.secondaryButton, { borderColor: theme.colors.border }]}
+        style={styles.secondaryButton}
         onPress={() => {
           void handlePickImage();
         }}
         disabled={isSubmitting}
       >
-        <Text style={{ color: theme.colors.text }}>{IMAGE_UPLOAD_UI.UPLOAD_BUTTON}</Text>
+        <Text style={styles.secondaryButtonText}>{IMAGE_UPLOAD_UI.UPLOAD_BUTTON}</Text>
       </Pressable>
       {productImageUrl ? (
-        <Text style={[styles.imageUrl, { color: theme.colors.textMuted }]} numberOfLines={1}>
+        <Text style={styles.imageUrl} numberOfLines={1}>
           {productImageUrl}
         </Text>
       ) : null}
@@ -214,21 +211,21 @@ export const CreateProductScreen = () => {
 
       <View style={styles.actions}>
         <Pressable
-          style={[styles.cancelButton, { borderColor: theme.colors.border }]}
+          style={styles.cancelButton}
           onPress={() => router.back()}
           disabled={isSubmitting}
         >
-          <Text style={{ color: theme.colors.text }}>{CREATE_PRODUCT_UI.CANCEL}</Text>
+          <Text style={styles.cancelButtonText}>{CREATE_PRODUCT_UI.CANCEL}</Text>
         </Pressable>
         <Pressable
-          style={[styles.submitButton, { backgroundColor: theme.colors.nearBlack }]}
+          style={[styles.submitButton, isSubmitting && styles.disabled]}
           onPress={() => {
             void handleSubmit();
           }}
           disabled={isSubmitting}
         >
           {isSubmitting ? (
-            <ActivityIndicator color="#fff" />
+            <ActivityIndicator color={theme.colors.onContrast} />
           ) : (
             <Text style={styles.submitText}>{CREATE_PRODUCT_UI.SUBMIT}</Text>
           )}
@@ -237,76 +234,3 @@ export const CreateProductScreen = () => {
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    gap: 10,
-    paddingBottom: 32,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  input: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 16,
-  },
-  textArea: {
-    minHeight: 100,
-    textAlignVertical: "top",
-  },
-  switchRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: 4,
-  },
-  secondaryButton: {
-    alignSelf: "flex-start",
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-  },
-  imageUrl: {
-    fontSize: 12,
-  },
-  error: {
-    color: "#c62828",
-    fontSize: 14,
-  },
-  success: {
-    color: "#2e7d32",
-    fontSize: 14,
-  },
-  actions: {
-    flexDirection: "row",
-    gap: 12,
-    marginTop: 8,
-  },
-  cancelButton: {
-    flex: 1,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 14,
-  },
-  submitButton: {
-    flex: 1,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 14,
-    minHeight: 48,
-  },
-  submitText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-});

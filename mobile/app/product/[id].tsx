@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
@@ -43,10 +43,13 @@ import {
   PRODUCT_UI,
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { useProductDetailScreenStyles } from "@/shared/theme/catalogProductStyles";
+import { AppButton } from "@/shared/ui/AppButton";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 export default function ProductDetailScreen() {
   const router = useRouter();
+  const styles = useProductDetailScreenStyles();
   const queryClient = useQueryClient();
   const { id } = useLocalSearchParams<{ id: string }>();
   const productId = Array.isArray(id) ? id[0] : id ?? "";
@@ -238,29 +241,19 @@ export default function ProductDetailScreen() {
 
       {isOwnProduct ? (
         <View style={styles.sellerActions}>
-          <Pressable
-            style={[
-              styles.promoteButton,
-              !canPromoteProduct && styles.promoteButtonDisabled,
-            ]}
+          <AppButton
+            label={PRODUCT_CARD_UI.PROMOTION_BUTTON}
+            variant="contrast"
             onPress={handleOpenPromotionModal}
             disabled={!canPromoteProduct}
-          >
-            <Text
-              style={[
-                styles.promoteButtonText,
-                !canPromoteProduct && styles.promoteButtonTextDisabled,
-              ]}
-            >
-              {PRODUCT_CARD_UI.PROMOTION_BUTTON}
-            </Text>
-          </Pressable>
-          <Pressable
-            style={styles.editButton}
+            style={[styles.sellerActionButton, !canPromoteProduct && styles.promoteButtonDisabled]}
+          />
+          <AppButton
+            label={PRODUCT_CARD_UI.EDIT_PRODUCT}
+            variant="outline"
             onPress={() => router.push(`/edit-product/${productId}`)}
-          >
-            <Text style={styles.editButtonText}>{PRODUCT_CARD_UI.EDIT_PRODUCT}</Text>
-          </Pressable>
+            style={styles.sellerActionButton}
+          />
         </View>
       ) : (
         <>
@@ -373,111 +366,3 @@ export default function ProductDetailScreen() {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    paddingBottom: 32,
-  },
-  titleRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 8,
-    marginTop: 16,
-  },
-  name: {
-    flex: 1,
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#111",
-  },
-  priceRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "center",
-    gap: 8,
-    marginTop: 12,
-  },
-  rating: {
-    marginTop: 8,
-    fontSize: 14,
-    color: "#444",
-  },
-  availability: {
-    marginTop: 8,
-    fontSize: 14,
-    color: "#2e7d32",
-  },
-  unavailable: {
-    color: "#c62828",
-  },
-  section: {
-    marginTop: 16,
-  },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#666",
-    marginBottom: 4,
-  },
-  sectionBody: {
-    fontSize: 15,
-    color: "#222",
-    lineHeight: 22,
-  },
-  reportButton: {
-    marginTop: 20,
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  reportButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#c62828",
-  },
-  reportButtonTextDisabled: {
-    color: "#999",
-  },
-  reportSuccess: {
-    marginTop: 8,
-    fontSize: 13,
-    color: "#2e7d32",
-    textAlign: "center",
-  },
-  sellerActions: {
-    marginTop: 20,
-    flexDirection: "row",
-    gap: 10,
-  },
-  promoteButton: {
-    flex: 1,
-    borderRadius: 10,
-    backgroundColor: "#111",
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  promoteButtonDisabled: {
-    backgroundColor: "#e5e7eb",
-  },
-  promoteButtonText: {
-    color: "#fff",
-    fontSize: 15,
-    fontWeight: "600",
-  },
-  promoteButtonTextDisabled: {
-    color: "#9ca3af",
-  },
-  editButton: {
-    flex: 1,
-    borderRadius: 10,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#d1d5db",
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  editButtonText: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#111",
-  },
-});

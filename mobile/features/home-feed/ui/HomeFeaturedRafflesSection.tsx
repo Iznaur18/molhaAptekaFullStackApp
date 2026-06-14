@@ -3,6 +3,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import type { FeaturedRaffle } from "@/entities/raffle/api/fetchFeaturedRaffles";
 import { HOME_FEED_UI, RAFFLE_FEATURED_UI } from "@/shared/config";
+import { useHomeFeaturedRafflesStyles } from "@/shared/theme/catalogProductStyles";
 
 type HomeFeaturedRafflesSectionProps = {
   raffles: FeaturedRaffle[];
@@ -10,6 +11,7 @@ type HomeFeaturedRafflesSectionProps = {
 
 export const HomeFeaturedRafflesSection = ({ raffles }: HomeFeaturedRafflesSectionProps) => {
   const router = useRouter();
+  const styles = useHomeFeaturedRafflesStyles();
 
   if (raffles.length === 0) {
     return null;
@@ -42,43 +44,3 @@ export const HomeFeaturedRafflesSection = ({ raffles }: HomeFeaturedRafflesSecti
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  scroll: {
-    paddingHorizontal: 8,
-    paddingBottom: 12,
-    gap: 10,
-  },
-  card: {
-    width: 260,
-    borderRadius: 12,
-    backgroundColor: "#fff4e5",
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#f0c987",
-    padding: 14,
-  },
-  badge: {
-    fontSize: 11,
-    fontWeight: "700",
-    color: "#b45309",
-    textTransform: "uppercase",
-    marginBottom: 6,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#111",
-    marginBottom: 4,
-  },
-  description: {
-    fontSize: 13,
-    color: "#555",
-    lineHeight: 18,
-    marginBottom: 8,
-  },
-  cta: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#1f6feb",
-  },
-});

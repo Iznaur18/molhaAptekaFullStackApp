@@ -1,15 +1,8 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  ActivityIndicator,
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { ProductCard } from "@/entities/product/ui/ProductCard";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
@@ -126,7 +119,7 @@ export const UserDetailsPage = () => {
       style={[styles.container, { backgroundColor: theme.colors.bg }]}
       contentContainerStyle={styles.content}
       refreshControl={
-        <RefreshControl refreshing={profileQuery.isRefetching} onRefresh={profileQuery.refetch} />
+        <ThemedRefreshControl refreshing={profileQuery.isRefetching} onRefresh={profileQuery.refetch} />
       }
     >
       <Text style={[styles.title, { color: theme.colors.text }]}>{displayName}</Text>

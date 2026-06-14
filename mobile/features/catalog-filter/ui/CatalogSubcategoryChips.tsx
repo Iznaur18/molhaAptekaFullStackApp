@@ -1,6 +1,10 @@
-import { ScrollView, Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 
 import { CATALOG_FILTER_UI } from "@/shared/config";
+import {
+  useCatalogSearchBarStyles,
+  useCatalogSubcategoryChipStyles,
+} from "@/shared/theme/catalogProductStyles";
 
 type SubcategoryChip = {
   id: string;
@@ -18,6 +22,8 @@ export const CatalogSubcategoryChips = ({
   selectedSubcategoryId,
   onSelect,
 }: CatalogSubcategoryChipsProps) => {
+  const styles = useCatalogSubcategoryChipStyles();
+
   if (subcategories.length === 0) {
     return null;
   }
@@ -51,34 +57,3 @@ export const CatalogSubcategoryChips = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  wrap: {
-    paddingBottom: 8,
-    backgroundColor: "#fff",
-  },
-  row: {
-    paddingHorizontal: 12,
-    gap: 8,
-  },
-  chip: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    backgroundColor: "#f7f7f7",
-    borderWidth: 1,
-    borderColor: "#e8e8e8",
-  },
-  chipActive: {
-    backgroundColor: "#333",
-    borderColor: "#333",
-  },
-  chipText: {
-    fontSize: 13,
-    color: "#444",
-  },
-  chipTextActive: {
-    color: "#fff",
-    fontWeight: "600",
-  },
-});

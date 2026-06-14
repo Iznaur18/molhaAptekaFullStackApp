@@ -1,14 +1,5 @@
 import { useMemo, useState } from "react";
-import {
-  ActivityIndicator,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Switch,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { ScrollView, Switch, Text, TextInput, View } from "react-native";
 
 import { buildPatchUserProfileBody } from "@/entities/user/lib/buildPatchUserProfileBody";
 import {
@@ -20,6 +11,9 @@ import { validateEditProfileForm } from "@/entities/user/lib/validateEditProfile
 import { usePatchUserProfileMutation } from "@/entities/user/model/usePatchUserProfileMutation";
 import { ProfileAvatarUpload } from "@/features/image-upload/ui/ProfileAvatarUpload";
 import { EDIT_PROFILE_UI } from "@/shared/config";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useFormFieldStyles } from "@/shared/theme/formChromeStyles";
+import { AppButton } from "@/shared/ui/AppButton";
 
 type EditProfileFormProps = {
   user: Record<string, unknown> & { _id: string; email?: string };
@@ -27,6 +21,8 @@ type EditProfileFormProps = {
 };
 
 export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
+  const theme = useAppTheme();
+  const styles = useFormFieldStyles();
   const initialForm = useMemo(() => mapUserToEditProfileForm(user), [user]);
   const [baselineForm, setBaselineForm] = useState(initialForm);
   const [form, setForm] = useState<EditProfileFormState>(initialForm);
@@ -73,7 +69,7 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
   const isSubmitting = patchMutation.isPending;
 
   return (
-    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+    <ScrollView contentContainerStyle={styles.formScroll} keyboardShouldPersistTaps="handled">
       <ProfileAvatarUpload
         avatarUrl={form.userAvatarUrl}
         disabled={isSubmitting}
@@ -81,14 +77,14 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
         onError={setErrorMessage}
       />
 
-      <Text style={styles.label}>{EDIT_PROFILE_UI.LABEL_EMAIL}</Text>
+      <Text style={[styles.labelStrong, { marginTop: 16 }]}>{EDIT_PROFILE_UI.LABEL_EMAIL}</Text>
       <TextInput
         style={[styles.input, styles.inputReadOnly]}
         value={user.email ?? ""}
         editable={false}
       />
 
-      <Text style={styles.label}>{EDIT_PROFILE_UI.LABEL_USERNAME}</Text>
+      <Text style={[styles.labelStrong, { marginTop: 16 }]}>{EDIT_PROFILE_UI.LABEL_USERNAME}</Text>
       <Text style={styles.hint}>{EDIT_PROFILE_UI.USERNAME_HINT}</Text>
       <TextInput
         style={styles.input}
@@ -97,15 +93,17 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
         autoCapitalize="none"
         autoCorrect={false}
         editable={!isSubmitting}
+        placeholderTextColor={theme.colors.textMuted}
       />
 
-      <Text style={styles.label}>{EDIT_PROFILE_UI.LABEL_PHONE}</Text>
+      <Text style={[styles.labelStrong, { marginTop: 16 }]}>{EDIT_PROFILE_UI.LABEL_PHONE}</Text>
       <TextInput
         style={styles.input}
         value={form.userPhoneNumber}
         onChangeText={(value) => updateField("userPhoneNumber", limitRuPhoneInput(value))}
         keyboardType="phone-pad"
         editable={!isSubmitting}
+        placeholderTextColor={theme.colors.textMuted}
       />
 
       <View style={styles.switchRow}>
@@ -117,92 +115,16 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
         />
       </View>
 
-      {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
-      {successMessage ? <Text style={styles.success}>{successMessage}</Text> : null}
+      {errorMessage ? <Text style={[styles.error, { marginTop: 16 }]}>{errorMessage}</Text> : null}
+      {successMessage ? <Text style={[styles.success, { marginTop: 16 }]}>{successMessage}</Text> : null}
 
-      <Pressable
-        style={[styles.submitButton, isSubmitting && styles.submitDisabled]}
+      <AppButton
+        label={EDIT_PROFILE_UI.SUBMIT}
+        variant="contrast"
         onPress={handleSubmit}
         disabled={isSubmitting}
-      >
-        {isSubmitting ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.submitButtonText}>{EDIT_PROFILE_UI.SUBMIT}</Text>
-        )}
-      </Pressable>
+        style={styles.submitSpacer}
+      />
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    paddingBottom: 32,
-  },
-  label: {
-    marginTop: 16,
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
-  },
-  hint: {
-    marginTop: 4,
-    fontSize: 12,
-    color: "#888",
-  },
-  input: {
-    marginTop: 8,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: "#111",
-    backgroundColor: "#fff",
-  },
-  inputReadOnly: {
-    backgroundColor: "#f5f5f5",
-    color: "#666",
-  },
-  switchRow: {
-    marginTop: 20,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  switchLabel: {
-    flex: 1,
-    fontSize: 15,
-    color: "#222",
-    marginRight: 12,
-  },
-  error: {
-    marginTop: 16,
-    fontSize: 14,
-    color: "#c62828",
-  },
-  success: {
-    marginTop: 16,
-    fontSize: 14,
-    color: "#2e7d32",
-  },
-  submitButton: {
-    marginTop: 24,
-    backgroundColor: "#111",
-    borderRadius: 10,
-    paddingVertical: 14,
-    alignItems: "center",
-    justifyContent: "center",
-    minHeight: 48,
-  },
-  submitDisabled: {
-    opacity: 0.6,
-  },
-  submitButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-});

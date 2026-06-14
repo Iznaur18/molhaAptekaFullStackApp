@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import { useProductCardChromeFlags } from "@/entities/product/lib/useProductCardChromeFlags";
 import { resolveProductImageUrl } from "@/entities/product/lib/resolveProductImageUrl";
@@ -10,6 +10,7 @@ import {
 } from "@/entities/product/ui/ProductPriceDisplay";
 import { WishlistToggleButton } from "@/features/wishlist-toggle/ui/WishlistToggleButton";
 import { PRODUCT_CARD_UI, PRODUCT_UI } from "@/shared/config";
+import { useProductCardStyles } from "@/shared/theme/catalogProductStyles";
 import { CachedProductImage } from "@/shared/ui/CachedProductImage";
 
 type ProductCardProps = {
@@ -28,6 +29,7 @@ type ProductCardProps = {
 
 export const ProductCard = ({ product }: ProductCardProps) => {
   const router = useRouter();
+  const styles = useProductCardStyles();
   const imageUrl = resolveProductImageUrl(product);
   const name = product.productName?.trim() || "Без названия";
   const isAvailable = product.productIsAvailable !== false;
@@ -77,62 +79,3 @@ export const ProductCard = ({ product }: ProductCardProps) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  card: {
-    flex: 1,
-    position: "relative",
-    margin: 6,
-    padding: 8,
-    borderRadius: 12,
-    backgroundColor: "#fff",
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#e5e5e5",
-  },
-  pressable: {
-    flex: 1,
-  },
-  cardPressed: {
-    opacity: 0.85,
-  },
-  wishlistSlot: {
-    position: "absolute",
-    top: 16,
-    right: 16,
-    zIndex: 2,
-  },
-  imageWrap: {
-    aspectRatio: 1,
-    borderRadius: 8,
-    overflow: "hidden",
-    backgroundColor: "#f4f4f4",
-  },
-  image: {
-    width: "100%",
-    height: "100%",
-  },
-  unavailableBadge: {
-    position: "absolute",
-    left: 6,
-    bottom: 6,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-    backgroundColor: "rgba(0,0,0,0.65)",
-  },
-  unavailableText: {
-    fontSize: 10,
-    color: "#fff",
-  },
-  name: {
-    marginTop: 8,
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#222",
-  },
-  rating: {
-    marginTop: 4,
-    fontSize: 12,
-    color: "#666",
-  },
-});

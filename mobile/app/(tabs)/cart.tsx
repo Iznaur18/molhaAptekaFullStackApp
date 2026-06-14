@@ -1,7 +1,8 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
-import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
+import { FlatList, Pressable, Text, View } from "react-native";
+import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { getCartLineExclusionReason } from "@/entities/cart/lib/getCartLineExclusionReason";
 import { selectCartCheckoutSummary } from "@/entities/cart/lib/selectCartCheckoutSummary";
@@ -18,10 +19,13 @@ import { CheckoutForm } from "@/features/checkout/ui/CheckoutForm";
 import { orderQueryKeys } from "@/shared/api";
 import { API_CLIENT_UI, AUTH_UI, CART_PAGE_UI, CHECKOUT_FORM_UI } from "@/shared/config";
 import { formatApiErrorMessage, formatPriceRub } from "@/shared/lib";
+import { useCartScreenStyles } from "@/shared/theme/catalogProductStyles";
+import { AppButton } from "@/shared/ui/AppButton";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 export default function CartScreen() {
   const router = useRouter();
+  const styles = useCartScreenStyles();
   const queryClient = useQueryClient();
   const isAuthorized = useIsAuthorized();
   const sessionQuery = useAuthSessionQuery();
@@ -102,9 +106,11 @@ export default function CartScreen() {
     return (
       <View style={styles.centered}>
         <Text style={styles.message}>{CART_PAGE_UI.AUTH_REQUIRED}</Text>
-        <Pressable style={styles.button} onPress={() => router.push("/(auth)/login")}>
-          <Text style={styles.buttonText}>{AUTH_UI.LOGIN_BUTTON}</Text>
-        </Pressable>
+        <AppButton
+          label={AUTH_UI.LOGIN_BUTTON}
+          variant="contrast"
+          onPress={() => router.push("/(auth)/login")}
+        />
       </View>
     );
   }
@@ -138,9 +144,11 @@ export default function CartScreen() {
     return (
       <View style={styles.centered}>
         <Text style={styles.message}>{CART_PAGE_UI.EMPTY}</Text>
-        <Pressable style={styles.button} onPress={() => router.push("/(tabs)")}>
-          <Text style={styles.buttonText}>{CART_PAGE_UI.GO_TO_CATALOG}</Text>
-        </Pressable>
+        <AppButton
+          label={CART_PAGE_UI.GO_TO_CATALOG}
+          variant="contrast"
+          onPress={() => router.push("/(tabs)")}
+        />
       </View>
     );
   }
@@ -200,7 +208,7 @@ export default function CartScreen() {
       contentContainerStyle={styles.list}
       ListFooterComponent={listFooter}
       refreshControl={
-        <RefreshControl
+        <ThemedRefreshControl
           refreshing={cartQuery.isRefetching || productsQuery.isRefetching}
           onRefresh={handleRefresh}
         />
@@ -208,77 +216,3 @@ export default function CartScreen() {
     />
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  list: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 32,
-  },
-  centered: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 24,
-  },
-  message: {
-    fontSize: 16,
-    color: "#666",
-    textAlign: "center",
-    marginBottom: 16,
-  },
-  footer: {
-    paddingTop: 8,
-  },
-  totalRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 4,
-  },
-  totalLabel: {
-    fontSize: 16,
-    color: "#666",
-  },
-  totalValue: {
-    fontSize: 20,
-    fontWeight: "700",
-  },
-  fullTotalHint: {
-    fontSize: 13,
-    color: "#888",
-    marginBottom: 12,
-  },
-  checkoutHint: {
-    fontSize: 14,
-    color: "#c62828",
-    marginBottom: 12,
-    textAlign: "center",
-  },
-  button: {
-    backgroundColor: "#111",
-    borderRadius: 10,
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  clearButton: {
-    alignItems: "center",
-    paddingVertical: 10,
-    marginBottom: 8,
-  },
-  clearButtonText: {
-    color: "#c62828",
-    fontSize: 15,
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-});

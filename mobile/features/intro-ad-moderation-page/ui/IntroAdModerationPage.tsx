@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { FlatList, RefreshControl, StyleSheet, Text, View } from "react-native";
+import { FlatList, Text, View } from "react-native";
+import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import {
   useIntroAdModerationMutations,
@@ -7,6 +8,7 @@ import {
 } from "@/entities/intro-ad/model/useIntroAdModerationMutations";
 import { INTRO_AD_MODERATION_PAGE_UI } from "@/shared/config";
 import { formatIsoDateTime } from "@/shared/lib";
+import { useStaffQueueStyles } from "@/shared/theme/staffQueueStyles";
 import { StaffModerationActions } from "@/shared/ui/StaffModerationActions";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
@@ -24,6 +26,7 @@ type RowProps = {
 };
 
 const IntroAdRow = ({ campaign, onChanged, approveMutation, rejectMutation }: RowProps) => {
+  const styles = useStaffQueueStyles();
   const [reason, setReason] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const campaignId = String(campaign._id);
@@ -75,6 +78,7 @@ const IntroAdRow = ({ campaign, onChanged, approveMutation, rejectMutation }: Ro
 };
 
 export const IntroAdModerationPage = () => {
+  const styles = useStaffQueueStyles();
   const queueQuery = usePendingIntroAdCampaignsQuery();
   const { approveMutation, rejectMutation } = useIntroAdModerationMutations();
   const campaigns = queueQuery.data ?? [];
@@ -102,7 +106,7 @@ export const IntroAdModerationPage = () => {
       keyExtractor={(item) => String(item._id)}
       contentContainerStyle={styles.list}
       refreshControl={
-        <RefreshControl refreshing={queueQuery.isFetching} onRefresh={() => void queueQuery.refetch()} />
+        <ThemedRefreshControl refreshing={queueQuery.isFetching} onRefresh={() => void queueQuery.refetch()} />
       }
       ListEmptyComponent={<Text style={styles.empty}>{INTRO_AD_MODERATION_PAGE_UI.EMPTY}</Text>}
       renderItem={({ item }) => (
@@ -116,11 +120,3 @@ export const IntroAdModerationPage = () => {
     />
   );
 };
-
-const styles = StyleSheet.create({
-  list: { padding: 12, gap: 16 },
-  row: { gap: 8, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: "#eee" },
-  title: { fontSize: 15, fontWeight: "600" },
-  meta: { fontSize: 13, color: "#666" },
-  empty: { textAlign: "center", color: "#666", padding: 24 },
-});

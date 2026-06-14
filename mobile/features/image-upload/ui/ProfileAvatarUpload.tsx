@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, Text, View } from "react-native";
 
 import { useUploadImageMutation } from "@/entities/upload/model/useUploadImageMutation";
 import { pickProfileImageAsset } from "@/features/image-upload/lib/pickProfileImageAsset";
 import { EDIT_PROFILE_UI, IMAGE_UPLOAD_UI } from "@/shared/config";
 import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useProfileAvatarUploadStyles } from "@/shared/theme/uploadFieldStyles";
 import { CachedProductImage } from "@/shared/ui/CachedProductImage";
 
 type ProfileAvatarUploadProps = {
@@ -20,6 +22,8 @@ export const ProfileAvatarUpload = ({
   onAvatarUrlChange,
   onError,
 }: ProfileAvatarUploadProps) => {
+  const theme = useAppTheme();
+  const styles = useProfileAvatarUploadStyles();
   const uploadMutation = useUploadImageMutation();
   const [localError, setLocalError] = useState("");
   const isBusy = uploadMutation.isPending;
@@ -60,7 +64,7 @@ export const ProfileAvatarUpload = ({
         disabled={disabled || isBusy}
       >
         {isBusy ? (
-          <ActivityIndicator color="#111" />
+          <ActivityIndicator color={theme.colors.nearBlack} />
         ) : (
           <Text style={styles.buttonText}>{IMAGE_UPLOAD_UI.UPLOAD_BUTTON}</Text>
         )}
@@ -70,58 +74,3 @@ export const ProfileAvatarUpload = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  wrap: {
-    marginTop: 8,
-    alignItems: "center",
-  },
-  label: {
-    alignSelf: "flex-start",
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
-  },
-  avatarWrap: {
-    marginTop: 12,
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    overflow: "hidden",
-    backgroundColor: "#f4f4f4",
-  },
-  avatar: {
-    width: "100%",
-    height: "100%",
-  },
-  button: {
-    marginTop: 12,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#111",
-    minWidth: 160,
-    alignItems: "center",
-  },
-  buttonDisabled: {
-    opacity: 0.5,
-  },
-  buttonText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#111",
-  },
-  hint: {
-    marginTop: 8,
-    fontSize: 12,
-    color: "#888",
-    textAlign: "center",
-  },
-  error: {
-    marginTop: 8,
-    fontSize: 13,
-    color: "#c62828",
-    textAlign: "center",
-  },
-});

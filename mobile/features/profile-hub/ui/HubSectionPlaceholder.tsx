@@ -1,7 +1,8 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 import { HUB_SECTION_UI } from "@/shared/config";
-import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { createThemedStyles } from "@/shared/theme/createThemedStyles";
+import { AppButton } from "@/shared/ui/AppButton";
 
 type HubSectionPlaceholderProps = {
   title: string;
@@ -9,54 +10,49 @@ type HubSectionPlaceholderProps = {
   onBack?: () => void;
 };
 
-export const HubSectionPlaceholder = ({
-  title,
-  hint = HUB_SECTION_UI.PLACEHOLDER_HINT,
-  onBack,
-}: HubSectionPlaceholderProps) => {
-  const theme = useAppTheme();
-
-  return (
-    <View style={styles.container}>
-      <Text style={[styles.title, { color: theme.colors.text }]}>{title}</Text>
-      <Text style={[styles.hint, { color: theme.colors.textMuted }]}>{hint}</Text>
-      {onBack ? (
-        <Pressable style={styles.button} onPress={onBack}>
-          <Text style={styles.buttonText}>{HUB_SECTION_UI.BACK_TO_PROFILE}</Text>
-        </Pressable>
-      ) : null}
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
+const useStyles = createThemedStyles((theme) => ({
   container: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    padding: 24,
-    gap: 12,
+    padding: theme.spacing[6],
+    gap: theme.spacing[3],
   },
   title: {
     fontSize: 22,
     fontWeight: "700",
     textAlign: "center",
+    color: theme.colors.text,
   },
   hint: {
     fontSize: 15,
     textAlign: "center",
     lineHeight: 22,
+    color: theme.colors.textMuted,
   },
   button: {
-    marginTop: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    backgroundColor: "#111",
+    marginTop: theme.spacing[3],
   },
-  buttonText: {
-    color: "#fff",
-    fontSize: 15,
-    fontWeight: "600",
-  },
-});
+}));
+
+export const HubSectionPlaceholder = ({
+  title,
+  hint = HUB_SECTION_UI.PLACEHOLDER_HINT,
+  onBack,
+}: HubSectionPlaceholderProps) => {
+  const styles = useStyles();
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>{title}</Text>
+      <Text style={styles.hint}>{hint}</Text>
+      {onBack ? (
+        <AppButton
+          label={HUB_SECTION_UI.BACK_TO_PROFILE}
+          onPress={onBack}
+          style={styles.button}
+        />
+      ) : null}
+    </View>
+  );
+};

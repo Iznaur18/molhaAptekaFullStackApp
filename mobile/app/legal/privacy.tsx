@@ -1,4 +1,4 @@
-import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Linking, Pressable, ScrollView, Text, View } from "react-native";
 
 import {
   PRIVACY_POLICY_CONTACT_EMAIL,
@@ -7,6 +7,7 @@ import {
   PRIVACY_POLICY_UPDATED_AT,
 } from "@/features/legal/model/privacyPolicyContent";
 import { LEGAL_UI, PRIVACY_POLICY_URL } from "@/shared/config";
+import { useLegalPageStyles } from "@/shared/theme/accountFeatureStyles";
 
 const handleOpenWebVersion = async () => {
   if (!PRIVACY_POLICY_URL) {
@@ -20,6 +21,8 @@ const handleOpenWebVersion = async () => {
 };
 
 export default function PrivacyPolicyScreen() {
+  const styles = useLegalPageStyles();
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>{LEGAL_UI.PRIVACY_TITLE}</Text>
@@ -51,55 +54,3 @@ export default function PrivacyPolicyScreen() {
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    paddingBottom: 40,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#111",
-  },
-  meta: {
-    marginTop: 8,
-    fontSize: 13,
-    color: "#666",
-  },
-  operator: {
-    marginTop: 12,
-    fontSize: 14,
-    color: "#c62828",
-    fontStyle: "italic",
-  },
-  section: {
-    marginTop: 20,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#222",
-    marginBottom: 8,
-  },
-  paragraph: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: "#333",
-    marginBottom: 8,
-  },
-  contact: {
-    marginTop: 24,
-    fontSize: 15,
-    color: "#333",
-  },
-  webLink: {
-    marginTop: 16,
-    alignSelf: "flex-start",
-  },
-  webLinkText: {
-    fontSize: 15,
-    color: "#1565c0",
-    fontWeight: "600",
-  },
-});

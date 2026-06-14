@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, ScrollView, Text, View } from "react-native";
 
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import { buildResolvedCatalogFeedTileDisplays } from "@/entities/product-category-display/lib/resolveCatalogFeedTileDisplay";
@@ -21,12 +21,12 @@ import {
   SELLER_PERSONAL_CATEGORY_PAGE_UI,
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
-import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useCatalogBrowserPageStyles } from "@/shared/theme/catalogProductStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 export const CatalogBrowserPage = () => {
   const router = useRouter();
-  const theme = useAppTheme();
+  const styles = useCatalogBrowserPageStyles();
   const { isAdmin, isAuthorized } = useUserAccess();
 
   const categoryDisplaysQuery = useProductCategoryDisplaysQuery();
@@ -122,14 +122,10 @@ export const CatalogBrowserPage = () => {
 
   return (
     <>
-      <ScrollView
-        contentContainerStyle={[styles.container, { backgroundColor: theme.colors.bg }]}
-      >
-        <Text style={[styles.title, { color: theme.colors.text }]}>{CATALOG_BROWSER_UI.TITLE}</Text>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.title}>{CATALOG_BROWSER_UI.TITLE}</Text>
 
-        <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>
-          {PRODUCT_CATEGORY_DISPLAY_UI.FEED_SECTION_TITLE}
-        </Text>
+        <Text style={styles.sectionLabel}>{PRODUCT_CATEGORY_DISPLAY_UI.FEED_SECTION_TITLE}</Text>
         <View style={styles.tilesGrid}>
           {feedTiles.map((item) => (
             <CatalogBrowserTileCard
@@ -138,9 +134,7 @@ export const CatalogBrowserPage = () => {
               imageUrl={item.imageUrl}
               onPress={() => handleFeedTilePress(item.tileKey)}
               onEditPress={
-                isAdmin
-                  ? () => setEditingFeedTileKey(item.tileKey)
-                  : undefined
+                isAdmin ? () => setEditingFeedTileKey(item.tileKey) : undefined
               }
               editAriaLabel={PRODUCT_CATEGORY_DISPLAY_UI.FEED_EDIT_ARIA(item.label)}
             />
@@ -149,7 +143,7 @@ export const CatalogBrowserPage = () => {
 
         {personalCategoryTiles.length > 0 ? (
           <>
-            <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>
+            <Text style={styles.sectionLabel}>
               {SELLER_PERSONAL_CATEGORY_PAGE_UI.TILES_SECTION_TITLE}
             </Text>
             <View style={styles.tilesGrid}>
@@ -165,7 +159,7 @@ export const CatalogBrowserPage = () => {
           </>
         ) : null}
 
-        <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>
+        <Text style={styles.sectionLabel}>
           {PRODUCT_CATEGORY_DISPLAY_UI.CATEGORIES_SECTION_TITLE}
         </Text>
         <View style={styles.tilesGrid}>
@@ -203,28 +197,3 @@ export const CatalogBrowserPage = () => {
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    paddingBottom: 32,
-    gap: 12,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "700",
-    marginBottom: 4,
-  },
-  sectionLabel: {
-    marginTop: 8,
-    fontSize: 13,
-    fontWeight: "600",
-    textTransform: "uppercase",
-    letterSpacing: 0.4,
-  },
-  tilesGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-  },
-});

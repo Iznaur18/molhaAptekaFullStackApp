@@ -1,14 +1,7 @@
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  ActivityIndicator,
-  FlatList,
-  Pressable,
-  RefreshControl,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
+import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 import { useFocusEffect } from "@react-navigation/native";
 
 import { buildCategoryFilterChips } from "@/entities/product-category-display/lib/buildCategoryFilterChips";
@@ -30,6 +23,7 @@ import {
   CATALOG_SEARCH_MIN_LENGTH,
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { useFeedScreenStyles } from "@/shared/theme/catalogProductStyles";
 import { ScreenErrorState } from "@/shared/ui/ScreenStates";
 
 const NUM_COLUMNS = 2;
@@ -49,6 +43,7 @@ const EMPTY_FEED_FILTERS: FeedFiltersState = {
 
 export default function CatalogScreen() {
   const router = useRouter();
+  const styles = useFeedScreenStyles();
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedRootSlug, setSelectedRootSlug] = useState<string | null>(null);
@@ -217,8 +212,9 @@ export default function CatalogScreen() {
       renderItem={({ item }) => <ProductCard product={item} />}
       contentContainerStyle={styles.listContent}
       columnWrapperStyle={styles.row}
+      style={styles.flex}
       refreshControl={
-        <RefreshControl refreshing={catalogQuery.isRefetching} onRefresh={handleRefresh} />
+        <ThemedRefreshControl refreshing={catalogQuery.isRefetching} onRefresh={handleRefresh} />
       }
       onEndReached={handleLoadMore}
       onEndReachedThreshold={0.4}
@@ -235,46 +231,3 @@ export default function CatalogScreen() {
     />
   );
 }
-
-const styles = StyleSheet.create({
-  flex: {
-    flex: 1,
-  },
-  centered: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 24,
-  },
-  listContent: {
-    padding: 6,
-    flexGrow: 1,
-  },
-  row: {
-    justifyContent: "space-between",
-  },
-  empty: {
-    fontSize: 16,
-    color: "#666",
-  },
-  error: {
-    color: "#c62828",
-    textAlign: "center",
-  },
-  footerLoader: {
-    marginVertical: 16,
-  },
-  browserLink: {
-    marginHorizontal: 8,
-    marginBottom: 8,
-    paddingVertical: 10,
-    alignItems: "center",
-    borderRadius: 10,
-    backgroundColor: "#eef4ff",
-  },
-  browserLinkText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#1f6feb",
-  },
-});

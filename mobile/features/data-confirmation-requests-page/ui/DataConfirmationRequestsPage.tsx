@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { FlatList, RefreshControl, StyleSheet, Text, View } from "react-native";
+import { FlatList, Text, View } from "react-native";
+import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import type { DataConfirmationRequest } from "@/entities/user-data-confirmation/api/dataConfirmationStaffApi";
 import {
@@ -12,6 +13,7 @@ import {
 } from "@/entities/user-data-confirmation/model/useDataConfirmationStaffMutations";
 import { DATA_CONFIRMATION_PAGE_UI } from "@/shared/config";
 import { formatIsoDateTime } from "@/shared/lib";
+import { useStaffQueueStyles } from "@/shared/theme/staffQueueStyles";
 import { StaffModerationActions } from "@/shared/ui/StaffModerationActions";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
@@ -24,6 +26,7 @@ type RowProps = {
 };
 
 const RequestRow = ({ request, onChanged, resolveMutation }: RowProps) => {
+  const styles = useStaffQueueStyles();
   const [staffNote, setStaffNote] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const isBusy = resolveMutation.isPending;
@@ -90,6 +93,7 @@ const RequestRow = ({ request, onChanged, resolveMutation }: RowProps) => {
 };
 
 export const DataConfirmationRequestsPage = () => {
+  const styles = useStaffQueueStyles();
   const queueQuery = usePendingDataConfirmationRequestsQuery();
   const resolveMutation = useResolveDataConfirmationRequestMutation();
   const requests = queueQuery.data ?? [];
@@ -115,7 +119,7 @@ export const DataConfirmationRequestsPage = () => {
       keyExtractor={(item) => String(item._id)}
       contentContainerStyle={styles.list}
       refreshControl={
-        <RefreshControl refreshing={queueQuery.isFetching} onRefresh={() => void queueQuery.refetch()} />
+        <ThemedRefreshControl refreshing={queueQuery.isFetching} onRefresh={() => void queueQuery.refetch()} />
       }
       ListEmptyComponent={<Text style={styles.empty}>{DATA_CONFIRMATION_PAGE_UI.EMPTY}</Text>}
       renderItem={({ item }) => (
@@ -128,11 +132,3 @@ export const DataConfirmationRequestsPage = () => {
     />
   );
 };
-
-const styles = StyleSheet.create({
-  list: { padding: 12, gap: 16 },
-  row: { gap: 8, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: "#eee" },
-  title: { fontSize: 15, fontWeight: "600" },
-  meta: { fontSize: 13, color: "#666" },
-  empty: { textAlign: "center", color: "#666", padding: 24 },
-});

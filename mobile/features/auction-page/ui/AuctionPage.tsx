@@ -1,14 +1,7 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import {
-  FlatList,
-  Image,
-  Pressable,
-  RefreshControl,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { FlatList, Image, Pressable, Text, View } from "react-native";
+import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import type { IncomingPriceOffer } from "@/entities/product-price-offer/api/incomingPriceOffersApi";
 import { useIncomingPriceOffersQuery } from "@/entities/product-price-offer/model/useIncomingPriceOffersQuery";
@@ -20,7 +13,7 @@ import {
   PRODUCT_PRICE_OFFER_UI,
 } from "@/shared/config";
 import { formatApiErrorMessage, formatIsoDateTime, formatPriceRub } from "@/shared/lib";
-import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useAuctionPageStyles } from "@/shared/theme/sellerFlowStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 const PRICE_OFFER_STATUS_PENDING = "pending";
@@ -33,6 +26,7 @@ type SellerOfferRowProps = {
 
 const SellerOfferRow = ({ offer, onChanged }: SellerOfferRowProps) => {
   const router = useRouter();
+  const styles = useAuctionPageStyles();
   const { acceptMutation, rejectMutation } = usePriceOfferSellerMutations(
     String(offer.productId),
   );
@@ -126,6 +120,7 @@ type BuyerBidRowProps = {
 
 const BuyerBidRow = ({ bid }: BuyerBidRowProps) => {
   const router = useRouter();
+  const styles = useAuctionPageStyles();
 
   return (
     <Pressable style={styles.bidRow} onPress={() => router.push(`/product/${bid.productId}`)}>
@@ -144,7 +139,7 @@ const BuyerBidRow = ({ bid }: BuyerBidRowProps) => {
 
 export const AuctionPage = () => {
   const router = useRouter();
-  const theme = useAppTheme();
+  const styles = useAuctionPageStyles();
   const isAuthorized = useIsAuthorized();
   const bidsQuery = useMyPriceOfferBidsQuery(isAuthorized);
   const offersQuery = useIncomingPriceOffersQuery(isAuthorized);
@@ -157,13 +152,8 @@ export const AuctionPage = () => {
   if (!isAuthorized) {
     return (
       <View style={styles.centered}>
-        <Text style={[styles.hint, { color: theme.colors.textMuted }]}>
-          {AUCTION_PAGE_UI.LOGIN_HINT}
-        </Text>
-        <Pressable
-          style={[styles.button, { backgroundColor: theme.colors.nearBlack }]}
-          onPress={() => router.push("/(auth)/login")}
-        >
+        <Text style={styles.hint}>{AUCTION_PAGE_UI.LOGIN_HINT}</Text>
+        <Pressable style={styles.button} onPress={() => router.push("/(auth)/login")}>
           <Text style={styles.buttonText}>{AUCTION_PAGE_UI.LOGIN_BUTTON}</Text>
         </Pressable>
       </View>
@@ -192,9 +182,7 @@ export const AuctionPage = () => {
   if (buyerBids.length === 0 && sellerOffers.length === 0) {
     return (
       <View style={styles.centered}>
-        <Text style={[styles.hint, { color: theme.colors.textMuted }]}>
-          {AUCTION_PAGE_UI.BOTH_EMPTY}
-        </Text>
+        <Text style={styles.hint}>{AUCTION_PAGE_UI.BOTH_EMPTY}</Text>
       </View>
     );
   }
@@ -204,7 +192,7 @@ export const AuctionPage = () => {
       data={[{ type: "content" as const }]}
       keyExtractor={() => "auction"}
       refreshControl={
-        <RefreshControl
+        <ThemedRefreshControl
           refreshing={bidsQuery.isRefetching || offersQuery.isRefetching}
           onRefresh={handleRefresh}
         />
@@ -234,126 +222,3 @@ export const AuctionPage = () => {
     />
   );
 };
-
-const styles = StyleSheet.create({
-  list: {
-    padding: 16,
-    flexGrow: 1,
-  },
-  section: {
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: "#111",
-    marginBottom: 10,
-  },
-  row: {
-    flexDirection: "row",
-    gap: 10,
-    marginBottom: 12,
-    padding: 12,
-    borderRadius: 10,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#ddd",
-  },
-  thumb: {
-    width: 56,
-    height: 56,
-    borderRadius: 8,
-  },
-  thumbPlaceholder: {
-    width: 56,
-    height: 56,
-    borderRadius: 8,
-    backgroundColor: "#f2f2f2",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  rowMain: {
-    flex: 1,
-    gap: 4,
-  },
-  rowTitle: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#1f6feb",
-  },
-  rowMeta: {
-    fontSize: 12,
-    color: "#666",
-  },
-  rowPrice: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#111",
-  },
-  accepted: {
-    fontSize: 12,
-    color: "#2e7d32",
-  },
-  actions: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-    marginTop: 6,
-  },
-  primaryButton: {
-    backgroundColor: "#111",
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  primaryButtonText: {
-    color: "#fff",
-    fontSize: 13,
-    fontWeight: "600",
-  },
-  rejectButton: {
-    borderRadius: 8,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#c62828",
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  rejectButtonText: {
-    color: "#c62828",
-    fontSize: 13,
-    fontWeight: "600",
-  },
-  bidRow: {
-    padding: 12,
-    borderRadius: 10,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#ddd",
-    marginBottom: 8,
-    gap: 4,
-  },
-  error: {
-    color: "#c62828",
-    fontSize: 12,
-  },
-  centered: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 24,
-    gap: 16,
-  },
-  hint: {
-    fontSize: 15,
-    textAlign: "center",
-    lineHeight: 22,
-  },
-  button: {
-    borderRadius: 10,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-});

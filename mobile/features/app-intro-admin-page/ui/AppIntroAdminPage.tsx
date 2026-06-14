@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 
 import {
   buildPatchAppIntroSettingsBody,
@@ -14,6 +14,7 @@ import { useAppIntro } from "@/features/app-intro/model/AppIntroProvider";
 import { ImageUrlUploadField } from "@/features/image-upload/ui/ImageUrlUploadField";
 import { VideoUrlUploadField } from "@/features/image-upload/ui/VideoUrlUploadField";
 import { APP_INTRO_ADMIN_PAGE_UI } from "@/shared/config";
+import { useStaffAdminStyles } from "@/shared/theme/staffAdminStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 const formToPreviewSettings = (form: AppIntroAdminForm): AppIntroSettings => {
@@ -32,6 +33,7 @@ const formToPreviewSettings = (form: AppIntroAdminForm): AppIntroSettings => {
 };
 
 export const AppIntroAdminPage = () => {
+  const styles = useStaffAdminStyles();
   const settingsQuery = useAppIntroSettingsQuery();
   const patchMutation = usePatchAppIntroSettingsMutation();
   const { previewIntro, replayIntro } = useAppIntro();
@@ -123,13 +125,13 @@ export const AppIntroAdminPage = () => {
         onChange={(value) => updateField("posterUrl", value)}
       />
 
-      <Text style={styles.label}>{APP_INTRO_ADMIN_PAGE_UI.LABEL_FALLBACK_TITLE}</Text>
+      <Text style={styles.labelLarge}>{APP_INTRO_ADMIN_PAGE_UI.LABEL_FALLBACK_TITLE}</Text>
       <TextInput
         style={styles.input}
         value={form.fallbackTitle}
         onChangeText={(value) => updateField("fallbackTitle", value)}
       />
-      <Text style={styles.label}>{APP_INTRO_ADMIN_PAGE_UI.LABEL_FALLBACK_HINT}</Text>
+      <Text style={styles.labelLarge}>{APP_INTRO_ADMIN_PAGE_UI.LABEL_FALLBACK_HINT}</Text>
       <TextInput
         style={styles.input}
         value={form.fallbackHint}
@@ -137,21 +139,21 @@ export const AppIntroAdminPage = () => {
       />
 
       <Text style={styles.section}>{APP_INTRO_ADMIN_PAGE_UI.SECTION_TIMING}</Text>
-      <Text style={styles.label}>{APP_INTRO_ADMIN_PAGE_UI.LABEL_MIN_MS}</Text>
+      <Text style={styles.labelLarge}>{APP_INTRO_ADMIN_PAGE_UI.LABEL_MIN_MS}</Text>
       <TextInput
         style={styles.input}
         value={form.minMs}
         onChangeText={(value) => updateField("minMs", value)}
         keyboardType="number-pad"
       />
-      <Text style={styles.label}>{APP_INTRO_ADMIN_PAGE_UI.LABEL_MAX_MS}</Text>
+      <Text style={styles.labelLarge}>{APP_INTRO_ADMIN_PAGE_UI.LABEL_MAX_MS}</Text>
       <TextInput
         style={styles.input}
         value={form.maxMs}
         onChangeText={(value) => updateField("maxMs", value)}
         keyboardType="number-pad"
       />
-      <Text style={styles.label}>{APP_INTRO_ADMIN_PAGE_UI.LABEL_FADE_MS}</Text>
+      <Text style={styles.labelLarge}>{APP_INTRO_ADMIN_PAGE_UI.LABEL_FADE_MS}</Text>
       <TextInput
         style={styles.input}
         value={form.fadeOutMs}
@@ -161,20 +163,20 @@ export const AppIntroAdminPage = () => {
 
       {actionError ? <Text style={styles.error}>{actionError}</Text> : null}
 
-      <View style={styles.actions}>
+      <View style={styles.actionsStretch}>
         <Pressable
-          style={[styles.secondaryButton, patchMutation.isPending && styles.disabled]}
+          style={[styles.secondaryButtonFlex, patchMutation.isPending && styles.disabled]}
           onPress={handlePreview}
           disabled={patchMutation.isPending}
         >
           <Text style={styles.secondaryButtonText}>{APP_INTRO_ADMIN_PAGE_UI.PREVIEW}</Text>
         </Pressable>
         <Pressable
-          style={[styles.saveButton, patchMutation.isPending && styles.disabled]}
+          style={[styles.primaryButtonFlex, patchMutation.isPending && styles.disabled]}
           onPress={() => void handleSave()}
           disabled={patchMutation.isPending}
         >
-          <Text style={styles.saveText}>
+          <Text style={styles.primaryButtonText}>
             {patchMutation.isPending
               ? APP_INTRO_ADMIN_PAGE_UI.SAVE_PENDING
               : APP_INTRO_ADMIN_PAGE_UI.SAVE}
@@ -184,39 +186,3 @@ export const AppIntroAdminPage = () => {
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  root: { padding: 16, gap: 12, paddingBottom: 32 },
-  notice: { gap: 6, marginBottom: 4 },
-  section: { fontSize: 16, fontWeight: "700", marginTop: 8 },
-  label: { fontSize: 14, fontWeight: "600" },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    padding: 10,
-    fontSize: 14,
-    backgroundColor: "#fff",
-  },
-  actions: { flexDirection: "row", gap: 10, marginTop: 8 },
-  saveButton: {
-    flex: 1,
-    backgroundColor: "#111",
-    borderRadius: 10,
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  saveText: { color: "#fff", fontWeight: "600" },
-  secondaryButton: {
-    flex: 1,
-    backgroundColor: "#eee",
-    borderRadius: 10,
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  secondaryButtonText: { fontWeight: "600" },
-  disabled: { opacity: 0.6 },
-  error: { color: "#c62828" },
-  success: { color: "#2e7d32" },
-  link: { color: "#1565c0", fontWeight: "600" },
-});

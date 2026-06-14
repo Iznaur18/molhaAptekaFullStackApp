@@ -1,11 +1,12 @@
 import { Image } from "expo-image";
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 
 import type { UserStoryRing } from "@/entities/user-story/api/userStoryApi";
 import { CreateUserStoryModal } from "@/features/home-feed/ui/CreateUserStoryModal";
 import { UserStoryViewerModal } from "@/features/home-feed/ui/UserStoryViewerModal";
 import { HOME_FEED_UI, USER_STORY_UI } from "@/shared/config";
+import { useUserStoriesStripStyles } from "@/shared/theme/catalogProductStyles";
 
 type UserStoriesStripProps = {
   rings: UserStoryRing[];
@@ -24,6 +25,7 @@ export const UserStoriesStrip = ({
   currentUserId,
   onPublished,
 }: UserStoriesStripProps) => {
+  const styles = useUserStoriesStripStyles();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [viewerAuthor, setViewerAuthor] = useState<UserStoryRing["author"] | null>(null);
 
@@ -109,68 +111,3 @@ export const UserStoriesStrip = ({
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  scroll: {
-    paddingHorizontal: 8,
-    paddingBottom: 12,
-    gap: 12,
-  },
-  item: {
-    width: 72,
-    alignItems: "center",
-  },
-  ring: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    borderWidth: 2,
-    borderColor: "#1f6feb",
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-  },
-  ringViewed: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    borderWidth: 2,
-    borderColor: "#bbb",
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-  },
-  ringAdd: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    borderWidth: 2,
-    borderColor: "#1f6feb",
-    borderStyle: "dashed",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  plus: {
-    fontSize: 28,
-    fontWeight: "300",
-    color: "#1f6feb",
-    lineHeight: 30,
-  },
-  avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-  },
-  avatarFallback: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#444",
-  },
-  label: {
-    marginTop: 4,
-    fontSize: 11,
-    color: "#333",
-    maxWidth: 72,
-    textAlign: "center",
-  },
-});

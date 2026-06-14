@@ -4,16 +4,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { z } from "zod";
-import {
-  Alert,
-  FlatList,
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Alert, FlatList, Pressable, ScrollView, Text, View } from "react-native";
+import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { getOrderItemIndex } from "@/entities/order/lib/getOrderItemIndex";
@@ -36,7 +28,7 @@ import {
   PRODUCT_REPORT_UI,
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
-import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useOrdersScreenStyles } from "@/shared/theme/commerceScreenStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 type OrderRecord = z.infer<typeof orderFromApiSchema>;
@@ -51,7 +43,7 @@ const STATUS_FILTERS: Array<{ value: string; label: string }> = [
 
 export default function MyOrdersScreen() {
   const router = useRouter();
-  const theme = useAppTheme();
+  const styles = useOrdersScreenStyles();
   const queryClient = useQueryClient();
   const isAuthorized = useIsAuthorized();
   const ordersQuery = useMyOrdersQuery();
@@ -273,12 +265,12 @@ export default function MyOrdersScreen() {
       )}
       contentContainerStyle={styles.list}
       refreshControl={
-        <RefreshControl refreshing={ordersQuery.isRefetching} onRefresh={ordersQuery.refetch} />
+        <ThemedRefreshControl refreshing={ordersQuery.isRefetching} onRefresh={ordersQuery.refetch} />
       }
       ListHeaderComponent={
         <>
           <View style={styles.toolbarHead}>
-            <Text style={[styles.countLabel, { color: theme.colors.textMuted }]}>
+            <Text style={styles.countLabel}>
               {MY_ORDERS_PAGE_UI.COUNT(filteredOrders.length)}
             </Text>
           </View>
@@ -292,18 +284,11 @@ export default function MyOrdersScreen() {
               return (
                 <Pressable
                   key={filter.value || "all"}
-                  style={[
-                    styles.filterChip,
-                    { borderColor: theme.colors.border },
-                    isActive && { backgroundColor: theme.colors.nearBlack },
-                  ]}
+                  style={[styles.filterChip, isActive && styles.filterChipActive]}
                   onPress={() => setStatusFilter(filter.value)}
                 >
                   <Text
-                    style={[
-                      styles.filterChipText,
-                      { color: isActive ? "#fff" : theme.colors.text },
-                    ]}
+                    style={[styles.filterChipText, isActive && styles.filterChipTextActive]}
                   >
                     {filter.label}
                   </Text>
@@ -326,64 +311,3 @@ export default function MyOrdersScreen() {
     />
   );
 }
-
-const styles = StyleSheet.create({
-  list: {
-    padding: 16,
-    flexGrow: 1,
-  },
-  toolbarHead: {
-    marginBottom: 8,
-  },
-  countLabel: {
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  filters: {
-    gap: 8,
-    paddingBottom: 12,
-  },
-  filterChip: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 999,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-  },
-  filterChipText: {
-    fontSize: 13,
-    fontWeight: "600",
-  },
-  centered: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 24,
-  },
-  message: {
-    fontSize: 16,
-    color: "#666",
-    textAlign: "center",
-    marginBottom: 16,
-  },
-  button: {
-    backgroundColor: "#111",
-    borderRadius: 10,
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  loyaltyFlash: {
-    marginBottom: 12,
-    padding: 12,
-    borderRadius: 10,
-    backgroundColor: "#e8f5e9",
-    color: "#2e7d32",
-    fontSize: 14,
-    fontWeight: "600",
-    textAlign: "center",
-  },
-});

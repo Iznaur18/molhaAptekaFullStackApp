@@ -728,7 +728,23 @@ npx eas submit --platform ios
 
 **DoD на экран:** `load` (spinner/error/retry) · `empty` · `guard` (роль/логин) · `actions` (основные CTA web).
 
-#### Tabs / каталог
+#### Автоматика (ПК, перед Samsung)
+
+```powershell
+cd mobile
+npm run typecheck
+npm run regression:wf72
+```
+
+`regression:wf72` — маршруты `app/*`, hub cases в `HubSectionContent`, deep links (mirror `parseAppDeepLink`).
+
+Samsung cold-open deep links:
+
+```powershell
+.\scripts\wf72-adb-deep-links.ps1 -ProductId <id> -RaffleId <id> -UserId <id> -SellerId <id>
+```
+
+#### Ручной прогон (Samsung / web dev client)
 
 - [ ] `/(tabs)` — лента, curated lists, raffles strip, stories strip (+ create при premium)
 - [ ] `/(tabs)/cart` — purchasable hints, checkout, redirect в orders
@@ -799,6 +815,147 @@ npx eas submit --platform ios
 
 _Нет открытых WF-пробелов._
 
-*WF функциональный слой закрыт. Дальше: **WS-0…WS-6** (стили).*
+## WS — Стили (design parity)
 
-*Последнее обновление WF: июнь 2026. WF-0 закрыт.*
+Порядок после WF: **WS-0 → WS-1…WS-6**. Источник токенов: `packages/design-tokens` (`@izibuy/design-tokens`), runtime: `mobile/shared/theme/AppThemeProvider.tsx`.
+
+| ID | Scope | Статус |
+|----|-------|--------|
+| WS-0 | Theme helpers + shared UI primitives | ✅ |
+| WS-1 | Tabs / profile hub chrome | ✅ |
+| WS-2 | Catalog / product / home feed | ✅ |
+| WS-3 | Forms (auth, edit, data-confirmation) | ✅ |
+| WS-4 | Staff queues & moderation screens | ✅ |
+| WS-5 | Modals & bottom sheets | ✅ |
+| WS-6 | Dark mode audit + spacing/radius sweep | ✅ |
+
+### WS-0 — Theme helpers + shared primitives ✅
+
+**Цель:** убрать hardcoded `#666` / `#eee` / `#fff` из shared-слоя; единый паттерн themed styles.
+
+| Артефакт | Путь |
+|----------|------|
+| `createThemedStyles` | `mobile/shared/theme/createThemedStyles.ts` |
+| Staff queue styles | `mobile/shared/theme/staffQueueStyles.ts` |
+| Staff admin styles | `mobile/shared/theme/staffAdminStyles.ts` |
+| `AppButton` | `mobile/shared/ui/AppButton.tsx` |
+| `ScreenLoadingState` / `ScreenErrorState` | `mobile/shared/ui/ScreenStates.tsx` |
+| `StaffModerationActions` | `mobile/shared/ui/StaffModerationActions.tsx` |
+
+**Паттерн:**
+
+```ts
+const useStyles = createThemedStyles((theme) => ({
+  row: { borderBottomColor: theme.colors.border },
+}));
+```
+
+**DoD WS-0:** shared primitives themed · `HubSectionPlaceholder` без `#111` · raffles/promotions staff на `useStaffQueueStyles` · docs WS матрица.
+
+### WS-1 — Tabs / profile hub ✅
+
+| Артефакт | Путь |
+|----------|------|
+| Profile tab screen | `mobile/app/(tabs)/profile.tsx` |
+| Hub menu | `mobile/features/profile-hub/ui/ProfileHubMenu.tsx` |
+| Chrome styles | `mobile/shared/theme/profileChromeStyles.ts` |
+| Overview banner / info | `mobile/entities/user/ui/ProfileOverviewBanner.tsx`, `UserProfileInfoPanel.tsx` |
+| Raffle seller panel | `mobile/features/profile-overview/ui/RaffleSellerOverview.tsx` |
+| Tab bar badges | `mobile/app/(tabs)/_layout.tsx` |
+| Profile stack header | `mobile/app/profile/_layout.tsx` |
+
+Токены: `warningSurface/Border/Text`, `premium` в `packages/design-tokens/src/colors.ts`.  
+`AppButton`: variants `contrast`, `outline`.
+
+**DoD:** profile tab + hub menu + overview chrome без literal colors · dark mode на tab badges · themed stack header.
+
+### WS-2 — Catalog / product / home ✅
+
+| Артефакт | Путь |
+|----------|------|
+| Shared styles | `mobile/shared/theme/catalogProductStyles.ts` |
+| Product entities | `mobile/entities/product/ui/*` |
+| Catalog filter | `mobile/features/catalog-filter/ui/*` |
+| Home feed sections | `mobile/features/home-feed/ui/{HomeFeaturedRafflesSection,HomeCuratedListsSection,UserStoriesStrip}.tsx` |
+| Product detail | `mobile/app/product/[id].tsx`, `mobile/features/product-detail/ui/*` |
+| Feed + cart | `mobile/app/(tabs)/index.tsx`, `mobile/app/(tabs)/cart.tsx` |
+
+Токены: `actionSurface`, `star`, `starMuted`, `raffleSurface`, `raffleBorder`.
+
+**DoD:** карточки/лента/детали без literal colors · dark-ready chips · admin edit modals → WS-5.
+
+### WS-3 — Forms ✅
+
+| Артефакт | Путь |
+|----------|------|
+| Shared form styles | `mobile/shared/theme/formChromeStyles.ts` |
+| Auth | `mobile/app/(auth)/{login,register}.tsx`, `_layout.tsx` |
+| Edit profile | `mobile/features/profile-edit/ui/EditProfileForm.tsx`, `app/profile/edit.tsx` |
+| Checkout | `mobile/features/checkout/ui/CheckoutForm.tsx` |
+| Address suggest | `mobile/entities/address/ui/AddressSuggestInput.tsx` |
+| Data confirmation | `mobile/features/data-confirmation-page/ui/*` |
+| Email verify modal | `mobile/features/email-verify/ui/EmailVerificationModal.tsx` |
+
+**DoD:** `TextInput`/labels/errors/success/radio из `theme.colors` · `AppButton` для submit · dark-ready auth stack header.
+
+### WS-4 — Staff queues ✅
+
+| Артефакт | Путь |
+|----------|------|
+| Queue styles | `mobile/shared/theme/staffQueueStyles.ts` (`useStaffQueueStyles`, `useStaffFilterChipStyles`) |
+| Admin CRUD styles | `mobile/shared/theme/staffAdminStyles.ts` |
+| Moderation queues | `product-moderation`, `intro-ad-moderation`, `seller-personal-category-moderation`, `installment-moderation`, `data-confirmation-requests` |
+| Disputes / reports | `installment-disputes-page`, `product-reports-page` (+ `UserStoryReportGroupRow`) |
+| Admin orders | `admin-orders-page` |
+| Admin CRUD | `category-tree-admin`, `search-synonyms-admin`, `app-intro-admin`, `popular-products-admin` (+ `CuratedProductListAdminCard`) |
+
+`AppButton`: variant `success` для dispute close.  
+Disputes/reports reject → `AppButton` danger/primary/success.
+
+**DoD:** staff/moderation/admin экраны без literal `#...` · filter/picker chips из `theme.colors` · shared queue row chrome.
+
+### WS-5 — Modals ✅
+
+| Артефакт | Путь |
+|----------|------|
+| Modal chrome styles | `mobile/shared/theme/modalChromeStyles.ts` |
+| Report bottom sheets | `ReportProductModal`, `ReportUserStoryModal` |
+| Story modals | `CreateUserStoryModal`, `UserStoryViewerModal` |
+| Promotion | `ProductPromotionModal` |
+| Admin edit sheets | `EditFeedTileDisplayModal`, `EditCategoryDisplayModal` |
+| Already themed (WS-3) | `DataConfirmationRequestModal`, `EmailVerificationModal` |
+
+Хуки: `useBottomSheetReportModalStyles`, `useCreateStoryModalStyles`, `useStoryViewerModalStyles`, `useAdminEditModalStyles`, `useProductPromotionModalStyles`.
+
+**DoD:** modals без literal `#...` · `MODAL_BACKDROP_SCRIM` · `ActivityIndicator` → `theme.colors.onContrast`.
+
+### WS-6 — Dark mode audit ✅
+
+| Артефакт | Путь |
+|----------|------|
+| Themed pull-to-refresh | `mobile/shared/ui/ThemedRefreshControl.tsx` |
+| Commerce / orders / cart | `mobile/shared/theme/commerceScreenStyles.ts` |
+| Upload fields / add-to-cart | `mobile/shared/theme/uploadFieldStyles.ts` |
+| Seller / advertising / auction | `mobile/shared/theme/sellerFlowStyles.ts` |
+| Account / social / legal | `mobile/shared/theme/accountFeatureStyles.ts` |
+
+`RefreshControl` → `ThemedRefreshControl` (tint `theme.colors.action`) во всех списках.  
+Оставшиеся literal `#...` только в data-пресетах (`userBackgroundPresets`) и `app/+html.tsx` (web static).
+
+**DoD:** UI-слой mobile без hardcoded palette · dark-ready lists refresh · WS матрица закрыта.
+
+## Post-mobile — следующий фокус
+
+WF + WS закрыты. Дальше по `docs/mobile-development.md`:
+
+| Приоритет | Задача |
+|-----------|--------|
+| P0 | Samsung manual smoke § WF-7.2 (чеклисты `- [ ]`) |
+| P0 | `eas build --profile preview` (MP § Store readiness) |
+| P1 | Push ветки `security/p0-hardening` + review |
+| P2 | MP backlog: push notifications, deep links universal links, GDPR delete account |
+
+*WF ✅ · WS-0…WS-6 ✅ — стилевой слой mobile завершён.*
+
+
+*Последнее обновление: июнь 2026.*

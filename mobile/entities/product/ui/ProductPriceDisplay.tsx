@@ -1,7 +1,8 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 import { PRODUCT_CARD_UI } from "@/shared/config";
 import { formatPriceRub } from "@/shared/lib";
+import { useProductPriceStyles } from "@/shared/theme/catalogProductStyles";
 
 import {
   hasProductCatalogDiscount,
@@ -24,14 +25,13 @@ export const ProductPriceDisplay = ({
   showLabel = false,
   variant = "card",
 }: ProductPriceDisplayProps) => {
+  const styles = useProductPriceStyles();
   const hasDiscount = hasProductCatalogDiscount(product);
   const currentPriceText = formatPriceRub(Math.floor(Number(product.productPrice)));
 
   return (
     <View style={variant === "inline" ? styles.inlineRoot : styles.cardRoot}>
-      {showLabel ? (
-        <Text style={styles.label}>{getProductFieldLabel("productPrice")}</Text>
-      ) : null}
+      {showLabel ? <Text style={styles.label}>{getProductFieldLabel("productPrice")}</Text> : null}
       <Text style={[styles.current, variant === "card" && styles.cardCurrent]}>
         {currentPriceText}
       </Text>
@@ -52,6 +52,7 @@ type ProductDiscountBadgeProps = {
 };
 
 export const ProductDiscountBadge = ({ product, variant = "inline" }: ProductDiscountBadgeProps) => {
+  const styles = useProductPriceStyles();
   const discountPercent = resolveProductDiscountPercent(product);
   if (discountPercent == null || discountPercent < 1) {
     return null;
@@ -63,50 +64,3 @@ export const ProductDiscountBadge = ({ product, variant = "inline" }: ProductDis
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  cardRoot: {
-    gap: 2,
-  },
-  inlineRoot: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "baseline",
-    gap: 8,
-  },
-  label: {
-    fontSize: 12,
-    color: "#666",
-  },
-  current: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#111",
-  },
-  cardCurrent: {
-    fontSize: 15,
-    fontWeight: "700",
-  },
-  old: {
-    fontSize: 14,
-    color: "#888",
-    textDecorationLine: "line-through",
-  },
-  badge: {
-    alignSelf: "flex-start",
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
-    backgroundColor: "#c62828",
-  },
-  badgeOverlay: {
-    position: "absolute",
-    top: 8,
-    left: 8,
-  },
-  badgeText: {
-    color: "#fff",
-    fontSize: 11,
-    fontWeight: "700",
-  },
-});

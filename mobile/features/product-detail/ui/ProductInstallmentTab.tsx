@@ -1,12 +1,5 @@
 import { useState } from "react";
-import {
-  ActivityIndicator,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Pressable, Text, TextInput, View } from "react-native";
 
 import { addressValueFromUser } from "@/entities/address/lib/addressValueFromUser";
 import { validateRuDeliveryAddressForm } from "@/entities/address/lib/validateRuDeliveryAddressForm";
@@ -23,6 +16,9 @@ import {
 } from "@/entities/order/model/constants";
 import { INSTALLMENT_UI, PRODUCT_UI } from "@/shared/config";
 import { formatPriceRub } from "@/shared/lib";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useProductDetailTabStyles } from "@/shared/theme/catalogProductStyles";
+import { AppButton } from "@/shared/ui/AppButton";
 import { ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 type ProductInstallmentTabProps = {
@@ -45,6 +41,8 @@ export const ProductInstallmentTab = ({
   isOwnProduct,
   defaultUser,
 }: ProductInstallmentTabProps) => {
+  const theme = useAppTheme();
+  const styles = useProductDetailTabStyles();
   const programQuery = useProductInstallmentProgramQuery(productId, installmentEnabled);
   const { createContractMutation } = useInstallmentMutations();
   const [selectedPlanId, setSelectedPlanId] = useState("");
@@ -126,7 +124,7 @@ export const ProductInstallmentTab = ({
   }
 
   return (
-    <View style={styles.container}>
+    <View style={styles.tabContainer}>
       {!isAuthorized || !isUserDataConfirmed ? (
         <Text style={styles.hint}>{INSTALLMENT_UI.BUYER_HINT}</Text>
       ) : null}
@@ -156,10 +154,11 @@ export const ProductInstallmentTab = ({
 
       <Text style={styles.label}>{INSTALLMENT_UI.QUANTITY_LABEL}</Text>
       <TextInput
-        style={styles.input}
+        style={styles.compactInput}
         value={quantity}
         onChangeText={setQuantity}
         keyboardType="number-pad"
+        placeholderTextColor={theme.colors.textMuted}
       />
 
       <AddressSuggestInput
@@ -185,7 +184,7 @@ export const ProductInstallmentTab = ({
       })}
 
       {selectedPlan ? (
-        <Text style={styles.summary}>
+        <Text style={styles.summaryStrong}>
           {INSTALLMENT_UI.MONTHLY_LABEL}: {formatPriceRub(selectedPlan.monthlyAmountRub)}
         </Text>
       ) : null}
@@ -193,128 +192,14 @@ export const ProductInstallmentTab = ({
       {successMessage ? <Text style={styles.success}>{successMessage}</Text> : null}
       {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
 
-      <Pressable
-        style={[styles.submit, createContractMutation.isPending && styles.submitDisabled]}
+      <AppButton
+        label={INSTALLMENT_UI.SUBMIT}
+        variant="contrast"
+        onPress={() => void handleSubmit()}
         disabled={
           createContractMutation.isPending || !isAuthorized || !isUserDataConfirmed
         }
-        onPress={() => {
-          void handleSubmit();
-        }}
-      >
-        {createContractMutation.isPending ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.submitText}>{INSTALLMENT_UI.SUBMIT}</Text>
-        )}
-      </Pressable>
+      />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    paddingTop: 8,
-    gap: 8,
-  },
-  message: {
-    fontSize: 15,
-    color: "#444",
-    lineHeight: 22,
-  },
-  hint: {
-    fontSize: 14,
-    color: "#666",
-    lineHeight: 20,
-  },
-  label: {
-    marginTop: 8,
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
-  },
-  planCard: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    padding: 12,
-  },
-  planCardSelected: {
-    borderColor: "#1f6feb",
-    backgroundColor: "#eef4ff",
-  },
-  planTitle: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: "#111",
-  },
-  planMeta: {
-    fontSize: 13,
-    color: "#555",
-    marginTop: 2,
-  },
-  planTotal: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#111",
-    marginTop: 4,
-  },
-  input: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 15,
-  },
-  methodChip: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#ccc",
-    borderRadius: 999,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    alignSelf: "flex-start",
-  },
-  methodChipActive: {
-    backgroundColor: "#111",
-    borderColor: "#111",
-  },
-  methodText: {
-    fontSize: 13,
-    color: "#333",
-  },
-  methodTextActive: {
-    color: "#fff",
-    fontWeight: "600",
-  },
-  summary: {
-    fontSize: 14,
-    color: "#222",
-    fontWeight: "600",
-  },
-  submit: {
-    marginTop: 8,
-    backgroundColor: "#111",
-    borderRadius: 10,
-    paddingVertical: 14,
-    alignItems: "center",
-    minHeight: 48,
-    justifyContent: "center",
-  },
-  submitDisabled: {
-    opacity: 0.6,
-  },
-  submitText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  success: {
-    color: "#2e7d32",
-    fontSize: 14,
-  },
-  error: {
-    color: "#c62828",
-    fontSize: 14,
-  },
-});

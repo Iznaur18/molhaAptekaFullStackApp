@@ -1,14 +1,6 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import {
-  ActivityIndicator,
-  FlatList,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { FlatList, Pressable, Text, TextInput, View } from "react-native";
 
 import {
   useProductReviewSummaryQuery,
@@ -17,6 +9,9 @@ import {
 import { useSubmitProductReviewMutation } from "@/entities/product-review/model/useSubmitProductReviewMutation";
 import { PRODUCT_REVIEW_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useProductDetailTabStyles } from "@/shared/theme/catalogProductStyles";
+import { AppButton } from "@/shared/ui/AppButton";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 type ProductReviewsTabProps = {
@@ -35,6 +30,8 @@ export const ProductReviewsTab = ({
   isOwnProduct,
 }: ProductReviewsTabProps) => {
   const router = useRouter();
+  const theme = useAppTheme();
+  const styles = useProductDetailTabStyles();
   const summaryQuery = useProductReviewSummaryQuery(productId);
   const reviewsQuery = useProductReviewsPageQuery(productId);
   const submitMutation = useSubmitProductReviewMutation(productId);
@@ -76,9 +73,7 @@ export const ProductReviewsTab = ({
       void summaryQuery.refetch();
       void reviewsQuery.refetch();
     } catch (error) {
-      setErrorMessage(
-        error instanceof Error ? error.message : PRODUCT_REVIEW_UI.SUBMIT,
-      );
+      setErrorMessage(error instanceof Error ? error.message : PRODUCT_REVIEW_UI.SUBMIT);
     }
   };
 
@@ -88,9 +83,11 @@ export const ProductReviewsTab = ({
     }
     if (!isAuthorized) {
       return (
-        <Pressable style={styles.loginButton} onPress={() => router.push("/(auth)/login")}>
-          <Text style={styles.loginButtonText}>{PRODUCT_REVIEW_UI.LOGIN_TO_REVIEW}</Text>
-        </Pressable>
+        <AppButton
+          label={PRODUCT_REVIEW_UI.LOGIN_TO_REVIEW}
+          variant="contrast"
+          onPress={() => router.push("/(auth)/login")}
+        />
       );
     }
     if (!isUserDataConfirmed) {
@@ -104,8 +101,8 @@ export const ProductReviewsTab = ({
     }
 
     return (
-      <View style={styles.composer}>
-        <Text style={styles.composerTitle}>{PRODUCT_REVIEW_UI.LEAVE_REVIEW}</Text>
+      <View style={styles.panel}>
+        <Text style={styles.panelTitle}>{PRODUCT_REVIEW_UI.LEAVE_REVIEW}</Text>
         <Text style={styles.label}>{PRODUCT_REVIEW_UI.LABEL_RATING}</Text>
         <View style={styles.stars}>
           {STAR_VALUES.map((value) => (
@@ -116,26 +113,20 @@ export const ProductReviewsTab = ({
         </View>
         <Text style={styles.label}>{PRODUCT_REVIEW_UI.LABEL_TEXT}</Text>
         <TextInput
-          style={styles.textArea}
+          style={styles.input}
           value={text}
           onChangeText={setText}
           placeholder={PRODUCT_REVIEW_UI.TEXT_PLACEHOLDER}
+          placeholderTextColor={theme.colors.textMuted}
           multiline
         />
         {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
-        <Pressable
-          style={[styles.submitButton, (rating < 1 || submitMutation.isPending) && styles.disabled]}
-          onPress={() => {
-            void handleSubmit();
-          }}
+        <AppButton
+          label={PRODUCT_REVIEW_UI.SUBMIT}
+          variant="contrast"
+          onPress={() => void handleSubmit()}
           disabled={rating < 1 || submitMutation.isPending}
-        >
-          {submitMutation.isPending ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.submitText}>{PRODUCT_REVIEW_UI.SUBMIT}</Text>
-          )}
-        </Pressable>
+        />
       </View>
     );
   };
@@ -156,11 +147,9 @@ export const ProductReviewsTab = ({
           contentContainerStyle={styles.list}
           renderItem={({ item }) => (
             <View style={styles.item}>
-              <Text style={styles.rating}>★ {item.rating}</Text>
-              {item.authorUserName ? (
-                <Text style={styles.author}>{item.authorUserName}</Text>
-              ) : null}
-              {item.text ? <Text style={styles.text}>{item.text}</Text> : null}
+              <Text style={styles.itemTitle}>★ {item.rating}</Text>
+              {item.authorUserName ? <Text style={styles.itemMeta}>{item.authorUserName}</Text> : null}
+              {item.text ? <Text style={styles.itemBody}>{item.text}</Text> : null}
             </View>
           )}
         />
@@ -168,115 +157,3 @@ export const ProductReviewsTab = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  root: {
-    gap: 12,
-    paddingTop: 8,
-  },
-  summary: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#111",
-  },
-  composer: {
-    gap: 8,
-    padding: 12,
-    borderRadius: 10,
-    backgroundColor: "#f8fafc",
-  },
-  composerTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#111",
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
-  },
-  stars: {
-    flexDirection: "row",
-    gap: 8,
-  },
-  star: {
-    fontSize: 28,
-    color: "#ccc",
-  },
-  starActive: {
-    color: "#f5a623",
-  },
-  textArea: {
-    minHeight: 80,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    padding: 10,
-    fontSize: 15,
-    textAlignVertical: "top",
-    backgroundColor: "#fff",
-  },
-  submitButton: {
-    alignSelf: "flex-start",
-    backgroundColor: "#111",
-    borderRadius: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    minHeight: 40,
-    justifyContent: "center",
-  },
-  submitText: {
-    color: "#fff",
-    fontWeight: "600",
-  },
-  disabled: {
-    opacity: 0.6,
-  },
-  hint: {
-    fontSize: 14,
-    color: "#666",
-    lineHeight: 20,
-  },
-  loginButton: {
-    alignSelf: "flex-start",
-    backgroundColor: "#111",
-    borderRadius: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-  },
-  loginButtonText: {
-    color: "#fff",
-    fontWeight: "600",
-  },
-  error: {
-    color: "#c62828",
-    fontSize: 13,
-  },
-  empty: {
-    fontSize: 15,
-    color: "#666",
-  },
-  list: {
-    gap: 10,
-  },
-  item: {
-    padding: 12,
-    borderRadius: 10,
-    backgroundColor: "#f8fafc",
-    gap: 4,
-  },
-  rating: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "#111",
-  },
-  author: {
-    fontSize: 13,
-    color: "#666",
-  },
-  text: {
-    fontSize: 14,
-    color: "#222",
-    lineHeight: 20,
-  },
-});
