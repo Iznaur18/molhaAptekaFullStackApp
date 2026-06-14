@@ -22,6 +22,10 @@ export const raffleIdParamsSchema = z.object({
   raffleId: mongoIdSchema,
 });
 
+export const promotionIdParamsSchema = z.object({
+  promotionId: mongoIdSchema,
+});
+
 export const reviewIdParamsSchema = z.object({
   reviewId: mongoIdSchema,
 });

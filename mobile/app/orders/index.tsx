@@ -1,13 +1,15 @@
 import { orderFromApiSchema } from "@molha/api-contract";
+import { useFocusEffect } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { z } from "zod";
 import {
   Alert,
   FlatList,
   Pressable,
   RefreshControl,
+  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -15,9 +17,12 @@ import {
 
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { getOrderItemIndex } from "@/entities/order/lib/getOrderItemIndex";
+import { resolveOrderLineProductId } from "@/entities/order/lib/resolveOrderLineProductId";
 import {
   ORDER_STATUS_CANCELLED,
   ORDER_STATUS_CONFIRMED,
+  ORDER_STATUSES,
+  ORDER_STATUS_LABEL_RU,
 } from "@/entities/order/model/constants";
 import { useOrderMutations } from "@/entities/order/model/useOrderMutations";
 import { useMyOrdersQuery } from "@/entities/order/model/useMyOrdersQuery";
@@ -31,16 +36,27 @@ import {
   PRODUCT_REPORT_UI,
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 type OrderRecord = z.infer<typeof orderFromApiSchema>;
 
+const STATUS_FILTERS: Array<{ value: string; label: string }> = [
+  { value: "", label: MY_ORDERS_PAGE_UI.STATUS_FILTER_ALL },
+  ...ORDER_STATUSES.map((status) => ({
+    value: status,
+    label: ORDER_STATUS_LABEL_RU[status],
+  })),
+];
+
 export default function MyOrdersScreen() {
   const router = useRouter();
+  const theme = useAppTheme();
   const queryClient = useQueryClient();
   const isAuthorized = useIsAuthorized();
   const ordersQuery = useMyOrdersQuery();
   const { confirmItemMutation, cancelItemMutation } = useOrderMutations();
+  const [statusFilter, setStatusFilter] = useState("");
   const [pendingActionKey, setPendingActionKey] = useState<string | null>(null);
   const [itemActionErrors, setItemActionErrors] = useState<Record<string, string>>({});
   const [loyaltyFlash, setLoyaltyFlash] = useState("");
@@ -53,6 +69,14 @@ export default function MyOrdersScreen() {
     return () => clearTimeout(timerId);
   }, [loyaltyFlash]);
 
+  useFocusEffect(
+    useCallback(() => {
+      if (isAuthorized) {
+        void ordersQuery.refetch();
+      }
+    }, [isAuthorized, ordersQuery.refetch]),
+  );
+
   const patchOrders = useCallback(
     (updater: (orders: OrderRecord[]) => OrderRecord[]) => {
       queryClient.setQueryData(orderQueryKeys.my(), (old) => {
@@ -64,6 +88,13 @@ export default function MyOrdersScreen() {
     },
     [queryClient],
   );
+
+  const invalidateOrderQueues = useCallback(async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: orderQueryKeys.my() }),
+      queryClient.invalidateQueries({ queryKey: orderQueryKeys.myActionCount() }),
+    ]);
+  }, [queryClient]);
 
   const handleConfirmDelivered = async ({
     orderId,
@@ -102,7 +133,7 @@ export default function MyOrdersScreen() {
       patchOrders((prev) =>
         prev.map((order) => (order._id === orderId ? updatedOrder : order)),
       );
-      void ordersQuery.refetch();
+      await invalidateOrderQueues();
     } catch (error) {
       const message = formatApiErrorMessage(error, API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK);
       setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
@@ -162,7 +193,7 @@ export default function MyOrdersScreen() {
       patchOrders((prev) =>
         prev.map((order) => (order._id === orderId ? updatedOrder : order)),
       );
-      void ordersQuery.refetch();
+      await invalidateOrderQueues();
     } catch (error) {
       const message = formatApiErrorMessage(error, API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK);
       setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
@@ -171,6 +202,33 @@ export default function MyOrdersScreen() {
       setPendingActionKey(null);
     }
   };
+
+  const handleProductClick = useCallback(
+    (item: unknown) => {
+      const productId = resolveOrderLineProductId(item);
+      if (!productId) {
+        return;
+      }
+      router.push({ pathname: "/product/[id]", params: { id: productId } });
+    },
+    [router],
+  );
+
+  const orders = ordersQuery.data ?? [];
+
+  const filteredOrders = useMemo(() => {
+    if (!statusFilter) {
+      return orders;
+    }
+    return orders.filter((order) => order.status === statusFilter);
+  }, [orders, statusFilter]);
+
+  const emptyMessage =
+    orders.length === 0
+      ? MY_ORDERS_PAGE_UI.EMPTY
+      : statusFilter
+        ? MY_ORDERS_PAGE_UI.EMPTY_BY_FILTER
+        : MY_ORDERS_PAGE_UI.EMPTY;
 
   if (!isAuthorized) {
     return (
@@ -199,15 +257,14 @@ export default function MyOrdersScreen() {
     );
   }
 
-  const orders = ordersQuery.data ?? [];
-
   return (
     <FlatList
-      data={orders}
+      data={filteredOrders}
       keyExtractor={(order) => order._id}
       renderItem={({ item }) => (
         <OrderCard
           order={item}
+          onProductClick={handleProductClick}
           onConfirmDelivered={handleConfirmDelivered}
           onCancelItem={handleCancelItem}
           pendingActionKey={pendingActionKey}
@@ -219,15 +276,51 @@ export default function MyOrdersScreen() {
         <RefreshControl refreshing={ordersQuery.isRefetching} onRefresh={ordersQuery.refetch} />
       }
       ListHeaderComponent={
-        loyaltyFlash ? (
-          <Text style={styles.loyaltyFlash} accessibilityRole="text">
-            {loyaltyFlash}
-          </Text>
-        ) : null
+        <>
+          <View style={styles.toolbarHead}>
+            <Text style={[styles.countLabel, { color: theme.colors.textMuted }]}>
+              {MY_ORDERS_PAGE_UI.COUNT(filteredOrders.length)}
+            </Text>
+          </View>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.filters}
+          >
+            {STATUS_FILTERS.map((filter) => {
+              const isActive = statusFilter === filter.value;
+              return (
+                <Pressable
+                  key={filter.value || "all"}
+                  style={[
+                    styles.filterChip,
+                    { borderColor: theme.colors.border },
+                    isActive && { backgroundColor: theme.colors.nearBlack },
+                  ]}
+                  onPress={() => setStatusFilter(filter.value)}
+                >
+                  <Text
+                    style={[
+                      styles.filterChipText,
+                      { color: isActive ? "#fff" : theme.colors.text },
+                    ]}
+                  >
+                    {filter.label}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+          {loyaltyFlash ? (
+            <Text style={styles.loyaltyFlash} accessibilityRole="text">
+              {loyaltyFlash}
+            </Text>
+          ) : null}
+        </>
       }
       ListEmptyComponent={
         <View style={styles.centered}>
-          <Text style={styles.message}>{MY_ORDERS_PAGE_UI.EMPTY}</Text>
+          <Text style={styles.message}>{emptyMessage}</Text>
         </View>
       }
     />
@@ -238,6 +331,27 @@ const styles = StyleSheet.create({
   list: {
     padding: 16,
     flexGrow: 1,
+  },
+  toolbarHead: {
+    marginBottom: 8,
+  },
+  countLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  filters: {
+    gap: 8,
+    paddingBottom: 12,
+  },
+  filterChip: {
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 999,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+  },
+  filterChipText: {
+    fontSize: 13,
+    fontWeight: "600",
   },
   centered: {
     flex: 1,
@@ -250,10 +364,6 @@ const styles = StyleSheet.create({
     color: "#666",
     textAlign: "center",
     marginBottom: 16,
-  },
-  error: {
-    color: "#c62828",
-    textAlign: "center",
   },
   button: {
     backgroundColor: "#111",

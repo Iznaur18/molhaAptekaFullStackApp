@@ -1,0 +1,61 @@
+.product-promotions-staff-page__state {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.product-promotions-staff-page__state_error {
+  color: var(--iz-color-danger-deep);
+}
+
+.product-promotions-staff-page__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.product-promotions-staff-page__row {
+  padding: 0.75rem;
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  border-radius: 12px;
+}
+
+.product-promotions-staff-page__title {
+  margin: 0 0 0.25rem;
+  font-weight: 700;
+}
+
+.product-promotions-staff-page__meta {
+  margin: 0;
+  font-size: 0.82rem;
+  opacity: 0.85;
+}
+
+.product-promotions-staff-page__row-error {
+  margin: 0.45rem 0 0;
+  font-size: 0.8rem;
+  color: var(--iz-color-danger-deep);
+}
+
+.product-promotions-staff-page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.55rem;
+}
+
+.product-promotions-staff-page__actions button {
+  padding: 0.4rem 0.7rem;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.product-promotions-staff-page__reject {
+  border: 1px solid var(--iz-color-danger-border);
+  background: var(--iz-color-danger-soft);
+  color: var(--iz-color-danger-text);
+}

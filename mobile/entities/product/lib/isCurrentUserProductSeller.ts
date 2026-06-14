@@ -1,17 +1,21 @@
+type ProductSellerRef = string | { _id?: string } | null | undefined;
+
 export const isCurrentUserProductSeller = (
   product: unknown,
-  currentUserId?: string | null,
+  currentUserId: string | null | undefined,
 ): boolean => {
-  if (!currentUserId || !product || typeof product !== "object") {
+  if (!product || typeof product !== "object" || !currentUserId) {
     return false;
   }
 
-  const seller = (product as { productSeller?: unknown }).productSeller;
+  const seller = (product as { productSeller?: ProductSellerRef }).productSeller;
   if (seller == null) {
     return false;
   }
-  if (typeof seller === "object" && seller !== null && "_id" in seller) {
-    return String((seller as { _id: unknown })._id) === String(currentUserId);
+
+  if (typeof seller === "object" && seller._id != null) {
+    return String(seller._id) === String(currentUserId);
   }
+
   return String(seller) === String(currentUserId);
 };

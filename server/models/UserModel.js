@@ -206,6 +206,17 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    expoPushTokens: {
+      type: [
+        {
+          token: { type: String, required: true, trim: true },
+          platform: { type: String, default: "unknown", trim: true },
+          updatedAt: { type: Date, default: Date.now },
+        },
+      ],
+      default: [],
+      select: false,
+    },
     isPremiumUser: {
       // является ли пользователь премиум-пользователем
       type: Boolean,

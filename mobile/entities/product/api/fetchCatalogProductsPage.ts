@@ -8,6 +8,12 @@ export type FetchCatalogProductsPageOptions = {
   search?: string;
   productCategory?: string;
   categoryId?: string;
+  sellerPersonalCategoryId?: string;
+  sort?: string;
+  followingOnly?: boolean;
+  auctionOnly?: boolean;
+  installmentOnly?: boolean;
+  saleOnly?: boolean;
 };
 
 export const fetchCatalogProductsPage = async ({
@@ -16,6 +22,12 @@ export const fetchCatalogProductsPage = async ({
   search,
   productCategory,
   categoryId,
+  sellerPersonalCategoryId,
+  sort,
+  followingOnly,
+  auctionOnly,
+  installmentOnly,
+  saleOnly,
 }: FetchCatalogProductsPageOptions = {}) => {
   try {
     const { data } = await apiClient.get("/product", {
@@ -25,6 +37,14 @@ export const fetchCatalogProductsPage = async ({
         ...(search?.trim() ? { search: search.trim() } : {}),
         ...(productCategory?.trim() ? { productCategory: productCategory.trim() } : {}),
         ...(categoryId?.trim() ? { categoryId: categoryId.trim() } : {}),
+        ...(sellerPersonalCategoryId?.trim()
+          ? { sellerPersonalCategoryId: sellerPersonalCategoryId.trim() }
+          : {}),
+        ...(sort ? { sort } : {}),
+        ...(followingOnly ? { followingOnly: "true" } : {}),
+        ...(auctionOnly ? { auctionOnly: "true" } : {}),
+        ...(installmentOnly ? { installmentOnly: "true" } : {}),
+        ...(saleOnly ? { saleOnly: "true" } : {}),
       },
     });
     const parsed = parseCatalogProductsPageData(data);

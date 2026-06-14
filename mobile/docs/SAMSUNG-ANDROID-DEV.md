@@ -100,12 +100,18 @@ npm run start:dev
 
 ## Smoke на Samsung (чеклист)
 
+Полный регресс по матрице web parity: `docs/mobile-development.md` § **WF-7.2**.
+
+Минимум перед релизом:
+
 - [ ] Каталог, скролл, pull-to-refresh
 - [ ] Карточка товара + **видео-превью** (expo-video)
 - [ ] Логин → корзина → checkout (DaData адрес)
 - [ ] Профиль → **аватар** (галерея Samsung)
 - [ ] Мои заказы → confirm / cancel
 - [ ] «Пожаловаться» на товар
+- [ ] Deep link `izibuy://product/<id>` (cold open)
+- [ ] Stories: create (premium) + viewer + report
 
 Баги фиксируем под Samsung; web — регрессия.
 

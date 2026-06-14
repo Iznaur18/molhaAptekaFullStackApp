@@ -24,6 +24,7 @@ import {
   Store,
   Ticket,
   UserCheck,
+  TrendingUp,
   Users,
   Wallet,
 } from "lucide-react";
@@ -51,6 +52,7 @@ export const PROFILE_NAV_ITEM_META = {
   "intro-ad-moderation": { icon: Megaphone, tone: "amber" },
   "seller-personal-category-moderation": { icon: FolderTree, tone: "teal" },
   "product-reports": { icon: Flag, tone: "rose" },
+  "product-promotions": { icon: TrendingUp, tone: "sky" },
   raffles: { icon: Ticket, tone: "fuchsia" },
   "data-confirmation-requests": { icon: UserCheck, tone: "lime" },
   "installment-moderation": { icon: Scale, tone: "indigo" },

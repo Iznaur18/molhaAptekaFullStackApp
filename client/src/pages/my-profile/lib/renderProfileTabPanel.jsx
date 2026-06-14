@@ -17,6 +17,7 @@ import {
   LazyPremiumPage,
   LazyProductModerationPage,
   LazyProductReportsPage,
+  LazyProductPromotionsStaffPage,
   LazyRafflesStaffPage,
   LazySearchSynonymsAdminPage,
   LazyAppIntroAdminPage,
@@ -50,6 +51,7 @@ export function renderProfileTabPanel(mainView, props) {
     refreshPendingIntroAdModerationCount,
     refreshPendingSellerPersonalCategoryModerationCount,
     refreshPendingProductReportsCount,
+    refreshPendingProductPromotionsCount,
     refreshPendingRafflesCount,
     refreshPendingDataConfirmationCount,
     refreshPendingInstallmentModerationCount,
@@ -204,6 +206,12 @@ export function renderProfileTabPanel(mainView, props) {
           onSellerNameClick={onSellerNameClick}
           onProductClick={onOpenProductDetails}
           onQueueChanged={() => void refreshPendingProductReportsCount()}
+        />
+      );
+    case "product-promotions":
+      return (
+        <LazyProductPromotionsStaffPage
+          onQueueChanged={() => void refreshPendingProductPromotionsCount()}
         />
       );
     case "staff-raffles":

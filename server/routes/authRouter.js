@@ -6,12 +6,18 @@ import {
   refreshAuthController,
   userMeController,
   markInAppNotificationsReadController,
+  registerPushTokenController,
+  removePushTokenController,
   verifyEmailController,
   resendEmailVerificationController,
   verifyEmailWithCodeController,
 } from "../controllers/index.js";
 import { registerUserValidation, loginUserValidation } from "../validations/index.js";
 import { verifyEmailWithCodeValidation } from "../validations/user/verifyEmailWithCodeValidation.js";
+import {
+  registerPushTokenValidation,
+  removePushTokenValidation,
+} from "../validations/user/pushTokenValidation.js";
 import {
   checkAuthMW,
   authRateLimiter,
@@ -27,6 +33,18 @@ router.patch(
   "/me/in-app-notifications/read",
   checkAuthMW,
   markInAppNotificationsReadController,
+);
+router.put(
+  "/me/push-token",
+  checkAuthMW,
+  registerPushTokenValidation,
+  registerPushTokenController,
+);
+router.delete(
+  "/me/push-token",
+  checkAuthMW,
+  removePushTokenValidation,
+  removePushTokenController,
 );
 
 // Rate limiting для авторизации (защита от брутфорса)

@@ -54,6 +54,7 @@ import "./MyProfilePage.css";
  * onPopularProductsAdminClick?: () => void;
  * onProductModerationClick?: () => void;
  * onProductReportsClick?: () => void;
+ * onProductPromotionsClick?: () => void;
  * onRafflesClick?: () => void;
  * onCreateRaffleClick?: () => void;
  * onDataConfirmationQueueClick?: () => void;
@@ -74,6 +75,8 @@ import "./MyProfilePage.css";
  * pendingInstallmentModerationCount?: number;
  * pendingInstallmentDisputesCount?: number;
  * pendingProductReportsCount?: number;
+ * pendingProductPromotionsCount?: number;
+ * pendingRafflesCount?: number;
  * pendingDataConfirmationCount?: number;
  * onSubscriptionsClick?: () => void;
  * onWishlistClick?: () => void;
@@ -104,6 +107,7 @@ export function MyProfilePage({
   onPopularProductsAdminClick,
   onProductModerationClick,
   onProductReportsClick,
+  onProductPromotionsClick,
   onRafflesClick,
   onCreateRaffleClick,
   onDataConfirmationQueueClick,
@@ -124,6 +128,7 @@ export function MyProfilePage({
   pendingInstallmentModerationCount = 0,
   pendingInstallmentDisputesCount = 0,
   pendingProductReportsCount = 0,
+  pendingProductPromotionsCount = 0,
   pendingRafflesCount = 0,
   pendingDataConfirmationCount = 0,
   onSubscriptionsClick,
@@ -198,6 +203,8 @@ export function MyProfilePage({
     !isRegularUser && isProfileReady && Boolean(onProductModerationClick);
   const canUseProductReports =
     !isRegularUser && isProfileReady && Boolean(onProductReportsClick);
+  const canUseProductPromotions =
+    !isRegularUser && isProfileReady && Boolean(onProductPromotionsClick);
   const canUseRaffles = !isRegularUser && isProfileReady && Boolean(onRafflesClick);
   const canUseCreateRaffle =
     isProfileReady &&
@@ -236,6 +243,7 @@ export function MyProfilePage({
         canUseInstallmentSales,
         canUseProductModeration,
         canUseProductReports,
+        canUseProductPromotions,
         canUseRaffles,
         canUseDataConfirmationQueue,
         canUseInstallmentModeration,
@@ -263,6 +271,7 @@ export function MyProfilePage({
         pendingIntroAdModerationCount,
         pendingSellerPersonalCategoryModerationCount,
         pendingProductReportsCount,
+        pendingProductPromotionsCount,
         pendingRafflesCount,
         pendingDataConfirmationCount,
         pendingInstallmentModerationCount,
@@ -279,6 +288,7 @@ export function MyProfilePage({
         onIntroAdModerationClick,
         onSellerPersonalCategoryModerationClick,
         onProductReportsClick,
+        onProductPromotionsClick,
         onRafflesClick,
         onDataConfirmationQueueClick,
         onInstallmentModerationClick,
@@ -319,6 +329,7 @@ export function MyProfilePage({
       canUsePremium,
       canUseProductModeration,
       canUseProductReports,
+      canUseProductPromotions,
       canUseRaffles,
       canUseSearchSynonymsAdmin,
       canUseSubscriptions,
@@ -347,6 +358,7 @@ export function MyProfilePage({
       onProductModerationClick,
       onIntroAdModerationClick,
       onProductReportsClick,
+      onProductPromotionsClick,
       onRafflesClick,
       onSearchSynonymsAdminClick,
       onSubscriptionsClick,
@@ -364,6 +376,7 @@ export function MyProfilePage({
       pendingMyOrdersActionCount,
       pendingMySalesActionCount,
       pendingProductReportsCount,
+      pendingProductPromotionsCount,
       pendingRafflesCount,
       showEditOnBanner,
     ],

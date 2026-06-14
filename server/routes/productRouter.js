@@ -57,6 +57,10 @@ import {
   getProductPromotionTariffsController,
   requestProductPromotionController,
   getMyProductPromotionsController,
+  getPendingProductPromotionsController,
+  getPendingProductPromotionsCountController,
+  approveProductPromotionController,
+  rejectProductPromotionController,
   getFeaturedRaffleController,
   getRaffleByIdController,
   getRaffleProductsController,
@@ -105,6 +109,8 @@ import {
   productReviewsListValidation,
   requestProductPromotionValidation,
   myProductPromotionsValidation,
+  promotionIdParamValidation,
+  rejectProductPromotionValidation,
   createRaffleValidation,
   patchRaffleValidation,
   raffleIdParamValidation,
@@ -364,6 +370,32 @@ router.patch(
   setProductRaffleParticipationController,
 );
 router.get("/promotions/tariffs", getProductPromotionTariffsController);
+router.get(
+  "/promotions/pending/count",
+  checkAuthMW,
+  checkProductModeratorMW,
+  getPendingProductPromotionsCountController,
+);
+router.get(
+  "/promotions/pending",
+  checkAuthMW,
+  checkProductModeratorMW,
+  getPendingProductPromotionsController,
+);
+router.patch(
+  "/promotions/:promotionId/approve",
+  checkAuthMW,
+  checkProductModeratorMW,
+  promotionIdParamValidation,
+  approveProductPromotionController,
+);
+router.patch(
+  "/promotions/:promotionId/reject",
+  checkAuthMW,
+  checkProductModeratorMW,
+  rejectProductPromotionValidation,
+  rejectProductPromotionController,
+);
 router.get(
   "/promotions/my",
   checkAuthMW,

@@ -2,9 +2,10 @@ import { useRouter } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useCartActions } from "@/entities/cart/model/useCartActions";
+import type { CartLineExclusionReason } from "@/entities/cart/lib/getCartLineExclusionReason";
 import { resolveProductImageUrl } from "@/entities/product/lib/resolveProductImageUrl";
 import { getProductPurchaseLimit } from "@/entities/product/lib/getProductPurchaseLimit";
-import { CART_PAGE_UI } from "@/shared/config";
+import { CART_PAGE_UI, PRODUCT_UI } from "@/shared/config";
 import { formatPriceRub } from "@/shared/lib";
 import { CachedProductImage } from "@/shared/ui/CachedProductImage";
 
@@ -12,9 +13,16 @@ import type { CartLine } from "../lib/selectCartLines";
 
 type CartLineItemProps = {
   line: CartLine;
+  exclusionReason?: CartLineExclusionReason | null;
 };
 
-export const CartLineItem = ({ line }: CartLineItemProps) => {
+const EXCLUSION_COPY: Record<CartLineExclusionReason, string> = {
+  missing: CART_PAGE_UI.PRODUCT_DELETED_OR_HIDDEN,
+  unavailable: PRODUCT_UI.UNAVAILABLE,
+  own_product: CART_PAGE_UI.LINE_OWN_PRODUCT,
+};
+
+export const CartLineItem = ({ line, exclusionReason = null }: CartLineItemProps) => {
   const router = useRouter();
   const { setItemQuantity, removeItem, isUpdating } = useCartActions();
 
@@ -46,10 +54,14 @@ export const CartLineItem = ({ line }: CartLineItemProps) => {
   };
 
   const increaseDisabled =
-    isUpdating || (purchaseLimit > 0 && line.quantity >= purchaseLimit);
+    isUpdating ||
+    Boolean(exclusionReason) ||
+    (purchaseLimit > 0 && line.quantity >= purchaseLimit);
+
+  const exclusionLabel = exclusionReason ? EXCLUSION_COPY[exclusionReason] : null;
 
   return (
-    <View style={[styles.row, isUpdating && styles.rowUpdating]}>
+    <View style={[styles.row, isUpdating && styles.rowUpdating, exclusionReason && styles.rowExcluded]}>
       <View style={styles.imageWrap}>
         <CachedProductImage uri={imageUrl} style={styles.image} />
       </View>
@@ -67,8 +79,8 @@ export const CartLineItem = ({ line }: CartLineItemProps) => {
           </Text>
         )}
 
-        {line.isMissing ? (
-          <Text style={styles.missing}>{CART_PAGE_UI.PRODUCT_DELETED_OR_HIDDEN}</Text>
+        {exclusionLabel ? (
+          <Text style={styles.excluded}>{exclusionLabel}</Text>
         ) : (
           <Text style={styles.unitPrice}>{formatPriceRub(product?.productPrice)}</Text>
         )}
@@ -117,6 +129,9 @@ const styles = StyleSheet.create({
   rowUpdating: {
     opacity: 0.7,
   },
+  rowExcluded: {
+    opacity: 0.65,
+  },
   imageWrap: {
     width: 72,
     height: 72,
@@ -141,7 +156,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#666",
   },
-  missing: {
+  excluded: {
     marginTop: 4,
     fontSize: 12,
     color: "#c62828",

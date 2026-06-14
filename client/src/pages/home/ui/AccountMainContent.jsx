@@ -44,6 +44,7 @@ export function AccountMainContent({
   pendingInstallmentModerationCount,
   pendingInstallmentDisputesCount,
   pendingProductReportsCount,
+  pendingProductPromotionsCount,
   pendingDataConfirmationCount,
   onRequestLogin,
   onSellerNameClick,
@@ -67,6 +68,7 @@ export function AccountMainContent({
   handlePopularProductsAdminFromProfile,
   handleProductModerationFromProfile,
   handleProductReportsFromProfile,
+  handleProductPromotionsFromProfile,
   handleRafflesFromProfile,
   onCreateRaffleClick,
   handleDataConfirmationQueueFromProfile,
@@ -85,6 +87,7 @@ export function AccountMainContent({
   refreshPendingIntroAdModerationCount,
   refreshPendingSellerPersonalCategoryModerationCount,
   refreshPendingProductReportsCount,
+  refreshPendingProductPromotionsCount,
   refreshPendingRafflesCount,
   refreshPendingDataConfirmationCount,
   refreshPendingInstallmentModerationCount,
@@ -127,6 +130,7 @@ export function AccountMainContent({
       refreshPendingIntroAdModerationCount,
       refreshPendingSellerPersonalCategoryModerationCount,
       refreshPendingProductReportsCount,
+      refreshPendingProductPromotionsCount,
       refreshPendingRafflesCount,
       refreshPendingDataConfirmationCount,
       refreshPendingInstallmentModerationCount,
@@ -194,9 +198,11 @@ export function AccountMainContent({
         onProductReportsClick={
           canModerateProducts ? handleProductReportsFromProfile : undefined
         }
+        onProductPromotionsClick={
+          canModerateProducts ? handleProductPromotionsFromProfile : undefined
+        }
         onRafflesClick={canModerateProducts ? handleRafflesFromProfile : undefined}
         onCreateRaffleClick={onCreateRaffleClick}
-        pendingRafflesCount={pendingRafflesCount}
         onDataConfirmationQueueClick={
           canModerateProducts ? handleDataConfirmationQueueFromProfile : undefined
         }
@@ -229,6 +235,8 @@ export function AccountMainContent({
         pendingInstallmentModerationCount={pendingInstallmentModerationCount}
         pendingInstallmentDisputesCount={pendingInstallmentDisputesCount}
         pendingProductReportsCount={pendingProductReportsCount}
+        pendingProductPromotionsCount={pendingProductPromotionsCount}
+        pendingRafflesCount={pendingRafflesCount}
         pendingDataConfirmationCount={pendingDataConfirmationCount}
         activeTab={activeProfileTab}
         onTabChange={setMyProfileTab}

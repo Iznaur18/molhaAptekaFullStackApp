@@ -1,10 +1,11 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { useMemo, useState } from "react";
-import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { useCallback, useMemo, useState } from "react";
+import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 
+import { getCartLineExclusionReason } from "@/entities/cart/lib/getCartLineExclusionReason";
+import { selectCartCheckoutSummary } from "@/entities/cart/lib/selectCartCheckoutSummary";
 import { selectCartLines } from "@/entities/cart/lib/selectCartLines";
-import { selectPurchasableCartLines } from "@/entities/cart/lib/selectPurchasableCartLines";
 import { useCartActions } from "@/entities/cart/model/useCartActions";
 import { useCartProductsQuery } from "@/entities/cart/model/useCartProductsQuery";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
@@ -36,18 +37,34 @@ export default function CartScreen() {
 
   const productIds = useMemo(() => Object.keys(cartQuery.data ?? {}), [cartQuery.data]);
   const productsQuery = useCartProductsQuery(productIds);
+  const currentUserId = sessionQuery.data?.user?._id;
 
-  const { lines, total } = useMemo(
+  const { lines } = useMemo(
     () => selectCartLines(cartQuery.data ?? {}, productsQuery.products),
     [cartQuery.data, productsQuery.products],
   );
 
-  const purchasableLines = useMemo(
-    () => selectPurchasableCartLines(lines, sessionQuery.data?.user?._id),
-    [lines, sessionQuery.data?.user?._id],
+  const checkoutSummary = useMemo(
+    () => selectCartCheckoutSummary(lines, currentUserId),
+    [lines, currentUserId],
   );
 
-  const canCheckout = purchasableLines.length > 0;
+  const lineExclusionByProductId = useMemo(
+    () =>
+      new Map(
+        lines.map((line) => [
+          line.productId,
+          getCartLineExclusionReason(line, currentUserId),
+        ]),
+      ),
+    [lines, currentUserId],
+  );
+
+  const canCheckout = checkoutSummary.purchasableLines.length > 0;
+
+  const handleRefresh = useCallback(async () => {
+    await Promise.all([cartQuery.refetch(), productsQuery.refetch()]);
+  }, [cartQuery, productsQuery]);
 
   const handleCheckoutSubmit = async (payload: {
     deliveryAddress: string;
@@ -57,7 +74,7 @@ export default function CartScreen() {
     setSubmitState({ isSubmitting: true, error: "", success: "" });
     try {
       await createOrderMutation.mutateAsync({
-        items: purchasableLines.map((line) => ({
+        items: checkoutSummary.purchasableLines.map((line) => ({
           productId: line.productId,
           quantity: line.quantity,
         })),
@@ -66,12 +83,11 @@ export default function CartScreen() {
         paymentMethod: payload.paymentMethod,
       });
       await clearCart();
-      void queryClient.invalidateQueries({ queryKey: orderQueryKeys.my() });
-      setSubmitState({
-        isSubmitting: false,
-        error: "",
-        success: CHECKOUT_FORM_UI.SUCCESS,
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: orderQueryKeys.my() }),
+        queryClient.invalidateQueries({ queryKey: orderQueryKeys.myActionCount() }),
+      ]);
+      router.replace("/orders");
     } catch (error) {
       setSubmitState({
         isSubmitting: false,
@@ -106,6 +122,18 @@ export default function CartScreen() {
     );
   }
 
+  if (productsQuery.isError) {
+    return (
+      <ScreenErrorState
+        message={formatApiErrorMessage(
+          productsQuery.error,
+          CART_PAGE_UI.PRODUCTS_LOAD_ERROR,
+        )}
+        onRetry={() => productsQuery.refetch()}
+      />
+    );
+  }
+
   if (lines.length === 0) {
     return (
       <View style={styles.centered}>
@@ -117,12 +145,22 @@ export default function CartScreen() {
     );
   }
 
+  const totalLabel = checkoutSummary.hasExcludedLines
+    ? CART_PAGE_UI.PURCHASABLE_TOTAL_LABEL
+    : CART_PAGE_UI.TOTAL_LABEL;
+
   const listFooter = (
     <View style={styles.footer}>
       <View style={styles.totalRow}>
-        <Text style={styles.totalLabel}>{CART_PAGE_UI.TOTAL_LABEL}</Text>
-        <Text style={styles.totalValue}>{formatPriceRub(total)}</Text>
+        <Text style={styles.totalLabel}>{totalLabel}</Text>
+        <Text style={styles.totalValue}>{formatPriceRub(checkoutSummary.displayTotal)}</Text>
       </View>
+
+      {checkoutSummary.hasExcludedLines ? (
+        <Text style={styles.fullTotalHint}>
+          {CART_PAGE_UI.FULL_TOTAL_HINT}: {formatPriceRub(checkoutSummary.fullTotal)}
+        </Text>
+      ) : null}
 
       <Pressable
         style={[styles.clearButton, isUpdating && styles.buttonDisabled]}
@@ -132,8 +170,12 @@ export default function CartScreen() {
         <Text style={styles.clearButtonText}>{CART_PAGE_UI.CLEAR_ALL}</Text>
       </Pressable>
 
+      {!canCheckout && checkoutSummary.checkoutBlockReason ? (
+        <Text style={styles.checkoutHint}>{checkoutSummary.checkoutBlockReason}</Text>
+      ) : null}
+
       <CheckoutForm
-        key={sessionQuery.data?.user?._id ?? "guest"}
+        key={currentUserId ?? "guest"}
         defaultUser={sessionQuery.data?.user}
         isSubmitting={submitState.isSubmitting}
         submitError={submitState.error}
@@ -149,9 +191,20 @@ export default function CartScreen() {
       style={styles.container}
       data={lines}
       keyExtractor={(line) => line.productId}
-      renderItem={({ item }) => <CartLineItem line={item} />}
+      renderItem={({ item }) => (
+        <CartLineItem
+          line={item}
+          exclusionReason={lineExclusionByProductId.get(item.productId) ?? null}
+        />
+      )}
       contentContainerStyle={styles.list}
       ListFooterComponent={listFooter}
+      refreshControl={
+        <RefreshControl
+          refreshing={cartQuery.isRefetching || productsQuery.isRefetching}
+          onRefresh={handleRefresh}
+        />
+      }
     />
   );
 }
@@ -177,10 +230,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 16,
   },
-  error: {
-    color: "#c62828",
-    textAlign: "center",
-  },
   footer: {
     paddingTop: 8,
   },
@@ -188,7 +237,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 12,
+    marginBottom: 4,
   },
   totalLabel: {
     fontSize: 16,
@@ -197,6 +246,17 @@ const styles = StyleSheet.create({
   totalValue: {
     fontSize: 20,
     fontWeight: "700",
+  },
+  fullTotalHint: {
+    fontSize: 13,
+    color: "#888",
+    marginBottom: 12,
+  },
+  checkoutHint: {
+    fontSize: 14,
+    color: "#c62828",
+    marginBottom: 12,
+    textAlign: "center",
   },
   button: {
     backgroundColor: "#111",
@@ -212,6 +272,7 @@ const styles = StyleSheet.create({
   clearButton: {
     alignItems: "center",
     paddingVertical: 10,
+    marginBottom: 8,
   },
   clearButtonText: {
     color: "#c62828",

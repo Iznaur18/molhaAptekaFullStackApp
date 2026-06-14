@@ -22,6 +22,12 @@ export const useCartProductsQuery = (productIds: string[]) => {
 
   const isPending = productIds.length > 0 && queries.some((query) => query.isPending);
   const isError = queries.some((query) => query.isError);
+  const isRefetching = queries.some((query) => query.isRefetching);
+  const error = queries.find((query) => query.error)?.error ?? null;
 
-  return { products, isPending, isError };
+  const refetch = async () => {
+    await Promise.all(queries.map((query) => query.refetch()));
+  };
+
+  return { products, isPending, isError, isRefetching, error, refetch };
 };

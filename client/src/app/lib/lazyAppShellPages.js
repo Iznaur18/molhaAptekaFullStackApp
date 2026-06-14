@@ -15,6 +15,11 @@ export const LazyRafflesStaffPage = lazyNamedExport(
   "RafflesStaffPage",
 );
 
+export const LazyProductPromotionsStaffPage = lazyNamedExport(
+  () => import("../../pages/product-promotions-staff/ui/ProductPromotionsStaffPage.jsx"),
+  "ProductPromotionsStaffPage",
+);
+
 export const LazyProductModerationPage = lazyNamedExport(
   () => import("../../pages/product-moderation/ui/ProductModerationPage.jsx"),
   "ProductModerationPage",

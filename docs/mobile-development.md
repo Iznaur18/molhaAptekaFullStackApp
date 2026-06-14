@@ -493,3 +493,312 @@ npx eas submit --platform ios
 ---
 
 *Последнее обновление: июнь 2026. Фаза 0 завершена.*
+
+---
+
+## Mobile Parity (MP) — полный паритет с web
+
+Зафиксированная спека (все пункты discovery = **А**):
+
+| Решение | Выбор |
+|--------|--------|
+| Staff/admin на mobile | Да — все 12 staff-разделов |
+| Seller на mobile | Да |
+| Стили | Design tokens web → RN `AppThemeProvider` |
+| Навигация | Profile hub как web (`buildProfileNavGroups`) |
+| Intro splash | Да — первый запуск, `GET /app-intro` |
+| Фичи 6–15 | Все да (wishlist, subscriptions, notifications, stories, auction, installment, premium, loyalty, raffles, ads, catalog-browser) |
+| Shared code | `packages/design-tokens`, `packages/shared-lib` |
+| Web dev | Сохраняем `npm run web` |
+
+### MP-0 — инфраструктура (в работе)
+
+- [x] `packages/design-tokens` — цвета, отступы, радиусы, типографика
+- [x] `packages/shared-lib` — `formatPriceRub`, `formatApiErrorMessage`, роли, staff access
+- [x] `mobile/shared/theme/AppThemeProvider` — `@izibuy/design-tokens`
+- [x] `entities/access` — `useUserAccess`
+- [x] `features/profile-hub` — меню разделов, `app/hub/[section]` + guards
+- [x] `features/app-intro` — splash при первом запуске
+- [x] npm workspaces + metro `extraNodeModules`
+
+### MP-1 — Buyer parity
+
+- [x] Wishlist — context, sync `GET|PUT /favorites`, `/hub/wishlist`, toggle на карточке/детали
+- [x] Subscriptions — `GET /user/me/following`, отписка, `/hub/subscriptions`
+- [x] Notifications — экран `/notifications`, badge на табе Профиль, `PATCH .../read`
+- [x] Catalog-browser — `/catalog-browser`, feed tiles + категории → фильтры каталога
+- [x] Каталог — sort, followingOnly, auctionOnly, installmentOnly, saleOnly в API
+- [x] Полная карточка/деталь — discount, stats grid, badges, tabs (reviews/auction/installment)
+- [x] `POST /product/:id/view`, `UserFollowButton` на seller preview
+- [x] Stories, curated lists, featured raffles на home (`features/home-feed`)
+- [x] Отзывы — форма отправки (`POST /product/:id/reviews`)
+- [x] Аукцион — submit/patch/cancel offer на детали товара
+- [x] Installment — оформление на вкладке товара + `/hub/installment-payments`
+
+### MP-2 — Seller
+
+- [x] `/hub/my-products` — infinite list, `ProductCard`, кнопка «Разместить товар»
+- [x] `/create-product` — форма `POST /product` (категория drill-down, фото, stock)
+- [x] `/edit-product/[id]` — `PATCH /product/:id`, удаление
+- [x] `/hub/my-sales` — `GET /order/sales`, ship/deliver/cancel на `OrderCard`
+- [x] `/hub/advertising` — submit intro-ad + личная категория (видео/фото upload)
+- [x] Seller auction — `/hub/auction`, accept/reject incoming offers
+
+### MP-3 — Premium / loyalty / installment / raffles
+
+- [x] `/hub/premium` — статус + покупка за баллы
+- [x] `/hub/loyalty-points` — баланс + preview пополнения (coming soon)
+- [x] `/hub/data-confirmation` — статус заявки (подача — web v1)
+- [x] `/hub/installment-payments` — договоры покупателя, mark-paid
+- [x] `/hub/installment-sales` — продажи продавца, confirm/reject оплат
+- [x] `/raffle/[id]` — товары розыгрыша
+- [x] `/hub/create-raffle` — форма `POST /product/raffles`
+- [x] staff raffles moderation / installment moderation (через hub)
+
+### MP-4 — Staff/admin
+
+- [x] 12 staff-экранов: product/intro-ad/personal-category moderation, product-reports (+ story reports), raffles, data-confirmation-requests, installment-moderation/disputes, admin-orders, search-synonyms-admin, category-tree-admin, app-intro-admin, popular-products-admin
+- [x] `useStaffHubBadgeCounts` + badge в `ProfileHubMenu`
+
+### MP-5 — Polish
+
+- [x] Deep links: `izibuy://` + `https://izibuy.ru` (`parseAppDeepLink`, `useAppDeepLinking`, intent filters)
+- [x] In-app notifications poll (`useInAppNotificationsPoll`, 30s) + routing по kind
+- [x] Тёмная тема: `izColorsDark`, `ThemePreferenceToggle` (system/light/dark), nav/tab bar theming
+- [x] Remote push: `expo-notifications` + `PUT/DELETE /auth/me/push-token` + Expo Push API при `createUserInAppNotification`
+- [x] Badge-счётчики в hub (staff + user actions)
+
+---
+
+## WF — Web Feature Parity (функциональный слой)
+
+Порядок после MP: **WF-0 → WF-1…WF-7 → WS-0…WS-6** (стили — после закрытия функционала).
+
+Источники истины:
+
+- Web main views: `client/src/shared/lib/homeMainViewPaths.js` (`HOME_MAIN_VIEW_PATH`)
+- Web profile hub: `client/src/pages/my-profile/lib/buildProfileNavGroups.js`
+- Mobile hub: `mobile/features/profile-hub/model/buildProfileNavGroups.ts`, `profileSections.ts`
+
+### WF-0 — Матрица маршрутов ✅
+
+**Definition of Done (экран = `full`):**
+
+| Критерий | Описание |
+|----------|----------|
+| `load` | Данные с API, loading/error/retry |
+| `empty` | Пустое состояние с копирайтом |
+| `guard` | Роль/авторизация → redirect или hint |
+| `create` | Создание сущности (если есть на web) |
+| `edit` | Редактирование (если есть на web) |
+| `delete` | Удаление/отмена (если есть на web) |
+| `actions` | Основные CTA web (модерация, ship, vote, …) |
+
+**Статусы:** `full` — DoD закрыт; `partial` — экран есть, не хватает CRUD/блоков; `missing` — маршрута/фичи нет.
+
+#### Main views (`HOME_MAIN_VIEW_PATH`)
+
+| Web view | Web path | Mobile route | Статус | Пробелы (→ WF) |
+|----------|----------|--------------|--------|----------------|
+| `catalog` | `/` | `/(tabs)` | **full** | — |
+| `catalog-browser` | `/catalog` | `/catalog-browser` | **full** | API feed tiles, personal categories, admin edit (WF-1.1 ✅) |
+| `my-profile` | `/me` | `/(tabs)/profile` + `/hub/overview` | **full** | overview: banner, stats, raffle (WF-2.1 ✅) |
+| `my-products` | `/my-products` | `/hub/my-products` | **full** | + `/create-product`, `/edit-product/[id]` |
+| `users` | `/user-list` | `/users` + `/user/[id]` | **full** | search, profile, vote, follow (WF-3.1 ✅) |
+| `subscriptions` | `/subscriptions` | `/hub/subscriptions` | **full** | — |
+| `wishlist` | `/wishlist` | `/hub/wishlist` | **full** | — |
+| `notifications` | `/notifications` | `/notifications` | **full** | auto-read, kind routing, cold-start push (WF-1.5 ✅) |
+| `cart` | `/basket` | `/(tabs)/cart` | **full** | purchasable hints, post-checkout → orders (WF-1.3 ✅) |
+| `my-sales` | `/my-sales` | `/hub/my-sales` | **full** | ship/deliver/cancel |
+| `my-orders` | `/my-orders` | `/orders` | **full** | status filter, product tap, badge refresh (WF-1.4 ✅) |
+| `auction` | `/auction` | `/hub/auction` | **full** | accept/reject offers |
+| `data-confirmation` | `/data-confirmation` | `/hub/data-confirmation` | **full** | native passport form + selfie upload (WF-3.2 ✅) |
+| `premium` | `/premium` | `/hub/premium` | **full** | покупка за баллы |
+| `loyalty-points` | `/loyalty-points` | `/hub/loyalty-points` | **full** | preview + coming soon, parity web (WF-3.3 ✅) |
+| `advertising` | `/profile/advertising` | `/hub/advertising` | **full** | intro-ad + personal category |
+| `admin-orders` | `/admin-orders` | `/hub/admin-orders` | **full** | — |
+| `search-synonyms-admin` | `/search-synonyms-admin` | `/hub/search-synonyms-admin` | **full** | create/edit + delete (WF-6.1 ✅) |
+| `category-tree-admin` | `/category-tree-admin` | `/hub/category-tree-admin` | **full** | CRUD дерева (WF-6.2 ✅) |
+| `app-intro-admin` | `/app-intro-admin` | `/hub/app-intro-admin` | **full** | timing + preview/replay (WF-6.3 ✅) |
+| `popular-products-admin` | `/profile/popular-products-admin` | `/hub/popular-products-admin` | **full** | edit lists + items (WF-6.4 ✅) |
+| `product-moderation` | `/moderation-products` | `/hub/product-moderation` | **full** | approve/reject |
+| `intro-ad-moderation` | `/moderation-intro-ad` | `/hub/intro-ad-moderation` | **full** | — |
+| `seller-personal-category-moderation` | `/moderation-seller-categories` | `/hub/seller-personal-category-moderation` | **full** | — |
+| `product-reports` | `/product-reports` | `/hub/product-reports` | **full** | products + story reports queue (WF-6.5 ✅) |
+| `product-promotions` | `/product-promotions` | `/hub/product-promotions` | **full** | Staff queue approve/reject (WF-4.1 ✅) |
+| `staff-raffles` | `/staff-raffles` | `/hub/raffles` | **full** | — |
+| `data-confirmation-requests` | `/data-confirmation-requests` | `/hub/data-confirmation-requests` | **full** | approve/reject |
+| `installment-payments` | `/installment-payments` | `/hub/installment-payments` | **full** | mark-paid |
+| `installment-sales` | `/installment-sales` | `/hub/installment-sales` | **full** | confirm/reject |
+| `installment-moderation` | `/installment-moderation` | `/hub/installment-moderation` | **full** | — |
+| `installment-disputes` | `/installment-disputes` | `/hub/installment-disputes` | **full** | — |
+
+#### Stack / modal маршруты (вне `HOME_MAIN_VIEW_PATH`)
+
+| Web | Mobile route | Статус | Пробелы (→ WF) |
+|-----|--------------|--------|----------------|
+| `/product/:id` (`ProductDetailsModal`) | `/product/[id]` | **full** | promotion request + seller actions (WF-1.2 ✅) |
+| `/seller/:userId` | `/seller/[userId]` | **full** | infinite catalog + follow (WF-3.4 ✅) |
+| `UserDetailsModal` (из user-list) | `/user/[id]` | **full** | stack screen + vote (WF-3.1 ✅) |
+| `/staff-raffles` → create | `/hub/create-raffle` | **full** | — |
+| `/raffle/:id` | `/raffle/[id]` | **full** | — |
+| Stories viewer | `HomeFeedHeader` + `UserStoryViewerModal` | **full** | create, delete own, video (WF-5.1 ✅) |
+| Story report (user) | `ReportUserStoryModal` в viewer | **full** | submit report (WF-5.2 ✅) |
+| Deep link `izibuy://` / `https://izibuy.ru` | `parseAppDeepLink` | **full** | product, raffle, seller, user, users (WF-7.1 ✅) |
+| `/(auth)/login` | `/(auth)/login` | **full** | — |
+| `/(auth)/register` | `/(auth)/register` | **full** | parity с web register |
+| `/profile/edit` | `/profile/edit` | **full** | — |
+| Legal privacy | `/legal/privacy` | **full** | — |
+| App intro splash | `AppIntroSplash` | **full** | `GET /app-intro` |
+
+#### Hub-only разделы
+
+| Section ID | Mobile route | Статус | Пробелы |
+|------------|--------------|--------|---------|
+| `overview` | `/hub/overview` | **full** | parity `MyProfilePage` overview (WF-2.1 ✅) |
+| `edit-profile` | `/profile/edit` | **full** | external route |
+
+#### Сводка WF-0
+
+| Статус | Кол-во |
+|--------|--------|
+| **full** | 47 |
+| **partial** | 0 |
+| **missing** | 0 |
+
+### WF-1 — Buyer core (следующий)
+
+| ID | Scope | Строки матрицы |
+|----|-------|----------------|
+| WF-1.1 | Catalog-browser: API tiles, personal categories, admin edit | `catalog-browser` | ✅ |
+| WF-1.2 | Product detail: promotion request, parity tabs/CTA | `/product/:id` | ✅ |
+| WF-1.3 | Cart → order (регрессии, edge cases) | `cart`, `my-orders` | ✅ |
+| WF-1.4 | My orders actions polish | `my-orders` | ✅ |
+| WF-1.5 | Notifications routing + read states | `notifications` | ✅ |
+
+### WF-2 — Profile shell
+
+| ID | Scope |
+|----|-------|
+| WF-2.1 | `/hub/overview` — баннер, stats, edit CTA, parity `MyProfilePage` | `overview`, `my-profile` | ✅ |
+
+### WF-3 — Social / users
+
+| ID | Scope | Mobile | Статус |
+|----|-------|--------|--------|
+| WF-3.1 | `/user-list` + `UserDetailsModal` + vote | `/users`, `/user/[id]` | ✅ |
+| WF-3.2 | Data confirmation submit (native form) | `/hub/data-confirmation` | ✅ |
+| WF-3.3 | Loyalty points purchase flow | `/hub/loyalty-points` | ✅ |
+| WF-3.4 | `/seller/:userId` seller catalog | `/seller/[userId]` | ✅ |
+
+### WF-4 — Seller promotions
+
+| ID | Scope | Статус |
+|----|-------|--------|
+| WF-4.1 | `/hub/product-promotions` staff queue | ✅ |
+| WF-4.2 | Product promotion request на детали (связка с WF-1.2) | ✅ |
+
+### WF-5 — Stories
+
+| ID | Scope | Статус |
+|----|-------|--------|
+| WF-5.1 | Create user story | ✅ |
+| WF-5.2 | Report story (user) | ✅ |
+
+### WF-6 — Admin CRUD gaps
+
+| ID | Scope | Статус |
+|----|-------|--------|
+| WF-6.1 | Search synonyms create/edit | ✅ |
+| WF-6.2 | Category tree CRUD | ✅ |
+| WF-6.3 | App intro admin timing + preview | ✅ |
+| WF-6.4 | Popular products curated lists edit | ✅ |
+| WF-6.5 | Story reports в `product-reports` | ✅ |
+
+### WF-7 — Deep links & polish
+
+| ID | Scope | Mobile | Статус |
+|----|-------|--------|--------|
+| WF-7.1 | Deep links: seller, user profile | `parseAppDeepLink` | ✅ |
+| WF-7.2 | Регрессионный чеклист по матрице | `docs/mobile-development.md` § WF-7.2 | ✅ |
+
+### WF-7.2 — Регрессионный чеклист ✅
+
+**Предусловия:** `server` на `:4444`, `mobile/.env` → LAN IP, dev client (не Expo Go). Аккаунты: гость, buyer, seller (premium для stories), staff (admin/moderator).
+
+**DoD на экран:** `load` (spinner/error/retry) · `empty` · `guard` (роль/логин) · `actions` (основные CTA web).
+
+#### Tabs / каталог
+
+- [ ] `/(tabs)` — лента, curated lists, raffles strip, stories strip (+ create при premium)
+- [ ] `/(tabs)/cart` — purchasable hints, checkout, redirect в orders
+- [ ] `/(tabs)/profile` — hub menu, badges, staff sections по роли
+- [ ] `/catalog-browser` — roots/children, personal categories, admin edit tile
+
+#### Auth / профиль
+
+- [ ] `/(auth)/login`, `/(auth)/register`
+- [ ] `/profile/edit` — аватар (gallery), поля профиля
+- [ ] `/hub/overview` — banner, stats, raffle CTA, edit profile
+- [ ] `/hub/my-products` → `/create-product`, `/edit-product/[id]`
+- [ ] `/hub/my-sales` — ship / deliver / cancel
+- [ ] `/orders` — фильтр статуса, tap на товар, badge refresh
+- [ ] `/hub/auction` — accept/reject offers
+- [ ] `/hub/subscriptions`, `/hub/wishlist`
+- [ ] `/hub/data-confirmation` — native passport + selfie upload
+- [ ] `/hub/premium`, `/hub/loyalty-points`, `/hub/advertising`
+- [ ] `/hub/installment-payments`, `/hub/installment-sales`
+
+#### Social / stack
+
+- [ ] `/product/[id]` — tabs, promotion modal (баллы), report, wishlist
+- [ ] `/seller/[userId]` — infinite scroll, follow
+- [ ] `/users`, `/user/[id]` — search, vote, follow, self → overview redirect
+- [ ] Stories — viewer, report, delete own; create (+) при `canPublish`
+- [ ] `/raffle/[id]`, `/hub/create-raffle`
+
+#### Staff (moderator/admin)
+
+- [ ] `/hub/product-moderation`, `/hub/intro-ad-moderation`, `/hub/seller-personal-category-moderation`
+- [ ] `/hub/product-reports` — фильтр Все/Товары/Сторисы, resolve
+- [ ] `/hub/raffles`, `/hub/product-promotions`, `/hub/data-confirmation-requests`
+- [ ] `/hub/installment-moderation`, `/hub/installment-disputes`
+- [ ] `/hub/admin-orders`
+- [ ] `/hub/search-synonyms-admin` — create/edit/delete
+- [ ] `/hub/category-tree-admin` — create/edit/delete (+ reassign)
+- [ ] `/hub/app-intro-admin` — timing, preview, save, replay
+- [ ] `/hub/popular-products-admin` — lists CRUD, reorder, productIds
+- [ ] `/hub/product-promotions` — pending queue, approve/reject, badge count
+
+#### Уведомления / intro / legal
+
+- [ ] `/notifications` — auto-read, routing по kind, cold-start из push
+- [ ] `AppIntroSplash` — первый запуск, skip, replay из admin
+- [ ] `/legal/privacy`
+
+#### Deep links (`parseAppDeepLink`)
+
+Проверить cold open (adb / ссылка в Notes):
+
+| URL | Ожидание |
+|-----|----------|
+| `izibuy://product/<id>` | `/product/<id>` |
+| `izibuy://raffle/<id>` | `/raffle/<id>` |
+| `izibuy://seller/<userId>` | `/seller/<userId>` |
+| `izibuy://user/<userId>` | `/user/<userId>` |
+| `izibuy://users` / `izibuy://user-list` | `/users` |
+| `https://izibuy.ru/product/<id>` | `/product/<id>` |
+| `izibuy://hub/wishlist` | `/hub/wishlist` |
+| `izibuy://orders` | `/orders` |
+
+#### Samsung smoke (натив)
+
+См. `mobile/docs/SAMSUNG-ANDROID-DEV.md` § Smoke — обязательно: SecureStore auth, image-picker (аватар, data-confirmation, story create), expo-video (product preview, stories, intro).
+
+#### Известные пробелы (не блокируют WF)
+
+_Нет открытых WF-пробелов._
+
+*WF функциональный слой закрыт. Дальше: **WS-0…WS-6** (стили).*
+
+*Последнее обновление WF: июнь 2026. WF-0 закрыт.*

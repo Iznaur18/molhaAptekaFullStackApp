@@ -18,6 +18,7 @@ export function buildProfileNavGroups({
   canUseInstallmentSales,
   canUseProductModeration,
   canUseProductReports,
+  canUseProductPromotions,
   canUseRaffles,
   canUseDataConfirmationQueue,
   canUseInstallmentModeration,
@@ -45,6 +46,7 @@ export function buildProfileNavGroups({
   pendingIntroAdModerationCount,
   pendingSellerPersonalCategoryModerationCount,
   pendingProductReportsCount,
+  pendingProductPromotionsCount,
   pendingRafflesCount,
   pendingDataConfirmationCount,
   pendingInstallmentModerationCount,
@@ -61,6 +63,7 @@ export function buildProfileNavGroups({
   onIntroAdModerationClick,
   onSellerPersonalCategoryModerationClick,
   onProductReportsClick,
+  onProductPromotionsClick,
   onRafflesClick,
   onDataConfirmationQueueClick,
   onInstallmentModerationClick,
@@ -263,6 +266,16 @@ export function buildProfileNavGroups({
             label: MY_PROFILE_PAGE_UI.TAB_PRODUCT_REPORTS,
             badgeCount: pendingProductReportsCount,
             onClick: () => selectTab("product-reports", onProductReportsClick),
+          },
+        ]
+      : []),
+    ...(canUseProductPromotions
+      ? [
+          {
+            tab: "product-promotions",
+            label: MY_PROFILE_PAGE_UI.TAB_PRODUCT_PROMOTIONS,
+            badgeCount: pendingProductPromotionsCount,
+            onClick: () => selectTab("product-promotions", onProductPromotionsClick),
           },
         ]
       : []),

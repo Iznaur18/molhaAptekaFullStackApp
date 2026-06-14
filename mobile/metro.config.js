@@ -14,6 +14,8 @@ config.resolver.nodeModulesPaths = [
 ];
 config.resolver.extraNodeModules = {
   "@molha/api-contract": contractRoot,
+  "@izibuy/design-tokens": path.resolve(monorepoRoot, "packages/design-tokens"),
+  "@izibuy/shared-lib": path.resolve(monorepoRoot, "packages/shared-lib"),
 };
 config.resolver.unstable_enablePackageExports = true;
 

@@ -1,0 +1,2 @@
+export const USER_VOTE_RATING_VALUE_MIN = 1;
+export const USER_VOTE_RATING_VALUE_MAX = 10;

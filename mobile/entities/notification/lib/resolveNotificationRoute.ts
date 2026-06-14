@@ -1,0 +1,152 @@
+import type { Href } from "expo-router";
+
+import {
+  IN_APP_NOTIFICATION_KIND_DATA_CONFIRMATION_APPROVED,
+  IN_APP_NOTIFICATION_KIND_DATA_CONFIRMATION_REJECTED,
+  IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_RAFFLE_COMPLETED,
+  IN_APP_NOTIFICATION_KIND_INSTALLMENT_DISPUTE_OPENED,
+  IN_APP_NOTIFICATION_KIND_INSTALLMENT_EARLY_PAYOFF,
+  IN_APP_NOTIFICATION_KIND_INSTALLMENT_NEW_FOR_SELLER,
+  IN_APP_NOTIFICATION_KIND_INSTALLMENT_OVERDUE,
+  IN_APP_NOTIFICATION_KIND_INSTALLMENT_PAYMENT_REMINDER,
+  IN_APP_NOTIFICATION_KIND_INSTALLMENT_SELLER_MESSAGE,
+  IN_APP_NOTIFICATION_KIND_NEW_FOLLOWER,
+  IN_APP_NOTIFICATION_KIND_PREMIUM_EXPIRED,
+  IN_APP_NOTIFICATION_KIND_PREMIUM_EXPIRING_SOON,
+  IN_APP_NOTIFICATION_KIND_PREMIUM_REVOKED_BY_STAFF,
+  IN_APP_NOTIFICATION_KIND_PRICE_OFFER_SELLER,
+  IN_APP_NOTIFICATION_KIND_STORY_HIDDEN,
+  INTRO_AD_NOTIFICATION_KIND_ACTIVATED,
+  INTRO_AD_NOTIFICATION_KIND_APPROVED,
+  INTRO_AD_NOTIFICATION_KIND_CANCELLED_BY_STAFF,
+  INTRO_AD_NOTIFICATION_KIND_EXPIRED,
+  INTRO_AD_NOTIFICATION_KIND_REJECTED,
+  RAFFLE_NOTIFICATION_KIND_GOAL_REACHED,
+  SELLER_PERSONAL_CATEGORY_NOTIFICATION_KIND_ACTIVATED,
+  SELLER_PERSONAL_CATEGORY_NOTIFICATION_KIND_EXPIRED,
+  SELLER_PERSONAL_CATEGORY_NOTIFICATION_KIND_REJECTED,
+  SELLER_PERSONAL_CATEGORY_NOTIFICATION_KIND_REMINDER_1_DAY,
+  SELLER_PERSONAL_CATEGORY_NOTIFICATION_KIND_REMINDER_1_HOUR,
+} from "@/entities/notification/model/constants";
+
+export type NotificationRouteInput = {
+  kind?: string;
+  productId?: string | null;
+  actorUserId?: string | null;
+  notificationId?: string | null;
+};
+
+const PREMIUM_KINDS = new Set<string>([
+  IN_APP_NOTIFICATION_KIND_PREMIUM_EXPIRING_SOON,
+  IN_APP_NOTIFICATION_KIND_PREMIUM_EXPIRED,
+  IN_APP_NOTIFICATION_KIND_PREMIUM_REVOKED_BY_STAFF,
+]);
+
+const DATA_CONFIRMATION_KINDS = new Set<string>([
+  IN_APP_NOTIFICATION_KIND_DATA_CONFIRMATION_APPROVED,
+  IN_APP_NOTIFICATION_KIND_DATA_CONFIRMATION_REJECTED,
+]);
+
+const INSTALLMENT_PAYMENTS_KINDS = new Set<string>([
+  IN_APP_NOTIFICATION_KIND_INSTALLMENT_PAYMENT_REMINDER,
+  IN_APP_NOTIFICATION_KIND_INSTALLMENT_OVERDUE,
+  IN_APP_NOTIFICATION_KIND_INSTALLMENT_SELLER_MESSAGE,
+]);
+
+const INSTALLMENT_SALES_KINDS = new Set<string>([
+  IN_APP_NOTIFICATION_KIND_INSTALLMENT_NEW_FOR_SELLER,
+  IN_APP_NOTIFICATION_KIND_INSTALLMENT_EARLY_PAYOFF,
+]);
+
+const ADVERTISING_KINDS = new Set<string>([
+  INTRO_AD_NOTIFICATION_KIND_ACTIVATED,
+  INTRO_AD_NOTIFICATION_KIND_APPROVED,
+  INTRO_AD_NOTIFICATION_KIND_REJECTED,
+  INTRO_AD_NOTIFICATION_KIND_EXPIRED,
+  INTRO_AD_NOTIFICATION_KIND_CANCELLED_BY_STAFF,
+  SELLER_PERSONAL_CATEGORY_NOTIFICATION_KIND_ACTIVATED,
+  SELLER_PERSONAL_CATEGORY_NOTIFICATION_KIND_REJECTED,
+  SELLER_PERSONAL_CATEGORY_NOTIFICATION_KIND_EXPIRED,
+  SELLER_PERSONAL_CATEGORY_NOTIFICATION_KIND_REMINDER_1_DAY,
+  SELLER_PERSONAL_CATEGORY_NOTIFICATION_KIND_REMINDER_1_HOUR,
+]);
+
+const resolveKindRoute = (input: NotificationRouteInput): Href | null => {
+  const kind = input.kind ?? "";
+
+  if (kind === IN_APP_NOTIFICATION_KIND_STORY_HIDDEN) {
+    return null;
+  }
+
+  if (kind === IN_APP_NOTIFICATION_KIND_NEW_FOLLOWER && input.actorUserId) {
+    return "/hub/subscriptions";
+  }
+
+  if (kind === IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_RAFFLE_COMPLETED) {
+    return "/(tabs)";
+  }
+
+  if (kind === IN_APP_NOTIFICATION_KIND_PRICE_OFFER_SELLER) {
+    return "/hub/auction";
+  }
+
+  if (kind === IN_APP_NOTIFICATION_KIND_INSTALLMENT_DISPUTE_OPENED) {
+    return "/hub/installment-disputes";
+  }
+
+  if (PREMIUM_KINDS.has(kind)) {
+    return "/hub/premium";
+  }
+
+  if (DATA_CONFIRMATION_KINDS.has(kind)) {
+    return "/hub/data-confirmation";
+  }
+
+  if (INSTALLMENT_PAYMENTS_KINDS.has(kind)) {
+    return "/hub/installment-payments";
+  }
+
+  if (INSTALLMENT_SALES_KINDS.has(kind)) {
+    return "/hub/installment-sales";
+  }
+
+  if (ADVERTISING_KINDS.has(kind)) {
+    return "/hub/advertising";
+  }
+
+  if (kind === RAFFLE_NOTIFICATION_KIND_GOAL_REACHED) {
+    return "/hub/my-products";
+  }
+
+  return null;
+};
+
+export const resolveNotificationRoute = (
+  input: NotificationRouteInput | null | undefined,
+): Href | null => {
+  if (!input) {
+    return null;
+  }
+
+  if (input.productId) {
+    return {
+      pathname: "/product/[id]",
+      params: { id: String(input.productId) },
+    };
+  }
+
+  const kindRoute = resolveKindRoute(input);
+  if (kindRoute) {
+    return kindRoute;
+  }
+
+  if (input.notificationId) {
+    return "/notifications";
+  }
+
+  return null;
+};
+
+export const isNotificationRouteAvailable = (
+  input: NotificationRouteInput | null | undefined,
+): boolean => resolveNotificationRoute(input) != null;

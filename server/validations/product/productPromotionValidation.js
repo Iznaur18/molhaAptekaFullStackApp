@@ -1,9 +1,12 @@
 import {
   myProductPromotionsQuerySchema,
+  promotionIdParamsSchema,
+  rejectProductPromotionBodySchema,
   requestProductPromotionBodySchema,
 } from "@molha/api-contract";
 
 import { validateBodyZod } from "../../middlewares/validateBodyZod.js";
+import { validateParamsZod } from "../../middlewares/validateParamsZod.js";
 import { validateQueryZod } from "../../middlewares/validateQueryZod.js";
 
 export const requestProductPromotionValidation = [
@@ -12,4 +15,11 @@ export const requestProductPromotionValidation = [
 
 export const myProductPromotionsValidation = [
   validateQueryZod(myProductPromotionsQuerySchema),
+];
+
+export const promotionIdParamValidation = [validateParamsZod(promotionIdParamsSchema)];
+
+export const rejectProductPromotionValidation = [
+  validateParamsZod(promotionIdParamsSchema),
+  validateBodyZod(rejectProductPromotionBodySchema),
 ];

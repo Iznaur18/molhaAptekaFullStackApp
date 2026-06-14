@@ -1,4 +1,8 @@
 import { UserInAppNotificationModel } from "../models/index.js";
+import {
+  buildExpoPushDataPayload,
+  sendExpoPushToUser,
+} from "./expoPushNotifications.js";
 
 const NOTIFICATION_LIST_LIMIT = 50;
 
@@ -18,12 +22,25 @@ export const createUserInAppNotification = async ({
   productId = null,
   actorUserId = null,
 }) => {
-  await UserInAppNotificationModel.create({
+  const doc = await UserInAppNotificationModel.create({
     userId,
     kind,
     message,
     productId: productId ?? null,
     actorUserId: actorUserId ?? null,
+  });
+
+  void sendExpoPushToUser(String(userId), {
+    body: message,
+    data: buildExpoPushDataPayload({
+      kind,
+      message,
+      productId: productId ? String(productId) : null,
+      actorUserId: actorUserId ? String(actorUserId) : null,
+      notificationId: String(doc._id),
+    }),
+  }).catch((error) => {
+    console.error("createUserInAppNotification push error:", error);
   });
 };
 

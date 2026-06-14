@@ -34,3 +34,23 @@ export const markOrderItemCancelled = async (orderId: string, itemIndex: number)
     throw new Error(formatApiErrorMessage(error, FALLBACK));
   }
 };
+
+export const markOrderItemShipped = async (orderId: string, itemIndex: number) => {
+  try {
+    const { data } = await apiClient.patch(`/order/${orderId}/items/${itemIndex}/shipped`);
+    return parseUpdateOrderItemData(data);
+  } catch (error) {
+    throw new Error(formatApiErrorMessage(error, FALLBACK));
+  }
+};
+
+export const markOrderItemDelivered = async (orderId: string, itemIndex: number) => {
+  try {
+    const { data } = await apiClient.patch(
+      `/order/${orderId}/items/${itemIndex}/delivered`,
+    );
+    return parseUpdateOrderItemData(data);
+  } catch (error) {
+    throw new Error(formatApiErrorMessage(error, FALLBACK));
+  }
+};

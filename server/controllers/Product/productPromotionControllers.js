@@ -1,4 +1,4 @@
-import { ProductModel, ProductPromotionModel } from "../../models/index.js";
+import { ProductModel, ProductPromotionModel, UserModel } from "../../models/index.js";
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
 import {
   calculateProductPromotionAmountRub,
@@ -8,6 +8,8 @@ import {
   PRODUCT_PROMOTION_DURATION_OPTIONS,
   PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS,
   PRODUCT_PROMOTION_STATUS_ACTIVE,
+  PRODUCT_PROMOTION_STATUS_PENDING_STAFF,
+  PRODUCT_PROMOTION_STATUS_REJECTED,
   PRODUCT_PROMOTION_TIER_META,
 } from "../../constants/productPromotionConstants.js";
 import {
@@ -15,6 +17,8 @@ import {
   expireProductPromotionsAndSendNotifications,
   isProductCatalogPromotionActive,
   PRODUCT_PROMOTION_NOTIFICATION_KIND_APPROVED,
+  PRODUCT_PROMOTION_NOTIFICATION_KIND_REJECTED,
+  refundProductPromotionPaymentIfNeeded,
 } from "../../utils/productPromotionHelpers.js";
 import {
   deductLoyaltyPoints,
@@ -57,6 +61,17 @@ const toPromotionPayload = (row) => ({
   cancelledAt: row.cancelledAt,
   createdAt: row.createdAt,
   updatedAt: row.updatedAt,
+});
+
+const toStaffPromotionPayload = (row, { product, seller }) => ({
+  ...toPromotionPayload(row),
+  productName: product?.productName ?? row.productName ?? null,
+  seller: seller
+    ? {
+        _id: String(seller._id),
+        userName: seller.userName ?? null,
+      }
+    : null,
 });
 
 export const getProductPromotionTariffsController = async (req, res) => {
@@ -226,5 +241,137 @@ export const getMyProductPromotionsController = async (req, res) => {
   } catch (error) {
     console.error("getMyProductPromotionsController error:", error);
     return errorRes(res, 500, "Ошибка при загрузке моих продвижений");
+  }
+};
+
+export const getPendingProductPromotionsController = async (req, res) => {
+  try {
+    await expireProductPromotionsAndSendNotifications();
+    const rows = await ProductPromotionModel.find({
+      status: PRODUCT_PROMOTION_STATUS_PENDING_STAFF,
+    })
+      .sort({ createdAt: 1 })
+      .limit(100)
+      .lean();
+
+    const productIds = [...new Set(rows.map((row) => String(row.productId)))];
+    const sellerIds = [...new Set(rows.map((row) => String(row.sellerId)))];
+
+    const [products, sellers] = await Promise.all([
+      ProductModel.find({ _id: { $in: productIds } })
+        .select("productName")
+        .lean(),
+      UserModel.find({ _id: { $in: sellerIds } })
+        .select("userName")
+        .lean(),
+    ]);
+
+    const productById = Object.fromEntries(
+      products.map((product) => [String(product._id), product]),
+    );
+    const sellerById = Object.fromEntries(
+      sellers.map((seller) => [String(seller._id), seller]),
+    );
+
+    return successRes(res, {
+      promotions: rows.map((row) =>
+        toStaffPromotionPayload(row, {
+          product: productById[String(row.productId)] ?? null,
+          seller: sellerById[String(row.sellerId)] ?? null,
+        }),
+      ),
+    });
+  } catch (error) {
+    console.error("getPendingProductPromotionsController error:", error);
+    return errorRes(res, 500, "Ошибка при загрузке очереди продвижения");
+  }
+};
+
+export const getPendingProductPromotionsCountController = async (req, res) => {
+  try {
+    const count = await ProductPromotionModel.countDocuments({
+      status: PRODUCT_PROMOTION_STATUS_PENDING_STAFF,
+    });
+    return successRes(res, { count });
+  } catch (error) {
+    console.error("getPendingProductPromotionsCountController error:", error);
+    return errorRes(res, 500, "Ошибка при загрузке счётчика продвижения");
+  }
+};
+
+export const approveProductPromotionController = async (req, res) => {
+  try {
+    const staffId = String(req.userId);
+    const promotion = await ProductPromotionModel.findById(req.params.promotionId);
+    if (!promotion) {
+      return errorRes(res, 404, "Заявка на продвижение не найдена");
+    }
+    if (promotion.status !== PRODUCT_PROMOTION_STATUS_PENDING_STAFF) {
+      return errorRes(res, 409, "Заявка уже обработана");
+    }
+
+    const product = await ProductModel.findById(promotion.productId).lean();
+    if (!product) {
+      return errorRes(res, 404, "Товар не найден");
+    }
+    if (product.productModerationStatus !== PRODUCT_MODERATION_APPROVED) {
+      return errorRes(res, 409, "Товар должен быть одобрен модерацией");
+    }
+    if (product.productIsAvailable === false) {
+      return errorRes(res, 409, "Скрытый товар нельзя продвигать");
+    }
+    if (isProductCatalogPromotionActive(product)) {
+      return errorRes(res, 409, "У товара уже есть активное продвижение");
+    }
+
+    const tierMeta = PRODUCT_PROMOTION_TIER_META.find((item) => item.tier === promotion.tier);
+    const promotionMessage = `Продвижение товара одобрено (${tierMeta?.title ?? `L${promotion.tier}`}, ${promotion.tariffTitle})`;
+
+    promotion.approvedByUserId = staffId;
+    await activateProductPromotionRecord(promotion, {
+      notificationMessage: promotionMessage,
+      actorUserId: staffId,
+    });
+
+    return successRes(res, {
+      message: "Продвижение одобрено",
+      promotion: toPromotionPayload(promotion.toObject()),
+    });
+  } catch (error) {
+    console.error("approveProductPromotionController error:", error);
+    return errorRes(res, 500, "Ошибка при одобрении продвижения");
+  }
+};
+
+export const rejectProductPromotionController = async (req, res) => {
+  try {
+    const staffId = String(req.userId);
+    const promotion = await ProductPromotionModel.findById(req.params.promotionId);
+    if (!promotion) {
+      return errorRes(res, 404, "Заявка на продвижение не найдена");
+    }
+    if (promotion.status !== PRODUCT_PROMOTION_STATUS_PENDING_STAFF) {
+      return errorRes(res, 409, "Заявка уже обработана");
+    }
+
+    promotion.status = PRODUCT_PROMOTION_STATUS_REJECTED;
+    await promotion.save();
+    await refundProductPromotionPaymentIfNeeded(promotion._id);
+
+    await createUserInAppNotification({
+      userId: promotion.sellerId,
+      kind: PRODUCT_PROMOTION_NOTIFICATION_KIND_REJECTED,
+      message: "Заявка на продвижение отклонена",
+      productId: promotion.productId,
+      actorUserId: staffId,
+    });
+
+    return successRes(res, {
+      message: "Заявка на продвижение отклонена",
+      promotion: toPromotionPayload(promotion.toObject()),
+    });
+  } catch (error) {
+    console.error("rejectProductPromotionController error:", error);
+    return errorRes(res, 500, "Ошибка при отклонении продвижения");
   }
 };

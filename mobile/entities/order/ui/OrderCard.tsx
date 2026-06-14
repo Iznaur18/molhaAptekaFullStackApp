@@ -1,16 +1,18 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { getOrderItemIndex } from "@/entities/order/lib/getOrderItemIndex";
+import { isOrderLineItemProductClickable } from "@/entities/order/lib/isOrderLineItemProductClickable";
 import { resolveOrderLineItemName } from "@/entities/order/lib/resolveOrderLineItemName";
 import {
   ORDER_PAYMENT_METHOD_LABEL_RU,
   ORDER_STATUS_DELIVERED,
   ORDER_STATUS_PENDING,
+  ORDER_STATUS_SHIPPED,
   ORDER_STATUS_LABEL_RU,
   type OrderPaymentMethod,
   type OrderStatus,
 } from "@/entities/order/model/constants";
-import { ORDER_CARD_UI } from "@/shared/config";
+import { INSTALLMENT_UI, ORDER_CARD_UI, PRODUCT_CARD_UI } from "@/shared/config";
 import { formatIsoDateTime, formatPriceRub } from "@/shared/lib";
 
 type OrderItemActionContext = {
@@ -26,10 +28,15 @@ type OrderCardProps = {
     deliveryAddress?: string;
     paymentMethod?: string;
     createdAt?: string;
+    priceOfferId?: string | null;
+    installmentContractId?: string | null;
     items?: unknown[];
   };
+  onProductClick?: (item: unknown) => void;
   onConfirmDelivered?: (ctx: OrderItemActionContext) => void | Promise<void>;
   onCancelItem?: (ctx: OrderItemActionContext) => void | Promise<void>;
+  onMarkShipped?: (ctx: OrderItemActionContext) => void | Promise<void>;
+  onMarkDelivered?: (ctx: OrderItemActionContext) => void | Promise<void>;
   pendingActionKey?: string | null;
   itemActionErrors?: Record<string, string>;
 };
@@ -40,19 +47,34 @@ const formatStatus = (status?: string) =>
 const formatPayment = (method?: string) =>
   ORDER_PAYMENT_METHOD_LABEL_RU[method as OrderPaymentMethod] ?? method ?? "—";
 
+const formatLoyaltyPoints = (value: unknown) => Math.floor(Number(value) || 0);
+
 export const OrderCard = ({
   order,
+  onProductClick,
   onConfirmDelivered,
   onCancelItem,
+  onMarkShipped,
+  onMarkDelivered,
   pendingActionKey = null,
   itemActionErrors = {},
 }: OrderCardProps) => {
   const items = Array.isArray(order.items) ? order.items : [];
+  const isAuctionOrder = Boolean(order.priceOfferId);
+  const isInstallmentOrder = Boolean(order.installmentContractId);
 
   return (
     <View style={styles.card}>
       <View style={styles.header}>
-        <Text style={styles.status}>{formatStatus(order.status)}</Text>
+        <View style={styles.headerBadges}>
+          <Text style={styles.status}>{formatStatus(order.status)}</Text>
+          {isAuctionOrder ? (
+            <Text style={styles.typeBadge}>{PRODUCT_CARD_UI.AUCTION_BADGE}</Text>
+          ) : null}
+          {isInstallmentOrder ? (
+            <Text style={styles.typeBadge}>{INSTALLMENT_UI.BADGE}</Text>
+          ) : null}
+        </View>
         <Text style={styles.total}>{formatPriceRub(order.totalAmount)}</Text>
       </View>
 
@@ -75,6 +97,11 @@ export const OrderCard = ({
           _id?: string;
           status?: string;
           itemIndex?: number;
+          unitPriceAtOrder?: number;
+          loyaltyPointsPerUnitAtOrder?: number;
+          loyaltyPointsReservedTotal?: number;
+          deliveredAt?: string;
+          confirmedAt?: string;
         };
         const itemIndex = getOrderItemIndex(source, index);
         const actionKey = `${order._id}:${itemIndex}`;
@@ -83,17 +110,114 @@ export const OrderCard = ({
         const canCancel = source.status === ORDER_STATUS_PENDING && Boolean(onCancelItem);
         const canConfirm =
           source.status === ORDER_STATUS_DELIVERED && Boolean(onConfirmDelivered);
+        const canMarkShipped = source.status === ORDER_STATUS_PENDING && Boolean(onMarkShipped);
+        const canMarkDelivered =
+          source.status === ORDER_STATUS_SHIPPED && Boolean(onMarkDelivered);
         const key = source._id ?? `item-${index}`;
+        const productName = resolveOrderLineItemName(item);
+        const isProductClickable =
+          Boolean(onProductClick) && isOrderLineItemProductClickable(item);
+        const loyaltyPerUnit = formatLoyaltyPoints(source.loyaltyPointsPerUnitAtOrder);
+        const loyaltyReservedTotal = formatLoyaltyPoints(source.loyaltyPointsReservedTotal);
+        const deliveredAtText = source.deliveredAt
+          ? formatIsoDateTime(source.deliveredAt)
+          : "";
+        const confirmedAtText = source.confirmedAt
+          ? formatIsoDateTime(source.confirmedAt)
+          : "";
 
         return (
           <View key={key} style={styles.itemBlock}>
-            <Text style={styles.itemLine} numberOfLines={2}>
-              {resolveOrderLineItemName(item)} × {source.quantity ?? 1}
-            </Text>
+            <View style={styles.itemTitleRow}>
+              {isProductClickable ? (
+                <Pressable onPress={() => onProductClick?.(item)} style={styles.itemNamePressable}>
+                  <Text style={styles.itemNameLink} numberOfLines={2}>
+                    {productName}
+                  </Text>
+                </Pressable>
+              ) : (
+                <Text style={styles.itemLine} numberOfLines={2}>
+                  {productName}
+                </Text>
+              )}
+              <Text style={styles.itemQuantity}>×{source.quantity ?? 1}</Text>
+            </View>
+
+            <Text style={styles.itemPrice}>{formatPriceRub(source.unitPriceAtOrder)}</Text>
+
+            {loyaltyPerUnit > 0 ? (
+              <Text style={styles.itemLoyalty}>
+                {ORDER_CARD_UI.LOYALTY_POINTS_LINE(loyaltyPerUnit)}
+                {(source.quantity ?? 1) > 1 ? ` · всего ${loyaltyReservedTotal}` : ""}
+              </Text>
+            ) : null}
+
             <Text style={styles.itemStatus}>
               {ORDER_CARD_UI.ITEM_STATUS_LABEL}: {formatStatus(source.status)}
             </Text>
-            {canCancel || canConfirm ? (
+
+            {deliveredAtText ? (
+              <Text style={styles.itemTimestamp}>
+                {ORDER_CARD_UI.ITEM_DELIVERED_AT_LABEL}: {deliveredAtText}
+              </Text>
+            ) : null}
+
+            {confirmedAtText ? (
+              <Text style={styles.itemTimestamp}>
+                {ORDER_CARD_UI.ITEM_CONFIRMED_AT_LABEL}: {confirmedAtText}
+              </Text>
+            ) : null}
+
+            {canMarkShipped && (onMarkShipped || onCancelItem) ? (
+              <View style={styles.itemActions}>
+                {onMarkShipped ? (
+                  <Pressable
+                    style={[styles.actionButton, isActionPending && styles.actionDisabled]}
+                    onPress={() => onMarkShipped({ orderId: order._id, itemIndex })}
+                    disabled={isActionPending}
+                  >
+                    <Text style={styles.actionButtonText}>
+                      {isActionPending
+                        ? ORDER_CARD_UI.ACTION_PENDING
+                        : ORDER_CARD_UI.ACTION_SHIPPED}
+                    </Text>
+                  </Pressable>
+                ) : null}
+                {onCancelItem ? (
+                  <Pressable
+                    style={[
+                      styles.actionButton,
+                      styles.actionButtonCancel,
+                      isActionPending && styles.actionDisabled,
+                    ]}
+                    onPress={() => onCancelItem({ orderId: order._id, itemIndex })}
+                    disabled={isActionPending}
+                  >
+                    <Text style={[styles.actionButtonText, styles.actionButtonTextCancel]}>
+                      {isActionPending
+                        ? ORDER_CARD_UI.ACTION_PENDING
+                        : ORDER_CARD_UI.ACTION_CANCEL}
+                    </Text>
+                  </Pressable>
+                ) : null}
+              </View>
+            ) : null}
+            {canMarkDelivered && onMarkDelivered ? (
+              <View style={styles.itemActions}>
+                <Pressable
+                  style={[styles.actionButton, isActionPending && styles.actionDisabled]}
+                  onPress={() => onMarkDelivered({ orderId: order._id, itemIndex })}
+                  disabled={isActionPending}
+                >
+                  <Text style={styles.actionButtonText}>
+                    {isActionPending
+                      ? ORDER_CARD_UI.ACTION_PENDING
+                      : ORDER_CARD_UI.ACTION_DELIVERED}
+                  </Text>
+                </Pressable>
+              </View>
+            ) : null}
+            {canConfirm || (canCancel && !onMarkShipped) ? (
               <View style={styles.itemActions}>
                 {canConfirm ? (
                   <Pressable
@@ -147,13 +271,31 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
     marginBottom: 8,
+    gap: 8,
+  },
+  headerBadges: {
+    flex: 1,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: 6,
   },
   status: {
     fontSize: 14,
     fontWeight: "700",
     color: "#111",
+  },
+  typeBadge: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: "#555",
+    backgroundColor: "#f0f0f0",
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 999,
+    overflow: "hidden",
   },
   total: {
     fontSize: 16,
@@ -176,14 +318,48 @@ const styles = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: "#eee",
   },
+  itemTitleRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
+  },
+  itemNamePressable: {
+    flex: 1,
+  },
   itemLine: {
+    flex: 1,
     fontSize: 14,
     color: "#222",
+  },
+  itemNameLink: {
+    fontSize: 14,
+    color: "#1565c0",
+    fontWeight: "600",
+  },
+  itemQuantity: {
+    fontSize: 14,
+    color: "#666",
+  },
+  itemPrice: {
+    marginTop: 4,
+    fontSize: 13,
+    color: "#333",
+    fontWeight: "600",
+  },
+  itemLoyalty: {
+    marginTop: 4,
+    fontSize: 12,
+    color: "#2e7d32",
   },
   itemStatus: {
     marginTop: 4,
     fontSize: 12,
     color: "#666",
+  },
+  itemTimestamp: {
+    marginTop: 2,
+    fontSize: 12,
+    color: "#888",
   },
   itemActions: {
     marginTop: 8,

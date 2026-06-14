@@ -11,6 +11,7 @@ import { orderQueryKeys } from "../../../entities/order/model/orderQueryKeys.js"
 import { moderationQueryKeys } from "../../../entities/product/model/moderationQueryKeys.js";
 import { priceOfferQueryKeys } from "../../../entities/product-price-offer/model/priceOfferQueryKeys.js";
 import { productReportQueryKeys } from "../../../entities/product-report/model/productReportQueryKeys.js";
+import { productPromotionQueryKeys } from "../../../entities/product-promotion/model/productPromotionQueryKeys.js";
 import { raffleQueryKeys } from "../../../entities/raffle/model/raffleQueryKeys.js";
 import { pendingDataConfirmationQueryKeys } from "../../../entities/user-data-confirmation/model/pendingDataConfirmationQueryKeys.js";
 import { userStoryReportQueryKeys } from "../../../entities/user-story/model/userStoryReportQueryKeys.js";
@@ -158,6 +159,25 @@ export function resolveRafflesStaffBadgeCount(queryClient, fetchCount) {
       return Array.isArray(cached?.pendingRaffles)
         ? cached.pendingRaffles.length
         : undefined;
+    },
+    fetchCount,
+  );
+}
+
+/**
+ * @param {import('@tanstack/react-query').QueryClient} queryClient
+ * @param {() => Promise<number>} fetchCount
+ */
+export function resolveProductPromotionsStaffBadgeCount(queryClient, fetchCount) {
+  return resolveStaffBadgeCount(
+    queryClient,
+    productPromotionQueryKeys.staffPendingCount(),
+    (client) => {
+      const cached = readSuccessfulQueryData(
+        client,
+        productPromotionQueryKeys.staffPending(),
+      );
+      return Array.isArray(cached) ? cached.length : undefined;
     },
     fetchCount,
   );

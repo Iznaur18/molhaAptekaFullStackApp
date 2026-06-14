@@ -10,8 +10,8 @@
 
 - [x] **Mobile MVP** — фазы 0–4, smoke web, privacy, store-assets (`docs/mobile-development.md`)
 - [x] **Интро-ролик** — `client/public/intro/intro.mp4`, poster, splash + admin (`/app-intro-admin`)
-- [ ] **Юр. оператор** — заполнить `legal/operator.config.json` → `npm run sync:legal`
-- [ ] **Git** — закоммитить mobile + client legal/intro (см. ниже)
+- [x] **Юр. оператор** — `legal/operator.config.json` → `npm run sync:legal`
+- [x] **Git** — `7a946d1` mobile + client legal/intro/store
 
 ---
 

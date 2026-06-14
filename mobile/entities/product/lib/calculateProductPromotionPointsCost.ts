@@ -1,0 +1,46 @@
+import { rublesToLoyaltyPoints } from "@/shared/config/loyaltyPointsConstants";
+
+export const PRODUCT_PROMOTION_TIER_GOLD = 1;
+export const PRODUCT_PROMOTION_TIER_TOP = 2;
+export const PRODUCT_PROMOTION_TIER_BANNER = 3;
+
+export const PRODUCT_PROMOTION_TIER_RATES: Record<number, number> = {
+  [PRODUCT_PROMOTION_TIER_GOLD]: 0.002,
+  [PRODUCT_PROMOTION_TIER_TOP]: 0.004,
+  [PRODUCT_PROMOTION_TIER_BANNER]: 0.01,
+};
+
+export const PRODUCT_PROMOTION_DURATION_MULT: Record<string, number> = {
+  "24h": 1,
+  "7d": 7,
+  "30d": 30,
+};
+
+type CalculatePromotionCostParams = {
+  productPrice: number;
+  tier: number;
+  durationCode: string;
+};
+
+export const calculateProductPromotionPointsCost = ({
+  productPrice,
+  tier,
+  durationCode,
+}: CalculatePromotionCostParams): number => {
+  const rate = PRODUCT_PROMOTION_TIER_RATES[Number(tier)];
+  const durationMult = PRODUCT_PROMOTION_DURATION_MULT[durationCode];
+  if (rate == null || durationMult == null) {
+    return 0;
+  }
+  const priceRub = Number(productPrice) * rate * durationMult;
+  return rublesToLoyaltyPoints(priceRub);
+};
+
+export const formatProductPromotionTierRatePercent = (tier: number): string => {
+  const rate = PRODUCT_PROMOTION_TIER_RATES[Number(tier)];
+  if (rate == null) {
+    return "";
+  }
+  const percent = rate * 100;
+  return Number.isInteger(percent) ? String(percent) : percent.toFixed(1).replace(/\.0$/, "");
+};

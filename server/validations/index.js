@@ -9,6 +9,10 @@ import { userSellerProductsValidation } from "./user/userSellerProductsValidatio
 import { submitDataConfirmationValidation } from "./user/submitDataConfirmationValidation.js";
 import { resolveDataConfirmationValidation } from "./user/resolveDataConfirmationValidation.js";
 import { userFollowListValidation } from "./user/userFollowListValidation.js";
+import {
+  registerPushTokenValidation,
+  removePushTokenValidation,
+} from "./user/pushTokenValidation.js";
 import { makeProductValidation } from "./product/makeProductValidation.js";
 import { productIdParamValidation } from "./product/productIdParamValidation.js";
 import { productsSearchValidation } from "./product/productsSearchValidation.js";
@@ -29,6 +33,8 @@ import {
 import {
   requestProductPromotionValidation,
   myProductPromotionsValidation,
+  promotionIdParamValidation,
+  rejectProductPromotionValidation,
 } from "./product/productPromotionValidation.js";
 import {
   createRaffleValidation,
@@ -111,6 +117,8 @@ export {
   submitDataConfirmationValidation,
   resolveDataConfirmationValidation,
   userFollowListValidation,
+  registerPushTokenValidation,
+  removePushTokenValidation,
   makeProductValidation,
   productIdParamValidation,
   productsSearchValidation,
@@ -126,6 +134,8 @@ export {
   productReviewsListValidation,
   requestProductPromotionValidation,
   myProductPromotionsValidation,
+  promotionIdParamValidation,
+  rejectProductPromotionValidation,
   createRaffleValidation,
   patchRaffleValidation,
   raffleIdParamValidation,

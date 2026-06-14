@@ -6,7 +6,7 @@ export type LegalSection = {
 export const PRIVACY_POLICY_UPDATED_AT = "13 июня 2026";
 
 export const PRIVACY_POLICY_OPERATOR_PLACEHOLDER =
-  "УКАЖИТЕ: ИП/ООО, ИНН, юридический адрес";
+  "Гужаев Рамзан Ризванович, 201400232973, Чеченская Республика, город Грозный";
 
 export const PRIVACY_POLICY_CONTACT_EMAIL = "support@izibuy.ru";
 

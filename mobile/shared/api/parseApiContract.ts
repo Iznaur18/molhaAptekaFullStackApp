@@ -3,11 +3,15 @@ import {
   authSessionDataSchema,
   catalogProductsPageDataSchema,
   createOrderDataSchema,
+  myIntroAdCampaignDataSchema,
+  mySellerPersonalCategoryCampaignDataSchema,
   orderFromApiSchema,
   parseApiSuccess,
   productFromApiSchema,
+  productWriteDataSchema,
   replaceCartDataSchema,
   userPublicProfileSchema,
+  userSellerProductsPageDataSchema,
 } from "@molha/api-contract";
 import { z } from "zod";
 import type { z as zod } from "zod";
@@ -67,12 +71,30 @@ const myOrdersDataSchema = z.object({
 export const parseMyOrdersData = (payload: unknown) =>
   parseApiContractData(payload, myOrdersDataSchema).orders;
 
+const productCategoryPublicNodeSchema = z
+  .object({
+    id: z.string().optional(),
+    _id: z.string().optional(),
+    slug: z.string().optional(),
+    labelRu: z.string().optional(),
+    name: z.string().optional(),
+    parentId: z.string().nullable().optional(),
+    depth: z.number().optional(),
+    pathSlugs: z.array(z.string()).optional(),
+    pathLabelRu: z.array(z.string()).optional(),
+    isLeaf: z.boolean().optional(),
+    legacyProductCategory: z.string().nullable().optional(),
+    searchKeywords: z.array(z.string()).optional(),
+  })
+  .passthrough()
+  .refine((node) => Boolean(node.id || node._id), {
+    message: "category id is required",
+    path: ["id"],
+  });
+
 const categoryChildrenDataSchema = z.object({
-  parent: z.object({ _id: z.string(), name: z.string().optional() }).passthrough(),
-  categories: z
-    .array(z.object({ _id: z.string(), name: z.string().optional() }).passthrough())
-    .optional()
-    .default([]),
+  parent: productCategoryPublicNodeSchema,
+  categories: z.array(productCategoryPublicNodeSchema).optional().default([]),
 });
 
 export const parseCategoryChildrenData = (payload: unknown) =>
@@ -150,3 +172,42 @@ export const parsePatchUserProfileData = (payload: unknown) => {
     return parseApiContractData(payload, userPublicProfileSchema);
   }
 };
+
+export const parseCreateProductData = (payload: unknown) =>
+  parseApiContractData(payload, productWriteDataSchema);
+
+export const parsePatchMyProductData = (payload: unknown) =>
+  parseApiContractData(payload, productWriteDataSchema);
+
+const mySalesDataSchema = z.object({
+  orders: z.array(orderFromApiSchema),
+  total: z.number().optional(),
+  page: z.number().optional(),
+  limit: z.number().optional(),
+});
+
+export const parseMySalesData = (payload: unknown) =>
+  parseApiContractData(payload, mySalesDataSchema);
+
+const categoryRootsDataSchema = z.object({
+  categories: z.array(productCategoryPublicNodeSchema).default([]),
+});
+
+export const parseCategoryRootsData = (payload: unknown) =>
+  parseApiContractData(payload, categoryRootsDataSchema);
+
+export const parseMyIntroAdCampaignData = (payload: unknown) =>
+  parseApiContractData(payload, myIntroAdCampaignDataSchema);
+
+export const parseMySellerPersonalCategoryCampaignData = (payload: unknown) =>
+  parseApiContractData(payload, mySellerPersonalCategoryCampaignDataSchema);
+
+const userProfileEnvelopeSchema = z.object({
+  user: userPublicProfileSchema,
+});
+
+export const parseUserProfileByIdData = (payload: unknown) =>
+  parseApiContractData(payload, userProfileEnvelopeSchema).user;
+
+export const parseUserSellerProductsPageData = (payload: unknown) =>
+  parseApiContractData(payload, userSellerProductsPageDataSchema);

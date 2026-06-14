@@ -2,6 +2,10 @@
   "name": "molha-apteka",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "packages/*",
+    "mobile"
+  ],
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

@@ -16,6 +16,7 @@ import { fetchPendingSellerPersonalCategoryCampaignsCount } from "../../../entit
 import { fetchPendingProductReportsCount } from "../../../entities/product-report/api/fetchPendingProductReportsCount.js";
 import { fetchPendingUserStoryReportsCount } from "../../../entities/user-story/api/fetchPendingUserStoryReportsCount.js";
 import { fetchPendingDataConfirmationCount } from "../../../entities/user-data-confirmation/api/fetchPendingDataConfirmationCount.js";
+import { fetchPendingProductPromotionsCount } from "../../../entities/product-promotion/api/fetchPendingProductPromotionsCount.js";
 import { fetchPendingRafflesCount } from "../../../entities/raffle/api/fetchPendingRafflesCount.js";
 import { introAdQueryKeys } from "../../../entities/intro-ad/model/introAdQueryKeys.js";
 import { sellerPersonalCategoryQueryKeys } from "../../../entities/seller-personal-category/model/sellerPersonalCategoryQueryKeys.js";
@@ -33,6 +34,7 @@ import {
   resolveMyOrdersActionCount,
   resolveMySalesActionCount,
   resolveProductReportsStaffBadgeCount,
+  resolveProductPromotionsStaffBadgeCount,
   resolveRafflesStaffBadgeCount,
 } from "../lib/staffBadgeCountResolvers.js";
 import {
@@ -42,6 +44,7 @@ import {
   syncInstallmentModerationQueueCaches,
   syncModerationQueueCaches,
   syncProductReportsQueueCaches,
+  syncProductPromotionsStaffQueueCaches,
   syncRafflesStaffQueueCaches,
   syncUserProfileActionCaches,
 } from "../lib/staffBadgeQueryCache.js";
@@ -106,6 +109,16 @@ export function useStaffBadgeQueries({
         queryKey: [...staffBadgeQueryKeys.raffles, mainView],
         queryFn: () =>
           resolveRafflesStaffBadgeCount(queryClient, fetchPendingRafflesCount),
+        enabled: staffEnabled,
+        ...STAFF_MODERATOR_QUERY_OPTIONS,
+      },
+      {
+        queryKey: [...staffBadgeQueryKeys.productPromotions, mainView],
+        queryFn: () =>
+          resolveProductPromotionsStaffBadgeCount(
+            queryClient,
+            fetchPendingProductPromotionsCount,
+          ),
         enabled: staffEnabled,
         ...STAFF_MODERATOR_QUERY_OPTIONS,
       },
@@ -193,6 +206,7 @@ export function useStaffBadgeQueries({
     productReportsQuery,
     dataConfirmationQuery,
     rafflesQuery,
+    productPromotionsQuery,
     installmentModerationQuery,
     installmentDisputesQuery,
     introAdModerationQuery,
@@ -226,6 +240,8 @@ export function useStaffBadgeQueries({
       refreshPendingDataConfirmationCount: () =>
         syncDataConfirmationQueueCaches(queryClient),
       refreshPendingRafflesCount: () => syncRafflesStaffQueueCaches(queryClient),
+      refreshPendingProductPromotionsCount: () =>
+        syncProductPromotionsStaffQueueCaches(queryClient),
       refreshPendingInstallmentModerationCount: () =>
         syncInstallmentModerationQueueCaches(queryClient),
       refreshPendingInstallmentDisputesCount: () =>
@@ -244,6 +260,7 @@ export function useStaffBadgeQueries({
     pendingProductReportsCount: productReportsQuery.data ?? 0,
     pendingDataConfirmationCount: dataConfirmationQuery.data ?? 0,
     pendingRafflesCount: rafflesQuery.data ?? 0,
+    pendingProductPromotionsCount: productPromotionsQuery.data ?? 0,
     pendingInstallmentModerationCount: installmentModerationQuery.data ?? 0,
     pendingInstallmentDisputesCount: installmentDisputesQuery.data ?? 0,
     pendingIncomingPriceOffersCount:

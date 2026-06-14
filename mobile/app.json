@@ -7,13 +7,28 @@
     "icon": "./assets/images/icon.png",
     "scheme": "izibuy",
     "userInterfaceStyle": "automatic",
+    "linking": {
+      "prefixes": ["izibuy://", "https://izibuy.ru", "https://www.izibuy.ru"]
+    },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "ru.izibuy.app"
+      "bundleIdentifier": "ru.izibuy.app",
+      "associatedDomains": ["applinks:izibuy.ru", "applinks:www.izibuy.ru"]
     },
     "android": {
       "package": "ru.izibuy.app",
       "usesCleartextTraffic": true,
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            { "scheme": "https", "host": "izibuy.ru", "pathPrefix": "/" },
+            { "scheme": "https", "host": "www.izibuy.ru", "pathPrefix": "/" }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -44,6 +59,13 @@
         "expo-image-picker",
         {
           "photosPermission": "iziBuy нужен доступ к фото для загрузки аватара"
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#E6F4FE"
         }
       ]
     ],

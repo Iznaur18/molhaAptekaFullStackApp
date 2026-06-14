@@ -123,6 +123,10 @@ import {
   getProductPromotionTariffsController,
   requestProductPromotionController,
   getMyProductPromotionsController,
+  getPendingProductPromotionsController,
+  getPendingProductPromotionsCountController,
+  approveProductPromotionController,
+  rejectProductPromotionController,
 } from "./Product/productPromotionControllers.js";
 import {
   getFeaturedRaffleController,
@@ -142,6 +146,10 @@ import {
   rejectRaffleController,
 } from "./Raffle/raffleControllers.js";
 import { markInAppNotificationsReadController } from "./User/markInAppNotificationsReadController.js";
+import {
+  registerPushTokenController,
+  removePushTokenController,
+} from "./User/pushTokenControllers.js";
 import {
   submitDataConfirmationRequestController,
   getMyDataConfirmationRequestController,
@@ -295,6 +303,10 @@ export {
   getProductPromotionTariffsController,
   requestProductPromotionController,
   getMyProductPromotionsController,
+  getPendingProductPromotionsController,
+  getPendingProductPromotionsCountController,
+  approveProductPromotionController,
+  rejectProductPromotionController,
   getFeaturedRaffleController,
   getRaffleByIdController,
   getRaffleProductsController,
@@ -311,6 +323,8 @@ export {
   approveRaffleController,
   rejectRaffleController,
   markInAppNotificationsReadController,
+  registerPushTokenController,
+  removePushTokenController,
   submitDataConfirmationRequestController,
   getMyDataConfirmationRequestController,
   getPendingDataConfirmationRequestsController,

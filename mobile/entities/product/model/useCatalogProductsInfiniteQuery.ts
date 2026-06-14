@@ -17,6 +17,12 @@ export const useCatalogProductsInfiniteQuery = (filters: CatalogListFilters) => 
         search: filters.search,
         productCategory: filters.productCategory,
         categoryId: filters.categoryId,
+        sellerPersonalCategoryId: filters.sellerPersonalCategoryId,
+        sort: filters.sort,
+        followingOnly: filters.followingOnly,
+        auctionOnly: filters.auctionOnly,
+        installmentOnly: filters.installmentOnly,
+        saleOnly: filters.saleOnly,
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {

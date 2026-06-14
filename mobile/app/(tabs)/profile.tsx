@@ -5,6 +5,10 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useLogoutMutation } from "@/entities/session/model/useLogoutMutation";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { EmailVerificationModal } from "@/features/email-verify/ui/EmailVerificationModal";
+import { ProfileHubMenu } from "@/features/profile-hub/ui/ProfileHubMenu";
+import { ThemePreferenceToggle } from "@/features/theme-settings/ui/ThemePreferenceToggle";
+import { useUnreadNotificationsCount } from "@/entities/notification/model/useInAppNotifications";
+import { useWishlist } from "@/entities/wishlist/model/WishlistProvider";
 import {
   API_CLIENT_UI,
   AUTH_UI,
@@ -12,15 +16,22 @@ import {
   EMAIL_VERIFICATION_UI,
   LEGAL_UI,
   MY_ORDERS_PAGE_UI,
+  NOTIFICATIONS_PAGE_UI,
+  MY_PROFILE_PAGE_UI,
+  USERS_PAGE_UI,
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 export default function ProfileScreen() {
   const router = useRouter();
+  const theme = useAppTheme();
   const sessionQuery = useAuthSessionQuery();
   const logoutMutation = useLogoutMutation();
   const [emailModalVisible, setEmailModalVisible] = useState(false);
+  const unreadNotifications = useUnreadNotificationsCount();
+  const { totalCount: wishlistCount } = useWishlist();
 
   const user = sessionQuery.data?.user;
   const isLoggedIn = Boolean(user);
@@ -52,9 +63,11 @@ export default function ProfileScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>{AUTH_UI.PROFILE_TITLE}</Text>
-      <Text style={styles.subtitle}>{statusLabel}</Text>
+    <ScrollView
+      contentContainerStyle={[styles.container, { backgroundColor: theme.colors.bg }]}
+    >
+      <Text style={[styles.title, { color: theme.colors.text }]}>{AUTH_UI.PROFILE_TITLE}</Text>
+      <Text style={[styles.subtitle, { color: theme.colors.textMuted }]}>{statusLabel}</Text>
 
       {needsEmailVerification ? (
         <View style={styles.banner}>
@@ -72,51 +85,88 @@ export default function ProfileScreen() {
       ) : null}
 
       {isLoggedIn ? (
-        <View style={styles.actions}>
-          <Pressable
-            style={styles.button}
-            onPress={() => router.push({ pathname: "/profile/edit" })}
-          >
-            <Text style={styles.buttonText}>{EDIT_PROFILE_UI.EDIT_BUTTON}</Text>
-          </Pressable>
-          <Pressable
-            style={styles.button}
-            onPress={() => router.push({ pathname: "/orders" })}
-          >
-            <Text style={styles.buttonText}>{MY_ORDERS_PAGE_UI.TITLE}</Text>
-          </Pressable>
-          <Pressable
-            style={[styles.button, styles.buttonSecondary]}
-            onPress={handleLogout}
-            disabled={logoutMutation.isPending}
-          >
-            <Text style={[styles.buttonText, styles.buttonSecondaryText]}>
-              {AUTH_UI.LOGOUT_BUTTON}
-            </Text>
-          </Pressable>
-        </View>
+        <>
+          <View style={styles.quickActions}>
+            <Pressable
+              style={[styles.button, { backgroundColor: theme.colors.nearBlack }]}
+              onPress={() => router.push("/hub/overview" as never)}
+            >
+              <Text style={styles.buttonText}>{MY_PROFILE_PAGE_UI.TAB_OVERVIEW}</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.button, { backgroundColor: theme.colors.nearBlack }]}
+              onPress={() => router.push("/users" as never)}
+            >
+              <Text style={styles.buttonText}>{USERS_PAGE_UI.OPEN_BUTTON}</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.button, { backgroundColor: theme.colors.nearBlack }]}
+              onPress={() => router.push("/notifications" as never)}
+            >
+              <Text style={styles.buttonText}>
+                {NOTIFICATIONS_PAGE_UI.OPEN_BUTTON}
+                {unreadNotifications > 0 ? ` (${unreadNotifications})` : ""}
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[styles.button, { backgroundColor: theme.colors.nearBlack }]}
+              onPress={() => router.push("/hub/wishlist")}
+            >
+              <Text style={styles.buttonText}>
+                {MY_PROFILE_PAGE_UI.TAB_WISHLIST}
+                {wishlistCount > 0 ? ` (${wishlistCount})` : ""}
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[styles.button, { backgroundColor: theme.colors.nearBlack }]}
+              onPress={() => router.push({ pathname: "/profile/edit" })}
+            >
+              <Text style={styles.buttonText}>{EDIT_PROFILE_UI.EDIT_BUTTON}</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.button, { backgroundColor: theme.colors.nearBlack }]}
+              onPress={() => router.push({ pathname: "/orders" })}
+            >
+              <Text style={styles.buttonText}>{MY_ORDERS_PAGE_UI.TITLE}</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.button, styles.buttonSecondary, { borderColor: theme.colors.nearBlack }]}
+              onPress={handleLogout}
+              disabled={logoutMutation.isPending}
+            >
+              <Text style={[styles.buttonText, styles.buttonSecondaryText, { color: theme.colors.nearBlack }]}>
+                {AUTH_UI.LOGOUT_BUTTON}
+              </Text>
+            </Pressable>
+          </View>
+          <ProfileHubMenu />
+        </>
       ) : (
         <View style={styles.authActions}>
-          <Pressable style={styles.button} onPress={() => router.push("/(auth)/login")}>
+          <Pressable
+            style={[styles.button, { backgroundColor: theme.colors.nearBlack }]}
+            onPress={() => router.push("/(auth)/login")}
+          >
             <Text style={styles.buttonText}>{AUTH_UI.LOGIN_BUTTON}</Text>
           </Pressable>
           <Pressable
-            style={[styles.button, styles.buttonSecondary]}
+            style={[styles.button, styles.buttonSecondary, { borderColor: theme.colors.nearBlack }]}
             onPress={() => router.push("/(auth)/register")}
           >
-            <Text style={[styles.buttonText, styles.buttonSecondaryText]}>
+            <Text style={[styles.buttonText, styles.buttonSecondaryText, { color: theme.colors.nearBlack }]}>
               {AUTH_UI.REGISTER_BUTTON}
             </Text>
           </Pressable>
         </View>
       )}
 
-      <Pressable
-        style={styles.legalLink}
-        onPress={() => router.push("/legal/privacy")}
-      >
-        <Text style={styles.legalLinkText}>{LEGAL_UI.PRIVACY_LINK}</Text>
+      <Pressable style={styles.legalLink} onPress={() => router.push("/legal/privacy")}>
+        <Text style={[styles.legalLinkText, { color: theme.colors.link }]}>
+          {LEGAL_UI.PRIVACY_LINK}
+        </Text>
       </Pressable>
+
+      <ThemePreferenceToggle />
 
       <EmailVerificationModal
         visible={emailModalVisible}
@@ -132,8 +182,9 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     padding: 24,
+    paddingBottom: 48,
   },
   title: {
     fontSize: 24,
@@ -142,7 +193,6 @@ const styles = StyleSheet.create({
   subtitle: {
     marginTop: 12,
     fontSize: 16,
-    color: "#666",
     textAlign: "center",
   },
   banner: {
@@ -169,7 +219,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "600",
   },
-  actions: {
+  quickActions: {
     marginTop: 24,
     width: "100%",
     maxWidth: 320,
@@ -182,7 +232,6 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   button: {
-    backgroundColor: "#111",
     borderRadius: 10,
     paddingVertical: 14,
     paddingHorizontal: 24,
@@ -192,16 +241,13 @@ const styles = StyleSheet.create({
   buttonSecondary: {
     backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: "#111",
   },
   buttonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "600",
   },
-  buttonSecondaryText: {
-    color: "#111",
-  },
+  buttonSecondaryText: {},
   error: {
     marginTop: 12,
     color: "#c62828",
@@ -213,7 +259,6 @@ const styles = StyleSheet.create({
   },
   legalLinkText: {
     fontSize: 14,
-    color: "#1565c0",
     textDecorationLine: "underline",
   },
 });

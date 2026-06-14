@@ -1,20 +1,28 @@
 import { useRouter } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { PRODUCT_UI } from "@/shared/config";
-import { formatPriceRub } from "@/shared/lib";
+import { useProductCardChromeFlags } from "@/entities/product/lib/useProductCardChromeFlags";
+import { resolveProductImageUrl } from "@/entities/product/lib/resolveProductImageUrl";
+import { ProductCatalogStatusBadges } from "@/entities/product/ui/ProductCatalogStatusBadges";
+import {
+  ProductDiscountBadge,
+  ProductPriceDisplay,
+} from "@/entities/product/ui/ProductPriceDisplay";
+import { WishlistToggleButton } from "@/features/wishlist-toggle/ui/WishlistToggleButton";
+import { PRODUCT_CARD_UI, PRODUCT_UI } from "@/shared/config";
 import { CachedProductImage } from "@/shared/ui/CachedProductImage";
 
-import { resolveProductImageUrl } from "../lib/resolveProductImageUrl";
-
 type ProductCardProps = {
-  product: {
+  product: Record<string, unknown> & {
     _id: string;
     productName?: string;
     productPrice?: number;
     productIsAvailable?: boolean;
     productImageUrls?: unknown;
     productImageUrl?: unknown;
+    productSeller?: string | { _id?: string } | null;
+    averageRating?: number;
+    reviewCount?: number;
   };
 };
 
@@ -23,37 +31,57 @@ export const ProductCard = ({ product }: ProductCardProps) => {
   const imageUrl = resolveProductImageUrl(product);
   const name = product.productName?.trim() || "Без названия";
   const isAvailable = product.productIsAvailable !== false;
+  const flags = useProductCardChromeFlags(product);
+  const averageRating = Number(product.averageRating);
+  const reviewCount = Number(product.reviewCount);
+  const showRating =
+    Number.isFinite(averageRating) && Number.isFinite(reviewCount) && reviewCount > 0;
 
   const handlePress = () => {
     router.push({ pathname: "/product/[id]", params: { id: product._id } });
   };
 
   return (
-    <Pressable
-      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
-      onPress={handlePress}
-      accessibilityRole="button"
-      accessibilityLabel={PRODUCT_UI.OPEN_ARIA(name)}
-    >
-      <View style={styles.imageWrap}>
-        <CachedProductImage uri={imageUrl} style={styles.image} />
-        {!isAvailable ? (
-          <View style={styles.unavailableBadge}>
-            <Text style={styles.unavailableText}>{PRODUCT_UI.UNAVAILABLE}</Text>
-          </View>
+    <View style={styles.card}>
+      <Pressable
+        style={({ pressed }) => [styles.pressable, pressed && styles.cardPressed]}
+        onPress={handlePress}
+        accessibilityRole="button"
+        accessibilityLabel={PRODUCT_UI.OPEN_ARIA(name)}
+      >
+        <View style={styles.imageWrap}>
+          <CachedProductImage uri={imageUrl} style={styles.image} />
+          {flags.showDiscountBadge ? (
+            <ProductDiscountBadge product={product} variant="overlay" />
+          ) : null}
+          {!isAvailable ? (
+            <View style={styles.unavailableBadge}>
+              <Text style={styles.unavailableText}>{PRODUCT_UI.UNAVAILABLE}</Text>
+            </View>
+          ) : null}
+        </View>
+        <Text style={styles.name} numberOfLines={2}>
+          {name}
+        </Text>
+        <ProductPriceDisplay product={product} showLabel={false} variant="card" />
+        {showRating ? (
+          <Text style={styles.rating}>
+            {PRODUCT_CARD_UI.RATING_LINE(averageRating, reviewCount)}
+          </Text>
         ) : null}
+        <ProductCatalogStatusBadges product={product} />
+      </Pressable>
+      <View style={styles.wishlistSlot}>
+        <WishlistToggleButton productId={product._id} product={product} variant="card" />
       </View>
-      <Text style={styles.name} numberOfLines={2}>
-        {name}
-      </Text>
-      <Text style={styles.price}>{formatPriceRub(product.productPrice)}</Text>
-    </Pressable>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
     flex: 1,
+    position: "relative",
     margin: 6,
     padding: 8,
     borderRadius: 12,
@@ -61,8 +89,17 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: "#e5e5e5",
   },
+  pressable: {
+    flex: 1,
+  },
   cardPressed: {
     opacity: 0.85,
+  },
+  wishlistSlot: {
+    position: "absolute",
+    top: 16,
+    right: 16,
+    zIndex: 2,
   },
   imageWrap: {
     aspectRatio: 1,
@@ -93,10 +130,9 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: "#222",
   },
-  price: {
+  rating: {
     marginTop: 4,
-    fontSize: 15,
-    fontWeight: "700",
-    color: "#111",
+    fontSize: 12,
+    color: "#666",
   },
 });

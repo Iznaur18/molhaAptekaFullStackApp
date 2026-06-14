@@ -48,3 +48,18 @@ export const requestProductPromotionBodySchema = z.object({
 export const myProductPromotionsQuerySchema = z.object({
   status: z.enum(PRODUCT_PROMOTION_STATUSES).optional(),
 });
+
+const PRODUCT_PROMOTION_REJECT_COMMENT_MAX_CHARS = 500;
+
+export const rejectProductPromotionBodySchema = z.object({
+  comment: z
+    .union([z.string(), z.null()])
+    .optional()
+    .refine(
+      (value) =>
+        value === undefined ||
+        value === null ||
+        value.length <= PRODUCT_PROMOTION_REJECT_COMMENT_MAX_CHARS,
+      `comment не длиннее ${PRODUCT_PROMOTION_REJECT_COMMENT_MAX_CHARS} символов`,
+    ),
+});

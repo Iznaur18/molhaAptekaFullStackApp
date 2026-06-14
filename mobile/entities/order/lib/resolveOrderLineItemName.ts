@@ -1,6 +1,8 @@
+import { ORDER_CARD_UI } from "@/shared/config";
+
 export const resolveOrderLineItemName = (item: unknown): string => {
   if (!item || typeof item !== "object") {
-    return "Товар";
+    return ORDER_CARD_UI.DELETED_PRODUCT_NAME;
   }
 
   const source = item as {
@@ -8,18 +10,18 @@ export const resolveOrderLineItemName = (item: unknown): string => {
     productId?: { productName?: string } | string;
   };
 
-  const atOrder = source.productNameAtOrder?.trim();
-  if (atOrder) {
-    return atOrder;
-  }
-
-  const product = source.productId;
-  if (product && typeof product === "object" && "productName" in product) {
-    const name = (product as { productName?: string }).productName?.trim();
+  const populated = source.productId;
+  if (populated != null && typeof populated === "object") {
+    const name = populated.productName?.trim();
     if (name) {
       return name;
     }
   }
 
-  return "Товар";
+  const atOrder = source.productNameAtOrder?.trim();
+  if (atOrder) {
+    return atOrder;
+  }
+
+  return ORDER_CARD_UI.DELETED_PRODUCT_NAME;
 };
