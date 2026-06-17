@@ -17,6 +17,7 @@
     },
     "android": {
       "package": "ru.izibuy.app",
+      "screenOrientation": "portrait",
       "usesCleartextTraffic": true,
       "intentFilters": [
         {

@@ -2,6 +2,7 @@ import { apiClient } from "../../../shared/api/index.js";
 import { parseCatalogProductsPageData } from "../../../shared/api/parseApiContract.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 import { CATALOG_PAGE_SIZE } from "../model/productConstants.js";
+import { formatApiErrorMessage } from "@izibuy/shared-lib";
 
 /**
  * Одна страница `GET /product` (пагинация + поиск + категория на сервере).
@@ -71,8 +72,6 @@ export async function fetchCatalogProductsPage({
       },
     };
   } catch (e) {
-    const message =
-      e?.response?.data?.message ?? e?.message ?? API_CLIENT_UI.FETCH_PRODUCTS_FALLBACK;
-    throw new Error(message);
+    throw new Error(formatApiErrorMessage(e, API_CLIENT_UI.FETCH_PRODUCTS_FALLBACK));
   }
 }

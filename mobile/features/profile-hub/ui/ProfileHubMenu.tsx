@@ -3,7 +3,9 @@ import { useMemo } from "react";
 import { Pressable, Text, View } from "react-native";
 
 import { buildProfileNavGroups } from "@/features/profile-hub/model/buildProfileNavGroups";
+import { openProfileStaffWebSection } from "@/features/profile-hub/lib/openProfileStaffWebSection";
 import {
+  isProfileStaffWebOnlySection,
   PROFILE_SECTION_OVERVIEW,
   resolveProfileSectionRoute,
   type ProfileSectionId,
@@ -16,14 +18,19 @@ import { useProfileHubMenuStyles } from "@/shared/theme/profileChromeStyles";
 import type { ProfileNavItem } from "../model/buildProfileNavGroups";
 
 type ProfileHubMenuProps = {
+  activeSectionId?: ProfileSectionId;
   onOverviewPress?: () => void;
+  onNavigate?: () => void;
+  variant?: "inline" | "sheet";
 };
 
 const ProfileHubNavItem = ({
   item,
+  isActive,
   onPress,
 }: {
   item: ProfileNavItem;
+  isActive: boolean;
   onPress: () => void;
 }) => {
   const styles = useProfileHubMenuStyles();
@@ -34,15 +41,18 @@ const ProfileHubNavItem = ({
     <Pressable
       style={[
         styles.item,
+        isActive && styles.itemActive,
         isCta && styles.itemCta,
         isDisabled && styles.itemDisabled,
       ]}
       onPress={onPress}
       disabled={isDisabled}
+      accessibilityState={{ selected: isActive }}
     >
       <Text
         style={[
           styles.itemLabel,
+          isActive && styles.itemLabelActive,
           isCta && styles.itemLabelCta,
           isDisabled && styles.itemLabelDisabled,
         ]}
@@ -61,7 +71,12 @@ const ProfileHubNavItem = ({
   );
 };
 
-export const ProfileHubMenu = ({ onOverviewPress }: ProfileHubMenuProps) => {
+export const ProfileHubMenu = ({
+  activeSectionId,
+  onOverviewPress,
+  onNavigate,
+  variant = "inline",
+}: ProfileHubMenuProps) => {
   const router = useRouter();
   const styles = useProfileHubMenuStyles();
   const hubAccess = useProfileHubAccess();
@@ -72,15 +87,22 @@ export const ProfileHubMenu = ({ onOverviewPress }: ProfileHubMenuProps) => {
     [hubAccess, badgeCounts],
   );
 
-  const openSection = (sectionId: ProfileSectionId) => {
+  const openSection = async (sectionId: ProfileSectionId) => {
     if (sectionId === PROFILE_SECTION_OVERVIEW) {
       onOverviewPress?.();
+      return;
+    }
+
+    if (isProfileStaffWebOnlySection(sectionId)) {
+      await openProfileStaffWebSection(sectionId);
+      onNavigate?.();
       return;
     }
 
     const route = resolveProfileSectionRoute(sectionId);
     if (route) {
       router.push(route as never);
+      onNavigate?.();
     }
   };
 
@@ -89,7 +111,10 @@ export const ProfileHubMenu = ({ onOverviewPress }: ProfileHubMenuProps) => {
   }
 
   return (
-    <View style={styles.root}>
+    <View
+      style={[styles.root, variant === "sheet" && styles.rootSheet]}
+      accessibilityLabel={MY_PROFILE_PAGE_UI.NAV_ARIA}
+    >
       <Text style={styles.heading}>{MY_PROFILE_PAGE_UI.TAB_TITLE}</Text>
       {navGroups.map((group) => (
         <View key={group.id} style={styles.group}>
@@ -98,6 +123,7 @@ export const ProfileHubMenu = ({ onOverviewPress }: ProfileHubMenuProps) => {
             <ProfileHubNavItem
               key={item.sectionId}
               item={item}
+              isActive={activeSectionId === item.sectionId}
               onPress={() => openSection(item.sectionId)}
             />
           ))}

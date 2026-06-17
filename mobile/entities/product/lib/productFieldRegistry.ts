@@ -1,3 +1,37 @@
+export type ProductFieldReadLayout = "price" | "stat" | "block" | "meta" | "default";
+
+const FIELD_LAYOUTS: Record<string, ProductFieldReadLayout> = {
+  productPrice: "price",
+  productCategory: "stat",
+  productSaleCity: "stat",
+  productStockQuantity: "stat",
+  soldQuantity: "stat",
+  uniqueViewerCount: "stat",
+  productWishlistCount: "stat",
+  productDescription: "block",
+  _id: "meta",
+  createdAt: "meta",
+  updatedAt: "meta",
+};
+
+export const PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS = [
+  "productPrice",
+  "productCategory",
+  "productSaleCity",
+  "productStockQuantity",
+  "soldQuantity",
+  "uniqueViewerCount",
+  "productWishlistCount",
+] as const;
+
+export const PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS = [
+  "productDescription",
+  "_id",
+  "createdAt",
+  "updatedAt",
+] as const;
+
+/** @deprecated use PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS without productPrice */
 export const PRODUCT_DETAILS_TOP_ROW_FIELD_KEYS = [
   "productCategory",
   "productSaleCity",
@@ -6,6 +40,11 @@ export const PRODUCT_DETAILS_TOP_ROW_FIELD_KEYS = [
   "uniqueViewerCount",
   "productWishlistCount",
 ] as const;
+
+export const getProductFieldReadLayout = (key: string): ProductFieldReadLayout =>
+  FIELD_LAYOUTS[key] ?? "default";
+
+export const isProductFieldMultilineRead = (key: string): boolean => key === "productDescription";
 
 export const getProductFieldLabel = (key: string): string => {
   const labels: Record<string, string> = {
@@ -16,6 +55,8 @@ export const getProductFieldLabel = (key: string): string => {
     uniqueViewerCount: "Просмотры",
     productWishlistCount: "В желаниях",
     productDescription: "Описание",
+    productPrice: "Цена",
+    _id: "ID",
     createdAt: "Создан",
     updatedAt: "Обновлён",
   };

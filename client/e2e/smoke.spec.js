@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./helpers/test.js";
 
 test("главная: кнопка «Войти» и загрузка каталога", async ({ page }) => {
   const healthResponse = await page.request.get("http://127.0.0.1:4444/health");

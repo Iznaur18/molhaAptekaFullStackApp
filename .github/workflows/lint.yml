@@ -6,6 +6,7 @@ on:
       - "client/**"
       - "server/**"
       - "contract/**"
+      - "packages/**"
       - "package.json"
       - "package-lock.json"
       - "eslint.config.js"
@@ -17,6 +18,7 @@ on:
       - "client/**"
       - "server/**"
       - "contract/**"
+      - "packages/**"
       - "package.json"
       - "package-lock.json"
       - "eslint.config.js"
@@ -46,3 +48,9 @@ jobs:
 
       - name: ESLint
         run: npm run lint
+
+      - name: Verify design tokens parity
+        run: npm run verify:design-tokens
+
+      - name: Package unit tests (contract + shared-lib)
+        run: npm run test:packages

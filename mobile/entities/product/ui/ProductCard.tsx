@@ -1,15 +1,20 @@
 import { useRouter } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 
+import { formatProductReviewRatingLine } from "@/entities/product-review/lib/formatProductReviewRatingLine";
+import { useUserAccess } from "@/entities/access/model/useUserAccess";
+import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useProductCardChromeFlags } from "@/entities/product/lib/useProductCardChromeFlags";
 import { resolveProductImageUrl } from "@/entities/product/lib/resolveProductImageUrl";
 import { ProductCatalogStatusBadges } from "@/entities/product/ui/ProductCatalogStatusBadges";
+import { ProductCardSellerRow } from "@/entities/product/ui/ProductCardSellerRow";
 import {
   ProductDiscountBadge,
   ProductPriceDisplay,
 } from "@/entities/product/ui/ProductPriceDisplay";
+import { ProductLoyaltyPointsBadge } from "@/entities/product/ui/ProductLoyaltyPointsBadge";
 import { WishlistToggleButton } from "@/features/wishlist-toggle/ui/WishlistToggleButton";
-import { PRODUCT_CARD_UI, PRODUCT_UI } from "@/shared/config";
+import { PRODUCT_REVIEW_UI, PRODUCT_UI } from "@/shared/config";
 import { useProductCardStyles } from "@/shared/theme/catalogProductStyles";
 import { CachedProductImage } from "@/shared/ui/CachedProductImage";
 
@@ -30,14 +35,13 @@ type ProductCardProps = {
 export const ProductCard = ({ product }: ProductCardProps) => {
   const router = useRouter();
   const styles = useProductCardStyles();
+  const { isPremiumUser } = useUserAccess();
+  const isAuthorized = useIsAuthorized();
+  const flags = useProductCardChromeFlags(product);
   const imageUrl = resolveProductImageUrl(product);
   const name = product.productName?.trim() || "Без названия";
-  const isAvailable = product.productIsAvailable !== false;
-  const flags = useProductCardChromeFlags(product);
-  const averageRating = Number(product.averageRating);
-  const reviewCount = Number(product.reviewCount);
-  const showRating =
-    Number.isFinite(averageRating) && Number.isFinite(reviewCount) && reviewCount > 0;
+  const reviewLine = formatProductReviewRatingLine(product.averageRating, product.reviewCount);
+  const hasReviewRating = reviewLine.length > 0;
 
   const handlePress = () => {
     router.push({ pathname: "/product/[id]", params: { id: product._id } });
@@ -53,26 +57,49 @@ export const ProductCard = ({ product }: ProductCardProps) => {
       >
         <View style={styles.imageWrap}>
           <CachedProductImage uri={imageUrl} style={styles.image} />
-          {flags.showDiscountBadge ? (
-            <ProductDiscountBadge product={product} variant="overlay" />
-          ) : null}
-          {!isAvailable ? (
-            <View style={styles.unavailableBadge}>
-              <Text style={styles.unavailableText}>{PRODUCT_UI.UNAVAILABLE}</Text>
+          {flags.showDiscountBadge || flags.showLoyaltyPointsBadge ? (
+            <View style={styles.imageBadges} pointerEvents="box-none">
+              {flags.showDiscountBadge ? (
+                <ProductDiscountBadge product={product} variant="overlay" />
+              ) : null}
+              {flags.showLoyaltyPointsBadge ? (
+                <ProductLoyaltyPointsBadge
+                  product={product}
+                  isAuthorized={isAuthorized}
+                  isPremiumUser={isPremiumUser}
+                  variant="overlay"
+                />
+              ) : null}
             </View>
           ) : null}
         </View>
-        <Text style={styles.name} numberOfLines={2}>
-          {name}
-        </Text>
-        <ProductPriceDisplay product={product} showLabel={false} variant="card" />
-        {showRating ? (
-          <Text style={styles.rating}>
-            {PRODUCT_CARD_UI.RATING_LINE(averageRating, reviewCount)}
+
+        <View style={styles.content}>
+          <Text style={styles.name} numberOfLines={1}>
+            {name}
           </Text>
-        ) : null}
-        <ProductCatalogStatusBadges product={product} />
+
+          <ProductPriceDisplay product={product} showLabel={false} variant="card" />
+
+          <View style={styles.metaStrip}>
+            <Text
+              style={[styles.rating, !hasReviewRating && styles.ratingPlaceholder]}
+              numberOfLines={1}
+              accessibilityLabel={hasReviewRating ? reviewLine : PRODUCT_REVIEW_UI.NO_REVIEWS}
+            >
+              {hasReviewRating ? reviewLine : PRODUCT_REVIEW_UI.NO_REVIEWS}
+            </Text>
+
+            <ProductCatalogStatusBadges
+              product={product}
+              showHiddenBadge={product.productIsAvailable === false}
+            />
+          </View>
+
+          <ProductCardSellerRow product={product} />
+        </View>
       </Pressable>
+
       <View style={styles.wishlistSlot}>
         <WishlistToggleButton productId={product._id} product={product} variant="card" />
       </View>

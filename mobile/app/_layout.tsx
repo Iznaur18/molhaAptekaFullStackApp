@@ -91,7 +91,7 @@ function RootLayoutNav() {
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="product/[id]" options={{ title: "Товар" }} />
+        <Stack.Screen name="product/[id]" options={{ headerShown: false }} />
         <Stack.Screen name="orders" options={{ headerShown: false }} />
         <Stack.Screen name="profile" options={{ headerShown: false }} />
         <Stack.Screen name="hub/[section]" options={{ title: "Раздел" }} />

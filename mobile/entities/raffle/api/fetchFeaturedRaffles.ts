@@ -2,12 +2,9 @@ import { apiClient } from "@/shared/api";
 import { API_CLIENT_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 
-export type FeaturedRaffle = {
-  _id: string;
-  title?: string;
-  description?: string;
-  status?: string;
-};
+import type { RaffleFromApi } from "../model/types";
+
+export type FeaturedRaffle = RaffleFromApi;
 
 export const fetchFeaturedRaffles = async (): Promise<FeaturedRaffle[]> => {
   try {

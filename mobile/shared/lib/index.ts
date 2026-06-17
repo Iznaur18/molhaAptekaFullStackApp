@@ -1,7 +1,9 @@
-import { formatApiErrorMessage, formatPriceRub } from "@izibuy/shared-lib";
-
-export { formatApiErrorMessage, formatPriceRub };
-export { formatIsoDateTime } from "./formatIsoDateTime";
+export {
+  formatApiErrorMessage,
+  formatIsoDateTime,
+  formatPriceRub,
+  normalizeUploadUrlForStorage,
+} from "@izibuy/shared-lib";
 export {
   isDisplayableMediaUrl,
   resolveUploadedMediaUrl,

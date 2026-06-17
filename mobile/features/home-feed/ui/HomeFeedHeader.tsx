@@ -31,6 +31,7 @@ export const HomeFeedHeader = ({ enabled }: HomeFeedHeaderProps) => {
 
   return (
     <>
+      <HomeFeaturedRafflesSection raffles={rafflesQuery.data ?? []} />
       <UserStoriesStrip
         rings={feed?.rings ?? []}
         showStrip={feed?.showStrip === true}
@@ -39,7 +40,6 @@ export const HomeFeedHeader = ({ enabled }: HomeFeedHeaderProps) => {
         currentUserId={currentUserId}
         onPublished={handleStoriesChanged}
       />
-      <HomeFeaturedRafflesSection raffles={rafflesQuery.data ?? []} />
       <HomeCuratedListsSection lists={curatedQuery.data ?? []} />
     </>
   );

@@ -1,7 +1,8 @@
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 
 import type { ProductDetailTabId } from "@/entities/product/model/useProductDetailTabs";
 import { useProductDetailTabBarStyles } from "@/shared/theme/catalogProductStyles";
+import { AppText } from "@/shared/ui/AppText";
 
 type ProductDetailTabBarProps = {
   tabs: { id: ProductDetailTabId; label: string }[];
@@ -30,7 +31,9 @@ export const ProductDetailTabBar = ({
             style={[styles.tab, isActive && styles.tabActive]}
             onPress={() => onTabChange(tab.id)}
           >
-            <Text style={[styles.tabText, isActive && styles.tabTextActive]}>{tab.label}</Text>
+            <AppText style={[styles.tabText, isActive && styles.tabTextActive]}>
+              {tab.label}
+            </AppText>
           </Pressable>
         );
       })}

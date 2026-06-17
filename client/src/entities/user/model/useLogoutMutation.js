@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { logoutUser } from "../api/logoutUser.js";
-import { authMeQueryKeys } from "./authMeQueryKeys.js";
+import { clearAuthMeCache } from "../lib/authMeQueryCache.js";
 
 export function useLogoutMutation() {
   const queryClient = useQueryClient();
@@ -9,7 +9,7 @@ export function useLogoutMutation() {
   return useMutation({
     mutationFn: logoutUser,
     onSuccess: () => {
-      queryClient.setQueryData(authMeQueryKeys.all, null);
+      clearAuthMeCache(queryClient);
     },
   });
 }

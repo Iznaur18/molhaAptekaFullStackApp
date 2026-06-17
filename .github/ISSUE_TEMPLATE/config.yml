@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Метки triage (док)
+    url: https://github.com/Iznaur18/molhaAptekaFullStackApp/blob/main/docs/bug-triage-labels.md
+    about: Классификация багов client ↔ mobile (audit §3)

@@ -1,5 +1,5 @@
 import { DEFAULT_USER_AVATAR_URL } from "@/entities/user/model/constants";
-import { normalizeUploadUrlForStorage } from "@/shared/lib/normalizeUploadUrlForStorage";
+import { normalizeUploadUrlForStorage } from "@/shared/lib";
 
 import { normalizeRuPhoneInput } from "./ruPhone";
 import type { EditProfileFormState } from "./mapUserToEditProfileForm";

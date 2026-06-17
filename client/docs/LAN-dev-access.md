@@ -22,7 +22,15 @@ npm run dev
 
 Узнать IP вручную: `ipconfig` → IPv4 у адаптера Wi‑Fi.
 
-## Брандмауэр Windows
+## Cookies и вход
+
+Cookie **привязаны к адресу в строке браузера**. `127.0.0.1`, `localhost` и `192.168.x.x` — **разные сайты**.
+
+- С телефона / по Wi‑Fi: смотри cookie для **`http://192.168.x.x`** в DevTools → Application → Cookies (не для `127.0.0.1`).
+- На LAN Chrome часто **не сохраняет** httpOnly cookie по IP — в dev сессия дублируется в `sessionStorage` (Bearer), вкладка Application → Session Storage → `dev_access_token`.
+- После смены адреса (LAN ↔ localhost) — **выйди и войди снова** на том же URL.
+
+---
 
 Разреши входящие TCP **5173** (Vite) и **4444** (API), если с телефона не открывается.
 

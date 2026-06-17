@@ -7,16 +7,17 @@ import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 type CatalogSearchBarProps = {
   value: string;
   onChange: (value: string) => void;
+  embedded?: boolean;
 };
 
-export const CatalogSearchBar = ({ value, onChange }: CatalogSearchBarProps) => {
+export const CatalogSearchBar = ({ value, onChange, embedded = false }: CatalogSearchBarProps) => {
   const styles = useCatalogSearchBarStyles();
   const theme = useAppTheme();
 
   return (
-    <View style={styles.wrap}>
+    <View style={[styles.wrap, embedded && styles.wrapEmbedded]}>
       <TextInput
-        style={styles.input}
+        style={[styles.input, embedded && styles.inputEmbedded]}
         value={value}
         onChangeText={onChange}
         placeholder={CATALOG_FILTER_UI.SEARCH_PLACEHOLDER}

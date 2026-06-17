@@ -4,7 +4,7 @@ export {
   getAccessToken,
   getRefreshToken,
   setAuthTokens,
-} from "./authTokenStorage";
+} from "./mobile-auth-storage";
 export {
   parseAddressSuggestionsData,
   parseApiContractData,

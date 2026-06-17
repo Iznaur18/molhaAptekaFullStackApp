@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "workspaces": [
+    "client",
     "packages/*",
     "mobile"
   ],
@@ -11,6 +12,11 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "verify:design-tokens": "node scripts/verify-design-tokens-parity.mjs",
+    "verify:profile-sections": "node scripts/verify-profile-sections-parity.mjs",
+    "test:contract": "npm test --prefix contract",
+    "test:shared-lib": "npm test --workspace=@izibuy/shared-lib",
+    "test:packages": "npm run test:contract && npm run test:shared-lib",
     "sync:legal": "node scripts/sync-legal-operator.mjs",
     "generate:intro-poster": "node scripts/generate-intro-poster.mjs"
   },

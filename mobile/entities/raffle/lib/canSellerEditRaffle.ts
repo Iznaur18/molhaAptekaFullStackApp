@@ -1,6 +1,9 @@
 import type { MyRaffleRecord } from "@/entities/raffle/api/fetchMyRaffle";
+import type { RaffleFromApi } from "@/entities/raffle/model/types";
 
-export const canSellerEditRaffle = (raffle: MyRaffleRecord | null | undefined): boolean => {
+type EditableRaffle = MyRaffleRecord | RaffleFromApi | null | undefined;
+
+export const canSellerEditRaffle = (raffle: EditableRaffle): boolean => {
   if (!raffle) {
     return false;
   }

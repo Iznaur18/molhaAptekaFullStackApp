@@ -94,7 +94,7 @@ export const CreateRafflePage = () => {
         prizeMediaType,
         prizeImageUrl: resolveUploadedMediaUrl(prizeImageUrl.trim()),
         prizeVideoUrl: resolveUploadedMediaUrl(prizeVideoUrl.trim()),
-        prizeImageFocus: { x: 0.5, y: 0.5 },
+        prizeImageFocus: { x: 50, y: 50 },
         targetSales: sales,
         instagramUrl: instagramUrl.trim(),
       });

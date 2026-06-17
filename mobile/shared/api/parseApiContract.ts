@@ -1,68 +1,64 @@
 import {
   authMeDataSchema,
-  authSessionDataSchema,
   catalogProductsPageDataSchema,
-  createOrderDataSchema,
   myIntroAdCampaignDataSchema,
   mySellerPersonalCategoryCampaignDataSchema,
   orderFromApiSchema,
   parseApiSuccess,
   productFromApiSchema,
-  productWriteDataSchema,
-  replaceCartDataSchema,
   userPublicProfileSchema,
-  userSellerProductsPageDataSchema,
 } from "@molha/api-contract";
+import {
+  parseApiContractData as parseSharedApiContractData,
+  parseAuthMeData as parseSharedAuthMeData,
+  parseAuthSessionData as parseSharedAuthSessionData,
+  parseCatalogProductsPageData as parseSharedCatalogProductsPageData,
+  parseCreateOrderData as parseSharedCreateOrderData,
+  parseCreateProductData as parseSharedCreateProductData,
+  parsePatchMyProductData as parseSharedPatchMyProductData,
+  parseReplaceCartData as parseSharedReplaceCartData,
+  parseUserSellerProductsPageData as parseSharedUserSellerProductsPageData,
+} from "@izibuy/shared-api";
 import { z } from "zod";
 import type { z as zod } from "zod";
 
 import { API_CLIENT_UI } from "@/shared/config";
 
-const toContractClientError = (error: unknown): Error => {
-  if (error instanceof Error && error.message === "INVALID_API_ENVELOPE") {
-    return new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
-  }
-  if (error instanceof Error && error.message === "INVALID_API_DATA") {
-    return new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
-  }
-  return error instanceof Error ? error : new Error(String(error));
-};
-
 export const parseApiContractData = <T extends zod.ZodTypeAny>(
   payload: unknown,
   dataSchema: T,
 ): zod.infer<T> => {
-  try {
-    return parseApiSuccess(payload, dataSchema);
-  } catch (error) {
-    throw toContractClientError(error);
-  }
+  return parseSharedApiContractData(
+    payload,
+    dataSchema,
+    API_CLIENT_UI.INVALID_SERVER_RESPONSE,
+  );
 };
 
 export const parseAuthMeData = (payload: unknown) =>
-  parseApiContractData(payload, authMeDataSchema);
+  parseSharedAuthMeData(payload, API_CLIENT_UI.INVALID_SERVER_RESPONSE);
 
 export const parseAuthSessionData = (payload: unknown) =>
-  parseApiContractData(payload, authSessionDataSchema);
+  parseSharedAuthSessionData(payload, API_CLIENT_UI.INVALID_SERVER_RESPONSE);
 
 const catalogProductDataSchema = z.object({
   product: productFromApiSchema,
 });
 
 export const parseCatalogProductsPageData = (payload: unknown) =>
-  parseApiContractData(payload, catalogProductsPageDataSchema);
+  parseSharedCatalogProductsPageData(payload, API_CLIENT_UI.INVALID_SERVER_RESPONSE);
 
 export const parseCatalogProductByIdData = (payload: unknown) =>
   parseApiContractData(payload, catalogProductDataSchema).product;
 
 export const parseMyCartData = (payload: unknown) =>
-  parseApiContractData(payload, replaceCartDataSchema);
+  parseSharedReplaceCartData(payload, API_CLIENT_UI.INVALID_SERVER_RESPONSE);
 
 export const parseReplaceCartData = (payload: unknown) =>
-  parseApiContractData(payload, replaceCartDataSchema);
+  parseSharedReplaceCartData(payload, API_CLIENT_UI.INVALID_SERVER_RESPONSE);
 
 export const parseCreateOrderData = (payload: unknown) =>
-  parseApiContractData(payload, createOrderDataSchema);
+  parseSharedCreateOrderData(payload, API_CLIENT_UI.INVALID_SERVER_RESPONSE);
 
 const myOrdersDataSchema = z.object({
   orders: z.array(orderFromApiSchema),
@@ -174,10 +170,10 @@ export const parsePatchUserProfileData = (payload: unknown) => {
 };
 
 export const parseCreateProductData = (payload: unknown) =>
-  parseApiContractData(payload, productWriteDataSchema);
+  parseSharedCreateProductData(payload, API_CLIENT_UI.INVALID_SERVER_RESPONSE);
 
 export const parsePatchMyProductData = (payload: unknown) =>
-  parseApiContractData(payload, productWriteDataSchema);
+  parseSharedPatchMyProductData(payload, API_CLIENT_UI.INVALID_SERVER_RESPONSE);
 
 const mySalesDataSchema = z.object({
   orders: z.array(orderFromApiSchema),
@@ -210,4 +206,7 @@ export const parseUserProfileByIdData = (payload: unknown) =>
   parseApiContractData(payload, userProfileEnvelopeSchema).user;
 
 export const parseUserSellerProductsPageData = (payload: unknown) =>
-  parseApiContractData(payload, userSellerProductsPageDataSchema);
+  parseSharedUserSellerProductsPageData(
+    payload,
+    API_CLIENT_UI.INVALID_SERVER_RESPONSE,
+  );

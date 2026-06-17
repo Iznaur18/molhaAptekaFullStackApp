@@ -1,8 +1,9 @@
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
 import { PRODUCT_CARD_UI } from "@/shared/config";
 import { formatPriceRub } from "@/shared/lib";
 import { useProductPriceStyles } from "@/shared/theme/catalogProductStyles";
+import { AppText } from "@/shared/ui/AppText";
 
 import {
   hasProductCatalogDiscount,
@@ -17,7 +18,7 @@ type ProductPriceDisplayProps = {
     discountPercent?: number | null;
   };
   showLabel?: boolean;
-  variant?: "card" | "inline";
+  variant?: "card" | "inline" | "detail";
 };
 
 export const ProductPriceDisplay = ({
@@ -28,15 +29,31 @@ export const ProductPriceDisplay = ({
   const styles = useProductPriceStyles();
   const hasDiscount = hasProductCatalogDiscount(product);
   const currentPriceText = formatPriceRub(Math.floor(Number(product.productPrice)));
+  const isDetail = variant === "detail";
+  const rootStyle = isDetail ? styles.detailRoot : variant === "inline" ? styles.inlineRoot : styles.cardRoot;
+  const currentStyle = [
+    styles.current,
+    variant === "card" && styles.cardCurrent,
+    isDetail && styles.detailCurrent,
+  ];
+  const oldStyle = [
+    styles.old,
+    variant === "card" && styles.cardOld,
+    isDetail && styles.detailOld,
+  ];
 
   return (
-    <View style={variant === "inline" ? styles.inlineRoot : styles.cardRoot}>
-      {showLabel ? <Text style={styles.label}>{getProductFieldLabel("productPrice")}</Text> : null}
-      <Text style={[styles.current, variant === "card" && styles.cardCurrent]}>
+    <View style={rootStyle}>
+      {showLabel ? (
+        <AppText style={styles.label}>{getProductFieldLabel("productPrice")}</AppText>
+      ) : null}
+      <AppText style={currentStyle} numberOfLines={1}>
         {currentPriceText}
-      </Text>
+      </AppText>
       {hasDiscount ? (
-        <Text style={styles.old}>{formatPriceRub(Math.floor(Number(product.productOldPrice)))}</Text>
+        <AppText style={oldStyle} numberOfLines={1}>
+          {formatPriceRub(Math.floor(Number(product.productOldPrice)))}
+        </AppText>
       ) : null}
     </View>
   );
@@ -48,7 +65,7 @@ type ProductDiscountBadgeProps = {
     productOldPrice?: number | null;
     discountPercent?: number | null;
   };
-  variant?: "inline" | "overlay";
+  variant?: "inline" | "overlay" | "detail";
 };
 
 export const ProductDiscountBadge = ({ product, variant = "inline" }: ProductDiscountBadgeProps) => {
@@ -59,8 +76,22 @@ export const ProductDiscountBadge = ({ product, variant = "inline" }: ProductDis
   }
 
   return (
-    <View style={[styles.badge, variant === "overlay" && styles.badgeOverlay]}>
-      <Text style={styles.badgeText}>{PRODUCT_CARD_UI.DISCOUNT_BADGE(discountPercent)}</Text>
+    <View
+      style={[
+        styles.badge,
+        variant === "overlay" && styles.badgeOverlay,
+        variant === "detail" && styles.detailDiscountBadge,
+      ]}
+    >
+      <AppText
+        style={[
+          styles.badgeText,
+          variant === "overlay" && styles.badgeOverlayText,
+          variant === "detail" && styles.detailDiscountText,
+        ]}
+      >
+        {PRODUCT_CARD_UI.DISCOUNT_BADGE(discountPercent)}
+      </AppText>
     </View>
   );
 };

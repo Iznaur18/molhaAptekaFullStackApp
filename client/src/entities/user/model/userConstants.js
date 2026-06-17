@@ -22,10 +22,13 @@ export { ADDRESS_LINE_MAX_LENGTH as USER_ADDRESS_MAX_CHARS } from "../../address
 /** Как `NOTES_ABOUT_USER_MAX_CHARS` в `server/utils/maxWordsText.js`. */
 export const NOTES_ABOUT_USER_MAX_CHARS = 500;
 
-/** Как в `server/models/UserModel.js` — `userRole.enum`. */
-export const USER_ROLE_USER = "user";
-export const USER_ROLE_ADMIN = "admin";
-export const USER_ROLE_MODERATOR = "moderator";
+import {
+  USER_ROLE_ADMIN,
+  USER_ROLE_MODERATOR,
+  USER_ROLE_USER,
+} from "@izibuy/shared-lib";
+
+export { USER_ROLE_ADMIN, USER_ROLE_MODERATOR, USER_ROLE_USER };
 
 export const USER_ROLE_LABEL_RU = {
   [USER_ROLE_USER]: "Пользователь",

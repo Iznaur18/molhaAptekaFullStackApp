@@ -1,21 +1,26 @@
 import { apiClient } from "../../../shared/api/index.js";
+import { resetAuthSessionState } from "../../../shared/api/apiClient.js";
+import { clearDevAuthTokens } from "../../../shared/api/devAuthTokenStorage.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
+import { formatApiErrorMessage } from "@izibuy/shared-lib";
 
 /**
- * Регистрация. JWT ставится сервером в httpOnly cookie.
+ * Регистрация. JWT: httpOnly cookie + dev Bearer (sessionStorage).
  *
  * @param {import('../model/types.js').RegisterUserPayload} payload
  */
 export async function registerUser(payload) {
   try {
+    resetAuthSessionState();
+    clearDevAuthTokens();
+    await apiClient.post("/auth/logout").catch(() => {});
+
     const { data } = await apiClient.post("/auth/register", payload);
 
     if (!data?.success || !data?.data?._id) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
   } catch (e) {
-    const message =
-      e?.response?.data?.message ?? e?.message ?? API_CLIENT_UI.REGISTER_FALLBACK;
-    throw new Error(message);
+    throw new Error(formatApiErrorMessage(e, API_CLIENT_UI.REGISTER_FALLBACK));
   }
 }

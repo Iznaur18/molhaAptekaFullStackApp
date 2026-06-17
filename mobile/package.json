@@ -3,7 +3,8 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "dependencies": {
-    "@expo/vector-icons": "^15.0.3",
+    "@expo/vector-icons": "^15.1.1",
+    "@izibuy/shared-api": "file:../packages/shared-api",
     "@izibuy/design-tokens": "file:../packages/design-tokens",
     "@izibuy/shared-lib": "file:../packages/shared-lib",
     "@molha/api-contract": "file:../contract",
@@ -32,6 +33,7 @@
     "react-native-reanimated": "~4.1.1",
     "react-native-safe-area-context": "~5.6.0",
     "react-native-screens": "~4.16.0",
+    "react-native-svg": "^15.12.1",
     "react-native-web": "~0.21.0",
     "react-native-worklets": "0.5.1",
     "zod": "^3.24.2"
@@ -68,7 +70,8 @@
     "generate:icons": "node scripts/generate-app-icons.mjs",
     "generate:store-feature-graphic": "node scripts/generate-store-feature-graphic.mjs",
     "capture:store-screenshots": "node scripts/capture-store-screenshots.mjs",
-    "regression:wf72": "node scripts/wf72-regression.mjs"
+    "regression:wf72": "node scripts/wf72-regression.mjs",
+    "smoke:buyer-path": "node scripts/buyer-path-api-smoke.mjs"
   },
   "private": true
 }

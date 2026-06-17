@@ -1,4 +1,8 @@
-import axios, { type AxiosError, type InternalAxiosRequestConfig } from "axios";
+import {
+  createJsonApiClient,
+  createRefreshSessionQueue,
+  setupAuthSessionInterceptors,
+} from "@izibuy/shared-api";
 
 import {
   API_BASE_URL,
@@ -11,33 +15,13 @@ import {
   getAccessToken,
   getRefreshToken,
   setAuthTokens,
-} from "./authTokenStorage";
+} from "./mobile-auth-storage";
 import { parseAuthSessionData } from "./parseApiContract";
 
-type AuthAwareRequestConfig = InternalAxiosRequestConfig & {
-  _authRefreshAttempted?: boolean;
-  _skipAuthRefresh?: boolean;
-};
-
-export const apiClient = axios.create({
-  baseURL: API_BASE_URL || undefined,
-  headers: {
-    "Content-Type": "application/json",
-  },
-  timeout: API_REQUEST_TIMEOUT_MS,
+export const apiClient = createJsonApiClient({
+  baseURL: API_BASE_URL,
+  timeoutMs: API_REQUEST_TIMEOUT_MS,
 });
-
-let refreshSessionPromise: Promise<void> | null = null;
-
-const shouldSkipAuthRefresh = (url?: string) => {
-  const path = String(url ?? "");
-  return (
-    path.includes("/auth/refresh") ||
-    path.includes("/auth/login") ||
-    path.includes("/auth/register") ||
-    path.includes("/auth/logout")
-  );
-};
 
 const refreshAuthSession = async (): Promise<void> => {
   const refreshToken = await getRefreshToken();
@@ -59,51 +43,15 @@ const refreshAuthSession = async (): Promise<void> => {
   });
 };
 
-const getRefreshSessionOnce = () => {
-  if (!refreshSessionPromise) {
-    refreshSessionPromise = refreshAuthSession().finally(() => {
-      refreshSessionPromise = null;
-    });
-  }
-  return refreshSessionPromise;
-};
+const getRefreshSessionOnce = createRefreshSessionQueue(refreshAuthSession);
 
-apiClient.interceptors.request.use(async (config) => {
-  if (!API_BASE_URL) {
-    return Promise.reject(new Error(API_CLIENT_UI.API_URL_MISSING));
-  }
-
-  const accessToken = await getAccessToken();
-  if (accessToken) {
-    config.headers.Authorization = `Bearer ${accessToken}`;
-  }
-
-  return config;
-});
-
-apiClient.interceptors.response.use(
-  (response) => response,
-  async (error: AxiosError) => {
-    const originalRequest = error.config as AuthAwareRequestConfig | undefined;
-
-    if (
-      error.response?.status !== 401 ||
-      !originalRequest ||
-      originalRequest._authRefreshAttempted ||
-      originalRequest._skipAuthRefresh ||
-      shouldSkipAuthRefresh(originalRequest.url)
-    ) {
-      return Promise.reject(error);
-    }
-
-    originalRequest._authRefreshAttempted = true;
-
-    try {
-      await getRefreshSessionOnce();
-      return apiClient(originalRequest);
-    } catch {
-      await clearAuthTokens();
-      return Promise.reject(error);
+setupAuthSessionInterceptors(apiClient, {
+  getAccessToken,
+  refreshSession: getRefreshSessionOnce,
+  onRequest: () => {
+    if (!API_BASE_URL) {
+      throw new Error(API_CLIENT_UI.API_URL_MISSING);
     }
   },
-);
+  onRefreshFailure: clearAuthTokens,
+});

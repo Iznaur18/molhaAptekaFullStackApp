@@ -1,6 +1,7 @@
 import { apiClient } from "../../../shared/api/index.js";
 import { parseCreateProductData } from "../../../shared/api/parseApiContract.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
+import { formatApiErrorMessage } from "@izibuy/shared-lib";
 
 /** @typedef {import('@molha/api-contract/types').CreateProductBodyContract} CreateProductBody */
 
@@ -57,8 +58,6 @@ export async function createProduct(body) {
     const parsed = parseCreateProductData(data);
     return parsed.product;
   } catch (e) {
-    const message =
-      e?.response?.data?.message ?? e?.message ?? API_CLIENT_UI.CREATE_PRODUCT_FALLBACK;
-    throw new Error(message);
+    throw new Error(formatApiErrorMessage(e, API_CLIENT_UI.CREATE_PRODUCT_FALLBACK));
   }
 }

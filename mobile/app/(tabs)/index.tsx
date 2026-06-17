@@ -1,6 +1,5 @@
-import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 import { useFocusEffect } from "@react-navigation/native";
 
@@ -11,14 +10,13 @@ import type { CatalogListFilters, CatalogSort } from "@/entities/product/model/c
 import { ProductCard } from "@/entities/product/ui/ProductCard";
 import { useCatalogProductsInfiniteQuery } from "@/entities/product/model/useCatalogProductsInfiniteQuery";
 import { CatalogCategoryChips } from "@/features/catalog-filter/ui/CatalogCategoryChips";
-import { CatalogSearchBar } from "@/features/catalog-filter/ui/CatalogSearchBar";
 import { CatalogSubcategoryChips } from "@/features/catalog-filter/ui/CatalogSubcategoryChips";
 import { consumePendingCatalogFilters } from "@/features/catalog-browser/model/pendingCatalogFilters";
+import { HomeCatalogSearchRow } from "@/features/home-feed/ui/HomeCatalogSearchRow";
 import { HomeFeedHeader } from "@/features/home-feed/ui/HomeFeedHeader";
 import { isHomeCatalogMainView } from "@/features/home-feed/lib/isHomeCatalogMainView";
 import {
   API_CLIENT_UI,
-  CATALOG_BROWSER_UI,
   CATALOG_SEARCH_DEBOUNCE_MS,
   CATALOG_SEARCH_MIN_LENGTH,
 } from "@/shared/config";
@@ -42,7 +40,6 @@ const EMPTY_FEED_FILTERS: FeedFiltersState = {
 };
 
 export default function CatalogScreen() {
-  const router = useRouter();
   const styles = useFeedScreenStyles();
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -162,20 +159,20 @@ export default function CatalogScreen() {
 
   const listHeader = (
     <View>
-      <Pressable style={styles.browserLink} onPress={() => router.push("/catalog-browser")}>
-        <Text style={styles.browserLinkText}>{CATALOG_BROWSER_UI.OPEN_BUTTON}</Text>
-      </Pressable>
-      <CatalogSearchBar value={searchInput} onChange={setSearchInput} />
-      <CatalogCategoryChips
-        chips={categoryChips}
-        selectedSlug={selectedRootSlug}
-        onSelect={handleRootCategorySelect}
-      />
-      <CatalogSubcategoryChips
-        subcategories={subcategoryChips}
-        selectedSubcategoryId={selectedSubcategoryId}
-        onSelect={setSelectedSubcategoryId}
-      />
+      {!showHomeFeed ? (
+        <>
+          <CatalogCategoryChips
+            chips={categoryChips}
+            selectedSlug={selectedRootSlug}
+            onSelect={handleRootCategorySelect}
+          />
+          <CatalogSubcategoryChips
+            subcategories={subcategoryChips}
+            selectedSubcategoryId={selectedSubcategoryId}
+            onSelect={setSelectedSubcategoryId}
+          />
+        </>
+      ) : null}
       {showHomeFeed ? <HomeFeedHeader enabled={showHomeFeed} /> : null}
     </View>
   );
@@ -183,6 +180,7 @@ export default function CatalogScreen() {
   if (catalogQuery.isPending) {
     return (
       <View style={styles.flex}>
+        <HomeCatalogSearchRow value={searchInput} onChange={setSearchInput} />
         {listHeader}
         <View style={styles.centered}>
           <ActivityIndicator size="large" />
@@ -194,6 +192,7 @@ export default function CatalogScreen() {
   if (catalogQuery.isError) {
     return (
       <View style={styles.flex}>
+        <HomeCatalogSearchRow value={searchInput} onChange={setSearchInput} />
         {listHeader}
         <ScreenErrorState
           message={formatApiErrorMessage(catalogQuery.error, API_CLIENT_UI.CATALOG_ERROR)}
@@ -204,30 +203,33 @@ export default function CatalogScreen() {
   }
 
   return (
-    <FlatList
-      data={catalogQuery.products}
-      keyExtractor={(item) => item._id}
-      numColumns={NUM_COLUMNS}
-      ListHeaderComponent={listHeader}
-      renderItem={({ item }) => <ProductCard product={item} />}
-      contentContainerStyle={styles.listContent}
-      columnWrapperStyle={styles.row}
-      style={styles.flex}
-      refreshControl={
-        <ThemedRefreshControl refreshing={catalogQuery.isRefetching} onRefresh={handleRefresh} />
-      }
-      onEndReached={handleLoadMore}
-      onEndReachedThreshold={0.4}
-      ListEmptyComponent={
-        <View style={styles.centered}>
-          <Text style={styles.empty}>{API_CLIENT_UI.CATALOG_EMPTY}</Text>
-        </View>
-      }
-      ListFooterComponent={
-        catalogQuery.isFetchingNextPage ? (
-          <ActivityIndicator style={styles.footerLoader} />
-        ) : null
-      }
-    />
+    <View style={styles.flex}>
+      <HomeCatalogSearchRow value={searchInput} onChange={setSearchInput} />
+      <FlatList
+        data={catalogQuery.products}
+        keyExtractor={(item) => item._id}
+        numColumns={NUM_COLUMNS}
+        ListHeaderComponent={listHeader}
+        renderItem={({ item }) => <ProductCard product={item} />}
+        contentContainerStyle={styles.listContent}
+        columnWrapperStyle={styles.row}
+        style={styles.flex}
+        refreshControl={
+          <ThemedRefreshControl refreshing={catalogQuery.isRefetching} onRefresh={handleRefresh} />
+        }
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.4}
+        ListEmptyComponent={
+          <View style={styles.centered}>
+            <Text style={styles.empty}>{API_CLIENT_UI.CATALOG_EMPTY}</Text>
+          </View>
+        }
+        ListFooterComponent={
+          catalogQuery.isFetchingNextPage ? (
+            <ActivityIndicator style={styles.footerLoader} />
+          ) : null
+        }
+      />
+    </View>
   );
 }

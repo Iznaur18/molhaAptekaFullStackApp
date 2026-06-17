@@ -29,6 +29,6 @@ export const inAppNotificationSchema = z
 
 /** `data` ответа `GET /auth/me`. */
 export const authMeDataSchema = z.object({
-  user: userPublicProfileSchema,
+  user: userPublicProfileSchema.nullable(),
   inAppNotifications: z.array(inAppNotificationSchema),
 });

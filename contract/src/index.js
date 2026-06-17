@@ -33,6 +33,14 @@ export {
   removePushTokenBodySchema,
   PUSH_TOKEN_PLATFORMS,
 } from "./pushToken.js";
+export {
+  UPLOAD_IMAGE_MAX_BYTES,
+  UPLOAD_IMAGE_MIME_TYPES,
+  UPLOAD_VIDEO_MAX_MB,
+  UPLOAD_VIDEO_MAX_BYTES,
+  UPLOAD_VIDEO_MIME_TYPES,
+  UPLOAD_VIDEO_EXTENSIONS,
+} from "./uploadLimits.js";
 export { userFollowListQuerySchema } from "./userFollow.js";
 export { voteBodySchema } from "./userVote.js";
 export {

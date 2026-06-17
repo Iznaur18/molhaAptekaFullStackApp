@@ -33,6 +33,30 @@ function rejectInactiveAccount(res, user) {
   return null;
 }
 
+/**
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
+async function attachUserIdFromAccessToken(req, res) {
+  const token = getAuthTokenFromRequest(req);
+  const decoded = verifyAccessToken(token);
+  const user = await UserModel.findById(decoded._id)
+    .select("isBlockedUser isActiveUser")
+    .lean();
+
+  if (!user) {
+    return errorRes(res, 401, "Не авторизован");
+  }
+
+  const inactiveResponse = rejectInactiveAccount(res, user);
+  if (inactiveResponse) {
+    return inactiveResponse;
+  }
+
+  req.userId = decoded._id;
+  return null;
+}
+
 export const checkAuthMW = async (req, res, next) => {
   const token = getAuthTokenFromRequest(req);
 
@@ -41,24 +65,37 @@ export const checkAuthMW = async (req, res, next) => {
   }
 
   try {
-    const decoded = verifyAccessToken(token);
-    const user = await UserModel.findById(decoded._id)
-      .select("isBlockedUser isActiveUser")
-      .lean();
-
-    if (!user) {
-      return errorRes(res, 401, "Не авторизован");
+    const errorResponse = await attachUserIdFromAccessToken(req, res);
+    if (errorResponse) {
+      return errorResponse;
     }
-
-    const inactiveResponse = rejectInactiveAccount(res, user);
-    if (inactiveResponse) {
-      return inactiveResponse;
-    }
-
-    req.userId = decoded._id;
     return next();
   } catch {
     return errorRes(res, 401, "Не авторизован");
+  }
+};
+
+/** GET /auth/me: без cookie — гость; просроченный access — 401; битый JWT — очистка cookie и гость. */
+export const checkAuthMeMW = async (req, res, next) => {
+  const token = getAuthTokenFromRequest(req);
+
+  if (!token) {
+    return next();
+  }
+
+  try {
+    const errorResponse = await attachUserIdFromAccessToken(req, res);
+    if (errorResponse) {
+      return errorResponse;
+    }
+    return next();
+  } catch (error) {
+    if (error?.name === "TokenExpiredError") {
+      return errorRes(res, 401, "Не авторизован");
+    }
+
+    clearAuthSessionCookies(res);
+    return next();
   }
 };
 

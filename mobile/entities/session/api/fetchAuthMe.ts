@@ -5,7 +5,11 @@ import { formatApiErrorMessage } from "@/shared/lib";
 export const fetchAuthMe = async () => {
   try {
     const { data } = await apiClient.get("/auth/me");
-    return parseAuthMeData(data);
+    const parsed = parseAuthMeData(data);
+    if (!parsed.user) {
+      return null;
+    }
+    return parsed;
   } catch (error) {
     throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.FETCH_ME_FALLBACK));
   }

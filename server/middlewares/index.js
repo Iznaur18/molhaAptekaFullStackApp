@@ -1,6 +1,6 @@
 import { uploadMW } from "./uploadMW.js";
 import { uploadVideoMW } from "./uploadVideoMW.js";
-import { checkAuthMW } from "./checkAuthMW.js";
+import { checkAuthMW, checkAuthMeMW } from "./checkAuthMW.js";
 import { checkOptionalAuthMW } from "./checkOptionalAuthMW.js";
 import { checkAdminMW } from "./checkAdminMW.js";
 import { checkProductModeratorMW } from "./checkProductModeratorMW.js";
@@ -38,6 +38,7 @@ export {
   uploadMW,
   uploadVideoMW,
   checkAuthMW,
+  checkAuthMeMW,
   checkOptionalAuthMW,
   checkAdminMW,
   checkProductModeratorMW,

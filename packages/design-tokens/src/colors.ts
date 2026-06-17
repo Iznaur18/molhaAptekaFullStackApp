@@ -19,7 +19,7 @@ export const izColors = {
   warning: "#d97706",
   warningSurface: "#fefce8",
   warningBorder: "#fcd34d",
-  warningText: "#78350f",
+  warningText: "#92400e",
   premium: "#eab308",
   star: "#edc93a",
   starMuted: "#d1d5db",

@@ -48,7 +48,7 @@ export const UserStoriesStrip = ({
 
   return (
     <>
-      <View accessibilityLabel={HOME_FEED_UI.STORIES_SECTION_ARIA}>
+      <View style={styles.root} accessibilityLabel={HOME_FEED_UI.STORIES_SECTION_ARIA}>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}

@@ -45,6 +45,25 @@ const shouldProxyToApi = (prefix, pathname) => {
   return pathname === prefix || pathname.startsWith(`${prefix}/`);
 };
 
+/** В dev cookie для localhost и 127.0.0.1 разные — редирект на один origin. */
+function devLocalhostRedirectPlugin() {
+  return {
+    name: "dev-localhost-redirect",
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const host = req.headers.host ?? "";
+        if (host.startsWith("localhost:5173")) {
+          const target = `http://127.0.0.1:5173${req.url ?? "/"}`;
+          res.writeHead(301, { Location: target });
+          res.end();
+          return;
+        }
+        next();
+      });
+    },
+  };
+}
+
 /** В dev по HTTP браузер не сохраняет Secure-cookie с API — снимаем при прокси. */
 const stripSecureFromProxySetCookie = (proxy) => {
   proxy.on("proxyRes", (proxyRes) => {
@@ -64,6 +83,8 @@ const devApiProxy = Object.fromEntries(
     {
       target: LOCAL_API_ORIGIN,
       changeOrigin: true,
+      cookieDomainRewrite: "",
+      cookiePathRewrite: "/",
       configure: stripSecureFromProxySetCookie,
       bypass(req) {
         const pathname = (req.url ?? "").split("?")[0];
@@ -99,7 +120,7 @@ function spaCspPreviewPlugin() {
 // https://vite.dev/config/
 export default defineConfig({
   appType: "spa",
-  plugins: [react(), spaCspPreviewPlugin()],
+  plugins: [react(), devLocalhostRedirectPlugin(), spaCspPreviewPlugin()],
   build: {
     sourcemap: "hidden",
     rollupOptions: {

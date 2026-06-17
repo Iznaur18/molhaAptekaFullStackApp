@@ -1,11 +1,19 @@
-import { Image, Pressable, Text, View } from "react-native";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { Image } from "expo-image";
+import { Pressable, Text, View } from "react-native";
 
-import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
+import { resolveCategoryDisplayTileImageUri } from "@/entities/product-category-display/lib/resolveProductCategoryDisplay";
 import { useCatalogBrowserTileStyles } from "@/shared/theme/catalogProductStyles";
+import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
+
+export type CatalogBrowserTileVariant = "category" | "feed";
 
 type CatalogBrowserTileCardProps = {
   label: string;
   imageUrl?: string | null;
+  placeholderImageUrl: string;
+  tileWidth: number;
+  variant?: CatalogBrowserTileVariant;
   onPress: () => void;
   onEditPress?: () => void;
   editAriaLabel?: string;
@@ -14,22 +22,26 @@ type CatalogBrowserTileCardProps = {
 export const CatalogBrowserTileCard = ({
   label,
   imageUrl,
+  placeholderImageUrl,
+  tileWidth,
+  variant = "category",
   onPress,
   onEditPress,
   editAriaLabel,
 }: CatalogBrowserTileCardProps) => {
   const styles = useCatalogBrowserTileStyles();
-  const resolvedImageUrl = imageUrl ? resolveUploadedMediaUrl(imageUrl) : "";
+  const { theme } = useAppThemeSettings();
+  const resolvedImageUrl = resolveCategoryDisplayTileImageUri(imageUrl, placeholderImageUrl);
+  const isFeedTile = variant === "feed";
 
   return (
-    <View style={styles.wrap}>
-      <Pressable style={styles.card} onPress={onPress}>
+    <View style={[styles.wrap, { width: tileWidth }]}>
+      <Pressable
+        style={[styles.card, isFeedTile && styles.cardFeed]}
+        onPress={onPress}
+      >
         <View style={styles.imageWrap}>
-          {resolvedImageUrl ? (
-            <Image source={{ uri: resolvedImageUrl }} style={styles.image} resizeMode="cover" />
-          ) : (
-            <Text style={styles.placeholder}>{label.slice(0, 1).toUpperCase()}</Text>
-          )}
+          <Image source={{ uri: resolvedImageUrl }} style={styles.image} contentFit="cover" />
         </View>
         <Text style={styles.label} numberOfLines={2}>
           {label}
@@ -41,7 +53,7 @@ export const CatalogBrowserTileCard = ({
           onPress={onEditPress}
           accessibilityLabel={editAriaLabel}
         >
-          <Text style={styles.editButtonText}>✎</Text>
+          <MaterialIcons name="edit" size={16} color={theme.colors.link} />
         </Pressable>
       ) : null}
     </View>

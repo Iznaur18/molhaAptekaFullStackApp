@@ -1,9 +1,9 @@
 import { Platform } from "react-native";
+import { postMultipart } from "@izibuy/shared-api";
 
 import { apiClient, parseUploadImageData } from "@/shared/api";
 import { IMAGE_UPLOAD_UI } from "@/shared/config";
-import { formatApiErrorMessage } from "@/shared/lib";
-import { normalizeUploadUrlForStorage } from "@/shared/lib/normalizeUploadUrlForStorage";
+import { formatApiErrorMessage, normalizeUploadUrlForStorage } from "@/shared/lib";
 
 export type UploadImageFilePayload = {
   uri: string;
@@ -30,12 +30,7 @@ export const uploadImage = async (file: UploadImageFilePayload): Promise<string>
     const formData = new FormData();
     await appendImageToFormData(formData, file);
 
-    const { data } = await apiClient.post("/upload", formData, {
-      transformRequest: (payload, headers) => {
-        delete headers["Content-Type"];
-        return payload;
-      },
-    });
+    const data = await postMultipart(apiClient, "/upload", formData);
 
     const parsed = parseUploadImageData(data);
     return normalizeUploadUrlForStorage(parsed.url);

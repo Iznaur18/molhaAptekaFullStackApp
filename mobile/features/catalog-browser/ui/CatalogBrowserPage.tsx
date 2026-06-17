@@ -1,10 +1,13 @@
 import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import { Alert, ScrollView, Text, View } from "react-native";
+import { Alert, ScrollView } from "react-native";
 
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import { buildResolvedCatalogFeedTileDisplays } from "@/entities/product-category-display/lib/resolveCatalogFeedTileDisplay";
-import { buildResolvedProductCategoryDisplaysFromRoots } from "@/entities/product-category-display/lib/resolveProductCategoryDisplay";
+import {
+  buildResolvedProductCategoryDisplaysFromRoots,
+  PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE,
+} from "@/entities/product-category-display/lib/resolveProductCategoryDisplay";
 import { useProductCatalogFeedTileDisplaysQuery } from "@/entities/product-category-display/model/useProductCatalogFeedTileDisplaysQuery";
 import { useProductCategoryDisplaysQuery } from "@/entities/product-category-display/model/useProductCategoryDisplaysQuery";
 import { useProductCategoryRootsQuery } from "@/entities/product-category-tree/model/useProductCategoryRootsQuery";
@@ -12,7 +15,9 @@ import { useSellerPersonalCategoryCatalogTilesQuery } from "@/entities/seller-pe
 import type { CatalogListFilters } from "@/entities/product/model/catalogListFilters";
 import { buildQueryForCatalogFeedTile } from "@/features/catalog-browser/model/buildQueryForCatalogFeedTile";
 import { setPendingCatalogFilters } from "@/features/catalog-browser/model/pendingCatalogFilters";
+import { useCatalogBrowserGridLayout } from "@/features/catalog-browser/lib/useCatalogBrowserGridLayout";
 import { CatalogBrowserTileCard } from "@/features/catalog-browser/ui/CatalogBrowserTileCard";
+import { CatalogBrowserTilesGrid } from "@/features/catalog-browser/ui/CatalogBrowserTilesGrid";
 import { EditCategoryDisplayModal } from "@/features/catalog-browser/ui/EditCategoryDisplayModal";
 import { EditFeedTileDisplayModal } from "@/features/catalog-browser/ui/EditFeedTileDisplayModal";
 import {
@@ -27,6 +32,7 @@ import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 export const CatalogBrowserPage = () => {
   const router = useRouter();
   const styles = useCatalogBrowserPageStyles();
+  const gridLayout = useCatalogBrowserGridLayout();
   const { isAdmin, isAuthorized } = useUserAccess();
 
   const categoryDisplaysQuery = useProductCategoryDisplaysQuery();
@@ -123,15 +129,19 @@ export const CatalogBrowserPage = () => {
   return (
     <>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>{CATALOG_BROWSER_UI.TITLE}</Text>
-
-        <Text style={styles.sectionLabel}>{PRODUCT_CATEGORY_DISPLAY_UI.FEED_SECTION_TITLE}</Text>
-        <View style={styles.tilesGrid}>
+        <CatalogBrowserTilesGrid
+          title={PRODUCT_CATEGORY_DISPLAY_UI.FEED_SECTION_TITLE}
+          accessibilityLabel={PRODUCT_CATEGORY_DISPLAY_UI.FEED_GRID_ARIA}
+          gap={gridLayout.gap}
+        >
           {feedTiles.map((item) => (
             <CatalogBrowserTileCard
               key={item.tileKey}
               label={item.label}
               imageUrl={item.imageUrl}
+              placeholderImageUrl={PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE}
+              tileWidth={gridLayout.tileWidth}
+              variant="feed"
               onPress={() => handleFeedTilePress(item.tileKey)}
               onEditPress={
                 isAdmin ? () => setEditingFeedTileKey(item.tileKey) : undefined
@@ -139,35 +149,38 @@ export const CatalogBrowserPage = () => {
               editAriaLabel={PRODUCT_CATEGORY_DISPLAY_UI.FEED_EDIT_ARIA(item.label)}
             />
           ))}
-        </View>
+        </CatalogBrowserTilesGrid>
 
         {personalCategoryTiles.length > 0 ? (
-          <>
-            <Text style={styles.sectionLabel}>
-              {SELLER_PERSONAL_CATEGORY_PAGE_UI.TILES_SECTION_TITLE}
-            </Text>
-            <View style={styles.tilesGrid}>
-              {personalCategoryTiles.map((tile) => (
-                <CatalogBrowserTileCard
-                  key={tile._id}
-                  label={tile.labelRu}
-                  imageUrl={tile.imageUrl}
-                  onPress={() => handlePersonalCategoryPress(tile._id)}
-                />
-              ))}
-            </View>
-          </>
+          <CatalogBrowserTilesGrid
+            title={SELLER_PERSONAL_CATEGORY_PAGE_UI.TILES_SECTION_TITLE}
+            gap={gridLayout.gap}
+          >
+            {personalCategoryTiles.map((tile) => (
+              <CatalogBrowserTileCard
+                key={tile._id}
+                label={tile.labelRu}
+                imageUrl={tile.imageUrl}
+                placeholderImageUrl={PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE}
+                tileWidth={gridLayout.tileWidth}
+                onPress={() => handlePersonalCategoryPress(tile._id)}
+              />
+            ))}
+          </CatalogBrowserTilesGrid>
         ) : null}
 
-        <Text style={styles.sectionLabel}>
-          {PRODUCT_CATEGORY_DISPLAY_UI.CATEGORIES_SECTION_TITLE}
-        </Text>
-        <View style={styles.tilesGrid}>
+        <CatalogBrowserTilesGrid
+          title={PRODUCT_CATEGORY_DISPLAY_UI.CATEGORIES_SECTION_TITLE}
+          accessibilityLabel={PRODUCT_CATEGORY_DISPLAY_UI.GRID_ARIA}
+          gap={gridLayout.gap}
+        >
           {categoryItems.map((item) => (
             <CatalogBrowserTileCard
               key={item.categorySlug}
               label={item.label}
               imageUrl={item.imageUrl}
+              placeholderImageUrl={PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE}
+              tileWidth={gridLayout.tileWidth}
               onPress={() => handleCategoryPress(item.categorySlug)}
               onEditPress={
                 isAdmin ? () => setEditingCategorySlug(item.categorySlug) : undefined
@@ -175,7 +188,7 @@ export const CatalogBrowserPage = () => {
               editAriaLabel={PRODUCT_CATEGORY_DISPLAY_UI.EDIT_ARIA(item.label)}
             />
           ))}
-        </View>
+        </CatalogBrowserTilesGrid>
       </ScrollView>
 
       <EditCategoryDisplayModal

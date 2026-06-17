@@ -1,70 +1,24 @@
-export const PROFILE_SECTION_OVERVIEW = "overview";
-export const PROFILE_SECTION_MY_PRODUCTS = "my-products";
-export const PROFILE_SECTION_MY_SALES = "my-sales";
-export const PROFILE_SECTION_MY_ORDERS = "my-orders";
-export const PROFILE_SECTION_AUCTION = "auction";
-export const PROFILE_SECTION_SUBSCRIPTIONS = "subscriptions";
-export const PROFILE_SECTION_WISHLIST = "wishlist";
-export const PROFILE_SECTION_DATA_CONFIRMATION = "data-confirmation";
-export const PROFILE_SECTION_PREMIUM = "premium";
-export const PROFILE_SECTION_LOYALTY_POINTS = "loyalty-points";
-export const PROFILE_SECTION_ADVERTISING = "advertising";
-export const PROFILE_SECTION_ADMIN_ORDERS = "admin-orders";
-export const PROFILE_SECTION_SEARCH_SYNONYMS_ADMIN = "search-synonyms-admin";
-export const PROFILE_SECTION_CATEGORY_TREE_ADMIN = "category-tree-admin";
-export const PROFILE_SECTION_APP_INTRO_ADMIN = "app-intro-admin";
-export const PROFILE_SECTION_POPULAR_PRODUCTS_ADMIN = "popular-products-admin";
-export const PROFILE_SECTION_PRODUCT_MODERATION = "product-moderation";
-export const PROFILE_SECTION_INTRO_AD_MODERATION = "intro-ad-moderation";
-export const PROFILE_SECTION_SELLER_PERSONAL_CATEGORY_MODERATION =
-  "seller-personal-category-moderation";
-export const PROFILE_SECTION_PRODUCT_REPORTS = "product-reports";
-export const PROFILE_SECTION_PRODUCT_PROMOTIONS = "product-promotions";
-export const PROFILE_SECTION_RAFFLES = "raffles";
-export const PROFILE_SECTION_DATA_CONFIRMATION_REQUESTS = "data-confirmation-requests";
-export const PROFILE_SECTION_INSTALLMENT_PAYMENTS = "installment-payments";
-export const PROFILE_SECTION_INSTALLMENT_SALES = "installment-sales";
-export const PROFILE_SECTION_INSTALLMENT_MODERATION = "installment-moderation";
-export const PROFILE_SECTION_INSTALLMENT_DISPUTES = "installment-disputes";
-export const PROFILE_SECTION_CREATE_RAFFLE = "create-raffle";
-export const PROFILE_SECTION_EDIT_PROFILE = "edit-profile";
-
-export const PROFILE_SECTION_IDS = [
-  PROFILE_SECTION_OVERVIEW,
-  PROFILE_SECTION_MY_PRODUCTS,
-  PROFILE_SECTION_MY_SALES,
-  PROFILE_SECTION_MY_ORDERS,
-  PROFILE_SECTION_AUCTION,
-  PROFILE_SECTION_SUBSCRIPTIONS,
-  PROFILE_SECTION_WISHLIST,
-  PROFILE_SECTION_DATA_CONFIRMATION,
-  PROFILE_SECTION_PREMIUM,
-  PROFILE_SECTION_LOYALTY_POINTS,
-  PROFILE_SECTION_ADVERTISING,
+import {
   PROFILE_SECTION_ADMIN_ORDERS,
-  PROFILE_SECTION_SEARCH_SYNONYMS_ADMIN,
-  PROFILE_SECTION_CATEGORY_TREE_ADMIN,
   PROFILE_SECTION_APP_INTRO_ADMIN,
-  PROFILE_SECTION_POPULAR_PRODUCTS_ADMIN,
-  PROFILE_SECTION_PRODUCT_MODERATION,
-  PROFILE_SECTION_INTRO_AD_MODERATION,
-  PROFILE_SECTION_SELLER_PERSONAL_CATEGORY_MODERATION,
-  PROFILE_SECTION_PRODUCT_REPORTS,
-  PROFILE_SECTION_PRODUCT_PROMOTIONS,
-  PROFILE_SECTION_RAFFLES,
-  PROFILE_SECTION_DATA_CONFIRMATION_REQUESTS,
-  PROFILE_SECTION_INSTALLMENT_PAYMENTS,
-  PROFILE_SECTION_INSTALLMENT_SALES,
-  PROFILE_SECTION_INSTALLMENT_MODERATION,
-  PROFILE_SECTION_INSTALLMENT_DISPUTES,
-  PROFILE_SECTION_CREATE_RAFFLE,
   PROFILE_SECTION_EDIT_PROFILE,
-] as const;
-
-export type ProfileSectionId = (typeof PROFILE_SECTION_IDS)[number];
-
-export const isProfileSectionId = (raw: string): raw is ProfileSectionId =>
-  (PROFILE_SECTION_IDS as readonly string[]).includes(raw);
+  PROFILE_SECTION_IDS,
+  PROFILE_SECTION_MY_ORDERS,
+  PROFILE_SECTION_OVERVIEW,
+  isProfileSectionId,
+  isProfileStaffWebOnlySection,
+} from "@izibuy/shared-lib";
+export {
+  PROFILE_SECTION_ADMIN_ORDERS,
+  PROFILE_SECTION_APP_INTRO_ADMIN,
+  PROFILE_SECTION_EDIT_PROFILE,
+  PROFILE_SECTION_IDS,
+  PROFILE_SECTION_MY_ORDERS,
+  PROFILE_SECTION_OVERVIEW,
+  isProfileSectionId,
+  isProfileStaffWebOnlySection,
+};
+export type { ProfileSectionId } from "@izibuy/shared-lib";
 
 /** Разделы, которые ведут на существующие stack-экраны, а не на /hub. */
 export const PROFILE_SECTION_EXTERNAL_ROUTES: Partial<

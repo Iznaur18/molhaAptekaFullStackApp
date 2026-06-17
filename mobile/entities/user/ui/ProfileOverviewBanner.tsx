@@ -5,7 +5,7 @@ import { isPremiumActive } from "@/entities/user/lib/isPremiumActive";
 import { pickUserProfilePhotoUrl } from "@/entities/user/lib/pickUserProfilePhotoUrl";
 import { resolveUserProfileBackgroundFromUser } from "@/entities/user/lib/resolveUserProfileBackgroundFromUser";
 import { MY_PROFILE_PAGE_UI } from "@/shared/config";
-import { createThemedStyles } from "@/shared/theme/createThemedStyles";
+import { useProfileOverviewBannerStyles } from "@/shared/theme/profileChromeStyles";
 import { AppButton } from "@/shared/ui/AppButton";
 
 type ProfileOverviewBannerProps = {
@@ -14,56 +14,12 @@ type ProfileOverviewBannerProps = {
   onEditPress?: () => void;
 };
 
-const useStyles = createThemedStyles((theme) => ({
-  wrap: {
-    marginBottom: theme.spacing[4],
-  },
-  banner: {
-    minHeight: 148,
-    borderRadius: 14,
-    overflow: "hidden",
-    justifyContent: "flex-end",
-    padding: theme.spacing[4],
-  },
-  bannerImage: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-  },
-  avatarWrap: {
-    position: "absolute",
-    left: theme.spacing[4],
-    bottom: theme.spacing[4],
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    overflow: "hidden",
-    borderWidth: 2,
-    borderColor: theme.colors.surface,
-    backgroundColor: theme.colors.surfaceMuted,
-  },
-  avatarWrapPremium: {
-    borderColor: theme.colors.premium,
-  },
-  avatar: {
-    width: "100%",
-    height: "100%",
-  },
-  editButton: {
-    alignSelf: "flex-end",
-  },
-}));
-
 export const ProfileOverviewBanner = ({
   user,
   showEditButton = false,
   onEditPress,
 }: ProfileOverviewBannerProps) => {
-  const styles = useStyles();
+  const styles = useProfileOverviewBannerStyles();
   const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
   const [backgroundLoadFailed, setBackgroundLoadFailed] = useState(false);
 
@@ -87,7 +43,10 @@ export const ProfileOverviewBanner = ({
       <View
         style={[
           styles.banner,
-          profileBackground.kind === "preset" && { backgroundColor: profileBackground.color },
+          profileBackground.kind === "preset" && canShowBackground
+            ? { backgroundColor: profileBackground.color }
+            : null,
+          !canShowBackground && styles.bannerFallback,
         ]}
       >
         {profileBackground.kind === "image" && canShowBackground ? (
@@ -97,6 +56,8 @@ export const ProfileOverviewBanner = ({
             onError={() => setBackgroundLoadFailed(true)}
           />
         ) : null}
+
+        {canShowBackground ? <View style={styles.bannerScrim} pointerEvents="none" /> : null}
 
         {photoUrl && !avatarLoadFailed ? (
           <View

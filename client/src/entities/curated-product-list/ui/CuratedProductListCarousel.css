@@ -11,7 +11,7 @@
 
 .curated-product-list-carousel__scroll {
   --curated-visible-cards: 10;
-  --curated-card-gap: 12px;
+  --curated-card-gap: 8px;
   --curated-card-min-width: 86px;
   --curated-card-max-width: 168px;
   display: flex;

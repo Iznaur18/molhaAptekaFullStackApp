@@ -1,9 +1,12 @@
-import { ScrollView, Text, View } from "react-native";
+import { useMemo } from "react";
+import { ScrollView, Text, useWindowDimensions, View } from "react-native";
 
+import { CuratedProductCompactCard } from "@/entities/curated-product-list/ui/CuratedProductCompactCard";
 import type { HomeCuratedProductList } from "@/entities/curated-product-list/api/fetchHomeCuratedProductLists";
-import { ProductCard } from "@/entities/product/ui/ProductCard";
+import { resolveCuratedCompactCardWidth } from "@/entities/curated-product-list/lib/curatedProductListHomeLayout";
 import { HOME_FEED_UI } from "@/shared/config";
 import { useHomeCuratedListsStyles } from "@/shared/theme/catalogProductStyles";
+import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 
 type HomeCuratedListsSectionProps = {
   lists: HomeCuratedProductList[];
@@ -11,6 +14,12 @@ type HomeCuratedListsSectionProps = {
 
 export const HomeCuratedListsSection = ({ lists }: HomeCuratedListsSectionProps) => {
   const styles = useHomeCuratedListsStyles();
+  const { width: screenWidth } = useWindowDimensions();
+
+  const compactCardWidth = useMemo(() => {
+    const scrollContainerWidth = screenWidth - SCREEN_CONTENT_PADDING_HORIZONTAL * 2;
+    return resolveCuratedCompactCardWidth(scrollContainerWidth);
+  }, [screenWidth]);
 
   if (lists.length === 0) {
     return null;
@@ -27,9 +36,11 @@ export const HomeCuratedListsSection = ({ lists }: HomeCuratedListsSectionProps)
             contentContainerStyle={styles.row}
           >
             {list.products.map((product) => (
-              <View key={product._id} style={styles.cardWrap}>
-                <ProductCard product={product} />
-              </View>
+              <CuratedProductCompactCard
+                key={product._id}
+                product={product}
+                width={compactCardWidth}
+              />
             ))}
           </ScrollView>
         </View>

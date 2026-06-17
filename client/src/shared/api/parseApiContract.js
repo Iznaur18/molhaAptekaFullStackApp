@@ -1,27 +1,15 @@
 import {
-  parseApiSuccess,
-  authMeDataSchema,
-  catalogProductsPageDataSchema,
-  createOrderDataSchema,
-  productWriteDataSchema,
-  replaceCartDataSchema,
-  userSellerProductsPageDataSchema,
-} from "@molha/api-contract";
+  parseApiContractData as parseSharedApiContractData,
+  parseAuthMeData as parseSharedAuthMeData,
+  parseCatalogProductsPageData as parseSharedCatalogProductsPageData,
+  parseCreateOrderData as parseSharedCreateOrderData,
+  parseCreateProductData as parseSharedCreateProductData,
+  parsePatchMyProductData as parseSharedPatchMyProductData,
+  parseReplaceCartData as parseSharedReplaceCartData,
+  parseUserSellerProductsPageData as parseSharedUserSellerProductsPageData,
+} from "@izibuy/shared-api";
 
 import { API_CLIENT_UI } from "../config/appUiCopy.js";
-
-/**
- * @param {unknown} error
- */
-function toContractClientError(error) {
-  if (error instanceof Error && error.message === "INVALID_API_ENVELOPE") {
-    return new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
-  }
-  if (error instanceof Error && error.message === "INVALID_API_DATA") {
-    return new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
-  }
-  return error instanceof Error ? error : new Error(String(error));
-}
 
 /**
  * @template {import('zod').ZodTypeAny} TSchema
@@ -29,11 +17,11 @@ function toContractClientError(error) {
  * @param {TSchema} dataSchema
  */
 export function parseApiContractData(payload, dataSchema) {
-  try {
-    return parseApiSuccess(payload, dataSchema);
-  } catch (e) {
-    throw toContractClientError(e);
-  }
+  return parseSharedApiContractData(
+    payload,
+    dataSchema,
+    API_CLIENT_UI.INVALID_SERVER_RESPONSE,
+  );
 }
 
 /**
@@ -41,7 +29,10 @@ export function parseApiContractData(payload, dataSchema) {
  * @returns {import('@molha/api-contract/types').CatalogProductsPageDataContract}
  */
 export function parseCatalogProductsPageData(payload) {
-  return parseApiContractData(payload, catalogProductsPageDataSchema);
+  return parseSharedCatalogProductsPageData(
+    payload,
+    API_CLIENT_UI.INVALID_SERVER_RESPONSE,
+  );
 }
 
 /**
@@ -49,7 +40,10 @@ export function parseCatalogProductsPageData(payload) {
  * @returns {import('@molha/api-contract/types').UserSellerProductsPageDataContract}
  */
 export function parseUserSellerProductsPageData(payload) {
-  return parseApiContractData(payload, userSellerProductsPageDataSchema);
+  return parseSharedUserSellerProductsPageData(
+    payload,
+    API_CLIENT_UI.INVALID_SERVER_RESPONSE,
+  );
 }
 
 /**
@@ -57,7 +51,7 @@ export function parseUserSellerProductsPageData(payload) {
  * @returns {import('@molha/api-contract/types').AuthMeDataContract}
  */
 export function parseAuthMeData(payload) {
-  return parseApiContractData(payload, authMeDataSchema);
+  return parseSharedAuthMeData(payload, API_CLIENT_UI.INVALID_SERVER_RESPONSE);
 }
 
 /**
@@ -65,7 +59,7 @@ export function parseAuthMeData(payload) {
  * @returns {import('@molha/api-contract/types').ReplaceCartDataContract}
  */
 export function parseReplaceCartData(payload) {
-  return parseApiContractData(payload, replaceCartDataSchema);
+  return parseSharedReplaceCartData(payload, API_CLIENT_UI.INVALID_SERVER_RESPONSE);
 }
 
 /**
@@ -73,7 +67,7 @@ export function parseReplaceCartData(payload) {
  * @returns {import('@molha/api-contract/types').CreateOrderDataContract}
  */
 export function parseCreateOrderData(payload) {
-  return parseApiContractData(payload, createOrderDataSchema);
+  return parseSharedCreateOrderData(payload, API_CLIENT_UI.INVALID_SERVER_RESPONSE);
 }
 
 /**
@@ -81,7 +75,7 @@ export function parseCreateOrderData(payload) {
  * @returns {import('@molha/api-contract/types').ProductWriteDataContract}
  */
 export function parseCreateProductData(payload) {
-  return parseApiContractData(payload, productWriteDataSchema);
+  return parseSharedCreateProductData(payload, API_CLIENT_UI.INVALID_SERVER_RESPONSE);
 }
 
 /**
@@ -89,5 +83,8 @@ export function parseCreateProductData(payload) {
  * @returns {import('@molha/api-contract/types').ProductWriteDataContract}
  */
 export function parsePatchMyProductData(payload) {
-  return parseApiContractData(payload, productWriteDataSchema);
+  return parseSharedPatchMyProductData(
+    payload,
+    API_CLIENT_UI.INVALID_SERVER_RESPONSE,
+  );
 }

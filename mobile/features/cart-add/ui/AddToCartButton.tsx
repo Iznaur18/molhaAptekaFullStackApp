@@ -7,21 +7,29 @@ import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useMyCartQuery } from "@/entities/cart/model/useMyCartQuery";
 import { getProductPurchaseLimit } from "@/entities/product/lib/getProductPurchaseLimit";
 import { ADD_TO_CART_UI } from "@/shared/config";
+import { FIXED_FONT_PROPS } from "@/shared/lib/fixedTypography";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useAddToCartButtonStyles } from "@/shared/theme/uploadFieldStyles";
 
 type AddToCartButtonProps = {
   productId: string;
   product?: unknown;
+  variant?: "default" | "detailDock";
 };
 
-export const AddToCartButton = ({ productId, product }: AddToCartButtonProps) => {
+export const AddToCartButton = ({
+  productId,
+  product,
+  variant = "default",
+}: AddToCartButtonProps) => {
   const router = useRouter();
   const theme = useAppTheme();
   const styles = useAddToCartButtonStyles();
   const isAuthorized = useIsAuthorized();
   const cartQuery = useMyCartQuery();
   const { addItem, setItemQuantity, removeItem, isUpdating } = useCartActions();
+  const isDetailDock = variant === "detailDock";
+  const fixedFontProps = isDetailDock ? FIXED_FONT_PROPS : {};
 
   const quantity = cartQuery.data?.[productId] ?? 0;
   const purchaseLimit = getProductPurchaseLimit(product);
@@ -40,8 +48,16 @@ export const AddToCartButton = ({ productId, product }: AddToCartButtonProps) =>
 
   if (!isAuthorized) {
     return (
-      <Pressable style={styles.loginButton} onPress={handleLogin}>
-        <Text style={styles.loginButtonText}>{ADD_TO_CART_UI.LOGIN_TO_ADD}</Text>
+      <Pressable
+        style={isDetailDock ? styles.detailDockLoginButton : styles.loginButton}
+        onPress={handleLogin}
+      >
+        <Text
+          style={isDetailDock ? styles.detailDockLoginButtonText : styles.loginButtonText}
+          {...fixedFontProps}
+        >
+          {ADD_TO_CART_UI.LOGIN_TO_ADD}
+        </Text>
       </Pressable>
     );
   }
@@ -51,14 +67,22 @@ export const AddToCartButton = ({ productId, product }: AddToCartButtonProps) =>
 
     return (
       <Pressable
-        style={[styles.addButton, (outOfStock || isUpdating) && styles.buttonDisabled]}
+        style={[
+          isDetailDock ? styles.detailDockAddButton : styles.addButton,
+          (outOfStock || isUpdating) && styles.buttonDisabled,
+        ]}
         onPress={() => addItem(productId, 1)}
         disabled={outOfStock || isUpdating}
       >
         {isUpdating ? (
           <ActivityIndicator color={theme.colors.onContrast} />
         ) : (
-          <Text style={styles.addButtonText}>{ADD_TO_CART_UI.ADD}</Text>
+          <Text
+            style={isDetailDock ? styles.detailDockAddButtonText : styles.addButtonText}
+            {...fixedFontProps}
+          >
+            {ADD_TO_CART_UI.ADD}
+          </Text>
         )}
       </Pressable>
     );
@@ -80,27 +104,39 @@ export const AddToCartButton = ({ productId, product }: AddToCartButtonProps) =>
   };
 
   const increaseDisabled = isUpdating || (hasStockLimit && quantity >= purchaseLimit);
+  const stepperStyle = isDetailDock ? styles.detailDockStepper : styles.stepper;
+  const stepButtonStyle = isDetailDock ? styles.detailDockStepButton : styles.stepButton;
+  const stepButtonTextStyle = isDetailDock ? styles.detailDockStepButtonText : styles.stepButtonText;
+  const quantityStyle = isDetailDock ? styles.detailDockQuantity : styles.quantity;
 
   return (
-    <View style={styles.stepper}>
+    <View style={stepperStyle}>
       <Pressable
-        style={styles.stepButton}
+        style={stepButtonStyle}
         onPress={handleDecrease}
         disabled={isUpdating}
         accessibilityLabel={ADD_TO_CART_UI.DECREASE_ARIA}
       >
-        <Text style={styles.stepButtonText}>−</Text>
+        <Text style={stepButtonTextStyle} {...fixedFontProps}>
+          −
+        </Text>
       </Pressable>
-      <Text style={styles.quantity} accessibilityLabel={ADD_TO_CART_UI.QUANTITY_ARIA}>
+      <Text
+        style={quantityStyle}
+        accessibilityLabel={ADD_TO_CART_UI.QUANTITY_ARIA}
+        {...fixedFontProps}
+      >
         {quantity}
       </Text>
       <Pressable
-        style={[styles.stepButton, increaseDisabled && styles.buttonDisabled]}
+        style={[stepButtonStyle, increaseDisabled && styles.buttonDisabled]}
         onPress={handleIncrease}
         disabled={increaseDisabled}
         accessibilityLabel={ADD_TO_CART_UI.INCREASE_ARIA}
       >
-        <Text style={styles.stepButtonText}>+</Text>
+        <Text style={stepButtonTextStyle} {...fixedFontProps}>
+          +
+        </Text>
       </Pressable>
     </View>
   );

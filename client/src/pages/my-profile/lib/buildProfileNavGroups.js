@@ -1,4 +1,9 @@
 import { MY_PROFILE_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import {
+  PROFILE_ACCOUNT_SECTION_ORDER,
+  PROFILE_STAFF_SECTION_ORDER,
+  PROFILE_TRADE_SECTION_ORDER,
+} from "@izibuy/shared-lib";
 import { enrichProfileNavItem } from "./profileNavItemMeta.js";
 import { PROFILE_TAB_OVERVIEW } from "./profileTabs.js";
 
@@ -87,6 +92,19 @@ export function buildProfileNavGroups({
     action?.();
   };
 
+  /**
+   * @param {Array<{ tab: string }>} items
+   * @param {readonly string[]} order
+   */
+  const orderNavItems = (items, order) => {
+    const indexByTab = new Map(order.map((tab, index) => [tab, index]));
+    return [...items].sort((left, right) => {
+      const leftIndex = indexByTab.get(left.tab) ?? Number.MAX_SAFE_INTEGER;
+      const rightIndex = indexByTab.get(right.tab) ?? Number.MAX_SAFE_INTEGER;
+      return leftIndex - rightIndex;
+    });
+  };
+
   /** @type {ProfileNavGroup[]} */
   const groups = [
     {
@@ -102,7 +120,7 @@ export function buildProfileNavGroups({
     {
       id: "trade",
       label: MY_PROFILE_PAGE_UI.NAV_SECTION_TRADE,
-      items: [
+      items: orderNavItems([
         {
           tab: "my-products",
           label: MY_PROFILE_PAGE_UI.TAB_MY_PRODUCTS,
@@ -154,12 +172,12 @@ export function buildProfileNavGroups({
               },
             ]
           : []),
-      ],
+      ], PROFILE_TRADE_SECTION_ORDER),
     },
     {
       id: "account",
       label: MY_PROFILE_PAGE_UI.NAV_SECTION_ACCOUNT,
-      items: [
+      items: orderNavItems([
         {
           tab: "subscriptions",
           label: MY_PROFILE_PAGE_UI.TAB_SUBSCRIPTIONS,
@@ -218,7 +236,7 @@ export function buildProfileNavGroups({
               },
             ]
           : []),
-      ],
+      ], PROFILE_ACCOUNT_SECTION_ORDER),
     },
   ];
 
@@ -369,11 +387,13 @@ export function buildProfileNavGroups({
       : []),
   ];
 
-  if (staffItems.length > 0) {
+  const orderedStaffItems = orderNavItems(staffItems, PROFILE_STAFF_SECTION_ORDER);
+
+  if (orderedStaffItems.length > 0) {
     groups.push({
       id: "staff",
       label: MY_PROFILE_PAGE_UI.NAV_SECTION_STAFF,
-      items: staffItems,
+      items: orderedStaffItems,
     });
   }
 

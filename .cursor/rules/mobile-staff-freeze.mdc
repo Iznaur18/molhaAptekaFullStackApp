@@ -1,0 +1,18 @@
+---
+description: G.1 — staff на mobile только через web, без новых RN-экранов
+globs:
+  - mobile/**
+alwaysApply: false
+---
+
+# Mobile staff freeze (G.1)
+
+- **Не добавлять** новые staff/moderation/admin экраны в `mobile/` (RN).
+- Новые staff-фичи — **только web** (`client/`).
+- В hub-меню staff-пункты открывают web: `openProfileStaffWebSection` + `PROFILE_SECTION_WEB_PATH` из `@izibuy/shared-lib`.
+- Пути web: `EXPO_PUBLIC_WEB_APP_URL` (dev: `http://127.0.0.1:5173` или staging).
+- Deep link buyer: `izibuy://` / `https://izibuy.ru/...` — in-app. Staff profile sections — browser/web SPA.
+- Существующие in-app staff экраны — **maintenance** (G.2), не расширять. Список: `mobile/README.md` § Staff inventory.
+- Buyer-critical path — **активная разработка** (G.3): `mobile/docs/BUYER-CRITICAL-PATH.md`.
+
+См. `mobile/docs/STAFF-WEB-ONLY.md`, `docs/client-mobile-consolidation-audit.md` §6–G.

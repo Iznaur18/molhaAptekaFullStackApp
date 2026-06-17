@@ -1,37 +1,81 @@
-import { Text, View } from "react-native";
+import { ScrollView, View } from "react-native";
 
+import { useProductCardChromeFlags } from "@/entities/product/lib/useProductCardChromeFlags";
+import {
+  productStatusBadgeScrollStyles,
+  productStatusBadgeVariantStyles,
+  type ProductStatusBadgeVariant,
+} from "@/entities/product/lib/productStatusBadgeStyles";
 import { PRODUCT_CARD_UI } from "@/shared/config";
-import { useProductStatusBadgeStyles } from "@/shared/theme/catalogProductStyles";
-
-import { useProductCardChromeFlags } from "../lib/useProductCardChromeFlags";
-import { resolveProductLoyaltyPointsPerUnit } from "../lib/resolveProductLoyaltyPointsPerUnit";
+import { AppText } from "@/shared/ui/AppText";
 
 type ProductCatalogStatusBadgesProps = {
   product: Record<string, unknown>;
-  isPremiumUser?: boolean;
+  showHiddenBadge?: boolean;
+};
+
+type StatusBadgeItem = {
+  key: string;
+  label: string;
+  variant: ProductStatusBadgeVariant;
 };
 
 export const ProductCatalogStatusBadges = ({
   product,
-  isPremiumUser = false,
+  showHiddenBadge = false,
 }: ProductCatalogStatusBadgesProps) => {
-  const styles = useProductStatusBadgeStyles();
   const flags = useProductCardChromeFlags(product);
-  const loyaltyPoints = resolveProductLoyaltyPointsPerUnit(product);
 
-  const badges: string[] = [];
-  if (flags.showPromotionBoostBadge) badges.push(PRODUCT_CARD_UI.PROMOTED_BADGE);
-  if (flags.showPromotionTopBadge) badges.push(PRODUCT_CARD_UI.PROMOTION_TOP_BADGE);
-  if (flags.showPromotionBannerBadge) badges.push(PRODUCT_CARD_UI.PROMOTION_BANNER_BADGE);
-  if (flags.showAuctionBadge) badges.push(PRODUCT_CARD_UI.AUCTION_BADGE);
-  if (flags.showInstallmentBadge) badges.push(PRODUCT_CARD_UI.INSTALLMENT_BADGE);
-  if (flags.showRaffleBadge) badges.push(PRODUCT_CARD_UI.RAFFLE_BADGE);
-  if (flags.showLoyaltyPointsBadge) {
-    badges.push(
-      isPremiumUser
-        ? PRODUCT_CARD_UI.LOYALTY_POINTS_PREMIUM(loyaltyPoints)
-        : PRODUCT_CARD_UI.LOYALTY_POINTS_GUEST(loyaltyPoints),
-    );
+  const badges: StatusBadgeItem[] = [];
+
+  if (showHiddenBadge && product.productIsAvailable === false) {
+    badges.push({
+      key: "hidden",
+      label: PRODUCT_CARD_UI.HIDDEN_FROM_CATALOG_BADGE,
+      variant: "hidden",
+    });
+  }
+  if (flags.showPromotionBoostBadge) {
+    badges.push({
+      key: "boost",
+      label: PRODUCT_CARD_UI.PROMOTED_BADGE,
+      variant: "promotionBoost",
+    });
+  }
+  if (flags.showPromotionTopBadge) {
+    badges.push({
+      key: "top",
+      label: PRODUCT_CARD_UI.PROMOTION_TOP_BADGE,
+      variant: "promotionTop",
+    });
+  }
+  if (flags.showPromotionBannerBadge) {
+    badges.push({
+      key: "banner",
+      label: PRODUCT_CARD_UI.PROMOTION_BANNER_BADGE,
+      variant: "promotionBanner",
+    });
+  }
+  if (flags.showAuctionBadge) {
+    badges.push({
+      key: "auction",
+      label: PRODUCT_CARD_UI.AUCTION_BADGE,
+      variant: "auction",
+    });
+  }
+  if (flags.showInstallmentBadge) {
+    badges.push({
+      key: "installment",
+      label: PRODUCT_CARD_UI.INSTALLMENT_BADGE,
+      variant: "installment",
+    });
+  }
+  if (flags.showRaffleBadge) {
+    badges.push({
+      key: "raffle",
+      label: PRODUCT_CARD_UI.RAFFLE_BADGE,
+      variant: "raffle",
+    });
   }
 
   if (badges.length === 0) {
@@ -39,12 +83,21 @@ export const ProductCatalogStatusBadges = ({
   }
 
   return (
-    <View style={styles.root} accessibilityLabel={PRODUCT_CARD_UI.STATUS_BADGES_ARIA}>
-      {badges.map((label) => (
-        <View key={label} style={styles.badge}>
-          <Text style={styles.badgeText}>{label}</Text>
-        </View>
-      ))}
-    </View>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      nestedScrollEnabled
+      accessibilityLabel={PRODUCT_CARD_UI.STATUS_BADGES_ARIA}
+      contentContainerStyle={productStatusBadgeScrollStyles.content}
+    >
+      {badges.map((badge) => {
+        const variantStyle = productStatusBadgeVariantStyles[badge.variant];
+        return (
+          <View key={badge.key} style={variantStyle.badge}>
+            <AppText style={variantStyle.text}>{badge.label}</AppText>
+          </View>
+        );
+      })}
+    </ScrollView>
   );
 };

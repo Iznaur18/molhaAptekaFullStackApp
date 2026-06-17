@@ -1,8 +1,13 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { fetchCurrentUserProfile } from "../api/fetchCurrentUserProfile.js";
 import { AUTH_ME_STALE_TIME_MS } from "../../../shared/api/queryClient.js";
+import { clearDeadAuthSession } from "../../../shared/api/apiClient.js";
+import {
+  clearAuthMeCache,
+} from "../lib/authMeQueryCache.js";
+import { subscribeAuthSessionDead } from "../../../shared/lib/authSessionEvents.js";
 import { authMeQueryKeys } from "./authMeQueryKeys.js";
 
 /** @typedef {import('../model/types.js').UserPublicProfile} UserPublicProfile */
@@ -35,12 +40,22 @@ export function useAuthSession() {
     enabled: fetchAllowed,
     retry: false,
     staleTime: AUTH_ME_STALE_TIME_MS,
+    refetchOnMount: "always",
   });
 
-  const user = query.data?.user ?? null;
+  const user = query.isSuccess ? (query.data?.user ?? null) : null;
   const isAuthReady = query.isFetched || !fetchAllowed;
-  const isAuthorized = query.isSuccess;
+  const isAuthorized = Boolean(user);
   const isSessionReady = isAuthReady;
+
+  useEffect(() => {
+    if (!query.isError || user) {
+      return;
+    }
+    void clearDeadAuthSession();
+  }, [query.isError, user]);
+
+  useEffect(() => subscribeAuthSessionDead(() => clearAuthMeCache(queryClient)), [queryClient]);
 
   const patchAuthMeUser = useCallback(
     /** @param {Partial<UserPublicProfile>} updates */
@@ -68,8 +83,9 @@ export function useAuthSession() {
   }, [queryClient]);
 
   const clearAuthSession = useCallback(() => {
-    setFetchAllowed(false);
-    queryClient.removeQueries({ queryKey: authMeQueryKeys.all });
+    setFetchAllowed(true);
+    clearAuthMeCache(queryClient);
+    void clearDeadAuthSession();
   }, [queryClient]);
 
   const setIsAuthorized = useCallback(
@@ -77,12 +93,15 @@ export function useAuthSession() {
     (value) => {
       if (value) {
         setFetchAllowed(true);
-        void invalidateAuthMe();
+        const cached = queryClient.getQueryData(authMeQueryKeys.all);
+        if (!cached?.user) {
+          void invalidateAuthMe();
+        }
       } else {
         clearAuthSession();
       }
     },
-    [clearAuthSession, invalidateAuthMe],
+    [clearAuthSession, invalidateAuthMe, queryClient],
   );
 
   const setLoyaltyPoints = useCallback(

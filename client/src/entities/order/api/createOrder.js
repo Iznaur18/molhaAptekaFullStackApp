@@ -1,6 +1,7 @@
 import { apiClient } from "../../../shared/api/index.js";
 import { parseCreateOrderData } from "../../../shared/api/parseApiContract.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
+import { formatApiErrorMessage } from "@izibuy/shared-lib";
 
 /**
  * `POST /order` — оформление заказа авторизованным пользователем.
@@ -25,8 +26,6 @@ export async function createOrder(payload) {
     const parsed = parseCreateOrderData(data);
     return parsed.order;
   } catch (e) {
-    const message =
-      e?.response?.data?.message ?? e?.message ?? API_CLIENT_UI.CREATE_ORDER_FALLBACK;
-    throw new Error(message);
+    throw new Error(formatApiErrorMessage(e, API_CLIENT_UI.CREATE_ORDER_FALLBACK));
   }
 }

@@ -1,6 +1,6 @@
 import { appendStructuredAddressToPayload } from "../../address/lib/appendStructuredAddressToPayload.js";
 import { isStructuredAddressEqual } from "../../address/lib/isStructuredAddressEqual.js";
-import { normalizeUploadUrlForStorage } from "../../../shared/lib/resolveUploadedImageUrl.js";
+import { normalizeUploadUrlForStorage } from "@izibuy/shared-lib";
 import { normalizeRuPhoneInput } from "./ruPhone.js";
 import { getUserAvatarFocus, getUserBackgroundFocus } from "./profileImageFocus.js";
 import { serializeUserBackgroundForForm } from "./userBackgroundValue.js";

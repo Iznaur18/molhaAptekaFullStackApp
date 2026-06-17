@@ -99,11 +99,10 @@ export const logoutUserController = async (req, res) => {
 /** Получение данных текущего пользователя. GET /auth/me (JWT в httpOnly cookie) */
 export const userMeController = async (req, res) => {
   try {
-    // 1. id текущего пользователя из auth middleware (JWT)
     const userIdClient = req.userId;
 
     if (!userIdClient) {
-      return errorRes(res, 401, "Вы не авторизованы");
+      return successRes(res, { user: null, inAppNotifications: [] });
     }
 
     // 2. Ищем пользователя в БД по id

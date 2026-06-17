@@ -14,7 +14,7 @@ type WishlistToggleButtonProps = {
   product?: {
     productSeller?: string | { _id?: string } | null;
   } | null;
-  variant?: "card" | "inline";
+  variant?: "card" | "inline" | "detailHero";
 };
 
 export const WishlistToggleButton = ({
@@ -49,6 +49,7 @@ export const WishlistToggleButton = ({
       style={[
         styles.root,
         variant === "card" && styles.card,
+        variant === "detailHero" && styles.detailHero,
         active && { backgroundColor: theme.colors.danger },
       ]}
       onPress={handlePress}
@@ -58,7 +59,7 @@ export const WishlistToggleButton = ({
     >
       <MaterialIcons
         name={active ? "favorite" : "favorite-border"}
-        size={variant === "card" ? 20 : 24}
+        size={variant === "card" || variant === "detailHero" ? 20 : 24}
         color={active ? theme.colors.onContrast : theme.colors.text}
       />
     </Pressable>
@@ -74,5 +75,19 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: "rgba(255,255,255,0.92)",
+  },
+  detailHero: {
+    position: "absolute",
+    top: 10.4,
+    right: 10.4,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.92)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
+    elevation: 2,
   },
 });

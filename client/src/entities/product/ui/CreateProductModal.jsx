@@ -34,7 +34,7 @@ import {
   formatRubPriceInput,
   keepDigitsOnly,
 } from "../../../shared/lib/numericInput.js";
-import { normalizeUploadUrlForStorage } from "../../../shared/lib/resolveUploadedImageUrl.js";
+import { normalizeUploadUrlForStorage } from "@izibuy/shared-lib";
 import { resolveProductLoyaltyPointsPerUnit } from "../lib/resolveProductLoyaltyPointsPerUnit.js";
 import { resolveSellerMaxLoyaltyPointsPerUnit } from "../lib/resolveSellerMaxLoyaltyPointsPerUnit.js";
 import { ProductModalShell } from "../../../shared/ui/ProductModalShell/ProductModalShell.jsx";

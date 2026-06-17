@@ -50,6 +50,9 @@ export const useMediaUploadFieldStyles = createThemedStyles((theme) => ({
   },
 }));
 
+/** Совпадает с --iz-color-warning-amber в designTokens.css */
+export const PRODUCT_DETAIL_DOCK_WARNING_AMBER = "#eab308";
+
 export const useAddToCartButtonStyles = createThemedStyles((theme) => ({
   addButton: {
     marginTop: theme.spacing[4],
@@ -62,6 +65,78 @@ export const useAddToCartButtonStyles = createThemedStyles((theme) => ({
     color: theme.colors.onContrast,
     fontWeight: "600",
     fontSize: 15,
+  },
+  detailDockAddButton: {
+    marginTop: 0,
+    width: "100%",
+    minHeight: 48,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 11.2,
+    borderWidth: 1,
+    borderColor: theme.colors.action,
+    backgroundColor: theme.colors.action,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  detailDockAddButtonText: {
+    color: theme.colors.onContrast,
+    fontWeight: "600",
+    fontSize: 16.3,
+  },
+  detailDockLoginButton: {
+    marginTop: 0,
+    width: "100%",
+    minHeight: 48,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 11.2,
+    borderWidth: 1,
+    borderColor: theme.colors.action,
+    backgroundColor: theme.colors.action,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  detailDockLoginButtonText: {
+    color: theme.colors.onContrast,
+    fontWeight: "600",
+    fontSize: 16.3,
+  },
+  detailDockStepper: {
+    marginTop: 0,
+    width: "100%",
+    minHeight: 48,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 11.2,
+    borderWidth: 1,
+    borderColor: theme.colors.action,
+    backgroundColor: theme.colors.actionSurface,
+  },
+  detailDockStepButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 5.6,
+    backgroundColor: theme.colors.surface,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  detailDockStepButtonText: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: theme.colors.action,
+    lineHeight: 18,
+  },
+  detailDockQuantity: {
+    fontSize: 15.2,
+    fontWeight: "600",
+    minWidth: 22,
+    textAlign: "center",
+    color: theme.colors.text,
   },
   loginButton: {
     marginTop: theme.spacing[4],

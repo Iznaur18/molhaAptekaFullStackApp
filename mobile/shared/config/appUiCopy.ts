@@ -141,6 +141,11 @@ export const CART_PAGE_UI = {
   CHECKOUT_BLOCKED_OWN_PRODUCTS_ONLY: "Нельзя оформить заказ на свои товары",
 } as const;
 
+export const FORMAT_BOOLEAN_RU = {
+  YES: "Да",
+  NO: "Нет",
+} as const;
+
 export const PRODUCT_UI = {
   NO_IMAGE: "Нет фото",
   UNAVAILABLE: "Нет в наличии",
@@ -149,7 +154,7 @@ export const PRODUCT_UI = {
   SELLER_TITLE: "Продавец",
   NO_DESCRIPTION: "Описание не указано",
   UNKNOWN_SELLER: "Продавец",
-  TAB_DETAILS: "Детали",
+  TAB_DETAILS: "О товаре",
   TAB_REVIEWS: "Отзывы",
   TAB_AUCTION: "Аукцион",
   TAB_INSTALLMENT: "Рассрочка",
@@ -161,24 +166,43 @@ export const PRODUCT_UI = {
 } as const;
 
 export const PRODUCT_DETAILS_MODAL_UI = {
+  BACK_ARIA: "Назад",
+  GALLERY_THUMBS_ARIA: "Дополнительные фотографии товара",
+  OPEN_GALLERY_FULLSCREEN: "Просмотреть все фото в полном экране",
+  SLIDER_REGION_ARIA: "Слайдер фотографий товара",
+  DETAILS_SECTION_ARIA: "Описание и служебная информация о товаре",
   SALE_CITY_ALL: "Во всех городах",
   CHARACTERISTICS_TITLE: "Характеристики",
+  CHARACTERISTICS_SECTION_ARIA: "Характеристики товара",
 } as const;
 
 export const PRODUCT_CARD_UI = {
-  DISCOUNT_BADGE: (percent: number) => `-${percent}%`,
+  DISCOUNT_BADGE: (percent: number) => `скидка -${percent}%`,
   STATUS_BADGES_ARIA: "Статусы товара",
-  PROMOTED_BADGE: "Продвижение",
+  PROMOTED_BADGE: "Буст",
   PROMOTION_TOP_BADGE: "Топ",
   PROMOTION_BANNER_BADGE: "Баннер",
   AUCTION_BADGE: "Аукцион",
   INSTALLMENT_BADGE: "Рассрочка",
   RAFFLE_BADGE: "Розыгрыш",
+  HIDDEN_FROM_CATALOG_BADGE: "Скрыт от покупателей",
   LOYALTY_POINTS_PREMIUM: (points: number) => `+${points} баллов`,
-  LOYALTY_POINTS_GUEST: (points: number) => `до +${points} баллов`,
+  LOYALTY_POINTS_WITH_PREMIUM: (points: number) => `+${points} баллов`,
+  LOYALTY_POINTS_GUEST: (points: number) => `До +${points} баллов с премиум`,
+  SELLER_PROFILE_ARIA: (sellerName: string) => `Профиль продавца: ${sellerName}`,
   RATING_LINE: (rating: number, count: number) => `★ ${rating.toFixed(1)} (${count})`,
   PROMOTION_BUTTON: "Продвигать",
   EDIT_PRODUCT: "Изменить",
+} as const;
+
+export const USER_PREMIUM_UI = {
+  CHECK_ARIA: "Премиум-пользователь",
+  CHECK_TITLE: "Премиум",
+} as const;
+
+export const USER_DATA_CONFIRMED_UI = {
+  BADGE_ARIA: "Данные подтверждены",
+  BADGE_TITLE: "Данные подтверждены",
 } as const;
 
 export const PRODUCT_PROMOTION_UI = {
@@ -208,13 +232,19 @@ export const PRODUCT_PROMOTION_UI = {
 
 export const PRODUCT_SELLER_PREVIEW_UI = {
   SECTION_LABEL: "Продавец",
+  OPEN_PROFILE_ARIA: "Открыть профиль продавца",
   LISTED_PRODUCTS_LABEL: "Товаров в продаже",
+  PREMIUM_LABEL: "Премиум",
 } as const;
 
 export const PRODUCT_REVIEW_UI = {
   TITLE: "Отзывы",
+  TAB_REVIEWS: "Отзывы",
+  TAB_REVIEWS_WITH_COUNT: (count: number) => `Отзывы (${count})`,
   LOADING: "Загрузка отзывов…",
   EMPTY: "Отзывов пока нет",
+  NO_REVIEWS: "Отзывов пока нет",
+  RATING_LINE: "★ {rating} · {count} отзывов",
   FETCH_FALLBACK: "Не удалось загрузить отзывы",
   SUMMARY_LINE: (rating: number, count: number) =>
     count > 0 ? `Средняя оценка ${rating.toFixed(1)} · ${count} отзывов` : "Нет оценок",
@@ -231,6 +261,9 @@ export const PRODUCT_REVIEW_UI = {
 } as const;
 
 export const PRODUCT_PRICE_OFFER_UI = {
+  TAB_DETAILS: "О товаре",
+  TAB_AUCTION: "Аукцион",
+  AUCTION_SHORTCUT: "В аукцион",
   SECTION_FORM_TITLE: "Ваша цена",
   LABEL_PRICE: "Ваша цена, ₽",
   ERROR_PRICE_MAX: "Цена не может превышать 999 999 999 ₽",
@@ -293,6 +326,30 @@ export const USER_STORY_UI = {
   NEXT_STORY: "Следующий",
 } as const;
 
+export const MOBILE_BOTTOM_NAV_UI = {
+  NAV_ARIA: "Основная навигация",
+  TAB_HOME: "Главная",
+  TAB_HOME_ARIA: "На главный экран",
+  TAB_CATALOG: "Каталог",
+  TAB_CATALOG_ARIA: "Обзор каталога",
+  TAB_PLACE_PRODUCT: "Разместить товар",
+  TAB_PLACE_PRODUCT_ARIA: "Разместить товар",
+  TAB_PLACE_PRODUCT_LOGIN_ARIA: "Войдите, чтобы разместить товар",
+  TAB_CART: "Корзина",
+  TAB_CART_ARIA: "Корзина",
+  TAB_PROFILE: "Мой профиль",
+  TAB_PROFILE_ARIA: "Мой профиль",
+} as const;
+
+export const HEADER_USERS_BUTTON_UI = {
+  ARIA: "Пользователи",
+} as const;
+
+export const CURATED_PRODUCT_COMPACT_CARD_UI = {
+  NO_IMAGE: "Нет фото",
+  OPEN_ARIA: (name?: string) => `Открыть товар ${name ?? ""}`.trim(),
+} as const;
+
 export const HOME_FEED_UI = {
   CURATED_SECTION_ARIA: "Подборки товаров",
   RAFFLES_SECTION_ARIA: "Розыгрыши",
@@ -304,6 +361,41 @@ export const RAFFLE_FEATURED_UI = {
   OPEN_PRODUCTS: "Товары розыгрыша",
 } as const;
 
+export const RAFFLE_FEATURED_CAROUSEL_UI = {
+  PREV: "Предыдущий розыгрыш",
+  NEXT: "Следующий розыгрыш",
+  SLIDE_ARIA: (index: number, total: number) => `Слайд ${index} из ${total}`,
+  AUTOPLAY_MS: 6000,
+} as const;
+
+export const RAFFLE_FEATURED_BANNER_UI = {
+  BADGE: "Розыгрыш",
+  PROGRESS: (progress: number, target: number) => `${progress} / ${target} продаж`,
+  REMAINING: (left: number) => `Осталось ${left}`,
+  COMPLETED: "Завершён",
+  OPEN_PRODUCTS: "Товары розыгрыша",
+  OPEN_INSTAGRAM: "Итоги в Instagram",
+  DESCRIPTION_MODAL_TITLE: "Описание",
+  DESCRIPTION_OPEN_ARIA: "Открыть полное описание розыгрыша",
+  CLOSE: "Закрыть",
+} as const;
+
+export const RAFFLE_PRIZE_MEDIA_UI = {
+  SOUND_TOGGLE_ARIA: (muted: boolean) =>
+    muted ? "Включить звук видео розыгрыша" : "Выключить звук видео розыгрыша",
+} as const;
+
+export const RAFFLE_MANAGE_UI = {
+  GROUP_LABEL: "Управление розыгрышем",
+  EDIT: "Изменить",
+  DELETE: "Удалить",
+  PAUSE: "Снять с витрины",
+  DELETE_CONFIRM_OWNER:
+    "Удалить розыгрыш? Участие товаров будет снято, восстановить нельзя.",
+  DELETE_CONFIRM_STAFF: "Удалить розыгрыш без возможности восстановления?",
+  LIVE_SECTION_TITLE: "Розыгрыш на главной",
+} as const;
+
 export const RAFFLE_PRODUCTS_PAGE_UI = {
   LOADING: "Загрузка…",
   EMPTY: "Нет товаров в этом розыгрыше.",
@@ -311,6 +403,8 @@ export const RAFFLE_PRODUCTS_PAGE_UI = {
 } as const;
 
 export const INSTALLMENT_UI = {
+  TAB: "Рассрочка",
+  SHORTCUT: "В рассрочку",
   BADGE: "Рассрочка",
   BUYER_HINT: "Оформление рассрочки доступно пользователям с подтверждёнными данными.",
   BUYER_REQUIRES_CONFIRMED:
@@ -535,6 +629,14 @@ export const MY_PROFILE_PAGE_UI = {
   TAB_LOYALTY_POINTS: "Баллы",
   TAB_ADVERTISING: "Реклама",
   EDIT_PROFILE: "Изменить профиль",
+  LOGOUT: "Выйти",
+  LOGOUT_CONFIRM: "Вы точно хотите выйти?",
+  LOGOUT_YES: "Да, выйти",
+  LOGOUT_CANCEL: "Отменить",
+  MOBILE_NAV_TOGGLE_ARIA: "Открыть меню разделов профиля",
+  MOBILE_NAV_CLOSE_ARIA: "Закрыть меню разделов",
+  MOBILE_NAV_CURRENT_SECTION: "Раздел",
+  NAV_ARIA: "Разделы профиля",
   TAB_BADGE: (count: number) => (count > 99 ? "99+" : String(count)),
 } as const;
 
@@ -588,7 +690,9 @@ export const USERS_PAGE_UI = {
 export const USER_LIST_ROW_UI = {
   BADGE_BLOCKED: "Блок",
   MISSING_NAME: "—",
+  RATING_LABEL: "Рейтинг",
   RATING_SCORE_LABEL: "Оценка",
+  USER_DATA_CONFIRMED_LABEL: "Пользователь подтверждён",
   TOTAL_SALES_COUNT_LABEL: "Продаж",
   FOLLOWERS_LABEL: "Подписчики",
 } as const;
@@ -659,6 +763,7 @@ export const HUB_SECTION_UI = {
   FORBIDDEN_HINT: "У вашего аккаунта нет прав на этот раздел.",
   BACK_TO_PROFILE: "К профилю",
   REQUIRES_AUTH: "Войдите в аккаунт, чтобы открыть раздел.",
+  OPENING_WEB: "Открываем веб-версию…",
 } as const;
 
 export const APP_INTRO_UI = {

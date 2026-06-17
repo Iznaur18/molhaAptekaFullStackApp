@@ -1,0 +1,46 @@
+---
+description: A.4 — что шарить между client/mobile (contract, packages), что не шарить (UI)
+globs:
+  - client/**
+  - mobile/**
+  - packages/**
+  - contract/**
+alwaysApply: false
+---
+
+# Client ↔ mobile: границы shared (A.4)
+
+Полный аудит: `docs/client-mobile-consolidation-audit.md` §2.6, §4.
+
+## Шарить (единый источник)
+
+| Что | Куда |
+| --- | ---- |
+| Zod-схемы, upload-лимиты, API shapes | `contract/` → `@molha/api-contract` |
+| Pure: цены, даты, URL media, роли, staff paths | `packages/shared-lib` |
+| `parseApiContract`, multipart, refresh queue | `packages/shared-api` + thin wrapper в client/mobile |
+| Design tokens | `packages/design-tokens` (+ verify CI) |
+| Profile sections / staff web paths | `shared-lib` (`profileSections`, `profileStaffWebPaths`) |
+
+**Правило:** третья копия одной функции в `client/` и `mobile/` — почти всегда баг процесса → вынести в пакет.
+
+## Не шарить
+
+- JSX / CSS / `StyleSheet` / DOM-хуки
+- `react-router` vs `expo-router` навигация
+- Vite proxy / cookies vs `EXPO_PUBLIC_*` / SecureStore
+- Web-only (DnD, scroll lock, dialog trap) и mobile-only (push, image-picker, deep links)
+- **Импорт `client/src/...` в `mobile/`** (и обратно UI) — запрещено
+
+## Auth
+
+- Один API (`server/`), разные **адаптеры** хранения токенов (cookie/sessionStorage vs SecureStore).
+- Не дублировать refresh/retry без синхронизации с `shared-api`.
+
+## Staff на mobile
+
+- Новые staff-фичи → **web only** (G.1). См. `mobile-staff-freeze.mdc`.
+
+## PR checklist
+
+См. `.github/pull_request_template.md` § Shared-слой.

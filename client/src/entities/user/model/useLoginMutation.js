@@ -1,19 +1,27 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { fetchCurrentUserProfile } from "../api/fetchCurrentUserProfile.js";
+import {
+  assertAuthenticatedProfile,
+  fetchCurrentUserProfile,
+} from "../api/fetchCurrentUserProfile.js";
 import { loginUser } from "../api/loginUser.js";
-import { authMeQueryKeys } from "./authMeQueryKeys.js";
+import { resetAuthSessionState } from "../../../shared/api/apiClient.js";
+import { hydrateAuthMeCache } from "../lib/authMeQueryCache.js";
 
 export function useLoginMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
+    onMutate: async () => {
+      resetAuthSessionState();
+      await queryClient.cancelQueries();
+    },
     mutationFn: async (credentials) => {
       await loginUser(credentials);
-      return fetchCurrentUserProfile();
+      return assertAuthenticatedProfile(await fetchCurrentUserProfile());
     },
     onSuccess: (data) => {
-      queryClient.setQueryData(authMeQueryKeys.all, data);
+      hydrateAuthMeCache(queryClient, data);
     },
   });
 }

@@ -6,8 +6,8 @@
    - `access_token` (1 ч)
    - `refresh_token` (30 д)
 2. Клиент: `axios` с `withCredentials: true` — cookie отправляется автоматически.
-3. `GET /auth/me` — читает access JWT из cookie (`checkAuthMW`).
-4. При **401** клиент один раз вызывает `POST /auth/refresh` и повторяет запрос.
+3. `GET /auth/me` — без cookie **200** и `user: null`; с валидным access JWT — профиль. Просроченный access — **401**, клиент делает refresh.
+4. При **401** на `/auth/me` клиент один раз вызывает `POST /auth/refresh` и повторяет запрос.
 5. `POST /auth/logout` — очищает оба cookie.
 
 ## Flow (mobile / native)

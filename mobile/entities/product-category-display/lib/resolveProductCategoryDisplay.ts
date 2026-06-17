@@ -2,8 +2,13 @@ import {
   PRODUCT_CATEGORIES,
   PRODUCT_CATEGORY_LABEL_RU,
 } from "@/entities/product/lib/productCategoryLabels";
+import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
 
 import type { ProductCategoryRootNode } from "../model/types";
+
+/** SVG data-uri — нейтральная иконка категории до кастома admin (sync web). */
+export const PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' fill='none'%3E%3Crect width='64' height='64' rx='12' fill='%23eef2ff'/%3E%3Cpath d='M20 42V26l12-8 12 8v16' stroke='%236366f1' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E";
 
 export type ProductCategoryDisplayFromApi = {
   categorySlug?: string | null;
@@ -108,4 +113,15 @@ export const buildResolvedProductCategoryDisplaysFromRoots = (
   }
 
   return items;
+};
+
+export const resolveCategoryDisplayTileImageUri = (
+  imageUrl: string | null | undefined,
+  placeholderImageUrl: string = PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE,
+): string => {
+  const trimmed = typeof imageUrl === "string" ? imageUrl.trim() : "";
+  if (!trimmed) {
+    return placeholderImageUrl;
+  }
+  return resolveUploadedMediaUrl(trimmed);
 };

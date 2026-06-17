@@ -1,17 +1,12 @@
 const API_BASE = "http://127.0.0.1:4444";
 
-/**
- * @param {import('@playwright/test').APIRequestContext} request
- * @param {{ email: string; password: string }} credentials
- */
-export async function loginAndGetCookieHeader(request, { email, password }) {
-  const response = await request.post(`${API_BASE}/auth/login`, {
-    data: { email, password },
-  });
-  if (!response.ok()) {
-    throw new Error(`login failed: ${response.status()} ${await response.text()}`);
-  }
+const DEV_ACCESS_TOKEN_KEY = "dev_access_token";
+const DEV_REFRESH_TOKEN_KEY = "dev_refresh_token";
 
+/**
+ * @param {import('@playwright/test').APIResponse} response
+ */
+function readCookieHeaderFromLoginResponse(response) {
   const setCookie = response.headers()["set-cookie"];
   if (!setCookie) {
     throw new Error("login: missing set-cookie");
@@ -19,6 +14,57 @@ export async function loginAndGetCookieHeader(request, { email, password }) {
 
   const cookies = Array.isArray(setCookie) ? setCookie : [setCookie];
   return cookies.map((chunk) => chunk.split(";")[0]).join("; ");
+}
+
+/**
+ * @param {unknown} authData
+ */
+function readDevAuthTokensFromLoginBody(authData) {
+  if (!authData || typeof authData !== "object") {
+    return { accessToken: null, refreshToken: null };
+  }
+
+  const accessToken =
+    "accessToken" in authData && typeof authData.accessToken === "string"
+      ? authData.accessToken
+      : null;
+  const refreshToken =
+    "refreshToken" in authData && typeof authData.refreshToken === "string"
+      ? authData.refreshToken
+      : null;
+
+  return { accessToken, refreshToken };
+}
+
+/**
+ * @param {import('@playwright/test').APIRequestContext} request
+ * @param {{ email: string; password: string }} credentials
+ */
+export async function loginAndGetAuthSession(request, credentials) {
+  const response = await request.post(`${API_BASE}/auth/login`, {
+    data: credentials,
+  });
+  if (!response.ok()) {
+    throw new Error(`login failed: ${response.status()} ${await response.text()}`);
+  }
+
+  const body = await response.json();
+  const { accessToken, refreshToken } = readDevAuthTokensFromLoginBody(body?.data);
+
+  return {
+    cookieHeader: readCookieHeaderFromLoginResponse(response),
+    accessToken,
+    refreshToken,
+  };
+}
+
+/**
+ * @param {import('@playwright/test').APIRequestContext} request
+ * @param {{ email: string; password: string }} credentials
+ */
+export async function loginAndGetCookieHeader(request, credentials) {
+  const session = await loginAndGetAuthSession(request, credentials);
+  return session.cookieHeader;
 }
 
 /**
@@ -41,12 +87,31 @@ export function parseCookieHeaderForPlaywright(cookieHeader) {
 
 /**
  * @param {import('@playwright/test').Page} page
+ * @param {{ accessToken: string | null; refreshToken: string | null }} tokens
+ */
+export async function applyDevAuthTokensToPage(page, { accessToken, refreshToken }) {
+  if (!accessToken || !refreshToken) {
+    return;
+  }
+
+  await page.addInitScript(
+    ([accessKey, refreshKey, nextAccessToken, nextRefreshToken]) => {
+      sessionStorage.setItem(accessKey, nextAccessToken);
+      sessionStorage.setItem(refreshKey, nextRefreshToken);
+    },
+    [DEV_ACCESS_TOKEN_KEY, DEV_REFRESH_TOKEN_KEY, accessToken, refreshToken],
+  );
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
  * @param {import('@playwright/test').APIRequestContext} request
  * @param {{ email: string; password: string }} credentials
  */
 export async function loginViaApiCookies(page, request, credentials) {
-  const cookieHeader = await loginAndGetCookieHeader(request, credentials);
-  await page.context().addCookies(parseCookieHeaderForPlaywright(cookieHeader));
+  const session = await loginAndGetAuthSession(request, credentials);
+  await page.context().addCookies(parseCookieHeaderForPlaywright(session.cookieHeader));
+  await applyDevAuthTokensToPage(page, session);
 }
 
 /**

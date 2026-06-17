@@ -1,9 +1,9 @@
 import { Platform } from "react-native";
+import { postMultipart } from "@izibuy/shared-api";
 
 import { apiClient, parseUploadImageData } from "@/shared/api";
 import { VIDEO_URL_FIELD_UI } from "@/shared/config";
-import { formatApiErrorMessage } from "@/shared/lib";
-import { normalizeUploadUrlForStorage } from "@/shared/lib/normalizeUploadUrlForStorage";
+import { formatApiErrorMessage, normalizeUploadUrlForStorage } from "@/shared/lib";
 
 export type UploadVideoFilePayload = {
   uri: string;
@@ -30,12 +30,7 @@ export const uploadVideo = async (file: UploadVideoFilePayload): Promise<string>
     const formData = new FormData();
     await appendVideoToFormData(formData, file);
 
-    const { data } = await apiClient.post("/upload/video", formData, {
-      transformRequest: (payload, headers) => {
-        delete headers["Content-Type"];
-        return payload;
-      },
-    });
+    const data = await postMultipart(apiClient, "/upload/video", formData);
 
     const parsed = parseUploadImageData(data);
     return normalizeUploadUrlForStorage(parsed.url);

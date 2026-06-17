@@ -75,7 +75,7 @@ const parseSuccessData = async (response) => {
   return body.data;
 };
 
-test("auth smoke: register → me → logout → me 401", async () => {
+test("auth smoke: register → me → logout → me guest", async () => {
   const registerResponse = await request("/auth/register", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -101,7 +101,10 @@ test("auth smoke: register → me → logout → me 401", async () => {
   assert.equal(logoutResponse.status, 200);
 
   const meAfterLogout = await request("/auth/me");
-  assert.equal(meAfterLogout.status, 401);
+  assert.equal(meAfterLogout.status, 200);
+  const guestMe = await parseSuccessData(meAfterLogout);
+  assert.equal(guestMe.user, null);
+  assert.deepEqual(guestMe.inAppNotifications, []);
 });
 
 test("auth refresh: register → refresh → me", async () => {

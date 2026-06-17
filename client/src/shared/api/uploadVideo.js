@@ -1,7 +1,6 @@
-import axios from "axios";
-
-import { normalizeUploadUrlForStorage } from "../lib/resolveUploadedImageUrl.js";
-import { API_BASE_URL } from "../config/apiBaseUrl.js";
+import { apiClient } from "./apiClient.js";
+import { postMultipart } from "@izibuy/shared-api";
+import { formatApiErrorMessage, normalizeUploadUrlForStorage } from "@izibuy/shared-lib";
 import { VIDEO_URL_FIELD_UI } from "../config/appUiCopy.js";
 
 /**
@@ -15,9 +14,8 @@ export async function uploadVideo(file) {
     const formData = new FormData();
     formData.append("video", file);
 
-    const { data } = await axios.post(`${API_BASE_URL || ""}/upload/video`, formData, {
-      withCredentials: true,
-    });
+    /** @type {{ success?: boolean; data?: { url?: string } }} */
+    const data = await postMultipart(apiClient, "/upload/video", formData);
 
     if (!data?.success || typeof data.data?.url !== "string") {
       throw new Error(VIDEO_URL_FIELD_UI.ERROR_GENERIC);
@@ -28,9 +26,6 @@ export async function uploadVideo(file) {
     if (error?.response?.status === 401) {
       throw new Error(VIDEO_URL_FIELD_UI.ERROR_AUTH);
     }
-    const message =
-      error?.response?.data?.message ??
-      (error instanceof Error ? error.message : VIDEO_URL_FIELD_UI.ERROR_GENERIC);
-    throw new Error(message);
+    throw new Error(formatApiErrorMessage(error, VIDEO_URL_FIELD_UI.ERROR_GENERIC));
   }
 }

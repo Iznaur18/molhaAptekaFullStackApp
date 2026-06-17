@@ -20,6 +20,7 @@ import {
 } from "../validations/user/pushTokenValidation.js";
 import {
   checkAuthMW,
+  checkAuthMeMW,
   authRateLimiter,
   refreshAuthRateLimiter,
   emailVerificationResendRateLimiter,
@@ -28,7 +29,7 @@ import {
 const router = Router();
 
 // путь в index.js начинается с /auth
-router.get("/me", checkAuthMW, userMeController);
+router.get("/me", checkAuthMeMW, userMeController);
 router.patch(
   "/me/in-app-notifications/read",
   checkAuthMW,

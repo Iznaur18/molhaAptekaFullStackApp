@@ -4,12 +4,14 @@ import { useEffect, useMemo } from "react";
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import { HubSectionContent } from "@/features/profile-hub/ui/HubSectionContent";
 import { HubSectionPlaceholder } from "@/features/profile-hub/ui/HubSectionPlaceholder";
+import { openProfileStaffWebSection } from "@/features/profile-hub/lib/openProfileStaffWebSection";
 import {
   canAccessProfileSection,
   useProfileHubAccess,
 } from "@/features/profile-hub/model/useProfileHubAccess";
 import {
   isProfileSectionId,
+  isProfileStaffWebOnlySection,
   PROFILE_SECTION_EXTERNAL_ROUTES,
 } from "@/features/profile-hub/model/profileSections";
 import { buildProfileNavGroups } from "@/features/profile-hub/model/buildProfileNavGroups";
@@ -47,6 +49,13 @@ export default function HubSectionScreen() {
     const externalRoute = PROFILE_SECTION_EXTERNAL_ROUTES[sectionId];
     if (externalRoute) {
       router.replace(externalRoute as never);
+      return;
+    }
+
+    if (isProfileStaffWebOnlySection(sectionId)) {
+      void openProfileStaffWebSection(sectionId).finally(() => {
+        router.replace("/(tabs)/profile");
+      });
     }
   }, [router, sectionId]);
 
@@ -72,6 +81,10 @@ export default function HubSectionScreen() {
 
   if (PROFILE_SECTION_EXTERNAL_ROUTES[sectionId]) {
     return <ScreenLoadingState message={AUTH_UI.SESSION_CHECK} />;
+  }
+
+  if (isProfileStaffWebOnlySection(sectionId)) {
+    return <ScreenLoadingState message={HUB_SECTION_UI.OPENING_WEB} />;
   }
 
   if (!canAccessProfileSection(sectionId, userAccess, hubAccess)) {

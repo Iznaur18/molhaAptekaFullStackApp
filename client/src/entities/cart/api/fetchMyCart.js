@@ -1,6 +1,7 @@
 import { apiClient } from "../../../shared/api/index.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 import { coerceCartItemsFromApi } from "../lib/coerceCartItemsFromApi.js";
+import { formatApiErrorMessage } from "@izibuy/shared-lib";
 
 /**
  * `GET /cart` — корзина текущего пользователя.
@@ -23,8 +24,6 @@ export async function fetchMyCart() {
 
     return coerceCartItemsFromApi(rawItems);
   } catch (e) {
-    const message =
-      e?.response?.data?.message ?? e?.message ?? API_CLIENT_UI.FETCH_CART_FALLBACK;
-    throw new Error(message);
+    throw new Error(formatApiErrorMessage(e, API_CLIENT_UI.FETCH_CART_FALLBACK));
   }
 }

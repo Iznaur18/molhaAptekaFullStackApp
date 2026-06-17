@@ -1,0 +1,67 @@
+name: Bug (triage)
+description: Баг с меткой из audit §3 (A.2)
+title: "[bug] "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Выберите **одну** метку triage. Подробнее: [`docs/bug-triage-labels.md`](../../docs/bug-triage-labels.md)
+
+  - type: dropdown
+    id: triage_label
+    attributes:
+      label: Метка triage
+      options:
+        - web-dev-infra
+        - web-feature
+        - mobile-feature
+        - server
+        - contract
+        - shared-drift
+    validations:
+      required: true
+
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Где воспроизводится
+      options:
+        - web only
+        - mobile only
+        - web + mobile
+        - server / API only
+        - CI / dev tooling
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Шаги
+      placeholder: "1. ...\n2. ..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Ожидание
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Факт
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Окружение
+      placeholder: "prod / staging / local web / Samsung dev build"
+    validations:
+      required: false

@@ -1,12 +1,21 @@
-import axios from "axios";
+import {
+  createJsonApiClient,
+  createRefreshSessionQueue,
+  setupAuthSessionInterceptors,
+} from "@izibuy/shared-api";
 
 import { API_BASE_URL } from "../config/apiBaseUrl.js";
+import { applyDevAuthTokensFromResponse } from "./applyDevAuthTokensFromResponse.js";
+import {
+  clearAuthTokens,
+  getAccessToken,
+  getRefreshToken,
+  isBearerAuthEnabled,
+} from "./web-auth-storage.js";
+import { emitAuthSessionDead } from "../lib/authSessionEvents.js";
 
-export const apiClient = axios.create({
-  baseURL: API_BASE_URL || undefined,
-  headers: {
-    "Content-Type": "application/json",
-  },
+export const apiClient = createJsonApiClient({
+  baseURL: API_BASE_URL,
   withCredentials: true,
 });
 
@@ -21,47 +30,66 @@ export const clearLegacyAuthTokenStorage = () => {
 
 clearLegacyAuthTokenStorage();
 
-let refreshSessionPromise = null;
+let authSessionDead = false;
 
-const shouldSkipAuthRefresh = (url) => {
-  const path = String(url ?? "");
+export const resetAuthSessionState = () => {
+  authSessionDead = false;
+};
+
+export const markAuthSessionDead = () => {
+  authSessionDead = true;
+};
+
+/** Сбрасывает битые httpOnly cookie после неудачного refresh. */
+export const clearDeadAuthSession = async () => {
+  markAuthSessionDead();
+  clearAuthTokens();
+  emitAuthSessionDead();
+  try {
+    await apiClient.post("/auth/logout");
+  } catch {
+    // гость или сеть
+  }
+};
+
+const isMissingAuthTokenError = (error) => {
+  const message = error?.response?.data?.message;
   return (
-    path.includes("/auth/refresh") ||
-    path.includes("/auth/login") ||
-    path.includes("/auth/register") ||
-    path.includes("/auth/logout")
+    typeof message === "string" &&
+    (message.includes("токен не найден") || message.includes("Refresh token required"))
   );
 };
 
-const refreshAuthSession = () => {
-  if (!refreshSessionPromise) {
-    refreshSessionPromise = apiClient.post("/auth/refresh").finally(() => {
-      refreshSessionPromise = null;
-    });
+const refreshAuthSession = createRefreshSessionQueue(async () => {
+  const refreshToken = getRefreshToken();
+  const refreshBody = refreshToken ? { refreshToken } : undefined;
+
+  try {
+    const response = await apiClient.post("/auth/refresh", refreshBody);
+    applyDevAuthTokensFromResponse(response);
+    resetAuthSessionState();
+  } catch (error) {
+    markAuthSessionDead();
+    clearAuthTokens();
+    emitAuthSessionDead();
+    throw error;
   }
-  return refreshSessionPromise;
-};
+});
 
-apiClient.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-    if (
-      error.response?.status !== 401 ||
-      !originalRequest ||
-      originalRequest._authRefreshAttempted ||
-      shouldSkipAuthRefresh(originalRequest.url)
-    ) {
-      return Promise.reject(error);
-    }
-
-    originalRequest._authRefreshAttempted = true;
-
-    try {
-      await refreshAuthSession();
-      return apiClient(originalRequest);
-    } catch {
-      return Promise.reject(error);
+setupAuthSessionInterceptors(apiClient, {
+  shouldAttachAccessToken: isBearerAuthEnabled,
+  getAccessToken,
+  refreshSession: refreshAuthSession,
+  shouldSkipByRequestConfig: () => authSessionDead,
+  shouldSkipRefreshOnError: isMissingAuthTokenError,
+  onRequest: (config) => {
+    if (config.data instanceof FormData) {
+      config.headers.delete("Content-Type");
     }
   },
-);
+  onAuthSuccessResponse: applyDevAuthTokensFromResponse,
+  shouldHandleAuthSuccessResponse: (path) =>
+    path.includes("/auth/login") ||
+    path.includes("/auth/register") ||
+    path.includes("/auth/refresh"),
+});

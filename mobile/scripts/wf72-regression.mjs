@@ -31,6 +31,8 @@ const HUB_EXTERNAL_SECTIONS = new Set(["my-orders", "edit-profile"]);
 
 const EXPECTED_APP_ROUTES = [
   "app/(tabs)/index.tsx",
+  "app/(tabs)/catalog.tsx",
+  "app/(tabs)/place-product.tsx",
   "app/(tabs)/cart.tsx",
   "app/(tabs)/profile.tsx",
   "app/(auth)/login.tsx",
@@ -126,6 +128,135 @@ const DEEP_LINK_CASES = [
   ["izibuy://orders", "/orders"],
 ];
 
+const UPLOAD_SOURCE_CHECKS = [
+  {
+    file: "entities/upload/api/uploadImage.ts",
+    mustInclude: [
+      "postMultipart",
+      "@izibuy/shared-api",
+      '"/upload"',
+      "normalizeUploadUrlForStorage",
+      "formatApiErrorMessage",
+    ],
+    mustNotInclude: ["axios.post("],
+  },
+  {
+    file: "entities/upload/api/uploadVideo.ts",
+    mustInclude: [
+      "postMultipart",
+      "@izibuy/shared-api",
+      '"/upload/video"',
+      "normalizeUploadUrlForStorage",
+    ],
+    mustNotInclude: ["axios.post("],
+  },
+  {
+    file: "entities/upload/model/constants.ts",
+    mustInclude: ["@molha/api-contract", "UPLOAD_IMAGE_MAX_BYTES", "UPLOAD_IMAGE_MIME_TYPES"],
+  },
+  {
+    file: "shared/lib/index.ts",
+    mustInclude: ["@izibuy/shared-lib", "normalizeUploadUrlForStorage"],
+  },
+];
+
+const DEAD_MOBILE_LIB_FILES = [
+  "shared/lib/formatPriceRub.ts",
+  "shared/lib/formatApiErrorMessage.ts",
+  "shared/lib/normalizeUploadUrlForStorage.ts",
+  "shared/lib/formatIsoDateTime.ts",
+];
+
+const STAFF_WEB_FILES = [
+  "features/profile-hub/lib/openProfileStaffWebSection.ts",
+  "shared/config/webAppBaseUrl.ts",
+  "../packages/shared-lib/src/profileStaffWebPaths.ts",
+];
+
+const BUYER_CRITICAL_ROUTES = [
+  "app/(tabs)/index.tsx",
+  "app/(tabs)/catalog.tsx",
+  "app/product/[id].tsx",
+  "app/(tabs)/cart.tsx",
+  "app/orders/index.tsx",
+  "app/(tabs)/profile.tsx",
+  "app/profile/edit.tsx",
+];
+
+const BUYER_API_SOURCE_CHECKS = [
+  {
+    file: "entities/product/api/fetchCatalogProductsPage.ts",
+    mustInclude: ["parseCatalogProductsPageData", 'apiClient.get("/product"'],
+  },
+  {
+    file: "entities/product/api/fetchCatalogProductById.ts",
+    mustInclude: ["parseCatalogProductByIdData", "/catalog"],
+  },
+  {
+    file: "entities/cart/api/fetchMyCart.ts",
+    mustInclude: ["parseMyCartData", 'apiClient.get("/cart"'],
+  },
+  {
+    file: "entities/cart/api/replaceMyCart.ts",
+    mustInclude: ["parseReplaceCartData", 'apiClient.put("/cart"'],
+  },
+  {
+    file: "entities/order/api/createOrder.ts",
+    mustInclude: ["parseCreateOrderData", 'apiClient.post("/order"'],
+  },
+  {
+    file: "entities/order/api/fetchMyOrders.ts",
+    mustInclude: ["parseMyOrdersData", 'apiClient.get("/order"'],
+  },
+  {
+    file: "entities/session/api/fetchAuthMe.ts",
+    mustInclude: ["parseAuthMeData", 'apiClient.get("/auth/me"'],
+  },
+];
+
+const BUYER_UI_WIRING_CHECKS = [
+  {
+    file: "entities/product/ui/ProductCard.tsx",
+    mustInclude: ['pathname: "/product/[id]"'],
+  },
+  {
+    file: "features/product-detail/ui/ProductDetailPurchaseActions.tsx",
+    mustInclude: ["AddToCartButton"],
+  },
+  {
+    file: "features/cart-add/ui/AddToCartButton.tsx",
+    mustInclude: ["useCartActions"],
+  },
+  {
+    file: "app/(tabs)/cart.tsx",
+    mustInclude: ["createOrderMutation", 'router.replace("/orders")'],
+  },
+  {
+    file: "app/(tabs)/profile.tsx",
+    mustInclude: ["useAuthSessionQuery"],
+  },
+];
+
+const assertSourceContains = (relativePath, fragments, label) => {
+  const source = read(relativePath);
+  const missing = fragments.filter((fragment) => !source.includes(fragment));
+  if (missing.length > 0) {
+    console.error(`✗ ${label} ${relativePath}: missing ${missing.join(", ")}`);
+    return missing.length;
+  }
+  return 0;
+};
+
+const assertSourceExcludes = (relativePath, fragments, label) => {
+  const source = read(relativePath);
+  const found = fragments.filter((fragment) => source.includes(fragment));
+  if (found.length > 0) {
+    console.error(`✗ ${label} ${relativePath}: forbidden ${found.join(", ")}`);
+    return found.length;
+  }
+  return 0;
+};
+
 const run = () => {
   let failed = 0;
 
@@ -175,12 +306,131 @@ const run = () => {
     console.log(`✓ deep links (${DEEP_LINK_CASES.length})`);
   }
 
+  let uploadFailed = 0;
+  for (const check of UPLOAD_SOURCE_CHECKS) {
+    if (!fileExists(check.file)) {
+      console.error(`✗ missing upload source: ${check.file}`);
+      uploadFailed += 1;
+      continue;
+    }
+
+    uploadFailed += assertSourceContains(
+      check.file,
+      check.mustInclude,
+      "upload wiring",
+    );
+    if (check.mustNotInclude?.length) {
+      uploadFailed += assertSourceExcludes(
+        check.file,
+        check.mustNotInclude,
+        "upload wiring",
+      );
+    }
+  }
+
+  for (const deadFile of DEAD_MOBILE_LIB_FILES) {
+    if (fileExists(deadFile)) {
+      console.error(`✗ remove dead mobile lib copy: ${deadFile}`);
+      uploadFailed += 1;
+    }
+  }
+
+  if (uploadFailed > 0) {
+    failed += uploadFailed;
+  } else {
+    console.log(`✓ upload stack (${UPLOAD_SOURCE_CHECKS.length} files, no dead lib copies)`);
+  }
+
+  let staffWebFailed = 0;
+  for (const relativePath of STAFF_WEB_FILES) {
+    const resolved =
+      relativePath.startsWith("../")
+        ? path.join(MOBILE_ROOT, relativePath)
+        : path.join(MOBILE_ROOT, relativePath);
+    if (!fs.existsSync(resolved)) {
+      console.error(`✗ missing staff-web file: ${relativePath}`);
+      staffWebFailed += 1;
+    }
+  }
+
+  const staffWebHelper = read("features/profile-hub/lib/openProfileStaffWebSection.ts");
+  if (!staffWebHelper.includes("isProfileStaffWebOnlySection")) {
+    console.error("✗ staff web helper must use isProfileStaffWebOnlySection");
+    staffWebFailed += 1;
+  }
+  if (!read("features/profile-hub/ui/ProfileHubMenu.tsx").includes("openProfileStaffWebSection")) {
+    console.error("✗ ProfileHubMenu must call openProfileStaffWebSection");
+    staffWebFailed += 1;
+  }
+
+  const readme = read("README.md");
+  if (!readme.includes("## Staff inventory (G.2")) {
+    console.error("✗ mobile/README.md must document Staff inventory (G.2)");
+    staffWebFailed += 1;
+  }
+
+  if (staffWebFailed > 0) {
+    failed += staffWebFailed;
+  } else {
+    console.log(`✓ staff → web (G.1, ${STAFF_WEB_FILES.length} files)`);
+  }
+
+  let buyerPathFailed = 0;
+  for (const route of BUYER_CRITICAL_ROUTES) {
+    if (!fileExists(route)) {
+      console.error(`✗ missing buyer-critical route: ${route}`);
+      buyerPathFailed += 1;
+    }
+  }
+
+  for (const check of BUYER_API_SOURCE_CHECKS) {
+    if (!fileExists(check.file)) {
+      console.error(`✗ missing buyer API source: ${check.file}`);
+      buyerPathFailed += 1;
+      continue;
+    }
+    buyerPathFailed += assertSourceContains(check.file, check.mustInclude, "buyer API");
+  }
+
+  for (const check of BUYER_UI_WIRING_CHECKS) {
+    if (!fileExists(check.file)) {
+      console.error(`✗ missing buyer UI wiring: ${check.file}`);
+      buyerPathFailed += 1;
+      continue;
+    }
+    buyerPathFailed += assertSourceContains(check.file, check.mustInclude, "buyer UI");
+  }
+
+  if (!read("README.md").includes("## Buyer-critical path (G.3)")) {
+    console.error("✗ mobile/README.md must document Buyer-critical path (G.3)");
+    buyerPathFailed += 1;
+  }
+
+  if (!fileExists("docs/BUYER-CRITICAL-PATH.md")) {
+    console.error("✗ missing docs/BUYER-CRITICAL-PATH.md");
+    buyerPathFailed += 1;
+  }
+
+  if (!fileExists("scripts/buyer-path-api-smoke.mjs")) {
+    console.error("✗ missing scripts/buyer-path-api-smoke.mjs");
+    buyerPathFailed += 1;
+  }
+
+  if (buyerPathFailed > 0) {
+    failed += buyerPathFailed;
+  } else {
+    console.log(
+      `✓ buyer-critical path (G.3, ${BUYER_CRITICAL_ROUTES.length} routes, ${BUYER_API_SOURCE_CHECKS.length} APIs)`,
+    );
+  }
+
   console.log("\n---");
   if (failed > 0) {
     console.error(`FAILED: ${failed} check(s)`);
     process.exit(1);
   }
   console.log("PASS — static WF-7.2");
+  console.log("API smoke: npm run smoke:buyer-path (G.3, needs server + e2e seed)");
   console.log("Manual: Samsung smoke → docs/mobile-development.md § WF-7.2");
   console.log("  adb shell am start -a android.intent.action.VIEW -d \"izibuy://product/<id>\"");
 };

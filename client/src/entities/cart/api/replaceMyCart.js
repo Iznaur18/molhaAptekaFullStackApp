@@ -2,6 +2,7 @@ import { apiClient } from "../../../shared/api/index.js";
 import { parseReplaceCartData } from "../../../shared/api/parseApiContract.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 import { coerceCartItemsFromApi } from "../lib/coerceCartItemsFromApi.js";
+import { formatApiErrorMessage } from "@izibuy/shared-lib";
 
 /**
  * `PUT /cart` — полная замена корзины на сервере.
@@ -20,8 +21,6 @@ export async function replaceMyCart(items) {
     const parsed = parseReplaceCartData(data);
     return coerceCartItemsFromApi(parsed.items);
   } catch (e) {
-    const message =
-      e?.response?.data?.message ?? e?.message ?? API_CLIENT_UI.REPLACE_CART_FALLBACK;
-    throw new Error(message);
+    throw new Error(formatApiErrorMessage(e, API_CLIENT_UI.REPLACE_CART_FALLBACK));
   }
 }
