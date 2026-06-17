@@ -1,5 +1,5 @@
 import { CartModel } from "../../models/index.js";
-import { errorRes, successRes } from "../../utils/index.js";
+import { errorRes, successRes } from "../../services/http/index.js";
 
 import {
   filterCartItemsToPurchasableProducts,
@@ -9,8 +9,7 @@ import { resolveCartUserId } from "./resolveCartUserId.js";
 
 /** `GET /cart` — корзина текущего пользователя; недоступные позиции выкидываются и сохраняются. */
 export const getMyCartController = async (req, res) => {
-  try {
-    const userId = resolveCartUserId(req.userId);
+const userId = resolveCartUserId(req.userId);
     if (!userId) {
       return errorRes(res, 401, "Не авторизован");
     }
@@ -33,8 +32,4 @@ export const getMyCartController = async (req, res) => {
     );
 
     return successRes(res, { items: purchasable });
-  } catch (error) {
-    console.error("getMyCartController error:", error);
-    return errorRes(res, 500, "Не удалось загрузить корзину");
-  }
 };

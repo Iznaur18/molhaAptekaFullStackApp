@@ -3,9 +3,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import { useCart } from "../../entities/cart/model/useCart.js";
 import { useWishlist } from "../../entities/wishlist/model/useWishlist.js";
-import { useHomeCatalogSections } from "../../pages/home/model/useHomeCatalogSections.jsx";
-import { AppShellCatalogSectionsProvider } from "../model/AppShellCatalogSectionsContext.jsx";
-import { AppShellStateProvider } from "../model/AppShellStateContext.jsx";
+import { useHomeCatalogSections } from "../../widgets/app-shell/model/useHomeCatalogSections.jsx";
+import { AppShellCatalogSectionsProvider } from "../../widgets/app-shell/model/AppShellCatalogSectionsContext.jsx";
+import { AppShellStateProvider } from "../../widgets/app-shell/model/AppShellStateContext.jsx";
 import { useAppShellController } from "../model/useAppShellController.js";
 import { useAppShellDomain } from "../model/useAppShellDomain.js";
 import { useAppShellState } from "../model/useAppShellState.js";

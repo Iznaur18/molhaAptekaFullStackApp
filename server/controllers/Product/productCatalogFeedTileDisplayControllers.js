@@ -1,6 +1,6 @@
 import ProductCatalogFeedTileDisplayModel from "../../models/ProductCatalogFeedTileDisplayModel.js";
-import { deleteUploadFileByUrl } from "../../utils/deleteUploadFileByUrl.js";
-import { errorRes, successRes } from "../../utils/index.js";
+import { deleteUploadFileByUrl } from "../../services/upload/deleteUploadFileByUrl.js";
+import { successRes } from "../../services/http/index.js";
 
 /**
  * @param {import('mongoose').Document | Record<string, unknown> | null | undefined} row
@@ -20,24 +20,15 @@ const toFeedTileDisplayPayload = (row) => ({
 
 /** GET /product/catalog-feed-displays */
 export async function getProductCatalogFeedTileDisplaysController(_req, res) {
-  try {
-    const rows = await ProductCatalogFeedTileDisplayModel.find().lean();
+const rows = await ProductCatalogFeedTileDisplayModel.find().lean();
     successRes(res, {
       displays: rows.map(toFeedTileDisplayPayload),
     });
-  } catch (error) {
-    return errorRes(
-      res,
-      500,
-      error instanceof Error ? error.message : "Не удалось загрузить подборки",
-    );
-  }
 }
 
 /** PATCH /product/catalog-feed-displays/:tileKey — только admin. */
 export async function patchProductCatalogFeedTileDisplayController(req, res) {
-  try {
-    const tileKey = String(req.params.tileKey ?? "").trim();
+const tileKey = String(req.params.tileKey ?? "").trim();
     const { customLabel, imageUrl, resetCustomLabel, resetImageUrl } = req.body ?? {};
 
     const existing = await ProductCatalogFeedTileDisplayModel.findOne({
@@ -87,11 +78,4 @@ export async function patchProductCatalogFeedTileDisplayController(req, res) {
     successRes(res, {
       display: toFeedTileDisplayPayload(saved),
     });
-  } catch (error) {
-    return errorRes(
-      res,
-      500,
-      error instanceof Error ? error.message : "Не удалось сохранить подборку",
-    );
-  }
 }

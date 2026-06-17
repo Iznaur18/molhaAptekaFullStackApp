@@ -13,6 +13,8 @@ import {
   registerPushTokenValidation,
   removePushTokenValidation,
 } from "./user/pushTokenValidation.js";
+import { refreshAuthValidation } from "./user/refreshAuthValidation.js";
+import { verifyEmailTokenValidation } from "./user/verifyEmailTokenValidation.js";
 import { makeProductValidation } from "./product/makeProductValidation.js";
 import { productIdParamValidation } from "./product/productIdParamValidation.js";
 import { productsSearchValidation } from "./product/productsSearchValidation.js";
@@ -49,6 +51,7 @@ import { updateOrderStatusValidation } from "./order/updateOrderStatusValidation
 import { getAllOrdersValidation } from "./order/getAllOrdersValidation.js";
 import { getMySalesValidation } from "./order/getMySalesValidation.js";
 import { orderItemActionValidation } from "./order/orderItemActionValidation.js";
+import { orderItemCancelValidation } from "./order/orderItemCancelValidation.js";
 import { replaceMyCartValidation } from "./cart/replaceMyCartValidation.js";
 import { replaceMyFavoritesValidation } from "./favorites/replaceMyFavoritesValidation.js";
 import {
@@ -117,6 +120,8 @@ export {
   submitDataConfirmationValidation,
   resolveDataConfirmationValidation,
   userFollowListValidation,
+  refreshAuthValidation,
+  verifyEmailTokenValidation,
   registerPushTokenValidation,
   removePushTokenValidation,
   makeProductValidation,
@@ -147,6 +152,7 @@ export {
   getAllOrdersValidation,
   getMySalesValidation,
   orderItemActionValidation,
+  orderItemCancelValidation,
   replaceMyCartValidation,
   replaceMyFavoritesValidation,
   userStoryIdParamValidation,

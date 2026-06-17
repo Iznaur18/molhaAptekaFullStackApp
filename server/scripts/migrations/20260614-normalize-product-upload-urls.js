@@ -1,4 +1,4 @@
-import { normalizeStoredUploadUrl } from "../../utils/buildPublicUploadUrl.js";
+import { normalizeStoredUploadUrl } from "../../services/upload/buildPublicUploadUrl.js";
 
 const UPLOAD_PATH_IN_ARRAY_RE = /\/uploads\//i;
 

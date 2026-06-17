@@ -18,7 +18,7 @@ import {
   connectMongoTestReplSet,
   disconnectMongoTestReplSet,
 } from "./helpers/mongoTestDb.js";
-import { resolveUserAddressCityNormalized } from "../utils/ruCityNormalized.js";
+import { resolveUserAddressCityNormalized } from "../services/product/ruCityNormalized.js";
 
 process.env.JWT_SECRET =
   process.env.JWT_SECRET ?? "integration-test-jwt-secret-min-32-chars";

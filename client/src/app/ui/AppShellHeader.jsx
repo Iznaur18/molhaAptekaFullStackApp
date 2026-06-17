@@ -22,7 +22,7 @@ import {
   PRODUCT_SEARCH_INPUT_UI,
 } from "../../shared/config/appUiCopy.js";
 import { getAppShellHeaderVariantClass } from "../lib/appShellVariant.js";
-import { isProfileTabMainView } from "../../pages/my-profile/lib/profileTabToMainView.js";
+import { isProfileTabMainView } from "../../widgets/app-shell/lib/profileTabToMainView.js";
 import {
   isCatalogBrowserMainView,
   isCatalogHeaderMainView,
@@ -30,7 +30,7 @@ import {
   isMyProductsMainView,
 } from "../../shared/lib/homeMainViewPaths.js";
 import { MobileBottomNav } from "../../widgets/mobile-bottom-nav/ui/MobileBottomNav.jsx";
-import { APP_SHELL_MOBILE_NAV_BREAKPOINT_PX } from "../lib/appShellMobileNavConstants.js";
+import { APP_SHELL_MOBILE_NAV_BREAKPOINT_PX } from "../../shared/lib/appShellMobileNavConstants.js";
 import { useMaxWidthMediaQuery } from "../../shared/lib/useMaxWidthMediaQuery.js";
 import { useScrollLock } from "../../shared/lib/useScrollLock.js";
 import { SearchInput } from "../../shared/ui/SearchInput/SearchInput.jsx";
@@ -91,29 +91,14 @@ const NON_CATALOG_VIEW_TITLES = {
  *   onRegisterClick: () => void;
  *   onNavigateToFullCatalogFromBreadcrumb: () => void;
  *   onMobileCartClick: () => void;
- *   catalogSort: string;
- *   onCatalogSortChange: (value: string) => void;
- *   catalogFollowingOnly: boolean;
- *   catalogAuctionOnly: boolean;
- *   catalogInstallmentOnly: boolean;
- *   catalogSaleOnly: boolean;
- *   onCatalogFollowingOnlyToggle: () => void;
- *   onCatalogAuctionOnlyToggle: () => void;
- *   onCatalogInstallmentOnlyToggle: () => void;
- *   onCatalogSaleOnlyToggle: () => void;
- *   isAdmin: boolean;
  *   canModerateProducts?: boolean;
  *   showHiddenCatalogProducts: boolean;
  *   onShowHiddenCatalogProductsToggle: () => void;
- *   myProductsTotal: number | null;
- *   sellerProductsLimit: number | null;
  *   pendingModerationCount?: number;
  *   pendingInstallmentModerationCount?: number;
  *   pendingInstallmentDisputesCount?: number;
  *   pendingProductReportsCount?: number;
  *   pendingDataConfirmationCount?: number;
- *   myProductsModerationFilter?: string;
- *   onMyProductsModerationFilterChange?: (value: string) => void;
  * }} props
  */
 export function AppShellHeader({
@@ -139,29 +124,14 @@ export function AppShellHeader({
   onRegisterClick,
   onNavigateToFullCatalogFromBreadcrumb,
   onMobileCartClick,
-  catalogSort,
-  onCatalogSortChange,
-  catalogFollowingOnly,
-  catalogAuctionOnly,
-  catalogInstallmentOnly,
-  catalogSaleOnly,
-  onCatalogFollowingOnlyToggle,
-  onCatalogAuctionOnlyToggle,
-  onCatalogInstallmentOnlyToggle,
-  onCatalogSaleOnlyToggle,
-  isAdmin,
   canModerateProducts = false,
   showHiddenCatalogProducts,
   onShowHiddenCatalogProductsToggle,
-  myProductsTotal,
-  sellerProductsLimit,
   pendingModerationCount = 0,
   pendingInstallmentModerationCount = 0,
   pendingInstallmentDisputesCount = 0,
   pendingProductReportsCount = 0,
   pendingDataConfirmationCount = 0,
-  myProductsModerationFilter = "",
-  onMyProductsModerationFilterChange,
 }) {
   /** @type {import('react').RefObject<HTMLDivElement | null>} */
   const productCategoryFilterRef = useRef(null);

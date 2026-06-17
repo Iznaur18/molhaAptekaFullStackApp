@@ -1,17 +1,16 @@
 import { UserModel } from "../../models/index.js";
-import { errorRes, successRes } from "../../utils/index.js";
-import { getOptionalViewerFromRequest } from "../../utils/optionalViewerFromRequest.js";
-import { sanitizeUserProfileForViewer } from "../../utils/userProfileVisibility.js";
-import { getUserRecentUniquePurchases } from "../../utils/userRecentPurchases.js";
+import { errorRes, successRes } from "../../services/http/index.js";
+import { getOptionalViewerFromRequest } from "../../services/user/optionalViewerFromRequest.js";
+import { sanitizeUserProfileForViewer } from "../../services/user/userProfileVisibility.js";
+import { getUserRecentUniquePurchases } from "../../services/user/userRecentPurchases.js";
 import {
   canViewerSeeOtherUserPurchases,
   OTHER_USER_PURCHASES_PREMIUM_ONLY_MESSAGE,
-} from "../../utils/userPurchasesVisibility.js";
+} from "../../services/user/userPurchasesVisibility.js";
 
 /** `GET /user/:userIdClient/purchases` — последние уникальные покупки (JWT). */
 export const getUserPurchasesController = async (req, res) => {
-  try {
-    if (!req.userId) {
+if (!req.userId) {
       return errorRes(res, 401, "Требуется авторизация");
     }
 
@@ -45,8 +44,4 @@ export const getUserPurchasesController = async (req, res) => {
     const items = await getUserRecentUniquePurchases(targetUserId);
 
     return successRes(res, { items });
-  } catch (error) {
-    console.error("getUserPurchasesController error:", error);
-    return errorRes(res, 500, "Ошибка при получении покупок пользователя");
-  }
 };

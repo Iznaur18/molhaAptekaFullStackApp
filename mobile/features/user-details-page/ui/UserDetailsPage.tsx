@@ -4,7 +4,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
+import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import { ProductCard } from "@/entities/product/ui/ProductCard";
+import { AdminUserStaffActions } from "@/entities/user/ui/AdminUserStaffActions";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { getUserProfileRows } from "@/entities/user/lib/getUserProfileRows";
 import { mapSellerCatalogItemsToProducts } from "@/entities/user/lib/mapSellerCatalogItemsToProducts";
@@ -31,6 +33,7 @@ export const UserDetailsPage = () => {
   const userId = String(params.id ?? "").trim();
 
   const sessionQuery = useAuthSessionQuery();
+  const { canModerate } = useUserAccess();
   const currentUser = sessionQuery.data?.user;
   const currentUserId = currentUser?._id != null ? String(currentUser._id) : null;
   const isAuthorized = Boolean(currentUser);
@@ -135,6 +138,14 @@ export const UserDetailsPage = () => {
       />
 
       <UserProfileInfoPanel rows={profileRows} />
+
+      {canModerate && !isSelf ? (
+        <AdminUserStaffActions
+          onEditPress={() =>
+            router.push({ pathname: "/user/[id]/edit", params: { id: userId } })
+          }
+        />
+      ) : null}
 
       {!isSelf ? (
         <View style={styles.section}>

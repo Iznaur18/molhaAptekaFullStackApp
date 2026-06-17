@@ -1,6 +1,6 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { useRouter } from "expo-router";
+import { usePathname, useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -8,6 +8,7 @@ import { useCartTotalCount } from "@/entities/cart/model/useCartTotalCount";
 import { useUnreadNotificationsCount } from "@/entities/notification/model/useInAppNotifications";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { CART_PAGE_UI, MOBILE_BOTTOM_NAV_UI } from "@/shared/config";
+import { isProfileTabBarRoute } from "@/shared/lib/isProfileTabBarRoute";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
 import { AppText } from "@/shared/ui/AppText";
@@ -104,6 +105,7 @@ const formatBadge = (count: number) => (count > 99 ? "99+" : String(count));
 
 export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => {
   const router = useRouter();
+  const pathname = usePathname();
   const insets = useSafeAreaInsets();
   const styles = useTabBarStyles();
   const { theme } = useAppThemeSettings();
@@ -111,6 +113,7 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
   const cartCount = useCartTotalCount();
   const unreadNotifications = useUnreadNotificationsCount();
   const isAuthorized = sessionQuery.data?.user != null;
+  const isProfileTabBarContext = isProfileTabBarRoute(pathname);
 
   const cartBadge = cartCount > 0 ? formatBadge(cartCount) : null;
   const profileBadge =
@@ -170,7 +173,8 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
         const isFocused =
           item.routeName !== PLACE_PRODUCT_ROUTE &&
           routeIndex >= 0 &&
-          state.index === routeIndex;
+          (state.index === routeIndex ||
+            (item.routeName === "profile" && isProfileTabBarContext));
         const badge =
           item.routeName === "cart"
             ? cartBadge

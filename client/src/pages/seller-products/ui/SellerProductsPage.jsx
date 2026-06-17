@@ -13,7 +13,7 @@ import { resolveUserProfileBackgroundFromUser } from "../../../entities/user/lib
 import { UserFollowButton } from "../../../entities/user-follow/ui/UserFollowButton.jsx";
 import { UserPremiumAvatar } from "../../../entities/user/ui/UserPremiumAvatar.jsx";
 import { UserPremiumDisplayName } from "../../../entities/user/ui/UserPremiumDisplayName.jsx";
-import { HomeCatalogGrid } from "../../home/ui/HomeCatalogGrid.jsx";
+import { HomeCatalogGrid } from "../../../widgets/catalog-product-grid/ui/HomeCatalogGrid.jsx";
 import { useSellerProductsCatalog } from "../model/useSellerProductsCatalog.js";
 import { SELLER_PRODUCTS_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 

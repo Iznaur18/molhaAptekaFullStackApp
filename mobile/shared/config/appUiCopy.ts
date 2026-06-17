@@ -113,6 +113,27 @@ export const EDIT_PROFILE_UI = {
   AUTH_REQUIRED: "Войдите, чтобы редактировать профиль",
 } as const;
 
+export const ADMIN_EDIT_USER_UI = {
+  TITLE: "Редактирование пользователя",
+  SECTION_ADMIN: "Администрирование",
+  LABEL_ROLE: "Роль",
+  LABEL_DISCOUNT: "Скидка, %",
+  LABEL_LOYALTY_POINTS: "Баллы лояльности",
+  PREMIUM_CARD_TITLE: "Премиум",
+  PREMIUM_TOGGLE_LABEL: "Премиум включён",
+  PREMIUM_STATUS_ACTIVE: (dateText: string) => `Активен до ${dateText}`,
+  PREMIUM_STATUS_OFF: "Выключен",
+  PREMIUM_EXTEND_HINT:
+    "Срок добавляется к текущей дате окончания, если премиум уже активен.",
+  PREMIUM_PRESET_MONTHS: (months: number) => `${months} мес.`,
+  PREMIUM_CUSTOM_DATE_LABEL: "Своя дата окончания (YYYY-MM-DDTHH:mm)",
+  DISABLE_PREMIUM_CONFIRM: (userName: string) => `Отключить премиум у «${userName}»?`,
+  LABEL_ACCOUNT_ACTIVE: "Учётка активна",
+  LABEL_BLOCKED: "Заблокирован",
+  LABEL_USER_DATA_CONFIRMED: "Данные подтверждены",
+  EDIT_BUTTON: "Редактировать",
+} as const;
+
 export const ADD_TO_CART_UI = {
   ADD: "В корзину",
   LOGIN_TO_ADD: "Войти, чтобы добавить",
@@ -193,6 +214,10 @@ export const PRODUCT_CARD_UI = {
   RATING_LINE: (rating: number, count: number) => `★ ${rating.toFixed(1)} (${count})`,
   PROMOTION_BUTTON: "Продвигать",
   EDIT_PRODUCT: "Изменить",
+  GALLERY_REGION_ARIA: "Галерея фото товара",
+  GALLERY_COUNTER_ARIA: (current: number, total: number) => `Фото ${current} из ${total}`,
+  GALLERY_PREV: "Предыдущее фото",
+  GALLERY_NEXT: "Следующее фото",
 } as const;
 
 export const USER_PREMIUM_UI = {
@@ -682,8 +707,9 @@ export const USERS_PAGE_UI = {
   TITLE: "Пользователи",
   OPEN_BUTTON: "Пользователи",
   LOADING: "Загрузка пользователей…",
-  EMPTY: "Введите минимум 3 символа для поиска.",
+  EMPTY: "Пользователей пока нет.",
   EMPTY_BY_QUERY: "Никого не нашли по этому запросу.",
+  SEARCH_TOO_SHORT: "Введите не менее 3 символов для поиска.",
   FETCH_FALLBACK: "Не удалось загрузить пользователей",
 } as const;
 
@@ -757,6 +783,7 @@ export const RAFFLE_SELLER_PANEL_UI = {
 } as const;
 
 export const HUB_SECTION_UI = {
+  SCREEN_TITLE: "Раздел",
   PLACEHOLDER_TITLE: "Раздел в разработке",
   PLACEHOLDER_HINT: "Экран будет добавлен в следующей фазе Mobile Parity.",
   FORBIDDEN_TITLE: "Нет доступа",

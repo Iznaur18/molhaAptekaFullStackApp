@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 
 import { assertProductionEnv } from "../utils/assertProductionEnv.js";
 import { buildSpaContentSecurityPolicy } from "../utils/buildSpaContentSecurityPolicy.js";
-import { isObjectStorageUploadEnabled } from "../utils/objectStorageUpload.js";
+import { isObjectStorageUploadEnabled } from "../services/upload/objectStorageUpload.js";
 
 process.env.NODE_ENV = "production";
 

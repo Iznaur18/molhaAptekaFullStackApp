@@ -1,8 +1,8 @@
 import { OrderModel } from "../../models/index.js";
-import { errorRes, successRes } from "../../utils/index.js";
+import { successRes } from "../../services/http/index.js";
 
 import { ORDER_BUYER_PUBLIC_FIELDS, ORDER_ITEMS_POPULATE } from "./orderQueries.js";
-import { syncOrderStatusFromItems } from "./orderStatus.js";
+import { syncOrderStatusFromItems } from "../../services/order/orderStatus.js";
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 20;
@@ -19,8 +19,7 @@ const buildOrdersQuery = ({ status }) => (status ? { status } : {});
 
 /** `GET /order/all` — все заказы (только админ), пагинация и опц. фильтр по `status`. */
 export const getAllOrdersController = async (req, res) => {
-  try {
-    const { page, limit, skip } = parsePagination(req.query);
+const { page, limit, skip } = parsePagination(req.query);
     const ordersQuery = buildOrdersQuery(req.query);
 
     const [orders, total] = await Promise.all([
@@ -36,8 +35,4 @@ export const getAllOrdersController = async (req, res) => {
     orders.forEach((order) => syncOrderStatusFromItems(order));
 
     return successRes(res, { orders, total, page, limit });
-  } catch (error) {
-    console.error("getAllOrdersController error:", error);
-    return errorRes(res, 500, "Ошибка при получении заказов");
-  }
 };

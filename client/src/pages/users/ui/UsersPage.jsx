@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { USER_SEARCH_MIN_LENGTH } from "@molha/api-contract";
+import { USER_SEARCH_MIN_LENGTH, isUsersSearchInputTooShort } from "@molha/api-contract";
 
 import { useUsersSearchQuery } from "../../../entities/user/model/useUsersSearchQuery.js";
 import { UserListRow } from "../../../entities/user/ui/UserListRow.jsx";
@@ -22,7 +22,7 @@ export function UsersPage({ onUserRowClick }) {
   const debouncedSearch = useDebouncedValue(searchTerm, USER_SEARCH_UI.DEBOUNCE_MS);
   const isSearchPending = searchTerm !== debouncedSearch;
   const hasSearchQuery = debouncedSearch.trim().length >= USER_SEARCH_MIN_LENGTH;
-  const hasActiveFilters = hasSearchQuery;
+  const isSearchInputTooShort = isUsersSearchInputTooShort(debouncedSearch);
 
   const { phase, users, error } = useUsersSearchQuery({ search: debouncedSearch });
 
@@ -41,7 +41,8 @@ export function UsersPage({ onUserRowClick }) {
         phase={phase}
         users={users}
         error={error}
-        hasActiveFilters={hasActiveFilters}
+        hasActiveFilters={hasSearchQuery}
+        isSearchInputTooShort={isSearchInputTooShort}
         onUserRowClick={onUserRowClick}
       />
     </div>
@@ -54,10 +55,18 @@ export function UsersPage({ onUserRowClick }) {
  *   users: import('../../../entities/user/model/types.js').UserSearchListItem[];
  *   error: string;
  *   hasActiveFilters: boolean;
+ *   isSearchInputTooShort?: boolean;
  *   onUserRowClick?: (userId: string) => void;
  * }} props
  */
-function UsersPageBody({ phase, users, error, hasActiveFilters, onUserRowClick }) {
+function UsersPageBody({
+  phase,
+  users,
+  error,
+  hasActiveFilters,
+  isSearchInputTooShort = false,
+  onUserRowClick,
+}) {
   if (phase === "loading") {
     return <p className="users-page__state">{USERS_PAGE_UI.LOADING}</p>;
   }
@@ -71,11 +80,12 @@ function UsersPageBody({ phase, users, error, hasActiveFilters, onUserRowClick }
   }
 
   if (users.length === 0) {
-    return (
-      <p className="users-page__state">
-        {hasActiveFilters ? USERS_PAGE_UI.EMPTY_BY_QUERY : USERS_PAGE_UI.EMPTY}
-      </p>
-    );
+    const emptyMessage = isSearchInputTooShort
+      ? USERS_PAGE_UI.SEARCH_TOO_SHORT
+      : hasActiveFilters
+        ? USERS_PAGE_UI.EMPTY_BY_QUERY
+        : USERS_PAGE_UI.EMPTY;
+    return <p className="users-page__state">{emptyMessage}</p>;
   }
 
   return (

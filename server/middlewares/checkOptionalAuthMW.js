@@ -1,5 +1,5 @@
 import { getAuthTokenFromRequest } from "../utils/authCookie.js";
-import { verifyAccessToken } from "../utils/authTokens.js";
+import { verifyAccessToken } from "../services/auth/authTokens.js";
 
 /** Кладёт `req.userId`, если передан валидный access JWT; иначе идёт дальше без ошибки. */
 export const checkOptionalAuthMW = (req, res, next) => {

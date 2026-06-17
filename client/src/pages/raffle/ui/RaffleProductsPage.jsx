@@ -1,6 +1,6 @@
 import { useRaffleByIdQuery } from "../../../entities/raffle/model/useRaffleByIdQuery.js";
 import { useRaffleProductsQuery } from "../../../entities/raffle/model/useRaffleProductsQuery.js";
-import { HomeCatalogGrid } from "../../home/ui/HomeCatalogGrid.jsx";
+import { HomeCatalogGrid } from "../../../widgets/catalog-product-grid/ui/HomeCatalogGrid.jsx";
 import {
   API_CLIENT_UI,
   RAFFLE_PRODUCTS_PAGE_UI,

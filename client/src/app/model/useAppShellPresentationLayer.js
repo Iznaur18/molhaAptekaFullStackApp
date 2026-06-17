@@ -1,7 +1,7 @@
-import { useCatalogMainContentProps } from "../../pages/home/model/useCatalogMainContentProps.js";
-import { useHomeHeaderProps } from "../../pages/home/model/useHomeHeaderProps.js";
-import { useHomeMainContentProps } from "../../pages/home/model/useHomeMainContentProps.js";
-import { useHomeModalsLayerProps } from "../../pages/home/model/useHomeModalsLayerProps.js";
+import { useCatalogMainContentProps } from "../../widgets/app-shell/model/useCatalogMainContentProps.js";
+import { useHomeHeaderProps } from "../../widgets/app-shell/model/useHomeHeaderProps.js";
+import { useHomeMainContentProps } from "../../widgets/app-shell/model/useHomeMainContentProps.js";
+import { useHomeModalsLayerProps } from "../../widgets/app-shell/model/useHomeModalsLayerProps.js";
 
 /** Сборка header / main / modals props для AppShellLayout. */
 export function useAppShellPresentationLayer() {

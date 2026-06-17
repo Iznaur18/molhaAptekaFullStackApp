@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { createAsyncRouter } from "../utils/createAsyncRouter.js";
 
 import {
   getAppIntroSettingsController,
@@ -7,7 +7,7 @@ import {
 import { checkAdminMW, checkAuthMW } from "../middlewares/index.js";
 import { patchAppIntroSettingsValidation } from "../validations/appIntro/appIntroSettingsValidation.js";
 
-const router = Router();
+const router = createAsyncRouter();
 
 router.get("/", getAppIntroSettingsController);
 router.patch(

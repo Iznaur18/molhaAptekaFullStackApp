@@ -1,6 +1,6 @@
 import { formatZodQueryError } from "@molha/api-contract";
 
-import { errorRes } from "../utils/index.js";
+import { errorRes } from "../services/http/index.js";
 
 /**
  * @param {import('zod').ZodTypeAny} schema

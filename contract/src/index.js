@@ -27,6 +27,8 @@ export {
   userSearchQuerySchema,
   USER_SEARCH_MIN_LENGTH,
   USER_SEARCH_QUERY_MAX_LENGTH,
+  canFetchUsersSearch,
+  isUsersSearchInputTooShort,
 } from "./userSearch.js";
 export {
   registerPushTokenBodySchema,
@@ -89,7 +91,11 @@ export {
   resolveDataConfirmationBodySchema,
   submitDataConfirmationBodySchema,
 } from "./dataConfirmation.js";
-export { verifyEmailWithCodeBodySchema } from "./emailVerification.js";
+export {
+  verifyEmailWithCodeBodySchema,
+  verifyEmailTokenQuerySchema,
+  EMAIL_VERIFICATION_TOKEN_HEX_LENGTH,
+} from "./emailVerification.js";
 export { addressSuggestBodySchema } from "./addressSuggest.js";
 export { adminCatalogDisplayPatchBodySchema } from "./adminDisplay.js";
 export {
@@ -178,6 +184,8 @@ export {
   orderFromApiSchema,
   orderIdParamsSchema,
   orderItemActionParamsSchema,
+  orderItemCancelBodySchema,
+  ORDER_ITEM_CANCELLATION_REASON_MAX_LENGTH,
   updateOrderStatusBodySchema,
 } from "./order.js";
 export {

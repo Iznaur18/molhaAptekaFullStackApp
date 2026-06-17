@@ -9,6 +9,7 @@ import {
 } from "react-native";
 
 import { markUserStoryViewed } from "@/entities/user-story/api/userStoryApi";
+import { resolveUserStoryMediaUrl } from "@/entities/user-story/lib/resolveUserStoryMediaUrl";
 import {
   USER_STORY_MEDIA_TYPE_VIDEO,
 } from "@/entities/user-story/model/constants";
@@ -101,6 +102,9 @@ export const UserStoryViewerModal = ({
   };
 
   const captionText = String(activeStory?.captionText ?? "").trim();
+  const resolvedMediaUrl = activeStory
+    ? resolveUserStoryMediaUrl(activeStory.mediaUrl)
+    : "";
 
   return (
     <>
@@ -119,10 +123,10 @@ export const UserStoryViewerModal = ({
           {activeStory ? (
             <View style={styles.mediaWrap}>
               {activeStory.mediaType === USER_STORY_MEDIA_TYPE_VIDEO ? (
-                <ProductPreviewVideo uri={activeStory.mediaUrl} />
+                <ProductPreviewVideo uri={resolvedMediaUrl} />
               ) : (
                 <Image
-                  source={{ uri: activeStory.mediaUrl }}
+                  source={{ uri: resolvedMediaUrl }}
                   style={styles.media}
                   contentFit="contain"
                 />

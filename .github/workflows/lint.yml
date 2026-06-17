@@ -43,6 +43,9 @@ jobs:
       - name: Install root tooling
         run: npm ci
 
+      - name: Build shared-lib
+        run: npm run build --workspace=@izibuy/shared-lib
+
       - name: Prettier check
         run: npm run format:check
 
@@ -54,3 +57,9 @@ jobs:
 
       - name: Package unit tests (contract + shared-lib)
         run: npm run test:packages
+
+      - name: Server tests
+        working-directory: server
+        run: |
+          npm ci
+          npm test

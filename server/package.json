@@ -9,6 +9,7 @@
   "scripts": {
     "test": "node --test --test-concurrency=1 tests/**/*.test.js",
     "start:dev": "nodemon index.js",
+    "start:worker": "node worker.js",
     "start:e2e": "node index.js",
     "e2e:seed": "node scripts/e2ePlaywrightSeed.js",
     "migrate": "node scripts/runMigrations.js",
@@ -22,16 +23,19 @@
     "sync-uploads:s3": "node scripts/syncUploadsToObjectStorage.js",
     "sync-uploads:s3:apply": "node scripts/syncUploadsToObjectStorage.js --apply",
     "test:smtp": "node scripts/testSmtp.js",
+    "audit:routes": "node scripts/auditRouteBodyValidation.js",
     "create-admin": "node scripts/createAdmin.js"
   },
   "devDependencies": {
-    "mongodb-memory-server": "^10.1.4"
+    "mongodb-memory-server": "^10.1.4",
+    "nodemon": "^3.1.11"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1062.0",
     "@molha/api-contract": "file:../contract",
     "@sentry/node": "^9.47.1",
     "bcrypt": "^6.0.0",
+    "bullmq": "^5.78.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.2.3",
@@ -44,7 +48,6 @@
     "mongoose": "^9.1.5",
     "multer": "^2.0.2",
     "nodemailer": "^8.0.10",
-    "nodemon": "^3.1.11",
     "rate-limit-redis": "^4.2.0",
     "redis": "^6.0.0"
   }

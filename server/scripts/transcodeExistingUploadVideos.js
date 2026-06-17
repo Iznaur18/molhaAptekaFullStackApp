@@ -9,8 +9,8 @@ import "dotenv/config";
 import { readdir, readFile, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-import { UPLOADS_DIR } from "../utils/uploadsDir.js";
-import { transcodeUploadVideoToH264 } from "../utils/transcodeUploadVideoToH264.js";
+import { UPLOADS_DIR } from "../services/upload/uploadsDir.js";
+import { transcodeUploadVideoToH264 } from "../services/upload/transcodeUploadVideoToH264.js";
 
 const VIDEO_EXTENSIONS = new Set([".mov", ".m4v", ".mp4", ".webm"]);
 const isApply = process.argv.includes("--apply");

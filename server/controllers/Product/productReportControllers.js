@@ -10,8 +10,8 @@ import {
   getPendingProductReportGroups,
   notifySellerAboutProductReport,
   resolvePendingReportsForProduct,
-} from "../../utils/productReportHelpers.js";
-import { errorRes, successRes } from "../../utils/index.js";
+} from "../../services/product/productReportHelpers.js";
+import { errorRes, successRes } from "../../services/http/index.js";
 
 /**
  * `POST /product/:productId/report`
@@ -83,8 +83,7 @@ export const submitProductReportController = async (req, res) => {
  * `GET /product/:productId/report/me`
  */
 export const getMyProductReportStatusController = async (req, res) => {
-  try {
-    const reporterId = String(req.userId);
+const reporterId = String(req.userId);
     const { productId } = req.params;
 
     const pending = await ProductReportModel.findOne({
@@ -98,46 +97,31 @@ export const getMyProductReportStatusController = async (req, res) => {
     return successRes(res, {
       hasPendingReport: Boolean(pending),
     });
-  } catch (error) {
-    console.error("getMyProductReportStatusController error:", error);
-    return errorRes(res, 500, "Ошибка при проверке жалобы");
-  }
 };
 
 /** `GET /product/reports/pending */
 export const getPendingProductReportsController = async (req, res) => {
-  try {
-    const { groups, totalReports } = await getPendingProductReportGroups();
+const { groups, totalReports } = await getPendingProductReportGroups();
 
     return successRes(res, {
       groups,
       totalReports,
       totalGroups: groups.length,
     });
-  } catch (error) {
-    console.error("getPendingProductReportsController error:", error);
-    return errorRes(res, 500, "Ошибка при получении жалоб");
-  }
 };
 
 /** `GET /product/reports/pending/count */
 export const getPendingProductReportsCountController = async (req, res) => {
-  try {
-    const totalReports = await ProductReportModel.countDocuments({
+const totalReports = await ProductReportModel.countDocuments({
       status: PRODUCT_REPORT_STATUS_PENDING,
     });
 
     return successRes(res, { totalReports });
-  } catch (error) {
-    console.error("getPendingProductReportsCountController error:", error);
-    return errorRes(res, 500, "Ошибка при получении счётчика жалоб");
-  }
 };
 
 /** `PATCH /product/reports/product/:productId/resolve */
 export const resolveProductReportsForProductController = async (req, res) => {
-  try {
-    const staffUserId = req.userId;
+const staffUserId = req.userId;
     const { productId } = req.params;
     const resolution = String(req.body?.resolution ?? "").trim();
     const staffNote = String(req.body?.staffNote ?? "").trim();
@@ -172,8 +156,4 @@ export const resolveProductReportsForProductController = async (req, res) => {
       }
       throw resolveError;
     }
-  } catch (error) {
-    console.error("resolveProductReportsForProductController error:", error);
-    return errorRes(res, 500, "Ошибка при обработке жалоб");
-  }
 };

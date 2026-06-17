@@ -9,13 +9,12 @@ import {
   PremiumAlreadyActiveError,
   purchasePremiumSubscription,
   syncPremiumExpiryForUser,
-} from "../../utils/premiumAccess.js";
-import { InsufficientLoyaltyPointsError } from "../../utils/loyaltyPointsSpend.js";
-import { errorRes, successRes } from "../../utils/index.js";
+} from "../../services/user/premiumAccess.js";
+import { InsufficientLoyaltyPointsError } from "../../services/loyalty/loyaltyPointsSpend.js";
+import { errorRes, successRes } from "../../services/http/index.js";
 
 export const getMyPremiumStatusController = async (req, res) => {
-  try {
-    const userId = String(req.userId);
+const userId = String(req.userId);
     await syncPremiumExpiryForUser(userId);
 
     const user = await UserModel.findById(userId)
@@ -36,10 +35,6 @@ export const getMyPremiumStatusController = async (req, res) => {
       pricePoints: PREMIUM_PRICE_POINTS,
       loyaltyPointsBalance: loyaltyPoints,
     });
-  } catch (error) {
-    console.error("getMyPremiumStatusController error:", error);
-    return errorRes(res, 500, "Ошибка при загрузке статуса премиума");
-  }
 };
 
 export const purchasePremiumController = async (req, res) => {

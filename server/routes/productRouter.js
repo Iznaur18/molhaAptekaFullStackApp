@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { createAsyncRouter } from "../utils/createAsyncRouter.js";
 import {
   postProductController,
   getProductsController,
@@ -140,7 +140,7 @@ import {
   createInstallmentContractValidation,
 } from "../validations/index.js";
 
-const router = Router();
+const router = createAsyncRouter();
 
 router.post("/", checkAuthMW, makeProductValidation, postProductController);
 router.get(

@@ -1,15 +1,14 @@
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
-import { getHiddenSellerIds } from "../../utils/adminUserGuard.js";
-import { findCatalogProductById } from "../../utils/findCatalogProductById.js";
-import { errorRes, successRes } from "../../utils/index.js";
-import { userHasPurchasedProduct } from "../../utils/userPurchasedProduct.js";
+import { getHiddenSellerIds } from "../../services/access/adminUserGuard.js";
+import { findCatalogProductById } from "../../services/product/findCatalogProductById.js";
+import { errorRes, successRes } from "../../services/http/index.js";
+import { userHasPurchasedProduct } from "../../services/user/userPurchasedProduct.js";
 
 /**
  * `GET /product/:productId/catalog` — карточка товара как в каталоге.
  */
 export const getCatalogProductByIdController = async (req, res) => {
-  try {
-    const { productId } = req.params;
+const { productId } = req.params;
     const viewerUserId = req.userId ? String(req.userId) : null;
 
     const product = await findCatalogProductById(productId);
@@ -44,8 +43,4 @@ export const getCatalogProductByIdController = async (req, res) => {
     }
 
     return successRes(res, { product });
-  } catch (error) {
-    console.error("getCatalogProductByIdController error:", error);
-    return errorRes(res, 500, "Ошибка при загрузке товара");
-  }
 };

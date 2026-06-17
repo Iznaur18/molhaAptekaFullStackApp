@@ -1,11 +1,11 @@
 import { ProductModel } from "../../models/index.js";
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
-import { isUserAdmin } from "../../utils/adminUserGuard.js";
+import { isUserAdmin } from "../../services/access/adminUserGuard.js";
 import {
   hasProductOpenSales,
   OPEN_SALES_BLOCK_MESSAGE,
 } from "../../utils/productOrderLocks.js";
-import { dismissPendingReportsForProduct } from "../../utils/productReportHelpers.js";
+import { dismissPendingReportsForProduct } from "../../services/product/productReportHelpers.js";
 import { rejectAllPendingOffersForProduct } from "../../utils/productPriceOfferHelpers.js";
 import { ProductPriceOfferModel } from "../../models/index.js";
 import {
@@ -17,15 +17,14 @@ import {
   PRODUCT_PROMOTION_STATUS_PENDING_STAFF,
 } from "../../constants/productPromotionConstants.js";
 import { cancelProductPromotionsForProduct } from "../../utils/productPromotionHelpers.js";
-import { deleteUploadFileByUrl } from "../../utils/deleteUploadFileByUrl.js";
+import { deleteUploadFileByUrl } from "../../services/upload/deleteUploadFileByUrl.js";
 import { normalizeProductPreviewVideoUrl } from "../../utils/productPreviewVideo.js";
 import { removeProductIdsFromAllWishlists } from "../Favorites/favoritesItemHelpers.js";
-import { errorRes, successRes } from "../../utils/index.js";
+import { errorRes, successRes } from "../../services/http/index.js";
 
 /** Удаление своего товара или любого (admin). DELETE /product/:productId */
 export const deleteMyProductController = async (req, res) => {
-  try {
-    const userId = req.userId;
+const userId = req.userId;
     const { productId } = req.params;
     const isAdmin = await isUserAdmin(userId);
 
@@ -88,8 +87,4 @@ export const deleteMyProductController = async (req, res) => {
     }
 
     return successRes(res, { message: "Товар удалён" });
-  } catch (error) {
-    console.error(error);
-    return errorRes(res, 500, "Ошибка при удалении товара");
-  }
 };

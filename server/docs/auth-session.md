@@ -8,7 +8,8 @@
 2. Клиент: `axios` с `withCredentials: true` — cookie отправляется автоматически.
 3. `GET /auth/me` — без cookie **200** и `user: null`; с валидным access JWT — профиль. Просроченный access — **401**, клиент делает refresh.
 4. При **401** на `/auth/me` клиент один раз вызывает `POST /auth/refresh` и повторяет запрос.
-5. `POST /auth/logout` — очищает оба cookie.
+5. `POST /auth/logout` — очищает оба cookie; инкрементирует `authTokenVersion` (все refresh недействительны).
+6. `POST /auth/refresh` — **rotation**: проверка `tv` в JWT ↔ `user.authTokenVersion`, затем bump и новая пара токенов; старый refresh → 401.
 
 ## Flow (mobile / native)
 
@@ -28,8 +29,8 @@ Mobile **не использует cookies**. Те же эндпоинты, но
 
 1. Login/register → сохранить `accessToken` + `refreshToken` в `expo-secure-store`.
 2. Запросы: `Authorization: Bearer <accessToken>`.
-3. `POST /auth/refresh` с body `{ "refreshToken": "..." }` (cookie — fallback для web).
-4. `POST /auth/logout` — очистка cookie на server; body `{ refreshToken }` опционально (blacklist — v2).
+3. `POST /auth/refresh` с body `{ "refreshToken": "..." }` (cookie — fallback для web). Rotation: старый refresh после успешного refresh → 401.
+4. `POST /auth/logout` — очистка cookie; body `{ refreshToken }` опционально; bump `authTokenVersion`.
 
 ## Cookie
 

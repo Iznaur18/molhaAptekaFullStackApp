@@ -1,6 +1,8 @@
 import { createElement, useEffect, useRef } from "react";
 import { StyleSheet, View } from "react-native";
 
+import { resolvePreviewVideoMimeType } from "@/shared/lib/resolvePreviewVideoMimeType";
+
 type ProductPreviewVideoProps = {
   uri: string;
   onPlaybackFailed?: () => void;
@@ -20,9 +22,9 @@ export const ProductPreviewVideo = ({ uri, onPlaybackFailed }: ProductPreviewVid
     };
 
     video.addEventListener("error", handleError);
-    void video.play().catch(() => {
-      onPlaybackFailed?.();
-    });
+    video.muted = true;
+    video.loop = true;
+    void video.play().catch(() => {});
 
     return () => {
       video.removeEventListener("error", handleError);
@@ -31,15 +33,22 @@ export const ProductPreviewVideo = ({ uri, onPlaybackFailed }: ProductPreviewVid
 
   return (
     <View style={styles.wrap}>
-      {createElement("video", {
-        ref: videoRef,
-        src: uri,
-        autoPlay: true,
-        loop: true,
-        muted: true,
-        playsInline: true,
-        style: styles.video,
-      })}
+      {createElement(
+        "video",
+        {
+          ref: videoRef,
+          autoPlay: true,
+          loop: true,
+          muted: true,
+          playsInline: true,
+          preload: "metadata",
+          style: styles.video,
+        },
+        createElement("source", {
+          src: uri,
+          type: resolvePreviewVideoMimeType(uri),
+        }),
+      )}
     </View>
   );
 };

@@ -6,8 +6,26 @@ import { USER_ROLE_VALUES } from "./userProfile.js";
 /** Синхрон с `server/validations/user/userSearchValidation.js`. */
 export const USER_SEARCH_QUERY_MAX_LENGTH = 50;
 
-/** Минимум символов в search (без полного листинга пользователей). */
+/** Минимум символов в search, если поле передано (без полного листинга при фильтре). */
 export const USER_SEARCH_MIN_LENGTH = 3;
+
+/**
+ * @param {unknown} search
+ * @returns {boolean}
+ */
+export function canFetchUsersSearch(search) {
+  const normalized = String(search ?? "").trim();
+  return normalized.length === 0 || normalized.length >= USER_SEARCH_MIN_LENGTH;
+}
+
+/**
+ * @param {unknown} search
+ * @returns {boolean}
+ */
+export function isUsersSearchInputTooShort(search) {
+  const normalized = String(search ?? "").trim();
+  return normalized.length > 0 && normalized.length < USER_SEARCH_MIN_LENGTH;
+}
 
 export const userSearchQuerySchema = z.object({
   search: optionalTrimmedString
@@ -31,12 +49,4 @@ export const userSearchQuerySchema = z.object({
       errorMap: () => ({ message: "userRole должен быть user, admin или moderator" }),
     })
     .optional(),
-})
-  .refine(
-    (data) =>
-      typeof data.search === "string" && data.search.length >= USER_SEARCH_MIN_LENGTH,
-    {
-      message: `search обязателен (минимум ${USER_SEARCH_MIN_LENGTH} символа)`,
-      path: ["search"],
-    },
-  );
+});

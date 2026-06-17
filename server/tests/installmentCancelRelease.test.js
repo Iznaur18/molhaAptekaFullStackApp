@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { after, before, test } from "node:test";
 
-import { cancelLinkedOrderForInstallmentContract } from "../utils/cancelLinkedOrderForInstallmentContract.js";
+import { cancelLinkedOrderForInstallmentContract } from "../services/order/cancelLinkedOrderForInstallmentContract.js";
 import {
   createOrderLoyaltyFixture,
   createOrderWithReserveTransaction,

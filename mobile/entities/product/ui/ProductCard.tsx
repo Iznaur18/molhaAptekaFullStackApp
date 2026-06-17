@@ -5,8 +5,9 @@ import { formatProductReviewRatingLine } from "@/entities/product-review/lib/for
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useProductCardChromeFlags } from "@/entities/product/lib/useProductCardChromeFlags";
-import { resolveProductImageUrl } from "@/entities/product/lib/resolveProductImageUrl";
+import { useProductCardMediaState } from "@/entities/product/lib/useProductCardMediaState";
 import { ProductCatalogStatusBadges } from "@/entities/product/ui/ProductCatalogStatusBadges";
+import { ProductCardMedia } from "@/entities/product/ui/ProductCardMedia";
 import { ProductCardSellerRow } from "@/entities/product/ui/ProductCardSellerRow";
 import {
   ProductDiscountBadge,
@@ -16,7 +17,6 @@ import { ProductLoyaltyPointsBadge } from "@/entities/product/ui/ProductLoyaltyP
 import { WishlistToggleButton } from "@/features/wishlist-toggle/ui/WishlistToggleButton";
 import { PRODUCT_REVIEW_UI, PRODUCT_UI } from "@/shared/config";
 import { useProductCardStyles } from "@/shared/theme/catalogProductStyles";
-import { CachedProductImage } from "@/shared/ui/CachedProductImage";
 
 type ProductCardProps = {
   product: Record<string, unknown> & {
@@ -38,7 +38,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
   const { isPremiumUser } = useUserAccess();
   const isAuthorized = useIsAuthorized();
   const flags = useProductCardChromeFlags(product);
-  const imageUrl = resolveProductImageUrl(product);
+  const cardMedia = useProductCardMediaState(product);
   const name = product.productName?.trim() || "Без названия";
   const reviewLine = formatProductReviewRatingLine(product.averageRating, product.reviewCount);
   const hasReviewRating = reviewLine.length > 0;
@@ -56,7 +56,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         accessibilityLabel={PRODUCT_UI.OPEN_ARIA(name)}
       >
         <View style={styles.imageWrap}>
-          <CachedProductImage uri={imageUrl} style={styles.image} />
+          <ProductCardMedia media={cardMedia} />
           {flags.showDiscountBadge || flags.showLoyaltyPointsBadge ? (
             <View style={styles.imageBadges} pointerEvents="box-none">
               {flags.showDiscountBadge ? (

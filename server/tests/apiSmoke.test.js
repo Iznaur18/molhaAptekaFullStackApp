@@ -135,6 +135,57 @@ test("auth refresh: register → refresh → me", async () => {
   assert.equal(meData.user.email, "smoke-refresh@example.com");
 });
 
+test("GET /user/search without search: returns user listing for auth viewer", async () => {
+  const registerResponse = await request("/auth/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(registerPayload("userlist")),
+  });
+  assert.equal(registerResponse.status, 200);
+
+  const authCookie = buildCookieHeader(registerResponse.headers);
+  const searchResponse = await request("/user/search?page=1&limit=10", {
+    headers: { Cookie: authCookie },
+  });
+  assert.equal(searchResponse.status, 200);
+
+  const data = await parseSuccessData(searchResponse);
+  assert.ok(Array.isArray(data.users));
+  assert.ok(data.users.length >= 1);
+  assert.equal(typeof data.total, "number");
+  assert.ok(data.total >= 1);
+  assert.ok(data.users.some((user) => user.userName === "smokeuseruserlist"));
+});
+
+test("auth refresh rotation: old refresh token rejected", async () => {
+  const registerResponse = await request("/auth/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(registerPayload("rotation")),
+  });
+  assert.equal(registerResponse.status, 200);
+
+  const session = await parseSuccessData(registerResponse);
+  const oldRefreshToken = session.refreshToken;
+
+  const refreshResponse = await request("/auth/refresh", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ refreshToken: oldRefreshToken }),
+  });
+  assert.equal(refreshResponse.status, 200);
+
+  const rotatedSession = await parseSuccessData(refreshResponse);
+  assert.notEqual(rotatedSession.refreshToken, oldRefreshToken);
+
+  const staleRefreshResponse = await request("/auth/refresh", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ refreshToken: oldRefreshToken }),
+  });
+  assert.equal(staleRefreshResponse.status, 401);
+});
+
 test("auth mobile: tokens in JSON, bearer me, refresh by body", async () => {
   const registerResponse = await request("/auth/register", {
     method: "POST",

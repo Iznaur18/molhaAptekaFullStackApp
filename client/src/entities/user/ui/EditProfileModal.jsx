@@ -1,20 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-import { useUserProfileMutations } from "../model/useUserProfileMutations.js";
-import { buildAdminPatchUserProfileBody } from "../lib/buildAdminPatchUserProfileBody.js";
-import { buildPatchUserProfileBody } from "../lib/buildPatchUserProfileBody.js";
-import { isPremiumExpiresAtInputActive } from "../lib/computeStaffPremiumExpiry.js";
-import { willFormDisablePremium } from "../lib/willFormDisablePremium.js";
+import { useEditProfileModal } from "../model/useEditProfileModal.js";
 import { AddressStructuredFields } from "../../address/ui/AddressStructuredFields.jsx";
-import { addressStructuredValueFromUser } from "../../address/lib/addressStructuredValueFromUser.js";
-import { mapUserToEditProfileForm } from "../lib/mapUserToEditProfileForm.js";
-import { limitRuPhoneInput } from "../lib/ruPhone.js";
-import {
-  INTEGER_INPUT_FIELD_PROPS,
-  keepDigitsOnly,
-} from "../../../shared/lib/numericInput.js";
-import { validateEditProfileForm } from "../lib/validateEditProfileForm.js";
 import {
   NOTES_ABOUT_USER_MAX_CHARS,
   USER_GENDER_FEMALE,
@@ -32,9 +19,7 @@ import {
   EDIT_PROFILE_MODAL_UI,
   USER_DETAILS_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
-import { isHttpProfileImageUrl } from "../lib/profileImageFocus.js";
-import { resolveImageUrlForDisplay } from "../../../shared/lib/resolveUploadedImageUrl.js";
-import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
+import { INTEGER_INPUT_FIELD_PROPS } from "../../../shared/lib/numericInput.js";
 import { ImageUrlField } from "../../../shared/ui/ImageUrlField/ImageUrlField.jsx";
 import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
 import { ProfileImageFocusEditor } from "./ProfileImageFocusEditor.jsx";
@@ -45,7 +30,6 @@ import { AdminPremiumStaffControl } from "./AdminPremiumStaffControl.jsx";
 import "./EditProfileModal.css";
 
 const GENDER_OPTIONS = [USER_GENDER_MALE, USER_GENDER_FEMALE, USER_GENDER_NO_SELECTED];
-
 const ROLE_OPTIONS = [USER_ROLE_USER, USER_ROLE_MODERATOR, USER_ROLE_ADMIN];
 
 /**
@@ -72,142 +56,29 @@ export function EditProfileModal({
   allowStaffLoyaltyEdit = false,
   onPremiumRevoked,
 }) {
-  const { patchMutation } = useUserProfileMutations();
-  const [form, setForm] = useState(() => mapUserToEditProfileForm({ _id: "" }));
-  const [feedback, setFeedback] = useState({ kind: "idle", message: "" });
-  const wasOpenRef = useRef(false);
-  const initialStructuredAddressRef = useRef(
-    /** @type {import('../../address/model/structuredTypes.js').RuStructuredDeliveryAddressValue | null} */ (
-      null
-    ),
-  );
-
-  useEffect(() => {
-    const didOpen = isOpen && !wasOpenRef.current;
-    wasOpenRef.current = isOpen;
-
-    if (!didOpen || !user) {
-      return undefined;
-    }
-
-    setForm(mapUserToEditProfileForm(user));
-    initialStructuredAddressRef.current = addressStructuredValueFromUser(user);
-    setFeedback({ kind: "idle", message: "" });
-    return undefined;
-  }, [isOpen, user]);
-
-  useScrollLock(isOpen);
-
-  useEffect(() => {
-    if (!isOpen) return undefined;
-    const onKeyDown = (event) => {
-      if (event.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, [isOpen, onClose]);
-
-  const notesChars = useMemo(
-    () => String(form.notesAboutUser ?? "").length,
-    [form.notesAboutUser],
-  );
-
-  const isPremiumUser = isPremiumExpiresAtInputActive(form.premiumExpiresAt);
-  const backgroundMode = adminMode ? "admin" : isPremiumUser ? "image" : "preset";
-
-  const avatarFocusImageUrl = useMemo(() => {
-    const url = resolveImageUrlForDisplay(form.userAvatarUrl ?? "");
-    return isHttpProfileImageUrl(url) ? url : "";
-  }, [form.userAvatarUrl]);
-
-  const backgroundFocusImageUrl = useMemo(() => {
-    const url = resolveImageUrlForDisplay(form.backgroundImageUrl ?? "");
-    if (!isHttpProfileImageUrl(url)) return "";
-    if (backgroundMode === "image" || backgroundMode === "admin") return url;
-    return "";
-  }, [backgroundMode, form.backgroundImageUrl]);
-
-  const isSubmitting = feedback.kind === "loading";
-
-  const handleChange = (event) => {
-    const { name, value, type, checked } = event.target;
-    let nextValue = type === "checkbox" ? checked : value;
-    if (name === "userName" && typeof nextValue === "string") {
-      nextValue = nextValue.toLowerCase().replace(/[^a-z0-9]/g, "");
-    }
-    if (name === "userPhoneNumber" && typeof nextValue === "string") {
-      nextValue = limitRuPhoneInput(nextValue);
-    }
-    if (
-      (name === "userLoyaltyPoints" || name === "userDiscountPercent") &&
-      typeof nextValue === "string"
-    ) {
-      nextValue = keepDigitsOnly(nextValue);
-    }
-    setForm((prev) => ({ ...prev, [name]: nextValue }));
-  };
-
-  const handleClose = () => {
-    setFeedback({ kind: "idle", message: "" });
-    onClose();
-  };
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    if (!user?._id) return;
-
-    const canEditLoyaltyPoints = adminMode || allowStaffLoyaltyEdit;
-    const clientError = validateEditProfileForm(form, {
-      includeAdmin: adminMode,
-      includeLoyaltyPoints: canEditLoyaltyPoints,
-      backgroundMode,
-    });
-    if (clientError) {
-      setFeedback({ kind: "error", message: clientError });
-      return;
-    }
-
-    const premiumWillBeDisabled =
-      adminMode && staffCanEditPremium && willFormDisablePremium(user, form);
-    if (premiumWillBeDisabled) {
-      const userName = String(user.userName ?? "").trim() || "пользователя";
-      if (!window.confirm(ADMIN_EDIT_USER_UI.DISABLE_PREMIUM_CONFIRM(userName))) {
-        return;
-      }
-    }
-
-    setFeedback({ kind: "loading", message: "" });
-
-    try {
-      const profilePatchOptions = {
-        initialPhoneNumber: user.userPhoneNumber,
-        initialStructuredAddress: initialStructuredAddressRef.current ?? undefined,
-      };
-      const body = adminMode
-        ? buildAdminPatchUserProfileBody(form, {
-            ...profilePatchOptions,
-            includePremium: staffCanEditPremium,
-          })
-        : buildPatchUserProfileBody(form, {
-            backgroundMode,
-            includeLoyaltyPoints: allowStaffLoyaltyEdit,
-            ...profilePatchOptions,
-          });
-      const updated = await patchMutation.mutateAsync({
-        userId: String(user._id),
-        body,
-      });
-      if (premiumWillBeDisabled) {
-        onPremiumRevoked?.();
-      }
-      handleClose();
-      onSaved(updated);
-    } catch (e) {
-      const message =
-        e instanceof Error ? e.message : EDIT_PROFILE_MODAL_UI.SUBMIT_IDLE;
-      setFeedback({ kind: "error", message });
-    }
-  };
+  const {
+    form,
+    setForm,
+    feedback,
+    notesChars,
+    backgroundMode,
+    avatarFocusImageUrl,
+    backgroundFocusImageUrl,
+    isSubmitting,
+    handleChange,
+    handleClose,
+    handleSubmit,
+  } = useEditProfileModal({
+    isOpen,
+    onClose,
+    user,
+    onSaved,
+    adminMode,
+    staffCanEditRole,
+    staffCanEditPremium,
+    allowStaffLoyaltyEdit,
+    onPremiumRevoked,
+  });
 
   if (!isOpen || !user) return null;
 

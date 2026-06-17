@@ -1,13 +1,12 @@
-import { LazyCartPage } from "../lib/lazyAppShellPages.js";
+import { LazyCartPage } from "../../widgets/app-shell/lib/lazyAppShellPages.js";
 import { useAppShell } from "../model/AppShellContext.jsx";
 
 /** UI корзины — путь `/basket` (не `/cart`: proxy Vite → API). */
 export function CartRoutePage() {
-  const { mainContentProps } = useAppShell();
+  const { mainContentProps, goToMainView } = useAppShell();
   const {
     isAuthorized,
     currentUserId,
-    goToMainView,
     refreshUserProfileActionBadgeCounts,
     onRequestLogin,
     onSellerNameClick,

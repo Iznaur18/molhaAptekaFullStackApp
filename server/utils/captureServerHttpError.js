@@ -19,13 +19,17 @@ export function captureServerHttpError(err, req) {
   }
 
   Sentry.withScope((scope) => {
-    scope.setTag("requestId", req.requestId ?? "unknown");
+    if (req) {
+      scope.setTag("requestId", req.requestId ?? "unknown");
+      scope.setContext("http", {
+        method: req.method,
+        path: req.originalUrl || req.url,
+        statusCode,
+      });
+    } else {
+      scope.setTag("source", "process");
+    }
     scope.setTag("statusCode", String(statusCode));
-    scope.setContext("http", {
-      method: req.method,
-      path: req.originalUrl || req.url,
-      statusCode,
-    });
     Sentry.captureException(err);
   });
 }

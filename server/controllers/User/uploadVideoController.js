@@ -1,11 +1,10 @@
-import { buildPublicUploadUrl } from "../../utils/buildPublicUploadUrl.js";
-import { finalizeUploadedFile } from "../../utils/finalizeUploadedFile.js";
-import { prepareUploadedVideoFile } from "../../utils/prepareUploadedVideoFile.js";
-import { successRes, errorRes } from "../../utils/index.js";
+import { buildPublicUploadUrl } from "../../services/upload/buildPublicUploadUrl.js";
+import { finalizeUploadedFile } from "../../services/upload/finalizeUploadedFile.js";
+import { prepareUploadedVideoFile } from "../../services/upload/prepareUploadedVideoFile.js";
+import { successRes, errorRes } from "../../services/http/index.js";
 
 export async function uploadVideoController(req, res) {
-  try {
-    if (!req.file) {
+if (!req.file) {
       return errorRes(
         res,
         400,
@@ -32,8 +31,4 @@ export async function uploadVideoController(req, res) {
       filename,
       originalname: req.file.originalname,
     });
-  } catch (error) {
-    console.error("uploadVideoController error:", error);
-    return errorRes(res, 500, "Не удалось сохранить файл");
-  }
 }

@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { createAsyncRouter } from "../utils/createAsyncRouter.js";
 
 import {
   cancelMyIntroAdCampaignController,
@@ -21,7 +21,7 @@ import {
   submitIntroAdCampaignValidation,
 } from "../validations/introAd/introAdCampaignValidation.js";
 
-const router = Router();
+const router = createAsyncRouter();
 
 router.get("/config", getIntroAdConfigController);
 router.get("/me", checkAuthMW, getMyIntroAdCampaignController);

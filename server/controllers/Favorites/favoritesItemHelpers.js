@@ -5,7 +5,7 @@ import { ProductModel, WishlistModel } from "../../models/index.js";
 import { attachProductSellerSnapshots } from "../../utils/attachProductSellerSnapshots.js";
 import { runInTransaction, withMongoSession } from "../../utils/mongoTransaction.js";
 import { attachProductAvailablePurchaseQuantity } from "../../utils/productStock.js";
-import { applyProductWishlistCountDelta } from "../../utils/productWishlistCount.js";
+import { applyProductWishlistCountDelta } from "../../services/product/productWishlistCount.js";
 
 import { resolveFavoritesUserId } from "./resolveFavoritesUserId.js";
 

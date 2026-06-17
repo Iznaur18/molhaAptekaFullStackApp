@@ -1,6 +1,6 @@
 import { UserModel } from "../models/index.js";
 import { canModerateProductsRole } from "../utils/productModeration.js";
-import { errorRes } from "../utils/index.js";
+import { errorRes } from "../services/http/index.js";
 
 /**
  * Требует роль admin или moderator. После `checkAuthMW`.

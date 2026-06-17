@@ -1,5 +1,6 @@
 import { WishlistPage } from "@/features/wishlist-page/ui/WishlistPage";
 import { SubscriptionsPage } from "@/features/subscriptions-page/ui/SubscriptionsPage";
+import { MyOrdersPage } from "@/features/my-orders-page/ui/MyOrdersPage";
 import { MyProductsPage } from "@/features/my-products-page/ui/MyProductsPage";
 import { MySalesPage } from "@/features/my-sales-page/ui/MySalesPage";
 import { AdvertisingPage } from "@/features/advertising-page/ui/AdvertisingPage";
@@ -50,6 +51,8 @@ export const HubSectionContent = ({
       return <MyProductsPage />;
     case "my-sales":
       return <MySalesPage />;
+    case "my-orders":
+      return <MyOrdersPage />;
     case "advertising":
       return <AdvertisingPage />;
     case "premium":

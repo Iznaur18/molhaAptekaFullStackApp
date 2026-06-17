@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { createAsyncRouter } from "../utils/createAsyncRouter.js";
 
 import {
   makeOrderController,
@@ -25,9 +25,10 @@ import {
   getAllOrdersValidation,
   getMySalesValidation,
   orderItemActionValidation,
+  orderItemCancelValidation,
 } from "../validations/index.js";
 
-const router = Router();
+const router = createAsyncRouter();
 
 router.get(
   "/all",
@@ -65,7 +66,7 @@ router.patch(
   "/:orderId/items/:itemIndex/cancelled",
   checkAuthMW,
   orderItemActionRateLimiter,
-  orderItemActionValidation,
+  orderItemCancelValidation,
   markOrderItemCancelledBySellerController,
 );
 router.patch(

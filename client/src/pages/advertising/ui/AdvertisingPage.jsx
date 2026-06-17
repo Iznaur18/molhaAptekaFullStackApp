@@ -17,11 +17,11 @@ import {
 } from "../../../shared/config/appUiCopy.js";
 import { ImageUrlField } from "../../../shared/ui/ImageUrlField/ImageUrlField.jsx";
 import { VideoUrlField } from "../../../shared/ui/VideoUrlField/VideoUrlField.jsx";
-import { validateAppIntroAdminForm } from "../../app-intro-admin/lib/validateAppIntroAdminForm.js";
 import {
   buildSubmitIntroAdCampaignBody,
   formToIntroAdPreviewSettings,
-} from "../lib/buildSubmitIntroAdCampaignBody.js";
+  validateAppIntroAdminForm,
+} from "../../../entities/intro-ad/lib/index.js";
 
 import { SellerPersonalCategoryAdvertisingSection } from "./SellerPersonalCategoryAdvertisingSection.jsx";
 

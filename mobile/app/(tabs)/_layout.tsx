@@ -4,7 +4,9 @@ import { useClientOnlyValue } from "@/components/useClientOnlyValue";
 import {
   CART_PAGE_UI,
   CATALOG_BROWSER_UI,
+  HUB_SECTION_UI,
   MOBILE_BOTTOM_NAV_UI,
+  MY_ORDERS_PAGE_UI,
   MY_PROFILE_PAGE_UI,
 } from "@/shared/config";
 import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
@@ -39,6 +41,13 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="hub/[section]"
+        options={{
+          href: null,
+          title: HUB_SECTION_UI.SCREEN_TITLE,
+        }}
+      />
+      <Tabs.Screen
         name="place-product"
         options={{
           href: null,
@@ -49,6 +58,13 @@ export default function TabLayout() {
         name="cart"
         options={{
           title: CART_PAGE_UI.TITLE,
+        }}
+      />
+      <Tabs.Screen
+        name="orders"
+        options={{
+          href: null,
+          title: MY_ORDERS_PAGE_UI.TITLE,
         }}
       />
       <Tabs.Screen

@@ -6,6 +6,7 @@ import {
   PRODUCT_CARD_IMAGE_BADGE_OVERLAY as BO,
   PRODUCT_CARD_MOBILE_LAYOUT,
 } from "@/entities/product/lib/productCardBadgePalette";
+import { PRODUCT_MEDIA_HERO_ASPECT_RATIO } from "@/entities/product/model/constants";
 import { CURATED_COMPACT_CARD_COLORS as C } from "@/entities/curated-product-list/lib/curatedCompactCardColors";
 import { CURATED_PRODUCT_LIST_HOME_CARD_GAP } from "@/entities/curated-product-list/lib/curatedProductListHomeLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
@@ -234,6 +235,54 @@ export const useProductCardStyles = createThemedStyles((theme) => ({
   ratingPlaceholder: {
     fontWeight: "500",
     color: BC.ratingPlaceholder,
+  },
+}));
+
+export const useProductCardMediaStyles = createThemedStyles((theme) => ({
+  frame: {
+    width: "100%",
+    height: "100%",
+    position: "relative",
+  },
+  media: {
+    width: "100%",
+    height: "100%",
+  },
+  navRow: {
+    position: "absolute",
+    top: "50%",
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: theme.spacing[1],
+    transform: [{ translateY: -18 }],
+  },
+  navButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: MEDIA_NAV_SCRIM,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  navButtonText: {
+    color: theme.colors.onContrast,
+    fontSize: 20,
+    fontWeight: "700",
+    lineHeight: 22,
+  },
+  counter: {
+    position: "absolute",
+    right: 8,
+    bottom: 8,
+    paddingHorizontal: theme.spacing[2],
+    paddingVertical: theme.spacing[1],
+    borderRadius: 6,
+    backgroundColor: MEDIA_OVERLAY_SCRIM,
+    color: theme.colors.onContrast,
+    fontSize: 11,
+    fontWeight: "600",
   },
 }));
 
@@ -611,7 +660,7 @@ export const useProductMediaGalleryStyles = createThemedStyles((theme) => ({
   },
   hero: {
     width: "100%",
-    aspectRatio: 1,
+    aspectRatio: PRODUCT_MEDIA_HERO_ASPECT_RATIO,
     borderRadius: theme.radius.md,
     overflow: "hidden",
     backgroundColor: theme.colors.surfaceMuted,
@@ -693,7 +742,7 @@ export const useProductMediaGalleryStyles = createThemedStyles((theme) => ({
   },
   detailHero: {
     width: "100%",
-    minHeight: 280,
+    aspectRatio: PRODUCT_MEDIA_HERO_ASPECT_RATIO,
     borderRadius: 13.6,
     overflow: "hidden",
     backgroundColor: theme.colors.surfaceMuted,

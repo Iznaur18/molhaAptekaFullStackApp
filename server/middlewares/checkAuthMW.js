@@ -4,8 +4,8 @@ import {
   clearRefreshCookie,
   getAuthTokenFromRequest,
 } from "../utils/authCookie.js";
-import { verifyAccessToken } from "../utils/authTokens.js";
-import { errorRes } from "../utils/index.js";
+import { verifyAccessToken } from "../services/auth/authTokens.js";
+import { errorRes } from "../services/http/index.js";
 
 const BLOCKED_ACCOUNT_MESSAGE = "Аккаунт заблокирован";
 const DISABLED_ACCOUNT_MESSAGE = "Аккаунт отключён администратором";

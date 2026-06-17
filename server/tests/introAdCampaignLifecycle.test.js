@@ -14,8 +14,8 @@ import {
   activateNextQueuedIntroAdCampaign,
   assertNoOpenIntroAdCampaignForAdvertiser,
   expireIntroAdCampaignsAndActivateQueue,
-} from "../utils/introAdCampaignHelpers.js";
-import { assertIntroAdMediaUrlsAreUploadedAssets } from "../utils/validateIntroAdMediaUrls.js";
+} from "../services/intro-ad/introAdCampaignHelpers.js";
+import { assertIntroAdMediaUrlsAreUploadedAssets } from "../services/intro-ad/validateIntroAdMediaUrls.js";
 import {
   clearMongoCollections,
   connectMongoTestReplSet,

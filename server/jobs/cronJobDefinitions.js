@@ -1,0 +1,28 @@
+import { INSTALLMENT_CRON_INTERVAL_MS } from "../constants/installmentConstants.js";
+import { INTRO_AD_CRON_INTERVAL_MS } from "../constants/introAdCampaignConstants.js";
+import { PREMIUM_CRON_INTERVAL_MS } from "../constants/premiumConstants.js";
+import { PRODUCT_PROMOTION_CRON_INTERVAL_MS } from "../constants/productPromotionConstants.js";
+import { SELLER_PERSONAL_CATEGORY_CRON_INTERVAL_MS } from "../constants/sellerPersonalCategoryConstants.js";
+import {
+  JOB_EXPIRE_PRODUCT_PROMOTIONS,
+  JOB_EXPIRE_STALE_USER_STORIES,
+  JOB_PROCESS_INSTALLMENT_CRON,
+  JOB_PROCESS_INTRO_AD_CRON,
+  JOB_PROCESS_PREMIUM_CRON,
+  JOB_PROCESS_SELLER_PERSONAL_CATEGORY_CRON,
+} from "../queues/queueConstants.js";
+
+const USER_STORY_CLEANUP_INTERVAL_MS = 15 * 60 * 1000;
+
+/** @type {ReadonlyArray<{ name: string; intervalMs: number }>} */
+export const CRON_JOB_DEFINITIONS = [
+  { name: JOB_EXPIRE_STALE_USER_STORIES, intervalMs: USER_STORY_CLEANUP_INTERVAL_MS },
+  { name: JOB_PROCESS_INSTALLMENT_CRON, intervalMs: INSTALLMENT_CRON_INTERVAL_MS },
+  { name: JOB_PROCESS_PREMIUM_CRON, intervalMs: PREMIUM_CRON_INTERVAL_MS },
+  { name: JOB_EXPIRE_PRODUCT_PROMOTIONS, intervalMs: PRODUCT_PROMOTION_CRON_INTERVAL_MS },
+  { name: JOB_PROCESS_INTRO_AD_CRON, intervalMs: INTRO_AD_CRON_INTERVAL_MS },
+  {
+    name: JOB_PROCESS_SELLER_PERSONAL_CATEGORY_CRON,
+    intervalMs: SELLER_PERSONAL_CATEGORY_CRON_INTERVAL_MS,
+  },
+];

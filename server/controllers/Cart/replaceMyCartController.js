@@ -1,5 +1,5 @@
 import { CartModel } from "../../models/index.js";
-import { errorRes, successRes } from "../../utils/index.js";
+import { errorRes, successRes } from "../../services/http/index.js";
 
 import {
   filterCartItemsToPurchasableProducts,
@@ -9,8 +9,7 @@ import { resolveCartUserId } from "./resolveCartUserId.js";
 
 /** `PUT /cart` — полная замена корзины; в ответе только доступные товары. */
 export const replaceMyCartController = async (req, res) => {
-  try {
-    const userId = resolveCartUserId(req.userId);
+const userId = resolveCartUserId(req.userId);
     if (!userId) {
       return errorRes(res, 401, "Не авторизован");
     }
@@ -28,8 +27,4 @@ export const replaceMyCartController = async (req, res) => {
     );
 
     return successRes(res, { items: purchasable });
-  } catch (error) {
-    console.error("replaceMyCartController error:", error);
-    return errorRes(res, 500, "Не удалось сохранить корзину");
-  }
 };

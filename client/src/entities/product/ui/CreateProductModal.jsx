@@ -1,42 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
-
-import { useMyProductMutations } from "../model/useMyProductMutations.js";
-import { resolveProductImageUrls } from "../lib/resolveProductImageUrls.js";
-import { createImageRow, imageRowsFromUrls } from "../lib/productImageRowHelpers.js";
+import { useCreateProductForm } from "../model/useCreateProductForm.js";
 import {
-  PRODUCT_CATEGORY_ELECTRONICS,
   PRODUCT_DESCRIPTION_MAX_CHARS,
   PRODUCT_DESCRIPTION_MIN_CHARS,
 } from "../model/productConstants.js";
 import { PRODUCT_MODERATION_APPROVED } from "../model/productModerationConstants.js";
-import {
-  PRODUCT_STOCK_QUANTITY_MAX,
-  PRODUCT_STOCK_QUANTITY_MIN,
-} from "../model/productStockConstants.js";
+import { PRODUCT_STOCK_QUANTITY_MAX } from "../model/productStockConstants.js";
 import { CreateProductCategoryPicker } from "../../product-category-tree/ui/CreateProductCategoryPicker.jsx";
-import { IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED } from "../../product-category-tree/lib/isProductCategoryTreePickerEnabled.js";
-import { urlsFromImageRows } from "../lib/productImageRowHelpers.js";
-import {
-  computeProductDiscountPercent,
-  parseProductPriceInput,
-  validateProductOldPricePair,
-} from "../lib/computeProductDiscountPercent.js";
-import { getProductPriceRubMaxError } from "../lib/productPriceRubValidation.js";
-import { validateProductDescription } from "../lib/validateProductDescription.js";
-import {
-  validateProductCharacteristicsRows,
-  productCharacteristicsFromRows,
-} from "../lib/validateProductCharacteristicsRows.js";
-import { characteristicRowsFromApi } from "../lib/characteristicRowsFromApi.js";
-import {
-  INTEGER_INPUT_FIELD_PROPS,
-  formatIntegerGroupRu,
-  formatRubPriceInput,
-  keepDigitsOnly,
-} from "../../../shared/lib/numericInput.js";
-import { normalizeUploadUrlForStorage } from "@izibuy/shared-lib";
-import { resolveProductLoyaltyPointsPerUnit } from "../lib/resolveProductLoyaltyPointsPerUnit.js";
-import { resolveSellerMaxLoyaltyPointsPerUnit } from "../lib/resolveSellerMaxLoyaltyPointsPerUnit.js";
+import { INTEGER_INPUT_FIELD_PROPS } from "../../../shared/lib/numericInput.js";
 import { ProductModalShell } from "../../../shared/ui/ProductModalShell/ProductModalShell.jsx";
 import { ProductEditManageSection } from "./ProductEditManageSection.jsx";
 import { InstallmentProgramModal } from "../../installment/ui/InstallmentProgramModal.jsx";
@@ -54,59 +24,6 @@ import "./CreateProductModal.css";
 
 const CREATE_PRODUCT_FORM_ID = "create-product-form";
 const EDIT_PRODUCT_FORM_ID = "edit-product-form";
-
-const INITIAL_FORM = {
-  productName: "",
-  productDescription: "",
-  productImageRows: [createImageRow("")],
-  productPreviewVideoUrl: "",
-  productPrice: "",
-  productOldPrice: "",
-  productCategory: PRODUCT_CATEGORY_ELECTRONICS,
-  productCategoryId: null,
-  categoryBreadcrumbRu: "",
-  productIsAvailable: true,
-  productStockQuantity: "1",
-  loyaltyPointsPerUnit: "0",
-  productCharacteristicRows: [],
-  productSaleCity: "",
-};
-
-/**
- * @param {import('../model/types.js').ProductFromApi} product
- */
-function formStateFromProduct(product) {
-  const urls = resolveProductImageUrls(product);
-  const priceRaw = product.productPrice;
-  const priceStr =
-    priceRaw != null && Number.isFinite(Number(priceRaw)) ? String(priceRaw) : "";
-  const oldPriceRaw = product.productOldPrice;
-  const oldPriceStr =
-    oldPriceRaw != null && Number.isFinite(Number(oldPriceRaw))
-      ? String(Math.floor(Number(oldPriceRaw)))
-      : "";
-  return {
-    productName: product.productName?.trim() ?? "",
-    productDescription: product.productDescription?.trim() ?? "",
-    productImageRows: imageRowsFromUrls(urls),
-    productPreviewVideoUrl: product.productPreviewVideoUrl?.trim() ?? "",
-    productPrice: priceStr ? formatIntegerGroupRu(priceStr) : "",
-    productOldPrice: oldPriceStr ? formatIntegerGroupRu(oldPriceStr) : "",
-    productCategory: product.productCategory ?? PRODUCT_CATEGORY_ELECTRONICS,
-    productCategoryId: product.productCategoryId ?? null,
-    categoryBreadcrumbRu: product.categoryBreadcrumbRu?.trim() ?? "",
-    productIsAvailable: product.productIsAvailable !== false,
-    productStockQuantity:
-      product.productIsAvailable !== false && product.productStockQuantity != null
-        ? String(Math.max(0, Math.floor(Number(product.productStockQuantity))))
-        : "1",
-    loyaltyPointsPerUnit: String(resolveProductLoyaltyPointsPerUnit(product)),
-    productCharacteristicRows: characteristicRowsFromApi(
-      product.productCharacteristics,
-    ),
-    productSaleCity: product.productSaleCity?.trim() ?? "",
-  };
-}
 
 /**
  * @param {{
@@ -167,306 +84,39 @@ export function CreateProductModal({
   onToggleRaffleParticipation,
   isRaffleParticipationPending = false,
 }) {
-  const { patchMutation, createMutation } = useMyProductMutations();
-  const [form, setForm] = useState(INITIAL_FORM);
-  const [status, setStatus] = useState({ kind: "idle", message: "" });
-  const [isInstallmentProgramOpen, setIsInstallmentProgramOpen] = useState(false);
-  const isEdit = mode === "edit";
-  const isSubmitting = status.kind === "loading";
-  const showManageSection =
-    isEdit && manageProduct != null && typeof onDeleteProduct === "function";
-  const showCatalogAvailabilityToggle =
-    !showManageSection &&
-    (!isEdit ||
-      (productToEdit?.productModerationStatus ?? PRODUCT_MODERATION_APPROVED) ===
-        PRODUCT_MODERATION_APPROVED);
-
-  const editingProductId =
-    isEdit && productToEdit?._id != null ? String(productToEdit._id) : null;
-
-  const sellerLoyaltyBudget = useMemo(
-    () =>
-      resolveSellerMaxLoyaltyPointsPerUnit({
-        loyaltyPointsBalance: sellerLoyaltyPointsBalance,
-        loyaltyPointsReserved: sellerLoyaltyPointsReserved,
-        sellerProducts,
-        editingProductId,
-      }),
-    [
-      sellerLoyaltyPointsBalance,
-      sellerLoyaltyPointsReserved,
-      sellerProducts,
-      editingProductId,
-    ],
-  );
-
-  const sellerPointsMaxPerUnit = sellerLoyaltyBudget.maxPerUnit;
-  const loyaltyFieldDisabled = sellerPointsMaxPerUnit <= 0;
-
-  useEffect(() => {
-    if (!isOpen) {
-      setIsInstallmentProgramOpen(false);
-      return;
-    }
-    setIsInstallmentProgramOpen(false);
-    if (isEdit && productToEdit) {
-      setForm(formStateFromProduct(productToEdit));
-    } else {
-      setForm(INITIAL_FORM);
-    }
-    setStatus({ kind: "idle", message: "" });
-  }, [isOpen, isEdit, productToEdit?._id]);
-
-  const descriptionChars = useMemo(
-    () => String(form.productDescription ?? "").length,
-    [form.productDescription],
-  );
+  const {
+    form,
+    setForm,
+    status,
+    isInstallmentProgramOpen,
+    setIsInstallmentProgramOpen,
+    isEdit,
+    showManageSection,
+    showCatalogAvailabilityToggle,
+    sellerLoyaltyBudget,
+    sellerPointsMaxPerUnit,
+    loyaltyFieldDisabled,
+    isSubmitting,
+    handleClose,
+    handleSubmit,
+    descriptionChars,
+    discountPreviewPercent,
+    handleChange,
+    handleAvailableChange,
+  } = useCreateProductForm({
+    isOpen,
+    onClose,
+    onSuccess,
+    mode,
+    productToEdit,
+    manageProduct,
+    onDeleteProduct,
+    sellerLoyaltyPointsBalance,
+    sellerLoyaltyPointsReserved,
+    sellerProducts,
+  });
 
   if (!isOpen) return null;
-
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    const isPriceField = name === "productPrice" || name === "productOldPrice";
-    const isIntegerField =
-      name === "productStockQuantity" || name === "loyaltyPointsPerUnit";
-    let nextValue = value;
-    if (isPriceField) {
-      nextValue = formatRubPriceInput(value);
-    } else if (isIntegerField) {
-      nextValue = keepDigitsOnly(value);
-    }
-    setForm((prev) => ({ ...prev, [name]: nextValue }));
-  };
-
-  const handleAvailableChange = (event) => {
-    const checked = event.target.checked;
-    setForm((prev) => ({
-      ...prev,
-      productIsAvailable: checked,
-      productStockQuantity:
-        checked && !String(prev.productStockQuantity).trim()
-          ? "1"
-          : prev.productStockQuantity,
-    }));
-  };
-
-  const handleClose = () => {
-    setStatus({ kind: "idle", message: "" });
-    setIsInstallmentProgramOpen(false);
-    onClose();
-  };
-
-  const parsePrice = (raw) => parseProductPriceInput(raw);
-
-  const discountPreviewPercent = computeProductDiscountPercent(
-    parsePrice(form.productOldPrice),
-    parsePrice(form.productPrice),
-  );
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setStatus({ kind: "loading", message: "" });
-
-    try {
-      const productPrice = parsePrice(form.productPrice);
-      if (productPrice == null) {
-        setStatus({
-          kind: "error",
-          message: CREATE_PRODUCT_MODAL_UI.ERROR_PRICE,
-        });
-        return;
-      }
-      const productPriceMaxError = getProductPriceRubMaxError(productPrice);
-      if (productPriceMaxError) {
-        setStatus({
-          kind: "error",
-          message: CREATE_PRODUCT_MODAL_UI.ERROR_PRICE_MAX,
-        });
-        return;
-      }
-
-      const productOldPrice = parsePrice(form.productOldPrice);
-      if (productOldPrice != null) {
-        const oldPriceMaxError = getProductPriceRubMaxError(productOldPrice);
-        if (oldPriceMaxError) {
-          setStatus({
-            kind: "error",
-            message: CREATE_PRODUCT_MODAL_UI.ERROR_PRICE_MAX,
-          });
-          return;
-        }
-      }
-      const oldPriceError = validateProductOldPricePair(productOldPrice, productPrice);
-      if (oldPriceError) {
-        setStatus({
-          kind: "error",
-          message: CREATE_PRODUCT_MODAL_UI.ERROR_OLD_PRICE,
-        });
-        return;
-      }
-
-      const descriptionError = validateProductDescription(form.productDescription);
-      if (descriptionError) {
-        setStatus({ kind: "error", message: descriptionError });
-        return;
-      }
-
-      const characteristicsError = validateProductCharacteristicsRows(
-        form.productCharacteristicRows,
-      );
-      if (characteristicsError) {
-        setStatus({ kind: "error", message: characteristicsError });
-        return;
-      }
-
-      const productCharacteristics = productCharacteristicsFromRows(
-        form.productCharacteristicRows,
-      );
-
-      const urls = urlsFromImageRows(form.productImageRows).map((url) =>
-        normalizeUploadUrlForStorage(url),
-      );
-      const previewVideoUrl = normalizeUploadUrlForStorage(
-        form.productPreviewVideoUrl.trim(),
-      );
-      if (previewVideoUrl && urls.length === 0) {
-        setStatus({
-          kind: "error",
-          message: CREATE_PRODUCT_MODAL_UI.ERROR_PREVIEW_VIDEO_REQUIRES_PHOTO,
-        });
-        return;
-      }
-
-      const stockParsed = Math.floor(Number(form.productStockQuantity));
-      const listedInCatalog = form.productIsAvailable === true;
-      const stockRequired =
-        listedInCatalog || (isEdit && !showCatalogAvailabilityToggle);
-      let productStockQuantity = 0;
-      if (stockRequired) {
-        if (
-          !Number.isFinite(stockParsed) ||
-          stockParsed < PRODUCT_STOCK_QUANTITY_MIN ||
-          stockParsed > PRODUCT_STOCK_QUANTITY_MAX
-        ) {
-          setStatus({
-            kind: "error",
-            message: CREATE_PRODUCT_MODAL_UI.ERROR_STOCK,
-          });
-          return;
-        }
-        productStockQuantity = stockParsed;
-      } else if (
-        isEdit &&
-        Number.isFinite(stockParsed) &&
-        stockParsed >= 0 &&
-        stockParsed <= PRODUCT_STOCK_QUANTITY_MAX
-      ) {
-        productStockQuantity = stockParsed;
-      }
-
-      const loyaltyParsed = Math.floor(Number(form.loyaltyPointsPerUnit));
-      const loyaltyPointsPerUnit =
-        Number.isFinite(loyaltyParsed) && loyaltyParsed >= 0 ? loyaltyParsed : 0;
-      if (loyaltyPointsPerUnit > sellerPointsMaxPerUnit) {
-        setStatus({
-          kind: "error",
-          message: CREATE_PRODUCT_MODAL_UI.ERROR_LOYALTY_POINTS_MAX(
-            sellerPointsMaxPerUnit,
-            sellerLoyaltyBudget.catalogCommitted,
-          ),
-        });
-        return;
-      }
-
-      if (IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED) {
-        if (!form.productCategoryId && !form.productCategory) {
-          setStatus({
-            kind: "error",
-            message: CREATE_PRODUCT_MODAL_UI.ERROR_CATEGORY_LEAF,
-          });
-          return;
-        }
-      } else if (!form.productCategory) {
-        setStatus({
-          kind: "error",
-          message: CREATE_PRODUCT_MODAL_UI.ERROR_CATEGORY_LEAF,
-        });
-        return;
-      }
-
-      const productSaleCity = String(form.productSaleCity ?? "").trim();
-      if (productSaleCity.length > PRODUCT_SALE_CITY_MAX_LENGTH) {
-        setStatus({
-          kind: "error",
-          message: CREATE_PRODUCT_MODAL_UI.ERROR_SALE_CITY_MAX,
-        });
-        return;
-      }
-
-      let product;
-      if (isEdit) {
-        if (productToEdit?._id == null) {
-          setStatus({
-            kind: "error",
-            message: CREATE_PRODUCT_MODAL_UI.ERROR_EDIT_GENERIC,
-          });
-          return;
-        }
-        const patchBody = {
-          productName: form.productName.trim(),
-          productDescription: form.productDescription.trim(),
-          productImageUrls: urls,
-          productPreviewVideoUrl: previewVideoUrl,
-          productPrice,
-          productOldPrice,
-          loyaltyPointsPerUnit,
-          productCharacteristics,
-          productSaleCity,
-        };
-        if (IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED && form.productCategoryId) {
-          patchBody.productCategoryId = form.productCategoryId;
-        } else {
-          patchBody.productCategory = form.productCategory;
-        }
-        if (showCatalogAvailabilityToggle) {
-          patchBody.productIsAvailable = form.productIsAvailable;
-        }
-        if (isEdit || showCatalogAvailabilityToggle) {
-          patchBody.productStockQuantity = productStockQuantity;
-        }
-        product = await patchMutation.mutateAsync({
-          productId: String(productToEdit._id),
-          body: patchBody,
-        });
-      } else {
-        product = await createMutation.mutateAsync({
-          productName: form.productName,
-          productDescription: form.productDescription,
-          productImageUrls: urls.length > 0 ? urls : undefined,
-          productPreviewVideoUrl: previewVideoUrl || undefined,
-          productPrice,
-          productOldPrice,
-          ...(IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED && form.productCategoryId
-            ? { productCategoryId: form.productCategoryId }
-            : { productCategory: form.productCategory }),
-          productIsAvailable: form.productIsAvailable,
-          productStockQuantity,
-          loyaltyPointsPerUnit,
-          productCharacteristics,
-          productSaleCity: productSaleCity || undefined,
-        });
-      }
-
-      onSuccess?.(product);
-      handleClose();
-    } catch (error) {
-      const fallback = isEdit
-        ? CREATE_PRODUCT_MODAL_UI.ERROR_EDIT_GENERIC
-        : CREATE_PRODUCT_MODAL_UI.ERROR_GENERIC;
-      const message = error instanceof Error ? error.message : fallback;
-      setStatus({ kind: "error", message });
-    }
-  };
 
   const dialogAria = isEdit
     ? CREATE_PRODUCT_MODAL_UI.ARIA_DIALOG_EDIT
@@ -480,7 +130,6 @@ export function CreateProductModal({
   const submitLoading = isEdit
     ? CREATE_PRODUCT_MODAL_UI.SUBMIT_EDIT_LOADING
     : CREATE_PRODUCT_MODAL_UI.SUBMIT_LOADING;
-
   const formId = isEdit ? EDIT_PRODUCT_FORM_ID : CREATE_PRODUCT_FORM_ID;
 
   const handleSaveClick = (event) => {
@@ -526,8 +175,14 @@ export function CreateProductModal({
           noValidate
           onSubmit={handleSubmit}
         >
-          <section className="create-product-modal__section" aria-labelledby="create-product-section-basic">
-            <h3 id="create-product-section-basic" className="create-product-modal__section-title">
+          <section
+            className="create-product-modal__section"
+            aria-labelledby="create-product-section-basic"
+          >
+            <h3
+              id="create-product-section-basic"
+              className="create-product-modal__section-title"
+            >
               {CREATE_PRODUCT_MODAL_UI.SECTION_BASIC}
             </h3>
             <div className="create-product-modal__section-body">
@@ -582,8 +237,14 @@ export function CreateProductModal({
             </div>
           </section>
 
-          <section className="create-product-modal__section" aria-labelledby="create-product-section-media">
-            <h3 id="create-product-section-media" className="create-product-modal__section-title">
+          <section
+            className="create-product-modal__section"
+            aria-labelledby="create-product-section-media"
+          >
+            <h3
+              id="create-product-section-media"
+              className="create-product-modal__section-title"
+            >
               {CREATE_PRODUCT_MODAL_UI.SECTION_MEDIA}
             </h3>
             <div className="create-product-modal__section-body">
@@ -745,7 +406,10 @@ export function CreateProductModal({
               className="create-product-modal__section create-product-modal__section_manage"
               aria-labelledby="create-product-section-manage"
             >
-              <h3 id="create-product-section-manage" className="create-product-modal__section-title">
+              <h3
+                id="create-product-section-manage"
+                className="create-product-modal__section-title"
+              >
                 {CREATE_PRODUCT_MODAL_UI.MANAGE_SECTION_TITLE}
               </h3>
               <div className="create-product-modal__section-body">

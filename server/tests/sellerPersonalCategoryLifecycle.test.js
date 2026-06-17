@@ -20,8 +20,8 @@ import {
   assertNoOpenSellerPersonalCategoryCampaign,
   expireDueActiveSellerPersonalCategoryCampaigns,
   linkSellerProductsToPersonalCategory,
-} from "../utils/sellerPersonalCategoryHelpers.js";
-import { assertSellerPersonalCategoryImageUrlIsUploadedAsset } from "../utils/validateSellerPersonalCategoryImageUrl.js";
+} from "../services/seller-personal-category/sellerPersonalCategoryHelpers.js";
+import { assertSellerPersonalCategoryImageUrlIsUploadedAsset } from "../services/seller-personal-category/validateSellerPersonalCategoryImageUrl.js";
 import {
   clearMongoCollections,
   connectMongoTestReplSet,

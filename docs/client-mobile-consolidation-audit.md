@@ -1,10 +1,9 @@
-# Аудит client ↔ mobile и план консолидации
+# Client ↔ mobile: консолидация и политика
 
-**Дата:** 2026-06-17  
-**Цель:** убрать дублирование и drift без переписывания mobile с нуля.  
-**Принцип:** один backend, два UI-клиента, shared только на уровне контрактов и pure-функций.
+**Roadmap закрыт:** 2026-06-17 (фазы A–G, все `[x]`).  
+**Назначение файла:** политика scope, границы shared, triage, smoke — не backlog.
 
-> Статусы шагов: `[ ]` не начато · `[~]` в работе · `[x]` готово
+**Принцип:** один `server/`, два UI (`client/` web, `mobile/` RN), общий код только в `contract/` и `packages/*`.
 
 ---
 
@@ -12,308 +11,176 @@
 
 | Миф | Факт |
 |-----|------|
-| «Mobile импортирует client» | **Нет.** Прямых импортов из `client/` в `mobile/` нет (кроме лого в `mobile/scripts/`). |
-| «Reuse сломал web» | Большинство web-багов — **dev-infra** (Vite proxy, cookies, nodemon) и **эволюция auth**, не mobile-код. |
-| «Нужен mobile с нуля» | Дорого, **не устраняет** drift. Проблема — **параллельные копии** одной логики в 2–4 местах. |
-| «Mobile = копия web» | По спеке MP — да (full parity). Это **главный источник** объёма и багов на mobile. |
-
-**Масштаб дублирования (июнь 2026):**
-
-| | `client/` | `mobile/` |
-|--|-----------|-----------|
-| entities (папки) | 24 | 28 |
-| файлы в entities | ~483 `.js` | ~292 `.ts` + ~28 `.tsx` |
-| общие entity-имена | 23 домена совпадают | +5 mobile-only (`access`, `notification`, `push-token`, `session`, `upload`) |
+| «Mobile импортирует client» | **Нет** (кроме лого в `mobile/scripts/`). |
+| «Reuse сломал web» | Чаще **dev-infra** (Vite, cookies, nodemon) и auth, не mobile-код. |
+| «Нужен mobile с нуля» | Не устраняет drift; проблема — **параллельные копии** логики. |
+| «Mobile = копия web» | Исторически MP full parity → объём; **с G.1** staff на mobile → web. |
 
 ---
 
-## 1. Карта shared-слоя (как есть)
+## 1. Архитектура (текущая)
 
 ```
 molhaAptekaFullStackApp/
-├── contract/              ← @molha/api-contract     ✅ оба клиента
+├── contract/                 ← @molha/api-contract (Zod, uploadLimits)
 ├── packages/
-│   ├── design-tokens/     ← @izibuy/design-tokens   ✅ mobile; ❌ client (CSS vars отдельно)
-│   └── shared-lib/        ← @izibuy/shared-lib      ✅ mobile; ❌ client (локальные копии)
-├── client/                ← web SPA (Vite)
-├── mobile/                ← Expo RN
-└── server/                ← общий API
+│   ├── design-tokens/        ← @izibuy/design-tokens
+│   ├── shared-lib/           ← pure: цены, даты, URL, роли, profile sections
+│   └── shared-api/           ← parseApiContract, refresh, multipart
+├── client/                   ← Vite SPA + web-auth adapter
+├── mobile/                   ← Expo RN + SecureStore adapter
+└── server/                   ← API; upload limits из contract
 ```
 
-**npm workspaces (root `package.json`):** `packages/*`, `mobile` — **`client` не в workspace**.
+**npm workspaces (root):** `client`, `packages/*`, `mobile`.
+
+**Тонкие обёртки клиентов:** `client/src/shared/api/*`, `mobile/shared/api/*` — wiring + platform-only parse.
+
+**CI:** `npm run test:packages`, `verify:design-tokens`, `verify:profile-sections` (`.github/workflows/lint.yml`).
 
 ---
 
-## 2. Инвентарь дублирования
+## 2. Shared-слой
 
-### 2.1. Pure-функции (кандидаты в `packages/shared-lib`)
+### 2.1 Что шарить (единый источник)
 
-| Функция / константа | `client` | `mobile` | `packages/shared-lib` | `contract` | Риск drift |
-|---------------------|----------|----------|-------------------------|------------|------------|
-| `formatPriceRub` | `client/src/shared/lib/formatPriceRub.js` | реэкспорт из `@izibuy/shared-lib` + **мёртвый** `mobile/shared/lib/formatPriceRub.ts` | ✅ | — | средний (разный fallback `—` vs `EM_DASH`) |
-| `formatApiErrorMessage` | нет (inline в catch) | `@izibuy/shared-lib` | ✅ | — | высокий для UX ошибок |
-| `formatIsoDateTime` | `client/.../formatIsoDateTime.js` | `mobile/.../formatIsoDateTime.ts` | ❌ | — | средний (разный формат даты) |
-| `normalizeUploadUrlForStorage` | `client/.../resolveUploadedImageUrl.js` | `mobile/.../normalizeUploadUrlForStorage.ts` | ❌ | частично `storedMediaUrl` | высокий |
-| `isDisplayable*Url` | `resolveUploadedImageUrl.js` | `resolveMediaUrl.ts` | ❌ | `isStoredMediaUrl` | средний |
-| `staffMainViews` / staff access | `client/.../staffMainViews.js` | `@izibuy/shared-lib` | ✅ | — | **высокий** (client не на пакете) |
-| user roles | разбросано по client | `@izibuy/shared-lib` | ✅ | — | средний |
+| Что | Где |
+| --- | --- |
+| API shapes, upload bytes/MIME | `contract/` → `@molha/api-contract` |
+| Pure-хелперы, роли, staff paths, profile section ids | `packages/shared-lib` |
+| parse API, refresh queue, multipart | `packages/shared-api` + adapter в client/mobile |
+| Цвета/spacing | `packages/design-tokens` (+ CI parity с CSS client) |
 
-### 2.2. Upload-константы (4 копии)
+Подробнее: `.cursor/rules/client-mobile-share-boundaries.mdc`, `.github/pull_request_template.md`.
 
-| Место | Файл |
-|-------|------|
-| server | `server/constants/uploadConstants.js` |
-| client | `client/src/shared/config/uploadConstants.js` |
-| mobile | `mobile/entities/upload/model/constants.ts` |
-| contract | ❌ нет |
-
-Лимиты совпадают (5 МБ, jpeg/png/webp), но **нет единого источника** — при смене на сервере клиенты расходятся молча.
-
-### 2.3. API-слой (параллельная реализация)
-
-| Компонент | `client` | `mobile` |
-|-----------|----------|----------|
-| HTTP client | `client/src/shared/api/apiClient.js` | `mobile/shared/api/apiClient.ts` |
-| Auth storage | httpOnly cookie + `sessionStorage` (dev Bearer) | `expo-secure-store` + Bearer |
-| parse contract | `client/src/shared/api/parseApiContract.js` (~94 строк) | `mobile/shared/api/parseApiContract.ts` (~214 строк) |
-| upload | `client/src/shared/api/uploadImage.js` | `mobile/entities/upload/api/uploadImage.ts` |
-| upload video | `client/src/shared/api/uploadVideo.js` | `mobile/entities/upload/api/uploadVideo.ts` |
-
-**Паттерн refresh/retry** дублирован; mobile уже корректнее для FormData (`delete Content-Type`).
-
-### 2.4. Навигация / доступ (логика, не UI)
-
-| | `client` | `mobile` |
-|--|----------|----------|
-| Profile hub menu | `client/src/pages/my-profile/lib/buildProfileNavGroups.js` | `mobile/features/profile-hub/model/buildProfileNavGroups.ts` |
-| Main view paths | `client/src/shared/lib/homeMainViewPaths.js` | `mobile/features/profile-hub/model/profileSections.ts` |
-| Staff sections | `staffMainViews.js` | `STAFF_SECTION_IDS` в shared-lib |
-
-Две независимые реализации одного меню → расхождение badge, guards, новых разделов.
-
-### 2.5. Design tokens
-
-| | `client` | `mobile` |
-|--|----------|----------|
-| Источник | CSS variables + `client/scripts/verify-design-tokens.mjs` | `@izibuy/design-tokens` + `AppThemeProvider` |
-| Связь | скрипт миграции, **не runtime dependency** | runtime |
-
-Цвета могут разъехаться без CI-проверки паритета.
-
-### 2.6. Что **правильно** не шарить
+### 2.2 Что **не** шарить
 
 - JSX / CSS / RN `StyleSheet`
 - `react-router` vs `expo-router`
-- Vite proxy vs `EXPO_PUBLIC_API_URL`
-- Web-хуки (`useScrollLock`, `useDialogFocusTrap`, DnD)
-- Mobile-only (`expo-image-picker`, push, deep links)
+- Vite proxy / cookies vs `EXPO_PUBLIC_*` / SecureStore
+- Web-хуки (DnD, scroll lock) и mobile-only (push, image-picker, deep links)
+- **Импорт `client/src/...` в `mobile/`** — запрещён
+
+**Platform display (осознанно локально):** `resolveUploadedImageUrl` (web), `resolveMediaUrl` (mobile), `isDisplayable*Url` — в `shared-lib` только при drift-баге.
+
+### 2.3 Архив: проблемы на старт аудита (июнь 2026)
+
+До фаз B–C: 3+ копии `formatPriceRub`, 4 независимых upload limits, два полных `parseApiContract`, client без `shared-lib`, мёртвые файлы в `mobile/shared/lib/`. Закрыто — см. §9.
 
 ---
 
-## 3. Классификация багов (метки для issues)
+## 3. Классификация багов (метки)
 
-При triage каждый баг получает **одну** метку:
+Одна метка на issue. Расширено: [`docs/bug-triage-labels.md`](bug-triage-labels.md), шаблон `.github/ISSUE_TEMPLATE/bug-triage.yml`.
 
-| Метка | Примеры |
-|-------|---------|
-| `web-dev-infra` | Vite proxy, nodemon restart на `uploads/`, localhost↔127.0.0.1 cookies |
-| `web-feature` | UI/логика только web |
-| `mobile-feature` | RN-экран, permissions, SecureStore |
-| `server` | API, multer, auth middleware |
-| `contract` | Zod-схема не совпадает с API |
-| `shared-drift` | client и mobile ведут себя по-разному при одном API |
+| Метка | Когда |
+|-------|--------|
+| `web-dev-infra` | Vite proxy, nodemon/uploads, localhost cookies |
+| `web-feature` | Только web UI/логика |
+| `mobile-feature` | RN, permissions, SecureStore |
+| `server` | API, middleware, БД |
+| `contract` | Zod/OpenAPI ≠ фактический API |
+| `shared-drift` | Один API — разное поведение client vs mobile |
 
-**Правило:** баг upload в dev на `127.0.0.1:5173` = `web-dev-infra`, не «mobile сломал».
-
----
-
-## 4. Целевая архитектура (куда идём)
-
-```
-contract/           — Zod-схемы, upload-лимиты, storedMediaUrl
-packages/
-  shared-lib/       — pure: цены, даты, URL, роли, staff access, normalizeUploadUrl
-  shared-api/       — parseApiContract, refresh-queue (без platform storage)
-  design-tokens/    — единый источник цветов/spacing/radius
-client/             — UI + web auth adapter + Vite
-mobile/             — UI + native auth adapter + Expo
-server/             — импортирует upload-константы из contract (опционально фаза 3)
-```
-
-**Не делаем:** импорт `client` → `mobile` или общий UI-пакет.
+**Правило:** upload падает на `127.0.0.1:5173` в dev → `web-dev-infra`.
 
 ---
 
-## 5. План выполнения (по порядку)
+## 4. Целевая схема (достигнута)
 
-### Фаза A — Стабилизация и правила (1–2 дня)
-
-| # | Шаг | DoD | Статус |
-|---|-----|-----|--------|
-| A.1 | Зафиксировать политику scope: **mobile buyer-first**; staff/seller-admin на mobile — maintenance, новые фичи сначала web | Решение в этом файле (§6); не добавлять новые staff-экраны без явного запроса | `[x]` |
-| A.2 | Ввести метки багов (§3) в workflow (issues / todo) | В `todo.md` или шаблоне issue есть таблица меток | `[x]` |
-| A.3 | Web dev fixes checklist | `server/nodemon.json` ignore `uploads/**`; upload через `apiClient` + FormData | `[x]` |
-| A.4 | Документ: «что шарить / что нет» — ссылка на §2.6 для команды | PR checklist или rule в `.cursor/rules` | `[x]` |
-
-### Фаза B — Консолидация pure-функций (3–5 дней)
-
-| # | Шаг | DoD | Статус |
-|---|-----|-----|--------|
-| B.1 | Добавить в `contract` модуль `uploadLimits` (MAX_BYTES, MIME types) — **источник истины для всех** | server + client + mobile импортируют из contract; тест в `contract/tests` | `[x]` |
-| B.2 | Перенести `normalizeUploadUrlForStorage` → `packages/shared-lib` | unit-тесты; client + mobile удаляют локальные копии | `[x]` |
-| B.3 | Перенести `formatIsoDateTime` → `packages/shared-lib` (единый `ru-RU` формат) | client + mobile на пакете | `[x]` |
-| B.4 | Подключить `client` к `@izibuy/shared-lib` | `formatPriceRub`, `staffMainViews`, roles — из пакета; удалить дубли в `client/src/shared/lib/` | `[x]` |
-| B.5 | Удалить мёртвый код mobile | удалить `mobile/shared/lib/formatPriceRub.ts`, `formatApiErrorMessage.ts` если только реэкспорт | `[x]` |
-| B.6 | Добавить `client` в root `workspaces` | `npm install` из корня; client видит `packages/*` | `[x]` |
-| B.7 | Тесты `packages/shared-lib` (vitest/node) | `formatPriceRub`, `normalizeUploadUrl`, `formatIsoDateTime` | `[x]` |
-
-### Фаза C — API-слой (5–7 дней)
-
-| # | Шаг | DoD | Статус |
-|---|-----|-----|--------|
-| C.1 | Создать `packages/shared-api` | `parseApiContractData`, `toContractClientError`, общие parse-* для auth/cart/product | `[x]` |
-| C.2 | Вынести refresh-queue | одна реализация `refreshSessionPromise` + skip paths | `[x]` |
-| C.3 | Platform adapters | `web-auth-storage.ts` (cookies + dev sessionStorage), `mobile-auth-storage.ts` (SecureStore) | `[x]` |
-| C.4 | Тонкие обёртки | `client/src/shared/api/apiClient.js` и `mobile/shared/api/apiClient.ts` только wiring | `[x]` |
-| C.5 | Унифицировать upload helpers | общий `postMultipart` с `delete Content-Type`; web + mobile | `[x]` |
-| C.6 | `formatApiErrorMessage` в client | все `catch` в entities используют shared-lib | `[x]` |
-
-### Фаза D — Навигация и доступ (3–4 дня)
-
-| # | Шаг | DoD | Статус |
-|---|-----|-----|--------|
-| D.1 | Вынести **данные** profile hub (список section id, роли, порядок) в `shared-lib` | один `PROFILE_SECTIONS` / `buildProfileNavGroups` input type | `[x]` |
-| D.2 | Web `buildProfileNavGroups.js` — тонкая обёртка над shared | mobile `buildProfileNavGroups.ts` — тоже | `[x]` |
-| D.3 | CI-проверка: одни и те же section ids в web main views и mobile hub | скрипт сравнения или unit-тест | `[x]` |
-
-### Фаза E — Design tokens (2–3 дня)
-
-| # | Шаг | DoD | Статус |
-|---|-----|-----|--------|
-| E.1 | `verify-design-tokens` сравнивает CSS vars client с `packages/design-tokens` | падает CI при расхождении | `[x]` |
-| E.2 | (опционально) client импортирует tokens в JS для runtime theme | один source для dark mode web | `[x]` |
-
-### Фаза F — Тесты и регрессия (параллельно с B–E)
-
-| # | Шаг | DoD | Статус |
-|---|-----|-----|--------|
-| F.1 | Web e2e: upload image (auth user) | Playwright: login → upload → URL `/uploads/` | `[x]` |
-| F.2 | Mobile regression: upload | расширить `mobile/scripts/wf72-regression.mjs` или Maestro smoke | `[x]` |
-| F.3 | CI job: `contract` + `packages/shared-lib` tests | GitHub Actions / локальный npm script | `[x]` |
-| F.4 | Smoke matrix (ручная, до автоматизации) | таблица §7 — прогон раз в релиз | `[x]` |
-
-### Фаза G — Scope mobile (стратегия, не одномоментно)
-
-| # | Шаг | DoD | Статус |
-|---|-----|-----|--------|
-| G.1 | Заморозить **новый** staff parity на mobile | новые staff-фичи → web; mobile deep link `izibuy://` / `https://izibuy.ru/...` | `[x]` |
-| G.2 | Inventory staff mobile screens → «maintenance» | список в `mobile/README.md` | `[x]` |
-| G.3 | Buyer-critical path 100% stable | каталог → карточка → корзина → заказ → профиль | `[x]` |
+См. §1. Не делаем: импорт client → mobile, общий UI-kit React/RN.
 
 ---
 
-## 6. Решение по scope mobile (зафиксировать)
+## 5. Roadmap (архив, все `[x]`)
 
-**Рекомендация v1 (рабочая):**
+| Фаза | Суть |
+|------|------|
+| **A** | Scope buyer-first, метки, dev-fixes, PR/rule границ |
+| **B** | `uploadLimits` в contract, `shared-lib`, client в workspaces |
+| **C** | `shared-api`, auth adapters, upload multipart |
+| **D** | Profile sections в `shared-lib`, `verify:profile-sections` |
+| **E** | Design tokens CI + runtime web |
+| **F** | e2e upload, wf72, `test:packages`, [`release-smoke-matrix.md`](release-smoke-matrix.md) |
+| **G** | Staff → web (G.1), inventory (G.2), buyer path (G.3) |
 
-| На mobile (приоритет) | Только web (или deep link) |
-|-----------------------|----------------------------|
+Детальный DoD по шагам A.1–G.3 — в git history (коммит `81b6c04` и ранее).
+
+---
+
+## 6. Scope mobile (рабочая политика)
+
+| На mobile (приоритет) | Только web |
+|-----------------------|------------|
 | Каталог, поиск, карточка | category-tree-admin, search-synonyms-admin |
 | Корзина, заказы | app-intro-admin, popular-products-admin |
-| Wishlist, подписки, уведомления | product-moderation, intro-ad-moderation, … |
-| Профиль, premium, loyalty (read/buy) | installment-disputes moderation |
-| Seller: my-products, create/edit (если нужен) | сложные staff CRUD с DnD |
-| Upload фото (товар, аватар, розыгрыш) | — |
+| Wishlist, подписки, push | product-moderation, intro-ad-moderation, … |
+| Профиль, premium, loyalty | installment-disputes moderation |
+| Seller: my-products, create/edit | сложные staff CRUD с DnD |
+| Upload фото (товар, аватар) | новый staff (G.1 → browser) |
 
-**Не переписывать mobile с нуля.** Режем **новый** scope и **дубли**, существующие MP-экраны остаются в maintenance.
+**Не переписывать mobile с нуля.** Legacy staff-экраны — maintenance: `mobile/README.md` § Staff inventory.
 
----
-
-## 7. Smoke matrix (минимум перед релизом)
-
-**Полная матрица + release log:** [`docs/release-smoke-matrix.md`](release-smoke-matrix.md) (F.4).
-
-| # | Сценарий | Web | Mobile |
-|---|----------|-----|--------|
-| 1 | Login / logout | | |
-| 2 | GET /auth/me после refresh | | |
-| 3 | Каталог + фильтры | | |
-| 4 | Добавить в корзину → оформить | | |
-| 5 | Upload image (auth) | | |
-| 6 | Upload video (seller ad) | | |
-| 7 | Создать розыгрыш + фото приза | | |
-| 8 | Wishlist sync | | |
-| 9 | Push token register (mobile) | n/a | |
-| 10 | Staff section (web на mobile, G.1) | | |
+См. также: `mobile/docs/STAFF-WEB-ONLY.md`, `mobile/docs/BUYER-CRITICAL-PATH.md`.
 
 ---
 
-## 8. Антипаттерны (не делать)
+## 7. Smoke перед релизом
 
-1. **Импорт `client/src/...` в mobile** — ломает Metro, тянет DOM/CSS.
-2. **Общий UI-kit React/RN** — преждевременно, дорого.
-3. **Full rewrite mobile** — 3–6 месяцев, те же баги на auth/upload.
-4. **Копипаста entity из web в mobile** без contract parse — добавлять только через `@molha/api-contract`.
-5. **Менять upload лимиты только на server** — без contract (фаза B.1).
+Краткая матрица §7 + release log: [`docs/release-smoke-matrix.md`](release-smoke-matrix.md).
 
----
-
-## 9. Метрики готовности
-
-*Актуализировано 2026-06-17 — после закрытия фаз A–G. «Было» — снимок на старт аудита (§2).*
-
-| Метрика | Было | Сейчас | Цель | Статус |
-| ------- | ---- | ------ | ---- | ------ |
-| Реализаций `formatPriceRub` | 3 независимых | **1** (`packages/shared-lib`); client/mobile — re-export | 1 | ✅ |
-| Источник upload limits (байты/MIME) | 4 копии чисел | **1** (`contract/src/uploadLimits.js`); server/client/mobile — импорт `@molha/api-contract` | 1 (`contract`) | ✅ |
-| Ядро `parseApiContract` | 2 полные копии (~94 + ~214 строк) | **1** (`packages/shared-api`); client/mobile — thin wrappers + platform-only parse | shared-api + wrappers | ✅ |
-| client: pure-хелперы из §2.1 на `shared-lib` | 0% | **перенесены:** `formatPriceRub`, `formatIsoDateTime`, `formatApiErrorMessage`, `normalizeUploadUrlForStorage`, roles, `profileSections`, staff access | 100% переносимых | ✅ |
-| client: `staffMainViews` / staff access | локальный дубль | **`@izibuy/shared-lib`** + тонкий `staffMainViews.js` (web-имена полей) | из пакета | ✅ |
-| client в root `workspaces` | нет | **да** (`package.json`) | да | ✅ |
-| Мёртвые копии в `mobile/shared/lib/` | `formatPriceRub.ts` и др. | **удалены**; barrel → `@izibuy/shared-lib` | 0 дублей | ✅ |
-| e2e upload (web) | нет | **`client/e2e/upload-image.spec.js`** | да (F.1) | ✅ |
-| CI `contract` + `shared-lib` | нет | **`npm run test:packages`** в `.github/workflows/lint.yml` | да (F.3) | ✅ |
-| mobile buyer path smoke | нет | **`npm run smoke:buyer-path`** + wf72 static (G.3) | да | ✅ |
-| design tokens parity CI | нет | **`npm run verify:design-tokens`** в lint.yml | да (E.1) | ✅ |
-| profile sections parity | 2 реализации | **`npm run verify:profile-sections`** (D.3) | один источник ids | ✅ |
-
-**Осознанно не в shared (§2.6):** `resolveUploadedImageUrl` / `resolveMediaUrl` (Vite proxy vs `EXPO_PUBLIC_*`), `isDisplayableProductImageUrl` / `isDisplayableMediaUrl` — platform display, дублируют логику; кандидат в `shared-lib` только при следующем drift-баге.
-
-**Операционно (не метрика кода):** ручной smoke — [`docs/release-smoke-matrix.md`](release-smoke-matrix.md) перед релизом.
+| # | Сценарий |
+|---|----------|
+| 1–4 | Auth, `/auth/me`, каталог, корзина → заказ |
+| 5–6 | Upload image / video |
+| 7–8 | Розыгрыш, wishlist |
+| 9 | Push token (mobile) |
+| 10 | Staff → web на mobile (G.1) |
 
 ---
 
-## 10. Порядок старта (TL;DR)
+## 8. Антипаттерны
 
-```
-A.1 → A.3 ✅ → A.2 → A.4
-  ↓
-B.1 → B.2 → B.3 → B.4 → B.6 → B.7 → B.5
-  ↓
-C.1 → C.2 → C.5 → C.3 → C.4 → C.6
-  ↓
-D.1 → D.2 → D.3
-  ↓
-E.1 → F.1 → F.2 → F.3
-  ↓
-G.1 → G.3 (ongoing)
-```
-
-**Следующая задача для Agent mode:** `B.2` (перенос `normalizeUploadUrlForStorage` в `packages/shared-lib`) — закроет второй крупный источник drift.
+1. Импорт `client/src/...` в mobile.
+2. Общий UI-kit React/RN без необходимости.
+3. Full rewrite mobile.
+4. Копипаста entity без `@molha/api-contract` parse.
+5. Менять upload лимиты только на server без contract.
 
 ---
 
-## 11. Связанные документы
+## 9. Метрики (снимок после консолидации)
 
-- `docs/mobile-development.md` — исходная спека mobile, MP/WF parity
-- `docs/release-smoke-matrix.md` — smoke перед релизом (F.4)
-- `docs/bug-triage-labels.md` — метки багов (A.2)
-- `client/docs/LAN-dev-access.md` — web dev cookies/proxy
-- `server/docs/auth-session.md` — сессия JWT
-- `contract/docs/TYPES.md` — типы API
+| Метрика | Сейчас | Цель |
+| ------- | ------ | ---- |
+| `formatPriceRub` | 1× `shared-lib`, re-export client/mobile | 1 |
+| Upload limits | 1× `contract/uploadLimits.js` | 1 |
+| `parseApiContract` | `shared-api` + thin wrappers | shared-api + wrappers |
+| Pure-хелперы §2.1 в client | `@izibuy/shared-lib` | да |
+| `staffMainViews` / roles | `shared-lib` + тонкий web wrapper | из пакета |
+| client в workspaces | да | да |
+| Мёртвый `mobile/shared/lib/*` | удалён | 0 дублей |
+| e2e upload web | `client/e2e/upload-image.spec.js` | да |
+| CI packages + tokens + profile | lint.yml | да |
+| Mobile buyer smoke | `smoke:buyer-path`, wf72 | да |
+
+**Операционно:** прогон `release-smoke-matrix.md` перед каждым релизом.
 
 ---
 
-*Обновлять этот файл при закрытии шагов: менять `[ ]` → `[x]` и дату в шапке.*
+## 10. Связанные документы
 
-**Статус roadmap (июнь 2026):** фазы A (кроме завершённых), B–G и F закрыты по чеклисту выше. Операционно: прогон `docs/release-smoke-matrix.md` перед каждым релизом.
+| Документ | Назначение |
+| -------- | ---------- |
+| [`bug-triage-labels.md`](bug-triage-labels.md) | Метки §3 |
+| [`release-smoke-matrix.md`](release-smoke-matrix.md) | Smoke §7 |
+| [`mobile-development.md`](mobile-development.md) | Спека mobile, WF parity |
+| [`mobile/README.md`](../mobile/README.md) | Staff inventory, buyer path |
+| [`client/docs/LAN-dev-access.md`](../client/docs/LAN-dev-access.md) | Web dev auth/proxy |
+| [`server/docs/auth-session.md`](../server/docs/auth-session.md) | JWT сессия |
+| `.cursor/rules/client-mobile-share-boundaries.mdc` | Границы §2 |
+| `.cursor/rules/mobile-staff-freeze.mdc` | G.1 staff freeze |
+
+---
+
+*При новых шагах консолидации — дополнять §5/§9; политику §2/§6/§8 не ломать без явного решения.*

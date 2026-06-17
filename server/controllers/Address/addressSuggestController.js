@@ -1,4 +1,4 @@
-import { errorRes, successRes } from "../../utils/index.js";
+import { errorRes, successRes } from "../../services/http/index.js";
 import {
   isDadataConfigured,
   suggestRuAddresses,
@@ -6,8 +6,7 @@ import {
 
 /** POST /address/suggest — подсказки DaData (до дома, РФ). */
 export const addressSuggestController = async (req, res) => {
-  try {
-    if (!isDadataConfigured()) {
+if (!isDadataConfigured()) {
       return errorRes(
         res,
         503,
@@ -25,8 +24,4 @@ export const addressSuggestController = async (req, res) => {
         data: item.data,
       })),
     });
-  } catch (error) {
-    console.error("addressSuggest error:", error);
-    return errorRes(res, 502, "Не удалось получить подсказки адреса");
-  }
 };

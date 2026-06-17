@@ -1,31 +1,16 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-
 import { UserPremiumAvatar } from "../../../entities/user/ui/UserPremiumAvatar.jsx";
-import { getUserProfileRows } from "../../../entities/user/lib/getUserProfileRows.js";
-import {
-  formatProfileImageObjectPosition,
-  getUserAvatarFocus,
-  getUserBackgroundFocus,
-} from "../../../entities/user/lib/profileImageFocus.js";
-import { resolveUserProfileBackgroundFromUser } from "../../../entities/user/lib/userBackgroundValue.js";
-import { pickUserProfilePhotoUrl } from "../../../entities/user/lib/pickUserProfilePhotoUrl.js";
 import { isPremiumActive } from "../../../entities/user/lib/isPremiumActive.js";
 import { USER_ROLE_USER } from "../../../entities/user/model/userConstants.js";
 import {
   MY_PROFILE_PAGE_UI,
   USER_DETAILS_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
-import { buildProfileNavGroups } from "../lib/buildProfileNavGroups.js";
-import {
-  isFullWidthCatalogProfileTab,
-  PROFILE_TAB_MY_PRODUCTS,
-  PROFILE_TAB_OVERVIEW,
-} from "../lib/profileTabs.js";
-import { MyProductsCatalogToolbar } from "../../home/ui/MyProductsCatalogToolbar.jsx";
-import { getActiveProfileNavLabel } from "../lib/getActiveProfileNavLabel.js";
+import { PROFILE_TAB_OVERVIEW } from "../../../widgets/app-shell/lib/profileTabs.js";
+import { MyProductsCatalogToolbar } from "../../../widgets/my-products-catalog-toolbar/ui/MyProductsCatalogToolbar.jsx";
 import { PROFILE_NAV_ITEM_META } from "../lib/profileNavItemMeta.js";
+import { useMyProfileNav } from "../model/useMyProfileNav.js";
+import { useMyProfilePageUi } from "../model/useMyProfilePageUi.js";
 import { AppIcon, Menu } from "../../../shared/ui/icon/index.js";
-import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import { UserProfileInfoPanel } from "../../../entities/user/ui/UserProfileInfoPanel.jsx";
 import { ProfileSidebar } from "./ProfileSidebar.jsx";
 
@@ -83,7 +68,7 @@ import "./MyProfilePage.css";
  * activeTab?: string;
  * onTabChange?: (tab: string) => void;
  * tabContent?: import('react').ReactNode;
- * myProductsCatalogToolbarProps?: import('../../home/ui/MyProductsCatalogToolbar.jsx').MyProductsCatalogToolbar extends (props: infer P) => unknown ? P : never;
+ * myProductsCatalogToolbarProps?: import('../../../widgets/my-products-catalog-toolbar/ui/MyProductsCatalogToolbar.jsx').MyProductsCatalogToolbar extends (props: infer P) => unknown ? P : never;
  * }} props
  */
 export function MyProfilePage({
@@ -138,287 +123,86 @@ export function MyProfilePage({
   tabContent = null,
   myProductsCatalogToolbarProps = null,
 }) {
-  const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
-  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
-  const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
-  const [backgroundLoadFailed, setBackgroundLoadFailed] = useState(false);
   const isProfileReady = Boolean(user) && !isLoading && !errorMessage;
-  const photoUrl = user ? pickUserProfilePhotoUrl(user) : null;
-  const avatarObjectPosition = useMemo(
-    () => formatProfileImageObjectPosition(getUserAvatarFocus(user)),
-    [user],
-  );
-  const backgroundObjectPosition = useMemo(
-    () => formatProfileImageObjectPosition(getUserBackgroundFocus(user)),
-    [user],
-  );
-  const profileBackground = user ? resolveUserProfileBackgroundFromUser(user) : null;
-  const rows = useMemo(
-    () =>
-      user
-        ? getUserProfileRows(user, { showAdminRole: false, hideMediaUrls: true })
-        : [],
-    [user],
-  );
-  const canUseMyProducts = isProfileReady && Boolean(onMyProductsClick);
-  const canUseMySales = isProfileReady && Boolean(onMySalesClick);
-  const canUseInstallmentPayments =
-    isProfileReady && Boolean(onInstallmentPaymentsClick);
-  const canUseInstallmentSales = isProfileReady && Boolean(onInstallmentSalesClick);
-  const canUseMyOrders = isProfileReady && Boolean(onMyOrdersClick);
-  const canUseAuction = isProfileReady && Boolean(onAuctionClick);
   const canUseEditProfile = isProfileReady && Boolean(onEditProfileClick);
   const isRegularUser = user?.userRole === USER_ROLE_USER;
-  const canUseAdminOrders =
-    !isRegularUser &&
-    isProfileReady &&
-    user?.userRole === "admin" &&
-    Boolean(onAdminOrdersClick);
-  const canUseSearchSynonymsAdmin =
-    !isRegularUser &&
-    isProfileReady &&
-    user?.userRole === "admin" &&
-    Boolean(onSearchSynonymsAdminClick);
-  const canUseCategoryTreeAdmin =
-    !isRegularUser &&
-    isProfileReady &&
-    user?.userRole === "admin" &&
-    Boolean(onCategoryTreeAdminClick);
-  const canUseAppIntroAdmin =
-    !isRegularUser &&
-    isProfileReady &&
-    user?.userRole === "admin" &&
-    Boolean(onAppIntroAdminClick);
-  const canUsePopularProductsAdmin =
-    !isRegularUser &&
-    isProfileReady &&
-    user?.userRole === "admin" &&
-    Boolean(onPopularProductsAdminClick);
-  const isUserDataConfirmed = user?.isUserDataConfirmed === true;
-  const canUseDataConfirmation = isProfileReady && Boolean(onDataConfirmationClick);
-  const canUsePremium = isProfileReady && Boolean(onPremiumClick);
-  const canUseLoyaltyPoints = isProfileReady && Boolean(onLoyaltyPointsClick);
-  const canUseAdvertising = isProfileReady && Boolean(onAdvertisingClick);
-  const canUseProductModeration =
-    !isRegularUser && isProfileReady && Boolean(onProductModerationClick);
-  const canUseProductReports =
-    !isRegularUser && isProfileReady && Boolean(onProductReportsClick);
-  const canUseProductPromotions =
-    !isRegularUser && isProfileReady && Boolean(onProductPromotionsClick);
-  const canUseRaffles = !isRegularUser && isProfileReady && Boolean(onRafflesClick);
-  const canUseCreateRaffle =
-    isProfileReady &&
-    user?.isUserDataConfirmed === true &&
-    Boolean(onCreateRaffleClick);
-  const canUseDataConfirmationQueue =
-    !isRegularUser && isProfileReady && Boolean(onDataConfirmationQueueClick);
-  const canUseInstallmentModeration =
-    !isRegularUser && isProfileReady && Boolean(onInstallmentModerationClick);
-  const canUseInstallmentDisputes =
-    !isRegularUser && isProfileReady && Boolean(onInstallmentDisputesClick);
-  const canUseSubscriptions = isProfileReady && Boolean(onSubscriptionsClick);
-  const canUseWishlist = isProfileReady && Boolean(onWishlistClick);
-  const isMyProductsTab = activeTab === PROFILE_TAB_MY_PRODUCTS;
-  const isFullWidthCatalogTab = isFullWidthCatalogProfileTab(activeTab);
-  const canShowBackground =
-    Boolean(profileBackground) &&
-    (profileBackground.kind === "preset" ||
-      (profileBackground.kind === "image" && !backgroundLoadFailed));
-  const showProfileBanner =
-    Boolean(user) && (canShowBackground || (Boolean(photoUrl) && !avatarLoadFailed));
-  const showEditOnBanner =
-    isRegularUser &&
-    canUseEditProfile &&
-    activeTab === PROFILE_TAB_OVERVIEW &&
-    showProfileBanner;
-  const navGroups = useMemo(
-    () =>
-      buildProfileNavGroups({
-        canUseCreateRaffle,
-        canUseMyProducts,
-        canUseMySales,
-        canUseMyOrders,
-        canUseAuction,
-        canUseInstallmentPayments,
-        canUseInstallmentSales,
-        canUseProductModeration,
-        canUseProductReports,
-        canUseProductPromotions,
-        canUseRaffles,
-        canUseDataConfirmationQueue,
-        canUseInstallmentModeration,
-        canUseInstallmentDisputes,
-        canUseAdminOrders,
-        canUseSearchSynonymsAdmin,
-        canUseCategoryTreeAdmin,
-        canUseAppIntroAdmin,
-        canUsePopularProductsAdmin,
-        canUseSubscriptions,
-        canUseWishlist,
-        canUseDataConfirmation,
-        isUserDataConfirmed,
-        canUsePremium,
-        canUseLoyaltyPoints,
-        canUseAdvertising,
-        canUseEditProfile,
-        showEditOnBanner,
-        pendingMySalesActionCount,
-        pendingMyOrdersActionCount,
-        pendingIncomingPriceOffersCount,
-        pendingInstallmentBuyerActionCount,
-        pendingInstallmentSellerActionCount,
-        pendingModerationCount,
-        pendingIntroAdModerationCount,
-        pendingSellerPersonalCategoryModerationCount,
-        pendingProductReportsCount,
-        pendingProductPromotionsCount,
-        pendingRafflesCount,
-        pendingDataConfirmationCount,
-        pendingInstallmentModerationCount,
-        pendingInstallmentDisputesCount,
-        onTabChange,
-        onCreateRaffleClick,
-        onMyProductsClick,
-        onMySalesClick,
-        onMyOrdersClick,
-        onAuctionClick,
-        onInstallmentPaymentsClick,
-        onInstallmentSalesClick,
-        onProductModerationClick,
-        onIntroAdModerationClick,
-        onSellerPersonalCategoryModerationClick,
-        onProductReportsClick,
-        onProductPromotionsClick,
-        onRafflesClick,
-        onDataConfirmationQueueClick,
-        onInstallmentModerationClick,
-        onInstallmentDisputesClick,
-        onAdminOrdersClick,
-        onSearchSynonymsAdminClick,
-        onCategoryTreeAdminClick,
-        onAppIntroAdminClick,
-        onPopularProductsAdminClick,
-        onSubscriptionsClick,
-        onWishlistClick,
-        onDataConfirmationClick,
-        onPremiumClick,
-        onLoyaltyPointsClick,
-        onAdvertisingClick,
-        onEditProfileClick,
-      }),
-    [
-      canUseAdminOrders,
-      canUseAuction,
-      canUseAppIntroAdmin,
-      canUsePopularProductsAdmin,
-      canUseCategoryTreeAdmin,
-      canUseCreateRaffle,
-      canUseDataConfirmation,
-      canUseDataConfirmationQueue,
-      isUserDataConfirmed,
-      canUseEditProfile,
-      canUseInstallmentDisputes,
-      canUseInstallmentModeration,
-      canUseInstallmentPayments,
-      canUseInstallmentSales,
-      canUseLoyaltyPoints,
-      canUseAdvertising,
-      canUseMyOrders,
-      canUseMyProducts,
-      canUseMySales,
-      canUsePremium,
-      canUseProductModeration,
-      canUseProductReports,
-      canUseProductPromotions,
-      canUseRaffles,
-      canUseSearchSynonymsAdmin,
-      canUseSubscriptions,
-      canUseWishlist,
-      onAdminOrdersClick,
-      onAuctionClick,
-      onAppIntroAdminClick,
-      onPopularProductsAdminClick,
-      onCategoryTreeAdminClick,
-      onCreateRaffleClick,
-      onDataConfirmationClick,
-      onDataConfirmationQueueClick,
-      onEditProfileClick,
-      onInstallmentDisputesClick,
-      onInstallmentModerationClick,
-      onInstallmentPaymentsClick,
-      onInstallmentSalesClick,
-      onLoyaltyPointsClick,
-      onAdvertisingClick,
-      onIntroAdModerationClick,
-      onSellerPersonalCategoryModerationClick,
-      onMyOrdersClick,
-      onMyProductsClick,
-      onMySalesClick,
-      onPremiumClick,
-      onProductModerationClick,
-      onIntroAdModerationClick,
-      onProductReportsClick,
-      onProductPromotionsClick,
-      onRafflesClick,
-      onSearchSynonymsAdminClick,
-      onSubscriptionsClick,
-      onWishlistClick,
-      onTabChange,
-      pendingDataConfirmationCount,
-      pendingIncomingPriceOffersCount,
-      pendingInstallmentBuyerActionCount,
-      pendingInstallmentDisputesCount,
-      pendingInstallmentModerationCount,
-      pendingInstallmentSellerActionCount,
-      pendingModerationCount,
-      pendingIntroAdModerationCount,
-      pendingSellerPersonalCategoryModerationCount,
-      pendingMyOrdersActionCount,
-      pendingMySalesActionCount,
-      pendingProductReportsCount,
-      pendingProductPromotionsCount,
-      pendingRafflesCount,
-      showEditOnBanner,
-    ],
-  );
-  const activeNavLabel = useMemo(
-    () => getActiveProfileNavLabel(navGroups, activeTab),
-    [activeTab, navGroups],
-  );
-  const closeMobileNav = useCallback(() => setIsMobileNavOpen(false), []);
-  const openMobileNav = useCallback(() => setIsMobileNavOpen(true), []);
 
-  useScrollLock(isMobileNavOpen);
+  const {
+    rows,
+    photoUrl,
+    avatarObjectPosition,
+    backgroundObjectPosition,
+    profileBackground,
+    canShowBackground,
+    showProfileBanner,
+    showEditOnBanner,
+    isMyProductsTab,
+    isFullWidthCatalogTab,
+    isLogoutConfirmOpen,
+    setIsLogoutConfirmOpen,
+    isMobileNavOpen,
+    closeMobileNav,
+    openMobileNav,
+    avatarLoadFailed,
+    setAvatarLoadFailed,
+    setBackgroundLoadFailed,
+  } = useMyProfilePageUi({
+    user,
+    isProfileReady,
+    activeTab,
+    canUseEditProfile,
+    isRegularUser,
+  });
 
-  useEffect(() => {
-    closeMobileNav();
-  }, [activeTab, closeMobileNav]);
-
-  useEffect(() => {
-    if (!isMobileNavOpen) {
-      return undefined;
-    }
-
-    const handleKeyDown = (event) => {
-      if (event.key === "Escape") {
-        closeMobileNav();
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [closeMobileNav, isMobileNavOpen]);
-
-  useEffect(() => {
-    setAvatarLoadFailed(false);
-    setBackgroundLoadFailed(false);
-  }, [user?._id]);
-
-  useEffect(() => {
-    if (activeTab !== PROFILE_TAB_OVERVIEW) {
-      setIsLogoutConfirmOpen(false);
-    }
-  }, [activeTab]);
+  const { navGroups, activeNavLabel } = useMyProfileNav({
+    user,
+    isProfileReady,
+    activeTab,
+    showEditOnBanner,
+    pendingModerationCount,
+    pendingIntroAdModerationCount,
+    pendingSellerPersonalCategoryModerationCount,
+    pendingIncomingPriceOffersCount,
+    pendingMySalesActionCount,
+    pendingMyOrdersActionCount,
+    pendingInstallmentBuyerActionCount,
+    pendingInstallmentSellerActionCount,
+    pendingInstallmentModerationCount,
+    pendingInstallmentDisputesCount,
+    pendingProductReportsCount,
+    pendingProductPromotionsCount,
+    pendingRafflesCount,
+    pendingDataConfirmationCount,
+    onTabChange,
+    onCreateRaffleClick,
+    onMyProductsClick,
+    onMySalesClick,
+    onMyOrdersClick,
+    onAuctionClick,
+    onInstallmentPaymentsClick,
+    onInstallmentSalesClick,
+    onProductModerationClick,
+    onIntroAdModerationClick,
+    onSellerPersonalCategoryModerationClick,
+    onProductReportsClick,
+    onProductPromotionsClick,
+    onRafflesClick,
+    onDataConfirmationQueueClick,
+    onInstallmentModerationClick,
+    onInstallmentDisputesClick,
+    onAdminOrdersClick,
+    onSearchSynonymsAdminClick,
+    onCategoryTreeAdminClick,
+    onAppIntroAdminClick,
+    onPopularProductsAdminClick,
+    onSubscriptionsClick,
+    onWishlistClick,
+    onDataConfirmationClick,
+    onPremiumClick,
+    onLoyaltyPointsClick,
+    onAdvertisingClick,
+    onEditProfileClick,
+  });
 
   return (
     <section

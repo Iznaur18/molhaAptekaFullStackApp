@@ -9,9 +9,9 @@ import {
   getPendingDataConfirmationRequests,
   normalizePassportSelfiePhotoUrl,
   resolveDataConfirmationRequest,
-} from "../../utils/userDataConfirmationHelpers.js";
-import { normalizePassportPayload } from "../../utils/validatePassportPayload.js";
-import { errorRes, successRes } from "../../utils/index.js";
+} from "../../services/user/userDataConfirmationHelpers.js";
+import { normalizePassportPayload } from "../../services/user/validatePassportPayload.js";
+import { errorRes, successRes } from "../../services/http/index.js";
 
 /**
  * `POST /user/me/data-confirmation-request`
@@ -91,8 +91,7 @@ export const submitDataConfirmationRequestController = async (req, res) => {
  * `GET /user/me/data-confirmation-request`
  */
 export const getMyDataConfirmationRequestController = async (req, res) => {
-  try {
-    const userId = String(req.userId);
+const userId = String(req.userId);
     const user = await UserModel.findById(userId).select("isUserDataConfirmed").lean();
 
     if (!user) {
@@ -105,46 +104,31 @@ export const getMyDataConfirmationRequestController = async (req, res) => {
       isUserDataConfirmed: user.isUserDataConfirmed === true,
       request,
     });
-  } catch (error) {
-    console.error("getMyDataConfirmationRequest error:", error);
-    return errorRes(res, 500, "Ошибка при получении заявки");
-  }
 };
 
 /**
  * `GET /user/data-confirmation-requests/pending`
  */
 export const getPendingDataConfirmationRequestsController = async (req, res) => {
-  try {
-    const { requests, totalPending } = await getPendingDataConfirmationRequests();
+const { requests, totalPending } = await getPendingDataConfirmationRequests();
     return successRes(res, { requests, totalPending });
-  } catch (error) {
-    console.error("getPendingDataConfirmationRequests error:", error);
-    return errorRes(res, 500, "Ошибка при загрузке заявок");
-  }
 };
 
 /**
  * `GET /user/data-confirmation-requests/pending/count`
  */
 export const getPendingDataConfirmationRequestsCountController = async (req, res) => {
-  try {
-    const totalPending = await UserDataConfirmationRequestModel.countDocuments({
+const totalPending = await UserDataConfirmationRequestModel.countDocuments({
       status: USER_DATA_CONFIRMATION_STATUS_PENDING,
     });
     return successRes(res, { totalPending });
-  } catch (error) {
-    console.error("getPendingDataConfirmationRequestsCount error:", error);
-    return errorRes(res, 500, "Ошибка при подсчёте заявок");
-  }
 };
 
 /**
  * `PATCH /user/data-confirmation-requests/:requestId/resolve`
  */
 export const resolveDataConfirmationRequestController = async (req, res) => {
-  try {
-    const staffUserId = req.userId;
+const staffUserId = req.userId;
     const { requestId } = req.params;
     const resolution = String(req.body?.resolution ?? "").trim();
     const staffNote = String(req.body?.staffNote ?? "").trim();
@@ -167,8 +151,4 @@ export const resolveDataConfirmationRequestController = async (req, res) => {
             : 400;
       return errorRes(res, status, message);
     }
-  } catch (error) {
-    console.error("resolveDataConfirmationRequest error:", error);
-    return errorRes(res, 500, "Ошибка при рассмотрении заявки");
-  }
 };

@@ -1,5 +1,5 @@
 import { OrderModel } from "../../models/index.js";
-import { errorRes, successRes } from "../../utils/index.js";
+import { errorRes, successRes } from "../../services/http/index.js";
 import { runInTransaction } from "../../utils/mongoTransaction.js";
 
 import { ORDER_BUYER_PUBLIC_FIELDS, ORDER_ITEMS_POPULATE } from "./orderQueries.js";
@@ -8,25 +8,24 @@ import {
   ORDER_STATUS_CONFIRMED,
   ORDER_STATUS_DELIVERED,
 } from "../../constants/orderConstants.js";
-import { syncRaffleProgressForProductSale } from "../../utils/raffleHelpers.js";
-import { applySoldQuantityDeltaForItemStatusChange } from "../../utils/productSoldQuantityDenorm.js";
+import { syncRaffleProgressForProductSale } from "../../services/raffle/raffleHelpers.js";
+import { applySoldQuantityDeltaForItemStatusChange } from "../../services/product/productSoldQuantityDenorm.js";
 import {
   decrementProductStockOnItemConfirmed,
   restoreProductStockOnItemCancelled,
-} from "../../utils/productStock.js";
+} from "../../services/product/productStock.js";
 import {
   markOrderLineLoyaltyReserveReleased,
   releaseUnawardedLoyaltyReservesForOrder,
-} from "../../utils/orderLoyaltyPoints.js";
+} from "../../services/order/orderLoyaltyPoints.js";
 import {
   normalizeOrderDocumentForRuntime,
   normalizeOrderItemsForRuntime,
-} from "./orderStatus.js";
+} from "../../services/order/orderStatus.js";
 
 /** `PATCH /order/:orderId/status` — смена статуса заказа (только админ). */
 export const updateOrderStatusController = async (req, res) => {
-  try {
-    const { orderId } = req.params;
+const { orderId } = req.params;
     const { status } = req.body;
 
     const order = await OrderModel.findById(orderId);
@@ -164,8 +163,4 @@ export const updateOrderStatusController = async (req, res) => {
     await order.populate(ORDER_ITEMS_POPULATE);
 
     return successRes(res, { order });
-  } catch (error) {
-    console.error("updateOrderStatusController error:", error);
-    return errorRes(res, 500, "Ошибка при обновлении статуса заказа");
-  }
 };

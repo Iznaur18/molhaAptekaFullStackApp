@@ -17,6 +17,8 @@ import {
   resolveDataConfirmationBodySchema,
   upsertProductInstallmentProgramBodySchema,
   verifyEmailWithCodeBodySchema,
+  verifyEmailTokenQuerySchema,
+  orderItemCancelBodySchema,
   createOrderBodySchema,
   createProductBodySchema,
   createRaffleBodySchema,
@@ -43,6 +45,8 @@ import {
   userFollowListQuerySchema,
   userIdClientParamsSchema,
   userSearchQuerySchema,
+  canFetchUsersSearch,
+  isUsersSearchInputTooShort,
   userSellerProductsQuerySchema,
 } from "../src/index.js";
 
@@ -63,6 +67,7 @@ test("authSessionDataSchema includes bearer tokens", () => {
   });
   assert.equal(parsed.accessToken, "access.jwt.token");
   assert.equal(refreshAuthBodySchema.parse({}).refreshToken, undefined);
+  assert.deepEqual(refreshAuthBodySchema.parse(undefined), {});
   assert.equal(
     refreshAuthBodySchema.parse({ refreshToken: "rt" }).refreshToken,
     "rt",
@@ -163,9 +168,41 @@ test("userSearchQuerySchema rejects short search", () => {
   assert.throws(() => userSearchQuerySchema.parse({ search: "ab" }));
 });
 
+test("userSearchQuerySchema allows browse without search", () => {
+  const parsed = userSearchQuerySchema.parse({ page: "1", limit: "10" });
+  assert.equal(parsed.search, undefined);
+  assert.equal(parsed.page, 1);
+  assert.equal(parsed.limit, 10);
+});
+
+test("canFetchUsersSearch: empty browse or min 3 chars", () => {
+  assert.equal(canFetchUsersSearch(""), true);
+  assert.equal(canFetchUsersSearch("   "), true);
+  assert.equal(canFetchUsersSearch("ab"), false);
+  assert.equal(canFetchUsersSearch("abc"), true);
+});
+
+test("isUsersSearchInputTooShort: only 1-2 chars", () => {
+  assert.equal(isUsersSearchInputTooShort(""), false);
+  assert.equal(isUsersSearchInputTooShort("a"), true);
+  assert.equal(isUsersSearchInputTooShort("ab"), true);
+  assert.equal(isUsersSearchInputTooShort("abc"), false);
+});
+
 test("verifyEmailWithCodeBodySchema validates six-digit code", () => {
   const parsed = verifyEmailWithCodeBodySchema.parse({ code: " 123456 " });
   assert.equal(parsed.code, "123456");
+});
+
+test("verifyEmailTokenQuerySchema validates hex token", () => {
+  const token = "a".repeat(64);
+  const parsed = verifyEmailTokenQuerySchema.parse({ token: ` ${token} ` });
+  assert.equal(parsed.token, token);
+});
+
+test("orderItemCancelBodySchema accepts optional reason", () => {
+  const parsed = orderItemCancelBodySchema.parse({ reason: " передумал " });
+  assert.equal(parsed.reason, "передумал");
 });
 
 test("resolveDataConfirmationBodySchema accepts approve resolution", () => {

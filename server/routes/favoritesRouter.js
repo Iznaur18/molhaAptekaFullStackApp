@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { createAsyncRouter } from "../utils/createAsyncRouter.js";
 
 import {
   getMyFavoritesController,
@@ -7,7 +7,7 @@ import {
 import { checkAuthMW, favoritesReplaceRateLimiter } from "../middlewares/index.js";
 import { replaceMyFavoritesValidation } from "../validations/index.js";
 
-const router = Router();
+const router = createAsyncRouter();
 
 router.get("/", checkAuthMW, getMyFavoritesController);
 router.put(

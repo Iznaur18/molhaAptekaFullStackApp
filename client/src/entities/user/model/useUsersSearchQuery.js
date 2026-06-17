@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
-import { USER_SEARCH_MIN_LENGTH } from "@molha/api-contract";
+import { canFetchUsersSearch, isUsersSearchInputTooShort } from "@molha/api-contract";
 
 import { fetchUsersSearchPage } from "../api/fetchUsersSearch.js";
 import { usersSearchQueryKeys } from "./usersSearchQueryKeys.js";
@@ -12,7 +12,7 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
  */
 export function useUsersSearchQuery({ search }) {
   const normalizedSearch = search.trim();
-  const canSearch = normalizedSearch.length >= USER_SEARCH_MIN_LENGTH;
+  const canFetch = canFetchUsersSearch(normalizedSearch);
 
   const query = useQuery({
     queryKey: usersSearchQueryKeys.list(normalizedSearch),
@@ -20,10 +20,13 @@ export function useUsersSearchQuery({ search }) {
       fetchUsersSearchPage({
         search: normalizedSearch,
       }),
-    enabled: canSearch,
+    enabled: canFetch,
   });
   const phase = useMemo(() => {
-    if (!canSearch) {
+    if (isUsersSearchInputTooShort(normalizedSearch)) {
+      return "success";
+    }
+    if (!canFetch) {
       return "success";
     }
     if (query.isPending) {
@@ -33,7 +36,7 @@ export function useUsersSearchQuery({ search }) {
       return "error";
     }
     return "success";
-  }, [canSearch, query.isError, query.isPending]);
+  }, [canFetch, normalizedSearch, query.isError, query.isPending]);
   const error =
     query.isError && query.error instanceof Error
       ? query.error.message
@@ -45,5 +48,6 @@ export function useUsersSearchQuery({ search }) {
     phase,
     users: query.data?.users ?? [],
     error,
+    isSearchInputTooShort: isUsersSearchInputTooShort(normalizedSearch),
   };
 }

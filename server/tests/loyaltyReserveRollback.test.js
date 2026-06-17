@@ -5,7 +5,7 @@ import { UserModel } from "../models/index.js";
 import {
   reserveLoyaltyPointsBySellerTotals,
   releaseLoyaltyPointsBySellerTotals,
-} from "../utils/loyaltyPointsReserve.js";
+} from "../services/loyalty/loyaltyPointsReserve.js";
 import { runInTransaction } from "../utils/mongoTransaction.js";
 import {
   connectMongoTestReplSet,

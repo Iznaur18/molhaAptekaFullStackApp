@@ -4,25 +4,25 @@ import { useAuthSession } from "../../entities/user/model/useAuthSession.js";
 import { useMyProductsTotalQuery } from "../../entities/product/model/useMyProductsTotalQuery.js";
 import { USER_ROLE_ADMIN } from "../../entities/user/model/userConstants.js";
 import { MY_PRODUCTS_MODERATION_FILTER_ALL } from "../../entities/product/model/productConstants.js";
-import { useCatalogMainView } from "../../pages/catalog/model/useCatalogMainView.js";
-import { useHomeEmailVerifiedRedirect } from "../../pages/home/model/useHomeEmailVerifiedRedirect.js";
-import { useHomeFeaturedContent } from "../../pages/home/model/useHomeFeaturedContent.js";
-import { useAppShellNavigation } from "../../pages/home/model/useAppShellNavigation.js";
-import { useHomeQueryRefreshers } from "../../pages/home/model/useHomeQueryRefreshers.js";
-import { useHomeRouteGuards } from "../../pages/home/model/useHomeRouteGuards.js";
-import { useHomeSellerAccess } from "../../pages/home/model/useHomeSellerAccess.js";
-import { useHomeSellerModal } from "../../pages/home/model/useHomeSellerModal.jsx";
-import { useStaffBadgeQueries } from "../../pages/home/model/useStaffBadgeQueries.js";
-import { useShellUiState } from "../../pages/home/model/useShellUiState.js";
+import { useCatalogMainView } from "../../widgets/app-shell/model/useCatalogMainView.js";
+import { useHomeEmailVerifiedRedirect } from "../../widgets/app-shell/model/useHomeEmailVerifiedRedirect.js";
+import { useHomeFeaturedContent } from "../../widgets/app-shell/model/useHomeFeaturedContent.js";
+import { useAppShellNavigation } from "../../widgets/app-shell/model/useAppShellNavigation.js";
+import { useHomeQueryRefreshers } from "../../widgets/app-shell/model/useHomeQueryRefreshers.js";
+import { useHomeRouteGuards } from "../../widgets/app-shell/model/useHomeRouteGuards.js";
+import { useHomeSellerAccess } from "../../widgets/app-shell/model/useHomeSellerAccess.js";
+import { useHomeSellerModal } from "../../widgets/app-shell/model/useHomeSellerModal.jsx";
+import { useStaffBadgeQueries } from "../../widgets/app-shell/model/useStaffBadgeQueries.js";
+import { useShellUiState } from "../../widgets/app-shell/model/useShellUiState.js";
 import {
   EMPTY_MY_PROFILE_PAGE,
   readInitialCatalogQuery,
-} from "../../pages/home/lib/catalogShellConstants.js";
+} from "../../widgets/app-shell/lib/catalogShellConstants.js";
 
 /**
  * @param {import('react-router-dom').Location} location
  * @param {import('react-router-dom').NavigateFunction} navigate
- * @returns {Partial<import('./appShellStateTypes.js').AppShellStateValue>}
+ * @returns {Partial<import('../../widgets/app-shell/model/appShellStateTypes.js').AppShellStateValue>}
  */
 export function useAppShellState(location, navigate) {
   const navigation = useAppShellNavigation(location, navigate);

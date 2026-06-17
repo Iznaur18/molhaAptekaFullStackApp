@@ -1,12 +1,13 @@
 import { UserModel } from "../../models/index.js";
-import { buildRegexSearchOr, errorRes, successRes } from "../../utils/index.js";
-import { getOptionalViewerFromRequest } from "../../utils/optionalViewerFromRequest.js";
+import { successRes } from "../../services/http/index.js";
+import { buildRegexSearchOr } from "../../utils/buildRegexSearchOr.js";
+import { getOptionalViewerFromRequest } from "../../services/user/optionalViewerFromRequest.js";
 import {
   applyAdminVisibilityToUsersSearchQuery,
   sanitizeUsersSearchList,
-} from "../../utils/userProfileVisibility.js";
-import { attachUserListCommerceStats } from "../../utils/attachUserListCommerceStats.js";
-import { attachFollowersCountToUsers } from "../../utils/userFollowHelpers.js";
+} from "../../services/user/userProfileVisibility.js";
+import { attachUserListCommerceStats } from "../../services/user/attachUserListCommerceStats.js";
+import { attachFollowersCountToUsers } from "../../services/user/userFollowHelpers.js";
 
 const USER_SEARCH_FIELDS = ["userName"];
 const DEFAULT_PAGE = 1;
@@ -49,8 +50,7 @@ const buildUsersQuery = ({ search }) => {
 };
 
 export const userSearchController = async (req, res) => {
-  try {
-    const { page, limit, skip } = parsePagination(req.query);
+const { page, limit, skip } = parsePagination(req.query);
     const usersQuery = buildUsersQuery(req.query);
     const viewer = await getOptionalViewerFromRequest(req);
 
@@ -95,8 +95,4 @@ export const userSearchController = async (req, res) => {
     const users = await attachFollowersCountToUsers(usersWithCommerce);
 
     return successRes(res, { users, total, page, limit });
-  } catch (error) {
-    console.error("userSearchController error:", error);
-    return errorRes(res, 500, "Ошибка при получении пользователей");
-  }
 };

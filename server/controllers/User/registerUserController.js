@@ -1,7 +1,8 @@
 import bcrypt from "bcrypt";
 import { UserModel } from "../../models/index.js";
-import { sendUserWithToken, errorRes } from "../../utils/index.js";
-import { sendEmailVerificationForUser } from "../../utils/emailVerification.js";
+import { errorRes } from "../../services/http/index.js";
+import { sendUserWithToken } from "../../services/auth/sendUserWithToken.js";
+import { enqueueSendEmailVerification } from "../../queues/enqueueSendEmailVerification.js";
 import { DEFAULT_AVATAR_URL } from "../../constants/constants.js";
 import {
   formatUserBackgroundPresetValue,
@@ -25,8 +26,7 @@ function resolveRegisterBackground(presetId) {
 
 /** Регистрация по email + пароль и опциональные поля профиля. POST /auth/register */
 export const registerUserController = async (req, res) => {
-  try {
-    const {
+const {
       email,
       password,
       userName,
@@ -83,14 +83,10 @@ export const registerUserController = async (req, res) => {
     const user = await doc.save();
 
     try {
-      await sendEmailVerificationForUser(user._id);
+      await enqueueSendEmailVerification(user._id);
     } catch (verificationError) {
-      console.error("sendEmailVerificationForUser error:", verificationError);
+      console.error("enqueueSendEmailVerification error:", verificationError);
     }
 
     return sendUserWithToken(user, res);
-  } catch (error) {
-    console.error(error);
-    return errorRes(res, 500, "Ошибка при регистрации пользователя");
-  }
 };

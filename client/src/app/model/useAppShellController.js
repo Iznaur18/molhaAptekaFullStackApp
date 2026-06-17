@@ -1,4 +1,4 @@
-import { useAppShellStateContext } from "./AppShellStateContext.jsx";
+import { useAppShellStateContext } from "../../widgets/app-shell/model/AppShellStateContext.jsx";
 import { useAppShellPresentationLayer } from "./useAppShellPresentationLayer.js";
 
 /**
@@ -22,6 +22,7 @@ export function useAppShellController() {
     emailVerificationNotice: ctx.emailVerificationNotice,
     dismissEmailVerificationNotice: ctx.dismissEmailVerificationNotice,
     staffActionNotice: ctx.staffActionNotice,
+    goToMainView: ctx.goToMainView,
     headerProps,
     catalogContentProps,
     accountContentProps,

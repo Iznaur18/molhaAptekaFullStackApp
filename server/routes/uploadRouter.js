@@ -1,4 +1,4 @@
-import { Router } from "express"; // Импортируем Router из express. Он будет использоваться для создания роута.
+import { createAsyncRouter } from "../utils/createAsyncRouter.js";
 import {
   uploadMW,
   checkAuthMW,
@@ -7,7 +7,7 @@ import {
 } from "../middlewares/index.js"; // Импортируем uploadMW и checkAuthMW из middlewares/index.js. Он будет использоваться для загрузки файла.
 import { uploadController, uploadVideoController } from "../controllers/index.js";
 
-const router = Router(); // Создаем роут для загрузки файла. Этот роут будет использоваться в index.js. Это роутер, который будет использоваться для загрузки файла.
+const router = createAsyncRouter();
 
 // Rate limiting для загрузки файлов (защита от перегрузки сервера)
 router.post(

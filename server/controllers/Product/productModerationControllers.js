@@ -9,18 +9,18 @@ import {
   attachProductSellerSnapshot,
   attachProductSellerSnapshots,
 } from "../../utils/attachProductSellerSnapshots.js";
-import { notifyFollowersOfSellerNewCatalogProduct } from "../../utils/userFollowHelpers.js";
+import { notifyFollowersOfSellerNewCatalogProduct } from "../../services/user/userFollowHelpers.js";
 import {
   computeProductDiscountPercent,
   notifyFollowersOfSellerProductDiscount,
 } from "../../utils/productDiscount.js";
 import { buildProductSearchBlobFromFields } from "../../utils/buildProductSearchBlob.js";
-import { resolveActiveSellerPersonalCategoryId } from "../../utils/sellerPersonalCategoryHelpers.js";
+import { resolveActiveSellerPersonalCategoryId } from "../../services/seller-personal-category/sellerPersonalCategoryHelpers.js";
 import {
   resolveDefaultLeafIdForLegacyCategory,
   resolveProductCategoryWriteFromId,
 } from "../../utils/resolveProductCategoryWrite.js";
-import { errorRes, successRes } from "../../utils/index.js";
+import { errorRes, successRes } from "../../services/http/index.js";
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 100;
@@ -34,8 +34,7 @@ const parsePagination = (query) => {
 
 /** `GET /product/moderation/pending` — очередь на модерацию (FIFO). */
 export const getPendingModerationProductsController = async (req, res) => {
-  try {
-    const { page, limit, skip } = parsePagination(req.query);
+const { page, limit, skip } = parsePagination(req.query);
 
     const filter = { productModerationStatus: PRODUCT_MODERATION_PENDING };
 
@@ -58,30 +57,20 @@ export const getPendingModerationProductsController = async (req, res) => {
       limit,
       totalPages: Math.ceil(total / limit) || 0,
     });
-  } catch (error) {
-    console.error("getPendingModerationProductsController error:", error);
-    return errorRes(res, 500, "Ошибка при получении очереди модерации");
-  }
 };
 
 /** `GET /product/moderation/pending/count` */
 export const getPendingModerationProductsCountController = async (req, res) => {
-  try {
-    const totalPending = await ProductModel.countDocuments({
+const totalPending = await ProductModel.countDocuments({
       productModerationStatus: PRODUCT_MODERATION_PENDING,
     });
 
     return successRes(res, { totalPending });
-  } catch (error) {
-    console.error("getPendingModerationProductsCountController error:", error);
-    return errorRes(res, 500, "Ошибка при получении счётчика модерации");
-  }
 };
 
 /** `PATCH /product/:productId/moderation/approve` */
 export const approveProductModerationController = async (req, res) => {
-  try {
-    const { productId } = req.params;
+const { productId } = req.params;
 
     const product = await ProductModel.findById(productId);
     if (!product) {
@@ -179,16 +168,11 @@ export const approveProductModerationController = async (req, res) => {
       message: "Товар одобрен и опубликован в каталоге",
       product: enriched,
     });
-  } catch (error) {
-    console.error("approveProductModerationController error:", error);
-    return errorRes(res, 500, "Ошибка при одобрении товара");
-  }
 };
 
 /** `PATCH /product/:productId/moderation/reject` */
 export const rejectProductModerationController = async (req, res) => {
-  try {
-    const { productId } = req.params;
+const { productId } = req.params;
     const commentRaw = req.body?.productModerationComment;
     const comment = commentRaw == null ? "" : String(commentRaw).trim().slice(0, 2000);
 
@@ -212,8 +196,4 @@ export const rejectProductModerationController = async (req, res) => {
       message: "Товар отклонён",
       product: enriched,
     });
-  } catch (error) {
-    console.error("rejectProductModerationController error:", error);
-    return errorRes(res, 500, "Ошибка при отклонении товара");
-  }
 };

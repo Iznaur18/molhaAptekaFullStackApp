@@ -1,24 +1,7 @@
-import { useMemo, useState } from "react";
-
-import { useInstallmentContractMutations } from "../model/useInstallmentMutations.js";
-import {
-  INSTALLMENT_CONTRACT_STATUS_ACTIVE,
-  INSTALLMENT_CONTRACT_STATUS_COMPLETED,
-  INSTALLMENT_CONTRACT_STATUS_PENDING_FIRST_PAYMENT,
-  INSTALLMENT_PAYMENT_STATUS_DUE,
-  INSTALLMENT_PAYMENT_STATUS_OVERDUE,
-  INSTALLMENT_PAYMENT_STATUS_PAID,
-  INSTALLMENT_PAYMENT_STATUS_PENDING_CONFIRMATION,
-} from "../model/constants.js";
-import { canBuyerMarkInstallmentPayment } from "../lib/canBuyerMarkInstallmentPayment.js";
-import { isEarlyPayoffPendingConfirmation } from "../lib/isEarlyPayoffPendingConfirmation.js";
-import {
-  getInstallmentRemainingAmountRub,
-  getInstallmentRemainingDays,
-} from "../lib/resolveInstallmentUiState.js";
+import { useInstallmentContractCard } from "../model/useInstallmentContractCard.js";
+import { INSTALLMENT_CONTRACT_STATUS_COMPLETED } from "../model/constants.js";
 import { INSTALLMENT_UI } from "../../../shared/config/appUiCopy.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
-
 import { InstallmentContractCounterparty } from "./InstallmentContractCounterparty.jsx";
 
 import "./InstallmentContractCard.css";
@@ -41,120 +24,33 @@ export function InstallmentContractCard({
   onProductClick,
   compact = false,
 }) {
-  const contractId = String(contract._id);
   const {
-    markPaidMutation,
-    confirmPaymentMutation,
-    rejectPaymentMutation,
-    markEarlyPayoffMutation,
-    confirmEarlyPayoffMutation,
-    cancelEarlyPayoffMutation,
-    rejectEarlyPayoffMutation,
-    openDisputeMutation,
-  } = useInstallmentContractMutations(contractId);
-  const [pendingKey, setPendingKey] = useState(null);
-  const [error, setError] = useState("");
-  const [showDisputeForm, setShowDisputeForm] = useState(false);
-  const [disputeReason, setDisputeReason] = useState("");
-
-  const remainingRub = getInstallmentRemainingAmountRub(contract);
-  const remainingDays = getInstallmentRemainingDays(contract);
-  const statusLabel =
-    INSTALLMENT_UI.CONTRACT_STATUS_LABEL[contract.status] ?? contract.status;
-  const paidPercent =
-    contract.totalAmountRub > 0
-      ? Math.min(100, Math.round((contract.paidAmountRub / contract.totalAmountRub) * 100))
-      : 0;
-
-  const nextPayablePayment = useMemo(
-    () =>
-      contract.payments.find(
-        (payment) =>
-          payment.status === INSTALLMENT_PAYMENT_STATUS_DUE ||
-          payment.status === INSTALLMENT_PAYMENT_STATUS_OVERDUE,
-      ),
-    [contract.payments],
-  );
-
-  const earlyPayoffPending = useMemo(
-    () => isEarlyPayoffPendingConfirmation(contract),
-    [contract],
-  );
-
-  const isActiveContract =
-    contract.status === INSTALLMENT_CONTRACT_STATUS_PENDING_FIRST_PAYMENT ||
-    contract.status === INSTALLMENT_CONTRACT_STATUS_ACTIVE;
-
-  const isFullyPaid = useMemo(() => {
-    if (contract.status === INSTALLMENT_CONTRACT_STATUS_COMPLETED) {
-      return true;
-    }
-    const payments = contract.payments ?? [];
-    return (
-      payments.length > 0 &&
-      payments.every((payment) => payment.status === INSTALLMENT_PAYMENT_STATUS_PAID)
-    );
-  }, [contract.status, contract.payments]);
-
-  const runAction = async (key, action) => {
-    setPendingKey(key);
-    setError("");
-    try {
-      const result = await action();
-      if (result?.contract) {
-        onUpdated?.(result.contract);
-      }
-    } catch (e) {
-      setError(e instanceof Error ? e.message : INSTALLMENT_UI.ERROR_GENERIC);
-    } finally {
-      setPendingKey(null);
-    }
-  };
-
-  const handleMarkPaid = (paymentIndex) => {
-    void runAction(`mark:${paymentIndex}`, () =>
-      markPaidMutation.mutateAsync(paymentIndex),
-    );
-  };
-
-  const handleConfirmPayment = (paymentIndex) => {
-    void runAction(`confirm:${paymentIndex}`, () =>
-      confirmPaymentMutation.mutateAsync(paymentIndex),
-    );
-  };
-
-  const handleRejectPayment = (paymentIndex) => {
-    void runAction(`reject:${paymentIndex}`, () =>
-      rejectPaymentMutation.mutateAsync(paymentIndex),
-    );
-  };
-
-  const handleEarlyPayoff = () => {
-    void runAction("early", () => markEarlyPayoffMutation.mutateAsync());
-  };
-
-  const handleConfirmEarlyPayoff = () => {
-    void runAction("early-confirm", () => confirmEarlyPayoffMutation.mutateAsync());
-  };
-
-  const handleCancelEarlyPayoff = () => {
-    void runAction("early-cancel", () => cancelEarlyPayoffMutation.mutateAsync());
-  };
-
-  const handleRejectEarlyPayoff = () => {
-    void runAction("early-reject", () => rejectEarlyPayoffMutation.mutateAsync());
-  };
-
-  const handleOpenDispute = () => {
-    const reason = disputeReason.trim();
-    if (!reason) return;
-    void runAction("dispute", async () => {
-      const result = await openDisputeMutation.mutateAsync(reason);
-      setShowDisputeForm(false);
-      setDisputeReason("");
-      return result;
-    });
-  };
+    remainingRub,
+    remainingDays,
+    statusLabel,
+    paidPercent,
+    nextPayablePayment,
+    earlyPayoffPending,
+    isActiveContract,
+    isFullyPaid,
+    pendingKey,
+    error,
+    showDisputeForm,
+    setShowDisputeForm,
+    disputeReason,
+    setDisputeReason,
+    handleMarkPaid,
+    handleConfirmPayment,
+    handleRejectPayment,
+    handleEarlyPayoff,
+    handleConfirmEarlyPayoff,
+    handleCancelEarlyPayoff,
+    handleRejectEarlyPayoff,
+    handleOpenDispute,
+    paymentStatusLabels,
+    canBuyerMarkPayment,
+    paymentStatuses,
+  } = useInstallmentContractCard({ contract, role, onUpdated });
 
   return (
     <article
@@ -276,13 +172,12 @@ export function InstallmentContractCard({
           {INSTALLMENT_UI.PAYMENTS_HEADING}
         </h4>
         {contract.payments.map((payment) => {
-          const paymentLabel =
-            INSTALLMENT_UI.PAYMENT_STATUS_LABEL[payment.status] ?? payment.status;
+          const paymentLabel = paymentStatusLabels[payment.status] ?? payment.status;
           const dueDate = new Date(payment.dueAt).toLocaleDateString("ru-RU");
-          const isOverdue = payment.status === INSTALLMENT_PAYMENT_STATUS_OVERDUE;
+          const isOverdue = payment.status === paymentStatuses.overdue;
           const isPendingConfirmation =
-            payment.status === INSTALLMENT_PAYMENT_STATUS_PENDING_CONFIRMATION;
-          const isPaid = payment.status === INSTALLMENT_PAYMENT_STATUS_PAID;
+            payment.status === paymentStatuses.pendingConfirmation;
+          const isPaid = payment.status === paymentStatuses.paid;
           const isRemaining = !isPaid && !isOverdue && !isPendingConfirmation;
 
           return (
@@ -311,7 +206,7 @@ export function InstallmentContractCard({
               </div>
               {role === "buyer" &&
               isActiveContract &&
-              canBuyerMarkInstallmentPayment(contract, payment) ? (
+              canBuyerMarkPayment(contract, payment) ? (
                 <button
                   type="button"
                   className="installment-contract-card__btn installment-contract-card__btn_primary"
@@ -325,7 +220,7 @@ export function InstallmentContractCard({
               ) : null}
               {role === "seller" &&
               !earlyPayoffPending &&
-              payment.status === INSTALLMENT_PAYMENT_STATUS_PENDING_CONFIRMATION ? (
+              payment.status === paymentStatuses.pendingConfirmation ? (
                 <span className="installment-contract-card__payment-actions">
                   <button
                     type="button"

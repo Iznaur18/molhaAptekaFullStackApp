@@ -1,4 +1,4 @@
-import { errorRes, successRes } from "../../utils/index.js";
+import { errorRes, successRes } from "../../services/http/index.js";
 
 import {
   parseReplaceWishlistBodyItems,
@@ -8,8 +8,7 @@ import { resolveFavoritesUserId } from "./resolveFavoritesUserId.js";
 
 /** `PUT /favorites` — полная замена списка желаний. */
 export const replaceMyFavoritesController = async (req, res) => {
-  try {
-    const userId = resolveFavoritesUserId(req.userId);
+const userId = resolveFavoritesUserId(req.userId);
     if (!userId) {
       return errorRes(res, 401, "Не авторизован");
     }
@@ -21,8 +20,4 @@ export const replaceMyFavoritesController = async (req, res) => {
 
     const payload = await syncWishlistForUser(req.userId, parsed.items);
     return successRes(res, payload);
-  } catch (error) {
-    console.error("replaceMyFavoritesController error:", error);
-    return errorRes(res, 500, "Не удалось сохранить список желаний");
-  }
 };

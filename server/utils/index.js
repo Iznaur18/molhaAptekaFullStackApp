@@ -1,6 +1,3 @@
-import { successRes } from "./successRes.js";
-import { errorRes } from "./errorRes.js";
-import { sendUserWithToken } from "./sendUserWithToken.js";
-import { buildRegexSearchOr } from "./buildRegexSearchOr.js";
-
-export { successRes, errorRes, sendUserWithToken, buildRegexSearchOr };
+export { successRes, errorRes } from "../services/http/index.js";
+export { sendUserWithToken } from "./sendUserWithToken.js";
+export { buildRegexSearchOr } from "./buildRegexSearchOr.js";

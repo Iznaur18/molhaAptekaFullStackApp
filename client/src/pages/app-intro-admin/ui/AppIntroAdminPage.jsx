@@ -8,7 +8,7 @@ import { useAppIntro } from "../../../features/app-intro/model/AppIntroContext.j
 import { APP_INTRO_ADMIN_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { ImageUrlField } from "../../../shared/ui/ImageUrlField/ImageUrlField.jsx";
 import { VideoUrlField } from "../../../shared/ui/VideoUrlField/VideoUrlField.jsx";
-import { validateAppIntroAdminForm } from "../lib/validateAppIntroAdminForm.js";
+import { validateAppIntroAdminForm } from "../../../entities/intro-ad/lib/index.js";
 
 import "./AppIntroAdminPage.css";
 

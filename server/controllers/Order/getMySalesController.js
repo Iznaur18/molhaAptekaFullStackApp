@@ -1,14 +1,15 @@
 import mongoose from "mongoose";
 
 import { OrderModel, ProductModel, UserModel } from "../../models/index.js";
-import { buildRegexSearchOr, errorRes, successRes } from "../../utils/index.js";
-import { loadInstallmentPlanSummariesByIds } from "../../utils/installmentHelpers.js";
+import { errorRes, successRes } from "../../services/http/index.js";
+import { buildRegexSearchOr } from "../../utils/buildRegexSearchOr.js";
+import { loadInstallmentPlanSummariesByIds } from "../../services/installment/installmentHelpers.js";
 
 import { ORDER_BUYER_PUBLIC_FIELDS, ORDER_ITEMS_POPULATE } from "./orderQueries.js";
 import {
   buildOrderStatusFromItems,
   normalizeOrderItemsForRuntime,
-} from "./orderStatus.js";
+} from "../../services/order/orderStatus.js";
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 20;
@@ -99,8 +100,7 @@ const buildBuyerIdsBySearch = async (searchTerm) => {
 
 /** `GET /order/sales` — продажи текущего продавца (товары из его каталога в заказах покупателей). */
 export const getMySalesController = async (req, res) => {
-  try {
-    const sellerId = String(req.userId);
+const sellerId = String(req.userId);
     const { page, limit, skip } = parsePagination(req.query);
     const { status, search, productIds } = req.query;
 
@@ -189,8 +189,4 @@ export const getMySalesController = async (req, res) => {
       page,
       limit,
     });
-  } catch (error) {
-    console.error("getMySalesController error:", error);
-    return errorRes(res, 500, "Ошибка при получении продаж");
-  }
 };

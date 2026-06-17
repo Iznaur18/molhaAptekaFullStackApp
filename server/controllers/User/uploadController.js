@@ -1,10 +1,9 @@
-import { buildPublicUploadUrl } from "../../utils/buildPublicUploadUrl.js";
-import { finalizeUploadedFile } from "../../utils/finalizeUploadedFile.js";
-import { successRes, errorRes } from "../../utils/index.js";
+import { buildPublicUploadUrl } from "../../services/upload/buildPublicUploadUrl.js";
+import { finalizeUploadedFile } from "../../services/upload/finalizeUploadedFile.js";
+import { successRes, errorRes } from "../../services/http/index.js";
 
 export async function uploadController(req, res) {
-  try {
-    if (!req.file) {
+if (!req.file) {
       return errorRes(
         res,
         400,
@@ -20,8 +19,4 @@ export async function uploadController(req, res) {
       filename,
       originalname: req.file.originalname,
     });
-  } catch (error) {
-    console.error("uploadController error:", error);
-    return errorRes(res, 500, "Не удалось сохранить файл");
-  }
 }

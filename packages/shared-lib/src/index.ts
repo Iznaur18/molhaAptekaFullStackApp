@@ -1,7 +1,8 @@
-export { formatApiErrorMessage } from "./formatApiErrorMessage";
-export { formatIsoDateTime } from "./formatIsoDateTime";
-export { formatPriceRub } from "./formatPriceRub";
-export { normalizeUploadUrlForStorage } from "./normalizeUploadUrlForStorage";
+export { formatApiErrorMessage } from "./formatApiErrorMessage.js";
+export { formatIsoDateTime } from "./formatIsoDateTime.js";
+export { formatPriceRub } from "./formatPriceRub.js";
+export { normalizeUploadUrlForStorage } from "./normalizeUploadUrlForStorage.js";
+export { resolveUploadedImageUrlForBrowser } from "./resolveUploadedImageUrlForBrowser.js";
 export {
   PROFILE_ACCOUNT_SECTION_ORDER,
   PROFILE_SECTION_ADVERTISING,
@@ -37,15 +38,19 @@ export {
   PROFILE_STAFF_SECTION_ORDER,
   PROFILE_TRADE_SECTION_ORDER,
   isProfileSectionId,
-} from "./profileSections";
-export type { ProfileSectionId } from "./profileSections";
+} from "./profileSections.js";
+export type { ProfileSectionId } from "./profileSections.js";
 export {
   isProfileStaffWebOnlySection,
   PROFILE_SECTION_WEB_PATH,
+  PROFILE_STAFF_IN_APP_SECTION_IDS,
   PROFILE_STAFF_WEB_ONLY_SECTION_IDS,
   resolveProfileStaffWebPath,
-} from "./profileStaffWebPaths";
-export type { ProfileStaffWebOnlySectionId } from "./profileStaffWebPaths";
+} from "./profileStaffWebPaths.js";
+export type {
+  ProfileStaffInAppSectionId,
+  ProfileStaffWebOnlySectionId,
+} from "./profileStaffWebPaths.js";
 export {
   isAdminRole,
   isModeratorRole,
@@ -53,11 +58,11 @@ export {
   USER_ROLE_ADMIN,
   USER_ROLE_MODERATOR,
   USER_ROLE_USER,
-} from "./userRoles";
-export type { UserRole } from "./userRoles";
+} from "./userRoles.js";
+export type { UserRole } from "./userRoles.js";
 export {
   isStaffSectionAllowed,
   isStaffSectionId,
   STAFF_SECTION_IDS,
-} from "./staffMainViews";
-export type { StaffSectionId } from "./staffMainViews";
+} from "./staffMainViews.js";
+export type { StaffSectionId } from "./staffMainViews.js";

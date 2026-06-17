@@ -11,11 +11,15 @@ export const authSessionDataSchema = userPublicProfileSchema
   .passthrough();
 
 /** Body `POST /auth/refresh` для mobile (cookie — fallback для web). */
-export const refreshAuthBodySchema = z.object({
-  refreshToken: z.string().min(1).optional(),
-});
+export const refreshAuthBodySchema = z
+  .object({
+    refreshToken: z.string().min(1).optional(),
+  })
+  .default({});
 
 /** Body `POST /auth/logout` для mobile (инвалидация на server — v2). */
-export const logoutAuthBodySchema = z.object({
-  refreshToken: z.string().min(1).optional(),
-});
+export const logoutAuthBodySchema = z
+  .object({
+    refreshToken: z.string().min(1).optional(),
+  })
+  .default({});

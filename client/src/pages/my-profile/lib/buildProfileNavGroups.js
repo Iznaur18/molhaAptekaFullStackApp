@@ -5,7 +5,7 @@ import {
   PROFILE_TRADE_SECTION_ORDER,
 } from "@izibuy/shared-lib";
 import { enrichProfileNavItem } from "./profileNavItemMeta.js";
-import { PROFILE_TAB_OVERVIEW } from "./profileTabs.js";
+import { PROFILE_TAB_OVERVIEW } from "../../../widgets/app-shell/lib/profileTabs.js";
 
 /** @typedef {import("../ui/ProfileSidebar.jsx").ProfileNavGroup} ProfileNavGroup */
 

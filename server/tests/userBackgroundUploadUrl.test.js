@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { isStoredBackgroundImageUrl } from "../utils/isStoredBackgroundImageUrl.js";
+import { isStoredBackgroundImageUrl } from "../services/upload/isStoredBackgroundImageUrl.js";
 import { normalizeUserBackgroundForSave } from "../utils/userBackgroundValue.js";
 
 test("isStoredBackgroundImageUrl accepts /uploads path", () => {

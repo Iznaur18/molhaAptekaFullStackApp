@@ -6,6 +6,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { resolveUploadedImageUrlForBrowser } from "../../packages/shared-lib/dist/index.js";
+
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const MOBILE_ROOT = path.resolve(SCRIPT_DIR, "..");
 
@@ -27,7 +29,7 @@ const extractHubSectionCases = () => {
   return [...source.matchAll(/case "([^"]+)":/g)].map((m) => m[1]);
 };
 
-const HUB_EXTERNAL_SECTIONS = new Set(["my-orders", "edit-profile"]);
+const HUB_EXTERNAL_SECTIONS = new Set(["edit-profile"]);
 
 const EXPECTED_APP_ROUTES = [
   "app/(tabs)/index.tsx",
@@ -40,15 +42,16 @@ const EXPECTED_APP_ROUTES = [
   "app/catalog-browser.tsx",
   "app/create-product.tsx",
   "app/edit-product/[id].tsx",
-  "app/hub/[section].tsx",
+  "app/(tabs)/hub/[section].tsx",
+  "app/(tabs)/orders/index.tsx",
   "app/legal/privacy.tsx",
   "app/notifications/index.tsx",
-  "app/orders/index.tsx",
   "app/product/[id].tsx",
   "app/profile/edit.tsx",
   "app/raffle/[id].tsx",
   "app/seller/[userId].tsx",
   "app/user/[id].tsx",
+  "app/user/[id]/edit.tsx",
   "app/users/index.tsx",
 ];
 
@@ -178,9 +181,50 @@ const BUYER_CRITICAL_ROUTES = [
   "app/(tabs)/catalog.tsx",
   "app/product/[id].tsx",
   "app/(tabs)/cart.tsx",
-  "app/orders/index.tsx",
+  "app/(tabs)/orders/index.tsx",
   "app/(tabs)/profile.tsx",
+  "app/(tabs)/hub/[section].tsx",
   "app/profile/edit.tsx",
+];
+
+const HUB_TAB_BAR_CHECKS = [
+  {
+    file: "app/(tabs)/_layout.tsx",
+    mustInclude: ['name="hub/[section]"', 'name="orders"', "href: null"],
+  },
+  {
+    file: "shared/ui/MobileBottomTabBar.tsx",
+    mustInclude: ["isProfileTabBarRoute", 'item.routeName === "profile" && isProfileTabBarContext'],
+  },
+  {
+    file: "shared/lib/isProfileTabBarRoute.ts",
+    mustInclude: ['normalized.startsWith("/hub/")', 'normalized.startsWith("/orders/")'],
+  },
+  {
+    file: "features/profile-hub/ui/HubSectionContent.tsx",
+    mustInclude: ['case "my-orders":', "MyOrdersPage"],
+  },
+  {
+    file: "features/profile-hub/model/profileSections.ts",
+    mustNotInclude: ["[PROFILE_SECTION_MY_ORDERS]: \"/orders\""],
+  },
+];
+
+// Mirror of isProfileTabBarRoute.ts (keep in sync)
+const isProfileTabBarRoute = (pathname) => {
+  const normalized = pathname.trim();
+  if (normalized === "/hub" || normalized.startsWith("/hub/")) {
+    return true;
+  }
+  return normalized === "/orders" || normalized.startsWith("/orders/");
+};
+
+const PROFILE_TAB_BAR_ROUTE_CASES = [
+  ["/hub/my-sales", true],
+  ["/hub/my-orders", true],
+  ["/orders", true],
+  ["/catalog", false],
+  ["/(tabs)/cart", false],
 ];
 
 const BUYER_API_SOURCE_CHECKS = [
@@ -214,10 +258,93 @@ const BUYER_API_SOURCE_CHECKS = [
   },
 ];
 
+const PRODUCT_PREVIEW_VIDEO_CHECKS = [
+  {
+    file: "entities/product/ui/ProductCard.tsx",
+    mustInclude: ["ProductCardMedia", "useProductCardMediaState"],
+  },
+  {
+    file: "entities/product/ui/ProductMediaSlideContent.tsx",
+    mustInclude: ["ProductPreviewVideo", 'slide.type === "video"'],
+  },
+  {
+    file: "shared/ui/ProductPreviewVideo.web.tsx",
+    mustInclude: ["resolvePreviewVideoMimeType", 'createElement("source"'],
+    mustNotInclude: ["play().catch(() => {\n      onPlaybackFailed"],
+  },
+  {
+    file: "entities/product/lib/resolveProductPreviewVideoUrl.ts",
+    mustInclude: ["productPreviewVideoUrl", "resolveUploadedMediaUrl"],
+  },
+  {
+    file: "shared/theme/catalogProductStyles.ts",
+    mustInclude: ["PRODUCT_MEDIA_HERO_ASPECT_RATIO", "aspectRatio: PRODUCT_MEDIA_HERO_ASPECT_RATIO"],
+  },
+  {
+    file: "entities/product/ui/ProductMediaGallery.tsx",
+    mustInclude: ["styles.detailHero"],
+    mustNotInclude: ["useWindowDimensions", "minHeight: detailHeroMinHeight", "DETAIL_HERO_MIN_HEIGHT"],
+  },
+];
+
+const STORY_MEDIA_WIRING_CHECKS = [
+  {
+    file: "shared/lib/resolveMediaUrl.ts",
+    mustInclude: ["resolveUploadedImageUrlForBrowser", "@izibuy/shared-lib"],
+  },
+  {
+    file: "entities/user-story/lib/resolveUserStoryMediaUrl.ts",
+    mustInclude: ["resolveUploadedMediaUrl"],
+  },
+  {
+    file: "features/home-feed/ui/UserStoryViewerModal.tsx",
+    mustInclude: ["resolveUserStoryMediaUrl", "resolvedMediaUrl"],
+  },
+];
+
+const STORY_MEDIA_DEV_REWRITE_CASES = [
+  [
+    "http://127.0.0.1:5173/uploads/story.jpg",
+    "http://192.168.1.10:4444",
+    "http://192.168.1.10:4444/uploads/story.jpg",
+  ],
+  [
+    "http://localhost:5173/uploads/story.jpg",
+    "http://192.168.1.10:4444",
+    "http://192.168.1.10:4444/uploads/story.jpg",
+  ],
+  [
+    "https://cdn.izibuy.ru/uploads/story.jpg",
+    "http://192.168.1.10:4444",
+    "https://cdn.izibuy.ru/uploads/story.jpg",
+  ],
+];
+
+// Mirror of resolvePreviewVideoMimeType.ts (keep in sync)
+const resolvePreviewVideoMimeType = (src) => {
+  const normalized = String(src ?? "").toLowerCase();
+  if (normalized.includes(".mov") || normalized.includes(".quicktime")) {
+    return "video/quicktime";
+  }
+  if (normalized.includes(".m4v")) {
+    return "video/mp4";
+  }
+  if (normalized.includes(".webm")) {
+    return "video/webm";
+  }
+  return "video/mp4";
+};
+
+const PREVIEW_VIDEO_MIME_CASES = [
+  ["/uploads/preview.webm", "video/webm"],
+  ["/uploads/preview.mov", "video/quicktime"],
+  ["/uploads/preview.mp4", "video/mp4"],
+];
+
 const BUYER_UI_WIRING_CHECKS = [
   {
     file: "entities/product/ui/ProductCard.tsx",
-    mustInclude: ['pathname: "/product/[id]"'],
+    mustInclude: ['pathname: "/product/[id]"', "ProductCardMedia"],
   },
   {
     file: "features/product-detail/ui/ProductDetailPurchaseActions.tsx",
@@ -270,6 +397,95 @@ const run = () => {
   }
   if (failed === 0) {
     console.log(`✓ app routes (${EXPECTED_APP_ROUTES.length})`);
+  }
+
+  if (fileExists("app/hub/[section].tsx")) {
+    console.error("✗ hub must live under (tabs), not app/hub/[section].tsx");
+    failed += 1;
+  } else {
+    console.log("✓ hub route nested in tabs (tab bar parity with web)");
+  }
+
+  let hubTabBarFailed = 0;
+  for (const check of HUB_TAB_BAR_CHECKS) {
+    hubTabBarFailed += assertSourceContains(check.file, check.mustInclude ?? [], "profile tab bar");
+    if (check.mustNotInclude) {
+      hubTabBarFailed += assertSourceExcludes(check.file, check.mustNotInclude, "profile tab bar");
+    }
+  }
+  hubTabBarFailed += assertSourceExcludes(
+    "app/_layout.tsx",
+    ['name="hub/[section]"', 'name="orders"'],
+    "root stack",
+  );
+  if (fileExists("app/orders/index.tsx")) {
+    console.error("✗ orders must live under (tabs), not app/orders/");
+    hubTabBarFailed += 1;
+  }
+  for (const [pathname, expected] of PROFILE_TAB_BAR_ROUTE_CASES) {
+    const actual = isProfileTabBarRoute(pathname);
+    if (actual !== expected) {
+      console.error(`✗ isProfileTabBarRoute(${pathname}) expected ${expected}, got ${actual}`);
+      hubTabBarFailed += 1;
+    }
+  }
+  if (hubTabBarFailed > 0) {
+    failed += hubTabBarFailed;
+  } else {
+    console.log(`✓ profile tab bar wiring (${HUB_TAB_BAR_CHECKS.length} checks + route helper)`);
+  }
+
+  let productVideoFailed = 0;
+  for (const check of PRODUCT_PREVIEW_VIDEO_CHECKS) {
+    productVideoFailed += assertSourceContains(
+      check.file,
+      check.mustInclude ?? [],
+      "product preview video",
+    );
+    if (check.mustNotInclude) {
+      productVideoFailed += assertSourceExcludes(
+        check.file,
+        check.mustNotInclude,
+        "product preview video",
+      );
+    }
+  }
+  for (const [src, expectedMime] of PREVIEW_VIDEO_MIME_CASES) {
+    const actualMime = resolvePreviewVideoMimeType(src);
+    if (actualMime !== expectedMime) {
+      console.error(`✗ resolvePreviewVideoMimeType(${src}) expected ${expectedMime}, got ${actualMime}`);
+      productVideoFailed += 1;
+    }
+  }
+  if (productVideoFailed > 0) {
+    failed += productVideoFailed;
+  } else {
+    console.log(`✓ product preview video (${PRODUCT_PREVIEW_VIDEO_CHECKS.length} checks + mime helper)`);
+  }
+
+  let storyMediaFailed = 0;
+  for (const check of STORY_MEDIA_WIRING_CHECKS) {
+    storyMediaFailed += assertSourceContains(
+      check.file,
+      check.mustInclude ?? [],
+      "story media",
+    );
+  }
+  for (const [rawUrl, mediaBase, expectedUrl] of STORY_MEDIA_DEV_REWRITE_CASES) {
+    const actualUrl = resolveUploadedImageUrlForBrowser(rawUrl, mediaBase);
+    if (actualUrl !== expectedUrl) {
+      console.error(
+        `✗ story media rewrite ${rawUrl} @ ${mediaBase}: expected ${expectedUrl}, got ${actualUrl}`,
+      );
+      storyMediaFailed += 1;
+    }
+  }
+  if (storyMediaFailed > 0) {
+    failed += storyMediaFailed;
+  } else {
+    console.log(
+      `✓ story media (${STORY_MEDIA_WIRING_CHECKS.length} wiring + ${STORY_MEDIA_DEV_REWRITE_CASES.length} dev rewrite)`,
+    );
   }
 
   const sectionIds = extractProfileSectionIds();
@@ -369,6 +585,19 @@ const run = () => {
     staffWebFailed += 1;
   }
 
+  const staffWebPathsSource = fs.readFileSync(
+    path.join(MOBILE_ROOT, "../packages/shared-lib/src/profileStaffWebPaths.ts"),
+    "utf8",
+  );
+  if (staffWebPathsSource.includes('PROFILE_SECTION_CREATE_RAFFLE]: "/me"')) {
+    console.error("✗ create-raffle must not redirect to web /me (in-app hub)");
+    staffWebFailed += 1;
+  }
+  if (!staffWebPathsSource.includes('PROFILE_STAFF_IN_APP_SECTION_IDS = ["create-raffle"]')) {
+    console.error("✗ create-raffle must be listed in PROFILE_STAFF_IN_APP_SECTION_IDS");
+    staffWebFailed += 1;
+  }
+
   if (staffWebFailed > 0) {
     failed += staffWebFailed;
   } else {
@@ -376,6 +605,21 @@ const run = () => {
   }
 
   let buyerPathFailed = 0;
+  const userDetailsPage = read("features/user-details-page/ui/UserDetailsPage.tsx");
+  if (!userDetailsPage.includes("AdminUserStaffActions")) {
+    console.error("✗ UserDetailsPage must expose admin edit action for staff");
+    buyerPathFailed += 1;
+  }
+  if (!fileExists("app/user/[id]/edit.tsx")) {
+    console.error("✗ missing admin edit user route: app/user/[id]/edit.tsx");
+    buyerPathFailed += 1;
+  }
+  const adminEditUserForm = read("features/admin-edit-user-page/model/useAdminEditUserForm.ts");
+  if (!adminEditUserForm.includes("router.back()")) {
+    console.error("✗ admin edit user form must navigate back after successful save");
+    buyerPathFailed += 1;
+  }
+
   for (const route of BUYER_CRITICAL_ROUTES) {
     if (!fileExists(route)) {
       console.error(`✗ missing buyer-critical route: ${route}`);

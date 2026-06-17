@@ -1,15 +1,12 @@
 import { useMemo, useState, type ReactNode } from "react";
-import { Pressable, Text, useWindowDimensions, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 import { buildProductMediaSlides } from "@/entities/product/lib/buildProductMediaSlides";
 import { PRODUCT_DETAILS_MODAL_UI } from "@/shared/config";
 import { useProductMediaGalleryStyles } from "@/shared/theme/catalogProductStyles";
 import { CachedProductImage } from "@/shared/ui/CachedProductImage";
-import { ProductPreviewVideo } from "@/shared/ui/ProductPreviewVideo";
-
-const DETAIL_HERO_MIN_HEIGHT_MAX = 448;
-const DETAIL_HERO_MIN_HEIGHT_RATIO = 0.58;
+import { ProductMediaSlideContent } from "@/entities/product/ui/ProductMediaSlideContent";
 
 type ProductMediaGalleryProps = {
   previewVideoUrl?: string | null;
@@ -29,14 +26,9 @@ export const ProductMediaGallery = ({
   reportOverlay = null,
 }: ProductMediaGalleryProps) => {
   const styles = useProductMediaGalleryStyles();
-  const { height: windowHeight } = useWindowDimensions();
   const [previewVideoFailed, setPreviewVideoFailed] = useState(false);
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const isDetail = variant === "detail";
-  const detailHeroMinHeight = Math.min(
-    windowHeight * DETAIL_HERO_MIN_HEIGHT_RATIO,
-    DETAIL_HERO_MIN_HEIGHT_MAX,
-  );
 
   const mediaSlides = useMemo(() => {
     const videoUrl =
@@ -65,25 +57,16 @@ export const ProductMediaGallery = ({
     setActiveSlideIndex((index) => (index + 1) % mediaSlides.length);
   };
 
-  const heroStyle = isDetail
-    ? [styles.detailHero, { minHeight: detailHeroMinHeight }]
-    : styles.hero;
+  const heroStyle = isDetail ? styles.detailHero : styles.hero;
   const rootStyle = isDetail ? styles.detailRoot : styles.root;
 
-  const renderHeroMedia = () => {
-    if (!activeSlide) {
-      return <CachedProductImage uri={null} style={styles.media} />;
-    }
-    if (activeSlide.type === "video") {
-      return (
-        <ProductPreviewVideo
-          uri={activeSlide.url}
-          onPlaybackFailed={() => setPreviewVideoFailed(true)}
-        />
-      );
-    }
-    return <CachedProductImage uri={activeSlide.url} style={styles.media} />;
-  };
+  const renderHeroMedia = () => (
+    <ProductMediaSlideContent
+      slide={activeSlide}
+      imageStyle={styles.media}
+      onVideoFailed={() => setPreviewVideoFailed(true)}
+    />
+  );
 
   const renderNav = () => {
     if (!hasMultipleSlides) {

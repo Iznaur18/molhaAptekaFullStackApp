@@ -1,7 +1,7 @@
 import ProductCategoryDisplayModel from "../../models/ProductCategoryDisplayModel.js";
 import ProductCategoryModel from "../../models/ProductCategoryModel.js";
-import { deleteUploadFileByUrl } from "../../utils/deleteUploadFileByUrl.js";
-import { errorRes, successRes } from "../../utils/index.js";
+import { deleteUploadFileByUrl } from "../../services/upload/deleteUploadFileByUrl.js";
+import { errorRes, successRes } from "../../services/http/index.js";
 
 /**
  * @param {import('mongoose').Document | Record<string, unknown> | null | undefined} row
@@ -70,24 +70,15 @@ const buildCategoryDisplayUpdate = async (existing, body, userId) => {
 
 /** GET /product/category-displays — публичные переопределения подписи/картинки категорий. */
 export async function getProductCategoryDisplaysController(_req, res) {
-  try {
-    const rows = await ProductCategoryDisplayModel.find().lean();
+const rows = await ProductCategoryDisplayModel.find().lean();
     successRes(res, {
       displays: rows.map(toCategoryDisplayPayload),
     });
-  } catch (error) {
-    return errorRes(
-      res,
-      500,
-      error instanceof Error ? error.message : "Не удалось загрузить категории",
-    );
-  }
 }
 
 /** PATCH /product/category-displays/:categorySlug — только admin. */
 export async function patchProductCategoryDisplayController(req, res) {
-  try {
-    const categorySlug = String(req.params.categorySlug ?? "").trim();
+const categorySlug = String(req.params.categorySlug ?? "").trim();
     const existing = await ProductCategoryDisplayModel.findOne({ categorySlug }).lean();
     const update = await buildCategoryDisplayUpdate(existing, req.body, req.userId);
 
@@ -100,19 +91,11 @@ export async function patchProductCategoryDisplayController(req, res) {
     successRes(res, {
       display: toCategoryDisplayPayload(saved),
     });
-  } catch (error) {
-    return errorRes(
-      res,
-      500,
-      error instanceof Error ? error.message : "Не удалось сохранить категорию",
-    );
-  }
 }
 
 /** PATCH /product/category-node-displays/:categoryId — только admin. */
 export async function patchProductCategoryNodeDisplayController(req, res) {
-  try {
-    const categoryId = String(req.params.categoryId ?? "").trim();
+const categoryId = String(req.params.categoryId ?? "").trim();
     const categoryExists = await ProductCategoryModel.exists({ _id: categoryId });
 
     if (!categoryExists) {
@@ -131,11 +114,4 @@ export async function patchProductCategoryNodeDisplayController(req, res) {
     successRes(res, {
       display: toCategoryDisplayPayload(saved),
     });
-  } catch (error) {
-    return errorRes(
-      res,
-      500,
-      error instanceof Error ? error.message : "Не удалось сохранить категорию",
-    );
-  }
 }

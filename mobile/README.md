@@ -87,7 +87,7 @@ npm run smoke:buyer-path     # API smoke (server + e2e seed)
 
 | Section ID | Feature / экран | Роль | Web path (G.1) |
 | ---------- | ---------------- | ---- | -------------- |
-| `create-raffle` | `features/create-raffle-page` | moderator | `/me` |
+| `create-raffle` | `features/create-raffle-page` | moderator | **in-app** (`/hub/create-raffle`) |
 | `product-moderation` | `features/product-moderation-page` | moderator | `/moderation-products` |
 | `intro-ad-moderation` | `features/intro-ad-moderation-page` | moderator | `/moderation-intro-ad` |
 | `seller-personal-category-moderation` | `features/seller-personal-category-moderation-page` | moderator | `/moderation-seller-categories` |

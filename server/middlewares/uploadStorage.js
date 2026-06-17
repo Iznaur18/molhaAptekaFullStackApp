@@ -1,8 +1,8 @@
 import multer from "multer";
 
-import { buildUploadFilename } from "../utils/buildUploadFilename.js";
-import { isObjectStorageUploadEnabled } from "../utils/objectStorageUpload.js";
-import { UPLOADS_DIR, ensureUploadsDir } from "../utils/uploadsDir.js";
+import { buildUploadFilename } from "../services/upload/buildUploadFilename.js";
+import { isObjectStorageUploadEnabled } from "../services/upload/objectStorageUpload.js";
+import { UPLOADS_DIR, ensureUploadsDir } from "../services/upload/uploadsDir.js";
 
 const createDiskStorage = () => {
   ensureUploadsDir();

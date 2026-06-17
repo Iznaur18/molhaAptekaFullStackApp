@@ -10,7 +10,7 @@ alwaysApply: false
 
 # Client ↔ mobile: границы shared (A.4)
 
-Полный аудит: `docs/client-mobile-consolidation-audit.md` §2.6, §4.
+Полный аудит: `docs/client-mobile-consolidation-audit.md` §2, §4.
 
 ## Шарить (единый источник)
 

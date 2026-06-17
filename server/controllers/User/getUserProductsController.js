@@ -1,12 +1,12 @@
 import { UserModel } from "../../models/index.js";
-import { errorRes, successRes } from "../../utils/index.js";
-import { getOptionalViewerFromRequest } from "../../utils/optionalViewerFromRequest.js";
-import { sanitizeUserProfileForViewer } from "../../utils/userProfileVisibility.js";
+import { errorRes, successRes } from "../../services/http/index.js";
+import { getOptionalViewerFromRequest } from "../../services/user/optionalViewerFromRequest.js";
+import { sanitizeUserProfileForViewer } from "../../services/user/userProfileVisibility.js";
 import {
   getSellerCatalogProductsPage,
   USER_SELLER_PRODUCTS_PAGE_SIZE_DEFAULT,
   USER_SELLER_PRODUCTS_PAGE_SIZE_MAX,
-} from "../../utils/userSellerCatalogProducts.js";
+} from "../../services/user/userSellerCatalogProducts.js";
 
 const parsePageLimit = (query) => {
   const page = Math.max(1, Number(query.page) || 1);
@@ -19,8 +19,7 @@ const parsePageLimit = (query) => {
 
 /** `GET /user/:userIdClient/products` — товары продавца в каталоге (публично, JWT опционален). */
 export const getUserProductsController = async (req, res) => {
-  try {
-    const targetUserId = req.params.userIdClient;
+const targetUserId = req.params.userIdClient;
     const targetUser = await UserModel.findById(targetUserId).lean();
 
     if (!targetUser) {
@@ -41,8 +40,4 @@ export const getUserProductsController = async (req, res) => {
     const payload = await getSellerCatalogProductsPage(targetUserId, page, limit);
 
     return successRes(res, payload);
-  } catch (error) {
-    console.error("getUserProductsController error:", error);
-    return errorRes(res, 500, "Ошибка при получении товаров пользователя");
-  }
 };

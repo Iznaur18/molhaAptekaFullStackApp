@@ -276,4 +276,6 @@ ProductSchema.index(
   { name: "catalog_approved_reviews" },
 );
 
+export { ProductSchema };
+
 export default mongoose.model("Product", ProductSchema);

@@ -1,16 +1,15 @@
 import { useParams } from "react-router-dom";
 
-import { LazyRaffleProductsPage } from "../lib/lazyAppShellPages.js";
+import { LazyRaffleProductsPage } from "../../widgets/app-shell/lib/lazyAppShellPages.js";
 import { useAppShell } from "../model/AppShellContext.jsx";
 
 /** Товары розыгрыша — `/raffle/:raffleId`. */
 export function RaffleProductsRoutePage() {
   const { raffleId } = useParams();
-  const { mainContentProps } = useAppShell();
+  const { mainContentProps, goToMainView } = useAppShell();
   const {
     isAuthorized,
     currentUserId,
-    goToMainView,
     onRequestLogin,
     onSellerNameClick,
     onOpenProductDetails,

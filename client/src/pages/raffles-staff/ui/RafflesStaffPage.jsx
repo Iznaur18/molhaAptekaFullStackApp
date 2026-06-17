@@ -2,7 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
 import { useRaffleMutations } from "../../../entities/raffle/model/useRaffleMutations.js";
-import { syncRafflesStaffQueueCaches } from "../../../pages/home/lib/staffBadgeQueryCache.js";
+import { syncRafflesStaffQueueCaches } from "../../../widgets/app-shell/lib/staffBadgeQueryCache.js";
 import { raffleQueryKeys } from "../../../entities/raffle/model/raffleQueryKeys.js";
 import { useStaffRafflesQueueQuery } from "../../../entities/raffle/model/useStaffRafflesQueueQuery.js";
 import { RaffleManageActions } from "../../../entities/raffle/ui/RaffleManageActions.jsx";

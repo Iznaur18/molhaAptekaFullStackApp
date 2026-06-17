@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { createAsyncRouter } from "../utils/createAsyncRouter.js";
 import {
   userVoteRatingController,
   userGetRatingController,
@@ -11,7 +11,7 @@ import {
   ratingUserIdParamValidation,
 } from "../validations/index.js";
 
-const router = Router();
+const router = createAsyncRouter();
 
 // путь в index.js начинается с /vote
 router.get(

@@ -10,7 +10,7 @@ import {
 } from "../../../entities/intro-ad/api/introAdModerationApi.js";
 import { introAdQueryKeys } from "../../../entities/intro-ad/model/introAdQueryKeys.js";
 import { useAppIntro } from "../../../features/app-intro/model/AppIntroContext.jsx";
-import { formToIntroAdPreviewSettings } from "../../advertising/lib/buildSubmitIntroAdCampaignBody.js";
+import { formToIntroAdPreviewSettings } from "../../../entities/intro-ad/lib/index.js";
 import { INTRO_AD_MODERATION_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
 import "./IntroAdModerationPage.css";

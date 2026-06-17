@@ -7,19 +7,20 @@ import {
 } from "../../constants/productCategoryTreeConstants.js";
 import ProductCategoryModel from "../../models/ProductCategoryModel.js";
 import ProductModel from "../../models/ProductModel.js";
-import { ensureProductCategoryDisplayForSlug } from "../../utils/ensureProductCategoryDisplayForSlug.js";
-import { computeProductCategoryNodePaths } from "../../utils/computeProductCategoryNodePaths.js";
-import { normalizeProductCategorySearchKeywords } from "../../utils/normalizeProductCategorySearchKeywords.js";
-import { rebuildProductCategorySubtreePaths } from "../../utils/rebuildProductCategorySubtreePaths.js";
-import { syncProductsDenormForCategorySubtree } from "../../utils/syncProductsDenormForCategorySubtree.js";
+import { AppError } from "../../errors/AppError.js";
+import { ensureProductCategoryDisplayForSlug } from "../../services/product/ensureProductCategoryDisplayForSlug.js";
+import { computeProductCategoryNodePaths } from "../../services/product/computeProductCategoryNodePaths.js";
+import { normalizeProductCategorySearchKeywords } from "../../services/product/normalizeProductCategorySearchKeywords.js";
+import { rebuildProductCategorySubtreePaths } from "../../services/product/rebuildProductCategorySubtreePaths.js";
+import { syncProductsDenormForCategorySubtree } from "../../services/product/syncProductsDenormForCategorySubtree.js";
 import {
   cleanupProductCategoryDisplayForDeletedCategory,
   detachProductsFromCategoryLeaf,
   getProductCategoryDeleteBlocker,
   reassignProductsFromCategoryLeaf,
   syncParentLeafFlagAfterChildDelete,
-} from "../../utils/productCategoryDeleteHelpers.js";
-import { errorRes, successRes } from "../../utils/index.js";
+} from "../../services/product/productCategoryDeleteHelpers.js";
+import { errorRes, successRes } from "../../services/http/index.js";
 
 const CATEGORY_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -50,10 +51,10 @@ const normalizeSlug = (raw) => {
     .trim()
     .toLowerCase();
   if (!slug || slug.length > PRODUCT_CATEGORY_SLUG_MAX_LENGTH) {
-    throw new Error("Некорректный slug");
+    throw new AppError(400, "Некорректный slug");
   }
   if (!CATEGORY_SLUG_PATTERN.test(slug)) {
-    throw new Error("Slug: только a-z, 0-9 и дефис");
+    throw new AppError(400, "Slug: только a-z, 0-9 и дефис");
   }
   return slug;
 };
@@ -64,7 +65,7 @@ const normalizeSlug = (raw) => {
 const normalizeLabelRu = (raw) => {
   const labelRu = String(raw ?? "").trim();
   if (!labelRu || labelRu.length > PRODUCT_CATEGORY_LABEL_RU_MAX_LENGTH) {
-    throw new Error("Некорректное название");
+    throw new AppError(400, "Некорректное название");
   }
   return labelRu;
 };
@@ -76,18 +77,18 @@ const normalizeLabelRu = (raw) => {
 const assertNoCategoryCycle = async (categoryId, parentId) => {
   if (!parentId) return;
   if (String(categoryId) === String(parentId)) {
-    throw new Error("Категория не может быть родителем самой себе");
+    throw new AppError(400, "Категория не может быть родителем самой себе");
   }
 
   let cursor = parentId;
   const guard = new Set();
   while (cursor) {
     if (guard.has(String(cursor))) {
-      throw new Error("Цикл в дереве категорий");
+      throw new AppError(400, "Цикл в дереве категорий");
     }
     guard.add(String(cursor));
     if (String(cursor) === String(categoryId)) {
-      throw new Error("Нельзя переместить категорию внутрь своего поддерева");
+      throw new AppError(400, "Нельзя переместить категорию внутрь своего поддерева");
     }
     const parent = await ProductCategoryModel.findById(cursor)
       .select("parentId")
@@ -98,276 +99,234 @@ const assertNoCategoryCycle = async (categoryId, parentId) => {
 
 /** GET /product/admin/categories */
 export async function listProductCategoriesAdminController(_req, res) {
-  try {
-    const rows = await ProductCategoryModel.find()
-      .sort({ pathSlugs: 1, sortOrder: 1, labelRu: 1 })
-      .lean();
-    successRes(res, { categories: rows.map(toCategoryAdminPayload) });
-  } catch (error) {
-    return errorRes(
-      res,
-      500,
-      error instanceof Error ? error.message : "Не удалось загрузить категории",
-    );
-  }
+  const rows = await ProductCategoryModel.find()
+    .sort({ pathSlugs: 1, sortOrder: 1, labelRu: 1 })
+    .lean();
+  successRes(res, { categories: rows.map(toCategoryAdminPayload) });
 }
 
 /** POST /product/admin/categories */
 export async function createProductCategoryAdminController(req, res) {
-  try {
-    const slug = normalizeSlug(req.body?.slug);
-    const labelRu = normalizeLabelRu(req.body?.labelRu);
-    const parentId = req.body?.parentId
-      ? new mongoose.Types.ObjectId(String(req.body.parentId))
-      : null;
-    const isRoot = !parentId;
-    const isLeaf = isRoot ? false : req.body?.isLeaf === true;
-    const sortOrder = Number(req.body?.sortOrder) || 0;
-    const searchKeywords = normalizeProductCategorySearchKeywords(
-      req.body?.searchKeywords ?? [],
-    );
+  const slug = normalizeSlug(req.body?.slug);
+  const labelRu = normalizeLabelRu(req.body?.labelRu);
+  const parentId = req.body?.parentId
+    ? new mongoose.Types.ObjectId(String(req.body.parentId))
+    : null;
+  const isRoot = !parentId;
+  const isLeaf = isRoot ? false : req.body?.isLeaf === true;
+  const sortOrder = Number(req.body?.sortOrder) || 0;
+  const searchKeywords = normalizeProductCategorySearchKeywords(
+    req.body?.searchKeywords ?? [],
+  );
 
-    let legacyProductCategory = null;
-    if (req.body?.legacyProductCategory != null) {
-      const legacy = String(req.body.legacyProductCategory).trim();
-      if (legacy) {
-        legacyProductCategory = legacy;
-      }
-    } else if (isRoot) {
-      legacyProductCategory = slug;
+  let legacyProductCategory = null;
+  if (req.body?.legacyProductCategory != null) {
+    const legacy = String(req.body.legacyProductCategory).trim();
+    if (legacy) {
+      legacyProductCategory = legacy;
     }
-
-    const duplicateSlug = await ProductCategoryModel.findOne({ slug }).lean();
-    if (duplicateSlug) {
-      return errorRes(res, 409, "Категория с таким slug уже есть");
-    }
-
-    if (parentId) {
-      const parent = await ProductCategoryModel.findById(parentId).lean();
-      if (!parent) {
-        return errorRes(res, 400, "Родитель не найден");
-      }
-      if (parent.isLeaf === true) {
-        return errorRes(res, 400, "Нельзя добавить дочернюю к листу");
-      }
-    }
-
-    const paths = await computeProductCategoryNodePaths({
-      slug,
-      labelRu,
-      parentId,
-    });
-
-    const doc = await ProductCategoryModel.create({
-      slug,
-      labelRu,
-      parentId: paths.parentId,
-      depth: paths.depth,
-      pathSlugs: paths.pathSlugs,
-      pathIds: paths.pathIds,
-      pathLabelRu: paths.pathLabelRu,
-      searchKeywords,
-      isLeaf,
-      sortOrder,
-      ...(legacyProductCategory ? { legacyProductCategory } : {}),
-    });
-
-    if (isRoot) {
-      await ensureProductCategoryDisplayForSlug(slug);
-    }
-
-    successRes(res, { category: toCategoryAdminPayload(doc.toObject()) }, 201);
-  } catch (error) {
-    return errorRes(
-      res,
-      400,
-      error instanceof Error ? error.message : "Не удалось создать категорию",
-    );
+  } else if (isRoot) {
+    legacyProductCategory = slug;
   }
+
+  const duplicateSlug = await ProductCategoryModel.findOne({ slug }).lean();
+  if (duplicateSlug) {
+    return errorRes(res, 409, "Категория с таким slug уже есть");
+  }
+
+  if (parentId) {
+    const parent = await ProductCategoryModel.findById(parentId).lean();
+    if (!parent) {
+      return errorRes(res, 400, "Родитель не найден");
+    }
+    if (parent.isLeaf === true) {
+      return errorRes(res, 400, "Нельзя добавить дочернюю к листу");
+    }
+  }
+
+  const paths = await computeProductCategoryNodePaths({
+    slug,
+    labelRu,
+    parentId,
+  });
+
+  const doc = await ProductCategoryModel.create({
+    slug,
+    labelRu,
+    parentId: paths.parentId,
+    depth: paths.depth,
+    pathSlugs: paths.pathSlugs,
+    pathIds: paths.pathIds,
+    pathLabelRu: paths.pathLabelRu,
+    searchKeywords,
+    isLeaf,
+    sortOrder,
+    ...(legacyProductCategory ? { legacyProductCategory } : {}),
+  });
+
+  if (isRoot) {
+    await ensureProductCategoryDisplayForSlug(slug);
+  }
+
+  successRes(res, { category: toCategoryAdminPayload(doc.toObject()) }, 201);
 }
 
 /** PATCH /product/admin/categories/:categoryId */
 export async function patchProductCategoryAdminController(req, res) {
-  try {
-    const categoryId = String(req.params.categoryId ?? "");
-    const doc = await ProductCategoryModel.findById(categoryId);
-    if (!doc) {
-      return errorRes(res, 404, "Категория не найдена");
+  const categoryId = String(req.params.categoryId ?? "");
+  const doc = await ProductCategoryModel.findById(categoryId);
+  if (!doc) {
+    return errorRes(res, 404, "Категория не найдена");
+  }
+
+  const nextLabelRu =
+    req.body?.labelRu !== undefined ? normalizeLabelRu(req.body.labelRu) : doc.labelRu;
+  const nextParentId =
+    req.body?.parentId !== undefined
+      ? req.body.parentId
+        ? new mongoose.Types.ObjectId(String(req.body.parentId))
+        : null
+      : doc.parentId;
+  const nextSlug =
+    req.body?.slug !== undefined ? normalizeSlug(req.body.slug) : doc.slug;
+
+  if (req.body?.slug !== undefined && nextSlug !== doc.slug) {
+    const duplicateSlug = await ProductCategoryModel.findOne({
+      slug: nextSlug,
+      _id: { $ne: doc._id },
+    }).lean();
+    if (duplicateSlug) {
+      return errorRes(res, 409, "Категория с таким slug уже есть");
     }
+  }
 
-    const nextLabelRu =
-      req.body?.labelRu !== undefined
-        ? normalizeLabelRu(req.body.labelRu)
-        : doc.labelRu;
-    const nextParentId =
-      req.body?.parentId !== undefined
-        ? req.body.parentId
-          ? new mongoose.Types.ObjectId(String(req.body.parentId))
-          : null
-        : doc.parentId;
-    const nextSlug =
-      req.body?.slug !== undefined ? normalizeSlug(req.body.slug) : doc.slug;
-
-    if (req.body?.slug !== undefined && nextSlug !== doc.slug) {
-      const duplicateSlug = await ProductCategoryModel.findOne({
-        slug: nextSlug,
-        _id: { $ne: doc._id },
-      }).lean();
-      if (duplicateSlug) {
-        return errorRes(res, 409, "Категория с таким slug уже есть");
+  if (req.body?.parentId !== undefined) {
+    await assertNoCategoryCycle(doc._id, nextParentId);
+    if (nextParentId) {
+      const parent = await ProductCategoryModel.findById(nextParentId).lean();
+      if (!parent) {
+        return errorRes(res, 400, "Родитель не найден");
+      }
+      if (parent.isLeaf === true) {
+        return errorRes(res, 400, "Нельзя переместить под лист");
       }
     }
+  }
 
-    if (req.body?.parentId !== undefined) {
-      await assertNoCategoryCycle(doc._id, nextParentId);
-      if (nextParentId) {
-        const parent = await ProductCategoryModel.findById(nextParentId).lean();
-        if (!parent) {
-          return errorRes(res, 400, "Родитель не найден");
-        }
-        if (parent.isLeaf === true) {
-          return errorRes(res, 400, "Нельзя переместить под лист");
-        }
-      }
+  if (req.body?.isLeaf === true) {
+    const childCount = await ProductCategoryModel.countDocuments({
+      parentId: doc._id,
+    });
+    if (childCount > 0) {
+      return errorRes(res, 400, "Нельзя сделать листом: есть дочерние категории");
     }
+  }
 
-    if (req.body?.isLeaf === true) {
-      const childCount = await ProductCategoryModel.countDocuments({
-        parentId: doc._id,
-      });
-      if (childCount > 0) {
-        return errorRes(res, 400, "Нельзя сделать листом: есть дочерние категории");
-      }
+  if (req.body?.isLeaf === false && doc.isLeaf === true) {
+    const productCount = await ProductModel.countDocuments({
+      productCategoryId: doc._id,
+    });
+    if (productCount > 0) {
+      return errorRes(res, 400, "Нельзя снять лист: к категории привязаны товары");
     }
+  }
 
-    if (req.body?.isLeaf === false && doc.isLeaf === true) {
-      const productCount = await ProductModel.countDocuments({
-        productCategoryId: doc._id,
-      });
-      if (productCount > 0) {
-        return errorRes(res, 400, "Нельзя снять лист: к категории привязаны товары");
-      }
-    }
+  const structureChanged =
+    req.body?.parentId !== undefined ||
+    req.body?.slug !== undefined ||
+    req.body?.labelRu !== undefined;
 
-    const structureChanged =
-      req.body?.parentId !== undefined ||
-      req.body?.slug !== undefined ||
-      req.body?.labelRu !== undefined;
+  doc.labelRu = nextLabelRu;
+  doc.slug = nextSlug;
+  doc.parentId = nextParentId;
 
-    doc.labelRu = nextLabelRu;
-    doc.slug = nextSlug;
-    doc.parentId = nextParentId;
-
-    if (req.body?.isLeaf !== undefined) {
-      doc.isLeaf = req.body.isLeaf === true;
-    }
-    if (req.body?.sortOrder !== undefined) {
-      doc.sortOrder = Number(req.body.sortOrder) || 0;
-    }
-    if (req.body?.searchKeywords !== undefined) {
-      doc.searchKeywords = normalizeProductCategorySearchKeywords(
-        req.body.searchKeywords,
-      );
-    }
-    if (req.body?.legacyProductCategory !== undefined) {
-      const legacy = String(req.body.legacyProductCategory ?? "").trim();
-      if (legacy && PRODUCT_CATEGORY_VALUES.includes(legacy)) {
-        doc.legacyProductCategory = legacy;
-      } else {
-        doc.set("legacyProductCategory", undefined);
-      }
-    }
-
-    if (structureChanged) {
-      const paths = await computeProductCategoryNodePaths({
-        slug: doc.slug,
-        labelRu: doc.labelRu,
-        parentId: doc.parentId,
-      });
-      doc.depth = paths.depth;
-      doc.pathSlugs = paths.pathSlugs;
-      doc.pathIds = paths.pathIds;
-      doc.pathLabelRu = paths.pathLabelRu;
-    }
-
-    await doc.save();
-
-    if (structureChanged) {
-      await rebuildProductCategorySubtreePaths(doc._id);
-      await syncProductsDenormForCategorySubtree(doc._id);
-    }
-
-    successRes(res, { category: toCategoryAdminPayload(doc.toObject()) });
-  } catch (error) {
-    return errorRes(
-      res,
-      400,
-      error instanceof Error ? error.message : "Не удалось обновить категорию",
+  if (req.body?.isLeaf !== undefined) {
+    doc.isLeaf = req.body.isLeaf === true;
+  }
+  if (req.body?.sortOrder !== undefined) {
+    doc.sortOrder = Number(req.body.sortOrder) || 0;
+  }
+  if (req.body?.searchKeywords !== undefined) {
+    doc.searchKeywords = normalizeProductCategorySearchKeywords(
+      req.body.searchKeywords,
     );
   }
+  if (req.body?.legacyProductCategory !== undefined) {
+    const legacy = String(req.body.legacyProductCategory ?? "").trim();
+    if (legacy && PRODUCT_CATEGORY_VALUES.includes(legacy)) {
+      doc.legacyProductCategory = legacy;
+    } else {
+      doc.set("legacyProductCategory", undefined);
+    }
+  }
+
+  if (structureChanged) {
+    const paths = await computeProductCategoryNodePaths({
+      slug: doc.slug,
+      labelRu: doc.labelRu,
+      parentId: doc.parentId,
+    });
+    doc.depth = paths.depth;
+    doc.pathSlugs = paths.pathSlugs;
+    doc.pathIds = paths.pathIds;
+    doc.pathLabelRu = paths.pathLabelRu;
+  }
+
+  await doc.save();
+
+  if (structureChanged) {
+    await rebuildProductCategorySubtreePaths(doc._id);
+    await syncProductsDenormForCategorySubtree(doc._id);
+  }
+
+  successRes(res, { category: toCategoryAdminPayload(doc.toObject()) });
 }
 
 /** DELETE /product/admin/categories/:categoryId */
 export async function deleteProductCategoryAdminController(req, res) {
-  try {
-    const categoryId = String(req.params.categoryId ?? "");
-    const doc = await ProductCategoryModel.findById(categoryId).lean();
-    if (!doc) {
-      return errorRes(res, 404, "Категория не найдена");
-    }
-
-    const reassignProductCategoryId = String(
-      req.body?.reassignProductCategoryId ?? "",
-    ).trim();
-    const detachProducts = req.body?.detachProducts === true;
-
-    let blocker = await getProductCategoryDeleteBlocker(doc);
-    if (blocker?.code === "products" && doc.isLeaf === true) {
-      if (reassignProductCategoryId && detachProducts) {
-        return errorRes(
-          res,
-          400,
-          "Укажите либо перенос товаров, либо отвязку от дерева",
-        );
-      }
-
-      if (reassignProductCategoryId) {
-        const target = await ProductCategoryModel.findById(
-          reassignProductCategoryId,
-        ).lean();
-        if (!target || target.isLeaf !== true) {
-          return errorRes(res, 400, "Укажите конечную категорию для переноса товаров");
-        }
-        if (String(target._id) === categoryId) {
-          return errorRes(
-            res,
-            400,
-            "Категория переназначения совпадает с удаляемой",
-          );
-        }
-
-        await reassignProductsFromCategoryLeaf(categoryId, target._id);
-        blocker = await getProductCategoryDeleteBlocker(doc);
-      } else if (detachProducts) {
-        await detachProductsFromCategoryLeaf(doc);
-        blocker = await getProductCategoryDeleteBlocker(doc);
-      }
-    }
-
-    if (blocker) {
-      return errorRes(res, 400, blocker.message);
-    }
-
-    await ProductCategoryModel.findByIdAndDelete(categoryId);
-    await cleanupProductCategoryDisplayForDeletedCategory(doc);
-    await syncParentLeafFlagAfterChildDelete(doc.parentId);
-
-    successRes(res, { deletedId: categoryId });
-  } catch (error) {
-    return errorRes(
-      res,
-      500,
-      error instanceof Error ? error.message : "Не удалось удалить категорию",
-    );
+  const categoryId = String(req.params.categoryId ?? "");
+  const doc = await ProductCategoryModel.findById(categoryId).lean();
+  if (!doc) {
+    return errorRes(res, 404, "Категория не найдена");
   }
+
+  const reassignProductCategoryId = String(
+    req.body?.reassignProductCategoryId ?? "",
+  ).trim();
+  const detachProducts = req.body?.detachProducts === true;
+
+  let blocker = await getProductCategoryDeleteBlocker(doc);
+  if (blocker?.code === "products" && doc.isLeaf === true) {
+    if (reassignProductCategoryId && detachProducts) {
+      return errorRes(res, 400, "Укажите либо перенос товаров, либо отвязку от дерева");
+    }
+
+    if (reassignProductCategoryId) {
+      const target = await ProductCategoryModel.findById(
+        reassignProductCategoryId,
+      ).lean();
+      if (!target || target.isLeaf !== true) {
+        return errorRes(res, 400, "Укажите конечную категорию для переноса товаров");
+      }
+      if (String(target._id) === categoryId) {
+        return errorRes(res, 400, "Категория переназначения совпадает с удаляемой");
+      }
+
+      await reassignProductsFromCategoryLeaf(categoryId, target._id);
+      blocker = await getProductCategoryDeleteBlocker(doc);
+    } else if (detachProducts) {
+      await detachProductsFromCategoryLeaf(doc);
+      blocker = await getProductCategoryDeleteBlocker(doc);
+    }
+  }
+
+  if (blocker) {
+    return errorRes(res, 400, blocker.message);
+  }
+
+  await ProductCategoryModel.findByIdAndDelete(categoryId);
+  await cleanupProductCategoryDisplayForDeletedCategory(doc);
+  await syncParentLeafFlagAfterChildDelete(doc.parentId);
+
+  successRes(res, { deletedId: categoryId });
 }

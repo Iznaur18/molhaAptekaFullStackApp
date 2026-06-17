@@ -92,9 +92,7 @@ function RootLayoutNav() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="product/[id]" options={{ headerShown: false }} />
-        <Stack.Screen name="orders" options={{ headerShown: false }} />
         <Stack.Screen name="profile" options={{ headerShown: false }} />
-        <Stack.Screen name="hub/[section]" options={{ title: "Раздел" }} />
         <Stack.Screen name="notifications/index" options={{ headerShown: true }} />
         <Stack.Screen name="catalog-browser" options={{ headerShown: true }} />
         <Stack.Screen name="create-product" options={{ title: "Новый товар" }} />
@@ -102,6 +100,7 @@ function RootLayoutNav() {
         <Stack.Screen name="raffle/[id]" options={{ title: "Розыгрыш" }} />
         <Stack.Screen name="users/index" options={{ title: "Пользователи" }} />
         <Stack.Screen name="user/[id]" options={{ title: "Профиль" }} />
+        <Stack.Screen name="user/[id]/edit" options={{ title: "Редактирование" }} />
         <Stack.Screen name="seller/[userId]" options={{ title: "Товары продавца" }} />
         <Stack.Screen name="legal/privacy" options={{ title: LEGAL_UI.PRIVACY_TITLE }} />
       </Stack>

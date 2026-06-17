@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { createAsyncRouter } from "../utils/createAsyncRouter.js";
 
 import {
   cancelMySellerPersonalCategoryCampaignController,
@@ -20,7 +20,7 @@ import {
   submitSellerPersonalCategoryCampaignValidation,
 } from "../validations/sellerPersonalCategory/sellerPersonalCategoryValidation.js";
 
-const router = Router();
+const router = createAsyncRouter();
 
 router.get("/config", getSellerPersonalCategoryConfigController);
 router.get("/catalog-tiles", getSellerPersonalCategoryCatalogTilesController);

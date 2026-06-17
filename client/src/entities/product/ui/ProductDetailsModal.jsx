@@ -1,4 +1,4 @@
-import { APP_SHELL_MOBILE_NAV_BREAKPOINT_PX } from "../../../app/lib/appShellMobileNavConstants.js";
+import { APP_SHELL_MOBILE_NAV_BREAKPOINT_PX } from "../../../shared/lib/appShellMobileNavConstants.js";
 import { useMaxWidthMediaQuery } from "../../../shared/lib/useMaxWidthMediaQuery.js";
 import { useSwipeRightToDismiss } from "../../../shared/lib/useSwipeRightToDismiss.js";
 import { ProductModalShell } from "../../../shared/ui/ProductModalShell/ProductModalShell.jsx";

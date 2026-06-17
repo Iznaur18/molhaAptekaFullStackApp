@@ -2,7 +2,6 @@ import {
   PROFILE_SECTION_ADMIN_ORDERS,
   PROFILE_SECTION_APP_INTRO_ADMIN,
   PROFILE_SECTION_CATEGORY_TREE_ADMIN,
-  PROFILE_SECTION_CREATE_RAFFLE,
   PROFILE_SECTION_DATA_CONFIRMATION_REQUESTS,
   PROFILE_SECTION_INSTALLMENT_DISPUTES,
   PROFILE_SECTION_INSTALLMENT_MODERATION,
@@ -16,14 +15,20 @@ import {
   PROFILE_SECTION_SELLER_PERSONAL_CATEGORY_MODERATION,
   PROFILE_STAFF_SECTION_ORDER,
   type ProfileSectionId,
-} from "./profileSections.ts";
+} from "./profileSections.js";
 
 /**
  * Web SPA paths for staff profile sections (G.1).
  * Must stay in sync with `client/src/shared/lib/homeMainViewPaths.js`.
+ *
+ * Sections in PROFILE_STAFF_IN_APP_SECTION_IDS stay in-app on mobile (no web redirect).
  */
+export const PROFILE_STAFF_IN_APP_SECTION_IDS = ["create-raffle"] as const;
+
+export type ProfileStaffInAppSectionId =
+  (typeof PROFILE_STAFF_IN_APP_SECTION_IDS)[number];
+
 export const PROFILE_SECTION_WEB_PATH = {
-  [PROFILE_SECTION_CREATE_RAFFLE]: "/me",
   [PROFILE_SECTION_PRODUCT_MODERATION]: "/moderation-products",
   [PROFILE_SECTION_INTRO_AD_MODERATION]: "/moderation-intro-ad",
   [PROFILE_SECTION_SELLER_PERSONAL_CATEGORY_MODERATION]: "/moderation-seller-categories",

@@ -6,16 +6,16 @@ import {
 } from "../../constants/orderConstants.js";
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
 import { OrderModel, ProductModel, UserModel } from "../../models/index.js";
-import { ORDER_ITEMS_POPULATE } from "../../controllers/Order/orderQueries.js";
-import { buildOrderStatusFromItems } from "../../controllers/Order/orderStatus.js";
-import { prepareLoyaltyPointsForConfirmedOrderItem } from "../../utils/loyaltyPoints.js";
+import { ORDER_ITEMS_POPULATE } from "../../services/order/orderQueries.js";
+import { buildOrderStatusFromItems } from "../../services/order/orderStatus.js";
+import { prepareLoyaltyPointsForConfirmedOrderItem } from "../../services/order/loyaltyPoints.js";
 import {
   buildOrderLineLoyaltySnapshot,
   markOrderLineLoyaltyReserveReleased,
   releaseUnawardedLoyaltyReservesForOrder,
   reserveLoyaltyPointsForNewOrder,
-} from "../../utils/orderLoyaltyPoints.js";
-import { settleLoyaltyPointsReservation } from "../../utils/loyaltyPointsReserve.js";
+} from "../../services/order/orderLoyaltyPoints.js";
+import { settleLoyaltyPointsReservation } from "../../services/loyalty/loyaltyPointsReserve.js";
 import { runInTransaction, withMongoSession } from "../../utils/mongoTransaction.js";
 
 const TEST_SUFFIX = () => `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;

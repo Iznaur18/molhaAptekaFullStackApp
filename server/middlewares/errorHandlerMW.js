@@ -5,7 +5,7 @@ import { captureServerHttpError } from "../utils/captureServerHttpError.js";
 import { logServerHttpError } from "../utils/logServerEvent.js";
 import { UPLOAD_IMAGE_MAX_BYTES, UPLOAD_VIDEO_MAX_BYTES } from "../constants/uploadConstants.js";
 import { formatUploadBytesAsMb } from "../utils/formatUploadBytesAsMb.js";
-import { errorRes } from "../utils/index.js";
+import { errorRes } from "../services/http/index.js";
 
 export { AppError };
 

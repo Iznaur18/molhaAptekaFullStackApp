@@ -1,7 +1,7 @@
 import { buildAddressLineFromStructured } from "@molha/api-contract";
 
 import { verifyRuDeliveryAddress } from "../utils/dadata/verifyRuDeliveryAddress.js";
-import { errorRes } from "../utils/index.js";
+import { errorRes } from "../services/http/index.js";
 import { validateRuDeliveryAddress } from "./validateRuDeliveryAddress.js";
 
 const STRUCTURED_ADDRESS_FIELDS = [

@@ -1,16 +1,27 @@
+import { resolveUploadedImageUrlForBrowser } from "@izibuy/shared-lib";
+
 import { API_BASE_URL, UPLOAD_BASE_URL } from "@/shared/config";
 
 const UPLOAD_ASSET_PATH_RE = /(\/uploads\/[^?#]+)/i;
 
-const resolveMediaBaseUrl = () => UPLOAD_BASE_URL || API_BASE_URL;
+const resolveMediaBaseUrl = (): string => {
+  const base = (UPLOAD_BASE_URL || API_BASE_URL || "").trim();
+  return base.replace(/\/$/, "");
+};
 
 /**
- * Абсолютный URL для `<Image source={{ uri }} />` без `window`.
+ * Абсолютный URL для `<Image>` / `<Video>` без `window`.
+ * Dev SPA origins (127.0.0.1:5173 и т.п.) → EXPO_PUBLIC_API_URL / UPLOAD_BASE_URL.
  */
 export const resolveUploadedMediaUrl = (raw: string): string => {
   const url = String(raw ?? "").trim();
   if (!url) {
     return "";
+  }
+
+  const base = resolveMediaBaseUrl();
+  if (base) {
+    return resolveUploadedImageUrlForBrowser(url, base);
   }
 
   if (/^https?:\/\//i.test(url)) {
@@ -23,12 +34,7 @@ export const resolveUploadedMediaUrl = (raw: string): string => {
     return url;
   }
 
-  const base = resolveMediaBaseUrl();
-  if (!base) {
-    return path;
-  }
-
-  return `${base}${path}`;
+  return path;
 };
 
 export const isDisplayableMediaUrl = (raw: unknown): boolean => {

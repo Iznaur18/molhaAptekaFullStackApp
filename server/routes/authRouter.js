@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { createAsyncRouter } from "../utils/createAsyncRouter.js";
 import {
   registerUserController,
   loginUserController,
@@ -14,10 +14,13 @@ import {
 } from "../controllers/index.js";
 import { registerUserValidation, loginUserValidation } from "../validations/index.js";
 import { verifyEmailWithCodeValidation } from "../validations/user/verifyEmailWithCodeValidation.js";
+import { refreshAuthValidation } from "../validations/user/refreshAuthValidation.js";
+import { verifyEmailTokenValidation } from "../validations/user/verifyEmailTokenValidation.js";
 import {
   registerPushTokenValidation,
   removePushTokenValidation,
 } from "../validations/user/pushTokenValidation.js";
+import { emptyBodyValidation } from "../validations/common/emptyBodyValidation.js";
 import {
   checkAuthMW,
   checkAuthMeMW,
@@ -26,13 +29,14 @@ import {
   emailVerificationResendRateLimiter,
 } from "../middlewares/index.js";
 
-const router = Router();
+const router = createAsyncRouter();
 
 // путь в index.js начинается с /auth
 router.get("/me", checkAuthMeMW, userMeController);
 router.patch(
   "/me/in-app-notifications/read",
   checkAuthMW,
+  emptyBodyValidation,
   markInAppNotificationsReadController,
 );
 router.put(
@@ -57,8 +61,8 @@ router.post(
 );
 router.post("/login", authRateLimiter, loginUserValidation, loginUserController);
 router.post("/logout", logoutUserController);
-router.post("/refresh", refreshAuthRateLimiter, refreshAuthController);
-router.get("/verify-email", verifyEmailController);
+router.post("/refresh", refreshAuthRateLimiter, refreshAuthValidation, refreshAuthController);
+router.get("/verify-email", verifyEmailTokenValidation, verifyEmailController);
 router.post(
   "/verify-email",
   checkAuthMW,
@@ -69,6 +73,7 @@ router.post(
   "/resend-verification",
   checkAuthMW,
   emailVerificationResendRateLimiter,
+  emptyBodyValidation,
   resendEmailVerificationController,
 );
 

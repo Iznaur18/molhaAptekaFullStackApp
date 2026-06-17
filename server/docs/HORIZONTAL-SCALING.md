@@ -180,7 +180,7 @@ SPA остаётся на CDN/nginx; API можно на меньших инст
 - [ ] `UPLOAD_STORAGE=s3`
 - [ ] Redis (Managed: Upstash / Atlas не даёт Redis — отдельный VPS или Upstash)
 - [ ] `rate-limit-redis` подключён
-- [ ] `CRON_LEADER` или отдельный `izibuy-worker`
+- [ ] `npm run start:worker` (BullMQ cron + email consumer при `REDIS_URL`)
 - [ ] Health check nginx только на живые upstream
 - [ ] Sentry + alert на p95 `/product`, `/order`
 - [ ] Load test (k6): 50 concurrent catalog + 10 checkout
@@ -205,8 +205,8 @@ SPA остаётся на CDN/nginx; API можно на меньших инст
 |----|--------|--------------|
 | H-1 | ~~Redis rate limit store~~ ✅ `REDIS_URL` + `rate-limit-redis` | 4 |
 | H-2 | `CRON_LEADER` / `worker.js` | 4 |
-| H-3 | `MONGO_URI_READ` + read models для `GET /product` | 5 |
-| H-4 | BullMQ + вынести email/cron из request path | 5–6 |
+| H-3 | ~~`MONGO_URI_READ` + read models для `GET /product`~~ ✅ | 5 |
+| H-4 | ~~BullMQ + вынести email/cron из request path~~ ✅ `queues/`, `worker.js` | 5–6 |
 | H-5 | ~~Денорм `soldQuantity` на Product~~ ✅ поле + sync + миграция `20260612` | 1–5 |
 | H-6 | ~~Убрать `expireProductPromotions` из hot path `getProducts`~~ ✅ cron в `index.js` | 1 |
 

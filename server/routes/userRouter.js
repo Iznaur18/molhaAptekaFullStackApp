@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { createAsyncRouter } from "../utils/createAsyncRouter.js";
 import {
   userGetProfileController,
   userUpdateProfileController,
@@ -52,7 +52,7 @@ import {
   resolveUserStoryReportsValidation,
 } from "../validations/index.js";
 
-const router = Router();
+const router = createAsyncRouter();
 
 router.get(
   "/search",

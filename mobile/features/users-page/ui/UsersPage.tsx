@@ -29,15 +29,22 @@ export const UsersPage = () => {
   }, [searchTerm]);
 
   const hasSearchQuery = debouncedSearch.length >= USER_SEARCH_MIN_LENGTH;
-  const { phase, users, error, refetch, isRefetching } = useUsersSearchQuery({
-    search: debouncedSearch,
-  });
+  const { phase, users, error, refetch, isRefetching, isSearchInputTooShort } =
+    useUsersSearchQuery({
+      search: debouncedSearch,
+    });
 
   const handleUserPress = (userId: string) => {
     router.push({ pathname: "/user/[id]", params: { id: userId } });
   };
 
-  const listEmptyText = hasSearchQuery ? USERS_PAGE_UI.EMPTY_BY_QUERY : USERS_PAGE_UI.EMPTY;
+  const listEmptyText = isSearchInputTooShort
+    ? USERS_PAGE_UI.SEARCH_TOO_SHORT
+    : hasSearchQuery
+      ? USERS_PAGE_UI.EMPTY_BY_QUERY
+      : USERS_PAGE_UI.EMPTY;
+
+  const canRefreshList = !isSearchInputTooShort;
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.bg }]}>
@@ -73,7 +80,7 @@ export const UsersPage = () => {
           keyExtractor={(item) => String(item._id)}
           contentContainerStyle={styles.list}
           refreshControl={
-            hasSearchQuery ? (
+            canRefreshList ? (
               <ThemedRefreshControl refreshing={isRefetching} onRefresh={refetch} />
             ) : undefined
           }

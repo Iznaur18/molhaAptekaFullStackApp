@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 
 import { CartServerSync } from "../../entities/cart/ui/CartServerSync.jsx";
@@ -9,10 +10,15 @@ import { buildAppShellRouteKey } from "../lib/buildAppShellRouteKey.js";
 import { useAppShell } from "../model/AppShellContext.jsx";
 
 import { AppShellHeader } from "./AppShellHeader.jsx";
-import { AppShellModalsLayer } from "./AppShellModalsLayer.jsx";
 import { AppShellRouteSuspense } from "./AppShellRouteSuspense.jsx";
 
 import "./AppShell.css";
+
+const LazyAppShellModalsLayer = lazy(() =>
+  import("./AppShellModalsLayer.jsx").then((module) => ({
+    default: module.AppShellModalsLayer,
+  })),
+);
 
 export function AppShellLayout() {
   const location = useLocation();
@@ -48,7 +54,9 @@ export function AppShellLayout() {
 
       <SiteFooter />
 
-      <AppShellModalsLayer {...modalsLayerProps} />
+      <Suspense fallback={null}>
+        <LazyAppShellModalsLayer {...modalsLayerProps} />
+      </Suspense>
     </div>
   );
 }

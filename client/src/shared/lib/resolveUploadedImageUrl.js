@@ -1,73 +1,11 @@
-import { normalizeUploadUrlForStorage } from "@izibuy/shared-lib";
+import {
+  normalizeUploadUrlForStorage,
+  resolveUploadedImageUrlForBrowser,
+} from "@izibuy/shared-lib";
 
 const UPLOAD_ASSET_PATH_RE = /(\/uploads\/[^?#]+)/i;
 
-/**
- * Dev SPA (Vite): другой LAN IP / localhost в БД — файлы на том же API через proxy.
- *
- * @param {string} origin
- */
-function isDevSpaUploadOrigin(origin) {
-  try {
-    const parsed = new URL(origin);
-    if (parsed.port === "5173" || parsed.port === "4173") {
-      return true;
-    }
-    const host = parsed.hostname.toLowerCase();
-    if (host === "localhost" || host === "127.0.0.1") {
-      return true;
-    }
-    if (/^192\.168\./.test(host) || /^10\./.test(host)) {
-      return true;
-    }
-    if (/^172\.(1[6-9]|2\d|3[0-1])\./.test(host)) {
-      return true;
-    }
-    return false;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Логика отображения upload URL в браузере (тестируется без window).
- *
- * @param {string} raw
- * @param {string} pageOrigin — window.location.origin
- * @returns {string}
- */
-export function resolveUploadedImageUrlForBrowser(raw, pageOrigin) {
-  const url = String(raw ?? "").trim();
-  if (!url) {
-    return "";
-  }
-
-  if (/^https?:\/\//i.test(url)) {
-    try {
-      const parsed = new URL(url);
-      const pathMatch = parsed.pathname.match(UPLOAD_ASSET_PATH_RE);
-      if (pathMatch) {
-        if (parsed.origin === pageOrigin || isDevSpaUploadOrigin(parsed.origin)) {
-          return `${pageOrigin}${pathMatch[1]}`;
-        }
-      }
-      return url;
-    } catch {
-      return url;
-    }
-  }
-
-  const uploadPathMatch = url.match(UPLOAD_ASSET_PATH_RE);
-  if (uploadPathMatch) {
-    return `${pageOrigin}${uploadPathMatch[1]}`;
-  }
-
-  if (url.startsWith("/")) {
-    return `${pageOrigin}${url}`;
-  }
-
-  return url;
-}
+export { resolveUploadedImageUrlForBrowser };
 
 /**
  * Превращает ответ upload в URL для <img>/<video>.

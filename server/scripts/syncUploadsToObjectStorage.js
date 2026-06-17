@@ -8,8 +8,8 @@ import {
   getS3Client,
   isObjectStorageUploadEnabled,
   objectStorageHasUpload,
-} from "../utils/objectStorageUpload.js";
-import { UPLOADS_DIR } from "../utils/uploadsDir.js";
+} from "../services/upload/objectStorageUpload.js";
+import { UPLOADS_DIR } from "../services/upload/uploadsDir.js";
 
 const MIME_BY_EXT = {
   ".jpg": "image/jpeg",

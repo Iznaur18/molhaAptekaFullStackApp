@@ -31,6 +31,7 @@ export const ProductPreviewVideo = ({ uri, onPlaybackFailed }: ProductPreviewVid
       style={styles.video}
       contentFit="cover"
       nativeControls={false}
+      allowsPictureInPicture={false}
       surfaceType="textureView"
     />
   );

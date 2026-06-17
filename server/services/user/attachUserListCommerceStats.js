@@ -1,0 +1,33 @@
+import { attachTotalPurchasesAmountToUsers } from "../../utils/buyerTotalPurchasesAmount.js";
+import { attachTotalSalesAmountToUsers } from "../order/sellerTotalSalesAmount.js";
+
+/**
+ * @param {Record<string, unknown>[]} users
+ */
+export const attachUserListCommerceStats = async (users) => {
+  if (!Array.isArray(users) || users.length === 0) {
+    return users;
+  }
+
+  const [withSales, withPurchases] = await Promise.all([
+    attachTotalSalesAmountToUsers(users),
+    attachTotalPurchasesAmountToUsers(users),
+  ]);
+
+  return withSales.map((user, index) => ({
+    ...user,
+    totalPurchasesAmount: withPurchases[index]?.totalPurchasesAmount ?? 0,
+  }));
+};
+
+/**
+ * @param {Record<string, unknown> | null | undefined} user
+ */
+export const attachUserCommerceStatsToUser = async (user) => {
+  if (!user || user._id == null) {
+    return user;
+  }
+
+  const [withStats] = await attachUserListCommerceStats([user]);
+  return withStats;
+};

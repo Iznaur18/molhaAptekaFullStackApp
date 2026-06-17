@@ -17,7 +17,7 @@
 - [ ] Нет импорта `client/src/...` в `mobile/` (и наоборот UI-компонентов)
 - [ ] Staff на mobile: не добавлял новые RN staff-экраны (G.1 → web)
 
-См. `docs/client-mobile-consolidation-audit.md` §2.6, `.cursor/rules/client-mobile-share-boundaries.mdc`
+См. `docs/client-mobile-consolidation-audit.md` §2, `.cursor/rules/client-mobile-share-boundaries.mdc`
 
 ## Triage (если фикс бага)
 

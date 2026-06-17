@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { PROFILE_SECTION_IDS } from "../packages/shared-lib/src/profileSections.ts";
+import { PROFILE_SECTION_IDS } from "@izibuy/shared-lib";
 
 const WEB_VIEW_TO_MOBILE_SECTION_ALIAS = new Map([["staff-raffles", "raffles"]]);
 

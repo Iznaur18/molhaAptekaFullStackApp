@@ -1,8 +1,11 @@
 import bcrypt from "bcrypt";
+import { bumpUserAuthTokenVersion } from "../../services/auth/userAuthTokenVersion.js";
+import { resolveLogoutUserId } from "../../services/auth/resolveLogoutUserId.js";
 import mongoose from "mongoose";
 import { UserModel, UserVoteRatingModel } from "../../models/index.js";
-import { deleteAllFollowsForUser } from "../../utils/userFollowHelpers.js";
-import { sendUserWithToken, errorRes, successRes } from "../../utils/index.js";
+import { deleteAllFollowsForUser } from "../../services/user/userFollowHelpers.js";
+import { errorRes, successRes } from "../../services/http/index.js";
+import { sendUserWithToken } from "../../services/auth/sendUserWithToken.js";
 import { clearAuthCookie, clearRefreshCookie } from "../../utils/authCookie.js";
 import {
   USER_DATA,
@@ -12,38 +15,38 @@ import {
   ALLOWED_FIELDS_FOR_MODERATOR,
   ALLOWED_FIELDS_FOR_MODERATOR_SELF,
 } from "../../constants/constants.js";
-import { isStaffRole } from "../../utils/adminUserGuard.js";
+import { isStaffRole } from "../../services/access/adminUserGuard.js";
 import {
   assertCanDeleteUser,
   assertCanSetUserRole,
-} from "../../utils/adminUserGuard.js";
-import { deleteSellerProductsAndRelatedData } from "../../utils/deleteUserCascade.js";
-import { cancelIntroAdCampaignsForAdvertiser } from "../../utils/introAdCampaignHelpers.js";
-import { getOptionalViewerFromRequest } from "../../utils/optionalViewerFromRequest.js";
-import { sanitizeUserProfileForViewer } from "../../utils/userProfileVisibility.js";
-import { attachFollowFieldsToPublicProfile } from "../../utils/userFollowHelpers.js";
-import { attachUserCommerceStatsToUser } from "../../utils/attachUserListCommerceStats.js";
+} from "../../services/access/adminUserGuard.js";
+import { deleteSellerProductsAndRelatedData } from "../../services/user/deleteUserCascade.js";
+import { cancelIntroAdCampaignsForAdvertiser } from "../../services/intro-ad/introAdCampaignHelpers.js";
+import { getOptionalViewerFromRequest } from "../../services/user/optionalViewerFromRequest.js";
+import { sanitizeUserProfileForViewer } from "../../services/user/userProfileVisibility.js";
+import { attachFollowFieldsToPublicProfile } from "../../services/user/userFollowHelpers.js";
+import { attachUserCommerceStatsToUser } from "../../services/user/attachUserListCommerceStats.js";
 import {
   backgroundValueAfterPremiumChange,
   normalizeUserBackgroundForSave,
-} from "../../utils/userBackgroundValue.js";
+} from "../../services/user/userBackgroundValue.js";
 import {
   normalizeUserAvatarFocus,
   normalizeUserBackgroundFocus,
-} from "../../utils/profileImageFocus.js";
-import { getUnreadInAppNotificationsForUser } from "../../utils/userInAppNotifications.js";
-import { buildUserProfileMongoUpdate } from "../../utils/buildUserProfileMongoUpdate.js";
-import { resolveUserAddressCityNormalized } from "../../utils/ruCityNormalized.js";
-import { normalizeStoredUploadUrl } from "../../utils/buildPublicUploadUrl.js";
-import { rejectPendingDataConfirmationForUser } from "../../utils/userDataConfirmationHelpers.js";
+} from "../../services/user/profileImageFocus.js";
+import { getUnreadInAppNotificationsForUser } from "../../services/user/userInAppNotifications.js";
+import { buildUserProfileMongoUpdate } from "../../services/user/buildUserProfileMongoUpdate.js";
+import { resolveUserAddressCityNormalized } from "../../services/product/ruCityNormalized.js";
+import { normalizeStoredUploadUrl } from "../../services/upload/buildPublicUploadUrl.js";
+import { rejectPendingDataConfirmationForUser } from "../../services/user/userDataConfirmationHelpers.js";
 import {
   applyPremiumExpiryAdminUpdate,
   isPremiumActive,
   notifyPremiumRevokedByStaff,
   resolvePremiumFlagsFromExpiry,
   syncPremiumExpiryForUser,
-} from "../../utils/premiumAccess.js";
-import { canStaffManageTargetPremium } from "../../utils/premiumStaffAccess.js";
+} from "../../services/user/premiumAccess.js";
+import { canStaffManageTargetPremium } from "../../services/access/premiumStaffAccess.js";
 
 /** Вход по email + пароль. POST /auth/login */
 export const loginUserController = async (req, res) => {
@@ -85,21 +88,23 @@ export const loginUserController = async (req, res) => {
 
 /** Выход: очистка cookie (web) + опциональный refreshToken в body (mobile). POST /auth/logout */
 export const logoutUserController = async (req, res) => {
-  try {
-    clearAuthCookie(res);
-    clearRefreshCookie(res);
-    // v2: blacklist req.body?.refreshToken
-    return successRes(res, { message: "Вы вышли из аккаунта" });
-  } catch (error) {
-    console.error("logoutUserController error:", error);
-    return errorRes(res, 500, "Ошибка при выходе");
+  const userId = resolveLogoutUserId(req);
+  if (userId) {
+    try {
+      await bumpUserAuthTokenVersion(userId);
+    } catch (error) {
+      console.error("logout bumpUserAuthTokenVersion error:", error);
+    }
   }
+
+  clearAuthCookie(res);
+  clearRefreshCookie(res);
+  return successRes(res, { message: "Вы вышли из аккаунта" });
 };
 
 /** Получение данных текущего пользователя. GET /auth/me (JWT в httpOnly cookie) */
 export const userMeController = async (req, res) => {
-  try {
-    const userIdClient = req.userId;
+const userIdClient = req.userId;
 
     if (!userIdClient) {
       return successRes(res, { user: null, inAppNotifications: [] });
@@ -125,16 +130,11 @@ export const userMeController = async (req, res) => {
     const inAppNotifications = await getUnreadInAppNotificationsForUser(userIdClient);
 
     return successRes(res, { user: userWithCommerce, inAppNotifications });
-  } catch (error) {
-    console.error("userMe error:", error);
-    return errorRes(res, 500, error.message || "Ошибка при получении своих данных");
-  }
 };
 
 /** Получение профиля другого пользователя по id. GET /user/:userId (публичный — без авторизации) */
 export const userGetProfileController = async (req, res) => {
-  try {
-    const { userIdClient } = req.params; // id юзера из URL (валидация выполняется в middleware userIdParamValidation)
+const { userIdClient } = req.params; // id юзера из URL (валидация выполняется в middleware userIdParamValidation)
 
     const userIdServer = await UserModel.findById(userIdClient)
       .select(USER_DATA)
@@ -168,10 +168,6 @@ export const userGetProfileController = async (req, res) => {
     const userWithCommerce = await attachUserCommerceStatsToUser(userWithFollow);
 
     return successRes(res, { user: userWithCommerce });
-  } catch (error) {
-    console.error("userGetProfile error:", error);
-    return errorRes(res, 500, error.message || "Ошибка при получении профиля");
-  }
 };
 
 /** Обновление профиля пользователя. PATCH /user/:userId (требует Authorization: Bearer <token>) */
@@ -512,6 +508,14 @@ export const userUpdateProfileController = async (req, res) => {
 
     if (becameBlocked || becameInactive) {
       try {
+        await bumpUserAuthTokenVersion(String(targetUserId));
+      } catch (tokenVersionError) {
+        console.error("bumpUserAuthTokenVersion error:", tokenVersionError);
+      }
+    }
+
+    if (becameBlocked || becameInactive) {
+      try {
         await cancelIntroAdCampaignsForAdvertiser(String(targetUserId));
       } catch (introAdCancelError) {
         console.error("cancelIntroAdCampaignsForAdvertiser error:", introAdCancelError);
@@ -535,18 +539,15 @@ export const userUpdateProfileController = async (req, res) => {
     }
 
     if (error.name === "CastError") {
-      // Ошибка приведения типа (например, неверный формат ObjectId)
-      return errorRes(res, 400, `Неверный формат данных: ${error.message}`);
+      return errorRes(res, 400, "Неверный формат данных");
     }
 
     if (error.code === 11000) {
-      // Ошибка дубликата уникального ключа
       const field = Object.keys(error.keyPattern)[0];
       return errorRes(res, 409, `Пользователь с таким ${field} уже существует`);
     }
 
-    // Общая ошибка сервера
-    return errorRes(res, 500, error.message || "Ошибка при обновлении профиля");
+    return errorRes(res, 500, "Ошибка при обновлении профиля");
   }
 };
 
@@ -648,10 +649,9 @@ export const userDeleteProfileController = async (req, res) => {
 
     // Обработка специфичных ошибок MongoDB
     if (error.name === "CastError") {
-      return errorRes(res, 400, `Неверный формат данных: ${error.message}`);
+      return errorRes(res, 400, "Неверный формат данных");
     }
 
-    // Общая ошибка сервера
-    return errorRes(res, 500, error.message || "Ошибка при удалении профиля");
+    return errorRes(res, 500, "Ошибка при удалении профиля");
   }
 };

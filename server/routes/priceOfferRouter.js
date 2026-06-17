@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { createAsyncRouter } from "../utils/createAsyncRouter.js";
 
 import {
   getIncomingPriceOffersController,
@@ -7,7 +7,7 @@ import {
 } from "../controllers/index.js";
 import { checkAuthMW } from "../middlewares/index.js";
 
-const router = Router();
+const router = createAsyncRouter();
 
 router.get("/my-bids", checkAuthMW, getMyPriceOfferBidsController);
 router.get("/incoming", checkAuthMW, getIncomingPriceOffersController);

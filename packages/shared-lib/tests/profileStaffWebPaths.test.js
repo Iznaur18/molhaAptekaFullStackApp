@@ -1,14 +1,20 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { PROFILE_STAFF_SECTION_ORDER } from "../src/profileSections.ts";
 import {
+  isProfileStaffWebOnlySection,
+  PROFILE_SECTION_CREATE_RAFFLE,
   PROFILE_SECTION_WEB_PATH,
+  PROFILE_STAFF_IN_APP_SECTION_IDS,
+  PROFILE_STAFF_SECTION_ORDER,
   PROFILE_STAFF_WEB_ONLY_SECTION_IDS,
-} from "../src/profileStaffWebPaths.ts";
+} from "@izibuy/shared-lib";
 
-test("profile staff web paths: every staff hub section has web path", () => {
-  const missing = PROFILE_STAFF_SECTION_ORDER.filter(
+test("profile staff web paths: web-only staff sections have SPA path", () => {
+  const expectedWebOnly = PROFILE_STAFF_SECTION_ORDER.filter(
+    (sectionId) => !PROFILE_STAFF_IN_APP_SECTION_IDS.includes(sectionId),
+  );
+  const missing = expectedWebOnly.filter(
     (sectionId) => !(sectionId in PROFILE_SECTION_WEB_PATH),
   );
 
@@ -19,8 +25,15 @@ test("profile staff web paths: every staff hub section has web path", () => {
   );
   assert.equal(
     PROFILE_STAFF_WEB_ONLY_SECTION_IDS.length,
-    PROFILE_STAFF_SECTION_ORDER.length,
+    expectedWebOnly.length,
   );
+});
+
+test("profile staff web paths: create-raffle stays in-app on mobile", () => {
+  assert.ok(
+    PROFILE_STAFF_IN_APP_SECTION_IDS.includes(PROFILE_SECTION_CREATE_RAFFLE),
+  );
+  assert.equal(isProfileStaffWebOnlySection(PROFILE_SECTION_CREATE_RAFFLE), false);
 });
 
 test("profile staff web paths: paths are absolute SPA routes", () => {

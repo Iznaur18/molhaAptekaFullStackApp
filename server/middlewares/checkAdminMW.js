@@ -1,5 +1,5 @@
 import { UserModel } from "../models/index.js";
-import { errorRes } from "../utils/index.js";
+import { errorRes } from "../services/http/index.js";
 
 const ADMIN_ROLE = "admin";
 

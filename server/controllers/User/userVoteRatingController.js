@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { UserVoteRatingModel, UserModel } from "../../models/index.js";
-import { errorRes, successRes } from "../../utils/index.js";
+import { errorRes, successRes } from "../../services/http/index.js";
 import { USER_ME_RAITING } from "../../constants/constants.js";
 const VOTE_RESPONSE_USER_FIELDS = "_id userRatingByVotes userName email userAvatarUrl";
 
@@ -11,8 +11,7 @@ function toObjectId(id) {
 
 /** Оценка текущего пользователя (JWT) целевому: если уже голосовал — значение 1–10, иначе `null`. GET /vote/me/:userVoteTargetIdClient */
 export const getMyVoteForTargetController = async (req, res) => {
-  try {
-    const voterOid = toObjectId(req.userId);
+const voterOid = toObjectId(req.userId);
     const targetOid = toObjectId(req.params.userVoteTargetIdClient);
 
     if (String(voterOid) === String(targetOid)) {
@@ -29,16 +28,11 @@ export const getMyVoteForTargetController = async (req, res) => {
     return successRes(res, {
       myVoteValue: row?.userVoteValue ?? null,
     });
-  } catch (error) {
-    console.error("getMyVoteForTarget error:", error);
-    return errorRes(res, 500, error.message || "Ошибка при получении вашей оценки");
-  }
 };
 
 /** Голосование за пользователя: первый раз или обновление оценки. POST /vote/:userVoteTargetIdClient */
 export const userVoteRatingController = async (req, res) => {
-  try {
-    const targetOid = toObjectId(req.params.userVoteTargetIdClient);
+const targetOid = toObjectId(req.params.userVoteTargetIdClient);
     const voterOid = toObjectId(req.userId);
     const { userVoteValueClient } = req.body;
 
@@ -125,18 +119,12 @@ export const userVoteRatingController = async (req, res) => {
       });
       throw errorAfterSave;
     }
-  } catch (error) {
-    console.error("Vote error:", error);
-    const message = error.message || "Ошибка при голосовании за пользователя";
-    return errorRes(res, 500, message);
-  }
 };
 
 /** Получение рейтинга пользователя. GET /vote/rating/:userId */
 
 export const userGetRatingController = async (req, res) => {
-  try {
-    const { userIdClient } = req.params;
+const { userIdClient } = req.params;
 
     const userIdServer = await UserModel.findById(userIdClient)
       .select(USER_ME_RAITING)
@@ -161,8 +149,4 @@ export const userGetRatingController = async (req, res) => {
         },
       },
     });
-  } catch (error) {
-    console.error("Get rating error:", error);
-    return errorRes(res, 500, error.message || "Ошибка при получении рейтинга");
-  }
 };

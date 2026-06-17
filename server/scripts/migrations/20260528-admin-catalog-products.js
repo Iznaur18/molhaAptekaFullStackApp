@@ -1,4 +1,4 @@
-import { ADMIN_ROLE } from "../../utils/adminUserGuard.js";
+import { ADMIN_ROLE } from "../../services/access/adminUserGuard.js";
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
 
 /**

@@ -20,11 +20,10 @@ export {
 };
 export type { ProfileSectionId } from "@izibuy/shared-lib";
 
-/** Разделы, которые ведут на существующие stack-экраны, а не на /hub. */
+/** Разделы, которые ведут на существующие stack-экраны вне /hub. */
 export const PROFILE_SECTION_EXTERNAL_ROUTES: Partial<
   Record<ProfileSectionId, string>
 > = {
-  [PROFILE_SECTION_MY_ORDERS]: "/orders",
   [PROFILE_SECTION_EDIT_PROFILE]: "/profile/edit",
 };
 

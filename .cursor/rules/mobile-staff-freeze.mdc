@@ -15,4 +15,4 @@ alwaysApply: false
 - Существующие in-app staff экраны — **maintenance** (G.2), не расширять. Список: `mobile/README.md` § Staff inventory.
 - Buyer-critical path — **активная разработка** (G.3): `mobile/docs/BUYER-CRITICAL-PATH.md`.
 
-См. `mobile/docs/STAFF-WEB-ONLY.md`, `docs/client-mobile-consolidation-audit.md` §6–G.
+См. `mobile/docs/STAFF-WEB-ONLY.md`, `docs/client-mobile-consolidation-audit.md` §5–§6.

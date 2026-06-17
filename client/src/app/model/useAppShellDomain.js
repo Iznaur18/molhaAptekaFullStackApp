@@ -4,15 +4,15 @@ import { useCallback } from "react";
 import { invalidateCuratedProductLists } from "../../entities/curated-product-list/lib/curatedProductListQueryCache.js";
 import { invalidateCatalogProducts } from "../../entities/product/lib/catalogProductsQueryCache.js";
 import { invalidateMyProductsTotal } from "../../entities/product/lib/myProductsTotalQueryCache.js";
-import { useHomeCatalogLoader } from "../../pages/home/model/useHomeCatalogLoader.js";
-import { useHomeCatalogProductDetails } from "../../pages/home/model/useHomeCatalogProductDetails.js";
-import { useEmailVerificationGate } from "../../pages/home/model/useEmailVerificationGate.js";
-import { useHomeLogout } from "../../pages/home/model/useHomeLogout.js";
-import { useHomeMyProfileSession } from "../../pages/home/model/useHomeMyProfileSession.js";
-import { useHomeNotifications } from "../../pages/home/model/useHomeNotifications.js";
-import { useHomeProductActions } from "../../pages/home/model/useHomeProductActions.js";
-import { useHomeCuratedProductLists } from "../../pages/home/model/useHomeCuratedProductLists.js";
-import { useHomeProfileNavigation } from "../../pages/home/model/useHomeProfileNavigation.js";
+import { useHomeCatalogLoader } from "../../widgets/app-shell/model/useHomeCatalogLoader.js";
+import { useHomeCatalogProductDetails } from "../../widgets/app-shell/model/useHomeCatalogProductDetails.js";
+import { useEmailVerificationGate } from "../../widgets/app-shell/model/useEmailVerificationGate.js";
+import { useHomeLogout } from "../../widgets/app-shell/model/useHomeLogout.js";
+import { useHomeMyProfileSession } from "../../widgets/app-shell/model/useHomeMyProfileSession.js";
+import { useHomeNotifications } from "../../widgets/app-shell/model/useHomeNotifications.js";
+import { useHomeProductActions } from "../../widgets/app-shell/model/useHomeProductActions.js";
+import { useHomeCuratedProductLists } from "../../widgets/app-shell/model/useHomeCuratedProductLists.js";
+import { useHomeProfileNavigation } from "../../widgets/app-shell/model/useHomeProfileNavigation.js";
 
 /**
  * @param {Record<string, unknown>} shell

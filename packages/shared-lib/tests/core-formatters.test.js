@@ -1,9 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { formatIsoDateTime } from "../src/formatIsoDateTime.ts";
-import { formatPriceRub } from "../src/formatPriceRub.ts";
-import { normalizeUploadUrlForStorage } from "../src/normalizeUploadUrlForStorage.ts";
+import {
+  formatIsoDateTime,
+  formatPriceRub,
+  normalizeUploadUrlForStorage,
+} from "@izibuy/shared-lib";
 
 test("formatPriceRub: formats finite values and handles empty", () => {
   assert.match(formatPriceRub(12500), /12.*500.*₽/);
@@ -18,7 +20,10 @@ test("normalizeUploadUrlForStorage: keeps canonical /uploads path", () => {
     "/uploads/image.webp",
   );
   assert.equal(normalizeUploadUrlForStorage("/uploads/photo.png"), "/uploads/photo.png");
-  assert.equal(normalizeUploadUrlForStorage("https://cdn.example.com/image.jpg"), "https://cdn.example.com/image.jpg");
+  assert.equal(
+    normalizeUploadUrlForStorage("https://cdn.example.com/image.jpg"),
+    "https://cdn.example.com/image.jpg",
+  );
   assert.equal(normalizeUploadUrlForStorage(""), "");
 });
 

@@ -1,12 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { buildObjectStorageKey } from "../utils/objectStorageUpload.js";
+import { buildObjectStorageKey } from "../services/upload/objectStorageUpload.js";
 import {
   buildPublicUploadUrl,
   normalizeStoredUploadUrl,
-} from "../utils/buildPublicUploadUrl.js";
-import { validateObjectStorageEnv } from "../utils/objectStorageUpload.js";
+} from "../services/upload/buildPublicUploadUrl.js";
+import { validateObjectStorageEnv } from "../services/upload/objectStorageUpload.js";
+import { UPLOADS_DIR } from "../services/upload/uploadsDir.js";
 
 test("buildPublicUploadUrl uses PUBLIC_UPLOAD_BASE_URL as CDN origin", () => {
   const prev = process.env.PUBLIC_UPLOAD_BASE_URL;
@@ -75,4 +76,8 @@ test("validateObjectStorageEnv requires bucket and CDN when s3", () => {
       }
     }
   }
+});
+
+test("UPLOADS_DIR points at server/uploads (not services/uploads)", () => {
+  assert.match(UPLOADS_DIR.replaceAll("\\", "/"), /\/server\/uploads$/);
 });

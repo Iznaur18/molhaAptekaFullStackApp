@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { resolveUploadContentType } from "../utils/resolveUploadContentType.js";
-import { resolveUploadFileExtension } from "../utils/resolveUploadFileExtension.js";
+import { resolveUploadContentType } from "../services/upload/resolveUploadContentType.js";
+import { resolveUploadFileExtension } from "../services/upload/resolveUploadFileExtension.js";
 
 test("resolveUploadFileExtension maps iPhone quicktime to mov", () => {
   assert.equal(

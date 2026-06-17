@@ -11,23 +11,12 @@ import {
 import { assertProductionEnv } from "./utils/assertProductionEnv.js";
 import { isObjectStorageUploadEnabled } from "./utils/objectStorageUpload.js";
 import { ensureUploadsDir } from "./utils/uploadsDir.js";
-import { expireStaleUserStories } from "./utils/userStoryHelpers.js";
-import { processInstallmentCronTasks } from "./utils/installmentHelpers.js";
-import { processPremiumCronTasks } from "./utils/premiumAccess.js";
-import { expireProductPromotionsAndSendNotifications } from "./utils/productPromotionHelpers.js";
-import { processIntroAdCampaignCronTasks } from "./utils/introAdCampaignHelpers.js";
-import { processSellerPersonalCategoryCronTasks } from "./utils/sellerPersonalCategoryHelpers.js";
-import { INSTALLMENT_CRON_INTERVAL_MS } from "./constants/installmentConstants.js";
-import { PREMIUM_CRON_INTERVAL_MS } from "./constants/premiumConstants.js";
-import { PRODUCT_PROMOTION_CRON_INTERVAL_MS } from "./constants/productPromotionConstants.js";
-import { INTRO_AD_CRON_INTERVAL_MS } from "./constants/introAdCampaignConstants.js";
-import { SELLER_PERSONAL_CATEGORY_CRON_INTERVAL_MS } from "./constants/sellerPersonalCategoryConstants.js";
+import { connectMongoRead } from "./db/mongoReadConnection.js";
+import { startCronIntervals } from "./jobs/startCronIntervals.js";
 
 if (!isObjectStorageUploadEnabled()) {
   ensureUploadsDir();
 }
-
-const USER_STORY_CLEANUP_INTERVAL_MS = 15 * 60 * 1000;
 
 if (!process.env.JWT_SECRET) {
   console.error("JWT_SECRET не задан в .env");
@@ -68,41 +57,9 @@ async function start() {
     await mongoose.connect(process.env.MONGO_URI);
     console.log("Connected to MongoDB");
 
-    setInterval(() => {
-      void expireStaleUserStories().catch((error) => {
-        console.error("expireStaleUserStories error:", error);
-      });
-    }, USER_STORY_CLEANUP_INTERVAL_MS);
+    await connectMongoRead();
 
-    setInterval(() => {
-      void processInstallmentCronTasks().catch((error) => {
-        console.error("processInstallmentCronTasks error:", error);
-      });
-    }, INSTALLMENT_CRON_INTERVAL_MS);
-
-    setInterval(() => {
-      void processPremiumCronTasks().catch((error) => {
-        console.error("processPremiumCronTasks error:", error);
-      });
-    }, PREMIUM_CRON_INTERVAL_MS);
-
-    setInterval(() => {
-      void expireProductPromotionsAndSendNotifications().catch((error) => {
-        console.error("expireProductPromotionsAndSendNotifications error:", error);
-      });
-    }, PRODUCT_PROMOTION_CRON_INTERVAL_MS);
-
-    setInterval(() => {
-      void processIntroAdCampaignCronTasks().catch((error) => {
-        console.error("processIntroAdCampaignCronTasks error:", error);
-      });
-    }, INTRO_AD_CRON_INTERVAL_MS);
-
-    setInterval(() => {
-      void processSellerPersonalCategoryCronTasks().catch((error) => {
-        console.error("processSellerPersonalCategoryCronTasks error:", error);
-      });
-    }, SELLER_PERSONAL_CATEGORY_CRON_INTERVAL_MS);
+    startCronIntervals();
 
     app
       .listen(PORT, () => {

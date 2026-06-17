@@ -1,6 +1,7 @@
 /// <reference types="vitest/config" />
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import { visualizer } from "rollup-plugin-visualizer";
 
 import { buildSpaContentSecurityPolicy } from "../server/utils/buildSpaContentSecurityPolicy.js";
 
@@ -120,7 +121,17 @@ function spaCspPreviewPlugin() {
 // https://vite.dev/config/
 export default defineConfig({
   appType: "spa",
-  plugins: [react(), devLocalhostRedirectPlugin(), spaCspPreviewPlugin()],
+  plugins: [
+    react(),
+    devLocalhostRedirectPlugin(),
+    spaCspPreviewPlugin(),
+    process.env.ANALYZE === "true" &&
+      visualizer({
+        filename: "dist/stats.html",
+        gzipSize: true,
+        open: false,
+      }),
+  ].filter(Boolean),
   build: {
     sourcemap: "hidden",
     rollupOptions: {
@@ -128,6 +139,12 @@ export default defineConfig({
         manualChunks(id) {
           if (!id.includes("node_modules")) {
             return undefined;
+          }
+          if (id.includes("@sentry")) {
+            return "vendor-sentry";
+          }
+          if (id.includes("@tanstack/react-query")) {
+            return "vendor-query";
           }
           if (id.includes("react-router")) {
             return "vendor-router";
@@ -143,6 +160,9 @@ export default defineConfig({
           }
           if (id.includes("lucide-react")) {
             return "vendor-icons";
+          }
+          if (id.includes("@molha/api-contract") || id.includes("@izibuy/")) {
+            return "vendor-workspace";
           }
           return "vendor-misc";
         },

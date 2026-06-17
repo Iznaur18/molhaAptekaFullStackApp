@@ -1,36 +1,26 @@
-import * as Sentry from "@sentry/react";
-
-const dsn = import.meta.env.VITE_SENTRY_DSN?.trim();
+import { isClientSentryEnabled } from "./clientSentryEnv.js";
 
 /**
- * @returns {boolean}
+ * @returns {Promise<boolean>}
  */
-export function isClientSentryEnabled() {
-  return Boolean(dsn);
-}
-
-/**
- * @returns {boolean}
- */
-export function initClientSentry() {
-  if (!dsn) {
+export async function initClientSentry() {
+  if (!isClientSentryEnabled()) {
     return false;
   }
+
+  const Sentry = await import("@sentry/react");
 
   const tracesSampleRate = Number(import.meta.env.VITE_SENTRY_TRACES_SAMPLE_RATE ?? "0.1");
   const release = import.meta.env.VITE_GIT_COMMIT_SHA?.trim() || undefined;
 
   Sentry.init({
-    dsn,
+    dsn: import.meta.env.VITE_SENTRY_DSN?.trim(),
     environment: import.meta.env.MODE,
     release,
     enabled: true,
     integrations: [
       Sentry.browserTracingIntegration({
-        tracePropagationTargets: [
-          /^\//,
-          import.meta.env.VITE_API_URL,
-        ].filter(Boolean),
+        tracePropagationTargets: [/^\//, import.meta.env.VITE_API_URL].filter(Boolean),
       }),
     ],
     tracesSampleRate: Number.isFinite(tracesSampleRate) ? tracesSampleRate : 0.1,
@@ -51,5 +41,3 @@ export function initClientSentry() {
 
   return true;
 }
-
-export { Sentry };

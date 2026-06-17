@@ -19,6 +19,8 @@ export const USER_ROLE_LABEL_RU: Record<string, string> = {
   moderator: "Модератор",
 };
 
+export const NOTES_ABOUT_USER_MAX_CHARS = 500;
+
 export const DEFAULT_USER_AVATAR_URL =
   "https://i.pinimg.com/originals/c9/31/92/c93192b782081d4d1d70b03a3c1cf011.jpg";
 

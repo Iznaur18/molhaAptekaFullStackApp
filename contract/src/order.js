@@ -81,6 +81,24 @@ export const orderItemActionParamsSchema = z.object({
   itemIndex: z.coerce.number().int().min(0, "itemIndex должен быть целым числом >= 0"),
 });
 
+/** Синхрон с `server/models/InstallmentContractModel.js` — `cancellationReason.maxlength`. */
+export const ORDER_ITEM_CANCELLATION_REASON_MAX_LENGTH = 2000;
+
+/** Body `PATCH /order/:orderId/items/:itemIndex/cancelled` (рассрочка — причина отмены). */
+export const orderItemCancelBodySchema = z
+  .object({
+    reason: z
+      .string()
+      .trim()
+      .min(1, "Причина отмены не может быть пустой")
+      .max(
+        ORDER_ITEM_CANCELLATION_REASON_MAX_LENGTH,
+        `Причина отмены не более ${ORDER_ITEM_CANCELLATION_REASON_MAX_LENGTH} символов`,
+      )
+      .optional(),
+  })
+  .default({});
+
 export const updateOrderStatusBodySchema = z.object({
   status: z.enum(ORDER_STATUSES),
 });

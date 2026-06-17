@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { isAllowedUploadVideoFile } from "../utils/isAllowedUploadVideoFile.js";
+import { isAllowedUploadVideoFile } from "../services/upload/isAllowedUploadVideoFile.js";
 
 test("isAllowedUploadVideoFile accepts HEVC and iOS octet-stream uploads", () => {
   assert.equal(

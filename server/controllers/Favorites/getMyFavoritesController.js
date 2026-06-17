@@ -1,4 +1,4 @@
-import { errorRes, successRes } from "../../utils/index.js";
+import { errorRes, successRes } from "../../services/http/index.js";
 
 import {
   normalizeStoredWishlistItems,
@@ -10,8 +10,7 @@ import { resolveFavoritesUserId } from "./resolveFavoritesUserId.js";
 
 /** `GET /favorites` — список желаний с populate товаров. */
 export const getMyFavoritesController = async (req, res) => {
-  try {
-    const userId = resolveFavoritesUserId(req.userId);
+const userId = resolveFavoritesUserId(req.userId);
     if (!userId) {
       return errorRes(res, 401, "Не авторизован");
     }
@@ -25,8 +24,4 @@ export const getMyFavoritesController = async (req, res) => {
     const payload = await syncWishlistForUser(req.userId, normalized);
 
     return successRes(res, payload);
-  } catch (error) {
-    console.error("getMyFavoritesController error:", error);
-    return errorRes(res, 500, "Не удалось загрузить список желаний");
-  }
 };

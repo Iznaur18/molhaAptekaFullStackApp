@@ -4,7 +4,7 @@ import { useState } from "react";
 import { usePendingProductPromotionsQuery } from "../../../entities/product-promotion/model/usePendingProductPromotionsQuery.js";
 import { useProductPromotionStaffMutations } from "../../../entities/product-promotion/model/useProductPromotionStaffMutations.js";
 import { productPromotionQueryKeys } from "../../../entities/product-promotion/model/productPromotionQueryKeys.js";
-import { syncProductPromotionsStaffQueueCaches } from "../../../pages/home/lib/staffBadgeQueryCache.js";
+import { syncProductPromotionsStaffQueueCaches } from "../../../widgets/app-shell/lib/staffBadgeQueryCache.js";
 import {
   API_CLIENT_UI,
   PRODUCT_PROMOTIONS_STAFF_PAGE_UI,

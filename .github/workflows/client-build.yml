@@ -35,5 +35,8 @@ jobs:
       - name: Install client dependencies
         run: npm install
 
+      - name: Build shared-lib
+        run: npm run build --workspace=@izibuy/shared-lib
+
       - name: Production build
         run: npm run build

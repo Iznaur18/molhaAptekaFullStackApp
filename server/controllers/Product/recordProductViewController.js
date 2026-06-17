@@ -1,12 +1,11 @@
 import { ProductModel, ProductViewModel } from "../../models/index.js";
-import { errorRes, successRes } from "../../utils/index.js";
+import { errorRes, successRes } from "../../services/http/index.js";
 
 const isDuplicateKeyError = (error) => error?.code === 11000;
 
 /** `POST /product/:productId/view` — уникальный просмотр (Bearer, не продавец товара). */
 export const recordProductViewController = async (req, res) => {
-  try {
-    const viewerUserId = String(req.userId);
+const viewerUserId = String(req.userId);
     const { productId } = req.params;
 
     const product = await ProductModel.findById(productId)
@@ -54,8 +53,4 @@ export const recordProductViewController = async (req, res) => {
       }
       throw error;
     }
-  } catch (error) {
-    console.error("recordProductViewController error:", error);
-    return errorRes(res, 500, "Ошибка при записи просмотра");
-  }
 };

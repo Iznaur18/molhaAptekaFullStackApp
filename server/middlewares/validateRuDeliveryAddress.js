@@ -1,5 +1,5 @@
 import { verifyRuDeliveryAddress } from "../utils/dadata/verifyRuDeliveryAddress.js";
-import { errorRes } from "../utils/index.js";
+import { errorRes } from "../services/http/index.js";
 
 /**
  * DaData-проверка адреса доставки после Zod-структуры тела.

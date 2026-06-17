@@ -8,15 +8,14 @@ import {
   followUser,
   listUserFollowRelations,
   unfollowUser,
-} from "../../utils/userFollowHelpers.js";
-import { errorRes, successRes } from "../../utils/index.js";
+} from "../../services/user/userFollowHelpers.js";
+import { errorRes, successRes } from "../../services/http/index.js";
 
 /**
  * `POST /user/:userIdClient/follow`
  */
 export const followUserController = async (req, res) => {
-  try {
-    const followerId = String(req.userId);
+const followerId = String(req.userId);
     const followingId = String(req.params.userIdClient);
 
     const result = await followUser(followerId, followingId);
@@ -36,18 +35,13 @@ export const followUserController = async (req, res) => {
       followersCount: result.followersCount,
       followingCount: result.followingCount,
     });
-  } catch (error) {
-    console.error("followUserController error:", error);
-    return errorRes(res, 500, "Ошибка при подписке");
-  }
 };
 
 /**
  * `DELETE /user/:userIdClient/follow`
  */
 export const unfollowUserController = async (req, res) => {
-  try {
-    const followerId = String(req.userId);
+const followerId = String(req.userId);
     const followingId = String(req.params.userIdClient);
 
     const result = await unfollowUser(followerId, followingId);
@@ -58,18 +52,13 @@ export const unfollowUserController = async (req, res) => {
       followersCount: result.followersCount,
       followingCount: result.followingCount,
     });
-  } catch (error) {
-    console.error("unfollowUserController error:", error);
-    return errorRes(res, 500, "Ошибка при отписке");
-  }
 };
 
 /**
  * `GET /user/me/following`
  */
 export const listMyFollowingController = async (req, res) => {
-  try {
-    const data = await listUserFollowRelations({
+const data = await listUserFollowRelations({
       userId: String(req.userId),
       role: "following",
       page: req.query.page,
@@ -77,18 +66,13 @@ export const listMyFollowingController = async (req, res) => {
     });
 
     return successRes(res, data);
-  } catch (error) {
-    console.error("listMyFollowingController error:", error);
-    return errorRes(res, 500, "Ошибка при загрузке подписок");
-  }
 };
 
 /**
  * `GET /user/me/followers`
  */
 export const listMyFollowersController = async (req, res) => {
-  try {
-    const data = await listUserFollowRelations({
+const data = await listUserFollowRelations({
       userId: String(req.userId),
       role: "followers",
       page: req.query.page,
@@ -96,8 +80,4 @@ export const listMyFollowersController = async (req, res) => {
     });
 
     return successRes(res, data);
-  } catch (error) {
-    console.error("listMyFollowersController error:", error);
-    return errorRes(res, 500, "Ошибка при загрузке подписчиков");
-  }
 };

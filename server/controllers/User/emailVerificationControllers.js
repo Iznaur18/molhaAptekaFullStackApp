@@ -5,17 +5,16 @@ import {
   EMAIL_VERIFICATION_SENT_MESSAGE,
   EMAIL_VERIFICATION_SUCCESS_MESSAGE,
 } from "../../constants/emailVerificationConstants.js";
-import { errorRes, successRes } from "../../utils/index.js";
+import { errorRes, successRes } from "../../services/http/index.js";
+import { enqueueSendEmailVerification } from "../../queues/enqueueSendEmailVerification.js";
 import {
-  sendEmailVerificationForUser,
   verifyEmailByCodeForUser,
   verifyEmailByToken,
-} from "../../utils/emailVerification.js";
+} from "../../services/auth/emailVerification.js";
 
 /** `GET /auth/verify-email?token=...` — подтверждение email по ссылке. */
 export const verifyEmailController = async (req, res) => {
-  try {
-    const token = req.query?.token;
+const token = req.query?.token;
     const frontendUrl = (process.env.FRONTEND_URL ?? "http://127.0.0.1:5173").replace(
       /\/$/,
       "",
@@ -36,19 +35,14 @@ export const verifyEmailController = async (req, res) => {
     return res.redirect(
       `${frontendUrl}/?emailVerified=1&message=${encodeURIComponent(EMAIL_VERIFICATION_SUCCESS_MESSAGE)}`,
     );
-  } catch (error) {
-    console.error("verifyEmailController error:", error);
-    return errorRes(res, 500, "Ошибка при подтверждении email");
-  }
 };
 
 /** `POST /auth/resend-verification` — повторная отправка (auth). */
 export const resendEmailVerificationController = async (req, res) => {
-  try {
-    const userId = req.userId;
+const userId = req.userId;
 
     try {
-      await sendEmailVerificationForUser(userId);
+      await enqueueSendEmailVerification(userId);
     } catch (sendError) {
       const message =
         sendError instanceof Error ? sendError.message : "Не удалось отправить письмо";
@@ -58,16 +52,11 @@ export const resendEmailVerificationController = async (req, res) => {
     }
 
     return successRes(res, { message: EMAIL_VERIFICATION_SENT_MESSAGE });
-  } catch (error) {
-    console.error("resendEmailVerificationController error:", error);
-    return errorRes(res, 500, "Ошибка при отправке письма");
-  }
 };
 
 /** `POST /auth/verify-email` — подтверждение email кодом из письма (auth). */
 export const verifyEmailWithCodeController = async (req, res) => {
-  try {
-    const userId = req.userId;
+const userId = req.userId;
     const code = req.body?.code;
 
     try {
@@ -83,16 +72,11 @@ export const verifyEmailWithCodeController = async (req, res) => {
     }
 
     return successRes(res, { message: EMAIL_VERIFICATION_SUCCESS_MESSAGE });
-  } catch (error) {
-    console.error("verifyEmailWithCodeController error:", error);
-    return errorRes(res, 500, "Ошибка при подтверждении email");
-  }
 };
 
 /** `GET /auth/verify-email/status` — JSON-подтверждение (для клиента без redirect). */
 export const verifyEmailJsonController = async (req, res) => {
-  try {
-    const token = req.query?.token;
+const token = req.query?.token;
     try {
       await verifyEmailByToken(token);
     } catch (verificationError) {
@@ -105,8 +89,4 @@ export const verifyEmailJsonController = async (req, res) => {
       );
     }
     return successRes(res, { message: EMAIL_VERIFICATION_SUCCESS_MESSAGE });
-  } catch (error) {
-    console.error("verifyEmailJsonController error:", error);
-    return errorRes(res, 500, "Ошибка при подтверждении email");
-  }
 };
