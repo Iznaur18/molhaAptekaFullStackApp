@@ -6,7 +6,7 @@ import { E2E_SELLER } from "./helpers/fixtures.js";
 const UNIQUE_NAME = `E2E UI Product ${Date.now()}`;
 const DESCRIPTION = "Описание товара для Playwright e2e, не короче десяти символов.";
 
-test("продавец: разместить товар через модалку", async ({ page }) => {
+test("продавец: разместить товар через пошаговую модалку", async ({ page }) => {
   await loginViaHeaderModal(page, E2E_SELLER);
 
   await page.goto("/");
@@ -17,10 +17,12 @@ test("продавец: разместить товар через модалк�
 
   await dialog.locator('input[name="productName"]').fill(UNIQUE_NAME);
   await dialog.locator('textarea[name="productDescription"]').fill(DESCRIPTION);
-  await dialog.locator('input[name="productPrice"]').fill("250");
+  await dialog.getByRole("button", { name: "Далее", exact: true }).click();
+
   await dialog
     .getByLabel("Ссылка на изображение 1")
     .fill("https://example.com/e2e-ui-product.jpg");
+  await dialog.getByRole("button", { name: "Далее", exact: true }).click();
 
   await pickLeafCategory(dialog, [
     "Электроника",
@@ -28,8 +30,12 @@ test("продавец: разместить товар через модалк�
     "Мобильные телефоны",
     "Смартфоны",
   ]);
+  await dialog.getByRole("button", { name: "Далее", exact: true }).click();
 
-  await dialog.getByRole("button", { name: "Создать", exact: true }).click();
+  await dialog.locator('input[name="productPrice"]').fill("250");
+  await dialog.getByRole("button", { name: "Далее", exact: true }).click();
+
+  await dialog.getByRole("button", { name: "Отправить на проверку", exact: true }).click();
 
   await expect(page).toHaveURL(/\/my-products/, { timeout: 20_000 });
   await expect(

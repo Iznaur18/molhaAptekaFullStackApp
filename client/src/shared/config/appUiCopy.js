@@ -1122,6 +1122,49 @@ export const CREATE_PRODUCT_MODAL_UI = {
   PLACEHOLDER_CHARACTERISTIC_VALUE: "Значение",
   ADD_CHARACTERISTIC_ROW: "+ Характеристика",
   CHARACTERISTIC_ROW_ARIA: (index) => `Характеристика ${index}`,
+  WIZARD_ERROR_NAME: "Название: не короче 3 символов",
+  WIZARD_STEP_BASIC_TITLE: "О товаре",
+  WIZARD_STEP_BASIC_SUBTITLE: "Название и описание — первое, что видит покупатель",
+  WIZARD_STEP_MEDIA_TITLE: "Фото и видео",
+  WIZARD_STEP_MEDIA_SUBTITLE: "Добавьте до 5 фото. Первое фото станет обложкой",
+  WIZARD_STEP_CATEGORY_TITLE: "Категория и город",
+  WIZARD_STEP_CATEGORY_SUBTITLE: "Помогите покупателям найти товар в каталоге",
+  WIZARD_STEP_COMMERCE_TITLE: "Цена и наличие",
+  WIZARD_STEP_COMMERCE_SUBTITLE: "Укажите стоимость и сколько единиц готовы продать",
+  WIZARD_STEP_REVIEW_TITLE: "Проверка",
+  WIZARD_STEP_REVIEW_SUBTITLE: "Всё верно? Отправим товар на модерацию",
+  WIZARD_MEDIA_LEAD: "Фото необязательны, но с ними товар продаётся быстрее.",
+  WIZARD_CATEGORY_LEAD: "Выберите самую точную подкатегорию.",
+  WIZARD_COMMERCE_LEAD: "Старая цена покажет скидку, если она выше текущей.",
+  WIZARD_REVIEW_LEAD: "Проверьте данные перед публикацией. Любой блок можно изменить.",
+  WIZARD_REVIEW_EDIT: "Изменить",
+  WIZARD_REVIEW_EMPTY: "—",
+  WIZARD_REVIEW_ALL_CITIES: "Все города",
+  WIZARD_REVIEW_HIDDEN: "Скрыт из каталога",
+  /** @param {number} imageCount @param {unknown} previewVideoUrl */
+  WIZARD_REVIEW_MEDIA: (imageCount, previewVideoUrl) => {
+    const parts = [];
+    if (imageCount > 0) {
+      parts.push(`${imageCount} фото`);
+    }
+    if (String(previewVideoUrl ?? "").trim()) {
+      parts.push("видео");
+    }
+    return parts.length > 0 ? parts.join(", ") : "Без медиа";
+  },
+  WIZARD_PLACEHOLDER_NAME: "Например: iPhone 15 Pro 256 ГБ",
+  WIZARD_PLACEHOLDER_DESCRIPTION: "Состояние, комплектация, особенности…",
+  WIZARD_BACK: "Назад",
+  WIZARD_NEXT: "Далее",
+  WIZARD_SUBMIT: "Отправить на проверку",
+  WIZARD_PROGRESS_ARIA: "Шаги размещения товара",
+  /** @param {number} current @param {number} total */
+  WIZARD_STEP_OF: (current, total) => `Шаг ${current} из ${total}`,
+  WIZARD_STEP_LABEL_BASIC: "О товаре",
+  WIZARD_STEP_LABEL_MEDIA: "Медиа",
+  WIZARD_STEP_LABEL_CATEGORY: "Категория",
+  WIZARD_STEP_LABEL_COMMERCE: "Цена",
+  WIZARD_STEP_LABEL_REVIEW: "Проверка",
   REMOVE_CHARACTERISTIC_ROW_ARIA: (index) => `Удалить характеристику ${index}`,
   ERROR_CHARACTERISTIC_PAIR: "У каждой характеристики должны быть и ключ, и значение",
   ERROR_CHARACTERISTIC_KEY_MAX: (max) =>
