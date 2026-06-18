@@ -2,6 +2,7 @@ import { Pressable, Text, View } from "react-native";
 
 import { THEME_SETTINGS_UI } from "@/shared/config";
 import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useThemePreferenceToggleStyles } from "@/shared/theme/profileChromeStyles";
 import type { ThemePreference } from "@/shared/theme/themePreferenceStorage";
 
@@ -13,10 +14,11 @@ const OPTIONS: Array<{ value: ThemePreference; label: string }> = [
 
 export const ThemePreferenceToggle = () => {
   const styles = useThemePreferenceToggleStyles();
+  const { profileContentStyle } = useScreenLayout();
   const { preference, setPreference } = useAppThemeSettings();
 
   return (
-    <View style={styles.root}>
+    <View style={[styles.root, profileContentStyle]}>
       <Text style={styles.label}>{THEME_SETTINGS_UI.LABEL}</Text>
       <View style={styles.row}>
         {OPTIONS.map((option) => {

@@ -3,8 +3,7 @@ import { useCallback, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 import { patchProductInAllCatalogCaches } from "../../../entities/product/lib/catalogProductsQueryCache.js";
-import { isRaffleProductsPath } from "../../../shared/lib/rafflePaths.js";
-import { isSellerProductsPath } from "../../../shared/lib/sellerPaths.js";
+import { resolveCatalogDetailsShowAddToCart } from "../lib/resolveCatalogDetailsShowAddToCart.js";
 import { useEnsureCatalogProduct } from "../../../entities/product/model/useEnsureCatalogProduct.js";
 import { isCurrentUserProductSeller } from "../../../entities/product/lib/isCurrentUserProductSeller.js";
 import { PRODUCT_MODERATION_APPROVED } from "../../../entities/product/model/productModerationConstants.js";
@@ -66,25 +65,16 @@ export const useHomeCatalogProductDetails = ({
     return isCurrentUserProductSeller(product, currentUserId);
   }, [catalogProductDetails, isAuthorized, currentUserId, isAdmin, isMineMode]);
 
-  const catalogDetailsShowAddToCart = useMemo(() => {
-    const product = catalogProductDetails;
-    if (!product) {
-      return false;
-    }
-    if (
-      isSellerProductsPath(location.pathname) ||
-      isRaffleProductsPath(location.pathname)
-    ) {
-      return false;
-    }
-    if (isMineMode) {
-      return false;
-    }
-    if (isCurrentUserProductSeller(product, currentUserId)) {
-      return false;
-    }
-    return true;
-  }, [catalogProductDetails, currentUserId, isMineMode, location.pathname]);
+  const catalogDetailsShowAddToCart = useMemo(
+    () =>
+      resolveCatalogDetailsShowAddToCart({
+        product: catalogProductDetails,
+        pathname: location.pathname,
+        isMineMode,
+        currentUserId,
+      }),
+    [catalogProductDetails, currentUserId, isMineMode, location.pathname],
+  );
 
   /** @param {string} productId */
   const handleCatalogProductClick = useCallback(

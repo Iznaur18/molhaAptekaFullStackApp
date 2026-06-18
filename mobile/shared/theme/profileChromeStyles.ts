@@ -1,12 +1,14 @@
 import { StyleSheet } from "react-native";
 
+import { PROFILE_CONTENT_MAX_WIDTH_PHONE } from "@/shared/lib/screenBreakpoints";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import {
   SCREEN_CONTENT_PADDING_BOTTOM,
   SCREEN_CONTENT_PADDING_HORIZONTAL,
 } from "@/shared/theme/screenContentLayout";
 
-export const PROFILE_CONTENT_MAX_WIDTH = 420;
+/** @deprecated используйте resolveProfileContentMaxWidth / useScreenLayout */
+export const PROFILE_CONTENT_MAX_WIDTH = PROFILE_CONTENT_MAX_WIDTH_PHONE;
 export const PROFILE_ACTIONS_MAX_WIDTH = 320;
 const PROFILE_AVATAR_SIZE = 72;
 const PROFILE_BANNER_HEIGHT = PROFILE_AVATAR_SIZE * 3;
@@ -17,6 +19,7 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
     paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
     paddingTop: theme.spacing[3],
     paddingBottom: SCREEN_CONTENT_PADDING_BOTTOM,
+    gap: theme.spacing[3],
     backgroundColor: theme.colors.bg,
   },
   bodyCard: {
@@ -24,8 +27,14 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
     borderColor: theme.colors.border,
     borderRadius: 14,
     backgroundColor: theme.colors.surface,
-    padding: theme.spacing[4],
+    paddingVertical: theme.spacing[3],
+    paddingHorizontal: 7,
     gap: theme.spacing[3],
+    shadowColor: theme.colors.nearBlack,
+    shadowOpacity: 0.06,
+    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 1,
   },
   guestContent: {
     flexGrow: 1,
@@ -153,17 +162,22 @@ export const useProfileMobileNavToggleStyles = createThemedStyles((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing[3],
-    paddingVertical: theme.spacing[3],
-    paddingHorizontal: theme.spacing[3],
-    borderRadius: theme.radius.md,
+    paddingVertical: 11,
+    paddingHorizontal: 14,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.actionSurface,
+    shadowColor: theme.colors.action,
+    shadowOpacity: 0.1,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 2,
   },
   iconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: theme.radius.sm,
+    width: 34,
+    height: 34,
+    borderRadius: 9,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: theme.colors.actionSurface,
@@ -175,15 +189,15 @@ export const useProfileMobileNavToggleStyles = createThemedStyles((theme) => ({
   },
   caption: {
     fontSize: 11,
-    fontWeight: "600",
+    fontWeight: "700",
     textTransform: "uppercase",
-    letterSpacing: 0.4,
-    color: theme.colors.textMuted,
+    letterSpacing: 0.8,
+    color: theme.colors.primaryBright,
   },
   label: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "700",
-    color: theme.colors.text,
+    color: theme.colors.primary,
   },
 }));
 
@@ -191,7 +205,7 @@ export const useProfileMobileNavSheetStyles = createThemedStyles((theme) => ({
   backdrop: {
     flex: 1,
     flexDirection: "row",
-    backgroundColor: "rgba(0,0,0,0.35)",
+    backgroundColor: "rgba(0,0,0,0.48)",
   },
   backdropPress: {
     flex: 1,
@@ -203,10 +217,10 @@ export const useProfileMobileNavSheetStyles = createThemedStyles((theme) => ({
     borderTopLeftRadius: 16,
     borderBottomLeftRadius: 16,
     shadowColor: theme.colors.nearBlack,
-    shadowOpacity: 0.15,
-    shadowRadius: 16,
-    shadowOffset: { width: -4, height: 0 },
-    elevation: 8,
+    shadowOpacity: 0.18,
+    shadowRadius: 32,
+    shadowOffset: { width: -12, height: 0 },
+    elevation: 12,
   },
   sheetContent: {
     padding: theme.spacing[4],
@@ -243,9 +257,8 @@ export const useProfileMobileNavSheetStyles = createThemedStyles((theme) => ({
 export const useProfileHubMenuStyles = createThemedStyles((theme) => ({
   root: {
     width: "100%",
-    maxWidth: PROFILE_CONTENT_MAX_WIDTH,
     marginTop: theme.spacing[5],
-    gap: theme.spacing[4],
+    gap: theme.spacing[2],
   },
   rootSheet: {
     marginTop: 0,
@@ -253,38 +266,49 @@ export const useProfileHubMenuStyles = createThemedStyles((theme) => ({
   },
   heading: {
     fontSize: 18,
-    fontWeight: "700",
+    fontWeight: "800",
+    letterSpacing: -0.3,
     textAlign: "center",
-    color: theme.colors.text,
+    color: theme.colors.primary,
   },
   group: {
-    gap: theme.spacing[2],
+    gap: 2,
+    paddingVertical: theme.spacing[2],
+    paddingHorizontal: theme.spacing[2],
+  },
+  groupDivided: {
+    marginTop: theme.spacing[1],
+    paddingTop: theme.spacing[3],
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
   },
   groupLabel: {
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: 11,
+    fontWeight: "800",
     textTransform: "uppercase",
-    letterSpacing: 0.4,
-    marginBottom: 2,
-    color: theme.colors.textMuted,
+    letterSpacing: 0.7,
+    marginBottom: theme.spacing[2],
+    paddingHorizontal: 9,
+    color: theme.colors.primaryBright,
   },
   item: {
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing[2],
-    paddingVertical: theme.spacing[3],
-    paddingHorizontal: 14,
-    borderRadius: theme.radius.button,
-    backgroundColor: theme.colors.surfaceMuted,
+    paddingVertical: 10,
+    paddingRight: 10,
+    paddingLeft: 7,
+    borderRadius: 10,
+    backgroundColor: "transparent",
     borderLeftWidth: 3,
     borderLeftColor: "transparent",
   },
-  itemActive: {
-    borderLeftColor: theme.colors.action,
-    backgroundColor: theme.colors.actionSurface,
-  },
-  itemCta: {
-    backgroundColor: theme.colors.action,
+  itemIconWrap: {
+    width: 30,
+    height: 30,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
   },
   itemDisabled: {
     opacity: 0.45,
@@ -292,15 +316,8 @@ export const useProfileHubMenuStyles = createThemedStyles((theme) => ({
   itemLabel: {
     flex: 1,
     fontSize: 15,
-    fontWeight: "500",
-    color: theme.colors.text,
-  },
-  itemLabelActive: {
-    fontWeight: "700",
-    color: theme.colors.action,
-  },
-  itemLabelCta: {
-    color: theme.colors.onContrast,
+    fontWeight: "600",
+    color: theme.colors.textSecondary,
   },
   itemLabelDisabled: {
     opacity: 0.45,
@@ -329,7 +346,6 @@ export const useProfileHubMenuStyles = createThemedStyles((theme) => ({
 export const useThemePreferenceToggleStyles = createThemedStyles((theme) => ({
   root: {
     width: "100%",
-    maxWidth: PROFILE_CONTENT_MAX_WIDTH,
     gap: theme.spacing[2],
     marginTop: theme.spacing[2],
   },

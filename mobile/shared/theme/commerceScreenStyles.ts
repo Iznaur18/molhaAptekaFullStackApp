@@ -401,6 +401,10 @@ export const useCachedProductImageStyles = createThemedStyles((theme) => ({
 }));
 
 export const useRaffleProductsPageStyles = createThemedStyles((theme) => ({
+  flex: {
+    flex: 1,
+    backgroundColor: theme.colors.bg,
+  },
   list: {
     padding: 6,
     flexGrow: 1,

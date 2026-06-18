@@ -68,6 +68,12 @@
   border-top: 1px solid color-mix(in srgb, var(--iz-color-border) 70%, transparent);
 }
 
+.my-profile-page__nav-group_logout {
+  margin-top: 0.35rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid color-mix(in srgb, var(--iz-color-border) 70%, transparent);
+}
+
 .my-profile-page__nav-group-label {
   margin: 0 0 0.4rem;
   padding: 0 0.55rem;
@@ -318,14 +324,6 @@
 .my-profile-page__nav-button:disabled {
   opacity: 0.45;
   cursor: not-allowed;
-}
-
-.my-profile-page__sidebar-footer {
-  margin-top: auto;
-  padding: 0.45rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-danger-accent) 35%, var(--iz-color-border));
-  border-radius: 0.75rem;
-  background: color-mix(in srgb, var(--iz-color-danger-soft) 55%, var(--iz-color-surface));
 }
 
 .my-profile-page__main {

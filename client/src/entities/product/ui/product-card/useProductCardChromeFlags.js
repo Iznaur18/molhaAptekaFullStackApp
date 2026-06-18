@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 
+import { SHOW_ADD_TO_CART_ON_CATALOG_CARD } from "../../lib/catalogCardPurchasePolicy.js";
 import { isProductRaffleParticipant } from "../../../raffle/lib/isProductRaffleParticipant.js";
 import { resolveAuctionUiState } from "../../lib/resolveAuctionUiState.js";
 import { shouldShowPremiumProductCardChrome } from "../../lib/isPremiumSellerProduct.js";
@@ -25,7 +26,6 @@ export function useProductCardChromeFlags(props, currentUserId) {
     promotionFullWidth = false,
     highlightRaffleProduct = false,
     isModerationQueue = false,
-    showAddToCartOnCard = true,
     onDeleteProduct,
   } = props;
 
@@ -76,8 +76,8 @@ export function useProductCardChromeFlags(props, currentUserId) {
     (highlightRaffleProduct || showRaffleBadge) && !isMineMode && !isModerationQueue;
 
   const showAddToCartButton =
+    SHOW_ADD_TO_CART_ON_CATALOG_CARD &&
     !isModerationQueue &&
-    (showAddToCartOnCard || showBannerLayout) &&
     product.productIsAvailable !== false &&
     product._id != null &&
     !isCurrentUserProductSeller(product, currentUserId);

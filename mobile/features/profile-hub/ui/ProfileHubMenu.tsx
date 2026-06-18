@@ -1,8 +1,9 @@
 import { useRouter } from "expo-router";
 import { useMemo } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 import { buildProfileNavGroups } from "@/features/profile-hub/model/buildProfileNavGroups";
+import { enrichProfileNavItem } from "@/features/profile-hub/lib/enrichProfileNavItem";
 import { openProfileStaffWebSection } from "@/features/profile-hub/lib/openProfileStaffWebSection";
 import {
   isProfileStaffWebOnlySection,
@@ -12,63 +13,16 @@ import {
 } from "@/features/profile-hub/model/profileSections";
 import { useProfileHubAccess } from "@/features/profile-hub/model/useProfileHubAccess";
 import { useStaffHubBadgeCounts } from "@/features/profile-hub/model/useStaffHubBadgeCounts";
+import { ProfileHubNavItem } from "@/features/profile-hub/ui/ProfileHubNavItem";
 import { MY_PROFILE_PAGE_UI } from "@/shared/config";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useProfileHubMenuStyles } from "@/shared/theme/profileChromeStyles";
-
-import type { ProfileNavItem } from "../model/buildProfileNavGroups";
 
 type ProfileHubMenuProps = {
   activeSectionId?: ProfileSectionId;
   onOverviewPress?: () => void;
   onNavigate?: () => void;
   variant?: "inline" | "sheet";
-};
-
-const ProfileHubNavItem = ({
-  item,
-  isActive,
-  onPress,
-}: {
-  item: ProfileNavItem;
-  isActive: boolean;
-  onPress: () => void;
-}) => {
-  const styles = useProfileHubMenuStyles();
-  const isCta = item.variant === "cta";
-  const isDisabled = item.disabled === true;
-
-  return (
-    <Pressable
-      style={[
-        styles.item,
-        isActive && styles.itemActive,
-        isCta && styles.itemCta,
-        isDisabled && styles.itemDisabled,
-      ]}
-      onPress={onPress}
-      disabled={isDisabled}
-      accessibilityState={{ selected: isActive }}
-    >
-      <Text
-        style={[
-          styles.itemLabel,
-          isActive && styles.itemLabelActive,
-          isCta && styles.itemLabelCta,
-          isDisabled && styles.itemLabelDisabled,
-        ]}
-      >
-        {item.label}
-      </Text>
-      {item.showAlert ? <View style={styles.alertDot} /> : null}
-      {item.badgeCount != null && item.badgeCount > 0 ? (
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>
-            {MY_PROFILE_PAGE_UI.TAB_BADGE(item.badgeCount)}
-          </Text>
-        </View>
-      ) : null}
-    </Pressable>
-  );
 };
 
 export const ProfileHubMenu = ({
@@ -79,13 +33,17 @@ export const ProfileHubMenu = ({
 }: ProfileHubMenuProps) => {
   const router = useRouter();
   const styles = useProfileHubMenuStyles();
+  const { profileContentStyle } = useScreenLayout();
   const hubAccess = useProfileHubAccess();
   const badgeCounts = useStaffHubBadgeCounts(hubAccess);
 
-  const navGroups = useMemo(
-    () => buildProfileNavGroups(hubAccess, badgeCounts),
-    [hubAccess, badgeCounts],
-  );
+  const navGroups = useMemo(() => {
+    const groups = buildProfileNavGroups(hubAccess, badgeCounts);
+    return groups.map((group) => ({
+      ...group,
+      items: group.items.map(enrichProfileNavItem),
+    }));
+  }, [hubAccess, badgeCounts]);
 
   const openSection = async (sectionId: ProfileSectionId) => {
     if (sectionId === PROFILE_SECTION_OVERVIEW) {
@@ -112,19 +70,22 @@ export const ProfileHubMenu = ({
 
   return (
     <View
-      style={[styles.root, variant === "sheet" && styles.rootSheet]}
+      style={[styles.root, profileContentStyle, variant === "sheet" && styles.rootSheet]}
       accessibilityLabel={MY_PROFILE_PAGE_UI.NAV_ARIA}
     >
       <Text style={styles.heading}>{MY_PROFILE_PAGE_UI.TAB_TITLE}</Text>
-      {navGroups.map((group) => (
-        <View key={group.id} style={styles.group}>
+      {navGroups.map((group, groupIndex) => (
+        <View
+          key={group.id}
+          style={[styles.group, groupIndex > 0 && styles.groupDivided]}
+        >
           {group.label ? <Text style={styles.groupLabel}>{group.label}</Text> : null}
           {group.items.map((item) => (
             <ProfileHubNavItem
               key={item.sectionId}
               item={item}
               isActive={activeSectionId === item.sectionId}
-              onPress={() => openSection(item.sectionId)}
+              onPress={() => void openSection(item.sectionId)}
             />
           ))}
         </View>

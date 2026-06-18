@@ -71,6 +71,10 @@
     "generate:store-feature-graphic": "node scripts/generate-store-feature-graphic.mjs",
     "capture:store-screenshots": "node scripts/capture-store-screenshots.mjs",
     "regression:wf72": "node scripts/wf72-regression.mjs",
+    "test:product-card-gallery": "node --test scripts/product-card-gallery-actions.test.mjs",
+    "test:profile-nav-chrome": "npm run build --prefix ../packages/shared-lib && node --test scripts/profile-nav-chrome.test.mjs",
+    "test:screen-layout": "node --test scripts/screen-layout.test.mjs",
+    "test:raffle-featured-slide": "node --test scripts/raffle-featured-slide-layout.test.mjs",
     "smoke:buyer-path": "node scripts/buyer-path-api-smoke.mjs"
   },
   "private": true

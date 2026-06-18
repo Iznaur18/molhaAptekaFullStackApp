@@ -2,6 +2,7 @@ import { MY_PROFILE_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
 import { ProfileTabAlert } from "./ProfileTabAlert.jsx";
 import { ProfileTabBadge } from "./ProfileTabBadge.jsx";
+import { ProfileSidebarLogout } from "./ProfileSidebarLogout.jsx";
 
 /**
  * @typedef {{
@@ -30,10 +31,11 @@ import { ProfileTabBadge } from "./ProfileTabBadge.jsx";
  *   groups: ProfileNavGroup[];
  *   activeTab: string;
  *   onItemSelect?: () => void;
+ *   onLogout?: () => void | Promise<void>;
  *   id?: string;
  * }} props
  */
-export function ProfileSidebar({ groups, activeTab, onItemSelect, id }) {
+export function ProfileSidebar({ groups, activeTab, onItemSelect, onLogout, id }) {
   const handleItemClick = (onClick) => {
     onClick();
     onItemSelect?.();
@@ -95,6 +97,15 @@ export function ProfileSidebar({ groups, activeTab, onItemSelect, id }) {
             </ul>
           </div>
         ))}
+        {onLogout ? (
+          <div className="my-profile-page__nav-group my-profile-page__nav-group_logout">
+            <ul className="my-profile-page__nav-list" role="list">
+              <li className="my-profile-page__nav-item">
+                <ProfileSidebarLogout onLogout={onLogout} />
+              </li>
+            </ul>
+          </div>
+        ) : null}
       </nav>
     </aside>
   );

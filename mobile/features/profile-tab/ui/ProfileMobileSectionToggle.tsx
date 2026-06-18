@@ -2,8 +2,8 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Pressable, Text, View } from "react-native";
 
 import { MY_PROFILE_PAGE_UI } from "@/shared/config";
-import { useProfileMobileNavToggleStyles } from "@/shared/theme/profileChromeStyles";
 import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
+import { useProfileMobileNavToggleStyles } from "@/shared/theme/profileChromeStyles";
 
 type ProfileMobileSectionToggleProps = {
   activeLabel: string;

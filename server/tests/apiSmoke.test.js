@@ -186,6 +186,41 @@ test("auth refresh rotation: old refresh token rejected", async () => {
   assert.equal(staleRefreshResponse.status, 401);
 });
 
+test("auth refresh: body token wins over stale cookie after rotation", async () => {
+  const registerResponse = await request("/auth/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(registerPayload("body-over-cookie")),
+  });
+  assert.equal(registerResponse.status, 200);
+
+  const staleCookies = buildCookieHeader(registerResponse.headers);
+  const session = await parseSuccessData(registerResponse);
+
+  const rotatedResponse = await request("/auth/refresh", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Cookie: staleCookies,
+    },
+    body: JSON.stringify({ refreshToken: session.refreshToken }),
+  });
+  assert.equal(rotatedResponse.status, 200);
+
+  const rotatedSession = await parseSuccessData(rotatedResponse);
+  assert.notEqual(rotatedSession.refreshToken, session.refreshToken);
+
+  const desyncRefreshResponse = await request("/auth/refresh", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Cookie: staleCookies,
+    },
+    body: JSON.stringify({ refreshToken: rotatedSession.refreshToken }),
+  });
+  assert.equal(desyncRefreshResponse.status, 200);
+});
+
 test("auth mobile: tokens in JSON, bearer me, refresh by body", async () => {
   const registerResponse = await request("/auth/register", {
     method: "POST",

@@ -43,7 +43,7 @@ const EXPECTED_APP_ROUTES = [
   "app/create-product.tsx",
   "app/edit-product/[id].tsx",
   "app/(tabs)/hub/[section].tsx",
-  "app/(tabs)/orders/index.tsx",
+  "app/(tabs)/orders.tsx",
   "app/legal/privacy.tsx",
   "app/notifications/index.tsx",
   "app/product/[id].tsx",
@@ -181,7 +181,7 @@ const BUYER_CRITICAL_ROUTES = [
   "app/(tabs)/catalog.tsx",
   "app/product/[id].tsx",
   "app/(tabs)/cart.tsx",
-  "app/(tabs)/orders/index.tsx",
+  "app/(tabs)/orders.tsx",
   "app/(tabs)/profile.tsx",
   "app/(tabs)/hub/[section].tsx",
   "app/profile/edit.tsx",
@@ -207,6 +207,88 @@ const HUB_TAB_BAR_CHECKS = [
   {
     file: "features/profile-hub/model/profileSections.ts",
     mustNotInclude: ["[PROFILE_SECTION_MY_ORDERS]: \"/orders\""],
+  },
+];
+
+const PROFILE_NAV_CHROME_CHECKS = [
+  {
+    file: "../packages/shared-lib/src/profileNavTones.ts",
+    mustInclude: ['overview: "indigo"', "resolveProfileNavSectionTone"],
+  },
+  {
+    file: "features/profile-hub/lib/enrichProfileNavItem.ts",
+    mustInclude: ["resolveProfileNavSectionTone", "resolveProfileNavIconName"],
+  },
+  {
+    file: "features/profile-hub/lib/profileNavItemPresentation.ts",
+    mustInclude: ["buildProfileNavItemPresentation", "borderLeftColor"],
+  },
+  {
+    file: "features/profile-hub/ui/ProfileHubNavItem.tsx",
+    mustInclude: ["MaterialIcons", "buildProfileNavItemPresentation"],
+  },
+  {
+    file: "features/profile-hub/ui/ProfileHubMenu.tsx",
+    mustInclude: ["ProfileHubNavItem", "groupDivided"],
+  },
+  {
+    file: "shared/theme/profileChromeStyles.ts",
+    mustInclude: ["primaryBright", "itemIconWrap", "groupDivided"],
+  },
+  {
+    file: "features/profile-tab/ui/ProfileMobileSectionToggle.tsx",
+    mustInclude: ['name="menu"', "MOBILE_NAV_CURRENT_SECTION"],
+  },
+];
+
+const SCREEN_LAYOUT_CHECKS = [
+  {
+    file: "shared/lib/screenBreakpoints.ts",
+    mustInclude: [
+      "resolveProductGridColumns",
+      "SCREEN_PRODUCT_GRID_2_COL_MAX_WIDTH",
+      "SCREEN_PRODUCT_GRID_4_COL_MIN_WIDTH",
+      "PRODUCT_GRID_COLUMNS_COMPACT",
+      "resolveLayoutContentWidth",
+      "resolveScreenWidthTier",
+    ],
+  },
+  {
+    file: "shared/model/useProductGridLayout.ts",
+    mustInclude: ["useWindowDimensions", "listKey"],
+  },
+  {
+    file: "shared/model/useScreenLayout.ts",
+    mustInclude: ["centeredContentStyle", "profileContentStyle"],
+  },
+  {
+    file: "app/(tabs)/index.tsx",
+    mustInclude: ["useProductGridLayout", "productGrid.columns"],
+    mustNotInclude: ["NUM_COLUMNS = 2", "NUM_COLUMNS = 3"],
+  },
+  {
+    file: "features/my-products-page/ui/MyProductsPage.tsx",
+    mustInclude: ["useProductGridLayout"],
+    mustNotInclude: ["NUM_COLUMNS = 2"],
+  },
+  {
+    file: "features/seller-products-page/ui/SellerProductsPage.tsx",
+    mustInclude: ["useProductGridLayout"],
+    mustNotInclude: ["NUM_COLUMNS = 2"],
+  },
+  {
+    file: "features/raffle-products-page/ui/RaffleProductsPage.tsx",
+    mustInclude: ["useProductGridLayout"],
+    mustNotInclude: ["numColumns={2}"],
+  },
+  {
+    file: "entities/raffle/ui/RaffleFeaturedCarousel.tsx",
+    mustInclude: ["useRaffleFeaturedSlideLayout"],
+    mustNotInclude: ["useWindowDimensions"],
+  },
+  {
+    file: "shared/theme/raffleFeaturedStyles.ts",
+    mustInclude: ["maxWidth: \"100%\"", "overflow: \"hidden\""],
   },
 ];
 
@@ -261,7 +343,14 @@ const BUYER_API_SOURCE_CHECKS = [
 const PRODUCT_PREVIEW_VIDEO_CHECKS = [
   {
     file: "entities/product/ui/ProductCard.tsx",
-    mustInclude: ["ProductCardMedia", "useProductCardMediaState"],
+    mustInclude: [
+      "ProductCardMediaSlide",
+      "ProductCardMediaGalleryNav",
+      "styles.imagePressable",
+      "styles.contentPressable",
+      "useProductCardMediaState",
+    ],
+    mustNotInclude: ['from "@/entities/product/ui/ProductCardMedia"'],
   },
   {
     file: "entities/product/ui/ProductMediaSlideContent.tsx",
@@ -344,7 +433,7 @@ const PREVIEW_VIDEO_MIME_CASES = [
 const BUYER_UI_WIRING_CHECKS = [
   {
     file: "entities/product/ui/ProductCard.tsx",
-    mustInclude: ['pathname: "/product/[id]"', "ProductCardMedia"],
+    mustInclude: ['pathname: "/product/[id]"', "ProductCardMediaSlide"],
   },
   {
     file: "features/product-detail/ui/ProductDetailPurchaseActions.tsx",
@@ -418,8 +507,8 @@ const run = () => {
     ['name="hub/[section]"', 'name="orders"'],
     "root stack",
   );
-  if (fileExists("app/orders/index.tsx")) {
-    console.error("✗ orders must live under (tabs), not app/orders/");
+  if (fileExists("app/orders/index.tsx") || fileExists("app/(tabs)/orders/index.tsx")) {
+    console.error("✗ orders must be app/(tabs)/orders.tsx, not orders/index.tsx");
     hubTabBarFailed += 1;
   }
   for (const [pathname, expected] of PROFILE_TAB_BAR_ROUTE_CASES) {
@@ -433,6 +522,47 @@ const run = () => {
     failed += hubTabBarFailed;
   } else {
     console.log(`✓ profile tab bar wiring (${HUB_TAB_BAR_CHECKS.length} checks + route helper)`);
+  }
+
+  let profileNavChromeFailed = 0;
+  for (const check of PROFILE_NAV_CHROME_CHECKS) {
+    const resolved =
+      check.file.startsWith("../")
+        ? path.join(MOBILE_ROOT, check.file)
+        : path.join(MOBILE_ROOT, check.file);
+    if (!fs.existsSync(resolved)) {
+      console.error(`✗ missing profile nav chrome file: ${check.file}`);
+      profileNavChromeFailed += 1;
+      continue;
+    }
+    profileNavChromeFailed += assertSourceContains(
+      check.file,
+      check.mustInclude,
+      "profile nav chrome",
+    );
+  }
+  if (profileNavChromeFailed > 0) {
+    failed += profileNavChromeFailed;
+  } else {
+    console.log(`✓ profile nav chrome (${PROFILE_NAV_CHROME_CHECKS.length} wiring files)`);
+  }
+
+  let screenLayoutFailed = 0;
+  for (const check of SCREEN_LAYOUT_CHECKS) {
+    if (!fileExists(check.file)) {
+      console.error(`✗ missing screen layout file: ${check.file}`);
+      screenLayoutFailed += 1;
+      continue;
+    }
+    screenLayoutFailed += assertSourceContains(check.file, check.mustInclude, "screen layout");
+    if (check.mustNotInclude) {
+      screenLayoutFailed += assertSourceExcludes(check.file, check.mustNotInclude, "screen layout");
+    }
+  }
+  if (screenLayoutFailed > 0) {
+    failed += screenLayoutFailed;
+  } else {
+    console.log(`✓ screen layout (${SCREEN_LAYOUT_CHECKS.length} wiring files)`);
   }
 
   let productVideoFailed = 0;
@@ -593,15 +723,23 @@ const run = () => {
     console.error("✗ create-raffle must not redirect to web /me (in-app hub)");
     staffWebFailed += 1;
   }
-  if (!staffWebPathsSource.includes('PROFILE_STAFF_IN_APP_SECTION_IDS = ["create-raffle"]')) {
-    console.error("✗ create-raffle must be listed in PROFILE_STAFF_IN_APP_SECTION_IDS");
+  if (!staffWebPathsSource.includes("isProfileStaffInAppSection")) {
+    console.error("✗ staff web paths must define isProfileStaffInAppSection");
+    staffWebFailed += 1;
+  }
+  if (!staffWebPathsSource.includes("...PROFILE_STAFF_SECTION_ORDER")) {
+    console.error("✗ PROFILE_STAFF_IN_APP_SECTION_IDS must include all staff sections");
+    staffWebFailed += 1;
+  }
+  if (!read("features/profile-hub/ui/ProfileHubMenu.tsx").includes("resolveProfileSectionRoute")) {
+    console.error("✗ ProfileHubMenu must route in-app sections via resolveProfileSectionRoute");
     staffWebFailed += 1;
   }
 
   if (staffWebFailed > 0) {
     failed += staffWebFailed;
   } else {
-    console.log(`✓ staff → web (G.1, ${STAFF_WEB_FILES.length} files)`);
+    console.log(`✓ staff in-app hub (${STAFF_WEB_FILES.length} wiring files)`);
   }
 
   let buyerPathFailed = 0;

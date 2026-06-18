@@ -7,10 +7,9 @@ import {
 } from "../../../shared/config/appUiCopy.js";
 import { PROFILE_TAB_OVERVIEW } from "../../../widgets/app-shell/lib/profileTabs.js";
 import { MyProductsCatalogToolbar } from "../../../widgets/my-products-catalog-toolbar/ui/MyProductsCatalogToolbar.jsx";
-import { PROFILE_NAV_ITEM_META } from "../lib/profileNavItemMeta.js";
 import { useMyProfileNav } from "../model/useMyProfileNav.js";
 import { useMyProfilePageUi } from "../model/useMyProfilePageUi.js";
-import { AppIcon, Menu } from "../../../shared/ui/icon/index.js";
+import { Menu } from "../../../shared/ui/icon/index.js";
 import { UserProfileInfoPanel } from "../../../entities/user/ui/UserProfileInfoPanel.jsx";
 import { ProfileSidebar } from "./ProfileSidebar.jsx";
 
@@ -138,8 +137,6 @@ export function MyProfilePage({
     showEditOnBanner,
     isMyProductsTab,
     isFullWidthCatalogTab,
-    isLogoutConfirmOpen,
-    setIsLogoutConfirmOpen,
     isMobileNavOpen,
     closeMobileNav,
     openMobileNav,
@@ -239,57 +236,8 @@ export function MyProfilePage({
             groups={navGroups}
             activeTab={activeTab}
             onItemSelect={closeMobileNav}
+            onLogout={onLogout}
           />
-          <footer className="my-profile-page__sidebar-footer">
-            {activeTab === PROFILE_TAB_OVERVIEW ? (
-              !isLogoutConfirmOpen ? (
-                <button
-                  type="button"
-                  className="my-profile-page__nav-button my-profile-page__nav-button_danger my-profile-page__logout-trigger"
-                  data-tone={PROFILE_NAV_ITEM_META.logout.tone}
-                  onClick={() => setIsLogoutConfirmOpen(true)}
-                >
-                  <span className="my-profile-page__nav-button-main">
-                    <span className="my-profile-page__nav-icon" aria-hidden="true">
-                      <AppIcon
-                        icon={PROFILE_NAV_ITEM_META.logout.icon}
-                        size="sm"
-                        strokeWidth={2.25}
-                      />
-                    </span>
-                    <span className="my-profile-page__nav-button-label">
-                      {MY_PROFILE_PAGE_UI.LOGOUT}
-                    </span>
-                  </span>
-                </button>
-              ) : (
-                <div className="my-profile-page__logout-confirm">
-                  <p className="my-profile-page__logout-question">
-                    {MY_PROFILE_PAGE_UI.LOGOUT_CONFIRM}
-                  </p>
-                  <div className="my-profile-page__logout-actions">
-                    <button
-                      type="button"
-                      className="my-profile-page__logout-yes"
-                      onClick={() => {
-                        void onLogout();
-                        setIsLogoutConfirmOpen(false);
-                      }}
-                    >
-                      {MY_PROFILE_PAGE_UI.LOGOUT_YES}
-                    </button>
-                    <button
-                      type="button"
-                      className="my-profile-page__logout-cancel"
-                      onClick={() => setIsLogoutConfirmOpen(false)}
-                    >
-                      {MY_PROFILE_PAGE_UI.LOGOUT_CANCEL}
-                    </button>
-                  </div>
-                </div>
-              )
-            ) : null}
-          </footer>
         </div>
 
         <div className="my-profile-page__main">

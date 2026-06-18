@@ -245,7 +245,6 @@ export function SellerProductsPage({
           isAuthorized={isAuthorized}
           currentUserId={currentUserId}
           onRequestLoginAddToCart={onRequestLoginAddToCart}
-          showAddToCartOnCard={false}
           catalogSentinelRef={sentinelRef}
           catalogHasMore={hasMore}
           isCatalogLoadingMore={isLoadingMore}

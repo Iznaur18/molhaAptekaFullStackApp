@@ -22,7 +22,7 @@ export function resolveLogoutUserId(req) {
   }
 
   try {
-    const refreshToken = req.body?.refreshToken ?? getRefreshTokenFromRequest(req);
+    const refreshToken = getRefreshTokenFromRequest(req);
     if (refreshToken) {
       const decoded = verifyRefreshToken(refreshToken);
       if (decoded?._id) {

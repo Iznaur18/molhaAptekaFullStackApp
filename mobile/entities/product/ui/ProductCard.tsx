@@ -7,7 +7,8 @@ import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useProductCardChromeFlags } from "@/entities/product/lib/useProductCardChromeFlags";
 import { useProductCardMediaState } from "@/entities/product/lib/useProductCardMediaState";
 import { ProductCatalogStatusBadges } from "@/entities/product/ui/ProductCatalogStatusBadges";
-import { ProductCardMedia } from "@/entities/product/ui/ProductCardMedia";
+import { ProductCardMediaGalleryNav } from "@/entities/product/ui/ProductCardMediaGalleryNav";
+import { ProductCardMediaSlide } from "@/entities/product/ui/ProductCardMediaSlide";
 import { ProductCardSellerRow } from "@/entities/product/ui/ProductCardSellerRow";
 import {
   ProductDiscountBadge,
@@ -42,6 +43,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
   const name = product.productName?.trim() || "Без названия";
   const reviewLine = formatProductReviewRatingLine(product.averageRating, product.reviewCount);
   const hasReviewRating = reviewLine.length > 0;
+  const openProductLabel = PRODUCT_UI.OPEN_ARIA(name);
 
   const handlePress = () => {
     router.push({ pathname: "/product/[id]", params: { id: product._id } });
@@ -49,31 +51,41 @@ export const ProductCard = ({ product }: ProductCardProps) => {
 
   return (
     <View style={styles.card}>
+      <View style={styles.imageWrap}>
+        <Pressable
+          style={({ pressed }) => [styles.imagePressable, pressed && styles.cardPressed]}
+          onPress={handlePress}
+          accessibilityRole="button"
+          accessibilityLabel={openProductLabel}
+        >
+          <ProductCardMediaSlide media={cardMedia} />
+        </Pressable>
+
+        <ProductCardMediaGalleryNav media={cardMedia} />
+
+        {flags.showDiscountBadge || flags.showLoyaltyPointsBadge ? (
+          <View style={styles.imageBadges} pointerEvents="box-none">
+            {flags.showDiscountBadge ? (
+              <ProductDiscountBadge product={product} variant="overlay" />
+            ) : null}
+            {flags.showLoyaltyPointsBadge ? (
+              <ProductLoyaltyPointsBadge
+                product={product}
+                isAuthorized={isAuthorized}
+                isPremiumUser={isPremiumUser}
+                variant="overlay"
+              />
+            ) : null}
+          </View>
+        ) : null}
+      </View>
+
       <Pressable
-        style={({ pressed }) => [styles.pressable, pressed && styles.cardPressed]}
+        style={({ pressed }) => [styles.contentPressable, pressed && styles.cardPressed]}
         onPress={handlePress}
         accessibilityRole="button"
-        accessibilityLabel={PRODUCT_UI.OPEN_ARIA(name)}
+        accessibilityLabel={openProductLabel}
       >
-        <View style={styles.imageWrap}>
-          <ProductCardMedia media={cardMedia} />
-          {flags.showDiscountBadge || flags.showLoyaltyPointsBadge ? (
-            <View style={styles.imageBadges} pointerEvents="box-none">
-              {flags.showDiscountBadge ? (
-                <ProductDiscountBadge product={product} variant="overlay" />
-              ) : null}
-              {flags.showLoyaltyPointsBadge ? (
-                <ProductLoyaltyPointsBadge
-                  product={product}
-                  isAuthorized={isAuthorized}
-                  isPremiumUser={isPremiumUser}
-                  variant="overlay"
-                />
-              ) : null}
-            </View>
-          ) : null}
-        </View>
-
         <View style={styles.content}>
           <Text style={styles.name} numberOfLines={1}>
             {name}

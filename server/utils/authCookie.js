@@ -7,6 +7,18 @@ import {
 
 const isProduction = () => process.env.NODE_ENV === "production";
 
+/**
+ * @param {unknown} value
+ * @returns {string | null}
+ */
+const readTrimmedRequestToken = (value) => {
+  if (typeof value !== "string") {
+    return null;
+  }
+  const trimmed = value.trim();
+  return trimmed ? trimmed : null;
+};
+
 /** SameSite=None для cross-origin (client и API на разных доменах). */
 const isCrossSiteCookie = () =>
   String(process.env.COOKIE_CROSS_SITE ?? "").toLowerCase() === "true";
@@ -60,17 +72,14 @@ export const clearRefreshCookie = (res) => {
  * @returns {string | null}
  */
 export const getAuthTokenFromRequest = (req) => {
-  const cookieToken = req.cookies?.[AUTH_COOKIE_NAME];
-  if (typeof cookieToken === "string" && cookieToken.trim()) {
-    return cookieToken.trim();
+  const cookieToken = readTrimmedRequestToken(req.cookies?.[AUTH_COOKIE_NAME]);
+  if (cookieToken) {
+    return cookieToken;
   }
 
   const authHeader = req.headers.authorization;
   if (typeof authHeader === "string" && authHeader.startsWith("Bearer ")) {
-    const bearer = authHeader.slice(7).trim();
-    if (bearer) {
-      return bearer;
-    }
+    return readTrimmedRequestToken(authHeader.slice(7));
   }
 
   return null;
@@ -81,15 +90,10 @@ export const getAuthTokenFromRequest = (req) => {
  * @returns {string | null}
  */
 export const getRefreshTokenFromRequest = (req) => {
-  const cookieToken = req.cookies?.[REFRESH_COOKIE_NAME];
-  if (typeof cookieToken === "string" && cookieToken.trim()) {
-    return cookieToken.trim();
+  const bodyToken = readTrimmedRequestToken(req.body?.refreshToken);
+  if (bodyToken) {
+    return bodyToken;
   }
 
-  const bodyToken = req.body?.refreshToken;
-  if (typeof bodyToken === "string" && bodyToken.trim()) {
-    return bodyToken.trim();
-  }
-
-  return null;
+  return readTrimmedRequestToken(req.cookies?.[REFRESH_COOKIE_NAME]);
 };

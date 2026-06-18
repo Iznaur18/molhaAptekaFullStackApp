@@ -3,10 +3,10 @@ import {
   FlatList,
   type NativeScrollEvent,
   type NativeSyntheticEvent,
-  useWindowDimensions,
   View,
 } from "react-native";
 
+import { useRaffleFeaturedSlideLayout } from "@/entities/raffle/lib/useRaffleFeaturedSlideLayout";
 import { RaffleFeaturedBanner } from "@/entities/raffle/ui/RaffleFeaturedBanner";
 import type { FeaturedRaffleManage, RaffleFromApi } from "@/entities/raffle/model/types";
 import { HOME_FEED_UI, RAFFLE_FEATURED_CAROUSEL_UI } from "@/shared/config";
@@ -14,7 +14,6 @@ import {
   RAFFLE_FEATURED_LAYOUT,
   useRaffleFeaturedCarouselStyles,
 } from "@/shared/theme/raffleFeaturedStyles";
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 
 type RaffleFeaturedCarouselProps = {
   raffles: RaffleFromApi[];
@@ -28,13 +27,10 @@ export const RaffleFeaturedCarousel = ({
   getManage,
 }: RaffleFeaturedCarouselProps) => {
   const styles = useRaffleFeaturedCarouselStyles();
-  const { width: screenWidth } = useWindowDimensions();
+  const { slideWidth, snapInterval } = useRaffleFeaturedSlideLayout();
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const listRef = useRef<FlatList<RaffleFromApi>>(null);
-
-  const slideWidth = screenWidth - SCREEN_CONTENT_PADDING_HORIZONTAL * 2;
-  const snapInterval = slideWidth + RAFFLE_FEATURED_LAYOUT.slideGap;
 
   useEffect(() => {
     setActiveIndex(0);
@@ -73,7 +69,7 @@ export const RaffleFeaturedCarousel = ({
   if (raffles.length === 1) {
     const raffle = raffles[0];
     return (
-      <View accessibilityLabel={HOME_FEED_UI.RAFFLES_SECTION_ARIA}>
+      <View style={styles.singleSlide} accessibilityLabel={HOME_FEED_UI.RAFFLES_SECTION_ARIA}>
         <RaffleFeaturedBanner
           raffle={raffle}
           onOpenProducts={onOpenProducts}

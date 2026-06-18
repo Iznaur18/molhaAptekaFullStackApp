@@ -23,7 +23,6 @@ import "./ProductCard.css";
  * @param {boolean} [isPremiumUser]
  * @param {string | null} [currentUserId]
  * @param {() => void} [onRequestLoginAddToCart]
- * @param {boolean} [showAddToCartOnCard]
  * @param {boolean} [isMineMode]
  * @param {boolean} [highlightCatalogPromotion]
  * @param {boolean} [promotionFullWidth]

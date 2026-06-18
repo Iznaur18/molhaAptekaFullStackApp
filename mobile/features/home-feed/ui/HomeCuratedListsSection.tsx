@@ -1,10 +1,11 @@
 import { useMemo } from "react";
-import { ScrollView, Text, useWindowDimensions, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 
 import { CuratedProductCompactCard } from "@/entities/curated-product-list/ui/CuratedProductCompactCard";
 import type { HomeCuratedProductList } from "@/entities/curated-product-list/api/fetchHomeCuratedProductLists";
 import { resolveCuratedCompactCardWidth } from "@/entities/curated-product-list/lib/curatedProductListHomeLayout";
 import { HOME_FEED_UI } from "@/shared/config";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useHomeCuratedListsStyles } from "@/shared/theme/catalogProductStyles";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 
@@ -14,12 +15,12 @@ type HomeCuratedListsSectionProps = {
 
 export const HomeCuratedListsSection = ({ lists }: HomeCuratedListsSectionProps) => {
   const styles = useHomeCuratedListsStyles();
-  const { width: screenWidth } = useWindowDimensions();
+  const { layoutWidth } = useScreenLayout();
 
   const compactCardWidth = useMemo(() => {
-    const scrollContainerWidth = screenWidth - SCREEN_CONTENT_PADDING_HORIZONTAL * 2;
+    const scrollContainerWidth = layoutWidth - SCREEN_CONTENT_PADDING_HORIZONTAL * 2;
     return resolveCuratedCompactCardWidth(scrollContainerWidth);
-  }, [screenWidth]);
+  }, [layoutWidth]);
 
   if (lists.length === 0) {
     return null;

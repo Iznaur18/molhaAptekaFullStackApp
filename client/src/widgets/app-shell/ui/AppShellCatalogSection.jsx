@@ -196,7 +196,6 @@ export function AppShellCatalogGridSection({
         sellerLoyaltyPointsBalance={sellerLoyaltyPointsBalance}
         sellerLoyaltyPointsReserved={sellerLoyaltyPointsReserved}
         onRequestLoginAddToCart={onRequestLoginAddToCart}
-        showAddToCartOnCard={false}
         catalogSentinelRef={catalogSentinelRef}
         catalogHasMore={catalogHasMore}
         isCatalogLoadingMore={isCatalogLoadingMore}

@@ -41,6 +41,14 @@ export {
 } from "./profileSections.js";
 export type { ProfileSectionId } from "./profileSections.js";
 export {
+  PROFILE_NAV_TONE_IDS,
+  PROFILE_NAV_TONE_PALETTE,
+  resolveProfileNavSectionTone,
+  resolveProfileNavTonePalette,
+} from "./profileNavTones.js";
+export type { ProfileNavToneId, ProfileNavTonePalette } from "./profileNavTones.js";
+export {
+  isProfileStaffInAppSection,
   isProfileStaffWebOnlySection,
   PROFILE_SECTION_WEB_PATH,
   PROFILE_STAFF_IN_APP_SECTION_IDS,

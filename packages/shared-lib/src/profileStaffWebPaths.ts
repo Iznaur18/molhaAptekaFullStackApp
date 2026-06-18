@@ -21,12 +21,20 @@ import {
  * Web SPA paths for staff profile sections (G.1).
  * Must stay in sync with `client/src/shared/lib/homeMainViewPaths.js`.
  *
- * Sections in PROFILE_STAFF_IN_APP_SECTION_IDS stay in-app on mobile (no web redirect).
+ * Sections in PROFILE_STAFF_IN_APP_SECTION_IDS open in mobile hub (`/hub/<section>`).
+ * Remaining entries in PROFILE_SECTION_WEB_PATH are web-only fallbacks (browser).
  */
-export const PROFILE_STAFF_IN_APP_SECTION_IDS = ["create-raffle"] as const;
+export const PROFILE_STAFF_IN_APP_SECTION_IDS = [
+  ...PROFILE_STAFF_SECTION_ORDER,
+] as const;
 
 export type ProfileStaffInAppSectionId =
   (typeof PROFILE_STAFF_IN_APP_SECTION_IDS)[number];
+
+export const isProfileStaffInAppSection = (
+  sectionId: ProfileSectionId,
+): sectionId is ProfileStaffInAppSectionId =>
+  (PROFILE_STAFF_IN_APP_SECTION_IDS as readonly string[]).includes(sectionId);
 
 export const PROFILE_SECTION_WEB_PATH = {
   [PROFILE_SECTION_PRODUCT_MODERATION]: "/moderation-products",
@@ -47,14 +55,15 @@ export const PROFILE_SECTION_WEB_PATH = {
 
 export type ProfileStaffWebOnlySectionId = keyof typeof PROFILE_SECTION_WEB_PATH;
 
-export const PROFILE_STAFF_WEB_ONLY_SECTION_IDS = PROFILE_STAFF_SECTION_ORDER.filter(
-  (sectionId): sectionId is ProfileStaffWebOnlySectionId =>
-    sectionId in PROFILE_SECTION_WEB_PATH,
-);
-
 export const isProfileStaffWebOnlySection = (
   sectionId: ProfileSectionId,
-): sectionId is ProfileStaffWebOnlySectionId => sectionId in PROFILE_SECTION_WEB_PATH;
+): sectionId is ProfileStaffWebOnlySectionId =>
+  sectionId in PROFILE_SECTION_WEB_PATH && !isProfileStaffInAppSection(sectionId);
+
+export const PROFILE_STAFF_WEB_ONLY_SECTION_IDS = PROFILE_STAFF_SECTION_ORDER.filter(
+  (sectionId): sectionId is ProfileStaffWebOnlySectionId =>
+    isProfileStaffWebOnlySection(sectionId),
+);
 
 export const resolveProfileStaffWebPath = (
   sectionId: ProfileStaffWebOnlySectionId,

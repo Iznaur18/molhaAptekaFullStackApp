@@ -21,10 +21,10 @@ import {
   CATALOG_SEARCH_MIN_LENGTH,
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { useProductGridLayout } from "@/shared/model/useProductGridLayout";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useFeedScreenStyles } from "@/shared/theme/catalogProductStyles";
 import { ScreenErrorState } from "@/shared/ui/ScreenStates";
-
-const NUM_COLUMNS = 2;
 
 type FeedFiltersState = Pick<
   CatalogListFilters,
@@ -41,6 +41,8 @@ const EMPTY_FEED_FILTERS: FeedFiltersState = {
 
 export default function CatalogScreen() {
   const styles = useFeedScreenStyles();
+  const productGrid = useProductGridLayout();
+  const { centeredContentStyle } = useScreenLayout();
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedRootSlug, setSelectedRootSlug] = useState<string | null>(null);
@@ -203,16 +205,17 @@ export default function CatalogScreen() {
   }
 
   return (
-    <View style={styles.flex}>
+    <View style={[styles.flex, centeredContentStyle]}>
       <HomeCatalogSearchRow value={searchInput} onChange={setSearchInput} />
       <FlatList
+        key={productGrid.listKey}
         data={catalogQuery.products}
         keyExtractor={(item) => item._id}
-        numColumns={NUM_COLUMNS}
+        numColumns={productGrid.columns}
         ListHeaderComponent={listHeader}
         renderItem={({ item }) => <ProductCard product={item} />}
         contentContainerStyle={styles.listContent}
-        columnWrapperStyle={styles.row}
+        columnWrapperStyle={productGrid.columns > 1 ? styles.row : undefined}
         style={styles.flex}
         refreshControl={
           <ThemedRefreshControl refreshing={catalogQuery.isRefetching} onRefresh={handleRefresh} />

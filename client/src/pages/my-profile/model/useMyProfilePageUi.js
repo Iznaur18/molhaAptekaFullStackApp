@@ -31,7 +31,6 @@ export function useMyProfilePageUi({
   canUseEditProfile,
   isRegularUser,
 }) {
-  const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
   const [backgroundLoadFailed, setBackgroundLoadFailed] = useState(false);
@@ -97,12 +96,6 @@ export function useMyProfilePageUi({
     setBackgroundLoadFailed(false);
   }, [user?._id]);
 
-  useEffect(() => {
-    if (activeTab !== PROFILE_TAB_OVERVIEW) {
-      setIsLogoutConfirmOpen(false);
-    }
-  }, [activeTab]);
-
   return {
     rows,
     photoUrl,
@@ -114,8 +107,6 @@ export function useMyProfilePageUi({
     showEditOnBanner,
     isMyProductsTab,
     isFullWidthCatalogTab,
-    isLogoutConfirmOpen,
-    setIsLogoutConfirmOpen,
     isMobileNavOpen,
     closeMobileNav,
     openMobileNav,

@@ -20,7 +20,6 @@ import { ProductCard } from "../../../entities/product/ui/ProductCard.jsx";
  *   isPremiumUser: boolean;
  *   currentUserId: string | null;
  *   onRequestLoginAddToCart: () => void;
- *   showAddToCartOnCard: boolean;
  *   promotionFullWidth?: boolean;
  *   highlightRaffleProducts: boolean;
  *   sellerRaffleActive: boolean;
@@ -51,7 +50,6 @@ export function CatalogGridProductCard({
   isPremiumUser,
   currentUserId,
   onRequestLoginAddToCart,
-  showAddToCartOnCard,
   promotionFullWidth = false,
   highlightRaffleProducts,
   sellerRaffleActive,
@@ -85,7 +83,6 @@ export function CatalogGridProductCard({
         isPremiumUser={isPremiumUser}
         currentUserId={currentUserId}
         onRequestLoginAddToCart={onRequestLoginAddToCart}
-        showAddToCartOnCard={showAddToCartOnCard}
         isMineMode={isMineMode}
         highlightCatalogPromotion={!isMineMode}
         promotionFullWidth={promotionFullWidth}

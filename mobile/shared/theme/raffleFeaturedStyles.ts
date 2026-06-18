@@ -7,9 +7,14 @@ import { SCREEN_CONTENT_SECTION_GAP } from "@/shared/theme/screenContentLayout";
 
 export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
   root: {
+    width: "100%",
+    maxWidth: "100%",
+    overflow: "hidden",
     marginBottom: SCREEN_CONTENT_SECTION_GAP,
   },
   inner: {
+    width: "100%",
+    maxWidth: "100%",
     borderWidth: 2,
     borderColor: P.premiumPurpleMuted,
     borderRadius: L.borderRadius,
@@ -32,11 +37,11 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
   visual: {
     position: "relative",
     alignSelf: "stretch",
-    width: "100%",
     height: L.visualMinHeight,
     minHeight: L.visualMinHeight,
     marginTop: -L.imageBleedTop,
-    marginHorizontal: -L.imageBleedX,
+    marginLeft: -L.imageBleedX,
+    marginRight: -L.imageBleedX,
     marginBottom: 0,
     borderTopLeftRadius: L.visualRadiusTop,
     borderTopRightRadius: L.visualRadiusTop,
@@ -85,6 +90,7 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     fontWeight: "700",
   },
   body: {
+    minWidth: 0,
     paddingTop: 10,
     gap: 0,
   },
@@ -94,6 +100,7 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     lineHeight: 25,
     fontWeight: "700",
     color: theme.colors.text,
+    flexShrink: 1,
   },
   description: {
     marginBottom: 10,
@@ -127,6 +134,7 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     fontSize: 14,
     fontWeight: "600",
     color: theme.colors.text,
+    flexShrink: 1,
   },
   manage: {
     marginBottom: 10,
@@ -307,7 +315,15 @@ export const useRaffleDescriptionModalStyles = createThemedStyles((theme) => ({
 
 export const useRaffleFeaturedCarouselStyles = createThemedStyles(() => ({
   viewport: {
+    width: "100%",
+    maxWidth: "100%",
+    overflow: "hidden",
     marginBottom: 0,
+  },
+  singleSlide: {
+    width: "100%",
+    maxWidth: "100%",
+    overflow: "hidden",
   },
 }));
 

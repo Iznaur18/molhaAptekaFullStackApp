@@ -631,6 +631,9 @@ export const useMyProductsPageStyles = createThemedStyles((theme) => ({
   footerLoader: {
     marginVertical: theme.spacing[4],
   },
+  row: {
+    justifyContent: "space-between",
+  },
   cardWrap: {
     flex: 1,
     margin: 6,
@@ -673,9 +676,11 @@ export const useSellerProductsPageStyles = createThemedStyles((theme) => ({
     fontWeight: "700",
     color: theme.colors.text,
   },
+  row: {
+    justifyContent: "space-between",
+  },
   cell: {
     flex: 1,
-    maxWidth: "50%",
     padding: 4,
   },
   hint: {

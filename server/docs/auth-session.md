@@ -57,7 +57,7 @@ Mobile **не использует cookies**. Те же эндпоинты, но
 
 `Authorization: Bearer <access_token>` — приоритет после cookie для access.
 
-Refresh token: cookie `refresh_token` **или** body `refreshToken` (приоритет у cookie).
+Refresh token: body `refreshToken` (mobile/dev Bearer) **или** cookie `refresh_token` (web-only).
 
 ## Production
 

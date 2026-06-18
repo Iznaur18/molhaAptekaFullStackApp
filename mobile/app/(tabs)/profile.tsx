@@ -17,6 +17,7 @@ import {
   MY_PROFILE_PAGE_UI,
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useProfileScreenStyles } from "@/shared/theme/profileChromeStyles";
 import { AppButton } from "@/shared/ui/AppButton";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
@@ -25,6 +26,7 @@ export default function ProfileScreen() {
   const router = useRouter();
   const scrollRef = useRef<ScrollView>(null);
   const styles = useProfileScreenStyles();
+  const { centeredContentStyle } = useScreenLayout();
   const sessionQuery = useAuthSessionQuery();
   const [emailModalVisible, setEmailModalVisible] = useState(false);
   const [navSheetVisible, setNavSheetVisible] = useState(false);
@@ -81,7 +83,7 @@ export default function ProfileScreen() {
     <>
       <ScrollView
         ref={scrollRef}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, centeredContentStyle]}
         refreshControl={
           <ThemedRefreshControl
             refreshing={sessionQuery.isRefetching}

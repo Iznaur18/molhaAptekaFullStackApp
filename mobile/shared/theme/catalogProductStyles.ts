@@ -181,6 +181,13 @@ export const useProductCardStyles = createThemedStyles((theme) => ({
   pressable: {
     flex: 1,
   },
+  imagePressable: {
+    width: "100%",
+    height: "100%",
+  },
+  contentPressable: {
+    flex: 1,
+  },
   cardPressed: {
     opacity: 0.94,
   },
@@ -243,6 +250,13 @@ export const useProductCardMediaStyles = createThemedStyles((theme) => ({
     width: "100%",
     height: "100%",
     position: "relative",
+  },
+  galleryOverlay: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
   },
   media: {
     width: "100%",

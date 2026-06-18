@@ -8,14 +8,16 @@ import { useMyProductsInfiniteQuery } from "@/entities/product/model/useMyProduc
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { MY_PRODUCTS_PAGE_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { useProductGridLayout } from "@/shared/model/useProductGridLayout";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useMyProductsPageStyles } from "@/shared/theme/sellerFlowStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
-
-const NUM_COLUMNS = 2;
 
 export const MyProductsPage = () => {
   const router = useRouter();
   const styles = useMyProductsPageStyles();
+  const productGrid = useProductGridLayout();
+  const { centeredContentStyle } = useScreenLayout();
   const isAuthorized = useIsAuthorized();
   const productsQuery = useMyProductsInfiniteQuery({ enabled: isAuthorized });
 
@@ -55,11 +57,13 @@ export const MyProductsPage = () => {
   const products = productsQuery.products;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, centeredContentStyle]}>
       <FlatList
+        key={productGrid.listKey}
         data={products}
         keyExtractor={(item) => String(item._id)}
-        numColumns={NUM_COLUMNS}
+        numColumns={productGrid.columns}
+        columnWrapperStyle={productGrid.columns > 1 ? styles.row : undefined}
         contentContainerStyle={styles.list}
         refreshControl={
           <ThemedRefreshControl

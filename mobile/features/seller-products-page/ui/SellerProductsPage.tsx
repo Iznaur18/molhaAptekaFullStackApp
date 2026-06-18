@@ -14,14 +14,16 @@ import { ProfileOverviewBanner } from "@/entities/user/ui/ProfileOverviewBanner"
 import { UserFollowButton } from "@/features/user-follow/ui/UserFollowButton";
 import { SELLER_PRODUCTS_PAGE_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { useProductGridLayout } from "@/shared/model/useProductGridLayout";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useSellerProductsPageStyles } from "@/shared/theme/sellerFlowStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
-
-const NUM_COLUMNS = 2;
 
 export const SellerProductsPage = () => {
   const router = useRouter();
   const styles = useSellerProductsPageStyles();
+  const productGrid = useProductGridLayout();
+  const { centeredContentStyle } = useScreenLayout();
   const queryClient = useQueryClient();
   const params = useLocalSearchParams<{ userId?: string }>();
   const sellerId = String(params.userId ?? "").trim();
@@ -123,11 +125,13 @@ export const SellerProductsPage = () => {
   const isFollowing = seller?.isFollowing === true;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, centeredContentStyle]}>
       <FlatList
+        key={productGrid.listKey}
         data={catalogQuery.products}
         keyExtractor={(item) => String(item._id)}
-        numColumns={NUM_COLUMNS}
+        numColumns={productGrid.columns}
+        columnWrapperStyle={productGrid.columns > 1 ? styles.row : undefined}
         contentContainerStyle={styles.list}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.4}
