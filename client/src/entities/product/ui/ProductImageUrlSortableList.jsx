@@ -1,23 +1,13 @@
 import { useState } from "react";
-import {
-  DndContext,
-  KeyboardSensor,
-  PointerSensor,
-  closestCenter,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
+import { DndContext, closestCenter } from "@dnd-kit/core";
 import {
   SortableContext,
-  arrayMove,
-  sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-import { createImageRow } from "../lib/productImageRowHelpers.js";
-import { PRODUCT_IMAGE_URLS_MAX } from "../model/productConstants.js";
+import { useProductImageUrlRows } from "../model/useProductImageUrlRows.js";
 import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { getProductFieldEditLabel } from "../lib/productFieldRegistry.js";
 import {
@@ -127,42 +117,15 @@ function SortableImageRow({
  * }} props
  */
 export function ProductImageUrlSortableList({ rows, onRowsChange, disabled = false }) {
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  );
-
-  const handleDragEnd = (event) => {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-
-    const oldIndex = rows.findIndex((row) => row.id === active.id);
-    const newIndex = rows.findIndex((row) => row.id === over.id);
-    if (oldIndex < 0 || newIndex < 0) return;
-
-    onRowsChange(arrayMove(rows, oldIndex, newIndex));
-  };
-
-  const handleUrlChange = (id, url) => {
-    onRowsChange(rows.map((row) => (row.id === id ? { ...row, url } : row)));
-  };
-
-  const handleRemove = (id) => {
-    if (rows.length <= 1) {
-      onRowsChange([createImageRow("")]);
-      return;
-    }
-    onRowsChange(rows.filter((row) => row.id !== id));
-  };
-
-  const handleAdd = () => {
-    if (rows.length >= PRODUCT_IMAGE_URLS_MAX) return;
-    onRowsChange([...rows, createImageRow("")]);
-  };
-
-  const rowIds = rows.map((row) => row.id);
+  const {
+    sensors,
+    rowIds,
+    canAddRow,
+    handleDragEnd,
+    updateRowUrl,
+    removeRow,
+    addRow,
+  } = useProductImageUrlRows(rows, onRowsChange);
 
   return (
     <fieldset className="product-image-sortable" disabled={disabled}>
@@ -172,11 +135,7 @@ export function ProductImageUrlSortableList({ rows, onRowsChange, disabled = fal
       <p className="product-image-sortable__hint">
         {CREATE_PRODUCT_MODAL_UI.IMAGE_ORDER_HINT}
       </p>
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={rowIds} strategy={verticalListSortingStrategy}>
           <ul className="product-image-sortable__list">
             {rows.map((row, index) => (
@@ -186,19 +145,15 @@ export function ProductImageUrlSortableList({ rows, onRowsChange, disabled = fal
                 index={index}
                 canRemove={rows.length > 1}
                 disabled={disabled}
-                onUrlChange={handleUrlChange}
-                onRemove={handleRemove}
+                onUrlChange={updateRowUrl}
+                onRemove={removeRow}
               />
             ))}
           </ul>
         </SortableContext>
       </DndContext>
-      {rows.length < PRODUCT_IMAGE_URLS_MAX ? (
-        <button
-          type="button"
-          className="product-image-sortable__add"
-          onClick={handleAdd}
-        >
+      {canAddRow ? (
+        <button type="button" className="product-image-sortable__add" onClick={addRow}>
           {CREATE_PRODUCT_MODAL_UI.ADD_IMAGE_ROW}
         </button>
       ) : null}

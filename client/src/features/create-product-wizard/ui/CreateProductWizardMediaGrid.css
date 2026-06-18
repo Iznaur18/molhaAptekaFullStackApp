@@ -1,0 +1,166 @@
+.create-product-wizard-media-grid__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.create-product-wizard-media-grid__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--iz-color-text);
+}
+
+.create-product-wizard-media-grid__count {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--iz-color-text-secondary);
+}
+
+.create-product-wizard-media-grid__hint {
+  margin: 0.35rem 0 0.75rem;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--iz-color-text-secondary);
+}
+
+.create-product-wizard-media-grid__tiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.create-product-wizard-media-grid__tile,
+.create-product-wizard-media-grid__add {
+  position: relative;
+  min-height: 6.5rem;
+  margin: 0;
+  padding: 0;
+  border-radius: 0.85rem;
+  cursor: pointer;
+}
+
+.create-product-wizard-media-grid__tile {
+  overflow: hidden;
+  border: 2px solid color-mix(in srgb, var(--iz-color-border) 85%, transparent);
+  background: var(--iz-color-surface);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.create-product-wizard-media-grid__select {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 6.5rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.create-product-wizard-media-grid__tile_selected {
+  border-color: var(--iz-color-action);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--iz-color-action) 16%, transparent);
+}
+
+.create-product-wizard-media-grid__tile_dragging {
+  z-index: 2;
+  opacity: 0.92;
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--iz-color-ink) 16%, transparent);
+}
+
+.create-product-wizard-media-grid__drag {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.35rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0.45rem;
+  background: color-mix(in srgb, var(--iz-color-ink) 58%, transparent);
+  color: var(--iz-color-on-contrast);
+  font-size: 0.62rem;
+  line-height: 1;
+  cursor: grab;
+  touch-action: none;
+}
+
+.create-product-wizard-media-grid__drag:active {
+  cursor: grabbing;
+}
+
+.create-product-wizard-media-grid__cover-tag {
+  position: absolute;
+  top: 0.35rem;
+  left: 0.35rem;
+  z-index: 2;
+  padding: 0.18rem 0.42rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--iz-color-action) 88%, transparent);
+  color: var(--iz-color-on-contrast);
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.create-product-wizard-media-grid__index {
+  position: absolute;
+  right: 0.45rem;
+  bottom: 0.35rem;
+  z-index: 2;
+  min-width: 1.2rem;
+  padding: 0.12rem 0.35rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--iz-color-ink) 62%, transparent);
+  color: var(--iz-color-on-contrast);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.create-product-wizard-media-grid__add {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  border: 2px dashed color-mix(in srgb, var(--iz-color-action) 45%, var(--iz-color-border));
+  background: color-mix(in srgb, var(--iz-color-action-soft) 55%, var(--iz-color-surface));
+  color: var(--iz-color-action);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.create-product-wizard-media-grid__add:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--iz-color-action-soft) 90%, var(--iz-color-surface));
+}
+
+.create-product-wizard-media-grid__add-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 999px;
+  background: var(--iz-color-surface);
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+@media (max-width: 560px) {
+  .create-product-wizard-media-grid__tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

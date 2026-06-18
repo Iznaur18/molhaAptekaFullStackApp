@@ -2,7 +2,7 @@ import { useCreateProductForm } from "../../../entities/product/model/useCreateP
 import { CreateProductBasicSection } from "../../../entities/product/ui/create-product-sections/CreateProductBasicSection.jsx";
 import { CreateProductCategorySection } from "../../../entities/product/ui/create-product-sections/CreateProductCategorySection.jsx";
 import { CreateProductCommerceSection } from "../../../entities/product/ui/create-product-sections/CreateProductCommerceSection.jsx";
-import { CreateProductMediaSection } from "../../../entities/product/ui/create-product-sections/CreateProductMediaSection.jsx";
+import { CreateProductWizardMediaStep } from "./CreateProductWizardMediaStep.jsx";
 import { CreateProductReviewSection } from "../../../entities/product/ui/create-product-sections/CreateProductReviewSection.jsx";
 import "../../../entities/product/ui/create-product-sections/CreateProductSections.css";
 import { ProductModalShell } from "../../../shared/ui/ProductModalShell/ProductModalShell.jsx";
@@ -159,7 +159,13 @@ export function CreateProductWizard({
       >
         <div key={wizard.stepId} className="create-product-wizard__step-panel">
           {wizard.stepId === "basic" ? <CreateProductBasicSection {...sectionProps} /> : null}
-          {wizard.stepId === "media" ? <CreateProductMediaSection {...sectionProps} /> : null}
+          {wizard.stepId === "media" ? (
+            <CreateProductWizardMediaStep
+              form={form}
+              setForm={setForm}
+              isSubmitting={isSubmitting}
+            />
+          ) : null}
           {wizard.stepId === "category" ? <CreateProductCategorySection {...sectionProps} /> : null}
           {wizard.stepId === "commerce" ? <CreateProductCommerceSection {...sectionProps} /> : null}
           {wizard.stepId === "review" ? (
