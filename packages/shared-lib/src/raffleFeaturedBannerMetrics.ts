@@ -1,6 +1,11 @@
 /** Высота visual = visualWidth × ratio (web + mobile). */
 export const RAFFLE_FEATURED_VISUAL_ASPECT_RATIO = 0.42;
 
+export const RAFFLE_FEATURED_VISUAL_ASPECT_RATIO_STACKED = 0.52;
+
+/** Web `.raffle-featured-banner__visual` min-height: 10rem */
+export const RAFFLE_FEATURED_VISUAL_MIN_HEIGHT = 160;
+
 /** Ширина карточки, с которой web переходит в 2-колоночный layout. */
 export const RAFFLE_FEATURED_SPLIT_LAYOUT_MIN_CARD_WIDTH = 641;
 
@@ -41,8 +46,18 @@ export type RaffleFeaturedBannerMetrics = {
   actionsSlotHeight: number;
 };
 
-export const resolveRaffleFeaturedVisualHeight = (visualWidth: number): number =>
-  Math.round(Math.max(0, visualWidth) * RAFFLE_FEATURED_VISUAL_ASPECT_RATIO);
+export const resolveRaffleFeaturedVisualHeight = (
+  visualWidth: number,
+  layout: RaffleFeaturedBannerLayoutMode = "stacked",
+): number => {
+  const ratio =
+    layout === "stacked"
+      ? RAFFLE_FEATURED_VISUAL_ASPECT_RATIO_STACKED
+      : RAFFLE_FEATURED_VISUAL_ASPECT_RATIO;
+  const fromAspect = Math.round(Math.max(0, visualWidth) * ratio);
+
+  return Math.max(RAFFLE_FEATURED_VISUAL_MIN_HEIGHT, fromAspect);
+};
 
 export const resolveRaffleFeaturedTitleSlotHeight = (): number =>
   RAFFLE_FEATURED_BANNER_CHROME.titleLineHeight +
@@ -104,6 +119,7 @@ export const resolveRaffleFeaturedBannerInnerMinHeight = (
   const chrome = RAFFLE_FEATURED_BANNER_CHROME;
   const visualHeight = resolveRaffleFeaturedVisualHeight(
     resolveRaffleFeaturedVisualWidth(cardWidth, layout),
+    layout,
   );
   const bodyMinHeight = resolveRaffleFeaturedBodyMinHeight();
 
@@ -134,7 +150,7 @@ export const resolveRaffleFeaturedBannerMetrics = (
     cardWidth: Math.max(0, cardWidth),
     layout,
     visualWidth,
-    visualHeight: resolveRaffleFeaturedVisualHeight(visualWidth),
+    visualHeight: resolveRaffleFeaturedVisualHeight(visualWidth, layout),
     bodyMinHeight: resolveRaffleFeaturedBodyMinHeight(),
     innerMinHeight: resolveRaffleFeaturedBannerInnerMinHeight(cardWidth, layout),
     titleSlotHeight: resolveRaffleFeaturedTitleSlotHeight(),

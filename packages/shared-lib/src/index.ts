@@ -47,6 +47,21 @@ export {
   resolveProfileNavTonePalette,
 } from "./profileNavTones.js";
 export type { ProfileNavToneId, ProfileNavTonePalette } from "./profileNavTones.js";
+export { RAFFLE_FEATURED_DESCRIPTION_PREVIEW_MAX_LINES } from "./raffleFeaturedBanner.js";
+export {
+  RAFFLE_FEATURED_BANNER_CHROME,
+  RAFFLE_FEATURED_SPLIT_LAYOUT_MIN_CARD_WIDTH,
+  RAFFLE_FEATURED_VISUAL_ASPECT_RATIO,
+  resolveRaffleFeaturedBannerInnerMinHeight,
+  resolveRaffleFeaturedBannerLayoutMode,
+  resolveRaffleFeaturedBannerMetrics,
+  resolveRaffleFeaturedVisualHeight,
+  resolveRaffleFeaturedVisualWidth,
+} from "./raffleFeaturedBannerMetrics.js";
+export type {
+  RaffleFeaturedBannerLayoutMode,
+  RaffleFeaturedBannerMetrics,
+} from "./raffleFeaturedBannerMetrics.js";
 export {
   isProfileStaffInAppSection,
   isProfileStaffWebOnlySection,
@@ -74,3 +89,12 @@ export {
   STAFF_SECTION_IDS,
 } from "./staffMainViews.js";
 export type { StaffSectionId } from "./staffMainViews.js";
+export {
+  CATALOG_TIER3_BANNER_ROW_INTERVAL,
+  interleaveCatalogTier3Banners,
+  isCatalogPromotionActive,
+  isProductTier3BannerPromotion,
+  PRODUCT_PROMOTION_TIER_BANNER,
+  shouldShowProductTier3BannerFullWidth,
+} from "./catalogTier3Banner.js";
+export type { CatalogTier3Product } from "./catalogTier3Banner.js";
