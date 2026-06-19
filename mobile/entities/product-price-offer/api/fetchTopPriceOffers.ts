@@ -4,17 +4,21 @@ import { formatApiErrorMessage, formatPriceRub } from "@/shared/lib";
 
 export type TopPriceOffer = {
   _id: string;
-  offerPriceRub: number;
-  buyerUserName?: string;
+  offerPrice: number;
+  createdAt?: string;
+  buyer?: {
+    _id?: string;
+    userName?: string;
+  } | null;
 };
 
 export const fetchTopPriceOffers = async (productId: string): Promise<TopPriceOffer[]> => {
   try {
     const { data } = await apiClient.get(`/product/${productId}/price-offers/top`);
-    if (!data?.success || !Array.isArray(data.data?.offers)) {
+    if (!data?.success || !Array.isArray(data.data?.top)) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
-    return data.data.offers;
+    return data.data.top;
   } catch (error) {
     throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.FETCH_TOP_PRICE_OFFERS_FALLBACK));
   }

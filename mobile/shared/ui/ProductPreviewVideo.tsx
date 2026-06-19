@@ -5,12 +5,21 @@ import { StyleSheet } from "react-native";
 
 type ProductPreviewVideoProps = {
   uri: string;
+  loop?: boolean;
   onPlaybackFailed?: () => void;
+  onReady?: () => void;
+  onEnded?: () => void;
 };
 
-export const ProductPreviewVideo = ({ uri, onPlaybackFailed }: ProductPreviewVideoProps) => {
+export const ProductPreviewVideo = ({
+  uri,
+  loop = true,
+  onPlaybackFailed,
+  onReady,
+  onEnded,
+}: ProductPreviewVideoProps) => {
   const player = useVideoPlayer(uri, (instance) => {
-    instance.loop = true;
+    instance.loop = loop;
     instance.muted = true;
     instance.play();
   });
@@ -22,8 +31,21 @@ export const ProductPreviewVideo = ({ uri, onPlaybackFailed }: ProductPreviewVid
   useEffect(() => {
     if (status === "error") {
       onPlaybackFailed?.();
+      return;
     }
-  }, [status, onPlaybackFailed]);
+    if (status === "readyToPlay") {
+      onReady?.();
+    }
+  }, [status, onPlaybackFailed, onReady]);
+
+  useEffect(() => {
+    if (!onEnded) {
+      return undefined;
+    }
+
+    const subscription = player.addListener("playToEnd", onEnded);
+    return () => subscription.remove();
+  }, [onEnded, player]);
 
   return (
     <VideoView

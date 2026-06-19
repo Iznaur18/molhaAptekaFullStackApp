@@ -146,7 +146,7 @@ export function AppShellCatalogGridSection({
           getManage={getFeaturedRaffleManage}
         />
       ) : null}
-      {isHomeCatalogMainView && userStoriesFeed.showStrip ? (
+      {isHomeCatalogMainView ? (
         <UserStoriesStrip
           rings={userStoriesFeed.rings}
           canPublish={userStoriesFeed.canPublish}
@@ -155,6 +155,7 @@ export function AppShellCatalogGridSection({
           currentUserId={currentUserId}
           onRefresh={onUserStoriesRefresh}
           onOpenProfile={onSellerNameClick}
+          onRequestLogin={onRequestLoginAddToCart}
         />
       ) : null}
       {showCuratedProductLists && homeCuratedProductLists.length > 0 ? (

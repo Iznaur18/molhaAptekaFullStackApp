@@ -1,9 +1,17 @@
 import { StyleSheet } from "react-native";
 
-import { RAFFLE_FEATURED_BANNER_LAYOUT as L } from "@/entities/raffle/lib/raffleFeaturedBannerLayout";
+import { RAFFLE_FEATURED_BANNER_CHROME as L } from "@izibuy/shared-lib";
+
 import { RAFFLE_FEATURED_PALETTE as P } from "@/entities/raffle/lib/raffleFeaturedPalette";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { SCREEN_CONTENT_SECTION_GAP } from "@/shared/theme/screenContentLayout";
+
+const BANNER_BORDER_RADIUS = 16;
+const VISUAL_RADIUS_TOP = 11;
+const VISUAL_RADIUS_BOTTOM = 9.6;
+const BADGE_INSET = 7;
+const SOUND_BUTTON_INSET = 7;
+const SOUND_BUTTON_SIZE = 32;
 
 export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
   root: {
@@ -13,42 +21,61 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     marginBottom: SCREEN_CONTENT_SECTION_GAP,
   },
   inner: {
+    position: "relative",
     width: "100%",
     maxWidth: "100%",
     borderWidth: 2,
     borderColor: P.premiumPurpleMuted,
-    borderRadius: L.borderRadius,
+    borderRadius: BANNER_BORDER_RADIUS,
     overflow: "hidden",
-    backgroundColor: P.accentPinkLilac,
-    paddingHorizontal: L.innerPaddingHorizontal,
-    paddingTop: L.innerPaddingTop,
-    paddingBottom: L.innerPaddingBottom,
     shadowColor: P.accentPurple,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.12,
     shadowRadius: 24,
     elevation: 4,
   },
+  innerStacked: {
+    flexDirection: "column",
+    paddingTop: 0,
+    paddingHorizontal: L.innerPaddingHorizontal,
+    paddingBottom: L.innerPaddingBottom,
+  },
+  innerSplit: {
+    flexDirection: "row",
+    alignItems: "stretch",
+    gap: L.splitGridGap,
+    paddingHorizontal: L.innerPaddingHorizontal,
+    paddingTop: L.innerPaddingTop,
+    paddingBottom: L.innerPaddingBottom,
+  },
   innerCompleted: {
     borderColor: P.successLight,
-    backgroundColor: P.successSurface,
     shadowColor: P.successVivid,
   },
   visual: {
     position: "relative",
-    alignSelf: "stretch",
-    height: L.visualMinHeight,
-    minHeight: L.visualMinHeight,
-    marginTop: -L.imageBleedTop,
-    marginLeft: -L.imageBleedX,
-    marginRight: -L.imageBleedX,
-    marginBottom: 0,
-    borderTopLeftRadius: L.visualRadiusTop,
-    borderTopRightRadius: L.visualRadiusTop,
-    borderBottomLeftRadius: L.visualRadiusBottom,
-    borderBottomRightRadius: L.visualRadiusBottom,
     overflow: "hidden",
     backgroundColor: "rgba(0,0,0,0.06)",
+  },
+  visualStacked: {
+    alignSelf: "stretch",
+    marginHorizontal: -L.innerPaddingHorizontal,
+    borderTopLeftRadius: BANNER_BORDER_RADIUS - 2,
+    borderTopRightRadius: BANNER_BORDER_RADIUS - 2,
+    borderBottomLeftRadius: VISUAL_RADIUS_BOTTOM,
+    borderBottomRightRadius: VISUAL_RADIUS_BOTTOM,
+  },
+  visualSplit: {
+    flex: 1,
+    minWidth: 0,
+    alignSelf: "stretch",
+    marginTop: -L.imageBleedTop,
+    marginLeft: -L.innerPaddingHorizontal,
+    marginBottom: -L.imageBleedTop,
+    borderTopLeftRadius: VISUAL_RADIUS_TOP,
+    borderTopRightRadius: VISUAL_RADIUS_TOP,
+    borderBottomLeftRadius: VISUAL_RADIUS_BOTTOM,
+    borderBottomRightRadius: VISUAL_RADIUS_BOTTOM,
   },
   mediaFrame: {
     ...StyleSheet.absoluteFillObject,
@@ -63,19 +90,19 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
   },
   soundButton: {
     position: "absolute",
-    right: L.soundButtonInset,
-    bottom: L.soundButtonInset,
-    width: L.soundButtonSize,
-    height: L.soundButtonSize,
-    borderRadius: L.soundButtonSize / 2,
+    right: SOUND_BUTTON_INSET,
+    bottom: SOUND_BUTTON_INSET,
+    width: SOUND_BUTTON_SIZE,
+    height: SOUND_BUTTON_SIZE,
+    borderRadius: SOUND_BUTTON_SIZE / 2,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "rgba(17, 17, 17, 0.55)",
   },
   badge: {
     position: "absolute",
-    top: L.badgeInset,
-    left: L.badgeInset,
+    top: BADGE_INSET,
+    left: BADGE_INSET,
     paddingHorizontal: 7,
     paddingVertical: 3,
     borderRadius: 6,
@@ -91,29 +118,34 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
   },
   body: {
     minWidth: 0,
-    paddingTop: 10,
+    paddingTop: L.bodyPaddingTop,
     gap: 0,
   },
+  bodySplit: {
+    flex: 1,
+    minWidth: 0,
+    justifyContent: "space-between",
+  },
   title: {
-    marginBottom: 5,
+    marginBottom: L.titleMarginBottom,
     fontSize: 20,
-    lineHeight: 25,
+    lineHeight: L.titleLineHeight,
     fontWeight: "700",
     color: theme.colors.text,
     flexShrink: 1,
   },
   description: {
-    marginBottom: 10,
+    marginBottom: L.descriptionMarginBottom,
     fontSize: 14,
-    lineHeight: 20,
+    lineHeight: L.descriptionLineHeight,
     color: theme.colors.text,
     opacity: 0.88,
   },
   progressWrap: {
-    marginBottom: 12,
+    marginBottom: L.progressMarginBottom,
   },
   progressBar: {
-    height: 9,
+    height: L.progressBarHeight,
     borderRadius: 999,
     backgroundColor: P.progressTrack,
     overflow: "hidden",
@@ -130,15 +162,16 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     backgroundColor: P.successVivid,
   },
   progressLabel: {
-    marginTop: 5,
+    marginTop: L.progressLabelMarginTop,
     fontSize: 14,
+    lineHeight: L.progressLabelLineHeight,
     fontWeight: "600",
     color: theme.colors.text,
     flexShrink: 1,
   },
   manage: {
-    marginBottom: 10,
-    paddingBottom: 10,
+    marginBottom: L.manageMarginBottom,
+    paddingBottom: L.managePaddingBottom,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: P.manageDivider,
   },
@@ -151,6 +184,7 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     gap: 8,
     marginTop: "auto",
+    minHeight: L.actionsMinHeight,
   },
   btnPrimary: {
     paddingVertical: 7,

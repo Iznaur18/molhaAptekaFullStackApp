@@ -18,7 +18,7 @@ type ProductPriceDisplayProps = {
     discountPercent?: number | null;
   };
   showLabel?: boolean;
-  variant?: "card" | "inline" | "detail";
+  variant?: "card" | "inline" | "detail" | "banner";
 };
 
 export const ProductPriceDisplay = ({
@@ -30,16 +30,25 @@ export const ProductPriceDisplay = ({
   const hasDiscount = hasProductCatalogDiscount(product);
   const currentPriceText = formatPriceRub(Math.floor(Number(product.productPrice)));
   const isDetail = variant === "detail";
-  const rootStyle = isDetail ? styles.detailRoot : variant === "inline" ? styles.inlineRoot : styles.cardRoot;
+  const isBanner = variant === "banner";
+  const rootStyle = isDetail
+    ? styles.detailRoot
+    : isBanner
+      ? styles.bannerRoot
+      : variant === "inline"
+        ? styles.inlineRoot
+        : styles.cardRoot;
   const currentStyle = [
     styles.current,
     variant === "card" && styles.cardCurrent,
     isDetail && styles.detailCurrent,
+    isBanner && styles.bannerCurrent,
   ];
   const oldStyle = [
     styles.old,
     variant === "card" && styles.cardOld,
     isDetail && styles.detailOld,
+    isBanner && styles.bannerOld,
   ];
 
   return (
@@ -65,7 +74,7 @@ type ProductDiscountBadgeProps = {
     productOldPrice?: number | null;
     discountPercent?: number | null;
   };
-  variant?: "inline" | "overlay" | "detail";
+  variant?: "inline" | "overlay" | "detail" | "banner";
 };
 
 export const ProductDiscountBadge = ({ product, variant = "inline" }: ProductDiscountBadgeProps) => {
@@ -81,6 +90,7 @@ export const ProductDiscountBadge = ({ product, variant = "inline" }: ProductDis
         styles.badge,
         variant === "overlay" && styles.badgeOverlay,
         variant === "detail" && styles.detailDiscountBadge,
+        variant === "banner" && styles.bannerDiscountBadge,
       ]}
     >
       <AppText
@@ -88,6 +98,7 @@ export const ProductDiscountBadge = ({ product, variant = "inline" }: ProductDis
           styles.badgeText,
           variant === "overlay" && styles.badgeOverlayText,
           variant === "detail" && styles.detailDiscountText,
+          variant === "banner" && styles.bannerDiscountText,
         ]}
       >
         {PRODUCT_CARD_UI.DISCOUNT_BADGE(discountPercent)}

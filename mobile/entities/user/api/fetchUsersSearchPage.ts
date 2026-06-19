@@ -6,6 +6,15 @@ export type UserSearchListItem = Record<string, unknown> & {
   _id: string;
   userName?: string;
   email?: string;
+  isPremiumUser?: boolean;
+  isUserDataConfirmed?: boolean;
+  isBlockedUser?: boolean;
+  followersCount?: number;
+  totalSalesCount?: number;
+  userRatingByVotes?: {
+    countVotes?: number;
+    totalRating?: number;
+  };
 };
 
 type FetchUsersSearchPageParams = {

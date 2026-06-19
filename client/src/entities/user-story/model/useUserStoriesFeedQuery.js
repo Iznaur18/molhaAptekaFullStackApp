@@ -6,7 +6,7 @@ import { userStoriesQueryKeys } from "./userStoriesQueryKeys.js";
 const EMPTY_FEED = {
   rings: [],
   canPublish: false,
-  showStrip: false,
+  showStrip: true,
 };
 
 /**

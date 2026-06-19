@@ -11,8 +11,9 @@ import { userProfileQueryKeys } from "@/entities/user/model/userProfileQueryKeys
 import { useSellerProductsInfiniteQuery } from "@/entities/user/model/useSellerProductsInfiniteQuery";
 import { useUserProfileQuery } from "@/entities/user/model/useUserProfileQuery";
 import { ProfileOverviewBanner } from "@/entities/user/ui/ProfileOverviewBanner";
+import { UserPremiumDisplayName } from "@/entities/user/ui/UserPremiumDisplayName";
 import { UserFollowButton } from "@/features/user-follow/ui/UserFollowButton";
-import { SELLER_PRODUCTS_PAGE_UI } from "@/shared/config";
+import { SELLER_PRODUCTS_PAGE_UI, USER_LIST_ROW_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { useProductGridLayout } from "@/shared/model/useProductGridLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
@@ -148,13 +149,23 @@ export const SellerProductsPage = () => {
           <View style={styles.header}>
             <Text style={styles.title}>{pageTitle}</Text>
             {seller ? <ProfileOverviewBanner user={seller} /> : null}
-            <UserFollowButton
-              targetUserId={sellerId}
-              isFollowing={isFollowing}
-              isAuthorized={isAuthorized}
-              isSelf={isSelf}
-              onFollowChange={handleFollowChange}
-            />
+            {seller ? (
+              <View style={styles.sellerMeta}>
+                <UserPremiumDisplayName
+                  name={String(seller.userName ?? "").trim() || USER_LIST_ROW_UI.MISSING_NAME}
+                  isPremium={seller.isPremiumUser === true}
+                  isUserDataConfirmed={seller.isUserDataConfirmed === true}
+                  textStyle={styles.sellerName}
+                />
+                <UserFollowButton
+                  targetUserId={sellerId}
+                  isFollowing={isFollowing}
+                  isAuthorized={isAuthorized}
+                  isSelf={isSelf}
+                  onFollowChange={handleFollowChange}
+                />
+              </View>
+            ) : null}
           </View>
         }
         ListEmptyComponent={<Text style={styles.hint}>{SELLER_PRODUCTS_PAGE_UI.EMPTY}</Text>}

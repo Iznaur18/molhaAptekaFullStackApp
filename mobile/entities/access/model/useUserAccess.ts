@@ -13,6 +13,7 @@ export type UserAccess = {
   role: UserRole;
   isAdmin: boolean;
   canModerate: boolean;
+  canModerateProducts: boolean;
   isUserDataConfirmed: boolean;
   isPremiumUser: boolean;
 };
@@ -29,6 +30,7 @@ export const useUserAccess = (): UserAccess => {
     role,
     isAdmin: isAdminRole(role),
     canModerate: isModeratorRole(role),
+    canModerateProducts: isAdminRole(role) || isModeratorRole(role),
     isUserDataConfirmed: user?.isUserDataConfirmed === true,
     isPremiumUser: user?.isPremiumUser === true,
   };

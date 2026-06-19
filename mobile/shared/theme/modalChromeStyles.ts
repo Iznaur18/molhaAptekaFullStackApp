@@ -7,6 +7,8 @@ export { MODAL_BACKDROP_SCRIM };
 
 export const STORY_VIEWER_ACTION_SCRIM = "rgba(255,255,255,0.12)";
 export const STORY_VIEWER_DELETE_SCRIM = "rgba(198,40,40,0.35)";
+export const STORY_VIEWER_OVERLAY_SCRIM = "rgba(0,0,0,0.55)";
+export const USER_STORY_FRAME_BORDER_RADIUS = 16;
 
 export const useBottomSheetReportModalStyles = createThemedStyles((theme) => ({
   overlay: {
@@ -216,58 +218,152 @@ export const useCreateStoryModalStyles = createThemedStyles((theme) => ({
 }));
 
 export const useStoryViewerModalStyles = createThemedStyles((theme) => ({
-  backdrop: {
+  viewer: {
     flex: 1,
-    backgroundColor: theme.colors.ink,
+    backgroundColor: theme.colors.nearBlack,
+  },
+  stage: {
+    flex: 1,
+    alignItems: "center",
     justifyContent: "center",
-    padding: theme.spacing[4],
+  },
+  edgePrev: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: "28%",
+    zIndex: 2,
+  },
+  edgeNext: {
+    position: "absolute",
+    right: 0,
+    top: 0,
+    bottom: 0,
+    width: "28%",
+    zIndex: 2,
+  },
+  edgeDisabled: {
+    pointerEvents: "none",
+  },
+  frame: {
+    position: "relative",
+    overflow: "hidden",
+    borderRadius: USER_STORY_FRAME_BORDER_RADIUS,
+    backgroundColor: theme.colors.nearBlack,
+    zIndex: 1,
   },
   closeButton: {
-    alignSelf: "flex-end",
-    padding: theme.spacing[2],
+    position: "absolute",
+    top: 12,
+    right: 12,
+    zIndex: 3,
+    width: 40,
+    height: 40,
+    borderRadius: theme.radius.pill,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: STORY_VIEWER_OVERLAY_SCRIM,
   },
   closeText: {
+    color: theme.colors.onContrast,
+    fontSize: 24,
+    lineHeight: 24,
+  },
+  header: {
+    position: "absolute",
+    top: 12,
+    left: 12,
+    right: 60,
+    zIndex: 3,
+  },
+  authorButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    maxWidth: "100%",
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: theme.radius.pill,
+  },
+  avatarFallback: {
+    width: 40,
+    height: 40,
+    borderRadius: theme.radius.pill,
+    backgroundColor: theme.colors.textSecondary,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  avatarFallbackText: {
+    color: theme.colors.onContrast,
+    fontWeight: "700",
+    fontSize: 16,
+  },
+  authorName: {
+    flexShrink: 1,
     color: theme.colors.onContrast,
     fontSize: 16,
     fontWeight: "600",
   },
-  author: {
-    color: theme.colors.onContrast,
-    fontSize: 18,
-    fontWeight: "700",
-    marginBottom: theme.spacing[3],
-  },
-  mediaWrap: {
-    width: "100%",
-    height: "62%",
-    borderRadius: theme.radius.button,
-    overflow: "hidden",
-    backgroundColor: theme.colors.nearBlack,
+  mediaLayer: {
+    ...StyleSheet.absoluteFillObject,
   },
   media: {
     width: "100%",
     height: "100%",
   },
-  caption: {
+  mediaHidden: {
+    opacity: 0,
+  },
+  mediaState: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 2,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 12,
+    padding: 16,
+    backgroundColor: theme.colors.nearBlack,
+  },
+  mediaStateText: {
     color: theme.colors.onContrast,
     fontSize: 15,
-    marginTop: theme.spacing[3],
-    lineHeight: 22,
+    lineHeight: 20,
+    textAlign: "center",
   },
-  error: {
-    color: theme.colors.danger,
-    fontSize: 13,
-    marginTop: theme.spacing[2],
+  caption: {
+    position: "absolute",
+    left: 12,
+    right: 12,
+    bottom: 72,
+    zIndex: 3,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: theme.radius.sm,
+    backgroundColor: STORY_VIEWER_OVERLAY_SCRIM,
+    color: theme.colors.onContrast,
+    fontSize: 15,
+    lineHeight: 20,
+    textAlign: "center",
+  },
+  captionNoFooter: {
+    bottom: 12,
   },
   footer: {
+    position: "absolute",
+    left: 12,
+    right: 12,
+    bottom: 12,
+    zIndex: 3,
     flexDirection: "row",
-    gap: theme.spacing[3],
-    marginTop: theme.spacing[4],
+    justifyContent: "center",
+    gap: 8,
   },
   actionButton: {
     paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: theme.radius.button,
+    paddingHorizontal: 16,
+    borderRadius: theme.radius.pill,
     backgroundColor: STORY_VIEWER_ACTION_SCRIM,
   },
   deleteButton: {
@@ -278,26 +374,19 @@ export const useStoryViewerModalStyles = createThemedStyles((theme) => ({
     fontSize: 14,
     fontWeight: "600",
   },
-  navRow: {
-    flexDirection: "row",
+  state: {
+    flex: 1,
     alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: theme.spacing[4],
+    justifyContent: "center",
+    padding: 16,
   },
-  navButton: {
-    padding: 10,
-  },
-  navDisabled: {
-    opacity: 0.4,
-  },
-  navText: {
+  stateText: {
     color: theme.colors.onContrast,
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: 15,
+    textAlign: "center",
   },
-  counter: {
-    color: theme.colors.textMuted,
-    fontSize: 14,
+  stateError: {
+    color: theme.colors.danger,
   },
 }));
 

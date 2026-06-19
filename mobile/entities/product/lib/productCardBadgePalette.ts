@@ -48,6 +48,19 @@ export const PRODUCT_CARD_MOBILE_LAYOUT = {
   metaStripGap: 2.4,
 } as const;
 
+/** client designTokens.css + productCardTokens.css */
+export const PRODUCT_CARD_BANNER_CHROME = {
+  accent: "#dc2626",
+  accentHover: "#b91c1c",
+  accentSoft: "#fecaca",
+  gradientEnd: "#fef2f2",
+  imageAspectRatio: 1.35,
+  outerRadius: 15,
+  contentPaddingX: 12,
+  contentPaddingTop: 15,
+  contentPaddingBottom: 13,
+} as const;
+
 /** Синхронизировано с ProductCardBadges.css / ProductCardMobileCatalog.css */
 export const PRODUCT_CARD_BADGE_LAYOUT = {
   borderRadius: 5.6,

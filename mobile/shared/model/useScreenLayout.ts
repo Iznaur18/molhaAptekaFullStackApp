@@ -1,6 +1,11 @@
 import { useMemo } from "react";
 import { useWindowDimensions, type ViewStyle } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import {
+  resolveScreenContentPaddingHorizontal,
+  SCREEN_CONTENT_PADDING_BOTTOM,
+} from "@/shared/theme/screenContentLayout";
 import {
   resolveContentMaxWidth,
   resolveIsLargeTabletScreen,
@@ -26,12 +31,15 @@ export type ScreenLayout = {
   isLargeTablet: boolean;
   contentMaxWidth: number | undefined;
   profileContentMaxWidth: number;
+  contentPaddingHorizontal: number;
+  contentPaddingBottom: number;
   centeredContentStyle: ViewStyle;
   profileContentStyle: ViewStyle;
 };
 
 export const useScreenLayout = (): ScreenLayout => {
   const { width, height } = useWindowDimensions();
+  const safeAreaInsets = useSafeAreaInsets();
 
   return useMemo(() => {
     const widthTier = resolveScreenWidthTier(width);
@@ -43,6 +51,8 @@ export const useScreenLayout = (): ScreenLayout => {
     const layoutWidth = resolveLayoutContentWidth(width);
     const contentMaxWidth = resolveContentMaxWidth(width);
     const profileContentMaxWidth = resolveProfileContentMaxWidth(width);
+    const contentPaddingHorizontal = resolveScreenContentPaddingHorizontal(safeAreaInsets);
+    const contentPaddingBottom = SCREEN_CONTENT_PADDING_BOTTOM;
 
     const centeredContentStyle: ViewStyle = contentMaxWidth
       ? { width: "100%", maxWidth: contentMaxWidth, alignSelf: "center" }
@@ -66,8 +76,10 @@ export const useScreenLayout = (): ScreenLayout => {
       isLargeTablet,
       contentMaxWidth,
       profileContentMaxWidth,
+      contentPaddingHorizontal,
+      contentPaddingBottom,
       centeredContentStyle,
       profileContentStyle,
     };
-  }, [width, height]);
+  }, [height, safeAreaInsets.left, safeAreaInsets.right, width]);
 };

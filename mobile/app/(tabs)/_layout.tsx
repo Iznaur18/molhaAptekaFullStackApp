@@ -8,6 +8,7 @@ import {
   MOBILE_BOTTOM_NAV_UI,
   MY_ORDERS_PAGE_UI,
   MY_PROFILE_PAGE_UI,
+  USERS_PAGE_UI,
 } from "@/shared/config";
 import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
 import { MobileBottomTabBar } from "@/shared/ui/MobileBottomTabBar";
@@ -65,6 +66,13 @@ export default function TabLayout() {
         options={{
           href: null,
           title: MY_ORDERS_PAGE_UI.TITLE,
+        }}
+      />
+      <Tabs.Screen
+        name="users"
+        options={{
+          href: null,
+          title: USERS_PAGE_UI.TITLE,
         }}
       />
       <Tabs.Screen

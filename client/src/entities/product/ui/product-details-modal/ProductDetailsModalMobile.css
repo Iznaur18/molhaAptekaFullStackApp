@@ -1,11 +1,6 @@
 @media (max-width: 40rem) {
   .product-modal-shell__backdrop:has(.product-details-modal) {
-    --app-shell-mobile-bottom-nav-height: 3.1rem;
-
-    inset: 0 0
-      calc(
-        var(--app-shell-mobile-bottom-nav-height) + env(safe-area-inset-bottom, 0px)
-      );
+    inset: 0;
     align-items: stretch;
     justify-content: stretch;
     padding: 0;
@@ -26,10 +21,7 @@
 
   .product-details-modal:not(.product-details-modal--mobile-dock-active)
     .product-modal-shell__body {
-    padding-bottom: calc(
-      var(--app-shell-mobile-bottom-nav-height) + env(safe-area-inset-bottom, 0px) +
-        var(--iz-space-4)
-    );
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--iz-space-4));
   }
 
   .product-details-modal__body {
@@ -199,9 +191,7 @@
     position: fixed;
     left: 0;
     right: 0;
-    bottom: calc(
-      var(--app-shell-mobile-bottom-nav-height) + env(safe-area-inset-bottom, 0px)
-    );
+    bottom: env(safe-area-inset-bottom, 0px);
     z-index: calc(var(--iz-z-modal-shell) + 2);
     padding: 0.55rem var(--iz-space-3) 0.65rem;
     border-top: 1px solid var(--iz-color-border);

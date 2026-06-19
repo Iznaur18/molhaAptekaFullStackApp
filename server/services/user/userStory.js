@@ -36,7 +36,7 @@ export async function getUserStoriesFeedForViewer({ viewerUserId }) {
   return {
     rings,
     canPublish,
-    showStrip: rings.length > 0 || canPublish,
+    showStrip: true,
   };
 }
 
@@ -60,10 +60,7 @@ export async function createUserStory({ authorUserId, body }) {
     .lean();
 
   if (!canPublishUserStory(user)) {
-    throw new AppError(
-      403,
-      "Публиковать сторис могут только премиум-пользователи и staff",
-    );
+    throw new AppError(403, "Публикация сторис недоступна");
   }
 
   if (!isStaffUnlimitedUserStories(user)) {

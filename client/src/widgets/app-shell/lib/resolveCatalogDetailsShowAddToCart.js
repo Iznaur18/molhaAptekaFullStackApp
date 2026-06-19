@@ -1,27 +1,21 @@
 import { isCurrentUserProductSeller } from "../../../entities/product/lib/isCurrentUserProductSeller.js";
-import { isSellerProductsPath } from "../../../shared/lib/sellerPaths.js";
 
 /**
  * Показывать «В корзину» в модалке товара (buyer-path).
- * Seller-products — без корзины; raffle products — можно покупать как в каталоге.
+ * Каталог, `/seller/:id`, розыгрыш — покупатель может добавить чужой товар.
  *
  * @param {{
  *   product: import('../../../entities/product/model/types.js').ProductFromApi | null;
- *   pathname: string;
  *   isMineMode: boolean;
  *   currentUserId?: string | null;
  * }} params
  */
 export function resolveCatalogDetailsShowAddToCart({
   product,
-  pathname,
   isMineMode,
   currentUserId = null,
 }) {
   if (!product) {
-    return false;
-  }
-  if (isSellerProductsPath(pathname)) {
     return false;
   }
   if (isMineMode) {

@@ -1,6 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
-import { useLocation } from "react-router-dom";
 
 import { patchProductInAllCatalogCaches } from "../../../entities/product/lib/catalogProductsQueryCache.js";
 import { resolveCatalogDetailsShowAddToCart } from "../lib/resolveCatalogDetailsShowAddToCart.js";
@@ -28,7 +27,6 @@ export const useHomeCatalogProductDetails = ({
   onBeforeOpenDetails,
 }) => {
   const queryClient = useQueryClient();
-  const location = useLocation();
   const ensureCatalogProduct = useEnsureCatalogProduct();
   const [catalogProductDetailsTab, setCatalogProductDetailsTab] = useState(
     /** @type {'details' | 'auction' | 'reviews' | 'installment'} */ ("details"),
@@ -69,22 +67,26 @@ export const useHomeCatalogProductDetails = ({
     () =>
       resolveCatalogDetailsShowAddToCart({
         product: catalogProductDetails,
-        pathname: location.pathname,
         isMineMode,
         currentUserId,
       }),
-    [catalogProductDetails, currentUserId, isMineMode, location.pathname],
+    [catalogProductDetails, currentUserId, isMineMode],
   );
 
-  /** @param {string} productId */
-  const handleCatalogProductClick = useCallback(
-    (productId) => {
+  /** @param {string} productId @param {ProductFromApi | null | undefined} [seedProduct] */
+  const openCatalogProductDetails = useCallback(
+    (productId, seedProduct = null) => {
       onBeforeOpenDetails?.();
       setCatalogProductDetailsTab("details");
+
       const inList = products.find((row) => String(row._id) === String(productId));
       if (inList) {
         setCatalogProductDetails(inList);
         return;
+      }
+
+      if (seedProduct) {
+        setCatalogProductDetails(seedProduct);
       }
 
       void ensureCatalogProduct(String(productId))
@@ -92,11 +94,32 @@ export const useHomeCatalogProductDetails = ({
           setCatalogProductDetails(product);
         })
         .catch(() => {
-          // модалка не открывается
+          setCatalogProductDetails(null);
         });
     },
     [ensureCatalogProduct, onBeforeOpenDetails, products, setCatalogProductDetails],
   );
+
+  /** @param {string} productId */
+  const handleCatalogProductClick = useCallback(
+    (productId) => {
+      openCatalogProductDetails(productId);
+    },
+    [openCatalogProductDetails],
+  );
+
+  /** @param {ProductFromApi} product */
+  const handleOpenCatalogProductDetails = useCallback(
+    (product) => {
+      if (product?._id == null) {
+        return;
+      }
+      openCatalogProductDetails(String(product._id), product);
+    },
+    [openCatalogProductDetails],
+  );
+
+  const handleUserProfileProductClick = handleOpenCatalogProductDetails;
 
   const handleProductStatsUpdate = useCallback(
     (productId, stats) => {
@@ -143,6 +166,8 @@ export const useHomeCatalogProductDetails = ({
     showCatalogProductManageFooter,
     catalogDetailsShowAddToCart,
     handleCatalogProductClick,
+    handleOpenCatalogProductDetails,
+    handleUserProfileProductClick,
     handleProductStatsUpdate,
   };
 };

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   FlatList,
+  type LayoutChangeEvent,
   type NativeScrollEvent,
   type NativeSyntheticEvent,
   View,
@@ -28,9 +29,18 @@ export const RaffleFeaturedCarousel = ({
 }: RaffleFeaturedCarouselProps) => {
   const styles = useRaffleFeaturedCarouselStyles();
   const { slideWidth, snapInterval } = useRaffleFeaturedSlideLayout();
+  const [viewportWidth, setViewportWidth] = useState(0);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const listRef = useRef<FlatList<RaffleFromApi>>(null);
+  const cardWidth = viewportWidth > 0 ? viewportWidth : slideWidth;
+
+  const handleViewportLayout = useCallback((event: LayoutChangeEvent) => {
+    const nextWidth = Math.round(event.nativeEvent.layout.width);
+    if (nextWidth > 0) {
+      setViewportWidth(nextWidth);
+    }
+  }, []);
 
   useEffect(() => {
     setActiveIndex(0);
@@ -69,9 +79,14 @@ export const RaffleFeaturedCarousel = ({
   if (raffles.length === 1) {
     const raffle = raffles[0];
     return (
-      <View style={styles.singleSlide} accessibilityLabel={HOME_FEED_UI.RAFFLES_SECTION_ARIA}>
+      <View
+        style={styles.singleSlide}
+        onLayout={handleViewportLayout}
+        accessibilityLabel={HOME_FEED_UI.RAFFLES_SECTION_ARIA}
+      >
         <RaffleFeaturedBanner
           raffle={raffle}
+          cardWidth={cardWidth}
           onOpenProducts={onOpenProducts}
           manage={getManage?.(raffle) ?? null}
         />
@@ -82,6 +97,7 @@ export const RaffleFeaturedCarousel = ({
   return (
     <View
       style={styles.viewport}
+      onLayout={handleViewportLayout}
       accessibilityLabel={HOME_FEED_UI.RAFFLES_SECTION_ARIA}
       onTouchStart={() => setIsPaused(true)}
       onTouchEnd={() => setIsPaused(false)}
@@ -103,12 +119,13 @@ export const RaffleFeaturedCarousel = ({
         onMomentumScrollEnd={handleMomentumScrollEnd}
         renderItem={({ item, index }) => (
           <View
-            style={{ width: slideWidth }}
+            style={{ width: cardWidth }}
             accessibilityElementsHidden={index !== activeIndex}
             importantForAccessibility={index === activeIndex ? "auto" : "no-hide-descendants"}
           >
             <RaffleFeaturedBanner
               raffle={item}
+              cardWidth={cardWidth}
               onOpenProducts={onOpenProducts}
               manage={getManage?.(item) ?? null}
             />

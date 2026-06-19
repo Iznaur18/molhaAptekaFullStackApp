@@ -243,62 +243,6 @@ export const useUserFollowButtonStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useUserListRowStyles = createThemedStyles((theme) => ({
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 1,
-    borderRadius: theme.radius.sm,
-    padding: theme.spacing[3],
-    gap: 6,
-    backgroundColor: theme.colors.surface,
-    borderColor: theme.colors.border,
-  },
-  rowPressed: {
-    opacity: 0.92,
-  },
-  head: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-  avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: theme.colors.surfaceMuted,
-  },
-  name: {
-    flex: 1,
-    fontSize: 16,
-    fontWeight: "700",
-    color: theme.colors.text,
-  },
-  email: {
-    fontSize: 13,
-    color: theme.colors.textMuted,
-  },
-  bannedBadge: {
-    alignSelf: "flex-start",
-    paddingHorizontal: theme.spacing[2],
-    paddingVertical: 2,
-    borderRadius: 6,
-    backgroundColor: theme.colors.warningSurface,
-  },
-  bannedText: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: theme.colors.danger,
-  },
-  metrics: {
-    gap: 2,
-  },
-  metric: {
-    fontSize: 13,
-    color: theme.colors.textMuted,
-  },
-}));
-
 export const useUserVoteRatingStyles = createThemedStyles((theme) => ({
   root: {
     marginTop: theme.spacing[4],
@@ -604,6 +548,29 @@ export const useSubscriptionsPageStyles = createThemedStyles((theme) => ({
     fontSize: 13,
     fontWeight: "600",
     color: theme.colors.textSecondary,
+  },
+}));
+
+export const useSubscriptionUserRowStyles = createThemedStyles((theme) => ({
+  root: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing[3],
+    minWidth: 0,
+  },
+  avatar: {
+    width: 44,
+    height: 44,
+  },
+  nameWrap: {
+    flex: 1,
+    minWidth: 0,
+  },
+  nameText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: theme.colors.text,
   },
 }));
 

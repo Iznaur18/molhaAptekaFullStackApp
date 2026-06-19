@@ -1,31 +1,39 @@
 import { useState } from "react";
 import { Linking, Pressable, Text, View } from "react-native";
 
+import { useRaffleFeaturedBannerMetrics } from "@/entities/raffle/model/useRaffleFeaturedBannerMetrics";
 import { RaffleDescriptionModal } from "@/entities/raffle/ui/RaffleDescriptionModal";
+import { RaffleFeaturedBannerBackground } from "@/entities/raffle/ui/RaffleFeaturedBannerBackground";
 import { RaffleManageActions } from "@/entities/raffle/ui/RaffleManageActions";
 import { RafflePrizeMedia } from "@/entities/raffle/ui/RafflePrizeMedia";
 import type { FeaturedRaffleManage, RaffleFromApi } from "@/entities/raffle/model/types";
 import { RAFFLE_FEATURED_BANNER_UI } from "@/shared/config";
 import { useRaffleFeaturedBannerStyles } from "@/shared/theme/raffleFeaturedStyles";
 
+const DESCRIPTION_PREVIEW_MAX_LINES = 3;
+
 type RaffleFeaturedBannerProps = {
   raffle: RaffleFromApi;
+  cardWidth: number;
   onOpenProducts: (raffleId: string) => void;
   manage?: FeaturedRaffleManage | null;
 };
 
 export const RaffleFeaturedBanner = ({
   raffle,
+  cardWidth,
   onOpenProducts,
   manage = null,
 }: RaffleFeaturedBannerProps) => {
   const styles = useRaffleFeaturedBannerStyles();
+  const metrics = useRaffleFeaturedBannerMetrics(cardWidth);
   const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
+  const isSplit = metrics.layout === "split";
+  const isCompleted = raffle.status === "completed";
 
   const progress = Number(raffle.salesProgress) || 0;
   const target = Number(raffle.targetSales) || 0;
   const percent = target > 0 ? Math.min(100, Math.round((progress / target) * 100)) : 0;
-  const isCompleted = raffle.status === "completed";
   const remaining = Math.max(0, target - progress);
   const hasManage = Boolean(
     manage && (manage.showEdit || manage.showDelete || manage.showPause),
@@ -52,16 +60,36 @@ export const RaffleFeaturedBanner = ({
       accessibilityRole="summary"
       accessibilityLabel={raffle.title}
     >
-      <View style={[styles.inner, isCompleted && styles.innerCompleted]}>
-        <View style={styles.visual}>
+      <View
+        style={[
+          styles.inner,
+          isSplit ? styles.innerSplit : styles.innerStacked,
+          isCompleted && styles.innerCompleted,
+          { minHeight: metrics.innerMinHeight },
+        ]}
+      >
+        <RaffleFeaturedBannerBackground completed={isCompleted} />
+
+        <View
+          style={[
+            styles.visual,
+            isSplit ? styles.visualSplit : styles.visualStacked,
+            {
+              height: metrics.visualHeight,
+              minHeight: metrics.visualHeight,
+            },
+          ]}
+        >
           <RafflePrizeMedia raffle={raffle} showSoundToggle />
           <View style={[styles.badge, isCompleted && styles.badgeCompleted]}>
             <Text style={styles.badgeText}>{RAFFLE_FEATURED_BANNER_UI.BADGE}</Text>
           </View>
         </View>
 
-        <View style={styles.body}>
-          <Text style={styles.title}>{raffle.title}</Text>
+        <View style={[styles.body, isSplit && styles.bodySplit]}>
+          <Text style={styles.title} numberOfLines={2}>
+            {raffle.title}
+          </Text>
 
           {raffle.description ? (
             <Pressable
@@ -69,7 +97,7 @@ export const RaffleFeaturedBanner = ({
               accessibilityLabel={RAFFLE_FEATURED_BANNER_UI.DESCRIPTION_OPEN_ARIA}
               onPress={() => setIsDescriptionOpen(true)}
             >
-              <Text style={styles.description} numberOfLines={3}>
+              <Text style={styles.description} numberOfLines={DESCRIPTION_PREVIEW_MAX_LINES}>
                 {raffle.description}
               </Text>
             </Pressable>
@@ -93,7 +121,7 @@ export const RaffleFeaturedBanner = ({
                 ]}
               />
             </View>
-            <Text style={styles.progressLabel}>
+            <Text style={styles.progressLabel} numberOfLines={2}>
               {RAFFLE_FEATURED_BANNER_UI.PROGRESS(progress, target)}
               {!isCompleted && remaining > 0
                 ? ` · ${RAFFLE_FEATURED_BANNER_UI.REMAINING(remaining)}`
@@ -103,7 +131,16 @@ export const RaffleFeaturedBanner = ({
 
           {hasManage ? (
             <View style={[styles.manage, isCompleted && styles.manageCompleted]}>
-              <RaffleManageActions {...manage} busy={manage?.busy} completed={isCompleted} />
+              <RaffleManageActions
+                showEdit={manage?.showEdit}
+                showDelete={manage?.showDelete}
+                showPause={manage?.showPause}
+                onEdit={manage?.onEdit}
+                onDelete={manage?.onDelete}
+                onPause={manage?.onPause}
+                busy={manage?.busy}
+                completed={isCompleted}
+              />
             </View>
           ) : null}
 

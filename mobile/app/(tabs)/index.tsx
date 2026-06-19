@@ -7,14 +7,22 @@ import { buildCategoryFilterChips } from "@/entities/product-category-display/li
 import { useProductCategoryDisplaysQuery } from "@/entities/product-category-display/model/useProductCategoryDisplaysQuery";
 import { useProductCategoryChildrenQuery } from "@/entities/product-category-tree/model/useProductCategoryChildrenQuery";
 import type { CatalogListFilters, CatalogSort } from "@/entities/product/model/catalogListFilters";
-import { ProductCard } from "@/entities/product/ui/ProductCard";
 import { useCatalogProductsInfiniteQuery } from "@/entities/product/model/useCatalogProductsInfiniteQuery";
+import { buildCatalogGridRows } from "@/features/catalog-grid/lib/buildCatalogGridRows";
+import { resolveCatalogGridListContentStyle } from "@/features/catalog-grid/lib/catalogGridLayout";
+import { shouldShowCatalogTier3Banners } from "@/features/catalog-grid/lib/shouldShowCatalogTier3Banners";
+import { CatalogGridRowItem } from "@/features/catalog-grid/ui/CatalogGridRowItem";
 import { CatalogCategoryChips } from "@/features/catalog-filter/ui/CatalogCategoryChips";
 import { CatalogSubcategoryChips } from "@/features/catalog-filter/ui/CatalogSubcategoryChips";
 import { consumePendingCatalogFilters } from "@/features/catalog-browser/model/pendingCatalogFilters";
 import { HomeCatalogSearchRow } from "@/features/home-feed/ui/HomeCatalogSearchRow";
 import { HomeFeedHeader } from "@/features/home-feed/ui/HomeFeedHeader";
 import { isHomeCatalogMainView } from "@/features/home-feed/lib/isHomeCatalogMainView";
+import {
+  EMPTY_HOME_CATALOG_FEED_FILTERS,
+  type HomeCatalogFeedFiltersState,
+} from "@/features/home-feed/model/homeCatalogFeedFilters";
+import { useResetHomeCatalogFilters } from "@/features/home-feed/model/useResetHomeCatalogFilters";
 import {
   API_CLIENT_UI,
   CATALOG_SEARCH_DEBOUNCE_MS,
@@ -26,18 +34,9 @@ import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useFeedScreenStyles } from "@/shared/theme/catalogProductStyles";
 import { ScreenErrorState } from "@/shared/ui/ScreenStates";
 
-type FeedFiltersState = Pick<
-  CatalogListFilters,
-  "sort" | "followingOnly" | "auctionOnly" | "installmentOnly" | "saleOnly"
->;
+type FeedFiltersState = HomeCatalogFeedFiltersState;
 
-const EMPTY_FEED_FILTERS: FeedFiltersState = {
-  sort: undefined,
-  followingOnly: false,
-  auctionOnly: false,
-  installmentOnly: false,
-  saleOnly: false,
-};
+const EMPTY_FEED_FILTERS = EMPTY_HOME_CATALOG_FEED_FILTERS;
 
 export default function CatalogScreen() {
   const styles = useFeedScreenStyles();
@@ -149,6 +148,16 @@ export default function CatalogScreen() {
     [debouncedSearch, feedFilters, selectedRootSlug, selectedSubcategoryId, selectedSellerPersonalCategoryId],
   );
 
+  const showFullWidthTier3Banners = shouldShowCatalogTier3Banners({ showHomeFeed });
+
+  const catalogGridRows = useMemo(
+    () =>
+      buildCatalogGridRows(catalogQuery.products, productGrid.columns, {
+        showFullWidthTier3Banners,
+      }),
+    [catalogQuery.products, productGrid.columns, showFullWidthTier3Banners],
+  );
+
   const handleRefresh = useCallback(() => {
     catalogQuery.refetch();
   }, [catalogQuery]);
@@ -158,6 +167,24 @@ export default function CatalogScreen() {
       catalogQuery.fetchNextPage();
     }
   };
+
+  const handleResetHomeCatalog = useResetHomeCatalogFilters({
+    setSearchInput,
+    setDebouncedSearch,
+    setSelectedRootSlug,
+    setSelectedSubcategoryId,
+    setSelectedSellerPersonalCategoryId,
+    setFeedFilters,
+    emptyFeedFilters: EMPTY_FEED_FILTERS,
+  });
+
+  const searchRow = (
+    <HomeCatalogSearchRow
+      value={searchInput}
+      onChange={setSearchInput}
+      onBrandPress={handleResetHomeCatalog}
+    />
+  );
 
   const listHeader = (
     <View>
@@ -182,7 +209,7 @@ export default function CatalogScreen() {
   if (catalogQuery.isPending) {
     return (
       <View style={styles.flex}>
-        <HomeCatalogSearchRow value={searchInput} onChange={setSearchInput} />
+        {searchRow}
         {listHeader}
         <View style={styles.centered}>
           <ActivityIndicator size="large" />
@@ -194,7 +221,7 @@ export default function CatalogScreen() {
   if (catalogQuery.isError) {
     return (
       <View style={styles.flex}>
-        <HomeCatalogSearchRow value={searchInput} onChange={setSearchInput} />
+        {searchRow}
         {listHeader}
         <ScreenErrorState
           message={formatApiErrorMessage(catalogQuery.error, API_CLIENT_UI.CATALOG_ERROR)}
@@ -206,16 +233,25 @@ export default function CatalogScreen() {
 
   return (
     <View style={[styles.flex, centeredContentStyle]}>
-      <HomeCatalogSearchRow value={searchInput} onChange={setSearchInput} />
+      {searchRow}
       <FlatList
         key={productGrid.listKey}
-        data={catalogQuery.products}
-        keyExtractor={(item) => item._id}
-        numColumns={productGrid.columns}
+        data={catalogGridRows}
+        keyExtractor={(item) => item.key}
+        numColumns={1}
         ListHeaderComponent={listHeader}
-        renderItem={({ item }) => <ProductCard product={item} />}
-        contentContainerStyle={styles.listContent}
-        columnWrapperStyle={productGrid.columns > 1 ? styles.row : undefined}
+        renderItem={({ item }) => (
+          <CatalogGridRowItem
+            row={item}
+            columns={productGrid.columns}
+            gap={productGrid.gap}
+            tileWidth={productGrid.tileWidth}
+          />
+        )}
+        contentContainerStyle={[
+          styles.listContent,
+          resolveCatalogGridListContentStyle(productGrid.gap),
+        ]}
         style={styles.flex}
         refreshControl={
           <ThemedRefreshControl refreshing={catalogQuery.isRefetching} onRefresh={handleRefresh} />

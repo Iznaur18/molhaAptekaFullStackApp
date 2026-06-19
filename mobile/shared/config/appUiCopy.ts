@@ -78,6 +78,7 @@ export const API_CLIENT_UI = {
   FETCH_USERS_SEARCH_FALLBACK: "Не удалось загрузить пользователей",
   FETCH_USER_PROFILE_FALLBACK: "Не удалось загрузить профиль пользователя",
   FETCH_USER_PRODUCTS_FALLBACK: "Не удалось загрузить товары продавца",
+  FETCH_USER_PURCHASES_FALLBACK: "Не удалось загрузить покупки",
   VOTE_SUBMIT_FALLBACK: "Не удалось отправить оценку",
   FETCH_MY_VOTE_FALLBACK: "Не удалось загрузить вашу оценку",
 } as const;
@@ -700,7 +701,9 @@ export const USER_SEARCH_UI = {
 
 export const USER_SEARCH_INPUT_UI = {
   PLACEHOLDER: "Поиск по нику, телефону или email…",
-  CLEAR: "Очистить",
+  ARIA_LABEL: "Поиск пользователей",
+  CLEAR_ARIA: "Очистить поле поиска",
+  PENDING_ARIA: "Идёт поиск",
 } as const;
 
 export const USERS_PAGE_UI = {
@@ -717,6 +720,7 @@ export const USER_LIST_ROW_UI = {
   BADGE_BLOCKED: "Блок",
   MISSING_NAME: "—",
   RATING_LABEL: "Рейтинг",
+  RATING_TITLE: "Средняя оценка · число голосов",
   RATING_SCORE_LABEL: "Оценка",
   USER_DATA_CONFIRMED_LABEL: "Пользователь подтверждён",
   TOTAL_SALES_COUNT_LABEL: "Продаж",
@@ -736,6 +740,17 @@ export const USER_PROFILE_PRODUCTS_UI = {
   VIEW_ALL: "Все товары",
   LOADING: "Загрузка товаров…",
   EMPTY: "Товаров нет",
+  SHOW_MORE: "Показать ещё",
+  SHOW_LESS: "Показать меньше",
+  LOADING_MORE: "Загрузка…",
+  UNAVAILABLE: "Товар недоступен или удален",
+} as const;
+
+export const USER_PROFILE_PURCHASES_UI = {
+  HEADING: "Список покупок",
+  LOADING: "Загрузка покупок…",
+  EMPTY: "Покупок нет",
+  UNAVAILABLE: "Товар недоступен или удален",
 } as const;
 
 export const SELLER_PRODUCTS_PAGE_UI = {

@@ -96,7 +96,7 @@ export const MyProductsPage = () => {
         }
         renderItem={({ item }) => (
           <View style={styles.cardWrap}>
-            <ProductCard product={item as Record<string, unknown> & { _id: string }} />
+            <ProductCard product={item as Record<string, unknown> & { _id: string }} highlightCatalogPromotion={false} isMineMode />
             <View style={styles.cardActions}>
               <Pressable
                 style={styles.cardAction}

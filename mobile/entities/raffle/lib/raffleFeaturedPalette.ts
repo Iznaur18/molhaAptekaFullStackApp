@@ -6,6 +6,7 @@ export const RAFFLE_FEATURED_PALETTE = {
   premiumPurpleMuted: "#c4b5fd",
   premiumPurpleLight: "#a78bfa",
   accentPinkSurface: "#faf5ff",
+  accentPinkSurface: "#faf5ff",
   accentPinkLilac: "#f8f4ff",
   accentPink: "#db2777",
   accentPinkDeep: "#9d174d",

@@ -5,10 +5,13 @@ import { formatProductReviewRatingLine } from "@/entities/product-review/lib/for
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useProductCardChromeFlags } from "@/entities/product/lib/useProductCardChromeFlags";
+import { resolveProductCardPromotionFrameStyle } from "@/entities/product/lib/resolveProductCardPromotionFrameStyle";
 import { useProductCardMediaState } from "@/entities/product/lib/useProductCardMediaState";
+import { ProductCardPromotionBackground } from "@/entities/product/ui/ProductCardPromotionBackground";
 import { ProductCatalogStatusBadges } from "@/entities/product/ui/ProductCatalogStatusBadges";
 import { ProductCardMediaGalleryNav } from "@/entities/product/ui/ProductCardMediaGalleryNav";
 import { ProductCardMediaSlide } from "@/entities/product/ui/ProductCardMediaSlide";
+import { ProductCardBanner } from "@/entities/product/ui/ProductCardBanner";
 import { ProductCardSellerRow } from "@/entities/product/ui/ProductCardSellerRow";
 import {
   ProductDiscountBadge,
@@ -31,26 +34,62 @@ type ProductCardProps = {
     averageRating?: number;
     reviewCount?: number;
   };
+  promotionFullWidth?: boolean;
+  layout?: "default" | "catalog-grid";
+  highlightCatalogPromotion?: boolean;
+  isMineMode?: boolean;
+  isModerationQueue?: boolean;
 };
 
-export const ProductCard = ({ product }: ProductCardProps) => {
+export const ProductCard = ({
+  product,
+  promotionFullWidth = false,
+  layout = "default",
+  highlightCatalogPromotion = true,
+  isMineMode = false,
+  isModerationQueue = false,
+}: ProductCardProps) => {
   const router = useRouter();
   const styles = useProductCardStyles();
   const { isPremiumUser } = useUserAccess();
   const isAuthorized = useIsAuthorized();
-  const flags = useProductCardChromeFlags(product);
+  const flags = useProductCardChromeFlags(product, {
+    promotionFullWidth,
+    highlightCatalogPromotion,
+    isMineMode,
+    isModerationQueue,
+  });
   const cardMedia = useProductCardMediaState(product);
   const name = product.productName?.trim() || "Без названия";
   const reviewLine = formatProductReviewRatingLine(product.averageRating, product.reviewCount);
   const hasReviewRating = reviewLine.length > 0;
   const openProductLabel = PRODUCT_UI.OPEN_ARIA(name);
 
+  if (flags.showBannerLayout) {
+    return <ProductCardBanner product={product} />;
+  }
+
   const handlePress = () => {
     router.push({ pathname: "/product/[id]", params: { id: product._id } });
   };
 
+  const promotionFrameStyle =
+    flags.showPromotionChrome && flags.promotionFrameTier
+      ? resolveProductCardPromotionFrameStyle(flags.promotionFrameTier, "compact")
+      : null;
+
   return (
-    <View style={styles.card}>
+    <View
+      style={[
+        styles.card,
+        layout === "catalog-grid" && styles.cardCatalogGrid,
+        promotionFrameStyle,
+      ]}
+    >
+      {flags.showPromotionChrome && flags.promotionFrameTier ? (
+        <ProductCardPromotionBackground tier={flags.promotionFrameTier} variant="compact" />
+      ) : null}
+
       <View style={styles.imageWrap}>
         <Pressable
           style={({ pressed }) => [styles.imagePressable, pressed && styles.cardPressed]}

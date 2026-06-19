@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-const SCREEN_CONTENT_PADDING_HORIZONTAL = 8;
+const SCREEN_CONTENT_PADDING_HORIZONTAL = 14;
 const RAFFLE_FEATURED_SLIDE_GAP = 12;
 
 // Mirror of useRaffleFeaturedSlideLayout.ts (keep in sync)

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { USER_STORY_UI } from "../../../shared/config/appUiCopy.js";
 import { resolveUserStoryAvatarUrl } from "../lib/resolveUserStoryMedia.js";
@@ -16,6 +16,7 @@ import "./UserStoriesStrip.css";
  *   currentUserId: string | null;
  *   onRefresh: () => void;
  *   onOpenProfile: (userId: string) => void;
+ *   onRequestLogin?: () => void;
  * }} props
  */
 export function UserStoriesStrip({
@@ -26,6 +27,7 @@ export function UserStoriesStrip({
   currentUserId,
   onRefresh,
   onOpenProfile,
+  onRequestLogin,
 }) {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [viewerAuthor, setViewerAuthor] = useState(
@@ -47,7 +49,18 @@ export function UserStoriesStrip({
     [rings],
   );
 
-  if (!showStrip) {
+  const handleAddClick = useCallback(() => {
+    if (!isAuthorized) {
+      onRequestLogin?.();
+      return;
+    }
+    if (!canPublish) {
+      return;
+    }
+    setIsCreateOpen(true);
+  }, [canPublish, isAuthorized, onRequestLogin]);
+
+  if (!showStrip && sortedRings.length === 0) {
     return null;
   }
 
@@ -55,22 +68,20 @@ export function UserStoriesStrip({
     <>
       <section className="user-stories-strip" aria-label="Сторисы">
         <div className="user-stories-strip__scroll">
-          {canPublish ? (
-            <button
-              type="button"
-              className="user-stories-strip__item user-stories-strip__item_add"
-              onClick={() => setIsCreateOpen(true)}
-            >
+          <button
+            type="button"
+            className="user-stories-strip__item user-stories-strip__item_add"
+            onClick={handleAddClick}
+          >
               <span className="user-stories-strip__ring user-stories-strip__ring_add">
                 <span className="user-stories-strip__plus" aria-hidden>
                   +
                 </span>
               </span>
               <span className="user-stories-strip__label">
-                {USER_STORY_UI.ADD_LABEL}
-              </span>
-            </button>
-          ) : null}
+              {USER_STORY_UI.ADD_LABEL}
+            </span>
+          </button>
 
           {sortedRings.map((ring) => {
             const authorId = String(ring.author._id);

@@ -49,7 +49,7 @@ const ModerationRow = ({ product, onChanged, approveMutation, rejectMutation }: 
 
   return (
     <View style={styles.row}>
-      <ProductCard product={product} />
+      <ProductCard product={product} highlightCatalogPromotion={false} isModerationQueue />
       <Text style={styles.meta}>
         {PRODUCT_MODERATION_PAGE_UI.SELLER_LABEL}: {getProductSellerDisplayName(product)}
       </Text>

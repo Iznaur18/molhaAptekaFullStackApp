@@ -1,4 +1,3 @@
-import { isPremiumActive } from "./premiumAccess.js";
 import {
   IN_APP_NOTIFICATION_KIND_STORY_HIDDEN,
   IN_APP_NOTIFICATION_MESSAGE_STORY_HIDDEN,
@@ -33,13 +32,7 @@ const UPLOAD_PATH_PREFIX = "/uploads/";
  * @param {Record<string, unknown> | null | undefined} user
  */
 export function canPublishUserStory(user) {
-  if (!user || user.isBlockedUser === true || user.isActiveUser === false) {
-    return false;
-  }
-  if (canModerateProductsRole(user.userRole)) {
-    return true;
-  }
-  return isPremiumActive(user);
+  return Boolean(user && user.isBlockedUser !== true);
 }
 
 /**

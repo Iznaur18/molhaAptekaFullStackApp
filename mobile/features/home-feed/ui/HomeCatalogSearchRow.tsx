@@ -1,40 +1,39 @@
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useRouter } from "expo-router";
-import { Pressable, View } from "react-native";
+import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { CatalogSearchBar } from "@/features/catalog-filter/ui/CatalogSearchBar";
-import { HEADER_USERS_BUTTON_UI } from "@/shared/config";
+import { HomeCatalogBrandLogo } from "@/features/home-feed/ui/HomeCatalogBrandLogo";
+import { HomeCatalogUsersButton } from "@/features/home-feed/ui/HomeCatalogUsersButton";
+import { resolveScreenContentPaddingHorizontal } from "@/shared/theme/screenContentLayout";
 import { useHomeCatalogSearchRowStyles } from "@/shared/theme/catalogProductStyles";
-import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
 
 type HomeCatalogSearchRowProps = {
   value: string;
   onChange: (value: string) => void;
+  onBrandPress?: () => void;
 };
 
-export const HomeCatalogSearchRow = ({ value, onChange }: HomeCatalogSearchRowProps) => {
-  const router = useRouter();
+export const HomeCatalogSearchRow = ({
+  value,
+  onChange,
+  onBrandPress,
+}: HomeCatalogSearchRowProps) => {
   const insets = useSafeAreaInsets();
   const styles = useHomeCatalogSearchRowStyles();
-  const { theme } = useAppThemeSettings();
-  const sessionQuery = useAuthSessionQuery();
-  const isAuthorized = sessionQuery.data?.user != null;
+  const paddingHorizontal = resolveScreenContentPaddingHorizontal(insets);
 
   return (
-    <View style={[styles.root, { paddingTop: Math.max(insets.top, 8) }]}>
-      <CatalogSearchBar value={value} onChange={onChange} embedded />
-      {isAuthorized ? (
-        <Pressable
-          style={styles.usersButton}
-          accessibilityRole="button"
-          accessibilityLabel={HEADER_USERS_BUTTON_UI.ARIA}
-          onPress={() => router.push("/users" as never)}
-        >
-          <MaterialIcons name="people" size={20} color={theme.colors.action} />
-        </Pressable>
-      ) : null}
+    <View
+      style={[
+        styles.root,
+        { paddingTop: Math.max(insets.top, 8), paddingHorizontal },
+      ]}
+    >
+      <HomeCatalogBrandLogo onPress={onBrandPress} />
+      <View style={styles.searchSlot}>
+        <CatalogSearchBar value={value} onChange={onChange} embedded />
+      </View>
+      <HomeCatalogUsersButton />
     </View>
   );
 };

@@ -671,6 +671,18 @@ export const useSellerProductsPageStyles = createThemedStyles((theme) => ({
     marginBottom: theme.spacing[3],
     gap: theme.spacing[2],
   },
+  sellerMeta: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: theme.spacing[2],
+  },
+  sellerName: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: theme.colors.text,
+  },
   title: {
     fontSize: 20,
     fontWeight: "700",

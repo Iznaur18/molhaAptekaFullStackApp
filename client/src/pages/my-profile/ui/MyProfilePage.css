@@ -420,12 +420,16 @@
     --my-profile-mobile-inline-inset: 0.1rem;
     --my-profile-catalog-grid-gap: 0.15rem;
 
-    margin-inline: calc(-1 * (var(--iz-space-4) - var(--my-profile-mobile-inline-inset)));
-    width: calc(100% + 2 * (var(--iz-space-4) - var(--my-profile-mobile-inline-inset)));
+    margin-inline: calc(
+      -1 * (var(--app-shell-content-inline-padding) - var(--my-profile-mobile-inline-inset))
+    );
+    width: calc(
+      100% + 2 * (var(--app-shell-content-inline-padding) - var(--my-profile-mobile-inline-inset))
+    );
   }
 
   .my-profile-page__body {
-    padding-inline: 0.45rem;
+    padding-inline: max(0.75rem, var(--app-shell-content-inline-padding));
     padding-block: 0.75rem;
   }
 
@@ -442,12 +446,16 @@
     --my-profile-mobile-inline-inset: 0.05rem;
     --my-profile-catalog-grid-gap: 0.1rem;
 
-    margin-inline: calc(-1 * (0.35rem - var(--my-profile-mobile-inline-inset)));
-    width: calc(100% + 2 * (0.35rem - var(--my-profile-mobile-inline-inset)));
+    margin-inline: calc(
+      -1 * (var(--app-shell-content-inline-padding) - var(--my-profile-mobile-inline-inset))
+    );
+    width: calc(
+      100% + 2 * (var(--app-shell-content-inline-padding) - var(--my-profile-mobile-inline-inset))
+    );
   }
 
   .my-profile-page__body {
-    padding-inline: 0.35rem;
+    padding-inline: max(0.75rem, var(--app-shell-content-inline-padding));
   }
 }
 

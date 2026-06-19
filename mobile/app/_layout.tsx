@@ -98,7 +98,6 @@ function RootLayoutNav() {
         <Stack.Screen name="create-product" options={{ title: "Новый товар" }} />
         <Stack.Screen name="edit-product/[id]" options={{ title: "Редактирование" }} />
         <Stack.Screen name="raffle/[id]" options={{ title: "Розыгрыш" }} />
-        <Stack.Screen name="users/index" options={{ title: "Пользователи" }} />
         <Stack.Screen name="user/[id]" options={{ title: "Профиль" }} />
         <Stack.Screen name="user/[id]/edit" options={{ title: "Редактирование" }} />
         <Stack.Screen name="seller/[userId]" options={{ title: "Товары продавца" }} />

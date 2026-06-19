@@ -4,6 +4,7 @@ import { FlatList, Pressable, Text, View } from "react-native";
 import { useMyFollowingQuery } from "@/entities/user-follow/model/useMyFollowingQuery";
 import { useUnfollowUserMutation } from "@/entities/user-follow/model/useUnfollowUserMutation";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
+import { SubscriptionUserRow } from "@/features/subscriptions-page/ui/SubscriptionUserRow";
 import { SUBSCRIPTIONS_PAGE_UI, USER_FOLLOW_BUTTON_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { useSubscriptionsPageStyles } from "@/shared/theme/accountFeatureStyles";
@@ -52,6 +53,10 @@ export const SubscriptionsPage = () => {
     );
   }
 
+  const handleOpenProfile = (userId: string) => {
+    router.push({ pathname: "/user/[id]", params: { id: userId } });
+  };
+
   const handleUnfollow = async (userId: string) => {
     try {
       await unfollowMutation.mutateAsync(userId);
@@ -65,29 +70,22 @@ export const SubscriptionsPage = () => {
       data={users}
       keyExtractor={(item) => item._id}
       contentContainerStyle={styles.list}
-      renderItem={({ item }) => {
-        const displayName = item.userName?.trim() || "Пользователь";
-
-        return (
-          <View style={styles.row}>
-            <View style={styles.info}>
-              <Text style={styles.name}>{displayName}</Text>
-              {item.isPremiumUser ? <Text style={styles.badge}>Premium</Text> : null}
-            </View>
-            <Pressable
-              style={styles.unfollow}
-              onPress={() => void handleUnfollow(item._id)}
-              disabled={unfollowMutation.isPending}
-            >
-              <Text style={styles.unfollowText}>
-                {unfollowMutation.isPending
-                  ? USER_FOLLOW_BUTTON_UI.LOADING
-                  : USER_FOLLOW_BUTTON_UI.UNFOLLOW}
-              </Text>
-            </Pressable>
-          </View>
-        );
-      }}
+      renderItem={({ item }) => (
+        <View style={styles.row}>
+          <SubscriptionUserRow user={item} onPress={handleOpenProfile} />
+          <Pressable
+            style={styles.unfollow}
+            onPress={() => void handleUnfollow(item._id)}
+            disabled={unfollowMutation.isPending}
+          >
+            <Text style={styles.unfollowText}>
+              {unfollowMutation.isPending
+                ? USER_FOLLOW_BUTTON_UI.LOADING
+                : USER_FOLLOW_BUTTON_UI.UNFOLLOW}
+            </Text>
+          </Pressable>
+        </View>
+      )}
     />
   );
 };

@@ -1,22 +1,42 @@
+@media (max-width: 40rem) {
+  body:has(.product-details-modal) .mobile-bottom-nav {
+    display: none;
+  }
+}
+
 .mobile-bottom-nav {
   --mobile-bottom-nav-icon-size: 1.5rem;
+  --mobile-bottom-nav-horizontal-inset: 0.75rem;
+  --mobile-bottom-nav-float-offset: 0.625rem;
 
   position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  left: max(
+    var(--mobile-bottom-nav-horizontal-inset),
+    env(safe-area-inset-left, 0px)
+  );
+  right: max(
+    var(--mobile-bottom-nav-horizontal-inset),
+    env(safe-area-inset-right, 0px)
+  );
+  bottom: calc(
+    var(--mobile-bottom-nav-float-offset) + env(safe-area-inset-bottom, 0px)
+  );
   z-index: 50;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   align-items: center;
   gap: 0.1rem;
   min-height: var(--app-shell-mobile-bottom-nav-height);
-  padding: 0.2rem 0.25rem calc(0.2rem + env(safe-area-inset-bottom, 0px));
-  border-top: 1px solid color-mix(in srgb, var(--iz-color-text) 8%, transparent);
+  padding: 0.35rem 0.45rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--iz-color-text) 10%, var(--iz-color-border));
+  border-radius: var(--iz-radius-pill);
   background: color-mix(in srgb, var(--iz-color-on-contrast) 92%, transparent);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  box-shadow: 0 -4px 20px color-mix(in srgb, var(--iz-color-ink) 8%, transparent);
+  box-shadow:
+    0 4px 8px color-mix(in srgb, var(--iz-color-ink) 6%, transparent),
+    0 16px 36px color-mix(in srgb, var(--iz-color-ink) 10%, transparent);
 }
 
 .mobile-bottom-nav__item {
@@ -28,7 +48,7 @@
   margin: 0;
   padding: 0.15rem;
   border: none;
-  border-radius: 0.5rem;
+  border-radius: var(--iz-radius-pill);
   background: transparent;
   color: var(--iz-color-text-secondary);
   cursor: pointer;

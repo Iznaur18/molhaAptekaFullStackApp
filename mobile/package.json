@@ -49,6 +49,11 @@
     "typescript": "~5.9.2"
   },
   "scripts": {
+    "build:shared-lib": "npm run build --prefix ../packages/shared-lib",
+    "prestart": "npm run build:shared-lib",
+    "prestart:go": "npm run build:shared-lib",
+    "prestart:dev": "npm run build:shared-lib",
+    "prestart:web": "npm run build:shared-lib",
     "start": "expo start",
     "start:go": "expo start --go",
     "start:dev": "expo start --dev-client",
@@ -74,7 +79,17 @@
     "test:product-card-gallery": "node --test scripts/product-card-gallery-actions.test.mjs",
     "test:profile-nav-chrome": "npm run build --prefix ../packages/shared-lib && node --test scripts/profile-nav-chrome.test.mjs",
     "test:screen-layout": "node --test scripts/screen-layout.test.mjs",
+    "test:screen-content-layout": "node --test scripts/screen-content-layout.test.mjs",
+    "test:product-detail-chrome": "node --test scripts/product-detail-chrome.test.mjs",
+    "test:home-catalog-search-row": "node --test scripts/home-catalog-search-row.test.mjs",
+    "test:users-page-layout": "node --test scripts/users-page-layout.test.mjs",
     "test:raffle-featured-slide": "node --test scripts/raffle-featured-slide-layout.test.mjs",
+    "test:raffle-featured-banner": "npm run build --prefix ../packages/shared-lib && node --test scripts/raffle-featured-banner-layout.test.mjs",
+    "test:catalog-tier3-banner": "npm run build --prefix ../packages/shared-lib && node --test scripts/catalog-tier3-banner.test.mjs",
+    "test:product-card-promotion-frame": "node --test scripts/product-card-promotion-frame.test.mjs",
+    "test:user-profile-parity": "node --test scripts/user-profile-parity.test.mjs",
+    "test:shared-lib-metro-resolve": "node --test scripts/shared-lib-metro-resolve.test.mjs",
+    "test:price-offer-api-parity": "node --test scripts/price-offer-api-parity.test.mjs",
     "smoke:buyer-path": "node scripts/buyer-path-api-smoke.mjs"
   },
   "private": true

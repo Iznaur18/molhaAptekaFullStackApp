@@ -2,12 +2,14 @@
   --app-shell-dropdown-z-index: var(--iz-z-dropdown);
   --app-shell-category-list-max-height: min(22rem, 70vh);
   --app-shell-mobile-bottom-nav-height: 3.1rem;
+  --app-shell-mobile-bottom-nav-float-offset: 0.625rem;
+  --app-shell-content-inline-padding: var(--iz-space-4);
 
   box-sizing: border-box;
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: var(--iz-space-6) var(--iz-space-4) 2.5rem;
+  padding: var(--iz-space-6) var(--app-shell-content-inline-padding) 2.5rem;
 }
 
 .app-shell__header {
@@ -295,11 +297,16 @@
   }
 }
 
-/* узкий мобильный: 2 карточки в ряд, плотнее отступы */
+/* узкий мобильный: 2 карточки в ряд, безопаснее inset от краёв */
 @media (max-width: 667px) {
   .app-shell {
-    padding-left: 0.35rem;
-    padding-right: 0.35rem;
+    --app-shell-content-inline-padding: max(
+      1rem,
+      env(safe-area-inset-left, 0px),
+      env(safe-area-inset-right, 0px)
+    );
+    padding-left: var(--app-shell-content-inline-padding);
+    padding-right: var(--app-shell-content-inline-padding);
   }
 
   .app-shell__grid {
@@ -522,8 +529,17 @@
 
 @media (max-width: 640px) {
   .app-shell {
+    --app-shell-content-inline-padding: max(
+      1rem,
+      env(safe-area-inset-left, 0px),
+      env(safe-area-inset-right, 0px)
+    );
+    padding-left: var(--app-shell-content-inline-padding);
+    padding-right: var(--app-shell-content-inline-padding);
     padding-bottom: calc(
-      var(--app-shell-mobile-bottom-nav-height) + env(safe-area-inset-bottom, 0px) + 1rem
+      var(--app-shell-mobile-bottom-nav-height) +
+        var(--app-shell-mobile-bottom-nav-float-offset) + env(safe-area-inset-bottom, 0px) +
+        1rem
     );
   }
 

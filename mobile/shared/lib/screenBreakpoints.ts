@@ -30,10 +30,10 @@ export const PROFILE_CONTENT_MAX_WIDTH_TABLET = PROFILE_CONTENT_MAX_WIDTH_SMALL_
 
 export const PRODUCT_GRID_GAP = 6;
 
-/** ≤768×1024 — телефоны и iPad portrait compact */
+/** ≤768dp — 2 колонки на главной ленте товаров */
 export const SCREEN_PRODUCT_GRID_2_COL_MAX_WIDTH = SCREEN_MEDIUM_TABLET_MIN_WIDTH;
 
-/** ≥1280×800 — широкие планшеты / landscape desktop */
+/** ≥1280dp — 4 колонки на главной ленте товаров */
 export const SCREEN_PRODUCT_GRID_4_COL_MIN_WIDTH = 1280;
 
 export const PRODUCT_GRID_COLUMNS_COMPACT = 2;
@@ -153,3 +153,5 @@ export const resolveProductGridColumns = ({ width }: ScreenSizeInput): number =>
   }
   return PRODUCT_GRID_COLUMNS_WIDE;
 };
+
+export const resolveProductGridGap = (_width: number): number => PRODUCT_GRID_GAP;

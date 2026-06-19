@@ -69,39 +69,31 @@ after(async () => {
   await disconnectMongoTestReplSet();
 });
 
-test("stories smoke: feed → create (moderator) → author → view", async () => {
+test("stories smoke: feed → create (any user) → author → view", async () => {
   const feedData = await parseSuccessData(await request("/user/stories/feed"));
   assert.ok(Array.isArray(feedData.rings));
+  assert.equal(feedData.showStrip, true);
+  assert.equal(feedData.canPublish, false);
 
   const { cookie: userCookie, user } = await registerUserAndGetCookie(
     request,
     "story-user",
   );
-  const forbidden = await request("/user/stories", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Cookie: userCookie,
-    },
-    body: JSON.stringify({
-      mediaType: "image",
-      mediaUrl: STORY_MEDIA_URL,
-    }),
-  });
-  assert.equal(forbidden.status, 403);
 
-  const { cookie: modCookie, user: modUser } = await registerUserAndGetCookie(
-    request,
-    "story-mod",
+  const authedFeed = await parseSuccessData(
+    await request("/user/stories/feed", {
+      headers: { Cookie: userCookie },
+    }),
   );
-  await setUserRole(modUser._id, "moderator");
+  assert.equal(authedFeed.canPublish, true);
+  assert.equal(authedFeed.showStrip, true);
 
   const createData = await parseSuccessData(
     await request("/user/stories", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Cookie: modCookie,
+        Cookie: userCookie,
       },
       body: JSON.stringify({
         mediaType: "image",
@@ -113,10 +105,43 @@ test("stories smoke: feed → create (moderator) → author → view", async () 
   assert.ok(createData.story?._id);
   const storyId = String(createData.story._id);
 
+  const { cookie: modCookie, user: modUser } = await registerUserAndGetCookie(
+    request,
+    "story-mod",
+  );
+  await setUserRole(modUser._id, "moderator");
+
+  await parseSuccessData(
+    await request("/user/stories", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Cookie: modCookie,
+      },
+      body: JSON.stringify({
+        mediaType: "image",
+        mediaUrl: STORY_MEDIA_URL,
+        captionText: "smoke-mod",
+      }),
+    }),
+  );
+
+  const viewerFeed = await parseSuccessData(
+    await request("/user/stories/feed", {
+      headers: { Cookie: userCookie },
+    }),
+  );
+  assert.ok(viewerFeed.rings.length >= 2);
+
   const authorData = await parseSuccessData(
-    await request(`/user/stories/author/${modUser._id}`),
+    await request(`/user/stories/author/${user._id}`),
   );
   assert.equal(authorData.stories.length, 1);
+
+  const modAuthorData = await parseSuccessData(
+    await request(`/user/stories/author/${modUser._id}`),
+  );
+  assert.equal(modAuthorData.stories.length, 1);
 
   const viewData = await parseSuccessData(
     await request(`/user/stories/${storyId}/view`, {

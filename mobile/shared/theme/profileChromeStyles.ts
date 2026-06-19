@@ -129,21 +129,18 @@ export const useProfileOverviewBannerStyles = createThemedStyles((theme) => ({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(0,0,0,0.28)",
   },
-  avatarWrap: {
+  avatarWrapPremium: {
+    borderColor: theme.colors.premium,
+  },
+  avatarOnBanner: {
     position: "absolute",
     top: 12,
     left: 12,
     width: PROFILE_AVATAR_SIZE,
     height: PROFILE_AVATAR_SIZE,
-    borderRadius: PROFILE_AVATAR_SIZE / 2,
-    overflow: "hidden",
+    zIndex: 2,
     borderWidth: 2,
     borderColor: theme.colors.surface,
-    backgroundColor: theme.colors.surfaceMuted,
-    zIndex: 2,
-  },
-  avatarWrapPremium: {
-    borderColor: theme.colors.premium,
   },
   avatar: {
     width: "100%",
@@ -382,5 +379,137 @@ export const useThemePreferenceToggleStyles = createThemedStyles((theme) => ({
   },
   chipTextIdle: {
     color: theme.colors.text,
+  },
+}));
+
+const USER_PROFILE_THUMB_SIZE = 48;
+
+export const useUserProfileThumbListStyles = createThemedStyles((theme) => ({
+  root: {
+    marginBottom: theme.spacing[4],
+    paddingVertical: 12,
+    paddingHorizontal: theme.spacing[4],
+    borderRadius: theme.radius.button,
+    backgroundColor: theme.colors.surfaceMuted,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+  },
+  headingRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "baseline",
+    justifyContent: "center",
+    gap: 6,
+    marginBottom: theme.spacing[2],
+  },
+  heading: {
+    fontSize: 15.2,
+    fontWeight: "600",
+    color: theme.colors.text,
+    textAlign: "center",
+  },
+  headingAction: {
+    textDecorationLine: "underline",
+  },
+  viewAll: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: theme.colors.action,
+    textDecorationLine: "underline",
+  },
+  state: {
+    fontSize: 14,
+    textAlign: "center",
+    color: theme.colors.textMuted,
+  },
+  stateError: {
+    color: theme.colors.danger,
+  },
+  grid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: 8,
+  },
+  thumbButton: {
+    borderRadius: 6,
+    overflow: "hidden",
+  },
+  thumbButtonUnavailable: {
+    opacity: 0.72,
+  },
+  thumb: {
+    width: USER_PROFILE_THUMB_SIZE,
+    height: USER_PROFILE_THUMB_SIZE,
+    borderRadius: 6,
+    backgroundColor: theme.colors.surface,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+  },
+  thumbPlaceholder: {
+    backgroundColor: theme.colors.surfaceMuted,
+  },
+  hint: {
+    marginTop: theme.spacing[2],
+    fontSize: 13,
+    textAlign: "center",
+    color: theme.colors.warningText,
+  },
+  moreButton: {
+    alignSelf: "center",
+    marginTop: theme.spacing[2],
+    paddingVertical: 5,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.borderStrong,
+    backgroundColor: theme.colors.surfaceMuted,
+  },
+  moreButtonText: {
+    fontSize: 13,
+    color: theme.colors.text,
+  },
+  moreButtonDisabled: {
+    opacity: 0.65,
+  },
+}));
+
+export const useUserDetailsPageStyles = createThemedStyles((theme) => ({
+  screen: {
+    flex: 1,
+    backgroundColor: theme.colors.bg,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingTop: theme.spacing[3],
+    paddingBottom: SCREEN_CONTENT_PADDING_BOTTOM,
+    gap: theme.spacing[2],
+  },
+  header: {
+    gap: theme.spacing[2],
+  },
+  titleRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: theme.spacing[2],
+  },
+  titleName: {
+    flex: 1,
+    minWidth: 0,
+  },
+  titleText: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: theme.colors.text,
+  },
+  profileBody: {
+    gap: theme.spacing[2],
+  },
+  footer: {
+    gap: theme.spacing[3],
+    marginTop: theme.spacing[2],
   },
 }));

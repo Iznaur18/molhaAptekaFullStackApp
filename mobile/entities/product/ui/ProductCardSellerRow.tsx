@@ -49,7 +49,7 @@ export const ProductCardSellerRow = ({ product }: ProductCardSellerRowProps) => 
   return (
     <Pressable
       style={styles.root}
-      onPress={() => router.push({ pathname: "/seller/[userId]", params: { userId: sellerId } })}
+      onPress={() => router.push({ pathname: "/user/[id]", params: { id: sellerId } })}
       accessibilityRole="link"
       accessibilityLabel={PRODUCT_CARD_UI.SELLER_PROFILE_ARIA(displayName)}
     >

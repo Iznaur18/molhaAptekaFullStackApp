@@ -1,6 +1,7 @@
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
 import { getHiddenSellerIds } from "../../services/access/adminUserGuard.js";
 import { findCatalogProductById } from "../../services/product/findCatalogProductById.js";
+import { attachProductAvailablePurchaseQuantity } from "../../services/product/productStock.js";
 import { errorRes, successRes } from "../../services/http/index.js";
 import { userHasPurchasedProduct } from "../../services/user/userPurchasedProduct.js";
 
@@ -42,5 +43,9 @@ const { productId } = req.params;
       }
     }
 
-    return successRes(res, { product });
+    return successRes(res, {
+      product: (
+        await attachProductAvailablePurchaseQuantity([product])
+      )[0],
+    });
 };

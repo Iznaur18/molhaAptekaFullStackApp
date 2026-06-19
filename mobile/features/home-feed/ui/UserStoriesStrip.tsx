@@ -1,5 +1,6 @@
 import { Image } from "expo-image";
-import { useMemo, useState } from "react";
+import { useRouter } from "expo-router";
+import { useCallback, useMemo, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 
 import type { UserStoryRing } from "@/entities/user-story/api/userStoryApi";
@@ -25,6 +26,7 @@ export const UserStoriesStrip = ({
   currentUserId,
   onPublished,
 }: UserStoriesStripProps) => {
+  const router = useRouter();
   const styles = useUserStoriesStripStyles();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [viewerAuthor, setViewerAuthor] = useState<UserStoryRing["author"] | null>(null);
@@ -42,7 +44,18 @@ export const UserStoriesStrip = ({
     [rings],
   );
 
-  if (!showStrip && !canPublish) {
+  const handleAddPress = useCallback(() => {
+    if (!isAuthorized) {
+      router.push("/(auth)/login");
+      return;
+    }
+    if (!canPublish) {
+      return;
+    }
+    setIsCreateOpen(true);
+  }, [canPublish, isAuthorized, router]);
+
+  if (!showStrip && sortedRings.length === 0) {
     return null;
   }
 
@@ -54,16 +67,14 @@ export const UserStoriesStrip = ({
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.scroll}
         >
-          {canPublish ? (
-            <Pressable style={styles.item} onPress={() => setIsCreateOpen(true)}>
+          <Pressable style={styles.item} onPress={handleAddPress}>
               <View style={styles.ringAdd}>
                 <Text style={styles.plus}>+</Text>
               </View>
               <Text style={styles.label} numberOfLines={1}>
-                {USER_STORY_UI.ADD_LABEL}
-              </Text>
-            </Pressable>
-          ) : null}
+              {USER_STORY_UI.ADD_LABEL}
+            </Text>
+          </Pressable>
 
           {sortedRings.map((ring) => {
             const authorId = String(ring.author._id);
@@ -96,6 +107,7 @@ export const UserStoriesStrip = ({
       <UserStoryViewerModal
         authorId={viewerAuthor?._id ?? null}
         authorName={viewerAuthor?.userName?.trim() || viewerAuthor?._id || ""}
+        authorAvatarUrl={viewerAuthor?.userAvatarUrl ?? null}
         visible={viewerAuthor != null}
         isAuthorized={isAuthorized}
         currentUserId={currentUserId}

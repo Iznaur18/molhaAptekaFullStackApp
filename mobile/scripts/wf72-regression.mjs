@@ -44,6 +44,7 @@ const EXPECTED_APP_ROUTES = [
   "app/edit-product/[id].tsx",
   "app/(tabs)/hub/[section].tsx",
   "app/(tabs)/orders.tsx",
+  "app/(tabs)/users.tsx",
   "app/legal/privacy.tsx",
   "app/notifications/index.tsx",
   "app/product/[id].tsx",
@@ -52,7 +53,6 @@ const EXPECTED_APP_ROUTES = [
   "app/seller/[userId].tsx",
   "app/user/[id].tsx",
   "app/user/[id]/edit.tsx",
-  "app/users/index.tsx",
 ];
 
 // Mirror of parseAppDeepLink.ts (keep in sync)
@@ -190,11 +190,22 @@ const BUYER_CRITICAL_ROUTES = [
 const HUB_TAB_BAR_CHECKS = [
   {
     file: "app/(tabs)/_layout.tsx",
-    mustInclude: ['name="hub/[section]"', 'name="orders"', "href: null"],
+    mustInclude: ['name="hub/[section]"', 'name="orders"', 'name="users"', "href: null"],
   },
   {
     file: "shared/ui/MobileBottomTabBar.tsx",
-    mustInclude: ["isProfileTabBarRoute", 'item.routeName === "profile" && isProfileTabBarContext'],
+    mustInclude: [
+      "isProfileTabBarRoute",
+      "isHomeTabBarRoute",
+      "resolveMobileBottomNavHorizontalInset",
+      "styles.bar",
+      'item.routeName === "profile" && isProfileTabBarContext',
+      'item.routeName === "index" && isHomeTabBarContext',
+    ],
+  },
+  {
+    file: "shared/lib/isHomeTabBarRoute.ts",
+    mustInclude: ['normalized === "/users"', 'normalized.startsWith("/users/")'],
   },
   {
     file: "shared/lib/isProfileTabBarRoute.ts",
@@ -249,6 +260,7 @@ const SCREEN_LAYOUT_CHECKS = [
       "SCREEN_PRODUCT_GRID_2_COL_MAX_WIDTH",
       "SCREEN_PRODUCT_GRID_4_COL_MIN_WIDTH",
       "PRODUCT_GRID_COLUMNS_COMPACT",
+      "PRODUCT_GRID_GAP = 6",
       "resolveLayoutContentWidth",
       "resolveScreenWidthTier",
     ],
@@ -301,12 +313,25 @@ const isProfileTabBarRoute = (pathname) => {
   return normalized === "/orders" || normalized.startsWith("/orders/");
 };
 
+// Mirror of isHomeTabBarRoute.ts (keep in sync)
+const isHomeTabBarRoute = (pathname) => {
+  const normalized = pathname.trim();
+  return normalized === "/users" || normalized.startsWith("/users/");
+};
+
 const PROFILE_TAB_BAR_ROUTE_CASES = [
   ["/hub/my-sales", true],
   ["/hub/my-orders", true],
   ["/orders", true],
   ["/catalog", false],
   ["/(tabs)/cart", false],
+];
+
+const HOME_TAB_BAR_ROUTE_CASES = [
+  ["/users", true],
+  ["/users/", true],
+  ["/catalog", false],
+  ["/orders", false],
 ];
 
 const BUYER_API_SOURCE_CHECKS = [
@@ -387,7 +412,12 @@ const STORY_MEDIA_WIRING_CHECKS = [
   },
   {
     file: "features/home-feed/ui/UserStoryViewerModal.tsx",
-    mustInclude: ["resolveUserStoryMediaUrl", "resolvedMediaUrl"],
+    mustInclude: [
+      "resolveUserStoryMediaUrl",
+      "resolvedMediaUrl",
+      "computeUserStoryFrameSize",
+      'presentationStyle="fullScreen"',
+    ],
   },
 ];
 
@@ -504,17 +534,28 @@ const run = () => {
   }
   hubTabBarFailed += assertSourceExcludes(
     "app/_layout.tsx",
-    ['name="hub/[section]"', 'name="orders"'],
+    ['name="hub/[section]"', 'name="orders"', 'name="users"'],
     "root stack",
   );
   if (fileExists("app/orders/index.tsx") || fileExists("app/(tabs)/orders/index.tsx")) {
     console.error("✗ orders must be app/(tabs)/orders.tsx, not orders/index.tsx");
     hubTabBarFailed += 1;
   }
+  if (fileExists("app/users/index.tsx") || fileExists("app/(tabs)/users/index.tsx")) {
+    console.error("✗ users must be app/(tabs)/users.tsx, not users/index.tsx");
+    hubTabBarFailed += 1;
+  }
   for (const [pathname, expected] of PROFILE_TAB_BAR_ROUTE_CASES) {
     const actual = isProfileTabBarRoute(pathname);
     if (actual !== expected) {
       console.error(`✗ isProfileTabBarRoute(${pathname}) expected ${expected}, got ${actual}`);
+      hubTabBarFailed += 1;
+    }
+  }
+  for (const [pathname, expected] of HOME_TAB_BAR_ROUTE_CASES) {
+    const actual = isHomeTabBarRoute(pathname);
+    if (actual !== expected) {
+      console.error(`✗ isHomeTabBarRoute(${pathname}) expected ${expected}, got ${actual}`);
       hubTabBarFailed += 1;
     }
   }

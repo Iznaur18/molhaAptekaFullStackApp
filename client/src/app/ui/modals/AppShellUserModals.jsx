@@ -37,6 +37,7 @@ import { ADMIN_EDIT_USER_UI } from "../../../shared/config/appUiCopy.js";
  *   isAdminEditUserOpen: boolean;
  *   isAdminDeleteUserOpen: boolean;
  *   setCatalogProductDetails: (product: ProductFromApi | null) => void;
+ *   handleUserProfileProductClick: (product: ProductFromApi) => void;
  *   refreshCatalogFeed: () => void;
  *   setStaffActionNotice: (message: string) => void;
  *   goToSellerProducts: (userId: string) => void;
@@ -69,6 +70,7 @@ export function AppShellUserModals({
   isAdminEditUserOpen,
   isAdminDeleteUserOpen,
   setCatalogProductDetails,
+  handleUserProfileProductClick,
   refreshCatalogFeed,
   setStaffActionNotice,
   goToSellerProducts,
@@ -116,7 +118,7 @@ export function AppShellUserModals({
         currentUserId={currentUserId}
         isAuthorized={isAuthorized}
         viewerCanSeeOtherUserPurchases={isPremiumUser || canModerateProducts}
-        onPurchaseProductClick={(product) => setCatalogProductDetails(product)}
+        onPurchaseProductClick={handleUserProfileProductClick}
         onViewAllSellerProducts={
           sellerModal.phase === "success" && sellerModal.user?._id != null
             ? () => goToSellerProducts(String(sellerModal.user._id))

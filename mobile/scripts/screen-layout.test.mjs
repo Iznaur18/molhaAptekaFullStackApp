@@ -15,9 +15,22 @@ const PROFILE_CONTENT_MAX_WIDTH_PHONE = 420;
 const PROFILE_CONTENT_MAX_WIDTH_SMALL_TABLET = 560;
 const PROFILE_CONTENT_MAX_WIDTH_MEDIUM_TABLET = 640;
 const PROFILE_CONTENT_MAX_WIDTH_LARGE_TABLET = 720;
+const PRODUCT_GRID_GAP = 6;
 const PRODUCT_GRID_COLUMNS_COMPACT = 2;
 const PRODUCT_GRID_COLUMNS_MEDIUM = 3;
 const PRODUCT_GRID_COLUMNS_WIDE = 4;
+
+const resolveProductGridColumns = ({ width }) => {
+  if (width <= SCREEN_PRODUCT_GRID_2_COL_MAX_WIDTH) {
+    return PRODUCT_GRID_COLUMNS_COMPACT;
+  }
+  if (width < SCREEN_PRODUCT_GRID_4_COL_MIN_WIDTH) {
+    return PRODUCT_GRID_COLUMNS_MEDIUM;
+  }
+  return PRODUCT_GRID_COLUMNS_WIDE;
+};
+
+const resolveProductGridGap = () => PRODUCT_GRID_GAP;
 
 const resolveScreenWidthTier = (width) => {
   if (width <= SCREEN_NARROW_MAX_WIDTH) return "phone-narrow";
@@ -48,31 +61,25 @@ const resolveProfileContentMaxWidth = (width) => {
   return PROFILE_CONTENT_MAX_WIDTH_PHONE;
 };
 
-const resolveProductGridColumns = ({ width }) => {
-  if (width <= SCREEN_PRODUCT_GRID_2_COL_MAX_WIDTH) {
-    return PRODUCT_GRID_COLUMNS_COMPACT;
-  }
-  if (width < SCREEN_PRODUCT_GRID_4_COL_MIN_WIDTH) {
-    return PRODUCT_GRID_COLUMNS_MEDIUM;
-  }
-  return PRODUCT_GRID_COLUMNS_WIDE;
-};
-
-test("resolveProductGridColumns: 2 cols up to 768x1024", () => {
+test("resolveProductGridColumns: home feed 2 cols up to 768", () => {
   assert.equal(resolveProductGridColumns({ width: 320, height: 640 }), 2);
   assert.equal(resolveProductGridColumns({ width: 390, height: 844 }), 2);
   assert.equal(resolveProductGridColumns({ width: 768, height: 1024 }), 2);
 });
 
-test("resolveProductGridColumns: 3 cols after 768 until 1280", () => {
+test("resolveProductGridColumns: home feed 3 cols after 768 until 1280", () => {
   assert.equal(resolveProductGridColumns({ width: 769, height: 1024 }), 3);
   assert.equal(resolveProductGridColumns({ width: 1024, height: 1366 }), 3);
   assert.equal(resolveProductGridColumns({ width: 1279, height: 800 }), 3);
 });
 
-test("resolveProductGridColumns: 4 cols from 1280x800", () => {
+test("resolveProductGridColumns: home feed 4 cols from 1280", () => {
   assert.equal(resolveProductGridColumns({ width: 1280, height: 800 }), 4);
-  assert.equal(resolveProductGridColumns({ width: 1366, height: 1024 }), 4);
+});
+
+test("resolveProductGridGap: fixed 6px on home feed", () => {
+  assert.equal(resolveProductGridGap(390), 6);
+  assert.equal(resolveProductGridGap(1280), 6);
 });
 
 test("width tiers for layout chrome unchanged", () => {

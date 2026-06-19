@@ -8,9 +8,14 @@ import { useCartTotalCount } from "@/entities/cart/model/useCartTotalCount";
 import { useUnreadNotificationsCount } from "@/entities/notification/model/useInAppNotifications";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { CART_PAGE_UI, MOBILE_BOTTOM_NAV_UI } from "@/shared/config";
+import { isHomeTabBarRoute } from "@/shared/lib/isHomeTabBarRoute";
 import { isProfileTabBarRoute } from "@/shared/lib/isProfileTabBarRoute";
-import { createThemedStyles } from "@/shared/theme/createThemedStyles";
+import {
+  MOBILE_BOTTOM_NAV_FLOAT_OFFSET,
+  resolveMobileBottomNavHorizontalInset,
+} from "@/shared/lib/mobileBottomNavLayout";
 import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
+import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { AppText } from "@/shared/ui/AppText";
 
 const TAB_ICON_SIZE = 24;
@@ -57,25 +62,35 @@ const TAB_ITEMS: TabItemConfig[] = [
 ];
 
 const useTabBarStyles = createThemedStyles((theme) => ({
-  container: {
+  shell: {
+    paddingTop: MOBILE_BOTTOM_NAV_FLOAT_OFFSET,
+  },
+  bar: {
     flexDirection: "row",
     alignItems: "center",
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.border,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.pill,
     backgroundColor: theme.colors.surface,
-    paddingTop: 4,
     paddingHorizontal: 4,
+    paddingVertical: 4,
+    shadowColor: theme.colors.ink,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.1,
+    shadowRadius: 16,
+    elevation: 8,
   },
   item: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    minHeight: 44,
-    borderRadius: theme.radius.sm,
-    paddingVertical: 4,
+    minHeight: 40,
+    borderRadius: theme.radius.pill,
+    paddingVertical: 6,
+    paddingHorizontal: 4,
   },
   itemActive: {
-    backgroundColor: theme.colors.actionSurface,
+    backgroundColor: `${theme.colors.action}1A`,
   },
   iconWrap: {
     position: "relative",
@@ -114,6 +129,7 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
   const unreadNotifications = useUnreadNotificationsCount();
   const isAuthorized = sessionQuery.data?.user != null;
   const isProfileTabBarContext = isProfileTabBarRoute(pathname);
+  const isHomeTabBarContext = isHomeTabBarRoute(pathname);
 
   const cartBadge = cartCount > 0 ? formatBadge(cartCount) : null;
   const profileBadge =
@@ -166,15 +182,23 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
     <View
       accessibilityRole="tablist"
       accessibilityLabel={MOBILE_BOTTOM_NAV_UI.NAV_ARIA}
-      style={[styles.container, { paddingBottom: Math.max(insets.bottom, 4) }]}
+      style={[
+        styles.shell,
+        {
+          paddingBottom: Math.max(insets.bottom, 4),
+          paddingHorizontal: resolveMobileBottomNavHorizontalInset(insets),
+        },
+      ]}
     >
+      <View style={styles.bar}>
       {TAB_ITEMS.map((item) => {
         const routeIndex = state.routes.findIndex((route) => route.name === item.routeName);
         const isFocused =
           item.routeName !== PLACE_PRODUCT_ROUTE &&
           routeIndex >= 0 &&
           (state.index === routeIndex ||
-            (item.routeName === "profile" && isProfileTabBarContext));
+            (item.routeName === "profile" && isProfileTabBarContext) ||
+            (item.routeName === "index" && isHomeTabBarContext));
         const badge =
           item.routeName === "cart"
             ? cartBadge
@@ -216,6 +240,7 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
           </Pressable>
         );
       })}
+      </View>
     </View>
   );
 };

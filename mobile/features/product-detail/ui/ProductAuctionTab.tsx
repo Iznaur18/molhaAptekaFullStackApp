@@ -149,9 +149,9 @@ export const ProductAuctionTab = ({
       ) : (
         offers.map((offer) => (
           <View key={offer._id} style={styles.item}>
-            <Text style={styles.itemTitle}>{formatOfferPrice(offer.offerPriceRub)}</Text>
-            {offer.buyerUserName ? (
-              <Text style={styles.itemMeta}>{offer.buyerUserName}</Text>
+            <Text style={styles.itemTitle}>{formatOfferPrice(offer.offerPrice)}</Text>
+            {offer.buyer?.userName ? (
+              <Text style={styles.itemMeta}>{offer.buyer.userName}</Text>
             ) : null}
           </View>
         ))

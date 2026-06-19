@@ -2,9 +2,10 @@ import { useMemo } from "react";
 import { useWindowDimensions } from "react-native";
 
 import {
-  PRODUCT_GRID_GAP,
   resolveLayoutContentWidth,
   resolveProductGridColumns,
+  resolveProductGridGap,
+  type ScreenSizeInput,
 } from "@/shared/lib/screenBreakpoints";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 
@@ -17,16 +18,27 @@ export type ProductGridLayout = {
   tileWidth: number;
 };
 
+export type ProductGridLayoutResolvers = {
+  resolveColumns: (input: ScreenSizeInput) => number;
+  resolveGap: (width: number) => number;
+};
+
+const defaultProductGridResolvers: ProductGridLayoutResolvers = {
+  resolveColumns: resolveProductGridColumns,
+  resolveGap: resolveProductGridGap,
+};
+
 export const useProductGridLayout = (
   pagePadding: number = SCREEN_CONTENT_PADDING_HORIZONTAL,
+  resolvers: ProductGridLayoutResolvers = defaultProductGridResolvers,
 ): ProductGridLayout => {
   const { width, height } = useWindowDimensions();
 
   return useMemo(() => {
     const layoutWidth = resolveLayoutContentWidth(width);
-    const columns = resolveProductGridColumns({ width, height });
+    const columns = resolvers.resolveColumns({ width, height });
     const contentWidth = layoutWidth - pagePadding * 2;
-    const gap = PRODUCT_GRID_GAP;
+    const gap = resolvers.resolveGap(width);
     const tileWidth = (contentWidth - gap * (columns - 1)) / columns;
 
     return {
@@ -37,5 +49,5 @@ export const useProductGridLayout = (
       contentWidth,
       tileWidth,
     };
-  }, [width, height, pagePadding]);
+  }, [width, height, pagePadding, resolvers]);
 };

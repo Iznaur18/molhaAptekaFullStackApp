@@ -13,30 +13,37 @@ describe("resolveCatalogDetailsShowAddToCart", () => {
     expect(
       resolveCatalogDetailsShowAddToCart({
         product,
-        pathname: "/raffle/raffle-42",
         isMineMode: false,
         currentUserId: "buyer-1",
       }),
     ).toBe(true);
   });
 
-  it("blocks add to cart on seller products route", () => {
+  it("allows add to cart on seller products route for non-seller", () => {
     expect(
       resolveCatalogDetailsShowAddToCart({
         product,
-        pathname: "/seller/seller-1",
         isMineMode: false,
         currentUserId: "buyer-1",
       }),
-    ).toBe(false);
+    ).toBe(true);
   });
 
   it("blocks add to cart for own product", () => {
     expect(
       resolveCatalogDetailsShowAddToCart({
         product: { ...product, productSeller: { _id: "buyer-1" } },
-        pathname: "/raffle/raffle-42",
         isMineMode: false,
+        currentUserId: "buyer-1",
+      }),
+    ).toBe(false);
+  });
+
+  it("blocks add to cart in my-products mode", () => {
+    expect(
+      resolveCatalogDetailsShowAddToCart({
+        product,
+        isMineMode: true,
         currentUserId: "buyer-1",
       }),
     ).toBe(false);

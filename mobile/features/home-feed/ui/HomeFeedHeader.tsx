@@ -34,7 +34,7 @@ export const HomeFeedHeader = ({ enabled }: HomeFeedHeaderProps) => {
       <HomeFeaturedRafflesSection raffles={rafflesQuery.data ?? []} />
       <UserStoriesStrip
         rings={feed?.rings ?? []}
-        showStrip={feed?.showStrip === true}
+        showStrip={feed?.showStrip !== false}
         canPublish={feed?.canPublish === true}
         isAuthorized={isAuthorized}
         currentUserId={currentUserId}
