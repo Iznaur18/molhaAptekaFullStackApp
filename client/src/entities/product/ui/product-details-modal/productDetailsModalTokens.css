@@ -6,3 +6,9 @@
       env(safe-area-inset-bottom, 0px) + 0.5rem
   );
 }
+
+@media (min-width: 40.0625rem) {
+  .product-details-modal {
+    --product-image-modal-main-side: min(calc(15rem * 1.5), calc(42vw * 1.5));
+  }
+}

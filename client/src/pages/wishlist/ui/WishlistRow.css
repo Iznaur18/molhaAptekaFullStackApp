@@ -7,7 +7,7 @@
   align-items: center;
   padding: 0.5rem 0.65rem;
   border: 1px solid var(--iz-color-border-subtle);
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   background: var(--iz-color-surface);
 }
 
@@ -15,7 +15,7 @@
   width: var(--product-image-thumb-side);
   height: var(--product-image-thumb-side);
   object-fit: cover;
-  border-radius: 0.4rem;
+  border-radius: 0.55rem;
   background: var(--iz-color-surface-alt);
 }
 

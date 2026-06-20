@@ -23,6 +23,7 @@ import {
 } from "../../../shared/config/appUiCopy.js";
 
 import "./MyOrdersPage.css";
+import "../../../shared/ui/profileQueueContentPanel.css";
 
 /**
  * @param {{

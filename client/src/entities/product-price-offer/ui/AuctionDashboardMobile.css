@@ -1,0 +1,14 @@
+@media (max-width: 640px) {
+  .auction-dashboard-row__composer-submit {
+    padding-inline: 0.65rem;
+    font-size: 0.78rem;
+  }
+
+  .auction-dashboard-row__decision {
+    grid-template-columns: 1fr;
+  }
+
+  .auction-dashboard-row__cta {
+    min-height: 2.85rem;
+  }
+}

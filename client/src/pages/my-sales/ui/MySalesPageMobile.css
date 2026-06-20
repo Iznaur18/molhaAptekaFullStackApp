@@ -1,0 +1,31 @@
+@media (max-width: 640px) {
+  .my-sales-page {
+    --profile-queue-list-gap: 1.15rem;
+  }
+
+  .my-sales-page > .my-sales-page__state {
+    font-size: 0.92rem;
+    text-align: center;
+    color: var(--iz-color-text-secondary);
+  }
+
+  .my-sales-page__status-chips {
+    flex-wrap: nowrap;
+    gap: 0.35rem;
+    margin: 0 calc(-1 * var(--app-shell-content-inline-padding, 1rem));
+    padding: 0.15rem var(--app-shell-content-inline-padding, 1rem) 0.25rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .my-sales-page__status-chips::-webkit-scrollbar {
+    display: none;
+  }
+
+  .my-sales-page__status-chip {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+}

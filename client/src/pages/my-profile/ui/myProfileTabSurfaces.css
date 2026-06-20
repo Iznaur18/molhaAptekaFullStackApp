@@ -1,0 +1,19 @@
+/* Радиус карточек/панелей вкладок профиля = кнопке «РАЗДЕЛ» (см. --my-profile-surface-radius). */
+.my-profile-page__tab-content :where(
+  .my-orders-page__toolbar,
+  .my-sales-page__toolbar,
+  .auction-page__toolbar,
+  .installment-page__toolbar,
+  .order-card,
+  .auction-dashboard-row,
+  .installment-contract-card,
+  .wishlist-row,
+  .subscription-user-row,
+  .data-confirmation-page__plan,
+  .my-orders-page > .my-orders-page__state,
+  .my-sales-page > .my-sales-page__state,
+  .auction-page > .auction-page__state,
+  .installment-page > .installment-page__state
+) {
+  border-radius: var(--my-profile-surface-radius);
+}

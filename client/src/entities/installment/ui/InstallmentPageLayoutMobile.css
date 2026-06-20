@@ -1,0 +1,60 @@
+@media (max-width: 640px) {
+  .installment-page {
+    gap: 0.75rem;
+    --profile-queue-list-gap: 1.15rem;
+  }
+
+  .installment-page__toolbar {
+    gap: 0.65rem;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .installment-page__toolbar-head {
+    align-items: center;
+  }
+
+  .installment-page__heading {
+    font-size: 1.05rem;
+    font-weight: 700;
+  }
+
+  .installment-page__count {
+    padding: 0.15rem 0.45rem;
+    border-radius: 999px;
+    background: var(--iz-color-surface-muted);
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+
+  .installment-page__chips {
+    flex-wrap: nowrap;
+    gap: 0.35rem;
+    margin: 0 calc(-1 * var(--app-shell-content-inline-padding, 1rem));
+    padding: 0.15rem var(--app-shell-content-inline-padding, 1rem) 0.25rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .installment-page__chips::-webkit-scrollbar {
+    display: none;
+  }
+
+  .installment-page__chip {
+    flex: 0 0 auto;
+    min-height: 2rem;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
+
+  .installment-page > .installment-page__state {
+    font-size: 0.92rem;
+    text-align: center;
+    color: var(--iz-color-text-secondary);
+  }
+}

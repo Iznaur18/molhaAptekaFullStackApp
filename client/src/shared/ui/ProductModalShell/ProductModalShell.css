@@ -40,6 +40,10 @@
   border-bottom: 1px solid var(--iz-color-border);
 }
 
+.product-modal-shell__header--title-hidden {
+  justify-content: flex-end;
+}
+
 .product-modal-shell__title {
   margin: 0;
   font-size: 1.05rem;

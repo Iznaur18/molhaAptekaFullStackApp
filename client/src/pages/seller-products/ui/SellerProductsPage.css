@@ -11,18 +11,6 @@
   margin-bottom: 1rem;
 }
 
-.seller-products-page__back {
-  align-self: flex-start;
-  margin: 0;
-  padding: 0;
-  border: none;
-  background: none;
-  color: var(--iz-color-action);
-  font: inherit;
-  cursor: pointer;
-  text-decoration: underline;
-}
-
 .seller-products-page__title {
   margin: 0;
   font-size: 1.35rem;

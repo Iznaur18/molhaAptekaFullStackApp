@@ -1,35 +1,51 @@
 .wishlist-page {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
   width: 100%;
   min-width: 0;
+  --profile-queue-list-gap: 1rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
 }
 
 .wishlist-page__list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--profile-queue-list-gap, 1rem);
   margin: 0;
   padding: 0;
+  border: none;
+  background: transparent;
   list-style: none;
 }
 
 .wishlist-page__state,
 .wishlist-page__hint {
   margin: 0;
-  padding: 0.35rem 0;
-  color: var(--iz-color-text-muted);
+  color: var(--iz-color-text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.45;
 }
 
 .wishlist-page__state_error {
-  color: var(--iz-color-danger-rose);
+  color: var(--iz-color-danger-strong);
 }
 
 .wishlist-page__login {
-  margin-top: 0.5rem;
+  align-self: flex-start;
+  margin: 0;
   padding: 0.55rem 1rem;
-  border: 1px solid var(--iz-color-primary);
-  border-radius: var(--iz-radius-input);
-  background: var(--iz-color-primary);
+  border: 1px solid var(--iz-color-link);
+  border-radius: 0.65rem;
+  background: var(--iz-color-link);
   color: var(--iz-color-on-contrast);
   font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
   cursor: pointer;
 }
+
+@import "./WishlistPageMobile.css";

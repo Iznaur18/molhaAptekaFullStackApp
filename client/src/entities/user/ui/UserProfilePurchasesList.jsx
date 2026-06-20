@@ -75,10 +75,11 @@ export function UserProfilePurchasesList({ targetUserId, onProductClick }) {
   };
 
   return (
-    <div className="user-profile-purchases">
+    <div className="user-profile-purchases-section">
       <h3 className="user-profile-purchases__heading">
         {USER_PROFILE_PURCHASES_UI.HEADING}
       </h3>
+      <div className="user-profile-purchases">
       {phase === "loading" ? (
         <p className="user-profile-purchases__state">
           {USER_PROFILE_PURCHASES_UI.LOADING}
@@ -140,6 +141,7 @@ export function UserProfilePurchasesList({ targetUserId, onProductClick }) {
           {unavailableHint}
         </p>
       ) : null}
+      </div>
     </div>
   );
 }

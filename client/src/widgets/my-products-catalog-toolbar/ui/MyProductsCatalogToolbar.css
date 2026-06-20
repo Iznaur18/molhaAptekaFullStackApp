@@ -1,5 +1,12 @@
 .my-products-catalog-toolbar {
-  width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem;
+  box-sizing: border-box;
+  width: calc(100% - 2 * var(--my-profile-shell-content-gutter, 0px));
+  margin-inline: var(--my-profile-shell-content-gutter, 0);
   min-width: 0;
 }
 
@@ -18,15 +25,37 @@
 
 @media (max-width: 640px) {
   .my-products-catalog-toolbar {
-    flex-direction: column;
+    flex-wrap: wrap;
     align-items: stretch;
+    gap: 0.55rem 0.65rem;
   }
 
   .my-products-catalog-toolbar .list-page-filter-bar__label {
-    width: 100%;
+    display: flex;
+    flex: 1 1 calc(50% - 0.35rem);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.3rem;
+    min-width: 0;
+  }
+
+  .my-products-catalog-toolbar .list-page-filter-bar__label > span {
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--iz-color-text-secondary);
   }
 
   .my-products-catalog-toolbar .list-page-filter-bar__control {
     width: 100%;
+    min-width: 0;
+    padding: 0.45rem 0.55rem;
+    font-size: 0.82rem;
+  }
+
+  .my-products-catalog-toolbar__quota {
+    flex: 1 1 100%;
+    white-space: normal;
+    font-size: 0.8rem;
   }
 }

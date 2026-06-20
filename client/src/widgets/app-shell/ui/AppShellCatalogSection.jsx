@@ -239,7 +239,6 @@ export function AppShellCatalogGridSection({
  *   onEditFeedTileClick: (tileKey: string) => void;
  *   selectedCategoryLabel: string | null;
  *   activeCatalogFeedLabel: string | null;
- *   onBackToCatalogLanding: () => void;
  *   catalogGridSectionProps: import('./AppShellCatalogSection.jsx').AppShellCatalogGridSection extends never ? never : Parameters<typeof AppShellCatalogGridSection>[0];
  * }} props
  */
@@ -267,7 +266,6 @@ export function AppShellCatalogSection({
   onEditFeedTileClick,
   selectedCategoryLabel,
   activeCatalogFeedLabel,
-  onBackToCatalogLanding,
   catalogGridSectionProps,
 }) {
   if (isCatalogSubcategoryPickerActive) {
@@ -314,39 +312,18 @@ export function AppShellCatalogSection({
 
   return (
     <>
-      <div className="catalog-categories-browser__toolbar">
-        <div className="catalog-categories-browser__toolbar-main">
+      {breadcrumbCurrentLabel ? (
+        <div className="catalog-categories-browser__toolbar">
           <nav
             className="catalog-categories-browser__breadcrumb"
             aria-label={HOME_PAGE_UI.BREADCRUMB_CATALOG}
           >
-            <button
-              type="button"
-              className="catalog-categories-browser__breadcrumb-link"
-              onClick={onBackToCatalogLanding}
-            >
-              {HOME_PAGE_UI.BREADCRUMB_CATALOG}
-            </button>
-            {breadcrumbCurrentLabel ? (
-              <>
-                <span className="app-shell__breadcrumb-sep" aria-hidden="true">
-                  {HOME_PAGE_UI.BREADCRUMB_SEPARATOR}
-                </span>
-                <span className="catalog-categories-browser__breadcrumb-current">
-                  {breadcrumbCurrentLabel}
-                </span>
-              </>
-            ) : null}
+            <span className="catalog-categories-browser__breadcrumb-current">
+              {breadcrumbCurrentLabel}
+            </span>
           </nav>
-          <button
-            type="button"
-            className="catalog-categories-browser__all-button"
-            onClick={onBackToCatalogLanding}
-          >
-            {HOME_PAGE_UI.BACK_TO_CATALOG_LANDING}
-          </button>
         </div>
-      </div>
+      ) : null}
       <AppShellCatalogGridSection {...catalogGridSectionProps} />
     </>
   );

@@ -18,7 +18,7 @@
   --iz-color-slate: #334155;
   --iz-color-slate-muted: #475569;
 
-  --iz-color-bg: #f5fbff;
+  --iz-color-bg: #e5eef2;
   --iz-color-surface: #ffffff;
   --iz-color-surface-muted: #f9fafb;
   --iz-color-surface-subtle: #f3f4f6;
@@ -334,13 +334,13 @@
 
   --iz-color-social-twitter: #1d9bf0;
 
-  --iz-radius-sm: 8px;
-  --iz-radius-md: 12px;
-  --iz-radius-lg: calc(14px * 1.2);
-  --iz-radius-pill: 999px;
-  --iz-radius-button: 10px;
-  --iz-radius-input: 0.5rem;
-  --iz-radius-modal: 0.75rem;
+  --iz-radius-sm: 8px; /* базовая шкала: мелкие чипы/бейджи (пока не подключён в CSS) */
+  --iz-radius-md: 12px; /* базовая шкала: средние панели (пока не подключён в CSS) */
+  --iz-radius-lg: calc(14px * 1.2); /* карточки товара (--product-card-radius) */
+  --iz-radius-pill: 999px; /* круглые/капсульные: bottom-nav, вкладки модалки товара, иконки в хедере */
+  --iz-radius-button: 10px; /* AppButton и общие кнопки */
+  --iz-radius-input: 0.5rem; /* поля ввода, SearchInput, контролы в модалке товара, wishlist */
+  --iz-radius-modal: 0.75rem; /* профиль: кнопка «РАЗДЕЛ», карточки вкладок → --my-profile-surface-radius */
 
   --iz-space-1: 0.25rem;
   --iz-space-2: 0.5rem;

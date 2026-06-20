@@ -16,6 +16,7 @@ import { ProductDetailsModalReviewsTab } from "./ProductDetailsModalReviewsTab.j
  *   ) => void;
  *   currentUserId?: string | null;
  *   mobileReportOverlay?: import('react').ReactNode;
+ *   productTitleId?: string;
  *   ctrl: ReturnType<import('./useProductDetailsModalController.js').useProductDetailsModalController>;
  * }} props
  */
@@ -28,6 +29,7 @@ export function ProductDetailsModalTabPanel({
   onProductStatsUpdate,
   currentUserId = null,
   mobileReportOverlay = null,
+  productTitleId,
   ctrl,
 }) {
   const {
@@ -118,6 +120,7 @@ export function ProductDetailsModalTabPanel({
         onProductStatsUpdate={onProductStatsUpdate}
         currentUserId={currentUserId}
         mobileReportOverlay={mobileReportOverlay}
+        productTitleId={productTitleId}
         ctrl={ctrl}
       />
       {isSellerView && auctionUi.showSellerArchive ? (

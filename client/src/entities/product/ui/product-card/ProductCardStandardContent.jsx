@@ -10,6 +10,7 @@ import {
 } from "../../lib/getProductModerationUi.js";
 import { getProductFieldLabel } from "../../lib/productFieldRegistry.js";
 import { ProductPriceDisplay } from "../ProductPriceDisplay.jsx";
+import { hasProductCardCatalogStatusBadges } from "../../lib/hasProductCardCatalogStatusBadges.js";
 import { ProductCardStatusSlot } from "./ProductCardStatusSlot.jsx";
 import { renderProductCardSellerValue } from "./renderProductCardSellerValue.jsx";
 
@@ -19,6 +20,8 @@ import { renderProductCardSellerValue } from "./renderProductCardSellerValue.jsx
  * }} props
  */
 export function ProductCardStandardContent({ vm }) {
+  const hasCatalogStatusBadges = hasProductCardCatalogStatusBadges(vm);
+
   const renderModerationBadge = () => {
     if (!vm.isMineMode && !vm.isModerationQueue) return null;
     return (
@@ -99,6 +102,15 @@ export function ProductCardStandardContent({ vm }) {
             {vm.showRaffleBadge ? (
               <p className="product-card__raffle-badge" role="status">
                 {PRODUCT_CARD_UI.RAFFLE_BADGE}
+              </p>
+            ) : null}
+            {!hasCatalogStatusBadges ? (
+              <p
+                className="product-card__status-badge-placeholder"
+                role="status"
+                aria-label={PRODUCT_CARD_UI.NO_STATUS_BADGE}
+              >
+                {PRODUCT_CARD_UI.NO_STATUS_BADGE}
               </p>
             ) : null}
           </div>

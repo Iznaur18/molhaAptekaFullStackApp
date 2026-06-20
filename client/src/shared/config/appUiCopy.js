@@ -215,6 +215,12 @@ export const PRODUCT_PRICE_OFFER_UI = {
 
 /** Вкладка «Аукцион» в профиле */
 export const AUCTION_PAGE_UI = {
+  TITLE: "Аукцион",
+  /** @param {number} count */
+  COUNT_BIDS: (count) => `${count} моих ставок`,
+  /** @param {number} count */
+  COUNT_OFFERS: (count) => `${count} входящих`,
+  BID_PRICE_LABEL: "Ставка",
   LOADING: "Загрузка аукциона…",
   ERROR_GENERIC: "Не удалось выполнить действие",
   BUYER_SECTION_TITLE: "Мои ставки",
@@ -309,10 +315,6 @@ export const HOME_PAGE_UI = {
   LOGO_ALT: "iziBuy",
   BREADCRUMB_HOME: "Главная",
   NAV_TO_HOME: "Главная",
-  BREADCRUMB_MY_PROFILE: "Мой профиль",
-  BREADCRUMB_MY_PRODUCTS: "Мои товары",
-  BREADCRUMB_SEPARATOR: " > ",
-  ARIA_MY_PRODUCTS_CRUMB: "Мой профиль, Мои товары",
   TITLE_USERS: "Пользователи",
   TITLE_CART: "Корзина",
   TITLE_MY_ORDERS: "Мои покупки",
@@ -362,7 +364,6 @@ export const HOME_PAGE_UI = {
   CATALOG_MENU_BUTTON_ARIA: "Каталог категорий",
   BREADCRUMB_CATALOG: "Каталог",
   CATEGORY_ALL_BUTTON: "Все категории",
-  BACK_TO_CATALOG_LANDING: "Назад в каталог",
   FILTER_BUTTON_ARIA: "Фильтр по категории",
   FILTER_BUTTON_ARIA_SELECTED: (categoryLabel) =>
     `Фильтр по категории: ${categoryLabel}`,
@@ -1246,6 +1247,7 @@ export const PRODUCT_CARD_UI = {
   PREVIEW_FIELDS_ARIA: "Краткая информация о товаре",
   FOOTER_ACTIONS_ARIA: "Действия с товаром",
   STATUS_BADGES_ARIA: "Статусы товара",
+  NO_STATUS_BADGE: "нет бейджа",
   /** @param {string} sellerName */
   SELLER_PROFILE_ARIA: (sellerName) => `Профиль продавца: ${sellerName}`,
   AVAILABILITY_STATUS_VISIBLE: "В каталоге для всех",
@@ -1368,6 +1370,11 @@ export const INSTALLMENT_UI = {
   CONTRACT_REMAINING: "Осталось",
   CONTRACT_DAYS_LEFT: (days) => `Дней до конца: ${days}`,
   PAYMENTS_HEADING: "График платежей",
+  PAYMENTS_FOCUS_HEADING: "Сейчас",
+  /** @param {number} count */
+  PAYMENTS_UPCOMING_SUMMARY: (count) => `Запланировано · ${count}`,
+  /** @param {number} count */
+  PAYMENTS_HISTORY_SUMMARY: (count) => `Оплачено · ${count}`,
   PAYMENT_DUE: "Срок",
   PAYMENT_AMOUNT: "Сумма",
   MARK_PAID: "Я оплатил",
@@ -1555,7 +1562,6 @@ export const RAFFLE_PRODUCTS_PAGE_UI = {
 
 export const SELLER_PRODUCTS_PAGE_UI = {
   LOADING: "Загрузка…",
-  BACK_CATALOG: "В каталог",
   LOGIN_HINT: "Войдите, чтобы посмотреть товары продавца.",
   LOGIN_BUTTON: "Войти",
   FETCH_PROFILE_FALLBACK: "Не удалось загрузить профиль продавца",
@@ -1691,7 +1697,6 @@ export const USER_PROFILE_PURCHASES_UI = {
 /** Блок товаров продавца в чужом профиле (авторизованный зритель). */
 export const USER_PROFILE_PRODUCTS_UI = {
   HEADING: "Список товаров",
-  VIEW_ALL: "Все товары",
   LOADING: "Загрузка товаров…",
   EMPTY: "Товаров нет",
   SHOW_MORE: "Показать ещё",

@@ -25,6 +25,7 @@ import "./ProductModalShell.css";
  *   size?: 'md' | 'lg';
  *   closeOnEscape?: boolean;
  *   hideHeader?: boolean;
+ *   hideTitle?: boolean;
  * }} props
  */
 export function ProductModalShell({
@@ -43,6 +44,7 @@ export function ProductModalShell({
   size = "lg",
   closeOnEscape = true,
   hideHeader = false,
+  hideTitle = false,
 }) {
   const panelRef = useRef(/** @type {HTMLDivElement | null} */ (null));
   const closeButtonRef = useRef(/** @type {HTMLButtonElement | null} */ (null));
@@ -105,10 +107,19 @@ export function ProductModalShell({
             {title}
           </h2>
         ) : (
-          <header className="product-modal-shell__header">
-            <h2 id={titleId} className="product-modal-shell__title">
-              {title}
-            </h2>
+          <header
+            className={[
+              "product-modal-shell__header",
+              hideTitle ? "product-modal-shell__header--title-hidden" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+          >
+            {hideTitle ? null : (
+              <h2 id={titleId} className="product-modal-shell__title">
+                {title}
+              </h2>
+            )}
             <button
               ref={closeButtonRef}
               type="button"

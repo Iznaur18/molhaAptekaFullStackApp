@@ -119,6 +119,19 @@
   line-height: 1.35;
 }
 
+.product-card__status-badge-placeholder {
+  margin: 0;
+  padding: 0.2rem 0.5rem;
+  width: fit-content;
+  border-radius: 0.35rem;
+  border: 1px solid var(--iz-color-border);
+  background: var(--iz-color-surface-muted);
+  color: var(--iz-color-text-muted);
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
 .product-card__catalog-badges--web {
   display: none;
 }
@@ -178,6 +191,7 @@
 .product-card__status-badges-row > .product-card__auction-badge,
 .product-card__status-badges-row > .product-card__installment-badge,
 .product-card__status-badges-row > .product-card__raffle-badge,
+.product-card__status-badges-row > .product-card__status-badge-placeholder,
 .product-card__status-badges-row > .product-card__loyalty-overcommitted-badge {
   margin: 0;
   flex-shrink: 0;

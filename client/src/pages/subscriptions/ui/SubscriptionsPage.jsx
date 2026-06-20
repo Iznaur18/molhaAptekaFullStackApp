@@ -44,31 +44,43 @@ export function SubscriptionsPage({ isAuthorized, onRequestLogin, onUserClick })
   }
 
   if (status.kind === "loading") {
-    return <p className="subscriptions-page__state">{SUBSCRIPTIONS_PAGE_UI.LOADING}</p>;
+    return (
+      <section className="subscriptions-page">
+        <p className="subscriptions-page__state">{SUBSCRIPTIONS_PAGE_UI.LOADING}</p>
+      </section>
+    );
   }
 
   if (status.kind === "error") {
     return (
-      <p
-        className="subscriptions-page__state subscriptions-page__state_error"
-        role="alert"
-      >
-        {status.message}
-      </p>
+      <section className="subscriptions-page">
+        <p
+          className="subscriptions-page__state subscriptions-page__state_error"
+          role="alert"
+        >
+          {status.message}
+        </p>
+      </section>
     );
   }
 
   if (users.length === 0) {
-    return <p className="subscriptions-page__state">{SUBSCRIPTIONS_PAGE_UI.EMPTY}</p>;
+    return (
+      <section className="subscriptions-page">
+        <p className="subscriptions-page__state">{SUBSCRIPTIONS_PAGE_UI.EMPTY}</p>
+      </section>
+    );
   }
 
   return (
-    <ul className="subscriptions-page__list" role="list">
-      {users.map((user) => (
-        <li key={user._id} role="listitem">
-          <SubscriptionUserRow user={user} onRowClick={onUserClick} />
-        </li>
-      ))}
-    </ul>
+    <section className="subscriptions-page">
+      <ul className="subscriptions-page__list" role="list">
+        {users.map((user) => (
+          <li key={user._id} role="listitem">
+            <SubscriptionUserRow user={user} onRowClick={onUserClick} />
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

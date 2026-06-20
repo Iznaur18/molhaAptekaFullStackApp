@@ -1,0 +1,100 @@
+@media (max-width: 640px) {
+  .installment-contract-card--compact {
+    gap: 0.55rem;
+    padding: 0.75rem;
+    border: 1px solid var(--iz-color-border-subtle);
+    border-left: none;
+    border-radius: 0.85rem;
+    background: var(--iz-color-surface);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--iz-color-ink) 6%, transparent);
+  }
+
+  .installment-contract-card--compact.installment-contract-card_completed {
+    border-color: color-mix(in srgb, var(--iz-color-success-light) 65%, var(--iz-color-border));
+    background: linear-gradient(
+      180deg,
+      var(--iz-color-surface) 0%,
+      var(--iz-color-success-surface) 120%
+    );
+  }
+
+  .installment-contract-card--compact .installment-contract-card__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+  }
+
+  .installment-contract-card--compact .installment-contract-card__title {
+    font-size: 0.98rem;
+    line-height: 1.35;
+  }
+
+  .installment-contract-card--compact .installment-contract-card__progress {
+    height: 0.42rem;
+  }
+
+  .installment-contract-card--compact .installment-contract-counterparty {
+    padding: 0.35rem 0.45rem;
+    border-radius: 0.5rem;
+    background: var(--iz-color-surface-muted);
+    font-size: 0.82rem;
+  }
+
+  .installment-contract-card--compact .installment-contract-counterparty__detail {
+    display: none;
+  }
+
+  .installment-contract-card__summary {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+  }
+
+  .installment-contract-card__summary-tile {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.15rem 0.5rem;
+    padding: 0.5rem 0.6rem;
+  }
+
+  .installment-contract-card__summary-label {
+    flex: 1 1 100%;
+    font-size: 0.68rem;
+  }
+
+  .installment-contract-card__summary-value {
+    font-size: 0.92rem;
+  }
+
+  .installment-contract-card__summary-foot {
+    margin-left: auto;
+    text-align: right;
+  }
+
+  .installment-contract-card--compact .installment-contract-card__payments-title {
+    margin: 0;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--iz-color-text-muted);
+  }
+
+  .installment-contract-card--compact .installment-contract-card__actions {
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .installment-contract-card--compact .installment-contract-card__btn {
+    width: 100%;
+    min-height: 2.5rem;
+    padding: 0.55rem 0.75rem;
+    border-radius: 0.55rem;
+    font-size: 0.88rem;
+  }
+
+  .installment-contract-card--compact .installment-contract-card__dispute-form {
+    width: 100%;
+  }
+}

@@ -111,42 +111,6 @@
   color: var(--iz-color-text-secondary);
 }
 
-.app-shell__breadcrumb {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0;
-}
-
-.app-shell__breadcrumb-link {
-  margin: 0;
-  padding: 0;
-  border: none;
-  background: none;
-  color: var(--iz-color-action);
-  font: inherit;
-  font-size: inherit;
-  font-weight: inherit;
-  line-height: inherit;
-  cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 0.15em;
-}
-
-.app-shell__breadcrumb-link:hover {
-  color: var(--iz-color-action-hover);
-}
-
-.app-shell__breadcrumb-sep {
-  color: inherit;
-  opacity: 0.85;
-  user-select: none;
-}
-
-.app-shell__breadcrumb-text {
-  font-weight: inherit;
-}
-
 .app-shell__filter {
   position: relative;
   flex-shrink: 0;
@@ -443,13 +407,6 @@
   color: transparent;
 }
 
-.app-shell--header-v1 .app-shell__title:has(.app-shell__breadcrumb) {
-  background: none;
-  -webkit-background-clip: border-box;
-  background-clip: border-box;
-  color: var(--iz-color-ink);
-}
-
 .app-shell--header-v1 .app-shell__title_inline {
   font-weight: 700;
 }
@@ -523,10 +480,6 @@
   box-shadow: 0 12px 32px var(--iz-shadow-card-hover);
 }
 
-.app-shell__view-title--profile-catalog-mobile {
-  display: none;
-}
-
 @media (max-width: 640px) {
   .app-shell {
     --app-shell-content-inline-padding: max(
@@ -550,37 +503,6 @@
     grid-template-areas: "brand search notifications";
     align-items: center;
     gap: 0.45rem 0.5rem;
-  }
-
-  .app-shell__header--profile-catalog .app-shell__header-top {
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas: "brand notifications";
-  }
-
-  .app-shell__header--profile-catalog .app-shell__header-search {
-    display: none;
-  }
-
-  .app-shell__header--profile-catalog .app-shell__breadcrumb {
-    display: none;
-  }
-
-  .app-shell__header--profile-catalog .app-shell__view-title--profile-catalog-mobile {
-    display: inline;
-  }
-
-  .app-shell__header--profile-catalog .app-shell__title-row {
-    flex-wrap: nowrap;
-    align-items: center;
-    gap: 0.5rem;
-    min-width: 0;
-  }
-
-  .app-shell__header--profile-catalog .app-shell__view-title--profile-catalog-mobile {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    min-width: 0;
   }
 
   .app-shell__header-main {

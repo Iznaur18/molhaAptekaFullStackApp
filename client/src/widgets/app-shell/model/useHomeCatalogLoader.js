@@ -172,7 +172,6 @@ export const useHomeCatalogLoader = ({
     handleSellerPersonalCategoryTileClick: browser.handleSellerPersonalCategoryTileClick,
     personalCategoryTiles: browser.personalCategoryTiles,
     handleCatalogFeedTileClick: browser.handleCatalogFeedTileClick,
-    handleBackToCatalogLanding: browser.handleBackToCatalogLanding,
     handleCategoryDisplaySaved: browser.handleCategoryDisplaySaved,
     handleFeedTileDisplaySaved: browser.handleFeedTileDisplaySaved,
     selectedCategoryLabel: browser.selectedCategoryLabel,

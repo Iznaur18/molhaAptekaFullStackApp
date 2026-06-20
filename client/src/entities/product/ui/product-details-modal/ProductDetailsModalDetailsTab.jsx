@@ -25,6 +25,7 @@ import { renderProductDetailsFieldRows } from "./renderProductDetailsFieldRows.j
  *   ) => void;
  *   currentUserId?: string | null;
  *   mobileReportOverlay?: import('react').ReactNode;
+ *   productTitleId?: string;
  *   ctrl: ReturnType<import('./useProductDetailsModalController.js').useProductDetailsModalController>;
  * }} props
  */
@@ -37,12 +38,12 @@ export function ProductDetailsModalDetailsTab({
   onProductStatsUpdate,
   currentUserId = null,
   mobileReportOverlay = null,
+  productTitleId,
   ctrl,
 }) {
   const {
     imageUrls,
     previewVideoUrl,
-    setGalleryLightboxOpen,
     auctionUi,
     installmentUi,
     fieldHandlers,
@@ -66,33 +67,37 @@ export function ProductDetailsModalDetailsTab({
           previewVideoUrl={previewVideoUrl}
           isActive={isOpen}
           resetToken={product._id}
-          onLightboxOpenChange={setGalleryLightboxOpen}
           onBack={fieldHandlers.onClose}
           heroOverlay={
-            <>
-              {!isOwnProduct ? (
-                <WishlistToggleButton
-                  productId={String(product._id)}
-                  product={product}
-                  isAuthorized={isAuthorized}
-                  onRequestLogin={onRequestLogin}
-                  currentUserId={currentUserId}
-                  onProductStatsUpdate={onProductStatsUpdate}
-                  variant="card"
-                />
-              ) : null}
-              {mobileReportOverlay ? (
-                <div className="product-media-gallery-readonly__report-slot">
-                  {mobileReportOverlay}
-                </div>
-              ) : null}
-            </>
+            !isOwnProduct || mobileReportOverlay ? (
+              <div className="product-media-gallery-readonly__hero-actions">
+                {mobileReportOverlay ? (
+                  <div className="product-media-gallery-readonly__report-slot">
+                    {mobileReportOverlay}
+                  </div>
+                ) : null}
+                {!isOwnProduct ? (
+                  <WishlistToggleButton
+                    productId={String(product._id)}
+                    product={product}
+                    isAuthorized={isAuthorized}
+                    onRequestLogin={onRequestLogin}
+                    currentUserId={currentUserId}
+                    onProductStatsUpdate={onProductStatsUpdate}
+                    variant="card"
+                  />
+                ) : null}
+              </div>
+            ) : null
           }
         />
         <div className="product-details-modal__spec">
           {showPriceBlock ? (
             <div className="product-details-modal__price-block product-details-modal__price-block--inline-actions">
-              <h3 className="product-details-modal__product-name">
+              <h3
+                id={productTitleId}
+                className="product-details-modal__product-name"
+              >
                 {product.productName?.trim() || "Товар"}
               </h3>
               <ProductPriceDisplay
@@ -124,13 +129,14 @@ export function ProductDetailsModalDetailsTab({
               />
             </div>
           ) : null}
-          {topStatFieldKeys.length > 0 ? (
-            <dl className="product-details-modal__stats-grid">
-              {renderProductDetailsFieldRows(product, topStatFieldKeys, fieldHandlers)}
-            </dl>
-          ) : null}
         </div>
       </div>
+
+      {topStatFieldKeys.length > 0 ? (
+        <dl className="product-details-modal__stats-grid product-details-modal__stats-grid--standalone">
+          {renderProductDetailsFieldRows(product, topStatFieldKeys, fieldHandlers)}
+        </dl>
+      ) : null}
 
       <ProductDetailsSellerPreview
         seller={product.productSeller}

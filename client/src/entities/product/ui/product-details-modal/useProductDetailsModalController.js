@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { useRecordProductViewMutation } from "../../model/useRecordProductViewMutation.js";
 import { resolveProductImageUrls } from "../../lib/resolveProductImageUrls.js";
@@ -40,7 +40,6 @@ export function useProductDetailsModalController({
     () => (product ? resolveProductPreviewVideoUrl(product) : null),
     [product],
   );
-  const [galleryLightboxOpen, setGalleryLightboxOpen] = useState(false);
   const { user: authUser } = useAuthSession();
   const isUserDataConfirmed = isAuthorized && authUser?.isUserDataConfirmed === true;
   const modalBodyRef = useRef(/** @type {HTMLDivElement | null} */ (null));
@@ -67,10 +66,6 @@ export function useProductDetailsModalController({
   );
 
   useEffect(() => {
-    setGalleryLightboxOpen(false);
-  }, [product?._id]);
-
-  useEffect(() => {
     if (!isOpen || !product?._id || !isAuthorized) return undefined;
 
     recordProductViewMutate(String(product._id), {
@@ -83,7 +78,7 @@ export function useProductDetailsModalController({
   }, [isOpen, isAuthorized, onProductStatsUpdate, product?._id, recordProductViewMutate]);
 
   useEffect(() => {
-    if (!isOpen || galleryLightboxOpen) return undefined;
+    if (!isOpen) return undefined;
 
     const onKeyDown = (event) => {
       if (event.key === "Escape") onClose();
@@ -93,7 +88,7 @@ export function useProductDetailsModalController({
     return () => {
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [galleryLightboxOpen, isOpen, onClose]);
+  }, [isOpen, onClose]);
 
   const topRowFieldKeys = showStaffDetails
     ? PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS_ADMIN
@@ -136,8 +131,6 @@ export function useProductDetailsModalController({
     showPriceBlock,
     imageUrls,
     previewVideoUrl,
-    galleryLightboxOpen,
-    setGalleryLightboxOpen,
     modalBodyRef,
     tabPanelRef,
     isUserDataConfirmed,

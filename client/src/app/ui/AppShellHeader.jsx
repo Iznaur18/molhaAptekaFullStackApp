@@ -26,8 +26,6 @@ import { isProfileTabMainView } from "../../widgets/app-shell/lib/profileTabToMa
 import {
   isCatalogBrowserMainView,
   isCatalogHeaderMainView,
-  isCatalogShellMainView,
-  isMyProductsMainView,
 } from "../../shared/lib/homeMainViewPaths.js";
 import { MobileBottomNav } from "../../widgets/mobile-bottom-nav/ui/MobileBottomNav.jsx";
 import { APP_SHELL_MOBILE_NAV_BREAKPOINT_PX } from "../../shared/lib/appShellMobileNavConstants.js";
@@ -152,7 +150,6 @@ export function AppShellHeader({
 
   useScrollLock(isProductCategoryListOpen);
 
-  const isCatalogShellView = isCatalogShellMainView(mainView);
   const isCatalogHeaderView = isCatalogHeaderMainView(mainView);
   const isPublicCatalogHeader = !isMineMode && isCatalogHeaderView;
   const isUsersNavActive = mainView === "users";
@@ -194,7 +191,6 @@ export function AppShellHeader({
   const headerClassName = [
     "app-shell__header",
     getAppShellHeaderVariantClass(),
-    isMyProductsMainView(mainView) && "app-shell__header--profile-catalog",
     isMobileNav && "app-shell__header--mobile-split",
   ]
     .filter(Boolean)
@@ -236,27 +232,23 @@ export function AppShellHeader({
         <div className="app-shell__header-top">
           <div className="app-shell__header-main">
             <HomeHeaderTitleRow
-              isCatalogShellView={isCatalogShellView}
               isCatalogHeaderView={isCatalogHeaderView}
-              isMineMode={isMineMode}
               headerViewTitle={headerViewTitle}
               onNavigateToFullCatalogFromBreadcrumb={
                 onNavigateToFullCatalogFromBreadcrumb
               }
             />
-            {isCatalogHeaderView ? (
-              <div className="app-shell__header-search">
-                <SearchInput
-                  value={productSearchTerm}
-                  onChange={onProductSearchTermChange}
-                  placeholder={PRODUCT_SEARCH_INPUT_UI.PLACEHOLDER}
-                  ariaLabel={PRODUCT_SEARCH_INPUT_UI.ARIA_LABEL}
-                  clearAriaLabel={PRODUCT_SEARCH_INPUT_UI.CLEAR_ARIA}
-                  pendingAriaLabel={PRODUCT_SEARCH_INPUT_UI.PENDING_ARIA}
-                  isPending={isProductSearchPending}
-                />
-              </div>
-            ) : null}
+            <div className="app-shell__header-search">
+              <SearchInput
+                value={productSearchTerm}
+                onChange={onProductSearchTermChange}
+                placeholder={PRODUCT_SEARCH_INPUT_UI.PLACEHOLDER}
+                ariaLabel={PRODUCT_SEARCH_INPUT_UI.ARIA_LABEL}
+                clearAriaLabel={PRODUCT_SEARCH_INPUT_UI.CLEAR_ARIA}
+                pendingAriaLabel={PRODUCT_SEARCH_INPUT_UI.PENDING_ARIA}
+                isPending={isProductSearchPending}
+              />
+            </div>
             {isCatalogHeaderView && !isMobileNav ? (
               <CatalogHeaderFilter {...catalogFilterProps} />
             ) : null}
@@ -487,17 +479,13 @@ function HeaderNavActions({
 
 /**
  * @param {{
- *   isCatalogShellView: boolean;
  *   isCatalogHeaderView: boolean;
- *   isMineMode: boolean;
  *   headerViewTitle: string;
  *   onNavigateToFullCatalogFromBreadcrumb: () => void;
  * }} props
  */
 function HomeHeaderTitleRow({
-  isCatalogShellView,
   isCatalogHeaderView,
-  isMineMode,
   headerViewTitle,
   onNavigateToFullCatalogFromBreadcrumb,
 }) {
@@ -520,27 +508,6 @@ function HomeHeaderTitleRow({
           />
         </button>
       </h1>
-      {isCatalogShellView && isMineMode ? (
-        <>
-          <span
-            className="app-shell__breadcrumb"
-            aria-label={HOME_PAGE_UI.ARIA_MY_PRODUCTS_CRUMB}
-          >
-            <span className="app-shell__breadcrumb-text">
-              {HOME_PAGE_UI.BREADCRUMB_MY_PROFILE}
-            </span>
-            <span className="app-shell__breadcrumb-sep" aria-hidden="true">
-              {HOME_PAGE_UI.BREADCRUMB_SEPARATOR}
-            </span>
-            <span className="app-shell__breadcrumb-text">
-              {HOME_PAGE_UI.BREADCRUMB_MY_PRODUCTS}
-            </span>
-          </span>
-          <span className="app-shell__view-title app-shell__view-title--profile-catalog-mobile">
-            {HOME_PAGE_UI.BREADCRUMB_MY_PRODUCTS}
-          </span>
-        </>
-      ) : null}
       {!isCatalogHeaderView && headerViewTitle ? (
         <span className="app-shell__view-title">{headerViewTitle}</span>
       ) : null}

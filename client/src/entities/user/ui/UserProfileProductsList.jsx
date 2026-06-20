@@ -149,31 +149,21 @@ export function UserProfileProductsList({
     typeof onViewAllProducts === "function" && phase === "success" && total > 0;
 
   return (
-    <div className="user-profile-purchases">
-      <div className="user-profile-purchases__heading-row">
-        {showViewAll ? (
-          <button
-            type="button"
-            className="user-profile-purchases__heading user-profile-purchases__heading_action"
-            onClick={onViewAllProducts}
-          >
-            {USER_PROFILE_PRODUCTS_UI.HEADING}
-          </button>
-        ) : (
-          <h3 className="user-profile-purchases__heading">
-            {USER_PROFILE_PRODUCTS_UI.HEADING}
-          </h3>
-        )}
-        {showViewAll ? (
-          <button
-            type="button"
-            className="user-profile-purchases__view-all"
-            onClick={onViewAllProducts}
-          >
-            {USER_PROFILE_PRODUCTS_UI.VIEW_ALL}
-          </button>
-        ) : null}
-      </div>
+    <div className="user-profile-purchases-section">
+      {showViewAll ? (
+        <button
+          type="button"
+          className="user-profile-purchases__heading user-profile-purchases__heading_action"
+          onClick={onViewAllProducts}
+        >
+          {USER_PROFILE_PRODUCTS_UI.HEADING}
+        </button>
+      ) : (
+        <h3 className="user-profile-purchases__heading">
+          {USER_PROFILE_PRODUCTS_UI.HEADING}
+        </h3>
+      )}
+      <div className="user-profile-purchases">
       {phase === "loading" ? (
         <p className="user-profile-purchases__state">
           {USER_PROFILE_PRODUCTS_UI.LOADING}
@@ -264,6 +254,7 @@ export function UserProfileProductsList({
           {unavailableHint}
         </p>
       ) : null}
+      </div>
     </div>
   );
 }

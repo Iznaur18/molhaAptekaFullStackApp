@@ -30,7 +30,6 @@ export function SellerProductsRoutePage() {
       onRequestLoginAddToCart={onRequestLogin}
       onSellerNameClick={onSellerNameClick}
       onOpenProductDetails={onOpenProductDetails}
-      onBackToCatalog={() => goToMainView("catalog")}
       onGoToMyProducts={() => goToMainView("my-products")}
     />
   );

@@ -4,7 +4,7 @@ export const izColors = {
   textMuted: "#6b7280",
   textSecondary: "#374151",
   ink: "#0f172a",
-  bg: "#f5fbff",
+  bg: "#e5eef2",
   surface: "#ffffff",
   surfaceMuted: "#f9fafb",
   surfaceElevated: "#f8fafc",

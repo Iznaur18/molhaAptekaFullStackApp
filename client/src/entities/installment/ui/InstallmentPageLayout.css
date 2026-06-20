@@ -1,8 +1,11 @@
+@import "../../../shared/ui/profileQueueContentPanel.css";
+
 .installment-page {
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
   min-width: 0;
+  --profile-queue-list-gap: 1rem;
 }
 
 .installment-page__toolbar {
@@ -97,9 +100,11 @@
 .installment-page__list {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: var(--profile-queue-list-gap, 1rem);
   margin: 0;
   padding: 0;
+  border: none;
+  background: transparent;
   list-style: none;
 }
 
@@ -227,3 +232,5 @@
   background: var(--iz-color-surface);
   color: var(--iz-color-danger-accent);
 }
+
+@import "./InstallmentPageLayoutMobile.css";

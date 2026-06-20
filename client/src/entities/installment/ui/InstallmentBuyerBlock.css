@@ -236,12 +236,4 @@
   cursor: not-allowed;
 }
 
-@media (max-width: 520px) {
-  .installment-buyer-block__row {
-    grid-template-columns: 1fr;
-  }
-
-  .installment-buyer-block__totals {
-    grid-template-columns: 1fr;
-  }
-}
+@import "./InstallmentBuyerBlockMobile.css";

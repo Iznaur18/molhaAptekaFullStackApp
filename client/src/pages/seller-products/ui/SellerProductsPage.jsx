@@ -32,7 +32,6 @@ import "./SellerProductsPage.css";
  *   onOpenProductDetails: (
  *     product: import('../../../entities/product/model/types.js').ProductFromApi,
  *   ) => void;
- *   onBackToCatalog: () => void;
  *   onGoToMyProducts: () => void;
  * }} props
  */
@@ -45,7 +44,6 @@ export function SellerProductsPage({
   onRequestLoginAddToCart,
   onSellerNameClick,
   onOpenProductDetails,
-  onBackToCatalog,
   onGoToMyProducts,
 }) {
   const queryClient = useQueryClient();
@@ -158,13 +156,6 @@ export function SellerProductsPage({
   return (
     <div className="seller-products-page">
       <header className="seller-products-page__header">
-        <button
-          type="button"
-          className="seller-products-page__back"
-          onClick={onBackToCatalog}
-        >
-          ← {SELLER_PRODUCTS_PAGE_UI.BACK_CATALOG}
-        </button>
         <h2 className="seller-products-page__title">{pageTitle}</h2>
         {seller ? (
           <div className="seller-products-page__seller">

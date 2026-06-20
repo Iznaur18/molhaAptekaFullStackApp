@@ -70,8 +70,7 @@ export function ProductDetailsModal({
   const isMobileNav = useMaxWidthMediaQuery(APP_SHELL_MOBILE_NAV_BREAKPOINT_PX);
 
   useSwipeRightToDismiss(ctrl.modalBodyRef, {
-    enabled:
-      isOpen && Boolean(product) && isMobileNav && !ctrl.galleryLightboxOpen,
+    enabled: isOpen && Boolean(product) && isMobileNav,
     onDismiss: onClose,
   });
 
@@ -123,7 +122,7 @@ export function ProductDetailsModal({
       title={title}
       titleId="product-details-modal-title"
       size="lg"
-      hideHeader={isMobileNav}
+      hideHeader
       panelClassName={[
         "product-details-modal",
         showMobilePurchaseDock ? "product-details-modal--mobile-dock-active" : "",
@@ -166,6 +165,7 @@ export function ProductDetailsModal({
           onProductStatsUpdate={onProductStatsUpdate}
           currentUserId={currentUserId}
           mobileReportOverlay={mobileReportOverlay}
+          productTitleId={isMobileNav ? undefined : "product-details-modal-title"}
           ctrl={ctrl}
         />
       </div>

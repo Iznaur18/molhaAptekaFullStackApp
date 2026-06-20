@@ -1,8 +1,11 @@
+@import "./myProfileTabSurfaces.css";
+
 .my-profile-page {
   --my-profile-sidebar-width: 16.25rem;
   --my-profile-mobile-nav-width: min(18rem, 88vw);
   --my-profile-mobile-nav-z-index: var(--iz-z-dropdown);
   --my-profile-nav-accent-width: 3px;
+  --my-profile-surface-radius: var(--iz-radius-modal);
   --modal-avatar-lead-size: 4.5rem;
   --modal-profile-banner-height-mult: 3;
   --modal-banner-avatar-inset: 0.75rem;
@@ -30,21 +33,15 @@
   display: flex;
   flex-direction: column;
   flex: 1 1 auto;
-  border: 1px solid color-mix(in srgb, var(--iz-color-action-light) 55%, var(--iz-color-border));
+  border: 1px solid color-mix(in srgb, var(--iz-color-text) 8%, var(--iz-color-border));
   border-radius: 0.9rem;
-  background: linear-gradient(
-    165deg,
-    var(--iz-color-surface) 0%,
-    var(--iz-color-action-soft) 120%
-  );
-  box-shadow:
-    0 1px 2px color-mix(in srgb, var(--iz-color-action) 10%, transparent),
-    0 8px 24px color-mix(in srgb, var(--iz-color-action) 6%, transparent);
+  background: var(--iz-color-surface);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--iz-color-ink) 6%, transparent);
 }
 
 .my-profile-page__sidebar-head {
   padding: 1rem 1rem 0.7rem;
-  border-bottom: 1px solid color-mix(in srgb, var(--iz-color-action-border) 80%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--iz-color-border) 70%, transparent);
 }
 
 .my-profile-page__title {
@@ -335,11 +332,8 @@
 }
 
 .my-profile-page__body {
-  border: 1px solid var(--iz-color-border);
-  border-radius: 0.85rem;
-  background: var(--iz-color-surface);
   padding: 1rem;
-  box-shadow: 0 1px 2px color-mix(in srgb, var(--iz-color-canvas-text) 6%, transparent);
+  background: transparent;
 }
 
 .my-profile-page__state {
@@ -415,9 +409,18 @@
   min-width: 0;
 }
 
+.my-profile-page--catalog-grid-tab .my-profile-page__catalog-shell {
+  box-sizing: border-box;
+  width: calc(100% - 2 * var(--my-profile-shell-content-gutter, 0px));
+  margin-inline: var(--my-profile-shell-content-gutter, 0);
+}
+
 @media (max-width: 903px) {
   .my-profile-page {
     --my-profile-mobile-inline-inset: 0.1rem;
+    --my-profile-shell-content-gutter: calc(
+      var(--app-shell-content-inline-padding) - var(--my-profile-mobile-inline-inset)
+    );
     --my-profile-catalog-grid-gap: 0.15rem;
 
     margin-inline: calc(
@@ -481,20 +484,26 @@
   min-height: 100%;
 }
 
+.my-profile-page .user-details-modal__banner {
+  border-radius: var(--my-profile-surface-radius);
+}
+
 .my-profile-page__banner-edit {
   position: absolute;
   top: var(--modal-banner-avatar-inset);
   right: var(--modal-banner-avatar-inset);
   z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
   margin: 0;
-  padding: 0.35rem 0.75rem;
-  border-radius: 8px;
+  padding: 0;
+  border-radius: var(--iz-radius-input);
   border: 1px solid var(--iz-color-overlay-white-border);
   background: var(--iz-color-overlay-white);
   color: var(--iz-color-text);
-  font: inherit;
-  font-size: 0.9rem;
-  font-weight: 600;
   cursor: pointer;
 }
 
@@ -567,7 +576,7 @@
   margin: 0;
   padding: 0.7rem 0.85rem;
   border: 1px solid color-mix(in srgb, var(--iz-color-action-light) 55%, var(--iz-color-border));
-  border-radius: 0.75rem;
+  border-radius: var(--my-profile-surface-radius);
   background: linear-gradient(
     165deg,
     var(--iz-color-surface) 0%,
@@ -640,6 +649,14 @@
 
   .my-profile-page__mobile-nav-toggle {
     display: flex;
+    box-sizing: border-box;
+    width: calc(
+      100% - 2 * var(--my-profile-shell-content-gutter, var(--app-shell-content-inline-padding))
+    );
+    margin-inline: var(
+      --my-profile-shell-content-gutter,
+      var(--app-shell-content-inline-padding)
+    );
   }
 
   .my-profile-page__mobile-nav-backdrop {
@@ -656,7 +673,7 @@
     width: var(--my-profile-mobile-nav-width);
     max-width: var(--my-profile-mobile-nav-width);
     padding: 0.65rem 0.45rem 0.65rem 0.65rem;
-    background: var(--iz-color-surface);
+    background: var(--iz-color-bg);
     box-shadow: 12px 0 32px color-mix(in srgb, var(--iz-color-ink) 18%, transparent);
     transform: translateX(calc(-100% - 0.75rem));
     transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
@@ -671,6 +688,10 @@
 
   .my-profile-page__sidebar {
     min-height: 100%;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
   }
 }
 

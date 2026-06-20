@@ -206,11 +206,6 @@ export function useCatalogBrowserLanding({
     [applyCatalogQueryState, isAuthorized, navigate, setIsLoginModalOpen],
   );
 
-  const handleBackToCatalogLanding = useCallback(() => {
-    subcategoryPicker.clearPickerTrail();
-    navigate(buildCatalogBrowserLocation(CATALOG_LANDING_QUERY), { replace: true });
-    applyCatalogQueryState(CATALOG_LANDING_QUERY);
-  }, [applyCatalogQueryState, navigate, subcategoryPicker.clearPickerTrail]);
 
   const handleCategoryDisplaySaved = useCallback(
     (display) => {
@@ -304,7 +299,6 @@ export function useCatalogBrowserLanding({
     handleSellerPersonalCategoryTileClick,
     personalCategoryTiles,
     handleCatalogFeedTileClick,
-    handleBackToCatalogLanding,
     handleCategoryDisplaySaved,
     handleFeedTileDisplaySaved,
     selectedCategoryLabel,

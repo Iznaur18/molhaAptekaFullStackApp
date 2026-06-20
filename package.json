@@ -16,6 +16,7 @@
     "verify:profile-sections": "npm run build --workspace=@izibuy/shared-lib && node scripts/verify-profile-sections-parity.mjs",
     "test:contract": "npm test --prefix contract",
     "test:shared-lib": "npm test --workspace=@izibuy/shared-lib",
+    "test:installment-mobile": "node --test scripts/installment-partition.test.mjs scripts/installment-mobile-chrome.test.mjs",
     "test:packages": "npm run test:contract && npm run test:shared-lib",
     "test:server": "npm test --prefix server",
     "test:client": "npm test --prefix client",

@@ -1,33 +1,55 @@
+.subscriptions-page {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  min-width: 0;
+  --profile-queue-list-gap: 1rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
 .subscriptions-page__hint {
-  margin: 0 0 1rem;
-  color: var(--color-text-muted, var(--iz-color-text-subtle));
+  margin: 0;
+  color: var(--iz-color-text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.45;
 }
 
 .subscriptions-page__login {
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  border: 1px solid var(--color-accent, var(--iz-color-link));
-  background: var(--color-accent, var(--iz-color-link));
+  align-self: flex-start;
+  margin: 0;
+  padding: 0.55rem 1rem;
+  border-radius: 0.65rem;
+  border: 1px solid var(--iz-color-link);
+  background: var(--iz-color-link);
   color: var(--iz-color-on-contrast);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
   cursor: pointer;
 }
 
 .subscriptions-page__state {
-  margin: 1rem 0;
-  color: var(--color-text-muted, var(--iz-color-text-subtle));
+  margin: 0;
+  color: var(--iz-color-text-secondary);
+  font-size: 0.95rem;
 }
 
 .subscriptions-page__state_error {
-  color: var(--iz-color-danger-deep);
+  color: var(--iz-color-danger-strong);
 }
 
 .subscriptions-page__list {
   list-style: none;
-  margin: 0;
-  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--profile-queue-list-gap, 1rem);
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
 }
 
 .subscription-user-row {
@@ -35,17 +57,22 @@
   align-items: center;
   gap: 0.75rem;
   width: 100%;
-  padding: 0.65rem 0.75rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-canvas-text) 12%, transparent);
-  border-radius: 10px;
-  background: var(--iz-color-canvas);
+  padding: 0.7rem 0.75rem;
+  border: 1px solid var(--iz-color-border-subtle);
+  border-radius: 0.75rem;
+  background: var(--iz-color-surface);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--iz-color-ink) 4%, transparent);
   cursor: pointer;
   font: inherit;
   text-align: left;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .subscription-user-row:hover {
-  background: color-mix(in srgb, var(--iz-color-canvas-text) 4%, var(--iz-color-canvas));
+  border-color: color-mix(in srgb, var(--iz-color-link) 28%, var(--iz-color-border));
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--iz-color-ink) 6%, transparent);
 }
 
 .subscription-user-row__avatar {
@@ -59,8 +86,8 @@
 .subscription-user-row__name {
   flex: 1;
   min-width: 0;
-  font-size: 1rem;
-  font-weight: 500;
+  font-size: 0.98rem;
+  font-weight: 600;
 }
 
 .subscription-user-row__name-text {
@@ -68,3 +95,5 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+@import "./SubscriptionsPageMobile.css";

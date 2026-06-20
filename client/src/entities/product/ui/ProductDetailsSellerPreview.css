@@ -7,9 +7,9 @@
   width: 100%;
   margin: 0;
   padding: 0.85rem 1rem;
-  border: 1px solid var(--iz-color-border);
+  border: 1px solid color-mix(in srgb, var(--iz-color-link) 16%, var(--iz-color-border));
   border-radius: 0.65rem;
-  background: var(--iz-color-surface);
+  background: color-mix(in srgb, var(--iz-color-action-soft) 72%, var(--iz-color-surface));
   color: var(--iz-color-text);
   font: inherit;
   text-align: left;
@@ -24,12 +24,14 @@
 }
 
 .product-details-seller-preview:hover {
-  border-color: var(--iz-color-action);
-  box-shadow: 0 4px 14px var(--iz-color-overlay-hover);
+  border-color: color-mix(in srgb, var(--iz-color-link) 32%, var(--iz-color-border));
+  background: color-mix(in srgb, var(--iz-color-action-soft) 88%, var(--iz-color-surface));
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--iz-color-link) 8%, transparent);
 }
 
 .product-details-seller-preview--static:hover {
-  border-color: var(--iz-color-border);
+  border-color: color-mix(in srgb, var(--iz-color-link) 16%, var(--iz-color-border));
+  background: color-mix(in srgb, var(--iz-color-action-soft) 72%, var(--iz-color-surface));
   box-shadow: none;
 }
 

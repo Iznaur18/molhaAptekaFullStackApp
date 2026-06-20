@@ -3,6 +3,7 @@
   flex-direction: column;
   gap: 0.65rem;
   min-width: 0;
+  --profile-queue-list-gap: 1rem;
 }
 
 .my-orders-page__toolbar {
@@ -102,9 +103,11 @@
 .my-orders-page__list {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: var(--profile-queue-list-gap, 1rem);
   margin: 0;
   padding: 0;
+  border: none;
+  background: transparent;
   list-style: none;
 }
 
@@ -139,3 +142,5 @@
 .my-orders-page__product-error {
   color: var(--iz-color-danger-strong);
 }
+
+@import "./MyOrdersPageMobile.css";

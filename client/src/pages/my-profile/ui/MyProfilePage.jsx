@@ -9,7 +9,7 @@ import { PROFILE_TAB_OVERVIEW } from "../../../widgets/app-shell/lib/profileTabs
 import { MyProductsCatalogToolbar } from "../../../widgets/my-products-catalog-toolbar/ui/MyProductsCatalogToolbar.jsx";
 import { useMyProfileNav } from "../model/useMyProfileNav.js";
 import { useMyProfilePageUi } from "../model/useMyProfilePageUi.js";
-import { Menu } from "../../../shared/ui/icon/index.js";
+import { AppIcon, Menu, Pencil } from "../../../shared/ui/icon/index.js";
 import { UserProfileInfoPanel } from "../../../entities/user/ui/UserProfileInfoPanel.jsx";
 import { ProfileSidebar } from "./ProfileSidebar.jsx";
 
@@ -339,9 +339,10 @@ export function MyProfilePage({
                         <button
                           type="button"
                           className="my-profile-page__banner-edit"
+                          aria-label={MY_PROFILE_PAGE_UI.EDIT_PROFILE}
                           onClick={() => onEditProfileClick?.()}
                         >
-                          {MY_PROFILE_PAGE_UI.EDIT_PROFILE}
+                          <AppIcon icon={Pencil} size="sm" strokeWidth={2.25} />
                         </button>
                       ) : null}
                     </div>

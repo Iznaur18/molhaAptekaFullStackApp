@@ -14,6 +14,9 @@ import {
   USER_LIST_ROW_UI,
 } from "../../../shared/config/appUiCopy.js";
 
+import { AuctionDashboardRowStatus } from "./AuctionDashboardRowStatus.jsx";
+import { AuctionDashboardSellerActions } from "./AuctionDashboardSellerActions.jsx";
+
 import "./AuctionDashboard.css";
 
 /**
@@ -114,49 +117,35 @@ export function AuctionSellerOfferRow({
             )}
             {" · "}
             {formatIsoDateTime(offer.createdAt)}
-            {isAccepted ? ` · ${PRODUCT_PRICE_OFFER_UI.ACCEPTED_BADGE}` : ""}
           </p>
-          <p
-            className={[
-              "auction-dashboard-row__status",
-              isPending
-                ? "auction-dashboard-row__status_pending"
-                : isAccepted
-                  ? "auction-dashboard-row__status_accepted"
-                  : "",
-            ]
-              .filter(Boolean)
-              .join(" ")}
-          >
-            {isPending ? PRODUCT_PRICE_OFFER_UI.STATUS_PENDING : null}
-          </p>
+          <AuctionDashboardRowStatus isPending={isPending} isAccepted={isAccepted}>
+            {isPending
+              ? PRODUCT_PRICE_OFFER_UI.STATUS_PENDING
+              : isAccepted
+                ? PRODUCT_PRICE_OFFER_UI.ACCEPTED_BADGE
+                : null}
+          </AuctionDashboardRowStatus>
         </div>
+      </div>
+
+      <div className="auction-dashboard-row__price-strip">
+        <span className="auction-dashboard-row__price-label">
+          {AUCTION_PAGE_UI.BID_PRICE_LABEL}
+        </span>
         <span className="auction-dashboard-row__price">
           {formatPriceRub(offer.offerPrice)}
         </span>
       </div>
 
       {isPending ? (
-        <div className="auction-dashboard-row__actions">
-          <button
-            type="button"
-            className="auction-dashboard-row__btn auction-dashboard-row__btn_primary"
-            disabled={isBusy}
-            onClick={() => void handleAccept()}
-          >
-            {isBusy
-              ? PRODUCT_PRICE_OFFER_UI.ACTION_PENDING
-              : PRODUCT_PRICE_OFFER_UI.ACTION_ACCEPT}
-          </button>
-          <button
-            type="button"
-            className="auction-dashboard-row__btn auction-dashboard-row__btn_reject"
-            disabled={isBusy}
-            onClick={() => void handleReject()}
-          >
-            {PRODUCT_PRICE_OFFER_UI.ACTION_REJECT}
-          </button>
-        </div>
+        <AuctionDashboardSellerActions
+          onAccept={() => void handleAccept()}
+          onReject={() => void handleReject()}
+          disabled={isBusy}
+          acceptLabel={PRODUCT_PRICE_OFFER_UI.ACTION_ACCEPT}
+          rejectLabel={PRODUCT_PRICE_OFFER_UI.ACTION_REJECT}
+          pendingLabel={PRODUCT_PRICE_OFFER_UI.ACTION_PENDING}
+        />
       ) : null}
 
       {error ? (

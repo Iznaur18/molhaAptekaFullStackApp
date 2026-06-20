@@ -1,0 +1,43 @@
+.profile-queue-content-panel,
+.my-sales-page > .my-sales-page__state,
+.my-orders-page > .my-orders-page__state,
+.auction-page > .auction-page__state,
+.installment-page > .installment-page__state {
+  --profile-queue-list-gap: 1rem;
+  --profile-queue-content-padding-block: 1rem;
+
+  padding: var(--profile-queue-content-padding-block) 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--iz-color-text) 8%, var(--iz-color-border));
+  border-radius: 0.85rem;
+  background: var(--iz-color-surface-subtle);
+}
+
+.profile-queue-content-panel > :where(ul[role="list"]) {
+  padding-block: 0.15rem;
+}
+
+.my-sales-page > .my-sales-page__state,
+.my-orders-page > .my-orders-page__state,
+.auction-page > .auction-page__state,
+.installment-page > .installment-page__state {
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .profile-queue-content-panel,
+  .my-sales-page > .my-sales-page__state,
+  .my-orders-page > .my-orders-page__state,
+  .auction-page > .auction-page__state,
+  .installment-page > .installment-page__state {
+    --profile-queue-list-gap: 1.15rem;
+    --profile-queue-content-padding-block: 1.1rem;
+
+    padding-inline: 0.65rem;
+    border-radius: 0.9rem;
+    background: color-mix(
+      in srgb,
+      var(--iz-color-text) 5%,
+      var(--iz-color-surface-alt)
+    );
+  }
+}

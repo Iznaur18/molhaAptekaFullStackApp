@@ -25,6 +25,7 @@ import { useRefetchOnVisible } from "../../../shared/lib/useRefetchOnVisible.js"
 import { SearchInput } from "../../../shared/ui/SearchInput/SearchInput.jsx";
 
 import "./MySalesPage.css";
+import "../../../shared/ui/profileQueueContentPanel.css";
 
 /**
  * @param {{

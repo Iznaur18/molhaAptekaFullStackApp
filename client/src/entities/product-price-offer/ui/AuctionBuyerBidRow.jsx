@@ -9,7 +9,6 @@ import { getProductPriceRubMaxError } from "../../product/lib/productPriceRubVal
 import { formatIsoDateTime } from "../../../shared/lib/formatIsoDateTime.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 import {
-  INTEGER_INPUT_FIELD_PROPS,
   formatIntegerGroupRu,
   formatRubPriceInput,
   parseRubPriceInput,
@@ -22,6 +21,9 @@ import {
   PRICE_OFFER_STATUS_ACCEPTED,
   PRICE_OFFER_STATUS_PENDING,
 } from "../model/constants.js";
+
+import { AuctionDashboardRowStatus } from "./AuctionDashboardRowStatus.jsx";
+import { AuctionDashboardBuyerPriceEditor } from "./AuctionDashboardBuyerPriceEditor.jsx";
 
 import "./AuctionDashboard.css";
 
@@ -151,26 +153,13 @@ export function AuctionBuyerBidRow({
           <p className="auction-dashboard-row__meta">
             {formatIsoDateTime(bid.createdAt)}
           </p>
-          <p
-            className={[
-              "auction-dashboard-row__status",
-              isPending
-                ? "auction-dashboard-row__status_pending"
-                : isAccepted
-                  ? "auction-dashboard-row__status_accepted"
-                  : "",
-            ]
-              .filter(Boolean)
-              .join(" ")}
-          >
+          <AuctionDashboardRowStatus isPending={isPending} isAccepted={isAccepted}>
             {isPending
               ? PRODUCT_PRICE_OFFER_UI.STATUS_PENDING
-              : isAccepted
-                ? showPay
-                  ? null
-                  : PRODUCT_PRICE_OFFER_UI.STATUS_ACCEPTED
+              : isAccepted && !showPay
+                ? PRODUCT_PRICE_OFFER_UI.STATUS_ACCEPTED
                 : null}
-          </p>
+          </AuctionDashboardRowStatus>
           {isAccepted && bid.paymentDeadlineAt ? (
             <p className="auction-dashboard-row__meta">
               {AUCTION_PAGE_UI.PAY_DEADLINE_LABEL}:{" "}
@@ -178,54 +167,37 @@ export function AuctionBuyerBidRow({
             </p>
           ) : null}
         </div>
-        <span className="auction-dashboard-row__price">
-          {formatPriceRub(bid.offerPrice)}
+      </div>
+
+      <div className="auction-dashboard-row__price-strip">
+        <span className="auction-dashboard-row__price-label">
+          {AUCTION_PAGE_UI.BID_PRICE_LABEL}
         </span>
+        <span className="auction-dashboard-row__price">{formatPriceRub(bid.offerPrice)}</span>
       </div>
 
       {isPending && isUserDataConfirmed ? (
-        <div className="auction-dashboard-row__actions">
-          <label className="auction-dashboard-row__field">
-            {AUCTION_PAGE_UI.EDIT_PRICE_LABEL}
-            <input
-              {...INTEGER_INPUT_FIELD_PROPS}
-              className="auction-dashboard-row__input"
-              value={priceInput}
-              onChange={(e) => setPriceInput(formatRubPriceInput(e.target.value))}
-              disabled={isBusy}
-            />
-          </label>
-          <button
-            type="button"
-            className="auction-dashboard-row__btn auction-dashboard-row__btn_primary"
-            disabled={isBusy}
-            onClick={() => void handleUpdate()}
-          >
-            {isBusy
-              ? PRODUCT_PRICE_OFFER_UI.ACTION_PENDING
-              : PRODUCT_PRICE_OFFER_UI.UPDATE}
-          </button>
-          <button
-            type="button"
-            className="auction-dashboard-row__btn"
-            disabled={isBusy}
-            onClick={() => void handleCancel()}
-          >
-            {PRODUCT_PRICE_OFFER_UI.CANCEL}
-          </button>
-        </div>
+        <AuctionDashboardBuyerPriceEditor
+          label={AUCTION_PAGE_UI.EDIT_PRICE_LABEL}
+          value={priceInput}
+          onChange={(next) => setPriceInput(formatRubPriceInput(next))}
+          onSubmit={() => void handleUpdate()}
+          onCancel={() => void handleCancel()}
+          disabled={isBusy}
+          submitLabel={PRODUCT_PRICE_OFFER_UI.UPDATE}
+          cancelLabel={PRODUCT_PRICE_OFFER_UI.CANCEL}
+          pendingLabel={PRODUCT_PRICE_OFFER_UI.ACTION_PENDING}
+        />
       ) : null}
 
       {isAccepted && !showPay ? (
-        <div className="auction-dashboard-row__actions">
-          <button
-            type="button"
-            className="auction-dashboard-row__btn auction-dashboard-row__btn_primary"
-            onClick={() => setShowPay(true)}
-          >
-            {PRODUCT_PRICE_OFFER_UI.PAY_BUTTON}
-          </button>
-        </div>
+        <button
+          type="button"
+          className="auction-dashboard-row__cta"
+          onClick={() => setShowPay(true)}
+        >
+          {PRODUCT_PRICE_OFFER_UI.PAY_BUTTON}
+        </button>
       ) : null}
 
       {isAccepted && showPay ? (

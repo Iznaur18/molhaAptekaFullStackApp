@@ -1,8 +1,9 @@
 @import "../../../entities/product/ui/productImageTokens.css";
 
 .cart-line {
+  position: relative;
   display: grid;
-  grid-template-columns: var(--product-image-thumb-side) 1fr auto auto auto;
+  grid-template-columns: var(--product-image-thumb-side) 1fr auto auto;
   align-items: center;
   gap: 0.85rem;
   padding: 0.65rem 0.85rem;
@@ -22,6 +23,7 @@
 
 .cart-line__info {
   min-width: 0;
+  padding-inline-end: 2.1rem;
 }
 
 .cart-line__heading {
@@ -70,7 +72,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.2rem 0.35rem;
+  padding: 0.2rem 0.15rem 0.2rem 0.35rem;
   border: 1px solid var(--iz-color-border);
   border-radius: 0.4rem;
 }
@@ -92,6 +94,20 @@
   background: var(--iz-color-action-bg-hover);
 }
 
+.cart-line__step-button--increase {
+  position: relative;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex-shrink: 0;
+  font-size: 1.2rem;
+}
+
+.cart-line__step-button--increase::before {
+  content: "";
+  position: absolute;
+  inset: -0.65rem -0.55rem -0.65rem -0.25rem;
+}
+
 .cart-line__quantity {
   min-width: 1.4rem;
   text-align: center;
@@ -100,21 +116,29 @@
 }
 
 .cart-line__total {
+  justify-self: end;
+  text-align: right;
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
   color: var(--iz-color-text);
   white-space: nowrap;
 }
 
 .cart-line__remove {
-  width: 1.8rem;
-  height: 1.8rem;
+  position: absolute;
+  top: 0.45rem;
+  right: 0.45rem;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
   padding: 0;
   border: none;
-  border-radius: 50%;
+  border-radius: 0.45rem;
   background: transparent;
   color: var(--iz-color-text-muted);
-  font-size: 1.2rem;
-  line-height: 1;
   cursor: pointer;
 }
 
@@ -125,10 +149,11 @@
 
 @media (max-width: 640px) {
   .cart-line {
-    grid-template-columns: 3.25rem 1fr auto;
+    grid-template-columns: 3.25rem 1fr;
     grid-template-areas:
-      "image info remove"
-      "stepper stepper total";
+      "image info"
+      "stepper total";
+    padding: 0.65rem 0.85rem;
   }
 
   .cart-line__image {
@@ -141,10 +166,6 @@
     grid-area: info;
   }
 
-  .cart-line__remove {
-    grid-area: remove;
-  }
-
   .cart-line__stepper {
     grid-area: stepper;
     justify-self: start;
@@ -153,5 +174,8 @@
   .cart-line__total {
     grid-area: total;
     justify-self: end;
+    align-self: center;
+    width: 100%;
+    padding-inline-start: 0.5rem;
   }
 }

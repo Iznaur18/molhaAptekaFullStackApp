@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from "react";
 
+import { isCatalogHeaderMainView } from "../../../shared/lib/homeMainViewPaths.js";
 import { useAppShellStateContext } from "./AppShellStateContext.jsx";
 
 export const useHomeHeaderProps = () => {
@@ -82,6 +83,16 @@ export const useHomeHeaderProps = () => {
     setIsRegisterModalOpen(true);
   }, [setIsRegisterModalOpen]);
 
+  const handleProductSearchTermChange = useCallback(
+    (next) => {
+      setProductSearchTerm(next);
+      if (next.trim() !== "" && !isCatalogHeaderMainView(mainView)) {
+        handleNavigateToFullCatalogFromBreadcrumb();
+      }
+    },
+    [mainView, setProductSearchTerm, handleNavigateToFullCatalogFromBreadcrumb],
+  );
+
   return useMemo(
     () => ({
       mainView,
@@ -101,7 +112,7 @@ export const useHomeHeaderProps = () => {
       onProductCategorySelect: handleProductCategorySelect,
       onProductCategoryFilterToggle: handleProductCategoryFilterToggle,
       onCloseProductCategoryFilter: handleCloseProductCategoryFilter,
-      onProductSearchTermChange: setProductSearchTerm,
+      onProductSearchTermChange: handleProductSearchTermChange,
       onPlaceProductClick: handleMobilePlaceProductClick,
       pendingModerationCount,
       pendingInstallmentModerationCount,
@@ -138,7 +149,7 @@ export const useHomeHeaderProps = () => {
       handleProductCategorySelect,
       handleProductCategoryFilterToggle,
       handleCloseProductCategoryFilter,
-      setProductSearchTerm,
+      handleProductSearchTermChange,
       closeCatalogProductDetails,
       pendingModerationCount,
       pendingInstallmentModerationCount,

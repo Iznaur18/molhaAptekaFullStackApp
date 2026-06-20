@@ -4,7 +4,7 @@ import { resolveProductImageUrls } from "../../../entities/product/lib/resolvePr
 import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../../../entities/product/model/productConstants.js";
 import { CART_PAGE_UI, COMMON_UI } from "../../../shared/config/appUiCopy.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
-import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
+import { AppIcon, Trash2 } from "../../../shared/ui/icon/index.js";
 
 import "./CartLineItem.css";
 
@@ -85,7 +85,7 @@ export function CartLineItem({ line, onProductClick }) {
         <span className="cart-line__quantity">{line.quantity}</span>
         <button
           type="button"
-          className="cart-line__step-button"
+          className="cart-line__step-button cart-line__step-button--increase"
           onClick={handleIncrease}
         >
           +
@@ -98,7 +98,7 @@ export function CartLineItem({ line, onProductClick }) {
         onClick={handleRemove}
         aria-label={CART_PAGE_UI.REMOVE_LINE_ARIA}
       >
-        <ModalCloseIcon size="lg" />
+        <AppIcon icon={Trash2} size="md" />
       </button>
     </article>
   );

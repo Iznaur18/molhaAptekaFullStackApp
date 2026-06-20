@@ -1,6 +1,6 @@
 .curated-product-compact-card {
   --curated-card-image-bg: var(--iz-color-surface-subtle);
-  --curated-card-price-bg: var(--iz-color-premium-indigo-soft);
+  --curated-card-price-bg: var(--iz-color-social-twitter);
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -56,11 +56,11 @@
 }
 
 .curated-product-compact-card__price-wrap:hover {
-  filter: brightness(0.97);
+  filter: brightness(1.06);
 }
 
 .curated-product-compact-card__price-wrap:focus-visible {
-  outline: 2px solid var(--iz-color-link-deep, #1e3a8a);
+  outline: 2px solid var(--iz-color-social-twitter);
   outline-offset: -2px;
 }
 
@@ -70,7 +70,7 @@
   font-size: 0.975rem;
   font-weight: 700;
   line-height: 1.2;
-  color: var(--iz-color-link-deep, #1e3a8a);
+  color: var(--iz-color-on-contrast);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

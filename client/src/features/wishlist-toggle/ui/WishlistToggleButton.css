@@ -14,15 +14,21 @@
 }
 
 .wishlist-toggle--card {
+  --wishlist-toggle-card-scale: 1.2;
   position: absolute;
   top: 0.45rem;
   right: 0.45rem;
   z-index: 2;
-  width: 2rem;
-  height: 2rem;
+  width: calc(2rem * var(--wishlist-toggle-card-scale));
+  height: calc(2rem * var(--wishlist-toggle-card-scale));
   border-radius: 999px;
   background: rgb(255 255 255 / 88%);
   box-shadow: 0 1px 4px rgb(15 23 42 / 12%);
+}
+
+.wishlist-toggle--card .wishlist-toggle__icon {
+  width: calc(16px * var(--wishlist-toggle-card-scale));
+  height: calc(16px * var(--wishlist-toggle-card-scale));
 }
 
 .wishlist-toggle--card:hover {

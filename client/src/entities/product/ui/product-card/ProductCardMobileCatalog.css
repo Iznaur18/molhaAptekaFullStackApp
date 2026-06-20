@@ -275,7 +275,10 @@
     > .product-card__status-slot,
   .product-card:not(.product-card--banner-layout)
     .product-card__status-badges-row
-    > .product-card__hidden-badge {
+    > .product-card__hidden-badge,
+  .product-card:not(.product-card--banner-layout)
+    .product-card__status-badges-row
+    > .product-card__status-badge-placeholder {
     box-sizing: border-box;
   }
 

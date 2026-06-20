@@ -6,6 +6,10 @@ import { AuctionBuyerBidRow } from "../../../entities/product-price-offer/ui/Auc
 import { AuctionSellerOfferRow } from "../../../entities/product-price-offer/ui/AuctionSellerOfferRow.jsx";
 import { AUCTION_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { useRefetchOnVisible } from "../../../shared/lib/useRefetchOnVisible.js";
+import "../../../shared/ui/profileQueueContentPanel.css";
+
+import { AuctionPageSection } from "./AuctionPageSection.jsx";
+import { AuctionPageToolbar } from "./AuctionPageToolbar.jsx";
 
 import "./AuctionPage.css";
 
@@ -73,51 +77,58 @@ export function AuctionPage({
   const showBuyerSection = buyerBids.length > 0;
   const showSellerSection = sellerOffers.length > 0;
 
-  if (!showBuyerSection && !showSellerSection) {
-    return <p className="auction-page__state">{AUCTION_PAGE_UI.BOTH_EMPTY}</p>;
-  }
-
   return (
-    <div className="auction-dashboard">
-      {showBuyerSection ? (
-        <section className="auction-dashboard__section">
-          <h3 className="auction-dashboard__section-title">
-            {AUCTION_PAGE_UI.BUYER_SECTION_TITLE}
-          </h3>
-          <ul className="auction-dashboard__list" role="list">
-            {buyerBids.map((bid) => (
-              <li key={bid._id} role="listitem">
-                <AuctionBuyerBidRow
-                  bid={bid}
-                  isUserDataConfirmed={isUserDataConfirmed}
-                  onProductClick={onProductClick}
-                  onChanged={reload}
-                />
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
+    <div className="auction-page">
+      <AuctionPageToolbar
+        buyerCount={buyerBids.length}
+        sellerCount={sellerOffers.length}
+      />
 
-      {showSellerSection ? (
-        <section className="auction-dashboard__section">
-          <h3 className="auction-dashboard__section-title">
-            {AUCTION_PAGE_UI.SELLER_SECTION_TITLE}
-          </h3>
-          <ul className="auction-dashboard__list" role="list">
-            {sellerOffers.map((offer) => (
-              <li key={offer._id} role="listitem">
-                <AuctionSellerOfferRow
-                  offer={offer}
-                  onProductClick={onProductClick}
-                  onBuyerClick={onBuyerClick}
-                  onChanged={reload}
-                />
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
+      {!showBuyerSection && !showSellerSection ? (
+        <p className="auction-page__state">{AUCTION_PAGE_UI.BOTH_EMPTY}</p>
+      ) : (
+        <div className="auction-dashboard">
+          {showBuyerSection ? (
+            <AuctionPageSection
+              title={AUCTION_PAGE_UI.BUYER_SECTION_TITLE}
+              count={buyerBids.length}
+            >
+              <ul className="auction-dashboard__list" role="list">
+                {buyerBids.map((bid) => (
+                  <li key={bid._id} role="listitem">
+                    <AuctionBuyerBidRow
+                      bid={bid}
+                      isUserDataConfirmed={isUserDataConfirmed}
+                      onProductClick={onProductClick}
+                      onChanged={reload}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </AuctionPageSection>
+          ) : null}
+
+          {showSellerSection ? (
+            <AuctionPageSection
+              title={AUCTION_PAGE_UI.SELLER_SECTION_TITLE}
+              count={sellerOffers.length}
+            >
+              <ul className="auction-dashboard__list" role="list">
+                {sellerOffers.map((offer) => (
+                  <li key={offer._id} role="listitem">
+                    <AuctionSellerOfferRow
+                      offer={offer}
+                      onProductClick={onProductClick}
+                      onBuyerClick={onBuyerClick}
+                      onChanged={reload}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </AuctionPageSection>
+          ) : null}
+        </div>
+      )}
     </div>
   );
 }

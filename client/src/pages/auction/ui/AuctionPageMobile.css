@@ -1,0 +1,23 @@
+@media (max-width: 640px) {
+  .auction-page {
+    gap: 0.75rem;
+    --profile-queue-list-gap: 1.15rem;
+  }
+
+  .auction-page__heading {
+    font-size: 1.05rem;
+    font-weight: 700;
+  }
+
+  .auction-page__count {
+    padding: 0.15rem 0.45rem;
+    border-radius: 999px;
+    background: var(--iz-color-surface-muted);
+  }
+
+  .auction-page > .auction-page__state {
+    font-size: 0.92rem;
+    text-align: center;
+    color: var(--iz-color-text-secondary);
+  }
+}

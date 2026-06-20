@@ -1,0 +1,20 @@
+@media (max-width: 640px) {
+  .subscriptions-page {
+    --profile-queue-list-gap: 1.15rem;
+  }
+
+  .subscriptions-page__state {
+    padding: 0.35rem 0.15rem;
+    font-size: 0.92rem;
+    text-align: center;
+  }
+
+  .subscriptions-page__hint {
+    text-align: center;
+  }
+
+  .subscriptions-page__login {
+    align-self: stretch;
+    min-height: 2.55rem;
+  }
+}

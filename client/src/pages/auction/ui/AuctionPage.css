@@ -1,3 +1,53 @@
+.auction-page {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  min-width: 0;
+  --profile-queue-list-gap: 1rem;
+}
+
+.auction-page__toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--iz-color-warning-bright) 24%, var(--iz-color-border));
+  border-radius: 0.65rem;
+  background: linear-gradient(
+    135deg,
+    var(--iz-color-surface) 0%,
+    var(--iz-color-warning-yellow-soft) 140%
+  );
+}
+
+.auction-page__toolbar-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.auction-page__heading {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--iz-color-text);
+}
+
+.auction-page__counts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.25rem 0.45rem;
+}
+
+.auction-page__count {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--iz-color-text-muted);
+}
+
 .auction-page__state {
   margin: 0;
   font-size: 1rem;
@@ -7,3 +57,5 @@
 .auction-page__state_error {
   color: var(--iz-color-danger-strong);
 }
+
+@import "./AuctionPageMobile.css";
