@@ -1,6 +1,4 @@
-import { DndContext, closestCenter } from "@dnd-kit/core";
-import { SortableContext, rectSortingStrategy, useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import { useEffect, useRef } from "react";
 
 import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { CreateProductWizardMediaTilePreview } from "./CreateProductWizardMediaCover.jsx";
@@ -17,44 +15,16 @@ import "./CreateProductWizardMediaGrid.css";
  *   onSelect: (index: number) => void;
  * }} props
  */
-function SortableMediaTile({
-  row,
-  index,
-  isSelected,
-  isCover,
-  disabled = false,
-  onSelect,
-}) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-    useSortable({ id: row.id, disabled });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
+function MediaTile({ row, index, isSelected, isCover, disabled = false, onSelect }) {
   return (
     <div
-      ref={setNodeRef}
-      style={style}
       className={[
         "create-product-wizard-media-grid__tile",
         isSelected ? "create-product-wizard-media-grid__tile_selected" : "",
-        isDragging ? "create-product-wizard-media-grid__tile_dragging" : "",
       ]
         .filter(Boolean)
         .join(" ")}
     >
-      <button
-        type="button"
-        className="create-product-wizard-media-grid__drag"
-        aria-label={CREATE_PRODUCT_MODAL_UI.DRAG_HANDLE_ARIA}
-        disabled={disabled}
-        {...attributes}
-        {...listeners}
-      >
-        ⋮⋮
-      </button>
       <button
         type="button"
         className="create-product-wizard-media-grid__select"
@@ -78,13 +48,10 @@ function SortableMediaTile({
 /**
  * @param {{
  *   rows: import('../../../entities/product/lib/productImageRowHelpers.js').ProductImageRow[];
- *   rowIds: string[];
  *   selectedIndex: number;
  *   canAddRow: boolean;
  *   maxRows: number;
  *   disabled?: boolean;
- *   sensors: import('@dnd-kit/core').SensorDescriptor<any>[];
- *   onDragEnd: import('@dnd-kit/core').DragEndEvent => void;
  *   onSelect: (index: number) => void;
  *   onAdd: () => void;
  *   filledCount: number;
@@ -92,19 +59,37 @@ function SortableMediaTile({
  */
 export function CreateProductWizardMediaGrid({
   rows,
-  rowIds,
   selectedIndex,
   canAddRow,
   maxRows,
   disabled = false,
-  sensors,
-  onDragEnd,
   onSelect,
   onAdd,
   filledCount,
 }) {
+  const trackRef = useRef(/** @type {HTMLDivElement | null} */ (null));
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) {
+      return;
+    }
+
+    const selectedTile = track.querySelector(
+      ".create-product-wizard-media-grid__tile_selected",
+    );
+    selectedTile?.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "nearest",
+    });
+  }, [selectedIndex]);
+
   return (
-    <section className="create-product-wizard-media-grid" aria-label={CREATE_PRODUCT_MODAL_UI.WIZARD_MEDIA_GALLERY_LABEL}>
+    <section
+      className="create-product-wizard-media-grid"
+      aria-label={CREATE_PRODUCT_MODAL_UI.WIZARD_MEDIA_GALLERY_LABEL}
+    >
       <div className="create-product-wizard-media-grid__head">
         <h4 className="create-product-wizard-media-grid__title">
           {CREATE_PRODUCT_MODAL_UI.WIZARD_MEDIA_GALLERY_LABEL}
@@ -116,36 +101,34 @@ export function CreateProductWizardMediaGrid({
       <p className="create-product-wizard-media-grid__hint">
         {CREATE_PRODUCT_MODAL_UI.WIZARD_MEDIA_GALLERY_HINT}
       </p>
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
-        <SortableContext items={rowIds} strategy={rectSortingStrategy}>
-          <div className="create-product-wizard-media-grid__tiles">
-            {rows.map((row, index) => (
-              <SortableMediaTile
-                key={row.id}
-                row={row}
-                index={index}
-                isSelected={selectedIndex === index}
-                isCover={index === 0}
-                disabled={disabled}
-                onSelect={onSelect}
-              />
-            ))}
-            {canAddRow ? (
-              <button
-                type="button"
-                className="create-product-wizard-media-grid__add"
-                onClick={onAdd}
-                disabled={disabled}
-              >
-                <span className="create-product-wizard-media-grid__add-icon" aria-hidden="true">
-                  +
-                </span>
-                <span>{CREATE_PRODUCT_MODAL_UI.WIZARD_MEDIA_ADD_SLOT}</span>
-              </button>
-            ) : null}
-          </div>
-        </SortableContext>
-      </DndContext>
+      <div ref={trackRef} className="create-product-wizard-media-grid__track">
+        {rows.map((row, index) => (
+          <MediaTile
+            key={row.id}
+            row={row}
+            index={index}
+            isSelected={selectedIndex === index}
+            isCover={index === 0}
+            disabled={disabled}
+            onSelect={onSelect}
+          />
+        ))}
+        {canAddRow ? (
+          <button
+            type="button"
+            className="create-product-wizard-media-grid__add"
+            onClick={onAdd}
+            disabled={disabled}
+          >
+            <span className="create-product-wizard-media-grid__add-icon" aria-hidden="true">
+              +
+            </span>
+            <span className="create-product-wizard-media-grid__add-label">
+              {CREATE_PRODUCT_MODAL_UI.WIZARD_MEDIA_ADD_SLOT}
+            </span>
+          </button>
+        ) : null}
+      </div>
     </section>
   );
 }

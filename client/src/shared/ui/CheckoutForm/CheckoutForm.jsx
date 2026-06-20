@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { AddressDeliveryFields } from "../../../entities/address/ui/AddressDeliveryFields.jsx";
 import { addressValueFromUser } from "../../../entities/address/lib/addressValueFromUser.js";
@@ -29,6 +30,7 @@ import "./CheckoutForm.css";
  *     paymentMethod: string;
  *   }) => void | Promise<void>;
  *   isDisabled?: boolean;
+ *   dockSubmit?: boolean;
  * }} props
  */
 export function CheckoutForm({
@@ -38,7 +40,9 @@ export function CheckoutForm({
   submitSuccess,
   onSubmit,
   isDisabled = false,
+  dockSubmit = false,
 }) {
+  const formId = useId();
   const [deliveryAddress, setDeliveryAddress] = useState(() =>
     addressValueFromUser(defaultDeliveryAddress),
   );
@@ -70,9 +74,34 @@ export function CheckoutForm({
     validateRuDeliveryAddressForm(deliveryAddress, { required: true }) === null;
   const isFormDisabled = isDisabled || isSubmitting || !isAddressValid;
   const displayError = localError || submitError;
+  const submitLabel = isSubmitting
+    ? CHECKOUT_FORM_UI.SUBMIT_LOADING
+    : CHECKOUT_FORM_UI.SUBMIT_IDLE;
+
+  const renderSubmitButton = (linkedToForm) => (
+    <button
+      type="submit"
+      className="checkout-form__submit"
+      form={linkedToForm ? formId : undefined}
+      disabled={isFormDisabled}
+    >
+      {submitLabel}
+    </button>
+  );
+
+  const dockedSubmit =
+    dockSubmit && typeof document !== "undefined"
+      ? createPortal(
+          <div className="product-modal-shell__docked-footer checkout-form__docked-footer">
+            {renderSubmitButton(true)}
+          </div>,
+          document.body,
+        )
+      : null;
 
   return (
-    <form className="checkout-form" onSubmit={handleSubmit}>
+    <>
+      <form id={formId} className="checkout-form" onSubmit={handleSubmit}>
       <h2 className="checkout-form__heading">{CHECKOUT_FORM_UI.HEADING}</h2>
 
       <AddressDeliveryFields
@@ -115,9 +144,9 @@ export function CheckoutForm({
         </p>
       ) : null}
 
-      <button type="submit" className="checkout-form__submit" disabled={isFormDisabled}>
-        {isSubmitting ? CHECKOUT_FORM_UI.SUBMIT_LOADING : CHECKOUT_FORM_UI.SUBMIT_IDLE}
-      </button>
-    </form>
+      {!dockSubmit ? renderSubmitButton(false) : null}
+      </form>
+      {dockedSubmit}
+    </>
   );
 }

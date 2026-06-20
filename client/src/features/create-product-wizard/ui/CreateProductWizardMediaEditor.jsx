@@ -10,9 +10,13 @@ import "./CreateProductWizardMediaEditor.css";
  *   isCover: boolean;
  *   url: string;
  *   canRemove: boolean;
+ *   canMoveEarlier?: boolean;
+ *   canMoveLater?: boolean;
  *   disabled?: boolean;
  *   onUrlChange: (url: string) => void;
  *   onRemove: () => void;
+ *   onMoveEarlier?: () => void;
+ *   onMoveLater?: () => void;
  * }} props
  */
 export function CreateProductWizardMediaEditor({
@@ -20,10 +24,16 @@ export function CreateProductWizardMediaEditor({
   isCover,
   url,
   canRemove,
+  canMoveEarlier = false,
+  canMoveLater = false,
   disabled = false,
   onUrlChange,
   onRemove,
+  onMoveEarlier,
+  onMoveLater,
 }) {
+  const showReorder = canMoveEarlier || canMoveLater;
+
   return (
     <section className="create-product-wizard-media-editor" aria-live="polite">
       <div className="create-product-wizard-media-editor__head">
@@ -42,6 +52,28 @@ export function CreateProductWizardMediaEditor({
           </button>
         ) : null}
       </div>
+      {showReorder ? (
+        <div className="create-product-wizard-media-editor__reorder">
+          <button
+            type="button"
+            className="create-product-wizard-media-editor__move"
+            disabled={disabled || !canMoveEarlier}
+            aria-label={CREATE_PRODUCT_MODAL_UI.WIZARD_MEDIA_MOVE_EARLIER_ARIA}
+            onClick={onMoveEarlier}
+          >
+            ← {CREATE_PRODUCT_MODAL_UI.WIZARD_MEDIA_MOVE_EARLIER}
+          </button>
+          <button
+            type="button"
+            className="create-product-wizard-media-editor__move"
+            disabled={disabled || !canMoveLater}
+            aria-label={CREATE_PRODUCT_MODAL_UI.WIZARD_MEDIA_MOVE_LATER_ARIA}
+            onClick={onMoveLater}
+          >
+            {CREATE_PRODUCT_MODAL_UI.WIZARD_MEDIA_MOVE_LATER} →
+          </button>
+        </div>
+      ) : null}
       <ImageUrlField
         value={url}
         onChange={onUrlChange}

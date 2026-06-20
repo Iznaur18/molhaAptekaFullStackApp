@@ -97,34 +97,6 @@ export function ProductEditManageSection({
           {PRODUCT_CARD_UI.OPEN_SALES_LOCKED_HINT}
         </p>
       ) : null}
-      {showVisibility ? (
-        isAvailabilityTogglePending ? (
-          <p className="product-card__availability-pending" aria-live="polite">
-            {PRODUCT_CARD_UI.AVAILABILITY_TOGGLE_PENDING}
-          </p>
-        ) : (
-          <div className="product-card__availability">
-            <p className="product-card__availability-status">
-              {isListedForOthers
-                ? PRODUCT_CARD_UI.AVAILABILITY_STATUS_VISIBLE
-                : PRODUCT_CARD_UI.AVAILABILITY_STATUS_HIDDEN}
-            </p>
-            <button
-              type="button"
-              className="product-card__availability-toggle"
-              disabled={actionsLocked}
-              onClick={() => {
-                if (product._id == null || actionsLocked) return;
-                void onSetAvailability(String(product._id), !isListedForOthers);
-              }}
-            >
-              {isListedForOthers
-                ? PRODUCT_CARD_UI.HIDE_FROM_CATALOG
-                : PRODUCT_CARD_UI.SHOW_IN_CATALOG}
-            </button>
-          </div>
-        )
-      ) : null}
       {showAuctionToggle ? (
         isAuctionTogglePending ? (
           <p className="product-card__availability-pending" aria-live="polite">
@@ -132,11 +104,6 @@ export function ProductEditManageSection({
           </p>
         ) : (
           <div className="product-card__availability">
-            <p className="product-card__availability-status">
-              {isAuctionEnabled
-                ? PRODUCT_CARD_UI.AUCTION_STATUS_ON
-                : PRODUCT_CARD_UI.AUCTION_STATUS_OFF}
-            </p>
             <button
               type="button"
               className="product-card__auction-toggle product-card__availability-toggle"
@@ -232,6 +199,29 @@ export function ProductEditManageSection({
           >
             {PRODUCT_CARD_UI.DELETE_PRODUCT}
           </button>
+        )
+      ) : null}
+      {showVisibility ? (
+        isAvailabilityTogglePending ? (
+          <p className="product-card__availability-pending" aria-live="polite">
+            {PRODUCT_CARD_UI.AVAILABILITY_TOGGLE_PENDING}
+          </p>
+        ) : (
+          <div className="product-card__availability">
+            <button
+              type="button"
+              className="product-card__availability-toggle"
+              disabled={actionsLocked}
+              onClick={() => {
+                if (product._id == null || actionsLocked) return;
+                void onSetAvailability(String(product._id), !isListedForOthers);
+              }}
+            >
+              {isListedForOthers
+                ? PRODUCT_CARD_UI.HIDE_FROM_CATALOG
+                : PRODUCT_CARD_UI.SHOW_IN_CATALOG}
+            </button>
+          </div>
         )
       ) : null}
     </section>

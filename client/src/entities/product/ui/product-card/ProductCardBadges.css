@@ -14,6 +14,7 @@
   margin: 0.2rem 0 0;
   padding: 0.2rem 0.5rem;
   width: fit-content;
+  max-width: none;
   border-radius: 0.35rem;
   border: 1px solid color-mix(in srgb, var(--iz-color-warning-bright) 35%, transparent);
   background: var(--iz-color-gold-soft);
@@ -21,6 +22,7 @@
   font-size: 0.72rem;
   font-weight: 600;
   line-height: 1.35;
+  white-space: nowrap;
 }
 
 .product-card__promotion-badge_pending {
@@ -146,7 +148,12 @@
   }
 
   .product-card__meta-strip {
-    min-height: 3.05rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    height: 44px;
+    min-height: 44px;
+    font-size: 1rem;
   }
 }
 
@@ -195,6 +202,7 @@
 .product-card__status-badges-row > .product-card__loyalty-overcommitted-badge {
   margin: 0;
   flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .product-card__status-slot--reserved {

@@ -22,7 +22,7 @@
 }
 
 .product-media-gallery-readonly__hero--multi {
-  touch-action: pan-y pinch-zoom;
+  touch-action: pan-y;
   cursor: grab;
   user-select: none;
 }

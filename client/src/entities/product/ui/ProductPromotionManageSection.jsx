@@ -1,0 +1,95 @@
+import { PRODUCT_MODERATION_APPROVED } from "../model/productModerationConstants.js";
+import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
+import { ProductEditManageSection } from "./ProductEditManageSection.jsx";
+
+import "./ProductPromotionManageSection.css";
+
+/**
+ * @typedef {Object} ProductPromotionManageSectionProps
+ * @property {import("../model/types.js").ProductFromApi} product
+ * @property {(productId: string) => void | Promise<void>} onDelete
+ * @property {(productId: string, productIsAvailable: boolean) => void | Promise<void>} [onSetAvailability]
+ * @property {(productId: string, productAuctionEnabled: boolean) => void | Promise<void>} [onSetAuction]
+ * @property {boolean} [isDeletePending]
+ * @property {boolean} [isAvailabilityTogglePending]
+ * @property {boolean} [isAuctionTogglePending]
+ * @property {string} [errorMessage]
+ * @property {boolean} [canEdit]
+ * @property {boolean} [canDelete]
+ * @property {boolean} [canToggleVisibility]
+ * @property {boolean} [sellerRaffleActive]
+ * @property {(product: import("../model/types.js").ProductFromApi, enabled: boolean) => void} [onToggleRaffleParticipation]
+ * @property {boolean} [isRaffleParticipationPending]
+ * @property {boolean} [isSubmitting]
+ * @property {() => void} [onOpenInstallmentProgram]
+ * @property {boolean} [embeddedInTab]
+ */
+
+/**
+ * @param {ProductPromotionManageSectionProps} props
+ */
+export function ProductPromotionManageSection({
+  product,
+  onDelete,
+  onSetAvailability,
+  onSetAuction,
+  isDeletePending = false,
+  isAvailabilityTogglePending = false,
+  isAuctionTogglePending = false,
+  errorMessage = "",
+  canEdit = true,
+  canDelete = true,
+  canToggleVisibility = true,
+  sellerRaffleActive = false,
+  onToggleRaffleParticipation,
+  isRaffleParticipationPending = false,
+  isSubmitting = false,
+  onOpenInstallmentProgram,
+  embeddedInTab = false,
+}) {
+  const sectionClassName = [
+    "product-promotion-manage",
+    embeddedInTab ? "product-promotion-manage--embedded" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  return (
+    <section
+      className={sectionClassName}
+      aria-labelledby={embeddedInTab ? undefined : "product-promotion-manage-title"}
+    >
+      {embeddedInTab ? null : (
+        <>
+          <h3 id="product-promotion-manage-title" className="product-promotion-manage__title">
+            {CREATE_PRODUCT_MODAL_UI.MANAGE_SECTION_TITLE}
+          </h3>
+          <p className="product-promotion-manage__lead">
+            {CREATE_PRODUCT_MODAL_UI.EDIT_WIZARD_STEP_MANAGE_SUBTITLE}
+          </p>
+        </>
+      )}
+      <ProductEditManageSection
+        product={product}
+        onDelete={onDelete}
+        onSetAvailability={onSetAvailability}
+        onSetAuction={onSetAuction}
+        isDeletePending={isDeletePending}
+        isAvailabilityTogglePending={isAvailabilityTogglePending}
+        isAuctionTogglePending={isAuctionTogglePending}
+        errorMessage={errorMessage}
+        canEdit={canEdit}
+        canDelete={canDelete}
+        canToggleVisibility={canToggleVisibility}
+        sellerRaffleActive={sellerRaffleActive}
+        onToggleRaffleParticipation={onToggleRaffleParticipation}
+        isRaffleParticipationPending={isRaffleParticipationPending}
+        disabled={isSubmitting}
+        onOpenInstallmentProgram={onOpenInstallmentProgram}
+        canOpenInstallmentProgram={
+          product.productModerationStatus === PRODUCT_MODERATION_APPROVED
+        }
+      />
+    </section>
+  );
+}

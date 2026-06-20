@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { addressValueFromUser } from "../../address/lib/addressValueFromUser.js";
 import { useCreateOrderMutation } from "../../order/model/useCreateOrderMutation.js";
@@ -19,11 +20,13 @@ import {
   parseRubPriceInput,
 } from "../../../shared/lib/numericInput.js";
 import { PRODUCT_PRICE_OFFER_UI } from "../../../shared/config/appUiCopy.js";
+import { APP_SHELL_MOBILE_NAV_BREAKPOINT_PX } from "../../../shared/lib/appShellMobileNavConstants.js";
 import {
   clearPriceOfferPayFlowOpened,
   isPriceOfferPayFlowOpened,
   markPriceOfferPayFlowOpened,
 } from "../lib/priceOfferPayFlowStorage.js";
+import { useMaxWidthMediaQuery } from "../../../shared/lib/useMaxWidthMediaQuery.js";
 
 import { ProductPriceOfferHintMessage } from "./ProductPriceOfferHintMessage.jsx";
 import { ProductPriceOfferSectionTitle } from "./ProductPriceOfferSectionTitle.jsx";
@@ -70,6 +73,8 @@ export function ProductPriceOfferBuyerBlock({
   const isBusy =
     submitMutation.isPending || patchMutation.isPending || cancelMutation.isPending;
   const isPaying = createOrderMutation.isPending;
+  const isMobileNav = useMaxWidthMediaQuery(APP_SHELL_MOBILE_NAV_BREAKPOINT_PX);
+  const dockSubmit = isMobileNav;
 
   useEffect(() => {
     if (myOffer?.offerPrice != null) {
@@ -204,6 +209,63 @@ export function ProductPriceOfferBuyerBlock({
   const showPayCheckout =
     myOffer?.status === PRICE_OFFER_STATUS_ACCEPTED && !hasLinkedOrder && showPay;
 
+  const offerSubmitLabel = isBusy
+    ? PRODUCT_PRICE_OFFER_UI.SUBMIT_LOADING
+    : myOffer?.status === PRICE_OFFER_STATUS_PENDING
+      ? PRODUCT_PRICE_OFFER_UI.UPDATE
+      : PRODUCT_PRICE_OFFER_UI.SUBMIT;
+
+  const dockPrimaryAction = (() => {
+    if (!dockSubmit || isOwnProduct || showPayCheckout) {
+      return null;
+    }
+    if (showPayButton) {
+      return {
+        label: `${PRODUCT_PRICE_OFFER_UI.PAY_BUTTON} (${formatPriceRub(myOffer.offerPrice)})`,
+        onClick: handleOpenPay,
+        disabled: false,
+      };
+    }
+    if (showForm) {
+      return {
+        label: offerSubmitLabel,
+        onClick: () => void handleSubmitOffer(),
+        disabled: isBusy,
+      };
+    }
+    if (!isAuthorized) {
+      return {
+        label: PRODUCT_PRICE_OFFER_UI.SUBMIT,
+        onClick: () => onRequestLogin?.(),
+        disabled: false,
+      };
+    }
+    return null;
+  })();
+
+  const showDockPrimaryAction = dockPrimaryAction != null;
+
+  const renderPrimaryButton = ({ label, onClick, disabled }) => (
+    <button
+      type="button"
+      className="product-price-offer__btn product-price-offer__btn--primary"
+      disabled={disabled}
+      onClick={onClick}
+    >
+      {label}
+    </button>
+  );
+
+  const dockedPrimaryAction =
+    showDockPrimaryAction && typeof document !== "undefined"
+      ? createPortal(
+          <div className="product-modal-shell__docked-footer product-price-offer__docked-footer">
+            {renderPrimaryButton(dockPrimaryAction)}
+          </div>,
+          document.body,
+        )
+      : null;
+
   return (
     <section className="product-price-offer">
       <ProductPriceOfferSectionTitle />
@@ -231,18 +293,13 @@ export function ProductPriceOfferBuyerBlock({
                 />
               </label>
               <div className="product-price-offer__actions">
-                <button
-                  type="button"
-                  className="product-price-offer__btn product-price-offer__btn--primary"
-                  disabled={isBusy}
-                  onClick={() => void handleSubmitOffer()}
-                >
-                  {isBusy
-                    ? PRODUCT_PRICE_OFFER_UI.SUBMIT_LOADING
-                    : myOffer?.status === PRICE_OFFER_STATUS_PENDING
-                      ? PRODUCT_PRICE_OFFER_UI.UPDATE
-                      : PRODUCT_PRICE_OFFER_UI.SUBMIT}
-                </button>
+                {!showDockPrimaryAction ? (
+                  renderPrimaryButton({
+                    label: offerSubmitLabel,
+                    onClick: () => void handleSubmitOffer(),
+                    disabled: isBusy,
+                  })
+                ) : null}
                 {myOffer?.status === PRICE_OFFER_STATUS_PENDING ? (
                   <button
                     type="button"
@@ -257,14 +314,12 @@ export function ProductPriceOfferBuyerBlock({
             </div>
           ) : null}
 
-          {!isAuthorized ? (
-            <button
-              type="button"
-              className="product-price-offer__btn product-price-offer__btn--primary"
-              onClick={() => onRequestLogin?.()}
-            >
-              {PRODUCT_PRICE_OFFER_UI.SUBMIT}
-            </button>
+          {!isAuthorized && !showDockPrimaryAction ? (
+            renderPrimaryButton({
+              label: PRODUCT_PRICE_OFFER_UI.SUBMIT,
+              onClick: () => onRequestLogin?.(),
+              disabled: false,
+            })
           ) : null}
 
           {isAuthorized && !isUserDataConfirmed && !isOwnProduct ? (
@@ -292,16 +347,13 @@ export function ProductPriceOfferBuyerBlock({
             </p>
           ) : null}
 
-          {showPayButton ? (
+          {showPayButton && !showDockPrimaryAction ? (
             <div className="product-price-offer__pay">
-              <button
-                type="button"
-                className="product-price-offer__btn product-price-offer__btn--primary"
-                onClick={handleOpenPay}
-              >
-                {PRODUCT_PRICE_OFFER_UI.PAY_BUTTON} (
-                {formatPriceRub(myOffer.offerPrice)})
-              </button>
+              {renderPrimaryButton({
+                label: `${PRODUCT_PRICE_OFFER_UI.PAY_BUTTON} (${formatPriceRub(myOffer.offerPrice)})`,
+                onClick: handleOpenPay,
+                disabled: false,
+              })}
             </div>
           ) : null}
 
@@ -313,6 +365,7 @@ export function ProductPriceOfferBuyerBlock({
                 submitError={payError}
                 submitSuccess={paySuccess}
                 onSubmit={handlePay}
+                dockSubmit={dockSubmit}
               />
             </div>
           ) : null}
@@ -324,6 +377,7 @@ export function ProductPriceOfferBuyerBlock({
           {error}
         </p>
       ) : null}
+      {dockedPrimaryAction}
     </section>
   );
 }

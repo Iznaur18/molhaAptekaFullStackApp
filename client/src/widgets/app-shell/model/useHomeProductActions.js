@@ -264,6 +264,9 @@ export const useHomeProductActions = ({
         setProductToEdit((prev) =>
           prev && String(prev._id) === productId ? null : prev,
         );
+        setPromotionProduct((prev) =>
+          prev && String(prev._id) === productId ? null : prev,
+        );
         setCatalogProductDetails((prev) =>
           prev && String(prev._id) === productId ? null : prev,
         );
@@ -284,6 +287,7 @@ export const useHomeProductActions = ({
       setDeletingProductId,
       setMyProductsCatalogError,
       setProductToEdit,
+      setPromotionProduct,
     ],
   );
 

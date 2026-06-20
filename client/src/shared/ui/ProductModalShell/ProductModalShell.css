@@ -33,15 +33,26 @@
 .product-modal-shell__header {
   display: flex;
   flex-shrink: 0;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--iz-space-3);
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--iz-space-2);
   padding: 0.85rem var(--iz-space-4);
   border-bottom: 1px solid var(--iz-color-border);
 }
 
-.product-modal-shell__header--title-hidden {
+.product-modal-shell__header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--iz-space-3);
+}
+
+.product-modal-shell__header--title-hidden .product-modal-shell__header-top {
   justify-content: flex-end;
+}
+
+.product-modal-shell__header--with-addon {
+  padding-bottom: 0.65rem;
 }
 
 .product-modal-shell__title {

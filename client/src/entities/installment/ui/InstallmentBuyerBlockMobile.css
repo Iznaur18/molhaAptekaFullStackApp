@@ -42,12 +42,10 @@
   }
 
   .installment-buyer-block__row {
-    grid-template-columns: 1fr;
     gap: 0.55rem;
   }
 
   .installment-buyer-block__totals {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.4rem;
   }
 
@@ -68,11 +66,5 @@
     min-height: 2.85rem;
     border-radius: 0.75rem;
     font-size: 1rem;
-  }
-}
-
-@media (max-width: 420px) {
-  .installment-buyer-block__totals {
-    grid-template-columns: 1fr;
   }
 }

@@ -6,7 +6,6 @@ import {
   resolveProductImageSelectionAfterReorder,
 } from "../../../entities/product/lib/resolveProductImageCoverPreview.js";
 import { useProductImageUrlRows } from "../../../entities/product/model/useProductImageUrlRows.js";
-import { CreateProductWizardMediaCover } from "./CreateProductWizardMediaCover.jsx";
 import { CreateProductWizardMediaEditor } from "./CreateProductWizardMediaEditor.jsx";
 import { CreateProductWizardMediaGrid } from "./CreateProductWizardMediaGrid.jsx";
 import { CreateProductWizardMediaVideoCard } from "./CreateProductWizardMediaVideoCard.jsx";
@@ -37,9 +36,13 @@ export function CreateProductWizardMediaStep({ form, setForm, isSubmitting }) {
   const filledCount = useMemo(() => countFilledProductImageRows(rows), [rows]);
   const selectedRow = rows[selectedIndex] ?? rows[0];
 
-  const handleDragEnd = useCallback(
-    (event) => {
-      const result = imageRows.handleDragEnd(event);
+  const handleMoveSelected = useCallback(
+    (delta) => {
+      if (!selectedRow) {
+        return;
+      }
+
+      const result = imageRows.moveRow(selectedRow.id, delta);
       if (!result) {
         return;
       }
@@ -48,7 +51,7 @@ export function CreateProductWizardMediaStep({ form, setForm, isSubmitting }) {
         resolveProductImageSelectionAfterReorder(result.oldIndex, result.newIndex, current),
       );
     },
-    [imageRows],
+    [imageRows, selectedRow],
   );
 
   const handleAdd = useCallback(() => {
@@ -72,16 +75,12 @@ export function CreateProductWizardMediaStep({ form, setForm, isSubmitting }) {
 
   return (
     <div className="create-product-wizard-media-step">
-      <CreateProductWizardMediaCover rows={rows} selectedIndex={selectedIndex} />
       <CreateProductWizardMediaGrid
         rows={rows}
-        rowIds={imageRows.rowIds}
         selectedIndex={selectedIndex}
         canAddRow={imageRows.canAddRow}
         maxRows={imageRows.maxRows}
         disabled={isSubmitting}
-        sensors={imageRows.sensors}
-        onDragEnd={handleDragEnd}
         onSelect={setSelectedIndex}
         onAdd={handleAdd}
         filledCount={filledCount}
@@ -92,9 +91,13 @@ export function CreateProductWizardMediaStep({ form, setForm, isSubmitting }) {
           isCover={selectedIndex === 0}
           url={selectedRow.url}
           canRemove={rows.length > 1 || Boolean(selectedRow.url.trim())}
+          canMoveEarlier={selectedIndex > 0}
+          canMoveLater={selectedIndex < rows.length - 1}
           disabled={isSubmitting}
           onUrlChange={(url) => imageRows.updateRowUrl(selectedRow.id, url)}
           onRemove={handleRemoveSelected}
+          onMoveEarlier={() => handleMoveSelected(-1)}
+          onMoveLater={() => handleMoveSelected(1)}
         />
       ) : null}
       <CreateProductWizardMediaVideoCard

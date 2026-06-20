@@ -1055,6 +1055,10 @@ export const CREATE_PRODUCT_MODAL_UI = {
   ARIA_CLOSE_BACKDROP_EDIT: "Закрыть окно редактирования товара",
   TITLE: "Новый товар",
   TITLE_EDIT: "Редактирование товара",
+  EDIT_WIZARD_PROGRESS_ARIA: "Шаги редактирования товара",
+  EDIT_WIZARD_STEP_MANAGE_TITLE: "Управление товаром",
+  EDIT_WIZARD_STEP_MANAGE_SUBTITLE: "Видимость, аукцион, рассрочка и удаление",
+  EDIT_WIZARD_STEP_LABEL_MANAGE: "Ещё",
   SECTION_BASIC: "Основное",
   SECTION_MEDIA: "Фото и видео",
   SECTION_COMMERCE: "Цена и продажа",
@@ -1139,7 +1143,11 @@ export const CREATE_PRODUCT_MODAL_UI = {
   WIZARD_MEDIA_COVER_LABEL: "Обложка в каталоге",
   WIZARD_MEDIA_COVER_EMPTY: "Добавьте фото — первое станет обложкой",
   WIZARD_MEDIA_GALLERY_LABEL: "Галерея",
-  WIZARD_MEDIA_GALLERY_HINT: "Перетащите карточки, чтобы изменить порядок. Первое фото — главное.",
+  WIZARD_MEDIA_GALLERY_HINT: "Листайте галерею и меняйте порядок стрелками. Первое фото — главное.",
+  WIZARD_MEDIA_MOVE_EARLIER: "Левее",
+  WIZARD_MEDIA_MOVE_EARLIER_ARIA: "Сдвинуть фото левее",
+  WIZARD_MEDIA_MOVE_LATER: "Правее",
+  WIZARD_MEDIA_MOVE_LATER_ARIA: "Сдвинуть фото правее",
   WIZARD_MEDIA_SLOT_ARIA: (index) => `Фото ${index}`,
   WIZARD_MEDIA_SLOT_EMPTY: "Пусто",
   WIZARD_MEDIA_ADD_SLOT: "Добавить фото",
@@ -1259,7 +1267,7 @@ export const PRODUCT_CARD_UI = {
   MANAGE_PRODUCT_TOGGLE: "Редактировать",
   MANAGE_PRODUCT_COLLAPSE: "Свернуть",
   EDIT_PRODUCT: "Изменить",
-  PROMOTION_BUTTON: "Продвигать",
+  PROMOTION_BUTTON: "Управлять",
   DELETE_PRODUCT: "Удалить товар",
   DELETE_PRODUCT_PENDING: "Удаление…",
   DELETE_CONFIRM_QUESTION: "Вы уверены, что хотите удалить этот товар?",
@@ -1501,6 +1509,8 @@ export const RAFFLE_FEATURED_BANNER_UI = {
   OPEN_INSTAGRAM: "Итоги в Instagram",
   DESCRIPTION_MODAL_TITLE: "Описание",
   DESCRIPTION_OPEN_ARIA: "Открыть полное описание розыгрыша",
+  INFO_TOGGLE_OPEN_ARIA: "Показать название и описание розыгрыша",
+  INFO_TOGGLE_CLOSE_ARIA: "Скрыть название и описание розыгрыша",
   CLOSE: "Закрыть",
 };
 
@@ -1558,7 +1568,6 @@ export const RAFFLE_PRODUCTS_PAGE_UI = {
   TITLE: "Товары розыгрыша",
   LOADING: "Загрузка…",
   EMPTY: "Нет товаров в этом розыгрыше.",
-  BACK_CATALOG: "В каталог",
 };
 
 export const SELLER_PRODUCTS_PAGE_UI = {
@@ -1591,6 +1600,8 @@ export const PRODUCT_PROMOTIONS_STAFF_PAGE_UI = {
 
 export const PRODUCT_PROMOTION_UI = {
   MODAL_TITLE: "Продвижение товара",
+  TAB_PROMOTION: "Продвижение",
+  TABS_ARIA: "Разделы модалки продвижения",
   MODAL_SUBTITLE: (productName) => `Товар: ${productName || "Без названия"}`,
   BALANCE_LABEL: "Ваш баланс",
   /** @param {number} balance */
@@ -1794,8 +1805,8 @@ export const MY_PROFILE_PAGE_UI = {
   TAB_PRODUCT_PROMOTIONS: "Продвижение",
   TAB_RAFFLES: "Розыгрыши",
   TAB_DATA_CONFIRMATION: "Подтверждение",
-  TAB_INSTALLMENT_PAYMENTS: "Мои рассрочки",
-  TAB_INSTALLMENT_SALES: "Рассрочка — продажи",
+  TAB_INSTALLMENT_PAYMENTS: "Рассрочка - Покупка",
+  TAB_INSTALLMENT_SALES: "Рассрочка - Продажа",
   TAB_INSTALLMENT_MODERATION: "Рассрочка — модерация",
   TAB_INSTALLMENT_DISPUTES: "Споры",
   TAB_SUBSCRIPTIONS: "Подписки",

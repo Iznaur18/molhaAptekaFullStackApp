@@ -69,7 +69,7 @@ export function ProductDetailsModal({
 
   const isMobileNav = useMaxWidthMediaQuery(APP_SHELL_MOBILE_NAV_BREAKPOINT_PX);
 
-  useSwipeRightToDismiss(ctrl.modalBodyRef, {
+  useSwipeRightToDismiss(isMobileNav ? ctrl.tabPanelRef : ctrl.modalBodyRef, {
     enabled: isOpen && Boolean(product) && isMobileNav,
     onDismiss: onClose,
   });
@@ -79,6 +79,19 @@ export function ProductDetailsModal({
   const title = product.productName?.trim() || "Товар";
   const showMobilePurchaseDock =
     isMobileNav && ctrl.detailsTab === "details" && ctrl.showPriceBlock;
+  const showMobileInstallmentDock =
+    isMobileNav &&
+    ctrl.detailsTab === "installment" &&
+    !ctrl.isSellerView &&
+    ctrl.installmentUi.installmentActive &&
+    Boolean(ctrl.installmentProgram);
+  const showMobileAuctionDock =
+    isMobileNav &&
+    ctrl.detailsTab === "auction" &&
+    !ctrl.isSellerView &&
+    ctrl.auctionUi.auctionActive;
+  const showMobileDock =
+    showMobilePurchaseDock || showMobileInstallmentDock || showMobileAuctionDock;
   const mobilePurchaseDock = showMobilePurchaseDock ? (
     <ProductDetailsModalPurchaseActions
       productId={String(product._id)}
@@ -125,7 +138,7 @@ export function ProductDetailsModal({
       hideHeader
       panelClassName={[
         "product-details-modal",
-        showMobilePurchaseDock ? "product-details-modal--mobile-dock-active" : "",
+        showMobileDock ? "product-details-modal--mobile-dock-active" : "",
       ]
         .filter(Boolean)
         .join(" ")}
@@ -151,7 +164,9 @@ export function ProductDetailsModal({
         ref={ctrl.tabPanelRef}
         className={tabPanelClassName}
         style={
-          ctrl.showProductDetailsTabs && ctrl.tabPanelMinHeight > 0
+          ctrl.showProductDetailsTabs &&
+          ctrl.tabPanelMinHeight > 0 &&
+          !isMobileNav
             ? { minHeight: `${ctrl.tabPanelMinHeight}px` }
             : undefined
         }

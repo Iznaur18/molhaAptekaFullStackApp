@@ -26,6 +26,7 @@ import "./ProductModalShell.css";
  *   closeOnEscape?: boolean;
  *   hideHeader?: boolean;
  *   hideTitle?: boolean;
+ *   headerAddon?: import('react').ReactNode;
  * }} props
  */
 export function ProductModalShell({
@@ -45,6 +46,7 @@ export function ProductModalShell({
   closeOnEscape = true,
   hideHeader = false,
   hideTitle = false,
+  headerAddon = null,
 }) {
   const panelRef = useRef(/** @type {HTMLDivElement | null} */ (null));
   const closeButtonRef = useRef(/** @type {HTMLButtonElement | null} */ (null));
@@ -111,24 +113,32 @@ export function ProductModalShell({
             className={[
               "product-modal-shell__header",
               hideTitle ? "product-modal-shell__header--title-hidden" : "",
+              headerAddon ? "product-modal-shell__header--with-addon" : "",
             ]
               .filter(Boolean)
               .join(" ")}
           >
-            {hideTitle ? null : (
-              <h2 id={titleId} className="product-modal-shell__title">
-                {title}
-              </h2>
-            )}
-            <button
-              ref={closeButtonRef}
-              type="button"
-              className="product-modal-shell__close"
-              onClick={onClose}
-              aria-label={USER_DETAILS_MODAL_UI.ARIA_CLOSE}
-            >
-              <ModalCloseIcon />
-            </button>
+            <div className="product-modal-shell__header-top">
+              {hideTitle ? (
+                <h2 id={titleId} className="product-modal-shell__visually-hidden-title">
+                  {title}
+                </h2>
+              ) : (
+                <h2 id={titleId} className="product-modal-shell__title">
+                  {title}
+                </h2>
+              )}
+              <button
+                ref={closeButtonRef}
+                type="button"
+                className="product-modal-shell__close"
+                onClick={onClose}
+                aria-label={USER_DETAILS_MODAL_UI.ARIA_CLOSE}
+              >
+                <ModalCloseIcon />
+              </button>
+            </div>
+            {headerAddon}
           </header>
         )}
         <div ref={bodyRef} className={bodyClass}>

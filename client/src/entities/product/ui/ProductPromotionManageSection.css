@@ -1,0 +1,39 @@
+.product-promotion-manage {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.85rem;
+  border-radius: 0.65rem;
+  border: 1px solid var(--iz-color-border-subtle);
+  background: var(--iz-color-surface-elevated);
+}
+
+.product-promotion-manage__title {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--iz-color-text);
+}
+
+.product-promotion-manage__lead {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--iz-color-text-secondary);
+}
+
+.product-promotion-manage .product-edit-manage {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+.product-promotion-manage .product-edit-manage__title {
+  display: none;
+}
+
+.product-promotion-manage--embedded {
+  padding: 0;
+  border: none;
+  background: transparent;
+}

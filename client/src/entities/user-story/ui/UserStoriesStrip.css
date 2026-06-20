@@ -7,8 +7,20 @@
   display: flex;
   gap: 14px;
   overflow-x: auto;
-  padding: 4px 4px 8px;
-  scrollbar-width: thin;
+  overflow-y: hidden;
+  padding: 12px 4px 12px 14px;
+  border: 1px solid transparent;
+  border-image: none;
+  border-radius: 20px;
+  background-color: rgba(32, 35, 40, 1);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.user-stories-strip__scroll::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 .user-stories-strip__item {
@@ -91,5 +103,5 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 0.75rem;
-  color: inherit;
+  color: var(--iz-color-on-contrast);
 }

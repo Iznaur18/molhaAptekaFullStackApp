@@ -8,6 +8,7 @@ import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { useCallback, useMemo } from "react";
 
 import { createImageRow } from "../lib/productImageRowHelpers.js";
+import { moveProductImageRows } from "./moveProductImageRows.js";
 import { PRODUCT_IMAGE_URLS_MAX } from "../model/productConstants.js";
 
 /**
@@ -74,12 +75,26 @@ export function useProductImageUrlRows(rows, onRowsChange) {
     return rows.length;
   }, [canAddRow, onRowsChange, rows]);
 
+  const moveRow = useCallback(
+    (id, delta) => {
+      const result = moveProductImageRows(rows, id, delta);
+      if (!result) {
+        return null;
+      }
+
+      onRowsChange(result.rows);
+      return { oldIndex: result.oldIndex, newIndex: result.newIndex };
+    },
+    [onRowsChange, rows],
+  );
+
   return {
     sensors,
     rowIds,
     canAddRow,
     maxRows: PRODUCT_IMAGE_URLS_MAX,
     handleDragEnd,
+    moveRow,
     updateRowUrl,
     removeRow,
     addRow,

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { isProductRaffleParticipant } from "../../raffle/lib/isProductRaffleParticipant.js";
+import { isProductPromoteButtonDisabled } from "../lib/isProductPromoteButtonDisabled.js";
 import { PRODUCT_CARD_UI } from "../../../shared/config/appUiCopy.js";
 
 import "./ProductSellerManageActions.css";
@@ -149,12 +150,12 @@ export function ProductSellerManageActions({
           <button
             type="button"
             className="product-card__promote"
-            disabled={
-              !isListedForOthers ||
-              isDeletePending ||
-              isAvailabilityTogglePending ||
-              isAuctionTogglePending
-            }
+            disabled={isProductPromoteButtonDisabled({
+              productIsAvailable: product.productIsAvailable,
+              isDeletePending,
+              isAvailabilityTogglePending,
+              isAuctionTogglePending,
+            })}
             onClick={(event) => {
               event.stopPropagation();
               onPromote?.(product);

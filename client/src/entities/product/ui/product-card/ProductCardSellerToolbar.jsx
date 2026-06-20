@@ -1,4 +1,5 @@
 import { PRODUCT_CARD_UI } from "../../../../shared/config/appUiCopy.js";
+import { isProductPromoteButtonDisabled } from "../../lib/isProductPromoteButtonDisabled.js";
 
 /**
  * @param {{
@@ -10,12 +11,12 @@ export function ProductCardSellerToolbar({ vm }) {
     return null;
   }
 
-  const promoteDisabled =
-    vm.product.productIsAvailable === false ||
-    vm.isPromotionActive ||
-    vm.isDeletePending ||
-    vm.isAvailabilityTogglePending ||
-    vm.isAuctionTogglePending;
+  const promoteDisabled = isProductPromoteButtonDisabled({
+    productIsAvailable: vm.product.productIsAvailable,
+    isDeletePending: vm.isDeletePending,
+    isAvailabilityTogglePending: vm.isAvailabilityTogglePending,
+    isAuctionTogglePending: vm.isAuctionTogglePending,
+  });
 
   return (
     <div className="product-card__seller-toolbar">

@@ -16,12 +16,9 @@
   }
 
   .product-details-modal .product-modal-shell__body {
-    padding-bottom: var(--product-details-modal-mobile-scroll-padding);
-  }
-
-  .product-details-modal:not(.product-details-modal--mobile-dock-active)
-    .product-modal-shell__body {
-    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--iz-space-4));
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
 
   .product-details-modal__body {
@@ -29,24 +26,45 @@
     gap: 0;
   }
 
+  .product-details-modal .product-details-modal__tabs {
+    flex-shrink: 0;
+    margin: var(--iz-space-3) 0 var(--product-details-modal-tabs-gap-bottom);
+    padding: var(--iz-space-2) var(--iz-space-4);
+  }
+
   .product-details-modal__tab-panel {
-    gap: var(--product-details-modal-gap);
+    flex: 1 1 auto;
+    flex-shrink: 1;
     min-width: 0;
+    min-height: 0;
     max-width: 100%;
     overflow-x: clip;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    display: block;
+  }
+
+  .product-details-modal__tab-panel > * + * {
+    margin-top: var(--product-details-modal-gap);
+  }
+
+  .product-details-modal--mobile-dock-active .product-details-modal__tab-panel {
+    padding-bottom: var(--product-details-modal-mobile-scroll-padding);
+  }
+
+  .product-details-modal:not(.product-details-modal--mobile-dock-active)
+    .product-details-modal__tab-panel {
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--iz-space-4));
   }
 
   .product-details-modal__row-top {
     gap: 0;
   }
 
-  .product-details-modal .product-details-modal__tabs {
-    margin: var(--iz-space-3) 0 var(--product-details-modal-tabs-gap-bottom);
-    padding: var(--iz-space-2) var(--iz-space-4);
-  }
-
   .product-details-modal__tab-panel--inset {
-    padding: 0 var(--iz-space-4) var(--iz-space-4);
+    padding-inline: var(--iz-space-4);
   }
 
   .product-details-modal .product-media-gallery-readonly {
@@ -233,6 +251,7 @@
 
   .product-details-modal__mobile-inline-actions {
     display: flex;
+    flex-shrink: 0;
     flex-wrap: wrap;
     justify-content: center;
     gap: 0.45rem;
@@ -266,5 +285,23 @@
   .product-details-modal__price-actions--mobile-dock .product-details-modal__auction-btn {
     min-height: 2.5rem;
     font-size: 0.82rem;
+  }
+
+  .installment-buyer-block__docked-footer .installment-buyer-block__submit {
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.75rem 1rem;
+    font-size: 1.02rem;
+    border-radius: 0.7rem;
+  }
+
+  .product-price-offer__docked-footer .product-price-offer__btn--primary,
+  .checkout-form__docked-footer .checkout-form__submit {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.75rem 1rem;
+    font-size: 1.02rem;
+    border-radius: 0.7rem;
   }
 }

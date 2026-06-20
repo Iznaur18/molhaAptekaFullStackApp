@@ -1,5 +1,14 @@
 .product-edit-manage {
   --product-card-delete-accent: var(--iz-color-danger);
+  --product-card-radius: var(--iz-radius-lg);
+  --product-card-inner-radius: var(--iz-radius-pill);
+  --product-edit-manage-btn-size-scale: 1.4;
+  --product-edit-manage-btn-padding-block: calc(
+    0.45rem * var(--product-edit-manage-btn-size-scale)
+  );
+  --product-edit-manage-btn-padding-inline: calc(
+    0.65rem * var(--product-edit-manage-btn-size-scale)
+  );
 
   box-sizing: border-box;
   display: flex;
@@ -24,4 +33,15 @@
   font-size: 0.84rem;
   line-height: 1.4;
   color: var(--iz-color-danger-strong);
+}
+
+.product-edit-manage .product-card__availability-toggle,
+.product-edit-manage .product-card__delete,
+.product-edit-manage .product-card__raffle-toggle,
+.product-edit-manage .product-card__availability-pending,
+.product-edit-manage .product-card__delete-pending,
+.product-edit-manage .product-card__delete-confirm-yes,
+.product-edit-manage .product-card__delete-confirm-cancel {
+  padding-block: var(--product-edit-manage-btn-padding-block);
+  padding-inline: var(--product-edit-manage-btn-padding-inline);
 }

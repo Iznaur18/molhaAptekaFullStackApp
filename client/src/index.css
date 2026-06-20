@@ -1,5 +1,11 @@
 @import "./shared/styles/designTokens.css";
 
+html,
+body,
+#root {
+  touch-action: manipulation;
+}
+
 html {
   scrollbar-gutter: stable;
 }

@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { AddressDeliveryFields } from "../../address/ui/AddressDeliveryFields.jsx";
 import { addressValueFromUser } from "../../address/lib/addressValueFromUser.js";
@@ -10,7 +11,9 @@ import {
 } from "../../order/model/constants.js";
 import { useInstallmentMutations } from "../model/useInstallmentMutations.js";
 import { INSTALLMENT_UI } from "../../../shared/config/appUiCopy.js";
+import { APP_SHELL_MOBILE_NAV_BREAKPOINT_PX } from "../../../shared/lib/appShellMobileNavConstants.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
+import { useMaxWidthMediaQuery } from "../../../shared/lib/useMaxWidthMediaQuery.js";
 import { getProductPurchaseLimit } from "../../product/lib/getProductPurchaseLimit.js";
 
 import "./InstallmentBuyerBlock.css";
@@ -40,6 +43,9 @@ export function InstallmentBuyerBlock({
   onRequestLogin,
 }) {
   const { createContractMutation } = useInstallmentMutations();
+  const formId = useId();
+  const isMobileNav = useMaxWidthMediaQuery(APP_SHELL_MOBILE_NAV_BREAKPOINT_PX);
+  const dockSubmit = isMobileNav;
   const [selectedPlanId, setSelectedPlanId] = useState(program.plans[0]?._id ?? "");
   const [quantity, setQuantity] = useState(1);
   const [deliveryAddress, setDeliveryAddress] = useState(() =>
@@ -118,11 +124,39 @@ export function InstallmentBuyerBlock({
       .filter(Boolean)
       .join(" ");
 
+  const isSubmitDisabled = isSubmitting || (isAuthorized && !isUserDataConfirmed);
+  const submitLabel = isSubmitting ? INSTALLMENT_UI.SUBMITTING : INSTALLMENT_UI.SUBMIT;
+
+  const renderSubmitButton = (linkedToForm) => (
+    <button
+      type="submit"
+      className="installment-buyer-block__submit"
+      form={linkedToForm ? formId : undefined}
+      disabled={isSubmitDisabled}
+    >
+      {submitLabel}
+    </button>
+  );
+
+  const dockedSubmit =
+    dockSubmit && typeof document !== "undefined"
+      ? createPortal(
+          <div className="product-modal-shell__docked-footer installment-buyer-block__docked-footer">
+            {renderSubmitButton(true)}
+          </div>,
+          document.body,
+        )
+      : null;
+
   return (
     <section className="installment-buyer-block">
       <p className="installment-buyer-block__hint">{INSTALLMENT_UI.BUYER_HINT}</p>
 
-      <form className="installment-buyer-block__form" onSubmit={handleSubmit}>
+      <form
+        id={formId}
+        className="installment-buyer-block__form"
+        onSubmit={handleSubmit}
+      >
         <fieldset className="installment-buyer-block__plans">
           <legend className="installment-buyer-block__legend">
             {INSTALLMENT_UI.PLANS_LABEL}
@@ -234,14 +268,9 @@ export function InstallmentBuyerBlock({
           </p>
         ) : null}
 
-        <button
-          type="submit"
-          className="installment-buyer-block__submit"
-          disabled={isSubmitting || (isAuthorized && !isUserDataConfirmed)}
-        >
-          {isSubmitting ? INSTALLMENT_UI.SUBMITTING : INSTALLMENT_UI.SUBMIT}
-        </button>
+        {!dockSubmit ? renderSubmitButton(false) : null}
       </form>
+      {dockedSubmit}
     </section>
   );
 }

@@ -6,7 +6,7 @@ import { useAppShell } from "../model/AppShellContext.jsx";
 /** Товары розыгрыша — `/raffle/:raffleId`. */
 export function RaffleProductsRoutePage() {
   const { raffleId } = useParams();
-  const { mainContentProps, goToMainView } = useAppShell();
+  const { mainContentProps } = useAppShell();
   const {
     isAuthorized,
     currentUserId,
@@ -27,7 +27,6 @@ export function RaffleProductsRoutePage() {
       onRequestLoginAddToCart={onRequestLogin}
       onSellerNameClick={onSellerNameClick}
       onOpenProductDetails={onOpenProductDetails}
-      onBackToCatalog={() => goToMainView("catalog")}
     />
   );
 }

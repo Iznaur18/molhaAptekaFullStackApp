@@ -1,36 +1,9 @@
+@import "../../../../shared/ui/ModalSectionTabs/ModalSectionTabs.css";
+
 .product-details-modal__tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--iz-space-2);
+  min-width: 0;
   margin: 0 calc(-1 * var(--iz-space-4)) var(--product-details-modal-tabs-gap-bottom);
   padding: var(--iz-space-2) var(--iz-space-4);
   border-bottom: 1px solid var(--iz-color-border);
   background: var(--product-details-modal-tabs-bg);
-}
-
-.product-details-modal__tab {
-  margin: 0;
-  padding: 0.4rem 0.85rem;
-  border: 1px solid var(--iz-color-action-border-muted);
-  border-radius: var(--iz-radius-pill);
-  background: var(--iz-color-surface);
-  color: var(--iz-color-action);
-  font: inherit;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition:
-    background-color 0.15s ease,
-    border-color 0.15s ease;
-}
-
-.product-details-modal__tab:hover {
-  border-color: var(--iz-color-action);
-  background: var(--iz-color-action-bg-hover);
-}
-
-.product-details-modal__tab_active {
-  border-color: var(--iz-color-action);
-  background: var(--iz-color-action);
-  color: var(--iz-color-on-contrast);
 }

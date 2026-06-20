@@ -40,3 +40,16 @@
 .raffle-featured-carousel .raffle-featured-banner__badge {
   pointer-events: none;
 }
+
+@media (max-width: 640px) {
+  .raffle-featured-carousel .raffle-featured-banner__info-toggle {
+    pointer-events: auto;
+    touch-action: manipulation;
+  }
+
+  .raffle-featured-carousel .raffle-featured-banner__info-panel_open {
+    pointer-events: auto;
+    touch-action: pan-y;
+    user-select: text;
+  }
+}

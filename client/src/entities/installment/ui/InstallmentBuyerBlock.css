@@ -104,10 +104,13 @@
 }
 
 .installment-buyer-block__row {
-  display: grid;
-  grid-template-columns: minmax(5rem, 0.35fr) minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: 0.65rem;
-  align-items: start;
+}
+
+.installment-buyer-block__field_quantity {
+  max-width: 8rem;
 }
 
 .installment-buyer-block__field {
@@ -144,8 +147,8 @@
 }
 
 .installment-buyer-block__totals {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 0.5rem;
 }
 

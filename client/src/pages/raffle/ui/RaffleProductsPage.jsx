@@ -16,7 +16,6 @@ import "./RaffleProductsPage.css";
  *   onRequestLoginAddToCart: () => void;
  *   onSellerNameClick: (userId: string) => void;
  *   onOpenProductDetails: (product: import('../../../entities/product/model/types.js').ProductFromApi) => void;
- *   onBackToCatalog: () => void;
  * }} props
  */
 export function RaffleProductsPage({
@@ -26,7 +25,6 @@ export function RaffleProductsPage({
   onRequestLoginAddToCart,
   onSellerNameClick,
   onOpenProductDetails,
-  onBackToCatalog,
 }) {
   const raffleQuery = useRaffleByIdQuery({ raffleId });
   const productsQuery = useRaffleProductsQuery({ raffleId });
@@ -61,13 +59,6 @@ export function RaffleProductsPage({
   return (
     <div className="raffle-products-page">
       <header className="raffle-products-page__header">
-        <button
-          type="button"
-          className="raffle-products-page__back"
-          onClick={onBackToCatalog}
-        >
-          ← {RAFFLE_PRODUCTS_PAGE_UI.BACK_CATALOG}
-        </button>
         <h2 className="raffle-products-page__title">
           {raffle?.title ?? RAFFLE_PRODUCTS_PAGE_UI.TITLE}
         </h2>

@@ -3,9 +3,9 @@
   inset: 0;
   z-index: 1300;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
-  padding: 1rem;
+  padding: 0;
   background: var(--iz-color-overlay-midnight);
 }
 
@@ -13,12 +13,27 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  width: min(100%, 28rem);
-  max-height: min(90vh, 640px);
+  width: 100%;
+  max-width: 100%;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin-inline: auto;
   overflow: hidden;
-  border-radius: 0.85rem;
+  border-radius: 0;
   background: var(--iz-color-surface);
   box-shadow: 0 12px 38px var(--iz-color-accent-installment-shadow);
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+@media (min-width: 40rem) {
+  .installment-program-modal__backdrop {
+    padding-inline: max(0px, calc((100vw - 28rem) / 2));
+  }
+
+  .installment-program-modal {
+    max-width: 28rem;
+    border-radius: var(--iz-radius-modal);
+  }
 }
 
 .installment-program-modal__header {
@@ -54,6 +69,7 @@
 }
 
 .installment-program-modal__loading {
+  flex: 1;
   margin: 0;
   padding: 1rem;
   font-size: 0.9rem;
@@ -122,8 +138,8 @@
   justify-content: space-between;
   gap: 0.5rem;
   padding: 0.55rem 0.75rem;
-  border-bottom: 1px solid var(--iz-color-border-subtle);
-  background: var(--iz-color-surface);
+  border-bottom: 1px solid var(--iz-color-action-hover);
+  background: var(--iz-color-action);
 }
 
 .installment-program-modal__plan-name {
@@ -134,16 +150,16 @@
   font-weight: 700;
   letter-spacing: 0.02em;
   text-transform: uppercase;
-  color: var(--iz-color-slate-muted);
+  color: var(--iz-color-on-contrast);
 }
 
 .installment-program-modal__plan-remove {
   margin: 0;
   padding: 0.2rem 0.45rem;
-  border: 1px solid var(--iz-color-danger-border);
+  border: 1px solid color-mix(in srgb, var(--iz-color-on-contrast) 40%, transparent);
   border-radius: 0.4rem;
-  background: var(--iz-color-surface);
-  color: var(--iz-color-danger-strong);
+  background: color-mix(in srgb, var(--iz-color-on-contrast) 12%, transparent);
+  color: var(--iz-color-on-contrast);
   font: inherit;
   font-size: 0.78rem;
   line-height: 1.2;
@@ -151,7 +167,7 @@
 }
 
 .installment-program-modal__plan-remove:hover:not(:disabled) {
-  background: var(--iz-color-danger-surface);
+  background: color-mix(in srgb, var(--iz-color-on-contrast) 22%, transparent);
 }
 
 .installment-program-modal__plan-remove:disabled {
@@ -236,7 +252,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  padding: 0.75rem 1rem 1rem;
+  padding: 0.75rem 1rem max(1rem, env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--iz-color-neutral-gray-surface);
   background: var(--iz-color-surface);
 }

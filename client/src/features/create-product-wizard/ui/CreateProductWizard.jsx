@@ -8,7 +8,9 @@ import "../../../entities/product/ui/create-product-sections/CreateProductSectio
 import { ProductModalShell } from "../../../shared/ui/ProductModalShell/ProductModalShell.jsx";
 import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { useCreateProductWizard } from "../model/useCreateProductWizard.js";
-import { CreateProductWizardProgress } from "./CreateProductWizardProgress.jsx";
+import { ProductWizardProgress } from "../../../shared/ui/ProductWizardProgress/ProductWizardProgress.jsx";
+import { ProductWizardStepHeadline } from "../../../shared/ui/ProductWizardProgress/ProductWizardStepHeadline.jsx";
+import { resolveCreateProductWizardStepCopy } from "../lib/resolveCreateProductWizardStepCopy.js";
 
 import "./CreateProductWizard.css";
 
@@ -99,6 +101,8 @@ export function CreateProductWizard({
     sellerPointsMaxPerUnit,
   };
 
+  const stepCopy = resolveCreateProductWizardStepCopy(wizard.stepId);
+
   return (
     <ProductModalShell
       isOpen={isOpen}
@@ -146,10 +150,10 @@ export function CreateProductWizard({
         </div>
       }
     >
-      <CreateProductWizardProgress
+      <ProductWizardProgress
         stepIds={wizard.stepIds}
         stepIndex={wizard.stepIndex}
-        stepId={wizard.stepId}
+        resolveStepCopy={resolveCreateProductWizardStepCopy}
       />
       <form
         id={CREATE_PRODUCT_WIZARD_FORM_ID}
@@ -158,6 +162,10 @@ export function CreateProductWizard({
         onSubmit={handlePrimaryAction}
       >
         <div key={wizard.stepId} className="create-product-wizard__step-panel">
+          <ProductWizardStepHeadline
+            title={stepCopy.title}
+            subtitle={stepCopy.subtitle}
+          />
           {wizard.stepId === "basic" ? <CreateProductBasicSection {...sectionProps} /> : null}
           {wizard.stepId === "media" ? (
             <CreateProductWizardMediaStep

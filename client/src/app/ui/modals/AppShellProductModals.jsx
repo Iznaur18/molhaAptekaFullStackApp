@@ -110,43 +110,10 @@ export function AppShellProductModals({
         sellerLoyaltyPointsReserved={loyaltyPointsReserved}
         sellerProducts={isMineMode ? products : []}
         productToEdit={productToEdit}
-        manageProduct={productToEdit}
-        onDeleteProduct={handleDeleteMyProduct}
-        onSetProductAvailability={handleSetMyProductAvailability}
-        onSetProductAuction={handleSetProductAuction}
-        isDeletePending={
-          productToEdit?._id != null && deletingProductId === String(productToEdit._id)
-        }
-        isAvailabilityTogglePending={
-          productToEdit?._id != null &&
-          togglingAvailabilityProductId === String(productToEdit._id)
-        }
-        isAuctionTogglePending={
-          productToEdit?._id != null &&
-          togglingAuctionProductId === String(productToEdit._id)
-        }
-        manageErrorMessage={myProductsCatalogError || productDetailsAdminError}
-        canManageEdit={
-          productToEdit != null && (isAdmin || canSellerEditProduct(productToEdit))
-        }
-        canManageDelete={
-          productToEdit != null && (isAdmin || canSellerDeleteProduct(productToEdit))
-        }
-        canManageToggleVisibility={
-          productToEdit != null &&
-          (isAdmin || canSellerToggleCatalogVisibility(productToEdit))
-        }
-        sellerRaffleActive={sellerRaffleActive}
-        onToggleRaffleParticipation={handleToggleRaffleParticipation}
-        isRaffleParticipationPending={
-          productToEdit?._id != null &&
-          raffleParticipationPendingProductId === String(productToEdit._id)
-        }
       />
       <ProductPromotionModal
         isOpen={promotionProduct != null}
-        productName={promotionProduct?.productName ?? ""}
-        productPrice={Number(promotionProduct?.productPrice) || 0}
+        product={promotionProduct}
         tiers={promotionConfig.tiers}
         durations={promotionConfig.durations}
         loyaltyPoints={loyaltyPoints}
@@ -154,6 +121,38 @@ export function AppShellProductModals({
         isSubmitting={isPromotionSubmitPending}
         onClose={handleClosePromotionModal}
         onSubmit={handleSubmitPromotionRequest}
+        onDeleteProduct={handleDeleteMyProduct}
+        onSetProductAvailability={handleSetMyProductAvailability}
+        onSetProductAuction={handleSetProductAuction}
+        isDeletePending={
+          promotionProduct?._id != null &&
+          deletingProductId === String(promotionProduct._id)
+        }
+        isAvailabilityTogglePending={
+          promotionProduct?._id != null &&
+          togglingAvailabilityProductId === String(promotionProduct._id)
+        }
+        isAuctionTogglePending={
+          promotionProduct?._id != null &&
+          togglingAuctionProductId === String(promotionProduct._id)
+        }
+        manageErrorMessage={myProductsCatalogError || productDetailsAdminError}
+        canManageEdit={
+          promotionProduct != null && (isAdmin || canSellerEditProduct(promotionProduct))
+        }
+        canManageDelete={
+          promotionProduct != null && (isAdmin || canSellerDeleteProduct(promotionProduct))
+        }
+        canManageToggleVisibility={
+          promotionProduct != null &&
+          (isAdmin || canSellerToggleCatalogVisibility(promotionProduct))
+        }
+        sellerRaffleActive={sellerRaffleActive}
+        onToggleRaffleParticipation={handleToggleRaffleParticipation}
+        isRaffleParticipationPending={
+          promotionProduct?._id != null &&
+          raffleParticipationPendingProductId === String(promotionProduct._id)
+        }
       />
       <CreateRaffleModal
         isOpen={raffleModal != null}

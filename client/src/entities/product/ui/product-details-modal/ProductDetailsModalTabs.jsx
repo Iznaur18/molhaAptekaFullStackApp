@@ -2,6 +2,7 @@ import {
   INSTALLMENT_UI,
   PRODUCT_PRICE_OFFER_UI,
 } from "../../../../shared/config/appUiCopy.js";
+import { ModalSectionTabs } from "../../../../shared/ui/ModalSectionTabs/ModalSectionTabs.jsx";
 
 /**
  * @param {{
@@ -21,66 +22,28 @@ export function ProductDetailsModalTabs({
   showReviewsTab,
   reviewsTabLabel,
 }) {
+  /** @type {Array<{ id: 'details' | 'auction' | 'reviews' | 'installment'; label: string }>} */
+  const tabs = [{ id: "details", label: PRODUCT_PRICE_OFFER_UI.TAB_DETAILS }];
+
+  if (showAuctionTab) {
+    tabs.push({ id: "auction", label: PRODUCT_PRICE_OFFER_UI.TAB_AUCTION });
+  }
+
+  if (showInstallmentTab) {
+    tabs.push({ id: "installment", label: INSTALLMENT_UI.TAB });
+  }
+
+  if (showReviewsTab) {
+    tabs.push({ id: "reviews", label: reviewsTabLabel });
+  }
+
   return (
-    <div className="product-details-modal__tabs" role="tablist">
-      <button
-        type="button"
-        role="tab"
-        aria-selected={detailsTab === "details"}
-        className={
-          detailsTab === "details"
-            ? "product-details-modal__tab product-details-modal__tab_active"
-            : "product-details-modal__tab"
-        }
-        onClick={() => setDetailsTab("details")}
-      >
-        {PRODUCT_PRICE_OFFER_UI.TAB_DETAILS}
-      </button>
-      {showAuctionTab ? (
-        <button
-          type="button"
-          role="tab"
-          aria-selected={detailsTab === "auction"}
-          className={
-            detailsTab === "auction"
-              ? "product-details-modal__tab product-details-modal__tab_active"
-              : "product-details-modal__tab"
-          }
-          onClick={() => setDetailsTab("auction")}
-        >
-          {PRODUCT_PRICE_OFFER_UI.TAB_AUCTION}
-        </button>
-      ) : null}
-      {showInstallmentTab ? (
-        <button
-          type="button"
-          role="tab"
-          aria-selected={detailsTab === "installment"}
-          className={
-            detailsTab === "installment"
-              ? "product-details-modal__tab product-details-modal__tab_active"
-              : "product-details-modal__tab"
-          }
-          onClick={() => setDetailsTab("installment")}
-        >
-          {INSTALLMENT_UI.TAB}
-        </button>
-      ) : null}
-      {showReviewsTab ? (
-        <button
-          type="button"
-          role="tab"
-          aria-selected={detailsTab === "reviews"}
-          className={
-            detailsTab === "reviews"
-              ? "product-details-modal__tab product-details-modal__tab_active"
-              : "product-details-modal__tab"
-          }
-          onClick={() => setDetailsTab("reviews")}
-        >
-          {reviewsTabLabel}
-        </button>
-      ) : null}
+    <div className="product-details-modal__tabs">
+      <ModalSectionTabs
+        tabs={tabs}
+        activeTabId={detailsTab}
+        onTabChange={setDetailsTab}
+      />
     </div>
   );
 }
