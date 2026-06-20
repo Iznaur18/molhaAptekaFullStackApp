@@ -10,6 +10,7 @@ import {
 } from "./computeProductDiscountPercent.js";
 import { getProductPriceRubMaxError } from "./productPriceRubValidation.js";
 import { validateProductDescription } from "./validateProductDescription.js";
+import { validateProductName } from "./validateProductName.js";
 import {
   productCharacteristicsFromRows,
   validateProductCharacteristicsRows,
@@ -59,6 +60,11 @@ export function prepareCreateProductSubmit({
   const oldPriceError = validateProductOldPricePair(productOldPrice, productPrice);
   if (oldPriceError) {
     return { ok: false, message: CREATE_PRODUCT_MODAL_UI.ERROR_OLD_PRICE };
+  }
+
+  const nameError = validateProductName(form.productName);
+  if (nameError) {
+    return { ok: false, message: nameError };
   }
 
   const descriptionError = validateProductDescription(form.productDescription);

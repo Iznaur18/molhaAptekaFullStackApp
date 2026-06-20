@@ -24,6 +24,7 @@ export function ProductCardStandardContent({ vm }) {
 
   const renderModerationBadge = () => {
     if (!vm.isMineMode && !vm.isModerationQueue) return null;
+    if (vm.showModerationPendingOverlay) return null;
     return (
       <>
         <span

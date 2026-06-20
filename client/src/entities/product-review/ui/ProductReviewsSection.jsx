@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { ProductPriceOfferHintMessage } from "../../product-price-offer/ui/ProductPriceOfferHintMessage.jsx";
-import { formatProductReviewRatingLine } from "../lib/formatProductReviewRatingLine.js";
 import { useProductReviewMutations } from "../model/useProductReviewMutations.js";
 import { useProductReviewsQuery } from "../model/useProductReviewsQuery.js";
 import { PRODUCT_REVIEW_UI } from "../../../shared/config/appUiCopy.js";
 import { ProductReviewForm } from "./ProductReviewForm.jsx";
 import { ProductReviewListItem } from "./ProductReviewListItem.jsx";
+import { ProductReviewSummary } from "./ProductReviewSummary.jsx";
 
 import "./ProductReviewsSection.css";
 
@@ -112,10 +112,6 @@ export function ProductReviewsSection({
       setErrorMessage(e instanceof Error ? e.message : PRODUCT_REVIEW_UI.LOADING);
     }
   };
-
-  const ratingLine = summary
-    ? formatProductReviewRatingLine(summary.averageRating, summary.reviewCount)
-    : "";
 
   const myReviewId = summary?.myReview?._id;
   const visibleReviews = myReviewId
@@ -248,8 +244,11 @@ export function ProductReviewsSection({
           {PRODUCT_REVIEW_UI.SECTION_TITLE}
         </h2>
       )}
-      {ratingLine ? (
-        <p className="product-reviews-section__summary">{ratingLine}</p>
+      {summary && summary.reviewCount > 0 ? (
+        <ProductReviewSummary
+          averageRating={summary.averageRating}
+          reviewCount={summary.reviewCount}
+        />
       ) : null}
       {isLoading ? (
         <p className="product-reviews-section__state">{PRODUCT_REVIEW_UI.LOADING}</p>

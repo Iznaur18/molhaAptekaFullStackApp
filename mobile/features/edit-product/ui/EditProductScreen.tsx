@@ -1,3 +1,4 @@
+import { PRODUCT_NAME_MAX_LENGTH } from "@molha/api-contract";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -12,6 +13,7 @@ import {
 } from "react-native";
 
 import { useCatalogProductQuery } from "@/entities/product/model/useCatalogProductQuery";
+import { validateProductName } from "@/entities/product/lib/validateProductName";
 import { useMyProductMutations } from "@/entities/product/model/useMyProductMutations";
 import { useUploadImageMutation } from "@/entities/upload/model/useUploadImageMutation";
 import { pickProfileImageAsset } from "@/features/image-upload/lib/pickProfileImageAsset";
@@ -77,8 +79,9 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
   }, [isInitialized, productQuery.data]);
 
   const validateForm = (): string | null => {
-    if (productName.trim().length < 3) {
-      return CREATE_PRODUCT_UI.ERROR_NAME;
+    const nameError = validateProductName(productName);
+    if (nameError) {
+      return nameError;
     }
     if (productDescription.trim().length < PRODUCT_DESCRIPTION_MIN_CHARS) {
       return CREATE_PRODUCT_UI.ERROR_DESCRIPTION;
@@ -199,6 +202,7 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
         style={styles.input}
         value={productName}
         onChangeText={setProductName}
+        maxLength={PRODUCT_NAME_MAX_LENGTH}
         editable={!isBusy}
       />
 

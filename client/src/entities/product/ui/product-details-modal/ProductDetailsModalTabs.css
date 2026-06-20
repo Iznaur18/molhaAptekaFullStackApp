@@ -2,7 +2,10 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--iz-space-2);
-  margin-bottom: var(--iz-space-3);
+  margin: 0 calc(-1 * var(--iz-space-4)) var(--product-details-modal-tabs-gap-bottom);
+  padding: var(--iz-space-2) var(--iz-space-4);
+  border-bottom: 1px solid var(--iz-color-border);
+  background: var(--product-details-modal-tabs-bg);
 }
 
 .product-details-modal__tab {

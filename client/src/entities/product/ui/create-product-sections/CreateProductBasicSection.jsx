@@ -1,4 +1,6 @@
 import {
+  PRODUCT_NAME_MAX_LENGTH,
+  PRODUCT_NAME_MIN_LENGTH,
   PRODUCT_DESCRIPTION_MAX_CHARS,
   PRODUCT_DESCRIPTION_MIN_CHARS,
 } from "../../model/productConstants.js";
@@ -35,7 +37,8 @@ export function CreateProductBasicSection({
           name="productName"
           value={String(form.productName ?? "")}
           onChange={handleChange}
-          minLength={3}
+          minLength={PRODUCT_NAME_MIN_LENGTH}
+          maxLength={PRODUCT_NAME_MAX_LENGTH}
           autoComplete="off"
           disabled={isSubmitting}
           placeholder={CREATE_PRODUCT_MODAL_UI.WIZARD_PLACEHOLDER_NAME}

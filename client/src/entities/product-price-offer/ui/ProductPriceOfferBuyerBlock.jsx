@@ -224,6 +224,7 @@ export function ProductPriceOfferBuyerBlock({
                 <input
                   {...INTEGER_INPUT_FIELD_PROPS}
                   className="product-price-offer__input"
+                  placeholder={PRODUCT_PRICE_OFFER_UI.INPUT_PLACEHOLDER}
                   value={priceInput}
                   onChange={(e) => setPriceInput(formatRubPriceInput(e.target.value))}
                   disabled={isBusy}

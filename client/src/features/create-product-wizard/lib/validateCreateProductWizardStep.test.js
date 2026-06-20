@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, expect, it } from "vitest";
 
 import { CREATE_PRODUCT_INITIAL_FORM } from "../../../entities/product/lib/createProductFormState.js";
+import { validateProductName } from "../../../entities/product/lib/validateProductName.js";
 import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { CREATE_PRODUCT_WIZARD_STEP_IDS } from "../lib/createProductWizardSteps.js";
 import { validateCreateProductWizardStep } from "../lib/validateCreateProductWizardStep.js";
@@ -14,7 +15,7 @@ const validationContext = {
 describe("validateCreateProductWizardStep", () => {
   it("requires name and description on basic step", () => {
     expect(validateCreateProductWizardStep("basic", CREATE_PRODUCT_INITIAL_FORM, validationContext)).toBe(
-      CREATE_PRODUCT_MODAL_UI.WIZARD_ERROR_NAME,
+      validateProductName(""),
     );
 
     const validBasic = {

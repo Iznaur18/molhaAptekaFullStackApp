@@ -19,12 +19,6 @@
   color: var(--iz-color-slate);
 }
 
-.product-reviews-section__summary {
-  margin: 0;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--iz-color-warning-deep);
-}
 
 .product-reviews-section__state {
   margin: 0;

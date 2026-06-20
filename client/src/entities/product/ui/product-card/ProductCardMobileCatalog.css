@@ -191,6 +191,12 @@
     display: none;
   }
 
+  .product-card:not(.product-card--banner-layout)
+    .product-card__image-frame:has(.product-card__moderation-pending-overlay)
+    .product-card__image-badges {
+    bottom: calc(1.85rem + 1px);
+  }
+
   .product-card:not(.product-card--banner-layout) .product-card__heading {
     grid-row: 2;
     margin: 0;

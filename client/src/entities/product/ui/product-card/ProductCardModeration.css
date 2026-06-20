@@ -4,3 +4,24 @@
   line-height: 1.4;
   color: var(--iz-color-danger-strong);
 }
+
+.product-card__moderation-pending-overlay {
+  position: absolute;
+  z-index: 4;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 0.35rem 0.5rem;
+  border-top: 1px solid var(--iz-color-border);
+  background: color-mix(in srgb, var(--iz-color-warning-cream) 92%, transparent);
+  color: var(--iz-color-warning-brown-deep);
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: center;
+  pointer-events: none;
+}

@@ -22,6 +22,22 @@ export function getProductModerationBadgeLabel(product) {
 /**
  * @param {import('../model/types.js').ProductFromApi} product
  */
+export function isProductModerationPending(product) {
+  return (product.productModerationStatus ?? PRODUCT_MODERATION_APPROVED) === PRODUCT_MODERATION_PENDING;
+}
+
+/**
+ * @param {import('../model/types.js').ProductFromApi} product
+ * @param {{ isMineMode?: boolean; isModerationQueue?: boolean }} context
+ */
+export function shouldShowProductModerationPendingOverlay(product, context = {}) {
+  const { isMineMode = false, isModerationQueue = false } = context;
+  return isProductModerationPending(product) && (isMineMode || isModerationQueue);
+}
+
+/**
+ * @param {import('../model/types.js').ProductFromApi} product
+ */
 export function getProductModerationBadgeClassName(product) {
   const status = product.productModerationStatus ?? PRODUCT_MODERATION_APPROVED;
   return `product-moderation-badge product-moderation-badge_${status}`;

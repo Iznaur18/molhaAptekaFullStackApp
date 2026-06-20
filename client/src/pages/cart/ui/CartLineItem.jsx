@@ -74,32 +74,36 @@ export function CartLineItem({ line, onProductClick }) {
           <p className="cart-line__unit-price">{unitPriceText}</p>
         )}
       </div>
-      <div className="cart-line__stepper" role="group">
-        <button
-          type="button"
-          className="cart-line__step-button"
-          onClick={handleDecrease}
-        >
-          −
-        </button>
-        <span className="cart-line__quantity">{line.quantity}</span>
-        <button
-          type="button"
-          className="cart-line__step-button cart-line__step-button--increase"
-          onClick={handleIncrease}
-        >
-          +
-        </button>
+      <div className="cart-line__actions">
+        <div className="cart-line__controls">
+          <button
+            type="button"
+            className="cart-line__remove"
+            onClick={handleRemove}
+            aria-label={CART_PAGE_UI.REMOVE_LINE_ARIA}
+          >
+            <AppIcon icon={Trash2} size="md" />
+          </button>
+          <div className="cart-line__stepper" role="group">
+            <button
+              type="button"
+              className="cart-line__step-button"
+              onClick={handleDecrease}
+            >
+              −
+            </button>
+            <span className="cart-line__quantity">{line.quantity}</span>
+            <button
+              type="button"
+              className="cart-line__step-button cart-line__step-button--increase"
+              onClick={handleIncrease}
+            >
+              +
+            </button>
+          </div>
+        </div>
+        <span className="cart-line__total">{lineTotalText}</span>
       </div>
-      <span className="cart-line__total">{lineTotalText}</span>
-      <button
-        type="button"
-        className="cart-line__remove"
-        onClick={handleRemove}
-        aria-label={CART_PAGE_UI.REMOVE_LINE_ARIA}
-      >
-        <AppIcon icon={Trash2} size="md" />
-      </button>
     </article>
   );
 }

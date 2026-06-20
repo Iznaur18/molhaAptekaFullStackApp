@@ -360,7 +360,7 @@ components:
       type: object
       required: [productName, productDescription, productPrice, productIsAvailable]
       properties:
-        productName: { type: string, minLength: 3 }
+        productName: { type: string, minLength: 3, maxLength: 100 }
         productDescription:
           type: string
           minLength: 10
@@ -401,7 +401,7 @@ components:
       type: object
       minProperties: 1
       properties:
-        productName: { type: string, minLength: 3 }
+        productName: { type: string, minLength: 3, maxLength: 100 }
         productDescription:
           type: string
           minLength: 10

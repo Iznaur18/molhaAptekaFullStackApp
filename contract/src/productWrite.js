@@ -37,12 +37,26 @@ export const PRODUCT_CATEGORY_VALUES = [
 ];
 
 export const PRODUCT_IMAGE_URLS_MAX = 5;
+export const PRODUCT_NAME_MIN_LENGTH = 3;
+export const PRODUCT_NAME_MAX_LENGTH = 100;
 export const PRODUCT_DESCRIPTION_MIN_CHARS = 10;
 export const PRODUCT_DESCRIPTION_MAX_CHARS = 2000;
 export const PRODUCT_PRICE_RUB_MAX = 999_999_999;
 export const PRODUCT_STOCK_QUANTITY_MIN = 1;
 export const PRODUCT_STOCK_QUANTITY_MAX = 9999;
 export const PRODUCT_CHARACTERISTICS_MAX_ITEMS = 10;
+
+const productNameFieldSchema = z
+  .string()
+  .trim()
+  .min(
+    PRODUCT_NAME_MIN_LENGTH,
+    `productName не короче ${PRODUCT_NAME_MIN_LENGTH} символов`,
+  )
+  .max(
+    PRODUCT_NAME_MAX_LENGTH,
+    `productName не длиннее ${PRODUCT_NAME_MAX_LENGTH} символов`,
+  );
 
 const productImageUrlsSchema = z
   .array(storedMediaUrlSchema)
@@ -98,7 +112,7 @@ const assertOldPricePair = (body, ctx, requireProductPrice) => {
 /** Тело `POST /product`. */
 export const createProductBodySchema = z
   .object({
-    productName: z.string().trim().min(3),
+    productName: productNameFieldSchema,
     productDescription: z
       .string()
       .trim()
@@ -130,7 +144,7 @@ export const createProductBodySchema = z
   .superRefine((body, ctx) => assertOldPricePair(body, ctx, true));
 
 const patchFieldShape = {
-  productName: z.string().trim().min(3).optional(),
+  productName: productNameFieldSchema.optional(),
   productDescription: z
     .string()
     .trim()

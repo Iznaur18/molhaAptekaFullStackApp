@@ -11,6 +11,12 @@ export const SELLER_PRODUCTS_LIMIT_PREMIUM = 30;
 export const SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE =
   "Достигнут лимит товаров: 15 для обычных пользователей, 30 для премиум.";
 
+/** Минимум символов в названии товара. */
+export const PRODUCT_NAME_MIN_LENGTH = 3;
+
+/** Максимум символов в названии товара. */
+export const PRODUCT_NAME_MAX_LENGTH = 100;
+
 /** Максимум символов в описании товара (валидация POST/PATCH /product). */
 export const PRODUCT_DESCRIPTION_MAX_CHARS = 2000;
 

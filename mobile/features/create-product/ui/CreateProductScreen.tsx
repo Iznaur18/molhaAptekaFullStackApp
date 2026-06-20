@@ -1,3 +1,4 @@
+import { PRODUCT_NAME_MAX_LENGTH } from "@molha/api-contract";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -13,6 +14,7 @@ import {
 import { useCreateProductMutation } from "@/entities/product/model/useCreateProductMutation";
 import { useUploadImageMutation } from "@/entities/upload/model/useUploadImageMutation";
 import { pickProfileImageAsset } from "@/features/image-upload/lib/pickProfileImageAsset";
+import { validateProductName } from "@/entities/product/lib/validateProductName";
 import { CreateProductCategoryPicker } from "@/features/create-product/ui/CreateProductCategoryPicker";
 import { CREATE_PRODUCT_UI, IMAGE_UPLOAD_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
@@ -46,8 +48,9 @@ export const CreateProductScreen = () => {
   const [successMessage, setSuccessMessage] = useState("");
 
   const validateForm = (): string | null => {
-    if (productName.trim().length < 3) {
-      return CREATE_PRODUCT_UI.ERROR_NAME;
+    const nameError = validateProductName(productName);
+    if (nameError) {
+      return nameError;
     }
     if (productDescription.trim().length < PRODUCT_DESCRIPTION_MIN_CHARS) {
       return CREATE_PRODUCT_UI.ERROR_DESCRIPTION;
@@ -128,6 +131,7 @@ export const CreateProductScreen = () => {
         style={styles.input}
         value={productName}
         onChangeText={setProductName}
+        maxLength={PRODUCT_NAME_MAX_LENGTH}
         editable={!isSubmitting}
       />
 

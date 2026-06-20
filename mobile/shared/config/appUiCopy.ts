@@ -940,7 +940,7 @@ export const CREATE_PRODUCT_UI = {
   SUCCESS: "Товар создан и отправлен на модерацию",
   ERROR_CATEGORY: "Выберите конечную подкатегорию",
   ERROR_STOCK: "Укажите количество от 1 до 9999",
-  ERROR_NAME: "Название — минимум 3 символа",
+  ERROR_NAME: "Название: от 3 до 100 символов",
   ERROR_DESCRIPTION: "Описание — минимум 10 символов",
   ERROR_PRICE: "Укажите цену",
   CATEGORY_BACK: "Назад",

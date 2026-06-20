@@ -41,8 +41,8 @@
   }
 
   .product-details-modal .product-details-modal__tabs {
-    margin: var(--iz-space-3) 0 0;
-    padding: 0 var(--iz-space-4);
+    margin: var(--iz-space-3) 0 var(--product-details-modal-tabs-gap-bottom);
+    padding: var(--iz-space-2) var(--iz-space-4);
   }
 
   .product-details-modal__tab-panel--inset {
@@ -86,15 +86,18 @@
   .product-details-modal
     .product-media-gallery-readonly__report-slot
     .product-details-modal__footer-btn--report {
+    position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 0;
     width: 2.5rem;
     height: 2.5rem;
     min-width: 0;
     margin: 0;
     padding: 0;
     flex: 0 0 auto;
+    overflow: hidden;
     border: none;
     border-radius: 999px;
     background: color-mix(in srgb, var(--iz-color-canvas) 92%, transparent);
@@ -104,6 +107,17 @@
     font-size: 0;
     line-height: 0;
     box-shadow: 0 1px 4px color-mix(in srgb, var(--iz-color-ink) 14%, transparent);
+  }
+
+  .product-details-modal
+    .product-media-gallery-readonly__report-slot
+    .product-details-modal__footer-btn--report
+    svg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    flex-shrink: 0;
   }
 
   .product-details-modal

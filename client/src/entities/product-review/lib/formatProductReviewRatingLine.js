@@ -1,4 +1,5 @@
 import { PRODUCT_REVIEW_UI } from "../../../shared/config/appUiCopy.js";
+import { pluralizeRuReview } from "../../../shared/lib/pluralizeRuReview.js";
 
 /**
  * @param {number} averageRating
@@ -13,6 +14,17 @@ export function formatProductReviewRatingLine(averageRating, reviewCount) {
   const rounded = Math.round(avg * 10) / 10;
   return PRODUCT_REVIEW_UI.RATING_LINE.replace("{rating}", String(rounded)).replace(
     "{count}",
-    String(count),
+    `${count} ${pluralizeRuReview(count)}`,
   );
+}
+
+/**
+ * @param {number} reviewCount
+ */
+export function formatProductReviewCountLabel(reviewCount) {
+  const count = Number(reviewCount) || 0;
+  if (count <= 0) {
+    return "";
+  }
+  return `${count} ${pluralizeRuReview(count)}`;
 }

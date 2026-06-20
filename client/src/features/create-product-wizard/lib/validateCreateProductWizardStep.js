@@ -11,14 +11,13 @@ import { urlsFromImageRows } from "../../../entities/product/lib/productImageRow
 import { prepareCreateProductSubmit } from "../../../entities/product/lib/prepareCreateProductSubmit.js";
 import { validateProductCharacteristicsRows } from "../../../entities/product/lib/validateProductCharacteristicsRows.js";
 import { validateProductDescription } from "../../../entities/product/lib/validateProductDescription.js";
+import { validateProductName } from "../../../entities/product/lib/validateProductName.js";
 import {
   PRODUCT_STOCK_QUANTITY_MAX,
   PRODUCT_STOCK_QUANTITY_MIN,
 } from "../../../entities/product/model/productStockConstants.js";
 import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { CREATE_PRODUCT_WIZARD_STEP_IDS } from "./createProductWizardSteps.js";
-
-const PRODUCT_NAME_MIN_LENGTH = 3;
 
 /**
  * @param {string} stepId
@@ -32,9 +31,9 @@ const PRODUCT_NAME_MIN_LENGTH = 3;
 export function validateCreateProductWizardStep(stepId, form, context) {
   switch (stepId) {
     case "basic": {
-      const name = String(form.productName ?? "").trim();
-      if (name.length < PRODUCT_NAME_MIN_LENGTH) {
-        return CREATE_PRODUCT_MODAL_UI.WIZARD_ERROR_NAME;
+      const nameError = validateProductName(form.productName);
+      if (nameError) {
+        return nameError;
       }
 
       const descriptionError = validateProductDescription(form.productDescription);

@@ -376,6 +376,18 @@ test("createProductBodySchema accepts relative /uploads image urls", () => {
   assert.deepEqual(parsed.productImageUrls, ["/uploads/photo.webp"]);
 });
 
+test("createProductBodySchema rejects productName longer than 100 chars", () => {
+  assert.throws(() => {
+    createProductBodySchema.parse({
+      productName: "А".repeat(101),
+      productDescription: "Description long enough for validation",
+      productPrice: 100,
+      productIsAvailable: true,
+      productCategory: "pharmacy",
+    });
+  });
+});
+
 test("createProductBodySchema requires category id or legacy slug", () => {
   assert.throws(() => {
     createProductBodySchema.parse({

@@ -6,6 +6,7 @@ import {
   canSellerDeleteProduct,
   canSellerEditProduct,
   canSellerToggleCatalogVisibility,
+  shouldShowProductModerationPendingOverlay,
 } from "../../lib/getProductModerationUi.js";
 import { getProductPurchaseLimit } from "../../lib/getProductPurchaseLimit.js";
 import { getProductPromotionTierLabel } from "../../lib/calculateProductPromotionPointsCost.js";
@@ -70,6 +71,10 @@ export function useProductCardViewModel(props) {
   const sellerCanDelete = !isMineMode || canSellerDeleteProduct(product);
   const sellerCanToggleVisibility =
     !isMineMode || canSellerToggleCatalogVisibility(product);
+  const showModerationPendingOverlay = shouldShowProductModerationPendingOverlay(product, {
+    isMineMode,
+    isModerationQueue,
+  });
   const rejectionComment =
     isMineMode &&
     product.productModerationStatus === PRODUCT_MODERATION_REJECTED &&
@@ -114,6 +119,7 @@ export function useProductCardViewModel(props) {
     sellerCanDelete,
     sellerCanToggleVisibility,
     rejectionComment,
+    showModerationPendingOverlay,
     reviewRatingLine,
     hasReviewRating: reviewRatingLine.length > 0,
     previewFieldKeysWithoutPrice,

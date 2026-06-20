@@ -45,6 +45,13 @@
   scroll-margin-top: var(--product-details-modal-gap);
 }
 
+.product-details-modal__auction-section .product-price-offer {
+  margin-top: 0;
+  border-color: var(--product-details-modal-auction-surface-border);
+  background: var(--product-details-modal-auction-surface-bg);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--iz-color-link) 8%, transparent);
+}
+
 @media (max-width: 36rem) {
   .product-details-modal__row-top {
     grid-template-columns: 1fr;

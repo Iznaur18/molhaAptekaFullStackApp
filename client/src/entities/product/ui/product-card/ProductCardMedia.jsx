@@ -1,5 +1,5 @@
 import { WishlistToggleButton } from "../../../../features/wishlist-toggle/ui/WishlistToggleButton.jsx";
-import { PRODUCT_CARD_UI } from "../../../../shared/config/appUiCopy.js";
+import { PRODUCT_CARD_UI, PRODUCT_MODERATION_PAGE_UI } from "../../../../shared/config/appUiCopy.js";
 import { ProductMediaSlideContent } from "../ProductMediaSlideContent.jsx";
 import { ProductDiscountBadge } from "../ProductPriceDisplay.jsx";
 import { ProductLoyaltyPointsBadge } from "../ProductLoyaltyPointsBadge.jsx";
@@ -51,6 +51,11 @@ export function ProductCardMedia({ vm }) {
           currentUserId={vm.currentUserId}
           variant="card"
         />
+      ) : null}
+      {vm.showModerationPendingOverlay ? (
+        <span className="product-card__moderation-pending-overlay" role="status">
+          {PRODUCT_MODERATION_PAGE_UI.BADGE_PENDING}
+        </span>
       ) : null}
       {vm.showImageOverlayBadges ? (
         <div className="product-card__image-badges" aria-hidden="true">

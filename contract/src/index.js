@@ -148,6 +148,8 @@ export { PRODUCT_MODERATION_STATUSES, productFromApiSchema } from "./productFrom
 export {
   PRODUCT_CATEGORY_VALUES,
   PRODUCT_IMAGE_URLS_MAX,
+  PRODUCT_NAME_MAX_LENGTH,
+  PRODUCT_NAME_MIN_LENGTH,
   createProductBodySchema,
   patchMyProductBodySchema,
   productModerationFromApiSchema,
