@@ -22,7 +22,11 @@
     "test:client": "npm test --prefix client",
     "test": "npm run test:server && npm run test:packages",
     "sync:legal": "node scripts/sync-legal-operator.mjs",
-    "generate:intro-poster": "node scripts/generate-intro-poster.mjs"
+    "generate:intro-poster": "node scripts/generate-intro-poster.mjs",
+    "mongo:up": "docker compose up -d && node scripts/mongo-replica-init.mjs",
+    "mongo:down": "docker compose down",
+    "mongo:check": "node scripts/check-mongo-replica-set.mjs",
+    "test:mongo-replica": "node --test scripts/mongoReplicaSetDev.test.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",

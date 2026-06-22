@@ -11,11 +11,12 @@ Production-деплой — [`deploy/DEPLOY.md`](deploy/DEPLOY.md).
 | --------- | ------------------- |
 | **Node.js** | 20 LTS |
 | **Git** | любой свежий |
-| **MongoDB** | Atlas M0+ (рекомендуется) или локальный `mongod` с **replica set** |
+| **MongoDB** | Atlas M0+ **или** Docker (`npm run mongo:up`) с **replica set** |
+| **Docker** | только если Mongo локально через compose (см. вариант C) |
 
 Опционально для dev: Redis, SMTP, DaData, Sentry — без них базовый сценарий работает.
 
-> **Replica set:** заказы и баллы используют MongoDB transactions. Локальный `mongod` без RS — часть операций упадёт. Для dev «как на проде» — один и тот же **Atlas URI** на всех машинах.
+> **Replica set:** заказы и баллы используют MongoDB transactions. Standalone `mongod` без RS — заказы/баллы ненадёжны. Варианты: **Atlas**, **Docker** (`docker-compose.yml` в корне), или свой `mongod --replSet rs0`.
 
 ---
 
@@ -82,7 +83,7 @@ EXPO_PUBLIC_API_URL=http://192.168.1.25:4444
 
 Тот же `MONGO_URI` → те же пользователи, товары и заказы.
 
-### Вариант B — чистая локальная копия
+### Вариант B — чистая локальная копия (Atlas)
 
 ```powershell
 copy server\.env.example server\.env
@@ -93,7 +94,7 @@ copy mobile\.env.example mobile\.env
 
 ```env
 JWT_SECRET=<сгенерировать, см. ниже>
-MONGO_URI=mongodb://localhost:27017/molhaApteka
+MONGO_URI=mongodb+srv://user:password@cluster.xxxxx.mongodb.net/molhaApteka
 FRONTEND_URL=http://127.0.0.1:5173
 ```
 
@@ -113,6 +114,30 @@ cd ..
 ```
 
 Шаблоны env: `server/.env.example`, `client/.env.example`, `mobile/.env.example`.
+
+### Вариант C — локальная Mongo с replica set (Docker)
+
+Нужен [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Windows/Mac) или Docker Engine (Linux).
+
+```powershell
+# из корня репозитория
+npm run mongo:up
+npm run mongo:check
+```
+
+Проверка replica set: `npm run mongo:check` → `PRIMARY` и строка `MONGO_URI=...replicaSet=rs0`.
+
+Остановка: `npm run mongo:down` (данные в volume `izibuy_mongo_data` сохраняются).
+
+В `server/.env` (после `copy server\.env.example server\.env`):
+
+```env
+JWT_SECRET=<сгенерировать>
+MONGO_URI=mongodb://127.0.0.1:27017/molhaApteka?replicaSet=rs0
+FRONTEND_URL=http://127.0.0.1:5173
+```
+
+Дальше — миграции и admin как в варианте B.
 
 ---
 
@@ -175,7 +200,8 @@ EXPO_PUBLIC_WEB_APP_URL=http://127.0.0.1:5173
 | Mobile не достучится до API | `EXPO_PUBLIC_API_URL` = LAN IP; разрешить порт 4444 в firewall |
 | Пустой каталог / нет пользователей | другая БД; скопируйте `MONGO_URI` с рабочей машины |
 | Нет картинок товаров | скопируйте `server/uploads/` или настройте S3 в `.env` |
-| Ошибки транзакций (заказ, баллы) | Mongo без replica set → Atlas или `mongod --replSet` |
+| Ошибки транзакций (заказ, баллы) | `npm run mongo:up` + `?replicaSet=rs0` в `MONGO_URI`, или Atlas |
+| `mongo:up` падает | Docker не запущен; порт 27017 занят другим mongod |
 | CORS / cookie не сохраняются | `FRONTEND_URL=http://127.0.0.1:5173` в `server/.env` |
 
 ---
@@ -183,11 +209,14 @@ EXPO_PUBLIC_WEB_APP_URL=http://127.0.0.1:5173
 ## 7. Проверка после установки
 
 ```powershell
+npm run test:mongo-replica
 cd server
 npm test
 cd ..\mobile
 npm run regression:wf72
 ```
+
+Если Mongo через Docker: `npm run mongo:check` перед ручной проверкой заказов.
 
 ---
 
