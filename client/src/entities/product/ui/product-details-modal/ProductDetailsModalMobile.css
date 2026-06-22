@@ -218,9 +218,8 @@
 
   .product-details-modal .product-details-seller-preview {
     box-sizing: border-box;
-    width: auto;
+    width: calc(100% - 2 * var(--iz-space-4));
     margin: var(--iz-space-2) var(--iz-space-4) 0;
-    align-self: stretch;
   }
 
   .product-details-modal .product-details-modal__stats-grid--standalone {

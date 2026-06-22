@@ -98,3 +98,12 @@ export {
   shouldShowProductTier3BannerFullWidth,
 } from "./catalogTier3Banner.js";
 export type { CatalogTier3Product } from "./catalogTier3Banner.js";
+export {
+  getProductNonEmptyCharacteristics,
+  hasProductCharacteristicsContent,
+  hasProductDescriptionContent,
+} from "./productDetailsContent.js";
+export type {
+  ProductCharacteristicLike,
+  ProductDetailsContentLike,
+} from "./productDetailsContent.js";

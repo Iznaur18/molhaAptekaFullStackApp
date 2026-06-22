@@ -39,7 +39,10 @@
 }
 
 .product-promotion-modal .product-modal-shell__header .modal-section-tabs_in-header {
+  box-sizing: border-box;
   padding-top: 0;
+  margin-inline: calc(-1 * var(--iz-space-4));
+  padding-inline: var(--iz-space-4);
 }
 
 .product-promotion-modal__footer {

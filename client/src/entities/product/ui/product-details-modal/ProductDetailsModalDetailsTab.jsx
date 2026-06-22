@@ -1,14 +1,14 @@
 import { PRODUCT_DETAILS_MODAL_UI } from "../../../../shared/config/appUiCopy.js";
+import { WishlistToggleButton } from "../../../../features/wishlist-toggle/ui/WishlistToggleButton.jsx";
 import { resolveProductDiscountPercent } from "../../lib/computeProductDiscountPercent.js";
-import { ProductCharacteristicsDetails } from "../ProductCharacteristicsDetails.jsx";
+import { ProductCatalogStatusBadges } from "../ProductCatalogStatusBadges.jsx";
 import { ProductDetailsSellerPreview } from "../ProductDetailsSellerPreview.jsx";
 import { ProductMediaGalleryReadonly } from "../ProductMediaGalleryReadonly.jsx";
-import { ProductCatalogStatusBadges } from "../ProductCatalogStatusBadges.jsx";
 import {
   ProductDiscountBadge,
   ProductPriceDisplay,
 } from "../ProductPriceDisplay.jsx";
-import { WishlistToggleButton } from "../../../../features/wishlist-toggle/ui/WishlistToggleButton.jsx";
+import { ProductDetailsContentSwitcher } from "./ProductDetailsContentSwitcher.jsx";
 import { ProductDetailsModalPurchaseActions } from "./ProductDetailsModalPurchaseActions.jsx";
 import { renderProductDetailsFieldRows } from "./renderProductDetailsFieldRows.jsx";
 
@@ -50,8 +50,9 @@ export function ProductDetailsModalDetailsTab({
     handleOpenSellerProfile,
     showPriceBlock,
     topStatFieldKeys,
-    bottomBlockFieldKeys,
     bottomMetaFieldKeys,
+    contentPanels,
+    hasDetailsSection,
     canShowAddToCart,
     purchaseLimit,
     handleAuctionShortcutClick,
@@ -143,27 +144,33 @@ export function ProductDetailsModalDetailsTab({
         onOpenProfile={handleOpenSellerProfile}
       />
 
-      {(bottomBlockFieldKeys.length > 0 ||
-        bottomMetaFieldKeys.length > 0 ||
-        (Array.isArray(product.productCharacteristics) &&
-          product.productCharacteristics.length > 0)) && (
+      {hasDetailsSection ? (
         <section
           className="product-details-modal__details"
           aria-label={PRODUCT_DETAILS_MODAL_UI.DETAILS_SECTION_ARIA}
         >
-          {bottomBlockFieldKeys.length > 0 ? (
+          {contentPanels?.hasContentPanels ? (
+            <ProductDetailsContentSwitcher
+              product={product}
+              contentPanels={contentPanels}
+            />
+          ) : null}
+          {contentPanels && contentPanels.otherBlockFieldKeys.length > 0 ? (
             <dl className="product-details-modal__blocks">
-              {renderProductDetailsFieldRows(product, bottomBlockFieldKeys, fieldHandlers)}
+              {renderProductDetailsFieldRows(
+                product,
+                contentPanels.otherBlockFieldKeys,
+                fieldHandlers,
+              )}
             </dl>
           ) : null}
-          <ProductCharacteristicsDetails items={product.productCharacteristics} />
           {bottomMetaFieldKeys.length > 0 ? (
             <dl className="product-details-modal__meta-grid">
               {renderProductDetailsFieldRows(product, bottomMetaFieldKeys, fieldHandlers)}
             </dl>
           ) : null}
         </section>
-      )}
+      ) : null}
     </>
   );
 }

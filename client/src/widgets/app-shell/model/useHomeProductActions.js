@@ -72,13 +72,15 @@ export const useHomeProductActions = ({
   const syncProductEditModalState = useCallback(
     (product) => {
       const id = String(product._id);
-      setProductToEdit((prev) =>
+      const mergeProduct = (prev) =>
         prev && String(prev._id) === id
           ? { ...product, hasOpenSales: prev.hasOpenSales ?? product.hasOpenSales }
-          : prev,
-      );
+          : prev;
+
+      setProductToEdit(mergeProduct);
+      setPromotionProduct(mergeProduct);
     },
-    [setProductToEdit],
+    [setProductToEdit, setPromotionProduct],
   );
 
   const syncCatalogProductState = useCallback(

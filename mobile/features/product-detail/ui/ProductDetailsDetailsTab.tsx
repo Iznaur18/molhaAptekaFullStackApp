@@ -1,3 +1,4 @@
+import { hasProductCharacteristicsContent } from "@izibuy/shared-lib";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
 import { Pressable, Text, View } from "react-native";
@@ -7,6 +8,7 @@ import {
   PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS,
   PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS,
 } from "@/entities/product/lib/productFieldRegistry";
+import { filterProductDetailsVisibleFieldKeys } from "@/entities/product/lib/isProductDetailsFieldVisible";
 import { ProductCatalogStatusBadges } from "@/entities/product/ui/ProductCatalogStatusBadges";
 import { ProductCharacteristicsDetails } from "@/entities/product/ui/ProductCharacteristicsDetails";
 import { ProductDetailFieldRows } from "@/entities/product/ui/ProductDetailFieldRows";
@@ -45,8 +47,11 @@ export const ProductDetailsDetailsTab = ({
   const styles = useProductDetailScreenStyles();
   const name = String(product.productName ?? "").trim() || "Товар";
 
-  const bottomBlockFieldKeys = PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS.filter(
-    (key) => getProductFieldReadLayout(key) === "block",
+  const bottomBlockFieldKeys = filterProductDetailsVisibleFieldKeys(
+    PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS.filter(
+      (key) => getProductFieldReadLayout(key) === "block",
+    ),
+    product,
   );
   const bottomMetaFieldKeys = PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS.filter(
     (key) => getProductFieldReadLayout(key) === "meta",
@@ -55,7 +60,11 @@ export const ProductDetailsDetailsTab = ({
   const hasDetailsSection =
     bottomBlockFieldKeys.length > 0 ||
     bottomMetaFieldKeys.length > 0 ||
-    (Array.isArray(characteristics) && characteristics.length > 0);
+    hasProductCharacteristicsContent({
+      productDescription:
+        typeof product.productDescription === "string" ? product.productDescription : "",
+      productCharacteristics: Array.isArray(characteristics) ? characteristics : [],
+    });
 
   const reportOverlay =
     !isOwnProduct ? (

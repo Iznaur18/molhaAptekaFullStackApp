@@ -13,6 +13,7 @@ import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
  * @property {boolean} [detailsTop]
  * @property {boolean} [detailsBottom]
  * @property {boolean} [detailsBottomStaffOnly]
+ * @property {boolean} [detailsHideWhenEmpty]
  */
 
 /** @type {Record<string, ProductFieldRegistryEntry>} */
@@ -36,6 +37,7 @@ export const PRODUCT_FIELD_REGISTRY = {
     multilineRead: true,
     editKind: "textarea",
     detailsBottom: true,
+    detailsHideWhenEmpty: true,
   },
   productImageUrls: {
     labelRu: "Фото (URL)",
@@ -44,6 +46,7 @@ export const PRODUCT_FIELD_REGISTRY = {
     multilineRead: true,
     editKind: "images",
     detailsBottomStaffOnly: true,
+    detailsHideWhenEmpty: true,
   },
   productPreviewVideoUrl: {
     labelRu: "Превью-видео (URL)",

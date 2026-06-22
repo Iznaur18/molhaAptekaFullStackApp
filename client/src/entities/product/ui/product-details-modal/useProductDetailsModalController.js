@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useRecordProductViewMutation } from "../../model/useRecordProductViewMutation.js";
 import { resolveProductImageUrls } from "../../lib/resolveProductImageUrls.js";
 import { resolveProductPreviewVideoUrl } from "../../lib/resolveProductPreviewVideoUrl.js";
+
 import {
   PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS,
   PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS_STAFF,
@@ -10,6 +11,8 @@ import {
   PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS_ADMIN,
 } from "../../model/productConstants.js";
 import { getProductFieldReadLayout } from "../../lib/productFieldRegistry.js";
+import { filterProductDetailsVisibleFieldKeys } from "../../lib/isProductDetailsFieldVisible.js";
+import { resolveProductDetailsContentPanels } from "../../lib/resolveProductDetailsContentPanels.js";
 import { useAuthSession } from "../../../user/model/useAuthSession.js";
 import { getProductPurchaseLimit } from "../../lib/getProductPurchaseLimit.js";
 import { PRODUCT_REVIEW_UI } from "../../../../shared/config/appUiCopy.js";
@@ -109,12 +112,32 @@ export function useProductDetailsModalController({
       key !== "productPrice" &&
       !(tabs.isOwnProduct && key === "productWishlistCount"),
   );
-  const bottomBlockFieldKeys = bottomRowFieldKeys.filter(
-    (key) => getProductFieldReadLayout(key) === "block",
-  );
-  const bottomMetaFieldKeys = bottomRowFieldKeys.filter(
-    (key) => getProductFieldReadLayout(key) === "meta",
-  );
+  const bottomBlockFieldKeys = useMemo(() => {
+    if (!product) return [];
+    return filterProductDetailsVisibleFieldKeys(
+      bottomRowFieldKeys.filter((key) => getProductFieldReadLayout(key) === "block"),
+      product,
+    );
+  }, [bottomRowFieldKeys, product]);
+  const bottomMetaFieldKeys = useMemo(() => {
+    if (!product) return [];
+    return filterProductDetailsVisibleFieldKeys(
+      bottomRowFieldKeys.filter((key) => getProductFieldReadLayout(key) === "meta"),
+      product,
+    );
+  }, [bottomRowFieldKeys, product]);
+  const contentPanels = useMemo(() => {
+    if (!product) return null;
+    return resolveProductDetailsContentPanels(product, bottomBlockFieldKeys);
+  }, [bottomBlockFieldKeys, product]);
+  const hasDetailsSection = useMemo(() => {
+    if (!product || !contentPanels) return false;
+    return (
+      contentPanels.hasContentPanels ||
+      contentPanels.otherBlockFieldKeys.length > 0 ||
+      bottomMetaFieldKeys.length > 0
+    );
+  }, [bottomMetaFieldKeys, contentPanels, product]);
   const purchaseLimit = product ? getProductPurchaseLimit(product) : 0;
   const canShowAddToCart =
     showAddToCart && product?._id != null && !tabs.isOwnProduct && purchaseLimit > 0;
@@ -140,6 +163,8 @@ export function useProductDetailsModalController({
     topStatFieldKeys,
     bottomBlockFieldKeys,
     bottomMetaFieldKeys,
+    contentPanels,
+    hasDetailsSection,
     canShowAddToCart,
     purchaseLimit,
     reviewsTabLabel,

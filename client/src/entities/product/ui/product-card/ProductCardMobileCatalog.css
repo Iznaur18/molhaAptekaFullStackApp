@@ -10,7 +10,10 @@
     --product-card-mobile-price-height: 1.3rem;
     --product-card-mobile-rating-height: 1.25rem;
     --product-card-mobile-status-badges-height: calc(0.72rem * 1.35 + 0.4rem + 2px);
-    --product-card-mobile-meta-height: 44px;
+    --product-card-mobile-meta-height: calc(
+      var(--product-card-mobile-rating-height) + 2px +
+        var(--product-card-mobile-status-badges-height)
+    );
     --product-card-mobile-fields-height: 0.84rem;
     --product-card-mobile-cart-height: 2.15rem;
     --product-card-mobile-footer-slot-height: var(--product-card-mobile-cart-height);
@@ -431,5 +434,52 @@
     .product-card__value--seller-inline {
     overflow: visible;
     text-overflow: clip;
+  }
+
+  .product-card:not(.product-card--banner-layout) .product-card__seller-toolbar .product-card__promote,
+  .product-card:not(.product-card--banner-layout) .product-card__seller-toolbar .product-card__edit {
+    font-size: 0.72rem;
+    padding: 0.3rem 0.35rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .app-shell__cell:not(.app-shell__cell--tier3-full-width):has(.product-card__seller-toolbar),
+  .product-card:not(.product-card--banner-layout):has(.product-card__seller-toolbar) {
+    --product-card-mobile-footer-slot-height: calc(
+      2 * var(--product-card-mobile-cart-height) + 0.45rem
+    );
+    --product-card-mobile-fixed-height: calc(
+      0.45rem + var(--product-card-mobile-footer-gap) +
+        var(--product-card-mobile-details-height) + var(--product-card-mobile-footer-gap) +
+        var(--product-card-mobile-footer-slot-height)
+    );
+  }
+
+  .app-shell__cell:not(.app-shell__cell--tier3-full-width):has(.product-card__seller-toolbar) {
+    height: var(--product-card-mobile-fixed-height);
+    min-height: var(--product-card-mobile-fixed-height);
+    max-height: var(--product-card-mobile-fixed-height);
+  }
+
+  .product-card:not(.product-card--banner-layout):has(.product-card__seller-toolbar) {
+    height: var(--product-card-mobile-fixed-height);
+    min-height: var(--product-card-mobile-fixed-height);
+    max-height: var(--product-card-mobile-fixed-height);
+  }
+
+  .product-card:not(.product-card--banner-layout) .product-card__seller-toolbar {
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .product-card:not(.product-card--banner-layout) .product-card__seller-toolbar .product-card__promote,
+  .product-card:not(.product-card--banner-layout) .product-card__seller-toolbar .product-card__edit {
+    flex: none;
+    width: 100%;
+    min-height: var(--product-card-mobile-cart-height);
+    font-size: 0.74rem;
+    padding: 0.32rem 0.4rem;
+    box-sizing: border-box;
   }
 }

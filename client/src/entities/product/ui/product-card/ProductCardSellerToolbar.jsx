@@ -12,7 +12,6 @@ export function ProductCardSellerToolbar({ vm }) {
   }
 
   const promoteDisabled = isProductPromoteButtonDisabled({
-    productIsAvailable: vm.product.productIsAvailable,
     isDeletePending: vm.isDeletePending,
     isAvailabilityTogglePending: vm.isAvailabilityTogglePending,
     isAuctionTogglePending: vm.isAuctionTogglePending,

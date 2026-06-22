@@ -1,3 +1,5 @@
+import { getProductNonEmptyCharacteristics } from "@izibuy/shared-lib";
+
 import { PRODUCT_DETAILS_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 
 import "./ProductCharacteristicsDetails.css";
@@ -5,12 +7,11 @@ import "./ProductCharacteristicsDetails.css";
 /**
  * @param {{
  *   items?: import('../model/types.js').ProductCharacteristic[];
+ *   showTitle?: boolean;
  * }} props
  */
-export function ProductCharacteristicsDetails({ items }) {
-  const rows = Array.isArray(items)
-    ? items.filter((item) => item?.key?.trim() && item?.value?.trim())
-    : [];
+export function ProductCharacteristicsDetails({ items, showTitle = true }) {
+  const rows = getProductNonEmptyCharacteristics(items);
 
   if (rows.length === 0) {
     return null;
@@ -21,9 +22,11 @@ export function ProductCharacteristicsDetails({ items }) {
       className="product-characteristics-details"
       aria-label={PRODUCT_DETAILS_MODAL_UI.CHARACTERISTICS_SECTION_ARIA}
     >
-      <h3 className="product-characteristics-details__title">
-        {PRODUCT_DETAILS_MODAL_UI.CHARACTERISTICS_TITLE}
-      </h3>
+      {showTitle ? (
+        <h3 className="product-characteristics-details__title">
+          {PRODUCT_DETAILS_MODAL_UI.CHARACTERISTICS_TITLE}
+        </h3>
+      ) : null}
       <dl className="product-characteristics-details__list">
         {rows.map((item) => (
           <div key={item.key} className="product-characteristics-details__row">

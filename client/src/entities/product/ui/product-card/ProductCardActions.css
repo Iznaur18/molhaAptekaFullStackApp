@@ -15,7 +15,11 @@
 .product-card__seller-toolbar .product-card__promote,
 .product-card__seller-toolbar .product-card__edit {
   flex: 1 1 0;
+  width: auto;
   min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .product-card__open-sales-hint {

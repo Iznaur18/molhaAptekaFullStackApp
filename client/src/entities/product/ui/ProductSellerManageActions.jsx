@@ -151,7 +151,6 @@ export function ProductSellerManageActions({
             type="button"
             className="product-card__promote"
             disabled={isProductPromoteButtonDisabled({
-              productIsAvailable: product.productIsAvailable,
               isDeletePending,
               isAvailabilityTogglePending,
               isAuctionTogglePending,

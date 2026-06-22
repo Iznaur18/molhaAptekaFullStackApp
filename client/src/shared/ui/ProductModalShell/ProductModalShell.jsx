@@ -138,7 +138,9 @@ export function ProductModalShell({
                 <ModalCloseIcon />
               </button>
             </div>
-            {headerAddon}
+            {headerAddon ? (
+              <div className="product-modal-shell__header-addon">{headerAddon}</div>
+            ) : null}
           </header>
         )}
         <div ref={bodyRef} className={bodyClass}>

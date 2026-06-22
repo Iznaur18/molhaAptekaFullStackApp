@@ -2,18 +2,11 @@
   --product-card-delete-accent: var(--iz-color-danger);
   --product-card-radius: var(--iz-radius-lg);
   --product-card-inner-radius: var(--iz-radius-pill);
-  --product-edit-manage-btn-size-scale: 1.4;
-  --product-edit-manage-btn-padding-block: calc(
-    0.45rem * var(--product-edit-manage-btn-size-scale)
-  );
-  --product-edit-manage-btn-padding-inline: calc(
-    0.65rem * var(--product-edit-manage-btn-size-scale)
-  );
 
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0.55rem;
   width: 100%;
   margin-top: 0.25rem;
   padding-top: 0.75rem;
@@ -35,13 +28,20 @@
   color: var(--iz-color-danger-strong);
 }
 
-.product-edit-manage .product-card__availability-toggle,
-.product-edit-manage .product-card__delete,
-.product-edit-manage .product-card__raffle-toggle,
-.product-edit-manage .product-card__availability-pending,
-.product-edit-manage .product-card__delete-pending,
+.product-edit-manage__toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.product-edit-manage .product-card__delete-confirm {
+  padding: 0.65rem 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--product-card-delete-accent) 35%, transparent);
+  border-radius: 0.65rem;
+  background: color-mix(in srgb, var(--product-card-delete-accent) 8%, var(--iz-color-surface));
+}
+
 .product-edit-manage .product-card__delete-confirm-yes,
 .product-edit-manage .product-card__delete-confirm-cancel {
-  padding-block: var(--product-edit-manage-btn-padding-block);
-  padding-inline: var(--product-edit-manage-btn-padding-inline);
+  padding: 0.45rem 0.75rem;
 }

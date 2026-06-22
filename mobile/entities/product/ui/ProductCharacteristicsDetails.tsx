@@ -1,3 +1,4 @@
+import { getProductNonEmptyCharacteristics } from "@izibuy/shared-lib";
 import { Text, View } from "react-native";
 
 import { PRODUCT_DETAILS_MODAL_UI } from "@/shared/config";
@@ -13,14 +14,9 @@ type ProductCharacteristicsDetailsProps = {
   items?: CharacteristicItem[] | null;
 };
 
-const resolveCharacteristicKey = (item: CharacteristicItem): string =>
-  item.key?.trim() || item.name?.trim() || "";
-
 export const ProductCharacteristicsDetails = ({ items }: ProductCharacteristicsDetailsProps) => {
   const styles = useProductCharacteristicsDetailsStyles();
-  const rows = Array.isArray(items)
-    ? items.filter((item) => resolveCharacteristicKey(item) && item.value?.trim())
-    : [];
+  const rows = getProductNonEmptyCharacteristics(items);
 
   if (rows.length === 0) {
     return null;
@@ -33,15 +29,12 @@ export const ProductCharacteristicsDetails = ({ items }: ProductCharacteristicsD
     >
       <Text style={styles.title}>{PRODUCT_DETAILS_MODAL_UI.CHARACTERISTICS_TITLE}</Text>
       <View style={styles.list}>
-        {rows.map((item) => {
-          const key = resolveCharacteristicKey(item);
-          return (
-            <View key={key} style={styles.row}>
-              <Text style={styles.key}>{key}</Text>
-              <Text style={styles.value}>{item.value?.trim()}</Text>
-            </View>
-          );
-        })}
+        {rows.map((item) => (
+          <View key={item.key} style={styles.row}>
+            <Text style={styles.key}>{item.key}</Text>
+            <Text style={styles.value}>{item.value}</Text>
+          </View>
+        ))}
       </View>
     </View>
   );

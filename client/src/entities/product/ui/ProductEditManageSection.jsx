@@ -4,9 +4,9 @@ import { isProductRaffleParticipant } from "../../raffle/lib/isProductRafflePart
 import { PRODUCT_CARD_UI } from "../../../shared/config/appUiCopy.js";
 import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 
+import { ProductManageToggleRow } from "./ProductManageToggleRow.jsx";
 import "./ProductCard.css";
 import "./ProductEditManageSection.css";
-import "./ProductSellerManageActions.css";
 
 /**
  * @param {{
@@ -58,6 +58,7 @@ export function ProductEditManageSection({
   const showVisibility = typeof onSetAvailability === "function" && canToggleVisibility;
   const showAuctionToggle = typeof onSetAuction === "function" && canEdit;
   const isAuctionEnabled = product.productAuctionEnabled === true;
+  const isInstallmentEnabled = product.productInstallmentEnabled === true;
   const showDelete = canDelete;
   const showRaffleToggle =
     sellerRaffleActive && typeof onToggleRaffleParticipation === "function";
@@ -97,133 +98,127 @@ export function ProductEditManageSection({
           {PRODUCT_CARD_UI.OPEN_SALES_LOCKED_HINT}
         </p>
       ) : null}
-      {showAuctionToggle ? (
-        isAuctionTogglePending ? (
-          <p className="product-card__availability-pending" aria-live="polite">
-            {PRODUCT_CARD_UI.AUCTION_TOGGLE_PENDING}
-          </p>
-        ) : (
-          <div className="product-card__availability">
-            <button
-              type="button"
-              className="product-card__auction-toggle product-card__availability-toggle"
-              disabled={actionsLocked}
-              onClick={() => {
-                if (product._id == null || actionsLocked) return;
-                void onSetAuction(String(product._id), !isAuctionEnabled);
-              }}
-            >
-              {isAuctionEnabled
-                ? PRODUCT_CARD_UI.AUCTION_TOGGLE_OFF
-                : PRODUCT_CARD_UI.AUCTION_TOGGLE_ON}
-            </button>
-          </div>
-        )
-      ) : null}
-      {showRaffleToggle ? (
-        <button
-          type="button"
-          className="product-card__raffle-toggle"
-          disabled={
-            isRaffleParticipationPending ||
-            isDeletePending ||
-            isAvailabilityTogglePending ||
-            isAuctionTogglePending ||
-            disabled
-          }
-          onClick={() => {
-            onToggleRaffleParticipation?.(product, !isRaffleParticipant);
-          }}
-        >
-          {isRaffleParticipationPending
-            ? PRODUCT_CARD_UI.RAFFLE_PARTICIPATION_PENDING
-            : isRaffleParticipant
-              ? PRODUCT_CARD_UI.RAFFLE_PARTICIPATION_ON
-              : PRODUCT_CARD_UI.RAFFLE_PARTICIPATION_OFF}
-        </button>
-      ) : null}
-      {showInstallmentButton ? (
-        <button
-          type="button"
-          className="product-card__availability-toggle product-card__installment-toggle"
-          disabled={
-            disabled ||
-            isDeletePending ||
-            isAvailabilityTogglePending ||
-            isAuctionTogglePending ||
-            isRaffleParticipationPending ||
-            !canOpenInstallmentProgram
-          }
-          onClick={(event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            onOpenInstallmentProgram?.();
-          }}
-        >
-          {PRODUCT_CARD_UI.INSTALLMENT_SELL_BUTTON}
-        </button>
-      ) : null}
-      {showDelete ? (
-        isDeletePending ? (
-          <p className="product-card__delete-pending" aria-live="polite">
-            {PRODUCT_CARD_UI.DELETE_PRODUCT_PENDING}
-          </p>
-        ) : isDeleteConfirmOpen ? (
-          <div className="product-card__delete-confirm" role="group">
-            <p className="product-card__delete-confirm-question">
-              {PRODUCT_CARD_UI.DELETE_CONFIRM_QUESTION}
-            </p>
-            <div className="product-card__delete-confirm-actions">
-              <button
-                type="button"
-                className="product-card__delete-confirm-yes"
-                onClick={handleDeleteConfirmYes}
-              >
-                {PRODUCT_CARD_UI.DELETE_CONFIRM_YES}
-              </button>
-              <button
-                type="button"
-                className="product-card__delete-confirm-cancel"
-                onClick={() => setIsDeleteConfirmOpen(false)}
-              >
-                {PRODUCT_CARD_UI.DELETE_CONFIRM_CANCEL}
-              </button>
+      <div className="product-edit-manage__toggles">
+        {showAuctionToggle ? (
+          <ProductManageToggleRow
+            title={CREATE_PRODUCT_MODAL_UI.MANAGE_AUCTION_TITLE}
+            titleStatus={
+              isAuctionEnabled
+                ? CREATE_PRODUCT_MODAL_UI.MANAGE_AUCTION_STATUS_ACTIVE
+                : CREATE_PRODUCT_MODAL_UI.MANAGE_AUCTION_STATUS_INACTIVE
+            }
+            description={CREATE_PRODUCT_MODAL_UI.MANAGE_AUCTION_HINT}
+            checked={isAuctionEnabled}
+            disabled={actionsLocked}
+            pending={isAuctionTogglePending}
+            pendingLabel={PRODUCT_CARD_UI.AUCTION_TOGGLE_PENDING}
+            variant="auction"
+            onCheckedChange={() => {
+              if (product._id == null || actionsLocked) return;
+              void onSetAuction(String(product._id), !isAuctionEnabled);
+            }}
+          />
+        ) : null}
+        {showRaffleToggle ? (
+          <ProductManageToggleRow
+            title={CREATE_PRODUCT_MODAL_UI.MANAGE_RAFFLE_TITLE}
+            description={CREATE_PRODUCT_MODAL_UI.MANAGE_RAFFLE_HINT}
+            checked={isRaffleParticipant}
+            disabled={
+              isRaffleParticipationPending ||
+              isDeletePending ||
+              isAvailabilityTogglePending ||
+              isAuctionTogglePending ||
+              disabled
+            }
+            pending={isRaffleParticipationPending}
+            pendingLabel={PRODUCT_CARD_UI.RAFFLE_PARTICIPATION_PENDING}
+            onCheckedChange={() => {
+              onToggleRaffleParticipation?.(product, !isRaffleParticipant);
+            }}
+          />
+        ) : null}
+        {showInstallmentButton ? (
+          <ProductManageToggleRow
+            title={CREATE_PRODUCT_MODAL_UI.MANAGE_INSTALLMENT_TITLE}
+            description={CREATE_PRODUCT_MODAL_UI.MANAGE_INSTALLMENT_HINT}
+            checked={isInstallmentEnabled}
+            disabled={
+              disabled ||
+              isDeletePending ||
+              isAvailabilityTogglePending ||
+              isAuctionTogglePending ||
+              isRaffleParticipationPending ||
+              !canOpenInstallmentProgram
+            }
+            variant="installment"
+            onPress={() => onOpenInstallmentProgram?.()}
+          />
+        ) : null}
+        {showDelete ? (
+          isDeletePending ? (
+            <ProductManageToggleRow
+              title={CREATE_PRODUCT_MODAL_UI.MANAGE_DELETE_TITLE}
+              description={CREATE_PRODUCT_MODAL_UI.MANAGE_DELETE_HINT}
+              pending
+              pendingLabel={PRODUCT_CARD_UI.DELETE_PRODUCT_PENDING}
+            />
+          ) : isDeleteConfirmOpen ? (
+            <div className="product-card__delete-confirm" role="group">
+              <p className="product-card__delete-confirm-question">
+                {PRODUCT_CARD_UI.DELETE_CONFIRM_QUESTION}
+              </p>
+              <div className="product-card__delete-confirm-actions">
+                <button
+                  type="button"
+                  className="product-card__delete-confirm-yes"
+                  onClick={handleDeleteConfirmYes}
+                >
+                  {PRODUCT_CARD_UI.DELETE_CONFIRM_YES}
+                </button>
+                <button
+                  type="button"
+                  className="product-card__delete-confirm-cancel"
+                  onClick={() => setIsDeleteConfirmOpen(false)}
+                >
+                  {PRODUCT_CARD_UI.DELETE_CONFIRM_CANCEL}
+                </button>
+              </div>
             </div>
-          </div>
-        ) : (
-          <button
-            type="button"
-            className="product-card__delete"
-            disabled={hasOpenSalesLocked || disabled}
-            onClick={() => setIsDeleteConfirmOpen(true)}
-          >
-            {PRODUCT_CARD_UI.DELETE_PRODUCT}
-          </button>
-        )
-      ) : null}
-      {showVisibility ? (
-        isAvailabilityTogglePending ? (
-          <p className="product-card__availability-pending" aria-live="polite">
-            {PRODUCT_CARD_UI.AVAILABILITY_TOGGLE_PENDING}
-          </p>
-        ) : (
-          <div className="product-card__availability">
-            <button
-              type="button"
-              className="product-card__availability-toggle"
-              disabled={actionsLocked}
-              onClick={() => {
-                if (product._id == null || actionsLocked) return;
-                void onSetAvailability(String(product._id), !isListedForOthers);
-              }}
-            >
-              {isListedForOthers
-                ? PRODUCT_CARD_UI.HIDE_FROM_CATALOG
-                : PRODUCT_CARD_UI.SHOW_IN_CATALOG}
-            </button>
-          </div>
-        )
-      ) : null}
+          ) : (
+            <ProductManageToggleRow
+              title={CREATE_PRODUCT_MODAL_UI.MANAGE_DELETE_TITLE}
+              description={CREATE_PRODUCT_MODAL_UI.MANAGE_DELETE_HINT}
+              disabled={hasOpenSalesLocked || disabled}
+              variant="danger"
+              onPress={() => setIsDeleteConfirmOpen(true)}
+            />
+          )
+        ) : null}
+        {showVisibility ? (
+          <ProductManageToggleRow
+            title={CREATE_PRODUCT_MODAL_UI.MANAGE_VISIBILITY_TITLE_VISIBLE}
+            titleStatus={
+              isListedForOthers
+                ? CREATE_PRODUCT_MODAL_UI.MANAGE_VISIBILITY_STATUS_VISIBLE
+                : CREATE_PRODUCT_MODAL_UI.MANAGE_VISIBILITY_STATUS_HIDDEN
+            }
+            description={
+              isListedForOthers
+                ? CREATE_PRODUCT_MODAL_UI.MANAGE_VISIBILITY_HINT_VISIBLE
+                : CREATE_PRODUCT_MODAL_UI.MANAGE_VISIBILITY_HINT_HIDDEN
+            }
+            checked={isListedForOthers}
+            disabled={actionsLocked}
+            pending={isAvailabilityTogglePending}
+            pendingLabel={PRODUCT_CARD_UI.AVAILABILITY_TOGGLE_PENDING}
+            onCheckedChange={() => {
+              if (product._id == null || actionsLocked) return;
+              void onSetAvailability(String(product._id), !isListedForOthers);
+            }}
+          />
+        ) : null}
+      </div>
     </section>
   );
 }

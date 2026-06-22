@@ -151,8 +151,8 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
-    height: 44px;
-    min-height: 44px;
+    min-height: calc(1.25rem + 2px + 0.72rem * 1.35 + 0.4rem + 2px);
+    height: auto;
     font-size: 1rem;
   }
 }
@@ -164,13 +164,14 @@
 .product-card__status-badges-row {
   display: flex;
   justify-content: flex-start;
-  align-items: flex-start;
+  align-items: center;
   flex-wrap: nowrap;
   gap: 6px;
   min-width: 0;
+  min-height: calc(0.72rem * 1.35 + 0.4rem + 2px);
   max-width: 100%;
   overflow-x: scroll;
-  overflow-y: hidden;
+  overflow-y: visible;
   overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-x pan-y;
