@@ -5,6 +5,7 @@ import {
   PRODUCT_CHARACTERISTICS_MAX_ITEMS,
 } from "../model/productCharacteristicsConstants.js";
 import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
+import { FormFieldLabel } from "../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
 import { getProductFieldEditLabel } from "../lib/productFieldRegistry.js";
 
 import "./ProductCharacteristicsEditor.css";
@@ -44,7 +45,9 @@ export function ProductCharacteristicsEditor({ rows, onRowsChange, disabled }) {
       aria-label={CREATE_PRODUCT_MODAL_UI.CHARACTERISTICS_SECTION_ARIA}
     >
       <legend className="product-characteristics-editor__legend">
-        {getProductFieldEditLabel("productCharacteristics")}
+        <FormFieldLabel>
+          {getProductFieldEditLabel("productCharacteristics")}
+        </FormFieldLabel>
       </legend>
       <p className="product-characteristics-editor__hint">
         {CREATE_PRODUCT_MODAL_UI.HINT_CHARACTERISTICS(
@@ -60,7 +63,7 @@ export function ProductCharacteristicsEditor({ rows, onRowsChange, disabled }) {
               aria-label={CREATE_PRODUCT_MODAL_UI.CHARACTERISTIC_ROW_ARIA(index + 1)}
             >
               <input
-                className="product-characteristics-editor__input"
+                className="create-product-section__input product-characteristics-editor__input"
                 type="text"
                 value={row.key}
                 onChange={(event) =>
@@ -72,7 +75,7 @@ export function ProductCharacteristicsEditor({ rows, onRowsChange, disabled }) {
                 autoComplete="off"
               />
               <input
-                className="product-characteristics-editor__input"
+                className="create-product-section__input product-characteristics-editor__input"
                 type="text"
                 value={row.value}
                 onChange={(event) =>
