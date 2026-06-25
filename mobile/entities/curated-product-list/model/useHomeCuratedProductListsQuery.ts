@@ -4,9 +4,17 @@ import { curatedProductListQueryKeys } from "@/shared/api";
 
 import { fetchHomeCuratedProductLists } from "../api/fetchHomeCuratedProductLists";
 
-export const useHomeCuratedProductListsQuery = (enabled = true) =>
+type HomeCuratedProductListsQueryOptions = {
+  enabled?: boolean;
+  allCities?: boolean;
+};
+
+export const useHomeCuratedProductListsQuery = ({
+  enabled = true,
+  allCities = false,
+}: HomeCuratedProductListsQueryOptions = {}) =>
   useQuery({
-    queryKey: curatedProductListQueryKeys.home(),
-    queryFn: fetchHomeCuratedProductLists,
+    queryKey: curatedProductListQueryKeys.home(allCities),
+    queryFn: () => fetchHomeCuratedProductLists({ allCities }),
     enabled,
   });

@@ -1,3 +1,4 @@
+import type { ProfileSectionId } from "@izibuy/shared-lib";
 import {
   PROFILE_SECTION_ADMIN_ORDERS,
   PROFILE_SECTION_APP_INTRO_ADMIN,

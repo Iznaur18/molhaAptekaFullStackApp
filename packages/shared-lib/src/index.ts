@@ -61,6 +61,7 @@ export {
 export type {
   RaffleFeaturedBannerLayoutMode,
   RaffleFeaturedBannerMetrics,
+  RaffleFeaturedBannerMetricsOptions,
 } from "./raffleFeaturedBannerMetrics.js";
 export {
   isProfileStaffInAppSection,

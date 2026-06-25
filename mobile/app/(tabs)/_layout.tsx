@@ -21,6 +21,21 @@ export default function TabLayout() {
       tabBar={(props) => <MobileBottomTabBar {...props} />}
       screenOptions={{
         tabBarShowLabel: false,
+        tabBarStyle: {
+          position: "absolute",
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: "transparent",
+          borderTopWidth: 0,
+          elevation: 0,
+          shadowOpacity: 0,
+          pointerEvents: "box-none",
+        },
+        tabBarBackground: () => null,
+        sceneStyle: {
+          backgroundColor: theme.colors.bg,
+        },
         headerStyle: {
           backgroundColor: theme.colors.surface,
         },
@@ -39,6 +54,7 @@ export default function TabLayout() {
         name="catalog"
         options={{
           title: CATALOG_BROWSER_UI.TITLE,
+          headerShown: false,
         }}
       />
       <Tabs.Screen
@@ -46,6 +62,7 @@ export default function TabLayout() {
         options={{
           href: null,
           title: HUB_SECTION_UI.SCREEN_TITLE,
+          headerShown: false,
         }}
       />
       <Tabs.Screen
@@ -53,12 +70,14 @@ export default function TabLayout() {
         options={{
           href: null,
           title: MOBILE_BOTTOM_NAV_UI.TAB_PLACE_PRODUCT,
+          headerShown: false,
         }}
       />
       <Tabs.Screen
         name="cart"
         options={{
           title: CART_PAGE_UI.TITLE,
+          headerShown: false,
         }}
       />
       <Tabs.Screen
@@ -66,6 +85,7 @@ export default function TabLayout() {
         options={{
           href: null,
           title: MY_ORDERS_PAGE_UI.TITLE,
+          headerShown: false,
         }}
       />
       <Tabs.Screen
@@ -73,6 +93,7 @@ export default function TabLayout() {
         options={{
           href: null,
           title: USERS_PAGE_UI.TITLE,
+          headerShown: false,
         }}
       />
       <Tabs.Screen

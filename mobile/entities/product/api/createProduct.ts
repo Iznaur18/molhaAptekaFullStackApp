@@ -14,10 +14,13 @@ export const createProduct = async (body: CreateProductBody) => {
       productName: parsedBody.productName.trim(),
       productDescription: parsedBody.productDescription.trim(),
       productPrice: parsedBody.productPrice,
-      productOldPrice: parsedBody.productOldPrice ?? null,
       productIsAvailable: parsedBody.productIsAvailable,
       productCategoryId: parsedBody.productCategoryId,
     };
+
+    if (parsedBody.productOldPrice != null) {
+      payload.productOldPrice = parsedBody.productOldPrice;
+    }
 
     if (parsedBody.productIsAvailable === true) {
       payload.productStockQuantity = parsedBody.productStockQuantity;
@@ -28,6 +31,32 @@ export const createProduct = async (body: CreateProductBody) => {
       : [];
     if (urls.length > 0) {
       payload.productImageUrls = urls;
+    }
+
+    const previewVideoUrl = String(parsedBody.productPreviewVideoUrl ?? "").trim();
+    if (previewVideoUrl) {
+      payload.productPreviewVideoUrl = previewVideoUrl;
+    }
+
+    const saleCity = String(parsedBody.productSaleCity ?? "").trim();
+    if (saleCity) {
+      payload.productSaleCity = saleCity;
+    }
+
+    if (
+      parsedBody.loyaltyPointsPerUnit != null &&
+      parsedBody.loyaltyPointsPerUnit > 0
+    ) {
+      payload.loyaltyPointsPerUnit = parsedBody.loyaltyPointsPerUnit;
+    }
+
+    const characteristics = Array.isArray(parsedBody.productCharacteristics)
+      ? parsedBody.productCharacteristics.filter(
+          (row) => row.key.trim() && row.value.trim(),
+        )
+      : [];
+    if (characteristics.length > 0) {
+      payload.productCharacteristics = characteristics;
     }
 
     const { data } = await apiClient.post("/product", payload);

@@ -106,7 +106,7 @@ export const ProductDetailsDetailsTab = ({
           <ProductPriceDisplay product={product} showLabel={false} variant="detail" />
           <View style={styles.priceBadgeRow}>
             <ProductDiscountBadge product={product} variant="detail" />
-            <ProductCatalogStatusBadges product={product} />
+            <ProductCatalogStatusBadges product={product} showNoStatusPlaceholder={false} />
           </View>
         </View>
 

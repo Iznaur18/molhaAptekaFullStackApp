@@ -85,7 +85,7 @@ export const priceOfferQueryKeys = {
 
 export const curatedProductListQueryKeys = {
   all: ["curated-product-lists"] as const,
-  home: () => [...curatedProductListQueryKeys.all, "home"] as const,
+  home: (allCities = false) => [...curatedProductListQueryKeys.all, "home", { allCities }] as const,
 };
 
 export const raffleQueryKeys = {

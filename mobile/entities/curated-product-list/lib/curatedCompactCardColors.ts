@@ -1,8 +1,8 @@
 /** Синхронизировано с client CuratedProductCompactCard.css + designTokens.css */
 export const CURATED_COMPACT_CARD_COLORS = {
-  border: "#e2e8f0",
-  imageBg: "#f3f4f6",
+  border: "#e5e7eb",
+  imageBg: "#f8fafc",
   imageFallbackText: "#374151",
-  priceBg: "#eef2ff",
-  priceText: "#4f46e5",
+  priceBg: "#1d9bf0",
+  priceText: "#ffffff",
 } as const;

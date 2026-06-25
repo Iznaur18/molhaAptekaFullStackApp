@@ -30,3 +30,9 @@ export const parseUserBackgroundPresetId = (stored: unknown): string | null => {
 
 export const getUserBackgroundPresetById = (id: string) =>
   USER_BACKGROUND_PRESETS.find((row) => row.id === id) ?? null;
+
+export const formatUserBackgroundPresetValue = (id: string): string =>
+  `${USER_BACKGROUND_PRESET_PREFIX}${id}`;
+
+export const getDefaultUserBackgroundStoredValue = (): string =>
+  formatUserBackgroundPresetValue(DEFAULT_USER_BACKGROUND_PRESET_ID);

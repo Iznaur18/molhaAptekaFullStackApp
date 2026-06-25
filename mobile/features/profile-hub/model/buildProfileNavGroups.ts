@@ -35,7 +35,7 @@ export const buildProfileNavGroups = (
     return count > 0 ? count : undefined;
   };
 
-  const tradeItems = PROFILE_TRADE_SECTION_ORDER.flatMap((sectionId) => {
+  const tradeItems: ProfileNavItem[] = PROFILE_TRADE_SECTION_ORDER.flatMap((sectionId): ProfileNavItem[] => {
     if (sectionId === "my-products") {
       return [
         {
@@ -95,7 +95,7 @@ export const buildProfileNavGroups = (
     return [];
   });
 
-  const accountItems = PROFILE_ACCOUNT_SECTION_ORDER.flatMap((sectionId) => {
+  const accountItems: ProfileNavItem[] = PROFILE_ACCOUNT_SECTION_ORDER.flatMap((sectionId): ProfileNavItem[] => {
     if (sectionId === "subscriptions") {
       return [
         {
@@ -158,7 +158,7 @@ export const buildProfileNavGroups = (
     return [];
   });
 
-  const staffItems: ProfileNavItem[] = PROFILE_STAFF_SECTION_ORDER.flatMap((sectionId) => {
+  const staffItems: ProfileNavItem[] = PROFILE_STAFF_SECTION_ORDER.flatMap((sectionId): ProfileNavItem[] => {
     if (sectionId === "create-raffle" && access.canUseCreateRaffle) {
       return [
         {

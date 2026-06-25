@@ -112,7 +112,7 @@ export const CheckoutForm = ({
 
       <AppButton
         label={CHECKOUT_FORM_UI.SUBMIT_IDLE}
-        variant="contrast"
+        variant="primary"
         onPress={handleSubmit}
         disabled={isFormDisabled}
         style={checkoutStyles.submitSpacer}

@@ -12,6 +12,7 @@ import { AppText } from "@/shared/ui/AppText";
 type ProductCatalogStatusBadgesProps = {
   product: Record<string, unknown>;
   showHiddenBadge?: boolean;
+  showNoStatusPlaceholder?: boolean;
 };
 
 type StatusBadgeItem = {
@@ -23,6 +24,7 @@ type StatusBadgeItem = {
 export const ProductCatalogStatusBadges = ({
   product,
   showHiddenBadge = false,
+  showNoStatusPlaceholder = true,
 }: ProductCatalogStatusBadgesProps) => {
   const flags = useProductCardChromeFlags(product);
 
@@ -78,7 +80,20 @@ export const ProductCatalogStatusBadges = ({
     });
   }
 
-  if (badges.length === 0) {
+  const visibleBadges =
+    badges.length > 0
+      ? badges
+      : showNoStatusPlaceholder
+        ? [
+            {
+              key: "placeholder",
+              label: PRODUCT_CARD_UI.NO_STATUS_BADGE,
+              variant: "placeholder" as const,
+            },
+          ]
+        : [];
+
+  if (visibleBadges.length === 0) {
     return null;
   }
 
@@ -90,10 +105,17 @@ export const ProductCatalogStatusBadges = ({
       accessibilityLabel={PRODUCT_CARD_UI.STATUS_BADGES_ARIA}
       contentContainerStyle={productStatusBadgeScrollStyles.content}
     >
-      {badges.map((badge) => {
+      {visibleBadges.map((badge) => {
         const variantStyle = productStatusBadgeVariantStyles[badge.variant];
         return (
-          <View key={badge.key} style={variantStyle.badge}>
+          <View
+            key={badge.key}
+            style={variantStyle.badge}
+            accessibilityRole="text"
+            accessibilityLabel={
+              badge.variant === "placeholder" ? PRODUCT_CARD_UI.NO_STATUS_BADGE : badge.label
+            }
+          >
             <AppText style={variantStyle.text}>{badge.label}</AppText>
           </View>
         );

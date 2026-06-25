@@ -26,6 +26,9 @@ export const PRODUCT_CARD_BADGE_COLORS = {
   raffleBorder: "rgba(167, 139, 250, 0.4)",
   raffleBg: "#ede9fe",
   raffleText: "#5b21b6",
+  statusPlaceholderBorder: "#e2e8f0",
+  statusPlaceholderBg: "#f1f5f9",
+  statusPlaceholderText: "rgba(17, 24, 39, 0.48)",
   priceCurrent: "#1d4ed8",
   rating: "#b45309",
   ratingPlaceholder: "rgba(17, 24, 39, 0.48)",
@@ -39,6 +42,18 @@ export const PRODUCT_CARD_IMAGE_BADGE_OVERLAY = {
   discountText: "rgba(153, 27, 27, 0.88)",
   loyaltyBackground: "rgba(220, 252, 231, 0.72)",
   loyaltyText: "rgba(22, 101, 52, 0.88)",
+} as const;
+
+/** ProductPriceDisplay.css + ProductCardMedia.css (0.72rem / 0.35rem) */
+export const PRODUCT_CARD_IMAGE_BADGE_OVERLAY_LAYOUT = {
+  borderRadius: 5.6,
+  paddingVertical: 3.2,
+  paddingHorizontal: 8,
+  fontSize: 11.52,
+  lineHeight: 15.47,
+  gap: 4.8,
+  insetX: 12,
+  insetBottom: 6.6,
 } as const;
 
 export const PRODUCT_CARD_MOBILE_LAYOUT = {
@@ -71,8 +86,8 @@ export const PRODUCT_CARD_BADGE_LAYOUT = {
   paddingHorizontalWide: 8.8,
   paddingVerticalCompact: 2.4,
   paddingHorizontalCompact: 7.2,
-  /** 0.35rem — ProductCardMobileCatalog.css */
-  imageInsetX: 5.6,
+  /** 0.75rem — mobile catalog image badge inset */
+  imageInsetX: 12,
   /** calc(0.35rem + 1px) — ProductCardMobileCatalog.css */
   imageInsetBottom: 6.6,
   imageGap: 4.8,
@@ -80,3 +95,34 @@ export const PRODUCT_CARD_BADGE_LAYOUT = {
   sellerBadgeSize: 15,
   sellerNameGap: 4,
 } as const;
+
+/** client ProductCardMedia.css `.product-card__image-nav-btn` */
+export const PRODUCT_CARD_IMAGE_NAV_CHROME = {
+  size: 28,
+  rowPaddingHorizontal: 2.4,
+  fontSize: 16,
+  lineHeight: 16,
+  borderWidth: 1,
+  backgroundSurfaceOpacity: 0.42,
+  buttonOpacity: 0.88,
+  blurRadius: 4,
+} as const;
+
+const mixHexWithAlpha = (hexColor: string, opacity: number): string => {
+  const hex = hexColor.replace("#", "");
+  if (hex.length !== 6) {
+    return `rgba(255, 255, 255, ${opacity})`;
+  }
+
+  const r = Number.parseInt(hex.slice(0, 2), 16);
+  const g = Number.parseInt(hex.slice(2, 4), 16);
+  const b = Number.parseInt(hex.slice(4, 6), 16);
+
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+};
+
+export const resolveProductCardImageNavBackground = (surfaceColor: string): string =>
+  mixHexWithAlpha(surfaceColor, PRODUCT_CARD_IMAGE_NAV_CHROME.backgroundSurfaceOpacity);
+
+export const resolveProductCardImageNavBorderColor = (textColor: string): string =>
+  mixHexWithAlpha(textColor, 0.14);

@@ -9,6 +9,7 @@ type ResetHomeCatalogFiltersParams = {
   setSelectedSubcategoryId: (value: string | null) => void;
   setSelectedSellerPersonalCategoryId: (value: string | null) => void;
   setFeedFilters: (value: HomeCatalogFeedFiltersState) => void;
+  setCatalogAllCities?: (value: boolean) => void;
   emptyFeedFilters: HomeCatalogFeedFiltersState;
 };
 
@@ -19,6 +20,7 @@ export const useResetHomeCatalogFilters = ({
   setSelectedSubcategoryId,
   setSelectedSellerPersonalCategoryId,
   setFeedFilters,
+  setCatalogAllCities,
   emptyFeedFilters,
 }: ResetHomeCatalogFiltersParams) =>
   useCallback(() => {
@@ -28,8 +30,10 @@ export const useResetHomeCatalogFilters = ({
     setSelectedSubcategoryId(null);
     setSelectedSellerPersonalCategoryId(null);
     setFeedFilters(emptyFeedFilters);
+    setCatalogAllCities?.(false);
   }, [
     emptyFeedFilters,
+    setCatalogAllCities,
     setDebouncedSearch,
     setFeedFilters,
     setSearchInput,

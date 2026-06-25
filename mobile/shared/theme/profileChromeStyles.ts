@@ -151,6 +151,14 @@ export const useProfileOverviewBannerStyles = createThemedStyles((theme) => ({
     top: 12,
     right: 12,
     zIndex: 2,
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.45)",
+    backgroundColor: "rgba(255,255,255,0.82)",
+    alignItems: "center",
+    justifyContent: "center",
   },
 }));
 

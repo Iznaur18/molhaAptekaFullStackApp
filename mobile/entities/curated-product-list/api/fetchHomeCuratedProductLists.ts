@@ -8,9 +8,11 @@ export type HomeCuratedProductList = {
   products: Array<Record<string, unknown> & { _id: string }>;
 };
 
-export const fetchHomeCuratedProductLists = async () => {
+export const fetchHomeCuratedProductLists = async ({ allCities = false }: { allCities?: boolean } = {}) => {
   try {
-    const { data } = await apiClient.get("/product/curated-lists/home");
+    const { data } = await apiClient.get("/product/curated-lists/home", {
+      params: allCities ? { allCities: "true" } : undefined,
+    });
     if (!data?.success || !Array.isArray(data.data?.lists)) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }

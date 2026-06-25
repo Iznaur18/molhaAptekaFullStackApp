@@ -108,11 +108,9 @@ export default function ProfileScreen() {
           </View>
         ) : null}
 
-        <View style={styles.bodyCard}>
-          <ProfileTabOverviewSection
-            onEditPress={() => router.push({ pathname: "/profile/edit" })}
-          />
-        </View>
+        <ProfileTabOverviewSection
+          onEditPress={() => router.push({ pathname: "/profile/edit" })}
+        />
 
         <Pressable style={styles.legalLink} onPress={() => router.push("/legal/privacy")}>
           <Text style={styles.legalLinkText}>{LEGAL_UI.PRIVACY_LINK}</Text>

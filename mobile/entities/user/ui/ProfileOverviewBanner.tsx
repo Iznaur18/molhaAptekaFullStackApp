@@ -1,6 +1,7 @@
+import { Feather } from "@expo/vector-icons";
 import { useMemo, useState } from "react";
 import { Image } from "expo-image";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 
 import { isPremiumActive } from "@/entities/user/lib/isPremiumActive";
 import {
@@ -13,7 +14,6 @@ import { resolveUserProfileBackgroundFromUser } from "@/entities/user/lib/resolv
 import { UserPremiumAvatar } from "@/entities/user/ui/UserPremiumAvatar";
 import { MY_PROFILE_PAGE_UI } from "@/shared/config";
 import { useProfileOverviewBannerStyles } from "@/shared/theme/profileChromeStyles";
-import { AppButton } from "@/shared/ui/AppButton";
 
 type ProfileOverviewBannerProps = {
   user: Record<string, unknown>;
@@ -86,12 +86,13 @@ export const ProfileOverviewBanner = ({
         ) : null}
 
         {showEditButton && onEditPress ? (
-          <AppButton
-            label={MY_PROFILE_PAGE_UI.EDIT_PROFILE}
-            variant="contrast"
-            onPress={onEditPress}
+          <Pressable
             style={styles.editButton}
-          />
+            onPress={onEditPress}
+            accessibilityLabel={MY_PROFILE_PAGE_UI.EDIT_PROFILE}
+          >
+            <Feather name="edit-2" size={16} color="#111827" />
+          </Pressable>
         ) : null}
       </View>
     </View>

@@ -4,12 +4,14 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg";
 import {
   PRODUCT_CARD_PROMOTION_BANNER_INNER_FRAME,
   PRODUCT_CARD_PROMOTION_COMPACT_FRAME,
+  PRODUCT_CARD_PROMOTION_PREMIUM_COMPACT_FRAME,
   type ProductCardPromotionTier,
 } from "@/entities/product/lib/productCardPromotionFramePalette";
 
 type ProductCardPromotionBackgroundProps = {
   tier: ProductCardPromotionTier;
   variant?: "compact" | "banner-inner";
+  isPremium?: boolean;
   borderRadius?: number;
   style?: StyleProp<ViewStyle>;
 };
@@ -17,10 +19,11 @@ type ProductCardPromotionBackgroundProps = {
 export const ProductCardPromotionBackground = ({
   tier,
   variant = "compact",
+  isPremium = false,
   borderRadius = 14,
   style,
 }: ProductCardPromotionBackgroundProps) => {
-  const gradientId = `productPromotion-${variant}-${tier}`;
+  const gradientId = `productPromotion-${variant}-${tier}-${isPremium ? "premium" : "base"}`;
 
   if (variant === "banner-inner") {
     const palette = PRODUCT_CARD_PROMOTION_BANNER_INNER_FRAME;
@@ -41,7 +44,9 @@ export const ProductCardPromotionBackground = ({
     );
   }
 
-  const palette = PRODUCT_CARD_PROMOTION_COMPACT_FRAME[tier];
+  const palette = isPremium
+    ? PRODUCT_CARD_PROMOTION_PREMIUM_COMPACT_FRAME[tier]
+    : PRODUCT_CARD_PROMOTION_COMPACT_FRAME[tier];
 
   return (
     <View style={[StyleSheet.absoluteFill, { borderRadius }, style]} pointerEvents="none">

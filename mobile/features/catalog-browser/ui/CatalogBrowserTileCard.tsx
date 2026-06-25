@@ -35,7 +35,7 @@ export const CatalogBrowserTileCard = ({
   const isFeedTile = variant === "feed";
 
   return (
-    <View style={[styles.wrap, { width: tileWidth }]}>
+    <View style={[styles.wrap, { width: tileWidth, height: tileWidth + 40 }]}>
       <Pressable
         style={[styles.card, isFeedTile && styles.cardFeed]}
         onPress={onPress}

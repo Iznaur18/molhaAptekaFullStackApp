@@ -228,7 +228,7 @@ export const postMultipart = async <TResponse = unknown>(
         delete headers["Content-Type"];
       }
       if (typeof requestConfig?.transformRequest === "function") {
-        return requestConfig.transformRequest(payload, headers);
+        return (requestConfig.transformRequest as (data: unknown, headers: unknown) => unknown)(payload, headers);
       }
       return payload;
     },

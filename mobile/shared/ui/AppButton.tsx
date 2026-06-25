@@ -1,4 +1,9 @@
 import { Pressable, Text, type PressableProps, type StyleProp, type ViewStyle } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
@@ -82,9 +87,16 @@ export const AppButton = ({
   variant = "primary",
   disabled,
   style,
+  onPressIn,
+  onPressOut,
   ...pressableProps
 }: AppButtonProps) => {
   const styles = useStyles();
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
 
   const variantStyle =
     variant === "secondary"
@@ -113,12 +125,22 @@ export const AppButton = ({
             : styles.labelOnPrimary;
 
   return (
-    <Pressable
-      style={[styles.base, variantStyle, disabled && styles.disabled, style]}
-      disabled={disabled}
-      {...pressableProps}
-    >
-      <Text style={[styles.label, labelStyle]}>{label}</Text>
-    </Pressable>
+    <Animated.View style={[animatedStyle, style]}>
+      <Pressable
+        style={[styles.base, variantStyle, disabled && styles.disabled]}
+        disabled={disabled}
+        onPressIn={(e) => {
+          scale.value = withSpring(0.96, { damping: 18, stiffness: 350 });
+          onPressIn?.(e);
+        }}
+        onPressOut={(e) => {
+          scale.value = withSpring(1, { damping: 18, stiffness: 350 });
+          onPressOut?.(e);
+        }}
+        {...pressableProps}
+      >
+        <Text style={[styles.label, labelStyle]}>{label}</Text>
+      </Pressable>
+    </Animated.View>
   );
 };

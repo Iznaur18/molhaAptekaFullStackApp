@@ -106,12 +106,37 @@ export const EDIT_PROFILE_UI = {
   USERNAME_HINT: "Только a–z и 0–9, без пробелов, 3–30 символов",
   LABEL_PHONE: "Телефон",
   LABEL_AVATAR: "Аватар",
+  LABEL_BIRTH_DATE: "Дата рождения",
+  PLACEHOLDER_BIRTH_DATE: "ГГГГ-ММ-ДД",
+  LABEL_GENDER: "Пол",
   LABEL_NOTIFICATIONS: "Уведомления по email",
+  LABEL_NOTES: "Заметки",
+  CHARS_USED: (used: number, max: number) => `${used} / ${max}`,
+  LABEL_BACKGROUND: "Фон профиля",
+  BG_MODE_PRESET: "Цвет",
+  BG_MODE_IMAGE: "Фото",
+  BG_PRESET_LEGEND: "Выберите цвет фона",
+  BG_UPLOAD_BUTTON: "Загрузить фото фона",
+  BG_REMOVE_IMAGE: "Убрать фото",
   SUBMIT: "Сохранить",
   SAVED: "Профиль сохранён",
   SAVE_ERROR: "Не удалось сохранить",
   NOTHING_TO_SAVE: "Нет изменений для сохранения",
   AUTH_REQUIRED: "Войдите, чтобы редактировать профиль",
+} as const;
+
+export const ADDRESS_STRUCTURED_UI = {
+  SECTION_LABEL: "Адрес",
+  LABEL_CITY: "Город",
+  LABEL_DISTRICT: "Район",
+  LABEL_STREET: "Улица",
+  LABEL_HOUSE: "Дом",
+  LABEL_FLAT: "Квартира",
+  PLACEHOLDER_CITY: "Москва",
+  PLACEHOLDER_DISTRICT: "Необязательно",
+  PLACEHOLDER_STREET: "ул. Примерная",
+  PLACEHOLDER_HOUSE: "12",
+  PLACEHOLDER_FLAT: "Необязательно",
 } as const;
 
 export const ADMIN_EDIT_USER_UI = {
@@ -201,6 +226,7 @@ export const PRODUCT_DETAILS_MODAL_UI = {
 export const PRODUCT_CARD_UI = {
   DISCOUNT_BADGE: (percent: number) => `скидка -${percent}%`,
   STATUS_BADGES_ARIA: "Статусы товара",
+  NO_STATUS_BADGE: "нет бейджа",
   PROMOTED_BADGE: "Буст",
   PROMOTION_TOP_BADGE: "Топ",
   PROMOTION_BANNER_BADGE: "Баннер",
@@ -348,6 +374,7 @@ export const USER_STORY_UI = {
   STORY_REPORTS_ACTION_DISMISS: "Отклонить жалобы",
   STORY_REPORTS_ACTION_HIDE: "Скрыть сторис",
   STORY_REPORTS_ACTION_PENDING: "Сохраняем…",
+  MEDIA_LOAD_ERROR: "Не удалось загрузить медиафайл",
   PREV_STORY: "Предыдущий",
   NEXT_STORY: "Следующий",
 } as const;
@@ -403,6 +430,8 @@ export const RAFFLE_FEATURED_BANNER_UI = {
   OPEN_INSTAGRAM: "Итоги в Instagram",
   DESCRIPTION_MODAL_TITLE: "Описание",
   DESCRIPTION_OPEN_ARIA: "Открыть полное описание розыгрыша",
+  INFO_TOGGLE_OPEN_ARIA: "Показать название и описание розыгрыша",
+  INFO_TOGGLE_CLOSE_ARIA: "Скрыть название и описание розыгрыша",
   CLOSE: "Закрыть",
 } as const;
 

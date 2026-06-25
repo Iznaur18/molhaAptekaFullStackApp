@@ -60,6 +60,71 @@ export const PRODUCT_CARD_PROMOTION_COMPACT_FRAME: Record<
   },
 };
 
+export type ProductCardPromotionFrameSurface = Pick<
+  ProductCardPromotionFramePalette,
+  | "borderWidth"
+  | "borderColor"
+  | "shadowColor"
+  | "shadowOpacity"
+  | "shadowRadius"
+  | "shadowOffsetY"
+  | "elevation"
+> & {
+  backgroundColor?: string;
+};
+
+/** product-card-premium-frame > .product-card */
+export const PRODUCT_CARD_PREMIUM_ONLY_FRAME: ProductCardPromotionFrameSurface = {
+  borderWidth: 2,
+  borderColor: "#d4af37",
+  backgroundColor: "#ffffff",
+  shadowColor: "transparent",
+  shadowOpacity: 0,
+  shadowRadius: 0,
+  shadowOffsetY: 0,
+  elevation: 0,
+};
+
+/** product-card-promotion-frame.product-card-premium-frame--tier-* */
+export const PRODUCT_CARD_PROMOTION_PREMIUM_COMPACT_FRAME: Record<
+  ProductCardPromotionTier,
+  ProductCardPromotionFramePalette
+> = {
+  [PRODUCT_CARD_PROMOTION_TIER.GOLD]: {
+    borderWidth: 2,
+    borderColor: "#d97706",
+    gradientStart: "#fff4d6",
+    gradientEnd: "#fffef5",
+    shadowColor: "#d97706",
+    shadowOpacity: 0.14,
+    shadowRadius: 12,
+    shadowOffsetY: 2,
+    elevation: 2,
+  },
+  [PRODUCT_CARD_PROMOTION_TIER.TOP]: {
+    borderWidth: 2,
+    borderColor: "#8c4fcc",
+    gradientStart: "#ebe4fd",
+    gradientEnd: "#f3efff",
+    shadowColor: "#7c3aed",
+    shadowOpacity: 0.28,
+    shadowRadius: 16,
+    shadowOffsetY: 4,
+    elevation: 3,
+  },
+  [PRODUCT_CARD_PROMOTION_TIER.BANNER]: {
+    borderWidth: 2,
+    borderColor: "#c9a227",
+    gradientStart: "#fef2f2",
+    gradientEnd: "#fffafa",
+    shadowColor: "#dc2626",
+    shadowOpacity: 0.18,
+    shadowRadius: 24,
+    shadowOffsetY: 6,
+    elevation: 4,
+  },
+};
+
 /** ProductCardBannerLayout.css — inner banner card */
 export const PRODUCT_CARD_PROMOTION_BANNER_INNER_FRAME = {
   borderWidth: 1,

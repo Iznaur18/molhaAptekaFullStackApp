@@ -10,7 +10,7 @@ const CLIENT_ROOT = join(MOBILE_ROOT, "..", "client");
 const readFile = (root, relativePath) =>
   readFileSync(join(root, relativePath), "utf8");
 
-const SCREEN_CONTENT_PADDING_HORIZONTAL = 14;
+const SCREEN_CONTENT_PADDING_HORIZONTAL = 16;
 const SCREEN_CONTENT_PADDING_BOTTOM = 18;
 
 const resolveScreenContentPaddingHorizontal = (insets = {}) =>
@@ -23,14 +23,15 @@ const resolveScreenContentPaddingHorizontal = (insets = {}) =>
 test("mobile content padding constants increased for edge safety", () => {
   const source = readFile(MOBILE_ROOT, "shared/theme/screenContentLayout.ts");
 
-  assert.match(source, /SCREEN_CONTENT_PADDING_HORIZONTAL = 14/);
+  assert.match(source, /SCREEN_CONTENT_PADDING_HORIZONTAL = 16/);
   assert.match(source, /SCREEN_CONTENT_PADDING_BOTTOM = 18/);
+  assert.match(source, /resolveScreenContentPaddingBottom/);
   assert.match(source, /resolveScreenContentPaddingHorizontal/);
 });
 
 test("resolveScreenContentPaddingHorizontal respects safe area", () => {
-  assert.equal(resolveScreenContentPaddingHorizontal(), 14);
-  assert.equal(resolveScreenContentPaddingHorizontal({ left: 0, right: 0 }), 14);
+  assert.equal(resolveScreenContentPaddingHorizontal(), 16);
+  assert.equal(resolveScreenContentPaddingHorizontal({ left: 0, right: 0 }), 16);
   assert.equal(resolveScreenContentPaddingHorizontal({ left: 20, right: 0 }), 20);
 });
 
@@ -60,7 +61,11 @@ test("mobile bottom nav layout matches web inset constants", () => {
 
   assert.match(source, /MOBILE_BOTTOM_NAV_HORIZONTAL_INSET = 12/);
   assert.match(source, /MOBILE_BOTTOM_NAV_FLOAT_OFFSET = 10/);
+  assert.match(source, /resolveMobileBottomNavReservedHeight/);
   assert.match(tabBar, /resolveMobileBottomNavHorizontalInset/);
+  assert.match(tabBar, /pointerEvents: "box-none"/);
+  assert.match(tabBar, /backgroundColor: "transparent"/);
   assert.match(tabBar, /theme\.radius\.pill/);
+  assert.doesNotMatch(tabBar, /MobileBottomNavGlassLayer/);
   assert.match(tabBar, /itemActive[\s\S]*`\$\{theme\.colors\.action\}1A`/);
 });

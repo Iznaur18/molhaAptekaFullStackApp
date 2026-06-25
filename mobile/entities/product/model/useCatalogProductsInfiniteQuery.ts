@@ -23,6 +23,7 @@ export const useCatalogProductsInfiniteQuery = (filters: CatalogListFilters) => 
         auctionOnly: filters.auctionOnly,
         installmentOnly: filters.installmentOnly,
         saleOnly: filters.saleOnly,
+        allCities: filters.allCities,
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {

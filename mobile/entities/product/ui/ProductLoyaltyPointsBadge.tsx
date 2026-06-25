@@ -33,8 +33,11 @@ export const ProductLoyaltyPointsBadge = ({
       : PRODUCT_CARD_UI.LOYALTY_POINTS_WITH_PREMIUM(points);
 
   return (
-    <View style={[styles.badge, variant === "overlay" && styles.badgeOverlay]}>
-      <AppText style={[styles.badgeText, variant === "overlay" && styles.badgeOverlayText]}>
+    <View style={variant === "overlay" ? styles.badgeOverlay : styles.badge}>
+      <AppText
+        style={variant === "overlay" ? styles.badgeOverlayText : styles.badgeText}
+        numberOfLines={1}
+      >
         {label}
       </AppText>
     </View>

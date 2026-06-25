@@ -159,24 +159,26 @@ export default function CartScreen() {
 
   const listFooter = (
     <View style={styles.footer}>
-      <View style={styles.totalRow}>
-        <Text style={styles.totalLabel}>{totalLabel}</Text>
-        <Text style={styles.totalValue}>{formatPriceRub(checkoutSummary.displayTotal)}</Text>
+      <View style={styles.summaryCard}>
+        <View style={styles.totalRow}>
+          <Text style={styles.totalLabel}>{totalLabel}</Text>
+          <Text style={styles.totalValue}>{formatPriceRub(checkoutSummary.displayTotal)}</Text>
+        </View>
+
+        {checkoutSummary.hasExcludedLines ? (
+          <Text style={styles.fullTotalHint}>
+            {formatPriceRub(checkoutSummary.fullTotal)}
+          </Text>
+        ) : null}
+
+        <Pressable
+          style={[styles.clearButton, isUpdating && styles.buttonDisabled]}
+          onPress={() => clearCart()}
+          disabled={isUpdating}
+        >
+          <Text style={styles.clearButtonText}>{CART_PAGE_UI.CLEAR_ALL}</Text>
+        </Pressable>
       </View>
-
-      {checkoutSummary.hasExcludedLines ? (
-        <Text style={styles.fullTotalHint}>
-          {CART_PAGE_UI.FULL_TOTAL_HINT}: {formatPriceRub(checkoutSummary.fullTotal)}
-        </Text>
-      ) : null}
-
-      <Pressable
-        style={[styles.clearButton, isUpdating && styles.buttonDisabled]}
-        onPress={() => clearCart()}
-        disabled={isUpdating}
-      >
-        <Text style={styles.clearButtonText}>{CART_PAGE_UI.CLEAR_ALL}</Text>
-      </Pressable>
 
       {!canCheckout && checkoutSummary.checkoutBlockReason ? (
         <Text style={styles.checkoutHint}>{checkoutSummary.checkoutBlockReason}</Text>

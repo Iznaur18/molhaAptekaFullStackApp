@@ -12,7 +12,8 @@ export type ProductStatusBadgeVariant =
   | "promotionBanner"
   | "auction"
   | "installment"
-  | "raffle";
+  | "raffle"
+  | "placeholder";
 
 const baseText: TextStyle = {
   fontSize: BL.fontSize,
@@ -76,6 +77,16 @@ export const productStatusBadgeVariantStyles: Record<
   auction: createBadge(BC.auctionBorder, BC.auctionBg, BC.auctionText),
   installment: createBadge(BC.installmentBorder, BC.installmentBg, BC.installmentText),
   raffle: createBadge(BC.raffleBorder, BC.raffleBg, BC.raffleText, { fontWeight: "600" }),
+  placeholder: createBadge(
+    BC.statusPlaceholderBorder,
+    BC.statusPlaceholderBg,
+    BC.statusPlaceholderText,
+    {
+      paddingHorizontal: BL.paddingHorizontalCompact,
+      paddingVertical: BL.paddingVerticalCompact,
+      fontWeight: "500",
+    },
+  ),
 };
 
 export const productStatusBadgeScrollStyles = StyleSheet.create({

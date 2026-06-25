@@ -4,7 +4,6 @@ import { RAFFLE_FEATURED_BANNER_CHROME as L } from "@izibuy/shared-lib";
 
 import { RAFFLE_FEATURED_PALETTE as P } from "@/entities/raffle/lib/raffleFeaturedPalette";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
-import { SCREEN_CONTENT_SECTION_GAP } from "@/shared/theme/screenContentLayout";
 
 const BANNER_BORDER_RADIUS = 16;
 const VISUAL_RADIUS_TOP = 11;
@@ -12,13 +11,21 @@ const VISUAL_RADIUS_BOTTOM = 9.6;
 const BADGE_INSET = 7;
 const SOUND_BUTTON_INSET = 7;
 const SOUND_BUTTON_SIZE = 32;
+/** Web `margin: 0 0 1.25rem` on header / raffle carousel @ 16px. */
+const BANNER_SECTION_MARGIN = 20;
+const BANNER_BOTTOM_MARGIN = BANNER_SECTION_MARGIN;
+
+const withAlpha = (hex: string, alphaHex: string): string => `${hex}${alphaHex}`;
 
 export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
   root: {
     width: "100%",
     maxWidth: "100%",
     overflow: "hidden",
-    marginBottom: SCREEN_CONTENT_SECTION_GAP,
+    marginBottom: BANNER_BOTTOM_MARGIN,
+  },
+  rootInCarousel: {
+    marginBottom: 0,
   },
   inner: {
     position: "relative",
@@ -33,10 +40,16 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     shadowOpacity: 0.12,
     shadowRadius: 24,
     elevation: 4,
+    backgroundColor: "transparent",
+  },
+  innerHasBackdrop: {
+    backgroundColor: withAlpha(theme.colors.surface, "D6"),
+    borderColor: withAlpha(P.premiumPurpleMuted, "B3"),
   },
   innerStacked: {
     flexDirection: "column",
-    paddingTop: 0,
+    gap: L.stackedGridGap,
+    paddingTop: L.innerPaddingTop,
     paddingHorizontal: L.innerPaddingHorizontal,
     paddingBottom: L.innerPaddingBottom,
   },
@@ -52,16 +65,44 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     borderColor: P.successLight,
     shadowColor: P.successVivid,
   },
+  innerCompletedBackdrop: {
+    borderColor: withAlpha(P.successLight, "B3"),
+  },
+  backdropSlot: {
+    ...StyleSheet.absoluteFillObject,
+    top: "-14%",
+    bottom: "-14%",
+    left: "-14%",
+    right: "-14%",
+    overflow: "hidden",
+    zIndex: 0,
+  },
+  backdropMedia: {
+    ...StyleSheet.absoluteFillObject,
+    opacity: 0.82,
+    transform: [{ scale: 1.06 }],
+  },
+  backdropScrim: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: withAlpha(theme.colors.surface, "2E"),
+    zIndex: 0,
+  },
+  backdropScrimCompleted: {
+    backgroundColor: withAlpha(theme.colors.surface, "9E"),
+  },
   visual: {
     position: "relative",
     overflow: "hidden",
     backgroundColor: "rgba(0,0,0,0.06)",
+    zIndex: 1,
   },
   visualStacked: {
     alignSelf: "stretch",
-    marginHorizontal: -L.innerPaddingHorizontal,
-    borderTopLeftRadius: BANNER_BORDER_RADIUS - 2,
-    borderTopRightRadius: BANNER_BORDER_RADIUS - 2,
+    marginTop: -L.imageBleedTop,
+    marginBottom: 0,
+    marginHorizontal: -L.imageBleedHorizontal,
+    borderTopLeftRadius: VISUAL_RADIUS_TOP,
+    borderTopRightRadius: VISUAL_RADIUS_TOP,
     borderBottomLeftRadius: VISUAL_RADIUS_BOTTOM,
     borderBottomRightRadius: VISUAL_RADIUS_BOTTOM,
   },
@@ -116,15 +157,77 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     fontSize: 11,
     fontWeight: "700",
   },
+  infoToggle: {
+    position: "absolute",
+    top: 7,
+    right: 7,
+    zIndex: 4,
+    width: 28,
+    height: 28,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: P.onContrast,
+    borderRadius: 999,
+    backgroundColor: "rgba(0,0,0,0.45)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.35,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  infoToggleOpen: {
+    backgroundColor: P.accentPurple,
+  },
+  infoToggleText: {
+    color: P.onContrast,
+    fontSize: 15,
+    fontWeight: "800",
+    lineHeight: 16,
+  },
+  infoPanel: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 2,
+    opacity: 0,
+  },
+  infoPanelOpen: {
+    opacity: 1,
+  },
+  infoPanelScroll: {
+    flex: 1,
+  },
+  infoPanelContent: {
+    flexGrow: 1,
+    gap: 8,
+    paddingTop: 42,
+    paddingHorizontal: 12,
+    paddingBottom: 12,
+    backgroundColor: "rgba(0,0,0,0.78)",
+  },
+  infoTitle: {
+    fontSize: 17,
+    lineHeight: 22,
+    fontWeight: "700",
+    color: P.onContrast,
+  },
+  infoDescription: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: P.onContrast,
+  },
   body: {
     minWidth: 0,
     paddingTop: L.bodyPaddingTop,
     gap: 0,
+    zIndex: 1,
   },
   bodySplit: {
     flex: 1,
     minWidth: 0,
     justifyContent: "space-between",
+  },
+  bodyStacked: {
+    paddingTop: 0,
   },
   title: {
     marginBottom: L.titleMarginBottom,
@@ -141,6 +244,12 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     color: theme.colors.text,
     opacity: 0.88,
   },
+  copyOnBackdrop: {
+    color: P.onContrast,
+    textShadowColor: "rgba(0,0,0,0.4)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+  },
   progressWrap: {
     marginBottom: L.progressMarginBottom,
   },
@@ -150,6 +259,9 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     backgroundColor: P.progressTrack,
     overflow: "hidden",
   },
+  progressBarBackdrop: {
+    backgroundColor: "rgba(255,255,255,0.38)",
+  },
   progressBarCompleted: {
     backgroundColor: P.progressTrackCompleted,
   },
@@ -158,12 +270,15 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     borderRadius: 999,
     backgroundColor: P.accentPurple,
   },
+  progressFillBackdrop: {
+    backgroundColor: P.onContrast,
+  },
   progressFillCompleted: {
     backgroundColor: P.successVivid,
   },
   progressLabel: {
     marginTop: L.progressLabelMarginTop,
-    fontSize: 14,
+    fontSize: 13.6,
     lineHeight: L.progressLabelLineHeight,
     fontWeight: "600",
     color: theme.colors.text,
@@ -182,29 +297,25 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     flexDirection: "row",
     flexWrap: "wrap",
     alignItems: "center",
-    gap: 8,
+    gap: L.actionsGap,
     marginTop: "auto",
-    minHeight: L.actionsMinHeight,
   },
   btnPrimary: {
-    paddingVertical: 7,
+    paddingVertical: 7.2,
     paddingHorizontal: 12,
     borderRadius: 10,
-    borderWidth: 1,
-    borderColor: P.accentPurple,
-    backgroundColor: P.accentPurpleSoft,
+    backgroundColor: P.accentPurple,
   },
   btnPrimaryCompleted: {
-    borderColor: P.success,
-    backgroundColor: P.successPale,
+    backgroundColor: P.successDeep,
   },
   btnPrimaryText: {
-    fontSize: 14,
+    fontSize: 13.6,
     fontWeight: "600",
-    color: P.accentPurpleText,
+    color: P.onContrast,
   },
   btnPrimaryTextCompleted: {
-    color: P.successMuted,
+    color: P.onContrast,
   },
   btnInstagram: {
     paddingVertical: 7,
@@ -352,12 +463,15 @@ export const useRaffleFeaturedCarouselStyles = createThemedStyles(() => ({
     width: "100%",
     maxWidth: "100%",
     overflow: "hidden",
-    marginBottom: 0,
+    marginTop: BANNER_SECTION_MARGIN,
+    marginBottom: BANNER_SECTION_MARGIN,
   },
   singleSlide: {
     width: "100%",
     maxWidth: "100%",
     overflow: "hidden",
+    marginTop: BANNER_SECTION_MARGIN,
+    marginBottom: BANNER_SECTION_MARGIN,
   },
 }));
 

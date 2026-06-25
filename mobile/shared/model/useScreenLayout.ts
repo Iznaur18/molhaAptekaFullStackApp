@@ -3,8 +3,8 @@ import { useWindowDimensions, type ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {
+  resolveScreenContentPaddingBottom,
   resolveScreenContentPaddingHorizontal,
-  SCREEN_CONTENT_PADDING_BOTTOM,
 } from "@/shared/theme/screenContentLayout";
 import {
   resolveContentMaxWidth,
@@ -52,7 +52,7 @@ export const useScreenLayout = (): ScreenLayout => {
     const contentMaxWidth = resolveContentMaxWidth(width);
     const profileContentMaxWidth = resolveProfileContentMaxWidth(width);
     const contentPaddingHorizontal = resolveScreenContentPaddingHorizontal(safeAreaInsets);
-    const contentPaddingBottom = SCREEN_CONTENT_PADDING_BOTTOM;
+    const contentPaddingBottom = resolveScreenContentPaddingBottom(safeAreaInsets.bottom);
 
     const centeredContentStyle: ViewStyle = contentMaxWidth
       ? { width: "100%", maxWidth: contentMaxWidth, alignSelf: "center" }
@@ -81,5 +81,5 @@ export const useScreenLayout = (): ScreenLayout => {
       centeredContentStyle,
       profileContentStyle,
     };
-  }, [height, safeAreaInsets.left, safeAreaInsets.right, width]);
+  }, [height, safeAreaInsets.bottom, safeAreaInsets.left, safeAreaInsets.right, width]);
 };

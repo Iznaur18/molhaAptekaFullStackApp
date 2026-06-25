@@ -6,6 +6,7 @@ export type UserStoryRing = {
   author: { _id: string; userName?: string; userAvatarUrl?: string | null };
   isOwn?: boolean;
   isViewed?: boolean;
+  activeCount?: number;
   latestPublishedAt?: string | null;
 };
 

@@ -8,10 +8,21 @@ export const RU_PHONE_E164_REGEX = /^\+79\d{9}$/;
 export const USER_ROLE_USER = "user";
 export const USER_ROLE_ADMIN = "admin";
 
+export const USER_GENDER_MALE = "male";
+export const USER_GENDER_FEMALE = "female";
+export const USER_GENDER_NO_SELECTED = "noSelected";
+
 export const USER_GENDER_LABEL_RU: Record<string, string> = {
   male: "Мужской",
   female: "Женский",
+  noSelected: "Не указан",
 };
+
+export const ADDRESS_CITY_MAX_LENGTH = 80;
+export const ADDRESS_DISTRICT_MAX_LENGTH = 80;
+export const ADDRESS_STREET_MAX_LENGTH = 80;
+export const ADDRESS_HOUSE_MAX_LENGTH = 20;
+export const ADDRESS_FLAT_MAX_LENGTH = 20;
 
 export const USER_ROLE_LABEL_RU: Record<string, string> = {
   user: "Пользователь",

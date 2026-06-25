@@ -2,6 +2,7 @@ import {
   createJsonApiClient,
   createRefreshSessionQueue,
   setupAuthSessionInterceptors,
+  type AuthAwareRequestConfig,
 } from "@izibuy/shared-api";
 
 import {

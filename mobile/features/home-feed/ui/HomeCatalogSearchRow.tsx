@@ -1,11 +1,17 @@
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { CatalogSearchBar } from "@/features/catalog-filter/ui/CatalogSearchBar";
 import { HomeCatalogBrandLogo } from "@/features/home-feed/ui/HomeCatalogBrandLogo";
+import {
+  HomeCatalogHeaderPanel,
+} from "@/features/home-feed/ui/HomeCatalogHeaderPanel";
+import { HomeCatalogHeaderSearch } from "@/features/home-feed/ui/HomeCatalogHeaderSearch";
 import { HomeCatalogUsersButton } from "@/features/home-feed/ui/HomeCatalogUsersButton";
-import { resolveScreenContentPaddingHorizontal } from "@/shared/theme/screenContentLayout";
-import { useHomeCatalogSearchRowStyles } from "@/shared/theme/catalogProductStyles";
+import {
+  resolveHomeCatalogHeaderPanelPaddingTop,
+  resolveHomeCatalogHeaderShellInset,
+} from "@/shared/lib/homeCatalogHeaderLayout";
+import { useHomeCatalogHeaderStyles } from "@/shared/theme/homeCatalogHeaderStyles";
 
 type HomeCatalogSearchRowProps = {
   value: string;
@@ -19,21 +25,20 @@ export const HomeCatalogSearchRow = ({
   onBrandPress,
 }: HomeCatalogSearchRowProps) => {
   const insets = useSafeAreaInsets();
-  const styles = useHomeCatalogSearchRowStyles();
-  const paddingHorizontal = resolveScreenContentPaddingHorizontal(insets);
+  const styles = useHomeCatalogHeaderStyles();
+  const marginHorizontal = resolveHomeCatalogHeaderShellInset(insets);
+  const panelPaddingTop = resolveHomeCatalogHeaderPanelPaddingTop(insets.top);
 
   return (
-    <View
-      style={[
-        styles.root,
-        { paddingTop: Math.max(insets.top, 8), paddingHorizontal },
-      ]}
+    <HomeCatalogHeaderPanel
+      paddingTop={panelPaddingTop}
+      style={{ marginHorizontal }}
     >
-      <HomeCatalogBrandLogo onPress={onBrandPress} />
-      <View style={styles.searchSlot}>
-        <CatalogSearchBar value={value} onChange={onChange} embedded />
+      <View style={styles.topRow}>
+        <HomeCatalogBrandLogo onPress={onBrandPress} />
+        <HomeCatalogHeaderSearch value={value} onChange={onChange} />
+        <HomeCatalogUsersButton />
       </View>
-      <HomeCatalogUsersButton />
-    </View>
+    </HomeCatalogHeaderPanel>
   );
 };

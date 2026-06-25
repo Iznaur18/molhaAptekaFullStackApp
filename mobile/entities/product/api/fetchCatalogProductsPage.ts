@@ -14,6 +14,7 @@ export type FetchCatalogProductsPageOptions = {
   auctionOnly?: boolean;
   installmentOnly?: boolean;
   saleOnly?: boolean;
+  allCities?: boolean;
 };
 
 export const fetchCatalogProductsPage = async ({
@@ -28,6 +29,7 @@ export const fetchCatalogProductsPage = async ({
   auctionOnly,
   installmentOnly,
   saleOnly,
+  allCities,
 }: FetchCatalogProductsPageOptions = {}) => {
   try {
     const { data } = await apiClient.get("/product", {
@@ -45,6 +47,7 @@ export const fetchCatalogProductsPage = async ({
         ...(auctionOnly ? { auctionOnly: "true" } : {}),
         ...(installmentOnly ? { installmentOnly: "true" } : {}),
         ...(saleOnly ? { saleOnly: "true" } : {}),
+        ...(allCities ? { allCities: "true" } : {}),
       },
     });
     const parsed = parseCatalogProductsPageData(data);

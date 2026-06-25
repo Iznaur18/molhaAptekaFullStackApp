@@ -162,8 +162,8 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
     borderColor: theme.colors.textMuted,
   },
   radioChecked: {
-    borderColor: theme.colors.nearBlack,
-    backgroundColor: theme.colors.nearBlack,
+    borderColor: theme.colors.action,
+    backgroundColor: theme.colors.action,
   },
   radioLabel: {
     fontSize: 15,

@@ -65,13 +65,14 @@ export const UserStoriesStrip = ({
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
+          style={styles.scrollWrapper}
           contentContainerStyle={styles.scroll}
         >
           <Pressable style={styles.item} onPress={handleAddPress}>
-              <View style={styles.ringAdd}>
-                <Text style={styles.plus}>+</Text>
-              </View>
-              <Text style={styles.label} numberOfLines={1}>
+            <View style={styles.ringAdd}>
+              <Text style={styles.plus}>+</Text>
+            </View>
+            <Text style={styles.label} numberOfLines={1}>
               {USER_STORY_UI.ADD_LABEL}
             </Text>
           </Pressable>
@@ -80,7 +81,8 @@ export const UserStoriesStrip = ({
             const authorId = String(ring.author._id);
             const authorName = ring.author.userName?.trim() || authorId;
             const avatarUrl = ring.author.userAvatarUrl ?? null;
-            const ringStyle = ring.isOwn || ring.isViewed ? styles.ringViewed : styles.ring;
+            const ringStyle =
+              ring.isOwn || ring.isViewed ? [styles.ring, styles.ringViewed] : styles.ring;
 
             return (
               <Pressable
@@ -92,8 +94,17 @@ export const UserStoriesStrip = ({
                   {avatarUrl ? (
                     <Image source={{ uri: avatarUrl }} style={styles.avatar} contentFit="cover" />
                   ) : (
-                    <Text style={styles.avatarFallback}>{authorName.slice(0, 1).toUpperCase()}</Text>
+                    <View style={styles.avatarFallback}>
+                      <Text style={styles.avatarFallbackText}>
+                        {authorName.slice(0, 1).toUpperCase()}
+                      </Text>
+                    </View>
                   )}
+                  {ring.activeCount != null && ring.activeCount > 1 ? (
+                    <View style={styles.countBadge}>
+                      <Text style={styles.countText}>{ring.activeCount}</Text>
+                    </View>
+                  ) : null}
                 </View>
                 <Text style={styles.label} numberOfLines={1}>
                   {authorName}

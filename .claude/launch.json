@@ -1,0 +1,28 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Backend (Express + nodemon)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start:dev"],
+      "cwd": "server",
+      "port": 4444,
+      "autoPort": false
+    },
+    {
+      "name": "Client (Vite dev)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "client",
+      "port": 5173,
+      "autoPort": false
+    },
+    {
+      "name": "Mobile (Expo)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start:dev"],
+      "cwd": "mobile",
+      "port": 8081
+    }
+  ]
+}

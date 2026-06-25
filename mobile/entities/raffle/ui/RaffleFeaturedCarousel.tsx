@@ -89,6 +89,7 @@ export const RaffleFeaturedCarousel = ({
           cardWidth={cardWidth}
           onOpenProducts={onOpenProducts}
           manage={getManage?.(raffle) ?? null}
+          inCarousel
         />
       </View>
     );
@@ -128,6 +129,7 @@ export const RaffleFeaturedCarousel = ({
               cardWidth={cardWidth}
               onOpenProducts={onOpenProducts}
               manage={getManage?.(item) ?? null}
+              inCarousel
             />
           </View>
         )}

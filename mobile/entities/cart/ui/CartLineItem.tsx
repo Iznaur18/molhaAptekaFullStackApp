@@ -1,3 +1,4 @@
+import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 
@@ -63,58 +64,66 @@ export const CartLineItem = ({ line, exclusionReason = null }: CartLineItemProps
   const exclusionLabel = exclusionReason ? EXCLUSION_COPY[exclusionReason] : null;
 
   return (
-    <View style={[styles.row, isUpdating && styles.rowUpdating, exclusionReason && styles.rowExcluded]}>
-      <View style={styles.imageWrap}>
-        <CachedProductImage uri={imageUrl} style={styles.image} />
-      </View>
-
-      <View style={styles.info}>
-        {product ? (
-          <Pressable onPress={handleOpenProduct}>
+    <View style={[styles.card, isUpdating && styles.cardUpdating, exclusionReason && styles.cardExcluded]}>
+      {/* Row 1: image + name/price */}
+      <View style={styles.topRow}>
+        <View style={styles.imageWrap}>
+          <CachedProductImage uri={imageUrl} style={styles.image} />
+        </View>
+        <View style={styles.info}>
+          {product ? (
+            <Pressable onPress={handleOpenProduct}>
+              <Text style={styles.nameLink} numberOfLines={2}>
+                {name}
+              </Text>
+            </Pressable>
+          ) : (
             <Text style={styles.name} numberOfLines={2}>
               {name}
             </Text>
-          </Pressable>
-        ) : (
-          <Text style={styles.name} numberOfLines={2}>
-            {name}
-          </Text>
-        )}
-
-        {exclusionLabel ? (
-          <Text style={styles.excluded}>{exclusionLabel}</Text>
-        ) : (
-          <Text style={styles.unitPrice}>{formatPriceRub(product?.productPrice)}</Text>
-        )}
-
-        <View style={styles.stepper}>
-          <Pressable
-            style={styles.stepButton}
-            onPress={handleDecrease}
-            disabled={isUpdating}
-          >
-            <Text style={styles.stepButtonText}>−</Text>
-          </Pressable>
-          <Text style={styles.quantity}>{line.quantity}</Text>
-          <Pressable
-            style={[styles.stepButton, increaseDisabled && styles.stepDisabled]}
-            onPress={handleIncrease}
-            disabled={increaseDisabled}
-          >
-            <Text style={styles.stepButtonText}>+</Text>
-          </Pressable>
+          )}
+          {exclusionLabel ? (
+            <Text style={styles.excluded}>{exclusionLabel}</Text>
+          ) : (
+            <Text style={styles.unitPrice}>{formatPriceRub(product?.productPrice)}</Text>
+          )}
         </View>
       </View>
 
-      <View style={styles.actions}>
-        <Text style={styles.lineTotal}>{formatPriceRub(line.lineTotal)}</Text>
-        <Pressable
-          onPress={() => removeItem(line.productId)}
-          disabled={isUpdating}
-          accessibilityLabel={CART_PAGE_UI.REMOVE_LINE_ARIA}
-        >
-          <Text style={styles.remove}>✕</Text>
-        </Pressable>
+      {/* Row 2: remove + stepper | total */}
+      <View style={styles.bottomRow}>
+        <View style={styles.controls}>
+          <Pressable
+            style={styles.removeButton}
+            onPress={() => removeItem(line.productId)}
+            disabled={isUpdating}
+            accessibilityLabel={CART_PAGE_UI.REMOVE_LINE_ARIA}
+          >
+            <Feather name="trash-2" size={18} color={styles.removeIcon.color} />
+          </Pressable>
+          <View style={styles.controlDivider} />
+          <View style={styles.stepper}>
+            <Pressable
+              style={styles.stepButton}
+              onPress={handleDecrease}
+              disabled={isUpdating}
+            >
+              <Text style={styles.stepButtonText}>−</Text>
+            </Pressable>
+            <Text style={styles.quantity}>{line.quantity}</Text>
+            <Pressable
+              style={[styles.stepButton, increaseDisabled && styles.stepDisabled]}
+              onPress={handleIncrease}
+              disabled={increaseDisabled}
+            >
+              <Text style={styles.stepButtonText}>+</Text>
+            </Pressable>
+          </View>
+        </View>
+        <View style={styles.totalWrap}>
+          <View style={styles.totalDivider} />
+          <Text style={styles.lineTotal}>{formatPriceRub(line.lineTotal)}</Text>
+        </View>
       </View>
     </View>
   );

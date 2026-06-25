@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Linking, Pressable, Text, View } from "react-native";
 
+import { getRaffleFeaturedBannerBackdrop } from "@/entities/raffle/lib/getRaffleFeaturedBannerBackdrop";
 import { useRaffleFeaturedBannerMetrics } from "@/entities/raffle/model/useRaffleFeaturedBannerMetrics";
 import { RaffleDescriptionModal } from "@/entities/raffle/ui/RaffleDescriptionModal";
+import { RaffleFeaturedBannerBackdropLayer } from "@/entities/raffle/ui/RaffleFeaturedBannerBackdropLayer";
 import { RaffleFeaturedBannerBackground } from "@/entities/raffle/ui/RaffleFeaturedBannerBackground";
+import { RaffleFeaturedBannerInfoOverlay } from "@/entities/raffle/ui/RaffleFeaturedBannerInfoOverlay";
 import { RaffleManageActions } from "@/entities/raffle/ui/RaffleManageActions";
 import { RafflePrizeMedia } from "@/entities/raffle/ui/RafflePrizeMedia";
 import type { FeaturedRaffleManage, RaffleFromApi } from "@/entities/raffle/model/types";
@@ -17,6 +20,7 @@ type RaffleFeaturedBannerProps = {
   cardWidth: number;
   onOpenProducts: (raffleId: string) => void;
   manage?: FeaturedRaffleManage | null;
+  inCarousel?: boolean;
 };
 
 export const RaffleFeaturedBanner = ({
@@ -24,20 +28,26 @@ export const RaffleFeaturedBanner = ({
   cardWidth,
   onOpenProducts,
   manage = null,
+  inCarousel = false,
 }: RaffleFeaturedBannerProps) => {
   const styles = useRaffleFeaturedBannerStyles();
-  const metrics = useRaffleFeaturedBannerMetrics(cardWidth);
+  const hasManage = Boolean(
+    manage && (manage.showEdit || manage.showDelete || manage.showPause),
+  );
+  const metrics = useRaffleFeaturedBannerMetrics(cardWidth, { hasManage });
+  const backdrop = useMemo(() => getRaffleFeaturedBannerBackdrop(raffle), [raffle]);
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
+
   const isSplit = metrics.layout === "split";
   const isCompleted = raffle.status === "completed";
+  const hasBackdrop = backdrop.hasBackdrop;
 
   const progress = Number(raffle.salesProgress) || 0;
   const target = Number(raffle.targetSales) || 0;
   const percent = target > 0 ? Math.min(100, Math.round((progress / target) * 100)) : 0;
   const remaining = Math.max(0, target - progress);
-  const hasManage = Boolean(
-    manage && (manage.showEdit || manage.showDelete || manage.showPause),
-  );
+  const copyOnBackdropStyle = hasBackdrop ? styles.copyOnBackdrop : undefined;
 
   const handleOpenInstagram = async () => {
     const url = raffle.instagramUrl?.trim();
@@ -56,7 +66,7 @@ export const RaffleFeaturedBanner = ({
 
   return (
     <View
-      style={styles.root}
+      style={[styles.root, inCarousel && styles.rootInCarousel]}
       accessibilityRole="summary"
       accessibilityLabel={raffle.title}
     >
@@ -64,11 +74,17 @@ export const RaffleFeaturedBanner = ({
         style={[
           styles.inner,
           isSplit ? styles.innerSplit : styles.innerStacked,
+          hasBackdrop && styles.innerHasBackdrop,
           isCompleted && styles.innerCompleted,
-          { minHeight: metrics.innerMinHeight },
+          isCompleted && hasBackdrop && styles.innerCompletedBackdrop,
         ]}
       >
-        <RaffleFeaturedBannerBackground completed={isCompleted} />
+        {!hasBackdrop ? <RaffleFeaturedBannerBackground completed={isCompleted} /> : null}
+        <RaffleFeaturedBannerBackdropLayer
+          raffle={raffle}
+          backdrop={backdrop}
+          completed={isCompleted}
+        />
 
         <View
           style={[
@@ -84,28 +100,52 @@ export const RaffleFeaturedBanner = ({
           <View style={[styles.badge, isCompleted && styles.badgeCompleted]}>
             <Text style={styles.badgeText}>{RAFFLE_FEATURED_BANNER_UI.BADGE}</Text>
           </View>
+          {!isSplit ? (
+            <RaffleFeaturedBannerInfoOverlay
+              raffle={raffle}
+              visible={isInfoOpen}
+              onToggle={() => setIsInfoOpen((open) => !open)}
+              onBackdropText={hasBackdrop}
+            />
+          ) : null}
         </View>
 
-        <View style={[styles.body, isSplit && styles.bodySplit]}>
-          <Text style={styles.title} numberOfLines={2}>
-            {raffle.title}
-          </Text>
-
-          {raffle.description ? (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={RAFFLE_FEATURED_BANNER_UI.DESCRIPTION_OPEN_ARIA}
-              onPress={() => setIsDescriptionOpen(true)}
-            >
-              <Text style={styles.description} numberOfLines={DESCRIPTION_PREVIEW_MAX_LINES}>
-                {raffle.description}
+        <View
+          style={[
+            styles.body,
+            isSplit ? styles.bodySplit : styles.bodyStacked,
+          ]}
+        >
+          {metrics.showInlineCopy ? (
+            <>
+              <Text style={[styles.title, copyOnBackdropStyle]} numberOfLines={2}>
+                {raffle.title}
               </Text>
-            </Pressable>
+
+              {raffle.description ? (
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={RAFFLE_FEATURED_BANNER_UI.DESCRIPTION_OPEN_ARIA}
+                  onPress={() => setIsDescriptionOpen(true)}
+                >
+                  <Text
+                    style={[styles.description, copyOnBackdropStyle]}
+                    numberOfLines={DESCRIPTION_PREVIEW_MAX_LINES}
+                  >
+                    {raffle.description}
+                  </Text>
+                </Pressable>
+              ) : null}
+            </>
           ) : null}
 
           <View style={styles.progressWrap}>
             <View
-              style={[styles.progressBar, isCompleted && styles.progressBarCompleted]}
+              style={[
+                styles.progressBar,
+                hasBackdrop && styles.progressBarBackdrop,
+                isCompleted && styles.progressBarCompleted,
+              ]}
               accessibilityRole="progressbar"
               accessibilityValue={{
                 min: 0,
@@ -116,12 +156,16 @@ export const RaffleFeaturedBanner = ({
               <View
                 style={[
                   styles.progressFill,
-                  isCompleted && styles.progressFillCompleted,
+                  hasBackdrop
+                    ? styles.progressFillBackdrop
+                    : isCompleted
+                      ? styles.progressFillCompleted
+                      : null,
                   { width: `${percent}%` },
                 ]}
               />
             </View>
-            <Text style={styles.progressLabel} numberOfLines={2}>
+            <Text style={[styles.progressLabel, copyOnBackdropStyle]} numberOfLines={2}>
               {RAFFLE_FEATURED_BANNER_UI.PROGRESS(progress, target)}
               {!isCompleted && remaining > 0
                 ? ` · ${RAFFLE_FEATURED_BANNER_UI.REMAINING(remaining)}`

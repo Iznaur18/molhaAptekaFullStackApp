@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { resolveAuctionUiState } from "./resolveAuctionUiState";
 import { resolveProductDiscountPercent } from "./computeProductDiscountPercent";
 import { resolveProductCardPromotionChrome } from "./resolveProductCardPromotionChrome";
+import { shouldShowPremiumProductCardChrome } from "./shouldShowPremiumProductCardChrome";
 import { shouldShowProductLoyaltyPointsBadge } from "./shouldShowProductLoyaltyPointsBadge";
 
 const PROMOTION_TIER_GOLD = 1;
@@ -36,6 +37,11 @@ export const useProductCardChromeFlags = (
     });
     const { isPromotionActive, promotionTier, showPromotionChrome, promotionFrameTier } =
       promotionChrome;
+    const showPremiumChrome = shouldShowPremiumProductCardChrome({
+      product,
+      isMineMode,
+      isModerationQueue,
+    });
     const { auctionActive } = resolveAuctionUiState(product);
     const discountPercent = resolveProductDiscountPercent(product);
     const showDiscountBadge = discountPercent != null && discountPercent > 0;
@@ -48,6 +54,7 @@ export const useProductCardChromeFlags = (
       discountPercent,
       showDiscountBadge,
       showLoyaltyPointsBadge,
+      showPremiumChrome,
       showPromotionChrome,
       promotionFrameTier,
       showPromotionBoostBadge:

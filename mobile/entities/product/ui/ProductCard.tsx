@@ -73,24 +73,33 @@ export const ProductCard = ({
     router.push({ pathname: "/product/[id]", params: { id: product._id } });
   };
 
-  const promotionFrameStyle =
-    flags.showPromotionChrome && flags.promotionFrameTier
-      ? resolveProductCardPromotionFrameStyle(flags.promotionFrameTier, "compact")
-      : null;
+  const isCatalogGrid = layout === "catalog-grid";
+  const showPromotionFrame = flags.showPromotionChrome && flags.promotionFrameTier != null;
+  const showCardChrome = showPromotionFrame || flags.showPremiumChrome;
+
+  const promotionFrameStyle = showCardChrome
+    ? resolveProductCardPromotionFrameStyle(flags.promotionFrameTier, "compact", {
+        isPremium: flags.showPremiumChrome,
+      })
+    : null;
 
   return (
     <View
       style={[
         styles.card,
-        layout === "catalog-grid" && styles.cardCatalogGrid,
+        isCatalogGrid && styles.cardCatalogGrid,
         promotionFrameStyle,
       ]}
     >
-      {flags.showPromotionChrome && flags.promotionFrameTier ? (
-        <ProductCardPromotionBackground tier={flags.promotionFrameTier} variant="compact" />
+      {showPromotionFrame && flags.promotionFrameTier ? (
+        <ProductCardPromotionBackground
+          tier={flags.promotionFrameTier}
+          variant="compact"
+          isPremium={flags.showPremiumChrome}
+        />
       ) : null}
 
-      <View style={styles.imageWrap}>
+      <View style={[styles.imageWrap, isCatalogGrid && styles.imageWrapCatalogGrid]}>
         <Pressable
           style={({ pressed }) => [styles.imagePressable, pressed && styles.cardPressed]}
           onPress={handlePress}
@@ -125,16 +134,23 @@ export const ProductCard = ({
         accessibilityRole="button"
         accessibilityLabel={openProductLabel}
       >
-        <View style={styles.content}>
-          <Text style={styles.name} numberOfLines={1}>
+        <View style={[styles.content, isCatalogGrid && styles.contentCatalogGrid]}>
+          <Text
+            style={[styles.name, isCatalogGrid && styles.nameCatalogGrid]}
+            numberOfLines={1}
+          >
             {name}
           </Text>
 
           <ProductPriceDisplay product={product} showLabel={false} variant="card" />
 
-          <View style={styles.metaStrip}>
+          <View style={[styles.metaStrip, isCatalogGrid && styles.metaStripCatalogGrid]}>
             <Text
-              style={[styles.rating, !hasReviewRating && styles.ratingPlaceholder]}
+              style={[
+                styles.rating,
+                isCatalogGrid && styles.ratingCatalogGrid,
+                !hasReviewRating && styles.ratingPlaceholder,
+              ]}
               numberOfLines={1}
               accessibilityLabel={hasReviewRating ? reviewLine : PRODUCT_REVIEW_UI.NO_REVIEWS}
             >
@@ -147,7 +163,9 @@ export const ProductCard = ({
             />
           </View>
 
-          <ProductCardSellerRow product={product} />
+          <View style={isCatalogGrid ? styles.sellerRowCatalogGrid : undefined}>
+            <ProductCardSellerRow product={product} />
+          </View>
         </View>
       </Pressable>
 

@@ -1,17 +1,31 @@
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 
 import { PRODUCT_CARD_BADGE_COLORS as BC } from "@/entities/product/lib/productCardBadgePalette";
 import {
   PRODUCT_CARD_BADGE_LAYOUT as BL,
   PRODUCT_CARD_BANNER_CHROME as BANNER,
   PRODUCT_CARD_IMAGE_BADGE_OVERLAY as BO,
+  PRODUCT_CARD_IMAGE_BADGE_OVERLAY_LAYOUT as BOL,
+  PRODUCT_CARD_IMAGE_NAV_CHROME as NAV,
   PRODUCT_CARD_MOBILE_LAYOUT,
+  resolveProductCardImageNavBackground,
+  resolveProductCardImageNavBorderColor,
 } from "@/entities/product/lib/productCardBadgePalette";
 import { PRODUCT_MEDIA_HERO_ASPECT_RATIO } from "@/entities/product/model/constants";
+import { PRODUCT_CARD_MOBILE_CATALOG_LAYOUT as MCL } from "@/entities/product/lib/productCardMobileCatalogLayout";
 import { CURATED_COMPACT_CARD_COLORS as C } from "@/entities/curated-product-list/lib/curatedCompactCardColors";
-import { CURATED_PRODUCT_LIST_HOME_CARD_GAP } from "@/entities/curated-product-list/lib/curatedProductListHomeLayout";
 import {
-  USER_STORY_STRIP_AVATAR_SIZE,
+  CURATED_PRODUCT_LIST_HOME_CARD_GAP,
+  CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_BOTTOM,
+  CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_HORIZONTAL,
+  CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_TOP,
+  CURATED_PRODUCT_LIST_HOME_SECTION_MARGIN_BOTTOM,
+  CURATED_PRODUCT_LIST_HOME_TITLE_MARGIN_BOTTOM,
+  CURATED_PRODUCT_LIST_HOME_TITLE_PADDING_X,
+} from "@/entities/curated-product-list/lib/curatedProductListHomeLayout";
+import {
+  USER_STORY_STRIP_COLORS,
+  USER_STORY_STRIP_INNER_SIZE,
   USER_STORY_STRIP_LAYOUT,
 } from "@/entities/user-story/lib/userStoryStripLayout";
 import { PRODUCT_DETAIL_DOCK_SCROLL_PADDING } from "@/shared/lib/productDetailScreenLayout";
@@ -185,9 +199,42 @@ export const useProductCardStyles = createThemedStyles((theme) => ({
     overflow: "hidden",
   },
   cardCatalogGrid: {
-    flex: undefined,
     width: "100%",
+    height: MCL.fixedHeight,
     margin: 0,
+    paddingTop: 0,
+    paddingHorizontal: 0,
+    paddingBottom: MCL.bottomPadding,
+  },
+  imageWrapCatalogGrid: {
+    height: MCL.imageHeight,
+    aspectRatio: undefined,
+  },
+  contentCatalogGrid: {
+    paddingHorizontal: MCL.contentInsetX,
+    paddingTop: MCL.bodyGap,
+    gap: MCL.bodyGap,
+    flexGrow: 0,
+  },
+  nameCatalogGrid: {
+    fontSize: MCL.nameFontSize,
+    lineHeight: MCL.nameLineHeight,
+    maxHeight: MCL.headingHeight,
+    fontWeight: "700",
+  },
+  metaStripCatalogGrid: {
+    gap: 2,
+    maxHeight: MCL.metaHeight,
+    overflow: "hidden",
+  },
+  ratingCatalogGrid: {
+    fontSize: MCL.ratingFontSize,
+    lineHeight: MCL.ratingLineHeight,
+    maxHeight: MCL.ratingLineHeight,
+  },
+  sellerRowCatalogGrid: {
+    maxHeight: MCL.sellerRowHeight,
+    overflow: "hidden",
   },
   pressable: {
     flex: 1,
@@ -223,12 +270,14 @@ export const useProductCardStyles = createThemedStyles((theme) => ({
   },
   imageBadges: {
     position: "absolute",
-    left: BL.imageInsetX,
-    right: BL.imageInsetX,
-    bottom: BL.imageInsetBottom,
+    left: BOL.insetX,
+    bottom: BOL.insetBottom,
     flexDirection: "row",
+    flexWrap: "nowrap",
     alignItems: "center",
-    gap: BL.imageGap,
+    gap: BOL.gap,
+    maxWidth: "100%",
+    pointerEvents: "box-none",
   },
   content: {
     paddingHorizontal: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
@@ -281,7 +330,7 @@ export const useProductCardBannerStyles = createThemedStyles((theme) => ({
     paddingHorizontal: BANNER.contentPaddingX,
     paddingTop: BANNER.contentPaddingTop,
     paddingBottom: BANNER.contentPaddingBottom,
-    gap: 8,
+    gap: 8.8,
   },
   tierBadge: {
     alignSelf: "flex-start",
@@ -306,7 +355,8 @@ export const useProductCardBannerStyles = createThemedStyles((theme) => ({
     flexDirection: "row",
     flexWrap: "wrap",
     alignItems: "center",
-    gap: 7,
+    rowGap: 7.2,
+    columnGap: 8.8,
   },
   metaRow: {
     flexDirection: "row",
@@ -360,22 +410,32 @@ export const useProductCardMediaStyles = createThemedStyles((theme) => ({
     right: 0,
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: theme.spacing[1],
-    transform: [{ translateY: -18 }],
+    paddingHorizontal: NAV.rowPaddingHorizontal,
+    transform: [{ translateY: -NAV.size / 2 }],
   },
   navButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: MEDIA_NAV_SCRIM,
+    width: NAV.size,
+    height: NAV.size,
+    borderRadius: NAV.size / 2,
+    borderWidth: NAV.borderWidth,
+    borderColor: resolveProductCardImageNavBorderColor(theme.colors.text),
+    backgroundColor: resolveProductCardImageNavBackground(theme.colors.surface),
     alignItems: "center",
     justifyContent: "center",
+    opacity: NAV.buttonOpacity,
+    ...Platform.select({
+      web: {
+        backdropFilter: `blur(${NAV.blurRadius}px)`,
+        WebkitBackdropFilter: `blur(${NAV.blurRadius}px)`,
+      },
+      default: {},
+    }),
   },
   navButtonText: {
-    color: theme.colors.onContrast,
-    fontSize: 20,
+    color: theme.colors.text,
+    fontSize: NAV.fontSize,
     fontWeight: "700",
-    lineHeight: 22,
+    lineHeight: NAV.lineHeight,
   },
   counter: {
     position: "absolute",
@@ -425,9 +485,15 @@ export const useProductLoyaltyPointsBadgeStyles = createThemedStyles(() => ({
     maxWidth: 152,
   },
   badgeOverlay: {
+    paddingHorizontal: BOL.paddingHorizontal,
+    paddingVertical: BOL.paddingVertical,
+    borderRadius: BOL.borderRadius,
+    borderWidth: 1,
     borderColor: BO.borderColor,
     backgroundColor: BO.loyaltyBackground,
-    maxWidth: undefined,
+    alignSelf: "flex-start",
+    flexShrink: 0,
+    maxWidth: "100%",
     shadowColor: BO.shadowColor,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 1,
@@ -442,6 +508,10 @@ export const useProductLoyaltyPointsBadgeStyles = createThemedStyles(() => ({
   },
   badgeOverlayText: {
     color: BO.loyaltyText,
+    fontSize: BOL.fontSize,
+    lineHeight: BOL.lineHeight,
+    fontWeight: "700",
+    textAlign: "center",
   },
 }));
 
@@ -497,8 +567,15 @@ export const useProductPriceStyles = createThemedStyles((theme) => ({
     backgroundColor: BC.discountBg,
   },
   badgeOverlay: {
+    paddingHorizontal: BOL.paddingHorizontal,
+    paddingVertical: BOL.paddingVertical,
+    borderRadius: BOL.borderRadius,
+    borderWidth: 1,
     borderColor: BO.borderColor,
     backgroundColor: BO.discountBackground,
+    alignSelf: "flex-start",
+    flexShrink: 0,
+    maxWidth: "100%",
     shadowColor: BO.shadowColor,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 1,
@@ -513,6 +590,10 @@ export const useProductPriceStyles = createThemedStyles((theme) => ({
   },
   badgeOverlayText: {
     color: BO.discountText,
+    fontSize: BOL.fontSize,
+    lineHeight: BOL.lineHeight,
+    fontWeight: "700",
+    textAlign: "center",
   },
   detailCurrent: {
     fontSize: 29.6,
@@ -553,12 +634,12 @@ export const useProductPriceStyles = createThemedStyles((theme) => ({
     fontSize: 23.2,
     fontWeight: "600",
     color: theme.colors.action,
-    letterSpacing: -0.45,
+    letterSpacing: -0.7,
   },
   bannerOld: {
     fontSize: 14.7,
-    fontWeight: "600",
-    color: theme.colors.textMuted,
+    fontWeight: "400",
+    color: "#9ca3af",
     textDecorationLine: "line-through",
   },
   bannerDiscountBadge: {
@@ -566,10 +647,10 @@ export const useProductPriceStyles = createThemedStyles((theme) => ({
     paddingVertical: 3.5,
     borderRadius: 999,
     borderWidth: 0,
-    backgroundColor: "#fbcfe8",
+    backgroundColor: "#fecdd3",
   },
   bannerDiscountText: {
-    color: "#9d174d",
+    color: "#be123c",
     fontSize: 12.5,
     fontWeight: "600",
     lineHeight: 15,
@@ -1408,85 +1489,60 @@ export const useCartScreenStyles = createThemedStyles((theme) => ({
   },
   footer: {
     paddingTop: theme.spacing[2],
+    gap: theme.spacing[3],
+  },
+  summaryCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: 10,
+    backgroundColor: theme.colors.surface,
   },
   totalRow: {
+    flex: 1,
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: theme.spacing[1],
+    gap: 8,
   },
   totalLabel: {
-    fontSize: 16,
+    fontSize: 15,
     color: theme.colors.textMuted,
   },
   totalValue: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "700",
     color: theme.colors.text,
+    flex: 1,
   },
   fullTotalHint: {
     fontSize: 13,
     color: theme.colors.textMuted,
-    marginBottom: theme.spacing[3],
   },
   checkoutHint: {
     fontSize: 14,
     color: theme.colors.danger,
-    marginBottom: theme.spacing[3],
     textAlign: "center",
   },
   checkoutButton: {
     marginBottom: theme.spacing[2],
   },
   clearButton: {
-    alignItems: "center",
-    paddingVertical: 10,
-    marginBottom: theme.spacing[2],
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: 6,
   },
   clearButtonText: {
     color: theme.colors.danger,
-    fontSize: 15,
+    fontSize: 14,
   },
   buttonDisabled: {
     opacity: 0.6,
-  },
-}));
-
-export const useHomeCatalogSearchRowStyles = createThemedStyles((theme) => ({
-  root: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing[2],
-    paddingVertical: theme.spacing[2],
-    backgroundColor: theme.colors.surface,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: theme.colors.border,
-  },
-  logoButton: {
-    width: 72,
-    height: 32,
-    alignItems: "flex-start",
-    justifyContent: "center",
-    flexShrink: 0,
-  },
-  logoImage: {
-    width: "100%",
-    height: "100%",
-  },
-  searchSlot: {
-    flex: 1,
-    minWidth: 0,
-  },
-  usersButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: "center",
-    justifyContent: "center",
-    flexShrink: 0,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surface,
   },
 }));
 
@@ -1530,17 +1586,48 @@ export const useCuratedProductCompactCardStyles = createThemedStyles(() => ({
 
 export const useHomeCuratedListsStyles = createThemedStyles((theme) => ({
   listBlock: {
-    marginBottom: SCREEN_CONTENT_SECTION_GAP,
+    marginBottom: CURATED_PRODUCT_LIST_HOME_SECTION_MARGIN_BOTTOM,
   },
   title: {
     fontSize: 18,
     fontWeight: "700",
     color: theme.colors.ink,
-    marginBottom: 10,
+    marginBottom: CURATED_PRODUCT_LIST_HOME_TITLE_MARGIN_BOTTOM,
+    paddingHorizontal: CURATED_PRODUCT_LIST_HOME_TITLE_PADDING_X,
   },
   row: {
-    paddingBottom: theme.spacing[2],
+    paddingTop: CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_TOP,
+    paddingBottom: CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_BOTTOM,
+    paddingHorizontal: CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_HORIZONTAL,
     gap: CURATED_PRODUCT_LIST_HOME_CARD_GAP,
+  },
+}));
+
+/** Паритет с `client/.../CatalogCityFilterBanner.css`. */
+export const useCatalogCityFilterBannerStyles = createThemedStyles((theme) => ({
+  root: {
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: 12,
+    marginBottom: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    backgroundColor: theme.colors.surfaceElevated,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  text: {
+    fontSize: 15,
+    lineHeight: 21,
+    color: theme.colors.text,
+  },
+  action: {
+    fontSize: 15,
+    lineHeight: 21,
+    fontWeight: "600",
+    color: theme.colors.action,
+    textDecorationLine: "underline",
   },
 }));
 
@@ -1550,13 +1637,25 @@ export const useUserStoriesStripStyles = createThemedStyles((theme) => ({
     paddingTop: USER_STORY_STRIP_LAYOUT.paddingTop,
     paddingBottom: USER_STORY_STRIP_LAYOUT.paddingBottom,
   },
+  scrollWrapper: {
+    minHeight: 119,
+    borderRadius: USER_STORY_STRIP_LAYOUT.scrollBorderRadius,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: "transparent",
+    backgroundColor: USER_STORY_STRIP_COLORS.scrollBackground,
+    overflow: "hidden",
+  },
   scroll: {
-    paddingHorizontal: USER_STORY_STRIP_LAYOUT.scrollPaddingHorizontal,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    paddingLeft: USER_STORY_STRIP_LAYOUT.scrollPaddingLeft,
+    paddingRight: USER_STORY_STRIP_LAYOUT.scrollPaddingRight,
     paddingTop: USER_STORY_STRIP_LAYOUT.scrollPaddingTop,
     paddingBottom: USER_STORY_STRIP_LAYOUT.scrollPaddingBottom,
     gap: USER_STORY_STRIP_LAYOUT.itemGap,
   },
   item: {
+    flexShrink: 0,
     width: USER_STORY_STRIP_LAYOUT.itemWidth,
     alignItems: "center",
     gap: USER_STORY_STRIP_LAYOUT.itemContentGap,
@@ -1565,51 +1664,74 @@ export const useUserStoriesStripStyles = createThemedStyles((theme) => ({
     width: USER_STORY_STRIP_LAYOUT.ringSize,
     height: USER_STORY_STRIP_LAYOUT.ringSize,
     borderRadius: USER_STORY_STRIP_LAYOUT.ringSize / 2,
-    borderWidth: USER_STORY_STRIP_LAYOUT.ringBorderWidth,
-    borderColor: theme.colors.action,
+    padding: USER_STORY_STRIP_LAYOUT.ringPadding,
+    backgroundColor: USER_STORY_STRIP_COLORS.ringActive,
     alignItems: "center",
     justifyContent: "center",
-    overflow: "hidden",
+    position: "relative",
   },
   ringViewed: {
-    width: USER_STORY_STRIP_LAYOUT.ringSize,
-    height: USER_STORY_STRIP_LAYOUT.ringSize,
-    borderRadius: USER_STORY_STRIP_LAYOUT.ringSize / 2,
-    borderWidth: USER_STORY_STRIP_LAYOUT.ringBorderWidth,
-    borderColor: theme.colors.borderStrong,
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
+    backgroundColor: USER_STORY_STRIP_COLORS.ringViewed,
   },
   ringAdd: {
     width: USER_STORY_STRIP_LAYOUT.ringSize,
     height: USER_STORY_STRIP_LAYOUT.ringSize,
     borderRadius: USER_STORY_STRIP_LAYOUT.ringSize / 2,
-    borderWidth: USER_STORY_STRIP_LAYOUT.ringBorderWidth,
-    borderColor: theme.colors.action,
-    borderStyle: "dashed",
+    padding: USER_STORY_STRIP_LAYOUT.ringPadding,
+    backgroundColor: USER_STORY_STRIP_COLORS.ringActive,
     alignItems: "center",
     justifyContent: "center",
   },
   plus: {
-    fontSize: 28,
-    fontWeight: "300",
-    color: theme.colors.action,
-    lineHeight: 30,
+    fontSize: USER_STORY_STRIP_LAYOUT.plusFontSize,
+    fontWeight: "400",
+    color: theme.colors.onContrast,
+    lineHeight: USER_STORY_STRIP_LAYOUT.plusFontSize,
   },
   avatar: {
-    width: USER_STORY_STRIP_AVATAR_SIZE,
-    height: USER_STORY_STRIP_AVATAR_SIZE,
-    borderRadius: USER_STORY_STRIP_AVATAR_SIZE / 2,
+    width: USER_STORY_STRIP_INNER_SIZE,
+    height: USER_STORY_STRIP_INNER_SIZE,
+    borderRadius: USER_STORY_STRIP_INNER_SIZE / 2,
+    borderWidth: USER_STORY_STRIP_LAYOUT.avatarBorderWidth,
+    borderColor: USER_STORY_STRIP_COLORS.avatarBorder,
   },
   avatarFallback: {
-    fontSize: 22,
+    width: USER_STORY_STRIP_INNER_SIZE,
+    height: USER_STORY_STRIP_INNER_SIZE,
+    borderRadius: USER_STORY_STRIP_INNER_SIZE / 2,
+    borderWidth: USER_STORY_STRIP_LAYOUT.avatarBorderWidth,
+    borderColor: USER_STORY_STRIP_COLORS.avatarBorder,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: theme.colors.textSecondary,
+  },
+  avatarFallbackText: {
+    fontSize: USER_STORY_STRIP_LAYOUT.avatarFallbackFontSize,
     fontWeight: "700",
-    color: theme.colors.textSecondary,
+    color: theme.colors.onContrast,
+  },
+  countBadge: {
+    position: "absolute",
+    right: -2,
+    bottom: -2,
+    minWidth: USER_STORY_STRIP_LAYOUT.countMinWidth,
+    height: USER_STORY_STRIP_LAYOUT.countHeight,
+    paddingHorizontal: USER_STORY_STRIP_LAYOUT.countPaddingHorizontal,
+    borderRadius: USER_STORY_STRIP_LAYOUT.countHeight / 2,
+    backgroundColor: USER_STORY_STRIP_COLORS.countBackground,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  countText: {
+    fontSize: USER_STORY_STRIP_LAYOUT.countFontSize,
+    fontWeight: "700",
+    color: theme.colors.onContrast,
+    lineHeight: USER_STORY_STRIP_LAYOUT.countHeight,
   },
   label: {
+    width: "100%",
     fontSize: USER_STORY_STRIP_LAYOUT.labelFontSize,
-    color: theme.colors.textSecondary,
+    color: theme.colors.onContrast,
     maxWidth: USER_STORY_STRIP_LAYOUT.itemWidth,
     textAlign: "center",
   },
@@ -1645,6 +1767,7 @@ export const useCatalogBrowserTileStyles = createThemedStyles((theme) => ({
     position: "relative",
   },
   card: {
+    height: "100%",
     padding: 8,
     borderWidth: 1,
     borderRadius: 12,

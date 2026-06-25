@@ -86,20 +86,23 @@ export const ProductDiscountBadge = ({ product, variant = "inline" }: ProductDis
 
   return (
     <View
-      style={[
-        styles.badge,
-        variant === "overlay" && styles.badgeOverlay,
-        variant === "detail" && styles.detailDiscountBadge,
-        variant === "banner" && styles.bannerDiscountBadge,
-      ]}
+      style={
+        variant === "overlay"
+          ? [styles.badgeOverlay]
+          : [
+              styles.badge,
+              variant === "detail" && styles.detailDiscountBadge,
+              variant === "banner" && styles.bannerDiscountBadge,
+            ]
+      }
     >
       <AppText
         style={[
-          styles.badgeText,
-          variant === "overlay" && styles.badgeOverlayText,
+          variant === "overlay" ? styles.badgeOverlayText : styles.badgeText,
           variant === "detail" && styles.detailDiscountText,
           variant === "banner" && styles.bannerDiscountText,
         ]}
+        numberOfLines={1}
       >
         {PRODUCT_CARD_UI.DISCOUNT_BADGE(discountPercent)}
       </AppText>

@@ -1,7 +1,7 @@
 import { Pressable, useWindowDimensions, View } from "react-native";
 
 import { AddToCartButton } from "@/features/cart-add/ui/AddToCartButton";
-import { CATALOG_BROWSER_GRID_NARROW_MAX_WIDTH } from "@/features/catalog-browser/lib/catalogBrowserGridConstants";
+import { SCREEN_NARROW_MAX_WIDTH as CATALOG_BROWSER_GRID_NARROW_MAX_WIDTH } from "@/shared/lib/screenBreakpoints";
 import { INSTALLMENT_UI, PRODUCT_PRICE_OFFER_UI } from "@/shared/config";
 import { useProductDetailPurchaseActionsStyles } from "@/shared/theme/catalogProductStyles";
 import { AppText } from "@/shared/ui/AppText";

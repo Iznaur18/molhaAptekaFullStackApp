@@ -3,38 +3,52 @@ export const RAFFLE_FEATURED_VISUAL_ASPECT_RATIO = 0.42;
 
 export const RAFFLE_FEATURED_VISUAL_ASPECT_RATIO_STACKED = 0.52;
 
-/** Web `.raffle-featured-banner__visual` min-height: 10rem */
+/** Web `.raffle-featured-banner__visual` min-height (split / desktop). */
 export const RAFFLE_FEATURED_VISUAL_MIN_HEIGHT = 160;
+
+/** Web mobile stacked: `height: 12.25rem`. */
+export const RAFFLE_FEATURED_VISUAL_STACKED_HEIGHT = 196;
 
 /** Ширина карточки, с которой web переходит в 2-колоночный layout. */
 export const RAFFLE_FEATURED_SPLIT_LAYOUT_MIN_CARD_WIDTH = 641;
 
 export const RAFFLE_FEATURED_BANNER_CHROME = {
   innerPaddingHorizontal: 6.4,
-  innerPaddingTop: 5,
-  innerPaddingBottom: 6,
-  imageBleedTop: 3.5,
+  innerPaddingTop: 5.12,
+  innerPaddingBottom: 6.08,
+  imageBleedHorizontal: 4.8,
+  imageBleedTop: 3.52,
+  /** Web `.raffle-featured-banner__inner` row gap @mobile stacked (`1rem`). */
+  stackedGridGap: 16,
   bodyPaddingTop: 10,
+  stackedBodyPaddingTop: 0,
   titleLineHeight: 25,
   titleMarginBottom: 5,
   descriptionLineHeight: 20,
   descriptionMarginBottom: 10,
-  progressBarHeight: 9,
-  progressLabelMarginTop: 5,
-  progressLabelLineHeight: 20,
+  progressBarHeight: 8.8,
+  progressLabelMarginTop: 5.6,
+  progressLabelLineHeight: 17,
   progressMarginBottom: 12,
   manageContentHeight: 32,
-  managePaddingBottom: 10,
-  manageMarginBottom: 10,
-  actionsMinHeight: 36,
+  managePaddingBottom: 10.4,
+  manageMarginBottom: 10.4,
+  actionsMinHeight: 32,
+  actionsGap: 8,
   splitGridGap: 20,
 } as const;
 
 export type RaffleFeaturedBannerLayoutMode = "stacked" | "split";
 
+export type RaffleFeaturedBannerMetricsOptions = {
+  hasManage?: boolean;
+};
+
 export type RaffleFeaturedBannerMetrics = {
   cardWidth: number;
   layout: RaffleFeaturedBannerLayoutMode;
+  /** Web mobile stacked: title/description в info-panel, не в body. */
+  showInlineCopy: boolean;
   visualWidth: number;
   visualHeight: number;
   bodyMinHeight: number;
@@ -50,11 +64,13 @@ export const resolveRaffleFeaturedVisualHeight = (
   visualWidth: number,
   layout: RaffleFeaturedBannerLayoutMode = "stacked",
 ): number => {
-  const ratio =
-    layout === "stacked"
-      ? RAFFLE_FEATURED_VISUAL_ASPECT_RATIO_STACKED
-      : RAFFLE_FEATURED_VISUAL_ASPECT_RATIO;
-  const fromAspect = Math.round(Math.max(0, visualWidth) * ratio);
+  if (layout === "stacked") {
+    return RAFFLE_FEATURED_VISUAL_STACKED_HEIGHT;
+  }
+
+  const fromAspect = Math.round(
+    Math.max(0, visualWidth) * RAFFLE_FEATURED_VISUAL_ASPECT_RATIO,
+  );
 
   return Math.max(RAFFLE_FEATURED_VISUAL_MIN_HEIGHT, fromAspect);
 };
@@ -81,14 +97,26 @@ export const resolveRaffleFeaturedManageSlotHeight = (): number =>
 export const resolveRaffleFeaturedActionsSlotHeight = (): number =>
   RAFFLE_FEATURED_BANNER_CHROME.actionsMinHeight;
 
-export const resolveRaffleFeaturedBodyMinHeight = (): number => {
+export const resolveRaffleFeaturedBodyMinHeight = (
+  layout: RaffleFeaturedBannerLayoutMode = "split",
+  options: RaffleFeaturedBannerMetricsOptions = {},
+): number => {
+  const { hasManage = false } = options;
   const chrome = RAFFLE_FEATURED_BANNER_CHROME;
+  const copySlots =
+    layout === "split"
+      ? resolveRaffleFeaturedTitleSlotHeight() +
+        resolveRaffleFeaturedDescriptionSlotHeight()
+      : 0;
+  const bodyPaddingTop =
+    layout === "split" ? chrome.bodyPaddingTop : chrome.stackedBodyPaddingTop;
+  const manageSlot = hasManage ? resolveRaffleFeaturedManageSlotHeight() : 0;
+
   return (
-    chrome.bodyPaddingTop +
-    resolveRaffleFeaturedTitleSlotHeight() +
-    resolveRaffleFeaturedDescriptionSlotHeight() +
+    bodyPaddingTop +
+    copySlots +
     resolveRaffleFeaturedProgressSlotHeight() +
-    resolveRaffleFeaturedManageSlotHeight() +
+    manageSlot +
     resolveRaffleFeaturedActionsSlotHeight()
   );
 };
@@ -115,13 +143,14 @@ export const resolveRaffleFeaturedVisualWidth = (
 export const resolveRaffleFeaturedBannerInnerMinHeight = (
   cardWidth: number,
   layout: RaffleFeaturedBannerLayoutMode = resolveRaffleFeaturedBannerLayoutMode(cardWidth),
+  options: RaffleFeaturedBannerMetricsOptions = {},
 ): number => {
   const chrome = RAFFLE_FEATURED_BANNER_CHROME;
   const visualHeight = resolveRaffleFeaturedVisualHeight(
     resolveRaffleFeaturedVisualWidth(cardWidth, layout),
     layout,
   );
-  const bodyMinHeight = resolveRaffleFeaturedBodyMinHeight();
+  const bodyMinHeight = resolveRaffleFeaturedBodyMinHeight(layout, options);
 
   if (layout === "stacked") {
     return Math.round(
@@ -129,6 +158,7 @@ export const resolveRaffleFeaturedBannerInnerMinHeight = (
         chrome.innerPaddingBottom +
         visualHeight -
         chrome.imageBleedTop +
+        chrome.stackedGridGap +
         bodyMinHeight,
     );
   }
@@ -143,16 +173,18 @@ export const resolveRaffleFeaturedBannerInnerMinHeight = (
 export const resolveRaffleFeaturedBannerMetrics = (
   cardWidth: number,
   layout: RaffleFeaturedBannerLayoutMode = resolveRaffleFeaturedBannerLayoutMode(cardWidth),
+  options: RaffleFeaturedBannerMetricsOptions = {},
 ): RaffleFeaturedBannerMetrics => {
   const visualWidth = resolveRaffleFeaturedVisualWidth(cardWidth, layout);
 
   return {
     cardWidth: Math.max(0, cardWidth),
     layout,
+    showInlineCopy: layout === "split",
     visualWidth,
     visualHeight: resolveRaffleFeaturedVisualHeight(visualWidth, layout),
-    bodyMinHeight: resolveRaffleFeaturedBodyMinHeight(),
-    innerMinHeight: resolveRaffleFeaturedBannerInnerMinHeight(cardWidth, layout),
+    bodyMinHeight: resolveRaffleFeaturedBodyMinHeight(layout, options),
+    innerMinHeight: resolveRaffleFeaturedBannerInnerMinHeight(cardWidth, layout, options),
     titleSlotHeight: resolveRaffleFeaturedTitleSlotHeight(),
     descriptionSlotHeight: resolveRaffleFeaturedDescriptionSlotHeight(),
     progressSlotHeight: resolveRaffleFeaturedProgressSlotHeight(),

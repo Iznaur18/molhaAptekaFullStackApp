@@ -141,25 +141,35 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
 }));
 
 export const useCartLineItemStyles = createThemedStyles((theme) => ({
-  row: {
-    flexDirection: "row",
-    paddingVertical: theme.spacing[3],
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: theme.colors.border,
-    gap: theme.spacing[3],
+  card: {
+    flexDirection: "column",
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    borderRadius: 8,
+    backgroundColor: theme.colors.surface,
+    marginBottom: 8,
+    gap: 10,
   },
-  rowUpdating: {
+  cardUpdating: {
     opacity: 0.7,
   },
-  rowExcluded: {
+  cardExcluded: {
     opacity: 0.65,
   },
+  topRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+  },
   imageWrap: {
-    width: 72,
-    height: 72,
-    borderRadius: theme.radius.button,
+    width: 52,
+    height: 52,
+    borderRadius: 6,
     overflow: "hidden",
     backgroundColor: theme.colors.surfaceMuted,
+    flexShrink: 0,
   },
   image: {
     width: "100%",
@@ -167,11 +177,17 @@ export const useCartLineItemStyles = createThemedStyles((theme) => ({
   },
   info: {
     flex: 1,
+    minWidth: 0,
   },
   name: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: "600",
     color: theme.colors.text,
+  },
+  nameLink: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: theme.colors.link,
   },
   unitPrice: {
     marginTop: 4,
@@ -183,27 +199,58 @@ export const useCartLineItemStyles = createThemedStyles((theme) => ({
     fontSize: 12,
     color: theme.colors.danger,
   },
-  stepper: {
-    marginTop: theme.spacing[2],
+  bottomRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: theme.spacing[2],
+    justifyContent: "space-between",
   },
-  stepButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 6,
-    backgroundColor: theme.colors.surfaceMuted,
+  controls: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  removeButton: {
+    width: 36,
+    height: 36,
     alignItems: "center",
     justifyContent: "center",
+    marginRight: 10,
+    paddingRight: 10,
+  },
+  removeIcon: {
+    fontSize: 18,
+    color: theme.colors.textMuted,
+  },
+  controlDivider: {
+    width: 1,
+    height: 28,
+    backgroundColor: theme.colors.border,
+    marginRight: 10,
+  },
+  stepper: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 4,
+    paddingVertical: 3,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: 6,
+  },
+  stepButton: {
+    width: 26,
+    height: 26,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 4,
   },
   stepDisabled: {
     opacity: 0.4,
   },
   stepButtonText: {
     fontSize: 18,
-    fontWeight: "600",
-    color: theme.colors.text,
+    fontWeight: "700",
+    color: theme.colors.action,
+    lineHeight: 22,
   },
   quantity: {
     fontSize: 15,
@@ -212,19 +259,21 @@ export const useCartLineItemStyles = createThemedStyles((theme) => ({
     textAlign: "center",
     color: theme.colors.text,
   },
-  actions: {
-    alignItems: "flex-end",
-    justifyContent: "space-between",
+  totalWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  totalDivider: {
+    width: 1,
+    height: 28,
+    backgroundColor: theme.colors.border,
+    marginRight: 10,
   },
   lineTotal: {
     fontSize: 15,
     fontWeight: "700",
     color: theme.colors.text,
-  },
-  remove: {
-    fontSize: 18,
-    color: theme.colors.textMuted,
-    padding: 4,
+    textAlign: "right",
   },
 }));
 
