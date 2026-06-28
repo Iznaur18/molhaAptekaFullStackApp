@@ -5,6 +5,7 @@
 | Гайд | Назначение |
 | ---- | ---------- |
 | [`../../docs/deploy/DEPLOY.md`](../../docs/deploy/DEPLOY.md) | **первый деплой** по шагам |
+| [`../../docs/ROADMAP-SCALING.md`](../../docs/ROADMAP-SCALING.md) | фазы роста, Redis, worker, compliance |
 | [`PRODUCTION-AND-ARCHITECTURE.md`](PRODUCTION-AND-ARCHITECTURE.md) | архитектура, варианты A/B |
 | [`../../docs/deploy/PROD-S3-CDN.md`](../../docs/deploy/PROD-S3-CDN.md) | медиа на R2 |
 
@@ -80,7 +81,8 @@ cd ../client && npm ci && npm run build
 **Nginx:**
 
 - [`docs/deploy/nginx-izibuy.conf.example`](../../docs/deploy/nginx-izibuy.conf.example)
-- SSL: `certbot --nginx -d ваш-домен.ru`
+- SSL: [`docs/deploy/CERTBOT-SSL.md`](../../docs/deploy/CERTBOT-SSL.md) — `setup-ssl.sh` или `certbot --nginx`
+- [ ] `sudo certbot renew --dry-run` после первого SSL
 - `client_max_body_size 6m` — upload до 5 МБ
 
 **Клиент (вариант A):** собирать **без** `VITE_API_URL`.

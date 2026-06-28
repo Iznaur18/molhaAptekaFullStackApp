@@ -5,7 +5,9 @@
 # 2. Пути:
 #    - root → каталог client/dist после npm run build
 #    - upstream → Express на 127.0.0.1:4444
-# 3. SSL: certbot --nginx -d izibuy.ru -d www.izibuy.ru
+# 3. SSL (на VPS): docs/deploy/CERTBOT-SSL.md
+#    ./docs/deploy/scripts/setup-ssl.sh admin@izibuy.ru
+#    или: sudo certbot --nginx -d izibuy.ru -d www.izibuy.ru --redirect
 #
 # server/.env для этого варианта:
 #   FRONTEND_URL=https://izibuy.ru
@@ -33,7 +35,14 @@ server {
     listen [::]:80;
     server_name izibuy.ru www.izibuy.ru;
 
-    # После certbot замени на listen 443 ssl http2; и добавь ssl_certificate*
+    # Certbot (HTTP-01) — не удаляй до получения сертификата
+    location ^~ /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+        default_type "text/plain";
+        allow all;
+    }
+
+    # После `certbot --nginx` появится отдельный server на 443 + редирект с :80
 
     root /var/www/izibuy/client/dist;
     index index.html;

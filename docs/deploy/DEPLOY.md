@@ -5,7 +5,9 @@
 | Документ | Когда |
 | -------- | ----- |
 | Этот файл | первый выклад |
+| [`../ROADMAP-SCALING.md`](../ROADMAP-SCALING.md) | фазы роста, Redis, worker, staging |
 | [`PROD-S3-CDN.md`](PROD-S3-CDN.md) | медиа на R2 вместо диска |
+| [`CERTBOT-SSL.md`](CERTBOT-SSL.md) | Let's Encrypt / продление / troubleshooting |
 | [`../../server/docs/production-checklist.md`](../../server/docs/production-checklist.md) | smoke после деплоя |
 | [`../../server/docs/RUNBOOK.md`](../../server/docs/RUNBOOK.md) | бэкап, rollback |
 
@@ -106,14 +108,18 @@ sudo systemctl status izibuy-api
 ## 5. nginx + SSL
 
 ```bash
+sudo mkdir -p /var/www/certbot
 sudo cp /var/www/izibuy/docs/deploy/nginx-izibuy.conf.example \
   /etc/nginx/sites-available/izibuy
 # root → /var/www/izibuy/client/dist
 sudo ln -sf /etc/nginx/sites-available/izibuy /etc/nginx/sites-enabled/
+sudo rm -f /etc/nginx/sites-enabled/default
 sudo nginx -t
 sudo systemctl reload nginx
 
-sudo certbot --nginx -d izibuy.ru -d www.izibuy.ru
+# SSL (Let's Encrypt, бесплатно) — подробно: docs/deploy/CERTBOT-SSL.md
+chmod +x /var/www/izibuy/docs/deploy/scripts/setup-ssl.sh
+/var/www/izibuy/docs/deploy/scripts/setup-ssl.sh admin@izibuy.ru
 ```
 
 ---

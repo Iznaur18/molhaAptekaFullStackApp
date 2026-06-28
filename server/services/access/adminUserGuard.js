@@ -30,7 +30,7 @@ export async function isUserStaff(userId) {
   return isStaffRole(user?.userRole);
 }
 
-export async function countAdminUsers(excludeUserId = null) {
+export async function countAdminUsers(excludeUserId = null) { // это для того чтобы нельзя было снять роль admin у единственного администратора
   const query = { userRole: ADMIN_ROLE };
   if (excludeUserId) {
     query._id = { $ne: excludeUserId };
