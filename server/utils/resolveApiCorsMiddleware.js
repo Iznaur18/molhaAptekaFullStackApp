@@ -23,7 +23,9 @@ export function resolveApiCorsMiddleware(isProduction) {
   const frontendUrl = process.env.FRONTEND_URL?.trim();
 
   if (isProduction && frontendUrl) {
-    return cors(corsOptionsWithRequestId(frontendUrl));
+    const allowedOrigins = frontendUrl.split(",").map((u) => u.trim());
+    const origin = allowedOrigins.length === 1 ? allowedOrigins[0] : allowedOrigins;
+    return cors(corsOptionsWithRequestId(origin));
   }
 
   return cors(corsOptionsWithRequestId(true));

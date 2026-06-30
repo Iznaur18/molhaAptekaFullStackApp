@@ -28,6 +28,7 @@ import {
   PRODUCT_REPORT_UI,
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useOrdersScreenStyles } from "@/shared/theme/commerceScreenStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
@@ -44,6 +45,7 @@ const STATUS_FILTERS: Array<{ value: string; label: string }> = [
 export const MyOrdersPage = () => {
   const router = useRouter();
   const styles = useOrdersScreenStyles();
+  const { contentPaddingTop } = useScreenLayout();
   const queryClient = useQueryClient();
   const isAuthorized = useIsAuthorized();
   const ordersQuery = useMyOrdersQuery();
@@ -263,7 +265,7 @@ export const MyOrdersPage = () => {
           itemActionErrors={itemActionErrors}
         />
       )}
-      contentContainerStyle={styles.list}
+      contentContainerStyle={[styles.list, { paddingTop: contentPaddingTop + 16 }]}
       refreshControl={
         <ThemedRefreshControl refreshing={ordersQuery.isRefetching} onRefresh={ordersQuery.refetch} />
       }

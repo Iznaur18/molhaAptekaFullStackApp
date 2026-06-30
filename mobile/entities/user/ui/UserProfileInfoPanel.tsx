@@ -96,8 +96,12 @@ const useStyles = createThemedStyles((theme) => ({
     overflow: "hidden",
   },
   detailRow: {
-    flexDirection: "column",
-    gap: 4,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "space-between",
+    columnGap: 12,
+    rowGap: 6,
     paddingHorizontal: 14,
     paddingVertical: 11,
     borderBottomWidth: StyleSheet.hairlineWidth,
@@ -106,6 +110,9 @@ const useStyles = createThemedStyles((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
+    flexGrow: 1,
+    flexShrink: 1,
+    minWidth: 0,
   },
   detailIconWrap: {
     width: 26,
@@ -118,25 +125,25 @@ const useStyles = createThemedStyles((theme) => ({
   detailLabel: {
     fontSize: 13,
     fontWeight: "600",
-    flex: 1,
+    flexShrink: 1,
   },
   detailValue: {
     fontSize: 14,
     fontWeight: "600",
     lineHeight: 20,
-    textAlign: "left",
+    textAlign: "right",
+    flexShrink: 0,
+    marginLeft: "auto",
   },
   detailValuePositive: {
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 999,
-    alignSelf: "flex-start",
   },
   detailValueMuted: {
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 999,
-    alignSelf: "flex-start",
   },
 }));
 

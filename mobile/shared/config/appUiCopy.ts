@@ -21,6 +21,7 @@ export const API_CLIENT_UI = {
   PATCH_CATALOG_FEED_DISPLAY_FALLBACK: "Не удалось сохранить подборку",
   FETCH_MY_ORDERS_FALLBACK: "Не удалось загрузить заказы",
   FETCH_CATEGORY_CHILDREN_FALLBACK: "Не удалось загрузить подкатегории",
+  FETCH_CATEGORY_BREADCRUMB_FALLBACK: "Не удалось загрузить путь категории",
   UPDATE_ORDER_STATUS_FALLBACK: "Не удалось обновить заказ",
   SUBMIT_PRODUCT_REPORT_FALLBACK: "Не удалось отправить жалобу",
   FETCH_PRODUCT_REPORT_STATUS_FALLBACK: "Не удалось проверить жалобу",
@@ -221,6 +222,7 @@ export const PRODUCT_DETAILS_MODAL_UI = {
   SALE_CITY_ALL: "Во всех городах",
   CHARACTERISTICS_TITLE: "Характеристики",
   CHARACTERISTICS_SECTION_ARIA: "Характеристики товара",
+  DESCRIPTION_SECTION_ARIA: "Описание товара",
 } as const;
 
 export const PRODUCT_CARD_UI = {
@@ -310,6 +312,8 @@ export const PRODUCT_REVIEW_UI = {
   CONFIRMED_DATA_REQUIRED:
     "Отзыв доступен только пользователям с подтверждёнными данными",
   NOT_DELIVERED: "Отзыв можно оставить после получения товара",
+  YOUR_REVIEW: "Ваш отзыв",
+  SECTION_TITLE: "Отзывы",
 } as const;
 
 export const PRODUCT_PRICE_OFFER_UI = {

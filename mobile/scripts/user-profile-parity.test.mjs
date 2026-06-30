@@ -72,6 +72,17 @@ test("user profile product thumb seeds catalog cache before product screen", () 
   assert.match(seed, /setQueryData/);
 });
 
+test("user profile info detail rows align label and value on one line", () => {
+  const panel = readMobileFile("entities/user/ui/UserProfileInfoPanel.tsx");
+  const detailRowBlock = panel.match(/detailRow:\s*\{([^}]*)\}/)?.[1] ?? "";
+  const detailValueBlock = panel.match(/detailValue:\s*\{([^}]*)\}/)?.[1] ?? "";
+
+  assert.match(detailRowBlock, /flexDirection:\s*"row"/);
+  assert.match(detailRowBlock, /justifyContent:\s*"space-between"/);
+  assert.match(detailValueBlock, /textAlign:\s*"right"/);
+  assert.doesNotMatch(detailRowBlock, /flexDirection:\s*"column"/);
+});
+
 test("subscriptions and seller name open user profile", () => {
   const subscriptions = readMobileFile("features/subscriptions-page/ui/SubscriptionsPage.tsx");
   const sellerRow = readMobileFile("entities/product/ui/ProductCardSellerRow.tsx");

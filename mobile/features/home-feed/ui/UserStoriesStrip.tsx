@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 
 import type { UserStoryRing } from "@/entities/user-story/api/userStoryApi";
+import { resolveUserStoryAvatarUrl } from "@/entities/user-story/lib/resolveUserStoryAvatarUrl";
 import { CreateUserStoryModal } from "@/features/home-feed/ui/CreateUserStoryModal";
 import { UserStoryViewerModal } from "@/features/home-feed/ui/UserStoryViewerModal";
 import { HOME_FEED_UI, USER_STORY_UI } from "@/shared/config";
@@ -80,7 +81,7 @@ export const UserStoriesStrip = ({
           {sortedRings.map((ring) => {
             const authorId = String(ring.author._id);
             const authorName = ring.author.userName?.trim() || authorId;
-            const avatarUrl = ring.author.userAvatarUrl ?? null;
+            const avatarUrl = resolveUserStoryAvatarUrl(ring.author);
             const ringStyle =
               ring.isOwn || ring.isViewed ? [styles.ring, styles.ringViewed] : styles.ring;
 

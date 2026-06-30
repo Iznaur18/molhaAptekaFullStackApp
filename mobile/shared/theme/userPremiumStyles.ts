@@ -4,10 +4,11 @@ export const useUserPremiumDisplayNameStyles = createThemedStyles((theme) => ({
   root: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     flexWrap: "wrap",
     gap: 4,
     maxWidth: "100%",
+    alignSelf: "stretch",
   },
   text: {
     flexShrink: 1,

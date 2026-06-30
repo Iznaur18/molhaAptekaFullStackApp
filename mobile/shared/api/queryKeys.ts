@@ -129,6 +129,8 @@ export const categoryTreeQueryKeys = {
   all: ["category-tree"] as const,
   children: (categoryId: string) =>
     [...categoryTreeQueryKeys.all, "children", categoryId] as const,
+  breadcrumb: (categoryId: string) =>
+    [...categoryTreeQueryKeys.all, "breadcrumb", categoryId] as const,
 };
 
 export const productReportQueryKeys = {

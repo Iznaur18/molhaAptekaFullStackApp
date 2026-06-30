@@ -2,12 +2,19 @@ import { apiClient } from "@/shared/api";
 import { API_CLIENT_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 
+export type ProductReviewAuthor = {
+  _id: string;
+  userName: string;
+  isUserDataConfirmed: boolean;
+  isPremiumUser?: boolean;
+};
+
 export type ProductReview = {
   _id: string;
   rating: number;
   text?: string;
-  authorUserName?: string;
   createdAt: string;
+  author?: ProductReviewAuthor | null;
 };
 
 export type ProductReviewSummary = {

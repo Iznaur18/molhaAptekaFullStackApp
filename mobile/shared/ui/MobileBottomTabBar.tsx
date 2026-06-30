@@ -77,7 +77,6 @@ const useTabBarStyles = createThemedStyles((theme) => ({
   },
   /** Внешний слой: тень + бордер. Без overflow:hidden, чтобы тень не обрезалась на Android */
   navShadow: {
-    flex: 1,
     borderRadius: 999,
     borderWidth: 1,
     borderColor: "rgba(17, 24, 39, 0.12)",
@@ -101,7 +100,7 @@ const useTabBarStyles = createThemedStyles((theme) => ({
   },
   navRow: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "stretch",
     gap: NAV_ITEMS_GAP,
   },
   item: {

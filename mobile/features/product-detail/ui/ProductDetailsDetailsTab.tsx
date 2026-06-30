@@ -1,6 +1,7 @@
 import { hasProductCharacteristicsContent } from "@izibuy/shared-lib";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
+import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
 import {
@@ -19,7 +20,10 @@ import {
   ProductPriceDisplay,
 } from "@/entities/product/ui/ProductPriceDisplay";
 import { WishlistToggleButton } from "@/features/wishlist-toggle/ui/WishlistToggleButton";
-import { PRODUCT_DETAILS_MODAL_UI, PRODUCT_REPORT_UI } from "@/shared/config";
+import {
+  PRODUCT_DETAILS_MODAL_UI,
+  PRODUCT_REPORT_UI,
+} from "@/shared/config";
 import { useProductDetailScreenStyles } from "@/shared/theme/catalogProductStyles";
 
 type ProductDetailsDetailsTabProps = {
@@ -46,40 +50,27 @@ export const ProductDetailsDetailsTab = ({
   const router = useRouter();
   const styles = useProductDetailScreenStyles();
   const name = String(product.productName ?? "").trim() || "Товар";
+  const [contentTab, setContentTab] = useState<"description" | "characteristics">("description");
 
-  const bottomBlockFieldKeys = filterProductDetailsVisibleFieldKeys(
-    PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS.filter(
-      (key) => getProductFieldReadLayout(key) === "block",
-    ),
-    product,
-  );
   const bottomMetaFieldKeys = PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS.filter(
     (key) => getProductFieldReadLayout(key) === "meta",
   );
   const characteristics = product.productCharacteristics;
-  const hasDetailsSection =
-    bottomBlockFieldKeys.length > 0 ||
-    bottomMetaFieldKeys.length > 0 ||
-    hasProductCharacteristicsContent({
-      productDescription:
-        typeof product.productDescription === "string" ? product.productDescription : "",
-      productCharacteristics: Array.isArray(characteristics) ? characteristics : [],
-    });
+  const descriptionText = String(product.productDescription ?? "").trim();
+  const hasDescription = descriptionText.length > 0;
+  const hasCharacteristics = hasProductCharacteristicsContent({
+    productDescription: typeof product.productDescription === "string" ? product.productDescription : "",
+    productCharacteristics: Array.isArray(characteristics) ? characteristics : [],
+  });
+  const hasContent = hasDescription || hasCharacteristics;
+  const hasBothPanels = hasDescription && hasCharacteristics;
 
-  const reportOverlay =
-    !isOwnProduct ? (
-      <Pressable
-        style={[styles.detailReportButton, reportDisabled && styles.detailReportButtonDisabled]}
-        onPress={onReportPress}
-        disabled={reportDisabled}
-        accessibilityRole="button"
-        accessibilityLabel={
-          reportDisabled ? PRODUCT_REPORT_UI.ALREADY_REPORTED : PRODUCT_REPORT_UI.REPORT_BUTTON
-        }
-      >
-        <MaterialIcons name="flag" size={20} color="#dc2626" />
-      </Pressable>
-    ) : null;
+  const charItems = Array.isArray(characteristics)
+    ? (characteristics as Array<{ key?: string; name?: string; value?: string }>)
+    : [];
+
+  const showDescription = hasDescription && (!hasBothPanels || contentTab === "description");
+  const showCharacteristics = hasCharacteristics && (!hasBothPanels || contentTab === "characteristics");
 
   return (
     <View style={styles.rowTop}>
@@ -90,14 +81,26 @@ export const ProductDetailsDetailsTab = ({
         onBack={() => router.back()}
         heroOverlay={
           !isOwnProduct ? (
-            <WishlistToggleButton
-              productId={productId}
-              product={product}
-              variant="detailHero"
-            />
+            <View style={styles.heroActions}>
+              <Pressable
+                style={[styles.detailReportButton, reportDisabled && styles.detailReportButtonDisabled]}
+                onPress={onReportPress}
+                disabled={reportDisabled}
+                accessibilityRole="button"
+                accessibilityLabel={
+                  reportDisabled ? PRODUCT_REPORT_UI.ALREADY_REPORTED : PRODUCT_REPORT_UI.REPORT_BUTTON
+                }
+              >
+                <MaterialIcons name="flag" size={20} color="#dc2626" />
+              </Pressable>
+              <WishlistToggleButton
+                productId={productId}
+                product={product}
+                variant="detailHeroInline"
+              />
+            </View>
           ) : null
         }
-        reportOverlay={reportOverlay}
       />
 
       <View style={styles.spec}>
@@ -117,25 +120,72 @@ export const ProductDetailsDetailsTab = ({
 
       <ProductDetailsSellerPreview seller={product.productSeller} />
 
-      {hasDetailsSection ? (
+      {hasContent ? (
         <View
           style={styles.detailsSection}
           accessibilityLabel={PRODUCT_DETAILS_MODAL_UI.DETAILS_SECTION_ARIA}
         >
-          {bottomBlockFieldKeys.length > 0 ? (
-            <ProductDetailFieldRows
-              product={product}
-              fieldKeys={bottomBlockFieldKeys}
-              layout="stack"
-            />
+          {hasBothPanels ? (
+            <View style={styles.contentSwitcherTabs}>
+              <Pressable
+                style={[
+                  styles.contentSwitcherTab,
+                  contentTab === "description" && styles.contentSwitcherTabActive,
+                ]}
+                onPress={() => setContentTab("description")}
+              >
+                <Text
+                  style={[
+                    styles.contentSwitcherTabText,
+                    contentTab === "description" && styles.contentSwitcherTabTextActive,
+                  ]}
+                >
+                  Описание
+                </Text>
+              </Pressable>
+              <Pressable
+                style={[
+                  styles.contentSwitcherTab,
+                  contentTab === "characteristics" && styles.contentSwitcherTabActive,
+                ]}
+                onPress={() => setContentTab("characteristics")}
+              >
+                <Text
+                  style={[
+                    styles.contentSwitcherTabText,
+                    contentTab === "characteristics" && styles.contentSwitcherTabTextActive,
+                  ]}
+                >
+                  Характеристики
+                </Text>
+              </Pressable>
+            </View>
           ) : null}
-          <ProductCharacteristicsDetails
-            items={
-              Array.isArray(characteristics)
-                ? (characteristics as Array<{ key?: string; name?: string; value?: string }>)
-                : []
-            }
-          />
+
+          {showDescription || showCharacteristics ? (
+            <View
+              style={styles.contentSwitcherPanel}
+              accessibilityRole={hasBothPanels ? "tabpanel" : undefined}
+              accessibilityLabel={
+                showCharacteristics
+                  ? PRODUCT_DETAILS_MODAL_UI.CHARACTERISTICS_SECTION_ARIA
+                  : PRODUCT_DETAILS_MODAL_UI.DESCRIPTION_SECTION_ARIA
+              }
+            >
+              {showDescription ? (
+                <Text style={styles.descriptionText}>{descriptionText}</Text>
+              ) : null}
+
+              {showCharacteristics ? (
+                <ProductCharacteristicsDetails
+                  items={charItems}
+                  showTitle={!hasBothPanels}
+                  embedded
+                />
+              ) : null}
+            </View>
+          ) : null}
+
           {bottomMetaFieldKeys.length > 0 ? (
             <View style={styles.metaGrid}>
               <ProductDetailFieldRows product={product} fieldKeys={bottomMetaFieldKeys} />

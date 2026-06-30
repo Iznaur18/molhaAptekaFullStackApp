@@ -26,6 +26,7 @@ import {
   SELLER_PERSONAL_CATEGORY_PAGE_UI,
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useCatalogBrowserPageStyles } from "@/shared/theme/catalogProductStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
@@ -33,6 +34,7 @@ export const CatalogBrowserPage = () => {
   const router = useRouter();
   const styles = useCatalogBrowserPageStyles();
   const gridLayout = useCatalogBrowserGridLayout();
+  const { contentPaddingTop } = useScreenLayout();
   const { isAdmin, isAuthorized } = useUserAccess();
 
   const categoryDisplaysQuery = useProductCategoryDisplaysQuery();
@@ -128,7 +130,7 @@ export const CatalogBrowserPage = () => {
 
   return (
     <>
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView contentContainerStyle={[styles.container, { paddingTop: contentPaddingTop + 16 }]}>
         <CatalogBrowserTilesGrid
           title={PRODUCT_CATEGORY_DISPLAY_UI.FEED_SECTION_TITLE}
           accessibilityLabel={PRODUCT_CATEGORY_DISPLAY_UI.FEED_GRID_ARIA}

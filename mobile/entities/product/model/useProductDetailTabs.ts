@@ -51,11 +51,11 @@ export const useProductDetailTabs = ({ product, currentUserId }: UseProductDetai
     if (showAuctionTab) {
       items.push({ id: "auction", label: PRODUCT_PRICE_OFFER_UI.TAB_AUCTION });
     }
-    if (showInstallmentTab) {
-      items.push({ id: "installment", label: INSTALLMENT_UI.TAB });
-    }
     if (showReviewsTab) {
       items.push({ id: "reviews", label: reviewsTabLabel });
+    }
+    if (showInstallmentTab) {
+      items.push({ id: "installment", label: INSTALLMENT_UI.TAB });
     }
     return items;
   }, [reviewsTabLabel, showAuctionTab, showInstallmentTab, showReviewsTab]);

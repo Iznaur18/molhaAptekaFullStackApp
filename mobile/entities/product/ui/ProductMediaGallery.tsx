@@ -1,5 +1,5 @@
 import { useMemo, useState, type ReactNode } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, useWindowDimensions, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 import { buildProductMediaSlides } from "@/entities/product/lib/buildProductMediaSlides";
@@ -26,6 +26,7 @@ export const ProductMediaGallery = ({
   reportOverlay = null,
 }: ProductMediaGalleryProps) => {
   const styles = useProductMediaGalleryStyles();
+  const { height: screenHeight } = useWindowDimensions();
   const [previewVideoFailed, setPreviewVideoFailed] = useState(false);
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const isDetail = variant === "detail";
@@ -57,7 +58,10 @@ export const ProductMediaGallery = ({
     setActiveSlideIndex((index) => (index + 1) % mediaSlides.length);
   };
 
-  const heroStyle = isDetail ? styles.detailHero : styles.hero;
+  const heroHeight = Math.min(screenHeight * 0.52, 400);
+  const heroStyle = isDetail
+    ? [styles.detailHero, { height: heroHeight }]
+    : styles.hero;
   const rootStyle = isDetail ? styles.detailRoot : styles.root;
 
   const renderHeroMedia = () => (

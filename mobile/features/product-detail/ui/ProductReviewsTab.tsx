@@ -7,6 +7,8 @@ import {
   useProductReviewsPageQuery,
 } from "@/entities/product-review/model/useProductReviewsQuery";
 import { useSubmitProductReviewMutation } from "@/entities/product-review/model/useSubmitProductReviewMutation";
+import { ProductReviewListItem } from "@/entities/product-review/ui/ProductReviewListItem";
+import { ProductReviewSummary } from "@/entities/product-review/ui/ProductReviewSummary";
 import { PRODUCT_REVIEW_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
@@ -59,12 +61,14 @@ export const ProductReviewsTab = ({
   }
 
   const summary = summaryQuery.data;
-  const reviews = reviewsQuery.data?.reviews ?? [];
+  const allReviews = reviewsQuery.data?.reviews ?? [];
+  const myReview = summary.myReview ?? null;
+  const otherReviews = myReview
+    ? allReviews.filter((r) => r._id !== myReview._id)
+    : allReviews;
 
   const handleSubmit = async () => {
-    if (rating < 1) {
-      return;
-    }
+    if (rating < 1) return;
     setErrorMessage("");
     try {
       await submitMutation.mutateAsync({ rating, text: text.trim() || undefined });
@@ -78,23 +82,18 @@ export const ProductReviewsTab = ({
   };
 
   const renderComposer = () => {
-    if (isOwnProduct) {
-      return null;
-    }
+    if (isOwnProduct || myReview) return null;
     if (!isAuthorized) {
       return (
         <AppButton
           label={PRODUCT_REVIEW_UI.LOGIN_TO_REVIEW}
-          variant="contrast"
+          variant="primary"
           onPress={() => router.push("/(auth)/login")}
         />
       );
     }
     if (!isUserDataConfirmed) {
       return <Text style={styles.hint}>{PRODUCT_REVIEW_UI.CONFIRMED_DATA_REQUIRED}</Text>;
-    }
-    if (summary.myReview) {
-      return null;
     }
     if (!summary.canReview) {
       return <Text style={styles.hint}>{PRODUCT_REVIEW_UI.NOT_DELIVERED}</Text>;
@@ -133,27 +132,31 @@ export const ProductReviewsTab = ({
 
   return (
     <View style={styles.root}>
-      <Text style={styles.summary}>
-        {PRODUCT_REVIEW_UI.SUMMARY_LINE(summary.averageRating, summary.reviewCount)}
-      </Text>
+      <ProductReviewSummary
+        averageRating={summary.averageRating}
+        reviewCount={summary.reviewCount}
+      />
+
+      {myReview ? (
+        <>
+          <Text style={styles.subheading}>{PRODUCT_REVIEW_UI.YOUR_REVIEW}</Text>
+          <ProductReviewListItem review={myReview} />
+        </>
+      ) : null}
+
       {renderComposer()}
-      {reviews.length === 0 ? (
+
+      {otherReviews.length === 0 && !myReview ? (
         <Text style={styles.empty}>{PRODUCT_REVIEW_UI.EMPTY}</Text>
-      ) : (
+      ) : otherReviews.length > 0 ? (
         <FlatList
-          data={reviews}
+          data={otherReviews}
           keyExtractor={(item) => item._id}
           scrollEnabled={false}
           contentContainerStyle={styles.list}
-          renderItem={({ item }) => (
-            <View style={styles.item}>
-              <Text style={styles.itemTitle}>★ {item.rating}</Text>
-              {item.authorUserName ? <Text style={styles.itemMeta}>{item.authorUserName}</Text> : null}
-              {item.text ? <Text style={styles.itemBody}>{item.text}</Text> : null}
-            </View>
-          )}
+          renderItem={({ item }) => <ProductReviewListItem review={item} />}
         />
-      )}
+      ) : null}
     </View>
   );
 };

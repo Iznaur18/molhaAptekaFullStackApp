@@ -20,12 +20,14 @@ import { orderQueryKeys } from "@/shared/api";
 import { API_CLIENT_UI, AUTH_UI, CART_PAGE_UI, CHECKOUT_FORM_UI } from "@/shared/config";
 import { formatApiErrorMessage, formatPriceRub } from "@/shared/lib";
 import { useCartScreenStyles } from "@/shared/theme/catalogProductStyles";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { AppButton } from "@/shared/ui/AppButton";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 export default function CartScreen() {
   const router = useRouter();
   const styles = useCartScreenStyles();
+  const { contentPaddingTop } = useScreenLayout();
   const queryClient = useQueryClient();
   const isAuthorized = useIsAuthorized();
   const sessionQuery = useAuthSessionQuery();
@@ -207,7 +209,7 @@ export default function CartScreen() {
           exclusionReason={lineExclusionByProductId.get(item.productId) ?? null}
         />
       )}
-      contentContainerStyle={styles.list}
+      contentContainerStyle={[styles.list, { paddingTop: contentPaddingTop + 8 }]}
       ListFooterComponent={listFooter}
       refreshControl={
         <ThemedRefreshControl

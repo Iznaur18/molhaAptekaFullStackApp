@@ -26,7 +26,7 @@ export default function ProfileScreen() {
   const router = useRouter();
   const scrollRef = useRef<ScrollView>(null);
   const styles = useProfileScreenStyles();
-  const { centeredContentStyle } = useScreenLayout();
+  const { centeredContentStyle, contentPaddingTop } = useScreenLayout();
   const sessionQuery = useAuthSessionQuery();
   const [emailModalVisible, setEmailModalVisible] = useState(false);
   const [navSheetVisible, setNavSheetVisible] = useState(false);
@@ -54,7 +54,7 @@ export default function ProfileScreen() {
 
   if (!isLoggedIn) {
     return (
-      <ScrollView contentContainerStyle={styles.guestContent}>
+      <ScrollView contentContainerStyle={[styles.guestContent, { paddingTop: contentPaddingTop + 24 }]}>
         <Text style={styles.title}>{AUTH_UI.PROFILE_TITLE}</Text>
         <Text style={styles.subtitle}>{AUTH_UI.GUEST_STATUS}</Text>
         <View style={styles.actions}>
@@ -83,7 +83,7 @@ export default function ProfileScreen() {
     <>
       <ScrollView
         ref={scrollRef}
-        contentContainerStyle={[styles.scrollContent, centeredContentStyle]}
+        contentContainerStyle={[styles.scrollContent, centeredContentStyle, { paddingTop: contentPaddingTop + 12 }]}
         refreshControl={
           <ThemedRefreshControl
             refreshing={sessionQuery.isRefetching}

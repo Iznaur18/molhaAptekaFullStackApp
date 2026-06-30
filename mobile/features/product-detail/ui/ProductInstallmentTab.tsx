@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 
 import { addressValueFromUser } from "@/entities/address/lib/addressValueFromUser";
@@ -18,8 +18,13 @@ import { INSTALLMENT_UI, PRODUCT_UI } from "@/shared/config";
 import { formatPriceRub } from "@/shared/lib";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useProductDetailTabStyles } from "@/shared/theme/catalogProductStyles";
-import { AppButton } from "@/shared/ui/AppButton";
 import { ScreenLoadingState } from "@/shared/ui/ScreenStates";
+
+export type ProductInstallmentDockFooter = {
+  onSubmit: () => void;
+  disabled: boolean;
+  label: string;
+};
 
 type ProductInstallmentTabProps = {
   productId: string;
@@ -28,6 +33,8 @@ type ProductInstallmentTabProps = {
   isUserDataConfirmed: boolean;
   isOwnProduct: boolean;
   defaultUser?: Record<string, unknown> | null;
+  dockSubmit?: boolean;
+  onDockFooterChange?: (footer: ProductInstallmentDockFooter | null) => void;
 };
 
 const resolvePlanTotal = (plan: InstallmentPlan) =>
@@ -40,6 +47,8 @@ export const ProductInstallmentTab = ({
   isUserDataConfirmed,
   isOwnProduct,
   defaultUser,
+  dockSubmit = true,
+  onDockFooterChange,
 }: ProductInstallmentTabProps) => {
   const theme = useAppTheme();
   const styles = useProductDetailTabStyles();
@@ -53,27 +62,11 @@ export const ProductInstallmentTab = ({
   const [paymentMethod, setPaymentMethod] = useState<OrderPaymentMethod>(
     ORDER_PAYMENT_METHOD_CARD_PREPAID,
   );
+  const [paymentMenuOpen, setPaymentMenuOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  if (isOwnProduct) {
-    return <Text style={styles.message}>{INSTALLMENT_UI.SELLER_TAB_HINT}</Text>;
-  }
-
-  if (!installmentEnabled) {
-    return <Text style={styles.message}>{PRODUCT_UI.INSTALLMENT_EMPTY}</Text>;
-  }
-
-  if (programQuery.isPending) {
-    return <ScreenLoadingState />;
-  }
-
-  const program = programQuery.data;
-  const plans = program?.plans ?? [];
-  const selectedPlan = plans.find((plan) => plan._id === selectedPlanId) ?? null;
-  const qty = Math.max(1, Number.parseInt(quantity, 10) || 1);
-
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     setErrorMessage("");
     setSuccessMessage("");
 
@@ -81,12 +74,10 @@ export const ProductInstallmentTab = ({
       setErrorMessage(INSTALLMENT_UI.BUYER_REQUIRES_CONFIRMED);
       return;
     }
-
     if (!isUserDataConfirmed) {
       setErrorMessage(INSTALLMENT_UI.BUYER_REQUIRES_CONFIRMED);
       return;
     }
-
     if (!selectedPlanId) {
       setErrorMessage(INSTALLMENT_UI.SELECT_PLAN);
       return;
@@ -97,6 +88,8 @@ export const ProductInstallmentTab = ({
       setErrorMessage(addressError);
       return;
     }
+
+    const qty = Math.max(1, Number.parseInt(quantity, 10) || 1);
 
     try {
       await createContractMutation.mutateAsync({
@@ -113,7 +106,69 @@ export const ProductInstallmentTab = ({
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : INSTALLMENT_UI.ERROR_GENERIC);
     }
-  };
+  }, [
+    createContractMutation,
+    deliveryAddress,
+    isAuthorized,
+    isUserDataConfirmed,
+    paymentMethod,
+    productId,
+    quantity,
+    selectedPlanId,
+  ]);
+
+  const program = programQuery.data;
+  const plans = program?.plans ?? [];
+  const selectedPlan = plans.find((plan) => plan._id === selectedPlanId) ?? null;
+  const qty = Math.max(1, Number.parseInt(quantity, 10) || 1);
+  const isSubmitDisabled =
+    createContractMutation.isPending || !isAuthorized || !isUserDataConfirmed;
+  const showCheckoutForm =
+    !isOwnProduct &&
+    installmentEnabled &&
+    !programQuery.isPending &&
+    Boolean(program?.isEnabled) &&
+    plans.length > 0;
+
+  useEffect(() => {
+    if (!dockSubmit || !onDockFooterChange || !showCheckoutForm) {
+      onDockFooterChange?.(null);
+      return;
+    }
+
+    onDockFooterChange({
+      onSubmit: () => {
+        void handleSubmit();
+      },
+      disabled: isSubmitDisabled,
+      label: createContractMutation.isPending
+        ? INSTALLMENT_UI.SUBMITTING
+        : INSTALLMENT_UI.SUBMIT,
+    });
+
+    return () => {
+      onDockFooterChange(null);
+    };
+  }, [
+    createContractMutation.isPending,
+    dockSubmit,
+    handleSubmit,
+    isSubmitDisabled,
+    onDockFooterChange,
+    showCheckoutForm,
+  ]);
+
+  if (isOwnProduct) {
+    return <Text style={styles.message}>{INSTALLMENT_UI.SELLER_TAB_HINT}</Text>;
+  }
+
+  if (!installmentEnabled) {
+    return <Text style={styles.message}>{PRODUCT_UI.INSTALLMENT_EMPTY}</Text>;
+  }
+
+  if (programQuery.isPending) {
+    return <ScreenLoadingState />;
+  }
 
   if (!program?.isEnabled || plans.length === 0) {
     const moderationHint =
@@ -125,9 +180,7 @@ export const ProductInstallmentTab = ({
 
   return (
     <View style={styles.tabContainer}>
-      {!isAuthorized || !isUserDataConfirmed ? (
-        <Text style={styles.hint}>{INSTALLMENT_UI.BUYER_HINT}</Text>
-      ) : null}
+      <Text style={styles.installmentBuyerHint}>{INSTALLMENT_UI.BUYER_HINT}</Text>
 
       <Text style={styles.label}>{INSTALLMENT_UI.PLANS_LABEL}</Text>
       {plans.map((plan) => {
@@ -138,68 +191,104 @@ export const ProductInstallmentTab = ({
             style={[styles.planCard, isSelected && styles.planCardSelected]}
             onPress={() => setSelectedPlanId(plan._id)}
           >
-            <Text style={styles.planTitle}>{plan.title ?? "План"}</Text>
-            <Text style={styles.planMeta}>
-              {plan.monthsCount} мес. · {formatPriceRub(plan.monthlyAmountRub)} / мес.
-            </Text>
-            {!plan.firstPaymentRequiredNow ? (
-              <Text style={styles.planMeta}>{INSTALLMENT_UI.FIRST_PAYMENT_LATER}</Text>
-            ) : null}
-            <Text style={styles.planTotal}>
-              {INSTALLMENT_UI.TOTAL_LABEL}: {formatPriceRub(resolvePlanTotal(plan) * qty)}
-            </Text>
+            <View style={[styles.planRadioOuter, isSelected && styles.planRadioOuterSelected]}>
+              {isSelected ? <View style={styles.planRadioInner} /> : null}
+            </View>
+            <View style={styles.planContent}>
+              <Text style={styles.planTitle}>{plan.title ?? "План"}</Text>
+              <Text style={styles.planMeta}>
+                {plan.monthsCount} мес × {formatPriceRub(plan.monthlyAmountRub)}
+              </Text>
+              {!plan.firstPaymentRequiredNow ? (
+                <Text style={styles.planMeta}>{INSTALLMENT_UI.FIRST_PAYMENT_LATER}</Text>
+              ) : null}
+            </View>
           </Pressable>
         );
       })}
 
-      <Text style={styles.label}>{INSTALLMENT_UI.QUANTITY_LABEL}</Text>
-      <TextInput
-        style={styles.compactInput}
-        value={quantity}
-        onChangeText={setQuantity}
-        keyboardType="number-pad"
-        placeholderTextColor={theme.colors.textMuted}
-      />
-
-      <AddressSuggestInput
-        value={deliveryAddress}
-        onChange={setDeliveryAddress}
-        disabled={createContractMutation.isPending}
-      />
-
-      <Text style={styles.label}>{INSTALLMENT_UI.PAYMENT_METHOD_LABEL}</Text>
-      {ORDER_PAYMENT_METHODS.map((method) => {
-        const isActive = paymentMethod === method;
-        return (
-          <Pressable
-            key={method}
-            style={[styles.methodChip, isActive && styles.methodChipActive]}
-            onPress={() => setPaymentMethod(method)}
-          >
-            <Text style={[styles.methodText, isActive && styles.methodTextActive]}>
-              {ORDER_PAYMENT_METHOD_LABEL_RU[method]}
-            </Text>
-          </Pressable>
-        );
-      })}
+      <View>
+        <Text style={styles.label}>{INSTALLMENT_UI.QUANTITY_LABEL}</Text>
+        <TextInput
+          style={[styles.compactInput, styles.quantityField, { marginTop: 6 }]}
+          value={quantity}
+          onChangeText={setQuantity}
+          keyboardType="number-pad"
+          placeholderTextColor={theme.colors.textMuted}
+        />
+      </View>
 
       {selectedPlan ? (
-        <Text style={styles.summaryStrong}>
-          {INSTALLMENT_UI.MONTHLY_LABEL}: {formatPriceRub(selectedPlan.monthlyAmountRub)}
-        </Text>
+        <View style={{ gap: 8 }}>
+          <View style={styles.totalBox}>
+            <Text style={styles.totalBoxLabel}>{INSTALLMENT_UI.MONTHLY_LABEL}</Text>
+            <Text style={styles.totalBoxValue}>
+              {formatPriceRub((selectedPlan.monthlyAmountRub ?? 0) * qty)}
+            </Text>
+          </View>
+          <View style={styles.totalBox}>
+            <Text style={styles.totalBoxLabel}>{INSTALLMENT_UI.TOTAL_LABEL}</Text>
+            <Text style={styles.totalBoxValue}>
+              {formatPriceRub(resolvePlanTotal(selectedPlan) * qty)}
+            </Text>
+          </View>
+        </View>
       ) : null}
+
+      <View style={styles.addressSection}>
+        <AddressSuggestInput
+          value={deliveryAddress}
+          onChange={setDeliveryAddress}
+          disabled={createContractMutation.isPending}
+        />
+
+        <View>
+          <Text style={styles.label}>{INSTALLMENT_UI.PAYMENT_METHOD_LABEL}</Text>
+          <Pressable
+            style={styles.paymentSelect}
+            onPress={() => setPaymentMenuOpen((v) => !v)}
+          >
+            <Text style={styles.paymentSelectText}>
+              {ORDER_PAYMENT_METHOD_LABEL_RU[paymentMethod]}
+            </Text>
+            <Text style={styles.paymentSelectChevron}>{paymentMenuOpen ? "▲" : "▾"}</Text>
+          </Pressable>
+          {paymentMenuOpen ? (
+            <View style={styles.paymentDropdown}>
+              {ORDER_PAYMENT_METHODS.map((method, index) => {
+                const isActive = paymentMethod === method;
+                const isLast = index === ORDER_PAYMENT_METHODS.length - 1;
+                return (
+                  <Pressable
+                    key={method}
+                    style={[
+                      styles.paymentDropdownItem,
+                      isLast && styles.paymentDropdownItemLast,
+                      isActive && styles.paymentDropdownItemActive,
+                    ]}
+                    onPress={() => {
+                      setPaymentMethod(method);
+                      setPaymentMenuOpen(false);
+                    }}
+                  >
+                    <Text
+                      style={[
+                        styles.paymentDropdownItemText,
+                        isActive && styles.paymentDropdownItemTextActive,
+                      ]}
+                    >
+                      {ORDER_PAYMENT_METHOD_LABEL_RU[method]}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          ) : null}
+        </View>
+      </View>
 
       {successMessage ? <Text style={styles.success}>{successMessage}</Text> : null}
       {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
-
-      <AppButton
-        label={INSTALLMENT_UI.SUBMIT}
-        variant="contrast"
-        onPress={() => void handleSubmit()}
-        disabled={
-          createContractMutation.isPending || !isAuthorized || !isUserDataConfirmed
-        }
-      />
     </View>
   );
 };

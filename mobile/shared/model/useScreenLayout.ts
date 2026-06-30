@@ -32,6 +32,7 @@ export type ScreenLayout = {
   contentMaxWidth: number | undefined;
   profileContentMaxWidth: number;
   contentPaddingHorizontal: number;
+  contentPaddingTop: number;
   contentPaddingBottom: number;
   centeredContentStyle: ViewStyle;
   profileContentStyle: ViewStyle;
@@ -52,6 +53,7 @@ export const useScreenLayout = (): ScreenLayout => {
     const contentMaxWidth = resolveContentMaxWidth(width);
     const profileContentMaxWidth = resolveProfileContentMaxWidth(width);
     const contentPaddingHorizontal = resolveScreenContentPaddingHorizontal(safeAreaInsets);
+    const contentPaddingTop = safeAreaInsets.top;
     const contentPaddingBottom = resolveScreenContentPaddingBottom(safeAreaInsets.bottom);
 
     const centeredContentStyle: ViewStyle = contentMaxWidth
@@ -77,6 +79,7 @@ export const useScreenLayout = (): ScreenLayout => {
       contentMaxWidth,
       profileContentMaxWidth,
       contentPaddingHorizontal,
+      contentPaddingTop,
       contentPaddingBottom,
       centeredContentStyle,
       profileContentStyle,

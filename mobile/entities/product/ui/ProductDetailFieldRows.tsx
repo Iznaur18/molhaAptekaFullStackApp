@@ -52,10 +52,25 @@ export const ProductDetailFieldRows = ({
           isProductFieldMultilineRead(key) && styles.valueMultiline,
         ];
 
+        const isStatRow = readLayout === "stat";
+        const displayValue = formatProductFieldForDisplay(key, product);
+
         return (
           <View key={key} style={rowStyle}>
-            <Text style={labelStyle}>{getProductFieldLabel(key)}</Text>
-            <Text style={valueStyle}>{formatProductFieldForDisplay(key, product)}</Text>
+            <Text
+              style={labelStyle}
+              numberOfLines={isStatRow ? 1 : undefined}
+              ellipsizeMode={isStatRow ? "tail" : undefined}
+            >
+              {getProductFieldLabel(key)}
+            </Text>
+            <Text
+              style={valueStyle}
+              numberOfLines={isStatRow ? 1 : undefined}
+              ellipsizeMode={isStatRow ? "tail" : undefined}
+            >
+              {displayValue}
+            </Text>
           </View>
         );
       })}

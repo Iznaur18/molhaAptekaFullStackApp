@@ -1,5 +1,7 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useLayoutEffect, useMemo } from "react";
+import { View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
@@ -22,6 +24,7 @@ import { ScreenLoadingState } from "@/shared/ui/ScreenStates";
 export default function HubSectionScreen() {
   const router = useRouter();
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
   const { section } = useLocalSearchParams<{ section: string }>();
   const sectionId = String(section ?? "");
   const userAccess = useUserAccess();
@@ -65,49 +68,67 @@ export default function HubSectionScreen() {
     }
   }, [router, sectionId]);
 
+  const shell = { flex: 1, paddingTop: insets.top } as const;
+
   if (!userAccess.isAuthorized && userAccess.isGuest) {
     return (
-      <HubSectionPlaceholder
-        title={AUTH_UI.GUEST_STATUS}
-        hint={HUB_SECTION_UI.REQUIRES_AUTH}
-        onBack={() => router.replace("/(tabs)/profile")}
-      />
+      <View style={shell}>
+        <HubSectionPlaceholder
+          title={AUTH_UI.GUEST_STATUS}
+          hint={HUB_SECTION_UI.REQUIRES_AUTH}
+          onBack={() => router.replace("/(tabs)/profile")}
+        />
+      </View>
     );
   }
 
   if (!isProfileSectionId(sectionId)) {
     return (
-      <HubSectionPlaceholder
-        title={HUB_SECTION_UI.FORBIDDEN_TITLE}
-        hint={HUB_SECTION_UI.FORBIDDEN_HINT}
-        onBack={() => router.replace("/(tabs)/profile")}
-      />
+      <View style={shell}>
+        <HubSectionPlaceholder
+          title={HUB_SECTION_UI.FORBIDDEN_TITLE}
+          hint={HUB_SECTION_UI.FORBIDDEN_HINT}
+          onBack={() => router.replace("/(tabs)/profile")}
+        />
+      </View>
     );
   }
 
   if (PROFILE_SECTION_EXTERNAL_ROUTES[sectionId]) {
-    return <ScreenLoadingState message={AUTH_UI.SESSION_CHECK} />;
+    return (
+      <View style={shell}>
+        <ScreenLoadingState message={AUTH_UI.SESSION_CHECK} />
+      </View>
+    );
   }
 
   if (isProfileStaffWebOnlySection(sectionId)) {
-    return <ScreenLoadingState message={HUB_SECTION_UI.OPENING_WEB} />;
+    return (
+      <View style={shell}>
+        <ScreenLoadingState message={HUB_SECTION_UI.OPENING_WEB} />
+      </View>
+    );
   }
 
   if (!canAccessProfileSection(sectionId, userAccess, hubAccess)) {
     return (
-      <HubSectionPlaceholder
-        title={HUB_SECTION_UI.FORBIDDEN_TITLE}
-        hint={HUB_SECTION_UI.FORBIDDEN_HINT}
-        onBack={() => router.replace("/(tabs)/profile")}
-      />
+      <View style={shell}>
+        <HubSectionPlaceholder
+          title={HUB_SECTION_UI.FORBIDDEN_TITLE}
+          hint={HUB_SECTION_UI.FORBIDDEN_HINT}
+          onBack={() => router.replace("/(tabs)/profile")}
+        />
+      </View>
     );
   }
 
   return (
-    <HubSectionContent
-      sectionId={sectionId}
-      sectionTitle={sectionTitle}
-      onBack={() => router.replace("/(tabs)/profile")}
-    />
+    <View style={shell}>
+      <HubSectionContent
+        sectionId={sectionId}
+        sectionTitle={sectionTitle}
+        onBack={() => router.replace("/(tabs)/profile")}
+      />
+    </View>
   );
 }

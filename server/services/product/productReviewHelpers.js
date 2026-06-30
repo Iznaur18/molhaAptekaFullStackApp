@@ -17,7 +17,7 @@ import {
   UserModel,
 } from "../../models/index.js";
 
-const AUTHOR_PUBLIC_SELECT = "_id userName isUserDataConfirmed";
+const AUTHOR_PUBLIC_SELECT = "_id userName isUserDataConfirmed isPremiumUser";
 
 /**
  * @param {{ productSeller?: unknown } | null} product
@@ -211,6 +211,7 @@ export const serializeProductReview = (review, author = null) => {
           _id: String(authorDoc._id),
           userName: authorDoc.userName ?? "",
           isUserDataConfirmed: authorDoc.isUserDataConfirmed === true,
+          isPremiumUser: authorDoc.isPremiumUser === true,
         }
       : null,
   };

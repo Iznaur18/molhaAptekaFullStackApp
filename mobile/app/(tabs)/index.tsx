@@ -4,9 +4,6 @@ import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 import { useFocusEffect } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 
-import { buildCategoryFilterChips } from "@/entities/product-category-display/lib/buildCategoryFilterChips";
-import { useProductCategoryDisplaysQuery } from "@/entities/product-category-display/model/useProductCategoryDisplaysQuery";
-import { useProductCategoryChildrenQuery } from "@/entities/product-category-tree/model/useProductCategoryChildrenQuery";
 import type { CatalogListFilters, CatalogSort } from "@/entities/product/model/catalogListFilters";
 import { useCatalogProductsInfiniteQuery } from "@/entities/product/model/useCatalogProductsInfiniteQuery";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
@@ -14,8 +11,8 @@ import { buildCatalogGridRows } from "@/features/catalog-grid/lib/buildCatalogGr
 import { resolveCatalogGridListContentStyle } from "@/features/catalog-grid/lib/catalogGridLayout";
 import { shouldShowCatalogTier3Banners } from "@/features/catalog-grid/lib/shouldShowCatalogTier3Banners";
 import { CatalogGridRowItem } from "@/features/catalog-grid/ui/CatalogGridRowItem";
-import { CatalogCategoryChips } from "@/features/catalog-filter/ui/CatalogCategoryChips";
-import { CatalogSubcategoryChips } from "@/features/catalog-filter/ui/CatalogSubcategoryChips";
+import { useCatalogBreadcrumbLabel } from "@/features/catalog-filter/model/useCatalogBreadcrumbLabel";
+import { CatalogBreadcrumb } from "@/features/catalog-filter/ui/CatalogBreadcrumb";
 import { consumePendingCatalogFilters } from "@/features/catalog-browser/model/pendingCatalogFilters";
 import { isHomeCuratedProductListsVisible } from "@/entities/curated-product-list/lib/isHomeCuratedProductListsVisible";
 import { isHomeCatalogMainView } from "@/features/home-feed/lib/isHomeCatalogMainView";
@@ -59,27 +56,6 @@ export default function CatalogScreen() {
   const [feedFilters, setFeedFilters] = useState<FeedFiltersState>(EMPTY_FEED_FILTERS);
   const [catalogAllCities, setCatalogAllCities] = useState(false);
 
-  const categoryDisplaysQuery = useProductCategoryDisplaysQuery();
-  const categoryChips = useMemo(
-    () => buildCategoryFilterChips(categoryDisplaysQuery.data ?? []),
-    [categoryDisplaysQuery.data],
-  );
-
-  const selectedRootChip = useMemo(
-    () => categoryChips.find((chip) => chip.slug === selectedRootSlug) ?? null,
-    [categoryChips, selectedRootSlug],
-  );
-
-  const childrenQuery = useProductCategoryChildrenQuery(selectedRootChip?.categoryId ?? null);
-
-  const subcategoryChips = useMemo(() => {
-    const categories = childrenQuery.data?.categories ?? [];
-    return categories.map((node) => ({
-      id: String(node._id),
-      label: String(node.name ?? node._id),
-    }));
-  }, [childrenQuery.data]);
-
   useEffect(() => {
     const timer = setTimeout(() => {
       const trimmed = searchInput.trim();
@@ -113,13 +89,6 @@ export default function CatalogScreen() {
       });
     }, []),
   );
-
-  const handleRootCategorySelect = (slug: string | null) => {
-    setSelectedRootSlug(slug);
-    setSelectedSubcategoryId(null);
-    setSelectedSellerPersonalCategoryId(null);
-    setFeedFilters(EMPTY_FEED_FILTERS);
-  };
 
   const catalogFilters = useMemo(
     (): CatalogListFilters => ({
@@ -163,6 +132,15 @@ export default function CatalogScreen() {
       }),
     [debouncedSearch, feedFilters, selectedRootSlug, selectedSubcategoryId, selectedSellerPersonalCategoryId],
   );
+
+  const catalogBreadcrumbLabel = useCatalogBreadcrumbLabel({
+    enabled: !showHomeFeed,
+    search: debouncedSearch,
+    selectedRootSlug,
+    selectedSubcategoryId,
+    selectedSellerPersonalCategoryId,
+    feedFilters,
+  });
 
   const showFullWidthTier3Banners = shouldShowCatalogTier3Banners({ showHomeFeed });
 
@@ -245,20 +223,7 @@ export default function CatalogScreen() {
 
   const listHeader = (
     <View>
-      {!showHomeFeed ? (
-        <>
-          <CatalogCategoryChips
-            chips={categoryChips}
-            selectedSlug={selectedRootSlug}
-            onSelect={handleRootCategorySelect}
-          />
-          <CatalogSubcategoryChips
-            subcategories={subcategoryChips}
-            selectedSubcategoryId={selectedSubcategoryId}
-            onSelect={setSelectedSubcategoryId}
-          />
-        </>
-      ) : null}
+      {!showHomeFeed ? <CatalogBreadcrumb label={catalogBreadcrumbLabel} /> : null}
       {showHomeFeed ? (
         <HomeFeedHeader
           enabled={showHomeFeed}

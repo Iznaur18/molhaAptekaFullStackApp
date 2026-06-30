@@ -49,7 +49,7 @@ export const isProductFieldMultilineRead = (key: string): boolean => key === "pr
 export const getProductFieldLabel = (key: string): string => {
   const labels: Record<string, string> = {
     productCategory: "Категория",
-    productSaleCity: "Город",
+    productSaleCity: "Город продажи",
     productStockQuantity: "В наличии (шт.)",
     soldQuantity: "Продано",
     uniqueViewerCount: "Просмотры",

@@ -412,6 +412,14 @@ const STORY_MEDIA_WIRING_CHECKS = [
     mustInclude: ["resolveUploadedMediaUrl"],
   },
   {
+    file: "entities/user-story/lib/resolveUserStoryAvatarUrl.ts",
+    mustInclude: ["pickUserProfilePhotoUrl"],
+  },
+  {
+    file: "features/home-feed/ui/UserStoriesStrip.tsx",
+    mustInclude: ["resolveUserStoryAvatarUrl"],
+  },
+  {
     file: "features/home-feed/ui/UserStoryViewerModal.tsx",
     mustInclude: [
       "resolveUserStoryMediaUrl",

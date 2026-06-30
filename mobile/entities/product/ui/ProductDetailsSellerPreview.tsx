@@ -104,7 +104,7 @@ export const ProductDetailsSellerPreview = ({ seller }: ProductDetailsSellerPrev
 
   return (
     <Pressable
-      style={styles.root}
+      style={({ pressed }) => [styles.root, pressed && styles.rootPressed]}
       onPress={handleOpenProfile}
       accessibilityRole="button"
       accessibilityLabel={PRODUCT_SELLER_PREVIEW_UI.OPEN_PROFILE_ARIA}

@@ -21,13 +21,14 @@ import { ProductDetailPurchaseActions } from "@/features/product-detail/ui/Produ
 import { ProductDetailTabBar } from "@/features/product-detail/ui/ProductDetailTabBar";
 import { ProductDetailsDetailsTab } from "@/features/product-detail/ui/ProductDetailsDetailsTab";
 import { ProductAuctionTab } from "@/features/product-detail/ui/ProductAuctionTab";
-import { ProductInstallmentTab } from "@/features/product-detail/ui/ProductInstallmentTab";
+import { ProductInstallmentTab, type ProductInstallmentDockFooter } from "@/features/product-detail/ui/ProductInstallmentTab";
 import { ProductReviewsTab } from "@/features/product-detail/ui/ProductReviewsTab";
 import { ProductPromotionModal } from "@/features/product-promotion/ui/ProductPromotionModal";
 import { ReportProductModal } from "@/features/product-report/ui/ReportProductModal";
 import { catalogQueryKeys, loyaltyPointsQueryKeys } from "@/shared/api";
 import {
   API_CLIENT_UI,
+  INSTALLMENT_UI,
   PRODUCT_CARD_UI,
   PRODUCT_PROMOTION_UI,
   PRODUCT_REPORT_UI,
@@ -55,6 +56,9 @@ export default function ProductDetailScreen() {
   });
   const [reportModalVisible, setReportModalVisible] = useState(false);
   const [promotionModalVisible, setPromotionModalVisible] = useState(false);
+  const [installmentDock, setInstallmentDock] = useState<ProductInstallmentDockFooter | null>(
+    null,
+  );
   const [promotionErrorMessage, setPromotionErrorMessage] = useState("");
   const [reportSuccessMessage, setReportSuccessMessage] = useState("");
   const [viewerCount, setViewerCount] = useState<number | null>(null);
@@ -94,6 +98,12 @@ export default function ProductDetailScreen() {
     });
   }, [isAuthorized, isOwnProduct, productId, recordViewMutation]);
 
+  useEffect(() => {
+    if (activeTab !== "installment") {
+      setInstallmentDock(null);
+    }
+  }, [activeTab]);
+
   if (productQuery.isPending) {
     return <ScreenLoadingState />;
   }
@@ -129,6 +139,7 @@ export default function ProductDetailScreen() {
   const canShowAddToCart = !isOwnProduct && isAvailable && purchaseLimit > 0;
   const showMobilePurchaseDock =
     activeTab === "details" && (canShowAddToCart || auctionUi.auctionActive || installmentActive);
+  const showInstallmentDock = activeTab === "installment" && installmentDock != null;
   const isAltTab = activeTab === "reviews" || activeTab === "auction" || activeTab === "installment";
 
   const handleReportPress = () => {
@@ -180,17 +191,18 @@ export default function ProductDetailScreen() {
   };
 
   return (
-    <View style={styles.screen}>
+    <View style={[styles.screen, { paddingTop: insets.top }]}>
+      {showTabs ? (
+        <ProductDetailTabBar tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
+      ) : null}
+
       <ScrollView
+        style={styles.scrollArea}
         contentContainerStyle={[
           styles.container,
-          !showMobilePurchaseDock && styles.containerNoDock,
+          !showMobilePurchaseDock && !showInstallmentDock && styles.containerNoDock,
         ]}
       >
-        {showTabs ? (
-          <ProductDetailTabBar tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
-        ) : null}
-
         <View style={[styles.tabPanel, isAltTab && styles.tabPanelInset]}>
           {activeTab === "details" ? (
             <ProductDetailsDetailsTab
@@ -231,6 +243,7 @@ export default function ProductDetailScreen() {
               isUserDataConfirmed={sessionQuery.data?.user?.isUserDataConfirmed === true}
               isOwnProduct={isOwnProduct}
               defaultUser={sessionQuery.data?.user ?? null}
+              onDockFooterChange={setInstallmentDock}
             />
           ) : null}
         </View>
@@ -269,6 +282,19 @@ export default function ProductDetailScreen() {
             onAuctionPress={handleAuctionShortcut}
             onInstallmentPress={handleInstallmentShortcut}
             variant="dock"
+          />
+        </View>
+      ) : null}
+
+      {showInstallmentDock && installmentDock ? (
+        <View style={[styles.installmentDock, { paddingBottom: Math.max(insets.bottom, 10.4) }]}>
+          <AppButton
+            label={installmentDock.label}
+            variant="primary"
+            onPress={installmentDock.onSubmit}
+            disabled={installmentDock.disabled}
+            style={styles.installmentDockButton}
+            accessibilityLabel={INSTALLMENT_UI.SUBMIT}
           />
         </View>
       ) : null}
