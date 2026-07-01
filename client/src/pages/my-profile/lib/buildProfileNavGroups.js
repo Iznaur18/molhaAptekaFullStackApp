@@ -32,6 +32,7 @@ export function buildProfileNavGroups({
   canUseSearchSynonymsAdmin,
   canUseCategoryTreeAdmin,
   canUseAppIntroAdmin,
+  canUseSiteHeaderBannerAdmin,
   canUsePopularProductsAdmin,
   canUseSubscriptions,
   canUseWishlist,
@@ -77,6 +78,7 @@ export function buildProfileNavGroups({
   onSearchSynonymsAdminClick,
   onCategoryTreeAdminClick,
   onAppIntroAdminClick,
+  onSiteHeaderBannerAdminClick,
   onPopularProductsAdminClick,
   onSubscriptionsClick,
   onWishlistClick,
@@ -372,6 +374,16 @@ export function buildProfileNavGroups({
             tab: "app-intro-admin",
             label: MY_PROFILE_PAGE_UI.TAB_APP_INTRO_ADMIN,
             onClick: () => selectTab("app-intro-admin", onAppIntroAdminClick),
+          },
+        ]
+      : []),
+    ...(canUseSiteHeaderBannerAdmin
+      ? [
+          {
+            tab: "site-header-banner-admin",
+            label: MY_PROFILE_PAGE_UI.TAB_SITE_HEADER_BANNER_ADMIN,
+            onClick: () =>
+              selectTab("site-header-banner-admin", onSiteHeaderBannerAdminClick),
           },
         ]
       : []),

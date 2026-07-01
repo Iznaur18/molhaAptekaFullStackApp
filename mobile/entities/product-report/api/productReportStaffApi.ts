@@ -6,6 +6,7 @@ export type ProductReportGroup = {
   product: Record<string, unknown> & {
     _id: string;
     productName?: string;
+    productSeller?: string | { _id?: string; userName?: string } | null;
   };
   reportCount: number;
   reports: Array<{

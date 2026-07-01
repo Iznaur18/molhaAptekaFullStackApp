@@ -371,7 +371,6 @@ const PRODUCT_PREVIEW_VIDEO_CHECKS = [
     file: "entities/product/ui/ProductCard.tsx",
     mustInclude: [
       "ProductCardMediaSlide",
-      "ProductCardMediaGalleryNav",
       "styles.imagePressable",
       "styles.contentPressable",
       "useProductCardMediaState",

@@ -9,6 +9,7 @@ import {
   Gift,
   Heart,
   LayoutDashboard,
+  Image,
   ListOrdered,
   Star,
   LogOut,
@@ -61,6 +62,7 @@ export const PROFILE_NAV_ITEM_META = {
   "search-synonyms-admin": { icon: Search, tone: "sky" },
   "category-tree-admin": { icon: FolderTree, tone: "emerald" },
   "app-intro-admin": { icon: Clapperboard, tone: "violet" },
+  "site-header-banner-admin": { icon: Image, tone: "sky" },
   "popular-products-admin": { icon: Star, tone: "amber" },
   logout: { icon: LogOut, tone: "rose" },
 };

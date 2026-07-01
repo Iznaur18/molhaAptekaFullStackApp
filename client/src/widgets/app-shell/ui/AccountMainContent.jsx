@@ -60,6 +60,7 @@ export function AccountMainContent({
   handleSearchSynonymsAdminFromProfile,
   handleCategoryTreeAdminFromProfile,
   handleAppIntroAdminFromProfile,
+  handleSiteHeaderBannerAdminFromProfile,
   handlePopularProductsAdminFromProfile,
   handleProductModerationFromProfile,
   handleProductReportsFromProfile,
@@ -183,6 +184,9 @@ export function AccountMainContent({
         }
         onAppIntroAdminClick={
           isAdmin ? handleAppIntroAdminFromProfile : undefined
+        }
+        onSiteHeaderBannerAdminClick={
+          canModerateProducts ? handleSiteHeaderBannerAdminFromProfile : undefined
         }
         onPopularProductsAdminClick={
           isAdmin ? handlePopularProductsAdminFromProfile : undefined

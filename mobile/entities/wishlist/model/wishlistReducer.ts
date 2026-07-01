@@ -39,8 +39,13 @@ export const wishlistReducer = (
       return { ...state, [action.productId]: Date.now() };
     case WISHLIST_ACTION_CLEAR:
       return {};
-    case WISHLIST_ACTION_HYDRATE:
-      return action.payload ?? {};
+    case WISHLIST_ACTION_HYDRATE: {
+      const payload = action.payload ?? {};
+      const hasSameKeys =
+        Object.keys(state).length === Object.keys(payload).length &&
+        Object.keys(payload).every((key) => state[key] === payload[key]);
+      return hasSameKeys ? state : payload;
+    }
     default:
       return state;
   }

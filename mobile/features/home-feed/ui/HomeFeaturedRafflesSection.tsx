@@ -8,6 +8,7 @@ import { useMyRaffleMutations } from "@/entities/raffle/model/useMyRaffleMutatio
 import type { FeaturedRaffleManage, RaffleFromApi } from "@/entities/raffle/model/types";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { RaffleFeaturedCarousel } from "@/entities/raffle/ui/RaffleFeaturedCarousel";
+import { CreateRaffleModal } from "@/features/create-raffle-page/ui/CreateRaffleModal";
 import { PRODUCT_REPORT_UI, RAFFLE_MANAGE_UI } from "@/shared/config";
 
 type HomeFeaturedRafflesSectionProps = {
@@ -20,6 +21,8 @@ export const HomeFeaturedRafflesSection = ({ raffles }: HomeFeaturedRafflesSecti
   const { canModerate } = useUserAccess();
   const { pauseMyMutation, deleteMyMutation } = useMyRaffleMutations();
   const [isBusy, setIsBusy] = useState(false);
+  const [editingRaffle, setEditingRaffle] = useState<RaffleFromApi | null>(null);
+  const [editUseStaffApi, setEditUseStaffApi] = useState(false);
 
   const currentUserId =
     sessionQuery.data?.user?._id != null ? String(sessionQuery.data.user._id) : null;
@@ -48,7 +51,10 @@ export const HomeFeaturedRafflesSection = ({ raffles }: HomeFeaturedRafflesSecti
         showDelete: isOwner,
         showPause: isOwner && raffle.status === "active",
         busy: isBusy,
-        onEdit: () => router.push("/(tabs)/profile" as never),
+        onEdit: () => {
+          setEditUseStaffApi(canModerate && !isOwner);
+          setEditingRaffle(raffle);
+        },
         onDelete: () => {
           Alert.alert(RAFFLE_MANAGE_UI.DELETE, RAFFLE_MANAGE_UI.DELETE_CONFIRM_OWNER, [
             { text: PRODUCT_REPORT_UI.CANCEL, style: "cancel" },
@@ -84,21 +90,23 @@ export const HomeFeaturedRafflesSection = ({ raffles }: HomeFeaturedRafflesSecti
         },
       };
     },
-    [
-      canModerate,
-      currentUserId,
-      deleteMyMutation,
-      isBusy,
-      pauseMyMutation,
-      router,
-    ],
+    [canModerate, currentUserId, deleteMyMutation, isBusy, pauseMyMutation],
   );
 
   return (
-    <RaffleFeaturedCarousel
-      raffles={raffles}
-      onOpenProducts={handleOpenProducts}
-      getManage={getManage}
-    />
+    <>
+      <RaffleFeaturedCarousel
+        raffles={raffles}
+        onOpenProducts={handleOpenProducts}
+        getManage={getManage}
+      />
+
+      <CreateRaffleModal
+        visible={editingRaffle != null}
+        raffleToEdit={editingRaffle}
+        useStaffApi={editUseStaffApi}
+        onClose={() => setEditingRaffle(null)}
+      />
+    </>
   );
 };

@@ -4,13 +4,13 @@ import type { AppIntroSettings } from "../model/types";
 
 export type AppIntroAdminForm = {
   videoMp4Url: string;
-  videoWebmUrl: string;
   posterUrl: string;
   fallbackTitle: string;
   fallbackHint: string;
   minMs: string;
   maxMs: string;
   fadeOutMs: string;
+  prioritizePlatformIntro: boolean;
 };
 
 export const mapAppIntroSettingsToForm = (
@@ -20,13 +20,13 @@ export const mapAppIntroSettingsToForm = (
 
   return {
     videoMp4Url: source.videoMp4Url ?? "",
-    videoWebmUrl: source.videoWebmUrl ?? "",
     posterUrl: source.posterUrl ?? "",
     fallbackTitle: source.fallbackTitle ?? APP_INTRO_SETTINGS_DEFAULTS.fallbackTitle,
     fallbackHint: source.fallbackHint ?? APP_INTRO_SETTINGS_DEFAULTS.fallbackHint,
     minMs: String(source.minMs ?? APP_INTRO_SETTINGS_DEFAULTS.minMs),
     maxMs: String(source.maxMs ?? APP_INTRO_SETTINGS_DEFAULTS.maxMs),
     fadeOutMs: String(source.fadeOutMs ?? APP_INTRO_SETTINGS_DEFAULTS.fadeOutMs),
+    prioritizePlatformIntro: source.prioritizePlatformIntro !== false,
   };
 };
 
@@ -38,12 +38,13 @@ export const buildPatchAppIntroSettingsBody = (form: AppIntroAdminForm) => {
 
   return {
     videoMp4Url: trimOrNull(form.videoMp4Url),
-    videoWebmUrl: trimOrNull(form.videoWebmUrl),
+    videoWebmUrl: null,
     posterUrl: trimOrNull(form.posterUrl),
     fallbackTitle: String(form.fallbackTitle ?? "").trim(),
     fallbackHint: String(form.fallbackHint ?? "").trim(),
     minMs: Number(form.minMs) || 0,
     maxMs: Number(form.maxMs) || 0,
     fadeOutMs: Number(form.fadeOutMs) || 0,
+    prioritizePlatformIntro: Boolean(form.prioritizePlatformIntro),
   };
 };

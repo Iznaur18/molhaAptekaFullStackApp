@@ -6,7 +6,9 @@ import { Platform, Pressable, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useCartTotalCount } from "@/entities/cart/model/useCartTotalCount";
+import { SellerProductsLimitModal } from "@/entities/product/ui/SellerProductsLimitModal";
 import { useUnreadNotificationsCount } from "@/entities/notification/model/useInAppNotifications";
+import { usePlaceProductPress } from "@/features/place-product/model/usePlaceProductPress";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { CART_PAGE_UI, MOBILE_BOTTOM_NAV_UI } from "@/shared/config";
 import { isHomeTabBarRoute } from "@/shared/lib/isHomeTabBarRoute";
@@ -161,14 +163,11 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
   const cartBadge = cartCount > 0 ? formatBadge(cartCount) : null;
   const profileBadge =
     unreadNotifications > 0 ? formatBadge(unreadNotifications) : null;
+  const placeProduct = usePlaceProductPress();
 
   const handlePress = (routeName: string) => {
     if (routeName === PLACE_PRODUCT_ROUTE) {
-      if (!isAuthorized) {
-        router.push("/(auth)/login");
-        return;
-      }
-      router.push("/create-product");
+      placeProduct.handlePlaceProductPress();
       return;
     }
 
@@ -256,28 +255,37 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
   });
 
   return (
-    <View
-      accessibilityRole="tablist"
-      accessibilityLabel={MOBILE_BOTTOM_NAV_UI.NAV_ARIA}
-      pointerEvents="box-none"
-      style={[
-        styles.shell,
-        {
-          paddingBottom: Math.max(insets.bottom, 4),
-          paddingHorizontal: resolveMobileBottomNavHorizontalInset(insets),
-        },
-      ]}
-    >
-      <View style={styles.navShadow}>
-        <BlurView
-          intensity={Platform.OS === "web" ? 0 : 85}
-          tint="light"
-          style={styles.navBlur}
-        >
-          <View style={styles.navOverlay} />
-          <View style={styles.navRow}>{items}</View>
-        </BlurView>
+    <>
+      <View
+        accessibilityRole="tablist"
+        accessibilityLabel={MOBILE_BOTTOM_NAV_UI.NAV_ARIA}
+        pointerEvents="box-none"
+        style={[
+          styles.shell,
+          {
+            paddingBottom: Math.max(insets.bottom, 4),
+            paddingHorizontal: resolveMobileBottomNavHorizontalInset(insets),
+          },
+        ]}
+      >
+        <View style={styles.navShadow}>
+          <BlurView
+            intensity={Platform.OS === "web" ? 0 : 85}
+            tint="light"
+            style={styles.navBlur}
+          >
+            <View style={styles.navOverlay} />
+            <View style={styles.navRow}>{items}</View>
+          </BlurView>
+        </View>
       </View>
-    </View>
+
+      <SellerProductsLimitModal
+        visible={placeProduct.limitModalVisible}
+        onClose={placeProduct.closeLimitModal}
+        isPremiumUser={placeProduct.isPremiumUser}
+        limit={placeProduct.sellerProductsLimit}
+      />
+    </>
   );
 };

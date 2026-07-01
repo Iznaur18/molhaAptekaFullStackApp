@@ -1,12 +1,21 @@
+export const INSTALLMENT_PAYMENT_STATUS_SCHEDULED = "scheduled";
 export const INSTALLMENT_PAYMENT_STATUS_DUE = "due";
 export const INSTALLMENT_PAYMENT_STATUS_OVERDUE = "overdue";
 export const INSTALLMENT_PAYMENT_STATUS_PENDING_CONFIRMATION = "pending_confirmation";
 export const INSTALLMENT_PAYMENT_STATUS_PAID = "paid";
 
+export const INSTALLMENT_CONTRACT_STATUS_PENDING_FIRST_PAYMENT = "pending_first_payment";
+export const INSTALLMENT_CONTRACT_STATUS_ACTIVE = "active";
+export const INSTALLMENT_CONTRACT_STATUS_COMPLETED = "completed";
+export const INSTALLMENT_CONTRACT_STATUS_DEFAULTED = "defaulted";
+export const INSTALLMENT_CONTRACT_STATUS_CANCELLED = "cancelled";
+
+export const INSTALLMENT_SALES_LIST_FILTER_IN_PROGRESS = "in_progress";
+
 export const INSTALLMENT_CONTRACT_STATUS_FILTER_OPTIONS = [
   { value: "", labelKey: "CONTRACT_STATUS_FILTER_ALL" as const },
-  { value: "in_progress", labelKey: "CONTRACT_STATUS_FILTER_IN_PROGRESS" as const },
-  { value: "completed", labelKey: "CONTRACT_STATUS_FILTER_COMPLETED" as const },
-  { value: "defaulted", labelKey: "CONTRACT_STATUS_FILTER_DEFAULTED" as const },
-  { value: "cancelled", labelKey: "CONTRACT_STATUS_FILTER_CANCELLED" as const },
+  { value: INSTALLMENT_SALES_LIST_FILTER_IN_PROGRESS, labelKey: "CONTRACT_STATUS_FILTER_IN_PROGRESS" as const },
+  { value: INSTALLMENT_CONTRACT_STATUS_COMPLETED, labelKey: "CONTRACT_STATUS_FILTER_COMPLETED" as const },
+  { value: INSTALLMENT_CONTRACT_STATUS_DEFAULTED, labelKey: "CONTRACT_STATUS_FILTER_DEFAULTED" as const },
+  { value: INSTALLMENT_CONTRACT_STATUS_CANCELLED, labelKey: "CONTRACT_STATUS_FILTER_CANCELLED" as const },
 ];

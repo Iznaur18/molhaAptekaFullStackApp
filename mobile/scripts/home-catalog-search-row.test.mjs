@@ -21,6 +21,7 @@ test("HomeCatalogSearchRow: glass panel, logo, header search, users", () => {
 });
 
 test("home catalog header panel matches web mobile-split chrome", () => {
+  const searchRow = readMobileFile("features/home-feed/ui/HomeCatalogSearchRow.tsx");
   const panel = readMobileFile("features/home-feed/ui/HomeCatalogHeaderPanel.tsx");
   const glass = readMobileFile("features/home-feed/ui/HomeCatalogHeaderGlassLayer.tsx");
   const styles = readMobileFile("shared/theme/homeCatalogHeaderStyles.ts");
@@ -31,6 +32,9 @@ test("home catalog header panel matches web mobile-split chrome", () => {
   assert.match(panel, /paddingTop/);
   assert.match(glass, /backdropFilter/);
   assert.match(glass, /resolveHomeCatalogHeaderGlassTint/);
+  assert.match(styles, /bannerBelowPanel/);
+  assert.match(layout, /HOME_CATALOG_HEADER_BANNER_BELOW_PANEL_MARGIN/);
+  assert.doesNotMatch(searchRow, /SiteHeaderBannerSlot/);
   assert.match(styles, /backgroundColor: "transparent"/);
   assert.match(styles, /paddingHorizontal: HOME_CATALOG_HEADER_PANEL_PADDING\.horizontal/);
   assert.match(styles, /paddingBottom: HOME_CATALOG_HEADER_PANEL_PADDING\.bottom/);

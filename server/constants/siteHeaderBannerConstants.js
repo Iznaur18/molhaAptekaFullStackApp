@@ -1,0 +1,11 @@
+export const SITE_HEADER_BANNER_SETTINGS_KEY = "default";
+export const SITE_HEADER_BANNER_HEIGHT_PX = 120;
+export const SITE_HEADER_BANNER_AUTOPLAY_MS = 5000;
+export const SITE_HEADER_BANNER_IMAGE_ALT_MAX_LENGTH = 200;
+export const SITE_HEADER_BANNER_LINK_PATH_MAX_LENGTH = 512;
+export const SITE_HEADER_BANNER_ITEM_ID_MAX_LENGTH = 64;
+
+export const SITE_HEADER_BANNER_SETTINGS_DEFAULTS = {
+  enabled: false,
+  items: [],
+};

@@ -41,9 +41,12 @@ export const WishlistServerSync = () => {
     }
 
     if (favoritesQuery.isSuccess && favoritesQuery.data) {
-      hydrateWishlist(favoritesQuery.data.items);
-      lastAckedItemsRef.current = favoritesQuery.data.items;
-      setRemoteReady(true);
+      const remoteItems = favoritesQuery.data.items;
+      if (packItems(itemsRef.current) !== packItems(remoteItems)) {
+        hydrateWishlist(remoteItems);
+      }
+      lastAckedItemsRef.current = remoteItems;
+      setRemoteReady((ready) => (ready ? ready : true));
       return;
     }
 

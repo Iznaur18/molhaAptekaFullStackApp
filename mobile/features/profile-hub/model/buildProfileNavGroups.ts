@@ -284,6 +284,14 @@ export const buildProfileNavGroups = (
         },
       ];
     }
+    if (sectionId === "site-header-banner-admin" && access.canUseSiteHeaderBannerAdmin) {
+      return [
+        {
+          sectionId,
+          label: MY_PROFILE_PAGE_UI.TAB_SITE_HEADER_BANNER_ADMIN,
+        },
+      ];
+    }
     if (sectionId === "popular-products-admin" && access.canUsePopularProductsAdmin) {
       return [
         {

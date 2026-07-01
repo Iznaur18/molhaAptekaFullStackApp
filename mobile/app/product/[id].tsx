@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Alert, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useQueryClient } from "@tanstack/react-query";
@@ -20,7 +20,7 @@ import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuer
 import { ProductDetailPurchaseActions } from "@/features/product-detail/ui/ProductDetailPurchaseActions";
 import { ProductDetailTabBar } from "@/features/product-detail/ui/ProductDetailTabBar";
 import { ProductDetailsDetailsTab } from "@/features/product-detail/ui/ProductDetailsDetailsTab";
-import { ProductAuctionTab } from "@/features/product-detail/ui/ProductAuctionTab";
+import { ProductAuctionTab, type ProductAuctionDockFooter } from "@/features/product-detail/ui/ProductAuctionTab";
 import { ProductInstallmentTab, type ProductInstallmentDockFooter } from "@/features/product-detail/ui/ProductInstallmentTab";
 import { ProductReviewsTab } from "@/features/product-detail/ui/ProductReviewsTab";
 import { ProductPromotionModal } from "@/features/product-promotion/ui/ProductPromotionModal";
@@ -49,6 +49,8 @@ export default function ProductDetailScreen() {
   const isAuthorized = useIsAuthorized();
   const sessionQuery = useAuthSessionQuery();
   const recordViewMutation = useRecordProductViewMutation();
+  const recordProductViewRef = useRef(recordViewMutation.mutate);
+  recordProductViewRef.current = recordViewMutation.mutate;
   const requestPromotionMutation = useRequestProductPromotionMutation();
   const reportStatusQuery = useMyProductReportStatusQuery({
     productId,
@@ -59,6 +61,7 @@ export default function ProductDetailScreen() {
   const [installmentDock, setInstallmentDock] = useState<ProductInstallmentDockFooter | null>(
     null,
   );
+  const [auctionDock, setAuctionDock] = useState<ProductAuctionDockFooter | null>(null);
   const [promotionErrorMessage, setPromotionErrorMessage] = useState("");
   const [reportSuccessMessage, setReportSuccessMessage] = useState("");
   const [viewerCount, setViewerCount] = useState<number | null>(null);
@@ -91,16 +94,46 @@ export default function ProductDetailScreen() {
     if (!isAuthorized || !productId || isOwnProduct) {
       return;
     }
-    recordViewMutation.mutate(productId, {
+    recordProductViewRef.current(productId, {
       onSuccess: (result) => {
         setViewerCount(result.uniqueViewerCount);
       },
     });
-  }, [isAuthorized, isOwnProduct, productId, recordViewMutation]);
+  }, [isAuthorized, isOwnProduct, productId]);
+
+  const handleInstallmentDockChange = useCallback((footer: ProductInstallmentDockFooter | null) => {
+    setInstallmentDock((prev) => {
+      if (footer === null) {
+        return prev === null ? prev : null;
+      }
+      if (prev !== null && prev.disabled === footer.disabled && prev.label === footer.label) {
+        return prev;
+      }
+      return footer;
+    });
+  }, []);
+
+  const handleAuctionDockChange = useCallback((footer: ProductAuctionDockFooter | null) => {
+    setAuctionDock((prev) => {
+      if (footer === null) {
+        return prev === null ? prev : null;
+      }
+      if (prev !== null && prev.disabled === footer.disabled && prev.label === footer.label) {
+        return prev;
+      }
+      return footer;
+    });
+  }, []);
 
   useEffect(() => {
     if (activeTab !== "installment") {
       setInstallmentDock(null);
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (activeTab !== "auction") {
+      setAuctionDock(null);
     }
   }, [activeTab]);
 
@@ -140,6 +173,7 @@ export default function ProductDetailScreen() {
   const showMobilePurchaseDock =
     activeTab === "details" && (canShowAddToCart || auctionUi.auctionActive || installmentActive);
   const showInstallmentDock = activeTab === "installment" && installmentDock != null;
+  const showAuctionDock = activeTab === "auction" && auctionDock != null;
   const isAltTab = activeTab === "reviews" || activeTab === "auction" || activeTab === "installment";
 
   const handleReportPress = () => {
@@ -200,7 +234,7 @@ export default function ProductDetailScreen() {
         style={styles.scrollArea}
         contentContainerStyle={[
           styles.container,
-          !showMobilePurchaseDock && !showInstallmentDock && styles.containerNoDock,
+          !showMobilePurchaseDock && !showInstallmentDock && !showAuctionDock && styles.containerNoDock,
         ]}
       >
         <View style={[styles.tabPanel, isAltTab && styles.tabPanelInset]}>
@@ -229,10 +263,10 @@ export default function ProductDetailScreen() {
               productId={productId}
               auctionActive={auctionUi.auctionActive}
               completedOnce={auctionUi.completedOnce}
-              productPrice={Number(productRecord.productPrice)}
               isAuthorized={isAuthorized}
               isUserDataConfirmed={sessionQuery.data?.user?.isUserDataConfirmed === true}
               isOwnProduct={isOwnProduct}
+              onDockFooterChange={handleAuctionDockChange}
             />
           ) : null}
           {activeTab === "installment" ? (
@@ -243,7 +277,7 @@ export default function ProductDetailScreen() {
               isUserDataConfirmed={sessionQuery.data?.user?.isUserDataConfirmed === true}
               isOwnProduct={isOwnProduct}
               defaultUser={sessionQuery.data?.user ?? null}
-              onDockFooterChange={setInstallmentDock}
+              onDockFooterChange={handleInstallmentDockChange}
             />
           ) : null}
         </View>
@@ -295,6 +329,19 @@ export default function ProductDetailScreen() {
             disabled={installmentDock.disabled}
             style={styles.installmentDockButton}
             accessibilityLabel={INSTALLMENT_UI.SUBMIT}
+          />
+        </View>
+      ) : null}
+
+      {showAuctionDock && auctionDock ? (
+        <View style={[styles.installmentDock, { paddingBottom: Math.max(insets.bottom, 10.4) }]}>
+          <AppButton
+            label={auctionDock.label}
+            variant="primary"
+            onPress={auctionDock.onSubmit}
+            disabled={auctionDock.disabled}
+            style={styles.installmentDockButton}
+            accessibilityLabel={auctionDock.label}
           />
         </View>
       ) : null}

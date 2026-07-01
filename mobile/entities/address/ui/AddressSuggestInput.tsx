@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type StyleProp, type TextStyle, type ViewStyle } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -25,6 +25,9 @@ type AddressSuggestInputProps = {
   onChange: (next: RuDeliveryAddressValue) => void;
   disabled?: boolean;
   placeholder?: string;
+  containerStyle?: StyleProp<ViewStyle>;
+  labelStyle?: StyleProp<TextStyle>;
+  inputStyle?: StyleProp<TextStyle>;
 };
 
 export const AddressSuggestInput = ({
@@ -32,6 +35,9 @@ export const AddressSuggestInput = ({
   onChange,
   disabled = false,
   placeholder,
+  containerStyle,
+  labelStyle,
+  inputStyle,
 }: AddressSuggestInputProps) => {
   const theme = useAppTheme();
   const fieldStyles = useFormFieldStyles();
@@ -89,10 +95,10 @@ export const AddressSuggestInput = ({
   };
 
   return (
-    <View style={suggestStyles.wrap}>
-      <Text style={fieldStyles.label}>{ADDRESS_DELIVERY_UI.LABEL_LINE}</Text>
+    <View style={[suggestStyles.wrap, containerStyle]}>
+      <Text style={[fieldStyles.labelStrong, labelStyle]}>{ADDRESS_DELIVERY_UI.LABEL_LINE}</Text>
       <TextInput
-        style={[fieldStyles.input, fieldStyles.inputCompact]}
+        style={[fieldStyles.input, fieldStyles.inputCompact, inputStyle]}
         value={value.line}
         onChangeText={handleLineChange}
         placeholder={placeholder}

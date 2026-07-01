@@ -1,110 +1,275 @@
-import { useState } from "react";
-import { FlatList, Text, View } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
+import { useCallback, useState } from "react";
+import { Alert, ScrollView, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
-import type { StaffRaffleRow } from "@/entities/raffle/api/raffleStaffApi";
+import type { RaffleFromApi } from "@/entities/raffle/model/types";
+import type { StaffRafflesQueueData } from "@/entities/raffle/api/raffleStaffApi";
 import {
   useRaffleStaffMutations,
   useStaffRafflesQueueQuery,
 } from "@/entities/raffle/model/useRaffleStaffMutations";
-import { RAFFLES_STAFF_PAGE_UI } from "@/shared/config";
-import { useStaffQueueStyles } from "@/shared/theme/staffQueueStyles";
-import { StaffModerationActions } from "@/shared/ui/StaffModerationActions";
-import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
-
-type RowProps = {
-  raffle: StaffRaffleRow;
-  onChanged: () => void;
-  approveMutation: ReturnType<typeof useRaffleStaffMutations>["approveMutation"];
-  rejectMutation: ReturnType<typeof useRaffleStaffMutations>["rejectMutation"];
-};
-
-const RaffleRow = ({ raffle, onChanged, approveMutation, rejectMutation }: RowProps) => {
-  const styles = useStaffQueueStyles();
-  const [errorMessage, setErrorMessage] = useState("");
-  const raffleId = String(raffle._id);
-  const isBusy = approveMutation.isPending || rejectMutation.isPending;
-
-  const handleApprove = async () => {
-    setErrorMessage("");
-    try {
-      await approveMutation.mutateAsync(raffleId);
-      onChanged();
-    } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : RAFFLES_STAFF_PAGE_UI.ACTION_PENDING);
-    }
-  };
-
-  const handleReject = async () => {
-    setErrorMessage("");
-    try {
-      await rejectMutation.mutateAsync(raffleId);
-      onChanged();
-    } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : RAFFLES_STAFF_PAGE_UI.ACTION_PENDING);
-    }
-  };
-
-  return (
-    <View style={styles.row}>
-      <Text style={styles.title}>{raffle.title ?? "Розыгрыш"}</Text>
-      <Text style={styles.meta}>
-        {RAFFLES_STAFF_PAGE_UI.ROW_SELLER}: {raffle.seller?.userName ?? "—"}
-      </Text>
-      <Text style={styles.meta}>
-        {RAFFLES_STAFF_PAGE_UI.ROW_TARGET}: {raffle.salesTarget ?? "—"}
-      </Text>
-      <StaffModerationActions
-        approveLabel={RAFFLES_STAFF_PAGE_UI.APPROVE}
-        rejectLabel={RAFFLES_STAFF_PAGE_UI.REJECT}
-        pendingLabel={RAFFLES_STAFF_PAGE_UI.ACTION_PENDING}
-        isBusy={isBusy}
-        onApprove={handleApprove}
-        onReject={handleReject}
-        errorMessage={errorMessage}
-      />
-    </View>
-  );
-};
+import { RafflesStaffLiveRow } from "@/entities/raffle/ui/RafflesStaffLiveRow";
+import { RafflesStaffPendingRow } from "@/entities/raffle/ui/RafflesStaffPendingRow";
+import { CreateRaffleModal } from "@/features/create-raffle-page/ui/CreateRaffleModal";
+import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
+import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
+import { raffleQueryKeys, staffBadgeQueryKeys } from "@/shared/api";
+import {
+  API_CLIENT_UI,
+  MY_PROFILE_PAGE_UI,
+  RAFFLE_MANAGE_UI,
+  RAFFLES_STAFF_PAGE_UI,
+} from "@/shared/config";
+import { formatApiErrorMessage } from "@/shared/lib";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
+import { useRafflesStaffPageStyles } from "@/shared/theme/rafflesStaffPageStyles";
+import { ScreenErrorState } from "@/shared/ui/ScreenStates";
 
 export const RafflesStaffPage = () => {
-  const styles = useStaffQueueStyles();
+  const router = useRouter();
+  const styles = useRafflesStaffPageStyles();
+  const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const queryClient = useQueryClient();
   const queueQuery = useStaffRafflesQueueQuery();
-  const { approveMutation, rejectMutation } = useRaffleStaffMutations();
-  const raffles = queueQuery.data?.pendingRaffles ?? [];
+  const { approveMutation, rejectMutation, deleteStaffMutation } = useRaffleStaffMutations();
+  const [navSheetVisible, setNavSheetVisible] = useState(false);
+  const [pendingId, setPendingId] = useState<string | null>(null);
+  const [editingRaffle, setEditingRaffle] = useState<RaffleFromApi | null>(null);
+  const [rowErrors, setRowErrors] = useState<Record<string, string>>({});
+  const [clearedLiveRaffleId, setClearedLiveRaffleId] = useState<string | null>(null);
 
-  if (queueQuery.isPending && raffles.length === 0) {
-    return <ScreenLoadingState message={RAFFLES_STAFF_PAGE_UI.LOADING} />;
-  }
+  const pendingRaffles = queueQuery.data?.pendingRaffles ?? [];
+  const liveRaffleFromQuery = queueQuery.data?.liveRaffle ?? null;
+  const liveRaffle =
+    clearedLiveRaffleId != null &&
+    liveRaffleFromQuery?._id != null &&
+    String(liveRaffleFromQuery._id) === clearedLiveRaffleId
+      ? null
+      : liveRaffleFromQuery;
 
-  if (queueQuery.isError && raffles.length === 0) {
-    return (
-      <ScreenErrorState
-        message={
-          queueQuery.error instanceof Error ? queueQuery.error.message : RAFFLES_STAFF_PAGE_UI.LOADING
+  useFocusEffect(
+    useCallback(() => {
+      void queueQuery.refetch();
+    }, [queueQuery.refetch]),
+  );
+
+  const removePendingRow = useCallback(
+    (raffleId: string) => {
+      queryClient.setQueryData(raffleQueryKeys.staffQueue(), (old: StaffRafflesQueueData | undefined) => {
+        if (!old) {
+          return old;
         }
-        onRetry={() => void queueQuery.refetch()}
-      />
+        return {
+          ...old,
+          pendingRaffles: old.pendingRaffles.filter((row) => String(row._id) !== raffleId),
+        };
+      });
+      setRowErrors((prev) => {
+        const next = { ...prev };
+        delete next[raffleId];
+        return next;
+      });
+    },
+    [queryClient],
+  );
+
+  const syncStaffQueueCaches = useCallback(async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: raffleQueryKeys.staffQueue() }),
+      queryClient.invalidateQueries({ queryKey: raffleQueryKeys.featured() }),
+      queryClient.invalidateQueries({ queryKey: [...staffBadgeQueryKeys.all, "raffles"] }),
+    ]);
+  }, [queryClient]);
+
+  const handleApprove = async (raffleId: string) => {
+    try {
+      setPendingId(raffleId);
+      setRowErrors((prev) => ({ ...prev, [raffleId]: "" }));
+      await approveMutation.mutateAsync(raffleId);
+      removePendingRow(raffleId);
+      await syncStaffQueueCaches();
+    } catch (error) {
+      setRowErrors((prev) => ({
+        ...prev,
+        [raffleId]: formatApiErrorMessage(error, API_CLIENT_UI.APPROVE_RAFFLE_FALLBACK),
+      }));
+    } finally {
+      setPendingId(null);
+    }
+  };
+
+  const handleReject = async (raffleId: string) => {
+    try {
+      setPendingId(raffleId);
+      setRowErrors((prev) => ({ ...prev, [raffleId]: "" }));
+      await rejectMutation.mutateAsync(raffleId);
+      removePendingRow(raffleId);
+      await syncStaffQueueCaches();
+    } catch (error) {
+      setRowErrors((prev) => ({
+        ...prev,
+        [raffleId]: formatApiErrorMessage(error, API_CLIENT_UI.REJECT_RAFFLE_FALLBACK),
+      }));
+    } finally {
+      setPendingId(null);
+    }
+  };
+
+  const confirmDelete = (onConfirm: () => void) => {
+    Alert.alert(RAFFLE_MANAGE_UI.DELETE, RAFFLE_MANAGE_UI.DELETE_CONFIRM_STAFF, [
+      { text: "Отмена", style: "cancel" },
+      { text: RAFFLE_MANAGE_UI.DELETE, style: "destructive", onPress: onConfirm },
+    ]);
+  };
+
+  const handleDelete = (raffleId: string, { clearLive = false }: { clearLive?: boolean } = {}) => {
+    confirmDelete(() => {
+      void (async () => {
+        try {
+          setPendingId(raffleId);
+          setRowErrors((prev) => ({ ...prev, [raffleId]: "" }));
+          await deleteStaffMutation.mutateAsync(raffleId);
+          removePendingRow(raffleId);
+          if (clearLive) {
+            setClearedLiveRaffleId(raffleId);
+          }
+          await syncStaffQueueCaches();
+        } catch (error) {
+          setRowErrors((prev) => ({
+            ...prev,
+            [raffleId]: formatApiErrorMessage(error, API_CLIENT_UI.DELETE_RAFFLE_FALLBACK),
+          }));
+        } finally {
+          setPendingId(null);
+        }
+      })();
+    });
+  };
+
+  const sectionToggle = (
+    <ProfileMobileSectionToggle
+      activeLabel={MY_PROFILE_PAGE_UI.TAB_RAFFLES}
+      onPress={() => setNavSheetVisible(true)}
+    />
+  );
+
+  const navSheet = (
+    <ProfileMobileNavSheet
+      visible={navSheetVisible}
+      activeSectionId="raffles"
+      onClose={() => setNavSheetVisible(false)}
+      onOverviewPress={() => router.replace("/(tabs)/profile")}
+    />
+  );
+
+  if (queueQuery.isPending && pendingRaffles.length === 0 && !liveRaffleFromQuery) {
+    return (
+      <>
+        <View style={[styles.container, centeredContentStyle, styles.centered]}>
+          <View style={styles.header}>{sectionToggle}</View>
+          <Text style={styles.state}>{RAFFLES_STAFF_PAGE_UI.LOADING}</Text>
+        </View>
+        {navSheet}
+      </>
     );
   }
 
+  if (queueQuery.isError && pendingRaffles.length === 0 && !liveRaffleFromQuery) {
+    return (
+      <>
+        <View style={[styles.container, centeredContentStyle, styles.centered]}>
+          <View style={styles.header}>{sectionToggle}</View>
+          <ScreenErrorState
+            message={formatApiErrorMessage(
+              queueQuery.error,
+              API_CLIENT_UI.FETCH_RAFFLES_QUEUE_FALLBACK,
+            )}
+            onRetry={() => queueQuery.refetch()}
+          />
+        </View>
+        {navSheet}
+      </>
+    );
+  }
+
+  const liveBusy = liveRaffle != null && pendingId === String(liveRaffle._id);
+
   return (
-    <FlatList
-      data={raffles}
-      keyExtractor={(item) => String(item._id)}
-      contentContainerStyle={styles.list}
-      refreshControl={
-        <ThemedRefreshControl refreshing={queueQuery.isFetching} onRefresh={() => void queueQuery.refetch()} />
-      }
-      ListEmptyComponent={<Text style={styles.empty}>{RAFFLES_STAFF_PAGE_UI.EMPTY}</Text>}
-      renderItem={({ item }) => (
-        <RaffleRow
-          raffle={item}
-          onChanged={() => void queueQuery.refetch()}
-          approveMutation={approveMutation}
-          rejectMutation={rejectMutation}
-        />
-      )}
-    />
+    <>
+      <ScrollView
+        style={[styles.container, centeredContentStyle]}
+        contentContainerStyle={[styles.scroll, { paddingBottom: contentPaddingBottom }]}
+        accessibilityLabel={RAFFLES_STAFF_PAGE_UI.TITLE}
+        refreshControl={
+          <ThemedRefreshControl
+            refreshing={queueQuery.isFetching}
+            onRefresh={async () => {
+              await queueQuery.refetch();
+              await syncStaffQueueCaches();
+            }}
+          />
+        }
+      >
+        <View style={styles.header}>{sectionToggle}</View>
+
+        {liveRaffle ? (
+          <View style={styles.liveSection}>
+            <Text style={styles.sectionTitle}>{RAFFLE_MANAGE_UI.LIVE_SECTION_TITLE}</Text>
+            <RafflesStaffLiveRow
+              raffle={liveRaffle}
+              busy={liveBusy}
+              errorMessage={rowErrors[String(liveRaffle._id)] ?? ""}
+              onEdit={() => setEditingRaffle(liveRaffle)}
+              onDelete={() => handleDelete(String(liveRaffle._id), { clearLive: true })}
+            />
+          </View>
+        ) : null}
+
+        <Text style={styles.sectionTitle}>{RAFFLES_STAFF_PAGE_UI.QUEUE_TITLE}</Text>
+
+        {pendingRaffles.length === 0 ? (
+          <Text style={styles.empty}>{RAFFLES_STAFF_PAGE_UI.EMPTY}</Text>
+        ) : (
+          <View style={styles.list}>
+            {pendingRaffles.map((raffle: RaffleFromApi) => {
+              const raffleId = String(raffle._id);
+              const busy = pendingId === raffleId;
+
+              return (
+                <RafflesStaffPendingRow
+                  key={raffleId}
+                  raffle={raffle}
+                  busy={busy}
+                  errorMessage={rowErrors[raffleId] ?? ""}
+                  onApprove={() => {
+                    void handleApprove(raffleId);
+                  }}
+                  onReject={() => {
+                    void handleReject(raffleId);
+                  }}
+                  onEdit={() => setEditingRaffle(raffle)}
+                  onDelete={() => handleDelete(raffleId)}
+                />
+              );
+            })}
+          </View>
+        )}
+      </ScrollView>
+
+      {navSheet}
+
+      <CreateRaffleModal
+        visible={editingRaffle != null}
+        raffleToEdit={editingRaffle}
+        useStaffApi
+        onClose={() => setEditingRaffle(null)}
+        onSuccess={() => {
+          void syncStaffQueueCaches();
+        }}
+      />
+    </>
   );
 };

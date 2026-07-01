@@ -45,6 +45,7 @@ import { getActiveProfileNavLabel } from "../lib/getActiveProfileNavLabel.js";
  *   onSearchSynonymsAdminClick?: () => void;
  *   onCategoryTreeAdminClick?: () => void;
  *   onAppIntroAdminClick?: () => void;
+ *   onSiteHeaderBannerAdminClick?: () => void;
  *   onPopularProductsAdminClick?: () => void;
  *   onSubscriptionsClick?: () => void;
  *   onWishlistClick?: () => void;
@@ -95,6 +96,7 @@ export function useMyProfileNav({
   onSearchSynonymsAdminClick,
   onCategoryTreeAdminClick,
   onAppIntroAdminClick,
+  onSiteHeaderBannerAdminClick,
   onPopularProductsAdminClick,
   onSubscriptionsClick,
   onWishlistClick,
@@ -135,6 +137,8 @@ export function useMyProfileNav({
     isProfileReady &&
     user?.userRole === "admin" &&
     Boolean(onAppIntroAdminClick);
+  const canUseSiteHeaderBannerAdmin =
+    !isRegularUser && isProfileReady && Boolean(onSiteHeaderBannerAdminClick);
   const canUsePopularProductsAdmin =
     !isRegularUser &&
     isProfileReady &&
@@ -185,6 +189,7 @@ export function useMyProfileNav({
         canUseSearchSynonymsAdmin,
         canUseCategoryTreeAdmin,
         canUseAppIntroAdmin,
+        canUseSiteHeaderBannerAdmin,
         canUsePopularProductsAdmin,
         canUseSubscriptions,
         canUseWishlist,
@@ -230,6 +235,7 @@ export function useMyProfileNav({
         onSearchSynonymsAdminClick,
         onCategoryTreeAdminClick,
         onAppIntroAdminClick,
+        onSiteHeaderBannerAdminClick,
         onPopularProductsAdminClick,
         onSubscriptionsClick,
         onWishlistClick,
@@ -270,6 +276,7 @@ export function useMyProfileNav({
       onAdminOrdersClick,
       onAuctionClick,
       onAppIntroAdminClick,
+      onSiteHeaderBannerAdminClick,
       onPopularProductsAdminClick,
       onCategoryTreeAdminClick,
       onCreateRaffleClick,

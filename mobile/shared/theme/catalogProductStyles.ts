@@ -6,13 +6,13 @@ import {
   PRODUCT_CARD_BANNER_CHROME as BANNER,
   PRODUCT_CARD_IMAGE_BADGE_OVERLAY as BO,
   PRODUCT_CARD_IMAGE_BADGE_OVERLAY_LAYOUT as BOL,
-  PRODUCT_CARD_IMAGE_NAV_CHROME as NAV,
   PRODUCT_CARD_MOBILE_LAYOUT,
-  resolveProductCardImageNavBackground,
-  resolveProductCardImageNavBorderColor,
 } from "@/entities/product/lib/productCardBadgePalette";
 import { PRODUCT_MEDIA_HERO_ASPECT_RATIO } from "@/entities/product/model/constants";
-import { PRODUCT_CARD_MOBILE_CATALOG_LAYOUT as MCL } from "@/entities/product/lib/productCardMobileCatalogLayout";
+import {
+  PRODUCT_CARD_MOBILE_CATALOG_LAYOUT as MCL,
+  resolveProductCardCatalogGridImageHeight,
+} from "@/entities/product/lib/productCardMobileCatalogLayout";
 import { CURATED_COMPACT_CARD_COLORS as C } from "@/entities/curated-product-list/lib/curatedCompactCardColors";
 import {
   CURATED_PRODUCT_LIST_HOME_CARD_GAP,
@@ -82,15 +82,15 @@ export const useFeedScreenStyles = createThemedStyles((theme) => ({
 
 export const useCatalogBreadcrumbStyles = createThemedStyles((theme) => ({
   toolbar: {
-    marginBottom: 20,
-    paddingBottom: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: theme.colors.border,
+    paddingTop: 16,
+    marginBottom: 16,
   },
-  current: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: theme.colors.text,
+  title: {
+    fontSize: 22,
+    fontWeight: "800",
+    lineHeight: 28,
+    letterSpacing: -0.44,
+    color: theme.colors.ink,
   },
 }));
 
@@ -220,8 +220,13 @@ export const useProductCardStyles = createThemedStyles((theme) => ({
     paddingHorizontal: 0,
     paddingBottom: MCL.bottomPadding,
   },
+  cardCatalogGridModerationQueue: {
+    height: undefined,
+    minHeight: undefined,
+    maxHeight: undefined,
+  },
   imageWrapCatalogGrid: {
-    height: MCL.imageHeight,
+    height: resolveProductCardCatalogGridImageHeight(Platform.OS),
     aspectRatio: undefined,
   },
   contentCatalogGrid: {
@@ -286,9 +291,8 @@ export const useProductCardStyles = createThemedStyles((theme) => ({
     position: "absolute",
     left: BOL.insetX,
     bottom: BOL.insetBottom,
-    flexDirection: "row",
-    flexWrap: "nowrap",
-    alignItems: "center",
+    flexDirection: "column",
+    alignItems: "flex-start",
     gap: BOL.gap,
     maxWidth: "100%",
     pointerEvents: "box-none",
@@ -398,6 +402,199 @@ export const useProductCardBannerStyles = createThemedStyles((theme) => ({
     right: 10,
     zIndex: 3,
   },
+  footerActions: {
+    marginTop: "auto",
+    paddingTop: 5.6,
+    paddingHorizontal: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
+    paddingBottom: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
+    gap: 7.2,
+  },
+  moderationBadge: {
+    alignSelf: "flex-start",
+    marginTop: 4,
+    marginHorizontal: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 999,
+    fontSize: 11.5,
+    fontWeight: "700",
+    overflow: "hidden",
+  },
+  moderationBadgePending: {
+    backgroundColor: theme.colors.warningSurface,
+    color: theme.colors.warningText,
+  },
+  moderationBadgeApproved: {
+    backgroundColor: `${theme.colors.success}1A`,
+    color: theme.colors.success,
+  },
+  moderationBadgeRejected: {
+    backgroundColor: `${theme.colors.danger}1A`,
+    color: theme.colors.danger,
+  },
+  moderationComment: {
+    marginTop: 4,
+    marginHorizontal: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
+    fontSize: 12.5,
+    lineHeight: 18,
+    color: theme.colors.textSecondary,
+  },
+  moderationPreviewFields: {
+    marginTop: 8,
+    gap: 8,
+  },
+  moderationPreviewSellerRow: {
+    marginHorizontal: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
+  },
+  moderationPreviewRow: {
+    gap: 4,
+    marginHorizontal: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
+  },
+  moderationPreviewKey: {
+    fontSize: 12,
+    lineHeight: 16,
+    color: theme.colors.textSecondary,
+  },
+  moderationPreviewValue: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: theme.colors.text,
+  },
+  moderationPreviewValueMultiline: {
+    lineHeight: 20,
+  },
+}));
+
+export const useProductCardSellerToolbarStyles = createThemedStyles((theme) => ({
+  toolbar: {
+    flexDirection: "column",
+    gap: 7.2,
+    width: "100%",
+  },
+  promoteButton: {
+    width: "100%",
+    borderWidth: 1,
+    borderColor: theme.colors.actionBorder,
+    borderRadius: 10,
+    backgroundColor: theme.colors.actionSurface,
+    paddingVertical: 7.2,
+    paddingHorizontal: 10.4,
+    alignItems: "center",
+  },
+  promoteButtonText: {
+    fontSize: 13.1,
+    fontWeight: "600",
+    color: theme.colors.link,
+  },
+  editButton: {
+    width: "100%",
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    borderRadius: 10,
+    backgroundColor: theme.colors.surfaceMuted,
+    paddingVertical: 7.2,
+    paddingHorizontal: 10.4,
+    alignItems: "center",
+  },
+  editButtonText: {
+    fontSize: 13.1,
+    fontWeight: "600",
+    color: theme.colors.text,
+  },
+  buttonDisabled: {
+    opacity: 0.65,
+  },
+}));
+
+export const useListPageFilterBarStyles = createThemedStyles((theme) => ({
+  bar: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: 13.6,
+  },
+  field: {
+    flexGrow: 1,
+    flexBasis: "46%",
+    minWidth: 140,
+    gap: 4.8,
+  },
+  fieldLabel: {
+    fontSize: 11.5,
+    fontWeight: "600",
+    lineHeight: 14.4,
+    color: theme.colors.textSecondary,
+  },
+  control: {
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: 6.4,
+    backgroundColor: theme.colors.surface,
+    paddingVertical: 7.2,
+    paddingHorizontal: 10.4,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
+  },
+  controlText: {
+    flex: 1,
+    fontSize: 13.1,
+    color: theme.colors.text,
+  },
+  controlChevron: {
+    fontSize: 12,
+    color: theme.colors.textMuted,
+  },
+  menu: {
+    position: "absolute",
+    maxHeight: 240,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: 8,
+    backgroundColor: theme.colors.surface,
+    overflow: "hidden",
+    zIndex: 2,
+    elevation: 8,
+    shadowColor: "#0f172a",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
+  },
+  menuBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "transparent",
+  },
+  menuItem: {
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: theme.colors.border,
+  },
+  menuItemLast: {
+    borderBottomWidth: 0,
+  },
+  menuItemActive: {
+    backgroundColor: theme.colors.actionSurface,
+  },
+  menuItemText: {
+    fontSize: 13.5,
+    color: theme.colors.text,
+  },
+  menuItemTextActive: {
+    fontWeight: "600",
+    color: theme.colors.action,
+  },
+  quota: {
+    flexBasis: "100%",
+    fontSize: 13.6,
+    fontWeight: "600",
+    color: theme.colors.action,
+  },
+  quotaLabel: {
+    fontWeight: "500",
+    opacity: 0.85,
+  },
 }));
 
 export const useProductCardMediaStyles = createThemedStyles((theme) => ({
@@ -406,17 +603,27 @@ export const useProductCardMediaStyles = createThemedStyles((theme) => ({
     height: "100%",
     position: "relative",
   },
-  galleryOverlay: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-  },
   media: {
     width: "100%",
     height: "100%",
   },
+  moderationPendingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(15, 23, 42, 0.52)",
+    zIndex: 2,
+  },
+  moderationPendingOverlayText: {
+    color: theme.colors.onContrast,
+    fontSize: 13.5,
+    fontWeight: "700",
+    textAlign: "center",
+    paddingHorizontal: 12,
+  },
+}));
+
+export const useProductCardMediaGalleryNavStyles = createThemedStyles((theme) => ({
   navRow: {
     position: "absolute",
     top: "50%",
@@ -424,44 +631,40 @@ export const useProductCardMediaStyles = createThemedStyles((theme) => ({
     right: 0,
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: NAV.rowPaddingHorizontal,
-    transform: [{ translateY: -NAV.size / 2 }],
+    paddingHorizontal: 2.4,
+    transform: [{ translateY: -14 }],
+    zIndex: 3,
   },
   navButton: {
-    width: NAV.size,
-    height: NAV.size,
-    borderRadius: NAV.size / 2,
-    borderWidth: NAV.borderWidth,
-    borderColor: resolveProductCardImageNavBorderColor(theme.colors.text),
-    backgroundColor: resolveProductCardImageNavBackground(theme.colors.surface),
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: "rgba(17, 24, 39, 0.14)",
+    backgroundColor: "rgba(255, 255, 255, 0.42)",
     alignItems: "center",
     justifyContent: "center",
-    opacity: NAV.buttonOpacity,
-    ...Platform.select({
-      web: {
-        backdropFilter: `blur(${NAV.blurRadius}px)`,
-        WebkitBackdropFilter: `blur(${NAV.blurRadius}px)`,
-      },
-      default: {},
-    }),
   },
   navButtonText: {
-    color: theme.colors.text,
-    fontSize: NAV.fontSize,
+    fontSize: 16,
     fontWeight: "700",
-    lineHeight: NAV.lineHeight,
+    lineHeight: 18,
+    color: theme.colors.text,
   },
   counter: {
     position: "absolute",
-    right: 8,
-    bottom: 8,
-    paddingHorizontal: theme.spacing[2],
-    paddingVertical: theme.spacing[1],
+    right: 5.6,
+    bottom: 3.2,
+    zIndex: 3,
+    paddingHorizontal: 5.12,
+    paddingVertical: 1.92,
     borderRadius: 6,
-    backgroundColor: MEDIA_OVERLAY_SCRIM,
+    backgroundColor: "rgba(15, 23, 42, 0.72)",
     color: theme.colors.onContrast,
-    fontSize: 11,
-    fontWeight: "600",
+    fontSize: 10.4,
+    fontWeight: "700",
+    lineHeight: 12,
+    overflow: "hidden",
   },
 }));
 
@@ -1292,6 +1495,169 @@ export const useProductDetailScreenStyles = createThemedStyles((theme) => ({
   },
 }));
 
+/** Паритет с web `ProductPriceOffer.css` + `product-details-modal__auction-section`. */
+export const useProductPriceOfferStyles = createThemedStyles((theme) => ({
+  card: {
+    marginTop: 0,
+    paddingVertical: 13.6,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: theme.colors.actionBorder,
+    borderRadius: 12,
+    backgroundColor: theme.colors.actionSurface,
+    shadowColor: theme.colors.action,
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 1,
+    gap: 0,
+  },
+  pageTitle: {
+    marginBottom: 12,
+    fontSize: 20,
+    fontWeight: "800",
+    lineHeight: 24,
+    letterSpacing: -0.4,
+    color: theme.colors.ink,
+  },
+  heading: {
+    marginBottom: 10.4,
+    fontSize: 15,
+    fontWeight: "700",
+    lineHeight: 19,
+    color: theme.colors.ink,
+  },
+  topList: {
+    gap: 6.4,
+    marginBottom: 16,
+  },
+  topItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 10.4,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: 8,
+    backgroundColor: theme.colors.surface,
+  },
+  topRank: {
+    width: 21.6,
+    flexShrink: 0,
+    fontSize: 13,
+    fontWeight: "600",
+    color: theme.colors.textMuted,
+  },
+  topBuyerPressable: {
+    flexShrink: 1,
+    minWidth: 0,
+    flexGrow: 1,
+  },
+  topBuyerName: {
+    fontSize: 15,
+    fontWeight: "500",
+    color: theme.colors.action,
+  },
+  topPrice: {
+    marginLeft: "auto",
+    flexShrink: 0,
+    fontSize: 14.4,
+    fontWeight: "700",
+    color: theme.colors.ink,
+  },
+  empty: {
+    marginBottom: 16,
+    fontSize: 14,
+    lineHeight: 19.6,
+    color: theme.colors.textMuted,
+  },
+  form: {
+    marginTop: 13.6,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: 10,
+    backgroundColor: theme.colors.surface,
+    gap: 0,
+  },
+  formHeading: {
+    marginBottom: 8,
+    fontSize: 15,
+    fontWeight: "700",
+    lineHeight: 19,
+    color: theme.colors.ink,
+  },
+  label: {
+    gap: 5.6,
+    fontSize: 13,
+    fontWeight: "500",
+    color: theme.colors.textSecondary,
+  },
+  input: {
+    marginTop: 5.6,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: 8,
+    paddingVertical: 8.8,
+    paddingHorizontal: 13.6,
+    fontSize: 15.2,
+    backgroundColor: theme.colors.surface,
+    color: theme.colors.text,
+  },
+  actions: {
+    gap: 8,
+    marginTop: 10.4,
+  },
+  inlinePrimaryButton: {
+    minHeight: 40,
+    borderRadius: 8,
+  },
+  hint: {
+    marginTop: 8,
+    fontSize: 14,
+    lineHeight: 19.6,
+    color: theme.colors.textMuted,
+  },
+  status: {
+    alignSelf: "flex-start",
+    marginTop: 10.4,
+    paddingVertical: 5.6,
+    paddingHorizontal: 10.4,
+    borderRadius: 999,
+    fontSize: 13,
+    fontWeight: "600",
+    lineHeight: 17,
+  },
+  statusPending: {
+    backgroundColor: theme.colors.actionSoft,
+    color: theme.colors.infoNavy,
+  },
+  statusAccepted: {
+    backgroundColor: `${theme.colors.success}1A`,
+    color: theme.colors.success,
+  },
+  statusRejected: {
+    backgroundColor: `${theme.colors.danger}1A`,
+    color: theme.colors.danger,
+  },
+  error: {
+    marginTop: 10.4,
+    paddingVertical: 7.2,
+    paddingHorizontal: 10.4,
+    borderRadius: 8,
+    backgroundColor: `${theme.colors.danger}1A`,
+    color: theme.colors.danger,
+    fontSize: 14,
+    lineHeight: 19.6,
+  },
+  inactiveHint: {
+    fontSize: 14,
+    lineHeight: 19.6,
+    color: theme.colors.textMuted,
+  },
+}));
+
 export const useProductDetailTabBarStyles = createThemedStyles((theme) => ({
   root: {
     borderBottomWidth: StyleSheet.hairlineWidth,
@@ -1414,16 +1780,18 @@ export const useProductDetailTabStyles = createThemedStyles((theme) => ({
     paddingHorizontal: 10,
     paddingVertical: 8,
   },
-  /** Паритет с web `installment-buyer-block__hint` (mobile). */
+  /** Паритет с web `installment-buyer-block__hint` (InstallmentBuyerBlock.css). */
   installmentBuyerHint: {
     margin: 0,
-    paddingVertical: 8.8,
-    paddingHorizontal: 10.4,
+    paddingVertical: 10.4,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.actionBorder,
     borderRadius: 10.4,
-    backgroundColor: theme.colors.surfaceMuted,
-    fontSize: 13.2,
-    lineHeight: 19.1,
-    color: theme.colors.textSecondary,
+    backgroundColor: theme.colors.actionSoft,
+    fontSize: 13.6,
+    lineHeight: 20,
+    color: theme.colors.infoNavy,
   },
   error: {
     color: theme.colors.danger,
@@ -1865,7 +2233,7 @@ export const useCartScreenStyles = createThemedStyles((theme) => ({
   summaryCard: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 14,
+    gap: 10,
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderWidth: 1,
@@ -1873,21 +2241,23 @@ export const useCartScreenStyles = createThemedStyles((theme) => ({
     borderRadius: 10,
     backgroundColor: theme.colors.surface,
   },
-  totalRow: {
+  summaryContent: {
     flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
+    minWidth: 0,
+    gap: 4,
+  },
+  totalRow: {
+    minWidth: 0,
   },
   totalLabel: {
     fontSize: 15,
     color: theme.colors.textMuted,
   },
   totalValue: {
+    minWidth: 0,
     fontSize: 18,
     fontWeight: "700",
     color: theme.colors.text,
-    flex: 1,
   },
   fullTotalHint: {
     fontSize: 13,
@@ -1902,6 +2272,7 @@ export const useCartScreenStyles = createThemedStyles((theme) => ({
     marginBottom: theme.spacing[2],
   },
   clearButton: {
+    flexShrink: 0,
     paddingVertical: 6,
     paddingHorizontal: 14,
     borderWidth: 1,

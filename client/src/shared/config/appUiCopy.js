@@ -1392,6 +1392,8 @@ export const INSTALLMENT_UI = {
   CONTRACT_PRODUCT: "Товар",
   SELLER_LABEL: "Продавец",
   BUYER_LABEL: "Покупатель",
+  BUYERS_LABEL: "Покупатели",
+  BUYER_PROFILE_ARIA: (buyerName) => `Профиль покупателя: ${buyerName}`,
   CONTRACT_PLAN: "План",
   CONTRACT_STATUS: "Статус",
   CONTRACT_PAID: "Оплачено",
@@ -1508,6 +1510,11 @@ export const CREATE_RAFFLE_MODAL_UI = {
     "Сколько подтверждённых продаж нужно для завершения розыгрыша. Целое число от 1 до 100 000.",
   HINT_INSTAGRAM:
     "Ссылка на ваш профиль Instagram — покупатели увидят её после завершения розыгрыша.",
+};
+
+export const SITE_HEADER_BANNER_UI = {
+  CAROUSEL_ARIA: "Баннеры на главной",
+  AUTOPLAY_MS: 5000,
 };
 
 export const RAFFLE_FEATURED_CAROUSEL_UI = {
@@ -1817,6 +1824,7 @@ export const MY_PROFILE_PAGE_UI = {
   TAB_POPULAR_PRODUCTS_ADMIN: "Популярные товары",
   TAB_CATEGORY_TREE_ADMIN: "Категории",
   TAB_APP_INTRO_ADMIN: "Intro-ролик",
+  TAB_SITE_HEADER_BANNER_ADMIN: "Баннер шапки",
   TAB_PRODUCT_MODERATION: "На модерации",
   TAB_INTRO_AD_MODERATION: "Intro-реклама",
   TAB_SELLER_PERSONAL_CATEGORY_MODERATION: "Личные категории",
@@ -2038,7 +2046,7 @@ export const CATEGORY_TREE_ADMIN_PAGE_UI = {
 /** Админ: настройка intro-ролика в профиле */
 export const APP_INTRO_ADMIN_PAGE_UI = {
   TITLE: "Intro-ролик",
-  HINT: "Заставка при первом заходе на сайт. Без своего MP4 используется файл /intro/intro.mp4 из репозитория.",
+  HINT: "Заставка при первом заходе на сайт. Без своего видео используется файл /intro/intro.mp4 из репозитория.",
   LOADING: "Загрузка настроек…",
   LOAD_ERROR: "Не удалось загрузить настройки intro",
   SAVE_ERROR: "Не удалось сохранить настройки intro",
@@ -2050,9 +2058,9 @@ export const APP_INTRO_ADMIN_PAGE_UI = {
   SECTION_MEDIA: "Видео и постер",
   SECTION_FALLBACK: "Заглушка при ошибке видео",
   SECTION_TIMING: "Тайминги",
-  LABEL_VIDEO_MP4: "Видео MP4",
-  HINT_VIDEO_MP4: "Пустое поле — дефолтный /intro/intro.mp4",
-  LABEL_VIDEO_WEBM: "Видео WebM (опционально)",
+  LABEL_VIDEO: "Видео",
+  HINT_VIDEO:
+    "MP4, WebM, MOV или HEVC — сервер конвертирует в MP4. Пустое поле — дефолтный /intro/intro.mp4",
   LABEL_POSTER: "Постер",
   LABEL_FALLBACK_TITLE: "Заголовок заглушки",
   LABEL_FALLBACK_HINT: "Подзаголовок заглушки",
@@ -2071,6 +2079,33 @@ export const APP_INTRO_ADMIN_PAGE_UI = {
   LABEL_PRIORITIZE_PLATFORM_INTRO: "Показывать intro платформы вместо рекламы",
   HINT_PRIORITIZE_PLATFORM_INTRO:
     "Если включено — платформенный intro имеет приоритет, оплаченные кампании ставятся на паузу.",
+};
+
+export const SITE_HEADER_BANNER_ADMIN_PAGE_UI = {
+  TITLE: "Баннер шапки",
+  HINT: "Карусель под строкой поиска на главном каталоге. Только изображение и alt-текст.",
+  LOADING: "Загрузка настроек…",
+  LOAD_ERROR: "Не удалось загрузить настройки баннера",
+  SAVE_ERROR: "Не удалось сохранить настройки баннера",
+  SAVE_SUCCESS: "Сохранено",
+  SAVE: "Сохранить",
+  SAVING: "Сохранение…",
+  SECTION_GLOBAL: "Общие настройки",
+  SECTION_ITEMS: "Слайды",
+  LABEL_ENABLED: "Показывать баннеры на главной",
+  LABEL_ITEM_ENABLED: "Слайд включён",
+  LABEL_IMAGE: "Изображение",
+  HINT_IMAGE: "Рекомендуемая высота ~120px, ширина на всю шапку",
+  LABEL_IMAGE_ALT: "Alt-текст",
+  LABEL_LINK_PATH: "Внутренний путь",
+  LINK_PATH_PLACEHOLDER: "/product/…",
+  HINT_LINK_PATH: "Путь внутри сайта, начинается с /. Пусто — без перехода.",
+  LABEL_BACKGROUND_COLOR: "Цвет фона",
+  ADD_ITEM: "Добавить слайд",
+  REMOVE_ITEM: "Удалить слайд",
+  EMPTY_ITEMS: "Слайдов пока нет.",
+  /** @param {number} index */
+  ITEM_TITLE: (index) => `Слайд ${index}`,
 };
 
 /**

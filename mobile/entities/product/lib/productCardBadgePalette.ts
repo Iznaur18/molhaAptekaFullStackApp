@@ -95,34 +95,3 @@ export const PRODUCT_CARD_BADGE_LAYOUT = {
   sellerBadgeSize: 15,
   sellerNameGap: 4,
 } as const;
-
-/** client ProductCardMedia.css `.product-card__image-nav-btn` */
-export const PRODUCT_CARD_IMAGE_NAV_CHROME = {
-  size: 28,
-  rowPaddingHorizontal: 2.4,
-  fontSize: 16,
-  lineHeight: 16,
-  borderWidth: 1,
-  backgroundSurfaceOpacity: 0.42,
-  buttonOpacity: 0.88,
-  blurRadius: 4,
-} as const;
-
-const mixHexWithAlpha = (hexColor: string, opacity: number): string => {
-  const hex = hexColor.replace("#", "");
-  if (hex.length !== 6) {
-    return `rgba(255, 255, 255, ${opacity})`;
-  }
-
-  const r = Number.parseInt(hex.slice(0, 2), 16);
-  const g = Number.parseInt(hex.slice(2, 4), 16);
-  const b = Number.parseInt(hex.slice(4, 6), 16);
-
-  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
-};
-
-export const resolveProductCardImageNavBackground = (surfaceColor: string): string =>
-  mixHexWithAlpha(surfaceColor, PRODUCT_CARD_IMAGE_NAV_CHROME.backgroundSurfaceOpacity);
-
-export const resolveProductCardImageNavBorderColor = (textColor: string): string =>
-  mixHexWithAlpha(textColor, 0.14);

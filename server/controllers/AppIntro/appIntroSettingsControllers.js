@@ -56,10 +56,16 @@ export const patchAppIntroSettingsController = async (req, res) => {
     await cleanupReplacedAppIntroMedia(existing?.videoMp4Url, nextVideoMp4Url);
     update.videoMp4Url = nextVideoMp4Url;
     mediaChanged = true;
+
+    const previousVideoMp4Url = normalizeOptionalMediaUrl(existing?.videoMp4Url) ?? null;
+    if (nextVideoMp4Url !== previousVideoMp4Url) {
+      await cleanupReplacedAppIntroMedia(existing?.videoWebmUrl, null);
+      update.videoWebmUrl = null;
+    }
   }
 
   const nextVideoWebmUrl = normalizeOptionalMediaUrl(body.videoWebmUrl);
-  if (nextVideoWebmUrl !== undefined) {
+  if (nextVideoWebmUrl !== undefined && update.videoWebmUrl === undefined) {
     await cleanupReplacedAppIntroMedia(existing?.videoWebmUrl, nextVideoWebmUrl);
     update.videoWebmUrl = nextVideoWebmUrl;
     mediaChanged = true;

@@ -1,0 +1,56 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { test } from "node:test";
+
+const MOBILE_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+
+const readMobileFile = (relativePath) =>
+  readFileSync(join(MOBILE_ROOT, relativePath), "utf8");
+
+test("create raffle page mirrors web modal form and hub chrome", () => {
+  const page = readMobileFile("features/create-raffle-page/ui/CreateRafflePage.tsx");
+  const styles = readMobileFile("shared/theme/createRafflePageStyles.ts");
+
+  assert.match(page, /ProfileMobileSectionToggle/);
+  assert.match(page, /ProfileMobileNavSheet/);
+  assert.match(page, /contentPaddingBottom/);
+  assert.match(page, /CREATE_RAFFLE_MODAL_UI/);
+  assert.match(page, /RafflePrizeMedia/);
+  assert.match(page, /keepDigitsOnly/);
+  assert.match(page, /activeSectionId="create-raffle"/);
+  assert.match(page, /TAB_CREATE_RAFFLE/);
+  assert.doesNotMatch(page, /sellerFlowStyles/);
+
+  assert.match(styles, /accentPurple/);
+  assert.match(styles, /previewFrame/);
+});
+
+test("create raffle modal mirrors web edit flow", () => {
+  const modal = readMobileFile("features/create-raffle-page/ui/CreateRaffleModal.tsx");
+  const formBody = readMobileFile("features/create-raffle-page/ui/CreateRaffleFormBody.tsx");
+  const home = readMobileFile("features/home-feed/ui/HomeFeaturedRafflesSection.tsx");
+  const patchMy = readMobileFile("entities/raffle/api/patchMyRaffle.ts");
+  const patchStaff = readMobileFile("entities/raffle/api/patchRaffleByStaff.ts");
+
+  assert.match(modal, /TITLE_EDIT/);
+  assert.match(modal, /patchStaffMutation/);
+  assert.match(modal, /patchMyMutation/);
+  assert.match(modal, /useStaffApi/);
+  assert.match(formBody, /CreateRaffleFormBody/);
+  assert.match(home, /CreateRaffleModal/);
+  assert.match(home, /setEditingRaffle/);
+  assert.match(home, /editUseStaffApi/);
+  assert.doesNotMatch(home, /router\.push\("\/\(tabs\)\/profile"/);
+  assert.match(patchMy, /\/product\/raffles\/\$\{raffleId\}/);
+  assert.match(patchStaff, /\/staff/);
+});
+
+test("create raffle ui copy matches web modal", () => {
+  const copy = readMobileFile("shared/config/appUiCopy.ts");
+
+  assert.match(copy, /CREATE_RAFFLE_MODAL_UI/);
+  assert.match(copy, /Короткое название для баннера/);
+  assert.match(copy, /После одобрения staff включите участие/);
+});

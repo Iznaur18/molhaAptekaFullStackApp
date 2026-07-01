@@ -52,7 +52,11 @@ export const ImageUrlUploadField = ({
   return (
     <View style={styles.wrap}>
       <Text style={styles.label}>{label}</Text>
-      {displayUrl ? <CachedProductImage uri={displayUrl} style={styles.preview} /> : null}
+      {displayUrl ? (
+        <View style={styles.previewWrap}>
+          <CachedProductImage uri={displayUrl} style={styles.preview} contentFit="contain" />
+        </View>
+      ) : null}
       <TextInput
         style={styles.input}
         value={value}

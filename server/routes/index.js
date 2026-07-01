@@ -21,6 +21,7 @@ import { installmentRouter } from "./installmentRouter.js";
 import { priceOfferRouter } from "./priceOfferRouter.js";
 
 import { appIntroRouter } from "./appIntroRouter.js";
+import { siteHeaderBannerRouter } from "./siteHeaderBannerRouter.js";
 import { introAdRouter } from "./introAdRouter.js";
 import { sellerPersonalCategoryRouter } from "./sellerPersonalCategoryRouter.js";
 
@@ -37,6 +38,7 @@ export {
   installmentRouter,
   priceOfferRouter,
   appIntroRouter,
+  siteHeaderBannerRouter,
   introAdRouter,
   sellerPersonalCategoryRouter,
 };

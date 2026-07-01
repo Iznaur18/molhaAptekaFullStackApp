@@ -31,6 +31,7 @@ const DEV_API_PROXY_PREFIXES = [
   "/price-offers",
   "/address",
   "/app-intro",
+  "/site-header-banner",
   "/intro-ad",
   "/seller-personal-category",
   "/health",

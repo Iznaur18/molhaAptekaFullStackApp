@@ -1,4 +1,7 @@
-import { useMemo, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
+import { useCallback, useMemo, useState } from "react";
 import { Alert, FlatList, Pressable, Text, TextInput, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
@@ -7,31 +10,32 @@ import {
   useProductSearchSynonymAdminMutations,
   useProductSearchSynonymsAdminQuery,
 } from "@/entities/product-search-synonym/model/useSearchSynonymAdminMutations";
+import {
+  filterSynonymRows,
+  sortSynonymRows,
+} from "@/features/search-synonyms-admin-page/lib/searchSynonymsAdminUtils";
+import { SearchSynonymAdminCard } from "@/features/search-synonyms-admin-page/ui/SearchSynonymAdminCard";
 import { SynonymCategoryPicker } from "@/features/search-synonyms-admin-page/ui/SynonymCategoryPicker";
-import { SEARCH_SYNONYMS_ADMIN_PAGE_UI } from "@/shared/config";
-import { useStaffAdminStyles } from "@/shared/theme/staffAdminStyles";
-import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
+import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
+import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
+import { searchSynonymAdminQueryKeys } from "@/shared/api";
+import { MY_PROFILE_PAGE_UI, SEARCH_SYNONYMS_ADMIN_PAGE_UI } from "@/shared/config";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
+import { useAdminPanelStyles } from "@/shared/theme/adminPanelStyles";
+import { AdminPanelShell } from "@/shared/ui/AdminPanelShell";
+import { ScreenErrorState } from "@/shared/ui/ScreenStates";
 
-const sortSynonymRows = (rows: SearchSynonymRow[]) =>
-  [...rows].sort((a, b) => a.token.localeCompare(b.token, "ru"));
-
-const filterSynonymRows = (rows: SearchSynonymRow[], query: string) => {
-  const q = query.trim().toLowerCase();
-  if (!q) {
-    return rows;
-  }
-  return rows.filter((row) => {
-    const token = row.token.toLowerCase();
-    const cats = row.categories.join(" ").toLowerCase();
-    return token.includes(q) || cats.includes(q);
-  });
-};
+const MIN_TOKEN_LENGTH = 3;
 
 export const SearchSynonymsAdminPage = () => {
-  const styles = useStaffAdminStyles();
+  const router = useRouter();
+  const styles = useAdminPanelStyles();
+  const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const queryClient = useQueryClient();
   const synonymsQuery = useProductSearchSynonymsAdminQuery();
   const { createMutation, patchMutation, deleteMutation } = useProductSearchSynonymAdminMutations();
 
+  const [navSheetVisible, setNavSheetVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [pendingId, setPendingId] = useState<string | null>(null);
@@ -50,36 +54,78 @@ export const SearchSynonymsAdminPage = () => {
     () => filterSynonymRows(rows, searchQuery),
     [rows, searchQuery],
   );
+  const phase = synonymsQuery.isPending
+    ? "loading"
+    : synonymsQuery.isError
+      ? "error"
+      : "success";
+  const isRefreshing = synonymsQuery.isRefetching;
+  const queryError =
+    synonymsQuery.error instanceof Error
+      ? synonymsQuery.error.message
+      : SEARCH_SYNONYMS_ADMIN_PAGE_UI.LOAD_ERROR;
 
-  const cancelEdit = () => {
+  useFocusEffect(
+    useCallback(() => {
+      void synonymsQuery.refetch();
+    }, [synonymsQuery.refetch]),
+  );
+
+  const updateRows = useCallback(
+    (updater: (prev: SearchSynonymRow[]) => SearchSynonymRow[]) => {
+      queryClient.setQueryData(searchSynonymAdminQueryKeys.all, (old: SearchSynonymRow[] | undefined) => {
+        const next = updater(old ?? []);
+        return sortSynonymRows(next);
+      });
+    },
+    [queryClient],
+  );
+
+  const reloadRows = useCallback(async () => {
+    setActionError("");
+    try {
+      await synonymsQuery.refetch();
+    } catch (error) {
+      setActionError(
+        error instanceof Error ? error.message : SEARCH_SYNONYMS_ADMIN_PAGE_UI.LOAD_ERROR,
+      );
+    }
+  }, [synonymsQuery.refetch]);
+
+  const cancelEdit = useCallback(() => {
     setEditingId(null);
     setEditToken("");
     setEditCategories([]);
-  };
+  }, []);
 
-  const startEdit = (row: SearchSynonymRow) => {
+  const startEdit = useCallback((row: SearchSynonymRow) => {
     setEditingId(row._id);
     setEditToken(row.token);
     setEditCategories(row.categories ?? []);
     setActionError("");
-  };
+  }, []);
 
   const handleCreate = async () => {
+    if (newToken.trim().length < MIN_TOKEN_LENGTH) {
+      setActionError(SEARCH_SYNONYMS_ADMIN_PAGE_UI.SAVE_ERROR);
+      return;
+    }
     if (newCategories.length === 0) {
       setActionError(SEARCH_SYNONYMS_ADMIN_PAGE_UI.SAVE_ERROR);
       return;
     }
-    setPendingId("create");
-    setActionError("");
+
     try {
-      await createMutation.mutateAsync({
+      setPendingId("create");
+      setActionError("");
+      const created = await createMutation.mutateAsync({
         token: newToken.trim(),
         categories: newCategories,
       });
+      updateRows((prev) => [...prev, created]);
       setNewToken("");
       setNewCategories([]);
       setIsCreateOpen(false);
-      await synonymsQuery.refetch();
     } catch (error) {
       setActionError(
         error instanceof Error ? error.message : SEARCH_SYNONYMS_ADMIN_PAGE_UI.SAVE_ERROR,
@@ -90,19 +136,23 @@ export const SearchSynonymsAdminPage = () => {
   };
 
   const handleSaveEdit = async (synonymId: string) => {
-    if (editCategories.length === 0) {
+    if (editToken.trim().length < MIN_TOKEN_LENGTH || editCategories.length === 0) {
       setActionError(SEARCH_SYNONYMS_ADMIN_PAGE_UI.SAVE_ERROR);
       return;
     }
-    setPendingId(synonymId);
-    setActionError("");
+
     try {
-      await patchMutation.mutateAsync({
+      setPendingId(synonymId);
+      setActionError("");
+      const updated = await patchMutation.mutateAsync({
         synonymId,
-        body: { token: editToken.trim(), categories: editCategories },
+        body: {
+          token: editToken.trim(),
+          categories: editCategories,
+        },
       });
+      updateRows((prev) => prev.map((row) => (row._id === synonymId ? updated : row)));
       cancelEdit();
-      await synonymsQuery.refetch();
     } catch (error) {
       setActionError(
         error instanceof Error ? error.message : SEARCH_SYNONYMS_ADMIN_PAGE_UI.SAVE_ERROR,
@@ -113,170 +163,216 @@ export const SearchSynonymsAdminPage = () => {
   };
 
   const handleDelete = (synonymId: string) => {
-    Alert.alert(SEARCH_SYNONYMS_ADMIN_PAGE_UI.DELETE, SEARCH_SYNONYMS_ADMIN_PAGE_UI.DELETE_CONFIRM, [
-      { text: SEARCH_SYNONYMS_ADMIN_PAGE_UI.CANCEL_BUTTON, style: "cancel" },
-      {
-        text: SEARCH_SYNONYMS_ADMIN_PAGE_UI.DELETE,
-        style: "destructive",
-        onPress: () => {
-          void (async () => {
-            setPendingId(synonymId);
-            setActionError("");
-            try {
-              await deleteMutation.mutateAsync(synonymId);
-              if (editingId === synonymId) {
-                cancelEdit();
+    Alert.alert(
+      SEARCH_SYNONYMS_ADMIN_PAGE_UI.DELETE_BUTTON,
+      SEARCH_SYNONYMS_ADMIN_PAGE_UI.DELETE_CONFIRM,
+      [
+        { text: SEARCH_SYNONYMS_ADMIN_PAGE_UI.CANCEL_BUTTON, style: "cancel" },
+        {
+          text: SEARCH_SYNONYMS_ADMIN_PAGE_UI.DELETE_BUTTON,
+          style: "destructive",
+          onPress: () => {
+            void (async () => {
+              try {
+                setPendingId(synonymId);
+                setActionError("");
+                await deleteMutation.mutateAsync(synonymId);
+                updateRows((prev) => prev.filter((row) => row._id !== synonymId));
+                if (editingId === synonymId) {
+                  cancelEdit();
+                }
+              } catch (error) {
+                setActionError(
+                  error instanceof Error
+                    ? error.message
+                    : SEARCH_SYNONYMS_ADMIN_PAGE_UI.DELETE_ERROR,
+                );
+              } finally {
+                setPendingId(null);
               }
-              await synonymsQuery.refetch();
-            } catch (error) {
-              setActionError(
-                error instanceof Error
-                  ? error.message
-                  : SEARCH_SYNONYMS_ADMIN_PAGE_UI.DELETE_ERROR,
-              );
-            } finally {
-              setPendingId(null);
-            }
-          })();
+            })();
+          },
         },
-      },
-    ]);
+      ],
+    );
   };
 
-  if (synonymsQuery.isPending && rows.length === 0) {
-    return <ScreenLoadingState message={SEARCH_SYNONYMS_ADMIN_PAGE_UI.LOADING} />;
+  const displayError = actionError || (phase === "error" ? queryError : "");
+
+  const createPanel = (
+    <>
+      <View style={styles.field}>
+        <Text style={styles.fieldLabel}>{SEARCH_SYNONYMS_ADMIN_PAGE_UI.LABEL_TOKEN}</Text>
+        <TextInput
+          style={styles.fieldInput}
+          value={newToken}
+          onChangeText={setNewToken}
+          editable={pendingId !== "create"}
+        />
+      </View>
+      <View style={styles.field}>
+        <Text style={styles.fieldLabel}>{SEARCH_SYNONYMS_ADMIN_PAGE_UI.CATEGORIES_HINT}</Text>
+        <SynonymCategoryPicker
+          selected={newCategories}
+          onChange={setNewCategories}
+          disabled={pendingId === "create"}
+        />
+      </View>
+      <View style={styles.createActions}>
+        <Pressable
+          style={[
+            styles.primaryButton,
+            (pendingId === "create" || newCategories.length === 0) && styles.primaryButtonDisabled,
+          ]}
+          disabled={pendingId === "create" || newCategories.length === 0}
+          onPress={() => void handleCreate()}
+        >
+          <Text style={styles.primaryButtonText}>{SEARCH_SYNONYMS_ADMIN_PAGE_UI.CREATE_BUTTON}</Text>
+        </Pressable>
+      </View>
+    </>
+  );
+
+  const listContent = (() => {
+    if (phase === "success" && rows.length === 0) {
+      return (
+        <Text style={[styles.alert, styles.alertInfo]}>{SEARCH_SYNONYMS_ADMIN_PAGE_UI.EMPTY}</Text>
+      );
+    }
+    if (phase === "success" && filteredRows.length === 0) {
+      return (
+        <Text style={[styles.alert, styles.alertInfo]}>
+          {SEARCH_SYNONYMS_ADMIN_PAGE_UI.EMPTY_FILTER}
+        </Text>
+      );
+    }
+    return null;
+  })();
+
+  const sectionToggle = (
+    <ProfileMobileSectionToggle
+      activeLabel={MY_PROFILE_PAGE_UI.TAB_SEARCH_SYNONYMS_ADMIN}
+      onPress={() => setNavSheetVisible(true)}
+    />
+  );
+
+  const navSheet = (
+    <ProfileMobileNavSheet
+      visible={navSheetVisible}
+      activeSectionId="search-synonyms-admin"
+      onClose={() => setNavSheetVisible(false)}
+      onOverviewPress={() => router.replace("/(tabs)/profile")}
+    />
+  );
+
+  if (phase === "loading" && rows.length === 0) {
+    return (
+      <>
+        <View style={[styles.pageContainer, centeredContentStyle, styles.pageList]}>
+          <AdminPanelShell
+            title={SEARCH_SYNONYMS_ADMIN_PAGE_UI.TITLE}
+            hint={SEARCH_SYNONYMS_ADMIN_PAGE_UI.HINT}
+            count={0}
+            searchValue={searchQuery}
+            onSearchChange={setSearchQuery}
+            searchPlaceholder={SEARCH_SYNONYMS_ADMIN_PAGE_UI.SEARCH_PLACEHOLDER}
+            onRefresh={() => void reloadRows()}
+            isLoading
+            isCreateOpen={isCreateOpen}
+            onToggleCreate={() => setIsCreateOpen((open) => !open)}
+            createHeading={SEARCH_SYNONYMS_ADMIN_PAGE_UI.CREATE_HEADING}
+            createPanel={createPanel}
+            topSlot={sectionToggle}
+          >
+            {null}
+          </AdminPanelShell>
+        </View>
+        {navSheet}
+      </>
+    );
   }
 
-  if (synonymsQuery.isError && rows.length === 0) {
+  if (phase === "error" && rows.length === 0) {
     return (
-      <ScreenErrorState
-        message={
-          synonymsQuery.error instanceof Error
-            ? synonymsQuery.error.message
-            : SEARCH_SYNONYMS_ADMIN_PAGE_UI.LOAD_ERROR
-        }
-        onRetry={() => void synonymsQuery.refetch()}
-      />
+      <>
+        <View style={[styles.pageContainer, centeredContentStyle, styles.pageList]}>
+          <AdminPanelShell
+            title={SEARCH_SYNONYMS_ADMIN_PAGE_UI.TITLE}
+            hint={SEARCH_SYNONYMS_ADMIN_PAGE_UI.HINT}
+            count={0}
+            searchValue={searchQuery}
+            onSearchChange={setSearchQuery}
+            searchPlaceholder={SEARCH_SYNONYMS_ADMIN_PAGE_UI.SEARCH_PLACEHOLDER}
+            onRefresh={() => void reloadRows()}
+            isLoading={false}
+            error={displayError}
+            isCreateOpen={isCreateOpen}
+            onToggleCreate={() => setIsCreateOpen((open) => !open)}
+            createHeading={SEARCH_SYNONYMS_ADMIN_PAGE_UI.CREATE_HEADING}
+            createPanel={createPanel}
+            topSlot={sectionToggle}
+          >
+            <ScreenErrorState message={queryError} onRetry={() => void reloadRows()} />
+          </AdminPanelShell>
+        </View>
+        {navSheet}
+      </>
     );
   }
 
   return (
-    <FlatList
-      data={filteredRows}
-      keyExtractor={(item) => item._id}
-      contentContainerStyle={styles.list}
-      refreshControl={
-        <ThemedRefreshControl refreshing={synonymsQuery.isFetching} onRefresh={() => void synonymsQuery.refetch()} />
-      }
-      ListHeaderComponent={
-        <View style={styles.header}>
-          <TextInput
-            style={styles.search}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            placeholder={SEARCH_SYNONYMS_ADMIN_PAGE_UI.SEARCH_PLACEHOLDER}
+    <>
+      <FlatList
+        style={[styles.pageContainer, styles.pageList, centeredContentStyle]}
+        contentContainerStyle={{ paddingBottom: contentPaddingBottom, gap: 8 }}
+        data={filteredRows}
+        keyExtractor={(item) => item._id}
+        refreshControl={
+          <ThemedRefreshControl
+            refreshing={isRefreshing}
+            onRefresh={() => void reloadRows()}
           />
-          <Pressable style={styles.toggleCreate} onPress={() => setIsCreateOpen((open) => !open)}>
-            <Text style={styles.toggleCreateText}>{SEARCH_SYNONYMS_ADMIN_PAGE_UI.ADD_CREATE}</Text>
-          </Pressable>
-          {isCreateOpen ? (
-            <View style={styles.panel}>
-              <Text style={styles.sectionTitle}>{SEARCH_SYNONYMS_ADMIN_PAGE_UI.CREATE_HEADING}</Text>
-              <Text style={styles.label}>{SEARCH_SYNONYMS_ADMIN_PAGE_UI.LABEL_TOKEN}</Text>
-              <TextInput
-                style={styles.input}
-                value={newToken}
-                onChangeText={setNewToken}
-                editable={pendingId !== "create"}
-              />
-              <Text style={styles.label}>{SEARCH_SYNONYMS_ADMIN_PAGE_UI.CATEGORIES_HINT}</Text>
-              <SynonymCategoryPicker
-                selected={newCategories}
-                onChange={setNewCategories}
-                disabled={pendingId === "create"}
-              />
-              <Pressable
-                style={[styles.primaryButton, pendingId === "create" && styles.disabled]}
-                onPress={() => void handleCreate()}
-                disabled={pendingId === "create" || newCategories.length === 0}
-              >
-                <Text style={styles.primaryButtonText}>
-                  {SEARCH_SYNONYMS_ADMIN_PAGE_UI.CREATE_BUTTON}
-                </Text>
-              </Pressable>
-            </View>
-          ) : null}
-          {actionError ? <Text style={styles.error}>{actionError}</Text> : null}
-        </View>
-      }
-      ListEmptyComponent={
-        <Text style={styles.empty}>
-          {rows.length === 0
-            ? SEARCH_SYNONYMS_ADMIN_PAGE_UI.EMPTY
-            : SEARCH_SYNONYMS_ADMIN_PAGE_UI.EMPTY_FILTER}
-        </Text>
-      }
-      renderItem={({ item }) => {
-        const isEditing = editingId === item._id;
-        const isPending = pendingId === item._id;
+        }
+        ListHeaderComponent={
+          <AdminPanelShell
+            title={SEARCH_SYNONYMS_ADMIN_PAGE_UI.TITLE}
+            hint={SEARCH_SYNONYMS_ADMIN_PAGE_UI.HINT}
+            count={rows.length}
+            filteredCount={searchQuery.trim() ? filteredRows.length : undefined}
+            searchValue={searchQuery}
+            onSearchChange={setSearchQuery}
+            searchPlaceholder={SEARCH_SYNONYMS_ADMIN_PAGE_UI.SEARCH_PLACEHOLDER}
+            onRefresh={() => void reloadRows()}
+            isLoading={false}
+            isRefreshing={isRefreshing}
+            error={displayError}
+            isCreateOpen={isCreateOpen}
+            onToggleCreate={() => setIsCreateOpen((open) => !open)}
+            createHeading={SEARCH_SYNONYMS_ADMIN_PAGE_UI.CREATE_HEADING}
+            createPanel={createPanel}
+            topSlot={sectionToggle}
+          >
+            {listContent}
+          </AdminPanelShell>
+        }
+        renderItem={({ item }) => (
+          <SearchSynonymAdminCard
+            row={item}
+            isEditing={editingId === item._id}
+            isPending={pendingId === item._id}
+            editToken={editToken}
+            editCategories={editCategories}
+            onEditTokenChange={setEditToken}
+            onEditCategoriesChange={setEditCategories}
+            onStartEdit={() => startEdit(item)}
+            onCancelEdit={cancelEdit}
+            onSave={() => void handleSaveEdit(item._id)}
+            onDelete={() => handleDelete(item._id)}
+          />
+        )}
+      />
 
-        return (
-          <View style={styles.row}>
-            {isEditing ? (
-              <>
-                <TextInput style={styles.input} value={editToken} onChangeText={setEditToken} />
-                <SynonymCategoryPicker
-                  selected={editCategories}
-                  onChange={setEditCategories}
-                  disabled={isPending}
-                />
-                <View style={styles.actions}>
-                  <Pressable
-                    style={styles.secondaryButton}
-                    onPress={() => void handleSaveEdit(item._id)}
-                    disabled={isPending}
-                  >
-                    <Text style={styles.secondaryButtonText}>
-                      {SEARCH_SYNONYMS_ADMIN_PAGE_UI.SAVE_BUTTON}
-                    </Text>
-                  </Pressable>
-                  <Pressable style={styles.ghostButton} onPress={cancelEdit} disabled={isPending}>
-                    <Text>{SEARCH_SYNONYMS_ADMIN_PAGE_UI.CANCEL_BUTTON}</Text>
-                  </Pressable>
-                </View>
-              </>
-            ) : (
-              <>
-                <Text style={styles.token}>
-                  {SEARCH_SYNONYMS_ADMIN_PAGE_UI.TOKEN_LABEL}: {item.token}
-                </Text>
-                <Text style={styles.meta}>
-                  {SEARCH_SYNONYMS_ADMIN_PAGE_UI.CATEGORIES_LABEL}:{" "}
-                  {(item.categories ?? []).join(", ") || "—"}
-                </Text>
-                <View style={styles.actions}>
-                  <Pressable style={styles.secondaryButton} onPress={() => startEdit(item)}>
-                    <Text style={styles.secondaryButtonText}>
-                      {SEARCH_SYNONYMS_ADMIN_PAGE_UI.EDIT_BUTTON}
-                    </Text>
-                  </Pressable>
-                  <Pressable
-                    style={styles.deleteButton}
-                    onPress={() => handleDelete(item._id)}
-                    disabled={isPending}
-                  >
-                    <Text style={styles.deleteText}>
-                      {isPending
-                        ? SEARCH_SYNONYMS_ADMIN_PAGE_UI.DELETE_PENDING
-                        : SEARCH_SYNONYMS_ADMIN_PAGE_UI.DELETE}
-                    </Text>
-                  </Pressable>
-                </View>
-              </>
-            )}
-          </View>
-        );
-      }}
-    />
+      {navSheet}
+    </>
   );
 };

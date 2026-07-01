@@ -80,6 +80,11 @@ export const LazyAppIntroAdminPage = lazyNamedExport(
   "AppIntroAdminPage",
 );
 
+export const LazySiteHeaderBannerAdminPage = lazyNamedExport(
+  () => import("../../../pages/site-header-banner-admin/ui/SiteHeaderBannerAdminPage.jsx"),
+  "SiteHeaderBannerAdminPage",
+);
+
 export const LazyPopularProductsAdminPage = lazyNamedExport(
   () => import("../../../pages/popular-products-admin/ui/PopularProductsAdminPage.jsx"),
   "PopularProductsAdminPage",

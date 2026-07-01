@@ -1,26 +1,93 @@
+import { useFocusEffect } from "@react-navigation/native";
+import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { useState } from "react";
-import { FlatList, Pressable, ScrollView, Text, View } from "react-native";
+import { useCallback, useState } from "react";
+import { FlatList, Pressable, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { InstallmentContractCard } from "@/entities/installment/ui/InstallmentContractCard";
-import { INSTALLMENT_CONTRACT_STATUS_FILTER_OPTIONS } from "@/entities/installment/model/constants";
 import { useMyInstallmentSalesQuery } from "@/entities/installment/model/useMyInstallmentSalesQuery";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
-import { INSTALLMENT_UI } from "@/shared/config";
+import { InstallmentPaymentsPageToolbar } from "@/features/installment-payments-page/ui/InstallmentPaymentsPageToolbar";
+import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
+import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
+import { staffBadgeQueryKeys } from "@/shared/api";
+import { INSTALLMENT_UI, MY_PROFILE_PAGE_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
-import { useOrdersScreenStyles } from "@/shared/theme/commerceScreenStyles";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
+import { useInstallmentPaymentsPageStyles } from "@/shared/theme/installmentPaymentsPageStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 export const InstallmentSalesPage = () => {
   const router = useRouter();
-  const styles = useOrdersScreenStyles();
+  const styles = useInstallmentPaymentsPageStyles();
+  const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const queryClient = useQueryClient();
   const isAuthorized = useIsAuthorized();
+  const [navSheetVisible, setNavSheetVisible] = useState(false);
   const [statusFilter, setStatusFilter] = useState("");
   const salesQuery = useMyInstallmentSalesQuery({
     status: statusFilter,
     enabled: isAuthorized,
   });
+
+  useFocusEffect(
+    useCallback(() => {
+      if (isAuthorized) {
+        void salesQuery.refetch();
+      }
+    }, [isAuthorized, salesQuery.refetch]),
+  );
+
+  const invalidateInstallmentQueues = useCallback(async () => {
+    await queryClient.invalidateQueries({
+      queryKey: [...staffBadgeQueryKeys.all, "user-actions"],
+    });
+  }, [queryClient]);
+
+  const handleRefresh = useCallback(async () => {
+    await salesQuery.refetch();
+    await invalidateInstallmentQueues();
+  }, [salesQuery, invalidateInstallmentQueues]);
+
+  const handleProductClick = useCallback(
+    (productId: string) => {
+      router.push({ pathname: "/product/[id]", params: { id: productId } });
+    },
+    [router],
+  );
+
+  const handleCounterpartyClick = useCallback(
+    (userId: string) => {
+      router.push({ pathname: "/user/[id]", params: { id: userId } });
+    },
+    [router],
+  );
+
+  const contracts = salesQuery.data ?? [];
+  const emptyMessage = statusFilter
+    ? INSTALLMENT_UI.SALES_PAGE_EMPTY_BY_FILTER
+    : INSTALLMENT_UI.SALES_PAGE_EMPTY;
+
+  const listHeader = (
+    <View style={styles.header}>
+      <ProfileMobileSectionToggle
+        activeLabel={MY_PROFILE_PAGE_UI.TAB_INSTALLMENT_SALES}
+        onPress={() => setNavSheetVisible(true)}
+      />
+      <InstallmentPaymentsPageToolbar
+        title={INSTALLMENT_UI.SALES_PAGE_TITLE}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        contractsCount={contracts.length}
+      />
+      {contracts.length === 0 ? (
+        <Text style={styles.emptyState} accessibilityRole="text">
+          {emptyMessage}
+        </Text>
+      ) : null}
+    </View>
+  );
 
   if (!isAuthorized) {
     return (
@@ -41,62 +108,49 @@ export const InstallmentSalesPage = () => {
     return (
       <ScreenErrorState
         message={formatApiErrorMessage(salesQuery.error, INSTALLMENT_UI.ERROR_GENERIC)}
-        onRetry={() => salesQuery.refetch()}
+        onRetry={() => {
+          void handleRefresh();
+        }}
       />
     );
   }
 
-  const contracts = salesQuery.data ?? [];
-
   return (
-    <FlatList
-      data={contracts}
-      keyExtractor={(contract) => contract._id}
-      contentContainerStyle={styles.list}
-      refreshControl={
-        <ThemedRefreshControl refreshing={salesQuery.isRefetching} onRefresh={salesQuery.refetch} />
-      }
-      ListHeaderComponent={
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.filters}
-        >
-          {INSTALLMENT_CONTRACT_STATUS_FILTER_OPTIONS.map((filter) => {
-            const isActive = statusFilter === filter.value;
-            const label = INSTALLMENT_UI[filter.labelKey];
-            return (
-              <Pressable
-                key={filter.value || "all"}
-                style={[styles.filterChip, isActive && styles.filterChipActive]}
-                onPress={() => setStatusFilter(filter.value)}
-              >
-                <Text
-                  style={[styles.filterChipText, isActive && styles.filterChipTextActive]}
-                >
-                  {label}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </ScrollView>
-      }
-      ListEmptyComponent={
-        <View style={styles.centered}>
-          <Text style={styles.hint}>
-            {statusFilter
-              ? INSTALLMENT_UI.SALES_PAGE_EMPTY_BY_FILTER
-              : INSTALLMENT_UI.SALES_PAGE_EMPTY}
-          </Text>
-        </View>
-      }
-      renderItem={({ item }) => (
-        <InstallmentContractCard
-          contract={item}
-          role="seller"
-          onProductPress={(productId) => router.push(`/product/${productId}`)}
-        />
-      )}
-    />
+    <>
+      <FlatList
+        style={[styles.container, styles.listFlex, centeredContentStyle]}
+        data={contracts}
+        keyExtractor={(contract) => contract._id}
+        contentContainerStyle={[styles.list, { paddingBottom: contentPaddingBottom }]}
+        refreshControl={
+          <ThemedRefreshControl
+            refreshing={salesQuery.isRefetching}
+            onRefresh={() => {
+              void handleRefresh();
+            }}
+          />
+        }
+        ListHeaderComponent={listHeader}
+        renderItem={({ item }) => (
+          <InstallmentContractCard
+            contract={item}
+            role="seller"
+            compact
+            onProductClick={handleProductClick}
+            onCounterpartyClick={handleCounterpartyClick}
+            onUpdated={() => {
+              void handleRefresh();
+            }}
+          />
+        )}
+      />
+
+      <ProfileMobileNavSheet
+        visible={navSheetVisible}
+        activeSectionId="installment-sales"
+        onClose={() => setNavSheetVisible(false)}
+        onOverviewPress={() => router.replace("/(tabs)/profile")}
+      />
+    </>
   );
 };

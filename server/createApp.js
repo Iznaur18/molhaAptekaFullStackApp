@@ -16,6 +16,7 @@ import {
   installmentRouter,
   priceOfferRouter,
   appIntroRouter,
+  siteHeaderBannerRouter,
   introAdRouter,
   sellerPersonalCategoryRouter,
 } from "./routes/index.js";
@@ -77,6 +78,7 @@ export const createApp = () => {
   app.use("/installment", installmentRouter);
   app.use("/price-offers", priceOfferRouter);
   app.use("/app-intro", appIntroRouter);
+  app.use("/site-header-banner", siteHeaderBannerRouter);
   app.use("/intro-ad", introAdRouter);
   app.use("/seller-personal-category", sellerPersonalCategoryRouter);
 

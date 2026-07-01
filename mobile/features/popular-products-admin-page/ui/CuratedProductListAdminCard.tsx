@@ -3,7 +3,7 @@ import { Pressable, Text, TextInput, View } from "react-native";
 
 import type { CuratedListAdminRow } from "@/entities/curated-product-list/api/curatedProductListAdminApi";
 import { POPULAR_PRODUCTS_ADMIN_PAGE_UI } from "@/shared/config";
-import { useStaffAdminStyles } from "@/shared/theme/staffAdminStyles";
+import { useAdminPanelStyles } from "@/shared/theme/adminPanelStyles";
 
 type CuratedProductListAdminCardProps = {
   list: CuratedListAdminRow;
@@ -30,7 +30,7 @@ export const CuratedProductListAdminCard = ({
   onAddProduct,
   onRemoveProduct,
 }: CuratedProductListAdminCardProps) => {
-  const styles = useStaffAdminStyles();
+  const styles = useAdminPanelStyles();
   const [titleDraft, setTitleDraft] = useState(list.title);
   const [productIdDraft, setProductIdDraft] = useState("");
   const [localError, setLocalError] = useState("");
@@ -79,58 +79,100 @@ export const CuratedProductListAdminCard = ({
 
   return (
     <View style={styles.card}>
-      <View style={styles.cardHeader}>
-        <View style={styles.orderRow}>
-          <Pressable style={styles.orderButton} onPress={onMoveUp} disabled={isBusy || isFirst}>
-            <Text>{POPULAR_PRODUCTS_ADMIN_PAGE_UI.MOVE_UP}</Text>
-          </Pressable>
-          <Pressable style={styles.orderButton} onPress={onMoveDown} disabled={isBusy || isLast}>
-            <Text>{POPULAR_PRODUCTS_ADMIN_PAGE_UI.MOVE_DOWN}</Text>
-          </Pressable>
-        </View>
-        <Pressable style={styles.deleteButtonCompact} onPress={onDeleteList} disabled={isBusy}>
-          <Text style={styles.deleteTextSmall}>{POPULAR_PRODUCTS_ADMIN_PAGE_UI.DELETE_LIST}</Text>
-        </Pressable>
-      </View>
-
-      <Text style={styles.label}>{POPULAR_PRODUCTS_ADMIN_PAGE_UI.LIST_TITLE_LABEL}</Text>
-      <TextInput
-        style={styles.input}
-        value={titleDraft}
-        maxLength={60}
-        onChangeText={setTitleDraft}
-        editable={!isBusy}
-      />
-      <Pressable style={styles.secondaryButton} onPress={() => void handleSaveTitle()} disabled={isBusy}>
-        <Text style={styles.secondaryButtonText}>{POPULAR_PRODUCTS_ADMIN_PAGE_UI.SAVE_TITLE}</Text>
-      </Pressable>
-
-      <Text style={styles.label}>{POPULAR_PRODUCTS_ADMIN_PAGE_UI.PRODUCT_ID_LABEL}</Text>
-      <TextInput
-        style={styles.input}
-        value={productIdDraft}
-        onChangeText={setProductIdDraft}
-        placeholder={POPULAR_PRODUCTS_ADMIN_PAGE_UI.PRODUCT_ID_PLACEHOLDER}
-        editable={!isBusy}
-      />
-      <Pressable style={styles.primaryButton} onPress={() => void handleAddProduct()} disabled={isBusy}>
-        <Text style={styles.primaryButtonText}>{POPULAR_PRODUCTS_ADMIN_PAGE_UI.ADD_PRODUCT}</Text>
-      </Pressable>
-
-      {list.productIds.length === 0 ? (
-        <Text style={styles.emptyList}>{POPULAR_PRODUCTS_ADMIN_PAGE_UI.EMPTY_LIST}</Text>
-      ) : (
-        list.productIds.map((productId) => (
-          <View key={productId} style={styles.productRow}>
-            <Text style={styles.productId}>{productId}</Text>
-            <Pressable onPress={() => void handleRemoveProduct(productId)} disabled={isBusy}>
-              <Text style={styles.removeText}>{POPULAR_PRODUCTS_ADMIN_PAGE_UI.REMOVE_PRODUCT}</Text>
+      <View style={styles.cardBody}>
+        <View style={styles.curatedCardHeader}>
+          <View style={styles.orderRow}>
+            <Pressable
+              style={[styles.orderButton, (isBusy || isFirst) && styles.orderButtonDisabled]}
+              onPress={onMoveUp}
+              disabled={isBusy || isFirst}
+              accessibilityRole="button"
+              accessibilityLabel={POPULAR_PRODUCTS_ADMIN_PAGE_UI.MOVE_UP_ARIA}
+            >
+              <Text style={styles.orderButtonText}>↑</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.orderButton, (isBusy || isLast) && styles.orderButtonDisabled]}
+              onPress={onMoveDown}
+              disabled={isBusy || isLast}
+              accessibilityRole="button"
+              accessibilityLabel={POPULAR_PRODUCTS_ADMIN_PAGE_UI.MOVE_DOWN_ARIA}
+            >
+              <Text style={styles.orderButtonText}>↓</Text>
             </Pressable>
           </View>
-        ))
-      )}
+          <Pressable style={styles.dangerButton} onPress={onDeleteList} disabled={isBusy}>
+            <Text style={styles.dangerButtonText}>{POPULAR_PRODUCTS_ADMIN_PAGE_UI.DELETE_LIST}</Text>
+          </Pressable>
+        </View>
 
-      {localError ? <Text style={styles.error}>{localError}</Text> : null}
+        <View style={styles.field}>
+          <Text style={styles.fieldLabel}>{POPULAR_PRODUCTS_ADMIN_PAGE_UI.LIST_TITLE_LABEL}</Text>
+          <TextInput
+            style={styles.fieldInput}
+            value={titleDraft}
+            maxLength={60}
+            onChangeText={setTitleDraft}
+            editable={!isBusy}
+          />
+        </View>
+        <Pressable
+          style={[styles.secondaryButton, (isBusy || titleDraft.trim() === "") && styles.primaryButtonDisabled]}
+          onPress={() => void handleSaveTitle()}
+          disabled={isBusy || titleDraft.trim() === ""}
+        >
+          <Text style={styles.secondaryButtonText}>{POPULAR_PRODUCTS_ADMIN_PAGE_UI.SAVE_TITLE}</Text>
+        </Pressable>
+
+        <View style={styles.addProductRow}>
+          <View style={[styles.field, styles.addProductField]}>
+            <Text style={styles.fieldLabel}>{POPULAR_PRODUCTS_ADMIN_PAGE_UI.PRODUCT_ID_LABEL}</Text>
+            <TextInput
+              style={styles.fieldInput}
+              value={productIdDraft}
+              onChangeText={setProductIdDraft}
+              placeholder={POPULAR_PRODUCTS_ADMIN_PAGE_UI.PRODUCT_ID_PLACEHOLDER}
+              editable={!isBusy}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+          </View>
+          <Pressable
+            style={[styles.primaryButton, isBusy && styles.primaryButtonDisabled]}
+            onPress={() => void handleAddProduct()}
+            disabled={isBusy}
+          >
+            <Text style={styles.primaryButtonText}>{POPULAR_PRODUCTS_ADMIN_PAGE_UI.ADD_PRODUCT}</Text>
+          </Pressable>
+        </View>
+
+        {localError ? (
+          <Text style={[styles.alert, styles.alertError]} accessibilityRole="alert">
+            {localError}
+          </Text>
+        ) : null}
+
+        {list.productIds.length === 0 ? (
+          <Text style={styles.emptyList}>{POPULAR_PRODUCTS_ADMIN_PAGE_UI.EMPTY_LIST}</Text>
+        ) : (
+          <View style={styles.productItems}>
+            {list.productIds.map((productId) => (
+              <View key={productId} style={styles.productItemRow}>
+                <Text style={styles.productIdText}>{productId}</Text>
+                <Pressable
+                  style={styles.secondaryButton}
+                  onPress={() => void handleRemoveProduct(productId)}
+                  disabled={isBusy}
+                >
+                  <Text style={styles.secondaryButtonText}>
+                    {POPULAR_PRODUCTS_ADMIN_PAGE_UI.REMOVE_PRODUCT}
+                  </Text>
+                </Pressable>
+              </View>
+            ))}
+          </View>
+        )}
+      </View>
     </View>
   );
 };

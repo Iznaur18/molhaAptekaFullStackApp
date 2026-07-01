@@ -34,6 +34,12 @@ export const CatalogBrowserPage = () => {
   const router = useRouter();
   const styles = useCatalogBrowserPageStyles();
   const gridLayout = useCatalogBrowserGridLayout();
+  const tileLayoutProps = {
+    tileWidth: gridLayout.tileWidth,
+    columns: gridLayout.columns,
+    gap: gridLayout.gap,
+    contentWidth: gridLayout.contentWidth,
+  };
   const { contentPaddingTop } = useScreenLayout();
   const { isAdmin, isAuthorized } = useUserAccess();
 
@@ -142,7 +148,7 @@ export const CatalogBrowserPage = () => {
               label={item.label}
               imageUrl={item.imageUrl}
               placeholderImageUrl={PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE}
-              tileWidth={gridLayout.tileWidth}
+              {...tileLayoutProps}
               variant="feed"
               onPress={() => handleFeedTilePress(item.tileKey)}
               onEditPress={
@@ -164,7 +170,7 @@ export const CatalogBrowserPage = () => {
                 label={tile.labelRu}
                 imageUrl={tile.imageUrl}
                 placeholderImageUrl={PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE}
-                tileWidth={gridLayout.tileWidth}
+                {...tileLayoutProps}
                 onPress={() => handlePersonalCategoryPress(tile._id)}
               />
             ))}
@@ -182,7 +188,7 @@ export const CatalogBrowserPage = () => {
               label={item.label}
               imageUrl={item.imageUrl}
               placeholderImageUrl={PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE}
-              tileWidth={gridLayout.tileWidth}
+              {...tileLayoutProps}
               onPress={() => handleCategoryPress(item.categorySlug)}
               onEditPress={
                 isAdmin ? () => setEditingCategorySlug(item.categorySlug) : undefined

@@ -1,122 +1,284 @@
-import { useState } from "react";
-import { FlatList, Text, View } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
+import { useCallback, useState } from "react";
+import { ScrollView, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
+import { campaignToIntroAdPreviewSettings } from "@/entities/intro-ad/lib/campaignToIntroAdPreviewSettings";
 import {
+  INTRO_AD_MODERATION_QUEUE_LIMIT,
   useIntroAdModerationMutations,
+  useManagedIntroAdCampaignsQuery,
   usePendingIntroAdCampaignsQuery,
 } from "@/entities/intro-ad/model/useIntroAdModerationMutations";
-import { INTRO_AD_MODERATION_PAGE_UI } from "@/shared/config";
-import { formatIsoDateTime } from "@/shared/lib";
-import { useStaffQueueStyles } from "@/shared/theme/staffQueueStyles";
-import { StaffModerationActions } from "@/shared/ui/StaffModerationActions";
+import {
+  IntroAdModerationCampaignCard,
+  type IntroAdModerationCampaign,
+} from "@/entities/intro-ad/ui/IntroAdModerationCampaignCard";
+import { useAppIntro } from "@/features/app-intro/model/AppIntroProvider";
+import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
+import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
+import { introAdQueryKeys, staffBadgeQueryKeys } from "@/shared/api";
+import { INTRO_AD_MODERATION_PAGE_UI, MY_PROFILE_PAGE_UI } from "@/shared/config";
+import { formatApiErrorMessage } from "@/shared/lib";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
+import { useIntroAdModerationPageStyles } from "@/shared/theme/introAdModerationPageStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
-type CampaignRow = Record<string, unknown> & {
-  _id: string;
-  advertiser?: { userName?: string } | null;
-  createdAt?: string;
-};
+export const IntroAdModerationPage = () => {
+  const router = useRouter();
+  const styles = useIntroAdModerationPageStyles();
+  const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const queryClient = useQueryClient();
+  const { previewIntro } = useAppIntro();
+  const queueQuery = usePendingIntroAdCampaignsQuery();
+  const managedQuery = useManagedIntroAdCampaignsQuery();
+  const { approveMutation, rejectMutation, staffCancelMutation } = useIntroAdModerationMutations();
+  const [navSheetVisible, setNavSheetVisible] = useState(false);
+  const [actionError, setActionError] = useState("");
+  const [pendingCampaignId, setPendingCampaignId] = useState<string | null>(null);
+  const [rejectReasons, setRejectReasons] = useState<Record<string, string>>({});
 
-type RowProps = {
-  campaign: CampaignRow;
-  onChanged: () => void;
-  approveMutation: ReturnType<typeof useIntroAdModerationMutations>["approveMutation"];
-  rejectMutation: ReturnType<typeof useIntroAdModerationMutations>["rejectMutation"];
-};
+  const pendingCampaigns = queueQuery.data ?? [];
+  const managedCampaigns = managedQuery.data ?? [];
 
-const IntroAdRow = ({ campaign, onChanged, approveMutation, rejectMutation }: RowProps) => {
-  const styles = useStaffQueueStyles();
-  const [reason, setReason] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const campaignId = String(campaign._id);
-  const isBusy = approveMutation.isPending || rejectMutation.isPending;
+  useFocusEffect(
+    useCallback(() => {
+      void queueQuery.refetch();
+      void managedQuery.refetch();
+    }, [managedQuery.refetch, queueQuery.refetch]),
+  );
 
-  const handleApprove = async () => {
-    setErrorMessage("");
+  const removeFromPendingQueue = useCallback(
+    (campaignId: string) => {
+      queryClient.setQueryData(
+        introAdQueryKeys.moderationPending(INTRO_AD_MODERATION_QUEUE_LIMIT),
+        (old: IntroAdModerationCampaign[] | undefined) => {
+          if (!Array.isArray(old)) {
+            return old;
+          }
+          return old.filter((item) => String(item._id) !== campaignId);
+        },
+      );
+      setRejectReasons((prev) => {
+        const next = { ...prev };
+        delete next[campaignId];
+        return next;
+      });
+    },
+    [queryClient],
+  );
+
+  const removeFromManagedQueue = useCallback(
+    (campaignId: string) => {
+      queryClient.setQueryData(
+        introAdQueryKeys.moderationManaged(),
+        (old: IntroAdModerationCampaign[] | undefined) => {
+          if (!Array.isArray(old)) {
+            return old;
+          }
+          return old.filter((item) => String(item._id) !== campaignId);
+        },
+      );
+    },
+    [queryClient],
+  );
+
+  const refreshModerationQueries = useCallback(async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: introAdQueryKeys.moderationPending(INTRO_AD_MODERATION_QUEUE_LIMIT),
+      }),
+      queryClient.invalidateQueries({ queryKey: introAdQueryKeys.moderationManaged() }),
+      queryClient.invalidateQueries({ queryKey: [...staffBadgeQueryKeys.all, "intro-ad"] }),
+    ]);
+  }, [queryClient]);
+
+  const handleApprove = async (campaignId: string) => {
     try {
+      setPendingCampaignId(campaignId);
+      setActionError("");
       await approveMutation.mutateAsync(campaignId);
-      onChanged();
+      removeFromPendingQueue(campaignId);
+      await refreshModerationQueries();
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : INTRO_AD_MODERATION_PAGE_UI.FETCH_FALLBACK);
+      setActionError(
+        formatApiErrorMessage(error, INTRO_AD_MODERATION_PAGE_UI.APPROVE_FALLBACK),
+      );
+    } finally {
+      setPendingCampaignId(null);
     }
   };
 
-  const handleReject = async () => {
-    setErrorMessage("");
+  const handleReject = async (campaignId: string) => {
     try {
-      await rejectMutation.mutateAsync({ campaignId, reason });
-      onChanged();
+      setPendingCampaignId(campaignId);
+      setActionError("");
+      await rejectMutation.mutateAsync({
+        campaignId,
+        reason: rejectReasons[campaignId] ?? "",
+      });
+      removeFromPendingQueue(campaignId);
+      await refreshModerationQueries();
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : INTRO_AD_MODERATION_PAGE_UI.FETCH_FALLBACK);
+      setActionError(
+        formatApiErrorMessage(error, INTRO_AD_MODERATION_PAGE_UI.REJECT_FALLBACK),
+      );
+    } finally {
+      setPendingCampaignId(null);
     }
   };
 
-  return (
-    <View style={styles.row}>
-      <Text style={styles.title}>
-        {INTRO_AD_MODERATION_PAGE_UI.ADVERTISER_LABEL}:{" "}
-        {campaign.advertiser?.userName ?? "—"}
-      </Text>
-      {campaign.createdAt ? (
-        <Text style={styles.meta}>{formatIsoDateTime(campaign.createdAt)}</Text>
-      ) : null}
-      <StaffModerationActions
-        approveLabel={INTRO_AD_MODERATION_PAGE_UI.APPROVE}
-        rejectLabel={INTRO_AD_MODERATION_PAGE_UI.REJECT}
-        pendingLabel={INTRO_AD_MODERATION_PAGE_UI.ACTION_PENDING}
-        isBusy={isBusy}
-        note={reason}
-        onNoteChange={setReason}
-        notePlaceholder={INTRO_AD_MODERATION_PAGE_UI.REJECT_REASON_PLACEHOLDER}
-        onApprove={handleApprove}
-        onReject={handleReject}
-        errorMessage={errorMessage}
+  const handleStaffCancel = async (campaignId: string) => {
+    try {
+      setPendingCampaignId(campaignId);
+      setActionError("");
+      await staffCancelMutation.mutateAsync(campaignId);
+      removeFromManagedQueue(campaignId);
+      await refreshModerationQueries();
+    } catch (error) {
+      setActionError(
+        formatApiErrorMessage(error, INTRO_AD_MODERATION_PAGE_UI.STAFF_CANCEL_FALLBACK),
+      );
+    } finally {
+      setPendingCampaignId(null);
+    }
+  };
+
+  const buildPreviewHandler = (campaign: IntroAdModerationCampaign) => () => {
+    previewIntro(campaignToIntroAdPreviewSettings(campaign));
+  };
+
+  const listHeader = (
+    <View style={styles.header}>
+      <ProfileMobileSectionToggle
+        activeLabel={MY_PROFILE_PAGE_UI.TAB_INTRO_AD_MODERATION}
+        onPress={() => setNavSheetVisible(true)}
       />
     </View>
   );
-};
 
-export const IntroAdModerationPage = () => {
-  const styles = useStaffQueueStyles();
-  const queueQuery = usePendingIntroAdCampaignsQuery();
-  const { approveMutation, rejectMutation } = useIntroAdModerationMutations();
-  const campaigns = queueQuery.data ?? [];
+  const navSheet = (
+    <ProfileMobileNavSheet
+      visible={navSheetVisible}
+      activeSectionId="intro-ad-moderation"
+      onClose={() => setNavSheetVisible(false)}
+      onOverviewPress={() => router.replace("/(tabs)/profile")}
+    />
+  );
 
-  if (queueQuery.isPending && campaigns.length === 0) {
+  if (queueQuery.isPending && managedQuery.isPending) {
     return <ScreenLoadingState message={INTRO_AD_MODERATION_PAGE_UI.LOADING} />;
   }
 
-  if (queueQuery.isError && campaigns.length === 0) {
+  const isEmpty = pendingCampaigns.length === 0 && managedCampaigns.length === 0;
+  const hasLoadError =
+    (queueQuery.isError && pendingCampaigns.length === 0) ||
+    (managedQuery.isError && managedCampaigns.length === 0);
+
+  if (hasLoadError && isEmpty) {
+    const error = queueQuery.error ?? managedQuery.error;
     return (
       <ScreenErrorState
-        message={
-          queueQuery.error instanceof Error
-            ? queueQuery.error.message
-            : INTRO_AD_MODERATION_PAGE_UI.FETCH_FALLBACK
-        }
-        onRetry={() => void queueQuery.refetch()}
+        message={formatApiErrorMessage(error, INTRO_AD_MODERATION_PAGE_UI.FETCH_FALLBACK)}
+        onRetry={async () => {
+          await Promise.all([queueQuery.refetch(), managedQuery.refetch()]);
+        }}
       />
     );
   }
 
+  if (isEmpty) {
+    return (
+      <>
+        <View style={[styles.container, centeredContentStyle, styles.centered]}>
+          {listHeader}
+          <Text style={styles.empty}>{INTRO_AD_MODERATION_PAGE_UI.EMPTY}</Text>
+        </View>
+        {navSheet}
+      </>
+    );
+  }
+
   return (
-    <FlatList
-      data={campaigns as CampaignRow[]}
-      keyExtractor={(item) => String(item._id)}
-      contentContainerStyle={styles.list}
-      refreshControl={
-        <ThemedRefreshControl refreshing={queueQuery.isFetching} onRefresh={() => void queueQuery.refetch()} />
-      }
-      ListEmptyComponent={<Text style={styles.empty}>{INTRO_AD_MODERATION_PAGE_UI.EMPTY}</Text>}
-      renderItem={({ item }) => (
-        <IntroAdRow
-          campaign={item}
-          onChanged={() => void queueQuery.refetch()}
-          approveMutation={approveMutation}
-          rejectMutation={rejectMutation}
-        />
-      )}
-    />
+    <>
+      <ScrollView
+        style={[styles.container, centeredContentStyle]}
+        contentContainerStyle={[styles.scroll, { paddingBottom: contentPaddingBottom }]}
+        refreshControl={
+          <ThemedRefreshControl
+            refreshing={queueQuery.isFetching || managedQuery.isFetching}
+            onRefresh={async () => {
+              await Promise.all([queueQuery.refetch(), managedQuery.refetch()]);
+              await refreshModerationQueries();
+            }}
+          />
+        }
+      >
+        {listHeader}
+
+        {actionError ? (
+          <Text style={[styles.state, styles.stateError]} accessibilityRole="alert">
+            {actionError}
+          </Text>
+        ) : null}
+
+        {managedCampaigns.length > 0 ? (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>{INTRO_AD_MODERATION_PAGE_UI.MANAGED_TITLE}</Text>
+            <View style={styles.list}>
+              {managedCampaigns.map((campaign) => {
+                const campaignId = String(campaign._id);
+                return (
+                  <IntroAdModerationCampaignCard
+                    key={campaignId}
+                    campaign={campaign}
+                    isPending={pendingCampaignId === campaignId}
+                    mode="managed"
+                    onPreview={buildPreviewHandler(campaign)}
+                    onStaffCancel={() => {
+                      void handleStaffCancel(campaignId);
+                    }}
+                  />
+                );
+              })}
+            </View>
+          </View>
+        ) : null}
+
+        {pendingCampaigns.length > 0 ? (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>{INTRO_AD_MODERATION_PAGE_UI.PENDING_TITLE}</Text>
+            <View style={styles.list}>
+              {pendingCampaigns.map((campaign) => {
+                const campaignId = String(campaign._id);
+                return (
+                  <IntroAdModerationCampaignCard
+                    key={campaignId}
+                    campaign={campaign}
+                    isPending={pendingCampaignId === campaignId}
+                    mode="pending"
+                    onPreview={buildPreviewHandler(campaign)}
+                    onApprove={() => {
+                      void handleApprove(campaignId);
+                    }}
+                    onReject={() => {
+                      void handleReject(campaignId);
+                    }}
+                    rejectReason={rejectReasons[campaignId] ?? ""}
+                    onRejectReasonChange={(value) =>
+                      setRejectReasons((prev) => ({ ...prev, [campaignId]: value }))
+                    }
+                  />
+                );
+              })}
+            </View>
+          </View>
+        ) : null}
+      </ScrollView>
+
+      {navSheet}
+    </>
   );
 };

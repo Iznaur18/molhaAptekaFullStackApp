@@ -3,7 +3,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { raffleQueryKeys } from "@/shared/api";
 
 import { deleteMyRaffle } from "../api/deleteMyRaffle";
+import { patchMyRaffle } from "../api/patchMyRaffle";
 import { pauseMyRaffle } from "../api/pauseMyRaffle";
+import type { CreateRaffleBody } from "../api/createRaffle";
 
 export const useMyRaffleMutations = () => {
   const queryClient = useQueryClient();
@@ -25,5 +27,11 @@ export const useMyRaffleMutations = () => {
     onSuccess: () => void invalidateMyRaffle(),
   });
 
-  return { pauseMyMutation, deleteMyMutation };
+  const patchMyMutation = useMutation({
+    mutationFn: ({ raffleId, body }: { raffleId: string; body: Partial<CreateRaffleBody> }) =>
+      patchMyRaffle(raffleId, body),
+    onSuccess: () => void invalidateMyRaffle(),
+  });
+
+  return { pauseMyMutation, deleteMyMutation, patchMyMutation };
 };

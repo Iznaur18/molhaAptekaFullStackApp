@@ -5,12 +5,13 @@ import {
   INSTALLMENT_MODERATION_REJECTED,
 } from "../../constants/installmentConstants.js";
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
-import { ProductInstallmentProgramModel, ProductModel } from "../../models/index.js";
+import { ProductInstallmentProgramModel, ProductModel, UserModel } from "../../models/index.js";
 import { AppError } from "../../errors/AppError.js";
 import { isUserStaff } from "../access/adminUserGuard.js";
 import { assertUserCanManageInstallmentAsSeller } from "../installment/installmentAccess.js";
 import {
   countActiveInstallmentContractsForProduct,
+  loadInstallmentBuyersByProductIds,
   normalizeInstallmentPlansInput,
   syncProductInstallmentEnabledFlag,
   toInstallmentProgramPayload,
@@ -161,18 +162,43 @@ export async function getPendingInstallmentModeration({ query }) {
   ]);
 
   const productIds = rows.map((row) => row.productId);
-  const products = await ProductModel.find({ _id: { $in: productIds } })
-    .select("productName productSeller")
-    .lean();
+  const sellerIds = [...new Set(rows.map((row) => String(row.sellerId)))];
+  const [products, sellers, buyersByProductId] = await Promise.all([
+    ProductModel.find({ _id: { $in: productIds } })
+      .select("productName productSeller")
+      .lean(),
+    UserModel.find({ _id: { $in: sellerIds } })
+      .select("userName email")
+      .lean(),
+    loadInstallmentBuyersByProductIds(productIds),
+  ]);
   const productById = Object.fromEntries(
     products.map((product) => [String(product._id), product]),
   );
+  const sellerById = Object.fromEntries(
+    sellers.map((seller) => [String(seller._id), seller]),
+  );
 
   return {
-    programs: rows.map((row) => ({
-      ...toInstallmentProgramPayload(row),
-      productName: productById[String(row.productId)]?.productName ?? null,
-    })),
+    programs: rows.map((row) => {
+      const sellerId = String(row.sellerId);
+      const seller = sellerById[sellerId];
+
+      return {
+        ...toInstallmentProgramPayload(row),
+        productName: productById[String(row.productId)]?.productName ?? null,
+        seller: {
+          _id: sellerId,
+          userName: seller?.userName ?? null,
+          email: seller?.email ?? null,
+        },
+        buyers: (buyersByProductId.get(String(row.productId)) ?? []).map((buyer) => ({
+          _id: buyer._id,
+          userName: buyer.userName || null,
+          email: buyer.email || null,
+        })),
+      };
+    }),
     pagination: {
       page,
       limit,

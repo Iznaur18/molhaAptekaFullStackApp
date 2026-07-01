@@ -102,3 +102,9 @@ export const formatCategoryLegacyDetachLabel = (row: {
   const path = Array.isArray(row.pathLabelRu) ? row.pathLabelRu.filter(Boolean) : [];
   return path[0] ?? row.labelRu ?? "корневую категорию";
 };
+
+export const CATEGORY_TREE_INDENT_MAX_DEPTH = 6;
+export const CATEGORY_TREE_INDENT_PX = 10;
+
+export const resolveCategoryTreeCardIndent = (depth: number): number =>
+  Math.min(depth, CATEGORY_TREE_INDENT_MAX_DEPTH) * CATEGORY_TREE_INDENT_PX;

@@ -7,7 +7,7 @@ import { DEFAULT_USER_AVATAR_URL } from "@/entities/user/model/constants";
 import { UserPremiumAvatar } from "@/entities/user/ui/UserPremiumAvatar";
 import { UserPremiumDisplayName } from "@/entities/user/ui/UserPremiumDisplayName";
 import { USER_LIST_ROW_UI } from "@/shared/config";
-import { useSubscriptionUserRowStyles } from "@/shared/theme/accountFeatureStyles";
+import { useSubscriptionUserRowStyles } from "@/shared/theme/subscriptionsPageStyles";
 
 type SubscriptionUserRowProps = {
   user: {
@@ -16,20 +16,23 @@ type SubscriptionUserRowProps = {
     isPremiumUser?: boolean;
     isUserDataConfirmed?: boolean;
   };
-  onPress: (userId: string) => void;
+  onRowClick: (userId: string) => void;
 };
 
-export const SubscriptionUserRow = ({ user, onPress }: SubscriptionUserRowProps) => {
+export const SubscriptionUserRow = ({ user, onRowClick }: SubscriptionUserRowProps) => {
   const styles = useSubscriptionUserRowStyles();
   const [imgFailed, setImgFailed] = useState(false);
+  const [pressed, setPressed] = useState(false);
   const picked = pickUserProfilePhotoUrl(user);
   const uri = !imgFailed && picked ? picked : DEFAULT_USER_AVATAR_URL;
   const displayName = user.userName?.trim() || USER_LIST_ROW_UI.MISSING_NAME;
 
   return (
     <Pressable
-      style={styles.root}
-      onPress={() => onPress(user._id)}
+      style={[styles.row, pressed && styles.rowPressed]}
+      onPress={() => onRowClick(user._id)}
+      onPressIn={() => setPressed(true)}
+      onPressOut={() => setPressed(false)}
       accessibilityRole="button"
     >
       <UserPremiumAvatar

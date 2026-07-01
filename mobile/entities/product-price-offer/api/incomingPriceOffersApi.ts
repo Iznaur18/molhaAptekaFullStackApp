@@ -2,21 +2,37 @@ import { apiClient } from "@/shared/api";
 import { API_CLIENT_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 
+export type PriceOfferProductPreview = {
+  _id?: string;
+  productName?: string;
+  productImageUrl?: string | null;
+};
+
+export type PriceOfferBuyerPreview = {
+  _id?: string;
+  userName?: string;
+  isPremiumUser?: boolean;
+  isUserDataConfirmed?: boolean;
+};
+
 export type IncomingPriceOffer = {
   _id: string;
   productId: string;
   offerPrice?: number;
   status?: string;
   createdAt?: string;
-  product?: {
-    _id?: string;
-    productName?: string;
-    productImageUrl?: string | null;
-  };
-  buyer?: {
-    _id?: string;
-    userName?: string;
-  };
+  product?: PriceOfferProductPreview;
+  buyer?: PriceOfferBuyerPreview;
+};
+
+export type MyPriceOfferBid = {
+  _id: string;
+  productId: string;
+  offerPrice?: number;
+  status?: string;
+  createdAt?: string;
+  paymentDeadlineAt?: string;
+  product?: PriceOfferProductPreview;
 };
 
 export const fetchIncomingPriceOffers = async (): Promise<IncomingPriceOffer[]> => {
@@ -39,13 +55,7 @@ export const fetchMyPriceOfferBids = async () => {
     if (!data?.success || !Array.isArray(data.data?.bids)) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
-    return data.data.bids as Array<{
-      _id: string;
-      productId: string;
-      offerPrice?: number;
-      status?: string;
-      product?: { _id?: string; productName?: string };
-    }>;
+    return data.data.bids as MyPriceOfferBid[];
   } catch (error) {
     throw new Error(
       formatApiErrorMessage(error, API_CLIENT_UI.FETCH_MY_PRICE_OFFER_BIDS_FALLBACK),

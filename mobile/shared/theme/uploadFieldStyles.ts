@@ -11,10 +11,16 @@ export const useMediaUploadFieldStyles = createThemedStyles((theme) => ({
     fontWeight: "600",
     color: theme.colors.textSecondary,
   },
+  previewWrap: {
+    width: "100%",
+    alignItems: "center",
+  },
   preview: {
     width: "100%",
-    height: 140,
+    maxWidth: 280,
+    height: 160,
     borderRadius: 10,
+    backgroundColor: theme.colors.surfaceMuted,
   },
   input: {
     borderWidth: StyleSheet.hairlineWidth,

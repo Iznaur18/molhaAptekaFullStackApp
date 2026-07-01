@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 import {
   fetchPendingDataConfirmationRequests,
@@ -13,9 +13,8 @@ export const usePendingDataConfirmationRequestsQuery = (enabled = true) =>
     enabled,
   });
 
-export const useResolveDataConfirmationRequestMutation = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
+export const useResolveDataConfirmationRequestMutation = () =>
+  useMutation({
     mutationFn: ({
       requestId,
       body,
@@ -23,9 +22,4 @@ export const useResolveDataConfirmationRequestMutation = () => {
       requestId: string;
       body: { resolution: string; staffNote?: string };
     }) => resolveDataConfirmationRequest(requestId, body),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: dataConfirmationStaffQueryKeys.all });
-      void queryClient.invalidateQueries({ queryKey: ["data-confirmation"] });
-    },
   });
-};

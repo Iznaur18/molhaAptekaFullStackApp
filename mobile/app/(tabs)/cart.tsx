@@ -162,16 +162,25 @@ export default function CartScreen() {
   const listFooter = (
     <View style={styles.footer}>
       <View style={styles.summaryCard}>
-        <View style={styles.totalRow}>
-          <Text style={styles.totalLabel}>{totalLabel}</Text>
-          <Text style={styles.totalValue}>{formatPriceRub(checkoutSummary.displayTotal)}</Text>
-        </View>
+        <View style={styles.summaryContent}>
+          <View style={styles.totalRow}>
+            <Text style={styles.totalLabel}>{totalLabel}</Text>
+            <Text
+              style={styles.totalValue}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.8}
+            >
+              {formatPriceRub(checkoutSummary.displayTotal)}
+            </Text>
+          </View>
 
-        {checkoutSummary.hasExcludedLines ? (
-          <Text style={styles.fullTotalHint}>
-            {formatPriceRub(checkoutSummary.fullTotal)}
-          </Text>
-        ) : null}
+          {checkoutSummary.hasExcludedLines ? (
+            <Text style={styles.fullTotalHint} numberOfLines={1}>
+              {formatPriceRub(checkoutSummary.fullTotal)}
+            </Text>
+          ) : null}
+        </View>
 
         <Pressable
           style={[styles.clearButton, isUpdating && styles.buttonDisabled]}

@@ -2,12 +2,14 @@ import { apiClient } from "@/shared/api";
 import { API_CLIENT_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 
+import type { PassportSnapshot } from "@/entities/user-data-confirmation/lib/emptyPassportForm";
+
 export type DataConfirmationRequest = {
   _id: string;
   createdAt?: string;
-  passport?: Record<string, unknown>;
+  passport?: Partial<PassportSnapshot>;
   passportSelfiePhotoUrl?: string | null;
-  user?: { _id?: string; userName?: string } | null;
+  user?: { _id?: string; userName?: string; isPremiumUser?: boolean } | null;
 };
 
 export const fetchPendingDataConfirmationRequests = async () => {

@@ -21,6 +21,7 @@ import {
   LazyRafflesStaffPage,
   LazySearchSynonymsAdminPage,
   LazyAppIntroAdminPage,
+  LazySiteHeaderBannerAdminPage,
   LazyPopularProductsAdminPage,
   LazySubscriptionsPage,
   LazyWishlistPage,
@@ -177,6 +178,8 @@ export function renderProfileTabPanel(mainView, props) {
       return <LazyCategoryTreeAdminPage />;
     case "app-intro-admin":
       return <LazyAppIntroAdminPage />;
+    case "site-header-banner-admin":
+      return <LazySiteHeaderBannerAdminPage />;
     case "popular-products-admin":
       return <LazyPopularProductsAdminPage />;
     case "product-moderation":

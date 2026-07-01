@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 import {
   approveInstallmentModeration,
@@ -24,25 +24,13 @@ export const usePendingInstallmentDisputesQuery = (enabled = true) =>
   });
 
 export const useInstallmentStaffMutations = () => {
-  const queryClient = useQueryClient();
-  const invalidateModeration = () => {
-    void queryClient.invalidateQueries({ queryKey: installmentQueryKeys.moderationPending() });
-    void queryClient.invalidateQueries({ queryKey: installmentQueryKeys.moderationPendingCount() });
-  };
-  const invalidateDisputes = () => {
-    void queryClient.invalidateQueries({ queryKey: installmentQueryKeys.disputesPending() });
-    void queryClient.invalidateQueries({ queryKey: installmentQueryKeys.disputesPendingCount() });
-  };
-
   const approveModerationMutation = useMutation({
     mutationFn: (productId: string) => approveInstallmentModeration(productId),
-    onSuccess: invalidateModeration,
   });
 
   const rejectModerationMutation = useMutation({
     mutationFn: ({ productId, comment }: { productId: string; comment?: string }) =>
       rejectInstallmentModeration(productId, comment ?? ""),
-    onSuccess: invalidateModeration,
   });
 
   const resolveDisputeMutation = useMutation({
@@ -53,7 +41,6 @@ export const useInstallmentStaffMutations = () => {
       disputeId: string;
       body: { action: string; resolutionNote?: string; partialRefundRub?: number };
     }) => resolveInstallmentDispute(disputeId, body),
-    onSuccess: invalidateDisputes,
   });
 
   return {

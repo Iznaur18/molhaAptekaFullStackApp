@@ -1,0 +1,44 @@
+import {
+  CATALOG_SORT_NEWEST,
+  CATALOG_SORT_PURCHASES,
+  CATALOG_SORT_REVIEWS,
+  CATALOG_SORT_VIEWS,
+} from "@/entities/product-category-display/lib/catalogFeedTiles";
+
+export const SELLER_PRODUCTS_LIMIT_REGULAR = 15;
+export const SELLER_PRODUCTS_LIMIT_PREMIUM = 30;
+
+export const CATALOG_SORT_OPTIONS_MY_PRODUCTS = [
+  CATALOG_SORT_NEWEST,
+  CATALOG_SORT_VIEWS,
+  CATALOG_SORT_PURCHASES,
+  CATALOG_SORT_REVIEWS,
+] as const;
+
+export type MyProductsCatalogSort = (typeof CATALOG_SORT_OPTIONS_MY_PRODUCTS)[number];
+
+export const MY_PRODUCTS_MODERATION_FILTER_ALL = "";
+export const MY_PRODUCTS_MODERATION_FILTER_PENDING = "pending";
+export const MY_PRODUCTS_MODERATION_FILTER_REJECTED = "rejected";
+
+export const MY_PRODUCTS_MODERATION_FILTER_OPTIONS = [
+  MY_PRODUCTS_MODERATION_FILTER_ALL,
+  MY_PRODUCTS_MODERATION_FILTER_PENDING,
+  MY_PRODUCTS_MODERATION_FILTER_REJECTED,
+] as const;
+
+export type MyProductsModerationFilter =
+  (typeof MY_PRODUCTS_MODERATION_FILTER_OPTIONS)[number];
+
+export const CATALOG_SORT_LABEL_RU: Record<string, string> = {
+  [CATALOG_SORT_NEWEST]: "Новинки",
+  [CATALOG_SORT_VIEWS]: "По просмотрам",
+  [CATALOG_SORT_PURCHASES]: "Больше всего купили",
+  [CATALOG_SORT_REVIEWS]: "По отзывам",
+};
+
+export const MY_PRODUCTS_MODERATION_FILTER_LABEL_RU: Record<string, string> = {
+  [MY_PRODUCTS_MODERATION_FILTER_ALL]: "Все",
+  [MY_PRODUCTS_MODERATION_FILTER_PENDING]: "На проверке",
+  [MY_PRODUCTS_MODERATION_FILTER_REJECTED]: "Отклонены",
+};

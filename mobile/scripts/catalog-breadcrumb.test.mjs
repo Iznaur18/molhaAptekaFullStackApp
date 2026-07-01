@@ -13,6 +13,7 @@ const readFile = (root, relativePath) =>
 test("catalog screen uses breadcrumb instead of category chips", () => {
   const catalogScreen = readFile(MOBILE_ROOT, "app/(tabs)/index.tsx");
   const breadcrumb = readFile(MOBILE_ROOT, "features/catalog-filter/ui/CatalogBreadcrumb.tsx");
+  const styles = readFile(MOBILE_ROOT, "shared/theme/catalogProductStyles.ts");
   const webCss = readFile(
     CLIENT_ROOT,
     "src/entities/product-category-display/ui/CatalogCategoriesGrid.css",
@@ -23,6 +24,9 @@ test("catalog screen uses breadcrumb instead of category chips", () => {
   assert.doesNotMatch(catalogScreen, /CatalogCategoryChips/);
   assert.doesNotMatch(catalogScreen, /CatalogSubcategoryChips/);
   assert.match(breadcrumb, /HOME_PAGE_UI\.BREADCRUMB_CATALOG/);
+  assert.match(breadcrumb, /accessibilityRole="header"/);
+  assert.match(styles, /title:/);
+  assert.match(styles, /paddingTop: 16/);
   assert.match(webCss, /catalog-categories-browser__breadcrumb/);
 });
 

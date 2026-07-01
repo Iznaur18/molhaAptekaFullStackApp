@@ -9,6 +9,8 @@ export type TopPriceOffer = {
   buyer?: {
     _id?: string;
     userName?: string;
+    isPremiumUser?: boolean;
+    isUserDataConfirmed?: boolean;
   } | null;
 };
 

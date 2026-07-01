@@ -1,10 +1,11 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Image } from "expo-image";
-import { Pressable, Text, View } from "react-native";
+import { Platform, Pressable, Text, View } from "react-native";
 
 import { resolveCategoryDisplayTileImageUri } from "@/entities/product-category-display/lib/resolveProductCategoryDisplay";
-import { useCatalogBrowserTileStyles } from "@/shared/theme/catalogProductStyles";
+import { resolveFlexGridItemWidthStyle } from "@/shared/lib/resolveFlexGridItemWidth";
 import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
+import { useCatalogBrowserTileStyles } from "@/shared/theme/catalogProductStyles";
 
 export type CatalogBrowserTileVariant = "category" | "feed";
 
@@ -13,6 +14,9 @@ type CatalogBrowserTileCardProps = {
   imageUrl?: string | null;
   placeholderImageUrl: string;
   tileWidth: number;
+  columns: number;
+  gap: number;
+  contentWidth: number;
   variant?: CatalogBrowserTileVariant;
   onPress: () => void;
   onEditPress?: () => void;
@@ -24,6 +28,9 @@ export const CatalogBrowserTileCard = ({
   imageUrl,
   placeholderImageUrl,
   tileWidth,
+  columns,
+  gap,
+  contentWidth,
   variant = "category",
   onPress,
   onEditPress,
@@ -33,9 +40,12 @@ export const CatalogBrowserTileCard = ({
   const { theme } = useAppThemeSettings();
   const resolvedImageUrl = resolveCategoryDisplayTileImageUri(imageUrl, placeholderImageUrl);
   const isFeedTile = variant === "feed";
+  const widthStyle = resolveFlexGridItemWidthStyle({ contentWidth, columns, gap });
+  const nativeHeightStyle =
+    Platform.OS === "web" ? null : { height: tileWidth + 40 };
 
   return (
-    <View style={[styles.wrap, { width: tileWidth, height: tileWidth + 40 }]}>
+    <View style={[styles.wrap, widthStyle, nativeHeightStyle]}>
       <Pressable
         style={[styles.card, isFeedTile && styles.cardFeed]}
         onPress={onPress}

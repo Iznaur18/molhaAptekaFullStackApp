@@ -10,11 +10,13 @@ import { AppError } from "../../errors/AppError.js";
 import {
   InstallmentContractModel,
   InstallmentDisputeModel,
+  ProductModel,
   UserModel,
 } from "../../models/index.js";
 import { cancelLinkedOrderForInstallmentContract } from "../order/cancelLinkedOrderForInstallmentContract.js";
 import {
   buildInstallmentContractPayload,
+  loadInstallmentCounterpartyMap,
   recomputeContractOverdueFlags,
   resolveContractStatusAfterPayment,
 } from "./installmentHelpers.js";
@@ -90,14 +92,55 @@ export async function listPendingInstallmentDisputes() {
     .sort({ createdAt: 1 })
     .lean();
 
-  return rows.map((row) => ({
-    _id: String(row._id),
-    contractId: String(row.contractId),
-    openedByUserId: String(row.openedByUserId),
-    reason: row.reason,
-    status: row.status,
-    createdAt: row.createdAt,
-  }));
+  const contractIds = rows.map((row) => row.contractId);
+  const contracts = await InstallmentContractModel.find({ _id: { $in: contractIds } })
+    .select("productId sellerUserId buyerUserId")
+    .lean();
+  const contractById = Object.fromEntries(
+    contracts.map((contract) => [String(contract._id), contract]),
+  );
+  const productIds = [...new Set(contracts.map((contract) => String(contract.productId)))];
+  const userIds = [
+    ...new Set(
+      contracts.flatMap((contract) => [
+        String(contract.sellerUserId),
+        String(contract.buyerUserId),
+      ]),
+    ),
+  ];
+
+  const [products, userMap] = await Promise.all([
+    ProductModel.find({ _id: { $in: productIds } })
+      .select("productName")
+      .lean(),
+    loadInstallmentCounterpartyMap(userIds),
+  ]);
+  const productById = Object.fromEntries(
+    products.map((product) => [String(product._id), product]),
+  );
+
+  return rows.map((row) => {
+    const contract = contractById[String(row.contractId)];
+    const productName = contract
+      ? (productById[String(contract.productId)]?.productName ?? null)
+      : null;
+    const seller = contract
+      ? (userMap.get(String(contract.sellerUserId)) ?? null)
+      : null;
+    const buyer = contract ? (userMap.get(String(contract.buyerUserId)) ?? null) : null;
+
+    return {
+      _id: String(row._id),
+      contractId: String(row.contractId),
+      openedByUserId: String(row.openedByUserId),
+      reason: row.reason,
+      status: row.status,
+      createdAt: row.createdAt,
+      productName,
+      seller,
+      buyer,
+    };
+  });
 }
 
 export async function countPendingInstallmentDisputes() {

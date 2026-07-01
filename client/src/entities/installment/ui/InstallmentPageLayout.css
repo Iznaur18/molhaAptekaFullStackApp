@@ -151,6 +151,19 @@
   line-height: 1.4;
 }
 
+.installment-queue-card__seller {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--iz-color-text-muted);
+  line-height: 1.4;
+}
+
+.installment-queue-card__seller-link {
+  color: var(--iz-color-link);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
 .installment-queue-card__plans {
   display: flex;
   flex-wrap: wrap;

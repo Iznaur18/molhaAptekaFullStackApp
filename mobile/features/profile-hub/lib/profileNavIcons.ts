@@ -32,6 +32,7 @@ const PROFILE_NAV_ICON_MAP: Partial<Record<ProfileSectionId | "logout", ProfileN
   "search-synonyms-admin": "search",
   "category-tree-admin": "account-tree",
   "app-intro-admin": "movie",
+  "site-header-banner-admin": "panorama",
   "popular-products-admin": "star",
   logout: "logout",
 };

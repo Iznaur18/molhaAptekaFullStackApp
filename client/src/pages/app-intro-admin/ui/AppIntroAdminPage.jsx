@@ -133,22 +133,14 @@ export function AppIntroAdminPage() {
           </legend>
 
           <label className="app-intro-admin__label">
-            {APP_INTRO_ADMIN_PAGE_UI.LABEL_VIDEO_MP4}
+            {APP_INTRO_ADMIN_PAGE_UI.LABEL_VIDEO}
             <VideoUrlField
               value={form.videoMp4Url}
               onChange={(value) => updateField("videoMp4Url", value)}
             />
             <span className="app-intro-admin__field-hint">
-              {APP_INTRO_ADMIN_PAGE_UI.HINT_VIDEO_MP4}
+              {APP_INTRO_ADMIN_PAGE_UI.HINT_VIDEO}
             </span>
-          </label>
-
-          <label className="app-intro-admin__label">
-            {APP_INTRO_ADMIN_PAGE_UI.LABEL_VIDEO_WEBM}
-            <VideoUrlField
-              value={form.videoWebmUrl}
-              onChange={(value) => updateField("videoWebmUrl", value)}
-            />
           </label>
 
           <label className="app-intro-admin__label">

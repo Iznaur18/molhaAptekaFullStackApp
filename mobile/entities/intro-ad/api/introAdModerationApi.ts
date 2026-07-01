@@ -1,4 +1,5 @@
 import {
+  managedIntroAdCampaignsDataSchema,
   pendingIntroAdCampaignsDataSchema,
 } from "@molha/api-contract";
 
@@ -20,12 +21,24 @@ export const fetchPendingIntroAdCampaigns = async (limit = 50) => {
   }
 };
 
+export const fetchManagedIntroAdCampaigns = async () => {
+  try {
+    const { data } = await apiClient.get("/intro-ad/moderation/managed");
+    const parsed = parseApiContractData(data, managedIntroAdCampaignsDataSchema);
+    return parsed.campaigns;
+  } catch (error) {
+    throw new Error(
+      formatApiErrorMessage(error, INTRO_AD_MODERATION_PAGE_UI.MANAGED_FETCH_FALLBACK),
+    );
+  }
+};
+
 export const approveIntroAdCampaign = async (campaignId: string) => {
   try {
     await apiClient.post(`/intro-ad/moderation/${campaignId}/approve`);
   } catch (error) {
     throw new Error(
-      formatApiErrorMessage(error, INTRO_AD_MODERATION_PAGE_UI.FETCH_FALLBACK),
+      formatApiErrorMessage(error, INTRO_AD_MODERATION_PAGE_UI.APPROVE_FALLBACK),
     );
   }
 };
@@ -37,7 +50,17 @@ export const rejectIntroAdCampaign = async (campaignId: string, reason = "") => 
     });
   } catch (error) {
     throw new Error(
-      formatApiErrorMessage(error, INTRO_AD_MODERATION_PAGE_UI.FETCH_FALLBACK),
+      formatApiErrorMessage(error, INTRO_AD_MODERATION_PAGE_UI.REJECT_FALLBACK),
+    );
+  }
+};
+
+export const cancelIntroAdCampaignByStaff = async (campaignId: string) => {
+  try {
+    await apiClient.delete(`/intro-ad/moderation/${campaignId}`);
+  } catch (error) {
+    throw new Error(
+      formatApiErrorMessage(error, INTRO_AD_MODERATION_PAGE_UI.STAFF_CANCEL_FALLBACK),
     );
   }
 };

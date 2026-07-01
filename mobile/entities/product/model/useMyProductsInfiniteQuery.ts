@@ -1,20 +1,31 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
+import { fetchMyProductsPage } from "@/entities/product/api/fetchMyProductsPage";
+import type {
+  MyProductsCatalogSort,
+  MyProductsModerationFilter,
+} from "@/entities/product/model/productConstants";
 import { myProductsQueryKeys } from "@/shared/api";
-
-import { fetchMyProductsPage } from "../api/fetchMyProductsPage";
 
 type UseMyProductsInfiniteQueryOptions = {
   search?: string;
+  sort?: MyProductsCatalogSort;
+  moderationStatus?: MyProductsModerationFilter;
   enabled?: boolean;
 };
 
 export const useMyProductsInfiniteQuery = ({
   search,
+  sort,
+  moderationStatus = "",
   enabled = true,
 }: UseMyProductsInfiniteQueryOptions = {}) => {
-  const queryKeyParams = { search: search?.trim() ?? "" };
+  const queryKeyParams = {
+    search: search?.trim() ?? "",
+    sort: sort ?? "",
+    moderationStatus: moderationStatus ?? "",
+  };
 
   const query = useInfiniteQuery({
     queryKey: myProductsQueryKeys.list(queryKeyParams),
@@ -22,6 +33,11 @@ export const useMyProductsInfiniteQuery = ({
       fetchMyProductsPage({
         page: pageParam,
         search: queryKeyParams.search || undefined,
+        sort: queryKeyParams.sort || undefined,
+        moderationStatus:
+          queryKeyParams.moderationStatus === ""
+            ? undefined
+            : (queryKeyParams.moderationStatus as "pending" | "rejected"),
       }),
     initialPageParam: 1,
     enabled,
@@ -44,5 +60,6 @@ export const useMyProductsInfiniteQuery = ({
     ...query,
     products,
     total,
+    queryKeyParams,
   };
 };

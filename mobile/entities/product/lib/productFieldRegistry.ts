@@ -31,6 +31,18 @@ export const PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS = [
   "updatedAt",
 ] as const;
 
+export const PRODUCT_CARD_PREVIEW_FIELD_KEYS = ["productPrice", "productSeller"] as const;
+
+export const PRODUCT_CARD_MODERATION_PREVIEW_FIELD_KEYS = [
+  "productPrice",
+  "productSeller",
+  "productDescription",
+  "createdAt",
+] as const;
+
+export const PRODUCT_CARD_MODERATION_PREVIEW_FIELD_KEYS_WITHOUT_PRICE =
+  PRODUCT_CARD_MODERATION_PREVIEW_FIELD_KEYS.filter((key) => key !== "productPrice");
+
 /** @deprecated use PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS without productPrice */
 export const PRODUCT_DETAILS_TOP_ROW_FIELD_KEYS = [
   "productCategory",
@@ -56,6 +68,7 @@ export const getProductFieldLabel = (key: string): string => {
     productWishlistCount: "В желаниях",
     productDescription: "Описание",
     productPrice: "Цена",
+    productSeller: "Продавец",
     _id: "ID",
     createdAt: "Создан",
     updatedAt: "Обновлён",

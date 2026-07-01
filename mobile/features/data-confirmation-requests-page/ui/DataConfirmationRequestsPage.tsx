@@ -1,134 +1,148 @@
-import { useState } from "react";
-import { FlatList, Text, View } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
+import { useCallback, useState } from "react";
+import { ScrollView, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import type { DataConfirmationRequest } from "@/entities/user-data-confirmation/api/dataConfirmationStaffApi";
-import {
-  USER_DATA_CONFIRMATION_RESOLUTION_APPROVE,
-  USER_DATA_CONFIRMATION_RESOLUTION_REJECT,
-} from "@/entities/user-data-confirmation/model/constants";
-import {
-  usePendingDataConfirmationRequestsQuery,
-  useResolveDataConfirmationRequestMutation,
-} from "@/entities/user-data-confirmation/model/useDataConfirmationStaffMutations";
-import { DATA_CONFIRMATION_PAGE_UI } from "@/shared/config";
-import { formatIsoDateTime } from "@/shared/lib";
-import { useStaffQueueStyles } from "@/shared/theme/staffQueueStyles";
-import { StaffModerationActions } from "@/shared/ui/StaffModerationActions";
-import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
-
-const countWords = (text: string) => text.trim().split(/\s+/).filter(Boolean).length;
-
-type RowProps = {
-  request: DataConfirmationRequest;
-  onChanged: () => void;
-  resolveMutation: ReturnType<typeof useResolveDataConfirmationRequestMutation>;
-};
-
-const RequestRow = ({ request, onChanged, resolveMutation }: RowProps) => {
-  const styles = useStaffQueueStyles();
-  const [staffNote, setStaffNote] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const isBusy = resolveMutation.isPending;
-
-  const handleResolve = async (resolution: string) => {
-    if (resolution === USER_DATA_CONFIRMATION_RESOLUTION_REJECT) {
-      if (countWords(staffNote) < DATA_CONFIRMATION_PAGE_UI.STAFF_NOTE_MIN_WORDS) {
-        setErrorMessage(
-          `Комментарий: не меньше ${DATA_CONFIRMATION_PAGE_UI.STAFF_NOTE_MIN_WORDS} слов`,
-        );
-        return;
-      }
-    }
-    setErrorMessage("");
-    try {
-      await resolveMutation.mutateAsync({
-        requestId: String(request._id),
-        body: {
-          resolution,
-          staffNote:
-            resolution === USER_DATA_CONFIRMATION_RESOLUTION_REJECT ? staffNote.trim() : "",
-        },
-      });
-      onChanged();
-    } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : DATA_CONFIRMATION_PAGE_UI.ACTION_PENDING);
-    }
-  };
-
-  const passport = request.passport ?? {};
-  const fullName = [
-    passport.lastName,
-    passport.firstName,
-    passport.middleName,
-  ]
-    .map((part) => (part == null ? "" : String(part)))
-    .filter(Boolean)
-    .join(" ");
-
-  return (
-    <View style={styles.row}>
-      <Text style={styles.title}>{request.user?.userName ?? "Заявитель"}</Text>
-      {request.createdAt ? (
-        <Text style={styles.meta}>
-          {DATA_CONFIRMATION_PAGE_UI.SUBMITTED_LABEL}: {formatIsoDateTime(request.createdAt)}
-        </Text>
-      ) : null}
-      <Text style={styles.meta}>{DATA_CONFIRMATION_PAGE_UI.PASSPORT_SECTION}</Text>
-      <Text style={styles.meta}>{fullName || "—"}</Text>
-      <StaffModerationActions
-        approveLabel={DATA_CONFIRMATION_PAGE_UI.ACTION_APPROVE}
-        rejectLabel={DATA_CONFIRMATION_PAGE_UI.ACTION_REJECT}
-        pendingLabel={DATA_CONFIRMATION_PAGE_UI.ACTION_PENDING}
-        isBusy={isBusy}
-        note={staffNote}
-        onNoteChange={setStaffNote}
-        notePlaceholder={DATA_CONFIRMATION_PAGE_UI.STAFF_NOTE_PLACEHOLDER}
-        onApprove={() => void handleResolve(USER_DATA_CONFIRMATION_RESOLUTION_APPROVE)}
-        onReject={() => void handleResolve(USER_DATA_CONFIRMATION_RESOLUTION_REJECT)}
-        errorMessage={errorMessage}
-      />
-    </View>
-  );
-};
+import { usePendingDataConfirmationRequestsQuery } from "@/entities/user-data-confirmation/model/useDataConfirmationStaffMutations";
+import { DataConfirmationRequestCard } from "@/entities/user-data-confirmation/ui/DataConfirmationRequestCard";
+import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
+import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
+import { dataConfirmationStaffQueryKeys, staffBadgeQueryKeys } from "@/shared/api";
+import { API_CLIENT_UI, DATA_CONFIRMATION_PAGE_UI, MY_PROFILE_PAGE_UI } from "@/shared/config";
+import { formatApiErrorMessage } from "@/shared/lib";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
+import { useDataConfirmationRequestsPageStyles } from "@/shared/theme/dataConfirmationRequestsPageStyles";
+import { ScreenErrorState } from "@/shared/ui/ScreenStates";
 
 export const DataConfirmationRequestsPage = () => {
-  const styles = useStaffQueueStyles();
+  const router = useRouter();
+  const styles = useDataConfirmationRequestsPageStyles();
+  const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const queryClient = useQueryClient();
   const queueQuery = usePendingDataConfirmationRequestsQuery();
-  const resolveMutation = useResolveDataConfirmationRequestMutation();
+  const [navSheetVisible, setNavSheetVisible] = useState(false);
+
   const requests = queueQuery.data ?? [];
 
+  useFocusEffect(
+    useCallback(() => {
+      void queueQuery.refetch();
+    }, [queueQuery.refetch]),
+  );
+
+  const removeRequestRow = useCallback(
+    (requestId: string) => {
+      queryClient.setQueryData(
+        dataConfirmationStaffQueryKeys.pending(),
+        (old: DataConfirmationRequest[] | undefined) => {
+          if (!old) {
+            return old;
+          }
+          return old.filter((row) => String(row._id) !== requestId);
+        },
+      );
+    },
+    [queryClient],
+  );
+
+  const syncStaffQueueCaches = useCallback(async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: dataConfirmationStaffQueryKeys.pending() }),
+      queryClient.invalidateQueries({ queryKey: [...staffBadgeQueryKeys.all, "data-confirmation"] }),
+    ]);
+  }, [queryClient]);
+
+  const handleResolved = useCallback(
+    async (requestId: string) => {
+      removeRequestRow(requestId);
+      await syncStaffQueueCaches();
+    },
+    [removeRequestRow, syncStaffQueueCaches],
+  );
+
+  const sectionToggle = (
+    <ProfileMobileSectionToggle
+      activeLabel={MY_PROFILE_PAGE_UI.TAB_DATA_CONFIRMATION}
+      onPress={() => setNavSheetVisible(true)}
+    />
+  );
+
+  const navSheet = (
+    <ProfileMobileNavSheet
+      visible={navSheetVisible}
+      activeSectionId="data-confirmation-requests"
+      onClose={() => setNavSheetVisible(false)}
+      onOverviewPress={() => router.replace("/(tabs)/profile")}
+    />
+  );
+
   if (queueQuery.isPending && requests.length === 0) {
-    return <ScreenLoadingState message={DATA_CONFIRMATION_PAGE_UI.LOADING} />;
+    return (
+      <>
+        <View style={[styles.container, centeredContentStyle, styles.centered]}>
+          <View style={styles.header}>{sectionToggle}</View>
+          <Text style={styles.state}>{DATA_CONFIRMATION_PAGE_UI.LOADING}</Text>
+        </View>
+        {navSheet}
+      </>
+    );
   }
 
   if (queueQuery.isError && requests.length === 0) {
     return (
-      <ScreenErrorState
-        message={
-          queueQuery.error instanceof Error ? queueQuery.error.message : DATA_CONFIRMATION_PAGE_UI.LOADING
-        }
-        onRetry={() => void queueQuery.refetch()}
-      />
+      <>
+        <View style={[styles.container, centeredContentStyle, styles.centered]}>
+          <View style={styles.header}>{sectionToggle}</View>
+          <ScreenErrorState
+            message={formatApiErrorMessage(
+              queueQuery.error,
+              API_CLIENT_UI.FETCH_DATA_CONFIRMATION_QUEUE_FALLBACK,
+            )}
+            onRetry={() => queueQuery.refetch()}
+          />
+        </View>
+        {navSheet}
+      </>
     );
   }
 
   return (
-    <FlatList
-      data={requests}
-      keyExtractor={(item) => String(item._id)}
-      contentContainerStyle={styles.list}
-      refreshControl={
-        <ThemedRefreshControl refreshing={queueQuery.isFetching} onRefresh={() => void queueQuery.refetch()} />
-      }
-      ListEmptyComponent={<Text style={styles.empty}>{DATA_CONFIRMATION_PAGE_UI.EMPTY}</Text>}
-      renderItem={({ item }) => (
-        <RequestRow
-          request={item}
-          onChanged={() => void queueQuery.refetch()}
-          resolveMutation={resolveMutation}
-        />
-      )}
-    />
+    <>
+      <ScrollView
+        style={[styles.container, centeredContentStyle]}
+        contentContainerStyle={[styles.scroll, { paddingBottom: contentPaddingBottom }]}
+        accessibilityLabel={MY_PROFILE_PAGE_UI.TAB_DATA_CONFIRMATION}
+        refreshControl={
+          <ThemedRefreshControl
+            refreshing={queueQuery.isFetching}
+            onRefresh={async () => {
+              await queueQuery.refetch();
+              await syncStaffQueueCaches();
+            }}
+          />
+        }
+      >
+        <View style={styles.header}>{sectionToggle}</View>
+
+        {requests.length === 0 ? (
+          <Text style={styles.state}>{DATA_CONFIRMATION_PAGE_UI.EMPTY}</Text>
+        ) : (
+          <View style={styles.list}>
+            {requests.map((request) => (
+              <DataConfirmationRequestCard
+                key={String(request._id)}
+                request={request}
+                onResolved={() => void handleResolved(String(request._id))}
+              />
+            ))}
+          </View>
+        )}
+      </ScrollView>
+
+      {navSheet}
+    </>
   );
 };

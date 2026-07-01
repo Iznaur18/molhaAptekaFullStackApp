@@ -14,6 +14,7 @@ import {
   buildSubmitIntroAdCampaignBody,
   introAdFormToPreviewSettings,
 } from "@/features/advertising-page/lib/buildSubmitIntroAdCampaignBody";
+import { resolveIntroAdStatusPanelStyle } from "@/features/advertising-page/lib/resolveAdvertisingStatusPanelStyle";
 import {
   createIntroAdFormState,
   type IntroAdFormState,
@@ -23,7 +24,9 @@ import { ImageUrlUploadField } from "@/features/image-upload/ui/ImageUrlUploadFi
 import { VideoUrlUploadField } from "@/features/image-upload/ui/VideoUrlUploadField";
 import { INTRO_AD_PAGE_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
-import { useAdvertisingCardStyles } from "@/shared/theme/sellerFlowStyles";
+import { useAdvertisingCardStyles } from "@/shared/theme/advertisingPageStyles";
+
+const INTRO_DURATION_BADGE = "3 дня";
 
 type IntroAdAdvertisingSectionProps = {
   loyaltyBalance: number;
@@ -52,6 +55,7 @@ export const IntroAdAdvertisingSection = ({ loyaltyBalance }: IntroAdAdvertising
   const canCancel = campaign?.status === "pending" || campaign?.status === "queued";
   const hasOpenCampaign = Boolean(campaign);
   const isSubmitting = submitMutation.isPending || cancelMutation.isPending;
+  const isStatusActive = campaign?.status === "active";
 
   const updateField = <K extends keyof IntroAdFormState>(key: K, value: IntroAdFormState[K]) => {
     setActionError("");
@@ -102,24 +106,33 @@ export const IntroAdAdvertisingSection = ({ loyaltyBalance }: IntroAdAdvertising
   };
 
   return (
-    <View style={styles.card}>
-      <Text style={styles.title}>{INTRO_AD_PAGE_UI.CARD_TITLE}</Text>
-      <Text style={styles.lead}>
-        {INTRO_AD_PAGE_UI.DESCRIPTION}
-      </Text>
-      <Text style={styles.meta}>
-        {INTRO_AD_PAGE_UI.PRICE(pricePoints)} · {INTRO_AD_PAGE_UI.DURATION}
-      </Text>
-      <Text style={styles.meta}>
-        {INTRO_AD_PAGE_UI.BALANCE(loyaltyBalance)}
-      </Text>
+    <View style={[styles.card, styles.cardIntro]}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>{INTRO_AD_PAGE_UI.CARD_TITLE}</Text>
+        <Text style={styles.cardBadge}>{INTRO_DURATION_BADGE}</Text>
+      </View>
+
+      <Text style={styles.lead}>{INTRO_AD_PAGE_UI.DESCRIPTION}</Text>
+
+      <View style={styles.meta}>
+        <View style={styles.metaItem}>
+          <Text style={styles.metaLabel}>Стоимость</Text>
+          <Text style={styles.metaValue}>{pricePoints} баллов</Text>
+        </View>
+        <View style={styles.metaItem}>
+          <Text style={styles.metaLabel}>Срок</Text>
+          <Text style={styles.metaValue}>{INTRO_DURATION_BADGE}</Text>
+        </View>
+      </View>
 
       {campaign ? (
-        <View style={styles.statusPanel}>
-          <Text style={styles.statusText}>{resolveStatusLabel(campaign.status)}</Text>
+        <View style={resolveIntroAdStatusPanelStyle(styles, campaign.status)}>
+          <Text style={[styles.statusText, isStatusActive && styles.statusTextActive]}>
+            {resolveStatusLabel(campaign.status)}
+          </Text>
           {canCancel ? (
             <Pressable
-              style={styles.secondaryButton}
+              style={[styles.secondaryButton, isSubmitting && styles.secondaryButtonDisabled]}
               onPress={() => {
                 void handleCancel();
               }}
@@ -138,92 +151,115 @@ export const IntroAdAdvertisingSection = ({ loyaltyBalance }: IntroAdAdvertising
       ) : null}
 
       {!hasOpenCampaign && showForm ? (
-        <View style={styles.form}>
-          <VideoUrlUploadField
-            label="MP4"
-            value={form.videoMp4Url}
-            onChange={(value) => updateField("videoMp4Url", value)}
-            disabled={isSubmitting}
-          />
-          <VideoUrlUploadField
-            label="WebM (необязательно)"
-            value={form.videoWebmUrl}
-            onChange={(value) => updateField("videoWebmUrl", value)}
-            disabled={isSubmitting}
-          />
-          <ImageUrlUploadField
-            label="Poster"
-            value={form.posterUrl}
-            onChange={(value) => updateField("posterUrl", value)}
-            disabled={isSubmitting}
-          />
-          <Text style={styles.fieldLabel}>Заголовок заглушки</Text>
-          <TextInput
-            style={styles.input}
-            value={form.fallbackTitle}
-            onChangeText={(value) => updateField("fallbackTitle", value)}
-          />
-          <Text style={styles.fieldLabel}>Подсказка заглушки</Text>
-          <TextInput
-            style={styles.input}
-            value={form.fallbackHint}
-            onChangeText={(value) => updateField("fallbackHint", value)}
-          />
-          <Text style={styles.sectionLabel}>{INTRO_AD_PAGE_UI.SECTION_TIMING}</Text>
-          <Text style={styles.timingHint}>{INTRO_AD_PAGE_UI.TIMING_HINT}</Text>
-          <Text style={styles.fieldLabel}>{INTRO_AD_PAGE_UI.LABEL_MIN_MS}</Text>
-          <TextInput
-            style={styles.input}
-            value={form.minMs}
-            onChangeText={(value) => updateField("minMs", value)}
-            keyboardType="number-pad"
-          />
-          <Text style={styles.fieldLabel}>{INTRO_AD_PAGE_UI.LABEL_MAX_MS}</Text>
-          <TextInput
-            style={styles.input}
-            value={form.maxMs}
-            onChangeText={(value) => updateField("maxMs", value)}
-            keyboardType="number-pad"
-          />
-          <Text style={styles.fieldLabel}>{INTRO_AD_PAGE_UI.LABEL_FADE_MS}</Text>
-          <TextInput
-            style={styles.input}
-            value={form.fadeOutMs}
-            onChangeText={(value) => updateField("fadeOutMs", value)}
-            keyboardType="number-pad"
-          />
+        <View style={styles.panel}>
+          <Text style={styles.panelTitle}>Заявка на intro</Text>
+          <View style={styles.form}>
+            <VideoUrlUploadField
+              label="MP4"
+              value={form.videoMp4Url}
+              onChange={(value) => updateField("videoMp4Url", value)}
+              disabled={isSubmitting}
+            />
+            <VideoUrlUploadField
+              label="WebM (необязательно)"
+              value={form.videoWebmUrl}
+              onChange={(value) => updateField("videoWebmUrl", value)}
+              disabled={isSubmitting}
+            />
+            <ImageUrlUploadField
+              label="Poster"
+              value={form.posterUrl}
+              onChange={(value) => updateField("posterUrl", value)}
+              disabled={isSubmitting}
+            />
+            <View style={styles.field}>
+              <Text style={styles.fieldLabel}>Заголовок заглушки</Text>
+              <TextInput
+                style={styles.input}
+                value={form.fallbackTitle}
+                onChangeText={(value) => updateField("fallbackTitle", value)}
+              />
+            </View>
+            <View style={styles.field}>
+              <Text style={styles.fieldLabel}>Подсказка заглушки</Text>
+              <TextInput
+                style={styles.input}
+                value={form.fallbackHint}
+                onChangeText={(value) => updateField("fallbackHint", value)}
+              />
+            </View>
+            <Text style={styles.timingLegend}>{INTRO_AD_PAGE_UI.SECTION_TIMING}</Text>
+            <Text style={styles.timingHint}>{INTRO_AD_PAGE_UI.TIMING_HINT}</Text>
+            <View style={styles.timingGrid}>
+              <View style={styles.timingField}>
+                <Text style={styles.fieldLabel}>{INTRO_AD_PAGE_UI.LABEL_MIN_MS}</Text>
+                <TextInput
+                  style={styles.input}
+                  value={form.minMs}
+                  onChangeText={(value) => updateField("minMs", value)}
+                  keyboardType="number-pad"
+                />
+              </View>
+              <View style={styles.timingField}>
+                <Text style={styles.fieldLabel}>{INTRO_AD_PAGE_UI.LABEL_MAX_MS}</Text>
+                <TextInput
+                  style={styles.input}
+                  value={form.maxMs}
+                  onChangeText={(value) => updateField("maxMs", value)}
+                  keyboardType="number-pad"
+                />
+              </View>
+              <View style={styles.timingField}>
+                <Text style={styles.fieldLabel}>{INTRO_AD_PAGE_UI.LABEL_FADE_MS}</Text>
+                <TextInput
+                  style={styles.input}
+                  value={form.fadeOutMs}
+                  onChangeText={(value) => updateField("fadeOutMs", value)}
+                  keyboardType="number-pad"
+                />
+              </View>
+            </View>
 
-          {actionError ? <Text style={styles.error}>{actionError}</Text> : null}
+            {actionError ? (
+              <Text style={styles.error} accessibilityRole="alert">
+                {actionError}
+              </Text>
+            ) : null}
 
-          <View style={styles.actions}>
-            <Pressable style={styles.secondaryButton} onPress={() => setShowForm(false)}>
-              <Text style={styles.secondaryButtonText}>Отмена</Text>
-            </Pressable>
-            <Pressable style={styles.secondaryButton} onPress={handlePreview}>
-              <Text style={styles.secondaryButtonText}>{INTRO_AD_PAGE_UI.PREVIEW}</Text>
-            </Pressable>
-            <Pressable
-              style={[
-                styles.primaryButton,
-                (isSubmitting || loyaltyBalance < pricePoints) && styles.disabled,
-              ]}
-              onPress={() => {
-                void handleSubmit();
-              }}
-              disabled={isSubmitting || loyaltyBalance < pricePoints}
-            >
-              {isSubmitting ? (
-                <ActivityIndicator color={theme.colors.onContrast} />
-              ) : (
-                <Text style={styles.primaryButtonText}>{INTRO_AD_PAGE_UI.SUBMIT}</Text>
-              )}
-            </Pressable>
+            <View style={styles.actions}>
+              <Pressable
+                style={[styles.secondaryButton, isSubmitting && styles.secondaryButtonDisabled]}
+                onPress={handlePreview}
+                disabled={isSubmitting}
+              >
+                <Text style={styles.secondaryButtonText}>{INTRO_AD_PAGE_UI.PREVIEW}</Text>
+              </Pressable>
+              <Pressable
+                style={[
+                  styles.primaryButton,
+                  (isSubmitting || loyaltyBalance < pricePoints) && styles.primaryButtonDisabled,
+                ]}
+                onPress={() => {
+                  void handleSubmit();
+                }}
+                disabled={isSubmitting || loyaltyBalance < pricePoints}
+              >
+                {isSubmitting ? (
+                  <ActivityIndicator color={theme.colors.onContrast} />
+                ) : (
+                  <Text style={styles.primaryButtonText}>{INTRO_AD_PAGE_UI.SUBMIT}</Text>
+                )}
+              </Pressable>
+            </View>
           </View>
         </View>
       ) : null}
 
-      {feedback ? <Text style={styles.success}>{feedback}</Text> : null}
-      {actionError && hasOpenCampaign ? <Text style={styles.error}>{actionError}</Text> : null}
+      {feedback ? (
+        <Text style={styles.feedback} accessibilityRole="text">
+          {feedback}
+        </Text>
+      ) : null}
     </View>
   );
 };

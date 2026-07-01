@@ -9,10 +9,12 @@ import {
 
 import { useMySellerPersonalCategoryCampaignQuery } from "@/entities/seller-personal-category/model/useMySellerPersonalCategoryCampaignQuery";
 import { useSellerPersonalCategoryMutations } from "@/entities/seller-personal-category/model/useSellerPersonalCategoryMutations";
+import { resolvePersonalCategoryStatusPanelStyle } from "@/features/advertising-page/lib/resolveAdvertisingStatusPanelStyle";
 import { ImageUrlUploadField } from "@/features/image-upload/ui/ImageUrlUploadField";
 import { SELLER_PERSONAL_CATEGORY_PAGE_UI } from "@/shared/config";
+import { formatApiErrorMessage } from "@/shared/lib";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
-import { useAdvertisingCardStyles } from "@/shared/theme/sellerFlowStyles";
+import { useAdvertisingCardStyles } from "@/shared/theme/advertisingPageStyles";
 
 type PersonalCategoryAdvertisingSectionProps = {
   loyaltyBalance: number;
@@ -50,6 +52,7 @@ export const PersonalCategoryAdvertisingSection = ({
   const isActiveCampaign = campaign?.status === "active";
   const hasOpenCampaign = Boolean(campaign);
   const isSubmitting = submitMutation.isPending || cancelMutation.isPending;
+  const showTariffQuote = !hasOpenCampaign || showForm;
 
   const handleSubmit = async () => {
     try {
@@ -92,42 +95,64 @@ export const PersonalCategoryAdvertisingSection = ({
 
   if (campaignQuery.isPending) {
     return (
-      <View style={styles.card}>
-        <Text style={styles.loading}>{SELLER_PERSONAL_CATEGORY_PAGE_UI.LOADING}</Text>
+      <View style={[styles.card, styles.cardCategory]}>
+        <Text style={styles.cardTitle}>{SELLER_PERSONAL_CATEGORY_PAGE_UI.SECTION_TITLE}</Text>
+        <Text style={styles.state}>{SELLER_PERSONAL_CATEGORY_PAGE_UI.LOADING}</Text>
+      </View>
+    );
+  }
+
+  if (campaignQuery.isError) {
+    return (
+      <View style={[styles.card, styles.cardCategory]}>
+        <Text style={styles.cardTitle}>{SELLER_PERSONAL_CATEGORY_PAGE_UI.SECTION_TITLE}</Text>
+        <Text style={styles.error} accessibilityRole="alert">
+          {formatApiErrorMessage(
+            campaignQuery.error,
+            SELLER_PERSONAL_CATEGORY_PAGE_UI.FETCH_FALLBACK,
+          )}
+        </Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.card}>
-      <Text style={styles.title}>
-        {SELLER_PERSONAL_CATEGORY_PAGE_UI.SECTION_TITLE}
-      </Text>
-      <Text style={styles.lead}>
-        {SELLER_PERSONAL_CATEGORY_PAGE_UI.SECTION_LEAD}
-      </Text>
+    <View style={[styles.card, styles.cardCategory]}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>{SELLER_PERSONAL_CATEGORY_PAGE_UI.SECTION_TITLE}</Text>
+        {selectedDuration ? (
+          <Text style={[styles.cardBadge, styles.cardBadgeCategory]}>{selectedDuration.title}</Text>
+        ) : null}
+      </View>
 
-      {selectedDuration ? (
-        <Text style={styles.meta}>
-          {SELLER_PERSONAL_CATEGORY_PAGE_UI.PRICE(pricePoints)} · {selectedDuration.title}
-        </Text>
+      <Text style={styles.lead}>{SELLER_PERSONAL_CATEGORY_PAGE_UI.SECTION_LEAD}</Text>
+
+      {showTariffQuote && selectedDuration ? (
+        <View style={styles.meta}>
+          <View style={styles.metaItem}>
+            <Text style={styles.metaLabel}>Стоимость</Text>
+            <Text style={styles.metaValue}>{pricePoints} баллов</Text>
+          </View>
+          <View style={styles.metaItem}>
+            <Text style={styles.metaLabel}>Срок</Text>
+            <Text style={styles.metaValue}>{selectedDuration.title}</Text>
+          </View>
+        </View>
       ) : null}
-      <Text style={styles.meta}>
-        {SELLER_PERSONAL_CATEGORY_PAGE_UI.BALANCE(loyaltyBalance)}
-      </Text>
 
       {campaign ? (
-        <View style={styles.statusPanel}>
-          <Text style={styles.statusText}>{resolveStatusLabel(campaign.status)}</Text>
+        <View style={resolvePersonalCategoryStatusPanelStyle(styles, campaign.status)}>
+          <Text style={[styles.statusText, isActiveCampaign && styles.statusTextActive]}>
+            {resolveStatusLabel(campaign.status)}
+          </Text>
           {isActiveCampaign && campaign.activeUntil ? (
-            <Text style={styles.statusText}>
+            <Text style={[styles.statusText, isActiveCampaign && styles.statusTextActive]}>
               {SELLER_PERSONAL_CATEGORY_PAGE_UI.STATUS_ACTIVE_UNTIL(campaign.activeUntil)}
             </Text>
           ) : null}
-          {campaign.labelRu ? <Text style={styles.statusText}>{campaign.labelRu}</Text> : null}
           {canCancel ? (
             <Pressable
-              style={styles.secondaryButton}
+              style={[styles.secondaryButton, isSubmitting && styles.secondaryButtonDisabled]}
               onPress={() => {
                 void handleCancel();
               }}
@@ -150,65 +175,87 @@ export const PersonalCategoryAdvertisingSection = ({
       ) : null}
 
       {!hasOpenCampaign && showForm ? (
-        <View style={styles.form}>
-          <Text style={styles.fieldLabel}>{SELLER_PERSONAL_CATEGORY_PAGE_UI.LABEL_NAME}</Text>
-          <TextInput
-            style={styles.input}
-            value={labelRu}
-            maxLength={80}
-            onChangeText={setLabelRu}
-          />
-          <ImageUrlUploadField
-            label={SELLER_PERSONAL_CATEGORY_PAGE_UI.LABEL_IMAGE}
-            value={imageUrl}
-            onChange={setImageUrl}
-            disabled={isSubmitting}
-          />
-          <Text style={styles.fieldLabel}>{SELLER_PERSONAL_CATEGORY_PAGE_UI.LABEL_DURATION}</Text>
-          {durations.map((item) => {
-            const isActive = tariffCode === item.code;
-            return (
+        <View style={styles.panel}>
+          <Text style={styles.panelTitle}>Заявка на личную категорию</Text>
+          <View style={styles.form}>
+            <View style={styles.field}>
+              <Text style={styles.fieldLabel}>{SELLER_PERSONAL_CATEGORY_PAGE_UI.LABEL_NAME}</Text>
+              <TextInput
+                style={styles.input}
+                value={labelRu}
+                maxLength={80}
+                onChangeText={setLabelRu}
+              />
+            </View>
+            <ImageUrlUploadField
+              label={SELLER_PERSONAL_CATEGORY_PAGE_UI.LABEL_IMAGE}
+              value={imageUrl}
+              onChange={setImageUrl}
+              disabled={isSubmitting}
+            />
+            <View style={styles.field}>
+              <Text style={styles.fieldLabel}>
+                {SELLER_PERSONAL_CATEGORY_PAGE_UI.LABEL_DURATION}
+              </Text>
+              <View style={styles.tariffs}>
+                {durations.map((item) => {
+                  const isSelected = tariffCode === item.code;
+                  return (
+                    <Pressable
+                      key={item.code}
+                      style={[styles.tariff, isSelected && styles.tariffSelected]}
+                      onPress={() => setTariffCode(item.code)}
+                    >
+                      <Text style={styles.tariffTitle}>{item.title}</Text>
+                      <Text style={styles.tariffPrice}>{item.pricePoints} баллов</Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </View>
+
+            {actionError ? (
+              <Text style={styles.error} accessibilityRole="alert">
+                {actionError}
+              </Text>
+            ) : null}
+
+            <View style={styles.actions}>
               <Pressable
-                key={item.code}
-                style={[styles.tariffChip, isActive && styles.tariffChipActive]}
-                onPress={() => setTariffCode(item.code)}
+                style={[styles.secondaryButton, isSubmitting && styles.secondaryButtonDisabled]}
+                onPress={() => setShowForm(false)}
+                disabled={isSubmitting}
               >
-                <Text style={[styles.tariffText, isActive && styles.tariffTextActive]}>
-                  {item.title} · {item.pricePoints} баллов
-                </Text>
+                <Text style={styles.secondaryButtonText}>Отмена</Text>
               </Pressable>
-            );
-          })}
-
-          {actionError ? <Text style={styles.error}>{actionError}</Text> : null}
-
-          <View style={styles.actions}>
-            <Pressable style={styles.secondaryButton} onPress={() => setShowForm(false)}>
-              <Text style={styles.secondaryButtonText}>Отмена</Text>
-            </Pressable>
-            <Pressable
-              style={[
-                styles.primaryButton,
-                (isSubmitting || loyaltyBalance < pricePoints) && styles.disabled,
-              ]}
-              onPress={() => {
-                void handleSubmit();
-              }}
-              disabled={isSubmitting || loyaltyBalance < pricePoints}
-            >
-              {isSubmitting ? (
-                <ActivityIndicator color={theme.colors.onContrast} />
-              ) : (
-                <Text style={styles.primaryButtonText}>
-                  {SELLER_PERSONAL_CATEGORY_PAGE_UI.SUBMIT}
-                </Text>
-              )}
-            </Pressable>
+              <Pressable
+                style={[
+                  styles.primaryButton,
+                  (isSubmitting || loyaltyBalance < pricePoints) && styles.primaryButtonDisabled,
+                ]}
+                onPress={() => {
+                  void handleSubmit();
+                }}
+                disabled={isSubmitting || loyaltyBalance < pricePoints}
+              >
+                {isSubmitting ? (
+                  <ActivityIndicator color={theme.colors.onContrast} />
+                ) : (
+                  <Text style={styles.primaryButtonText}>
+                    {SELLER_PERSONAL_CATEGORY_PAGE_UI.SUBMIT}
+                  </Text>
+                )}
+              </Pressable>
+            </View>
           </View>
         </View>
       ) : null}
 
-      {feedback ? <Text style={styles.success}>{feedback}</Text> : null}
+      {feedback ? (
+        <Text style={styles.feedback} accessibilityRole="text">
+          {feedback}
+        </Text>
+      ) : null}
     </View>
   );
 };

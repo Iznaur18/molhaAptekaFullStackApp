@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 
 import { addressValueFromUser } from "@/entities/address/lib/addressValueFromUser";
@@ -54,6 +54,8 @@ export const ProductInstallmentTab = ({
   const styles = useProductDetailTabStyles();
   const programQuery = useProductInstallmentProgramQuery(productId, installmentEnabled);
   const { createContractMutation } = useInstallmentMutations();
+  const { mutateAsync: createInstallmentContract, isPending: isCreateContractPending } =
+    createContractMutation;
   const [selectedPlanId, setSelectedPlanId] = useState("");
   const [quantity, setQuantity] = useState("1");
   const [deliveryAddress, setDeliveryAddress] = useState<RuDeliveryAddressValue>(() =>
@@ -92,7 +94,7 @@ export const ProductInstallmentTab = ({
     const qty = Math.max(1, Number.parseInt(quantity, 10) || 1);
 
     try {
-      await createContractMutation.mutateAsync({
+      await createInstallmentContract({
         productId,
         body: {
           planId: selectedPlanId,
@@ -107,7 +109,7 @@ export const ProductInstallmentTab = ({
       setErrorMessage(error instanceof Error ? error.message : INSTALLMENT_UI.ERROR_GENERIC);
     }
   }, [
-    createContractMutation,
+    createInstallmentContract,
     deliveryAddress,
     isAuthorized,
     isUserDataConfirmed,
@@ -117,12 +119,15 @@ export const ProductInstallmentTab = ({
     selectedPlanId,
   ]);
 
+  const handleSubmitRef = useRef(handleSubmit);
+  handleSubmitRef.current = handleSubmit;
+
   const program = programQuery.data;
   const plans = program?.plans ?? [];
   const selectedPlan = plans.find((plan) => plan._id === selectedPlanId) ?? null;
   const qty = Math.max(1, Number.parseInt(quantity, 10) || 1);
-  const isSubmitDisabled =
-    createContractMutation.isPending || !isAuthorized || !isUserDataConfirmed;
+  const isSubmitDisabled = isCreateContractPending || !isAuthorized || !isUserDataConfirmed;
+  const dockLabel = isCreateContractPending ? INSTALLMENT_UI.SUBMITTING : INSTALLMENT_UI.SUBMIT;
   const showCheckoutForm =
     !isOwnProduct &&
     installmentEnabled &&
@@ -131,32 +136,30 @@ export const ProductInstallmentTab = ({
     plans.length > 0;
 
   useEffect(() => {
-    if (!dockSubmit || !onDockFooterChange || !showCheckoutForm) {
-      onDockFooterChange?.(null);
+    if (!onDockFooterChange) {
+      return;
+    }
+
+    if (!dockSubmit || !showCheckoutForm) {
+      onDockFooterChange(null);
       return;
     }
 
     onDockFooterChange({
       onSubmit: () => {
-        void handleSubmit();
+        void handleSubmitRef.current();
       },
       disabled: isSubmitDisabled,
-      label: createContractMutation.isPending
-        ? INSTALLMENT_UI.SUBMITTING
-        : INSTALLMENT_UI.SUBMIT,
+      label: dockLabel,
     });
+  }, [dockLabel, dockSubmit, isSubmitDisabled, onDockFooterChange, showCheckoutForm]);
 
-    return () => {
-      onDockFooterChange(null);
-    };
-  }, [
-    createContractMutation.isPending,
-    dockSubmit,
-    handleSubmit,
-    isSubmitDisabled,
-    onDockFooterChange,
-    showCheckoutForm,
-  ]);
+  useEffect(
+    () => () => {
+      onDockFooterChange?.(null);
+    },
+    [onDockFooterChange],
+  );
 
   if (isOwnProduct) {
     return <Text style={styles.message}>{INSTALLMENT_UI.SELLER_TAB_HINT}</Text>;
@@ -239,7 +242,7 @@ export const ProductInstallmentTab = ({
         <AddressSuggestInput
           value={deliveryAddress}
           onChange={setDeliveryAddress}
-          disabled={createContractMutation.isPending}
+          disabled={isCreateContractPending}
         />
 
         <View>

@@ -62,6 +62,9 @@ export const HOME_CATALOG_HEADER_USERS_PILL_SHADOW = "rgba(15, 23, 42, 0.05)";
 /** Web `.app-shell__header-top` column gap `0.5rem` @640. */
 export const HOME_CATALOG_HEADER_TOP_ROW_GAP = 8;
 
+/** Отступ между glass-панелью шапки и каруселью баннера (sibling, не внутри panel). */
+export const HOME_CATALOG_HEADER_BANNER_BELOW_PANEL_MARGIN = 8;
+
 /** Web mobile-split header: высота от контента, не фикс. */
 export const HOME_CATALOG_HEADER_SEARCH_INPUT_MIN_HEIGHT = 30.4;
 

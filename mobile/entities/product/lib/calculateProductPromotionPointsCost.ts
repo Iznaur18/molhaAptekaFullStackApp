@@ -10,6 +10,15 @@ export const PRODUCT_PROMOTION_TIER_RATES: Record<number, number> = {
   [PRODUCT_PROMOTION_TIER_BANNER]: 0.01,
 };
 
+export const PRODUCT_PROMOTION_TIER_LABELS: Record<number, string> = {
+  [PRODUCT_PROMOTION_TIER_GOLD]: "Золото",
+  [PRODUCT_PROMOTION_TIER_TOP]: "Топ",
+  [PRODUCT_PROMOTION_TIER_BANNER]: "Баннер",
+};
+
+export const getProductPromotionTierLabel = (tier: number | null | undefined): string =>
+  PRODUCT_PROMOTION_TIER_LABELS[Number(tier)] ?? "";
+
 export const PRODUCT_PROMOTION_DURATION_MULT: Record<string, number> = {
   "24h": 1,
   "7d": 7,

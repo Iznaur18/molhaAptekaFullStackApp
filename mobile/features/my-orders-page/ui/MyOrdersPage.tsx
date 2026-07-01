@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { z } from "zod";
-import { Alert, FlatList, Pressable, ScrollView, Text, View } from "react-native";
+import { Alert, FlatList, Pressable, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { getOrderItemIndex } from "@/entities/order/lib/getOrderItemIndex";
@@ -12,44 +12,39 @@ import { resolveOrderLineProductId } from "@/entities/order/lib/resolveOrderLine
 import {
   ORDER_STATUS_CANCELLED,
   ORDER_STATUS_CONFIRMED,
-  ORDER_STATUSES,
-  ORDER_STATUS_LABEL_RU,
 } from "@/entities/order/model/constants";
 import { useMyOrdersQuery } from "@/entities/order/model/useMyOrdersQuery";
 import { useOrderMutations } from "@/entities/order/model/useOrderMutations";
 import { OrderCard } from "@/entities/order/ui/OrderCard";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
+import { MyOrdersPageToolbar } from "@/features/my-orders-page/ui/MyOrdersPageToolbar";
+import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
+import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import { orderQueryKeys } from "@/shared/api";
 import {
   API_CLIENT_UI,
   AUTH_UI,
   MY_ORDERS_PAGE_UI,
+  MY_PROFILE_PAGE_UI,
   ORDER_CARD_UI,
   PRODUCT_REPORT_UI,
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
-import { useOrdersScreenStyles } from "@/shared/theme/commerceScreenStyles";
+import { useMyOrdersPageStyles } from "@/shared/theme/myOrdersPageStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 type OrderRecord = z.infer<typeof orderFromApiSchema>;
 
-const STATUS_FILTERS: Array<{ value: string; label: string }> = [
-  { value: "", label: MY_ORDERS_PAGE_UI.STATUS_FILTER_ALL },
-  ...ORDER_STATUSES.map((status) => ({
-    value: status,
-    label: ORDER_STATUS_LABEL_RU[status],
-  })),
-];
-
 export const MyOrdersPage = () => {
   const router = useRouter();
-  const styles = useOrdersScreenStyles();
-  const { contentPaddingTop } = useScreenLayout();
+  const styles = useMyOrdersPageStyles();
+  const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
   const queryClient = useQueryClient();
   const isAuthorized = useIsAuthorized();
   const ordersQuery = useMyOrdersQuery();
   const { confirmItemMutation, cancelItemMutation } = useOrderMutations();
+  const [navSheetVisible, setNavSheetVisible] = useState(false);
   const [statusFilter, setStatusFilter] = useState("");
   const [pendingActionKey, setPendingActionKey] = useState<string | null>(null);
   const [itemActionErrors, setItemActionErrors] = useState<Record<string, string>>({});
@@ -84,10 +79,7 @@ export const MyOrdersPage = () => {
   );
 
   const invalidateOrderQueues = useCallback(async () => {
-    await Promise.all([
-      queryClient.invalidateQueries({ queryKey: orderQueryKeys.my() }),
-      queryClient.invalidateQueries({ queryKey: orderQueryKeys.myActionCount() }),
-    ]);
+    await queryClient.invalidateQueries({ queryKey: orderQueryKeys.myActionCount() });
   }, [queryClient]);
 
   const handleConfirmDelivered = async ({
@@ -128,6 +120,7 @@ export const MyOrdersPage = () => {
         prev.map((order) => (order._id === orderId ? updatedOrder : order)),
       );
       await invalidateOrderQueues();
+      void ordersQuery.refetch();
     } catch (error) {
       const message = formatApiErrorMessage(error, API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK);
       setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
@@ -188,6 +181,7 @@ export const MyOrdersPage = () => {
         prev.map((order) => (order._id === orderId ? updatedOrder : order)),
       );
       await invalidateOrderQueues();
+      void ordersQuery.refetch();
     } catch (error) {
       const message = formatApiErrorMessage(error, API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK);
       setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
@@ -224,10 +218,34 @@ export const MyOrdersPage = () => {
         ? MY_ORDERS_PAGE_UI.EMPTY_BY_FILTER
         : MY_ORDERS_PAGE_UI.EMPTY;
 
+  const listHeader = (
+    <View style={styles.header}>
+      <ProfileMobileSectionToggle
+        activeLabel={MY_PROFILE_PAGE_UI.TAB_MY_ORDERS}
+        onPress={() => setNavSheetVisible(true)}
+      />
+      <MyOrdersPageToolbar
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        ordersCount={filteredOrders.length}
+      />
+      {loyaltyFlash ? (
+        <Text style={styles.loyaltyFlash} accessibilityRole="text">
+          {loyaltyFlash}
+        </Text>
+      ) : null}
+      {filteredOrders.length === 0 ? (
+        <Text style={styles.emptyState} accessibilityRole="text">
+          {emptyMessage}
+        </Text>
+      ) : null}
+    </View>
+  );
+
   if (!isAuthorized) {
     return (
       <View style={styles.centered}>
-        <Text style={styles.message}>{MY_ORDERS_PAGE_UI.AUTH_REQUIRED}</Text>
+        <Text style={styles.hint}>{MY_ORDERS_PAGE_UI.AUTH_REQUIRED}</Text>
         <Pressable style={styles.button} onPress={() => router.push("/(auth)/login")}>
           <Text style={styles.buttonText}>{AUTH_UI.LOGIN_BUTTON}</Text>
         </Pressable>
@@ -252,64 +270,38 @@ export const MyOrdersPage = () => {
   }
 
   return (
-    <FlatList
-      data={filteredOrders}
-      keyExtractor={(order) => order._id}
-      renderItem={({ item }) => (
-        <OrderCard
-          order={item}
-          onProductClick={handleProductClick}
-          onConfirmDelivered={handleConfirmDelivered}
-          onCancelItem={handleCancelItem}
-          pendingActionKey={pendingActionKey}
-          itemActionErrors={itemActionErrors}
-        />
-      )}
-      contentContainerStyle={[styles.list, { paddingTop: contentPaddingTop + 16 }]}
-      refreshControl={
-        <ThemedRefreshControl refreshing={ordersQuery.isRefetching} onRefresh={ordersQuery.refetch} />
-      }
-      ListHeaderComponent={
-        <>
-          <View style={styles.toolbarHead}>
-            <Text style={styles.countLabel}>
-              {MY_ORDERS_PAGE_UI.COUNT(filteredOrders.length)}
-            </Text>
-          </View>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.filters}
-          >
-            {STATUS_FILTERS.map((filter) => {
-              const isActive = statusFilter === filter.value;
-              return (
-                <Pressable
-                  key={filter.value || "all"}
-                  style={[styles.filterChip, isActive && styles.filterChipActive]}
-                  onPress={() => setStatusFilter(filter.value)}
-                >
-                  <Text
-                    style={[styles.filterChipText, isActive && styles.filterChipTextActive]}
-                  >
-                    {filter.label}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </ScrollView>
-          {loyaltyFlash ? (
-            <Text style={styles.loyaltyFlash} accessibilityRole="text">
-              {loyaltyFlash}
-            </Text>
-          ) : null}
-        </>
-      }
-      ListEmptyComponent={
-        <View style={styles.centered}>
-          <Text style={styles.message}>{emptyMessage}</Text>
-        </View>
-      }
-    />
+    <>
+      <FlatList
+        style={[styles.container, styles.listFlex, centeredContentStyle]}
+        data={filteredOrders}
+        keyExtractor={(order) => order._id}
+        contentContainerStyle={[styles.list, { paddingBottom: contentPaddingBottom }]}
+        refreshControl={
+          <ThemedRefreshControl
+            refreshing={ordersQuery.isRefetching}
+            onRefresh={() => ordersQuery.refetch()}
+          />
+        }
+        ListHeaderComponent={listHeader}
+        renderItem={({ item }) => (
+          <OrderCard
+            order={item}
+            compact
+            onProductClick={handleProductClick}
+            onConfirmDelivered={handleConfirmDelivered}
+            onCancelItem={handleCancelItem}
+            pendingActionKey={pendingActionKey}
+            itemActionErrors={itemActionErrors}
+          />
+        )}
+      />
+
+      <ProfileMobileNavSheet
+        visible={navSheetVisible}
+        activeSectionId="my-orders"
+        onClose={() => setNavSheetVisible(false)}
+        onOverviewPress={() => router.replace("/(tabs)/profile")}
+      />
+    </>
   );
 };

@@ -124,7 +124,7 @@ export function InstallmentDisputesPage({ onQueueChanged }) {
                 <article className="installment-queue-card">
                   <div className="installment-queue-card__head">
                     <h3 className="installment-queue-card__title">
-                      {INSTALLMENT_UI.DISPUTE_CONTRACT_LABEL}
+                      {dispute.productName?.trim() || INSTALLMENT_UI.DISPUTE_CONTRACT_LABEL}
                     </h3>
                   </div>
                   <p className="installment-queue-card__meta">
@@ -132,6 +132,32 @@ export function InstallmentDisputesPage({ onQueueChanged }) {
                     <br />
                     {INSTALLMENT_UI.DISPUTE_REASON_LABEL}: {dispute.reason}
                   </p>
+                  {dispute.seller?._id ? (
+                    <p className="installment-queue-card__seller">
+                      {INSTALLMENT_UI.SELLER_LABEL}:{" "}
+                      <a
+                        className="installment-queue-card__seller-link"
+                        href={`/user/${dispute.seller._id}`}
+                      >
+                        {dispute.seller.userName?.trim() ||
+                          dispute.seller.email?.trim() ||
+                          dispute.seller._id}
+                      </a>
+                    </p>
+                  ) : null}
+                  {dispute.buyer?._id ? (
+                    <p className="installment-queue-card__seller">
+                      {INSTALLMENT_UI.BUYER_LABEL}:{" "}
+                      <a
+                        className="installment-queue-card__seller-link"
+                        href={`/user/${dispute.buyer._id}`}
+                      >
+                        {dispute.buyer.userName?.trim() ||
+                          dispute.buyer.email?.trim() ||
+                          dispute.buyer._id}
+                      </a>
+                    </p>
+                  ) : null}
                   <label className="installment-queue-card__field">
                     {INSTALLMENT_UI.DISPUTE_RESOLVE_NOTE}
                     <textarea

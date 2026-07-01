@@ -8,12 +8,14 @@ type CachedProductImageProps = {
   uri?: string | null;
   style?: StyleProp<ImageStyle>;
   fallbackLabel?: string;
+  contentFit?: "cover" | "contain";
 };
 
 export const CachedProductImage = ({
   uri,
   style,
   fallbackLabel = PRODUCT_UI.NO_IMAGE,
+  contentFit = "cover",
 }: CachedProductImageProps) => {
   const styles = useCachedProductImageStyles();
 
@@ -29,7 +31,7 @@ export const CachedProductImage = ({
     <Image
       source={{ uri }}
       style={[styles.image, style]}
-      contentFit="cover"
+      contentFit={contentFit}
       cachePolicy="memory-disk"
       transition={200}
     />

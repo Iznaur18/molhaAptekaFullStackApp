@@ -1,3 +1,5 @@
+import { pluralizeRuBall } from "@/shared/lib/pluralizeRuBall";
+
 export const API_CLIENT_UI = {
   INVALID_SERVER_RESPONSE: "Неверный ответ сервера",
   FETCH_ME_FALLBACK: "Не удалось загрузить профиль",
@@ -59,6 +61,7 @@ export const API_CLIENT_UI = {
   ACCEPT_PRICE_OFFER_FALLBACK: "Не удалось принять ставку",
   REJECT_PRICE_OFFER_FALLBACK: "Не удалось отклонить ставку",
   CREATE_RAFFLE_FALLBACK: "Не удалось создать розыгрыш",
+  PATCH_RAFFLE_FALLBACK: "Не удалось сохранить розыгрыш",
   FETCH_MY_RAFFLE_FALLBACK: "Не удалось загрузить розыгрыш",
   PAUSE_RAFFLE_FALLBACK: "Не удалось снять розыгрыш с витрины",
   DELETE_RAFFLE_FALLBACK: "Не удалось удалить розыгрыш",
@@ -82,6 +85,8 @@ export const API_CLIENT_UI = {
   FETCH_USER_PURCHASES_FALLBACK: "Не удалось загрузить покупки",
   VOTE_SUBMIT_FALLBACK: "Не удалось отправить оценку",
   FETCH_MY_VOTE_FALLBACK: "Не удалось загрузить вашу оценку",
+  CREATE_PRODUCT_PENDING_HINT:
+    "Товар создан и ожидает проверки модератором. После одобрения он появится в каталоге.",
 } as const;
 
 export const IMAGE_UPLOAD_UI = {
@@ -243,6 +248,11 @@ export const PRODUCT_CARD_UI = {
   RATING_LINE: (rating: number, count: number) => `★ ${rating.toFixed(1)} (${count})`,
   PROMOTION_BUTTON: "Продвигать",
   EDIT_PRODUCT: "Изменить",
+  FOOTER_ACTIONS_ARIA: "Действия с товаром",
+  PREVIEW_FIELDS_ARIA: "Краткая информация о товаре",
+  PROMOTED_TIER_UNTIL: (tierLabel: string, until: string) =>
+    `Продвижение «${tierLabel}» до ${until}`,
+  LOYALTY_POINTS_OVERCOMMITTED_BADGE: "Бонус выше доступного остатка баллов",
   GALLERY_REGION_ARIA: "Галерея фото товара",
   GALLERY_COUNTER_ARIA: (current: number, total: number) => `Фото ${current} из ${total}`,
   GALLERY_PREV: "Предыдущее фото",
@@ -320,8 +330,11 @@ export const PRODUCT_PRICE_OFFER_UI = {
   TAB_DETAILS: "О товаре",
   TAB_AUCTION: "Аукцион",
   AUCTION_SHORTCUT: "В аукцион",
+  SECTION_TOP_TITLE: "Топ ставок",
   SECTION_FORM_TITLE: "Ваша цена",
   LABEL_PRICE: "Ваша цена, ₽",
+  INPUT_PLACEHOLDER: "Предложите свою цену",
+  EMPTY_TOP: "Ставок пока нет",
   ERROR_PRICE_MAX: "Цена не может превышать 999 999 999 ₽",
   SUBMIT: "Предложить цену",
   UPDATE: "Изменить цену",
@@ -336,9 +349,17 @@ export const PRODUCT_PRICE_OFFER_UI = {
   ACTION_REJECT: "Отклонить",
   ACTION_PENDING: "Сохраняем…",
   ACCEPTED_BADGE: "Ожидает оплаты",
+  PAY_BUTTON: "Оплатить по принятой цене",
+  PAY_ORDER_PLACED: "Заказ по принятой цене оформлен",
 } as const;
 
 export const AUCTION_PAGE_UI = {
+  TITLE: "Аукцион",
+  COUNT_BIDS: (count: number) => `${count} моих ставок`,
+  COUNT_OFFERS: (count: number) => `${count} входящих`,
+  BID_PRICE_LABEL: "Ставка",
+  PAY_DEADLINE_LABEL: "Оплатить до",
+  EDIT_PRICE_LABEL: "Новая цена, ₽",
   LOADING: "Загрузка аукциона…",
   ERROR_GENERIC: "Не удалось выполнить действие",
   BUYER_SECTION_TITLE: "Мои ставки",
@@ -378,6 +399,8 @@ export const USER_STORY_UI = {
   STORY_REPORTS_ACTION_DISMISS: "Отклонить жалобы",
   STORY_REPORTS_ACTION_HIDE: "Скрыть сторис",
   STORY_REPORTS_ACTION_PENDING: "Сохраняем…",
+  STORY_REPORTS_STAFF_NOTE_LABEL: "Комментарий staff",
+  STORY_REPORTS_STAFF_NOTE_PLACEHOLDER: "Обязательный комментарий…",
   MEDIA_LOAD_ERROR: "Не удалось загрузить медиафайл",
   PREV_STORY: "Предыдущий",
   NEXT_STORY: "Следующий",
@@ -416,6 +439,11 @@ export const HOME_FEED_UI = {
 export const RAFFLE_FEATURED_UI = {
   BADGE: "Розыгрыш",
   OPEN_PRODUCTS: "Товары розыгрыша",
+} as const;
+
+export const SITE_HEADER_BANNER_UI = {
+  CAROUSEL_ARIA: "Баннеры на главной",
+  AUTOPLAY_MS: 5000,
 } as const;
 
 export const RAFFLE_FEATURED_CAROUSEL_UI = {
@@ -465,6 +493,7 @@ export const INSTALLMENT_UI = {
   TAB: "Рассрочка",
   SHORTCUT: "В рассрочку",
   BADGE: "Рассрочка",
+  CONTRACT_PLAN: "План",
   BUYER_HINT: "Оформление рассрочки доступно пользователям с подтверждёнными данными.",
   BUYER_REQUIRES_CONFIRMED:
     "Рассрочка доступна только пользователям с подтверждёнными данными.",
@@ -482,20 +511,30 @@ export const INSTALLMENT_UI = {
   MODERATION_PENDING: "Программа на модерации",
   MODERATION_REJECTED: "Программа отклонена",
   SELLER_TAB_HINT: "Настройте планы в «Изменить товар» → «Продать в рассрочку».",
+  SELLER_PROFILE_ARIA: (sellerName: string) => `Профиль продавца: ${sellerName}`,
   CONTRACT_PRODUCT: "Товар",
   MODERATION_PAGE_TITLE: "Рассрочка — модерация",
   MODERATION_PAGE_LOADING: "Загрузка очереди…",
   MODERATION_PAGE_EMPTY: "Нет программ на модерации.",
   MODERATION_APPROVE: "Одобрить",
   MODERATION_REJECT: "Отклонить",
+  MODERATION_REJECT_COMMENT: "Комментарий (необязательно)",
   MODERATION_REJECT_PLACEHOLDER: "Комментарий для продавца…",
+  BUYER_PROFILE_ARIA: (buyerName: string) => `Профиль покупателя: ${buyerName}`,
+  BUYERS_LABEL: "Покупатели",
+  COUNT_PROGRAMS: (count: number) => `${count} программ`,
   DISPUTES_PAGE_TITLE: "Споры по рассрочке",
   DISPUTES_PAGE_LOADING: "Загрузка споров…",
   DISPUTES_PAGE_EMPTY: "Нет открытых споров.",
+  COUNT_DISPUTES: (count: number) => `${count} споров`,
+  DISPUTE_CONTRACT_LABEL: "Контракт",
+  DISPUTE_REASON_LABEL: "Причина",
   DISPUTE_REASON: "Причина",
-  DISPUTE_ACTION_CLOSE: "Закрыть спор",
+  DISPUTE_RESOLVE_NOTE: "Комментарий staff",
+  DISPUTE_PARTIAL_AMOUNT: "Сумма возврата, ₽",
+  DISPUTE_ACTION_CLOSE: "Закрыть договор",
   DISPUTE_ACTION_CANCEL: "Отменить договор",
-  DISPUTE_ACTION_ADJUST: "Скорректировать график",
+  DISPUTE_ACTION_ADJUST: "Сдвинуть график",
   DISPUTE_ACTION_REFUND: "Частичный возврат",
   SELLER_LABEL: "Продавец",
   BUYER_LABEL: "Покупатель",
@@ -506,8 +545,22 @@ export const INSTALLMENT_UI = {
   MARK_PAID: "Я оплатил",
   CONFIRM_PAYMENT: "Подтвердить оплату",
   REJECT_PAYMENT: "Отклонить оплату",
+  REJECT_EARLY_PAYOFF: "Отклонить досрочное погашение",
+  EARLY_PAYOFF: "Досрочное погашение",
+  CANCEL_EARLY_PAYOFF: "Отклонить досрочное погашение",
+  CONFIRM_EARLY_PAYOFF: "Подтвердить досрочное погашение",
+  OPEN_DISPUTE: "Открыть спор",
+  DISPUTE_REASON_PLACEHOLDER: "Причина спора…",
   ACTION_PENDING: "Сохраняем…",
+  OVERDUE_BADGE: "Просрочка",
+  CONTRACT_DAYS_LEFT: (days: number) => `Дней до конца: ${days}`,
+  PAYMENTS_FOCUS_HEADING: "Сейчас",
+  PAYMENTS_UPCOMING_SUMMARY: (count: number) => `Запланировано · ${count}`,
+  PAYMENTS_HISTORY_SUMMARY: (count: number) => `Оплачено · ${count}`,
+  PAYMENT_DUE: "Срок",
   PAYMENTS_PAGE_TITLE: "Мои рассрочки",
+  COUNT_CONTRACTS: (count: number) => `${count} договоров`,
+  CONTRACT_STATUS_FILTER_LABEL: "Статус",
   PAYMENTS_PAGE_LOADING: "Загрузка рассрочек…",
   PAYMENTS_PAGE_EMPTY: "У вас пока нет рассрочек.",
   PAYMENTS_PAGE_EMPTY_BY_FILTER: "По выбранному статусу рассрочек нет.",
@@ -569,14 +622,17 @@ export const ORDER_CARD_UI = {
   ADDRESS_LABEL: "Адрес доставки",
   PAYMENT_LABEL: "Оплата",
   CREATED_LABEL: "Создан",
+  BUYER_LABEL: "Покупатель",
   ITEM_STATUS_LABEL: "Статус позиции",
   ITEM_DELIVERED_AT_LABEL: "Доставлен",
   ITEM_CONFIRMED_AT_LABEL: "Подтверждён",
+  DETAILS_FOLD_SUMMARY: "Подробности заказа",
   ACTION_CONFIRM: "Подтвердить получение",
   ACTION_CANCEL: "Отменить",
   ACTION_SHIPPED: "Отправлен",
   ACTION_DELIVERED: "Доставлен",
   ACTION_PENDING: "Сохраняем…",
+  CANCEL_CONFIRM: "Отменить заказ покупателя?",
   BUYER_CANCEL_CONFIRM: "Отменить заказ?",
   SELLER_CANCEL_CONFIRM: "Отменить заказ покупателя?",
   DELETED_PRODUCT_NAME: "Товар удалён",
@@ -600,13 +656,15 @@ export const PRODUCT_REPORT_UI = {
 export const PRODUCT_REPORT_TEXT_MAX_CHARS = 1000;
 
 export const MY_ORDERS_PAGE_UI = {
-  TITLE: "Мои заказы",
+  TITLE: "Мои покупки",
   COUNT: (count: number) => `${count} заказов`,
+  STATUS_FILTER_LABEL: "Фильтр по статусу",
   STATUS_FILTER_ALL: "Все статусы",
-  LOADING: "Загрузка заказов…",
-  EMPTY: "У вас пока нет заказов",
-  EMPTY_BY_FILTER: "По выбранному статусу заказов нет",
-  AUTH_REQUIRED: "Войдите, чтобы видеть заказы",
+  LOADING: "Загрузка покупок…",
+  PRODUCT_DETAILS_LOADING: "Открываем карточку товара…",
+  EMPTY: "У вас пока нет покупок.",
+  EMPTY_BY_FILTER: "По выбранному статусу покупок нет.",
+  AUTH_REQUIRED: "Войдите, чтобы видеть покупки",
   LOYALTY_POINTS_EARNED: (points: number) => `+${points} баллов лояльности`,
 } as const;
 
@@ -671,6 +729,7 @@ export const MY_PROFILE_PAGE_UI = {
   TAB_POPULAR_PRODUCTS_ADMIN: "Популярные товары",
   TAB_CATEGORY_TREE_ADMIN: "Категории",
   TAB_APP_INTRO_ADMIN: "Intro-ролик",
+  TAB_SITE_HEADER_BANNER_ADMIN: "Баннер шапки",
   TAB_PRODUCT_MODERATION: "На модерации",
   TAB_INTRO_AD_MODERATION: "Intro-реклама",
   TAB_SELLER_PERSONAL_CATEGORY_MODERATION: "Личные категории",
@@ -880,7 +939,7 @@ export const WISHLIST_TOGGLE_UI = {
 
 export const SUBSCRIPTIONS_PAGE_UI = {
   LOADING: "Загрузка подписок…",
-  EMPTY: "Вы ни на кого не подписаны. Найдите продавцов в каталоге.",
+  EMPTY: "Вы ни на кого не подписаны. Найдите продавцов в разделе «Пользователи».",
   FETCH_FALLBACK: "Не удалось загрузить подписки",
   LOGIN_HINT: "Войдите, чтобы видеть список подписок.",
   LOGIN_BUTTON: "Войти",
@@ -930,23 +989,42 @@ export const PRODUCT_CATEGORY_DISPLAY_UI = {
 export const MY_PRODUCTS_PAGE_UI = {
   LOADING: "Загрузка товаров…",
   EMPTY: "У вас пока нет товаров в каталоге.",
+  EMPTY_BY_FILTER: "По выбранному фильтру товаров нет.",
   FETCH_FALLBACK: "Не удалось загрузить ваши товары",
   LOGIN_HINT: "Войдите, чтобы видеть свои товары.",
   LOGIN_BUTTON: "Войти",
   CREATE_BUTTON: "Разместить товар",
-  EDIT_BUTTON: "Редактировать",
+  SORT_LABEL: "Сортировка",
+  MODERATION_STATUS_FILTER_LABEL: "Статус",
+  QUOTA_LABEL: "Товаров",
   /** @param {number} count */
   COUNT: (count: number) => `${count} товаров`,
 } as const;
 
+export const SELLER_PRODUCTS_LIMIT_MODAL_UI = {
+  TITLE: "Лимит товаров",
+  BODY_REGULAR: (limit: number, premiumLimit: number) =>
+    `Достигнут лимит размещения товаров (${limit}). Увеличить лимит до ${premiumLimit} можно, оформив премиум.`,
+  BODY_PREMIUM: (limit: number) =>
+    `Достигнут максимальный лимит премиум (${limit} товаров). Чтобы разместить новый товар, удалите один из существующих.`,
+  CLOSE: "Понятно",
+} as const;
+
 export const MY_SALES_PAGE_UI = {
+  TITLE: "Мои продажи",
+  COUNT: (count: number) => `${count} заказов`,
+  TOTAL_SALES_COUNT: (count: number) => `Продаж: ${count}`,
   LOADING: "Загрузка продаж…",
   EMPTY: "У вас пока нет продаж.",
   EMPTY_BY_FILTER: "По выбранному статусу продаж нет.",
+  EMPTY_BY_SEARCH: "По вашему запросу покупатель не найден.",
   FETCH_FALLBACK: "Не удалось загрузить продажи",
   LOGIN_HINT: "Войдите, чтобы видеть продажи.",
   LOGIN_BUTTON: "Войти",
+  STATUS_FILTER_LABEL: "Фильтр по статусу",
   STATUS_FILTER_ALL: "Все статусы",
+  SEARCH_LABEL: "Поиск покупателя",
+  SEARCH_PLACEHOLDER: "Имя, email или телефон покупателя…",
   SEARCH_DEBOUNCE_MS: 350,
 } as const;
 
@@ -983,7 +1061,7 @@ export const CREATE_PRODUCT_UI = {
 export const ADVERTISING_PAGE_UI = {
   PAGE_TITLE: "Реклама",
   PAGE_LEAD:
-    "Продвигайте магазин через intro-ролик и личную плитку в каталоге. Оплата баллами лояльности.",
+    "Продвигайте магазин через intro-ролик при входе и личную плитку в каталоге. Оплата баллами лояльности.",
   BALANCE_LABEL: "Баланс",
   /** @param {number} balance */
   BALANCE: (balance: number) => `${balance} баллов`,
@@ -1006,6 +1084,10 @@ export const VIDEO_URL_FIELD_UI = {
 
 export const INTRO_AD_PAGE_UI = {
   CARD_TITLE: "Intro-ролик",
+  PAGE_ARIA: "Реклама в intro",
+  LOGIN_HINT: "Войдите, чтобы оформить рекламу в intro.",
+  LOGIN_BUTTON: "Войти",
+  LOADING: "Загрузка…",
   FETCH_FALLBACK: "Не удалось загрузить раздел рекламы",
   SUBMIT_FALLBACK: "Не удалось отправить заявку",
   SUBMIT_SUCCESS: "Заявка отправлена на модерацию",
@@ -1015,7 +1097,7 @@ export const INTRO_AD_PAGE_UI = {
   PRICE: (price: number) => `Стоимость: ${price} баллов`,
   DURATION: "Срок показа: 3 дня",
   DESCRIPTION:
-    "Ваш intro-ролик заменит заставку для новых посетителей. После модерации баллы списываются, показ ставится в очередь, если слот занят.",
+    "Ваш intro-ролик заменит заставку сайта для новых посетителей и при просмотре intro. После модерации баллы списываются, показ ставится в очередь, если слот занят.",
   /** @param {number} balance */
   BALANCE: (balance: number) => `Доступно: ${balance} баллов`,
   STATUS_PENDING: "На модерации. Баллы зарезервированы.",
@@ -1029,7 +1111,7 @@ export const INTRO_AD_PAGE_UI = {
   LABEL_MIN_MS: "Минимум показа, мс",
   LABEL_MAX_MS: "Максимум показа, мс",
   LABEL_FADE_MS: "Fade-out, мс",
-  TIMING_HINT: "По умолчанию как у платформенного intro.",
+  TIMING_HINT: "Необязательно — по умолчанию как у платформенного intro.",
   ERROR_FALLBACK_TITLE_REQUIRED: "Укажите заголовок заглушки",
   ERROR_FALLBACK_TITLE_TOO_LONG: "Заголовок заглушки слишком длинный",
   ERROR_FALLBACK_HINT_REQUIRED: "Укажите подзаголовок заглушки",
@@ -1044,7 +1126,7 @@ export const INTRO_AD_PAGE_UI = {
 export const SELLER_PERSONAL_CATEGORY_PAGE_UI = {
   SECTION_TITLE: "Личная категория",
   SECTION_LEAD:
-    "Отдельная плитка в каталоге с вашим названием и картинкой. После модерации баллы списываются.",
+    "Отдельная плитка в каталоге с вашим названием и картинкой. Все одобренные товары попадают и в глобальную категорию, и в личную. После модерации баллы списываются.",
   FETCH_FALLBACK: "Не удалось загрузить заявку на личную категорию",
   FETCH_TILES_FALLBACK: "Не удалось загрузить личные категории",
   TILES_SECTION_TITLE: "Магазины продавцов",
@@ -1105,7 +1187,45 @@ export const CREATE_RAFFLE_PAGE_UI = {
   ERROR_PRIZE_VIDEO: "Загрузите видео приза",
 } as const;
 
+export const CREATE_RAFFLE_MODAL_UI = {
+  ARIA_DIALOG: "Создание розыгрыша",
+  ARIA_DIALOG_EDIT: "Редактирование розыгрыша",
+  ARIA_CLOSE: "Закрыть",
+  TITLE: "Создать розыгрыш",
+  TITLE_EDIT: "Изменить розыгрыш",
+  LABEL_TITLE: "Название",
+  LABEL_DESCRIPTION: "Описание",
+  LABEL_PRIZE_MEDIA: "Медиа приза (фото или видео)",
+  LABEL_PRIZE_MEDIA_TYPE_IMAGE: "Фото",
+  LABEL_PRIZE_MEDIA_TYPE_VIDEO: "Видео",
+  LABEL_PRIZE_IMAGE: "Фото приза (ссылка или файл)",
+  LABEL_PRIZE_VIDEO: "Видео приза (ссылка или файл)",
+  PREVIEW_LABEL: "Превью",
+  LABEL_TARGET: "Цель продаж",
+  LABEL_INSTAGRAM: "Ссылка Instagram",
+  SUBMIT: "Отправить на модерацию",
+  SUBMIT_EDIT: "Сохранить",
+  SUBMIT_LOADING: "Отправляем…",
+  SUBMIT_EDIT_LOADING: "Сохраняем…",
+  HINT: "После одобрения staff включите участие на своих товарах в «Мои товары».",
+  HINT_EDIT_ACTIVE:
+    "Изменения цели продаж пересчитают прогресс для активного розыгрыша.",
+  HINT_TITLE: "Короткое название для баннера и карусели на главной. До 120 символов.",
+  HINT_DESCRIPTION:
+    "Условия, описание приза и другие детали для покупателей. Необязательно, до 4000 символов.",
+  HINT_PRIZE_MEDIA: "Выберите, чем показать приз в баннере розыгрыша — фото или видео.",
+  HINT_PRIZE_IMAGE:
+    "Загрузите файл или вставьте ссылку http/https либо путь /uploads/… с сервера.",
+  HINT_PRIZE_VIDEO:
+    "Прямая ссылка на MP4/WebM или видеофайл, загруженный на сервер.",
+  HINT_TARGET:
+    "Сколько подтверждённых продаж нужно для завершения розыгрыша. Целое число от 1 до 100 000.",
+  HINT_INSTAGRAM:
+    "Ссылка на ваш профиль Instagram — покупатели увидят её после завершения розыгрыша.",
+} as const;
+
 export const PREMIUM_PAGE_UI = {
+  PAGE_ARIA: "Премиум",
   LOGIN_HINT: "Войдите, чтобы оформить премиум.",
   LOGIN_BUTTON: "Войти",
   LOADING: "Загрузка…",
@@ -1121,6 +1241,7 @@ export const PREMIUM_PAGE_UI = {
     "Сторис и фон профиля по ссылке",
     "Рассрочка для продавца (нужны подтверждённые данные)",
     "Товары в фильтре «Только премиум»",
+    "Просмотр покупок других пользователей",
   ],
   BALANCE: (balance: number) => `Ваш баланс: ${balance} баллов`,
   ACTIVE: "Премиум уже активен. Продление будет доступно после окончания срока.",
@@ -1131,11 +1252,12 @@ export const PREMIUM_PAGE_UI = {
 } as const;
 
 export const LOYALTY_POINTS_PAGE_UI = {
+  PAGE_ARIA: "Баллы",
   LOGIN_HINT: "Войдите, чтобы посмотреть баллы.",
   LOGIN_BUTTON: "Войти",
   LOADING: "Загрузка…",
   FETCH_FALLBACK: "Не удалось загрузить баллы",
-  BALANCE_POINTS: (balance: number) => `Ваш баланс: ${balance} баллов`,
+  BALANCE_POINTS: (balance: number) => `Ваш баланс: ${balance} ${pluralizeRuBall(balance)}`,
   INFO: "1 балл = 1 ₽. Продавец задаёт бонус за покупку; премиум-покупатель получает баллы после подтверждения получения.",
   PURCHASE_SECTION: "Пополнение",
   PURCHASE_AMOUNT_LABEL: "Сумма, ₽",
@@ -1144,6 +1266,7 @@ export const LOYALTY_POINTS_PAGE_UI = {
   PURCHASE_AMOUNT_MIN: (min: number) => `Минимум ${min} ₽`,
   PURCHASE_AMOUNT_MAX: (max: number) => `Не больше ${max} ₽`,
   BUY: "Купить",
+  COMING_SOON: "Пополнение картой и по QR — скоро.",
   COMING_SOON_AMOUNT: (rub: number, points: number) =>
     `Пополнение на ${rub} ₽ (${points} баллов) картой и по QR — скоро.`,
   USES: [
@@ -1155,6 +1278,7 @@ export const LOYALTY_POINTS_PAGE_UI = {
 } as const;
 
 export const USER_DATA_CONFIRMATION_PROFILE_PAGE_UI = {
+  PAGE_ARIA: "Подтверждение данных",
   LOGIN_HINT: "Войдите, чтобы подать заявку на подтверждение.",
   LOGIN_BUTTON: "Войти",
   LOADING: "Загрузка…",
@@ -1168,6 +1292,7 @@ export const USER_DATA_CONFIRMATION_PROFILE_PAGE_UI = {
     "Покупка в рассрочку",
     "Создание розыгрыша (для продавца)",
     "Товары в фильтре «Подтверждённые продавцы»",
+    "Бейдж подтверждения у имени в каталоге",
   ],
   PLAN_NOTE:
     "Не заменяет премиум: баллы за покупки, 30 товаров и золотая обводка — отдельно.",
@@ -1206,34 +1331,64 @@ export const DATA_CONFIRMATION_MODAL_UI = {
 } as const;
 
 export const PRODUCT_MODERATION_PAGE_UI = {
+  TITLE: "На модерации",
   LOADING: "Загрузка очереди…",
   EMPTY: "Нет товаров, ожидающих проверки.",
+  BADGE_PENDING: "На проверке",
+  BADGE_APPROVED: "Одобрен",
+  BADGE_REJECTED: "Отклонён",
+  REJECT_COMMENT_LABEL: "Комментарий для продавца (необязательно)",
   REJECT_COMMENT_PLACEHOLDER: "Причина отклонения…",
   APPROVE: "Одобрить",
   REJECT: "Отклонить",
   ACTION_PENDING: "Сохраняем…",
   SELLER_LABEL: "Продавец",
+  CREATED_LABEL: "Создан",
+  REJECTION_COMMENT_PREFIX: "Комментарий модератора:",
+  PRODUCTS_LIST_ARIA: "Очередь товаров на модерации",
+  TAB_BADGE: (n: number) => (n > 99 ? "99+" : String(n)),
 } as const;
 
 export const INTRO_AD_MODERATION_PAGE_UI = {
+  TITLE: "Intro-реклама",
   LOADING: "Загрузка очереди…",
   EMPTY: "Нет заявок на intro-рекламу.",
   APPROVE: "Одобрить",
   REJECT: "Отклонить",
+  REJECT_REASON_LABEL: "Причина отклонения (необязательно)",
   REJECT_REASON_PLACEHOLDER: "Комментарий для рекламодателя…",
   ACTION_PENDING: "Сохраняем…",
   ADVERTISER_LABEL: "Рекламодатель",
+  SUBMITTED_LABEL: "Отправлено",
+  PREVIEW: "Предпросмотр",
   FETCH_FALLBACK: "Не удалось загрузить очередь intro-рекламы",
+  APPROVE_SUCCESS: "Заявка одобрена",
+  APPROVE_FALLBACK: "Не удалось одобрить заявку",
+  REJECT_SUCCESS: "Заявка отклонена",
+  REJECT_FALLBACK: "Не удалось отклонить заявку",
+  PENDING_TITLE: "На модерации",
+  MANAGED_TITLE: "Активные и в очереди",
+  STATUS_LABEL: "Статус",
+  STATUS_ACTIVE: "Показ активен",
+  STATUS_QUEUED: "В очереди",
+  STAFF_CANCEL: "Снять кампанию",
+  STAFF_CANCEL_SUCCESS: "Кампания снята",
+  STAFF_CANCEL_FALLBACK: "Не удалось снять кампанию",
+  MANAGED_FETCH_FALLBACK: "Не удалось загрузить активные кампании",
 } as const;
 
 export const SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI = {
+  TITLE: "Личные категории",
   LOADING: "Загрузка очереди…",
   EMPTY: "Нет заявок на личные категории.",
   SELLER_LABEL: "Продавец",
   REJECT_REASON_PLACEHOLDER: "Комментарий для продавца…",
   APPROVE: "Одобрить",
   REJECT: "Отклонить",
+  ACTION_PENDING: "Сохраняем…",
   FETCH_FALLBACK: "Не удалось загрузить очередь личных категорий",
+  APPROVE_FALLBACK: "Не удалось одобрить заявку",
+  REJECT_FALLBACK: "Не удалось отклонить заявку",
 } as const;
 
 export const PRODUCT_REPORTS_PAGE_UI = {
@@ -1247,20 +1402,27 @@ export const PRODUCT_REPORTS_PAGE_UI = {
   SECTION_PRODUCTS: "Товары",
   SECTION_STORIES: "Сторисы",
   REPORTS_COUNT_LABEL: (count: number) => `Жалоб: ${count}`,
+  REPORT_ITEM_META: (userName: string, dateText: string) => `${userName} · ${dateText}`,
+  STAFF_NOTE_LABEL: "Комментарий staff",
   STAFF_NOTE_PLACEHOLDER: "Обязательный комментарий…",
   ACTION_DISMISS: "Отклонить жалобы",
   ACTION_HIDE: "Скрыть товар",
   ACTION_REJECT: "Отклонить товар",
   ACTION_PENDING: "Сохраняем…",
   OPEN_PRODUCT: "Открыть товар",
-  OPEN_AUTHOR: "Автор",
+  OPEN_SELLER: "Продавец",
+  OPEN_REPORTER: "Жалобщик",
 } as const;
 
 export const DATA_CONFIRMATION_PAGE_UI = {
   LOADING: "Загрузка заявок…",
   EMPTY: "Нет заявок на рассмотрении.",
   SUBMITTED_LABEL: "Подана",
+  OPEN_APPLICANT: "Профиль заявителя",
   PASSPORT_SECTION: "Паспортные данные",
+  PASSPORT_SELFIE_SECTION: "Фото с паспортом в руках",
+  PASSPORT_SELFIE_MISSING: "Фото не приложено",
+  PASSPORT_SELFIE_OPEN: "Открыть фото в полном размере",
   STAFF_NOTE_LABEL: "Комментарий при отклонении",
   STAFF_NOTE_PLACEHOLDER: "Не меньше 3 слов…",
   STAFF_NOTE_MIN_WORDS: 3,
@@ -1270,11 +1432,15 @@ export const DATA_CONFIRMATION_PAGE_UI = {
 } as const;
 
 export const RAFFLES_STAFF_PAGE_UI = {
+  TITLE: "Розыгрыши",
+  QUEUE_TITLE: "Заявки на модерацию",
   LOADING: "Загрузка…",
   EMPTY: "Нет заявок на розыгрыш.",
   APPROVE: "Одобрить",
   REJECT: "Отклонить",
-  ACTION_PENDING: "Сохраняем…",
+  EDIT: "Изменить",
+  DELETE: "Удалить",
+  PENDING: "Сохраняем…",
   ROW_SELLER: "Продавец",
   ROW_TARGET: "Цель",
 } as const;
@@ -1296,12 +1462,33 @@ export const PRODUCT_PROMOTIONS_STAFF_PAGE_UI = {
 } as const;
 
 export const ADMIN_ORDERS_PAGE_UI = {
+  TITLE: "Все заказы",
+  COUNT: (count: number) => `${count} заказов`,
   LOADING: "Загрузка заказов…",
-  EMPTY: "Заказов нет.",
+  EMPTY: "Заказов пока нет.",
+  EMPTY_BY_FILTER: "По выбранному статусу заказов нет.",
+  STATUS_FILTER_LABEL: "Фильтр по статусу",
+  STATUS_FILTER_ALL: "Все статусы",
+  STATUS_CHANGE_LABEL: "Сменить статус",
+  STATUS_CHANGE_PENDING: "Сохраняем…",
   FETCH_FALLBACK: "Не удалось загрузить заказы",
+  PAGE_LIMIT: 20,
+} as const;
+
+export const ADMIN_PANEL_UI = {
+  LOADING: "Загрузка…",
+  REFRESH: "Обновить",
+  SHOW_CREATE: "+ Добавить",
+  HIDE_CREATE: "Скрыть форму",
+  SEARCH_CLEAR: "Очистить поиск",
+  SEARCH_PENDING: "Поиск…",
+  COUNT: (count: number) => `${count} записей`,
+  COUNT_FILTERED: (shown: number, total: number) => `${shown} из ${total}`,
 } as const;
 
 export const SEARCH_SYNONYMS_ADMIN_PAGE_UI = {
+  TITLE: "Синонимы поиска",
+  HINT: "Токен в запросе расширяет выдачу по legacy-категориям. Изменения в каталоге — сразу после сохранения.",
   LOADING: "Загрузка…",
   EMPTY: "Синонимов нет",
   EMPTY_FILTER: "Ничего не найдено",
@@ -1311,22 +1498,21 @@ export const SEARCH_SYNONYMS_ADMIN_PAGE_UI = {
   SEARCH_PLACEHOLDER: "Токен или категория…",
   CREATE_HEADING: "Новый синоним",
   LABEL_TOKEN: "Токен запроса",
+  LABEL_CATEGORIES: "Категории",
   CATEGORIES_HINT: "Выберите одну или несколько",
   CREATE_BUTTON: "Добавить",
   EDIT_BUTTON: "Изменить",
   SAVE_BUTTON: "Сохранить",
   CANCEL_BUTTON: "Отмена",
-  DELETE: "Удалить",
-  DELETE_PENDING: "Удаляем…",
+  DELETE_BUTTON: "Удалить",
   DELETE_CONFIRM: "Удалить синоним?",
-  TOKEN_LABEL: "Синоним",
-  CATEGORIES_LABEL: "Категории",
-  ADD_CREATE: "+ Новый",
 } as const;
 
 export const CATEGORY_TREE_ADMIN_PAGE_UI = {
+  TITLE: "Дерево категорий",
+  HINT: "Корневые категории — плитки на главной каталога. Подкатегории — визард при размещении товара.",
   LOADING: "Загрузка…",
-  EMPTY: "Категорий нет",
+  EMPTY: "Категорий нет — миграция дерева или новый узел",
   EMPTY_FILTER: "Ничего не найдено",
   LOAD_ERROR: "Не удалось загрузить категории",
   SAVE_ERROR: "Не удалось сохранить",
@@ -1334,13 +1520,13 @@ export const CATEGORY_TREE_ADMIN_PAGE_UI = {
   SEARCH_PLACEHOLDER: "Название, slug, ключевые слова…",
   CREATE_HEADING: "Новая категория",
   LABEL_SLUG: "Slug",
-  SLUG_HINT: "a–z, 0–9, дефис",
-  SLUG_INVALID: "Slug: только латиница, цифры и дефис",
+  SLUG_HINT: "Только a–z, 0–9 и дефис. Пример: electronics-headphones. Не кириллица.",
+  SLUG_INVALID: "Slug: только латиница, цифры и дефис (минимум 2 символа)",
   LABEL_NAME: "Название (RU)",
   LABEL_PARENT: "Родитель",
   PARENT_ROOT: "Корень",
   LABEL_LEAF: "Конечная (лист)",
-  LABEL_KEYWORDS: "Ключевые слова",
+  LABEL_KEYWORDS: "Ключевые слова поиска",
   KEYWORDS_PLACEHOLDER: "телефон, смартфон",
   LABEL_LEGACY: "Legacy productCategory",
   LEGACY_NONE: "—",
@@ -1349,42 +1535,76 @@ export const CATEGORY_TREE_ADMIN_PAGE_UI = {
   SAVE_BUTTON: "Сохранить",
   CANCEL_BUTTON: "Отмена",
   DELETE_BUTTON: "Удалить",
-  DELETE_CONFIRM: "Удалить категорию?",
+  DELETE_CONFIRM: "Удалить категорию? Должны отсутствовать дочерние узлы и товары.",
   DELETE_REASSIGN_CONFIRM: (message: string, targetLabel: string) =>
     `${message}\n\nПереназначить товары на «${targetLabel}» и удалить?`,
   DELETE_DETACH_CONFIRM: (message: string, legacyLabel: string) =>
-    `${message}\n\nОтвязать товары (останется «${legacyLabel}») и удалить?`,
+    `${message}\n\nОтвязать товары от подкатегории (останется «${legacyLabel}») и удалить?`,
   LEAF_BADGE: "Лист",
   BRANCH_BADGE: "Ветка",
-  ADD_CREATE: "+ Новая",
 } as const;
 
 export const APP_INTRO_ADMIN_PAGE_UI = {
-  LOADING: "Загрузка…",
+  TITLE: "Intro-ролик",
+  HINT: "Заставка при первом заходе на сайт. Без своего видео используется файл /intro/intro.mp4 из репозитория.",
+  LOADING: "Загрузка настроек…",
   LOAD_ERROR: "Не удалось загрузить настройки intro",
   SAVE: "Сохранить",
-  SAVE_PENDING: "Сохраняем…",
+  SAVING: "Сохранение…",
   SAVE_SUCCESS: "Сохранено",
-  SAVE_ERROR: "Не удалось сохранить",
+  SAVE_ERROR: "Не удалось сохранить настройки intro",
   WATCH_AFTER_SAVE: "Посмотреть intro",
   PREVIEW: "Предпросмотр",
+  SECTION_MEDIA: "Видео и постер",
+  SECTION_FALLBACK: "Заглушка при ошибке видео",
   SECTION_TIMING: "Тайминги",
-  LABEL_VIDEO_MP4: "Видео MP4",
-  LABEL_VIDEO_WEBM: "Видео WebM",
+  SECTION_PRIORITY: "Приоритет показа",
+  LABEL_VIDEO: "Видео",
+  HINT_VIDEO:
+    "MP4, WebM, MOV или HEVC — сервер конвертирует в MP4. Пустое поле — дефолтный /intro/intro.mp4",
   LABEL_POSTER: "Постер",
   LABEL_FALLBACK_TITLE: "Заголовок заглушки",
   LABEL_FALLBACK_HINT: "Подзаголовок заглушки",
   LABEL_MIN_MS: "Минимум показа, мс",
   LABEL_MAX_MS: "Максимум показа, мс",
   LABEL_FADE_MS: "Fade-out, мс",
+  LABEL_PRIORITIZE_PLATFORM_INTRO: "Показывать intro платформы вместо рекламы",
+  HINT_PRIORITIZE_PLATFORM_INTRO:
+    "Если включено — платформенный intro имеет приоритет, оплаченные кампании ставятся на паузу.",
   ERROR_FALLBACK_TITLE_REQUIRED: "Укажите заголовок заглушки",
-  ERROR_FALLBACK_TITLE_TOO_LONG: "Заголовок слишком длинный",
+  ERROR_FALLBACK_TITLE_TOO_LONG: "Заголовок заглушки слишком длинный",
   ERROR_FALLBACK_HINT_REQUIRED: "Укажите подзаголовок заглушки",
-  ERROR_FALLBACK_HINT_TOO_LONG: "Подзаголовок слишком длинный",
-  ERROR_MIN_MS: "Минимум показа вне диапазона",
-  ERROR_MAX_MS: "Максимум показа вне диапазона",
+  ERROR_FALLBACK_HINT_TOO_LONG: "Подзаголовок заглушки слишком длинный",
+  ERROR_MIN_MS: "Минимум показа вне допустимого диапазона",
+  ERROR_MAX_MS: "Максимум показа вне допустимого диапазона",
   ERROR_MAX_LT_MIN: "Максимум не может быть меньше минимума",
-  ERROR_FADE_MS: "Fade-out вне диапазона",
+  ERROR_FADE_MS: "Fade-out вне допустимого диапазона",
+} as const;
+
+export const SITE_HEADER_BANNER_ADMIN_PAGE_UI = {
+  TITLE: "Баннер шапки",
+  HINT: "Карусель под строкой поиска на главном каталоге. Только изображение и alt-текст.",
+  LOADING: "Загрузка настроек…",
+  LOAD_ERROR: "Не удалось загрузить настройки баннера",
+  SAVE_ERROR: "Не удалось сохранить настройки баннера",
+  SAVE_SUCCESS: "Сохранено",
+  SAVE: "Сохранить",
+  SAVING: "Сохранение…",
+  SECTION_GLOBAL: "Общие настройки",
+  SECTION_ITEMS: "Слайды",
+  LABEL_ENABLED: "Показывать баннеры на главной",
+  LABEL_ITEM_ENABLED: "Слайд включён",
+  LABEL_IMAGE: "Изображение",
+  HINT_IMAGE: "Рекомендуемая высота ~120px, ширина на всю шапку",
+  LABEL_IMAGE_ALT: "Alt-текст",
+  LABEL_LINK_PATH: "Внутренний путь",
+  LINK_PATH_PLACEHOLDER: "/product/…",
+  HINT_LINK_PATH: "Путь внутри сайта, начинается с /. Пусто — без перехода.",
+  LABEL_BACKGROUND_COLOR: "Цвет фона",
+  ADD_ITEM: "Добавить слайд",
+  REMOVE_ITEM: "Удалить слайд",
+  EMPTY_ITEMS: "Слайдов пока нет.",
+  ITEM_TITLE: (index: number) => `Слайд ${index}`,
 } as const;
 
 export const THEME_SETTINGS_UI = {
@@ -1395,12 +1615,16 @@ export const THEME_SETTINGS_UI = {
 } as const;
 
 export const POPULAR_PRODUCTS_ADMIN_PAGE_UI = {
+  TITLE: "Популярные товары",
+  HINT: "Списки с заголовком и productId. На главной — только одобренные и доступные товары; недоступные удаляются автоматически.",
+  SEARCH_PLACEHOLDER: "Заголовок или productId…",
   LOADING: "Загрузка…",
   EMPTY: "Списков нет — создайте первый",
   LOAD_ERROR: "Не удалось загрузить списки",
   CREATE_ERROR: "Не удалось создать список",
   SAVE_ERROR: "Не удалось сохранить заголовок",
   DELETE_ERROR: "Не удалось удалить список",
+  REORDER_ERROR: "Не удалось изменить порядок",
   ADD_ITEM_ERROR: "Не удалось добавить товар",
   REMOVE_ITEM_ERROR: "Не удалось удалить товар",
   CREATE_HEADING: "Новый список",
@@ -1409,15 +1633,14 @@ export const POPULAR_PRODUCTS_ADMIN_PAGE_UI = {
   CREATE_LIST: "Создать список",
   SAVE_TITLE: "Сохранить заголовок",
   PRODUCT_ID_LABEL: "productId",
-  PRODUCT_ID_PLACEHOLDER: "MongoDB ObjectId",
+  PRODUCT_ID_PLACEHOLDER: "MongoDB ObjectId товара",
   PRODUCT_ID_REQUIRED: "Укажите productId",
   ADD_PRODUCT: "Добавить товар",
   REMOVE_PRODUCT: "Удалить",
   DELETE_LIST: "Удалить список",
   DELETE_LIST_CONFIRM: "Удалить список и все товары в нём?",
+  CANCEL_BUTTON: "Отмена",
   EMPTY_LIST: "В списке пока нет товаров",
-  MOVE_UP: "↑",
-  MOVE_DOWN: "↓",
-  ADD_CREATE: "+ Новый",
-  ITEMS_COUNT: (count: number) => `${count} товаров`,
+  MOVE_UP_ARIA: "Поднять список",
+  MOVE_DOWN_ARIA: "Опустить список",
 } as const;

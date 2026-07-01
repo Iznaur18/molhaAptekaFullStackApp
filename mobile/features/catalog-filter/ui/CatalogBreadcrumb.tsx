@@ -15,12 +15,14 @@ export const CatalogBreadcrumb = ({ label }: CatalogBreadcrumbProps) => {
   }
 
   return (
-    <View
-      style={styles.toolbar}
-      accessibilityRole="text"
-      accessibilityLabel={`${HOME_PAGE_UI.BREADCRUMB_CATALOG}: ${label}`}
-    >
-      <Text style={styles.current}>{label}</Text>
+    <View style={styles.toolbar}>
+      <Text
+        style={styles.title}
+        accessibilityRole="header"
+        accessibilityLabel={`${HOME_PAGE_UI.BREADCRUMB_CATALOG}: ${label}`}
+      >
+        {label}
+      </Text>
     </View>
   );
 };

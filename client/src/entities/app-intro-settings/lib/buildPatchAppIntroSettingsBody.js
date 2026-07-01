@@ -10,7 +10,7 @@ export function buildPatchAppIntroSettingsBody(form) {
 
   return {
     videoMp4Url: trimOrNull(form.videoMp4Url),
-    videoWebmUrl: trimOrNull(form.videoWebmUrl),
+    videoWebmUrl: null,
     posterUrl: trimOrNull(form.posterUrl),
     fallbackTitle: String(form.fallbackTitle ?? "").trim(),
     fallbackHint: String(form.fallbackHint ?? "").trim(),

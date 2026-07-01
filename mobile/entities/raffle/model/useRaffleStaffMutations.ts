@@ -1,10 +1,13 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 import {
   approveRaffle,
+  deleteRaffleByStaff,
   fetchStaffRafflesQueue,
   rejectRaffle,
 } from "@/entities/raffle/api/raffleStaffApi";
+import { patchRaffleByStaff } from "@/entities/raffle/api/patchRaffleByStaff";
+import type { CreateRaffleBody } from "@/entities/raffle/api/createRaffle";
 import { raffleQueryKeys } from "@/shared/api";
 
 export const useStaffRafflesQueueQuery = (enabled = true) =>
@@ -15,20 +18,22 @@ export const useStaffRafflesQueueQuery = (enabled = true) =>
   });
 
 export const useRaffleStaffMutations = () => {
-  const queryClient = useQueryClient();
-  const invalidate = () => {
-    void queryClient.invalidateQueries({ queryKey: raffleQueryKeys.all });
-  };
-
   const approveMutation = useMutation({
     mutationFn: (raffleId: string) => approveRaffle(raffleId),
-    onSuccess: invalidate,
   });
 
   const rejectMutation = useMutation({
     mutationFn: (raffleId: string) => rejectRaffle(raffleId),
-    onSuccess: invalidate,
   });
 
-  return { approveMutation, rejectMutation };
+  const deleteStaffMutation = useMutation({
+    mutationFn: (raffleId: string) => deleteRaffleByStaff(raffleId),
+  });
+
+  const patchStaffMutation = useMutation({
+    mutationFn: ({ raffleId, body }: { raffleId: string; body: Partial<CreateRaffleBody> }) =>
+      patchRaffleByStaff(raffleId, body),
+  });
+
+  return { approveMutation, rejectMutation, deleteStaffMutation, patchStaffMutation };
 };

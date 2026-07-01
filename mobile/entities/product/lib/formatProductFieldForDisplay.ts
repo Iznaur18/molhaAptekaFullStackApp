@@ -2,6 +2,7 @@ import { PRODUCT_DETAILS_MODAL_UI } from "@/shared/config";
 import { formatIsoDateTime } from "@/shared/lib";
 import { formatPriceRub } from "@/shared/lib";
 
+import { getProductSellerDisplayName } from "./getProductSellerDisplayName";
 import { PRODUCT_CATEGORY_LABEL_RU } from "./productCategoryLabels";
 
 const EM_DASH = "—";
@@ -17,6 +18,8 @@ export const formatProductFieldForDisplay = (
       return raw == null || raw === "" ? EM_DASH : String(raw);
     case "productPrice":
       return typeof raw === "number" ? formatPriceRub(raw) : EM_DASH;
+    case "productSeller":
+      return getProductSellerDisplayName(product) || EM_DASH;
     case "productCategory": {
       const slug = raw == null ? "" : String(raw);
       return PRODUCT_CATEGORY_LABEL_RU[slug] ?? (slug || EM_DASH);

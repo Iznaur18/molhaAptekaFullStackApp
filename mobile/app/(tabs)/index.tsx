@@ -25,6 +25,7 @@ import {
 import { useResetHomeCatalogFilters } from "@/features/home-feed/model/useResetHomeCatalogFilters";
 import { HomeFeedHeader } from "@/features/home-feed/ui/HomeFeedHeader";
 import { HomeCatalogSearchRow } from "@/features/home-feed/ui/HomeCatalogSearchRow";
+import { HomeCatalogSiteHeaderBannerRow } from "@/features/home-feed/ui/HomeCatalogSiteHeaderBannerRow";
 import {
   API_CLIENT_UI,
   CATALOG_SEARCH_DEBOUNCE_MS,
@@ -223,6 +224,7 @@ export default function CatalogScreen() {
 
   const listHeader = (
     <View>
+      {showHomeFeed ? <HomeCatalogSiteHeaderBannerRow visible={showHomeFeed} /> : null}
       {!showHomeFeed ? <CatalogBreadcrumb label={catalogBreadcrumbLabel} /> : null}
       {showHomeFeed ? (
         <HomeFeedHeader

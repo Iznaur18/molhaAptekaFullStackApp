@@ -183,16 +183,40 @@ test("mobile installment tab matches web buyer hint and docked submit", () => {
   const tab = readFile(MOBILE_ROOT, "features/product-detail/ui/ProductInstallmentTab.tsx");
   const screen = readFile(MOBILE_ROOT, "app/product/[id].tsx");
   const styles = readFile(MOBILE_ROOT, "shared/theme/catalogProductStyles.ts");
-  const webCss = readFile(
-    CLIENT_ROOT,
-    "src/entities/installment/ui/InstallmentBuyerBlockMobile.css",
-  );
+  const webCss = readFile(CLIENT_ROOT, "src/entities/installment/ui/InstallmentBuyerBlock.css");
 
   assert.match(webCss, /installment-buyer-block__hint/);
+  assert.match(webCss, /--iz-color-action-soft/);
+  assert.match(webCss, /--iz-color-info-navy/);
+  assert.match(styles, /installmentBuyerHint/);
+  assert.match(styles, /actionSoft/);
+  assert.match(styles, /infoNavy/);
   assert.match(tab, /installmentBuyerHint/);
   assert.match(tab, /INSTALLMENT_UI\.BUYER_HINT/);
   assert.match(tab, /onDockFooterChange/);
   assert.match(screen, /installmentDock/);
   assert.match(screen, /showInstallmentDock/);
   assert.match(styles, /installmentDock:/);
+});
+
+test("mobile auction tab matches web price-offer layout and docked submit", () => {
+  const tab = readFile(MOBILE_ROOT, "features/product-detail/ui/ProductAuctionTab.tsx");
+  const topList = readFile(MOBILE_ROOT, "features/product-detail/ui/ProductPriceOfferTopList.tsx");
+  const screen = readFile(MOBILE_ROOT, "app/product/[id].tsx");
+  const styles = readFile(MOBILE_ROOT, "shared/theme/catalogProductStyles.ts");
+  const webCss = readFile(CLIENT_ROOT, "src/entities/product-price-offer/ui/ProductPriceOffer.css");
+
+  assert.match(webCss, /product-price-offer__top-item/);
+  assert.match(webCss, /product-price-offer__status--pending/);
+  assert.match(styles, /useProductPriceOfferStyles/);
+  assert.match(styles, /topItem:/);
+  assert.match(styles, /statusPending:/);
+  assert.match(tab, /SECTION_TOP_TITLE/);
+  assert.match(tab, /useProductPriceOfferStyles/);
+  assert.match(tab, /onDockFooterChange/);
+  assert.match(topList, /UserPremiumDisplayName/);
+  assert.match(topList, /topRank/);
+  assert.match(screen, /auctionDock/);
+  assert.match(screen, /showAuctionDock/);
+  assert.doesNotMatch(tab, /Текущая цена/);
 });

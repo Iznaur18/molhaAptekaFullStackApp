@@ -2,11 +2,33 @@ import { apiClient } from "@/shared/api";
 import { API_CLIENT_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 
+export type InstallmentModerationSeller = {
+  _id: string;
+  userName?: string | null;
+  email?: string | null;
+};
+
+export type InstallmentModerationBuyer = InstallmentModerationSeller;
+
+export type PendingInstallmentPlan = {
+  _id?: string;
+  title?: string;
+  monthsCount?: number;
+  monthlyAmountRub?: number;
+};
+
 export type PendingInstallmentProgram = {
   productId: string;
+  sellerId?: string;
   productName?: string | null;
   moderationStatus?: string;
-  plans?: Array<{ title?: string; monthsCount?: number; monthlyAmountRub?: number }>;
+  seller?: InstallmentModerationSeller | null;
+  buyers?: InstallmentModerationBuyer[];
+  plans: PendingInstallmentPlan[];
+};
+
+export type PendingInstallmentModerationQueue = {
+  programs: PendingInstallmentProgram[];
 };
 
 export type InstallmentDispute = {
@@ -16,15 +38,18 @@ export type InstallmentDispute = {
   status?: string;
   createdAt?: string;
   openedByUserId?: string;
+  productName?: string | null;
+  seller?: InstallmentModerationSeller | null;
+  buyer?: InstallmentModerationBuyer | null;
 };
 
-export const fetchPendingInstallmentModeration = async () => {
+export const fetchPendingInstallmentModeration = async (): Promise<PendingInstallmentModerationQueue> => {
   try {
     const { data } = await apiClient.get("/product/installment/moderation/pending");
     if (!data?.success || !Array.isArray(data.data?.programs)) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
-    return data.data.programs as PendingInstallmentProgram[];
+    return { programs: data.data.programs as PendingInstallmentProgram[] };
   } catch (error) {
     throw new Error(formatApiErrorMessage(error, "Не удалось загрузить очередь рассрочки"));
   }

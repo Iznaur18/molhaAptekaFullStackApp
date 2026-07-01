@@ -13,7 +13,9 @@ export type ProductStatusBadgeVariant =
   | "auction"
   | "installment"
   | "raffle"
-  | "placeholder";
+  | "placeholder"
+  | "loyaltyOvercommit"
+  | "promotionActive";
 
 const baseText: TextStyle = {
   fontSize: BL.fontSize,
@@ -86,6 +88,15 @@ export const productStatusBadgeVariantStyles: Record<
       paddingVertical: BL.paddingVerticalCompact,
       fontWeight: "500",
     },
+  ),
+  loyaltyOvercommit: createBadge("rgba(220, 38, 38, 0.35)", "rgba(254, 226, 226, 0.95)", "#991b1b", {
+    fontWeight: "600",
+  }),
+  promotionActive: createBadge(
+    BC.promotionBoostBorder,
+    BC.promotionBoostBg,
+    BC.promotionBoostText,
+    { fontWeight: "600" },
   ),
 };
 

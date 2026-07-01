@@ -1,39 +1,54 @@
+import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import { useState } from "react";
-import { Alert, ScrollView, Text, View } from "react-native";
+import { useCallback, useState } from "react";
+import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 
-import { useMyDataConfirmationStatusQuery } from "@/entities/user-data-confirmation/model/useMyDataConfirmationStatusQuery";
-import { DataConfirmationRequestModal } from "@/features/data-confirmation-page/ui/DataConfirmationRequestModal";
-import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
-import { USER_DATA_CONFIRMATION_PROFILE_PAGE_UI } from "@/shared/config";
-import { formatApiErrorMessage } from "@/shared/lib";
 import {
-  useDataConfirmationPageStyles,
-  useFormFieldStyles,
-} from "@/shared/theme/formChromeStyles";
-import { AppButton } from "@/shared/ui/AppButton";
+  USER_DATA_CONFIRMATION_STATUS_PENDING,
+  USER_DATA_CONFIRMATION_STATUS_REJECTED,
+} from "@/entities/user-data-confirmation/model/constants";
+import { useMyDataConfirmationStatusQuery } from "@/entities/user-data-confirmation/model/useMyDataConfirmationStatusQuery";
+import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
+import { DataConfirmationRequestModal } from "@/features/data-confirmation-page/ui/DataConfirmationRequestModal";
+import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
+import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
+import { MY_PROFILE_PAGE_UI, USER_DATA_CONFIRMATION_PROFILE_PAGE_UI } from "@/shared/config";
+import { formatApiErrorMessage } from "@/shared/lib";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
+import { useDataConfirmationPageStyles } from "@/shared/theme/dataConfirmationPageStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
-
-const STATUS_PENDING = "pending";
-const STATUS_REJECTED = "rejected";
 
 export const DataConfirmationPage = () => {
   const router = useRouter();
-  const pageStyles = useDataConfirmationPageStyles();
-  const fieldStyles = useFormFieldStyles();
+  const styles = useDataConfirmationPageStyles();
+  const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
   const isAuthorized = useIsAuthorized();
   const statusQuery = useMyDataConfirmationStatusQuery(isAuthorized);
+  const [navSheetVisible, setNavSheetVisible] = useState(false);
   const [requestModalVisible, setRequestModalVisible] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (isAuthorized) {
+        void statusQuery.refetch();
+      }
+    }, [isAuthorized, statusQuery.refetch]),
+  );
+
+  const handleSubmitted = () => {
+    Alert.alert("", USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.SUBMIT_SUCCESS);
+    void statusQuery.refetch();
+  };
 
   if (!isAuthorized) {
     return (
-      <View style={pageStyles.centered}>
-        <Text style={pageStyles.hint}>{USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.LOGIN_HINT}</Text>
-        <AppButton
-          label={USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.LOGIN_BUTTON}
-          variant="contrast"
-          onPress={() => router.push("/(auth)/login")}
-        />
+      <View style={styles.centered}>
+        <Text style={styles.hint}>{USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.LOGIN_HINT}</Text>
+        <Pressable style={styles.loginButton} onPress={() => router.push("/(auth)/login")}>
+          <Text style={styles.loginButtonText}>
+            {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.LOGIN_BUTTON}
+          </Text>
+        </Pressable>
       </View>
     );
   }
@@ -58,61 +73,93 @@ export const DataConfirmationPage = () => {
   const isUserDataConfirmed = status?.isUserDataConfirmed === true;
   const requestStatus = status?.request?.status ?? null;
   const staffNote =
-    requestStatus === STATUS_REJECTED
+    requestStatus === USER_DATA_CONFIRMATION_STATUS_REJECTED
       ? String(status?.request?.staffNote ?? "").trim()
       : "";
   const canOpenRequest =
-    !isUserDataConfirmed && requestStatus !== STATUS_PENDING;
-
-  const handleSubmitted = () => {
-    Alert.alert("", USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.SUBMIT_SUCCESS);
-    void statusQuery.refetch();
-  };
+    !isUserDataConfirmed && requestStatus !== USER_DATA_CONFIRMATION_STATUS_PENDING;
 
   return (
     <>
-      <ScrollView contentContainerStyle={pageStyles.container}>
-        <Text style={pageStyles.title}>{USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.PLAN_TITLE}</Text>
-        <Text style={pageStyles.intro}>{USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.PLAN_INTRO}</Text>
-        {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.PLAN_BENEFITS.map((item) => (
-          <Text key={item} style={pageStyles.benefit}>
-            • {item}
-          </Text>
-        ))}
-        <Text style={pageStyles.note}>{USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.PLAN_NOTE}</Text>
-
-        {isUserDataConfirmed ? (
-          <Text style={[fieldStyles.statusOk, pageStyles.statusBlock]}>
-            {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.STATUS_CONFIRMED}
-          </Text>
-        ) : null}
-
-        {!isUserDataConfirmed && requestStatus === STATUS_PENDING ? (
-          <Text style={[fieldStyles.statusPending, pageStyles.statusBlock]}>
-            {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.STATUS_PENDING}
-          </Text>
-        ) : null}
-
-        {!isUserDataConfirmed && requestStatus === STATUS_REJECTED ? (
-          <Text style={[fieldStyles.statusRejected, pageStyles.statusBlock]}>
-            {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.STATUS_REJECTED(staffNote)}
-          </Text>
-        ) : null}
-
-        {canOpenRequest ? (
-          <AppButton
-            label={USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.OPEN_REQUEST}
-            variant="contrast"
-            onPress={() => setRequestModalVisible(true)}
-            style={pageStyles.actionSpacer}
+      <ScrollView
+        style={[styles.container, centeredContentStyle]}
+        contentContainerStyle={[
+          styles.scroll,
+          styles.content,
+          { paddingBottom: contentPaddingBottom },
+        ]}
+        accessibilityLabel={USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.PAGE_ARIA}
+      >
+        <View style={styles.header}>
+          <ProfileMobileSectionToggle
+            activeLabel={MY_PROFILE_PAGE_UI.TAB_DATA_CONFIRMATION}
+            onPress={() => setNavSheetVisible(true)}
           />
-        ) : null}
+
+          <View style={styles.plan}>
+            <Text style={styles.planTitle}>{USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.PLAN_TITLE}</Text>
+            <Text style={styles.planIntro}>{USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.PLAN_INTRO}</Text>
+            <View style={styles.benefits}>
+              {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.PLAN_BENEFITS.map((item) => (
+                <Text key={item} style={styles.benefit}>
+                  • {item}
+                </Text>
+              ))}
+            </View>
+            <Text style={styles.planNote}>{USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.PLAN_NOTE}</Text>
+          </View>
+
+          {isUserDataConfirmed ? (
+            <Text
+              style={[styles.status, styles.statusOk]}
+              accessibilityRole="text"
+            >
+              {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.STATUS_CONFIRMED}
+            </Text>
+          ) : null}
+
+          {!isUserDataConfirmed && requestStatus === USER_DATA_CONFIRMATION_STATUS_PENDING ? (
+            <Text
+              style={[styles.status, styles.statusPending]}
+              accessibilityRole="text"
+            >
+              {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.STATUS_PENDING}
+            </Text>
+          ) : null}
+
+          {!isUserDataConfirmed && requestStatus === USER_DATA_CONFIRMATION_STATUS_REJECTED ? (
+            <Text
+              style={[styles.status, styles.statusRejected]}
+              accessibilityRole="alert"
+            >
+              {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.STATUS_REJECTED(staffNote)}
+            </Text>
+          ) : null}
+
+          {canOpenRequest ? (
+            <Pressable
+              style={styles.submit}
+              onPress={() => setRequestModalVisible(true)}
+            >
+              <Text style={styles.submitText}>
+                {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.OPEN_REQUEST}
+              </Text>
+            </Pressable>
+          ) : null}
+        </View>
       </ScrollView>
 
       <DataConfirmationRequestModal
         visible={requestModalVisible}
         onClose={() => setRequestModalVisible(false)}
         onSubmitted={handleSubmitted}
+      />
+
+      <ProfileMobileNavSheet
+        visible={navSheetVisible}
+        activeSectionId="data-confirmation"
+        onClose={() => setNavSheetVisible(false)}
+        onOverviewPress={() => router.replace("/(tabs)/profile")}
       />
     </>
   );

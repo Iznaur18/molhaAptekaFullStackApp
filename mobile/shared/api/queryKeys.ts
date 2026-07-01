@@ -40,6 +40,7 @@ export const myProductsQueryKeys = {
   all: ["my-products"] as const,
   list: (params: Record<string, unknown> = {}) =>
     [...myProductsQueryKeys.all, "list", params] as const,
+  total: () => [...myProductsQueryKeys.all, "total"] as const,
 };
 
 export const introAdQueryKeys = {
@@ -47,6 +48,7 @@ export const introAdQueryKeys = {
   myCampaign: () => [...introAdQueryKeys.all, "me"] as const,
   moderationPending: (limit = 50) =>
     [...introAdQueryKeys.all, "moderation", "pending", limit] as const,
+  moderationManaged: () => [...introAdQueryKeys.all, "moderation", "managed"] as const,
   moderationCount: () => [...introAdQueryKeys.all, "moderation", "count"] as const,
 };
 

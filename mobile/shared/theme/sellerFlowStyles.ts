@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 
+import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { MEDIA_OVERLAY_SCRIM } from "@/shared/theme/catalogProductStyles";
 
@@ -157,132 +158,6 @@ export const useSellerFormStyles = createThemedStyles((theme) => ({
     color: theme.colors.onContrast,
     fontWeight: "600",
     fontSize: 16,
-  },
-}));
-
-export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
-  card: {
-    gap: theme.spacing[3],
-    padding: theme.spacing[4],
-    borderRadius: theme.radius.sm,
-    backgroundColor: theme.colors.surface,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-  },
-  statusPanel: {
-    padding: theme.spacing[3],
-    borderRadius: theme.radius.button,
-    backgroundColor: theme.colors.surfaceMuted,
-  },
-  statusText: {
-    fontSize: 14,
-    color: theme.colors.text,
-  },
-  fieldLabel: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: theme.colors.textSecondary,
-  },
-  sectionLabel: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: theme.colors.text,
-  },
-  timingHint: {
-    fontSize: 13,
-    color: theme.colors.textMuted,
-  },
-  input: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    borderRadius: 10,
-    paddingHorizontal: theme.spacing[3],
-    paddingVertical: 10,
-    fontSize: 15,
-    color: theme.colors.text,
-    backgroundColor: theme.colors.surface,
-  },
-  primaryButton: {
-    paddingVertical: theme.spacing[3],
-    borderRadius: 10,
-    alignItems: "center",
-    backgroundColor: theme.colors.nearBlack,
-  },
-  primaryButtonText: {
-    color: theme.colors.onContrast,
-    fontWeight: "600",
-    fontSize: 15,
-  },
-  secondaryButton: {
-    paddingVertical: theme.spacing[3],
-    borderRadius: 10,
-    alignItems: "center",
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surface,
-  },
-  secondaryButtonText: {
-    color: theme.colors.text,
-    fontWeight: "600",
-    fontSize: 15,
-  },
-  error: {
-    color: theme.colors.danger,
-    fontSize: 13,
-  },
-  success: {
-    color: theme.colors.success,
-    fontSize: 13,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: theme.colors.text,
-  },
-  lead: {
-    fontSize: 14,
-    lineHeight: 20,
-    color: theme.colors.textSecondary,
-  },
-  meta: {
-    fontSize: 13,
-    color: theme.colors.textMuted,
-  },
-  loading: {
-    fontSize: 14,
-    color: theme.colors.textMuted,
-  },
-  form: {
-    gap: 10,
-    marginTop: 4,
-  },
-  actions: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: theme.spacing[2],
-    marginTop: 4,
-  },
-  disabled: {
-    opacity: 0.6,
-  },
-  tariffChip: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: theme.spacing[3],
-  },
-  tariffChipActive: {
-    backgroundColor: theme.colors.nearBlack,
-    borderColor: theme.colors.nearBlack,
-  },
-  tariffText: {
-    fontSize: 14,
-    color: theme.colors.text,
-  },
-  tariffTextActive: {
-    color: theme.colors.onContrast,
-    fontWeight: "600",
   },
 }));
 
@@ -512,97 +387,60 @@ export const useProductEditorScreenStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useAdvertisingPageStyles = createThemedStyles((theme) => ({
-  container: {
-    padding: theme.spacing[4],
-    gap: theme.spacing[3],
-    paddingBottom: theme.spacing[8],
-    backgroundColor: theme.colors.bg,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: theme.colors.text,
-  },
-  lead: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: theme.colors.textMuted,
-  },
-  balanceCard: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    borderRadius: theme.radius.sm,
-    padding: 14,
-    gap: 4,
-    backgroundColor: theme.colors.surface,
-  },
-  balanceLabel: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: theme.colors.textMuted,
-  },
-  balance: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: theme.colors.text,
-  },
-  centered: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: theme.spacing[6],
-    gap: theme.spacing[4],
-    backgroundColor: theme.colors.bg,
-  },
-  hint: {
-    fontSize: 15,
-    textAlign: "center",
-    lineHeight: 22,
-    color: theme.colors.textMuted,
-  },
-  button: {
-    borderRadius: 10,
-    paddingVertical: theme.spacing[3],
-    paddingHorizontal: theme.spacing[6],
-    backgroundColor: theme.colors.nearBlack,
-  },
-  buttonText: {
-    color: theme.colors.onContrast,
-    fontSize: 16,
-    fontWeight: "600",
-  },
-}));
-
 export const useMyProductsPageStyles = createThemedStyles((theme) => ({
   container: {
     flex: 1,
+    minHeight: 0,
     backgroundColor: theme.colors.bg,
   },
+  listFlex: {
+    flex: 1,
+    minHeight: 0,
+  },
   list: {
-    padding: 10,
+    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
     flexGrow: 1,
   },
   header: {
-    paddingHorizontal: 6,
-    paddingBottom: theme.spacing[3],
-    gap: theme.spacing[3],
+    gap: 13.6,
+    paddingTop: 12,
+    paddingBottom: 12,
   },
-  count: {
-    fontSize: 14,
-    color: theme.colors.textMuted,
+  headerActions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 10,
   },
   createButton: {
-    alignSelf: "flex-start",
     borderRadius: 10,
     paddingVertical: 10,
-    paddingHorizontal: theme.spacing[4],
-    backgroundColor: theme.colors.nearBlack,
+    paddingHorizontal: 14,
+    backgroundColor: theme.colors.action,
+  },
+  createButtonDisabled: {
+    opacity: 0.55,
   },
   createButtonText: {
     color: theme.colors.onContrast,
-    fontSize: 15,
+    fontSize: 14.4,
     fontWeight: "600",
+  },
+  banner: {
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    fontSize: 13.5,
+    lineHeight: 19,
+  },
+  noticeBanner: {
+    backgroundColor: theme.colors.actionSurface,
+    color: theme.colors.infoNavy,
+  },
+  errorBanner: {
+    backgroundColor: `${theme.colors.danger}14`,
+    color: theme.colors.danger,
   },
   centered: {
     flex: 1,
@@ -630,30 +468,6 @@ export const useMyProductsPageStyles = createThemedStyles((theme) => ({
   },
   footerLoader: {
     marginVertical: theme.spacing[4],
-  },
-  row: {
-    justifyContent: "space-between",
-  },
-  cardWrap: {
-    flex: 1,
-    margin: 6,
-  },
-  cardActions: {
-    marginTop: 4,
-    paddingHorizontal: 4,
-  },
-  cardAction: {
-    alignSelf: "flex-start",
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    borderRadius: theme.radius.button,
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-  },
-  cardActionText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: theme.colors.text,
   },
 }));
 

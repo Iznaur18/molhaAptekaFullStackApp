@@ -35,6 +35,7 @@ import "./MyProfilePage.css";
  * onSearchSynonymsAdminClick?: () => void;
  * onCategoryTreeAdminClick?: () => void;
  * onAppIntroAdminClick?: () => void;
+ * onSiteHeaderBannerAdminClick?: () => void;
  * onPopularProductsAdminClick?: () => void;
  * onProductModerationClick?: () => void;
  * onProductReportsClick?: () => void;
@@ -88,6 +89,7 @@ export function MyProfilePage({
   onSearchSynonymsAdminClick,
   onCategoryTreeAdminClick,
   onAppIntroAdminClick,
+  onSiteHeaderBannerAdminClick,
   onPopularProductsAdminClick,
   onProductModerationClick,
   onProductReportsClick,
@@ -191,6 +193,7 @@ export function MyProfilePage({
     onSearchSynonymsAdminClick,
     onCategoryTreeAdminClick,
     onAppIntroAdminClick,
+  onSiteHeaderBannerAdminClick,
     onPopularProductsAdminClick,
     onSubscriptionsClick,
     onWishlistClick,

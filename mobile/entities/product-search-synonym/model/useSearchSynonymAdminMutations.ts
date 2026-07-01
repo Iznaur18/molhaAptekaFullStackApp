@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { createProductSearchSynonymAdmin } from "@/entities/product-search-synonym/api/createProductSearchSynonymAdmin";
 import { deleteProductSearchSynonymAdmin } from "@/entities/product-search-synonym/api/searchSynonymAdminApi";
@@ -14,15 +14,8 @@ export const useProductSearchSynonymsAdminQuery = (enabled = true) =>
   });
 
 export const useProductSearchSynonymAdminMutations = () => {
-  const queryClient = useQueryClient();
-
-  const invalidate = () => {
-    void queryClient.invalidateQueries({ queryKey: searchSynonymAdminQueryKeys.all });
-  };
-
   const createMutation = useMutation({
     mutationFn: createProductSearchSynonymAdmin,
-    onSuccess: invalidate,
   });
 
   const patchMutation = useMutation({
@@ -33,12 +26,10 @@ export const useProductSearchSynonymAdminMutations = () => {
       synonymId: string;
       body: { token?: string; categories?: string[] };
     }) => patchProductSearchSynonymAdmin(synonymId, body),
-    onSuccess: invalidate,
   });
 
   const deleteMutation = useMutation({
     mutationFn: (synonymId: string) => deleteProductSearchSynonymAdmin(synonymId),
-    onSuccess: invalidate,
   });
 
   return { createMutation, patchMutation, deleteMutation };

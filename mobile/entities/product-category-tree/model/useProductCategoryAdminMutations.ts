@@ -1,25 +1,16 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 
 import {
   createProductCategoryAdmin,
   deleteProductCategoryAdmin,
   patchProductCategoryAdmin,
 } from "@/entities/product-category-tree/api/categoryAdminMutationsApi";
-import { categoryAdminQueryKeys } from "@/shared/api";
-
-import type { ProductCategoryAdminWritePayload } from "./adminTypes";
-import type { DeleteProductCategoryOptions } from "../api/categoryAdminMutationsApi";
+import type { ProductCategoryAdminWritePayload } from "@/entities/product-category-tree/model/adminTypes";
+import type { DeleteProductCategoryOptions } from "@/entities/product-category-tree/api/categoryAdminMutationsApi";
 
 export const useProductCategoryAdminMutations = () => {
-  const queryClient = useQueryClient();
-
-  const invalidate = () => {
-    void queryClient.invalidateQueries({ queryKey: categoryAdminQueryKeys.all });
-  };
-
   const createMutation = useMutation({
     mutationFn: (payload: ProductCategoryAdminWritePayload) => createProductCategoryAdmin(payload),
-    onSuccess: invalidate,
   });
 
   const patchMutation = useMutation({
@@ -30,7 +21,6 @@ export const useProductCategoryAdminMutations = () => {
       categoryId: string;
       body: Partial<ProductCategoryAdminWritePayload>;
     }) => patchProductCategoryAdmin(categoryId, body),
-    onSuccess: invalidate,
   });
 
   const deleteMutation = useMutation({
@@ -41,7 +31,6 @@ export const useProductCategoryAdminMutations = () => {
       categoryId: string;
       options?: DeleteProductCategoryOptions;
     }) => deleteProductCategoryAdmin(categoryId, options),
-    onSuccess: invalidate,
   });
 
   return { createMutation, patchMutation, deleteMutation };

@@ -1,188 +1,245 @@
-import { useEffect, useState } from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
+import { useRouter } from "expo-router";
+import { useCallback, useState } from "react";
+import { Pressable, ScrollView, Switch, Text, TextInput, View } from "react-native";
 
-import {
-  buildPatchAppIntroSettingsBody,
-  mapAppIntroSettingsToForm,
-  type AppIntroAdminForm,
-} from "@/entities/app-intro-settings/lib/appIntroAdminForm";
-import { validateAppIntroAdminForm } from "@/entities/app-intro-settings/lib/validateAppIntroAdminForm";
-import { usePatchAppIntroSettingsMutation } from "@/entities/app-intro-settings/model/usePatchAppIntroSettingsMutation";
-import { useAppIntroSettingsQuery } from "@/entities/app-intro-settings/model/useAppIntroSettingsQuery";
-import type { AppIntroSettings } from "@/entities/app-intro-settings/model/types";
-import { useAppIntro } from "@/features/app-intro/model/AppIntroProvider";
+import { useAppIntroAdminPage } from "@/features/app-intro-admin-page/model/useAppIntroAdminPage";
 import { ImageUrlUploadField } from "@/features/image-upload/ui/ImageUrlUploadField";
 import { VideoUrlUploadField } from "@/features/image-upload/ui/VideoUrlUploadField";
-import { APP_INTRO_ADMIN_PAGE_UI } from "@/shared/config";
-import { useStaffAdminStyles } from "@/shared/theme/staffAdminStyles";
-import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
-
-const formToPreviewSettings = (form: AppIntroAdminForm): AppIntroSettings => {
-  const body = buildPatchAppIntroSettingsBody(form);
-  return {
-    videoMp4Url: body.videoMp4Url,
-    videoWebmUrl: body.videoWebmUrl,
-    posterUrl: body.posterUrl,
-    fallbackTitle: body.fallbackTitle ?? "",
-    fallbackHint: body.fallbackHint ?? "",
-    minMs: body.minMs,
-    maxMs: body.maxMs,
-    fadeOutMs: body.fadeOutMs,
-    updatedAt: null,
-  };
-};
+import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
+import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
+import { APP_INTRO_ADMIN_PAGE_UI, MY_PROFILE_PAGE_UI } from "@/shared/config";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
+import { useAppIntroAdminPageStyles } from "@/shared/theme/appIntroAdminPageStyles";
+import { ScreenErrorState } from "@/shared/ui/ScreenStates";
 
 export const AppIntroAdminPage = () => {
-  const styles = useStaffAdminStyles();
-  const settingsQuery = useAppIntroSettingsQuery();
-  const patchMutation = usePatchAppIntroSettingsMutation();
-  const { previewIntro, replayIntro } = useAppIntro();
+  const router = useRouter();
+  const styles = useAppIntroAdminPageStyles();
+  const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const [navSheetVisible, setNavSheetVisible] = useState(false);
 
-  const [form, setForm] = useState<AppIntroAdminForm>(() => mapAppIntroSettingsToForm(null));
-  const [actionError, setActionError] = useState("");
-  const [saveNotice, setSaveNotice] = useState(false);
+  const {
+    form,
+    phase,
+    isSaving,
+    queryError,
+    actionError,
+    saveNotice,
+    updateField,
+    handlePreview,
+    handleSave,
+    handleWatchSaved,
+    reloadSettings,
+    refetchSettings,
+  } = useAppIntroAdminPage();
 
-  useEffect(() => {
-    if (settingsQuery.data?.settings) {
-      setForm(mapAppIntroSettingsToForm(settingsQuery.data.settings));
-    }
-  }, [settingsQuery.data]);
+  useFocusEffect(
+    useCallback(() => {
+      void refetchSettings();
+    }, [refetchSettings]),
+  );
 
-  const updateField = (key: keyof AppIntroAdminForm, value: string) => {
-    setActionError("");
-    setSaveNotice(false);
-    setForm((prev) => ({ ...prev, [key]: value }));
-  };
+  const navSheet = (
+    <ProfileMobileNavSheet
+      visible={navSheetVisible}
+      activeSectionId="app-intro-admin"
+      onClose={() => setNavSheetVisible(false)}
+      onOverviewPress={() => router.replace("/(tabs)/profile")}
+    />
+  );
 
-  const handlePreview = () => {
-    const validationError = validateAppIntroAdminForm(form);
-    if (validationError) {
-      setActionError(validationError);
-      return;
-    }
-    setActionError("");
-    previewIntro(formToPreviewSettings(form));
-  };
+  const sectionToggle = (
+    <ProfileMobileSectionToggle
+      activeLabel={MY_PROFILE_PAGE_UI.TAB_APP_INTRO_ADMIN}
+      onPress={() => setNavSheetVisible(true)}
+    />
+  );
 
-  const handleSave = async () => {
-    const validationError = validateAppIntroAdminForm(form);
-    if (validationError) {
-      setActionError(validationError);
-      return;
-    }
+  const pageHeader = (
+    <View style={styles.header}>
+      {sectionToggle}
+      <Text style={styles.title}>{APP_INTRO_ADMIN_PAGE_UI.TITLE}</Text>
+      <Text style={styles.hint}>{APP_INTRO_ADMIN_PAGE_UI.HINT}</Text>
+    </View>
+  );
 
-    setActionError("");
-    try {
-      const saved = await patchMutation.mutateAsync(buildPatchAppIntroSettingsBody(form));
-      setForm(mapAppIntroSettingsToForm(saved.settings));
-      setSaveNotice(true);
-    } catch (error) {
-      setActionError(error instanceof Error ? error.message : APP_INTRO_ADMIN_PAGE_UI.SAVE_ERROR);
-    }
-  };
-
-  if (settingsQuery.isPending) {
-    return <ScreenLoadingState message={APP_INTRO_ADMIN_PAGE_UI.LOADING} />;
+  if (phase === "loading") {
+    return (
+      <>
+        <ScrollView
+          style={[styles.container, centeredContentStyle]}
+          contentContainerStyle={[styles.scroll, styles.content, { paddingBottom: contentPaddingBottom }]}
+        >
+          {pageHeader}
+          <Text style={styles.status}>{APP_INTRO_ADMIN_PAGE_UI.LOADING}</Text>
+        </ScrollView>
+        {navSheet}
+      </>
+    );
   }
 
-  if (settingsQuery.isError) {
+  if (phase === "error") {
     return (
-      <ScreenErrorState
-        message={
-          settingsQuery.error instanceof Error
-            ? settingsQuery.error.message
-            : APP_INTRO_ADMIN_PAGE_UI.LOAD_ERROR
-        }
-        onRetry={() => void settingsQuery.refetch()}
-      />
+      <>
+        <ScrollView
+          style={[styles.container, centeredContentStyle]}
+          contentContainerStyle={[styles.scroll, styles.content, { paddingBottom: contentPaddingBottom }]}
+        >
+          {pageHeader}
+          <ScreenErrorState message={queryError} onRetry={() => void reloadSettings()} />
+        </ScrollView>
+        {navSheet}
+      </>
     );
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.root}>
-      {saveNotice ? (
-        <View style={styles.notice}>
-          <Text style={styles.success}>{APP_INTRO_ADMIN_PAGE_UI.SAVE_SUCCESS}</Text>
-          <Pressable onPress={() => replayIntro()}>
-            <Text style={styles.link}>{APP_INTRO_ADMIN_PAGE_UI.WATCH_AFTER_SAVE}</Text>
-          </Pressable>
+    <>
+      <ScrollView
+        style={[styles.container, centeredContentStyle]}
+        contentContainerStyle={[styles.scroll, styles.content, { paddingBottom: contentPaddingBottom }]}
+      >
+        {pageHeader}
+
+        {saveNotice ? (
+          <View style={styles.notice} accessibilityRole="text">
+            <Text style={styles.noticeText}>{APP_INTRO_ADMIN_PAGE_UI.SAVE_SUCCESS}</Text>
+            <Pressable style={styles.noticeButton} onPress={handleWatchSaved}>
+              <Text style={styles.noticeButtonText}>{APP_INTRO_ADMIN_PAGE_UI.WATCH_AFTER_SAVE}</Text>
+            </Pressable>
+          </View>
+        ) : null}
+
+        <View style={[styles.form, isSaving && styles.fieldsetDisabled]}>
+          <View style={styles.fieldset} pointerEvents={isSaving ? "none" : "auto"}>
+            <Text style={styles.legend}>{APP_INTRO_ADMIN_PAGE_UI.SECTION_MEDIA}</Text>
+
+            <View style={styles.field}>
+              <VideoUrlUploadField
+                label={APP_INTRO_ADMIN_PAGE_UI.LABEL_VIDEO}
+                value={form.videoMp4Url}
+                onChange={(value) => updateField("videoMp4Url", value)}
+                disabled={isSaving}
+              />
+              <Text style={styles.fieldHint}>{APP_INTRO_ADMIN_PAGE_UI.HINT_VIDEO}</Text>
+            </View>
+
+            <ImageUrlUploadField
+              label={APP_INTRO_ADMIN_PAGE_UI.LABEL_POSTER}
+              value={form.posterUrl}
+              onChange={(value) => updateField("posterUrl", value)}
+              disabled={isSaving}
+            />
+          </View>
+
+          <View style={styles.fieldset} pointerEvents={isSaving ? "none" : "auto"}>
+            <Text style={styles.legend}>{APP_INTRO_ADMIN_PAGE_UI.SECTION_FALLBACK}</Text>
+
+            <View style={styles.field}>
+              <Text style={styles.fieldLabel}>{APP_INTRO_ADMIN_PAGE_UI.LABEL_FALLBACK_TITLE}</Text>
+              <TextInput
+                style={styles.fieldInput}
+                value={form.fallbackTitle}
+                onChangeText={(value) => updateField("fallbackTitle", value)}
+                maxLength={80}
+                editable={!isSaving}
+              />
+            </View>
+
+            <View style={styles.field}>
+              <Text style={styles.fieldLabel}>{APP_INTRO_ADMIN_PAGE_UI.LABEL_FALLBACK_HINT}</Text>
+              <TextInput
+                style={styles.fieldInput}
+                value={form.fallbackHint}
+                onChangeText={(value) => updateField("fallbackHint", value)}
+                maxLength={200}
+                editable={!isSaving}
+              />
+            </View>
+          </View>
+
+          <View style={styles.fieldset} pointerEvents={isSaving ? "none" : "auto"}>
+            <Text style={styles.legend}>{APP_INTRO_ADMIN_PAGE_UI.SECTION_TIMING}</Text>
+
+            <View style={styles.timingGrid}>
+              <View style={styles.timingField}>
+                <Text style={styles.fieldLabel}>{APP_INTRO_ADMIN_PAGE_UI.LABEL_MIN_MS}</Text>
+                <TextInput
+                  style={styles.fieldInput}
+                  value={form.minMs}
+                  onChangeText={(value) => updateField("minMs", value)}
+                  keyboardType="number-pad"
+                  editable={!isSaving}
+                />
+              </View>
+              <View style={styles.timingField}>
+                <Text style={styles.fieldLabel}>{APP_INTRO_ADMIN_PAGE_UI.LABEL_MAX_MS}</Text>
+                <TextInput
+                  style={styles.fieldInput}
+                  value={form.maxMs}
+                  onChangeText={(value) => updateField("maxMs", value)}
+                  keyboardType="number-pad"
+                  editable={!isSaving}
+                />
+              </View>
+              <View style={styles.timingField}>
+                <Text style={styles.fieldLabel}>{APP_INTRO_ADMIN_PAGE_UI.LABEL_FADE_MS}</Text>
+                <TextInput
+                  style={styles.fieldInput}
+                  value={form.fadeOutMs}
+                  onChangeText={(value) => updateField("fadeOutMs", value)}
+                  keyboardType="number-pad"
+                  editable={!isSaving}
+                />
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.fieldset} pointerEvents={isSaving ? "none" : "auto"}>
+            <Text style={styles.legend}>{APP_INTRO_ADMIN_PAGE_UI.SECTION_PRIORITY}</Text>
+            <View style={styles.checkboxRow}>
+              <Switch
+                value={form.prioritizePlatformIntro}
+                onValueChange={(value) => updateField("prioritizePlatformIntro", value)}
+                disabled={isSaving}
+              />
+              <Text style={styles.checkboxLabel}>
+                {APP_INTRO_ADMIN_PAGE_UI.LABEL_PRIORITIZE_PLATFORM_INTRO}
+              </Text>
+            </View>
+            <Text style={styles.fieldHint}>
+              {APP_INTRO_ADMIN_PAGE_UI.HINT_PRIORITIZE_PLATFORM_INTRO}
+            </Text>
+          </View>
+
+          {actionError ? (
+            <Text style={styles.error} accessibilityRole="alert">
+              {actionError}
+            </Text>
+          ) : null}
+
+          <View style={styles.actions}>
+            <Pressable
+              style={[styles.secondaryButton, isSaving && styles.secondaryButtonDisabled]}
+              onPress={handlePreview}
+              disabled={isSaving}
+            >
+              <Text style={styles.secondaryButtonText}>{APP_INTRO_ADMIN_PAGE_UI.PREVIEW}</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.primaryButton, isSaving && styles.primaryButtonDisabled]}
+              onPress={() => void handleSave()}
+              disabled={isSaving}
+            >
+              <Text style={styles.primaryButtonText}>
+                {isSaving ? APP_INTRO_ADMIN_PAGE_UI.SAVING : APP_INTRO_ADMIN_PAGE_UI.SAVE}
+              </Text>
+            </Pressable>
+          </View>
         </View>
-      ) : null}
-
-      <VideoUrlUploadField
-        label={APP_INTRO_ADMIN_PAGE_UI.LABEL_VIDEO_MP4}
-        value={form.videoMp4Url}
-        onChange={(value) => updateField("videoMp4Url", value)}
-      />
-      <VideoUrlUploadField
-        label={APP_INTRO_ADMIN_PAGE_UI.LABEL_VIDEO_WEBM}
-        value={form.videoWebmUrl}
-        onChange={(value) => updateField("videoWebmUrl", value)}
-      />
-      <ImageUrlUploadField
-        label={APP_INTRO_ADMIN_PAGE_UI.LABEL_POSTER}
-        value={form.posterUrl}
-        onChange={(value) => updateField("posterUrl", value)}
-      />
-
-      <Text style={styles.labelLarge}>{APP_INTRO_ADMIN_PAGE_UI.LABEL_FALLBACK_TITLE}</Text>
-      <TextInput
-        style={styles.input}
-        value={form.fallbackTitle}
-        onChangeText={(value) => updateField("fallbackTitle", value)}
-      />
-      <Text style={styles.labelLarge}>{APP_INTRO_ADMIN_PAGE_UI.LABEL_FALLBACK_HINT}</Text>
-      <TextInput
-        style={styles.input}
-        value={form.fallbackHint}
-        onChangeText={(value) => updateField("fallbackHint", value)}
-      />
-
-      <Text style={styles.section}>{APP_INTRO_ADMIN_PAGE_UI.SECTION_TIMING}</Text>
-      <Text style={styles.labelLarge}>{APP_INTRO_ADMIN_PAGE_UI.LABEL_MIN_MS}</Text>
-      <TextInput
-        style={styles.input}
-        value={form.minMs}
-        onChangeText={(value) => updateField("minMs", value)}
-        keyboardType="number-pad"
-      />
-      <Text style={styles.labelLarge}>{APP_INTRO_ADMIN_PAGE_UI.LABEL_MAX_MS}</Text>
-      <TextInput
-        style={styles.input}
-        value={form.maxMs}
-        onChangeText={(value) => updateField("maxMs", value)}
-        keyboardType="number-pad"
-      />
-      <Text style={styles.labelLarge}>{APP_INTRO_ADMIN_PAGE_UI.LABEL_FADE_MS}</Text>
-      <TextInput
-        style={styles.input}
-        value={form.fadeOutMs}
-        onChangeText={(value) => updateField("fadeOutMs", value)}
-        keyboardType="number-pad"
-      />
-
-      {actionError ? <Text style={styles.error}>{actionError}</Text> : null}
-
-      <View style={styles.actionsStretch}>
-        <Pressable
-          style={[styles.secondaryButtonFlex, patchMutation.isPending && styles.disabled]}
-          onPress={handlePreview}
-          disabled={patchMutation.isPending}
-        >
-          <Text style={styles.secondaryButtonText}>{APP_INTRO_ADMIN_PAGE_UI.PREVIEW}</Text>
-        </Pressable>
-        <Pressable
-          style={[styles.primaryButtonFlex, patchMutation.isPending && styles.disabled]}
-          onPress={() => void handleSave()}
-          disabled={patchMutation.isPending}
-        >
-          <Text style={styles.primaryButtonText}>
-            {patchMutation.isPending
-              ? APP_INTRO_ADMIN_PAGE_UI.SAVE_PENDING
-              : APP_INTRO_ADMIN_PAGE_UI.SAVE}
-          </Text>
-        </Pressable>
-      </View>
-    </ScrollView>
+      </ScrollView>
+      {navSheet}
+    </>
   );
 };

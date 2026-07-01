@@ -4,21 +4,20 @@ import { formatApiErrorMessage } from "@/shared/lib";
 
 import { fetchFeaturedRaffles } from "./fetchFeaturedRaffles";
 
-export type StaffRaffleRow = Record<string, unknown> & {
-  _id: string;
-  title?: string;
-  status?: string;
-  salesTarget?: number;
-  seller?: { _id?: string; userName?: string } | null;
+import type { RaffleFromApi } from "../model/types";
+
+export type StaffRafflesQueueData = {
+  pendingRaffles: RaffleFromApi[];
+  liveRaffle: RaffleFromApi | null;
 };
 
-export const fetchPendingRaffles = async () => {
+export const fetchPendingRaffles = async (): Promise<RaffleFromApi[]> => {
   try {
     const { data } = await apiClient.get("/product/raffles/pending");
     if (!data?.success || !Array.isArray(data.data?.raffles)) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
-    return data.data.raffles as StaffRaffleRow[];
+    return data.data.raffles as RaffleFromApi[];
   } catch (error) {
     throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.FETCH_RAFFLES_QUEUE_FALLBACK));
   }
@@ -46,7 +45,18 @@ export const rejectRaffle = async (raffleId: string) => {
   }
 };
 
-export const fetchStaffRafflesQueue = async () => {
+export const deleteRaffleByStaff = async (raffleId: string) => {
+  try {
+    const { data } = await apiClient.delete(`/product/raffles/${raffleId}`);
+    if (!data?.success) {
+      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
+    }
+  } catch (error) {
+    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.DELETE_RAFFLE_FALLBACK));
+  }
+};
+
+export const fetchStaffRafflesQueue = async (): Promise<StaffRafflesQueueData> => {
   const [pendingRaffles, featuredList] = await Promise.all([
     fetchPendingRaffles(),
     fetchFeaturedRaffles(),

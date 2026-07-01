@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { Pressable, Text, TextInput, View, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
 
 import { addressValueFromUser } from "@/entities/address/lib/addressValueFromUser";
 import { validateRuDeliveryAddressForm } from "@/entities/address/lib/validateRuDeliveryAddressForm";
@@ -13,7 +13,7 @@ import {
 import type { RuDeliveryAddressValue } from "@/entities/address/model/types";
 import { CHECKOUT_FORM_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
-import { useCheckoutFormStyles, useFormFieldStyles } from "@/shared/theme/formChromeStyles";
+import { useCheckoutFormStyles } from "@/shared/theme/formChromeStyles";
 import { AppButton } from "@/shared/ui/AppButton";
 
 type CheckoutFormProps = {
@@ -39,7 +39,6 @@ export const CheckoutForm = ({
 }: CheckoutFormProps) => {
   const theme = useAppTheme();
   const checkoutStyles = useCheckoutFormStyles();
-  const fieldStyles = useFormFieldStyles();
   const [deliveryAddress, setDeliveryAddress] = useState<RuDeliveryAddressValue>(() =>
     addressValueFromUser(defaultUser),
   );
@@ -76,11 +75,14 @@ export const CheckoutForm = ({
         onChange={setDeliveryAddress}
         disabled={isDisabled || isSubmitting}
         placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_DELIVERY_ADDRESS}
+        containerStyle={checkoutStyles.fieldGroup}
+        labelStyle={checkoutStyles.fieldLabel}
+        inputStyle={checkoutStyles.fieldInput}
       />
 
-      <Text style={fieldStyles.label}>{CHECKOUT_FORM_UI.LABEL_FLAT}</Text>
+      <Text style={checkoutStyles.fieldLabel}>{CHECKOUT_FORM_UI.LABEL_FLAT}</Text>
       <TextInput
-        style={fieldStyles.input}
+        style={checkoutStyles.fieldInput}
         value={deliveryAddress.flat}
         onChangeText={(flat) => setDeliveryAddress((prev) => ({ ...prev, flat }))}
         placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_FLAT}
@@ -107,8 +109,8 @@ export const CheckoutForm = ({
         </Pressable>
       ))}
 
-      {displayError ? <Text style={fieldStyles.error}>{displayError}</Text> : null}
-      {submitSuccess ? <Text style={fieldStyles.success}>{submitSuccess}</Text> : null}
+      {displayError ? <Text style={checkoutStyles.feedbackError}>{displayError}</Text> : null}
+      {submitSuccess ? <Text style={checkoutStyles.feedbackSuccess}>{submitSuccess}</Text> : null}
 
       <AppButton
         label={CHECKOUT_FORM_UI.SUBMIT_IDLE}

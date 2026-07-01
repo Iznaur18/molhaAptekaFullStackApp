@@ -504,6 +504,58 @@ export const loadInstallmentCounterpartyMap = async (userIds) => {
 };
 
 /**
+ * @param {Array<string | import('mongoose').Types.ObjectId>} productIds
+ * @param {{ statuses?: string[] }} [options]
+ * @returns {Promise<Map<string, Array<NonNullable<ReturnType<typeof toInstallmentCounterpartyPayload>>>>>}
+ */
+export const loadInstallmentBuyersByProductIds = async (
+  productIds,
+  { statuses = ACTIVE_CONTRACT_STATUSES } = {},
+) => {
+  const uniqueProductIds = [
+    ...new Set(
+      productIds
+        .map((id) => String(id ?? ""))
+        .filter((id) => mongoose.isValidObjectId(id)),
+    ),
+  ];
+  if (uniqueProductIds.length === 0) {
+    return new Map();
+  }
+
+  const contracts = await InstallmentContractModel.find({
+    productId: { $in: uniqueProductIds },
+    status: { $in: statuses },
+  })
+    .select("productId buyerUserId")
+    .lean();
+
+  const userMap = await loadInstallmentCounterpartyMap(
+    contracts.map((contract) => contract.buyerUserId),
+  );
+
+  /** @type {Map<string, Array<NonNullable<ReturnType<typeof toInstallmentCounterpartyPayload>>>>} */
+  const buyersByProductId = new Map();
+  for (const contract of contracts) {
+    const productId = String(contract.productId);
+    const buyer = userMap.get(String(contract.buyerUserId));
+    if (!buyer) {
+      continue;
+    }
+
+    const existingBuyers = buyersByProductId.get(productId) ?? [];
+    if (existingBuyers.some((row) => row._id === buyer._id)) {
+      continue;
+    }
+
+    existingBuyers.push(buyer);
+    buyersByProductId.set(productId, existingBuyers);
+  }
+
+  return buyersByProductId;
+};
+
+/**
  * @param {Record<string, unknown>} payload
  * @param {Map<string, ReturnType<typeof toInstallmentCounterpartyPayload>>} userMap
  */

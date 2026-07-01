@@ -132,26 +132,46 @@ export const useFormFieldStyles = createThemedStyles((theme) => ({
 
 export const useCheckoutFormStyles = createThemedStyles((theme) => ({
   form: {
-    paddingTop: theme.spacing[4],
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: theme.colors.border,
+    gap: 14,
+    padding: theme.spacing[4],
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.button,
+    backgroundColor: theme.colors.surface,
   },
   heading: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: "700",
-    marginBottom: theme.spacing[3],
+    color: theme.colors.text,
+  },
+  fieldGroup: {
+    marginBottom: 0,
+  },
+  fieldLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: theme.colors.textSecondary,
+    marginBottom: 4,
+  },
+  fieldInput: {
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.input,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    marginBottom: 0,
+    fontSize: 15,
+    backgroundColor: theme.colors.surface,
     color: theme.colors.text,
   },
   legend: {
     fontSize: 14,
     fontWeight: "600",
-    marginBottom: theme.spacing[2],
     color: theme.colors.textSecondary,
   },
   radioRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: theme.spacing[2],
     gap: 10,
   },
   radio: {
@@ -169,8 +189,17 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
     fontSize: 15,
     color: theme.colors.text,
   },
+  feedbackError: {
+    color: theme.colors.danger,
+    fontSize: 14,
+  },
+  feedbackSuccess: {
+    color: theme.colors.success,
+    fontSize: 14,
+  },
   submitSpacer: {
-    marginTop: theme.spacing[4],
+    alignSelf: "flex-start",
+    marginTop: 4,
   },
 }));
 
@@ -198,55 +227,6 @@ export const useAddressSuggestStyles = createThemedStyles((theme) => ({
   },
   loader: {
     marginTop: theme.spacing[2],
-  },
-}));
-
-export const useDataConfirmationPageStyles = createThemedStyles((theme) => ({
-  container: {
-    padding: theme.spacing[4],
-    gap: theme.spacing[2],
-    paddingBottom: theme.spacing[8],
-    backgroundColor: theme.colors.bg,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: theme.colors.text,
-  },
-  intro: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: theme.colors.textMuted,
-  },
-  benefit: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: theme.colors.text,
-  },
-  note: {
-    fontSize: 13,
-    lineHeight: 20,
-    marginTop: theme.spacing[1],
-    color: theme.colors.textMuted,
-  },
-  statusBlock: {
-    marginTop: theme.spacing[3],
-  },
-  centered: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: theme.spacing[6],
-    gap: theme.spacing[4],
-    backgroundColor: theme.colors.bg,
-  },
-  hint: {
-    fontSize: 15,
-    textAlign: "center",
-    color: theme.colors.textMuted,
-  },
-  actionSpacer: {
-    marginTop: theme.spacing[3],
   },
 }));
 

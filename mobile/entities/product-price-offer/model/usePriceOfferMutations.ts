@@ -14,6 +14,7 @@ export const usePriceOfferMutations = (productId: string) => {
   const invalidateOffers = () => {
     void queryClient.invalidateQueries({ queryKey: priceOfferQueryKeys.my(productId) });
     void queryClient.invalidateQueries({ queryKey: priceOfferQueryKeys.top(productId) });
+    void queryClient.invalidateQueries({ queryKey: priceOfferQueryKeys.myBids() });
   };
 
   const submitMutation = useMutation({

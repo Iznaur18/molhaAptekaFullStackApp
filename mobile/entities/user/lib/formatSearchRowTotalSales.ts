@@ -31,8 +31,11 @@ export const formatSearchRowTotalSales = (totalSalesAmount: unknown): string => 
   return formatCompactSearchRowAmount(amount);
 };
 
-export const formatSearchRowTotalSalesCount = (totalSalesCount: unknown): string => {
+export const normalizeTotalSalesCount = (totalSalesCount: unknown): number => {
   const value = Number(totalSalesCount);
-  const normalized = Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
-  return String(normalized);
+  return Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
+};
+
+export const formatSearchRowTotalSalesCount = (totalSalesCount: unknown): string => {
+  return String(normalizeTotalSalesCount(totalSalesCount));
 };

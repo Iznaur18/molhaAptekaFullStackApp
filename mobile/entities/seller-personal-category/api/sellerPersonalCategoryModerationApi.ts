@@ -36,7 +36,7 @@ export const approveSellerPersonalCategoryCampaign = async (campaignId: string) 
     throw new Error(
       formatApiErrorMessage(
         error,
-        SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.FETCH_FALLBACK,
+        SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.APPROVE_FALLBACK,
       ),
     );
   }
@@ -56,7 +56,7 @@ export const rejectSellerPersonalCategoryCampaign = async (
     throw new Error(
       formatApiErrorMessage(
         error,
-        SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.FETCH_FALLBACK,
+        SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.REJECT_FALLBACK,
       ),
     );
   }

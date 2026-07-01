@@ -8,7 +8,6 @@ export function mapAppIntroSettingsToForm(settings) {
 
   return {
     videoMp4Url: source.videoMp4Url ?? "",
-    videoWebmUrl: source.videoWebmUrl ?? "",
     posterUrl: source.posterUrl ?? "",
     fallbackTitle: source.fallbackTitle ?? APP_INTRO_SETTINGS_DEFAULTS.fallbackTitle,
     fallbackHint: source.fallbackHint ?? APP_INTRO_SETTINGS_DEFAULTS.fallbackHint,

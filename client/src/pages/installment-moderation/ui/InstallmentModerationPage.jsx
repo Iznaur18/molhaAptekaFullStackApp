@@ -129,6 +129,40 @@ export function InstallmentModerationPage({ onQueueChanged }) {
                       {program.productName ?? productId}
                     </h3>
                   </div>
+                  {program.seller?._id ? (
+                    <p className="installment-queue-card__seller">
+                      {INSTALLMENT_UI.SELLER_LABEL}:{" "}
+                      <a
+                        className="installment-queue-card__seller-link"
+                        href={`/user/${program.seller._id}`}
+                      >
+                        {program.seller.userName?.trim() ||
+                          program.seller.email?.trim() ||
+                          program.seller._id}
+                      </a>
+                    </p>
+                  ) : null}
+                  {(program.buyers ?? []).length > 0 ? (
+                    <p className="installment-queue-card__seller">
+                      {(program.buyers ?? []).length > 1
+                        ? INSTALLMENT_UI.BUYERS_LABEL
+                        : INSTALLMENT_UI.BUYER_LABEL}
+                      :{" "}
+                      {(program.buyers ?? []).map((buyer, index) => (
+                        <span key={buyer._id}>
+                          {index > 0 ? ", " : null}
+                          <a
+                            className="installment-queue-card__seller-link"
+                            href={`/user/${buyer._id}`}
+                          >
+                            {buyer.userName?.trim() ||
+                              buyer.email?.trim() ||
+                              buyer._id}
+                          </a>
+                        </span>
+                      ))}
+                    </p>
+                  ) : null}
                   <ul className="installment-queue-card__plans" role="list">
                     {program.plans.map((plan) => (
                       <li key={plan._id} className="installment-queue-card__plan-pill">

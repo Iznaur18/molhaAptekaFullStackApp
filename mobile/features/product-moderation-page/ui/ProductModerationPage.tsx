@@ -1,113 +1,248 @@
+import { useFocusEffect } from "@react-navigation/native";
+import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { useState } from "react";
-import { FlatList, Pressable, Text, View } from "react-native";
+import { useCallback, useMemo, useState } from "react";
+import { FlatList, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
-import { ProductCard } from "@/entities/product/ui/ProductCard";
 import type { ModerationProduct } from "@/entities/product/api/productModerationApi";
-import { usePendingModerationProductsQuery, useProductModerationMutations } from "@/entities/product/model/useProductModerationMutations";
-import { getProductSellerDisplayName } from "@/entities/product/lib/getProductSellerDisplayName";
-import { PRODUCT_MODERATION_PAGE_UI } from "@/shared/config";
-import { useStaffQueueStyles } from "@/shared/theme/staffQueueStyles";
-import { StaffModerationActions } from "@/shared/ui/StaffModerationActions";
-import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
+import {
+  usePendingModerationProductsQuery,
+  useProductModerationMutations,
+} from "@/entities/product/model/useProductModerationMutations";
+import { buildCatalogGridRows } from "@/features/catalog-grid/lib/buildCatalogGridRows";
+import { resolveCatalogGridListContentStyle } from "@/features/catalog-grid/lib/catalogGridLayout";
+import { ProductModerationGridRowItem } from "@/features/product-moderation-page/ui/ProductModerationGridRowItem";
+import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
+import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
+import { API_CLIENT_UI, MY_PROFILE_PAGE_UI, PRODUCT_MODERATION_PAGE_UI } from "@/shared/config";
+import { formatApiErrorMessage } from "@/shared/lib";
+import { useProductGridLayout } from "@/shared/model/useProductGridLayout";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
+import { moderationQueryKeys, staffBadgeQueryKeys } from "@/shared/api";
+import { useProductModerationPageStyles } from "@/shared/theme/productModerationPageStyles";
+import { ScreenErrorState } from "@/shared/ui/ScreenStates";
 
-type ModerationRowProps = {
-  product: ModerationProduct;
-  onChanged: () => void;
-  approveMutation: ReturnType<typeof useProductModerationMutations>["approveMutation"];
-  rejectMutation: ReturnType<typeof useProductModerationMutations>["rejectMutation"];
-};
-
-const ModerationRow = ({ product, onChanged, approveMutation, rejectMutation }: ModerationRowProps) => {
-  const styles = useStaffQueueStyles();
-  const router = useRouter();
-  const [rejectComment, setRejectComment] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const productId = String(product._id);
-  const isBusy = approveMutation.isPending || rejectMutation.isPending;
-
-  const handleApprove = async () => {
-    setErrorMessage("");
-    try {
-      await approveMutation.mutateAsync(productId);
-      onChanged();
-    } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : PRODUCT_MODERATION_PAGE_UI.ACTION_PENDING);
-    }
-  };
-
-  const handleReject = async () => {
-    setErrorMessage("");
-    try {
-      await rejectMutation.mutateAsync({ productId, comment: rejectComment });
-      onChanged();
-    } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : PRODUCT_MODERATION_PAGE_UI.ACTION_PENDING);
-    }
-  };
-
-  return (
-    <View style={styles.row}>
-      <ProductCard product={product} highlightCatalogPromotion={false} isModerationQueue />
-      <Text style={styles.meta}>
-        {PRODUCT_MODERATION_PAGE_UI.SELLER_LABEL}: {getProductSellerDisplayName(product)}
-      </Text>
-      <Pressable onPress={() => router.push(`/product/${productId}`)}>
-        <Text style={styles.linkLarge}>{product.productName ?? "Товар"}</Text>
-      </Pressable>
-      <StaffModerationActions
-        approveLabel={PRODUCT_MODERATION_PAGE_UI.APPROVE}
-        rejectLabel={PRODUCT_MODERATION_PAGE_UI.REJECT}
-        pendingLabel={PRODUCT_MODERATION_PAGE_UI.ACTION_PENDING}
-        isBusy={isBusy}
-        note={rejectComment}
-        onNoteChange={setRejectComment}
-        notePlaceholder={PRODUCT_MODERATION_PAGE_UI.REJECT_COMMENT_PLACEHOLDER}
-        onApprove={handleApprove}
-        onReject={handleReject}
-        errorMessage={errorMessage}
-      />
-    </View>
-  );
-};
+const MODERATION_QUEUE_LIMIT = 100;
 
 export const ProductModerationPage = () => {
-  const styles = useStaffQueueStyles();
+  const router = useRouter();
+  const styles = useProductModerationPageStyles();
+  const productGrid = useProductGridLayout();
+  const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const queryClient = useQueryClient();
   const queueQuery = usePendingModerationProductsQuery();
   const { approveMutation, rejectMutation } = useProductModerationMutations();
+  const [navSheetVisible, setNavSheetVisible] = useState(false);
+  const [actionError, setActionError] = useState("");
+  const [pendingProductId, setPendingProductId] = useState<string | null>(null);
+  const [rejectComments, setRejectComments] = useState<Record<string, string>>({});
+  const [cardErrors, setCardErrors] = useState<Record<string, string>>({});
+
   const products = queueQuery.data ?? [];
+  const catalogGridRows = useMemo(
+    () => buildCatalogGridRows(products, productGrid.columns),
+    [productGrid.columns, products],
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      void queueQuery.refetch();
+    }, [queueQuery.refetch]),
+  );
+
+  const invalidateModerationBadges = useCallback(async () => {
+    await queryClient.invalidateQueries({
+      queryKey: [...staffBadgeQueryKeys.all, "moderation"],
+    });
+  }, [queryClient]);
+
+  const removeFromQueue = useCallback(
+    (productId: string) => {
+      queryClient.setQueryData(
+        moderationQueryKeys.pending({ limit: MODERATION_QUEUE_LIMIT }),
+        (old: ModerationProduct[] | undefined) => {
+          if (!Array.isArray(old)) {
+            return old;
+          }
+          return old.filter((product) => String(product._id) !== productId);
+        },
+      );
+      setRejectComments((prev) => {
+        const next = { ...prev };
+        delete next[productId];
+        return next;
+      });
+      setCardErrors((prev) => {
+        const next = { ...prev };
+        delete next[productId];
+        return next;
+      });
+    },
+    [queryClient],
+  );
+
+  const handleQueueChanged = useCallback(async () => {
+    await invalidateModerationBadges();
+  }, [invalidateModerationBadges]);
+
+  const handleApprove = async (productId: string) => {
+    try {
+      setPendingProductId(productId);
+      setActionError("");
+      setCardErrors((prev) => ({ ...prev, [productId]: "" }));
+      await approveMutation.mutateAsync(productId);
+      removeFromQueue(productId);
+      await handleQueueChanged();
+    } catch (error) {
+      const message = formatApiErrorMessage(
+        error,
+        API_CLIENT_UI.APPROVE_PRODUCT_MODERATION_FALLBACK,
+      );
+      setActionError(message);
+      setCardErrors((prev) => ({ ...prev, [productId]: message }));
+    } finally {
+      setPendingProductId(null);
+    }
+  };
+
+  const handleReject = async (productId: string) => {
+    try {
+      setPendingProductId(productId);
+      setActionError("");
+      setCardErrors((prev) => ({ ...prev, [productId]: "" }));
+      const comment = rejectComments[productId] ?? "";
+      await rejectMutation.mutateAsync({ productId, comment });
+      removeFromQueue(productId);
+      await handleQueueChanged();
+    } catch (error) {
+      const message = formatApiErrorMessage(
+        error,
+        API_CLIENT_UI.REJECT_PRODUCT_MODERATION_FALLBACK,
+      );
+      setActionError(message);
+      setCardErrors((prev) => ({ ...prev, [productId]: message }));
+    } finally {
+      setPendingProductId(null);
+    }
+  };
+
+  const sectionToggle = (
+    <ProfileMobileSectionToggle
+      activeLabel={MY_PROFILE_PAGE_UI.TAB_PRODUCT_MODERATION}
+      onPress={() => setNavSheetVisible(true)}
+    />
+  );
+
+  const navSheet = (
+    <ProfileMobileNavSheet
+      visible={navSheetVisible}
+      activeSectionId="product-moderation"
+      onClose={() => setNavSheetVisible(false)}
+      onOverviewPress={() => router.replace("/(tabs)/profile")}
+    />
+  );
+
+  const listHeader = (
+    <View style={styles.header}>
+      {sectionToggle}
+      {actionError ? (
+        <Text style={[styles.state, styles.stateError]} accessibilityRole="alert">
+          {actionError}
+        </Text>
+      ) : null}
+    </View>
+  );
 
   if (queueQuery.isPending && products.length === 0) {
-    return <ScreenLoadingState message={PRODUCT_MODERATION_PAGE_UI.LOADING} />;
+    return (
+      <>
+        <View style={[styles.container, centeredContentStyle, styles.centered]}>
+          <View style={styles.header}>{sectionToggle}</View>
+          <Text style={styles.state}>{PRODUCT_MODERATION_PAGE_UI.LOADING}</Text>
+        </View>
+        {navSheet}
+      </>
+    );
   }
 
   if (queueQuery.isError && products.length === 0) {
     return (
-      <ScreenErrorState
-        message={queueQuery.error instanceof Error ? queueQuery.error.message : PRODUCT_MODERATION_PAGE_UI.LOADING}
-        onRetry={() => void queueQuery.refetch()}
-      />
+      <>
+        <View style={[styles.container, centeredContentStyle, styles.centered]}>
+          <View style={styles.header}>{sectionToggle}</View>
+          <ScreenErrorState
+            message={formatApiErrorMessage(
+              queueQuery.error,
+              API_CLIENT_UI.FETCH_MODERATION_QUEUE_FALLBACK,
+            )}
+            onRetry={() => queueQuery.refetch()}
+          />
+        </View>
+        {navSheet}
+      </>
+    );
+  }
+
+  if (products.length === 0) {
+    return (
+      <>
+        <View style={[styles.container, centeredContentStyle, styles.centered]}>
+          {listHeader}
+          <Text style={styles.empty}>{PRODUCT_MODERATION_PAGE_UI.EMPTY}</Text>
+        </View>
+        {navSheet}
+      </>
     );
   }
 
   return (
-    <FlatList
-      data={products}
-      keyExtractor={(item) => String(item._id)}
-      contentContainerStyle={styles.list}
-      refreshControl={
-        <ThemedRefreshControl refreshing={queueQuery.isFetching} onRefresh={() => void queueQuery.refetch()} />
-      }
-      ListEmptyComponent={<Text style={styles.empty}>{PRODUCT_MODERATION_PAGE_UI.EMPTY}</Text>}
-      renderItem={({ item }) => (
-        <ModerationRow
-          product={item}
-          onChanged={() => void queueQuery.refetch()}
-          approveMutation={approveMutation}
-          rejectMutation={rejectMutation}
-        />
-      )}
-    />
+    <>
+      <FlatList
+        style={[styles.container, centeredContentStyle]}
+        contentContainerStyle={[
+          styles.list,
+          resolveCatalogGridListContentStyle(productGrid.gap),
+          { paddingBottom: contentPaddingBottom },
+        ]}
+        data={catalogGridRows}
+        key={productGrid.listKey}
+        numColumns={1}
+        keyExtractor={(item) => item.key}
+        accessibilityLabel={PRODUCT_MODERATION_PAGE_UI.PRODUCTS_LIST_ARIA}
+        ListHeaderComponent={listHeader}
+        refreshControl={
+          <ThemedRefreshControl
+            refreshing={queueQuery.isFetching}
+            onRefresh={async () => {
+              await queueQuery.refetch();
+              await invalidateModerationBadges();
+            }}
+          />
+        }
+        renderItem={({ item }) => (
+          <ProductModerationGridRowItem
+            row={item}
+            columns={productGrid.columns}
+            gap={productGrid.gap}
+            tileWidth={productGrid.tileWidth}
+            rejectComments={rejectComments}
+            cardErrors={cardErrors}
+            pendingProductId={pendingProductId}
+            onRejectCommentChange={(productId, value) =>
+              setRejectComments((prev) => ({ ...prev, [productId]: value }))
+            }
+            onApprove={(productId) => {
+              void handleApprove(productId);
+            }}
+            onReject={(productId) => {
+              void handleReject(productId);
+            }}
+          />
+        )}
+      />
+
+      {navSheet}
+    </>
   );
 };

@@ -32,6 +32,8 @@ import { APP_SHELL_MOBILE_NAV_BREAKPOINT_PX } from "../../shared/lib/appShellMob
 import { useMaxWidthMediaQuery } from "../../shared/lib/useMaxWidthMediaQuery.js";
 import { useScrollLock } from "../../shared/lib/useScrollLock.js";
 import { SearchInput } from "../../shared/ui/SearchInput/SearchInput.jsx";
+import { SiteHeaderBannerCarousel } from "../../entities/site-header-banner/ui/SiteHeaderBannerCarousel.jsx";
+import { useSiteHeaderBannerSlidesQuery } from "../../entities/site-header-banner/model/useSiteHeaderBannerSlidesQuery.js";
 
 const PRODUCT_CATEGORY_FILTER_LIST_ID = HOME_PAGE_UI.PRODUCT_CATEGORY_FILTER_LIST_ID;
 
@@ -97,6 +99,7 @@ const NON_CATALOG_VIEW_TITLES = {
  *   pendingInstallmentDisputesCount?: number;
  *   pendingProductReportsCount?: number;
  *   pendingDataConfirmationCount?: number;
+ *   showSiteHeaderBanner?: boolean;
  * }} props
  */
 export function AppShellHeader({
@@ -130,6 +133,7 @@ export function AppShellHeader({
   pendingInstallmentDisputesCount = 0,
   pendingProductReportsCount = 0,
   pendingDataConfirmationCount = 0,
+  showSiteHeaderBanner = false,
 }) {
   /** @type {import('react').RefObject<HTMLDivElement | null>} */
   const productCategoryFilterRef = useRef(null);
@@ -187,6 +191,13 @@ export function AppShellHeader({
   const headerViewTitle = isHeaderViewTitleHidden(mainView) ? "" : nonCatalogTitle;
 
   const isMobileNav = useMaxWidthMediaQuery(APP_SHELL_MOBILE_NAV_BREAKPOINT_PX);
+  const showSiteHeaderBannerOnViewport = showSiteHeaderBanner && isMobileNav;
+  const slidesQuery = useSiteHeaderBannerSlidesQuery({
+    enabled: showSiteHeaderBannerOnViewport,
+  });
+  const siteHeaderBannerSlides = showSiteHeaderBannerOnViewport
+    ? (slidesQuery.data ?? [])
+    : [];
 
   const headerClassName = [
     "app-shell__header",
@@ -229,35 +240,40 @@ export function AppShellHeader({
   return (
     <>
       <header className={headerClassName}>
-        <div className="app-shell__header-top">
-          <div className="app-shell__header-main">
-            <HomeHeaderTitleRow
-              isCatalogHeaderView={isCatalogHeaderView}
-              headerViewTitle={headerViewTitle}
-              onNavigateToFullCatalogFromBreadcrumb={
-                onNavigateToFullCatalogFromBreadcrumb
-              }
-            />
-            <div className="app-shell__header-search">
-              <SearchInput
-                value={productSearchTerm}
-                onChange={onProductSearchTermChange}
-                placeholder={PRODUCT_SEARCH_INPUT_UI.PLACEHOLDER}
-                ariaLabel={PRODUCT_SEARCH_INPUT_UI.ARIA_LABEL}
-                clearAriaLabel={PRODUCT_SEARCH_INPUT_UI.CLEAR_ARIA}
-                pendingAriaLabel={PRODUCT_SEARCH_INPUT_UI.PENDING_ARIA}
-                isPending={isProductSearchPending}
+        <div className="app-shell__header-panel">
+          <div className="app-shell__header-top">
+            <div className="app-shell__header-main">
+              <HomeHeaderTitleRow
+                isCatalogHeaderView={isCatalogHeaderView}
+                headerViewTitle={headerViewTitle}
+                onNavigateToFullCatalogFromBreadcrumb={
+                  onNavigateToFullCatalogFromBreadcrumb
+                }
               />
+              <div className="app-shell__header-search">
+                <SearchInput
+                  value={productSearchTerm}
+                  onChange={onProductSearchTermChange}
+                  placeholder={PRODUCT_SEARCH_INPUT_UI.PLACEHOLDER}
+                  ariaLabel={PRODUCT_SEARCH_INPUT_UI.ARIA_LABEL}
+                  clearAriaLabel={PRODUCT_SEARCH_INPUT_UI.CLEAR_ARIA}
+                  pendingAriaLabel={PRODUCT_SEARCH_INPUT_UI.PENDING_ARIA}
+                  isPending={isProductSearchPending}
+                />
+              </div>
+              {isCatalogHeaderView && !isMobileNav ? (
+                <CatalogHeaderFilter {...catalogFilterProps} />
+              ) : null}
             </div>
-            {isCatalogHeaderView && !isMobileNav ? (
-              <CatalogHeaderFilter {...catalogFilterProps} />
-            ) : null}
+            <HeaderNavActions
+              {...navActionsProps}
+              variant={isMobileNav ? "mobile-top" : "desktop"}
+            />
           </div>
-          <HeaderNavActions
-            {...navActionsProps}
-            variant={isMobileNav ? "mobile-top" : "desktop"}
-          />
         </div>
+        {siteHeaderBannerSlides.length > 0 ? (
+          <SiteHeaderBannerCarousel slides={siteHeaderBannerSlides} />
+        ) : null}
       </header>
       {isMobileNav ? (
         <MobileBottomNav

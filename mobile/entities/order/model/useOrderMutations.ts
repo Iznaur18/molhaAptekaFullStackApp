@@ -6,6 +6,7 @@ import {
   markOrderItemDelivered,
   markOrderItemShipped,
 } from "@/entities/order/api/updateOrderItemStatus";
+import { updateOrderStatus } from "@/entities/order/api/updateOrderStatus";
 import { orderQueryKeys } from "@/shared/api";
 
 export const useOrderMutations = () => {
@@ -66,10 +67,16 @@ export const useOrderMutations = () => {
     onSuccess: invalidateSales,
   });
 
+  const updateStatusMutation = useMutation({
+    mutationFn: ({ orderId, status }: { orderId: string; status: string }) =>
+      updateOrderStatus(orderId, status),
+  });
+
   return {
     confirmItemMutation,
     cancelItemMutation,
     shipItemMutation,
     deliverItemMutation,
+    updateStatusMutation,
   };
 };

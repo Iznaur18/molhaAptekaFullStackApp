@@ -68,7 +68,7 @@ export default function HubSectionScreen() {
     }
   }, [router, sectionId]);
 
-  const shell = { flex: 1, paddingTop: insets.top } as const;
+  const shell = { flex: 1, minHeight: 0, paddingTop: insets.top } as const;
 
   if (!userAccess.isAuthorized && userAccess.isGuest) {
     return (

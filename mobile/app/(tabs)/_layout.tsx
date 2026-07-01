@@ -34,6 +34,7 @@ export default function TabLayout() {
         },
         tabBarBackground: () => null,
         sceneStyle: {
+          flex: 1,
           backgroundColor: theme.colors.bg,
         },
         headerStyle: {

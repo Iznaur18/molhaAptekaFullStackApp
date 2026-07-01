@@ -1,0 +1,142 @@
+.site-header-banner-admin {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.site-header-banner-admin__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.site-header-banner-admin__title {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.site-header-banner-admin__hint {
+  margin: 0;
+  color: var(--iz-color-text-muted, #64748b);
+  font-size: 0.92rem;
+}
+
+.site-header-banner-admin__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.site-header-banner-admin__fieldset {
+  margin: 0;
+  padding: 0.85rem;
+  border: 1px solid var(--iz-color-border, #e2e8f0);
+  border-radius: 10px;
+}
+
+.site-header-banner-admin__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.site-header-banner-admin__legend {
+  padding: 0 0.35rem;
+  font-weight: 600;
+}
+
+.site-header-banner-admin__label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.site-header-banner-admin__input {
+  width: 100%;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--iz-color-border, #e2e8f0);
+  border-radius: 8px;
+}
+
+.site-header-banner-admin__field-hint {
+  color: var(--iz-color-text-muted, #64748b);
+  font-size: 0.82rem;
+}
+
+.site-header-banner-admin__checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.site-header-banner-admin__items-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.site-header-banner-admin__items-title {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.site-header-banner-admin__empty {
+  margin: 0;
+  color: var(--iz-color-text-muted, #64748b);
+}
+
+.site-header-banner-admin__actions {
+  display: flex;
+  gap: 0.65rem;
+}
+
+.site-header-banner-admin__btn {
+  padding: 0.55rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.site-header-banner-admin__btn_primary {
+  background: var(--iz-color-brand, #2563eb);
+  color: #fff;
+}
+
+.site-header-banner-admin__btn_secondary {
+  background: var(--iz-color-surface, #fff);
+  border-color: var(--iz-color-border, #e2e8f0);
+}
+
+.site-header-banner-admin__btn_danger {
+  align-self: flex-start;
+  background: #fff;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.site-header-banner-admin__btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.site-header-banner-admin__error {
+  margin: 0;
+  color: #b91c1c;
+}
+
+.site-header-banner-admin__status {
+  margin: 0;
+  color: var(--iz-color-text-muted, #64748b);
+}
+
+.site-header-banner-admin__notice {
+  padding: 0.75rem 0.9rem;
+  border-radius: 8px;
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.site-header-banner-admin__notice p {
+  margin: 0;
+}

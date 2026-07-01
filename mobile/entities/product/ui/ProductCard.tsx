@@ -2,6 +2,13 @@ import { useRouter } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 
 import { formatProductReviewRatingLine } from "@/entities/product-review/lib/formatProductReviewRatingLine";
+import {
+  canSellerEditProduct,
+  getProductModerationBadgeLabel,
+  getProductModerationBadgeVariant,
+  getProductModerationRejectionComment,
+  shouldShowProductModerationPendingOverlay,
+} from "@/entities/product/lib/getProductModerationUi";
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useProductCardChromeFlags } from "@/entities/product/lib/useProductCardChromeFlags";
@@ -12,14 +19,21 @@ import { ProductCatalogStatusBadges } from "@/entities/product/ui/ProductCatalog
 import { ProductCardMediaGalleryNav } from "@/entities/product/ui/ProductCardMediaGalleryNav";
 import { ProductCardMediaSlide } from "@/entities/product/ui/ProductCardMediaSlide";
 import { ProductCardBanner } from "@/entities/product/ui/ProductCardBanner";
+import { ProductCardModerationPendingOverlay } from "@/entities/product/ui/ProductCardModerationPendingOverlay";
+import { ProductCardModerationPreviewFields } from "@/entities/product/ui/ProductCardModerationPreviewFields";
+import {
+  ProductModerationDetailsFooter,
+  type ProductModerationActions,
+} from "@/entities/product/ui/ProductModerationDetailsFooter";
 import { ProductCardSellerRow } from "@/entities/product/ui/ProductCardSellerRow";
+import { ProductCardSellerToolbar } from "@/entities/product/ui/ProductCardSellerToolbar";
 import {
   ProductDiscountBadge,
   ProductPriceDisplay,
 } from "@/entities/product/ui/ProductPriceDisplay";
 import { ProductLoyaltyPointsBadge } from "@/entities/product/ui/ProductLoyaltyPointsBadge";
 import { WishlistToggleButton } from "@/features/wishlist-toggle/ui/WishlistToggleButton";
-import { PRODUCT_REVIEW_UI, PRODUCT_UI } from "@/shared/config";
+import { PRODUCT_MODERATION_PAGE_UI, PRODUCT_CARD_UI, PRODUCT_REVIEW_UI, PRODUCT_UI } from "@/shared/config";
 import { useProductCardStyles } from "@/shared/theme/catalogProductStyles";
 
 type ProductCardProps = {
@@ -39,6 +53,14 @@ type ProductCardProps = {
   highlightCatalogPromotion?: boolean;
   isMineMode?: boolean;
   isModerationQueue?: boolean;
+  moderationActions?: ProductModerationActions | null;
+  onEditProduct?: () => void;
+  onPromoteProduct?: () => void;
+  onDeleteProduct?: () => void;
+  isDeletePending?: boolean;
+  isAvailabilityTogglePending?: boolean;
+  isAuctionTogglePending?: boolean;
+  isLoyaltyPointsOvercommitted?: boolean;
 };
 
 export const ProductCard = ({
@@ -48,6 +70,14 @@ export const ProductCard = ({
   highlightCatalogPromotion = true,
   isMineMode = false,
   isModerationQueue = false,
+  moderationActions = null,
+  onEditProduct,
+  onPromoteProduct,
+  onDeleteProduct,
+  isDeletePending = false,
+  isAvailabilityTogglePending = false,
+  isAuctionTogglePending = false,
+  isLoyaltyPointsOvercommitted = false,
 }: ProductCardProps) => {
   const router = useRouter();
   const styles = useProductCardStyles();
@@ -83,11 +113,30 @@ export const ProductCard = ({
       })
     : null;
 
+  const moderationBadgeVariant = getProductModerationBadgeVariant(product);
+  const moderationBadgeLabel = getProductModerationBadgeLabel(product);
+  const moderationRejectionComment = getProductModerationRejectionComment(product, isMineMode);
+  const showModerationPendingOverlay = shouldShowProductModerationPendingOverlay(product, {
+    isMineMode,
+    isModerationQueue,
+  });
+  const showModerationBadge =
+    (isMineMode || isModerationQueue) &&
+    !showModerationPendingOverlay &&
+    !(isCatalogGrid && isModerationQueue);
+  const showSellerFooter =
+    !flags.showBannerLayout &&
+    (typeof onEditProduct === "function" ||
+      typeof onPromoteProduct === "function" ||
+      typeof onDeleteProduct === "function");
+  const showWishlistToggle = !isMineMode && !isModerationQueue;
+
   return (
     <View
       style={[
         styles.card,
         isCatalogGrid && styles.cardCatalogGrid,
+        isCatalogGrid && isModerationQueue && styles.cardCatalogGridModerationQueue,
         promotionFrameStyle,
       ]}
     >
@@ -109,7 +158,7 @@ export const ProductCard = ({
           <ProductCardMediaSlide media={cardMedia} />
         </Pressable>
 
-        <ProductCardMediaGalleryNav media={cardMedia} />
+        {showModerationPendingOverlay ? <ProductCardModerationPendingOverlay /> : null}
 
         {flags.showDiscountBadge || flags.showLoyaltyPointsBadge ? (
           <View style={styles.imageBadges} pointerEvents="box-none">
@@ -125,6 +174,21 @@ export const ProductCard = ({
               />
             ) : null}
           </View>
+        ) : null}
+
+        {cardMedia.mediaSlides.length > 1 ? (
+          <ProductCardMediaGalleryNav
+            slideIndex={cardMedia.cardSlideIndex}
+            slideCount={cardMedia.mediaSlides.length}
+            onPrevious={() => {
+              const count = cardMedia.mediaSlides.length;
+              cardMedia.setCardSlideIndex((index) => (index - 1 + count) % count);
+            }}
+            onNext={() => {
+              const count = cardMedia.mediaSlides.length;
+              cardMedia.setCardSlideIndex((index) => (index + 1) % count);
+            }}
+          />
         ) : null}
       </View>
 
@@ -144,34 +208,107 @@ export const ProductCard = ({
 
           <ProductPriceDisplay product={product} showLabel={false} variant="card" />
 
-          <View style={[styles.metaStrip, isCatalogGrid && styles.metaStripCatalogGrid]}>
-            <Text
-              style={[
-                styles.rating,
-                isCatalogGrid && styles.ratingCatalogGrid,
-                !hasReviewRating && styles.ratingPlaceholder,
-              ]}
-              numberOfLines={1}
-              accessibilityLabel={hasReviewRating ? reviewLine : PRODUCT_REVIEW_UI.NO_REVIEWS}
-            >
-              {hasReviewRating ? reviewLine : PRODUCT_REVIEW_UI.NO_REVIEWS}
-            </Text>
+          {isModerationQueue ? (
+            <>
+              {showModerationBadge ? (
+                <Text
+                  style={[
+                    styles.moderationBadge,
+                    moderationBadgeVariant === "pending" && styles.moderationBadgePending,
+                    moderationBadgeVariant === "approved" && styles.moderationBadgeApproved,
+                    moderationBadgeVariant === "rejected" && styles.moderationBadgeRejected,
+                  ]}
+                  accessibilityRole="text"
+                  accessibilityLabel={moderationBadgeLabel}
+                >
+                  {moderationBadgeLabel}
+                </Text>
+              ) : null}
+              {moderationRejectionComment ? (
+                <Text style={styles.moderationComment}>
+                  {PRODUCT_MODERATION_PAGE_UI.REJECTION_COMMENT_PREFIX} {moderationRejectionComment}
+                </Text>
+              ) : null}
+              <ProductCardModerationPreviewFields product={product} />
+            </>
+          ) : (
+            <>
+              <View style={[styles.metaStrip, isCatalogGrid && styles.metaStripCatalogGrid]}>
+                <Text
+                  style={[
+                    styles.rating,
+                    isCatalogGrid && styles.ratingCatalogGrid,
+                    !hasReviewRating && styles.ratingPlaceholder,
+                  ]}
+                  numberOfLines={1}
+                  accessibilityLabel={hasReviewRating ? reviewLine : PRODUCT_REVIEW_UI.NO_REVIEWS}
+                >
+                  {hasReviewRating ? reviewLine : PRODUCT_REVIEW_UI.NO_REVIEWS}
+                </Text>
 
-            <ProductCatalogStatusBadges
-              product={product}
-              showHiddenBadge={product.productIsAvailable === false}
-            />
-          </View>
+                <ProductCatalogStatusBadges
+                  product={product}
+                  showHiddenBadge={product.productIsAvailable === false}
+                  isMineMode={isMineMode}
+                  isLoyaltyPointsOvercommitted={isLoyaltyPointsOvercommitted}
+                />
+              </View>
 
-          <View style={isCatalogGrid ? styles.sellerRowCatalogGrid : undefined}>
-            <ProductCardSellerRow product={product} />
-          </View>
+              <View
+                style={isCatalogGrid ? styles.sellerRowCatalogGrid : undefined}
+                accessibilityLabel={isMineMode ? PRODUCT_CARD_UI.PREVIEW_FIELDS_ARIA : undefined}
+              >
+                <ProductCardSellerRow product={product} />
+              </View>
+
+              {showModerationBadge ? (
+                <Text
+                  style={[
+                    styles.moderationBadge,
+                    moderationBadgeVariant === "pending" && styles.moderationBadgePending,
+                    moderationBadgeVariant === "approved" && styles.moderationBadgeApproved,
+                    moderationBadgeVariant === "rejected" && styles.moderationBadgeRejected,
+                  ]}
+                  accessibilityRole="text"
+                  accessibilityLabel={moderationBadgeLabel}
+                >
+                  {moderationBadgeLabel}
+                </Text>
+              ) : null}
+              {moderationRejectionComment ? (
+                <Text style={styles.moderationComment}>
+                  {PRODUCT_MODERATION_PAGE_UI.REJECTION_COMMENT_PREFIX} {moderationRejectionComment}
+                </Text>
+              ) : null}
+            </>
+          )}
         </View>
       </Pressable>
 
-      <View style={styles.wishlistSlot}>
-        <WishlistToggleButton productId={product._id} product={product} variant="card" />
-      </View>
+      {showSellerFooter ? (
+        <View style={styles.footerActions}>
+          <ProductCardSellerToolbar
+            onPromote={onPromoteProduct}
+            onEdit={onEditProduct}
+            canEdit={canSellerEditProduct(product)}
+            isDeletePending={isDeletePending}
+            isAvailabilityTogglePending={isAvailabilityTogglePending}
+            isAuctionTogglePending={isAuctionTogglePending}
+          />
+        </View>
+      ) : null}
+
+      {isModerationQueue && moderationActions ? (
+        <View style={styles.footerActions}>
+          <ProductModerationDetailsFooter {...moderationActions} />
+        </View>
+      ) : null}
+
+      {showWishlistToggle ? (
+        <View style={styles.wishlistSlot}>
+          <WishlistToggleButton productId={product._id} product={product} variant="card" />
+        </View>
+      ) : null}
     </View>
   );
 };

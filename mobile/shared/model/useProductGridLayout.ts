@@ -1,6 +1,8 @@
 import { useMemo } from "react";
 import { useWindowDimensions } from "react-native";
 
+import { resolveGridTileWidth } from "@/shared/lib/resolveGridTileWidth";
+import { resolveViewportLayoutWidth } from "@/shared/lib/resolveViewportLayoutWidth";
 import {
   resolveLayoutContentWidth,
   resolveProductGridColumns,
@@ -35,11 +37,12 @@ export const useProductGridLayout = (
   const { width, height } = useWindowDimensions();
 
   return useMemo(() => {
-    const layoutWidth = resolveLayoutContentWidth(width);
-    const columns = resolvers.resolveColumns({ width, height });
+    const viewportWidth = resolveViewportLayoutWidth(width);
+    const layoutWidth = resolveLayoutContentWidth(viewportWidth);
+    const columns = resolvers.resolveColumns({ width: viewportWidth, height });
     const contentWidth = layoutWidth - pagePadding * 2;
-    const gap = resolvers.resolveGap(width);
-    const tileWidth = (contentWidth - gap * (columns - 1)) / columns;
+    const gap = resolvers.resolveGap(viewportWidth);
+    const tileWidth = resolveGridTileWidth(contentWidth, columns, gap);
 
     return {
       columns,

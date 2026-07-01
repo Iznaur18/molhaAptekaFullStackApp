@@ -17,20 +17,42 @@ export type InstallmentProgram = {
   plans: InstallmentPlan[];
 };
 
+export type InstallmentPayment = {
+  _id?: string | null;
+  paymentIndex: number;
+  amountRub?: number;
+  dueAt?: string;
+  status?: string;
+  paidAt?: string | null;
+  buyerMarkedPaidAt?: string | null;
+};
+
+export type InstallmentCounterparty = {
+  _id?: string;
+  userName?: string;
+  email?: string;
+  userPhoneNumber?: string;
+  isPremiumUser?: boolean;
+  isUserDataConfirmed?: boolean;
+};
+
 export type InstallmentContract = {
   _id: string;
+  productId?: string;
   status?: string;
+  planTitle?: string;
+  monthsCount?: number;
+  monthlyPaymentRub?: number;
   totalAmountRub?: number;
   paidAmountRub?: number;
+  productNameAtContract?: string;
+  finalDueAt?: string;
+  nextPaymentDueAt?: string | null;
+  hasOverduePayment?: boolean;
   product?: { _id?: string; productName?: string };
-  buyer?: { _id?: string; userName?: string };
-  seller?: { _id?: string; userName?: string };
-  payments?: Array<{
-    index?: number;
-    status?: string;
-    amountRub?: number;
-    dueAt?: string;
-  }>;
+  buyer?: InstallmentCounterparty;
+  seller?: InstallmentCounterparty;
+  payments?: InstallmentPayment[];
 };
 
 export const fetchProductInstallmentProgram = async (productId: string) => {
@@ -102,7 +124,7 @@ export const markInstallmentPaymentPaid = async (contractId: string, paymentInde
     if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
-    return data.data;
+    return data.data as { contract?: InstallmentContract };
   } catch (error) {
     throw new Error(formatApiErrorMessage(error, "Не удалось отметить оплату"));
   }
@@ -116,7 +138,7 @@ export const confirmInstallmentPayment = async (contractId: string, paymentIndex
     if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
-    return data.data;
+    return data.data as { contract?: InstallmentContract };
   } catch (error) {
     throw new Error(formatApiErrorMessage(error, "Не удалось подтвердить оплату"));
   }
@@ -130,8 +152,76 @@ export const rejectInstallmentPayment = async (contractId: string, paymentIndex:
     if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
-    return data.data;
+    return data.data as { contract?: InstallmentContract };
   } catch (error) {
     throw new Error(formatApiErrorMessage(error, "Не удалось отклонить оплату"));
+  }
+};
+
+export const markInstallmentEarlyPayoff = async (contractId: string) => {
+  try {
+    const { data } = await apiClient.patch(`/installment/contracts/${contractId}/pay-early`);
+    if (!data?.success) {
+      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
+    }
+    return data.data as { contract?: InstallmentContract };
+  } catch (error) {
+    throw new Error(formatApiErrorMessage(error, "Не удалось оформить досрочное погашение"));
+  }
+};
+
+export const confirmInstallmentEarlyPayoff = async (contractId: string) => {
+  try {
+    const { data } = await apiClient.patch(
+      `/installment/contracts/${contractId}/pay-early/confirm`,
+    );
+    if (!data?.success) {
+      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
+    }
+    return data.data as { contract?: InstallmentContract };
+  } catch (error) {
+    throw new Error(formatApiErrorMessage(error, "Не удалось подтвердить досрочное погашение"));
+  }
+};
+
+export const cancelInstallmentEarlyPayoff = async (contractId: string) => {
+  try {
+    const { data } = await apiClient.patch(
+      `/installment/contracts/${contractId}/pay-early/cancel`,
+    );
+    if (!data?.success) {
+      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
+    }
+    return data.data as { contract?: InstallmentContract };
+  } catch (error) {
+    throw new Error(formatApiErrorMessage(error, "Не удалось отменить досрочное погашение"));
+  }
+};
+
+export const rejectInstallmentEarlyPayoff = async (contractId: string) => {
+  try {
+    const { data } = await apiClient.patch(
+      `/installment/contracts/${contractId}/pay-early/reject`,
+    );
+    if (!data?.success) {
+      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
+    }
+    return data.data as { contract?: InstallmentContract };
+  } catch (error) {
+    throw new Error(formatApiErrorMessage(error, "Не удалось отклонить досрочное погашение"));
+  }
+};
+
+export const openInstallmentDispute = async (contractId: string, reason: string) => {
+  try {
+    const { data } = await apiClient.post(`/installment/contracts/${contractId}/dispute`, {
+      reason,
+    });
+    if (!data?.success) {
+      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
+    }
+    return data.data as { contract?: InstallmentContract };
+  } catch (error) {
+    throw new Error(formatApiErrorMessage(error, "Не удалось открыть спор"));
   }
 };

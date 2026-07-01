@@ -1,15 +1,18 @@
+import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import { useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
 
-import { resolveProductImageUrl } from "@/entities/product/lib/resolveProductImageUrl";
 import { useMyFavoritesQuery } from "@/entities/wishlist/model/useMyFavoritesQuery";
 import { useWishlist } from "@/entities/wishlist/model/WishlistProvider";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
-import { WISHLIST_PAGE_UI } from "@/shared/config";
-import { formatApiErrorMessage, formatPriceRub } from "@/shared/lib";
-import { useSimpleProductListStyles } from "@/shared/theme/commerceScreenStyles";
-import { CachedProductImage } from "@/shared/ui/CachedProductImage";
+import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
+import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
+import { WishlistRow } from "@/features/wishlist-page/ui/WishlistRow";
+import { MY_PROFILE_PAGE_UI, WISHLIST_PAGE_UI } from "@/shared/config";
+import { formatApiErrorMessage } from "@/shared/lib";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
+import { useWishlistPageStyles } from "@/shared/theme/wishlistPageStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 type WishlistProduct = {
@@ -22,10 +25,20 @@ type WishlistProduct = {
 
 export const WishlistPage = () => {
   const router = useRouter();
-  const styles = useSimpleProductListStyles();
+  const styles = useWishlistPageStyles();
+  const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
   const isAuthorized = useIsAuthorized();
   const favoritesQuery = useMyFavoritesQuery({ enabled: isAuthorized });
-  const { items, removeItem } = useWishlist();
+  const { items } = useWishlist();
+  const [navSheetVisible, setNavSheetVisible] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (isAuthorized) {
+        void favoritesQuery.refetch();
+      }
+    }, [isAuthorized, favoritesQuery.refetch]),
+  );
 
   const products = useMemo(() => {
     const fromApi = (favoritesQuery.data?.products ?? []) as WishlistProduct[];
@@ -36,12 +49,28 @@ export const WishlistPage = () => {
       .filter((product): product is WishlistProduct => Boolean(product));
   }, [favoritesQuery.data?.products, items]);
 
+  const handleOpenProduct = useCallback(
+    (product: WishlistProduct) => {
+      router.push({ pathname: "/product/[id]", params: { id: product._id } });
+    },
+    [router],
+  );
+
+  const listHeader = (
+    <View style={styles.header}>
+      <ProfileMobileSectionToggle
+        activeLabel={MY_PROFILE_PAGE_UI.TAB_WISHLIST}
+        onPress={() => setNavSheetVisible(true)}
+      />
+    </View>
+  );
+
   if (!isAuthorized) {
     return (
       <View style={styles.centered}>
         <Text style={styles.hint}>{WISHLIST_PAGE_UI.LOGIN_HINT}</Text>
-        <Pressable style={styles.button} onPress={() => router.push("/(auth)/login")}>
-          <Text style={styles.buttonText}>{WISHLIST_PAGE_UI.LOGIN_BUTTON}</Text>
+        <Pressable style={styles.loginButton} onPress={() => router.push("/(auth)/login")}>
+          <Text style={styles.loginButtonText}>{WISHLIST_PAGE_UI.LOGIN_BUTTON}</Text>
         </Pressable>
       </View>
     );
@@ -65,45 +94,43 @@ export const WishlistPage = () => {
 
   if (products.length === 0) {
     return (
-      <View style={styles.centered}>
-        <Text style={styles.hint}>{WISHLIST_PAGE_UI.EMPTY}</Text>
-      </View>
+      <>
+        <View style={[styles.container, centeredContentStyle, styles.centered]}>
+          {listHeader}
+          <Text style={styles.state}>{WISHLIST_PAGE_UI.EMPTY}</Text>
+        </View>
+        <ProfileMobileNavSheet
+          visible={navSheetVisible}
+          activeSectionId="wishlist"
+          onClose={() => setNavSheetVisible(false)}
+          onOverviewPress={() => router.replace("/(tabs)/profile")}
+        />
+      </>
     );
   }
 
   return (
-    <FlatList
-      data={products}
-      keyExtractor={(item) => item._id}
-      contentContainerStyle={styles.list}
-      renderItem={({ item }) => {
-        const title = item.productName?.trim() || "Без названия";
-        const imageUrl = resolveProductImageUrl(item);
+    <>
+      <FlatList
+        style={[styles.container, centeredContentStyle]}
+        contentContainerStyle={[
+          styles.listContent,
+          { paddingBottom: contentPaddingBottom },
+        ]}
+        data={products}
+        keyExtractor={(item) => item._id}
+        ListHeaderComponent={listHeader}
+        renderItem={({ item }) => (
+          <WishlistRow product={item} onProductPress={handleOpenProduct} />
+        )}
+      />
 
-        return (
-          <View style={styles.row}>
-            <Pressable
-              style={styles.rowMain}
-              onPress={() => router.push({ pathname: "/product/[id]", params: { id: item._id } })}
-            >
-              <CachedProductImage uri={imageUrl} style={styles.image} />
-              <View style={styles.info}>
-                <Text style={styles.title} numberOfLines={2}>
-                  {title}
-                </Text>
-                <Text style={styles.price}>{formatPriceRub(item.productPrice)}</Text>
-              </View>
-            </Pressable>
-            <Pressable
-              style={styles.remove}
-              onPress={() => removeItem(item._id)}
-              accessibilityLabel={WISHLIST_PAGE_UI.REMOVE_ARIA(title)}
-            >
-              <Text style={styles.removeText}>×</Text>
-            </Pressable>
-          </View>
-        );
-      }}
-    />
+      <ProfileMobileNavSheet
+        visible={navSheetVisible}
+        activeSectionId="wishlist"
+        onClose={() => setNavSheetVisible(false)}
+        onOverviewPress={() => router.replace("/(tabs)/profile")}
+      />
+    </>
   );
 };

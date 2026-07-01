@@ -659,3 +659,40 @@ export const useProductPromotionModalStyles = createThemedStyles((theme) => ({
     fontWeight: "600",
   },
 }));
+
+export const useSellerProductsLimitModalStyles = createThemedStyles((theme) => ({
+  overlay: {
+    flex: 1,
+    backgroundColor: MODAL_BACKDROP_SCRIM,
+    justifyContent: "center",
+    padding: 24,
+  },
+  card: {
+    borderRadius: theme.radius.md,
+    padding: 20,
+    gap: theme.spacing[3],
+    backgroundColor: theme.colors.surface,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: theme.colors.text,
+  },
+  body: {
+    fontSize: 15,
+    lineHeight: 22,
+    color: theme.colors.textSecondary,
+  },
+  button: {
+    alignSelf: "flex-start",
+    borderRadius: 10,
+    paddingVertical: theme.spacing[3],
+    paddingHorizontal: theme.spacing[5],
+    backgroundColor: theme.colors.nearBlack,
+  },
+  buttonText: {
+    color: theme.colors.onContrast,
+    fontWeight: "600",
+    fontSize: 15,
+  },
+}));

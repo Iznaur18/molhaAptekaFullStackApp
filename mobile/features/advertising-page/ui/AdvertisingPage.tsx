@@ -1,73 +1,108 @@
+import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
+import { useCallback, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 
 import { useMyIntroAdCampaignQuery } from "@/entities/intro-ad/model/useMyIntroAdCampaignQuery";
-import { useMySellerPersonalCategoryCampaignQuery } from "@/entities/seller-personal-category/model/useMySellerPersonalCategoryCampaignQuery";
 import { useMyLoyaltyPointsStatusQuery } from "@/entities/user/model/useMyLoyaltyPointsStatusQuery";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { IntroAdAdvertisingSection } from "@/features/advertising-page/ui/IntroAdAdvertisingSection";
 import { PersonalCategoryAdvertisingSection } from "@/features/advertising-page/ui/PersonalCategoryAdvertisingSection";
+import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
+import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import {
   ADVERTISING_PAGE_UI,
   INTRO_AD_PAGE_UI,
+  MY_PROFILE_PAGE_UI,
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
-import { useAdvertisingPageStyles } from "@/shared/theme/sellerFlowStyles";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
+import { useAdvertisingPageStyles } from "@/shared/theme/advertisingPageStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 export const AdvertisingPage = () => {
   const router = useRouter();
   const styles = useAdvertisingPageStyles();
+  const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
   const isAuthorized = useIsAuthorized();
   const loyaltyQuery = useMyLoyaltyPointsStatusQuery(isAuthorized);
-  const introQuery = useMyIntroAdCampaignQuery(isAuthorized);
-  const personalCategoryQuery = useMySellerPersonalCategoryCampaignQuery(isAuthorized);
+  const campaignQuery = useMyIntroAdCampaignQuery(isAuthorized);
+  const [navSheetVisible, setNavSheetVisible] = useState(false);
 
-  const loyaltyBalance = loyaltyQuery.data?.loyaltyPointsBalance ?? 0;
+  useFocusEffect(
+    useCallback(() => {
+      if (isAuthorized) {
+        void loyaltyQuery.refetch();
+        void campaignQuery.refetch();
+      }
+    }, [isAuthorized, loyaltyQuery.refetch, campaignQuery.refetch]),
+  );
 
   if (!isAuthorized) {
     return (
       <View style={styles.centered}>
-        <Text style={styles.hint}>{ADVERTISING_PAGE_UI.LOGIN_HINT}</Text>
-        <Pressable style={styles.button} onPress={() => router.push("/(auth)/login")}>
-          <Text style={styles.buttonText}>{ADVERTISING_PAGE_UI.LOGIN_BUTTON}</Text>
+        <Text style={styles.hint}>{INTRO_AD_PAGE_UI.LOGIN_HINT}</Text>
+        <Pressable style={styles.loginButton} onPress={() => router.push("/(auth)/login")}>
+          <Text style={styles.loginButtonText}>{INTRO_AD_PAGE_UI.LOGIN_BUTTON}</Text>
         </Pressable>
       </View>
     );
   }
 
-  const isLoading =
-    introQuery.isPending || personalCategoryQuery.isPending || loyaltyQuery.isPending;
-  const queryError = introQuery.error ?? personalCategoryQuery.error ?? loyaltyQuery.error;
-
-  if (isLoading) {
-    return <ScreenLoadingState message={ADVERTISING_PAGE_UI.LOADING} />;
+  if (campaignQuery.isPending || loyaltyQuery.isPending) {
+    return <ScreenLoadingState message={INTRO_AD_PAGE_UI.LOADING} />;
   }
 
-  if (queryError) {
+  if (campaignQuery.isError) {
     return (
       <ScreenErrorState
-        message={formatApiErrorMessage(queryError, INTRO_AD_PAGE_UI.FETCH_FALLBACK)}
-        onRetry={() => {
-          void introQuery.refetch();
-          void personalCategoryQuery.refetch();
-          void loyaltyQuery.refetch();
-        }}
+        message={formatApiErrorMessage(campaignQuery.error, INTRO_AD_PAGE_UI.FETCH_FALLBACK)}
+        onRetry={() => campaignQuery.refetch()}
       />
     );
   }
 
+  const loyaltyBalance = loyaltyQuery.data?.loyaltyPointsBalance ?? 0;
+
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.lead}>{ADVERTISING_PAGE_UI.PAGE_LEAD}</Text>
+    <>
+      <ScrollView
+        style={[styles.container, centeredContentStyle]}
+        contentContainerStyle={[
+          styles.scroll,
+          styles.content,
+          { paddingBottom: contentPaddingBottom },
+        ]}
+        accessibilityLabel={INTRO_AD_PAGE_UI.PAGE_ARIA}
+      >
+        <View style={styles.header}>
+          <ProfileMobileSectionToggle
+            activeLabel={MY_PROFILE_PAGE_UI.TAB_ADVERTISING}
+            onPress={() => setNavSheetVisible(true)}
+          />
 
-      <View style={styles.balanceCard}>
-        <Text style={styles.balanceLabel}>{ADVERTISING_PAGE_UI.BALANCE_LABEL}</Text>
-        <Text style={styles.balance}>{ADVERTISING_PAGE_UI.BALANCE(loyaltyBalance)}</Text>
-      </View>
+          <Text style={styles.pageLead}>{ADVERTISING_PAGE_UI.PAGE_LEAD}</Text>
 
-      <IntroAdAdvertisingSection loyaltyBalance={loyaltyBalance} />
-      <PersonalCategoryAdvertisingSection loyaltyBalance={loyaltyBalance} />
-    </ScrollView>
+          <View style={styles.balanceBar}>
+            <Text style={styles.balanceLabel}>{ADVERTISING_PAGE_UI.BALANCE_LABEL}</Text>
+            <Text style={styles.balanceValue}>
+              {ADVERTISING_PAGE_UI.BALANCE(loyaltyBalance)}
+            </Text>
+          </View>
+
+          <View style={styles.cards}>
+            <IntroAdAdvertisingSection loyaltyBalance={loyaltyBalance} />
+            <PersonalCategoryAdvertisingSection loyaltyBalance={loyaltyBalance} />
+          </View>
+        </View>
+      </ScrollView>
+
+      <ProfileMobileNavSheet
+        visible={navSheetVisible}
+        activeSectionId="advertising"
+        onClose={() => setNavSheetVisible(false)}
+        onOverviewPress={() => router.replace("/(tabs)/profile")}
+      />
+    </>
   );
 };
