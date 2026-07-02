@@ -51,8 +51,9 @@ export const ProductAuctionTab = ({
   const router = useRouter();
   const theme = useAppTheme();
   const styles = useProductPriceOfferStyles();
+  const myOfferQueryEnabled = isAuthorized && !isOwnProduct;
   const offersQuery = useTopPriceOffersQuery(productId, auctionActive);
-  const myOfferQuery = useMyPriceOfferQuery(productId, isAuthorized && !isOwnProduct);
+  const myOfferQuery = useMyPriceOfferQuery(productId, myOfferQueryEnabled);
   const { submitMutation, patchMutation, cancelMutation } = usePriceOfferMutations(productId);
   const [priceInput, setPriceInput] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -125,10 +126,10 @@ export const ProductAuctionTab = ({
       setPriceInput(formatRubPriceInput(myOffer.offerPrice));
       return;
     }
-    if (!myOfferQuery.isPending) {
+    if (!myOfferQueryEnabled || !myOfferQuery.isPending) {
       setPriceInput("");
     }
-  }, [myOffer?._id, myOffer?.offerPrice, myOfferQuery.isPending]);
+  }, [myOffer?._id, myOffer?.offerPrice, myOfferQuery.isPending, myOfferQueryEnabled]);
 
   const showForm =
     !isOwnProduct &&
@@ -188,7 +189,7 @@ export const ProductAuctionTab = ({
     );
   }
 
-  if (offersQuery.isPending || (isAuthorized && myOfferQuery.isPending)) {
+  if (offersQuery.isLoading || (myOfferQueryEnabled && myOfferQuery.isLoading)) {
     return <ScreenLoadingState />;
   }
 

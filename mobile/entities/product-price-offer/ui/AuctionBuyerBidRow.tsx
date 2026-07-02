@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { Image, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import { useCreateOrderMutation } from "@/entities/order/model/useCreateOrderMutation";
 import type { OrderPaymentMethod } from "@/entities/order/model/constants";
 import type { MyPriceOfferBid } from "@/entities/product-price-offer/api/incomingPriceOffersApi";
 import { usePriceOfferMutations } from "@/entities/product-price-offer/model/usePriceOfferMutations";
 import { AuctionDashboardBuyerPriceEditor } from "@/entities/product-price-offer/ui/AuctionDashboardBuyerPriceEditor";
+import { AuctionDashboardProductThumb } from "@/entities/product-price-offer/ui/AuctionDashboardProductThumb";
 import { AuctionDashboardRowStatus } from "@/entities/product-price-offer/ui/AuctionDashboardRowStatus";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { CheckoutForm } from "@/features/checkout/ui/CheckoutForm";
@@ -51,7 +52,6 @@ export const AuctionBuyerBidRow = ({
   const [paySuccess, setPaySuccess] = useState("");
 
   const productName = bid.product?.productName ?? "Товар";
-  const imageUrl = bid.product?.productImageUrl ?? null;
   const isPending = bid.status === PRICE_OFFER_STATUS_PENDING;
   const isAccepted = bid.status === PRICE_OFFER_STATUS_ACCEPTED;
 
@@ -117,25 +117,25 @@ export const AuctionBuyerBidRow = ({
   return (
     <View style={styles.row}>
       <View style={styles.head}>
-        {imageUrl ? (
-          <Image source={{ uri: imageUrl }} style={styles.thumb} accessibilityIgnoresInvertColors />
-        ) : (
-          <View style={styles.thumbPlaceholder}>
-            <Text style={styles.thumbPlaceholderText}>—</Text>
-          </View>
-        )}
+        <AuctionDashboardProductThumb product={bid.product} />
         <View style={styles.main}>
           {onProductClick ? (
             <Pressable
               style={styles.titlePressable}
               onPress={() => onProductClick(bid.productId)}
             >
-              <Text style={styles.title}>{productName}</Text>
+              <Text style={styles.title} numberOfLines={2}>
+                {productName}
+              </Text>
             </Pressable>
           ) : (
-            <Text style={styles.titleStatic}>{productName}</Text>
+            <Text style={styles.titleStatic} numberOfLines={2}>
+              {productName}
+            </Text>
           )}
-          <Text style={styles.meta}>{formatIsoDateTime(bid.createdAt)}</Text>
+          <Text style={styles.meta} numberOfLines={1}>
+            {formatIsoDateTime(bid.createdAt)}
+          </Text>
           <AuctionDashboardRowStatus isPending={isPending} isAccepted={isAccepted}>
             {isPending
               ? PRODUCT_PRICE_OFFER_UI.STATUS_PENDING

@@ -1,7 +1,7 @@
 import { View } from "react-native";
 
 import type { ModerationProduct } from "@/entities/product/api/productModerationApi";
-import { ProductCard } from "@/entities/product/ui/ProductCard";
+import { ProductModerationQueueCard } from "@/entities/product/ui/ProductModerationQueueCard";
 import type { ProductModerationActions } from "@/entities/product/ui/ProductModerationDetailsFooter";
 import type { CatalogGridRow } from "@/features/catalog-grid/lib/buildCatalogGridRows";
 import { catalogGridRowStyles } from "@/features/catalog-grid/lib/catalogGridLayout";
@@ -49,11 +49,8 @@ export const ProductModerationGridRowItem = ({
 
         return (
           <View key={productId} style={{ width: tileWidth }}>
-            <ProductCard
+            <ProductModerationQueueCard
               product={product as ModerationProduct}
-              layout="catalog-grid"
-              highlightCatalogPromotion={false}
-              isModerationQueue
               moderationActions={buildModerationActions(productId, actionProps)}
             />
           </View>

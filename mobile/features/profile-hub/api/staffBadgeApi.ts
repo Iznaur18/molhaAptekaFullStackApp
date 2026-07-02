@@ -24,23 +24,17 @@ const fetchCount = async (path: string, field: string): Promise<number> => {
 export const fetchPendingModerationProductsCount = () =>
   fetchCount("/product/moderation/pending/count", "totalPending");
 
-export const fetchPendingIntroAdCampaignsCount = async () => {
+export const fetchPendingIntroAdCampaignsOnlyCount = async (): Promise<number> => {
   try {
-    const [introResponse, bannerCount] = await Promise.all([
-      apiClient.get("/intro-ad/moderation/pending/count"),
-      fetchPendingSiteHeaderBannerCampaignsCount(),
-    ]);
-    const parsed = parseApiContractData(
-      introResponse.data,
-      pendingIntroAdCampaignsCountDataSchema,
-    );
-    return parsed.count + bannerCount;
+    const { data } = await apiClient.get("/intro-ad/moderation/pending/count");
+    const parsed = parseApiContractData(data, pendingIntroAdCampaignsCountDataSchema);
+    return parsed.count;
   } catch {
     return 0;
   }
 };
 
-export const fetchPendingSellerPersonalCategoryCampaignsCount = async () => {
+export const fetchPendingSellerPersonalCategoryCampaignsCount = async (): Promise<number> => {
   try {
     const { data } = await apiClient.get(
       "/seller-personal-category/moderation/pending/count",
@@ -54,6 +48,18 @@ export const fetchPendingSellerPersonalCategoryCampaignsCount = async () => {
     return 0;
   }
 };
+
+export const fetchPendingAdModerationNavBadgeCount = async (): Promise<number> => {
+  const [introCount, bannerCount, personalCategoryCount] = await Promise.all([
+    fetchPendingIntroAdCampaignsOnlyCount(),
+    fetchPendingSiteHeaderBannerCampaignsCount(),
+    fetchPendingSellerPersonalCategoryCampaignsCount(),
+  ]);
+  return introCount + bannerCount + personalCategoryCount;
+};
+
+/** @deprecated используйте fetchPendingIntroAdCampaignsOnlyCount или fetchPendingAdModerationNavBadgeCount */
+export const fetchPendingIntroAdCampaignsCount = fetchPendingAdModerationNavBadgeCount;
 
 export const fetchPendingProductReportsCount = () =>
   fetchCount("/product/reports/pending/count", "count");

@@ -18,8 +18,10 @@ import { setPendingCatalogFilters } from "@/features/catalog-browser/model/pendi
 import { useCatalogBrowserGridLayout } from "@/features/catalog-browser/lib/useCatalogBrowserGridLayout";
 import { CatalogBrowserTileCard } from "@/features/catalog-browser/ui/CatalogBrowserTileCard";
 import { CatalogBrowserTilesGrid } from "@/features/catalog-browser/ui/CatalogBrowserTilesGrid";
+import { CatalogSubcategoryPicker } from "@/features/catalog-browser/ui/CatalogSubcategoryPicker";
 import { EditCategoryDisplayModal } from "@/features/catalog-browser/ui/EditCategoryDisplayModal";
 import { EditFeedTileDisplayModal } from "@/features/catalog-browser/ui/EditFeedTileDisplayModal";
+import { useCatalogSubcategoryPicker } from "@/features/catalog-browser/model/useCatalogSubcategoryPicker";
 import {
   CATALOG_BROWSER_UI,
   PRODUCT_CATEGORY_DISPLAY_UI,
@@ -78,11 +80,23 @@ export const CatalogBrowserPage = () => {
     categoryRootsQuery.error ??
     personalCategoryTilesQuery.error;
 
+  const subcategoryPicker = useCatalogSubcategoryPicker({
+    categoryRoots,
+    onNavigateToProducts: (filters) => {
+      setPendingCatalogFilters({
+        view: "main",
+        ...filters,
+      });
+      router.replace("/(tabs)");
+    },
+  });
+
   const openCatalogWithFilters = (filters: Partial<CatalogListFilters>) => {
     setPendingCatalogFilters({
       view: "main",
       ...filters,
     });
+    subcategoryPicker.clearPickerTrail();
     router.replace("/(tabs)");
   };
 
@@ -104,9 +118,12 @@ export const CatalogBrowserPage = () => {
     openCatalogWithFilters(query);
   };
 
-  const handleCategoryPress = (categorySlug: string) => {
-    openCatalogWithFilters({ productCategory: categorySlug });
+  const handleCategoryPress = (item: (typeof categoryItems)[number]) => {
+    void subcategoryPicker.handleCatalogCategoryGridClick(item);
   };
+
+  const resolveCategoryTileKey = (item: (typeof categoryItems)[number]) =>
+    String(item.categoryId ?? item.categorySlug);
 
   const handlePersonalCategoryPress = (campaignId: string) => {
     openCatalogWithFilters({ sellerPersonalCategoryId: campaignId });
@@ -130,6 +147,20 @@ export const CatalogBrowserPage = () => {
       <ScreenErrorState
         message={formatApiErrorMessage(queryError, CATALOG_BROWSER_UI.ERROR)}
         onRetry={handleRefreshDisplays}
+      />
+    );
+  }
+
+  if (subcategoryPicker.isCatalogSubcategoryPickerActive) {
+    return (
+      <CatalogSubcategoryPicker
+        trail={subcategoryPicker.pickerTrail}
+        displays={categoryDisplays}
+        loadError={subcategoryPicker.pickerLoadError}
+        resolvingCategoryId={subcategoryPicker.resolvingPickerCategoryId}
+        onBack={subcategoryPicker.handleSubcategoryPickerBack}
+        onViewAll={subcategoryPicker.handleSubcategoryPickerViewAll}
+        onCategoryClick={subcategoryPicker.handleSubcategoryPickerCategoryClick}
       />
     );
   }
@@ -189,7 +220,11 @@ export const CatalogBrowserPage = () => {
               imageUrl={item.imageUrl}
               placeholderImageUrl={PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE}
               {...tileLayoutProps}
-              onPress={() => handleCategoryPress(item.categorySlug)}
+              disabled={subcategoryPicker.resolvingLandingCategoryKey != null}
+              pending={
+                subcategoryPicker.resolvingLandingCategoryKey === resolveCategoryTileKey(item)
+              }
+              onPress={() => handleCategoryPress(item)}
               onEditPress={
                 isAdmin ? () => setEditingCategorySlug(item.categorySlug) : undefined
               }

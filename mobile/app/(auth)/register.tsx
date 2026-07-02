@@ -3,10 +3,10 @@ import { useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   ScrollView,
   Text,
   TextInput,
+  View,
 } from "react-native";
 
 import { buildRegisterPayload } from "@/entities/session/lib/buildRegisterPayload";
@@ -96,16 +96,22 @@ export default function RegisterScreen() {
 
         {errorMessage ? <Text style={fieldStyles.error}>{errorMessage}</Text> : null}
 
-        <AppButton
-          label={AUTH_UI.REGISTER_BUTTON}
-          variant="contrast"
-          onPress={handleSubmit}
-          disabled={registerMutation.isPending}
-        />
-
-        <Pressable onPress={() => router.push("/(auth)/login")}>
-          <Text style={authStyles.link}>{AUTH_UI.GO_TO_LOGIN}</Text>
-        </Pressable>
+        <View style={authStyles.authActions}>
+          <AppButton
+            label={AUTH_UI.REGISTER_BUTTON}
+            variant="primary"
+            style={authStyles.authButton}
+            onPress={handleSubmit}
+            disabled={registerMutation.isPending}
+          />
+          <AppButton
+            label={AUTH_UI.GO_TO_LOGIN}
+            variant="secondary"
+            style={[authStyles.authButton, authStyles.authSecondaryButton]}
+            onPress={() => router.push("/(auth)/login")}
+            disabled={registerMutation.isPending}
+          />
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );

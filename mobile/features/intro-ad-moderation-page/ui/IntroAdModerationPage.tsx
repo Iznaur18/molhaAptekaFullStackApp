@@ -17,6 +17,8 @@ import {
   type IntroAdModerationCampaign,
 } from "@/entities/intro-ad/ui/IntroAdModerationCampaignCard";
 import { useAppIntro } from "@/features/app-intro/model/AppIntroProvider";
+import { ModerationSectionTitle } from "@/features/intro-ad-moderation-page/ui/ModerationSectionTitle";
+import { SellerPersonalCategoryCampaignModerationSection } from "@/features/intro-ad-moderation-page/ui/SellerPersonalCategoryCampaignModerationSection";
 import { SiteHeaderBannerCampaignModerationSection } from "@/features/intro-ad-moderation-page/ui/SiteHeaderBannerCampaignModerationSection";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
@@ -173,12 +175,12 @@ export const IntroAdModerationPage = () => {
     return <ScreenLoadingState message={INTRO_AD_MODERATION_PAGE_UI.LOADING} />;
   }
 
-  const isEmpty = pendingCampaigns.length === 0 && managedCampaigns.length === 0;
-  const hasLoadError =
+  const hasIntroLoadError =
     (queueQuery.isError && pendingCampaigns.length === 0) ||
     (managedQuery.isError && managedCampaigns.length === 0);
+  const isIntroEmpty = pendingCampaigns.length === 0 && managedCampaigns.length === 0;
 
-  if (hasLoadError && isEmpty) {
+  if (hasIntroLoadError && isIntroEmpty) {
     const error = queueQuery.error ?? managedQuery.error;
     return (
       <ScreenErrorState
@@ -190,21 +192,87 @@ export const IntroAdModerationPage = () => {
     );
   }
 
-  if (isEmpty) {
+  const moderationSections = (
+    <>
+      {isIntroEmpty ? (
+        <Text style={styles.empty}>{INTRO_AD_MODERATION_PAGE_UI.EMPTY}</Text>
+      ) : null}
+
+      {managedCampaigns.length > 0 ? (
+        <View style={styles.section}>
+          <ModerationSectionTitle title={INTRO_AD_MODERATION_PAGE_UI.INTRO_MANAGED_TITLE} />
+          <View style={styles.list}>
+            {managedCampaigns.map((campaign) => {
+              const campaignId = String(campaign._id);
+              return (
+                <IntroAdModerationCampaignCard
+                  key={campaignId}
+                  campaign={campaign}
+                  isPending={pendingCampaignId === campaignId}
+                  mode="managed"
+                  onPreview={buildPreviewHandler(campaign)}
+                  onStaffCancel={() => {
+                    void handleStaffCancel(campaignId);
+                  }}
+                />
+              );
+            })}
+          </View>
+        </View>
+      ) : null}
+
+      {pendingCampaigns.length > 0 ? (
+        <View style={styles.section}>
+          <ModerationSectionTitle
+            title={INTRO_AD_MODERATION_PAGE_UI.INTRO_PENDING_TITLE}
+            pendingCount={pendingCampaigns.length}
+          />
+          <View style={styles.list}>
+            {pendingCampaigns.map((campaign) => {
+              const campaignId = String(campaign._id);
+              return (
+                <IntroAdModerationCampaignCard
+                  key={campaignId}
+                  campaign={campaign}
+                  isPending={pendingCampaignId === campaignId}
+                  mode="pending"
+                  onPreview={buildPreviewHandler(campaign)}
+                  onApprove={() => {
+                    void handleApprove(campaignId);
+                  }}
+                  onReject={() => {
+                    void handleReject(campaignId);
+                  }}
+                  rejectReason={rejectReasons[campaignId] ?? ""}
+                  onRejectReasonChange={(value) =>
+                    setRejectReasons((prev) => ({ ...prev, [campaignId]: value }))
+                  }
+                />
+              );
+            })}
+          </View>
+        </View>
+      ) : null}
+
+      <SiteHeaderBannerCampaignModerationSection onActionError={setActionError} />
+      <SellerPersonalCategoryCampaignModerationSection onActionError={setActionError} />
+    </>
+  );
+
+  if (isIntroEmpty) {
     return (
       <>
         <ScrollView
           style={[styles.container, centeredContentStyle]}
-          contentContainerStyle={[styles.scroll, styles.centered, { paddingBottom: contentPaddingBottom }]}
+          contentContainerStyle={[styles.scroll, { paddingBottom: contentPaddingBottom }]}
         >
           {listHeader}
-          <Text style={styles.empty}>{INTRO_AD_MODERATION_PAGE_UI.EMPTY}</Text>
-          <SiteHeaderBannerCampaignModerationSection onActionError={setActionError} />
           {actionError ? (
             <Text style={[styles.state, styles.stateError]} accessibilityRole="alert">
               {actionError}
             </Text>
           ) : null}
+          {moderationSections}
         </ScrollView>
         {navSheet}
       </>
@@ -234,60 +302,7 @@ export const IntroAdModerationPage = () => {
           </Text>
         ) : null}
 
-        {managedCampaigns.length > 0 ? (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{INTRO_AD_MODERATION_PAGE_UI.MANAGED_TITLE}</Text>
-            <View style={styles.list}>
-              {managedCampaigns.map((campaign) => {
-                const campaignId = String(campaign._id);
-                return (
-                  <IntroAdModerationCampaignCard
-                    key={campaignId}
-                    campaign={campaign}
-                    isPending={pendingCampaignId === campaignId}
-                    mode="managed"
-                    onPreview={buildPreviewHandler(campaign)}
-                    onStaffCancel={() => {
-                      void handleStaffCancel(campaignId);
-                    }}
-                  />
-                );
-              })}
-            </View>
-          </View>
-        ) : null}
-
-        {pendingCampaigns.length > 0 ? (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{INTRO_AD_MODERATION_PAGE_UI.PENDING_TITLE}</Text>
-            <View style={styles.list}>
-              {pendingCampaigns.map((campaign) => {
-                const campaignId = String(campaign._id);
-                return (
-                  <IntroAdModerationCampaignCard
-                    key={campaignId}
-                    campaign={campaign}
-                    isPending={pendingCampaignId === campaignId}
-                    mode="pending"
-                    onPreview={buildPreviewHandler(campaign)}
-                    onApprove={() => {
-                      void handleApprove(campaignId);
-                    }}
-                    onReject={() => {
-                      void handleReject(campaignId);
-                    }}
-                    rejectReason={rejectReasons[campaignId] ?? ""}
-                    onRejectReasonChange={(value) =>
-                      setRejectReasons((prev) => ({ ...prev, [campaignId]: value }))
-                    }
-                  />
-                );
-              })}
-            </View>
-          </View>
-        ) : null}
-
-        <SiteHeaderBannerCampaignModerationSection onActionError={setActionError} />
+        {moderationSections}
       </ScrollView>
 
       {navSheet}

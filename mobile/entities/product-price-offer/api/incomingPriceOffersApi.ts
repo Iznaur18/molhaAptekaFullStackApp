@@ -5,6 +5,7 @@ import { formatApiErrorMessage } from "@/shared/lib";
 export type PriceOfferProductPreview = {
   _id?: string;
   productName?: string;
+  productImageUrls?: string[];
   productImageUrl?: string | null;
 };
 

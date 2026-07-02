@@ -12,7 +12,9 @@ export type ProductModerationActions = {
   errorMessage?: string;
 };
 
-type ProductModerationDetailsFooterProps = ProductModerationActions;
+type ProductModerationDetailsFooterProps = ProductModerationActions & {
+  variant?: "default" | "compact";
+};
 
 export const ProductModerationDetailsFooter = ({
   rejectComment,
@@ -21,44 +23,54 @@ export const ProductModerationDetailsFooter = ({
   onReject,
   isBusy = false,
   errorMessage = "",
+  variant = "default",
 }: ProductModerationDetailsFooterProps) => {
   const styles = useProductModerationDetailsFooterStyles();
+  const isCompact = variant === "compact";
 
   return (
-    <View style={styles.root}>
+    <View style={[styles.root, isCompact && styles.rootCompact]}>
       {errorMessage ? (
         <Text style={styles.error} accessibilityRole="alert">
           {errorMessage}
         </Text>
       ) : null}
       <View style={styles.rejectLabel}>
-        <Text>{PRODUCT_MODERATION_PAGE_UI.REJECT_COMMENT_LABEL}</Text>
+        {isCompact ? null : <Text>{PRODUCT_MODERATION_PAGE_UI.REJECT_COMMENT_LABEL}</Text>}
         <TextInput
-          style={styles.rejectInput}
+          style={[styles.rejectInput, isCompact && styles.rejectInputCompact]}
           value={rejectComment}
           multiline
-          numberOfLines={3}
+          numberOfLines={isCompact ? 2 : 3}
           editable={!isBusy}
           placeholder={PRODUCT_MODERATION_PAGE_UI.REJECT_COMMENT_PLACEHOLDER}
           onChangeText={onRejectCommentChange}
         />
       </View>
-      <View style={styles.actions}>
+      <View style={[styles.actions, isCompact && styles.actionsCompact]}>
         <Pressable
-          style={[styles.approveButton, isBusy && styles.buttonDisabled]}
+          style={[
+            styles.rejectButton,
+            isCompact && styles.rejectButtonCompact,
+            isBusy && styles.buttonDisabled,
+          ]}
+          onPress={onReject}
+          disabled={isBusy}
+        >
+          <Text style={styles.rejectText}>{PRODUCT_MODERATION_PAGE_UI.REJECT}</Text>
+        </Pressable>
+        <Pressable
+          style={[
+            styles.approveButton,
+            isCompact && styles.approveButtonCompact,
+            isBusy && styles.buttonDisabled,
+          ]}
           onPress={onApprove}
           disabled={isBusy}
         >
           <Text style={styles.approveText}>
             {isBusy ? PRODUCT_MODERATION_PAGE_UI.ACTION_PENDING : PRODUCT_MODERATION_PAGE_UI.APPROVE}
           </Text>
-        </Pressable>
-        <Pressable
-          style={[styles.rejectButton, isBusy && styles.buttonDisabled]}
-          onPress={onReject}
-          disabled={isBusy}
-        >
-          <Text style={styles.rejectText}>{PRODUCT_MODERATION_PAGE_UI.REJECT}</Text>
         </Pressable>
       </View>
     </View>

@@ -17,7 +17,8 @@ import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNa
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import { API_CLIENT_UI, MY_PROFILE_PAGE_UI, PRODUCT_MODERATION_PAGE_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
-import { useProductGridLayout } from "@/shared/model/useProductGridLayout";
+import { useProductGridLayout, type ProductGridLayoutResolvers } from "@/shared/model/useProductGridLayout";
+import { resolveProductGridGap } from "@/shared/lib/screenBreakpoints";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { moderationQueryKeys, staffBadgeQueryKeys } from "@/shared/api";
 import { useProductModerationPageStyles } from "@/shared/theme/productModerationPageStyles";
@@ -25,10 +26,15 @@ import { ScreenErrorState } from "@/shared/ui/ScreenStates";
 
 const MODERATION_QUEUE_LIMIT = 100;
 
+const moderationQueueGridResolvers: ProductGridLayoutResolvers = {
+  resolveColumns: () => 1,
+  resolveGap: resolveProductGridGap,
+};
+
 export const ProductModerationPage = () => {
   const router = useRouter();
   const styles = useProductModerationPageStyles();
-  const productGrid = useProductGridLayout();
+  const productGrid = useProductGridLayout(undefined, moderationQueueGridResolvers);
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
   const queryClient = useQueryClient();
   const queueQuery = usePendingModerationProductsQuery();

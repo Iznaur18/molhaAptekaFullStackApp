@@ -21,11 +21,31 @@ export const useIntroAdModerationPageStyles = createThemedStyles((theme) => ({
   section: {
     gap: 12,
   },
+  sectionTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    flexWrap: "wrap",
+  },
   sectionTitle: {
     margin: 0,
     fontSize: 16,
     fontWeight: "600",
     color: theme.colors.text,
+  },
+  sectionBadge: {
+    minWidth: 22,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 999,
+    backgroundColor: theme.colors.danger,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sectionBadgeText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: theme.colors.onContrast,
   },
   list: {
     gap: 16,

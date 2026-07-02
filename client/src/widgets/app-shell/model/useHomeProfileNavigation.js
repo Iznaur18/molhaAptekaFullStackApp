@@ -164,7 +164,7 @@ export const useHomeProfileNavigation = ({
   }, [navigateFromProfileTab]);
 
   const handleSellerPersonalCategoryModerationFromProfile = useCallback(() => {
-    navigateFromProfileTab(PROFILE_TAB_SELLER_PERSONAL_CATEGORY_MODERATION);
+    navigateFromProfileTab(PROFILE_TAB_INTRO_AD_MODERATION);
   }, [navigateFromProfileTab]);
 
   const handleSubscriptionsFromProfile = useCallback(() => {

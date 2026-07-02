@@ -6,8 +6,11 @@ import { useRaffleFeaturedBannerMetrics } from "@/entities/raffle/model/useRaffl
 import { RaffleDescriptionModal } from "@/entities/raffle/ui/RaffleDescriptionModal";
 import { RaffleFeaturedBannerBackdropLayer } from "@/entities/raffle/ui/RaffleFeaturedBannerBackdropLayer";
 import { RaffleFeaturedBannerBackground } from "@/entities/raffle/ui/RaffleFeaturedBannerBackground";
-import { RaffleFeaturedBannerInfoOverlay } from "@/entities/raffle/ui/RaffleFeaturedBannerInfoOverlay";
-import { RaffleManageActions } from "@/entities/raffle/ui/RaffleManageActions";
+import {
+  RaffleFeaturedBannerInfoPanel,
+  RaffleFeaturedBannerInfoToggle,
+} from "@/entities/raffle/ui/RaffleFeaturedBannerInfoOverlay";
+import { RaffleFeaturedBannerManageMenu } from "@/entities/raffle/ui/RaffleFeaturedBannerManageMenu";
 import { RafflePrizeMedia } from "@/entities/raffle/ui/RafflePrizeMedia";
 import type { FeaturedRaffleManage, RaffleFromApi } from "@/entities/raffle/model/types";
 import { RAFFLE_FEATURED_BANNER_UI } from "@/shared/config";
@@ -34,7 +37,7 @@ export const RaffleFeaturedBanner = ({
   const hasManage = Boolean(
     manage && (manage.showEdit || manage.showDelete || manage.showPause),
   );
-  const metrics = useRaffleFeaturedBannerMetrics(cardWidth, { hasManage });
+  const metrics = useRaffleFeaturedBannerMetrics(cardWidth);
   const backdrop = useMemo(() => getRaffleFeaturedBannerBackdrop(raffle), [raffle]);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
@@ -100,11 +103,29 @@ export const RaffleFeaturedBanner = ({
           <View style={[styles.badge, isCompleted && styles.badgeCompleted]}>
             <Text style={styles.badgeText}>{RAFFLE_FEATURED_BANNER_UI.BADGE}</Text>
           </View>
+          <View style={styles.visualControls}>
+            {hasManage && manage ? (
+              <RaffleFeaturedBannerManageMenu
+                showEdit={manage.showEdit}
+                showDelete={manage.showDelete}
+                showPause={manage.showPause}
+                onEdit={manage.onEdit}
+                onDelete={manage.onDelete}
+                onPause={manage.onPause}
+                busy={manage.busy}
+              />
+            ) : null}
+            {!isSplit ? (
+              <RaffleFeaturedBannerInfoToggle
+                visible={isInfoOpen}
+                onToggle={() => setIsInfoOpen((open) => !open)}
+              />
+            ) : null}
+          </View>
           {!isSplit ? (
-            <RaffleFeaturedBannerInfoOverlay
+            <RaffleFeaturedBannerInfoPanel
               raffle={raffle}
               visible={isInfoOpen}
-              onToggle={() => setIsInfoOpen((open) => !open)}
               onBackdropText={hasBackdrop}
             />
           ) : null}
@@ -172,21 +193,6 @@ export const RaffleFeaturedBanner = ({
                 : ""}
             </Text>
           </View>
-
-          {hasManage ? (
-            <View style={[styles.manage, isCompleted && styles.manageCompleted]}>
-              <RaffleManageActions
-                showEdit={manage?.showEdit}
-                showDelete={manage?.showDelete}
-                showPause={manage?.showPause}
-                onEdit={manage?.onEdit}
-                onDelete={manage?.onDelete}
-                onPause={manage?.onPause}
-                busy={manage?.busy}
-                completed={isCompleted}
-              />
-            </View>
-          ) : null}
 
           <View style={styles.actions}>
             <Pressable

@@ -1,6 +1,6 @@
 import { View } from "react-native";
 
-import { ProductCard } from "@/entities/product/ui/ProductCard";
+import { MyProductCatalogCard } from "@/entities/product/ui/MyProductCatalogCard";
 import { ProductCardBanner } from "@/entities/product/ui/ProductCardBanner";
 
 import type { CatalogGridRow } from "@/features/catalog-grid/lib/buildCatalogGridRows";
@@ -35,11 +35,8 @@ export const MyProductsCatalogGridRowItem = ({
     <View style={[catalogGridRowStyles.row, { gap }]}>
       {row.products.map((product) => (
         <View key={product._id} style={{ width: tileWidth }}>
-          <ProductCard
+          <MyProductCatalogCard
             product={product}
-            layout="catalog-grid"
-            highlightCatalogPromotion={false}
-            isMineMode
             isLoyaltyPointsOvercommitted={resolveLoyaltyOvercommitted(product)}
             onEditProduct={() => onEditProduct(product)}
             onPromoteProduct={() => onPromoteProduct(product)}

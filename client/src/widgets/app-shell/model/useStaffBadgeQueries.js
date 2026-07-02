@@ -11,7 +11,7 @@ import { fetchMyOrdersActionCount } from "../../../entities/order/api/fetchMyOrd
 import { fetchMySalesActionCount } from "../../../entities/order/api/fetchMySalesActionCount.js";
 import { fetchIncomingPriceOffersPendingCount } from "../../../entities/product-price-offer/api/fetchIncomingPriceOffersPendingCount.js";
 import { fetchPendingModerationProductsCount } from "../../../entities/product/api/fetchPendingModerationProductsCount.js";
-import { fetchPendingIntroAdCampaignsCount } from "../../../entities/intro-ad/api/introAdModerationApi.js";
+import { fetchPendingAdModerationNavBadgeCount } from "../../../entities/intro-ad/api/introAdModerationApi.js";
 import { fetchPendingSellerPersonalCategoryCampaignsCount } from "../../../entities/seller-personal-category/api/sellerPersonalCategoryApi.js";
 import { fetchPendingProductReportsCount } from "../../../entities/product-report/api/fetchPendingProductReportsCount.js";
 import { fetchPendingUserStoryReportsCount } from "../../../entities/user-story/api/fetchPendingUserStoryReportsCount.js";
@@ -147,7 +147,7 @@ export function useStaffBadgeQueries({
         queryFn: () =>
           resolveIntroAdModerationStaffBadgeCount(
             queryClient,
-            fetchPendingIntroAdCampaignsCount,
+            fetchPendingAdModerationNavBadgeCount,
           ),
         enabled: staffEnabled,
         ...STAFF_MODERATOR_QUERY_OPTIONS,
@@ -233,7 +233,7 @@ export function useStaffBadgeQueries({
         queryClient.invalidateQueries({ queryKey: introAdQueryKeys.moderationCount() }),
       refreshPendingSellerPersonalCategoryModerationCount: () =>
         queryClient.invalidateQueries({
-          queryKey: sellerPersonalCategoryQueryKeys.moderationCount(),
+          queryKey: introAdQueryKeys.moderationCount(),
         }),
       refreshPendingProductReportsCount: () =>
         syncProductReportsQueueCaches(queryClient),

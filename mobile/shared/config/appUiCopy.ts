@@ -47,6 +47,9 @@ export const API_CLIENT_UI = {
   REQUEST_PRODUCT_PROMOTION_FALLBACK: "Не удалось оформить продвижение",
   PATCH_MY_PRODUCT_FALLBACK: "Не удалось сохранить товар",
   DELETE_MY_PRODUCT_FALLBACK: "Не удалось удалить товар",
+  SET_RAFFLE_PARTICIPATION_FALLBACK: "Не удалось обновить участие в розыгрыше",
+  FETCH_INSTALLMENT_PROGRAM_FALLBACK: "Не удалось загрузить рассрочку",
+  UPSERT_INSTALLMENT_PROGRAM_FALLBACK: "Не удалось сохранить рассрочку",
   FETCH_PREMIUM_STATUS_FALLBACK: "Не удалось загрузить премиум",
   PURCHASE_PREMIUM_FALLBACK: "Не удалось оформить премиум",
   PREMIUM_PURCHASE_SUCCESS: "Премиум оформлен",
@@ -246,7 +249,7 @@ export const PRODUCT_CARD_UI = {
   LOYALTY_POINTS_GUEST: (points: number) => `До +${points} баллов с премиум`,
   SELLER_PROFILE_ARIA: (sellerName: string) => `Профиль продавца: ${sellerName}`,
   RATING_LINE: (rating: number, count: number) => `★ ${rating.toFixed(1)} (${count})`,
-  PROMOTION_BUTTON: "Продвигать",
+  PROMOTION_BUTTON: "Управление",
   EDIT_PRODUCT: "Изменить",
   FOOTER_ACTIONS_ARIA: "Действия с товаром",
   PREVIEW_FIELDS_ARIA: "Краткая информация о товаре",
@@ -257,6 +260,15 @@ export const PRODUCT_CARD_UI = {
   GALLERY_COUNTER_ARIA: (current: number, total: number) => `Фото ${current} из ${total}`,
   GALLERY_PREV: "Предыдущее фото",
   GALLERY_NEXT: "Следующее фото",
+  AVAILABILITY_TOGGLE_PENDING: "Обновление…",
+  AUCTION_TOGGLE_PENDING: "Обновление…",
+  RAFFLE_PARTICIPATION_PENDING: "Сохраняем…",
+  DELETE_PRODUCT_PENDING: "Удаление…",
+  DELETE_CONFIRM_QUESTION: "Вы уверены, что хотите удалить этот товар?",
+  DELETE_CONFIRM_YES: "Да, удалить",
+  DELETE_CONFIRM_CANCEL: "Отмена",
+  OPEN_SALES_LOCKED_HINT:
+    "Удаление недоступно: по товару есть незавершённые продажи или активные заказы.",
 } as const;
 
 export const USER_PREMIUM_UI = {
@@ -287,11 +299,13 @@ export const PRODUCT_PROMOTION_UI = {
   TARIFF_DURATION: (durationHours: number) => `${durationHours} ч.`,
   INSUFFICIENT_POINTS: (required: number, balance: number) =>
     `Недостаточно баллов: нужно ${required}, у вас ${balance}.`,
-  SUBMIT_POINTS: "Оплатить баллами и включить",
+  SUBMIT_POINTS: "Оплатить баллами",
   SUBMIT_PENDING: "Отправка…",
   CANCEL: "Отмена",
   SUCCESS_DEFAULT: "Продвижение активировано.",
   LOADING_TARIFFS: "Загрузка тарифов…",
+  TAB_PROMOTION: "Продвижение",
+  TABS_ARIA: "Разделы модалки продвижения",
 } as const;
 
 export const PRODUCT_SELLER_PREVIEW_UI = {
@@ -432,6 +446,7 @@ export const CURATED_PRODUCT_COMPACT_CARD_UI = {
 
 export const HOME_FEED_UI = {
   CURATED_SECTION_ARIA: "Подборки товаров",
+  RAFFLES_SECTION_TITLE: "Розыгрыш",
   RAFFLES_SECTION_ARIA: "Розыгрыши",
   STORIES_SECTION_ARIA: "Сторисы",
 } as const;
@@ -474,6 +489,7 @@ export const RAFFLE_PRIZE_MEDIA_UI = {
 
 export const RAFFLE_MANAGE_UI = {
   GROUP_LABEL: "Управление розыгрышем",
+  MENU_CLOSE_ARIA: "Закрыть меню управления розыгрышем",
   EDIT: "Изменить",
   DELETE: "Удалить",
   PAUSE: "Снять с витрины",
@@ -575,6 +591,34 @@ export const INSTALLMENT_UI = {
   CONTRACT_STATUS_FILTER_CANCELLED: "Отменённые",
   LOGIN_HINT: "Войдите, чтобы видеть рассрочки.",
   LOGIN_BUTTON: "Войти",
+  PROGRAM_MODAL_PENDING_HINT: "Программа на модерации — изменения сохранятся после проверки.",
+  PROGRAM_MODAL_REJECTED_HINT: "Программа отклонена — исправьте планы и сохраните снова.",
+  PROGRAM_MODAL_APPROVED_HINT: "Рассрочка активна — покупатели могут оформить её на этот товар.",
+  PROGRAM_MODAL_TITLE: "Рассрочка на товар",
+  PROGRAM_MODAL_ENABLED: "Включить рассрочку",
+  PROGRAM_MODAL_PLAN_NUMBER: (n: number) => `План ${n}`,
+  PROGRAM_MODAL_PLAN_TITLE: "Название плана",
+  PROGRAM_MODAL_PLAN_TITLE_PLACEHOLDER: "Например: Стандарт",
+  PROGRAM_MODAL_ERROR_NO_PLANS: "Добавьте хотя бы один план рассрочки",
+  PROGRAM_MODAL_ERROR_PLAN_TITLE: (planNumber: number) =>
+    `План ${planNumber}: укажите название`,
+  PROGRAM_MODAL_ERROR_PLAN_TITLE_MAX: (planNumber: number, maxLength: number) =>
+    `План ${planNumber}: название не длиннее ${maxLength} символов`,
+  PROGRAM_MODAL_ERROR_PLAN_MONTHS: (planNumber: number, min: number, max: number) =>
+    `План ${planNumber}: срок ${min}–${max} мес.`,
+  PROGRAM_MODAL_ERROR_PLAN_MONTHLY: (planNumber: number, minRub: number) =>
+    `План ${planNumber}: платёж от ${minRub} ₽`,
+  PROGRAM_MODAL_MONTHS: "Месяцев",
+  PROGRAM_MODAL_MONTHLY: "Платёж, ₽",
+  PROGRAM_MODAL_PLAN_TOTAL: (formatted: string) => `Итого ${formatted}`,
+  PROGRAM_MODAL_FIRST_NOW: "Первый платёж сразу",
+  PROGRAM_MODAL_ADD_PLAN: "Добавить план",
+  PROGRAM_MODAL_REMOVE_PLAN: "Удалить",
+  PROGRAM_MODAL_SAVE: "Сохранить",
+  PROGRAM_MODAL_SAVING: "Сохраняем…",
+  PROGRAM_MODAL_MAX_PLANS: (max: number) => `Не больше ${max} планов`,
+  PROGRAM_MODAL_SUCCESS: "Программа сохранена",
+  PROGRAM_MODAL_CLOSE: "Закрыть",
   CONTRACT_STATUS_LABEL: {
     pending_first_payment: "Ожидает первый платёж",
     active: "Активна",
@@ -719,6 +763,7 @@ export const MY_PROFILE_PAGE_UI = {
   NAV_SECTION_TRADE: "Торговля",
   NAV_SECTION_ACCOUNT: "Аккаунт",
   NAV_SECTION_STAFF: "Модерация",
+  NAV_SECTION_MANAGEMENT: "Управление",
   TAB_CREATE_RAFFLE: "Создать розыгрыш",
   TAB_MY_PRODUCTS: "Мои товары",
   TAB_MY_SALES: "Мои продажи",
@@ -984,6 +1029,11 @@ export const PRODUCT_CATEGORY_DISPLAY_UI = {
   FEED_EDIT_ARIA: (label: string) => `Редактировать подборку «${label}»`,
   FEED_LABEL_HINT: "Пустое поле — стандартное название из списка.",
   FEED_SAVE_FALLBACK: "Не удалось сохранить подборку",
+  SUBCATEGORY_VIEW_ALL: "Посмотреть всё",
+  SUBCATEGORY_PICKER_ARIA: "Подкатегории",
+  SUBCATEGORY_BACK: "Назад",
+  SUBCATEGORY_BACK_ARIA: "Назад к предыдущему уровню категорий",
+  SUBCATEGORY_NODE_EDIT_ARIA: (label: string) => `Редактировать подкатегорию «${label}»`,
 } as const;
 
 export const MY_PRODUCTS_PAGE_UI = {
@@ -1056,6 +1106,25 @@ export const CREATE_PRODUCT_UI = {
   ERROR_PRICE: "Укажите цену",
   CATEGORY_BACK: "Назад",
   CATEGORY_SELECT_LEAF: "Выбрать эту категорию",
+  MANAGE_SECTION_TITLE: "Управление товаром",
+  MANAGE_SECTION_ARIA: "Дополнительные действия с товаром",
+  MANAGE_AUCTION_TITLE: "Аукцион",
+  MANAGE_AUCTION_HINT: "Покупатели смогут предлагать свою цену",
+  MANAGE_AUCTION_STATUS_ACTIVE: "(активен)",
+  MANAGE_AUCTION_STATUS_INACTIVE: "(неактивен)",
+  MANAGE_RAFFLE_TITLE: "Участие в розыгрыше",
+  MANAGE_RAFFLE_HINT: "Товар участвует в активном розыгрыше продавца",
+  MANAGE_RAFFLE_STATUS_ACTIVE: "(участвует)",
+  MANAGE_INSTALLMENT_TITLE: "Рассрочка",
+  MANAGE_INSTALLMENT_HINT: "Покупатель оплачивает товар частями по графику",
+  MANAGE_VISIBILITY_TITLE_VISIBLE: "Виден в каталоге",
+  MANAGE_VISIBILITY_TITLE_HIDDEN: "Скрыт от покупателей",
+  MANAGE_VISIBILITY_STATUS_VISIBLE: "(виден)",
+  MANAGE_VISIBILITY_STATUS_HIDDEN: "(не виден)",
+  MANAGE_VISIBILITY_HINT_VISIBLE: "Товар доступен для просмотра и покупки",
+  MANAGE_VISIBILITY_HINT_HIDDEN: "Только вы видите товар в личном кабинете",
+  MANAGE_DELETE_TITLE: "Удалить товар",
+  MANAGE_DELETE_HINT: "Безвозвратно уберёт товар из каталога",
 } as const;
 
 export const ADVERTISING_PAGE_UI = {
@@ -1395,6 +1464,9 @@ export const INTRO_AD_MODERATION_PAGE_UI = {
   TITLE: "Intro-реклама",
   LOADING: "Загрузка очереди…",
   EMPTY: "Нет заявок на intro-рекламу.",
+  INTRO_PENDING_TITLE: "Intro-ролик — на модерации",
+  INTRO_MANAGED_TITLE: "Intro-ролик — активные и в очереди",
+  PENDING_BADGE: (count: number) => (count > 99 ? "99+" : String(count)),
   APPROVE: "Одобрить",
   REJECT: "Отклонить",
   REJECT_REASON_LABEL: "Причина отклонения (необязательно)",
@@ -1421,6 +1493,7 @@ export const INTRO_AD_MODERATION_PAGE_UI = {
 
 export const SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI = {
   TITLE: "Личные категории",
+  PENDING_TITLE: "Личные категории — на модерации",
   LOADING: "Загрузка очереди…",
   EMPTY: "Нет заявок на личные категории.",
   SELLER_LABEL: "Продавец",

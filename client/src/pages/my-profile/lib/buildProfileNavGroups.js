@@ -1,6 +1,7 @@
 import { MY_PROFILE_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import {
   PROFILE_ACCOUNT_SECTION_ORDER,
+  PROFILE_MANAGEMENT_SECTION_ORDER,
   PROFILE_STAFF_SECTION_ORDER,
   PROFILE_TRADE_SECTION_ORDER,
 } from "@izibuy/shared-lib";
@@ -267,16 +268,6 @@ export function buildProfileNavGroups({
             badgeCount: pendingIntroAdModerationCount,
             onClick: () => selectTab("intro-ad-moderation", onIntroAdModerationClick),
           },
-          {
-            tab: "seller-personal-category-moderation",
-            label: MY_PROFILE_PAGE_UI.TAB_SELLER_PERSONAL_CATEGORY_MODERATION,
-            badgeCount: pendingSellerPersonalCategoryModerationCount,
-            onClick: () =>
-              selectTab(
-                "seller-personal-category-moderation",
-                onSellerPersonalCategoryModerationClick,
-              ),
-          },
         ]
       : []),
     ...(canUseProductReports
@@ -341,30 +332,25 @@ export function buildProfileNavGroups({
           },
         ]
       : []),
-    ...(canUseAdminOrders
-      ? [
-          {
-            tab: "admin-orders",
-            label: MY_PROFILE_PAGE_UI.TAB_ADMIN_ORDERS,
-            onClick: () => selectTab("admin-orders", onAdminOrdersClick),
-          },
-        ]
-      : []),
-    ...(canUseSearchSynonymsAdmin
-      ? [
-          {
-            tab: "search-synonyms-admin",
-            label: MY_PROFILE_PAGE_UI.TAB_SEARCH_SYNONYMS_ADMIN,
-            onClick: () => selectTab("search-synonyms-admin", onSearchSynonymsAdminClick),
-          },
-        ]
-      : []),
+  ];
+
+  const managementItems = [
     ...(canUseCategoryTreeAdmin
       ? [
           {
             tab: "category-tree-admin",
             label: MY_PROFILE_PAGE_UI.TAB_CATEGORY_TREE_ADMIN,
             onClick: () => selectTab("category-tree-admin", onCategoryTreeAdminClick),
+          },
+        ]
+      : []),
+    ...(canUsePopularProductsAdmin
+      ? [
+          {
+            tab: "popular-products-admin",
+            label: MY_PROFILE_PAGE_UI.TAB_POPULAR_PRODUCTS_ADMIN,
+            onClick: () =>
+              selectTab("popular-products-admin", onPopularProductsAdminClick),
           },
         ]
       : []),
@@ -387,25 +373,49 @@ export function buildProfileNavGroups({
           },
         ]
       : []),
-    ...(canUsePopularProductsAdmin
+    ...(canUseSearchSynonymsAdmin
       ? [
           {
-            tab: "popular-products-admin",
-            label: MY_PROFILE_PAGE_UI.TAB_POPULAR_PRODUCTS_ADMIN,
-            onClick: () =>
-              selectTab("popular-products-admin", onPopularProductsAdminClick),
+            tab: "search-synonyms-admin",
+            label: MY_PROFILE_PAGE_UI.TAB_SEARCH_SYNONYMS_ADMIN,
+            onClick: () => selectTab("search-synonyms-admin", onSearchSynonymsAdminClick),
+          },
+        ]
+      : []),
+    ...(canUseAdminOrders
+      ? [
+          {
+            tab: "admin-orders",
+            label: MY_PROFILE_PAGE_UI.TAB_ADMIN_ORDERS,
+            onClick: () => selectTab("admin-orders", onAdminOrdersClick),
           },
         ]
       : []),
   ];
 
-  const orderedStaffItems = orderNavItems(staffItems, PROFILE_STAFF_SECTION_ORDER);
+  const managementSectionIds = new Set(PROFILE_MANAGEMENT_SECTION_ORDER);
+
+  const orderedStaffItems = orderNavItems(staffItems, PROFILE_STAFF_SECTION_ORDER).filter(
+    (item) => !managementSectionIds.has(item.tab),
+  );
+  const orderedManagementItems = orderNavItems(
+    managementItems,
+    PROFILE_MANAGEMENT_SECTION_ORDER,
+  );
 
   if (orderedStaffItems.length > 0) {
     groups.push({
       id: "staff",
       label: MY_PROFILE_PAGE_UI.NAV_SECTION_STAFF,
       items: orderedStaffItems,
+    });
+  }
+
+  if (orderedManagementItems.length > 0) {
+    groups.push({
+      id: "management",
+      label: MY_PROFILE_PAGE_UI.NAV_SECTION_MANAGEMENT,
+      items: orderedManagementItems,
     });
   }
 

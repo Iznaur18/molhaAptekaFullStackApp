@@ -53,8 +53,7 @@ export const PROFILE_TAB_TO_MAIN_VIEW = {
   [PROFILE_TAB_POPULAR_PRODUCTS_ADMIN]: "popular-products-admin",
   [PROFILE_TAB_PRODUCT_MODERATION]: "product-moderation",
   [PROFILE_TAB_INTRO_AD_MODERATION]: "intro-ad-moderation",
-  [PROFILE_TAB_SELLER_PERSONAL_CATEGORY_MODERATION]:
-    "seller-personal-category-moderation",
+  [PROFILE_TAB_SELLER_PERSONAL_CATEGORY_MODERATION]: "intro-ad-moderation",
   [PROFILE_TAB_PRODUCT_REPORTS]: "product-reports",
   [PROFILE_TAB_PRODUCT_PROMOTIONS]: "product-promotions",
   [PROFILE_TAB_RAFFLES]: "staff-raffles",

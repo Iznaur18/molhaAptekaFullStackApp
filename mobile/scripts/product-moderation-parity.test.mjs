@@ -18,7 +18,8 @@ test("product moderation page mirrors web queue grid and actions", () => {
   assert.match(page, /contentPaddingBottom/);
   assert.match(page, /ProductModerationGridRowItem/);
   assert.match(page, /buildCatalogGridRows/);
-  assert.match(page, /tileWidth/);
+  assert.match(page, /moderationQueueGridResolvers/);
+  assert.match(page, /resolveColumns: \(\) => 1/);
   assert.match(page, /removeFromQueue/);
   assert.match(page, /PRODUCTS_LIST_ARIA/);
   assert.match(page, /activeSectionId="product-moderation"/);
@@ -37,28 +38,28 @@ test("product moderation details footer mirrors web", () => {
   assert.match(footer, /REJECT/);
 });
 
-test("product moderation grid row uses catalog-grid product card", () => {
+test("product moderation grid row uses compact queue card", () => {
   const rowItem = readMobileFile(
     "features/product-moderation-page/ui/ProductModerationGridRowItem.tsx",
   );
+  const card = readMobileFile("entities/product/ui/ProductModerationQueueCard.tsx");
 
-  assert.match(rowItem, /layout="catalog-grid"/);
-  assert.match(rowItem, /isModerationQueue/);
+  assert.match(rowItem, /ProductModerationQueueCard/);
   assert.match(rowItem, /tileWidth/);
+  assert.match(card, /ProductModerationDetailsFooter/);
+  assert.match(card, /variant="compact"/);
+  assert.match(card, /ProductCompactCardMediaThumb/);
+  assert.match(card, /useProductCompactCardStyles/);
 });
 
-test("product card moderation queue mirrors web preview fields", () => {
-  const card = readMobileFile("entities/product/ui/ProductCard.tsx");
-  const preview = readMobileFile("entities/product/ui/ProductCardModerationPreviewFields.tsx");
+test("product moderation queue card keeps moderation preview data", () => {
+  const card = readMobileFile("entities/product/ui/ProductModerationQueueCard.tsx");
 
-  assert.match(card, /ProductCardModerationPreviewFields/);
-  assert.match(card, /ProductCardMediaGalleryNav/);
-  assert.match(card, /isModerationQueue \?/);
-  assert.match(preview, /PRODUCT_CARD_MODERATION_PREVIEW_FIELD_KEYS_WITHOUT_PRICE/);
-  assert.match(
-    readMobileFile("entities/product/lib/productFieldRegistry.ts"),
-    /"createdAt"/,
-  );
+  assert.match(card, /formatProductFieldForDisplay\("productDescription"/);
+  assert.match(card, /formatProductFieldForDisplay\("createdAt"/);
+  assert.match(card, /ProductCardSellerRow/);
+  assert.match(card, /ProductPriceDisplay/);
+  assert.doesNotMatch(card, /ProductCardModerationPreviewFields/);
 });
 
 test("product moderation ui copy matches web page", () => {

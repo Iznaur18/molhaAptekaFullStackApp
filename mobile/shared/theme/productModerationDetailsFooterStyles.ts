@@ -9,6 +9,9 @@ export const useProductModerationDetailsFooterStyles = createThemedStyles((theme
   root: {
     gap: 12,
   },
+  rootCompact: {
+    gap: 8,
+  },
   error: {
     fontSize: 14,
     lineHeight: 20,
@@ -18,6 +21,11 @@ export const useProductModerationDetailsFooterStyles = createThemedStyles((theme
     gap: 5.6,
     fontSize: 14,
     color: theme.colors.textSecondary,
+  },
+  rejectInputCompact: {
+    minHeight: 40,
+    paddingVertical: 6,
+    fontSize: 14,
   },
   rejectInput: {
     minHeight: 72,
@@ -36,6 +44,10 @@ export const useProductModerationDetailsFooterStyles = createThemedStyles((theme
     flexWrap: "wrap",
     gap: 8,
   },
+  actionsCompact: {
+    flexWrap: "nowrap",
+    gap: 8,
+  },
   approveButton: {
     paddingVertical: 7.2,
     paddingHorizontal: 13.6,
@@ -51,6 +63,14 @@ export const useProductModerationDetailsFooterStyles = createThemedStyles((theme
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: DANGER_STRONG,
     backgroundColor: theme.colors.surface,
+  },
+  approveButtonCompact: {
+    flex: 1,
+    alignItems: "center",
+  },
+  rejectButtonCompact: {
+    flex: 1,
+    alignItems: "center",
   },
   buttonDisabled: {
     opacity: 0.65,

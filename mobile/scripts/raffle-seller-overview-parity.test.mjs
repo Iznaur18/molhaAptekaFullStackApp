@@ -27,9 +27,9 @@ test("raffle seller overview mirrors web panel and manage actions", () => {
   assert.match(styles, /warningBrownDeep/);
 });
 
-test("profile overview section embeds raffle seller overview", () => {
+test("profile overview section no longer embeds raffle seller overview", () => {
   const section = readMobileFile("features/profile-tab/ui/ProfileTabOverviewSection.tsx");
 
-  assert.match(section, /RaffleSellerOverview/);
-  assert.match(section, /raffleSection/);
+  assert.doesNotMatch(section, /RaffleSellerOverview/);
+  assert.doesNotMatch(section, /raffleSection/);
 });

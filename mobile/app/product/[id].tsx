@@ -6,9 +6,15 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import { resolveProductImageUrls } from "@/entities/product/lib/resolveProductImageUrls";
 import { resolveProductPreviewVideoUrl } from "@/entities/product/lib/resolveProductPreviewVideoUrl";
+import {
+  canSellerDeleteProduct,
+  canSellerEditProduct,
+  canSellerToggleCatalogVisibility,
+} from "@/entities/product/lib/getProductModerationUi";
 import { getProductPurchaseLimit } from "@/entities/product/lib/getProductPurchaseLimit";
 import { isCatalogPromotionActive } from "@/entities/product/lib/productPromotionStatus";
 import { useCatalogProductQuery } from "@/entities/product/model/useCatalogProductQuery";
+import { useMyProductMutations } from "@/entities/product/model/useMyProductMutations";
 import { useProductDetailTabs } from "@/entities/product/model/useProductDetailTabs";
 import { useProductPromotionTariffsQuery } from "@/entities/product/model/useProductPromotionTariffsQuery";
 import { useRecordProductViewMutation } from "@/entities/product/model/useRecordProductViewMutation";
@@ -17,6 +23,7 @@ import { useMyProductReportStatusQuery } from "@/entities/product-report/model/u
 import { useMyLoyaltyPointsStatusQuery } from "@/entities/user/model/useMyLoyaltyPointsStatusQuery";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
+import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import { ProductDetailPurchaseActions } from "@/features/product-detail/ui/ProductDetailPurchaseActions";
 import { ProductDetailTabBar } from "@/features/product-detail/ui/ProductDetailTabBar";
 import { ProductDetailsDetailsTab } from "@/features/product-detail/ui/ProductDetailsDetailsTab";
@@ -24,10 +31,12 @@ import { ProductAuctionTab, type ProductAuctionDockFooter } from "@/features/pro
 import { ProductInstallmentTab, type ProductInstallmentDockFooter } from "@/features/product-detail/ui/ProductInstallmentTab";
 import { ProductReviewsTab } from "@/features/product-detail/ui/ProductReviewsTab";
 import { ProductPromotionModal } from "@/features/product-promotion/ui/ProductPromotionModal";
+import { useProductPromotionManageSupport } from "@/features/product-promotion/model/useProductPromotionManageSupport";
 import { ReportProductModal } from "@/features/product-report/ui/ReportProductModal";
 import { catalogQueryKeys, loyaltyPointsQueryKeys } from "@/shared/api";
 import {
   API_CLIENT_UI,
+  CREATE_PRODUCT_UI,
   INSTALLMENT_UI,
   PRODUCT_CARD_UI,
   PRODUCT_PROMOTION_UI,
@@ -52,6 +61,8 @@ export default function ProductDetailScreen() {
   const recordProductViewRef = useRef(recordViewMutation.mutate);
   recordProductViewRef.current = recordViewMutation.mutate;
   const requestPromotionMutation = useRequestProductPromotionMutation();
+  const { patchMutation, deleteMutation } = useMyProductMutations();
+  const { isAdmin } = useUserAccess();
   const reportStatusQuery = useMyProductReportStatusQuery({
     productId,
     enabled: isAuthorized,
@@ -63,6 +74,10 @@ export default function ProductDetailScreen() {
   );
   const [auctionDock, setAuctionDock] = useState<ProductAuctionDockFooter | null>(null);
   const [promotionErrorMessage, setPromotionErrorMessage] = useState("");
+  const [manageErrorMessage, setManageErrorMessage] = useState("");
+  const [isDeletePending, setIsDeletePending] = useState(false);
+  const [isAvailabilityTogglePending, setIsAvailabilityTogglePending] = useState(false);
+  const [isAuctionTogglePending, setIsAuctionTogglePending] = useState(false);
   const [reportSuccessMessage, setReportSuccessMessage] = useState("");
   const [viewerCount, setViewerCount] = useState<number | null>(null);
 
@@ -73,6 +88,15 @@ export default function ProductDetailScreen() {
 
   const product = productQuery.data as Record<string, unknown> | undefined;
   const currentUserId = sessionQuery.data?.user?._id ?? null;
+
+  const syncPromotionProduct = useCallback(
+    (updated: Record<string, unknown> & { _id: string }) => {
+      queryClient.setQueryData(catalogQueryKeys.product(productId), (prev) =>
+        prev && typeof prev === "object" ? { ...(prev as Record<string, unknown>), ...updated } : prev,
+      );
+    },
+    [productId, queryClient],
+  );
 
   const {
     activeTab,
@@ -88,6 +112,18 @@ export default function ProductDetailScreen() {
   } = useProductDetailTabs({
     product,
     currentUserId,
+  });
+
+  const promotionProduct =
+    isOwnProduct && product?._id != null
+      ? (product as Record<string, unknown> & { _id: string })
+      : null;
+
+  const manageSupport = useProductPromotionManageSupport({
+    product: promotionProduct,
+    syncProduct: syncPromotionProduct,
+    setManageErrorMessage,
+    enabled: promotionModalVisible && isOwnProduct,
   });
 
   useEffect(() => {
@@ -192,12 +228,15 @@ export default function ProductDetailScreen() {
 
   const handleOpenPromotionModal = () => {
     setPromotionErrorMessage("");
+    setManageErrorMessage("");
     setPromotionModalVisible(true);
   };
 
   const handleClosePromotionModal = () => {
     setPromotionModalVisible(false);
     setPromotionErrorMessage("");
+    setManageErrorMessage("");
+    manageSupport.closeInstallmentProgramModal();
   };
 
   const handleSubmitPromotion = async (tier: number, tariffCode: string) => {
@@ -221,6 +260,65 @@ export default function ProductDetailScreen() {
           ? error.message
           : API_CLIENT_UI.REQUEST_PRODUCT_PROMOTION_FALLBACK,
       );
+    }
+  };
+
+  const handleDeleteMyProduct = async (targetProductId: string) => {
+    setIsDeletePending(true);
+    setManageErrorMessage("");
+    try {
+      await deleteMutation.mutateAsync(targetProductId);
+      handleClosePromotionModal();
+      Alert.alert(CREATE_PRODUCT_UI.DELETE_SUCCESS);
+      router.back();
+    } catch (error) {
+      setManageErrorMessage(
+        error instanceof Error ? error.message : API_CLIENT_UI.DELETE_MY_PRODUCT_FALLBACK,
+      );
+    } finally {
+      setIsDeletePending(false);
+    }
+  };
+
+  const handleSetMyProductAvailability = async (
+    targetProductId: string,
+    isAvailable: boolean,
+  ) => {
+    setIsAvailabilityTogglePending(true);
+    setManageErrorMessage("");
+    try {
+      const updated = await patchMutation.mutateAsync({
+        productId: targetProductId,
+        body: { productIsAvailable: isAvailable },
+      });
+      syncPromotionProduct(updated as Record<string, unknown> & { _id: string });
+    } catch (error) {
+      setManageErrorMessage(
+        error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+      );
+    } finally {
+      setIsAvailabilityTogglePending(false);
+    }
+  };
+
+  const handleSetProductAuction = async (
+    targetProductId: string,
+    auctionEnabled: boolean,
+  ) => {
+    setIsAuctionTogglePending(true);
+    setManageErrorMessage("");
+    try {
+      const updated = await patchMutation.mutateAsync({
+        productId: targetProductId,
+        body: { productAuctionEnabled: auctionEnabled },
+      });
+      syncPromotionProduct(updated as Record<string, unknown> & { _id: string });
+    } catch (error) {
+      setManageErrorMessage(
+        error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+      );
+    } finally {
+      setIsAuctionTogglePending(false);
     }
   };
 
@@ -357,6 +455,7 @@ export default function ProductDetailScreen() {
 
       <ProductPromotionModal
         visible={promotionModalVisible}
+        product={isOwnProduct ? (productRecord as Record<string, unknown> & { _id: string }) : null}
         productName={name}
         productPrice={productPrice}
         tiers={promotionTariffsQuery.data?.tiers ?? []}
@@ -371,6 +470,25 @@ export default function ProductDetailScreen() {
         onRetryTariffs={() => void promotionTariffsQuery.refetch()}
         onClose={handleClosePromotionModal}
         onSubmit={handleSubmitPromotion}
+        onDeleteProduct={isOwnProduct ? handleDeleteMyProduct : undefined}
+        onSetProductAvailability={isOwnProduct ? handleSetMyProductAvailability : undefined}
+        onSetProductAuction={isOwnProduct ? handleSetProductAuction : undefined}
+        isDeletePending={isDeletePending}
+        isAvailabilityTogglePending={isAvailabilityTogglePending}
+        isAuctionTogglePending={isAuctionTogglePending}
+        manageErrorMessage={manageErrorMessage}
+        canManageEdit={isOwnProduct && (isAdmin || canSellerEditProduct(productRecord))}
+        canManageDelete={isOwnProduct && (isAdmin || canSellerDeleteProduct(productRecord))}
+        canManageToggleVisibility={
+          isOwnProduct && (isAdmin || canSellerToggleCatalogVisibility(productRecord))
+        }
+        sellerRaffleActive={manageSupport.sellerRaffleActive}
+        onToggleRaffleParticipation={manageSupport.handleToggleRaffleParticipation}
+        isRaffleParticipationPending={manageSupport.isRaffleParticipationPending}
+        onOpenInstallmentProgram={manageSupport.openInstallmentProgramModal}
+        installmentProgramModalVisible={manageSupport.installmentProgramModalVisible}
+        onCloseInstallmentProgram={manageSupport.closeInstallmentProgramModal}
+        onInstallmentProgramSaved={manageSupport.handleInstallmentProgramSaved}
       />
     </View>
   );

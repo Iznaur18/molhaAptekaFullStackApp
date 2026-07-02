@@ -18,6 +18,8 @@ type CatalogBrowserTileCardProps = {
   gap: number;
   contentWidth: number;
   variant?: CatalogBrowserTileVariant;
+  disabled?: boolean;
+  pending?: boolean;
   onPress: () => void;
   onEditPress?: () => void;
   editAriaLabel?: string;
@@ -32,6 +34,8 @@ export const CatalogBrowserTileCard = ({
   gap,
   contentWidth,
   variant = "category",
+  disabled = false,
+  pending = false,
   onPress,
   onEditPress,
   editAriaLabel,
@@ -47,8 +51,13 @@ export const CatalogBrowserTileCard = ({
   return (
     <View style={[styles.wrap, widthStyle, nativeHeightStyle]}>
       <Pressable
-        style={[styles.card, isFeedTile && styles.cardFeed]}
+        style={[
+          styles.card,
+          isFeedTile && styles.cardFeed,
+          (disabled || pending) && styles.cardPending,
+        ]}
         onPress={onPress}
+        disabled={disabled || pending}
       >
         <View style={styles.imageWrap}>
           <Image source={{ uri: resolvedImageUrl }} style={styles.image} contentFit="cover" />

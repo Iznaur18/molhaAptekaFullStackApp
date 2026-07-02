@@ -10,7 +10,7 @@ import {
 import { useRaffleFeaturedSlideLayout } from "@/entities/raffle/lib/useRaffleFeaturedSlideLayout";
 import { RaffleFeaturedBanner } from "@/entities/raffle/ui/RaffleFeaturedBanner";
 import type { FeaturedRaffleManage, RaffleFromApi } from "@/entities/raffle/model/types";
-import { HOME_FEED_UI, RAFFLE_FEATURED_CAROUSEL_UI } from "@/shared/config";
+import { RAFFLE_FEATURED_CAROUSEL_UI } from "@/shared/config";
 import {
   RAFFLE_FEATURED_LAYOUT,
   useRaffleFeaturedCarouselStyles,
@@ -79,11 +79,7 @@ export const RaffleFeaturedCarousel = ({
   if (raffles.length === 1) {
     const raffle = raffles[0];
     return (
-      <View
-        style={styles.singleSlide}
-        onLayout={handleViewportLayout}
-        accessibilityLabel={HOME_FEED_UI.RAFFLES_SECTION_ARIA}
-      >
+      <View style={styles.singleSlide} onLayout={handleViewportLayout}>
         <RaffleFeaturedBanner
           raffle={raffle}
           cardWidth={cardWidth}
@@ -99,7 +95,6 @@ export const RaffleFeaturedCarousel = ({
     <View
       style={styles.viewport}
       onLayout={handleViewportLayout}
-      accessibilityLabel={HOME_FEED_UI.RAFFLES_SECTION_ARIA}
       onTouchStart={() => setIsPaused(true)}
       onTouchEnd={() => setIsPaused(false)}
       onTouchCancel={() => setIsPaused(false)}

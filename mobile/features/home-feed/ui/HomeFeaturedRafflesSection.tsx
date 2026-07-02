@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { Alert } from "react-native";
+import { Alert, Text, View } from "react-native";
 
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import { canSellerEditRaffle } from "@/entities/raffle/lib/canSellerEditRaffle";
@@ -9,13 +9,15 @@ import type { FeaturedRaffleManage, RaffleFromApi } from "@/entities/raffle/mode
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { RaffleFeaturedCarousel } from "@/entities/raffle/ui/RaffleFeaturedCarousel";
 import { CreateRaffleModal } from "@/features/create-raffle-page/ui/CreateRaffleModal";
-import { PRODUCT_REPORT_UI, RAFFLE_MANAGE_UI } from "@/shared/config";
+import { HOME_FEED_UI, PRODUCT_REPORT_UI, RAFFLE_MANAGE_UI } from "@/shared/config";
+import { useRaffleFeaturedSectionStyles } from "@/shared/theme/raffleFeaturedStyles";
 
 type HomeFeaturedRafflesSectionProps = {
   raffles: RaffleFromApi[];
 };
 
 export const HomeFeaturedRafflesSection = ({ raffles }: HomeFeaturedRafflesSectionProps) => {
+  const sectionStyles = useRaffleFeaturedSectionStyles();
   const router = useRouter();
   const sessionQuery = useAuthSessionQuery();
   const { canModerate } = useUserAccess();
@@ -95,11 +97,19 @@ export const HomeFeaturedRafflesSection = ({ raffles }: HomeFeaturedRafflesSecti
 
   return (
     <>
-      <RaffleFeaturedCarousel
-        raffles={raffles}
-        onOpenProducts={handleOpenProducts}
-        getManage={getManage}
-      />
+      {raffles.length > 0 ? (
+        <View
+          style={sectionStyles.root}
+          accessibilityLabel={HOME_FEED_UI.RAFFLES_SECTION_ARIA}
+        >
+          <Text style={sectionStyles.title}>{HOME_FEED_UI.RAFFLES_SECTION_TITLE}</Text>
+          <RaffleFeaturedCarousel
+            raffles={raffles}
+            onOpenProducts={handleOpenProducts}
+            getManage={getManage}
+          />
+        </View>
+      ) : null}
 
       <CreateRaffleModal
         visible={editingRaffle != null}

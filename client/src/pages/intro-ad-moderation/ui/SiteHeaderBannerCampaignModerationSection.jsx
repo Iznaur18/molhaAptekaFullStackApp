@@ -14,6 +14,8 @@ import { SiteHeaderBannerCarousel } from "../../../entities/site-header-banner/u
 import { introAdQueryKeys } from "../../../entities/intro-ad/model/introAdQueryKeys.js";
 import { SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
+import { ModerationSectionTitle } from "./ModerationSectionTitle.jsx";
+
 const MODERATION_QUEUE_LIMIT = 50;
 
 /**
@@ -273,9 +275,9 @@ export function SiteHeaderBannerCampaignModerationSection({
 
       {managedCampaigns.length > 0 ? (
         <section className="intro-ad-moderation-page__section">
-          <h3 className="intro-ad-moderation-page__section-title">
-            {SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.MANAGED_TITLE}
-          </h3>
+          <ModerationSectionTitle
+            title={SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.MANAGED_TITLE}
+          />
           <ul className="intro-ad-moderation-page__list">
             {managedCampaigns.map((campaign) => {
               const campaignId = String(campaign._id);
@@ -295,9 +297,10 @@ export function SiteHeaderBannerCampaignModerationSection({
 
       {pendingCampaigns.length > 0 ? (
         <section className="intro-ad-moderation-page__section">
-          <h3 className="intro-ad-moderation-page__section-title">
-            {SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.PENDING_TITLE}
-          </h3>
+          <ModerationSectionTitle
+            title={SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.PENDING_TITLE}
+            pendingCount={pendingCampaigns.length}
+          />
           <ul className="intro-ad-moderation-page__list">
             {pendingCampaigns.map((campaign) => {
               const campaignId = String(campaign._id);

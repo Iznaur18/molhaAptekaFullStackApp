@@ -11,6 +11,7 @@ type ProductCardSellerToolbarProps = {
   isDeletePending?: boolean;
   isAvailabilityTogglePending?: boolean;
   isAuctionTogglePending?: boolean;
+  variant?: "default" | "compact";
 };
 
 export const ProductCardSellerToolbar = ({
@@ -20,8 +21,10 @@ export const ProductCardSellerToolbar = ({
   isDeletePending = false,
   isAvailabilityTogglePending = false,
   isAuctionTogglePending = false,
+  variant = "default",
 }: ProductCardSellerToolbarProps) => {
   const styles = useProductCardSellerToolbarStyles();
+  const isCompact = variant === "compact";
   const promoteDisabled = isProductPromoteButtonDisabled({
     isDeletePending,
     isAvailabilityTogglePending,
@@ -36,12 +39,16 @@ export const ProductCardSellerToolbar = ({
 
   return (
     <View
-      style={styles.toolbar}
+      style={[styles.toolbar, isCompact && styles.toolbarCompact]}
       accessibilityLabel={PRODUCT_CARD_UI.FOOTER_ACTIONS_ARIA}
     >
       {showPromote ? (
         <Pressable
-          style={[styles.promoteButton, promoteDisabled && styles.buttonDisabled]}
+          style={[
+            styles.promoteButton,
+            isCompact && styles.promoteButtonCompact,
+            promoteDisabled && styles.buttonDisabled,
+          ]}
           disabled={promoteDisabled}
           onPress={onPromote}
         >
@@ -52,7 +59,11 @@ export const ProductCardSellerToolbar = ({
       ) : null}
       {showEdit ? (
         <Pressable
-          style={[styles.editButton, isDeletePending && styles.buttonDisabled]}
+          style={[
+            styles.editButton,
+            isCompact && styles.editButtonCompact,
+            isDeletePending && styles.buttonDisabled,
+          ]}
           disabled={isDeletePending}
           onPress={onEdit}
         >

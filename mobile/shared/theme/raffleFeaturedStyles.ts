@@ -11,6 +11,9 @@ const VISUAL_RADIUS_BOTTOM = 9.6;
 const BADGE_INSET = 7;
 const SOUND_BUTTON_INSET = 7;
 const SOUND_BUTTON_SIZE = 32;
+const VISUAL_CONTROL_SIZE = 28;
+const VISUAL_CONTROL_INSET = 7;
+const VISUAL_CONTROL_GAP = 4;
 /** Web `margin: 0 0 1.25rem` on header / raffle carousel @ 16px. */
 const BANNER_SECTION_MARGIN = 20;
 const BANNER_BOTTOM_MARGIN = BANNER_SECTION_MARGIN;
@@ -157,13 +160,18 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     fontSize: 11,
     fontWeight: "700",
   },
-  infoToggle: {
+  visualControls: {
     position: "absolute",
-    top: 7,
-    right: 7,
-    zIndex: 4,
-    width: 28,
-    height: 28,
+    top: VISUAL_CONTROL_INSET,
+    right: VISUAL_CONTROL_INSET,
+    zIndex: 5,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: VISUAL_CONTROL_GAP,
+  },
+  visualControlButton: {
+    width: VISUAL_CONTROL_SIZE,
+    height: VISUAL_CONTROL_SIZE,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
@@ -284,15 +292,6 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     color: theme.colors.text,
     flexShrink: 1,
   },
-  manage: {
-    marginBottom: L.manageMarginBottom,
-    paddingBottom: L.managePaddingBottom,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: P.manageDivider,
-  },
-  manageCompleted: {
-    borderBottomColor: P.manageDividerCompleted,
-  },
   actions: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -390,6 +389,86 @@ export const useRaffleManageActionsStyles = createThemedStyles(() => ({
   },
 }));
 
+export const useRaffleFeaturedBannerManageMenuStyles = createThemedStyles(() => ({
+  toggle: {
+    width: VISUAL_CONTROL_SIZE,
+    height: VISUAL_CONTROL_SIZE,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: P.onContrast,
+    borderRadius: 999,
+    backgroundColor: "rgba(0,0,0,0.45)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.35,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  toggleOpen: {
+    backgroundColor: P.accentPurple,
+  },
+  toggleDisabled: {
+    opacity: 0.55,
+  },
+  toggleText: {
+    color: P.onContrast,
+    fontSize: 18,
+    fontWeight: "800",
+    lineHeight: 18,
+    marginTop: -2,
+  },
+  menuBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "transparent",
+  },
+  menu: {
+    position: "absolute",
+    minWidth: 168,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: P.premiumPurpleMuted,
+    backgroundColor: P.accentPinkSurface,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.16,
+    shadowRadius: 12,
+    elevation: 6,
+    overflow: "hidden",
+  },
+  menuItem: {
+    paddingVertical: 11,
+    paddingHorizontal: 14,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: P.manageDivider,
+  },
+  menuItemLast: {
+    borderBottomWidth: 0,
+  },
+  menuItemEdit: {
+    backgroundColor: P.accentPurpleSoft,
+  },
+  menuItemDelete: {
+    backgroundColor: P.dangerSoft,
+  },
+  menuItemPause: {
+    backgroundColor: P.warningPeach,
+  },
+  menuItemText: {
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  menuItemTextEdit: {
+    color: P.accentPurpleText,
+  },
+  menuItemTextDelete: {
+    color: P.dangerText,
+  },
+  menuItemTextPause: {
+    color: P.warningBrownDeep,
+  },
+}));
+
 export const useRaffleDescriptionModalStyles = createThemedStyles((theme) => ({
   backdrop: {
     flex: 1,
@@ -458,20 +537,29 @@ export const useRaffleDescriptionModalStyles = createThemedStyles((theme) => ({
   },
 }));
 
+export const useRaffleFeaturedSectionStyles = createThemedStyles((theme) => ({
+  root: {
+    marginTop: BANNER_SECTION_MARGIN,
+    marginBottom: BANNER_SECTION_MARGIN,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: theme.colors.ink,
+    marginBottom: 12,
+  },
+}));
+
 export const useRaffleFeaturedCarouselStyles = createThemedStyles(() => ({
   viewport: {
     width: "100%",
     maxWidth: "100%",
     overflow: "hidden",
-    marginTop: BANNER_SECTION_MARGIN,
-    marginBottom: BANNER_SECTION_MARGIN,
   },
   singleSlide: {
     width: "100%",
     maxWidth: "100%",
     overflow: "hidden",
-    marginTop: BANNER_SECTION_MARGIN,
-    marginBottom: BANNER_SECTION_MARGIN,
   },
 }));
 

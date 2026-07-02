@@ -2,7 +2,7 @@
 export const ORDER_ITEMS_POPULATE = {
   path: "items.productId",
   select:
-    "productName productPrice productImageUrls productSeller productAuctionEnabled",
+    "productName productPrice productImageUrls productImageUrl productSeller productAuctionEnabled",
   populate: { path: "productSeller", select: "userName _id" },
 };
 

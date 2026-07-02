@@ -1,7 +1,6 @@
 import { useMemo, useEffect } from "react";
 import { View } from "react-native";
 import Animated, {
-  FadeInDown,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -14,7 +13,6 @@ import { getUserProfileRows } from "@/entities/user/lib/getUserProfileRows";
 import { USER_ROLE_USER } from "@/entities/user/model/constants";
 import { ProfileOverviewBanner } from "@/entities/user/ui/ProfileOverviewBanner";
 import { UserProfileInfoPanel } from "@/entities/user/ui/UserProfileInfoPanel";
-import { RaffleSellerOverview } from "@/features/profile-overview/ui/RaffleSellerOverview";
 import { useProfileOverviewSectionStyles } from "@/shared/theme/profileChromeStyles";
 
 type ProfileTabOverviewSectionProps = {
@@ -55,10 +53,6 @@ export const ProfileTabOverviewSection = ({ onEditPress }: ProfileTabOverviewSec
         showEditButton={showEditOnBanner}
         onEditPress={onEditPress}
       />
-
-      <Animated.View entering={FadeInDown.delay(200).springify().damping(18).stiffness(200)} style={styles.raffleSection}>
-        <RaffleSellerOverview />
-      </Animated.View>
 
       <UserProfileInfoPanel rows={profileRows} />
     </Animated.View>

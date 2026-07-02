@@ -33,6 +33,9 @@ test("my sales page mirrors web toolbar, search and seller order card", () => {
   assert.match(toolbar, /SEARCH_PLACEHOLDER/);
   assert.match(toolbar, /resolveMySalesStatusFilterChipActiveColors/);
 
+  assert.match(orderCard, /OrderCardLineItemThumb/);
+  assert.match(orderCard, /itemsList/);
+  assert.doesNotMatch(orderCard, /ITEMS_HEADING/);
   assert.match(orderCard, /showBuyer/);
   assert.match(orderCard, /compact/);
   assert.match(orderCard, /DETAILS_FOLD_SUMMARY/);

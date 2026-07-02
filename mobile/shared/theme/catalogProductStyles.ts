@@ -474,6 +474,10 @@ export const useProductCardSellerToolbarStyles = createThemedStyles((theme) => (
     gap: 7.2,
     width: "100%",
   },
+  toolbarCompact: {
+    flexDirection: "row",
+    gap: 8,
+  },
   promoteButton: {
     width: "100%",
     borderWidth: 1,
@@ -489,6 +493,10 @@ export const useProductCardSellerToolbarStyles = createThemedStyles((theme) => (
     fontWeight: "600",
     color: theme.colors.link,
   },
+  promoteButtonCompact: {
+    flex: 1,
+    width: undefined,
+  },
   editButton: {
     width: "100%",
     borderWidth: StyleSheet.hairlineWidth,
@@ -503,6 +511,10 @@ export const useProductCardSellerToolbarStyles = createThemedStyles((theme) => (
     fontSize: 13.1,
     fontWeight: "600",
     color: theme.colors.text,
+  },
+  editButtonCompact: {
+    flex: 1,
+    width: undefined,
   },
   buttonDisabled: {
     opacity: 0.65,
@@ -2491,6 +2503,64 @@ export const useCatalogBrowserPageStyles = createThemedStyles((theme) => ({
   },
 }));
 
+export const useCatalogSubcategoryPickerStyles = createThemedStyles((theme) => ({
+  container: {
+    padding: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingBottom: SCREEN_CONTENT_PADDING_BOTTOM,
+    gap: 16,
+    backgroundColor: theme.colors.bg,
+  },
+  header: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: 12,
+    marginBottom: 4,
+  },
+  backButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderRadius: 999,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+  },
+  backButtonPressed: {
+    opacity: 0.85,
+  },
+  backButtonText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: theme.colors.link,
+  },
+  title: {
+    flex: 1,
+    minWidth: 120,
+    fontSize: 18,
+    fontWeight: "700",
+    color: theme.colors.ink,
+  },
+  error: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: theme.colors.danger,
+  },
+  loading: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 32,
+    gap: 12,
+  },
+  loadingText: {
+    fontSize: 14,
+    color: theme.colors.textMuted,
+  },
+  grid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
+}));
+
 export const useCatalogBrowserSectionStyles = createThemedStyles((theme) => ({
   section: {
     marginBottom: SCREEN_CONTENT_SECTION_GAP,
@@ -2521,6 +2591,9 @@ export const useCatalogBrowserTileStyles = createThemedStyles((theme) => ({
   },
   cardFeed: {
     borderStyle: "dashed",
+  },
+  cardPending: {
+    opacity: 0.55,
   },
   imageWrap: {
     aspectRatio: 1,

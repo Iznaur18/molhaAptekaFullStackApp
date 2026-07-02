@@ -152,6 +152,9 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
     alignItems: "flex-start",
     gap: 10.4,
   },
+  thumbSlot: {
+    flexShrink: 0,
+  },
   thumb: {
     width: THUMB_SIZE,
     height: THUMB_SIZE,
@@ -180,38 +183,52 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
     gap: 4,
   },
   titlePressable: {
-    alignSelf: "flex-start",
+    alignSelf: "stretch",
+    maxWidth: "100%",
   },
   title: {
     fontSize: 15.2,
     fontWeight: "600",
     color: theme.colors.actionHover,
+    flexShrink: 1,
   },
   titleStatic: {
     fontSize: 15.2,
     fontWeight: "600",
     color: theme.colors.text,
+    flexShrink: 1,
   },
-  meta: {
-    fontSize: 13.6,
-    color: theme.colors.textMuted,
-  },
-  metaRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "center",
+  metaBlock: {
     gap: 2,
+    maxWidth: "100%",
+    alignSelf: "stretch",
   },
-  buyerLink: {
+  metaBuyerPressable: {
     alignSelf: "flex-start",
+    maxWidth: "100%",
   },
-  buyerLinkText: {
+  metaBuyerName: {
+    fontSize: 13.6,
+    fontWeight: "600",
+    color: theme.colors.textSecondary,
+  },
+  metaBuyerNameLink: {
     fontSize: 13.6,
     fontWeight: "600",
     color: theme.colors.actionHover,
   },
+  metaDate: {
+    fontSize: 13.6,
+    color: theme.colors.textMuted,
+  },
+  meta: {
+    fontSize: 13.6,
+    color: theme.colors.textMuted,
+    flexShrink: 1,
+  },
   statusPill: {
     alignSelf: "flex-start",
+    maxWidth: "100%",
     paddingVertical: 1.92,
     paddingHorizontal: 7.2,
     borderRadius: 999,
@@ -226,6 +243,7 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
     fontSize: 12,
     fontWeight: "600",
     lineHeight: 14.4,
+    flexShrink: 1,
   },
   statusPillTextPending: {
     color: WARNING_BROWN_DARK,
@@ -255,6 +273,7 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
     fontWeight: "800",
     color: theme.colors.link,
     fontVariant: ["tabular-nums"],
+    flexShrink: 0,
   },
   editor: {
     gap: 6.4,
@@ -320,6 +339,7 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
   },
   decisionBtn: {
     flex: 1,
+    minWidth: 0,
     minHeight: 40.8,
     alignItems: "center",
     justifyContent: "center",

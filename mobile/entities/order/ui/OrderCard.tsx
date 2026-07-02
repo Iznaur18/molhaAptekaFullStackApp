@@ -5,6 +5,7 @@ import { getOrderItemIndex } from "@/entities/order/lib/getOrderItemIndex";
 import { isOrderLineItemProductClickable } from "@/entities/order/lib/isOrderLineItemProductClickable";
 import { resolveOrderLineItemName } from "@/entities/order/lib/resolveOrderLineItemName";
 import { resolveOrderStatusBadgeStyle } from "@/entities/order/lib/resolveOrderStatusBadgeStyle";
+import { OrderCardLineItemThumb } from "@/entities/order/ui/OrderCardLineItemThumb";
 import {
   ORDER_PAYMENT_METHOD_LABEL_RU,
   ORDER_STATUS_DELIVERED,
@@ -232,125 +233,142 @@ export const OrderCard = ({
     const deliveredAtText = source.deliveredAt ? formatIsoDateTime(source.deliveredAt) : "";
     const confirmedAtText = source.confirmedAt ? formatIsoDateTime(source.confirmedAt) : "";
     const showSecondaryInline = !compact;
+    const hasItemActions =
+      (canMarkShipped && (onMarkShipped || onCancelItem)) ||
+      (canMarkDelivered && onMarkDelivered) ||
+      (canConfirm || (canCancel && !onMarkShipped));
 
     return (
-      <View key={key} style={styles.itemBlock}>
-        <View style={styles.itemTitleRow}>
-          {isProductClickable ? (
-            <Pressable onPress={() => onProductClick?.(item)} style={styles.itemNamePressable}>
-              <Text style={styles.itemNameLink} numberOfLines={2}>
-                {productName}
+      <View
+        key={key}
+        style={[styles.itemBlock, compact ? styles.itemBlockCompact : undefined]}
+      >
+        <View style={styles.itemRow}>
+          <OrderCardLineItemThumb
+            item={item}
+            productName={productName}
+            onProductClick={onProductClick}
+          />
+          <View style={styles.itemBody}>
+            <View style={styles.itemMain}>
+              {isProductClickable ? (
+                <Pressable onPress={() => onProductClick?.(item)} style={styles.itemNamePressable}>
+                  <Text style={styles.itemNameLink} numberOfLines={2}>
+                    {productName}
+                  </Text>
+                </Pressable>
+              ) : (
+                <Text style={styles.itemLine} numberOfLines={2}>
+                  {productName}
+                </Text>
+              )}
+              <Text style={styles.itemQuantity}>×{source.quantity ?? 1}</Text>
+              <Text style={styles.itemPrice}>{formatPriceRub(source.unitPriceAtOrder)}</Text>
+            </View>
+
+            {showSecondaryInline && loyaltyPerUnit > 0 ? (
+              <Text style={styles.itemLoyalty}>
+                {ORDER_CARD_UI.LOYALTY_POINTS_LINE(loyaltyPerUnit)}
+                {(source.quantity ?? 1) > 1 ? ` · всего ${loyaltyReservedTotal}` : ""}
               </Text>
-            </Pressable>
-          ) : (
-            <Text style={styles.itemLine} numberOfLines={2}>
-              {productName}
-            </Text>
-          )}
-          <Text style={styles.itemQuantity}>×{source.quantity ?? 1}</Text>
+            ) : null}
+
+            {showSecondaryInline ? (
+              <Text style={styles.itemStatus}>
+                {ORDER_CARD_UI.ITEM_STATUS_LABEL}: {formatStatus(source.status)}
+              </Text>
+            ) : null}
+
+            {showSecondaryInline && deliveredAtText ? (
+              <Text style={styles.itemTimestamp}>
+                {ORDER_CARD_UI.ITEM_DELIVERED_AT_LABEL}: {deliveredAtText}
+              </Text>
+            ) : null}
+
+            {showSecondaryInline && confirmedAtText ? (
+              <Text style={styles.itemTimestamp}>
+                {ORDER_CARD_UI.ITEM_CONFIRMED_AT_LABEL}: {confirmedAtText}
+              </Text>
+            ) : null}
+          </View>
         </View>
 
-        <Text style={styles.itemPrice}>{formatPriceRub(source.unitPriceAtOrder)}</Text>
-
-        {showSecondaryInline && loyaltyPerUnit > 0 ? (
-          <Text style={styles.itemLoyalty}>
-            {ORDER_CARD_UI.LOYALTY_POINTS_LINE(loyaltyPerUnit)}
-            {(source.quantity ?? 1) > 1 ? ` · всего ${loyaltyReservedTotal}` : ""}
-          </Text>
-        ) : null}
-
-        {showSecondaryInline ? (
-          <Text style={styles.itemStatus}>
-            {ORDER_CARD_UI.ITEM_STATUS_LABEL}: {formatStatus(source.status)}
-          </Text>
-        ) : null}
-
-        {showSecondaryInline && deliveredAtText ? (
-          <Text style={styles.itemTimestamp}>
-            {ORDER_CARD_UI.ITEM_DELIVERED_AT_LABEL}: {deliveredAtText}
-          </Text>
-        ) : null}
-
-        {showSecondaryInline && confirmedAtText ? (
-          <Text style={styles.itemTimestamp}>
-            {ORDER_CARD_UI.ITEM_CONFIRMED_AT_LABEL}: {confirmedAtText}
-          </Text>
-        ) : null}
-
-        {canMarkShipped && (onMarkShipped || onCancelItem) ? (
-          <View style={styles.itemActions}>
-            {onMarkShipped ? (
+        {hasItemActions || actionError ? (
+          <View style={styles.itemActionsRow}>
+            {canMarkShipped && (onMarkShipped || onCancelItem) ? (
+              <>
+                {onMarkShipped ? (
+                  <Pressable
+                    style={[styles.actionButton, isActionPending && styles.actionDisabled]}
+                    onPress={() => onMarkShipped({ orderId: order._id, itemIndex })}
+                    disabled={isActionPending}
+                  >
+                    <Text style={styles.actionButtonText}>
+                      {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_SHIPPED}
+                    </Text>
+                  </Pressable>
+                ) : null}
+                {onCancelItem ? (
+                  <Pressable
+                    style={[
+                      styles.actionButton,
+                      styles.actionButtonCancel,
+                      isActionPending && styles.actionDisabled,
+                    ]}
+                    onPress={() => onCancelItem({ orderId: order._id, itemIndex })}
+                    disabled={isActionPending}
+                  >
+                    <Text style={[styles.actionButtonText, styles.actionButtonTextCancel]}>
+                      {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_CANCEL}
+                    </Text>
+                  </Pressable>
+                ) : null}
+              </>
+            ) : null}
+            {canMarkDelivered && onMarkDelivered ? (
               <Pressable
                 style={[styles.actionButton, isActionPending && styles.actionDisabled]}
-                onPress={() => onMarkShipped({ orderId: order._id, itemIndex })}
+                onPress={() => onMarkDelivered({ orderId: order._id, itemIndex })}
                 disabled={isActionPending}
               >
                 <Text style={styles.actionButtonText}>
-                  {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_SHIPPED}
+                  {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_DELIVERED}
                 </Text>
               </Pressable>
             ) : null}
-            {onCancelItem ? (
-              <Pressable
-                style={[
-                  styles.actionButton,
-                  styles.actionButtonCancel,
-                  isActionPending && styles.actionDisabled,
-                ]}
-                onPress={() => onCancelItem({ orderId: order._id, itemIndex })}
-                disabled={isActionPending}
-              >
-                <Text style={[styles.actionButtonText, styles.actionButtonTextCancel]}>
-                  {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_CANCEL}
-                </Text>
-              </Pressable>
+            {canConfirm || (canCancel && !onMarkShipped) ? (
+              <>
+                {canConfirm ? (
+                  <Pressable
+                    style={[styles.actionButton, isActionPending && styles.actionDisabled]}
+                    onPress={() => onConfirmDelivered?.({ orderId: order._id, itemIndex })}
+                    disabled={isActionPending}
+                  >
+                    <Text style={styles.actionButtonText}>
+                      {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_CONFIRM}
+                    </Text>
+                  </Pressable>
+                ) : null}
+                {canCancel ? (
+                  <Pressable
+                    style={[
+                      styles.actionButton,
+                      styles.actionButtonCancel,
+                      isActionPending && styles.actionDisabled,
+                    ]}
+                    onPress={() => onCancelItem?.({ orderId: order._id, itemIndex })}
+                    disabled={isActionPending}
+                  >
+                    <Text style={[styles.actionButtonText, styles.actionButtonTextCancel]}>
+                      {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_CANCEL}
+                    </Text>
+                  </Pressable>
+                ) : null}
+              </>
             ) : null}
+            {actionError ? <Text style={styles.itemError}>{actionError}</Text> : null}
           </View>
         ) : null}
-        {canMarkDelivered && onMarkDelivered ? (
-          <View style={styles.itemActions}>
-            <Pressable
-              style={[styles.actionButton, isActionPending && styles.actionDisabled]}
-              onPress={() => onMarkDelivered({ orderId: order._id, itemIndex })}
-              disabled={isActionPending}
-            >
-              <Text style={styles.actionButtonText}>
-                {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_DELIVERED}
-              </Text>
-            </Pressable>
-          </View>
-        ) : null}
-        {canConfirm || (canCancel && !onMarkShipped) ? (
-          <View style={styles.itemActions}>
-            {canConfirm ? (
-              <Pressable
-                style={[styles.actionButton, isActionPending && styles.actionDisabled]}
-                onPress={() => onConfirmDelivered?.({ orderId: order._id, itemIndex })}
-                disabled={isActionPending}
-              >
-                <Text style={styles.actionButtonText}>
-                  {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_CONFIRM}
-                </Text>
-              </Pressable>
-            ) : null}
-            {canCancel ? (
-              <Pressable
-                style={[
-                  styles.actionButton,
-                  styles.actionButtonCancel,
-                  isActionPending && styles.actionDisabled,
-                ]}
-                onPress={() => onCancelItem?.({ orderId: order._id, itemIndex })}
-                disabled={isActionPending}
-              >
-                <Text style={[styles.actionButtonText, styles.actionButtonTextCancel]}>
-                  {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_CANCEL}
-                </Text>
-              </Pressable>
-            ) : null}
-          </View>
-        ) : null}
-        {actionError ? <Text style={styles.itemError}>{actionError}</Text> : null}
       </View>
     );
   };
@@ -389,8 +407,9 @@ export const OrderCard = ({
         />
       ) : null}
 
-      <Text style={styles.itemsHeading}>{ORDER_CARD_UI.ITEMS_HEADING}</Text>
-      {items.map((item, index) => renderLineItem(item, index))}
+      <View style={styles.itemsList}>
+        {items.map((item, index) => renderLineItem(item, index))}
+      </View>
 
       {compact ? (
         <View style={styles.detailsFold}>

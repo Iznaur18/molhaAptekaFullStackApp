@@ -125,9 +125,9 @@ export const AppButton = ({
             : styles.labelOnPrimary;
 
   return (
-    <Animated.View style={[animatedStyle, style]}>
+    <Animated.View style={animatedStyle}>
       <Pressable
-        style={[styles.base, variantStyle, disabled && styles.disabled]}
+        style={[styles.base, variantStyle, disabled && styles.disabled, style]}
         disabled={disabled}
         onPressIn={(e) => {
           scale.value = withSpring(0.96, { damping: 18, stiffness: 350 });

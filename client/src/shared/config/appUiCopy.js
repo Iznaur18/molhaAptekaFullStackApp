@@ -556,6 +556,10 @@ export const INTRO_AD_MODERATION_PAGE_UI = {
   TITLE: "Intro-реклама",
   LOADING: "Загрузка очереди…",
   EMPTY: "Нет заявок на intro-рекламу.",
+  INTRO_PENDING_TITLE: "Intro-ролик — на модерации",
+  INTRO_MANAGED_TITLE: "Intro-ролик — активные и в очереди",
+  /** @param {number} count */
+  PENDING_BADGE: (count) => (count > 99 ? "99+" : String(count)),
   APPROVE: "Одобрить",
   REJECT: "Отклонить",
   REJECT_REASON_LABEL: "Причина отклонения (необязательно)",
@@ -713,6 +717,7 @@ export const SELLER_PERSONAL_CATEGORY_PAGE_UI = {
 /** Очередь личных категорий (moderator) */
 export const SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI = {
   TITLE: "Личные категории",
+  PENDING_TITLE: "Личные категории — на модерации",
   EMPTY: "Нет заявок на личные категории.",
   SELLER_LABEL: "Продавец",
   REJECT_REASON_PLACEHOLDER: "Комментарий для продавца…",
@@ -1330,7 +1335,7 @@ export const PRODUCT_CARD_UI = {
   MANAGE_PRODUCT_TOGGLE: "Редактировать",
   MANAGE_PRODUCT_COLLAPSE: "Свернуть",
   EDIT_PRODUCT: "Изменить",
-  PROMOTION_BUTTON: "Управлять",
+  PROMOTION_BUTTON: "Управление",
   DELETE_PRODUCT: "Удалить товар",
   DELETE_PRODUCT_PENDING: "Удаление…",
   DELETE_CONFIRM_QUESTION: "Вы уверены, что хотите удалить этот товар?",
@@ -1696,7 +1701,7 @@ export const PRODUCT_PROMOTION_UI = {
   TARIFF_DURATION: (durationHours) => `${durationHours} ч.`,
   INSUFFICIENT_POINTS: (required, balance) =>
     `Недостаточно баллов: нужно ${required}, у вас ${balance}.`,
-  SUBMIT_POINTS: "Оплатить баллами и включить",
+  SUBMIT_POINTS: "Оплатить баллами",
   SUBMIT_PENDING: "Отправка…",
   CANCEL: "Отмена",
   CLOSE: "Закрыть",
@@ -1856,6 +1861,7 @@ export const MY_PROFILE_PAGE_UI = {
   NAV_SECTION_TRADE: "Торговля",
   NAV_SECTION_ACCOUNT: "Аккаунт",
   NAV_SECTION_STAFF: "Модерация",
+  NAV_SECTION_MANAGEMENT: "Управление",
   TAB_CREATE_RAFFLE: "Создать розыгрыш",
   TAB_MY_PRODUCTS: "Мои товары",
   TAB_MY_SALES: "Мои продажи",

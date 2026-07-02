@@ -36,13 +36,46 @@ test("mobile dashboard price-offer APIs use bids and offers fields", () => {
   assert.match(source, /data\.data\?\.offers/);
 });
 
+test("auction dashboard rows resolve product image URLs for mobile", () => {
+  const resolver = readSource(
+    MOBILE_ROOT,
+    "entities/product-price-offer/lib/resolvePriceOfferProductImageUrl.ts",
+  );
+  const thumb = readSource(
+    MOBILE_ROOT,
+    "entities/product-price-offer/ui/AuctionDashboardProductThumb.tsx",
+  );
+  const sellerRow = readSource(
+    MOBILE_ROOT,
+    "entities/product-price-offer/ui/AuctionSellerOfferRow.tsx",
+  );
+
+  const sellerActions = readSource(
+    MOBILE_ROOT,
+    "entities/product-price-offer/ui/AuctionDashboardSellerActions.tsx",
+  );
+
+  const styles = readSource(MOBILE_ROOT, "shared/theme/auctionPageStyles.ts");
+
+  assert.match(resolver, /resolveProductImageUrl/);
+  assert.match(thumb, /resolvePriceOfferProductImageUrl/);
+  assert.match(thumb, /onError/);
+  assert.match(thumb, /thumbSlot/);
+  assert.match(sellerRow, /AuctionDashboardProductThumb/);
+  assert.match(sellerRow, /AuctionDashboardRowBuyerMeta/);
+  assert.match(styles, /decision:\s*\{[\s\S]*flexDirection: "row"/);
+  assert.doesNotMatch(sellerActions, /decisionStacked/);
+  assert.doesNotMatch(sellerActions, /useWindowDimensions/);
+  assert.doesNotMatch(sellerRow, /metaRow/);
+  assert.doesNotMatch(sellerRow, /productImageUrl \?\? null/);
+});
+
 test("ProductAuctionTab renders server top-offer fields", () => {
   const source = readSource(
     MOBILE_ROOT,
     "features/product-detail/ui/ProductAuctionTab.tsx",
   );
 
-  assert.match(source, /offer\.offerPrice/);
-  assert.match(source, /offer\.buyer\?\.userName/);
+  assert.match(source, /ProductPriceOfferTopList/);
   assert.doesNotMatch(source, /offerPriceRub/);
 });

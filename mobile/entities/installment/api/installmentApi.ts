@@ -67,6 +67,31 @@ export const fetchProductInstallmentProgram = async (productId: string) => {
   }
 };
 
+export type UpsertInstallmentProgramBody = {
+  isEnabled: boolean;
+  plans: Array<{
+    title: string;
+    monthsCount: number;
+    monthlyAmountRub: number;
+    firstPaymentRequiredNow?: boolean;
+  }>;
+};
+
+export const upsertProductInstallmentProgram = async (
+  productId: string,
+  body: UpsertInstallmentProgramBody,
+) => {
+  try {
+    const { data } = await apiClient.put(`/product/${productId}/installment-program`, body);
+    if (!data?.success) {
+      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
+    }
+    return data.data as { message?: string; product?: Record<string, unknown> };
+  } catch (error) {
+    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.UPSERT_INSTALLMENT_PROGRAM_FALLBACK));
+  }
+};
+
 export const createInstallmentContract = async (
   productId: string,
   body: {

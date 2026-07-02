@@ -39,19 +39,26 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
   guestContent: {
     flexGrow: 1,
     alignItems: "center",
-    justifyContent: "flex-start",
+    justifyContent: "center",
     paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
-    paddingTop: theme.spacing[6],
     paddingBottom: SCREEN_CONTENT_PADDING_BOTTOM,
     backgroundColor: theme.colors.bg,
+  },
+  guestInner: {
+    flexGrow: 1,
+    width: "100%",
+    maxWidth: PROFILE_ACTIONS_MAX_WIDTH,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: theme.spacing[3],
   },
   title: {
     fontSize: 24,
     fontWeight: "700",
     color: theme.colors.text,
+    textAlign: "center",
   },
   subtitle: {
-    marginTop: theme.spacing[3],
     fontSize: 16,
     textAlign: "center",
     color: theme.colors.textMuted,
@@ -74,13 +81,13 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
     alignSelf: "center",
   },
   actions: {
-    marginTop: theme.spacing[6],
+    marginTop: 0,
     width: "100%",
     maxWidth: PROFILE_ACTIONS_MAX_WIDTH,
     gap: theme.spacing[3],
   },
   actionButton: {
-    minWidth: 200,
+    width: "100%",
   },
   error: {
     marginTop: theme.spacing[3],
@@ -88,7 +95,7 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
     textAlign: "center",
   },
   legalLink: {
-    marginTop: theme.spacing[6],
+    marginTop: 0,
     paddingVertical: theme.spacing[2],
   },
   legalLinkText: {
@@ -360,15 +367,27 @@ export const useThemePreferenceToggleStyles = createThemedStyles((theme) => ({
     gap: theme.spacing[2],
     marginTop: theme.spacing[2],
   },
+  rootCentered: {
+    width: "100%",
+    alignItems: "center",
+    alignSelf: "center",
+    marginTop: 0,
+  },
   label: {
     fontSize: 14,
     fontWeight: "600",
     color: theme.colors.text,
   },
+  labelCentered: {
+    textAlign: "center",
+  },
   row: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: theme.spacing[2],
+  },
+  rowCentered: {
+    justifyContent: "center",
   },
   chip: {
     borderWidth: 1,

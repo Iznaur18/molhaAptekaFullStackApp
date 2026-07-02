@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 
+import { ORDER_CARD_ITEM_THUMB_SIZE } from "@/entities/product/model/constants";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 export const useOrderCardStyles = createThemedStyles((theme) => ({
@@ -65,17 +66,58 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     color: theme.colors.textMuted,
     marginBottom: 4,
   },
-  itemsHeading: {
+  itemsList: {
     marginTop: theme.spacing[2],
-    fontSize: 13,
-    fontWeight: "600",
-    color: theme.colors.textSecondary,
+    gap: 4,
   },
   itemBlock: {
-    marginTop: theme.spacing[2],
-    paddingTop: theme.spacing[2],
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: theme.colors.border,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    borderRadius: 6,
+    backgroundColor: theme.colors.surfaceMuted,
+  },
+  itemBlockCompact: {
+    backgroundColor: theme.colors.surface,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+  },
+  itemRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 10,
+  },
+  itemThumb: {
+    width: ORDER_CARD_ITEM_THUMB_SIZE,
+    height: ORDER_CARD_ITEM_THUMB_SIZE,
+    borderRadius: 6,
+    overflow: "hidden",
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surfaceMuted,
+  },
+  itemThumbPressable: {
+    width: ORDER_CARD_ITEM_THUMB_SIZE,
+    height: ORDER_CARD_ITEM_THUMB_SIZE,
+    borderRadius: 6,
+    overflow: "hidden",
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surfaceMuted,
+  },
+  itemThumbImage: {
+    width: "100%",
+    height: "100%",
+  },
+  itemBody: {
+    flex: 1,
+    minWidth: 0,
+    gap: 4,
+  },
+  itemMain: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: 4,
   },
   itemTitleRow: {
     flexDirection: "row",
@@ -100,7 +142,6 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     color: theme.colors.textMuted,
   },
   itemPrice: {
-    marginTop: 4,
     fontSize: 13,
     color: theme.colors.textSecondary,
     fontWeight: "600",
@@ -122,6 +163,15 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
   },
   itemActions: {
     marginTop: theme.spacing[2],
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: theme.spacing[2],
+  },
+  itemActionsRow: {
+    marginTop: 6,
+    paddingTop: 6,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: theme.colors.border,
     flexDirection: "row",
     flexWrap: "wrap",
     gap: theme.spacing[2],

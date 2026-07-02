@@ -24,18 +24,18 @@ export const AuctionDashboardSellerActions = ({
   return (
     <View style={styles.decision} accessibilityRole="toolbar">
       <Pressable
-        style={[styles.decisionBtn, styles.decisionBtnAccept, disabled ? styles.disabled : null]}
-        disabled={disabled}
-        onPress={onAccept}
-      >
-        <Text style={styles.decisionBtnTextAccept}>{disabled ? pendingLabel : acceptLabel}</Text>
-      </Pressable>
-      <Pressable
         style={[styles.decisionBtn, styles.decisionBtnReject, disabled ? styles.disabled : null]}
         disabled={disabled}
         onPress={onReject}
       >
         <Text style={styles.decisionBtnTextReject}>{rejectLabel}</Text>
+      </Pressable>
+      <Pressable
+        style={[styles.decisionBtn, styles.decisionBtnAccept, disabled ? styles.disabled : null]}
+        disabled={disabled}
+        onPress={onAccept}
+      >
+        <Text style={styles.decisionBtnTextAccept}>{disabled ? pendingLabel : acceptLabel}</Text>
       </Pressable>
     </View>
   );

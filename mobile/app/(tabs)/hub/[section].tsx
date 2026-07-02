@@ -65,6 +65,11 @@ export default function HubSectionScreen() {
       void openProfileStaffWebSection(sectionId).finally(() => {
         router.replace("/(tabs)/profile");
       });
+      return;
+    }
+
+    if (sectionId === "seller-personal-category-moderation") {
+      router.replace("/hub/intro-ad-moderation" as never);
     }
   }, [router, sectionId]);
 

@@ -3,10 +3,10 @@ import { useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   ScrollView,
   Text,
   TextInput,
+  View,
 } from "react-native";
 
 import { useLoginMutation } from "@/entities/session/model/useLoginMutation";
@@ -70,16 +70,22 @@ export default function LoginScreen() {
 
         {errorMessage ? <Text style={fieldStyles.error}>{errorMessage}</Text> : null}
 
-        <AppButton
-          label={AUTH_UI.LOGIN_BUTTON}
-          variant="contrast"
-          onPress={handleSubmit}
-          disabled={loginMutation.isPending}
-        />
-
-        <Pressable onPress={() => router.push("/(auth)/register")}>
-          <Text style={authStyles.link}>{AUTH_UI.GO_TO_REGISTER}</Text>
-        </Pressable>
+        <View style={authStyles.authActions}>
+          <AppButton
+            label={AUTH_UI.LOGIN_BUTTON}
+            variant="primary"
+            style={authStyles.authButton}
+            onPress={handleSubmit}
+            disabled={loginMutation.isPending}
+          />
+          <AppButton
+            label={AUTH_UI.GO_TO_REGISTER}
+            variant="secondary"
+            style={[authStyles.authButton, authStyles.authSecondaryButton]}
+            onPress={() => router.push("/(auth)/register")}
+            disabled={loginMutation.isPending}
+          />
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );

@@ -68,11 +68,16 @@ test("RaffleFeaturedBanner uses content height, backdrop and carousel variant", 
   const carousel = readMobileFile("entities/raffle/ui/RaffleFeaturedCarousel.tsx");
 
   assert.match(banner, /useRaffleFeaturedBannerMetrics/);
-  assert.match(banner, /hasManage/);
+  assert.match(banner, /RaffleFeaturedBannerManageMenu/);
+  assert.match(banner, /visualControls/);
+  assert.doesNotMatch(banner, /RaffleManageActions/);
+  assert.doesNotMatch(banner, /styles\.manage/);
+  assert.match(banner, /RaffleFeaturedBannerInfoToggle/);
   assert.match(banner, /inCarousel/);
   assert.match(banner, /metrics\.showInlineCopy/);
   assert.match(banner, /getRaffleFeaturedBannerBackdrop/);
-  assert.match(banner, /RaffleFeaturedBannerInfoOverlay/);
+  assert.match(banner, /RaffleFeaturedBannerInfoToggle/);
+  assert.match(banner, /RaffleFeaturedBannerInfoPanel/);
   assert.doesNotMatch(banner, /minHeight: metrics\.innerMinHeight/);
   assert.match(styles, /rootInCarousel/);
   assert.match(styles, /paddingTop: L\.innerPaddingTop/);

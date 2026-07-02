@@ -14,6 +14,8 @@ import { formToIntroAdPreviewSettings } from "../../../entities/intro-ad/lib/ind
 import { INTRO_AD_MODERATION_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
 import { SiteHeaderBannerCampaignModerationSection } from "./SiteHeaderBannerCampaignModerationSection.jsx";
+import { SellerPersonalCategoryCampaignModerationSection } from "./SellerPersonalCategoryCampaignModerationSection.jsx";
+import { ModerationSectionTitle } from "./ModerationSectionTitle.jsx";
 
 import "./IntroAdModerationPage.css";
 
@@ -296,12 +298,12 @@ export function IntroAdModerationPage({ onQueueChanged }) {
     );
   }
 
-  const isEmpty = pendingCampaigns.length === 0 && managedCampaigns.length === 0;
+  const isIntroEmpty = pendingCampaigns.length === 0 && managedCampaigns.length === 0;
   const hasLoadError =
     (queueQuery.isError && pendingCampaigns.length === 0) ||
     (managedQuery.isError && managedCampaigns.length === 0);
 
-  if (hasLoadError && isEmpty) {
+  if (hasLoadError && isIntroEmpty) {
     const error =
       queueQuery.error instanceof Error
         ? queueQuery.error
@@ -315,28 +317,15 @@ export function IntroAdModerationPage({ onQueueChanged }) {
     );
   }
 
-  if (isEmpty) {
-    return (
-      <>
+  const moderationSections = (
+    <>
+      {isIntroEmpty ? (
         <p className="intro-ad-moderation-page__state">{INTRO_AD_MODERATION_PAGE_UI.EMPTY}</p>
-        <SiteHeaderBannerCampaignModerationSection onQueueChanged={onQueueChanged} />
-      </>
-    );
-  }
-
-  return (
-    <div className="intro-ad-moderation-page">
-      {actionError ? (
-        <p className="intro-ad-moderation-page__state intro-ad-moderation-page__state_error">
-          {actionError}
-        </p>
       ) : null}
 
       {managedCampaigns.length > 0 ? (
         <section className="intro-ad-moderation-page__section">
-          <h3 className="intro-ad-moderation-page__section-title">
-            {INTRO_AD_MODERATION_PAGE_UI.MANAGED_TITLE}
-          </h3>
+          <ModerationSectionTitle title={INTRO_AD_MODERATION_PAGE_UI.INTRO_MANAGED_TITLE} />
           <ul className="intro-ad-moderation-page__list">
             {managedCampaigns.map((campaign) => {
               const campaignId = String(campaign._id);
@@ -357,9 +346,10 @@ export function IntroAdModerationPage({ onQueueChanged }) {
 
       {pendingCampaigns.length > 0 ? (
         <section className="intro-ad-moderation-page__section">
-          <h3 className="intro-ad-moderation-page__section-title">
-            {INTRO_AD_MODERATION_PAGE_UI.PENDING_TITLE}
-          </h3>
+          <ModerationSectionTitle
+            title={INTRO_AD_MODERATION_PAGE_UI.INTRO_PENDING_TITLE}
+            pendingCount={pendingCampaigns.length}
+          />
           <ul className="intro-ad-moderation-page__list">
             {pendingCampaigns.map((campaign) => {
               const campaignId = String(campaign._id);
@@ -388,6 +378,36 @@ export function IntroAdModerationPage({ onQueueChanged }) {
         actionError={actionError}
         onActionError={setActionError}
       />
+      <SellerPersonalCategoryCampaignModerationSection
+        onQueueChanged={onQueueChanged}
+        actionError={actionError}
+        onActionError={setActionError}
+      />
+    </>
+  );
+
+  if (isIntroEmpty) {
+    return (
+      <div className="intro-ad-moderation-page">
+        {actionError ? (
+          <p className="intro-ad-moderation-page__state intro-ad-moderation-page__state_error">
+            {actionError}
+          </p>
+        ) : null}
+        {moderationSections}
+      </div>
+    );
+  }
+
+  return (
+    <div className="intro-ad-moderation-page">
+      {actionError ? (
+        <p className="intro-ad-moderation-page__state intro-ad-moderation-page__state_error">
+          {actionError}
+        </p>
+      ) : null}
+
+      {moderationSections}
     </div>
   );
 }

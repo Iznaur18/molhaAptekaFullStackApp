@@ -20,6 +20,17 @@ export const useAuthFormStyles = createThemedStyles((theme) => ({
     marginBottom: theme.spacing[6],
     color: theme.colors.text,
   },
+  authActions: {
+    gap: theme.spacing[3],
+    marginTop: theme.spacing[2],
+  },
+  authButton: {
+    width: "100%",
+  },
+  authSecondaryButton: {
+    backgroundColor: theme.colors.surface,
+    borderColor: theme.colors.borderStrong,
+  },
   link: {
     marginTop: theme.spacing[5],
     textAlign: "center",

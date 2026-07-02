@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 
 import { MODAL_BACKDROP_SCRIM } from "@/shared/theme/formChromeStyles";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
@@ -477,96 +477,330 @@ export const useAdminEditModalStyles = createThemedStyles((theme) => ({
   },
 }));
 
+export const useModalSectionTabsStyles = createThemedStyles((theme) => ({
+  row: {
+    flexDirection: "row",
+    flexWrap: "nowrap",
+    gap: theme.spacing[2],
+    paddingVertical: 2,
+  },
+  rowInHeader: {
+    paddingTop: 6,
+  },
+  tab: {
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+  },
+  tabActive: {
+    borderColor: theme.colors.action,
+    backgroundColor: theme.colors.action,
+  },
+  tabPressed: {
+    borderColor: theme.colors.action,
+    backgroundColor: theme.colors.actionSoft,
+  },
+  tabLabel: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: theme.colors.action,
+  },
+  tabLabelActive: {
+    color: theme.colors.onContrast,
+  },
+}));
+
+export const useProductManageToggleRowStyles = createThemedStyles((theme) => ({
+  row: {
+    width: "100%",
+    paddingVertical: 11,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+  },
+  rowPressed: {
+    backgroundColor: theme.colors.surfaceMuted,
+    borderColor: theme.colors.borderStrong,
+  },
+  rowWebClickable: {
+    cursor: "pointer",
+  },
+  rowDisabled: {
+    opacity: 0.65,
+  },
+  rowPending: {
+    justifyContent: "center",
+  },
+  pendingLabel: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: theme.colors.textMuted,
+  },
+  rowDefaultChecked: {
+    borderColor: theme.colors.actionBorder,
+    backgroundColor: theme.colors.actionSurface,
+  },
+  rowRaffle: {
+    borderColor: `${theme.colors.raffleBorder}99`,
+    backgroundColor: theme.colors.raffleSurface,
+  },
+  rowRaffleChecked: {
+    borderColor: theme.colors.raffleBorder,
+    backgroundColor: theme.colors.raffleSurface,
+  },
+  rowAuction: {
+    borderColor: `${theme.colors.warningBorder}99`,
+    backgroundColor: theme.colors.warningSurface,
+  },
+  rowAuctionChecked: {
+    borderColor: theme.colors.warning,
+    backgroundColor: theme.colors.warningSurface,
+  },
+  rowInstallment: {
+    borderColor: `${theme.colors.success}55`,
+    backgroundColor: `${theme.colors.success}12`,
+  },
+  rowInstallmentChecked: {
+    borderColor: theme.colors.success,
+    backgroundColor: `${theme.colors.success}1F`,
+  },
+  rowDanger: {
+    borderColor: `${theme.colors.danger}55`,
+    backgroundColor: `${theme.colors.danger}0F`,
+  },
+  textBlock: {
+    gap: 3,
+  },
+  title: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: theme.colors.text,
+    lineHeight: 19,
+  },
+  titleStatus: {
+    fontWeight: "600",
+    color: theme.colors.textMuted,
+  },
+  description: {
+    fontSize: 12,
+    lineHeight: 17,
+    color: theme.colors.textMuted,
+  },
+}));
+
+export const useProductEditManageSectionStyles = createThemedStyles((theme) => ({
+  root: {
+    gap: 9,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+  },
+  title: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: theme.colors.text,
+    marginBottom: 2,
+  },
+  error: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: theme.colors.danger,
+  },
+  openSalesHint: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: theme.colors.textMuted,
+  },
+  toggles: {
+    gap: 8,
+  },
+  deleteConfirm: {
+    paddingVertical: 11,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: `${theme.colors.danger}59`,
+    backgroundColor: `${theme.colors.danger}14`,
+    gap: 10,
+  },
+  deleteConfirmQuestion: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: theme.colors.text,
+  },
+  deleteConfirmActions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  deleteConfirmYes: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    backgroundColor: theme.colors.danger,
+    ...Platform.select({
+      web: { cursor: "pointer" },
+      default: {},
+    }),
+  },
+  deleteConfirmYesText: {
+    color: theme.colors.onContrast,
+    fontSize: 13,
+    fontWeight: "700",
+  },
+  deleteConfirmCancel: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+    ...Platform.select({
+      web: { cursor: "pointer" },
+      default: {},
+    }),
+  },
+  deleteConfirmCancelText: {
+    color: theme.colors.textSecondary,
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  deleteConfirmPressed: {
+    opacity: 0.85,
+  },
+}));
+
 export const useProductPromotionModalStyles = createThemedStyles((theme) => ({
   overlay: {
     flex: 1,
     backgroundColor: MODAL_BACKDROP_SCRIM,
     justifyContent: "flex-end",
+    ...Platform.select({
+      web: {
+        position: "relative",
+        zIndex: 1,
+      },
+      default: {},
+    }),
   },
   card: {
-    maxHeight: "92%",
+    height: "92%",
+    flexDirection: "column",
     borderTopLeftRadius: theme.radius.md,
     borderTopRightRadius: theme.radius.md,
     padding: 20,
-    gap: theme.spacing[3],
+    gap: 12,
     backgroundColor: theme.colors.surface,
+    ...Platform.select({
+      web: {
+        position: "relative",
+        zIndex: 2,
+      },
+      default: {},
+    }),
   },
   title: {
     fontSize: 18,
     fontWeight: "700",
     color: theme.colors.text,
   },
+  headerAddon: {
+    marginTop: -4,
+  },
+  bodyScroll: {
+    flex: 1,
+    minHeight: 0,
+  },
   body: {
-    paddingBottom: theme.spacing[2],
-    gap: 10,
+    paddingBottom: 8,
+    gap: 16,
+  },
+  productBox: {
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 9,
+    borderWidth: 1,
+    backgroundColor: theme.colors.surfaceElevated,
+    borderColor: theme.colors.border,
   },
   subtitle: {
     fontSize: 14,
-    color: theme.colors.textMuted,
+    lineHeight: 20,
+    color: theme.colors.textSecondary,
   },
   balanceCard: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: theme.radius.sm,
-    padding: theme.spacing[3],
-    gap: 4,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingVertical: 11,
+    paddingHorizontal: 14,
   },
   balanceCardOk: {
-    backgroundColor: theme.colors.surfaceMuted,
-    borderColor: theme.colors.border,
+    backgroundColor: "#ecfdf5",
+    borderColor: "#05966947",
   },
   balanceCardInsufficient: {
-    backgroundColor: theme.colors.warningSurface,
-    borderColor: theme.colors.danger,
+    backgroundColor: "#fef2f2",
+    borderColor: "#dc262647",
   },
   balanceLabel: {
-    fontSize: 12,
-    textTransform: "uppercase",
-    letterSpacing: 0.4,
+    fontSize: 13,
     color: theme.colors.textMuted,
   },
   balanceValue: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: "700",
     color: theme.colors.text,
   },
   hint: {
     fontSize: 13,
-    lineHeight: 18,
+    lineHeight: 19,
     color: theme.colors.textMuted,
   },
   sectionTitle: {
-    marginTop: 4,
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: "700",
     color: theme.colors.text,
+    marginBottom: 2,
   },
   tierGrid: {
-    gap: theme.spacing[2],
+    gap: 9,
   },
   tierCard: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: theme.radius.sm,
-    padding: theme.spacing[3],
-    gap: 4,
+    borderWidth: 1.5,
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    gap: 3,
     backgroundColor: theme.colors.surface,
     borderColor: theme.colors.border,
   },
-  tierCardSelected: {
-    borderColor: theme.colors.nearBlack,
-  },
   tierBadge: {
-    fontSize: 12,
+    alignSelf: "flex-start",
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 6,
+    fontSize: 11,
     fontWeight: "700",
     textTransform: "uppercase",
-    color: theme.colors.text,
+    letterSpacing: 0.3,
   },
   tierTitle: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 15,
+    fontWeight: "700",
     color: theme.colors.text,
   },
   tierRate: {
     fontSize: 12,
+    fontWeight: "600",
     color: theme.colors.textMuted,
   },
   tierDescription: {
@@ -577,86 +811,135 @@ export const useProductPromotionModalStyles = createThemedStyles((theme) => ({
   durationRow: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: theme.spacing[2],
+    gap: 7,
   },
   durationChip: {
     minWidth: "30%",
     flexGrow: 1,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 10,
-    padding: 10,
-    gap: 4,
+    borderWidth: 1.5,
+    borderRadius: 9,
+    paddingVertical: 9,
+    paddingHorizontal: 6,
+    gap: 2,
+    alignItems: "center",
     backgroundColor: theme.colors.surface,
     borderColor: theme.colors.border,
   },
-  durationChipSelected: {
-    borderColor: theme.colors.nearBlack,
-  },
   durationTitle: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "600",
     color: theme.colors.text,
   },
   durationPrice: {
     fontSize: 12,
-    color: theme.colors.textMuted,
+    fontWeight: "700",
+    color: theme.colors.link,
   },
   summary: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: theme.radius.sm,
-    padding: theme.spacing[3],
-    gap: theme.spacing[2],
-    marginTop: 4,
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    gap: 7,
     borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surfaceMuted,
+    backgroundColor: theme.colors.surfaceElevated,
   },
   summaryRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    gap: theme.spacing[3],
+    gap: 12,
   },
   summaryLabel: {
+    fontSize: 13,
     color: theme.colors.textMuted,
   },
   summaryValueStrong: {
+    fontSize: 13,
     color: theme.colors.text,
-    fontWeight: "600",
+    fontWeight: "700",
+    textAlign: "right",
+  },
+  summaryTotalRow: {
+    marginTop: 4,
+    paddingTop: 7,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.borderStrong,
+    borderStyle: "dashed",
   },
   summaryValueBold: {
+    fontSize: 14,
     color: theme.colors.text,
     fontWeight: "700",
   },
+  summaryTotalValue: {
+    fontSize: 16,
+    color: theme.colors.link,
+    fontWeight: "700",
+    textAlign: "right",
+  },
+  errorBox: {
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingVertical: 9,
+    paddingHorizontal: 10,
+    backgroundColor: "#fef2f2",
+    borderColor: "#dc262640",
+  },
   error: {
-    color: theme.colors.danger,
+    color: "#b42318",
     fontSize: 13,
+    lineHeight: 18,
+  },
+  footer: {
+    flexShrink: 0,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
   },
   actions: {
     flexDirection: "row",
-    gap: 10,
-    marginTop: 4,
+    gap: 8,
   },
   secondaryButton: {
     flex: 1,
-    borderWidth: StyleSheet.hairlineWidth,
+    minHeight: 44,
+    borderWidth: 1,
     borderColor: theme.colors.border,
-    borderRadius: 10,
-    paddingVertical: theme.spacing[3],
+    borderRadius: 11,
     alignItems: "center",
+    justifyContent: "center",
     backgroundColor: theme.colors.surface,
   },
   secondaryButtonText: {
-    color: theme.colors.text,
+    color: theme.colors.textSecondary,
+    fontWeight: "700",
+    fontSize: 15,
   },
   primaryButton: {
     flex: 1.4,
-    borderRadius: 10,
-    paddingVertical: theme.spacing[3],
+    minHeight: 44,
+    borderWidth: 1,
+    borderRadius: 11,
     alignItems: "center",
-    backgroundColor: theme.colors.nearBlack,
+    justifyContent: "center",
+    backgroundColor: theme.colors.action,
+    borderColor: theme.colors.action,
+    shadowColor: theme.colors.action,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.24,
+    shadowRadius: 12,
+    elevation: 6,
   },
   primaryButtonText: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
+    fontWeight: "700",
+    fontSize: 15,
+  },
+  buttonPressed: {
+    opacity: 0.85,
+  },
+  buttonDisabled: {
+    opacity: 0.6,
   },
 }));
 

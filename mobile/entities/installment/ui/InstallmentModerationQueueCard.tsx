@@ -110,21 +110,21 @@ export const InstallmentModerationQueueCard = ({
 
       <View style={styles.actions}>
         <Pressable
-          style={[styles.actionApprove, isBusy && styles.actionDisabled]}
-          disabled={isBusy}
-          onPress={onApprove}
-        >
-          <Text style={styles.actionApproveText}>
-            {isBusy ? INSTALLMENT_UI.ACTION_PENDING : INSTALLMENT_UI.MODERATION_APPROVE}
-          </Text>
-        </Pressable>
-        <Pressable
           style={[styles.actionReject, isBusy && styles.actionDisabled]}
           disabled={isBusy}
           onPress={onReject}
         >
           <Text style={styles.actionRejectText}>
             {isBusy ? INSTALLMENT_UI.ACTION_PENDING : INSTALLMENT_UI.MODERATION_REJECT}
+          </Text>
+        </Pressable>
+        <Pressable
+          style={[styles.actionApprove, isBusy && styles.actionDisabled]}
+          disabled={isBusy}
+          onPress={onApprove}
+        >
+          <Text style={styles.actionApproveText}>
+            {isBusy ? INSTALLMENT_UI.ACTION_PENDING : INSTALLMENT_UI.MODERATION_APPROVE}
           </Text>
         </Pressable>
       </View>

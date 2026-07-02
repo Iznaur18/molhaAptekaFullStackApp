@@ -4,6 +4,11 @@ import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
+import {
+  canSellerDeleteProduct,
+  canSellerEditProduct,
+  canSellerToggleCatalogVisibility,
+} from "@/entities/product/lib/getProductModerationUi";
 import { getSellerProductsLimit } from "@/entities/product/lib/sellerProductsLimit";
 import { isSellerProductLoyaltyPointsOvercommitted } from "@/entities/product/lib/isSellerProductLoyaltyPointsOvercommitted";
 import {
@@ -28,15 +33,21 @@ import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNa
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import { MY_PRODUCTS_PAGE_UI, MY_PROFILE_PAGE_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
-import { useProductGridLayout } from "@/shared/model/useProductGridLayout";
+import { useProductGridLayout, type ProductGridLayoutResolvers } from "@/shared/model/useProductGridLayout";
+import { resolveProductGridGap } from "@/shared/lib/screenBreakpoints";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useMyProductsPageStyles } from "@/shared/theme/sellerFlowStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
+const myProductsGridResolvers: ProductGridLayoutResolvers = {
+  resolveColumns: () => 1,
+  resolveGap: resolveProductGridGap,
+};
+
 export const MyProductsPage = () => {
   const router = useRouter();
   const styles = useMyProductsPageStyles();
-  const productGrid = useProductGridLayout();
+  const productGrid = useProductGridLayout(undefined, myProductsGridResolvers);
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
   const isAuthorized = useIsAuthorized();
   const sessionQuery = useAuthSessionQuery();
@@ -218,6 +229,7 @@ export const MyProductsPage = () => {
 
       <ProductPromotionModal
         visible={pageActions.promotionModalVisible}
+        product={promotionProduct}
         productName={promotionProductName}
         productPrice={promotionProductPrice}
         tiers={promotionTariffsQuery.data?.tiers ?? []}
@@ -232,6 +244,30 @@ export const MyProductsPage = () => {
         onRetryTariffs={() => void promotionTariffsQuery.refetch()}
         onClose={pageActions.handleClosePromotionModal}
         onSubmit={pageActions.handleSubmitPromotion}
+        onDeleteProduct={pageActions.handleDeleteMyProduct}
+        onSetProductAvailability={pageActions.handleSetMyProductAvailability}
+        onSetProductAuction={pageActions.handleSetProductAuction}
+        isDeletePending={pageActions.isDeletePending}
+        isAvailabilityTogglePending={pageActions.isAvailabilityTogglePending}
+        isAuctionTogglePending={pageActions.isAuctionTogglePending}
+        manageErrorMessage={pageActions.manageErrorMessage}
+        canManageEdit={
+          promotionProduct != null && (isAdmin || canSellerEditProduct(promotionProduct))
+        }
+        canManageDelete={
+          promotionProduct != null && (isAdmin || canSellerDeleteProduct(promotionProduct))
+        }
+        canManageToggleVisibility={
+          promotionProduct != null &&
+          (isAdmin || canSellerToggleCatalogVisibility(promotionProduct))
+        }
+        sellerRaffleActive={pageActions.sellerRaffleActive}
+        onToggleRaffleParticipation={pageActions.handleToggleRaffleParticipation}
+        isRaffleParticipationPending={pageActions.isRaffleParticipationPending}
+        onOpenInstallmentProgram={pageActions.openInstallmentProgramModal}
+        installmentProgramModalVisible={pageActions.installmentProgramModalVisible}
+        onCloseInstallmentProgram={pageActions.closeInstallmentProgramModal}
+        onInstallmentProgramSaved={pageActions.handleInstallmentProgramSaved}
       />
     </>
   );

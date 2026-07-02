@@ -11,6 +11,9 @@ const DANGER_STRONG = "#b42318";
 const DANGER_SURFACE = "#fef3f2";
 const DANGER_ACCENT = "#dc2626";
 
+const PAYMENTS_FOLD_SUMMARY_PADDING_VERTICAL = 9;
+const PAYMENTS_FOLD_SUMMARY_MIN_HEIGHT = 47;
+
 export const useInstallmentContractCardChromeStyles = createThemedStyles((theme) => ({
   card: {
     gap: 7.2,
@@ -181,7 +184,9 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
     gap: 6,
   },
   foldSummary: {
-    paddingVertical: 6,
+    minHeight: PAYMENTS_FOLD_SUMMARY_MIN_HEIGHT,
+    justifyContent: "center",
+    paddingVertical: PAYMENTS_FOLD_SUMMARY_PADDING_VERTICAL,
     paddingHorizontal: 8,
     borderRadius: 8,
     backgroundColor: theme.colors.surfaceMuted,

@@ -34,17 +34,21 @@ test("home catalog screen wires city filter and home-feed refresh", () => {
   assert.match(index, /catalogAllCities/);
   assert.match(index, /invalidateHomeFeedQueries/);
   assert.match(index, /isHomeCuratedProductListsVisible/);
+  assert.match(index, /HOME_PAGE_UI\.BREADCRUMB_HOME/);
   assert.match(header, /showCuratedLists/);
   assert.match(header, /allCities: catalogAllCities/);
   assert.match(header, /CatalogCityFilterBanner/);
 });
 
 test("raffle carousel section margin matches web 1.25rem", () => {
-  const source = readMobileFile("shared/theme/raffleFeaturedStyles.ts");
+  const styles = readMobileFile("shared/theme/raffleFeaturedStyles.ts");
+  const section = readMobileFile("features/home-feed/ui/HomeFeaturedRafflesSection.tsx");
 
-  assert.match(source, /marginTop: BANNER_SECTION_MARGIN/);
-  assert.match(source, /marginBottom: BANNER_SECTION_MARGIN/);
-  assert.match(source, /const BANNER_SECTION_MARGIN = 20/);
+  assert.match(styles, /useRaffleFeaturedSectionStyles/);
+  assert.match(styles, /marginTop: BANNER_SECTION_MARGIN/);
+  assert.match(styles, /marginBottom: BANNER_SECTION_MARGIN/);
+  assert.match(styles, /const BANNER_SECTION_MARGIN = 20/);
+  assert.match(section, /HOME_FEED_UI\.RAFFLES_SECTION_TITLE/);
 });
 
 test("city filter banner copy matches web HOME_PAGE_UI", () => {

@@ -4,6 +4,7 @@ import { test } from "node:test";
 import {
   isProfileStaffInAppSection,
   isProfileStaffWebOnlySection,
+  PROFILE_MANAGEMENT_SECTION_ORDER,
   PROFILE_SECTION_CREATE_RAFFLE,
   PROFILE_SECTION_PRODUCT_MODERATION,
   PROFILE_SECTION_WEB_PATH,
@@ -12,8 +13,13 @@ import {
   PROFILE_STAFF_WEB_ONLY_SECTION_IDS,
 } from "@izibuy/shared-lib";
 
+const PROFILE_STAFF_AND_MANAGEMENT_SECTION_ORDER = [
+  ...PROFILE_STAFF_SECTION_ORDER,
+  ...PROFILE_MANAGEMENT_SECTION_ORDER,
+];
+
 test("profile staff: all staff sections open in-app on mobile", () => {
-  for (const sectionId of PROFILE_STAFF_SECTION_ORDER) {
+  for (const sectionId of PROFILE_STAFF_AND_MANAGEMENT_SECTION_ORDER) {
     assert.ok(
       isProfileStaffInAppSection(sectionId),
       `${sectionId} must be in PROFILE_STAFF_IN_APP_SECTION_IDS`,
@@ -25,12 +31,15 @@ test("profile staff: all staff sections open in-app on mobile", () => {
     );
   }
 
-  assert.equal(PROFILE_STAFF_IN_APP_SECTION_IDS.length, PROFILE_STAFF_SECTION_ORDER.length);
+  assert.equal(
+    PROFILE_STAFF_IN_APP_SECTION_IDS.length,
+    PROFILE_STAFF_AND_MANAGEMENT_SECTION_ORDER.length,
+  );
   assert.deepEqual(PROFILE_STAFF_WEB_ONLY_SECTION_IDS, []);
 });
 
 test("profile staff web paths: web-only staff sections have SPA path", () => {
-  const expectedWebOnly = PROFILE_STAFF_SECTION_ORDER.filter(
+  const expectedWebOnly = PROFILE_STAFF_AND_MANAGEMENT_SECTION_ORDER.filter(
     (sectionId) => !PROFILE_STAFF_IN_APP_SECTION_IDS.includes(sectionId),
   );
   const missing = expectedWebOnly.filter(

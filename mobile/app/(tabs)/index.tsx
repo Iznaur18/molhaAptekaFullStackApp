@@ -35,6 +35,7 @@ import { formatApiErrorMessage } from "@/shared/lib";
 import { useProductGridLayout } from "@/shared/model/useProductGridLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useFeedScreenStyles } from "@/shared/theme/catalogProductStyles";
+import { HOME_PAGE_UI } from "@/shared/config/homePageUi";
 import { ScreenErrorState } from "@/shared/ui/ScreenStates";
 
 type FeedFiltersState = HomeCatalogFeedFiltersState;
@@ -236,6 +237,7 @@ export default function CatalogScreen() {
           onShowAllCities={handleShowAllCatalogCities}
         />
       ) : null}
+      {showHomeFeed ? <CatalogBreadcrumb label={HOME_PAGE_UI.BREADCRUMB_HOME} /> : null}
     </View>
   );
 

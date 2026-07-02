@@ -37,6 +37,14 @@ export const getProductModerationBadgeVariant = (
 export const canSellerEditProduct = (product: ModerationProduct): boolean =>
   (product.productModerationStatus ?? PRODUCT_MODERATION_APPROVED) !== PRODUCT_MODERATION_PENDING;
 
+export const canSellerDeleteProduct = (product: ModerationProduct): boolean =>
+  (product.productModerationStatus ?? PRODUCT_MODERATION_APPROVED) ===
+  PRODUCT_MODERATION_APPROVED;
+
+export const canSellerToggleCatalogVisibility = (product: ModerationProduct): boolean =>
+  (product.productModerationStatus ?? PRODUCT_MODERATION_APPROVED) ===
+  PRODUCT_MODERATION_APPROVED;
+
 export const getProductModerationRejectionComment = (
   product: ModerationProduct,
   isMineMode: boolean,

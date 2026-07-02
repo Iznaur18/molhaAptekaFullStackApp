@@ -15,6 +15,7 @@ import {
   PROFILE_SECTION_SEARCH_SYNONYMS_ADMIN,
   PROFILE_SECTION_SELLER_PERSONAL_CATEGORY_MODERATION,
   PROFILE_STAFF_SECTION_ORDER,
+  PROFILE_MANAGEMENT_SECTION_ORDER,
   type ProfileSectionId,
 } from "./profileSections.js";
 
@@ -27,6 +28,7 @@ import {
  */
 export const PROFILE_STAFF_IN_APP_SECTION_IDS = [
   ...PROFILE_STAFF_SECTION_ORDER,
+  ...PROFILE_MANAGEMENT_SECTION_ORDER,
 ] as const;
 
 export type ProfileStaffInAppSectionId =
@@ -62,10 +64,9 @@ export const isProfileStaffWebOnlySection = (
 ): sectionId is ProfileStaffWebOnlySectionId =>
   sectionId in PROFILE_SECTION_WEB_PATH && !isProfileStaffInAppSection(sectionId);
 
-export const PROFILE_STAFF_WEB_ONLY_SECTION_IDS = PROFILE_STAFF_SECTION_ORDER.filter(
-  (sectionId): sectionId is ProfileStaffWebOnlySectionId =>
-    isProfileStaffWebOnlySection(sectionId),
-);
+export const PROFILE_STAFF_WEB_ONLY_SECTION_IDS = (
+  Object.keys(PROFILE_SECTION_WEB_PATH) as ProfileStaffWebOnlySectionId[]
+).filter((sectionId) => isProfileStaffWebOnlySection(sectionId));
 
 export const resolveProfileStaffWebPath = (
   sectionId: ProfileStaffWebOnlySectionId,

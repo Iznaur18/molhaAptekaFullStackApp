@@ -218,5 +218,7 @@ test("mobile auction tab matches web price-offer layout and docked submit", () =
   assert.match(topList, /topRank/);
   assert.match(screen, /auctionDock/);
   assert.match(screen, /showAuctionDock/);
-  assert.doesNotMatch(tab, /Текущая цена/);
+  assert.match(tab, /myOfferQueryEnabled/);
+  assert.match(tab, /myOfferQueryEnabled && myOfferQuery\.isLoading/);
+  assert.doesNotMatch(tab, /isAuthorized && myOfferQuery\.isPending/);
 });

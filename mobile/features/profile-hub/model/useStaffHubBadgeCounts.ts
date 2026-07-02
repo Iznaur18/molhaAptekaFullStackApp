@@ -10,11 +10,10 @@ import {
   fetchPendingDataConfirmationCount,
   fetchPendingInstallmentDisputesCount,
   fetchPendingInstallmentModerationCount,
-  fetchPendingIntroAdCampaignsCount,
+  fetchPendingAdModerationNavBadgeCount,
   fetchPendingModerationProductsCount,
   fetchPendingProductPromotionsCount,
   fetchPendingRafflesCount,
-  fetchPendingSellerPersonalCategoryCampaignsCount,
   fetchStaffProductReportsBadgeCount,
 } from "@/features/profile-hub/api/staffBadgeApi";
 import type { ProfileSectionId } from "@/features/profile-hub/model/profileSections";
@@ -44,13 +43,7 @@ export const useStaffHubBadgeCounts = (
       },
       {
         queryKey: [...staffBadgeQueryKeys.all, "intro-ad"],
-        queryFn: fetchPendingIntroAdCampaignsCount,
-        enabled: staffEnabled,
-        ...BADGE_QUERY_OPTIONS,
-      },
-      {
-        queryKey: [...staffBadgeQueryKeys.all, "seller-personal-category"],
-        queryFn: fetchPendingSellerPersonalCategoryCampaignsCount,
+        queryFn: fetchPendingAdModerationNavBadgeCount,
         enabled: staffEnabled,
         ...BADGE_QUERY_OPTIONS,
       },
@@ -124,7 +117,6 @@ export const useStaffHubBadgeCounts = (
     const [
       moderationQuery,
       introAdQuery,
-      sellerCategoryQuery,
       productReportsQuery,
       dataConfirmationQuery,
       rafflesQuery,
@@ -153,7 +145,6 @@ export const useStaffHubBadgeCounts = (
     if (staffEnabled) {
       counts["product-moderation"] = moderationQuery.data ?? 0;
       counts["intro-ad-moderation"] = introAdQuery.data ?? 0;
-      counts["seller-personal-category-moderation"] = sellerCategoryQuery.data ?? 0;
       counts["product-reports"] = productReportsQuery.data ?? 0;
     }
 

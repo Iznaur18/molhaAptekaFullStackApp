@@ -1,6 +1,7 @@
 import { MY_PROFILE_PAGE_UI } from "@/shared/config/appUiCopy";
 import {
   PROFILE_ACCOUNT_SECTION_ORDER,
+  PROFILE_MANAGEMENT_SECTION_ORDER,
   PROFILE_STAFF_SECTION_ORDER,
   PROFILE_TRADE_SECTION_ORDER,
 } from "@izibuy/shared-lib";
@@ -25,6 +26,124 @@ export type ProfileNavGroup = {
   label?: string;
   items: ProfileNavItem[];
 };
+
+const resolveProfileStaffNavItem = (
+  sectionId: ProfileSectionId,
+  access: ProfileHubAccess,
+  badgeCounts: Partial<Record<ProfileSectionId, number>>,
+): ProfileNavItem | null => {
+  if (sectionId === "create-raffle" && access.canUseCreateRaffle) {
+    return {
+      sectionId,
+      label: MY_PROFILE_PAGE_UI.TAB_CREATE_RAFFLE,
+      variant: "cta",
+    };
+  }
+  if (sectionId === "product-moderation" && access.canUseProductModeration) {
+    return {
+      sectionId,
+      label: MY_PROFILE_PAGE_UI.TAB_PRODUCT_MODERATION,
+      badgeCount: badgeCounts["product-moderation"],
+    };
+  }
+  if (sectionId === "intro-ad-moderation" && access.canUseProductModeration) {
+    return {
+      sectionId,
+      label: MY_PROFILE_PAGE_UI.TAB_INTRO_AD_MODERATION,
+      badgeCount: badgeCounts["intro-ad-moderation"],
+    };
+  }
+  if (sectionId === "product-reports" && access.canUseProductReports) {
+    return {
+      sectionId,
+      label: MY_PROFILE_PAGE_UI.TAB_PRODUCT_REPORTS,
+      badgeCount: badgeCounts["product-reports"],
+    };
+  }
+  if (sectionId === "product-promotions" && access.canUseProductPromotions) {
+    return {
+      sectionId,
+      label: MY_PROFILE_PAGE_UI.TAB_PRODUCT_PROMOTIONS,
+      badgeCount: badgeCounts["product-promotions"],
+    };
+  }
+  if (sectionId === "raffles" && access.canUseRaffles) {
+    return {
+      sectionId,
+      label: MY_PROFILE_PAGE_UI.TAB_RAFFLES,
+      badgeCount: badgeCounts.raffles,
+    };
+  }
+  if (sectionId === "data-confirmation-requests" && access.canUseDataConfirmationQueue) {
+    return {
+      sectionId,
+      label: MY_PROFILE_PAGE_UI.TAB_DATA_CONFIRMATION,
+      badgeCount: badgeCounts["data-confirmation-requests"],
+    };
+  }
+  if (sectionId === "installment-moderation" && access.canUseInstallmentModeration) {
+    return {
+      sectionId,
+      label: MY_PROFILE_PAGE_UI.TAB_INSTALLMENT_MODERATION,
+      badgeCount: badgeCounts["installment-moderation"],
+    };
+  }
+  if (sectionId === "installment-disputes" && access.canUseInstallmentDisputes) {
+    return {
+      sectionId,
+      label: MY_PROFILE_PAGE_UI.TAB_INSTALLMENT_DISPUTES,
+      badgeCount: badgeCounts["installment-disputes"],
+    };
+  }
+  if (sectionId === "admin-orders" && access.canUseAdminOrders) {
+    return {
+      sectionId,
+      label: MY_PROFILE_PAGE_UI.TAB_ADMIN_ORDERS,
+    };
+  }
+  if (sectionId === "search-synonyms-admin" && access.canUseSearchSynonymsAdmin) {
+    return {
+      sectionId,
+      label: MY_PROFILE_PAGE_UI.TAB_SEARCH_SYNONYMS_ADMIN,
+    };
+  }
+  if (sectionId === "category-tree-admin" && access.canUseCategoryTreeAdmin) {
+    return {
+      sectionId,
+      label: MY_PROFILE_PAGE_UI.TAB_CATEGORY_TREE_ADMIN,
+    };
+  }
+  if (sectionId === "app-intro-admin" && access.canUseAppIntroAdmin) {
+    return {
+      sectionId,
+      label: MY_PROFILE_PAGE_UI.TAB_APP_INTRO_ADMIN,
+    };
+  }
+  if (sectionId === "site-header-banner-admin" && access.canUseSiteHeaderBannerAdmin) {
+    return {
+      sectionId,
+      label: MY_PROFILE_PAGE_UI.TAB_SITE_HEADER_BANNER_ADMIN,
+    };
+  }
+  if (sectionId === "popular-products-admin" && access.canUsePopularProductsAdmin) {
+    return {
+      sectionId,
+      label: MY_PROFILE_PAGE_UI.TAB_POPULAR_PRODUCTS_ADMIN,
+    };
+  }
+
+  return null;
+};
+
+const resolveProfileNavItems = (
+  sectionOrder: readonly ProfileSectionId[],
+  access: ProfileHubAccess,
+  badgeCounts: Partial<Record<ProfileSectionId, number>>,
+): ProfileNavItem[] =>
+  sectionOrder.flatMap((sectionId) => {
+    const item = resolveProfileStaffNavItem(sectionId, access, badgeCounts);
+    return item ? [item] : [];
+  });
 
 export const buildProfileNavGroups = (
   access: ProfileHubAccess,
@@ -158,150 +277,16 @@ export const buildProfileNavGroups = (
     return [];
   });
 
-  const staffItems: ProfileNavItem[] = PROFILE_STAFF_SECTION_ORDER.flatMap((sectionId): ProfileNavItem[] => {
-    if (sectionId === "create-raffle" && access.canUseCreateRaffle) {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.TAB_CREATE_RAFFLE,
-          variant: "cta" as const,
-        },
-      ];
-    }
-    if (sectionId === "product-moderation" && access.canUseProductModeration) {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.TAB_PRODUCT_MODERATION,
-          badgeCount: badgeCounts["product-moderation"],
-        },
-      ];
-    }
-    if (sectionId === "intro-ad-moderation" && access.canUseProductModeration) {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.TAB_INTRO_AD_MODERATION,
-          badgeCount: badgeCounts["intro-ad-moderation"],
-        },
-      ];
-    }
-    if (
-      sectionId === "seller-personal-category-moderation" &&
-      access.canUseProductModeration
-    ) {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.TAB_SELLER_PERSONAL_CATEGORY_MODERATION,
-          badgeCount: badgeCounts["seller-personal-category-moderation"],
-        },
-      ];
-    }
-    if (sectionId === "product-reports" && access.canUseProductReports) {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.TAB_PRODUCT_REPORTS,
-          badgeCount: badgeCounts["product-reports"],
-        },
-      ];
-    }
-    if (sectionId === "product-promotions" && access.canUseProductPromotions) {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.TAB_PRODUCT_PROMOTIONS,
-          badgeCount: badgeCounts["product-promotions"],
-        },
-      ];
-    }
-    if (sectionId === "raffles" && access.canUseRaffles) {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.TAB_RAFFLES,
-          badgeCount: badgeCounts.raffles,
-        },
-      ];
-    }
-    if (sectionId === "data-confirmation-requests" && access.canUseDataConfirmationQueue) {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.TAB_DATA_CONFIRMATION,
-          badgeCount: badgeCounts["data-confirmation-requests"],
-        },
-      ];
-    }
-    if (sectionId === "installment-moderation" && access.canUseInstallmentModeration) {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.TAB_INSTALLMENT_MODERATION,
-          badgeCount: badgeCounts["installment-moderation"],
-        },
-      ];
-    }
-    if (sectionId === "installment-disputes" && access.canUseInstallmentDisputes) {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.TAB_INSTALLMENT_DISPUTES,
-          badgeCount: badgeCounts["installment-disputes"],
-        },
-      ];
-    }
-    if (sectionId === "admin-orders" && access.canUseAdminOrders) {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.TAB_ADMIN_ORDERS,
-        },
-      ];
-    }
-    if (sectionId === "search-synonyms-admin" && access.canUseSearchSynonymsAdmin) {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.TAB_SEARCH_SYNONYMS_ADMIN,
-        },
-      ];
-    }
-    if (sectionId === "category-tree-admin" && access.canUseCategoryTreeAdmin) {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.TAB_CATEGORY_TREE_ADMIN,
-        },
-      ];
-    }
-    if (sectionId === "app-intro-admin" && access.canUseAppIntroAdmin) {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.TAB_APP_INTRO_ADMIN,
-        },
-      ];
-    }
-    if (sectionId === "site-header-banner-admin" && access.canUseSiteHeaderBannerAdmin) {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.TAB_SITE_HEADER_BANNER_ADMIN,
-        },
-      ];
-    }
-    if (sectionId === "popular-products-admin" && access.canUsePopularProductsAdmin) {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.TAB_POPULAR_PRODUCTS_ADMIN,
-        },
-      ];
-    }
-    return [];
-  });
+  const managementSectionIds = new Set<ProfileSectionId>(PROFILE_MANAGEMENT_SECTION_ORDER);
+
+  const staffItems = resolveProfileNavItems(PROFILE_STAFF_SECTION_ORDER, access, badgeCounts).filter(
+    (item) => !managementSectionIds.has(item.sectionId),
+  );
+  const managementItems = resolveProfileNavItems(
+    PROFILE_MANAGEMENT_SECTION_ORDER,
+    access,
+    badgeCounts,
+  );
 
   const groups: ProfileNavGroup[] = [
     {
@@ -330,6 +315,14 @@ export const buildProfileNavGroups = (
       id: "staff",
       label: MY_PROFILE_PAGE_UI.NAV_SECTION_STAFF,
       items: staffItems,
+    });
+  }
+
+  if (managementItems.length > 0) {
+    groups.push({
+      id: "management",
+      label: MY_PROFILE_PAGE_UI.NAV_SECTION_MANAGEMENT,
+      items: managementItems,
     });
   }
 

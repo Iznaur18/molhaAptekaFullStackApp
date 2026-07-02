@@ -19,6 +19,7 @@ import {
 import { formatApiErrorMessage } from "@/shared/lib";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useProfileScreenStyles } from "@/shared/theme/profileChromeStyles";
+import { useAuthFormStyles } from "@/shared/theme/formChromeStyles";
 import { AppButton } from "@/shared/ui/AppButton";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
@@ -26,7 +27,8 @@ export default function ProfileScreen() {
   const router = useRouter();
   const scrollRef = useRef<ScrollView>(null);
   const styles = useProfileScreenStyles();
-  const { centeredContentStyle, contentPaddingTop } = useScreenLayout();
+  const authStyles = useAuthFormStyles();
+  const { centeredContentStyle, contentPaddingTop, height } = useScreenLayout();
   const sessionQuery = useAuthSessionQuery();
   const [emailModalVisible, setEmailModalVisible] = useState(false);
   const [navSheetVisible, setNavSheetVisible] = useState(false);
@@ -54,27 +56,33 @@ export default function ProfileScreen() {
 
   if (!isLoggedIn) {
     return (
-      <ScrollView contentContainerStyle={[styles.guestContent, { paddingTop: contentPaddingTop + 24 }]}>
-        <Text style={styles.title}>{AUTH_UI.PROFILE_TITLE}</Text>
-        <Text style={styles.subtitle}>{AUTH_UI.GUEST_STATUS}</Text>
-        <View style={styles.actions}>
-          <AppButton
-            label={AUTH_UI.LOGIN_BUTTON}
-            variant="contrast"
-            style={styles.actionButton}
-            onPress={() => router.push("/(auth)/login")}
-          />
-          <AppButton
-            label={AUTH_UI.REGISTER_BUTTON}
-            variant="outline"
-            style={styles.actionButton}
-            onPress={() => router.push("/(auth)/register")}
-          />
+      <ScrollView
+        contentContainerStyle={[
+          styles.guestContent,
+          { paddingTop: contentPaddingTop, minHeight: height },
+        ]}
+      >
+        <View style={styles.guestInner}>
+          <Text style={styles.title}>{AUTH_UI.PROFILE_TITLE}</Text>
+          <Text style={styles.subtitle}>{AUTH_UI.GUEST_STATUS}</Text>
+          <View style={styles.actions}>
+            <AppButton
+              label={AUTH_UI.LOGIN_BUTTON}
+              variant="primary"
+              style={styles.actionButton}
+              onPress={() => router.push("/(auth)/login")}
+            />
+            <AppButton
+              label={AUTH_UI.REGISTER_BUTTON}
+              variant="secondary"
+              style={[styles.actionButton, authStyles.authSecondaryButton]}
+              onPress={() => router.push("/(auth)/register")}
+            />
+          </View>
+          <Pressable style={styles.legalLink} onPress={() => router.push("/legal/privacy")}>
+            <Text style={styles.legalLinkText}>{LEGAL_UI.PRIVACY_LINK}</Text>
+          </Pressable>
         </View>
-        <Pressable style={styles.legalLink} onPress={() => router.push("/legal/privacy")}>
-          <Text style={styles.legalLinkText}>{LEGAL_UI.PRIVACY_LINK}</Text>
-        </Pressable>
-        <ThemePreferenceToggle />
       </ScrollView>
     );
   }

@@ -1,12 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { installmentQueryKeys } from "@/shared/api";
+import { catalogQueryKeys, installmentQueryKeys } from "@/shared/api";
 
 import {
   confirmInstallmentPayment,
   createInstallmentContract,
   markInstallmentPaymentPaid,
   rejectInstallmentPayment,
+  upsertProductInstallmentProgram,
 } from "../api/installmentApi";
 
 export const useInstallmentMutations = () => {
@@ -70,10 +71,26 @@ export const useInstallmentMutations = () => {
     },
   });
 
+  const upsertProgramMutation = useMutation({
+    mutationFn: ({
+      productId,
+      body,
+    }: {
+      productId: string;
+      body: Parameters<typeof upsertProductInstallmentProgram>[1];
+    }) => upsertProductInstallmentProgram(productId, body),
+    onSuccess: (_data, { productId }) => {
+      void queryClient.invalidateQueries({ queryKey: installmentQueryKeys.all });
+      void queryClient.invalidateQueries({ queryKey: installmentQueryKeys.program(productId) });
+      void queryClient.invalidateQueries({ queryKey: catalogQueryKeys.all });
+    },
+  });
+
   return {
     createContractMutation,
     markPaidMutation,
     confirmPaymentMutation,
     rejectPaymentMutation,
+    upsertProgramMutation,
   };
 };

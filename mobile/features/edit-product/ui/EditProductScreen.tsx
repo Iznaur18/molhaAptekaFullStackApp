@@ -194,39 +194,46 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-      <Text style={styles.label}>
-        {CREATE_PRODUCT_UI.LABEL_NAME}
-      </Text>
-      <TextInput
-        style={styles.input}
-        value={productName}
-        onChangeText={setProductName}
-        maxLength={PRODUCT_NAME_MAX_LENGTH}
-        editable={!isBusy}
-      />
+    <ScrollView
+      style={styles.scroll}
+      contentContainerStyle={styles.container}
+      keyboardShouldPersistTaps="handled"
+    >
+      <View style={styles.field}>
+        <Text style={styles.label}>{CREATE_PRODUCT_UI.LABEL_NAME}</Text>
+        <TextInput
+          style={styles.input}
+          value={productName}
+          onChangeText={setProductName}
+          maxLength={PRODUCT_NAME_MAX_LENGTH}
+          editable={!isBusy}
+          placeholderTextColor={theme.colors.textMuted}
+        />
+      </View>
 
-      <Text style={styles.label}>
-        {CREATE_PRODUCT_UI.LABEL_DESCRIPTION}
-      </Text>
-      <TextInput
-        style={[styles.input, styles.textArea]}
-        value={productDescription}
-        onChangeText={setProductDescription}
-        multiline
-        editable={!isBusy}
-      />
+      <View style={styles.field}>
+        <Text style={styles.label}>{CREATE_PRODUCT_UI.LABEL_DESCRIPTION}</Text>
+        <TextInput
+          style={[styles.input, styles.textArea]}
+          value={productDescription}
+          onChangeText={setProductDescription}
+          multiline
+          editable={!isBusy}
+          placeholderTextColor={theme.colors.textMuted}
+        />
+      </View>
 
-      <Text style={styles.label}>
-        {CREATE_PRODUCT_UI.LABEL_PRICE}
-      </Text>
-      <TextInput
-        style={styles.input}
-        value={productPrice}
-        onChangeText={setProductPrice}
-        keyboardType="number-pad"
-        editable={!isBusy}
-      />
+      <View style={styles.field}>
+        <Text style={styles.label}>{CREATE_PRODUCT_UI.LABEL_PRICE}</Text>
+        <TextInput
+          style={styles.input}
+          value={productPrice}
+          onChangeText={setProductPrice}
+          keyboardType="number-pad"
+          editable={!isBusy}
+          placeholderTextColor={theme.colors.textMuted}
+        />
+      </View>
 
       <CreateProductCategoryPicker
         selectedCategoryId={productCategoryId}
@@ -238,82 +245,103 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
       />
 
       <View style={styles.switchRow}>
-        <Text style={styles.label}>
-          {CREATE_PRODUCT_UI.LABEL_AVAILABLE}
-        </Text>
+        <Text style={styles.switchLabel}>{CREATE_PRODUCT_UI.LABEL_AVAILABLE}</Text>
         <Switch
           value={productIsAvailable}
           onValueChange={setProductIsAvailable}
           disabled={isBusy}
+          trackColor={{ false: theme.colors.border, true: theme.colors.action }}
+          thumbColor={theme.colors.surface}
         />
       </View>
 
       {productIsAvailable ? (
-        <>
-          <Text style={styles.label}>
-            {CREATE_PRODUCT_UI.LABEL_STOCK}
-          </Text>
+        <View style={styles.field}>
+          <Text style={styles.label}>{CREATE_PRODUCT_UI.LABEL_STOCK}</Text>
           <TextInput
             style={styles.input}
             value={productStockQuantity}
             onChangeText={setProductStockQuantity}
             keyboardType="number-pad"
             editable={!isBusy}
+            placeholderTextColor={theme.colors.textMuted}
           />
-        </>
+        </View>
       ) : null}
 
-      <Text style={styles.label}>
-        {CREATE_PRODUCT_UI.LABEL_IMAGE}
-      </Text>
-      <Pressable
-        style={styles.secondaryButton}
-        onPress={() => {
-          void handlePickImage();
-        }}
-        disabled={isBusy}
-      >
-        <Text style={styles.secondaryButtonText}>{IMAGE_UPLOAD_UI.UPLOAD_BUTTON}</Text>
-      </Pressable>
-      {productImageUrl ? (
-        <Text style={styles.imageUrl} numberOfLines={1}>
-          {productImageUrl}
-        </Text>
-      ) : null}
-
-      {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
-      {successMessage ? <Text style={styles.success}>{successMessage}</Text> : null}
-
-      <View style={styles.actions}>
+      <View style={styles.field}>
+        <Text style={styles.label}>{CREATE_PRODUCT_UI.LABEL_IMAGE}</Text>
         <Pressable
-          style={styles.cancelButton}
-          onPress={() => router.back()}
-          disabled={isBusy}
-        >
-          <Text style={styles.cancelButtonText}>{CREATE_PRODUCT_UI.CANCEL}</Text>
-        </Pressable>
-        <Pressable
-          style={[styles.submitButton, isBusy && styles.disabled]}
+          style={({ pressed }) => [styles.secondaryButton, pressed && styles.buttonPressed]}
           onPress={() => {
-            void handleSave();
+            void handlePickImage();
           }}
           disabled={isBusy}
         >
-          {patchMutation.isPending ? (
-            <ActivityIndicator color={theme.colors.onContrast} />
-          ) : (
-            <Text style={styles.submitText}>{CREATE_PRODUCT_UI.SAVE}</Text>
-          )}
+          <Text style={styles.secondaryButtonText}>{IMAGE_UPLOAD_UI.UPLOAD_BUTTON}</Text>
         </Pressable>
+        {productImageUrl ? (
+          <Text style={styles.imageUrl} numberOfLines={1}>
+            {productImageUrl}
+          </Text>
+        ) : null}
       </View>
 
-      <Pressable
-        style={[styles.deleteButton, isBusy && styles.disabled]}
-        onPress={handleDelete}
-        disabled={isBusy}
-      >
-        <Text style={styles.deleteText}>{CREATE_PRODUCT_UI.DELETE}</Text>
-      </Pressable>
+      {errorMessage ? (
+        <View style={[styles.feedbackBox, styles.errorBox]} accessibilityRole="alert">
+          <Text style={styles.error}>{errorMessage}</Text>
+        </View>
+      ) : null}
+      {successMessage ? (
+        <View style={[styles.feedbackBox, styles.successBox]}>
+          <Text style={styles.success}>{successMessage}</Text>
+        </View>
+      ) : null}
+
+      <View style={styles.footer}>
+        <View style={styles.actions}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.cancelButton,
+              pressed && styles.buttonPressed,
+              isBusy && styles.disabled,
+            ]}
+            onPress={() => router.back()}
+            disabled={isBusy}
+          >
+            <Text style={styles.cancelButtonText}>{CREATE_PRODUCT_UI.CANCEL}</Text>
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [
+              styles.submitButton,
+              pressed && !isBusy && styles.buttonPressed,
+              isBusy && styles.disabled,
+            ]}
+            onPress={() => {
+              void handleSave();
+            }}
+            disabled={isBusy}
+          >
+            {patchMutation.isPending ? (
+              <ActivityIndicator color={theme.colors.onContrast} />
+            ) : (
+              <Text style={styles.submitText}>{CREATE_PRODUCT_UI.SAVE}</Text>
+            )}
+          </Pressable>
+        </View>
+
+        <Pressable
+          style={({ pressed }) => [
+            styles.deleteButton,
+            pressed && styles.buttonPressed,
+            isBusy && styles.disabled,
+          ]}
+          onPress={handleDelete}
+          disabled={isBusy}
+        >
+          <Text style={styles.deleteText}>{CREATE_PRODUCT_UI.DELETE}</Text>
+        </Pressable>
+      </View>
     </ScrollView>
   );
 };

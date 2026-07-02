@@ -12,15 +12,27 @@ const OPTIONS: Array<{ value: ThemePreference; label: string }> = [
   { value: "dark", label: THEME_SETTINGS_UI.DARK },
 ];
 
-export const ThemePreferenceToggle = () => {
+type ThemePreferenceToggleProps = {
+  centered?: boolean;
+};
+
+export const ThemePreferenceToggle = ({ centered = false }: ThemePreferenceToggleProps) => {
   const styles = useThemePreferenceToggleStyles();
   const { profileContentStyle } = useScreenLayout();
   const { preference, setPreference } = useAppThemeSettings();
 
   return (
-    <View style={[styles.root, profileContentStyle]}>
-      <Text style={styles.label}>{THEME_SETTINGS_UI.LABEL}</Text>
-      <View style={styles.row}>
+    <View
+      style={[
+        styles.root,
+        centered ? styles.rootCentered : null,
+        centered ? null : profileContentStyle,
+      ]}
+    >
+      <Text style={[styles.label, centered ? styles.labelCentered : null]}>
+        {THEME_SETTINGS_UI.LABEL}
+      </Text>
+      <View style={[styles.row, centered ? styles.rowCentered : null]}>
         {OPTIONS.map((option) => {
           const isActive = preference === option.value;
           return (

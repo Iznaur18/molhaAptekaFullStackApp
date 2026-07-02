@@ -197,10 +197,8 @@ export function renderProfileTabPanel(mainView, props) {
       );
     case "seller-personal-category-moderation":
       return (
-        <LazySellerPersonalCategoryModerationPage
-          refreshPendingSellerPersonalCategoryModerationCount={
-            refreshPendingSellerPersonalCategoryModerationCount
-          }
+        <LazyIntroAdModerationPage
+          onQueueChanged={refreshPendingIntroAdModerationCount}
         />
       );
     case "product-reports":
