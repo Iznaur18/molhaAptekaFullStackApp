@@ -3,6 +3,7 @@ import {
   pendingSellerPersonalCategoryCampaignsCountDataSchema,
 } from "@molha/api-contract";
 
+import { fetchPendingSiteHeaderBannerCampaignsCount } from "@/entities/site-header-banner-campaign/api/siteHeaderBannerCampaignModerationApi";
 import { apiClient, parseApiContractData } from "@/shared/api";
 import { API_CLIENT_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
@@ -25,9 +26,15 @@ export const fetchPendingModerationProductsCount = () =>
 
 export const fetchPendingIntroAdCampaignsCount = async () => {
   try {
-    const { data } = await apiClient.get("/intro-ad/moderation/pending/count");
-    const parsed = parseApiContractData(data, pendingIntroAdCampaignsCountDataSchema);
-    return parsed.count;
+    const [introResponse, bannerCount] = await Promise.all([
+      apiClient.get("/intro-ad/moderation/pending/count"),
+      fetchPendingSiteHeaderBannerCampaignsCount(),
+    ]);
+    const parsed = parseApiContractData(
+      introResponse.data,
+      pendingIntroAdCampaignsCountDataSchema,
+    );
+    return parsed.count + bannerCount;
   } catch {
     return 0;
   }

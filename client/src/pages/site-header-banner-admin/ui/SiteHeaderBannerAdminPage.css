@@ -2,23 +2,28 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  max-width: 42rem;
 }
 
 .site-header-banner-admin__header {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--iz-color-border-subtle);
 }
 
 .site-header-banner-admin__title {
   margin: 0;
-  font-size: 1.35rem;
+  font-size: 1.25rem;
+  font-weight: 700;
 }
 
 .site-header-banner-admin__hint {
   margin: 0;
-  color: var(--iz-color-text-muted, #64748b);
-  font-size: 0.92rem;
+  color: var(--iz-color-text-muted);
+  font-size: 0.9375rem;
+  line-height: 1.45;
 }
 
 .site-header-banner-admin__form {
@@ -27,114 +32,192 @@
   gap: 1rem;
 }
 
-.site-header-banner-admin__fieldset {
-  margin: 0;
-  padding: 0.85rem;
-  border: 1px solid var(--iz-color-border, #e2e8f0);
-  border-radius: 10px;
+.site-header-banner-admin__panel {
+  overflow: hidden;
+  border: 1px solid var(--iz-color-border-subtle);
+  border-radius: 0.75rem;
+  background: var(--iz-color-surface-elevated, #fff);
 }
 
-.site-header-banner-admin__item {
+.site-header-banner-admin__panel.site-header-banner-admin__panel-section {
+  padding: 0.85rem;
+}
+
+.site-header-banner-admin__panel-section {
+  padding: 0.85rem;
+  border-bottom: 1px solid var(--iz-color-border-subtle);
+}
+
+.site-header-banner-admin__panel > .site-header-banner-admin__panel-section:last-child {
+  border-bottom: 0;
+}
+
+.site-header-banner-admin__toolbar {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
   gap: 0.75rem;
 }
 
-.site-header-banner-admin__legend {
-  padding: 0 0.35rem;
+.site-header-banner-admin__slide-zone {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--iz-color-border-subtle);
+  border-radius: 0.75rem;
+  background: var(--iz-color-surface-elevated, #fff);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--iz-color-text, #0f172a) 6%, transparent);
+}
+
+.site-header-banner-admin__slide-zone_disabled {
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+.site-header-banner-admin__slide-title {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0.55rem 0.85rem;
+  border-bottom: 1px solid var(--iz-color-border-subtle);
+  background: var(--iz-color-surface-muted, #f8fafc);
+  font-size: inherit;
   font-weight: 600;
+}
+
+.site-header-banner-admin__field-block {
+  padding: 0.8rem 0.85rem;
+  border-bottom: 1px solid var(--iz-color-border-subtle);
+}
+
+.site-header-banner-admin__field-block:last-child {
+  border-bottom: 0;
+}
+
+.site-header-banner-admin__field-block_actions {
+  background: var(--iz-color-surface-muted, #f8fafc);
 }
 
 .site-header-banner-admin__label {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
+  font-size: 0.9375rem;
 }
 
 .site-header-banner-admin__input {
   width: 100%;
+  box-sizing: border-box;
   padding: 0.55rem 0.65rem;
-  border: 1px solid var(--iz-color-border, #e2e8f0);
-  border-radius: 8px;
-}
-
-.site-header-banner-admin__field-hint {
-  color: var(--iz-color-text-muted, #64748b);
-  font-size: 0.82rem;
+  border: 1px solid var(--iz-color-border-subtle);
+  border-radius: 0.5rem;
+  font: inherit;
+  background: var(--iz-color-bg, #fff);
 }
 
 .site-header-banner-admin__checkbox {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
 }
 
-.site-header-banner-admin__items-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
+.site-header-banner-admin__preview {
+  width: 100%;
+  padding-top: 0.65rem;
+  padding-bottom: 0.65rem;
+  background: var(--iz-color-surface-muted, #f8fafc);
 }
 
-.site-header-banner-admin__items-title {
-  margin: 0;
-  font-size: 1rem;
+.site-header-banner-admin__preview .site-header-banner-carousel {
+  display: block;
 }
 
 .site-header-banner-admin__empty {
   margin: 0;
-  color: var(--iz-color-text-muted, #64748b);
+  color: var(--iz-color-text-muted);
+}
+
+.site-header-banner-admin__color-field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.site-header-banner-admin__color-picker {
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0.1rem;
+  border: 1px solid var(--iz-color-border-subtle);
+  border-radius: 0.5rem;
+  background: var(--iz-color-bg, #fff);
+  cursor: pointer;
+}
+
+.site-header-banner-admin__color-field .site-header-banner-admin__input {
+  flex: 1;
 }
 
 .site-header-banner-admin__actions {
   display: flex;
   gap: 0.65rem;
+  background: var(--iz-color-surface-muted, #f8fafc);
 }
 
 .site-header-banner-admin__btn {
-  padding: 0.55rem 0.9rem;
-  border-radius: 8px;
-  border: 1px solid transparent;
+  margin: 0;
+  padding: 0.55rem 1rem;
+  border-radius: 0.5rem;
+  font: inherit;
+  font-weight: 600;
   cursor: pointer;
 }
 
 .site-header-banner-admin__btn_primary {
-  background: var(--iz-color-brand, #2563eb);
-  color: #fff;
+  border: 1px solid var(--iz-color-accent);
+  background: var(--iz-color-accent);
+  color: var(--iz-color-on-accent);
 }
 
 .site-header-banner-admin__btn_secondary {
-  background: var(--iz-color-surface, #fff);
-  border-color: var(--iz-color-border, #e2e8f0);
+  border: 1px solid var(--iz-color-border-subtle);
+  background: var(--iz-color-bg, #fff);
+  color: inherit;
 }
 
 .site-header-banner-admin__btn_danger {
   align-self: flex-start;
-  background: #fff;
-  border-color: #fecaca;
-  color: #b91c1c;
+  border: 1px solid #fecaca;
+  background: var(--iz-color-bg, #fff);
+  color: #b42318;
 }
 
 .site-header-banner-admin__btn:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
+  opacity: 0.6;
+  cursor: default;
 }
 
 .site-header-banner-admin__error {
   margin: 0;
-  color: #b91c1c;
+  color: var(--iz-color-danger);
+  background: color-mix(in srgb, var(--iz-color-danger, #dc2626) 8%, transparent);
 }
 
 .site-header-banner-admin__status {
   margin: 0;
-  color: var(--iz-color-text-muted, #64748b);
+  color: var(--iz-color-text-muted);
 }
 
 .site-header-banner-admin__notice {
-  padding: 0.75rem 0.9rem;
-  border-radius: 8px;
-  background: #ecfdf5;
-  color: #047857;
+  padding: 0.75rem 0.85rem;
+  border-radius: 0.65rem;
+  background: var(--iz-color-success-soft, #ecfdf3);
+  border: 1px solid var(--iz-color-success-border, #86efac);
 }
 
 .site-header-banner-admin__notice p {

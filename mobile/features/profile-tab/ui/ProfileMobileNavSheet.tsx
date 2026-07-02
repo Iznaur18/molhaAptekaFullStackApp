@@ -1,5 +1,12 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Modal, Pressable, ScrollView, Text, View } from "react-native";
+import Animated, {
+  Easing,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useLogoutMutation } from "@/entities/session/model/useLogoutMutation";
@@ -10,7 +17,10 @@ import {
 } from "@/features/profile-hub/model/profileSections";
 import { API_CLIENT_UI, MY_PROFILE_PAGE_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
-import { useProfileMobileNavSheetStyles } from "@/shared/theme/profileChromeStyles";
+import {
+  PROFILE_MOBILE_NAV_SHEET_ANIMATION,
+  useProfileMobileNavSheetStyles,
+} from "@/shared/theme/profileChromeStyles";
 import { AppButton } from "@/shared/ui/AppButton";
 
 type ProfileMobileNavSheetProps = {
@@ -19,6 +29,8 @@ type ProfileMobileNavSheetProps = {
   onClose: () => void;
   onOverviewPress: () => void;
 };
+
+const { enterMs, exitMs, slideDistance } = PROFILE_MOBILE_NAV_SHEET_ANIMATION;
 
 export const ProfileMobileNavSheet = ({
   visible,
@@ -30,6 +42,60 @@ export const ProfileMobileNavSheet = ({
   const styles = useProfileMobileNavSheetStyles();
   const logoutMutation = useLogoutMutation();
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
+  const [modalVisible, setModalVisible] = useState(visible);
+  const sheetTranslateX = useSharedValue(slideDistance);
+  const backdropOpacity = useSharedValue(0);
+
+  const finishClose = useCallback(() => {
+    setModalVisible(false);
+    setLogoutConfirmOpen(false);
+  }, []);
+
+  useEffect(() => {
+    if (visible) {
+      setModalVisible(true);
+      sheetTranslateX.value = slideDistance;
+      backdropOpacity.value = 0;
+      sheetTranslateX.value = withTiming(0, {
+        duration: enterMs,
+        easing: Easing.out(Easing.cubic),
+      });
+      backdropOpacity.value = withTiming(1, {
+        duration: enterMs,
+        easing: Easing.out(Easing.cubic),
+      });
+      return;
+    }
+
+    if (!modalVisible) {
+      return;
+    }
+
+    sheetTranslateX.value = withTiming(
+      slideDistance,
+      {
+        duration: exitMs,
+        easing: Easing.in(Easing.cubic),
+      },
+      (finished) => {
+        if (finished) {
+          runOnJS(finishClose)();
+        }
+      },
+    );
+    backdropOpacity.value = withTiming(0, {
+      duration: exitMs,
+      easing: Easing.in(Easing.cubic),
+    });
+  }, [backdropOpacity, finishClose, modalVisible, sheetTranslateX, visible]);
+
+  const backdropAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: backdropOpacity.value,
+  }));
+
+  const sheetAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: sheetTranslateX.value }],
+  }));
 
   const handleNavigate = () => {
     onClose();
@@ -52,14 +118,16 @@ export const ProfileMobileNavSheet = ({
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
-      <View style={styles.backdrop}>
+    <Modal visible={modalVisible} animationType="none" transparent onRequestClose={onClose}>
+      <Animated.View style={[styles.backdrop, backdropAnimatedStyle]}>
         <Pressable
           style={styles.backdropPress}
           accessibilityLabel={MY_PROFILE_PAGE_UI.MOBILE_NAV_CLOSE_ARIA}
           onPress={onClose}
         />
-        <View style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, 16) }]}>
+        <Animated.View
+          style={[styles.sheet, sheetAnimatedStyle, { paddingBottom: Math.max(insets.bottom, 16) }]}
+        >
           <ScrollView contentContainerStyle={styles.sheetContent}>
             <ProfileHubMenu
               activeSectionId={activeSectionId}
@@ -103,8 +171,8 @@ export const ProfileMobileNavSheet = ({
               </View>
             ) : null}
           </ScrollView>
-        </View>
-      </View>
+        </Animated.View>
+      </Animated.View>
     </Modal>
   );
 };

@@ -1,12 +1,18 @@
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Pressable, ScrollView, Switch, Text, TextInput, View } from "react-native";
 
 import {
   createEmptySiteHeaderBannerItem,
   type SiteHeaderBannerAdminForm,
 } from "@/entities/site-header-banner/lib/siteHeaderBannerAdminForm";
+import {
+  normalizeSiteHeaderBannerHexColor,
+  resolvePreviewSiteHeaderBannerSlidesFromForm,
+  resolveSiteHeaderBannerColorPreview,
+} from "@/entities/site-header-banner/lib/resolvePreviewSiteHeaderBannerSlidesFromForm";
+import { SiteHeaderBannerCarousel } from "@/entities/site-header-banner/ui/SiteHeaderBannerCarousel";
 import { ImageUrlUploadField } from "@/features/image-upload/ui/ImageUrlUploadField";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
@@ -41,6 +47,11 @@ export const SiteHeaderBannerAdminPage = () => {
     }, [refetchSettings]),
   );
 
+  const previewSlides = useMemo(
+    () => resolvePreviewSiteHeaderBannerSlidesFromForm(form),
+    [form],
+  );
+
   const updateForm = (next: SiteHeaderBannerAdminForm) => {
     setFormState(next);
   };
@@ -66,6 +77,191 @@ export const SiteHeaderBannerAdminPage = () => {
       {sectionToggle}
       <Text style={styles.title}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.TITLE}</Text>
       <Text style={styles.hint}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.HINT}</Text>
+    </View>
+  );
+
+  const renderFormBody = () => (
+    <View style={styles.form}>
+      <View style={styles.controlPanel}>
+      <View style={[styles.panelSection, styles.toolbar]}>
+        <View style={styles.switchRow}>
+          <Text style={styles.labelText}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_ENABLED}</Text>
+          <Switch
+            value={form.enabled}
+            disabled={isSaving}
+            onValueChange={(enabled) => updateForm({ ...form, enabled })}
+          />
+        </View>
+        <Pressable
+          style={[styles.button, styles.buttonSecondary, isSaving && { opacity: 0.7 }]}
+          disabled={isSaving}
+          onPress={() =>
+            updateForm({
+              ...form,
+              items: [...form.items, createEmptySiteHeaderBannerItem()],
+            })
+          }
+        >
+          <Text style={styles.buttonTextSecondary}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.ADD_ITEM}</Text>
+        </Pressable>
+      </View>
+
+      {previewSlides.length > 0 ? (
+        <View style={[styles.panelSection, styles.preview]}>
+          <SiteHeaderBannerCarousel slides={previewSlides} />
+        </View>
+      ) : null}
+
+      {form.items.length === 0 ? (
+        <Text style={[styles.panelSection, styles.empty]}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.EMPTY_ITEMS}</Text>
+      ) : null}
+      </View>
+
+      {form.items.map((item, index) => (
+        <View key={item.id} style={styles.slideZone}>
+          <Text style={styles.slideTitle}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.ITEM_TITLE(index + 1)}</Text>
+
+          <View style={styles.fieldBlock}>
+            <View style={styles.switchRow}>
+            <Text style={styles.labelText}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_ITEM_ENABLED}</Text>
+            <Switch
+              value={item.enabled}
+              disabled={isSaving}
+              onValueChange={(enabled) =>
+                updateForm({
+                  ...form,
+                  items: form.items.map((entry) =>
+                    entry.id === item.id ? { ...entry, enabled } : entry,
+                  ),
+                })
+              }
+            />
+          </View>
+          </View>
+
+          <View style={styles.fieldBlock}>
+          <ImageUrlUploadField
+            label={SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_IMAGE}
+            value={item.imageUrl}
+            disabled={isSaving}
+            onChange={(imageUrl) =>
+              updateForm({
+                ...form,
+                items: form.items.map((entry) =>
+                  entry.id === item.id ? { ...entry, imageUrl } : entry,
+                ),
+              })
+            }
+          />
+          </View>
+
+          <View style={styles.fieldBlock}>
+          <View style={styles.label}>
+            <Text style={styles.labelText}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_IMAGE_ALT}</Text>
+            <TextInput
+              style={styles.input}
+              value={item.imageAlt}
+              editable={!isSaving}
+              onChangeText={(imageAlt) =>
+                updateForm({
+                  ...form,
+                  items: form.items.map((entry) =>
+                    entry.id === item.id ? { ...entry, imageAlt } : entry,
+                  ),
+                })
+              }
+              maxLength={200}
+            />
+          </View>
+          </View>
+
+          <View style={styles.fieldBlock}>
+          <View style={styles.label}>
+            <Text style={styles.labelText}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_LINK_PATH}</Text>
+            <TextInput
+              style={styles.input}
+              value={item.linkPath}
+              editable={!isSaving}
+              onChangeText={(linkPath) =>
+                updateForm({
+                  ...form,
+                  items: form.items.map((entry) =>
+                    entry.id === item.id ? { ...entry, linkPath } : entry,
+                  ),
+                })
+              }
+              placeholder={SITE_HEADER_BANNER_ADMIN_PAGE_UI.LINK_PATH_PLACEHOLDER}
+              autoCapitalize="none"
+            />
+          </View>
+          </View>
+
+          <View style={styles.fieldBlock}>
+          <View style={styles.label}>
+            <Text style={styles.labelText}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_BACKGROUND_COLOR}</Text>
+            <View style={styles.colorField}>
+              <View
+                style={[
+                  styles.colorSwatch,
+                  resolveSiteHeaderBannerColorPreview(item.backgroundColor)
+                    ? { backgroundColor: resolveSiteHeaderBannerColorPreview(item.backgroundColor) }
+                    : styles.colorSwatchEmpty,
+                ]}
+              />
+              <TextInput
+                style={[styles.input, styles.colorInput]}
+                value={item.backgroundColor}
+                editable={!isSaving}
+                onChangeText={(backgroundColor) => {
+                  const normalized = normalizeSiteHeaderBannerHexColor(backgroundColor);
+                  updateForm({
+                    ...form,
+                    items: form.items.map((entry) =>
+                      entry.id === item.id
+                        ? { ...entry, backgroundColor: normalized ?? backgroundColor }
+                        : entry,
+                    ),
+                  });
+                }}
+                placeholder="#RRGGBB"
+                autoCapitalize="none"
+              />
+            </View>
+          </View>
+          </View>
+
+          <View style={[styles.fieldBlock, styles.fieldBlockActions]}>
+          <Pressable
+            style={[styles.button, styles.buttonDanger, isSaving && { opacity: 0.7 }]}
+            disabled={isSaving}
+            onPress={() =>
+              updateForm({
+                ...form,
+                items: form.items.filter((entry) => entry.id !== item.id),
+              })
+            }
+          >
+            <Text style={styles.buttonTextDanger}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.REMOVE_ITEM}</Text>
+          </Pressable>
+          </View>
+        </View>
+      ))}
+
+      {actionError ? (
+        <Text style={[styles.standalonePanel, styles.error]}>{actionError}</Text>
+      ) : null}
+
+      <View style={[styles.standalonePanel, styles.actions]}>
+      <Pressable
+        style={[styles.button, styles.buttonPrimary, isSaving && { opacity: 0.7 }]}
+        disabled={isSaving}
+        onPress={() => void handleSave()}
+      >
+        <Text style={styles.buttonTextPrimary}>
+          {isSaving ? SITE_HEADER_BANNER_ADMIN_PAGE_UI.SAVING : SITE_HEADER_BANNER_ADMIN_PAGE_UI.SAVE}
+        </Text>
+      </Pressable>
+      </View>
     </View>
   );
 
@@ -113,162 +309,7 @@ export const SiteHeaderBannerAdminPage = () => {
           </View>
         ) : null}
 
-        <View style={styles.form}>
-          <View style={styles.fieldset}>
-            <Text style={styles.legend}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.SECTION_GLOBAL}</Text>
-            <View style={styles.switchRow}>
-              <Text style={styles.labelText}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_ENABLED}</Text>
-              <Switch
-                value={form.enabled}
-                onValueChange={(enabled) => updateForm({ ...form, enabled })}
-              />
-            </View>
-          </View>
-
-          <View style={styles.itemsHeader}>
-            <Text style={styles.itemsTitle}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.SECTION_ITEMS}</Text>
-            <Pressable
-              style={[styles.button, styles.buttonSecondary]}
-              onPress={() =>
-                updateForm({
-                  ...form,
-                  items: [...form.items, createEmptySiteHeaderBannerItem()],
-                })
-              }
-            >
-              <Text style={styles.buttonTextSecondary}>
-                {SITE_HEADER_BANNER_ADMIN_PAGE_UI.ADD_ITEM}
-              </Text>
-            </Pressable>
-          </View>
-
-          {form.items.length === 0 ? (
-            <Text style={styles.empty}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.EMPTY_ITEMS}</Text>
-          ) : null}
-
-          {form.items.map((item, index) => (
-            <View key={item.id} style={styles.fieldset}>
-              <Text style={styles.legend}>
-                {SITE_HEADER_BANNER_ADMIN_PAGE_UI.ITEM_TITLE(index + 1)}
-              </Text>
-
-              <View style={styles.switchRow}>
-                <Text style={styles.labelText}>
-                  {SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_ITEM_ENABLED}
-                </Text>
-                <Switch
-                  value={item.enabled}
-                  onValueChange={(enabled) =>
-                    updateForm({
-                      ...form,
-                      items: form.items.map((entry) =>
-                        entry.id === item.id ? { ...entry, enabled } : entry,
-                      ),
-                    })
-                  }
-                />
-              </View>
-
-              <ImageUrlUploadField
-                label={SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_IMAGE}
-                value={item.imageUrl}
-                onChange={(imageUrl) =>
-                  updateForm({
-                    ...form,
-                    items: form.items.map((entry) =>
-                      entry.id === item.id ? { ...entry, imageUrl } : entry,
-                    ),
-                  })
-                }
-              />
-              <Text style={styles.fieldHint}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.HINT_IMAGE}</Text>
-
-              <View style={styles.label}>
-                <Text style={styles.labelText}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_IMAGE_ALT}</Text>
-                <TextInput
-                  style={styles.input}
-                  value={item.imageAlt}
-                  onChangeText={(imageAlt) =>
-                    updateForm({
-                      ...form,
-                      items: form.items.map((entry) =>
-                        entry.id === item.id ? { ...entry, imageAlt } : entry,
-                      ),
-                    })
-                  }
-                  maxLength={200}
-                />
-              </View>
-
-              <View style={styles.label}>
-                <Text style={styles.labelText}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_LINK_PATH}</Text>
-                <TextInput
-                  style={styles.input}
-                  value={item.linkPath}
-                  onChangeText={(linkPath) =>
-                    updateForm({
-                      ...form,
-                      items: form.items.map((entry) =>
-                        entry.id === item.id ? { ...entry, linkPath } : entry,
-                      ),
-                    })
-                  }
-                  placeholder={SITE_HEADER_BANNER_ADMIN_PAGE_UI.LINK_PATH_PLACEHOLDER}
-                  autoCapitalize="none"
-                />
-                <Text style={styles.fieldHint}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.HINT_LINK_PATH}</Text>
-              </View>
-
-              <View style={styles.label}>
-                <Text style={styles.labelText}>
-                  {SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_BACKGROUND_COLOR}
-                </Text>
-                <TextInput
-                  style={styles.input}
-                  value={item.backgroundColor}
-                  onChangeText={(backgroundColor) =>
-                    updateForm({
-                      ...form,
-                      items: form.items.map((entry) =>
-                        entry.id === item.id ? { ...entry, backgroundColor } : entry,
-                      ),
-                    })
-                  }
-                  placeholder="#RRGGBB"
-                  autoCapitalize="none"
-                />
-              </View>
-
-              <Pressable
-                style={[styles.button, styles.buttonDanger]}
-                onPress={() =>
-                  updateForm({
-                    ...form,
-                    items: form.items.filter((entry) => entry.id !== item.id),
-                  })
-                }
-              >
-                <Text style={styles.buttonTextDanger}>
-                  {SITE_HEADER_BANNER_ADMIN_PAGE_UI.REMOVE_ITEM}
-                </Text>
-              </Pressable>
-            </View>
-          ))}
-
-          {actionError ? <Text style={styles.error}>{actionError}</Text> : null}
-
-          <Pressable
-            style={[styles.button, styles.buttonPrimary, isSaving && { opacity: 0.7 }]}
-            disabled={isSaving}
-            onPress={() => void handleSave()}
-          >
-            <Text style={styles.buttonTextPrimary}>
-              {isSaving
-                ? SITE_HEADER_BANNER_ADMIN_PAGE_UI.SAVING
-                : SITE_HEADER_BANNER_ADMIN_PAGE_UI.SAVE}
-            </Text>
-          </Pressable>
-        </View>
+        {renderFormBody()}
       </ScrollView>
       {navSheet}
     </>

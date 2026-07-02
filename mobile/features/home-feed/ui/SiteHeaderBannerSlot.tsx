@@ -3,9 +3,13 @@ import { useSiteHeaderBannerSlidesQuery } from "@/entities/site-header-banner/mo
 
 type SiteHeaderBannerSlotProps = {
   visible: boolean;
+  edgeToEdge?: boolean;
 };
 
-export const SiteHeaderBannerSlot = ({ visible }: SiteHeaderBannerSlotProps) => {
+export const SiteHeaderBannerSlot = ({
+  visible,
+  edgeToEdge = false,
+}: SiteHeaderBannerSlotProps) => {
   const slidesQuery = useSiteHeaderBannerSlidesQuery({ enabled: visible });
   const slides = visible ? (slidesQuery.data ?? []) : [];
 
@@ -13,5 +17,5 @@ export const SiteHeaderBannerSlot = ({ visible }: SiteHeaderBannerSlotProps) => 
     return null;
   }
 
-  return <SiteHeaderBannerCarousel slides={slides} />;
+  return <SiteHeaderBannerCarousel slides={slides} edgeToEdge={edgeToEdge} />;
 };

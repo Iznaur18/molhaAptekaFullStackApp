@@ -31,6 +31,7 @@ const DEV_API_PROXY_PREFIXES = [
   "/price-offers",
   "/address",
   "/app-intro",
+  "/site-header-banner-campaign",
   "/site-header-banner",
   "/intro-ad",
   "/seller-personal-category",
@@ -43,6 +44,9 @@ const DEV_API_PROXY_PREFIXES = [
 const shouldProxyToApi = (prefix, pathname) => {
   if (prefix === "/user") {
     return /^\/user(?:\/|$)/.test(pathname);
+  }
+  if (prefix === "/site-header-banner") {
+    return /^\/site-header-banner(?:\/|$)/.test(pathname);
   }
   return pathname === prefix || pathname.startsWith(`${prefix}/`);
 };

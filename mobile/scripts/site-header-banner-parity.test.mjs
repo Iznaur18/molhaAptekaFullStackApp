@@ -20,16 +20,36 @@ test("site header banner admin page mirrors web form and hub chrome", () => {
   const hook = readMobileFile(
     "features/site-header-banner-admin-page/model/useSiteHeaderBannerAdminPage.ts",
   );
+  const webPage = readRepoFile(
+    "client/src/pages/site-header-banner-admin/ui/SiteHeaderBannerAdminPage.jsx",
+  );
 
   assert.match(page, /ProfileMobileSectionToggle/);
   assert.match(page, /ProfileMobileNavSheet/);
   assert.match(page, /contentPaddingBottom/);
   assert.match(page, /activeSectionId="site-header-banner-admin"/);
   assert.match(page, /TAB_SITE_HEADER_BANNER_ADMIN/);
-  assert.match(page, /SECTION_GLOBAL/);
-  assert.match(page, /SECTION_ITEMS/);
+  assert.match(page, /LABEL_ENABLED/);
+  assert.match(page, /SiteHeaderBannerCarousel/);
+  assert.match(page, /resolvePreviewSiteHeaderBannerSlidesFromForm/);
+  assert.match(page, /styles\.panel/);
+  assert.match(page, /styles\.slideZone/);
+  assert.match(page, /styles\.controlPanel/);
+  assert.doesNotMatch(page, /styles\.slideDivider/);
   assert.match(page, /ImageUrlUploadField/);
   assert.match(page, /LABEL_IMAGE_ALT/);
+
+  assert.match(webPage, /SiteHeaderBannerCarousel/);
+  assert.match(webPage, /site-header-banner-admin__toolbar/);
+  assert.match(webPage, /site-header-banner-admin__panel/);
+  assert.match(webPage, /site-header-banner-admin__slide-zone/);
+  assert.doesNotMatch(webPage, /site-header-banner-admin__slide-divider/);
+  assert.doesNotMatch(webPage, /site-header-banner-admin__slides-stack/);
+  assert.match(page, /styles\.slideTitle/);
+  assert.doesNotMatch(webPage, /site-header-banner-admin__legend/);
+  assert.match(webPage, /type="color"/);
+  assert.doesNotMatch(webPage, /site-header-banner-admin__workspace/);
+  assert.doesNotMatch(webPage, /site-header-banner-admin__save-bar/);
 
   assert.match(hook, /validateSiteHeaderBannerAdminForm/);
   assert.match(hook, /buildPatchSiteHeaderBannerSettingsBody/);
@@ -52,7 +72,10 @@ test("home catalog feed renders banner in scrollable list header", () => {
   );
   assert.doesNotMatch(searchRow, /SiteHeaderBannerSlot/);
   assert.match(bannerRow, /SiteHeaderBannerSlot/);
-  assert.match(bannerRow, /bannerBelowPanel/);
+  assert.match(bannerRow, /bannerListHeaderFullWidth/);
+  assert.doesNotMatch(bannerRow, /edgeToEdge/);
+  assert.doesNotMatch(bannerRow, /layoutWidth/);
+  assert.doesNotMatch(bannerRow, /marginHorizontal: -/);
   assert.match(slot, /useSiteHeaderBannerSlidesQuery/);
   assert.match(carousel, /AUTOPLAY_MS/);
   assert.match(carousel, /resolveSiteHeaderBannerMobileRoute/);

@@ -223,7 +223,7 @@ export default function CatalogScreen() {
   );
 
   const listHeader = (
-    <View>
+    <View style={styles.listHeader}>
       {showHomeFeed ? <HomeCatalogSiteHeaderBannerRow visible={showHomeFeed} /> : null}
       {!showHomeFeed ? <CatalogBreadcrumb label={catalogBreadcrumbLabel} /> : null}
       {showHomeFeed ? (

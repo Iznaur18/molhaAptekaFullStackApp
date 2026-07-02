@@ -17,6 +17,7 @@ import {
   priceOfferRouter,
   appIntroRouter,
   siteHeaderBannerRouter,
+  siteHeaderBannerCampaignRouter,
   introAdRouter,
   sellerPersonalCategoryRouter,
 } from "./routes/index.js";
@@ -79,6 +80,7 @@ export const createApp = () => {
   app.use("/price-offers", priceOfferRouter);
   app.use("/app-intro", appIntroRouter);
   app.use("/site-header-banner", siteHeaderBannerRouter);
+  app.use("/site-header-banner-campaign", siteHeaderBannerCampaignRouter);
   app.use("/intro-ad", introAdRouter);
   app.use("/seller-personal-category", sellerPersonalCategoryRouter);
 

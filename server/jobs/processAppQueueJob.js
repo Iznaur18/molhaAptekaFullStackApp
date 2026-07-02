@@ -5,6 +5,7 @@ import {
   JOB_PROCESS_INTRO_AD_CRON,
   JOB_PROCESS_PREMIUM_CRON,
   JOB_PROCESS_SELLER_PERSONAL_CATEGORY_CRON,
+  JOB_PROCESS_SITE_HEADER_BANNER_CAMPAIGN_CRON,
   JOB_SEND_EMAIL_VERIFICATION,
 } from "../queues/queueConstants.js";
 import { sendEmailVerificationForUser } from "../services/auth/emailVerification.js";
@@ -13,6 +14,7 @@ import { processInstallmentCronTasks } from "../utils/installmentHelpers.js";
 import { processPremiumCronTasks } from "../utils/premiumAccess.js";
 import { expireProductPromotionsAndSendNotifications } from "../utils/productPromotionHelpers.js";
 import { processSellerPersonalCategoryCronTasks } from "../services/seller-personal-category/sellerPersonalCategoryHelpers.js";
+import { processSiteHeaderBannerCampaignCronTasks } from "../services/site-header-banner-campaign/siteHeaderBannerCampaignHelpers.js";
 import { expireStaleUserStories } from "../utils/userStoryHelpers.js";
 
 /**
@@ -34,6 +36,8 @@ export async function processAppQueueJob(job) {
       return processIntroAdCampaignCronTasks();
     case JOB_PROCESS_SELLER_PERSONAL_CATEGORY_CRON:
       return processSellerPersonalCategoryCronTasks();
+    case JOB_PROCESS_SITE_HEADER_BANNER_CAMPAIGN_CRON:
+      return processSiteHeaderBannerCampaignCronTasks();
     default:
       throw new Error(`Unknown BullMQ job: ${job.name}`);
   }

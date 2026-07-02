@@ -5,6 +5,7 @@ import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 const SUCCESS_SOFT = "#ecfdf3";
 const SUCCESS_BORDER = "#86efac";
+const DANGER_SOFT = "#fef2f2";
 const DANGER_STRONG = "#b42318";
 
 export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme) => ({
@@ -25,6 +26,9 @@ export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme) => 
   },
   header: {
     gap: 6,
+    paddingBottom: 10,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: theme.colors.border,
   },
   title: {
     fontSize: 20,
@@ -55,18 +59,70 @@ export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme) => 
   form: {
     gap: 16,
   },
-  fieldset: {
-    gap: 12,
-    padding: 14,
+  controlPanel: {
+    overflow: "hidden",
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
     borderRadius: 12,
     backgroundColor: theme.colors.surface,
   },
-  legend: {
+  standalonePanel: {
+    overflow: "hidden",
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    borderRadius: 12,
+    backgroundColor: theme.colors.surface,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  panelSection: {
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: theme.colors.border,
+  },
+  toolbar: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  slideZone: {
+    width: "100%",
+    maxWidth: "100%",
+    minWidth: 0,
+    overflow: "hidden",
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    borderRadius: 12,
+    backgroundColor: theme.colors.surface,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  slideTitle: {
+    width: "100%",
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: theme.colors.border,
+    backgroundColor: theme.colors.bg,
     fontSize: 15,
     fontWeight: "600",
     color: theme.colors.text,
+  },
+  fieldBlock: {
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: theme.colors.border,
+    gap: 8,
+  },
+  fieldBlockActions: {
+    backgroundColor: theme.colors.bg,
   },
   label: {
     gap: 6,
@@ -87,34 +143,40 @@ export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme) => 
     color: theme.colors.text,
     backgroundColor: theme.colors.bg,
   },
-  fieldHint: {
-    fontSize: 13,
-    lineHeight: 18,
-    color: theme.colors.textMuted,
-  },
   switchRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     gap: 12,
   },
-  itemsHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 12,
-  },
-  itemsTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: theme.colors.text,
+  preview: {
+    width: "100%",
+    backgroundColor: theme.colors.bg,
   },
   empty: {
     fontSize: 14,
     color: theme.colors.textMuted,
   },
+  colorField: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  colorSwatch: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+  },
+  colorSwatchEmpty: {
+    backgroundColor: theme.colors.bg,
+  },
+  colorInput: {
+    flex: 1,
+  },
   actions: {
-    gap: 10,
+    backgroundColor: theme.colors.bg,
   },
   button: {
     minHeight: 44,
@@ -129,7 +191,7 @@ export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme) => 
   buttonSecondary: {
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.bg,
   },
   buttonDanger: {
     alignSelf: "flex-start",
@@ -155,5 +217,6 @@ export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme) => 
   error: {
     fontSize: 14,
     color: DANGER_STRONG,
+    backgroundColor: DANGER_SOFT,
   },
 }));

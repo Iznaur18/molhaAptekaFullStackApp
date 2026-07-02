@@ -84,6 +84,10 @@ export const useHomeCatalogHeaderStyles = createThemedStyles((theme) => ({
   bannerBelowPanel: {
     marginTop: HOME_CATALOG_HEADER_BANNER_BELOW_PANEL_MARGIN,
   },
+  bannerListHeaderFullWidth: {
+    alignSelf: "stretch",
+    width: "100%",
+  },
   logoButton: {
     height: HOME_CATALOG_HEADER_LOGO_HEIGHT,
     maxWidth: HOME_CATALOG_HEADER_LOGO_MAX_WIDTH_REM,

@@ -29,3 +29,16 @@ export const resolvePersonalCategoryStatusPanelStyle = (
   }
   return styles.statusPanel;
 };
+
+export const resolveSiteHeaderBannerStatusPanelStyle = (
+  styles: StatusPanelStyles,
+  status?: string | null,
+) => {
+  if (status === "active") {
+    return [styles.statusPanel, styles.statusPanelActive];
+  }
+  if (status === "pending") {
+    return [styles.statusPanel, styles.statusPanelPending];
+  }
+  return styles.statusPanel;
+};

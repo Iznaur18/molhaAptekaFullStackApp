@@ -3,6 +3,7 @@ import { INTRO_AD_CRON_INTERVAL_MS } from "../constants/introAdCampaignConstants
 import { PREMIUM_CRON_INTERVAL_MS } from "../constants/premiumConstants.js";
 import { PRODUCT_PROMOTION_CRON_INTERVAL_MS } from "../constants/productPromotionConstants.js";
 import { SELLER_PERSONAL_CATEGORY_CRON_INTERVAL_MS } from "../constants/sellerPersonalCategoryConstants.js";
+import { SITE_HEADER_BANNER_CAMPAIGN_CRON_INTERVAL_MS } from "../constants/siteHeaderBannerCampaignConstants.js";
 import {
   JOB_EXPIRE_PRODUCT_PROMOTIONS,
   JOB_EXPIRE_STALE_USER_STORIES,
@@ -10,6 +11,7 @@ import {
   JOB_PROCESS_INTRO_AD_CRON,
   JOB_PROCESS_PREMIUM_CRON,
   JOB_PROCESS_SELLER_PERSONAL_CATEGORY_CRON,
+  JOB_PROCESS_SITE_HEADER_BANNER_CAMPAIGN_CRON,
 } from "../queues/queueConstants.js";
 
 const USER_STORY_CLEANUP_INTERVAL_MS = 15 * 60 * 1000;
@@ -24,5 +26,9 @@ export const CRON_JOB_DEFINITIONS = [
   {
     name: JOB_PROCESS_SELLER_PERSONAL_CATEGORY_CRON,
     intervalMs: SELLER_PERSONAL_CATEGORY_CRON_INTERVAL_MS,
+  },
+  {
+    name: JOB_PROCESS_SITE_HEADER_BANNER_CAMPAIGN_CRON,
+    intervalMs: SITE_HEADER_BANNER_CAMPAIGN_CRON_INTERVAL_MS,
   },
 ];

@@ -83,4 +83,12 @@ export const useIntroAdModerationCampaignCardStyles = createThemedStyles((theme)
     backgroundColor: theme.colors.surface,
     textAlignVertical: "top",
   },
+  bannerPreview: {
+    width: "100%",
+    maxHeight: 120,
+    borderRadius: 8,
+  },
+  bannerCarouselPreview: {
+    width: "100%",
+  },
 }));

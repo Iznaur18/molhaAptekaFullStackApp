@@ -55,6 +55,9 @@ export const useFeedScreenStyles = createThemedStyles((theme) => ({
     paddingBottom: SCREEN_CONTENT_PADDING_BOTTOM,
     flexGrow: 1,
   },
+  listHeader: {
+    alignSelf: "stretch",
+  },
   row: {
     justifyContent: "space-between",
   },

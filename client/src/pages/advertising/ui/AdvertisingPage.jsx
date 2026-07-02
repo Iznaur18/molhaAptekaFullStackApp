@@ -24,6 +24,7 @@ import {
 } from "../../../entities/intro-ad/lib/index.js";
 
 import { SellerPersonalCategoryAdvertisingSection } from "./SellerPersonalCategoryAdvertisingSection.jsx";
+import { SiteHeaderBannerAdvertisingSection } from "./SiteHeaderBannerAdvertisingSection.jsx";
 
 import "./AdvertisingPage.css";
 
@@ -381,6 +382,11 @@ export function AdvertisingPage({ isAuthorized, onRequestLogin }) {
         </article>
 
         <SellerPersonalCategoryAdvertisingSection
+          isAuthorized={isAuthorized}
+          loyaltyBalance={loyaltyBalance}
+        />
+
+        <SiteHeaderBannerAdvertisingSection
           isAuthorized={isAuthorized}
           loyaltyBalance={loyaltyBalance}
         />

@@ -8,6 +8,7 @@ import { useMyLoyaltyPointsStatusQuery } from "@/entities/user/model/useMyLoyalt
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { IntroAdAdvertisingSection } from "@/features/advertising-page/ui/IntroAdAdvertisingSection";
 import { PersonalCategoryAdvertisingSection } from "@/features/advertising-page/ui/PersonalCategoryAdvertisingSection";
+import { SiteHeaderBannerAdvertisingSection } from "@/features/advertising-page/ui/SiteHeaderBannerAdvertisingSection";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import {
@@ -93,6 +94,7 @@ export const AdvertisingPage = () => {
           <View style={styles.cards}>
             <IntroAdAdvertisingSection loyaltyBalance={loyaltyBalance} />
             <PersonalCategoryAdvertisingSection loyaltyBalance={loyaltyBalance} />
+            <SiteHeaderBannerAdvertisingSection loyaltyBalance={loyaltyBalance} />
           </View>
         </View>
       </ScrollView>

@@ -256,6 +256,8 @@ export {
 export {
   SITE_HEADER_BANNER_AUTOPLAY_MS,
   SITE_HEADER_BANNER_HEIGHT_PX,
+  SITE_HEADER_BANNER_CAROUSEL_PEEK_PX,
+  SITE_HEADER_BANNER_CAROUSEL_SLIDE_GAP_PX,
   SITE_HEADER_BANNER_IMAGE_ALT_MAX_LENGTH,
   SITE_HEADER_BANNER_ITEM_ID_MAX_LENGTH,
   SITE_HEADER_BANNER_LINK_PATH_MAX_LENGTH,
@@ -268,3 +270,24 @@ export {
   siteHeaderBannerSlideSchema,
   siteHeaderBannerSlidesDataSchema,
 } from "./siteHeaderBanner.js";
+export {
+  SITE_HEADER_BANNER_CAMPAIGN_DURATION_DAYS,
+  SITE_HEADER_BANNER_CAMPAIGN_PAID_SLOT_LIMIT,
+  SITE_HEADER_BANNER_CAMPAIGN_PRICE_POINTS,
+  SITE_HEADER_BANNER_CAMPAIGN_STATUS_ACTIVE,
+  SITE_HEADER_BANNER_CAMPAIGN_STATUS_CANCELLED,
+  SITE_HEADER_BANNER_CAMPAIGN_STATUS_EXPIRED,
+  SITE_HEADER_BANNER_CAMPAIGN_STATUS_PENDING,
+  SITE_HEADER_BANNER_CAMPAIGN_STATUS_REJECTED,
+  SITE_HEADER_BANNER_CAMPAIGN_STATUSES,
+  cancelSiteHeaderBannerCampaignDataSchema,
+  mySiteHeaderBannerCampaignDataSchema,
+  rejectSiteHeaderBannerCampaignBodySchema,
+  siteHeaderBannerCampaignConfigDataSchema,
+  siteHeaderBannerCampaignIdParamsSchema,
+  siteHeaderBannerCampaignModerationCountDataSchema,
+  siteHeaderBannerCampaignModerationListDataSchema,
+  siteHeaderBannerCampaignSchema,
+  submitSiteHeaderBannerCampaignBodySchema,
+  submitSiteHeaderBannerCampaignDataSchema,
+} from "./siteHeaderBannerCampaign.js";

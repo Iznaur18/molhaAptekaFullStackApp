@@ -3,6 +3,7 @@ import { AppError } from "../../errors/AppError.js";
 import { deleteAllFollowsForUser } from "./userFollowHelpers.js";
 import { deleteSellerProductsAndRelatedData } from "./deleteUserCascade.js";
 import { cancelIntroAdCampaignsForAdvertiser } from "../intro-ad/introAdCampaignHelpers.js";
+import { cancelSiteHeaderBannerCampaignsForAdvertiser } from "../site-header-banner-campaign/siteHeaderBannerCampaignHelpers.js";
 
 import { PROFILE_DELETE_CASCADE_ERROR_MESSAGE } from "./updateProfileConstants.js";
 
@@ -47,6 +48,12 @@ export async function runProfileDeleteCascade(targetUserId) {
     await cancelIntroAdCampaignsForAdvertiser(String(targetUserId));
   } catch (introAdCancelError) {
     console.error("cancelIntroAdCampaignsForAdvertiser error:", introAdCancelError);
+  }
+
+  try {
+    await cancelSiteHeaderBannerCampaignsForAdvertiser(String(targetUserId));
+  } catch (bannerCancelError) {
+    console.error("cancelSiteHeaderBannerCampaignsForAdvertiser error:", bannerCancelError);
   }
 
   return cascadeSummary;

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   buildPatchSiteHeaderBannerSettingsBody,
@@ -6,12 +6,49 @@ import {
   mapSiteHeaderBannerSettingsToForm,
   validateSiteHeaderBannerAdminForm,
 } from "../../../entities/site-header-banner/lib/siteHeaderBannerAdminForm.js";
+import {
+  normalizeSiteHeaderBannerHexColor,
+  resolvePreviewSiteHeaderBannerSlidesFromForm,
+  resolveSiteHeaderBannerColorInputValue,
+} from "../../../entities/site-header-banner/lib/resolvePreviewSiteHeaderBannerSlidesFromForm.js";
 import { usePatchSiteHeaderBannerSettingsMutation } from "../../../entities/site-header-banner/model/usePatchSiteHeaderBannerSettingsMutation.js";
 import { useSiteHeaderBannerSettingsQuery } from "../../../entities/site-header-banner/model/useSiteHeaderBannerSettingsQuery.js";
+import { SiteHeaderBannerCarousel } from "../../../entities/site-header-banner/ui/SiteHeaderBannerCarousel.jsx";
 import { SITE_HEADER_BANNER_ADMIN_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { ImageUrlField } from "../../../shared/ui/ImageUrlField/ImageUrlField.jsx";
 
 import "./SiteHeaderBannerAdminPage.css";
+
+/**
+ * @param {{
+ *   value: string;
+ *   disabled?: boolean;
+ *   onChange: (value: string) => void;
+ * }} props
+ */
+function SiteHeaderBannerColorField({ value, disabled = false, onChange }) {
+  return (
+    <div className="site-header-banner-admin__color-field">
+      <input
+        className="site-header-banner-admin__color-picker"
+        type="color"
+        value={resolveSiteHeaderBannerColorInputValue(value)}
+        disabled={disabled}
+        onChange={(event) => onChange(event.target.value.toLowerCase())}
+        aria-label={SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_BACKGROUND_COLOR}
+      />
+      <input
+        className="site-header-banner-admin__input"
+        type="text"
+        value={value}
+        disabled={disabled}
+        onChange={(event) => onChange(event.target.value)}
+        placeholder="#RRGGBB"
+        spellCheck={false}
+      />
+    </div>
+  );
+}
 
 export function SiteHeaderBannerAdminPage() {
   const settingsQuery = useSiteHeaderBannerSettingsQuery();
@@ -26,6 +63,11 @@ export function SiteHeaderBannerAdminPage() {
     }
   }, [settingsQuery.data]);
 
+  const previewSlides = useMemo(
+    () => resolvePreviewSiteHeaderBannerSlidesFromForm(form),
+    [form],
+  );
+
   const isLoading = settingsQuery.isPending;
   const isSaving = patchMutation.isPending;
   const loadError =
@@ -33,38 +75,18 @@ export function SiteHeaderBannerAdminPage() {
       ? settingsQuery.error.message
       : SITE_HEADER_BANNER_ADMIN_PAGE_UI.LOAD_ERROR;
 
-  const updateGlobalEnabled = (enabled) => {
+  const resetDraftState = () => {
     setActionError("");
     setSaveNotice(false);
-    setForm((prev) => ({ ...prev, enabled }));
   };
 
   const updateItem = (itemId, patch) => {
-    setActionError("");
-    setSaveNotice(false);
+    resetDraftState();
     setForm((prev) => ({
       ...prev,
       items: prev.items.map((item) =>
         item.id === itemId ? { ...item, ...patch } : item,
       ),
-    }));
-  };
-
-  const handleAddItem = () => {
-    setActionError("");
-    setSaveNotice(false);
-    setForm((prev) => ({
-      ...prev,
-      items: [...prev.items, createEmptySiteHeaderBannerItem()],
-    }));
-  };
-
-  const handleRemoveItem = (itemId) => {
-    setActionError("");
-    setSaveNotice(false);
-    setForm((prev) => ({
-      ...prev,
-      items: prev.items.filter((item) => item.id !== itemId),
     }));
   };
 
@@ -119,48 +141,66 @@ export function SiteHeaderBannerAdminPage() {
       ) : null}
 
       <form className="site-header-banner-admin__form" onSubmit={handleSave}>
-        <fieldset className="site-header-banner-admin__fieldset" disabled={isSaving}>
-          <legend className="site-header-banner-admin__legend">
-            {SITE_HEADER_BANNER_ADMIN_PAGE_UI.SECTION_GLOBAL}
-          </legend>
-          <label className="site-header-banner-admin__checkbox">
+        <div className="site-header-banner-admin__panel">
+          <div className="site-header-banner-admin__panel-section site-header-banner-admin__toolbar">
+            <label className="site-header-banner-admin__checkbox">
             <input
               type="checkbox"
               checked={form.enabled}
-              onChange={(event) => updateGlobalEnabled(event.target.checked)}
+              disabled={isSaving}
+              onChange={(event) => {
+                resetDraftState();
+                setForm((prev) => ({ ...prev, enabled: event.target.checked }));
+              }}
             />
             <span>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_ENABLED}</span>
           </label>
-        </fieldset>
-
-        <div className="site-header-banner-admin__items-header">
-          <h3 className="site-header-banner-admin__items-title">
-            {SITE_HEADER_BANNER_ADMIN_PAGE_UI.SECTION_ITEMS}
-          </h3>
           <button
             type="button"
             className="site-header-banner-admin__btn site-header-banner-admin__btn_secondary"
-            onClick={handleAddItem}
+            disabled={isSaving}
+            onClick={() => {
+              resetDraftState();
+              setForm((prev) => ({
+                ...prev,
+                items: [...prev.items, createEmptySiteHeaderBannerItem()],
+              }));
+            }}
           >
             {SITE_HEADER_BANNER_ADMIN_PAGE_UI.ADD_ITEM}
           </button>
-        </div>
+          </div>
 
-        {form.items.length === 0 ? (
-          <p className="site-header-banner-admin__empty">{SITE_HEADER_BANNER_ADMIN_PAGE_UI.EMPTY_ITEMS}</p>
+        {previewSlides.length > 0 ? (
+          <div className="site-header-banner-admin__panel-section site-header-banner-admin__preview">
+            <SiteHeaderBannerCarousel slides={previewSlides} />
+          </div>
         ) : null}
 
-        {form.items.map((item, index) => (
-          <fieldset
-            key={item.id}
-            className="site-header-banner-admin__fieldset site-header-banner-admin__item"
-            disabled={isSaving}
-          >
-            <legend className="site-header-banner-admin__legend">
-              {SITE_HEADER_BANNER_ADMIN_PAGE_UI.ITEM_TITLE(index + 1)}
-            </legend>
+        {form.items.length === 0 ? (
+          <p className="site-header-banner-admin__panel-section site-header-banner-admin__empty">
+            {SITE_HEADER_BANNER_ADMIN_PAGE_UI.EMPTY_ITEMS}
+          </p>
+        ) : null}
+        </div>
 
-            <label className="site-header-banner-admin__checkbox">
+        {form.items.map((item, index) => (
+          <div
+            key={item.id}
+            className={[
+              "site-header-banner-admin__slide-zone",
+              isSaving ? "site-header-banner-admin__slide-zone_disabled" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+            aria-disabled={isSaving || undefined}
+          >
+            <div className="site-header-banner-admin__slide-title">
+              {SITE_HEADER_BANNER_ADMIN_PAGE_UI.ITEM_TITLE(index + 1)}
+            </div>
+
+            <div className="site-header-banner-admin__field-block">
+              <label className="site-header-banner-admin__checkbox">
               <input
                 type="checkbox"
                 checked={item.enabled}
@@ -170,14 +210,17 @@ export function SiteHeaderBannerAdminPage() {
               />
               <span>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_ITEM_ENABLED}</span>
             </label>
+            </div>
 
+            <div className="site-header-banner-admin__field-block">
             <ImageUrlField
               label={SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_IMAGE}
               value={item.imageUrl}
               onChange={(value) => updateItem(item.id, { imageUrl: value })}
-              hint={SITE_HEADER_BANNER_ADMIN_PAGE_UI.HINT_IMAGE}
             />
+            </div>
 
+            <div className="site-header-banner-admin__field-block">
             <label className="site-header-banner-admin__label">
               <span>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_IMAGE_ALT}</span>
               <input
@@ -187,7 +230,9 @@ export function SiteHeaderBannerAdminPage() {
                 maxLength={200}
               />
             </label>
+            </div>
 
+            <div className="site-header-banner-admin__field-block">
             <label className="site-header-banner-admin__label">
               <span>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_LINK_PATH}</span>
               <input
@@ -196,40 +241,50 @@ export function SiteHeaderBannerAdminPage() {
                 onChange={(event) => updateItem(item.id, { linkPath: event.target.value })}
                 placeholder={SITE_HEADER_BANNER_ADMIN_PAGE_UI.LINK_PATH_PLACEHOLDER}
               />
-              <span className="site-header-banner-admin__field-hint">
-                {SITE_HEADER_BANNER_ADMIN_PAGE_UI.HINT_LINK_PATH}
-              </span>
             </label>
+            </div>
 
+            <div className="site-header-banner-admin__field-block">
             <label className="site-header-banner-admin__label">
               <span>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_BACKGROUND_COLOR}</span>
-              <input
-                className="site-header-banner-admin__input"
+              <SiteHeaderBannerColorField
                 value={item.backgroundColor}
-                onChange={(event) =>
-                  updateItem(item.id, { backgroundColor: event.target.value })
-                }
-                placeholder="#RRGGBB"
+                disabled={isSaving}
+                onChange={(backgroundColor) => {
+                  const normalized = normalizeSiteHeaderBannerHexColor(backgroundColor);
+                  updateItem(item.id, {
+                    backgroundColor: normalized ?? backgroundColor,
+                  });
+                }}
               />
             </label>
+            </div>
 
+            <div className="site-header-banner-admin__field-block site-header-banner-admin__field-block_actions">
             <button
               type="button"
               className="site-header-banner-admin__btn site-header-banner-admin__btn_danger"
-              onClick={() => handleRemoveItem(item.id)}
+              onClick={() => {
+                resetDraftState();
+                setForm((prev) => ({
+                  ...prev,
+                  items: prev.items.filter((entry) => entry.id !== item.id),
+                }));
+              }}
             >
               {SITE_HEADER_BANNER_ADMIN_PAGE_UI.REMOVE_ITEM}
             </button>
-          </fieldset>
+            </div>
+          </div>
         ))}
 
         {actionError ? (
-          <p className="site-header-banner-admin__error" role="alert">
+          <p className="site-header-banner-admin__panel site-header-banner-admin__panel-section site-header-banner-admin__error" role="alert">
             {actionError}
           </p>
         ) : null}
 
-        <div className="site-header-banner-admin__actions">
+        <div className="site-header-banner-admin__panel site-header-banner-admin__panel-section site-header-banner-admin__actions">
           <button
             type="submit"
             className="site-header-banner-admin__btn site-header-banner-admin__btn_primary"

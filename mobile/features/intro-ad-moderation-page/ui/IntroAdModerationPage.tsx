@@ -17,6 +17,7 @@ import {
   type IntroAdModerationCampaign,
 } from "@/entities/intro-ad/ui/IntroAdModerationCampaignCard";
 import { useAppIntro } from "@/features/app-intro/model/AppIntroProvider";
+import { SiteHeaderBannerCampaignModerationSection } from "@/features/intro-ad-moderation-page/ui/SiteHeaderBannerCampaignModerationSection";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import { introAdQueryKeys, staffBadgeQueryKeys } from "@/shared/api";
@@ -192,10 +193,19 @@ export const IntroAdModerationPage = () => {
   if (isEmpty) {
     return (
       <>
-        <View style={[styles.container, centeredContentStyle, styles.centered]}>
+        <ScrollView
+          style={[styles.container, centeredContentStyle]}
+          contentContainerStyle={[styles.scroll, styles.centered, { paddingBottom: contentPaddingBottom }]}
+        >
           {listHeader}
           <Text style={styles.empty}>{INTRO_AD_MODERATION_PAGE_UI.EMPTY}</Text>
-        </View>
+          <SiteHeaderBannerCampaignModerationSection onActionError={setActionError} />
+          {actionError ? (
+            <Text style={[styles.state, styles.stateError]} accessibilityRole="alert">
+              {actionError}
+            </Text>
+          ) : null}
+        </ScrollView>
         {navSheet}
       </>
     );
@@ -276,6 +286,8 @@ export const IntroAdModerationPage = () => {
             </View>
           </View>
         ) : null}
+
+        <SiteHeaderBannerCampaignModerationSection onActionError={setActionError} />
       </ScrollView>
 
       {navSheet}

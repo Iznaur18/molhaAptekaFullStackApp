@@ -13,6 +13,8 @@ import { useAppIntro } from "../../../features/app-intro/model/AppIntroContext.j
 import { formToIntroAdPreviewSettings } from "../../../entities/intro-ad/lib/index.js";
 import { INTRO_AD_MODERATION_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
+import { SiteHeaderBannerCampaignModerationSection } from "./SiteHeaderBannerCampaignModerationSection.jsx";
+
 import "./IntroAdModerationPage.css";
 
 const MODERATION_QUEUE_LIMIT = 50;
@@ -315,7 +317,10 @@ export function IntroAdModerationPage({ onQueueChanged }) {
 
   if (isEmpty) {
     return (
-      <p className="intro-ad-moderation-page__state">{INTRO_AD_MODERATION_PAGE_UI.EMPTY}</p>
+      <>
+        <p className="intro-ad-moderation-page__state">{INTRO_AD_MODERATION_PAGE_UI.EMPTY}</p>
+        <SiteHeaderBannerCampaignModerationSection onQueueChanged={onQueueChanged} />
+      </>
     );
   }
 
@@ -377,6 +382,12 @@ export function IntroAdModerationPage({ onQueueChanged }) {
           </ul>
         </section>
       ) : null}
+
+      <SiteHeaderBannerCampaignModerationSection
+        onQueueChanged={onQueueChanged}
+        actionError={actionError}
+        onActionError={setActionError}
+      />
     </div>
   );
 }

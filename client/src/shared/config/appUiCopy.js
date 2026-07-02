@@ -586,7 +586,7 @@ export const INTRO_AD_MODERATION_PAGE_UI = {
 export const ADVERTISING_PAGE_UI = {
   PAGE_TITLE: "Реклама",
   PAGE_LEAD:
-    "Продвигайте магазин через intro-ролик при входе и личную плитку в каталоге. Оплата баллами лояльности.",
+    "Продвигайте магазин через intro-ролик, баннер в шапке и личную плитку в каталоге. Оплата баллами лояльности.",
   /** @param {number} balance */
   BALANCE: (balance) => `${balance} баллов`,
   BALANCE_LABEL: "Баланс",
@@ -622,6 +622,50 @@ export const INTRO_AD_PAGE_UI = {
   LABEL_MAX_MS: "Максимум показа, мс",
   LABEL_FADE_MS: "Fade-out, мс",
   TIMING_HINT: "Необязательно — по умолчанию как у платформенного intro.",
+};
+
+/** Покупка баннера в шапке (вкладка «Реклама») */
+export const SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI = {
+  CARD_TITLE: "Баннер в шапке",
+  LOADING: "Загрузка…",
+  FETCH_FALLBACK: "Не удалось загрузить раздел баннера",
+  SUBMIT_FALLBACK: "Не удалось отправить заявку",
+  SUBMIT_SUCCESS: "Заявка отправлена на модерацию. Баллы зарезервированы.",
+  CANCEL_FALLBACK: "Не удалось отменить заявку",
+  CANCEL_SUCCESS: "Заявка отменена. Баллы возвращены.",
+  DESCRIPTION:
+    "Ваш баннер появится в карусели под шапкой на главной после модерации. Показ длится 7 дней. Одновременно доступно до 3 платных слотов.",
+  STATUS_PENDING: "На модерации. Баллы зарезервированы.",
+  STATUS_ACTIVE: "Показ активен.",
+  SUBMIT: "Отправить на модерацию",
+  CANCEL: "Отменить заявку",
+  PREVIEW: "Предпросмотр",
+  OPEN_FORM: "Оформить баннер",
+};
+
+/** Модерация баннера в шапке (вкладка intro-ad-moderation) */
+export const SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI = {
+  PENDING_TITLE: "Баннер в шапке — на модерации",
+  MANAGED_TITLE: "Баннер в шапке — активные",
+  EMPTY: "Нет заявок на баннер в шапке.",
+  ADVERTISER_LABEL: "Рекламодатель",
+  SUBMITTED_LABEL: "Отправлено",
+  STATUS_LABEL: "Статус",
+  STATUS_ACTIVE: "Показ активен",
+  PREVIEW: "Предпросмотр",
+  APPROVE: "Одобрить",
+  REJECT: "Отклонить",
+  STAFF_CANCEL: "Снять баннер",
+  REJECT_REASON_LABEL: "Причина отклонения (необязательно)",
+  REJECT_REASON_PLACEHOLDER: "Комментарий для рекламодателя…",
+  FETCH_FALLBACK: "Не удалось загрузить очередь баннеров",
+  MANAGED_FETCH_FALLBACK: "Не удалось загрузить активные баннеры",
+  APPROVE_SUCCESS: "Заявка одобрена",
+  APPROVE_FALLBACK: "Не удалось одобрить заявку",
+  REJECT_SUCCESS: "Заявка отклонена",
+  REJECT_FALLBACK: "Не удалось отклонить заявку",
+  STAFF_CANCEL_SUCCESS: "Баннер снят",
+  STAFF_CANCEL_FALLBACK: "Не удалось снять баннер",
 };
 
 /** Личная категория продавца (вкладка «Реклама») */
@@ -2106,6 +2150,13 @@ export const SITE_HEADER_BANNER_ADMIN_PAGE_UI = {
   EMPTY_ITEMS: "Слайдов пока нет.",
   /** @param {number} index */
   ITEM_TITLE: (index) => `Слайд ${index}`,
+  SECTION_PREVIEW: "Превью",
+  HINT_PREVIEW: "Как карусель выглядит на главной при текущих настройках.",
+  PREVIEW_EMPTY: "Включите баннер и добавьте изображения, чтобы увидеть превью.",
+  SELECT_SLIDE_HINT: "Выберите слайд слева для редактирования.",
+  NO_SLIDE_SELECTED: "Слайд не выбран.",
+  ITEM_DISABLED_BADGE: "выкл.",
+  CLEAR_COLOR: "Сбросить цвет",
 };
 
 /**

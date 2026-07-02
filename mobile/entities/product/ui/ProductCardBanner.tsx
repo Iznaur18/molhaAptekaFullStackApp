@@ -71,14 +71,9 @@ export const ProductCardBanner = ({ product }: ProductCardBannerProps) => {
         />
 
         <View style={styles.imageWrap}>
-          <Pressable
-            style={styles.imagePressable}
-            onPress={handlePress}
-            accessibilityRole="button"
-            accessibilityLabel={openProductLabel}
-          >
+          <View style={styles.imagePressable}>
             <ProductCardMediaSlide media={cardMedia} />
-          </Pressable>
+          </View>
         </View>
 
         <View style={styles.content}>

@@ -7,6 +7,7 @@ import {
 import { apiClient } from "../../../shared/api/index.js";
 import { parseApiContractData } from "../../../shared/api/parseApiContract.js";
 import { INTRO_AD_MODERATION_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import { fetchPendingSiteHeaderBannerCampaignsCount } from "../../site-header-banner-campaign/api/siteHeaderBannerCampaignModerationApi.js";
 
 /**
  * @param {{ limit?: number }} [params]
@@ -31,9 +32,15 @@ export async function fetchPendingIntroAdCampaigns(params = {}) {
  */
 export async function fetchPendingIntroAdCampaignsCount() {
   try {
-    const { data } = await apiClient.get("/intro-ad/moderation/pending/count");
-    const parsed = parseApiContractData(data, pendingIntroAdCampaignsCountDataSchema);
-    return parsed.count;
+    const [introResult, bannerCount] = await Promise.all([
+      apiClient.get("/intro-ad/moderation/pending/count"),
+      fetchPendingSiteHeaderBannerCampaignsCount().catch(() => 0),
+    ]);
+    const parsed = parseApiContractData(
+      introResult.data,
+      pendingIntroAdCampaignsCountDataSchema,
+    );
+    return parsed.count + bannerCount;
   } catch (e) {
     const message =
       e?.response?.data?.message ??

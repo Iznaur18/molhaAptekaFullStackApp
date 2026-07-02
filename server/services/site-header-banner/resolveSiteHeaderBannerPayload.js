@@ -1,4 +1,8 @@
 import { SITE_HEADER_BANNER_SETTINGS_DEFAULTS } from "../../constants/siteHeaderBannerConstants.js";
+import {
+  SITE_HEADER_BANNER_CAMPAIGN_STATUS_ACTIVE,
+} from "../../constants/siteHeaderBannerCampaignConstants.js";
+import { SiteHeaderBannerCampaignModel } from "../../models/SiteHeaderBannerCampaignModel.js";
 
 /**
  * @param {import('mongoose').LeanDocument<any> | null | undefined} row
@@ -49,4 +53,48 @@ export const resolvePublicSiteHeaderBannerSlides = (row) => {
       linkPath: item.linkPath,
       backgroundColor: item.backgroundColor,
     }));
+};
+
+/**
+ * @returns {Promise<Array<{
+ *   id: string;
+ *   imageUrl: string;
+ *   imageAlt: string;
+ *   linkPath: string | null;
+ *   backgroundColor: string | null;
+ * }>>}
+ */
+export const resolveActivePaidSiteHeaderBannerCampaignSlides = async () => {
+  const now = new Date();
+  const rows = await SiteHeaderBannerCampaignModel.find({
+    status: SITE_HEADER_BANNER_CAMPAIGN_STATUS_ACTIVE,
+    activeUntil: { $gt: now },
+  })
+    .sort({ activatedAt: 1, createdAt: 1 })
+    .lean();
+
+  return rows
+    .filter((row) => row.imageUrl)
+    .map((row) => ({
+      id: `paid:${String(row._id)}`,
+      imageUrl: String(row.imageUrl).trim(),
+      imageAlt: String(row.imageAlt ?? "").trim() || "Баннер",
+      linkPath:
+        row.linkPath == null || String(row.linkPath).trim() === ""
+          ? null
+          : String(row.linkPath).trim(),
+      backgroundColor:
+        row.backgroundColor == null || String(row.backgroundColor).trim() === ""
+          ? null
+          : String(row.backgroundColor).trim(),
+    }));
+};
+
+/**
+ * @param {import('mongoose').LeanDocument<any> | null | undefined} row
+ */
+export const resolveMergedPublicSiteHeaderBannerSlides = async (row) => {
+  const staffSlides = resolvePublicSiteHeaderBannerSlides(row);
+  const paidSlides = await resolveActivePaidSiteHeaderBannerCampaignSlides();
+  return [...staffSlides, ...paidSlides];
 };

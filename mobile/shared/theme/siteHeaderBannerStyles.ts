@@ -46,4 +46,13 @@ export const useSiteHeaderBannerCarouselStyles = createThemedStyles((theme) => (
   dotActive: {
     backgroundColor: theme.colors.primary,
   },
+  viewportEdgeToEdge: {
+    borderRadius: 0,
+  },
+  slideEdgeToEdge: {
+    borderRadius: 0,
+  },
+  singleSlideEdgeToEdge: {
+    borderRadius: 0,
+  },
 }));

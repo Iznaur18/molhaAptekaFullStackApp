@@ -3,12 +3,14 @@ import { INTRO_AD_CRON_INTERVAL_MS } from "../constants/introAdCampaignConstants
 import { PREMIUM_CRON_INTERVAL_MS } from "../constants/premiumConstants.js";
 import { PRODUCT_PROMOTION_CRON_INTERVAL_MS } from "../constants/productPromotionConstants.js";
 import { SELLER_PERSONAL_CATEGORY_CRON_INTERVAL_MS } from "../constants/sellerPersonalCategoryConstants.js";
+import { SITE_HEADER_BANNER_CAMPAIGN_CRON_INTERVAL_MS } from "../constants/siteHeaderBannerCampaignConstants.js";
 import { expireStaleUserStories } from "../utils/userStoryHelpers.js";
 import { processInstallmentCronTasks } from "../utils/installmentHelpers.js";
 import { processPremiumCronTasks } from "../utils/premiumAccess.js";
 import { expireProductPromotionsAndSendNotifications } from "../utils/productPromotionHelpers.js";
 import { processIntroAdCampaignCronTasks } from "../services/intro-ad/introAdCampaignHelpers.js";
 import { processSellerPersonalCategoryCronTasks } from "../services/seller-personal-category/sellerPersonalCategoryHelpers.js";
+import { processSiteHeaderBannerCampaignCronTasks } from "../services/site-header-banner-campaign/siteHeaderBannerCampaignHelpers.js";
 
 import { isBullMqEnabled } from "../queues/bullMqEnabled.js";
 
@@ -69,6 +71,12 @@ export function startCronIntervals() {
       console.error("processSellerPersonalCategoryCronTasks error:", error);
     });
   }, SELLER_PERSONAL_CATEGORY_CRON_INTERVAL_MS);
+
+  setInterval(() => {
+    void processSiteHeaderBannerCampaignCronTasks().catch((error) => {
+      console.error("processSiteHeaderBannerCampaignCronTasks error:", error);
+    });
+  }, SITE_HEADER_BANNER_CAMPAIGN_CRON_INTERVAL_MS);
 
   return true;
 }

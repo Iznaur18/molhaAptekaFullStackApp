@@ -1,7 +1,7 @@
 import { SITE_HEADER_BANNER_SETTINGS_KEY } from "../../constants/siteHeaderBannerConstants.js";
 import { SiteHeaderBannerSettingsModel } from "../../models/SiteHeaderBannerSettingsModel.js";
 import {
-  resolvePublicSiteHeaderBannerSlides,
+  resolveMergedPublicSiteHeaderBannerSlides,
   resolveSiteHeaderBannerSettingsPayload,
 } from "../../services/site-header-banner/resolveSiteHeaderBannerPayload.js";
 import { successRes } from "../../services/http/index.js";
@@ -26,7 +26,7 @@ export const getSiteHeaderBannerSlidesController = async (_req, res) => {
   }).lean();
 
   return successRes(res, {
-    slides: resolvePublicSiteHeaderBannerSlides(row),
+    slides: await resolveMergedPublicSiteHeaderBannerSlides(row),
   });
 };
 

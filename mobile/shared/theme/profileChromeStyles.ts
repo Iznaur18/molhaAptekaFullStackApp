@@ -206,6 +206,12 @@ export const useProfileMobileNavToggleStyles = createThemedStyles((theme) => ({
   },
 }));
 
+export const PROFILE_MOBILE_NAV_SHEET_ANIMATION = {
+  enterMs: 280,
+  exitMs: 240,
+  slideDistance: 320,
+} as const;
+
 export const useProfileMobileNavSheetStyles = createThemedStyles((theme) => ({
   backdrop: {
     flex: 1,

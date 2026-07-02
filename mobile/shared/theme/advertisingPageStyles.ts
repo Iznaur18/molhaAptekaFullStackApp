@@ -114,6 +114,10 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
     borderColor: theme.colors.warningBorder,
     backgroundColor: PROMOTION_BOOST_BG,
   },
+  cardBanner: {
+    borderColor: theme.colors.primaryBright,
+    backgroundColor: theme.colors.actionSoft,
+  },
   cardHead: {
     flexDirection: "row",
     flexWrap: "wrap",

@@ -3,11 +3,14 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   FlatList,
   Image,
+  Linking,
   Pressable,
   View,
   type LayoutChangeEvent,
   type NativeScrollEvent,
   type NativeSyntheticEvent,
+  type StyleProp,
+  type ViewStyle,
 } from "react-native";
 
 import type { SiteHeaderBannerSlide } from "@/entities/site-header-banner/model/types";
@@ -18,15 +21,31 @@ import { useSiteHeaderBannerCarouselStyles } from "@/shared/theme/siteHeaderBann
 
 type SiteHeaderBannerCarouselProps = {
   slides: SiteHeaderBannerSlide[];
+  edgeToEdge?: boolean;
 };
 
-export const SiteHeaderBannerCarousel = ({ slides }: SiteHeaderBannerCarouselProps) => {
+export const SiteHeaderBannerCarousel = ({
+  slides,
+  edgeToEdge = false,
+}: SiteHeaderBannerCarouselProps) => {
   const router = useRouter();
   const styles = useSiteHeaderBannerCarouselStyles();
   const [viewportWidth, setViewportWidth] = useState(0);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const listRef = useRef<FlatList<SiteHeaderBannerSlide>>(null);
+
+  const edgeStyles = edgeToEdge
+    ? {
+        viewport: styles.viewportEdgeToEdge,
+        slide: styles.slideEdgeToEdge,
+        singleSlide: styles.singleSlideEdgeToEdge,
+      }
+    : {
+        viewport: undefined,
+        slide: undefined,
+        singleSlide: undefined,
+      };
 
   const handleViewportLayout = useCallback((event: LayoutChangeEvent) => {
     const nextWidth = Math.round(event.nativeEvent.layout.width);
@@ -37,7 +56,8 @@ export const SiteHeaderBannerCarousel = ({ slides }: SiteHeaderBannerCarouselPro
 
   useEffect(() => {
     setActiveIndex(0);
-  }, [slides.length]);
+    listRef.current?.scrollToOffset({ offset: 0, animated: false });
+  }, [slides.length, viewportWidth]);
 
   useEffect(() => {
     if (slides.length <= 1 || isPaused || viewportWidth <= 0) {
@@ -73,7 +93,12 @@ export const SiteHeaderBannerCarousel = ({ slides }: SiteHeaderBannerCarouselPro
       if (!linkPath) {
         return;
       }
-      const route = resolveSiteHeaderBannerMobileRoute(linkPath);
+      const trimmed = linkPath.trim();
+      if (/^https?:\/\//i.test(trimmed)) {
+        void Linking.openURL(trimmed);
+        return;
+      }
+      const route = resolveSiteHeaderBannerMobileRoute(trimmed);
       if (route) {
         router.push(route as never);
       }
@@ -96,7 +121,7 @@ export const SiteHeaderBannerCarousel = ({ slides }: SiteHeaderBannerCarouselPro
     );
 
     return (
-      <View style={[styles.slide, slideStyle]}>
+      <View style={[styles.slide, edgeStyles.slide, slideStyle]}>
         {slide.linkPath ? (
           <Pressable
             style={styles.pressable}
@@ -116,10 +141,12 @@ export const SiteHeaderBannerCarousel = ({ slides }: SiteHeaderBannerCarouselPro
     return null;
   }
 
+  const rootStyle: StyleProp<ViewStyle> = styles.root;
+
   if (slides.length === 1) {
     return (
       <View
-        style={styles.root}
+        style={[rootStyle, styles.singleSlide, edgeStyles.singleSlide]}
         onLayout={handleViewportLayout}
         accessibilityLabel={SITE_HEADER_BANNER_UI.CAROUSEL_ARIA}
       >
@@ -130,14 +157,14 @@ export const SiteHeaderBannerCarousel = ({ slides }: SiteHeaderBannerCarouselPro
 
   return (
     <View
-      style={styles.root}
+      style={rootStyle}
       onLayout={handleViewportLayout}
       accessibilityLabel={SITE_HEADER_BANNER_UI.CAROUSEL_ARIA}
       onTouchStart={() => setIsPaused(true)}
       onTouchEnd={() => setIsPaused(false)}
       onTouchCancel={() => setIsPaused(false)}
     >
-      <View style={styles.viewport}>
+      <View style={[styles.viewport, edgeStyles.viewport]}>
         <FlatList
           ref={listRef}
           horizontal

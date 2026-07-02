@@ -11,3 +11,5 @@ export const JOB_EXPIRE_PRODUCT_PROMOTIONS = "expireProductPromotions";
 export const JOB_PROCESS_INTRO_AD_CRON = "processIntroAdCampaignCronTasks";
 export const JOB_PROCESS_SELLER_PERSONAL_CATEGORY_CRON =
   "processSellerPersonalCategoryCronTasks";
+export const JOB_PROCESS_SITE_HEADER_BANNER_CAMPAIGN_CRON =
+  "processSiteHeaderBannerCampaignCronTasks";

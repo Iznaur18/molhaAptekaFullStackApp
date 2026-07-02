@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { SITE_HEADER_BANNER_UI } from "../../../shared/config/appUiCopy.js";
+import { openSiteHeaderBannerLink } from "../../../shared/lib/openSiteHeaderBannerLink.js";
 import { resolveImageUrlForDisplay } from "../../../shared/lib/resolveUploadedImageUrl.js";
 
 import "./SiteHeaderBannerCarousel.css";
@@ -138,7 +139,10 @@ export function SiteHeaderBannerCarousel({ slides }) {
     if (!linkPath || isDragging) {
       return;
     }
-    navigate(linkPath);
+    const resolved = openSiteHeaderBannerLink(linkPath);
+    if (resolved) {
+      navigate(resolved);
+    }
   };
 
   if (slideCount === 0) {
