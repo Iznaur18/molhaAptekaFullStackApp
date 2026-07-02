@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+import { expect, test } from "vitest";
 
 import {
   isAllowedUploadVideoFile,
@@ -7,66 +6,56 @@ import {
 } from "./isAllowedUploadVideoFile.js";
 
 test("normalizeUploadVideoMime strips codec parameters", () => {
-  assert.equal(
-    normalizeUploadVideoMime('video/mp4; codecs="hvc1"'),
-    "video/mp4",
-  );
+  expect(normalizeUploadVideoMime('video/mp4; codecs="hvc1"')).toBe("video/mp4");
 });
 
 test("isAllowedUploadVideoFile accepts iPhone quicktime and mov extension", () => {
-  assert.equal(
+  expect(
     isAllowedUploadVideoFile({
       name: "IMG_1234.MOV",
       type: "video/quicktime",
     }),
-    true,
-  );
-  assert.equal(
+  ).toBe(true);
+  expect(
     isAllowedUploadVideoFile({
       name: "clip.mov",
       type: "",
     }),
-    true,
-  );
+  ).toBe(true);
 });
 
 test("isAllowedUploadVideoFile accepts HEVC mime and iOS octet-stream", () => {
-  assert.equal(
+  expect(
     isAllowedUploadVideoFile({
       name: "video.mp4",
       type: "video/hevc",
     }),
-    true,
-  );
-  assert.equal(
+  ).toBe(true);
+  expect(
     isAllowedUploadVideoFile({
       name: "IMG_0001.MOV",
       type: "application/octet-stream",
     }),
-    true,
-  );
-  assert.equal(
+  ).toBe(true);
+  expect(
     isAllowedUploadVideoFile({
       name: "clip.mp4",
       type: 'video/mp4; codecs="hvc1,mp4a.40.2"',
     }),
-    true,
-  );
+  ).toBe(true);
 });
 
 test("isAllowedUploadVideoFile rejects unsupported formats", () => {
-  assert.equal(
+  expect(
     isAllowedUploadVideoFile({
       name: "video.avi",
       type: "video/x-msvideo",
     }),
-    false,
-  );
-  assert.equal(
+  ).toBe(false);
+  expect(
     isAllowedUploadVideoFile({
       name: "blob",
       type: "application/octet-stream",
     }),
-    false,
-  );
+  ).toBe(false);
 });

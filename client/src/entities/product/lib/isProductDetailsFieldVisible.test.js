@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+import { expect, test } from "vitest";
 
 import {
   filterProductDetailsVisibleFieldKeys,
@@ -15,26 +14,24 @@ const product = {
 };
 
 test("productDescription hidden when empty", () => {
-  assert.equal(isProductDetailsFieldVisible("productDescription", product), true);
-  assert.equal(
+  expect(isProductDetailsFieldVisible("productDescription", product)).toBe(true);
+  expect(
     isProductDetailsFieldVisible("productDescription", {
       ...product,
       productDescription: "   ",
     }),
-    false,
-  );
+  ).toBe(false);
 });
 
 test("meta fields stay visible without detailsHideWhenEmpty", () => {
-  assert.equal(isProductDetailsFieldVisible("createdAt", product), true);
+  expect(isProductDetailsFieldVisible("createdAt", product)).toBe(true);
 });
 
 test("filterProductDetailsVisibleFieldKeys drops empty description block", () => {
-  assert.deepEqual(
+  expect(
     filterProductDetailsVisibleFieldKeys(
       ["productDescription", "createdAt"],
       { ...product, productDescription: "" },
     ),
-    ["createdAt"],
-  );
+  ).toEqual(["createdAt"]);
 });

@@ -30,7 +30,8 @@ const getCookieOptions = (maxAgeMs) => {
   const crossSite = isProduction() && isCrossSiteCookie();
   return {
     httpOnly: true,
-    secure: crossSite,
+    // В production куки только по HTTPS независимо от режима (same-site/cross-site).
+    secure: isProduction(),
     sameSite: crossSite ? "none" : "lax",
     maxAge: maxAgeMs,
     path: "/",

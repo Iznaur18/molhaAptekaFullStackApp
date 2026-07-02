@@ -190,7 +190,7 @@ test("auth refresh: body token wins over stale cookie after rotation", async () 
   const registerResponse = await request("/auth/register", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(registerPayload("body-over-cookie")),
+    body: JSON.stringify(registerPayload("bodyovercookie")),
   });
   assert.equal(registerResponse.status, 200);
 

@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+import { expect, test } from "vitest";
 
 import { PRODUCT_DETAILS_CONTENT_PANEL } from "./productDetailsContentPanelConstants.js";
 import { resolveProductDetailsContentPanels } from "./resolveProductDetailsContentPanels.js";
@@ -11,8 +10,8 @@ const product = {
 
 test("showSwitcher when both description and characteristics exist", () => {
   const panels = resolveProductDetailsContentPanels(product, ["productDescription"]);
-  assert.equal(panels.showSwitcher, true);
-  assert.equal(panels.defaultPanel, PRODUCT_DETAILS_CONTENT_PANEL.DESCRIPTION);
+  expect(panels.showSwitcher).toBe(true);
+  expect(panels.defaultPanel).toBe(PRODUCT_DETAILS_CONTENT_PANEL.DESCRIPTION);
 });
 
 test("only description when characteristics are empty", () => {
@@ -20,9 +19,9 @@ test("only description when characteristics are empty", () => {
     { productDescription: "Текст" },
     ["productDescription"],
   );
-  assert.equal(panels.showSwitcher, false);
-  assert.equal(panels.hasDescription, true);
-  assert.equal(panels.hasCharacteristics, false);
+  expect(panels.showSwitcher).toBe(false);
+  expect(panels.hasDescription).toBe(true);
+  expect(panels.hasCharacteristics).toBe(false);
 });
 
 test("otherBlockFieldKeys exclude productDescription", () => {
@@ -30,5 +29,5 @@ test("otherBlockFieldKeys exclude productDescription", () => {
     "productDescription",
     "productImageUrls",
   ]);
-  assert.deepEqual(panels.otherBlockFieldKeys, ["productImageUrls"]);
+  expect(panels.otherBlockFieldKeys).toEqual(["productImageUrls"]);
 });

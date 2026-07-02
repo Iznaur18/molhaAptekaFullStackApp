@@ -34,6 +34,7 @@ describe("buildCatalogListQueryParams", () => {
       search: "аспирин",
       productCategory: "medicines",
       categoryId: null,
+      sellerPersonalCategoryId: null,
       sort: "price_asc",
       moderationStatus: null,
       includeHidden: null,
@@ -41,6 +42,7 @@ describe("buildCatalogListQueryParams", () => {
       auctionOnly: true,
       installmentOnly: null,
       saleOnly: null,
+      allCities: null,
     });
   });
 
@@ -60,6 +62,7 @@ describe("buildCatalogListQueryParams", () => {
       search: null,
       productCategory: "supplements",
       categoryId: null,
+      sellerPersonalCategoryId: null,
       sort: "newest",
       moderationStatus: "pending",
       includeHidden: null,
@@ -67,6 +70,7 @@ describe("buildCatalogListQueryParams", () => {
       auctionOnly: null,
       installmentOnly: null,
       saleOnly: null,
+      allCities: null,
     });
   });
 

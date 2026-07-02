@@ -33,7 +33,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1062.0",
     "@molha/api-contract": "file:../contract",
-    "@sentry/node": "^9.47.1",
+    "@sentry/node": "^10.63.0",
     "bcrypt": "^6.0.0",
     "bullmq": "^5.78.1",
     "cookie-parser": "^1.4.7",
@@ -47,7 +47,7 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.1.5",
     "multer": "^2.0.2",
-    "nodemailer": "^8.0.10",
+    "nodemailer": "^9.0.3",
     "rate-limit-redis": "^4.2.0",
     "redis": "^6.0.0"
   }
