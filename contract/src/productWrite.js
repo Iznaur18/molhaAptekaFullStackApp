@@ -37,6 +37,8 @@ export const PRODUCT_CATEGORY_VALUES = [
 ];
 
 export const PRODUCT_IMAGE_URLS_MAX = 5;
+export const PRODUCT_IMAGE_REQUIRED_MESSAGE =
+  "Добавьте хотя бы одно фото товара";
 export const PRODUCT_NAME_MIN_LENGTH = 3;
 export const PRODUCT_NAME_MAX_LENGTH = 100;
 export const PRODUCT_DESCRIPTION_MIN_CHARS = 10;
@@ -84,6 +86,22 @@ const assertCategoryIdOrLegacy = (body, ctx) => {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: "Укажите productCategoryId (лист дерева) или productCategory",
+    });
+  }
+};
+
+const assertCreateProductRequiresPhoto = (body, ctx) => {
+  const fromArray = Array.isArray(body.productImageUrls)
+    ? body.productImageUrls.filter((url) => String(url ?? "").trim().length > 0)
+    : [];
+  const hasLegacy =
+    typeof body.productImageUrl === "string" &&
+    body.productImageUrl.trim().length > 0;
+  if (fromArray.length === 0 && !hasLegacy) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["productImageUrls"],
+      message: PRODUCT_IMAGE_REQUIRED_MESSAGE,
     });
   }
 };
@@ -141,6 +159,7 @@ export const createProductBodySchema = z
     productSaleCity: productSaleCityFieldSchema,
   })
   .superRefine(assertCategoryIdOrLegacy)
+  .superRefine(assertCreateProductRequiresPhoto)
   .superRefine((body, ctx) => assertOldPricePair(body, ctx, true));
 
 const patchFieldShape = {

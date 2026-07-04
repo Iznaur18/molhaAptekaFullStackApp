@@ -151,7 +151,7 @@ export default function CartScreen() {
         <Text style={styles.message}>{CART_PAGE_UI.EMPTY}</Text>
         <AppButton
           label={CART_PAGE_UI.GO_TO_CATALOG}
-          variant="contrast"
+          variant="primary"
           onPress={() => router.push("/(tabs)")}
         />
       </View>

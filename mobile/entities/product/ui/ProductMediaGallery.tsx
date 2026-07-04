@@ -1,12 +1,13 @@
 import { useMemo, useState, type ReactNode } from "react";
-import { Pressable, Text, useWindowDimensions, View } from "react-native";
+import { Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 import { buildProductMediaSlides } from "@/entities/product/lib/buildProductMediaSlides";
+import { ProductMediaHorizontalPager } from "@/entities/product/ui/ProductMediaHorizontalPager";
+import { ProductMediaSlideContent } from "@/entities/product/ui/ProductMediaSlideContent";
 import { PRODUCT_DETAILS_MODAL_UI } from "@/shared/config";
 import { useProductMediaGalleryStyles } from "@/shared/theme/catalogProductStyles";
 import { CachedProductImage } from "@/shared/ui/CachedProductImage";
-import { ProductMediaSlideContent } from "@/entities/product/ui/ProductMediaSlideContent";
 
 type ProductMediaGalleryProps = {
   previewVideoUrl?: string | null;
@@ -41,72 +42,24 @@ export const ProductMediaGallery = ({
   }, [imageUrls, previewVideoUrl, previewVideoFailed]);
 
   const safeSlideIndex = Math.min(activeSlideIndex, Math.max(0, mediaSlides.length - 1));
-  const activeSlide = mediaSlides[safeSlideIndex] ?? null;
+  const pagerSlideCount = Math.max(mediaSlides.length, 1);
   const hasMultipleSlides = mediaSlides.length > 1;
-
-  const handlePrev = () => {
-    if (!hasMultipleSlides) {
-      return;
-    }
-    setActiveSlideIndex((index) => (index - 1 + mediaSlides.length) % mediaSlides.length);
-  };
-
-  const handleNext = () => {
-    if (!hasMultipleSlides) {
-      return;
-    }
-    setActiveSlideIndex((index) => (index + 1) % mediaSlides.length);
-  };
 
   const heroHeight = Math.min(screenHeight * 0.52, 400);
   const heroStyle = isDetail
     ? [styles.detailHero, { height: heroHeight }]
     : styles.hero;
   const rootStyle = isDetail ? styles.detailRoot : styles.root;
+  const counterStyle = isDetail ? styles.detailCounter : styles.counter;
 
-  const renderHeroMedia = () => (
-    <ProductMediaSlideContent
-      slide={activeSlide}
-      imageStyle={styles.media}
-      onVideoFailed={() => setPreviewVideoFailed(true)}
-    />
-  );
-
-  const renderNav = () => {
+  const renderCounter = () => {
     if (!hasMultipleSlides) {
       return null;
     }
-    if (isDetail) {
-      return (
-        <>
-          <View style={styles.detailSliderNav} pointerEvents="box-none">
-            <Pressable style={styles.detailSliderButton} onPress={handlePrev}>
-              <Text style={styles.detailSliderButtonText}>‹</Text>
-            </Pressable>
-            <Pressable style={styles.detailSliderButton} onPress={handleNext}>
-              <Text style={styles.detailSliderButtonText}>›</Text>
-            </Pressable>
-          </View>
-          <Text style={styles.detailCounter}>
-            {safeSlideIndex + 1} / {mediaSlides.length}
-          </Text>
-        </>
-      );
-    }
     return (
-      <>
-        <View style={styles.navRow}>
-          <Pressable style={styles.navButton} onPress={handlePrev}>
-            <Text style={styles.navButtonText}>‹</Text>
-          </Pressable>
-          <Pressable style={styles.navButton} onPress={handleNext}>
-            <Text style={styles.navButtonText}>›</Text>
-          </Pressable>
-        </View>
-        <Text style={styles.counter}>
-          {safeSlideIndex + 1} / {mediaSlides.length}
-        </Text>
-      </>
+      <Text style={counterStyle}>
+        {safeSlideIndex + 1} / {mediaSlides.length}
+      </Text>
     );
   };
 
@@ -156,8 +109,20 @@ export const ProductMediaGallery = ({
             {reportOverlay ? <View style={styles.detailReportSlot}>{reportOverlay}</View> : null}
           </View>
         ) : null}
-        {renderHeroMedia()}
-        {renderNav()}
+        <ProductMediaHorizontalPager
+          style={StyleSheet.absoluteFillObject}
+          slideCount={pagerSlideCount}
+          activeIndex={safeSlideIndex}
+          onIndexChange={setActiveSlideIndex}
+          renderSlide={(index) => (
+            <ProductMediaSlideContent
+              slide={mediaSlides[index] ?? null}
+              imageStyle={styles.media}
+              onVideoFailed={() => setPreviewVideoFailed(true)}
+            />
+          )}
+        />
+        {renderCounter()}
       </View>
       {renderThumbs()}
     </View>

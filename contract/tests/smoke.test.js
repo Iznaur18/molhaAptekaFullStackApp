@@ -236,6 +236,13 @@ test("catalogFeedTileKeyParamsSchema accepts known tile key", () => {
   assert.equal(parsed.tileKey, "sort:newest");
 });
 
+test("catalogFeedTileKeyParamsSchema accepts installment filter tile key", () => {
+  const parsed = catalogFeedTileKeyParamsSchema.parse({
+    tileKey: "filter:__installment_only__",
+  });
+  assert.equal(parsed.tileKey, "filter:__installment_only__");
+});
+
 test("upsertProductInstallmentProgramBodySchema validates plans", () => {
   const parsed = upsertProductInstallmentProgramBodySchema.parse({
     isEnabled: true,
@@ -384,6 +391,19 @@ test("createProductBodySchema rejects productName longer than 100 chars", () => 
       productPrice: 100,
       productIsAvailable: true,
       productCategory: "pharmacy",
+      productImageUrls: ["/uploads/photo.webp"],
+    });
+  });
+});
+
+test("createProductBodySchema requires at least one product image", () => {
+  assert.throws(() => {
+    createProductBodySchema.parse({
+      productName: "Test product name",
+      productDescription: "Description long enough for validation",
+      productPrice: 100,
+      productIsAvailable: true,
+      productCategory: "pharmacy",
     });
   });
 });
@@ -395,6 +415,7 @@ test("createProductBodySchema requires category id or legacy slug", () => {
       productDescription: "Description long enough for validation",
       productPrice: 100,
       productIsAvailable: true,
+      productImageUrls: ["/uploads/photo.webp"],
     });
   });
 });

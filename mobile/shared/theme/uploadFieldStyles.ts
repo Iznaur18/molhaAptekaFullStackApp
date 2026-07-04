@@ -36,7 +36,8 @@ export const useMediaUploadFieldStyles = createThemedStyles((theme) => ({
     alignSelf: "flex-start",
     borderRadius: theme.radius.button,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.nearBlack,
+    borderColor: theme.colors.action,
+    backgroundColor: theme.colors.action,
     paddingVertical: 10,
     paddingHorizontal: 14,
     minHeight: 40,
@@ -48,7 +49,7 @@ export const useMediaUploadFieldStyles = createThemedStyles((theme) => ({
   buttonText: {
     fontSize: 14,
     fontWeight: "600",
-    color: theme.colors.nearBlack,
+    color: theme.colors.onContrast,
   },
   fieldHint: {
     fontSize: 13,
@@ -58,6 +59,106 @@ export const useMediaUploadFieldStyles = createThemedStyles((theme) => ({
   error: {
     color: theme.colors.danger,
     fontSize: 13,
+  },
+}));
+
+export const useProductPhotoGridStyles = createThemedStyles((theme) => ({
+  wrap: {
+    gap: theme.spacing[2],
+  },
+  grid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: theme.spacing[2],
+  },
+  tile: {
+    width: "31%",
+    aspectRatio: 1,
+    borderRadius: theme.radius.sm,
+    overflow: "hidden",
+    backgroundColor: theme.colors.surfaceMuted,
+  },
+  tileImage: {
+    width: "100%",
+    height: "100%",
+  },
+  coverBadge: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    paddingVertical: 3,
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.55)",
+  },
+  coverBadgeText: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: "#ffffff",
+  },
+  removeBadge: {
+    position: "absolute",
+    top: 4,
+    right: 4,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(0,0,0,0.55)",
+  },
+  removeBadgeText: {
+    fontSize: 12,
+    fontWeight: "700",
+    lineHeight: 14,
+    color: "#ffffff",
+  },
+  uploadingTile: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  addTile: {
+    width: "31%",
+    aspectRatio: 1,
+    borderRadius: theme.radius.sm,
+    borderWidth: 1,
+    borderStyle: "dashed",
+    borderColor: theme.colors.actionBorder,
+    backgroundColor: theme.colors.actionSoft,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 2,
+  },
+  addTilePressed: {
+    backgroundColor: theme.colors.actionSurface,
+    borderColor: theme.colors.action,
+  },
+  addTileDisabled: {
+    opacity: 0.5,
+  },
+  addTilePlus: {
+    fontSize: 26,
+    lineHeight: 30,
+    fontWeight: "600",
+    color: theme.colors.action,
+  },
+  addTileLabel: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: theme.colors.action,
+  },
+  counter: {
+    fontSize: 13,
+    color: theme.colors.textMuted,
+  },
+  hint: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: theme.colors.textSecondary,
+  },
+  error: {
+    fontSize: 13,
+    color: theme.colors.danger,
   },
 }));
 

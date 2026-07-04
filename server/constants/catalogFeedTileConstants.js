@@ -3,6 +3,7 @@ export const CATALOG_FEED_TILE_KEY_VALUES = [
   "sort:newest",
   "sort:views",
   "sort:purchases",
+  "sort:city",
   "sort:reviews",
   "sort:premium",
   "sort:confirmed",

@@ -4,10 +4,18 @@ import {
   ActivityIndicator,
   Modal,
   Pressable,
+  StyleSheet,
   Text,
   TextInput,
   View,
 } from "react-native";
+import Animated, {
+  Easing,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
 import { useUserStoryMutations } from "@/entities/user-story/model/useUserStoryMutations";
 import {
@@ -25,7 +33,10 @@ import { pickGalleryImageAsset } from "@/features/image-upload/lib/pickGalleryIm
 import { pickVideoAsset } from "@/features/image-upload/lib/pickVideoAsset";
 import { USER_STORY_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
-import { useCreateStoryModalStyles } from "@/shared/theme/modalChromeStyles";
+import {
+  CREATE_STORY_MODAL_ANIMATION,
+  useCreateStoryModalStyles,
+} from "@/shared/theme/modalChromeStyles";
 import { ProductPreviewVideo } from "@/shared/ui/ProductPreviewVideo";
 
 type CreateUserStoryModalProps = {
@@ -33,6 +44,8 @@ type CreateUserStoryModalProps = {
   onClose: () => void;
   onPublished?: () => void;
 };
+
+const { enterMs, exitMs, sheetSlideDistance } = CREATE_STORY_MODAL_ANIMATION;
 
 export const CreateUserStoryModal = ({
   visible,
@@ -45,11 +58,14 @@ export const CreateUserStoryModal = ({
   const uploadImageMutation = useUploadImageMutation();
   const uploadVideoMutation = useUploadVideoMutation();
 
+  const [modalVisible, setModalVisible] = useState(visible);
   const [captionText, setCaptionText] = useState("");
   const [mediaType, setMediaType] = useState<UserStoryMediaType | null>(null);
   const [imageFile, setImageFile] = useState<UploadImageFilePayload | null>(null);
   const [videoFile, setVideoFile] = useState<UploadVideoFilePayload | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
+  const backdropOpacity = useSharedValue(0);
+  const sheetTranslateY = useSharedValue(sheetSlideDistance);
 
   const isBusy =
     createMutation.isPending || uploadImageMutation.isPending || uploadVideoMutation.isPending;
@@ -64,17 +80,61 @@ export const CreateUserStoryModal = ({
     setErrorMessage("");
   }, []);
 
+  const finishClose = useCallback(() => {
+    setModalVisible(false);
+    resetForm();
+  }, [resetForm]);
+
   useEffect(() => {
-    if (!visible) {
-      resetForm();
+    if (visible) {
+      setModalVisible(true);
+      backdropOpacity.value = 0;
+      sheetTranslateY.value = sheetSlideDistance;
+      backdropOpacity.value = withTiming(1, {
+        duration: enterMs,
+        easing: Easing.out(Easing.cubic),
+      });
+      sheetTranslateY.value = withTiming(0, {
+        duration: enterMs,
+        easing: Easing.out(Easing.cubic),
+      });
+      return;
     }
-  }, [visible, resetForm]);
+
+    if (!modalVisible) {
+      return;
+    }
+
+    backdropOpacity.value = withTiming(0, {
+      duration: exitMs,
+      easing: Easing.in(Easing.cubic),
+    });
+    sheetTranslateY.value = withTiming(
+      sheetSlideDistance,
+      {
+        duration: exitMs,
+        easing: Easing.in(Easing.cubic),
+      },
+      (finished) => {
+        if (finished) {
+          runOnJS(finishClose)();
+        }
+      },
+    );
+  }, [backdropOpacity, finishClose, modalVisible, sheetTranslateY, visible]);
+
+  const backdropAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: backdropOpacity.value,
+  }));
+
+  const sheetAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: sheetTranslateY.value }],
+  }));
 
   const handleClose = () => {
     if (isBusy) {
       return;
     }
-    resetForm();
     onClose();
   };
 
@@ -133,7 +193,6 @@ export const CreateUserStoryModal = ({
         captionText: caption,
       });
 
-      resetForm();
       onPublished?.();
       onClose();
     } catch (error) {
@@ -141,10 +200,23 @@ export const CreateUserStoryModal = ({
     }
   };
 
+  if (!modalVisible) {
+    return null;
+  }
+
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={handleClose}>
-      <View style={styles.overlay}>
-        <View style={styles.card}>
+    <Modal visible={modalVisible} animationType="none" transparent onRequestClose={handleClose}>
+      <View style={styles.root}>
+        <Animated.View style={[styles.backdrop, backdropAnimatedStyle]} pointerEvents="box-none">
+          <Pressable
+            style={StyleSheet.absoluteFillObject}
+            onPress={handleClose}
+            disabled={isBusy}
+            accessibilityLabel={USER_STORY_UI.CLOSE}
+          />
+        </Animated.View>
+
+        <Animated.View style={[styles.card, sheetAnimatedStyle]}>
           <View style={styles.header}>
             <Text style={styles.title}>{USER_STORY_UI.CREATE_TITLE}</Text>
             <Pressable onPress={handleClose} disabled={isBusy} hitSlop={8}>
@@ -208,7 +280,7 @@ export const CreateUserStoryModal = ({
               <Text style={styles.submitText}>{USER_STORY_UI.PUBLISH}</Text>
             )}
           </Pressable>
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );

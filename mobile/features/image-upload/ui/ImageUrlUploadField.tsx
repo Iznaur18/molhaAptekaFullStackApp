@@ -74,7 +74,7 @@ export const ImageUrlUploadField = ({
         disabled={disabled || isBusy}
       >
         {isBusy ? (
-          <ActivityIndicator color={theme.colors.nearBlack} />
+          <ActivityIndicator color={theme.colors.onContrast} />
         ) : (
           <Text style={styles.buttonText}>{IMAGE_UPLOAD_UI.UPLOAD_BUTTON}</Text>
         )}

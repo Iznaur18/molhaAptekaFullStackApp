@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 
@@ -55,10 +54,7 @@ export const ProductDetailsSellerPreview = ({ seller }: ProductDetailsSellerPrev
     ? String(Math.max(0, Math.floor(listedCount)))
     : "0";
 
-  const ratingText = useMemo(
-    () => formatSearchRowRatingCompact(sellerObj.userRatingByVotes),
-    [sellerObj.userRatingByVotes],
-  );
+  const ratingText = formatSearchRowRatingCompact(sellerObj.userRatingByVotes);
 
   const metrics = [
     { key: "rating", label: USER_LIST_ROW_UI.RATING_LABEL, value: ratingText },

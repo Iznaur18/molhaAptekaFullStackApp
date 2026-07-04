@@ -9,6 +9,7 @@ export default function ProfileStackLayout() {
   return (
     <Stack
       screenOptions={{
+        headerBackTitle: "Назад",
         headerStyle: { backgroundColor: theme.colors.surface },
         headerTintColor: theme.colors.text,
         contentStyle: { backgroundColor: theme.colors.bg },

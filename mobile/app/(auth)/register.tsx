@@ -52,65 +52,79 @@ export default function RegisterScreen() {
       style={authStyles.flex}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <ScrollView contentContainerStyle={authStyles.container} keyboardShouldPersistTaps="handled">
-        <Text style={authStyles.title}>{AUTH_UI.REGISTER_TITLE}</Text>
+      <ScrollView
+        contentContainerStyle={authStyles.container}
+        keyboardShouldPersistTaps="handled"
+        scrollEnabled={false}
+        bounces={false}
+        showsVerticalScrollIndicator={false}
+        overScrollMode="never"
+      >
+        <View style={authStyles.card}>
+          <View style={authStyles.heroZone}>
+            <Text style={authStyles.title}>{AUTH_UI.REGISTER_TITLE}</Text>
+            <Text style={authStyles.subtitle}>{AUTH_UI.REGISTER_SUBTITLE}</Text>
+          </View>
 
-        <Text style={fieldStyles.label}>{AUTH_UI.EMAIL_LABEL}</Text>
-        <TextInput
-          style={fieldStyles.input}
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          autoCorrect={false}
-          keyboardType="email-address"
-          placeholderTextColor={theme.colors.textMuted}
-        />
+          <View style={authStyles.formZone}>
+            <Text style={fieldStyles.label}>{AUTH_UI.EMAIL_LABEL}</Text>
+            <TextInput
+              style={[fieldStyles.input, authStyles.authInput]}
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="email-address"
+              placeholderTextColor={theme.colors.textMuted}
+            />
 
-        <Text style={fieldStyles.label}>{AUTH_UI.USER_NAME_LABEL}</Text>
-        <TextInput
-          style={fieldStyles.input}
-          value={userName}
-          onChangeText={handleUserNameChange}
-          autoCapitalize="none"
-          autoCorrect={false}
-          placeholderTextColor={theme.colors.textMuted}
-        />
+            <Text style={fieldStyles.label}>{AUTH_UI.USER_NAME_LABEL}</Text>
+            <TextInput
+              style={[fieldStyles.input, authStyles.authInput]}
+              value={userName}
+              onChangeText={handleUserNameChange}
+              autoCapitalize="none"
+              autoCorrect={false}
+              placeholderTextColor={theme.colors.textMuted}
+            />
 
-        <Text style={fieldStyles.label}>{AUTH_UI.PASSWORD_LABEL}</Text>
-        <TextInput
-          style={fieldStyles.input}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          placeholderTextColor={theme.colors.textMuted}
-        />
+            <Text style={fieldStyles.label}>{AUTH_UI.PASSWORD_LABEL}</Text>
+            <TextInput
+              style={[fieldStyles.input, authStyles.authInput]}
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              placeholderTextColor={theme.colors.textMuted}
+            />
 
-        <Text style={fieldStyles.label}>{AUTH_UI.PASSWORD_CONFIRM_LABEL}</Text>
-        <TextInput
-          style={fieldStyles.input}
-          value={passwordConfirm}
-          onChangeText={setPasswordConfirm}
-          secureTextEntry
-          placeholderTextColor={theme.colors.textMuted}
-        />
+            <Text style={fieldStyles.label}>{AUTH_UI.PASSWORD_CONFIRM_LABEL}</Text>
+            <TextInput
+              style={[fieldStyles.input, authStyles.authInput]}
+              value={passwordConfirm}
+              onChangeText={setPasswordConfirm}
+              secureTextEntry
+              placeholderTextColor={theme.colors.textMuted}
+            />
 
-        {errorMessage ? <Text style={fieldStyles.error}>{errorMessage}</Text> : null}
+            {errorMessage ? <Text style={fieldStyles.error}>{errorMessage}</Text> : null}
+          </View>
 
-        <View style={authStyles.authActions}>
-          <AppButton
-            label={AUTH_UI.REGISTER_BUTTON}
-            variant="primary"
-            style={authStyles.authButton}
-            onPress={handleSubmit}
-            disabled={registerMutation.isPending}
-          />
-          <AppButton
-            label={AUTH_UI.GO_TO_LOGIN}
-            variant="secondary"
-            style={[authStyles.authButton, authStyles.authSecondaryButton]}
-            onPress={() => router.push("/(auth)/login")}
-            disabled={registerMutation.isPending}
-          />
+          <View style={[authStyles.actionsZone, authStyles.authActions]}>
+            <AppButton
+              label={AUTH_UI.REGISTER_BUTTON}
+              variant="primary"
+              style={authStyles.authButton}
+              onPress={handleSubmit}
+              disabled={registerMutation.isPending}
+            />
+            <AppButton
+              label={AUTH_UI.GO_TO_LOGIN}
+              variant="secondary"
+              style={[authStyles.authButton, authStyles.authSecondaryButton]}
+              onPress={() => router.push("/(auth)/login")}
+              disabled={registerMutation.isPending}
+            />
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

@@ -12,23 +12,63 @@ export const useAuthFormStyles = createThemedStyles((theme) => ({
   container: {
     flexGrow: 1,
     padding: theme.spacing[6],
-    justifyContent: "center",
+    paddingTop: theme.spacing[8],
+    justifyContent: "flex-start",
+  },
+  card: {
+    borderRadius: theme.radius.lg,
+    overflow: "hidden",
+    backgroundColor: theme.colors.surface,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    shadowColor: theme.colors.ink,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.12,
+    shadowRadius: 14,
+    elevation: 5,
+  },
+  heroZone: {
+    backgroundColor: theme.colors.primary,
+    paddingHorizontal: theme.spacing[6],
+    paddingVertical: theme.spacing[6],
+  },
+  formZone: {
+    backgroundColor: theme.colors.surface,
+    paddingHorizontal: theme.spacing[6],
+    paddingTop: theme.spacing[6],
+    paddingBottom: theme.spacing[2],
+  },
+  actionsZone: {
+    backgroundColor: theme.colors.actionSoft,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: theme.colors.actionBorder,
+    paddingHorizontal: theme.spacing[6],
+    paddingVertical: theme.spacing[5],
   },
   title: {
     fontSize: 28,
     fontWeight: "700",
-    marginBottom: theme.spacing[6],
-    color: theme.colors.text,
+    color: theme.colors.onContrast,
+  },
+  subtitle: {
+    marginTop: theme.spacing[1],
+    fontSize: 14,
+    lineHeight: 20,
+    color: theme.colors.onContrast,
+    opacity: 0.78,
   },
   authActions: {
     gap: theme.spacing[3],
-    marginTop: theme.spacing[2],
   },
   authButton: {
     width: "100%",
   },
   authSecondaryButton: {
     backgroundColor: theme.colors.surface,
+    borderColor: theme.colors.borderStrong,
+  },
+  authInput: {
+    backgroundColor: theme.colors.surfaceMuted,
     borderColor: theme.colors.borderStrong,
   },
   link: {

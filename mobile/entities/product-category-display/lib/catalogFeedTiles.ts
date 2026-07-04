@@ -29,22 +29,27 @@ export const CATALOG_FEED_TILES: CatalogFeedTile[] = [
   { key: "sort:premium", kind: "sort", value: CATALOG_SORT_PREMIUM, label: "Premium" },
   { key: "sort:confirmed", kind: "sort", value: CATALOG_SORT_CONFIRMED, label: "Проверенные" },
   {
-    key: "filter:following",
+    key: `filter:${CATALOG_FILTER_FOLLOWING_ONLY}`,
     kind: "filter",
     value: CATALOG_FILTER_FOLLOWING_ONLY,
     label: "Подписки",
   },
   {
-    key: "filter:auction",
+    key: `filter:${CATALOG_FILTER_AUCTION_ONLY}`,
     kind: "filter",
     value: CATALOG_FILTER_AUCTION_ONLY,
     label: "Аукцион",
   },
   {
-    key: "filter:installment",
+    key: `filter:${CATALOG_FILTER_INSTALLMENT_ONLY}`,
     kind: "filter",
     value: CATALOG_FILTER_INSTALLMENT_ONLY,
     label: "Рассрочка",
   },
-  { key: "filter:sale", kind: "filter", value: CATALOG_FILTER_SALE_ONLY, label: "Скидки" },
+  {
+    key: `filter:${CATALOG_FILTER_SALE_ONLY}`,
+    kind: "filter",
+    value: CATALOG_FILTER_SALE_ONLY,
+    label: "Скидки",
+  },
 ];

@@ -96,6 +96,13 @@ export function prepareCreateProductSubmit({
     };
   }
 
+  if (!isEdit && urls.length === 0) {
+    return {
+      ok: false,
+      message: CREATE_PRODUCT_MODAL_UI.ERROR_IMAGE_REQUIRED,
+    };
+  }
+
   const stockParsed = Math.floor(Number(form.productStockQuantity));
   const listedInCatalog = form.productIsAvailable === true;
   const stockRequired = listedInCatalog || (isEdit && !showCatalogAvailabilityToggle);
@@ -179,7 +186,7 @@ export function prepareCreateProductSubmit({
     createBody: {
       productName: form.productName,
       productDescription: form.productDescription,
-      productImageUrls: urls.length > 0 ? urls : undefined,
+      productImageUrls: urls,
       productPreviewVideoUrl: previewVideoUrl || undefined,
       productPrice,
       productOldPrice,

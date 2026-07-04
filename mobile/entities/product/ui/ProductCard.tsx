@@ -16,8 +16,10 @@ import { resolveProductCardPromotionFrameStyle } from "@/entities/product/lib/re
 import { useProductCardMediaState } from "@/entities/product/lib/useProductCardMediaState";
 import { ProductCardPromotionBackground } from "@/entities/product/ui/ProductCardPromotionBackground";
 import { ProductCatalogStatusBadges } from "@/entities/product/ui/ProductCatalogStatusBadges";
-import { ProductCardMediaGalleryNav } from "@/entities/product/ui/ProductCardMediaGalleryNav";
-import { ProductCardMediaSlide } from "@/entities/product/ui/ProductCardMediaSlide";
+import { ProductCardMediaGalleryCounter } from "@/entities/product/ui/ProductCardMediaGalleryNav";
+import { ProductMediaHorizontalPager } from "@/entities/product/ui/ProductMediaHorizontalPager";
+import { ProductMediaSlideContent } from "@/entities/product/ui/ProductMediaSlideContent";
+import { useProductCardMediaStyles } from "@/shared/theme/catalogProductStyles";
 import { ProductCardBanner } from "@/entities/product/ui/ProductCardBanner";
 import { ProductCardModerationPendingOverlay } from "@/entities/product/ui/ProductCardModerationPendingOverlay";
 import { ProductCardModerationPreviewFields } from "@/entities/product/ui/ProductCardModerationPreviewFields";
@@ -99,6 +101,9 @@ export const ProductCard = ({
     return <ProductCardBanner product={product} />;
   }
 
+  const cardMediaStyles = useProductCardMediaStyles();
+  const gallerySlideCount = Math.max(cardMedia.mediaSlides.length, 1);
+
   const handlePress = () => {
     router.push({ pathname: "/product/[id]", params: { id: product._id } });
   };
@@ -149,14 +154,26 @@ export const ProductCard = ({
       ) : null}
 
       <View style={[styles.imageWrap, isCatalogGrid && styles.imageWrapCatalogGrid]}>
-        <Pressable
-          style={({ pressed }) => [styles.imagePressable, pressed && styles.cardPressed]}
-          onPress={handlePress}
-          accessibilityRole="button"
-          accessibilityLabel={openProductLabel}
-        >
-          <ProductCardMediaSlide media={cardMedia} />
-        </Pressable>
+        <ProductMediaHorizontalPager
+          style={styles.imagePressable}
+          slideCount={gallerySlideCount}
+          activeIndex={cardMedia.cardSlideIndex}
+          onIndexChange={cardMedia.setCardSlideIndex}
+          renderSlide={(index) => (
+            <Pressable
+              style={cardMediaStyles.frame}
+              onPress={handlePress}
+              accessibilityRole="button"
+              accessibilityLabel={openProductLabel}
+            >
+              <ProductMediaSlideContent
+                slide={cardMedia.mediaSlides[index] ?? null}
+                imageStyle={cardMediaStyles.media}
+                onVideoFailed={() => cardMedia.setPreviewVideoFailed(true)}
+              />
+            </Pressable>
+          )}
+        />
 
         {showModerationPendingOverlay ? <ProductCardModerationPendingOverlay /> : null}
 
@@ -176,20 +193,10 @@ export const ProductCard = ({
           </View>
         ) : null}
 
-        {cardMedia.mediaSlides.length > 1 ? (
-          <ProductCardMediaGalleryNav
-            slideIndex={cardMedia.cardSlideIndex}
-            slideCount={cardMedia.mediaSlides.length}
-            onPrevious={() => {
-              const count = cardMedia.mediaSlides.length;
-              cardMedia.setCardSlideIndex((index) => (index - 1 + count) % count);
-            }}
-            onNext={() => {
-              const count = cardMedia.mediaSlides.length;
-              cardMedia.setCardSlideIndex((index) => (index + 1) % count);
-            }}
-          />
-        ) : null}
+        <ProductCardMediaGalleryCounter
+          slideIndex={cardMedia.cardSlideIndex}
+          slideCount={cardMedia.mediaSlides.length}
+        />
       </View>
 
       <Pressable

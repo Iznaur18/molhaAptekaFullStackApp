@@ -10,6 +10,12 @@ export const STORY_VIEWER_DELETE_SCRIM = "rgba(198,40,40,0.35)";
 export const STORY_VIEWER_OVERLAY_SCRIM = "rgba(0,0,0,0.55)";
 export const USER_STORY_FRAME_BORDER_RADIUS = 16;
 
+export const CREATE_STORY_MODAL_ANIMATION = {
+  enterMs: 300,
+  exitMs: 240,
+  sheetSlideDistance: 420,
+} as const;
+
 export const useBottomSheetReportModalStyles = createThemedStyles((theme) => ({
   overlay: {
     flex: 1,
@@ -109,10 +115,13 @@ export const useBottomSheetReportModalStyles = createThemedStyles((theme) => ({
 }));
 
 export const useCreateStoryModalStyles = createThemedStyles((theme) => ({
-  overlay: {
+  root: {
     flex: 1,
-    backgroundColor: MODAL_BACKDROP_SCRIM,
     justifyContent: "flex-end",
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: MODAL_BACKDROP_SCRIM,
   },
   card: {
     backgroundColor: theme.colors.surface,
@@ -208,7 +217,7 @@ export const useCreateStoryModalStyles = createThemedStyles((theme) => ({
     marginTop: theme.spacing[4],
     paddingVertical: 14,
     borderRadius: 10,
-    backgroundColor: theme.colors.nearBlack,
+    backgroundColor: theme.colors.action,
     alignItems: "center",
     justifyContent: "center",
     minHeight: 48,

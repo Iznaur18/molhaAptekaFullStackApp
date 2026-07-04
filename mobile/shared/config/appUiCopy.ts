@@ -101,6 +101,10 @@ export const IMAGE_UPLOAD_UI = {
   ERROR_GENERIC: "Не удалось загрузить файл",
   ERROR_AUTH: "Войдите в аккаунт, чтобы загрузить файл",
   PERMISSION_DENIED: "Нет доступа к галерее",
+  ADD_PHOTO_TILE: "Фото",
+  COVER_BADGE: "Обложка",
+  REMOVE_PHOTO: "Удалить фото",
+  TAP_TO_COVER_HINT: "Нажмите на фото, чтобы сделать его обложкой",
 } as const;
 
 export const SCREEN_STATE_UI = {
@@ -795,7 +799,9 @@ export const LEGAL_UI = {
 
 export const AUTH_UI = {
   LOGIN_TITLE: "Вход",
+  LOGIN_SUBTITLE: "Войдите, чтобы продолжить покупки",
   REGISTER_TITLE: "Регистрация",
+  REGISTER_SUBTITLE: "Создайте аккаунт за пару минут",
   EMAIL_LABEL: "Email",
   PASSWORD_LABEL: "Пароль",
   PASSWORD_CONFIRM_LABEL: "Повторите пароль",
@@ -1154,7 +1160,7 @@ export const CREATE_PRODUCT_UI = {
   CATEGORY_PLACEHOLDER: "Выберите конечную подкатегорию",
   LABEL_AVAILABLE: "Товар в наличии",
   LABEL_STOCK: "Количество, шт.",
-  LABEL_IMAGE: "Фото (необязательно)",
+  LABEL_IMAGE: "Фото (обязательно)",
   SUBMIT: "Создать",
   SUBMIT_LOADING: "Создаём…",
   SAVE: "Сохранить",
@@ -1170,6 +1176,7 @@ export const CREATE_PRODUCT_UI = {
   ERROR_NAME: "Название: от 3 до 100 символов",
   ERROR_DESCRIPTION: "Описание — минимум 10 символов",
   ERROR_PRICE: "Укажите цену",
+  ERROR_IMAGE_REQUIRED: "Добавьте хотя бы одно фото товара",
   CATEGORY_BACK: "Назад",
   CATEGORY_SELECT_LEAF: "Выбрать эту категорию",
   MANAGE_SECTION_TITLE: "Управление товаром",

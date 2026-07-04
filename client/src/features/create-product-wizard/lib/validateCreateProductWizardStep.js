@@ -48,11 +48,8 @@ export function validateCreateProductWizardStep(stepId, form, context) {
       const urls = urlsFromImageRows(form.productImageRows).map((url) =>
         normalizeUploadUrlForStorage(url),
       );
-      const previewVideoUrl = normalizeUploadUrlForStorage(
-        String(form.productPreviewVideoUrl ?? "").trim(),
-      );
-      if (previewVideoUrl && urls.length === 0) {
-        return CREATE_PRODUCT_MODAL_UI.ERROR_PREVIEW_VIDEO_REQUIRES_PHOTO;
+      if (urls.length === 0) {
+        return CREATE_PRODUCT_MODAL_UI.ERROR_IMAGE_REQUIRED;
       }
       return null;
     }

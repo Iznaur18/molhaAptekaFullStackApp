@@ -2612,12 +2612,13 @@ export const useCatalogBrowserTileStyles = createThemedStyles((theme) => ({
     position: "relative",
   },
   card: {
-    height: "100%",
-    padding: 8,
-    borderWidth: 1,
+    width: "100%",
+    aspectRatio: 1,
+    overflow: "hidden",
     borderRadius: 12,
-    backgroundColor: theme.colors.surface,
+    borderWidth: 1,
     borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surfaceElevated,
   },
   cardFeed: {
     borderStyle: "dashed",
@@ -2625,21 +2626,21 @@ export const useCatalogBrowserTileStyles = createThemedStyles((theme) => ({
   cardPending: {
     opacity: 0.55,
   },
-  imageWrap: {
-    aspectRatio: 1,
-    overflow: "hidden",
-    borderRadius: 8,
-    backgroundColor: theme.colors.surfaceElevated,
-  },
   image: {
-    width: "100%",
-    height: "100%",
+    ...StyleSheet.absoluteFillObject,
+  },
+  labelSlot: {
+    position: "absolute",
+    top: 8,
+    left: 8,
+    right: 8,
+    maxWidth: "78%",
   },
   label: {
-    marginTop: 8,
-    fontSize: 13,
-    lineHeight: 16,
-    textAlign: "center",
+    fontSize: 11,
+    lineHeight: 14,
+    fontWeight: "600",
+    textAlign: "left",
     color: theme.colors.ink,
   },
   editButton: {

@@ -15,7 +15,7 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { useCreateProductMutation } from "@/entities/product/model/useCreateProductMutation";
 import { validateProductName } from "@/entities/product/lib/validateProductName";
-import { ImageUrlUploadField } from "@/features/image-upload/ui/ImageUrlUploadField";
+import { ProductPhotoGrid } from "@/features/image-upload/ui/ProductPhotoGrid";
 import { CreateProductCategoryPicker } from "@/features/create-product/ui/CreateProductCategoryPicker";
 import { CREATE_PRODUCT_UI } from "@/shared/config";
 import { textInputFocusScrollProps } from "@/shared/lib/scrollTextInputIntoViewOnFocus";
@@ -45,7 +45,7 @@ const STEP_COPY: Record<WizardStepId, { title: string; subtitle: string; label: 
   },
   media: {
     title: "Фото и видео",
-    subtitle: "Добавьте до 5 фото. Первое фото станет обложкой",
+    subtitle: "До 5 фото, можно выбрать несколько сразу. Первое — обложка",
     label: "Медиа",
   },
   category: {
@@ -123,9 +123,9 @@ function validateStep(stepId: WizardStepId, form: WizardForm): string | null {
       return null;
     }
     case "media": {
-      const hasVideo = form.productPreviewVideoUrl.trim().length > 0;
-      if (hasVideo && form.imageUrls.filter(Boolean).length === 0) {
-        return "При превью-видео нужно хотя бы одно фото товара";
+      const imageCount = form.imageUrls.filter(Boolean).length;
+      if (imageCount === 0) {
+        return CREATE_PRODUCT_UI.ERROR_IMAGE_REQUIRED;
       }
       return null;
     }
@@ -172,6 +172,7 @@ function validateStep(stepId: WizardStepId, form: WizardForm): string | null {
     case "review": {
       return (
         validateStep("basic", form) ??
+        validateStep("media", form) ??
         validateStep("category", form) ??
         validateStep("commerce", form)
       );
@@ -219,13 +220,15 @@ export const CreateProductScreen = () => {
     const error = validateStep(stepId, form);
     if (error) { setStepError(error); return; }
     setStepError("");
-    setStepIndex((i) => Math.min(i + 1, WIZARD_STEPS.length - 1));
-  }, [form, stepId]);
+    // Абсолютный индекс вместо функционального апдейта: два тапа до
+    // ре-рендера валидируют и двигают один и тот же шаг, а не проскакивают два.
+    setStepIndex(Math.min(stepIndex + 1, WIZARD_STEPS.length - 1));
+  }, [form, stepId, stepIndex]);
 
   const goBack = useCallback(() => {
     setStepError("");
-    setStepIndex((i) => Math.max(i - 1, 0));
-  }, []);
+    setStepIndex(Math.max(stepIndex - 1, 0));
+  }, [stepIndex]);
 
   const handleCancel = useCallback(() => {
     if (router.canGoBack()) {
@@ -692,82 +695,14 @@ function BasicStep({ form, setForm, disabled, theme, styles }: StepProps) {
 // ─── MediaStep ────────────────────────────────────────────────────────────────
 
 function MediaStep({ form, setForm, disabled, theme, styles }: StepProps) {
-  const filledCount = form.imageUrls.filter(Boolean).length;
-
-  const handleAddSlot = () => {
-    if (form.imageUrls.length >= PRODUCT_IMAGE_URLS_MAX) return;
-    setForm((prev) => ({ ...prev, imageUrls: [...prev.imageUrls, ""] }));
-  };
-
-  const handleImageChange = (index: number, url: string) => {
-    setForm((prev) => {
-      const next = [...prev.imageUrls];
-      next[index] = url;
-      return { ...prev, imageUrls: next };
-    });
-  };
-
-  const handleRemoveSlot = (index: number) => {
-    setForm((prev) => ({
-      ...prev,
-      imageUrls: prev.imageUrls.filter((_, i) => i !== index),
-    }));
-  };
-
   return (
     <View style={styles.section}>
-      {/* Lead — mirrors .create-product-section__lead */}
-      <Text style={[styles.lead, { color: theme.colors.textSecondary }]}>
-        Фото необязательны, но с ними товар продаётся быстрее.
-      </Text>
-
-      {form.imageUrls.length === 0 ? (
-        <Pressable
-          style={[styles.outlineButton, { borderColor: theme.colors.border + "d9" }]}
-          onPress={handleAddSlot}
-          disabled={disabled}
-        >
-          <Text style={[styles.outlineButtonText, { color: theme.colors.text }]}>
-            Добавить фото
-          </Text>
-        </Pressable>
-      ) : null}
-
-      {form.imageUrls.map((url, index) => (
-        <View key={index} style={styles.imageSlot}>
-          <ImageUrlUploadField
-            label={index === 0 ? "Фото 1 (обложка)" : `Фото ${index + 1}`}
-            value={url}
-            onChange={(next) => handleImageChange(index, next)}
-            disabled={disabled}
-          />
-          <Pressable
-            style={[styles.removeImageButton, { borderColor: theme.colors.border + "d9" }]}
-            onPress={() => handleRemoveSlot(index)}
-            disabled={disabled}
-          >
-            <Text style={[styles.removeImageText, { color: theme.colors.danger }]}>
-              Удалить фото
-            </Text>
-          </Pressable>
-        </View>
-      ))}
-
-      {form.imageUrls.length > 0 && form.imageUrls.length < PRODUCT_IMAGE_URLS_MAX ? (
-        <Pressable
-          style={[styles.outlineButton, { borderColor: theme.colors.border + "d9" }]}
-          onPress={handleAddSlot}
-          disabled={disabled}
-        >
-          <Text style={[styles.outlineButtonText, { color: theme.colors.text }]}>
-            + Добавить ещё фото ({filledCount} / {PRODUCT_IMAGE_URLS_MAX})
-          </Text>
-        </Pressable>
-      ) : form.imageUrls.length >= PRODUCT_IMAGE_URLS_MAX ? (
-        <Text style={[styles.hint, { color: theme.colors.textMuted }]}>
-          Максимум {PRODUCT_IMAGE_URLS_MAX} фото
-        </Text>
-      ) : null}
+      <ProductPhotoGrid
+        urls={form.imageUrls.filter(Boolean)}
+        onChange={(urls) => setForm((prev) => ({ ...prev, imageUrls: urls }))}
+        maxCount={PRODUCT_IMAGE_URLS_MAX}
+        disabled={disabled}
+      />
 
       {/* Video preview field */}
       <View style={styles.fieldLabel}>
@@ -1200,37 +1135,6 @@ const useStyles = createThemedStyles((theme) => ({
   },
   charAddButtonText: {
     fontSize: 14,
-    fontWeight: "600",
-  },
-
-  // ── Outline add button (dashed-style secondary action) ──
-
-  outlineButton: {
-    borderWidth: 1,
-    borderRadius: 10, // 0.65rem
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    alignItems: "center",
-  },
-  outlineButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
-  },
-
-  // ── Media slot ──
-
-  imageSlot: {
-    gap: 6,
-  },
-  removeImageButton: {
-    alignSelf: "flex-start",
-    borderWidth: 1,
-    borderRadius: 7,
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-  },
-  removeImageText: {
-    fontSize: 13,
     fontWeight: "600",
   },
 

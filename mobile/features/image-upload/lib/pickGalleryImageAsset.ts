@@ -27,3 +27,26 @@ export const pickGalleryImageAsset = async (): Promise<UploadImageFilePayload | 
 
   return prepareImageAssetForUpload(result.assets[0]);
 };
+
+export const pickGalleryImageAssets = async (
+  selectionLimit: number,
+): Promise<UploadImageFilePayload[]> => {
+  await ensureLibraryPermission();
+
+  const result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ["images"],
+    allowsEditing: false,
+    allowsMultipleSelection: true,
+    orderedSelection: true,
+    selectionLimit,
+    quality: 0.9,
+  });
+
+  if (result.canceled || result.assets.length === 0) {
+    return [];
+  }
+
+  return Promise.all(
+    result.assets.slice(0, selectionLimit).map((asset) => prepareImageAssetForUpload(asset)),
+  );
+};
