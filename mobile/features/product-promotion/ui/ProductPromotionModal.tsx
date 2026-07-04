@@ -415,14 +415,14 @@ export const ProductPromotionModal = ({
               <View style={styles.actions}>
                 <Pressable
                   style={({ pressed }) => [
-                    styles.secondaryButton,
+                    styles.cancelButton,
                     pressed && styles.buttonPressed,
                     isSubmitting && styles.buttonDisabled,
                   ]}
                   onPress={onClose}
                   disabled={isSubmitting}
                 >
-                  <Text style={styles.secondaryButtonText}>{PRODUCT_PROMOTION_UI.CANCEL}</Text>
+                  <Text style={styles.cancelButtonText}>{PRODUCT_PROMOTION_UI.CANCEL}</Text>
                 </Pressable>
                 <Pressable
                   style={({ pressed }) => [

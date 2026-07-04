@@ -55,6 +55,14 @@
   color: var(--iz-color-text-muted);
 }
 
+.my-sales-page__toolbar-meta-row {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+
 .my-sales-page__status-chips {
   display: flex;
   flex-wrap: wrap;

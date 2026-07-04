@@ -3,6 +3,8 @@ import { z } from "zod";
 /** Синхрон с `server/constants/userStoryConstants.js`. */
 export const USER_STORY_MEDIA_TYPES = ["image", "video"];
 export const USER_STORY_CAPTION_MAX_CHARS = 150;
+/** Синхрон с `server/constants/userStoryConstants.js`. */
+export const USER_STORY_VIDEO_MAX_DURATION_SEC = 30;
 export const USER_STORY_REPORT_RESOLUTION_DISMISS = "dismiss";
 export const USER_STORY_REPORT_RESOLUTION_HIDE = "hide";
 export const USER_STORY_REPORT_RESOLUTION_VALUES = [

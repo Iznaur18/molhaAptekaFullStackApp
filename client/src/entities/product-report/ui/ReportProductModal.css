@@ -106,8 +106,9 @@
 }
 
 .report-product-modal__cancel {
-  border: 1px solid var(--iz-color-border-strong);
-  background: var(--iz-color-surface);
+  border: 1px solid var(--iz-color-danger);
+  background: var(--iz-color-danger);
+  color: var(--iz-color-on-contrast);
 }
 
 .report-product-modal__submit {

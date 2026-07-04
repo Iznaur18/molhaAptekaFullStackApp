@@ -24,8 +24,9 @@ async function safeUnlink(filePath) {
 
 /**
  * @param {import('express').Multer.File} file
+ * @param {{ maxDurationSec?: number | null }} [options]
  */
-export async function prepareUploadedVideoFile(file) {
+export async function prepareUploadedVideoFile(file, options = {}) {
   if (!file) {
     throw new Error("Файл не передан");
   }
@@ -34,7 +35,7 @@ export async function prepareUploadedVideoFile(file) {
     return file;
   }
 
-  const transcodedBuffer = await transcodeUploadVideoToH264(file);
+  const transcodedBuffer = await transcodeUploadVideoToH264(file, options);
   const nextFilename = toMp4Filename(file.filename);
 
   if (file.path) {

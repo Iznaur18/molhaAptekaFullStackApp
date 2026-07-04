@@ -19,6 +19,8 @@ test("installment payments page mirrors web toolbar and compact contract card", 
   assert.match(page, /PAYMENTS_PAGE_TITLE/);
   assert.match(page, /ProfileMobileSectionToggle/);
   assert.match(page, /InstallmentPaymentsPageToolbar/);
+  assert.match(page, /InstallmentPaymentsOverview/);
+  assert.match(page, /collapsible/);
   assert.match(page, /ListHeaderComponent/);
   assert.match(page, /contentPaddingBottom/);
   assert.match(page, /compact/);
@@ -26,7 +28,8 @@ test("installment payments page mirrors web toolbar and compact contract card", 
   assert.match(page, /onProductClick/);
   assert.doesNotMatch(page, /useOrdersScreenStyles/);
 
-  assert.match(toolbar, /COUNT_CONTRACTS/);
+  assert.match(toolbar, /contractsCountLabel/);
+  assert.match(page, /COUNT_FILTERED/);
   assert.match(toolbar, /resolveInstallmentStatusFilterChipActiveColors/);
   assert.match(toolbar, /CONTRACT_STATUS_FILTER_LABEL/);
 

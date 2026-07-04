@@ -11,6 +11,8 @@ import {
   SellerPersonalCategoryModerationCampaignCard,
   type SellerPersonalCategoryModerationCampaign,
 } from "@/entities/seller-personal-category/ui/SellerPersonalCategoryModerationCampaignCard";
+import { filterPendingModerationCampaigns } from "@/features/intro-ad-moderation-page/lib/filterPendingModerationCampaigns";
+import { buildModerationCampaignRowId } from "@/features/intro-ad-moderation-page/lib/introAdModerationSectionFilters";
 import { ModerationSectionTitle } from "@/features/intro-ad-moderation-page/ui/ModerationSectionTitle";
 import { SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
@@ -19,10 +21,16 @@ import { sellerPersonalCategoryQueryKeys, staffBadgeQueryKeys } from "@/shared/a
 
 type SellerPersonalCategoryCampaignModerationSectionProps = {
   onActionError?: (message: string) => void;
+  attentionOnly?: boolean;
+  expandedIds?: Set<string>;
+  onToggleExpanded?: (rowId: string) => void;
 };
 
 export const SellerPersonalCategoryCampaignModerationSection = ({
   onActionError,
+  attentionOnly = false,
+  expandedIds = new Set(),
+  onToggleExpanded,
 }: SellerPersonalCategoryCampaignModerationSectionProps) => {
   const styles = useIntroAdModerationPageStyles();
   const queryClient = useQueryClient();
@@ -33,6 +41,7 @@ export const SellerPersonalCategoryCampaignModerationSection = ({
   const [cardErrors, setCardErrors] = useState<Record<string, string>>({});
 
   const campaigns = queueQuery.data ?? [];
+  const filteredCampaigns = filterPendingModerationCampaigns(campaigns, { attentionOnly });
 
   const handleApprove = useCallback(
     async (campaignId: string) => {
@@ -99,20 +108,28 @@ export const SellerPersonalCategoryCampaignModerationSection = ({
     return null;
   }
 
+  if (filteredCampaigns.length === 0) {
+    return null;
+  }
+
   return (
     <View style={styles.section}>
       <ModerationSectionTitle
         title={SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.PENDING_TITLE}
-        pendingCount={campaigns.length}
+        pendingCount={filteredCampaigns.length}
       />
       <View style={styles.list}>
-        {campaigns.map((campaign: SellerPersonalCategoryModerationCampaign) => {
+        {filteredCampaigns.map((campaign: SellerPersonalCategoryModerationCampaign) => {
           const campaignId = String(campaign._id);
+          const rowId = buildModerationCampaignRowId("personal", campaignId);
           return (
             <SellerPersonalCategoryModerationCampaignCard
               key={campaignId}
               campaign={campaign}
               isPending={pendingCampaignId === campaignId}
+              collapsible
+              expanded={expandedIds.has(rowId)}
+              onExpandedChange={() => onToggleExpanded?.(rowId)}
               rejectReason={rejectReasonById[campaignId] ?? ""}
               onRejectReasonChange={(value) =>
                 setRejectReasonById((prev) => ({ ...prev, [campaignId]: value }))

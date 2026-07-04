@@ -1,0 +1,60 @@
+.app-btn--cancel,
+.iz-cancel-btn,
+.product-card__delete-confirm-cancel,
+.my-profile-page__logout-cancel,
+.order-card__item-action-button_cancel,
+.report-product-modal__cancel,
+.edit-profile-modal__cancel,
+.product-reviews-section__cancel-edit,
+.admin-delete-user__btn_secondary,
+.product-price-offer__btn--cancel,
+.auction-dashboard-row__editor-cancel,
+.installment-queue-card__btn_cancel {
+  border: 1px solid var(--iz-color-danger);
+  background: var(--iz-color-danger);
+  color: var(--iz-color-on-contrast);
+}
+
+.app-btn--cancel:hover:not(:disabled),
+.iz-cancel-btn:hover:not(:disabled),
+.product-card__delete-confirm-cancel:hover:not(:disabled),
+.my-profile-page__logout-cancel:hover:not(:disabled),
+.order-card__item-action-button_cancel:hover:not(:disabled),
+.report-product-modal__cancel:hover:not(:disabled),
+.edit-profile-modal__cancel:hover:not(:disabled),
+.product-reviews-section__cancel-edit:hover:not(:disabled),
+.admin-delete-user__btn_secondary:hover:not(:disabled),
+.product-price-offer__btn--cancel:hover:not(:disabled),
+.auction-dashboard-row__editor-cancel:hover:not(:disabled),
+.installment-queue-card__btn_cancel:hover:not(:disabled) {
+  border-color: var(--iz-color-danger-strong);
+  background: var(--iz-color-danger-strong);
+}
+
+.app-btn--cancel:disabled,
+.iz-cancel-btn:disabled,
+.product-card__delete-confirm-cancel:disabled,
+.my-profile-page__logout-cancel:disabled,
+.order-card__item-action-button_cancel:disabled,
+.report-product-modal__cancel:disabled,
+.edit-profile-modal__cancel:disabled,
+.product-reviews-section__cancel-edit:disabled,
+.admin-delete-user__btn_secondary:disabled,
+.product-price-offer__btn--cancel:disabled,
+.auction-dashboard-row__editor-cancel:disabled,
+.installment-queue-card__btn_cancel:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.auction-dashboard-row__editor-cancel {
+  align-self: flex-start;
+  margin: 0;
+  padding: 0.35rem 0.65rem;
+  border-radius: 0.4rem;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}

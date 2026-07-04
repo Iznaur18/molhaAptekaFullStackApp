@@ -1,3 +1,8 @@
+import {
+  bidNeedsAttention,
+  resolveBuyerBidCollapsedPreview,
+} from "../lib/auctionDashboardAttention.js";
+
 import { useEffect, useState } from "react";
 
 import { addressValueFromUser } from "../../address/lib/addressValueFromUser.js";
@@ -33,6 +38,9 @@ import "./AuctionDashboard.css";
  *   isUserDataConfirmed?: boolean;
  *   onProductClick?: (productId: string) => void;
  *   onChanged?: () => void;
+ *   collapsible?: boolean;
+ *   expanded?: boolean;
+ *   onExpandedChange?: (expanded: boolean) => void;
  * }} props
  */
 export function AuctionBuyerBidRow({
@@ -40,6 +48,9 @@ export function AuctionBuyerBidRow({
   isUserDataConfirmed = false,
   onProductClick,
   onChanged,
+  collapsible = false,
+  expanded = true,
+  onExpandedChange,
 }) {
   const [priceInput, setPriceInput] = useState(() =>
     formatIntegerGroupRu(bid.offerPrice ?? ""),
@@ -58,6 +69,13 @@ export function AuctionBuyerBidRow({
   const imageUrl = bid.product?.productImageUrl ?? null;
   const isPending = bid.status === PRICE_OFFER_STATUS_PENDING;
   const isAccepted = bid.status === PRICE_OFFER_STATUS_ACCEPTED;
+  const isExpanded = !collapsible || expanded;
+  const needsAttention = bidNeedsAttention(bid);
+  const collapsedPreview = !isExpanded ? resolveBuyerBidCollapsedPreview(bid) : null;
+
+  const toggleExpanded = () => {
+    onExpandedChange?.(!expanded);
+  };
 
   useEffect(() => {
     setPriceInput(formatIntegerGroupRu(bid.offerPrice ?? ""));
@@ -124,7 +142,14 @@ export function AuctionBuyerBidRow({
   };
 
   return (
-    <article className="auction-dashboard-row">
+    <article
+      className={[
+        "auction-dashboard-row",
+        needsAttention ? "auction-dashboard-row_attention" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
       <div className="auction-dashboard-row__head">
         {imageUrl ? (
           <img
@@ -139,32 +164,59 @@ export function AuctionBuyerBidRow({
           </span>
         )}
         <div className="auction-dashboard-row__main">
-          {typeof onProductClick === "function" ? (
-            <button
-              type="button"
-              className="auction-dashboard-row__title"
-              onClick={() => onProductClick(bid.productId)}
-            >
-              {productName}
-            </button>
-          ) : (
-            <p className="auction-dashboard-row__title_static">{productName}</p>
-          )}
-          <p className="auction-dashboard-row__meta">
-            {formatIsoDateTime(bid.createdAt)}
-          </p>
-          <AuctionDashboardRowStatus isPending={isPending} isAccepted={isAccepted}>
-            {isPending
-              ? PRODUCT_PRICE_OFFER_UI.STATUS_PENDING
-              : isAccepted && !showPay
-                ? PRODUCT_PRICE_OFFER_UI.STATUS_ACCEPTED
-                : null}
-          </AuctionDashboardRowStatus>
-          {isAccepted && bid.paymentDeadlineAt ? (
-            <p className="auction-dashboard-row__meta">
-              {AUCTION_PAGE_UI.PAY_DEADLINE_LABEL}:{" "}
-              {formatIsoDateTime(bid.paymentDeadlineAt)}
-            </p>
+          <div className="auction-dashboard-row__head-line">
+            {typeof onProductClick === "function" ? (
+              <button
+                type="button"
+                className="auction-dashboard-row__title"
+                onClick={() => onProductClick(bid.productId)}
+              >
+                {productName}
+              </button>
+            ) : (
+              <p className="auction-dashboard-row__title_static">{productName}</p>
+            )}
+            {collapsible ? (
+              <button
+                type="button"
+                className="auction-dashboard-row__chevron-btn"
+                aria-expanded={isExpanded}
+                aria-label={AUCTION_PAGE_UI.EXPAND_TOGGLE(isExpanded)}
+                onClick={toggleExpanded}
+              >
+                <span
+                  className={[
+                    "auction-dashboard-row__chevron",
+                    isExpanded ? "auction-dashboard-row__chevron_expanded" : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  aria-hidden="true"
+                >
+                  ▸
+                </span>
+              </button>
+            ) : null}
+          </div>
+          {isExpanded ? (
+            <>
+              <p className="auction-dashboard-row__meta">
+                {formatIsoDateTime(bid.createdAt)}
+              </p>
+              <AuctionDashboardRowStatus isPending={isPending} isAccepted={isAccepted}>
+                {isPending
+                  ? PRODUCT_PRICE_OFFER_UI.STATUS_PENDING
+                  : isAccepted && !showPay
+                    ? PRODUCT_PRICE_OFFER_UI.STATUS_ACCEPTED
+                    : null}
+              </AuctionDashboardRowStatus>
+              {isAccepted && bid.paymentDeadlineAt ? (
+                <p className="auction-dashboard-row__meta">
+                  {AUCTION_PAGE_UI.PAY_DEADLINE_LABEL}:{" "}
+                  {formatIsoDateTime(bid.paymentDeadlineAt)}
+                </p>
+              ) : null}
+            </>
           ) : null}
         </div>
       </div>
@@ -176,46 +228,54 @@ export function AuctionBuyerBidRow({
         <span className="auction-dashboard-row__price">{formatPriceRub(bid.offerPrice)}</span>
       </div>
 
-      {isPending && isUserDataConfirmed ? (
-        <AuctionDashboardBuyerPriceEditor
-          label={AUCTION_PAGE_UI.EDIT_PRICE_LABEL}
-          value={priceInput}
-          onChange={(next) => setPriceInput(formatRubPriceInput(next))}
-          onSubmit={() => void handleUpdate()}
-          onCancel={() => void handleCancel()}
-          disabled={isBusy}
-          submitLabel={PRODUCT_PRICE_OFFER_UI.UPDATE}
-          cancelLabel={PRODUCT_PRICE_OFFER_UI.CANCEL}
-          pendingLabel={PRODUCT_PRICE_OFFER_UI.ACTION_PENDING}
-        />
+      {collapsedPreview ? (
+        <p className="auction-dashboard-row__preview">{collapsedPreview}</p>
       ) : null}
 
-      {isAccepted && !showPay ? (
-        <button
-          type="button"
-          className="auction-dashboard-row__cta"
-          onClick={() => setShowPay(true)}
-        >
-          {PRODUCT_PRICE_OFFER_UI.PAY_BUTTON}
-        </button>
-      ) : null}
+      {isExpanded ? (
+        <>
+          {isPending && isUserDataConfirmed ? (
+            <AuctionDashboardBuyerPriceEditor
+              label={AUCTION_PAGE_UI.EDIT_PRICE_LABEL}
+              value={priceInput}
+              onChange={(next) => setPriceInput(formatRubPriceInput(next))}
+              onSubmit={() => void handleUpdate()}
+              onCancel={() => void handleCancel()}
+              disabled={isBusy}
+              submitLabel={PRODUCT_PRICE_OFFER_UI.UPDATE}
+              cancelLabel={PRODUCT_PRICE_OFFER_UI.CANCEL}
+              pendingLabel={PRODUCT_PRICE_OFFER_UI.ACTION_PENDING}
+            />
+          ) : null}
 
-      {isAccepted && showPay ? (
-        <div className="auction-dashboard-row__checkout">
-          <CheckoutForm
-            defaultDeliveryAddress={defaultAddress}
-            isSubmitting={isPaying}
-            submitError={payError}
-            submitSuccess={paySuccess}
-            onSubmit={handlePay}
-          />
-        </div>
-      ) : null}
+          {isAccepted && !showPay ? (
+            <button
+              type="button"
+              className="auction-dashboard-row__cta"
+              onClick={() => setShowPay(true)}
+            >
+              {PRODUCT_PRICE_OFFER_UI.PAY_BUTTON}
+            </button>
+          ) : null}
 
-      {error ? (
-        <p className="auction-dashboard-row__error" role="alert">
-          {error}
-        </p>
+          {isAccepted && showPay ? (
+            <div className="auction-dashboard-row__checkout">
+              <CheckoutForm
+                defaultDeliveryAddress={defaultAddress}
+                isSubmitting={isPaying}
+                submitError={payError}
+                submitSuccess={paySuccess}
+                onSubmit={handlePay}
+              />
+            </div>
+          ) : null}
+
+          {error ? (
+            <p className="auction-dashboard-row__error" role="alert">
+              {error}
+            </p>
+          ) : null}
+        </>
       ) : null}
     </article>
   );

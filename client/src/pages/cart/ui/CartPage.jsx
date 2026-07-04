@@ -191,14 +191,16 @@ export function CartPage({
       </div>
 
       {isAuthorized ? (
-        <CheckoutForm
-          defaultDeliveryAddress={defaultAddress}
-          isSubmitting={submitState.isSubmitting}
-          submitError={submitState.error}
-          submitSuccess={submitState.success}
-          onSubmit={handleCheckoutSubmit}
-          isDisabled={!canCheckout}
-        />
+        <div className="cart-page__checkout-zone">
+          <CheckoutForm
+            defaultDeliveryAddress={defaultAddress}
+            isSubmitting={submitState.isSubmitting}
+            submitError={submitState.error}
+            submitSuccess={submitState.success}
+            onSubmit={handleCheckoutSubmit}
+            isDisabled={!canCheckout}
+          />
+        </div>
       ) : (
         <div className="cart-page__auth-wall">
           <p>{CART_PAGE_UI.AUTH_REQUIRED}</p>

@@ -6,8 +6,17 @@ import {
   ORDER_STATUS_LABEL_RU,
 } from "../model/constants.js";
 import {
+  orderNeedsBuyerAttention,
+  resolveOrderCollapsedPreview,
+} from "../lib/orderNeedsBuyerAttention.js";
+import {
+  orderNeedsSellerAttention,
+  resolveSellerOrderCollapsedPreview,
+} from "../lib/orderNeedsSellerAttention.js";
+import {
   COMMON_UI,
   INSTALLMENT_UI,
+  MY_ORDERS_PAGE_UI,
   ORDER_CARD_UI,
   PRODUCT_CARD_UI,
 } from "../../../shared/config/appUiCopy.js";
@@ -317,6 +326,10 @@ function OrderCardLineItem({
  *   itemActionErrors?: Record<string, string>;
  *   onBuyerNameClick?: (userId: string) => void;
  *   compact?: boolean;
+ *   collapsible?: boolean;
+ *   expanded?: boolean;
+ *   onExpandedChange?: (expanded: boolean) => void;
+ *   attentionRole?: "buyer" | "seller";
  * }} props
  */
 export function OrderCard({
@@ -332,9 +345,27 @@ export function OrderCard({
   pendingActionKey = null,
   itemActionErrors = {},
   onBuyerNameClick,
+  collapsible = false,
+  expanded = true,
+  onExpandedChange,
+  attentionRole = "buyer",
 }) {
   const isInstallmentOrder = Boolean(order.installmentContractId);
   const isAuctionOrder = Boolean(order.priceOfferId);
+  const isExpanded = !collapsible || expanded;
+  const needsAttention =
+    attentionRole === "seller"
+      ? orderNeedsSellerAttention(order)
+      : orderNeedsBuyerAttention(order);
+  const collapsedPreview = !isExpanded
+    ? attentionRole === "seller"
+      ? resolveSellerOrderCollapsedPreview(order)
+      : resolveOrderCollapsedPreview(order)
+    : null;
+
+  const toggleExpanded = () => {
+    onExpandedChange?.(!expanded);
+  };
 
   const lineItemProps = {
     orderId: order._id,
@@ -351,69 +382,104 @@ export function OrderCard({
 
   return (
     <article
-      className={["order-card", compact ? "order-card--compact" : ""]
+      className={[
+        "order-card",
+        compact ? "order-card--compact" : "",
+        needsAttention ? "order-card_attention" : "",
+      ]
         .filter(Boolean)
         .join(" ")}
     >
       <header className="order-card__header">
-        <div className="order-card__header-badges">
-          <span className={`order-card__status order-card__status_${order.status}`}>
-            {formatStatus(order.status)}
-          </span>
-          {isAuctionOrder ? (
-            <span className="order-card__auction-badge">{PRODUCT_CARD_UI.AUCTION_BADGE}</span>
-          ) : null}
-          {isInstallmentOrder ? (
-            <span className="order-card__installment-badge">{INSTALLMENT_UI.BADGE}</span>
+        <div className="order-card__header-main">
+          <div className="order-card__header-badges">
+            <span className={`order-card__status order-card__status_${order.status}`}>
+              {formatStatus(order.status)}
+            </span>
+            {isAuctionOrder ? (
+              <span className="order-card__auction-badge">{PRODUCT_CARD_UI.AUCTION_BADGE}</span>
+            ) : null}
+            {isInstallmentOrder ? (
+              <span className="order-card__installment-badge">{INSTALLMENT_UI.BADGE}</span>
+            ) : null}
+          </div>
+          {collapsible ? (
+            <button
+              type="button"
+              className="order-card__chevron-button"
+              aria-label={MY_ORDERS_PAGE_UI.EXPAND_TOGGLE(isExpanded)}
+              aria-expanded={isExpanded}
+              onClick={toggleExpanded}
+            >
+              <span
+                className={[
+                  "order-card__chevron",
+                  isExpanded ? "order-card__chevron_expanded" : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                aria-hidden="true"
+              >
+                ▸
+              </span>
+            </button>
           ) : null}
         </div>
         <span className="order-card__total">{formatPriceRub(order.totalAmount)}</span>
       </header>
 
-      {compact ? null : (
-        <OrderCardMeta
-          order={order}
-          showBuyer={showBuyer}
-          onBuyerNameClick={onBuyerNameClick}
-          isInstallmentOrder={isInstallmentOrder}
-        />
-      )}
+      {collapsedPreview ? (
+        <p className="order-card__collapsed-preview">{collapsedPreview}</p>
+      ) : null}
 
-      <h3 className="order-card__items-heading">{ORDER_CARD_UI.ITEMS_HEADING}</h3>
-      <ul className="order-card__items" role="list">
-        {order.items.map((item, index) => (
-          <OrderCardLineItem
-            key={`${order._id}-${index}`}
-            item={item}
-            index={index}
-            {...lineItemProps}
-          />
-        ))}
-      </ul>
-
-      {compact ? (
-        <details className="order-card__details-fold">
-          <summary className="order-card__details-fold-summary">
-            {ORDER_CARD_UI.DETAILS_FOLD_SUMMARY}
-          </summary>
-          <div className="order-card__details-fold-body">
+      {isExpanded ? (
+        <>
+          {compact ? null : (
             <OrderCardMeta
               order={order}
               showBuyer={showBuyer}
               onBuyerNameClick={onBuyerNameClick}
               isInstallmentOrder={isInstallmentOrder}
             />
+          )}
+
+          <h3 className="order-card__items-heading">{ORDER_CARD_UI.ITEMS_HEADING}</h3>
+          <ul className="order-card__items" role="list">
             {order.items.map((item, index) => (
               <OrderCardLineItem
-                key={`${order._id}-extras-${index}`}
+                key={`${order._id}-${index}`}
                 item={item}
                 index={index}
-                showSecondaryOnly
                 {...lineItemProps}
               />
             ))}
-          </div>
-        </details>
+          </ul>
+
+          {compact ? (
+            <details className="order-card__details-fold">
+              <summary className="order-card__details-fold-summary">
+                {ORDER_CARD_UI.DETAILS_FOLD_SUMMARY}
+              </summary>
+              <div className="order-card__details-fold-body">
+                <OrderCardMeta
+                  order={order}
+                  showBuyer={showBuyer}
+                  onBuyerNameClick={onBuyerNameClick}
+                  isInstallmentOrder={isInstallmentOrder}
+                />
+                {order.items.map((item, index) => (
+                  <OrderCardLineItem
+                    key={`${order._id}-extras-${index}`}
+                    item={item}
+                    index={index}
+                    showSecondaryOnly
+                    {...lineItemProps}
+                  />
+                ))}
+              </div>
+            </details>
+          ) : null}
+        </>
       ) : null}
 
       {statusSlot ? <footer className="order-card__footer">{statusSlot}</footer> : null}

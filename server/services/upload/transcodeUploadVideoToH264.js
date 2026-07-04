@@ -26,13 +26,33 @@ function resolveFfmpegBinaryPath() {
 /**
  * @param {string} inputPath
  * @param {string} outputPath
+ * @param {{ maxDurationSec?: number | null, maxVideoBitrateMbit?: number | null }} [options]
  */
-function runFfmpegTranscode(inputPath, outputPath) {
+function runFfmpegTranscode(inputPath, outputPath, options = {}) {
   return new Promise((resolve, reject) => {
+    const maxDurationSec = Number(options.maxDurationSec);
+    const trimArgs =
+      Number.isFinite(maxDurationSec) && maxDurationSec > 0
+        ? ["-t", String(maxDurationSec)]
+        : [];
+
+    const maxVideoBitrateMbit = Number(options.maxVideoBitrateMbit);
+    const bitrateArgs =
+      Number.isFinite(maxVideoBitrateMbit) && maxVideoBitrateMbit > 0
+        ? [
+            "-maxrate",
+            `${maxVideoBitrateMbit}M`,
+            "-bufsize",
+            `${maxVideoBitrateMbit * 2}M`,
+          ]
+        : [];
+
     const args = [
       "-y",
       "-i",
       inputPath,
+      ...trimArgs,
+      ...bitrateArgs,
       "-c:v",
       "libx264",
       "-profile:v",
@@ -95,11 +115,14 @@ async function safeUnlink(filePath) {
 
 /**
  * Конвертирует iPhone HEVC/MOV и прочие форматы в H.264 MP4 для Chrome/Firefox.
+ * При `options.maxDurationSec` дополнительно обрезает видео до указанной длины,
+ * при `options.maxVideoBitrateMbit` ограничивает пиковый видеобитрейт.
  *
  * @param {import('express').Multer.File} file
+ * @param {{ maxDurationSec?: number | null, maxVideoBitrateMbit?: number | null }} [options]
  * @returns {Promise<Buffer>}
  */
-export async function transcodeUploadVideoToH264(file) {
+export async function transcodeUploadVideoToH264(file, options = {}) {
   const ownsInput =
     !file.path && Buffer.isBuffer(file.buffer) && file.buffer.length > 0;
   const inputPath =
@@ -108,7 +131,7 @@ export async function transcodeUploadVideoToH264(file) {
   const outputPath = path.join(tmpdir(), `${randomUUID()}.mp4`);
 
   try {
-    await runFfmpegTranscode(inputPath, outputPath);
+    await runFfmpegTranscode(inputPath, outputPath, options);
     return await readFile(outputPath);
   } finally {
     if (ownsInput) {

@@ -4,7 +4,6 @@ import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Switch,
@@ -12,12 +11,14 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useCreateProductMutation } from "@/entities/product/model/useCreateProductMutation";
 import { validateProductName } from "@/entities/product/lib/validateProductName";
 import { ImageUrlUploadField } from "@/features/image-upload/ui/ImageUrlUploadField";
 import { CreateProductCategoryPicker } from "@/features/create-product/ui/CreateProductCategoryPicker";
 import { CREATE_PRODUCT_UI } from "@/shared/config";
+import { textInputFocusScrollProps } from "@/shared/lib/scrollTextInputIntoViewOnFocus";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
@@ -201,6 +202,7 @@ export const CreateProductScreen = () => {
   const router = useRouter();
   const theme = useAppTheme();
   const styles = useStyles();
+  const insets = useSafeAreaInsets();
   const createMutation = useCreateProductMutation();
 
   const [form, setForm] = useState<WizardForm>(INITIAL_FORM);
@@ -224,6 +226,14 @@ export const CreateProductScreen = () => {
     setStepError("");
     setStepIndex((i) => Math.max(i - 1, 0));
   }, []);
+
+  const handleCancel = useCallback(() => {
+    if (router.canGoBack()) {
+      router.back();
+      return;
+    }
+    router.replace("/(tabs)");
+  }, [router]);
 
   const goToStep = useCallback((index: number) => {
     setStepError("");
@@ -276,27 +286,16 @@ export const CreateProductScreen = () => {
   };
 
   return (
-    <SafeAreaView style={[styles.root, { backgroundColor: theme.colors.bg }]}>
-
-      {/* ── Header ── */}
-      <View style={[styles.header, { borderBottomColor: theme.colors.border, backgroundColor: theme.colors.surface }]}>
-        <Text style={[styles.headerTitle, { color: theme.colors.text }]}>
-          {CREATE_PRODUCT_UI.TITLE}
-        </Text>
-        <Pressable
-          style={({ pressed }) => [styles.closeButton, pressed && { opacity: 0.6 }]}
-          onPress={() => router.replace("/(tabs)")}
-          hitSlop={8}
-        >
-          <Text style={[styles.closeButtonText, { color: theme.colors.textSecondary }]}>✕</Text>
-        </Pressable>
-      </View>
-
-      {/* ── Scrollable body ── */}
+    <SafeAreaView
+      edges={["top"]}
+      style={[styles.root, { backgroundColor: theme.colors.bg }]}
+    >
       <ScrollView
         style={[styles.body, { backgroundColor: theme.colors.bg }]}
-        contentContainerStyle={styles.bodyContent}
+        contentContainerStyle={[styles.bodyContent, { flexGrow: 1 }]}
         keyboardShouldPersistTaps="handled"
+        automaticallyAdjustKeyboardInsets
+        automaticallyAdjustsScrollIndicatorInsets
       >
         {/* Progress card — mirrors .product-wizard-progress */}
         <WizardProgress
@@ -346,16 +345,18 @@ export const CreateProductScreen = () => {
             </Text>
           </View>
         ) : null}
-      </ScrollView>
 
-      {/* ── Footer — mirrors .create-product-wizard__footer ── */}
-      <View style={[
-        styles.footer,
-        {
-          borderTopColor: theme.colors.border + "cc", // 80%
-          backgroundColor: theme.colors.surfaceMuted,
-        },
-      ]}>
+        <View style={styles.footerSpacer} />
+
+        {/* ── Footer — scrolls with content (not pinned above keyboard) ── */}
+        <View style={[
+          styles.footer,
+          {
+            borderTopColor: theme.colors.border + "cc", // 80%
+            backgroundColor: theme.colors.surfaceMuted,
+            paddingBottom: insets.bottom,
+          },
+        ]}>
         {!isFirstStep ? (
           <Pressable
             style={({ pressed }) => [
@@ -372,8 +373,23 @@ export const CreateProductScreen = () => {
             </Text>
           </Pressable>
         ) : (
-          /* Placeholder to keep layout grid */
-          <View style={[styles.backButton, { opacity: 0 }]} pointerEvents="none" />
+          <Pressable
+            style={({ pressed }) => [
+              styles.backButton,
+              {
+                borderColor: theme.colors.danger + "59",
+                backgroundColor: theme.colors.surface,
+              },
+              pressed && styles.buttonPressed,
+              isSubmitting && styles.buttonDisabled,
+            ]}
+            onPress={handleCancel}
+            disabled={isSubmitting}
+          >
+            <Text style={[styles.backButtonText, { color: theme.colors.danger }]}>
+              {CREATE_PRODUCT_UI.CANCEL}
+            </Text>
+          </Pressable>
         )}
 
         <Pressable
@@ -398,7 +414,8 @@ export const CreateProductScreen = () => {
             </Text>
           )}
         </Pressable>
-      </View>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -571,6 +588,7 @@ function BasicStep({ form, setForm, disabled, theme, styles }: StepProps) {
           <Text style={{ color: theme.colors.danger }}>*</Text>
         </Text>
         <TextInput
+          {...textInputFocusScrollProps}
           style={[styles.input, { color: theme.colors.text, backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
           value={form.productName}
           onChangeText={(text) => setForm((prev) => ({ ...prev, productName: text }))}
@@ -589,6 +607,7 @@ function BasicStep({ form, setForm, disabled, theme, styles }: StepProps) {
           <Text style={{ color: theme.colors.danger }}>*</Text>
         </Text>
         <TextInput
+          {...textInputFocusScrollProps}
           style={[styles.input, styles.textarea, { color: theme.colors.text, backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
           value={form.productDescription}
           onChangeText={(text) => setForm((prev) => ({ ...prev, productDescription: text }))}
@@ -609,8 +628,18 @@ function BasicStep({ form, setForm, disabled, theme, styles }: StepProps) {
       <View style={styles.fieldLabel}>
         <Text style={[styles.label, { color: theme.colors.text }]}>Характеристики</Text>
         {form.characteristicRows.map((row) => (
-          <View key={row.id} style={styles.charRow}>
+          <View
+            key={row.id}
+            style={[
+              styles.charRow,
+              {
+                borderColor: `${theme.colors.border}cc`,
+                backgroundColor: theme.colors.surfaceElevated,
+              },
+            ]}
+          >
             <TextInput
+              {...textInputFocusScrollProps}
               style={[styles.charInput, { color: theme.colors.text, backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
               value={row.key}
               onChangeText={(text) => updateCharRow(row.id, "key", text)}
@@ -620,6 +649,7 @@ function BasicStep({ form, setForm, disabled, theme, styles }: StepProps) {
               maxLength={50}
             />
             <TextInput
+              {...textInputFocusScrollProps}
               style={[styles.charInput, styles.charInputValue, { color: theme.colors.text, backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
               value={row.value}
               onChangeText={(text) => updateCharRow(row.id, "value", text)}
@@ -639,11 +669,17 @@ function BasicStep({ form, setForm, disabled, theme, styles }: StepProps) {
         ))}
         {form.characteristicRows.length < CHARACTERISTICS_MAX ? (
           <Pressable
-            style={[styles.outlineButton, { borderColor: theme.colors.border + "d9" }]}
+            style={({ pressed }) => [
+              styles.charAddButton,
+              {
+                borderColor: pressed ? theme.colors.action : theme.colors.actionBorder,
+                backgroundColor: pressed ? theme.colors.actionSoft : theme.colors.actionSurface,
+              },
+            ]}
             onPress={addCharRow}
             disabled={disabled}
           >
-            <Text style={[styles.outlineButtonText, { color: theme.colors.text }]}>
+            <Text style={[styles.charAddButtonText, { color: theme.colors.action }]}>
               + Добавить характеристику
             </Text>
           </Pressable>
@@ -745,6 +781,7 @@ function MediaStep({ form, setForm, disabled, theme, styles }: StepProps) {
           URL загруженного короткого видео (до 3 сек). При указании видео нужно хотя бы одно фото.
         </Text>
         <TextInput
+          {...textInputFocusScrollProps}
           style={[styles.input, { color: theme.colors.text, backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
           value={form.productPreviewVideoUrl}
           onChangeText={(text) =>
@@ -788,6 +825,7 @@ function CategoryStep({ form, setForm, disabled, theme, styles }: StepProps) {
       <View style={styles.fieldLabel}>
         <Text style={[styles.label, { color: theme.colors.text }]}>Город продажи</Text>
         <TextInput
+          {...textInputFocusScrollProps}
           style={[styles.input, { color: theme.colors.text, backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
           value={form.productSaleCity}
           onChangeText={(text) => setForm((prev) => ({ ...prev, productSaleCity: text }))}
@@ -825,6 +863,7 @@ function CommerceStep({ form, setForm, disabled, theme, styles }: StepProps) {
             <Text style={{ color: theme.colors.danger }}>*</Text>
           </Text>
           <TextInput
+            {...textInputFocusScrollProps}
             style={[styles.input, styles.priceInput, { color: theme.colors.text, backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
             value={form.productPrice}
             onChangeText={(text) =>
@@ -839,6 +878,7 @@ function CommerceStep({ form, setForm, disabled, theme, styles }: StepProps) {
         <View style={[styles.fieldLabel, styles.priceCol]}>
           <Text style={[styles.label, { color: theme.colors.text }]}>Старая цена, ₽</Text>
           <TextInput
+            {...textInputFocusScrollProps}
             style={[styles.input, styles.priceInput, { color: theme.colors.text, backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
             value={form.productOldPrice}
             onChangeText={(text) =>
@@ -890,6 +930,7 @@ function CommerceStep({ form, setForm, disabled, theme, styles }: StepProps) {
             <Text style={{ color: theme.colors.danger }}>*</Text>
           </Text>
           <TextInput
+            {...textInputFocusScrollProps}
             style={[styles.input, { color: theme.colors.text, backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
             value={form.productStockQuantity}
             onChangeText={(text) =>
@@ -908,6 +949,7 @@ function CommerceStep({ form, setForm, disabled, theme, styles }: StepProps) {
           Бонусные баллы за шт.
         </Text>
         <TextInput
+          {...textInputFocusScrollProps}
           style={[styles.input, { color: theme.colors.text, backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
           value={form.loyaltyPointsPerUnit}
           onChangeText={(text) =>
@@ -1030,42 +1072,18 @@ const useStyles = createThemedStyles((theme) => ({
     flex: 1,
   },
 
-  // Header — mirrors .product-modal-shell__header
-  header: {
-    flexShrink: 0,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    backgroundColor: theme.colors.surface,
-  },
-  headerTitle: {
-    flex: 1,
-    fontSize: 17,
-    fontWeight: "700",
-    textAlign: "center",
-  },
-  closeButton: {
-    width: 32,
-    height: 32,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 16,
-  },
-  closeButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-  },
-
   // Body — mirrors .create-product-wizard__body
   body: {
     flex: 1,
   },
   bodyContent: {
-    padding: 20, // 1.25rem
-    paddingBottom: 32,
+    paddingHorizontal: 20, // 1.25rem
+    paddingTop: 20,
     gap: 16, // 1rem
+  },
+  footerSpacer: {
+    flexGrow: 1,
+    minHeight: 16,
   },
 
   // Step headline — mirrors .product-wizard-step-headline
@@ -1141,8 +1159,12 @@ const useStyles = createThemedStyles((theme) => ({
 
   charRow: {
     flexDirection: "row",
-    gap: 6,
+    gap: 8,
     alignItems: "center",
+    paddingVertical: 9,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderRadius: 10,
   },
   charInput: {
     flex: 1,
@@ -1166,6 +1188,19 @@ const useStyles = createThemedStyles((theme) => ({
   charRemoveText: {
     fontSize: 13,
     fontWeight: "700",
+  },
+  charAddButton: {
+    alignSelf: "flex-start",
+    borderWidth: 1,
+    borderStyle: "dashed",
+    borderRadius: 9,
+    paddingVertical: 7,
+    paddingHorizontal: 14,
+    alignItems: "center",
+  },
+  charAddButtonText: {
+    fontSize: 14,
+    fontWeight: "600",
   },
 
   // ── Outline add button (dashed-style secondary action) ──
@@ -1293,12 +1328,11 @@ const useStyles = createThemedStyles((theme) => ({
   // ── Footer — mirrors .create-product-wizard__footer ──
 
   footer: {
-    flexShrink: 0,
     flexDirection: "row",
     gap: 10, // 0.65rem
+    marginHorizontal: -20, // bleed to screen edges inside body padding
     paddingHorizontal: 20, // 1.25rem
     paddingTop: 12, // ~var(--iz-space-3)
-    paddingBottom: 20, // safe-area fallback
     borderTopWidth: 1,
   },
 

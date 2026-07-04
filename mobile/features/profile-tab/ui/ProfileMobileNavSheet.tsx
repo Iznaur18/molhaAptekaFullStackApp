@@ -162,7 +162,7 @@ export const ProfileMobileNavSheet = ({
                       />
                       <AppButton
                         label={MY_PROFILE_PAGE_UI.LOGOUT_CANCEL}
-                        variant="ghost"
+                        variant="cancel"
                         onPress={() => setLogoutConfirmOpen(false)}
                       />
                     </View>

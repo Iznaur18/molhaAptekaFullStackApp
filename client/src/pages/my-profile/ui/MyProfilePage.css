@@ -555,13 +555,14 @@
 }
 
 .my-profile-page__logout-cancel {
-  border: 1px solid color-mix(in srgb, var(--iz-color-canvas-text) 20%, transparent);
-  background: transparent;
-  color: inherit;
+  border: 1px solid var(--iz-color-danger);
+  background: var(--iz-color-danger);
+  color: var(--iz-color-on-contrast);
 }
 
-.my-profile-page__logout-cancel:hover {
-  background: color-mix(in srgb, var(--iz-color-canvas-text) 6%, transparent);
+.my-profile-page__logout-cancel:hover:not(:disabled) {
+  border-color: var(--iz-color-danger-strong);
+  background: var(--iz-color-danger-strong);
 }
 
 .my-profile-page__mobile-nav-toggle,

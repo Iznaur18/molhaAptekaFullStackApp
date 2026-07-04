@@ -121,7 +121,7 @@ export const PersonalCategoryAdvertisingSection = ({
       <View style={styles.cardHead}>
         <Text style={styles.cardTitle}>{SELLER_PERSONAL_CATEGORY_PAGE_UI.SECTION_TITLE}</Text>
         {selectedDuration ? (
-          <Text style={[styles.cardBadge, styles.cardBadgeCategory]}>{selectedDuration.title}</Text>
+          <Text style={styles.cardBadge}>{selectedDuration.title}</Text>
         ) : null}
       </View>
 
@@ -152,13 +152,13 @@ export const PersonalCategoryAdvertisingSection = ({
           ) : null}
           {canCancel ? (
             <Pressable
-              style={[styles.secondaryButton, isSubmitting && styles.secondaryButtonDisabled]}
+              style={[styles.cancelButton, isSubmitting && styles.cancelButtonDisabled]}
               onPress={() => {
                 void handleCancel();
               }}
               disabled={isSubmitting}
             >
-              <Text style={styles.secondaryButtonText}>
+              <Text style={styles.cancelButtonText}>
                 {SELLER_PERSONAL_CATEGORY_PAGE_UI.CANCEL}
               </Text>
             </Pressable>
@@ -222,11 +222,11 @@ export const PersonalCategoryAdvertisingSection = ({
 
             <View style={styles.actions}>
               <Pressable
-                style={[styles.secondaryButton, isSubmitting && styles.secondaryButtonDisabled]}
+                style={[styles.cancelButton, isSubmitting && styles.cancelButtonDisabled]}
                 onPress={() => setShowForm(false)}
                 disabled={isSubmitting}
               >
-                <Text style={styles.secondaryButtonText}>Отмена</Text>
+                <Text style={styles.cancelButtonText}>Отмена</Text>
               </Pressable>
               <Pressable
                 style={[

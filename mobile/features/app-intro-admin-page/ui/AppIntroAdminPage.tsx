@@ -4,8 +4,8 @@ import { useCallback, useState } from "react";
 import { Pressable, ScrollView, Switch, Text, TextInput, View } from "react-native";
 
 import { useAppIntroAdminPage } from "@/features/app-intro-admin-page/model/useAppIntroAdminPage";
+import { IntroVideoUploadField } from "@/features/image-upload/ui/IntroVideoUploadField";
 import { ImageUrlUploadField } from "@/features/image-upload/ui/ImageUrlUploadField";
-import { VideoUrlUploadField } from "@/features/image-upload/ui/VideoUrlUploadField";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import { APP_INTRO_ADMIN_PAGE_UI, MY_PROFILE_PAGE_UI } from "@/shared/config";
@@ -115,15 +115,12 @@ export const AppIntroAdminPage = () => {
           <View style={styles.fieldset} pointerEvents={isSaving ? "none" : "auto"}>
             <Text style={styles.legend}>{APP_INTRO_ADMIN_PAGE_UI.SECTION_MEDIA}</Text>
 
-            <View style={styles.field}>
-              <VideoUrlUploadField
-                label={APP_INTRO_ADMIN_PAGE_UI.LABEL_VIDEO}
-                value={form.videoMp4Url}
-                onChange={(value) => updateField("videoMp4Url", value)}
-                disabled={isSaving}
-              />
-              <Text style={styles.fieldHint}>{APP_INTRO_ADMIN_PAGE_UI.HINT_VIDEO}</Text>
-            </View>
+            <IntroVideoUploadField
+              label={APP_INTRO_ADMIN_PAGE_UI.LABEL_VIDEO}
+              value={form.videoMp4Url}
+              onChange={(value) => updateField("videoMp4Url", value)}
+              disabled={isSaving}
+            />
 
             <ImageUrlUploadField
               label={APP_INTRO_ADMIN_PAGE_UI.LABEL_POSTER}
@@ -156,43 +153,6 @@ export const AppIntroAdminPage = () => {
                 maxLength={200}
                 editable={!isSaving}
               />
-            </View>
-          </View>
-
-          <View style={styles.fieldset} pointerEvents={isSaving ? "none" : "auto"}>
-            <Text style={styles.legend}>{APP_INTRO_ADMIN_PAGE_UI.SECTION_TIMING}</Text>
-
-            <View style={styles.timingGrid}>
-              <View style={styles.timingField}>
-                <Text style={styles.fieldLabel}>{APP_INTRO_ADMIN_PAGE_UI.LABEL_MIN_MS}</Text>
-                <TextInput
-                  style={styles.fieldInput}
-                  value={form.minMs}
-                  onChangeText={(value) => updateField("minMs", value)}
-                  keyboardType="number-pad"
-                  editable={!isSaving}
-                />
-              </View>
-              <View style={styles.timingField}>
-                <Text style={styles.fieldLabel}>{APP_INTRO_ADMIN_PAGE_UI.LABEL_MAX_MS}</Text>
-                <TextInput
-                  style={styles.fieldInput}
-                  value={form.maxMs}
-                  onChangeText={(value) => updateField("maxMs", value)}
-                  keyboardType="number-pad"
-                  editable={!isSaving}
-                />
-              </View>
-              <View style={styles.timingField}>
-                <Text style={styles.fieldLabel}>{APP_INTRO_ADMIN_PAGE_UI.LABEL_FADE_MS}</Text>
-                <TextInput
-                  style={styles.fieldInput}
-                  value={form.fadeOutMs}
-                  onChangeText={(value) => updateField("fadeOutMs", value)}
-                  keyboardType="number-pad"
-                  editable={!isSaving}
-                />
-              </View>
             </View>
           </View>
 

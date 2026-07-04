@@ -48,6 +48,12 @@ export const useIntroAdModerationCampaignCardStyles = createThemedStyles((theme)
     borderColor: DANGER_STRONG,
     backgroundColor: theme.colors.surface,
   },
+  cancelButton: {
+    paddingVertical: 7.2,
+    paddingHorizontal: 13.6,
+    borderRadius: 8,
+    backgroundColor: theme.colors.danger,
+  },
   buttonDisabled: {
     opacity: 0.65,
   },
@@ -65,6 +71,11 @@ export const useIntroAdModerationCampaignCardStyles = createThemedStyles((theme)
     fontSize: 14,
     fontWeight: "500",
     color: DANGER_STRONG,
+  },
+  cancelButtonText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: theme.colors.onContrast,
   },
   rejectLabel: {
     gap: 6,

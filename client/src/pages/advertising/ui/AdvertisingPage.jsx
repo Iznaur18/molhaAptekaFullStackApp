@@ -16,7 +16,7 @@ import {
   INTRO_AD_PAGE_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { ImageUrlField } from "../../../shared/ui/ImageUrlField/ImageUrlField.jsx";
-import { VideoUrlField } from "../../../shared/ui/VideoUrlField/VideoUrlField.jsx";
+import { IntroVideoUploadField } from "../../../shared/ui/IntroVideoUploadField/IntroVideoUploadField.jsx";
 import {
   buildSubmitIntroAdCampaignBody,
   formToIntroAdPreviewSettings,
@@ -247,7 +247,7 @@ export function AdvertisingPage({ isAuthorized, onRequestLogin }) {
               {canCancel ? (
                 <button
                   type="button"
-                  className="app-btn app-btn--secondary"
+                  className="app-btn app-btn--cancel"
                   onClick={handleCancel}
                   disabled={isSubmitting}
                 >
@@ -271,16 +271,14 @@ export function AdvertisingPage({ isAuthorized, onRequestLogin }) {
             <div className="advertising-page__panel">
               <p className="advertising-page__panel-title">Заявка на intro</p>
               <form className="advertising-page__form" onSubmit={handleSubmit}>
-                <VideoUrlField
-                  label="MP4"
-                  value={form.videoMp4Url}
-                  onChange={(value) => updateField("videoMp4Url", value)}
-                />
-                <VideoUrlField
-                  label="WebM (необязательно)"
-                  value={form.videoWebmUrl}
-                  onChange={(value) => updateField("videoWebmUrl", value)}
-                />
+                <label className="advertising-page__field">
+                  Видео
+                  <IntroVideoUploadField
+                    value={form.videoMp4Url}
+                    onChange={(value) => updateField("videoMp4Url", value)}
+                    disabled={isSubmitting}
+                  />
+                </label>
                 <ImageUrlField
                   label="Poster"
                   value={form.posterUrl}

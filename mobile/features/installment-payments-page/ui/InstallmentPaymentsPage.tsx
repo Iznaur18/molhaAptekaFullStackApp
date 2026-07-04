@@ -1,13 +1,18 @@
 import { useFocusEffect } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
+import { contractNeedsBuyerAttention } from "@/entities/installment/lib/contractNeedsBuyerAttention";
+import { filterInstallmentBuyerContracts } from "@/entities/installment/lib/filterInstallmentBuyerContracts";
+import { summarizeInstallmentBuyerContracts } from "@/entities/installment/lib/summarizeInstallmentBuyerContracts";
 import { InstallmentContractCard } from "@/entities/installment/ui/InstallmentContractCard";
 import { useMyInstallmentContractsQuery } from "@/entities/installment/model/useMyInstallmentContractsQuery";
+import { INSTALLMENT_SALES_LIST_FILTER_IN_PROGRESS } from "@/entities/installment/model/constants";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
+import { InstallmentPaymentsOverview } from "@/features/installment-payments-page/ui/InstallmentPaymentsOverview";
 import { InstallmentPaymentsPageToolbar } from "@/features/installment-payments-page/ui/InstallmentPaymentsPageToolbar";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
@@ -26,10 +31,26 @@ export const InstallmentPaymentsPage = () => {
   const isAuthorized = useIsAuthorized();
   const [navSheetVisible, setNavSheetVisible] = useState(false);
   const [statusFilter, setStatusFilter] = useState("");
+  const [attentionOnly, setAttentionOnly] = useState(false);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set());
   const contractsQuery = useMyInstallmentContractsQuery({
-    status: statusFilter,
     enabled: isAuthorized,
   });
+
+  const allContracts = contractsQuery.data ?? [];
+  const summary = useMemo(
+    () => summarizeInstallmentBuyerContracts(allContracts),
+    [allContracts],
+  );
+  const contracts = useMemo(
+    () => filterInstallmentBuyerContracts(allContracts, { status: statusFilter, attentionOnly }),
+    [allContracts, statusFilter, attentionOnly],
+  );
+
+  const hasFilters = Boolean(statusFilter) || attentionOnly;
+  const countLabel = hasFilters
+    ? INSTALLMENT_UI.COUNT_FILTERED(contracts.length, allContracts.length)
+    : INSTALLMENT_UI.COUNT_CONTRACTS(allContracts.length);
 
   useFocusEffect(
     useCallback(() => {
@@ -38,6 +59,18 @@ export const InstallmentPaymentsPage = () => {
       }
     }, [isAuthorized, contractsQuery.refetch]),
   );
+
+  useEffect(() => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      for (const contract of allContracts) {
+        if (contractNeedsBuyerAttention(contract)) {
+          next.add(String(contract._id));
+        }
+      }
+      return next;
+    });
+  }, [allContracts]);
 
   const invalidateInstallmentQueues = useCallback(async () => {
     await queryClient.invalidateQueries({
@@ -64,8 +97,32 @@ export const InstallmentPaymentsPage = () => {
     [router],
   );
 
-  const contracts = contractsQuery.data ?? [];
-  const emptyMessage = statusFilter
+  const toggleExpanded = useCallback((contractId: string) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(contractId)) {
+        next.delete(contractId);
+      } else {
+        next.add(contractId);
+      }
+      return next;
+    });
+  }, []);
+
+  const expandAll = useCallback(() => {
+    setExpandedIds(new Set(contracts.map((contract) => String(contract._id))));
+  }, [contracts]);
+
+  const collapseAll = useCallback(() => {
+    setExpandedIds(new Set());
+  }, []);
+
+  const handleActiveFilterClick = useCallback(() => {
+    setStatusFilter(INSTALLMENT_SALES_LIST_FILTER_IN_PROGRESS);
+    setAttentionOnly(false);
+  }, []);
+
+  const emptyMessage = hasFilters
     ? INSTALLMENT_UI.PAYMENTS_PAGE_EMPTY_BY_FILTER
     : INSTALLMENT_UI.PAYMENTS_PAGE_EMPTY;
 
@@ -78,9 +135,35 @@ export const InstallmentPaymentsPage = () => {
       <InstallmentPaymentsPageToolbar
         title={INSTALLMENT_UI.PAYMENTS_PAGE_TITLE}
         statusFilter={statusFilter}
-        onStatusFilterChange={setStatusFilter}
-        contractsCount={contracts.length}
+        onStatusFilterChange={(value) => {
+          setStatusFilter(value);
+          if (value) {
+            setAttentionOnly(false);
+          }
+        }}
+        contractsCountLabel={countLabel}
       />
+      <InstallmentPaymentsOverview
+        activeCount={summary.activeCount}
+        attentionCount={summary.attentionCount}
+        totalRemainingRub={summary.totalRemainingRub}
+        attentionOnly={attentionOnly}
+        onAttentionFilterChange={setAttentionOnly}
+        onActiveFilterClick={handleActiveFilterClick}
+      />
+      {contracts.length > 0 ? (
+        <View style={styles.listActions}>
+          <Pressable style={styles.listAction} onPress={expandAll}>
+            <Text style={styles.listActionText}>{INSTALLMENT_UI.PAYMENTS_EXPAND_ALL}</Text>
+          </Pressable>
+          <Pressable style={styles.listAction} onPress={collapseAll}>
+            <Text style={styles.listActionText}>{INSTALLMENT_UI.PAYMENTS_COLLAPSE_ALL}</Text>
+          </Pressable>
+          {attentionOnly ? (
+            <Text style={styles.filterHint}>{INSTALLMENT_UI.PAYMENTS_ATTENTION_FILTER_HINT}</Text>
+          ) : null}
+        </View>
+      ) : null}
       {contracts.length === 0 ? (
         <Text style={styles.emptyState} accessibilityRole="text">
           {emptyMessage}
@@ -131,18 +214,24 @@ export const InstallmentPaymentsPage = () => {
           />
         }
         ListHeaderComponent={listHeader}
-        renderItem={({ item }) => (
-          <InstallmentContractCard
-            contract={item}
-            role="buyer"
-            compact
-            onProductClick={handleProductClick}
-            onCounterpartyClick={handleCounterpartyClick}
-            onUpdated={() => {
-              void handleRefresh();
-            }}
-          />
-        )}
+        renderItem={({ item }) => {
+          const contractId = String(item._id);
+          return (
+            <InstallmentContractCard
+              contract={item}
+              role="buyer"
+              compact
+              collapsible
+              expanded={expandedIds.has(contractId)}
+              onExpandedChange={() => toggleExpanded(contractId)}
+              onProductClick={handleProductClick}
+              onCounterpartyClick={handleCounterpartyClick}
+              onUpdated={() => {
+                void handleRefresh();
+              }}
+            />
+          );
+        }}
       />
 
       <ProfileMobileNavSheet

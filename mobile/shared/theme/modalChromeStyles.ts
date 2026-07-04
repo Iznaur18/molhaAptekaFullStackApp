@@ -81,13 +81,13 @@ export const useBottomSheetReportModalStyles = createThemedStyles((theme) => ({
     flex: 1,
     paddingVertical: 14,
     borderRadius: 10,
-    backgroundColor: theme.colors.surfaceMuted,
+    backgroundColor: theme.colors.danger,
     alignItems: "center",
   },
   cancelButtonText: {
     fontSize: 15,
     fontWeight: "600",
-    color: theme.colors.text,
+    color: theme.colors.onContrast,
   },
   submitButton: {
     flex: 1,
@@ -175,6 +175,12 @@ export const useCreateStoryModalStyles = createThemedStyles((theme) => ({
     fontSize: 14,
     fontWeight: "600",
     color: theme.colors.text,
+  },
+  videoHint: {
+    marginTop: 8,
+    fontSize: 13,
+    lineHeight: 18,
+    color: theme.colors.textMuted,
   },
   label: {
     marginTop: 14,
@@ -657,16 +663,14 @@ export const useProductEditManageSectionStyles = createThemedStyles((theme) => (
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 8,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.danger,
     ...Platform.select({
       web: { cursor: "pointer" },
       default: {},
     }),
   },
   deleteConfirmCancelText: {
-    color: theme.colors.textSecondary,
+    color: theme.colors.onContrast,
     fontSize: 13,
     fontWeight: "600",
   },
@@ -912,6 +916,19 @@ export const useProductPromotionModalStyles = createThemedStyles((theme) => ({
   },
   secondaryButtonText: {
     color: theme.colors.textSecondary,
+    fontWeight: "700",
+    fontSize: 15,
+  },
+  cancelButton: {
+    flex: 1,
+    minHeight: 44,
+    borderRadius: 11,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: theme.colors.danger,
+  },
+  cancelButtonText: {
+    color: theme.colors.onContrast,
     fontWeight: "700",
     fontSize: 15,
   },

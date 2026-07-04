@@ -1,0 +1,46 @@
+import {
+  INTRO_UPLOAD_VIDEO_MAX_BYTES,
+  STORY_UPLOAD_VIDEO_MAX_BYTES,
+  UPLOAD_VIDEO_MAX_BYTES,
+} from "../../constants/uploadConstants.js";
+import {
+  APP_INTRO_VIDEO_MAX_BITRATE_MBIT,
+  APP_INTRO_VIDEO_MAX_DURATION_SEC,
+} from "../../constants/appIntroSettingsConstants.js";
+import { USER_STORY_VIDEO_MAX_BITRATE_MBIT, USER_STORY_VIDEO_MAX_DURATION_SEC } from "../../constants/userStoryConstants.js";
+import { isIntroVideoUploadRequest } from "./isIntroVideoUploadRequest.js";
+import { isStoryVideoUploadRequest } from "./isStoryVideoUploadRequest.js";
+
+/**
+ * @param {import('express').Request} req
+ * @returns {{
+ *   maxBytes: number;
+ *   transcodeOptions: { maxDurationSec?: number; maxVideoBitrateMbit?: number };
+ * }}
+ */
+export function resolveVideoUploadProfile(req) {
+  if (isIntroVideoUploadRequest(req)) {
+    return {
+      maxBytes: INTRO_UPLOAD_VIDEO_MAX_BYTES,
+      transcodeOptions: {
+        maxDurationSec: APP_INTRO_VIDEO_MAX_DURATION_SEC,
+        maxVideoBitrateMbit: APP_INTRO_VIDEO_MAX_BITRATE_MBIT,
+      },
+    };
+  }
+
+  if (isStoryVideoUploadRequest(req)) {
+    return {
+      maxBytes: STORY_UPLOAD_VIDEO_MAX_BYTES,
+      transcodeOptions: {
+        maxDurationSec: USER_STORY_VIDEO_MAX_DURATION_SEC,
+        maxVideoBitrateMbit: USER_STORY_VIDEO_MAX_BITRATE_MBIT,
+      },
+    };
+  }
+
+  return {
+    maxBytes: UPLOAD_VIDEO_MAX_BYTES,
+    transcodeOptions: {},
+  };
+}

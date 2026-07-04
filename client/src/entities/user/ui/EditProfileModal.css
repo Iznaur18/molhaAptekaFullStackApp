@@ -177,10 +177,10 @@
 }
 
 .edit-profile-modal__cancel {
-  border: 1px solid var(--iz-color-border-strong);
+  border: 1px solid var(--iz-color-danger);
   border-radius: 0.5rem;
-  background: var(--iz-color-surface);
-  color: var(--iz-color-text-secondary);
+  background: var(--iz-color-danger);
+  color: var(--iz-color-on-contrast);
   padding: 0.55rem 0.85rem;
   font-size: 0.9375rem;
   font-weight: 500;

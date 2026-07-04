@@ -20,8 +20,8 @@ import {
   type IntroAdFormState,
 } from "@/features/advertising-page/lib/mapIntroAdFormDefaults";
 import { validateIntroAdForm } from "@/features/advertising-page/lib/validateIntroAdForm";
+import { IntroVideoUploadField } from "@/features/image-upload/ui/IntroVideoUploadField";
 import { ImageUrlUploadField } from "@/features/image-upload/ui/ImageUrlUploadField";
-import { VideoUrlUploadField } from "@/features/image-upload/ui/VideoUrlUploadField";
 import { INTRO_AD_PAGE_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useAdvertisingCardStyles } from "@/shared/theme/advertisingPageStyles";
@@ -132,13 +132,13 @@ export const IntroAdAdvertisingSection = ({ loyaltyBalance }: IntroAdAdvertising
           </Text>
           {canCancel ? (
             <Pressable
-              style={[styles.secondaryButton, isSubmitting && styles.secondaryButtonDisabled]}
+              style={[styles.cancelButton, isSubmitting && styles.cancelButtonDisabled]}
               onPress={() => {
                 void handleCancel();
               }}
               disabled={isSubmitting}
             >
-              <Text style={styles.secondaryButtonText}>{INTRO_AD_PAGE_UI.CANCEL}</Text>
+              <Text style={styles.cancelButtonText}>{INTRO_AD_PAGE_UI.CANCEL}</Text>
             </Pressable>
           ) : null}
         </View>
@@ -154,16 +154,9 @@ export const IntroAdAdvertisingSection = ({ loyaltyBalance }: IntroAdAdvertising
         <View style={styles.panel}>
           <Text style={styles.panelTitle}>Заявка на intro</Text>
           <View style={styles.form}>
-            <VideoUrlUploadField
-              label="MP4"
+            <IntroVideoUploadField
               value={form.videoMp4Url}
               onChange={(value) => updateField("videoMp4Url", value)}
-              disabled={isSubmitting}
-            />
-            <VideoUrlUploadField
-              label="WebM (необязательно)"
-              value={form.videoWebmUrl}
-              onChange={(value) => updateField("videoWebmUrl", value)}
               disabled={isSubmitting}
             />
             <ImageUrlUploadField
@@ -188,38 +181,6 @@ export const IntroAdAdvertisingSection = ({ loyaltyBalance }: IntroAdAdvertising
                 onChangeText={(value) => updateField("fallbackHint", value)}
               />
             </View>
-            <Text style={styles.timingLegend}>{INTRO_AD_PAGE_UI.SECTION_TIMING}</Text>
-            <Text style={styles.timingHint}>{INTRO_AD_PAGE_UI.TIMING_HINT}</Text>
-            <View style={styles.timingGrid}>
-              <View style={styles.timingField}>
-                <Text style={styles.fieldLabel}>{INTRO_AD_PAGE_UI.LABEL_MIN_MS}</Text>
-                <TextInput
-                  style={styles.input}
-                  value={form.minMs}
-                  onChangeText={(value) => updateField("minMs", value)}
-                  keyboardType="number-pad"
-                />
-              </View>
-              <View style={styles.timingField}>
-                <Text style={styles.fieldLabel}>{INTRO_AD_PAGE_UI.LABEL_MAX_MS}</Text>
-                <TextInput
-                  style={styles.input}
-                  value={form.maxMs}
-                  onChangeText={(value) => updateField("maxMs", value)}
-                  keyboardType="number-pad"
-                />
-              </View>
-              <View style={styles.timingField}>
-                <Text style={styles.fieldLabel}>{INTRO_AD_PAGE_UI.LABEL_FADE_MS}</Text>
-                <TextInput
-                  style={styles.input}
-                  value={form.fadeOutMs}
-                  onChangeText={(value) => updateField("fadeOutMs", value)}
-                  keyboardType="number-pad"
-                />
-              </View>
-            </View>
-
             {actionError ? (
               <Text style={styles.error} accessibilityRole="alert">
                 {actionError}

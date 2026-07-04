@@ -20,6 +20,11 @@ export const USER_STORY_STATUSES = [
 export const USER_STORY_TTL_MS = 12 * 60 * 60 * 1000;
 
 export const USER_STORY_CAPTION_MAX_CHARS = 150;
+/** Синхрон с contract `USER_STORY_VIDEO_MAX_DURATION_SEC`: ffmpeg `-t` при загрузке. */
+export const USER_STORY_VIDEO_MAX_DURATION_SEC = 30;
+
+/** Пиковый видеобитрейт после ffmpeg-пережатия сторис-ролика. */
+export const USER_STORY_VIDEO_MAX_BITRATE_MBIT = 2.5;
 
 export const USER_STORY_REPORT_STATUS_PENDING = "pending";
 export const USER_STORY_REPORT_STATUS_DISMISSED = "dismissed";

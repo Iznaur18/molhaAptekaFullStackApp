@@ -11,6 +11,13 @@ export type UploadVideoFilePayload = {
   type: string;
 };
 
+/** `POST /upload/video` — загрузка видео (cookie auth, multipart, поле `video`). */
+export type UploadVideoPurpose = "intro" | "story";
+
+type UploadVideoOptions = {
+  purpose?: UploadVideoPurpose;
+};
+
 const appendVideoToFormData = async (
   formData: FormData,
   file: UploadVideoFilePayload,
@@ -25,12 +32,18 @@ const appendVideoToFormData = async (
   formData.append("video", file as unknown as Blob);
 };
 
-export const uploadVideo = async (file: UploadVideoFilePayload): Promise<string> => {
+export const uploadVideo = async (
+  file: UploadVideoFilePayload,
+  { purpose }: UploadVideoOptions = {},
+): Promise<string> => {
   try {
     const formData = new FormData();
     await appendVideoToFormData(formData, file);
 
-    const data = await postMultipart(apiClient, "/upload/video", formData);
+    const endpoint = purpose
+      ? `/upload/video?purpose=${encodeURIComponent(purpose)}`
+      : "/upload/video";
+    const data = await postMultipart(apiClient, endpoint, formData);
 
     const parsed = parseUploadImageData(data);
     return normalizeUploadUrlForStorage(parsed.url);

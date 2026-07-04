@@ -276,13 +276,14 @@
 }
 
 .product-card__delete-confirm-cancel {
-  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
-  background: transparent;
-  color: inherit;
+  border: 1px solid var(--iz-color-danger);
+  background: var(--iz-color-danger);
+  color: var(--iz-color-on-contrast);
 }
 
-.product-card__delete-confirm-cancel:hover {
-  background: color-mix(in srgb, currentColor 6%, transparent);
+.product-card__delete-confirm-cancel:hover:not(:disabled) {
+  border-color: var(--iz-color-danger-strong);
+  background: var(--iz-color-danger-strong);
 }
 
 .product-card-promotion-frame--tier-3

@@ -34,7 +34,7 @@ export default function EditProfileScreen() {
         <Text style={styles.message}>{EDIT_PROFILE_UI.AUTH_REQUIRED}</Text>
         <AppButton
           label={AUTH_UI.LOGIN_BUTTON}
-          variant="contrast"
+          variant="primary"
           onPress={() => router.push("/(auth)/login")}
         />
       </View>

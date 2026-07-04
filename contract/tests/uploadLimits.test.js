@@ -2,6 +2,9 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  INTRO_UPLOAD_VIDEO_MAX_BYTES,
+  STORY_UPLOAD_VIDEO_MAX_BYTES,
+  STORY_UPLOAD_VIDEO_MAX_MB,
   UPLOAD_IMAGE_MAX_BYTES,
   UPLOAD_IMAGE_MIME_TYPES,
   UPLOAD_VIDEO_EXTENSIONS,
@@ -21,8 +24,10 @@ test("image upload limits are stable", () => {
 });
 
 test("video upload limits are stable", () => {
-  assert.equal(UPLOAD_VIDEO_MAX_MB, 25);
-  assert.equal(UPLOAD_VIDEO_MAX_BYTES, 25 * 1024 * 1024);
+  assert.equal(UPLOAD_VIDEO_MAX_MB, 5);
+  assert.equal(UPLOAD_VIDEO_MAX_BYTES, 5 * 1024 * 1024);
+  assert.equal(STORY_UPLOAD_VIDEO_MAX_MB, 50);
+  assert.equal(STORY_UPLOAD_VIDEO_MAX_BYTES, 50 * 1024 * 1024);
   assert.deepEqual(UPLOAD_VIDEO_MIME_TYPES, [
     "video/mp4",
     "video/webm",

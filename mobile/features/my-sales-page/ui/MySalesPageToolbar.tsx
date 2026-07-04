@@ -18,23 +18,23 @@ const STATUS_FILTER_OPTIONS = [
 ];
 
 type MySalesPageToolbarProps = {
+  summaryCountLabel: string;
+  totalSalesCount: number;
   statusFilter: string;
   onStatusFilterChange: (value: string) => void;
   searchTerm: string;
   onSearchTermChange: (value: string) => void;
   isSearchPending: boolean;
-  ordersCount: number;
-  totalSalesCount: number;
 };
 
 export const MySalesPageToolbar = ({
+  summaryCountLabel,
+  totalSalesCount,
   statusFilter,
   onStatusFilterChange,
   searchTerm,
   onSearchTermChange,
   isSearchPending,
-  ordersCount,
-  totalSalesCount,
 }: MySalesPageToolbarProps) => {
   const styles = useMySalesPageStyles();
   const theme = useAppTheme();
@@ -48,7 +48,7 @@ export const MySalesPageToolbar = ({
           <Text style={styles.totalSalesCount}>
             {MY_SALES_PAGE_UI.TOTAL_SALES_COUNT(totalSalesCount)}
           </Text>
-          <Text style={styles.ordersCount}>{MY_SALES_PAGE_UI.COUNT(ordersCount)}</Text>
+          <Text style={styles.ordersCount}>{summaryCountLabel}</Text>
         </View>
       </View>
 

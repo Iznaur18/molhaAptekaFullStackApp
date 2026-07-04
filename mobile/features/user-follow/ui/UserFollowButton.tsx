@@ -12,6 +12,7 @@ type UserFollowButtonProps = {
   isFollowing: boolean;
   isAuthorized: boolean;
   isSelf: boolean;
+  layout?: "default" | "inline";
   onFollowChange?: (next: { isFollowing: boolean }) => void;
 };
 
@@ -20,6 +21,7 @@ export const UserFollowButton = ({
   isFollowing,
   isAuthorized,
   isSelf,
+  layout = "default",
   onFollowChange,
 }: UserFollowButtonProps) => {
   const router = useRouter();
@@ -59,9 +61,13 @@ export const UserFollowButton = ({
   const label = isFollowing ? USER_FOLLOW_BUTTON_UI.UNFOLLOW : USER_FOLLOW_BUTTON_UI.FOLLOW;
 
   return (
-    <View style={styles.root}>
+    <View style={[styles.root, layout === "inline" && styles.rootInline]}>
       <Pressable
-        style={[styles.button, isFollowing && styles.buttonFollowing]}
+        style={[
+          styles.button,
+          layout === "inline" && styles.buttonInline,
+          isFollowing && styles.buttonFollowing,
+        ]}
         onPress={() => void handlePress()}
         disabled={isBusy}
       >

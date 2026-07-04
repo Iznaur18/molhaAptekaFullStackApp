@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  background: var(--iz-color-overlay-black-strong);
+  background: var(--iz-color-overlay-midnight);
 }
 
 .create-raffle-modal {
@@ -15,8 +15,10 @@
   max-height: min(92vh, 40rem);
   overflow: auto;
   padding: 1rem 1.1rem 1.15rem;
-  border-radius: 14px;
-  background: var(--iz-color-canvas);
+  border: 2px solid var(--iz-color-premium-purple-muted);
+  border-radius: 16px;
+  background: var(--iz-gradient-raffle-modal);
+  box-shadow: 0 12px 38px var(--iz-color-accent-purple-shadow-strong);
   color: var(--iz-color-canvas-text);
 }
 
@@ -26,16 +28,22 @@
   justify-content: space-between;
   gap: 0.75rem;
   margin-bottom: 0.75rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid var(--iz-color-accent-purple-ring);
 }
 
 .create-raffle-modal__header h2 {
   margin: 0;
   font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--iz-color-accent-purple-text);
 }
 
 .create-raffle-modal__close {
-  border: none;
-  background: none;
+  border: 1px solid var(--iz-color-accent-purple);
+  border-radius: 8px;
+  background: var(--iz-color-accent-purple-soft);
+  color: var(--iz-color-accent-purple-text);
   font-size: 1.5rem;
   line-height: 1;
   cursor: pointer;
@@ -44,7 +52,38 @@
 .create-raffle-modal__form {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.65rem;
+}
+
+.create-raffle-modal__section {
+  border: 1px solid var(--iz-color-accent-purple-ring);
+  border-radius: 0.7rem;
+  background: var(--iz-color-surface);
+  overflow: hidden;
+  box-shadow: 0 2px 8px var(--iz-color-accent-purple-shadow);
+}
+
+.create-raffle-modal__section-title {
+  margin: 0;
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid var(--iz-color-accent-purple-ring-soft);
+  background: color-mix(
+    in srgb,
+    var(--iz-color-accent-pink-surface) 70%,
+    var(--iz-color-surface) 30%
+  );
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--iz-color-accent-purple-text);
+}
+
+.create-raffle-modal__section-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: 0.75rem;
 }
 
 .create-raffle-modal__field {
@@ -65,15 +104,16 @@
   box-sizing: border-box;
   width: 100%;
   padding: 0.45rem 0.55rem;
-  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  border: 1px solid var(--iz-color-accent-purple-ring);
   border-radius: 8px;
   font: inherit;
+  background: var(--iz-color-accent-pink-lilac);
 }
 
 .create-raffle-modal__hint {
   margin: 0;
   font-size: 0.8rem;
-  opacity: 0.75;
+  color: var(--iz-color-accent-purple-text);
   line-height: 1.4;
 }
 
@@ -99,15 +139,17 @@
 
 .create-raffle-modal__actions button[type="submit"] {
   border: 1px solid var(--iz-color-accent-purple);
-  background: var(--iz-color-accent-purple-soft);
-  color: var(--iz-color-accent-purple-text);
+  background: var(--iz-color-accent-purple);
+  color: var(--iz-color-on-contrast);
   font-weight: 600;
 }
 
 .create-raffle-modal__media-type {
   margin: 0;
-  padding: 0;
-  border: none;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--iz-color-accent-purple-ring-soft);
+  border-radius: 8px;
+  background: var(--iz-color-accent-pink-surface);
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem 1rem;
@@ -132,6 +174,11 @@
   font-size: 0.875rem;
 }
 
+.create-raffle-modal__media-type-option input[type="radio"] {
+  width: auto;
+  accent-color: var(--iz-color-accent-purple);
+}
+
 .create-raffle-modal__preview {
   display: flex;
   flex-direction: column;
@@ -146,7 +193,8 @@
 .create-raffle-modal__preview-frame {
   position: relative;
   height: 9rem;
+  border: 1px solid var(--iz-color-accent-purple-ring);
   border-radius: 10px;
   overflow: hidden;
-  background: color-mix(in srgb, currentColor 8%, transparent);
+  background: var(--iz-color-accent-pink-surface);
 }

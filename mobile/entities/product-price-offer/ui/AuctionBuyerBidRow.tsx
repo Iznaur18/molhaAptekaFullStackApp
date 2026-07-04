@@ -4,6 +4,10 @@ import { Pressable, Text, View } from "react-native";
 import { useCreateOrderMutation } from "@/entities/order/model/useCreateOrderMutation";
 import type { OrderPaymentMethod } from "@/entities/order/model/constants";
 import type { MyPriceOfferBid } from "@/entities/product-price-offer/api/incomingPriceOffersApi";
+import {
+  bidNeedsAttention,
+  resolveBuyerBidCollapsedPreview,
+} from "@/entities/product-price-offer/lib/auctionDashboardAttention";
 import { usePriceOfferMutations } from "@/entities/product-price-offer/model/usePriceOfferMutations";
 import { AuctionDashboardBuyerPriceEditor } from "@/entities/product-price-offer/ui/AuctionDashboardBuyerPriceEditor";
 import { AuctionDashboardProductThumb } from "@/entities/product-price-offer/ui/AuctionDashboardProductThumb";
@@ -31,6 +35,9 @@ type AuctionBuyerBidRowProps = {
   isUserDataConfirmed?: boolean;
   onProductClick?: (productId: string) => void;
   onChanged?: () => void;
+  collapsible?: boolean;
+  expanded?: boolean;
+  onExpandedChange?: (expanded: boolean) => void;
 };
 
 export const AuctionBuyerBidRow = ({
@@ -38,6 +45,9 @@ export const AuctionBuyerBidRow = ({
   isUserDataConfirmed = false,
   onProductClick,
   onChanged,
+  collapsible = false,
+  expanded = true,
+  onExpandedChange,
 }: AuctionBuyerBidRowProps) => {
   const styles = useAuctionDashboardRowStyles();
   const sessionQuery = useAuthSessionQuery();
@@ -54,6 +64,13 @@ export const AuctionBuyerBidRow = ({
   const productName = bid.product?.productName ?? "Товар";
   const isPending = bid.status === PRICE_OFFER_STATUS_PENDING;
   const isAccepted = bid.status === PRICE_OFFER_STATUS_ACCEPTED;
+  const isExpanded = !collapsible || expanded;
+  const needsAttention = bidNeedsAttention(bid);
+  const collapsedPreview = !isExpanded ? resolveBuyerBidCollapsedPreview(bid) : null;
+
+  const toggleExpanded = () => {
+    onExpandedChange?.(!expanded);
+  };
 
   useEffect(() => {
     setPriceInput(formatIntegerGroupRu(bid.offerPrice ?? ""));
@@ -115,38 +132,54 @@ export const AuctionBuyerBidRow = ({
   };
 
   return (
-    <View style={styles.row}>
+    <View style={[styles.row, needsAttention ? styles.rowAttention : null]}>
       <View style={styles.head}>
         <AuctionDashboardProductThumb product={bid.product} />
         <View style={styles.main}>
-          {onProductClick ? (
-            <Pressable
-              style={styles.titlePressable}
-              onPress={() => onProductClick(bid.productId)}
-            >
-              <Text style={styles.title} numberOfLines={2}>
+          <View style={styles.headLine}>
+            {onProductClick ? (
+              <Pressable
+                style={styles.titlePressable}
+                onPress={() => onProductClick(bid.productId)}
+              >
+                <Text style={styles.title} numberOfLines={2}>
+                  {productName}
+                </Text>
+              </Pressable>
+            ) : (
+              <Text style={styles.titleStatic} numberOfLines={2}>
                 {productName}
               </Text>
-            </Pressable>
-          ) : (
-            <Text style={styles.titleStatic} numberOfLines={2}>
-              {productName}
-            </Text>
-          )}
-          <Text style={styles.meta} numberOfLines={1}>
-            {formatIsoDateTime(bid.createdAt)}
-          </Text>
-          <AuctionDashboardRowStatus isPending={isPending} isAccepted={isAccepted}>
-            {isPending
-              ? PRODUCT_PRICE_OFFER_UI.STATUS_PENDING
-              : isAccepted && !showPay
-                ? PRODUCT_PRICE_OFFER_UI.STATUS_ACCEPTED
-                : null}
-          </AuctionDashboardRowStatus>
-          {isAccepted && bid.paymentDeadlineAt ? (
-            <Text style={styles.meta}>
-              {AUCTION_PAGE_UI.PAY_DEADLINE_LABEL}: {formatIsoDateTime(bid.paymentDeadlineAt)}
-            </Text>
+            )}
+            {collapsible ? (
+              <Pressable
+                style={styles.chevronButton}
+                accessibilityRole="button"
+                accessibilityLabel={AUCTION_PAGE_UI.EXPAND_TOGGLE(isExpanded)}
+                onPress={toggleExpanded}
+              >
+                <Text style={[styles.chevron, isExpanded ? styles.chevronExpanded : null]}>▸</Text>
+              </Pressable>
+            ) : null}
+          </View>
+          {isExpanded ? (
+            <>
+              <Text style={styles.meta} numberOfLines={1}>
+                {formatIsoDateTime(bid.createdAt)}
+              </Text>
+              <AuctionDashboardRowStatus isPending={isPending} isAccepted={isAccepted}>
+                {isPending
+                  ? PRODUCT_PRICE_OFFER_UI.STATUS_PENDING
+                  : isAccepted && !showPay
+                    ? PRODUCT_PRICE_OFFER_UI.STATUS_ACCEPTED
+                    : null}
+              </AuctionDashboardRowStatus>
+              {isAccepted && bid.paymentDeadlineAt ? (
+                <Text style={styles.meta}>
+                  {AUCTION_PAGE_UI.PAY_DEADLINE_LABEL}: {formatIsoDateTime(bid.paymentDeadlineAt)}
+                </Text>
+              ) : null}
+            </>
           ) : null}
         </View>
       </View>
@@ -156,46 +189,52 @@ export const AuctionBuyerBidRow = ({
         <Text style={styles.price}>{formatPriceRub(bid.offerPrice)}</Text>
       </View>
 
-      {isPending && isUserDataConfirmed ? (
-        <AuctionDashboardBuyerPriceEditor
-          label={AUCTION_PAGE_UI.EDIT_PRICE_LABEL}
-          value={priceInput}
-          onChange={(next) => setPriceInput(formatRubPriceInput(next))}
-          onSubmit={() => {
-            void handleUpdate();
-          }}
-          onCancel={() => {
-            void handleCancel();
-          }}
-          disabled={isBusy}
-          submitLabel={PRODUCT_PRICE_OFFER_UI.UPDATE}
-          cancelLabel={PRODUCT_PRICE_OFFER_UI.CANCEL}
-          pendingLabel={PRODUCT_PRICE_OFFER_UI.ACTION_PENDING}
-        />
-      ) : null}
+      {collapsedPreview ? <Text style={styles.preview}>{collapsedPreview}</Text> : null}
 
-      {isAccepted && !showPay ? (
-        <Pressable style={styles.cta} onPress={() => setShowPay(true)}>
-          <Text style={styles.ctaText}>{PRODUCT_PRICE_OFFER_UI.PAY_BUTTON}</Text>
-        </Pressable>
-      ) : null}
+      {isExpanded ? (
+        <>
+          {isPending && isUserDataConfirmed ? (
+            <AuctionDashboardBuyerPriceEditor
+              label={AUCTION_PAGE_UI.EDIT_PRICE_LABEL}
+              value={priceInput}
+              onChange={(next) => setPriceInput(formatRubPriceInput(next))}
+              onSubmit={() => {
+                void handleUpdate();
+              }}
+              onCancel={() => {
+                void handleCancel();
+              }}
+              disabled={isBusy}
+              submitLabel={PRODUCT_PRICE_OFFER_UI.UPDATE}
+              cancelLabel={PRODUCT_PRICE_OFFER_UI.CANCEL}
+              pendingLabel={PRODUCT_PRICE_OFFER_UI.ACTION_PENDING}
+            />
+          ) : null}
 
-      {isAccepted && showPay ? (
-        <View style={styles.checkout}>
-          <CheckoutForm
-            defaultUser={sessionQuery.data?.user ?? null}
-            isSubmitting={isPaying}
-            submitError={payError}
-            submitSuccess={paySuccess}
-            onSubmit={handlePay}
-          />
-        </View>
-      ) : null}
+          {isAccepted && !showPay ? (
+            <Pressable style={styles.cta} onPress={() => setShowPay(true)}>
+              <Text style={styles.ctaText}>{PRODUCT_PRICE_OFFER_UI.PAY_BUTTON}</Text>
+            </Pressable>
+          ) : null}
 
-      {error ? (
-        <Text style={styles.error} accessibilityRole="alert">
-          {error}
-        </Text>
+          {isAccepted && showPay ? (
+            <View style={styles.checkout}>
+              <CheckoutForm
+                defaultUser={sessionQuery.data?.user ?? null}
+                isSubmitting={isPaying}
+                submitError={payError}
+                submitSuccess={paySuccess}
+                onSubmit={handlePay}
+              />
+            </View>
+          ) : null}
+
+          {error ? (
+            <Text style={styles.error} accessibilityRole="alert">
+              {error}
+            </Text>
+          ) : null}
+        </>
       ) : null}
     </View>
   );

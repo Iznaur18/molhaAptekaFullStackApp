@@ -9,6 +9,8 @@ import {
   useSiteHeaderBannerCampaignModerationMutations,
 } from "@/entities/site-header-banner-campaign/model/useSiteHeaderBannerCampaignModerationMutations";
 import { SiteHeaderBannerCampaignModerationCard } from "@/entities/site-header-banner-campaign/ui/SiteHeaderBannerCampaignModerationCard";
+import { filterPendingModerationCampaigns } from "@/features/intro-ad-moderation-page/lib/filterPendingModerationCampaigns";
+import { buildModerationCampaignRowId } from "@/features/intro-ad-moderation-page/lib/introAdModerationSectionFilters";
 import { ModerationSectionTitle } from "@/features/intro-ad-moderation-page/ui/ModerationSectionTitle";
 import { SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
@@ -17,10 +19,16 @@ import { staffBadgeQueryKeys } from "@/shared/api";
 
 type SiteHeaderBannerCampaignModerationSectionProps = {
   onActionError?: (message: string) => void;
+  attentionOnly?: boolean;
+  expandedIds?: Set<string>;
+  onToggleExpanded?: (rowId: string) => void;
 };
 
 export const SiteHeaderBannerCampaignModerationSection = ({
   onActionError,
+  attentionOnly = false,
+  expandedIds = new Set(),
+  onToggleExpanded,
 }: SiteHeaderBannerCampaignModerationSectionProps) => {
   const styles = useIntroAdModerationPageStyles();
   const queryClient = useQueryClient();
@@ -32,6 +40,9 @@ export const SiteHeaderBannerCampaignModerationSection = ({
   const [rejectReasons, setRejectReasons] = useState<Record<string, string>>({});
 
   const pendingCampaigns = queueQuery.data ?? [];
+  const filteredPendingCampaigns = filterPendingModerationCampaigns(pendingCampaigns, {
+    attentionOnly,
+  });
   const managedCampaigns = managedQuery.data ?? [];
 
   const handleApprove = useCallback(
@@ -45,13 +56,16 @@ export const SiteHeaderBannerCampaignModerationSection = ({
         });
       } catch (error) {
         onActionError?.(
-          formatApiErrorMessage(error, SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.APPROVE_FALLBACK),
+          formatApiErrorMessage(
+            error,
+            SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.APPROVE_FALLBACK,
+          ),
         );
       } finally {
         setPendingCampaignId(null);
       }
     },
-    [approveMutation, onActionError],
+    [approveMutation, onActionError, queryClient],
   );
 
   const handleReject = useCallback(
@@ -68,13 +82,16 @@ export const SiteHeaderBannerCampaignModerationSection = ({
         });
       } catch (error) {
         onActionError?.(
-          formatApiErrorMessage(error, SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.REJECT_FALLBACK),
+          formatApiErrorMessage(
+            error,
+            SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.REJECT_FALLBACK,
+          ),
         );
       } finally {
         setPendingCampaignId(null);
       }
     },
-    [onActionError, rejectMutation, rejectReasons],
+    [onActionError, queryClient, rejectMutation, rejectReasons],
   );
 
   const handleStaffCancel = useCallback(
@@ -97,16 +114,24 @@ export const SiteHeaderBannerCampaignModerationSection = ({
         setPendingCampaignId(null);
       }
     },
-    [onActionError, staffCancelMutation],
+    [onActionError, queryClient, staffCancelMutation],
   );
+
+  if (queueQuery.isPending && managedQuery.isPending) {
+    return null;
+  }
 
   if (pendingCampaigns.length === 0 && managedCampaigns.length === 0) {
     return null;
   }
 
+  if (attentionOnly && filteredPendingCampaigns.length === 0) {
+    return null;
+  }
+
   return (
     <>
-      {managedCampaigns.length > 0 ? (
+      {!attentionOnly && managedCampaigns.length > 0 ? (
         <View style={styles.section}>
           <ModerationSectionTitle
             title={SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.MANAGED_TITLE}
@@ -130,21 +155,25 @@ export const SiteHeaderBannerCampaignModerationSection = ({
         </View>
       ) : null}
 
-      {pendingCampaigns.length > 0 ? (
+      {filteredPendingCampaigns.length > 0 ? (
         <View style={styles.section}>
           <ModerationSectionTitle
             title={SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.PENDING_TITLE}
-            pendingCount={pendingCampaigns.length}
+            pendingCount={filteredPendingCampaigns.length}
           />
           <View style={styles.list}>
-            {pendingCampaigns.map((campaign) => {
+            {filteredPendingCampaigns.map((campaign) => {
               const campaignId = String(campaign._id);
+              const rowId = buildModerationCampaignRowId("banner", campaignId);
               return (
                 <SiteHeaderBannerCampaignModerationCard
                   key={campaignId}
                   campaign={campaign}
                   isPending={pendingCampaignId === campaignId}
                   mode="pending"
+                  collapsible
+                  expanded={expandedIds.has(rowId)}
+                  onExpandedChange={() => onToggleExpanded?.(rowId)}
                   onApprove={() => {
                     void handleApprove(campaignId);
                   }}

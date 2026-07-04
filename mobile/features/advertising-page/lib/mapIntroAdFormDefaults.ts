@@ -6,9 +6,6 @@ export type IntroAdFormState = {
   posterUrl: string;
   fallbackTitle: string;
   fallbackHint: string;
-  minMs: string;
-  maxMs: string;
-  fadeOutMs: string;
 };
 
 export const createIntroAdFormState = (): IntroAdFormState => ({
@@ -17,7 +14,4 @@ export const createIntroAdFormState = (): IntroAdFormState => ({
   posterUrl: "",
   fallbackTitle: APP_INTRO_SETTINGS_DEFAULTS.fallbackTitle ?? "",
   fallbackHint: APP_INTRO_SETTINGS_DEFAULTS.fallbackHint ?? "",
-  minMs: String(APP_INTRO_SETTINGS_DEFAULTS.minMs ?? ""),
-  maxMs: String(APP_INTRO_SETTINGS_DEFAULTS.maxMs ?? ""),
-  fadeOutMs: String(APP_INTRO_SETTINGS_DEFAULTS.fadeOutMs ?? ""),
 });

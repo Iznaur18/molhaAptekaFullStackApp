@@ -2,6 +2,11 @@
   display: grid;
   gap: 1rem;
   max-width: 44rem;
+  --adv-accent: #ea580c;
+  --adv-accent-soft: #ffedd5;
+  --adv-accent-strong: #c2410c;
+  --adv-accent-border: #fdba74;
+  --adv-accent-ring: rgb(234 88 12 / 18%);
 }
 
 .advertising-page__header {
@@ -30,13 +35,9 @@
   justify-content: space-between;
   gap: 0.75rem;
   padding: 0.7rem 0.9rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-action-light) 55%, var(--iz-color-border));
+  border: 1px solid var(--adv-accent-border);
   border-radius: 12px;
-  background: linear-gradient(
-    135deg,
-    var(--iz-color-surface) 0%,
-    var(--iz-color-action-soft) 140%
-  );
+  background: var(--adv-accent-soft);
 }
 
 .advertising-page__balance-label {
@@ -45,7 +46,7 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--iz-color-primary-bright);
+  color: var(--adv-accent-strong);
 }
 
 .advertising-page__balance-value {
@@ -70,22 +71,12 @@
   box-shadow: 0 6px 18px color-mix(in srgb, var(--iz-color-ink) 4%, transparent);
 }
 
-.advertising-page__card_intro {
-  border-color: color-mix(in srgb, var(--iz-color-premium-indigo-muted) 45%, var(--iz-color-border));
-  background: linear-gradient(
-    165deg,
-    var(--iz-color-surface) 0%,
-    color-mix(in srgb, var(--iz-color-premium-indigo-soft) 55%, var(--iz-color-surface)) 100%
-  );
-}
-
-.advertising-page__card_category {
-  border-color: color-mix(in srgb, var(--iz-color-warning) 35%, var(--iz-color-border));
-  background: linear-gradient(
-    165deg,
-    var(--iz-color-surface) 0%,
-    color-mix(in srgb, var(--iz-color-promotion-boost-bg) 70%, var(--iz-color-surface)) 100%
-  );
+.advertising-page__card_intro,
+.advertising-page__card_category,
+.advertising-page__card_banner {
+  border-color: var(--iz-color-border-subtle);
+  border-top: 3px solid var(--adv-accent);
+  background: var(--iz-color-surface);
 }
 
 .advertising-page__card-head {
@@ -108,15 +99,10 @@
   align-items: center;
   padding: 0.2rem 0.55rem;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--iz-color-action) 12%, var(--iz-color-surface));
-  color: var(--iz-color-link-deep);
+  background: var(--adv-accent-soft);
+  color: var(--adv-accent-strong);
   font-size: 0.75rem;
   font-weight: 700;
-}
-
-.advertising-page__card_category .advertising-page__card-badge {
-  background: color-mix(in srgb, var(--iz-color-warning) 14%, var(--iz-color-surface));
-  color: var(--iz-color-gold-muted);
 }
 
 .advertising-page__lead,
@@ -142,7 +128,7 @@
   padding: 0.55rem 0.7rem;
   border: 1px solid var(--iz-color-border-subtle);
   border-radius: 10px;
-  background: color-mix(in srgb, var(--iz-color-surface) 88%, var(--iz-color-surface-elevated));
+  background: var(--iz-color-surface-elevated);
 }
 
 .advertising-page__meta-label {
@@ -195,7 +181,7 @@
   padding: 0.85rem;
   border: 1px dashed var(--iz-color-border-subtle);
   border-radius: 12px;
-  background: color-mix(in srgb, var(--iz-color-surface) 92%, var(--iz-color-surface-elevated));
+  background: var(--iz-color-surface-elevated);
 }
 
 .advertising-page__panel-title {
@@ -247,7 +233,7 @@
 }
 
 .advertising-page__input:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--iz-color-action) 45%, transparent);
+  outline: 2px solid var(--adv-accent-ring);
   outline-offset: 1px;
 }
 
@@ -272,8 +258,9 @@
 }
 
 .advertising-page__tariff:has(input:checked) {
-  border-color: var(--iz-color-premium-indigo-muted);
-  box-shadow: 0 0 0 1px var(--iz-color-premium-indigo-muted);
+  border-color: var(--adv-accent);
+  background: var(--adv-accent-soft);
+  box-shadow: 0 0 0 1px var(--adv-accent-ring);
 }
 
 .advertising-page__tariff input {
@@ -327,6 +314,68 @@
 
 .advertising-page__login {
   width: fit-content;
+}
+
+.advertising-page__color-field {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.advertising-page__color-field input[type="color"] {
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0.15rem;
+  border: 1px solid var(--iz-color-border-subtle);
+  border-radius: 10px;
+  background: var(--iz-color-surface);
+  cursor: pointer;
+}
+
+.advertising-page__color-field .advertising-page__input {
+  flex: 1;
+  min-width: 8rem;
+}
+
+.advertising-page__preview {
+  overflow: hidden;
+  border: 1px solid var(--iz-color-border-subtle);
+  border-radius: 12px;
+  background: var(--iz-color-surface-elevated);
+}
+
+.advertising-page .app-btn--primary {
+  border-color: var(--adv-accent);
+  background: var(--adv-accent);
+  color: var(--iz-color-on-contrast);
+}
+
+.advertising-page .app-btn--primary:hover:not(:disabled) {
+  border-color: var(--adv-accent-strong);
+  background: var(--adv-accent-strong);
+}
+
+.advertising-page .app-btn--secondary {
+  border-color: var(--adv-accent-border);
+  background: var(--iz-color-surface);
+  color: var(--adv-accent-strong);
+}
+
+.advertising-page .app-btn--secondary:hover:not(:disabled) {
+  border-color: var(--adv-accent);
+  background: var(--adv-accent-soft);
+}
+
+.advertising-page .app-btn--cancel {
+  border-color: var(--iz-color-danger);
+  background: var(--iz-color-danger);
+  color: var(--iz-color-on-contrast);
+}
+
+.advertising-page .app-btn--cancel:hover:not(:disabled) {
+  border-color: var(--iz-color-danger-strong);
+  background: var(--iz-color-danger-strong);
 }
 
 @media (min-width: 640px) {

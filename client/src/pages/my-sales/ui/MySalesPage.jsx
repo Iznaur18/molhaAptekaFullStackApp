@@ -1,6 +1,10 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { filterMySales } from "../../../entities/order/lib/filterMySales.js";
+import { orderNeedsSellerAttention } from "../../../entities/order/lib/orderNeedsSellerAttention.js";
+import { summarizeMySales } from "../../../entities/order/lib/summarizeMySales.js";
+import { MY_ORDERS_LIST_FILTER_IN_PROGRESS } from "../../../entities/order/model/myOrdersListFilters.js";
 import { orderQueryKeys } from "../../../entities/order/model/orderQueryKeys.js";
 import { normalizeTotalSalesCount } from "../../../entities/user/lib/formatSearchRowTotalSalesCount.js";
 import { useMySalesQuery } from "../../../entities/order/model/useMySalesQuery.js";
@@ -24,7 +28,10 @@ import { useDebouncedValue } from "../../../shared/lib/useDebouncedValue.js";
 import { useRefetchOnVisible } from "../../../shared/lib/useRefetchOnVisible.js";
 import { SearchInput } from "../../../shared/ui/SearchInput/SearchInput.jsx";
 
+import { MySalesPageOverview } from "./MySalesPageOverview.jsx";
+
 import "./MySalesPage.css";
+import "./MySalesPageOverview.css";
 import "../../../shared/ui/profileQueueContentPanel.css";
 
 /**
@@ -44,6 +51,8 @@ export function MySalesPage({
   onQueueChanged,
 }) {
   const [statusFilter, setStatusFilter] = useState("");
+  const [attentionOnly, setAttentionOnly] = useState(false);
+  const [expandedIds, setExpandedIds] = useState(() => new Set());
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebouncedValue(
     searchTerm,
@@ -68,20 +77,41 @@ export function MySalesPage({
     [totalSalesCount],
   );
 
+  const serverStatusFilter =
+    statusFilter === MY_ORDERS_LIST_FILTER_IN_PROGRESS ? "" : statusFilter;
+
   const salesParams = useMemo(
     () => ({
-      ...(statusFilter ? { status: statusFilter } : {}),
+      ...(serverStatusFilter ? { status: serverStatusFilter } : {}),
       ...(hasSearchQuery ? { search: debouncedSearchTerm.trim() } : {}),
     }),
-    [statusFilter, hasSearchQuery, debouncedSearchTerm],
+    [serverStatusFilter, hasSearchQuery, debouncedSearchTerm],
   );
 
+  const overviewQuery = useMySalesQuery({ enabled: isAuthorized });
   const salesQuery = useMySalesQuery({
     status: salesParams.status,
     search: salesParams.search,
     enabled: isAuthorized,
   });
-  const orders = salesQuery.data?.orders ?? [];
+
+  const allOrders = overviewQuery.data?.orders ?? [];
+  const serverOrders = salesQuery.data?.orders ?? [];
+  const summary = useMemo(() => summarizeMySales(allOrders), [allOrders]);
+  const filteredOrders = useMemo(
+    () => filterMySales(serverOrders, { statusFilter, attentionOnly }),
+    [serverOrders, statusFilter, attentionOnly],
+  );
+
+  const totalServer = serverOrders.length;
+  const totalVisible = filteredOrders.length;
+  const hasClientFilters =
+    statusFilter === MY_ORDERS_LIST_FILTER_IN_PROGRESS || attentionOnly;
+  const hasFilters = Boolean(serverStatusFilter) || hasSearchQuery || hasClientFilters;
+  const summaryCountLabel = hasFilters
+    ? MY_SALES_PAGE_UI.COUNT_FILTERED(totalVisible, totalServer)
+    : MY_SALES_PAGE_UI.COUNT_ITEMS(totalServer);
+
   const phase = salesQuery.isPending
     ? "loading"
     : salesQuery.isError
@@ -91,12 +121,47 @@ export function MySalesPage({
     salesQuery.error instanceof Error
       ? salesQuery.error.message
       : API_CLIENT_UI.FETCH_MY_SALES_FALLBACK;
+  const isRefreshing = salesQuery.isFetching || overviewQuery.isFetching;
 
   const reloadSales = useCallback(async () => {
-    await salesQuery.refetch();
-  }, [salesQuery]);
+    await Promise.all([salesQuery.refetch(), overviewQuery.refetch()]);
+    onQueueChanged?.();
+  }, [salesQuery, overviewQuery, onQueueChanged]);
 
   useRefetchOnVisible(reloadSales, phase === "success");
+
+  useEffect(() => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      allOrders.filter(orderNeedsSellerAttention).forEach((order) => next.add(String(order._id)));
+      return next;
+    });
+  }, [allOrders]);
+
+  const toggleExpanded = useCallback((orderId) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(orderId)) {
+        next.delete(orderId);
+      } else {
+        next.add(orderId);
+      }
+      return next;
+    });
+  }, []);
+
+  const expandAll = useCallback(() => {
+    setExpandedIds(new Set(filteredOrders.map((order) => String(order._id))));
+  }, [filteredOrders]);
+
+  const collapseAll = useCallback(() => {
+    setExpandedIds(new Set());
+  }, []);
+
+  const handleInProgressFilterClick = useCallback(() => {
+    setStatusFilter(MY_ORDERS_LIST_FILTER_IN_PROGRESS);
+    setAttentionOnly(false);
+  }, []);
 
   const patchOrders = useCallback(
     (/** @type {(orders: import('../../../entities/order/model/types.js').Order[]) => import('../../../entities/order/model/types.js').Order[]} */ updater) => {
@@ -113,6 +178,15 @@ export function MySalesPage({
         return {
           ...page,
           orders: updater(page.orders),
+        };
+      });
+      queryClient.setQueryData(orderQueryKeys.sales({}), (old) => {
+        if (!old || typeof old !== "object" || !("orders" in old)) {
+          return old;
+        }
+        return {
+          ...old,
+          orders: updater(/** @type {{ orders: import('../../../entities/order/model/types.js').Order[] }} */ (old).orders),
         };
       });
     },
@@ -240,70 +314,115 @@ export function MySalesPage({
     }
   };
 
+  const emptyMessage = hasSearchQuery
+    ? MY_SALES_PAGE_UI.EMPTY_BY_SEARCH
+    : hasFilters
+      ? MY_SALES_PAGE_UI.EMPTY_BY_FILTER
+      : MY_SALES_PAGE_UI.EMPTY;
+
+  const overview = (
+    <MySalesPageOverview
+      inProgressCount={summary.inProgressCount}
+      attentionCount={summary.attentionCount}
+      totalAmountRub={summary.totalAmountRub}
+      attentionOnly={attentionOnly}
+      onInProgressFilterClick={handleInProgressFilterClick}
+      onAttentionFilterChange={setAttentionOnly}
+    />
+  );
+
+  const listActions =
+    totalVisible > 0 ? (
+      <div className="my-sales-page__list-actions">
+        <button type="button" className="my-sales-page__list-action" onClick={expandAll}>
+          {MY_SALES_PAGE_UI.EXPAND_ALL}
+        </button>
+        <button type="button" className="my-sales-page__list-action" onClick={collapseAll}>
+          {MY_SALES_PAGE_UI.COLLAPSE_ALL}
+        </button>
+        {attentionOnly ? (
+          <p className="my-sales-page__filter-hint">{MY_SALES_PAGE_UI.ATTENTION_FILTER_HINT}</p>
+        ) : null}
+      </div>
+    ) : null;
+
+  const toolbar = (
+    <SalesToolbar
+      summaryCountLabel={summaryCountLabel}
+      totalSalesCount={sellerTotalSalesCount}
+      statusFilter={statusFilter}
+      onStatusFilterChange={(value) => {
+        setStatusFilter(value);
+        if (value) {
+          setAttentionOnly(false);
+        }
+      }}
+      searchTerm={searchTerm}
+      onSearchTermChange={setSearchTerm}
+      isSearchPending={isSearchPending}
+      onRefresh={() => {
+        void reloadSales();
+      }}
+      isRefreshing={isRefreshing}
+    />
+  );
+
   if (phase === "loading") {
-    return <p className="my-sales-page__state">{MY_SALES_PAGE_UI.LOADING}</p>;
+    return (
+      <div className="my-sales-page">
+        {toolbar}
+        {overview}
+        <p className="my-sales-page__state">{MY_SALES_PAGE_UI.LOADING}</p>
+      </div>
+    );
   }
 
   if (phase === "error") {
     return (
-      <p className="my-sales-page__state my-sales-page__state_error" role="alert">
-        {error}
-      </p>
-    );
-  }
-
-  const emptyMessage = hasSearchQuery
-    ? MY_SALES_PAGE_UI.EMPTY_BY_SEARCH
-    : statusFilter
-      ? MY_SALES_PAGE_UI.EMPTY_BY_FILTER
-      : MY_SALES_PAGE_UI.EMPTY;
-
-  if (orders.length === 0) {
-    return (
       <div className="my-sales-page">
-        <SalesToolbar
-          statusFilter={statusFilter}
-          onStatusFilterChange={setStatusFilter}
-          searchTerm={searchTerm}
-          onSearchTermChange={setSearchTerm}
-          isSearchPending={isSearchPending}
-          ordersCount={0}
-          totalSalesCount={sellerTotalSalesCount}
-        />
-        <p className="my-sales-page__state">{emptyMessage}</p>
+        {toolbar}
+        {overview}
+        <p className="my-sales-page__state my-sales-page__state_error" role="alert">
+          {error}
+        </p>
       </div>
     );
   }
 
   return (
     <div className="my-sales-page">
-      <SalesToolbar
-        statusFilter={statusFilter}
-        onStatusFilterChange={setStatusFilter}
-        searchTerm={searchTerm}
-        onSearchTermChange={setSearchTerm}
-        isSearchPending={isSearchPending}
-        ordersCount={orders.length}
-        totalSalesCount={sellerTotalSalesCount}
-      />
-      <ul className="my-sales-page__list" role="list">
-        {orders.map((order) => (
-          <li key={order._id} className="my-sales-page__item" role="listitem">
-            <OrderCard
-              order={order}
-              compact
-              showBuyer
-              onBuyerNameClick={onSellerNameClick}
-              onProductClick={openCatalogProductFromOrderLine}
-              onMarkShipped={handleMarkShipped}
-              onMarkDelivered={handleMarkDelivered}
-              onCancelItem={handleCancelItem}
-              pendingActionKey={pendingActionKey}
-              itemActionErrors={itemActionErrors}
-            />
-          </li>
-        ))}
-      </ul>
+      {toolbar}
+      {overview}
+      {listActions}
+      {totalVisible === 0 ? (
+        <p className="my-sales-page__state">{emptyMessage}</p>
+      ) : (
+        <ul className="my-sales-page__list" role="list">
+          {filteredOrders.map((order) => {
+            const orderId = String(order._id);
+            return (
+              <li key={order._id} className="my-sales-page__item" role="listitem">
+                <OrderCard
+                  order={order}
+                  compact
+                  collapsible
+                  expanded={expandedIds.has(orderId)}
+                  onExpandedChange={() => toggleExpanded(orderId)}
+                  attentionRole="seller"
+                  showBuyer
+                  onBuyerNameClick={onSellerNameClick}
+                  onProductClick={openCatalogProductFromOrderLine}
+                  onMarkShipped={handleMarkShipped}
+                  onMarkDelivered={handleMarkDelivered}
+                  onCancelItem={handleCancelItem}
+                  pendingActionKey={pendingActionKey}
+                  itemActionErrors={itemActionErrors}
+                />
+              </li>
+            );
+          })}
+        </ul>
+      )}
       <ProductDetailsModal
         isOpen={catalogProduct != null}
         product={catalogProduct}
@@ -327,23 +446,27 @@ const SALES_STATUS_FILTER_OPTIONS = [
 
 /**
  * @param {{
+ *   summaryCountLabel: string;
+ *   totalSalesCount: number;
  *   statusFilter: string;
  *   onStatusFilterChange: (value: string) => void;
  *   searchTerm: string;
  *   onSearchTermChange: (value: string) => void;
  *   isSearchPending: boolean;
- *   ordersCount: number;
- *   totalSalesCount: number;
+ *   onRefresh?: () => void;
+ *   isRefreshing?: boolean;
  * }} props
  */
 function SalesToolbar({
+  summaryCountLabel,
+  totalSalesCount,
   statusFilter,
   onStatusFilterChange,
   searchTerm,
   onSearchTermChange,
   isSearchPending,
-  ordersCount,
-  totalSalesCount,
+  onRefresh,
+  isRefreshing = false,
 }) {
   return (
     <div className="my-sales-page__toolbar">
@@ -353,7 +476,20 @@ function SalesToolbar({
           <span className="my-sales-page__total-sales-count">
             {MY_SALES_PAGE_UI.TOTAL_SALES_COUNT(totalSalesCount)}
           </span>
-          <span className="my-sales-page__count">{MY_SALES_PAGE_UI.COUNT(ordersCount)}</span>
+          <div className="my-sales-page__toolbar-meta-row">
+            <span className="my-sales-page__count">{summaryCountLabel}</span>
+            {typeof onRefresh === "function" ? (
+              <button
+                type="button"
+                className="my-sales-page__refresh"
+                onClick={onRefresh}
+                disabled={isRefreshing}
+                aria-busy={isRefreshing}
+              >
+                {MY_SALES_PAGE_UI.REFRESH}
+              </button>
+            ) : null}
+          </div>
         </div>
       </div>
 

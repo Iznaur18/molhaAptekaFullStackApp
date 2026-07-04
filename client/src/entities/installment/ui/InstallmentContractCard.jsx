@@ -1,10 +1,13 @@
 import { useInstallmentContractCard } from "../model/useInstallmentContractCard.js";
+import { contractNeedsBuyerAttention } from "../lib/contractNeedsBuyerAttention.js";
+import { contractNeedsSellerAttention } from "../lib/contractNeedsSellerAttention.js";
 import { INSTALLMENT_CONTRACT_STATUS_COMPLETED } from "../model/constants.js";
 import { INSTALLMENT_UI } from "../../../shared/config/appUiCopy.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 import { InstallmentContractCounterparty } from "./InstallmentContractCounterparty.jsx";
 import { InstallmentContractCardSummary } from "./InstallmentContractCardSummary.jsx";
 import { InstallmentContractCardPayments } from "./InstallmentContractCardPayments.jsx";
+import { InstallmentContractProgressBar } from "./InstallmentContractProgressBar.jsx";
 
 import "./InstallmentContractCard.css";
 
@@ -16,6 +19,9 @@ import "./InstallmentContractCard.css";
  *   onCounterpartyClick?: (userId: string) => void;
  *   onProductClick?: (productId: string) => void;
  *   compact?: boolean;
+ *   collapsible?: boolean;
+ *   expanded?: boolean;
+ *   onExpandedChange?: (expanded: boolean) => void;
  * }} props
  */
 export function InstallmentContractCard({
@@ -25,8 +31,40 @@ export function InstallmentContractCard({
   onCounterpartyClick,
   onProductClick,
   compact = false,
+  collapsible = false,
+  expanded = true,
+  onExpandedChange,
 }) {
   const card = useInstallmentContractCard({ contract, role, onUpdated });
+  const isExpanded = !collapsible || expanded;
+  const needsAttention =
+    role === "buyer"
+      ? contractNeedsBuyerAttention(contract)
+      : contractNeedsSellerAttention(contract);
+
+  const toggleExpanded = () => {
+    onExpandedChange?.(!expanded);
+  };
+
+  const pendingConfirmationPayment = (contract.payments ?? []).find(
+    (payment) => payment.status === card.paymentStatuses.pendingConfirmation,
+  );
+
+  const nextDuePreview = !isExpanded
+    ? role === "buyer" && card.nextPayablePayment
+      ? INSTALLMENT_UI.PAYMENTS_NEXT_DUE(
+          formatPriceRub(card.nextPayablePayment.amountRub),
+          new Date(card.nextPayablePayment.dueAt).toLocaleDateString("ru-RU"),
+        )
+      : role === "seller" && card.earlyPayoffPending
+        ? INSTALLMENT_UI.SALES_NEXT_ACTION_EARLY_PAYOFF
+        : role === "seller" && pendingConfirmationPayment
+          ? INSTALLMENT_UI.PAYMENTS_NEXT_DUE(
+              formatPriceRub(pendingConfirmationPayment.amountRub),
+              new Date(pendingConfirmationPayment.dueAt).toLocaleDateString("ru-RU"),
+            )
+          : null
+    : null;
 
   return (
     <article
@@ -34,12 +72,56 @@ export function InstallmentContractCard({
         "installment-contract-card",
         compact ? "installment-contract-card--compact" : "",
         card.isFullyPaid && "installment-contract-card_completed",
+        needsAttention && "installment-contract-card_attention",
       ]
         .filter(Boolean)
         .join(" ")}
     >
       <div className="installment-contract-card__header">
-        {typeof onProductClick === "function" ? (
+        {collapsible ? (
+          <button
+            type="button"
+            className="installment-contract-card__header-toggle"
+            aria-expanded={isExpanded}
+            onClick={toggleExpanded}
+          >
+            {typeof onProductClick === "function" ? (
+              <span
+                className="installment-contract-card__title installment-contract-card__title_link"
+                role="link"
+                tabIndex={0}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onProductClick(String(contract.productId));
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    onProductClick(String(contract.productId));
+                  }
+                }}
+              >
+                {contract.productNameAtContract}
+              </span>
+            ) : (
+              <span className="installment-contract-card__title">
+                {contract.productNameAtContract}
+              </span>
+            )}
+            <span
+              className={[
+                "installment-contract-card__chevron",
+                isExpanded ? "installment-contract-card__chevron_expanded" : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              aria-hidden="true"
+            >
+              ▸
+            </span>
+          </button>
+        ) : typeof onProductClick === "function" ? (
           <button
             type="button"
             className="installment-contract-card__title installment-contract-card__title_link"
@@ -70,21 +152,18 @@ export function InstallmentContractCard({
       </div>
 
       {compact ? (
-        <div
-          className="installment-contract-card__progress"
-          role="progressbar"
-          aria-valuenow={card.paidPercent}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-label={`${INSTALLMENT_UI.CONTRACT_PAID}: ${card.paidPercent}%`}
-        >
-          <div
-            className="installment-contract-card__progress-fill"
-            style={{ width: `${card.paidPercent}%` }}
-          />
-        </div>
+        <InstallmentContractProgressBar
+          percent={card.paidPercent}
+          ariaLabel={`${INSTALLMENT_UI.CONTRACT_PAID}: ${card.paidPercent}%`}
+        />
       ) : null}
 
+      {!isExpanded && nextDuePreview ? (
+        <p className="installment-contract-card__next-due">{nextDuePreview}</p>
+      ) : null}
+
+      {isExpanded ? (
+        <>
       {role === "buyer" ? (
         <InstallmentContractCounterparty
           label={INSTALLMENT_UI.SELLER_LABEL}
@@ -176,7 +255,7 @@ export function InstallmentContractCard({
           {role === "buyer" && card.earlyPayoffPending ? (
             <button
               type="button"
-              className="installment-contract-card__btn"
+              className="installment-contract-card__btn installment-contract-card__btn_cancel"
               disabled={card.pendingKey != null}
               onClick={card.handleCancelEarlyPayoff}
             >
@@ -255,6 +334,8 @@ export function InstallmentContractCard({
             </>
           ) : null}
         </div>
+      ) : null}
+        </>
       ) : null}
     </article>
   );

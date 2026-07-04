@@ -144,11 +144,6 @@ export const useFormFieldStyles = createThemedStyles((theme) => ({
 export const useCheckoutFormStyles = createThemedStyles((theme) => ({
   form: {
     gap: 14,
-    padding: theme.spacing[4],
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    borderRadius: theme.radius.button,
-    backgroundColor: theme.colors.surface,
   },
   heading: {
     fontSize: 17,
@@ -209,8 +204,15 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
     fontSize: 14,
   },
   submitSpacer: {
-    alignSelf: "flex-start",
-    marginTop: 4,
+    alignSelf: "stretch",
+    marginTop: theme.spacing[2],
+    paddingVertical: theme.spacing[1],
+    borderRadius: theme.radius.button,
+    shadowColor: theme.colors.action,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.22,
+    shadowRadius: 6,
+    elevation: 4,
   },
 }));
 

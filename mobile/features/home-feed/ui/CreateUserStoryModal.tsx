@@ -18,6 +18,7 @@ import {
 } from "@/entities/user-story/model/constants";
 import type { UploadImageFilePayload } from "@/entities/upload/api/uploadImage";
 import type { UploadVideoFilePayload } from "@/entities/upload/api/uploadVideo";
+import { STORY_UPLOAD_VIDEO_MAX_BYTES } from "@/entities/upload/model/videoConstants";
 import { useUploadImageMutation } from "@/entities/upload/model/useUploadImageMutation";
 import { useUploadVideoMutation } from "@/entities/upload/model/useUploadVideoMutation";
 import { pickGalleryImageAsset } from "@/features/image-upload/lib/pickGalleryImageAsset";
@@ -95,7 +96,7 @@ export const CreateUserStoryModal = ({
   const handlePickVideo = async () => {
     setErrorMessage("");
     try {
-      const asset = await pickVideoAsset();
+      const asset = await pickVideoAsset({ maxBytes: STORY_UPLOAD_VIDEO_MAX_BYTES });
       if (!asset) {
         return;
       }
@@ -123,7 +124,7 @@ export const CreateUserStoryModal = ({
     try {
       const mediaUrl =
         mediaType === USER_STORY_MEDIA_TYPE_VIDEO
-          ? await uploadVideoMutation.mutateAsync(videoFile!)
+          ? await uploadVideoMutation.mutateAsync({ ...videoFile!, purpose: "story" })
           : await uploadImageMutation.mutateAsync(imageFile!);
 
       await createMutation.mutateAsync({
@@ -179,6 +180,8 @@ export const CreateUserStoryModal = ({
               <Text style={styles.pickText}>{USER_STORY_UI.PICK_VIDEO}</Text>
             </Pressable>
           </View>
+
+          <Text style={styles.videoHint}>{USER_STORY_UI.VIDEO_DURATION_HINT}</Text>
 
           <Text style={styles.label}>{USER_STORY_UI.CAPTION_LABEL}</Text>
           <TextInput

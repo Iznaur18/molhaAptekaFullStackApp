@@ -131,6 +131,92 @@ export const useAuctionPageStyles = createThemedStyles((theme) => ({
     color: theme.colors.onContrast,
     fontWeight: "600",
   },
+  viewChips: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 5.6,
+    paddingVertical: 2.4,
+  },
+  viewChip: {
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 999,
+    paddingVertical: 3.5,
+    paddingHorizontal: 8.8,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+  },
+  viewChipActive: {
+    borderColor: "#d97706",
+    backgroundColor: "#d97706",
+  },
+  viewChipText: {
+    fontSize: 14.4,
+    fontWeight: "600",
+    lineHeight: 18.7,
+    color: theme.colors.textSecondary,
+  },
+  viewChipTextActive: {
+    color: theme.colors.onContrast,
+  },
+  overview: {
+    gap: 8,
+  },
+  overviewTile: {
+    gap: 2,
+    paddingVertical: 9.6,
+    paddingHorizontal: 10.4,
+    borderRadius: 8.8,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+  },
+  overviewTileActive: {
+    borderColor: "#d97706",
+    backgroundColor: WARNING_YELLOW_SOFT,
+  },
+  overviewTileAttention: {
+    borderColor: "rgba(217, 119, 6, 0.45)",
+  },
+  overviewLabel: {
+    fontSize: 11.2,
+    fontWeight: "700",
+    letterSpacing: 0.4,
+    textTransform: "uppercase",
+    color: theme.colors.textMuted,
+  },
+  overviewValue: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: theme.colors.text,
+    fontVariant: ["tabular-nums"],
+  },
+  overviewValueAttention: {
+    color: WARNING_BROWN_DARK,
+  },
+  listActions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+    alignItems: "center",
+  },
+  listAction: {
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 999,
+    paddingVertical: 3.5,
+    paddingHorizontal: 8.8,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+  },
+  listActionText: {
+    fontSize: 13.1,
+    fontWeight: "600",
+    color: theme.colors.textSecondary,
+  },
+  filterHint: {
+    flexBasis: "100%",
+    fontSize: 13.1,
+    color: theme.colors.textMuted,
+  },
 }));
 
 export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
@@ -138,14 +224,48 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
     gap: ROW_GAP,
     padding: ROW_PADDING,
     borderWidth: StyleSheet.hairlineWidth,
+    borderLeftWidth: 3,
     borderRadius: ROW_RADIUS,
     borderColor: theme.colors.border,
+    borderLeftColor: theme.colors.border,
     backgroundColor: theme.colors.surface,
     shadowColor: theme.colors.ink,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.04,
     shadowRadius: 0,
     elevation: 1,
+  },
+  rowAttention: {
+    borderLeftColor: "#d97706",
+    shadowOpacity: 0.1,
+  },
+  headLine: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: 7.2,
+  },
+  chevronButton: {
+    flexShrink: 0,
+    padding: 0,
+  },
+  chevron: {
+    width: 20,
+    height: 20,
+    borderRadius: 999,
+    overflow: "hidden",
+    textAlign: "center",
+    lineHeight: 20,
+    fontSize: 12,
+    color: theme.colors.textMuted,
+    backgroundColor: theme.colors.surfaceMuted,
+  },
+  chevronExpanded: {
+    transform: [{ rotate: "90deg" }],
+  },
+  preview: {
+    fontSize: 13.1,
+    color: theme.colors.textSecondary,
   },
   head: {
     flexDirection: "row",
@@ -326,12 +446,16 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
   },
   editorCancel: {
     alignSelf: "flex-start",
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 7,
+    backgroundColor: theme.colors.danger,
   },
   editorCancelText: {
     fontSize: 13.12,
     fontWeight: "600",
-    color: DANGER_STRONG,
-    textDecorationLine: "underline",
+    color: theme.colors.onContrast,
+    textDecorationLine: "none",
   },
   decision: {
     flexDirection: "row",

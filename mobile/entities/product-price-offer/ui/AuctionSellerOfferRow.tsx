@@ -2,6 +2,10 @@ import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
 import type { IncomingPriceOffer } from "@/entities/product-price-offer/api/incomingPriceOffersApi";
+import {
+  offerNeedsAttention,
+  resolveSellerOfferCollapsedPreview,
+} from "@/entities/product-price-offer/lib/auctionDashboardAttention";
 import { usePriceOfferSellerMutations } from "@/entities/product-price-offer/model/usePriceOfferSellerMutations";
 import { AuctionDashboardProductThumb } from "@/entities/product-price-offer/ui/AuctionDashboardProductThumb";
 import { AuctionDashboardRowBuyerMeta } from "@/entities/product-price-offer/ui/AuctionDashboardRowBuyerMeta";
@@ -22,6 +26,9 @@ type AuctionSellerOfferRowProps = {
   onProductClick?: (productId: string) => void;
   onBuyerClick?: (userId: string) => void;
   onChanged?: () => void;
+  collapsible?: boolean;
+  expanded?: boolean;
+  onExpandedChange?: (expanded: boolean) => void;
 };
 
 export const AuctionSellerOfferRow = ({
@@ -29,6 +36,9 @@ export const AuctionSellerOfferRow = ({
   onProductClick,
   onBuyerClick,
   onChanged,
+  collapsible = false,
+  expanded = true,
+  onExpandedChange,
 }: AuctionSellerOfferRowProps) => {
   const styles = useAuctionDashboardRowStyles();
   const { acceptMutation, rejectMutation } = usePriceOfferSellerMutations(String(offer.productId));
@@ -38,6 +48,13 @@ export const AuctionSellerOfferRow = ({
   const productName = offer.product?.productName ?? "Товар";
   const isPending = offer.status === PRICE_OFFER_STATUS_PENDING;
   const isAccepted = offer.status === PRICE_OFFER_STATUS_ACCEPTED;
+  const isExpanded = !collapsible || expanded;
+  const needsAttention = offerNeedsAttention(offer);
+  const collapsedPreview = !isExpanded ? resolveSellerOfferCollapsedPreview(offer) : null;
+
+  const toggleExpanded = () => {
+    onExpandedChange?.(!expanded);
+  };
 
   const handleAccept = async () => {
     setError("");
@@ -60,36 +77,52 @@ export const AuctionSellerOfferRow = ({
   };
 
   return (
-    <View style={styles.row}>
+    <View style={[styles.row, needsAttention ? styles.rowAttention : null]}>
       <View style={styles.head}>
         <AuctionDashboardProductThumb product={offer.product} />
         <View style={styles.main}>
-          {onProductClick ? (
-            <Pressable
-              style={styles.titlePressable}
-              onPress={() => onProductClick(String(offer.productId))}
-            >
-              <Text style={styles.title} numberOfLines={2}>
+          <View style={styles.headLine}>
+            {onProductClick ? (
+              <Pressable
+                style={styles.titlePressable}
+                onPress={() => onProductClick(String(offer.productId))}
+              >
+                <Text style={styles.title} numberOfLines={2}>
+                  {productName}
+                </Text>
+              </Pressable>
+            ) : (
+              <Text style={styles.titleStatic} numberOfLines={2}>
                 {productName}
               </Text>
-            </Pressable>
-          ) : (
-            <Text style={styles.titleStatic} numberOfLines={2}>
-              {productName}
-            </Text>
-          )}
-          <AuctionDashboardRowBuyerMeta
-            buyer={offer.buyer}
-            createdAt={offer.createdAt}
-            onBuyerClick={onBuyerClick}
-          />
-          <AuctionDashboardRowStatus isPending={isPending} isAccepted={isAccepted}>
-            {isPending
-              ? PRODUCT_PRICE_OFFER_UI.STATUS_PENDING
-              : isAccepted
-                ? PRODUCT_PRICE_OFFER_UI.ACCEPTED_BADGE
-                : null}
-          </AuctionDashboardRowStatus>
+            )}
+            {collapsible ? (
+              <Pressable
+                style={styles.chevronButton}
+                accessibilityRole="button"
+                accessibilityLabel={AUCTION_PAGE_UI.EXPAND_TOGGLE(isExpanded)}
+                onPress={toggleExpanded}
+              >
+                <Text style={[styles.chevron, isExpanded ? styles.chevronExpanded : null]}>▸</Text>
+              </Pressable>
+            ) : null}
+          </View>
+          {isExpanded ? (
+            <>
+              <AuctionDashboardRowBuyerMeta
+                buyer={offer.buyer}
+                createdAt={offer.createdAt}
+                onBuyerClick={onBuyerClick}
+              />
+              <AuctionDashboardRowStatus isPending={isPending} isAccepted={isAccepted}>
+                {isPending
+                  ? PRODUCT_PRICE_OFFER_UI.STATUS_PENDING
+                  : isAccepted
+                    ? PRODUCT_PRICE_OFFER_UI.ACCEPTED_BADGE
+                    : null}
+              </AuctionDashboardRowStatus>
+            </>
+          ) : null}
         </View>
       </View>
 
@@ -98,25 +131,31 @@ export const AuctionSellerOfferRow = ({
         <Text style={styles.price}>{formatPriceRub(offer.offerPrice)}</Text>
       </View>
 
-      {isPending ? (
-        <AuctionDashboardSellerActions
-          onAccept={() => {
-            void handleAccept();
-          }}
-          onReject={() => {
-            void handleReject();
-          }}
-          disabled={isBusy}
-          acceptLabel={PRODUCT_PRICE_OFFER_UI.ACTION_ACCEPT}
-          rejectLabel={PRODUCT_PRICE_OFFER_UI.ACTION_REJECT}
-          pendingLabel={PRODUCT_PRICE_OFFER_UI.ACTION_PENDING}
-        />
-      ) : null}
+      {collapsedPreview ? <Text style={styles.preview}>{collapsedPreview}</Text> : null}
 
-      {error ? (
-        <Text style={styles.error} accessibilityRole="alert">
-          {error}
-        </Text>
+      {isExpanded ? (
+        <>
+          {isPending ? (
+            <AuctionDashboardSellerActions
+              onAccept={() => {
+                void handleAccept();
+              }}
+              onReject={() => {
+                void handleReject();
+              }}
+              disabled={isBusy}
+              acceptLabel={PRODUCT_PRICE_OFFER_UI.ACTION_ACCEPT}
+              rejectLabel={PRODUCT_PRICE_OFFER_UI.ACTION_REJECT}
+              pendingLabel={PRODUCT_PRICE_OFFER_UI.ACTION_PENDING}
+            />
+          ) : null}
+
+          {error ? (
+            <Text style={styles.error} accessibilityRole="alert">
+              {error}
+            </Text>
+          ) : null}
+        </>
       ) : null}
     </View>
   );

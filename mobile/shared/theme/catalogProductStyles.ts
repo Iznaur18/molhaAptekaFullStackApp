@@ -20,6 +20,9 @@ import {
   CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_HORIZONTAL,
   CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_TOP,
   CURATED_PRODUCT_LIST_HOME_SECTION_MARGIN_BOTTOM,
+  CURATED_PRODUCT_LIST_HOME_SECTION_BORDER_RADIUS,
+  CURATED_PRODUCT_LIST_HOME_SECTION_PADDING_HORIZONTAL,
+  CURATED_PRODUCT_LIST_HOME_SECTION_PADDING_VERTICAL,
   CURATED_PRODUCT_LIST_HOME_TITLE_MARGIN_BOTTOM,
   CURATED_PRODUCT_LIST_HOME_TITLE_PADDING_X,
 } from "@/entities/curated-product-list/lib/curatedProductListHomeLayout";
@@ -86,13 +89,14 @@ export const useFeedScreenStyles = createThemedStyles((theme) => ({
 export const useCatalogBreadcrumbStyles = createThemedStyles((theme) => ({
   toolbar: {
     paddingTop: 16,
-    marginBottom: 16,
+    marginBottom: 14,
   },
+  // iOS large title
   title: {
-    fontSize: 22,
+    fontSize: 28,
     fontWeight: "800",
-    lineHeight: 28,
-    letterSpacing: -0.44,
+    lineHeight: 34,
+    letterSpacing: -0.7,
     color: theme.colors.ink,
   },
 }));
@@ -209,10 +213,14 @@ export const useProductCardStyles = createThemedStyles((theme) => ({
     position: "relative",
     margin: 3,
     paddingBottom: 7,
-    borderRadius: 14,
+    borderRadius: 16,
     backgroundColor: theme.colors.surface,
-    borderWidth: 1,
-    borderColor: "rgba(17, 24, 39, 0.14)",
+    // Без жёсткой рамки: карточка «плавает» на мягкой тени.
+    shadowColor: "#0f172a",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    elevation: 2,
     overflow: "hidden",
   },
   cardCatalogGrid: {
@@ -872,6 +880,26 @@ export const useProductPriceStyles = createThemedStyles((theme) => ({
     fontSize: 14.7,
     fontWeight: "400",
     color: "#9ca3af",
+    textDecorationLine: "line-through",
+  },
+  cartRoot: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "baseline",
+    gap: 6,
+    columnGap: 8,
+    rowGap: 2,
+  },
+  cartCurrent: {
+    fontSize: 17,
+    fontWeight: "700",
+    color: theme.colors.link,
+    letterSpacing: -0.3,
+  },
+  cartOld: {
+    fontSize: 13,
+    fontWeight: "500",
+    color: theme.colors.textMuted,
     textDecorationLine: "line-through",
   },
   bannerDiscountBadge: {
@@ -2222,18 +2250,17 @@ export const useProductDetailTabStyles = createThemedStyles((theme) => ({
 export const useCartScreenStyles = createThemedStyles((theme) => ({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: theme.colors.surface,
   },
   list: {
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
-    paddingTop: theme.spacing[2],
-    paddingBottom: SCREEN_CONTENT_PADDING_BOTTOM,
+    flexGrow: 1,
   },
   centered: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     padding: theme.spacing[6],
+    backgroundColor: theme.colors.surface,
   },
   message: {
     fontSize: 16,
@@ -2242,61 +2269,54 @@ export const useCartScreenStyles = createThemedStyles((theme) => ({
     marginBottom: theme.spacing[4],
   },
   footer: {
-    paddingTop: theme.spacing[2],
-    gap: theme.spacing[3],
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: theme.colors.border,
+    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingTop: 16,
+    paddingBottom: theme.spacing[2],
+    gap: 10,
   },
-  summaryCard: {
+  footerTopRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    borderRadius: 10,
-    backgroundColor: theme.colors.surface,
+    justifyContent: "space-between",
+    gap: 12,
   },
-  summaryContent: {
+  footerTotalBlock: {
     flex: 1,
     minWidth: 0,
-    gap: 4,
+    gap: 2,
   },
-  totalRow: {
-    minWidth: 0,
-  },
-  totalLabel: {
-    fontSize: 15,
-    color: theme.colors.textMuted,
-  },
-  totalValue: {
-    minWidth: 0,
-    fontSize: 18,
-    fontWeight: "700",
-    color: theme.colors.text,
-  },
-  fullTotalHint: {
+  footerTotalLabel: {
     fontSize: 13,
     color: theme.colors.textMuted,
   },
-  checkoutHint: {
-    fontSize: 14,
-    color: theme.colors.danger,
-    textAlign: "center",
+  footerTotalValue: {
+    fontSize: 20,
+    fontWeight: "800",
+    color: theme.colors.text,
   },
-  checkoutButton: {
-    marginBottom: theme.spacing[2],
+  footerFullTotalHint: {
+    fontSize: 12,
+    color: theme.colors.textMuted,
+  },
+  footerCheckoutButton: {
+    marginTop: 4,
   },
   clearButton: {
     flexShrink: 0,
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    borderRadius: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
   },
   clearButtonText: {
     color: theme.colors.danger,
     fontSize: 14,
+    fontWeight: "600",
+  },
+  checkoutHint: {
+    fontSize: 13,
+    color: theme.colors.danger,
+    textAlign: "center",
   },
   buttonDisabled: {
     opacity: 0.6,
@@ -2307,7 +2327,7 @@ export const useCuratedProductCompactCardStyles = createThemedStyles(() => ({
   card: {
     borderWidth: 1,
     borderColor: C.border,
-    borderRadius: 12,
+    borderRadius: 16,
     overflow: "hidden",
     backgroundColor: "transparent",
   },
@@ -2344,10 +2364,17 @@ export const useCuratedProductCompactCardStyles = createThemedStyles(() => ({
 export const useHomeCuratedListsStyles = createThemedStyles((theme) => ({
   listBlock: {
     marginBottom: CURATED_PRODUCT_LIST_HOME_SECTION_MARGIN_BOTTOM,
+    paddingHorizontal: CURATED_PRODUCT_LIST_HOME_SECTION_PADDING_HORIZONTAL,
+    paddingVertical: CURATED_PRODUCT_LIST_HOME_SECTION_PADDING_VERTICAL,
+    backgroundColor: "#ffffff",
+    borderWidth: 0,
+    borderColor: "transparent",
+    borderRadius: CURATED_PRODUCT_LIST_HOME_SECTION_BORDER_RADIUS,
   },
   title: {
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: 16,
+    fontWeight: "600",
+    letterSpacing: -0.4,
     color: theme.colors.ink,
     marginBottom: CURATED_PRODUCT_LIST_HOME_TITLE_MARGIN_BOTTOM,
     paddingHorizontal: CURATED_PRODUCT_LIST_HOME_TITLE_PADDING_X,
@@ -2360,19 +2387,21 @@ export const useHomeCuratedListsStyles = createThemedStyles((theme) => ({
   },
 }));
 
-/** Паритет с `client/.../CatalogCityFilterBanner.css`. */
 export const useCatalogCityFilterBannerStyles = createThemedStyles((theme) => ({
   root: {
     flexDirection: "column",
     alignItems: "flex-start",
     gap: 12,
     marginBottom: 12,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 10,
-    backgroundColor: theme.colors.surfaceElevated,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 14,
+    backgroundColor: theme.colors.surface,
+    shadowColor: "#0f172a",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 1,
   },
   text: {
     fontSize: 15,
@@ -2398,13 +2427,14 @@ export const useUserStoriesStripStyles = createThemedStyles((theme) => ({
     minHeight: 119,
     borderRadius: USER_STORY_STRIP_LAYOUT.scrollBorderRadius,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "transparent",
+    borderColor: theme.colors.border,
     backgroundColor: USER_STORY_STRIP_COLORS.scrollBackground,
     overflow: "hidden",
   },
   scroll: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    flexGrow: 1,
+    alignItems: "center",
     paddingLeft: USER_STORY_STRIP_LAYOUT.scrollPaddingLeft,
     paddingRight: USER_STORY_STRIP_LAYOUT.scrollPaddingRight,
     paddingTop: USER_STORY_STRIP_LAYOUT.scrollPaddingTop,
@@ -2488,7 +2518,7 @@ export const useUserStoriesStripStyles = createThemedStyles((theme) => ({
   label: {
     width: "100%",
     fontSize: USER_STORY_STRIP_LAYOUT.labelFontSize,
-    color: theme.colors.onContrast,
+    color: theme.colors.textSecondary,
     maxWidth: USER_STORY_STRIP_LAYOUT.itemWidth,
     textAlign: "center",
   },

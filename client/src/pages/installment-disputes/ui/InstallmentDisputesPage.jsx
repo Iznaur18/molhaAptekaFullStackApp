@@ -197,7 +197,7 @@ export function InstallmentDisputesPage({ onQueueChanged }) {
                     </button>
                     <button
                       type="button"
-                      className="installment-queue-card__btn"
+                      className="installment-queue-card__btn installment-queue-card__btn_cancel"
                       disabled={isBusy}
                       onClick={() => void handleResolve(dispute._id, "cancel")}
                     >

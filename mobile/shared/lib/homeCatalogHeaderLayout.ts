@@ -1,8 +1,8 @@
 /** Паритет с web `AppShell.css` @media (max-width: 640px). */
 export const HOME_CATALOG_HEADER_SHELL_HORIZONTAL_INSET = 16;
 
-/** Web `.app-shell--header-v1 .app-shell__header--v1` border-radius @640. */
-export const HOME_CATALOG_HEADER_PANEL_RADIUS = 14;
+/** Мобильный редизайн: крупные скругления нижних углов glass-панели. */
+export const HOME_CATALOG_HEADER_PANEL_RADIUS = 24;
 
 /**
  * Web `.app-shell--header-v1 .app-shell__header--v1` padding @640:
@@ -17,8 +17,8 @@ export const HOME_CATALOG_HEADER_PANEL_PADDING = {
 /** Web `.app-shell--header-v1 .app-shell__header--v1` margin-bottom @mobile preview. */
 export const HOME_CATALOG_HEADER_BOTTOM_MARGIN = 0;
 
-/** Web `color-mix(in srgb, var(--iz-color-text) 8%, transparent)` on #111827. */
-export const HOME_CATALOG_HEADER_PANEL_BORDER_COLOR = "rgba(17, 24, 39, 0.08)";
+/** Едва заметная кромка glass-панели (мобильный редизайн). */
+export const HOME_CATALOG_HEADER_PANEL_BORDER_COLOR = "rgba(17, 24, 39, 0.04)";
 
 /** Web `backdrop-filter: blur(14px)` on glass header. */
 export const HOME_CATALOG_HEADER_PANEL_BLUR_RADIUS = 14;
@@ -49,11 +49,11 @@ export const HOME_CATALOG_HEADER_PANEL_GLASS_BACKGROUND = "rgba(255, 255, 255, 0
 /** Web inset `0 1px 0 color-mix(on-contrast 65%)`. */
 export const HOME_CATALOG_HEADER_PANEL_INSET_LINE_COLOR = "rgba(255, 255, 255, 0.65)";
 
-/** Web `--iz-shadow-lg`. */
+/** Мягкая рассеянная тень под панелью. */
 export const HOME_CATALOG_HEADER_PANEL_SHADOW = {
-  color: "rgba(15, 23, 42, 0.07)",
-  offsetY: 10,
-  radius: 28,
+  color: "rgba(15, 23, 42, 0.06)",
+  offsetY: 12,
+  radius: 32,
 } as const;
 
 /** Web `--iz-shadow-card` on auth-actions pill. */
@@ -65,8 +65,8 @@ export const HOME_CATALOG_HEADER_TOP_ROW_GAP = 8;
 /** Отступ между glass-панелью шапки и каруселью баннера (sibling, не внутри panel). */
 export const HOME_CATALOG_HEADER_BANNER_BELOW_PANEL_MARGIN = 8;
 
-/** Web mobile-split header: высота от контента, не фикс. */
-export const HOME_CATALOG_HEADER_SEARCH_INPUT_MIN_HEIGHT = 30.4;
+/** Высота поисковой «пилюли» в стиле iOS search bar. */
+export const HOME_CATALOG_HEADER_SEARCH_INPUT_MIN_HEIGHT = 38;
 
 /** Web `.app-shell__header--v1::before` height. */
 export const HOME_CATALOG_HEADER_ACCENT_HEIGHT = 3;
@@ -83,26 +83,30 @@ export const resolveHomeCatalogHeaderLogoMaxWidth = (screenWidth: number): numbe
 /** Web `.header-circle-button` `2.25rem`. */
 export const HOME_CATALOG_HEADER_CIRCLE_BUTTON_SIZE = 36;
 
-/** Web `.app-shell__auth-actions--mobile-top` padding `0.2rem` @640. */
-export const HOME_CATALOG_HEADER_USERS_PILL_PADDING = 3.2;
+/** Кнопки шапки без внешней обводки — паддинг не нужен. */
+export const HOME_CATALOG_HEADER_USERS_PILL_PADDING = 0;
 
 /** Web `.app-shell__auth-actions--mobile-top` gap `0.3rem` @640. */
 export const HOME_CATALOG_HEADER_USERS_PILL_GAP = 4.8;
 
-/** Web `.search-input__field` padding vertical `0.45rem` @640. */
-export const HOME_CATALOG_HEADER_SEARCH_INPUT_PADDING_VERTICAL = 7.2;
+/** Вертикальный паддинг поисковой «пилюли». */
+export const HOME_CATALOG_HEADER_SEARCH_INPUT_PADDING_VERTICAL = 8;
 
-/** Web `.search-input__field` padding-left `0.85rem`. */
-export const HOME_CATALOG_HEADER_SEARCH_INPUT_PADDING_LEFT = 13.6;
+/** Левый паддинг поисковой «пилюли»: место под иконку-лупу. */
+export const HOME_CATALOG_HEADER_SEARCH_INPUT_PADDING_LEFT = 38;
 
-/** Web `.search-input__field` padding-right @640 `2rem`. */
+/** Размер и отступ иконки-лупы внутри поисковой «пилюли». */
+export const HOME_CATALOG_HEADER_SEARCH_ICON_SIZE = 18;
+export const HOME_CATALOG_HEADER_SEARCH_ICON_LEFT = 12;
+
+/** Правый паддинг (место под clear-кнопку). */
 export const HOME_CATALOG_HEADER_SEARCH_INPUT_PADDING_RIGHT = 32;
 
-/** Web `--iz-radius-input` `0.5rem`. */
-export const HOME_CATALOG_HEADER_SEARCH_INPUT_BORDER_RADIUS = 8;
+/** Полностью скруглённая «пилюля» (высота 38 / 2). */
+export const HOME_CATALOG_HEADER_SEARCH_INPUT_BORDER_RADIUS = 19;
 
-/** Web `.search-input__field` font-size `0.82rem` @640. */
-export const HOME_CATALOG_HEADER_SEARCH_INPUT_FONT_SIZE = 13.12;
+/** Читабельный размер шрифта поиска. */
+export const HOME_CATALOG_HEADER_SEARCH_INPUT_FONT_SIZE = 15;
 
 type ScreenSafeAreaInsets = {
   left?: number;

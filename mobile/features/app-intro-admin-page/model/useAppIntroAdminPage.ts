@@ -20,9 +20,9 @@ const formToPreviewSettings = (form: AppIntroAdminForm): AppIntroSettings => {
     posterUrl: body.posterUrl,
     fallbackTitle: body.fallbackTitle ?? "",
     fallbackHint: body.fallbackHint ?? "",
-    minMs: body.minMs,
-    maxMs: body.maxMs,
-    fadeOutMs: body.fadeOutMs,
+    minMs: Number(form.minMs) || 0,
+    maxMs: Number(form.maxMs) || 0,
+    fadeOutMs: Number(form.fadeOutMs) || 0,
     updatedAt: null,
   };
 };

@@ -22,6 +22,7 @@ type CheckoutFormProps = {
   submitError: string;
   submitSuccess: string;
   isDisabled?: boolean;
+  showHeading?: boolean;
   onSubmit: (payload: {
     deliveryAddress: string;
     deliveryAddressFlat: string;
@@ -35,6 +36,7 @@ export const CheckoutForm = ({
   submitError,
   submitSuccess,
   isDisabled = false,
+  showHeading = true,
   onSubmit,
 }: CheckoutFormProps) => {
   const theme = useAppTheme();
@@ -68,7 +70,9 @@ export const CheckoutForm = ({
 
   return (
     <View style={checkoutStyles.form}>
-      <Text style={checkoutStyles.heading}>{CHECKOUT_FORM_UI.HEADING}</Text>
+      {showHeading ? (
+        <Text style={checkoutStyles.heading}>{CHECKOUT_FORM_UI.HEADING}</Text>
+      ) : null}
 
       <AddressSuggestInput
         value={deliveryAddress}

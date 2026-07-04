@@ -95,7 +95,7 @@ function RootLayoutNav() {
         <Stack.Screen name="profile" options={{ headerShown: false }} />
         <Stack.Screen name="notifications/index" options={{ headerShown: true }} />
         <Stack.Screen name="catalog-browser" options={{ headerShown: true }} />
-        <Stack.Screen name="create-product" options={{ title: "Новый товар" }} />
+        <Stack.Screen name="create-product" options={{ headerShown: false }} />
         <Stack.Screen name="edit-product/[id]" options={{ title: "Редактирование" }} />
         <Stack.Screen name="raffle/[id]" options={{ title: "Розыгрыш" }} />
         <Stack.Screen name="user/[id]" options={{ title: "Профиль" }} />

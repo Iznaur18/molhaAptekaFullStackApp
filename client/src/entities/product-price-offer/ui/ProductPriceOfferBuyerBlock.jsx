@@ -303,7 +303,7 @@ export function ProductPriceOfferBuyerBlock({
                 {myOffer?.status === PRICE_OFFER_STATUS_PENDING ? (
                   <button
                     type="button"
-                    className="product-price-offer__btn product-price-offer__btn--secondary"
+                    className="product-price-offer__btn product-price-offer__btn--cancel"
                     disabled={isBusy}
                     onClick={() => void handleCancel()}
                   >

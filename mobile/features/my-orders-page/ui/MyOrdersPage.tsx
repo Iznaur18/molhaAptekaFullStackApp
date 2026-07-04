@@ -8,15 +8,20 @@ import { Alert, FlatList, Pressable, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { getOrderItemIndex } from "@/entities/order/lib/getOrderItemIndex";
+import { filterMyOrders } from "@/entities/order/lib/filterMyOrders";
+import { orderNeedsBuyerAttention } from "@/entities/order/lib/orderNeedsBuyerAttention";
 import { resolveOrderLineProductId } from "@/entities/order/lib/resolveOrderLineProductId";
+import { summarizeMyOrders } from "@/entities/order/lib/summarizeMyOrders";
 import {
   ORDER_STATUS_CANCELLED,
   ORDER_STATUS_CONFIRMED,
 } from "@/entities/order/model/constants";
+import { MY_ORDERS_LIST_FILTER_IN_PROGRESS } from "@/entities/order/model/myOrdersListFilters";
 import { useMyOrdersQuery } from "@/entities/order/model/useMyOrdersQuery";
 import { useOrderMutations } from "@/entities/order/model/useOrderMutations";
 import { OrderCard } from "@/entities/order/ui/OrderCard";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
+import { MyOrdersPageOverview } from "@/features/my-orders-page/ui/MyOrdersPageOverview";
 import { MyOrdersPageToolbar } from "@/features/my-orders-page/ui/MyOrdersPageToolbar";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
@@ -46,9 +51,25 @@ export const MyOrdersPage = () => {
   const { confirmItemMutation, cancelItemMutation } = useOrderMutations();
   const [navSheetVisible, setNavSheetVisible] = useState(false);
   const [statusFilter, setStatusFilter] = useState("");
+  const [attentionOnly, setAttentionOnly] = useState(false);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set());
   const [pendingActionKey, setPendingActionKey] = useState<string | null>(null);
   const [itemActionErrors, setItemActionErrors] = useState<Record<string, string>>({});
   const [loyaltyFlash, setLoyaltyFlash] = useState("");
+
+  const allOrders = ordersQuery.data ?? [];
+  const summary = useMemo(() => summarizeMyOrders(allOrders), [allOrders]);
+  const filteredOrders = useMemo(
+    () => filterMyOrders(allOrders, { status: statusFilter, attentionOnly }),
+    [allOrders, statusFilter, attentionOnly],
+  );
+
+  const totalAll = allOrders.length;
+  const totalVisible = filteredOrders.length;
+  const hasFilters = Boolean(statusFilter) || attentionOnly;
+  const summaryCountLabel = hasFilters
+    ? MY_ORDERS_PAGE_UI.COUNT_FILTERED(totalVisible, totalAll)
+    : MY_ORDERS_PAGE_UI.COUNT_ITEMS(totalAll);
 
   useEffect(() => {
     if (!loyaltyFlash) {
@@ -66,6 +87,14 @@ export const MyOrdersPage = () => {
     }, [isAuthorized, ordersQuery.refetch]),
   );
 
+  useEffect(() => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      allOrders.filter(orderNeedsBuyerAttention).forEach((order) => next.add(String(order._id)));
+      return next;
+    });
+  }, [allOrders]);
+
   const patchOrders = useCallback(
     (updater: (orders: OrderRecord[]) => OrderRecord[]) => {
       queryClient.setQueryData(orderQueryKeys.my(), (old) => {
@@ -81,6 +110,36 @@ export const MyOrdersPage = () => {
   const invalidateOrderQueues = useCallback(async () => {
     await queryClient.invalidateQueries({ queryKey: orderQueryKeys.myActionCount() });
   }, [queryClient]);
+
+  const handleRefresh = useCallback(async () => {
+    await ordersQuery.refetch();
+    await invalidateOrderQueues();
+  }, [ordersQuery, invalidateOrderQueues]);
+
+  const toggleExpanded = useCallback((orderId: string) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(orderId)) {
+        next.delete(orderId);
+      } else {
+        next.add(orderId);
+      }
+      return next;
+    });
+  }, []);
+
+  const expandAll = useCallback(() => {
+    setExpandedIds(new Set(filteredOrders.map((order) => String(order._id))));
+  }, [filteredOrders]);
+
+  const collapseAll = useCallback(() => {
+    setExpandedIds(new Set());
+  }, []);
+
+  const handleInProgressFilterClick = useCallback(() => {
+    setStatusFilter(MY_ORDERS_LIST_FILTER_IN_PROGRESS);
+    setAttentionOnly(false);
+  }, []);
 
   const handleConfirmDelivered = async ({
     orderId,
@@ -202,19 +261,10 @@ export const MyOrdersPage = () => {
     [router],
   );
 
-  const orders = ordersQuery.data ?? [];
-
-  const filteredOrders = useMemo(() => {
-    if (!statusFilter) {
-      return orders;
-    }
-    return orders.filter((order) => order.status === statusFilter);
-  }, [orders, statusFilter]);
-
   const emptyMessage =
-    orders.length === 0
+    totalAll === 0
       ? MY_ORDERS_PAGE_UI.EMPTY
-      : statusFilter
+      : hasFilters
         ? MY_ORDERS_PAGE_UI.EMPTY_BY_FILTER
         : MY_ORDERS_PAGE_UI.EMPTY;
 
@@ -225,16 +275,42 @@ export const MyOrdersPage = () => {
         onPress={() => setNavSheetVisible(true)}
       />
       <MyOrdersPageToolbar
+        summaryCountLabel={summaryCountLabel}
         statusFilter={statusFilter}
-        onStatusFilterChange={setStatusFilter}
-        ordersCount={filteredOrders.length}
+        onStatusFilterChange={(value) => {
+          setStatusFilter(value);
+          if (value) {
+            setAttentionOnly(false);
+          }
+        }}
       />
+      <MyOrdersPageOverview
+        inProgressCount={summary.inProgressCount}
+        attentionCount={summary.attentionCount}
+        totalAmountRub={summary.totalAmountRub}
+        attentionOnly={attentionOnly}
+        onInProgressFilterClick={handleInProgressFilterClick}
+        onAttentionFilterChange={setAttentionOnly}
+      />
+      {totalVisible > 0 ? (
+        <View style={styles.listActions}>
+          <Pressable style={styles.listAction} onPress={expandAll}>
+            <Text style={styles.listActionText}>{MY_ORDERS_PAGE_UI.EXPAND_ALL}</Text>
+          </Pressable>
+          <Pressable style={styles.listAction} onPress={collapseAll}>
+            <Text style={styles.listActionText}>{MY_ORDERS_PAGE_UI.COLLAPSE_ALL}</Text>
+          </Pressable>
+          {attentionOnly ? (
+            <Text style={styles.filterHint}>{MY_ORDERS_PAGE_UI.ATTENTION_FILTER_HINT}</Text>
+          ) : null}
+        </View>
+      ) : null}
       {loyaltyFlash ? (
         <Text style={styles.loyaltyFlash} accessibilityRole="text">
           {loyaltyFlash}
         </Text>
       ) : null}
-      {filteredOrders.length === 0 ? (
+      {totalVisible === 0 ? (
         <Text style={styles.emptyState} accessibilityRole="text">
           {emptyMessage}
         </Text>
@@ -279,21 +355,29 @@ export const MyOrdersPage = () => {
         refreshControl={
           <ThemedRefreshControl
             refreshing={ordersQuery.isRefetching}
-            onRefresh={() => ordersQuery.refetch()}
+            onRefresh={() => {
+              void handleRefresh();
+            }}
           />
         }
         ListHeaderComponent={listHeader}
-        renderItem={({ item }) => (
-          <OrderCard
-            order={item}
-            compact
-            onProductClick={handleProductClick}
-            onConfirmDelivered={handleConfirmDelivered}
-            onCancelItem={handleCancelItem}
-            pendingActionKey={pendingActionKey}
-            itemActionErrors={itemActionErrors}
-          />
-        )}
+        renderItem={({ item }) => {
+          const orderId = String(item._id);
+          return (
+            <OrderCard
+              order={item}
+              compact
+              collapsible
+              expanded={expandedIds.has(orderId)}
+              onExpandedChange={() => toggleExpanded(orderId)}
+              onProductClick={handleProductClick}
+              onConfirmDelivered={handleConfirmDelivered}
+              onCancelItem={handleCancelItem}
+              pendingActionKey={pendingActionKey}
+              itemActionErrors={itemActionErrors}
+            />
+          );
+        }}
       />
 
       <ProfileMobileNavSheet

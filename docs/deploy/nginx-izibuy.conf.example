@@ -48,7 +48,7 @@ server {
     index index.html;
 
     # Фото 5 МБ, видео розыгрыша 5 МБ + запас
-    client_max_body_size 6m;
+    client_max_body_size 52m;
 
     # --- Раздача загрузок через Express (или alias на server/uploads, см. ниже) ---
 

@@ -1,4 +1,4 @@
-import { UPLOAD_VIDEO_MAX_BYTES } from "../../../shared/config/uploadConstants.js";
+import { STORY_UPLOAD_VIDEO_MAX_BYTES } from "../../../shared/config/uploadConstants.js";
 import { buildUploadVideoSizeError } from "../../../shared/lib/formatUploadBytesAsMb.js";
 import { isAllowedUploadVideoFile } from "../../../shared/lib/isAllowedUploadVideoFile.js";
 import { USER_STORY_UI } from "../../../shared/config/appUiCopy.js";
@@ -15,8 +15,8 @@ export async function validateStoryVideoFile(file) {
     return USER_STORY_UI.ERROR_VIDEO_TYPE;
   }
 
-  if (file.size > UPLOAD_VIDEO_MAX_BYTES) {
-    return buildUploadVideoSizeError(file.size, UPLOAD_VIDEO_MAX_BYTES);
+  if (file.size > STORY_UPLOAD_VIDEO_MAX_BYTES) {
+    return buildUploadVideoSizeError(file.size, STORY_UPLOAD_VIDEO_MAX_BYTES);
   }
 
   try {

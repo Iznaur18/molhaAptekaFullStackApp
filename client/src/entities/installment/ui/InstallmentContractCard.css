@@ -236,6 +236,17 @@
   color: var(--iz-color-danger-strong);
 }
 
+.installment-contract-card__btn_cancel {
+  border-color: var(--iz-color-danger);
+  background: var(--iz-color-danger);
+  color: var(--iz-color-on-contrast);
+}
+
+.installment-contract-card__btn_cancel:hover:not(:disabled) {
+  border-color: var(--iz-color-danger-strong);
+  background: var(--iz-color-danger-strong);
+}
+
 .installment-contract-card__payment-actions {
   display: flex;
   flex-wrap: wrap;
@@ -319,17 +330,6 @@
   border-radius: 999px;
   background: var(--iz-color-surface-subtle);
   overflow: hidden;
-}
-
-.installment-contract-card__progress-fill {
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(
-    90deg,
-    var(--iz-color-link-deep) 0%,
-    var(--iz-color-success-teal-bright) 100%
-  );
-  transition: width 0.2s ease;
 }
 
 .installment-contract-card--compact .installment-contract-card__textarea {

@@ -102,9 +102,9 @@
 
 .product-reviews-section__cancel-edit {
   align-self: flex-start;
-  border: 1px solid var(--iz-color-border-subtle);
-  background: var(--iz-color-surface);
-  color: var(--iz-color-text-subtle);
+  border: 1px solid var(--iz-color-danger);
+  background: var(--iz-color-danger);
+  color: var(--iz-color-on-contrast);
 }
 
 .product-reviews-section__edit:disabled,

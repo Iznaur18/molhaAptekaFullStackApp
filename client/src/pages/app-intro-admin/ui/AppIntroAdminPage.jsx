@@ -7,7 +7,7 @@ import { usePatchAppIntroSettingsMutation } from "../../../entities/app-intro-se
 import { useAppIntro } from "../../../features/app-intro/model/AppIntroContext.jsx";
 import { APP_INTRO_ADMIN_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { ImageUrlField } from "../../../shared/ui/ImageUrlField/ImageUrlField.jsx";
-import { VideoUrlField } from "../../../shared/ui/VideoUrlField/VideoUrlField.jsx";
+import { IntroVideoUploadField } from "../../../shared/ui/IntroVideoUploadField/IntroVideoUploadField.jsx";
 import { validateAppIntroAdminForm } from "../../../entities/intro-ad/lib/index.js";
 
 import "./AppIntroAdminPage.css";
@@ -23,9 +23,9 @@ const formToPreviewSettings = (form) => {
     posterUrl: body.posterUrl,
     fallbackTitle: body.fallbackTitle ?? "",
     fallbackHint: body.fallbackHint ?? "",
-    minMs: body.minMs,
-    maxMs: body.maxMs,
-    fadeOutMs: body.fadeOutMs,
+    minMs: Number(form.minMs) || 0,
+    maxMs: Number(form.maxMs) || 0,
+    fadeOutMs: Number(form.fadeOutMs) || 0,
     updatedAt: null,
   };
 };
@@ -134,13 +134,11 @@ export function AppIntroAdminPage() {
 
           <label className="app-intro-admin__label">
             {APP_INTRO_ADMIN_PAGE_UI.LABEL_VIDEO}
-            <VideoUrlField
+            <IntroVideoUploadField
               value={form.videoMp4Url}
               onChange={(value) => updateField("videoMp4Url", value)}
+              disabled={isSaving}
             />
-            <span className="app-intro-admin__field-hint">
-              {APP_INTRO_ADMIN_PAGE_UI.HINT_VIDEO}
-            </span>
           </label>
 
           <label className="app-intro-admin__label">
@@ -178,53 +176,6 @@ export function AppIntroAdminPage() {
               maxLength={200}
             />
           </label>
-        </fieldset>
-
-        <fieldset className="app-intro-admin__fieldset" disabled={isSaving}>
-          <legend className="app-intro-admin__legend">
-            {APP_INTRO_ADMIN_PAGE_UI.SECTION_TIMING}
-          </legend>
-
-          <div className="app-intro-admin__timing-grid">
-            <label className="app-intro-admin__label">
-              {APP_INTRO_ADMIN_PAGE_UI.LABEL_MIN_MS}
-              <input
-                className="app-intro-admin__input"
-                type="number"
-                min={500}
-                max={30000}
-                step={100}
-                value={form.minMs}
-                onChange={(event) => updateField("minMs", event.target.value)}
-              />
-            </label>
-
-            <label className="app-intro-admin__label">
-              {APP_INTRO_ADMIN_PAGE_UI.LABEL_MAX_MS}
-              <input
-                className="app-intro-admin__input"
-                type="number"
-                min={1000}
-                max={60000}
-                step={100}
-                value={form.maxMs}
-                onChange={(event) => updateField("maxMs", event.target.value)}
-              />
-            </label>
-
-            <label className="app-intro-admin__label">
-              {APP_INTRO_ADMIN_PAGE_UI.LABEL_FADE_MS}
-              <input
-                className="app-intro-admin__input"
-                type="number"
-                min={100}
-                max={2000}
-                step={50}
-                value={form.fadeOutMs}
-                onChange={(event) => updateField("fadeOutMs", event.target.value)}
-              />
-            </label>
-          </div>
         </fieldset>
 
         <fieldset className="app-intro-admin__fieldset" disabled={isSaving}>

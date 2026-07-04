@@ -367,7 +367,7 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
                 </p>
               ) : null}
               <div className="data-confirmation-modal__actions">
-                <button type="button" onClick={onClose}>
+                <button type="button" className="app-btn app-btn--cancel" onClick={onClose}>
                   {DATA_CONFIRMATION_MODAL_UI.CANCEL}
                 </button>
                 <button
@@ -386,7 +386,7 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
 
         {phase === "ready" && !canSubmit ? (
           <div className="data-confirmation-modal__actions">
-            <button type="button" onClick={onClose}>
+            <button type="button" className="app-btn app-btn--cancel" onClick={onClose}>
               {DATA_CONFIRMATION_MODAL_UI.CANCEL}
             </button>
           </div>

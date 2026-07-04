@@ -11,9 +11,9 @@ export function buildSubmitIntroAdCampaignBody(form) {
     posterUrl: body.posterUrl ?? null,
     fallbackTitle: body.fallbackTitle ?? null,
     fallbackHint: body.fallbackHint ?? null,
-    minMs: body.minMs,
-    maxMs: body.maxMs,
-    fadeOutMs: body.fadeOutMs,
+    minMs: Number(form.minMs) || 0,
+    maxMs: Number(form.maxMs) || 0,
+    fadeOutMs: Number(form.fadeOutMs) || 0,
   };
 }
 

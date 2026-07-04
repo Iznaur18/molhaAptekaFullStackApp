@@ -232,7 +232,7 @@ export function SiteHeaderBannerAdvertisingSection({ isAuthorized, loyaltyBalanc
           {canCancel ? (
             <button
               type="button"
-              className="app-btn app-btn--secondary"
+              className="app-btn app-btn--cancel"
               onClick={handleCancel}
               disabled={isSubmitting}
             >

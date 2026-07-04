@@ -1,6 +1,6 @@
-/** Пиксель-паритет с `client/src/entities/user-story/ui/UserStoriesStrip.css`. */
+/** Плашка сториз — фон/рамка через theme в useUserStoriesStripStyles. */
 export const USER_STORY_STRIP_COLORS = {
-  scrollBackground: "rgba(32, 35, 40, 1)",
+  scrollBackground: "#ffffff",
   ringActive: "#1d9bf0",
   ringViewed: "#9ca3af",
   avatarBorder: "#ffffff",
@@ -12,10 +12,10 @@ export const USER_STORY_STRIP_LAYOUT = {
   paddingTop: 8,
   paddingBottom: 4,
   scrollBorderRadius: 20,
-  scrollPaddingLeft: 14,
+  scrollPaddingLeft: 12,
   scrollPaddingRight: 4,
-  scrollPaddingTop: 12,
-  scrollPaddingBottom: 12,
+  scrollPaddingTop: 8,
+  scrollPaddingBottom: 8,
   itemGap: 14,
   itemWidth: 78,
   itemContentGap: 6,

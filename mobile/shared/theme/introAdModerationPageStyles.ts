@@ -1,8 +1,11 @@
+import { StyleSheet } from "react-native";
+
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 const DANGER_STRONG = "#b42318";
 const NEUTRAL_GRAY_DEEP = "#4b5563";
+const WARNING_BROWN_DARK = "#92400e";
 
 export const useIntroAdModerationPageStyles = createThemedStyles((theme) => ({
   container: {
@@ -17,6 +20,143 @@ export const useIntroAdModerationPageStyles = createThemedStyles((theme) => ({
   },
   header: {
     marginBottom: 4,
+    gap: 12,
+  },
+  toolbar: {
+    gap: 8,
+    paddingVertical: 10.4,
+    paddingHorizontal: 12,
+    borderRadius: 10.4,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: "rgba(124, 58, 237, 0.28)",
+    backgroundColor: "#faf5ff",
+  },
+  toolbarHead: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    gap: 8,
+  },
+  toolbarMeta: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  toolbarHeading: {
+    flex: 1,
+    fontSize: 15.2,
+    fontWeight: "600",
+    color: theme.colors.text,
+  },
+  queueCount: {
+    fontSize: 13.6,
+    color: theme.colors.textMuted,
+    fontVariant: ["tabular-nums"],
+  },
+  refreshButton: {
+    minWidth: 72,
+    minHeight: 28,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 8,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    borderRadius: 999,
+    backgroundColor: theme.colors.surface,
+  },
+  refreshText: {
+    fontSize: 12.8,
+    fontWeight: "600",
+    color: theme.colors.textSecondary,
+  },
+  sectionChips: {
+    gap: 5.6,
+    paddingVertical: 2.4,
+  },
+  sectionChip: {
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 999,
+    paddingVertical: 3.5,
+    paddingHorizontal: 8.8,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+  },
+  sectionChipActive: {
+    borderColor: "#7c3aed",
+    backgroundColor: "#ede9fe",
+  },
+  sectionChipText: {
+    fontSize: 14.4,
+    fontWeight: "600",
+    color: theme.colors.textSecondary,
+  },
+  sectionChipTextActive: {
+    color: "#5b21b6",
+  },
+  overview: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 7.2,
+  },
+  overviewTile: {
+    flexGrow: 1,
+    flexBasis: "47%",
+    minWidth: 120,
+    gap: 2.4,
+    paddingVertical: 8.8,
+    paddingHorizontal: 10.4,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    borderRadius: 8.8,
+    backgroundColor: theme.colors.surface,
+  },
+  overviewTileActive: {
+    borderColor: "#7c3aed",
+    backgroundColor: "#ede9fe",
+  },
+  overviewTileAttention: {
+    borderColor: "rgba(245, 158, 11, 0.45)",
+  },
+  overviewLabel: {
+    fontSize: 11.5,
+    fontWeight: "600",
+    letterSpacing: 0.3,
+    textTransform: "uppercase",
+    color: theme.colors.textMuted,
+  },
+  overviewValue: {
+    fontSize: 16,
+    fontWeight: "700",
+    fontVariant: ["tabular-nums"],
+    color: theme.colors.text,
+  },
+  overviewValueAttention: {
+    color: WARNING_BROWN_DARK,
+  },
+  listActions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 7.2,
+    alignItems: "center",
+  },
+  listAction: {
+    paddingVertical: 4.8,
+    paddingHorizontal: 10.4,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    borderRadius: 999,
+    backgroundColor: theme.colors.surface,
+  },
+  listActionText: {
+    fontSize: 13.2,
+    fontWeight: "600",
+    color: theme.colors.textSecondary,
+  },
+  filterHint: {
+    flexBasis: "100%",
+    fontSize: 13.2,
+    lineHeight: 18.5,
+    color: theme.colors.textMuted,
   },
   section: {
     gap: 12,
@@ -49,6 +189,57 @@ export const useIntroAdModerationPageStyles = createThemedStyles((theme) => ({
   },
   list: {
     gap: 16,
+  },
+  cardAttention: {
+    borderRadius: 12,
+  },
+  collapsedToggle: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    borderRadius: 10,
+    backgroundColor: theme.colors.surface,
+  },
+  collapsedToggleAttention: {
+    borderColor: "rgba(245, 158, 11, 0.45)",
+    backgroundColor: "#fffbeb",
+  },
+  collapsedMain: {
+    flex: 1,
+    minWidth: 0,
+    gap: 2,
+  },
+  collapsedTitle: {
+    fontSize: 14.8,
+    fontWeight: "700",
+    color: theme.colors.text,
+  },
+  collapsedPreview: {
+    fontSize: 12.8,
+    fontWeight: "600",
+    color: WARNING_BROWN_DARK,
+  },
+  collapsedMeta: {
+    alignItems: "flex-end",
+    gap: 2,
+  },
+  collapsedCreated: {
+    fontSize: 11.5,
+    color: theme.colors.textMuted,
+  },
+  collapsedChevron: {
+    fontSize: 14,
+    color: theme.colors.textMuted,
+  },
+  collapsedExpandLabel: {
+    fontSize: 10.5,
+    fontWeight: "600",
+    color: theme.colors.textMuted,
   },
   state: {
     marginBottom: 16,

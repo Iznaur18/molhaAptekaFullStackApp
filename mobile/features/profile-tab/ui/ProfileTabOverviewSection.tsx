@@ -1,10 +1,5 @@
-import { useMemo, useEffect } from "react";
+import { useMemo } from "react";
 import { View } from "react-native";
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-} from "react-native-reanimated";
 
 import { resolveUserRole } from "@izibuy/shared-lib";
 
@@ -33,21 +28,12 @@ export const ProfileTabOverviewSection = ({ onEditPress }: ProfileTabOverviewSec
     Boolean(user) &&
     resolveUserRole((user as { userRole?: string }).userRole) === USER_ROLE_USER;
 
-  const translateX = useSharedValue(320);
-  const slideStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: translateX.value }],
-  }));
-
-  useEffect(() => {
-    translateX.value = withSpring(0, { damping: 20, stiffness: 180 });
-  }, [translateX]);
-
   if (!user) {
     return null;
   }
 
   return (
-    <Animated.View style={[styles.root, slideStyle]}>
+    <View style={styles.root}>
       <ProfileOverviewBanner
         user={user as Record<string, unknown>}
         showEditButton={showEditOnBanner}
@@ -55,6 +41,6 @@ export const ProfileTabOverviewSection = ({ onEditPress }: ProfileTabOverviewSec
       />
 
       <UserProfileInfoPanel rows={profileRows} />
-    </Animated.View>
+    </View>
   );
 };

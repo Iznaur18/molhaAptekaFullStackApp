@@ -2,24 +2,29 @@ import { orderFromApiSchema } from "@molha/api-contract";
 import { useFocusEffect } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { z } from "zod";
 import { Alert, FlatList, Pressable, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { getOrderItemIndex } from "@/entities/order/lib/getOrderItemIndex";
+import { filterMySales } from "@/entities/order/lib/filterMySales";
+import { orderNeedsSellerAttention } from "@/entities/order/lib/orderNeedsSellerAttention";
 import { resolveOrderLineProductId } from "@/entities/order/lib/resolveOrderLineProductId";
+import { summarizeMySales } from "@/entities/order/lib/summarizeMySales";
 import {
   ORDER_STATUS_CANCELLED,
   ORDER_STATUS_DELIVERED,
   ORDER_STATUS_SHIPPED,
 } from "@/entities/order/model/constants";
+import { MY_ORDERS_LIST_FILTER_IN_PROGRESS } from "@/entities/order/model/myOrdersListFilters";
 import { useMySalesQuery } from "@/entities/order/model/useMySalesQuery";
 import { useOrderMutations } from "@/entities/order/model/useOrderMutations";
 import { OrderCard } from "@/entities/order/ui/OrderCard";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { normalizeTotalSalesCount } from "@/entities/user/lib/formatSearchRowTotalSales";
+import { MySalesPageOverview } from "@/features/my-sales-page/ui/MySalesPageOverview";
 import { MySalesPageToolbar } from "@/features/my-sales-page/ui/MySalesPageToolbar";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
@@ -48,19 +53,25 @@ export const MySalesPage = () => {
   const sessionQuery = useAuthSessionQuery();
   const [navSheetVisible, setNavSheetVisible] = useState(false);
   const [statusFilter, setStatusFilter] = useState("");
+  const [attentionOnly, setAttentionOnly] = useState(false);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set());
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebouncedValue(searchTerm, MY_SALES_PAGE_UI.SEARCH_DEBOUNCE_MS);
   const isSearchPending = searchTerm !== debouncedSearchTerm;
   const hasSearchQuery = debouncedSearchTerm.trim() !== "";
 
+  const serverStatusFilter =
+    statusFilter === MY_ORDERS_LIST_FILTER_IN_PROGRESS ? "" : statusFilter;
+
   const salesParams = useMemo(
     () => ({
-      ...(statusFilter ? { status: statusFilter } : {}),
+      ...(serverStatusFilter ? { status: serverStatusFilter } : {}),
       ...(hasSearchQuery ? { search: debouncedSearchTerm.trim() } : {}),
     }),
-    [statusFilter, hasSearchQuery, debouncedSearchTerm],
+    [serverStatusFilter, hasSearchQuery, debouncedSearchTerm],
   );
 
+  const overviewQuery = useMySalesQuery({ enabled: isAuthorized });
   const salesQuery = useMySalesQuery({
     status: salesParams.status,
     search: salesParams.search,
@@ -75,30 +86,88 @@ export const MySalesPage = () => {
     [sessionQuery.data?.user?.totalSalesCount],
   );
 
+  const allOrders = overviewQuery.data?.orders ?? [];
+  const serverOrders = salesQuery.data?.orders ?? [];
+  const summary = useMemo(() => summarizeMySales(allOrders), [allOrders]);
+  const filteredOrders = useMemo(
+    () => filterMySales(serverOrders, { statusFilter, attentionOnly }),
+    [serverOrders, statusFilter, attentionOnly],
+  );
+
+  const totalServer = serverOrders.length;
+  const totalVisible = filteredOrders.length;
+  const hasClientFilters =
+    statusFilter === MY_ORDERS_LIST_FILTER_IN_PROGRESS || attentionOnly;
+  const hasFilters = Boolean(serverStatusFilter) || hasSearchQuery || hasClientFilters;
+  const summaryCountLabel = hasFilters
+    ? MY_SALES_PAGE_UI.COUNT_FILTERED(totalVisible, totalServer)
+    : MY_SALES_PAGE_UI.COUNT_ITEMS(totalServer);
+
   useFocusEffect(
     useCallback(() => {
       if (isAuthorized) {
         void salesQuery.refetch();
+        void overviewQuery.refetch();
       }
-    }, [isAuthorized, salesQuery.refetch]),
+    }, [isAuthorized, salesQuery.refetch, overviewQuery.refetch]),
   );
+
+  useEffect(() => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      allOrders.filter(orderNeedsSellerAttention).forEach((order) => next.add(String(order._id)));
+      return next;
+    });
+  }, [allOrders]);
 
   const invalidateSalesQueues = useCallback(async () => {
     await queryClient.invalidateQueries({ queryKey: orderQueryKeys.salesActionCount() });
   }, [queryClient]);
 
-  const patchSales = useCallback(
+  const handleRefresh = useCallback(async () => {
+    await Promise.all([salesQuery.refetch(), overviewQuery.refetch()]);
+    await invalidateSalesQueues();
+  }, [salesQuery, overviewQuery, invalidateSalesQueues]);
+
+  const toggleExpanded = useCallback((orderId: string) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(orderId)) {
+        next.delete(orderId);
+      } else {
+        next.add(orderId);
+      }
+      return next;
+    });
+  }, []);
+
+  const expandAll = useCallback(() => {
+    setExpandedIds(new Set(filteredOrders.map((order) => String(order._id))));
+  }, [filteredOrders]);
+
+  const collapseAll = useCallback(() => {
+    setExpandedIds(new Set());
+  }, []);
+
+  const handleInProgressFilterClick = useCallback(() => {
+    setStatusFilter(MY_ORDERS_LIST_FILTER_IN_PROGRESS);
+    setAttentionOnly(false);
+  }, []);
+
+  const patchSalesCaches = useCallback(
     (updater: (orders: OrderRecord[]) => OrderRecord[]) => {
-      queryClient.setQueryData(orderQueryKeys.sales(salesParams), (old) => {
-        if (!old || typeof old !== "object" || !("orders" in old)) {
-          return old;
-        }
-        const page = old as { orders: OrderRecord[] };
-        return {
-          ...page,
-          orders: updater(page.orders),
-        };
-      });
+      for (const params of [salesParams, {}]) {
+        queryClient.setQueryData(orderQueryKeys.sales(params), (old) => {
+          if (!old || typeof old !== "object" || !("orders" in old)) {
+            return old;
+          }
+          const page = old as { orders: OrderRecord[] };
+          return {
+            ...page,
+            orders: updater(page.orders),
+          };
+        });
+      }
     },
     [queryClient, salesParams],
   );
@@ -118,7 +187,7 @@ export const MySalesPage = () => {
     setPendingActionKey(actionKey);
     setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
 
-    patchSales((prev) =>
+    patchSalesCaches((prev) =>
       prev.map((order) => {
         if (order._id !== orderId) {
           return order;
@@ -135,15 +204,15 @@ export const MySalesPage = () => {
 
     try {
       const updatedOrder = await mutate();
-      patchSales((prev) =>
+      patchSalesCaches((prev) =>
         prev.map((order) => (order._id === orderId ? updatedOrder : order)),
       );
       await invalidateSalesQueues();
-      void salesQuery.refetch();
+      void handleRefresh();
     } catch (error) {
       const message = formatApiErrorMessage(error, API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK);
       setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
-      void salesQuery.refetch();
+      void handleRefresh();
     } finally {
       setPendingActionKey(null);
     }
@@ -221,11 +290,9 @@ export const MySalesPage = () => {
     [router],
   );
 
-  const orders = salesQuery.data?.orders ?? [];
-
   const emptyMessage = hasSearchQuery
     ? MY_SALES_PAGE_UI.EMPTY_BY_SEARCH
-    : statusFilter
+    : hasFilters
       ? MY_SALES_PAGE_UI.EMPTY_BY_FILTER
       : MY_SALES_PAGE_UI.EMPTY;
 
@@ -236,15 +303,41 @@ export const MySalesPage = () => {
         onPress={() => setNavSheetVisible(true)}
       />
       <MySalesPageToolbar
+        summaryCountLabel={summaryCountLabel}
+        totalSalesCount={sellerTotalSalesCount}
         statusFilter={statusFilter}
-        onStatusFilterChange={setStatusFilter}
+        onStatusFilterChange={(value) => {
+          setStatusFilter(value);
+          if (value) {
+            setAttentionOnly(false);
+          }
+        }}
         searchTerm={searchTerm}
         onSearchTermChange={setSearchTerm}
         isSearchPending={isSearchPending}
-        ordersCount={orders.length}
-        totalSalesCount={sellerTotalSalesCount}
       />
-      {orders.length === 0 ? (
+      <MySalesPageOverview
+        inProgressCount={summary.inProgressCount}
+        attentionCount={summary.attentionCount}
+        totalAmountRub={summary.totalAmountRub}
+        attentionOnly={attentionOnly}
+        onInProgressFilterClick={handleInProgressFilterClick}
+        onAttentionFilterChange={setAttentionOnly}
+      />
+      {totalVisible > 0 ? (
+        <View style={styles.listActions}>
+          <Pressable style={styles.listAction} onPress={expandAll}>
+            <Text style={styles.listActionText}>{MY_SALES_PAGE_UI.EXPAND_ALL}</Text>
+          </Pressable>
+          <Pressable style={styles.listAction} onPress={collapseAll}>
+            <Text style={styles.listActionText}>{MY_SALES_PAGE_UI.COLLAPSE_ALL}</Text>
+          </Pressable>
+          {attentionOnly ? (
+            <Text style={styles.filterHint}>{MY_SALES_PAGE_UI.ATTENTION_FILTER_HINT}</Text>
+          ) : null}
+        </View>
+      ) : null}
+      {totalVisible === 0 ? (
         <Text style={styles.emptyState} accessibilityRole="text">
           {emptyMessage}
         </Text>
@@ -280,30 +373,39 @@ export const MySalesPage = () => {
     <>
       <FlatList
         style={[styles.container, styles.listFlex, centeredContentStyle]}
-        data={orders}
+        data={filteredOrders}
         keyExtractor={(order) => order._id}
         contentContainerStyle={[styles.list, { paddingBottom: contentPaddingBottom }]}
         refreshControl={
           <ThemedRefreshControl
-            refreshing={salesQuery.isRefetching}
-            onRefresh={() => salesQuery.refetch()}
+            refreshing={salesQuery.isRefetching || overviewQuery.isRefetching}
+            onRefresh={() => {
+              void handleRefresh();
+            }}
           />
         }
         ListHeaderComponent={listHeader}
-        renderItem={({ item }) => (
-          <OrderCard
-            order={item}
-            compact
-            showBuyer
-            onBuyerNameClick={handleBuyerNameClick}
-            onProductClick={handleProductClick}
-            onMarkShipped={handleMarkShipped}
-            onMarkDelivered={handleMarkDelivered}
-            onCancelItem={handleCancelItem}
-            pendingActionKey={pendingActionKey}
-            itemActionErrors={itemActionErrors}
-          />
-        )}
+        renderItem={({ item }) => {
+          const orderId = String(item._id);
+          return (
+            <OrderCard
+              order={item}
+              compact
+              collapsible
+              expanded={expandedIds.has(orderId)}
+              onExpandedChange={() => toggleExpanded(orderId)}
+              attentionRole="seller"
+              showBuyer
+              onBuyerNameClick={handleBuyerNameClick}
+              onProductClick={handleProductClick}
+              onMarkShipped={handleMarkShipped}
+              onMarkDelivered={handleMarkDelivered}
+              onCancelItem={handleCancelItem}
+              pendingActionKey={pendingActionKey}
+              itemActionErrors={itemActionErrors}
+            />
+          );
+        }}
       />
 
       <ProfileMobileNavSheet

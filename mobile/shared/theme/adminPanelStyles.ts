@@ -327,6 +327,17 @@ export const useAdminPanelStyles = createThemedStyles((theme) => ({
     borderColor: theme.colors.borderStrong,
     backgroundColor: theme.colors.surface,
   },
+  cancelButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    backgroundColor: theme.colors.danger,
+  },
+  cancelButtonText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: theme.colors.onContrast,
+  },
   dangerButton: {
     paddingVertical: 6,
     paddingHorizontal: 10,

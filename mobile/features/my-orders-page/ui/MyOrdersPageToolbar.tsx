@@ -17,15 +17,15 @@ const STATUS_FILTER_OPTIONS = [
 ];
 
 type MyOrdersPageToolbarProps = {
+  summaryCountLabel: string;
   statusFilter: string;
   onStatusFilterChange: (value: string) => void;
-  ordersCount: number;
 };
 
 export const MyOrdersPageToolbar = ({
+  summaryCountLabel,
   statusFilter,
   onStatusFilterChange,
-  ordersCount,
 }: MyOrdersPageToolbarProps) => {
   const styles = useMyOrdersPageStyles();
 
@@ -33,7 +33,7 @@ export const MyOrdersPageToolbar = ({
     <View style={styles.toolbar}>
       <View style={styles.toolbarHead}>
         <Text style={styles.toolbarHeading}>{MY_ORDERS_PAGE_UI.TITLE}</Text>
-        <Text style={styles.ordersCount}>{MY_ORDERS_PAGE_UI.COUNT(ordersCount)}</Text>
+        <Text style={styles.ordersCount}>{summaryCountLabel}</Text>
       </View>
 
       <ScrollView

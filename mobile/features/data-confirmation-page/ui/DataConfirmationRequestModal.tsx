@@ -30,6 +30,7 @@ import {
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useCancelButtonStyles } from "@/shared/theme/cancelButtonChromeStyles";
 import {
   useBottomSheetFormStyles,
   useFormFieldStyles,
@@ -52,6 +53,7 @@ export const DataConfirmationRequestModal = ({
 }: DataConfirmationRequestModalProps) => {
   const theme = useAppTheme();
   const sheetStyles = useBottomSheetFormStyles();
+  const cancelStyles = useCancelButtonStyles();
   const fieldStyles = useFormFieldStyles();
   const submitMutation = useSubmitDataConfirmationRequestMutation();
   const uploadMutation = useUploadImageMutation();
@@ -152,8 +154,14 @@ export const DataConfirmationRequestModal = ({
         <View style={sheetStyles.sheet}>
           <View style={sheetStyles.header}>
             <Text style={sheetStyles.title}>{DATA_CONFIRMATION_MODAL_UI.TITLE}</Text>
-            <Pressable onPress={onClose} hitSlop={8}>
-              <Text style={sheetStyles.close}>{DATA_CONFIRMATION_MODAL_UI.CANCEL}</Text>
+            <Pressable
+              style={cancelStyles.cancelButtonCompact}
+              onPress={onClose}
+              hitSlop={8}
+            >
+              <Text style={cancelStyles.cancelButtonTextCompact}>
+                {DATA_CONFIRMATION_MODAL_UI.CANCEL}
+              </Text>
             </Pressable>
           </View>
 

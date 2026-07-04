@@ -13,7 +13,12 @@ import { siteHeaderBannerCampaignQueryKeys } from "../../../entities/site-header
 import { SiteHeaderBannerCarousel } from "../../../entities/site-header-banner/ui/SiteHeaderBannerCarousel.jsx";
 import { introAdQueryKeys } from "../../../entities/intro-ad/model/introAdQueryKeys.js";
 import { SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import { campaignModerationNeedsAttention } from "../../../shared/lib/campaignModerationAttention.js";
 
+import { filterPendingModerationCampaigns } from "../lib/filterPendingModerationCampaigns.js";
+import { buildModerationCampaignRowId } from "../lib/introAdModerationSectionFilters.js";
+import { resolveModerationCampaignCollapsedPreview } from "../lib/resolveModerationCampaignCollapsedPreview.js";
+import { ModerationCampaignCollapsibleFrame } from "./ModerationCampaignCollapsibleFrame.jsx";
 import { ModerationSectionTitle } from "./ModerationSectionTitle.jsx";
 
 const MODERATION_QUEUE_LIMIT = 50;
@@ -40,6 +45,9 @@ function resolveAdvertiserName(advertiser, advertiserId) {
  *   onStaffCancel?: () => void;
  *   rejectReason?: string;
  *   onRejectReasonChange?: (value: string) => void;
+ *   collapsible?: boolean;
+ *   expanded?: boolean;
+ *   onExpandedChange?: () => void;
  * }} props
  */
 function SiteHeaderBannerCampaignModerationCard({
@@ -51,9 +59,18 @@ function SiteHeaderBannerCampaignModerationCard({
   onStaffCancel,
   rejectReason = "",
   onRejectReasonChange,
+  collapsible = false,
+  expanded = true,
+  onExpandedChange,
 }) {
   const [showPreview, setShowPreview] = useState(false);
   const advertiserName = resolveAdvertiserName(campaign.advertiser, String(campaign.advertiserId));
+  const needsAttention = mode === "pending" && campaignModerationNeedsAttention(campaign);
+  const collapsedPreview = resolveModerationCampaignCollapsedPreview(campaign);
+  const createdLabel =
+    mode === "pending" && campaign.createdAt
+      ? new Date(String(campaign.createdAt)).toLocaleString("ru-RU")
+      : null;
   const previewSlides = useMemo(
     () => campaignToSiteHeaderBannerPreviewSlides(campaign),
     [campaign],
@@ -61,7 +78,16 @@ function SiteHeaderBannerCampaignModerationCard({
   const canPreview = previewSlides.length > 0;
 
   return (
-    <li className="intro-ad-moderation-page__item">
+    <ModerationCampaignCollapsibleFrame
+      title={advertiserName}
+      collapsedPreview={collapsedPreview}
+      createdLabel={createdLabel}
+      needsAttention={needsAttention}
+      collapsible={collapsible}
+      expanded={expanded}
+      onExpandedChange={onExpandedChange}
+    >
+      <div className="intro-ad-moderation-page__item">
       <p className="intro-ad-moderation-page__meta">
         {SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.ADVERTISER_LABEL}: {advertiserName}
       </p>
@@ -107,7 +133,7 @@ function SiteHeaderBannerCampaignModerationCard({
         {mode === "managed" && onStaffCancel ? (
           <button
             type="button"
-            className="app-btn app-btn--danger"
+            className="app-btn app-btn--cancel"
             disabled={isPending}
             onClick={onStaffCancel}
           >
@@ -138,7 +164,8 @@ function SiteHeaderBannerCampaignModerationCard({
           </button>
         </>
       ) : null}
-    </li>
+      </div>
+    </ModerationCampaignCollapsibleFrame>
   );
 }
 
@@ -147,12 +174,18 @@ function SiteHeaderBannerCampaignModerationCard({
  *   onQueueChanged?: () => void;
  *   actionError?: string;
  *   onActionError?: (message: string) => void;
+ *   attentionOnly?: boolean;
+ *   expandedIds?: Set<string>;
+ *   onToggleExpanded?: (rowId: string) => void;
  * }} props
  */
 export function SiteHeaderBannerCampaignModerationSection({
   onQueueChanged,
   actionError: parentActionError = "",
   onActionError,
+  attentionOnly = false,
+  expandedIds = new Set(),
+  onToggleExpanded,
 }) {
   const queryClient = useQueryClient();
   const [localActionError, setLocalActionError] = useState("");
@@ -178,6 +211,9 @@ export function SiteHeaderBannerCampaignModerationSection({
   });
 
   const pendingCampaigns = queueQuery.data?.campaigns ?? [];
+  const filteredPendingCampaigns = filterPendingModerationCampaigns(pendingCampaigns, {
+    attentionOnly,
+  });
   const managedCampaigns = managedQuery.data?.campaigns ?? [];
   const actionError = parentActionError || localActionError;
 
@@ -265,6 +301,10 @@ export function SiteHeaderBannerCampaignModerationSection({
     return null;
   }
 
+  if (attentionOnly && filteredPendingCampaigns.length === 0) {
+    return null;
+  }
+
   return (
     <>
       {actionError ? (
@@ -273,7 +313,7 @@ export function SiteHeaderBannerCampaignModerationSection({
         </p>
       ) : null}
 
-      {managedCampaigns.length > 0 ? (
+      {!attentionOnly && managedCampaigns.length > 0 ? (
         <section className="intro-ad-moderation-page__section">
           <ModerationSectionTitle
             title={SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.MANAGED_TITLE}
@@ -295,21 +335,25 @@ export function SiteHeaderBannerCampaignModerationSection({
         </section>
       ) : null}
 
-      {pendingCampaigns.length > 0 ? (
+      {filteredPendingCampaigns.length > 0 ? (
         <section className="intro-ad-moderation-page__section">
           <ModerationSectionTitle
             title={SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.PENDING_TITLE}
-            pendingCount={pendingCampaigns.length}
+            pendingCount={filteredPendingCampaigns.length}
           />
-          <ul className="intro-ad-moderation-page__list">
-            {pendingCampaigns.map((campaign) => {
+          <ul className="intro-ad-moderation-page__list profile-queue-content-panel">
+            {filteredPendingCampaigns.map((campaign) => {
               const campaignId = String(campaign._id);
+              const rowId = buildModerationCampaignRowId("banner", campaignId);
               return (
                 <SiteHeaderBannerCampaignModerationCard
                   key={campaignId}
                   campaign={campaign}
                   isPending={pendingCampaignId === campaignId}
                   mode="pending"
+                  collapsible
+                  expanded={expandedIds.has(rowId)}
+                  onExpandedChange={() => onToggleExpanded?.(rowId)}
                   onApprove={() => handleApprove(campaignId)}
                   onReject={() => handleReject(campaignId)}
                   rejectReason={rejectReasons[campaignId] ?? ""}

@@ -3,6 +3,14 @@ import { Pressable, Text, View } from "react-native";
 
 import { getOrderItemIndex } from "@/entities/order/lib/getOrderItemIndex";
 import { isOrderLineItemProductClickable } from "@/entities/order/lib/isOrderLineItemProductClickable";
+import {
+  orderNeedsBuyerAttention,
+  resolveOrderCollapsedPreview,
+} from "@/entities/order/lib/orderNeedsBuyerAttention";
+import {
+  orderNeedsSellerAttention,
+  resolveSellerOrderCollapsedPreview,
+} from "@/entities/order/lib/orderNeedsSellerAttention";
 import { resolveOrderLineItemName } from "@/entities/order/lib/resolveOrderLineItemName";
 import { resolveOrderStatusBadgeStyle } from "@/entities/order/lib/resolveOrderStatusBadgeStyle";
 import { OrderCardLineItemThumb } from "@/entities/order/ui/OrderCardLineItemThumb";
@@ -15,7 +23,7 @@ import {
   type OrderPaymentMethod,
   type OrderStatus,
 } from "@/entities/order/model/constants";
-import { INSTALLMENT_UI, ORDER_CARD_UI, PRODUCT_CARD_UI } from "@/shared/config";
+import { INSTALLMENT_UI, MY_ORDERS_PAGE_UI, ORDER_CARD_UI, PRODUCT_CARD_UI } from "@/shared/config";
 import { formatIsoDateTime, formatPriceRub } from "@/shared/lib";
 import { useOrderCardStyles } from "@/shared/theme/commerceScreenStyles";
 
@@ -57,6 +65,10 @@ type OrderCardProps = {
   onMarkDelivered?: (ctx: OrderItemActionContext) => void | Promise<void>;
   pendingActionKey?: string | null;
   itemActionErrors?: Record<string, string>;
+  collapsible?: boolean;
+  expanded?: boolean;
+  onExpandedChange?: (expanded: boolean) => void;
+  attentionRole?: "buyer" | "seller";
 };
 
 const formatStatus = (status?: string) =>
@@ -150,6 +162,10 @@ export const OrderCard = ({
   onMarkDelivered,
   pendingActionKey = null,
   itemActionErrors = {},
+  collapsible = false,
+  expanded = true,
+  onExpandedChange,
+  attentionRole = "buyer",
 }: OrderCardProps) => {
   const styles = useOrderCardStyles();
   const [detailsExpanded, setDetailsExpanded] = useState(false);
@@ -157,6 +173,20 @@ export const OrderCard = ({
   const isAuctionOrder = Boolean(order.priceOfferId);
   const isInstallmentOrder = Boolean(order.installmentContractId);
   const statusBadgeColors = resolveOrderStatusBadgeStyle(order.status);
+  const isExpanded = !collapsible || expanded;
+  const needsAttention =
+    attentionRole === "seller"
+      ? orderNeedsSellerAttention(order)
+      : orderNeedsBuyerAttention(order);
+  const collapsedPreview = !isExpanded
+    ? attentionRole === "seller"
+      ? resolveSellerOrderCollapsedPreview(order)
+      : resolveOrderCollapsedPreview(order)
+    : null;
+
+  const toggleExpanded = () => {
+    onExpandedChange?.(!expanded);
+  };
 
   const renderLineItemSecondary = (
     item: unknown,
@@ -374,65 +404,83 @@ export const OrderCard = ({
   };
 
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, needsAttention ? styles.cardAttention : null]}>
       <View style={styles.header}>
-        <View style={styles.headerBadges}>
-          <Text
-            style={[
-              styles.statusBadge,
-              {
-                backgroundColor: statusBadgeColors.backgroundColor,
-                color: statusBadgeColors.color,
-              },
-            ]}
-          >
-            {formatStatus(order.status)}
-          </Text>
-          {isAuctionOrder ? (
-            <Text style={styles.auctionBadge}>{PRODUCT_CARD_UI.AUCTION_BADGE}</Text>
-          ) : null}
-          {isInstallmentOrder ? (
-            <Text style={styles.installmentBadge}>{INSTALLMENT_UI.BADGE}</Text>
+        <View style={styles.headerMain}>
+          <View style={styles.headerBadges}>
+            <Text
+              style={[
+                styles.statusBadge,
+                {
+                  backgroundColor: statusBadgeColors.backgroundColor,
+                  color: statusBadgeColors.color,
+                },
+              ]}
+            >
+              {formatStatus(order.status)}
+            </Text>
+            {isAuctionOrder ? (
+              <Text style={styles.auctionBadge}>{PRODUCT_CARD_UI.AUCTION_BADGE}</Text>
+            ) : null}
+            {isInstallmentOrder ? (
+              <Text style={styles.installmentBadge}>{INSTALLMENT_UI.BADGE}</Text>
+            ) : null}
+          </View>
+          {collapsible ? (
+            <Pressable
+              style={styles.chevronButton}
+              accessibilityRole="button"
+              accessibilityLabel={MY_ORDERS_PAGE_UI.EXPAND_TOGGLE(isExpanded)}
+              onPress={toggleExpanded}
+            >
+              <Text style={[styles.chevron, isExpanded ? styles.chevronExpanded : null]}>▸</Text>
+            </Pressable>
           ) : null}
         </View>
         <Text style={styles.total}>{formatPriceRub(order.totalAmount)}</Text>
       </View>
 
-      {!compact ? (
-        <OrderCardMeta
-          order={order}
-          showBuyer={showBuyer}
-          onBuyerNameClick={onBuyerNameClick}
-          isInstallmentOrder={isInstallmentOrder}
-        />
-      ) : null}
+      {collapsedPreview ? <Text style={styles.collapsedPreview}>{collapsedPreview}</Text> : null}
 
-      <View style={styles.itemsList}>
-        {items.map((item, index) => renderLineItem(item, index))}
-      </View>
+      {isExpanded ? (
+        <>
+          {!compact ? (
+            <OrderCardMeta
+              order={order}
+              showBuyer={showBuyer}
+              onBuyerNameClick={onBuyerNameClick}
+              isInstallmentOrder={isInstallmentOrder}
+            />
+          ) : null}
 
-      {compact ? (
-        <View style={styles.detailsFold}>
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => setDetailsExpanded((value) => !value)}
-          >
-            <Text style={styles.detailsFoldSummary}>{ORDER_CARD_UI.DETAILS_FOLD_SUMMARY}</Text>
-          </Pressable>
-          {detailsExpanded ? (
-            <View style={styles.detailsFoldBody}>
-              <OrderCardMeta
-                order={order}
-                showBuyer={showBuyer}
-                onBuyerNameClick={onBuyerNameClick}
-                isInstallmentOrder={isInstallmentOrder}
-              />
-              {items.map((item, index) =>
-                renderLineItemSecondary(item, index, { showName: true }),
-              )}
+          <View style={styles.itemsList}>
+            {items.map((item, index) => renderLineItem(item, index))}
+          </View>
+
+          {compact ? (
+            <View style={styles.detailsFold}>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => setDetailsExpanded((value) => !value)}
+              >
+                <Text style={styles.detailsFoldSummary}>{ORDER_CARD_UI.DETAILS_FOLD_SUMMARY}</Text>
+              </Pressable>
+              {detailsExpanded ? (
+                <View style={styles.detailsFoldBody}>
+                  <OrderCardMeta
+                    order={order}
+                    showBuyer={showBuyer}
+                    onBuyerNameClick={onBuyerNameClick}
+                    isInstallmentOrder={isInstallmentOrder}
+                  />
+                  {items.map((item, index) =>
+                    renderLineItemSecondary(item, index, { showName: true }),
+                  )}
+                </View>
+              ) : null}
             </View>
           ) : null}
-        </View>
+        </>
       ) : null}
 
       {statusSlot ? <View style={styles.footer}>{statusSlot}</View> : null}

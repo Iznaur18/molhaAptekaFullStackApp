@@ -213,7 +213,7 @@ export function SellerPersonalCategoryAdvertisingSection({
           {canCancel ? (
             <button
               type="button"
-              className="app-btn app-btn--secondary"
+              className="app-btn app-btn--cancel"
               onClick={handleCancel}
               disabled={isSubmitting}
             >
@@ -279,7 +279,7 @@ export function SellerPersonalCategoryAdvertisingSection({
             <div className="advertising-page__actions">
               <button
                 type="button"
-                className="app-btn app-btn--secondary"
+                className="app-btn app-btn--cancel"
                 onClick={() => setShowForm(false)}
                 disabled={isSubmitting}
               >

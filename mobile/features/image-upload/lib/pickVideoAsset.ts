@@ -21,7 +21,14 @@ const ensureLibraryPermission = async (): Promise<void> => {
   }
 };
 
-export const pickVideoAsset = async (): Promise<UploadVideoFilePayload | null> => {
+type PickVideoAssetOptions = {
+  /** Лимит размера исходника; по умолчанию — общий лимит видео. */
+  maxBytes?: number;
+};
+
+export const pickVideoAsset = async ({
+  maxBytes = UPLOAD_VIDEO_MAX_BYTES,
+}: PickVideoAssetOptions = {}): Promise<UploadVideoFilePayload | null> => {
   await ensureLibraryPermission();
 
   const result = await ImagePicker.launchImageLibraryAsync({
@@ -41,8 +48,8 @@ export const pickVideoAsset = async (): Promise<UploadVideoFilePayload | null> =
     throw new Error(VIDEO_URL_FIELD_UI.ERROR_TYPE);
   }
 
-  if (asset.fileSize && asset.fileSize > UPLOAD_VIDEO_MAX_BYTES) {
-    throw new Error(VIDEO_URL_FIELD_UI.ERROR_SIZE);
+  if (asset.fileSize && asset.fileSize > maxBytes) {
+    throw new Error(VIDEO_URL_FIELD_UI.ERROR_SIZE(Math.floor(maxBytes / (1024 * 1024))));
   }
 
   return {

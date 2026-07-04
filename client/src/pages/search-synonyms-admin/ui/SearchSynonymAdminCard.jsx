@@ -68,7 +68,7 @@ export const SearchSynonymAdminCard = memo(function SearchSynonymAdminCard({
               </button>
               <button
                 type="button"
-                className="app-btn app-btn--secondary"
+                className="app-btn app-btn--cancel"
                 onClick={onCancelEdit}
               >
                 {SEARCH_SYNONYMS_ADMIN_PAGE_UI.CANCEL_BUTTON}

@@ -1,8 +1,8 @@
 import { Platform, StyleSheet } from "react-native";
 
-import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
-import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { MEDIA_OVERLAY_SCRIM } from "@/shared/theme/catalogProductStyles";
+import { createThemedStyles } from "@/shared/theme/createThemedStyles";
+import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 
 export const useAppIntroSplashStyles = createThemedStyles((theme) => ({
   overlay: {
@@ -33,15 +33,17 @@ export const useAppIntroSplashStyles = createThemedStyles((theme) => ({
   },
   controls: {
     position: "absolute",
-    top: 52,
-    right: theme.spacing[4],
+    left: 0,
+    right: 0,
+    bottom: theme.spacing[8],
+    alignItems: "center",
     gap: theme.spacing[3],
-    alignItems: "flex-end",
   },
   controlText: {
     color: theme.colors.onContrast,
     fontSize: 15,
     fontWeight: "600",
+    textAlign: "center",
     textShadowColor: MEDIA_OVERLAY_SCRIM,
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 3,
@@ -394,13 +396,11 @@ export const useProductEditorScreenStyles = createThemedStyles((theme) => ({
   cancelButton: {
     flex: 1,
     minHeight: 44,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
     borderRadius: 11,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 16,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.danger,
   },
   submitButton: {
     flex: 1.4,
@@ -433,7 +433,7 @@ export const useProductEditorScreenStyles = createThemedStyles((theme) => ({
     fontWeight: "600",
   },
   cancelButtonText: {
-    color: theme.colors.textSecondary,
+    color: theme.colors.onContrast,
     fontWeight: "700",
     fontSize: 15,
   },
@@ -517,7 +517,7 @@ export const useMyProductsPageStyles = createThemedStyles((theme) => ({
     borderRadius: 10,
     paddingVertical: theme.spacing[3],
     paddingHorizontal: theme.spacing[6],
-    backgroundColor: theme.colors.nearBlack,
+    backgroundColor: theme.colors.action,
   },
   buttonText: {
     color: theme.colors.onContrast,
@@ -534,21 +534,34 @@ export const useSellerProductsPageStyles = createThemedStyles((theme) => ({
     flex: 1,
     backgroundColor: theme.colors.bg,
   },
+  listFlex: {
+    flex: 1,
+  },
   list: {
-    padding: theme.spacing[3],
-    paddingBottom: theme.spacing[8],
-    gap: theme.spacing[2],
+    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingTop: theme.spacing[3],
+    flexGrow: 1,
   },
   header: {
     marginBottom: theme.spacing[3],
     gap: theme.spacing[2],
   },
-  sellerMeta: {
+  sellerMetaZone: {
     flexDirection: "row",
-    flexWrap: "wrap",
     alignItems: "center",
     justifyContent: "space-between",
     gap: theme.spacing[2],
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: theme.radius.sm,
+    backgroundColor: theme.colors.actionSurface,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+  },
+  sellerMetaName: {
+    flex: 1,
+    minWidth: 0,
+    justifyContent: "center",
   },
   sellerName: {
     fontSize: 16,
@@ -559,13 +572,6 @@ export const useSellerProductsPageStyles = createThemedStyles((theme) => ({
     fontSize: 20,
     fontWeight: "700",
     color: theme.colors.text,
-  },
-  row: {
-    justifyContent: "space-between",
-  },
-  cell: {
-    flex: 1,
-    padding: 4,
   },
   hint: {
     textAlign: "center",
@@ -588,7 +594,7 @@ export const useSellerProductsPageStyles = createThemedStyles((theme) => ({
     borderRadius: 10,
     paddingVertical: theme.spacing[3],
     paddingHorizontal: 20,
-    backgroundColor: theme.colors.nearBlack,
+    backgroundColor: theme.colors.action,
   },
   buttonText: {
     color: theme.colors.onContrast,

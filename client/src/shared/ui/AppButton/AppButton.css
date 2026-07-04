@@ -46,6 +46,17 @@ button:not([class]):hover:not(:disabled) {
   background: var(--iz-color-accent-purple-hover);
 }
 
+.app-btn--cancel {
+  border-color: var(--iz-color-danger);
+  background: var(--iz-color-danger);
+  color: var(--iz-color-on-contrast);
+}
+
+.app-btn--cancel:hover:not(:disabled) {
+  border-color: var(--iz-color-danger-strong);
+  background: var(--iz-color-danger-strong);
+}
+
 .app-btn--danger {
   border-color: var(--iz-color-danger-coral);
   background: var(--iz-color-danger-soft);
@@ -70,6 +81,7 @@ button:not([class]):hover:not(:disabled) {
 .app-btn:disabled,
 .app-btn--primary:disabled,
 .app-btn--secondary:disabled,
+.app-btn--cancel:disabled,
 .app-btn--ghost:disabled,
 .app-btn--danger:disabled,
 button:not([class]):disabled {

@@ -153,6 +153,12 @@ export const useInstallmentDisputesPageStyles = createThemedStyles((theme) => ({
     borderColor: theme.colors.borderStrong,
     backgroundColor: theme.colors.surface,
   },
+  actionCancel: {
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    backgroundColor: theme.colors.danger,
+  },
   actionDisabled: {
     opacity: 0.6,
   },

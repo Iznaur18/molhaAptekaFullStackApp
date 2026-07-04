@@ -14,6 +14,10 @@ test("installment sales page mirrors web toolbar and compact seller contract car
 
   assert.match(page, /ProfileMobileSectionToggle/);
   assert.match(page, /InstallmentPaymentsPageToolbar/);
+  assert.match(page, /InstallmentPaymentsOverview/);
+  assert.match(page, /collapsible/);
+  assert.match(page, /contractNeedsSellerAttention/);
+  assert.match(page, /COUNT_FILTERED/);
   assert.match(page, /SALES_PAGE_TITLE/);
   assert.match(page, /ListHeaderComponent/);
   assert.match(page, /contentPaddingBottom/);

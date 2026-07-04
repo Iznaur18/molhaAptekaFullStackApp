@@ -53,6 +53,11 @@ export const useUserFollowButtonStyles = createThemedStyles((theme) => ({
     marginTop: 4,
     gap: 4,
   },
+  rootInline: {
+    marginTop: 0,
+    flexShrink: 0,
+    alignSelf: "center",
+  },
   button: {
     alignSelf: "flex-start",
     paddingVertical: theme.spacing[2],
@@ -60,6 +65,9 @@ export const useUserFollowButtonStyles = createThemedStyles((theme) => ({
     borderRadius: theme.radius.button,
     backgroundColor: theme.colors.action,
     alignItems: "center",
+  },
+  buttonInline: {
+    alignSelf: "center",
   },
   buttonFollowing: {
     backgroundColor: theme.colors.surface,
@@ -380,7 +388,7 @@ export const useNotificationsPageStyles = createThemedStyles((theme) => ({
     borderRadius: 10,
     paddingVertical: theme.spacing[3],
     paddingHorizontal: theme.spacing[6],
-    backgroundColor: theme.colors.nearBlack,
+    backgroundColor: theme.colors.action,
   },
   loginButtonText: {
     color: theme.colors.onContrast,

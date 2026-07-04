@@ -35,6 +35,36 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
     borderLeftColor: SUCCESS_TEAL_BRIGHT,
     backgroundColor: SUCCESS_SURFACE,
   },
+  cardAttention: {
+    borderLeftColor: "#f59e0b",
+    shadowColor: "#f59e0b",
+    shadowOpacity: 0.14,
+  },
+  headerToggle: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
+  },
+  chevron: {
+    width: 20,
+    height: 20,
+    borderRadius: 999,
+    overflow: "hidden",
+    textAlign: "center",
+    lineHeight: 20,
+    fontSize: 12,
+    color: theme.colors.textMuted,
+    backgroundColor: theme.colors.surfaceMuted,
+  },
+  chevronExpanded: {
+    transform: [{ rotate: "90deg" }],
+  },
+  nextDue: {
+    fontSize: 13.1,
+    color: theme.colors.textSecondary,
+  },
   header: {
     flexDirection: "column",
     alignItems: "flex-start",
@@ -269,6 +299,10 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
   btnDanger: {
     borderColor: "rgba(220, 38, 38, 0.7)",
     backgroundColor: theme.colors.surface,
+  },
+  btnCancel: {
+    borderColor: theme.colors.danger,
+    backgroundColor: theme.colors.danger,
   },
   btnText: {
     fontSize: 13.6,

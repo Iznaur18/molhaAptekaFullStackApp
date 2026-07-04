@@ -1,6 +1,9 @@
 import { useState } from "react";
 
-import { UserPremiumDisplayName } from "../../user/ui/UserPremiumDisplayName.jsx";
+import {
+  offerNeedsAttention,
+  resolveSellerOfferCollapsedPreview,
+} from "../lib/auctionDashboardAttention.js";
 import { usePriceOfferSellerMutations } from "../model/usePriceOfferSellerMutations.js";
 import {
   PRICE_OFFER_STATUS_ACCEPTED,
@@ -13,6 +16,7 @@ import {
   PRODUCT_PRICE_OFFER_UI,
   USER_LIST_ROW_UI,
 } from "../../../shared/config/appUiCopy.js";
+import { UserPremiumDisplayName } from "../../user/ui/UserPremiumDisplayName.jsx";
 
 import { AuctionDashboardRowStatus } from "./AuctionDashboardRowStatus.jsx";
 import { AuctionDashboardSellerActions } from "./AuctionDashboardSellerActions.jsx";
@@ -25,6 +29,9 @@ import "./AuctionDashboard.css";
  *   onProductClick?: (productId: string) => void;
  *   onBuyerClick?: (userId: string) => void;
  *   onChanged?: () => void;
+ *   collapsible?: boolean;
+ *   expanded?: boolean;
+ *   onExpandedChange?: (expanded: boolean) => void;
  * }} props
  */
 export function AuctionSellerOfferRow({
@@ -32,6 +39,9 @@ export function AuctionSellerOfferRow({
   onProductClick,
   onBuyerClick,
   onChanged,
+  collapsible = false,
+  expanded = true,
+  onExpandedChange,
 }) {
   const { acceptMutation, rejectMutation } = usePriceOfferSellerMutations(
     String(offer.productId),
@@ -47,6 +57,13 @@ export function AuctionSellerOfferRow({
   const buyerName = buyer?.userName?.trim() || USER_LIST_ROW_UI.MISSING_NAME;
   const isPending = offer.status === PRICE_OFFER_STATUS_PENDING;
   const isAccepted = offer.status === PRICE_OFFER_STATUS_ACCEPTED;
+  const isExpanded = !collapsible || expanded;
+  const needsAttention = offerNeedsAttention(offer);
+  const collapsedPreview = !isExpanded ? resolveSellerOfferCollapsedPreview(offer) : null;
+
+  const toggleExpanded = () => {
+    onExpandedChange?.(!expanded);
+  };
 
   const handleAccept = async () => {
     setError("");
@@ -69,7 +86,14 @@ export function AuctionSellerOfferRow({
   };
 
   return (
-    <article className="auction-dashboard-row">
+    <article
+      className={[
+        "auction-dashboard-row",
+        needsAttention ? "auction-dashboard-row_attention" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
       <div className="auction-dashboard-row__head">
         {imageUrl ? (
           <img
@@ -84,47 +108,74 @@ export function AuctionSellerOfferRow({
           </span>
         )}
         <div className="auction-dashboard-row__main">
-          {typeof onProductClick === "function" ? (
-            <button
-              type="button"
-              className="auction-dashboard-row__title"
-              onClick={() => onProductClick(offer.productId)}
-            >
-              {productName}
-            </button>
-          ) : (
-            <p className="auction-dashboard-row__title_static">{productName}</p>
-          )}
-          <p className="auction-dashboard-row__meta">
-            {buyerId && typeof onBuyerClick === "function" ? (
+          <div className="auction-dashboard-row__head-line">
+            {typeof onProductClick === "function" ? (
               <button
                 type="button"
-                className="auction-dashboard-row__buyer-link"
-                onClick={() => onBuyerClick(buyerId)}
+                className="auction-dashboard-row__title"
+                onClick={() => onProductClick(offer.productId)}
               >
-                <UserPremiumDisplayName
-                  name={buyerName}
-                  isPremium={buyer?.isPremiumUser === true}
-                  isUserDataConfirmed={buyer?.isUserDataConfirmed === true}
-                />
+                {productName}
               </button>
             ) : (
-              <UserPremiumDisplayName
-                name={buyerName}
-                isPremium={buyer?.isPremiumUser === true}
-                isUserDataConfirmed={buyer?.isUserDataConfirmed === true}
-              />
+              <p className="auction-dashboard-row__title_static">{productName}</p>
             )}
-            {" · "}
-            {formatIsoDateTime(offer.createdAt)}
-          </p>
-          <AuctionDashboardRowStatus isPending={isPending} isAccepted={isAccepted}>
-            {isPending
-              ? PRODUCT_PRICE_OFFER_UI.STATUS_PENDING
-              : isAccepted
-                ? PRODUCT_PRICE_OFFER_UI.ACCEPTED_BADGE
-                : null}
-          </AuctionDashboardRowStatus>
+            {collapsible ? (
+              <button
+                type="button"
+                className="auction-dashboard-row__chevron-btn"
+                aria-expanded={isExpanded}
+                aria-label={AUCTION_PAGE_UI.EXPAND_TOGGLE(isExpanded)}
+                onClick={toggleExpanded}
+              >
+                <span
+                  className={[
+                    "auction-dashboard-row__chevron",
+                    isExpanded ? "auction-dashboard-row__chevron_expanded" : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  aria-hidden="true"
+                >
+                  ▸
+                </span>
+              </button>
+            ) : null}
+          </div>
+          {isExpanded ? (
+            <>
+              <p className="auction-dashboard-row__meta">
+                {buyerId && typeof onBuyerClick === "function" ? (
+                  <button
+                    type="button"
+                    className="auction-dashboard-row__buyer-link"
+                    onClick={() => onBuyerClick(buyerId)}
+                  >
+                    <UserPremiumDisplayName
+                      name={buyerName}
+                      isPremium={buyer?.isPremiumUser === true}
+                      isUserDataConfirmed={buyer?.isUserDataConfirmed === true}
+                    />
+                  </button>
+                ) : (
+                  <UserPremiumDisplayName
+                    name={buyerName}
+                    isPremium={buyer?.isPremiumUser === true}
+                    isUserDataConfirmed={buyer?.isUserDataConfirmed === true}
+                  />
+                )}
+                {" · "}
+                {formatIsoDateTime(offer.createdAt)}
+              </p>
+              <AuctionDashboardRowStatus isPending={isPending} isAccepted={isAccepted}>
+                {isPending
+                  ? PRODUCT_PRICE_OFFER_UI.STATUS_PENDING
+                  : isAccepted
+                    ? PRODUCT_PRICE_OFFER_UI.ACCEPTED_BADGE
+                    : null}
+              </AuctionDashboardRowStatus>
+            </>
+          ) : null}
         </div>
       </div>
 
@@ -137,21 +188,29 @@ export function AuctionSellerOfferRow({
         </span>
       </div>
 
-      {isPending ? (
-        <AuctionDashboardSellerActions
-          onAccept={() => void handleAccept()}
-          onReject={() => void handleReject()}
-          disabled={isBusy}
-          acceptLabel={PRODUCT_PRICE_OFFER_UI.ACTION_ACCEPT}
-          rejectLabel={PRODUCT_PRICE_OFFER_UI.ACTION_REJECT}
-          pendingLabel={PRODUCT_PRICE_OFFER_UI.ACTION_PENDING}
-        />
+      {collapsedPreview ? (
+        <p className="auction-dashboard-row__preview">{collapsedPreview}</p>
       ) : null}
 
-      {error ? (
-        <p className="auction-dashboard-row__error" role="alert">
-          {error}
-        </p>
+      {isExpanded ? (
+        <>
+          {isPending ? (
+            <AuctionDashboardSellerActions
+              onAccept={() => void handleAccept()}
+              onReject={() => void handleReject()}
+              disabled={isBusy}
+              acceptLabel={PRODUCT_PRICE_OFFER_UI.ACTION_ACCEPT}
+              rejectLabel={PRODUCT_PRICE_OFFER_UI.ACTION_REJECT}
+              pendingLabel={PRODUCT_PRICE_OFFER_UI.ACTION_PENDING}
+            />
+          ) : null}
+
+          {error ? (
+            <p className="auction-dashboard-row__error" role="alert">
+              {error}
+            </p>
+          ) : null}
+        </>
       ) : null}
     </article>
   );

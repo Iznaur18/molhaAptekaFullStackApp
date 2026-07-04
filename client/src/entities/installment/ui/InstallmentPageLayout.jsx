@@ -1,3 +1,5 @@
+import { INSTALLMENT_UI } from "../../../shared/config/appUiCopy.js";
+
 import "./InstallmentPageLayout.css";
 
 /**
@@ -8,6 +10,8 @@ import "./InstallmentPageLayout.css";
  *   onStatusFilterChange?: (value: string) => void;
  *   statusOptions?: Array<{ value: string; label: string }>;
  *   statusFilterAriaLabel?: string;
+ *   onRefresh?: () => void;
+ *   isRefreshing?: boolean;
  *   children: import("react").ReactNode;
  * }} props
  */
@@ -18,6 +22,8 @@ export function InstallmentPageLayout({
   onStatusFilterChange,
   statusOptions = [],
   statusFilterAriaLabel = "",
+  onRefresh,
+  isRefreshing = false,
   children,
 }) {
   const hasStatusFilters =
@@ -28,7 +34,20 @@ export function InstallmentPageLayout({
       <div className="installment-page__toolbar">
         <div className="installment-page__toolbar-head">
           <h3 className="installment-page__heading">{title}</h3>
-          <span className="installment-page__count">{countLabel}</span>
+          <div className="installment-page__toolbar-meta">
+            <span className="installment-page__count">{countLabel}</span>
+            {typeof onRefresh === "function" ? (
+              <button
+                type="button"
+                className="installment-page__refresh"
+                onClick={onRefresh}
+                disabled={isRefreshing}
+                aria-busy={isRefreshing}
+              >
+                {INSTALLMENT_UI.PAYMENTS_REFRESH}
+              </button>
+            ) : null}
+          </div>
         </div>
 
         {hasStatusFilters ? (

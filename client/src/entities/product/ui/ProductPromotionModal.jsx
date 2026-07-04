@@ -153,7 +153,7 @@ export function ProductPromotionModal({
     <div className="product-promotion-modal__actions">
       <button
         type="button"
-        className="app-btn app-btn--secondary"
+        className="app-btn app-btn--cancel"
         onClick={onClose}
         disabled={isSubmitting}
       >

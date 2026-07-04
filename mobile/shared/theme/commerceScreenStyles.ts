@@ -1,6 +1,7 @@
 import { StyleSheet } from "react-native";
 
 import { ORDER_CARD_ITEM_THUMB_SIZE } from "@/entities/product/model/constants";
+import { CART_LINE_IMAGE_SIZE } from "@/shared/config/cartConstants";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 export const useOrderCardStyles = createThemedStyles((theme) => ({
@@ -11,6 +12,41 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
+    borderLeftWidth: StyleSheet.hairlineWidth,
+  },
+  cardAttention: {
+    borderLeftWidth: 3,
+    borderLeftColor: "#d97706",
+  },
+  headerMain: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 6,
+    minWidth: 0,
+  },
+  chevronButton: {
+    flexShrink: 0,
+    padding: 2,
+  },
+  chevron: {
+    width: 20,
+    height: 20,
+    borderRadius: 999,
+    overflow: "hidden",
+    backgroundColor: theme.colors.surfaceMuted,
+    color: theme.colors.textMuted,
+    fontSize: 12,
+    lineHeight: 20,
+    textAlign: "center",
+  },
+  chevronExpanded: {
+    transform: [{ rotate: "90deg" }],
+  },
+  collapsedPreview: {
+    fontSize: 13.1,
+    color: theme.colors.textSecondary,
+    marginBottom: 4,
   },
   header: {
     flexDirection: "row",
@@ -185,9 +221,9 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.action,
   },
   actionButtonCancel: {
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.danger,
     borderWidth: 1,
-    borderColor: "#b42318",
+    borderColor: theme.colors.danger,
   },
   actionDisabled: {
     opacity: 0.6,
@@ -198,7 +234,7 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     color: theme.colors.onContrast,
   },
   actionButtonTextCancel: {
-    color: "#b42318",
+    color: theme.colors.onContrast,
   },
   itemError: {
     marginTop: 6,
@@ -256,32 +292,25 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
 }));
 
 export const useCartLineItemStyles = createThemedStyles((theme) => ({
-  card: {
-    flexDirection: "column",
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    borderRadius: 8,
+  row: {
+    paddingHorizontal: 16,
+    paddingVertical: 14,
     backgroundColor: theme.colors.surface,
-    marginBottom: 8,
-    gap: 10,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: theme.colors.border,
   },
-  cardUpdating: {
+  rowUpdating: {
     opacity: 0.7,
   },
-  cardExcluded: {
-    opacity: 0.65,
-  },
-  topRow: {
+  mainRow: {
     flexDirection: "row",
-    alignItems: "center",
-    gap: 14,
+    alignItems: "flex-start",
+    gap: 12,
   },
   imageWrap: {
-    width: 52,
-    height: 52,
-    borderRadius: 6,
+    width: CART_LINE_IMAGE_SIZE,
+    height: CART_LINE_IMAGE_SIZE,
+    borderRadius: 10,
     overflow: "hidden",
     backgroundColor: theme.colors.surfaceMuted,
     flexShrink: 0,
@@ -293,101 +322,80 @@ export const useCartLineItemStyles = createThemedStyles((theme) => ({
   info: {
     flex: 1,
     minWidth: 0,
+    gap: 4,
+  },
+  stockHint: {
+    fontSize: 12,
+    fontWeight: "500",
+    color: "#ea580c",
   },
   name: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: 14,
+    fontWeight: "400",
+    lineHeight: 18,
     color: theme.colors.text,
   },
   nameLink: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: theme.colors.link,
+    fontSize: 14,
+    fontWeight: "400",
+    lineHeight: 18,
+    color: theme.colors.text,
   },
-  unitPrice: {
-    marginTop: 4,
-    fontSize: 13,
-    color: theme.colors.textMuted,
-  },
-  excluded: {
-    marginTop: 4,
-    fontSize: 12,
-    color: theme.colors.danger,
-  },
-  bottomRow: {
+  actionRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-  },
-  controls: {
-    flexDirection: "row",
-    alignItems: "center",
+    marginTop: 12,
+    gap: 12,
   },
   removeButton: {
     width: 36,
     height: 36,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 10,
-    paddingRight: 10,
   },
   removeIcon: {
-    fontSize: 18,
     color: theme.colors.textMuted,
   },
-  controlDivider: {
-    width: 1,
-    height: 28,
-    backgroundColor: theme.colors.border,
-    marginRight: 10,
+  stepperWrap: {
+    flex: 1,
+    alignItems: "center",
   },
   stepper: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
-    paddingHorizontal: 4,
-    paddingVertical: 3,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    borderRadius: 6,
+    gap: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    backgroundColor: theme.colors.surfaceMuted,
   },
   stepButton: {
-    width: 26,
-    height: 26,
+    width: 28,
+    height: 28,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 4,
   },
   stepDisabled: {
-    opacity: 0.4,
+    opacity: 0.35,
   },
   stepButtonText: {
     fontSize: 18,
-    fontWeight: "700",
-    color: theme.colors.action,
+    fontWeight: "600",
+    color: theme.colors.text,
     lineHeight: 22,
   },
   quantity: {
     fontSize: 15,
     fontWeight: "600",
-    minWidth: 20,
+    minWidth: 22,
     textAlign: "center",
     color: theme.colors.text,
-  },
-  totalWrap: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  totalDivider: {
-    width: 1,
-    height: 28,
-    backgroundColor: theme.colors.border,
-    marginRight: 10,
   },
   lineTotal: {
     fontSize: 15,
     fontWeight: "700",
     color: theme.colors.text,
+    minWidth: 72,
     textAlign: "right",
   },
 }));

@@ -5,7 +5,7 @@ import { RAFFLE_FEATURED_BANNER_CHROME as L } from "@izibuy/shared-lib";
 import { RAFFLE_FEATURED_PALETTE as P } from "@/entities/raffle/lib/raffleFeaturedPalette";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-const BANNER_BORDER_RADIUS = 16;
+const BANNER_BORDER_RADIUS = 20;
 const VISUAL_RADIUS_TOP = 11;
 const VISUAL_RADIUS_BOTTOM = 9.6;
 const BADGE_INSET = 7;
@@ -34,7 +34,7 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     position: "relative",
     width: "100%",
     maxWidth: "100%",
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: P.premiumPurpleMuted,
     borderRadius: BANNER_BORDER_RADIUS,
     overflow: "hidden",
@@ -543,8 +543,9 @@ export const useRaffleFeaturedSectionStyles = createThemedStyles((theme) => ({
     marginBottom: BANNER_SECTION_MARGIN,
   },
   title: {
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: 20,
+    fontWeight: "800",
+    letterSpacing: -0.4,
     color: theme.colors.ink,
     marginBottom: 12,
   },

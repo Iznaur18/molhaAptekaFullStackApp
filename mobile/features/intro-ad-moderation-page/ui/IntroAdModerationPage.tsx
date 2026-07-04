@@ -1,8 +1,8 @@
 import { useFocusEffect } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { useCallback, useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { campaignToIntroAdPreviewSettings } from "@/entities/intro-ad/lib/campaignToIntroAdPreviewSettings";
@@ -16,7 +16,20 @@ import {
   IntroAdModerationCampaignCard,
   type IntroAdModerationCampaign,
 } from "@/entities/intro-ad/ui/IntroAdModerationCampaignCard";
+import { usePendingSellerPersonalCategoryCampaignsQuery } from "@/entities/seller-personal-category/model/useSellerPersonalCategoryModerationMutations";
+import { usePendingSiteHeaderBannerCampaignsQuery } from "@/entities/site-header-banner-campaign/model/useSiteHeaderBannerCampaignModerationMutations";
 import { useAppIntro } from "@/features/app-intro/model/AppIntroProvider";
+import { filterPendingModerationCampaigns } from "@/features/intro-ad-moderation-page/lib/filterPendingModerationCampaigns";
+import {
+  buildModerationCampaignRowId,
+  INTRO_AD_MODERATION_SECTION_BANNER,
+  INTRO_AD_MODERATION_SECTION_INTRO,
+  INTRO_AD_MODERATION_SECTION_PERSONAL,
+  isIntroAdModerationSectionVisible,
+} from "@/features/intro-ad-moderation-page/lib/introAdModerationSectionFilters";
+import { summarizeIntroAdModerationHub } from "@/features/intro-ad-moderation-page/lib/summarizeIntroAdModerationHub";
+import { IntroAdModerationPageOverview } from "@/features/intro-ad-moderation-page/ui/IntroAdModerationPageOverview";
+import { IntroAdModerationPageToolbar } from "@/features/intro-ad-moderation-page/ui/IntroAdModerationPageToolbar";
 import { ModerationSectionTitle } from "@/features/intro-ad-moderation-page/ui/ModerationSectionTitle";
 import { SellerPersonalCategoryCampaignModerationSection } from "@/features/intro-ad-moderation-page/ui/SellerPersonalCategoryCampaignModerationSection";
 import { SiteHeaderBannerCampaignModerationSection } from "@/features/intro-ad-moderation-page/ui/SiteHeaderBannerCampaignModerationSection";
@@ -24,6 +37,7 @@ import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNa
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import { introAdQueryKeys, staffBadgeQueryKeys } from "@/shared/api";
 import { INTRO_AD_MODERATION_PAGE_UI, MY_PROFILE_PAGE_UI } from "@/shared/config";
+import { campaignModerationNeedsAttention } from "@/shared/lib/campaignModerationAttention";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useIntroAdModerationPageStyles } from "@/shared/theme/introAdModerationPageStyles";
@@ -37,21 +51,157 @@ export const IntroAdModerationPage = () => {
   const { previewIntro } = useAppIntro();
   const queueQuery = usePendingIntroAdCampaignsQuery();
   const managedQuery = useManagedIntroAdCampaignsQuery();
+  const bannerPendingQuery = usePendingSiteHeaderBannerCampaignsQuery();
+  const personalPendingQuery = usePendingSellerPersonalCategoryCampaignsQuery();
   const { approveMutation, rejectMutation, staffCancelMutation } = useIntroAdModerationMutations();
   const [navSheetVisible, setNavSheetVisible] = useState(false);
+  const [sectionFilter, setSectionFilter] = useState("");
+  const [attentionOnly, setAttentionOnly] = useState(false);
+  const [expandedIds, setExpandedIds] = useState(() => new Set<string>());
   const [actionError, setActionError] = useState("");
   const [pendingCampaignId, setPendingCampaignId] = useState<string | null>(null);
   const [rejectReasons, setRejectReasons] = useState<Record<string, string>>({});
 
   const pendingCampaigns = queueQuery.data ?? [];
   const managedCampaigns = managedQuery.data ?? [];
+  const bannerPendingCampaigns = bannerPendingQuery.data ?? [];
+  const personalPendingCampaigns = personalPendingQuery.data ?? [];
+
+  const summary = useMemo(
+    () =>
+      summarizeIntroAdModerationHub({
+        introPending: pendingCampaigns,
+        bannerPending: bannerPendingCampaigns,
+        personalPending: personalPendingCampaigns,
+      }),
+    [bannerPendingCampaigns, pendingCampaigns, personalPendingCampaigns],
+  );
+
+  const filteredIntroPending = useMemo(
+    () => filterPendingModerationCampaigns(pendingCampaigns, { attentionOnly }),
+    [attentionOnly, pendingCampaigns],
+  );
+
+  const showIntroSection = isIntroAdModerationSectionVisible(
+    sectionFilter,
+    INTRO_AD_MODERATION_SECTION_INTRO,
+  );
+  const showBannerSection = isIntroAdModerationSectionVisible(
+    sectionFilter,
+    INTRO_AD_MODERATION_SECTION_BANNER,
+  );
+  const showPersonalSection = isIntroAdModerationSectionVisible(
+    sectionFilter,
+    INTRO_AD_MODERATION_SECTION_PERSONAL,
+  );
+
+  const totalPendingAll = summary.pendingTotal;
+  const visiblePendingCount =
+    (showIntroSection ? filteredIntroPending.length : 0) +
+    (showBannerSection
+      ? filterPendingModerationCampaigns(bannerPendingCampaigns, { attentionOnly }).length
+      : 0) +
+    (showPersonalSection
+      ? filterPendingModerationCampaigns(personalPendingCampaigns, { attentionOnly }).length
+      : 0);
+
+  const hasFilters = Boolean(sectionFilter) || attentionOnly;
+  const summaryCountLabel = hasFilters
+    ? INTRO_AD_MODERATION_PAGE_UI.COUNT_FILTERED(visiblePendingCount, totalPendingAll)
+    : INTRO_AD_MODERATION_PAGE_UI.COUNT_ITEMS(totalPendingAll);
+
+  const isRefreshing =
+    queueQuery.isFetching ||
+    managedQuery.isFetching ||
+    bannerPendingQuery.isFetching ||
+    personalPendingQuery.isFetching;
 
   useFocusEffect(
     useCallback(() => {
       void queueQuery.refetch();
       void managedQuery.refetch();
-    }, [managedQuery.refetch, queueQuery.refetch]),
+      void bannerPendingQuery.refetch();
+      void personalPendingQuery.refetch();
+    }, [
+      bannerPendingQuery.refetch,
+      managedQuery.refetch,
+      personalPendingQuery.refetch,
+      queueQuery.refetch,
+    ]),
   );
+
+  useEffect(() => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      const register = (prefix: string, campaigns: IntroAdModerationCampaign[]) => {
+        campaigns
+          .filter(campaignModerationNeedsAttention)
+          .forEach((campaign) => next.add(buildModerationCampaignRowId(prefix, String(campaign._id))));
+      };
+      register("intro", pendingCampaigns);
+      register("banner", bannerPendingCampaigns);
+      register("personal", personalPendingCampaigns);
+      return next;
+    });
+  }, [bannerPendingCampaigns, pendingCampaigns, personalPendingCampaigns]);
+
+  const toggleExpanded = useCallback((rowId: string) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(rowId)) {
+        next.delete(rowId);
+      } else {
+        next.add(rowId);
+      }
+      return next;
+    });
+  }, []);
+
+  const expandAllVisible = useCallback(() => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      filteredIntroPending.forEach((campaign) =>
+        next.add(buildModerationCampaignRowId("intro", String(campaign._id))),
+      );
+      if (showBannerSection) {
+        filterPendingModerationCampaigns(bannerPendingCampaigns, { attentionOnly }).forEach(
+          (campaign) => next.add(buildModerationCampaignRowId("banner", String(campaign._id))),
+        );
+      }
+      if (showPersonalSection) {
+        filterPendingModerationCampaigns(personalPendingCampaigns, { attentionOnly }).forEach(
+          (campaign) => next.add(buildModerationCampaignRowId("personal", String(campaign._id))),
+        );
+      }
+      return next;
+    });
+  }, [
+    attentionOnly,
+    bannerPendingCampaigns,
+    filteredIntroPending,
+    personalPendingCampaigns,
+    showBannerSection,
+    showPersonalSection,
+  ]);
+
+  const collapseAll = useCallback(() => {
+    setExpandedIds(new Set());
+  }, []);
+
+  const handlePendingFilterClick = useCallback(() => {
+    setSectionFilter("");
+    setAttentionOnly(false);
+  }, []);
+
+  const handleIntroFilterClick = useCallback(() => {
+    setSectionFilter(INTRO_AD_MODERATION_SECTION_INTRO);
+    setAttentionOnly(false);
+  }, []);
+
+  const handleBannerFilterClick = useCallback(() => {
+    setSectionFilter(INTRO_AD_MODERATION_SECTION_BANNER);
+    setAttentionOnly(false);
+  }, []);
 
   const removeFromPendingQueue = useCallback(
     (campaignId: string) => {
@@ -67,6 +217,11 @@ export const IntroAdModerationPage = () => {
       setRejectReasons((prev) => {
         const next = { ...prev };
         delete next[campaignId];
+        return next;
+      });
+      setExpandedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(buildModerationCampaignRowId("intro", campaignId));
         return next;
       });
     },
@@ -94,9 +249,27 @@ export const IntroAdModerationPage = () => {
         queryKey: introAdQueryKeys.moderationPending(INTRO_AD_MODERATION_QUEUE_LIMIT),
       }),
       queryClient.invalidateQueries({ queryKey: introAdQueryKeys.moderationManaged() }),
-      queryClient.invalidateQueries({ queryKey: [...staffBadgeQueryKeys.all, "intro-ad"] }),
+      queryClient.invalidateQueries({
+        queryKey: [...staffBadgeQueryKeys.all, "intro-ad"],
+      }),
     ]);
   }, [queryClient]);
+
+  const reload = useCallback(async () => {
+    await Promise.all([
+      queueQuery.refetch(),
+      managedQuery.refetch(),
+      bannerPendingQuery.refetch(),
+      personalPendingQuery.refetch(),
+    ]);
+    await refreshModerationQueries();
+  }, [
+    bannerPendingQuery,
+    managedQuery,
+    personalPendingQuery,
+    queueQuery,
+    refreshModerationQueries,
+  ]);
 
   const handleApprove = async (campaignId: string) => {
     try {
@@ -106,9 +279,7 @@ export const IntroAdModerationPage = () => {
       removeFromPendingQueue(campaignId);
       await refreshModerationQueries();
     } catch (error) {
-      setActionError(
-        formatApiErrorMessage(error, INTRO_AD_MODERATION_PAGE_UI.APPROVE_FALLBACK),
-      );
+      setActionError(formatApiErrorMessage(error, INTRO_AD_MODERATION_PAGE_UI.APPROVE_FALLBACK));
     } finally {
       setPendingCampaignId(null);
     }
@@ -125,9 +296,7 @@ export const IntroAdModerationPage = () => {
       removeFromPendingQueue(campaignId);
       await refreshModerationQueries();
     } catch (error) {
-      setActionError(
-        formatApiErrorMessage(error, INTRO_AD_MODERATION_PAGE_UI.REJECT_FALLBACK),
-      );
+      setActionError(formatApiErrorMessage(error, INTRO_AD_MODERATION_PAGE_UI.REJECT_FALLBACK));
     } finally {
       setPendingCampaignId(null);
     }
@@ -171,34 +340,77 @@ export const IntroAdModerationPage = () => {
     />
   );
 
+  const toolbar = (
+    <IntroAdModerationPageToolbar
+      summaryCountLabel={summaryCountLabel}
+      sectionFilter={sectionFilter}
+      onSectionFilterChange={setSectionFilter}
+      isRefreshing={isRefreshing}
+      onRefresh={() => {
+        void reload();
+      }}
+    />
+  );
+
+  const overview = (
+    <IntroAdModerationPageOverview
+      pendingTotal={summary.pendingTotal}
+      introPendingCount={summary.introPendingCount}
+      bannerPendingCount={summary.bannerPendingCount}
+      attentionCount={summary.attentionCount}
+      attentionOnly={attentionOnly}
+      onPendingFilterClick={handlePendingFilterClick}
+      onIntroFilterClick={handleIntroFilterClick}
+      onBannerFilterClick={handleBannerFilterClick}
+      onAttentionFilterChange={setAttentionOnly}
+    />
+  );
+
+  const listActions =
+    visiblePendingCount > 0 ? (
+      <View style={styles.listActions}>
+        <Pressable style={styles.listAction} onPress={expandAllVisible}>
+          <Text style={styles.listActionText}>{INTRO_AD_MODERATION_PAGE_UI.EXPAND_ALL}</Text>
+        </Pressable>
+        <Pressable style={styles.listAction} onPress={collapseAll}>
+          <Text style={styles.listActionText}>{INTRO_AD_MODERATION_PAGE_UI.COLLAPSE_ALL}</Text>
+        </Pressable>
+        {attentionOnly ? (
+          <Text style={styles.filterHint}>{INTRO_AD_MODERATION_PAGE_UI.ATTENTION_FILTER_HINT}</Text>
+        ) : null}
+      </View>
+    ) : null;
+
   if (queueQuery.isPending && managedQuery.isPending) {
     return <ScreenLoadingState message={INTRO_AD_MODERATION_PAGE_UI.LOADING} />;
   }
 
-  const hasIntroLoadError =
+  const isIntroEmpty = pendingCampaigns.length === 0 && managedCampaigns.length === 0;
+  const hasLoadError =
     (queueQuery.isError && pendingCampaigns.length === 0) ||
     (managedQuery.isError && managedCampaigns.length === 0);
-  const isIntroEmpty = pendingCampaigns.length === 0 && managedCampaigns.length === 0;
 
-  if (hasIntroLoadError && isIntroEmpty) {
+  if (hasLoadError && isIntroEmpty && totalPendingAll === 0) {
     const error = queueQuery.error ?? managedQuery.error;
     return (
       <ScreenErrorState
         message={formatApiErrorMessage(error, INTRO_AD_MODERATION_PAGE_UI.FETCH_FALLBACK)}
-        onRetry={async () => {
-          await Promise.all([queueQuery.refetch(), managedQuery.refetch()]);
-        }}
+        onRetry={reload}
       />
     );
   }
 
+  const emptyMessage = hasFilters
+    ? INTRO_AD_MODERATION_PAGE_UI.EMPTY_BY_FILTER
+    : INTRO_AD_MODERATION_PAGE_UI.EMPTY;
+
+  const introHasVisibleContent =
+    showIntroSection &&
+    ((!attentionOnly && managedCampaigns.length > 0) || filteredIntroPending.length > 0);
+
   const moderationSections = (
     <>
-      {isIntroEmpty ? (
-        <Text style={styles.empty}>{INTRO_AD_MODERATION_PAGE_UI.EMPTY}</Text>
-      ) : null}
-
-      {managedCampaigns.length > 0 ? (
+      {showIntroSection && !attentionOnly && managedCampaigns.length > 0 ? (
         <View style={styles.section}>
           <ModerationSectionTitle title={INTRO_AD_MODERATION_PAGE_UI.INTRO_MANAGED_TITLE} />
           <View style={styles.list}>
@@ -221,21 +433,25 @@ export const IntroAdModerationPage = () => {
         </View>
       ) : null}
 
-      {pendingCampaigns.length > 0 ? (
+      {showIntroSection && filteredIntroPending.length > 0 ? (
         <View style={styles.section}>
           <ModerationSectionTitle
             title={INTRO_AD_MODERATION_PAGE_UI.INTRO_PENDING_TITLE}
-            pendingCount={pendingCampaigns.length}
+            pendingCount={filteredIntroPending.length}
           />
           <View style={styles.list}>
-            {pendingCampaigns.map((campaign) => {
+            {filteredIntroPending.map((campaign) => {
               const campaignId = String(campaign._id);
+              const rowId = buildModerationCampaignRowId("intro", campaignId);
               return (
                 <IntroAdModerationCampaignCard
                   key={campaignId}
                   campaign={campaign}
                   isPending={pendingCampaignId === campaignId}
                   mode="pending"
+                  collapsible
+                  expanded={expandedIds.has(rowId)}
+                  onExpandedChange={() => toggleExpanded(rowId)}
                   onPreview={buildPreviewHandler(campaign)}
                   onApprove={() => {
                     void handleApprove(campaignId);
@@ -254,30 +470,41 @@ export const IntroAdModerationPage = () => {
         </View>
       ) : null}
 
-      <SiteHeaderBannerCampaignModerationSection onActionError={setActionError} />
-      <SellerPersonalCategoryCampaignModerationSection onActionError={setActionError} />
+      {showBannerSection ? (
+        <SiteHeaderBannerCampaignModerationSection
+          onActionError={setActionError}
+          attentionOnly={attentionOnly}
+          expandedIds={expandedIds}
+          onToggleExpanded={toggleExpanded}
+        />
+      ) : null}
+
+      {showPersonalSection ? (
+        <SellerPersonalCategoryCampaignModerationSection
+          onActionError={setActionError}
+          attentionOnly={attentionOnly}
+          expandedIds={expandedIds}
+          onToggleExpanded={toggleExpanded}
+        />
+      ) : null}
+
+      {!introHasVisibleContent &&
+      !showBannerSection &&
+      !showPersonalSection &&
+      totalPendingAll === 0 &&
+      isIntroEmpty ? (
+        <Text style={styles.empty}>{INTRO_AD_MODERATION_PAGE_UI.EMPTY}</Text>
+      ) : null}
+
+      {hasFilters && visiblePendingCount === 0 && !attentionOnly && totalPendingAll > 0 ? (
+        <Text style={styles.empty}>{emptyMessage}</Text>
+      ) : null}
+
+      {attentionOnly && visiblePendingCount === 0 ? (
+        <Text style={styles.empty}>{emptyMessage}</Text>
+      ) : null}
     </>
   );
-
-  if (isIntroEmpty) {
-    return (
-      <>
-        <ScrollView
-          style={[styles.container, centeredContentStyle]}
-          contentContainerStyle={[styles.scroll, { paddingBottom: contentPaddingBottom }]}
-        >
-          {listHeader}
-          {actionError ? (
-            <Text style={[styles.state, styles.stateError]} accessibilityRole="alert">
-              {actionError}
-            </Text>
-          ) : null}
-          {moderationSections}
-        </ScrollView>
-        {navSheet}
-      </>
-    );
-  }
 
   return (
     <>
@@ -285,26 +512,20 @@ export const IntroAdModerationPage = () => {
         style={[styles.container, centeredContentStyle]}
         contentContainerStyle={[styles.scroll, { paddingBottom: contentPaddingBottom }]}
         refreshControl={
-          <ThemedRefreshControl
-            refreshing={queueQuery.isFetching || managedQuery.isFetching}
-            onRefresh={async () => {
-              await Promise.all([queueQuery.refetch(), managedQuery.refetch()]);
-              await refreshModerationQueries();
-            }}
-          />
+          <ThemedRefreshControl refreshing={isRefreshing} onRefresh={reload} />
         }
       >
         {listHeader}
-
+        {toolbar}
+        {overview}
         {actionError ? (
           <Text style={[styles.state, styles.stateError]} accessibilityRole="alert">
             {actionError}
           </Text>
         ) : null}
-
+        {listActions}
         {moderationSections}
       </ScrollView>
-
       {navSheet}
     </>
   );

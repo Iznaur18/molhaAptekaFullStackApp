@@ -1,6 +1,8 @@
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { TextInput, View } from "react-native";
 
 import { CATALOG_FILTER_UI } from "@/shared/config";
+import { HOME_CATALOG_HEADER_SEARCH_ICON_SIZE } from "@/shared/lib/homeCatalogHeaderLayout";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useHomeCatalogHeaderStyles } from "@/shared/theme/homeCatalogHeaderStyles";
 
@@ -15,6 +17,13 @@ export const HomeCatalogHeaderSearch = ({ value, onChange }: HomeCatalogHeaderSe
 
   return (
     <View style={styles.searchWrap}>
+      <MaterialIcons
+        name="search"
+        size={HOME_CATALOG_HEADER_SEARCH_ICON_SIZE}
+        color={theme.colors.textMuted}
+        style={styles.searchIcon}
+        pointerEvents="none"
+      />
       <TextInput
         style={styles.searchInput}
         value={value}

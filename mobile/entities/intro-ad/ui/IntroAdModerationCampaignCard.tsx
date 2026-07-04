@@ -2,6 +2,12 @@ import { Pressable, Text, TextInput, View } from "react-native";
 
 import { resolveIntroAdAdvertiserName } from "@/entities/intro-ad/lib/resolveIntroAdAdvertiserName";
 import { resolveIntroAdManagedStatusLabel } from "@/entities/intro-ad/lib/resolveIntroAdManagedStatusLabel";
+import { ModerationCampaignCollapsibleFrame } from "@/features/intro-ad-moderation-page/ui/ModerationCampaignCollapsibleFrame";
+import {
+  resolveModerationCampaignCollapsedPreview,
+  resolveModerationCampaignTitle,
+} from "@/features/intro-ad-moderation-page/lib/resolveModerationCampaignCollapsedPreview";
+import { campaignModerationNeedsAttention } from "@/shared/lib/campaignModerationAttention";
 import { INTRO_AD_MODERATION_PAGE_UI } from "@/shared/config";
 import { formatIsoDateTime } from "@/shared/lib";
 import { useIntroAdModerationCampaignCardStyles } from "@/shared/theme/introAdModerationCampaignCardStyles";
@@ -24,6 +30,9 @@ type IntroAdModerationCampaignCardProps = {
   onStaffCancel?: () => void;
   rejectReason?: string;
   onRejectReasonChange?: (value: string) => void;
+  collapsible?: boolean;
+  expanded?: boolean;
+  onExpandedChange?: () => void;
 };
 
 export const IntroAdModerationCampaignCard = ({
@@ -36,11 +45,18 @@ export const IntroAdModerationCampaignCard = ({
   onStaffCancel,
   rejectReason = "",
   onRejectReasonChange,
+  collapsible = false,
+  expanded = true,
+  onExpandedChange,
 }: IntroAdModerationCampaignCardProps) => {
   const styles = useIntroAdModerationCampaignCardStyles();
   const advertiserName = resolveIntroAdAdvertiserName(campaign);
+  const needsAttention = mode === "pending" && campaignModerationNeedsAttention(campaign);
+  const collapsedPreview = resolveModerationCampaignCollapsedPreview(campaign);
+  const createdLabel =
+    mode === "pending" && campaign.createdAt ? formatIsoDateTime(campaign.createdAt) : null;
 
-  return (
+  const cardBody = (
     <View style={styles.card}>
       <Text style={styles.meta}>
         {INTRO_AD_MODERATION_PAGE_UI.ADVERTISER_LABEL}: {advertiserName}
@@ -83,11 +99,11 @@ export const IntroAdModerationCampaignCard = ({
 
         {mode === "managed" && onStaffCancel ? (
           <Pressable
-            style={[styles.dangerButton, isPending && styles.buttonDisabled]}
+            style={[styles.cancelButton, isPending && styles.buttonDisabled]}
             onPress={onStaffCancel}
             disabled={isPending}
           >
-            <Text style={styles.dangerButtonText}>{INTRO_AD_MODERATION_PAGE_UI.STAFF_CANCEL}</Text>
+            <Text style={styles.cancelButtonText}>{INTRO_AD_MODERATION_PAGE_UI.STAFF_CANCEL}</Text>
           </Pressable>
         ) : null}
       </View>
@@ -116,5 +132,23 @@ export const IntroAdModerationCampaignCard = ({
         </>
       ) : null}
     </View>
+  );
+
+  if (!collapsible) {
+    return cardBody;
+  }
+
+  return (
+    <ModerationCampaignCollapsibleFrame
+      title={resolveModerationCampaignTitle(campaign)}
+      collapsedPreview={collapsedPreview}
+      createdLabel={createdLabel}
+      needsAttention={needsAttention}
+      collapsible
+      expanded={expanded}
+      onExpandedChange={onExpandedChange}
+    >
+      {cardBody}
+    </ModerationCampaignCollapsibleFrame>
   );
 };

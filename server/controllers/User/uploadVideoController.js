@@ -1,7 +1,21 @@
+import { unlink } from "node:fs/promises";
+
 import { buildPublicUploadUrl } from "../../services/upload/buildPublicUploadUrl.js";
 import { finalizeUploadedFile } from "../../services/upload/finalizeUploadedFile.js";
 import { prepareUploadedVideoFile } from "../../services/upload/prepareUploadedVideoFile.js";
+import { resolveVideoUploadProfile } from "../../services/upload/resolveVideoUploadProfile.js";
 import { successRes, errorRes } from "../../services/http/index.js";
+
+/**
+ * Оригинал не должен оставаться на диске, если перекодировка не удалась.
+ *
+ * @param {import('express').Request['file']} file
+ */
+async function cleanupUploadedOriginal(file) {
+  if (file?.path) {
+    await unlink(file.path).catch(() => {});
+  }
+}
 
 export async function uploadVideoController(req, res) {
 if (!req.file) {
@@ -13,9 +27,13 @@ if (!req.file) {
     }
 
     try {
-      await prepareUploadedVideoFile(req.file);
+      await prepareUploadedVideoFile(
+        req.file,
+        resolveVideoUploadProfile(req).transcodeOptions,
+      );
     } catch (transcodeError) {
       console.error("uploadVideoController transcode error:", transcodeError);
+      await cleanupUploadedOriginal(req.file);
       return errorRes(
         res,
         400,

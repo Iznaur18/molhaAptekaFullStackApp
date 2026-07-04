@@ -64,9 +64,56 @@
   gap: 0.55rem;
   padding: 0.75rem;
   border: 1px solid var(--iz-color-border-subtle);
+  border-left: 3px solid var(--iz-color-border-subtle);
   border-radius: 0.75rem;
   background: var(--iz-color-surface);
   box-shadow: 0 1px 0 color-mix(in srgb, var(--iz-color-ink) 4%, transparent);
+}
+
+.auction-dashboard-row_attention {
+  border-left-color: var(--iz-color-warning-bright);
+  box-shadow: 0 1px 4px color-mix(in srgb, var(--iz-color-warning-bright) 16%, transparent);
+}
+
+.auction-dashboard-row__head-line {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.auction-dashboard-row__chevron-btn {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.auction-dashboard-row__chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 999px;
+  background: var(--iz-color-surface-muted);
+  color: var(--iz-color-text-muted);
+  font-size: 0.75rem;
+  line-height: 1;
+  transition: transform 0.15s ease;
+}
+
+.auction-dashboard-row__chevron_expanded {
+  transform: rotate(90deg);
+}
+
+.auction-dashboard-row__preview {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--iz-color-text-secondary);
 }
 
 .auction-dashboard-row__head {
@@ -266,21 +313,6 @@
 .auction-dashboard-row__composer-submit:disabled {
   opacity: 0.65;
   cursor: not-allowed;
-}
-
-.auction-dashboard-row__editor-cancel {
-  align-self: flex-start;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--iz-color-danger-strong);
-  font: inherit;
-  font-size: 0.82rem;
-  font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 0.12em;
-  cursor: pointer;
 }
 
 .auction-dashboard-row__editor-cancel:disabled {

@@ -74,9 +74,9 @@
 }
 
 .admin-delete-user__btn_secondary {
-  border-color: var(--iz-color-border);
-  background: var(--iz-color-surface);
-  color: var(--iz-color-text);
+  border-color: var(--iz-color-danger);
+  background: var(--iz-color-danger);
+  color: var(--iz-color-on-contrast);
 }
 
 .admin-delete-user__btn_danger {

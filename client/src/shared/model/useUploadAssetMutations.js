@@ -9,7 +9,11 @@ export function useUploadAssetMutations() {
   });
 
   const uploadVideoMutation = useMutation({
-    mutationFn: uploadVideo,
+    mutationFn: (variables) => {
+      const file = variables?.file ?? variables;
+      const purpose = variables?.purpose;
+      return uploadVideo(file, purpose ? { purpose } : {});
+    },
   });
 
   return {

@@ -1,8 +1,9 @@
-import { Platform, StyleSheet } from "react-native";
+import { Platform } from "react-native";
 
 import {
   HOME_CATALOG_HEADER_BOTTOM_MARGIN,
   HOME_CATALOG_HEADER_CIRCLE_BUTTON_SIZE,
+  HOME_CATALOG_HEADER_SEARCH_ICON_LEFT,
   HOME_CATALOG_HEADER_LOGO_HEIGHT,
   HOME_CATALOG_HEADER_LOGO_MAX_WIDTH_REM,
   HOME_CATALOG_HEADER_PANEL_BORDER_COLOR,
@@ -20,11 +21,8 @@ import {
   HOME_CATALOG_HEADER_TOP_ROW_GAP,
   HOME_CATALOG_HEADER_USERS_PILL_GAP,
   HOME_CATALOG_HEADER_USERS_PILL_PADDING,
-  HOME_CATALOG_HEADER_USERS_PILL_SHADOW,
 } from "@/shared/lib/homeCatalogHeaderLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
-
-const BORDER_SUBTLE = "#e2e8f0";
 
 const panelShadowStyle =
   Platform.OS === "ios"
@@ -103,20 +101,26 @@ export const useHomeCatalogHeaderStyles = createThemedStyles((theme) => ({
   searchWrap: {
     flex: 1,
     minWidth: 0,
+    justifyContent: "center",
+  },
+  searchIcon: {
+    position: "absolute",
+    left: HOME_CATALOG_HEADER_SEARCH_ICON_LEFT,
+    zIndex: 1,
   },
   searchInput: {
     width: "100%",
     minHeight: HOME_CATALOG_HEADER_SEARCH_INPUT_MIN_HEIGHT,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderWidth: 0,
     borderRadius: HOME_CATALOG_HEADER_SEARCH_INPUT_BORDER_RADIUS,
     paddingLeft: HOME_CATALOG_HEADER_SEARCH_INPUT_PADDING_LEFT,
     paddingRight: HOME_CATALOG_HEADER_SEARCH_INPUT_PADDING_RIGHT,
     paddingVertical: HOME_CATALOG_HEADER_SEARCH_INPUT_PADDING_VERTICAL,
     fontSize: HOME_CATALOG_HEADER_SEARCH_INPUT_FONT_SIZE,
-    lineHeight: 16,
+    lineHeight: 20,
     color: theme.colors.text,
-    backgroundColor: theme.colors.surface,
+    // iOS search bar fill: тонированный текст ~8%, адаптируется к теме.
+    backgroundColor: `${theme.colors.text}14`,
   },
   usersNavPill: {
     flexDirection: "row",
@@ -126,19 +130,8 @@ export const useHomeCatalogHeaderStyles = createThemedStyles((theme) => ({
     flexShrink: 0,
     gap: HOME_CATALOG_HEADER_USERS_PILL_GAP,
     padding: HOME_CATALOG_HEADER_USERS_PILL_PADDING,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
     borderRadius: theme.radius.pill,
-    backgroundColor: theme.colors.surfaceElevated,
-    ...Platform.select({
-      ios: {
-        shadowColor: HOME_CATALOG_HEADER_USERS_PILL_SHADOW,
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 1,
-        shadowRadius: 2,
-      },
-      android: { elevation: 1 },
-    }),
+    backgroundColor: "transparent",
   },
   usersButton: {
     width: HOME_CATALOG_HEADER_CIRCLE_BUTTON_SIZE,
@@ -146,8 +139,6 @@ export const useHomeCatalogHeaderStyles = createThemedStyles((theme) => ({
     borderRadius: HOME_CATALOG_HEADER_CIRCLE_BUTTON_SIZE / 2,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: BORDER_SUBTLE,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: `${theme.colors.text}14`,
   },
 }));

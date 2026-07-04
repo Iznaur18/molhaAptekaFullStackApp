@@ -50,6 +50,11 @@ export const useMediaUploadFieldStyles = createThemedStyles((theme) => ({
     fontWeight: "600",
     color: theme.colors.nearBlack,
   },
+  fieldHint: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: theme.colors.textMuted,
+  },
   error: {
     color: theme.colors.danger,
     fontSize: 13,

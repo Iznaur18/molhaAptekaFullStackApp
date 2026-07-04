@@ -1,19 +1,18 @@
 import { StyleSheet } from "react-native";
 
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
+import { cancelButtonStyleBlock } from "@/shared/theme/cancelButtonChromeStyles";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-const PREMIUM_INDIGO_MUTED = "#818cf8";
-const PREMIUM_INDIGO_SOFT = "#eef2ff";
-const LINK_DEEP = "#1d4ed8";
-const GOLD_MUTED = "#7a5a00";
-const PROMOTION_BOOST_BG = "#fffbeb";
+/** Палитра nav-tone «Реклама» — `profileNavTones.orange` */
+const ADV_ACCENT = "#ea580c";
+const ADV_ACCENT_SOFT = "#ffedd5";
+const ADV_ACCENT_STRONG = "#c2410c";
+const ADV_ACCENT_BORDER = "#fdba74";
+
 const SUCCESS_LIGHT = "#86efac";
 const SUCCESS_SOFT = "#ecfdf5";
 const SUCCESS_STRONG = "#047857";
-const DANGER_STRONG = "#b42318";
-const SLATE = "#475569";
-const WARNING_BORDER_MIX = "#fcd34d";
 
 export const useAdvertisingPageStyles = createThemedStyles((theme) => ({
   container: {
@@ -46,15 +45,15 @@ export const useAdvertisingPageStyles = createThemedStyles((theme) => ({
     paddingHorizontal: 14.4,
     borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.actionBorder,
-    backgroundColor: theme.colors.actionSoft,
+    borderColor: ADV_ACCENT_BORDER,
+    backgroundColor: ADV_ACCENT_SOFT,
   },
   balanceLabel: {
     fontSize: 12.48,
     fontWeight: "700",
     letterSpacing: 0.64,
     textTransform: "uppercase",
-    color: theme.colors.primaryBright,
+    color: ADV_ACCENT_STRONG,
   },
   balanceValue: {
     fontSize: 16.8,
@@ -82,8 +81,8 @@ export const useAdvertisingPageStyles = createThemedStyles((theme) => ({
   loginButton: {
     paddingVertical: 10,
     paddingHorizontal: 16,
-    borderRadius: 8,
-    backgroundColor: theme.colors.action,
+    borderRadius: 10,
+    backgroundColor: ADV_ACCENT,
   },
   loginButtonText: {
     color: theme.colors.onContrast,
@@ -92,7 +91,13 @@ export const useAdvertisingPageStyles = createThemedStyles((theme) => ({
   },
 }));
 
+const advertisingCardAccent = {
+  borderTopWidth: 3,
+  borderTopColor: ADV_ACCENT,
+} as const;
+
 export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
+  ...cancelButtonStyleBlock(theme),
   card: {
     gap: 13.6,
     padding: 16,
@@ -106,18 +111,9 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
     shadowRadius: 18,
     elevation: 2,
   },
-  cardIntro: {
-    borderColor: PREMIUM_INDIGO_MUTED,
-    backgroundColor: PREMIUM_INDIGO_SOFT,
-  },
-  cardCategory: {
-    borderColor: theme.colors.warningBorder,
-    backgroundColor: PROMOTION_BOOST_BG,
-  },
-  cardBanner: {
-    borderColor: theme.colors.primaryBright,
-    backgroundColor: theme.colors.actionSoft,
-  },
+  cardIntro: advertisingCardAccent,
+  cardCategory: advertisingCardAccent,
+  cardBanner: advertisingCardAccent,
   cardHead: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -135,15 +131,11 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
     paddingVertical: 3.2,
     paddingHorizontal: 8.8,
     borderRadius: 999,
-    backgroundColor: theme.colors.actionSurface,
-    color: LINK_DEEP,
+    backgroundColor: ADV_ACCENT_SOFT,
+    color: ADV_ACCENT_STRONG,
     fontSize: 12,
     fontWeight: "700",
     overflow: "hidden",
-  },
-  cardBadgeCategory: {
-    backgroundColor: theme.colors.warningSurface,
-    color: GOLD_MUTED,
   },
   lead: {
     fontSize: 14.4,
@@ -197,13 +189,13 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
     backgroundColor: SUCCESS_SOFT,
   },
   statusPanelPending: {
-    borderColor: WARNING_BORDER_MIX,
+    borderColor: theme.colors.warningBorder,
     backgroundColor: theme.colors.warningSurface,
   },
   statusText: {
     fontSize: 14.08,
     lineHeight: 19.7,
-    color: SLATE,
+    color: theme.colors.textSecondary,
   },
   statusTextActive: {
     color: SUCCESS_STRONG,
@@ -233,7 +225,7 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
   fieldLabel: {
     fontSize: 14.08,
     fontWeight: "600",
-    color: SLATE,
+    color: theme.colors.textSecondary,
   },
   input: {
     borderWidth: StyleSheet.hairlineWidth,
@@ -248,7 +240,7 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
   timingLegend: {
     fontSize: 14.08,
     fontWeight: "700",
-    color: SLATE,
+    color: theme.colors.textSecondary,
   },
   timingHint: {
     fontSize: 13.12,
@@ -279,12 +271,8 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
   },
   tariffSelected: {
-    borderColor: PREMIUM_INDIGO_MUTED,
-    shadowColor: PREMIUM_INDIGO_MUTED,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 1,
-    shadowRadius: 1,
-    elevation: 1,
+    borderColor: ADV_ACCENT,
+    backgroundColor: ADV_ACCENT_SOFT,
   },
   tariffTitle: {
     fontSize: 13.12,
@@ -304,8 +292,8 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
     alignSelf: "flex-start",
     paddingVertical: 10,
     paddingHorizontal: 16,
-    borderRadius: 8,
-    backgroundColor: theme.colors.action,
+    borderRadius: 10,
+    backgroundColor: ADV_ACCENT,
   },
   primaryButtonDisabled: {
     opacity: 0.55,
@@ -319,23 +307,23 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
     alignSelf: "flex-start",
     paddingVertical: 10,
     paddingHorizontal: 16,
-    borderRadius: 8,
+    borderRadius: 10,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
+    borderColor: ADV_ACCENT_BORDER,
     backgroundColor: theme.colors.surface,
   },
   secondaryButtonDisabled: {
     opacity: 0.55,
   },
   secondaryButtonText: {
-    color: theme.colors.text,
+    color: ADV_ACCENT_STRONG,
     fontWeight: "600",
     fontSize: 15.2,
   },
   error: {
     fontSize: 14.08,
     lineHeight: 20.2,
-    color: DANGER_STRONG,
+    color: theme.colors.danger,
   },
   feedback: {
     paddingVertical: 8.8,

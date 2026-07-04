@@ -97,6 +97,13 @@
   cursor: not-allowed;
 }
 
+.create-user-story-modal__video-hint {
+  margin: 8px 0 0;
+  color: var(--iz-color-text-subtle);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
 .create-user-story-modal__caption-label {
   display: flex;
   flex-direction: column;

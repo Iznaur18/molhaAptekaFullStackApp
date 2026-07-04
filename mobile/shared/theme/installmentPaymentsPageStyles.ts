@@ -108,4 +108,66 @@ export const useInstallmentPaymentsPageStyles = createThemedStyles((theme) => ({
     color: theme.colors.onContrast,
     fontWeight: "600",
   },
+  overview: {
+    gap: 8,
+  },
+  overviewTile: {
+    gap: 2,
+    paddingVertical: 9.6,
+    paddingHorizontal: 10.4,
+    borderRadius: 8.8,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+  },
+  overviewTileActive: {
+    borderColor: LINK_DEEP,
+    backgroundColor: "#eef2ff",
+  },
+  overviewTileAttention: {
+    borderColor: "rgba(245, 158, 11, 0.45)",
+  },
+  overviewTileStatic: {
+    opacity: 1,
+  },
+  overviewLabel: {
+    fontSize: 11.2,
+    fontWeight: "700",
+    letterSpacing: 0.4,
+    textTransform: "uppercase",
+    color: theme.colors.textMuted,
+  },
+  overviewValue: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: theme.colors.text,
+    fontVariant: ["tabular-nums"],
+  },
+  overviewValueAttention: {
+    color: "#92400e",
+  },
+  listActions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+    alignItems: "center",
+  },
+  listAction: {
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 999,
+    paddingVertical: 3.5,
+    paddingHorizontal: 8.8,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+  },
+  listActionText: {
+    fontSize: 13.1,
+    fontWeight: "600",
+    color: theme.colors.textSecondary,
+  },
+  filterHint: {
+    flexBasis: "100%",
+    fontSize: 13.1,
+    color: theme.colors.textMuted,
+  },
 }));

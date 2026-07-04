@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   approveIntroAdCampaign,
@@ -9,142 +9,39 @@ import {
   rejectIntroAdCampaign,
 } from "../../../entities/intro-ad/api/introAdModerationApi.js";
 import { introAdQueryKeys } from "../../../entities/intro-ad/model/introAdQueryKeys.js";
-import { useAppIntro } from "../../../features/app-intro/model/AppIntroContext.jsx";
 import { formToIntroAdPreviewSettings } from "../../../entities/intro-ad/lib/index.js";
+import { fetchPendingSellerPersonalCategoryCampaigns } from "../../../entities/seller-personal-category/api/sellerPersonalCategoryApi.js";
+import { sellerPersonalCategoryQueryKeys } from "../../../entities/seller-personal-category/model/sellerPersonalCategoryQueryKeys.js";
+import {
+  fetchPendingSiteHeaderBannerCampaigns,
+} from "../../../entities/site-header-banner-campaign/api/siteHeaderBannerCampaignModerationApi.js";
+import { siteHeaderBannerCampaignQueryKeys } from "../../../entities/site-header-banner-campaign/model/siteHeaderBannerCampaignQueryKeys.js";
+import { useAppIntro } from "../../../features/app-intro/model/AppIntroContext.jsx";
+import { campaignModerationNeedsAttention } from "../../../shared/lib/campaignModerationAttention.js";
 import { INTRO_AD_MODERATION_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import { useRefetchOnVisible } from "../../../shared/lib/useRefetchOnVisible.js";
 
+import { filterPendingModerationCampaigns } from "../lib/filterPendingModerationCampaigns.js";
+import {
+  buildModerationCampaignRowId,
+  INTRO_AD_MODERATION_SECTION_BANNER,
+  INTRO_AD_MODERATION_SECTION_INTRO,
+  INTRO_AD_MODERATION_SECTION_PERSONAL,
+  isIntroAdModerationSectionVisible,
+} from "../lib/introAdModerationSectionFilters.js";
+import { summarizeIntroAdModerationHub } from "../lib/summarizeIntroAdModerationHub.js";
+import { IntroAdModerationCampaignCard } from "./IntroAdModerationCampaignCard.jsx";
+import { IntroAdModerationPageOverview } from "./IntroAdModerationPageOverview.jsx";
+import { IntroAdModerationPageToolbar } from "./IntroAdModerationPageToolbar.jsx";
 import { SiteHeaderBannerCampaignModerationSection } from "./SiteHeaderBannerCampaignModerationSection.jsx";
 import { SellerPersonalCategoryCampaignModerationSection } from "./SellerPersonalCategoryCampaignModerationSection.jsx";
 import { ModerationSectionTitle } from "./ModerationSectionTitle.jsx";
 
 import "./IntroAdModerationPage.css";
+import "./IntroAdModerationPageOverview.css";
+import "../../../shared/ui/profileQueueContentPanel.css";
 
 const MODERATION_QUEUE_LIMIT = 50;
-
-/**
- * @param {import('@molha/api-contract').IntroAdCampaignContract & { advertiser?: Record<string, unknown> | null }} campaign
- */
-function resolveAdvertiserName(campaign) {
-  const advertiser = campaign.advertiser;
-  return (
-    advertiser?.userNickname ||
-    [advertiser?.userName, advertiser?.userSurname].filter(Boolean).join(" ") ||
-    campaign.advertiserId
-  );
-}
-
-/**
- * @param {string | null | undefined} status
- */
-function resolveManagedStatusLabel(status) {
-  if (status === "active") {
-    return INTRO_AD_MODERATION_PAGE_UI.STATUS_ACTIVE;
-  }
-  if (status === "queued") {
-    return INTRO_AD_MODERATION_PAGE_UI.STATUS_QUEUED;
-  }
-  return status ?? "—";
-}
-
-/**
- * @param {{
- *   campaign: import('@molha/api-contract').IntroAdCampaignContract & { advertiser?: Record<string, unknown> | null };
- *   isPending: boolean;
- *   onPreview: () => void;
- *   onApprove?: () => void;
- *   onReject?: () => void;
- *   onStaffCancel?: () => void;
- *   rejectReason?: string;
- *   onRejectReasonChange?: (value: string) => void;
- *   mode: "pending" | "managed";
- * }} props
- */
-function IntroAdModerationCampaignCard({
-  campaign,
-  isPending,
-  onPreview,
-  onApprove,
-  onReject,
-  onStaffCancel,
-  rejectReason = "",
-  onRejectReasonChange,
-  mode,
-}) {
-  const campaignId = String(campaign._id);
-  const advertiserName = resolveAdvertiserName(campaign);
-
-  return (
-    <li className="intro-ad-moderation-page__item">
-      <p className="intro-ad-moderation-page__meta">
-        {INTRO_AD_MODERATION_PAGE_UI.ADVERTISER_LABEL}: {advertiserName}
-      </p>
-      {mode === "managed" ? (
-        <p className="intro-ad-moderation-page__meta">
-          {INTRO_AD_MODERATION_PAGE_UI.STATUS_LABEL}:{" "}
-          {resolveManagedStatusLabel(campaign.status)}
-        </p>
-      ) : (
-        <p className="intro-ad-moderation-page__meta">
-          {INTRO_AD_MODERATION_PAGE_UI.SUBMITTED_LABEL}:{" "}
-          {campaign.createdAt
-            ? new Date(campaign.createdAt).toLocaleString("ru-RU")
-            : "—"}
-        </p>
-      )}
-      <div className="intro-ad-moderation-page__actions">
-        <button
-          type="button"
-          className="app-btn app-btn--secondary"
-          disabled={isPending}
-          onClick={onPreview}
-        >
-          {INTRO_AD_MODERATION_PAGE_UI.PREVIEW}
-        </button>
-        {mode === "pending" && onApprove ? (
-          <button
-            type="button"
-            className="app-btn app-btn--primary"
-            disabled={isPending}
-            onClick={onApprove}
-          >
-            {INTRO_AD_MODERATION_PAGE_UI.APPROVE}
-          </button>
-        ) : null}
-        {mode === "managed" && onStaffCancel ? (
-          <button
-            type="button"
-            className="app-btn app-btn--danger"
-            disabled={isPending}
-            onClick={onStaffCancel}
-          >
-            {INTRO_AD_MODERATION_PAGE_UI.STAFF_CANCEL}
-          </button>
-        ) : null}
-      </div>
-      {mode === "pending" && onReject && onRejectReasonChange ? (
-        <>
-          <label className="intro-ad-moderation-page__reject">
-            {INTRO_AD_MODERATION_PAGE_UI.REJECT_REASON_LABEL}
-            <textarea
-              className="intro-ad-moderation-page__textarea"
-              value={rejectReason}
-              onChange={(event) => onRejectReasonChange(event.target.value)}
-              placeholder={INTRO_AD_MODERATION_PAGE_UI.REJECT_REASON_PLACEHOLDER}
-            />
-          </label>
-          <button
-            type="button"
-            className="app-btn app-btn--danger"
-            disabled={isPending}
-            onClick={onReject}
-          >
-            {INTRO_AD_MODERATION_PAGE_UI.REJECT}
-          </button>
-        </>
-      ) : null}
-    </li>
-  );
-}
 
 /**
  * @param {{
@@ -154,6 +51,9 @@ function IntroAdModerationCampaignCard({
 export function IntroAdModerationPage({ onQueueChanged }) {
   const queryClient = useQueryClient();
   const { previewIntro } = useAppIntro();
+  const [sectionFilter, setSectionFilter] = useState("");
+  const [attentionOnly, setAttentionOnly] = useState(false);
+  const [expandedIds, setExpandedIds] = useState(() => new Set());
   const [actionError, setActionError] = useState("");
   const [pendingCampaignId, setPendingCampaignId] = useState(null);
   const [rejectReasons, setRejectReasons] = useState(
@@ -170,6 +70,16 @@ export function IntroAdModerationPage({ onQueueChanged }) {
     queryFn: fetchManagedIntroAdCampaigns,
   });
 
+  const bannerPendingQuery = useQuery({
+    queryKey: siteHeaderBannerCampaignQueryKeys.moderationPending(MODERATION_QUEUE_LIMIT),
+    queryFn: () => fetchPendingSiteHeaderBannerCampaigns({ limit: MODERATION_QUEUE_LIMIT }),
+  });
+
+  const personalPendingQuery = useQuery({
+    queryKey: sellerPersonalCategoryQueryKeys.moderationPending(),
+    queryFn: () => fetchPendingSellerPersonalCategoryCampaigns(MODERATION_QUEUE_LIMIT),
+  });
+
   const approveMutation = useMutation({ mutationFn: approveIntroAdCampaign });
   const rejectMutation = useMutation({
     mutationFn: ({ campaignId, reason }) => rejectIntroAdCampaign(campaignId, reason),
@@ -180,6 +90,147 @@ export function IntroAdModerationPage({ onQueueChanged }) {
 
   const pendingCampaigns = queueQuery.data?.campaigns ?? [];
   const managedCampaigns = managedQuery.data?.campaigns ?? [];
+  const bannerPendingCampaigns = bannerPendingQuery.data?.campaigns ?? [];
+  const personalPendingCampaigns = personalPendingQuery.data?.campaigns ?? [];
+
+  const summary = useMemo(
+    () =>
+      summarizeIntroAdModerationHub({
+        introPending: pendingCampaigns,
+        bannerPending: bannerPendingCampaigns,
+        personalPending: personalPendingCampaigns,
+      }),
+    [bannerPendingCampaigns, pendingCampaigns, personalPendingCampaigns],
+  );
+
+  const filteredIntroPending = useMemo(
+    () => filterPendingModerationCampaigns(pendingCampaigns, { attentionOnly }),
+    [attentionOnly, pendingCampaigns],
+  );
+
+  const showIntroSection = isIntroAdModerationSectionVisible(
+    sectionFilter,
+    INTRO_AD_MODERATION_SECTION_INTRO,
+  );
+  const showBannerSection = isIntroAdModerationSectionVisible(
+    sectionFilter,
+    INTRO_AD_MODERATION_SECTION_BANNER,
+  );
+  const showPersonalSection = isIntroAdModerationSectionVisible(
+    sectionFilter,
+    INTRO_AD_MODERATION_SECTION_PERSONAL,
+  );
+
+  const totalPendingAll = summary.pendingTotal;
+  const visiblePendingCount =
+    (showIntroSection ? filteredIntroPending.length : 0) +
+    (showBannerSection
+      ? filterPendingModerationCampaigns(bannerPendingCampaigns, { attentionOnly }).length
+      : 0) +
+    (showPersonalSection
+      ? filterPendingModerationCampaigns(personalPendingCampaigns, { attentionOnly }).length
+      : 0);
+
+  const hasFilters = Boolean(sectionFilter) || attentionOnly;
+  const summaryCountLabel = hasFilters
+    ? INTRO_AD_MODERATION_PAGE_UI.COUNT_FILTERED(visiblePendingCount, totalPendingAll)
+    : INTRO_AD_MODERATION_PAGE_UI.COUNT_ITEMS(totalPendingAll);
+
+  const isRefreshing =
+    queueQuery.isFetching ||
+    managedQuery.isFetching ||
+    bannerPendingQuery.isFetching ||
+    personalPendingQuery.isFetching;
+
+  const reload = useCallback(async () => {
+    await Promise.all([
+      queueQuery.refetch(),
+      managedQuery.refetch(),
+      bannerPendingQuery.refetch(),
+      personalPendingQuery.refetch(),
+    ]);
+    onQueueChanged?.();
+  }, [
+    bannerPendingQuery,
+    managedQuery,
+    onQueueChanged,
+    personalPendingQuery,
+    queueQuery,
+  ]);
+
+  useRefetchOnVisible(reload, !queueQuery.isPending && !managedQuery.isPending);
+
+  useEffect(() => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      const register = (prefix, campaigns) => {
+        campaigns
+          .filter(campaignModerationNeedsAttention)
+          .forEach((campaign) => next.add(buildModerationCampaignRowId(prefix, String(campaign._id))));
+      };
+      register("intro", pendingCampaigns);
+      register("banner", bannerPendingCampaigns);
+      register("personal", personalPendingCampaigns);
+      return next;
+    });
+  }, [bannerPendingCampaigns, pendingCampaigns, personalPendingCampaigns]);
+
+  const toggleExpanded = useCallback((rowId) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(rowId)) {
+        next.delete(rowId);
+      } else {
+        next.add(rowId);
+      }
+      return next;
+    });
+  }, []);
+
+  const expandAllVisible = useCallback(() => {
+    const next = new Set(expandedIds);
+    filteredIntroPending.forEach((campaign) =>
+      next.add(buildModerationCampaignRowId("intro", String(campaign._id))),
+    );
+    if (showBannerSection) {
+      filterPendingModerationCampaigns(bannerPendingCampaigns, { attentionOnly }).forEach(
+        (campaign) => next.add(buildModerationCampaignRowId("banner", String(campaign._id))),
+      );
+    }
+    if (showPersonalSection) {
+      filterPendingModerationCampaigns(personalPendingCampaigns, { attentionOnly }).forEach(
+        (campaign) => next.add(buildModerationCampaignRowId("personal", String(campaign._id))),
+      );
+    }
+    setExpandedIds(next);
+  }, [
+    attentionOnly,
+    bannerPendingCampaigns,
+    expandedIds,
+    filteredIntroPending,
+    personalPendingCampaigns,
+    showBannerSection,
+    showPersonalSection,
+  ]);
+
+  const collapseAll = useCallback(() => {
+    setExpandedIds(new Set());
+  }, []);
+
+  const handlePendingFilterClick = useCallback(() => {
+    setSectionFilter("");
+    setAttentionOnly(false);
+  }, []);
+
+  const handleIntroFilterClick = useCallback(() => {
+    setSectionFilter(INTRO_AD_MODERATION_SECTION_INTRO);
+    setAttentionOnly(false);
+  }, []);
+
+  const handleBannerFilterClick = useCallback(() => {
+    setSectionFilter(INTRO_AD_MODERATION_SECTION_BANNER);
+    setAttentionOnly(false);
+  }, []);
 
   const removeFromPendingQueue = (campaignId) => {
     queryClient.setQueryData(
@@ -194,17 +245,15 @@ export function IntroAdModerationPage({ onQueueChanged }) {
         };
       },
     );
-  };
-
-  const removeFromManagedQueue = (campaignId) => {
-    queryClient.setQueryData(introAdQueryKeys.moderationManaged(), (old) => {
-      if (!old?.campaigns) {
-        return old;
-      }
-      return {
-        ...old,
-        campaigns: old.campaigns.filter((item) => String(item._id) !== campaignId),
-      };
+    setRejectReasons((prev) => {
+      const next = { ...prev };
+      delete next[campaignId];
+      return next;
+    });
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      next.delete(buildModerationCampaignRowId("intro", campaignId));
+      return next;
     });
   };
 
@@ -263,7 +312,15 @@ export function IntroAdModerationPage({ onQueueChanged }) {
       setPendingCampaignId(campaignId);
       setActionError("");
       await staffCancelMutation.mutateAsync(campaignId);
-      removeFromManagedQueue(campaignId);
+      queryClient.setQueryData(introAdQueryKeys.moderationManaged(), (old) => {
+        if (!old?.campaigns) {
+          return old;
+        }
+        return {
+          ...old,
+          campaigns: old.campaigns.filter((item) => String(item._id) !== campaignId),
+        };
+      });
       await refreshModerationQueries();
     } catch (error) {
       setActionError(
@@ -290,11 +347,61 @@ export function IntroAdModerationPage({ onQueueChanged }) {
       }),
     );
 
+  const toolbar = (
+    <IntroAdModerationPageToolbar
+      summaryCountLabel={summaryCountLabel}
+      sectionFilter={sectionFilter}
+      onSectionFilterChange={setSectionFilter}
+      isRefreshing={isRefreshing}
+      onRefresh={() => void reload()}
+    />
+  );
+
+  const overview = (
+    <IntroAdModerationPageOverview
+      pendingTotal={summary.pendingTotal}
+      introPendingCount={summary.introPendingCount}
+      bannerPendingCount={summary.bannerPendingCount}
+      attentionCount={summary.attentionCount}
+      attentionOnly={attentionOnly}
+      onPendingFilterClick={handlePendingFilterClick}
+      onIntroFilterClick={handleIntroFilterClick}
+      onBannerFilterClick={handleBannerFilterClick}
+      onAttentionFilterChange={setAttentionOnly}
+    />
+  );
+
+  const listActions =
+    visiblePendingCount > 0 ? (
+      <div className="intro-ad-moderation-page__list-actions">
+        <button
+          type="button"
+          className="intro-ad-moderation-page__list-action"
+          onClick={expandAllVisible}
+        >
+          {INTRO_AD_MODERATION_PAGE_UI.EXPAND_ALL}
+        </button>
+        <button
+          type="button"
+          className="intro-ad-moderation-page__list-action"
+          onClick={collapseAll}
+        >
+          {INTRO_AD_MODERATION_PAGE_UI.COLLAPSE_ALL}
+        </button>
+        {attentionOnly ? (
+          <p className="intro-ad-moderation-page__filter-hint">
+            {INTRO_AD_MODERATION_PAGE_UI.ATTENTION_FILTER_HINT}
+          </p>
+        ) : null}
+      </div>
+    ) : null;
+
   if (queueQuery.isPending && managedQuery.isPending) {
     return (
-      <p className="intro-ad-moderation-page__state">
-        {INTRO_AD_MODERATION_PAGE_UI.LOADING}
-      </p>
+      <div className="intro-ad-moderation-page">
+        {toolbar}
+        <p className="intro-ad-moderation-page__state">{INTRO_AD_MODERATION_PAGE_UI.LOADING}</p>
+      </div>
     );
   }
 
@@ -303,7 +410,7 @@ export function IntroAdModerationPage({ onQueueChanged }) {
     (queueQuery.isError && pendingCampaigns.length === 0) ||
     (managedQuery.isError && managedCampaigns.length === 0);
 
-  if (hasLoadError && isIntroEmpty) {
+  if (hasLoadError && isIntroEmpty && totalPendingAll === 0) {
     const error =
       queueQuery.error instanceof Error
         ? queueQuery.error
@@ -311,22 +418,29 @@ export function IntroAdModerationPage({ onQueueChanged }) {
           ? managedQuery.error
           : null;
     return (
-      <p className="intro-ad-moderation-page__state intro-ad-moderation-page__state_error">
-        {error?.message ?? INTRO_AD_MODERATION_PAGE_UI.FETCH_FALLBACK}
-      </p>
+      <div className="intro-ad-moderation-page">
+        {toolbar}
+        <p className="intro-ad-moderation-page__state intro-ad-moderation-page__state_error">
+          {error?.message ?? INTRO_AD_MODERATION_PAGE_UI.FETCH_FALLBACK}
+        </p>
+      </div>
     );
   }
 
+  const emptyMessage = hasFilters
+    ? INTRO_AD_MODERATION_PAGE_UI.EMPTY_BY_FILTER
+    : INTRO_AD_MODERATION_PAGE_UI.EMPTY;
+
+  const introHasVisibleContent =
+    showIntroSection &&
+    (( !attentionOnly && managedCampaigns.length > 0) || filteredIntroPending.length > 0);
+
   const moderationSections = (
     <>
-      {isIntroEmpty ? (
-        <p className="intro-ad-moderation-page__state">{INTRO_AD_MODERATION_PAGE_UI.EMPTY}</p>
-      ) : null}
-
-      {managedCampaigns.length > 0 ? (
+      {showIntroSection && !attentionOnly && managedCampaigns.length > 0 ? (
         <section className="intro-ad-moderation-page__section">
           <ModerationSectionTitle title={INTRO_AD_MODERATION_PAGE_UI.INTRO_MANAGED_TITLE} />
-          <ul className="intro-ad-moderation-page__list">
+          <ul className="intro-ad-moderation-page__list profile-queue-content-panel">
             {managedCampaigns.map((campaign) => {
               const campaignId = String(campaign._id);
               return (
@@ -336,7 +450,7 @@ export function IntroAdModerationPage({ onQueueChanged }) {
                   isPending={pendingCampaignId === campaignId}
                   mode="managed"
                   onPreview={buildPreviewHandler(campaign)}
-                  onStaffCancel={() => handleStaffCancel(campaignId)}
+                  onStaffCancel={() => void handleStaffCancel(campaignId)}
                 />
               );
             })}
@@ -344,24 +458,28 @@ export function IntroAdModerationPage({ onQueueChanged }) {
         </section>
       ) : null}
 
-      {pendingCampaigns.length > 0 ? (
+      {showIntroSection && filteredIntroPending.length > 0 ? (
         <section className="intro-ad-moderation-page__section">
           <ModerationSectionTitle
             title={INTRO_AD_MODERATION_PAGE_UI.INTRO_PENDING_TITLE}
-            pendingCount={pendingCampaigns.length}
+            pendingCount={filteredIntroPending.length}
           />
-          <ul className="intro-ad-moderation-page__list">
-            {pendingCampaigns.map((campaign) => {
+          <ul className="intro-ad-moderation-page__list profile-queue-content-panel">
+            {filteredIntroPending.map((campaign) => {
               const campaignId = String(campaign._id);
+              const rowId = buildModerationCampaignRowId("intro", campaignId);
               return (
                 <IntroAdModerationCampaignCard
                   key={campaignId}
                   campaign={campaign}
                   isPending={pendingCampaignId === campaignId}
                   mode="pending"
+                  collapsible
+                  expanded={expandedIds.has(rowId)}
+                  onExpandedChange={() => toggleExpanded(rowId)}
                   onPreview={buildPreviewHandler(campaign)}
-                  onApprove={() => handleApprove(campaignId)}
-                  onReject={() => handleReject(campaignId)}
+                  onApprove={() => void handleApprove(campaignId)}
+                  onReject={() => void handleReject(campaignId)}
                   rejectReason={rejectReasons[campaignId] ?? ""}
                   onRejectReasonChange={(value) =>
                     setRejectReasons((prev) => ({ ...prev, [campaignId]: value }))
@@ -373,40 +491,56 @@ export function IntroAdModerationPage({ onQueueChanged }) {
         </section>
       ) : null}
 
-      <SiteHeaderBannerCampaignModerationSection
-        onQueueChanged={onQueueChanged}
-        actionError={actionError}
-        onActionError={setActionError}
-      />
-      <SellerPersonalCategoryCampaignModerationSection
-        onQueueChanged={onQueueChanged}
-        actionError={actionError}
-        onActionError={setActionError}
-      />
+      {showBannerSection ? (
+        <SiteHeaderBannerCampaignModerationSection
+          onQueueChanged={onQueueChanged}
+          actionError={actionError}
+          onActionError={setActionError}
+          attentionOnly={attentionOnly}
+          expandedIds={expandedIds}
+          onToggleExpanded={toggleExpanded}
+        />
+      ) : null}
+
+      {showPersonalSection ? (
+        <SellerPersonalCategoryCampaignModerationSection
+          onQueueChanged={onQueueChanged}
+          actionError={actionError}
+          onActionError={setActionError}
+          attentionOnly={attentionOnly}
+          expandedIds={expandedIds}
+          onToggleExpanded={toggleExpanded}
+        />
+      ) : null}
+
+      {!introHasVisibleContent &&
+      !showBannerSection &&
+      !showPersonalSection &&
+      totalPendingAll === 0 &&
+      isIntroEmpty ? (
+        <p className="intro-ad-moderation-page__state">{INTRO_AD_MODERATION_PAGE_UI.EMPTY}</p>
+      ) : null}
+
+      {hasFilters && visiblePendingCount === 0 && !attentionOnly && totalPendingAll > 0 ? (
+        <p className="intro-ad-moderation-page__state">{emptyMessage}</p>
+      ) : null}
+
+      {attentionOnly && visiblePendingCount === 0 ? (
+        <p className="intro-ad-moderation-page__state">{emptyMessage}</p>
+      ) : null}
     </>
   );
 
-  if (isIntroEmpty) {
-    return (
-      <div className="intro-ad-moderation-page">
-        {actionError ? (
-          <p className="intro-ad-moderation-page__state intro-ad-moderation-page__state_error">
-            {actionError}
-          </p>
-        ) : null}
-        {moderationSections}
-      </div>
-    );
-  }
-
   return (
     <div className="intro-ad-moderation-page">
+      {toolbar}
+      {overview}
       {actionError ? (
         <p className="intro-ad-moderation-page__state intro-ad-moderation-page__state_error">
           {actionError}
         </p>
       ) : null}
-
+      {listActions}
       {moderationSections}
     </div>
   );

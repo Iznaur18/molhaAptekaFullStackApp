@@ -1,4 +1,6 @@
 @import "./shared/styles/designTokens.css";
+@import "./shared/styles/cancelButton.css";
+@import "./shared/ui/AppButton/AppButton.css";
 
 html,
 body,

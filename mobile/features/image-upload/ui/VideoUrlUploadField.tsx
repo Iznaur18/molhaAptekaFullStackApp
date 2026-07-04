@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { ActivityIndicator, Pressable, Text, TextInput, View } from "react-native";
 
+import type { UploadVideoPurpose } from "@/entities/upload/api/uploadVideo";
 import { useUploadVideoMutation } from "@/entities/upload/model/useUploadVideoMutation";
+import {
+  INTRO_UPLOAD_VIDEO_MAX_BYTES,
+  UPLOAD_VIDEO_MAX_BYTES,
+} from "@/entities/upload/model/videoConstants";
 import { pickVideoAsset } from "@/features/image-upload/lib/pickVideoAsset";
 import { VIDEO_URL_FIELD_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
@@ -12,6 +17,8 @@ type VideoUrlUploadFieldProps = {
   value: string;
   onChange: (url: string) => void;
   disabled?: boolean;
+  /** «intro» — сервер обрежет ролик до лимита intro при загрузке. */
+  uploadPurpose?: UploadVideoPurpose;
 };
 
 export const VideoUrlUploadField = ({
@@ -19,6 +26,7 @@ export const VideoUrlUploadField = ({
   value,
   onChange,
   disabled = false,
+  uploadPurpose,
 }: VideoUrlUploadFieldProps) => {
   const theme = useAppTheme();
   const styles = useMediaUploadFieldStyles();
@@ -33,11 +41,19 @@ export const VideoUrlUploadField = ({
 
     setErrorMessage("");
     try {
-      const asset = await pickVideoAsset();
+      const asset = await pickVideoAsset({
+        maxBytes:
+          uploadPurpose === "intro"
+            ? INTRO_UPLOAD_VIDEO_MAX_BYTES
+            : UPLOAD_VIDEO_MAX_BYTES,
+      });
       if (!asset) {
         return;
       }
-      const storedUrl = await uploadMutation.mutateAsync(asset);
+      const storedUrl = await uploadMutation.mutateAsync({
+        ...asset,
+        purpose: uploadPurpose,
+      });
       onChange(storedUrl);
     } catch (error) {
       setErrorMessage(

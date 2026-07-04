@@ -1,8 +1,10 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { useRefetchOnVisible } from "../../../shared/lib/useRefetchOnVisible.js";
-
+import { filterMyOrders } from "../../../entities/order/lib/filterMyOrders.js";
+import { orderNeedsBuyerAttention } from "../../../entities/order/lib/orderNeedsBuyerAttention.js";
+import { summarizeMyOrders } from "../../../entities/order/lib/summarizeMyOrders.js";
+import { MY_ORDERS_LIST_FILTER_IN_PROGRESS } from "../../../entities/order/model/myOrdersListFilters.js";
 import { orderQueryKeys } from "../../../entities/order/model/orderQueryKeys.js";
 import { useMyOrdersQuery } from "../../../entities/order/model/useMyOrdersQuery.js";
 import { useOrderMutations } from "../../../entities/order/model/useOrderMutations.js";
@@ -21,8 +23,12 @@ import {
   MY_ORDERS_PAGE_UI,
   ORDER_CARD_UI,
 } from "../../../shared/config/appUiCopy.js";
+import { useRefetchOnVisible } from "../../../shared/lib/useRefetchOnVisible.js";
+
+import { MyOrdersPageOverview } from "./MyOrdersPageOverview.jsx";
 
 import "./MyOrdersPage.css";
+import "./MyOrdersPageOverview.css";
 import "../../../shared/ui/profileQueueContentPanel.css";
 
 /**
@@ -44,7 +50,27 @@ export function MyOrdersPage({
   const queryClient = useQueryClient();
   const { confirmItemMutation, cancelItemMutation } = useOrderMutations();
   const ordersQuery = useMyOrdersQuery({ enabled: isAuthorized });
-  const orders = ordersQuery.data ?? [];
+  const allOrders = ordersQuery.data ?? [];
+  const [statusFilter, setStatusFilter] = useState("");
+  const [attentionOnly, setAttentionOnly] = useState(false);
+  const [expandedIds, setExpandedIds] = useState(() => new Set());
+  const [pendingActionKey, setPendingActionKey] = useState(null);
+  const [itemActionErrors, setItemActionErrors] = useState({});
+  const [loyaltyFlash, setLoyaltyFlash] = useState("");
+
+  const summary = useMemo(() => summarizeMyOrders(allOrders), [allOrders]);
+  const filteredOrders = useMemo(
+    () => filterMyOrders(allOrders, { status: statusFilter, attentionOnly }),
+    [allOrders, statusFilter, attentionOnly],
+  );
+
+  const totalAll = allOrders.length;
+  const totalVisible = filteredOrders.length;
+  const hasFilters = Boolean(statusFilter) || attentionOnly;
+  const summaryCountLabel = hasFilters
+    ? MY_ORDERS_PAGE_UI.COUNT_FILTERED(totalVisible, totalAll)
+    : MY_ORDERS_PAGE_UI.COUNT_ITEMS(totalAll);
+
   const phase = ordersQuery.isPending
     ? "loading"
     : ordersQuery.isError
@@ -54,17 +80,7 @@ export function MyOrdersPage({
     ordersQuery.error instanceof Error
       ? ordersQuery.error.message
       : API_CLIENT_UI.FETCH_MY_ORDERS_FALLBACK;
-  const [statusFilter, setStatusFilter] = useState("");
-  const [pendingActionKey, setPendingActionKey] = useState(null);
-  const [itemActionErrors, setItemActionErrors] = useState({});
-  const [loyaltyFlash, setLoyaltyFlash] = useState("");
-  const filteredOrders = useMemo(() => {
-    if (!statusFilter) {
-      return orders;
-    }
-
-    return orders.filter((order) => order.status === statusFilter);
-  }, [orders, statusFilter]);
+  const isRefreshing = ordersQuery.isFetching;
 
   const {
     catalogProduct,
@@ -77,15 +93,49 @@ export function MyOrdersPage({
 
   const reloadOrders = useCallback(async () => {
     await ordersQuery.refetch();
-  }, [ordersQuery]);
+    onQueueChanged?.();
+  }, [ordersQuery, onQueueChanged]);
 
-  useRefetchOnVisible(reloadOrders, phase === "success");
+  useRefetchOnVisible(reloadOrders, phase === "success" && isAuthorized);
 
   useEffect(() => {
     if (!loyaltyFlash) return undefined;
     const timerId = window.setTimeout(() => setLoyaltyFlash(""), 4000);
     return () => window.clearTimeout(timerId);
   }, [loyaltyFlash]);
+
+  useEffect(() => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      allOrders.filter(orderNeedsBuyerAttention).forEach((order) => next.add(String(order._id)));
+      return next;
+    });
+  }, [allOrders]);
+
+  const toggleExpanded = useCallback((orderId) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(orderId)) {
+        next.delete(orderId);
+      } else {
+        next.add(orderId);
+      }
+      return next;
+    });
+  }, []);
+
+  const expandAll = useCallback(() => {
+    setExpandedIds(new Set(filteredOrders.map((order) => String(order._id))));
+  }, [filteredOrders]);
+
+  const collapseAll = useCallback(() => {
+    setExpandedIds(new Set());
+  }, []);
+
+  const handleInProgressFilterClick = useCallback(() => {
+    setStatusFilter(MY_ORDERS_LIST_FILTER_IN_PROGRESS);
+    setAttentionOnly(false);
+  }, []);
 
   const patchOrders = useCallback(
     (/** @type {(orders: import('../../../entities/order/model/types.js').Order[]) => import('../../../entities/order/model/types.js').Order[]} */ updater) => {
@@ -183,67 +233,111 @@ export function MyOrdersPage({
     catalogProduct != null &&
     !isCurrentUserProductSeller(catalogProduct, currentUserId);
 
+  const emptyMessage =
+    totalAll === 0
+      ? MY_ORDERS_PAGE_UI.EMPTY
+      : hasFilters
+        ? MY_ORDERS_PAGE_UI.EMPTY_BY_FILTER
+        : MY_ORDERS_PAGE_UI.EMPTY;
+
+  const overview = (
+    <MyOrdersPageOverview
+      inProgressCount={summary.inProgressCount}
+      attentionCount={summary.attentionCount}
+      totalAmountRub={summary.totalAmountRub}
+      attentionOnly={attentionOnly}
+      onInProgressFilterClick={handleInProgressFilterClick}
+      onAttentionFilterChange={setAttentionOnly}
+    />
+  );
+
+  const listActions =
+    totalVisible > 0 ? (
+      <div className="my-orders-page__list-actions">
+        <button type="button" className="my-orders-page__list-action" onClick={expandAll}>
+          {MY_ORDERS_PAGE_UI.EXPAND_ALL}
+        </button>
+        <button type="button" className="my-orders-page__list-action" onClick={collapseAll}>
+          {MY_ORDERS_PAGE_UI.COLLAPSE_ALL}
+        </button>
+        {attentionOnly ? (
+          <p className="my-orders-page__filter-hint">{MY_ORDERS_PAGE_UI.ATTENTION_FILTER_HINT}</p>
+        ) : null}
+      </div>
+    ) : null;
+
+  const toolbar = (
+    <OrdersToolbar
+      summaryCountLabel={summaryCountLabel}
+      statusFilter={statusFilter}
+      onStatusFilterChange={(value) => {
+        setStatusFilter(value);
+        if (value) {
+          setAttentionOnly(false);
+        }
+      }}
+      onRefresh={() => {
+        void reloadOrders();
+      }}
+      isRefreshing={isRefreshing}
+    />
+  );
+
   if (phase === "loading") {
-    return <p className="my-orders-page__state">{MY_ORDERS_PAGE_UI.LOADING}</p>;
+    return (
+      <div className="my-orders-page">
+        {toolbar}
+        {overview}
+        <p className="my-orders-page__state">{MY_ORDERS_PAGE_UI.LOADING}</p>
+      </div>
+    );
   }
 
   if (phase === "error") {
     return (
-      <p className="my-orders-page__state my-orders-page__state_error" role="alert">
-        {error}
-      </p>
-    );
-  }
-
-  const emptyMessage =
-    orders.length === 0
-      ? MY_ORDERS_PAGE_UI.EMPTY
-      : statusFilter
-        ? MY_ORDERS_PAGE_UI.EMPTY_BY_FILTER
-        : MY_ORDERS_PAGE_UI.EMPTY;
-
-  if (orders.length === 0) {
-    return (
       <div className="my-orders-page">
-        <OrdersToolbar
-          statusFilter={statusFilter}
-          onStatusFilterChange={setStatusFilter}
-          ordersCount={0}
-        />
-        <p className="my-orders-page__state">{emptyMessage}</p>
+        {toolbar}
+        {overview}
+        <p className="my-orders-page__state my-orders-page__state_error" role="alert">
+          {error}
+        </p>
       </div>
     );
   }
 
   return (
     <div className="my-orders-page">
-      <OrdersToolbar
-        statusFilter={statusFilter}
-        onStatusFilterChange={setStatusFilter}
-        ordersCount={filteredOrders.length}
-      />
+      {toolbar}
+      {overview}
+      {listActions}
       {loyaltyFlash ? (
         <p className="my-orders-page__loyalty-flash" role="status">
           {loyaltyFlash}
         </p>
       ) : null}
-      {filteredOrders.length === 0 ? (
+      {totalVisible === 0 ? (
         <p className="my-orders-page__state">{emptyMessage}</p>
       ) : (
         <ul className="my-orders-page__list" role="list">
-          {filteredOrders.map((order) => (
-            <li key={order._id} className="my-orders-page__item" role="listitem">
-              <OrderCard
-                order={order}
-                compact
-                onProductClick={openCatalogProductFromOrderLine}
-                onConfirmDelivered={handleConfirmDelivered}
-                onCancelItem={handleCancelItem}
-                pendingActionKey={pendingActionKey}
-                itemActionErrors={itemActionErrors}
-              />
-            </li>
-          ))}
+          {filteredOrders.map((order) => {
+            const orderId = String(order._id);
+            return (
+              <li key={order._id} className="my-orders-page__item" role="listitem">
+                <OrderCard
+                  order={order}
+                  compact
+                  collapsible
+                  expanded={expandedIds.has(orderId)}
+                  onExpandedChange={() => toggleExpanded(orderId)}
+                  onProductClick={openCatalogProductFromOrderLine}
+                  onConfirmDelivered={handleConfirmDelivered}
+                  onCancelItem={handleCancelItem}
+                  pendingActionKey={pendingActionKey}
+                  itemActionErrors={itemActionErrors}
+                />
+              </li>
+            );
+          })}
         </ul>
       )}
       {catalogProductPhase === "loading" ? (
@@ -281,17 +375,38 @@ const ORDERS_STATUS_FILTER_OPTIONS = [
 
 /**
  * @param {{
+ *   summaryCountLabel: string;
  *   statusFilter: string;
  *   onStatusFilterChange: (value: string) => void;
- *   ordersCount: number;
+ *   onRefresh?: () => void;
+ *   isRefreshing?: boolean;
  * }} props
  */
-function OrdersToolbar({ statusFilter, onStatusFilterChange, ordersCount }) {
+function OrdersToolbar({
+  summaryCountLabel,
+  statusFilter,
+  onStatusFilterChange,
+  onRefresh,
+  isRefreshing = false,
+}) {
   return (
     <div className="my-orders-page__toolbar">
       <div className="my-orders-page__toolbar-head">
         <h3 className="my-orders-page__heading">{MY_ORDERS_PAGE_UI.TITLE}</h3>
-        <span className="my-orders-page__count">{MY_ORDERS_PAGE_UI.COUNT(ordersCount)}</span>
+        <div className="my-orders-page__toolbar-meta">
+          <span className="my-orders-page__count">{summaryCountLabel}</span>
+          {typeof onRefresh === "function" ? (
+            <button
+              type="button"
+              className="my-orders-page__refresh"
+              onClick={onRefresh}
+              disabled={isRefreshing}
+              aria-busy={isRefreshing}
+            >
+              {MY_ORDERS_PAGE_UI.REFRESH}
+            </button>
+          ) : null}
+        </div>
       </div>
 
       <div

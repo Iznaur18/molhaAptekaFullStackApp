@@ -174,13 +174,13 @@ export const SiteHeaderBannerAdvertisingSection = ({
           </Text>
           {canCancel ? (
             <Pressable
-              style={[styles.secondaryButton, isSubmitting && styles.secondaryButtonDisabled]}
+              style={[styles.cancelButton, isSubmitting && styles.cancelButtonDisabled]}
               onPress={() => {
                 void handleCancel();
               }}
               disabled={isSubmitting}
             >
-              <Text style={styles.secondaryButtonText}>
+              <Text style={styles.cancelButtonText}>
                 {SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI.CANCEL}
               </Text>
             </Pressable>
@@ -265,7 +265,7 @@ export const SiteHeaderBannerAdvertisingSection = ({
               disabled={isSubmitting || loyaltyBalance < pricePoints}
             >
               {isSubmitting ? (
-                <ActivityIndicator color={theme.colors.onPrimary} />
+                <ActivityIndicator color={theme.colors.onContrast} />
               ) : (
                 <Text style={styles.primaryButtonText}>
                   {SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI.SUBMIT}

@@ -121,7 +121,7 @@ export const CategoryTreeAdminCard = memo(function CategoryTreeAdminCard({
               </button>
               <button
                 type="button"
-                className="app-btn app-btn--secondary"
+                className="app-btn app-btn--cancel"
                 onClick={onCancelEdit}
               >
                 {CATEGORY_TREE_ADMIN_PAGE_UI.CANCEL_BUTTON}

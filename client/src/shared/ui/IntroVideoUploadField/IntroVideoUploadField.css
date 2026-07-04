@@ -1,0 +1,62 @@
+.intro-video-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.intro-video-upload__preview {
+  width: 100%;
+  max-width: 320px;
+  max-height: 200px;
+  border-radius: 0.5rem;
+  background: var(--iz-color-near-black);
+  object-fit: contain;
+}
+
+.intro-video-upload__pick {
+  align-self: flex-start;
+  margin: 0;
+  padding: 0.5rem 0.85rem;
+  border: 1px solid var(--iz-color-action-light);
+  border-radius: 0.5rem;
+  background: var(--iz-color-action-soft);
+  color: var(--iz-color-link-hover);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.intro-video-upload__pick:hover:not(:disabled) {
+  background: var(--iz-color-action-border);
+}
+
+.intro-video-upload__pick:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.intro-video-upload__hint {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--iz-color-text-muted);
+  line-height: 1.4;
+}
+
+.intro-video-upload__error {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--iz-color-danger-deep);
+}
+
+.intro-video-upload__file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

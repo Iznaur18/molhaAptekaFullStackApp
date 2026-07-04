@@ -1,8 +1,11 @@
 import { Pressable, Text, TextInput, View } from "react-native";
 
 import type { InstallmentContract } from "@/entities/installment/api/installmentApi";
+import { contractNeedsBuyerAttention } from "@/entities/installment/lib/contractNeedsBuyerAttention";
+import { contractNeedsSellerAttention } from "@/entities/installment/lib/contractNeedsSellerAttention";
 import { useInstallmentContractCard } from "@/entities/installment/model/useInstallmentContractCard";
 import { InstallmentContractCardPayments } from "@/entities/installment/ui/InstallmentContractCardPayments";
+import { InstallmentContractProgressBar } from "@/entities/installment/ui/InstallmentContractProgressBar";
 import { InstallmentContractCardSummary } from "@/entities/installment/ui/InstallmentContractCardSummary";
 import { InstallmentContractCounterparty } from "@/entities/installment/ui/InstallmentContractCounterparty";
 import { INSTALLMENT_UI } from "@/shared/config";
@@ -17,6 +20,9 @@ type InstallmentContractCardProps = {
   onProductClick?: (productId: string) => void;
   onProductPress?: (productId: string) => void;
   compact?: boolean;
+  collapsible?: boolean;
+  expanded?: boolean;
+  onExpandedChange?: (expanded: boolean) => void;
 };
 
 const resolveProductId = (contract: InstallmentContract) =>
@@ -52,6 +58,9 @@ export const InstallmentContractCard = ({
   onProductClick,
   onProductPress,
   compact = false,
+  collapsible = false,
+  expanded = true,
+  onExpandedChange,
 }: InstallmentContractCardProps) => {
   const styles = useInstallmentContractCardChromeStyles();
   const card = useInstallmentContractCard({ contract, role, onUpdated });
@@ -59,6 +68,39 @@ export const InstallmentContractCard = ({
   const productName = resolveProductName(contract);
   const handleProductClick = onProductClick ?? onProductPress;
   const statusPillStyle = resolveStatusPillStyle(contract.status, styles);
+  const isExpanded = !collapsible || expanded;
+  const needsAttention =
+    role === "buyer"
+      ? contractNeedsBuyerAttention(contract)
+      : contractNeedsSellerAttention(contract);
+
+  const toggleExpanded = () => {
+    onExpandedChange?.(!expanded);
+  };
+
+  const pendingConfirmationPayment = (contract.payments ?? []).find(
+    (payment) => payment.status === "pending_confirmation",
+  );
+
+  const nextDuePreview = !isExpanded
+    ? role === "buyer" && card.nextPayablePayment
+      ? INSTALLMENT_UI.PAYMENTS_NEXT_DUE(
+          formatPriceRub(card.nextPayablePayment.amountRub),
+          card.nextPayablePayment.dueAt
+            ? new Date(card.nextPayablePayment.dueAt).toLocaleDateString("ru-RU")
+            : "—",
+        )
+      : role === "seller" && card.earlyPayoffPending
+        ? INSTALLMENT_UI.SALES_NEXT_ACTION_EARLY_PAYOFF
+        : role === "seller" && pendingConfirmationPayment
+          ? INSTALLMENT_UI.PAYMENTS_NEXT_DUE(
+              formatPriceRub(pendingConfirmationPayment.amountRub),
+              pendingConfirmationPayment.dueAt
+                ? new Date(pendingConfirmationPayment.dueAt).toLocaleDateString("ru-RU")
+                : "—",
+            )
+          : null
+    : null;
 
   if (!compact) {
     return (
@@ -110,9 +152,32 @@ export const InstallmentContractCard = ({
   }
 
   return (
-    <View style={[styles.card, card.isFullyPaid ? styles.cardCompleted : null]}>
+    <View
+      style={[
+        styles.card,
+        card.isFullyPaid ? styles.cardCompleted : null,
+        needsAttention ? styles.cardAttention : null,
+      ]}
+    >
       <View style={styles.header}>
-        {handleProductClick && productId ? (
+        {collapsible ? (
+          <View style={styles.headerToggle}>
+            {handleProductClick && productId ? (
+              <Pressable style={styles.titlePressable} onPress={() => handleProductClick(productId)}>
+                <Text style={styles.title}>{productName}</Text>
+              </Pressable>
+            ) : (
+              <Text style={[styles.titleStatic, styles.titlePressable]}>{productName}</Text>
+            )}
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={INSTALLMENT_UI.PAYMENTS_EXPAND_TOGGLE(isExpanded)}
+              onPress={toggleExpanded}
+            >
+              <Text style={[styles.chevron, isExpanded ? styles.chevronExpanded : null]}>▸</Text>
+            </Pressable>
+          </View>
+        ) : handleProductClick && productId ? (
           <Pressable style={styles.titlePressable} onPress={() => handleProductClick(productId)}>
             <Text style={styles.title}>{productName}</Text>
           </Pressable>
@@ -131,14 +196,17 @@ export const InstallmentContractCard = ({
         </View>
       </View>
 
-      <View
-        style={styles.progress}
-        accessibilityRole="progressbar"
-        accessibilityValue={{ min: 0, max: 100, now: card.paidPercent }}
-      >
-        <View style={[styles.progressFill, { width: `${card.paidPercent}%` }]} />
-      </View>
+      <InstallmentContractProgressBar
+        percent={card.paidPercent}
+        ariaLabel={`${INSTALLMENT_UI.CONTRACT_PAID}: ${card.paidPercent}%`}
+      />
 
+      {!isExpanded && nextDuePreview ? (
+        <Text style={styles.nextDue}>{nextDuePreview}</Text>
+      ) : null}
+
+      {isExpanded ? (
+        <>
       {role === "buyer" ? (
         <InstallmentContractCounterparty
           label={INSTALLMENT_UI.SELLER_LABEL}
@@ -185,11 +253,15 @@ export const InstallmentContractCard = ({
         <View style={styles.cardActions}>
           {role === "buyer" && card.earlyPayoffPending ? (
             <Pressable
-              style={[styles.btn, card.pendingKey != null ? styles.disabled : null]}
+              style={[
+                styles.btn,
+                styles.btnCancel,
+                card.pendingKey != null ? styles.disabled : null,
+              ]}
               disabled={card.pendingKey != null}
               onPress={card.handleCancelEarlyPayoff}
             >
-              <Text style={styles.btnText}>
+              <Text style={[styles.btnText, styles.btnTextPrimary]}>
                 {card.pendingKey === "early-cancel"
                   ? INSTALLMENT_UI.ACTION_PENDING
                   : INSTALLMENT_UI.CANCEL_EARLY_PAYOFF}
@@ -268,6 +340,8 @@ export const InstallmentContractCard = ({
             )
           ) : null}
         </View>
+      ) : null}
+        </>
       ) : null}
     </View>
   );

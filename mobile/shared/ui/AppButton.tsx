@@ -10,6 +10,7 @@ import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 export type AppButtonVariant =
   | "primary"
   | "secondary"
+  | "cancel"
   | "danger"
   | "success"
   | "ghost"
@@ -101,7 +102,7 @@ export const AppButton = ({
   const variantStyle =
     variant === "secondary"
       ? styles.secondary
-      : variant === "danger"
+      : variant === "cancel" || variant === "danger"
         ? styles.danger
         : variant === "success"
           ? styles.success

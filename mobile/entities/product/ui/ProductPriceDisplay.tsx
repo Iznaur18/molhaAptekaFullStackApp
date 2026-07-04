@@ -18,7 +18,7 @@ type ProductPriceDisplayProps = {
     discountPercent?: number | null;
   };
   showLabel?: boolean;
-  variant?: "card" | "inline" | "detail" | "banner";
+  variant?: "card" | "inline" | "detail" | "banner" | "cart";
 };
 
 export const ProductPriceDisplay = ({
@@ -31,24 +31,29 @@ export const ProductPriceDisplay = ({
   const currentPriceText = formatPriceRub(Math.floor(Number(product.productPrice)));
   const isDetail = variant === "detail";
   const isBanner = variant === "banner";
+  const isCart = variant === "cart";
   const rootStyle = isDetail
     ? styles.detailRoot
     : isBanner
       ? styles.bannerRoot
-      : variant === "inline"
-        ? styles.inlineRoot
-        : styles.cardRoot;
+      : isCart
+        ? styles.cartRoot
+        : variant === "inline"
+          ? styles.inlineRoot
+          : styles.cardRoot;
   const currentStyle = [
     styles.current,
     variant === "card" && styles.cardCurrent,
     isDetail && styles.detailCurrent,
     isBanner && styles.bannerCurrent,
+    isCart && styles.cartCurrent,
   ];
   const oldStyle = [
     styles.old,
     variant === "card" && styles.cardOld,
     isDetail && styles.detailOld,
     isBanner && styles.bannerOld,
+    isCart && styles.cartOld,
   ];
 
   return (

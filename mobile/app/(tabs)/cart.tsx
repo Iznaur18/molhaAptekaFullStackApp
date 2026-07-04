@@ -2,7 +2,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
-import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { getCartLineExclusionReason } from "@/entities/cart/lib/getCartLineExclusionReason";
 import { selectCartCheckoutSummary } from "@/entities/cart/lib/selectCartCheckoutSummary";
@@ -15,19 +14,20 @@ import { CartLineItem } from "@/entities/cart/ui/CartLineItem";
 import type { OrderPaymentMethod } from "@/entities/order/model/constants";
 import { useCreateOrderMutation } from "@/entities/order/model/useCreateOrderMutation";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
-import { CheckoutForm } from "@/features/checkout/ui/CheckoutForm";
+import { CheckoutSheetModal } from "@/features/checkout/ui/CheckoutSheetModal";
 import { orderQueryKeys } from "@/shared/api";
 import { API_CLIENT_UI, AUTH_UI, CART_PAGE_UI, CHECKOUT_FORM_UI } from "@/shared/config";
 import { formatApiErrorMessage, formatPriceRub } from "@/shared/lib";
 import { useCartScreenStyles } from "@/shared/theme/catalogProductStyles";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { AppButton } from "@/shared/ui/AppButton";
+import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 export default function CartScreen() {
   const router = useRouter();
   const styles = useCartScreenStyles();
-  const { contentPaddingTop } = useScreenLayout();
+  const { contentPaddingTop, contentPaddingBottom } = useScreenLayout();
   const queryClient = useQueryClient();
   const isAuthorized = useIsAuthorized();
   const sessionQuery = useAuthSessionQuery();
@@ -35,6 +35,7 @@ export default function CartScreen() {
   const { clearCart, isUpdating } = useCartActions();
   const createOrderMutation = useCreateOrderMutation();
 
+  const [checkoutSheetOpen, setCheckoutSheetOpen] = useState(false);
   const [submitState, setSubmitState] = useState({
     isSubmitting: false,
     error: "",
@@ -50,19 +51,16 @@ export default function CartScreen() {
     [cartQuery.data, productsQuery.products],
   );
 
-  const checkoutSummary = useMemo(
-    () => selectCartCheckoutSummary(lines, currentUserId),
+  const visibleLines = useMemo(
+    () =>
+      lines.filter(
+        (line) => getCartLineExclusionReason(line, currentUserId) == null,
+      ),
     [lines, currentUserId],
   );
 
-  const lineExclusionByProductId = useMemo(
-    () =>
-      new Map(
-        lines.map((line) => [
-          line.productId,
-          getCartLineExclusionReason(line, currentUserId),
-        ]),
-      ),
+  const checkoutSummary = useMemo(
+    () => selectCartCheckoutSummary(lines, currentUserId),
     [lines, currentUserId],
   );
 
@@ -89,6 +87,7 @@ export default function CartScreen() {
         paymentMethod: payload.paymentMethod,
       });
       await clearCart();
+      setCheckoutSheetOpen(false);
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: orderQueryKeys.my() }),
         queryClient.invalidateQueries({ queryKey: orderQueryKeys.myActionCount() }),
@@ -104,13 +103,17 @@ export default function CartScreen() {
     }
   };
 
+  const totalLabel = checkoutSummary.hasExcludedLines
+    ? CART_PAGE_UI.PURCHASABLE_TOTAL_LABEL
+    : CART_PAGE_UI.TOTAL_LABEL;
+
   if (!isAuthorized) {
     return (
       <View style={styles.centered}>
         <Text style={styles.message}>{CART_PAGE_UI.AUTH_REQUIRED}</Text>
         <AppButton
           label={AUTH_UI.LOGIN_BUTTON}
-          variant="contrast"
+          variant="primary"
           onPress={() => router.push("/(auth)/login")}
         />
       </View>
@@ -155,33 +158,34 @@ export default function CartScreen() {
     );
   }
 
-  const totalLabel = checkoutSummary.hasExcludedLines
-    ? CART_PAGE_UI.PURCHASABLE_TOTAL_LABEL
-    : CART_PAGE_UI.TOTAL_LABEL;
+  if (visibleLines.length === 0) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.message}>{CART_PAGE_UI.CHECKOUT_BLOCKED_ALL_UNAVAILABLE}</Text>
+        <AppButton
+          label={CART_PAGE_UI.CLEAR_ALL}
+          variant="contrast"
+          onPress={() => clearCart()}
+          disabled={isUpdating}
+        />
+      </View>
+    );
+  }
 
   const listFooter = (
     <View style={styles.footer}>
-      <View style={styles.summaryCard}>
-        <View style={styles.summaryContent}>
-          <View style={styles.totalRow}>
-            <Text style={styles.totalLabel}>{totalLabel}</Text>
-            <Text
-              style={styles.totalValue}
-              numberOfLines={1}
-              adjustsFontSizeToFit
-              minimumFontScale={0.8}
-            >
-              {formatPriceRub(checkoutSummary.displayTotal)}
-            </Text>
-          </View>
-
+      <View style={styles.footerTopRow}>
+        <View style={styles.footerTotalBlock}>
+          <Text style={styles.footerTotalLabel}>{totalLabel}</Text>
+          <Text style={styles.footerTotalValue} numberOfLines={1}>
+            {formatPriceRub(checkoutSummary.displayTotal)}
+          </Text>
           {checkoutSummary.hasExcludedLines ? (
-            <Text style={styles.fullTotalHint} numberOfLines={1}>
+            <Text style={styles.footerFullTotalHint} numberOfLines={1}>
               {formatPriceRub(checkoutSummary.fullTotal)}
             </Text>
           ) : null}
         </View>
-
         <Pressable
           style={[styles.clearButton, isUpdating && styles.buttonDisabled]}
           onPress={() => clearCart()}
@@ -195,37 +199,46 @@ export default function CartScreen() {
         <Text style={styles.checkoutHint}>{checkoutSummary.checkoutBlockReason}</Text>
       ) : null}
 
-      <CheckoutForm
-        key={currentUserId ?? "guest"}
-        defaultUser={sessionQuery.data?.user}
-        isSubmitting={submitState.isSubmitting}
-        submitError={submitState.error}
-        submitSuccess={submitState.success}
-        isDisabled={!canCheckout}
-        onSubmit={handleCheckoutSubmit}
+      <AppButton
+        label={CART_PAGE_UI.CHECKOUT_OPEN}
+        variant="primary"
+        style={styles.footerCheckoutButton}
+        disabled={!canCheckout || isUpdating}
+        onPress={() => setCheckoutSheetOpen(true)}
       />
     </View>
   );
 
   return (
-    <FlatList
-      style={styles.container}
-      data={lines}
-      keyExtractor={(line) => line.productId}
-      renderItem={({ item }) => (
-        <CartLineItem
-          line={item}
-          exclusionReason={lineExclusionByProductId.get(item.productId) ?? null}
-        />
-      )}
-      contentContainerStyle={[styles.list, { paddingTop: contentPaddingTop + 8 }]}
-      ListFooterComponent={listFooter}
-      refreshControl={
-        <ThemedRefreshControl
-          refreshing={cartQuery.isRefetching || productsQuery.isRefetching}
-          onRefresh={handleRefresh}
-        />
-      }
-    />
+    <>
+      <FlatList
+        style={styles.container}
+        data={visibleLines}
+        keyExtractor={(line) => line.productId}
+        renderItem={({ item }) => <CartLineItem line={item} />}
+        contentContainerStyle={[
+          styles.list,
+          { paddingTop: contentPaddingTop + 8, paddingBottom: contentPaddingBottom },
+        ]}
+        ListFooterComponent={listFooter}
+        refreshControl={
+          <ThemedRefreshControl
+            refreshing={cartQuery.isRefetching || productsQuery.isRefetching}
+            onRefresh={handleRefresh}
+          />
+        }
+      />
+
+      <CheckoutSheetModal
+        visible={checkoutSheetOpen}
+        defaultUser={sessionQuery.data?.user}
+        isSubmitting={submitState.isSubmitting}
+        submitError={submitState.error}
+        submitSuccess={submitState.success}
+        isDisabled={!canCheckout}
+        onClose={() => setCheckoutSheetOpen(false)}
+        onSubmit={handleCheckoutSubmit}
+      />
+    </>
   );
 }

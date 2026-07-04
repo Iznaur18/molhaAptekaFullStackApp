@@ -9,14 +9,14 @@ type InstallmentPaymentsPageToolbarProps = {
   title: string;
   statusFilter: string;
   onStatusFilterChange: (value: string) => void;
-  contractsCount: number;
+  contractsCountLabel: string;
 };
 
 export const InstallmentPaymentsPageToolbar = ({
   title,
   statusFilter,
   onStatusFilterChange,
-  contractsCount,
+  contractsCountLabel,
 }: InstallmentPaymentsPageToolbarProps) => {
   const styles = useInstallmentPaymentsPageStyles();
 
@@ -24,7 +24,7 @@ export const InstallmentPaymentsPageToolbar = ({
     <View style={styles.toolbar}>
       <View style={styles.toolbarHead}>
         <Text style={styles.toolbarHeading}>{title}</Text>
-        <Text style={styles.contractsCount}>{INSTALLMENT_UI.COUNT_CONTRACTS(contractsCount)}</Text>
+        <Text style={styles.contractsCount}>{contractsCountLabel}</Text>
       </View>
 
       <View

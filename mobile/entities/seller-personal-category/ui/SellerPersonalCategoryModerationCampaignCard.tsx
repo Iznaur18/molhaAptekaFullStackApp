@@ -4,7 +4,11 @@ import {
   formatSellerPersonalCategoryCampaignSummary,
   resolveSellerPersonalCategorySellerName,
 } from "@/entities/seller-personal-category/lib/resolveSellerPersonalCategorySellerName";
+import { ModerationCampaignCollapsibleFrame } from "@/features/intro-ad-moderation-page/ui/ModerationCampaignCollapsibleFrame";
+import { resolveModerationCampaignCollapsedPreview } from "@/features/intro-ad-moderation-page/lib/resolveModerationCampaignCollapsedPreview";
+import { campaignModerationNeedsAttention } from "@/shared/lib/campaignModerationAttention";
 import { SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI } from "@/shared/config";
+import { formatIsoDateTime } from "@/shared/lib";
 import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
 import { useSellerPersonalCategoryModerationCampaignCardStyles } from "@/shared/theme/sellerPersonalCategoryModerationCampaignCardStyles";
 
@@ -16,6 +20,7 @@ export type SellerPersonalCategoryModerationCampaign = {
   imageUrl?: string | null;
   amountPoints?: number | null;
   tariffCode?: string | null;
+  createdAt?: string | Date | null;
 };
 
 type SellerPersonalCategoryModerationCampaignCardProps = {
@@ -26,6 +31,9 @@ type SellerPersonalCategoryModerationCampaignCardProps = {
   onApprove: () => void;
   onReject: () => void;
   errorMessage?: string;
+  collapsible?: boolean;
+  expanded?: boolean;
+  onExpandedChange?: () => void;
 };
 
 export const SellerPersonalCategoryModerationCampaignCard = ({
@@ -36,12 +44,19 @@ export const SellerPersonalCategoryModerationCampaignCard = ({
   onApprove,
   onReject,
   errorMessage = "",
+  collapsible = false,
+  expanded = true,
+  onExpandedChange,
 }: SellerPersonalCategoryModerationCampaignCardProps) => {
   const styles = useSellerPersonalCategoryModerationCampaignCardStyles();
   const sellerName = resolveSellerPersonalCategorySellerName(campaign);
+  const title = sellerName || String(campaign.sellerId ?? "—");
   const imageSrc = campaign.imageUrl ? resolveUploadedMediaUrl(campaign.imageUrl) : "";
+  const needsAttention = campaignModerationNeedsAttention(campaign);
+  const collapsedPreview = resolveModerationCampaignCollapsedPreview(campaign);
+  const createdLabel = campaign.createdAt ? formatIsoDateTime(campaign.createdAt) : null;
 
-  return (
+  const cardBody = (
     <View style={styles.card}>
       {errorMessage ? (
         <Text style={styles.error} accessibilityRole="alert">
@@ -98,5 +113,23 @@ export const SellerPersonalCategoryModerationCampaignCard = ({
         </Pressable>
       </View>
     </View>
+  );
+
+  if (!collapsible) {
+    return cardBody;
+  }
+
+  return (
+    <ModerationCampaignCollapsibleFrame
+      title={title}
+      collapsedPreview={collapsedPreview}
+      createdLabel={createdLabel}
+      needsAttention={needsAttention}
+      collapsible
+      expanded={expanded}
+      onExpandedChange={onExpandedChange}
+    >
+      {cardBody}
+    </ModerationCampaignCollapsibleFrame>
   );
 };

@@ -1,6 +1,183 @@
 .intro-ad-moderation-page {
-  display: grid;
-  gap: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  min-width: 0;
+  --profile-queue-list-gap: 1rem;
+}
+
+.intro-ad-moderation-page__toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--iz-color-accent-purple) 24%, var(--iz-color-border));
+  border-radius: 0.65rem;
+  background: linear-gradient(
+    135deg,
+    var(--iz-color-surface) 0%,
+    var(--iz-color-accent-pink-surface) 140%
+  );
+}
+
+.intro-ad-moderation-page__toolbar-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.intro-ad-moderation-page__heading {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.intro-ad-moderation-page__toolbar-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.intro-ad-moderation-page__count {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--iz-color-text-muted);
+}
+
+.intro-ad-moderation-page__refresh {
+  margin: 0;
+  padding: 0.18rem 0.5rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 999px;
+  background: var(--iz-color-surface);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.intro-ad-moderation-page__section-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.intro-ad-moderation-page__section-chip {
+  margin: 0;
+  padding: 0.22rem 0.55rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 999px;
+  background: var(--iz-color-surface);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.intro-ad-moderation-page__section-chip_active {
+  border-color: var(--iz-color-accent-purple);
+  background: var(--iz-color-accent-purple-soft);
+  color: var(--iz-color-accent-purple-text);
+}
+
+.intro-ad-moderation-page__list-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.intro-ad-moderation-page__list-action {
+  margin: 0;
+  padding: 0.22rem 0.55rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 999px;
+  background: var(--iz-color-surface);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.intro-ad-moderation-page__filter-hint {
+  margin: 0;
+  flex-basis: 100%;
+  font-size: 0.82rem;
+  color: var(--iz-color-text-muted);
+}
+
+.intro-ad-moderation-campaign-frame {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.intro-ad-moderation-campaign-frame_attention {
+  border-radius: 0.65rem;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--iz-color-warning-bright) 45%, transparent);
+}
+
+.intro-ad-moderation-campaign-frame__toggle {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--iz-color-border-subtle);
+  border-radius: 0.55rem;
+  background: var(--iz-color-surface);
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.intro-ad-moderation-campaign-frame__toggle_attention {
+  border-color: color-mix(in srgb, var(--iz-color-warning-bright) 45%, var(--iz-color-border));
+  background: var(--iz-color-warning-yellow-soft);
+}
+
+.intro-ad-moderation-campaign-frame__main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.intro-ad-moderation-campaign-frame__title {
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.intro-ad-moderation-campaign-frame__preview {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--iz-color-warning-brown-dark);
+}
+
+.intro-ad-moderation-campaign-frame__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.1rem;
+  flex-shrink: 0;
+}
+
+.intro-ad-moderation-campaign-frame__created {
+  font-size: 0.72rem;
+  color: var(--iz-color-text-muted);
+}
+
+.intro-ad-moderation-campaign-frame__chevron {
+  font-size: 0.85rem;
+  color: var(--iz-color-text-muted);
+}
+
+.intro-ad-moderation-campaign-frame__expand-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--iz-color-text-muted);
 }
 
 .intro-ad-moderation-page__section {

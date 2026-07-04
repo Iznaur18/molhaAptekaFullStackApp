@@ -163,6 +163,17 @@
   background: var(--iz-color-action-hover);
 }
 
+.product-price-offer__btn--cancel {
+  border: 1px solid var(--iz-color-danger);
+  background: var(--iz-color-danger);
+  color: var(--iz-color-on-contrast);
+}
+
+.product-price-offer__btn--cancel:hover:not(:disabled) {
+  border-color: var(--iz-color-danger-strong);
+  background: var(--iz-color-danger-strong);
+}
+
 .product-price-offer__btn--secondary {
   border: 1px solid var(--iz-color-action-border-strong);
   background: var(--iz-color-surface);

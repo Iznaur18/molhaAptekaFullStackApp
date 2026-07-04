@@ -2,12 +2,14 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { BlurView } from "expo-blur";
 import { usePathname, useRouter } from "expo-router";
+import { useCallback, useEffect, useRef } from "react";
 import { Platform, Pressable, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useCartTotalCount } from "@/entities/cart/model/useCartTotalCount";
 import { SellerProductsLimitModal } from "@/entities/product/ui/SellerProductsLimitModal";
 import { useUnreadNotificationsCount } from "@/entities/notification/model/useInAppNotifications";
+import { useAppIntro } from "@/features/app-intro/model/AppIntroProvider";
 import { usePlaceProductPress } from "@/features/place-product/model/usePlaceProductPress";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { CART_PAGE_UI, MOBILE_BOTTOM_NAV_UI } from "@/shared/config";
@@ -23,6 +25,10 @@ import { AppText } from "@/shared/ui/AppText";
 
 const TAB_ICON_SIZE = 24;
 const PLACE_PRODUCT_ROUTE = "place-product";
+const HOME_TAB_ROUTE = "index";
+
+/** Удержание кнопки «Домой» дольше этого времени запускает повтор интро-ролика. */
+const INTRO_REPLAY_HOLD_MS = 1000;
 
 /** 0.1rem = 1.6px gap между item-ами — паритет с web */
 const NAV_ITEMS_GAP = 1.6;
@@ -164,6 +170,25 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
   const profileBadge =
     unreadNotifications > 0 ? formatBadge(unreadNotifications) : null;
   const placeProduct = usePlaceProductPress();
+  const { replayIntro } = useAppIntro();
+  const introHoldTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearIntroHoldTimer = useCallback(() => {
+    if (introHoldTimerRef.current != null) {
+      clearTimeout(introHoldTimerRef.current);
+      introHoldTimerRef.current = null;
+    }
+  }, []);
+
+  const startIntroHoldTimer = useCallback(() => {
+    clearIntroHoldTimer();
+    introHoldTimerRef.current = setTimeout(() => {
+      introHoldTimerRef.current = null;
+      replayIntro();
+    }, INTRO_REPLAY_HOLD_MS);
+  }, [clearIntroHoldTimer, replayIntro]);
+
+  useEffect(() => clearIntroHoldTimer, [clearIntroHoldTimer]);
 
   const handlePress = (routeName: string) => {
     if (routeName === PLACE_PRODUCT_ROUTE) {
@@ -233,6 +258,8 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
         }
         onPress={() => handlePress(item.routeName)}
         onLongPress={() => handleLongPress(item.routeName)}
+        onPressIn={item.routeName === HOME_TAB_ROUTE ? startIntroHoldTimer : undefined}
+        onPressOut={item.routeName === HOME_TAB_ROUTE ? clearIntroHoldTimer : undefined}
         style={[styles.item, isFocused && styles.itemActive]}
       >
         <View style={styles.iconWrap}>

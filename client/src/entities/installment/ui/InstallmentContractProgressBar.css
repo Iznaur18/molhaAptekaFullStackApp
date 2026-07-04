@@ -1,0 +1,49 @@
+.installment-contract-card__progress-fill {
+  position: relative;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    var(--iz-color-link-deep) 0%,
+    var(--iz-color-success-teal-bright) 100%
+  );
+  transition: width 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  overflow: hidden;
+  will-change: width;
+}
+
+.installment-contract-card__progress-fill_shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--iz-color-on-contrast) 42%, transparent) 50%,
+    transparent 100%
+  );
+  transform: translateX(-120%);
+  animation: installment-contract-card-progress-shimmer 2.2s ease-in-out infinite;
+}
+
+@keyframes installment-contract-card-progress-shimmer {
+  0% {
+    transform: translateX(-120%);
+  }
+
+  55%,
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .installment-contract-card__progress-fill {
+    transition: none;
+    will-change: auto;
+  }
+
+  .installment-contract-card__progress-fill_shimmer::after {
+    animation: none;
+  }
+}

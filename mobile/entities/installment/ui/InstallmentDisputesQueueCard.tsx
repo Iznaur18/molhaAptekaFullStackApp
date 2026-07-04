@@ -124,11 +124,11 @@ export const InstallmentDisputesQueueCard = ({
           <Text style={styles.actionPrimaryText}>{INSTALLMENT_UI.DISPUTE_ACTION_CLOSE}</Text>
         </Pressable>
         <Pressable
-          style={[styles.actionSecondary, isBusy && styles.actionDisabled]}
+          style={[styles.actionCancel, isBusy && styles.actionDisabled]}
           disabled={isBusy}
           onPress={() => onResolve("cancel")}
         >
-          <Text style={styles.actionSecondaryText}>{INSTALLMENT_UI.DISPUTE_ACTION_CANCEL}</Text>
+          <Text style={styles.actionPrimaryText}>{INSTALLMENT_UI.DISPUTE_ACTION_CANCEL}</Text>
         </Pressable>
         <Pressable
           style={[styles.actionSecondary, isBusy && styles.actionDisabled]}

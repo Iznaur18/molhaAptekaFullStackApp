@@ -21,6 +21,7 @@ test("app intro admin page mirrors web form sections and hub chrome", () => {
   assert.match(page, /SECTION_MEDIA/);
   assert.match(page, /SECTION_FALLBACK/);
   assert.match(page, /SECTION_PRIORITY/);
+  assert.doesNotMatch(page, /SECTION_TIMING/);
   assert.match(page, /prioritizePlatformIntro/);
   assert.match(page, /LABEL_VIDEO/);
   assert.match(page, /HINT_VIDEO/);

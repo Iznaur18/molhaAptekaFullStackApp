@@ -259,7 +259,7 @@ export const ProductAuctionTab = ({
                 {myOffer?.status === PRICE_OFFER_STATUS_PENDING ? (
                   <AppButton
                     label={PRODUCT_PRICE_OFFER_UI.CANCEL}
-                    variant="outline"
+                    variant="cancel"
                     onPress={() => void handleCancel()}
                     disabled={isBusy}
                     style={styles.inlinePrimaryButton}

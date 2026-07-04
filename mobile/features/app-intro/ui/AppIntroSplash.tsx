@@ -18,10 +18,11 @@ type IntroVideoProps = {
   uri: string;
   isMuted: boolean;
   onFailed: () => void;
+  onEnded: () => void;
   videoStyle: ReturnType<typeof useAppIntroSplashStyles>["video"];
 };
 
-const IntroVideo = ({ uri, isMuted, onFailed, videoStyle }: IntroVideoProps) => {
+const IntroVideo = ({ uri, isMuted, onFailed, onEnded, videoStyle }: IntroVideoProps) => {
   const player = useVideoPlayer(uri, (instance) => {
     instance.loop = false;
     instance.muted = isMuted;
@@ -37,6 +38,13 @@ const IntroVideo = ({ uri, isMuted, onFailed, videoStyle }: IntroVideoProps) => 
       onFailed();
     }
   }, [onFailed, player.status]);
+
+  useEffect(() => {
+    const subscription = player.addListener("playToEnd", onEnded);
+    return () => {
+      subscription.remove();
+    };
+  }, [onEnded, player]);
 
   return (
     <VideoView player={player} style={videoStyle} contentFit="cover" nativeControls={false} />
@@ -122,6 +130,7 @@ const AppIntroSplashContent = ({ onDismiss }: AppIntroSplashContentProps) => {
             setVideoFailed(true);
             dismissAfterMinDuration();
           }}
+          onEnded={dismissAfterMinDuration}
           videoStyle={styles.video}
         />
       ) : playbackConfig.posterSrc ? (

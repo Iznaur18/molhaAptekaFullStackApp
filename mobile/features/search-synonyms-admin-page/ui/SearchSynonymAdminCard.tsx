@@ -68,8 +68,8 @@ export const SearchSynonymAdminCard = ({
               >
                 <Text style={styles.primaryButtonText}>{SEARCH_SYNONYMS_ADMIN_PAGE_UI.SAVE_BUTTON}</Text>
               </Pressable>
-              <Pressable style={styles.secondaryButton} onPress={onCancelEdit} disabled={isPending}>
-                <Text style={styles.secondaryButtonText}>
+              <Pressable style={styles.cancelButton} onPress={onCancelEdit} disabled={isPending}>
+                <Text style={styles.cancelButtonText}>
                   {SEARCH_SYNONYMS_ADMIN_PAGE_UI.CANCEL_BUTTON}
                 </Text>
               </Pressable>

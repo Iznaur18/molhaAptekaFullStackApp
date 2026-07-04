@@ -1,10 +1,9 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
-import { ProductCard } from "@/entities/product/ui/ProductCard";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { userProfileQueryKeys } from "@/entities/user/model/userProfileQueryKeys";
@@ -13,6 +12,9 @@ import { useUserProfileQuery } from "@/entities/user/model/useUserProfileQuery";
 import { ProfileOverviewBanner } from "@/entities/user/ui/ProfileOverviewBanner";
 import { UserPremiumDisplayName } from "@/entities/user/ui/UserPremiumDisplayName";
 import { UserFollowButton } from "@/features/user-follow/ui/UserFollowButton";
+import { buildCatalogGridRows } from "@/features/catalog-grid/lib/buildCatalogGridRows";
+import { resolveCatalogGridListContentStyle } from "@/features/catalog-grid/lib/catalogGridLayout";
+import { CatalogGridRowItem } from "@/features/catalog-grid/ui/CatalogGridRowItem";
 import { SELLER_PRODUCTS_PAGE_UI, USER_LIST_ROW_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { useProductGridLayout } from "@/shared/model/useProductGridLayout";
@@ -24,7 +26,7 @@ export const SellerProductsPage = () => {
   const router = useRouter();
   const styles = useSellerProductsPageStyles();
   const productGrid = useProductGridLayout();
-  const { centeredContentStyle } = useScreenLayout();
+  const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
   const queryClient = useQueryClient();
   const params = useLocalSearchParams<{ userId?: string }>();
   const sellerId = String(params.userId ?? "").trim();
@@ -70,6 +72,14 @@ export const SellerProductsPage = () => {
       void catalogQuery.fetchNextPage();
     }
   }, [catalogQuery]);
+
+  const catalogGridRows = useMemo(
+    () =>
+      buildCatalogGridRows(catalogQuery.products, productGrid.columns, {
+        showFullWidthTier3Banners: true,
+      }),
+    [catalogQuery.products, productGrid.columns],
+  );
 
   if (!sellerId) {
     return (
@@ -129,11 +139,15 @@ export const SellerProductsPage = () => {
     <View style={[styles.container, centeredContentStyle]}>
       <FlatList
         key={productGrid.listKey}
-        data={catalogQuery.products}
-        keyExtractor={(item) => String(item._id)}
-        numColumns={productGrid.columns}
-        columnWrapperStyle={productGrid.columns > 1 ? styles.row : undefined}
-        contentContainerStyle={styles.list}
+        style={styles.listFlex}
+        data={catalogGridRows}
+        keyExtractor={(item) => item.key}
+        numColumns={1}
+        contentContainerStyle={[
+          styles.list,
+          resolveCatalogGridListContentStyle(productGrid.gap),
+          { paddingBottom: contentPaddingBottom },
+        ]}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.4}
         refreshControl={
@@ -150,18 +164,21 @@ export const SellerProductsPage = () => {
             <Text style={styles.title}>{pageTitle}</Text>
             {seller ? <ProfileOverviewBanner user={seller} /> : null}
             {seller ? (
-              <View style={styles.sellerMeta}>
-                <UserPremiumDisplayName
-                  name={String(seller.userName ?? "").trim() || USER_LIST_ROW_UI.MISSING_NAME}
-                  isPremium={seller.isPremiumUser === true}
-                  isUserDataConfirmed={seller.isUserDataConfirmed === true}
-                  textStyle={styles.sellerName}
-                />
+              <View style={styles.sellerMetaZone}>
+                <View style={styles.sellerMetaName}>
+                  <UserPremiumDisplayName
+                    name={String(seller.userName ?? "").trim() || USER_LIST_ROW_UI.MISSING_NAME}
+                    isPremium={seller.isPremiumUser === true}
+                    isUserDataConfirmed={seller.isUserDataConfirmed === true}
+                    textStyle={styles.sellerName}
+                  />
+                </View>
                 <UserFollowButton
                   targetUserId={sellerId}
                   isFollowing={isFollowing}
                   isAuthorized={isAuthorized}
                   isSelf={isSelf}
+                  layout="inline"
                   onFollowChange={handleFollowChange}
                 />
               </View>
@@ -175,9 +192,12 @@ export const SellerProductsPage = () => {
           ) : null
         }
         renderItem={({ item }) => (
-          <View style={styles.cell}>
-            <ProductCard product={item} />
-          </View>
+          <CatalogGridRowItem
+            row={item}
+            columns={productGrid.columns}
+            gap={productGrid.gap}
+            tileWidth={productGrid.tileWidth}
+          />
         )}
       />
     </View>

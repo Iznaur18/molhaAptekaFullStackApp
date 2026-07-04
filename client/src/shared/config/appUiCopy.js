@@ -25,6 +25,18 @@ export const IMAGE_URL_FIELD_UI = {
   FILE_INPUT_ARIA: "Выбрать изображение с устройства",
 };
 
+/** Загрузка intro-ролика: одна кнопка, сервер пережимает в MP4. */
+export const INTRO_VIDEO_UPLOAD_UI = {
+  PICK_BUTTON: "Выбрать видео",
+  UPLOAD_LOADING: "Загружаем…",
+  REPLACE_BUTTON: "Заменить",
+  DURATION_HINT:
+    "Максимум 10 секунд: более длинный ролик автоматически обрежется при загрузке. Исходный файл — до 100 МБ.",
+  ERROR_TYPE: "Допустимы только MP4, WebM, MOV и HEVC",
+  ERROR_GENERIC: "Не удалось загрузить видео",
+  FILE_INPUT_ARIA: "Выбрать intro-видео с устройства",
+};
+
 /** Поле URL видео с загрузкой файла (`POST /upload/video`) */
 export const VIDEO_URL_FIELD_UI = {
   UPLOAD_BUTTON: "Выбрать файл",
@@ -229,6 +241,31 @@ export const AUCTION_PAGE_UI = {
   BUYER_EMPTY: "У вас пока нет активных ставок",
   SELLER_EMPTY: "Входящих ставок пока нет",
   BOTH_EMPTY: "Активных ставок пока нет",
+  /** @param {number} shown @param {number} total */
+  COUNT_FILTERED: (shown, total) => `${shown} из ${total}`,
+  /** @param {number} count */
+  COUNT_ITEMS: (count) => `${count} записей`,
+  VIEW_FILTER_LABEL: "Раздел",
+  VIEW_FILTER_ALL: "Все",
+  VIEW_FILTER_BUYER: "Мои ставки",
+  VIEW_FILTER_SELLER: "Входящие",
+  OVERVIEW_BUYER_BIDS: "Мои ставки",
+  OVERVIEW_INCOMING: "Входящие",
+  OVERVIEW_ATTENTION: "Нужно действие",
+  EXPAND_ALL: "Развернуть все",
+  COLLAPSE_ALL: "Свернуть все",
+  REFRESH: "Обновить",
+  ATTENTION_FILTER_HINT: "Показаны ставки, где нужно ваше действие",
+  /** @param {string} price */
+  COLLAPSED_BUYER_PAY: (price) => `Оплатить ${price}`,
+  COLLAPSED_BUYER_PENDING: "Ожидает ответа продавца",
+  /** @param {string} price */
+  COLLAPSED_SELLER_REVIEW: (price) => `Подтвердите ставку ${price}`,
+  /** @param {boolean} expanded */
+  EXPAND_TOGGLE: (expanded) => (expanded ? "Свернуть" : "Развернуть"),
+  LOGIN_HINT: "Войдите, чтобы видеть аукцион.",
+  LOGIN_BUTTON: "Войти",
+  EMPTY_BY_FILTER: "По выбранному фильтру ставок нет.",
   /** @param {number} count */
   TAB_BADGE: (count) => (count > 99 ? "99+" : String(count)),
   PAY_DEADLINE_LABEL: "Оплатить до",
@@ -541,8 +578,24 @@ export const MY_ORDERS_PAGE_UI = {
   TITLE: "Мои покупки",
   /** @param {number} count */
   COUNT: (count) => `${count} заказов`,
+  /** @param {number} shown @param {number} total */
+  COUNT_FILTERED: (shown, total) => `${shown} из ${total}`,
+  /** @param {number} count */
+  COUNT_ITEMS: (count) => `${count} заказов`,
   STATUS_FILTER_LABEL: "Фильтр по статусу",
   STATUS_FILTER_ALL: "Все статусы",
+  OVERVIEW_IN_PROGRESS: "В работе",
+  OVERVIEW_ATTENTION: "Нужно действие",
+  OVERVIEW_TOTAL: "Сумма покупок",
+  EXPAND_ALL: "Развернуть все",
+  COLLAPSE_ALL: "Свернуть все",
+  REFRESH: "Обновить",
+  ATTENTION_FILTER_HINT: "Показаны заказы, где нужно ваше действие",
+  COLLAPSED_CONFIRM: "Подтвердите получение",
+  COLLAPSED_PENDING: "Ожидает отправки",
+  COLLAPSED_SHIPPED: "Заказ в пути",
+  /** @param {boolean} expanded */
+  EXPAND_TOGGLE: (expanded) => (expanded ? "Свернуть" : "Развернуть"),
   LOADING: "Загрузка покупок…",
   PRODUCT_DETAILS_LOADING: "Открываем карточку товара…",
   EMPTY: "У вас пока нет покупок.",
@@ -556,10 +609,32 @@ export const INTRO_AD_MODERATION_PAGE_UI = {
   TITLE: "Intro-реклама",
   LOADING: "Загрузка очереди…",
   EMPTY: "Нет заявок на intro-рекламу.",
+  EMPTY_BY_FILTER: "По выбранному фильтру заявок нет.",
   INTRO_PENDING_TITLE: "Intro-ролик — на модерации",
   INTRO_MANAGED_TITLE: "Intro-ролик — активные и в очереди",
   /** @param {number} count */
   PENDING_BADGE: (count) => (count > 99 ? "99+" : String(count)),
+  /** @param {number} shown @param {number} total */
+  COUNT_FILTERED: (shown, total) => `${shown} из ${total}`,
+  /** @param {number} count */
+  COUNT_ITEMS: (count) => `${count} заявок`,
+  SECTION_FILTER_LABEL: "Раздел",
+  SECTION_FILTER_ALL: "Все",
+  SECTION_FILTER_INTRO: "Intro",
+  SECTION_FILTER_BANNER: "Баннер",
+  SECTION_FILTER_PERSONAL: "Личные",
+  OVERVIEW_PENDING: "На модерации",
+  OVERVIEW_INTRO: "Intro",
+  OVERVIEW_BANNER: "Баннер",
+  OVERVIEW_ATTENTION: "Нужно действие",
+  EXPAND_ALL: "Развернуть все",
+  COLLAPSE_ALL: "Свернуть все",
+  REFRESH: "Обновить",
+  ATTENTION_FILTER_HINT: "Показаны заявки, которые давно ждут или без обязательного медиа",
+  COLLAPSED_STALE: "Давно в очереди",
+  COLLAPSED_MISSING_MEDIA: "Нет медиа",
+  /** @param {boolean} expanded */
+  EXPAND_TOGGLE: (expanded) => (expanded ? "Свернуть" : "Развернуть"),
   APPROVE: "Одобрить",
   REJECT: "Отклонить",
   REJECT_REASON_LABEL: "Причина отклонения (необязательно)",
@@ -795,9 +870,11 @@ export const USER_STORY_UI = {
   CLOSE: "Закрыть",
   ERROR_GENERIC: "Не удалось выполнить действие",
   ERROR_VIDEO_TYPE: "Видео: только MP4 или WebM",
-  ERROR_VIDEO_SIZE: "Видео: не больше 25 МБ",
+  ERROR_VIDEO_SIZE: "Видео: не больше 50 МБ",
   ERROR_VIDEO_ASPECT: "Видео: только вертикальный формат 9:16",
   ERROR_VIDEO_READ: "Не удалось прочитать видео",
+  VIDEO_DURATION_HINT:
+    "Максимум 30 секунд: более длинный ролик автоматически обрежется при загрузке. Исходный файл — до 50 МБ.",
   ERROR_IMAGE: "Не удалось обработать фото",
   ERROR_CAPTION: "Текст: не больше 150 символов",
   ERROR_MEDIA_REQUIRED: "Выберите фото или видео",
@@ -974,8 +1051,23 @@ export const MY_SALES_PAGE_UI = {
   TITLE: "Мои продажи",
   /** @param {number} count */
   COUNT: (count) => `${count} заказов`,
+  /** @param {number} shown @param {number} total */
+  COUNT_FILTERED: (shown, total) => `${shown} из ${total}`,
+  /** @param {number} count */
+  COUNT_ITEMS: (count) => `${count} заказов`,
   /** @param {number} count */
   TOTAL_SALES_COUNT: (count) => `Продаж: ${count}`,
+  OVERVIEW_IN_PROGRESS: "В работе",
+  OVERVIEW_ATTENTION: "Нужно действие",
+  OVERVIEW_TOTAL: "Сумма продаж",
+  EXPAND_ALL: "Развернуть все",
+  COLLAPSE_ALL: "Свернуть все",
+  REFRESH: "Обновить",
+  ATTENTION_FILTER_HINT: "Показаны продажи, где нужно отметить отправку или доставку",
+  COLLAPSED_SHIP: "Отметьте отправку",
+  COLLAPSED_DELIVER: "Отметьте доставку",
+  /** @param {boolean} expanded */
+  EXPAND_TOGGLE: (expanded) => (expanded ? "Свернуть" : "Развернуть"),
   LOADING: "Загрузка продаж…",
   EMPTY: "У вас пока нет продаж.",
   EMPTY_BY_FILTER: "По выбранному статусу продаж нет.",
@@ -1478,10 +1570,26 @@ export const INSTALLMENT_UI = {
   PAYMENTS_PAGE_LOADING: "Загрузка рассрочек…",
   PAYMENTS_PAGE_EMPTY: "У вас пока нет рассрочек.",
   PAYMENTS_PAGE_EMPTY_BY_FILTER: "По выбранному статусу рассрочек нет.",
+  /** @param {number} shown @param {number} total */
+  COUNT_FILTERED: (shown, total) => `${shown} из ${total}`,
+  PAYMENTS_OVERVIEW_ACTIVE: "Активные",
+  PAYMENTS_OVERVIEW_ATTENTION: "Нужно действие",
+  PAYMENTS_OVERVIEW_REMAINING: "Осталось всего",
+  PAYMENTS_EXPAND_ALL: "Развернуть все",
+  PAYMENTS_COLLAPSE_ALL: "Свернуть все",
+  PAYMENTS_REFRESH: "Обновить",
+  /** @param {string} amount @param {string} date */
+  PAYMENTS_NEXT_DUE: (amount, date) => `След. платёж: ${amount} · ${date}`,
+  PAYMENTS_ATTENTION_FILTER_HINT: "Показаны договоры, где нужно ваше действие",
+  /** @param {boolean} expanded */
+  PAYMENTS_EXPAND_TOGGLE: (expanded) => (expanded ? "Свернуть" : "Развернуть"),
   SALES_PAGE_TITLE: "Продажи в рассрочку",
   SALES_PAGE_LOADING: "Загрузка продаж…",
   SALES_PAGE_EMPTY: "Продаж в рассрочку пока нет.",
   SALES_PAGE_EMPTY_BY_FILTER: "По выбранному статусу продаж нет.",
+  SALES_OVERVIEW_REMAINING: "К получению",
+  SALES_ATTENTION_FILTER_HINT: "Показаны продажи, где нужно подтвердить оплату",
+  SALES_NEXT_ACTION_EARLY_PAYOFF: "Досрочное погашение — ждёт подтверждения",
   CONTRACT_STATUS_FILTER_LABEL: "Статус",
   CONTRACT_STATUS_FILTER_ALL: "Все",
   CONTRACT_STATUS_FILTER_IN_PROGRESS: "Активные",
@@ -1530,6 +1638,9 @@ export const CREATE_RAFFLE_MODAL_UI = {
   ARIA_CLOSE: "Закрыть",
   TITLE: "Создать розыгрыш",
   TITLE_EDIT: "Изменить розыгрыш",
+  SECTION_BASIC: "Основное",
+  SECTION_PRIZE: "Приз",
+  SECTION_CONDITIONS: "Условия",
   LABEL_TITLE: "Название",
   LABEL_DESCRIPTION: "Описание",
   LABEL_PRIZE_MEDIA: "Медиа приза (фото или видео)",
