@@ -16,6 +16,7 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import { useCreateProductMutation } from "@/entities/product/model/useCreateProductMutation";
 import { validateProductName } from "@/entities/product/lib/validateProductName";
 import { ProductPhotoGrid } from "@/features/image-upload/ui/ProductPhotoGrid";
+import { ProductPreviewVideoUploadField } from "@/features/image-upload/ui/ProductPreviewVideoUploadField";
 import { CreateProductCategoryPicker } from "@/features/create-product/ui/CreateProductCategoryPicker";
 import { CREATE_PRODUCT_UI } from "@/shared/config";
 import { textInputFocusScrollProps } from "@/shared/lib/scrollTextInputIntoViewOnFocus";
@@ -704,31 +705,13 @@ function MediaStep({ form, setForm, disabled, theme, styles }: StepProps) {
         disabled={disabled}
       />
 
-      {/* Video preview field */}
-      <View style={styles.fieldLabel}>
-        <Text style={[styles.label, { color: theme.colors.text }]}>
-          Видео-превью{" "}
-          <Text style={[styles.optionalTag, { color: theme.colors.textMuted }]}>
-            (необязательно)
-          </Text>
-        </Text>
-        <Text style={[styles.hint, { color: theme.colors.textSecondary }]}>
-          URL загруженного короткого видео (до 3 сек). При указании видео нужно хотя бы одно фото.
-        </Text>
-        <TextInput
-          {...textInputFocusScrollProps}
-          style={[styles.input, { color: theme.colors.text, backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
-          value={form.productPreviewVideoUrl}
-          onChangeText={(text) =>
-            setForm((prev) => ({ ...prev, productPreviewVideoUrl: text }))
-          }
-          editable={!disabled}
-          placeholder="https://… или /uploads/…"
-          placeholderTextColor={theme.colors.textMuted}
-          autoCapitalize="none"
-          autoCorrect={false}
-        />
-      </View>
+      <ProductPreviewVideoUploadField
+        value={form.productPreviewVideoUrl}
+        onChange={(url) =>
+          setForm((prev) => ({ ...prev, productPreviewVideoUrl: url }))
+        }
+        disabled={disabled}
+      />
     </View>
   );
 }

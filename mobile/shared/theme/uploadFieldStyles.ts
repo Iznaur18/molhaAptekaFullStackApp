@@ -2,6 +2,9 @@ import { StyleSheet } from "react-native";
 
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
+export const PRODUCT_PHOTO_GRID_COLUMNS = 3;
+export const PRODUCT_PHOTO_GRID_GAP = 8;
+
 export const useMediaUploadFieldStyles = createThemedStyles((theme) => ({
   wrap: {
     gap: theme.spacing[2],
@@ -51,6 +54,20 @@ export const useMediaUploadFieldStyles = createThemedStyles((theme) => ({
     fontWeight: "600",
     color: theme.colors.onContrast,
   },
+  dangerButton: {
+    alignSelf: "flex-start",
+    borderRadius: theme.radius.button,
+    backgroundColor: theme.colors.danger,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    minHeight: 40,
+    justifyContent: "center",
+  },
+  dangerButtonText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: theme.colors.onContrast,
+  },
   fieldHint: {
     fontSize: 13,
     lineHeight: 18,
@@ -69,14 +86,13 @@ export const useProductPhotoGridStyles = createThemedStyles((theme) => ({
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: theme.spacing[2],
+    gap: PRODUCT_PHOTO_GRID_GAP,
   },
   tile: {
-    width: "31%",
-    aspectRatio: 1,
     borderRadius: theme.radius.sm,
     overflow: "hidden",
     backgroundColor: theme.colors.surfaceMuted,
+    flexShrink: 0,
   },
   tileImage: {
     width: "100%",
@@ -118,8 +134,6 @@ export const useProductPhotoGridStyles = createThemedStyles((theme) => ({
     justifyContent: "center",
   },
   addTile: {
-    width: "31%",
-    aspectRatio: 1,
     borderRadius: theme.radius.sm,
     borderWidth: 1,
     borderStyle: "dashed",
@@ -127,7 +141,8 @@ export const useProductPhotoGridStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.actionSoft,
     alignItems: "center",
     justifyContent: "center",
-    gap: 2,
+    paddingHorizontal: 6,
+    flexShrink: 0,
   },
   addTilePressed: {
     backgroundColor: theme.colors.actionSurface,
@@ -136,15 +151,11 @@ export const useProductPhotoGridStyles = createThemedStyles((theme) => ({
   addTileDisabled: {
     opacity: 0.5,
   },
-  addTilePlus: {
-    fontSize: 26,
-    lineHeight: 30,
-    fontWeight: "600",
-    color: theme.colors.action,
-  },
   addTileLabel: {
-    fontSize: 12,
+    fontSize: 14,
+    lineHeight: 18,
     fontWeight: "600",
+    textAlign: "center",
     color: theme.colors.action,
   },
   counter: {

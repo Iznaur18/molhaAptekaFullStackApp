@@ -1,12 +1,23 @@
-import { useState } from "react";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { useCallback, useMemo, useState } from "react";
+import {
+  ActivityIndicator,
+  type LayoutChangeEvent,
+  Pressable,
+  Text,
+  View,
+} from "react-native";
 
 import { useUploadImageMutation } from "@/entities/upload/model/useUploadImageMutation";
 import { pickGalleryImageAssets } from "@/features/image-upload/lib/pickGalleryImageAsset";
 import { IMAGE_UPLOAD_UI } from "@/shared/config";
+import { resolveGridTileWidth } from "@/shared/lib/resolveGridTileWidth";
 import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
-import { useProductPhotoGridStyles } from "@/shared/theme/uploadFieldStyles";
+import {
+  PRODUCT_PHOTO_GRID_COLUMNS,
+  PRODUCT_PHOTO_GRID_GAP,
+  useProductPhotoGridStyles,
+} from "@/shared/theme/uploadFieldStyles";
 import { CachedProductImage } from "@/shared/ui/CachedProductImage";
 
 type ProductPhotoGridProps = {
@@ -25,11 +36,27 @@ export const ProductPhotoGrid = ({
   const theme = useAppTheme();
   const styles = useProductPhotoGridStyles();
   const uploadMutation = useUploadImageMutation();
+  const [gridWidth, setGridWidth] = useState(0);
   const [uploadingCount, setUploadingCount] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
 
   const remaining = maxCount - urls.length - uploadingCount;
   const isBusy = uploadingCount > 0;
+
+  const tileSize = useMemo(
+    () => resolveGridTileWidth(gridWidth, PRODUCT_PHOTO_GRID_COLUMNS, PRODUCT_PHOTO_GRID_GAP),
+    [gridWidth],
+  );
+
+  const tileDimensions =
+    tileSize > 0 ? { width: tileSize, height: tileSize } : { width: 0, height: 0 };
+
+  const handleGridLayout = useCallback((event: LayoutChangeEvent) => {
+    const nextWidth = Math.floor(event.nativeEvent.layout.width);
+    if (nextWidth > 0) {
+      setGridWidth((current) => (current === nextWidth ? current : nextWidth));
+    }
+  }, []);
 
   const handleAdd = async () => {
     if (disabled || isBusy || remaining <= 0) {
@@ -76,11 +103,11 @@ export const ProductPhotoGrid = ({
 
   return (
     <View style={styles.wrap}>
-      <View style={styles.grid}>
+      <View style={styles.grid} onLayout={handleGridLayout}>
         {urls.map((url, index) => (
           <Pressable
             key={`${url}-${index}`}
-            style={styles.tile}
+            style={[styles.tile, tileDimensions]}
             onPress={() => makeCover(index)}
             disabled={disabled || index === 0}
           >
@@ -107,15 +134,16 @@ export const ProductPhotoGrid = ({
         ))}
 
         {Array.from({ length: uploadingCount }).map((_, i) => (
-          <View key={`uploading-${i}`} style={[styles.tile, styles.uploadingTile]}>
+          <View key={`uploading-${i}`} style={[styles.tile, styles.uploadingTile, tileDimensions]}>
             <ActivityIndicator color={theme.colors.action} />
           </View>
         ))}
 
-        {urls.length + uploadingCount < maxCount ? (
+        {urls.length + uploadingCount < maxCount && tileSize > 0 ? (
           <Pressable
             style={({ pressed }) => [
               styles.addTile,
+              tileDimensions,
               pressed && styles.addTilePressed,
               (disabled || isBusy) && styles.addTileDisabled,
             ]}
@@ -123,9 +151,11 @@ export const ProductPhotoGrid = ({
               void handleAdd();
             }}
             disabled={disabled || isBusy}
+            accessibilityLabel={IMAGE_UPLOAD_UI.UPLOAD_BUTTON}
           >
-            <Text style={styles.addTilePlus}>+</Text>
-            <Text style={styles.addTileLabel}>{IMAGE_UPLOAD_UI.ADD_PHOTO_TILE}</Text>
+            <Text style={styles.addTileLabel} numberOfLines={1}>
+              + {IMAGE_UPLOAD_UI.ADD_PHOTO_TILE}
+            </Text>
           </Pressable>
         ) : null}
       </View>

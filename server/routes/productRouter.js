@@ -7,6 +7,7 @@ import {
   patchProductCategoryDisplayController,
   patchProductCategoryNodeDisplayController,
   getProductCategoryRootsController,
+  getProductCategorySearchController,
   getProductCategoryChildrenController,
   getProductCategoryBreadcrumbController,
   listProductCategoriesAdminController,
@@ -151,6 +152,7 @@ router.get(
 );
 router.get("/category-displays", getProductCategoryDisplaysController);
 router.get("/categories/roots", getProductCategoryRootsController);
+router.get("/categories/search", getProductCategorySearchController);
 router.get(
   "/categories/:categoryId/children",
   productCategoryIdParamValidation,

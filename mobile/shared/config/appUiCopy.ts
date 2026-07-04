@@ -1158,6 +1158,14 @@ export const CREATE_PRODUCT_UI = {
   LABEL_PRICE: "Цена, ₽",
   LABEL_CATEGORY: "Категория",
   CATEGORY_PLACEHOLDER: "Выберите конечную подкатегорию",
+  CATEGORY_FIELD_PLACEHOLDER: "Выбрать категорию",
+  CATEGORY_SHEET_TITLE: "Категория",
+  CATEGORY_SHEET_CLOSE: "Закрыть",
+  CATEGORY_SEARCH_PLACEHOLDER: "Поиск: например, смартфоны",
+  CATEGORY_SEARCH_EMPTY: "Ничего не найдено. Попробуйте другое слово или выберите из списка",
+  CATEGORY_SEARCH_LOADING: "Ищем…",
+  CATEGORY_ROOT_CRUMB: "Все категории",
+  CATEGORY_EMPTY_LEVEL: "Подкатегории не найдены",
   LABEL_AVAILABLE: "Товар в наличии",
   LABEL_STOCK: "Количество, шт.",
   LABEL_IMAGE: "Фото (обязательно)",
@@ -1223,6 +1231,18 @@ export const VIDEO_URL_FIELD_UI = {
   ERROR_GENERIC: "Не удалось загрузить видео",
   ERROR_AUTH: "Войдите в аккаунт, чтобы загрузить файл",
   PERMISSION_DENIED: "Нет доступа к галерее",
+} as const;
+
+export const PRODUCT_PREVIEW_VIDEO_UPLOAD_UI = {
+  LABEL: "Видео-превью",
+  OPTIONAL_TAG: "(необязательно)",
+  PICK_BUTTON: "Выбрать видео",
+  REPLACE_BUTTON: "Заменить видео",
+  CLEAR_BUTTON: "Убрать видео",
+  UPLOAD_LOADING: "Загружаем…",
+  DURATION_HINT:
+    "До 3 секунд: более длинный ролик автоматически обрежется при загрузке. Нужно хотя бы одно фото товара.",
+  ERROR_GENERIC: "Не удалось загрузить видео",
 } as const;
 
 export const INTRO_VIDEO_UPLOAD_UI = {

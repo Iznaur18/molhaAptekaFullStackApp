@@ -12,7 +12,7 @@ export type UploadVideoFilePayload = {
 };
 
 /** `POST /upload/video` — загрузка видео (cookie auth, multipart, поле `video`). */
-export type UploadVideoPurpose = "intro" | "story";
+export type UploadVideoPurpose = "intro" | "story" | "product-preview";
 
 type UploadVideoOptions = {
   purpose?: UploadVideoPurpose;

@@ -7,8 +7,13 @@ import {
   APP_INTRO_VIDEO_MAX_BITRATE_MBIT,
   APP_INTRO_VIDEO_MAX_DURATION_SEC,
 } from "../../constants/appIntroSettingsConstants.js";
+import {
+  PRODUCT_PREVIEW_VIDEO_MAX_BITRATE_MBIT,
+  PRODUCT_PREVIEW_VIDEO_MAX_DURATION_SEC,
+} from "../../constants/productPreviewVideoConstants.js";
 import { USER_STORY_VIDEO_MAX_BITRATE_MBIT, USER_STORY_VIDEO_MAX_DURATION_SEC } from "../../constants/userStoryConstants.js";
 import { isIntroVideoUploadRequest } from "./isIntroVideoUploadRequest.js";
+import { isProductPreviewVideoUploadRequest } from "./isProductPreviewVideoUploadRequest.js";
 import { isStoryVideoUploadRequest } from "./isStoryVideoUploadRequest.js";
 
 /**
@@ -35,6 +40,16 @@ export function resolveVideoUploadProfile(req) {
       transcodeOptions: {
         maxDurationSec: USER_STORY_VIDEO_MAX_DURATION_SEC,
         maxVideoBitrateMbit: USER_STORY_VIDEO_MAX_BITRATE_MBIT,
+      },
+    };
+  }
+
+  if (isProductPreviewVideoUploadRequest(req)) {
+    return {
+      maxBytes: STORY_UPLOAD_VIDEO_MAX_BYTES,
+      transcodeOptions: {
+        maxDurationSec: PRODUCT_PREVIEW_VIDEO_MAX_DURATION_SEC,
+        maxVideoBitrateMbit: PRODUCT_PREVIEW_VIDEO_MAX_BITRATE_MBIT,
       },
     };
   }

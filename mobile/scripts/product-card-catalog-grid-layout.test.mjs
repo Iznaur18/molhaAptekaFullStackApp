@@ -7,10 +7,10 @@ import { test } from "node:test";
 const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
 const LAYOUT = {
-  fixedHeight: 430,
+  fixedHeight: 516,
   bottomPadding: 7.2,
   bodyGap: 4,
-  imageHeight: 273,
+  imageHeight: 328,
   headingHeight: 20,
   priceHeight: 21,
   metaHeight: 46,

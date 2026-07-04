@@ -49,6 +49,7 @@ import {
 } from "./Product/productCatalogFeedTileDisplayControllers.js";
 import {
   getProductCategoryRootsController,
+  getProductCategorySearchController,
   getProductCategoryChildrenController,
   getProductCategoryBreadcrumbController,
 } from "./Product/productCategoryTreeControllers.js";
@@ -249,6 +250,7 @@ export {
   getProductCatalogFeedTileDisplaysController,
   patchProductCatalogFeedTileDisplayController,
   getProductCategoryRootsController,
+  getProductCategorySearchController,
   getProductCategoryChildrenController,
   getProductCategoryBreadcrumbController,
   listProductCategoriesAdminController,

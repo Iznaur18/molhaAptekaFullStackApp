@@ -5,6 +5,7 @@ import type { UploadVideoPurpose } from "@/entities/upload/api/uploadVideo";
 import { useUploadVideoMutation } from "@/entities/upload/model/useUploadVideoMutation";
 import {
   INTRO_UPLOAD_VIDEO_MAX_BYTES,
+  STORY_UPLOAD_VIDEO_MAX_BYTES,
   UPLOAD_VIDEO_MAX_BYTES,
 } from "@/entities/upload/model/videoConstants";
 import { pickVideoAsset } from "@/features/image-upload/lib/pickVideoAsset";
@@ -45,7 +46,9 @@ export const VideoUrlUploadField = ({
         maxBytes:
           uploadPurpose === "intro"
             ? INTRO_UPLOAD_VIDEO_MAX_BYTES
-            : UPLOAD_VIDEO_MAX_BYTES,
+            : uploadPurpose === "story" || uploadPurpose === "product-preview"
+              ? STORY_UPLOAD_VIDEO_MAX_BYTES
+              : UPLOAD_VIDEO_MAX_BYTES,
       });
       if (!asset) {
         return;
