@@ -1,33 +1,48 @@
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useRouter } from "expo-router";
-import { Pressable, View } from "react-native";
+import { usePathname, useRouter } from "expo-router";
+import { useCallback, useMemo, useState } from "react";
 
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
-import { HEADER_USERS_BUTTON_UI } from "@/shared/config";
-import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
-import { useHomeCatalogHeaderStyles } from "@/shared/theme/homeCatalogHeaderStyles";
+import { buildHomeCatalogUsersMenuItems } from "@/features/home-feed/lib/buildHomeCatalogUsersMenuItems";
+import { HomeCatalogUsersStretchMenu } from "@/features/home-feed/ui/HomeCatalogUsersStretchMenu";
+
+const USERS_ROUTE = "/users";
 
 export const HomeCatalogUsersButton = () => {
   const router = useRouter();
-  const styles = useHomeCatalogHeaderStyles();
-  const { theme } = useAppThemeSettings();
+  const pathname = usePathname();
   const sessionQuery = useAuthSessionQuery();
   const isAuthorized = sessionQuery.data?.user != null;
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuItems = useMemo(() => buildHomeCatalogUsersMenuItems(), []);
+  const isUsersActive = pathname === USERS_ROUTE || pathname.startsWith(`${USERS_ROUTE}/`);
+
+  const handleToggleMenu = useCallback(() => {
+    setMenuOpen((current) => !current);
+  }, []);
+
+  const handleItemPress = useCallback(
+    (item: (typeof menuItems)[number]) => {
+      if (!item.href) {
+        return;
+      }
+
+      setMenuOpen(false);
+      router.push(item.href as never);
+    },
+    [router],
+  );
 
   if (!isAuthorized) {
     return null;
   }
 
   return (
-    <View style={styles.usersNavPill}>
-      <Pressable
-        style={styles.usersButton}
-        accessibilityRole="button"
-        accessibilityLabel={HEADER_USERS_BUTTON_UI.ARIA}
-        onPress={() => router.push("/users" as never)}
-      >
-        <MaterialIcons name="people" size={22} color={theme.colors.textSecondary} />
-      </Pressable>
-    </View>
+    <HomeCatalogUsersStretchMenu
+      open={menuOpen}
+      items={menuItems}
+      activeItemKey={isUsersActive ? "users" : null}
+      onToggle={handleToggleMenu}
+      onItemPress={handleItemPress}
+    />
   );
 };

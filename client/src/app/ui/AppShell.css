@@ -7,7 +7,7 @@
 
   box-sizing: border-box;
   width: 100%;
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
   padding: var(--iz-space-6) var(--app-shell-content-inline-padding) 2.5rem;
 }
@@ -254,7 +254,7 @@
 }
 
 /* до ~904px: всегда 3 карточки в ряд (~667px, ~900px и т.д.) */
-@media (max-width: 903px) {
+@container app-viewport (max-width: 903px) {
   .app-shell__grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.15rem;
@@ -262,7 +262,7 @@
 }
 
 /* узкий мобильный: 2 карточки в ряд, безопаснее inset от краёв */
-@media (max-width: 667px) {
+@container app-viewport (max-width: 667px) {
   .app-shell {
     --app-shell-content-inline-padding: max(
       1rem,
@@ -494,7 +494,7 @@
   box-shadow: 0 12px 32px var(--iz-shadow-card-hover);
 }
 
-@media (max-width: 640px) {
+@container app-viewport (max-width: 640px) {
   .app-shell {
     --app-shell-content-inline-padding: max(
       1rem,
@@ -799,7 +799,7 @@
   outline-offset: 2px;
 }
 
-@media (max-width: 640px) {
+@container app-viewport (max-width: 640px) {
   /* с баннером внутри липкость выключаем, иначе баннер «прилипает» вместе с панелью */
   .app-shell--header-v2 .app-shell__header--v2:has(.site-header-banner-carousel) {
     position: static;

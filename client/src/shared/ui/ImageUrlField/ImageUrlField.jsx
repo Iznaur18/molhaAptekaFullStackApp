@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 
 import { useUploadAssetMutations } from "../../model/useUploadAssetMutations.js";
+import { prepareBrowserImageFileForUpload } from "../../lib/prepareBrowserImageFileForUpload.js";
 import { validateUploadImageFile } from "../../lib/validateUploadImageFile.js";
 import { IMAGE_URL_FIELD_UI } from "../../config/appUiCopy.js";
 import { UPLOAD_FILE_INPUT_ACCEPT } from "../../config/uploadConstants.js";
@@ -50,18 +51,19 @@ export function ImageUrlField({
   };
 
   const handleFileChange = async (event) => {
-    const file = event.target.files?.[0];
+    const rawFile = event.target.files?.[0];
     event.target.value = "";
-    if (!file) return;
-
-    const validationError = validateUploadImageFile(file);
-    if (validationError) {
-      setUploadError(validationError);
-      return;
-    }
+    if (!rawFile) return;
 
     setUploadError("");
     try {
+      const file = await prepareBrowserImageFileForUpload(rawFile);
+      const validationError = validateUploadImageFile(file);
+      if (validationError) {
+        setUploadError(validationError);
+        return;
+      }
+
       const url = await uploadImageMutation.mutateAsync(file);
       onChange(url);
     } catch (error) {

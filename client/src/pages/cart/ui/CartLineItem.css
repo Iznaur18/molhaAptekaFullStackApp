@@ -189,7 +189,7 @@
   color: var(--iz-color-danger-strong);
 }
 
-@media (max-width: 640px) {
+@container app-viewport (max-width: 640px) {
   .cart-line {
     --cart-line-action-gap: 0.65rem;
 

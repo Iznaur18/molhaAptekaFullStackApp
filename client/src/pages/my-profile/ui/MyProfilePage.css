@@ -415,7 +415,7 @@
   margin-inline: var(--my-profile-shell-content-gutter, 0);
 }
 
-@media (max-width: 903px) {
+@container app-viewport (max-width: 903px) {
   .my-profile-page {
     --my-profile-mobile-inline-inset: 0.1rem;
     --my-profile-shell-content-gutter: calc(
@@ -444,7 +444,7 @@
   }
 }
 
-@media (max-width: 667px) {
+@container app-viewport (max-width: 667px) {
   .my-profile-page {
     --my-profile-mobile-inline-inset: 0.05rem;
     --my-profile-catalog-grid-gap: 0.1rem;
@@ -643,7 +643,7 @@
   pointer-events: auto;
 }
 
-@media (max-width: 900px) {
+@container app-viewport (max-width: 900px) {
   .my-profile-page__layout {
     flex-direction: column;
   }
@@ -696,7 +696,7 @@
   }
 }
 
-@media (max-width: 560px) {
+@container app-viewport (max-width: 560px) {
   .my-profile-page__nav-button {
     font-size: 0.92rem;
     padding-top: 0.62rem;

@@ -34,7 +34,7 @@
   cursor: grabbing;
 }
 
-@media (min-width: 768px) {
+@container app-viewport (min-width: 768px) {
   .curated-product-list-carousel__scroll {
     padding-bottom: 4px;
   }

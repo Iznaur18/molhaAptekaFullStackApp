@@ -281,7 +281,7 @@
   color: var(--iz-color-on-contrast);
 }
 
-@media (min-width: 668px) {
+@container app-viewport (min-width: 668px) {
   .product-card--banner-layout > .product-card__body,
   .product-card--banner-layout > .product-card__details-surface {
     flex-direction: row;

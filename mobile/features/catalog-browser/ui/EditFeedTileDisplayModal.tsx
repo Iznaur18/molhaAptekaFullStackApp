@@ -1,9 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
-  Modal,
   Pressable,
-  ScrollView,
   Text,
   TextInput,
   View,
@@ -17,8 +15,10 @@ import {
 import { useProductCategoryDisplayMutations } from "@/entities/product-category-display/model/useProductCategoryDisplayMutations";
 import { ImageUrlUploadField } from "@/features/image-upload/ui/ImageUrlUploadField";
 import { PRODUCT_CATEGORY_DISPLAY_UI } from "@/shared/config";
+import { useSyncAdminEditFormOnOpen } from "@/shared/model/useSyncAdminEditFormOnOpen";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useAdminEditModalStyles } from "@/shared/theme/modalChromeStyles";
+import { AdminEditModalShell } from "@/shared/ui/AdminEditModalShell";
 
 type EditFeedTileDisplayModalProps = {
   visible: boolean;
@@ -41,35 +41,57 @@ export const EditFeedTileDisplayModal = ({
   const [label, setLabel] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [isImageFieldBusy, setIsImageFieldBusy] = useState(false);
+  const [activeTileKey, setActiveTileKey] = useState<string | null>(tileKey);
+
+  useEffect(() => {
+    if (tileKey) {
+      setActiveTileKey(tileKey);
+    }
+  }, [tileKey]);
 
   const resolved = useMemo(() => {
-    if (!tileKey) {
+    if (!activeTileKey) {
       return null;
     }
     return (
-      buildResolvedCatalogFeedTileDisplays(displays).find((item) => item.tileKey === tileKey) ??
-      null
+      buildResolvedCatalogFeedTileDisplays(displays).find(
+        (item) => item.tileKey === activeTileKey,
+      ) ?? null
     );
-  }, [displays, tileKey]);
+  }, [activeTileKey, displays]);
 
-  const defaultLabel = tileKey ? (findCatalogFeedTileByKey(tileKey)?.label ?? "") : "";
+  const defaultLabel = activeTileKey
+    ? (findCatalogFeedTileByKey(activeTileKey)?.label ?? "")
+    : "";
 
-  useEffect(() => {
-    if (!visible || !resolved) {
+  const syncFormFromResolved = useCallback(() => {
+    if (!resolved) {
       return;
     }
     setLabel(resolved.isCustomLabel ? resolved.label : "");
     setImageUrl(resolved.imageUrl ?? "");
     setErrorMessage("");
-  }, [visible, resolved]);
+  }, [resolved]);
 
-  const handleClose = () => {
+  useSyncAdminEditFormOnOpen({
+    visible,
+    sessionKey: activeTileKey,
+    enabled: resolved != null,
+    onSync: syncFormFromResolved,
+  });
+
+  const handleClose = useCallback(() => {
     setErrorMessage("");
     onClose();
-  };
+  }, [onClose]);
+
+  const handleDismissed = useCallback(() => {
+    setActiveTileKey(null);
+  }, []);
 
   const handleSubmit = async () => {
-    if (!tileKey || !resolved) {
+    if (!activeTileKey || !resolved) {
       return;
     }
 
@@ -78,7 +100,7 @@ export const EditFeedTileDisplayModal = ({
       const trimmedLabel = label.trim();
       const trimmedImage = imageUrl.trim();
       await patchFeedTileMutation.mutateAsync({
-        tileKey,
+        tileKey: activeTileKey,
         body: {
           customLabel: trimmedLabel || null,
           imageUrl: trimmedImage || null,
@@ -96,14 +118,14 @@ export const EditFeedTileDisplayModal = ({
   };
 
   const handleReset = async () => {
-    if (!tileKey) {
+    if (!activeTileKey) {
       return;
     }
 
     try {
       setErrorMessage("");
       await patchFeedTileMutation.mutateAsync({
-        tileKey,
+        tileKey: activeTileKey,
         body: {
           resetCustomLabel: true,
           resetImageUrl: true,
@@ -118,76 +140,74 @@ export const EditFeedTileDisplayModal = ({
     }
   };
 
-  if (!visible || !tileKey || !resolved) {
+  if (!activeTileKey && !visible) {
     return null;
   }
 
   const isSaving = patchFeedTileMutation.isPending;
 
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={handleClose}>
-      <View style={styles.overlay}>
-        <ScrollView contentContainerStyle={styles.scroll}>
-          <View style={styles.card}>
-            <Text style={styles.title}>
-              {PRODUCT_CATEGORY_DISPLAY_UI.FEED_EDIT_TITLE(resolved.label)}
-            </Text>
+    <AdminEditModalShell
+      visible={visible}
+      onClose={handleClose}
+      onDismissed={handleDismissed}
+      dismissDisabled={isSaving || isImageFieldBusy}
+    >
+      {resolved ? (
+        <>
+          <Text style={styles.title}>
+            {PRODUCT_CATEGORY_DISPLAY_UI.FEED_EDIT_TITLE(resolved.label)}
+          </Text>
 
-            <Text style={styles.fieldLabel}>
-              {PRODUCT_CATEGORY_DISPLAY_UI.LABEL_FIELD}
-            </Text>
-            <TextInput
-              style={styles.input}
-              value={label}
-              onChangeText={setLabel}
-              placeholder={PRODUCT_CATEGORY_DISPLAY_UI.LABEL_PLACEHOLDER(defaultLabel)}
-              maxLength={120}
-            />
-            <Text style={styles.hint}>
-              {PRODUCT_CATEGORY_DISPLAY_UI.FEED_LABEL_HINT}
-            </Text>
+          <Text style={styles.fieldLabel}>{PRODUCT_CATEGORY_DISPLAY_UI.LABEL_FIELD}</Text>
+          <TextInput
+            style={styles.input}
+            value={label}
+            onChangeText={setLabel}
+            placeholder={PRODUCT_CATEGORY_DISPLAY_UI.LABEL_PLACEHOLDER(defaultLabel)}
+            maxLength={120}
+          />
+          <Text style={styles.hint}>{PRODUCT_CATEGORY_DISPLAY_UI.FEED_LABEL_HINT}</Text>
 
-            <ImageUrlUploadField
-              label={PRODUCT_CATEGORY_DISPLAY_UI.IMAGE_FIELD}
-              value={imageUrl}
-              onChange={setImageUrl}
-            />
+          <ImageUrlUploadField
+            label={PRODUCT_CATEGORY_DISPLAY_UI.IMAGE_FIELD}
+            value={imageUrl}
+            onChange={setImageUrl}
+            onInteractionBusyChange={setIsImageFieldBusy}
+          />
 
-            {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
+          {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
 
-            <View style={styles.actions}>
-              <Pressable
-                style={styles.secondaryButton}
-                onPress={() => void handleReset()}
-                disabled={isSaving}
-              >
-                <Text style={styles.secondaryButtonText}>
-                  {PRODUCT_CATEGORY_DISPLAY_UI.RESET_BUTTON}
-                </Text>
-              </Pressable>
-              <Pressable
-                style={styles.primaryButton}
-                onPress={() => void handleSubmit()}
-                disabled={isSaving}
-              >
-                {isSaving ? (
-                  <ActivityIndicator color={theme.colors.onContrast} />
-                ) : (
-                  <Text style={styles.primaryButtonText}>
-                    {PRODUCT_CATEGORY_DISPLAY_UI.SAVE_BUTTON}
-                  </Text>
-                )}
-              </Pressable>
-            </View>
-
-            <Pressable onPress={handleClose} style={styles.closeLink}>
-              <Text style={styles.closeLinkText}>
-                {PRODUCT_CATEGORY_DISPLAY_UI.CLOSE_ARIA}
+          <View style={styles.actions}>
+            <Pressable
+              style={styles.secondaryButton}
+              onPress={() => void handleReset()}
+              disabled={isSaving}
+            >
+              <Text style={styles.secondaryButtonText}>
+                {PRODUCT_CATEGORY_DISPLAY_UI.RESET_BUTTON}
               </Text>
             </Pressable>
+            <Pressable
+              style={styles.primaryButton}
+              onPress={() => void handleSubmit()}
+              disabled={isSaving}
+            >
+              {isSaving ? (
+                <ActivityIndicator color={theme.colors.onContrast} />
+              ) : (
+                <Text style={styles.primaryButtonText}>
+                  {PRODUCT_CATEGORY_DISPLAY_UI.SAVE_BUTTON}
+                </Text>
+              )}
+            </Pressable>
           </View>
-        </ScrollView>
-      </View>
-    </Modal>
+
+          <Pressable onPress={handleClose} style={styles.closeLink}>
+            <Text style={styles.closeLinkText}>{PRODUCT_CATEGORY_DISPLAY_UI.CLOSE_ARIA}</Text>
+          </Pressable>
+        </>
+      ) : null}
+    </AdminEditModalShell>
   );
 };

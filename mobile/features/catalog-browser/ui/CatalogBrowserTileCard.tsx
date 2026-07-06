@@ -60,7 +60,12 @@ export const CatalogBrowserTileCard = ({
         accessibilityRole="button"
         accessibilityLabel={label}
       >
-        <Image source={{ uri: resolvedImageUrl }} style={styles.image} contentFit="cover" />
+        <Image
+          source={{ uri: resolvedImageUrl }}
+          style={styles.image}
+          contentFit="cover"
+          recyclingKey={resolvedImageUrl}
+        />
         <View style={styles.labelSlot} pointerEvents="none">
           <Text style={styles.label} numberOfLines={2}>
             {label}

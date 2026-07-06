@@ -13,6 +13,10 @@ const gallerySource = readFileSync(
   join(root, "features/image-upload/lib/pickGalleryImageAsset.ts"),
   "utf8",
 );
+const pickerOptionsSource = readFileSync(
+  join(root, "features/image-upload/lib/imagePickerGalleryOptions.ts"),
+  "utf8",
+);
 const profileSource = readFileSync(
   join(root, "features/image-upload/lib/pickProfileImageAsset.ts"),
   "utf8",
@@ -23,7 +27,10 @@ assert.match(prepareSource, /image\/heic/);
 assert.match(prepareSource, /image\/heif/);
 assert.match(prepareSource, /\.heic/);
 assert.match(gallerySource, /prepareImageAssetForUpload/);
+assert.match(gallerySource, /IMAGE_PICKER_GALLERY_OPTIONS/);
 assert.match(profileSource, /prepareImageAssetForUpload/);
+assert.match(profileSource, /IMAGE_PICKER_GALLERY_OPTIONS/);
+assert.match(pickerOptionsSource, /Compatible/);
 assert.doesNotMatch(gallerySource, /image\/heic.*image\/jpeg/s);
 
 console.log("image-upload-heic-parity.test.mjs: ok");

@@ -26,7 +26,7 @@
   margin: 0;
 }
 
-@media (min-width: 641px) {
+@container app-viewport (min-width: 641px) {
   .product-details-modal__price-display .product-price-display__current {
     font-size: calc(1.08rem * 3);
     line-height: 1.1;
@@ -50,7 +50,7 @@
 }
 
 /* Совпадает с APP_SHELL_MOBILE_NAV_BREAKPOINT_PX (640px): бейджи только на мобиле. */
-@media (min-width: 641px) {
+@container app-viewport (min-width: 641px) {
   .product-details-modal .product-details-modal__price-badge-row {
     display: none;
   }

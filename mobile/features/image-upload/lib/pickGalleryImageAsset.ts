@@ -3,6 +3,7 @@ import * as ImagePicker from "expo-image-picker";
 import type { UploadImageFilePayload } from "@/entities/upload/api/uploadImage";
 import { IMAGE_UPLOAD_UI } from "@/shared/config";
 
+import { IMAGE_PICKER_GALLERY_OPTIONS } from "./imagePickerGalleryOptions";
 import { prepareImageAssetForUpload } from "./prepareImageAssetForUpload";
 
 const ensureLibraryPermission = async (): Promise<void> => {
@@ -15,11 +16,7 @@ const ensureLibraryPermission = async (): Promise<void> => {
 export const pickGalleryImageAsset = async (): Promise<UploadImageFilePayload | null> => {
   await ensureLibraryPermission();
 
-  const result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ["images"],
-    allowsEditing: false,
-    quality: 0.9,
-  });
+  const result = await ImagePicker.launchImageLibraryAsync(IMAGE_PICKER_GALLERY_OPTIONS);
 
   if (result.canceled || !result.assets[0]) {
     return null;
@@ -34,12 +31,10 @@ export const pickGalleryImageAssets = async (
   await ensureLibraryPermission();
 
   const result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ["images"],
-    allowsEditing: false,
+    ...IMAGE_PICKER_GALLERY_OPTIONS,
     allowsMultipleSelection: true,
     orderedSelection: true,
     selectionLimit,
-    quality: 0.9,
   });
 
   if (result.canceled || result.assets.length === 0) {

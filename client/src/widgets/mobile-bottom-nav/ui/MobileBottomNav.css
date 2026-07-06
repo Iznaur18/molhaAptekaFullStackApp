@@ -1,4 +1,4 @@
-@media (max-width: 40rem) {
+@container app-viewport (max-width: 40rem) {
   body:has(.product-details-modal) .mobile-bottom-nav {
     display: none;
   }
@@ -10,13 +10,13 @@
   --mobile-bottom-nav-float-offset: 0.625rem;
 
   position: fixed;
-  left: max(
-    var(--mobile-bottom-nav-horizontal-inset),
-    env(safe-area-inset-left, 0px)
+  left: calc(
+    var(--app-viewport-side-inset, 0px) +
+      max(var(--mobile-bottom-nav-horizontal-inset), env(safe-area-inset-left, 0px))
   );
-  right: max(
-    var(--mobile-bottom-nav-horizontal-inset),
-    env(safe-area-inset-right, 0px)
+  right: calc(
+    var(--app-viewport-side-inset, 0px) +
+      max(var(--mobile-bottom-nav-horizontal-inset), env(safe-area-inset-right, 0px))
   );
   bottom: calc(
     var(--mobile-bottom-nav-float-offset) + env(safe-area-inset-bottom, 0px)

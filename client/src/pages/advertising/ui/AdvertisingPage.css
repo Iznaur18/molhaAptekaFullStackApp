@@ -378,7 +378,7 @@
   background: var(--iz-color-danger-strong);
 }
 
-@media (min-width: 640px) {
+@container app-viewport (min-width: 640px) {
   .advertising-page__cards {
     gap: 1.15rem;
   }

@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { PRODUCT_CATEGORY_VALUES } from "./productWrite.js";
 import { mongoIdSchema } from "./mongoId.js";
 /** Синхрон с `server/constants/productCategoryTreeConstants.js`. */
 export const PRODUCT_CATEGORY_SLUG_MAX_LENGTH = 80;
@@ -33,6 +34,13 @@ const searchKeywordsFieldSchema = z
 
 export const productCategorySlugParamsSchema = z.object({
   categorySlug: categorySlugFieldSchema,
+});
+
+const legacyProductCategorySlugEnumSchema = z.enum(PRODUCT_CATEGORY_VALUES);
+
+/** PATCH /product/category-displays/:categorySlug — tree slug или legacy enum. */
+export const productCategoryDisplaySlugParamsSchema = z.object({
+  categorySlug: z.union([categorySlugFieldSchema, legacyProductCategorySlugEnumSchema]),
 });
 
 export const productCategoryIdParamsSchema = z.object({

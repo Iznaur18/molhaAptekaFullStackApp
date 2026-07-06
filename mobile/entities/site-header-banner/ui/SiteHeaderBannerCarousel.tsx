@@ -1,8 +1,8 @@
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   FlatList,
-  Image,
   Linking,
   Pressable,
   View,
@@ -76,6 +76,17 @@ export const SiteHeaderBannerCarousel = ({
     listRef.current?.scrollToOffset({ offset: 0, animated: false });
   }, [slides.length, viewportWidth]);
 
+  // Прогреваем memory-disk кеш expo-image, чтобы возврат на ленту показывал
+  // баннер мгновенно, без повторной загрузки картинки.
+  useEffect(() => {
+    const uris = slides
+      .map((slide) => resolveUploadedMediaUrl(slide.imageUrl))
+      .filter((uri): uri is string => Boolean(uri));
+    if (uris.length > 0) {
+      void Image.prefetch(uris, { cachePolicy: "memory-disk" });
+    }
+  }, [slides]);
+
   useEffect(() => {
     if (slides.length <= 1 || isPaused || stride <= 0) {
       return undefined;
@@ -132,7 +143,9 @@ export const SiteHeaderBannerCarousel = ({
         source={{ uri: imageUri }}
         style={styles.image}
         accessibilityLabel={slide.imageAlt}
-        resizeMode="cover"
+        contentFit="cover"
+        cachePolicy="memory-disk"
+        transition={200}
       />
     );
 

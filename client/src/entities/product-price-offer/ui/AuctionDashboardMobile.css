@@ -1,4 +1,4 @@
-@media (max-width: 640px) {
+@container app-viewport (max-width: 640px) {
   .auction-dashboard-row__composer-submit {
     padding-inline: 0.65rem;
     font-size: 0.78rem;

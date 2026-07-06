@@ -8,11 +8,14 @@ body,
   touch-action: manipulation;
 }
 
-html {
-  scrollbar-gutter: stable;
-}
-
 :root {
+  --app-viewport-max-width: 430px;
+  --app-viewport-effective-width: min(var(--app-viewport-max-width), 100vw);
+  --app-viewport-side-inset: max(
+    0px,
+    calc((100vw - var(--app-viewport-effective-width)) / 2)
+  );
+
   font-family: var(--iz-font-family);
   line-height: var(--iz-line-height);
   font-weight: var(--iz-font-weight);
@@ -20,6 +23,25 @@ html {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scrollbar-gutter: stable;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--app-viewport-max-width);
+  margin-inline: auto;
+  container-type: inline-size;
+  container-name: app-viewport;
+  min-height: 100%;
+}
+
+@media (min-width: 431px) {
+  html {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--iz-color-border) 80%, transparent),
+      0 12px 48px -12px color-mix(in srgb, var(--iz-color-ink) 14%, transparent);
+  }
 }
 
 body {

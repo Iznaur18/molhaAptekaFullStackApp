@@ -1,7 +1,11 @@
-import ProductCategoryDisplayModel from "../../models/ProductCategoryDisplayModel.js";
 import ProductCategoryModel from "../../models/ProductCategoryModel.js";
 import { deleteUploadFileByUrl } from "../../services/upload/deleteUploadFileByUrl.js";
+import {
+  resolveProductCategoryDisplayPatchTarget,
+  upsertProductCategoryDisplay,
+} from "../../services/product/productCategoryDisplayPatch.js";
 import { errorRes, successRes } from "../../services/http/index.js";
+import ProductCategoryDisplayModel from "../../models/ProductCategoryDisplayModel.js";
 
 /**
  * @param {import('mongoose').Document | Record<string, unknown> | null | undefined} row
@@ -70,48 +74,47 @@ const buildCategoryDisplayUpdate = async (existing, body, userId) => {
 
 /** GET /product/category-displays — публичные переопределения подписи/картинки категорий. */
 export async function getProductCategoryDisplaysController(_req, res) {
-const rows = await ProductCategoryDisplayModel.find().lean();
-    successRes(res, {
-      displays: rows.map(toCategoryDisplayPayload),
-    });
+  const rows = await ProductCategoryDisplayModel.find().lean();
+  successRes(res, {
+    displays: rows.map(toCategoryDisplayPayload),
+  });
 }
 
 /** PATCH /product/category-displays/:categorySlug — только admin. */
 export async function patchProductCategoryDisplayController(req, res) {
-const categorySlug = String(req.params.categorySlug ?? "").trim();
-    const existing = await ProductCategoryDisplayModel.findOne({ categorySlug }).lean();
-    const update = await buildCategoryDisplayUpdate(existing, req.body, req.userId);
+  const categorySlug = String(req.params.categorySlug ?? "").trim();
+  const target = await resolveProductCategoryDisplayPatchTarget({ categorySlug });
+  const update = await buildCategoryDisplayUpdate(target.existing, req.body, req.userId);
 
-    const saved = await ProductCategoryDisplayModel.findOneAndUpdate(
-      { categorySlug },
-      { $set: { categorySlug, ...update } },
-      { upsert: true, returnDocument: "after", runValidators: true },
-    ).lean();
+  const saved = await upsertProductCategoryDisplay({
+    categorySlug,
+    categoryId: target.categoryId,
+    update,
+  });
 
-    successRes(res, {
-      display: toCategoryDisplayPayload(saved),
-    });
+  successRes(res, {
+    display: toCategoryDisplayPayload(saved),
+  });
 }
 
 /** PATCH /product/category-node-displays/:categoryId — только admin. */
 export async function patchProductCategoryNodeDisplayController(req, res) {
-const categoryId = String(req.params.categoryId ?? "").trim();
-    const categoryExists = await ProductCategoryModel.exists({ _id: categoryId });
+  const categoryId = String(req.params.categoryId ?? "").trim();
+  const categoryExists = await ProductCategoryModel.exists({ _id: categoryId });
 
-    if (!categoryExists) {
-      return errorRes(res, 404, "Категория не найдена");
-    }
+  if (!categoryExists) {
+    return errorRes(res, 404, "Категория не найдена");
+  }
 
-    const existing = await ProductCategoryDisplayModel.findOne({ categoryId }).lean();
-    const update = await buildCategoryDisplayUpdate(existing, req.body, req.userId);
+  const target = await resolveProductCategoryDisplayPatchTarget({ categoryId });
+  const update = await buildCategoryDisplayUpdate(target.existing, req.body, req.userId);
 
-    const saved = await ProductCategoryDisplayModel.findOneAndUpdate(
-      { categoryId },
-      { $set: { categoryId, ...update } },
-      { upsert: true, returnDocument: "after", runValidators: true },
-    ).lean();
+  const saved = await upsertProductCategoryDisplay({
+    categoryId,
+    update,
+  });
 
-    successRes(res, {
-      display: toCategoryDisplayPayload(saved),
-    });
+  successRes(res, {
+    display: toCategoryDisplayPayload(saved),
+  });
 }

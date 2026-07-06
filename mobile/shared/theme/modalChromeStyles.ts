@@ -31,6 +31,12 @@ export const REPORT_PRODUCT_MODAL_ANIMATION = {
   sheetRestOffsetRatio: 0.4,
 } as const;
 
+export const ADMIN_EDIT_MODAL_ANIMATION = {
+  enterMs: 280,
+  exitMs: 220,
+  sheetSlideDistance: 360,
+} as const;
+
 export const useBottomSheetReportModalStyles = createThemedStyles((theme) => ({
   root: {
     flex: 1,
@@ -460,6 +466,17 @@ export const useStoryViewerModalStyles = createThemedStyles((theme) => ({
 }));
 
 export const useAdminEditModalStyles = createThemedStyles((theme) => ({
+  root: {
+    flex: 1,
+    justifyContent: "flex-end",
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: MODAL_BACKDROP_SCRIM,
+  },
+  sheet: {
+    maxHeight: "92%",
+  },
   overlay: {
     flex: 1,
     backgroundColor: MODAL_BACKDROP_SCRIM,
@@ -470,7 +487,6 @@ export const useAdminEditModalStyles = createThemedStyles((theme) => ({
     justifyContent: "flex-end",
   },
   card: {
-    maxHeight: "92%",
     borderTopLeftRadius: theme.radius.md,
     borderTopRightRadius: theme.radius.md,
     padding: 20,

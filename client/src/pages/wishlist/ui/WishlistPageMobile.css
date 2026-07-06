@@ -1,4 +1,4 @@
-@media (max-width: 640px) {
+@container app-viewport (max-width: 640px) {
   .wishlist-page {
     --profile-queue-list-gap: 1.15rem;
   }

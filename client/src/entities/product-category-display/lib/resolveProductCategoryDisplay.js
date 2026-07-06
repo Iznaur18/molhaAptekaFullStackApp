@@ -22,12 +22,44 @@ export function mapCategoryDisplaysBySlug(displays) {
 }
 
 /**
+ * @param {import('./types.js').ProductCategoryDisplayFromApi[]} displays
+ * @returns {Map<string, import('./types.js').ProductCategoryDisplayFromApi>}
+ */
+export function mapCategoryDisplaysById(displays) {
+  /** @type {Map<string, import('./types.js').ProductCategoryDisplayFromApi>} */
+  const map = new Map();
+
+  for (const row of displays) {
+    if (typeof row.categoryId === "string" && row.categoryId.trim()) {
+      map.set(row.categoryId.trim(), row);
+    }
+  }
+
+  return map;
+}
+
+/**
  * @param {string} categorySlug
  * @param {Map<string, import('./types.js').ProductCategoryDisplayFromApi>} overridesBySlug
+ * @param {Map<string, import('./types.js').ProductCategoryDisplayFromApi>} overridesById
+ * @param {string | null} categoryId
  * @param {string} fallbackLabel
  */
-function resolveCatalogCategoryDisplayFields(categorySlug, overridesBySlug, fallbackLabel) {
-  const override = overridesBySlug.get(categorySlug);
+function resolveCatalogCategoryDisplayFields(
+  categorySlug,
+  overridesBySlug,
+  overridesById,
+  categoryId,
+  fallbackLabel,
+  legacySlug = null,
+) {
+  const overrideById = categoryId ? overridesById.get(categoryId) : undefined;
+  const overrideBySlug =
+    overridesBySlug.get(categorySlug) ??
+    (legacySlug && legacySlug !== categorySlug
+      ? overridesBySlug.get(legacySlug)
+      : undefined);
+  const override = overrideById ?? overrideBySlug;
   const customLabel =
     typeof override?.customLabel === "string" && override.customLabel.trim()
       ? override.customLabel.trim()
@@ -53,11 +85,14 @@ export function resolveProductCategoryDisplay(categorySlug, overridesBySlug) {
   const fields = resolveCatalogCategoryDisplayFields(
     categorySlug,
     overridesBySlug ?? new Map(),
+    new Map(),
+    null,
     PRODUCT_CATEGORY_LABEL_RU[categorySlug] ?? categorySlug,
   );
 
   return {
     categorySlug,
+    displaySlug: categorySlug,
     ...fields,
   };
 }
@@ -83,6 +118,7 @@ function findRootForLegacySlug(roots, legacySlug) {
  */
 export function buildResolvedProductCategoryDisplaysFromRoots(roots, displays) {
   const overridesBySlug = mapCategoryDisplaysBySlug(displays);
+  const overridesById = mapCategoryDisplaysById(displays);
   const matchedRootIds = new Set();
   /** @type {import('./types.js').ResolvedProductCategoryDisplay[]} */
   const items = [];
@@ -97,12 +133,16 @@ export function buildResolvedProductCategoryDisplaysFromRoots(roots, displays) {
     const fields = resolveCatalogCategoryDisplayFields(
       displaySlug,
       overridesBySlug,
+      overridesById,
+      root?.id ?? null,
       root?.labelRu ?? PRODUCT_CATEGORY_LABEL_RU[legacySlug] ?? legacySlug,
+      legacySlug,
     );
 
     items.push({
       categoryId: root?.id ?? null,
       categorySlug: legacySlug,
+      displaySlug,
       ...fields,
     });
   }
@@ -115,12 +155,15 @@ export function buildResolvedProductCategoryDisplaysFromRoots(roots, displays) {
     const fields = resolveCatalogCategoryDisplayFields(
       root.slug,
       overridesBySlug,
+      overridesById,
+      root.id,
       root.labelRu ?? root.slug,
     );
 
     items.push({
       categoryId: root.id,
       categorySlug: root.slug,
+      displaySlug: root.slug,
       ...fields,
     });
   }

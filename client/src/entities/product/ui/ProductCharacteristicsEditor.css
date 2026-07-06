@@ -107,7 +107,7 @@
   cursor: not-allowed;
 }
 
-@media (max-width: 560px) {
+@container app-viewport (max-width: 560px) {
   .product-characteristics-editor__row {
     grid-template-columns: minmax(0, 1fr) auto;
     grid-template-rows: auto auto;

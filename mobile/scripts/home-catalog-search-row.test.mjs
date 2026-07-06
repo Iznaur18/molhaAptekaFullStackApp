@@ -44,8 +44,51 @@ test("home catalog header panel matches web mobile-split chrome", () => {
   assert.match(styles, /borderBottomLeftRadius: HOME_CATALOG_HEADER_PANEL_RADIUS/);
   assert.match(searchRow, /resolveHomeCatalogHeaderPanelPaddingTop/);
   assert.match(layout, /HOME_CATALOG_HEADER_PANEL_TOP_GAP = 0/);
-  assert.match(layout, /HOME_CATALOG_HEADER_PANEL_HORIZONTAL_INSET = 0/);
+  assert.match(layout, /horizontal: HOME_CATALOG_HEADER_SHELL_HORIZONTAL_INSET/);
+  assert.match(
+    layout,
+    /HOME_CATALOG_HEADER_CIRCLE_BUTTON_SIZE =\s*\n\s*HOME_CATALOG_HEADER_SEARCH_INPUT_MIN_HEIGHT/,
+  );
   assert.doesNotMatch(searchRow, /marginHorizontal/);
   assert.match(layout, /HOME_CATALOG_HEADER_PANEL_BLUR_RADIUS = 18/);
   assert.match(layout, /HOME_CATALOG_HEADER_BOTTOM_MARGIN = 0/);
+});
+
+test("HomeCatalogUsersButton opens stretch menu from circle", () => {
+  const button = readMobileFile("features/home-feed/ui/HomeCatalogUsersButton.tsx");
+  const menu = readMobileFile("features/home-feed/ui/HomeCatalogUsersStretchMenu.tsx");
+  const animation = readMobileFile(
+    "features/home-feed/model/useHomeCatalogUsersStretchMenuAnimation.ts",
+  );
+  const items = readMobileFile("features/home-feed/lib/buildHomeCatalogUsersMenuItems.ts");
+  const layout = readMobileFile("shared/lib/homeCatalogHeaderLayout.ts");
+  const styles = readMobileFile("shared/theme/homeCatalogHeaderStyles.ts");
+
+  assert.match(button, /HomeCatalogUsersStretchMenu/);
+  assert.match(button, /handleToggleMenu/);
+  assert.doesNotMatch(button, /measureInWindow/);
+  assert.doesNotMatch(button, /Modal/);
+  assert.doesNotMatch(button, /onPress=\{\(\) => router\.push\("\/users"/);
+
+  assert.match(menu, /usersStretchShell/);
+  assert.match(menu, /name="visibility"/);
+  assert.match(menu, /accessibilityRole="menu"/);
+  assert.match(menu, /MaterialIcons/);
+  assert.match(menu, /accessibilityLabel=\{item\.accessibilityLabel\}/);
+
+  assert.match(animation, /interpolateColor/);
+  assert.match(animation, /resolveHomeCatalogUsersStretchMenuHeight/);
+
+  assert.match(layout, /HOME_CATALOG_HEADER_USERS_STRETCH_TOGGLE_GAP/);
+  assert.match(styles, /marginTop: HOME_CATALOG_HEADER_USERS_STRETCH_TOGGLE_GAP/);
+  assert.match(styles, /usersStretchShell/);
+  assert.match(menu, /Modal/);
+  assert.match(menu, /measureInWindow/);
+  assert.match(menu, /usersStretchShellPortal/);
+  assert.match(styles, /usersMenuPortalBackdrop/);
+
+  assert.match(items, /icon: "people"/);
+  assert.match(items, /placeholder-1/);
+  assert.match(items, /help-outline/);
+  assert.match(items, /MENU_ITEM_USERS_ARIA/);
 });

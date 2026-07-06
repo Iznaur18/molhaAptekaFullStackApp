@@ -105,6 +105,7 @@ export { addressSuggestBodySchema } from "./addressSuggest.js";
 export { adminCatalogDisplayPatchBodySchema } from "./adminDisplay.js";
 export {
   productCategorySlugParamsSchema,
+  productCategoryDisplaySlugParamsSchema,
   productCategoryIdParamsSchema,
   createProductCategoryAdminBodySchema,
   deleteProductCategoryAdminBodySchema,

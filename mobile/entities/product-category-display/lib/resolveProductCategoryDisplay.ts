@@ -19,7 +19,10 @@ export type ProductCategoryDisplayFromApi = {
 
 export type ResolvedProductCategoryDisplay = {
   categoryId: string | null;
+  /** Legacy / navigation slug (PRODUCT_CATEGORIES slot). */
   categorySlug: string;
+  /** Ключ PATCH /product/category-displays/:slug — совпадает с lookup override. */
+  displaySlug: string;
   label: string;
   imageUrl: string | null;
   isCustomLabel: boolean;
@@ -35,12 +38,35 @@ const mapCategoryDisplaysBySlug = (
       .map((row) => [String(row.categorySlug).trim(), row]),
   );
 
+const mapCategoryDisplaysById = (
+  displays: ProductCategoryDisplayFromApi[],
+): Map<string, ProductCategoryDisplayFromApi> => {
+  const map = new Map<string, ProductCategoryDisplayFromApi>();
+
+  for (const row of displays) {
+    if (typeof row.categoryId === "string" && row.categoryId.trim()) {
+      map.set(row.categoryId.trim(), row);
+    }
+  }
+
+  return map;
+};
+
 const resolveCatalogCategoryDisplayFields = (
   categorySlug: string,
   overridesBySlug: Map<string, ProductCategoryDisplayFromApi>,
+  overridesById: Map<string, ProductCategoryDisplayFromApi>,
+  categoryId: string | null,
   fallbackLabel: string,
+  legacySlug: string | null = null,
 ) => {
-  const override = overridesBySlug.get(categorySlug);
+  const overrideById = categoryId ? overridesById.get(categoryId) : undefined;
+  const overrideBySlug =
+    overridesBySlug.get(categorySlug) ??
+    (legacySlug && legacySlug !== categorySlug
+      ? overridesBySlug.get(legacySlug)
+      : undefined);
+  const override = overrideById ?? overrideBySlug;
   const customLabel =
     typeof override?.customLabel === "string" && override.customLabel.trim()
       ? override.customLabel.trim()
@@ -71,6 +97,7 @@ export const buildResolvedProductCategoryDisplaysFromRoots = (
   displays: ProductCategoryDisplayFromApi[],
 ): ResolvedProductCategoryDisplay[] => {
   const overridesBySlug = mapCategoryDisplaysBySlug(displays);
+  const overridesById = mapCategoryDisplaysById(displays);
   const matchedRootIds = new Set<string>();
   const items: ResolvedProductCategoryDisplay[] = [];
 
@@ -84,12 +111,16 @@ export const buildResolvedProductCategoryDisplaysFromRoots = (
     const fields = resolveCatalogCategoryDisplayFields(
       displaySlug,
       overridesBySlug,
+      overridesById,
+      root?.id ?? null,
       root?.labelRu ?? PRODUCT_CATEGORY_LABEL_RU[legacySlug] ?? legacySlug,
+      legacySlug,
     );
 
     items.push({
       categoryId: root?.id ?? null,
       categorySlug: legacySlug,
+      displaySlug,
       ...fields,
     });
   }
@@ -102,12 +133,15 @@ export const buildResolvedProductCategoryDisplaysFromRoots = (
     const fields = resolveCatalogCategoryDisplayFields(
       root.slug,
       overridesBySlug,
+      overridesById,
+      root.id,
       root.labelRu || root.slug,
     );
 
     items.push({
       categoryId: root.id,
       categorySlug: root.slug,
+      displaySlug: root.slug,
       ...fields,
     });
   }

@@ -231,7 +231,7 @@
   border-top-color: var(--iz-color-surface-subtle);
 }
 
-@media (max-width: 903px) {
+@container app-viewport (max-width: 903px) {
   .user-details-modal__backdrop:not(.user-details-modal__backdrop_register) {
     --user-details-modal-mobile-inline-inset: 0.1rem;
 
@@ -264,7 +264,7 @@
   }
 }
 
-@media (max-width: 667px) {
+@container app-viewport (max-width: 667px) {
   .user-details-modal__backdrop:not(.user-details-modal__backdrop_register) {
     --user-details-modal-mobile-inline-inset: 0.05rem;
   }

@@ -147,7 +147,7 @@
   box-shadow: 0 1px 4px color-mix(in srgb, var(--iz-color-warning-bright) 18%, transparent);
 }
 
-@media (max-width: 640px) {
+@container app-viewport (max-width: 640px) {
   .installment-payments-overview {
     grid-template-columns: 1fr;
   }

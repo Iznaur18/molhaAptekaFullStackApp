@@ -1,4 +1,4 @@
-@media (max-width: 640px) {
+@container app-viewport (max-width: 640px) {
   .installment-contract-card--compact {
     gap: 0.55rem;
     padding: 0.75rem;

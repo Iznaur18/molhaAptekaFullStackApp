@@ -277,7 +277,6 @@ router.patch(
   "/category-displays/:categorySlug",
   checkAuthMW,
   checkAdminMW,
-  productCategorySlugParamValidation,
   patchProductCategoryDisplayValidation,
   patchProductCategoryDisplayController,
 );

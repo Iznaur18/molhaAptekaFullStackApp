@@ -32,7 +32,7 @@
   color: var(--color-link-hover, #1d4ed8);
 }
 
-@media (max-width: 640px) {
+@container app-viewport (max-width: 640px) {
   .catalog-city-filter-banner {
     flex-direction: column;
     align-items: flex-start;

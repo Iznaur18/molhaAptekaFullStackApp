@@ -14,7 +14,7 @@
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-@media (min-width: 40rem) {
+@container app-viewport (min-width: 40rem) {
   .product-modal-shell__backdrop:has(.product-promotion-modal) {
     padding-inline: max(0px, calc((100vw - 40rem) / 2));
   }
@@ -367,7 +367,7 @@
   border: 0;
 }
 
-@media (max-width: 480px) {
+@container app-viewport (max-width: 480px) {
   .product-promotion-modal__duration-row {
     grid-template-columns: 1fr;
   }

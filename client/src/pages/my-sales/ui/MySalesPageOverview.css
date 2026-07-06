@@ -114,7 +114,7 @@
   cursor: pointer;
 }
 
-@media (max-width: 640px) {
+@container app-viewport (max-width: 640px) {
   .my-sales-overview {
     grid-template-columns: 1fr;
   }

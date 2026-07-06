@@ -472,7 +472,11 @@ export const MOBILE_BOTTOM_NAV_UI = {
 } as const;
 
 export const HEADER_USERS_BUTTON_UI = {
-  ARIA: "Пользователи",
+  TOGGLE_ARIA: "Действия аккаунта",
+  MENU_ARIA: "Действия аккаунта",
+  MENU_CLOSE_ARIA: "Закрыть меню",
+  MENU_ITEM_USERS_ARIA: "Пользователи",
+  MENU_ITEM_PLACEHOLDER_ARIA: (index: number) => `Пункт ${index} (скоро)`,
 } as const;
 
 export const CURATED_PRODUCT_COMPACT_CARD_UI = {

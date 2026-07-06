@@ -55,13 +55,13 @@
   color: var(--iz-color-warning-brown-dark);
 }
 
-@media (max-width: 720px) {
+@container app-viewport (max-width: 720px) {
   .intro-ad-moderation-overview {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 420px) {
+@container app-viewport (max-width: 420px) {
   .intro-ad-moderation-overview {
     grid-template-columns: 1fr;
   }

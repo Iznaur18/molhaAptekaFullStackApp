@@ -41,7 +41,7 @@
   pointer-events: none;
 }
 
-@media (max-width: 640px) {
+@container app-viewport (max-width: 640px) {
   .raffle-featured-carousel .raffle-featured-banner__info-toggle {
     pointer-events: auto;
     touch-action: manipulation;

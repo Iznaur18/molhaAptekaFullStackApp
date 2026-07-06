@@ -126,7 +126,14 @@ export const ProfileMobileNavSheet = ({
           onPress={onClose}
         />
         <Animated.View
-          style={[styles.sheet, sheetAnimatedStyle, { paddingBottom: Math.max(insets.bottom, 16) }]}
+          style={[
+            styles.sheet,
+            sheetAnimatedStyle,
+            {
+              paddingTop: insets.top,
+              paddingBottom: Math.max(insets.bottom, 16),
+            },
+          ]}
         >
           <ScrollView contentContainerStyle={styles.sheetContent}>
             <ProfileHubMenu

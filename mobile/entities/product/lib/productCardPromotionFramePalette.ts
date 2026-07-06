@@ -37,8 +37,8 @@ export const PRODUCT_CARD_PROMOTION_COMPACT_FRAME: Record<
   [PRODUCT_CARD_PROMOTION_TIER.GOLD]: {
     borderWidth: 2,
     borderColor: "rgba(217, 119, 6, 0.68)",
-    gradientStart: "#fff8e6",
-    gradientEnd: "#fffef8",
+    gradientStart: "#ffffff",
+    gradientEnd: "#ffffff",
     shadowColor: "#d97706",
     shadowOpacity: 0.14,
     shadowRadius: 12,
@@ -102,8 +102,8 @@ export const PRODUCT_CARD_PROMOTION_PREMIUM_COMPACT_FRAME: Record<
   [PRODUCT_CARD_PROMOTION_TIER.GOLD]: {
     borderWidth: 2,
     borderColor: "#d97706",
-    gradientStart: "#fff4d6",
-    gradientEnd: "#fffef5",
+    gradientStart: "#ffffff",
+    gradientEnd: "#ffffff",
     shadowColor: "#d97706",
     shadowOpacity: 0.14,
     shadowRadius: 12,

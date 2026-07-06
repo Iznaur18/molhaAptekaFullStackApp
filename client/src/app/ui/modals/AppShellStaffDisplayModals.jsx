@@ -9,6 +9,7 @@ import { EditProductCategoryNodeDisplayModal } from "../../../entities/product-c
  *   editingCategoryNode: { categoryId: string; fallbackLabel: string } | null;
  *   setEditingCategoryNode: (payload: { categoryId: string; fallbackLabel: string } | null) => void;
  *   categoryDisplays: import('../../../entities/product-category-display/model/types.js').ProductCategoryDisplayFromApi[];
+ *   categoryRoots: import('../../../entities/product-category-tree/model/types.js').ProductCategoryNode[];
  *   handleCategoryDisplaySaved: () => void;
  *   editingFeedTileKey: string | null;
  *   setEditingFeedTileKey: (tileKey: string | null) => void;
@@ -22,6 +23,7 @@ export function AppShellStaffDisplayModals({
   editingCategoryNode,
   setEditingCategoryNode,
   categoryDisplays,
+  categoryRoots,
   handleCategoryDisplaySaved,
   editingFeedTileKey,
   setEditingFeedTileKey,
@@ -33,6 +35,7 @@ export function AppShellStaffDisplayModals({
       <EditProductCategoryDisplayModal
         isOpen={editingCategorySlug != null}
         categorySlug={editingCategorySlug}
+        categoryRoots={categoryRoots}
         displays={categoryDisplays}
         onClose={() => setEditingCategorySlug(null)}
         onSaved={handleCategoryDisplaySaved}

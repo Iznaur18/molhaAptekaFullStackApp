@@ -13,7 +13,7 @@ export const HOME_CATALOG_HEADER_PANEL_TOP_GAP = 0;
 /** Тонкая рамка панели вокруг крупного поля поиска. */
 export const HOME_CATALOG_HEADER_PANEL_PADDING = {
   top: 8,
-  horizontal: 8,
+  horizontal: HOME_CATALOG_HEADER_SHELL_HORIZONTAL_INSET,
   bottom: 8,
 } as const;
 
@@ -74,8 +74,44 @@ export const HOME_CATALOG_HEADER_SEARCH_INPUT_MIN_HEIGHT = 44;
 /** Web `.app-shell__header--v1::before` height. */
 export const HOME_CATALOG_HEADER_ACCENT_HEIGHT = 3;
 
-/** Web `.header-circle-button` `2.25rem`. */
-export const HOME_CATALOG_HEADER_CIRCLE_BUTTON_SIZE = 36;
+/** Круглые кнопки шапки — высота как у поля поиска. */
+export const HOME_CATALOG_HEADER_CIRCLE_BUTTON_SIZE =
+  HOME_CATALOG_HEADER_SEARCH_INPUT_MIN_HEIGHT;
+
+/** Web `.header-circle-button` `border-width: 1px`. */
+export const HOME_CATALOG_HEADER_CIRCLE_BUTTON_BORDER_WIDTH = 1;
+
+/** Stretch-menu: отступ между кнопкой-глазом и первым пунктом. */
+export const HOME_CATALOG_HEADER_USERS_STRETCH_TOGGLE_GAP = 12;
+
+/** Stretch-menu: gap between menu items. */
+export const HOME_CATALOG_HEADER_USERS_STRETCH_ITEM_GAP = 8;
+
+/** Stretch-menu: bottom inset inside blue pill. */
+export const HOME_CATALOG_HEADER_USERS_STRETCH_BOTTOM_PADDING = 8;
+
+export const resolveHomeCatalogUsersStretchMenuHeight = (itemCount: number): number => {
+  if (itemCount <= 0) {
+    return HOME_CATALOG_HEADER_CIRCLE_BUTTON_SIZE;
+  }
+
+  return (
+    HOME_CATALOG_HEADER_CIRCLE_BUTTON_SIZE +
+    HOME_CATALOG_HEADER_USERS_STRETCH_TOGGLE_GAP +
+    itemCount * HOME_CATALOG_HEADER_CIRCLE_BUTTON_SIZE +
+    Math.max(0, itemCount - 1) * HOME_CATALOG_HEADER_USERS_STRETCH_ITEM_GAP +
+    HOME_CATALOG_HEADER_USERS_STRETCH_BOTTOM_PADDING
+  );
+};
+
+/** @deprecated Stretch-menu is anchored in header, not a floating dropdown. */
+export const HOME_CATALOG_HEADER_USERS_MENU_GAP = 4;
+
+/** @deprecated */
+export const HOME_CATALOG_HEADER_USERS_MENU_MIN_WIDTH = HOME_CATALOG_HEADER_CIRCLE_BUTTON_SIZE;
+
+/** @deprecated */
+export const HOME_CATALOG_HEADER_USERS_MENU_BORDER_RADIUS = 8;
 
 /** Кнопки шапки без внешней обводки — паддинг не нужен. */
 export const HOME_CATALOG_HEADER_USERS_PILL_PADDING = 0;

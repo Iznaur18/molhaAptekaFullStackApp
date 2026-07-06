@@ -44,6 +44,17 @@ export const errorHandler = (err, req, res, next) => {
   // Обработка ошибок дубликата уникального ключа MongoDB
   if (err.code === 11000) {
     const field = Object.keys(err.keyPattern || {})[0] || "поле";
+    const isCategoryDisplayDuplicate =
+      err.message?.includes("ProductCategoryDisplay") ||
+      field === "categorySlug" ||
+      field === "categoryId";
+    if (isCategoryDisplayDuplicate) {
+      return errorRes(
+        res,
+        409,
+        "Переопределение отображения для этой категории уже существует. Обновите страницу и повторите.",
+      );
+    }
     return errorRes(res, 409, `Пользователь с таким ${field} уже существует`);
   }
 

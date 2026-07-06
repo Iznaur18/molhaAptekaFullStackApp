@@ -5,6 +5,7 @@ import type { UserSearchListItem } from "@/entities/user/api/fetchUsersSearchPag
 import { UserListRow } from "@/entities/user/ui/UserListRow";
 import { useUsersGridLayout } from "@/features/users-page/model/useUsersGridLayout";
 import { USERS_PAGE_UI } from "@/shared/config";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useUsersPageStyles } from "@/shared/theme/usersPageStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
@@ -32,6 +33,7 @@ export const UsersPageBody = ({
   canRefresh = true,
 }: UsersPageBodyProps) => {
   const styles = useUsersPageStyles();
+  const { contentPaddingBottom } = useScreenLayout();
   const grid = useUsersGridLayout();
 
   if (phase === "loading") {
@@ -64,7 +66,7 @@ export const UsersPageBody = ({
       numColumns={grid.columns}
       keyExtractor={(item) => String(item._id)}
       style={styles.listFlex}
-      contentContainerStyle={[styles.list, { gap: grid.gap }]}
+      contentContainerStyle={[styles.list, { gap: grid.gap, paddingBottom: contentPaddingBottom }]}
       columnWrapperStyle={grid.columns > 1 ? { gap: grid.gap } : undefined}
       refreshControl={
         canRefresh && onRefresh ? (

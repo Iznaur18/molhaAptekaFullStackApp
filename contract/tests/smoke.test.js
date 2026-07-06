@@ -12,6 +12,7 @@ import {
   catalogProductsQuerySchema,
   catalogFeedTileKeyParamsSchema,
   createProductCategoryAdminBodySchema,
+  productCategoryDisplaySlugParamsSchema,
   createProductSearchSynonymBodySchema,
   getMyInstallmentContractsListQuerySchema,
   resolveDataConfirmationBodySchema,
@@ -442,6 +443,20 @@ test("patchMyProductBodySchema rejects empty patch body", () => {
   assert.throws(() => {
     patchMyProductBodySchema.parse({});
   });
+});
+
+test("productCategoryDisplaySlugParamsSchema accepts legacy underscore slugs", () => {
+  const parsed = productCategoryDisplaySlugParamsSchema.parse({
+    categorySlug: "beauty_health",
+  });
+  assert.equal(parsed.categorySlug, "beauty_health");
+});
+
+test("productCategoryDisplaySlugParamsSchema accepts hyphenated tree slugs", () => {
+  const parsed = productCategoryDisplaySlugParamsSchema.parse({
+    categorySlug: "electronics-headphones",
+  });
+  assert.equal(parsed.categorySlug, "electronics-headphones");
 });
 
 test("openapi.yaml documents commerce and auth contract paths", () => {

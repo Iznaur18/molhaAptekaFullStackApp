@@ -12,6 +12,8 @@ const readMobileFile = (relativePath) =>
 test("UsersPage mirrors web: debounced search + split body", () => {
   const source = readMobileFile("features/users-page/ui/UsersPage.tsx");
 
+  assert.match(source, /useScreenLayout/);
+  assert.match(source, /contentPaddingTop/);
   assert.match(source, /useDebouncedValue/);
   assert.match(source, /UsersPageSearchBar/);
   assert.match(source, /UsersPageBody/);
@@ -53,7 +55,8 @@ test("users grid gap matches web breakpoints", () => {
   assert.match(constants, /USERS_GRID_GAP_COMPACT = 10\.4/);
   assert.match(constants, /USERS_GRID_GAP_DEFAULT = 16/);
   assert.match(resolver, /resolveUsersGridGap/);
-  assert.match(body, /contentContainerStyle=\{\[styles\.list, \{ gap: grid\.gap \}\]\}/);
+  assert.match(body, /contentPaddingBottom/);
+  assert.match(body, /contentContainerStyle=\{\[styles\.list, \{ gap: grid\.gap, paddingBottom: contentPaddingBottom \}\]\}/);
   assert.match(body, /columnWrapperStyle=\{grid\.columns > 1 \? \{ gap: grid\.gap \} : undefined\}/);
 });
 

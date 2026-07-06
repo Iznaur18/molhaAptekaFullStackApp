@@ -1,4 +1,4 @@
-@media (max-width: 640px) {
+@container app-viewport (max-width: 640px) {
   .installment-buyer-block {
     gap: 0.65rem;
   }

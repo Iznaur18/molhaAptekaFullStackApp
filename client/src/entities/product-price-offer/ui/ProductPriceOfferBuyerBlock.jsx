@@ -20,13 +20,7 @@ import {
   parseRubPriceInput,
 } from "../../../shared/lib/numericInput.js";
 import { PRODUCT_PRICE_OFFER_UI } from "../../../shared/config/appUiCopy.js";
-import { APP_SHELL_MOBILE_NAV_BREAKPOINT_PX } from "../../../shared/lib/appShellMobileNavConstants.js";
-import {
-  clearPriceOfferPayFlowOpened,
-  isPriceOfferPayFlowOpened,
-  markPriceOfferPayFlowOpened,
-} from "../lib/priceOfferPayFlowStorage.js";
-import { useMaxWidthMediaQuery } from "../../../shared/lib/useMaxWidthMediaQuery.js";
+import { useAppShellCompactLayout } from "../../../shared/lib/useAppShellCompactLayout.js";
 
 import { ProductPriceOfferHintMessage } from "./ProductPriceOfferHintMessage.jsx";
 import { ProductPriceOfferSectionTitle } from "./ProductPriceOfferSectionTitle.jsx";
@@ -73,7 +67,7 @@ export function ProductPriceOfferBuyerBlock({
   const isBusy =
     submitMutation.isPending || patchMutation.isPending || cancelMutation.isPending;
   const isPaying = createOrderMutation.isPending;
-  const isMobileNav = useMaxWidthMediaQuery(APP_SHELL_MOBILE_NAV_BREAKPOINT_PX);
+  const isMobileNav = useAppShellCompactLayout();
   const dockSubmit = isMobileNav;
 
   useEffect(() => {

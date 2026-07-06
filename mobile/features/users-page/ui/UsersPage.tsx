@@ -8,11 +8,13 @@ import { UsersPageBody } from "@/features/users-page/ui/UsersPageBody";
 import { UsersPageSearchBar } from "@/features/users-page/ui/UsersPageSearchBar";
 import { USER_SEARCH_UI } from "@/shared/config";
 import { useDebouncedValue } from "@/shared/lib/useDebouncedValue";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useUsersPageStyles } from "@/shared/theme/usersPageStyles";
 
 export const UsersPage = () => {
   const router = useRouter();
   const styles = useUsersPageStyles();
+  const { contentPaddingTop } = useScreenLayout();
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebouncedValue(searchTerm, USER_SEARCH_UI.DEBOUNCE_MS);
   const isSearchPending = searchTerm !== debouncedSearch;
@@ -31,7 +33,7 @@ export const UsersPage = () => {
   const canRefreshList = !isSearchInputTooShort;
 
   return (
-    <View style={styles.screen}>
+    <View style={[styles.screen, { paddingTop: contentPaddingTop }]}>
       <UsersPageSearchBar
         value={searchTerm}
         onChange={setSearchTerm}

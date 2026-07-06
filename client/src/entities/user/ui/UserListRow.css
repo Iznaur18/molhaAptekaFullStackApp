@@ -190,7 +190,7 @@
   text-overflow: ellipsis;
 }
 
-@media (max-width: 903px) {
+@container app-viewport (max-width: 903px) {
   .user-list-row {
     padding: 0.5rem 0.45rem;
     gap: 0.4rem;
@@ -262,7 +262,7 @@
   }
 }
 
-@media (max-width: 667px) {
+@container app-viewport (max-width: 667px) {
   .user-list-row__avatar {
     width: 3rem;
     height: 3rem;

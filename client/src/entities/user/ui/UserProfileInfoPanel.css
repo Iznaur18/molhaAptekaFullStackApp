@@ -182,13 +182,13 @@
   font-size: 0.82rem;
 }
 
-@media (max-width: 900px) {
+@container app-viewport (max-width: 900px) {
   .user-profile-info__stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 280px) {
+@container app-viewport (max-width: 280px) {
   .user-profile-info__detail-value,
   .user-profile-info__detail-value_positive,
   .user-profile-info__detail-value_negative {

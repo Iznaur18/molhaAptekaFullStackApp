@@ -23,7 +23,7 @@
   margin: 0;
 }
 
-@media (max-width: 640px) {
+@container app-viewport (max-width: 640px) {
   .profile-queue-content-panel,
   .my-sales-page > .my-sales-page__state,
   .my-orders-page > .my-orders-page__state,

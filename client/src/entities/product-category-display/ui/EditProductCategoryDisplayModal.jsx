@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-import { useProductCategoryDisplayMutations } from "../model/useProductCategoryDisplayMutations.js";
-import { resolveProductCategoryDisplay } from "../lib/resolveProductCategoryDisplay.js";
+import { buildResolvedProductCategoryDisplaysFromRoots } from "../lib/resolveProductCategoryDisplay.js";
+import { patchResolvedProductCategoryDisplay } from "../lib/patchResolvedProductCategoryDisplay.js";
 import { PRODUCT_CATEGORY_DISPLAY_UI } from "../../../shared/config/appUiCopy.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import { ImageUrlField } from "../../../shared/ui/ImageUrlField/ImageUrlField.jsx";
@@ -14,6 +14,7 @@ import "./EditProductCategoryDisplayModal.css";
  * @param {{
  *   isOpen: boolean;
  *   categorySlug: import('../../product/model/types.js').ProductCategory | null;
+ *   categoryRoots: import('../../product-category-tree/model/types.js').ProductCategoryNode[];
  *   displays: import('../model/types.js').ProductCategoryDisplayFromApi[];
  *   onClose: () => void;
  *   onSaved: (display: import('../model/types.js').ProductCategoryDisplayFromApi) => void;
@@ -22,34 +23,40 @@ import "./EditProductCategoryDisplayModal.css";
 export function EditProductCategoryDisplayModal({
   isOpen,
   categorySlug,
+  categoryRoots,
   displays,
   onClose,
   onSaved,
 }) {
-  const { patchCategoryMutation } = useProductCategoryDisplayMutations();
-  const [label, setLabel] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const isSaving = patchCategoryMutation.isPending;
+  const [isSaving, setIsSaving] = useState(false);
   const wasOpenRef = useRef(false);
+
+  const resolved = useMemo(() => {
+    if (categorySlug == null) {
+      return null;
+    }
+
+    return (
+      buildResolvedProductCategoryDisplaysFromRoots(categoryRoots, displays).find(
+        (item) => item.categorySlug === categorySlug,
+      ) ?? null
+    );
+  }, [categorySlug, categoryRoots, displays]);
 
   useEffect(() => {
     const didOpen = isOpen && !wasOpenRef.current;
     wasOpenRef.current = isOpen;
 
-    if (!didOpen || !categorySlug) {
+    if (!didOpen || !resolved) {
       return undefined;
     }
 
-    const resolvedItem = resolveProductCategoryDisplay(
-      categorySlug,
-      new Map(displays.map((row) => [row.categorySlug, row])),
-    );
-    setLabel(resolvedItem.isCustomLabel ? resolvedItem.label : "");
-    setImageUrl(resolvedItem.imageUrl ?? "");
+    setLabel(resolved.isCustomLabel ? resolved.label : "");
+    setImageUrl(resolved.imageUrl ?? "");
     setErrorMessage("");
     return undefined;
-  }, [isOpen, categorySlug, displays]);
+  }, [isOpen, resolved]);
 
   useScrollLock(isOpen);
 
@@ -66,17 +73,9 @@ export function EditProductCategoryDisplayModal({
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [isOpen, onClose]);
 
-  const resolved =
-    categorySlug != null
-      ? resolveProductCategoryDisplay(
-          categorySlug,
-          new Map(displays.map((row) => [row.categorySlug, row])),
-        )
-      : null;
-
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!categorySlug) {
+    if (!categorySlug || !resolved) {
       return;
     }
 
@@ -85,14 +84,12 @@ export function EditProductCategoryDisplayModal({
 
       const trimmedLabel = label.trim();
       const trimmedImage = imageUrl.trim();
-      const { display } = await patchCategoryMutation.mutateAsync({
-        categorySlug,
-        body: {
-          customLabel: trimmedLabel || null,
-          imageUrl: trimmedImage || null,
-          resetCustomLabel: trimmedLabel === "" && resolved?.isCustomLabel,
-          resetImageUrl: trimmedImage === "" && resolved?.isCustomImage,
-        },
+      setIsSaving(true);
+      const display = await patchResolvedProductCategoryDisplay(resolved, {
+        customLabel: trimmedLabel || null,
+        imageUrl: trimmedImage || null,
+        resetCustomLabel: trimmedLabel === "" && resolved.isCustomLabel,
+        resetImageUrl: trimmedImage === "" && resolved.isCustomImage,
       });
 
       onSaved(display);
@@ -103,22 +100,22 @@ export function EditProductCategoryDisplayModal({
           ? error.message
           : PRODUCT_CATEGORY_DISPLAY_UI.SAVE_FALLBACK,
       );
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const handleReset = async () => {
-    if (!categorySlug) {
+    if (!categorySlug || !resolved) {
       return;
     }
 
     try {
       setErrorMessage("");
-      const { display } = await patchCategoryMutation.mutateAsync({
-        categorySlug,
-        body: {
-          resetCustomLabel: true,
-          resetImageUrl: true,
-        },
+      setIsSaving(true);
+      const display = await patchResolvedProductCategoryDisplay(resolved, {
+        resetCustomLabel: true,
+        resetImageUrl: true,
       });
       onSaved(display);
       onClose();
@@ -128,6 +125,8 @@ export function EditProductCategoryDisplayModal({
           ? error.message
           : PRODUCT_CATEGORY_DISPLAY_UI.SAVE_FALLBACK,
       );
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -178,12 +177,13 @@ export function EditProductCategoryDisplayModal({
             </span>
           </label>
 
-          <ImageUrlField
-            label={PRODUCT_CATEGORY_DISPLAY_UI.IMAGE_FIELD}
-            value={imageUrl}
-            onChange={setImageUrl}
-            hint={PRODUCT_CATEGORY_DISPLAY_UI.IMAGE_HINT}
-          />
+          <label className="edit-category-display-modal__field">
+            <span>{PRODUCT_CATEGORY_DISPLAY_UI.IMAGE_FIELD}</span>
+            <ImageUrlField value={imageUrl} onChange={setImageUrl} />
+            <span className="edit-category-display-modal__hint">
+              {PRODUCT_CATEGORY_DISPLAY_UI.IMAGE_HINT}
+            </span>
+          </label>
 
           {errorMessage ? (
             <p className="edit-category-display-modal__error" role="alert">

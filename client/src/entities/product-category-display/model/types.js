@@ -13,6 +13,7 @@
  * @typedef {Object} ResolvedProductCategoryDisplay
  * @property {string | null} categoryId
  * @property {string} categorySlug
+ * @property {string} displaySlug
  * @property {string} label
  * @property {string | null} imageUrl
  * @property {boolean} isCustomLabel

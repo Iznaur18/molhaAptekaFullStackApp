@@ -1,6 +1,5 @@
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import {
-  SCREEN_CONTENT_PADDING_BOTTOM,
   SCREEN_CONTENT_PADDING_HORIZONTAL,
 } from "@/shared/theme/screenContentLayout";
 
@@ -16,7 +15,6 @@ export const useUsersPageStyles = createThemedStyles((theme) => ({
   },
   list: {
     paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
-    paddingBottom: SCREEN_CONTENT_PADDING_BOTTOM,
     flexGrow: 1,
   },
   cell: {

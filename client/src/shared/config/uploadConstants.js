@@ -18,7 +18,7 @@ export const UPLOAD_ALLOWED_MIME_TYPES = UPLOAD_IMAGE_MIME_TYPES.filter(
 );
 
 export const UPLOAD_FILE_INPUT_ACCEPT =
-  "image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp";
+  "image/jpeg,image/png,image/webp,image/heic,image/heif,.jpg,.jpeg,.png,.webp,.heic,.heif";
 
 /** iOS при выборе из «Фото» часто перекодирует HEVC — файл в браузере крупнее, чем в галерее. */
 export {

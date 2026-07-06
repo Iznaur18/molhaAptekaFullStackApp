@@ -400,13 +400,13 @@
   color: var(--iz-color-on-contrast);
 }
 
-@media (min-width: 641px) {
+@container app-viewport (min-width: 641px) {
   .raffle-featured-banner__info-panel {
     display: none;
   }
 }
 
-@media (max-width: 640px) {
+@container app-viewport (max-width: 640px) {
   .raffle-featured-banner__inner {
     grid-template-columns: 1fr;
   }
@@ -434,7 +434,7 @@
   }
 }
 
-@media (max-width: 667px) {
+@container app-viewport (max-width: 667px) {
   .raffle-featured-banner__inner {
     --product-card-radius: calc(10px * 1.2);
     --product-card-image-bleed-x: 0.3rem;

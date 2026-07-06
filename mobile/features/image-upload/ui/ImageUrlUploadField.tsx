@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, Text, TextInput, View } from "react-native";
 
 import { useUploadImageMutation } from "@/entities/upload/model/useUploadImageMutation";
@@ -14,6 +14,7 @@ type ImageUrlUploadFieldProps = {
   value: string;
   onChange: (url: string) => void;
   disabled?: boolean;
+  onInteractionBusyChange?: (busy: boolean) => void;
 };
 
 export const ImageUrlUploadField = ({
@@ -21,13 +22,26 @@ export const ImageUrlUploadField = ({
   value,
   onChange,
   disabled = false,
+  onInteractionBusyChange,
 }: ImageUrlUploadFieldProps) => {
   const theme = useAppTheme();
   const styles = useMediaUploadFieldStyles();
   const uploadMutation = useUploadImageMutation();
   const [errorMessage, setErrorMessage] = useState("");
-  const isBusy = uploadMutation.isPending;
+  const [isPicking, setIsPicking] = useState(false);
+  const isBusy = uploadMutation.isPending || isPicking;
   const displayUrl = resolveUploadedMediaUrl(value);
+
+  useEffect(() => {
+    onInteractionBusyChange?.(isBusy);
+  }, [isBusy, onInteractionBusyChange]);
+
+  useEffect(
+    () => () => {
+      onInteractionBusyChange?.(false);
+    },
+    [onInteractionBusyChange],
+  );
 
   const handleUpload = async () => {
     if (disabled || isBusy) {
@@ -35,6 +49,7 @@ export const ImageUrlUploadField = ({
     }
 
     setErrorMessage("");
+    setIsPicking(true);
     try {
       const asset = await pickGalleryImageAsset();
       if (!asset) {
@@ -46,6 +61,8 @@ export const ImageUrlUploadField = ({
       setErrorMessage(
         error instanceof Error ? error.message : IMAGE_UPLOAD_UI.ERROR_GENERIC,
       );
+    } finally {
+      setIsPicking(false);
     }
   };
 

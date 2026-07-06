@@ -23,7 +23,7 @@
   opacity: 0.85;
 }
 
-@media (max-width: 640px) {
+@container app-viewport (max-width: 640px) {
   .my-products-catalog-toolbar {
     flex-wrap: wrap;
     align-items: stretch;

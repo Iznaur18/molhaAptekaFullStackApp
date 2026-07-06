@@ -11,9 +11,7 @@ import {
 } from "../../order/model/constants.js";
 import { useInstallmentMutations } from "../model/useInstallmentMutations.js";
 import { INSTALLMENT_UI } from "../../../shared/config/appUiCopy.js";
-import { APP_SHELL_MOBILE_NAV_BREAKPOINT_PX } from "../../../shared/lib/appShellMobileNavConstants.js";
-import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
-import { useMaxWidthMediaQuery } from "../../../shared/lib/useMaxWidthMediaQuery.js";
+import { useAppShellCompactLayout } from "../../../shared/lib/useAppShellCompactLayout.js";
 import { getProductPurchaseLimit } from "../../product/lib/getProductPurchaseLimit.js";
 
 import "./InstallmentBuyerBlock.css";
@@ -44,7 +42,7 @@ export function InstallmentBuyerBlock({
 }) {
   const { createContractMutation } = useInstallmentMutations();
   const formId = useId();
-  const isMobileNav = useMaxWidthMediaQuery(APP_SHELL_MOBILE_NAV_BREAKPOINT_PX);
+  const isMobileNav = useAppShellCompactLayout();
   const dockSubmit = isMobileNav;
   const [selectedPlanId, setSelectedPlanId] = useState(program.plans[0]?._id ?? "");
   const [quantity, setQuantity] = useState(1);

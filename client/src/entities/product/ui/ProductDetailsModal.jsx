@@ -1,5 +1,4 @@
-import { APP_SHELL_MOBILE_NAV_BREAKPOINT_PX } from "../../../shared/lib/appShellMobileNavConstants.js";
-import { useMaxWidthMediaQuery } from "../../../shared/lib/useMaxWidthMediaQuery.js";
+import { useAppShellCompactLayout } from "../../../shared/lib/useAppShellCompactLayout.js";
 import { useSwipeRightToDismiss } from "../../../shared/lib/useSwipeRightToDismiss.js";
 import { ProductModalShell } from "../../../shared/ui/ProductModalShell/ProductModalShell.jsx";
 import { ProductDetailsModalPurchaseActions } from "./product-details-modal/ProductDetailsModalPurchaseActions.jsx";
@@ -67,7 +66,7 @@ export function ProductDetailsModal({
     onProfileActionBadgesChanged,
   });
 
-  const isMobileNav = useMaxWidthMediaQuery(APP_SHELL_MOBILE_NAV_BREAKPOINT_PX);
+  const isMobileNav = useAppShellCompactLayout();
 
   useSwipeRightToDismiss(isMobileNav ? ctrl.tabPanelRef : ctrl.modalBodyRef, {
     enabled: isOpen && Boolean(product) && isMobileNav,

@@ -28,8 +28,7 @@ import {
   isCatalogHeaderMainView,
 } from "../../shared/lib/homeMainViewPaths.js";
 import { MobileBottomNav } from "../../widgets/mobile-bottom-nav/ui/MobileBottomNav.jsx";
-import { APP_SHELL_MOBILE_NAV_BREAKPOINT_PX } from "../../shared/lib/appShellMobileNavConstants.js";
-import { useMaxWidthMediaQuery } from "../../shared/lib/useMaxWidthMediaQuery.js";
+import { useAppShellCompactLayout } from "../../shared/lib/useAppShellCompactLayout.js";
 import { useScrollLock } from "../../shared/lib/useScrollLock.js";
 import { SearchInput } from "../../shared/ui/SearchInput/SearchInput.jsx";
 import { SiteHeaderBannerCarousel } from "../../entities/site-header-banner/ui/SiteHeaderBannerCarousel.jsx";
@@ -190,7 +189,7 @@ export function AppShellHeader({
 
   const headerViewTitle = isHeaderViewTitleHidden(mainView) ? "" : nonCatalogTitle;
 
-  const isMobileNav = useMaxWidthMediaQuery(APP_SHELL_MOBILE_NAV_BREAKPOINT_PX);
+  const isMobileNav = useAppShellCompactLayout();
   const showSiteHeaderBannerOnViewport = showSiteHeaderBanner && isMobileNav;
   const slidesQuery = useSiteHeaderBannerSlidesQuery({
     enabled: showSiteHeaderBannerOnViewport,

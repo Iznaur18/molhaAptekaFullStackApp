@@ -301,7 +301,7 @@
   align-items: start;
 }
 
-@media (max-width: 560px) {
+@container app-viewport (max-width: 560px) {
   .admin-panel__form-grid,
   .admin-panel__edit-grid {
     grid-template-columns: 1fr;
@@ -363,7 +363,7 @@
   cursor: not-allowed;
 }
 
-@media (max-width: 640px) {
+@container app-viewport (max-width: 640px) {
   .admin-panel__toolbar-search {
     max-width: none;
     flex-basis: 100%;

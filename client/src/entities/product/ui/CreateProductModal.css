@@ -308,7 +308,7 @@
   cursor: not-allowed;
 }
 
-@media (max-width: 520px) {
+@container app-viewport (max-width: 520px) {
   .create-product-modal__price-grid {
     grid-template-columns: 1fr;
   }

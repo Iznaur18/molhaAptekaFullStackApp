@@ -4,13 +4,12 @@ import { categoryDisplayQueryKeys } from "@/shared/api";
 
 import { patchProductCatalogFeedTileDisplay } from "../api/patchProductCatalogFeedTileDisplay";
 import { patchProductCategoryDisplay } from "../api/patchProductCategoryDisplay";
-
-type PatchDisplayBody = {
-  customLabel?: string | null;
-  imageUrl?: string | null;
-  resetCustomLabel?: boolean;
-  resetImageUrl?: boolean;
-};
+import { patchProductCategoryNodeDisplay } from "../api/patchProductCategoryNodeDisplay";
+import {
+  patchResolvedProductCategoryDisplay,
+  type PatchCategoryDisplayBody,
+} from "../lib/patchResolvedProductCategoryDisplay";
+import type { ResolvedProductCategoryDisplay } from "../lib/resolveProductCategoryDisplay";
 
 const invalidateDisplays = (queryClient: ReturnType<typeof useQueryClient>) => {
   void queryClient.invalidateQueries({ queryKey: categoryDisplayQueryKeys.all });
@@ -25,19 +24,43 @@ export const useProductCategoryDisplayMutations = () => {
       body,
     }: {
       categorySlug: string;
-      body: PatchDisplayBody;
+      body: PatchCategoryDisplayBody;
     }) => patchProductCategoryDisplay(categorySlug, body),
     onSuccess: () => invalidateDisplays(queryClient),
   });
 
+  const patchCategoryNodeMutation = useMutation({
+    mutationFn: ({
+      categoryId,
+      body,
+    }: {
+      categoryId: string;
+      body: PatchCategoryDisplayBody;
+    }) => patchProductCategoryNodeDisplay(categoryId, body),
+    onSuccess: () => invalidateDisplays(queryClient),
+  });
+
+  const patchResolvedCategoryMutation = useMutation({
+    mutationFn: ({
+      resolved,
+      body,
+    }: {
+      resolved: Pick<ResolvedProductCategoryDisplay, "categoryId" | "displaySlug">;
+      body: PatchCategoryDisplayBody;
+    }) => patchResolvedProductCategoryDisplay(resolved, body),
+    onSuccess: () => invalidateDisplays(queryClient),
+  });
+
   const patchFeedTileMutation = useMutation({
-    mutationFn: ({ tileKey, body }: { tileKey: string; body: PatchDisplayBody }) =>
+    mutationFn: ({ tileKey, body }: { tileKey: string; body: PatchCategoryDisplayBody }) =>
       patchProductCatalogFeedTileDisplay(tileKey, body),
     onSuccess: () => invalidateDisplays(queryClient),
   });
 
   return {
     patchCategoryMutation,
+    patchCategoryNodeMutation,
+    patchResolvedCategoryMutation,
     patchFeedTileMutation,
   };
 };

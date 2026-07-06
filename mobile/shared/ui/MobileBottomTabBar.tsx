@@ -1,4 +1,4 @@
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import Feather from "@expo/vector-icons/Feather";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { BlurView } from "expo-blur";
 import { usePathname, useRouter } from "expo-router";
@@ -39,7 +39,7 @@ const NAV_PADDING_HORIZONTAL = 8;
 
 type TabItemConfig = {
   routeName: string;
-  icon: keyof typeof MaterialIcons.glyphMap;
+  icon: keyof typeof Feather.glyphMap;
   label: string;
   accessibilityLabel: string;
 };
@@ -59,7 +59,7 @@ const TAB_ITEMS: TabItemConfig[] = [
   },
   {
     routeName: PLACE_PRODUCT_ROUTE,
-    icon: "add",
+    icon: "plus",
     label: MOBILE_BOTTOM_NAV_UI.TAB_PLACE_PRODUCT,
     accessibilityLabel: MOBILE_BOTTOM_NAV_UI.TAB_PLACE_PRODUCT_ARIA,
   },
@@ -71,7 +71,7 @@ const TAB_ITEMS: TabItemConfig[] = [
   },
   {
     routeName: "profile",
-    icon: "person",
+    icon: "user",
     label: MOBILE_BOTTOM_NAV_UI.TAB_PROFILE,
     accessibilityLabel: MOBILE_BOTTOM_NAV_UI.TAB_PROFILE_ARIA,
   },
@@ -254,7 +254,7 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
         style={[styles.item, isFocused && styles.itemActive]}
       >
         <View style={styles.iconWrap}>
-          <MaterialIcons name={item.icon} size={TAB_ICON_SIZE} color={iconColor} />
+          <Feather name={item.icon} size={TAB_ICON_SIZE} color={iconColor} />
           {badge ? (
             <View
               style={styles.badge}

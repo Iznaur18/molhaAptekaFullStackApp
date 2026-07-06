@@ -170,7 +170,7 @@
   background: color-mix(in srgb, var(--iz-color-action) 10%, transparent);
 }
 
-@media (max-width: 560px) {
+@container app-viewport (max-width: 560px) {
   .create-product-section__price-grid {
     grid-template-columns: 1fr;
   }

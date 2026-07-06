@@ -1,4 +1,4 @@
-@media (max-width: 40rem) {
+@container app-viewport (max-width: 40rem) {
   .product-modal-shell__backdrop:has(.product-details-modal) {
     inset: 0;
     align-items: stretch;
