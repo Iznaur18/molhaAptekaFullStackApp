@@ -93,7 +93,7 @@ export const SiteHeaderBannerAdminPage = () => {
           />
         </View>
         <Pressable
-          style={[styles.button, styles.buttonSecondary, isSaving && { opacity: 0.7 }]}
+          style={[styles.button, styles.buttonPrimary, isSaving && { opacity: 0.7 }]}
           disabled={isSaving}
           onPress={() =>
             updateForm({
@@ -102,7 +102,7 @@ export const SiteHeaderBannerAdminPage = () => {
             })
           }
         >
-          <Text style={styles.buttonTextSecondary}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.ADD_ITEM}</Text>
+          <Text style={styles.buttonTextPrimary}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.ADD_ITEM}</Text>
         </Pressable>
       </View>
 

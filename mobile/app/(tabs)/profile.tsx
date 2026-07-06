@@ -1,6 +1,8 @@
+import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
@@ -28,7 +30,7 @@ export default function ProfileScreen() {
   const scrollRef = useRef<ScrollView>(null);
   const styles = useProfileScreenStyles();
   const authStyles = useAuthFormStyles();
-  const { centeredContentStyle, contentPaddingTop, height } = useScreenLayout();
+  const { centeredContentStyle, contentPaddingBottom, profileContentStyle } = useScreenLayout();
   const sessionQuery = useAuthSessionQuery();
   const [emailModalVisible, setEmailModalVisible] = useState(false);
   const [navSheetVisible, setNavSheetVisible] = useState(false);
@@ -36,96 +38,115 @@ export default function ProfileScreen() {
   const user = sessionQuery.data?.user;
   const isLoggedIn = Boolean(user);
   const needsEmailVerification = isLoggedIn && user?.isEmailVerified === false;
+  const isSessionLoading = sessionQuery.isPending && sessionQuery.data === undefined;
 
-  if (sessionQuery.isPending) {
-    return <ScreenLoadingState message={AUTH_UI.SESSION_CHECK} />;
-  }
-
-  if (sessionQuery.isError) {
-    return (
-      <ScreenErrorState
-        message={formatApiErrorMessage(sessionQuery.error, AUTH_UI.SESSION_ERROR)}
-        onRetry={() => sessionQuery.refetch()}
-      />
-    );
-  }
+  useFocusEffect(
+    useCallback(() => {
+      requestAnimationFrame(() => {
+        scrollRef.current?.scrollTo({ y: 0, animated: false });
+      });
+    }, []),
+  );
 
   const handleOverviewPress = () => {
     scrollRef.current?.scrollTo({ y: 0, animated: true });
   };
 
+  if (isSessionLoading) {
+    return (
+      <SafeAreaView edges={["top"]} style={styles.safeArea}>
+        <ScreenLoadingState message={AUTH_UI.SESSION_CHECK} />
+      </SafeAreaView>
+    );
+  }
+
+  if (sessionQuery.isError && sessionQuery.data === undefined) {
+    return (
+      <SafeAreaView edges={["top"]} style={styles.safeArea}>
+        <ScreenErrorState
+          message={formatApiErrorMessage(sessionQuery.error, AUTH_UI.SESSION_ERROR)}
+          onRetry={() => sessionQuery.refetch()}
+        />
+      </SafeAreaView>
+    );
+  }
+
   if (!isLoggedIn) {
     return (
-      <ScrollView
-        contentContainerStyle={[
-          styles.guestContent,
-          { paddingTop: contentPaddingTop, minHeight: height },
-        ]}
-      >
-        <View style={styles.guestInner}>
-          <Text style={styles.title}>{AUTH_UI.PROFILE_TITLE}</Text>
-          <Text style={styles.subtitle}>{AUTH_UI.GUEST_STATUS}</Text>
-          <View style={styles.actions}>
-            <AppButton
-              label={AUTH_UI.LOGIN_BUTTON}
-              variant="primary"
-              style={styles.actionButton}
-              onPress={() => router.push("/(auth)/login")}
-            />
-            <AppButton
-              label={AUTH_UI.REGISTER_BUTTON}
-              variant="secondary"
-              style={[styles.actionButton, authStyles.authSecondaryButton]}
-              onPress={() => router.push("/(auth)/register")}
-            />
+      <SafeAreaView edges={["top"]} style={styles.safeArea}>
+        <ScrollView contentContainerStyle={styles.guestContent}>
+          <View style={styles.guestInner}>
+            <Text style={styles.title}>{AUTH_UI.PROFILE_TITLE}</Text>
+            <Text style={styles.subtitle}>{AUTH_UI.GUEST_STATUS}</Text>
+            <View style={styles.actions}>
+              <AppButton
+                label={AUTH_UI.LOGIN_BUTTON}
+                variant="primary"
+                style={styles.actionButton}
+                onPress={() => router.push("/(auth)/login")}
+              />
+              <AppButton
+                label={AUTH_UI.REGISTER_BUTTON}
+                variant="secondary"
+                style={[styles.actionButton, authStyles.authSecondaryButton]}
+                onPress={() => router.push("/(auth)/register")}
+              />
+            </View>
+            <Pressable style={styles.legalLink} onPress={() => router.push("/legal/privacy")}>
+              <Text style={styles.legalLinkText}>{LEGAL_UI.PRIVACY_LINK}</Text>
+            </Pressable>
           </View>
-          <Pressable style={styles.legalLink} onPress={() => router.push("/legal/privacy")}>
-            <Text style={styles.legalLinkText}>{LEGAL_UI.PRIVACY_LINK}</Text>
-          </Pressable>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </SafeAreaView>
     );
   }
 
   return (
     <>
-      <ScrollView
-        ref={scrollRef}
-        contentContainerStyle={[styles.scrollContent, centeredContentStyle, { paddingTop: contentPaddingTop + 12 }]}
-        refreshControl={
-          <ThemedRefreshControl
-            refreshing={sessionQuery.isRefetching}
-            onRefresh={sessionQuery.refetch}
-          />
-        }
-      >
-        <ProfileMobileSectionToggle
-          activeLabel={MY_PROFILE_PAGE_UI.TAB_OVERVIEW}
-          onPress={() => setNavSheetVisible(true)}
-        />
-
-        {needsEmailVerification ? (
-          <View style={styles.emailBanner}>
-            <Text style={styles.emailBannerText}>{EMAIL_VERIFICATION_UI.BANNER}</Text>
-            <AppButton
-              label={EMAIL_VERIFICATION_UI.OPEN_BUTTON}
-              variant="ghost"
-              onPress={() => setEmailModalVisible(true)}
-              style={styles.emailBannerButton}
+      <SafeAreaView edges={["top"]} style={styles.safeArea}>
+        <ScrollView
+          ref={scrollRef}
+          contentContainerStyle={[
+            styles.scrollContent,
+            centeredContentStyle,
+            profileContentStyle,
+            { paddingBottom: contentPaddingBottom },
+          ]}
+          refreshControl={
+            <ThemedRefreshControl
+              refreshing={sessionQuery.isRefetching}
+              onRefresh={sessionQuery.refetch}
             />
-          </View>
-        ) : null}
+          }
+        >
+          <ProfileMobileSectionToggle
+            activeLabel={MY_PROFILE_PAGE_UI.TAB_OVERVIEW}
+            onPress={() => setNavSheetVisible(true)}
+          />
 
-        <ProfileTabOverviewSection
-          onEditPress={() => router.push({ pathname: "/profile/edit" })}
-        />
+          {needsEmailVerification ? (
+            <View style={styles.emailBanner}>
+              <Text style={styles.emailBannerText}>{EMAIL_VERIFICATION_UI.BANNER}</Text>
+              <AppButton
+                label={EMAIL_VERIFICATION_UI.OPEN_BUTTON}
+                variant="ghost"
+                onPress={() => setEmailModalVisible(true)}
+                style={styles.emailBannerButton}
+              />
+            </View>
+          ) : null}
 
-        <Pressable style={styles.legalLink} onPress={() => router.push("/legal/privacy")}>
-          <Text style={styles.legalLinkText}>{LEGAL_UI.PRIVACY_LINK}</Text>
-        </Pressable>
+          <ProfileTabOverviewSection
+            onEditPress={() => router.push({ pathname: "/profile/edit" })}
+          />
 
-        <ThemePreferenceToggle />
-      </ScrollView>
+          <Pressable style={styles.legalLink} onPress={() => router.push("/legal/privacy")}>
+            <Text style={styles.legalLinkText}>{LEGAL_UI.PRIVACY_LINK}</Text>
+          </Pressable>
+
+          <ThemePreferenceToggle />
+        </ScrollView>
+      </SafeAreaView>
 
       <ProfileMobileNavSheet
         visible={navSheetVisible}

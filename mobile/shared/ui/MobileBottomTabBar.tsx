@@ -30,12 +30,12 @@ const HOME_TAB_ROUTE = "index";
 /** Удержание кнопки «Домой» дольше этого времени запускает повтор интро-ролика. */
 const INTRO_REPLAY_HOLD_MS = 1000;
 
-/** 0.1rem = 1.6px gap между item-ами — паритет с web */
-const NAV_ITEMS_GAP = 1.6;
-/** 0.35rem padding сверху/снизу пилюли — паритет с web */
-const NAV_PADDING_VERTICAL = 5.6;
-/** 0.45rem padding по горизонтали пилюли — паритет с web */
-const NAV_PADDING_HORIZONTAL = 7.2;
+/** Ozon-стиль: плоский бар, табы вплотную. */
+const NAV_ITEMS_GAP = 0;
+/** Вертикальный паддинг плоского бара. */
+const NAV_PADDING_VERTICAL = 4;
+/** Горизонтальный паддинг плоского бара. */
+const NAV_PADDING_HORIZONTAL = 8;
 
 type TabItemConfig = {
   routeName: string;
@@ -83,28 +83,20 @@ const useTabBarStyles = createThemedStyles((theme) => ({
     backgroundColor: "transparent",
     pointerEvents: "box-none",
   },
-  /** Внешний слой: тень + бордер. Без overflow:hidden, чтобы тень не обрезалась на Android */
+  /** Ozon-стиль: плоский бар во всю ширину, отделён тонкой линией сверху. */
   navShadow: {
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: "rgba(17, 24, 39, 0.12)",
-    shadowColor: "#0f172a",
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.10,
-    shadowRadius: 22,
-    elevation: 8,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: "rgba(17, 24, 39, 0.08)",
   },
-  /** BlurView: клипует blur по форме пилюли */
   navBlur: {
-    borderRadius: 999,
     overflow: "hidden",
     paddingVertical: NAV_PADDING_VERTICAL,
     paddingHorizontal: NAV_PADDING_HORIZONTAL,
   },
-  /** Белый слой поверх blur — 92% opacity, паритет с web color-mix(white 92%, transparent) */
+  /** Почти непрозрачный белый слой поверх blur — Ozon-стиль. */
   navOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(255, 255, 255, 0.92)",
+    backgroundColor: "rgba(255, 255, 255, 0.96)",
   },
   navRow: {
     flexDirection: "row",
@@ -115,14 +107,13 @@ const useTabBarStyles = createThemedStyles((theme) => ({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    minHeight: 40,
-    borderRadius: 999,
+    minHeight: 48,
     paddingVertical: 6,
     paddingHorizontal: 4,
   },
-  /** action-bg-active = rgba(31,111,235, 0.10) — паритет с web --iz-color-action-bg-active */
+  /** Ozon-стиль: активный таб показывает только цвет иконки, без подложки. */
   itemActive: {
-    backgroundColor: "rgba(31, 111, 235, 0.10)",
+    backgroundColor: "transparent",
   },
   iconWrap: {
     position: "relative",
@@ -290,7 +281,6 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
         style={[
           styles.shell,
           {
-            paddingBottom: Math.max(insets.bottom, 4),
             paddingHorizontal: resolveMobileBottomNavHorizontalInset(insets),
           },
         ]}
@@ -299,7 +289,11 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
           <BlurView
             intensity={Platform.OS === "web" ? 0 : 85}
             tint="light"
-            style={styles.navBlur}
+            style={[
+              styles.navBlur,
+              // белый бар закрывает нижнюю safe-area целиком (Ozon-стиль)
+              { paddingBottom: NAV_PADDING_VERTICAL + Math.max(insets.bottom, 4) },
+            ]}
           >
             <View style={styles.navOverlay} />
             <View style={styles.navRow}>{items}</View>

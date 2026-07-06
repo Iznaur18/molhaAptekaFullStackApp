@@ -6,6 +6,7 @@ import { EMAIL_VERIFICATION_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useBottomSheetFormStyles, useFormFieldStyles } from "@/shared/theme/formChromeStyles";
 import { AppButton } from "@/shared/ui/AppButton";
+import { ModalSheetGradientBackdrop } from "@/shared/ui/ModalSheetGradientBackdrop";
 
 const CODE_LENGTH = 6;
 
@@ -77,6 +78,7 @@ export const EmailVerificationModal = ({
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={handleClose}>
       <View style={sheetStyles.backdrop}>
+        <ModalSheetGradientBackdrop />
         <View style={[sheetStyles.sheet, sheetStyles.sheetPadding]}>
           <Text style={sheetStyles.title}>{EMAIL_VERIFICATION_UI.MODAL_TITLE}</Text>
           <Text style={sheetStyles.modalText}>{EMAIL_VERIFICATION_UI.MODAL_TEXT(email)}</Text>

@@ -4,12 +4,6 @@ import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentL
 import { cancelButtonStyleBlock } from "@/shared/theme/cancelButtonChromeStyles";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-/** Палитра nav-tone «Реклама» — `profileNavTones.orange` */
-const ADV_ACCENT = "#ea580c";
-const ADV_ACCENT_SOFT = "#ffedd5";
-const ADV_ACCENT_STRONG = "#c2410c";
-const ADV_ACCENT_BORDER = "#fdba74";
-
 const SUCCESS_LIGHT = "#86efac";
 const SUCCESS_SOFT = "#ecfdf5";
 const SUCCESS_STRONG = "#047857";
@@ -45,15 +39,15 @@ export const useAdvertisingPageStyles = createThemedStyles((theme) => ({
     paddingHorizontal: 14.4,
     borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: ADV_ACCENT_BORDER,
-    backgroundColor: ADV_ACCENT_SOFT,
+    borderColor: theme.colors.actionBorder,
+    backgroundColor: theme.colors.actionSoft,
   },
   balanceLabel: {
     fontSize: 12.48,
     fontWeight: "700",
     letterSpacing: 0.64,
     textTransform: "uppercase",
-    color: ADV_ACCENT_STRONG,
+    color: theme.colors.action,
   },
   balanceValue: {
     fontSize: 16.8,
@@ -82,7 +76,7 @@ export const useAdvertisingPageStyles = createThemedStyles((theme) => ({
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 10,
-    backgroundColor: ADV_ACCENT,
+    backgroundColor: theme.colors.action,
   },
   loginButtonText: {
     color: theme.colors.onContrast,
@@ -90,11 +84,6 @@ export const useAdvertisingPageStyles = createThemedStyles((theme) => ({
     fontSize: 15.2,
   },
 }));
-
-const advertisingCardAccent = {
-  borderTopWidth: 3,
-  borderTopColor: ADV_ACCENT,
-} as const;
 
 export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
   ...cancelButtonStyleBlock(theme),
@@ -111,9 +100,18 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
     shadowRadius: 18,
     elevation: 2,
   },
-  cardIntro: advertisingCardAccent,
-  cardCategory: advertisingCardAccent,
-  cardBanner: advertisingCardAccent,
+  cardIntro: {
+    borderTopWidth: 3,
+    borderTopColor: theme.colors.action,
+  },
+  cardCategory: {
+    borderTopWidth: 3,
+    borderTopColor: theme.colors.action,
+  },
+  cardBanner: {
+    borderTopWidth: 3,
+    borderTopColor: theme.colors.action,
+  },
   cardHead: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -131,8 +129,8 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
     paddingVertical: 3.2,
     paddingHorizontal: 8.8,
     borderRadius: 999,
-    backgroundColor: ADV_ACCENT_SOFT,
-    color: ADV_ACCENT_STRONG,
+    backgroundColor: theme.colors.actionSoft,
+    color: theme.colors.action,
     fontSize: 12,
     fontWeight: "700",
     overflow: "hidden",
@@ -167,7 +165,7 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
     fontWeight: "700",
     letterSpacing: 0.8,
     textTransform: "uppercase",
-    color: theme.colors.textMuted,
+    color: theme.colors.action,
   },
   metaValue: {
     fontSize: 14.72,
@@ -271,8 +269,8 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
   },
   tariffSelected: {
-    borderColor: ADV_ACCENT,
-    backgroundColor: ADV_ACCENT_SOFT,
+    borderColor: theme.colors.action,
+    backgroundColor: theme.colors.actionSoft,
   },
   tariffTitle: {
     fontSize: 13.12,
@@ -293,7 +291,7 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 10,
-    backgroundColor: ADV_ACCENT,
+    backgroundColor: theme.colors.action,
   },
   primaryButtonDisabled: {
     opacity: 0.55,
@@ -309,14 +307,14 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
     paddingHorizontal: 16,
     borderRadius: 10,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: ADV_ACCENT_BORDER,
+    borderColor: theme.colors.actionBorder,
     backgroundColor: theme.colors.surface,
   },
   secondaryButtonDisabled: {
     opacity: 0.55,
   },
   secondaryButtonText: {
-    color: ADV_ACCENT_STRONG,
+    color: theme.colors.action,
     fontWeight: "600",
     fontSize: 15.2,
   },

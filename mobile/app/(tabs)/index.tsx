@@ -1,16 +1,21 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, FlatList, Text, View } from "react-native";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ActivityIndicator, Text, View, type FlatList } from "react-native";
+import type Animated from "react-native-reanimated";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useScrollToTop } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 
 import type { CatalogListFilters, CatalogSort } from "@/entities/product/model/catalogListFilters";
 import { useCatalogProductsInfiniteQuery } from "@/entities/product/model/useCatalogProductsInfiniteQuery";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { buildCatalogGridRows } from "@/features/catalog-grid/lib/buildCatalogGridRows";
+import type { CatalogGridRow } from "@/features/catalog-grid/lib/buildCatalogGridRows";
 import { resolveCatalogGridListContentStyle } from "@/features/catalog-grid/lib/catalogGridLayout";
 import { shouldShowCatalogTier3Banners } from "@/features/catalog-grid/lib/shouldShowCatalogTier3Banners";
 import { CatalogGridRowItem } from "@/features/catalog-grid/ui/CatalogGridRowItem";
+import { CatalogGridSkeleton } from "@/features/catalog-grid/ui/CatalogGridSkeleton";
+import { CatalogAnimatedFlatList } from "@/features/catalog-grid/ui/CatalogAnimatedFlatList";
+import { CatalogScrollAnimationProvider } from "@/features/catalog-grid/model/CatalogScrollAnimationContext";
 import { useCatalogBreadcrumbLabel } from "@/features/catalog-filter/model/useCatalogBreadcrumbLabel";
 import { CatalogBreadcrumb } from "@/features/catalog-filter/ui/CatalogBreadcrumb";
 import { consumePendingCatalogFilters } from "@/features/catalog-browser/model/pendingCatalogFilters";
@@ -22,7 +27,6 @@ import {
   EMPTY_HOME_CATALOG_FEED_FILTERS,
   type HomeCatalogFeedFiltersState,
 } from "@/features/home-feed/model/homeCatalogFeedFilters";
-import { useResetHomeCatalogFilters } from "@/features/home-feed/model/useResetHomeCatalogFilters";
 import { HomeFeedHeader } from "@/features/home-feed/ui/HomeFeedHeader";
 import { HomeCatalogSearchRow } from "@/features/home-feed/ui/HomeCatalogSearchRow";
 import { HomeCatalogSiteHeaderBannerRow } from "@/features/home-feed/ui/HomeCatalogSiteHeaderBannerRow";
@@ -57,6 +61,14 @@ export default function CatalogScreen() {
   >(null);
   const [feedFilters, setFeedFilters] = useState<FeedFiltersState>(EMPTY_FEED_FILTERS);
   const [catalogAllCities, setCatalogAllCities] = useState(false);
+  // Пересечение типов: рантайм-реф Reanimated отдаёт внутренний FlatList
+  // (нужен useScrollToTop), а проп ref анимированного списка требует
+  // Animated.FlatList.
+  const catalogListRef = useRef<
+    FlatList<CatalogGridRow> & Animated.FlatList<CatalogGridRow>
+  >(null);
+
+  useScrollToTop(catalogListRef);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -204,23 +216,8 @@ export default function CatalogScreen() {
     }
   };
 
-  const handleResetHomeCatalog = useResetHomeCatalogFilters({
-    setSearchInput,
-    setDebouncedSearch,
-    setSelectedRootSlug,
-    setSelectedSubcategoryId,
-    setSelectedSellerPersonalCategoryId,
-    setFeedFilters,
-    setCatalogAllCities,
-    emptyFeedFilters: EMPTY_FEED_FILTERS,
-  });
-
   const searchRow = (
-    <HomeCatalogSearchRow
-      value={searchInput}
-      onChange={setSearchInput}
-      onBrandPress={handleResetHomeCatalog}
-    />
+    <HomeCatalogSearchRow value={searchInput} onChange={setSearchInput} />
   );
 
   const listHeader = (
@@ -242,12 +239,24 @@ export default function CatalogScreen() {
   );
 
   if (catalogQuery.isPending) {
+    // Та же геометрия, что у загруженного списка (паддинги, gap), плюс
+    // скелетон-плитки вместо спиннера — приход данных не сдвигает вёрстку.
     return (
-      <View style={styles.flex}>
+      <View style={[styles.flex, centeredContentStyle]}>
         {searchRow}
-        {listHeader}
-        <View style={styles.centered}>
-          <ActivityIndicator size="large" />
+        <View
+          style={[
+            styles.listContent,
+            resolveCatalogGridListContentStyle(productGrid.gap),
+            { paddingBottom: contentPaddingBottom },
+          ]}
+        >
+          {listHeader}
+          <CatalogGridSkeleton
+            columns={productGrid.columns}
+            tileWidth={productGrid.tileWidth}
+            gap={productGrid.gap}
+          />
         </View>
       </View>
     );
@@ -267,44 +276,48 @@ export default function CatalogScreen() {
   }
 
   return (
-    <View style={[styles.flex, centeredContentStyle]}>
-      {searchRow}
-      <FlatList
-        key={productGrid.listKey}
-        data={catalogGridRows}
-        keyExtractor={(item) => item.key}
-        numColumns={1}
-        ListHeaderComponent={listHeader}
-        renderItem={({ item }) => (
-          <CatalogGridRowItem
-            row={item}
-            columns={productGrid.columns}
-            gap={productGrid.gap}
-            tileWidth={productGrid.tileWidth}
-          />
-        )}
-        contentContainerStyle={[
-          styles.listContent,
-          resolveCatalogGridListContentStyle(productGrid.gap),
-          { paddingBottom: contentPaddingBottom },
-        ]}
-        style={styles.flex}
-        refreshControl={
-          <ThemedRefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
-        }
-        onEndReached={handleLoadMore}
-        onEndReachedThreshold={0.4}
-        ListEmptyComponent={
-          <View style={styles.centered}>
-            <Text style={styles.empty}>{API_CLIENT_UI.CATALOG_EMPTY}</Text>
-          </View>
-        }
-        ListFooterComponent={
-          catalogQuery.isFetchingNextPage ? (
-            <ActivityIndicator style={styles.footerLoader} />
-          ) : null
-        }
-      />
-    </View>
+    <CatalogScrollAnimationProvider>
+      <View style={[styles.flex, centeredContentStyle]}>
+        {searchRow}
+        <CatalogAnimatedFlatList
+          ref={catalogListRef}
+          key={productGrid.listKey}
+          data={catalogGridRows}
+          keyExtractor={(item) => item.key}
+          numColumns={1}
+          ListHeaderComponent={listHeader}
+          renderItem={({ item, index }) => (
+            <CatalogGridRowItem
+              row={item}
+              columns={productGrid.columns}
+              gap={productGrid.gap}
+              tileWidth={productGrid.tileWidth}
+              rowIndex={index}
+            />
+          )}
+          contentContainerStyle={[
+            styles.listContent,
+            resolveCatalogGridListContentStyle(productGrid.gap),
+            { paddingBottom: contentPaddingBottom },
+          ]}
+          style={styles.flex}
+          refreshControl={
+            <ThemedRefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
+          }
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.4}
+          ListEmptyComponent={
+            <View style={styles.centered}>
+              <Text style={styles.empty}>{API_CLIENT_UI.CATALOG_EMPTY}</Text>
+            </View>
+          }
+          ListFooterComponent={
+            catalogQuery.isFetchingNextPage ? (
+              <ActivityIndicator style={styles.footerLoader} />
+            ) : null
+          }
+        />
+      </View>
+    </CatalogScrollAnimationProvider>
   );
 }

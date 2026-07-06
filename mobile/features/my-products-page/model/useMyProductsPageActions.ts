@@ -7,7 +7,6 @@ import { useRequestProductPromotionMutation } from "@/entities/product/model/use
 import { useProductPromotionManageSupport } from "@/features/product-promotion/model/useProductPromotionManageSupport";
 import {
   API_CLIENT_UI,
-  CREATE_PRODUCT_UI,
   PRODUCT_PROMOTION_UI,
 } from "@/shared/config";
 import { catalogQueryKeys, loyaltyPointsQueryKeys, myProductsQueryKeys } from "@/shared/api";
@@ -18,7 +17,7 @@ export const useMyProductsPageActions = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
   const requestPromotionMutation = useRequestProductPromotionMutation();
-  const { patchMutation, deleteMutation } = useMyProductMutations();
+  const { patchMutation } = useMyProductMutations();
 
   const [catalogNotice, setCatalogNotice] = useState("");
   const [catalogError, setCatalogError] = useState("");
@@ -26,7 +25,6 @@ export const useMyProductsPageActions = () => {
   const [promotionModalVisible, setPromotionModalVisible] = useState(false);
   const [promotionErrorMessage, setPromotionErrorMessage] = useState("");
   const [manageErrorMessage, setManageErrorMessage] = useState("");
-  const [deletingProductId, setDeletingProductId] = useState<string | null>(null);
   const [togglingAvailabilityProductId, setTogglingAvailabilityProductId] = useState<string | null>(
     null,
   );
@@ -67,8 +65,7 @@ export const useMyProductsPageActions = () => {
     setPromotionProduct(null);
     setPromotionErrorMessage("");
     setManageErrorMessage("");
-    manageSupport.closeInstallmentProgramModal();
-  }, [manageSupport]);
+  }, []);
 
   const handleSubmitPromotion = useCallback(
     async (tier: number, tariffCode: string) => {
@@ -104,30 +101,6 @@ export const useMyProductsPageActions = () => {
       queryClient,
       requestPromotionMutation,
     ],
-  );
-
-  const handleDeleteMyProduct = useCallback(
-    async (productId: string) => {
-      const normalizedProductId = String(productId ?? "").trim();
-      if (!normalizedProductId) {
-        return;
-      }
-
-      setDeletingProductId(normalizedProductId);
-      setManageErrorMessage("");
-      try {
-        await deleteMutation.mutateAsync(normalizedProductId);
-        setCatalogNotice(CREATE_PRODUCT_UI.DELETE_SUCCESS);
-        handleClosePromotionModal();
-      } catch (error) {
-        setManageErrorMessage(
-          error instanceof Error ? error.message : API_CLIENT_UI.DELETE_MY_PRODUCT_FALLBACK,
-        );
-      } finally {
-        setDeletingProductId(null);
-      }
-    },
-    [deleteMutation, handleClosePromotionModal],
   );
 
   const handleSetMyProductAvailability = useCallback(
@@ -182,6 +155,15 @@ export const useMyProductsPageActions = () => {
     [patchMutation, syncPromotionProduct],
   );
 
+  const handleInstallmentProgramSaved = useCallback(
+    async (productPatch?: Record<string, unknown>) => {
+      manageSupport.handleInstallmentProgramSaved(productPatch);
+      await queryClient.invalidateQueries({ queryKey: myProductsQueryKeys.all });
+      handleClosePromotionModal();
+    },
+    [handleClosePromotionModal, manageSupport, queryClient],
+  );
+
   const promotionProductId = promotionProduct?._id != null ? String(promotionProduct._id) : null;
 
   return {
@@ -194,7 +176,6 @@ export const useMyProductsPageActions = () => {
     promotionErrorMessage,
     manageErrorMessage,
     isPromotionSubmitting: requestPromotionMutation.isPending,
-    isDeletePending: promotionProductId != null && deletingProductId === promotionProductId,
     isAvailabilityTogglePending:
       promotionProductId != null && togglingAvailabilityProductId === promotionProductId,
     isAuctionTogglePending:
@@ -203,15 +184,11 @@ export const useMyProductsPageActions = () => {
     handlePromoteProduct,
     handleClosePromotionModal,
     handleSubmitPromotion,
-    handleDeleteMyProduct,
     handleSetMyProductAvailability,
     handleSetProductAuction,
     sellerRaffleActive: manageSupport.sellerRaffleActive,
     handleToggleRaffleParticipation: manageSupport.handleToggleRaffleParticipation,
     isRaffleParticipationPending: manageSupport.isRaffleParticipationPending,
-    installmentProgramModalVisible: manageSupport.installmentProgramModalVisible,
-    openInstallmentProgramModal: manageSupport.openInstallmentProgramModal,
-    closeInstallmentProgramModal: manageSupport.closeInstallmentProgramModal,
-    handleInstallmentProgramSaved: manageSupport.handleInstallmentProgramSaved,
+    handleInstallmentProgramSaved,
   };
 };

@@ -36,6 +36,7 @@ import {
   useFormFieldStyles,
 } from "@/shared/theme/formChromeStyles";
 import { AppButton } from "@/shared/ui/AppButton";
+import { ModalSheetGradientBackdrop } from "@/shared/ui/ModalSheetGradientBackdrop";
 import { ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 const keepDigitsOnly = (value: string): string => value.replace(/\D/g, "");
@@ -151,6 +152,7 @@ export const DataConfirmationRequestModal = ({
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
       <View style={sheetStyles.backdrop}>
+        <ModalSheetGradientBackdrop />
         <View style={sheetStyles.sheet}>
           <View style={sheetStyles.header}>
             <Text style={sheetStyles.title}>{DATA_CONFIRMATION_MODAL_UI.TITLE}</Text>

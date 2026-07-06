@@ -1,6 +1,6 @@
 .create-product-wizard-media-grid {
   --media-tile-width: 5.25rem;
-  --media-tile-height: 6.75rem;
+  --media-tile-height: var(--media-tile-width);
 }
 
 .create-product-wizard-media-grid__head {

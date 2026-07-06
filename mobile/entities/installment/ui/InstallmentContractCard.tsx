@@ -167,9 +167,10 @@ export const InstallmentContractCard = ({
                 <Text style={styles.title}>{productName}</Text>
               </Pressable>
             ) : (
-              <Text style={[styles.titleStatic, styles.titlePressable]}>{productName}</Text>
+              <Text style={styles.titleStatic}>{productName}</Text>
             )}
             <Pressable
+              style={styles.chevronButton}
               accessibilityRole="button"
               accessibilityLabel={INSTALLMENT_UI.PAYMENTS_EXPAND_TOGGLE(isExpanded)}
               onPress={toggleExpanded}

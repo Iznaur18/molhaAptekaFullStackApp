@@ -582,3 +582,256 @@
     flex: 0 0 auto;
   }
 }
+
+/* ——— Вариант 2: плавающая «стеклянная» панель-остров, ghost-кнопки, CTA «+» ——— */
+.app-shell--header-v2 {
+  /* зазор сверху = sticky-смещению панели, чтобы не было скачка при скролле */
+  padding-top: 0.5rem;
+}
+
+.app-shell--header-v2 .app-shell__header--v2 {
+  /* липкий сам header: родитель (.app-shell) высокий, панели есть куда липнуть */
+  position: sticky;
+  top: 0.5rem;
+  z-index: 50;
+  box-sizing: border-box;
+  align-items: flex-start;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.app-shell--header-v2 .app-shell__header-panel {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--iz-color-text) 10%, transparent);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--iz-color-on-contrast) 80%, transparent);
+  backdrop-filter: blur(18px) saturate(1.5);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, var(--iz-color-on-contrast) 70%, transparent) inset,
+    0 10px 30px -14px color-mix(in srgb, var(--iz-color-ink) 45%, transparent);
+}
+
+.app-shell--header-v2 .app-shell__brand-button {
+  border-radius: 10px;
+  transition: transform 0.15s ease;
+}
+
+.app-shell--header-v2 .app-shell__brand-button:hover {
+  transform: scale(1.04);
+}
+
+.app-shell--header-v2 .app-shell__brand-button:hover .app-shell__logo {
+  opacity: 1;
+}
+
+.app-shell--header-v2 .app-shell__view-title {
+  padding: 0.28rem 0.75rem;
+  border-radius: 999px;
+  background: var(--iz-color-action-bg-active);
+  color: var(--iz-color-action);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.app-shell--header-v2 .app-shell__header-search .search-input__field {
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+  padding-left: 1rem;
+  border-color: transparent;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--iz-color-text) 6%, transparent);
+}
+
+.app-shell--header-v2 .app-shell__header-search .search-input__field:hover {
+  background: color-mix(in srgb, var(--iz-color-text) 9%, transparent);
+}
+
+.app-shell--header-v2 .app-shell__header-search .search-input__field:focus {
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-surface);
+  box-shadow: 0 0 0 3px var(--iz-color-action-focus-ring);
+}
+
+.app-shell--header-v2 .header-circle-button {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-color: transparent;
+  background: transparent;
+  color: var(--iz-color-text-secondary);
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.app-shell--header-v2 .header-circle-button:hover {
+  border-color: transparent;
+  background: var(--iz-color-action-bg-hover);
+  color: var(--iz-color-action);
+  transform: translateY(-1px);
+}
+
+.app-shell--header-v2 .header-circle-button--active,
+.app-shell--header-v2 .header-circle-button--active:hover {
+  border-color: transparent;
+  background: var(--iz-gradient-header-btn);
+  color: var(--iz-color-on-contrast);
+  transform: none;
+}
+
+.app-shell--header-v2 .header-circle-button--cta,
+.app-shell--header-v2 .header-circle-button--cta:hover {
+  border-color: transparent;
+  background: var(--iz-gradient-header-btn);
+  color: var(--iz-color-on-contrast);
+  box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--iz-color-action) 65%, transparent);
+}
+
+.app-shell--header-v2 .header-circle-button--cta:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.07);
+}
+
+.app-shell--header-v2 .app-shell__header-filter .header-circle-button {
+  width: 2.625rem;
+  height: 2.625rem;
+  border-radius: 12px;
+  border-color: color-mix(in srgb, var(--iz-color-text) 10%, transparent);
+  background: var(--iz-color-surface);
+}
+
+.app-shell--header-v2 .app-shell__header-filter .header-circle-button:hover {
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action-bg-hover);
+}
+
+.app-shell--header-v2 .app-shell__auth-actions {
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border: 1px solid color-mix(in srgb, var(--iz-color-text) 8%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--iz-color-on-contrast) 55%, var(--iz-color-surface));
+  box-shadow: 0 1px 2px var(--iz-shadow-card-subtle);
+}
+
+.app-shell--header-v2 .app-shell__auth-button,
+.app-shell--header-v2 .app-shell__list-product-button {
+  border-radius: 999px;
+}
+
+.app-shell--header-v2 .app-shell__auth-button {
+  border-width: 1px;
+  box-shadow: none;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    filter 0.15s ease;
+}
+
+.app-shell--header-v2 .app-shell__auth-button:not(.app-shell__auth-button_secondary) {
+  background: var(--iz-gradient-header-btn);
+  border-color: transparent;
+}
+
+.app-shell--header-v2
+  .app-shell__auth-button:not(.app-shell__auth-button_secondary):hover {
+  filter: brightness(1.07);
+}
+
+.app-shell--header-v2 .app-shell__auth-button_secondary {
+  border-color: transparent;
+  background: transparent;
+}
+
+.app-shell--header-v2 .app-shell__auth-button_secondary:hover {
+  background: var(--iz-color-action-bg-hover);
+}
+
+.app-shell--header-v2 .app-shell__list-product-button {
+  border-color: color-mix(in srgb, var(--iz-color-action) 28%, var(--iz-color-border));
+  background: var(--iz-color-surface);
+  box-shadow: 0 1px 2px var(--iz-shadow-card-subtle);
+}
+
+.app-shell--header-v2 .app-shell__list-product-button:hover:not(:disabled) {
+  border-color: var(--iz-color-action);
+  background: color-mix(in srgb, var(--iz-color-action) 9%, var(--iz-color-on-contrast));
+}
+
+.app-shell--header-v2 .app-shell__header-nav-button--active,
+.app-shell--header-v2 .app-shell__header-nav-button--active:hover:not(:disabled) {
+  border-color: var(--iz-color-link-hover);
+  background: var(--iz-gradient-header-btn);
+  color: var(--iz-color-on-contrast);
+  box-shadow: none;
+}
+
+.app-shell--header-v2 .app-shell__category-list {
+  border-radius: 14px;
+  border-color: var(--iz-color-border-subtle);
+  box-shadow: 0 12px 32px var(--iz-shadow-card-hover);
+}
+
+.app-shell--header-v2 .app-shell__brand-button:focus-visible,
+.app-shell--header-v2 .header-circle-button:focus-visible,
+.app-shell--header-v2 .app-shell__auth-button:focus-visible,
+.app-shell--header-v2 .app-shell__list-product-button:focus-visible {
+  outline: 2px solid var(--iz-color-action);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  /* с баннером внутри липкость выключаем, иначе баннер «прилипает» вместе с панелью */
+  .app-shell--header-v2 .app-shell__header--v2:has(.site-header-banner-carousel) {
+    position: static;
+  }
+
+  .app-shell--header-v2 .app-shell__header-panel {
+    border-radius: 16px;
+    padding: 0.55rem 0.65rem;
+  }
+
+  .app-shell--header-v2 .app-shell__auth-actions--mobile-top {
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    gap: 0.25rem;
+    padding: 0.2rem;
+  }
+
+  .app-shell--header-v2 .app-shell__auth-actions--mobile-top > .header-circle-button {
+    flex: 0 0 auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-shell--header-v2 .app-shell__brand-button,
+  .app-shell--header-v2 .header-circle-button,
+  .app-shell--header-v2 .app-shell__auth-button {
+    transition: none;
+  }
+
+  .app-shell--header-v2 .app-shell__brand-button:hover,
+  .app-shell--header-v2 .header-circle-button:hover,
+  .app-shell--header-v2 .header-circle-button--cta:hover {
+    transform: none;
+  }
+}

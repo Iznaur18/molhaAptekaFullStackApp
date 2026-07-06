@@ -6,14 +6,14 @@ import { validateRuDeliveryAddressForm } from "@/entities/address/lib/validateRu
 import { AddressSuggestInput } from "@/entities/address/ui/AddressSuggestInput";
 import type { RuDeliveryAddressValue } from "@/entities/address/model/types";
 import type { InstallmentPlan } from "@/entities/installment/api/installmentApi";
+import { resolveInstallmentPlanPriceSummary } from "@/entities/installment/lib/resolveInstallmentPlanPriceSummary";
 import { useInstallmentMutations } from "@/entities/installment/model/useInstallmentMutations";
 import { useProductInstallmentProgramQuery } from "@/entities/installment/model/useProductInstallmentProgramQuery";
 import {
   ORDER_PAYMENT_METHOD_CARD_PREPAID,
-  ORDER_PAYMENT_METHOD_LABEL_RU,
-  ORDER_PAYMENT_METHODS,
   type OrderPaymentMethod,
 } from "@/entities/order/model/constants";
+import { CheckoutPaymentMethodPicker } from "@/features/checkout/ui/CheckoutPaymentMethodPicker";
 import { INSTALLMENT_UI, PRODUCT_UI } from "@/shared/config";
 import { formatPriceRub } from "@/shared/lib";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
@@ -28,6 +28,7 @@ export type ProductInstallmentDockFooter = {
 
 type ProductInstallmentTabProps = {
   productId: string;
+  productPrice?: number;
   installmentEnabled: boolean;
   isAuthorized: boolean;
   isUserDataConfirmed: boolean;
@@ -42,6 +43,7 @@ const resolvePlanTotal = (plan: InstallmentPlan) =>
 
 export const ProductInstallmentTab = ({
   productId,
+  productPrice = 0,
   installmentEnabled,
   isAuthorized,
   isUserDataConfirmed,
@@ -64,7 +66,6 @@ export const ProductInstallmentTab = ({
   const [paymentMethod, setPaymentMethod] = useState<OrderPaymentMethod>(
     ORDER_PAYMENT_METHOD_CARD_PREPAID,
   );
-  const [paymentMenuOpen, setPaymentMenuOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -126,6 +127,15 @@ export const ProductInstallmentTab = ({
   const plans = program?.plans ?? [];
   const selectedPlan = plans.find((plan) => plan._id === selectedPlanId) ?? null;
   const qty = Math.max(1, Number.parseInt(quantity, 10) || 1);
+  const selectedPlanPriceSummary = selectedPlan
+    ? resolveInstallmentPlanPriceSummary(
+        productPrice,
+        selectedPlan.monthsCount ?? 0,
+        selectedPlan.monthlyAmountRub ?? 0,
+      )
+    : null;
+  const baseTotalRub = (selectedPlanPriceSummary?.productPriceRub ?? 0) * qty;
+  const markupTotalRub = (selectedPlanPriceSummary?.markupRub ?? 0) * qty;
   const isSubmitDisabled = isCreateContractPending || !isAuthorized || !isUserDataConfirmed;
   const dockLabel = isCreateContractPending ? INSTALLMENT_UI.SUBMITTING : INSTALLMENT_UI.SUBMIT;
   const showCheckoutForm =
@@ -134,6 +144,20 @@ export const ProductInstallmentTab = ({
     !programQuery.isPending &&
     Boolean(program?.isEnabled) &&
     plans.length > 0;
+
+  useEffect(() => {
+    if (plans.length === 0) {
+      setSelectedPlanId("");
+      return;
+    }
+
+    setSelectedPlanId((prev) => {
+      if (prev && plans.some((plan) => plan._id === prev)) {
+        return prev;
+      }
+      return plans[0]?._id ?? "";
+    });
+  }, [plans]);
 
   useEffect(() => {
     if (!onDockFooterChange) {
@@ -183,7 +207,9 @@ export const ProductInstallmentTab = ({
 
   return (
     <View style={styles.tabContainer}>
-      <Text style={styles.installmentBuyerHint}>{INSTALLMENT_UI.BUYER_HINT}</Text>
+      {!isUserDataConfirmed ? (
+        <Text style={styles.installmentBuyerHintBlocked}>{INSTALLMENT_UI.BUYER_HINT}</Text>
+      ) : null}
 
       <Text style={styles.label}>{INSTALLMENT_UI.PLANS_LABEL}</Text>
       {plans.map((plan) => {
@@ -224,6 +250,14 @@ export const ProductInstallmentTab = ({
       {selectedPlan ? (
         <View style={{ gap: 8 }}>
           <View style={styles.totalBox}>
+            <Text style={styles.totalBoxLabel}>{INSTALLMENT_UI.BUYER_PRODUCT_PRICE_LABEL}</Text>
+            <Text style={styles.totalBoxValue}>{formatPriceRub(baseTotalRub)}</Text>
+          </View>
+          <View style={styles.totalBox}>
+            <Text style={styles.totalBoxLabel}>{INSTALLMENT_UI.BUYER_MARKUP_LABEL}</Text>
+            <Text style={styles.totalBoxValue}>+{formatPriceRub(markupTotalRub)}</Text>
+          </View>
+          <View style={styles.totalBox}>
             <Text style={styles.totalBoxLabel}>{INSTALLMENT_UI.MONTHLY_LABEL}</Text>
             <Text style={styles.totalBoxValue}>
               {formatPriceRub((selectedPlan.monthlyAmountRub ?? 0) * qty)}
@@ -245,49 +279,11 @@ export const ProductInstallmentTab = ({
           disabled={isCreateContractPending}
         />
 
-        <View>
-          <Text style={styles.label}>{INSTALLMENT_UI.PAYMENT_METHOD_LABEL}</Text>
-          <Pressable
-            style={styles.paymentSelect}
-            onPress={() => setPaymentMenuOpen((v) => !v)}
-          >
-            <Text style={styles.paymentSelectText}>
-              {ORDER_PAYMENT_METHOD_LABEL_RU[paymentMethod]}
-            </Text>
-            <Text style={styles.paymentSelectChevron}>{paymentMenuOpen ? "▲" : "▾"}</Text>
-          </Pressable>
-          {paymentMenuOpen ? (
-            <View style={styles.paymentDropdown}>
-              {ORDER_PAYMENT_METHODS.map((method, index) => {
-                const isActive = paymentMethod === method;
-                const isLast = index === ORDER_PAYMENT_METHODS.length - 1;
-                return (
-                  <Pressable
-                    key={method}
-                    style={[
-                      styles.paymentDropdownItem,
-                      isLast && styles.paymentDropdownItemLast,
-                      isActive && styles.paymentDropdownItemActive,
-                    ]}
-                    onPress={() => {
-                      setPaymentMethod(method);
-                      setPaymentMenuOpen(false);
-                    }}
-                  >
-                    <Text
-                      style={[
-                        styles.paymentDropdownItemText,
-                        isActive && styles.paymentDropdownItemTextActive,
-                      ]}
-                    >
-                      {ORDER_PAYMENT_METHOD_LABEL_RU[method]}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-          ) : null}
-        </View>
+        <CheckoutPaymentMethodPicker
+          value={paymentMethod}
+          onChange={setPaymentMethod}
+          disabled={isCreateContractPending}
+        />
       </View>
 
       {successMessage ? <Text style={styles.success}>{successMessage}</Text> : null}

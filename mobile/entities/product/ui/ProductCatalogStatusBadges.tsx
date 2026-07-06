@@ -53,27 +53,6 @@ export const ProductCatalogStatusBadges = ({
         variant: "hidden",
       });
     }
-    if (flags.showPromotionBoostBadge && !isMineMode) {
-      badges.push({
-        key: "boost",
-        label: PRODUCT_CARD_UI.PROMOTED_BADGE,
-        variant: "promotionBoost",
-      });
-    }
-    if (flags.showPromotionTopBadge && !isMineMode) {
-      badges.push({
-        key: "top",
-        label: PRODUCT_CARD_UI.PROMOTION_TOP_BADGE,
-        variant: "promotionTop",
-      });
-    }
-    if (flags.showPromotionBannerBadge && !isMineMode) {
-      badges.push({
-        key: "banner",
-        label: PRODUCT_CARD_UI.PROMOTION_BANNER_BADGE,
-        variant: "promotionBanner",
-      });
-    }
     if (flags.showAuctionBadge) {
       badges.push({
         key: "auction",
@@ -117,10 +96,13 @@ export const ProductCatalogStatusBadges = ({
   return (
     <ScrollView
       horizontal
+      style={productStatusBadgeScrollStyles.root}
+      contentContainerStyle={productStatusBadgeScrollStyles.content}
       showsHorizontalScrollIndicator={false}
       nestedScrollEnabled
+      directionalLockEnabled
+      keyboardShouldPersistTaps="handled"
       accessibilityLabel={PRODUCT_CARD_UI.STATUS_BADGES_ARIA}
-      contentContainerStyle={productStatusBadgeScrollStyles.content}
     >
       {visibleBadges.map((badge) => {
         const variantStyle = productStatusBadgeVariantStyles[badge.variant];

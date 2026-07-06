@@ -1,0 +1,26 @@
+import {
+  ORDER_PAYMENT_METHOD_CARD_PREPAID,
+  ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
+  ORDER_PAYMENT_METHOD_LABEL_RU,
+  ORDER_PAYMENT_METHODS,
+} from "../../../entities/order/model/constants.js";
+
+export const CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT = {
+  widthPx: 148,
+  minHeightPx: 84,
+  borderRadiusPx: 16,
+  gapPx: 12,
+};
+
+export const CHECKOUT_PAYMENT_METHOD_CARD_THEME = {
+  [ORDER_PAYMENT_METHOD_CARD_PREPAID]: {
+    surface: "#E8F2FF",
+    label: "#0057D9",
+  },
+  [ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY]: {
+    surface: "#ECFDF5",
+    label: "#047857",
+  },
+};
+
+export { ORDER_PAYMENT_METHODS, ORDER_PAYMENT_METHOD_LABEL_RU };

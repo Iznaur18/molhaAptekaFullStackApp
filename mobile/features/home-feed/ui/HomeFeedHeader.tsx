@@ -1,15 +1,15 @@
 import { useQueryClient } from "@tanstack/react-query";
 
-import { isHomeCuratedProductListsVisible } from "@/entities/curated-product-list/lib/isHomeCuratedProductListsVisible";
 import { useHomeCuratedProductListsQuery } from "@/entities/curated-product-list/model/useHomeCuratedProductListsQuery";
 import { useFeaturedRafflesQuery } from "@/entities/raffle/model/useFeaturedRafflesQuery";
 import { useUserStoriesFeedQuery } from "@/entities/user-story/model/useUserStoriesFeedQuery";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { CatalogCityFilterBanner } from "@/features/home-feed/ui/CatalogCityFilterBanner";
 import { HomeCuratedListsSection } from "@/features/home-feed/ui/HomeCuratedListsSection";
+import { HomeCuratedListsSectionSkeleton } from "@/features/home-feed/ui/HomeCuratedListsSectionSkeleton";
 import { HomeFeaturedRafflesSection } from "@/features/home-feed/ui/HomeFeaturedRafflesSection";
 import { UserStoriesStrip } from "@/features/home-feed/ui/UserStoriesStrip";
-import { curatedProductListQueryKeys, userStoriesQueryKeys } from "@/shared/api";
+import { userStoriesQueryKeys } from "@/shared/api";
 
 type HomeFeedHeaderProps = {
   enabled: boolean;
@@ -62,7 +62,11 @@ export const HomeFeedHeader = ({
         onPublished={handleStoriesChanged}
       />
       {showCuratedLists ? (
-        <HomeCuratedListsSection lists={curatedQuery.data ?? []} />
+        curatedQuery.isPending ? (
+          <HomeCuratedListsSectionSkeleton />
+        ) : (
+          <HomeCuratedListsSection lists={curatedQuery.data ?? []} />
+        )
       ) : null}
       {showCityFilterBanner ? (
         <CatalogCityFilterBanner

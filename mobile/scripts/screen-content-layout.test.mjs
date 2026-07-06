@@ -55,17 +55,18 @@ test("web mobile bottom nav uses horizontal safe area and rounded edges", () => 
   assert.match(navCss, /--mobile-bottom-nav-horizontal-inset/);
 });
 
-test("mobile bottom nav layout matches web inset constants", () => {
+test("mobile bottom nav is flat full-width (Ozon-style)", () => {
   const source = readFile(MOBILE_ROOT, "shared/lib/mobileBottomNavLayout.ts");
   const tabBar = readFile(MOBILE_ROOT, "shared/ui/MobileBottomTabBar.tsx");
 
-  assert.match(source, /MOBILE_BOTTOM_NAV_HORIZONTAL_INSET = 12/);
-  assert.match(source, /MOBILE_BOTTOM_NAV_FLOAT_OFFSET = 10/);
+  assert.match(source, /MOBILE_BOTTOM_NAV_HORIZONTAL_INSET = 0/);
+  assert.match(source, /MOBILE_BOTTOM_NAV_FLOAT_OFFSET = 0/);
   assert.match(source, /resolveMobileBottomNavReservedHeight/);
   assert.match(tabBar, /resolveMobileBottomNavHorizontalInset/);
   assert.match(tabBar, /pointerEvents: "box-none"/);
   assert.match(tabBar, /backgroundColor: "transparent"/);
-  assert.match(tabBar, /theme\.radius\.pill/);
+  assert.match(tabBar, /borderTopWidth: StyleSheet\.hairlineWidth/);
   assert.doesNotMatch(tabBar, /MobileBottomNavGlassLayer/);
-  assert.match(tabBar, /itemActive[\s\S]*`\$\{theme\.colors\.action\}1A`/);
+  // активный таб — только цветом иконки, без подложки
+  assert.match(tabBar, /itemActive[\s\S]*backgroundColor: "transparent"/);
 });

@@ -2,12 +2,11 @@ import { useEffect, useId, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { AddressDeliveryFields } from "../../../entities/address/ui/AddressDeliveryFields.jsx";
+import { CheckoutPaymentMethodPicker } from "../../../features/checkout/ui/CheckoutPaymentMethodPicker.jsx";
 import { addressValueFromUser } from "../../../entities/address/lib/addressValueFromUser.js";
 import { validateRuDeliveryAddressForm } from "../../../entities/address/lib/validateRuDeliveryAddressForm.js";
 import {
-  ORDER_PAYMENT_METHODS,
   ORDER_PAYMENT_METHOD_CARD_PREPAID,
-  ORDER_PAYMENT_METHOD_LABEL_RU,
 } from "../../../entities/order/model/constants.js";
 import { CHECKOUT_FORM_UI } from "../../config/appUiCopy.js";
 
@@ -114,24 +113,12 @@ export function CheckoutForm({
         }}
       />
 
-      <fieldset className="checkout-form__fieldset">
-        <legend className="checkout-form__legend">
-          {CHECKOUT_FORM_UI.LABEL_PAYMENT_METHOD}
-        </legend>
-        {ORDER_PAYMENT_METHODS.map((method) => (
-          <label key={method} className="checkout-form__radio">
-            <input
-              type="radio"
-              name="paymentMethod"
-              value={method}
-              checked={paymentMethod === method}
-              onChange={() => setPaymentMethod(method)}
-              disabled={isDisabled || isSubmitting}
-            />
-            <span>{ORDER_PAYMENT_METHOD_LABEL_RU[method]}</span>
-          </label>
-        ))}
-      </fieldset>
+      <CheckoutPaymentMethodPicker
+        value={paymentMethod}
+        onChange={setPaymentMethod}
+        disabled={isDisabled || isSubmitting}
+        legend={CHECKOUT_FORM_UI.LABEL_PAYMENT_METHOD}
+      />
 
       {displayError ? (
         <p className="checkout-form__error" role="alert">

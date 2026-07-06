@@ -4,8 +4,6 @@ import {
   HOME_CATALOG_HEADER_BOTTOM_MARGIN,
   HOME_CATALOG_HEADER_CIRCLE_BUTTON_SIZE,
   HOME_CATALOG_HEADER_SEARCH_ICON_LEFT,
-  HOME_CATALOG_HEADER_LOGO_HEIGHT,
-  HOME_CATALOG_HEADER_LOGO_MAX_WIDTH_REM,
   HOME_CATALOG_HEADER_PANEL_BORDER_COLOR,
   HOME_CATALOG_HEADER_PANEL_INSET_LINE_COLOR,
   HOME_CATALOG_HEADER_PANEL_PADDING,
@@ -32,7 +30,7 @@ const panelShadowStyle =
         shadowOpacity: 1,
         shadowRadius: HOME_CATALOG_HEADER_PANEL_SHADOW.radius,
       }
-    : { elevation: 4 };
+    : { elevation: 6 };
 
 export const useHomeCatalogHeaderStyles = createThemedStyles((theme) => ({
   panel: {
@@ -86,18 +84,6 @@ export const useHomeCatalogHeaderStyles = createThemedStyles((theme) => ({
     alignSelf: "stretch",
     width: "100%",
   },
-  logoButton: {
-    height: HOME_CATALOG_HEADER_LOGO_HEIGHT,
-    maxWidth: HOME_CATALOG_HEADER_LOGO_MAX_WIDTH_REM,
-    margin: 0,
-    padding: 0,
-    alignItems: "flex-start",
-    justifyContent: "center",
-    flexShrink: 0,
-  },
-  logoImage: {
-    height: HOME_CATALOG_HEADER_LOGO_HEIGHT,
-  },
   searchWrap: {
     flex: 1,
     minWidth: 0,
@@ -139,6 +125,7 @@ export const useHomeCatalogHeaderStyles = createThemedStyles((theme) => ({
     borderRadius: HOME_CATALOG_HEADER_CIRCLE_BUTTON_SIZE / 2,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: `${theme.colors.text}14`,
+    // Ozon-стиль: плоская иконка без подложки.
+    backgroundColor: "transparent",
   },
 }));

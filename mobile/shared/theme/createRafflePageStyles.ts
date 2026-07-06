@@ -1,11 +1,8 @@
 import { StyleSheet } from "react-native";
 
-import { RAFFLE_FEATURED_PALETTE } from "@/entities/raffle/lib/raffleFeaturedPalette";
 import { MODAL_BACKDROP_SCRIM } from "@/shared/theme/formChromeStyles";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
-
-const DANGER_DEEP = "#b42318";
 
 export const useCreateRafflePageStyles = createThemedStyles((theme) => ({
   container: {
@@ -20,7 +17,7 @@ export const useCreateRafflePageStyles = createThemedStyles((theme) => ({
     gap: 12,
     paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
     paddingTop: 12,
-    backgroundColor: RAFFLE_FEATURED_PALETTE.accentPinkLilac,
+    backgroundColor: theme.colors.bg,
   },
   header: {
     marginBottom: 4,
@@ -30,13 +27,13 @@ export const useCreateRafflePageStyles = createThemedStyles((theme) => ({
   },
   section: {
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: RAFFLE_FEATURED_PALETTE.premiumPurpleMuted,
+    borderColor: theme.colors.border,
     borderRadius: 12,
     overflow: "hidden",
-    backgroundColor: RAFFLE_FEATURED_PALETTE.surface,
-    shadowColor: RAFFLE_FEATURED_PALETTE.accentPurple,
+    backgroundColor: theme.colors.surface,
+    shadowColor: theme.colors.ink,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.06,
     shadowRadius: 6,
     elevation: 2,
   },
@@ -44,13 +41,13 @@ export const useCreateRafflePageStyles = createThemedStyles((theme) => ({
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: RAFFLE_FEATURED_PALETTE.manageDivider,
-    backgroundColor: RAFFLE_FEATURED_PALETTE.accentPinkSurface,
+    borderBottomColor: theme.colors.actionBorder,
+    backgroundColor: theme.colors.action,
     fontSize: 11.5,
     fontWeight: "800",
     letterSpacing: 0.6,
     textTransform: "uppercase",
-    color: RAFFLE_FEATURED_PALETTE.accentPurpleText,
+    color: theme.colors.onContrast,
   },
   sectionBody: {
     gap: 12,
@@ -71,13 +68,13 @@ export const useCreateRafflePageStyles = createThemedStyles((theme) => ({
   },
   input: {
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: RAFFLE_FEATURED_PALETTE.premiumPurpleMuted,
+    borderColor: theme.colors.border,
     borderRadius: 8,
     paddingHorizontal: 8.8,
     paddingVertical: 7.2,
     fontSize: 15,
     color: theme.colors.text,
-    backgroundColor: RAFFLE_FEATURED_PALETTE.accentPinkLilac,
+    backgroundColor: theme.colors.surfaceMuted,
   },
   textarea: {
     minHeight: 96,
@@ -88,8 +85,8 @@ export const useCreateRafflePageStyles = createThemedStyles((theme) => ({
     padding: 10,
     borderRadius: 8,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: RAFFLE_FEATURED_PALETTE.manageDivider,
-    backgroundColor: RAFFLE_FEATURED_PALETTE.accentPinkSurface,
+    borderColor: theme.colors.actionBorder,
+    backgroundColor: theme.colors.actionSoft,
   },
   mediaTypeLegend: {
     fontSize: 14,
@@ -125,13 +122,13 @@ export const useCreateRafflePageStyles = createThemedStyles((theme) => ({
     justifyContent: "center",
   },
   mediaTypeDotActive: {
-    borderColor: RAFFLE_FEATURED_PALETTE.accentPurple,
+    borderColor: theme.colors.action,
   },
   mediaTypeDotInner: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: RAFFLE_FEATURED_PALETTE.accentPurple,
+    backgroundColor: theme.colors.action,
   },
   preview: {
     gap: 5.6,
@@ -145,19 +142,19 @@ export const useCreateRafflePageStyles = createThemedStyles((theme) => ({
     borderRadius: 10,
     overflow: "hidden",
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: RAFFLE_FEATURED_PALETTE.premiumPurpleMuted,
-    backgroundColor: RAFFLE_FEATURED_PALETTE.accentPinkSurface,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surfaceMuted,
   },
   pageHint: {
     fontSize: 12.8,
     lineHeight: 17.9,
-    color: RAFFLE_FEATURED_PALETTE.accentPurpleText,
+    color: theme.colors.action,
     paddingHorizontal: 4,
   },
   error: {
     fontSize: 13.6,
     lineHeight: 19.5,
-    color: DANGER_DEEP,
+    color: theme.colors.danger,
   },
   success: {
     fontSize: 13.6,
@@ -166,7 +163,7 @@ export const useCreateRafflePageStyles = createThemedStyles((theme) => ({
   },
   actions: {
     flexDirection: "row",
-    justifyContent: "flex-end",
+    justifyContent: "center",
     gap: 8,
     marginTop: 4,
   },
@@ -175,8 +172,9 @@ export const useCreateRafflePageStyles = createThemedStyles((theme) => ({
     paddingHorizontal: 14,
     borderRadius: 8,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: RAFFLE_FEATURED_PALETTE.accentPurple,
-    backgroundColor: RAFFLE_FEATURED_PALETTE.accentPurple,
+    borderColor: theme.colors.action,
+    backgroundColor: theme.colors.action,
+    alignSelf: "center",
   },
   submitDisabled: {
     opacity: 0.55,
@@ -184,7 +182,7 @@ export const useCreateRafflePageStyles = createThemedStyles((theme) => ({
   submitText: {
     fontSize: 15,
     fontWeight: "600",
-    color: RAFFLE_FEATURED_PALETTE.onContrast,
+    color: theme.colors.onContrast,
   },
   centered: {
     flex: 1,
@@ -216,7 +214,7 @@ export const useCreateRafflePageStyles = createThemedStyles((theme) => ({
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 10.4,
-    backgroundColor: theme.colors.link,
+    backgroundColor: theme.colors.action,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -244,14 +242,14 @@ export const useCreateRaffleModalStyles = createThemedStyles((theme) => ({
     maxHeight: "92%",
     borderRadius: 14,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: RAFFLE_FEATURED_PALETTE.premiumPurpleMuted,
+    borderColor: theme.colors.border,
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 12,
-    backgroundColor: RAFFLE_FEATURED_PALETTE.accentPinkSurface,
-    shadowColor: RAFFLE_FEATURED_PALETTE.accentPurple,
+    backgroundColor: theme.colors.surface,
+    shadowColor: theme.colors.ink,
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.18,
+    shadowOpacity: 0.12,
     shadowRadius: 16,
     elevation: 8,
   },
@@ -263,13 +261,13 @@ export const useCreateRaffleModalStyles = createThemedStyles((theme) => ({
     marginBottom: 12,
     paddingBottom: 10,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: RAFFLE_FEATURED_PALETTE.manageDivider,
+    borderBottomColor: theme.colors.actionBorder,
   },
   title: {
     flex: 1,
     fontSize: 18,
     fontWeight: "700",
-    color: RAFFLE_FEATURED_PALETTE.accentPurpleText,
+    color: theme.colors.action,
   },
   closeButton: {
     paddingHorizontal: 4,

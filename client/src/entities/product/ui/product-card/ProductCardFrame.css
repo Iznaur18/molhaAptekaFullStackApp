@@ -10,6 +10,7 @@
   overflow: hidden;
   text-align: left;
   background: var(--iz-color-surface);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--iz-color-canvas-text) 6%, transparent);
   transition:
     border-color 0.15s ease,
     box-shadow 0.15s ease;
@@ -17,7 +18,7 @@
 
 .product-card:hover {
   border-color: color-mix(in srgb, currentColor 24%, transparent);
-  box-shadow: 0 4px 14px color-mix(in srgb, var(--iz-color-canvas-text) 6%, transparent);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--iz-color-canvas-text) 8%, transparent);
 }
 
 .product-card-promotion-frame,
@@ -55,8 +56,8 @@
   border: 2px solid color-mix(in srgb, var(--product-card-promotion-accent) 78%, transparent);
   background: linear-gradient(
     165deg,
-    color-mix(in srgb, var(--iz-color-accent-purple-soft) 94%, var(--iz-color-accent-purple)),
-    color-mix(in srgb, var(--iz-color-premium-purple-soft) 88%, var(--iz-color-accent-purple-hover))
+    color-mix(in srgb, var(--iz-color-accent-purple-soft) 45%, var(--iz-color-accent-purple)),
+    color-mix(in srgb, var(--iz-color-accent-purple) 28%, var(--iz-color-premium-purple-soft))
   );
   box-shadow:
     0 0 0 1px color-mix(in srgb, var(--product-card-promotion-accent-soft) 52%, transparent),
@@ -91,19 +92,26 @@
 }
 
 .product-card-premium-frame > .product-card {
-  border: 2px solid var(--iz-color-gold);
   background: var(--iz-color-canvas);
-  box-shadow: none;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--iz-color-canvas-text) 6%, transparent);
 }
 
 .product-card-premium-frame > .product-card:hover {
-  border-color: var(--iz-color-gold);
-  box-shadow: 0 4px 14px color-mix(in srgb, var(--iz-color-canvas-text) 6%, transparent);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--iz-color-canvas-text) 8%, transparent);
+}
+
+.product-card-promotion-frame.product-card-premium-frame > .product-card {
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--iz-color-canvas-text) 6%, transparent);
+}
+
+.product-card-promotion-frame.product-card-premium-frame > .product-card:hover {
+  border-color: color-mix(in srgb, currentColor 24%, transparent);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--iz-color-canvas-text) 8%, transparent);
 }
 
 .product-card-promotion-frame.product-card-premium-frame.product-card-promotion-frame--tier-1
   > .product-card {
-  border-color: var(--product-card-promotion-accent);
   background: linear-gradient(
     165deg,
     color-mix(in srgb, var(--iz-color-gold-highlight) 88%, var(--product-card-promotion-accent-soft)),
@@ -113,17 +121,15 @@
 
 .product-card-promotion-frame.product-card-premium-frame.product-card-promotion-frame--tier-2
   > .product-card {
-  border-color: color-mix(in srgb, var(--iz-color-accent-purple) 82%, var(--iz-color-gold));
   background: linear-gradient(
     165deg,
-    color-mix(in srgb, var(--iz-color-accent-purple-soft) 92%, var(--iz-color-accent-purple)),
-    color-mix(in srgb, var(--iz-color-premium-purple-soft) 86%, var(--iz-color-accent-purple-hover))
+    color-mix(in srgb, var(--iz-color-accent-purple-soft) 42%, var(--iz-color-accent-purple)),
+    color-mix(in srgb, var(--iz-color-accent-purple) 26%, var(--iz-color-premium-purple-soft))
   );
 }
 
 .product-card-promotion-frame.product-card-premium-frame.product-card-promotion-frame--tier-3
   > .product-card {
-  border-color: color-mix(in srgb, var(--product-card-banner-accent) 68%, var(--iz-color-gold));
   background: linear-gradient(
     165deg,
     color-mix(in srgb, var(--product-card-banner-gradient-end) 88%, var(--product-card-banner-accent-soft)),

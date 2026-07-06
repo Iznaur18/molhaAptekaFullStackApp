@@ -12,6 +12,14 @@ import { ProductLoyaltyPointsBadge } from "../ProductLoyaltyPointsBadge.jsx";
 export function ProductCardMedia({ vm }) {
   const hasSlideMedia = vm.renderedSlide != null;
 
+  const promotionRibbon = vm.showPromotionBoostBadge
+    ? { tier: 1, label: PRODUCT_CARD_UI.PROMOTED_BADGE }
+    : vm.showPromotionTopBadge
+      ? { tier: 2, label: PRODUCT_CARD_UI.PROMOTION_TOP_BADGE }
+      : vm.showPromotionBannerBadge
+        ? { tier: 3, label: PRODUCT_CARD_UI.PROMOTION_BANNER_BADGE }
+        : null;
+
   return (
     <div
       className={[
@@ -51,6 +59,14 @@ export function ProductCardMedia({ vm }) {
           currentUserId={vm.currentUserId}
           variant="card"
         />
+      ) : null}
+      {promotionRibbon ? (
+        <span
+          className={`product-card__promotion-ribbon product-card__promotion-ribbon--tier-${promotionRibbon.tier}`}
+          role="status"
+        >
+          {promotionRibbon.label}
+        </span>
       ) : null}
       {vm.showModerationPendingOverlay ? (
         <span className="product-card__moderation-pending-overlay" role="status">

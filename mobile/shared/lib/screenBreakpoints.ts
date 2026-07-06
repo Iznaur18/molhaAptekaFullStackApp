@@ -28,7 +28,7 @@ export const PROFILE_CONTENT_MAX_WIDTH_LARGE_TABLET = 720;
 /** @deprecated используйте PROFILE_CONTENT_MAX_WIDTH_SMALL_TABLET */
 export const PROFILE_CONTENT_MAX_WIDTH_TABLET = PROFILE_CONTENT_MAX_WIDTH_SMALL_TABLET;
 
-export const PRODUCT_GRID_GAP = 6;
+export const PRODUCT_GRID_GAP = 8;
 
 /** ≤667px — 2 колонки как web mobile */
 export const SCREEN_PRODUCT_GRID_2_COL_MAX_WIDTH = 667;

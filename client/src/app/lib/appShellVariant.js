@@ -1,5 +1,5 @@
 /** Текущий вариант оформления шапки главной (увеличивай до «стоп»). */
-export const HOME_HEADER_VARIANT = 1;
+export const HOME_HEADER_VARIANT = 2;
 
 /**
  * @returns {string}

@@ -26,8 +26,8 @@ test("image upload limits are stable", () => {
 test("video upload limits are stable", () => {
   assert.equal(UPLOAD_VIDEO_MAX_MB, 5);
   assert.equal(UPLOAD_VIDEO_MAX_BYTES, 5 * 1024 * 1024);
-  assert.equal(STORY_UPLOAD_VIDEO_MAX_MB, 50);
-  assert.equal(STORY_UPLOAD_VIDEO_MAX_BYTES, 50 * 1024 * 1024);
+  assert.equal(STORY_UPLOAD_VIDEO_MAX_MB, 100);
+  assert.equal(STORY_UPLOAD_VIDEO_MAX_BYTES, 100 * 1024 * 1024);
   assert.deepEqual(UPLOAD_VIDEO_MIME_TYPES, [
     "video/mp4",
     "video/webm",

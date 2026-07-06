@@ -5,12 +5,14 @@ import { ProductModerationQueueCard } from "@/entities/product/ui/ProductModerat
 import type { ProductModerationActions } from "@/entities/product/ui/ProductModerationDetailsFooter";
 import type { CatalogGridRow } from "@/features/catalog-grid/lib/buildCatalogGridRows";
 import { catalogGridRowStyles } from "@/features/catalog-grid/lib/catalogGridLayout";
+import { CatalogGridRowEnteringShell } from "@/features/catalog-grid/ui/CatalogGridRowEnteringShell";
 
 type ProductModerationGridRowItemProps = {
   row: CatalogGridRow;
   columns: number;
   gap: number;
   tileWidth: number;
+  rowIndex?: number;
   rejectComments: Record<string, string>;
   cardErrors: Record<string, string>;
   pendingProductId: string | null;
@@ -36,6 +38,7 @@ export const ProductModerationGridRowItem = ({
   columns,
   gap,
   tileWidth,
+  rowIndex = 0,
   ...actionProps
 }: ProductModerationGridRowItemProps) => {
   if (row.kind !== "product-cells") {
@@ -43,7 +46,8 @@ export const ProductModerationGridRowItem = ({
   }
 
   return (
-    <View style={[catalogGridRowStyles.row, { gap }]}>
+    <CatalogGridRowEnteringShell rowIndex={rowIndex}>
+      <View style={[catalogGridRowStyles.row, { gap }]}>
       {row.products.map((product) => {
         const productId = String(product._id);
 
@@ -61,6 +65,7 @@ export const ProductModerationGridRowItem = ({
             <View key={`product-moderation-grid-pad-${index}`} style={{ width: tileWidth }} />
           ))
         : null}
-    </View>
+      </View>
+    </CatalogGridRowEnteringShell>
   );
 };

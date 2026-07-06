@@ -77,6 +77,8 @@ test("home catalog feed renders banner in scrollable list header", () => {
   assert.doesNotMatch(bannerRow, /layoutWidth/);
   assert.doesNotMatch(bannerRow, /marginHorizontal: -/);
   assert.match(slot, /useSiteHeaderBannerSlidesQuery/);
+  assert.match(carousel, /resolveSiteHeaderBannerCarouselMetrics/);
+  assert.match(carousel, /snapToInterval/);
   assert.match(carousel, /AUTOPLAY_MS/);
   assert.match(carousel, /resolveSiteHeaderBannerMobileRoute/);
 });
@@ -127,5 +129,6 @@ test("shared staff section and api routes exist", () => {
   assert.match(staffMainViews, /site-header-banner-admin/);
   assert.match(router, /getSiteHeaderBannerSlidesController/);
   assert.match(router, /checkProductModeratorMW/);
-  assert.match(contract, /SITE_HEADER_BANNER_HEIGHT_PX = 120/);
+  assert.match(contract, /SITE_HEADER_BANNER_HEIGHT_PX = 180/);
+  assert.match(contract, /SITE_HEADER_BANNER_CAROUSEL_SLIDE_GAP_PX = 8/);
 });

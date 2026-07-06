@@ -59,9 +59,12 @@ export const useHomeCatalogGridProps = () => {
     raffleParticipationPendingProductId,
     homeCuratedProductLists,
     showCuratedProductLists,
+    curatedListsQuery,
   } = ctx;
 
   const catalogCityFilterLabel = String(authUser?.userAddressCity ?? "").trim();
+  const isCuratedProductListsLoading =
+    showCuratedProductLists && curatedListsQuery.isPending;
 
   return useMemo(
     () => ({
@@ -127,6 +130,7 @@ export const useHomeCatalogGridProps = () => {
       raffleParticipationPendingProductId,
       homeCuratedProductLists,
       showCuratedProductLists,
+      isCuratedProductListsLoading,
     }),
     [
       catalogStatus,
@@ -180,6 +184,7 @@ export const useHomeCatalogGridProps = () => {
       raffleParticipationPendingProductId,
       homeCuratedProductLists,
       showCuratedProductLists,
+      isCuratedProductListsLoading,
     ],
   );
 };

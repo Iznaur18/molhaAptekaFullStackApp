@@ -7,7 +7,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { resolveProductImageUrls } from "@/entities/product/lib/resolveProductImageUrls";
 import { resolveProductPreviewVideoUrl } from "@/entities/product/lib/resolveProductPreviewVideoUrl";
 import {
-  canSellerDeleteProduct,
   canSellerEditProduct,
   canSellerToggleCatalogVisibility,
 } from "@/entities/product/lib/getProductModerationUi";
@@ -33,10 +32,9 @@ import { ProductReviewsTab } from "@/features/product-detail/ui/ProductReviewsTa
 import { ProductPromotionModal } from "@/features/product-promotion/ui/ProductPromotionModal";
 import { useProductPromotionManageSupport } from "@/features/product-promotion/model/useProductPromotionManageSupport";
 import { ReportProductModal } from "@/features/product-report/ui/ReportProductModal";
-import { catalogQueryKeys, loyaltyPointsQueryKeys } from "@/shared/api";
+import { catalogQueryKeys, loyaltyPointsQueryKeys, myProductsQueryKeys } from "@/shared/api";
 import {
   API_CLIENT_UI,
-  CREATE_PRODUCT_UI,
   INSTALLMENT_UI,
   PRODUCT_CARD_UI,
   PRODUCT_PROMOTION_UI,
@@ -61,7 +59,7 @@ export default function ProductDetailScreen() {
   const recordProductViewRef = useRef(recordViewMutation.mutate);
   recordProductViewRef.current = recordViewMutation.mutate;
   const requestPromotionMutation = useRequestProductPromotionMutation();
-  const { patchMutation, deleteMutation } = useMyProductMutations();
+  const { patchMutation } = useMyProductMutations();
   const { isAdmin } = useUserAccess();
   const reportStatusQuery = useMyProductReportStatusQuery({
     productId,
@@ -75,7 +73,6 @@ export default function ProductDetailScreen() {
   const [auctionDock, setAuctionDock] = useState<ProductAuctionDockFooter | null>(null);
   const [promotionErrorMessage, setPromotionErrorMessage] = useState("");
   const [manageErrorMessage, setManageErrorMessage] = useState("");
-  const [isDeletePending, setIsDeletePending] = useState(false);
   const [isAvailabilityTogglePending, setIsAvailabilityTogglePending] = useState(false);
   const [isAuctionTogglePending, setIsAuctionTogglePending] = useState(false);
   const [reportSuccessMessage, setReportSuccessMessage] = useState("");
@@ -173,6 +170,25 @@ export default function ProductDetailScreen() {
     }
   }, [activeTab]);
 
+  const handleClosePromotionModal = useCallback(() => {
+    setPromotionModalVisible(false);
+    setPromotionErrorMessage("");
+    setManageErrorMessage("");
+  }, []);
+
+  const handleInstallmentProgramSaved = useCallback(
+    async (productPatch?: Record<string, unknown>) => {
+      manageSupport.handleInstallmentProgramSaved(productPatch);
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: myProductsQueryKeys.all }),
+        queryClient.invalidateQueries({ queryKey: catalogQueryKeys.all }),
+      ]);
+      handleClosePromotionModal();
+      router.replace("/hub/my-products");
+    },
+    [handleClosePromotionModal, manageSupport, queryClient, router],
+  );
+
   if (productQuery.isPending) {
     return <ScreenLoadingState />;
   }
@@ -232,13 +248,6 @@ export default function ProductDetailScreen() {
     setPromotionModalVisible(true);
   };
 
-  const handleClosePromotionModal = () => {
-    setPromotionModalVisible(false);
-    setPromotionErrorMessage("");
-    setManageErrorMessage("");
-    manageSupport.closeInstallmentProgramModal();
-  };
-
   const handleSubmitPromotion = async (tier: number, tariffCode: string) => {
     setPromotionErrorMessage("");
     try {
@@ -260,23 +269,6 @@ export default function ProductDetailScreen() {
           ? error.message
           : API_CLIENT_UI.REQUEST_PRODUCT_PROMOTION_FALLBACK,
       );
-    }
-  };
-
-  const handleDeleteMyProduct = async (targetProductId: string) => {
-    setIsDeletePending(true);
-    setManageErrorMessage("");
-    try {
-      await deleteMutation.mutateAsync(targetProductId);
-      handleClosePromotionModal();
-      Alert.alert(CREATE_PRODUCT_UI.DELETE_SUCCESS);
-      router.back();
-    } catch (error) {
-      setManageErrorMessage(
-        error instanceof Error ? error.message : API_CLIENT_UI.DELETE_MY_PRODUCT_FALLBACK,
-      );
-    } finally {
-      setIsDeletePending(false);
     }
   };
 
@@ -370,6 +362,7 @@ export default function ProductDetailScreen() {
           {activeTab === "installment" ? (
             <ProductInstallmentTab
               productId={productId}
+              productPrice={productPrice}
               installmentEnabled={productRecord.productInstallmentEnabled === true}
               isAuthorized={isAuthorized}
               isUserDataConfirmed={sessionQuery.data?.user?.isUserDataConfirmed === true}
@@ -470,25 +463,19 @@ export default function ProductDetailScreen() {
         onRetryTariffs={() => void promotionTariffsQuery.refetch()}
         onClose={handleClosePromotionModal}
         onSubmit={handleSubmitPromotion}
-        onDeleteProduct={isOwnProduct ? handleDeleteMyProduct : undefined}
         onSetProductAvailability={isOwnProduct ? handleSetMyProductAvailability : undefined}
         onSetProductAuction={isOwnProduct ? handleSetProductAuction : undefined}
-        isDeletePending={isDeletePending}
         isAvailabilityTogglePending={isAvailabilityTogglePending}
         isAuctionTogglePending={isAuctionTogglePending}
         manageErrorMessage={manageErrorMessage}
         canManageEdit={isOwnProduct && (isAdmin || canSellerEditProduct(productRecord))}
-        canManageDelete={isOwnProduct && (isAdmin || canSellerDeleteProduct(productRecord))}
         canManageToggleVisibility={
           isOwnProduct && (isAdmin || canSellerToggleCatalogVisibility(productRecord))
         }
         sellerRaffleActive={manageSupport.sellerRaffleActive}
         onToggleRaffleParticipation={manageSupport.handleToggleRaffleParticipation}
         isRaffleParticipationPending={manageSupport.isRaffleParticipationPending}
-        onOpenInstallmentProgram={manageSupport.openInstallmentProgramModal}
-        installmentProgramModalVisible={manageSupport.installmentProgramModalVisible}
-        onCloseInstallmentProgram={manageSupport.closeInstallmentProgramModal}
-        onInstallmentProgramSaved={manageSupport.handleInstallmentProgramSaved}
+        onInstallmentProgramSaved={handleInstallmentProgramSaved}
       />
     </View>
   );

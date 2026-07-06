@@ -1,32 +1,35 @@
-/** Паритет с web `AppShell.css` @media (max-width: 640px). */
+/** Выравнивание контента ленты (карусели, баннеры) — не менять вместе с панелью. */
 export const HOME_CATALOG_HEADER_SHELL_HORIZONTAL_INSET = 16;
 
-/** Мобильный редизайн: крупные скругления нижних углов glass-панели. */
-export const HOME_CATALOG_HEADER_PANEL_RADIUS = 24;
+/** Ozon-стиль: панель от края до края. */
+export const HOME_CATALOG_HEADER_PANEL_HORIZONTAL_INSET = 0;
 
-/**
- * Web `.app-shell--header-v1 .app-shell__header--v1` padding @640:
- * `0.75rem 0.85rem 0.9rem`.
- */
+/** Ozon-стиль: белая карта с крупным скруглением снизу. */
+export const HOME_CATALOG_HEADER_PANEL_RADIUS = 18;
+
+/** Панель прижата к верху экрана; safe-area — внутри paddingTop. */
+export const HOME_CATALOG_HEADER_PANEL_TOP_GAP = 0;
+
+/** Тонкая рамка панели вокруг крупного поля поиска. */
 export const HOME_CATALOG_HEADER_PANEL_PADDING = {
-  top: 12,
-  horizontal: 13.6,
-  bottom: 12,
+  top: 8,
+  horizontal: 8,
+  bottom: 8,
 } as const;
 
 /** Web `.app-shell--header-v1 .app-shell__header--v1` margin-bottom @mobile preview. */
 export const HOME_CATALOG_HEADER_BOTTOM_MARGIN = 0;
 
-/** Едва заметная кромка glass-панели (мобильный редизайн). */
-export const HOME_CATALOG_HEADER_PANEL_BORDER_COLOR = "rgba(17, 24, 39, 0.04)";
+/** Ozon-стиль: кромка почти незаметна — панель отделяется тенью. */
+export const HOME_CATALOG_HEADER_PANEL_BORDER_COLOR = "rgba(17, 24, 39, 0.06)";
 
-/** Web `backdrop-filter: blur(14px)` on glass header. */
-export const HOME_CATALOG_HEADER_PANEL_BLUR_RADIUS = 14;
+/** Blur остаётся для контента, уезжающего под панель. */
+export const HOME_CATALOG_HEADER_PANEL_BLUR_RADIUS = 18;
 
-/** Web `color-mix(on-contrast 86%, transparent)`. */
-export const HOME_CATALOG_HEADER_PANEL_GLASS_OPACITY = 0.86;
+/** Ozon-стиль: почти непрозрачная белая карта. */
+export const HOME_CATALOG_HEADER_PANEL_GLASS_OPACITY = 0.96;
 
-/** Web `color-mix(in srgb, var(--iz-color-on-contrast) 86%, transparent)`. */
+/** Web `color-mix(in srgb, var(--iz-color-on-contrast) 80%, transparent)`. */
 export const resolveHomeCatalogHeaderGlassTint = (
   onContrast: string,
   opacity = HOME_CATALOG_HEADER_PANEL_GLASS_OPACITY,
@@ -49,11 +52,11 @@ export const HOME_CATALOG_HEADER_PANEL_GLASS_BACKGROUND = "rgba(255, 255, 255, 0
 /** Web inset `0 1px 0 color-mix(on-contrast 65%)`. */
 export const HOME_CATALOG_HEADER_PANEL_INSET_LINE_COLOR = "rgba(255, 255, 255, 0.65)";
 
-/** Мягкая рассеянная тень под панелью. */
+/** Мягкая тень под белой картой (Ozon-стиль). */
 export const HOME_CATALOG_HEADER_PANEL_SHADOW = {
-  color: "rgba(15, 23, 42, 0.06)",
-  offsetY: 12,
-  radius: 32,
+  color: "rgba(15, 23, 42, 0.08)",
+  offsetY: 6,
+  radius: 16,
 } as const;
 
 /** Web `--iz-shadow-card` on auth-actions pill. */
@@ -65,20 +68,11 @@ export const HOME_CATALOG_HEADER_TOP_ROW_GAP = 8;
 /** Отступ между glass-панелью шапки и каруселью баннера (sibling, не внутри panel). */
 export const HOME_CATALOG_HEADER_BANNER_BELOW_PANEL_MARGIN = 8;
 
-/** Высота поисковой «пилюли» в стиле iOS search bar. */
-export const HOME_CATALOG_HEADER_SEARCH_INPUT_MIN_HEIGHT = 38;
+/** Ozon-стиль: крупное поле поиска. */
+export const HOME_CATALOG_HEADER_SEARCH_INPUT_MIN_HEIGHT = 44;
 
 /** Web `.app-shell__header--v1::before` height. */
 export const HOME_CATALOG_HEADER_ACCENT_HEIGHT = 3;
-
-/** Web `.app-shell__logo` height `clamp(2rem, 5vw, 2.5rem)` → 32px @mobile. */
-export const HOME_CATALOG_HEADER_LOGO_HEIGHT = 32;
-
-/** Web `max-width: min(9rem, 42vw)`. */
-export const HOME_CATALOG_HEADER_LOGO_MAX_WIDTH_REM = 144;
-
-export const resolveHomeCatalogHeaderLogoMaxWidth = (screenWidth: number): number =>
-  Math.min(HOME_CATALOG_HEADER_LOGO_MAX_WIDTH_REM, screenWidth * 0.42);
 
 /** Web `.header-circle-button` `2.25rem`. */
 export const HOME_CATALOG_HEADER_CIRCLE_BUTTON_SIZE = 36;
@@ -95,18 +89,18 @@ export const HOME_CATALOG_HEADER_SEARCH_INPUT_PADDING_VERTICAL = 8;
 /** Левый паддинг поисковой «пилюли»: место под иконку-лупу. */
 export const HOME_CATALOG_HEADER_SEARCH_INPUT_PADDING_LEFT = 38;
 
-/** Размер и отступ иконки-лупы внутри поисковой «пилюли». */
-export const HOME_CATALOG_HEADER_SEARCH_ICON_SIZE = 18;
-export const HOME_CATALOG_HEADER_SEARCH_ICON_LEFT = 12;
+/** Размер и отступ иконки-лупы внутри поля поиска. */
+export const HOME_CATALOG_HEADER_SEARCH_ICON_SIZE = 20;
+export const HOME_CATALOG_HEADER_SEARCH_ICON_LEFT = 14;
 
 /** Правый паддинг (место под clear-кнопку). */
-export const HOME_CATALOG_HEADER_SEARCH_INPUT_PADDING_RIGHT = 32;
+export const HOME_CATALOG_HEADER_SEARCH_INPUT_PADDING_RIGHT = 36;
 
-/** Полностью скруглённая «пилюля» (высота 38 / 2). */
-export const HOME_CATALOG_HEADER_SEARCH_INPUT_BORDER_RADIUS = 19;
+/** Ozon-стиль: скруглённый прямоугольник, не пилюля. */
+export const HOME_CATALOG_HEADER_SEARCH_INPUT_BORDER_RADIUS = 14;
 
-/** Читабельный размер шрифта поиска. */
-export const HOME_CATALOG_HEADER_SEARCH_INPUT_FONT_SIZE = 15;
+/** Ozon-стиль: крупный читабельный шрифт поиска. */
+export const HOME_CATALOG_HEADER_SEARCH_INPUT_FONT_SIZE = 16;
 
 type ScreenSafeAreaInsets = {
   left?: number;
@@ -122,5 +116,13 @@ export const resolveHomeCatalogHeaderShellInset = (
     insets.right ?? 0,
   );
 
+/** Боковые поля панели поиска — 0, full-bleed. */
+export const resolveHomeCatalogHeaderPanelInset = (): number =>
+  HOME_CATALOG_HEADER_PANEL_HORIZONTAL_INSET;
+
+/** Панель от верхнего края scene; safe-area учитывается в paddingTop. */
+export const resolveHomeCatalogHeaderPanelTopMargin = (): number =>
+  HOME_CATALOG_HEADER_PANEL_TOP_GAP;
+
 export const resolveHomeCatalogHeaderPanelPaddingTop = (safeAreaTop: number): number =>
-  Math.max(safeAreaTop, HOME_CATALOG_HEADER_PANEL_PADDING.top);
+  safeAreaTop + HOME_CATALOG_HEADER_PANEL_PADDING.top;

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 
 import { getCatalogGridColumnCount } from "../lib/getCatalogGridColumnCount.js";
 
@@ -21,7 +21,7 @@ function applyCatalogGridColumnCount(width, setColumnCount) {
 export function useCatalogGridColumnCount(containerRef, enabled) {
   const [columnCount, setColumnCount] = useState(1);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!enabled) {
       return undefined;
     }
@@ -46,7 +46,9 @@ export function useCatalogGridColumnCount(containerRef, enabled) {
       });
     };
 
-    scheduleUpdate();
+    // Синхронно до первой отрисовки: иначе первый кадр раскладывается с
+    // columnCount = 1, а после замера баннеры перепрыгивают на другие ряды (CLS).
+    applyCatalogGridColumnCount(element.clientWidth, setColumnCount);
     const observer = new ResizeObserver(scheduleUpdate);
     observer.observe(element);
 

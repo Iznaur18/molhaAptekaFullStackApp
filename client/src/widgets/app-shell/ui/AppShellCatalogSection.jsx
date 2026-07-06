@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 
 import { HomeCuratedProductListsSection } from "../../../entities/curated-product-list/ui/HomeCuratedProductListsSection.jsx";
+import { CuratedProductListCarouselSkeleton } from "../../../entities/curated-product-list/ui/CuratedProductListCarouselSkeleton.jsx";
 import { RaffleFeaturedCarousel } from "../../../entities/raffle/ui/RaffleFeaturedCarousel.jsx";
 import { UserStoriesStrip } from "../../../entities/user-story/ui/UserStoriesStrip.jsx";
 import { CatalogCityFilterBanner } from "../../../entities/product/ui/CatalogCityFilterBanner.jsx";
@@ -9,6 +10,7 @@ import { CatalogSubcategoryPicker } from "../../../entities/product-category-dis
 import { buildRafflePath } from "../../../shared/lib/rafflePaths.js";
 import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
+import { CatalogGridSkeleton } from "../../catalog-product-grid/ui/CatalogGridSkeleton.jsx";
 import { HomeCatalogGrid } from "../../catalog-product-grid/ui/HomeCatalogGrid.jsx";
 
 /** @typedef {import('../../../entities/product/model/types.js').ProductFromApi} ProductFromApi */
@@ -66,6 +68,7 @@ import { HomeCatalogGrid } from "../../catalog-product-grid/ui/HomeCatalogGrid.j
  *   raffleParticipationPendingProductId: string | null;
  *   homeCuratedProductLists: import('../../../entities/curated-product-list/model/types.js').HomeCuratedProductListFromApi[];
  *   showCuratedProductLists: boolean;
+ *   isCuratedProductListsLoading: boolean;
  * }} props
  */
 export function AppShellCatalogGridSection({
@@ -120,12 +123,12 @@ export function AppShellCatalogGridSection({
   raffleParticipationPendingProductId,
   homeCuratedProductLists,
   showCuratedProductLists,
+  isCuratedProductListsLoading = false,
 }) {
   const navigate = useNavigate();
 
-  if (catalogStatus.kind === "loading" && products.length === 0) {
-    return <p className="app-shell__state">{HOME_PAGE_UI.LOADING_CATALOG}</p>;
-  }
+  const isCatalogInitialLoading =
+    catalogStatus.kind === "loading" && products.length === 0;
 
   if (catalogStatus.kind === "error") {
     return (
@@ -163,6 +166,8 @@ export function AppShellCatalogGridSection({
           lists={homeCuratedProductLists}
           onOpenProduct={onOpenProductDetails}
         />
+      ) : showCuratedProductLists && isCuratedProductListsLoading ? (
+        <CuratedProductListCarouselSkeleton />
       ) : null}
       {showCatalogCityFilterBanner && catalogCityFilterLabel && onShowAllCatalogCities ? (
         <CatalogCityFilterBanner
@@ -170,48 +175,52 @@ export function AppShellCatalogGridSection({
           onShowAllCities={onShowAllCatalogCities}
         />
       ) : null}
-      <HomeCatalogGrid
-        products={products}
-        selectedProductCategory={
-          catalogMainView === "catalog-browser"
-            ? activeCatalogBrowserCategory
-            : selectedProductCategory
-        }
-        hasQuery={hasProductSearchQuery}
-        isMineMode={isMineMode}
-        deletingProductId={deletingProductId}
-        onSellerNameClick={onSellerNameClick}
-        onDeleteMyProduct={onDeleteMyProduct}
-        onEditMyProduct={onEditMyProduct}
-        onPromoteMyProduct={onPromoteMyProduct}
-        myProductsCatalogError={myProductsCatalogError}
-        myProductsCatalogNotice={myProductsCatalogNotice}
-        onOpenProductDetails={onOpenProductDetails}
-        onSetMyProductAvailability={onSetMyProductAvailability}
-        onSetMyProductAuction={onSetMyProductAuction}
-        togglingAvailabilityProductId={togglingAvailabilityProductId}
-        togglingAuctionProductId={togglingAuctionProductId}
-        isAuthorized={isAuthorized}
-        isPremiumUser={isPremiumUser}
-        currentUserId={currentUserId}
-        sellerLoyaltyPointsBalance={sellerLoyaltyPointsBalance}
-        sellerLoyaltyPointsReserved={sellerLoyaltyPointsReserved}
-        onRequestLoginAddToCart={onRequestLoginAddToCart}
-        catalogSentinelRef={catalogSentinelRef}
-        catalogHasMore={catalogHasMore}
-        isCatalogLoadingMore={isCatalogLoadingMore}
-        catalogLoadMoreError={catalogLoadMoreError}
-        onRetryCatalogLoadMore={onRetryCatalogLoadMore}
-        myProductsModerationFilter={myProductsModerationFilter}
-        catalogFollowingOnly={catalogFollowingOnly}
-        catalogAuctionOnly={catalogAuctionOnly}
-        catalogInstallmentOnly={catalogInstallmentOnly}
-        catalogSaleOnly={catalogSaleOnly}
-        showFullWidthTier3Banners={showFullWidthTier3Banners}
-        sellerRaffleActive={sellerRaffleActive}
-        onToggleRaffleParticipation={onToggleRaffleParticipation}
-        raffleParticipationPendingProductId={raffleParticipationPendingProductId}
-      />
+      {isCatalogInitialLoading ? (
+        <CatalogGridSkeleton />
+      ) : (
+        <HomeCatalogGrid
+          products={products}
+          selectedProductCategory={
+            catalogMainView === "catalog-browser"
+              ? activeCatalogBrowserCategory
+              : selectedProductCategory
+          }
+          hasQuery={hasProductSearchQuery}
+          isMineMode={isMineMode}
+          deletingProductId={deletingProductId}
+          onSellerNameClick={onSellerNameClick}
+          onDeleteMyProduct={onDeleteMyProduct}
+          onEditMyProduct={onEditMyProduct}
+          onPromoteMyProduct={onPromoteMyProduct}
+          myProductsCatalogError={myProductsCatalogError}
+          myProductsCatalogNotice={myProductsCatalogNotice}
+          onOpenProductDetails={onOpenProductDetails}
+          onSetMyProductAvailability={onSetMyProductAvailability}
+          onSetMyProductAuction={onSetMyProductAuction}
+          togglingAvailabilityProductId={togglingAvailabilityProductId}
+          togglingAuctionProductId={togglingAuctionProductId}
+          isAuthorized={isAuthorized}
+          isPremiumUser={isPremiumUser}
+          currentUserId={currentUserId}
+          sellerLoyaltyPointsBalance={sellerLoyaltyPointsBalance}
+          sellerLoyaltyPointsReserved={sellerLoyaltyPointsReserved}
+          onRequestLoginAddToCart={onRequestLoginAddToCart}
+          catalogSentinelRef={catalogSentinelRef}
+          catalogHasMore={catalogHasMore}
+          isCatalogLoadingMore={isCatalogLoadingMore}
+          catalogLoadMoreError={catalogLoadMoreError}
+          onRetryCatalogLoadMore={onRetryCatalogLoadMore}
+          myProductsModerationFilter={myProductsModerationFilter}
+          catalogFollowingOnly={catalogFollowingOnly}
+          catalogAuctionOnly={catalogAuctionOnly}
+          catalogInstallmentOnly={catalogInstallmentOnly}
+          catalogSaleOnly={catalogSaleOnly}
+          showFullWidthTier3Banners={showFullWidthTier3Banners}
+          sellerRaffleActive={sellerRaffleActive}
+          onToggleRaffleParticipation={onToggleRaffleParticipation}
+          raffleParticipationPendingProductId={raffleParticipationPendingProductId}
+        />
+      )}
     </>
   );
 }

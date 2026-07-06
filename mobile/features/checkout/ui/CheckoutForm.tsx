@@ -1,13 +1,11 @@
 import { useState } from "react";
-import { Pressable, Text, TextInput, View, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
+import { Text, TextInput, View } from "react-native";
 
 import { addressValueFromUser } from "@/entities/address/lib/addressValueFromUser";
 import { validateRuDeliveryAddressForm } from "@/entities/address/lib/validateRuDeliveryAddressForm";
 import { AddressSuggestInput } from "@/entities/address/ui/AddressSuggestInput";
 import {
   ORDER_PAYMENT_METHOD_CARD_PREPAID,
-  ORDER_PAYMENT_METHOD_LABEL_RU,
-  ORDER_PAYMENT_METHODS,
   type OrderPaymentMethod,
 } from "@/entities/order/model/constants";
 import type { RuDeliveryAddressValue } from "@/entities/address/model/types";
@@ -15,6 +13,7 @@ import { CHECKOUT_FORM_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useCheckoutFormStyles } from "@/shared/theme/formChromeStyles";
 import { AppButton } from "@/shared/ui/AppButton";
+import { CheckoutPaymentMethodPicker } from "@/features/checkout/ui/CheckoutPaymentMethodPicker";
 
 type CheckoutFormProps = {
   defaultUser?: Record<string, unknown> | null;
@@ -95,23 +94,11 @@ export const CheckoutForm = ({
         keyboardType="default"
       />
 
-      <Text style={checkoutStyles.legend}>{CHECKOUT_FORM_UI.LABEL_PAYMENT_METHOD}</Text>
-      {ORDER_PAYMENT_METHODS.map((method) => (
-        <Pressable
-          key={method}
-          style={checkoutStyles.radioRow}
-          onPress={() => setPaymentMethod(method)}
-          disabled={isDisabled || isSubmitting}
-        >
-          <View
-            style={[
-              checkoutStyles.radio,
-              paymentMethod === method && checkoutStyles.radioChecked,
-            ]}
-          />
-          <Text style={checkoutStyles.radioLabel}>{ORDER_PAYMENT_METHOD_LABEL_RU[method]}</Text>
-        </Pressable>
-      ))}
+      <CheckoutPaymentMethodPicker
+        value={paymentMethod}
+        onChange={setPaymentMethod}
+        disabled={isDisabled || isSubmitting}
+      />
 
       {displayError ? <Text style={checkoutStyles.feedbackError}>{displayError}</Text> : null}
       {submitSuccess ? <Text style={checkoutStyles.feedbackSuccess}>{submitSuccess}</Text> : null}

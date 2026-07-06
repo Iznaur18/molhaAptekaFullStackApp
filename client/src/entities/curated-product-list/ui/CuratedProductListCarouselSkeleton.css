@@ -1,0 +1,43 @@
+.curated-product-list-carousel-skeleton__title-line {
+  display: inline-block;
+  width: 9rem;
+  max-width: 60%;
+  height: 1em;
+  vertical-align: middle;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    var(--iz-color-surface-elevated) 0%,
+    var(--iz-color-border-subtle) 50%,
+    var(--iz-color-surface-elevated) 100%
+  );
+  background-size: 200% 100%;
+  animation: curated-carousel-skeleton-shimmer 1.2s ease-in-out infinite;
+}
+
+.curated-product-list-carousel-skeleton__shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--iz-color-surface-elevated) 0%,
+    var(--iz-color-border-subtle) 50%,
+    var(--iz-color-surface-elevated) 100%
+  );
+  background-size: 200% 100%;
+  animation: curated-carousel-skeleton-shimmer 1.2s ease-in-out infinite;
+}
+
+/* Нейтральный фон вместо акцентного у реальной плашки цены. */
+.curated-product-list-carousel-skeleton .curated-product-compact-card__price-wrap {
+  background: var(--iz-color-surface-elevated);
+  cursor: default;
+}
+
+@keyframes curated-carousel-skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}

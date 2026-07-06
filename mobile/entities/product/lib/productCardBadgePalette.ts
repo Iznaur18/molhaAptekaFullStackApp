@@ -34,31 +34,54 @@ export const PRODUCT_CARD_BADGE_COLORS = {
   ratingPlaceholder: "rgba(17, 24, 39, 0.48)",
 } as const;
 
-/** client ProductCardMedia.css — бейджи поверх фото */
+/** Ozon-стиль: непрозрачные пастельные плашки с ярким жирным текстом поверх фото. */
 export const PRODUCT_CARD_IMAGE_BADGE_OVERLAY = {
-  borderColor: "rgba(17, 24, 39, 0.18)",
-  shadowColor: "rgba(0, 0, 0, 0.18)",
-  discountBackground: "rgba(254, 226, 226, 0.72)",
-  discountText: "rgba(153, 27, 27, 0.88)",
-  loyaltyBackground: "rgba(220, 252, 231, 0.72)",
-  loyaltyText: "rgba(22, 101, 52, 0.88)",
+  borderColor: "transparent",
+  shadowColor: "transparent",
+  /** Светло-розовая плашка скидки, ярко-малиновый текст. */
+  discountBackground: "#fbdcea",
+  discountText: "#f1117e",
+  /** Светло-лавандовая плашка баллов, фиолетовый текст. */
+  loyaltyBackground: "#f0e4fa",
+  loyaltyText: "#8e24aa",
 } as const;
 
-/** ProductPriceDisplay.css + ProductCardMedia.css (0.72rem / 0.35rem) */
+/** Ozon-стиль: стопка плашек флеш к левому краю фото, скругление только справа. */
 export const PRODUCT_CARD_IMAGE_BADGE_OVERLAY_LAYOUT = {
-  borderRadius: 5.6,
-  paddingVertical: 3.2,
+  borderRadius: 6,
+  paddingVertical: 2,
+  paddingHorizontal: 10,
+  fontSize: 10,
+  lineHeight: 12,
+  gap: 0,
+  insetX: 0,
+  insetBottom: 0,
+} as const;
+
+/**
+ * Статус-бейджи (аукцион, рассрочка…) — тот же компактный стиль, что overlay на фото.
+ * Откат: `PRODUCT_CARD_STATUS_BADGES_USE_OVERLAY_STYLE = false`.
+ */
+export const PRODUCT_CARD_STATUS_BADGES_USE_OVERLAY_STYLE = true;
+
+export const PRODUCT_CARD_STATUS_BADGE_OVERLAY_LAYOUT = {
+  borderRadius: PRODUCT_CARD_IMAGE_BADGE_OVERLAY_LAYOUT.borderRadius,
+  paddingVertical: PRODUCT_CARD_IMAGE_BADGE_OVERLAY_LAYOUT.paddingVertical,
+  paddingHorizontal: PRODUCT_CARD_IMAGE_BADGE_OVERLAY_LAYOUT.paddingHorizontal,
+  fontSize: PRODUCT_CARD_IMAGE_BADGE_OVERLAY_LAYOUT.fontSize,
+  lineHeight: PRODUCT_CARD_IMAGE_BADGE_OVERLAY_LAYOUT.lineHeight,
+  rowGap: 2,
+} as const;
+
+/** Подложка строки бейджей на экране товара. */
+export const PRODUCT_CARD_DETAIL_BADGE_ROW_CHROME = {
   paddingHorizontal: 8,
-  fontSize: 11.52,
-  lineHeight: 15.47,
-  gap: 4.8,
-  insetX: 12,
-  insetBottom: 6.6,
+  paddingVertical: 6,
+  borderRadius: 10,
 } as const;
 
 export const PRODUCT_CARD_MOBILE_LAYOUT = {
   contentInsetX: 8,
-  imageAspectRatio: 0.685,
   bodyGap: 4,
   metaStripGap: 2.4,
 } as const;

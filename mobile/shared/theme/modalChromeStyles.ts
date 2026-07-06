@@ -1,5 +1,6 @@
 import { StyleSheet, Platform } from "react-native";
 
+import { USER_STORY_FRAME_ASPECT_RATIO } from "@/entities/user-story/lib/computeUserStoryFrameSize";
 import { MODAL_BACKDROP_SCRIM } from "@/shared/theme/formChromeStyles";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
@@ -14,9 +15,31 @@ export const CREATE_STORY_MODAL_ANIMATION = {
   enterMs: 300,
   exitMs: 240,
   sheetSlideDistance: 420,
+  maxHeightRatio: 0.92,
+} as const;
+
+/** Множитель к `theme.spacing[4]` (16px) между полем подписи и «Опубликовать». */
+export const CREATE_STORY_CAPTION_SUBMIT_GAP_MULTIPLIER = 50;
+
+/** minHeight 48 + paddingVertical 28 + footer paddingTop/Bottom 16+32 */
+export const CREATE_STORY_SUBMIT_FOOTER_HEIGHT_PX = 124;
+
+export const REPORT_PRODUCT_MODAL_ANIMATION = {
+  enterMs: 280,
+  exitMs: 220,
+  sheetSlideDistance: 360,
+  sheetRestOffsetRatio: 0.4,
 } as const;
 
 export const useBottomSheetReportModalStyles = createThemedStyles((theme) => ({
+  root: {
+    flex: 1,
+    justifyContent: "flex-end",
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: MODAL_BACKDROP_SCRIM,
+  },
   overlay: {
     flex: 1,
     backgroundColor: MODAL_BACKDROP_SCRIM,
@@ -24,10 +47,11 @@ export const useBottomSheetReportModalStyles = createThemedStyles((theme) => ({
   },
   card: {
     backgroundColor: theme.colors.surface,
-    borderTopLeftRadius: theme.radius.md,
-    borderTopRightRadius: theme.radius.md,
+    borderRadius: theme.radius.md,
+    marginHorizontal: theme.spacing[4],
     padding: 20,
     paddingBottom: theme.spacing[8],
+    overflow: "hidden",
   },
   title: {
     fontSize: 18,
@@ -48,7 +72,7 @@ export const useBottomSheetReportModalStyles = createThemedStyles((theme) => ({
     marginTop: theme.spacing[4],
     fontSize: 14,
     fontWeight: "600",
-    color: theme.colors.textSecondary,
+    color: theme.colors.action,
   },
   input: {
     marginTop: theme.spacing[2],
@@ -59,6 +83,7 @@ export const useBottomSheetReportModalStyles = createThemedStyles((theme) => ({
     padding: theme.spacing[3],
     fontSize: 15,
     color: theme.colors.text,
+    backgroundColor: theme.colors.surfaceMuted,
     textAlignVertical: "top",
   },
   inputError: {
@@ -99,7 +124,7 @@ export const useBottomSheetReportModalStyles = createThemedStyles((theme) => ({
     flex: 1,
     paddingVertical: 14,
     borderRadius: 10,
-    backgroundColor: theme.colors.nearBlack,
+    backgroundColor: theme.colors.action,
     alignItems: "center",
     justifyContent: "center",
     minHeight: 48,
@@ -127,9 +152,33 @@ export const useCreateStoryModalStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
     borderTopLeftRadius: theme.radius.md,
     borderTopRightRadius: theme.radius.md,
-    padding: 20,
-    paddingBottom: theme.spacing[8],
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 0,
     maxHeight: "92%",
+  },
+  bodyScroll: {
+    flexGrow: 0,
+    flexShrink: 1,
+  },
+  bodyScrollContent: {
+    flexGrow: 1,
+  },
+  captionBlock: {
+    marginTop: theme.spacing[3],
+  },
+  submitSpacer: {
+    minHeight:
+      theme.spacing[4] * CREATE_STORY_CAPTION_SUBMIT_GAP_MULTIPLIER +
+      theme.spacing[8] +
+      theme.spacing[4] -
+      theme.spacing[3],
+  },
+  submitFooter: {
+    flexShrink: 0,
+    paddingTop: theme.spacing[4],
+    paddingBottom: theme.spacing[8],
+    backgroundColor: theme.colors.surface,
   },
   header: {
     flexDirection: "row",
@@ -148,7 +197,9 @@ export const useCreateStoryModalStyles = createThemedStyles((theme) => ({
     color: theme.colors.textMuted,
   },
   preview: {
-    height: 280,
+    alignSelf: "center",
+    width: "100%",
+    aspectRatio: USER_STORY_FRAME_ASPECT_RATIO,
     borderRadius: theme.radius.sm,
     backgroundColor: theme.colors.nearBlack,
     overflow: "hidden",
@@ -169,6 +220,7 @@ export const useCreateStoryModalStyles = createThemedStyles((theme) => ({
     flexDirection: "row",
     gap: 10,
     marginTop: 14,
+    marginBottom: theme.spacing[4],
   },
   pickButton: {
     flex: 1,
@@ -186,23 +238,25 @@ export const useCreateStoryModalStyles = createThemedStyles((theme) => ({
     color: theme.colors.text,
   },
   videoHint: {
-    marginTop: 8,
+    marginTop: theme.spacing[2],
+    marginBottom: 0,
     fontSize: 13,
     lineHeight: 18,
     color: theme.colors.textMuted,
   },
   label: {
-    marginTop: 14,
+    marginTop: theme.spacing[2],
     fontSize: 14,
     fontWeight: "600",
     color: theme.colors.textSecondary,
   },
   caption: {
-    marginTop: theme.spacing[2],
+    marginTop: theme.spacing[4],
     minHeight: 64,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
     borderRadius: 10,
+    backgroundColor: theme.colors.surfaceMuted,
     padding: theme.spacing[3],
     fontSize: 15,
     color: theme.colors.text,
@@ -214,7 +268,7 @@ export const useCreateStoryModalStyles = createThemedStyles((theme) => ({
     color: theme.colors.danger,
   },
   submit: {
-    marginTop: theme.spacing[4],
+    marginTop: 0,
     paddingVertical: 14,
     borderRadius: 10,
     backgroundColor: theme.colors.action,
@@ -476,7 +530,7 @@ export const useAdminEditModalStyles = createThemedStyles((theme) => ({
     borderRadius: 10,
     paddingVertical: theme.spacing[3],
     alignItems: "center",
-    backgroundColor: theme.colors.nearBlack,
+    backgroundColor: theme.colors.action,
   },
   primaryButtonText: {
     color: theme.colors.onContrast,
@@ -634,58 +688,6 @@ export const useProductEditManageSectionStyles = createThemedStyles((theme) => (
   toggles: {
     gap: 8,
   },
-  deleteConfirm: {
-    paddingVertical: 11,
-    paddingHorizontal: 12,
-    borderWidth: 1,
-    borderRadius: 10,
-    borderColor: `${theme.colors.danger}59`,
-    backgroundColor: `${theme.colors.danger}14`,
-    gap: 10,
-  },
-  deleteConfirmQuestion: {
-    fontSize: 13,
-    lineHeight: 18,
-    color: theme.colors.text,
-  },
-  deleteConfirmActions: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  deleteConfirmYes: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    backgroundColor: theme.colors.danger,
-    ...Platform.select({
-      web: { cursor: "pointer" },
-      default: {},
-    }),
-  },
-  deleteConfirmYesText: {
-    color: theme.colors.onContrast,
-    fontSize: 13,
-    fontWeight: "700",
-  },
-  deleteConfirmCancel: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    backgroundColor: theme.colors.danger,
-    ...Platform.select({
-      web: { cursor: "pointer" },
-      default: {},
-    }),
-  },
-  deleteConfirmCancelText: {
-    color: theme.colors.onContrast,
-    fontSize: 13,
-    fontWeight: "600",
-  },
-  deleteConfirmPressed: {
-    opacity: 0.85,
-  },
 }));
 
 export const useProductPromotionModalStyles = createThemedStyles((theme) => ({
@@ -718,9 +720,30 @@ export const useProductPromotionModalStyles = createThemedStyles((theme) => ({
     }),
   },
   title: {
+    flex: 1,
     fontSize: 18,
     fontWeight: "700",
     color: theme.colors.text,
+  },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  closeCircleButton: {
+    width: 32,
+    height: 32,
+    flexShrink: 0,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: theme.radius.pill,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surfaceMuted,
+  },
+  closeCircleButtonPressed: {
+    opacity: 0.85,
+    backgroundColor: theme.colors.surfaceElevated,
   },
   headerAddon: {
     marginTop: -4,
@@ -942,7 +965,7 @@ export const useProductPromotionModalStyles = createThemedStyles((theme) => ({
     fontSize: 15,
   },
   primaryButton: {
-    flex: 1.4,
+    flex: 1,
     minHeight: 44,
     borderWidth: 1,
     borderRadius: 11,
@@ -955,6 +978,10 @@ export const useProductPromotionModalStyles = createThemedStyles((theme) => ({
     shadowOpacity: 0.24,
     shadowRadius: 12,
     elevation: 6,
+  },
+  primaryButtonFull: {
+    width: "100%",
+    flex: undefined,
   },
   primaryButtonText: {
     color: theme.colors.onContrast,

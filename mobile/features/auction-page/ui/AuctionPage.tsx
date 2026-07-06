@@ -33,6 +33,7 @@ import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMob
 import { staffBadgeQueryKeys } from "@/shared/api";
 import { AUCTION_PAGE_UI, MY_PROFILE_PAGE_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { mergeExpandedRowIds } from "@/shared/lib/mergeExpandedRowIds";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useAuctionPageStyles } from "@/shared/theme/auctionPageStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
@@ -41,6 +42,9 @@ type AuctionListItem =
   | { kind: "section"; id: string; title: string; count: number }
   | { kind: "bid"; id: string; bid: MyPriceOfferBid }
   | { kind: "offer"; id: string; offer: IncomingPriceOffer };
+
+const EMPTY_BUYER_BIDS: MyPriceOfferBid[] = [];
+const EMPTY_SELLER_OFFERS: IncomingPriceOffer[] = [];
 
 export const AuctionPage = () => {
   const router = useRouter();
@@ -58,8 +62,8 @@ export const AuctionPage = () => {
 
   const isUserDataConfirmed = sessionQuery.data?.user?.isUserDataConfirmed === true;
 
-  const allBuyerBids = bidsQuery.data ?? [];
-  const allSellerOffers = offersQuery.data ?? [];
+  const allBuyerBids = bidsQuery.data ?? EMPTY_BUYER_BIDS;
+  const allSellerOffers = offersQuery.data ?? EMPTY_SELLER_OFFERS;
 
   const summary = useMemo(
     () => summarizeAuctionDashboard(allBuyerBids, allSellerOffers),
@@ -92,15 +96,24 @@ export const AuctionPage = () => {
   );
 
   useEffect(() => {
-    setExpandedIds((prev) => {
-      const next = new Set(prev);
-      allBuyerBids.filter(bidNeedsAttention).forEach((bid) => next.add(`bid:${bid._id}`));
-      allSellerOffers
-        .filter(offerNeedsAttention)
-        .forEach((offer) => next.add(`offer:${offer._id}`));
-      return next;
-    });
-  }, [allBuyerBids, allSellerOffers]);
+    if (bidsQuery.data == null && offersQuery.data == null) {
+      return;
+    }
+
+    const attentionIds: string[] = [];
+    (bidsQuery.data ?? EMPTY_BUYER_BIDS)
+      .filter(bidNeedsAttention)
+      .forEach((bid) => {
+        attentionIds.push(`bid:${bid._id}`);
+      });
+    (offersQuery.data ?? EMPTY_SELLER_OFFERS)
+      .filter(offerNeedsAttention)
+      .forEach((offer) => {
+        attentionIds.push(`offer:${offer._id}`);
+      });
+
+    setExpandedIds((prev) => mergeExpandedRowIds(prev, attentionIds));
+  }, [bidsQuery.data, offersQuery.data]);
 
   const invalidateAuctionQueues = useCallback(async () => {
     await queryClient.invalidateQueries({

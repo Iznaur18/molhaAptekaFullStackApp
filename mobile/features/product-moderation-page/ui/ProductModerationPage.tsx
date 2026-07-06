@@ -2,7 +2,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
-import { FlatList, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import type { ModerationProduct } from "@/entities/product/api/productModerationApi";
@@ -12,6 +12,8 @@ import {
 } from "@/entities/product/model/useProductModerationMutations";
 import { buildCatalogGridRows } from "@/features/catalog-grid/lib/buildCatalogGridRows";
 import { resolveCatalogGridListContentStyle } from "@/features/catalog-grid/lib/catalogGridLayout";
+import { CatalogScrollAnimationProvider } from "@/features/catalog-grid/model/CatalogScrollAnimationContext";
+import { CatalogAnimatedFlatList } from "@/features/catalog-grid/ui/CatalogAnimatedFlatList";
 import { ProductModerationGridRowItem } from "@/features/product-moderation-page/ui/ProductModerationGridRowItem";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
@@ -163,9 +165,11 @@ export const ProductModerationPage = () => {
   if (queueQuery.isPending && products.length === 0) {
     return (
       <>
-        <View style={[styles.container, centeredContentStyle, styles.centered]}>
+        <View style={[styles.container, centeredContentStyle, styles.idleShell]}>
           <View style={styles.header}>{sectionToggle}</View>
-          <Text style={styles.state}>{PRODUCT_MODERATION_PAGE_UI.LOADING}</Text>
+          <View style={styles.idleMessageWrap}>
+            <Text style={styles.state}>{PRODUCT_MODERATION_PAGE_UI.LOADING}</Text>
+          </View>
         </View>
         {navSheet}
       </>
@@ -175,15 +179,17 @@ export const ProductModerationPage = () => {
   if (queueQuery.isError && products.length === 0) {
     return (
       <>
-        <View style={[styles.container, centeredContentStyle, styles.centered]}>
+        <View style={[styles.container, centeredContentStyle, styles.idleShell]}>
           <View style={styles.header}>{sectionToggle}</View>
-          <ScreenErrorState
-            message={formatApiErrorMessage(
-              queueQuery.error,
-              API_CLIENT_UI.FETCH_MODERATION_QUEUE_FALLBACK,
-            )}
-            onRetry={() => queueQuery.refetch()}
-          />
+          <View style={styles.idleMessageWrap}>
+            <ScreenErrorState
+              message={formatApiErrorMessage(
+                queueQuery.error,
+                API_CLIENT_UI.FETCH_MODERATION_QUEUE_FALLBACK,
+              )}
+              onRetry={() => queueQuery.refetch()}
+            />
+          </View>
         </View>
         {navSheet}
       </>
@@ -193,9 +199,11 @@ export const ProductModerationPage = () => {
   if (products.length === 0) {
     return (
       <>
-        <View style={[styles.container, centeredContentStyle, styles.centered]}>
+        <View style={[styles.container, centeredContentStyle, styles.idleShell]}>
           {listHeader}
-          <Text style={styles.empty}>{PRODUCT_MODERATION_PAGE_UI.EMPTY}</Text>
+          <View style={styles.idleMessageWrap}>
+            <Text style={styles.empty}>{PRODUCT_MODERATION_PAGE_UI.EMPTY}</Text>
+          </View>
         </View>
         {navSheet}
       </>
@@ -204,7 +212,8 @@ export const ProductModerationPage = () => {
 
   return (
     <>
-      <FlatList
+      <CatalogScrollAnimationProvider>
+        <CatalogAnimatedFlatList
         style={[styles.container, centeredContentStyle]}
         contentContainerStyle={[
           styles.list,
@@ -226,12 +235,13 @@ export const ProductModerationPage = () => {
             }}
           />
         }
-        renderItem={({ item }) => (
+        renderItem={({ item, index }) => (
           <ProductModerationGridRowItem
             row={item}
             columns={productGrid.columns}
             gap={productGrid.gap}
             tileWidth={productGrid.tileWidth}
+            rowIndex={index}
             rejectComments={rejectComments}
             cardErrors={cardErrors}
             pendingProductId={pendingProductId}
@@ -246,7 +256,8 @@ export const ProductModerationPage = () => {
             }}
           />
         )}
-      />
+        />
+      </CatalogScrollAnimationProvider>
 
       {navSheet}
     </>

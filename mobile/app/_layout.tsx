@@ -1,21 +1,17 @@
 import { Sentry } from "@/shared/lib/initMobileSentry";
 import "react-native-gesture-handler";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
-import { QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
 import "react-native-reanimated";
 
-import { AppIntroProvider } from "@/features/app-intro/model/AppIntroProvider";
-import { AppIntroSplash } from "@/features/app-intro/ui/AppIntroSplash";
-import { AppRuntimeSync } from "@/features/app-runtime/ui/AppRuntimeSync";
-import { WishlistProvider } from "@/entities/wishlist/model/WishlistProvider";
-import { WishlistServerSync } from "@/entities/wishlist/ui/WishlistServerSync";
 import { createAppQueryClient } from "@/shared/api";
 import { LEGAL_UI } from "@/shared/config";
-import { AppThemeProvider, useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
+import { AppProviders } from "@/shared/providers/AppProviders";
+import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -44,18 +40,11 @@ function RootLayout() {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <AppThemeProvider>
-        <WishlistProvider>
-          <AppIntroProvider>
-            <RootLayoutNav />
-            <AppRuntimeSync />
-            <WishlistServerSync />
-            <AppIntroSplash />
-          </AppIntroProvider>
-        </WishlistProvider>
-      </AppThemeProvider>
-    </QueryClientProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <AppProviders queryClient={queryClient}>
+        <RootLayoutNav />
+      </AppProviders>
+    </GestureHandlerRootView>
   );
 }
 

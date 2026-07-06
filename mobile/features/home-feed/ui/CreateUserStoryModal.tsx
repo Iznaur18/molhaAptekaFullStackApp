@@ -1,12 +1,15 @@
 import { Image } from "expo-image";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Modal,
+  Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
+  useWindowDimensions,
   View,
 } from "react-native";
 import Animated, {
@@ -17,6 +20,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
+import { computeCreateStoryPreviewSize } from "@/entities/user-story/lib/computeUserStoryFrameSize";
 import { useUserStoryMutations } from "@/entities/user-story/model/useUserStoryMutations";
 import {
   USER_STORY_CAPTION_MAX_CHARS,
@@ -35,6 +39,7 @@ import { USER_STORY_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import {
   CREATE_STORY_MODAL_ANIMATION,
+  CREATE_STORY_SUBMIT_FOOTER_HEIGHT_PX,
   useCreateStoryModalStyles,
 } from "@/shared/theme/modalChromeStyles";
 import { ProductPreviewVideo } from "@/shared/ui/ProductPreviewVideo";
@@ -45,7 +50,7 @@ type CreateUserStoryModalProps = {
   onPublished?: () => void;
 };
 
-const { enterMs, exitMs, sheetSlideDistance } = CREATE_STORY_MODAL_ANIMATION;
+const { enterMs, exitMs, sheetSlideDistance, maxHeightRatio } = CREATE_STORY_MODAL_ANIMATION;
 
 export const CreateUserStoryModal = ({
   visible,
@@ -53,6 +58,19 @@ export const CreateUserStoryModal = ({
   onPublished,
 }: CreateUserStoryModalProps) => {
   const styles = useCreateStoryModalStyles();
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+  const previewSize = useMemo(
+    () => computeCreateStoryPreviewSize(windowWidth, windowHeight),
+    [windowWidth, windowHeight],
+  );
+  const cardMaxHeight = useMemo(
+    () => windowHeight * maxHeightRatio,
+    [windowHeight],
+  );
+  const bodyScrollMaxHeight = useMemo(
+    () => cardMaxHeight - CREATE_STORY_SUBMIT_FOOTER_HEIGHT_PX,
+    [cardMaxHeight],
+  );
   const theme = useAppTheme();
   const { createMutation } = useUserStoryMutations();
   const uploadImageMutation = useUploadImageMutation();
@@ -216,70 +234,95 @@ export const CreateUserStoryModal = ({
           />
         </Animated.View>
 
-        <Animated.View style={[styles.card, sheetAnimatedStyle]}>
-          <View style={styles.header}>
-            <Text style={styles.title}>{USER_STORY_UI.CREATE_TITLE}</Text>
-            <Pressable onPress={handleClose} disabled={isBusy} hitSlop={8}>
-              <Text style={styles.close}>{USER_STORY_UI.CLOSE}</Text>
-            </Pressable>
-          </View>
-
-          <View style={styles.preview}>
-            {previewUri && mediaType === USER_STORY_MEDIA_TYPE_VIDEO ? (
-              <ProductPreviewVideo uri={previewUri} />
-            ) : null}
-            {previewUri && mediaType === USER_STORY_MEDIA_TYPE_IMAGE ? (
-              <Image source={{ uri: previewUri }} style={styles.previewMedia} contentFit="cover" />
-            ) : null}
-            {!previewUri ? (
-              <Text style={styles.placeholder}>{USER_STORY_UI.ERROR_MEDIA_REQUIRED}</Text>
-            ) : null}
-          </View>
-
-          <View style={styles.pickers}>
-            <Pressable
-              style={[styles.pickButton, isBusy && styles.pickDisabled]}
-              onPress={handlePickPhoto}
-              disabled={isBusy}
-            >
-              <Text style={styles.pickText}>{USER_STORY_UI.PICK_PHOTO}</Text>
-            </Pressable>
-            <Pressable
-              style={[styles.pickButton, isBusy && styles.pickDisabled]}
-              onPress={handlePickVideo}
-              disabled={isBusy}
-            >
-              <Text style={styles.pickText}>{USER_STORY_UI.PICK_VIDEO}</Text>
-            </Pressable>
-          </View>
-
-          <Text style={styles.videoHint}>{USER_STORY_UI.VIDEO_DURATION_HINT}</Text>
-
-          <Text style={styles.label}>{USER_STORY_UI.CAPTION_LABEL}</Text>
-          <TextInput
-            style={styles.caption}
-            value={captionText}
-            onChangeText={setCaptionText}
-            placeholder={USER_STORY_UI.CAPTION_PLACEHOLDER}
-            maxLength={USER_STORY_CAPTION_MAX_CHARS}
-            multiline
-            numberOfLines={2}
-            editable={!isBusy}
-          />
-
-          {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
-
-          <Pressable
-            style={[styles.submit, isBusy && styles.submitDisabled]}
-            onPress={handlePublish}
-            disabled={isBusy}
+        <Animated.View
+          style={[styles.card, { maxHeight: cardMaxHeight }, sheetAnimatedStyle]}
+        >
+          <ScrollView
+            style={[styles.bodyScroll, { maxHeight: bodyScrollMaxHeight }]}
+            contentContainerStyle={styles.bodyScrollContent}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "on-drag"}
+            automaticallyAdjustKeyboardInsets={Platform.OS !== "web"}
+            showsVerticalScrollIndicator={false}
+            bounces={false}
           >
-            {isBusy ? (
-              <ActivityIndicator color={theme.colors.onContrast} />
-            ) : (
-              <Text style={styles.submitText}>{USER_STORY_UI.PUBLISH}</Text>
-            )}
-          </Pressable>
+            <View style={styles.header}>
+              <Text style={styles.title}>{USER_STORY_UI.CREATE_TITLE}</Text>
+              <Pressable onPress={handleClose} disabled={isBusy} hitSlop={8}>
+                <Text style={styles.close}>{USER_STORY_UI.CLOSE}</Text>
+              </Pressable>
+            </View>
+
+            <View
+              style={[
+                styles.preview,
+                previewSize.width > 0 && previewSize.height > 0
+                  ? { width: previewSize.width, height: previewSize.height }
+                  : null,
+              ]}
+            >
+              {previewUri && mediaType === USER_STORY_MEDIA_TYPE_VIDEO ? (
+                <ProductPreviewVideo uri={previewUri} />
+              ) : null}
+              {previewUri && mediaType === USER_STORY_MEDIA_TYPE_IMAGE ? (
+                <Image source={{ uri: previewUri }} style={styles.previewMedia} contentFit="cover" />
+              ) : null}
+              {!previewUri ? (
+                <Text style={styles.placeholder}>{USER_STORY_UI.ERROR_MEDIA_REQUIRED}</Text>
+              ) : null}
+            </View>
+
+            <View style={styles.pickers}>
+              <Pressable
+                style={[styles.pickButton, isBusy && styles.pickDisabled]}
+                onPress={handlePickPhoto}
+                disabled={isBusy}
+              >
+                <Text style={styles.pickText}>{USER_STORY_UI.PICK_PHOTO}</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.pickButton, isBusy && styles.pickDisabled]}
+                onPress={handlePickVideo}
+                disabled={isBusy}
+              >
+                <Text style={styles.pickText}>{USER_STORY_UI.PICK_VIDEO}</Text>
+              </Pressable>
+            </View>
+
+            <Text style={styles.videoHint}>{USER_STORY_UI.VIDEO_DURATION_HINT}</Text>
+
+            <View style={styles.captionBlock}>
+              <Text style={styles.label}>{USER_STORY_UI.CAPTION_LABEL}</Text>
+              <TextInput
+                style={styles.caption}
+                value={captionText}
+                onChangeText={setCaptionText}
+                placeholder={USER_STORY_UI.CAPTION_PLACEHOLDER}
+                maxLength={USER_STORY_CAPTION_MAX_CHARS}
+                multiline
+                numberOfLines={2}
+                editable={!isBusy}
+              />
+
+              {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
+            </View>
+
+            <View style={styles.submitSpacer} />
+          </ScrollView>
+
+          <View style={styles.submitFooter}>
+            <Pressable
+              style={[styles.submit, isBusy && styles.submitDisabled]}
+              onPress={handlePublish}
+              disabled={isBusy}
+            >
+              {isBusy ? (
+                <ActivityIndicator color={theme.colors.onContrast} />
+              ) : (
+                <Text style={styles.submitText}>{USER_STORY_UI.PUBLISH}</Text>
+              )}
+            </Pressable>
+          </View>
         </Animated.View>
       </View>
     </Modal>

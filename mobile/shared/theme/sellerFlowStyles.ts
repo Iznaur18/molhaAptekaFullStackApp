@@ -604,19 +604,24 @@ export const useSellerProductsPageStyles = createThemedStyles((theme) => ({
 }));
 
 export const useInstallmentProgramModalStyles = createThemedStyles((theme) => ({
+  embeddedRoot: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 30,
+    elevation: 30,
+  },
   overlay: {
     flex: 1,
     backgroundColor: "rgba(15, 23, 42, 0.45)",
-    justifyContent: "flex-end",
   },
   card: {
-    maxHeight: "92%",
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
+    flex: 1,
+    flexDirection: "column",
+    height: "100%",
     backgroundColor: theme.colors.surface,
     overflow: "hidden",
   },
   header: {
+    flexShrink: 0,
     flexDirection: "row",
     alignItems: "flex-start",
     justifyContent: "space-between",
@@ -646,11 +651,13 @@ export const useInstallmentProgramModalStyles = createThemedStyles((theme) => ({
     color: theme.colors.textMuted,
   },
   loadingWrap: {
-    paddingVertical: 32,
+    flex: 1,
     alignItems: "center",
+    justifyContent: "center",
   },
   bodyScroll: {
-    flexGrow: 0,
+    flex: 1,
+    minHeight: 0,
   },
   body: {
     padding: 16,
@@ -685,12 +692,11 @@ export const useInstallmentProgramModalStyles = createThemedStyles((theme) => ({
     color: theme.colors.text,
   },
   planCard: {
-    padding: 12,
     borderRadius: 10,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: 1,
     borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surfaceMuted,
-    gap: 8,
+    backgroundColor: theme.colors.surfaceElevated,
+    overflow: "hidden",
   },
   planCardLast: {
     marginBottom: 0,
@@ -700,16 +706,39 @@ export const useInstallmentProgramModalStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "space-between",
     gap: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: theme.colors.actionHover,
+    backgroundColor: theme.colors.action,
   },
   planTitle: {
-    fontSize: 14,
+    flex: 1,
+    fontSize: 13,
     fontWeight: "700",
-    color: theme.colors.text,
+    letterSpacing: 0.3,
+    textTransform: "uppercase",
+    color: theme.colors.onContrast,
+  },
+  planRemoveButton: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.4)",
+    backgroundColor: "rgba(255,255,255,0.12)",
   },
   planRemove: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "600",
-    color: theme.colors.danger,
+    color: theme.colors.onContrast,
+  },
+  planBody: {
+    paddingHorizontal: 12,
+    paddingTop: 10,
+    paddingBottom: 12,
+    gap: 8,
+    backgroundColor: theme.colors.surfaceElevated,
   },
   fieldLabel: {
     fontSize: 13,
@@ -734,7 +763,22 @@ export const useInstallmentProgramModalStyles = createThemedStyles((theme) => ({
     flex: 1,
     gap: 6,
   },
-  planTotal: {
+  planTotalBlock: {
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderStyle: "dashed",
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+    gap: 4,
+  },
+  planTotalMeta: {
+    fontSize: 12,
+    fontWeight: "500",
+    color: theme.colors.textSecondary,
+  },
+  planTotalMain: {
     fontSize: 13,
     fontWeight: "600",
     color: theme.colors.text,
@@ -768,6 +812,7 @@ export const useInstallmentProgramModalStyles = createThemedStyles((theme) => ({
     color: theme.colors.textMuted,
   },
   footer: {
+    flexShrink: 0,
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderTopWidth: StyleSheet.hairlineWidth,

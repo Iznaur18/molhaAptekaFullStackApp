@@ -1,29 +1,23 @@
-import {
-  SITE_HEADER_BANNER_CAROUSEL_PEEK_PX,
-  SITE_HEADER_BANNER_CAROUSEL_SLIDE_GAP_PX,
-} from "@molha/api-contract";
+import { SITE_HEADER_BANNER_CAROUSEL_SLIDE_GAP_PX } from "@molha/api-contract";
 
 /**
  * @param {number} viewportWidth
  */
 export function resolveSiteHeaderBannerCarouselMetrics(viewportWidth) {
-  const peekWidth = SITE_HEADER_BANNER_CAROUSEL_PEEK_PX;
   const gapWidth = SITE_HEADER_BANNER_CAROUSEL_SLIDE_GAP_PX;
 
   if (viewportWidth <= 0) {
     return {
-      peekWidth,
       gapWidth,
       slideWidth: 0,
       stride: 0,
     };
   }
 
-  const slideWidth = Math.max(viewportWidth - peekWidth, 1);
+  const slideWidth = Math.max(viewportWidth, 1);
   const stride = slideWidth + gapWidth;
 
   return {
-    peekWidth,
     gapWidth,
     slideWidth,
     stride,

@@ -2,18 +2,21 @@ import { hasProductCharacteristicsContent } from "@izibuy/shared-lib";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Platform, Pressable, Text, View } from "react-native";
 
+import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import {
   getProductFieldReadLayout,
   PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS,
   PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS,
 } from "@/entities/product/lib/productFieldRegistry";
 import { filterProductDetailsVisibleFieldKeys } from "@/entities/product/lib/isProductDetailsFieldVisible";
+import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { ProductCatalogStatusBadges } from "@/entities/product/ui/ProductCatalogStatusBadges";
 import { ProductCharacteristicsDetails } from "@/entities/product/ui/ProductCharacteristicsDetails";
 import { ProductDetailFieldRows } from "@/entities/product/ui/ProductDetailFieldRows";
 import { ProductDetailsSellerPreview } from "@/entities/product/ui/ProductDetailsSellerPreview";
+import { ProductLoyaltyPointsBadge } from "@/entities/product/ui/ProductLoyaltyPointsBadge";
 import { ProductMediaGallery } from "@/entities/product/ui/ProductMediaGallery";
 import {
   ProductDiscountBadge,
@@ -49,6 +52,8 @@ export const ProductDetailsDetailsTab = ({
 }: ProductDetailsDetailsTabProps) => {
   const router = useRouter();
   const styles = useProductDetailScreenStyles();
+  const isAuthorized = useIsAuthorized();
+  const { isPremiumUser } = useUserAccess();
   const name = String(product.productName ?? "").trim() || "Товар";
   const [contentTab, setContentTab] = useState<"description" | "characteristics">("description");
 
@@ -109,6 +114,12 @@ export const ProductDetailsDetailsTab = ({
           <ProductPriceDisplay product={product} showLabel={false} variant="detail" />
           <View style={styles.priceBadgeRow}>
             <ProductDiscountBadge product={product} variant="detail" />
+            <ProductLoyaltyPointsBadge
+              product={product}
+              isAuthorized={isAuthorized}
+              isPremiumUser={isPremiumUser}
+              variant="detail"
+            />
             <ProductCatalogStatusBadges product={product} showNoStatusPlaceholder={false} />
           </View>
         </View>
@@ -165,7 +176,9 @@ export const ProductDetailsDetailsTab = ({
           {showDescription || showCharacteristics ? (
             <View
               style={styles.contentSwitcherPanel}
-              accessibilityRole={hasBothPanels ? "tabpanel" : undefined}
+              accessibilityRole={
+                hasBothPanels && Platform.OS === "web" ? "tabpanel" : undefined
+              }
               accessibilityLabel={
                 showCharacteristics
                   ? PRODUCT_DETAILS_MODAL_UI.CHARACTERISTICS_SECTION_ARIA

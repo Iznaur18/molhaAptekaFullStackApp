@@ -7,5 +7,7 @@ export const PRODUCT_IMAGE_PLACEHOLDER_URL =
 /** Web `--product-image-thumb-side` (4rem @ 16px). */
 export const ORDER_CARD_ITEM_THUMB_SIZE = 64;
 
-/** Квадрат hero в карточке и в деталях — синхрон с web `--product-card-image-aspect-ratio`. */
-export const PRODUCT_MEDIA_HERO_ASPECT_RATIO = 1;
+export {
+  PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO,
+  PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO as PRODUCT_MEDIA_HERO_ASPECT_RATIO,
+} from "@izibuy/design-tokens";

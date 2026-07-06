@@ -1,11 +1,10 @@
 /**
- * Мобильный каталог (≤903px): стандартные карточки строго одной высоты.
- * Бейджи/цена/отзывы не влияют на размер — фиксированная сетка строк.
+ * Мобильный каталог (≤903px): карточки одной ширины колонки; фото 1:1 (--product-card-image-aspect-ratio).
+ * Бейджи/цена/отзывы не влияют на размер — фиксированная сетка строк под фото.
  */
 @media (max-width: 903px) {
   .product-card:not(.product-card--banner-layout),
   .app-shell__cell:not(.app-shell__cell--tier3-full-width) {
-    --product-card-mobile-image-height: calc(18em + 15px);
     --product-card-mobile-heading-height: 1.25rem;
     --product-card-mobile-price-height: 1.3rem;
     --product-card-mobile-rating-height: 1.25rem;
@@ -19,25 +18,19 @@
     --product-card-mobile-footer-slot-height: var(--product-card-mobile-cart-height);
     --product-card-mobile-body-gap: 0.25rem;
     --product-card-mobile-footer-gap: 0;
-    --product-card-mobile-details-height: calc(
-      var(--product-card-mobile-image-height) + var(--product-card-mobile-body-gap) +
-        var(--product-card-mobile-heading-height) + var(--product-card-mobile-body-gap) +
-        var(--product-card-mobile-price-height) + var(--product-card-mobile-body-gap) +
-        var(--product-card-mobile-meta-height) + var(--product-card-mobile-body-gap) +
-        var(--product-card-mobile-fields-height)
-    );
-    --product-card-mobile-fixed-height: calc(
-      0.45rem + var(--product-card-mobile-footer-gap) +
-        var(--product-card-mobile-details-height) + var(--product-card-mobile-footer-gap) +
-        var(--product-card-mobile-footer-slot-height)
+    --product-card-mobile-text-stack-height: calc(
+      var(--product-card-mobile-body-gap) + var(--product-card-mobile-heading-height) +
+        var(--product-card-mobile-body-gap) + var(--product-card-mobile-price-height) +
+        var(--product-card-mobile-body-gap) + var(--product-card-mobile-meta-height) +
+        var(--product-card-mobile-body-gap) + var(--product-card-mobile-fields-height)
     );
   }
 
   .app-shell__cell:not(.app-shell__cell--tier3-full-width) {
     box-sizing: border-box;
-    height: var(--product-card-mobile-fixed-height);
-    min-height: var(--product-card-mobile-fixed-height);
-    max-height: var(--product-card-mobile-fixed-height);
+    height: auto;
+    min-height: 0;
+    max-height: none;
   }
 
   .app-shell__cell:not(.app-shell__cell--tier3-full-width) > .product-card,
@@ -78,9 +71,9 @@
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    height: var(--product-card-mobile-fixed-height);
-    min-height: var(--product-card-mobile-fixed-height);
-    max-height: var(--product-card-mobile-fixed-height);
+    height: auto;
+    min-height: 0;
+    max-height: none;
     padding: 0 0 0.45rem;
     gap: var(--product-card-mobile-footer-gap);
     overflow: hidden;
@@ -88,9 +81,9 @@
 
   .product-card-promotion-frame:not(.product-card-promotion-frame--full-width),
   .product-card-premium-frame:not(.product-card-promotion-frame--full-width) {
-    height: var(--product-card-mobile-fixed-height);
-    min-height: var(--product-card-mobile-fixed-height);
-    max-height: var(--product-card-mobile-fixed-height);
+    height: auto;
+    min-height: 0;
+    max-height: none;
   }
 
   .app-shell__cell--tier3-full-width > .product-card-promotion-frame,
@@ -132,7 +125,7 @@
     flex: 0 0 auto;
     align-self: stretch;
     grid-template-rows:
-      var(--product-card-mobile-image-height)
+      auto
       var(--product-card-mobile-heading-height)
       var(--product-card-mobile-price-height)
       var(--product-card-mobile-meta-height)
@@ -141,7 +134,7 @@
     padding: 0 var(--product-card-mobile-content-inset-x);
     align-content: start;
     height: auto;
-    max-height: var(--product-card-mobile-details-height);
+    max-height: none;
     min-height: 0;
     overflow: visible;
   }
@@ -150,15 +143,15 @@
     position: relative;
     grid-row: 1;
     width: calc(100% + 2 * var(--product-card-mobile-content-inset-x));
-    height: var(--product-card-mobile-image-height);
-    min-height: var(--product-card-mobile-image-height);
-    max-height: var(--product-card-mobile-image-height);
+    height: auto;
+    min-height: 0;
+    max-height: none;
     margin: 0 calc(-1 * var(--product-card-mobile-content-inset-x));
     border-radius: calc(var(--product-card-radius) - 1px)
       calc(var(--product-card-radius) - 1px)
       var(--product-card-inner-radius)
       var(--product-card-inner-radius);
-    aspect-ratio: unset;
+    aspect-ratio: var(--product-card-image-aspect-ratio);
     overflow: hidden;
   }
 
@@ -376,32 +369,26 @@
     --product-card-mobile-meta-height: var(--product-card-mobile-status-badges-height);
     --product-card-mobile-footer-gap: 0.5rem;
     --product-card-mobile-seller-name-pull-up: var(--product-card-mobile-body-gap);
-    --product-card-mobile-details-height: calc(
-      var(--product-card-mobile-image-height) + var(--product-card-mobile-body-gap) +
-        var(--product-card-mobile-heading-height) + var(--product-card-mobile-body-gap) +
-        var(--product-card-mobile-price-height) + var(--product-card-mobile-body-gap) +
-        var(--product-card-mobile-meta-height) + var(--product-card-mobile-body-gap) +
-        var(--product-card-mobile-fields-height) -
+    --product-card-mobile-text-stack-height: calc(
+      var(--product-card-mobile-body-gap) + var(--product-card-mobile-heading-height) +
+        var(--product-card-mobile-body-gap) + var(--product-card-mobile-price-height) +
+        var(--product-card-mobile-body-gap) + var(--product-card-mobile-meta-height) +
+        var(--product-card-mobile-body-gap) + var(--product-card-mobile-fields-height) -
         var(--product-card-mobile-seller-name-pull-up)
-    );
-    --product-card-mobile-fixed-height: calc(
-      0.45rem + var(--product-card-mobile-footer-gap) +
-        var(--product-card-mobile-details-height) + var(--product-card-mobile-footer-gap) +
-        var(--product-card-mobile-footer-slot-height)
     );
   }
 
   .app-shell__cell:not(.app-shell__cell--tier3-full-width):has(.product-card__seller-toolbar) {
-    height: var(--product-card-mobile-fixed-height);
-    min-height: var(--product-card-mobile-fixed-height);
-    max-height: var(--product-card-mobile-fixed-height);
+    height: auto;
+    min-height: 0;
+    max-height: none;
   }
 
   .product-card:not(.product-card--banner-layout):has(.product-card__seller-toolbar) {
     gap: var(--product-card-mobile-footer-gap);
-    height: var(--product-card-mobile-fixed-height);
-    min-height: var(--product-card-mobile-fixed-height);
-    max-height: var(--product-card-mobile-fixed-height);
+    height: auto;
+    min-height: 0;
+    max-height: none;
   }
 
   .product-card:not(.product-card--banner-layout):has(.product-card__seller-toolbar)
@@ -449,23 +436,18 @@
     --product-card-mobile-footer-slot-height: calc(
       2 * var(--product-card-mobile-cart-height) + 0.45rem
     );
-    --product-card-mobile-fixed-height: calc(
-      0.45rem + var(--product-card-mobile-footer-gap) +
-        var(--product-card-mobile-details-height) + var(--product-card-mobile-footer-gap) +
-        var(--product-card-mobile-footer-slot-height)
-    );
   }
 
   .app-shell__cell:not(.app-shell__cell--tier3-full-width):has(.product-card__seller-toolbar) {
-    height: var(--product-card-mobile-fixed-height);
-    min-height: var(--product-card-mobile-fixed-height);
-    max-height: var(--product-card-mobile-fixed-height);
+    height: auto;
+    min-height: 0;
+    max-height: none;
   }
 
   .product-card:not(.product-card--banner-layout):has(.product-card__seller-toolbar) {
-    height: var(--product-card-mobile-fixed-height);
-    min-height: var(--product-card-mobile-fixed-height);
-    max-height: var(--product-card-mobile-fixed-height);
+    height: auto;
+    min-height: 0;
+    max-height: none;
   }
 
   .product-card:not(.product-card--banner-layout) .product-card__seller-toolbar {

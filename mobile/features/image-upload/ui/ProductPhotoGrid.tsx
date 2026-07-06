@@ -7,6 +7,8 @@ import {
   View,
 } from "react-native";
 
+import { resolveProductMediaDisplayHeight } from "@izibuy/design-tokens";
+
 import { useUploadImageMutation } from "@/entities/upload/model/useUploadImageMutation";
 import { pickGalleryImageAssets } from "@/features/image-upload/lib/pickGalleryImageAsset";
 import { IMAGE_UPLOAD_UI } from "@/shared/config";
@@ -48,8 +50,10 @@ export const ProductPhotoGrid = ({
     [gridWidth],
   );
 
+  const tileHeight = useMemo(() => resolveProductMediaDisplayHeight(tileSize), [tileSize]);
+
   const tileDimensions =
-    tileSize > 0 ? { width: tileSize, height: tileSize } : { width: 0, height: 0 };
+    tileSize > 0 ? { width: tileSize, height: tileHeight } : { width: 0, height: 0 };
 
   const handleGridLayout = useCallback((event: LayoutChangeEvent) => {
     const nextWidth = Math.floor(event.nativeEvent.layout.width);
@@ -161,6 +165,9 @@ export const ProductPhotoGrid = ({
       </View>
 
       <Text style={styles.counter}>{`${urls.length} из ${maxCount} фото`}</Text>
+      {urls.length > 0 ? (
+        <Text style={styles.hint}>{IMAGE_UPLOAD_UI.PRODUCT_PHOTO_CROP_HINT}</Text>
+      ) : null}
       {urls.length > 1 ? (
         <Text style={styles.hint}>{IMAGE_UPLOAD_UI.TAP_TO_COVER_HINT}</Text>
       ) : null}

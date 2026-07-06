@@ -3,6 +3,8 @@ import { StyleSheet, type TextStyle, type ViewStyle } from "react-native";
 import {
   PRODUCT_CARD_BADGE_COLORS as BC,
   PRODUCT_CARD_BADGE_LAYOUT as BL,
+  PRODUCT_CARD_STATUS_BADGE_OVERLAY_LAYOUT as BSOL,
+  PRODUCT_CARD_STATUS_BADGES_USE_OVERLAY_STYLE,
 } from "@/entities/product/lib/productCardBadgePalette";
 
 export type ProductStatusBadgeVariant =
@@ -17,21 +19,29 @@ export type ProductStatusBadgeVariant =
   | "loyaltyOvercommit"
   | "promotionActive";
 
-const baseText: TextStyle = {
+type BadgeStyleOptions = {
+  paddingHorizontal?: number;
+  paddingVertical?: number;
+  fontWeight?: TextStyle["fontWeight"];
+};
+
+const legacyBaseText: TextStyle = {
   fontSize: BL.fontSize,
   fontWeight: "700",
   lineHeight: BL.lineHeight,
 };
 
-const createBadge = (
+const overlayBaseText: TextStyle = {
+  fontSize: BSOL.fontSize,
+  fontWeight: "800",
+  lineHeight: BSOL.lineHeight,
+};
+
+const createLegacyBadge = (
   borderColor: string,
   backgroundColor: string,
   textColor: string,
-  options?: {
-    paddingHorizontal?: number;
-    paddingVertical?: number;
-    fontWeight?: TextStyle["fontWeight"];
-  },
+  options?: BadgeStyleOptions,
 ): { badge: ViewStyle; text: TextStyle } => ({
   badge: {
     paddingHorizontal: options?.paddingHorizontal ?? BL.paddingHorizontal,
@@ -43,38 +53,84 @@ const createBadge = (
     backgroundColor,
   },
   text: {
-    ...baseText,
+    ...legacyBaseText,
     color: textColor,
-    fontWeight: options?.fontWeight ?? baseText.fontWeight,
+    fontWeight: options?.fontWeight ?? legacyBaseText.fontWeight,
   },
 });
+
+const createOverlayBadge = (
+  backgroundColor: string,
+  textColor: string,
+  options?: BadgeStyleOptions,
+): { badge: ViewStyle; text: TextStyle } => ({
+  badge: {
+    paddingHorizontal: options?.paddingHorizontal ?? BSOL.paddingHorizontal,
+    paddingVertical: options?.paddingVertical ?? BSOL.paddingVertical,
+    borderRadius: BSOL.borderRadius,
+    borderWidth: 0,
+    flexShrink: 0,
+    backgroundColor,
+  },
+  text: {
+    ...overlayBaseText,
+    color: textColor,
+    fontWeight: options?.fontWeight ?? overlayBaseText.fontWeight,
+  },
+});
+
+const createBadge = (
+  borderColor: string,
+  backgroundColor: string,
+  textColor: string,
+  options?: BadgeStyleOptions,
+): { badge: ViewStyle; text: TextStyle } =>
+  PRODUCT_CARD_STATUS_BADGES_USE_OVERLAY_STYLE
+    ? createOverlayBadge(backgroundColor, textColor, options)
+    : createLegacyBadge(borderColor, backgroundColor, textColor, options);
 
 export const productStatusBadgeVariantStyles: Record<
   ProductStatusBadgeVariant,
   { badge: ViewStyle; text: TextStyle }
 > = {
   hidden: createBadge("transparent", BC.hiddenBg, BC.hiddenText, {
-    paddingHorizontal: BL.paddingHorizontalCompact,
-    paddingVertical: BL.paddingVerticalCompact,
+    paddingHorizontal: PRODUCT_CARD_STATUS_BADGES_USE_OVERLAY_STYLE
+      ? BSOL.paddingHorizontal
+      : BL.paddingHorizontalCompact,
+    paddingVertical: PRODUCT_CARD_STATUS_BADGES_USE_OVERLAY_STYLE
+      ? BSOL.paddingVertical
+      : BL.paddingVerticalCompact,
     fontWeight: "600",
   }),
   promotionBoost: createBadge(
     BC.promotionBoostBorder,
     BC.promotionBoostBg,
     BC.promotionBoostText,
-    { paddingHorizontal: BL.paddingHorizontalWide },
+    {
+      paddingHorizontal: PRODUCT_CARD_STATUS_BADGES_USE_OVERLAY_STYLE
+        ? BSOL.paddingHorizontal
+        : BL.paddingHorizontalWide,
+    },
   ),
   promotionTop: createBadge(
     BC.promotionTopBorder,
     BC.promotionTopBg,
     BC.promotionTopText,
-    { paddingHorizontal: BL.paddingHorizontalWide },
+    {
+      paddingHorizontal: PRODUCT_CARD_STATUS_BADGES_USE_OVERLAY_STYLE
+        ? BSOL.paddingHorizontal
+        : BL.paddingHorizontalWide,
+    },
   ),
   promotionBanner: createBadge(
     BC.promotionBannerBorder,
     BC.promotionBannerBg,
     BC.promotionBannerText,
-    { paddingHorizontal: BL.paddingHorizontalWide },
+    {
+      paddingHorizontal: PRODUCT_CARD_STATUS_BADGES_USE_OVERLAY_STYLE
+        ? BSOL.paddingHorizontal
+        : BL.paddingHorizontalWide,
+    },
   ),
   auction: createBadge(BC.auctionBorder, BC.auctionBg, BC.auctionText),
   installment: createBadge(BC.installmentBorder, BC.installmentBg, BC.installmentText),
@@ -84,8 +140,12 @@ export const productStatusBadgeVariantStyles: Record<
     BC.statusPlaceholderBg,
     BC.statusPlaceholderText,
     {
-      paddingHorizontal: BL.paddingHorizontalCompact,
-      paddingVertical: BL.paddingVerticalCompact,
+      paddingHorizontal: PRODUCT_CARD_STATUS_BADGES_USE_OVERLAY_STYLE
+        ? BSOL.paddingHorizontal
+        : BL.paddingHorizontalCompact,
+      paddingVertical: PRODUCT_CARD_STATUS_BADGES_USE_OVERLAY_STYLE
+        ? BSOL.paddingVertical
+        : BL.paddingVerticalCompact,
       fontWeight: "500",
     },
   ),
@@ -100,11 +160,26 @@ export const productStatusBadgeVariantStyles: Record<
   ),
 };
 
+const statusBadgeRowGap = PRODUCT_CARD_STATUS_BADGES_USE_OVERLAY_STYLE
+  ? BSOL.rowGap
+  : BL.statusGap;
+
+const statusBadgeRowMinHeight = PRODUCT_CARD_STATUS_BADGES_USE_OVERLAY_STYLE
+  ? BSOL.lineHeight + BSOL.paddingVertical * 2
+  : 21;
+
 export const productStatusBadgeScrollStyles = StyleSheet.create({
+  root: {
+    alignSelf: "stretch",
+    maxWidth: "100%",
+    flexGrow: 0,
+    flexShrink: 0,
+  },
   content: {
     flexDirection: "row",
     alignItems: "center",
-    gap: BL.statusGap,
-    minHeight: 21,
+    gap: statusBadgeRowGap,
+    minHeight: statusBadgeRowMinHeight,
+    paddingRight: statusBadgeRowGap,
   },
 });

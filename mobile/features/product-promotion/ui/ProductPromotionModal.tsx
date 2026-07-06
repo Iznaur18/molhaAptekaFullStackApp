@@ -1,3 +1,4 @@
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -56,7 +57,6 @@ type ProductPromotionModalProps = {
   onRetryTariffs?: () => void;
   onClose: () => void;
   onSubmit: (tier: number, tariffCode: string) => void | Promise<void>;
-  onDeleteProduct?: (productId: string) => void | Promise<void>;
   onSetProductAvailability?: (
     productId: string,
     productIsAvailable: boolean,
@@ -65,19 +65,14 @@ type ProductPromotionModalProps = {
     productId: string,
     productAuctionEnabled: boolean,
   ) => void | Promise<void>;
-  isDeletePending?: boolean;
   isAvailabilityTogglePending?: boolean;
   isAuctionTogglePending?: boolean;
   manageErrorMessage?: string;
   canManageEdit?: boolean;
-  canManageDelete?: boolean;
   canManageToggleVisibility?: boolean;
   sellerRaffleActive?: boolean;
   onToggleRaffleParticipation?: (product: CatalogProduct, enabled: boolean) => void;
   isRaffleParticipationPending?: boolean;
-  onOpenInstallmentProgram?: () => void;
-  installmentProgramModalVisible?: boolean;
-  onCloseInstallmentProgram?: () => void;
   onInstallmentProgramSaved?: (productPatch?: Record<string, unknown>) => void;
 };
 
@@ -96,22 +91,16 @@ export const ProductPromotionModal = ({
   onRetryTariffs,
   onClose,
   onSubmit,
-  onDeleteProduct,
   onSetProductAvailability,
   onSetProductAuction,
-  isDeletePending = false,
   isAvailabilityTogglePending = false,
   isAuctionTogglePending = false,
   manageErrorMessage = "",
   canManageEdit = true,
-  canManageDelete = true,
   canManageToggleVisibility = true,
   sellerRaffleActive = false,
   onToggleRaffleParticipation,
   isRaffleParticipationPending = false,
-  onOpenInstallmentProgram,
-  installmentProgramModalVisible = false,
-  onCloseInstallmentProgram,
   onInstallmentProgramSaved,
 }: ProductPromotionModalProps) => {
   const styles = useProductPromotionModalStyles();
@@ -119,7 +108,9 @@ export const ProductPromotionModal = ({
   const resolvedProductName = String(product?.productName ?? productName).trim() || "Без названия";
   const resolvedProductPrice =
     product?.productPrice != null ? Number(product.productPrice) || 0 : productPrice;
-  const showManageSection = product != null && typeof onDeleteProduct === "function";
+  const showManageSection =
+    product != null &&
+    (typeof onSetProductAvailability === "function" || typeof onSetProductAuction === "function");
   const { activeTabId, setActiveTabId, isPromotionTab } = useProductPromotionModalTab({
     visible,
     showManageTab: showManageSection,
@@ -129,10 +120,12 @@ export const ProductPromotionModal = ({
   const defaultDuration = durations[0]?.code ?? "";
   const [selectedTier, setSelectedTier] = useState(defaultTier);
   const [selectedDurationCode, setSelectedDurationCode] = useState(defaultDuration);
+  const [isInstallmentProgramOpen, setIsInstallmentProgramOpen] = useState(false);
   const bodyScrollRef = useRef<ScrollView>(null);
 
   useEffect(() => {
     if (!visible) {
+      setIsInstallmentProgramOpen(false);
       return;
     }
     setSelectedTier(defaultTier);
@@ -244,9 +237,6 @@ export const ProductPromotionModal = ({
                 >
                   {TIER_BADGE_LABELS[tier.tier] ?? tier.title}
                 </Text>
-                <Text style={[styles.tierTitle, tierStyle.title]}>
-                  {tier.title}
-                </Text>
                 {ratePercent ? (
                   <Text style={styles.tierRate}>
                     {PRODUCT_PROMOTION_UI.TIER_RATE_HINT(ratePercent)}
@@ -346,27 +336,24 @@ export const ProductPromotionModal = ({
       return renderPromotionBody();
     }
 
-    if (product == null || onDeleteProduct == null) {
+    if (product == null || !showManageSection) {
       return null;
     }
 
     return (
       <ProductPromotionManageTab
         product={product}
-        onDelete={onDeleteProduct}
         onSetAvailability={onSetProductAvailability}
         onSetAuction={onSetProductAuction}
-        isDeletePending={isDeletePending}
         isAvailabilityTogglePending={isAvailabilityTogglePending}
         isAuctionTogglePending={isAuctionTogglePending}
         errorMessage={manageErrorMessage}
         canEdit={canManageEdit}
-        canDelete={canManageDelete}
         canToggleVisibility={canManageToggleVisibility}
         sellerRaffleActive={sellerRaffleActive}
         onToggleRaffleParticipation={onToggleRaffleParticipation}
         isRaffleParticipationPending={isRaffleParticipationPending}
-        onOpenInstallmentProgram={onOpenInstallmentProgram}
+        onOpenInstallmentProgram={() => setIsInstallmentProgramOpen(true)}
         isSubmitting={isSubmitting}
       />
     );
@@ -382,9 +369,22 @@ export const ProductPromotionModal = ({
     >
       <View style={styles.overlay} pointerEvents="box-none">
         <View style={styles.card} pointerEvents="auto">
-          <Text style={styles.title}>
-            {PRODUCT_PROMOTION_UI.MODAL_TITLE}
-          </Text>
+          <View style={styles.headerRow}>
+            <Text style={styles.title}>{PRODUCT_PROMOTION_UI.MODAL_TITLE}</Text>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={PRODUCT_PROMOTION_UI.CLOSE}
+              disabled={isSubmitting}
+              style={({ pressed }) => [
+                styles.closeCircleButton,
+                pressed && styles.closeCircleButtonPressed,
+                isSubmitting && styles.buttonDisabled,
+              ]}
+              onPress={onClose}
+            >
+              <MaterialIcons name="close" size={18} color={theme.colors.textMuted} />
+            </Pressable>
+          </View>
 
           {showManageSection ? (
             <View style={styles.headerAddon}>
@@ -407,66 +407,63 @@ export const ProductPromotionModal = ({
               {renderBody()}
             </ScrollView>
           ) : (
-            <View style={[styles.bodyScroll, styles.body]}>{renderBody()}</View>
+            <ScrollView
+              style={styles.bodyScroll}
+              contentContainerStyle={styles.body}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator
+            >
+              {renderBody()}
+            </ScrollView>
           )}
 
           {isPromotionTab ? (
             <View style={styles.footer}>
-              <View style={styles.actions}>
-                <Pressable
-                  style={({ pressed }) => [
-                    styles.cancelButton,
-                    pressed && styles.buttonPressed,
-                    isSubmitting && styles.buttonDisabled,
-                  ]}
-                  onPress={onClose}
-                  disabled={isSubmitting}
-                >
-                  <Text style={styles.cancelButtonText}>{PRODUCT_PROMOTION_UI.CANCEL}</Text>
-                </Pressable>
-                <Pressable
-                  style={({ pressed }) => [
-                    styles.primaryButton,
-                    pressed && styles.buttonPressed,
-                    (isTariffsLoading ||
-                      Boolean(tariffsError) ||
-                      !selectedDuration ||
-                      isSubmitting ||
-                      !hasEnoughFunds ||
-                      tiers.length === 0) &&
-                      styles.buttonDisabled,
-                  ]}
-                  onPress={handleSubmit}
-                  disabled={
-                    isTariffsLoading ||
+              <Pressable
+                style={({ pressed }) => [
+                  styles.primaryButton,
+                  styles.primaryButtonFull,
+                  pressed && styles.buttonPressed,
+                  (isTariffsLoading ||
                     Boolean(tariffsError) ||
                     !selectedDuration ||
                     isSubmitting ||
                     !hasEnoughFunds ||
-                    tiers.length === 0
-                  }
-                >
-                  {isSubmitting ? (
-                    <ActivityIndicator color={theme.colors.onContrast} />
-                  ) : (
-                    <Text style={styles.primaryButtonText}>{PRODUCT_PROMOTION_UI.SUBMIT_POINTS}</Text>
-                  )}
-                </Pressable>
-              </View>
+                    tiers.length === 0) &&
+                    styles.buttonDisabled,
+                ]}
+                onPress={handleSubmit}
+                disabled={
+                  isTariffsLoading ||
+                  Boolean(tariffsError) ||
+                  !selectedDuration ||
+                  isSubmitting ||
+                  !hasEnoughFunds ||
+                  tiers.length === 0
+                }
+              >
+                {isSubmitting ? (
+                  <ActivityIndicator color={theme.colors.onContrast} />
+                ) : (
+                  <Text style={styles.primaryButtonText}>{PRODUCT_PROMOTION_UI.SUBMIT_POINTS}</Text>
+                )}
+              </Pressable>
             </View>
           ) : null}
         </View>
+        {isInstallmentProgramOpen && product?._id != null ? (
+          <InstallmentProgramModal
+            embedded
+            visible
+            productId={String(product._id)}
+            productName={resolvedProductName}
+            productPrice={resolvedProductPrice}
+            onClose={() => setIsInstallmentProgramOpen(false)}
+            onSaved={onInstallmentProgramSaved}
+          />
+        ) : null}
       </View>
     </Modal>
-      {product?._id != null ? (
-        <InstallmentProgramModal
-          visible={installmentProgramModalVisible}
-          productId={String(product._id)}
-          productName={resolvedProductName}
-          onClose={() => onCloseInstallmentProgram?.()}
-          onSaved={onInstallmentProgramSaved}
-        />
-      ) : null}
     </>
   );
 };

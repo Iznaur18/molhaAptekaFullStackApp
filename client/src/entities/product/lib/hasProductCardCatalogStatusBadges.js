@@ -31,9 +31,6 @@ export function shouldShowProductCardStatusSlot(vm) {
 export function hasProductCardCatalogStatusBadges(vm) {
   return (
     shouldShowProductCardStatusSlot(vm) ||
-    vm.showPromotionBoostBadge ||
-    vm.showPromotionTopBadge ||
-    vm.showPromotionBannerBadge ||
     vm.showAuctionBadge ||
     vm.showInstallmentBadge ||
     vm.showRaffleBadge

@@ -26,7 +26,7 @@ export const HomeCatalogUsersButton = () => {
         accessibilityLabel={HEADER_USERS_BUTTON_UI.ARIA}
         onPress={() => router.push("/users" as never)}
       >
-        <MaterialIcons name="people" size={20} color={theme.colors.action} />
+        <MaterialIcons name="people" size={22} color={theme.colors.textSecondary} />
       </Pressable>
     </View>
   );

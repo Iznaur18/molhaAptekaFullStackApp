@@ -43,11 +43,11 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     shadowOpacity: 0.12,
     shadowRadius: 24,
     elevation: 4,
-    backgroundColor: "transparent",
+    backgroundColor: theme.colors.surface,
   },
   innerHasBackdrop: {
-    backgroundColor: withAlpha(theme.colors.surface, "D6"),
-    borderColor: withAlpha(P.premiumPurpleMuted, "B3"),
+    backgroundColor: theme.colors.surface,
+    borderColor: theme.colors.border,
   },
   innerStacked: {
     flexDirection: "column",
@@ -87,11 +87,11 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
   },
   backdropScrim: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: withAlpha(theme.colors.surface, "2E"),
+    backgroundColor: theme.colors.surface,
     zIndex: 0,
   },
   backdropScrimCompleted: {
-    backgroundColor: withAlpha(theme.colors.surface, "9E"),
+    backgroundColor: theme.colors.surface,
   },
   visual: {
     position: "relative",

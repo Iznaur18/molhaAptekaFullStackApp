@@ -1,0 +1,67 @@
+.catalog-grid-skeleton__card {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--iz-color-border-subtle);
+  border-radius: 12px;
+  background: var(--iz-color-surface);
+  overflow: hidden;
+}
+
+.catalog-grid-skeleton__image {
+  display: block;
+  width: 100%;
+  aspect-ratio: var(--product-card-image-aspect-ratio, 1 / 1);
+  background: linear-gradient(
+    90deg,
+    var(--iz-color-surface-elevated) 0%,
+    var(--iz-color-border-subtle) 50%,
+    var(--iz-color-surface-elevated) 100%
+  );
+  background-size: 200% 100%;
+  animation: catalog-grid-skeleton-shimmer 1.2s ease-in-out infinite;
+}
+
+/* Высота контентной части реальной карточки (заголовок, цена, мета) ~120px:
+   фиксируем её, чтобы замена скелетона карточками не сдвигала вёрстку. */
+.catalog-grid-skeleton__content {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  height: 7.5rem;
+  padding: 0.75rem;
+}
+
+.catalog-grid-skeleton__line {
+  display: block;
+  height: 0.875rem;
+  width: 60%;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    var(--iz-color-surface-elevated) 0%,
+    var(--iz-color-border-subtle) 50%,
+    var(--iz-color-surface-elevated) 100%
+  );
+  background-size: 200% 100%;
+  animation: catalog-grid-skeleton-shimmer 1.2s ease-in-out infinite;
+}
+
+.catalog-grid-skeleton__line_wide {
+  width: 82%;
+}
+
+.catalog-grid-skeleton__line_short {
+  width: 40%;
+}
+
+@keyframes catalog-grid-skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}

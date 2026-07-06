@@ -1,5 +1,7 @@
 import { useRouter } from "expo-router";
+import { useCallback, useState } from "react";
 import { Pressable, Text, View } from "react-native";
+import Animated from "react-native-reanimated";
 
 import { formatProductReviewRatingLine } from "@/entities/product-review/lib/formatProductReviewRatingLine";
 import {
@@ -9,14 +11,19 @@ import {
   getProductModerationRejectionComment,
   shouldShowProductModerationPendingOverlay,
 } from "@/entities/product/lib/getProductModerationUi";
+import { isCurrentUserProductSeller } from "@/entities/product/lib/isCurrentUserProductSeller";
+import { useProductCardImageTapActions } from "@/entities/product/lib/useProductCardImageTapActions";
+import { useProductCardPressFeedback } from "@/entities/product/lib/useProductCardPressFeedback";
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useProductCardChromeFlags } from "@/entities/product/lib/useProductCardChromeFlags";
 import { resolveProductCardPromotionFrameStyle } from "@/entities/product/lib/resolveProductCardPromotionFrameStyle";
 import { useProductCardMediaState } from "@/entities/product/lib/useProductCardMediaState";
+import { ProductCardGalleryDots } from "@/entities/product/ui/ProductCardGalleryDots";
+import { ProductCardWishlistBurst } from "@/entities/product/ui/ProductCardWishlistBurst";
 import { ProductCardPromotionBackground } from "@/entities/product/ui/ProductCardPromotionBackground";
+import { ProductCardPromotionCornerFlag } from "@/entities/product/ui/ProductCardPromotionCornerFlag";
 import { ProductCatalogStatusBadges } from "@/entities/product/ui/ProductCatalogStatusBadges";
-import { ProductCardMediaGalleryCounter } from "@/entities/product/ui/ProductCardMediaGalleryNav";
 import { ProductMediaHorizontalPager } from "@/entities/product/ui/ProductMediaHorizontalPager";
 import { ProductMediaSlideContent } from "@/entities/product/ui/ProductMediaSlideContent";
 import { useProductCardMediaStyles } from "@/shared/theme/catalogProductStyles";
@@ -35,6 +42,8 @@ import {
 } from "@/entities/product/ui/ProductPriceDisplay";
 import { ProductLoyaltyPointsBadge } from "@/entities/product/ui/ProductLoyaltyPointsBadge";
 import { WishlistToggleButton } from "@/features/wishlist-toggle/ui/WishlistToggleButton";
+import { useWishlist } from "@/entities/wishlist/model/WishlistProvider";
+import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { PRODUCT_MODERATION_PAGE_UI, PRODUCT_CARD_UI, PRODUCT_REVIEW_UI, PRODUCT_UI } from "@/shared/config";
 import { useProductCardStyles } from "@/shared/theme/catalogProductStyles";
 
@@ -85,6 +94,10 @@ export const ProductCard = ({
   const styles = useProductCardStyles();
   const { isPremiumUser } = useUserAccess();
   const isAuthorized = useIsAuthorized();
+  const sessionQuery = useAuthSessionQuery();
+  const { isInWishlist, toggleItem } = useWishlist();
+  const { cardAnimatedStyle, onCardPressIn, onCardPressOut } = useProductCardPressFeedback();
+  const [wishlistBurstToken, setWishlistBurstToken] = useState(0);
   const flags = useProductCardChromeFlags(product, {
     promotionFullWidth,
     highlightCatalogPromotion,
@@ -92,21 +105,46 @@ export const ProductCard = ({
     isModerationQueue,
   });
   const cardMedia = useProductCardMediaState(product);
-  const name = product.productName?.trim() || "Без названия";
-  const reviewLine = formatProductReviewRatingLine(product.averageRating, product.reviewCount);
-  const hasReviewRating = reviewLine.length > 0;
-  const openProductLabel = PRODUCT_UI.OPEN_ARIA(name);
+  const showWishlistToggle = !isMineMode && !isModerationQueue;
+  const currentUserId = sessionQuery.data?.user?._id ?? null;
+  const canDoubleTapWishlist =
+    showWishlistToggle && !isCurrentUserProductSeller(product, currentUserId);
+
+  const handlePress = useCallback(() => {
+    router.push({ pathname: "/product/[id]", params: { id: product._id } });
+  }, [product._id, router]);
+
+  const handleDoubleTapWishlist = useCallback(() => {
+    if (!isAuthorized) {
+      router.push("/(auth)/login");
+      return;
+    }
+    toggleItem(product._id);
+    setWishlistBurstToken((token) => token + 1);
+  }, [isAuthorized, product._id, router, toggleItem]);
+
+  const handleImagePress = useProductCardImageTapActions({
+    onOpen: handlePress,
+    onDoubleTap: handleDoubleTapWishlist,
+    doubleTapEnabled: canDoubleTapWishlist,
+  });
+
+  const cardPressHandlers = {
+    onPressIn: onCardPressIn,
+    onPressOut: onCardPressOut,
+  };
 
   if (flags.showBannerLayout) {
     return <ProductCardBanner product={product} />;
   }
 
+  const name = product.productName?.trim() || "Без названия";
+  const reviewLine = formatProductReviewRatingLine(product.averageRating, product.reviewCount);
+  const hasReviewRating = reviewLine.length > 0;
+  const openProductLabel = PRODUCT_UI.OPEN_ARIA(name);
+
   const cardMediaStyles = useProductCardMediaStyles();
   const gallerySlideCount = Math.max(cardMedia.mediaSlides.length, 1);
-
-  const handlePress = () => {
-    router.push({ pathname: "/product/[id]", params: { id: product._id } });
-  };
 
   const isCatalogGrid = layout === "catalog-grid";
   const showPromotionFrame = flags.showPromotionChrome && flags.promotionFrameTier != null;
@@ -134,15 +172,16 @@ export const ProductCard = ({
     (typeof onEditProduct === "function" ||
       typeof onPromoteProduct === "function" ||
       typeof onDeleteProduct === "function");
-  const showWishlistToggle = !isMineMode && !isModerationQueue;
+  const isWishlisted = isInWishlist(product._id);
 
   return (
-    <View
+    <Animated.View
       style={[
         styles.card,
         isCatalogGrid && styles.cardCatalogGrid,
         isCatalogGrid && isModerationQueue && styles.cardCatalogGridModerationQueue,
         promotionFrameStyle,
+        cardAnimatedStyle,
       ]}
     >
       {showPromotionFrame && flags.promotionFrameTier ? (
@@ -162,9 +201,13 @@ export const ProductCard = ({
           renderSlide={(index) => (
             <Pressable
               style={cardMediaStyles.frame}
-              onPress={handlePress}
+              onPress={handleImagePress}
+              {...cardPressHandlers}
               accessibilityRole="button"
               accessibilityLabel={openProductLabel}
+              accessibilityHint={
+                canDoubleTapWishlist ? PRODUCT_CARD_UI.DOUBLE_TAP_WISHLIST_HINT : undefined
+              }
             >
               <ProductMediaSlideContent
                 slide={cardMedia.mediaSlides[index] ?? null}
@@ -176,6 +219,10 @@ export const ProductCard = ({
         />
 
         {showModerationPendingOverlay ? <ProductCardModerationPendingOverlay /> : null}
+
+        {showPromotionFrame && flags.promotionFrameTier ? (
+          <ProductCardPromotionCornerFlag tier={flags.promotionFrameTier} />
+        ) : null}
 
         {flags.showDiscountBadge || flags.showLoyaltyPointsBadge ? (
           <View style={styles.imageBadges} pointerEvents="box-none">
@@ -193,19 +240,22 @@ export const ProductCard = ({
           </View>
         ) : null}
 
-        <ProductCardMediaGalleryCounter
+        <ProductCardWishlistBurst burstToken={wishlistBurstToken} active={isWishlisted} />
+
+        <ProductCardGalleryDots
           slideIndex={cardMedia.cardSlideIndex}
           slideCount={cardMedia.mediaSlides.length}
         />
       </View>
 
-      <Pressable
-        style={({ pressed }) => [styles.contentPressable, pressed && styles.cardPressed]}
-        onPress={handlePress}
-        accessibilityRole="button"
-        accessibilityLabel={openProductLabel}
-      >
-        <View style={[styles.content, isCatalogGrid && styles.contentCatalogGrid]}>
+      <View style={[styles.content, isCatalogGrid && styles.contentCatalogGrid]}>
+        <Pressable
+          style={styles.contentPressable}
+          onPress={handlePress}
+          {...cardPressHandlers}
+          accessibilityRole="button"
+          accessibilityLabel={openProductLabel}
+        >
           <Text
             style={[styles.name, isCatalogGrid && styles.nameCatalogGrid]}
             numberOfLines={1}
@@ -238,9 +288,20 @@ export const ProductCard = ({
               ) : null}
               <ProductCardModerationPreviewFields product={product} />
             </>
-          ) : (
-            <>
-              <View style={[styles.metaStrip, isCatalogGrid && styles.metaStripCatalogGrid]}>
+          ) : null}
+        </Pressable>
+
+        {!isModerationQueue ? (
+          <>
+            <View style={[styles.metaStrip, isCatalogGrid && styles.metaStripCatalogGrid]}>
+              <Pressable
+                style={styles.contentPressable}
+                onPress={handlePress}
+                {...cardPressHandlers}
+                accessibilityRole="button"
+                accessibilityLabel={openProductLabel}
+                importantForAccessibility="no-hide-descendants"
+              >
                 <Text
                   style={[
                     styles.rating,
@@ -252,15 +313,24 @@ export const ProductCard = ({
                 >
                   {hasReviewRating ? reviewLine : PRODUCT_REVIEW_UI.NO_REVIEWS}
                 </Text>
+              </Pressable>
 
-                <ProductCatalogStatusBadges
-                  product={product}
-                  showHiddenBadge={product.productIsAvailable === false}
-                  isMineMode={isMineMode}
-                  isLoyaltyPointsOvercommitted={isLoyaltyPointsOvercommitted}
-                />
-              </View>
+              <ProductCatalogStatusBadges
+                product={product}
+                showHiddenBadge={product.productIsAvailable === false}
+                isMineMode={isMineMode}
+                isLoyaltyPointsOvercommitted={isLoyaltyPointsOvercommitted}
+              />
+            </View>
 
+            <Pressable
+              style={styles.contentPressable}
+              onPress={handlePress}
+              {...cardPressHandlers}
+              accessibilityRole="button"
+              accessibilityLabel={openProductLabel}
+              importantForAccessibility="no-hide-descendants"
+            >
               <View
                 style={isCatalogGrid ? styles.sellerRowCatalogGrid : undefined}
                 accessibilityLabel={isMineMode ? PRODUCT_CARD_UI.PREVIEW_FIELDS_ARIA : undefined}
@@ -287,10 +357,10 @@ export const ProductCard = ({
                   {PRODUCT_MODERATION_PAGE_UI.REJECTION_COMMENT_PREFIX} {moderationRejectionComment}
                 </Text>
               ) : null}
-            </>
-          )}
-        </View>
-      </Pressable>
+            </Pressable>
+          </>
+        ) : null}
+      </View>
 
       {showSellerFooter ? (
         <View style={styles.footerActions}>
@@ -316,6 +386,6 @@ export const ProductCard = ({
           <WishlistToggleButton productId={product._id} product={product} variant="card" />
         </View>
       ) : null}
-    </View>
+    </Animated.View>
   );
 };

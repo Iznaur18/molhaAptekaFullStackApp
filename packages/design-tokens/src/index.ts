@@ -1,4 +1,8 @@
 export { izColors, izColorsDark } from "./colors";
+export {
+  PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO,
+  resolveProductMediaDisplayHeight,
+} from "./productMedia";
 export { izRadius } from "./radius";
 export { izSpacing } from "./spacing";
 export { izTypography } from "./typography";

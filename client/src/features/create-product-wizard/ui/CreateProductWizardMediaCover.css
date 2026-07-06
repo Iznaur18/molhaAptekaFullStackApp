@@ -1,7 +1,9 @@
+@import "../../../entities/product/ui/productImageTokens.css";
+
 .create-product-wizard-media-cover__frame {
   position: relative;
   overflow: hidden;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: var(--product-card-image-aspect-ratio);
   border-radius: 1rem;
   border: 1px solid color-mix(in srgb, var(--iz-color-action) 16%, var(--iz-color-border));
   background:

@@ -1,7 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo } from "react";
-import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
@@ -15,6 +15,8 @@ import { UserFollowButton } from "@/features/user-follow/ui/UserFollowButton";
 import { buildCatalogGridRows } from "@/features/catalog-grid/lib/buildCatalogGridRows";
 import { resolveCatalogGridListContentStyle } from "@/features/catalog-grid/lib/catalogGridLayout";
 import { CatalogGridRowItem } from "@/features/catalog-grid/ui/CatalogGridRowItem";
+import { CatalogAnimatedFlatList } from "@/features/catalog-grid/ui/CatalogAnimatedFlatList";
+import { CatalogScrollAnimationProvider } from "@/features/catalog-grid/model/CatalogScrollAnimationContext";
 import { SELLER_PRODUCTS_PAGE_UI, USER_LIST_ROW_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { useProductGridLayout } from "@/shared/model/useProductGridLayout";
@@ -136,8 +138,9 @@ export const SellerProductsPage = () => {
   const isFollowing = seller?.isFollowing === true;
 
   return (
-    <View style={[styles.container, centeredContentStyle]}>
-      <FlatList
+    <CatalogScrollAnimationProvider>
+      <View style={[styles.container, centeredContentStyle]}>
+        <CatalogAnimatedFlatList
         key={productGrid.listKey}
         style={styles.listFlex}
         data={catalogGridRows}
@@ -191,15 +194,17 @@ export const SellerProductsPage = () => {
             <ActivityIndicator style={styles.footerLoader} />
           ) : null
         }
-        renderItem={({ item }) => (
+        renderItem={({ item, index }) => (
           <CatalogGridRowItem
             row={item}
             columns={productGrid.columns}
             gap={productGrid.gap}
             tileWidth={productGrid.tileWidth}
+            rowIndex={index}
           />
         )}
-      />
-    </View>
+        />
+      </View>
+    </CatalogScrollAnimationProvider>
   );
 };

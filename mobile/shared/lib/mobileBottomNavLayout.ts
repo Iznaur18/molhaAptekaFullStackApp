@@ -1,11 +1,11 @@
-/** Паритет с web `MobileBottomNav.css` — inset 0.75rem @ 16px. */
-export const MOBILE_BOTTOM_NAV_HORIZONTAL_INSET = 12;
+/** Ozon-стиль: плоский бар во всю ширину, без боковых полей. */
+export const MOBILE_BOTTOM_NAV_HORIZONTAL_INSET = 0;
 
-/** Паритет с web `--mobile-bottom-nav-float-offset`. */
-export const MOBILE_BOTTOM_NAV_FLOAT_OFFSET = 10;
+/** Ozon-стиль: бар прижат к низу, «плавающий» зазор убран. */
+export const MOBILE_BOTTOM_NAV_FLOAT_OFFSET = 0;
 
-/** Web `.mobile-bottom-nav` item `min-height: 2.5rem`. */
-export const MOBILE_BOTTOM_NAV_ITEM_MIN_HEIGHT = 40;
+/** Ozon-стиль: высокий тач-таргет табов. */
+export const MOBILE_BOTTOM_NAV_ITEM_MIN_HEIGHT = 48;
 
 /** Shell `paddingBottom` floor when safe-area inset is zero. */
 export const MOBILE_BOTTOM_NAV_SHELL_MIN_PADDING_BOTTOM = 4;

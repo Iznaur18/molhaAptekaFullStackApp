@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   FlatList,
   Image,
@@ -16,6 +16,10 @@ import {
 import type { SiteHeaderBannerSlide } from "@/entities/site-header-banner/model/types";
 import { resolveSiteHeaderBannerMobileRoute } from "@/features/deep-linking/lib/resolveSiteHeaderBannerMobileRoute";
 import { SITE_HEADER_BANNER_UI } from "@/shared/config";
+import {
+  resolveSiteHeaderBannerCarouselIndex,
+  resolveSiteHeaderBannerCarouselMetrics,
+} from "@/shared/lib/siteHeaderBannerCarouselLayout";
 import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
 import { useSiteHeaderBannerCarouselStyles } from "@/shared/theme/siteHeaderBannerStyles";
 
@@ -34,6 +38,19 @@ export const SiteHeaderBannerCarousel = ({
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const listRef = useRef<FlatList<SiteHeaderBannerSlide>>(null);
+
+  const carouselMetrics = useMemo(
+    () => resolveSiteHeaderBannerCarouselMetrics(viewportWidth),
+    [viewportWidth],
+  );
+
+  const { slideWidth, gapWidth, stride } = edgeToEdge
+    ? {
+        slideWidth: viewportWidth,
+        gapWidth: 0,
+        stride: viewportWidth,
+      }
+    : carouselMetrics;
 
   const edgeStyles = edgeToEdge
     ? {
@@ -60,32 +77,31 @@ export const SiteHeaderBannerCarousel = ({
   }, [slides.length, viewportWidth]);
 
   useEffect(() => {
-    if (slides.length <= 1 || isPaused || viewportWidth <= 0) {
+    if (slides.length <= 1 || isPaused || stride <= 0) {
       return undefined;
     }
 
     const timerId = setInterval(() => {
       const nextIndex = (activeIndex + 1) % slides.length;
       listRef.current?.scrollToOffset({
-        offset: nextIndex * viewportWidth,
+        offset: nextIndex * stride,
         animated: true,
       });
       setActiveIndex(nextIndex);
     }, SITE_HEADER_BANNER_UI.AUTOPLAY_MS);
 
     return () => clearInterval(timerId);
-  }, [activeIndex, isPaused, slides.length, viewportWidth]);
+  }, [activeIndex, isPaused, slides.length, stride]);
 
   const handleMomentumScrollEnd = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      if (viewportWidth <= 0) {
+      if (stride <= 0) {
         return;
       }
       const offsetX = event.nativeEvent.contentOffset.x;
-      const nextIndex = Math.round(offsetX / viewportWidth);
-      setActiveIndex(Math.min(Math.max(nextIndex, 0), Math.max(slides.length - 1, 0)));
+      setActiveIndex(resolveSiteHeaderBannerCarouselIndex(offsetX, stride, slides.length));
     },
-    [slides.length, viewportWidth],
+    [slides.length, stride],
   );
 
   const handleSlidePress = useCallback(
@@ -168,14 +184,30 @@ export const SiteHeaderBannerCarousel = ({
         <FlatList
           ref={listRef}
           horizontal
-          pagingEnabled
+          pagingEnabled={edgeToEdge}
+          snapToInterval={edgeToEdge || stride <= 0 ? undefined : stride}
+          snapToAlignment="start"
+          decelerationRate="fast"
+          disableIntervalMomentum
           data={slides}
           keyExtractor={(item) => item.id}
           showsHorizontalScrollIndicator={false}
           onMomentumScrollEnd={handleMomentumScrollEnd}
+          getItemLayout={
+            stride > 0
+              ? (_, index) => ({
+                  length: stride,
+                  offset: stride * index,
+                  index,
+                })
+              : undefined
+          }
           renderItem={({ item, index }) => (
             <View
-              style={{ width: viewportWidth > 0 ? viewportWidth : "100%" }}
+              style={{
+                width: slideWidth > 0 ? slideWidth : "100%",
+                marginRight: index < slides.length - 1 ? gapWidth : 0,
+              }}
               accessibilityElementsHidden={index !== activeIndex}
               importantForAccessibility={index === activeIndex ? "auto" : "no-hide-descendants"}
             >
@@ -190,11 +222,11 @@ export const SiteHeaderBannerCarousel = ({
             key={slide.id}
             style={[styles.dot, index === activeIndex && styles.dotActive]}
             onPress={() => {
-              if (viewportWidth <= 0) {
+              if (stride <= 0) {
                 return;
               }
               listRef.current?.scrollToOffset({
-                offset: index * viewportWidth,
+                offset: index * stride,
                 animated: true,
               });
               setActiveIndex(index);

@@ -1,18 +1,19 @@
-import { Platform, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
+
+import { PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO } from "@izibuy/design-tokens";
 
 import { PRODUCT_CARD_BADGE_COLORS as BC } from "@/entities/product/lib/productCardBadgePalette";
+import { PRODUCT_CARD_SOFT_ELEVATION_SHADOW } from "@/entities/product/lib/productCardPromotionFramePalette";
 import {
   PRODUCT_CARD_BADGE_LAYOUT as BL,
   PRODUCT_CARD_BANNER_CHROME as BANNER,
   PRODUCT_CARD_IMAGE_BADGE_OVERLAY as BO,
   PRODUCT_CARD_IMAGE_BADGE_OVERLAY_LAYOUT as BOL,
   PRODUCT_CARD_MOBILE_LAYOUT,
+  PRODUCT_CARD_DETAIL_BADGE_ROW_CHROME as DBRC,
+  PRODUCT_CARD_STATUS_BADGE_OVERLAY_LAYOUT as BSOL,
 } from "@/entities/product/lib/productCardBadgePalette";
-import { PRODUCT_MEDIA_HERO_ASPECT_RATIO } from "@/entities/product/model/constants";
-import {
-  PRODUCT_CARD_MOBILE_CATALOG_LAYOUT as MCL,
-  resolveProductCardCatalogGridImageHeight,
-} from "@/entities/product/lib/productCardMobileCatalogLayout";
+import { PRODUCT_CARD_MOBILE_CATALOG_LAYOUT as MCL } from "@/entities/product/lib/productCardMobileCatalogLayout";
 import { CURATED_COMPACT_CARD_COLORS as C } from "@/entities/curated-product-list/lib/curatedCompactCardColors";
 import {
   CURATED_PRODUCT_LIST_HOME_CARD_GAP,
@@ -215,17 +216,15 @@ export const useProductCardStyles = createThemedStyles((theme) => ({
     paddingBottom: 7,
     borderRadius: 16,
     backgroundColor: theme.colors.surface,
-    // Без жёсткой рамки: карточка «плавает» на мягкой тени.
-    shadowColor: "#0f172a",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 12,
-    elevation: 2,
+    shadowColor: PRODUCT_CARD_SOFT_ELEVATION_SHADOW.shadowColor,
+    shadowOffset: { width: 0, height: PRODUCT_CARD_SOFT_ELEVATION_SHADOW.shadowOffsetY },
+    shadowOpacity: PRODUCT_CARD_SOFT_ELEVATION_SHADOW.shadowOpacity,
+    shadowRadius: PRODUCT_CARD_SOFT_ELEVATION_SHADOW.shadowRadius,
+    elevation: PRODUCT_CARD_SOFT_ELEVATION_SHADOW.elevation,
     overflow: "hidden",
   },
   cardCatalogGrid: {
     width: "100%",
-    height: MCL.fixedHeight,
     margin: 0,
     paddingTop: 0,
     paddingHorizontal: 0,
@@ -237,8 +236,7 @@ export const useProductCardStyles = createThemedStyles((theme) => ({
     maxHeight: undefined,
   },
   imageWrapCatalogGrid: {
-    height: resolveProductCardCatalogGridImageHeight(Platform.OS),
-    aspectRatio: undefined,
+    aspectRatio: PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO,
   },
   contentCatalogGrid: {
     paddingHorizontal: MCL.contentInsetX,
@@ -250,12 +248,12 @@ export const useProductCardStyles = createThemedStyles((theme) => ({
     fontSize: MCL.nameFontSize,
     lineHeight: MCL.nameLineHeight,
     maxHeight: MCL.headingHeight,
-    fontWeight: "700",
+    fontWeight: "500",
   },
   metaStripCatalogGrid: {
     gap: 2,
     maxHeight: MCL.metaHeight,
-    overflow: "hidden",
+    overflow: "visible",
   },
   ratingCatalogGrid: {
     fontSize: MCL.ratingFontSize,
@@ -274,21 +272,21 @@ export const useProductCardStyles = createThemedStyles((theme) => ({
     height: "100%",
   },
   contentPressable: {
-    flex: 1,
+    alignSelf: "stretch",
   },
   cardPressed: {
     opacity: 0.94,
   },
   wishlistSlot: {
     position: "absolute",
-    top: 8,
-    right: 8,
+    top: 6,
+    right: 6,
     zIndex: 3,
   },
   imageWrap: {
     position: "relative",
     marginHorizontal: -PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
-    aspectRatio: PRODUCT_CARD_MOBILE_LAYOUT.imageAspectRatio,
+    aspectRatio: PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO,
     backgroundColor: "rgba(17, 24, 39, 0.05)",
     overflow: "hidden",
     borderBottomLeftRadius: 10,
@@ -317,7 +315,7 @@ export const useProductCardStyles = createThemedStyles((theme) => ({
     gap: PRODUCT_CARD_MOBILE_LAYOUT.metaStripGap,
   },
   name: {
-    fontSize: 13.8,
+    fontSize: 14,
     lineHeight: 17,
     fontWeight: "400",
     color: theme.colors.text,
@@ -691,6 +689,34 @@ export const useProductCardMediaGalleryNavStyles = createThemedStyles((theme) =>
   },
 }));
 
+export const useProductCardGalleryDotsStyles = createThemedStyles((theme) => ({
+  root: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 8,
+    zIndex: 3,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 4,
+    pointerEvents: "none",
+  },
+  dot: {
+    height: 5,
+    borderRadius: 999,
+    backgroundColor: theme.colors.onContrast,
+  },
+}));
+
+export const useProductCardWishlistBurstStyles = createThemedStyles(() => ({
+  root: {
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 4,
+  },
+}));
+
 export const useProductCardSellerRowStyles = createThemedStyles((theme) => ({
   root: {
     minHeight: 14,
@@ -728,17 +754,13 @@ export const useProductLoyaltyPointsBadgeStyles = createThemedStyles(() => ({
     paddingHorizontal: BOL.paddingHorizontal,
     paddingVertical: BOL.paddingVertical,
     borderRadius: BOL.borderRadius,
-    borderWidth: 1,
-    borderColor: BO.borderColor,
+    // флеш к левому краю фото — левые углы прямые (Ozon-стиль)
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
     backgroundColor: BO.loyaltyBackground,
     alignSelf: "flex-start",
     flexShrink: 0,
     maxWidth: "100%",
-    shadowColor: BO.shadowColor,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 1,
-    shadowRadius: 4,
-    elevation: 2,
   },
   badgeText: {
     color: BC.loyaltyText,
@@ -750,8 +772,22 @@ export const useProductLoyaltyPointsBadgeStyles = createThemedStyles(() => ({
     color: BO.loyaltyText,
     fontSize: BOL.fontSize,
     lineHeight: BOL.lineHeight,
-    fontWeight: "700",
-    textAlign: "center",
+    fontWeight: "800",
+    textAlign: "left",
+  },
+  detailBadge: {
+    paddingHorizontal: BSOL.paddingHorizontal,
+    paddingVertical: BSOL.paddingVertical,
+    borderRadius: BSOL.borderRadius,
+    borderWidth: 0,
+    backgroundColor: BO.loyaltyBackground,
+    flexShrink: 0,
+  },
+  detailBadgeText: {
+    color: BO.loyaltyText,
+    fontSize: BSOL.fontSize,
+    lineHeight: BSOL.lineHeight,
+    fontWeight: "800",
   },
 }));
 
@@ -782,7 +818,7 @@ export const useProductPriceStyles = createThemedStyles((theme) => ({
     color: theme.colors.text,
   },
   cardCurrent: {
-    fontSize: 15.2,
+    fontSize: 18,
     fontWeight: "800",
     color: BC.priceCurrent,
     letterSpacing: -0.3,
@@ -810,17 +846,13 @@ export const useProductPriceStyles = createThemedStyles((theme) => ({
     paddingHorizontal: BOL.paddingHorizontal,
     paddingVertical: BOL.paddingVertical,
     borderRadius: BOL.borderRadius,
-    borderWidth: 1,
-    borderColor: BO.borderColor,
+    // флеш к левому краю фото — левые углы прямые (Ozon-стиль)
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
     backgroundColor: BO.discountBackground,
     alignSelf: "flex-start",
     flexShrink: 0,
     maxWidth: "100%",
-    shadowColor: BO.shadowColor,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 1,
-    shadowRadius: 4,
-    elevation: 2,
   },
   badgeText: {
     color: BC.discountText,
@@ -832,8 +864,8 @@ export const useProductPriceStyles = createThemedStyles((theme) => ({
     color: BO.discountText,
     fontSize: BOL.fontSize,
     lineHeight: BOL.lineHeight,
-    fontWeight: "700",
-    textAlign: "center",
+    fontWeight: "800",
+    textAlign: "left",
   },
   detailCurrent: {
     fontSize: 29.6,
@@ -856,13 +888,18 @@ export const useProductPriceStyles = createThemedStyles((theme) => ({
     columnGap: 9,
   },
   detailDiscountBadge: {
-    paddingHorizontal: 7.2,
-    paddingVertical: 3.2,
-    borderRadius: 6.4,
+    paddingHorizontal: BSOL.paddingHorizontal,
+    paddingVertical: BSOL.paddingVertical,
+    borderRadius: BSOL.borderRadius,
+    borderWidth: 0,
+    backgroundColor: BO.discountBackground,
+    flexShrink: 0,
   },
   detailDiscountText: {
-    fontSize: 13.1,
-    fontWeight: "700",
+    color: BO.discountText,
+    fontSize: BSOL.fontSize,
+    lineHeight: BSOL.lineHeight,
+    fontWeight: "800",
   },
   bannerRoot: {
     flexDirection: "row",
@@ -1171,7 +1208,7 @@ export const useProductMediaGalleryStyles = createThemedStyles((theme) => ({
   },
   hero: {
     width: "100%",
-    aspectRatio: PRODUCT_MEDIA_HERO_ASPECT_RATIO,
+    aspectRatio: PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO,
     borderRadius: theme.radius.md,
     overflow: "hidden",
     backgroundColor: theme.colors.surfaceMuted,
@@ -1408,9 +1445,15 @@ export const useProductDetailScreenStyles = createThemedStyles((theme) => ({
     flexDirection: "row",
     flexWrap: "wrap",
     alignItems: "center",
-    gap: 5.6,
-    rowGap: 5.6,
-    columnGap: 7.2,
+    alignSelf: "stretch",
+    width: "100%",
+    gap: BSOL.rowGap,
+    rowGap: BSOL.rowGap,
+    columnGap: BSOL.rowGap,
+    paddingHorizontal: DBRC.paddingHorizontal,
+    paddingVertical: DBRC.paddingVertical,
+    borderRadius: DBRC.borderRadius,
+    backgroundColor: `${theme.colors.text}0A`,
   },
   detailsSection: {
     paddingHorizontal: DETAIL_SPEC_PADDING_H,
@@ -1513,6 +1556,8 @@ export const useProductDetailScreenStyles = createThemedStyles((theme) => ({
     left: 0,
     right: 0,
     bottom: 0,
+    zIndex: 10,
+    elevation: 10,
     paddingTop: 8.8,
     paddingHorizontal: 12,
     paddingBottom: 10.4,
@@ -1836,6 +1881,19 @@ export const useProductDetailTabStyles = createThemedStyles((theme) => ({
     lineHeight: 20,
     color: theme.colors.infoNavy,
   },
+  installmentBuyerHintBlocked: {
+    margin: 0,
+    paddingVertical: 10.4,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.danger,
+    borderRadius: 10.4,
+    backgroundColor: `${theme.colors.danger}33`,
+    fontSize: 13.6,
+    lineHeight: 20,
+    fontWeight: "600",
+    color: theme.colors.danger,
+  },
   error: {
     color: theme.colors.danger,
     fontSize: 13,
@@ -2143,6 +2201,7 @@ export const useProductDetailTabStyles = createThemedStyles((theme) => ({
   },
   quantityField: {
     maxWidth: 120,
+    backgroundColor: theme.colors.surfaceMuted,
   },
   summaryCard: {
     position: "relative",
@@ -2225,7 +2284,7 @@ export const useProductDetailTabStyles = createThemedStyles((theme) => ({
   totalBoxLabel: {
     fontSize: 12,
     fontWeight: "600",
-    color: theme.colors.textMuted,
+    color: theme.colors.action,
   },
   totalBoxValue: {
     fontSize: 17,

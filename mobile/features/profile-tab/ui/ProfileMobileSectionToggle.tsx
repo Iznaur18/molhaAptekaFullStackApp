@@ -21,7 +21,7 @@ export const ProfileMobileSectionToggle = ({
   const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
 
   return (
-    <Animated.View style={animatedStyle}>
+    <Animated.View style={[styles.outer, animatedStyle]}>
     <Pressable
       style={styles.root}
       accessibilityRole="button"

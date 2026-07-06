@@ -84,5 +84,5 @@ export const useScreenLayout = (): ScreenLayout => {
       centeredContentStyle,
       profileContentStyle,
     };
-  }, [height, safeAreaInsets.bottom, safeAreaInsets.left, safeAreaInsets.right, width]);
+  }, [height, safeAreaInsets.bottom, safeAreaInsets.left, safeAreaInsets.right, safeAreaInsets.top, width]);
 };

@@ -28,7 +28,7 @@ test("create raffle page mirrors web modal form and hub chrome", () => {
   assert.match(formBody, /SECTION_CONDITIONS/);
 
   assert.match(styles, /sectionTitle/);
-  assert.match(styles, /accentPinkSurface/);
+  assert.match(styles, /actionSoft/);
   assert.match(styles, /previewFrame/);
 });
 

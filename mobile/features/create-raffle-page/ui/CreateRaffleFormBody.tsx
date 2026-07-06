@@ -1,6 +1,5 @@
 import { ActivityIndicator, Pressable, Text, TextInput, View } from "react-native";
 
-import { RAFFLE_FEATURED_PALETTE } from "@/entities/raffle/lib/raffleFeaturedPalette";
 import {
   RAFFLE_PRIZE_MEDIA_TYPE_IMAGE,
   RAFFLE_PRIZE_MEDIA_TYPE_VIDEO,
@@ -235,7 +234,7 @@ export const CreateRaffleFormBody = ({
           disabled={isSubmitting}
         >
           {isSubmitting ? (
-            <ActivityIndicator color={RAFFLE_FEATURED_PALETTE.onContrast} />
+            <ActivityIndicator color={theme.colors.onContrast} />
           ) : (
             <Text style={styles.submitText}>{submitLabel}</Text>
           )}

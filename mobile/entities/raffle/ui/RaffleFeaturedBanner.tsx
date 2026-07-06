@@ -50,7 +50,7 @@ export const RaffleFeaturedBanner = ({
   const target = Number(raffle.targetSales) || 0;
   const percent = target > 0 ? Math.min(100, Math.round((progress / target) * 100)) : 0;
   const remaining = Math.max(0, target - progress);
-  const copyOnBackdropStyle = hasBackdrop ? styles.copyOnBackdrop : undefined;
+  const copyOnBackdropStyle = undefined;
 
   const handleOpenInstagram = async () => {
     const url = raffle.instagramUrl?.trim();
@@ -82,7 +82,7 @@ export const RaffleFeaturedBanner = ({
           isCompleted && hasBackdrop && styles.innerCompletedBackdrop,
         ]}
       >
-        {!hasBackdrop ? <RaffleFeaturedBannerBackground completed={isCompleted} /> : null}
+        {!hasBackdrop ? <RaffleFeaturedBannerBackground /> : null}
         <RaffleFeaturedBannerBackdropLayer
           raffle={raffle}
           backdrop={backdrop}
@@ -164,7 +164,6 @@ export const RaffleFeaturedBanner = ({
             <View
               style={[
                 styles.progressBar,
-                hasBackdrop && styles.progressBarBackdrop,
                 isCompleted && styles.progressBarCompleted,
               ]}
               accessibilityRole="progressbar"
@@ -177,11 +176,7 @@ export const RaffleFeaturedBanner = ({
               <View
                 style={[
                   styles.progressFill,
-                  hasBackdrop
-                    ? styles.progressFillBackdrop
-                    : isCompleted
-                      ? styles.progressFillCompleted
-                      : null,
+                  isCompleted ? styles.progressFillCompleted : null,
                   { width: `${percent}%` },
                 ]}
               />

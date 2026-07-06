@@ -59,6 +59,80 @@
   pointer-events: auto;
 }
 
+.product-card__promotion-ribbon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  margin: 0;
+  padding: 0.28rem 0.7rem 0.32rem 0.62rem;
+  border-bottom-right-radius: 0.75rem;
+  color: var(--iz-color-on-contrast);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  pointer-events: none;
+  overflow: hidden;
+  box-shadow: 0 2px 8px var(--iz-color-overlay-black-soft);
+}
+
+.product-card__promotion-ribbon--tier-1 {
+  background: linear-gradient(
+    120deg,
+    color-mix(in srgb, var(--iz-color-warning) 78%, var(--iz-color-gold-soft)),
+    var(--iz-color-warning)
+  );
+}
+
+.product-card__promotion-ribbon--tier-2 {
+  background: linear-gradient(
+    120deg,
+    color-mix(in srgb, var(--iz-color-accent-purple) 78%, var(--iz-color-accent-purple-soft)),
+    var(--iz-color-accent-purple)
+  );
+}
+
+.product-card__promotion-ribbon--tier-3 {
+  background: linear-gradient(
+    120deg,
+    color-mix(in srgb, var(--product-card-banner-accent) 78%, var(--product-card-banner-accent-soft)),
+    var(--product-card-banner-accent)
+  );
+}
+
+.product-card__promotion-ribbon::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 38%,
+    color-mix(in srgb, var(--iz-color-on-contrast) 42%, transparent) 50%,
+    transparent 62%
+  );
+  transform: translateX(-130%);
+  animation: product-card-promotion-ribbon-shine 4.5s ease-in-out infinite;
+}
+
+@keyframes product-card-promotion-ribbon-shine {
+  0% {
+    transform: translateX(-130%);
+  }
+  45%,
+  100% {
+    transform: translateX(130%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-card__promotion-ribbon::after {
+    animation: none;
+    content: none;
+  }
+}
+
 .product-card__image-placeholder {
   position: absolute;
   inset: 0;

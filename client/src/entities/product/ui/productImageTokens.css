@@ -3,7 +3,7 @@
  * Импортируйте этот файл первым в связанных `*.css`.
  */
 :root {
-  /** Квадрат превью на карточке каталога — фиксированная высота блока с фото. */
+  /** Квадрат превью — SSOT: @izibuy/design-tokens PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO (1). */
   --product-card-image-aspect-ratio: 1 / 1;
   --product-image-thumb-side: 4rem;
   /** Квадрат основного фото в модалке товара (левая колонка). */

@@ -4,13 +4,16 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { test } from "node:test";
 
+import {
+  PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO,
+  resolveProductMediaDisplayHeight,
+} from "../../packages/design-tokens/src/productMedia.ts";
+
 const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
 const LAYOUT = {
-  fixedHeight: 516,
   bottomPadding: 7.2,
   bodyGap: 4,
-  imageHeight: 328,
   headingHeight: 20,
   priceHeight: 21,
   metaHeight: 46,
@@ -27,35 +30,22 @@ const resolveContentBelowImageHeight = (layout) =>
   layout.bodyGap +
   layout.sellerRowHeight;
 
-const resolveImageHeight = (platformOs, layout = LAYOUT) => {
-  if (platformOs !== "ios") {
-    return layout.imageHeight;
-  }
-
-  return Math.round(
-    layout.fixedHeight - layout.bottomPadding - resolveContentBelowImageHeight(layout),
-  );
-};
-
-test("catalog-grid image height fills iOS card without bottom slack", () => {
-  const imageHeight = resolveImageHeight("ios");
-  const contentBelow = resolveContentBelowImageHeight(LAYOUT);
-  const total = imageHeight + contentBelow + LAYOUT.bottomPadding;
-
-  assert.equal(imageHeight, 306);
-  assert.ok(Math.abs(total - LAYOUT.fixedHeight) < 1);
+test("product media display aspect ratio is square", () => {
+  assert.equal(PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO, 1);
+  assert.equal(resolveProductMediaDisplayHeight(180), 180);
 });
 
-test("catalog-grid image height unchanged on web and android", () => {
-  assert.equal(resolveImageHeight("web"), 273);
-  assert.equal(resolveImageHeight("android"), 273);
+test("catalog-grid text stack height unchanged", () => {
+  assert.equal(resolveContentBelowImageHeight(LAYOUT), 116.5);
 });
 
-test("catalogProductStyles uses platform-aware catalog-grid image height", () => {
+test("catalogProductStyles uses shared product media aspect ratio for catalog grid", () => {
   const source = readFileSync(
     join(REPO_ROOT, "mobile/shared/theme/catalogProductStyles.ts"),
     "utf8",
   );
 
-  assert.match(source, /resolveProductCardCatalogGridImageHeight\(Platform\.OS\)/);
+  assert.match(source, /PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO/);
+  assert.match(source, /imageWrapCatalogGrid:[\s\S]*aspectRatio: PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO/);
+  assert.doesNotMatch(source, /resolveProductCardCatalogGridImageHeight/);
 });

@@ -1,12 +1,21 @@
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
+  Dimensions,
   Modal,
   Pressable,
+  StyleSheet,
   Text,
   TextInput,
   View,
 } from "react-native";
+import Animated, {
+  Easing,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
 import { useSubmitProductReportMutation } from "@/entities/product-report/model/useSubmitProductReportMutation";
 import {
@@ -14,7 +23,10 @@ import {
   PRODUCT_REPORT_UI,
 } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
-import { useBottomSheetReportModalStyles } from "@/shared/theme/modalChromeStyles";
+import {
+  REPORT_PRODUCT_MODAL_ANIMATION,
+  useBottomSheetReportModalStyles,
+} from "@/shared/theme/modalChromeStyles";
 
 type ReportProductModalProps = {
   visible: boolean;
@@ -24,6 +36,9 @@ type ReportProductModalProps = {
   onClose: () => void;
   onSubmitted?: () => void;
 };
+
+const { enterMs, exitMs, sheetSlideDistance, sheetRestOffsetRatio } =
+  REPORT_PRODUCT_MODAL_ANIMATION;
 
 export const ReportProductModal = ({
   visible,
@@ -35,18 +50,82 @@ export const ReportProductModal = ({
 }: ReportProductModalProps) => {
   const styles = useBottomSheetReportModalStyles();
   const theme = useAppTheme();
+  const sheetRestOffset = useMemo(
+    () => Dimensions.get("window").height * sheetRestOffsetRatio,
+    [],
+  );
   const submitMutation = useSubmitProductReportMutation();
+  const [modalVisible, setModalVisible] = useState(visible);
   const [reportText, setReportText] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const backdropOpacity = useSharedValue(0);
+  const sheetTranslateY = useSharedValue(sheetSlideDistance);
 
   const charCount = reportText.length;
   const isOverLimit = charCount > PRODUCT_REPORT_TEXT_MAX_CHARS;
   const isBlocked = hasPendingReport || !productId;
   const isSubmitting = submitMutation.isPending;
 
-  const handleClose = () => {
+  const resetForm = useCallback(() => {
     setReportText("");
     setErrorMessage("");
+  }, []);
+
+  const finishClose = useCallback(() => {
+    setModalVisible(false);
+    resetForm();
+  }, [resetForm]);
+
+  useEffect(() => {
+    if (visible) {
+      setModalVisible(true);
+      backdropOpacity.value = 0;
+      sheetTranslateY.value = sheetSlideDistance;
+      backdropOpacity.value = withTiming(1, {
+        duration: enterMs,
+        easing: Easing.out(Easing.cubic),
+      });
+      sheetTranslateY.value = withTiming(0, {
+        duration: enterMs,
+        easing: Easing.out(Easing.cubic),
+      });
+      return;
+    }
+
+    if (!modalVisible) {
+      return;
+    }
+
+    backdropOpacity.value = withTiming(0, {
+      duration: exitMs,
+      easing: Easing.in(Easing.cubic),
+    });
+    sheetTranslateY.value = withTiming(
+      sheetSlideDistance,
+      {
+        duration: exitMs,
+        easing: Easing.in(Easing.cubic),
+      },
+      (finished) => {
+        if (finished) {
+          runOnJS(finishClose)();
+        }
+      },
+    );
+  }, [backdropOpacity, finishClose, modalVisible, sheetTranslateY, visible]);
+
+  const backdropAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: backdropOpacity.value,
+  }));
+
+  const sheetAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: sheetTranslateY.value }],
+  }));
+
+  const handleClose = () => {
+    if (isSubmitting) {
+      return;
+    }
     onClose();
   };
 
@@ -70,10 +149,23 @@ export const ReportProductModal = ({
     }
   };
 
+  if (!modalVisible) {
+    return null;
+  }
+
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={handleClose}>
-      <View style={styles.overlay}>
-        <View style={styles.card}>
+    <Modal visible={modalVisible} animationType="none" transparent onRequestClose={handleClose}>
+      <View style={[styles.root, { paddingBottom: sheetRestOffset }]}>
+        <Animated.View style={[styles.backdrop, backdropAnimatedStyle]} pointerEvents="box-none">
+          <Pressable
+            style={StyleSheet.absoluteFillObject}
+            onPress={handleClose}
+            disabled={isSubmitting}
+            accessibilityLabel={PRODUCT_REPORT_UI.CANCEL}
+          />
+        </Animated.View>
+
+        <Animated.View style={[styles.card, sheetAnimatedStyle]}>
           <Text style={styles.title}>{PRODUCT_REPORT_UI.MODAL_TITLE}</Text>
           {productName ? <Text style={styles.productName}>{productName}</Text> : null}
 
@@ -120,7 +212,7 @@ export const ReportProductModal = ({
               </Pressable>
             ) : null}
           </View>
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );

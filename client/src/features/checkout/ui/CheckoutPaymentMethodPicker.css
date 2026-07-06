@@ -1,0 +1,72 @@
+.checkout-payment-method-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-top: 0.35rem;
+}
+
+.checkout-payment-method-picker__legend {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--iz-color-text-secondary);
+}
+
+.checkout-payment-method-picker__scroll {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding-bottom: 0.15rem;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+
+.checkout-payment-method-picker__card {
+  box-sizing: border-box;
+  flex: 0 0 9.25rem;
+  min-height: 5.25rem;
+  padding: 0.75rem;
+  border: 1px solid transparent;
+  border-radius: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  scroll-snap-align: start;
+  background: var(--iz-color-surface-muted);
+  color: var(--iz-color-text);
+  font: inherit;
+  text-align: center;
+}
+
+.checkout-payment-method-picker__card--cardPrepaid:not(
+    .checkout-payment-method-picker__card--selected
+  ) {
+  background: #e8f2ff;
+  border-color: #e8f2ff;
+  color: #0057d9;
+}
+
+.checkout-payment-method-picker__card--cashOnDelivery:not(
+    .checkout-payment-method-picker__card--selected
+  ) {
+  background: #ecfdf5;
+  border-color: #ecfdf5;
+  color: #047857;
+}
+
+.checkout-payment-method-picker__card--selected {
+  background: var(--iz-color-surface);
+  border: 2px solid var(--iz-color-action);
+  color: var(--iz-color-text);
+}
+
+.checkout-payment-method-picker__card:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.checkout-payment-method-picker__label {
+  font-size: 0.8125rem;
+  line-height: 1.25;
+  font-weight: 600;
+}

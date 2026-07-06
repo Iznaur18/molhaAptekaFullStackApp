@@ -870,11 +870,11 @@ export const USER_STORY_UI = {
   CLOSE: "Закрыть",
   ERROR_GENERIC: "Не удалось выполнить действие",
   ERROR_VIDEO_TYPE: "Видео: только MP4 или WebM",
-  ERROR_VIDEO_SIZE: "Видео: не больше 50 МБ",
+  ERROR_VIDEO_SIZE: "Видео: не больше 100 МБ",
   ERROR_VIDEO_ASPECT: "Видео: только вертикальный формат 9:16",
   ERROR_VIDEO_READ: "Не удалось прочитать видео",
   VIDEO_DURATION_HINT:
-    "Максимум 30 секунд: более длинный ролик автоматически обрежется при загрузке. Исходный файл — до 50 МБ.",
+    "Максимум 30 секунд: более длинный ролик автоматически обрежется при загрузке. Исходный файл — до 100 МБ.",
   ERROR_IMAGE: "Не удалось обработать фото",
   ERROR_CAPTION: "Текст: не больше 150 символов",
   ERROR_MEDIA_REQUIRED: "Выберите фото или видео",
@@ -1302,7 +1302,8 @@ export const CREATE_PRODUCT_MODAL_UI = {
   WIZARD_MEDIA_COVER_LABEL: "Обложка в каталоге",
   WIZARD_MEDIA_COVER_EMPTY: "Добавьте фото — первое станет обложкой",
   WIZARD_MEDIA_GALLERY_LABEL: "Галерея",
-  WIZARD_MEDIA_GALLERY_HINT: "Листайте галерею и меняйте порядок стрелками. Первое фото — главное.",
+  WIZARD_MEDIA_GALLERY_HINT:
+    "Листайте галерею и меняйте порядок стрелками. Первое фото — главное. В каталоге обложка показывается в квадрате — центр кадра попадёт в превью.",
   WIZARD_MEDIA_MOVE_EARLIER: "Левее",
   WIZARD_MEDIA_MOVE_EARLIER_ARIA: "Сдвинуть фото левее",
   WIZARD_MEDIA_MOVE_LATER: "Правее",
@@ -1453,14 +1454,14 @@ export const PRODUCT_CARD_UI = {
   AUCTION_BADGE: "Аукцион",
   LOYALTY_POINTS_TOOLTIP: "Даёт продавец; получает премиум-покупатель",
   /** @param {number} percent */
-  DISCOUNT_BADGE: (percent) => `скидка -${percent}%`,
+  DISCOUNT_BADGE: (percent) => `-${percent}%`,
   /** @param {number} points */
   LOYALTY_POINTS_PREMIUM: (points) => `+${points} ${pluralizeRuBall(points)}`,
   /** @param {number} points */
   LOYALTY_POINTS_WITH_PREMIUM: (points) => `+${points} ${pluralizeRuBall(points)}`,
   /** @param {number} points */
   LOYALTY_POINTS_GUEST: (points) =>
-    `До +${points} ${pluralizeRuBall(points)} с премиум`,
+    `+${points} ${pluralizeRuBall(points)} с премиум`,
   LOYALTY_POINTS_OVERCOMMITTED_BADGE: "Бонус выше доступного остатка баллов",
   RAFFLE_PARTICIPATION_ON: "Участвует в розыгрыше",
   RAFFLE_PARTICIPATION_OFF: "Добавить в розыгрыш",

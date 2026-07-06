@@ -105,6 +105,8 @@ export const IMAGE_UPLOAD_UI = {
   COVER_BADGE: "Обложка",
   REMOVE_PHOTO: "Удалить фото",
   TAP_TO_COVER_HINT: "Нажмите на фото, чтобы сделать его обложкой",
+  PRODUCT_PHOTO_CROP_HINT:
+    "В каталоге обложка показывается в квадрате — центр кадра попадёт в превью.",
 } as const;
 
 export const SCREEN_STATE_UI = {
@@ -242,7 +244,7 @@ export const PRODUCT_DETAILS_MODAL_UI = {
 } as const;
 
 export const PRODUCT_CARD_UI = {
-  DISCOUNT_BADGE: (percent: number) => `скидка -${percent}%`,
+  DISCOUNT_BADGE: (percent: number) => `-${percent}%`,
   STATUS_BADGES_ARIA: "Статусы товара",
   NO_STATUS_BADGE: "нет бейджа",
   PROMOTED_BADGE: "Буст",
@@ -254,7 +256,7 @@ export const PRODUCT_CARD_UI = {
   HIDDEN_FROM_CATALOG_BADGE: "Скрыт от покупателей",
   LOYALTY_POINTS_PREMIUM: (points: number) => `+${points} баллов`,
   LOYALTY_POINTS_WITH_PREMIUM: (points: number) => `+${points} баллов`,
-  LOYALTY_POINTS_GUEST: (points: number) => `До +${points} баллов с премиум`,
+  LOYALTY_POINTS_GUEST: (points: number) => `+${points} баллов с премиум`,
   SELLER_PROFILE_ARIA: (sellerName: string) => `Профиль продавца: ${sellerName}`,
   RATING_LINE: (rating: number, count: number) => `★ ${rating.toFixed(1)} (${count})`,
   PROMOTION_BUTTON: "Управление",
@@ -266,6 +268,7 @@ export const PRODUCT_CARD_UI = {
   LOYALTY_POINTS_OVERCOMMITTED_BADGE: "Бонус выше доступного остатка баллов",
   GALLERY_REGION_ARIA: "Галерея фото товара",
   GALLERY_COUNTER_ARIA: (current: number, total: number) => `Фото ${current} из ${total}`,
+  DOUBLE_TAP_WISHLIST_HINT: "Двойное нажатие добавит товар в избранное",
   GALLERY_PREV: "Предыдущее фото",
   GALLERY_NEXT: "Следующее фото",
   AVAILABILITY_TOGGLE_PENDING: "Обновление…",
@@ -309,6 +312,7 @@ export const PRODUCT_PROMOTION_UI = {
     `Недостаточно баллов: нужно ${required}, у вас ${balance}.`,
   SUBMIT_POINTS: "Оплатить баллами",
   SUBMIT_PENDING: "Отправка…",
+  CLOSE: "Закрыть",
   CANCEL: "Отмена",
   SUCCESS_DEFAULT: "Продвижение активировано.",
   LOADING_TARIFFS: "Загрузка тарифов…",
@@ -428,12 +432,12 @@ export const USER_STORY_UI = {
   ERROR_IMAGE: "Не удалось обработать фото",
   ERROR_CAPTION: "Текст: не больше 150 символов",
   ERROR_MEDIA_REQUIRED: "Выберите фото или видео",
-  ERROR_VIDEO_SIZE: "Видео: не больше 50 МБ",
+  ERROR_VIDEO_SIZE: "Видео: не больше 100 МБ",
   ERROR_VIDEO_TYPE: "Видео: только MP4, WebM или MOV",
   ERROR_VIDEO_ASPECT: "Видео: только вертикальный формат 9:16",
   ERROR_VIDEO_READ: "Не удалось прочитать видео",
   VIDEO_DURATION_HINT:
-    "Максимум 30 секунд: более длинный ролик автоматически обрежется при загрузке. Исходный файл — до 50 МБ.",
+    "Максимум 30 секунд: более длинный ролик автоматически обрежется при загрузке. Исходный файл — до 100 МБ.",
   STORY_REPORT_TITLE: "Жалоба на сторис",
   STORY_REPORT_SUBMIT: "Отправить жалобу",
   STORY_REPORT_PENDING: "Отправляем…",
@@ -549,6 +553,8 @@ export const INSTALLMENT_UI = {
   FIRST_PAYMENT_LATER: "первый платёж позже",
   QUANTITY_LABEL: "Количество",
   MONTHLY_LABEL: "Ежемесячно",
+  BUYER_PRODUCT_PRICE_LABEL: "Цена товара",
+  BUYER_MARKUP_LABEL: "Переплата",
   TOTAL_LABEL: "Итого по договору",
   PAYMENT_METHOD_LABEL: "Способ оплаты",
   SUBMIT: "Оформить рассрочку",
@@ -654,7 +660,11 @@ export const INSTALLMENT_UI = {
   PROGRAM_MODAL_ERROR_PLAN_MONTHLY: (planNumber: number, minRub: number) =>
     `План ${planNumber}: платёж от ${minRub} ₽`,
   PROGRAM_MODAL_MONTHS: "Месяцев",
+  PROGRAM_MODAL_MARKUP_PERCENT: "Надбавка, %",
   PROGRAM_MODAL_MONTHLY: "Платёж, ₽",
+  PROGRAM_MODAL_PLAN_ORIGINAL_PRICE: (formatted: string) => `Цена товара: ${formatted}`,
+  PROGRAM_MODAL_PLAN_MARKUP: (rubFormatted: string, percent: number) =>
+    `Надбавка: +${rubFormatted} (+${percent}%)`,
   PROGRAM_MODAL_PLAN_TOTAL: (formatted: string) => `Итого ${formatted}`,
   PROGRAM_MODAL_FIRST_NOW: "Первый платёж сразу",
   PROGRAM_MODAL_ADD_PLAN: "Добавить план",

@@ -24,7 +24,6 @@ export const useProductPromotionManageSupport = ({
   const [raffleParticipationPendingProductId, setRaffleParticipationPendingProductId] = useState<
     string | null
   >(null);
-  const [installmentProgramModalVisible, setInstallmentProgramModalVisible] = useState(false);
 
   const sellerRaffleActive = myRaffleQuery.data?.raffle?.status === "active";
   const productId = product?._id != null ? String(product._id) : null;
@@ -73,9 +72,6 @@ export const useProductPromotionManageSupport = ({
     handleToggleRaffleParticipation,
     isRaffleParticipationPending:
       productId != null && raffleParticipationPendingProductId === productId,
-    installmentProgramModalVisible,
-    openInstallmentProgramModal: () => setInstallmentProgramModalVisible(true),
-    closeInstallmentProgramModal: () => setInstallmentProgramModalVisible(false),
     handleInstallmentProgramSaved,
   };
 };

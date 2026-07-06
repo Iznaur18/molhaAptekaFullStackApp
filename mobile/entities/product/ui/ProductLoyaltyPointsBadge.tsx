@@ -10,7 +10,7 @@ type ProductLoyaltyPointsBadgeProps = {
   product: Record<string, unknown>;
   isAuthorized?: boolean;
   isPremiumUser?: boolean;
-  variant?: "inline" | "overlay";
+  variant?: "inline" | "overlay" | "detail";
 };
 
 export const ProductLoyaltyPointsBadge = ({
@@ -33,9 +33,23 @@ export const ProductLoyaltyPointsBadge = ({
       : PRODUCT_CARD_UI.LOYALTY_POINTS_WITH_PREMIUM(points);
 
   return (
-    <View style={variant === "overlay" ? styles.badgeOverlay : styles.badge}>
+    <View
+      style={
+        variant === "overlay"
+          ? styles.badgeOverlay
+          : variant === "detail"
+            ? styles.detailBadge
+            : styles.badge
+      }
+    >
       <AppText
-        style={variant === "overlay" ? styles.badgeOverlayText : styles.badgeText}
+        style={
+          variant === "overlay"
+            ? styles.badgeOverlayText
+            : variant === "detail"
+              ? styles.detailBadgeText
+              : styles.badgeText
+        }
         numberOfLines={1}
       >
         {label}

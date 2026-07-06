@@ -41,7 +41,12 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.35rem 0.45rem;
+  align-self: stretch;
+  width: 100%;
+  gap: 0.125rem;
+  padding: 0.375rem 0.5rem;
+  border-radius: 0.625rem;
+  background: color-mix(in srgb, currentColor 4%, transparent);
 }
 
 /* Совпадает с APP_SHELL_MOBILE_NAV_BREAKPOINT_PX (640px): бейджи только на мобиле. */
@@ -49,6 +54,44 @@
   .product-details-modal .product-details-modal__price-badge-row {
     display: none;
   }
+}
+
+.product-details-modal__price-badge-row .product-discount-badge {
+  margin: 0;
+  padding: 0.25rem 0.625rem;
+  border: 0;
+  border-radius: 0.375rem;
+  background: #fbdcea;
+  color: #f1117e;
+  font-size: 0.625rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.product-details-modal__price-badge-row .product-card__auction-badge,
+.product-details-modal__price-badge-row .product-card__installment-badge,
+.product-details-modal__price-badge-row .product-card__raffle-badge {
+  border: 0;
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.625rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.product-details-modal__price-badge-row .product-card__auction-badge {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.product-details-modal__price-badge-row .product-card__installment-badge {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.product-details-modal__price-badge-row .product-card__raffle-badge {
+  background: #ede9fe;
+  color: #5b21b6;
 }
 
 .product-details-modal__price-badge-row .product-catalog-status-badges {

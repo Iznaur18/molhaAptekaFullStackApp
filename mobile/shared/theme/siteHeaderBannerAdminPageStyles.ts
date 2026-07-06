@@ -64,14 +64,14 @@ export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme) => 
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
     borderRadius: 12,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.surfaceElevated,
   },
   standalonePanel: {
     overflow: "hidden",
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
     borderRadius: 12,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.surfaceElevated,
     paddingHorizontal: 14,
     paddingVertical: 12,
   },
@@ -96,7 +96,7 @@ export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme) => 
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
     borderRadius: 12,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.surfaceElevated,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.06,
@@ -108,11 +108,11 @@ export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme) => 
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: theme.colors.border,
-    backgroundColor: theme.colors.bg,
+    borderBottomColor: theme.colors.action,
+    backgroundColor: theme.colors.action,
     fontSize: 15,
     fontWeight: "600",
-    color: theme.colors.text,
+    color: theme.colors.onContrast,
   },
   fieldBlock: {
     paddingHorizontal: 14,
@@ -122,7 +122,7 @@ export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme) => 
     gap: 8,
   },
   fieldBlockActions: {
-    backgroundColor: theme.colors.bg,
+    backgroundColor: theme.colors.surfaceMuted,
   },
   label: {
     gap: 6,
@@ -141,7 +141,7 @@ export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme) => 
     borderRadius: 10,
     fontSize: 15,
     color: theme.colors.text,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: theme.colors.surface,
   },
   switchRow: {
     flexDirection: "row",
@@ -151,7 +151,7 @@ export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme) => 
   },
   preview: {
     width: "100%",
-    backgroundColor: theme.colors.bg,
+    backgroundColor: theme.colors.surfaceMuted,
   },
   empty: {
     fontSize: 14,
@@ -170,13 +170,13 @@ export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme) => 
     borderColor: theme.colors.border,
   },
   colorSwatchEmpty: {
-    backgroundColor: theme.colors.bg,
+    backgroundColor: theme.colors.surface,
   },
   colorInput: {
     flex: 1,
   },
   actions: {
-    backgroundColor: theme.colors.bg,
+    backgroundColor: theme.colors.surfaceMuted,
   },
   button: {
     minHeight: 44,
@@ -186,18 +186,18 @@ export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme) => 
     paddingHorizontal: 16,
   },
   buttonPrimary: {
-    backgroundColor: theme.colors.link,
+    backgroundColor: theme.colors.action,
   },
   buttonSecondary: {
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: theme.colors.surface,
   },
   buttonDanger: {
     alignSelf: "flex-start",
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#fecaca",
-    backgroundColor: theme.colors.surface,
+    borderColor: theme.colors.danger,
+    backgroundColor: theme.colors.danger,
   },
   buttonTextPrimary: {
     fontSize: 15,
@@ -212,7 +212,7 @@ export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme) => 
   buttonTextDanger: {
     fontSize: 15,
     fontWeight: "600",
-    color: DANGER_STRONG,
+    color: theme.colors.onContrast,
   },
   error: {
     fontSize: 14,

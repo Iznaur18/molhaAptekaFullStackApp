@@ -31,7 +31,7 @@ test("my products page uses catalog toolbar, grid and seller card footer", () =>
   assert.match(tabBar, /SellerProductsLimitModal/);
   assert.match(tabBar, /usePlaceProductPress/);
   assert.match(page, /sellerRaffleActive/);
-  assert.match(page, /openInstallmentProgramModal/);
+  assert.match(page, /handleInstallmentProgramSaved/);
   assert.match(page, /useMyProductsPageActions/);
   assert.match(page, /moderationStatus: moderationFilter/);
   assert.doesNotMatch(page, /cardWrap/);

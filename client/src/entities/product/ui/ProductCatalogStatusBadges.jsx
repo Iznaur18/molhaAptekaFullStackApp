@@ -66,21 +66,6 @@ export function ProductCatalogStatusBadges({
       aria-label={PRODUCT_CARD_UI.STATUS_BADGES_ARIA}
     >
       <ProductCardStatusSlot vm={statusSlotVm} />
-      {flags.showPromotionBoostBadge ? (
-        <p className="product-card__promotion-boost-badge" role="status">
-          {PRODUCT_CARD_UI.PROMOTED_BADGE}
-        </p>
-      ) : null}
-      {flags.showPromotionTopBadge ? (
-        <p className="product-card__promotion-top-badge" role="status">
-          {PRODUCT_CARD_UI.PROMOTION_TOP_BADGE}
-        </p>
-      ) : null}
-      {flags.showPromotionBannerBadge ? (
-        <p className="product-card__promotion-banner-badge" role="status">
-          {PRODUCT_CARD_UI.PROMOTION_BANNER_BADGE}
-        </p>
-      ) : null}
       {flags.showAuctionBadge ? (
         <p className="product-card__auction-badge" role="status">
           {PRODUCT_CARD_UI.AUCTION_BADGE}

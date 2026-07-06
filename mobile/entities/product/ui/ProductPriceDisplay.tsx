@@ -94,17 +94,21 @@ export const ProductDiscountBadge = ({ product, variant = "inline" }: ProductDis
       style={
         variant === "overlay"
           ? [styles.badgeOverlay]
-          : [
-              styles.badge,
-              variant === "detail" && styles.detailDiscountBadge,
-              variant === "banner" && styles.bannerDiscountBadge,
-            ]
+          : variant === "detail"
+            ? [styles.detailDiscountBadge]
+            : [
+                styles.badge,
+                variant === "banner" && styles.bannerDiscountBadge,
+              ]
       }
     >
       <AppText
         style={[
-          variant === "overlay" ? styles.badgeOverlayText : styles.badgeText,
-          variant === "detail" && styles.detailDiscountText,
+          variant === "overlay"
+            ? styles.badgeOverlayText
+            : variant === "detail"
+              ? styles.detailDiscountText
+              : styles.badgeText,
           variant === "banner" && styles.bannerDiscountText,
         ]}
         numberOfLines={1}

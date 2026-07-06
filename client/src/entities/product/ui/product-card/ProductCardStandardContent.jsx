@@ -75,21 +75,6 @@ export function ProductCardStandardContent({ vm }) {
             {...vm.statusBadgesDragScrollProps}
           >
             <ProductCardStatusSlot vm={vm} />
-            {vm.showPromotionBoostBadge ? (
-              <p className="product-card__promotion-boost-badge" role="status">
-                {PRODUCT_CARD_UI.PROMOTED_BADGE}
-              </p>
-            ) : null}
-            {vm.showPromotionTopBadge ? (
-              <p className="product-card__promotion-top-badge" role="status">
-                {PRODUCT_CARD_UI.PROMOTION_TOP_BADGE}
-              </p>
-            ) : null}
-            {vm.showPromotionBannerBadge ? (
-              <p className="product-card__promotion-banner-badge" role="status">
-                {PRODUCT_CARD_UI.PROMOTION_BANNER_BADGE}
-              </p>
-            ) : null}
             {vm.showAuctionBadge ? (
               <p className="product-card__auction-badge" role="status">
                 {PRODUCT_CARD_UI.AUCTION_BADGE}

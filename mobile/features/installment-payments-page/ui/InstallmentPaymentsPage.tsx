@@ -6,6 +6,7 @@ import { FlatList, Pressable, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { contractNeedsBuyerAttention } from "@/entities/installment/lib/contractNeedsBuyerAttention";
+import type { InstallmentContract } from "@/entities/installment/api/installmentApi";
 import { filterInstallmentBuyerContracts } from "@/entities/installment/lib/filterInstallmentBuyerContracts";
 import { summarizeInstallmentBuyerContracts } from "@/entities/installment/lib/summarizeInstallmentBuyerContracts";
 import { InstallmentContractCard } from "@/entities/installment/ui/InstallmentContractCard";
@@ -19,9 +20,12 @@ import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMob
 import { staffBadgeQueryKeys } from "@/shared/api";
 import { INSTALLMENT_UI, MY_PROFILE_PAGE_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { mergeExpandedRowIds } from "@/shared/lib/mergeExpandedRowIds";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useInstallmentPaymentsPageStyles } from "@/shared/theme/installmentPaymentsPageStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
+
+const EMPTY_INSTALLMENT_CONTRACTS: InstallmentContract[] = [];
 
 export const InstallmentPaymentsPage = () => {
   const router = useRouter();
@@ -37,7 +41,7 @@ export const InstallmentPaymentsPage = () => {
     enabled: isAuthorized,
   });
 
-  const allContracts = contractsQuery.data ?? [];
+  const allContracts = contractsQuery.data ?? EMPTY_INSTALLMENT_CONTRACTS;
   const summary = useMemo(
     () => summarizeInstallmentBuyerContracts(allContracts),
     [allContracts],
@@ -61,16 +65,16 @@ export const InstallmentPaymentsPage = () => {
   );
 
   useEffect(() => {
-    setExpandedIds((prev) => {
-      const next = new Set(prev);
-      for (const contract of allContracts) {
-        if (contractNeedsBuyerAttention(contract)) {
-          next.add(String(contract._id));
-        }
-      }
-      return next;
-    });
-  }, [allContracts]);
+    if (contractsQuery.data == null) {
+      return;
+    }
+
+    const attentionIds = (contractsQuery.data ?? EMPTY_INSTALLMENT_CONTRACTS)
+      .filter(contractNeedsBuyerAttention)
+      .map((contract) => String(contract._id));
+
+    setExpandedIds((prev) => mergeExpandedRowIds(prev, attentionIds));
+  }, [contractsQuery.data]);
 
   const invalidateInstallmentQueues = useCallback(async () => {
     await queryClient.invalidateQueries({

@@ -8,6 +8,15 @@ export const PRODUCT_CARD_PROMOTION_TIER = {
 export type ProductCardPromotionTier =
   (typeof PRODUCT_CARD_PROMOTION_TIER)[keyof typeof PRODUCT_CARD_PROMOTION_TIER];
 
+/** Паритет с ProductCardFrame.css — нейтральная «плавающая» тень карточки */
+export const PRODUCT_CARD_SOFT_ELEVATION_SHADOW = {
+  shadowColor: "#0f172a",
+  shadowOpacity: 0.06,
+  shadowRadius: 12,
+  shadowOffsetY: 4,
+  elevation: 2,
+} as const;
+
 export type ProductCardPromotionFramePalette = {
   borderWidth: number;
   borderColor: string;
@@ -39,8 +48,8 @@ export const PRODUCT_CARD_PROMOTION_COMPACT_FRAME: Record<
   [PRODUCT_CARD_PROMOTION_TIER.TOP]: {
     borderWidth: 2,
     borderColor: "rgba(124, 58, 237, 0.78)",
-    gradientStart: "#ebe4fd",
-    gradientEnd: "#f3efff",
+    gradientStart: "#c4b5fd",
+    gradientEnd: "#ede9fe",
     shadowColor: "#7c3aed",
     shadowOpacity: 0.28,
     shadowRadius: 16,
@@ -104,8 +113,9 @@ export const PRODUCT_CARD_PROMOTION_PREMIUM_COMPACT_FRAME: Record<
   [PRODUCT_CARD_PROMOTION_TIER.TOP]: {
     borderWidth: 2,
     borderColor: "#8c4fcc",
-    gradientStart: "#ebe4fd",
-    gradientEnd: "#f3efff",
+    gradientStart: "#ffffff",
+    gradientEnd: "#ffffff",
+    // gradientEnd: "#c4b5fd",
     shadowColor: "#7c3aed",
     shadowOpacity: 0.28,
     shadowRadius: 16,

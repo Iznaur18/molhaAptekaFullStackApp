@@ -392,7 +392,7 @@ const PRODUCT_PREVIEW_VIDEO_CHECKS = [
   },
   {
     file: "shared/theme/catalogProductStyles.ts",
-    mustInclude: ["PRODUCT_MEDIA_HERO_ASPECT_RATIO", "aspectRatio: PRODUCT_MEDIA_HERO_ASPECT_RATIO"],
+    mustInclude: ["PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO", "aspectRatio: PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO"],
   },
   {
     file: "entities/product/ui/ProductMediaGallery.tsx",

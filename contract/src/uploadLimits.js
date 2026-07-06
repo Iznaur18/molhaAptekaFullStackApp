@@ -21,7 +21,7 @@ export const INTRO_UPLOAD_VIDEO_MAX_BYTES = INTRO_UPLOAD_VIDEO_MAX_MB * 1024 * 1
  * Исходник сторис-видео: щедрый лимит, сервер пережимает в H.264 MP4.
  * Оригинал на диске не хранится.
  */
-export const STORY_UPLOAD_VIDEO_MAX_MB = 50;
+export const STORY_UPLOAD_VIDEO_MAX_MB = 100;
 export const STORY_UPLOAD_VIDEO_MAX_BYTES = STORY_UPLOAD_VIDEO_MAX_MB * 1024 * 1024;
 
 export const UPLOAD_VIDEO_MIME_TYPES = [

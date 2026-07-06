@@ -1,7 +1,5 @@
 import {
-  createContext,
   useCallback,
-  useContext,
   useMemo,
   useReducer,
   useRef,
@@ -18,8 +16,9 @@ import {
   wishlistReducer,
 } from "./wishlistReducer";
 import type { WishlistContextValue, WishlistItemsByProductId } from "./types";
+import { WishlistContext } from "./wishlistContext";
 
-const WishlistContext = createContext<WishlistContextValue | null>(null);
+export { useWishlist } from "./useWishlist";
 
 const countItems = (items: WishlistItemsByProductId) => Object.keys(items).length;
 
@@ -94,12 +93,4 @@ export const WishlistProvider = ({ children }: WishlistProviderProps) => {
   );
 
   return <WishlistContext.Provider value={value}>{children}</WishlistContext.Provider>;
-};
-
-export const useWishlist = (): WishlistContextValue => {
-  const value = useContext(WishlistContext);
-  if (!value) {
-    throw new Error("useWishlist must be used within WishlistProvider");
-  }
-  return value;
 };

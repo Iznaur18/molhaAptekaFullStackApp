@@ -44,8 +44,11 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
     width: "100%",
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
     gap: 8,
+  },
+  chevronButton: {
+    flexShrink: 0,
+    alignSelf: "center",
   },
   chevron: {
     width: 20,
@@ -55,8 +58,8 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
     textAlign: "center",
     lineHeight: 20,
     fontSize: 12,
-    color: theme.colors.textMuted,
-    backgroundColor: theme.colors.surfaceMuted,
+    color: theme.colors.onContrast,
+    backgroundColor: theme.colors.nearBlack,
   },
   chevronExpanded: {
     transform: [{ rotate: "90deg" }],
@@ -77,7 +80,7 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
     gap: 8,
   },
   titlePressable: {
-    width: "100%",
+    flex: 1,
     minWidth: 0,
   },
   title: {
@@ -87,7 +90,7 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
     color: theme.colors.action,
   },
   titleStatic: {
-    width: "100%",
+    flex: 1,
     minWidth: 0,
     fontSize: 15.2,
     lineHeight: 21,

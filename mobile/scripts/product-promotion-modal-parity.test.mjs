@@ -22,7 +22,8 @@ test("product promotion modal mirrors web tier and action colors", () => {
   assert.match(modal, /ProductPromotionManageTab/);
   assert.match(modal, /onToggleRaffleParticipation/);
   assert.match(modal, /InstallmentProgramModal/);
-  assert.match(modal, /onOpenInstallmentProgram/);
+  assert.match(modal, /isInstallmentProgramOpen/);
+  assert.match(modal, /embedded/);
   const promotionStyles = styles.slice(
     styles.indexOf("export const useProductPromotionModalStyles"),
     styles.indexOf("export const useSellerProductsLimitModalStyles"),

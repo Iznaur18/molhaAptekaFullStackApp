@@ -14,6 +14,10 @@ const PROFILE_AVATAR_SIZE = 72;
 const PROFILE_BANNER_HEIGHT = PROFILE_AVATAR_SIZE * 3;
 
 export const useProfileScreenStyles = createThemedStyles((theme) => ({
+  safeArea: {
+    flex: 1,
+    backgroundColor: theme.colors.bg,
+  },
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
@@ -170,7 +174,11 @@ export const useProfileOverviewBannerStyles = createThemedStyles((theme) => ({
 }));
 
 export const useProfileMobileNavToggleStyles = createThemedStyles((theme) => ({
+  outer: {
+    alignSelf: "stretch",
+  },
   root: {
+    alignSelf: "stretch",
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing[3],

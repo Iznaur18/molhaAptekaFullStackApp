@@ -1,11 +1,10 @@
 import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import {
-  canSellerDeleteProduct,
   canSellerEditProduct,
   canSellerToggleCatalogVisibility,
 } from "@/entities/product/lib/getProductModerationUi";
@@ -24,6 +23,8 @@ import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useMyLoyaltyPointsStatusQuery } from "@/entities/user/model/useMyLoyaltyPointsStatusQuery";
 import { buildCatalogGridRows } from "@/features/catalog-grid/lib/buildCatalogGridRows";
 import { resolveCatalogGridListContentStyle } from "@/features/catalog-grid/lib/catalogGridLayout";
+import { CatalogScrollAnimationProvider } from "@/features/catalog-grid/model/CatalogScrollAnimationContext";
+import { CatalogAnimatedFlatList } from "@/features/catalog-grid/ui/CatalogAnimatedFlatList";
 import { MyProductsCatalogToolbar } from "@/features/my-products-catalog-toolbar/ui/MyProductsCatalogToolbar";
 import { useMyProductsPageActions } from "@/features/my-products-page/model/useMyProductsPageActions";
 import { MyProductsCatalogGridRowItem } from "@/features/my-products-page/ui/MyProductsCatalogGridRowItem";
@@ -137,7 +138,8 @@ export const MyProductsPage = () => {
 
   return (
     <>
-      <FlatList
+      <CatalogScrollAnimationProvider>
+        <CatalogAnimatedFlatList
         style={[styles.container, styles.listFlex, centeredContentStyle]}
         key={productGrid.listKey}
         data={catalogGridRows}
@@ -207,18 +209,20 @@ export const MyProductsPage = () => {
             <ActivityIndicator style={styles.footerLoader} />
           ) : null
         }
-        renderItem={({ item }) => (
+        renderItem={({ item, index }) => (
           <MyProductsCatalogGridRowItem
             row={item}
             columns={productGrid.columns}
             gap={productGrid.gap}
             tileWidth={productGrid.tileWidth}
+            rowIndex={index}
             onEditProduct={pageActions.handleEditProduct}
             onPromoteProduct={pageActions.handlePromoteProduct}
             resolveLoyaltyOvercommitted={resolveLoyaltyOvercommitted}
           />
         )}
-      />
+        />
+      </CatalogScrollAnimationProvider>
 
       <ProfileMobileNavSheet
         visible={navSheetVisible}
@@ -244,18 +248,13 @@ export const MyProductsPage = () => {
         onRetryTariffs={() => void promotionTariffsQuery.refetch()}
         onClose={pageActions.handleClosePromotionModal}
         onSubmit={pageActions.handleSubmitPromotion}
-        onDeleteProduct={pageActions.handleDeleteMyProduct}
         onSetProductAvailability={pageActions.handleSetMyProductAvailability}
         onSetProductAuction={pageActions.handleSetProductAuction}
-        isDeletePending={pageActions.isDeletePending}
         isAvailabilityTogglePending={pageActions.isAvailabilityTogglePending}
         isAuctionTogglePending={pageActions.isAuctionTogglePending}
         manageErrorMessage={pageActions.manageErrorMessage}
         canManageEdit={
           promotionProduct != null && (isAdmin || canSellerEditProduct(promotionProduct))
-        }
-        canManageDelete={
-          promotionProduct != null && (isAdmin || canSellerDeleteProduct(promotionProduct))
         }
         canManageToggleVisibility={
           promotionProduct != null &&
@@ -264,9 +263,6 @@ export const MyProductsPage = () => {
         sellerRaffleActive={pageActions.sellerRaffleActive}
         onToggleRaffleParticipation={pageActions.handleToggleRaffleParticipation}
         isRaffleParticipationPending={pageActions.isRaffleParticipationPending}
-        onOpenInstallmentProgram={pageActions.openInstallmentProgramModal}
-        installmentProgramModalVisible={pageActions.installmentProgramModalVisible}
-        onCloseInstallmentProgram={pageActions.closeInstallmentProgramModal}
         onInstallmentProgramSaved={pageActions.handleInstallmentProgramSaved}
       />
     </>

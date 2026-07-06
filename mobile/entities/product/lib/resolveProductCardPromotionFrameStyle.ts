@@ -3,6 +3,7 @@ import {
   PRODUCT_CARD_PROMOTION_BANNER_INNER_FRAME,
   PRODUCT_CARD_PROMOTION_COMPACT_FRAME,
   PRODUCT_CARD_PROMOTION_PREMIUM_COMPACT_FRAME,
+  PRODUCT_CARD_SOFT_ELEVATION_SHADOW,
   type ProductCardPromotionTier,
 } from "./productCardPromotionFramePalette";
 
@@ -11,6 +12,21 @@ type PromotionFrameVariant = "compact" | "banner-outer" | "banner-inner";
 type ResolveProductCardPromotionFrameOptions = {
   isPremium?: boolean;
 };
+
+const withProductCardPremiumSoftElevationFrame = (
+  frameStyle: {
+    backgroundColor?: string;
+  } = {},
+) =>
+  ({
+    borderWidth: 0,
+    backgroundColor: frameStyle.backgroundColor,
+    shadowColor: PRODUCT_CARD_SOFT_ELEVATION_SHADOW.shadowColor,
+    shadowOpacity: PRODUCT_CARD_SOFT_ELEVATION_SHADOW.shadowOpacity,
+    shadowRadius: PRODUCT_CARD_SOFT_ELEVATION_SHADOW.shadowRadius,
+    shadowOffset: { width: 0, height: PRODUCT_CARD_SOFT_ELEVATION_SHADOW.shadowOffsetY },
+    elevation: PRODUCT_CARD_SOFT_ELEVATION_SHADOW.elevation,
+  }) as const;
 
 export const resolveProductCardPromotionFrameStyle = (
   tier: ProductCardPromotionTier | null,
@@ -37,21 +53,20 @@ export const resolveProductCardPromotionFrameStyle = (
       return null;
     }
 
-    return {
-      borderWidth: PRODUCT_CARD_PREMIUM_ONLY_FRAME.borderWidth,
-      borderColor: PRODUCT_CARD_PREMIUM_ONLY_FRAME.borderColor,
+    return withProductCardPremiumSoftElevationFrame({
       backgroundColor: PRODUCT_CARD_PREMIUM_ONLY_FRAME.backgroundColor,
-      shadowColor: PRODUCT_CARD_PREMIUM_ONLY_FRAME.shadowColor,
-      shadowOpacity: PRODUCT_CARD_PREMIUM_ONLY_FRAME.shadowOpacity,
-      shadowRadius: PRODUCT_CARD_PREMIUM_ONLY_FRAME.shadowRadius,
-      shadowOffset: { width: 0, height: PRODUCT_CARD_PREMIUM_ONLY_FRAME.shadowOffsetY },
-      elevation: PRODUCT_CARD_PREMIUM_ONLY_FRAME.elevation,
-    } as const;
+    });
   }
 
   const palette = isPremium
     ? PRODUCT_CARD_PROMOTION_PREMIUM_COMPACT_FRAME[tier]
     : PRODUCT_CARD_PROMOTION_COMPACT_FRAME[tier];
+
+  if (isPremium) {
+    return withProductCardPremiumSoftElevationFrame({
+      backgroundColor: "transparent",
+    });
+  }
 
   return {
     borderWidth: palette.borderWidth,
