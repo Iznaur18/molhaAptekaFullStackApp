@@ -1,8 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Easing,
   interpolate,
   interpolateColor,
+  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -10,11 +11,11 @@ import {
 
 import {
   HOME_CATALOG_HEADER_CIRCLE_BUTTON_SIZE,
+  HOME_CATALOG_HEADER_USERS_STRETCH_ANIMATION_MS,
   resolveHomeCatalogUsersStretchMenuHeight,
 } from "@/shared/lib/homeCatalogHeaderLayout";
 
-const STRETCH_ENTER_MS = 220;
-const STRETCH_EXIT_MS = 180;
+const stretchEasing = Easing.out(Easing.cubic);
 
 type UseHomeCatalogUsersStretchMenuAnimationParams = {
   open: boolean;
@@ -35,13 +36,35 @@ export const useHomeCatalogUsersStretchMenuAnimation = ({
 }: UseHomeCatalogUsersStretchMenuAnimationParams) => {
   const expandedHeight = resolveHomeCatalogUsersStretchMenuHeight(itemCount);
   const progress = useSharedValue(open ? 1 : 0);
+  const [portalVisible, setPortalVisible] = useState(open);
 
   useEffect(() => {
-    progress.value = withTiming(open ? 1 : 0, {
-      duration: open ? STRETCH_ENTER_MS : STRETCH_EXIT_MS,
-      easing: Easing.out(Easing.cubic),
-    });
-  }, [open, progress]);
+    if (open) {
+      setPortalVisible(true);
+      progress.value = withTiming(1, {
+        duration: HOME_CATALOG_HEADER_USERS_STRETCH_ANIMATION_MS,
+        easing: stretchEasing,
+      });
+      return;
+    }
+
+    if (!portalVisible) {
+      return;
+    }
+
+    progress.value = withTiming(
+      0,
+      {
+        duration: HOME_CATALOG_HEADER_USERS_STRETCH_ANIMATION_MS,
+        easing: stretchEasing,
+      },
+      (finished) => {
+        if (finished) {
+          runOnJS(setPortalVisible)(false);
+        }
+      },
+    );
+  }, [open, portalVisible, progress]);
 
   const shellAnimatedStyle = useAnimatedStyle(() => ({
     height: interpolate(
@@ -62,11 +85,12 @@ export const useHomeCatalogUsersStretchMenuAnimation = ({
   }));
 
   const itemsAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(progress.value, [0.35, 1], [0, 1]),
-    transform: [{ scale: interpolate(progress.value, [0, 1], [0.88, 1]) }],
+    opacity: progress.value,
+    transform: [{ scale: interpolate(progress.value, [0, 1], [0.92, 1]) }],
   }));
 
   return {
+    portalVisible,
     shellAnimatedStyle,
     itemsAnimatedStyle,
   };

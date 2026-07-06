@@ -30,7 +30,8 @@ export default function ProfileScreen() {
   const scrollRef = useRef<ScrollView>(null);
   const styles = useProfileScreenStyles();
   const authStyles = useAuthFormStyles();
-  const { centeredContentStyle, contentPaddingBottom, profileContentStyle } = useScreenLayout();
+  const { centeredContentStyle, contentPaddingBottom, contentPaddingHorizontal } =
+    useScreenLayout();
   const sessionQuery = useAuthSessionQuery();
   const [emailModalVisible, setEmailModalVisible] = useState(false);
   const [navSheetVisible, setNavSheetVisible] = useState(false);
@@ -106,11 +107,13 @@ export default function ProfileScreen() {
       <SafeAreaView edges={["top"]} style={styles.safeArea}>
         <ScrollView
           ref={scrollRef}
+          style={centeredContentStyle}
           contentContainerStyle={[
             styles.scrollContent,
-            centeredContentStyle,
-            profileContentStyle,
-            { paddingBottom: contentPaddingBottom },
+            {
+              paddingHorizontal: contentPaddingHorizontal,
+              paddingBottom: contentPaddingBottom,
+            },
           ]}
           refreshControl={
             <ThemedRefreshControl

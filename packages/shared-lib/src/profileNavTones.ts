@@ -81,6 +81,7 @@ const PROFILE_NAV_SECTION_TONE_MAP = {
   "category-tree-admin": "emerald",
   "app-intro-admin": "violet",
   "site-header-banner-admin": "cyan",
+  "product-manage-toggle-display-admin": "violet",
   "popular-products-admin": "amber",
   logout: "rose",
 } as const satisfies Partial<Record<ProfileSectionId | "logout", ProfileNavToneId>>;

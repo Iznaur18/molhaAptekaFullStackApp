@@ -5,6 +5,8 @@ import {
   CATALOG_SORT_VIEWS,
 } from "@/entities/product-category-display/lib/catalogFeedTiles";
 
+export { CATALOG_SORT_NEWEST };
+
 export const SELLER_PRODUCTS_LIMIT_REGULAR = 15;
 export const SELLER_PRODUCTS_LIMIT_PREMIUM = 30;
 

@@ -4,10 +4,10 @@ import { MY_ORDERS_LIST_FILTER_IN_PROGRESS } from "@/entities/order/model/myOrde
 
 type OrderRecord = { status?: string; items?: { status?: string }[] };
 
-export const filterMyOrders = (
-  orders: OrderRecord[],
+export const filterMyOrders = <T extends OrderRecord>(
+  orders: T[],
   { status = "", attentionOnly = false } = {},
-) => {
+): T[] => {
   let result = orders;
 
   if (status === MY_ORDERS_LIST_FILTER_IN_PROGRESS) {

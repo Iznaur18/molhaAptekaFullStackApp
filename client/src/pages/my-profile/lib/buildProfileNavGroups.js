@@ -34,6 +34,7 @@ export function buildProfileNavGroups({
   canUseCategoryTreeAdmin,
   canUseAppIntroAdmin,
   canUseSiteHeaderBannerAdmin,
+  canUseProductManageToggleDisplayAdmin,
   canUsePopularProductsAdmin,
   canUseSubscriptions,
   canUseWishlist,
@@ -80,6 +81,7 @@ export function buildProfileNavGroups({
   onCategoryTreeAdminClick,
   onAppIntroAdminClick,
   onSiteHeaderBannerAdminClick,
+  onProductManageToggleDisplayAdminClick,
   onPopularProductsAdminClick,
   onSubscriptionsClick,
   onWishlistClick,
@@ -370,6 +372,19 @@ export function buildProfileNavGroups({
             label: MY_PROFILE_PAGE_UI.TAB_SITE_HEADER_BANNER_ADMIN,
             onClick: () =>
               selectTab("site-header-banner-admin", onSiteHeaderBannerAdminClick),
+          },
+        ]
+      : []),
+    ...(canUseProductManageToggleDisplayAdmin
+      ? [
+          {
+            tab: "product-manage-toggle-display-admin",
+            label: MY_PROFILE_PAGE_UI.TAB_PRODUCT_MANAGE_TOGGLE_DISPLAY_ADMIN,
+            onClick: () =>
+              selectTab(
+                "product-manage-toggle-display-admin",
+                onProductManageToggleDisplayAdminClick,
+              ),
           },
         ]
       : []),

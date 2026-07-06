@@ -2,6 +2,7 @@ import { StyleSheet } from "react-native";
 
 import { RAFFLE_FEATURED_BANNER_CHROME as L } from "@izibuy/shared-lib";
 
+import { HOME_FEED_SECTION_GAP } from "@/features/home-feed/lib/homeFeedSectionLayout";
 import { RAFFLE_FEATURED_PALETTE as P } from "@/entities/raffle/lib/raffleFeaturedPalette";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
@@ -14,11 +15,14 @@ const SOUND_BUTTON_SIZE = 32;
 const VISUAL_CONTROL_SIZE = 28;
 const VISUAL_CONTROL_INSET = 7;
 const VISUAL_CONTROL_GAP = 4;
-/** Web `margin: 0 0 1.25rem` on header / raffle carousel @ 16px. */
-const BANNER_SECTION_MARGIN = 20;
-const BANNER_BOTTOM_MARGIN = BANNER_SECTION_MARGIN;
+const BANNER_BOTTOM_MARGIN = HOME_FEED_SECTION_GAP;
 
-const withAlpha = (hex: string, alphaHex: string): string => `${hex}${alphaHex}`;
+/** Паритет с CuratedProductListCarousel section chrome на главной. */
+const RAFFLE_SECTION_CARD_BORDER_RADIUS = 16;
+const RAFFLE_SECTION_CARD_PADDING_HORIZONTAL = 12;
+const RAFFLE_SECTION_CARD_PADDING_VERTICAL = 8;
+const RAFFLE_SECTION_TITLE_MARGIN_BOTTOM = 10;
+const RAFFLE_SECTION_TITLE_PADDING_X = 4;
 
 export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
   root: {
@@ -34,8 +38,7 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     position: "relative",
     width: "100%",
     maxWidth: "100%",
-    borderWidth: 1,
-    borderColor: P.premiumPurpleMuted,
+    borderWidth: 0,
     borderRadius: BANNER_BORDER_RADIUS,
     overflow: "hidden",
     shadowColor: P.accentPurple,
@@ -47,7 +50,6 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
   },
   innerHasBackdrop: {
     backgroundColor: theme.colors.surface,
-    borderColor: theme.colors.border,
   },
   innerStacked: {
     flexDirection: "column",
@@ -65,11 +67,7 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     paddingBottom: L.innerPaddingBottom,
   },
   innerCompleted: {
-    borderColor: P.successLight,
     shadowColor: P.successVivid,
-  },
-  innerCompletedBackdrop: {
-    borderColor: withAlpha(P.successLight, "B3"),
   },
   backdropSlot: {
     ...StyleSheet.absoluteFillObject,
@@ -184,11 +182,22 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     shadowRadius: 4,
     elevation: 2,
   },
-  infoToggleOpen: {
-    backgroundColor: P.accentPurple,
+  infoToggleButton: {
+    width: VISUAL_CONTROL_SIZE,
+    height: VISUAL_CONTROL_SIZE,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 0,
+    borderRadius: VISUAL_CONTROL_SIZE / 2,
+    backgroundColor: theme.colors.surface,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 2,
   },
   infoToggleText: {
-    color: P.onContrast,
+    color: theme.colors.ink,
     fontSize: 15,
     fontWeight: "800",
     lineHeight: 16,
@@ -539,15 +548,23 @@ export const useRaffleDescriptionModalStyles = createThemedStyles((theme) => ({
 
 export const useRaffleFeaturedSectionStyles = createThemedStyles((theme) => ({
   root: {
-    marginTop: BANNER_SECTION_MARGIN,
-    marginBottom: BANNER_SECTION_MARGIN,
+    marginBottom: HOME_FEED_SECTION_GAP,
+  },
+  sectionCard: {
+    paddingHorizontal: RAFFLE_SECTION_CARD_PADDING_HORIZONTAL,
+    paddingVertical: RAFFLE_SECTION_CARD_PADDING_VERTICAL,
+    backgroundColor: theme.colors.surface,
+    borderWidth: 0,
+    borderColor: "transparent",
+    borderRadius: RAFFLE_SECTION_CARD_BORDER_RADIUS,
   },
   title: {
-    fontSize: 20,
-    fontWeight: "800",
+    fontSize: 16,
+    fontWeight: "600",
     letterSpacing: -0.4,
     color: theme.colors.ink,
-    marginBottom: 12,
+    marginBottom: RAFFLE_SECTION_TITLE_MARGIN_BOTTOM,
+    paddingHorizontal: RAFFLE_SECTION_TITLE_PADDING_X,
   },
 }));
 

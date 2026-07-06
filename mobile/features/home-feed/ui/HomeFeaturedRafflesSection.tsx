@@ -127,12 +127,14 @@ export const HomeFeaturedRafflesSection = ({ raffles }: HomeFeaturedRafflesSecti
           style={sectionStyles.root}
           accessibilityLabel={HOME_FEED_UI.RAFFLES_SECTION_ARIA}
         >
-          <Text style={sectionStyles.title}>{HOME_FEED_UI.RAFFLES_SECTION_TITLE}</Text>
-          <RaffleFeaturedCarousel
-            raffles={raffles}
-            onOpenProducts={handleOpenProducts}
-            getManage={getManage}
-          />
+          <View style={sectionStyles.sectionCard}>
+            <Text style={sectionStyles.title}>{HOME_FEED_UI.RAFFLES_SECTION_TITLE}</Text>
+            <RaffleFeaturedCarousel
+              raffles={raffles}
+              onOpenProducts={handleOpenProducts}
+              getManage={getManage}
+            />
+          </View>
         </View>
       ) : null}
 

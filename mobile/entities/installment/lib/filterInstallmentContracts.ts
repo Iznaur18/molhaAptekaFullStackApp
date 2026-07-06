@@ -9,7 +9,7 @@ type FilterInstallmentContractsParams = {
 
 export const filterInstallmentContracts = (
   contracts: InstallmentContract[],
-  { status = "", attentionOnly = false, needsAttention = null }: FilterInstallmentContractsParams,
+  { status = "", attentionOnly = false, needsAttention }: FilterInstallmentContractsParams,
 ): InstallmentContract[] => {
   let result = contracts;
 

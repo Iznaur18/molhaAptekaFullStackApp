@@ -85,6 +85,14 @@ export const LazySiteHeaderBannerAdminPage = lazyNamedExport(
   "SiteHeaderBannerAdminPage",
 );
 
+export const LazyProductManageToggleDisplayAdminPage = lazyNamedExport(
+  () =>
+    import(
+      "../../../pages/product-manage-toggle-display-admin/ui/ProductManageToggleDisplayAdminPage.jsx"
+    ),
+  "ProductManageToggleDisplayAdminPage",
+);
+
 export const LazyPopularProductsAdminPage = lazyNamedExport(
   () => import("../../../pages/popular-products-admin/ui/PopularProductsAdminPage.jsx"),
   "PopularProductsAdminPage",

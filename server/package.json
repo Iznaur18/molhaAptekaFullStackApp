@@ -24,7 +24,9 @@
     "sync-uploads:s3:apply": "node scripts/syncUploadsToObjectStorage.js --apply",
     "test:smtp": "node scripts/testSmtp.js",
     "audit:routes": "node scripts/auditRouteBodyValidation.js",
-    "create-admin": "node scripts/createAdmin.js"
+    "create-admin": "node scripts/createAdmin.js",
+    "delete-products-without-images": "node scripts/deleteProductsWithoutImages.js",
+    "delete-products-without-images:apply": "node scripts/deleteProductsWithoutImages.js --apply"
   },
   "devDependencies": {
     "mongodb-memory-server": "^10.1.4",

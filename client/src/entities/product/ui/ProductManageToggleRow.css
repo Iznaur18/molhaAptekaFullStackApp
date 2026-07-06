@@ -1,26 +1,29 @@
 .product-manage-toggle-row {
   box-sizing: border-box;
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   width: 100%;
+  min-height: 4.5rem;
   margin: 0;
-  padding: 0.65rem 0.75rem;
-  border: 1px solid var(--iz-color-border-subtle);
-  border-radius: 0.65rem;
-  background: var(--iz-color-surface);
+  padding: 0.75rem 0.75rem 0.75rem 1rem;
+  border: 0;
+  border-radius: 2.5rem;
   color: inherit;
   font: inherit;
   text-align: left;
   cursor: pointer;
+  overflow: hidden;
   transition:
-    border-color 0.15s ease,
-    background-color 0.15s ease;
+    transform 0.15s ease,
+    opacity 0.15s ease,
+    filter 0.15s ease;
 }
 
 .product-manage-toggle-row:hover:not(.product-manage-toggle-row_disabled):not(
     .product-manage-toggle-row_pending
   ) {
-  border-color: var(--iz-color-border);
-  background: var(--iz-color-surface-muted);
+  filter: brightness(0.98);
 }
 
 .product-manage-toggle-row:focus-visible {
@@ -34,64 +37,77 @@
 }
 
 .product-manage-toggle-row_pending {
+  justify-content: center;
+  min-height: 3.9rem;
+  border-radius: 1rem;
+  background: var(--iz-color-surface-muted);
   font-size: 0.84rem;
   font-weight: 600;
   color: var(--iz-color-text-muted);
   cursor: default;
 }
 
-.product-manage-toggle-row_checked {
-  border-color: color-mix(in srgb, var(--iz-color-action) 45%, var(--iz-color-border-subtle));
-  background: color-mix(in srgb, var(--iz-color-action-soft) 55%, var(--iz-color-surface));
-}
-
-.product-manage-toggle-row_auction {
-  border-color: color-mix(in srgb, var(--iz-color-gold-deep) 35%, var(--iz-color-border-subtle));
-  background: color-mix(in srgb, var(--iz-color-gold-highlight) 40%, var(--iz-color-surface));
-}
-
-.product-manage-toggle-row_auction.product-manage-toggle-row_checked {
-  border-color: var(--iz-color-warning-gold);
-  background: color-mix(in srgb, var(--iz-color-gold) 35%, var(--iz-color-surface));
-}
-
-.product-manage-toggle-row_installment {
-  border-color: color-mix(in srgb, var(--iz-color-success-bright) 35%, var(--iz-color-border-subtle));
-  background: color-mix(in srgb, var(--iz-color-success-soft) 55%, var(--iz-color-surface));
-}
-
-.product-manage-toggle-row_installment.product-manage-toggle-row_checked {
-  border-color: var(--iz-color-success-bright);
-  background: color-mix(in srgb, var(--iz-color-success-pale) 65%, var(--iz-color-surface));
-}
-
 .product-manage-toggle-row_danger {
-  border-color: color-mix(in srgb, var(--iz-color-danger-strong) 35%, var(--iz-color-border-subtle));
+  border: 1px solid color-mix(in srgb, var(--iz-color-danger-strong) 35%, transparent);
+  border-radius: 0.65rem;
+  min-height: auto;
+  padding: 0.65rem 0.75rem;
   background: color-mix(in srgb, var(--iz-color-status-danger-subtle) 45%, var(--iz-color-surface));
+}
+
+.product-manage-toggle-row__content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  min-width: 0;
 }
 
 .product-manage-toggle-row__text {
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: 0.2rem;
   min-width: 0;
 }
 
 .product-manage-toggle-row__title {
-  font-size: 0.88rem;
+  font-size: 0.95rem;
   font-weight: 700;
-  line-height: 1.3;
-  color: var(--iz-color-text);
+  line-height: 1.25;
 }
 
 .product-manage-toggle-row__title-status {
-  margin-left: 0.25rem;
+  margin-left: 0.15rem;
   font-weight: 600;
-  color: var(--iz-color-text-muted);
+  opacity: 0.82;
 }
 
 .product-manage-toggle-row__description {
   font-size: 0.78rem;
-  line-height: 1.4;
-  color: var(--iz-color-text-muted);
+  line-height: 1.35;
+  opacity: 0.92;
+}
+
+.product-manage-toggle-row__artwork {
+  flex: 0 0 auto;
+  width: 5.5rem;
+  height: 3.5rem;
+}
+
+.product-manage-toggle-row__artwork img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: right center;
+}
+
+.product-manage-toggle-row_danger .product-manage-toggle-row__title,
+.product-manage-toggle-row_danger .product-manage-toggle-row__description {
+  color: var(--iz-color-text);
+}
+
+.product-manage-toggle-row_danger .product-manage-toggle-row__description {
+  opacity: 0.72;
 }

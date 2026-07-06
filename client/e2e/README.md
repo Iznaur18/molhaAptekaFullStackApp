@@ -25,6 +25,7 @@ npm run test:e2e
 | `catalog-cart.spec.js`          | вход → карточка в ленте → «В корзину» → `/basket`               |
 | `seller-create-product.spec.js` | вход продавца → «Разместить товар» → дерево категорий → создать |
 | `upload-image.spec.js`          | вход (buyer) → аватар в профиле → URL `/uploads/`                |
+| `product-manage-toggle-display.spec.js` | модератор → админка кнопок → upload; продавец → «Управление» → artwork |
 | `query-profile-smoke.spec.js`   | Query-вкладки профиля + derive action-count vs list API         |
 | `query-mutations-smoke.spec.js` | checkout, moderation approve, story upload, KYC submit          |
 | `catalog-virtualizer-mobile.spec.js` | mobile/Pixel: виртуализация каталога (scroll, resize)        |

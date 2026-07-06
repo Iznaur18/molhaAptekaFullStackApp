@@ -601,16 +601,22 @@ export const useModalSectionTabsStyles = createThemedStyles((theme) => ({
 export const useProductManageToggleRowStyles = createThemedStyles((theme) => ({
   row: {
     width: "100%",
-    paddingVertical: 11,
-    paddingHorizontal: 12,
-    borderWidth: 1,
-    borderRadius: 10,
-    borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surface,
+    minHeight: 72,
+    paddingVertical: 12,
+    paddingLeft: 16,
+    paddingRight: 12,
+    borderWidth: 0,
+    borderRadius: 40,
+    overflow: "hidden",
+  },
+  rowContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    width: "100%",
   },
   rowPressed: {
-    backgroundColor: theme.colors.surfaceMuted,
-    borderColor: theme.colors.borderStrong,
+    opacity: 0.96,
   },
   rowWebClickable: {
     cursor: "pointer",
@@ -620,61 +626,51 @@ export const useProductManageToggleRowStyles = createThemedStyles((theme) => ({
   },
   rowPending: {
     justifyContent: "center",
+    minHeight: 62,
+    borderRadius: 16,
+    backgroundColor: theme.colors.surfaceMuted,
   },
   pendingLabel: {
     fontSize: 13,
     fontWeight: "600",
     color: theme.colors.textMuted,
   },
-  rowDefaultChecked: {
-    borderColor: theme.colors.actionBorder,
-    backgroundColor: theme.colors.actionSurface,
-  },
-  rowRaffle: {
-    borderColor: `${theme.colors.raffleBorder}99`,
-    backgroundColor: theme.colors.raffleSurface,
-  },
-  rowRaffleChecked: {
-    borderColor: theme.colors.raffleBorder,
-    backgroundColor: theme.colors.raffleSurface,
-  },
-  rowAuction: {
-    borderColor: `${theme.colors.warningBorder}99`,
-    backgroundColor: theme.colors.warningSurface,
-  },
-  rowAuctionChecked: {
-    borderColor: theme.colors.warning,
-    backgroundColor: theme.colors.warningSurface,
-  },
-  rowInstallment: {
-    borderColor: `${theme.colors.success}55`,
-    backgroundColor: `${theme.colors.success}12`,
-  },
-  rowInstallmentChecked: {
-    borderColor: theme.colors.success,
-    backgroundColor: `${theme.colors.success}1F`,
-  },
   rowDanger: {
+    minHeight: undefined,
+    paddingVertical: 11,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderRadius: 10,
     borderColor: `${theme.colors.danger}55`,
     backgroundColor: `${theme.colors.danger}0F`,
   },
   textBlock: {
+    flex: 1,
     gap: 3,
+    minWidth: 0,
   },
   title: {
     fontSize: 14,
     fontWeight: "700",
-    color: theme.colors.text,
     lineHeight: 19,
   },
   titleStatus: {
     fontWeight: "600",
-    color: theme.colors.textMuted,
+    opacity: 0.82,
   },
   description: {
     fontSize: 12,
     lineHeight: 17,
-    color: theme.colors.textMuted,
+    opacity: 0.92,
+  },
+  artwork: {
+    width: 88,
+    height: 56,
+    flexShrink: 0,
+  },
+  artworkImage: {
+    width: "100%",
+    height: "100%",
   },
 }));
 

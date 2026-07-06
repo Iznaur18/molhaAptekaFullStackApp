@@ -28,6 +28,8 @@ import {
   removeCuratedProductListItemAdminController,
   getProductCatalogFeedTileDisplaysController,
   patchProductCatalogFeedTileDisplayController,
+  getProductManageToggleDisplaysController,
+  patchProductManageToggleDisplayController,
   getCatalogProductByIdController,
   deleteMyProductController,
   patchMyProductController,
@@ -136,6 +138,8 @@ import {
   patchProductCategoryNodeDisplayValidation,
   catalogFeedTileKeyParamValidation,
   patchProductCatalogFeedTileDisplayValidation,
+  productManageToggleKeyParamValidation,
+  patchProductManageToggleDisplayValidation,
   upsertProductInstallmentProgramValidation,
   rejectInstallmentModerationValidation,
   createInstallmentContractValidation,
@@ -295,6 +299,15 @@ router.patch(
   catalogFeedTileKeyParamValidation,
   patchProductCatalogFeedTileDisplayValidation,
   patchProductCatalogFeedTileDisplayController,
+);
+router.get("/manage-toggle-displays", getProductManageToggleDisplaysController);
+router.patch(
+  "/manage-toggle-displays/:toggleKey",
+  checkAuthMW,
+  checkProductModeratorMW,
+  productManageToggleKeyParamValidation,
+  patchProductManageToggleDisplayValidation,
+  patchProductManageToggleDisplayController,
 );
 router.get("/my", checkAuthMW, productsSearchValidation, getMyProductsController);
 router.get("/raffles/featured", getFeaturedRaffleController);

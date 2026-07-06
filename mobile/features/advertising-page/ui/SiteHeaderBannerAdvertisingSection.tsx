@@ -277,7 +277,7 @@ export const SiteHeaderBannerAdvertisingSection = ({
       ) : null}
 
       {feedback ? (
-        <Text style={styles.feedback} accessibilityRole="status">
+        <Text style={styles.feedback} role="status">
           {feedback}
         </Text>
       ) : null}

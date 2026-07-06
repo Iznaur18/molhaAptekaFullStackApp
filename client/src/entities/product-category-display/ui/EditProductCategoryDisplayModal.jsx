@@ -28,6 +28,8 @@ export function EditProductCategoryDisplayModal({
   onClose,
   onSaved,
 }) {
+  const [label, setLabel] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const wasOpenRef = useRef(false);

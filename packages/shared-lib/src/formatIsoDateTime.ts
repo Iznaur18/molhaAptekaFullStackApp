@@ -6,14 +6,14 @@ const DATE_TIME_FORMAT_RU = new Intl.DateTimeFormat("ru-RU", {
   minute: "2-digit",
 });
 
-export const formatIsoDateTime = (iso?: string | null): string => {
+export const formatIsoDateTime = (iso?: string | Date | null): string => {
   if (!iso) {
     return "—";
   }
 
-  const date = new Date(iso);
+  const date = iso instanceof Date ? iso : new Date(iso);
   if (Number.isNaN(date.getTime())) {
-    return iso;
+    return typeof iso === "string" ? iso : "—";
   }
 
   return DATE_TIME_FORMAT_RU.format(date);

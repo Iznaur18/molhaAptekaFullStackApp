@@ -49,7 +49,7 @@ export const OrderStatusSelect = ({
         })}
       </View>
       {isPending ? (
-        <Text style={styles.pending} accessibilityRole="status">
+        <Text style={styles.pending} role="status">
           {ADMIN_ORDERS_PAGE_UI.STATUS_CHANGE_PENDING}
         </Text>
       ) : null}

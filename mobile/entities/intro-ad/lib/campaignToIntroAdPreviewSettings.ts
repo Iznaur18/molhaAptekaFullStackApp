@@ -1,3 +1,9 @@
+import {
+  APP_INTRO_FADE_OUT_MS_DEFAULT,
+  APP_INTRO_MAX_MS_DEFAULT,
+  APP_INTRO_MIN_MS_DEFAULT,
+} from "@molha/api-contract";
+
 import type { AppIntroSettings } from "@/entities/app-intro-settings/model/types";
 
 type IntroAdCampaignPreviewSource = {
@@ -9,6 +15,7 @@ type IntroAdCampaignPreviewSource = {
   minMs?: number | null;
   maxMs?: number | null;
   fadeOutMs?: number | null;
+  [key: string]: unknown;
 };
 
 export const campaignToIntroAdPreviewSettings = (
@@ -19,9 +26,9 @@ export const campaignToIntroAdPreviewSettings = (
   posterUrl: campaign.posterUrl ?? null,
   fallbackTitle: campaign.fallbackTitle ?? "",
   fallbackHint: campaign.fallbackHint ?? "",
-  minMs: campaign.minMs ?? undefined,
-  maxMs: campaign.maxMs ?? undefined,
-  fadeOutMs: campaign.fadeOutMs ?? undefined,
+  minMs: campaign.minMs ?? APP_INTRO_MIN_MS_DEFAULT,
+  maxMs: campaign.maxMs ?? APP_INTRO_MAX_MS_DEFAULT,
+  fadeOutMs: campaign.fadeOutMs ?? APP_INTRO_FADE_OUT_MS_DEFAULT,
   prioritizePlatformIntro: false,
   updatedAt: null,
 });

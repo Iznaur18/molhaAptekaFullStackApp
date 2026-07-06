@@ -1,5 +1,5 @@
 export const mergeExpandedRowIds = (
-  prev: ReadonlySet<string>,
+  prev: Set<string>,
   idsToAdd: Iterable<string>,
 ): Set<string> => {
   const next = new Set(prev);

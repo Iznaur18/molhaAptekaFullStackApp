@@ -2,14 +2,11 @@ import { apiClient } from "@/shared/api";
 import { API_CLIENT_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 
-export type MyRaffleRecord = {
-  _id: string;
-  title: string;
-  status: string;
-  salesProgress?: number;
-  targetSales?: number;
-  moderationComment?: string;
-};
+import type { RaffleFromApi } from "@/entities/raffle/model/types";
+
+// Эндпоинт `/product/raffles/my` возвращает полный публичный payload розыгрыша
+// (toPublicRafflePayload с includePrivateFields), т.е. форму RaffleFromApi.
+export type MyRaffleRecord = RaffleFromApi;
 
 export type MyRafflePayload = {
   raffle: MyRaffleRecord | null;

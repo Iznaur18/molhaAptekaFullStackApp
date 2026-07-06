@@ -5,6 +5,7 @@ import { useCallback, useMemo, useState } from "react";
 import { FlatList, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
+import type { AdminOrder } from "@/entities/order/api/fetchAllOrdersAdmin";
 import { resolveOrderLineProductId } from "@/entities/order/lib/resolveOrderLineProductId";
 import { useAdminOrdersQuery } from "@/entities/order/model/useAdminOrdersQuery";
 import { useOrderMutations } from "@/entities/order/model/useOrderMutations";
@@ -62,7 +63,12 @@ export const AdminOrdersPage = () => {
 
     try {
       const updated = await updateStatusMutation.mutateAsync({ orderId, status: nextStatus });
-      queryClient.setQueryData(orderQueryKeys.adminAll(queryParams), (old) => {
+      queryClient.setQueryData<{
+        orders: AdminOrder[];
+        total: number;
+        page: number;
+        limit: number;
+      }>(orderQueryKeys.adminAll(queryParams), (old) => {
         if (!old?.orders) {
           return old;
         }

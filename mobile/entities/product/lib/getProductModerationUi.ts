@@ -8,6 +8,7 @@ import {
 type ModerationProduct = {
   productModerationStatus?: string;
   productModerationComment?: string | null;
+  [key: string]: unknown;
 };
 
 export const getProductModerationBadgeLabel = (product: ModerationProduct): string => {

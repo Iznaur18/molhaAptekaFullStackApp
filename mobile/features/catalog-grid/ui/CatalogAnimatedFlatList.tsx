@@ -10,8 +10,12 @@ const CatalogAnimatedFlatListInner = <T,>(
   ref: Ref<Animated.FlatList<T>>,
 ) => {
   const catalogScrollHandler = useCatalogScrollHandler();
+  // ComponentProps типизирует onScroll шире, чем ждёт useComposedEventHandler
+  // (reanimated EventHandlerProcessed) — приводим к параметру самого хука.
   const scrollHandler = useComposedEventHandler(
-    onScroll != null ? [catalogScrollHandler, onScroll] : [catalogScrollHandler],
+    (onScroll != null
+      ? [catalogScrollHandler, onScroll]
+      : [catalogScrollHandler]) as unknown as Parameters<typeof useComposedEventHandler>[0],
   );
 
   return (

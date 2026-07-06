@@ -25,6 +25,7 @@ import { SearchSynonymsAdminPage } from "@/features/search-synonyms-admin-page/u
 import { CategoryTreeAdminPage } from "@/features/category-tree-admin-page/ui/CategoryTreeAdminPage";
 import { AppIntroAdminPage } from "@/features/app-intro-admin-page/ui/AppIntroAdminPage";
 import { SiteHeaderBannerAdminPage } from "@/features/site-header-banner-admin-page/ui/SiteHeaderBannerAdminPage";
+import { ProductManageToggleDisplayAdminPage } from "@/features/product-manage-toggle-display-admin-page/ui/ProductManageToggleDisplayAdminPage";
 import { PopularProductsAdminPage } from "@/features/popular-products-admin-page/ui/PopularProductsAdminPage";
 import { HubSectionPlaceholder } from "@/features/profile-hub/ui/HubSectionPlaceholder";
 import { HUB_SECTION_UI } from "@/shared/config";
@@ -97,6 +98,8 @@ export const HubSectionContent = ({
       return <AppIntroAdminPage />;
     case "site-header-banner-admin":
       return <SiteHeaderBannerAdminPage />;
+    case "product-manage-toggle-display-admin":
+      return <ProductManageToggleDisplayAdminPage />;
     case "popular-products-admin":
       return <PopularProductsAdminPage />;
     default:

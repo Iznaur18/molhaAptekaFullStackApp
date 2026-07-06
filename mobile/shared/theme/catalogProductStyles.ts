@@ -330,6 +330,67 @@ export const useProductCardStyles = createThemedStyles((theme) => ({
     fontWeight: "500",
     color: BC.ratingPlaceholder,
   },
+  footerActions: {
+    marginTop: "auto",
+    paddingTop: 5.6,
+    paddingHorizontal: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
+    paddingBottom: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
+    gap: 7.2,
+  },
+  moderationBadge: {
+    alignSelf: "flex-start",
+    marginTop: 4,
+    marginHorizontal: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 999,
+    fontSize: 11.5,
+    fontWeight: "700",
+    overflow: "hidden",
+  },
+  moderationBadgePending: {
+    backgroundColor: theme.colors.warningSurface,
+    color: theme.colors.warningText,
+  },
+  moderationBadgeApproved: {
+    backgroundColor: `${theme.colors.success}1A`,
+    color: theme.colors.success,
+  },
+  moderationBadgeRejected: {
+    backgroundColor: `${theme.colors.danger}1A`,
+    color: theme.colors.danger,
+  },
+  moderationComment: {
+    marginTop: 4,
+    marginHorizontal: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
+    fontSize: 12.5,
+    lineHeight: 18,
+    color: theme.colors.textSecondary,
+  },
+  moderationPreviewFields: {
+    marginTop: 8,
+    gap: 8,
+  },
+  moderationPreviewSellerRow: {
+    marginHorizontal: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
+  },
+  moderationPreviewRow: {
+    gap: 4,
+    marginHorizontal: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
+  },
+  moderationPreviewKey: {
+    fontSize: 12,
+    lineHeight: 16,
+    color: theme.colors.textSecondary,
+  },
+  moderationPreviewValue: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: theme.colors.text,
+  },
+  moderationPreviewValueMultiline: {
+    lineHeight: 20,
+  },
 }));
 
 export const useProductCardBannerStyles = createThemedStyles((theme) => ({
@@ -410,67 +471,6 @@ export const useProductCardBannerStyles = createThemedStyles((theme) => ({
     top: 10,
     right: 10,
     zIndex: 3,
-  },
-  footerActions: {
-    marginTop: "auto",
-    paddingTop: 5.6,
-    paddingHorizontal: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
-    paddingBottom: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
-    gap: 7.2,
-  },
-  moderationBadge: {
-    alignSelf: "flex-start",
-    marginTop: 4,
-    marginHorizontal: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 999,
-    fontSize: 11.5,
-    fontWeight: "700",
-    overflow: "hidden",
-  },
-  moderationBadgePending: {
-    backgroundColor: theme.colors.warningSurface,
-    color: theme.colors.warningText,
-  },
-  moderationBadgeApproved: {
-    backgroundColor: `${theme.colors.success}1A`,
-    color: theme.colors.success,
-  },
-  moderationBadgeRejected: {
-    backgroundColor: `${theme.colors.danger}1A`,
-    color: theme.colors.danger,
-  },
-  moderationComment: {
-    marginTop: 4,
-    marginHorizontal: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
-    fontSize: 12.5,
-    lineHeight: 18,
-    color: theme.colors.textSecondary,
-  },
-  moderationPreviewFields: {
-    marginTop: 8,
-    gap: 8,
-  },
-  moderationPreviewSellerRow: {
-    marginHorizontal: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
-  },
-  moderationPreviewRow: {
-    gap: 4,
-    marginHorizontal: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
-  },
-  moderationPreviewKey: {
-    fontSize: 12,
-    lineHeight: 16,
-    color: theme.colors.textSecondary,
-  },
-  moderationPreviewValue: {
-    fontSize: 14,
-    lineHeight: 20,
-    color: theme.colors.text,
-  },
-  moderationPreviewValueMultiline: {
-    lineHeight: 20,
   },
 }));
 
@@ -2446,35 +2446,6 @@ export const useHomeCuratedListsStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useCatalogCityFilterBannerStyles = createThemedStyles((theme) => ({
-  root: {
-    flexDirection: "column",
-    alignItems: "flex-start",
-    gap: 12,
-    marginBottom: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 14,
-    backgroundColor: theme.colors.surface,
-    shadowColor: "#0f172a",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 1,
-  },
-  text: {
-    fontSize: 15,
-    lineHeight: 21,
-    color: theme.colors.text,
-  },
-  action: {
-    fontSize: 15,
-    lineHeight: 21,
-    fontWeight: "600",
-    color: theme.colors.action,
-    textDecorationLine: "underline",
-  },
-}));
 
 export const useUserStoriesStripStyles = createThemedStyles((theme) => ({
   root: {

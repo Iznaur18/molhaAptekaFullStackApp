@@ -289,6 +289,12 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     fontWeight: "600",
     color: theme.colors.text,
   },
+  footer: {
+    marginTop: theme.spacing[3],
+    paddingTop: theme.spacing[3],
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: theme.colors.border,
+  },
 }));
 
 export const useCartLineItemStyles = createThemedStyles((theme) => ({

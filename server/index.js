@@ -12,6 +12,7 @@ import { assertProductionEnv } from "./utils/assertProductionEnv.js";
 import { isObjectStorageUploadEnabled } from "./utils/objectStorageUpload.js";
 import { ensureUploadsDir } from "./utils/uploadsDir.js";
 import { connectMongoRead } from "./db/mongoReadConnection.js";
+import { syncCriticalIndexes } from "./db/syncCriticalIndexes.js";
 import { startCronIntervals } from "./jobs/startCronIntervals.js";
 
 if (!isObjectStorageUploadEnabled()) {
@@ -56,6 +57,8 @@ async function start() {
 
     await mongoose.connect(process.env.MONGO_URI);
     console.log("Connected to MongoDB");
+
+    await syncCriticalIndexes();
 
     await connectMongoRead();
 

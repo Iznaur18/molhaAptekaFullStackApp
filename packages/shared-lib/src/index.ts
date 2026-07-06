@@ -48,6 +48,18 @@ export {
   resolveProfileNavTonePalette,
 } from "./profileNavTones.js";
 export type { ProfileNavToneId, ProfileNavTonePalette } from "./profileNavTones.js";
+export {
+  PRODUCT_MANAGE_TOGGLE_KEY_VALUES,
+  PRODUCT_MANAGE_TOGGLE_PALETTE,
+  PRODUCT_MANAGE_TOGGLE_VARIANT_BY_KEY,
+  resolveProductManageToggleKeyFromVariant,
+  resolveProductManageTogglePalette,
+} from "./productManageToggleDisplay.js";
+export type {
+  ProductManageToggleKey,
+  ProductManageTogglePaletteEntry,
+  ProductManageToggleRowVariant,
+} from "./productManageToggleDisplay.js";
 export { RAFFLE_FEATURED_DESCRIPTION_PREVIEW_MAX_LINES } from "./raffleFeaturedBanner.js";
 export {
   RAFFLE_FEATURED_BANNER_CHROME,

@@ -38,8 +38,20 @@ const ProductCategoryDisplaySchema = new Schema(
   { timestamps: true },
 );
 
-ProductCategoryDisplaySchema.index({ categorySlug: 1 }, { unique: true, sparse: true });
-ProductCategoryDisplaySchema.index({ categoryId: 1 }, { unique: true, sparse: true });
+// ВАЖНО: sparse НЕ исключает документы с полем = null (только полностью
+// отсутствующее поле). Поскольку categorySlug/categoryId имеют default: null,
+// каждая «node»-запись хранит categorySlug: null, а каждая «slug»-запись —
+// categoryId: null. С { unique, sparse } второй null конфликтует с первым и даёт
+// E11000. Поэтому используем partialFilterExpression: индексируем только реальные
+// значения нужного типа, а null'ы в уникальный индекс не попадают.
+ProductCategoryDisplaySchema.index(
+  { categorySlug: 1 },
+  { unique: true, partialFilterExpression: { categorySlug: { $type: "string" } } },
+);
+ProductCategoryDisplaySchema.index(
+  { categoryId: 1 },
+  { unique: true, partialFilterExpression: { categoryId: { $type: "objectId" } } },
+);
 
 ProductCategoryDisplaySchema.pre("validate", function validateCategoryDisplayKey(next) {
   const hasSlug =

@@ -1,0 +1,39 @@
+.product-manage-toggle-display-admin {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.product-manage-toggle-display-admin__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.product-manage-toggle-display-admin__title {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.product-manage-toggle-display-admin__hint {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--iz-color-text-muted);
+}
+
+.product-manage-toggle-display-admin__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: 1rem;
+}
+
+.product-manage-toggle-display-admin__status,
+.product-manage-toggle-display-admin__error {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.product-manage-toggle-display-admin__error {
+  color: var(--iz-color-danger-strong);
+}

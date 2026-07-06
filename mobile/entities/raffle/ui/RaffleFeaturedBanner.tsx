@@ -79,7 +79,6 @@ export const RaffleFeaturedBanner = ({
           isSplit ? styles.innerSplit : styles.innerStacked,
           hasBackdrop && styles.innerHasBackdrop,
           isCompleted && styles.innerCompleted,
-          isCompleted && hasBackdrop && styles.innerCompletedBackdrop,
         ]}
       >
         {!hasBackdrop ? <RaffleFeaturedBannerBackground /> : null}

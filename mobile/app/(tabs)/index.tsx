@@ -7,7 +7,6 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import type { CatalogListFilters, CatalogSort } from "@/entities/product/model/catalogListFilters";
 import { useCatalogProductsInfiniteQuery } from "@/entities/product/model/useCatalogProductsInfiniteQuery";
-import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { buildCatalogGridRows } from "@/features/catalog-grid/lib/buildCatalogGridRows";
 import type { CatalogGridRow } from "@/features/catalog-grid/lib/buildCatalogGridRows";
 import { resolveCatalogGridListContentStyle } from "@/features/catalog-grid/lib/catalogGridLayout";
@@ -22,7 +21,6 @@ import { consumePendingCatalogFilters } from "@/features/catalog-browser/model/p
 import { isHomeCuratedProductListsVisible } from "@/entities/curated-product-list/lib/isHomeCuratedProductListsVisible";
 import { isHomeCatalogMainView } from "@/features/home-feed/lib/isHomeCatalogMainView";
 import { invalidateHomeFeedQueries } from "@/features/home-feed/model/invalidateHomeFeedQueries";
-import { useHomeCatalogCityFilter } from "@/features/home-feed/model/useHomeCatalogCityFilter";
 import {
   EMPTY_HOME_CATALOG_FEED_FILTERS,
   type HomeCatalogFeedFiltersState,
@@ -49,7 +47,6 @@ const EMPTY_FEED_FILTERS = EMPTY_HOME_CATALOG_FEED_FILTERS;
 export default function CatalogScreen() {
   const styles = useFeedScreenStyles();
   const queryClient = useQueryClient();
-  const sessionQuery = useAuthSessionQuery();
   const productGrid = useProductGridLayout();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
   const [searchInput, setSearchInput] = useState("");
@@ -60,7 +57,6 @@ export default function CatalogScreen() {
     string | null
   >(null);
   const [feedFilters, setFeedFilters] = useState<FeedFiltersState>(EMPTY_FEED_FILTERS);
-  const [catalogAllCities, setCatalogAllCities] = useState(false);
   // Пересечение типов: рантайм-реф Reanimated отдаёт внутренний FlatList
   // (нужен useScrollToTop), а проп ref анимированного списка требует
   // Animated.FlatList.
@@ -117,10 +113,8 @@ export default function CatalogScreen() {
       auctionOnly: feedFilters.auctionOnly || undefined,
       installmentOnly: feedFilters.installmentOnly || undefined,
       saleOnly: feedFilters.saleOnly || undefined,
-      allCities: catalogAllCities || undefined,
     }),
     [
-      catalogAllCities,
       debouncedSearch,
       feedFilters,
       selectedRootSlug,
@@ -173,21 +167,6 @@ export default function CatalogScreen() {
     [debouncedSearch, feedFilters, selectedRootSlug, selectedSubcategoryId, showHomeFeed],
   );
 
-  const isAuthorized = sessionQuery.data?.user != null;
-  const { cityLabel, showBanner: showCityFilterBanner } = useHomeCatalogCityFilter({
-    isAuthorized,
-    catalogAllCities,
-    sort: feedFilters.sort,
-    userAddressCity:
-      sessionQuery.data?.user != null
-        ? (sessionQuery.data.user as { userAddressCity?: string }).userAddressCity
-        : null,
-  });
-
-  const handleShowAllCatalogCities = useCallback(() => {
-    setCatalogAllCities(true);
-  }, []);
-
   const catalogGridRows = useMemo(
     () =>
       buildCatalogGridRows(catalogQuery.products, productGrid.columns, {
@@ -200,13 +179,13 @@ export default function CatalogScreen() {
     try {
       const tasks: Promise<unknown>[] = [catalogQuery.refetch()];
       if (showHomeFeed) {
-        tasks.push(invalidateHomeFeedQueries(queryClient, catalogAllCities));
+        tasks.push(invalidateHomeFeedQueries(queryClient));
       }
       await Promise.all(tasks);
     } catch {
       // individual queries surface errors via query state
     }
-  }, [catalogAllCities, catalogQuery, queryClient, showHomeFeed]);
+  }, [catalogQuery, queryClient, showHomeFeed]);
 
   const isRefreshing = catalogQuery.isRefetching;
 
@@ -228,10 +207,6 @@ export default function CatalogScreen() {
         <HomeFeedHeader
           enabled={showHomeFeed}
           showCuratedLists={showCuratedProductLists}
-          catalogAllCities={catalogAllCities}
-          showCityFilterBanner={showCityFilterBanner}
-          cityFilterLabel={cityLabel}
-          onShowAllCities={handleShowAllCatalogCities}
         />
       ) : null}
       {showHomeFeed ? <CatalogBreadcrumb label={HOME_PAGE_UI.BREADCRUMB_HOME} /> : null}

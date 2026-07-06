@@ -19,7 +19,7 @@ export const RaffleFeaturedBannerInfoToggle = ({
 
   return (
     <Pressable
-      style={[styles.visualControlButton, visible && styles.infoToggleOpen]}
+      style={styles.infoToggleButton}
       accessibilityRole="button"
       accessibilityState={{ expanded: visible }}
       accessibilityLabel={

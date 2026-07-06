@@ -83,7 +83,7 @@ export const CreateUserStoryModal = ({
   const [videoFile, setVideoFile] = useState<UploadVideoFilePayload | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
   const backdropOpacity = useSharedValue(0);
-  const sheetTranslateY = useSharedValue(sheetSlideDistance);
+  const sheetTranslateY = useSharedValue<number>(sheetSlideDistance);
 
   const isBusy =
     createMutation.isPending || uploadImageMutation.isPending || uploadVideoMutation.isPending;

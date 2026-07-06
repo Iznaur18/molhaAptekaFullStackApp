@@ -27,33 +27,40 @@ test("curated home layout uses web card gap", () => {
   assert.match(source, /CURATED_PRODUCT_LIST_HOME_CARD_GAP = 12/);
 });
 
-test("home catalog screen wires city filter and home-feed refresh", () => {
+test("home catalog screen wires home-feed refresh", () => {
   const index = readMobileFile("app/(tabs)/index.tsx");
   const header = readMobileFile("features/home-feed/ui/HomeFeedHeader.tsx");
 
-  assert.match(index, /catalogAllCities/);
   assert.match(index, /invalidateHomeFeedQueries/);
   assert.match(index, /isHomeCuratedProductListsVisible/);
   assert.match(index, /HOME_PAGE_UI\.BREADCRUMB_HOME/);
   assert.match(header, /showCuratedLists/);
-  assert.match(header, /allCities: catalogAllCities/);
-  assert.match(header, /CatalogCityFilterBanner/);
+  assert.doesNotMatch(header, /CatalogCityFilterBanner/);
 });
 
-test("raffle carousel section margin matches web 1.25rem", () => {
+test("home feed sections share one vertical gap constant", () => {
+  const layout = readMobileFile("features/home-feed/lib/homeFeedSectionLayout.ts");
+  const raffle = readMobileFile("shared/theme/raffleFeaturedStyles.ts");
+  const stories = readMobileFile("entities/user-story/lib/userStoryStripLayout.ts");
+  const curated = readMobileFile(
+    "entities/curated-product-list/lib/curatedProductListHomeLayout.ts",
+  );
+  const header = readMobileFile("shared/theme/homeCatalogHeaderStyles.ts");
+
+  assert.match(layout, /HOME_FEED_SECTION_GAP = 16/);
+  assert.match(raffle, /marginBottom: HOME_FEED_SECTION_GAP/);
+  assert.match(stories, /marginBottom: HOME_FEED_SECTION_GAP/);
+  assert.match(curated, /CURATED_PRODUCT_LIST_HOME_SECTION_MARGIN_BOTTOM = HOME_FEED_SECTION_GAP/);
+  assert.match(header, /marginBottom: HOME_FEED_SECTION_GAP/);
+  assert.doesNotMatch(raffle, /marginTop: HOME_FEED_SECTION_GAP/);
+});
+
+test("raffle carousel section uses home feed surface card", () => {
   const styles = readMobileFile("shared/theme/raffleFeaturedStyles.ts");
   const section = readMobileFile("features/home-feed/ui/HomeFeaturedRafflesSection.tsx");
 
-  assert.match(styles, /useRaffleFeaturedSectionStyles/);
-  assert.match(styles, /marginTop: BANNER_SECTION_MARGIN/);
-  assert.match(styles, /marginBottom: BANNER_SECTION_MARGIN/);
-  assert.match(styles, /const BANNER_SECTION_MARGIN = 20/);
+  assert.match(styles, /sectionCard/);
+  assert.match(styles, /backgroundColor: theme\.colors\.surface/);
+  assert.match(section, /sectionStyles\.sectionCard/);
   assert.match(section, /HOME_FEED_UI\.RAFFLES_SECTION_TITLE/);
-});
-
-test("city filter banner copy matches web HOME_PAGE_UI", () => {
-  const source = readMobileFile("shared/config/homePageUi.ts");
-
-  assert.match(source, /CATALOG_CITY_FILTER_BANNER/);
-  assert.match(source, /CATALOG_CITY_FILTER_SHOW_ALL/);
 });

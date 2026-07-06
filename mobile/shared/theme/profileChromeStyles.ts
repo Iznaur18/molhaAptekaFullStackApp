@@ -20,8 +20,9 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
-    paddingTop: theme.spacing[3],
+    width: "100%",
+    alignSelf: "stretch",
+    paddingTop: 12,
     paddingBottom: SCREEN_CONTENT_PADDING_BOTTOM,
     gap: theme.spacing[3],
     backgroundColor: theme.colors.bg,

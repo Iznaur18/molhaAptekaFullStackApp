@@ -24,6 +24,7 @@ import {
   Sparkles,
   Store,
   Ticket,
+  ToggleLeft,
   UserCheck,
   TrendingUp,
   Users,
@@ -63,6 +64,7 @@ export const PROFILE_NAV_ITEM_META = {
   "category-tree-admin": { icon: FolderTree, tone: "emerald" },
   "app-intro-admin": { icon: Clapperboard, tone: "violet" },
   "site-header-banner-admin": { icon: Image, tone: "sky" },
+  "product-manage-toggle-display-admin": { icon: ToggleLeft, tone: "violet" },
   "popular-products-admin": { icon: Star, tone: "amber" },
   logout: { icon: LogOut, tone: "rose" },
 };

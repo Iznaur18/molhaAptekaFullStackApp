@@ -87,8 +87,11 @@ export const HOME_CATALOG_HEADER_USERS_STRETCH_TOGGLE_GAP = 12;
 /** Stretch-menu: gap between menu items. */
 export const HOME_CATALOG_HEADER_USERS_STRETCH_ITEM_GAP = 8;
 
-/** Stretch-menu: bottom inset inside blue pill. */
+/** Stretch-menu: bottom inset inside pill. */
 export const HOME_CATALOG_HEADER_USERS_STRETCH_BOTTOM_PADDING = 8;
+
+/** Stretch open/close duration (symmetric). */
+export const HOME_CATALOG_HEADER_USERS_STRETCH_ANIMATION_MS = 220;
 
 export const resolveHomeCatalogUsersStretchMenuHeight = (itemCount: number): number => {
   if (itemCount <= 0) {

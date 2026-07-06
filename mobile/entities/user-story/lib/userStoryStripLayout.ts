@@ -1,4 +1,6 @@
 /** Плашка сториз — фон/рамка через theme в useUserStoriesStripStyles. */
+import { HOME_FEED_SECTION_GAP } from "@/features/home-feed/lib/homeFeedSectionLayout";
+
 export const USER_STORY_STRIP_COLORS = {
   scrollBackground: "#ffffff",
   ringActive: "#1d9bf0",
@@ -8,7 +10,7 @@ export const USER_STORY_STRIP_COLORS = {
 } as const;
 
 export const USER_STORY_STRIP_LAYOUT = {
-  marginBottom: 16,
+  marginBottom: HOME_FEED_SECTION_GAP,
   paddingTop: 8,
   paddingBottom: 4,
   scrollBorderRadius: 20,

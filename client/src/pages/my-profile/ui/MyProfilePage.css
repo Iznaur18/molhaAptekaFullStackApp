@@ -10,15 +10,21 @@
   --modal-profile-banner-height-mult: 3;
   --modal-banner-avatar-inset: 0.75rem;
 
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
 }
 
 .my-profile-page__layout {
+  box-sizing: border-box;
   display: flex;
   align-items: stretch;
   gap: 1rem;
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
 }
 
@@ -324,7 +330,10 @@
 }
 
 .my-profile-page__main {
+  box-sizing: border-box;
   flex: 1 1 auto;
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -332,7 +341,10 @@
 }
 
 .my-profile-page__body {
-  padding: 1rem;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
   background: transparent;
 }
 
@@ -416,7 +428,7 @@
 }
 
 @container app-viewport (max-width: 903px) {
-  .my-profile-page {
+  .my-profile-page--catalog-grid-tab {
     --my-profile-mobile-inline-inset: 0.1rem;
     --my-profile-shell-content-gutter: calc(
       var(--app-shell-content-inline-padding) - var(--my-profile-mobile-inline-inset)
@@ -431,11 +443,6 @@
     );
   }
 
-  .my-profile-page__body {
-    padding-inline: max(0.75rem, var(--app-shell-content-inline-padding));
-    padding-block: 0.75rem;
-  }
-
   .my-profile-page--catalog-grid-tab .my-profile-page__catalog-shell .app-shell__grid,
   .my-profile-page--catalog-grid-tab
     .my-profile-page__catalog-shell
@@ -445,7 +452,7 @@
 }
 
 @container app-viewport (max-width: 667px) {
-  .my-profile-page {
+  .my-profile-page--catalog-grid-tab {
     --my-profile-mobile-inline-inset: 0.05rem;
     --my-profile-catalog-grid-gap: 0.1rem;
 
@@ -455,10 +462,6 @@
     width: calc(
       100% + 2 * (var(--app-shell-content-inline-padding) - var(--my-profile-mobile-inline-inset))
     );
-  }
-
-  .my-profile-page__body {
-    padding-inline: max(0.75rem, var(--app-shell-content-inline-padding));
   }
 }
 
@@ -651,13 +654,13 @@
   .my-profile-page__mobile-nav-toggle {
     display: flex;
     box-sizing: border-box;
-    width: calc(
-      100% - 2 * var(--my-profile-shell-content-gutter, var(--app-shell-content-inline-padding))
-    );
-    margin-inline: var(
-      --my-profile-shell-content-gutter,
-      var(--app-shell-content-inline-padding)
-    );
+    width: 100%;
+    margin-inline: 0;
+  }
+
+  .my-profile-page--catalog-grid-tab .my-profile-page__mobile-nav-toggle {
+    width: calc(100% - 2 * var(--my-profile-shell-content-gutter, 0px));
+    margin-inline: var(--my-profile-shell-content-gutter, 0);
   }
 
   .my-profile-page__mobile-nav-backdrop {

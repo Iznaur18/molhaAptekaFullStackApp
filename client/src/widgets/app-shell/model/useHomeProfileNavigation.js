@@ -6,6 +6,7 @@ import {
   PROFILE_TAB_CATEGORY_TREE_ADMIN,
   PROFILE_TAB_APP_INTRO_ADMIN,
   PROFILE_TAB_SITE_HEADER_BANNER_ADMIN,
+  PROFILE_TAB_PRODUCT_MANAGE_TOGGLE_DISPLAY_ADMIN,
   PROFILE_TAB_POPULAR_PRODUCTS_ADMIN,
   PROFILE_TAB_AUCTION,
   PROFILE_TAB_DATA_CONFIRMATION,
@@ -115,6 +116,10 @@ export const useHomeProfileNavigation = ({
     navigateFromProfileTab(PROFILE_TAB_SITE_HEADER_BANNER_ADMIN);
   }, [navigateFromProfileTab]);
 
+  const handleProductManageToggleDisplayAdminFromProfile = useCallback(() => {
+    navigateFromProfileTab(PROFILE_TAB_PRODUCT_MANAGE_TOGGLE_DISPLAY_ADMIN);
+  }, [navigateFromProfileTab]);
+
   const handlePopularProductsAdminFromProfile = useCallback(() => {
     navigateFromProfileTab(PROFILE_TAB_POPULAR_PRODUCTS_ADMIN);
   }, [navigateFromProfileTab]);
@@ -207,6 +212,8 @@ export const useHomeProfileNavigation = ({
     handleAppIntroAdminFromProfile,
 
     handleSiteHeaderBannerAdminFromProfile,
+
+    handleProductManageToggleDisplayAdminFromProfile,
 
     handlePopularProductsAdminFromProfile,
 

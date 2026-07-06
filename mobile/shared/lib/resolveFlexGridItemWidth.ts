@@ -1,4 +1,4 @@
-import { Platform, type ViewStyle } from "react-native";
+import { Platform, type DimensionValue, type ViewStyle } from "react-native";
 
 import { resolveGridTileWidth } from "@/shared/lib/resolveGridTileWidth";
 
@@ -23,8 +23,9 @@ export const resolveFlexGridItemWidthStyle = ({
 
   if (Platform.OS === "web") {
     const totalGap = gap * Math.max(0, columns - 1);
+    // Web-only calc(): react-native-web поддерживает, но RN-типы его не знают.
     return {
-      width: `calc((100% - ${totalGap}px) / ${columns})`,
+      width: `calc((100% - ${totalGap}px) / ${columns})` as unknown as DimensionValue,
     };
   }
 

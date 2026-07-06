@@ -2,6 +2,7 @@ type DiscountProduct = {
   productOldPrice?: number | null;
   productPrice?: number | null;
   discountPercent?: number | null;
+  [key: string]: unknown;
 };
 
 export const computeProductDiscountPercent = (

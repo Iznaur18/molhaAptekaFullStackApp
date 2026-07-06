@@ -36,7 +36,7 @@ export const HomeCatalogUsersStretchMenu = ({
   const { theme } = useAppThemeSettings();
   const anchorRef = useRef<View>(null);
   const [menuAnchor, setMenuAnchor] = useState<LayoutRectangle | null>(null);
-  const { shellAnimatedStyle, itemsAnimatedStyle } = useHomeCatalogUsersStretchMenuAnimation({
+  const { portalVisible, shellAnimatedStyle, itemsAnimatedStyle } = useHomeCatalogUsersStretchMenuAnimation({
     open,
     itemCount: items.length,
     closedBackgroundColor: theme.colors.surface,
@@ -50,6 +50,8 @@ export const HomeCatalogUsersStretchMenu = ({
       setMenuAnchor({ x, y, width, height });
     });
   }, []);
+
+  const isMenuExpanded = open || portalVisible;
 
   const handleToggle = useCallback(() => {
     if (open) {
@@ -76,10 +78,10 @@ export const HomeCatalogUsersStretchMenu = ({
         style={styles.usersStretchToggle}
         accessibilityRole="button"
         accessibilityLabel={HEADER_USERS_BUTTON_UI.TOGGLE_ARIA}
-        accessibilityState={{ expanded: open }}
+        accessibilityState={{ expanded: isMenuExpanded }}
         onPress={handleToggle}
       >
-        {open ? (
+        {isMenuExpanded ? (
           <View style={styles.usersStretchIconCircle}>
             <MaterialIcons name="visibility" size={22} color={theme.colors.textSecondary} />
           </View>
@@ -130,11 +132,11 @@ export const HomeCatalogUsersStretchMenu = ({
   return (
     <>
       <View ref={anchorRef} style={styles.usersNavPill} onLayout={measureAnchor}>
-        {open ? <View style={styles.usersNavPillPlaceholder} /> : renderShell()}
+        {isMenuExpanded ? <View style={styles.usersNavPillPlaceholder} /> : renderShell()}
       </View>
 
       <Modal
-        visible={open}
+        visible={portalVisible}
         transparent
         animationType="none"
         statusBarTranslucent

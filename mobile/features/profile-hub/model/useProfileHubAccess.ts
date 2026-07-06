@@ -39,6 +39,7 @@ export type ProfileHubAccess = {
   canUseCategoryTreeAdmin: boolean;
   canUseAppIntroAdmin: boolean;
   canUseSiteHeaderBannerAdmin: boolean;
+  canUseProductManageToggleDisplayAdmin: boolean;
   canUsePopularProductsAdmin: boolean;
 };
 
@@ -79,6 +80,7 @@ export const useProfileHubAccess = (): ProfileHubAccess => {
     canUseCategoryTreeAdmin: isProfileReady && isAdmin,
     canUseAppIntroAdmin: isProfileReady && isAdmin,
     canUseSiteHeaderBannerAdmin: isProfileReady && canModerate,
+    canUseProductManageToggleDisplayAdmin: isProfileReady && canModerate,
     canUsePopularProductsAdmin: isProfileReady && isAdmin,
   };
 };

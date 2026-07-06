@@ -16,7 +16,7 @@ export type AppIntroAdminForm = {
 export const mapAppIntroSettingsToForm = (
   settings: AppIntroSettings | null | undefined,
 ): AppIntroAdminForm => {
-  const source = settings ?? APP_INTRO_SETTINGS_DEFAULTS;
+  const source: AppIntroSettings = settings ?? APP_INTRO_SETTINGS_DEFAULTS;
 
   return {
     videoMp4Url: source.videoMp4Url ?? "",

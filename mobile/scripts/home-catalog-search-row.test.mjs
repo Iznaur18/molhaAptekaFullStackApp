@@ -76,8 +76,10 @@ test("HomeCatalogUsersButton opens stretch menu from circle", () => {
   assert.match(menu, /MaterialIcons/);
   assert.match(menu, /accessibilityLabel=\{item\.accessibilityLabel\}/);
 
-  assert.match(animation, /interpolateColor/);
-  assert.match(animation, /resolveHomeCatalogUsersStretchMenuHeight/);
+  assert.match(animation, /portalVisible/);
+  assert.match(animation, /HOME_CATALOG_HEADER_USERS_STRETCH_ANIMATION_MS/);
+  assert.match(menu, /visible=\{portalVisible\}/);
+  assert.match(menu, /isMenuExpanded/);
 
   assert.match(layout, /HOME_CATALOG_HEADER_USERS_STRETCH_TOGGLE_GAP/);
   assert.match(styles, /marginTop: HOME_CATALOG_HEADER_USERS_STRETCH_TOGGLE_GAP/);

@@ -390,7 +390,7 @@ export const ProductPromotionModal = ({
             <View style={styles.headerAddon}>
               <ProductPromotionModalTabs
                 activeTabId={activeTabId}
-                onTabChange={setActiveTabId}
+                onTabChange={(tabId) => setActiveTabId(tabId as typeof activeTabId)}
                 showManageTab={showManageSection}
               />
             </View>

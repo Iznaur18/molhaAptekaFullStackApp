@@ -43,7 +43,7 @@ export const ProfileMobileNavSheet = ({
   const logoutMutation = useLogoutMutation();
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
   const [modalVisible, setModalVisible] = useState(visible);
-  const sheetTranslateX = useSharedValue(slideDistance);
+  const sheetTranslateX = useSharedValue<number>(slideDistance);
   const backdropOpacity = useSharedValue(0);
 
   const finishClose = useCallback(() => {

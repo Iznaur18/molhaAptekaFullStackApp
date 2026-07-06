@@ -125,6 +125,15 @@ const resolveProfileStaffNavItem = (
       label: MY_PROFILE_PAGE_UI.TAB_SITE_HEADER_BANNER_ADMIN,
     };
   }
+  if (
+    sectionId === "product-manage-toggle-display-admin" &&
+    access.canUseProductManageToggleDisplayAdmin
+  ) {
+    return {
+      sectionId,
+      label: MY_PROFILE_PAGE_UI.TAB_PRODUCT_MANAGE_TOGGLE_DISPLAY_ADMIN,
+    };
+  }
   if (sectionId === "popular-products-admin" && access.canUsePopularProductsAdmin) {
     return {
       sectionId,

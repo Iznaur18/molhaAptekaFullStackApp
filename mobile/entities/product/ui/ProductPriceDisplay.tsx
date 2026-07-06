@@ -16,6 +16,7 @@ type ProductPriceDisplayProps = {
     productPrice?: number | null;
     productOldPrice?: number | null;
     discountPercent?: number | null;
+    [key: string]: unknown;
   };
   showLabel?: boolean;
   variant?: "card" | "inline" | "detail" | "banner" | "cart";
@@ -78,6 +79,7 @@ type ProductDiscountBadgeProps = {
     productPrice?: number | null;
     productOldPrice?: number | null;
     discountPercent?: number | null;
+    [key: string]: unknown;
   };
   variant?: "inline" | "overlay" | "detail" | "banner";
 };

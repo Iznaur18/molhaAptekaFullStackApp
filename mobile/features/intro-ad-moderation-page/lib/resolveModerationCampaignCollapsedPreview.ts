@@ -2,11 +2,10 @@ import { resolveIntroAdAdvertiserName } from "@/entities/intro-ad/lib/resolveInt
 import { campaignModerationIsStale, campaignModerationNeedsAttention } from "@/shared/lib/campaignModerationAttention";
 import { INTRO_AD_MODERATION_PAGE_UI } from "@/shared/config";
 
-/**
- * @param {Record<string, unknown>} campaign
- * @param {number} [nowMs]
- */
-export function resolveModerationCampaignCollapsedPreview(campaign, nowMs = Date.now()) {
+export function resolveModerationCampaignCollapsedPreview(
+  campaign: Record<string, unknown>,
+  nowMs = Date.now(),
+) {
   if (campaignModerationIsStale(campaign, nowMs)) {
     return INTRO_AD_MODERATION_PAGE_UI.COLLAPSED_STALE;
   }
@@ -16,9 +15,6 @@ export function resolveModerationCampaignCollapsedPreview(campaign, nowMs = Date
   return null;
 }
 
-/**
- * @param {Record<string, unknown>} campaign
- */
-export function resolveModerationCampaignTitle(campaign) {
+export function resolveModerationCampaignTitle(campaign: Record<string, unknown>) {
   return resolveIntroAdAdvertiserName(campaign);
 }

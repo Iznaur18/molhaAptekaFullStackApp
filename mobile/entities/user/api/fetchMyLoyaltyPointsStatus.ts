@@ -9,8 +9,10 @@ export const fetchMyLoyaltyPointsStatus = async () => {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
     const loyaltyPointsBalance = Number(data.data.loyaltyPointsBalance);
+    const loyaltyPointsReserved = Number(data.data.loyaltyPointsReserved);
     return {
       loyaltyPointsBalance: Number.isFinite(loyaltyPointsBalance) ? loyaltyPointsBalance : 0,
+      loyaltyPointsReserved: Number.isFinite(loyaltyPointsReserved) ? loyaltyPointsReserved : 0,
     };
   } catch (error) {
     throw new Error(

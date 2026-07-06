@@ -176,7 +176,7 @@ export const ProductDetailsDetailsTab = ({
           {showDescription || showCharacteristics ? (
             <View
               style={styles.contentSwitcherPanel}
-              accessibilityRole={
+              role={
                 hasBothPanels && Platform.OS === "web" ? "tabpanel" : undefined
               }
               accessibilityLabel={

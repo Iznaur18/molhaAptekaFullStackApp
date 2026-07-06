@@ -1,6 +1,7 @@
 import { Text, View } from "react-native";
 
 import { isProductRaffleParticipant } from "@/entities/raffle/lib/isProductRaffleParticipant";
+import { useProductManageToggleImagesByVariant } from "@/entities/product-manage-toggle-display/model/useProductManageToggleImagesByVariant";
 import { ProductManageToggleRow } from "@/entities/product/ui/ProductManageToggleRow";
 import { PRODUCT_MODERATION_APPROVED } from "@/entities/product/model/productModerationConstants";
 import { CREATE_PRODUCT_UI, PRODUCT_CARD_UI } from "@/shared/config";
@@ -42,6 +43,7 @@ export const ProductEditManageSection = ({
   disabled = false,
 }: ProductEditManageSectionProps) => {
   const styles = useProductEditManageSectionStyles();
+  const { imageByVariant } = useProductManageToggleImagesByVariant();
 
   const isListedForOthers = product.productIsAvailable !== false;
   const hasOpenSalesLocked = product.hasOpenSales === true;
@@ -98,6 +100,7 @@ export const ProductEditManageSection = ({
             pending={isAuctionTogglePending}
             pendingLabel={PRODUCT_CARD_UI.AUCTION_TOGGLE_PENDING}
             variant="auction"
+            imageUrl={imageByVariant.auction}
             onPress={() => {
               if (product._id == null || auctionActionsLocked) {
                 return;
@@ -123,6 +126,7 @@ export const ProductEditManageSection = ({
             pending={isRaffleParticipationPending}
             pendingLabel={PRODUCT_CARD_UI.RAFFLE_PARTICIPATION_PENDING}
             variant="raffle"
+            imageUrl={imageByVariant.raffle}
             onPress={() => {
               onToggleRaffleParticipation?.(product, !isRaffleParticipant);
             }}
@@ -141,6 +145,7 @@ export const ProductEditManageSection = ({
               !canOpenInstallment
             }
             variant="installment"
+            imageUrl={imageByVariant.installment}
             onPress={() => onOpenInstallmentProgram?.()}
           />
         ) : null}
@@ -165,6 +170,7 @@ export const ProductEditManageSection = ({
             disabled={visibilityActionsLocked}
             pending={isAvailabilityTogglePending}
             pendingLabel={PRODUCT_CARD_UI.AVAILABILITY_TOGGLE_PENDING}
+            imageUrl={imageByVariant.default}
             onPress={() => {
               if (product._id == null || visibilityActionsLocked) {
                 return;

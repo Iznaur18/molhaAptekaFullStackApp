@@ -154,6 +154,8 @@ export const API_CLIENT_UI = {
   PATCH_CATEGORY_DISPLAY_FALLBACK: "Не удалось сохранить категорию",
   FETCH_CATALOG_FEED_DISPLAYS_FALLBACK: "Не удалось загрузить подборки",
   PATCH_CATALOG_FEED_DISPLAY_FALLBACK: "Не удалось сохранить подборку",
+  FETCH_MANAGE_TOGGLE_DISPLAYS_FALLBACK: "Не удалось загрузить оформление кнопок",
+  PATCH_MANAGE_TOGGLE_DISPLAY_FALLBACK: "Не удалось сохранить оформление кнопки",
   PAUSE_RAFFLE_FALLBACK: "Не удалось снять розыгрыш с витрины",
   SET_RAFFLE_PARTICIPATION_FALLBACK: "Не удалось обновить участие в розыгрыше",
   FETCH_RAFFLES_QUEUE_FALLBACK: "Не удалось загрузить очередь розыгрышей",
@@ -1988,6 +1990,7 @@ export const MY_PROFILE_PAGE_UI = {
   TAB_CATEGORY_TREE_ADMIN: "Категории",
   TAB_APP_INTRO_ADMIN: "Intro-ролик",
   TAB_SITE_HEADER_BANNER_ADMIN: "Баннер шапки",
+  TAB_PRODUCT_MANAGE_TOGGLE_DISPLAY_ADMIN: "Кнопки управления",
   TAB_PRODUCT_MODERATION: "На модерации",
   TAB_INTRO_AD_MODERATION: "Intro-реклама",
   TAB_SELLER_PERSONAL_CATEGORY_MODERATION: "Личные категории",
@@ -2276,6 +2279,22 @@ export const SITE_HEADER_BANNER_ADMIN_PAGE_UI = {
   NO_SLIDE_SELECTED: "Слайд не выбран.",
   ITEM_DISABLED_BADGE: "выкл.",
   CLEAR_COLOR: "Сбросить цвет",
+};
+
+export const PRODUCT_MANAGE_TOGGLE_DISPLAY_ADMIN_PAGE_UI = {
+  TITLE: "Кнопки управления товаром",
+  HINT: "Фон фиксирован по типу кнопки. Можно загрузить иллюстрацию справа.",
+  LOADING: "Загрузка…",
+  LOAD_ERROR: "Не удалось загрузить оформление кнопок",
+};
+
+export const PRODUCT_MANAGE_TOGGLE_DISPLAY_ADMIN_UI = {
+  LABEL_IMAGE: "Иллюстрация справа",
+  SAVE: "Сохранить",
+  SAVING: "Сохранение…",
+  SAVED: "Сохранено",
+  SAVE_ERROR: "Не удалось сохранить",
+  RESET_IMAGE: "Сбросить картинку",
 };
 
 /**

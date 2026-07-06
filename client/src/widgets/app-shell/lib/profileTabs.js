@@ -14,6 +14,8 @@ export const PROFILE_TAB_SEARCH_SYNONYMS_ADMIN = "search-synonyms-admin";
 export const PROFILE_TAB_CATEGORY_TREE_ADMIN = "category-tree-admin";
 export const PROFILE_TAB_APP_INTRO_ADMIN = "app-intro-admin";
 export const PROFILE_TAB_SITE_HEADER_BANNER_ADMIN = "site-header-banner-admin";
+export const PROFILE_TAB_PRODUCT_MANAGE_TOGGLE_DISPLAY_ADMIN =
+  "product-manage-toggle-display-admin";
 export const PROFILE_TAB_POPULAR_PRODUCTS_ADMIN = "popular-products-admin";
 export const PROFILE_TAB_PRODUCT_MODERATION = "product-moderation";
 export const PROFILE_TAB_INTRO_AD_MODERATION = "intro-ad-moderation";
@@ -57,6 +59,7 @@ export const PROFILE_TAB_VALUES = [
   PROFILE_TAB_CATEGORY_TREE_ADMIN,
   PROFILE_TAB_APP_INTRO_ADMIN,
   PROFILE_TAB_SITE_HEADER_BANNER_ADMIN,
+  PROFILE_TAB_PRODUCT_MANAGE_TOGGLE_DISPLAY_ADMIN,
   PROFILE_TAB_POPULAR_PRODUCTS_ADMIN,
   PROFILE_TAB_PRODUCT_MODERATION,
   PROFILE_TAB_INTRO_AD_MODERATION,

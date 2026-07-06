@@ -14,7 +14,7 @@ const { enterMs, exitMs, sheetSlideDistance } = ADMIN_EDIT_MODAL_ANIMATION;
 export const useAdminEditModalAnimation = (visible: boolean, onDismissed?: () => void) => {
   const [modalVisible, setModalVisible] = useState(false);
   const backdropOpacity = useSharedValue(0);
-  const sheetTranslateY = useSharedValue(sheetSlideDistance);
+  const sheetTranslateY = useSharedValue<number>(sheetSlideDistance);
   const wasVisibleRef = useRef(false);
   const modalVisibleRef = useRef(false);
   const onDismissedRef = useRef(onDismissed);

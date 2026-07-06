@@ -1,7 +1,14 @@
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import {
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+  type AccessibilityState,
+} from "react-native";
 
 import { useMyLoyaltyPointsStatusQuery } from "@/entities/user/model/useMyLoyaltyPointsStatusQuery";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
@@ -151,7 +158,10 @@ export const LoyaltyPointsPage = () => {
                 inputMode="numeric"
                 placeholder={String(LOYALTY_POINTS_PURCHASE_MIN_RUB)}
                 placeholderTextColor={theme.colors.textMuted}
-                accessibilityState={{ invalid: Boolean(purchaseValidationError) }}
+                // `invalid` — web-only (react-native-web → aria-invalid); RN-типы его не знают.
+                accessibilityState={
+                  { invalid: Boolean(purchaseValidationError) } as unknown as AccessibilityState
+                }
               />
             </View>
             <Text style={styles.purchaseHint}>{LOYALTY_POINTS_PAGE_UI.PURCHASE_AMOUNT_HINT}</Text>

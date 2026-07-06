@@ -51,6 +51,13 @@ export default function HubSectionScreen() {
   }, [navigation, sectionTitle]);
 
   useEffect(() => {
+    // Легаси-алиас: старый id секции ведёт на объединённую модерацию.
+    // Проверяем до isProfileSectionId — этого id нет в union валидных секций.
+    if (sectionId === "seller-personal-category-moderation") {
+      router.replace("/hub/intro-ad-moderation" as never);
+      return;
+    }
+
     if (!isProfileSectionId(sectionId)) {
       return;
     }
@@ -66,10 +73,6 @@ export default function HubSectionScreen() {
         router.replace("/(tabs)/profile");
       });
       return;
-    }
-
-    if (sectionId === "seller-personal-category-moderation") {
-      router.replace("/hub/intro-ad-moderation" as never);
     }
   }, [router, sectionId]);
 

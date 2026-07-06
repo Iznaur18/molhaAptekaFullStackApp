@@ -59,7 +59,7 @@ export const ReportProductModal = ({
   const [reportText, setReportText] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const backdropOpacity = useSharedValue(0);
-  const sheetTranslateY = useSharedValue(sheetSlideDistance);
+  const sheetTranslateY = useSharedValue<number>(sheetSlideDistance);
 
   const charCount = reportText.length;
   const isOverLimit = charCount > PRODUCT_REPORT_TEXT_MAX_CHARS;

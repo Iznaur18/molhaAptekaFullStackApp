@@ -10,7 +10,7 @@ export type SiteHeaderBannerItem = {
 export type SiteHeaderBannerSettings = {
   enabled: boolean;
   items: SiteHeaderBannerItem[];
-  updatedAt?: string | null;
+  updatedAt?: string | Date | null;
 };
 
 export type SiteHeaderBannerSlide = {

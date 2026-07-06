@@ -136,3 +136,42 @@ test("PATCH /product/category-node-displays/:categoryId updates legacy slug disp
   const rows = await ProductCategoryDisplayModel.find().lean();
   assert.equal(rows.length, 1, JSON.stringify(rows));
 });
+
+test("category image override works for MULTIPLE category nodes (no null-key E11000)", async () => {
+  await ensureProductCategoryTreeSeeded();
+
+  const mkRoot = async (slug, label) =>
+    ProductCategoryModel.create({
+      slug,
+      labelRu: label,
+      parentId: null,
+      depth: 0,
+      isLeaf: false,
+      legacyProductCategory: null,
+      pathSlugs: [slug],
+      pathLabelRu: [label],
+    });
+  const rootA = await mkRoot("multi-node-a", "Категория A");
+  const rootB = await mkRoot("multi-node-b", "Категория B");
+
+  const { cookie, user } = await registerUserAndGetCookie(request, "admin-multi-node");
+  await verifyUserEmail("int-admin-multi-node@example.com");
+  await setUserRole(user._id, "admin");
+
+  const patchNode = (categoryId, imageUrl) =>
+    request(`/product/category-node-displays/${categoryId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", Cookie: cookie },
+      body: JSON.stringify({ imageUrl }),
+    });
+
+  const first = await patchNode(String(rootA._id), "/uploads/multi-a.jpg");
+  assert.equal(first.status, 200);
+
+  // Раньше падало с 409 (E11000): обе записи имеют categorySlug: null, а
+  // { unique, sparse } индексирует null. Теперь индекс partial — второй проходит.
+  const second = await patchNode(String(rootB._id), "/uploads/multi-b.jpg");
+  assert.equal(second.status, 200, await second.clone().text());
+  const secondData = await parseSuccessData(second);
+  assert.equal(secondData.display.imageUrl, "/uploads/multi-b.jpg");
+});

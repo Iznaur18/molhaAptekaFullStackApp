@@ -48,6 +48,10 @@ import {
   patchProductCatalogFeedTileDisplayController,
 } from "./Product/productCatalogFeedTileDisplayControllers.js";
 import {
+  getProductManageToggleDisplaysController,
+  patchProductManageToggleDisplayController,
+} from "./Product/productManageToggleDisplayControllers.js";
+import {
   getProductCategoryRootsController,
   getProductCategorySearchController,
   getProductCategoryChildrenController,
@@ -249,6 +253,8 @@ export {
   patchProductCategoryNodeDisplayController,
   getProductCatalogFeedTileDisplaysController,
   patchProductCatalogFeedTileDisplayController,
+  getProductManageToggleDisplaysController,
+  patchProductManageToggleDisplayController,
   getProductCategoryRootsController,
   getProductCategorySearchController,
   getProductCategoryChildrenController,

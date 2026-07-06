@@ -49,7 +49,7 @@ type OrderCardOrder = {
     monthsCount?: number;
     monthlyPaymentRub?: number;
   } | null;
-  items?: unknown[];
+  items?: { status?: string }[];
 };
 
 type OrderCardProps = {

@@ -1,4 +1,4 @@
-import { useEffect, useState, type StyleProp, type TextStyle, type ViewStyle } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -6,6 +6,9 @@ import {
   Text,
   TextInput,
   View,
+  type StyleProp,
+  type TextStyle,
+  type ViewStyle,
 } from "react-native";
 
 import { ADDRESS_DELIVERY_UI } from "@/shared/config";

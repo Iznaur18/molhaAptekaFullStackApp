@@ -89,6 +89,10 @@ import {
   catalogFeedTileKeyParamValidation,
   patchProductCatalogFeedTileDisplayValidation,
 } from "./product/productCatalogFeedTileDisplayValidation.js";
+import {
+  productManageToggleKeyParamValidation,
+  patchProductManageToggleDisplayValidation,
+} from "./product/productManageToggleDisplayValidation.js";
 import { patchAppIntroSettingsValidation } from "./appIntro/appIntroSettingsValidation.js";
 import {
   upsertProductInstallmentProgramValidation,
@@ -177,6 +181,8 @@ export {
   addCuratedProductListItemValidation,
   catalogFeedTileKeyParamValidation,
   patchProductCatalogFeedTileDisplayValidation,
+  productManageToggleKeyParamValidation,
+  patchProductManageToggleDisplayValidation,
   patchAppIntroSettingsValidation,
   upsertProductInstallmentProgramValidation,
   rejectInstallmentModerationValidation,

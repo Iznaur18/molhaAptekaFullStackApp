@@ -11,6 +11,8 @@ import {
   refreshAuthBodySchema,
   catalogProductsQuerySchema,
   catalogFeedTileKeyParamsSchema,
+  productManageToggleKeyParamsSchema,
+  adminManageToggleDisplayPatchBodySchema,
   createProductCategoryAdminBodySchema,
   productCategoryDisplaySlugParamsSchema,
   createProductSearchSynonymBodySchema,
@@ -242,6 +244,18 @@ test("catalogFeedTileKeyParamsSchema accepts installment filter tile key", () =>
     tileKey: "filter:__installment_only__",
   });
   assert.equal(parsed.tileKey, "filter:__installment_only__");
+});
+
+test("productManageToggleKeyParamsSchema accepts known toggle key", () => {
+  const parsed = productManageToggleKeyParamsSchema.parse({ toggleKey: "auction" });
+  assert.equal(parsed.toggleKey, "auction");
+});
+
+test("adminManageToggleDisplayPatchBodySchema accepts imageUrl patch", () => {
+  const parsed = adminManageToggleDisplayPatchBodySchema.parse({
+    imageUrl: "/uploads/toggle.png",
+  });
+  assert.equal(parsed.imageUrl, "/uploads/toggle.png");
 });
 
 test("upsertProductInstallmentProgramBodySchema validates plans", () => {
