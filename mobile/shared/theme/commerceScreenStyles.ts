@@ -3,6 +3,7 @@ import { StyleSheet } from "react-native";
 import { ORDER_CARD_ITEM_THUMB_SIZE } from "@/entities/product/model/constants";
 import { CART_LINE_IMAGE_SIZE } from "@/shared/config/cartConstants";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
+import { semanticColors } from "@/shared/theme/semanticColors";
 
 export const useOrderCardStyles = createThemedStyles((theme) => ({
   card: {
@@ -16,7 +17,7 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
   },
   cardAttention: {
     borderLeftWidth: 3,
-    borderLeftColor: "#d97706",
+    borderLeftColor: theme.colors.warning,
   },
   headerMain: {
     flex: 1,
@@ -77,8 +78,8 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     paddingVertical: 4,
     borderRadius: 999,
     overflow: "hidden",
-    backgroundColor: "rgba(59, 130, 246, 0.12)",
-    color: "#1d4ed8",
+    backgroundColor: semanticColors.actionSoft,
+    color: theme.colors.actionHover,
   },
   auctionBadge: {
     fontSize: 12.8,
@@ -88,9 +89,9 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     borderRadius: 999,
     overflow: "hidden",
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "rgba(59, 130, 246, 0.4)",
-    backgroundColor: "#e0f2fe",
-    color: "#2563eb",
+    borderColor: semanticColors.actionBorder,
+    backgroundColor: semanticColors.infoSoft,
+    color: theme.colors.link,
   },
   total: {
     fontSize: 16,
@@ -301,7 +302,7 @@ export const useCartLineItemStyles = createThemedStyles((theme) => ({
   row: {
     paddingHorizontal: 16,
     paddingVertical: 14,
-    backgroundColor: "#ffffff",
+    backgroundColor: theme.colors.onContrast,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: theme.colors.border,
   },
@@ -333,7 +334,7 @@ export const useCartLineItemStyles = createThemedStyles((theme) => ({
   stockHint: {
     fontSize: 12,
     fontWeight: "500",
-    color: "#ea580c",
+    color: semanticColors.warning,
   },
   name: {
     fontSize: 14,

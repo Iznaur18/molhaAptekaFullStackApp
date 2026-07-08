@@ -92,8 +92,8 @@
   font-weight: 600;
   padding: 0.05rem 0.35rem;
   border-radius: 0.25rem;
-  background: var(--iz-color-surface-subtle);
-  color: var(--iz-color-text-tertiary);
+  background: var(--iz-color-surface-muted);
+  color: var(--iz-color-text-secondary);
 }
 
 .user-list-row__metrics {
@@ -112,7 +112,7 @@
   min-width: 0;
   padding: 0.45rem 0.5rem;
   border-radius: 0.5rem;
-  background: color-mix(in srgb, var(--iz-color-canvas-text) 4%, transparent);
+  background: color-mix(in srgb, var(--iz-color-text) 4%, transparent);
 }
 
 .user-list-row__metric-label {
@@ -167,11 +167,11 @@
 }
 
 .user-list-row__metric-value_confirmed-yes {
-  color: var(--iz-color-success-strong);
+  color: var(--iz-color-success);
 }
 
 .user-list-row__metric-value_confirmed-no {
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }
 
 .user-list-row__metric-value_amount {

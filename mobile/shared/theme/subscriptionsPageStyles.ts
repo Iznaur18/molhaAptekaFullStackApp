@@ -3,7 +3,6 @@ import { StyleSheet } from "react-native";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-const DANGER_STRONG = "#b42318";
 const LIST_GAP = 18.4;
 
 export const useSubscriptionsPageStyles = createThemedStyles((theme) => ({

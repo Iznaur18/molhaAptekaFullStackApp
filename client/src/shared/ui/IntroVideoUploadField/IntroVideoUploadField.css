@@ -9,7 +9,7 @@
   max-width: 320px;
   max-height: 200px;
   border-radius: 0.5rem;
-  background: var(--iz-color-near-black);
+  background: var(--iz-color-ink);
   object-fit: contain;
 }
 
@@ -17,10 +17,10 @@
   align-self: flex-start;
   margin: 0;
   padding: 0.5rem 0.85rem;
-  border: 1px solid var(--iz-color-action-light);
+  border: 1px solid var(--iz-color-action-soft);
   border-radius: 0.5rem;
   background: var(--iz-color-action-soft);
-  color: var(--iz-color-link-hover);
+  color: var(--iz-color-action-hover);
   font: inherit;
   font-size: 0.875rem;
   font-weight: 600;
@@ -46,7 +46,7 @@
 .intro-video-upload__error {
   margin: 0;
   font-size: 0.8125rem;
-  color: var(--iz-color-danger-deep);
+  color: var(--iz-color-danger);
 }
 
 .intro-video-upload__file-input {

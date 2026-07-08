@@ -42,20 +42,20 @@
   flex-shrink: 0;
   backdrop-filter: blur(4px);
   border-color: color-mix(in srgb, currentColor 18%, transparent);
-  box-shadow: 0 1px 4px var(--iz-color-overlay-black-soft);
+  box-shadow: 0 1px 4px var(--iz-color-overlay-subtle);
   white-space: nowrap;
   max-width: none;
   text-align: center;
 }
 
 .product-card__image-badges > .product-discount-badge {
-  background: color-mix(in srgb, var(--iz-color-danger-soft) 72%, transparent);
+  background: color-mix(in srgb, var(--iz-color-danger-surface) 72%, transparent);
   color: color-mix(in srgb, var(--iz-color-danger-text) 88%, transparent);
 }
 
 .product-card__image-badges > .product-loyalty-points-badge {
-  background: color-mix(in srgb, var(--iz-color-success-pale) 72%, transparent);
-  color: color-mix(in srgb, var(--iz-color-success-muted) 88%, transparent);
+  background: color-mix(in srgb, var(--iz-color-success-surface) 72%, transparent);
+  color: color-mix(in srgb, var(--iz-color-success-text) 88%, transparent);
   pointer-events: auto;
 }
 
@@ -75,13 +75,13 @@
   line-height: 1.2;
   pointer-events: none;
   overflow: hidden;
-  box-shadow: 0 2px 8px var(--iz-color-overlay-black-soft);
+  box-shadow: 0 2px 8px var(--iz-color-overlay-subtle);
 }
 
 .product-card__promotion-ribbon--tier-1 {
   background: linear-gradient(
     120deg,
-    color-mix(in srgb, var(--iz-color-warning) 78%, var(--iz-color-gold-soft)),
+    color-mix(in srgb, var(--iz-color-warning) 78%, var(--iz-color-warning-surface)),
     var(--iz-color-warning)
   );
 }
@@ -89,8 +89,8 @@
 .product-card__promotion-ribbon--tier-2 {
   background: linear-gradient(
     120deg,
-    color-mix(in srgb, var(--iz-color-accent-purple) 78%, var(--iz-color-accent-purple-soft)),
-    var(--iz-color-accent-purple)
+    color-mix(in srgb, var(--iz-color-accent) 78%, var(--iz-color-accent-soft)),
+    var(--iz-color-accent)
   );
 }
 
@@ -175,7 +175,7 @@
   padding: 0;
   border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
   border-radius: 50%;
-  background: color-mix(in srgb, var(--iz-color-canvas) 42%, transparent);
+  background: color-mix(in srgb, var(--iz-color-surface) 42%, transparent);
   backdrop-filter: blur(4px);
   color: inherit;
   font-size: 1rem;
@@ -186,7 +186,7 @@
 }
 
 .product-card__image-nav-btn:hover {
-  background: color-mix(in srgb, var(--iz-color-canvas) 62%, transparent);
+  background: color-mix(in srgb, var(--iz-color-surface) 62%, transparent);
   opacity: 1;
 }
 
@@ -198,14 +198,14 @@
   font-weight: 700;
   padding: 0.12rem 0.32rem;
   border-radius: 6px;
-  background: var(--iz-color-overlay-media);
+  background: var(--iz-color-overlay);
   color: var(--iz-color-on-contrast);
   line-height: 1;
   pointer-events: none;
 }
 
 .product-card__details-surface:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--iz-color-canvas-text) 55%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--iz-color-text) 55%, transparent);
   outline-offset: 2px;
   border-radius: calc(var(--product-card-radius) * 12 / 14);
 }

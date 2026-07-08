@@ -4,7 +4,7 @@
 }
 
 .product-promotions-staff-page__state_error {
-  color: var(--iz-color-danger-deep);
+  color: var(--iz-color-danger);
 }
 
 .product-promotions-staff-page__list {
@@ -36,7 +36,7 @@
 .product-promotions-staff-page__row-error {
   margin: 0.45rem 0 0;
   font-size: 0.8rem;
-  color: var(--iz-color-danger-deep);
+  color: var(--iz-color-danger);
 }
 
 .product-promotions-staff-page__actions {
@@ -56,6 +56,6 @@
 
 .product-promotions-staff-page__reject {
   border: 1px solid var(--iz-color-danger-border);
-  background: var(--iz-color-danger-soft);
+  background: var(--iz-color-danger-surface);
   color: var(--iz-color-danger-text);
 }

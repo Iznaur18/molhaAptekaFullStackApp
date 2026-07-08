@@ -40,15 +40,15 @@
 }
 
 .seller-products-page__state_error {
-  color: var(--iz-color-danger-deep);
+  color: var(--iz-color-danger);
 }
 
 .seller-products-page__login {
   margin-top: 0.5rem;
   padding: 0.45rem 0.9rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-canvas-text) 20%, transparent);
+  border: 1px solid color-mix(in srgb, var(--iz-color-text) 20%, transparent);
   border-radius: 8px;
-  background: var(--iz-color-canvas);
+  background: var(--iz-color-surface);
   font: inherit;
   cursor: pointer;
 }

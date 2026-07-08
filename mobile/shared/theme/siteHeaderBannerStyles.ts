@@ -8,6 +8,7 @@ export const useSiteHeaderBannerCarouselStyles = createThemedStyles((theme) => (
     width: "100%",
   },
   viewport: {
+    position: "relative",
     overflow: "hidden",
     borderRadius: SITE_HEADER_BANNER_LAYOUT.radius,
   },
@@ -34,19 +35,24 @@ export const useSiteHeaderBannerCarouselStyles = createThemedStyles((theme) => (
     height: SITE_HEADER_BANNER_LAYOUT.height,
   },
   dots: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: SITE_HEADER_BANNER_LAYOUT.dotsBottomInset,
     flexDirection: "row",
     justifyContent: "center",
     gap: SITE_HEADER_BANNER_LAYOUT.dotGap,
-    marginTop: SITE_HEADER_BANNER_LAYOUT.dotsTopMargin,
+    zIndex: 5,
+    elevation: 5,
   },
   dot: {
     width: SITE_HEADER_BANNER_LAYOUT.dotSize,
     height: SITE_HEADER_BANNER_LAYOUT.dotSize,
     borderRadius: SITE_HEADER_BANNER_LAYOUT.dotSize / 2,
-    backgroundColor: theme.colors.border,
+    backgroundColor: `${theme.colors.onContrast}66`,
   },
   dotActive: {
-    backgroundColor: theme.colors.primary,
+    backgroundColor: theme.colors.onContrast,
   },
   adBadge: {
     position: "absolute",

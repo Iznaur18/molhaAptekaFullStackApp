@@ -23,7 +23,7 @@
 
 .search-input__field:focus {
   border-color: var(--iz-color-action);
-  box-shadow: 0 0 0 3px var(--iz-color-action-focus-ring);
+  box-shadow: 0 0 0 3px var(--iz-color-focus-ring);
 }
 
 .search-input__field::-webkit-search-cancel-button {
@@ -59,7 +59,7 @@
   width: 0.85rem;
   height: 0.85rem;
   margin-top: -0.425rem;
-  border: 2px solid var(--iz-color-action-spinner-track);
+  border: 2px solid var(--iz-color-focus-ring);
   border-top-color: var(--iz-color-action);
   border-radius: 50%;
   animation: search-input-spin 0.7s linear infinite;

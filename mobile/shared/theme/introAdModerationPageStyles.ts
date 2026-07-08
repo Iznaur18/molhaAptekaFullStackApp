@@ -3,10 +3,6 @@ import { StyleSheet } from "react-native";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-const DANGER_STRONG = "#b42318";
-const NEUTRAL_GRAY_DEEP = "#4b5563";
-const WARNING_BROWN_DARK = "#92400e";
-
 export const useIntroAdModerationPageStyles = createThemedStyles((theme) => ({
   container: {
     flex: 1,
@@ -29,7 +25,7 @@ export const useIntroAdModerationPageStyles = createThemedStyles((theme) => ({
     borderRadius: 10.4,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: "rgba(124, 58, 237, 0.28)",
-    backgroundColor: "#faf5ff",
+    backgroundColor: theme.colors.accentSoft,
   },
   toolbarHead: {
     flexDirection: "row",
@@ -82,8 +78,8 @@ export const useIntroAdModerationPageStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
   },
   sectionChipActive: {
-    borderColor: "#7c3aed",
-    backgroundColor: "#ede9fe",
+    borderColor: theme.colors.accent,
+    backgroundColor: theme.colors.accentSoft,
   },
   sectionChipText: {
     fontSize: 14.4,
@@ -91,7 +87,7 @@ export const useIntroAdModerationPageStyles = createThemedStyles((theme) => ({
     color: theme.colors.textSecondary,
   },
   sectionChipTextActive: {
-    color: "#5b21b6",
+    color: theme.colors.accent,
   },
   overview: {
     flexDirection: "row",
@@ -111,8 +107,8 @@ export const useIntroAdModerationPageStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
   },
   overviewTileActive: {
-    borderColor: "#7c3aed",
-    backgroundColor: "#ede9fe",
+    borderColor: theme.colors.accent,
+    backgroundColor: theme.colors.accentSoft,
   },
   overviewTileAttention: {
     borderColor: "rgba(245, 158, 11, 0.45)",
@@ -131,7 +127,7 @@ export const useIntroAdModerationPageStyles = createThemedStyles((theme) => ({
     color: theme.colors.text,
   },
   overviewValueAttention: {
-    color: WARNING_BROWN_DARK,
+    color: theme.colors.warningText,
   },
   listActions: {
     flexDirection: "row",
@@ -207,7 +203,7 @@ export const useIntroAdModerationPageStyles = createThemedStyles((theme) => ({
   },
   collapsedToggleAttention: {
     borderColor: "rgba(245, 158, 11, 0.45)",
-    backgroundColor: "#fffbeb",
+    backgroundColor: theme.colors.warningSurface,
   },
   collapsedMain: {
     flex: 1,
@@ -222,7 +218,7 @@ export const useIntroAdModerationPageStyles = createThemedStyles((theme) => ({
   collapsedPreview: {
     fontSize: 12.8,
     fontWeight: "600",
-    color: WARNING_BROWN_DARK,
+    color: theme.colors.warningText,
   },
   collapsedMeta: {
     alignItems: "flex-end",
@@ -245,15 +241,15 @@ export const useIntroAdModerationPageStyles = createThemedStyles((theme) => ({
     marginBottom: 16,
     fontSize: 15.2,
     lineHeight: 22,
-    color: NEUTRAL_GRAY_DEEP,
+    color: theme.colors.textSecondary,
   },
   stateError: {
-    color: DANGER_STRONG,
+    color: theme.colors.danger,
   },
   empty: {
     fontSize: 15.2,
     lineHeight: 22,
-    color: NEUTRAL_GRAY_DEEP,
+    color: theme.colors.textSecondary,
     textAlign: "center",
     paddingVertical: 8,
   },

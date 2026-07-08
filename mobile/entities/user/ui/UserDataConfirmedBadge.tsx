@@ -1,6 +1,7 @@
+import { semanticColors } from "@/shared/theme/semanticColors";
 import Svg, { Path } from "react-native-svg";
 
-const VERIFIED_BADGE_BLUE = "#1d9bf0";
+const VERIFIED_BADGE_BLUE = semanticColors.info;
 
 type UserDataConfirmedBadgeProps = {
   size?: number;
@@ -14,7 +15,7 @@ export const UserDataConfirmedBadge = ({ size = 18 }: UserDataConfirmedBadgeProp
     />
     <Path
       fill="none"
-      stroke="#fff"
+      stroke={semanticColors.onContrast}
       strokeWidth={3.5}
       strokeLinecap="round"
       strokeLinejoin="round"

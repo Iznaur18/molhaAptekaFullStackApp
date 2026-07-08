@@ -19,18 +19,18 @@
   align-items: stretch;
   min-height: 11.5rem;
   padding: 0.55rem 0.75rem 0.65rem;
-  border: 2px solid var(--iz-color-premium-purple-muted);
+  border: 2px solid var(--iz-color-accent-soft);
   border-radius: 16px;
   overflow: hidden;
   background: var(--iz-gradient-raffle-pink);
-  box-shadow: 0 8px 24px var(--iz-color-accent-purple-shadow);
+  box-shadow: 0 8px 24px var(--iz-color-accent-shadow);
 }
 
 .raffle-featured-banner__inner_has-backdrop {
   --raffle-featured-banner-text: var(--iz-color-on-contrast);
 
   background: color-mix(in srgb, var(--iz-color-surface) 84%, transparent);
-  border-color: color-mix(in srgb, var(--iz-color-premium-purple-muted) 70%, transparent);
+  border-color: color-mix(in srgb, var(--iz-color-accent-soft) 70%, transparent);
 }
 
 .raffle-featured-banner__inner_has-backdrop::before {
@@ -95,7 +95,7 @@
 .raffle-featured-banner__inner_has-backdrop .raffle-featured-banner__info-description,
 .raffle-featured-banner__inner_has-backdrop .raffle-featured-banner__progress-label {
   color: var(--raffle-featured-banner-text);
-  text-shadow: 0 1px 3px color-mix(in srgb, var(--iz-color-black) 40%, transparent);
+  text-shadow: 0 1px 3px color-mix(in srgb, var(--iz-color-ink) 40%, transparent);
 }
 
 .raffle-featured-banner__inner_has-backdrop .raffle-featured-banner__progress-bar {
@@ -142,7 +142,7 @@
 }
 
 .raffle-featured-banner__prize-video {
-  background: var(--iz-color-black);
+  background: var(--iz-color-ink);
 }
 
 .raffle-featured-banner__info-toggle {
@@ -159,8 +159,8 @@
   padding: 0;
   border: 2px solid var(--iz-color-on-contrast);
   border-radius: 0.5rem;
-  background: color-mix(in srgb, var(--iz-color-black) 45%, transparent);
-  box-shadow: 0 1px 4px color-mix(in srgb, var(--iz-color-black) 35%, transparent);
+  background: color-mix(in srgb, var(--iz-color-ink) 45%, transparent);
+  box-shadow: 0 1px 4px color-mix(in srgb, var(--iz-color-ink) 35%, transparent);
   color: var(--iz-color-on-contrast);
   font: inherit;
   font-size: 0.95rem;
@@ -173,7 +173,7 @@
 
 .raffle-featured-banner__info-toggle_open {
   border-color: var(--iz-color-on-contrast);
-  background: var(--iz-color-accent-purple);
+  background: var(--iz-color-accent);
 }
 
 .raffle-featured-banner__info-panel {
@@ -189,8 +189,8 @@
   overscroll-behavior: contain;
   background: linear-gradient(
     180deg,
-    color-mix(in srgb, var(--iz-color-black) 72%, transparent) 0%,
-    color-mix(in srgb, var(--iz-color-black) 84%, transparent) 100%
+    color-mix(in srgb, var(--iz-color-ink) 72%, transparent) 0%,
+    color-mix(in srgb, var(--iz-color-ink) 84%, transparent) 100%
   );
   color: var(--iz-color-on-contrast);
   opacity: 0;
@@ -278,7 +278,7 @@
 .raffle-featured-banner__progress-bar {
   height: 0.55rem;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--iz-color-accent-purple) 12%, transparent);
+  background: color-mix(in srgb, var(--iz-color-accent) 12%, transparent);
   overflow: hidden;
 }
 
@@ -301,7 +301,7 @@
 .raffle-featured-banner__manage {
   margin-bottom: 0.65rem;
   padding-bottom: 0.65rem;
-  border-bottom: 1px solid color-mix(in srgb, var(--iz-color-accent-purple) 18%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--iz-color-accent) 18%, transparent);
 }
 
 .raffle-featured-banner__actions {
@@ -327,31 +327,31 @@
 
 .raffle-featured-banner__btn_primary {
   border: none;
-  background: var(--iz-color-accent-purple);
+  background: var(--iz-color-accent);
   color: var(--iz-color-on-contrast);
 }
 
 .raffle-featured-banner__btn_instagram {
-  border: 1px solid var(--iz-color-accent-pink);
-  background: var(--iz-color-accent-pink-soft);
-  color: var(--iz-color-accent-pink-deep);
+  border: 1px solid var(--iz-color-accent);
+  background: var(--iz-color-accent-soft);
+  color: var(--iz-color-accent);
 }
 
 .raffle-featured-banner__completed {
   font-size: 0.82rem;
   font-weight: 700;
-  color: var(--iz-color-success-deep);
+  color: var(--iz-color-success-text);
 }
 
 .raffle-featured-banner_completed .raffle-featured-banner__inner {
-  border-color: var(--iz-color-success-light);
+  border-color: var(--iz-color-success-surface);
   background: var(--iz-gradient-raffle-success);
-  box-shadow: 0 8px 24px var(--iz-color-accent-success-shadow);
+  box-shadow: 0 8px 24px var(--iz-color-accent-shadow);
 }
 
 .raffle-featured-banner_completed .raffle-featured-banner__inner_has-backdrop {
   background: color-mix(in srgb, var(--iz-color-surface) 84%, transparent);
-  border-color: color-mix(in srgb, var(--iz-color-success-light) 70%, transparent);
+  border-color: color-mix(in srgb, var(--iz-color-success-surface) 70%, transparent);
 }
 
 .raffle-featured-banner_completed .raffle-featured-banner__inner_has-backdrop::after {
@@ -359,7 +359,7 @@
 }
 
 .raffle-featured-banner_completed .raffle-featured-banner__progress-bar {
-  background: color-mix(in srgb, var(--iz-color-success-vivid) 16%, transparent);
+  background: color-mix(in srgb, var(--iz-color-success) 16%, transparent);
 }
 
 .raffle-featured-banner_completed .raffle-featured-banner__inner_has-backdrop .raffle-featured-banner__progress-bar {
@@ -380,7 +380,7 @@
 
 .raffle-featured-banner_completed .raffle-featured-banner__btn_primary {
   border: none;
-  background: var(--iz-color-success-deep);
+  background: var(--iz-color-success-text);
   color: var(--iz-color-on-contrast);
 }
 

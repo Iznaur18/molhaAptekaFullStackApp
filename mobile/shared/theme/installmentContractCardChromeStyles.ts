@@ -2,14 +2,7 @@ import { StyleSheet } from "react-native";
 
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-const LINK_DEEP = "#4f46e5";
-const SUCCESS_TEAL_BRIGHT = "#0d9488";
-const SUCCESS_PALE = "#dcfce7";
-const SUCCESS_FOREST = "#065f46";
-const SUCCESS_SURFACE = "#f0fdf4";
-const DANGER_STRONG = "#b42318";
-const DANGER_SURFACE = "#fef3f2";
-const DANGER_ACCENT = "#dc2626";
+
 
 const PAYMENTS_FOLD_SUMMARY_PADDING_VERTICAL = 9;
 const PAYMENTS_FOLD_SUMMARY_MIN_HEIGHT = 47;
@@ -23,21 +16,21 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
     borderRadius: 8.8,
     borderColor: "rgba(79, 70, 229, 0.35)",
     borderLeftWidth: 3,
-    borderLeftColor: LINK_DEEP,
+    borderLeftColor: theme.colors.action,
     backgroundColor: theme.colors.surface,
-    shadowColor: LINK_DEEP,
+    shadowColor: theme.colors.action,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.08,
     shadowRadius: 3,
     elevation: 1,
   },
   cardCompleted: {
-    borderLeftColor: SUCCESS_TEAL_BRIGHT,
-    backgroundColor: SUCCESS_SURFACE,
+    borderLeftColor: theme.colors.success,
+    backgroundColor: theme.colors.successSurface,
   },
   cardAttention: {
-    borderLeftColor: "#f59e0b",
-    shadowColor: "#f59e0b",
+    borderLeftColor: theme.colors.warning,
+    shadowColor: theme.colors.warning,
     shadowOpacity: 0.14,
   },
   headerToggle: {
@@ -109,19 +102,19 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
     color: theme.colors.actionHover,
   },
   statusPillActive: {
-    backgroundColor: "#dbeafe",
+    backgroundColor: theme.colors.actionBorder,
   },
   statusPillCompleted: {
-    backgroundColor: SUCCESS_PALE,
+    backgroundColor: theme.colors.successSurface,
   },
   statusPillCompletedText: {
-    color: SUCCESS_FOREST,
+    color: theme.colors.successText,
   },
   statusPillDefaulted: {
-    backgroundColor: DANGER_SURFACE,
+    backgroundColor: theme.colors.dangerSurface,
   },
   statusPillDefaultedText: {
-    color: DANGER_STRONG,
+    color: theme.colors.danger,
   },
   statusPillCancelled: {
     backgroundColor: theme.colors.surfaceMuted,
@@ -133,12 +126,12 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
     paddingVertical: 3.2,
     paddingHorizontal: 8,
     borderRadius: 5.6,
-    backgroundColor: DANGER_SURFACE,
+    backgroundColor: theme.colors.dangerSurface,
   },
   overdueBadgeText: {
     fontSize: 12,
     fontWeight: "600",
-    color: DANGER_STRONG,
+    color: theme.colors.danger,
   },
   progress: {
     height: 6,
@@ -149,7 +142,7 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
   progressFill: {
     height: "100%",
     borderRadius: 999,
-    backgroundColor: LINK_DEEP,
+    backgroundColor: theme.colors.action,
   },
   counterparty: {
     gap: 2,
@@ -242,10 +235,10 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
     opacity: 0.85,
   },
   paymentRowOverdue: {
-    backgroundColor: DANGER_SURFACE,
+    backgroundColor: theme.colors.dangerSurface,
   },
   paymentRowPending: {
-    backgroundColor: "#fffbeb",
+    backgroundColor: theme.colors.warningSurface,
   },
   paymentMain: {
     gap: 4,
@@ -267,13 +260,13 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
     color: theme.colors.textSecondary,
   },
   paymentStatusPaid: {
-    color: SUCCESS_FOREST,
+    color: theme.colors.successText,
   },
   paymentStatusOverdue: {
-    color: DANGER_STRONG,
+    color: theme.colors.danger,
   },
   paymentStatusPending: {
-    color: "#92400e",
+    color: theme.colors.warningText,
   },
   paymentActions: {
     flexDirection: "row",
@@ -292,12 +285,12 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
     backgroundColor: theme.colors.surface,
   },
   btnPrimary: {
-    borderColor: LINK_DEEP,
-    backgroundColor: LINK_DEEP,
+    borderColor: theme.colors.action,
+    backgroundColor: theme.colors.action,
   },
   btnSuccess: {
-    borderColor: SUCCESS_TEAL_BRIGHT,
-    backgroundColor: SUCCESS_TEAL_BRIGHT,
+    borderColor: theme.colors.success,
+    backgroundColor: theme.colors.success,
   },
   btnDanger: {
     borderColor: "rgba(220, 38, 38, 0.7)",
@@ -316,7 +309,7 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
     color: theme.colors.onContrast,
   },
   btnTextDanger: {
-    color: DANGER_ACCENT,
+    color: theme.colors.danger,
   },
   cardActions: {
     flexDirection: "row",
@@ -340,7 +333,7 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
   },
   error: {
     fontSize: 13.6,
-    color: DANGER_STRONG,
+    color: theme.colors.danger,
   },
   disabled: {
     opacity: 0.65,

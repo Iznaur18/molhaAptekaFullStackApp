@@ -1,13 +1,14 @@
 import type { OrderStatus } from "@/entities/order/model/constants";
+import { semanticColors } from "@/shared/theme/semanticColors";
 
 /** Паритет с web `MySalesPage.css` status chip active colors. */
 export const MY_SALES_STATUS_FILTER_CHIP_COLORS = {
-  defaultActive: "#22c55e",
-  pending: "#f59e0b",
-  confirmed: "#1f6feb",
-  shipped: "#6d28d9",
-  delivered: "#22c55e",
-  cancelled: "#dc2626",
+  defaultActive: semanticColors.success,
+  pending: semanticColors.warning,
+  confirmed: semanticColors.action,
+  shipped: semanticColors.accent,
+  delivered: semanticColors.success,
+  cancelled: semanticColors.danger,
 } as const;
 
 export const resolveMySalesStatusFilterChipActiveColors = (

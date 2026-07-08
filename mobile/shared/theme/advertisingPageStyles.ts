@@ -4,9 +4,7 @@ import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentL
 import { cancelButtonStyleBlock } from "@/shared/theme/cancelButtonChromeStyles";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-const SUCCESS_LIGHT = "#86efac";
-const SUCCESS_SOFT = "#ecfdf5";
-const SUCCESS_STRONG = "#047857";
+
 
 export const useAdvertisingPageStyles = createThemedStyles((theme) => ({
   container: {
@@ -183,8 +181,8 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surfaceElevated,
   },
   statusPanelActive: {
-    borderColor: SUCCESS_LIGHT,
-    backgroundColor: SUCCESS_SOFT,
+    borderColor: theme.colors.successSurface,
+    backgroundColor: theme.colors.successSurface,
   },
   statusPanelPending: {
     borderColor: theme.colors.warningBorder,
@@ -196,7 +194,7 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
     color: theme.colors.textSecondary,
   },
   statusTextActive: {
-    color: SUCCESS_STRONG,
+    color: theme.colors.successText,
   },
   panel: {
     gap: 13.6,
@@ -328,9 +326,9 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
     paddingHorizontal: 11.2,
     borderRadius: 8,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: SUCCESS_LIGHT,
-    backgroundColor: SUCCESS_SOFT,
-    color: SUCCESS_STRONG,
+    borderColor: theme.colors.successSurface,
+    backgroundColor: theme.colors.successSurface,
+    color: theme.colors.successText,
     fontSize: 14.4,
     lineHeight: 20.2,
   },

@@ -40,7 +40,7 @@
 
 .product-manage-toggle-admin-card__btn_primary {
   border-color: var(--iz-color-action-border);
-  background: var(--iz-color-action-surface);
+  background: var(--iz-color-action-soft);
   color: var(--iz-color-text);
 }
 
@@ -58,11 +58,11 @@
 .product-manage-toggle-admin-card__error {
   margin: 0;
   font-size: 0.82rem;
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }
 
 .product-manage-toggle-admin-card__notice {
   margin: 0;
   font-size: 0.82rem;
-  color: var(--iz-color-success-strong);
+  color: var(--iz-color-success);
 }

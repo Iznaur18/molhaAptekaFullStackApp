@@ -22,11 +22,11 @@
 }
 
 .email-verification-modal__message_success {
-  color: var(--iz-color-success-strong);
+  color: var(--iz-color-success);
 }
 
 .email-verification-modal__message_error {
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }
 
 .email-verification-modal__actions {

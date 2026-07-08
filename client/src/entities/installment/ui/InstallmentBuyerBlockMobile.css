@@ -32,7 +32,7 @@
 
   .installment-buyer-block__plan-card_selected {
     box-shadow:
-      0 0 0 2px var(--iz-color-action-outline-soft),
+      0 0 0 2px var(--iz-color-focus-ring),
       0 8px 20px color-mix(in srgb, var(--iz-color-link) 10%, transparent);
   }
 
@@ -52,7 +52,7 @@
   .installment-buyer-block__total-item {
     padding: 0.6rem 0.65rem;
     border-style: solid;
-    border-color: var(--iz-color-border-subtle);
+    border-color: var(--iz-color-border);
     border-radius: 0.65rem;
   }
 

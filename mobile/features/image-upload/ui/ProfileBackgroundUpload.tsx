@@ -1,3 +1,4 @@
+import { semanticColors } from "@/shared/theme/semanticColors";
 import { useState } from "react";
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 import { Image } from "expo-image";
@@ -79,7 +80,7 @@ export const ProfileBackgroundUpload = ({
                 active && { backgroundColor: theme.colors.action, borderColor: theme.colors.action },
               ]}
             >
-              <Text style={[styles.modeBtnText, { color: active ? "#fff" : theme.colors.text }]}>
+              <Text style={[styles.modeBtnText, { color: active ? semanticColors.onContrast : theme.colors.text }]}>
                 {m === "preset" ? EDIT_PROFILE_UI.BG_MODE_PRESET : EDIT_PROFILE_UI.BG_MODE_IMAGE}
               </Text>
             </Pressable>
@@ -200,8 +201,8 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#d1d5db",
-    backgroundColor: "#ffffff",
+    borderColor: semanticColors.borderStrong,
+    backgroundColor: semanticColors.onContrast,
   },
   modeBtnFirst: {
     borderTopLeftRadius: 8,
@@ -244,8 +245,8 @@ const styles = StyleSheet.create({
   },
   swatchSelected: {
     borderWidth: 3,
-    borderColor: "#ffffff",
-    shadowColor: "#000",
+    borderColor: semanticColors.onContrast,
+    shadowColor: semanticColors.ink,
     shadowOpacity: 0.3,
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 1 },
@@ -255,7 +256,7 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: "#ffffff",
+    backgroundColor: semanticColors.onContrast,
   },
   swatchLabels: {
     flexDirection: "row",

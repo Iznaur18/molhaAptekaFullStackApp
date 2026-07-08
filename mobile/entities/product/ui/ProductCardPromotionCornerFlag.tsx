@@ -1,3 +1,4 @@
+import { semanticColors } from "@/shared/theme/semanticColors";
 import { StyleSheet, View } from "react-native";
 
 import {
@@ -53,7 +54,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   text: {
-    color: "#ffffff",
+    color: semanticColors.onContrast,
     fontSize: 10.5,
     fontWeight: "800",
     letterSpacing: 0.9,

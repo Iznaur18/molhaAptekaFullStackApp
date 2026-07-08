@@ -18,7 +18,7 @@
   font-weight: 700;
   line-height: 1.2;
   cursor: pointer;
-  box-shadow: 0 1px 2px var(--iz-color-overlay-hover);
+  box-shadow: 0 1px 2px var(--iz-color-overlay-subtle);
 }
 
 .raffle-manage-actions__btn:disabled {
@@ -27,19 +27,19 @@
 }
 
 .raffle-manage-actions__btn_edit {
-  border-color: var(--iz-color-accent-purple);
-  background: var(--iz-color-accent-purple-soft);
-  color: var(--iz-color-accent-purple-text);
+  border-color: var(--iz-color-accent);
+  background: var(--iz-color-accent-soft);
+  color: var(--iz-color-accent);
 }
 
 .raffle-manage-actions__btn_delete {
-  border-color: var(--iz-color-danger-accent);
-  background: var(--iz-color-danger-soft);
+  border-color: var(--iz-color-danger);
+  background: var(--iz-color-danger-surface);
   color: var(--iz-color-danger-text);
 }
 
 .raffle-manage-actions__btn_pause {
   border-color: var(--iz-color-warning);
-  background: var(--iz-color-warning-peach);
-  color: var(--iz-color-warning-brown-deep);
+  background: var(--iz-color-warning-surface);
+  color: var(--iz-color-warning-text);
 }

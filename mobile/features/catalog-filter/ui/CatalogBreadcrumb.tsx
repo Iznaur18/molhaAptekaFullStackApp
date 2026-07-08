@@ -5,9 +5,10 @@ import { useCatalogBreadcrumbStyles } from "@/shared/theme/catalogProductStyles"
 
 type CatalogBreadcrumbProps = {
   label: string | null;
+  compactTop?: boolean;
 };
 
-export const CatalogBreadcrumb = ({ label }: CatalogBreadcrumbProps) => {
+export const CatalogBreadcrumb = ({ label, compactTop = false }: CatalogBreadcrumbProps) => {
   const styles = useCatalogBreadcrumbStyles();
 
   if (!label) {
@@ -15,7 +16,7 @@ export const CatalogBreadcrumb = ({ label }: CatalogBreadcrumbProps) => {
   }
 
   return (
-    <View style={styles.toolbar}>
+    <View style={[styles.toolbar, compactTop && styles.toolbarCompactTop]}>
       <Text
         style={styles.title}
         accessibilityRole="header"

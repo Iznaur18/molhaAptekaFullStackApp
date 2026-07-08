@@ -50,14 +50,14 @@
 }
 
 .product-details-modal__footer-btn--report {
-  border: 1px dashed var(--iz-color-danger-strong);
+  border: 1px dashed var(--iz-color-danger);
   background: transparent;
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }
 
 .product-details-modal__footer-btn--report:hover:not(:disabled) {
   border-style: solid;
-  background: color-mix(in srgb, var(--iz-color-danger-strong) 8%, transparent);
+  background: color-mix(in srgb, var(--iz-color-danger) 8%, transparent);
 }
 
 .product-details-modal__footer-btn:disabled {

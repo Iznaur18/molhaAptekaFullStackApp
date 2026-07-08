@@ -12,7 +12,7 @@
   background: var(--iz-color-action-soft);
   font-size: 0.85rem;
   line-height: 1.45;
-  color: var(--iz-color-info-navy);
+  color: var(--iz-color-info-deep);
 }
 
 .installment-buyer-block__form {
@@ -20,7 +20,7 @@
   flex-direction: column;
   gap: 0.85rem;
   padding: 0.85rem;
-  border: 1px solid var(--iz-color-border-subtle);
+  border: 1px solid var(--iz-color-border);
   border-radius: 0.75rem;
   background: var(--iz-color-surface-elevated);
 }
@@ -29,7 +29,7 @@
 .installment-buyer-block__label {
   font-size: 0.82rem;
   font-weight: 600;
-  color: var(--iz-color-slate);
+  color: var(--iz-color-text-secondary);
 }
 
 .installment-buyer-block__plans {
@@ -55,7 +55,7 @@
   column-gap: 0.55rem;
   row-gap: 0.15rem;
   padding: 0.65rem 0.75rem;
-  border: 1px solid var(--iz-color-border-muted);
+  border: 1px solid var(--iz-color-border);
   border-radius: 0.6rem;
   background: var(--iz-color-surface);
   cursor: pointer;
@@ -66,13 +66,13 @@
 }
 
 .installment-buyer-block__plan-card:hover {
-  border-color: var(--iz-color-action-light);
+  border-color: var(--iz-color-action-soft);
 }
 
 .installment-buyer-block__plan-card_selected {
   border-color: var(--iz-color-link);
   background: var(--iz-color-action-soft);
-  box-shadow: 0 0 0 2px var(--iz-color-action-outline-soft);
+  box-shadow: 0 0 0 2px var(--iz-color-focus-ring);
 }
 
 .installment-buyer-block__plan-input {
@@ -94,13 +94,13 @@
 .installment-buyer-block__plan-meta {
   grid-area: meta;
   font-size: 0.84rem;
-  color: var(--iz-color-slate-muted);
+  color: var(--iz-color-text-muted);
 }
 
 .installment-buyer-block__plan-note {
   grid-area: note;
   font-size: 0.78rem;
-  color: var(--iz-color-text-subtle);
+  color: var(--iz-color-text-muted);
 }
 
 .installment-buyer-block__row {
@@ -124,7 +124,7 @@
   box-sizing: border-box;
   width: 100%;
   padding: 0.5rem 0.6rem;
-  border: 1px solid var(--iz-color-border-muted);
+  border: 1px solid var(--iz-color-border);
   border-radius: 0.45rem;
   background: var(--iz-color-surface);
   font: inherit;
@@ -133,13 +133,13 @@
 }
 
 .installment-buyer-block__input:focus {
-  outline: 2px solid var(--iz-color-action-outline-muted);
+  outline: 2px solid var(--iz-color-focus-ring);
   border-color: var(--iz-color-link);
 }
 
 .installment-buyer-block__input:disabled {
-  background: var(--iz-color-surface-alt);
-  color: var(--iz-color-text-subtle);
+  background: var(--iz-color-surface-elevated);
+  color: var(--iz-color-text-muted);
 }
 
 .installment-buyer-block__select {
@@ -157,7 +157,7 @@
   flex-direction: column;
   gap: 0.2rem;
   padding: 0.55rem 0.65rem;
-  border: 1px dashed var(--iz-color-border-muted);
+  border: 1px dashed var(--iz-color-border);
   border-radius: 0.45rem;
   background: var(--iz-color-surface);
 }
@@ -165,7 +165,7 @@
 .installment-buyer-block__total-label {
   font-size: 0.78rem;
   font-weight: 600;
-  color: var(--iz-color-text-subtle);
+  color: var(--iz-color-text-muted);
 }
 
 .installment-buyer-block__total-value {
@@ -179,7 +179,7 @@
   flex-direction: column;
   gap: 0.65rem;
   padding: 0.75rem;
-  border: 1px solid var(--iz-color-border-subtle);
+  border: 1px solid var(--iz-color-border);
   border-radius: 0.6rem;
   background: var(--iz-color-surface);
 }
@@ -193,7 +193,7 @@
   margin-bottom: 0.3rem;
   font-size: 0.82rem;
   font-weight: 600;
-  color: var(--iz-color-slate);
+  color: var(--iz-color-text-secondary);
 }
 
 .installment-buyer-block__error {
@@ -201,7 +201,7 @@
   padding: 0.55rem 0.65rem;
   border-radius: 0.45rem;
   background: var(--iz-color-danger-surface);
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
   font-size: 0.85rem;
 }
 
@@ -209,8 +209,8 @@
   margin: 0;
   padding: 0.55rem 0.65rem;
   border-radius: 0.45rem;
-  background: var(--iz-color-success-soft);
-  color: var(--iz-color-success-strong);
+  background: var(--iz-color-success-surface);
+  color: var(--iz-color-success);
   font-size: 0.85rem;
 }
 
@@ -230,8 +230,8 @@
 }
 
 .installment-buyer-block__submit:hover:not(:disabled) {
-  background: var(--iz-color-link-hover);
-  border-color: var(--iz-color-link-hover);
+  background: var(--iz-color-action-hover);
+  border-color: var(--iz-color-action-hover);
 }
 
 .installment-buyer-block__submit:disabled {

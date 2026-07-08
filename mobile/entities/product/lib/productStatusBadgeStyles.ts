@@ -1,3 +1,4 @@
+import { semanticColors } from "@/shared/theme/semanticColors";
 import { StyleSheet, type TextStyle, type ViewStyle } from "react-native";
 
 import {
@@ -149,9 +150,14 @@ export const productStatusBadgeVariantStyles: Record<
       fontWeight: "500",
     },
   ),
-  loyaltyOvercommit: createBadge("rgba(220, 38, 38, 0.35)", "rgba(254, 226, 226, 0.95)", "#991b1b", {
+  loyaltyOvercommit: createBadge(
+    `${semanticColors.danger}59`,
+    semanticColors.dangerSurface,
+    semanticColors.dangerText,
+    {
     fontWeight: "600",
-  }),
+  },
+  ),
   promotionActive: createBadge(
     BC.promotionBoostBorder,
     BC.promotionBoostBg,

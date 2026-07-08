@@ -232,24 +232,24 @@ export const SiteHeaderBannerCarousel = ({
             </View>
           )}
         />
-      </View>
-      <View style={styles.dots} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-        {slides.map((slide, index) => (
-          <Pressable
-            key={slide.id}
-            style={[styles.dot, index === activeIndex && styles.dotActive]}
-            onPress={() => {
-              if (stride <= 0) {
-                return;
-              }
-              listRef.current?.scrollToOffset({
-                offset: index * stride,
-                animated: true,
-              });
-              setActiveIndex(index);
-            }}
-          />
-        ))}
+        <View style={styles.dots} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+          {slides.map((slide, index) => (
+            <Pressable
+              key={slide.id}
+              style={[styles.dot, index === activeIndex && styles.dotActive]}
+              onPress={() => {
+                if (stride <= 0) {
+                  return;
+                }
+                listRef.current?.scrollToOffset({
+                  offset: index * stride,
+                  animated: true,
+                });
+                setActiveIndex(index);
+              }}
+            />
+          ))}
+        </View>
       </View>
     </View>
   );

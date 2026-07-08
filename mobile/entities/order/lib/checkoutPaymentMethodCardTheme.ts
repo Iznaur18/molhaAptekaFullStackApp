@@ -1,3 +1,4 @@
+import { semanticColors } from "@/shared/theme/semanticColors";
 import {
   ORDER_PAYMENT_METHOD_CARD_PREPAID,
   ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
@@ -23,11 +24,11 @@ export const CHECKOUT_PAYMENT_METHOD_CARD_THEME: Record<
   PaymentMethodCardTheme
 > = {
   [ORDER_PAYMENT_METHOD_CARD_PREPAID]: {
-    surface: "#E8F2FF",
-    label: "#0057D9",
+    surface: semanticColors.actionSoft,
+    label: semanticColors.action,
   },
   [ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY]: {
-    surface: "#ECFDF5",
-    label: "#047857",
+    surface: semanticColors.successSurface,
+    label: semanticColors.successText,
   },
 };

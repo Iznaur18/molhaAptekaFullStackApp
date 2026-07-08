@@ -8,7 +8,7 @@
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--iz-color-text-subtle);
+  color: var(--iz-color-text-muted);
 }
 
 .product-characteristics-details__list {
@@ -26,7 +26,7 @@
   gap: 0.75rem;
   margin: 0;
   padding: 0.35rem 0;
-  border-bottom: 1px solid var(--iz-color-border-subtle);
+  border-bottom: 1px solid var(--iz-color-border);
 }
 
 .product-characteristics-details__row:last-child {
@@ -42,7 +42,7 @@
 
 .product-characteristics-details__key {
   flex: 1 1 auto;
-  color: var(--iz-color-slate-muted);
+  color: var(--iz-color-text-muted);
   font-weight: 500;
 }
 

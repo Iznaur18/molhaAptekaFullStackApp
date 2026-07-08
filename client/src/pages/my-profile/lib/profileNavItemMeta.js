@@ -1,3 +1,4 @@
+import { resolveProfileNavSectionTone } from "@izibuy/shared-lib";
 import {
   Clapperboard,
   ClipboardCheck,
@@ -33,40 +34,40 @@ import {
 
 /** @typedef {import("lucide-react").LucideIcon} LucideIcon */
 
-/** @type {Record<string, { icon: LucideIcon; tone: string }>} */
+/** @type {Record<string, { icon: LucideIcon }>} */
 export const PROFILE_NAV_ITEM_META = {
-  overview: { icon: LayoutDashboard, tone: "indigo" },
-  "my-products": { icon: Package, tone: "sky" },
-  "my-sales": { icon: Store, tone: "emerald" },
-  "my-orders": { icon: ShoppingBag, tone: "blue" },
-  auction: { icon: Gavel, tone: "amber" },
-  "installment-payments": { icon: CreditCard, tone: "teal" },
-  "installment-sales": { icon: Wallet, tone: "cyan" },
-  subscriptions: { icon: Users, tone: "violet" },
-  wishlist: { icon: Heart, tone: "rose" },
-  "data-confirmation": { icon: ShieldCheck, tone: "green" },
-  premium: { icon: Crown, tone: "gold" },
-  "loyalty-points": { icon: Sparkles, tone: "pink" },
-  advertising: { icon: Megaphone, tone: "orange" },
-  "edit-profile": { icon: Pencil, tone: "slate" },
-  "create-raffle": { icon: Gift, tone: "purple" },
-  "product-moderation": { icon: ClipboardCheck, tone: "orange" },
-  "intro-ad-moderation": { icon: Megaphone, tone: "amber" },
-  "seller-personal-category-moderation": { icon: FolderTree, tone: "teal" },
-  "product-reports": { icon: Flag, tone: "rose" },
-  "product-promotions": { icon: TrendingUp, tone: "sky" },
-  raffles: { icon: Ticket, tone: "fuchsia" },
-  "data-confirmation-requests": { icon: UserCheck, tone: "lime" },
-  "installment-moderation": { icon: Scale, tone: "indigo" },
-  "installment-disputes": { icon: MessageSquareWarning, tone: "red" },
-  "admin-orders": { icon: ListOrdered, tone: "blue" },
-  "search-synonyms-admin": { icon: Search, tone: "sky" },
-  "category-tree-admin": { icon: FolderTree, tone: "emerald" },
-  "app-intro-admin": { icon: Clapperboard, tone: "violet" },
-  "site-header-banner-admin": { icon: Image, tone: "sky" },
-  "product-manage-toggle-display-admin": { icon: ToggleLeft, tone: "violet" },
-  "popular-products-admin": { icon: Star, tone: "amber" },
-  logout: { icon: LogOut, tone: "rose" },
+  overview: { icon: LayoutDashboard },
+  "my-products": { icon: Package },
+  "my-sales": { icon: Store },
+  "my-orders": { icon: ShoppingBag },
+  auction: { icon: Gavel },
+  "installment-payments": { icon: CreditCard },
+  "installment-sales": { icon: Wallet },
+  subscriptions: { icon: Users },
+  wishlist: { icon: Heart },
+  "data-confirmation": { icon: ShieldCheck },
+  premium: { icon: Crown },
+  "loyalty-points": { icon: Sparkles },
+  advertising: { icon: Megaphone },
+  "edit-profile": { icon: Pencil },
+  "create-raffle": { icon: Gift },
+  "product-moderation": { icon: ClipboardCheck },
+  "intro-ad-moderation": { icon: Megaphone },
+  "seller-personal-category-moderation": { icon: FolderTree },
+  "product-reports": { icon: Flag },
+  "product-promotions": { icon: TrendingUp },
+  raffles: { icon: Ticket },
+  "data-confirmation-requests": { icon: UserCheck },
+  "installment-moderation": { icon: Scale },
+  "installment-disputes": { icon: MessageSquareWarning },
+  "admin-orders": { icon: ListOrdered },
+  "search-synonyms-admin": { icon: Search },
+  "category-tree-admin": { icon: FolderTree },
+  "app-intro-admin": { icon: Clapperboard },
+  "site-header-banner-admin": { icon: Image },
+  "product-manage-toggle-display-admin": { icon: ToggleLeft },
+  "popular-products-admin": { icon: Star },
+  logout: { icon: LogOut },
 };
 
 /**
@@ -75,12 +76,15 @@ export const PROFILE_NAV_ITEM_META = {
 export function enrichProfileNavItem(item) {
   const meta = PROFILE_NAV_ITEM_META[item.tab];
   if (!meta) {
-    return item;
+    return {
+      ...item,
+      tone: resolveProfileNavSectionTone(item.tab),
+    };
   }
 
   return {
     ...item,
     icon: meta.icon,
-    tone: meta.tone,
+    tone: resolveProfileNavSectionTone(item.tab),
   };
 }

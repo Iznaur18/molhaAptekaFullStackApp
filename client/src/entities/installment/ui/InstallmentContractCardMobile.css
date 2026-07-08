@@ -2,7 +2,7 @@
   .installment-contract-card--compact {
     gap: 0.55rem;
     padding: 0.75rem;
-    border: 1px solid var(--iz-color-border-subtle);
+    border: 1px solid var(--iz-color-border);
     border-left: none;
     border-radius: 0.85rem;
     background: var(--iz-color-surface);
@@ -10,7 +10,7 @@
   }
 
   .installment-contract-card--compact.installment-contract-card_completed {
-    border-color: color-mix(in srgb, var(--iz-color-success-light) 65%, var(--iz-color-border));
+    border-color: color-mix(in srgb, var(--iz-color-success-surface) 65%, var(--iz-color-border));
     background: linear-gradient(
       180deg,
       var(--iz-color-surface) 0%,

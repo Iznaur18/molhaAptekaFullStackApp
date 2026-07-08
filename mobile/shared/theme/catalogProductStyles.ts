@@ -14,6 +14,7 @@ import {
   PRODUCT_CARD_STATUS_BADGE_OVERLAY_LAYOUT as BSOL,
 } from "@/entities/product/lib/productCardBadgePalette";
 import { PRODUCT_CARD_MOBILE_CATALOG_LAYOUT as MCL } from "@/entities/product/lib/productCardMobileCatalogLayout";
+import { HOME_FEED_SECTION_GAP } from "@/features/home-feed/lib/homeFeedSectionLayout";
 import { CURATED_COMPACT_CARD_COLORS as C } from "@/entities/curated-product-list/lib/curatedCompactCardColors";
 import {
   CURATED_PRODUCT_LIST_HOME_CARD_GAP,
@@ -61,6 +62,7 @@ export const useFeedScreenStyles = createThemedStyles((theme) => ({
   },
   listHeader: {
     alignSelf: "stretch",
+    gap: HOME_FEED_SECTION_GAP,
   },
   row: {
     justifyContent: "space-between",
@@ -91,6 +93,10 @@ export const useCatalogBreadcrumbStyles = createThemedStyles((theme) => ({
   toolbar: {
     paddingTop: 16,
     marginBottom: 14,
+  },
+  toolbarCompactTop: {
+    paddingTop: 0,
+    marginBottom: HOME_FEED_SECTION_GAP,
   },
   // iOS large title
   title: {
@@ -577,7 +583,7 @@ export const useListPageFilterBarStyles = createThemedStyles((theme) => ({
     overflow: "hidden",
     zIndex: 2,
     elevation: 8,
-    shadowColor: "#0f172a",
+    shadowColor: theme.colors.text,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.12,
     shadowRadius: 16,
@@ -916,7 +922,7 @@ export const useProductPriceStyles = createThemedStyles((theme) => ({
   bannerOld: {
     fontSize: 14.7,
     fontWeight: "400",
-    color: "#9ca3af",
+    color: theme.colors.textMuted,
     textDecorationLine: "line-through",
   },
   cartRoot: {
@@ -944,10 +950,10 @@ export const useProductPriceStyles = createThemedStyles((theme) => ({
     paddingVertical: 3.5,
     borderRadius: 999,
     borderWidth: 0,
-    backgroundColor: "#fecdd3",
+    backgroundColor: theme.colors.dangerSurface,
   },
   bannerDiscountText: {
-    color: "#be123c",
+    color: theme.colors.danger,
     fontSize: 12.5,
     fontWeight: "600",
     lineHeight: 15,
@@ -1306,7 +1312,7 @@ export const useProductMediaGalleryStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "rgba(255,255,255,0.92)",
-    shadowColor: "#000",
+    shadowColor: theme.colors.ink,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.14,
     shadowRadius: 4,
@@ -1329,7 +1335,7 @@ export const useProductMediaGalleryStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "rgba(255,255,255,0.92)",
-    shadowColor: "#000",
+    shadowColor: theme.colors.ink,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.14,
     shadowRadius: 4,
@@ -1495,7 +1501,7 @@ export const useProductDetailScreenStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "rgba(255,255,255,0.92)",
-    shadowColor: "#000",
+    shadowColor: theme.colors.ink,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.14,
     shadowRadius: 4,
@@ -2074,7 +2080,7 @@ export const useProductDetailTabStyles = createThemedStyles((theme) => ({
     paddingVertical: 12,
     paddingHorizontal: 14,
     backgroundColor: theme.colors.surface,
-    shadowColor: "#000",
+    shadowColor: theme.colors.ink,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.04,
     shadowRadius: 1,
@@ -2214,7 +2220,7 @@ export const useProductDetailTabStyles = createThemedStyles((theme) => ({
     paddingHorizontal: 16,
     borderWidth: 1,
     borderRadius: 12,
-    shadowColor: "#0f172a",
+    shadowColor: theme.colors.text,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.08,
     shadowRadius: 3,
@@ -2345,7 +2351,7 @@ export const useCartScreenStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
     paddingTop: 16,
     gap: 10,
-    shadowColor: "#0f172a",
+    shadowColor: theme.colors.text,
     shadowOpacity: 0.08,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: -2 },
@@ -2437,11 +2443,14 @@ export const useCuratedProductCompactCardStyles = createThemedStyles(() => ({
 }));
 
 export const useHomeCuratedListsStyles = createThemedStyles((theme) => ({
+  section: {
+    gap: CURATED_PRODUCT_LIST_HOME_SECTION_MARGIN_BOTTOM,
+  },
   listBlock: {
     marginBottom: 0,
     paddingHorizontal: CURATED_PRODUCT_LIST_HOME_SECTION_PADDING_HORIZONTAL,
     paddingVertical: CURATED_PRODUCT_LIST_HOME_SECTION_PADDING_VERTICAL,
-    backgroundColor: "#ffffff",
+    backgroundColor: theme.colors.onContrast,
     borderWidth: 0,
     borderColor: "transparent",
     borderRadius: CURATED_PRODUCT_LIST_HOME_SECTION_BORDER_RADIUS,
@@ -2461,7 +2470,6 @@ export const useHomeCuratedListsStyles = createThemedStyles((theme) => ({
     gap: CURATED_PRODUCT_LIST_HOME_CARD_GAP,
   },
 }));
-
 
 export const useUserStoriesStripStyles = createThemedStyles((theme) => ({
   root: {

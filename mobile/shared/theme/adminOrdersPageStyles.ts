@@ -11,8 +11,6 @@ const CHIP_GAP = 5.6;
 const CHIP_PADDING_VERTICAL = 3.5;
 const CHIP_PADDING_HORIZONTAL = 8.8;
 const LIST_GAP = 12;
-const NEUTRAL_GRAY_DEEP = "#4b5563";
-const DANGER_ACCENT = "#dc2626";
 
 export const useAdminOrdersPageStyles = createThemedStyles((theme) => ({
   container: {
@@ -41,7 +39,7 @@ export const useAdminOrdersPageStyles = createThemedStyles((theme) => ({
     borderRadius: TOOLBAR_RADIUS,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: "rgba(31, 111, 235, 0.28)",
-    backgroundColor: "#eff6ff",
+    backgroundColor: theme.colors.actionSoft,
   },
   toolbarHead: {
     flexDirection: "row",
@@ -83,10 +81,10 @@ export const useAdminOrdersPageStyles = createThemedStyles((theme) => ({
   state: {
     fontSize: 15.2,
     lineHeight: 22,
-    color: NEUTRAL_GRAY_DEEP,
+    color: theme.colors.textSecondary,
   },
   stateError: {
-    color: DANGER_ACCENT,
+    color: theme.colors.danger,
   },
   centered: {
     flex: 1,
@@ -146,6 +144,6 @@ export const useOrderStatusSelectStyles = createThemedStyles((theme) => ({
     width: "100%",
     fontSize: 12.8,
     lineHeight: 18,
-    color: DANGER_ACCENT,
+    color: theme.colors.danger,
   },
 }));

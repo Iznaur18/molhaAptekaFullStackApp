@@ -1,3 +1,4 @@
+import { semanticColors } from "@/shared/theme/semanticColors";
 import { hasProductCharacteristicsContent } from "@izibuy/shared-lib";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
@@ -102,7 +103,7 @@ export const ProductDetailsDetailsTab = ({
                   reportDisabled ? PRODUCT_REPORT_UI.ALREADY_REPORTED : PRODUCT_REPORT_UI.REPORT_BUTTON
                 }
               >
-                <MaterialIcons name="flag" size={20} color="#dc2626" />
+                <MaterialIcons name="flag" size={20} color={semanticColors.danger} />
               </Pressable>
               <WishlistToggleButton
                 productId={productId}

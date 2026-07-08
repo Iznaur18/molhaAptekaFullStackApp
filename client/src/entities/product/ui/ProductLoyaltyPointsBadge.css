@@ -5,8 +5,8 @@
   max-width: 100%;
   border-radius: 0.35rem;
   border: 1px solid color-mix(in srgb, var(--iz-color-success) 45%, transparent);
-  background: var(--iz-color-success-pale);
-  color: var(--iz-color-success-muted);
+  background: var(--iz-color-success-surface);
+  color: var(--iz-color-success-text);
   font-size: 0.72rem;
   font-weight: 700;
   line-height: 1.35;

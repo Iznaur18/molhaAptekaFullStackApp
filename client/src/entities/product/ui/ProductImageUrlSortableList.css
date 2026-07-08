@@ -73,7 +73,7 @@
   min-width: 1.25rem;
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--iz-color-text-tertiary);
+  color: var(--iz-color-text-secondary);
   text-align: center;
 }
 
@@ -83,7 +83,7 @@
   height: 2.5rem;
   border-radius: 0.35rem;
   overflow: hidden;
-  background: var(--iz-color-surface-subtle);
+  background: var(--iz-color-surface-muted);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -125,18 +125,18 @@
 }
 
 .product-image-sortable__remove:hover {
-  background: var(--iz-color-danger-soft);
-  border-color: var(--iz-color-danger-coral);
+  background: var(--iz-color-danger-surface);
+  border-color: var(--iz-color-danger);
 }
 
 .product-image-sortable__add {
   align-self: flex-start;
   margin: 0;
   padding: 0.35rem 0.65rem;
-  border: 1px dashed var(--iz-color-action-light);
+  border: 1px dashed var(--iz-color-action-soft);
   border-radius: 0.5rem;
   background: var(--iz-color-action-soft);
-  color: var(--iz-color-link-hover);
+  color: var(--iz-color-action-hover);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;

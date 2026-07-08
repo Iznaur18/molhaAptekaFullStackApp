@@ -15,7 +15,7 @@
   background: linear-gradient(
     135deg,
     var(--iz-color-surface) 0%,
-    color-mix(in srgb, var(--iz-color-primary) 6%, var(--iz-color-surface-alt)) 140%
+    color-mix(in srgb, var(--iz-color-primary) 6%, var(--iz-color-surface-elevated)) 140%
   );
 }
 
@@ -65,7 +65,7 @@
 
 .admin-orders-page__status-chip:hover {
   border-color: color-mix(in srgb, var(--iz-color-primary) 35%, var(--iz-color-border));
-  background: var(--iz-color-surface-alt);
+  background: var(--iz-color-surface-elevated);
 }
 
 .admin-orders-page__status-chip_active {
@@ -75,8 +75,8 @@
 }
 
 .admin-orders-page__status-chip_active.admin-orders-page__status-chip_pending {
-  border-color: var(--iz-color-warning-bright);
-  background: var(--iz-color-warning-bright);
+  border-color: var(--iz-color-warning);
+  background: var(--iz-color-warning);
 }
 
 .admin-orders-page__status-chip_active.admin-orders-page__status-chip_confirmed {
@@ -85,18 +85,18 @@
 }
 
 .admin-orders-page__status-chip_active.admin-orders-page__status-chip_shipped {
-  border-color: var(--iz-color-premium-purple);
-  background: var(--iz-color-premium-purple);
+  border-color: var(--iz-color-accent);
+  background: var(--iz-color-accent);
 }
 
 .admin-orders-page__status-chip_active.admin-orders-page__status-chip_delivered {
-  border-color: var(--iz-color-success-vivid);
-  background: var(--iz-color-success-vivid);
+  border-color: var(--iz-color-success);
+  background: var(--iz-color-success);
 }
 
 .admin-orders-page__status-chip_active.admin-orders-page__status-chip_cancelled {
-  border-color: var(--iz-color-danger-accent);
-  background: var(--iz-color-danger-accent);
+  border-color: var(--iz-color-danger);
+  background: var(--iz-color-danger);
 }
 
 .admin-orders-page__list {
@@ -118,7 +118,7 @@
 }
 
 .admin-orders-page__state_error {
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }
 
 .admin-orders-page .order-card--compact .order-card__footer {

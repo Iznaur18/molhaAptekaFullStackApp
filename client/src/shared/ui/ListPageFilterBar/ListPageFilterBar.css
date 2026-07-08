@@ -10,7 +10,7 @@
   align-items: center;
   gap: 0.4rem;
   font-size: 0.85rem;
-  color: var(--iz-color-text-tertiary);
+  color: var(--iz-color-text-secondary);
 }
 
 .list-page-filter-bar__control {

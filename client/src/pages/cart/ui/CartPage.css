@@ -27,14 +27,14 @@
   align-items: center;
   gap: 0.85rem;
   padding: 0.875rem 1rem;
-  border: 1.5px solid var(--iz-color-raffle-border);
+  border: 1.5px solid var(--iz-color-warning);
   border-radius: 0.75rem;
-  background: var(--iz-color-raffle-surface);
+  background: var(--iz-color-warning-surface);
 }
 
 .cart-page__total-label {
   font-size: 0.95rem;
-  color: var(--iz-color-text-tertiary);
+  color: var(--iz-color-text-secondary);
 }
 
 .cart-page__total-value {
@@ -79,7 +79,7 @@
   border: 1px solid var(--iz-color-border);
   border-radius: 0.4rem;
   background: transparent;
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
   font: inherit;
   font-size: 0.85rem;
   cursor: pointer;
@@ -96,7 +96,7 @@
 }
 
 .cart-page__state_error {
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }
 
 .cart-page__empty,

@@ -1,7 +1,7 @@
 @import "./productImageTokens.css";
 
 .product-image-lightbox {
-  --product-image-lightbox-backdrop: var(--iz-color-overlay-media-strong);
+  --product-image-lightbox-backdrop: var(--iz-color-overlay-strong);
   --product-image-lightbox-padding: 1rem;
   --product-image-lightbox-z: 1400;
 
@@ -38,10 +38,10 @@
   flex-shrink: 0;
   margin: 0;
   padding: 0.25rem 0.55rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-canvas-text) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--iz-color-text) 18%, transparent);
   border-radius: 8px;
-  background: var(--iz-color-canvas);
-  color: var(--iz-color-canvas-text);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
   font: inherit;
   font-size: 1.25rem;
   line-height: 1;
@@ -49,7 +49,7 @@
 }
 
 .product-image-lightbox__close:hover {
-  background: color-mix(in srgb, var(--iz-color-canvas-text) 8%, var(--iz-color-canvas));
+  background: color-mix(in srgb, var(--iz-color-text) 8%, var(--iz-color-surface));
 }
 
 .product-image-lightbox__stage {
@@ -89,10 +89,10 @@
   height: 2.25rem;
   margin: 0;
   padding: 0;
-  border: 1px solid color-mix(in srgb, var(--iz-color-canvas-text) 20%, transparent);
+  border: 1px solid color-mix(in srgb, var(--iz-color-text) 20%, transparent);
   border-radius: 50%;
-  background: color-mix(in srgb, var(--iz-color-canvas) 92%, transparent);
-  color: var(--iz-color-canvas-text);
+  background: color-mix(in srgb, var(--iz-color-surface) 92%, transparent);
+  color: var(--iz-color-text);
   font-size: 1.35rem;
   font-weight: 700;
   line-height: 1;
@@ -100,7 +100,7 @@
 }
 
 .product-image-lightbox__nav:hover {
-  background: var(--iz-color-canvas);
+  background: var(--iz-color-surface);
 }
 
 .product-image-lightbox__img {

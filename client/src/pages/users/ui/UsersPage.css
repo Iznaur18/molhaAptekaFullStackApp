@@ -29,5 +29,5 @@
 }
 
 .users-page__state_error {
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }

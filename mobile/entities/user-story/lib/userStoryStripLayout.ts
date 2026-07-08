@@ -1,18 +1,18 @@
+import { semanticColors } from "@/shared/theme/semanticColors";
 /** Плашка сториз — фон/рамка через theme в useUserStoriesStripStyles. */
-import { HOME_FEED_SECTION_GAP } from "@/features/home-feed/lib/homeFeedSectionLayout";
 
 export const USER_STORY_STRIP_COLORS = {
-  scrollBackground: "#ffffff",
-  ringActive: "#1d9bf0",
-  ringViewed: "#9ca3af",
-  avatarBorder: "#ffffff",
-  countBackground: "#2563eb",
+  scrollBackground: semanticColors.onContrast,
+  ringActive: semanticColors.action,
+  ringViewed: semanticColors.textMuted,
+  avatarBorder: semanticColors.onContrast,
+  countBackground: semanticColors.link,
 } as const;
 
 export const USER_STORY_STRIP_LAYOUT = {
-  marginBottom: HOME_FEED_SECTION_GAP,
-  paddingTop: 8,
-  paddingBottom: 4,
+  marginBottom: 0,
+  paddingTop: 0,
+  paddingBottom: 0,
   scrollBorderRadius: 20,
   scrollPaddingLeft: 12,
   scrollPaddingRight: 4,

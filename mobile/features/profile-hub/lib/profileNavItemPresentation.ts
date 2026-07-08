@@ -4,6 +4,7 @@ import {
   resolveProfileNavTonePalette,
   type ProfileNavToneId,
 } from "@izibuy/shared-lib";
+import { semanticColors } from "@/shared/theme/semanticColors";
 
 type ProfileNavItemVisualState = {
   isActive: boolean;
@@ -42,7 +43,7 @@ export const buildProfileNavItemPresentation = (
         borderColor: withAlpha(palette.main, "2E"),
       };
 
-  const iconColor = highlighted ? "#ffffff" : palette.main;
+  const iconColor = highlighted ? semanticColors.onContrast : palette.main;
 
   const label: TextStyle = {
     color: highlighted ? palette.strong : undefined,

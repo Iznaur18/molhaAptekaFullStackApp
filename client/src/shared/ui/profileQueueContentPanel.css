@@ -9,7 +9,7 @@
   padding: var(--profile-queue-content-padding-block) 0.75rem;
   border: 1px solid color-mix(in srgb, var(--iz-color-text) 8%, var(--iz-color-border));
   border-radius: 0.85rem;
-  background: var(--iz-color-surface-subtle);
+  background: var(--iz-color-surface-muted);
 }
 
 .profile-queue-content-panel > :where(ul[role="list"]) {
@@ -37,7 +37,7 @@
     background: color-mix(
       in srgb,
       var(--iz-color-text) 5%,
-      var(--iz-color-surface-alt)
+      var(--iz-color-surface-elevated)
     );
   }
 }

@@ -12,8 +12,6 @@ const CHIP_PADDING_VERTICAL = 3.5;
 const CHIP_PADDING_HORIZONTAL = 8.8;
 const LIST_GAP = 16;
 
-const LINK_DEEP = "#4f46e5";
-
 export const useInstallmentPaymentsPageStyles = createThemedStyles((theme) => ({
   container: {
     flex: 1,
@@ -41,7 +39,7 @@ export const useInstallmentPaymentsPageStyles = createThemedStyles((theme) => ({
     borderRadius: TOOLBAR_RADIUS,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: "rgba(79, 70, 229, 0.28)",
-    backgroundColor: "#eef2ff",
+    backgroundColor: theme.colors.actionSoft,
   },
   toolbarHead: {
     flexDirection: "row",
@@ -102,7 +100,7 @@ export const useInstallmentPaymentsPageStyles = createThemedStyles((theme) => ({
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 8,
-    backgroundColor: LINK_DEEP,
+    backgroundColor: theme.colors.action,
   },
   buttonText: {
     color: theme.colors.onContrast,
@@ -125,8 +123,8 @@ export const useInstallmentPaymentsPageStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
   },
   overviewTileActive: {
-    borderColor: LINK_DEEP,
-    backgroundColor: "#eef2ff",
+    borderColor: theme.colors.action,
+    backgroundColor: theme.colors.actionSoft,
   },
   overviewTileAttention: {
     borderColor: "rgba(245, 158, 11, 0.45)",
@@ -148,7 +146,7 @@ export const useInstallmentPaymentsPageStyles = createThemedStyles((theme) => ({
     fontVariant: ["tabular-nums"],
   },
   overviewValueAttention: {
-    color: "#92400e",
+    color: theme.colors.warningText,
   },
   listActions: {
     flexDirection: "row",

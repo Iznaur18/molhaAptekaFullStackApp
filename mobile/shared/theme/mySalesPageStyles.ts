@@ -39,7 +39,7 @@ export const useMySalesPageStyles = createThemedStyles((theme) => ({
     borderRadius: TOOLBAR_RADIUS,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: "rgba(34, 197, 94, 0.22)",
-    backgroundColor: "#f0fdf4",
+    backgroundColor: theme.colors.successSurface,
   },
   toolbarHead: {
     flexDirection: "row",
@@ -168,8 +168,8 @@ export const useMySalesPageStyles = createThemedStyles((theme) => ({
     opacity: 1,
   },
   overviewTileActive: {
-    borderColor: "#16a34a",
-    backgroundColor: "#f0fdf4",
+    borderColor: theme.colors.success,
+    backgroundColor: theme.colors.successSurface,
   },
   overviewTileAttention: {
     borderColor: "rgba(217, 119, 6, 0.45)",
@@ -188,7 +188,7 @@ export const useMySalesPageStyles = createThemedStyles((theme) => ({
     fontVariant: ["tabular-nums"],
   },
   overviewValueAttention: {
-    color: "#854d0e",
+    color: theme.colors.warningText,
   },
   listActions: {
     flexDirection: "row",

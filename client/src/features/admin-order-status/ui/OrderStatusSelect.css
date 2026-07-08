@@ -10,7 +10,7 @@
   align-items: center;
   gap: 0.4rem;
   font-size: 0.85rem;
-  color: var(--iz-color-text-tertiary);
+  color: var(--iz-color-text-secondary);
 }
 
 .order-status-select__control {
@@ -35,5 +35,5 @@
 
 .order-status-select__error {
   font-size: 0.8rem;
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }

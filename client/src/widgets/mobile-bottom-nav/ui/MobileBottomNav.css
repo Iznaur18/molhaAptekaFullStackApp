@@ -57,12 +57,12 @@
 
 .mobile-bottom-nav__item:hover {
   color: var(--iz-color-action);
-  background: var(--iz-color-action-bg-hover);
+  background: var(--iz-color-action-soft);
 }
 
 .mobile-bottom-nav__item--active {
   color: var(--iz-color-action);
-  background: var(--iz-color-action-bg-active);
+  background: var(--iz-color-action-soft);
 }
 
 .mobile-bottom-nav__icon-wrap {
@@ -89,7 +89,7 @@
   height: 0.95rem;
   padding: 0 0.2rem;
   border-radius: var(--iz-radius-pill);
-  background: var(--iz-color-danger-strong);
+  background: var(--iz-color-danger);
   color: var(--iz-color-on-contrast);
   font-size: 0.55rem;
   font-weight: 700;

@@ -21,7 +21,7 @@
   object-fit: cover;
   object-position: center;
   border-radius: 0.4rem;
-  background: var(--iz-color-surface-subtle);
+  background: var(--iz-color-surface-muted);
 }
 
 .cart-line__info {
@@ -64,13 +64,13 @@
 .cart-line__unit-price {
   margin: 0;
   font-size: 0.85rem;
-  color: var(--iz-color-text-tertiary);
+  color: var(--iz-color-text-secondary);
 }
 
 .cart-line__missing {
   margin: 0;
   font-size: 0.85rem;
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }
 
 .cart-line__actions {
@@ -109,7 +109,7 @@
 }
 
 .cart-line__step-button:hover {
-  background: var(--iz-color-action-bg-hover);
+  background: var(--iz-color-action-soft);
 }
 
 .cart-line__step-button--increase {
@@ -186,7 +186,7 @@
 
 .cart-line__remove:hover {
   background: var(--iz-color-overlay-subtle);
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }
 
 @container app-viewport (max-width: 640px) {

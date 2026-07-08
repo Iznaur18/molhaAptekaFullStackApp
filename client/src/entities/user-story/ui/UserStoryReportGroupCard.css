@@ -30,7 +30,7 @@
   margin-bottom: 12px;
   border-radius: 12px;
   overflow: hidden;
-  background: var(--iz-color-near-black);
+  background: var(--iz-color-ink);
 }
 
 .user-story-report-group-card__media {
@@ -47,7 +47,7 @@
   margin: 0;
   padding: 6px 8px;
   border-radius: 6px;
-  background: var(--iz-color-overlay-dark-strong);
+  background: var(--iz-color-overlay-strong);
   color: var(--iz-color-on-contrast);
   font-size: 0.8rem;
 }
@@ -75,7 +75,7 @@
 
 .user-story-report-group-card__report {
   padding: 10px 0;
-  border-top: 1px solid var(--iz-color-surface-subtle);
+  border-top: 1px solid var(--iz-color-surface-muted);
 }
 
 .user-story-report-group-card__report-meta {
@@ -106,7 +106,7 @@
 
 .user-story-report-group-card__error {
   margin: 8px 0 0;
-  color: var(--iz-color-danger-deep);
+  color: var(--iz-color-danger);
 }
 
 .user-story-report-group-card__actions {
@@ -120,13 +120,13 @@
   border: none;
   border-radius: 999px;
   padding: 10px 14px;
-  background: var(--iz-color-premium-indigo-soft);
-  color: var(--iz-color-info-navy);
+  background: var(--iz-color-accent-soft);
+  color: var(--iz-color-info-deep);
   cursor: pointer;
 }
 
 .user-story-report-group-card__action_hide {
-  background: var(--iz-color-danger-soft);
+  background: var(--iz-color-danger-surface);
   color: var(--iz-color-danger-text);
 }
 
@@ -141,20 +141,20 @@
   gap: 0.4rem;
   padding: 0.55rem 0.65rem;
   border-radius: 0.55rem;
-  border-color: color-mix(in srgb, var(--iz-color-border) 85%, var(--iz-color-danger-soft));
+  border-color: color-mix(in srgb, var(--iz-color-border) 85%, var(--iz-color-danger-surface));
   background: linear-gradient(
     180deg,
     var(--iz-color-surface) 0%,
     var(--iz-color-surface-muted) 100%
   );
-  box-shadow: 0 1px 2px color-mix(in srgb, var(--iz-color-canvas-text) 5%, transparent);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--iz-color-text) 5%, transparent);
 }
 
 .user-story-report-group-card--compact .user-story-report-group-card__header {
   gap: 0.5rem;
   margin-bottom: 0;
   padding-bottom: 0.35rem;
-  border-bottom: 1px solid var(--iz-color-surface-subtle);
+  border-bottom: 1px solid var(--iz-color-surface-muted);
 }
 
 .user-story-report-group-card--compact .user-story-report-group-card__preview {

@@ -1,3 +1,4 @@
+import { semanticColors } from "@/shared/theme/semanticColors";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -308,7 +309,7 @@ export const ProductPromotionModal = ({
               <Text
                 style={[
                   styles.summaryTotalValue,
-                  selectedTier === PRODUCT_PROMOTION_TIER_BANNER && { color: "#dc2626" },
+                  selectedTier === PRODUCT_PROMOTION_TIER_BANNER && { color: semanticColors.danger },
                 ]}
               >
                 {PRODUCT_PROMOTION_UI.TOTAL_POINTS(selectedPricePoints)}

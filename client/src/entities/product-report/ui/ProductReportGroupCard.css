@@ -21,7 +21,7 @@
 .product-report-group-card__count {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
   white-space: nowrap;
 }
 
@@ -101,7 +101,7 @@
 
 .product-report-group-card__error {
   margin: 0 0 0.5rem;
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
   font-size: 0.875rem;
 }
 
@@ -121,8 +121,8 @@
 }
 
 .product-report-group-card__action_reject {
-  border-color: var(--iz-color-danger-strong);
-  color: var(--iz-color-danger-strong);
+  border-color: var(--iz-color-danger);
+  color: var(--iz-color-danger);
 }
 
 .product-report-group-card__action:disabled {
@@ -136,20 +136,20 @@
   gap: 0.4rem;
   padding: 0.55rem 0.65rem;
   border-radius: 0.55rem;
-  border-color: color-mix(in srgb, var(--iz-color-border) 85%, var(--iz-color-danger-soft));
+  border-color: color-mix(in srgb, var(--iz-color-border) 85%, var(--iz-color-danger-surface));
   background: linear-gradient(
     180deg,
     var(--iz-color-surface) 0%,
     var(--iz-color-surface-muted) 100%
   );
-  box-shadow: 0 1px 2px color-mix(in srgb, var(--iz-color-canvas-text) 5%, transparent);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--iz-color-text) 5%, transparent);
 }
 
 .product-report-group-card--compact .product-report-group-card__header {
   gap: 0.5rem;
   margin-bottom: 0;
   padding-bottom: 0.35rem;
-  border-bottom: 1px solid var(--iz-color-surface-subtle);
+  border-bottom: 1px solid var(--iz-color-surface-muted);
 }
 
 .product-report-group-card--compact .product-report-group-card__links {
@@ -167,7 +167,7 @@
   flex-direction: column;
   gap: 0.15rem;
   padding: 0.3rem 0.4rem;
-  border: 1px solid var(--iz-color-surface-subtle);
+  border: 1px solid var(--iz-color-surface-muted);
   border-radius: 0.35rem;
   background: var(--iz-color-surface);
 }

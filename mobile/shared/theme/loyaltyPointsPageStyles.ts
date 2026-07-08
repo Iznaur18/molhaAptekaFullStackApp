@@ -3,13 +3,6 @@ import { StyleSheet } from "react-native";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-const INFO_DEEP = "#1e40af";
-const INFO_NAVY = "#1e3a8a";
-const INFO_MUTED = "#bfdbfe";
-const SLATE = "#475569";
-const DANGER_STRONG = "#b42318";
-const SURFACE_FADE_TOP = "#f8fafc";
-
 export const useLoyaltyPointsPageStyles = createThemedStyles((theme) => ({
   container: {
     flex: 1,
@@ -30,7 +23,7 @@ export const useLoyaltyPointsPageStyles = createThemedStyles((theme) => ({
   balance: {
     fontSize: 21.6,
     fontWeight: "700",
-    color: INFO_DEEP,
+    color: theme.colors.infoDeep,
     fontVariant: ["tabular-nums"],
   },
   info: {
@@ -45,26 +38,26 @@ export const useLoyaltyPointsPageStyles = createThemedStyles((theme) => ({
   use: {
     fontSize: 14.72,
     lineHeight: 21.3,
-    color: SLATE,
+    color: theme.colors.textSecondary,
   },
   purchase: {
     gap: 8.8,
     padding: 16,
     borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: INFO_MUTED,
-    backgroundColor: SURFACE_FADE_TOP,
+    borderColor: theme.colors.infoSoft,
+    backgroundColor: theme.colors.surfaceElevated,
   },
   purchaseTitle: {
     fontSize: 16,
     fontWeight: "700",
-    color: INFO_NAVY,
+    color: theme.colors.infoDeep,
   },
   purchaseLabel: {
     gap: 5.6,
     fontSize: 14.4,
     fontWeight: "600",
-    color: SLATE,
+    color: theme.colors.textSecondary,
   },
   purchaseInput: {
     maxWidth: 192,
@@ -86,12 +79,12 @@ export const useLoyaltyPointsPageStyles = createThemedStyles((theme) => ({
   purchasePreview: {
     fontSize: 16.8,
     fontWeight: "700",
-    color: INFO_DEEP,
+    color: theme.colors.infoDeep,
     fontVariant: ["tabular-nums"],
   },
   purchaseError: {
     fontSize: 14.08,
-    color: DANGER_STRONG,
+    color: theme.colors.danger,
     lineHeight: 20.2,
   },
   buy: {
@@ -114,9 +107,9 @@ export const useLoyaltyPointsPageStyles = createThemedStyles((theme) => ({
     paddingHorizontal: 12,
     borderRadius: 8,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: INFO_MUTED,
+    borderColor: theme.colors.infoSoft,
     backgroundColor: theme.colors.actionSoft,
-    color: INFO_DEEP,
+    color: theme.colors.infoDeep,
     fontSize: 14.4,
     lineHeight: 20.2,
   },

@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  background: var(--iz-color-overlay-ink);
+  background: var(--iz-color-overlay);
 }
 
 .data-confirmation-modal {
@@ -42,7 +42,7 @@
 .data-confirmation-modal__intro {
   margin: 0 0 0.75rem;
   font-size: 0.875rem;
-  color: var(--iz-color-slate-muted);
+  color: var(--iz-color-text-muted);
 }
 
 .data-confirmation-modal__status {
@@ -51,11 +51,11 @@
 }
 
 .data-confirmation-modal__status_ok {
-  color: var(--iz-color-success-teal-bright);
+  color: var(--iz-color-success);
 }
 
 .data-confirmation-modal__status_reject {
-  color: var(--iz-color-warning-deep);
+  color: var(--iz-color-warning-text);
 }
 
 .data-confirmation-modal__staff-note {
@@ -81,14 +81,14 @@
   flex-direction: column;
   gap: 0.25rem;
   font-size: 0.75rem;
-  color: var(--iz-color-slate);
+  color: var(--iz-color-text-secondary);
 }
 
 .data-confirmation-modal__grid input,
 .data-confirmation-modal__grid textarea {
   font: inherit;
   padding: 0.4rem 0.5rem;
-  border: 1px solid var(--iz-color-border-muted);
+  border: 1px solid var(--iz-color-border);
   border-radius: 6px;
 }
 
@@ -98,12 +98,12 @@
   gap: 0.35rem;
   margin-top: 0.85rem;
   font-size: 0.75rem;
-  color: var(--iz-color-slate);
+  color: var(--iz-color-text-secondary);
 }
 
 .data-confirmation-modal__selfie-hint {
   font-size: 0.6875rem;
-  color: var(--iz-color-text-subtle);
+  color: var(--iz-color-text-muted);
 }
 
 .data-confirmation-modal__selfie-upload {
@@ -116,10 +116,10 @@
 .data-confirmation-modal__file-btn {
   margin: 0;
   padding: 0.5rem 0.85rem;
-  border: 1px solid var(--iz-color-action-light);
+  border: 1px solid var(--iz-color-action-soft);
   border-radius: 8px;
   background: var(--iz-color-action-soft);
-  color: var(--iz-color-link-hover);
+  color: var(--iz-color-action-hover);
   font: inherit;
   font-size: 0.8125rem;
   font-weight: 600;
@@ -133,11 +133,11 @@
 
 .data-confirmation-modal__file-btn:hover:not(:disabled) {
   background: var(--iz-color-action-border);
-  border-color: var(--iz-color-action-light);
+  border-color: var(--iz-color-action-soft);
 }
 
 .data-confirmation-modal__file-btn:focus-visible {
-  outline: 2px solid var(--iz-color-primary-bright);
+  outline: 2px solid var(--iz-color-action);
   outline-offset: 2px;
 }
 
@@ -148,7 +148,7 @@
 
 .data-confirmation-modal__file-name {
   font-size: 0.75rem;
-  color: var(--iz-color-slate-muted);
+  color: var(--iz-color-text-muted);
   word-break: break-all;
 }
 
@@ -170,7 +170,7 @@
   max-height: 12rem;
   margin-top: 0.35rem;
   object-fit: contain;
-  border: 1px solid var(--iz-color-border-subtle);
+  border: 1px solid var(--iz-color-border);
   border-radius: 8px;
   background: var(--iz-color-surface-elevated);
 }
@@ -189,5 +189,5 @@
 }
 
 .data-confirmation-modal__state_error {
-  color: var(--iz-color-danger-deep);
+  color: var(--iz-color-danger);
 }

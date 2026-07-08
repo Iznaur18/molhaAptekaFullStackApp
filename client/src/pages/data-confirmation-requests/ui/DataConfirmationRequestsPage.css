@@ -9,9 +9,9 @@
 
 .data-confirmation-requests-page__state {
   margin: 1rem 0;
-  color: var(--iz-color-text-subtle);
+  color: var(--iz-color-text-muted);
 }
 
 .data-confirmation-requests-page__state_error {
-  color: var(--iz-color-danger-deep);
+  color: var(--iz-color-danger);
 }

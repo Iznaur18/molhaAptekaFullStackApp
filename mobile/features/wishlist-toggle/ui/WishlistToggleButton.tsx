@@ -1,3 +1,4 @@
+import { semanticColors } from "@/shared/theme/semanticColors";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
 import { Pressable, StyleSheet } from "react-native";
@@ -85,7 +86,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     backgroundColor: "rgba(255,255,255,0.92)",
-    shadowColor: "#000",
+    shadowColor: semanticColors.ink,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.12,
     shadowRadius: 4,
@@ -96,7 +97,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     backgroundColor: "rgba(255,255,255,0.92)",
-    shadowColor: "#000",
+    shadowColor: semanticColors.ink,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.12,
     shadowRadius: 4,

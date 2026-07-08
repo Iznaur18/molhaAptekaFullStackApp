@@ -56,8 +56,8 @@
   padding: 0.65rem 0.75rem;
   border-radius: 0.55rem;
   background: var(--iz-color-surface-elevated);
-  border: 1px solid var(--iz-color-border-subtle);
-  color: var(--iz-color-slate);
+  border: 1px solid var(--iz-color-border);
+  color: var(--iz-color-text-secondary);
   font-size: 0.9rem;
   line-height: 1.4;
   overflow-wrap: anywhere;
@@ -74,18 +74,18 @@
 }
 
 .product-promotion-modal__balance-card_ok {
-  background: var(--iz-color-success-soft);
-  border-color: color-mix(in srgb, var(--iz-color-success-bright) 28%, transparent);
+  background: var(--iz-color-success-surface);
+  border-color: color-mix(in srgb, var(--iz-color-success) 28%, transparent);
 }
 
 .product-promotion-modal__balance-card_low {
   background: var(--iz-color-danger-surface);
-  border-color: color-mix(in srgb, var(--iz-color-danger-accent) 28%, transparent);
+  border-color: color-mix(in srgb, var(--iz-color-danger) 28%, transparent);
 }
 
 .product-promotion-modal__balance-label {
   font-size: 0.82rem;
-  color: var(--iz-color-slate-muted);
+  color: var(--iz-color-text-muted);
 }
 
 .product-promotion-modal__balance-value {
@@ -97,7 +97,7 @@
   margin: 0;
   font-size: 0.84rem;
   line-height: 1.45;
-  color: var(--iz-color-text-subtle);
+  color: var(--iz-color-text-muted);
 }
 
 .product-promotion-modal__section {
@@ -126,7 +126,7 @@
   gap: 0.2rem;
   padding: 0.75rem 0.85rem 0.75rem 2.35rem;
   border-radius: 0.65rem;
-  border: 1.5px solid var(--iz-color-border-subtle);
+  border: 1.5px solid var(--iz-color-border);
   background: var(--iz-color-surface);
   cursor: pointer;
   transition:
@@ -143,7 +143,7 @@
   width: 1rem;
   height: 1rem;
   border-radius: 50%;
-  border: 2px solid var(--iz-color-border-muted);
+  border: 2px solid var(--iz-color-border);
   background: var(--iz-color-surface);
   transform: translateY(-50%);
   transition:
@@ -159,16 +159,16 @@
 
 .product-promotion-modal__tier-card--tier-1 {
   --promotion-tier-accent: var(--iz-color-warning);
-  --promotion-tier-soft: var(--iz-color-gold-soft);
+  --promotion-tier-soft: var(--iz-color-warning-surface);
 }
 
 .product-promotion-modal__tier-card--tier-2 {
-  --promotion-tier-accent: var(--iz-color-accent-purple);
-  --promotion-tier-soft: var(--iz-color-accent-purple-soft);
+  --promotion-tier-accent: var(--iz-color-accent);
+  --promotion-tier-soft: var(--iz-color-accent-soft);
 }
 
 .product-promotion-modal__tier-card--tier-3 {
-  --promotion-tier-accent: var(--iz-color-danger-accent);
+  --promotion-tier-accent: var(--iz-color-danger);
   --promotion-tier-soft: var(--iz-color-danger-surface);
 }
 
@@ -213,7 +213,7 @@
 
 .product-promotion-modal__tier-card--tier-2 .product-promotion-modal__tier-badge {
   background: var(--promotion-tier-soft);
-  color: var(--iz-color-accent-purple-text);
+  color: var(--iz-color-accent);
 }
 
 .product-promotion-modal__tier-card--tier-3 .product-promotion-modal__tier-badge {
@@ -222,17 +222,17 @@
 }
 
 .product-promotion-modal--tier-3 .product-promotion-modal__duration-chip_selected {
-  border-color: var(--iz-color-danger-accent);
+  border-color: var(--iz-color-danger);
   background: var(--iz-color-danger-surface);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--iz-color-danger-accent) 18%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--iz-color-danger) 18%, transparent);
 }
 
 .product-promotion-modal--tier-3 .product-promotion-modal__duration-price {
-  color: var(--iz-color-danger-accent);
+  color: var(--iz-color-danger);
 }
 
 .product-promotion-modal--tier-3 .product-promotion-modal__summary-row_total strong {
-  color: var(--iz-color-danger-accent);
+  color: var(--iz-color-danger);
 }
 
 .product-promotion-modal__tier-title {
@@ -244,13 +244,13 @@
 .product-promotion-modal__tier-rate {
   font-size: 0.78rem;
   font-weight: 600;
-  color: var(--iz-color-text-subtle);
+  color: var(--iz-color-text-muted);
 }
 
 .product-promotion-modal__tier-description {
   font-size: 0.82rem;
   line-height: 1.4;
-  color: var(--iz-color-slate-muted);
+  color: var(--iz-color-text-muted);
 }
 
 .product-promotion-modal__duration-row {
@@ -266,7 +266,7 @@
   gap: 0.15rem;
   padding: 0.55rem 0.35rem;
   border-radius: 0.55rem;
-  border: 1.5px solid var(--iz-color-border-subtle);
+  border: 1.5px solid var(--iz-color-border);
   background: var(--iz-color-surface);
   cursor: pointer;
   transition:
@@ -276,7 +276,7 @@
 }
 
 .product-promotion-modal__duration-chip:hover:not(:disabled) {
-  border-color: var(--iz-color-border-muted);
+  border-color: var(--iz-color-border);
   background: var(--iz-color-surface-elevated);
 }
 
@@ -305,7 +305,7 @@
   padding: 0.75rem 0.85rem;
   border-radius: 0.65rem;
   background: var(--iz-color-surface-elevated);
-  border: 1px solid var(--iz-color-border-subtle);
+  border: 1px solid var(--iz-color-border);
 }
 
 .product-promotion-modal__summary-row {
@@ -314,7 +314,7 @@
   justify-content: space-between;
   gap: 0.75rem;
   font-size: 0.84rem;
-  color: var(--iz-color-slate-muted);
+  color: var(--iz-color-text-muted);
 }
 
 .product-promotion-modal__summary-row strong {
@@ -324,13 +324,13 @@
 
 .product-promotion-modal__summary-row_total {
   padding-top: 0.45rem;
-  border-top: 1px dashed var(--iz-color-border-muted);
+  border-top: 1px dashed var(--iz-color-border);
   font-size: 0.9rem;
 }
 
 .product-promotion-modal__summary-row_total strong {
   font-size: 1rem;
-  color: var(--iz-color-link-hover);
+  color: var(--iz-color-action-hover);
 }
 
 .product-promotion-modal__error {
@@ -338,8 +338,8 @@
   padding: 0.55rem 0.65rem;
   border-radius: 0.5rem;
   background: var(--iz-color-danger-surface);
-  border: 1px solid color-mix(in srgb, var(--iz-color-danger-accent) 25%, transparent);
-  color: var(--iz-color-danger-strong);
+  border: 1px solid color-mix(in srgb, var(--iz-color-danger) 25%, transparent);
+  color: var(--iz-color-danger);
   font-size: 0.84rem;
   line-height: 1.4;
 }

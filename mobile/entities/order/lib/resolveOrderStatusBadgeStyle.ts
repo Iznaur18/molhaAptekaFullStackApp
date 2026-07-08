@@ -8,44 +8,45 @@ import {
   ORDER_STATUS_SHIPPED,
   type OrderStatus,
 } from "@/entities/order/model/constants";
+import { semanticColors } from "@/shared/theme/semanticColors";
 
 /** Паритет с web `OrderCard.css` status / type badges. */
 const ORDER_STATUS_BADGE_PALETTE = {
   default: {
-    backgroundColor: "#e5e7eb",
-    color: "#111827",
+    backgroundColor: semanticColors.border,
+    color: semanticColors.text,
   },
   [ORDER_STATUS_PENDING]: {
     backgroundColor: "rgba(245, 158, 11, 0.15)",
-    color: "#92400e",
+    color: semanticColors.warningText,
   },
   [ORDER_STATUS_CONFIRMED]: {
     backgroundColor: "rgba(31, 111, 235, 0.12)",
-    color: "#1f6feb",
+    color: semanticColors.action,
   },
   [ORDER_STATUS_SHIPPED]: {
     backgroundColor: "rgba(124, 58, 237, 0.12)",
-    color: "#6d28d9",
+    color: semanticColors.accent,
   },
   [ORDER_STATUS_DELIVERED]: {
     backgroundColor: "rgba(16, 185, 129, 0.15)",
-    color: "#047857",
+    color: semanticColors.successText,
   },
   [ORDER_STATUS_CANCELLED]: {
     backgroundColor: "rgba(180, 35, 24, 0.12)",
-    color: "#b42318",
+    color: semanticColors.danger,
   },
 } as const;
 
 export const ORDER_INSTALLMENT_BADGE_PALETTE = {
   backgroundColor: "rgba(59, 130, 246, 0.12)",
-  color: "#1d4ed8",
+  color: semanticColors.actionHover,
 } as const;
 
 export const ORDER_AUCTION_BADGE_PALETTE = {
-  backgroundColor: "#e0f2fe",
+  backgroundColor: semanticColors.infoSoft,
   borderColor: "rgba(59, 130, 246, 0.4)",
-  color: "#2563eb",
+  color: semanticColors.link,
 } as const;
 
 export const resolveOrderStatusBadgeStyle = (

@@ -13,7 +13,7 @@
 .notifications-page__clear {
   margin: 0;
   padding: 0.4rem 0.85rem;
-  border: 1px solid var(--iz-color-action-border-strong);
+  border: 1px solid var(--iz-color-action-border);
   border-radius: 0.5rem;
   background: transparent;
   color: var(--iz-color-action);
@@ -25,7 +25,7 @@
 
 .notifications-page__clear:hover:not(:disabled) {
   border-color: var(--iz-color-action);
-  background: var(--iz-color-action-bg-hover);
+  background: var(--iz-color-action-soft);
 }
 
 .notifications-page__clear:disabled {
@@ -35,7 +35,7 @@
 
 .notifications-page__error {
   margin: 0 0 0.75rem;
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
   font-size: 0.875rem;
 }
 
@@ -62,10 +62,10 @@
   width: 100%;
   margin: 0;
   padding: 0.75rem 0.85rem;
-  border: 1px solid var(--iz-color-info-muted);
+  border: 1px solid var(--iz-color-info-soft);
   border-radius: 0.5rem;
   background: var(--iz-color-action-soft);
-  color: var(--iz-color-info-navy);
+  color: var(--iz-color-info-deep);
   font: inherit;
   font-size: 0.875rem;
   text-align: left;
@@ -74,5 +74,5 @@
 
 .notifications-page__item-btn:hover {
   background: var(--iz-color-action-border);
-  border-color: var(--iz-color-action-light);
+  border-color: var(--iz-color-action-soft);
 }

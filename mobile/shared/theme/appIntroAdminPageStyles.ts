@@ -3,10 +3,6 @@ import { StyleSheet } from "react-native";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-const SUCCESS_SOFT = "#ecfdf3";
-const SUCCESS_BORDER = "#86efac";
-const DANGER_STRONG = "#b42318";
-
 export const useAppIntroAdminPageStyles = createThemedStyles((theme) => ({
   container: {
     flex: 1,
@@ -49,8 +45,8 @@ export const useAppIntroAdminPageStyles = createThemedStyles((theme) => ({
     paddingHorizontal: 14,
     borderRadius: 10,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: SUCCESS_BORDER,
-    backgroundColor: SUCCESS_SOFT,
+    borderColor: theme.colors.successSurface,
+    backgroundColor: theme.colors.successSurface,
   },
   noticeText: {
     fontSize: 14,
@@ -135,7 +131,7 @@ export const useAppIntroAdminPageStyles = createThemedStyles((theme) => ({
   },
   error: {
     fontSize: 14,
-    color: DANGER_STRONG,
+    color: theme.colors.danger,
   },
   actions: {
     flexDirection: "row",

@@ -2,8 +2,6 @@ import { StyleSheet } from "react-native";
 
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-const DANGER_STRONG = "#b42318";
-
 export const useStaffReportGroupCardStyles = createThemedStyles((theme) => ({
   card: {
     gap: 8,
@@ -32,7 +30,7 @@ export const useStaffReportGroupCardStyles = createThemedStyles((theme) => ({
   count: {
     fontSize: 13,
     fontWeight: "600",
-    color: DANGER_STRONG,
+    color: theme.colors.danger,
   },
   links: {
     flexDirection: "row",
@@ -88,7 +86,7 @@ export const useStaffReportGroupCardStyles = createThemedStyles((theme) => ({
   error: {
     fontSize: 14,
     lineHeight: 20,
-    color: DANGER_STRONG,
+    color: theme.colors.danger,
   },
   actions: {
     flexDirection: "row",
@@ -104,7 +102,7 @@ export const useStaffReportGroupCardStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
   },
   actionButtonDanger: {
-    borderColor: DANGER_STRONG,
+    borderColor: theme.colors.danger,
   },
   actionButtonDisabled: {
     opacity: 0.65,
@@ -115,7 +113,7 @@ export const useStaffReportGroupCardStyles = createThemedStyles((theme) => ({
     color: theme.colors.text,
   },
   actionButtonTextDanger: {
-    color: DANGER_STRONG,
+    color: theme.colors.danger,
   },
   media: {
     width: "100%",

@@ -4,8 +4,8 @@
   border-radius: inherit;
   background: linear-gradient(
     90deg,
-    var(--iz-color-link-deep) 0%,
-    var(--iz-color-success-teal-bright) 100%
+    var(--iz-color-action) 0%,
+    var(--iz-color-success) 100%
   );
   transition: width 0.65s cubic-bezier(0.22, 1, 0.36, 1);
   overflow: hidden;

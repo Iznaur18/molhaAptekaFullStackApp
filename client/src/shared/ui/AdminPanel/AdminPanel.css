@@ -1,10 +1,10 @@
 .admin-panel {
-  --admin-panel-accent: var(--iz-color-accent-purple-text);
-  --admin-panel-accent-soft: var(--iz-color-accent-purple-soft);
+  --admin-panel-accent: var(--iz-color-accent);
+  --admin-panel-accent-soft: var(--iz-color-accent-soft);
   --admin-panel-border: var(--iz-color-border);
   --admin-panel-surface: var(--iz-color-surface);
-  --admin-panel-muted: var(--iz-color-text-subtle);
-  --admin-panel-danger: var(--iz-color-danger-deep);
+  --admin-panel-muted: var(--iz-color-text-muted);
+  --admin-panel-danger: var(--iz-color-danger);
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -144,7 +144,7 @@
 .admin-panel__field select:focus,
 .admin-panel__field textarea:focus {
   outline: none;
-  border-color: var(--iz-color-accent-purple);
+  border-color: var(--iz-color-accent);
   box-shadow: 0 0 0 3px var(--iz-color-status-purple-soft);
 }
 
@@ -200,8 +200,8 @@
 }
 
 .admin-panel__card_editing {
-  border-color: var(--iz-color-premium-purple-muted);
-  box-shadow: 0 0 0 3px var(--iz-color-accent-purple-ring-soft);
+  border-color: var(--iz-color-accent-soft);
+  box-shadow: 0 0 0 3px var(--iz-color-accent-ring-soft);
 }
 
 .admin-panel__card-body {
@@ -258,8 +258,8 @@
   max-width: 100%;
   padding: 0.15rem 0.5rem;
   border-radius: 999px;
-  background: var(--iz-color-surface-alt);
-  color: var(--iz-color-slate);
+  background: var(--iz-color-surface-elevated);
+  color: var(--iz-color-text-secondary);
   font-size: 0.75rem;
   line-height: 1.35;
   word-break: break-word;
@@ -271,8 +271,8 @@
 }
 
 .admin-panel__chip_leaf {
-  background: var(--iz-color-success-pale);
-  color: var(--iz-color-success-muted);
+  background: var(--iz-color-success-surface);
+  color: var(--iz-color-success-text);
 }
 
 .admin-panel__chip_branch {
@@ -352,7 +352,7 @@
 }
 
 .admin-panel__category-chip-btn_selected {
-  border-color: var(--iz-color-accent-purple);
+  border-color: var(--iz-color-accent);
   background: var(--admin-panel-accent-soft);
   color: var(--admin-panel-accent);
   font-weight: 600;

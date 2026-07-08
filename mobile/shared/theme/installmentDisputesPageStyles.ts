@@ -7,9 +7,6 @@ const TOOLBAR_PADDING_VERTICAL = 10.4;
 const TOOLBAR_PADDING_HORIZONTAL = 12;
 const TOOLBAR_RADIUS = 10.4;
 const TOOLBAR_GAP = 8;
-const NEUTRAL_GRAY_DEEP = "#4b5563";
-const LINK_DEEP = "#4f46e5";
-const DANGER_ACCENT = "#dc2626";
 
 export const useInstallmentDisputesPageStyles = createThemedStyles((theme) => ({
   container: {
@@ -32,7 +29,7 @@ export const useInstallmentDisputesPageStyles = createThemedStyles((theme) => ({
     borderRadius: TOOLBAR_RADIUS,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: "rgba(79, 70, 229, 0.28)",
-    backgroundColor: "#eef2ff",
+    backgroundColor: theme.colors.actionSoft,
   },
   toolbarHead: {
     flexDirection: "row",
@@ -56,10 +53,10 @@ export const useInstallmentDisputesPageStyles = createThemedStyles((theme) => ({
   state: {
     fontSize: 15.2,
     lineHeight: 22,
-    color: NEUTRAL_GRAY_DEEP,
+    color: theme.colors.textSecondary,
   },
   stateError: {
-    color: DANGER_ACCENT,
+    color: theme.colors.danger,
   },
   centered: {
     flex: 1,
@@ -75,9 +72,9 @@ export const useInstallmentDisputesPageStyles = createThemedStyles((theme) => ({
     paddingHorizontal: 12,
     borderRadius: 10,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: `${LINK_DEEP}33`,
+    borderColor: `${theme.colors.action}33`,
     borderLeftWidth: 3,
-    borderLeftColor: LINK_DEEP,
+    borderLeftColor: theme.colors.action,
     backgroundColor: theme.colors.surface,
   },
   cardTitle: {
@@ -103,7 +100,7 @@ export const useInstallmentDisputesPageStyles = createThemedStyles((theme) => ({
   partyLink: {
     fontSize: 13.6,
     fontWeight: "600",
-    color: LINK_DEEP,
+    color: theme.colors.action,
     textDecorationLine: "underline",
   },
   fieldLabel: {
@@ -143,7 +140,7 @@ export const useInstallmentDisputesPageStyles = createThemedStyles((theme) => ({
     paddingVertical: 5,
     paddingHorizontal: 10,
     borderRadius: 8,
-    backgroundColor: LINK_DEEP,
+    backgroundColor: theme.colors.action,
   },
   actionSecondary: {
     paddingVertical: 5,

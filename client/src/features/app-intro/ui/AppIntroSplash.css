@@ -51,7 +51,7 @@
   max-height: none;
   border-radius: 0;
   object-fit: cover;
-  background: var(--iz-color-midnight);
+  background: var(--iz-color-ink);
 }
 
 .app-intro-splash__fallback {

@@ -6,16 +6,16 @@
 
 .data-confirmation-page__state {
   margin: 0;
-  color: var(--iz-color-text-subtle);
+  color: var(--iz-color-text-muted);
 }
 
 .data-confirmation-page__state_error {
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }
 
 .data-confirmation-page__hint {
   margin: 0;
-  color: var(--iz-color-text-subtle);
+  color: var(--iz-color-text-muted);
 }
 
 .data-confirmation-page__login {
@@ -27,7 +27,7 @@
   flex-direction: column;
   gap: 0.85rem;
   padding: 1rem;
-  border: 1px solid var(--iz-color-info-light);
+  border: 1px solid var(--iz-color-info-soft);
   border-radius: 12px;
   background: var(--iz-gradient-info-panel);
 }
@@ -42,14 +42,14 @@
 .data-confirmation-page__plan-intro {
   margin: 0;
   font-size: 0.9rem;
-  color: var(--iz-color-text-subtle);
+  color: var(--iz-color-text-muted);
   line-height: 1.45;
 }
 
 .data-confirmation-page__benefits {
   margin: 0;
   padding-left: 1.15rem;
-  color: var(--iz-color-slate);
+  color: var(--iz-color-text-secondary);
   font-size: 0.92rem;
   line-height: 1.45;
 }
@@ -57,7 +57,7 @@
 .data-confirmation-page__plan-note {
   margin: 0;
   font-size: 0.82rem;
-  color: var(--iz-color-text-subtle);
+  color: var(--iz-color-text-muted);
   line-height: 1.4;
 }
 
@@ -70,13 +70,13 @@
 }
 
 .data-confirmation-page__status_ok {
-  border: 1px solid var(--iz-color-success-light);
-  background: var(--iz-color-success-soft);
-  color: var(--iz-color-success-strong);
+  border: 1px solid var(--iz-color-success-surface);
+  background: var(--iz-color-success-surface);
+  color: var(--iz-color-success);
 }
 
 .data-confirmation-page__status_pending {
-  border: 1px solid var(--iz-color-gold-border);
+  border: 1px solid var(--iz-color-warning-surface);
   background: var(--iz-color-surface)beb;
   color: var(--iz-color-warning-text);
 }
@@ -84,14 +84,14 @@
 .data-confirmation-page__status_rejected {
   border: 1px solid var(--iz-color-danger-border);
   background: var(--iz-color-danger-surface);
-  color: var(--iz-color-danger-deep);
+  color: var(--iz-color-danger);
 }
 
 .data-confirmation-page__submit {
   align-self: flex-start;
   margin: 0;
   padding: 0.55rem 1.1rem;
-  border: 1px solid var(--iz-color-info-sky);
+  border: 1px solid var(--iz-color-info);
   border-radius: 10px;
   background: var(--iz-color-info-soft);
   color: var(--iz-color-info);
@@ -101,5 +101,5 @@
 }
 
 .data-confirmation-page__submit:hover:not(:disabled) {
-  background: var(--iz-color-info-lighter);
+  background: var(--iz-color-info-soft);
 }

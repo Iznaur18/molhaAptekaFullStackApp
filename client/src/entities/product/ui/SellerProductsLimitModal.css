@@ -12,7 +12,7 @@
 .seller-products-limit-modal__backdrop {
   position: absolute;
   inset: 0;
-  background: var(--iz-color-overlay-backdrop);
+  background: var(--iz-color-overlay);
 }
 
 .seller-products-limit-modal__card {
@@ -35,7 +35,7 @@
 .seller-products-limit-modal__body {
   margin: 0 0 1rem;
   font-size: 0.9rem;
-  color: var(--iz-color-text-tertiary);
+  color: var(--iz-color-text-secondary);
   line-height: 1.45;
 }
 

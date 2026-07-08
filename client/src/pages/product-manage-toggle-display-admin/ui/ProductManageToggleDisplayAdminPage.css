@@ -35,7 +35,7 @@
 }
 
 .product-manage-toggle-display-admin__error {
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }
 
 .product-manage-toggle-display-admin_embedded {

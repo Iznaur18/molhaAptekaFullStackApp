@@ -39,7 +39,7 @@ export const useMyOrdersPageStyles = createThemedStyles((theme) => ({
     borderRadius: TOOLBAR_RADIUS,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: "rgba(31, 111, 235, 0.22)",
-    backgroundColor: "#eff6ff",
+    backgroundColor: theme.colors.actionSoft,
   },
   toolbarHead: {
     flexDirection: "row",
@@ -82,8 +82,8 @@ export const useMyOrdersPageStyles = createThemedStyles((theme) => ({
     borderRadius: 8,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    backgroundColor: "#ecfdf3",
-    color: "#027a48",
+    backgroundColor: theme.colors.successSurface,
+    color: theme.colors.successText,
     fontSize: 15.2,
     lineHeight: 21,
   },
@@ -159,7 +159,7 @@ export const useMyOrdersPageStyles = createThemedStyles((theme) => ({
     fontVariant: ["tabular-nums"],
   },
   overviewValueAttention: {
-    color: "#854d0e",
+    color: theme.colors.warningText,
   },
   listActions: {
     flexDirection: "row",

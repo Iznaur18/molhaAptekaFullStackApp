@@ -19,7 +19,7 @@
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--iz-color-primary-bright);
+  color: var(--iz-color-action);
 }
 
 .product-wizard-progress__steps {
@@ -67,7 +67,7 @@
 .product-wizard-progress__step_complete .product-wizard-progress__step-index {
   border-color: var(--iz-color-success);
   background: color-mix(in srgb, var(--iz-color-success) 14%, var(--iz-color-surface));
-  color: var(--iz-color-success-deep);
+  color: var(--iz-color-success-text);
 }
 
 .product-wizard-progress__step-label {

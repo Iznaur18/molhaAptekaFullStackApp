@@ -19,7 +19,7 @@
   flex-wrap: wrap;
   gap: 0.25rem 0.35rem;
   font-size: 0.8125rem;
-  color: var(--iz-color-text-tertiary);
+  color: var(--iz-color-text-secondary);
 }
 
 .create-product-category-picker__trail-item:not(:last-child)::after {
@@ -63,7 +63,7 @@
 }
 
 .create-product-category-picker__option:hover:not(:disabled) {
-  background: var(--iz-color-action-bg-hover);
+  background: var(--iz-color-action-soft);
 }
 
 .create-product-category-picker__option:disabled {
@@ -91,7 +91,7 @@
 .create-product-category-picker__error {
   margin: 0;
   font-size: 0.875rem;
-  color: var(--iz-color-danger-deep);
+  color: var(--iz-color-danger);
 }
 
 .create-product-category-picker__actions {

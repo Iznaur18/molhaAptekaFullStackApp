@@ -11,12 +11,12 @@
   flex-direction: column;
   gap: 0.5rem;
   padding: 0.65rem 0.75rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-warning-bright) 24%, var(--iz-color-border));
+  border: 1px solid color-mix(in srgb, var(--iz-color-warning) 24%, var(--iz-color-border));
   border-radius: 0.65rem;
   background: linear-gradient(
     135deg,
     var(--iz-color-surface) 0%,
-    var(--iz-color-warning-yellow-soft) 140%
+    var(--iz-color-warning-surface) 140%
   );
 }
 
@@ -51,11 +51,11 @@
 .auction-page__state {
   margin: 0;
   font-size: 1rem;
-  color: var(--iz-color-text-tertiary);
+  color: var(--iz-color-text-secondary);
 }
 
 .auction-page__state_error {
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }
 
 .auction-page__toolbar-meta {
@@ -79,8 +79,8 @@
 }
 
 .auction-page__refresh:hover:not(:disabled) {
-  border-color: var(--iz-color-warning-bright);
-  background: var(--iz-color-warning-yellow-soft);
+  border-color: var(--iz-color-warning);
+  background: var(--iz-color-warning-surface);
 }
 
 .auction-page__refresh:disabled {
@@ -113,13 +113,13 @@
 }
 
 .auction-page__chip:hover {
-  border-color: color-mix(in srgb, var(--iz-color-warning-bright) 35%, var(--iz-color-border));
-  background: var(--iz-color-warning-yellow-soft);
+  border-color: color-mix(in srgb, var(--iz-color-warning) 35%, var(--iz-color-border));
+  background: var(--iz-color-warning-surface);
 }
 
 .auction-page__chip_active {
-  border-color: var(--iz-color-warning-bright);
-  background: var(--iz-color-warning-bright);
+  border-color: var(--iz-color-warning);
+  background: var(--iz-color-warning);
   color: var(--iz-color-on-contrast);
 }
 
@@ -135,7 +135,7 @@
   gap: 0.15rem;
   min-width: 0;
   padding: 0.55rem 0.65rem;
-  border: 1px solid var(--iz-color-border-subtle);
+  border: 1px solid var(--iz-color-border);
   border-radius: 0.55rem;
   background: var(--iz-color-surface);
   text-align: left;
@@ -147,8 +147,8 @@
 }
 
 .auction-page__overview-tile:hover {
-  border-color: color-mix(in srgb, var(--iz-color-warning-bright) 35%, var(--iz-color-border));
-  background: var(--iz-color-warning-yellow-soft);
+  border-color: color-mix(in srgb, var(--iz-color-warning) 35%, var(--iz-color-border));
+  background: var(--iz-color-warning-surface);
 }
 
 .auction-page__overview-tile:active {
@@ -156,12 +156,12 @@
 }
 
 .auction-page__overview-tile_active {
-  border-color: var(--iz-color-warning-bright);
-  background: var(--iz-color-warning-yellow-soft);
+  border-color: var(--iz-color-warning);
+  background: var(--iz-color-warning-surface);
 }
 
 .auction-page__overview-tile_attention:not(.auction-page__overview-tile_active) {
-  border-color: color-mix(in srgb, var(--iz-color-warning-bright) 45%, var(--iz-color-border));
+  border-color: color-mix(in srgb, var(--iz-color-warning) 45%, var(--iz-color-border));
 }
 
 .auction-page__overview-label {
@@ -181,7 +181,7 @@
 }
 
 .auction-page__overview-tile_attention .auction-page__overview-value {
-  color: var(--iz-color-warning-brown-dark);
+  color: var(--iz-color-warning-text);
 }
 
 .auction-page__list-actions {
@@ -205,8 +205,8 @@
 }
 
 .auction-page__list-action:hover {
-  border-color: var(--iz-color-warning-bright);
-  background: var(--iz-color-warning-yellow-soft);
+  border-color: var(--iz-color-warning);
+  background: var(--iz-color-warning-surface);
 }
 
 .auction-page__filter-hint {

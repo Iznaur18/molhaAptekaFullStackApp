@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: center;
   padding: 16px;
-  background: var(--iz-color-overlay-dark-strong);
+  background: var(--iz-color-overlay-strong);
 }
 
 .report-user-story-modal {
@@ -59,11 +59,11 @@
 
 .report-user-story-modal__error {
   margin: 8px 0 0;
-  color: var(--iz-color-danger-deep);
+  color: var(--iz-color-danger);
   font-size: 0.875rem;
 }
 
 .report-user-story-modal__success {
   margin: 0 0 12px;
-  color: var(--iz-color-success-muted);
+  color: var(--iz-color-success-text);
 }

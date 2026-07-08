@@ -1,3 +1,5 @@
+import { semanticColors } from "@/shared/theme/semanticColors";
+
 /** Синхронизировано с client ProductCardFrame.css + designTokens.css */
 export const PRODUCT_CARD_PROMOTION_TIER = {
   GOLD: 1,
@@ -10,7 +12,7 @@ export type ProductCardPromotionTier =
 
 /** Паритет с ProductCardFrame.css — нейтральная «плавающая» тень карточки */
 export const PRODUCT_CARD_SOFT_ELEVATION_SHADOW = {
-  shadowColor: "#0f172a",
+  shadowColor: semanticColors.text,
   shadowOpacity: 0.06,
   shadowRadius: 12,
   shadowOffsetY: 4,
@@ -36,10 +38,10 @@ export const PRODUCT_CARD_PROMOTION_COMPACT_FRAME: Record<
 > = {
   [PRODUCT_CARD_PROMOTION_TIER.GOLD]: {
     borderWidth: 2,
-    borderColor: "rgba(217, 119, 6, 0.68)",
-    gradientStart: "#ffffff",
-    gradientEnd: "#ffffff",
-    shadowColor: "#d97706",
+    borderColor: `${semanticColors.warning}ad`,
+    gradientStart: semanticColors.onContrast,
+    gradientEnd: semanticColors.onContrast,
+    shadowColor: semanticColors.warning,
     shadowOpacity: 0.14,
     shadowRadius: 12,
     shadowOffsetY: 2,
@@ -47,10 +49,10 @@ export const PRODUCT_CARD_PROMOTION_COMPACT_FRAME: Record<
   },
   [PRODUCT_CARD_PROMOTION_TIER.TOP]: {
     borderWidth: 2,
-    borderColor: "rgba(124, 58, 237, 0.78)",
-    gradientStart: "#c4b5fd",
-    gradientEnd: "#ede9fe",
-    shadowColor: "#7c3aed",
+    borderColor: `${semanticColors.accent}c7`,
+    gradientStart: semanticColors.accentSoft,
+    gradientEnd: semanticColors.accentSoft,
+    shadowColor: semanticColors.accent,
     shadowOpacity: 0.28,
     shadowRadius: 16,
     shadowOffsetY: 4,
@@ -58,10 +60,10 @@ export const PRODUCT_CARD_PROMOTION_COMPACT_FRAME: Record<
   },
   [PRODUCT_CARD_PROMOTION_TIER.BANNER]: {
     borderWidth: 2,
-    borderColor: "rgba(220, 38, 38, 0.72)",
-    gradientStart: "#fef2f2",
-    gradientEnd: "#fffafa",
-    shadowColor: "#dc2626",
+    borderColor: `${semanticColors.danger}b8`,
+    gradientStart: semanticColors.dangerSurface,
+    gradientEnd: semanticColors.onContrast,
+    shadowColor: semanticColors.danger,
     shadowOpacity: 0.18,
     shadowRadius: 24,
     shadowOffsetY: 6,
@@ -85,8 +87,8 @@ export type ProductCardPromotionFrameSurface = Pick<
 /** product-card-premium-frame > .product-card */
 export const PRODUCT_CARD_PREMIUM_ONLY_FRAME: ProductCardPromotionFrameSurface = {
   borderWidth: 2,
-  borderColor: "#d4af37",
-  backgroundColor: "#ffffff",
+  borderColor: semanticColors.warning,
+  backgroundColor: semanticColors.onContrast,
   shadowColor: "transparent",
   shadowOpacity: 0,
   shadowRadius: 0,
@@ -101,10 +103,10 @@ export const PRODUCT_CARD_PROMOTION_PREMIUM_COMPACT_FRAME: Record<
 > = {
   [PRODUCT_CARD_PROMOTION_TIER.GOLD]: {
     borderWidth: 2,
-    borderColor: "#d97706",
-    gradientStart: "#ffffff",
-    gradientEnd: "#ffffff",
-    shadowColor: "#d97706",
+    borderColor: semanticColors.warning,
+    gradientStart: semanticColors.onContrast,
+    gradientEnd: semanticColors.onContrast,
+    shadowColor: semanticColors.warning,
     shadowOpacity: 0.14,
     shadowRadius: 12,
     shadowOffsetY: 2,
@@ -112,11 +114,10 @@ export const PRODUCT_CARD_PROMOTION_PREMIUM_COMPACT_FRAME: Record<
   },
   [PRODUCT_CARD_PROMOTION_TIER.TOP]: {
     borderWidth: 2,
-    borderColor: "#8c4fcc",
-    gradientStart: "#ffffff",
-    gradientEnd: "#ffffff",
-    // gradientEnd: "#c4b5fd",
-    shadowColor: "#7c3aed",
+    borderColor: semanticColors.accent,
+    gradientStart: semanticColors.onContrast,
+    gradientEnd: semanticColors.onContrast,
+    shadowColor: semanticColors.accent,
     shadowOpacity: 0.28,
     shadowRadius: 16,
     shadowOffsetY: 4,
@@ -124,10 +125,10 @@ export const PRODUCT_CARD_PROMOTION_PREMIUM_COMPACT_FRAME: Record<
   },
   [PRODUCT_CARD_PROMOTION_TIER.BANNER]: {
     borderWidth: 2,
-    borderColor: "#c9a227",
-    gradientStart: "#fef2f2",
-    gradientEnd: "#fffafa",
-    shadowColor: "#dc2626",
+    borderColor: semanticColors.warning,
+    gradientStart: semanticColors.dangerSurface,
+    gradientEnd: semanticColors.onContrast,
+    shadowColor: semanticColors.danger,
     shadowOpacity: 0.18,
     shadowRadius: 24,
     shadowOffsetY: 6,
@@ -138,11 +139,11 @@ export const PRODUCT_CARD_PROMOTION_PREMIUM_COMPACT_FRAME: Record<
 /** ProductCardBannerLayout.css — inner banner card */
 export const PRODUCT_CARD_PROMOTION_BANNER_INNER_FRAME = {
   borderWidth: 1,
-  borderColor: "#dc2626",
-  gradientStart: "#ffffff",
-  gradientMid: "#fff5f5",
-  gradientEnd: "#fef2f2",
-  shadowColor: "#dc2626",
+  borderColor: semanticColors.danger,
+  gradientStart: semanticColors.onContrast,
+  gradientMid: semanticColors.dangerSurface,
+  gradientEnd: semanticColors.dangerSurface,
+  shadowColor: semanticColors.danger,
   shadowOpacity: 0.12,
   shadowRadius: 14,
   shadowOffsetY: 2,

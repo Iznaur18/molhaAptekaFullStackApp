@@ -1,8 +1,9 @@
+import { semanticColors } from "@/shared/theme/semanticColors";
 import { StyleSheet } from "react-native";
 
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-const DANGER_STRONG = "#b42318";
+const DANGER_STRONG = semanticColors.danger;
 
 export const useSellerPersonalCategoryModerationCampaignCardStyles = createThemedStyles(
   (theme) => ({

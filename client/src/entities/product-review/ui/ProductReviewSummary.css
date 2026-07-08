@@ -4,12 +4,12 @@
   gap: var(--iz-space-3);
   margin: 0;
   padding: var(--iz-space-3) var(--iz-space-4);
-  border: 1px solid color-mix(in srgb, var(--iz-color-warning-amber) 28%, var(--iz-color-border));
+  border: 1px solid color-mix(in srgb, var(--iz-color-warning) 28%, var(--iz-color-border));
   border-radius: 0.75rem;
   background: linear-gradient(
     145deg,
     var(--iz-color-surface-elevated) 0%,
-    color-mix(in srgb, var(--iz-color-warning-amber) 10%, var(--iz-color-surface-alt)) 100%
+    color-mix(in srgb, var(--iz-color-warning) 10%, var(--iz-color-surface-elevated)) 100%
   );
   box-shadow: 0 1px 3px color-mix(in srgb, var(--iz-color-ink) 8%, transparent);
 }
@@ -40,9 +40,9 @@
   font-size: 0.9rem;
   font-weight: 600;
   line-height: 1.25;
-  color: var(--iz-color-text-subtle);
+  color: var(--iz-color-text-muted);
 }
 
 .product-review-summary .product-review-stars__star--filled {
-  color: var(--iz-color-warning-deep);
+  color: var(--iz-color-warning-text);
 }

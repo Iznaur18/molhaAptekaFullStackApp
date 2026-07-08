@@ -8,12 +8,12 @@
   padding: 1rem;
   box-sizing: border-box;
   overflow: hidden;
-  background: color-mix(in srgb, var(--iz-color-black) 55%, transparent);
+  background: color-mix(in srgb, var(--iz-color-ink) 55%, transparent);
 }
 
 .user-details-modal__backdrop_register {
   z-index: 1000;
-  background: var(--iz-color-overlay-dark);
+  background: var(--iz-color-overlay);
 }
 
 .user-details-modal {
@@ -30,10 +30,10 @@
   margin: 0;
   padding: 1.25rem 1.5rem 1.5rem;
   border-radius: 12px;
-  background: var(--iz-color-canvas);
-  color: var(--iz-color-canvas-text);
-  border: 1px solid color-mix(in srgb, var(--iz-color-canvas-text) 15%, transparent);
-  box-shadow: 0 12px 40px color-mix(in srgb, var(--iz-color-black) 25%, transparent);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
+  border: 1px solid color-mix(in srgb, var(--iz-color-text) 15%, transparent);
+  box-shadow: 0 12px 40px color-mix(in srgb, var(--iz-color-ink) 25%, transparent);
 }
 
 .user-details-modal_register {
@@ -105,11 +105,11 @@
   margin-bottom: 1rem;
   border-radius: 10px;
   overflow: hidden;
-  background-color: color-mix(in srgb, var(--iz-color-canvas-text) 7%, transparent);
+  background-color: color-mix(in srgb, var(--iz-color-text) 7%, transparent);
 }
 
 .user-details-modal_register .user-details-modal__banner {
-  background-color: var(--iz-color-surface-subtle);
+  background-color: var(--iz-color-surface-muted);
 }
 
 .user-details-modal__banner-image,
@@ -133,8 +133,8 @@
   pointer-events: none;
   background: linear-gradient(
     to bottom,
-    color-mix(in srgb, var(--iz-color-black) 42%, transparent),
-    color-mix(in srgb, var(--iz-color-black) 18%, transparent)
+    color-mix(in srgb, var(--iz-color-ink) 42%, transparent),
+    color-mix(in srgb, var(--iz-color-ink) 18%, transparent)
   );
 }
 
@@ -155,7 +155,7 @@
   border: none;
   box-shadow:
     0 10px 28px var(--iz-shadow-panel),
-    0 3px 10px var(--iz-color-overlay-hover);
+    0 3px 10px var(--iz-color-overlay-subtle);
 }
 
 .user-details-modal__avatar_lead {
@@ -178,14 +178,14 @@
   flex-shrink: 0;
   padding: 0.35rem 0.75rem;
   border-radius: 8px;
-  border: 1px solid color-mix(in srgb, var(--iz-color-canvas-text) 20%, transparent);
+  border: 1px solid color-mix(in srgb, var(--iz-color-text) 20%, transparent);
   background: transparent;
   cursor: pointer;
   font: inherit;
 }
 
 .user-details-modal__close:hover {
-  background: color-mix(in srgb, var(--iz-color-canvas-text) 6%, transparent);
+  background: color-mix(in srgb, var(--iz-color-text) 6%, transparent);
 }
 
 .user-details-modal__close_register {
@@ -217,18 +217,18 @@
 }
 
 .user-details-modal__state_error {
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }
 
 .user-details-modal__footer-outer {
   flex-shrink: 0;
   margin-top: 0.75rem;
   padding-top: 0.75rem;
-  border-top: 1px solid color-mix(in srgb, var(--iz-color-canvas-text) 12%, transparent);
+  border-top: 1px solid color-mix(in srgb, var(--iz-color-text) 12%, transparent);
 }
 
 .user-details-modal_register .user-details-modal__footer-outer {
-  border-top-color: var(--iz-color-surface-subtle);
+  border-top-color: var(--iz-color-surface-muted);
 }
 
 @container app-viewport (max-width: 903px) {

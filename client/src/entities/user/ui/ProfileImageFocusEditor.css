@@ -7,15 +7,15 @@
 .profile-image-focus-editor__label {
   margin: 0;
   font-size: 0.82rem;
-  color: color-mix(in srgb, var(--iz-color-canvas-text) 62%, transparent);
+  color: color-mix(in srgb, var(--iz-color-text) 62%, transparent);
 }
 
 .profile-image-focus-editor__frame {
   position: relative;
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--iz-color-canvas-text) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--iz-color-text) 14%, transparent);
   border-radius: 10px;
-  background: color-mix(in srgb, var(--iz-color-canvas-text) 6%, transparent);
+  background: color-mix(in srgb, var(--iz-color-text) 6%, transparent);
   cursor: grab;
   touch-action: none;
   user-select: none;

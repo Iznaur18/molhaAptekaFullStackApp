@@ -29,7 +29,7 @@
 }
 
 .create-product-wizard-media-step .product-preview-video-field__clear:hover:not(:disabled) {
-  background: var(--iz-color-surface-alt);
+  background: var(--iz-color-surface-elevated);
 }
 
 .create-product-wizard-media-step .product-preview-video-field__hint {

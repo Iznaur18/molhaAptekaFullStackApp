@@ -26,7 +26,7 @@
 }
 
 .catalog-feed-tiles__icon-text {
-  color: var(--iz-color-link-deep);
+  color: var(--iz-color-action);
   font-size: 1.25rem;
   font-weight: 700;
   line-height: 1;

@@ -1,9 +1,11 @@
 import Svg, { Path } from "react-native-svg";
 
+import { izColors } from "@izibuy/design-tokens";
+
 const PREMIUM_STAR_PATH =
   "M20 6.15 24.05 14.75 33.35 14.75 26.15 20.55 29.15 30.05 20 24.95 10.85 30.05 13.85 20.55 6.65 14.75 15.95 14.75 20 6.15Z";
 
-const PREMIUM_STAR_FILL = "#ffa200";
+const PREMIUM_STAR_FILL = izColors.star;
 
 type UserPremiumVerifiedBadgeProps = {
   size?: number;

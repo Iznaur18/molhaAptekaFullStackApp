@@ -3,6 +3,7 @@ import { StyleSheet, Platform } from "react-native";
 import { USER_STORY_FRAME_ASPECT_RATIO } from "@/entities/user-story/lib/computeUserStoryFrameSize";
 import { MODAL_BACKDROP_SCRIM } from "@/shared/theme/formChromeStyles";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
+import { semanticColors } from "@/shared/theme/semanticColors";
 
 export { MODAL_BACKDROP_SCRIM };
 
@@ -792,12 +793,12 @@ export const useProductPromotionModalStyles = createThemedStyles((theme) => ({
     paddingHorizontal: 14,
   },
   balanceCardOk: {
-    backgroundColor: "#ecfdf5",
-    borderColor: "#05966947",
+    backgroundColor: theme.colors.successSurface,
+    borderColor: `${semanticColors.success}47`,
   },
   balanceCardInsufficient: {
-    backgroundColor: "#fef2f2",
-    borderColor: "#dc262647",
+    backgroundColor: theme.colors.dangerSurface,
+    borderColor: `${semanticColors.danger}47`,
   },
   balanceLabel: {
     fontSize: 13,
@@ -930,11 +931,11 @@ export const useProductPromotionModalStyles = createThemedStyles((theme) => ({
     borderRadius: 8,
     paddingVertical: 9,
     paddingHorizontal: 10,
-    backgroundColor: "#fef2f2",
-    borderColor: "#dc262640",
+    backgroundColor: theme.colors.dangerSurface,
+    borderColor: `${semanticColors.danger}40`,
   },
   error: {
-    color: "#b42318",
+    color: theme.colors.danger,
     fontSize: 13,
     lineHeight: 18,
   },

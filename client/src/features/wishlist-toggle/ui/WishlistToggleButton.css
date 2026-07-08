@@ -6,7 +6,7 @@
   padding: 0;
   border: none;
   background: transparent;
-  color: var(--iz-color-neutral-gray);
+  color: var(--iz-color-text-muted);
   cursor: pointer;
   transition:
     color 0.15s ease,
@@ -32,25 +32,25 @@
 }
 
 .wishlist-toggle--card:hover {
-  color: var(--iz-color-danger-rose);
+  color: var(--iz-color-danger);
   transform: scale(1.05);
 }
 
 .wishlist-toggle--inline {
   width: 2.25rem;
   height: 2.25rem;
-  border: 1px solid var(--iz-color-border-subtle);
+  border: 1px solid var(--iz-color-border);
   border-radius: var(--iz-radius-input);
   background: var(--iz-color-surface);
 }
 
 .wishlist-toggle--inline:hover {
-  color: var(--iz-color-danger-rose);
-  border-color: var(--iz-color-danger-rose);
+  color: var(--iz-color-danger);
+  border-color: var(--iz-color-danger);
 }
 
 .wishlist-toggle--active {
-  color: var(--iz-color-danger-rose);
+  color: var(--iz-color-danger);
 }
 
 .wishlist-toggle--active .wishlist-toggle__icon {

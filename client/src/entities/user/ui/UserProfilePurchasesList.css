@@ -9,8 +9,8 @@
   margin-bottom: 0;
   padding: 0.75rem 1rem;
   border-radius: 8px;
-  background: color-mix(in srgb, var(--iz-color-canvas-text) 4%, var(--iz-color-canvas));
-  border: 1px solid color-mix(in srgb, var(--iz-color-canvas-text) 12%, transparent);
+  background: color-mix(in srgb, var(--iz-color-text) 4%, var(--iz-color-surface));
+  border: 1px solid color-mix(in srgb, var(--iz-color-text) 12%, transparent);
 }
 
 .user-profile-purchases-section > .user-profile-purchases__heading,
@@ -39,11 +39,11 @@
   margin: 0;
   font-size: 0.875rem;
   text-align: center;
-  color: color-mix(in srgb, var(--iz-color-canvas-text) 70%, transparent);
+  color: color-mix(in srgb, var(--iz-color-text) 70%, transparent);
 }
 
 .user-profile-purchases__state_error {
-  color: var(--iz-color-danger-deep);
+  color: var(--iz-color-danger);
 }
 
 .user-profile-purchases__list {
@@ -88,8 +88,8 @@
   height: var(--user-profile-purchases-thumb-size);
   border-radius: 6px;
   object-fit: cover;
-  background: color-mix(in srgb, var(--iz-color-canvas-text) 8%, var(--iz-color-canvas));
-  border: 1px solid color-mix(in srgb, var(--iz-color-canvas-text) 14%, transparent);
+  background: color-mix(in srgb, var(--iz-color-text) 8%, var(--iz-color-surface));
+  border: 1px solid color-mix(in srgb, var(--iz-color-text) 14%, transparent);
 }
 
 .user-profile-purchases__row_unavailable .user-profile-purchases__thumb {
@@ -100,7 +100,7 @@
   margin: 0.5rem 0 0;
   font-size: 0.8125rem;
   text-align: center;
-  color: var(--iz-color-warning-deep);
+  color: var(--iz-color-warning-text);
 }
 
 .user-profile-purchases__more {
@@ -109,9 +109,9 @@
   margin-left: auto;
   margin-right: auto;
   padding: 0.35rem 0.75rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-canvas-text) 20%, transparent);
+  border: 1px solid color-mix(in srgb, var(--iz-color-text) 20%, transparent);
   border-radius: 6px;
-  background: color-mix(in srgb, var(--iz-color-canvas-text) 4%, var(--iz-color-canvas));
+  background: color-mix(in srgb, var(--iz-color-text) 4%, var(--iz-color-surface));
   color: inherit;
   font: inherit;
   font-size: 0.8125rem;

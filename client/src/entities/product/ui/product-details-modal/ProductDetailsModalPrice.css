@@ -18,7 +18,7 @@
   background: linear-gradient(
     165deg,
     var(--iz-color-surface-elevated) 0%,
-    var(--iz-color-surface-alt) 100%
+    var(--iz-color-surface-elevated) 100%
   );
 }
 
@@ -157,9 +157,9 @@
   min-height: 2.5rem;
   margin: 0;
   padding: 0.45rem var(--iz-space-2);
-  border: 1px solid var(--iz-color-warning-amber);
+  border: 1px solid var(--iz-color-warning);
   border-radius: var(--iz-radius-input);
-  background: var(--iz-color-warning-amber);
+  background: var(--iz-color-warning);
   color: var(--iz-color-on-contrast);
   font: inherit;
   font-size: 0.9rem;
@@ -171,14 +171,14 @@
 }
 
 .product-details-modal__auction-btn:hover:not(:disabled) {
-  background: var(--iz-color-warning-gold);
-  border-color: var(--iz-color-warning-gold);
+  background: var(--iz-color-warning);
+  border-color: var(--iz-color-warning);
 }
 
 .product-details-modal__auction-btn--inactive,
 .product-details-modal__auction-btn:disabled {
-  border-color: var(--iz-color-border-subtle);
-  background: var(--iz-color-surface-alt);
-  color: var(--iz-color-neutral-gray);
+  border-color: var(--iz-color-border);
+  background: var(--iz-color-surface-elevated);
+  color: var(--iz-color-text-muted);
   cursor: default;
 }

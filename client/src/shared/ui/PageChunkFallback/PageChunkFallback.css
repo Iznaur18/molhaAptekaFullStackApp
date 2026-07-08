@@ -1,5 +1,5 @@
 .page-chunk-fallback {
   margin: 1rem 0;
   text-align: center;
-  color: color-mix(in srgb, var(--iz-color-canvas-text) 70%, transparent);
+  color: color-mix(in srgb, var(--iz-color-text) 70%, transparent);
 }

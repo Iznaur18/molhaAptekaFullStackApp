@@ -3,11 +3,7 @@ import { StyleSheet } from "react-native";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-const DANGER_STRONG = "#b42318";
-const NEUTRAL_GRAY_DEEP = "#4b5563";
 const THUMB_SIZE = 72;
-const PURPLE_SOFT = "#f3e8ff";
-const PURPLE_BORDER = "#9333ea33";
 
 export const useRafflesStaffPageStyles = createThemedStyles((theme) => ({
   container: {
@@ -43,8 +39,8 @@ export const useRafflesStaffPageStyles = createThemedStyles((theme) => ({
     gap: 8,
   },
   rowLive: {
-    borderColor: PURPLE_BORDER,
-    backgroundColor: PURPLE_SOFT,
+    borderColor: theme.colors.accentSoft,
+    backgroundColor: theme.colors.accentSoft,
   },
   rowMain: {
     flexDirection: "row",
@@ -91,7 +87,7 @@ export const useRafflesStaffPageStyles = createThemedStyles((theme) => ({
   rowError: {
     fontSize: 13,
     lineHeight: 18,
-    color: DANGER_STRONG,
+    color: theme.colors.danger,
   },
   actions: {
     flexDirection: "row",
@@ -109,8 +105,8 @@ export const useRafflesStaffPageStyles = createThemedStyles((theme) => ({
     paddingHorizontal: 12,
     borderRadius: 8,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: DANGER_STRONG,
-    backgroundColor: `${DANGER_STRONG}14`,
+    borderColor: theme.colors.danger,
+    backgroundColor: `${theme.colors.danger}14`,
   },
   actionEdit: {
     paddingVertical: 6,
@@ -131,7 +127,7 @@ export const useRafflesStaffPageStyles = createThemedStyles((theme) => ({
   actionDangerText: {
     fontSize: 14,
     fontWeight: "500",
-    color: DANGER_STRONG,
+    color: theme.colors.danger,
   },
   actionEditText: {
     fontSize: 14,
@@ -141,12 +137,12 @@ export const useRafflesStaffPageStyles = createThemedStyles((theme) => ({
   state: {
     fontSize: 15.2,
     lineHeight: 22,
-    color: NEUTRAL_GRAY_DEEP,
+    color: theme.colors.textSecondary,
   },
   empty: {
     fontSize: 15.2,
     lineHeight: 22,
-    color: NEUTRAL_GRAY_DEEP,
+    color: theme.colors.textSecondary,
   },
   centered: {
     flex: 1,

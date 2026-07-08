@@ -11,7 +11,7 @@
   flex-direction: column;
   gap: 0.5rem;
   padding: 0.65rem 0.75rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-success-vivid) 22%, var(--iz-color-border));
+  border: 1px solid color-mix(in srgb, var(--iz-color-success) 22%, var(--iz-color-border));
   border-radius: 0.65rem;
   background: linear-gradient(
     135deg,
@@ -88,19 +88,19 @@
 }
 
 .my-sales-page__status-chip:hover {
-  border-color: color-mix(in srgb, var(--iz-color-success-vivid) 35%, var(--iz-color-border));
-  background: var(--iz-color-success-pale);
+  border-color: color-mix(in srgb, var(--iz-color-success) 35%, var(--iz-color-border));
+  background: var(--iz-color-success-surface);
 }
 
 .my-sales-page__status-chip_active {
-  border-color: var(--iz-color-success-vivid);
-  background: var(--iz-color-success-vivid);
+  border-color: var(--iz-color-success);
+  background: var(--iz-color-success);
   color: var(--iz-color-on-contrast);
 }
 
 .my-sales-page__status-chip_active.my-sales-page__status-chip_pending {
-  border-color: var(--iz-color-warning-bright);
-  background: var(--iz-color-warning-bright);
+  border-color: var(--iz-color-warning);
+  background: var(--iz-color-warning);
 }
 
 .my-sales-page__status-chip_active.my-sales-page__status-chip_confirmed {
@@ -109,18 +109,18 @@
 }
 
 .my-sales-page__status-chip_active.my-sales-page__status-chip_shipped {
-  border-color: var(--iz-color-premium-purple);
-  background: var(--iz-color-premium-purple);
+  border-color: var(--iz-color-accent);
+  background: var(--iz-color-accent);
 }
 
 .my-sales-page__status-chip_active.my-sales-page__status-chip_delivered {
-  border-color: var(--iz-color-success-vivid);
-  background: var(--iz-color-success-vivid);
+  border-color: var(--iz-color-success);
+  background: var(--iz-color-success);
 }
 
 .my-sales-page__status-chip_active.my-sales-page__status-chip_cancelled {
-  border-color: var(--iz-color-danger-accent);
-  background: var(--iz-color-danger-accent);
+  border-color: var(--iz-color-danger);
+  background: var(--iz-color-danger);
 }
 
 .my-sales-page__search {
@@ -148,7 +148,7 @@
 }
 
 .my-sales-page__state_error {
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }
 
 @import "./MySalesPageMobile.css";

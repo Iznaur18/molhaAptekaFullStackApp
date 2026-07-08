@@ -3,8 +3,7 @@ import { StyleSheet } from "react-native";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-const DANGER_STRONG = "#b42318";
-const NEUTRAL_GRAY_DEEP = "#4b5563";
+
 
 export const useProductModerationPageStyles = createThemedStyles((theme) => ({
   container: {
@@ -24,15 +23,15 @@ export const useProductModerationPageStyles = createThemedStyles((theme) => ({
     marginBottom: 16,
     fontSize: 15.2,
     lineHeight: 22,
-    color: NEUTRAL_GRAY_DEEP,
+    color: theme.colors.textSecondary,
   },
   stateError: {
-    color: DANGER_STRONG,
+    color: theme.colors.danger,
   },
   empty: {
     fontSize: 15.2,
     lineHeight: 22,
-    color: NEUTRAL_GRAY_DEEP,
+    color: theme.colors.textSecondary,
     textAlign: "center",
     paddingVertical: 8,
   },

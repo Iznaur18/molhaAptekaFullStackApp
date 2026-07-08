@@ -29,7 +29,7 @@
   padding: 0.25rem 0.4rem;
   border: 1px solid var(--iz-color-action);
   border-radius: 0.5rem;
-  background: var(--iz-color-action-bg-hover);
+  background: var(--iz-color-action-soft);
 }
 
 .add-to-cart__step-button {

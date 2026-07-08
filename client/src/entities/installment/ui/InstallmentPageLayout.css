@@ -13,12 +13,12 @@
   flex-direction: column;
   gap: 0.5rem;
   padding: 0.65rem 0.75rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-link-deep) 28%, var(--iz-color-border));
+  border: 1px solid color-mix(in srgb, var(--iz-color-action) 28%, var(--iz-color-border));
   border-radius: 0.65rem;
   background: linear-gradient(
     135deg,
     var(--iz-color-surface) 0%,
-    color-mix(in srgb, var(--iz-color-link-deep) 8%, var(--iz-color-action-soft)) 140%
+    color-mix(in srgb, var(--iz-color-action) 8%, var(--iz-color-action-soft)) 140%
   );
 }
 
@@ -50,7 +50,7 @@
 }
 
 .installment-page__refresh:hover:not(:disabled) {
-  border-color: var(--iz-color-link-deep);
+  border-color: var(--iz-color-action);
   background: var(--iz-color-action-soft);
 }
 
@@ -97,34 +97,34 @@
 }
 
 .installment-page__chip:hover {
-  border-color: color-mix(in srgb, var(--iz-color-link-deep) 35%, var(--iz-color-border));
+  border-color: color-mix(in srgb, var(--iz-color-action) 35%, var(--iz-color-border));
   background: var(--iz-color-action-soft);
 }
 
 .installment-page__chip_active {
-  border-color: var(--iz-color-link-deep);
-  background: var(--iz-color-link-deep);
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action);
   color: var(--iz-color-on-contrast);
 }
 
 .installment-page__chip_active.installment-page__chip_in_progress {
-  border-color: var(--iz-color-success-teal-bright);
-  background: var(--iz-color-success-teal-bright);
+  border-color: var(--iz-color-success);
+  background: var(--iz-color-success);
 }
 
 .installment-page__chip_active.installment-page__chip_completed {
-  border-color: var(--iz-color-success-vivid);
-  background: var(--iz-color-success-vivid);
+  border-color: var(--iz-color-success);
+  background: var(--iz-color-success);
 }
 
 .installment-page__chip_active.installment-page__chip_defaulted {
-  border-color: var(--iz-color-warning-bright);
-  background: var(--iz-color-warning-bright);
+  border-color: var(--iz-color-warning);
+  background: var(--iz-color-warning);
 }
 
 .installment-page__chip_active.installment-page__chip_cancelled {
-  border-color: var(--iz-color-danger-accent);
-  background: var(--iz-color-danger-accent);
+  border-color: var(--iz-color-danger);
+  background: var(--iz-color-danger);
 }
 
 .installment-page__list {
@@ -144,7 +144,7 @@
 }
 
 .installment-page__state_error {
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }
 
 .installment-queue-card {
@@ -152,11 +152,11 @@
   flex-direction: column;
   gap: 0.45rem;
   padding: 0.6rem 0.7rem 0.65rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-border) 80%, var(--iz-color-link-deep));
-  border-left: 3px solid var(--iz-color-link-deep);
+  border: 1px solid color-mix(in srgb, var(--iz-color-border) 80%, var(--iz-color-action));
+  border-left: 3px solid var(--iz-color-action);
   border-radius: 0.55rem;
   background: var(--iz-color-surface);
-  box-shadow: 0 1px 3px color-mix(in srgb, var(--iz-color-link-deep) 8%, transparent);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--iz-color-action) 8%, transparent);
 }
 
 .installment-queue-card__head {
@@ -208,7 +208,7 @@
   padding: 0.18rem 0.5rem;
   border-radius: 999px;
   background: var(--iz-color-action-soft);
-  color: var(--iz-color-link-hover);
+  color: var(--iz-color-action-hover);
   font-size: 0.82rem;
   font-weight: 600;
 }
@@ -259,21 +259,21 @@
 }
 
 .installment-queue-card__btn_primary {
-  border-color: var(--iz-color-link-deep);
-  background: var(--iz-color-link-deep);
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action);
   color: var(--iz-color-on-contrast);
 }
 
 .installment-queue-card__btn_success {
-  border-color: var(--iz-color-success-teal-bright);
-  background: var(--iz-color-success-teal-bright);
+  border-color: var(--iz-color-success);
+  background: var(--iz-color-success);
   color: var(--iz-color-on-contrast);
 }
 
 .installment-queue-card__btn_danger {
-  border-color: var(--iz-color-danger-accent);
+  border-color: var(--iz-color-danger);
   background: var(--iz-color-surface);
-  color: var(--iz-color-danger-accent);
+  color: var(--iz-color-danger);
 }
 
 @import "./InstallmentPageLayoutMobile.css";

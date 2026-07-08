@@ -12,7 +12,7 @@
 .edit-profile-modal__backdrop {
   position: absolute;
   inset: 0;
-  background: var(--iz-color-overlay-backdrop);
+  background: var(--iz-color-overlay);
 }
 
 .edit-profile-modal__card {
@@ -102,7 +102,7 @@
 }
 
 .edit-profile-modal__input_readonly {
-  background: var(--iz-color-surface-subtle);
+  background: var(--iz-color-surface-muted);
   color: var(--iz-color-text-muted);
 }
 
@@ -126,7 +126,7 @@
   margin: 0 0 0.35rem;
   font-size: 0.85rem;
   font-weight: 600;
-  color: color-mix(in srgb, var(--iz-color-canvas-text) 72%, transparent);
+  color: color-mix(in srgb, var(--iz-color-text) 72%, transparent);
 }
 
 .edit-profile-modal__hint {
@@ -141,7 +141,7 @@
 }
 
 .edit-profile-modal__word-meter_overflow {
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
   font-weight: 600;
 }
 
@@ -152,7 +152,7 @@
   gap: 0.75rem;
   margin-top: 0.75rem;
   padding-top: 0.75rem;
-  border-top: 1px solid var(--iz-color-surface-subtle);
+  border-top: 1px solid var(--iz-color-surface-muted);
 }
 
 .edit-profile-modal__feedback {
@@ -166,7 +166,7 @@
 }
 
 .edit-profile-modal__message_error {
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }
 
 .edit-profile-modal__actions {

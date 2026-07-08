@@ -2,7 +2,7 @@
   margin: 0;
   font-size: 0.8125rem;
   line-height: 1.4;
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }
 
 .product-card__moderation-pending-overlay {
@@ -17,8 +17,8 @@
   box-sizing: border-box;
   padding: 0.35rem 0.5rem;
   border-top: 1px solid var(--iz-color-border);
-  background: color-mix(in srgb, var(--iz-color-warning-cream) 92%, transparent);
-  color: var(--iz-color-warning-brown-deep);
+  background: color-mix(in srgb, var(--iz-color-warning-surface) 92%, transparent);
+  color: var(--iz-color-warning-text);
   font-size: 0.72rem;
   font-weight: 600;
   line-height: 1.25;

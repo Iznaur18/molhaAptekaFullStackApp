@@ -26,7 +26,7 @@
   margin: 0;
   font-size: 0.92rem;
   line-height: 1.45;
-  color: var(--iz-color-text-subtle);
+  color: var(--iz-color-text-muted);
 }
 
 .advertising-page__balance-bar {
@@ -65,7 +65,7 @@
   display: grid;
   gap: 0.85rem;
   padding: 1rem;
-  border: 1px solid var(--iz-color-border-subtle);
+  border: 1px solid var(--iz-color-border);
   border-radius: 14px;
   background: var(--iz-color-surface);
   box-shadow: 0 6px 18px color-mix(in srgb, var(--iz-color-ink) 4%, transparent);
@@ -74,7 +74,7 @@
 .advertising-page__card_intro,
 .advertising-page__card_category,
 .advertising-page__card_banner {
-  border-color: var(--iz-color-border-subtle);
+  border-color: var(--iz-color-border);
   border-top: 3px solid var(--adv-accent);
   background: var(--iz-color-surface);
 }
@@ -112,7 +112,7 @@
   margin: 0;
   font-size: 0.9rem;
   line-height: 1.45;
-  color: var(--iz-color-text-subtle);
+  color: var(--iz-color-text-muted);
 }
 
 .advertising-page__meta {
@@ -126,7 +126,7 @@
   gap: 0.1rem;
   min-width: 7.5rem;
   padding: 0.55rem 0.7rem;
-  border: 1px solid var(--iz-color-border-subtle);
+  border: 1px solid var(--iz-color-border);
   border-radius: 10px;
   background: var(--iz-color-surface-elevated);
 }
@@ -136,7 +136,7 @@
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--iz-color-text-subtle);
+  color: var(--iz-color-text-muted);
 }
 
 .advertising-page__meta-value {
@@ -150,7 +150,7 @@
   gap: 0.55rem;
   padding: 0.65rem 0.75rem;
   border-radius: 10px;
-  border: 1px solid var(--iz-color-border-subtle);
+  border: 1px solid var(--iz-color-border);
   background: var(--iz-color-surface-elevated);
 }
 
@@ -158,16 +158,16 @@
   margin: 0;
   font-size: 0.88rem;
   line-height: 1.4;
-  color: var(--iz-color-slate);
+  color: var(--iz-color-text-secondary);
 }
 
 .advertising-page__status_active {
-  border-color: var(--iz-color-success-light);
-  background: var(--iz-color-success-soft);
+  border-color: var(--iz-color-success-surface);
+  background: var(--iz-color-success-surface);
 }
 
 .advertising-page__status_active .advertising-page__status-text {
-  color: var(--iz-color-success-strong);
+  color: var(--iz-color-success);
 }
 
 .advertising-page__status_pending {
@@ -179,7 +179,7 @@
   display: grid;
   gap: 0.85rem;
   padding: 0.85rem;
-  border: 1px dashed var(--iz-color-border-subtle);
+  border: 1px dashed var(--iz-color-border);
   border-radius: 12px;
   background: var(--iz-color-surface-elevated);
 }
@@ -190,22 +190,22 @@
   font-weight: 700;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  color: var(--iz-color-text-subtle);
+  color: var(--iz-color-text-muted);
 }
 
 .advertising-page__state_error,
 .advertising-page__error {
   margin: 0;
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
   font-size: 0.88rem;
 }
 
 .advertising-page__feedback {
   padding: 0.55rem 0.7rem;
   border-radius: 8px;
-  border: 1px solid var(--iz-color-success-light);
-  background: var(--iz-color-success-soft);
-  color: var(--iz-color-success-strong);
+  border: 1px solid var(--iz-color-success-surface);
+  background: var(--iz-color-success-surface);
+  color: var(--iz-color-success);
 }
 
 .advertising-page__form {
@@ -218,14 +218,14 @@
   gap: 0.35rem;
   font-size: 0.88rem;
   font-weight: 600;
-  color: var(--iz-color-slate);
+  color: var(--iz-color-text-secondary);
 }
 
 .advertising-page__input {
   width: 100%;
   box-sizing: border-box;
   padding: 0.5rem 0.65rem;
-  border: 1px solid var(--iz-color-border-subtle);
+  border: 1px solid var(--iz-color-border);
   border-radius: 10px;
   background: var(--iz-color-surface);
   font: inherit;
@@ -248,7 +248,7 @@
   gap: 0.15rem;
   margin: 0;
   padding: 0.6rem 0.65rem;
-  border: 1px solid var(--iz-color-border-subtle);
+  border: 1px solid var(--iz-color-border);
   border-radius: 10px;
   background: var(--iz-color-surface);
   cursor: pointer;
@@ -277,7 +277,7 @@
 
 .advertising-page__tariff-price {
   font-size: 0.78rem;
-  color: var(--iz-color-text-subtle);
+  color: var(--iz-color-text-muted);
 }
 
 .advertising-page__actions {
@@ -297,12 +297,12 @@
 .advertising-page__timing-legend {
   font-size: 0.88rem;
   font-weight: 700;
-  color: var(--iz-color-slate);
+  color: var(--iz-color-text-secondary);
 }
 
 .advertising-page__timing-hint {
   margin: 0;
-  color: var(--iz-color-text-subtle);
+  color: var(--iz-color-text-muted);
   font-size: 0.82rem;
 }
 
@@ -327,7 +327,7 @@
   width: 2.75rem;
   height: 2.75rem;
   padding: 0.15rem;
-  border: 1px solid var(--iz-color-border-subtle);
+  border: 1px solid var(--iz-color-border);
   border-radius: 10px;
   background: var(--iz-color-surface);
   cursor: pointer;
@@ -340,7 +340,7 @@
 
 .advertising-page__preview {
   overflow: hidden;
-  border: 1px solid var(--iz-color-border-subtle);
+  border: 1px solid var(--iz-color-border);
   border-radius: 12px;
   background: var(--iz-color-surface-elevated);
 }
@@ -374,8 +374,8 @@
 }
 
 .advertising-page .app-btn--cancel:hover:not(:disabled) {
-  border-color: var(--iz-color-danger-strong);
-  background: var(--iz-color-danger-strong);
+  border-color: var(--iz-color-danger);
+  background: var(--iz-color-danger);
 }
 
 @container app-viewport (min-width: 640px) {

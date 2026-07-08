@@ -1,3 +1,4 @@
+import { semanticColors } from "@/shared/theme/semanticColors";
 import { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from "react-native";
 
@@ -194,7 +195,7 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
               <Text
                 style={[
                   localStyles.genderBtnText,
-                  { color: selected ? "#ffffff" : theme.colors.text },
+                  { color: selected ? semanticColors.onContrast : theme.colors.text },
                 ]}
               >
                 {USER_GENDER_LABEL_RU[option]}
@@ -279,8 +280,8 @@ const localStyles = StyleSheet.create({
     paddingVertical: 9,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#d1d5db",
-    backgroundColor: "#ffffff",
+    borderColor: semanticColors.borderStrong,
+    backgroundColor: semanticColors.onContrast,
     borderRadius: 0,
   },
   genderBtnFirst: {

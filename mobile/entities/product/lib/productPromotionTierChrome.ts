@@ -1,3 +1,4 @@
+import { semanticColors } from "@/shared/theme/semanticColors";
 import type { TextStyle, ViewStyle } from "react-native";
 
 import {
@@ -5,18 +6,6 @@ import {
   PRODUCT_PROMOTION_TIER_GOLD,
   PRODUCT_PROMOTION_TIER_TOP,
 } from "@/entities/product/lib/calculateProductPromotionPointsCost";
-
-const SUCCESS_SOFT = "#ecfdf5";
-const SUCCESS_BORDER = "#05966947";
-const DANGER_SURFACE = "#fef2f2";
-const DANGER_BORDER = "#dc262647";
-const DANGER_ACCENT = "#dc2626";
-const DANGER_STRONG = "#b42318";
-const GOLD_SOFT = "#fef3c7";
-const PURPLE_SOFT = "#ede9fe";
-const ACTION_SOFT = "#eff6ff";
-const LINK = "#2563eb";
-const LINK_HOVER = "#1d4ed8";
 
 type TierChrome = {
   accent: string;
@@ -26,19 +15,19 @@ type TierChrome = {
 
 const TIER_CHROME: Record<number, TierChrome> = {
   [PRODUCT_PROMOTION_TIER_GOLD]: {
-    accent: "#d97706",
-    soft: GOLD_SOFT,
-    badgeText: "#92400e",
+    accent: semanticColors.warning,
+    soft: semanticColors.warningSurface,
+    badgeText: semanticColors.warningText,
   },
   [PRODUCT_PROMOTION_TIER_TOP]: {
-    accent: "#7c3aed",
-    soft: PURPLE_SOFT,
-    badgeText: "#5b21b6",
+    accent: semanticColors.accent,
+    soft: semanticColors.accentSoft,
+    badgeText: semanticColors.accent,
   },
   [PRODUCT_PROMOTION_TIER_BANNER]: {
-    accent: DANGER_ACCENT,
-    soft: DANGER_SURFACE,
-    badgeText: "#991b1b",
+    accent: semanticColors.danger,
+    soft: semanticColors.dangerSurface,
+    badgeText: semanticColors.dangerText,
   },
 };
 
@@ -54,8 +43,8 @@ export const resolveProductPromotionTierCardStyle = (
   if (!isSelected) {
     return {
       card: {
-        borderColor: "#e5e7eb",
-        backgroundColor: "#ffffff",
+        borderColor: semanticColors.border,
+        backgroundColor: semanticColors.onContrast,
       },
       badge: {
         backgroundColor: chrome.soft,
@@ -64,7 +53,7 @@ export const resolveProductPromotionTierCardStyle = (
         color: chrome.badgeText,
       },
       title: {
-        color: "#111827",
+        color: semanticColors.text,
       },
     };
   }
@@ -93,11 +82,11 @@ export const resolveProductPromotionDurationChipStyle = (
   if (!isSelected) {
     return {
       chip: {
-        borderColor: "#e5e7eb",
-        backgroundColor: "#ffffff",
+        borderColor: semanticColors.border,
+        backgroundColor: semanticColors.onContrast,
       },
       price: {
-        color: LINK,
+        color: semanticColors.link,
       },
     };
   }
@@ -105,37 +94,37 @@ export const resolveProductPromotionDurationChipStyle = (
   if (selectedTier === PRODUCT_PROMOTION_TIER_BANNER) {
     return {
       chip: {
-        borderColor: DANGER_ACCENT,
-        backgroundColor: DANGER_SURFACE,
+        borderColor: semanticColors.danger,
+        backgroundColor: semanticColors.dangerSurface,
       },
       price: {
-        color: DANGER_ACCENT,
+        color: semanticColors.danger,
       },
     };
   }
 
   return {
     chip: {
-      borderColor: LINK,
-      backgroundColor: ACTION_SOFT,
+      borderColor: semanticColors.link,
+      backgroundColor: semanticColors.actionSoft,
     },
     price: {
-      color: LINK,
+      color: semanticColors.link,
     },
   };
 };
 
 export const productPromotionModalPalette = {
-  productBoxBg: "#f8fafc",
-  productBoxBorder: "#e5e7eb",
-  balanceOkBg: SUCCESS_SOFT,
-  balanceOkBorder: SUCCESS_BORDER,
-  balanceLowBg: DANGER_SURFACE,
-  balanceLowBorder: DANGER_BORDER,
-  summaryBg: "#f8fafc",
-  summaryBorder: "#e5e7eb",
-  summaryTotal: LINK_HOVER,
-  errorBg: DANGER_SURFACE,
-  errorBorder: `${DANGER_ACCENT}40`,
-  errorText: DANGER_STRONG,
+  productBoxBg: semanticColors.surfaceElevated,
+  productBoxBorder: semanticColors.border,
+  balanceOkBg: semanticColors.successSurface,
+  balanceOkBorder: `${semanticColors.success}47`,
+  balanceLowBg: semanticColors.dangerSurface,
+  balanceLowBorder: `${semanticColors.danger}47`,
+  summaryBg: semanticColors.surfaceElevated,
+  summaryBorder: semanticColors.border,
+  summaryTotal: semanticColors.actionHover,
+  errorBg: semanticColors.dangerSurface,
+  errorBorder: `${semanticColors.danger}40`,
+  errorText: semanticColors.danger,
 } as const;

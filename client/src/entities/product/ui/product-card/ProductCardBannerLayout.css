@@ -103,7 +103,7 @@
 .product-card--banner-layout .product-card__price--banner .product-price-display__current {
   font-size: 1.45rem;
   font-weight: 600;
-  color: var(--iz-color-link-hover);
+  color: var(--iz-color-action);
   letter-spacing: -0.03em;
 }
 
@@ -116,8 +116,8 @@
   padding: 0.22rem 0.55rem;
   border: none;
   border-radius: 999px;
-  background: var(--iz-color-danger-pink);
-  color: var(--iz-color-danger-rose-dark);
+  background: var(--iz-color-danger-surface);
+  color: var(--iz-color-danger-text);
   font-size: 0.78rem;
   font-weight: 600;
   line-height: 1.2;
@@ -145,7 +145,7 @@
 
 .product-card--banner-layout .product-card__banner-meta-item--rating {
   align-items: center;
-  color: var(--iz-color-text-tertiary);
+  color: var(--iz-color-text-secondary);
 }
 
 .product-card--banner-layout .product-card__banner-meta-sep {

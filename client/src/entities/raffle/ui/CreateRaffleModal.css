@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  background: var(--iz-color-overlay-midnight);
+  background: var(--iz-color-overlay);
 }
 
 .create-raffle-modal {
@@ -15,11 +15,11 @@
   max-height: min(92vh, 40rem);
   overflow: auto;
   padding: 1rem 1.1rem 1.15rem;
-  border: 2px solid var(--iz-color-premium-purple-muted);
+  border: 2px solid var(--iz-color-accent-soft);
   border-radius: 16px;
   background: var(--iz-gradient-raffle-modal);
-  box-shadow: 0 12px 38px var(--iz-color-accent-purple-shadow-strong);
-  color: var(--iz-color-canvas-text);
+  box-shadow: 0 12px 38px var(--iz-color-accent-shadow-strong);
+  color: var(--iz-color-text);
 }
 
 .create-raffle-modal__header {
@@ -29,21 +29,21 @@
   gap: 0.75rem;
   margin-bottom: 0.75rem;
   padding-bottom: 0.65rem;
-  border-bottom: 1px solid var(--iz-color-accent-purple-ring);
+  border-bottom: 1px solid var(--iz-color-accent-ring);
 }
 
 .create-raffle-modal__header h2 {
   margin: 0;
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--iz-color-accent-purple-text);
+  color: var(--iz-color-accent);
 }
 
 .create-raffle-modal__close {
-  border: 1px solid var(--iz-color-accent-purple);
+  border: 1px solid var(--iz-color-accent);
   border-radius: 8px;
-  background: var(--iz-color-accent-purple-soft);
-  color: var(--iz-color-accent-purple-text);
+  background: var(--iz-color-accent-soft);
+  color: var(--iz-color-accent);
   font-size: 1.5rem;
   line-height: 1;
   cursor: pointer;
@@ -56,27 +56,27 @@
 }
 
 .create-raffle-modal__section {
-  border: 1px solid var(--iz-color-accent-purple-ring);
+  border: 1px solid var(--iz-color-accent-ring);
   border-radius: 0.7rem;
   background: var(--iz-color-surface);
   overflow: hidden;
-  box-shadow: 0 2px 8px var(--iz-color-accent-purple-shadow);
+  box-shadow: 0 2px 8px var(--iz-color-accent-shadow);
 }
 
 .create-raffle-modal__section-title {
   margin: 0;
   padding: 0.55rem 0.75rem;
-  border-bottom: 1px solid var(--iz-color-accent-purple-ring-soft);
+  border-bottom: 1px solid var(--iz-color-accent-ring-soft);
   background: color-mix(
     in srgb,
-    var(--iz-color-accent-pink-surface) 70%,
+    var(--iz-color-accent-soft) 70%,
     var(--iz-color-surface) 30%
   );
   font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--iz-color-accent-purple-text);
+  color: var(--iz-color-accent);
 }
 
 .create-raffle-modal__section-body {
@@ -95,7 +95,7 @@
 .create-raffle-modal__field-hint {
   margin: 0;
   font-size: 0.78rem;
-  color: var(--iz-color-text-subtle);
+  color: var(--iz-color-text-muted);
   line-height: 1.4;
 }
 
@@ -104,22 +104,22 @@
   box-sizing: border-box;
   width: 100%;
   padding: 0.45rem 0.55rem;
-  border: 1px solid var(--iz-color-accent-purple-ring);
+  border: 1px solid var(--iz-color-accent-ring);
   border-radius: 8px;
   font: inherit;
-  background: var(--iz-color-accent-pink-lilac);
+  background: var(--iz-color-accent-soft);
 }
 
 .create-raffle-modal__hint {
   margin: 0;
   font-size: 0.8rem;
-  color: var(--iz-color-accent-purple-text);
+  color: var(--iz-color-accent);
   line-height: 1.4;
 }
 
 .create-raffle-modal__error {
   margin: 0;
-  color: var(--iz-color-danger-deep);
+  color: var(--iz-color-danger);
   font-size: 0.85rem;
 }
 
@@ -138,8 +138,8 @@
 }
 
 .create-raffle-modal__actions button[type="submit"] {
-  border: 1px solid var(--iz-color-accent-purple);
-  background: var(--iz-color-accent-purple);
+  border: 1px solid var(--iz-color-accent);
+  background: var(--iz-color-accent);
   color: var(--iz-color-on-contrast);
   font-weight: 600;
 }
@@ -147,9 +147,9 @@
 .create-raffle-modal__media-type {
   margin: 0;
   padding: 0.55rem 0.65rem;
-  border: 1px solid var(--iz-color-accent-purple-ring-soft);
+  border: 1px solid var(--iz-color-accent-ring-soft);
   border-radius: 8px;
-  background: var(--iz-color-accent-pink-surface);
+  background: var(--iz-color-accent-soft);
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem 1rem;
@@ -176,7 +176,7 @@
 
 .create-raffle-modal__media-type-option input[type="radio"] {
   width: auto;
-  accent-color: var(--iz-color-accent-purple);
+  accent-color: var(--iz-color-accent);
 }
 
 .create-raffle-modal__preview {
@@ -193,8 +193,8 @@
 .create-raffle-modal__preview-frame {
   position: relative;
   height: 9rem;
-  border: 1px solid var(--iz-color-accent-purple-ring);
+  border: 1px solid var(--iz-color-accent-ring);
   border-radius: 10px;
   overflow: hidden;
-  background: var(--iz-color-accent-pink-surface);
+  background: var(--iz-color-accent-soft);
 }

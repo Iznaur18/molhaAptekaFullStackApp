@@ -168,8 +168,8 @@
   display: inline-flex;
   padding: 0.15rem 0.55rem;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--iz-color-success-strong) 14%, transparent);
-  color: var(--iz-color-success-strong);
+  background: color-mix(in srgb, var(--iz-color-success) 14%, transparent);
+  color: var(--iz-color-success);
   font-size: 0.82rem;
 }
 

@@ -22,7 +22,7 @@
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
-  color: var(--iz-color-link-hover);
+  color: var(--iz-color-action);
 }
 
 .product-price-display__old {
@@ -45,7 +45,7 @@
   max-width: 100%;
   border-radius: 0.35rem;
   border: 1px solid var(--iz-color-danger-border);
-  background: var(--iz-color-danger-soft);
+  background: var(--iz-color-danger-surface);
   color: var(--iz-color-danger-text);
   font-size: 0.72rem;
   font-weight: 700;

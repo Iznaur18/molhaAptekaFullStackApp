@@ -27,8 +27,8 @@
 .product-price-offer__btn--cancel:hover:not(:disabled),
 .auction-dashboard-row__editor-cancel:hover:not(:disabled),
 .installment-queue-card__btn_cancel:hover:not(:disabled) {
-  border-color: var(--iz-color-danger-strong);
-  background: var(--iz-color-danger-strong);
+  border-color: var(--iz-color-danger);
+  background: var(--iz-color-danger);
 }
 
 .app-btn--cancel:disabled,

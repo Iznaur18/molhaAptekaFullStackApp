@@ -7,7 +7,7 @@
   border-radius: 0.65rem;
   background: linear-gradient(
     165deg,
-    color-mix(in srgb, var(--iz-color-promotion-boost-bg) 55%, var(--iz-color-surface)),
+    color-mix(in srgb, var(--iz-color-warning-surface) 55%, var(--iz-color-surface)),
     var(--iz-color-surface)
   );
 }
@@ -29,7 +29,7 @@
   margin: 0;
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--iz-color-slate-muted);
+  color: var(--iz-color-text-muted);
 }
 
 .admin-premium-staff-control__toggle {
@@ -38,7 +38,7 @@
   gap: 0.5rem;
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--iz-color-slate);
+  color: var(--iz-color-text-secondary);
   cursor: pointer;
 }
 
@@ -58,7 +58,7 @@
   margin: 0;
   font-size: 0.75rem;
   line-height: 1.35;
-  color: var(--iz-color-text-subtle);
+  color: var(--iz-color-text-muted);
 }
 
 .admin-premium-staff-control__presets {
@@ -70,7 +70,7 @@
 .admin-premium-staff-control__preset {
   margin: 0;
   padding: 0.4rem 0.65rem;
-  border: 1px solid var(--iz-color-warning-yellow-light);
+  border: 1px solid var(--iz-color-warning);
   border-radius: 999px;
   background: var(--iz-color-surface)beb;
   color: var(--iz-color-warning-text);
@@ -84,14 +84,14 @@
 }
 
 .admin-premium-staff-control__preset:hover:not(:disabled) {
-  background: var(--iz-color-gold-soft);
-  border-color: var(--iz-color-warning-bright);
+  background: var(--iz-color-warning-surface);
+  border-color: var(--iz-color-warning);
 }
 
 .admin-premium-staff-control__preset_selected {
   border-color: var(--iz-color-warning);
-  background: var(--iz-color-gold-border);
-  color: var(--iz-color-warning-brown);
+  background: var(--iz-color-warning-surface);
+  color: var(--iz-color-warning-text);
 }
 
 .admin-premium-staff-control__preset:disabled {
@@ -104,7 +104,7 @@
   flex-direction: column;
   gap: 0.25rem;
   font-size: 0.75rem;
-  color: var(--iz-color-slate);
+  color: var(--iz-color-text-secondary);
 }
 
 .admin-premium-staff-control__datetime {
@@ -118,7 +118,7 @@
 }
 
 .admin-premium-staff-control__datetime:focus {
-  outline: 2px solid var(--iz-color-warning-bright);
+  outline: 2px solid var(--iz-color-warning);
   outline-offset: 1px;
-  border-color: var(--iz-color-warning-bright);
+  border-color: var(--iz-color-warning);
 }

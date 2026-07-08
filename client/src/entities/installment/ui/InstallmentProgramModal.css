@@ -6,7 +6,7 @@
   align-items: stretch;
   justify-content: center;
   padding: 0;
-  background: var(--iz-color-overlay-midnight);
+  background: var(--iz-color-overlay);
 }
 
 .installment-program-modal {
@@ -21,7 +21,7 @@
   overflow: hidden;
   border-radius: 0;
   background: var(--iz-color-surface);
-  box-shadow: 0 12px 38px var(--iz-color-accent-installment-shadow);
+  box-shadow: 0 12px 38px var(--iz-color-overlay-strong);
   padding-top: env(safe-area-inset-top, 0px);
 }
 
@@ -43,7 +43,7 @@
   justify-content: space-between;
   gap: 0.75rem;
   padding: 1rem 1rem 0.75rem;
-  border-bottom: 1px solid var(--iz-color-neutral-gray-surface);
+  border-bottom: 1px solid var(--iz-color-surface-muted);
 }
 
 .installment-program-modal__title {
@@ -58,7 +58,7 @@
   padding: 0;
   border: none;
   background: transparent;
-  color: var(--iz-color-text-subtle);
+  color: var(--iz-color-text-muted);
   font-size: 1.5rem;
   line-height: 1;
   cursor: pointer;
@@ -73,7 +73,7 @@
   margin: 0;
   padding: 1rem;
   font-size: 0.9rem;
-  color: var(--iz-color-text-subtle);
+  color: var(--iz-color-text-muted);
 }
 
 .installment-program-modal__form {
@@ -105,7 +105,7 @@
   background: var(--iz-color-action-soft);
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--iz-color-info-navy);
+  color: var(--iz-color-info-deep);
   cursor: pointer;
 }
 
@@ -126,7 +126,7 @@
 .installment-program-modal__plan {
   margin: 0;
   padding: 0;
-  border: 1px solid var(--iz-color-border-subtle);
+  border: 1px solid var(--iz-color-border);
   border-radius: 0.65rem;
   background: var(--iz-color-surface-elevated);
   overflow: hidden;
@@ -187,7 +187,7 @@
   flex-direction: column;
   gap: 0.3rem;
   font-size: 0.82rem;
-  color: var(--iz-color-slate);
+  color: var(--iz-color-text-secondary);
 }
 
 .installment-program-modal__label {
@@ -199,14 +199,14 @@
   box-sizing: border-box;
   width: 100%;
   padding: 0.45rem 0.55rem;
-  border: 1px solid var(--iz-color-border-muted);
+  border: 1px solid var(--iz-color-border);
   border-radius: 0.45rem;
   background: var(--iz-color-surface);
   font: inherit;
 }
 
 .installment-program-modal__field input:focus {
-  outline: 2px solid var(--iz-color-action-outline);
+  outline: 2px solid var(--iz-color-focus-ring);
   border-color: var(--iz-color-link);
 }
 
@@ -221,7 +221,7 @@
   padding: 0.45rem 0.55rem;
   border-radius: 0.45rem;
   background: var(--iz-color-surface);
-  border: 1px dashed var(--iz-color-border-muted);
+  border: 1px dashed var(--iz-color-border);
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--iz-color-ink);
@@ -233,7 +233,7 @@
   gap: 0.45rem;
   margin: 0;
   font-size: 0.82rem;
-  color: var(--iz-color-slate);
+  color: var(--iz-color-text-secondary);
   cursor: pointer;
 }
 
@@ -253,7 +253,7 @@
   justify-content: space-between;
   gap: 0.5rem;
   padding: 0.75rem 1rem max(1rem, env(safe-area-inset-bottom, 0px));
-  border-top: 1px solid var(--iz-color-neutral-gray-surface);
+  border-top: 1px solid var(--iz-color-surface-muted);
   background: var(--iz-color-surface);
 }
 
@@ -267,7 +267,7 @@
 .installment-program-modal__btn {
   margin: 0;
   padding: 0.45rem 0.85rem;
-  border: 1px solid var(--iz-color-border-muted);
+  border: 1px solid var(--iz-color-border);
   border-radius: 0.45rem;
   background: var(--iz-color-surface);
   font: inherit;
@@ -292,20 +292,20 @@
 }
 
 .installment-program-modal__btn_primary:hover:not(:disabled) {
-  background: var(--iz-color-link-hover);
+  background: var(--iz-color-action-hover);
 }
 
 .installment-program-modal__btn_add {
-  border-color: var(--iz-color-info-muted);
+  border-color: var(--iz-color-info-soft);
   background: var(--iz-color-action-soft);
-  color: var(--iz-color-link-hover);
+  color: var(--iz-color-action-hover);
   font-weight: 600;
 }
 
 .installment-program-modal__max-hint {
   margin: 0;
   font-size: 0.8rem;
-  color: var(--iz-color-text-subtle);
+  color: var(--iz-color-text-muted);
 }
 
 .installment-program-modal__form > .installment-program-modal__error,
@@ -322,13 +322,13 @@
 
 .installment-program-modal__error {
   margin: 0;
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
   font-size: 0.85rem;
 }
 
 .installment-program-modal__success {
   margin: 0;
-  color: var(--iz-color-success-strong);
+  color: var(--iz-color-success);
   font-size: 0.85rem;
 }
 

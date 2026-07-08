@@ -39,7 +39,7 @@
   padding: 0.55rem 0.65rem;
   border: 1px solid color-mix(in srgb, var(--iz-color-border) 80%, transparent);
   border-radius: 0.65rem;
-  background: color-mix(in srgb, var(--iz-color-surface-alt) 45%, var(--iz-color-surface));
+  background: color-mix(in srgb, var(--iz-color-surface-elevated) 45%, var(--iz-color-surface));
 }
 
 .product-characteristics-editor__input {
@@ -70,9 +70,9 @@
 }
 
 .product-characteristics-editor__remove:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--iz-color-danger-strong) 35%, transparent);
-  background: color-mix(in srgb, var(--iz-color-danger-soft) 70%, var(--iz-color-surface));
-  color: var(--iz-color-danger-strong);
+  border-color: color-mix(in srgb, var(--iz-color-danger) 35%, transparent);
+  background: color-mix(in srgb, var(--iz-color-danger-surface) 70%, var(--iz-color-surface));
+  color: var(--iz-color-danger);
 }
 
 .product-characteristics-editor__remove:disabled {

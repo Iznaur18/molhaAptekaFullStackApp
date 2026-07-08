@@ -28,7 +28,7 @@
   margin: 0;
   padding: 0.4rem 0.85rem;
   white-space: nowrap;
-  border: 1px solid var(--iz-color-action-border-muted);
+  border: 1px solid var(--iz-color-focus-ring);
   border-radius: var(--iz-radius-pill);
   background: var(--iz-color-surface);
   color: var(--iz-color-action);
@@ -44,7 +44,7 @@
 
 .modal-section-tabs__tab:hover {
   border-color: var(--iz-color-action-hover);
-  background: var(--iz-color-action-bg-selected);
+  background: var(--iz-color-action-soft);
   color: var(--iz-color-action-hover);
 }
 

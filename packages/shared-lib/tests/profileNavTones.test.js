@@ -8,15 +8,15 @@ import {
   resolveProfileNavTonePalette,
 } from "@izibuy/shared-lib";
 
-test("profile nav tones: overview uses indigo", () => {
-  assert.equal(resolveProfileNavSectionTone(PROFILE_SECTION_OVERVIEW), "indigo");
-  assert.deepEqual(resolveProfileNavTonePalette("indigo"), {
-    main: "#4f46e5",
-    soft: "#eef2ff",
-    strong: "#4338ca",
+test("profile nav tones: overview uses blue", () => {
+  assert.equal(resolveProfileNavSectionTone(PROFILE_SECTION_OVERVIEW), "blue");
+  assert.deepEqual(resolveProfileNavTonePalette("blue"), {
+    main: "#2563eb",
+    soft: "#eff6ff",
+    strong: "#1557b3",
   });
 });
 
-test("profile nav tones: moderation uses orange", () => {
-  assert.equal(resolveProfileNavSectionTone(PROFILE_SECTION_PRODUCT_MODERATION), "orange");
+test("profile nav tones: moderation uses amber", () => {
+  assert.equal(resolveProfileNavSectionTone(PROFILE_SECTION_PRODUCT_MODERATION), "amber");
 });

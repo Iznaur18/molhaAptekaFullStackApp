@@ -2,17 +2,7 @@ import { StyleSheet } from "react-native";
 
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
-
-const GOLD = "#d4af37";
-const GOLD_MUTED = "#7a5a00";
-const GOLD_DEEP = "#d4a017";
-const GOLD_HIGHLIGHT = "#ffefb8";
-const PROMOTION_BOOST_BG = "#fffbeb";
-const SUCCESS_LIGHT = "#86efac";
-const SUCCESS_SOFT = "#ecfdf5";
-const SUCCESS_STRONG = "#047857";
-const DANGER_STRONG = "#b42318";
-const SLATE = "#475569";
+import { semanticColors } from "@/shared/theme/semanticColors";
 
 export const usePremiumPageStyles = createThemedStyles((theme) => ({
   container: {
@@ -36,13 +26,13 @@ export const usePremiumPageStyles = createThemedStyles((theme) => ({
     padding: 16,
     borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: GOLD,
-    backgroundColor: PROMOTION_BOOST_BG,
+    borderColor: theme.colors.warning,
+    backgroundColor: theme.colors.warningSurface,
   },
   planTitle: {
     fontSize: 18.4,
     fontWeight: "700",
-    color: GOLD_MUTED,
+    color: theme.colors.warningText,
   },
   planPrice: {
     fontSize: 21.6,
@@ -61,7 +51,7 @@ export const usePremiumPageStyles = createThemedStyles((theme) => ({
   benefit: {
     fontSize: 14.72,
     lineHeight: 21.3,
-    color: SLATE,
+    color: theme.colors.textSecondary,
   },
   balance: {
     fontSize: 14.08,
@@ -72,15 +62,15 @@ export const usePremiumPageStyles = createThemedStyles((theme) => ({
     paddingHorizontal: 12,
     borderRadius: 8,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: SUCCESS_LIGHT,
-    backgroundColor: SUCCESS_SOFT,
-    color: SUCCESS_STRONG,
+    borderColor: theme.colors.successSurface,
+    backgroundColor: theme.colors.successSurface,
+    color: theme.colors.successText,
     fontSize: 14.4,
     lineHeight: 20.2,
   },
   error: {
     fontSize: 14.08,
-    color: DANGER_STRONG,
+    color: theme.colors.danger,
     lineHeight: 20.2,
   },
   submit: {
@@ -89,8 +79,8 @@ export const usePremiumPageStyles = createThemedStyles((theme) => ({
     paddingHorizontal: 17.6,
     borderRadius: 10,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: GOLD_DEEP,
-    backgroundColor: "#fff8e6",
+    borderColor: theme.colors.warning,
+    backgroundColor: semanticColors.warningSurface,
   },
   submitDisabled: {
     opacity: 0.65,
@@ -98,7 +88,7 @@ export const usePremiumPageStyles = createThemedStyles((theme) => ({
   submitText: {
     fontSize: 15.2,
     fontWeight: "700",
-    color: GOLD_MUTED,
+    color: theme.colors.warningText,
   },
   centered: {
     flex: 1,

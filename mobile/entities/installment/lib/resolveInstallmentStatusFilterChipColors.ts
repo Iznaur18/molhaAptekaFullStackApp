@@ -1,26 +1,23 @@
-const LINK_DEEP = "#4f46e5";
-const SUCCESS_TEAL_BRIGHT = "#0d9488";
-const SUCCESS_VIVID = "#22c55e";
-const WARNING_BRIGHT = "#f59e0b";
-const DANGER_ACCENT = "#dc2626";
+import { semanticColors } from "@/shared/theme/semanticColors";
+
 
 export const resolveInstallmentStatusFilterChipActiveColors = (
   status: string,
 ): { backgroundColor: string; borderColor: string } => {
   if (!status) {
-    return { backgroundColor: LINK_DEEP, borderColor: LINK_DEEP };
+    return { backgroundColor: semanticColors.action, borderColor: semanticColors.action };
   }
   if (status === "in_progress") {
-    return { backgroundColor: SUCCESS_TEAL_BRIGHT, borderColor: SUCCESS_TEAL_BRIGHT };
+    return { backgroundColor: semanticColors.success, borderColor: semanticColors.success };
   }
   if (status === "completed") {
-    return { backgroundColor: SUCCESS_VIVID, borderColor: SUCCESS_VIVID };
+    return { backgroundColor: semanticColors.success, borderColor: semanticColors.success };
   }
   if (status === "defaulted") {
-    return { backgroundColor: WARNING_BRIGHT, borderColor: WARNING_BRIGHT };
+    return { backgroundColor: semanticColors.warning, borderColor: semanticColors.warning };
   }
   if (status === "cancelled") {
-    return { backgroundColor: DANGER_ACCENT, borderColor: DANGER_ACCENT };
+    return { backgroundColor: semanticColors.danger, borderColor: semanticColors.danger };
   }
-  return { backgroundColor: LINK_DEEP, borderColor: LINK_DEEP };
+  return { backgroundColor: semanticColors.action, borderColor: semanticColors.action };
 };

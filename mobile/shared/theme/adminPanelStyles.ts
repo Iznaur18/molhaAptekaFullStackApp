@@ -2,12 +2,7 @@ import { StyleSheet } from "react-native";
 
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
-
-const ACCENT_PURPLE = "#7c3aed";
-const ACCENT_PURPLE_SOFT = "#ede9fe";
-const DANGER_STRONG = "#b42318";
-const DANGER_SURFACE = "#fef3f2";
-const DANGER_BORDER = "#fecdca";
+import { semanticColors } from "@/shared/theme/semanticColors";
 
 export const useAdminPanelStyles = createThemedStyles((theme) => ({
   root: {
@@ -51,12 +46,12 @@ export const useAdminPanelStyles = createThemedStyles((theme) => ({
     paddingVertical: 3,
     paddingHorizontal: 9,
     borderRadius: 999,
-    backgroundColor: ACCENT_PURPLE_SOFT,
+    backgroundColor: theme.colors.accentSoft,
   },
   countBadgeText: {
     fontSize: 12,
     fontWeight: "600",
-    color: ACCENT_PURPLE,
+    color: theme.colors.accent,
   },
   searchWrap: {
     width: "100%",
@@ -117,9 +112,9 @@ export const useAdminPanelStyles = createThemedStyles((theme) => ({
   },
   alertError: {
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: DANGER_BORDER,
-    backgroundColor: DANGER_SURFACE,
-    color: DANGER_STRONG,
+    borderColor: theme.colors.dangerSurface,
+    backgroundColor: theme.colors.dangerSurface,
+    color: theme.colors.danger,
   },
   alertInfo: {
     borderWidth: StyleSheet.hairlineWidth,
@@ -238,7 +233,7 @@ export const useAdminPanelStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
   },
   cardEditing: {
-    borderColor: "#9333ea66",
+    borderColor: `${semanticColors.accent}66`,
   },
   cardBody: {
     gap: 10,
@@ -287,24 +282,24 @@ export const useAdminPanelStyles = createThemedStyles((theme) => ({
     paddingVertical: 3,
     paddingHorizontal: 8,
     borderRadius: 999,
-    backgroundColor: ACCENT_PURPLE_SOFT,
+    backgroundColor: theme.colors.accentSoft,
   },
   chipText: {
     fontSize: 12,
     lineHeight: 16,
-    color: ACCENT_PURPLE,
+    color: theme.colors.accent,
   },
   chipLeaf: {
-    backgroundColor: "#dcfce7",
+    backgroundColor: semanticColors.successSurface,
   },
   chipLeafText: {
-    color: "#15803d",
+    color: semanticColors.successText,
   },
   chipBranch: {
-    backgroundColor: "#dbeafe",
+    backgroundColor: theme.colors.actionBorder,
   },
   chipBranchText: {
-    color: "#2563eb",
+    color: theme.colors.link,
   },
   chipNeutral: {
     backgroundColor: theme.colors.surfaceMuted,
@@ -343,7 +338,7 @@ export const useAdminPanelStyles = createThemedStyles((theme) => ({
     paddingHorizontal: 10,
     borderRadius: 8,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: DANGER_STRONG,
+    borderColor: theme.colors.danger,
     backgroundColor: theme.colors.surface,
   },
   secondaryButtonText: {
@@ -354,7 +349,7 @@ export const useAdminPanelStyles = createThemedStyles((theme) => ({
   dangerButtonText: {
     fontSize: 14,
     fontWeight: "600",
-    color: DANGER_STRONG,
+    color: theme.colors.danger,
   },
   editActions: {
     flexDirection: "row",

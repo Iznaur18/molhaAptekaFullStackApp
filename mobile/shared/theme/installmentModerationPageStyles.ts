@@ -7,10 +7,6 @@ const TOOLBAR_PADDING_VERTICAL = 10.4;
 const TOOLBAR_PADDING_HORIZONTAL = 12;
 const TOOLBAR_RADIUS = 10.4;
 const TOOLBAR_GAP = 8;
-const NEUTRAL_GRAY_DEEP = "#4b5563";
-const LINK_DEEP = "#4f46e5";
-const SUCCESS_TEAL = "#0d9488";
-const DANGER_ACCENT = "#dc2626";
 
 export const useInstallmentModerationPageStyles = createThemedStyles((theme) => ({
   container: {
@@ -33,7 +29,7 @@ export const useInstallmentModerationPageStyles = createThemedStyles((theme) => 
     borderRadius: TOOLBAR_RADIUS,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: "rgba(79, 70, 229, 0.28)",
-    backgroundColor: "#eef2ff",
+    backgroundColor: theme.colors.actionSoft,
   },
   toolbarHead: {
     flexDirection: "row",
@@ -57,10 +53,10 @@ export const useInstallmentModerationPageStyles = createThemedStyles((theme) => 
   state: {
     fontSize: 15.2,
     lineHeight: 22,
-    color: NEUTRAL_GRAY_DEEP,
+    color: theme.colors.textSecondary,
   },
   stateError: {
-    color: DANGER_ACCENT,
+    color: theme.colors.danger,
   },
   centered: {
     flex: 1,
@@ -76,9 +72,9 @@ export const useInstallmentModerationPageStyles = createThemedStyles((theme) => 
     paddingHorizontal: 12,
     borderRadius: 10,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: `${LINK_DEEP}33`,
+    borderColor: `${theme.colors.action}33`,
     borderLeftWidth: 3,
-    borderLeftColor: LINK_DEEP,
+    borderLeftColor: theme.colors.action,
     backgroundColor: theme.colors.surface,
   },
   cardTitle: {
@@ -99,7 +95,7 @@ export const useInstallmentModerationPageStyles = createThemedStyles((theme) => 
   sellerLink: {
     fontSize: 13.6,
     fontWeight: "600",
-    color: LINK_DEEP,
+    color: theme.colors.action,
     textDecorationLine: "underline",
   },
   plans: {
@@ -111,12 +107,12 @@ export const useInstallmentModerationPageStyles = createThemedStyles((theme) => 
     paddingVertical: 3,
     paddingHorizontal: 8,
     borderRadius: 999,
-    backgroundColor: `${LINK_DEEP}14`,
+    backgroundColor: `${theme.colors.action}14`,
   },
   planPillText: {
     fontSize: 13,
     fontWeight: "600",
-    color: LINK_DEEP,
+    color: theme.colors.action,
   },
   fieldLabel: {
     gap: 4,
@@ -144,14 +140,14 @@ export const useInstallmentModerationPageStyles = createThemedStyles((theme) => 
     paddingVertical: 5,
     paddingHorizontal: 10,
     borderRadius: 8,
-    backgroundColor: SUCCESS_TEAL,
+    backgroundColor: theme.colors.success,
   },
   actionReject: {
     paddingVertical: 5,
     paddingHorizontal: 10,
     borderRadius: 8,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: DANGER_ACCENT,
+    borderColor: theme.colors.danger,
     backgroundColor: theme.colors.surface,
   },
   actionDisabled: {
@@ -165,6 +161,6 @@ export const useInstallmentModerationPageStyles = createThemedStyles((theme) => 
   actionRejectText: {
     fontSize: 13.6,
     fontWeight: "500",
-    color: DANGER_ACCENT,
+    color: theme.colors.danger,
   },
 }));

@@ -9,32 +9,18 @@ import {
 } from "@/entities/user/lib/groupProfileRows";
 import { getProfileRowIcon } from "@/entities/user/lib/profileRowIcons";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
+import { semanticColors } from "@/shared/theme/semanticColors";
 
 type UserProfileInfoPanelProps = {
   rows: ProfileRow[];
 };
 
-const ACCENT_BG = "#eef4ff";
-const ACCENT_BORDER = "#c8d8f5";
-const ACCENT_COLOR = "#2f5eb8";
-const ACCENT_ICON_BG = "#dbeafe";
-
-const CALM_BG = "#edf6f5";
-const CALM_BORDER = "#c8e5e3";
-const CALM_COLOR = "#2f736b";
-const CALM_ICON_BG = "#d1f0ed";
-
-const SECTION_TONES: Record<string, "accent" | "calm"> = {
-  stats: "accent",
-  identity: "accent",
-  personal: "calm",
-  account: "calm",
-  other: "calm",
-};
-
-function getTone(sectionId: string): "accent" | "calm" {
-  return SECTION_TONES[sectionId] ?? "calm";
-}
+const PROFILE_INFO_PALETTE = {
+  bg: semanticColors.surface,
+  border: semanticColors.border,
+  color: semanticColors.textSecondary,
+  iconBg: semanticColors.surfaceMuted,
+} as const;
 
 const useStyles = createThemedStyles((theme) => ({
   root: {
@@ -158,11 +144,7 @@ export const UserProfileInfoPanel = ({ rows }: UserProfileInfoPanelProps) => {
   return (
     <View style={styles.root}>
       {sections.map((section, sectionIndex) => {
-        const tone = getTone(section.id);
-        const bg = tone === "accent" ? ACCENT_BG : CALM_BG;
-        const border = tone === "accent" ? ACCENT_BORDER : CALM_BORDER;
-        const color = tone === "accent" ? ACCENT_COLOR : CALM_COLOR;
-        const iconBg = tone === "accent" ? ACCENT_ICON_BG : CALM_ICON_BG;
+        const { bg, border, color, iconBg } = PROFILE_INFO_PALETTE;
         if (section.id === "stats") {
           return (
             <View key={section.id} style={styles.statsGrid}>
@@ -235,14 +217,20 @@ export const UserProfileInfoPanel = ({ rows }: UserProfileInfoPanelProps) => {
                   <Text
                     style={[
                       styles.detailValue,
-                      { color: isBoolean ? undefined : "#374151" },
+                      { color: isBoolean ? undefined : semanticColors.textSecondary },
                       isBoolean && isYes && [
                         styles.detailValuePositive,
-                        { backgroundColor: "#dcfce7", color: "#15803d" },
+                        {
+                          backgroundColor: semanticColors.surfaceMuted,
+                          color: semanticColors.textSecondary,
+                        },
                       ],
                       isBoolean && isNo && [
                         styles.detailValueMuted,
-                        { backgroundColor: "#f3f4f6", color: "#6b7280" },
+                        {
+                          backgroundColor: semanticColors.surfaceMuted,
+                          color: semanticColors.textMuted,
+                        },
                       ],
                     ]}
                   >

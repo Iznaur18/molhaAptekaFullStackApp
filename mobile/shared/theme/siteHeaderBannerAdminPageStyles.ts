@@ -3,10 +3,7 @@ import { StyleSheet } from "react-native";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-const SUCCESS_SOFT = "#ecfdf3";
-const SUCCESS_BORDER = "#86efac";
-const DANGER_SOFT = "#fef2f2";
-const DANGER_STRONG = "#b42318";
+
 
 export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme) => ({
   container: {
@@ -135,7 +132,7 @@ export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme) => 
     borderColor: theme.colors.border,
     borderRadius: 12,
     backgroundColor: theme.colors.surfaceElevated,
-    shadowColor: "#000",
+    shadowColor: theme.colors.ink,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
     shadowRadius: 10,
@@ -160,8 +157,8 @@ export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme) => 
     paddingHorizontal: 14,
     borderRadius: 10,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: SUCCESS_BORDER,
-    backgroundColor: SUCCESS_SOFT,
+    borderColor: theme.colors.successSurface,
+    backgroundColor: theme.colors.successSurface,
   },
   noticeText: {
     fontSize: 14,
@@ -208,7 +205,7 @@ export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme) => 
     borderColor: theme.colors.border,
     borderRadius: 12,
     backgroundColor: theme.colors.surfaceElevated,
-    shadowColor: "#000",
+    shadowColor: theme.colors.ink,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.06,
     shadowRadius: 2,
@@ -327,8 +324,8 @@ export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme) => 
   },
   error: {
     fontSize: 14,
-    color: DANGER_STRONG,
-    backgroundColor: DANGER_SOFT,
+    color: theme.colors.danger,
+    backgroundColor: theme.colors.dangerSurface,
   },
 }));
 

@@ -33,7 +33,7 @@
 .app-intro-admin__fieldset {
   margin: 0;
   padding: 0.85rem;
-  border: 1px solid var(--iz-color-border-subtle);
+  border: 1px solid var(--iz-color-border);
   border-radius: 0.75rem;
   display: flex;
   flex-direction: column;
@@ -56,7 +56,7 @@
   width: 100%;
   box-sizing: border-box;
   padding: 0.55rem 0.65rem;
-  border: 1px solid var(--iz-color-border-subtle);
+  border: 1px solid var(--iz-color-border);
   border-radius: 0.5rem;
   font: inherit;
 }
@@ -108,11 +108,11 @@
 .app-intro-admin__btn_primary {
   border: 1px solid var(--iz-color-accent);
   background: var(--iz-color-accent);
-  color: var(--iz-color-on-accent);
+  color: var(--iz-color-on-contrast);
 }
 
 .app-intro-admin__btn_secondary {
-  border: 1px solid var(--iz-color-border-subtle);
+  border: 1px solid var(--iz-color-border);
   background: var(--iz-color-surface-elevated);
   color: inherit;
 }
@@ -139,7 +139,7 @@
   gap: 0.65rem;
   padding: 0.75rem 0.85rem;
   border-radius: 0.65rem;
-  background: var(--iz-color-success-soft, #ecfdf3);
+  background: var(--iz-color-success-surface, #ecfdf3);
   border: 1px solid var(--iz-color-success-border, #86efac);
 }
 
@@ -153,7 +153,7 @@
   border: 0;
   border-radius: 0.45rem;
   background: var(--iz-color-accent);
-  color: var(--iz-color-on-accent);
+  color: var(--iz-color-on-contrast);
   font: inherit;
   font-weight: 600;
   cursor: pointer;

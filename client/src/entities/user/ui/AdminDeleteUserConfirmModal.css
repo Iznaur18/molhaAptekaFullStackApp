@@ -12,7 +12,7 @@
 .admin-delete-user__backdrop {
   position: absolute;
   inset: 0;
-  background: var(--iz-color-overlay-backdrop);
+  background: var(--iz-color-overlay);
 }
 
 .admin-delete-user__card {
@@ -35,7 +35,7 @@
 .admin-delete-user__hint {
   margin: 0 0 0.75rem;
   font-size: 0.9rem;
-  color: var(--iz-color-text-tertiary);
+  color: var(--iz-color-text-secondary);
 }
 
 .admin-delete-user__form {
@@ -56,7 +56,7 @@
 .admin-delete-user__error {
   margin: 0;
   font-size: 0.85rem;
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }
 
 .admin-delete-user__actions {
@@ -80,7 +80,7 @@
 }
 
 .admin-delete-user__btn_danger {
-  background: var(--iz-color-danger-strong);
+  background: var(--iz-color-danger);
   color: var(--iz-color-on-contrast);
 }
 

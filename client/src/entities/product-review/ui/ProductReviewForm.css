@@ -3,7 +3,7 @@
   flex-direction: column;
   gap: 0.65rem;
   padding: 0.85rem;
-  border: 1px solid var(--iz-color-border-subtle);
+  border: 1px solid var(--iz-color-border);
   border-radius: 0.65rem;
   background: var(--iz-color-surface-elevated);
 }
@@ -14,13 +14,13 @@
   gap: 0.35rem;
   font-size: 0.82rem;
   font-weight: 600;
-  color: var(--iz-color-slate-muted);
+  color: var(--iz-color-text-muted);
 }
 
 .product-review-form__textarea {
   min-height: 5.5rem;
   padding: 0.55rem 0.65rem;
-  border: 1px solid var(--iz-color-border-muted);
+  border: 1px solid var(--iz-color-border);
   border-radius: 0.5rem;
   font: inherit;
   font-size: 0.9rem;
@@ -30,7 +30,7 @@
 .product-review-form__meter {
   align-self: flex-end;
   font-size: 0.78rem;
-  color: var(--iz-color-text-subtle);
+  color: var(--iz-color-text-muted);
 }
 
 .product-review-form__actions {
@@ -58,10 +58,10 @@
 
 .product-review-form__delete {
   padding: 0.45rem 1rem;
-  border: 1px solid var(--iz-color-border-subtle);
+  border: 1px solid var(--iz-color-border);
   border-radius: 0.5rem;
   background: var(--iz-color-surface);
-  color: var(--iz-color-danger-deep);
+  color: var(--iz-color-danger);
   font: inherit;
   font-size: 0.9rem;
   font-weight: 600;

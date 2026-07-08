@@ -15,14 +15,6 @@ const ROW_RADIUS = 12;
 const THUMB_SIZE = 52;
 const THUMB_RADIUS = 7.2;
 
-const SUCCESS_TEAL_BRIGHT = "#0d9488";
-const SUCCESS_PALE = "#dcfce7";
-const SUCCESS_FOREST = "#065f46";
-const WARNING_YELLOW_SOFT = "#fefce8";
-const WARNING_BROWN_DARK = "#854d0e";
-const DANGER_STRONG = "#b42318";
-const DANGER_SURFACE = "#fef3f2";
-
 export const useAuctionPageStyles = createThemedStyles((theme) => ({
   container: {
     flex: 1,
@@ -50,7 +42,7 @@ export const useAuctionPageStyles = createThemedStyles((theme) => ({
     borderRadius: TOOLBAR_RADIUS,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: "rgba(217, 119, 6, 0.24)",
-    backgroundColor: WARNING_YELLOW_SOFT,
+    backgroundColor: theme.colors.warningSurface,
   },
   toolbarHead: {
     flexDirection: "row",
@@ -146,8 +138,8 @@ export const useAuctionPageStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
   },
   viewChipActive: {
-    borderColor: "#d97706",
-    backgroundColor: "#d97706",
+    borderColor: theme.colors.warning,
+    backgroundColor: theme.colors.warning,
   },
   viewChipText: {
     fontSize: 14.4,
@@ -175,8 +167,8 @@ export const useAuctionPageStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
   },
   overviewTileActive: {
-    borderColor: "#d97706",
-    backgroundColor: WARNING_YELLOW_SOFT,
+    borderColor: theme.colors.warning,
+    backgroundColor: theme.colors.warningSurface,
   },
   overviewTileAttention: {
     borderColor: "rgba(217, 119, 6, 0.45)",
@@ -195,7 +187,7 @@ export const useAuctionPageStyles = createThemedStyles((theme) => ({
     fontVariant: ["tabular-nums"],
   },
   overviewValueAttention: {
-    color: WARNING_BROWN_DARK,
+    color: theme.colors.warningText,
   },
   listActions: {
     flexDirection: "row",
@@ -240,7 +232,7 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
     elevation: 1,
   },
   rowAttention: {
-    borderLeftColor: "#d97706",
+    borderLeftColor: theme.colors.warning,
     shadowOpacity: 0.1,
   },
   headLine: {
@@ -358,10 +350,10 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
     borderRadius: 999,
   },
   statusPillPending: {
-    backgroundColor: WARNING_YELLOW_SOFT,
+    backgroundColor: theme.colors.warningSurface,
   },
   statusPillAccepted: {
-    backgroundColor: SUCCESS_PALE,
+    backgroundColor: theme.colors.successSurface,
   },
   statusPillText: {
     fontSize: 12,
@@ -370,10 +362,10 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
     flexShrink: 1,
   },
   statusPillTextPending: {
-    color: WARNING_BROWN_DARK,
+    color: theme.colors.warningText,
   },
   statusPillTextAccepted: {
-    color: SUCCESS_FOREST,
+    color: theme.colors.successText,
   },
   priceStrip: {
     flexDirection: "row",
@@ -478,7 +470,7 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
   },
   decisionBtnAccept: {
     borderColor: "transparent",
-    backgroundColor: SUCCESS_TEAL_BRIGHT,
+    backgroundColor: theme.colors.success,
   },
   decisionBtnReject: {
     borderColor: "rgba(180, 35, 24, 0.7)",
@@ -493,7 +485,7 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
   decisionBtnTextReject: {
     fontSize: 14.08,
     fontWeight: "700",
-    color: DANGER_STRONG,
+    color: theme.colors.danger,
     textAlign: "center",
   },
   cta: {
@@ -515,12 +507,12 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
   },
   error: {
     fontSize: 13.6,
-    color: DANGER_STRONG,
+    color: theme.colors.danger,
   },
   disabled: {
     opacity: 0.65,
   },
   rejectPressed: {
-    backgroundColor: DANGER_SURFACE,
+    backgroundColor: theme.colors.dangerSurface,
   },
 }));

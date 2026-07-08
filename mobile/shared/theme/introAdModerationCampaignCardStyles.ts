@@ -2,8 +2,6 @@ import { StyleSheet } from "react-native";
 
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-const DANGER_STRONG = "#b42318";
-
 export const useIntroAdModerationCampaignCardStyles = createThemedStyles((theme) => ({
   card: {
     gap: 10,
@@ -45,7 +43,7 @@ export const useIntroAdModerationCampaignCardStyles = createThemedStyles((theme)
     paddingHorizontal: 13.6,
     borderRadius: 8,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: DANGER_STRONG,
+    borderColor: theme.colors.danger,
     backgroundColor: theme.colors.surface,
   },
   cancelButton: {
@@ -70,7 +68,7 @@ export const useIntroAdModerationCampaignCardStyles = createThemedStyles((theme)
   dangerButtonText: {
     fontSize: 14,
     fontWeight: "500",
-    color: DANGER_STRONG,
+    color: theme.colors.danger,
   },
   cancelButtonText: {
     fontSize: 14,

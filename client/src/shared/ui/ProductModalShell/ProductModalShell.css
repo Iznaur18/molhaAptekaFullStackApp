@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--iz-space-4);
-  background: var(--iz-color-overlay-backdrop);
+  background: var(--iz-color-overlay);
 }
 
 .product-modal-shell__panel {
@@ -83,7 +83,7 @@
 }
 
 .product-modal-shell__close:hover {
-  background: var(--iz-color-overlay-hover);
+  background: var(--iz-color-overlay-subtle);
   color: var(--iz-color-text);
 }
 

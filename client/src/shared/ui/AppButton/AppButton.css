@@ -37,13 +37,13 @@ button:not([class]):hover:not(:disabled) {
 }
 
 .app-btn--primary {
-  border-color: var(--iz-color-accent-purple);
-  background: var(--iz-color-accent-purple-soft);
-  color: var(--iz-color-accent-purple-text);
+  border-color: var(--iz-color-accent);
+  background: var(--iz-color-accent-soft);
+  color: var(--iz-color-accent);
 }
 
 .app-btn--primary:hover:not(:disabled) {
-  background: var(--iz-color-accent-purple-hover);
+  background: var(--iz-color-accent-soft);
 }
 
 .app-btn--cancel {
@@ -53,13 +53,13 @@ button:not([class]):hover:not(:disabled) {
 }
 
 .app-btn--cancel:hover:not(:disabled) {
-  border-color: var(--iz-color-danger-strong);
-  background: var(--iz-color-danger-strong);
+  border-color: var(--iz-color-danger);
+  background: var(--iz-color-danger);
 }
 
 .app-btn--danger {
-  border-color: var(--iz-color-danger-coral);
-  background: var(--iz-color-danger-soft);
+  border-color: var(--iz-color-danger);
+  background: var(--iz-color-danger-surface);
   color: var(--iz-color-danger-text);
 }
 

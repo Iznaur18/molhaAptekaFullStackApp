@@ -51,7 +51,7 @@
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--iz-color-text-subtle);
+  color: var(--iz-color-text-muted);
 }
 
 .product-details-modal__row--price .product-details-modal__value {
@@ -136,7 +136,7 @@
   padding: 0.55rem 0.65rem;
   border-radius: var(--iz-radius-input);
   background: var(--iz-color-surface-elevated);
-  border: 1px solid var(--iz-color-neutral-gray-subtle);
+  border: 1px solid var(--iz-color-surface-muted);
 }
 
 .product-details-modal__row--meta .product-details-modal__key {
@@ -144,13 +144,13 @@
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--iz-color-neutral-gray);
+  color: var(--iz-color-text-muted);
 }
 
 .product-details-modal__row--meta .product-details-modal__value {
   font-size: 0.78rem;
   font-weight: 500;
-  color: var(--iz-color-slate);
+  color: var(--iz-color-text-secondary);
   word-break: break-all;
 }
 
@@ -183,7 +183,7 @@
 }
 
 .product-details-modal__seller-link:hover {
-  color: var(--iz-color-link-hover);
+  color: var(--iz-color-action-hover);
 }
 
 .product-details-modal__image-url-list {

@@ -209,7 +209,9 @@ export default function CatalogScreen() {
           showCuratedLists={showCuratedProductLists}
         />
       ) : null}
-      {showHomeFeed ? <CatalogBreadcrumb label={HOME_PAGE_UI.BREADCRUMB_HOME} /> : null}
+      {showHomeFeed ? (
+        <CatalogBreadcrumb label={HOME_PAGE_UI.BREADCRUMB_HOME} compactTop />
+      ) : null}
     </View>
   );
 

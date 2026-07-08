@@ -1,10 +1,10 @@
 .product-moderation-page__state {
   margin: 0 0 1rem;
-  color: var(--iz-color-neutral-gray-deep);
+  color: var(--iz-color-text-secondary);
 }
 
 .product-moderation-page__state_error {
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }
 
 .product-moderation-badge {
@@ -18,16 +18,16 @@
 }
 
 .product-moderation-badge_pending {
-  background: var(--iz-color-warning-cream);
-  color: var(--iz-color-warning-brown-deep);
+  background: var(--iz-color-warning-surface);
+  color: var(--iz-color-warning-text);
 }
 
 .product-moderation-badge_approved {
-  background: var(--iz-color-success-badge);
-  color: var(--iz-color-success-strong);
+  background: var(--iz-color-success-surface);
+  color: var(--iz-color-success);
 }
 
 .product-moderation-badge_rejected {
-  background: var(--iz-color-danger-blush-deep);
-  color: var(--iz-color-danger-strong);
+  background: var(--iz-color-danger-surface);
+  color: var(--iz-color-danger);
 }

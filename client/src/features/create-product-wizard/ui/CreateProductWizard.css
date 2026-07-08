@@ -15,7 +15,7 @@
   padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
   border: none;
-  border-inline: 1px solid color-mix(in srgb, var(--iz-color-action-light) 45%, var(--iz-color-border));
+  border-inline: 1px solid color-mix(in srgb, var(--iz-color-action-soft) 45%, var(--iz-color-border));
   box-shadow:
     0 18px 48px color-mix(in srgb, var(--iz-color-ink) 16%, transparent),
     0 0 0 1px color-mix(in srgb, var(--iz-color-surface) 80%, transparent);
@@ -88,15 +88,15 @@
   margin: 0;
   padding: 0.55rem 0.7rem;
   border-radius: 0.55rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-danger-strong) 35%, transparent);
-  background: color-mix(in srgb, var(--iz-color-danger-soft) 70%, var(--iz-color-surface));
-  color: var(--iz-color-danger-strong);
+  border: 1px solid color-mix(in srgb, var(--iz-color-danger) 35%, transparent);
+  background: color-mix(in srgb, var(--iz-color-danger-surface) 70%, var(--iz-color-surface));
+  color: var(--iz-color-danger);
   font-size: 0.88rem;
 }
 
 .create-product-wizard__footer {
   border-top: 1px solid color-mix(in srgb, var(--iz-color-border) 80%, transparent);
-  background: color-mix(in srgb, var(--iz-color-surface-alt) 40%, var(--iz-color-surface));
+  background: color-mix(in srgb, var(--iz-color-surface-elevated) 40%, var(--iz-color-surface));
   padding-inline: 1.25rem;
   padding-bottom: max(var(--iz-space-4), env(safe-area-inset-bottom, 0px));
 }
@@ -129,7 +129,7 @@
 }
 
 .create-product-wizard__back:hover:not(:disabled) {
-  background: var(--iz-color-surface-alt);
+  background: var(--iz-color-surface-elevated);
 }
 
 .create-product-wizard__back_placeholder {

@@ -8,13 +8,13 @@
 }
 
 .email-verification-notice_success {
-  background: var(--iz-color-success-mint);
-  border: 1px solid var(--iz-color-success-light);
+  background: var(--iz-color-success-surface);
+  border: 1px solid var(--iz-color-success-surface);
 }
 
 .email-verification-notice_error {
-  background: var(--iz-color-danger-blush);
-  border: 1px solid var(--iz-color-danger-salmon-soft);
+  background: var(--iz-color-danger-surface);
+  border: 1px solid var(--iz-color-danger-surface);
 }
 
 .email-verification-notice__text {
@@ -24,11 +24,11 @@
 }
 
 .email-verification-notice_success .email-verification-notice__text {
-  color: var(--iz-color-success-deep);
+  color: var(--iz-color-success-text);
 }
 
 .email-verification-notice_error .email-verification-notice__text {
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }
 
 .email-verification-notice__dismiss {

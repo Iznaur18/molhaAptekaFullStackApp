@@ -1,3 +1,4 @@
+import { semanticColors } from "@/shared/theme/semanticColors";
 import { Feather } from "@expo/vector-icons";
 import { useMemo, useState } from "react";
 import { Image } from "expo-image";
@@ -91,7 +92,7 @@ export const ProfileOverviewBanner = ({
             onPress={onEditPress}
             accessibilityLabel={MY_PROFILE_PAGE_UI.EDIT_PROFILE}
           >
-            <Feather name="edit-2" size={16} color="#111827" />
+            <Feather name="edit-2" size={16} color={semanticColors.text} />
           </Pressable>
         ) : null}
       </View>

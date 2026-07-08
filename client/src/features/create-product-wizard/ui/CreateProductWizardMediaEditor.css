@@ -2,7 +2,7 @@
   padding: 0.85rem;
   border: 1px solid color-mix(in srgb, var(--iz-color-border) 85%, transparent);
   border-radius: 0.9rem;
-  background: color-mix(in srgb, var(--iz-color-surface-alt) 45%, var(--iz-color-surface));
+  background: color-mix(in srgb, var(--iz-color-surface-elevated) 45%, var(--iz-color-surface));
 }
 
 .create-product-wizard-media-editor__head {
@@ -26,10 +26,10 @@
   gap: 0.35rem;
   margin: 0;
   padding: 0.35rem 0.55rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-danger-strong) 28%, transparent);
+  border: 1px solid color-mix(in srgb, var(--iz-color-danger) 28%, transparent);
   border-radius: 0.55rem;
-  background: color-mix(in srgb, var(--iz-color-danger-soft) 70%, var(--iz-color-surface));
-  color: var(--iz-color-danger-strong);
+  background: color-mix(in srgb, var(--iz-color-danger-surface) 70%, var(--iz-color-surface));
+  color: var(--iz-color-danger);
   font: inherit;
   font-size: 0.78rem;
   font-weight: 600;
@@ -37,7 +37,7 @@
 }
 
 .create-product-wizard-media-editor__remove:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--iz-color-danger-soft) 100%, var(--iz-color-surface));
+  background: color-mix(in srgb, var(--iz-color-danger-surface) 100%, var(--iz-color-surface));
 }
 
 .create-product-wizard-media-editor__remove:disabled {
@@ -67,7 +67,7 @@
 
 .create-product-wizard-media-editor__move:hover:not(:disabled) {
   border-color: var(--iz-color-action);
-  color: var(--iz-color-link-hover);
+  color: var(--iz-color-action-hover);
   background: color-mix(in srgb, var(--iz-color-action-soft) 55%, var(--iz-color-surface));
 }
 

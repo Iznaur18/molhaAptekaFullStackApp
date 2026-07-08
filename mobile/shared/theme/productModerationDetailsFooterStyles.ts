@@ -2,9 +2,6 @@ import { StyleSheet } from "react-native";
 
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-const DANGER_STRONG = "#b42318";
-const SUCCESS_STRONG = "#047857";
-
 export const useProductModerationDetailsFooterStyles = createThemedStyles((theme) => ({
   root: {
     gap: 12,
@@ -15,7 +12,7 @@ export const useProductModerationDetailsFooterStyles = createThemedStyles((theme
   error: {
     fontSize: 14,
     lineHeight: 20,
-    color: DANGER_STRONG,
+    color: theme.colors.danger,
   },
   rejectLabel: {
     gap: 5.6,
@@ -53,15 +50,15 @@ export const useProductModerationDetailsFooterStyles = createThemedStyles((theme
     paddingHorizontal: 13.6,
     borderRadius: 8,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: SUCCESS_STRONG,
-    backgroundColor: SUCCESS_STRONG,
+    borderColor: theme.colors.successText,
+    backgroundColor: theme.colors.successText,
   },
   rejectButton: {
     paddingVertical: 7.2,
     paddingHorizontal: 13.6,
     borderRadius: 8,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: DANGER_STRONG,
+    borderColor: theme.colors.danger,
     backgroundColor: theme.colors.surface,
   },
   approveButtonCompact: {
@@ -83,6 +80,6 @@ export const useProductModerationDetailsFooterStyles = createThemedStyles((theme
   rejectText: {
     fontSize: 14,
     fontWeight: "500",
-    color: DANGER_STRONG,
+    color: theme.colors.danger,
   },
 }));

@@ -16,7 +16,6 @@ const VISUAL_CONTROL_INSET = 16;
 const VISUAL_CONTROL_BORDER_RADIUS = 8;
 const VISUAL_CONTROL_GAP = 4;
 const BANNER_BOTTOM_MARGIN = HOME_FEED_SECTION_GAP;
-const RAFFLE_PRIMARY_BLUE = "#1d9bf0";
 
 /** Паритет с CuratedProductListCarousel section chrome на главной. */
 const RAFFLE_SECTION_CARD_BORDER_RADIUS = 16;
@@ -160,7 +159,7 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     borderColor: P.onContrast,
     borderRadius: VISUAL_CONTROL_BORDER_RADIUS,
     backgroundColor: "rgba(0,0,0,0.45)",
-    shadowColor: "#000",
+    shadowColor: theme.colors.ink,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.35,
     shadowRadius: 4,
@@ -175,7 +174,7 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     borderWidth: 0,
     borderRadius: VISUAL_CONTROL_BORDER_RADIUS,
     backgroundColor: theme.colors.surface,
-    shadowColor: "#000",
+    shadowColor: theme.colors.ink,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
@@ -270,13 +269,13 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
   progressFill: {
     height: "100%",
     borderRadius: 999,
-    backgroundColor: RAFFLE_PRIMARY_BLUE,
+    backgroundColor: theme.colors.action,
   },
   progressFillBackdrop: {
     backgroundColor: P.onContrast,
   },
   progressFillCompleted: {
-    backgroundColor: RAFFLE_PRIMARY_BLUE,
+    backgroundColor: theme.colors.action,
   },
   progressLabel: {
     marginTop: L.progressLabelMarginTop,
@@ -297,10 +296,10 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     paddingVertical: 7.2,
     paddingHorizontal: 12,
     borderRadius: 10,
-    backgroundColor: RAFFLE_PRIMARY_BLUE,
+    backgroundColor: theme.colors.action,
   },
   btnPrimaryCompleted: {
-    backgroundColor: RAFFLE_PRIMARY_BLUE,
+    backgroundColor: theme.colors.action,
   },
   btnPrimaryText: {
     fontSize: 13.6,
@@ -330,7 +329,7 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useRaffleManageActionsStyles = createThemedStyles(() => ({
+export const useRaffleManageActionsStyles = createThemedStyles((theme) => ({
   root: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -345,7 +344,7 @@ export const useRaffleManageActionsStyles = createThemedStyles(() => ({
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#000",
+    shadowColor: theme.colors.ink,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.08,
     shadowRadius: 2,
@@ -383,7 +382,7 @@ export const useRaffleManageActionsStyles = createThemedStyles(() => ({
   },
 }));
 
-export const useRaffleFeaturedBannerManageMenuStyles = createThemedStyles(() => ({
+export const useRaffleFeaturedBannerManageMenuStyles = createThemedStyles((theme) => ({
   toggle: {
     width: VISUAL_CONTROL_SIZE,
     height: VISUAL_CONTROL_SIZE,
@@ -393,7 +392,7 @@ export const useRaffleFeaturedBannerManageMenuStyles = createThemedStyles(() => 
     borderColor: P.onContrast,
     borderRadius: 999,
     backgroundColor: "rgba(0,0,0,0.45)",
-    shadowColor: "#000",
+    shadowColor: theme.colors.ink,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.35,
     shadowRadius: 4,
@@ -423,7 +422,7 @@ export const useRaffleFeaturedBannerManageMenuStyles = createThemedStyles(() => 
     borderWidth: 1,
     borderColor: P.premiumPurpleMuted,
     backgroundColor: P.accentPinkSurface,
-    shadowColor: "#000",
+    shadowColor: theme.colors.ink,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.16,
     shadowRadius: 12,
@@ -532,9 +531,7 @@ export const useRaffleDescriptionModalStyles = createThemedStyles((theme) => ({
 }));
 
 export const useRaffleFeaturedSectionStyles = createThemedStyles((theme) => ({
-  root: {
-    marginBottom: HOME_FEED_SECTION_GAP,
-  },
+  root: {},
   sectionCard: {
     paddingHorizontal: RAFFLE_SECTION_CARD_PADDING_HORIZONTAL,
     paddingVertical: RAFFLE_SECTION_CARD_PADDING_VERTICAL,

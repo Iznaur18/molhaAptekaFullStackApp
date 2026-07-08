@@ -13,16 +13,16 @@
 
 .catalog-subcategory-picker__back {
   padding: 0.35rem 0.75rem;
-  border: 1px solid var(--iz-color-border-subtle);
+  border: 1px solid var(--iz-color-border);
   border-radius: 999px;
   background: var(--iz-color-surface);
-  color: var(--iz-color-link-deep);
+  color: var(--iz-color-action);
   font-size: 0.875rem;
   cursor: pointer;
 }
 
 .catalog-subcategory-picker__back:hover {
-  border-color: var(--iz-color-premium-indigo-muted);
+  border-color: var(--iz-color-accent-soft);
 }
 
 .catalog-subcategory-picker__title {
@@ -34,5 +34,5 @@
 
 .catalog-subcategory-picker__error {
   margin: 0;
-  color: var(--iz-color-danger-deep);
+  color: var(--iz-color-danger);
 }

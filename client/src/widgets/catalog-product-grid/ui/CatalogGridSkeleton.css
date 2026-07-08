@@ -2,7 +2,7 @@
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--iz-color-border-subtle);
+  border: 1px solid var(--iz-color-border);
   border-radius: 12px;
   background: var(--iz-color-surface);
   overflow: hidden;
@@ -15,7 +15,7 @@
   background: linear-gradient(
     90deg,
     var(--iz-color-surface-elevated) 0%,
-    var(--iz-color-border-subtle) 50%,
+    var(--iz-color-border) 50%,
     var(--iz-color-surface-elevated) 100%
   );
   background-size: 200% 100%;
@@ -41,7 +41,7 @@
   background: linear-gradient(
     90deg,
     var(--iz-color-surface-elevated) 0%,
-    var(--iz-color-border-subtle) 50%,
+    var(--iz-color-border) 50%,
     var(--iz-color-surface-elevated) 100%
   );
   background-size: 200% 100%;

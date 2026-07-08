@@ -27,7 +27,7 @@
 }
 
 .product-manage-toggle-row:focus-visible {
-  outline: 2px solid var(--iz-color-action-outline);
+  outline: 2px solid var(--iz-color-focus-ring);
   outline-offset: 2px;
 }
 
@@ -48,7 +48,7 @@
 }
 
 .product-manage-toggle-row_danger {
-  border: 1px solid color-mix(in srgb, var(--iz-color-danger-strong) 35%, transparent);
+  border: 1px solid color-mix(in srgb, var(--iz-color-danger) 35%, transparent);
   border-radius: 0.65rem;
   min-height: auto;
   padding: 0.65rem 0.75rem;

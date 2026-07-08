@@ -28,11 +28,11 @@
 }
 
 .login-modal__message_error {
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }
 
 .login-modal__message_success {
-  color: var(--iz-color-success-strong);
+  color: var(--iz-color-success);
 }
 
 .login-modal__submit {

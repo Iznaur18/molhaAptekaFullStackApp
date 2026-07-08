@@ -5,7 +5,7 @@ export const SITE_HEADER_BANNER_LAYOUT = {
   radius: 16,
   dotSize: 6,
   dotGap: 6,
-  dotsTopMargin: 6,
+  dotsBottomInset: 8,
   adBadgeInset: 10,
   adBadgePaddingHorizontal: 10,
   adBadgePaddingVertical: 2,

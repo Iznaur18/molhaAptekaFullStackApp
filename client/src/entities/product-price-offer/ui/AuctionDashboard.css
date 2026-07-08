@@ -51,11 +51,11 @@
 .auction-dashboard__state {
   margin: 0;
   font-size: 1rem;
-  color: var(--iz-color-text-tertiary);
+  color: var(--iz-color-text-secondary);
 }
 
 .auction-dashboard__state_error {
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }
 
 .auction-dashboard-row {
@@ -63,16 +63,16 @@
   flex-direction: column;
   gap: 0.55rem;
   padding: 0.75rem;
-  border: 1px solid var(--iz-color-border-subtle);
-  border-left: 3px solid var(--iz-color-border-subtle);
+  border: 1px solid var(--iz-color-border);
+  border-left: 3px solid var(--iz-color-border);
   border-radius: 0.75rem;
   background: var(--iz-color-surface);
   box-shadow: 0 1px 0 color-mix(in srgb, var(--iz-color-ink) 4%, transparent);
 }
 
 .auction-dashboard-row_attention {
-  border-left-color: var(--iz-color-warning-bright);
-  box-shadow: 0 1px 4px color-mix(in srgb, var(--iz-color-warning-bright) 16%, transparent);
+  border-left-color: var(--iz-color-warning);
+  box-shadow: 0 1px 4px color-mix(in srgb, var(--iz-color-warning) 16%, transparent);
 }
 
 .auction-dashboard-row__head-line {
@@ -129,7 +129,7 @@
   border: 1px solid var(--iz-color-border);
   border-radius: 0.45rem;
   object-fit: cover;
-  background: var(--iz-color-surface-subtle);
+  background: var(--iz-color-surface-muted);
 }
 
 .auction-dashboard-row__thumb_placeholder {
@@ -153,7 +153,7 @@
   padding: 0;
   border: 0;
   background: transparent;
-  color: var(--iz-color-link-hover);
+  color: var(--iz-color-action-hover);
   font: inherit;
   font-weight: 600;
   text-align: left;
@@ -214,13 +214,13 @@
 }
 
 .auction-dashboard-row__status-pill_pending {
-  background: var(--iz-color-warning-yellow-soft);
-  color: var(--iz-color-warning-brown-dark);
+  background: var(--iz-color-warning-surface);
+  color: var(--iz-color-warning-text);
 }
 
 .auction-dashboard-row__status-pill_accepted {
-  background: var(--iz-color-success-pale);
-  color: var(--iz-color-success-forest);
+  background: var(--iz-color-success-surface);
+  color: var(--iz-color-success-text);
 }
 
 .auction-dashboard-row__status {
@@ -234,7 +234,7 @@
 }
 
 .auction-dashboard-row__status_accepted {
-  color: var(--iz-color-success-strong);
+  color: var(--iz-color-success);
 }
 
 .auction-dashboard-row__editor {
@@ -307,7 +307,7 @@
 }
 
 .auction-dashboard-row__composer-submit:hover:not(:disabled) {
-  background: var(--iz-color-link-hover);
+  background: var(--iz-color-action-hover);
 }
 
 .auction-dashboard-row__composer-submit:disabled {
@@ -345,7 +345,7 @@
 }
 
 .auction-dashboard-row__decision-btn_accept {
-  background: var(--iz-color-success-teal-bright);
+  background: var(--iz-color-success);
   color: var(--iz-color-on-contrast);
 }
 
@@ -356,7 +356,7 @@
 .auction-dashboard-row__decision-btn_reject {
   border-color: color-mix(in srgb, var(--iz-color-danger-border) 70%, transparent);
   background: var(--iz-color-surface);
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }
 
 .auction-dashboard-row__decision-btn_reject:hover:not(:disabled) {
@@ -373,7 +373,7 @@
   background: linear-gradient(
     135deg,
     var(--iz-color-link) 0%,
-    var(--iz-color-link-hover) 100%
+    var(--iz-color-action-hover) 100%
   );
   color: var(--iz-color-on-contrast);
   font: inherit;
@@ -390,14 +390,14 @@
 .auction-dashboard-row__error {
   margin: 0;
   font-size: 0.85rem;
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }
 
 .auction-dashboard-row__buyer-link {
   padding: 0;
   border: 0;
   background: transparent;
-  color: var(--iz-color-link-hover);
+  color: var(--iz-color-action-hover);
   font: inherit;
   font-weight: 600;
   cursor: pointer;

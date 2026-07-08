@@ -25,11 +25,11 @@
 .admin-user-modal-footer__btn_edit {
   border-color: var(--iz-color-link);
   background: var(--iz-color-action-soft);
-  color: var(--iz-color-link-hover);
+  color: var(--iz-color-action-hover);
 }
 
 .admin-user-modal-footer__btn_delete {
   border-color: var(--iz-color-danger-border);
   background: var(--iz-color-danger-surface);
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }

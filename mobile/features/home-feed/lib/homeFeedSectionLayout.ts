@@ -1,2 +1,2 @@
 /** Вертикальный зазор между блоками главной ленты (баннер, розыгрыш, сториз, подборки). */
-export const HOME_FEED_SECTION_GAP = 16;
+export const HOME_FEED_SECTION_GAP = 8;

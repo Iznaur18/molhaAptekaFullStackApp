@@ -1,9 +1,6 @@
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-const DANGER_STRONG = "#b42318";
-const NEUTRAL_GRAY_DEEP = "#4b5563";
-
 export const useSellerPersonalCategoryModerationPageStyles = createThemedStyles((theme) => ({
   container: {
     flex: 1,
@@ -25,15 +22,15 @@ export const useSellerPersonalCategoryModerationPageStyles = createThemedStyles(
     marginBottom: 16,
     fontSize: 15.2,
     lineHeight: 22,
-    color: NEUTRAL_GRAY_DEEP,
+    color: theme.colors.textSecondary,
   },
   stateError: {
-    color: DANGER_STRONG,
+    color: theme.colors.danger,
   },
   empty: {
     fontSize: 15.2,
     lineHeight: 22,
-    color: NEUTRAL_GRAY_DEEP,
+    color: theme.colors.textSecondary,
     textAlign: "center",
     paddingVertical: 8,
   },

@@ -1,6 +1,7 @@
 import { StyleSheet } from "react-native";
 
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
+import { semanticColors } from "@/shared/theme/semanticColors";
 
 export const PRODUCT_PHOTO_GRID_COLUMNS = 3;
 export const PRODUCT_PHOTO_GRID_GAP = 8;
@@ -110,7 +111,7 @@ export const useProductPhotoGridStyles = createThemedStyles((theme) => ({
   coverBadgeText: {
     fontSize: 11,
     fontWeight: "700",
-    color: "#ffffff",
+    color: theme.colors.onContrast,
   },
   removeBadge: {
     position: "absolute",
@@ -127,7 +128,7 @@ export const useProductPhotoGridStyles = createThemedStyles((theme) => ({
     fontSize: 12,
     fontWeight: "700",
     lineHeight: 14,
-    color: "#ffffff",
+    color: theme.colors.onContrast,
   },
   uploadingTile: {
     alignItems: "center",
@@ -174,7 +175,7 @@ export const useProductPhotoGridStyles = createThemedStyles((theme) => ({
 }));
 
 /** Совпадает с --iz-color-warning-amber в designTokens.css */
-export const PRODUCT_DETAIL_DOCK_WARNING_AMBER = "#eab308";
+export const PRODUCT_DETAIL_DOCK_WARNING_AMBER = semanticColors.warning;
 
 export const useAddToCartButtonStyles = createThemedStyles((theme) => ({
   addButton: {

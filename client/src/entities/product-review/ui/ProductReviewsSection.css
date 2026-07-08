@@ -16,14 +16,14 @@
   margin: 0 0 0.35rem;
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--iz-color-slate);
+  color: var(--iz-color-text-secondary);
 }
 
 
 .product-reviews-section__state {
   margin: 0;
   font-size: 0.875rem;
-  color: var(--iz-color-text-subtle);
+  color: var(--iz-color-text-muted);
 }
 
 .product-reviews-section__list {
@@ -57,10 +57,10 @@
 .product-reviews-section__more {
   align-self: center;
   padding: 0.4rem 0.9rem;
-  border: 1px solid var(--iz-color-border-subtle);
+  border: 1px solid var(--iz-color-border);
   border-radius: 0.5rem;
   background: var(--iz-color-surface);
-  color: var(--iz-color-slate);
+  color: var(--iz-color-text-secondary);
   font: inherit;
   font-size: 0.875rem;
   cursor: pointer;
@@ -97,7 +97,7 @@
 .product-reviews-section__delete {
   border: 1px solid var(--iz-color-danger-border);
   background: var(--iz-color-surface);
-  color: var(--iz-color-danger-deep);
+  color: var(--iz-color-danger);
 }
 
 .product-reviews-section__cancel-edit {

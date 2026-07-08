@@ -84,7 +84,7 @@
     left: 0.65rem;
     width: 2.5rem;
     height: 2.5rem;
-    background: color-mix(in srgb, var(--iz-color-canvas) 92%, transparent);
+    background: color-mix(in srgb, var(--iz-color-surface) 92%, transparent);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
   }
@@ -118,10 +118,10 @@
     overflow: hidden;
     border: none;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--iz-color-canvas) 92%, transparent);
+    background: color-mix(in srgb, var(--iz-color-surface) 92%, transparent);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    color: var(--iz-color-danger-strong);
+    color: var(--iz-color-danger);
     font-size: 0;
     line-height: 0;
     box-shadow: 0 1px 4px color-mix(in srgb, var(--iz-color-ink) 14%, transparent);
@@ -142,8 +142,8 @@
     .product-media-gallery-readonly__report-slot
     .product-details-modal__footer-btn--report:hover:not(:disabled) {
     border: none;
-    background: var(--iz-color-canvas);
-    color: var(--iz-color-danger-strong);
+    background: var(--iz-color-surface);
+    color: var(--iz-color-danger);
   }
 
   .product-details-modal

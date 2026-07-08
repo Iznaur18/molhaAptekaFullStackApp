@@ -32,5 +32,5 @@
 .user-follow-button__error {
   margin: 0;
   font-size: 0.75rem;
-  color: var(--iz-color-danger-deep);
+  color: var(--iz-color-danger);
 }

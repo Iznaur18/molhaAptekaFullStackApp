@@ -9,12 +9,12 @@
 }
 
 .installment-contract-card_completed {
-  border-color: var(--iz-color-success-light);
+  border-color: var(--iz-color-success-surface);
   background: var(--iz-color-success-surface);
 }
 
 .installment-contract-card_completed .installment-contract-card__amount {
-  color: var(--iz-color-success-muted);
+  color: var(--iz-color-success-text);
 }
 
 .installment-contract-card__header {
@@ -51,7 +51,7 @@
   padding: 0.2rem 0.5rem;
   border-radius: 0.35rem;
   background: var(--iz-color-danger-surface);
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
   font-size: 0.75rem;
   font-weight: 600;
 }
@@ -122,7 +122,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.65rem 0.75rem;
-  border: 1px solid var(--iz-color-surface-subtle);
+  border: 1px solid var(--iz-color-surface-muted);
   border-radius: 0.5rem;
   font-size: 0.875rem;
   line-height: 1.35;
@@ -145,7 +145,7 @@
   height: 1.5rem;
   padding: 0 0.45rem;
   border-radius: 999px;
-  background: var(--iz-color-overlay-hover);
+  background: var(--iz-color-overlay-subtle);
   font-size: inherit;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -167,8 +167,8 @@
 
 .installment-contract-card__payment_remaining {
   border-color: var(--iz-color-border-strong);
-  background: var(--iz-color-surface-subtle);
-  color: var(--iz-color-text-tertiary);
+  background: var(--iz-color-surface-muted);
+  color: var(--iz-color-text-secondary);
 }
 
 .installment-contract-card__payment_remaining
@@ -182,25 +182,25 @@
 }
 
 .installment-contract-card__payment_pending {
-  border-color: var(--iz-color-warning-yellow-pale);
-  background: var(--iz-color-warning-yellow-soft);
+  border-color: var(--iz-color-warning);
+  background: var(--iz-color-warning-surface);
 }
 
 .installment-contract-card__payment_paid {
-  border-color: var(--iz-color-success-light);
+  border-color: var(--iz-color-success-surface);
   background: var(--iz-color-success-surface);
 }
 
 .installment-contract-card__payment_paid .installment-contract-card__amount {
-  color: var(--iz-color-success-muted);
+  color: var(--iz-color-success-text);
 }
 
 .installment-contract-card__payment_overdue .installment-contract-card__amount {
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }
 
 .installment-contract-card__payment_pending .installment-contract-card__amount {
-  color: var(--iz-color-warning-brown-dark);
+  color: var(--iz-color-warning-text);
 }
 
 .installment-contract-card__actions {
@@ -233,7 +233,7 @@
 .installment-contract-card__btn_danger {
   border-color: var(--iz-color-danger-border);
   background: var(--iz-color-surface);
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }
 
 .installment-contract-card__btn_cancel {
@@ -243,8 +243,8 @@
 }
 
 .installment-contract-card__btn_cancel:hover:not(:disabled) {
-  border-color: var(--iz-color-danger-strong);
-  background: var(--iz-color-danger-strong);
+  border-color: var(--iz-color-danger);
+  background: var(--iz-color-danger);
 }
 
 .installment-contract-card__payment-actions {
@@ -255,7 +255,7 @@
 
 .installment-contract-card__error {
   margin: 0;
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
   font-size: 0.85rem;
 }
 
@@ -279,14 +279,14 @@
   gap: 0.45rem;
   padding: 0.6rem 0.7rem 0.65rem;
   border-radius: 0.55rem;
-  border-color: color-mix(in srgb, var(--iz-color-border) 80%, var(--iz-color-link-deep));
-  border-left: 3px solid var(--iz-color-link-deep);
+  border-color: color-mix(in srgb, var(--iz-color-border) 80%, var(--iz-color-action));
+  border-left: 3px solid var(--iz-color-action);
   background: var(--iz-color-surface);
-  box-shadow: 0 1px 3px color-mix(in srgb, var(--iz-color-link-deep) 8%, transparent);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--iz-color-action) 8%, transparent);
 }
 
 .installment-contract-card--compact.installment-contract-card_completed {
-  border-left-color: var(--iz-color-success-teal-bright);
+  border-left-color: var(--iz-color-success);
   background: linear-gradient(
     180deg,
     var(--iz-color-surface) 0%,
@@ -299,7 +299,7 @@
   padding: 0.12rem 0.5rem;
   border-radius: 999px;
   background: var(--iz-color-action-soft);
-  color: var(--iz-color-link-hover);
+  color: var(--iz-color-action-hover);
   font-size: 0.8rem;
   font-weight: 600;
 }
@@ -307,28 +307,28 @@
 .installment-contract-card__status-pill_active,
 .installment-contract-card__status-pill_pending_first_payment {
   background: var(--iz-color-status-info-soft);
-  color: var(--iz-color-link-hover);
+  color: var(--iz-color-action-hover);
 }
 
 .installment-contract-card__status-pill_completed {
-  background: var(--iz-color-success-pale);
-  color: var(--iz-color-success-forest);
+  background: var(--iz-color-success-surface);
+  color: var(--iz-color-success-text);
 }
 
 .installment-contract-card__status-pill_defaulted {
-  background: var(--iz-color-danger-soft);
-  color: var(--iz-color-danger-strong);
+  background: var(--iz-color-danger-surface);
+  color: var(--iz-color-danger);
 }
 
 .installment-contract-card__status-pill_cancelled {
-  background: var(--iz-color-surface-alt);
+  background: var(--iz-color-surface-elevated);
   color: var(--iz-color-text-muted);
 }
 
 .installment-contract-card__progress {
   height: 0.35rem;
   border-radius: 999px;
-  background: var(--iz-color-surface-subtle);
+  background: var(--iz-color-surface-muted);
   overflow: hidden;
 }
 
@@ -348,7 +348,7 @@
   gap: 0.15rem;
   min-width: 0;
   padding: 0.45rem 0.5rem;
-  border: 1px solid var(--iz-color-border-subtle);
+  border: 1px solid var(--iz-color-border);
   border-radius: 0.55rem;
   background: var(--iz-color-surface-muted);
 }
@@ -376,7 +376,7 @@
 
 .installment-contract-card__summary-foot {
   font-size: 0.72rem;
-  color: var(--iz-color-text-subtle);
+  color: var(--iz-color-text-muted);
   line-height: 1.2;
 }
 
@@ -391,7 +391,7 @@
 }
 
 .installment-contract-card__payments-fold {
-  border: 1px solid var(--iz-color-border-subtle);
+  border: 1px solid var(--iz-color-border);
   border-radius: 0.55rem;
   background: var(--iz-color-surface-muted);
   overflow: hidden;
@@ -465,25 +465,25 @@
   align-items: center;
   padding: 0.12rem 0.45rem;
   border-radius: 999px;
-  background: var(--iz-color-surface-subtle);
+  background: var(--iz-color-surface-muted);
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--iz-color-text-secondary);
 }
 
 .installment-contract-card__payment-status_paid {
-  background: var(--iz-color-success-pale);
-  color: var(--iz-color-success-forest);
+  background: var(--iz-color-success-surface);
+  color: var(--iz-color-success-text);
 }
 
 .installment-contract-card__payment-status_overdue {
-  background: var(--iz-color-danger-soft);
-  color: var(--iz-color-danger-strong);
+  background: var(--iz-color-danger-surface);
+  color: var(--iz-color-danger);
 }
 
 .installment-contract-card__payment-status_pending {
-  background: var(--iz-color-warning-yellow-soft);
-  color: var(--iz-color-warning-brown-dark);
+  background: var(--iz-color-warning-surface);
+  color: var(--iz-color-warning-text);
 }
 
 .installment-contract-card__payment_compact .installment-contract-card__btn,

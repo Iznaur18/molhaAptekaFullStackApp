@@ -40,7 +40,7 @@
   gap: 0.75rem;
   margin-top: 0.75rem;
   padding: 0.75rem 0 1rem;
-  border-top: 1px solid var(--iz-color-surface-subtle);
+  border-top: 1px solid var(--iz-color-surface-muted);
 }
 
 .register-modal__feedback {
@@ -70,19 +70,19 @@
 }
 
 .register-modal__label--invalid {
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
   font-weight: 600;
 }
 
 .register-modal__input.register-modal__input--invalid {
-  border: 2px solid var(--iz-color-danger-rose);
-  background-color: var(--iz-color-danger-blush);
-  box-shadow: 0 0 0 1px var(--iz-color-danger-rose);
+  border: 2px solid var(--iz-color-danger);
+  background-color: var(--iz-color-danger-surface);
+  box-shadow: 0 0 0 1px var(--iz-color-danger);
 }
 
 .register-modal__input.register-modal__input--invalid:focus {
-  border-color: var(--iz-color-danger-strong);
-  outline: 2px solid var(--iz-color-danger-salmon);
+  border-color: var(--iz-color-danger);
+  outline: 2px solid var(--iz-color-danger-surface);
   outline-offset: 1px;
 }
 
@@ -93,7 +93,7 @@
 }
 
 .register-modal__message_error {
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }
 
 .register-modal__submit {

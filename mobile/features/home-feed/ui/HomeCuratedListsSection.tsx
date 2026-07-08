@@ -27,7 +27,7 @@ export const HomeCuratedListsSection = ({ lists }: HomeCuratedListsSectionProps)
   }
 
   return (
-    <View accessibilityLabel={HOME_FEED_UI.CURATED_SECTION_ARIA}>
+    <View style={styles.section} accessibilityLabel={HOME_FEED_UI.CURATED_SECTION_ARIA}>
       {lists.map((list) => (
         <View key={list._id} style={styles.listBlock}>
           <Text style={styles.title}>{list.title}</Text>

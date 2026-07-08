@@ -127,7 +127,7 @@
   align-items: center;
   gap: 0.4rem;
   font-size: 0.85rem;
-  color: var(--iz-color-text-tertiary);
+  color: var(--iz-color-text-secondary);
   cursor: pointer;
   user-select: none;
 }
@@ -173,11 +173,11 @@
 }
 
 .app-shell__category-option:hover {
-  background: var(--iz-color-action-bg-hover);
+  background: var(--iz-color-action-soft);
 }
 
 .app-shell__category-option_selected {
-  background: var(--iz-color-action-bg-selected);
+  background: var(--iz-color-action-soft);
   color: var(--iz-color-action);
   font-weight: 500;
 }
@@ -186,7 +186,7 @@
 .app-shell__list-product-button {
   margin: 0;
   padding: 0.4rem 0.85rem;
-  border: 1px solid var(--iz-color-action-border-strong);
+  border: 1px solid var(--iz-color-action-border);
   border-radius: 0.5rem;
   background: transparent;
   color: var(--iz-color-action);
@@ -199,7 +199,7 @@
 
 .app-shell__list-product-button:hover:not(:disabled) {
   border-color: var(--iz-color-action);
-  background: var(--iz-color-action-bg-hover);
+  background: var(--iz-color-action-soft);
 }
 
 .app-shell__header-nav-button--active,
@@ -299,11 +299,11 @@
 }
 
 .app-shell__state_error {
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }
 
 .app-shell__state_notice {
-  color: var(--iz-color-success-strong);
+  color: var(--iz-color-success);
 }
 
 .app-shell__grid-virtual-host {
@@ -439,7 +439,7 @@
 
 .app-shell--header-v1 .app-shell__header-nav-button--active,
 .app-shell--header-v1 .app-shell__header-nav-button--active:hover:not(:disabled) {
-  border-color: var(--iz-color-link-hover);
+  border-color: var(--iz-color-action-hover);
   background: var(--iz-gradient-header-btn);
   color: var(--iz-color-on-contrast);
   box-shadow: none;
@@ -463,19 +463,19 @@
 }
 
 .app-shell--header-v1 .header-circle-button {
-  border-color: var(--iz-color-border-subtle);
+  border-color: var(--iz-color-border);
   background: var(--iz-color-surface);
 }
 
 .app-shell--header-v1 .header-circle-button:hover {
   border-color: var(--iz-color-action);
-  background: var(--iz-color-action-bg-hover);
+  background: var(--iz-color-action-soft);
 }
 
 .app-shell--header-v1 .header-circle-button--active,
 .app-shell--header-v1 .header-circle-button--active:hover {
   border-color: var(--iz-color-action);
-  background: var(--iz-color-action-bg-active);
+  background: var(--iz-color-action-soft);
 }
 
 .app-shell--header-v1 .app-shell__auth-button {
@@ -485,12 +485,12 @@
 
 .app-shell--header-v1 .app-shell__auth-button:not(.app-shell__auth-button_secondary) {
   background: var(--iz-gradient-header-btn);
-  border-color: var(--iz-color-link-hover);
+  border-color: var(--iz-color-action-hover);
 }
 
 .app-shell--header-v1 .app-shell__category-list {
   border-radius: 12px;
-  border-color: var(--iz-color-border-subtle);
+  border-color: var(--iz-color-border);
   box-shadow: 0 12px 32px var(--iz-shadow-card-hover);
 }
 
@@ -640,7 +640,7 @@
 .app-shell--header-v2 .app-shell__view-title {
   padding: 0.28rem 0.75rem;
   border-radius: 999px;
-  background: var(--iz-color-action-bg-active);
+  background: var(--iz-color-action-soft);
   color: var(--iz-color-action);
   font-size: 0.9rem;
   white-space: nowrap;
@@ -662,7 +662,7 @@
 .app-shell--header-v2 .app-shell__header-search .search-input__field:focus {
   border-color: var(--iz-color-action);
   background: var(--iz-color-surface);
-  box-shadow: 0 0 0 3px var(--iz-color-action-focus-ring);
+  box-shadow: 0 0 0 3px var(--iz-color-focus-ring);
 }
 
 .app-shell--header-v2 .header-circle-button {
@@ -681,7 +681,7 @@
 
 .app-shell--header-v2 .header-circle-button:hover {
   border-color: transparent;
-  background: var(--iz-color-action-bg-hover);
+  background: var(--iz-color-action-soft);
   color: var(--iz-color-action);
   transform: translateY(-1px);
 }
@@ -717,7 +717,7 @@
 
 .app-shell--header-v2 .app-shell__header-filter .header-circle-button:hover {
   border-color: var(--iz-color-action);
-  background: var(--iz-color-action-bg-hover);
+  background: var(--iz-color-action-soft);
 }
 
 .app-shell--header-v2 .app-shell__auth-actions {
@@ -763,7 +763,7 @@
 }
 
 .app-shell--header-v2 .app-shell__auth-button_secondary:hover {
-  background: var(--iz-color-action-bg-hover);
+  background: var(--iz-color-action-soft);
 }
 
 .app-shell--header-v2 .app-shell__list-product-button {
@@ -779,7 +779,7 @@
 
 .app-shell--header-v2 .app-shell__header-nav-button--active,
 .app-shell--header-v2 .app-shell__header-nav-button--active:hover:not(:disabled) {
-  border-color: var(--iz-color-link-hover);
+  border-color: var(--iz-color-action-hover);
   background: var(--iz-gradient-header-btn);
   color: var(--iz-color-on-contrast);
   box-shadow: none;
@@ -787,7 +787,7 @@
 
 .app-shell--header-v2 .app-shell__category-list {
   border-radius: 14px;
-  border-color: var(--iz-color-border-subtle);
+  border-color: var(--iz-color-border);
   box-shadow: 0 12px 32px var(--iz-shadow-card-hover);
 }
 

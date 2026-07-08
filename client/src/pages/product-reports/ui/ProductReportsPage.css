@@ -10,7 +10,7 @@
   flex-direction: column;
   gap: 0.5rem;
   padding: 0.65rem 0.75rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-danger-accent) 28%, var(--iz-color-border));
+  border: 1px solid color-mix(in srgb, var(--iz-color-danger) 28%, var(--iz-color-border));
   border-radius: 0.65rem;
   background: linear-gradient(
     135deg,
@@ -64,24 +64,24 @@
 }
 
 .product-reports-page__section-chip:hover {
-  border-color: color-mix(in srgb, var(--iz-color-danger-accent) 35%, var(--iz-color-border));
-  background: var(--iz-color-danger-blush);
+  border-color: color-mix(in srgb, var(--iz-color-danger) 35%, var(--iz-color-border));
+  background: var(--iz-color-danger-surface);
 }
 
 .product-reports-page__section-chip_active {
-  border-color: var(--iz-color-danger-accent);
-  background: var(--iz-color-danger-accent);
+  border-color: var(--iz-color-danger);
+  background: var(--iz-color-danger);
   color: var(--iz-color-on-contrast);
 }
 
 .product-reports-page__section-chip_active.product-reports-page__section-chip_products {
-  border-color: var(--iz-color-warning-bright);
-  background: var(--iz-color-warning-bright);
+  border-color: var(--iz-color-warning);
+  background: var(--iz-color-warning);
 }
 
 .product-reports-page__section-chip_active.product-reports-page__section-chip_stories {
-  border-color: var(--iz-color-premium-purple);
-  background: var(--iz-color-premium-purple);
+  border-color: var(--iz-color-accent);
+  background: var(--iz-color-accent);
 }
 
 .product-reports-page__section + .product-reports-page__section {
@@ -115,5 +115,5 @@
 }
 
 .product-reports-page__state_error {
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }

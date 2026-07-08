@@ -3,9 +3,6 @@ import { StyleSheet } from "react-native";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-const DANGER_STRONG = "#b42318";
-const NEUTRAL_GRAY_DEEP = "#4b5563";
-const WARNING_DEEP = "#b54708";
 const SELFIE_MAX_WIDTH = 288;
 const SELFIE_MAX_HEIGHT = 224;
 
@@ -29,7 +26,7 @@ export const useDataConfirmationRequestsPageStyles = createThemedStyles((theme) 
   state: {
     fontSize: 15.2,
     lineHeight: 22,
-    color: NEUTRAL_GRAY_DEEP,
+    color: theme.colors.textSecondary,
   },
   centered: {
     flex: 1,
@@ -135,7 +132,7 @@ export const useDataConfirmationRequestsPageStyles = createThemedStyles((theme) 
   rowError: {
     fontSize: 13,
     lineHeight: 18,
-    color: DANGER_STRONG,
+    color: theme.colors.danger,
   },
   actions: {
     flexDirection: "row",
@@ -167,6 +164,6 @@ export const useDataConfirmationRequestsPageStyles = createThemedStyles((theme) 
   actionRejectText: {
     fontSize: 14,
     fontWeight: "500",
-    color: WARNING_DEEP,
+    color: theme.colors.warningText,
   },
 }));

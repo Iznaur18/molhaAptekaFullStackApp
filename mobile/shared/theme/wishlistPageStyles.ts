@@ -4,8 +4,7 @@ import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentL
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 const PRODUCT_IMAGE_THUMB_SIDE = 64;
-const DANGER_STRONG = "#b42318";
-const NEUTRAL_GRAY = "#9ca3af";
+
 const LIST_GAP = 18.4;
 
 export const useWishlistPageStyles = createThemedStyles((theme) => ({
@@ -111,9 +110,9 @@ export const useWishlistRowStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surfaceMuted,
   },
   removeIcon: {
-    color: NEUTRAL_GRAY,
+    color: theme.colors.textMuted,
   },
   removeIconPressed: {
-    color: DANGER_STRONG,
+    color: theme.colors.danger,
   },
 }));

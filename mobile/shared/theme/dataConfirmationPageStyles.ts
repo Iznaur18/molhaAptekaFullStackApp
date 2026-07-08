@@ -3,21 +3,6 @@ import { StyleSheet } from "react-native";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-const INFO = "#0369a1";
-const INFO_LIGHT = "#7dd3fc";
-const INFO_PALE = "#f0f9ff";
-const INFO_SOFT = "#e0f2fe";
-const INFO_SKY = "#0284c7";
-const SUCCESS_LIGHT = "#86efac";
-const SUCCESS_SOFT = "#ecfdf5";
-const SUCCESS_STRONG = "#047857";
-const GOLD_BORDER = "#fde68a";
-const WARNING_TEXT = "#92400e";
-const DANGER_BORDER = "#fecaca";
-const DANGER_SURFACE = "#fef3f2";
-const DANGER_DEEP = "#b91c1c";
-const SLATE = "#475569";
-
 export const useDataConfirmationPageStyles = createThemedStyles((theme) => ({
   container: {
     flex: 1,
@@ -40,13 +25,13 @@ export const useDataConfirmationPageStyles = createThemedStyles((theme) => ({
     padding: 16,
     borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: INFO_LIGHT,
-    backgroundColor: INFO_PALE,
+    borderColor: theme.colors.infoSoft,
+    backgroundColor: theme.colors.infoSoft,
   },
   planTitle: {
     fontSize: 18.4,
     fontWeight: "700",
-    color: INFO,
+    color: theme.colors.info,
   },
   planIntro: {
     fontSize: 14.4,
@@ -60,7 +45,7 @@ export const useDataConfirmationPageStyles = createThemedStyles((theme) => ({
   benefit: {
     fontSize: 14.72,
     lineHeight: 21.3,
-    color: SLATE,
+    color: theme.colors.textSecondary,
   },
   planNote: {
     fontSize: 13.12,
@@ -76,19 +61,19 @@ export const useDataConfirmationPageStyles = createThemedStyles((theme) => ({
     lineHeight: 20.2,
   },
   statusOk: {
-    borderColor: SUCCESS_LIGHT,
-    backgroundColor: SUCCESS_SOFT,
-    color: SUCCESS_STRONG,
+    borderColor: theme.colors.successSurface,
+    backgroundColor: theme.colors.successSurface,
+    color: theme.colors.successText,
   },
   statusPending: {
-    borderColor: GOLD_BORDER,
+    borderColor: theme.colors.warningSurface,
     backgroundColor: theme.colors.surface,
-    color: WARNING_TEXT,
+    color: theme.colors.warningText,
   },
   statusRejected: {
-    borderColor: DANGER_BORDER,
-    backgroundColor: DANGER_SURFACE,
-    color: DANGER_DEEP,
+    borderColor: theme.colors.dangerSurface,
+    backgroundColor: theme.colors.dangerSurface,
+    color: theme.colors.danger,
   },
   submit: {
     alignSelf: "flex-start",
@@ -96,13 +81,13 @@ export const useDataConfirmationPageStyles = createThemedStyles((theme) => ({
     paddingHorizontal: 17.6,
     borderRadius: 10,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: INFO_SKY,
-    backgroundColor: INFO_SOFT,
+    borderColor: theme.colors.info,
+    backgroundColor: theme.colors.infoSoft,
   },
   submitText: {
     fontSize: 15.2,
     fontWeight: "700",
-    color: INFO,
+    color: theme.colors.info,
   },
   centered: {
     flex: 1,

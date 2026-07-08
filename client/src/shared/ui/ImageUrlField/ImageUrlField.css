@@ -20,10 +20,10 @@
   flex-shrink: 0;
   margin: 0;
   padding: 0.5rem 0.75rem;
-  border: 1px solid var(--iz-color-action-light);
+  border: 1px solid var(--iz-color-action-soft);
   border-radius: 0.5rem;
   background: var(--iz-color-action-soft);
-  color: var(--iz-color-link-hover);
+  color: var(--iz-color-action-hover);
   font-size: 0.875rem;
   font-weight: 500;
   white-space: nowrap;
@@ -49,7 +49,7 @@
 .image-url-field__error {
   margin: 0;
   font-size: 0.8rem;
-  color: var(--iz-color-danger-deep);
+  color: var(--iz-color-danger);
   line-height: 1.35;
 }
 

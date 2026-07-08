@@ -1,3 +1,4 @@
+import { semanticColors } from "@/shared/theme/semanticColors";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Pressable, Text, View } from "react-native";
@@ -55,7 +56,7 @@ export const CartLineItem = ({ line }: CartLineItemProps) => {
     isUpdating || (purchaseLimit > 0 && line.quantity >= purchaseLimit);
 
   return (
-    <View style={[styles.row, { backgroundColor: "#ffffff" }, isUpdating && styles.rowUpdating]}>
+    <View style={[styles.row, { backgroundColor: semanticColors.onContrast }, isUpdating && styles.rowUpdating]}>
       <View style={styles.mainRow}>
         <Pressable
           style={styles.imageWrap}

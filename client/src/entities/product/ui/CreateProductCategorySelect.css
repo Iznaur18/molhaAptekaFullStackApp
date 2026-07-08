@@ -89,10 +89,10 @@
 }
 
 .create-product-category-select__option:hover {
-  background: var(--iz-color-action-bg-hover);
+  background: var(--iz-color-action-soft);
 }
 
 .create-product-category-select__option_selected {
   font-weight: 600;
-  background: var(--iz-color-action-bg-selected);
+  background: var(--iz-color-action-soft);
 }

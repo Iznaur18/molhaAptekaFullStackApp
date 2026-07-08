@@ -3,7 +3,7 @@
   padding: 0.15rem 0.45rem;
   width: fit-content;
   border-radius: 0.35rem;
-  background: var(--iz-color-gold-soft);
+  background: var(--iz-color-warning-surface);
   color: var(--iz-color-warning-text);
   font-size: 0.72rem;
   font-weight: 600;
@@ -16,8 +16,8 @@
   width: fit-content;
   max-width: none;
   border-radius: 0.35rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-warning-bright) 35%, transparent);
-  background: var(--iz-color-gold-soft);
+  border: 1px solid color-mix(in srgb, var(--iz-color-warning) 35%, transparent);
+  background: var(--iz-color-warning-surface);
   color: var(--iz-color-warning-text);
   font-size: 0.72rem;
   font-weight: 600;
@@ -26,8 +26,8 @@
 }
 
 .product-card__promotion-badge_pending {
-  background: var(--iz-color-accent-purple-soft);
-  color: var(--iz-color-accent-purple-text);
+  background: var(--iz-color-accent-soft);
+  color: var(--iz-color-accent);
 }
 
 .product-card__loyalty-overcommitted-badge {
@@ -35,8 +35,8 @@
   padding: 0.2rem 0.5rem;
   width: fit-content;
   border-radius: 0.35rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-danger-accent) 40%, transparent);
-  background: var(--iz-color-danger-soft);
+  border: 1px solid color-mix(in srgb, var(--iz-color-danger) 40%, transparent);
+  background: var(--iz-color-danger-surface);
   color: var(--iz-color-danger-text);
   font-size: 0.72rem;
   font-weight: 600;
@@ -48,7 +48,7 @@
   padding: 0.2rem 0.5rem;
   width: fit-content;
   border-radius: 0.35rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-info-bright) 40%, transparent);
+  border: 1px solid color-mix(in srgb, var(--iz-color-info) 40%, transparent);
   background: var(--iz-color-info-soft);
   color: var(--iz-color-info);
   font-size: 0.72rem;
@@ -61,9 +61,9 @@
   padding: 0.2rem 0.5rem;
   width: fit-content;
   border-radius: 0.35rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-success-bright) 40%, transparent);
-  background: var(--iz-color-success-soft);
-  color: var(--iz-color-success-strong);
+  border: 1px solid color-mix(in srgb, var(--iz-color-success) 40%, transparent);
+  background: var(--iz-color-success-surface);
+  color: var(--iz-color-success);
   font-size: 0.72rem;
   font-weight: 600;
   line-height: 1.35;
@@ -75,7 +75,7 @@
   width: fit-content;
   border-radius: 0.35rem;
   border: 1px solid color-mix(in srgb, var(--iz-color-warning) 45%, transparent);
-  background: var(--iz-color-gold-soft);
+  background: var(--iz-color-warning-surface);
   color: var(--iz-color-warning-text);
   font-size: 0.72rem;
   font-weight: 700;
@@ -87,9 +87,9 @@
   padding: 0.2rem 0.55rem;
   width: fit-content;
   border-radius: 0.35rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-accent-purple) 45%, transparent);
-  background: var(--iz-color-accent-purple-soft);
-  color: var(--iz-color-accent-purple-text);
+  border: 1px solid color-mix(in srgb, var(--iz-color-accent) 45%, transparent);
+  background: var(--iz-color-accent-soft);
+  color: var(--iz-color-accent);
   font-size: 0.72rem;
   font-weight: 700;
   line-height: 1.35;
@@ -113,9 +113,9 @@
   padding: 0.2rem 0.5rem;
   width: fit-content;
   border-radius: 0.35rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-premium-purple-light) 40%, transparent);
-  background: var(--iz-color-accent-purple-soft);
-  color: var(--iz-color-accent-purple-text);
+  border: 1px solid color-mix(in srgb, var(--iz-color-accent) 40%, transparent);
+  background: var(--iz-color-accent-soft);
+  color: var(--iz-color-accent);
   font-size: 0.72rem;
   font-weight: 600;
   line-height: 1.35;
@@ -222,7 +222,7 @@
   margin: 0.15rem 0 0;
   font-size: 0.82rem;
   font-weight: 600;
-  color: var(--iz-color-warning-deep);
+  color: var(--iz-color-warning-text);
   min-height: 1.25rem;
   line-height: 1.35;
 }

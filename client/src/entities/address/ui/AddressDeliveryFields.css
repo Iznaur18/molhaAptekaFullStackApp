@@ -20,7 +20,7 @@
   max-height: 12rem;
   overflow-y: auto;
   background: var(--iz-color-surface);
-  border: 1px solid var(--color-border, var(--iz-color-neutral-gray-border));
+  border: 1px solid var(--color-border, var(--iz-color-border));
   border-radius: 0.5rem;
   box-shadow: 0 4px 12px var(--iz-shadow-suggest);
 }
@@ -37,14 +37,14 @@
 
 .address-delivery-fields__suggestion:hover,
 .address-delivery-fields__suggestion:focus-visible {
-  background: var(--color-surface-muted, var(--iz-color-neutral-gray-pale));
+  background: var(--color-surface-muted, var(--iz-color-surface-muted));
 }
 
 .address-delivery-fields__hint {
   font-size: 0.8rem;
-  color: var(--color-text-muted, var(--iz-color-neutral-gray-deep));
+  color: var(--color-text-muted, var(--iz-color-text-secondary));
 }
 
 .address-delivery-fields__hint_error {
-  color: var(--color-danger, var(--iz-color-danger-rose));
+  color: var(--color-danger, var(--iz-color-danger));
 }

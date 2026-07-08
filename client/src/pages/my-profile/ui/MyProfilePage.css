@@ -84,7 +84,7 @@
   font-weight: 800;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: var(--iz-color-primary-bright);
+  color: var(--iz-color-action);
 }
 
 .my-profile-page__nav-list {
@@ -101,9 +101,9 @@
 }
 
 .my-profile-page__nav-button {
-  --nav-tone: var(--iz-color-slate);
-  --nav-tone-soft: var(--iz-color-surface-alt);
-  --nav-tone-strong: var(--iz-color-slate-muted);
+  --nav-tone: var(--iz-color-text-secondary);
+  --nav-tone-soft: var(--iz-color-surface-elevated);
+  --nav-tone-strong: var(--iz-color-text-muted);
 
   display: flex;
   align-items: center;
@@ -129,112 +129,40 @@
     transform 0.15s ease;
 }
 
-.my-profile-page__nav-button[data-tone="indigo"] {
-  --nav-tone: #4f46e5;
-  --nav-tone-soft: #eef2ff;
-  --nav-tone-strong: #4338ca;
-}
-
-.my-profile-page__nav-button[data-tone="sky"] {
-  --nav-tone: #0284c7;
-  --nav-tone-soft: #e0f2fe;
-  --nav-tone-strong: #0369a1;
-}
-
 .my-profile-page__nav-button[data-tone="blue"] {
-  --nav-tone: #2563eb;
-  --nav-tone-soft: #dbeafe;
-  --nav-tone-strong: #1d4ed8;
-}
-
-.my-profile-page__nav-button[data-tone="emerald"] {
-  --nav-tone: #059669;
-  --nav-tone-soft: #d1fae5;
-  --nav-tone-strong: #047857;
+  --nav-tone: var(--iz-color-link);
+  --nav-tone-soft: var(--iz-color-action-soft);
+  --nav-tone-strong: var(--iz-color-action-hover);
 }
 
 .my-profile-page__nav-button[data-tone="green"] {
-  --nav-tone: #16a34a;
-  --nav-tone-soft: #dcfce7;
-  --nav-tone-strong: #15803d;
-}
-
-.my-profile-page__nav-button[data-tone="teal"] {
-  --nav-tone: #0d9488;
-  --nav-tone-soft: #ccfbf1;
-  --nav-tone-strong: #0f766e;
-}
-
-.my-profile-page__nav-button[data-tone="cyan"] {
-  --nav-tone: #0891b2;
-  --nav-tone-soft: #cffafe;
-  --nav-tone-strong: #0e7490;
+  --nav-tone: var(--iz-color-success);
+  --nav-tone-soft: var(--iz-color-success-surface);
+  --nav-tone-strong: var(--iz-color-success-text);
 }
 
 .my-profile-page__nav-button[data-tone="amber"] {
-  --nav-tone: #d97706;
-  --nav-tone-soft: #fef3c7;
-  --nav-tone-strong: #b45309;
-}
-
-.my-profile-page__nav-button[data-tone="gold"] {
-  --nav-tone: #ca8a04;
-  --nav-tone-soft: #fef9c3;
-  --nav-tone-strong: #a16207;
-}
-
-.my-profile-page__nav-button[data-tone="orange"] {
-  --nav-tone: #ea580c;
-  --nav-tone-soft: #ffedd5;
-  --nav-tone-strong: #c2410c;
-}
-
-.my-profile-page__nav-button[data-tone="rose"] {
-  --nav-tone: #e11d48;
-  --nav-tone-soft: #ffe4e6;
-  --nav-tone-strong: #be123c;
+  --nav-tone: var(--iz-color-warning);
+  --nav-tone-soft: var(--iz-color-warning-surface);
+  --nav-tone-strong: var(--iz-color-warning-text);
 }
 
 .my-profile-page__nav-button[data-tone="red"] {
-  --nav-tone: #dc2626;
-  --nav-tone-soft: #fee2e2;
-  --nav-tone-strong: #b91c1c;
-}
-
-.my-profile-page__nav-button[data-tone="pink"] {
-  --nav-tone: #db2777;
-  --nav-tone-soft: #fce7f3;
-  --nav-tone-strong: #be185d;
-}
-
-.my-profile-page__nav-button[data-tone="fuchsia"] {
-  --nav-tone: #c026d3;
-  --nav-tone-soft: #fae8ff;
-  --nav-tone-strong: #a21caf;
+  --nav-tone: var(--iz-color-danger);
+  --nav-tone-soft: var(--iz-color-danger-surface);
+  --nav-tone-strong: var(--iz-color-danger-text);
 }
 
 .my-profile-page__nav-button[data-tone="purple"] {
-  --nav-tone: #9333ea;
-  --nav-tone-soft: #f3e8ff;
-  --nav-tone-strong: #7e22ce;
-}
-
-.my-profile-page__nav-button[data-tone="violet"] {
-  --nav-tone: #7c3aed;
-  --nav-tone-soft: #ede9fe;
-  --nav-tone-strong: #6d28d9;
-}
-
-.my-profile-page__nav-button[data-tone="lime"] {
-  --nav-tone: #65a30d;
-  --nav-tone-soft: #ecfccb;
-  --nav-tone-strong: #4d7c0f;
+  --nav-tone: var(--iz-color-accent);
+  --nav-tone-soft: var(--iz-color-accent-soft);
+  --nav-tone-strong: var(--iz-color-accent);
 }
 
 .my-profile-page__nav-button[data-tone="slate"] {
-  --nav-tone: #475569;
-  --nav-tone-soft: #f1f5f9;
-  --nav-tone-strong: #334155;
+  --nav-tone: var(--iz-color-text-secondary);
+  --nav-tone-soft: var(--iz-color-surface-muted);
+  --nav-tone-strong: var(--iz-color-text-muted);
 }
 
 .my-profile-page__nav-button-main {
@@ -321,7 +249,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }
 
 .my-profile-page__nav-button:disabled {
@@ -353,16 +281,16 @@
 }
 
 .my-profile-page__state_error {
-  color: var(--iz-color-danger-strong);
+  color: var(--iz-color-danger);
 }
 
 .my-profile-page__notice {
   margin: 0 0 0.75rem;
   padding: 0.55rem 0.75rem;
   border-radius: 8px;
-  border: 1px solid var(--iz-color-success-light);
-  background: var(--iz-color-success-soft);
-  color: var(--iz-color-success-strong);
+  border: 1px solid var(--iz-color-success-surface);
+  background: var(--iz-color-success-surface);
+  color: var(--iz-color-success);
   font-size: 0.9rem;
 }
 
@@ -373,7 +301,7 @@
   min-width: 1.25rem;
   padding: 0 0.35rem;
   border-radius: 999px;
-  background: var(--iz-color-danger-strong);
+  background: var(--iz-color-danger);
   color: var(--iz-color-on-contrast);
   font-size: 0.72rem;
   font-weight: 700;
@@ -385,14 +313,14 @@
   padding: 0.65rem 0.75rem;
   border-radius: 0.5rem;
   background: var(--iz-color-action-soft);
-  border: 1px solid var(--iz-color-info-muted);
+  border: 1px solid var(--iz-color-info-soft);
 }
 
 .my-profile-page__notifications-list {
   margin: 0;
   padding: 0 0 0 1rem;
   font-size: 0.875rem;
-  color: var(--iz-color-info-navy);
+  color: var(--iz-color-info-deep);
 }
 
 .my-profile-page__notification-btn {
@@ -548,13 +476,13 @@
 }
 
 .my-profile-page__logout-yes {
-  border: 1px solid color-mix(in srgb, var(--iz-color-danger-strong) 45%, transparent);
-  background: color-mix(in srgb, var(--iz-color-danger-strong) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--iz-color-danger) 45%, transparent);
+  background: color-mix(in srgb, var(--iz-color-danger) 12%, transparent);
   color: inherit;
 }
 
 .my-profile-page__logout-yes:hover {
-  background: color-mix(in srgb, var(--iz-color-danger-strong) 20%, transparent);
+  background: color-mix(in srgb, var(--iz-color-danger) 20%, transparent);
 }
 
 .my-profile-page__logout-cancel {
@@ -564,8 +492,8 @@
 }
 
 .my-profile-page__logout-cancel:hover:not(:disabled) {
-  border-color: var(--iz-color-danger-strong);
-  background: var(--iz-color-danger-strong);
+  border-color: var(--iz-color-danger);
+  background: var(--iz-color-danger);
 }
 
 .my-profile-page__mobile-nav-toggle,
@@ -579,7 +507,7 @@
   width: 100%;
   margin: 0;
   padding: 0.7rem 0.85rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-action-light) 55%, var(--iz-color-border));
+  border: 1px solid color-mix(in srgb, var(--iz-color-action-soft) 55%, var(--iz-color-border));
   border-radius: var(--my-profile-surface-radius);
   background: linear-gradient(
     165deg,
@@ -619,7 +547,7 @@
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--iz-color-primary-bright);
+  color: var(--iz-color-action);
 }
 
 .my-profile-page__mobile-nav-toggle-label {

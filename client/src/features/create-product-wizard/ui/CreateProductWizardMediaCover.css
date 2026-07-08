@@ -12,7 +12,7 @@
       color-mix(in srgb, var(--iz-color-action-soft) 80%, transparent),
       transparent 55%
     ),
-    var(--iz-color-surface-alt);
+    var(--iz-color-surface-elevated);
 }
 
 .create-product-wizard-media-cover__image {

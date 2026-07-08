@@ -1,6 +1,5 @@
 import { Platform, StyleSheet } from "react-native";
 
-import { HOME_FEED_SECTION_GAP } from "@/features/home-feed/lib/homeFeedSectionLayout";
 import {
   HOME_CATALOG_HEADER_BOTTOM_MARGIN,
   HOME_CATALOG_HEADER_CIRCLE_BUTTON_BORDER_WIDTH,
@@ -84,7 +83,7 @@ export const useHomeCatalogHeaderStyles = createThemedStyles((theme) => ({
   },
   bannerBelowPanel: {
     marginTop: HOME_CATALOG_HEADER_BANNER_BELOW_PANEL_MARGIN,
-    marginBottom: HOME_FEED_SECTION_GAP,
+    marginBottom: 0,
   },
   bannerListHeaderFullWidth: {
     alignSelf: "stretch",
