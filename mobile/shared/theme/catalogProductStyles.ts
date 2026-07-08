@@ -14,6 +14,7 @@ import {
   PRODUCT_CARD_STATUS_BADGE_OVERLAY_LAYOUT as BSOL,
 } from "@/entities/product/lib/productCardBadgePalette";
 import { PRODUCT_CARD_MOBILE_CATALOG_LAYOUT as MCL } from "@/entities/product/lib/productCardMobileCatalogLayout";
+import { HOME_CATALOG_PRIMARY_BACKDROP_COLOR } from "@/shared/lib/homeCatalogBackdropLayout";
 import { HOME_FEED_SECTION_GAP } from "@/features/home-feed/lib/homeFeedSectionLayout";
 import { CURATED_COMPACT_CARD_COLORS as C } from "@/entities/curated-product-list/lib/curatedCompactCardColors";
 import {
@@ -47,6 +48,51 @@ export const useFeedScreenStyles = createThemedStyles((theme) => ({
   flex: {
     flex: 1,
     backgroundColor: theme.colors.bg,
+  },
+  homeFeedScene: {
+    backgroundColor: HOME_CATALOG_PRIMARY_BACKDROP_COLOR,
+    width: "100%",
+    alignSelf: "stretch",
+  },
+  homeFeedList: {
+    backgroundColor: "transparent",
+    zIndex: 1,
+    width: "100%",
+    alignSelf: "stretch",
+  },
+  homeFeedListContent: {
+    width: "100%",
+    alignSelf: "stretch",
+    paddingHorizontal: 0,
+    flexGrow: 1,
+  },
+  homeFeedInsetContent: {
+    width: "100%",
+    alignSelf: "stretch",
+    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+  },
+  homeFeedRowSurface: {
+    alignSelf: "stretch",
+    width: "100%",
+  },
+  homeFeedSheetFiller: {
+    flexGrow: 1,
+    minHeight: 1,
+    alignSelf: "stretch",
+  },
+  homeFeedListFooterWrap: {
+    alignSelf: "stretch",
+  },
+  homeFeedPendingRoot: {
+    flex: 1,
+    width: "100%",
+    alignSelf: "stretch",
+  },
+  homeFeedPendingSheet: {
+    flex: 1,
+    width: "100%",
+    alignSelf: "stretch",
+    overflow: "hidden",
   },
   centered: {
     flex: 1,

@@ -9,20 +9,27 @@ type HomeCatalogHeaderPanelProps = {
   children: ReactNode;
   paddingTop: number;
   style?: StyleProp<ViewStyle>;
+  /** Без рамки, тени и inset-линии — для sticky foreground-sheet. */
+  flatSheet?: boolean;
 };
 
 export const HomeCatalogHeaderPanel = ({
   children,
   paddingTop,
   style,
+  flatSheet = false,
 }: HomeCatalogHeaderPanelProps) => {
   const styles = useHomeCatalogHeaderStyles();
 
   return (
-    <View style={[styles.panel, { paddingTop }, style]}>
-      <HomeCatalogHeaderGlassLayer />
-      <HomeCatalogHeaderAccent />
-      <View style={styles.panelInsetLine} pointerEvents="none" />
+    <View style={[styles.panel, flatSheet && styles.panelFlatSheet, { paddingTop }, style]}>
+      {flatSheet ? null : (
+        <>
+          <HomeCatalogHeaderGlassLayer />
+          <HomeCatalogHeaderAccent />
+          <View style={styles.panelInsetLine} pointerEvents="none" />
+        </>
+      )}
       <View style={styles.panelContent}>{children}</View>
     </View>
   );

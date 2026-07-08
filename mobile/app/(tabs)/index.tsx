@@ -1,9 +1,17 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ActivityIndicator, Text, View, type FlatList } from "react-native";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  ActivityIndicator,
+  Text,
+  useWindowDimensions,
+  View,
+  type FlatList,
+  type ViewStyle,
+} from "react-native";
 import type Animated from "react-native-reanimated";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 import { useFocusEffect, useScrollToTop } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import type { CatalogListFilters, CatalogSort } from "@/entities/product/model/catalogListFilters";
 import { useCatalogProductsInfiniteQuery } from "@/entities/product/model/useCatalogProductsInfiniteQuery";
@@ -20,22 +28,33 @@ import { CatalogBreadcrumb } from "@/features/catalog-filter/ui/CatalogBreadcrum
 import { consumePendingCatalogFilters } from "@/features/catalog-browser/model/pendingCatalogFilters";
 import { isHomeCuratedProductListsVisible } from "@/entities/curated-product-list/lib/isHomeCuratedProductListsVisible";
 import { isHomeCatalogMainView } from "@/features/home-feed/lib/isHomeCatalogMainView";
+import {
+  buildHomeCatalogFeedListRows,
+  HOME_CATALOG_FEED_STICKY_SEARCH_INDEX,
+  HOME_CATALOG_FEED_META_ROW_COUNT,
+  type HomeCatalogFeedListRow,
+} from "@/features/home-feed/lib/buildHomeCatalogFeedListRows";
 import { invalidateHomeFeedQueries } from "@/features/home-feed/model/invalidateHomeFeedQueries";
 import {
   EMPTY_HOME_CATALOG_FEED_FILTERS,
   type HomeCatalogFeedFiltersState,
 } from "@/features/home-feed/model/homeCatalogFeedFilters";
 import { HomeFeedHeader } from "@/features/home-feed/ui/HomeFeedHeader";
+import { HomeCatalogFeedSheetCap } from "@/features/home-feed/ui/HomeCatalogFeedSheetCap";
+import { HomeCatalogPrimaryBackdrop } from "@/features/home-feed/ui/HomeCatalogPrimaryBackdrop";
 import { HomeCatalogSearchRow } from "@/features/home-feed/ui/HomeCatalogSearchRow";
 import { HomeCatalogSiteHeaderBannerRow } from "@/features/home-feed/ui/HomeCatalogSiteHeaderBannerRow";
+import { HomeCatalogStickySearchShell } from "@/features/home-feed/ui/HomeCatalogStickySearchShell";
 import {
   API_CLIENT_UI,
   CATALOG_SEARCH_DEBOUNCE_MS,
   CATALOG_SEARCH_MIN_LENGTH,
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { resolveHomeCatalogBackdropScrollPaddingTop } from "@/shared/lib/homeCatalogBackdropLayout";
 import { useProductGridLayout } from "@/shared/model/useProductGridLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
+import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
 import { useFeedScreenStyles } from "@/shared/theme/catalogProductStyles";
 import { HOME_PAGE_UI } from "@/shared/config/homePageUi";
 import { ScreenErrorState } from "@/shared/ui/ScreenStates";
@@ -46,9 +65,12 @@ const EMPTY_FEED_FILTERS = EMPTY_HOME_CATALOG_FEED_FILTERS;
 
 export default function CatalogScreen() {
   const styles = useFeedScreenStyles();
+  const { theme } = useAppThemeSettings();
+  const safeAreaInsets = useSafeAreaInsets();
   const queryClient = useQueryClient();
   const productGrid = useProductGridLayout();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const { height: windowHeight } = useWindowDimensions();
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedRootSlug, setSelectedRootSlug] = useState<string | null>(null);
@@ -61,7 +83,8 @@ export default function CatalogScreen() {
   // (нужен useScrollToTop), а проп ref анимированного списка требует
   // Animated.FlatList.
   const catalogListRef = useRef<
-    FlatList<CatalogGridRow> & Animated.FlatList<CatalogGridRow>
+    FlatList<HomeCatalogFeedListRow | CatalogGridRow> &
+      Animated.FlatList<HomeCatalogFeedListRow | CatalogGridRow>
   >(null);
 
   useScrollToTop(catalogListRef);
@@ -175,6 +198,11 @@ export default function CatalogScreen() {
     [catalogQuery.products, productGrid.columns, showFullWidthTier3Banners],
   );
 
+  const homeFeedListRows = useMemo(
+    () => buildHomeCatalogFeedListRows(catalogGridRows),
+    [catalogGridRows],
+  );
+
   const handleRefresh = useCallback(async () => {
     try {
       const tasks: Promise<unknown>[] = [catalogQuery.refetch()];
@@ -196,7 +224,11 @@ export default function CatalogScreen() {
   };
 
   const searchRow = (
-    <HomeCatalogSearchRow value={searchInput} onChange={setSearchInput} />
+    <HomeCatalogSearchRow
+      value={searchInput}
+      onChange={setSearchInput}
+      embeddedInForegroundSheet={showHomeFeed}
+    />
   );
 
   const listHeader = (
@@ -215,9 +247,139 @@ export default function CatalogScreen() {
     </View>
   );
 
+  const homeBackdropScrollPaddingTop = useMemo(
+    () => resolveHomeCatalogBackdropScrollPaddingTop(safeAreaInsets.top),
+    [safeAreaInsets.top],
+  );
+
+  const homeFeedListFooter = (
+    <View style={[styles.homeFeedSheetFiller, { backgroundColor: theme.colors.surface }]} />
+  );
+
+  const homeFeedContentContainerStyle = useMemo(
+    (): ViewStyle[] => [
+      styles.homeFeedListContent,
+      {
+        paddingTop: homeBackdropScrollPaddingTop,
+        paddingBottom: contentPaddingBottom,
+        minHeight: windowHeight,
+        flexGrow: 1,
+      },
+    ],
+    [contentPaddingBottom, homeBackdropScrollPaddingTop, styles.homeFeedListContent, windowHeight],
+  );
+
+  const renderHomeFeedRow = useCallback(
+    ({ item, index }: { item: HomeCatalogFeedListRow; index: number }) => {
+      if (item.kind === "cap") {
+        return <HomeCatalogFeedSheetCap />;
+      }
+
+      if (item.kind === "search") {
+        return (
+          <HomeCatalogStickySearchShell>
+            <HomeCatalogSearchRow
+              value={searchInput}
+              onChange={setSearchInput}
+              embeddedInForegroundSheet
+            />
+          </HomeCatalogStickySearchShell>
+        );
+      }
+
+      if (item.kind === "feed-header") {
+        return (
+          <View
+            style={[
+              styles.homeFeedRowSurface,
+              styles.homeFeedInsetContent,
+              { backgroundColor: theme.colors.surface },
+            ]}
+          >
+            {listHeader}
+            {catalogGridRows.length === 0 ? (
+              <View style={styles.centered}>
+                <Text style={styles.empty}>{API_CLIENT_UI.CATALOG_EMPTY}</Text>
+              </View>
+            ) : null}
+          </View>
+        );
+      }
+
+      const productRowIndex = index - HOME_CATALOG_FEED_META_ROW_COUNT;
+
+      return (
+        <View
+          style={[
+            styles.homeFeedRowSurface,
+            styles.homeFeedInsetContent,
+            { backgroundColor: theme.colors.surface, paddingBottom: productGrid.gap },
+          ]}
+        >
+          <CatalogGridRowItem
+            row={item.row}
+            columns={productGrid.columns}
+            gap={productGrid.gap}
+            tileWidth={productGrid.tileWidth}
+            rowIndex={productRowIndex}
+          />
+        </View>
+      );
+    },
+    [
+      catalogGridRows.length,
+      listHeader,
+      productGrid.columns,
+      productGrid.gap,
+      productGrid.tileWidth,
+      searchInput,
+      styles.homeFeedInsetContent,
+      styles.homeFeedRowSurface,
+      theme.colors.surface,
+    ],
+  );
+
+  const catalogContentContainerStyle = useMemo(
+    (): ViewStyle[] => [
+      styles.listContent,
+      resolveCatalogGridListContentStyle(productGrid.gap),
+      { paddingBottom: contentPaddingBottom },
+    ],
+    [contentPaddingBottom, productGrid.gap, styles.listContent],
+  );
+
+  const renderHomeFeedScene = (content: ReactNode) => (
+    <View style={[styles.flex, styles.homeFeedScene]}>
+      <HomeCatalogPrimaryBackdrop />
+      {content}
+    </View>
+  );
+
   if (catalogQuery.isPending) {
     // Та же геометрия, что у загруженного списка (паддинги, gap), плюс
     // скелетон-плитки вместо спиннера — приход данных не сдвигает вёрстку.
+    if (showHomeFeed) {
+      return renderHomeFeedScene(
+        <View style={styles.homeFeedPendingRoot}>
+          <View style={{ height: homeBackdropScrollPaddingTop }} />
+          <View style={[styles.homeFeedPendingSheet, { backgroundColor: theme.colors.surface }]}>
+            <HomeCatalogFeedSheetCap />
+            <HomeCatalogStickySearchShell>
+              {searchRow}
+            </HomeCatalogStickySearchShell>
+            <View style={styles.homeFeedInsetContent}>
+              {listHeader}
+              <CatalogGridSkeleton
+                columns={productGrid.columns}
+                tileWidth={productGrid.tileWidth}
+                gap={productGrid.gap}
+              />
+            </View>
+          </View>
+        </View>,
+      );
+    }
+
     return (
       <View style={[styles.flex, centeredContentStyle]}>
         {searchRow}
@@ -240,6 +402,27 @@ export default function CatalogScreen() {
   }
 
   if (catalogQuery.isError) {
+    if (showHomeFeed) {
+      return renderHomeFeedScene(
+        <View style={styles.homeFeedPendingRoot}>
+          <View style={{ height: homeBackdropScrollPaddingTop }} />
+          <View style={[styles.homeFeedPendingSheet, { backgroundColor: theme.colors.surface }]}>
+            <HomeCatalogFeedSheetCap />
+            <HomeCatalogStickySearchShell>
+              {searchRow}
+            </HomeCatalogStickySearchShell>
+            <View style={styles.homeFeedInsetContent}>
+              {listHeader}
+              <ScreenErrorState
+                message={formatApiErrorMessage(catalogQuery.error, API_CLIENT_UI.CATALOG_ERROR)}
+                onRetry={() => catalogQuery.refetch()}
+              />
+            </View>
+          </View>
+        </View>,
+      );
+    }
+
     return (
       <View style={styles.flex}>
         {searchRow}
@@ -249,6 +432,41 @@ export default function CatalogScreen() {
           onRetry={() => catalogQuery.refetch()}
         />
       </View>
+    );
+  }
+
+  if (showHomeFeed) {
+    return (
+      <CatalogScrollAnimationProvider>
+        {renderHomeFeedScene(
+          <CatalogAnimatedFlatList
+            ref={catalogListRef}
+            key={`${productGrid.listKey}-home-feed`}
+            data={homeFeedListRows}
+            keyExtractor={(item) => item.key}
+            numColumns={1}
+            stickyHeaderIndices={[HOME_CATALOG_FEED_STICKY_SEARCH_INDEX]}
+            renderItem={renderHomeFeedRow}
+            contentContainerStyle={homeFeedContentContainerStyle}
+            style={[styles.flex, styles.homeFeedList]}
+            refreshControl={
+              <ThemedRefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
+            }
+            onEndReached={handleLoadMore}
+            onEndReachedThreshold={0.4}
+            ListFooterComponent={
+              <View style={styles.homeFeedListFooterWrap}>
+                {catalogQuery.isFetchingNextPage ? (
+                  <View style={{ backgroundColor: theme.colors.surface }}>
+                    <ActivityIndicator style={styles.footerLoader} />
+                  </View>
+                ) : null}
+                {homeFeedListFooter}
+              </View>
+            }
+          />,
+        )}
+      </CatalogScrollAnimationProvider>
     );
   }
 
@@ -272,11 +490,7 @@ export default function CatalogScreen() {
               rowIndex={index}
             />
           )}
-          contentContainerStyle={[
-            styles.listContent,
-            resolveCatalogGridListContentStyle(productGrid.gap),
-            { paddingBottom: contentPaddingBottom },
-          ]}
+          contentContainerStyle={catalogContentContainerStyle}
           style={styles.flex}
           refreshControl={
             <ThemedRefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
