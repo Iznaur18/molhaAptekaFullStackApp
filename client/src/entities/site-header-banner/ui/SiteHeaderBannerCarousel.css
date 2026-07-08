@@ -15,11 +15,27 @@
 }
 
 .site-header-banner-carousel__slide {
+  position: relative;
   flex: 0 0 100%;
   width: 100%;
   min-height: var(--site-header-banner-height);
   overflow: hidden;
   border-radius: 10px;
+}
+
+.site-header-banner-carousel__ad-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 4;
+  padding: 2px 10px;
+  border-radius: 4px;
+  background: rgb(255 255 255 / 72%);
+  color: var(--iz-color-ink);
+  font-size: 7px;
+  font-weight: 600;
+  letter-spacing: 0.012em;
+  pointer-events: none;
 }
 
 .site-header-banner-carousel__link,

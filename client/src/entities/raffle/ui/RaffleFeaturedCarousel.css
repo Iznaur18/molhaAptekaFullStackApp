@@ -37,10 +37,6 @@
   pointer-events: none;
 }
 
-.raffle-featured-carousel .raffle-featured-banner__badge {
-  pointer-events: none;
-}
-
 @container app-viewport (max-width: 640px) {
   .raffle-featured-carousel .raffle-featured-banner__info-toggle {
     pointer-events: auto;

@@ -12,12 +12,14 @@ export const useSiteHeaderBannerCarouselStyles = createThemedStyles((theme) => (
     borderRadius: SITE_HEADER_BANNER_LAYOUT.radius,
   },
   singleSlide: {
+    position: "relative",
     width: "100%",
     minHeight: SITE_HEADER_BANNER_LAYOUT.height,
     borderRadius: SITE_HEADER_BANNER_LAYOUT.radius,
     overflow: "hidden",
   },
   slide: {
+    position: "relative",
     width: "100%",
     minHeight: SITE_HEADER_BANNER_LAYOUT.height,
     overflow: "hidden",
@@ -45,6 +47,23 @@ export const useSiteHeaderBannerCarouselStyles = createThemedStyles((theme) => (
   },
   dotActive: {
     backgroundColor: theme.colors.primary,
+  },
+  adBadge: {
+    position: "absolute",
+    top: SITE_HEADER_BANNER_LAYOUT.adBadgeInset,
+    left: SITE_HEADER_BANNER_LAYOUT.adBadgeInset,
+    zIndex: 4,
+    elevation: 4,
+    paddingHorizontal: SITE_HEADER_BANNER_LAYOUT.adBadgePaddingHorizontal,
+    paddingVertical: SITE_HEADER_BANNER_LAYOUT.adBadgePaddingVertical,
+    borderRadius: SITE_HEADER_BANNER_LAYOUT.adBadgeBorderRadius,
+    backgroundColor: "rgba(255, 255, 255, 0.72)",
+  },
+  adBadgeText: {
+    color: theme.colors.ink,
+    fontSize: SITE_HEADER_BANNER_LAYOUT.adBadgeFontSize,
+    fontWeight: "600",
+    letterSpacing: SITE_HEADER_BANNER_LAYOUT.adBadgeLetterSpacing,
   },
   viewportEdgeToEdge: {
     borderRadius: 0,

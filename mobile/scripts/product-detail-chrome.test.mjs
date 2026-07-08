@@ -108,7 +108,8 @@ test("mobile seller preview matches web product-details-seller-preview chrome", 
   assert.match(sellerStylesBlock, /borderColor:\s*`\$\{theme\.colors\.link\}29`/);
   assert.match(sellerStylesBlock, /rootPressed:/);
   assert.match(preview, /pressed && styles\.rootPressed/);
-  assert.match(sellerStylesBlock, /minWidth:\s*152/);
+  assert.match(sellerStylesBlock, /width:\s*"50%"/);
+  assert.match(sellerStylesBlock, /margin:\s*-6/);
 });
 
 test("mobile premium display name aligns from start like web user-premium-name", () => {

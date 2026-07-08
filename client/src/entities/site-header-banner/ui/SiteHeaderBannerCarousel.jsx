@@ -185,6 +185,9 @@ export function SiteHeaderBannerCarousel({ slides }) {
         ) : (
           <div className="site-header-banner-carousel__static">{content}</div>
         )}
+        <span className="site-header-banner-carousel__ad-badge" aria-hidden="true">
+          {SITE_HEADER_BANNER_UI.AD_BADGE}
+        </span>
       </div>
     );
   };

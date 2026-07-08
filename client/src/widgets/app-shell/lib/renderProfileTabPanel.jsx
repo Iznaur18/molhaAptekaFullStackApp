@@ -17,12 +17,10 @@ import {
   LazyPremiumPage,
   LazyProductModerationPage,
   LazyProductReportsPage,
-  LazyProductPromotionsStaffPage,
   LazyRafflesStaffPage,
   LazySearchSynonymsAdminPage,
   LazyAppIntroAdminPage,
   LazySiteHeaderBannerAdminPage,
-  LazyProductManageToggleDisplayAdminPage,
   LazyPopularProductsAdminPage,
   LazySubscriptionsPage,
   LazyWishlistPage,
@@ -53,7 +51,6 @@ export function renderProfileTabPanel(mainView, props) {
     refreshPendingIntroAdModerationCount,
     refreshPendingSellerPersonalCategoryModerationCount,
     refreshPendingProductReportsCount,
-    refreshPendingProductPromotionsCount,
     refreshPendingRafflesCount,
     refreshPendingDataConfirmationCount,
     refreshPendingInstallmentModerationCount,
@@ -181,8 +178,6 @@ export function renderProfileTabPanel(mainView, props) {
       return <LazyAppIntroAdminPage />;
     case "site-header-banner-admin":
       return <LazySiteHeaderBannerAdminPage />;
-    case "product-manage-toggle-display-admin":
-      return <LazyProductManageToggleDisplayAdminPage />;
     case "popular-products-admin":
       return <LazyPopularProductsAdminPage />;
     case "product-moderation":
@@ -210,12 +205,6 @@ export function renderProfileTabPanel(mainView, props) {
           onSellerNameClick={onSellerNameClick}
           onProductClick={onOpenProductDetails}
           onQueueChanged={() => void refreshPendingProductReportsCount()}
-        />
-      );
-    case "product-promotions":
-      return (
-        <LazyProductPromotionsStaffPage
-          onQueueChanged={() => void refreshPendingProductPromotionsCount()}
         />
       );
     case "staff-raffles":

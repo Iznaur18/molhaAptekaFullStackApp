@@ -61,7 +61,6 @@ export function AccountMainContent({
   handleCategoryTreeAdminFromProfile,
   handleAppIntroAdminFromProfile,
   handleSiteHeaderBannerAdminFromProfile,
-  handleProductManageToggleDisplayAdminFromProfile,
   handlePopularProductsAdminFromProfile,
   handleProductModerationFromProfile,
   handleProductReportsFromProfile,
@@ -188,11 +187,6 @@ export function AccountMainContent({
         }
         onSiteHeaderBannerAdminClick={
           canModerateProducts ? handleSiteHeaderBannerAdminFromProfile : undefined
-        }
-        onProductManageToggleDisplayAdminClick={
-          canModerateProducts
-            ? handleProductManageToggleDisplayAdminFromProfile
-            : undefined
         }
         onPopularProductsAdminClick={
           isAdmin ? handlePopularProductsAdminFromProfile : undefined

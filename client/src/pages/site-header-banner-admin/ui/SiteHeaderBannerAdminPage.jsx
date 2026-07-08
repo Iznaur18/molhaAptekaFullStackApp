@@ -6,54 +6,48 @@ import {
   mapSiteHeaderBannerSettingsToForm,
   validateSiteHeaderBannerAdminForm,
 } from "../../../entities/site-header-banner/lib/siteHeaderBannerAdminForm.js";
-import {
-  normalizeSiteHeaderBannerHexColor,
-  resolvePreviewSiteHeaderBannerSlidesFromForm,
-  resolveSiteHeaderBannerColorInputValue,
-} from "../../../entities/site-header-banner/lib/resolvePreviewSiteHeaderBannerSlidesFromForm.js";
+import { resolvePreviewSiteHeaderBannerSlidesFromForm } from "../../../entities/site-header-banner/lib/resolvePreviewSiteHeaderBannerSlidesFromForm.js";
 import { usePatchSiteHeaderBannerSettingsMutation } from "../../../entities/site-header-banner/model/usePatchSiteHeaderBannerSettingsMutation.js";
 import { useSiteHeaderBannerSettingsQuery } from "../../../entities/site-header-banner/model/useSiteHeaderBannerSettingsQuery.js";
 import { SiteHeaderBannerCarousel } from "../../../entities/site-header-banner/ui/SiteHeaderBannerCarousel.jsx";
 import { SITE_HEADER_BANNER_ADMIN_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import { ModalSectionTabs } from "../../../shared/ui/ModalSectionTabs/ModalSectionTabs.jsx";
 import { ImageUrlField } from "../../../shared/ui/ImageUrlField/ImageUrlField.jsx";
+import { ProductManageToggleDisplayAdminPage } from "../../product-manage-toggle-display-admin/ui/ProductManageToggleDisplayAdminPage.jsx";
+import {
+  SITE_HEADER_BANNER_ADMIN_TAB_BUTTONS,
+  SITE_HEADER_BANNER_ADMIN_TAB_GUEST,
+  SITE_HEADER_BANNER_ADMIN_TAB_SLIDES,
+} from "../lib/siteHeaderBannerAdminTabs.js";
+import { SiteHeaderBannerAdminSlideEditor } from "./SiteHeaderBannerAdminSlideEditor.jsx";
+import { SiteHeaderBannerAdminSlideList } from "./SiteHeaderBannerAdminSlideList.jsx";
 
 import "./SiteHeaderBannerAdminPage.css";
 
-/**
- * @param {{
- *   value: string;
- *   disabled?: boolean;
- *   onChange: (value: string) => void;
- * }} props
- */
-function SiteHeaderBannerColorField({ value, disabled = false, onChange }) {
-  return (
-    <div className="site-header-banner-admin__color-field">
-      <input
-        className="site-header-banner-admin__color-picker"
-        type="color"
-        value={resolveSiteHeaderBannerColorInputValue(value)}
-        disabled={disabled}
-        onChange={(event) => onChange(event.target.value.toLowerCase())}
-        aria-label={SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_BACKGROUND_COLOR}
-      />
-      <input
-        className="site-header-banner-admin__input"
-        type="text"
-        value={value}
-        disabled={disabled}
-        onChange={(event) => onChange(event.target.value)}
-        placeholder="#RRGGBB"
-        spellCheck={false}
-      />
-    </div>
-  );
-}
+const ADMIN_TABS = [
+  { id: SITE_HEADER_BANNER_ADMIN_TAB_SLIDES, label: SITE_HEADER_BANNER_ADMIN_PAGE_UI.TAB_SLIDES },
+  { id: SITE_HEADER_BANNER_ADMIN_TAB_BUTTONS, label: SITE_HEADER_BANNER_ADMIN_PAGE_UI.TAB_BUTTONS },
+  { id: SITE_HEADER_BANNER_ADMIN_TAB_GUEST, label: SITE_HEADER_BANNER_ADMIN_PAGE_UI.TAB_GUEST },
+];
+
+const resolveNextSelectedSlideId = (items, removedId, currentId) => {
+  if (currentId !== removedId) {
+    return currentId;
+  }
+  if (items.length === 0) {
+    return null;
+  }
+  const removedIndex = items.findIndex((item) => item.id === removedId);
+  const nextItem = items[removedIndex] ?? items[removedIndex - 1] ?? items[0];
+  return nextItem?.id ?? null;
+};
 
 export function SiteHeaderBannerAdminPage() {
   const settingsQuery = useSiteHeaderBannerSettingsQuery();
   const patchMutation = usePatchSiteHeaderBannerSettingsMutation();
   const [form, setForm] = useState(() => mapSiteHeaderBannerSettingsToForm(null));
+  const [activeTab, setActiveTab] = useState(SITE_HEADER_BANNER_ADMIN_TAB_SLIDES);
+  const [selectedSlideId, setSelectedSlideId] = useState(null);
   const [actionError, setActionError] = useState("");
   const [saveNotice, setSaveNotice] = useState(false);
 
@@ -63,17 +57,28 @@ export function SiteHeaderBannerAdminPage() {
     }
   }, [settingsQuery.data]);
 
+  useEffect(() => {
+    if (form.items.length === 0) {
+      setSelectedSlideId(null);
+      return;
+    }
+    if (!selectedSlideId || !form.items.some((item) => item.id === selectedSlideId)) {
+      setSelectedSlideId(form.items[0]?.id ?? null);
+    }
+  }, [form.items, selectedSlideId]);
+
   const previewSlides = useMemo(
     () => resolvePreviewSiteHeaderBannerSlidesFromForm(form),
     [form],
   );
 
-  const isLoading = settingsQuery.isPending;
+  const selectedSlide = form.items.find((item) => item.id === selectedSlideId) ?? null;
+  const selectedSlideIndex = selectedSlide
+    ? form.items.findIndex((item) => item.id === selectedSlide.id)
+    : -1;
   const isSaving = patchMutation.isPending;
-  const loadError =
-    settingsQuery.error instanceof Error
-      ? settingsQuery.error.message
-      : SITE_HEADER_BANNER_ADMIN_PAGE_UI.LOAD_ERROR;
+  const showFormSave = activeTab === SITE_HEADER_BANNER_ADMIN_TAB_SLIDES
+    || activeTab === SITE_HEADER_BANNER_ADMIN_TAB_GUEST;
 
   const resetDraftState = () => {
     setActionError("");
@@ -84,10 +89,28 @@ export function SiteHeaderBannerAdminPage() {
     resetDraftState();
     setForm((prev) => ({
       ...prev,
-      items: prev.items.map((item) =>
-        item.id === itemId ? { ...item, ...patch } : item,
-      ),
+      items: prev.items.map((item) => (item.id === itemId ? { ...item, ...patch } : item)),
     }));
+  };
+
+  const handleAddSlide = () => {
+    const nextItem = createEmptySiteHeaderBannerItem();
+    resetDraftState();
+    setForm((prev) => ({
+      ...prev,
+      items: [...prev.items, nextItem],
+    }));
+    setSelectedSlideId(nextItem.id);
+    setActiveTab(SITE_HEADER_BANNER_ADMIN_TAB_SLIDES);
+  };
+
+  const handleRemoveSlide = (itemId) => {
+    resetDraftState();
+    setForm((prev) => {
+      const nextItems = prev.items.filter((entry) => entry.id !== itemId);
+      setSelectedSlideId((currentId) => resolveNextSelectedSlideId(nextItems, itemId, currentId));
+      return { ...prev, items: nextItems };
+    });
   };
 
   const handleSave = async (event) => {
@@ -113,14 +136,16 @@ export function SiteHeaderBannerAdminPage() {
     }
   };
 
-  if (isLoading) {
+  if (settingsQuery.isPending) {
     return <p className="site-header-banner-admin__status">{SITE_HEADER_BANNER_ADMIN_PAGE_UI.LOADING}</p>;
   }
 
   if (settingsQuery.isError) {
     return (
       <p className="site-header-banner-admin__error" role="alert">
-        {loadError}
+        {settingsQuery.error instanceof Error
+          ? settingsQuery.error.message
+          : SITE_HEADER_BANNER_ADMIN_PAGE_UI.LOAD_ERROR}
       </p>
     );
   }
@@ -132,6 +157,13 @@ export function SiteHeaderBannerAdminPage() {
           {SITE_HEADER_BANNER_ADMIN_PAGE_UI.TITLE}
         </h2>
         <p className="site-header-banner-admin__hint">{SITE_HEADER_BANNER_ADMIN_PAGE_UI.HINT}</p>
+        <ModalSectionTabs
+          className="modal-section-tabs_in-header"
+          tabs={ADMIN_TABS}
+          activeTabId={activeTab}
+          ariaLabel={SITE_HEADER_BANNER_ADMIN_PAGE_UI.TABS_ARIA}
+          onTabChange={setActiveTab}
+        />
       </header>
 
       {saveNotice ? (
@@ -141,142 +173,116 @@ export function SiteHeaderBannerAdminPage() {
       ) : null}
 
       <form className="site-header-banner-admin__form" onSubmit={handleSave}>
-        <div className="site-header-banner-admin__panel">
-          <div className="site-header-banner-admin__panel-section site-header-banner-admin__toolbar">
-            <label className="site-header-banner-admin__checkbox">
-            <input
-              type="checkbox"
-              checked={form.enabled}
-              disabled={isSaving}
-              onChange={(event) => {
-                resetDraftState();
-                setForm((prev) => ({ ...prev, enabled: event.target.checked }));
-              }}
-            />
-            <span>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_ENABLED}</span>
-          </label>
-          <button
-            type="button"
-            className="site-header-banner-admin__btn site-header-banner-admin__btn_secondary"
-            disabled={isSaving}
-            onClick={() => {
-              resetDraftState();
-              setForm((prev) => ({
-                ...prev,
-                items: [...prev.items, createEmptySiteHeaderBannerItem()],
-              }));
-            }}
-          >
-            {SITE_HEADER_BANNER_ADMIN_PAGE_UI.ADD_ITEM}
-          </button>
-          </div>
-
-        {previewSlides.length > 0 ? (
-          <div className="site-header-banner-admin__panel-section site-header-banner-admin__preview">
-            <SiteHeaderBannerCarousel slides={previewSlides} />
-          </div>
-        ) : null}
-
-        {form.items.length === 0 ? (
-          <p className="site-header-banner-admin__panel-section site-header-banner-admin__empty">
-            {SITE_HEADER_BANNER_ADMIN_PAGE_UI.EMPTY_ITEMS}
-          </p>
-        ) : null}
-        </div>
-
-        {form.items.map((item, index) => (
-          <div
-            key={item.id}
-            className={[
-              "site-header-banner-admin__slide-zone",
-              isSaving ? "site-header-banner-admin__slide-zone_disabled" : "",
-            ]
-              .filter(Boolean)
-              .join(" ")}
-            aria-disabled={isSaving || undefined}
-          >
-            <div className="site-header-banner-admin__slide-title">
-              {SITE_HEADER_BANNER_ADMIN_PAGE_UI.ITEM_TITLE(index + 1)}
-            </div>
-
-            <div className="site-header-banner-admin__field-block">
+        {activeTab === SITE_HEADER_BANNER_ADMIN_TAB_SLIDES ? (
+          <div className="site-header-banner-admin__tab-panel">
+            <div className="site-header-banner-admin__panel site-header-banner-admin__panel-section site-header-banner-admin__toolbar">
               <label className="site-header-banner-admin__checkbox">
-              <input
-                type="checkbox"
-                checked={item.enabled}
-                onChange={(event) =>
-                  updateItem(item.id, { enabled: event.target.checked })
-                }
-              />
-              <span>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_ITEM_ENABLED}</span>
-            </label>
-            </div>
-
-            <div className="site-header-banner-admin__field-block">
-            <ImageUrlField
-              label={SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_IMAGE}
-              value={item.imageUrl}
-              onChange={(value) => updateItem(item.id, { imageUrl: value })}
-            />
-            </div>
-
-            <div className="site-header-banner-admin__field-block">
-            <label className="site-header-banner-admin__label">
-              <span>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_IMAGE_ALT}</span>
-              <input
-                className="site-header-banner-admin__input"
-                value={item.imageAlt}
-                onChange={(event) => updateItem(item.id, { imageAlt: event.target.value })}
-                maxLength={200}
-              />
-            </label>
-            </div>
-
-            <div className="site-header-banner-admin__field-block">
-            <label className="site-header-banner-admin__label">
-              <span>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_LINK_PATH}</span>
-              <input
-                className="site-header-banner-admin__input"
-                value={item.linkPath}
-                onChange={(event) => updateItem(item.id, { linkPath: event.target.value })}
-                placeholder={SITE_HEADER_BANNER_ADMIN_PAGE_UI.LINK_PATH_PLACEHOLDER}
-              />
-            </label>
-            </div>
-
-            <div className="site-header-banner-admin__field-block">
-            <label className="site-header-banner-admin__label">
-              <span>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_BACKGROUND_COLOR}</span>
-              <SiteHeaderBannerColorField
-                value={item.backgroundColor}
+                <input
+                  type="checkbox"
+                  checked={form.enabled}
+                  disabled={isSaving}
+                  onChange={(event) => {
+                    resetDraftState();
+                    setForm((prev) => ({ ...prev, enabled: event.target.checked }));
+                  }}
+                />
+                <span>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_ENABLED}</span>
+              </label>
+              <button
+                type="button"
+                className="site-header-banner-admin__btn site-header-banner-admin__btn_secondary"
                 disabled={isSaving}
-                onChange={(backgroundColor) => {
-                  const normalized = normalizeSiteHeaderBannerHexColor(backgroundColor);
-                  updateItem(item.id, {
-                    backgroundColor: normalized ?? backgroundColor,
-                  });
+                onClick={handleAddSlide}
+              >
+                {SITE_HEADER_BANNER_ADMIN_PAGE_UI.ADD_ITEM}
+              </button>
+            </div>
+
+            <div className="site-header-banner-admin__preview-card">
+              <div className="site-header-banner-admin__preview-card-head">
+                <h3 className="site-header-banner-admin__section-title">
+                  {SITE_HEADER_BANNER_ADMIN_PAGE_UI.SECTION_PREVIEW}
+                </h3>
+                <p className="site-header-banner-admin__field-hint">
+                  {SITE_HEADER_BANNER_ADMIN_PAGE_UI.HINT_PREVIEW}
+                </p>
+              </div>
+              {previewSlides.length > 0 ? (
+                <div className="site-header-banner-admin__preview">
+                  <SiteHeaderBannerCarousel slides={previewSlides} />
+                </div>
+              ) : (
+                <p className="site-header-banner-admin__preview-empty">
+                  {SITE_HEADER_BANNER_ADMIN_PAGE_UI.PREVIEW_EMPTY}
+                </p>
+              )}
+            </div>
+
+            <div className="site-header-banner-admin__slides-layout">
+              <aside className="site-header-banner-admin__slides-sidebar">
+                <h3 className="site-header-banner-admin__section-title">
+                  {SITE_HEADER_BANNER_ADMIN_PAGE_UI.SECTION_ITEMS}
+                </h3>
+                <p className="site-header-banner-admin__field-hint">
+                  {SITE_HEADER_BANNER_ADMIN_PAGE_UI.SELECT_SLIDE_HINT}
+                </p>
+                <SiteHeaderBannerAdminSlideList
+                  items={form.items}
+                  selectedItemId={selectedSlideId}
+                  disabled={isSaving}
+                  onSelect={setSelectedSlideId}
+                />
+              </aside>
+
+              <div className="site-header-banner-admin__slides-main">
+                {selectedSlide && selectedSlideIndex >= 0 ? (
+                  <SiteHeaderBannerAdminSlideEditor
+                    item={selectedSlide}
+                    index={selectedSlideIndex}
+                    disabled={isSaving}
+                    onChange={(patch) => updateItem(selectedSlide.id, patch)}
+                    onRemove={() => handleRemoveSlide(selectedSlide.id)}
+                  />
+                ) : (
+                  <div className="site-header-banner-admin__slide-editor-empty">
+                    <p>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.NO_SLIDE_SELECTED}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        {activeTab === SITE_HEADER_BANNER_ADMIN_TAB_BUTTONS ? (
+          <div className="site-header-banner-admin__tab-panel">
+            <ProductManageToggleDisplayAdminPage embedded />
+          </div>
+        ) : null}
+
+        {activeTab === SITE_HEADER_BANNER_ADMIN_TAB_GUEST ? (
+          <div className="site-header-banner-admin__tab-panel">
+            <div className="site-header-banner-admin__panel site-header-banner-admin__panel-section">
+              <h3 className="site-header-banner-admin__section-title">
+                {SITE_HEADER_BANNER_ADMIN_PAGE_UI.TAB_GUEST}
+              </h3>
+              <p className="site-header-banner-admin__field-hint">
+                {SITE_HEADER_BANNER_ADMIN_PAGE_UI.HINT_GUEST_PROFILE}
+              </p>
+              <ImageUrlField
+                label={SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_GUEST_PROFILE_LOGIN_MENU_BANNER_IMAGE}
+                value={form.guestProfileLoginMenuBannerImageUrl}
+                disabled={isSaving}
+                onChange={(value) => {
+                  resetDraftState();
+                  setForm((prev) => ({
+                    ...prev,
+                    guestProfileLoginMenuBannerImageUrl: value,
+                  }));
                 }}
               />
-            </label>
-            </div>
-
-            <div className="site-header-banner-admin__field-block site-header-banner-admin__field-block_actions">
-            <button
-              type="button"
-              className="site-header-banner-admin__btn site-header-banner-admin__btn_danger"
-              onClick={() => {
-                resetDraftState();
-                setForm((prev) => ({
-                  ...prev,
-                  items: prev.items.filter((entry) => entry.id !== item.id),
-                }));
-              }}
-            >
-              {SITE_HEADER_BANNER_ADMIN_PAGE_UI.REMOVE_ITEM}
-            </button>
             </div>
           </div>
-        ))}
+        ) : null}
 
         {actionError ? (
           <p className="site-header-banner-admin__panel site-header-banner-admin__panel-section site-header-banner-admin__error" role="alert">
@@ -284,17 +290,19 @@ export function SiteHeaderBannerAdminPage() {
           </p>
         ) : null}
 
-        <div className="site-header-banner-admin__panel site-header-banner-admin__panel-section site-header-banner-admin__actions">
-          <button
-            type="submit"
-            className="site-header-banner-admin__btn site-header-banner-admin__btn_primary"
-            disabled={isSaving}
-          >
-            {isSaving
-              ? SITE_HEADER_BANNER_ADMIN_PAGE_UI.SAVING
-              : SITE_HEADER_BANNER_ADMIN_PAGE_UI.SAVE}
-          </button>
-        </div>
+        {showFormSave ? (
+          <div className="site-header-banner-admin__save-bar">
+            <button
+              type="submit"
+              className="site-header-banner-admin__btn site-header-banner-admin__btn_primary"
+              disabled={isSaving}
+            >
+              {isSaving
+                ? SITE_HEADER_BANNER_ADMIN_PAGE_UI.SAVING
+                : SITE_HEADER_BANNER_ADMIN_PAGE_UI.SAVE}
+            </button>
+          </div>
+        ) : null}
       </form>
     </section>
   );

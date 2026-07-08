@@ -112,9 +112,6 @@ export function RaffleFeaturedBanner({
           onPointerCancel={carouselVisualDrag?.onPointerCancel}
         >
           {prizeMedia}
-          <span className="raffle-featured-banner__badge">
-            {RAFFLE_FEATURED_BANNER_UI.BADGE}
-          </span>
           <button
             type="button"
             className={[

@@ -2,6 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { getCartLineExclusionReason } from "@/entities/cart/lib/getCartLineExclusionReason";
 import { selectCartCheckoutSummary } from "@/entities/cart/lib/selectCartCheckoutSummary";
@@ -18,16 +19,22 @@ import { CheckoutSheetModal } from "@/features/checkout/ui/CheckoutSheetModal";
 import { orderQueryKeys } from "@/shared/api";
 import { API_CLIENT_UI, AUTH_UI, CART_PAGE_UI, CHECKOUT_FORM_UI } from "@/shared/config";
 import { formatApiErrorMessage, formatPriceRub } from "@/shared/lib";
+import { resolveMobileBottomNavLayoutHeight } from "@/shared/lib/mobileBottomNavLayout";
 import { useCartScreenStyles } from "@/shared/theme/catalogProductStyles";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { AppButton } from "@/shared/ui/AppButton";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
+/** Примерная высота закреплённого footer (итог + CTA). */
+const CART_STICKY_FOOTER_HEIGHT = 132;
+
 export default function CartScreen() {
   const router = useRouter();
   const styles = useCartScreenStyles();
-  const { contentPaddingTop, contentPaddingBottom } = useScreenLayout();
+  const insets = useSafeAreaInsets();
+  const { contentPaddingTop, contentPaddingHorizontal } = useScreenLayout();
+  const bottomNavLayoutHeight = resolveMobileBottomNavLayoutHeight(insets.bottom);
   const queryClient = useQueryClient();
   const isAuthorized = useIsAuthorized();
   const sessionQuery = useAuthSessionQuery();
@@ -172,8 +179,14 @@ export default function CartScreen() {
     );
   }
 
-  const listFooter = (
-    <View style={styles.footer}>
+  const stickyFooterStyle = {
+    bottom: 0,
+    paddingHorizontal: contentPaddingHorizontal,
+    paddingBottom: 0,
+  };
+
+  const checkoutFooter = (
+    <View style={[styles.stickyFooter, stickyFooterStyle]}>
       <View style={styles.footerTopRow}>
         <View style={styles.footerTotalBlock}>
           <Text style={styles.footerTotalLabel}>{totalLabel}</Text>
@@ -210,7 +223,7 @@ export default function CartScreen() {
   );
 
   return (
-    <>
+    <View style={styles.container}>
       <FlatList
         style={styles.container}
         data={visibleLines}
@@ -218,9 +231,11 @@ export default function CartScreen() {
         renderItem={({ item }) => <CartLineItem line={item} />}
         contentContainerStyle={[
           styles.list,
-          { paddingTop: contentPaddingTop + 8, paddingBottom: contentPaddingBottom },
+          {
+            paddingTop: contentPaddingTop + 8,
+            paddingBottom: bottomNavLayoutHeight + CART_STICKY_FOOTER_HEIGHT,
+          },
         ]}
-        ListFooterComponent={listFooter}
         refreshControl={
           <ThemedRefreshControl
             refreshing={cartQuery.isRefetching || productsQuery.isRefetching}
@@ -228,6 +243,8 @@ export default function CartScreen() {
           />
         }
       />
+
+      {checkoutFooter}
 
       <CheckoutSheetModal
         visible={checkoutSheetOpen}
@@ -239,6 +256,6 @@ export default function CartScreen() {
         onClose={() => setCheckoutSheetOpen(false)}
         onSubmit={handleCheckoutSubmit}
       />
-    </>
+    </View>
   );
 }

@@ -99,9 +99,6 @@ export const RaffleFeaturedBanner = ({
           ]}
         >
           <RafflePrizeMedia raffle={raffle} showSoundToggle />
-          <View style={[styles.badge, isCompleted && styles.badgeCompleted]}>
-            <Text style={styles.badgeText}>{RAFFLE_FEATURED_BANNER_UI.BADGE}</Text>
-          </View>
           <View style={styles.visualControls}>
             {hasManage && manage ? (
               <RaffleFeaturedBannerManageMenu

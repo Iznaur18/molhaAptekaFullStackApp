@@ -73,11 +73,13 @@ export const siteHeaderBannerSlideSchema = z.object({
 export const siteHeaderBannerSettingsSchema = z.object({
   enabled: z.boolean(),
   items: z.array(siteHeaderBannerItemSchema),
+  guestProfileLoginMenuBannerImageUrl: optionalTrimmedMediaUrl,
   updatedAt: z.union([z.string(), z.date(), z.null()]).optional().nullable(),
 });
 
 export const siteHeaderBannerSlidesDataSchema = z.object({
   slides: z.array(siteHeaderBannerSlideSchema),
+  guestProfileLoginMenuBannerImageUrl: optionalTrimmedMediaUrl,
 });
 
 export const siteHeaderBannerSettingsDataSchema = z.object({
@@ -97,6 +99,7 @@ export const patchSiteHeaderBannerSettingsBodySchema = z
   .object({
     enabled: z.boolean().optional(),
     items: z.array(patchSiteHeaderBannerItemSchema).optional(),
+    guestProfileLoginMenuBannerImageUrl: optionalTrimmedMediaUrl,
   })
   .superRefine((body, ctx) => {
     if (body.items == null) {
@@ -128,4 +131,5 @@ export const patchSiteHeaderBannerSettingsBodySchema = z
 export const SITE_HEADER_BANNER_SETTINGS_DEFAULTS = {
   enabled: false,
   items: [],
+  guestProfileLoginMenuBannerImageUrl: null,
 };

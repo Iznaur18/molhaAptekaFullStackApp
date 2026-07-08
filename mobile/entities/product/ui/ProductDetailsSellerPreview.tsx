@@ -2,37 +2,37 @@ import { Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 
 import { formatSearchRowRatingCompact } from "@/entities/user/lib/formatSearchRowRating";
+import { formatSearchRowTotalSales } from "@/entities/user/lib/formatSearchRowTotalSales";
 import { UserPremiumDisplayName } from "@/entities/user/ui/UserPremiumDisplayName";
 import {
-  FORMAT_BOOLEAN_RU,
   PRODUCT_SELLER_PREVIEW_UI,
   USER_LIST_ROW_UI,
   USER_PROFILE_COPY,
 } from "@/shared/config";
-import { formatIsoDateTime } from "@/shared/lib";
 import { useProductDetailsSellerPreviewStyles } from "@/shared/theme/catalogProductStyles";
 
 type SellerObject = {
   _id: string;
   userName?: string;
-  email?: string;
-  userPhoneNumber?: string;
-  userAddress?: string;
-  createdAt?: string;
   isPremiumUser?: boolean;
   isUserDataConfirmed?: boolean;
   userRatingByVotes?: { countVotes?: number; totalRating?: number };
   sellerListedProductCount?: number;
   sellerListedProductsCount?: number;
+  totalSalesAmount?: number;
+  followersCount?: number;
 };
 
 type ProductDetailsSellerPreviewProps = {
   seller: unknown;
 };
 
-const formatOptionalText = (value?: string): string => {
-  const text = value?.trim() ?? "";
-  return text.length > 0 ? text : "—";
+const formatFollowersCount = (value?: number): string => {
+  if (value == null) {
+    return "0";
+  }
+
+  return String(Math.max(0, Math.floor(Number(value)) || 0));
 };
 
 export const ProductDetailsSellerPreview = ({ seller }: ProductDetailsSellerPreviewProps) => {
@@ -54,43 +54,26 @@ export const ProductDetailsSellerPreview = ({ seller }: ProductDetailsSellerPrev
     ? String(Math.max(0, Math.floor(listedCount)))
     : "0";
 
-  const ratingText = formatSearchRowRatingCompact(sellerObj.userRatingByVotes);
-
   const metrics = [
-    { key: "rating", label: USER_LIST_ROW_UI.RATING_LABEL, value: ratingText },
     {
-      key: "confirmed",
-      label: USER_LIST_ROW_UI.USER_DATA_CONFIRMED_LABEL,
-      value: isConfirmed ? FORMAT_BOOLEAN_RU.YES : FORMAT_BOOLEAN_RU.NO,
+      key: "rating",
+      label: USER_LIST_ROW_UI.RATING_LABEL,
+      value: formatSearchRowRatingCompact(sellerObj.userRatingByVotes),
     },
     {
-      key: "premium",
-      label: PRODUCT_SELLER_PREVIEW_UI.PREMIUM_LABEL,
-      value: isPremium ? FORMAT_BOOLEAN_RU.YES : FORMAT_BOOLEAN_RU.NO,
-    },
-    { key: "email", label: USER_PROFILE_COPY.LABELS.email, value: formatOptionalText(sellerObj.email) },
-    {
-      key: "phone",
-      label: USER_PROFILE_COPY.LABELS.userPhoneNumber,
-      value: formatOptionalText(sellerObj.userPhoneNumber),
-    },
-    {
-      key: "address",
-      label: USER_PROFILE_COPY.LABELS.userAddress,
-      value: formatOptionalText(sellerObj.userAddress),
-    },
-    {
-      key: "createdAt",
-      label: USER_PROFILE_COPY.LABELS.createdAt,
-      value:
-        typeof sellerObj.createdAt === "string"
-          ? formatIsoDateTime(sellerObj.createdAt)
-          : "—",
+      key: "totalSales",
+      label: USER_PROFILE_COPY.LABELS.totalSalesAmount,
+      value: formatSearchRowTotalSales(sellerObj.totalSalesAmount),
     },
     {
       key: "listed",
       label: PRODUCT_SELLER_PREVIEW_UI.LISTED_PRODUCTS_LABEL,
       value: listedProductsText,
+    },
+    {
+      key: "followers",
+      label: USER_LIST_ROW_UI.FOLLOWERS_LABEL,
+      value: formatFollowersCount(sellerObj.followersCount),
     },
   ];
 

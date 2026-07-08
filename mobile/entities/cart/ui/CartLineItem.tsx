@@ -55,7 +55,7 @@ export const CartLineItem = ({ line }: CartLineItemProps) => {
     isUpdating || (purchaseLimit > 0 && line.quantity >= purchaseLimit);
 
   return (
-    <View style={[styles.row, isUpdating && styles.rowUpdating]}>
+    <View style={[styles.row, { backgroundColor: "#ffffff" }, isUpdating && styles.rowUpdating]}>
       <View style={styles.mainRow}>
         <Pressable
           style={styles.imageWrap}

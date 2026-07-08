@@ -8,6 +8,7 @@ export const mapSiteHeaderBannerSettingsToForm = (settings) => {
 
   return {
     enabled: Boolean(source.enabled),
+    guestProfileLoginMenuBannerImageUrl: source.guestProfileLoginMenuBannerImageUrl ?? "",
     items: Array.isArray(source.items)
       ? source.items.map((item) => ({
           id: item.id,
@@ -26,6 +27,8 @@ export const mapSiteHeaderBannerSettingsToForm = (settings) => {
  */
 export const buildPatchSiteHeaderBannerSettingsBody = (form) => ({
   enabled: Boolean(form.enabled),
+  guestProfileLoginMenuBannerImageUrl:
+    String(form.guestProfileLoginMenuBannerImageUrl ?? "").trim() || null,
   items: form.items.map((item) => ({
     id: item.id,
     enabled: Boolean(item.enabled),

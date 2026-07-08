@@ -5,6 +5,7 @@ import {
   FlatList,
   Linking,
   Pressable,
+  Text,
   View,
   type LayoutChangeEvent,
   type NativeScrollEvent,
@@ -162,6 +163,9 @@ export const SiteHeaderBannerCarousel = ({
         ) : (
           image
         )}
+        <View style={styles.adBadge} pointerEvents="none" accessibilityElementsHidden>
+          <Text style={styles.adBadgeText}>{SITE_HEADER_BANNER_UI.AD_BADGE}</Text>
+        </View>
       </View>
     );
   };

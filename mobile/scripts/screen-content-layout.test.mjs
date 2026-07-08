@@ -58,15 +58,28 @@ test("web mobile bottom nav uses horizontal safe area and rounded edges", () => 
 test("mobile bottom nav is flat full-width (Ozon-style)", () => {
   const source = readFile(MOBILE_ROOT, "shared/lib/mobileBottomNavLayout.ts");
   const tabBar = readFile(MOBILE_ROOT, "shared/ui/MobileBottomTabBar.tsx");
+  const cartScreen = readFile(MOBILE_ROOT, "app/(tabs)/cart.tsx");
 
   assert.match(source, /MOBILE_BOTTOM_NAV_HORIZONTAL_INSET = 0/);
   assert.match(source, /MOBILE_BOTTOM_NAV_FLOAT_OFFSET = 0/);
+  assert.match(source, /resolveMobileBottomNavLayoutHeight/);
   assert.match(source, /resolveMobileBottomNavReservedHeight/);
   assert.match(tabBar, /resolveMobileBottomNavHorizontalInset/);
+  assert.match(tabBar, /MOBILE_BOTTOM_NAV_PADDING_VERTICAL/);
   assert.match(tabBar, /pointerEvents: "box-none"/);
   assert.match(tabBar, /backgroundColor: "transparent"/);
   assert.match(tabBar, /borderTopWidth: StyleSheet\.hairlineWidth/);
+  assert.match(cartScreen, /resolveMobileBottomNavLayoutHeight/);
   assert.doesNotMatch(tabBar, /MobileBottomNavGlassLayer/);
   // активный таб — только цветом иконки, без подложки
   assert.match(tabBar, /itemActive[\s\S]*backgroundColor: "transparent"/);
+});
+
+test("resolveMobileBottomNavLayoutHeight matches tab bar chrome", () => {
+  const source = readFile(MOBILE_ROOT, "shared/lib/mobileBottomNavLayout.ts");
+
+  assert.match(source, /StyleSheet\.hairlineWidth/);
+  assert.match(source, /MOBILE_BOTTOM_NAV_PADDING_VERTICAL \+/);
+  assert.match(source, /MOBILE_BOTTOM_NAV_ITEM_MIN_HEIGHT \+/);
+  assert.match(source, /Math\.max\(safeAreaBottom, MOBILE_BOTTOM_NAV_SHELL_MIN_PADDING_BOTTOM\)/);
 });

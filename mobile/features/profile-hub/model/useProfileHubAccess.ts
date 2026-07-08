@@ -39,7 +39,6 @@ export type ProfileHubAccess = {
   canUseCategoryTreeAdmin: boolean;
   canUseAppIntroAdmin: boolean;
   canUseSiteHeaderBannerAdmin: boolean;
-  canUseProductManageToggleDisplayAdmin: boolean;
   canUsePopularProductsAdmin: boolean;
 };
 
@@ -80,13 +79,13 @@ export const useProfileHubAccess = (): ProfileHubAccess => {
     canUseCategoryTreeAdmin: isProfileReady && isAdmin,
     canUseAppIntroAdmin: isProfileReady && isAdmin,
     canUseSiteHeaderBannerAdmin: isProfileReady && canModerate,
-    canUseProductManageToggleDisplayAdmin: isProfileReady && canModerate,
     canUsePopularProductsAdmin: isProfileReady && isAdmin,
   };
 };
 
 const STAFF_SECTION_ALIASES: Partial<Record<string, StaffSectionId>> = {
   raffles: "staff-raffles",
+  "product-manage-toggle-display-admin": "site-header-banner-admin",
 };
 
 export const resolveStaffSectionId = (sectionId: string): StaffSectionId | null => {

@@ -159,9 +159,13 @@ export const useAuctionPageStyles = createThemedStyles((theme) => ({
     color: theme.colors.onContrast,
   },
   overview: {
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
   },
   overviewTile: {
+    flex: 1,
+    minWidth: 0,
     gap: 2,
     paddingVertical: 9.6,
     paddingHorizontal: 10.4,

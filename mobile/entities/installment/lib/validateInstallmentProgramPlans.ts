@@ -12,6 +12,12 @@ export type InstallmentProgramPlanDraft = {
   monthsCount?: number;
   monthlyAmountRub?: number;
   firstPaymentRequiredNow?: boolean;
+  /**
+   * Процент надбавки, который ввёл продавец. Это источник правды для поля
+   * ввода: `monthlyAmountRub` считается из него, а не наоборот, иначе
+   * округление ежемесячного платежа «перебивает» набранный процент.
+   */
+  markupPercent?: number;
 };
 
 export const validateInstallmentProgramPlans = (

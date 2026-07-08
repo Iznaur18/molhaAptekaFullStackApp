@@ -366,8 +366,8 @@ export const HOME_PAGE_UI = {
   TITLE_ADVERTISING: "Реклама в intro",
   TITLE_PRODUCT_REPORTS: "Жалобы",
   TITLE_DATA_CONFIRMATION: "Подтверждение данных",
-  TITLE_INSTALLMENT_PAYMENTS: "Мои рассрочки",
-  TITLE_INSTALLMENT_SALES: "Продажи в рассрочку",
+  TITLE_INSTALLMENT_PAYMENTS: "Покупки - Рассрочка",
+  TITLE_INSTALLMENT_SALES: "Продажи - Рассрочка",
   TITLE_INSTALLMENT_MODERATION: "Рассрочка — модерация",
   TITLE_INSTALLMENT_DISPUTES: "Споры по рассрочке",
   NAV_TO_CATALOG: "← Каталог товаров",
@@ -1564,7 +1564,7 @@ export const INSTALLMENT_UI = {
   SEND_MESSAGE: "Написать продавцу",
   MESSAGE_PLACEHOLDER: "Сообщение…",
   ACTION_PENDING: "Сохраняем…",
-  PAYMENTS_PAGE_TITLE: "Мои рассрочки",
+  PAYMENTS_PAGE_TITLE: "Покупки - Рассрочка",
   /** @param {number} count */
   COUNT_CONTRACTS: (count) => `${count} договоров`,
   /** @param {number} count */
@@ -1587,7 +1587,7 @@ export const INSTALLMENT_UI = {
   PAYMENTS_ATTENTION_FILTER_HINT: "Показаны договоры, где нужно ваше действие",
   /** @param {boolean} expanded */
   PAYMENTS_EXPAND_TOGGLE: (expanded) => (expanded ? "Свернуть" : "Развернуть"),
-  SALES_PAGE_TITLE: "Продажи в рассрочку",
+  SALES_PAGE_TITLE: "Продажи - Рассрочка",
   SALES_PAGE_LOADING: "Загрузка продаж…",
   SALES_PAGE_EMPTY: "Продаж в рассрочку пока нет.",
   SALES_PAGE_EMPTY_BY_FILTER: "По выбранному статусу продаж нет.",
@@ -1679,6 +1679,7 @@ export const CREATE_RAFFLE_MODAL_UI = {
 export const SITE_HEADER_BANNER_UI = {
   CAROUSEL_ARIA: "Баннеры на главной",
   AUTOPLAY_MS: 5000,
+  AD_BADGE: "Реклама",
 };
 
 export const RAFFLE_FEATURED_CAROUSEL_UI = {
@@ -1989,7 +1990,7 @@ export const MY_PROFILE_PAGE_UI = {
   TAB_POPULAR_PRODUCTS_ADMIN: "Популярные товары",
   TAB_CATEGORY_TREE_ADMIN: "Категории",
   TAB_APP_INTRO_ADMIN: "Intro-ролик",
-  TAB_SITE_HEADER_BANNER_ADMIN: "Баннер шапки",
+  TAB_SITE_HEADER_BANNER_ADMIN: "Картинки",
   TAB_PRODUCT_MANAGE_TOGGLE_DISPLAY_ADMIN: "Кнопки управления",
   TAB_PRODUCT_MODERATION: "На модерации",
   TAB_INTRO_AD_MODERATION: "Intro-реклама",
@@ -1998,8 +1999,8 @@ export const MY_PROFILE_PAGE_UI = {
   TAB_PRODUCT_PROMOTIONS: "Продвижение",
   TAB_RAFFLES: "Розыгрыши",
   TAB_DATA_CONFIRMATION: "Подтверждение",
-  TAB_INSTALLMENT_PAYMENTS: "Рассрочка - Покупка",
-  TAB_INSTALLMENT_SALES: "Рассрочка - Продажа",
+  TAB_INSTALLMENT_PAYMENTS: "Покупки - Рассрочка",
+  TAB_INSTALLMENT_SALES: "Продажи - Рассрочка",
   TAB_INSTALLMENT_MODERATION: "Рассрочка — модерация",
   TAB_INSTALLMENT_DISPUTES: "Споры",
   TAB_SUBSCRIPTIONS: "Подписки",
@@ -2248,7 +2249,7 @@ export const APP_INTRO_ADMIN_PAGE_UI = {
 };
 
 export const SITE_HEADER_BANNER_ADMIN_PAGE_UI = {
-  TITLE: "Баннер шапки",
+  TITLE: "Картинки",
   HINT: "Карусель под строкой поиска на главном каталоге. Только изображение и alt-текст.",
   LOADING: "Загрузка настроек…",
   LOAD_ERROR: "Не удалось загрузить настройки баннера",
@@ -2256,9 +2257,16 @@ export const SITE_HEADER_BANNER_ADMIN_PAGE_UI = {
   SAVE_SUCCESS: "Сохранено",
   SAVE: "Сохранить",
   SAVING: "Сохранение…",
+  TABS_ARIA: "Разделы баннера шапки",
+  TAB_SLIDES: "Слайды",
+  TAB_BUTTONS: "Кнопки",
+  TAB_GUEST: "Профиль гостя",
   SECTION_GLOBAL: "Общие настройки",
   SECTION_ITEMS: "Слайды",
   LABEL_ENABLED: "Показывать баннеры на главной",
+  LABEL_GUEST_PROFILE_LOGIN_MENU_BANNER_IMAGE: "Картинка меню профиля (вход)",
+  HINT_GUEST_PROFILE:
+    "Показывается гостю на экране профиля над кнопками входа и регистрации.",
   LABEL_ITEM_ENABLED: "Слайд включён",
   LABEL_IMAGE: "Изображение",
   HINT_IMAGE: "Рекомендуемая высота ~120px, ширина на всю шапку",

@@ -17,7 +17,7 @@ export function resolveProductDetailsContentPanels(product, bottomBlockFieldKeys
   const otherBlockFieldKeys = bottomBlockFieldKeys.filter(
     (key) => key !== "productDescription",
   );
-  const showSwitcher = hasDescription && hasCharacteristics;
+  const showSwitcher = hasDescription || hasCharacteristics;
   const defaultPanel = hasDescription
     ? PRODUCT_DETAILS_CONTENT_PANEL.DESCRIPTION
     : hasCharacteristics

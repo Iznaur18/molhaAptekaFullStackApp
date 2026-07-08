@@ -64,7 +64,7 @@ export const resolveSiteHeaderBannerMobileRoute = (linkPath: string): string | n
   }
 
   const staffHubMatch = normalized.match(
-    /^\/(moderation-products|moderation-intro-ad|moderation-seller-categories|product-reports|product-promotions|staff-raffles|data-confirmation-requests|installment-moderation|installment-disputes|admin-orders|search-synonyms-admin|category-tree-admin|app-intro-admin|site-header-banner-admin|product-manage-toggle-display-admin|profile\/popular-products-admin)$/i,
+    /^\/(moderation-products|moderation-intro-ad|moderation-seller-categories|product-reports|staff-raffles|data-confirmation-requests|installment-moderation|installment-disputes|admin-orders|search-synonyms-admin|category-tree-admin|app-intro-admin|site-header-banner-admin|product-manage-toggle-display-admin|profile\/popular-products-admin)$/i,
   );
   if (staffHubMatch?.[1]) {
     const staffPathMap: Record<string, string> = {
@@ -72,7 +72,6 @@ export const resolveSiteHeaderBannerMobileRoute = (linkPath: string): string | n
       "moderation-intro-ad": "/hub/intro-ad-moderation",
       "moderation-seller-categories": "/hub/seller-personal-category-moderation",
       "product-reports": "/hub/product-reports",
-      "product-promotions": "/hub/product-promotions",
       "staff-raffles": "/hub/raffles",
       "data-confirmation-requests": "/hub/data-confirmation-requests",
       "installment-moderation": "/hub/installment-moderation",
@@ -82,7 +81,7 @@ export const resolveSiteHeaderBannerMobileRoute = (linkPath: string): string | n
       "category-tree-admin": "/hub/category-tree-admin",
       "app-intro-admin": "/hub/app-intro-admin",
       "site-header-banner-admin": "/hub/site-header-banner-admin",
-      "product-manage-toggle-display-admin": "/hub/product-manage-toggle-display-admin",
+      "product-manage-toggle-display-admin": "/hub/site-header-banner-admin",
       "profile/popular-products-admin": "/hub/popular-products-admin",
     };
     return staffPathMap[staffHubMatch[1].toLowerCase()] ?? null;

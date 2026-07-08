@@ -194,111 +194,122 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
   }
 
   return (
-    <ScrollView
-      style={styles.scroll}
-      contentContainerStyle={styles.container}
-      keyboardShouldPersistTaps="handled"
-    >
-      <View style={styles.field}>
-        <Text style={styles.label}>{CREATE_PRODUCT_UI.LABEL_NAME}</Text>
-        <TextInput
-          style={styles.input}
-          value={productName}
-          onChangeText={setProductName}
-          maxLength={PRODUCT_NAME_MAX_LENGTH}
-          editable={!isBusy}
-          placeholderTextColor={theme.colors.textMuted}
-        />
-      </View>
+    <View style={styles.editorScreen}>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={[styles.container, styles.contentWithFooterPad]}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.content}>
+          <View style={[styles.zoneBlock, styles.zoneMain]}>
+            <View style={styles.field}>
+              <Text style={styles.label}>{CREATE_PRODUCT_UI.LABEL_NAME}</Text>
+              <TextInput
+                style={styles.input}
+                value={productName}
+                onChangeText={setProductName}
+                maxLength={PRODUCT_NAME_MAX_LENGTH}
+                editable={!isBusy}
+                placeholderTextColor={theme.colors.textMuted}
+              />
+            </View>
 
-      <View style={styles.field}>
-        <Text style={styles.label}>{CREATE_PRODUCT_UI.LABEL_DESCRIPTION}</Text>
-        <TextInput
-          style={[styles.input, styles.textArea]}
-          value={productDescription}
-          onChangeText={setProductDescription}
-          multiline
-          editable={!isBusy}
-          placeholderTextColor={theme.colors.textMuted}
-        />
-      </View>
+            <View style={styles.field}>
+              <Text style={styles.label}>{CREATE_PRODUCT_UI.LABEL_DESCRIPTION}</Text>
+              <TextInput
+                style={[styles.input, styles.textArea]}
+                value={productDescription}
+                onChangeText={setProductDescription}
+                multiline
+                editable={!isBusy}
+                placeholderTextColor={theme.colors.textMuted}
+              />
+            </View>
 
-      <View style={styles.field}>
-        <Text style={styles.label}>{CREATE_PRODUCT_UI.LABEL_PRICE}</Text>
-        <TextInput
-          style={styles.input}
-          value={productPrice}
-          onChangeText={setProductPrice}
-          keyboardType="number-pad"
-          editable={!isBusy}
-          placeholderTextColor={theme.colors.textMuted}
-        />
-      </View>
+            <View style={styles.field}>
+              <Text style={styles.label}>{CREATE_PRODUCT_UI.LABEL_PRICE}</Text>
+              <TextInput
+                style={styles.input}
+                value={productPrice}
+                onChangeText={setProductPrice}
+                keyboardType="number-pad"
+                editable={!isBusy}
+                placeholderTextColor={theme.colors.textMuted}
+              />
+            </View>
 
-      <CreateProductCategoryPicker
-        selectedCategoryId={productCategoryId}
-        selectedCategoryLabel={productCategoryLabel}
-        onSelect={(categoryId, label) => {
-          setProductCategoryId(categoryId);
-          setProductCategoryLabel(label);
-        }}
-      />
+            <CreateProductCategoryPicker
+              selectedCategoryId={productCategoryId}
+              selectedCategoryLabel={productCategoryLabel}
+              onSelect={(categoryId, label) => {
+                setProductCategoryId(categoryId);
+                setProductCategoryLabel(label);
+              }}
+            />
+          </View>
 
-      <View style={styles.switchRow}>
-        <Text style={styles.switchLabel}>{CREATE_PRODUCT_UI.LABEL_AVAILABLE}</Text>
-        <Switch
-          value={productIsAvailable}
-          onValueChange={setProductIsAvailable}
-          disabled={isBusy}
-          trackColor={{ false: theme.colors.border, true: theme.colors.action }}
-          thumbColor={theme.colors.surface}
-        />
-      </View>
+          <View style={[styles.zoneBlock, styles.zoneInventory]}>
+            <View style={styles.switchRow}>
+              <Text style={styles.switchLabel}>{CREATE_PRODUCT_UI.LABEL_AVAILABLE}</Text>
+              <Switch
+                value={productIsAvailable}
+                onValueChange={setProductIsAvailable}
+                disabled={isBusy}
+                trackColor={{ false: theme.colors.border, true: theme.colors.action }}
+                thumbColor={theme.colors.surface}
+              />
+            </View>
 
-      {productIsAvailable ? (
-        <View style={styles.field}>
-          <Text style={styles.label}>{CREATE_PRODUCT_UI.LABEL_STOCK}</Text>
-          <TextInput
-            style={styles.input}
-            value={productStockQuantity}
-            onChangeText={setProductStockQuantity}
-            keyboardType="number-pad"
-            editable={!isBusy}
-            placeholderTextColor={theme.colors.textMuted}
-          />
-        </View>
-      ) : null}
+            {productIsAvailable ? (
+              <View style={styles.field}>
+                <Text style={styles.label}>{CREATE_PRODUCT_UI.LABEL_STOCK}</Text>
+                <TextInput
+                  style={styles.input}
+                  value={productStockQuantity}
+                  onChangeText={setProductStockQuantity}
+                  keyboardType="number-pad"
+                  editable={!isBusy}
+                  placeholderTextColor={theme.colors.textMuted}
+                />
+              </View>
+            ) : null}
+          </View>
 
-      <View style={styles.field}>
-        <Text style={styles.label}>{CREATE_PRODUCT_UI.LABEL_IMAGE}</Text>
-        <Pressable
-          style={({ pressed }) => [styles.secondaryButton, pressed && styles.buttonPressed]}
-          onPress={() => {
-            void handlePickImage();
-          }}
-          disabled={isBusy}
-        >
-          <Text style={styles.secondaryButtonText}>{IMAGE_UPLOAD_UI.UPLOAD_BUTTON}</Text>
-        </Pressable>
-        {productImageUrl ? (
-          <Text style={styles.imageUrl} numberOfLines={1}>
-            {productImageUrl}
-          </Text>
+          <View style={[styles.zoneBlock, styles.zoneMedia]}>
+            <View style={styles.field}>
+              <Text style={styles.label}>{CREATE_PRODUCT_UI.LABEL_IMAGE}</Text>
+              <Pressable
+                style={({ pressed }) => [styles.secondaryButton, pressed && styles.buttonPressed]}
+                onPress={() => {
+                  void handlePickImage();
+                }}
+                disabled={isBusy}
+              >
+                <Text style={styles.secondaryButtonText}>{IMAGE_UPLOAD_UI.UPLOAD_BUTTON}</Text>
+              </Pressable>
+              {productImageUrl ? (
+                <Text style={styles.imageUrl} numberOfLines={1}>
+                  {productImageUrl}
+                </Text>
+              ) : null}
+            </View>
+          </View>
+
+        {errorMessage ? (
+          <View style={[styles.feedbackBox, styles.errorBox]} accessibilityRole="alert">
+            <Text style={styles.error}>{errorMessage}</Text>
+          </View>
         ) : null}
-      </View>
-
-      {errorMessage ? (
-        <View style={[styles.feedbackBox, styles.errorBox]} accessibilityRole="alert">
-          <Text style={styles.error}>{errorMessage}</Text>
+        {successMessage ? (
+          <View style={[styles.feedbackBox, styles.successBox]}>
+            <Text style={styles.success}>{successMessage}</Text>
+          </View>
+        ) : null}
         </View>
-      ) : null}
-      {successMessage ? (
-        <View style={[styles.feedbackBox, styles.successBox]}>
-          <Text style={styles.success}>{successMessage}</Text>
-        </View>
-      ) : null}
+      </ScrollView>
 
-      <View style={styles.footer}>
+      <View style={styles.footerDock}>
+        <View style={styles.footer}>
         <View style={styles.actions}>
           <Pressable
             style={({ pressed }) => [
@@ -341,7 +352,8 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
         >
           <Text style={styles.deleteText}>{CREATE_PRODUCT_UI.DELETE}</Text>
         </Pressable>
+        </View>
       </View>
-    </ScrollView>
+    </View>
   );
 };

@@ -1,7 +1,6 @@
 import { usePathname, useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 
-import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { buildHomeCatalogUsersMenuItems } from "@/features/home-feed/lib/buildHomeCatalogUsersMenuItems";
 import { HomeCatalogUsersStretchMenu } from "@/features/home-feed/ui/HomeCatalogUsersStretchMenu";
 
@@ -10,8 +9,6 @@ const USERS_ROUTE = "/users";
 export const HomeCatalogUsersButton = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const sessionQuery = useAuthSessionQuery();
-  const isAuthorized = sessionQuery.data?.user != null;
   const [menuOpen, setMenuOpen] = useState(false);
   const menuItems = useMemo(() => buildHomeCatalogUsersMenuItems(), []);
   const isUsersActive = pathname === USERS_ROUTE || pathname.startsWith(`${USERS_ROUTE}/`);
@@ -31,10 +28,6 @@ export const HomeCatalogUsersButton = () => {
     },
     [router],
   );
-
-  if (!isAuthorized) {
-    return null;
-  }
 
   return (
     <HomeCatalogUsersStretchMenu

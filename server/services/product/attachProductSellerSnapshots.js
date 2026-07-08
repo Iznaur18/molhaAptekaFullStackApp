@@ -1,4 +1,6 @@
 import { PRODUCT_SELLER_PUBLIC_FIELD_NAMES } from "../../constants/productSellerPublicFields.js";
+import { attachTotalSalesAmountToUsers } from "../order/sellerTotalSalesAmount.js";
+import { attachFollowersCountToUsers } from "../user/userFollowHelpers.js";
 import { enrichProductApiFields } from "./productDiscount.js";
 import { getSellerListedProductCountByIds } from "./sellerListedProductCount.js";
 
@@ -22,6 +24,14 @@ export const pickProductSellerPublicSnapshot = (seller) => {
     snapshot.sellerListedProductCount = seller.sellerListedProductCount;
   }
 
+  if (seller.totalSalesAmount !== undefined) {
+    snapshot.totalSalesAmount = seller.totalSalesAmount;
+  }
+
+  if (seller.followersCount !== undefined) {
+    snapshot.followersCount = seller.followersCount;
+  }
+
   return snapshot._id != null ? snapshot : null;
 };
 
@@ -38,7 +48,21 @@ export const attachProductSellerSnapshots = async (products) => {
     .filter((id) => id != null)
     .map((id) => String(id));
 
-  const listedCounts = await getSellerListedProductCountByIds(sellerIds);
+  const uniqueSellerIds = [...new Set(sellerIds)];
+  const sellerIdRows = uniqueSellerIds.map((sellerId) => ({ _id: sellerId }));
+
+  const [listedCounts, sellersWithFollowers, sellersWithSales] = await Promise.all([
+    getSellerListedProductCountByIds(uniqueSellerIds),
+    attachFollowersCountToUsers(sellerIdRows),
+    attachTotalSalesAmountToUsers(sellerIdRows),
+  ]);
+
+  const followersBySellerId = Object.fromEntries(
+    sellersWithFollowers.map((seller) => [String(seller._id), seller.followersCount ?? 0]),
+  );
+  const totalSalesBySellerId = Object.fromEntries(
+    sellersWithSales.map((seller) => [String(seller._id), seller.totalSalesAmount ?? 0]),
+  );
 
   return products.map((product) => {
     const seller = product.productSeller;
@@ -50,6 +74,8 @@ export const attachProductSellerSnapshots = async (products) => {
     const snapshot = pickProductSellerPublicSnapshot({
       ...seller,
       sellerListedProductCount: listedCounts[sellerId] ?? 0,
+      totalSalesAmount: totalSalesBySellerId[sellerId] ?? 0,
+      followersCount: followersBySellerId[sellerId] ?? 0,
     });
 
     return enrichProductApiFields({

@@ -4,6 +4,7 @@ import type { SiteHeaderBannerSettings } from "@/entities/site-header-banner/mod
 
 export type SiteHeaderBannerAdminForm = {
   enabled: boolean;
+  guestProfileLoginMenuBannerImageUrl: string;
   items: Array<{
     id: string;
     enabled: boolean;
@@ -21,6 +22,7 @@ export const mapSiteHeaderBannerSettingsToForm = (
 
   return {
     enabled: Boolean(source.enabled),
+    guestProfileLoginMenuBannerImageUrl: source.guestProfileLoginMenuBannerImageUrl ?? "",
     items: Array.isArray(source.items)
       ? source.items.map((item) => ({
           id: item.id,
@@ -36,6 +38,8 @@ export const mapSiteHeaderBannerSettingsToForm = (
 
 export const buildPatchSiteHeaderBannerSettingsBody = (form: SiteHeaderBannerAdminForm) => ({
   enabled: Boolean(form.enabled),
+  guestProfileLoginMenuBannerImageUrl:
+    String(form.guestProfileLoginMenuBannerImageUrl ?? "").trim() || null,
   items: form.items.map((item) => ({
     id: item.id,
     enabled: Boolean(item.enabled),

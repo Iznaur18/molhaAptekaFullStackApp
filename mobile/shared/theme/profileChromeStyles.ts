@@ -12,11 +12,18 @@ export const PROFILE_CONTENT_MAX_WIDTH = PROFILE_CONTENT_MAX_WIDTH_PHONE;
 export const PROFILE_ACTIONS_MAX_WIDTH = 320;
 const PROFILE_AVATAR_SIZE = 72;
 const PROFILE_BANNER_HEIGHT = PROFILE_AVATAR_SIZE * 3;
+const GUEST_BODY_PADDING_TOP = 0;
+const GUEST_BODY_MARGIN_TOP = 36;
+const GUEST_BODY_MARGIN_BOTTOM = 36;
 
 export const useProfileScreenStyles = createThemedStyles((theme) => ({
   safeArea: {
     flex: 1,
     backgroundColor: theme.colors.bg,
+  },
+  guestSafeArea: {
+    flex: 1,
+    backgroundColor: theme.colors.surface,
   },
   scrollContent: {
     flexGrow: 1,
@@ -43,19 +50,44 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
   },
   guestContent: {
     flexGrow: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    width: "100%",
+    alignItems: "stretch",
+    justifyContent: "flex-start",
     paddingBottom: SCREEN_CONTENT_PADDING_BOTTOM,
-    backgroundColor: theme.colors.bg,
+    backgroundColor: theme.colors.surface,
   },
   guestInner: {
-    flexGrow: 1,
+    alignSelf: "stretch",
     width: "100%",
-    maxWidth: PROFILE_ACTIONS_MAX_WIDTH,
+    borderRadius: 32,
+    backgroundColor: theme.colors.surface,
+    overflow: "hidden",
+  },
+  guestHero: {
+    width: "100%",
+    backgroundColor: theme.colors.surfaceMuted,
+    borderRadius: 32,
+    overflow: "hidden",
+  },
+  guestHeroImage: {
+    width: "100%",
+    height: "100%",
+  },
+  guestHeroSkeleton: {
+    width: "100%",
+    height: "100%",
+    backgroundColor: theme.colors.surfaceMuted,
+    borderRadius: 32,
+  },
+  guestBody: {
     alignItems: "center",
     justifyContent: "center",
-    gap: theme.spacing[3],
+    gap: theme.spacing[4],
+    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    paddingTop: GUEST_BODY_PADDING_TOP,
+    marginTop: GUEST_BODY_MARGIN_TOP,
+    marginBottom: GUEST_BODY_MARGIN_BOTTOM,
+    paddingBottom: 0,
   },
   title: {
     fontSize: 24,
@@ -88,7 +120,6 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
   actions: {
     marginTop: 0,
     width: "100%",
-    maxWidth: PROFILE_ACTIONS_MAX_WIDTH,
     gap: theme.spacing[3],
   },
   actionButton: {

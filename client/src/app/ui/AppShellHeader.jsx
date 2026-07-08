@@ -420,10 +420,6 @@ function HeaderNavActions({
     .join(" ");
 
   if (variant === "mobile-top") {
-    if (!isAuthorized) {
-      return null;
-    }
-
     return (
       <nav className={navClassName} aria-label={HOME_PAGE_UI.NAV_AUTH_ARIA}>
         <HeaderUsersButton

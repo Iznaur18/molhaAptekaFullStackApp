@@ -17,6 +17,7 @@ import { isHomeTabBarRoute } from "@/shared/lib/isHomeTabBarRoute";
 import { isProfileTabBarRoute } from "@/shared/lib/isProfileTabBarRoute";
 import {
   MOBILE_BOTTOM_NAV_FLOAT_OFFSET,
+  MOBILE_BOTTOM_NAV_PADDING_VERTICAL,
   resolveMobileBottomNavHorizontalInset,
 } from "@/shared/lib/mobileBottomNavLayout";
 import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
@@ -32,8 +33,6 @@ const INTRO_REPLAY_HOLD_MS = 1000;
 
 /** Ozon-стиль: плоский бар, табы вплотную. */
 const NAV_ITEMS_GAP = 0;
-/** Вертикальный паддинг плоского бара. */
-const NAV_PADDING_VERTICAL = 4;
 /** Горизонтальный паддинг плоского бара. */
 const NAV_PADDING_HORIZONTAL = 8;
 
@@ -90,7 +89,7 @@ const useTabBarStyles = createThemedStyles((theme) => ({
   },
   navBlur: {
     overflow: "hidden",
-    paddingVertical: NAV_PADDING_VERTICAL,
+    paddingVertical: MOBILE_BOTTOM_NAV_PADDING_VERTICAL,
     paddingHorizontal: NAV_PADDING_HORIZONTAL,
   },
   /** Почти непрозрачный белый слой поверх blur — Ozon-стиль. */
@@ -292,7 +291,10 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
             style={[
               styles.navBlur,
               // белый бар закрывает нижнюю safe-area целиком (Ozon-стиль)
-              { paddingBottom: NAV_PADDING_VERTICAL + Math.max(insets.bottom, 4) },
+              {
+                paddingBottom:
+                  MOBILE_BOTTOM_NAV_PADDING_VERTICAL + Math.max(insets.bottom, 4),
+              },
             ]}
           >
             <View style={styles.navOverlay} />

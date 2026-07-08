@@ -25,8 +25,12 @@ export const getSiteHeaderBannerSlidesController = async (_req, res) => {
     settingsKey: SITE_HEADER_BANNER_SETTINGS_KEY,
   }).lean();
 
+  const settingsPayload = resolveSiteHeaderBannerSettingsPayload(row);
+
   return successRes(res, {
     slides: await resolveMergedPublicSiteHeaderBannerSlides(row),
+    guestProfileLoginMenuBannerImageUrl:
+      settingsPayload.guestProfileLoginMenuBannerImageUrl,
   });
 };
 
@@ -49,6 +53,12 @@ export const patchSiteHeaderBannerSettingsController = async (req, res) => {
 
   if (body.enabled !== undefined) {
     update.enabled = Boolean(body.enabled);
+  }
+
+  if (body.guestProfileLoginMenuBannerImageUrl !== undefined) {
+    update.guestProfileLoginMenuBannerImageUrl = normalizeOptionalString(
+      body.guestProfileLoginMenuBannerImageUrl,
+    );
   }
 
   if (body.items !== undefined) {

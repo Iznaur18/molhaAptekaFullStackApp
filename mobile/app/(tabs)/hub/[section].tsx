@@ -51,10 +51,21 @@ export default function HubSectionScreen() {
   }, [navigation, sectionTitle]);
 
   useEffect(() => {
+    if (sectionId === "product-manage-toggle-display-admin") {
+      router.replace("/hub/site-header-banner-admin" as never);
+      return;
+    }
+
     // Легаси-алиас: старый id секции ведёт на объединённую модерацию.
     // Проверяем до isProfileSectionId — этого id нет в union валидных секций.
     if (sectionId === "seller-personal-category-moderation") {
       router.replace("/hub/intro-ad-moderation" as never);
+      return;
+    }
+
+    // Удалённая секция "Продвижение" → объединённая модерация "Продукты".
+    if (sectionId === "product-promotions") {
+      router.replace("/hub/product-moderation" as never);
       return;
     }
 

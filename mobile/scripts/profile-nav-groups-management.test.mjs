@@ -39,6 +39,19 @@ test("profile nav: seller personal category moderation merged into intro-ad", as
   );
 });
 
+test("profile nav: product-manage-toggle-display-admin removed from management order", async () => {
+  execSync("npm run build", { cwd: SHARED_LIB_ROOT, stdio: "pipe" });
+
+  const { PROFILE_MANAGEMENT_SECTION_ORDER } = await import(
+    pathToFileURL(join(SHARED_LIB_ROOT, "dist/profileSections.js")).href
+  );
+
+  assert.equal(
+    PROFILE_MANAGEMENT_SECTION_ORDER.includes("product-manage-toggle-display-admin"),
+    false,
+  );
+});
+
 test("profile nav builders exclude management ids from staff group", () => {
   const mobileBuilder = readRepoFile(
     "mobile/features/profile-hub/model/buildProfileNavGroups.ts",

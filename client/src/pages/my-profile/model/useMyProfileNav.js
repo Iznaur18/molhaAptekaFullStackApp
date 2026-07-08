@@ -46,7 +46,6 @@ import { getActiveProfileNavLabel } from "../lib/getActiveProfileNavLabel.js";
  *   onCategoryTreeAdminClick?: () => void;
  *   onAppIntroAdminClick?: () => void;
  *   onSiteHeaderBannerAdminClick?: () => void;
- *   onProductManageToggleDisplayAdminClick?: () => void;
  *   onPopularProductsAdminClick?: () => void;
  *   onSubscriptionsClick?: () => void;
  *   onWishlistClick?: () => void;
@@ -98,7 +97,6 @@ export function useMyProfileNav({
   onCategoryTreeAdminClick,
   onAppIntroAdminClick,
   onSiteHeaderBannerAdminClick,
-  onProductManageToggleDisplayAdminClick,
   onPopularProductsAdminClick,
   onSubscriptionsClick,
   onWishlistClick,
@@ -141,8 +139,6 @@ export function useMyProfileNav({
     Boolean(onAppIntroAdminClick);
   const canUseSiteHeaderBannerAdmin =
     !isRegularUser && isProfileReady && Boolean(onSiteHeaderBannerAdminClick);
-  const canUseProductManageToggleDisplayAdmin =
-    !isRegularUser && isProfileReady && Boolean(onProductManageToggleDisplayAdminClick);
   const canUsePopularProductsAdmin =
     !isRegularUser &&
     isProfileReady &&
@@ -194,8 +190,6 @@ export function useMyProfileNav({
         canUseCategoryTreeAdmin,
         canUseAppIntroAdmin,
         canUseSiteHeaderBannerAdmin,
-      canUseProductManageToggleDisplayAdmin,
-        canUseProductManageToggleDisplayAdmin,
         canUsePopularProductsAdmin,
         canUseSubscriptions,
         canUseWishlist,
@@ -242,7 +236,6 @@ export function useMyProfileNav({
         onCategoryTreeAdminClick,
         onAppIntroAdminClick,
         onSiteHeaderBannerAdminClick,
-        onProductManageToggleDisplayAdminClick,
         onPopularProductsAdminClick,
         onSubscriptionsClick,
         onWishlistClick,
@@ -284,7 +277,6 @@ export function useMyProfileNav({
       onAuctionClick,
       onAppIntroAdminClick,
       onSiteHeaderBannerAdminClick,
-      onProductManageToggleDisplayAdminClick,
       onPopularProductsAdminClick,
       onCategoryTreeAdminClick,
       onCreateRaffleClick,

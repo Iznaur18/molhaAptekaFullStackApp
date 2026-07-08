@@ -14,7 +14,6 @@ import { InstallmentSalesPage } from "@/features/installment-sales-page/ui/Insta
 import { ProductModerationPage } from "@/features/product-moderation-page/ui/ProductModerationPage";
 import { IntroAdModerationPage } from "@/features/intro-ad-moderation-page/ui/IntroAdModerationPage";
 import { ProductReportsPage } from "@/features/product-reports-page/ui/ProductReportsPage";
-import { ProductPromotionsStaffPage } from "@/features/product-promotions-staff-page/ui/ProductPromotionsStaffPage";
 import { RafflesStaffPage } from "@/features/raffles-staff-page/ui/RafflesStaffPage";
 import { DataConfirmationRequestsPage } from "@/features/data-confirmation-requests-page/ui/DataConfirmationRequestsPage";
 import { InstallmentModerationPage } from "@/features/installment-moderation-page/ui/InstallmentModerationPage";
@@ -25,7 +24,6 @@ import { SearchSynonymsAdminPage } from "@/features/search-synonyms-admin-page/u
 import { CategoryTreeAdminPage } from "@/features/category-tree-admin-page/ui/CategoryTreeAdminPage";
 import { AppIntroAdminPage } from "@/features/app-intro-admin-page/ui/AppIntroAdminPage";
 import { SiteHeaderBannerAdminPage } from "@/features/site-header-banner-admin-page/ui/SiteHeaderBannerAdminPage";
-import { ProductManageToggleDisplayAdminPage } from "@/features/product-manage-toggle-display-admin-page/ui/ProductManageToggleDisplayAdminPage";
 import { PopularProductsAdminPage } from "@/features/popular-products-admin-page/ui/PopularProductsAdminPage";
 import { HubSectionPlaceholder } from "@/features/profile-hub/ui/HubSectionPlaceholder";
 import { HUB_SECTION_UI } from "@/shared/config";
@@ -79,7 +77,13 @@ export const HubSectionContent = ({
     case "product-reports":
       return <ProductReportsPage />;
     case "product-promotions":
-      return <ProductPromotionsStaffPage />;
+      return (
+        <HubSectionPlaceholder
+          title={sectionTitle}
+          hint={HUB_SECTION_UI.PLACEHOLDER_HINT}
+          onBack={onBack}
+        />
+      );
     case "raffles":
       return <RafflesStaffPage />;
     case "data-confirmation-requests":
@@ -98,8 +102,6 @@ export const HubSectionContent = ({
       return <AppIntroAdminPage />;
     case "site-header-banner-admin":
       return <SiteHeaderBannerAdminPage />;
-    case "product-manage-toggle-display-admin":
-      return <ProductManageToggleDisplayAdminPage />;
     case "popular-products-admin":
       return <PopularProductsAdminPage />;
     default:

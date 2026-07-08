@@ -7,7 +7,10 @@ import { PRODUCT_MANAGE_TOGGLE_DISPLAY_ADMIN_PAGE_UI } from "../../../shared/con
 
 import "./ProductManageToggleDisplayAdminPage.css";
 
-export function ProductManageToggleDisplayAdminPage() {
+/**
+ * @param {{ embedded?: boolean }} [props]
+ */
+export function ProductManageToggleDisplayAdminPage({ embedded = false }) {
   const displaysQuery = useProductManageToggleDisplaysQuery();
   const displaysByKey = useMemo(() => {
     const map = new Map();
@@ -36,15 +39,24 @@ export function ProductManageToggleDisplayAdminPage() {
   }
 
   return (
-    <section className="product-manage-toggle-display-admin">
-      <header className="product-manage-toggle-display-admin__header">
-        <h2 className="product-manage-toggle-display-admin__title">
-          {PRODUCT_MANAGE_TOGGLE_DISPLAY_ADMIN_PAGE_UI.TITLE}
-        </h2>
-        <p className="product-manage-toggle-display-admin__hint">
-          {PRODUCT_MANAGE_TOGGLE_DISPLAY_ADMIN_PAGE_UI.HINT}
-        </p>
-      </header>
+    <section
+      className={[
+        "product-manage-toggle-display-admin",
+        embedded ? "product-manage-toggle-display-admin_embedded" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      {embedded ? null : (
+        <header className="product-manage-toggle-display-admin__header">
+          <h2 className="product-manage-toggle-display-admin__title">
+            {PRODUCT_MANAGE_TOGGLE_DISPLAY_ADMIN_PAGE_UI.TITLE}
+          </h2>
+          <p className="product-manage-toggle-display-admin__hint">
+            {PRODUCT_MANAGE_TOGGLE_DISPLAY_ADMIN_PAGE_UI.HINT}
+          </p>
+        </header>
+      )}
       <div className="product-manage-toggle-display-admin__grid">
         {PRODUCT_MANAGE_TOGGLE_ADMIN_CARDS.map((card) => {
           const display = displaysByKey.get(card.toggleKey);

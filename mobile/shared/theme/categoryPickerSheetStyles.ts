@@ -21,7 +21,7 @@ export const useCategoryPickerSheetStyles = createThemedStyles((theme) => ({
     borderRadius: 10,
     paddingHorizontal: theme.spacing[3],
     paddingVertical: 12,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.surfaceMuted,
   },
   fieldBoxPressed: {
     borderColor: theme.colors.action,

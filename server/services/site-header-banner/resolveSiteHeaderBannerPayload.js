@@ -12,6 +12,11 @@ export const resolveSiteHeaderBannerSettingsPayload = (row) => {
 
   return {
     enabled: Boolean(source.enabled),
+    guestProfileLoginMenuBannerImageUrl:
+      source.guestProfileLoginMenuBannerImageUrl == null ||
+      String(source.guestProfileLoginMenuBannerImageUrl).trim() === ""
+        ? null
+        : String(source.guestProfileLoginMenuBannerImageUrl).trim(),
     items: Array.isArray(source.items)
       ? source.items.map((item) => ({
           id: String(item.id ?? "").trim(),

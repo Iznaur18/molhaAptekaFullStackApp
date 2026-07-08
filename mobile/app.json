@@ -13,7 +13,12 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "ru.izibuy.app",
-      "associatedDomains": ["applinks:izibuy.ru", "applinks:www.izibuy.ru"]
+      "associatedDomains": ["applinks:izibuy.ru", "applinks:www.izibuy.ru"],
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsLocalNetworking": true
+        }
+      }
     },
     "android": {
       "package": "ru.izibuy.app",

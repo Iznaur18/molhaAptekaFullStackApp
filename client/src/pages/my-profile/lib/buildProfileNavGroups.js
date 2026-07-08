@@ -34,7 +34,6 @@ export function buildProfileNavGroups({
   canUseCategoryTreeAdmin,
   canUseAppIntroAdmin,
   canUseSiteHeaderBannerAdmin,
-  canUseProductManageToggleDisplayAdmin,
   canUsePopularProductsAdmin,
   canUseSubscriptions,
   canUseWishlist,
@@ -81,7 +80,6 @@ export function buildProfileNavGroups({
   onCategoryTreeAdminClick,
   onAppIntroAdminClick,
   onSiteHeaderBannerAdminClick,
-  onProductManageToggleDisplayAdminClick,
   onPopularProductsAdminClick,
   onSubscriptionsClick,
   onWishlistClick,
@@ -260,13 +258,13 @@ export function buildProfileNavGroups({
       ? [
           {
             tab: "product-moderation",
-            label: MY_PROFILE_PAGE_UI.TAB_PRODUCT_MODERATION,
+            label: "Товар (модерация)",
             badgeCount: pendingModerationCount,
             onClick: () => selectTab("product-moderation", onProductModerationClick),
           },
           {
             tab: "intro-ad-moderation",
-            label: MY_PROFILE_PAGE_UI.TAB_INTRO_AD_MODERATION,
+            label: "Реклама (модерация)",
             badgeCount: pendingIntroAdModerationCount,
             onClick: () => selectTab("intro-ad-moderation", onIntroAdModerationClick),
           },
@@ -276,19 +274,9 @@ export function buildProfileNavGroups({
       ? [
           {
             tab: "product-reports",
-            label: MY_PROFILE_PAGE_UI.TAB_PRODUCT_REPORTS,
+            label: "Жалоба (модерация)",
             badgeCount: pendingProductReportsCount,
             onClick: () => selectTab("product-reports", onProductReportsClick),
-          },
-        ]
-      : []),
-    ...(canUseProductPromotions
-      ? [
-          {
-            tab: "product-promotions",
-            label: MY_PROFILE_PAGE_UI.TAB_PRODUCT_PROMOTIONS,
-            badgeCount: pendingProductPromotionsCount,
-            onClick: () => selectTab("product-promotions", onProductPromotionsClick),
           },
         ]
       : []),
@@ -296,7 +284,7 @@ export function buildProfileNavGroups({
       ? [
           {
             tab: "raffles",
-            label: MY_PROFILE_PAGE_UI.TAB_RAFFLES,
+            label: "Розыгрыш (модерация)",
             badgeCount: pendingRafflesCount,
             onClick: () => selectTab("raffles", onRafflesClick),
           },
@@ -306,7 +294,7 @@ export function buildProfileNavGroups({
       ? [
           {
             tab: "data-confirmation-requests",
-            label: MY_PROFILE_PAGE_UI.TAB_DATA_CONFIRMATION,
+            label: "Подтверждение (модерация)",
             badgeCount: pendingDataConfirmationCount,
             onClick: () =>
               selectTab("data-confirmation-requests", onDataConfirmationQueueClick),
@@ -317,7 +305,7 @@ export function buildProfileNavGroups({
       ? [
           {
             tab: "installment-moderation",
-            label: MY_PROFILE_PAGE_UI.TAB_INSTALLMENT_MODERATION,
+            label: "Рассрочка (модерация)",
             badgeCount: pendingInstallmentModerationCount,
             onClick: () =>
               selectTab("installment-moderation", onInstallmentModerationClick),
@@ -328,7 +316,7 @@ export function buildProfileNavGroups({
       ? [
           {
             tab: "installment-disputes",
-            label: MY_PROFILE_PAGE_UI.TAB_INSTALLMENT_DISPUTES,
+            label: "Споры (модерация)",
             badgeCount: pendingInstallmentDisputesCount,
             onClick: () => selectTab("installment-disputes", onInstallmentDisputesClick),
           },
@@ -372,19 +360,6 @@ export function buildProfileNavGroups({
             label: MY_PROFILE_PAGE_UI.TAB_SITE_HEADER_BANNER_ADMIN,
             onClick: () =>
               selectTab("site-header-banner-admin", onSiteHeaderBannerAdminClick),
-          },
-        ]
-      : []),
-    ...(canUseProductManageToggleDisplayAdmin
-      ? [
-          {
-            tab: "product-manage-toggle-display-admin",
-            label: MY_PROFILE_PAGE_UI.TAB_PRODUCT_MANAGE_TOGGLE_DISPLAY_ADMIN,
-            onClick: () =>
-              selectTab(
-                "product-manage-toggle-display-admin",
-                onProductManageToggleDisplayAdminClick,
-              ),
           },
         ]
       : []),

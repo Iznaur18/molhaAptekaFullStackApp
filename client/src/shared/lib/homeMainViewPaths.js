@@ -5,7 +5,7 @@ import { isStaffStandaloneMainView } from "./staffMainViews.js";
  * проксирует `/cart` и `/user/...` на Express (см. vite.config.js).
  * Путь `/user-list` ок: не совпадает с API `/user` (иначе F5 → 404 JSON).
  *
- * @typedef {'catalog' | 'catalog-browser' | 'my-profile' | 'my-products' | 'users' | 'subscriptions' | 'wishlist' | 'notifications' | 'cart' | 'my-sales' | 'my-orders' | 'auction' | 'data-confirmation' | 'premium' | 'loyalty-points' | 'advertising' | 'admin-orders' | 'search-synonyms-admin' | 'category-tree-admin' | 'app-intro-admin' | 'site-header-banner-admin' | 'product-manage-toggle-display-admin' | 'popular-products-admin' | 'product-moderation' | 'intro-ad-moderation' | 'seller-personal-category-moderation' | 'product-reports' | 'product-promotions' | 'staff-raffles' | 'data-confirmation-requests' | 'installment-payments' | 'installment-sales' | 'installment-moderation' | 'installment-disputes'} HomeMainView
+ * @typedef {'catalog' | 'catalog-browser' | 'my-profile' | 'my-products' | 'users' | 'subscriptions' | 'wishlist' | 'notifications' | 'cart' | 'my-sales' | 'my-orders' | 'auction' | 'data-confirmation' | 'premium' | 'loyalty-points' | 'advertising' | 'admin-orders' | 'search-synonyms-admin' | 'category-tree-admin' | 'app-intro-admin' | 'site-header-banner-admin' | 'product-manage-toggle-display-admin' | 'popular-products-admin' | 'product-moderation' | 'intro-ad-moderation' | 'seller-personal-category-moderation' | 'product-reports' | 'staff-raffles' | 'data-confirmation-requests' | 'installment-payments' | 'installment-sales' | 'installment-moderation' | 'installment-disputes'} HomeMainView
  */
 
 /** @type {Record<HomeMainView, string>} */
@@ -33,13 +33,11 @@ export const HOME_MAIN_VIEW_PATH = {
   "category-tree-admin": "/category-tree-admin",
   "app-intro-admin": "/app-intro-admin",
   "site-header-banner-admin": "/site-header-banner-admin",
-  "product-manage-toggle-display-admin": "/product-manage-toggle-display-admin",
   "popular-products-admin": "/profile/popular-products-admin",
   "product-moderation": "/moderation-products",
   "intro-ad-moderation": "/moderation-intro-ad",
   "seller-personal-category-moderation": "/moderation-seller-categories",
   "product-reports": "/product-reports",
-  "product-promotions": "/product-promotions",
   "staff-raffles": "/staff-raffles",
   "data-confirmation-requests": "/data-confirmation-requests",
   "installment-payments": "/installment-payments",
@@ -60,6 +58,7 @@ const PATH_TO_VIEW = new Map(
 const LEGACY_PATH_TO_VIEW = new Map([
   ["/users", "users"],
   ["/moderation-seller-categories", "intro-ad-moderation"],
+  ["/product-manage-toggle-display-admin", "site-header-banner-admin"],
 ]);
 
 /**

@@ -10,6 +10,7 @@ export type SiteHeaderBannerItem = {
 export type SiteHeaderBannerSettings = {
   enabled: boolean;
   items: SiteHeaderBannerItem[];
+  guestProfileLoginMenuBannerImageUrl?: string | null;
   updatedAt?: string | Date | null;
 };
 

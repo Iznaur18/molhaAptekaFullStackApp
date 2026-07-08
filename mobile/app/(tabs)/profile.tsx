@@ -1,11 +1,12 @@
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
+import { useGuestProfileLoginMenuBannerImageQuery } from "@/entities/site-header-banner/model/useGuestProfileLoginMenuBannerImageQuery";
 import { EmailVerificationModal } from "@/features/email-verify/ui/EmailVerificationModal";
 import { PROFILE_SECTION_OVERVIEW } from "@/features/profile-hub/model/profileSections";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
@@ -19,10 +20,12 @@ import {
   MY_PROFILE_PAGE_UI,
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useProfileScreenStyles } from "@/shared/theme/profileChromeStyles";
 import { useAuthFormStyles } from "@/shared/theme/formChromeStyles";
 import { AppButton } from "@/shared/ui/AppButton";
+import { CachedProductImage } from "@/shared/ui/CachedProductImage";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 export default function ProfileScreen() {
@@ -30,16 +33,44 @@ export default function ProfileScreen() {
   const scrollRef = useRef<ScrollView>(null);
   const styles = useProfileScreenStyles();
   const authStyles = useAuthFormStyles();
-  const { centeredContentStyle, contentPaddingBottom, contentPaddingHorizontal } =
-    useScreenLayout();
+  const {
+    centeredContentStyle,
+    contentPaddingBottom,
+    contentPaddingHorizontal,
+    width: screenWidth,
+  } = useScreenLayout();
+  const safeAreaInsets = useSafeAreaInsets();
   const sessionQuery = useAuthSessionQuery();
   const [emailModalVisible, setEmailModalVisible] = useState(false);
   const [navSheetVisible, setNavSheetVisible] = useState(false);
+  const [guestHeroWidth, setGuestHeroWidth] = useState(() =>
+    Math.max(
+      0,
+      Math.round(
+        screenWidth - (safeAreaInsets.left ?? 0) - (safeAreaInsets.right ?? 0),
+      ),
+    ),
+  );
+
+  useEffect(() => {
+    setGuestHeroWidth(
+      Math.max(
+        0,
+        Math.round(
+          screenWidth - (safeAreaInsets.left ?? 0) - (safeAreaInsets.right ?? 0),
+        ),
+      ),
+    );
+  }, [screenWidth, safeAreaInsets.left, safeAreaInsets.right]);
 
   const user = sessionQuery.data?.user;
   const isLoggedIn = Boolean(user);
   const needsEmailVerification = isLoggedIn && user?.isEmailVerified === false;
   const isSessionLoading = sessionQuery.isPending && sessionQuery.data === undefined;
+
+  const guestProfileLoginMenuBannerImageQuery = useGuestProfileLoginMenuBannerImageQuery({
+    enabled: !isLoggedIn && !isSessionLoading,
+  });
 
   useFocusEffect(
     useCallback(() => {
@@ -73,29 +104,69 @@ export default function ProfileScreen() {
   }
 
   if (!isLoggedIn) {
+    const guestProfileLoginMenuBannerImageUrl =
+      guestProfileLoginMenuBannerImageQuery.data ?? null;
+    const guestProfileLoginMenuBannerImageUri = guestProfileLoginMenuBannerImageUrl
+      ? resolveUploadedMediaUrl(guestProfileLoginMenuBannerImageUrl)
+      : null;
+
+    const guestHeroHeight =
+      guestHeroWidth > 0 ? Math.round(guestHeroWidth + safeAreaInsets.top) : undefined;
+
     return (
-      <SafeAreaView edges={["top"]} style={styles.safeArea}>
-        <ScrollView contentContainerStyle={styles.guestContent}>
-          <View style={styles.guestInner}>
-            <Text style={styles.title}>{AUTH_UI.PROFILE_TITLE}</Text>
-            <Text style={styles.subtitle}>{AUTH_UI.GUEST_STATUS}</Text>
-            <View style={styles.actions}>
-              <AppButton
-                label={AUTH_UI.LOGIN_BUTTON}
-                variant="primary"
-                style={styles.actionButton}
-                onPress={() => router.push("/(auth)/login")}
-              />
-              <AppButton
-                label={AUTH_UI.REGISTER_BUTTON}
-                variant="secondary"
-                style={[styles.actionButton, authStyles.authSecondaryButton]}
-                onPress={() => router.push("/(auth)/register")}
-              />
+      <SafeAreaView edges={["left", "right", "bottom"]} style={styles.guestSafeArea}>
+        <ScrollView
+          scrollEnabled
+          contentContainerStyle={[
+            styles.guestContent,
+            { width: "100%" },
+          ]}
+        >
+          <View
+            style={styles.guestInner}
+            onLayout={(event) => {
+              const nextWidth = Math.round(event.nativeEvent.layout.width);
+              if (nextWidth > 0) {
+                setGuestHeroWidth(nextWidth);
+              }
+            }}
+          >
+            <View style={[styles.guestHero, guestHeroHeight ? { height: guestHeroHeight } : null]}>
+              {guestProfileLoginMenuBannerImageUri ? (
+                <CachedProductImage
+                  uri={guestProfileLoginMenuBannerImageUri}
+                  style={styles.guestHeroImage}
+                  contentFit="cover"
+                />
+              ) : (
+                <View style={styles.guestHeroSkeleton} />
+              )}
             </View>
-            <Pressable style={styles.legalLink} onPress={() => router.push("/legal/privacy")}>
-              <Text style={styles.legalLinkText}>{LEGAL_UI.PRIVACY_LINK}</Text>
-            </Pressable>
+
+            <View style={styles.guestBody}>
+              <Text style={styles.title}>{AUTH_UI.PROFILE_TITLE}</Text>
+              <Text style={styles.subtitle}>{AUTH_UI.GUEST_STATUS}</Text>
+              <View style={styles.actions}>
+                <AppButton
+                  label={AUTH_UI.LOGIN_BUTTON}
+                  variant="primary"
+                  style={styles.actionButton}
+                  onPress={() => router.push("/(auth)/login")}
+                />
+                <AppButton
+                  label={AUTH_UI.REGISTER_BUTTON}
+                  variant="secondary"
+                  style={[styles.actionButton, authStyles.authSecondaryButton]}
+                  onPress={() => router.push("/(auth)/register")}
+                />
+              </View>
+              <Pressable
+                style={styles.legalLink}
+                onPress={() => router.push("/legal/privacy")}
+              >
+                <Text style={styles.legalLinkText}>{LEGAL_UI.PRIVACY_LINK}</Text>
+              </Pressable>
+            </View>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -107,6 +178,7 @@ export default function ProfileScreen() {
       <SafeAreaView edges={["top"]} style={styles.safeArea}>
         <ScrollView
           ref={scrollRef}
+          scrollEnabled
           style={centeredContentStyle}
           contentContainerStyle={[
             styles.scrollContent,

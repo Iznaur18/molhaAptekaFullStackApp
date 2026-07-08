@@ -19,7 +19,6 @@ import {
   PROFILE_TAB_PRODUCT_MODERATION,
   PROFILE_TAB_INTRO_AD_MODERATION,
   PROFILE_TAB_SELLER_PERSONAL_CATEGORY_MODERATION,
-  PROFILE_TAB_PRODUCT_PROMOTIONS,
   PROFILE_TAB_PRODUCT_REPORTS,
   PROFILE_TAB_RAFFLES,
   PROFILE_TAB_SEARCH_SYNONYMS_ADMIN,
@@ -51,13 +50,11 @@ export const PROFILE_TAB_TO_MAIN_VIEW = {
   [PROFILE_TAB_CATEGORY_TREE_ADMIN]: "category-tree-admin",
   [PROFILE_TAB_APP_INTRO_ADMIN]: "app-intro-admin",
   [PROFILE_TAB_SITE_HEADER_BANNER_ADMIN]: "site-header-banner-admin",
-  [PROFILE_TAB_PRODUCT_MANAGE_TOGGLE_DISPLAY_ADMIN]: "product-manage-toggle-display-admin",
   [PROFILE_TAB_POPULAR_PRODUCTS_ADMIN]: "popular-products-admin",
   [PROFILE_TAB_PRODUCT_MODERATION]: "product-moderation",
   [PROFILE_TAB_INTRO_AD_MODERATION]: "intro-ad-moderation",
   [PROFILE_TAB_SELLER_PERSONAL_CATEGORY_MODERATION]: "intro-ad-moderation",
   [PROFILE_TAB_PRODUCT_REPORTS]: "product-reports",
-  [PROFILE_TAB_PRODUCT_PROMOTIONS]: "product-promotions",
   [PROFILE_TAB_RAFFLES]: "staff-raffles",
   [PROFILE_TAB_DATA_CONFIRMATION_REQUESTS]: "data-confirmation-requests",
   [PROFILE_TAB_INSTALLMENT_PAYMENTS]: "installment-payments",
@@ -76,6 +73,9 @@ const MAIN_VIEW_TO_PROFILE_TAB = new Map(
  * @returns {HomeMainView}
  */
 export function profileTabToMainView(tab) {
+  if (tab === PROFILE_TAB_PRODUCT_MANAGE_TOGGLE_DISPLAY_ADMIN) {
+    return "site-header-banner-admin";
+  }
   return PROFILE_TAB_TO_MAIN_VIEW[normalizeProfileTab(tab)] ?? "my-profile";
 }
 

@@ -6,7 +6,7 @@
   gap: calc(0.75rem * 0.55);
   width: 100%;
   margin: 0;
-  padding: 0.85rem 1rem;
+  padding: 0.85rem 16px;
   border: 1px solid color-mix(in srgb, var(--iz-color-link) 16%, var(--iz-color-border));
   border-radius: 0.65rem;
   background: color-mix(in srgb, var(--iz-color-action-soft) 72%, var(--iz-color-surface));
@@ -56,8 +56,8 @@
 
 .product-details-seller-preview__metrics {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
   margin: 0;
 }
 

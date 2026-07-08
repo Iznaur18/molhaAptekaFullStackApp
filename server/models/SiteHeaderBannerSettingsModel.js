@@ -62,6 +62,7 @@ const SiteHeaderBannerSettingsSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    guestProfileLoginMenuBannerImageUrl: clearableMediaUrlSchema,
     items: {
       type: [SiteHeaderBannerItemSchema],
       default: [],

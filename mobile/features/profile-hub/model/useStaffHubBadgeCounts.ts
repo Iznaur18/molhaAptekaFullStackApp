@@ -12,7 +12,6 @@ import {
   fetchPendingInstallmentModerationCount,
   fetchPendingAdModerationNavBadgeCount,
   fetchPendingModerationProductsCount,
-  fetchPendingProductPromotionsCount,
   fetchPendingRafflesCount,
   fetchStaffProductReportsBadgeCount,
 } from "@/features/profile-hub/api/staffBadgeApi";
@@ -66,12 +65,6 @@ export const useStaffHubBadgeCounts = (
         ...BADGE_QUERY_OPTIONS,
       },
       {
-        queryKey: [...staffBadgeQueryKeys.all, "product-promotions"],
-        queryFn: fetchPendingProductPromotionsCount,
-        enabled: staffEnabled && hubAccess.canUseProductPromotions,
-        ...BADGE_QUERY_OPTIONS,
-      },
-      {
         queryKey: [...staffBadgeQueryKeys.all, "installment-moderation"],
         queryFn: fetchPendingInstallmentModerationCount,
         enabled: staffEnabled && hubAccess.canUseInstallmentModeration,
@@ -120,7 +113,6 @@ export const useStaffHubBadgeCounts = (
       productReportsQuery,
       dataConfirmationQuery,
       rafflesQuery,
-      productPromotionsQuery,
       installmentModerationQuery,
       installmentDisputesQuery,
       userActionsQuery,
@@ -154,10 +146,6 @@ export const useStaffHubBadgeCounts = (
 
     if (hubAccess.canUseRaffles) {
       counts.raffles = rafflesQuery.data ?? 0;
-    }
-
-    if (hubAccess.canUseProductPromotions) {
-      counts["product-promotions"] = productPromotionsQuery.data ?? 0;
     }
 
     if (hubAccess.canUseInstallmentModeration) {

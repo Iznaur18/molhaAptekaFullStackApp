@@ -70,11 +70,12 @@ test.describe.serial("product manage toggle display", () => {
 
   test("moderator: admin page uploads auction toggle artwork", async ({ page, request }) => {
     await loginViaApiCookies(page, request, E2E_MODERATOR);
-    await page.goto("/product-manage-toggle-display-admin");
+    await page.goto("/site-header-banner-admin");
 
     await expect(
-      page.getByRole("heading", { name: "Кнопки управления товаром" }),
+      page.getByRole("heading", { name: "Картинки" }),
     ).toBeVisible({ timeout: 15_000 });
+    await page.getByRole("tab", { name: "Кнопки" }).click();
 
     const auctionCard = page.locator(".product-manage-toggle-admin-card").nth(0);
     await expect(auctionCard).toBeVisible();

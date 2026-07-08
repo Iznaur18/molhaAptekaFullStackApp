@@ -19,6 +19,22 @@ export const fetchSiteHeaderBannerSlides = async (): Promise<SiteHeaderBannerSli
   }
 };
 
+export const fetchGuestProfileLoginMenuBannerImageUrl = async (): Promise<
+  string | null
+> => {
+  try {
+    const { data } = await apiClient.get("/site-header-banner");
+    const parsed = parseApiContractData(data, siteHeaderBannerSlidesDataSchema);
+    return parsed.guestProfileLoginMenuBannerImageUrl ?? null;
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Не удалось загрузить баннер входа профиля";
+    throw new Error(message);
+  }
+};
+
 export const fetchSiteHeaderBannerSettings = async (): Promise<SiteHeaderBannerSettings> => {
   try {
     const { data } = await apiClient.get("/site-header-banner/settings");

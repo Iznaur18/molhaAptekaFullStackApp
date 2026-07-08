@@ -40,10 +40,6 @@ export function ProductDetailsContentSwitcher({ product, contentPanels }) {
   }, [hasCharacteristics, hasDescription]);
 
   const descriptionText = String(product.productDescription ?? "").trim();
-  const soloTitle =
-    hasDescription && !hasCharacteristics
-      ? getProductFieldLabel("productDescription")
-      : PRODUCT_DETAILS_MODAL_UI.CHARACTERISTICS_TITLE;
 
   return (
     <section
@@ -59,9 +55,7 @@ export function ProductDetailsContentSwitcher({ product, contentPanels }) {
             ariaLabel={PRODUCT_DETAILS_MODAL_UI.CONTENT_SWITCHER_ARIA}
           />
         </div>
-      ) : (
-        <h3 className="product-details-content-switcher__solo-title">{soloTitle}</h3>
-      )}
+      ) : null}
 
       <div
         className="product-details-content-switcher__panel"

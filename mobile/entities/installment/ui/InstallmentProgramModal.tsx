@@ -45,6 +45,7 @@ const createEmptyPlan = (planNumber = 1): InstallmentProgramPlanDraft => ({
   monthsCount: 3,
   monthlyAmountRub: INSTALLMENT_MONTHLY_PAYMENT_MIN_RUB,
   firstPaymentRequiredNow: true,
+  markupPercent: 0,
 });
 
 type InstallmentProgramModalProps = {
@@ -84,6 +85,24 @@ export const InstallmentProgramModal = ({
   const isSubmitting = upsertProgramMutation.isPending;
   const programModerationStatus = programQuery.data?.moderationStatus;
 
+  // Дефолтный план: ежемесячный платёж согласован с надбавкой 0% и ценой,
+  // а не жёстко минимальным значением — иначе стартовый расчёт выглядит битым.
+  const buildDefaultPlan = useCallback(
+    (planNumber: number): InstallmentProgramPlanDraft => {
+      const base = createEmptyPlan(planNumber);
+      return {
+        ...base,
+        markupPercent: 0,
+        monthlyAmountRub: resolveInstallmentMonthlyFromMarkupPercent(
+          productPrice,
+          Number(base.monthsCount) || 0,
+          0,
+        ),
+      };
+    },
+    [productPrice],
+  );
+
   const moderationHint =
     programModerationStatus === INSTALLMENT_MODERATION_PENDING
       ? INSTALLMENT_UI.PROGRAM_MODAL_PENDING_HINT
@@ -109,20 +128,30 @@ export const InstallmentProgramModal = ({
       setIsEnabled(program.isEnabled !== false);
       setPlans(
         program.plans?.length
-          ? program.plans.map((plan) => ({
-              title: plan.title ?? DEFAULT_PLAN_TITLE,
-              monthsCount: Number(plan.monthsCount) || 3,
-              monthlyAmountRub: Number(plan.monthlyAmountRub) || INSTALLMENT_MONTHLY_PAYMENT_MIN_RUB,
-              firstPaymentRequiredNow: plan.firstPaymentRequiredNow !== false,
-            }))
-          : [createEmptyPlan()],
+          ? program.plans.map((plan) => {
+              const monthsCount = Number(plan.monthsCount) || 3;
+              const monthlyAmountRub =
+                Number(plan.monthlyAmountRub) || INSTALLMENT_MONTHLY_PAYMENT_MIN_RUB;
+              return {
+                title: plan.title ?? DEFAULT_PLAN_TITLE,
+                monthsCount,
+                monthlyAmountRub,
+                firstPaymentRequiredNow: plan.firstPaymentRequiredNow !== false,
+                markupPercent: resolveInstallmentPlanPriceSummary(
+                  productPrice,
+                  monthsCount,
+                  monthlyAmountRub,
+                ).markupPercent,
+              };
+            })
+          : [buildDefaultPlan(1)],
       );
       return;
     }
 
     setIsEnabled(true);
-    setPlans([createEmptyPlan()]);
-  }, [isLoading, programQuery.data, visible]);
+    setPlans([buildDefaultPlan(1)]);
+  }, [buildDefaultPlan, isLoading, productPrice, programQuery.data, visible]);
 
   const updatePlan = useCallback((index: number, patch: Partial<InstallmentProgramPlanDraft>) => {
     setPlans((prev) =>
@@ -134,7 +163,7 @@ export const InstallmentProgramModal = ({
     if (plans.length >= INSTALLMENT_PLANS_MAX) {
       return;
     }
-    setPlans((prev) => [...prev, createEmptyPlan(prev.length + 1)]);
+    setPlans((prev) => [...prev, buildDefaultPlan(prev.length + 1)]);
   };
 
   const removePlan = (index: number) => {
@@ -253,12 +282,15 @@ export const InstallmentProgramModal = ({
             {plans.map((plan, index) => {
               const monthsCount = Math.floor(Number(plan.monthsCount) || 0);
               const monthlyAmountRub = Math.floor(Number(plan.monthlyAmountRub) || 0);
-              const { planTotalRub, productPriceRub, markupRub, markupPercent } =
+              const { planTotalRub, productPriceRub, markupRub } =
                 resolveInstallmentPlanPriceSummary(
                   productPrice,
                   monthsCount,
                   monthlyAmountRub,
                 );
+              // Процент надбавки берём из черновика (что ввёл продавец), а не
+              // пересчитываем из округлённого платежа — иначе значение «прыгает».
+              const markupPercent = Math.max(0, Math.floor(Number(plan.markupPercent) || 0));
               const isLast = index === plans.length - 1;
 
               return (
@@ -323,8 +355,9 @@ export const InstallmentProgramModal = ({
                           editable={!isSubmitting && productPriceRub > 0}
                           onFocus={() => scrollPlanFieldIntoView(index, 72)}
                           onChangeText={(value) => {
-                            const nextMarkupPercent = Number(value) || 0;
+                            const nextMarkupPercent = Math.max(0, Math.floor(Number(value) || 0));
                             updatePlan(index, {
+                              markupPercent: nextMarkupPercent,
                               monthlyAmountRub: resolveInstallmentMonthlyFromMarkupPercent(
                                 productPrice,
                                 monthsCount,
@@ -342,9 +375,17 @@ export const InstallmentProgramModal = ({
                           keyboardType="number-pad"
                           editable={!isSubmitting}
                           onFocus={() => scrollPlanFieldIntoView(index, 72)}
-                          onChangeText={(value) =>
-                            updatePlan(index, { monthlyAmountRub: Number(value) || 0 })
-                          }
+                          onChangeText={(value) => {
+                            const nextMonthly = Number(value) || 0;
+                            updatePlan(index, {
+                              monthlyAmountRub: nextMonthly,
+                              markupPercent: resolveInstallmentPlanPriceSummary(
+                                productPrice,
+                                monthsCount,
+                                nextMonthly,
+                              ).markupPercent,
+                            });
+                          }}
                         />
                       </View>
                     </View>

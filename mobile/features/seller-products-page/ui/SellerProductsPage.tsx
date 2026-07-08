@@ -133,8 +133,6 @@ export const SellerProductsPage = () => {
     );
   }
 
-  const sellerName = String(seller?.userName ?? "").trim() || "продавца";
-  const pageTitle = SELLER_PRODUCTS_PAGE_UI.TITLE_FOR(sellerName);
   const isFollowing = seller?.isFollowing === true;
 
   return (
@@ -164,7 +162,6 @@ export const SellerProductsPage = () => {
         }
         ListHeaderComponent={
           <View style={styles.header}>
-            <Text style={styles.title}>{pageTitle}</Text>
             {seller ? <ProfileOverviewBanner user={seller} /> : null}
             {seller ? (
               <View style={styles.sellerMetaZone}>

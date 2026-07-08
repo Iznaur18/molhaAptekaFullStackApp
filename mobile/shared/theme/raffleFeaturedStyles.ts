@@ -9,17 +9,18 @@ import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 const BANNER_BORDER_RADIUS = 20;
 const VISUAL_RADIUS_TOP = 11;
 const VISUAL_RADIUS_BOTTOM = 9.6;
-const BADGE_INSET = 7;
 const SOUND_BUTTON_INSET = 7;
 const SOUND_BUTTON_SIZE = 32;
 const VISUAL_CONTROL_SIZE = 28;
-const VISUAL_CONTROL_INSET = 7;
+const VISUAL_CONTROL_INSET = 16;
+const VISUAL_CONTROL_BORDER_RADIUS = 8;
 const VISUAL_CONTROL_GAP = 4;
 const BANNER_BOTTOM_MARGIN = HOME_FEED_SECTION_GAP;
+const RAFFLE_PRIMARY_BLUE = "#1d9bf0";
 
 /** Паритет с CuratedProductListCarousel section chrome на главной. */
 const RAFFLE_SECTION_CARD_BORDER_RADIUS = 16;
-const RAFFLE_SECTION_CARD_PADDING_HORIZONTAL = 12;
+const RAFFLE_SECTION_CARD_PADDING_HORIZONTAL = 16;
 const RAFFLE_SECTION_CARD_PADDING_VERTICAL = 8;
 const RAFFLE_SECTION_TITLE_MARGIN_BOTTOM = 10;
 const RAFFLE_SECTION_TITLE_PADDING_X = 4;
@@ -141,23 +142,6 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     justifyContent: "center",
     backgroundColor: "rgba(17, 17, 17, 0.55)",
   },
-  badge: {
-    position: "absolute",
-    top: BADGE_INSET,
-    left: BADGE_INSET,
-    paddingHorizontal: 7,
-    paddingVertical: 3,
-    borderRadius: 6,
-    backgroundColor: P.accentPurple,
-  },
-  badgeCompleted: {
-    backgroundColor: P.successDeep,
-  },
-  badgeText: {
-    color: P.onContrast,
-    fontSize: 11,
-    fontWeight: "700",
-  },
   visualControls: {
     position: "absolute",
     top: VISUAL_CONTROL_INSET,
@@ -174,7 +158,7 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     justifyContent: "center",
     borderWidth: 2,
     borderColor: P.onContrast,
-    borderRadius: 999,
+    borderRadius: VISUAL_CONTROL_BORDER_RADIUS,
     backgroundColor: "rgba(0,0,0,0.45)",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
@@ -187,8 +171,9 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     height: VISUAL_CONTROL_SIZE,
     alignItems: "center",
     justifyContent: "center",
+    padding: 0,
     borderWidth: 0,
-    borderRadius: VISUAL_CONTROL_SIZE / 2,
+    borderRadius: VISUAL_CONTROL_BORDER_RADIUS,
     backgroundColor: theme.colors.surface,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
@@ -273,25 +258,25 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
   progressBar: {
     height: L.progressBarHeight,
     borderRadius: 999,
-    backgroundColor: P.progressTrack,
+    backgroundColor: theme.colors.actionSurface,
     overflow: "hidden",
   },
   progressBarBackdrop: {
     backgroundColor: "rgba(255,255,255,0.38)",
   },
   progressBarCompleted: {
-    backgroundColor: P.progressTrackCompleted,
+    backgroundColor: theme.colors.actionSurface,
   },
   progressFill: {
     height: "100%",
     borderRadius: 999,
-    backgroundColor: P.accentPurple,
+    backgroundColor: RAFFLE_PRIMARY_BLUE,
   },
   progressFillBackdrop: {
     backgroundColor: P.onContrast,
   },
   progressFillCompleted: {
-    backgroundColor: P.successVivid,
+    backgroundColor: RAFFLE_PRIMARY_BLUE,
   },
   progressLabel: {
     marginTop: L.progressLabelMarginTop,
@@ -312,10 +297,10 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     paddingVertical: 7.2,
     paddingHorizontal: 12,
     borderRadius: 10,
-    backgroundColor: P.accentPurple,
+    backgroundColor: RAFFLE_PRIMARY_BLUE,
   },
   btnPrimaryCompleted: {
-    backgroundColor: P.successDeep,
+    backgroundColor: RAFFLE_PRIMARY_BLUE,
   },
   btnPrimaryText: {
     fontSize: 13.6,

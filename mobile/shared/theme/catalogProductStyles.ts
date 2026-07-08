@@ -1074,8 +1074,10 @@ export const useProductDetailsSellerPreviewStyles = createThemedStyles((theme) =
   root: {
     marginTop: 8,
     marginHorizontal: DETAIL_SPEC_PADDING_H,
-    paddingVertical: 13.6,
-    paddingHorizontal: 16,
+    paddingTop: 13.6,
+    paddingBottom: 13.6,
+    paddingLeft: 16,
+    paddingRight: 16,
     borderWidth: 1,
     borderColor: `${theme.colors.link}29`,
     borderRadius: 10.4,
@@ -1102,12 +1104,11 @@ export const useProductDetailsSellerPreviewStyles = createThemedStyles((theme) =
   metrics: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 12,
+    margin: -6,
   },
   metric: {
-    minWidth: 152,
-    flexGrow: 1,
-    maxWidth: "100%",
+    width: "50%",
+    padding: 6,
     gap: 1.9,
   },
   metricKey: {
@@ -2313,6 +2314,7 @@ export const useCartScreenStyles = createThemedStyles((theme) => ({
   },
   list: {
     flexGrow: 1,
+    backgroundColor: theme.colors.actionSurface,
   },
   centered: {
     flex: 1,
@@ -2330,10 +2332,24 @@ export const useCartScreenStyles = createThemedStyles((theme) => ({
   footer: {
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: theme.colors.border,
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
     paddingTop: 16,
-    paddingBottom: theme.spacing[2],
     gap: 10,
+  },
+  stickyFooter: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+    paddingTop: 16,
+    gap: 10,
+    shadowColor: "#0f172a",
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: -2 },
+    elevation: 8,
   },
   footerTopRow: {
     flexDirection: "row",
@@ -2422,7 +2438,7 @@ export const useCuratedProductCompactCardStyles = createThemedStyles(() => ({
 
 export const useHomeCuratedListsStyles = createThemedStyles((theme) => ({
   listBlock: {
-    marginBottom: CURATED_PRODUCT_LIST_HOME_SECTION_MARGIN_BOTTOM,
+    marginBottom: 0,
     paddingHorizontal: CURATED_PRODUCT_LIST_HOME_SECTION_PADDING_HORIZONTAL,
     paddingVertical: CURATED_PRODUCT_LIST_HOME_SECTION_PADDING_VERTICAL,
     backgroundColor: "#ffffff",

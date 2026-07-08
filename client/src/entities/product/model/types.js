@@ -20,6 +20,8 @@
  * @property {boolean} [isUserDataConfirmed]
  * @property {string} [createdAt]
  * @property {number} [sellerListedProductCount] — одобренные и видимые в каталоге
+ * @property {number} [totalSalesAmount]
+ * @property {number} [followersCount]
  * @property {'user'|'admin'|'moderator'} [userRole]
  */
 

@@ -9,6 +9,8 @@ export const PRODUCT_SELLER_PUBLIC_FIELD_NAMES = [
   "isPremiumUser",
   "isUserDataConfirmed",
   "createdAt",
+  "totalSalesAmount",
+  "followersCount",
 ];
 
 export const PRODUCT_SELLER_PUBLIC_SELECT = PRODUCT_SELLER_PUBLIC_FIELD_NAMES.join(" ");

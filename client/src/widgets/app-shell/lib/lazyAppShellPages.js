@@ -15,11 +15,6 @@ export const LazyRafflesStaffPage = lazyNamedExport(
   "RafflesStaffPage",
 );
 
-export const LazyProductPromotionsStaffPage = lazyNamedExport(
-  () => import("../../../pages/product-promotions-staff/ui/ProductPromotionsStaffPage.jsx"),
-  "ProductPromotionsStaffPage",
-);
-
 export const LazyProductModerationPage = lazyNamedExport(
   () => import("../../../pages/product-moderation/ui/ProductModerationPage.jsx"),
   "ProductModerationPage",
@@ -83,14 +78,6 @@ export const LazyAppIntroAdminPage = lazyNamedExport(
 export const LazySiteHeaderBannerAdminPage = lazyNamedExport(
   () => import("../../../pages/site-header-banner-admin/ui/SiteHeaderBannerAdminPage.jsx"),
   "SiteHeaderBannerAdminPage",
-);
-
-export const LazyProductManageToggleDisplayAdminPage = lazyNamedExport(
-  () =>
-    import(
-      "../../../pages/product-manage-toggle-display-admin/ui/ProductManageToggleDisplayAdminPage.jsx"
-    ),
-  "ProductManageToggleDisplayAdminPage",
 );
 
 export const LazyPopularProductsAdminPage = lazyNamedExport(

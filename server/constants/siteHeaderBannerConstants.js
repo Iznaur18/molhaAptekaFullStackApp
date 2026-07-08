@@ -8,4 +8,5 @@ export const SITE_HEADER_BANNER_ITEM_ID_MAX_LENGTH = 64;
 export const SITE_HEADER_BANNER_SETTINGS_DEFAULTS = {
   enabled: false,
   items: [],
+  guestProfileLoginMenuBannerImageUrl: null,
 };

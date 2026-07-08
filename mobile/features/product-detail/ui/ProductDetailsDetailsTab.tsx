@@ -7,6 +7,7 @@ import { Platform, Pressable, Text, View } from "react-native";
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import {
   getProductFieldReadLayout,
+  getProductFieldLabel,
   PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS,
   PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS,
 } from "@/entities/product/lib/productFieldRegistry";
@@ -64,18 +65,23 @@ export const ProductDetailsDetailsTab = ({
   const descriptionText = String(product.productDescription ?? "").trim();
   const hasDescription = descriptionText.length > 0;
   const hasCharacteristics = hasProductCharacteristicsContent({
-    productDescription: typeof product.productDescription === "string" ? product.productDescription : "",
     productCharacteristics: Array.isArray(characteristics) ? characteristics : [],
   });
   const hasContent = hasDescription || hasCharacteristics;
-  const hasBothPanels = hasDescription && hasCharacteristics;
+  const showContentTabs = hasDescription || hasCharacteristics;
+  const resolvedContentTab =
+    hasDescription && hasCharacteristics
+      ? contentTab
+      : hasDescription
+        ? "description"
+        : "characteristics";
 
   const charItems = Array.isArray(characteristics)
     ? (characteristics as Array<{ key?: string; name?: string; value?: string }>)
     : [];
 
-  const showDescription = hasDescription && (!hasBothPanels || contentTab === "description");
-  const showCharacteristics = hasCharacteristics && (!hasBothPanels || contentTab === "characteristics");
+  const showDescription = hasDescription && resolvedContentTab === "description";
+  const showCharacteristics = hasCharacteristics && resolvedContentTab === "characteristics";
 
   return (
     <View style={styles.rowTop}>
@@ -136,40 +142,44 @@ export const ProductDetailsDetailsTab = ({
           style={styles.detailsSection}
           accessibilityLabel={PRODUCT_DETAILS_MODAL_UI.DETAILS_SECTION_ARIA}
         >
-          {hasBothPanels ? (
+          {showContentTabs ? (
             <View style={styles.contentSwitcherTabs}>
-              <Pressable
-                style={[
-                  styles.contentSwitcherTab,
-                  contentTab === "description" && styles.contentSwitcherTabActive,
-                ]}
-                onPress={() => setContentTab("description")}
-              >
-                <Text
+              {hasDescription ? (
+                <Pressable
                   style={[
-                    styles.contentSwitcherTabText,
-                    contentTab === "description" && styles.contentSwitcherTabTextActive,
+                    styles.contentSwitcherTab,
+                    resolvedContentTab === "description" && styles.contentSwitcherTabActive,
                   ]}
+                  onPress={() => setContentTab("description")}
                 >
-                  Описание
-                </Text>
-              </Pressable>
-              <Pressable
-                style={[
-                  styles.contentSwitcherTab,
-                  contentTab === "characteristics" && styles.contentSwitcherTabActive,
-                ]}
-                onPress={() => setContentTab("characteristics")}
-              >
-                <Text
+                  <Text
+                    style={[
+                      styles.contentSwitcherTabText,
+                      resolvedContentTab === "description" && styles.contentSwitcherTabTextActive,
+                    ]}
+                  >
+                    {getProductFieldLabel("productDescription")}
+                  </Text>
+                </Pressable>
+              ) : null}
+              {hasCharacteristics ? (
+                <Pressable
                   style={[
-                    styles.contentSwitcherTabText,
-                    contentTab === "characteristics" && styles.contentSwitcherTabTextActive,
+                    styles.contentSwitcherTab,
+                    resolvedContentTab === "characteristics" && styles.contentSwitcherTabActive,
                   ]}
+                  onPress={() => setContentTab("characteristics")}
                 >
-                  Характеристики
-                </Text>
-              </Pressable>
+                  <Text
+                    style={[
+                      styles.contentSwitcherTabText,
+                      resolvedContentTab === "characteristics" && styles.contentSwitcherTabTextActive,
+                    ]}
+                  >
+                    {PRODUCT_DETAILS_MODAL_UI.CHARACTERISTICS_TITLE}
+                  </Text>
+                </Pressable>
+              ) : null}
             </View>
           ) : null}
 
@@ -177,7 +187,7 @@ export const ProductDetailsDetailsTab = ({
             <View
               style={styles.contentSwitcherPanel}
               role={
-                hasBothPanels && Platform.OS === "web" ? "tabpanel" : undefined
+                showContentTabs && Platform.OS === "web" ? "tabpanel" : undefined
               }
               accessibilityLabel={
                 showCharacteristics
@@ -192,7 +202,7 @@ export const ProductDetailsDetailsTab = ({
               {showCharacteristics ? (
                 <ProductCharacteristicsDetails
                   items={charItems}
-                  showTitle={!hasBothPanels}
+                  showTitle={!showContentTabs}
                   embedded
                 />
               ) : null}

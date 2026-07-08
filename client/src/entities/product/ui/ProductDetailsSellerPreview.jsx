@@ -1,10 +1,9 @@
 import { useMemo } from "react";
 
 import { formatSearchRowRating } from "../../user/lib/formatSearchRowRating.js";
+import { formatSearchRowTotalSales } from "../../user/lib/formatSearchRowTotalSales.js";
 import { UserPremiumDisplayName } from "../../user/ui/UserPremiumDisplayName.jsx";
 import {
-  COMMON_UI,
-  FORMAT_BOOLEAN_RU,
   PRODUCT_SELLER_PREVIEW_UI,
   USER_LIST_ROW_UI,
   USER_PROFILE_COPY,
@@ -12,29 +11,15 @@ import {
 
 import "./ProductDetailsSellerPreview.css";
 
-const DATE_FORMAT = new Intl.DateTimeFormat(COMMON_UI.LOCALE_RU, {
-  dateStyle: "short",
-  timeStyle: "short",
-});
-
 /**
- * @param {string | undefined} iso
+ * @param {number | undefined} value
  */
-function formatProfileCreatedAt(iso) {
-  if (iso == null || iso === "") return COMMON_UI.EM_DASH;
-  try {
-    return DATE_FORMAT.format(new Date(iso));
-  } catch {
-    return String(iso);
+function formatFollowersCount(value) {
+  if (value == null) {
+    return "0";
   }
-}
 
-/**
- * @param {string | undefined} value
- */
-function formatOptionalText(value) {
-  const text = value?.trim() ?? "";
-  return text.length > 0 ? text : COMMON_UI.EM_DASH;
+  return String(Math.max(0, Math.floor(Number(value)) || 0));
 }
 
 /**
@@ -75,39 +60,19 @@ export function ProductDetailsSellerPreview({ seller, onOpenProfile }) {
       value: ratingText,
     },
     {
-      key: "confirmed",
-      label: USER_LIST_ROW_UI.USER_DATA_CONFIRMED_LABEL,
-      value: isConfirmed ? FORMAT_BOOLEAN_RU.YES : FORMAT_BOOLEAN_RU.NO,
-    },
-    {
-      key: "premium",
-      label: PRODUCT_SELLER_PREVIEW_UI.PREMIUM_LABEL,
-      value: isPremium ? FORMAT_BOOLEAN_RU.YES : FORMAT_BOOLEAN_RU.NO,
-    },
-    {
-      key: "email",
-      label: USER_PROFILE_COPY.LABELS.email,
-      value: formatOptionalText(seller.email),
-    },
-    {
-      key: "phone",
-      label: USER_PROFILE_COPY.LABELS.userPhoneNumber,
-      value: formatOptionalText(seller.userPhoneNumber),
-    },
-    {
-      key: "address",
-      label: USER_PROFILE_COPY.LABELS.userAddress,
-      value: formatOptionalText(seller.userAddress),
-    },
-    {
-      key: "createdAt",
-      label: USER_PROFILE_COPY.LABELS.createdAt,
-      value: formatProfileCreatedAt(seller.createdAt),
+      key: "totalSales",
+      label: USER_PROFILE_COPY.LABELS.totalSalesAmount,
+      value: formatSearchRowTotalSales(seller.totalSalesAmount),
     },
     {
       key: "listed",
       label: PRODUCT_SELLER_PREVIEW_UI.LISTED_PRODUCTS_LABEL,
       value: listedProductsText,
+    },
+    {
+      key: "followers",
+      label: USER_LIST_ROW_UI.FOLLOWERS_LABEL,
+      value: formatFollowersCount(seller.followersCount),
     },
   ];
 

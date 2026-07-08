@@ -42,56 +42,49 @@ const resolveProfileStaffNavItem = (
   if (sectionId === "product-moderation" && access.canUseProductModeration) {
     return {
       sectionId,
-      label: MY_PROFILE_PAGE_UI.TAB_PRODUCT_MODERATION,
+      label: "Товар (модерация)",
       badgeCount: badgeCounts["product-moderation"],
     };
   }
   if (sectionId === "intro-ad-moderation" && access.canUseProductModeration) {
     return {
       sectionId,
-      label: MY_PROFILE_PAGE_UI.TAB_INTRO_AD_MODERATION,
+      label: "Реклама (модерация)",
       badgeCount: badgeCounts["intro-ad-moderation"],
     };
   }
   if (sectionId === "product-reports" && access.canUseProductReports) {
     return {
       sectionId,
-      label: MY_PROFILE_PAGE_UI.TAB_PRODUCT_REPORTS,
+      label: "Жалоба (модерация)",
       badgeCount: badgeCounts["product-reports"],
-    };
-  }
-  if (sectionId === "product-promotions" && access.canUseProductPromotions) {
-    return {
-      sectionId,
-      label: MY_PROFILE_PAGE_UI.TAB_PRODUCT_PROMOTIONS,
-      badgeCount: badgeCounts["product-promotions"],
     };
   }
   if (sectionId === "raffles" && access.canUseRaffles) {
     return {
       sectionId,
-      label: MY_PROFILE_PAGE_UI.TAB_RAFFLES,
+      label: "Розыгрыш (модерация)",
       badgeCount: badgeCounts.raffles,
     };
   }
   if (sectionId === "data-confirmation-requests" && access.canUseDataConfirmationQueue) {
     return {
       sectionId,
-      label: MY_PROFILE_PAGE_UI.TAB_DATA_CONFIRMATION,
+      label: "Подтверждение (модерация)",
       badgeCount: badgeCounts["data-confirmation-requests"],
     };
   }
   if (sectionId === "installment-moderation" && access.canUseInstallmentModeration) {
     return {
       sectionId,
-      label: MY_PROFILE_PAGE_UI.TAB_INSTALLMENT_MODERATION,
+      label: "Рассрочка (модерация)",
       badgeCount: badgeCounts["installment-moderation"],
     };
   }
   if (sectionId === "installment-disputes" && access.canUseInstallmentDisputes) {
     return {
       sectionId,
-      label: MY_PROFILE_PAGE_UI.TAB_INSTALLMENT_DISPUTES,
+      label: "Споры (модерация)",
       badgeCount: badgeCounts["installment-disputes"],
     };
   }
@@ -123,15 +116,6 @@ const resolveProfileStaffNavItem = (
     return {
       sectionId,
       label: MY_PROFILE_PAGE_UI.TAB_SITE_HEADER_BANNER_ADMIN,
-    };
-  }
-  if (
-    sectionId === "product-manage-toggle-display-admin" &&
-    access.canUseProductManageToggleDisplayAdmin
-  ) {
-    return {
-      sectionId,
-      label: MY_PROFILE_PAGE_UI.TAB_PRODUCT_MANAGE_TOGGLE_DISPLAY_ADMIN,
     };
   }
   if (sectionId === "popular-products-admin" && access.canUsePopularProductsAdmin) {

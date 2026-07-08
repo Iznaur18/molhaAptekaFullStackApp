@@ -301,7 +301,7 @@ export const useCartLineItemStyles = createThemedStyles((theme) => ({
   row: {
     paddingHorizontal: 16,
     paddingVertical: 14,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: "#ffffff",
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: theme.colors.border,
   },

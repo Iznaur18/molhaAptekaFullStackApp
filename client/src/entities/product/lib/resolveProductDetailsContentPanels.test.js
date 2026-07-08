@@ -14,12 +14,12 @@ test("showSwitcher when both description and characteristics exist", () => {
   expect(panels.defaultPanel).toBe(PRODUCT_DETAILS_CONTENT_PANEL.DESCRIPTION);
 });
 
-test("only description when characteristics are empty", () => {
+test("showSwitcher when only description exists", () => {
   const panels = resolveProductDetailsContentPanels(
     { productDescription: "Текст" },
     ["productDescription"],
   );
-  expect(panels.showSwitcher).toBe(false);
+  expect(panels.showSwitcher).toBe(true);
   expect(panels.hasDescription).toBe(true);
   expect(panels.hasCharacteristics).toBe(false);
 });

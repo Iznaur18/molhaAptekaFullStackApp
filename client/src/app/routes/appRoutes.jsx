@@ -29,6 +29,10 @@ export function renderAppShellRoutes() {
   return [
     <Route key="shell" element={<AppShellRoot />}>
       <Route path="/basket" element={<CartRoutePage />} />
+      <Route
+        path="/product-promotions"
+        element={<Navigate to="/moderation-products" replace />}
+      />
       <Route path="/seller/:userId" element={<SellerProductsRoutePage />} />
       <Route path="/raffle/:raffleId" element={<RaffleProductsRoutePage />} />
       <Route path="/" element={<CatalogRoutePage />} />
@@ -38,6 +42,10 @@ export function renderAppShellRoutes() {
         <Route key={path} path={path} element={<AccountRoutePage />} />
       ))}
       <Route path="/users" element={<Navigate to="/user-list" replace />} />
+      <Route
+        path="/product-manage-toggle-display-admin"
+        element={<Navigate to="/site-header-banner-admin" replace />}
+      />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Route>,
   ];
