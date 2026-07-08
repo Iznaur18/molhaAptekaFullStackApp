@@ -22,7 +22,6 @@ import {
   CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_HORIZONTAL,
   CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_TOP,
   CURATED_PRODUCT_LIST_HOME_SECTION_MARGIN_BOTTOM,
-  CURATED_PRODUCT_LIST_HOME_SECTION_BORDER_RADIUS,
   CURATED_PRODUCT_LIST_HOME_SECTION_PADDING_HORIZONTAL,
   CURATED_PRODUCT_LIST_HOME_SECTION_PADDING_VERTICAL,
   CURATED_PRODUCT_LIST_HOME_TITLE_MARGIN_BOTTOM,
@@ -2453,7 +2452,6 @@ export const useHomeCuratedListsStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.onContrast,
     borderWidth: 0,
     borderColor: "transparent",
-    borderRadius: CURATED_PRODUCT_LIST_HOME_SECTION_BORDER_RADIUS,
   },
   title: {
     fontSize: 16,
@@ -2479,11 +2477,9 @@ export const useUserStoriesStripStyles = createThemedStyles((theme) => ({
   },
   scrollWrapper: {
     minHeight: 119,
-    borderRadius: USER_STORY_STRIP_LAYOUT.scrollBorderRadius,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
     backgroundColor: USER_STORY_STRIP_COLORS.scrollBackground,
-    overflow: "hidden",
   },
   scroll: {
     flexDirection: "row",

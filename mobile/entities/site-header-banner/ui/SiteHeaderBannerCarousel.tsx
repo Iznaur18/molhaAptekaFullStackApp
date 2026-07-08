@@ -22,7 +22,9 @@ import {
   resolveSiteHeaderBannerCarouselMetrics,
 } from "@/shared/lib/siteHeaderBannerCarouselLayout";
 import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
+import { SITE_HEADER_BANNER_LAYOUT } from "@/shared/lib/siteHeaderBannerLayout";
 import { useSiteHeaderBannerCarouselStyles } from "@/shared/theme/siteHeaderBannerStyles";
+import { SquircleView } from "@/shared/ui/SquircleView";
 
 type SiteHeaderBannerCarouselProps = {
   slides: SiteHeaderBannerSlide[];
@@ -177,7 +179,7 @@ export const SiteHeaderBannerCarousel = ({
   const rootStyle: StyleProp<ViewStyle> = styles.root;
 
   if (slides.length === 1) {
-    return (
+    const singleSlideContent = (
       <View
         style={[rootStyle, styles.singleSlide, edgeStyles.singleSlide]}
         onLayout={handleViewportLayout}
@@ -186,19 +188,29 @@ export const SiteHeaderBannerCarousel = ({
         {renderSlide(slides[0])}
       </View>
     );
+
+    if (edgeToEdge) {
+      return singleSlideContent;
+    }
+
+    return (
+      <SquircleView radius={SITE_HEADER_BANNER_LAYOUT.radius} style={rootStyle}>
+        <View
+          style={[styles.singleSlide, edgeStyles.singleSlide]}
+          onLayout={handleViewportLayout}
+          accessibilityLabel={SITE_HEADER_BANNER_UI.CAROUSEL_ARIA}
+        >
+          {renderSlide(slides[0])}
+        </View>
+      </SquircleView>
+    );
   }
 
-  return (
+  const carouselBody = (
     <View
-      style={rootStyle}
-      onLayout={handleViewportLayout}
-      accessibilityLabel={SITE_HEADER_BANNER_UI.CAROUSEL_ARIA}
-      onTouchStart={() => setIsPaused(true)}
-      onTouchEnd={() => setIsPaused(false)}
-      onTouchCancel={() => setIsPaused(false)}
+      style={[styles.viewport, edgeStyles.viewport]}
     >
-      <View style={[styles.viewport, edgeStyles.viewport]}>
-        <FlatList
+      <FlatList
           ref={listRef}
           horizontal
           pagingEnabled={edgeToEdge}
@@ -251,6 +263,33 @@ export const SiteHeaderBannerCarousel = ({
           ))}
         </View>
       </View>
+  );
+
+  if (edgeToEdge) {
+    return (
+      <View
+        style={rootStyle}
+        onLayout={handleViewportLayout}
+        accessibilityLabel={SITE_HEADER_BANNER_UI.CAROUSEL_ARIA}
+        onTouchStart={() => setIsPaused(true)}
+        onTouchEnd={() => setIsPaused(false)}
+        onTouchCancel={() => setIsPaused(false)}
+      >
+        {carouselBody}
+      </View>
+    );
+  }
+
+  return (
+    <View
+      style={rootStyle}
+      onLayout={handleViewportLayout}
+      accessibilityLabel={SITE_HEADER_BANNER_UI.CAROUSEL_ARIA}
+      onTouchStart={() => setIsPaused(true)}
+      onTouchEnd={() => setIsPaused(false)}
+      onTouchCancel={() => setIsPaused(false)}
+    >
+      <SquircleView radius={SITE_HEADER_BANNER_LAYOUT.radius}>{carouselBody}</SquircleView>
     </View>
   );
 };

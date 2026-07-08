@@ -14,7 +14,11 @@ import { RaffleFeaturedBannerManageMenu } from "@/entities/raffle/ui/RaffleFeatu
 import { RafflePrizeMedia } from "@/entities/raffle/ui/RafflePrizeMedia";
 import type { FeaturedRaffleManage, RaffleFromApi } from "@/entities/raffle/model/types";
 import { RAFFLE_FEATURED_BANNER_UI } from "@/shared/config";
-import { useRaffleFeaturedBannerStyles } from "@/shared/theme/raffleFeaturedStyles";
+import {
+  RAFFLE_FEATURED_BANNER_BORDER_RADIUS,
+  useRaffleFeaturedBannerStyles,
+} from "@/shared/theme/raffleFeaturedStyles";
+import { SquircleView } from "@/shared/ui/SquircleView";
 
 const DESCRIPTION_PREVIEW_MAX_LINES = 3;
 
@@ -67,39 +71,36 @@ export const RaffleFeaturedBanner = ({
     }
   };
 
-  return (
-    <View
-      style={[styles.root, inCarousel && styles.rootInCarousel]}
-      accessibilityRole="summary"
-      accessibilityLabel={raffle.title}
-    >
+  const innerStyle = [
+    styles.inner,
+    inCarousel && styles.innerInCarousel,
+    isSplit ? styles.innerSplit : styles.innerStacked,
+    hasBackdrop && styles.innerHasBackdrop,
+    isCompleted && styles.innerCompleted,
+  ];
+
+  const bannerContent = (
+    <>
+      {!hasBackdrop ? <RaffleFeaturedBannerBackground /> : null}
+      <RaffleFeaturedBannerBackdropLayer
+        raffle={raffle}
+        backdrop={backdrop}
+        completed={isCompleted}
+      />
+
       <View
         style={[
-          styles.inner,
-          isSplit ? styles.innerSplit : styles.innerStacked,
-          hasBackdrop && styles.innerHasBackdrop,
-          isCompleted && styles.innerCompleted,
+          styles.visual,
+          isSplit ? styles.visualSplit : styles.visualStacked,
+          {
+            height: metrics.visualHeight,
+            minHeight: metrics.visualHeight,
+          },
         ]}
       >
-        {!hasBackdrop ? <RaffleFeaturedBannerBackground /> : null}
-        <RaffleFeaturedBannerBackdropLayer
-          raffle={raffle}
-          backdrop={backdrop}
-          completed={isCompleted}
-        />
-
-        <View
-          style={[
-            styles.visual,
-            isSplit ? styles.visualSplit : styles.visualStacked,
-            {
-              height: metrics.visualHeight,
-              minHeight: metrics.visualHeight,
-            },
-          ]}
-        >
-          <RafflePrizeMedia raffle={raffle} showSoundToggle />
-          <View style={styles.visualControls}>
+        <RafflePrizeMedia raffle={raffle} showSoundToggle />
+        {!isSplit || (hasManage && manage) ? (
+          <View style={styles.visualActionControls}>
             {hasManage && manage ? (
               <RaffleFeaturedBannerManageMenu
                 showEdit={manage.showEdit}
@@ -118,104 +119,114 @@ export const RaffleFeaturedBanner = ({
               />
             ) : null}
           </View>
-          {!isSplit ? (
-            <RaffleFeaturedBannerInfoPanel
-              raffle={raffle}
-              visible={isInfoOpen}
-              onBackdropText={hasBackdrop}
-            />
-          ) : null}
-        </View>
+        ) : null}
+        {!isSplit ? (
+          <RaffleFeaturedBannerInfoPanel
+            raffle={raffle}
+            visible={isInfoOpen}
+            onBackdropText={hasBackdrop}
+          />
+        ) : null}
+      </View>
 
-        <View
-          style={[
-            styles.body,
-            isSplit ? styles.bodySplit : styles.bodyStacked,
-          ]}
-        >
-          {metrics.showInlineCopy ? (
-            <>
-              <Text style={[styles.title, copyOnBackdropStyle]} numberOfLines={2}>
-                {raffle.title}
-              </Text>
-
-              {raffle.description ? (
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel={RAFFLE_FEATURED_BANNER_UI.DESCRIPTION_OPEN_ARIA}
-                  onPress={() => setIsDescriptionOpen(true)}
-                >
-                  <Text
-                    style={[styles.description, copyOnBackdropStyle]}
-                    numberOfLines={DESCRIPTION_PREVIEW_MAX_LINES}
-                  >
-                    {raffle.description}
-                  </Text>
-                </Pressable>
-              ) : null}
-            </>
-          ) : null}
-
-          <View style={styles.progressWrap}>
-            <View
-              style={[
-                styles.progressBar,
-                isCompleted && styles.progressBarCompleted,
-              ]}
-              accessibilityRole="progressbar"
-              accessibilityValue={{
-                min: 0,
-                max: target,
-                now: progress,
-              }}
-            >
-              <View
-                style={[
-                  styles.progressFill,
-                  isCompleted ? styles.progressFillCompleted : null,
-                  { width: `${percent}%` },
-                ]}
-              />
-            </View>
-            <Text style={[styles.progressLabel, copyOnBackdropStyle]} numberOfLines={2}>
-              {RAFFLE_FEATURED_BANNER_UI.PROGRESS(progress, target)}
-              {!isCompleted && remaining > 0
-                ? ` · ${RAFFLE_FEATURED_BANNER_UI.REMAINING(remaining)}`
-                : ""}
+      <View style={[styles.body, isSplit ? styles.bodySplit : styles.bodyStacked]}>
+        {metrics.showInlineCopy ? (
+          <>
+            <Text style={[styles.title, copyOnBackdropStyle]} numberOfLines={2}>
+              {raffle.title}
             </Text>
-          </View>
 
-          <View style={styles.actions}>
-            <Pressable
-              style={[styles.btnPrimary, isCompleted && styles.btnPrimaryCompleted]}
-              accessibilityRole="button"
-              onPress={() => onOpenProducts(raffle._id)}
-            >
-              <Text
-                style={[styles.btnPrimaryText, isCompleted && styles.btnPrimaryTextCompleted]}
-              >
-                {RAFFLE_FEATURED_BANNER_UI.OPEN_PRODUCTS}
-              </Text>
-            </Pressable>
-
-            {isCompleted && raffle.instagramUrl ? (
+            {raffle.description ? (
               <Pressable
-                style={styles.btnInstagram}
-                accessibilityRole="link"
-                onPress={() => void handleOpenInstagram()}
+                accessibilityRole="button"
+                accessibilityLabel={RAFFLE_FEATURED_BANNER_UI.DESCRIPTION_OPEN_ARIA}
+                onPress={() => setIsDescriptionOpen(true)}
               >
-                <Text style={styles.btnInstagramText}>
-                  {RAFFLE_FEATURED_BANNER_UI.OPEN_INSTAGRAM}
+                <Text
+                  style={[styles.description, copyOnBackdropStyle]}
+                  numberOfLines={DESCRIPTION_PREVIEW_MAX_LINES}
+                >
+                  {raffle.description}
                 </Text>
               </Pressable>
             ) : null}
+          </>
+        ) : null}
 
-            {isCompleted ? (
-              <Text style={styles.completedLabel}>{RAFFLE_FEATURED_BANNER_UI.COMPLETED}</Text>
-            ) : null}
+        <View style={styles.progressWrap}>
+          <View
+            style={[styles.progressBar, isCompleted && styles.progressBarCompleted]}
+            accessibilityRole="progressbar"
+            accessibilityValue={{
+              min: 0,
+              max: target,
+              now: progress,
+            }}
+          >
+            <View
+              style={[
+                styles.progressFill,
+                isCompleted ? styles.progressFillCompleted : null,
+                { width: `${percent}%` },
+              ]}
+            />
           </View>
+          <Text style={[styles.progressLabel, copyOnBackdropStyle]} numberOfLines={2}>
+            {RAFFLE_FEATURED_BANNER_UI.PROGRESS(progress, target)}
+            {!isCompleted && remaining > 0
+              ? ` · ${RAFFLE_FEATURED_BANNER_UI.REMAINING(remaining)}`
+              : ""}
+          </Text>
+        </View>
+
+        <View style={styles.actions}>
+          <Pressable
+            style={[styles.btnPrimary, isCompleted && styles.btnPrimaryCompleted]}
+            accessibilityRole="button"
+            onPress={() => onOpenProducts(raffle._id)}
+          >
+            <Text style={[styles.btnPrimaryText, isCompleted && styles.btnPrimaryTextCompleted]}>
+              {RAFFLE_FEATURED_BANNER_UI.OPEN_PRODUCTS}
+            </Text>
+          </Pressable>
+
+          {isCompleted && raffle.instagramUrl ? (
+            <Pressable
+              style={styles.btnInstagram}
+              accessibilityRole="link"
+              onPress={() => void handleOpenInstagram()}
+            >
+              <Text style={styles.btnInstagramText}>
+                {RAFFLE_FEATURED_BANNER_UI.OPEN_INSTAGRAM}
+              </Text>
+            </Pressable>
+          ) : null}
+
+          {isCompleted ? (
+            <Text style={styles.completedLabel}>{RAFFLE_FEATURED_BANNER_UI.COMPLETED}</Text>
+          ) : null}
         </View>
       </View>
+    </>
+  );
+
+  return (
+    <View
+      style={[styles.root, inCarousel && styles.rootInCarousel]}
+      accessibilityRole="summary"
+      accessibilityLabel={raffle.title}
+    >
+      {inCarousel ? (
+        <View style={innerStyle}>{bannerContent}</View>
+      ) : (
+        <SquircleView
+          radius={RAFFLE_FEATURED_BANNER_BORDER_RADIUS}
+          shadowStyle={styles.innerShadow}
+          style={innerStyle}
+        >
+          {bannerContent}
+        </SquircleView>
+      )}
 
       <RaffleDescriptionModal
         visible={isDescriptionOpen}

@@ -13,7 +13,8 @@ import { RaffleFeaturedCarousel } from "@/entities/raffle/ui/RaffleFeaturedCarou
 import { CreateRaffleModal } from "@/features/create-raffle-page/ui/CreateRaffleModal";
 import { raffleQueryKeys } from "@/shared/api";
 import { HOME_FEED_UI, PRODUCT_REPORT_UI, RAFFLE_MANAGE_UI } from "@/shared/config";
-import { useRaffleFeaturedSectionStyles } from "@/shared/theme/raffleFeaturedStyles";
+import { RAFFLE_SECTION_CARD_BORDER_RADIUS, useRaffleFeaturedSectionStyles } from "@/shared/theme/raffleFeaturedStyles";
+import { SquircleView } from "@/shared/ui/SquircleView";
 
 type HomeFeaturedRafflesSectionProps = {
   raffles: RaffleFromApi[];
@@ -127,14 +128,14 @@ export const HomeFeaturedRafflesSection = ({ raffles }: HomeFeaturedRafflesSecti
           style={sectionStyles.root}
           accessibilityLabel={HOME_FEED_UI.RAFFLES_SECTION_ARIA}
         >
-          <View style={sectionStyles.sectionCard}>
+          <SquircleView radius={RAFFLE_SECTION_CARD_BORDER_RADIUS} style={sectionStyles.sectionCard}>
             <Text style={sectionStyles.title}>{HOME_FEED_UI.RAFFLES_SECTION_TITLE}</Text>
             <RaffleFeaturedCarousel
               raffles={raffles}
               onOpenProducts={handleOpenProducts}
               getManage={getManage}
             />
-          </View>
+          </SquircleView>
         </View>
       ) : null}
 

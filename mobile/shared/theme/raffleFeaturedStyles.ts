@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 
 import { RAFFLE_FEATURED_BANNER_CHROME as L } from "@izibuy/shared-lib";
 
@@ -6,19 +6,31 @@ import { HOME_FEED_SECTION_GAP } from "@/features/home-feed/lib/homeFeedSectionL
 import { RAFFLE_FEATURED_PALETTE as P } from "@/entities/raffle/lib/raffleFeaturedPalette";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-const BANNER_BORDER_RADIUS = 20;
-const VISUAL_RADIUS_TOP = 11;
-const VISUAL_RADIUS_BOTTOM = 9.6;
+export const RAFFLE_FEATURED_BANNER_BORDER_RADIUS = 20;
+export const RAFFLE_FEATURED_VISUAL_RADIUS_TOP = 11;
+export const RAFFLE_FEATURED_VISUAL_RADIUS_BOTTOM = 9.6;
 const SOUND_BUTTON_INSET = 7;
 const SOUND_BUTTON_SIZE = 32;
 const VISUAL_CONTROL_SIZE = 28;
-const VISUAL_CONTROL_INSET = 16;
 const VISUAL_CONTROL_BORDER_RADIUS = 8;
 const VISUAL_CONTROL_GAP = 4;
+const VISUAL_ACTION_BUTTON_SIZE_SCALE = 0.75;
+const VISUAL_ACTION_BUTTON_SIZE = VISUAL_CONTROL_SIZE * VISUAL_ACTION_BUTTON_SIZE_SCALE;
+const VISUAL_ACTION_BUTTON_BORDER_RADIUS =
+  VISUAL_CONTROL_BORDER_RADIUS * VISUAL_ACTION_BUTTON_SIZE_SCALE;
+const VISUAL_ACTION_BUTTON_INSET = 8;
+const VISUAL_ACTION_BUTTON_BACKGROUND_OPACITY = 0.72;
+const VISUAL_ACTION_BUTTON_SHADOW_OPACITY = 0.14;
+const VISUAL_ACTION_BUTTON_SHADOW_RADIUS = 2;
+const VISUAL_ACTION_BUTTON_ELEVATION = 1;
+const INFO_TOGGLE_FONT_SIZE = 15 * VISUAL_ACTION_BUTTON_SIZE_SCALE;
+const INFO_TOGGLE_LINE_HEIGHT = 16 * VISUAL_ACTION_BUTTON_SIZE_SCALE;
+const MANAGE_TOGGLE_FONT_SIZE = 18 * VISUAL_ACTION_BUTTON_SIZE_SCALE;
+const MANAGE_TOGGLE_LINE_HEIGHT = 18 * VISUAL_ACTION_BUTTON_SIZE_SCALE;
 const BANNER_BOTTOM_MARGIN = HOME_FEED_SECTION_GAP;
 
 /** Паритет с CuratedProductListCarousel section chrome на главной. */
-const RAFFLE_SECTION_CARD_BORDER_RADIUS = 16;
+export const RAFFLE_SECTION_CARD_BORDER_RADIUS = 16;
 const RAFFLE_SECTION_CARD_PADDING_HORIZONTAL = 16;
 const RAFFLE_SECTION_CARD_PADDING_VERTICAL = 8;
 const RAFFLE_SECTION_TITLE_MARGIN_BOTTOM = 10;
@@ -39,17 +51,21 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     width: "100%",
     maxWidth: "100%",
     borderWidth: 0,
-    borderRadius: BANNER_BORDER_RADIUS,
     overflow: "hidden",
+    backgroundColor: theme.colors.surface,
+  },
+  innerShadow: {
     shadowColor: P.accentPurple,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.12,
     shadowRadius: 24,
     elevation: 4,
-    backgroundColor: theme.colors.surface,
   },
   innerHasBackdrop: {
     backgroundColor: theme.colors.surface,
+  },
+  innerInCarousel: {
+    borderRadius: 0,
   },
   innerStacked: {
     flexDirection: "column",
@@ -96,16 +112,18 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     overflow: "hidden",
     backgroundColor: "rgba(0,0,0,0.06)",
     zIndex: 1,
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
   },
   visualStacked: {
     alignSelf: "stretch",
     marginTop: -L.imageBleedTop,
     marginBottom: 0,
-    marginHorizontal: -L.imageBleedHorizontal,
-    borderTopLeftRadius: VISUAL_RADIUS_TOP,
-    borderTopRightRadius: VISUAL_RADIUS_TOP,
-    borderBottomLeftRadius: VISUAL_RADIUS_BOTTOM,
-    borderBottomRightRadius: VISUAL_RADIUS_BOTTOM,
+    marginLeft: -L.imageBleedHorizontal,
+    marginRight: -L.imageBleedHorizontal,
+    borderTopLeftRadius: RAFFLE_FEATURED_VISUAL_RADIUS_TOP,
+    borderTopRightRadius: RAFFLE_FEATURED_VISUAL_RADIUS_TOP,
+    borderBottomLeftRadius: RAFFLE_FEATURED_VISUAL_RADIUS_BOTTOM,
+    borderBottomRightRadius: RAFFLE_FEATURED_VISUAL_RADIUS_BOTTOM,
   },
   visualSplit: {
     flex: 1,
@@ -114,20 +132,21 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     marginTop: -L.imageBleedTop,
     marginLeft: -L.innerPaddingHorizontal,
     marginBottom: -L.imageBleedTop,
-    borderTopLeftRadius: VISUAL_RADIUS_TOP,
-    borderTopRightRadius: VISUAL_RADIUS_TOP,
-    borderBottomLeftRadius: VISUAL_RADIUS_BOTTOM,
-    borderBottomRightRadius: VISUAL_RADIUS_BOTTOM,
+    borderTopLeftRadius: RAFFLE_FEATURED_VISUAL_RADIUS_TOP,
+    borderTopRightRadius: RAFFLE_FEATURED_VISUAL_RADIUS_TOP,
+    borderBottomLeftRadius: RAFFLE_FEATURED_VISUAL_RADIUS_BOTTOM,
+    borderBottomRightRadius: RAFFLE_FEATURED_VISUAL_RADIUS_BOTTOM,
   },
   mediaFrame: {
     ...StyleSheet.absoluteFillObject,
+    overflow: "hidden",
   },
   media: {
-    width: "100%",
-    height: "100%",
+    ...StyleSheet.absoluteFillObject,
   },
   videoWrap: {
     ...StyleSheet.absoluteFillObject,
+    overflow: "hidden",
     backgroundColor: P.black,
   },
   soundButton: {
@@ -141,50 +160,51 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     justifyContent: "center",
     backgroundColor: "rgba(17, 17, 17, 0.55)",
   },
-  visualControls: {
+  visualActionControls: {
     position: "absolute",
-    top: VISUAL_CONTROL_INSET,
-    right: VISUAL_CONTROL_INSET,
+    top: VISUAL_ACTION_BUTTON_INSET,
+    right: VISUAL_ACTION_BUTTON_INSET,
     zIndex: 5,
     flexDirection: "row",
     alignItems: "center",
     gap: VISUAL_CONTROL_GAP,
   },
-  visualControlButton: {
-    width: VISUAL_CONTROL_SIZE,
-    height: VISUAL_CONTROL_SIZE,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 2,
-    borderColor: P.onContrast,
-    borderRadius: VISUAL_CONTROL_BORDER_RADIUS,
-    backgroundColor: "rgba(0,0,0,0.45)",
-    shadowColor: theme.colors.ink,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.35,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  infoToggleButton: {
-    width: VISUAL_CONTROL_SIZE,
-    height: VISUAL_CONTROL_SIZE,
+  visualActionButton: {
+    width: VISUAL_ACTION_BUTTON_SIZE,
+    height: VISUAL_ACTION_BUTTON_SIZE,
     alignItems: "center",
     justifyContent: "center",
     padding: 0,
     borderWidth: 0,
-    borderRadius: VISUAL_CONTROL_BORDER_RADIUS,
-    backgroundColor: theme.colors.surface,
+    borderRadius: VISUAL_ACTION_BUTTON_BORDER_RADIUS,
+    backgroundColor: `rgba(255, 255, 255, ${VISUAL_ACTION_BUTTON_BACKGROUND_OPACITY})`,
     shadowColor: theme.colors.ink,
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 2,
+    shadowOpacity: VISUAL_ACTION_BUTTON_SHADOW_OPACITY,
+    shadowRadius: VISUAL_ACTION_BUTTON_SHADOW_RADIUS,
+    elevation: VISUAL_ACTION_BUTTON_ELEVATION,
+  },
+  infoToggleButton: {
+    width: VISUAL_ACTION_BUTTON_SIZE,
+    height: VISUAL_ACTION_BUTTON_SIZE,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 0,
+    borderWidth: 0,
+    borderRadius: VISUAL_ACTION_BUTTON_BORDER_RADIUS,
+    backgroundColor: `rgba(255, 255, 255, ${VISUAL_ACTION_BUTTON_BACKGROUND_OPACITY})`,
+    shadowColor: theme.colors.ink,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: VISUAL_ACTION_BUTTON_SHADOW_OPACITY,
+    shadowRadius: VISUAL_ACTION_BUTTON_SHADOW_RADIUS,
+    elevation: VISUAL_ACTION_BUTTON_ELEVATION,
   },
   infoToggleText: {
     color: theme.colors.ink,
-    fontSize: 15,
+    fontSize: INFO_TOGGLE_FONT_SIZE,
     fontWeight: "800",
-    lineHeight: 16,
+    lineHeight: INFO_TOGGLE_LINE_HEIGHT,
+    opacity: 0.88,
   },
   infoPanel: {
     ...StyleSheet.absoluteFillObject,
@@ -384,32 +404,33 @@ export const useRaffleManageActionsStyles = createThemedStyles((theme) => ({
 
 export const useRaffleFeaturedBannerManageMenuStyles = createThemedStyles((theme) => ({
   toggle: {
-    width: VISUAL_CONTROL_SIZE,
-    height: VISUAL_CONTROL_SIZE,
+    width: VISUAL_ACTION_BUTTON_SIZE,
+    height: VISUAL_ACTION_BUTTON_SIZE,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 2,
-    borderColor: P.onContrast,
-    borderRadius: 999,
-    backgroundColor: "rgba(0,0,0,0.45)",
+    padding: 0,
+    borderWidth: 0,
+    borderRadius: VISUAL_ACTION_BUTTON_BORDER_RADIUS,
+    backgroundColor: `rgba(255, 255, 255, ${VISUAL_ACTION_BUTTON_BACKGROUND_OPACITY})`,
     shadowColor: theme.colors.ink,
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.35,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOpacity: VISUAL_ACTION_BUTTON_SHADOW_OPACITY,
+    shadowRadius: VISUAL_ACTION_BUTTON_SHADOW_RADIUS,
+    elevation: VISUAL_ACTION_BUTTON_ELEVATION,
   },
   toggleOpen: {
-    backgroundColor: P.accentPurple,
+    backgroundColor: `rgba(124, 58, 237, ${VISUAL_ACTION_BUTTON_BACKGROUND_OPACITY})`,
   },
   toggleDisabled: {
     opacity: 0.55,
   },
   toggleText: {
-    color: P.onContrast,
-    fontSize: 18,
+    color: theme.colors.ink,
+    fontSize: MANAGE_TOGGLE_FONT_SIZE,
     fontWeight: "800",
-    lineHeight: 18,
-    marginTop: -2,
+    lineHeight: MANAGE_TOGGLE_LINE_HEIGHT,
+    marginTop: -1,
+    opacity: 0.88,
   },
   menuBackdrop: {
     ...StyleSheet.absoluteFillObject,
@@ -538,7 +559,7 @@ export const useRaffleFeaturedSectionStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
     borderWidth: 0,
     borderColor: "transparent",
-    borderRadius: RAFFLE_SECTION_CARD_BORDER_RADIUS,
+    overflow: "hidden",
   },
   title: {
     fontSize: 16,

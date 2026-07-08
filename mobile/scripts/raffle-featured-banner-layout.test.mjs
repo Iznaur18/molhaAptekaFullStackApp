@@ -69,7 +69,7 @@ test("RaffleFeaturedBanner uses content height, backdrop and carousel variant", 
 
   assert.match(banner, /useRaffleFeaturedBannerMetrics/);
   assert.match(banner, /RaffleFeaturedBannerManageMenu/);
-  assert.match(banner, /visualControls/);
+  assert.match(banner, /visualActionControls/);
   assert.doesNotMatch(banner, /RaffleManageActions/);
   assert.doesNotMatch(banner, /styles\.manage/);
   assert.match(banner, /RaffleFeaturedBannerInfoToggle/);

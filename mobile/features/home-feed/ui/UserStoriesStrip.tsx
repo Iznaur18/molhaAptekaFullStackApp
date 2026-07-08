@@ -7,8 +7,10 @@ import type { UserStoryRing } from "@/entities/user-story/api/userStoryApi";
 import { resolveUserStoryAvatarUrl } from "@/entities/user-story/lib/resolveUserStoryAvatarUrl";
 import { CreateUserStoryModal } from "@/features/home-feed/ui/CreateUserStoryModal";
 import { UserStoryViewerModal } from "@/features/home-feed/ui/UserStoryViewerModal";
+import { USER_STORY_STRIP_LAYOUT } from "@/entities/user-story/lib/userStoryStripLayout";
 import { HOME_FEED_UI, USER_STORY_UI } from "@/shared/config";
 import { useUserStoriesStripStyles } from "@/shared/theme/catalogProductStyles";
+import { SquircleView } from "@/shared/ui/SquircleView";
 
 type UserStoriesStripProps = {
   rings: UserStoryRing[];
@@ -63,12 +65,15 @@ export const UserStoriesStrip = ({
   return (
     <>
       <View style={styles.root} accessibilityLabel={HOME_FEED_UI.STORIES_SECTION_ARIA}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
+        <SquircleView
+          radius={USER_STORY_STRIP_LAYOUT.scrollBorderRadius}
           style={styles.scrollWrapper}
-          contentContainerStyle={styles.scroll}
         >
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.scroll}
+          >
           <Pressable style={styles.item} onPress={handleAddPress}>
             <View style={styles.ringAdd}>
               <Text style={styles.plus}>+</Text>
@@ -113,7 +118,8 @@ export const UserStoriesStrip = ({
               </Pressable>
             );
           })}
-        </ScrollView>
+          </ScrollView>
+        </SquircleView>
       </View>
 
       <UserStoryViewerModal
