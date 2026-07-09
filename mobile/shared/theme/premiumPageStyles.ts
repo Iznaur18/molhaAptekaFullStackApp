@@ -2,7 +2,6 @@ import { StyleSheet } from "react-native";
 
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
-import { semanticColors } from "@/shared/theme/semanticColors";
 
 export const usePremiumPageStyles = createThemedStyles((theme) => ({
   container: {
@@ -19,76 +18,188 @@ export const usePremiumPageStyles = createThemedStyles((theme) => ({
     paddingTop: 12,
   },
   header: {
-    gap: 13.6,
+    gap: 14,
   },
-  plan: {
-    gap: 13.6,
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.warning,
-    backgroundColor: theme.colors.warningSurface,
+  heroCard: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 14,
+    padding: 20,
+    borderRadius: 18,
+    backgroundColor: theme.colors.warning,
+    shadowColor: theme.colors.ink,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.16,
+    shadowRadius: 14,
+    elevation: 5,
   },
-  planTitle: {
-    fontSize: 18.4,
+  heroTextBlock: {
+    flex: 1,
+    minWidth: 0,
+    gap: 2,
+  },
+  heroCaption: {
+    fontSize: 12,
     fontWeight: "700",
-    color: theme.colors.warningText,
+    textTransform: "uppercase",
+    letterSpacing: 0.8,
+    color: theme.colors.onContrast,
+    opacity: 0.72,
   },
-  planPrice: {
-    fontSize: 21.6,
-    fontWeight: "700",
-    color: theme.colors.ink,
+  heroRow: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    gap: 6,
+  },
+  heroValue: {
+    fontSize: 34,
+    fontWeight: "800",
+    letterSpacing: -0.5,
+    color: theme.colors.onContrast,
     fontVariant: ["tabular-nums"],
   },
-  planPeriod: {
-    fontSize: 14.4,
-    color: theme.colors.textMuted,
+  heroUnit: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: theme.colors.onContrast,
+    opacity: 0.85,
   },
-  benefits: {
-    gap: 4,
-    paddingLeft: 18.4,
+  heroInfo: {
+    marginTop: 8,
+    fontSize: 13,
+    lineHeight: 19,
+    color: theme.colors.onContrast,
+    opacity: 0.8,
   },
-  benefit: {
-    fontSize: 14.72,
-    lineHeight: 21.3,
+  heroIconWrap: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: theme.colors.surface,
+  },
+  benefitsCard: {
+    gap: 12,
+    padding: 16,
+    borderRadius: 14,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+  },
+  benefitsTitle: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: theme.colors.text,
+  },
+  benefitRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 12,
+  },
+  benefitIconWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: theme.colors.warningSurface,
+  },
+  benefitText: {
+    flex: 1,
+    minWidth: 0,
+    fontSize: 14.5,
+    lineHeight: 20,
+    paddingTop: 6,
     color: theme.colors.textSecondary,
   },
-  balance: {
-    fontSize: 14.08,
-    color: theme.colors.textMuted,
+  balanceCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 14,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
   },
-  active: {
-    paddingVertical: 10.4,
+  balanceIconWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: theme.colors.actionSoft,
+  },
+  balance: {
+    flex: 1,
+    minWidth: 0,
+    fontSize: 14.5,
+    lineHeight: 20,
+    color: theme.colors.textSecondary,
+    fontVariant: ["tabular-nums"],
+  },
+  statusBanner: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
+    paddingVertical: 10,
     paddingHorizontal: 12,
-    borderRadius: 8,
+    borderRadius: 10,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.successSurface,
     backgroundColor: theme.colors.successSurface,
+  },
+  active: {
+    flex: 1,
+    minWidth: 0,
     color: theme.colors.successText,
     fontSize: 14.4,
-    lineHeight: 20.2,
+    lineHeight: 20.8,
   },
-  error: {
-    fontSize: 14.08,
-    color: theme.colors.danger,
-    lineHeight: 20.2,
-  },
-  submit: {
-    alignSelf: "flex-start",
-    paddingVertical: 8.8,
-    paddingHorizontal: 17.6,
+  feedbackBanner: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
     borderRadius: 10,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.warning,
-    backgroundColor: semanticColors.warningSurface,
+    borderColor: theme.colors.infoSoft,
+    backgroundColor: theme.colors.actionSoft,
   },
-  submitDisabled: {
-    opacity: 0.65,
+  feedbackText: {
+    flex: 1,
+    minWidth: 0,
+    color: theme.colors.infoDeep,
+    fontSize: 14.4,
+    lineHeight: 20.8,
   },
-  submitText: {
-    fontSize: 15.2,
-    fontWeight: "700",
-    color: theme.colors.warningText,
+  errorBanner: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.dangerSurface,
+    backgroundColor: theme.colors.dangerSurface,
+  },
+  error: {
+    flex: 1,
+    minWidth: 0,
+    fontSize: 14.08,
+    lineHeight: 20.2,
+    color: theme.colors.danger,
+  },
+  actions: {
+    gap: 10,
+  },
+  submitButton: {
+    width: "100%",
+    backgroundColor: theme.colors.warning,
   },
   centered: {
     flex: 1,
@@ -106,7 +217,7 @@ export const usePremiumPageStyles = createThemedStyles((theme) => ({
   loginButton: {
     paddingVertical: 10,
     paddingHorizontal: 16,
-    borderRadius: 8,
+    borderRadius: 10,
     backgroundColor: theme.colors.action,
   },
   loginButtonText: {

@@ -92,7 +92,7 @@ export const PRODUCT_CARD_BANNER_CHROME = {
   accentHover: semanticColors.danger,
   accentSoft: semanticColors.dangerSurface,
   gradientEnd: semanticColors.dangerSurface,
-  imageAspectRatio: 1.35,
+  imageAspectRatio: 1,
   outerRadius: 15,
   contentPaddingX: 12,
   contentPaddingTop: 15,

@@ -95,9 +95,11 @@ export const WishlistPage = () => {
   if (products.length === 0) {
     return (
       <>
-        <View style={[styles.container, centeredContentStyle, styles.centered]}>
+        <View style={[styles.container, centeredContentStyle, styles.emptyRoot]}>
           {listHeader}
-          <Text style={styles.state}>{WISHLIST_PAGE_UI.EMPTY}</Text>
+          <View style={styles.emptyBody}>
+            <Text style={styles.state}>{WISHLIST_PAGE_UI.EMPTY}</Text>
+          </View>
         </View>
         <ProfileMobileNavSheet
           visible={navSheetVisible}

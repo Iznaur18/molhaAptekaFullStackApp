@@ -13,6 +13,7 @@ import { useAppIntro } from "@/features/app-intro/model/AppIntroProvider";
 import { usePlaceProductPress } from "@/features/place-product/model/usePlaceProductPress";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { CART_PAGE_UI, MOBILE_BOTTOM_NAV_UI } from "@/shared/config";
+import { useCatalogCategoryView } from "@/shared/lib/catalogCategoryViewStore";
 import { isHomeTabBarRoute } from "@/shared/lib/isHomeTabBarRoute";
 import { isProfileTabBarRoute } from "@/shared/lib/isProfileTabBarRoute";
 import {
@@ -155,6 +156,8 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
   const isAuthorized = sessionQuery.data?.user != null;
   const isProfileTabBarContext = isProfileTabBarRoute(pathname);
   const isHomeTabBarContext = isHomeTabBarRoute(pathname);
+  // На вкладке index может быть открыт список категории — тогда активен «Каталог».
+  const isCatalogCategoryView = useCatalogCategoryView();
 
   const cartBadge = cartCount > 0 ? formatBadge(cartCount) : null;
   const profileBadge =
@@ -221,12 +224,20 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
 
   const items = TAB_ITEMS.map((item) => {
     const routeIndex = state.routes.findIndex((route) => route.name === item.routeName);
-    const isFocused =
-      item.routeName !== PLACE_PRODUCT_ROUTE &&
-      routeIndex >= 0 &&
-      (state.index === routeIndex ||
-        (item.routeName === "profile" && isProfileTabBarContext) ||
-        (item.routeName === "index" && isHomeTabBarContext));
+    const isRouteActive = routeIndex >= 0 && state.index === routeIndex;
+    let isFocused: boolean;
+    if (item.routeName === PLACE_PRODUCT_ROUTE) {
+      isFocused = false;
+    } else if (item.routeName === "index") {
+      // Пока на index открыт список категории, «Домой» не активна (активен «Каталог»).
+      isFocused = !isCatalogCategoryView && (isRouteActive || isHomeTabBarContext);
+    } else if (item.routeName === "catalog") {
+      isFocused = isRouteActive || isCatalogCategoryView;
+    } else if (item.routeName === "profile") {
+      isFocused = isRouteActive || isProfileTabBarContext;
+    } else {
+      isFocused = isRouteActive;
+    }
     const badge =
       item.routeName === "cart"
         ? cartBadge

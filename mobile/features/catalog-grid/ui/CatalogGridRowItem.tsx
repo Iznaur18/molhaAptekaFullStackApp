@@ -22,6 +22,10 @@ export const CatalogGridRowItem = ({
   tileWidth,
   rowIndex = 0,
 }: CatalogGridRowItemProps) => {
+  if (!row) {
+    return null;
+  }
+
   const content =
     row.kind === "tier3-banner" ? (
       <ProductCardBanner product={row.product} />

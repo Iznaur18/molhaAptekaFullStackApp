@@ -10,7 +10,7 @@ const TOOLBAR_GAP = 8;
 const CHIP_GAP = 5.6;
 const CHIP_PADDING_VERTICAL = 3.5;
 const CHIP_PADDING_HORIZONTAL = 8.8;
-const LIST_GAP = 16;
+const LIST_GAP = 4;
 
 export const useInstallmentPaymentsPageStyles = createThemedStyles((theme) => ({
   container: {

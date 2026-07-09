@@ -86,8 +86,10 @@ test("HomeCatalogUsersButton opens stretch menu from circle", () => {
   assert.match(styles, /usersStretchShell/);
   assert.match(menu, /Modal/);
   assert.match(menu, /measureInWindow/);
-  assert.match(menu, /usersStretchShellPortal/);
-  assert.match(styles, /usersMenuPortalBackdrop/);
+  assert.match(menu, /resolveHomeCatalogUsersMenuPortalStyle/);
+  assert.match(layout, /resolveHomeCatalogUsersMenuPortalTop/);
+  assert.match(menu, /embeddedInForegroundSheet/);
+  assert.match(menu, /useStickyAnchorFallback/);
 
   assert.match(items, /icon: "people"/);
   assert.match(items, /placeholder-1/);

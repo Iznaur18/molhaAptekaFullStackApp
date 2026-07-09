@@ -1,8 +1,9 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Dimensions,
   Modal,
+  Platform,
   Pressable,
   View,
   type LayoutRectangle,
@@ -10,10 +11,12 @@ import {
   type ViewStyle,
 } from "react-native";
 import Animated from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import type { HomeCatalogUsersMenuItem } from "@/features/home-feed/lib/buildHomeCatalogUsersMenuItems";
 import { useHomeCatalogUsersStretchMenuAnimation } from "@/features/home-feed/model/useHomeCatalogUsersStretchMenuAnimation";
 import { HEADER_USERS_BUTTON_UI } from "@/shared/config";
+import { resolveHomeCatalogUsersMenuPortalStyle } from "@/shared/lib/homeCatalogHeaderLayout";
 import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
 import { useHomeCatalogHeaderStyles } from "@/shared/theme/homeCatalogHeaderStyles";
 
@@ -21,6 +24,7 @@ type HomeCatalogUsersStretchMenuProps = {
   open: boolean;
   items: HomeCatalogUsersMenuItem[];
   activeItemKey: HomeCatalogUsersMenuItem["key"] | null;
+  embeddedInForegroundSheet?: boolean;
   onToggle: () => void;
   onItemPress: (item: HomeCatalogUsersMenuItem) => void;
 };
@@ -29,11 +33,13 @@ export const HomeCatalogUsersStretchMenu = ({
   open,
   items,
   activeItemKey,
+  embeddedInForegroundSheet = false,
   onToggle,
   onItemPress,
 }: HomeCatalogUsersStretchMenuProps) => {
   const styles = useHomeCatalogHeaderStyles();
   const { theme } = useAppThemeSettings();
+  const insets = useSafeAreaInsets();
   const anchorRef = useRef<View>(null);
   const [menuAnchor, setMenuAnchor] = useState<LayoutRectangle | null>(null);
   const { portalVisible, shellAnimatedStyle, itemsAnimatedStyle } = useHomeCatalogUsersStretchMenuAnimation({
@@ -50,6 +56,18 @@ export const HomeCatalogUsersStretchMenu = ({
       setMenuAnchor({ x, y, width, height });
     });
   }, []);
+
+  useEffect(() => {
+    if (!portalVisible) {
+      return;
+    }
+
+    const frame = requestAnimationFrame(() => {
+      measureAnchor();
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [measureAnchor, portalVisible]);
 
   const isMenuExpanded = open || portalVisible;
 
@@ -124,14 +142,16 @@ export const HomeCatalogUsersStretchMenu = ({
   const portalShellStyle =
     menuAnchor == null
       ? null
-      : {
-          top: menuAnchor.y,
-          right: Dimensions.get("window").width - menuAnchor.x - menuAnchor.width,
-        };
+      : resolveHomeCatalogUsersMenuPortalStyle(menuAnchor, Dimensions.get("window").width, {
+          safeAreaTop: insets.top,
+          embeddedInForegroundSheet,
+          safeAreaInsets: insets,
+          useStickyAnchorFallback: Platform.OS !== "web",
+        });
 
   return (
     <>
-      <View ref={anchorRef} style={styles.usersNavPill} onLayout={measureAnchor}>
+      <View ref={anchorRef} style={styles.usersNavPill} onLayout={measureAnchor} collapsable={false}>
         {isMenuExpanded ? <View style={styles.usersNavPillPlaceholder} /> : renderShell()}
       </View>
 

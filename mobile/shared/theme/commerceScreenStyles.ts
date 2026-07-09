@@ -299,12 +299,16 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
 }));
 
 export const useCartLineItemStyles = createThemedStyles((theme) => ({
+  rowOuter: {
+    marginHorizontal: 12,
+    marginBottom: 10,
+  },
   row: {
     paddingHorizontal: 16,
     paddingVertical: 14,
-    backgroundColor: theme.colors.onContrast,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
   },
   rowUpdating: {
     opacity: 0.7,

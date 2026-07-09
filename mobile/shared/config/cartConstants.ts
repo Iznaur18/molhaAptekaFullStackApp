@@ -8,3 +8,6 @@ export const CART_LOW_STOCK_WARNING_THRESHOLD = 10;
 
 /** Превью товара в строке корзины (Ozon-like). */
 export const CART_LINE_IMAGE_SIZE = 72;
+
+/** Сквиркл-радиус карточки строки корзины. */
+export const CART_LINE_CARD_BORDER_RADIUS = 14;

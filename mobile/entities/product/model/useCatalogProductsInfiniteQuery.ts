@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
 import { catalogQueryKeys } from "@/shared/api";
@@ -31,6 +31,10 @@ export const useCatalogProductsInfiniteQuery = (filters: CatalogListFilters) => 
       const { page, totalPages } = lastPage.pagination;
       return page < totalPages ? page + 1 : undefined;
     },
+    // При смене фильтра/категории queryKey меняется. Без этого запрос уходит в
+    // isPending и index.tsx мигает скелетоном + перемонтирует список. Держим
+    // предыдущие плитки на экране до прихода новых данных — своп без пустых кадров.
+    placeholderData: keepPreviousData,
   });
 
   const products = useMemo(

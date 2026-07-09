@@ -2,7 +2,7 @@ import { type ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
+import { useFeedScreenStyles } from "@/shared/theme/catalogProductStyles";
 
 type HomeCatalogStickySearchShellProps = {
   children: ReactNode;
@@ -10,17 +10,15 @@ type HomeCatalogStickySearchShellProps = {
 
 export const HomeCatalogStickySearchShell = ({ children }: HomeCatalogStickySearchShellProps) => {
   const insets = useSafeAreaInsets();
-  const { theme } = useAppThemeSettings();
+  const styles = useFeedScreenStyles();
 
   return (
     <View
       collapsable={false}
       style={[
-        styles.shell,
-        {
-          backgroundColor: theme.colors.surface,
-          paddingTop: insets.top,
-        },
+        shellStyles.shell,
+        styles.homeFeedForeground,
+        { paddingTop: insets.top },
       ]}
     >
       {children}
@@ -28,10 +26,11 @@ export const HomeCatalogStickySearchShell = ({ children }: HomeCatalogStickySear
   );
 };
 
-const styles = StyleSheet.create({
+const shellStyles = StyleSheet.create({
   shell: {
     width: "100%",
     alignSelf: "stretch",
-    zIndex: 2,
+    zIndex: 100,
+    elevation: 100,
   },
 });

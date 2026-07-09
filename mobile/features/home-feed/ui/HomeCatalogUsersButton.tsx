@@ -6,7 +6,13 @@ import { HomeCatalogUsersStretchMenu } from "@/features/home-feed/ui/HomeCatalog
 
 const USERS_ROUTE = "/users";
 
-export const HomeCatalogUsersButton = () => {
+type HomeCatalogUsersButtonProps = {
+  embeddedInForegroundSheet?: boolean;
+};
+
+export const HomeCatalogUsersButton = ({
+  embeddedInForegroundSheet = false,
+}: HomeCatalogUsersButtonProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -34,6 +40,7 @@ export const HomeCatalogUsersButton = () => {
       open={menuOpen}
       items={menuItems}
       activeItemKey={isUsersActive ? "users" : null}
+      embeddedInForegroundSheet={embeddedInForegroundSheet}
       onToggle={handleToggleMenu}
       onItemPress={handleItemPress}
     />

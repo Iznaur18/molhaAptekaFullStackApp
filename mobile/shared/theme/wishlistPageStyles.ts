@@ -5,7 +5,7 @@ import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 const PRODUCT_IMAGE_THUMB_SIDE = 64;
 
-const LIST_GAP = 18.4;
+const LIST_GAP = 4;
 
 export const useWishlistPageStyles = createThemedStyles((theme) => ({
   container: {
@@ -19,7 +19,19 @@ export const useWishlistPageStyles = createThemedStyles((theme) => ({
     paddingTop: 12,
   },
   header: {
+    alignSelf: "stretch",
+    width: "100%",
     marginBottom: 4,
+  },
+  emptyRoot: {
+    flex: 1,
+    paddingTop: 12,
+    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+  },
+  emptyBody: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   state: {
     fontSize: 14.72,
@@ -66,8 +78,8 @@ export const useWishlistRowStyles = createThemedStyles((theme) => ({
   row: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10.4,
-    paddingVertical: 8,
+    gap: 8,
+    paddingVertical: 6,
     paddingHorizontal: 10.4,
     borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,

@@ -136,16 +136,16 @@ export const PRODUCT_CARD_PROMOTION_PREMIUM_COMPACT_FRAME: Record<
   },
 };
 
-/** ProductCardBannerLayout.css — inner banner card */
+/** ProductCardBannerLayout.css — inner banner card (без красной обводки на mobile). */
 export const PRODUCT_CARD_PROMOTION_BANNER_INNER_FRAME = {
-  borderWidth: 1,
-  borderColor: semanticColors.danger,
+  borderWidth: 0,
+  borderColor: "transparent",
   gradientStart: semanticColors.onContrast,
   gradientMid: semanticColors.dangerSurface,
   gradientEnd: semanticColors.dangerSurface,
-  shadowColor: semanticColors.danger,
-  shadowOpacity: 0.12,
-  shadowRadius: 14,
-  shadowOffsetY: 2,
-  elevation: 2,
+  shadowColor: PRODUCT_CARD_SOFT_ELEVATION_SHADOW.shadowColor,
+  shadowOpacity: PRODUCT_CARD_SOFT_ELEVATION_SHADOW.shadowOpacity,
+  shadowRadius: PRODUCT_CARD_SOFT_ELEVATION_SHADOW.shadowRadius,
+  shadowOffsetY: PRODUCT_CARD_SOFT_ELEVATION_SHADOW.shadowOffsetY,
+  elevation: PRODUCT_CARD_SOFT_ELEVATION_SHADOW.elevation,
 } as const;

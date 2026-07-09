@@ -25,6 +25,16 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
     flex: 1,
     backgroundColor: theme.colors.surface,
   },
+  guestScrollBlock: {
+    flex: 1,
+    width: "100%",
+    backgroundColor: theme.colors.surface,
+  },
+  guestScrollContent: {
+    flexGrow: 1,
+    width: "100%",
+    backgroundColor: theme.colors.surface,
+  },
   scrollContent: {
     flexGrow: 1,
     width: "100%",
@@ -49,11 +59,9 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
     elevation: 1,
   },
   guestContent: {
-    flexGrow: 1,
+    flex: 1,
     width: "100%",
     alignItems: "stretch",
-    justifyContent: "flex-start",
-    paddingBottom: SCREEN_CONTENT_PADDING_BOTTOM,
     backgroundColor: theme.colors.surface,
   },
   guestInner: {

@@ -1,3 +1,4 @@
+import { Feather } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
@@ -15,11 +16,14 @@ import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMob
 import { MY_PROFILE_PAGE_UI, USER_DATA_CONFIRMATION_PROFILE_PAGE_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useDataConfirmationPageStyles } from "@/shared/theme/dataConfirmationPageStyles";
+import { AppButton } from "@/shared/ui/AppButton";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 export const DataConfirmationPage = () => {
   const router = useRouter();
+  const theme = useAppTheme();
   const styles = useDataConfirmationPageStyles();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
   const isAuthorized = useIsAuthorized();
@@ -96,55 +100,104 @@ export const DataConfirmationPage = () => {
             onPress={() => setNavSheetVisible(true)}
           />
 
-          <View style={styles.plan}>
-            <Text style={styles.planTitle}>{USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.PLAN_TITLE}</Text>
-            <Text style={styles.planIntro}>{USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.PLAN_INTRO}</Text>
-            <View style={styles.benefits}>
-              {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.PLAN_BENEFITS.map((item) => (
-                <Text key={item} style={styles.benefit}>
-                  • {item}
-                </Text>
-              ))}
+          <View
+            style={styles.heroCard}
+            accessibilityLabel={USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.PLAN_TITLE}
+          >
+            <View style={styles.heroTextBlock}>
+              <Text style={styles.heroTitle}>
+                {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.PLAN_TITLE}
+              </Text>
+              <Text style={styles.heroInfo}>
+                {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.PLAN_INTRO}
+              </Text>
             </View>
-            <Text style={styles.planNote}>{USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.PLAN_NOTE}</Text>
+            <View style={styles.heroIconWrap}>
+              <Feather
+                name="user-check"
+                size={24}
+                color={theme.colors.onContrast}
+                accessibilityElementsHidden
+                importantForAccessibility="no"
+              />
+            </View>
+          </View>
+
+          <View style={styles.benefitsCard}>
+            <Text style={styles.benefitsTitle}>
+              {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.BENEFITS_TITLE}
+            </Text>
+            {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.PLAN_BENEFITS.map((item) => (
+              <View key={item} style={styles.benefitRow}>
+                <View style={styles.benefitIconWrap}>
+                  <Feather
+                    name="check"
+                    size={16}
+                    color={theme.colors.info}
+                    accessibilityElementsHidden
+                    importantForAccessibility="no"
+                  />
+                </View>
+                <Text style={styles.benefitText}>{item}</Text>
+              </View>
+            ))}
+            <Text style={styles.planNote}>
+              {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.PLAN_NOTE}
+            </Text>
           </View>
 
           {isUserDataConfirmed ? (
-            <Text
-              style={[styles.status, styles.statusOk]}
-              accessibilityRole="text"
-            >
-              {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.STATUS_CONFIRMED}
-            </Text>
+            <View style={[styles.statusBanner, styles.statusOk]} accessibilityRole="text">
+              <Feather
+                name="check-circle"
+                size={18}
+                color={theme.colors.successText}
+                accessibilityElementsHidden
+                importantForAccessibility="no"
+              />
+              <Text style={[styles.statusText, styles.statusOkText]}>
+                {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.STATUS_CONFIRMED}
+              </Text>
+            </View>
           ) : null}
 
           {!isUserDataConfirmed && requestStatus === USER_DATA_CONFIRMATION_STATUS_PENDING ? (
-            <Text
-              style={[styles.status, styles.statusPending]}
-              accessibilityRole="text"
-            >
-              {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.STATUS_PENDING}
-            </Text>
+            <View style={[styles.statusBanner, styles.statusPending]} accessibilityRole="text">
+              <Feather
+                name="clock"
+                size={18}
+                color={theme.colors.warningText}
+                accessibilityElementsHidden
+                importantForAccessibility="no"
+              />
+              <Text style={[styles.statusText, styles.statusPendingText]}>
+                {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.STATUS_PENDING}
+              </Text>
+            </View>
           ) : null}
 
           {!isUserDataConfirmed && requestStatus === USER_DATA_CONFIRMATION_STATUS_REJECTED ? (
-            <Text
-              style={[styles.status, styles.statusRejected]}
-              accessibilityRole="alert"
-            >
-              {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.STATUS_REJECTED(staffNote)}
-            </Text>
+            <View style={[styles.statusBanner, styles.statusRejected]} accessibilityRole="alert">
+              <Feather
+                name="alert-circle"
+                size={18}
+                color={theme.colors.danger}
+                accessibilityElementsHidden
+                importantForAccessibility="no"
+              />
+              <Text style={[styles.statusText, styles.statusRejectedText]}>
+                {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.STATUS_REJECTED(staffNote)}
+              </Text>
+            </View>
           ) : null}
 
           {canOpenRequest ? (
-            <Pressable
-              style={styles.submit}
+            <AppButton
+              label={USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.OPEN_REQUEST}
+              variant="primary"
+              style={styles.submitButton}
               onPress={() => setRequestModalVisible(true)}
-            >
-              <Text style={styles.submitText}>
-                {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.OPEN_REQUEST}
-              </Text>
-            </Pressable>
+            />
           ) : null}
         </View>
       </ScrollView>

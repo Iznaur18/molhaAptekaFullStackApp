@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-const LIST_GAP = 18.4;
+const LIST_GAP = 4;
 
 export const useSubscriptionsPageStyles = createThemedStyles((theme) => ({
   container: {
@@ -17,7 +17,19 @@ export const useSubscriptionsPageStyles = createThemedStyles((theme) => ({
     paddingTop: 12,
   },
   header: {
+    alignSelf: "stretch",
+    width: "100%",
     marginBottom: 4,
+  },
+  emptyRoot: {
+    flex: 1,
+    paddingTop: 12,
+    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+  },
+  emptyBody: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   state: {
     fontSize: 14.72,
@@ -64,9 +76,9 @@ export const useSubscriptionUserRowStyles = createThemedStyles((theme) => ({
   row: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: 8,
     width: "100%",
-    paddingVertical: 11.2,
+    paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,

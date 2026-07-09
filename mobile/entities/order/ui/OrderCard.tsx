@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, View, type StyleProp, type ViewStyle } from "react-native";
 
 import { getOrderItemIndex } from "@/entities/order/lib/getOrderItemIndex";
 import { isOrderLineItemProductClickable } from "@/entities/order/lib/isOrderLineItemProductClickable";
@@ -69,6 +69,7 @@ type OrderCardProps = {
   expanded?: boolean;
   onExpandedChange?: (expanded: boolean) => void;
   attentionRole?: "buyer" | "seller";
+  style?: StyleProp<ViewStyle>;
 };
 
 const formatStatus = (status?: string) =>
@@ -166,6 +167,7 @@ export const OrderCard = ({
   expanded = true,
   onExpandedChange,
   attentionRole = "buyer",
+  style,
 }: OrderCardProps) => {
   const styles = useOrderCardStyles();
   const [detailsExpanded, setDetailsExpanded] = useState(false);
@@ -404,7 +406,7 @@ export const OrderCard = ({
   };
 
   return (
-    <View style={[styles.card, needsAttention ? styles.cardAttention : null]}>
+    <View style={[styles.card, needsAttention ? styles.cardAttention : null, style]}>
       <View style={styles.header}>
         <View style={styles.headerMain}>
           <View style={styles.headerBadges}>

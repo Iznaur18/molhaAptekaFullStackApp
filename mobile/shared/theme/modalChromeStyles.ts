@@ -32,6 +32,8 @@ export const REPORT_PRODUCT_MODAL_ANIMATION = {
   sheetRestOffsetRatio: 0.4,
 } as const;
 
+export const EMAIL_VERIFY_MODAL_ANIMATION = REPORT_PRODUCT_MODAL_ANIMATION;
+
 export const ADMIN_EDIT_MODAL_ANIMATION = {
   enterMs: 280,
   exitMs: 220,

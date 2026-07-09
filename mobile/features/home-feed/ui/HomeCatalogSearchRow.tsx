@@ -32,7 +32,7 @@ export const HomeCatalogSearchRow = ({
     <HomeCatalogHeaderPanel paddingTop={paddingTop} flatSheet={embeddedInForegroundSheet}>
       <View style={styles.topRow}>
         <HomeCatalogHeaderSearch value={value} onChange={onChange} />
-        <HomeCatalogUsersButton />
+        <HomeCatalogUsersButton embeddedInForegroundSheet={embeddedInForegroundSheet} />
       </View>
     </HomeCatalogHeaderPanel>
   );

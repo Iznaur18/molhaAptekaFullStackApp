@@ -366,6 +366,7 @@ export const MyOrdersPage = () => {
           return (
             <OrderCard
               order={item}
+              style={styles.orderCardInList}
               compact
               collapsible
               expanded={expandedIds.has(orderId)}

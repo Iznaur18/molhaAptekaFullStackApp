@@ -1,4 +1,3 @@
-import { semanticColors } from "@/shared/theme/semanticColors";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Pressable, Text, View } from "react-native";
@@ -8,10 +7,11 @@ import { useCartActions } from "@/entities/cart/model/useCartActions";
 import { ProductPriceDisplay } from "@/entities/product/ui/ProductPriceDisplay";
 import { resolveProductImageUrl } from "@/entities/product/lib/resolveProductImageUrl";
 import { getProductPurchaseLimit } from "@/entities/product/lib/getProductPurchaseLimit";
-import { CART_PAGE_UI } from "@/shared/config";
+import { CART_LINE_CARD_BORDER_RADIUS, CART_PAGE_UI } from "@/shared/config";
 import { formatPriceRub } from "@/shared/lib";
 import { useCartLineItemStyles } from "@/shared/theme/commerceScreenStyles";
 import { CachedProductImage } from "@/shared/ui/CachedProductImage";
+import { SquircleView } from "@/shared/ui/SquircleView";
 
 import type { CartLine } from "../lib/selectCartLines";
 
@@ -56,7 +56,8 @@ export const CartLineItem = ({ line }: CartLineItemProps) => {
     isUpdating || (purchaseLimit > 0 && line.quantity >= purchaseLimit);
 
   return (
-    <View style={[styles.row, { backgroundColor: semanticColors.onContrast }, isUpdating && styles.rowUpdating]}>
+    <View style={[styles.rowOuter, isUpdating && styles.rowUpdating]}>
+      <SquircleView radius={CART_LINE_CARD_BORDER_RADIUS} style={styles.row}>
       <View style={styles.mainRow}>
         <Pressable
           style={styles.imageWrap}
@@ -116,6 +117,7 @@ export const CartLineItem = ({ line }: CartLineItemProps) => {
 
         <Text style={styles.lineTotal}>{formatPriceRub(line.lineTotal)}</Text>
       </View>
+      </SquircleView>
     </View>
   );
 };

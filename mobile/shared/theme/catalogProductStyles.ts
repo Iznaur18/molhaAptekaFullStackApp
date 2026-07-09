@@ -14,7 +14,6 @@ import {
   PRODUCT_CARD_STATUS_BADGE_OVERLAY_LAYOUT as BSOL,
 } from "@/entities/product/lib/productCardBadgePalette";
 import { PRODUCT_CARD_MOBILE_CATALOG_LAYOUT as MCL } from "@/entities/product/lib/productCardMobileCatalogLayout";
-import { HOME_CATALOG_PRIMARY_BACKDROP_COLOR } from "@/shared/lib/homeCatalogBackdropLayout";
 import { HOME_FEED_SECTION_GAP } from "@/features/home-feed/lib/homeFeedSectionLayout";
 import { CURATED_COMPACT_CARD_COLORS as C } from "@/entities/curated-product-list/lib/curatedCompactCardColors";
 import {
@@ -50,7 +49,10 @@ export const useFeedScreenStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.bg,
   },
   homeFeedScene: {
-    backgroundColor: HOME_CATALOG_PRIMARY_BACKDROP_COLOR,
+    // Фон сцены совпадает с foreground-цветом листа: фиолетовая шапка —
+    // обычный первый ряд FlatList (HomeCatalogPrimaryBackdrop), поэтому
+    // любые недорисованные зоны списка сливаются с контентом без полос.
+    backgroundColor: theme.colors.bg,
     width: "100%",
     alignSelf: "stretch",
   },
@@ -70,6 +72,11 @@ export const useFeedScreenStyles = createThemedStyles((theme) => ({
     width: "100%",
     alignSelf: "stretch",
     paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+  },
+  homeFeedForeground: {
+    // Единый передний фон ленты; совпадает со сценой (homeFeedScene) и с
+    // фоном остальных экранов — карточки товаров (surface) читаются на нём.
+    backgroundColor: theme.colors.bg,
   },
   homeFeedRowSurface: {
     alignSelf: "stretch",
@@ -458,7 +465,7 @@ export const useProductCardBannerStyles = createThemedStyles((theme) => ({
   },
   imageWrap: {
     width: "100%",
-    aspectRatio: BANNER.imageAspectRatio,
+    aspectRatio: PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO,
     backgroundColor: "rgba(17, 24, 39, 0.05)",
   },
   imagePressable: {
@@ -2361,18 +2368,18 @@ export const useProductDetailTabStyles = createThemedStyles((theme) => ({
 export const useCartScreenStyles = createThemedStyles((theme) => ({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.bg,
   },
   list: {
     flexGrow: 1,
-    backgroundColor: theme.colors.actionSurface,
+    backgroundColor: theme.colors.bg,
   },
   centered: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     padding: theme.spacing[6],
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.bg,
   },
   message: {
     fontSize: 16,

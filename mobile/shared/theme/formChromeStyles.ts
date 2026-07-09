@@ -2,8 +2,11 @@ import { StyleSheet } from "react-native";
 
 import { CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT } from "@/entities/order/lib/checkoutPaymentMethodCardTheme";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
+import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 
 export const MODAL_BACKDROP_SCRIM = "rgba(0,0,0,0.45)";
+
+export const EMAIL_VERIFY_MODAL_CORNER_RADIUS = 36;
 
 export const useAuthFormStyles = createThemedStyles((theme) => ({
   flex: {
@@ -38,6 +41,16 @@ export const useAuthFormStyles = createThemedStyles((theme) => ({
     paddingHorizontal: theme.spacing[6],
     paddingTop: theme.spacing[6],
     paddingBottom: theme.spacing[2],
+  },
+  backButton: {
+    alignSelf: "flex-start",
+    paddingVertical: theme.spacing[1],
+    marginBottom: theme.spacing[2],
+  },
+  backButtonText: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: theme.colors.link,
   },
   actionsZone: {
     backgroundColor: theme.colors.actionSoft,
@@ -77,6 +90,120 @@ export const useAuthFormStyles = createThemedStyles((theme) => ({
     textAlign: "center",
     color: theme.colors.link,
     fontSize: 15,
+  },
+}));
+
+export const useLoginScreenStyles = createThemedStyles((theme) => ({
+  flex: {
+    flex: 1,
+    backgroundColor: theme.colors.surface,
+  },
+  page: {
+    flex: 1,
+    backgroundColor: theme.colors.surface,
+    paddingBottom: theme.spacing[8],
+    overflow: "hidden",
+  },
+  scrollContent: {
+    flexGrow: 1,
+    backgroundColor: theme.colors.surface,
+    paddingBottom: theme.spacing[8],
+  },
+  hero: {
+    width: "100%",
+    backgroundColor: theme.colors.surfaceMuted,
+    borderBottomLeftRadius: 32,
+    borderBottomRightRadius: 32,
+    overflow: "hidden",
+  },
+  heroImage: {
+    width: "100%",
+    height: "100%",
+  },
+  heroSkeleton: {
+    width: "100%",
+    height: "100%",
+    backgroundColor: theme.colors.surfaceMuted,
+  },
+  body: {
+    paddingHorizontal: theme.spacing[6],
+    paddingTop: theme.spacing[6],
+    gap: theme.spacing[2],
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: "700",
+    color: theme.colors.text,
+    textAlign: "center",
+  },
+  subtitle: {
+    fontSize: 15,
+    lineHeight: 20,
+    color: theme.colors.textMuted,
+    textAlign: "center",
+    marginBottom: theme.spacing[2],
+  },
+  form: {
+    gap: theme.spacing[4],
+  },
+  backButtonOverlay: {
+    position: "absolute",
+    zIndex: 10,
+    paddingVertical: theme.spacing[2],
+    paddingHorizontal: theme.spacing[3],
+    borderRadius: theme.radius.button,
+    backgroundColor: "rgba(255, 255, 255, 0.92)",
+  },
+  backButtonOverlayText: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: theme.colors.link,
+  },
+  field: {
+    gap: 6,
+  },
+  label: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: theme.colors.textSecondary,
+    marginLeft: theme.spacing[1],
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: theme.colors.borderStrong,
+    borderRadius: theme.radius.button,
+    paddingHorizontal: theme.spacing[4],
+    paddingVertical: 14,
+    fontSize: 16,
+    backgroundColor: theme.colors.surface,
+    color: theme.colors.text,
+  },
+  inputFocused: {
+    borderColor: theme.colors.action,
+    backgroundColor: theme.colors.surface,
+    shadowColor: theme.colors.action,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.14,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  error: {
+    color: theme.colors.danger,
+    fontSize: 14,
+    textAlign: "center",
+  },
+  submitButton: {
+    width: "100%",
+    marginTop: theme.spacing[2],
+  },
+  registerLink: {
+    alignSelf: "center",
+    paddingVertical: theme.spacing[2],
+  },
+  registerLinkText: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: theme.colors.link,
   },
 }));
 
@@ -442,6 +569,34 @@ export const useBottomSheetFormStyles = createThemedStyles((theme) => ({
   sheetPadding: {
     padding: theme.spacing[6],
     paddingBottom: theme.spacing[8],
+  },
+  emailVerifyRoot: {
+    flex: 1,
+  },
+  emailVerifySheetHost: {
+    flex: 1,
+    justifyContent: "flex-end",
+    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+  },
+  emailVerifySheetAnimated: {
+    width: "100%",
+  },
+  emailVerifyBackdropLayer: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: MODAL_BACKDROP_SCRIM,
+  },
+  emailVerifyCard: {
+    width: "100%",
+    backgroundColor: theme.colors.surface,
+  },
+  emailVerifyCardContent: {
+    padding: theme.spacing[6],
+    paddingBottom: theme.spacing[8],
+  },
+  emailVerifyTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: theme.colors.text,
   },
 }));
 

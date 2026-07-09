@@ -1,14 +1,36 @@
-import { useState } from "react";
-import { Modal, Pressable, Text, TextInput, View } from "react-native";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  Dimensions,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import Animated, {
+  Easing,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
 import { useEmailVerificationMutations } from "@/entities/session/model/useEmailVerificationMutations";
 import { EMAIL_VERIFICATION_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
-import { useBottomSheetFormStyles, useFormFieldStyles } from "@/shared/theme/formChromeStyles";
+import {
+  EMAIL_VERIFY_MODAL_CORNER_RADIUS,
+  useBottomSheetFormStyles,
+  useFormFieldStyles,
+} from "@/shared/theme/formChromeStyles";
+import { EMAIL_VERIFY_MODAL_ANIMATION } from "@/shared/theme/modalChromeStyles";
 import { AppButton } from "@/shared/ui/AppButton";
-import { ModalSheetGradientBackdrop } from "@/shared/ui/ModalSheetGradientBackdrop";
+import { SquircleView } from "@/shared/ui/SquircleView";
 
 const CODE_LENGTH = 6;
+const { enterMs, exitMs, sheetSlideDistance, sheetRestOffsetRatio } =
+  EMAIL_VERIFY_MODAL_ANIMATION;
 
 type EmailVerificationModalProps = {
   visible: boolean;
@@ -29,11 +51,76 @@ export const EmailVerificationModal = ({
   const sheetStyles = useBottomSheetFormStyles();
   const fieldStyles = useFormFieldStyles();
   const { verifyMutation, resendMutation } = useEmailVerificationMutations();
+  const [modalVisible, setModalVisible] = useState(visible);
   const [code, setCode] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const backdropOpacity = useSharedValue(0);
+  const sheetTranslateY = useSharedValue<number>(sheetSlideDistance);
+
+  const sheetRestOffset = useMemo(
+    () => Dimensions.get("window").height * sheetRestOffsetRatio,
+    [],
+  );
 
   const isBusy = verifyMutation.isPending || resendMutation.isPending;
+
+  const resetForm = useCallback(() => {
+    setCode("");
+    setErrorMessage("");
+    setSuccessMessage("");
+  }, []);
+
+  const finishClose = useCallback(() => {
+    setModalVisible(false);
+    resetForm();
+  }, [resetForm]);
+
+  useEffect(() => {
+    if (visible) {
+      setModalVisible(true);
+      backdropOpacity.value = 0;
+      sheetTranslateY.value = sheetSlideDistance;
+      backdropOpacity.value = withTiming(1, {
+        duration: enterMs,
+        easing: Easing.out(Easing.cubic),
+      });
+      sheetTranslateY.value = withTiming(0, {
+        duration: enterMs,
+        easing: Easing.out(Easing.cubic),
+      });
+      return;
+    }
+
+    if (!modalVisible) {
+      return;
+    }
+
+    backdropOpacity.value = withTiming(0, {
+      duration: exitMs,
+      easing: Easing.in(Easing.cubic),
+    });
+    sheetTranslateY.value = withTiming(
+      sheetSlideDistance,
+      {
+        duration: exitMs,
+        easing: Easing.in(Easing.cubic),
+      },
+      (finished) => {
+        if (finished) {
+          runOnJS(finishClose)();
+        }
+      },
+    );
+  }, [backdropOpacity, finishClose, modalVisible, sheetTranslateY, visible]);
+
+  const backdropAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: backdropOpacity.value,
+  }));
+
+  const sheetAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: sheetTranslateY.value }],
+  }));
 
   const handleCodeChange = (value: string) => {
     setCode(keepDigitsOnly(value).slice(0, CODE_LENGTH));
@@ -69,57 +156,86 @@ export const EmailVerificationModal = ({
   };
 
   const handleClose = () => {
-    setCode("");
-    setErrorMessage("");
-    setSuccessMessage("");
+    if (isBusy) {
+      return;
+    }
     onClose();
   };
 
+  if (!modalVisible) {
+    return null;
+  }
+
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={handleClose}>
-      <View style={sheetStyles.backdrop}>
-        <ModalSheetGradientBackdrop />
-        <View style={[sheetStyles.sheet, sheetStyles.sheetPadding]}>
-          <Text style={sheetStyles.title}>{EMAIL_VERIFICATION_UI.MODAL_TITLE}</Text>
-          <Text style={sheetStyles.modalText}>{EMAIL_VERIFICATION_UI.MODAL_TEXT(email)}</Text>
-
-          <Text style={fieldStyles.label}>{EMAIL_VERIFICATION_UI.LABEL_CODE}</Text>
-          <TextInput
-            style={[fieldStyles.input, fieldStyles.inputCode]}
-            value={code}
-            onChangeText={handleCodeChange}
-            keyboardType="number-pad"
-            maxLength={CODE_LENGTH}
-            placeholder={EMAIL_VERIFICATION_UI.CODE_PLACEHOLDER}
-            placeholderTextColor={theme.colors.textMuted}
-            editable={!isBusy}
-          />
-
-          {errorMessage ? <Text style={fieldStyles.error}>{errorMessage}</Text> : null}
-          {successMessage ? <Text style={fieldStyles.success}>{successMessage}</Text> : null}
-
-          <AppButton
-            label={EMAIL_VERIFICATION_UI.CONFIRM_BUTTON}
-            variant="contrast"
-            onPress={handleVerify}
-            disabled={isBusy}
-          />
-
+    <Modal visible={modalVisible} animationType="none" transparent onRequestClose={handleClose}>
+      <View style={sheetStyles.emailVerifyRoot}>
+        <Animated.View
+          style={[sheetStyles.emailVerifyBackdropLayer, backdropAnimatedStyle]}
+          pointerEvents="box-none"
+        >
           <Pressable
-            style={sheetStyles.secondaryAction}
-            onPress={handleResend}
+            style={StyleSheet.absoluteFillObject}
+            onPress={handleClose}
             disabled={isBusy}
-          >
-            <Text style={sheetStyles.secondaryActionText}>
-              {resendMutation.isPending
-                ? EMAIL_VERIFICATION_UI.RESEND_LOADING
-                : EMAIL_VERIFICATION_UI.RESEND_BUTTON}
-            </Text>
-          </Pressable>
+            accessibilityRole="button"
+          />
+        </Animated.View>
 
-          <Pressable onPress={handleClose} disabled={isBusy}>
-            <Text style={sheetStyles.dismiss}>{EMAIL_VERIFICATION_UI.CLOSE}</Text>
-          </Pressable>
+        <View style={[sheetStyles.emailVerifySheetHost, { paddingBottom: sheetRestOffset }]}>
+          <Animated.View
+            style={[sheetStyles.emailVerifySheetAnimated, sheetAnimatedStyle]}
+            pointerEvents="box-none"
+          >
+            <SquircleView
+              radius={EMAIL_VERIFY_MODAL_CORNER_RADIUS}
+              style={sheetStyles.emailVerifyCard}
+            >
+            <View style={sheetStyles.emailVerifyCardContent}>
+              <Text style={sheetStyles.emailVerifyTitle}>
+                {EMAIL_VERIFICATION_UI.MODAL_TITLE}
+              </Text>
+              <Text style={sheetStyles.modalText}>{EMAIL_VERIFICATION_UI.MODAL_TEXT(email)}</Text>
+
+              <Text style={fieldStyles.label}>{EMAIL_VERIFICATION_UI.LABEL_CODE}</Text>
+              <TextInput
+                style={[fieldStyles.input, fieldStyles.inputCode]}
+                value={code}
+                onChangeText={handleCodeChange}
+                keyboardType="number-pad"
+                maxLength={CODE_LENGTH}
+                placeholder={EMAIL_VERIFICATION_UI.CODE_PLACEHOLDER}
+                placeholderTextColor={theme.colors.textMuted}
+                editable={!isBusy}
+              />
+
+              {errorMessage ? <Text style={fieldStyles.error}>{errorMessage}</Text> : null}
+              {successMessage ? <Text style={fieldStyles.success}>{successMessage}</Text> : null}
+
+              <AppButton
+                label={EMAIL_VERIFICATION_UI.CONFIRM_BUTTON}
+                variant="primary"
+                onPress={handleVerify}
+                disabled={isBusy}
+              />
+
+              <Pressable
+                style={sheetStyles.secondaryAction}
+                onPress={handleResend}
+                disabled={isBusy}
+              >
+                <Text style={sheetStyles.secondaryActionText}>
+                  {resendMutation.isPending
+                    ? EMAIL_VERIFICATION_UI.RESEND_LOADING
+                    : EMAIL_VERIFICATION_UI.RESEND_BUTTON}
+                </Text>
+              </Pressable>
+
+              <Pressable onPress={handleClose} disabled={isBusy}>
+                <Text style={sheetStyles.dismiss}>{EMAIL_VERIFICATION_UI.CLOSE}</Text>
+              </Pressable>
+            </View>
+            </SquircleView>
+          </Animated.View>
         </View>
       </View>
     </Modal>

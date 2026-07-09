@@ -10,7 +10,7 @@ const TOOLBAR_GAP = 8;
 const CHIP_GAP = 5.6;
 const CHIP_PADDING_VERTICAL = 3.5;
 const CHIP_PADDING_HORIZONTAL = 8.8;
-const LIST_GAP = 16;
+const LIST_GAP = 4;
 
 export const useMySalesPageStyles = createThemedStyles((theme) => ({
   container: {
@@ -26,6 +26,9 @@ export const useMySalesPageStyles = createThemedStyles((theme) => ({
     paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
     gap: LIST_GAP,
     flexGrow: 1,
+  },
+  orderCardInList: {
+    marginBottom: 0,
   },
   header: {
     gap: 13.6,
@@ -91,6 +94,7 @@ export const useMySalesPageStyles = createThemedStyles((theme) => ({
   searchRoot: {
     flexDirection: "row",
     alignItems: "center",
+    minWidth: 0,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
     borderRadius: theme.radius.sm,
@@ -99,9 +103,11 @@ export const useMySalesPageStyles = createThemedStyles((theme) => ({
   },
   searchField: {
     flex: 1,
-    fontSize: 15,
+    minWidth: 0,
+    fontSize: 16,
+    lineHeight: 20,
     color: theme.colors.text,
-    paddingVertical: 8,
+    paddingVertical: 10,
     paddingHorizontal: 12,
   },
   searchClearButton: {

@@ -99,6 +99,7 @@ export const MySalesPageToolbar = ({
           placeholder={MY_SALES_PAGE_UI.SEARCH_PLACEHOLDER}
           placeholderTextColor={theme.colors.textMuted}
           accessibilityLabel={MY_SALES_PAGE_UI.SEARCH_LABEL}
+          allowFontScaling={false}
           autoCorrect={false}
           autoCapitalize="none"
           clearButtonMode="never"

@@ -128,6 +128,7 @@ export const useHomeCatalogHeaderStyles = createThemedStyles((theme) => ({
   },
   usersNavPill: {
     position: "relative",
+    zIndex: 2,
     width: HOME_CATALOG_HEADER_CIRCLE_BUTTON_SIZE,
     height: HOME_CATALOG_HEADER_CIRCLE_BUTTON_SIZE,
     flexShrink: 0,
@@ -154,7 +155,7 @@ export const useHomeCatalogHeaderStyles = createThemedStyles((theme) => ({
   },
   usersStretchShellPortal: {
     position: "absolute",
-    zIndex: 2,
+    zIndex: 10,
   },
   usersStretchToggle: {
     width: HOME_CATALOG_HEADER_CIRCLE_BUTTON_SIZE,

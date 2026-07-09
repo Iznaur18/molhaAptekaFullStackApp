@@ -165,3 +165,60 @@ export const resolveHomeCatalogHeaderPanelTopMargin = (): number =>
 
 export const resolveHomeCatalogHeaderPanelPaddingTop = (safeAreaTop: number): number =>
   safeAreaTop + HOME_CATALOG_HEADER_PANEL_PADDING.top;
+
+type HomeCatalogUsersMenuPortalAnchor = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+/** Верх портала stretch-menu при sticky-шапке (safe-area + padding панели). */
+export const resolveHomeCatalogUsersMenuPortalTop = (
+  safeAreaTop: number,
+  embeddedInForegroundSheet = false,
+): number =>
+  embeddedInForegroundSheet
+    ? safeAreaTop + HOME_CATALOG_HEADER_PANEL_PADDING.top
+    : resolveHomeCatalogHeaderPanelPaddingTop(safeAreaTop);
+
+const isStaleStickyMenuAnchorY = (anchorY: number, fallbackTop: number): boolean =>
+  !Number.isFinite(anchorY) || anchorY < 0 || Math.abs(anchorY - fallbackTop) > 120;
+
+/**
+ * iOS FlatList sticky: measureInWindow иногда отдаёт Y из контента списка, не с экрана.
+ * Web ведёт себя корректно — fallback только на native.
+ */
+export const resolveHomeCatalogUsersMenuPortalStyle = (
+  anchor: HomeCatalogUsersMenuPortalAnchor,
+  windowWidth: number,
+  {
+    safeAreaTop,
+    embeddedInForegroundSheet = false,
+    safeAreaInsets = {},
+    useStickyAnchorFallback = false,
+  }: {
+    safeAreaTop: number;
+    embeddedInForegroundSheet?: boolean;
+    safeAreaInsets?: ScreenSafeAreaInsets;
+    useStickyAnchorFallback?: boolean;
+  },
+): { top: number; right: number } => {
+  const fallbackTop = resolveHomeCatalogUsersMenuPortalTop(
+    safeAreaTop,
+    embeddedInForegroundSheet,
+  );
+  const fallbackRight = resolveHomeCatalogHeaderShellInset(safeAreaInsets);
+  const measuredRight = windowWidth - anchor.x - anchor.width;
+
+  const top =
+    useStickyAnchorFallback && isStaleStickyMenuAnchorY(anchor.y, fallbackTop)
+      ? fallbackTop
+      : anchor.y;
+  const right =
+    !Number.isFinite(measuredRight) || measuredRight < 0 || measuredRight > windowWidth
+      ? fallbackRight
+      : measuredRight;
+
+  return { top, right };
+};

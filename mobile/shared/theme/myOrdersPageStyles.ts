@@ -10,7 +10,7 @@ const TOOLBAR_GAP = 8;
 const CHIP_GAP = 5.6;
 const CHIP_PADDING_VERTICAL = 3.5;
 const CHIP_PADDING_HORIZONTAL = 8.8;
-const LIST_GAP = 16;
+const LIST_GAP = 4;
 
 export const useMyOrdersPageStyles = createThemedStyles((theme) => ({
   container: {
@@ -26,6 +26,9 @@ export const useMyOrdersPageStyles = createThemedStyles((theme) => ({
     paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
     gap: LIST_GAP,
     flexGrow: 1,
+  },
+  orderCardInList: {
+    marginBottom: 0,
   },
   header: {
     gap: 13.6,
