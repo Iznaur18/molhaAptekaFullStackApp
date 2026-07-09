@@ -11,6 +11,7 @@ import type Animated from "react-native-reanimated";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 import { useFocusEffect, useScrollToTop } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import type { CatalogListFilters, CatalogSort } from "@/entities/product/model/catalogListFilters";
 import { useCatalogProductsInfiniteQuery } from "@/entities/product/model/useCatalogProductsInfiniteQuery";
@@ -33,6 +34,10 @@ import {
   HOME_CATALOG_FEED_META_ROW_COUNT,
   type HomeCatalogFeedListRow,
 } from "@/features/home-feed/lib/buildHomeCatalogFeedListRows";
+import {
+  homeCatalogFeedListScrollProps,
+  resolveHomeCatalogFeedListStyle,
+} from "@/features/home-feed/lib/homeCatalogFeedListScrollProps";
 import { invalidateHomeFeedQueries } from "@/features/home-feed/model/invalidateHomeFeedQueries";
 import { useHomeFeedContentReady } from "@/features/home-feed/model/useHomeFeedContentReady";
 import {
@@ -51,6 +56,11 @@ import {
   CATALOG_SEARCH_MIN_LENGTH,
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import {
+  resetHomeCatalogTabBarReveal,
+  setHomeCatalogTabBarScrollLinked,
+  syncHomeCatalogTabBarRevealDistance,
+} from "@/shared/model/homeCatalogTabBarVisibility";
 import { useProductGridLayout } from "@/shared/model/useProductGridLayout";
 import { useColdStartSplashGate } from "@/shared/model/coldStartSplashGate";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
@@ -67,6 +77,7 @@ export default function CatalogScreen() {
   const queryClient = useQueryClient();
   const productGrid = useProductGridLayout();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const insets = useSafeAreaInsets();
   const { height: windowHeight } = useWindowDimensions();
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -196,6 +207,22 @@ export default function CatalogScreen() {
   // не готовы — экран появляется одним кадром, без поддёргиваний от
   // догружающихся блоков. После первого показа гейт — no-op.
   useColdStartSplashGate(homeFeedContentReady && !catalogQuery.isLoading);
+
+  useEffect(() => {
+    syncHomeCatalogTabBarRevealDistance(insets.bottom);
+  }, [insets.bottom]);
+
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        resetHomeCatalogTabBarReveal();
+      };
+    }, []),
+  );
+
+  useEffect(() => {
+    setHomeCatalogTabBarScrollLinked(showHomeFeed);
+  }, [showHomeFeed]);
 
   const catalogGridRows = useMemo(
     () =>
@@ -454,7 +481,8 @@ export default function CatalogScreen() {
             removeClippedSubviews={false}
             renderItem={renderHomeFeedRow}
             contentContainerStyle={homeFeedContentContainerStyle}
-            style={[styles.flex, styles.homeFeedList]}
+            style={resolveHomeCatalogFeedListStyle(styles.flex, styles.homeFeedList)}
+            {...homeCatalogFeedListScrollProps}
             refreshControl={
               <ThemedRefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
             }

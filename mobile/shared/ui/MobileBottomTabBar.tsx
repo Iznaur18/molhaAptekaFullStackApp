@@ -4,6 +4,7 @@ import { BlurView } from "expo-blur";
 import { usePathname, useRouter } from "expo-router";
 import { useCallback, useEffect, useRef } from "react";
 import { Platform, Pressable, StyleSheet, View } from "react-native";
+import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useCartTotalCount } from "@/entities/cart/model/useCartTotalCount";
@@ -20,7 +21,9 @@ import {
   MOBILE_BOTTOM_NAV_FLOAT_OFFSET,
   MOBILE_BOTTOM_NAV_PADDING_VERTICAL,
   resolveMobileBottomNavHorizontalInset,
+  resolveMobileBottomNavLayoutHeight,
 } from "@/shared/lib/mobileBottomNavLayout";
+import { homeCatalogTabBarRevealProgress } from "@/shared/model/homeCatalogTabBarVisibility";
 import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { AppText } from "@/shared/ui/AppText";
@@ -183,6 +186,18 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
 
   useEffect(() => clearIntroHoldTimer, [clearIntroHoldTimer]);
 
+  const tabBarLayoutHeight = resolveMobileBottomNavLayoutHeight(insets.bottom);
+  const animatedShellStyle = useAnimatedStyle(
+    () => ({
+      transform: [
+        {
+          translateY: (1 - homeCatalogTabBarRevealProgress.value) * tabBarLayoutHeight,
+        },
+      ],
+    }),
+    [tabBarLayoutHeight],
+  );
+
   const handlePress = (routeName: string) => {
     if (routeName === PLACE_PRODUCT_ROUTE) {
       placeProduct.handlePlaceProductPress();
@@ -295,23 +310,24 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
           },
         ]}
       >
-        <View style={styles.navShadow}>
-          <BlurView
-            intensity={Platform.OS === "web" ? 0 : 85}
-            tint="light"
-            style={[
-              styles.navBlur,
-              // белый бар закрывает нижнюю safe-area целиком (Ozon-стиль)
-              {
-                paddingBottom:
-                  MOBILE_BOTTOM_NAV_PADDING_VERTICAL + Math.max(insets.bottom, 4),
-              },
-            ]}
-          >
-            <View style={styles.navOverlay} />
-            <View style={styles.navRow}>{items}</View>
-          </BlurView>
-        </View>
+        <Animated.View pointerEvents="box-none" style={animatedShellStyle}>
+          <View style={styles.navShadow}>
+            <BlurView
+              intensity={Platform.OS === "web" ? 0 : 85}
+              tint="light"
+              style={[
+                styles.navBlur,
+                {
+                  paddingBottom:
+                    MOBILE_BOTTOM_NAV_PADDING_VERTICAL + Math.max(insets.bottom, 4),
+                },
+              ]}
+            >
+              <View style={styles.navOverlay} />
+              <View style={styles.navRow}>{items}</View>
+            </BlurView>
+          </View>
+        </Animated.View>
       </View>
 
       <SellerProductsLimitModal

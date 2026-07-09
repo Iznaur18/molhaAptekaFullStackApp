@@ -3,13 +3,12 @@ import { StyleSheet, View } from "react-native";
 import {
   HOME_CATALOG_FOREGROUND_SHEET_CAP_HEIGHT,
   HOME_CATALOG_FOREGROUND_SHEET_TOP_RADIUS,
-  HOME_CATALOG_PRIMARY_BACKDROP_COLOR,
 } from "@/shared/lib/homeCatalogBackdropLayout";
 import { useFeedScreenStyles } from "@/shared/theme/catalogProductStyles";
 
 /**
- * Скруглённая верхняя кромка foreground-листа. Снаружи скругления — фиолетовый
- * фон шапки, поэтому уголки визуально «вырезаны» из фиолетового, без щелей.
+ * Скруглённая верхняя кромка foreground-листа. Под скруглением — прозрачно:
+ * intro-видео из hero (overlap) видно в уголках, без цветных артефактов.
  */
 export const HomeCatalogFeedSheetCap = () => {
   const styles = useFeedScreenStyles();
@@ -34,7 +33,7 @@ const capStyles = StyleSheet.create({
   backdropUnderlay: {
     width: "100%",
     alignSelf: "stretch",
-    backgroundColor: HOME_CATALOG_PRIMARY_BACKDROP_COLOR,
+    backgroundColor: "transparent",
   },
   cap: {
     width: "100%",

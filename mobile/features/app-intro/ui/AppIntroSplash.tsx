@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { useVideoPlayer, VideoView } from "expo-video";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Image, Modal, Pressable, Text, View } from "react-native";
 
@@ -9,46 +8,10 @@ import { appIntroSettingsQueryKeys } from "@/entities/app-intro-settings/model/t
 import { useAppIntro } from "@/features/app-intro/model/AppIntroProvider";
 import { APP_INTRO_UI } from "@/shared/config";
 import { useAppIntroSplashStyles } from "@/shared/theme/sellerFlowStyles";
+import { LoopingCoverVideo } from "@/shared/ui/LoopingCoverVideo";
 
 type AppIntroSplashContentProps = {
   onDismiss: () => void;
-};
-
-type IntroVideoProps = {
-  uri: string;
-  isMuted: boolean;
-  onFailed: () => void;
-  onEnded: () => void;
-  videoStyle: ReturnType<typeof useAppIntroSplashStyles>["video"];
-};
-
-const IntroVideo = ({ uri, isMuted, onFailed, onEnded, videoStyle }: IntroVideoProps) => {
-  const player = useVideoPlayer(uri, (instance) => {
-    instance.loop = false;
-    instance.muted = isMuted;
-    instance.play();
-  });
-
-  useEffect(() => {
-    player.muted = isMuted;
-  }, [isMuted, player]);
-
-  useEffect(() => {
-    if (player.status === "error") {
-      onFailed();
-    }
-  }, [onFailed, player.status]);
-
-  useEffect(() => {
-    const subscription = player.addListener("playToEnd", onEnded);
-    return () => {
-      subscription.remove();
-    };
-  }, [onEnded, player]);
-
-  return (
-    <VideoView player={player} style={videoStyle} contentFit="cover" nativeControls={false} />
-  );
 };
 
 const AppIntroSplashContent = ({ onDismiss }: AppIntroSplashContentProps) => {
@@ -123,15 +86,16 @@ const AppIntroSplashContent = ({ onDismiss }: AppIntroSplashContentProps) => {
   return (
     <View style={styles.overlay}>
       {hasVideo ? (
-        <IntroVideo
+        <LoopingCoverVideo
           uri={playbackConfig.videoMp4Src}
+          loop={false}
           isMuted={isMuted}
-          onFailed={() => {
+          onPlaybackFailed={() => {
             setVideoFailed(true);
             dismissAfterMinDuration();
           }}
           onEnded={dismissAfterMinDuration}
-          videoStyle={styles.video}
+          style={styles.video}
         />
       ) : playbackConfig.posterSrc ? (
         <Image source={{ uri: playbackConfig.posterSrc }} style={styles.video} resizeMode="cover" />
