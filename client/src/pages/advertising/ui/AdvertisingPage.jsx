@@ -103,7 +103,7 @@ export function AdvertisingPage({ isAuthorized, onRequestLogin }) {
   });
 
   const campaign = campaignQuery.data?.campaign ?? null;
-  const pricePoints = campaignQuery.data?.pricePoints ?? 30_000;
+  const pricePoints = campaignQuery.data?.pricePoints ?? 6_000;
   const loyaltyBalance = loyaltyQuery.data?.loyaltyPointsBalance ?? 0;
   const canCancel =
     campaign?.status === "pending" || campaign?.status === "queued";

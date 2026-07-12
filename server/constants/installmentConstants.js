@@ -77,8 +77,8 @@ export const INSTALLMENT_COUNTERPARTY_PUBLIC_SELECT =
 
 export const INSTALLMENT_PLAN_TITLE_MAX_LENGTH = 80;
 
-export const INSTALLMENT_SELLER_REQUIRES_PREMIUM_MESSAGE =
-  "Рассрочку могут включать только премиум-продавцы с подтверждёнными данными";
+export const INSTALLMENT_SELLER_REQUIRES_CONFIRMED_MESSAGE =
+  "Рассрочку могут включать только пользователи с подтверждёнными данными";
 export const INSTALLMENT_BUYER_REQUIRES_CONFIRMED_MESSAGE =
   "Рассрочку могут оформлять только пользователи с подтверждёнными данными";
 export const INSTALLMENT_PROGRAM_NOT_AVAILABLE_MESSAGE =

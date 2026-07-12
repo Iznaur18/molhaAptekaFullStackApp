@@ -1,4 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { memo, useCallback } from "react";
 
 import { useHomeCuratedProductListsQuery } from "@/entities/curated-product-list/model/useHomeCuratedProductListsQuery";
 import { useFeaturedRafflesQuery } from "@/entities/raffle/model/useFeaturedRafflesQuery";
@@ -15,7 +16,7 @@ type HomeFeedHeaderProps = {
   showCuratedLists: boolean;
 };
 
-export const HomeFeedHeader = ({
+export const HomeFeedHeader = memo(({
   enabled,
   showCuratedLists,
 }: HomeFeedHeaderProps) => {
@@ -32,9 +33,9 @@ export const HomeFeedHeader = ({
   const currentUserId =
     sessionQuery.data?.user?._id != null ? String(sessionQuery.data.user._id) : null;
 
-  const handleStoriesChanged = () => {
+  const handleStoriesChanged = useCallback(() => {
     void queryClient.invalidateQueries({ queryKey: userStoriesQueryKeys.all });
-  };
+  }, [queryClient]);
 
   if (!enabled) {
     return null;
@@ -60,4 +61,6 @@ export const HomeFeedHeader = ({
       ) : null}
     </>
   );
-};
+});
+
+HomeFeedHeader.displayName = "HomeFeedHeader";

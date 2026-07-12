@@ -37,10 +37,8 @@ export const RaffleFeaturedBannerInfoToggle = ({
 export const RaffleFeaturedBannerInfoPanel = ({
   raffle,
   visible,
-  onBackdropText = false,
-}: Pick<RaffleFeaturedBannerInfoOverlayProps, "raffle" | "visible" | "onBackdropText">) => {
+}: Pick<RaffleFeaturedBannerInfoOverlayProps, "raffle" | "visible">) => {
   const styles = useRaffleFeaturedBannerStyles();
-  const textStyle = onBackdropText ? styles.copyOnBackdrop : undefined;
 
   return (
     <View
@@ -54,9 +52,9 @@ export const RaffleFeaturedBannerInfoPanel = ({
         contentContainerStyle={styles.infoPanelContent}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={[styles.infoTitle, textStyle]}>{raffle.title}</Text>
+        <Text style={styles.infoTitle}>{raffle.title}</Text>
         {raffle.description ? (
-          <Text style={[styles.infoDescription, textStyle]}>{raffle.description}</Text>
+          <Text style={styles.infoDescription}>{raffle.description}</Text>
         ) : null}
       </ScrollView>
     </View>

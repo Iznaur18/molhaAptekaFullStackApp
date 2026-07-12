@@ -1,0 +1,136 @@
+.account-requirement-modal__body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--iz-space-2);
+  padding: var(--iz-space-4);
+  text-align: center;
+}
+
+.account-requirement-modal__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin-bottom: var(--iz-space-1);
+  border-radius: 50%;
+}
+
+.account-requirement-modal__badge--premium {
+  color: var(--iz-color-warning-text);
+  background: var(--iz-color-warning-surface);
+  box-shadow: 0 0 0 1px var(--iz-color-warning-border);
+}
+
+.account-requirement-modal__badge--confirm {
+  color: var(--iz-color-success-text);
+  background: var(--iz-color-success-surface);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--iz-color-success) 30%, var(--iz-color-border));
+}
+
+.account-requirement-modal__intro {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--iz-color-text);
+}
+
+.account-requirement-modal__description {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--iz-color-text-muted);
+}
+
+.account-requirement-modal__benefits-title {
+  align-self: flex-start;
+  margin: var(--iz-space-2) 0 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--iz-color-text-muted);
+}
+
+.account-requirement-modal__benefits {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: var(--iz-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.account-requirement-modal__benefit {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--iz-space-2);
+  font-size: 0.9rem;
+  line-height: 1.35;
+  color: var(--iz-color-text);
+}
+
+.account-requirement-modal__benefit-icon {
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+  color: var(--iz-color-success);
+}
+
+.account-requirement-modal__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--iz-space-2);
+}
+
+.account-requirement-modal__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.7rem var(--iz-space-4);
+  border: none;
+  border-radius: var(--iz-radius-button, 0.6rem);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--iz-color-on-contrast);
+  cursor: pointer;
+}
+
+.account-requirement-modal__cta--premium {
+  background: var(--iz-color-warning);
+}
+
+.account-requirement-modal__cta--premium:hover {
+  background: color-mix(in srgb, var(--iz-color-warning) 88%, #000);
+}
+
+.account-requirement-modal__cta--confirm {
+  background: var(--iz-color-success);
+}
+
+.account-requirement-modal__cta--confirm:hover {
+  background: color-mix(in srgb, var(--iz-color-success) 88%, #000);
+}
+
+.account-requirement-modal__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.6rem var(--iz-space-4);
+  border: 1px solid var(--iz-color-border);
+  border-radius: var(--iz-radius-button, 0.6rem);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--iz-color-text-muted);
+  background: transparent;
+  cursor: pointer;
+}
+
+.account-requirement-modal__close:hover {
+  background: var(--iz-color-overlay-subtle);
+  color: var(--iz-color-text);
+}

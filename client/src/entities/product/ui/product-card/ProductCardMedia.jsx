@@ -85,7 +85,6 @@ export function ProductCardMedia({ vm }) {
             <ProductLoyaltyPointsBadge
               product={vm.product}
               isAuthorized={vm.isAuthorized}
-              isPremiumUser={vm.isPremiumUser}
               variant="overlay"
             />
           ) : null}

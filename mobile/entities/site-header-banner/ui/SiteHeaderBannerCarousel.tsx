@@ -21,6 +21,7 @@ import {
   resolveSiteHeaderBannerCarouselIndex,
   resolveSiteHeaderBannerCarouselMetrics,
 } from "@/shared/lib/siteHeaderBannerCarouselLayout";
+import { nestedHorizontalScrollProps } from "@/shared/lib/nestedHorizontalScrollProps";
 import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
 import { SITE_HEADER_BANNER_LAYOUT } from "@/shared/lib/siteHeaderBannerLayout";
 import { useSiteHeaderBannerCarouselStyles } from "@/shared/theme/siteHeaderBannerStyles";
@@ -213,6 +214,7 @@ export const SiteHeaderBannerCarousel = ({
       <FlatList
           ref={listRef}
           horizontal
+          {...nestedHorizontalScrollProps}
           pagingEnabled={edgeToEdge}
           snapToInterval={edgeToEdge || stride <= 0 ? undefined : stride}
           snapToAlignment="start"

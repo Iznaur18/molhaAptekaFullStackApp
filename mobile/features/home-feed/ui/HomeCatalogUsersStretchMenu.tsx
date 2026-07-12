@@ -101,10 +101,10 @@ export const HomeCatalogUsersStretchMenu = ({
       >
         {isMenuExpanded ? (
           <View style={styles.usersStretchIconCircle}>
-            <MaterialIcons name="visibility" size={22} color={theme.colors.textSecondary} />
+            <MaterialIcons name="grid-view" size={22} color={theme.colors.textSecondary} />
           </View>
         ) : (
-          <MaterialIcons name="visibility" size={22} color={theme.colors.textSecondary} />
+          <MaterialIcons name="grid-view" size={22} color={theme.colors.textSecondary} />
         )}
       </Pressable>
 

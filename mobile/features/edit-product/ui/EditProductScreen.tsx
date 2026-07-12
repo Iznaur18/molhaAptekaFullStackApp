@@ -1,6 +1,6 @@
-import { PRODUCT_NAME_MAX_LENGTH } from "@molha/api-contract";
+import { PRODUCT_IMAGE_URLS_MAX, PRODUCT_NAME_MAX_LENGTH } from "@molha/api-contract";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -12,14 +12,26 @@ import {
   View,
 } from "react-native";
 
-import { useCatalogProductQuery } from "@/entities/product/model/useCatalogProductQuery";
+import { computeProductDiscountPercent } from "@/entities/product/lib/computeProductDiscountPercent";
+import {
+  mapProductCharacteristicsToRows,
+  type ProductCharacteristicRow,
+  serializeProductCharacteristicRows,
+} from "@/entities/product/lib/productCharacteristicRows";
+import { resolveProductImageUrls } from "@/entities/product/lib/resolveProductImageUrls";
+import { resolveProductLoyaltyPointsPerUnit } from "@/entities/product/lib/resolveProductLoyaltyPointsPerUnit";
+import { resolveSellerMaxLoyaltyPointsPerUnit } from "@/entities/product/lib/resolveSellerMaxLoyaltyPointsPerUnit";
 import { validateProductName } from "@/entities/product/lib/validateProductName";
+import { useCatalogProductQuery } from "@/entities/product/model/useCatalogProductQuery";
 import { useMyProductMutations } from "@/entities/product/model/useMyProductMutations";
-import { useUploadImageMutation } from "@/entities/upload/model/useUploadImageMutation";
-import { pickProfileImageAsset } from "@/features/image-upload/lib/pickProfileImageAsset";
+import { useMyProductsInfiniteQuery } from "@/entities/product/model/useMyProductsInfiniteQuery";
+import { ProductCharacteristicsEditor } from "@/entities/product/ui/ProductCharacteristicsEditor";
+import { useMyLoyaltyPointsStatusQuery } from "@/entities/user/model/useMyLoyaltyPointsStatusQuery";
 import { CreateProductCategoryPicker } from "@/features/create-product/ui/CreateProductCategoryPicker";
-import { API_CLIENT_UI, CREATE_PRODUCT_UI, IMAGE_UPLOAD_UI, PRODUCT_REPORT_UI } from "@/shared/config";
+import { ProductPhotoGrid } from "@/features/image-upload/ui/ProductPhotoGrid";
+import { API_CLIENT_UI, CREATE_PRODUCT_UI, PRODUCT_REPORT_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { keepDigitsOnly } from "@/shared/lib/rubPriceInput";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useProductEditorScreenStyles } from "@/shared/theme/sellerFlowStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
@@ -27,6 +39,10 @@ import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 const PRODUCT_DESCRIPTION_MIN_CHARS = 10;
 const PRODUCT_STOCK_QUANTITY_MIN = 1;
 const PRODUCT_STOCK_QUANTITY_MAX = 9999;
+const PRODUCT_PRICE_RUB_MAX = 999_999_999;
+const LOYALTY_POINTS_MAX_LENGTH = 8;
+
+const keepDigits = (value: string) => keepDigitsOnly(value);
 
 type EditProductScreenProps = {
   productId: string;
@@ -43,16 +59,20 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
   const styles = useProductEditorScreenStyles();
   const productQuery = useCatalogProductQuery(productId);
   const { patchMutation, deleteMutation } = useMyProductMutations();
-  const uploadMutation = useUploadImageMutation();
+  const loyaltyPointsQuery = useMyLoyaltyPointsStatusQuery(Boolean(productId));
+  const sellerProductsQuery = useMyProductsInfiniteQuery({ enabled: Boolean(productId) });
 
   const [productName, setProductName] = useState("");
   const [productDescription, setProductDescription] = useState("");
   const [productPrice, setProductPrice] = useState("");
+  const [productOldPrice, setProductOldPrice] = useState("");
   const [productIsAvailable, setProductIsAvailable] = useState(true);
   const [productStockQuantity, setProductStockQuantity] = useState("1");
+  const [loyaltyPointsPerUnit, setLoyaltyPointsPerUnit] = useState("0");
   const [productCategoryId, setProductCategoryId] = useState<string | null>(null);
   const [productCategoryLabel, setProductCategoryLabel] = useState("");
-  const [productImageUrl, setProductImageUrl] = useState<string | null>(null);
+  const [productImageUrls, setProductImageUrls] = useState<string[]>([]);
+  const [characteristicRows, setCharacteristicRows] = useState<ProductCharacteristicRow[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isInitialized, setIsInitialized] = useState(false);
@@ -65,18 +85,62 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
     setProductName(String(product.productName ?? "").trim());
     setProductDescription(String(product.productDescription ?? "").trim());
     setProductPrice(String(product.productPrice ?? ""));
+    const oldPrice = product.productOldPrice;
+    setProductOldPrice(
+      oldPrice != null && Number.isFinite(Number(oldPrice)) ? String(Math.floor(Number(oldPrice))) : "",
+    );
     setProductIsAvailable(product.productIsAvailable !== false);
     setProductStockQuantity(String(product.productStockQuantity ?? 1));
+    setLoyaltyPointsPerUnit(String(resolveProductLoyaltyPointsPerUnit(product)));
     const categoryId = product.productCategoryId;
     if (typeof categoryId === "string" && categoryId.trim()) {
       setProductCategoryId(categoryId);
       setProductCategoryLabel(String(product.productCategoryLabelRu ?? categoryId));
     }
-    const urls = Array.isArray(product.productImageUrls) ? product.productImageUrls : [];
-    const firstUrl = urls[0] ?? product.productImageUrl;
-    setProductImageUrl(typeof firstUrl === "string" ? firstUrl : null);
+    setProductImageUrls(resolveProductImageUrls(product));
+    setCharacteristicRows(mapProductCharacteristicsToRows(product.productCharacteristics));
     setIsInitialized(true);
   }, [isInitialized, productQuery.data]);
+
+  useEffect(() => {
+    if (!sellerProductsQuery.hasNextPage || sellerProductsQuery.isFetchingNextPage) {
+      return;
+    }
+    void sellerProductsQuery.fetchNextPage();
+  }, [
+    sellerProductsQuery.data,
+    sellerProductsQuery.fetchNextPage,
+    sellerProductsQuery.hasNextPage,
+    sellerProductsQuery.isFetchingNextPage,
+  ]);
+
+  const loyaltyBudget = useMemo(
+    () =>
+      resolveSellerMaxLoyaltyPointsPerUnit({
+        loyaltyPointsBalance: loyaltyPointsQuery.data?.loyaltyPointsBalance ?? 0,
+        loyaltyPointsReserved: loyaltyPointsQuery.data?.loyaltyPointsReserved ?? 0,
+        sellerProducts: sellerProductsQuery.products,
+        editingProductId: productId,
+      }),
+    [
+      loyaltyPointsQuery.data?.loyaltyPointsBalance,
+      loyaltyPointsQuery.data?.loyaltyPointsReserved,
+      productId,
+      sellerProductsQuery.products,
+    ],
+  );
+
+  const loyaltyFieldDisabled = loyaltyBudget.maxPerUnit <= 0;
+
+  const discountPercent = useMemo(() => {
+    const price = parsePositiveInt(productPrice);
+    const oldPriceRaw = productOldPrice.trim();
+    if (price == null || !oldPriceRaw) {
+      return null;
+    }
+    const oldPrice = parsePositiveInt(oldPriceRaw);
+    return computeProductDiscountPercent(oldPrice, price);
+  }, [productOldPrice, productPrice]);
 
   const validateForm = (): string | null => {
     const nameError = validateProductName(productName);
@@ -90,8 +154,24 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
     if (price == null || price < 0) {
       return CREATE_PRODUCT_UI.ERROR_PRICE;
     }
+    if (price > PRODUCT_PRICE_RUB_MAX) {
+      return CREATE_PRODUCT_UI.ERROR_PRICE_MAX;
+    }
+    const oldPriceRaw = productOldPrice.trim();
+    if (oldPriceRaw) {
+      const oldPrice = parsePositiveInt(oldPriceRaw);
+      if (oldPrice == null || oldPrice <= price) {
+        return CREATE_PRODUCT_UI.ERROR_OLD_PRICE;
+      }
+      if (oldPrice > PRODUCT_PRICE_RUB_MAX) {
+        return CREATE_PRODUCT_UI.ERROR_PRICE_MAX;
+      }
+    }
     if (!productCategoryId) {
       return CREATE_PRODUCT_UI.ERROR_CATEGORY;
+    }
+    if (productImageUrls.length === 0) {
+      return CREATE_PRODUCT_UI.ERROR_IMAGE_REQUIRED;
     }
     if (productIsAvailable) {
       const stock = parsePositiveInt(productStockQuantity);
@@ -103,25 +183,20 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
         return CREATE_PRODUCT_UI.ERROR_STOCK;
       }
     }
+    const loyaltyParsed = Math.floor(Number(loyaltyPointsPerUnit));
+    if (!Number.isFinite(loyaltyParsed) || loyaltyParsed < 0) {
+      return CREATE_PRODUCT_UI.ERROR_LOYALTY_POINTS;
+    }
+    if (loyaltyParsed > loyaltyBudget.maxPerUnit) {
+      return CREATE_PRODUCT_UI.ERROR_LOYALTY_POINTS_MAX(
+        loyaltyBudget.maxPerUnit,
+        loyaltyBudget.catalogCommitted,
+      );
+    }
     return null;
   };
 
-  const isBusy =
-    patchMutation.isPending || deleteMutation.isPending || uploadMutation.isPending;
-
-  const handlePickImage = async () => {
-    setErrorMessage("");
-    try {
-      const asset = await pickProfileImageAsset();
-      if (!asset) {
-        return;
-      }
-      const url = await uploadMutation.mutateAsync(asset);
-      setProductImageUrl(url);
-    } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : IMAGE_UPLOAD_UI.ERROR_GENERIC);
-    }
-  };
+  const isBusy = patchMutation.isPending || deleteMutation.isPending;
 
   const handleSave = async () => {
     const validationError = validateForm();
@@ -133,6 +208,9 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
     setErrorMessage("");
     setSuccessMessage("");
 
+    const oldPriceRaw = productOldPrice.trim();
+    const oldPrice = oldPriceRaw ? parsePositiveInt(oldPriceRaw) : null;
+
     try {
       await patchMutation.mutateAsync({
         productId,
@@ -140,12 +218,15 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
           productName: productName.trim(),
           productDescription: productDescription.trim(),
           productPrice: parsePositiveInt(productPrice) ?? 0,
+          productOldPrice: oldPriceRaw ? oldPrice : null,
           productCategoryId: productCategoryId ?? undefined,
           productIsAvailable,
           productStockQuantity: productIsAvailable
             ? (parsePositiveInt(productStockQuantity) ?? PRODUCT_STOCK_QUANTITY_MIN)
             : undefined,
-          productImageUrls: productImageUrl ? [productImageUrl] : undefined,
+          productImageUrls,
+          productCharacteristics: serializeProductCharacteristicRows(characteristicRows),
+          loyaltyPointsPerUnit: Math.floor(Number(loyaltyPointsPerUnit)) || 0,
         },
       });
       setSuccessMessage(CREATE_PRODUCT_UI.SAVED);
@@ -226,17 +307,49 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
               />
             </View>
 
-            <View style={styles.field}>
-              <Text style={styles.label}>{CREATE_PRODUCT_UI.LABEL_PRICE}</Text>
-              <TextInput
-                style={styles.input}
-                value={productPrice}
-                onChangeText={setProductPrice}
-                keyboardType="number-pad"
-                editable={!isBusy}
-                placeholderTextColor={theme.colors.textMuted}
-              />
+            <ProductCharacteristicsEditor
+              rows={characteristicRows}
+              onChange={setCharacteristicRows}
+              disabled={isBusy}
+            />
+
+            <Text style={styles.hint}>{CREATE_PRODUCT_UI.HINT_OLD_PRICE}</Text>
+
+            <View style={styles.priceGrid}>
+              <View style={[styles.field, styles.priceCol]}>
+                <Text style={styles.label}>{CREATE_PRODUCT_UI.LABEL_PRICE}</Text>
+                <TextInput
+                  style={[styles.input, styles.priceInput]}
+                  value={productPrice}
+                  onChangeText={(text) => setProductPrice(keepDigits(text))}
+                  keyboardType="number-pad"
+                  editable={!isBusy}
+                  placeholderTextColor={theme.colors.textMuted}
+                />
+              </View>
+              <View style={[styles.field, styles.priceCol]}>
+                <Text style={styles.label}>{CREATE_PRODUCT_UI.LABEL_OLD_PRICE}</Text>
+                <TextInput
+                  style={[styles.input, styles.priceInput]}
+                  value={productOldPrice}
+                  onChangeText={(text) => setProductOldPrice(keepDigits(text))}
+                  keyboardType="number-pad"
+                  editable={!isBusy}
+                  placeholder="0"
+                  placeholderTextColor={theme.colors.textMuted}
+                />
+              </View>
             </View>
+
+            {discountPercent != null ? (
+              <View
+                style={[styles.discountPreview, { backgroundColor: `${theme.colors.success}1f` }]}
+              >
+                <Text style={[styles.discountPreviewText, { color: theme.colors.success }]}>
+                  {CREATE_PRODUCT_UI.DISCOUNT_PREVIEW(discountPercent)}
+                </Text>
+              </View>
+            ) : null}
 
             <CreateProductCategoryPicker
               selectedCategoryId={productCategoryId}
@@ -273,85 +386,100 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
                 />
               </View>
             ) : null}
+
+            <View style={styles.field}>
+              <Text style={styles.label}>{CREATE_PRODUCT_UI.LABEL_LOYALTY_POINTS_PER_UNIT}</Text>
+              <TextInput
+                style={styles.input}
+                value={loyaltyPointsPerUnit}
+                onChangeText={(text) => setLoyaltyPointsPerUnit(keepDigits(text))}
+                keyboardType="number-pad"
+                editable={!isBusy && !loyaltyFieldDisabled}
+                maxLength={LOYALTY_POINTS_MAX_LENGTH}
+                placeholder="0"
+                placeholderTextColor={theme.colors.textMuted}
+              />
+              <Text style={styles.hint}>
+                {loyaltyFieldDisabled
+                  ? CREATE_PRODUCT_UI.HINT_LOYALTY_POINTS_ZERO_BALANCE
+                  : CREATE_PRODUCT_UI.HINT_LOYALTY_POINTS_PER_UNIT(
+                      loyaltyBudget.available,
+                      loyaltyBudget.catalogCommitted,
+                      loyaltyBudget.maxPerUnit,
+                    )}
+              </Text>
+            </View>
           </View>
 
           <View style={[styles.zoneBlock, styles.zoneMedia]}>
             <View style={styles.field}>
               <Text style={styles.label}>{CREATE_PRODUCT_UI.LABEL_IMAGE}</Text>
-              <Pressable
-                style={({ pressed }) => [styles.secondaryButton, pressed && styles.buttonPressed]}
-                onPress={() => {
-                  void handlePickImage();
-                }}
+              <ProductPhotoGrid
+                urls={productImageUrls}
+                onChange={setProductImageUrls}
+                maxCount={PRODUCT_IMAGE_URLS_MAX}
                 disabled={isBusy}
-              >
-                <Text style={styles.secondaryButtonText}>{IMAGE_UPLOAD_UI.UPLOAD_BUTTON}</Text>
-              </Pressable>
-              {productImageUrl ? (
-                <Text style={styles.imageUrl} numberOfLines={1}>
-                  {productImageUrl}
-                </Text>
-              ) : null}
+              />
             </View>
           </View>
 
-        {errorMessage ? (
-          <View style={[styles.feedbackBox, styles.errorBox]} accessibilityRole="alert">
-            <Text style={styles.error}>{errorMessage}</Text>
-          </View>
-        ) : null}
-        {successMessage ? (
-          <View style={[styles.feedbackBox, styles.successBox]}>
-            <Text style={styles.success}>{successMessage}</Text>
-          </View>
-        ) : null}
+          {errorMessage ? (
+            <View style={[styles.feedbackBox, styles.errorBox]} accessibilityRole="alert">
+              <Text style={styles.error}>{errorMessage}</Text>
+            </View>
+          ) : null}
+          {successMessage ? (
+            <View style={[styles.feedbackBox, styles.successBox]}>
+              <Text style={styles.success}>{successMessage}</Text>
+            </View>
+          ) : null}
         </View>
       </ScrollView>
 
       <View style={styles.footerDock}>
         <View style={styles.footer}>
-        <View style={styles.actions}>
+          <View style={styles.actions}>
+            <Pressable
+              style={({ pressed }) => [
+                styles.cancelButton,
+                pressed && styles.buttonPressed,
+                isBusy && styles.disabled,
+              ]}
+              onPress={() => router.back()}
+              disabled={isBusy}
+            >
+              <Text style={styles.cancelButtonText}>{CREATE_PRODUCT_UI.CANCEL}</Text>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [
+                styles.submitButton,
+                pressed && !isBusy && styles.buttonPressed,
+                isBusy && styles.disabled,
+              ]}
+              onPress={() => {
+                void handleSave();
+              }}
+              disabled={isBusy}
+            >
+              {patchMutation.isPending ? (
+                <ActivityIndicator color={theme.colors.onContrast} />
+              ) : (
+                <Text style={styles.submitText}>{CREATE_PRODUCT_UI.SAVE}</Text>
+              )}
+            </Pressable>
+          </View>
+
           <Pressable
             style={({ pressed }) => [
-              styles.cancelButton,
+              styles.deleteButton,
               pressed && styles.buttonPressed,
               isBusy && styles.disabled,
             ]}
-            onPress={() => router.back()}
+            onPress={handleDelete}
             disabled={isBusy}
           >
-            <Text style={styles.cancelButtonText}>{CREATE_PRODUCT_UI.CANCEL}</Text>
+            <Text style={styles.deleteText}>{CREATE_PRODUCT_UI.DELETE}</Text>
           </Pressable>
-          <Pressable
-            style={({ pressed }) => [
-              styles.submitButton,
-              pressed && !isBusy && styles.buttonPressed,
-              isBusy && styles.disabled,
-            ]}
-            onPress={() => {
-              void handleSave();
-            }}
-            disabled={isBusy}
-          >
-            {patchMutation.isPending ? (
-              <ActivityIndicator color={theme.colors.onContrast} />
-            ) : (
-              <Text style={styles.submitText}>{CREATE_PRODUCT_UI.SAVE}</Text>
-            )}
-          </Pressable>
-        </View>
-
-        <Pressable
-          style={({ pressed }) => [
-            styles.deleteButton,
-            pressed && styles.buttonPressed,
-            isBusy && styles.disabled,
-          ]}
-          onPress={handleDelete}
-          disabled={isBusy}
-        >
-          <Text style={styles.deleteText}>{CREATE_PRODUCT_UI.DELETE}</Text>
-        </Pressable>
         </View>
       </View>
     </View>

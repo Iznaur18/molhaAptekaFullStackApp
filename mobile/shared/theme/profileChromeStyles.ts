@@ -12,6 +12,7 @@ export const PROFILE_CONTENT_MAX_WIDTH = PROFILE_CONTENT_MAX_WIDTH_PHONE;
 export const PROFILE_ACTIONS_MAX_WIDTH = 320;
 const PROFILE_AVATAR_SIZE = 72;
 const PROFILE_BANNER_HEIGHT = PROFILE_AVATAR_SIZE * 3;
+export const PROFILE_CARD_SQUIRCLE_RADIUS = 24;
 const GUEST_BODY_PADDING_TOP = 0;
 const GUEST_BODY_MARGIN_TOP = 36;
 const GUEST_BODY_MARGIN_BOTTOM = 36;
@@ -165,8 +166,6 @@ export const useProfileOverviewBannerStyles = createThemedStyles((theme) => ({
   banner: {
     position: "relative",
     minHeight: PROFILE_BANNER_HEIGHT,
-    borderRadius: 10,
-    overflow: "hidden",
   },
   bannerFallback: {
     backgroundColor: theme.colors.surfaceMuted,
@@ -463,40 +462,53 @@ export const useThemePreferenceToggleStyles = createThemedStyles((theme) => ({
   },
 }));
 
-const USER_PROFILE_THUMB_SIZE = 48;
+const USER_PROFILE_THUMB_SIZE = 64;
+export const USER_PROFILE_THUMB_SQUIRCLE_RADIUS = 14;
+export const USER_PROFILE_THUMB_ROW_SIZE = 5;
 
 export const useUserProfileThumbListStyles = createThemedStyles((theme) => ({
   root: {
     marginBottom: theme.spacing[4],
-    paddingVertical: 12,
-    paddingHorizontal: theme.spacing[4],
-    borderRadius: theme.radius.button,
-    backgroundColor: theme.colors.surfaceMuted,
+    backgroundColor: theme.colors.surface,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
   },
-  headingRow: {
+  header: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "baseline",
-    justifyContent: "center",
-    gap: 6,
-    marginBottom: theme.spacing[2],
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: theme.spacing[2],
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    backgroundColor: theme.colors.ink,
+    borderBottomColor: theme.colors.ink,
   },
-  heading: {
-    fontSize: 15.2,
-    fontWeight: "600",
-    color: theme.colors.text,
-    textAlign: "center",
+  headerTitle: {
+    flex: 1,
+    minWidth: 0,
+    fontSize: 11,
+    fontWeight: "800",
+    letterSpacing: 0.9,
+    textTransform: "uppercase",
+    color: theme.colors.onContrast,
   },
-  headingAction: {
-    textDecorationLine: "underline",
+  headerTitlePressable: {
+    flex: 1,
+    minWidth: 0,
   },
-  viewAll: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: theme.colors.action,
-    textDecorationLine: "underline",
+  headerAction: {
+    flexShrink: 0,
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 0.4,
+    color: theme.colors.onContrast,
+    opacity: 0.82,
+  },
+  body: {
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    gap: theme.spacing[2],
   },
   state: {
     fontSize: 14,
@@ -507,51 +519,60 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme) => ({
     color: theme.colors.danger,
   },
   grid: {
+    gap: 10,
+  },
+  gridRow: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    gap: 8,
+    justifyContent: "space-between",
+  },
+  gridRowPartial: {
+    justifyContent: "flex-start",
+    gap: 10,
   },
   thumbButton: {
-    borderRadius: 6,
-    overflow: "hidden",
+    width: USER_PROFILE_THUMB_SIZE,
+    height: USER_PROFILE_THUMB_SIZE,
   },
   thumbButtonUnavailable: {
     opacity: 0.72,
   },
-  thumb: {
+  thumbClip: {
     width: USER_PROFILE_THUMB_SIZE,
     height: USER_PROFILE_THUMB_SIZE,
-    borderRadius: 6,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.surfaceMuted,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
   },
+  thumbImage: {
+    width: "100%",
+    height: "100%",
+  },
   thumbPlaceholder: {
+    width: "100%",
+    height: "100%",
     backgroundColor: theme.colors.surfaceMuted,
   },
   hint: {
-    marginTop: theme.spacing[2],
     fontSize: 13,
     textAlign: "center",
     color: theme.colors.warningText,
   },
-  moreButton: {
-    alignSelf: "center",
-    marginTop: theme.spacing[2],
-    paddingVertical: 5,
-    paddingHorizontal: 12,
-    borderRadius: 6,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.borderStrong,
+  footerAction: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 11,
+    paddingHorizontal: 14,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: theme.colors.border,
     backgroundColor: theme.colors.surfaceMuted,
   },
-  moreButtonText: {
-    fontSize: 13,
-    color: theme.colors.text,
-  },
-  moreButtonDisabled: {
+  footerActionDisabled: {
     opacity: 0.65,
+  },
+  footerActionText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: theme.colors.action,
   },
 }));
 

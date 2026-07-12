@@ -8,6 +8,7 @@ import {
   resolveCuratedCompactCardWidth,
 } from "@/entities/curated-product-list/lib/curatedProductListHomeLayout";
 import { HOME_FEED_UI } from "@/shared/config";
+import { nestedHorizontalScrollProps } from "@/shared/lib/nestedHorizontalScrollProps";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useHomeCuratedListsStyles } from "@/shared/theme/catalogProductStyles";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
@@ -41,6 +42,7 @@ export const HomeCuratedListsSection = ({ lists }: HomeCuratedListsSectionProps)
           <Text style={styles.title}>{list.title}</Text>
           <ScrollView
             horizontal
+            {...nestedHorizontalScrollProps}
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.row}
           >

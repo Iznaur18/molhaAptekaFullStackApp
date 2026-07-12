@@ -1,7 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { Alert, Text, View } from "react-native";
+import { Alert, View } from "react-native";
 
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import { canSellerEditRaffle } from "@/entities/raffle/lib/canSellerEditRaffle";
@@ -13,8 +13,7 @@ import { RaffleFeaturedCarousel } from "@/entities/raffle/ui/RaffleFeaturedCarou
 import { CreateRaffleModal } from "@/features/create-raffle-page/ui/CreateRaffleModal";
 import { raffleQueryKeys } from "@/shared/api";
 import { HOME_FEED_UI, PRODUCT_REPORT_UI, RAFFLE_MANAGE_UI } from "@/shared/config";
-import { RAFFLE_SECTION_CARD_BORDER_RADIUS, useRaffleFeaturedSectionStyles } from "@/shared/theme/raffleFeaturedStyles";
-import { SquircleView } from "@/shared/ui/SquircleView";
+import { useRaffleFeaturedSectionStyles } from "@/shared/theme/raffleFeaturedStyles";
 
 type HomeFeaturedRafflesSectionProps = {
   raffles: RaffleFromApi[];
@@ -124,18 +123,12 @@ export const HomeFeaturedRafflesSection = ({ raffles }: HomeFeaturedRafflesSecti
   return (
     <>
       {raffles.length > 0 ? (
-        <View
-          style={sectionStyles.root}
-          accessibilityLabel={HOME_FEED_UI.RAFFLES_SECTION_ARIA}
-        >
-          <SquircleView radius={RAFFLE_SECTION_CARD_BORDER_RADIUS} style={sectionStyles.sectionCard}>
-            <Text style={sectionStyles.title}>{HOME_FEED_UI.RAFFLES_SECTION_TITLE}</Text>
-            <RaffleFeaturedCarousel
-              raffles={raffles}
-              onOpenProducts={handleOpenProducts}
-              getManage={getManage}
-            />
-          </SquircleView>
+        <View style={sectionStyles.root} accessibilityLabel={HOME_FEED_UI.RAFFLES_SECTION_ARIA}>
+          <RaffleFeaturedCarousel
+            raffles={raffles}
+            onOpenProducts={handleOpenProducts}
+            getManage={getManage}
+          />
         </View>
       ) : null}
 

@@ -11,6 +11,7 @@ export type UserSearchListItem = Record<string, unknown> & {
   isBlockedUser?: boolean;
   followersCount?: number;
   totalSalesCount?: number;
+  userLoyaltyPoints?: number;
   userRatingByVotes?: {
     countVotes?: number;
     totalRating?: number;

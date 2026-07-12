@@ -1,15 +1,16 @@
 import { Platform, StyleSheet } from "react-native";
 
-import { RAFFLE_FEATURED_BANNER_CHROME as L } from "@izibuy/shared-lib";
+import {
+  RAFFLE_FEATURED_BANNER_CHROME as L,
+  RAFFLE_FEATURED_CARD_BORDER_RADIUS,
+} from "@izibuy/shared-lib";
 
 import { HOME_FEED_SECTION_GAP } from "@/features/home-feed/lib/homeFeedSectionLayout";
 import { RAFFLE_FEATURED_PALETTE as P } from "@/entities/raffle/lib/raffleFeaturedPalette";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-export const RAFFLE_FEATURED_BANNER_BORDER_RADIUS = 20;
-export const RAFFLE_FEATURED_VISUAL_RADIUS_TOP = 11;
-export const RAFFLE_FEATURED_VISUAL_RADIUS_BOTTOM = 9.6;
-const SOUND_BUTTON_INSET = 7;
+export const RAFFLE_FEATURED_BANNER_BORDER_RADIUS = RAFFLE_FEATURED_CARD_BORDER_RADIUS;
+const SOUND_BUTTON_INSET = 10;
 const SOUND_BUTTON_SIZE = 32;
 const VISUAL_CONTROL_SIZE = 28;
 const VISUAL_CONTROL_BORDER_RADIUS = 8;
@@ -18,7 +19,6 @@ const VISUAL_ACTION_BUTTON_SIZE_SCALE = 0.75;
 const VISUAL_ACTION_BUTTON_SIZE = VISUAL_CONTROL_SIZE * VISUAL_ACTION_BUTTON_SIZE_SCALE;
 const VISUAL_ACTION_BUTTON_BORDER_RADIUS =
   VISUAL_CONTROL_BORDER_RADIUS * VISUAL_ACTION_BUTTON_SIZE_SCALE;
-const VISUAL_ACTION_BUTTON_INSET = 8;
 const VISUAL_ACTION_BUTTON_BACKGROUND_OPACITY = 0.72;
 const VISUAL_ACTION_BUTTON_SHADOW_OPACITY = 0.14;
 const VISUAL_ACTION_BUTTON_SHADOW_RADIUS = 2;
@@ -29,113 +29,35 @@ const MANAGE_TOGGLE_FONT_SIZE = 18 * VISUAL_ACTION_BUTTON_SIZE_SCALE;
 const MANAGE_TOGGLE_LINE_HEIGHT = 18 * VISUAL_ACTION_BUTTON_SIZE_SCALE;
 const BANNER_BOTTOM_MARGIN = HOME_FEED_SECTION_GAP;
 
-/** Паритет с CuratedProductListCarousel section chrome на главной. */
+/** @deprecated Секция без внешней обёртки — оставлено для совместимости импортов. */
 export const RAFFLE_SECTION_CARD_BORDER_RADIUS = 16;
-const RAFFLE_SECTION_CARD_PADDING_HORIZONTAL = 16;
-const RAFFLE_SECTION_CARD_PADDING_VERTICAL = 8;
-const RAFFLE_SECTION_TITLE_MARGIN_BOTTOM = 10;
-const RAFFLE_SECTION_TITLE_PADDING_X = 4;
 
 export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
   root: {
     width: "100%",
     maxWidth: "100%",
-    overflow: "hidden",
     marginBottom: BANNER_BOTTOM_MARGIN,
   },
   rootInCarousel: {
     marginBottom: 0,
   },
-  inner: {
-    position: "relative",
+  cardStack: {
     width: "100%",
-    maxWidth: "100%",
-    borderWidth: 0,
+    gap: L.cardPanelGap,
+  },
+  visualCard: {
+    width: "100%",
     overflow: "hidden",
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.surfaceMuted,
   },
-  innerShadow: {
-    shadowColor: P.accentPurple,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.12,
-    shadowRadius: 24,
-    elevation: 4,
-  },
-  innerHasBackdrop: {
-    backgroundColor: theme.colors.surface,
-  },
-  innerInCarousel: {
-    borderRadius: 0,
-  },
-  innerStacked: {
-    flexDirection: "column",
-    gap: L.stackedGridGap,
-    paddingTop: L.innerPaddingTop,
-    paddingHorizontal: L.innerPaddingHorizontal,
-    paddingBottom: L.innerPaddingBottom,
-  },
-  innerSplit: {
-    flexDirection: "row",
-    alignItems: "stretch",
-    gap: L.splitGridGap,
-    paddingHorizontal: L.innerPaddingHorizontal,
-    paddingTop: L.innerPaddingTop,
-    paddingBottom: L.innerPaddingBottom,
-  },
-  innerCompleted: {
-    shadowColor: P.successVivid,
-  },
-  backdropSlot: {
-    ...StyleSheet.absoluteFillObject,
-    top: "-14%",
-    bottom: "-14%",
-    left: "-14%",
-    right: "-14%",
-    overflow: "hidden",
-    zIndex: 0,
-  },
-  backdropMedia: {
-    ...StyleSheet.absoluteFillObject,
-    opacity: 0.82,
-    transform: [{ scale: 1.06 }],
-  },
-  backdropScrim: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: theme.colors.surface,
-    zIndex: 0,
-  },
-  backdropScrimCompleted: {
-    backgroundColor: theme.colors.surface,
+  visualCardCompleted: {
+    backgroundColor: theme.colors.surfaceMuted,
   },
   visual: {
     position: "relative",
     overflow: "hidden",
-    backgroundColor: "rgba(0,0,0,0.06)",
-    zIndex: 1,
+    backgroundColor: theme.colors.surfaceMuted,
     ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
-  },
-  visualStacked: {
-    alignSelf: "stretch",
-    marginTop: -L.imageBleedTop,
-    marginBottom: 0,
-    marginLeft: -L.imageBleedHorizontal,
-    marginRight: -L.imageBleedHorizontal,
-    borderTopLeftRadius: RAFFLE_FEATURED_VISUAL_RADIUS_TOP,
-    borderTopRightRadius: RAFFLE_FEATURED_VISUAL_RADIUS_TOP,
-    borderBottomLeftRadius: RAFFLE_FEATURED_VISUAL_RADIUS_BOTTOM,
-    borderBottomRightRadius: RAFFLE_FEATURED_VISUAL_RADIUS_BOTTOM,
-  },
-  visualSplit: {
-    flex: 1,
-    minWidth: 0,
-    alignSelf: "stretch",
-    marginTop: -L.imageBleedTop,
-    marginLeft: -L.innerPaddingHorizontal,
-    marginBottom: -L.imageBleedTop,
-    borderTopLeftRadius: RAFFLE_FEATURED_VISUAL_RADIUS_TOP,
-    borderTopRightRadius: RAFFLE_FEATURED_VISUAL_RADIUS_TOP,
-    borderBottomLeftRadius: RAFFLE_FEATURED_VISUAL_RADIUS_BOTTOM,
-    borderBottomRightRadius: RAFFLE_FEATURED_VISUAL_RADIUS_BOTTOM,
   },
   mediaFrame: {
     ...StyleSheet.absoluteFillObject,
@@ -160,29 +82,21 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     justifyContent: "center",
     backgroundColor: "rgba(17, 17, 17, 0.55)",
   },
-  visualActionControls: {
+  visualTopBar: {
     position: "absolute",
-    top: VISUAL_ACTION_BUTTON_INSET,
-    right: VISUAL_ACTION_BUTTON_INSET,
+    top: L.visualControlInset,
+    left: L.visualControlInset,
+    right: L.visualControlInset,
     zIndex: 5,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "flex-end",
+  },
+  visualTopControls: {
     flexDirection: "row",
     alignItems: "center",
     gap: VISUAL_CONTROL_GAP,
-  },
-  visualActionButton: {
-    width: VISUAL_ACTION_BUTTON_SIZE,
-    height: VISUAL_ACTION_BUTTON_SIZE,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 0,
-    borderWidth: 0,
-    borderRadius: VISUAL_ACTION_BUTTON_BORDER_RADIUS,
-    backgroundColor: `rgba(255, 255, 255, ${VISUAL_ACTION_BUTTON_BACKGROUND_OPACITY})`,
-    shadowColor: theme.colors.ink,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: VISUAL_ACTION_BUTTON_SHADOW_OPACITY,
-    shadowRadius: VISUAL_ACTION_BUTTON_SHADOW_RADIUS,
-    elevation: VISUAL_ACTION_BUTTON_ELEVATION,
+    flexShrink: 0,
   },
   infoToggleButton: {
     width: VISUAL_ACTION_BUTTON_SIZE,
@@ -236,69 +150,38 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     lineHeight: 20,
     color: P.onContrast,
   },
-  body: {
-    minWidth: 0,
-    paddingTop: L.bodyPaddingTop,
-    gap: 0,
-    zIndex: 1,
+  footerCard: {
+    width: "100%",
+    overflow: "hidden",
+    backgroundColor: theme.colors.surfaceMuted,
   },
-  bodySplit: {
-    flex: 1,
-    minWidth: 0,
-    justifyContent: "space-between",
+  footerCardCompleted: {
+    backgroundColor: theme.colors.surfaceMuted,
   },
-  bodyStacked: {
-    paddingTop: 0,
-  },
-  title: {
-    marginBottom: L.titleMarginBottom,
-    fontSize: 20,
-    lineHeight: L.titleLineHeight,
-    fontWeight: "700",
-    color: theme.colors.text,
-    flexShrink: 1,
-  },
-  description: {
-    marginBottom: L.descriptionMarginBottom,
-    fontSize: 14,
-    lineHeight: L.descriptionLineHeight,
-    color: theme.colors.text,
-    opacity: 0.88,
-  },
-  copyOnBackdrop: {
-    color: P.onContrast,
-    textShadowColor: "rgba(0,0,0,0.4)",
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
-  },
-  progressWrap: {
-    marginBottom: L.progressMarginBottom,
+  footerContent: {
+    gap: L.footerContentGap,
+    paddingHorizontal: L.footerPaddingHorizontal,
+    paddingBottom: L.footerPaddingBottom,
+    paddingTop: L.progressLabelMarginTop,
   },
   progressBar: {
     height: L.progressBarHeight,
-    borderRadius: 999,
-    backgroundColor: theme.colors.actionSurface,
+    borderRadius: 0,
+    backgroundColor: theme.colors.actionBorder,
     overflow: "hidden",
   },
-  progressBarBackdrop: {
-    backgroundColor: "rgba(255,255,255,0.38)",
-  },
   progressBarCompleted: {
-    backgroundColor: theme.colors.actionSurface,
+    backgroundColor: theme.colors.successSurface,
   },
   progressFill: {
     height: "100%",
-    borderRadius: 999,
+    borderRadius: 0,
     backgroundColor: theme.colors.action,
-  },
-  progressFillBackdrop: {
-    backgroundColor: P.onContrast,
   },
   progressFillCompleted: {
-    backgroundColor: theme.colors.action,
+    backgroundColor: theme.colors.success,
   },
   progressLabel: {
-    marginTop: L.progressLabelMarginTop,
     fontSize: 13.6,
     lineHeight: L.progressLabelLineHeight,
     fontWeight: "600",
@@ -310,19 +193,19 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     flexWrap: "wrap",
     alignItems: "center",
     gap: L.actionsGap,
-    marginTop: "auto",
   },
   btnPrimary: {
-    paddingVertical: 7.2,
-    paddingHorizontal: 12,
-    borderRadius: 10,
+    alignSelf: "flex-start",
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 999,
     backgroundColor: theme.colors.action,
   },
   btnPrimaryCompleted: {
     backgroundColor: theme.colors.action,
   },
   btnPrimaryText: {
-    fontSize: 13.6,
+    fontSize: 13.2,
     fontWeight: "600",
     color: P.onContrast,
   },
@@ -332,13 +215,13 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
   btnInstagram: {
     paddingVertical: 7,
     paddingHorizontal: 12,
-    borderRadius: 10,
+    borderRadius: 999,
     borderWidth: 1,
     borderColor: P.accentPink,
     backgroundColor: P.accentPinkSoft,
   },
   btnInstagramText: {
-    fontSize: 14,
+    fontSize: 13.2,
     fontWeight: "600",
     color: P.accentPinkDeep,
   },
@@ -551,23 +434,9 @@ export const useRaffleDescriptionModalStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useRaffleFeaturedSectionStyles = createThemedStyles((theme) => ({
-  root: {},
-  sectionCard: {
-    paddingHorizontal: RAFFLE_SECTION_CARD_PADDING_HORIZONTAL,
-    paddingVertical: RAFFLE_SECTION_CARD_PADDING_VERTICAL,
-    backgroundColor: theme.colors.surface,
-    borderWidth: 0,
-    borderColor: "transparent",
-    overflow: "hidden",
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "600",
-    letterSpacing: -0.4,
-    color: theme.colors.ink,
-    marginBottom: RAFFLE_SECTION_TITLE_MARGIN_BOTTOM,
-    paddingHorizontal: RAFFLE_SECTION_TITLE_PADDING_X,
+export const useRaffleFeaturedSectionStyles = createThemedStyles(() => ({
+  root: {
+    width: "100%",
   },
 }));
 

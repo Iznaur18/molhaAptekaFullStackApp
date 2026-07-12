@@ -3,15 +3,19 @@ import { StyleSheet } from "react-native";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-const TOOLBAR_PADDING_VERTICAL = 10.4;
+const TOOLBAR_PADDING_VERTICAL = 12;
 const TOOLBAR_PADDING_HORIZONTAL = 12;
-const TOOLBAR_RADIUS = 10.4;
+const TOOLBAR_RADIUS = 16;
 const TOOLBAR_GAP = 8;
 const LIST_GAP = 4;
 const SECTION_GAP = 4;
 const ROW_GAP = 8;
 const ROW_PADDING = 8;
 const ROW_RADIUS = 12;
+const VIEW_CHIP_GAP = 6;
+const VIEW_CHIP_PADDING_VERTICAL = 4;
+const VIEW_CHIP_PADDING_HORIZONTAL = 8;
+const OVERVIEW_TILE_RADIUS = 16;
 const THUMB_SIZE = 52;
 const THUMB_RADIUS = 7.2;
 
@@ -41,8 +45,8 @@ export const useAuctionPageStyles = createThemedStyles((theme) => ({
     paddingHorizontal: TOOLBAR_PADDING_HORIZONTAL,
     borderRadius: TOOLBAR_RADIUS,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "rgba(217, 119, 6, 0.24)",
-    backgroundColor: theme.colors.warningSurface,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surfaceMuted,
   },
   toolbarHead: {
     flexDirection: "row",
@@ -116,7 +120,7 @@ export const useAuctionPageStyles = createThemedStyles((theme) => ({
   button: {
     paddingVertical: 10,
     paddingHorizontal: 16,
-    borderRadius: 8,
+    borderRadius: 16,
     backgroundColor: theme.colors.action,
   },
   buttonText: {
@@ -126,14 +130,14 @@ export const useAuctionPageStyles = createThemedStyles((theme) => ({
   viewChips: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 5.6,
+    gap: VIEW_CHIP_GAP,
     paddingVertical: 2.4,
   },
   viewChip: {
     borderWidth: StyleSheet.hairlineWidth,
     borderRadius: 999,
-    paddingVertical: 3.5,
-    paddingHorizontal: 8.8,
+    paddingVertical: VIEW_CHIP_PADDING_VERTICAL,
+    paddingHorizontal: VIEW_CHIP_PADDING_HORIZONTAL,
     borderColor: theme.colors.border,
     backgroundColor: theme.colors.surface,
   },
@@ -153,22 +157,22 @@ export const useAuctionPageStyles = createThemedStyles((theme) => ({
   overview: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8,
+    gap: 7.2,
   },
   overviewTile: {
     flex: 1,
     minWidth: 0,
-    gap: 2,
-    paddingVertical: 9.6,
-    paddingHorizontal: 10.4,
-    borderRadius: 8.8,
+    gap: 2.4,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderRadius: OVERVIEW_TILE_RADIUS,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
     backgroundColor: theme.colors.surface,
   },
   overviewTileActive: {
-    borderColor: theme.colors.warning,
-    backgroundColor: theme.colors.warningSurface,
+    borderColor: theme.colors.success,
+    backgroundColor: theme.colors.successSurface,
   },
   overviewTileAttention: {
     borderColor: "rgba(217, 119, 6, 0.45)",
@@ -240,24 +244,6 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
     alignItems: "flex-start",
     justifyContent: "space-between",
     gap: 7.2,
-  },
-  chevronButton: {
-    flexShrink: 0,
-    padding: 0,
-  },
-  chevron: {
-    width: 20,
-    height: 20,
-    borderRadius: 999,
-    overflow: "hidden",
-    textAlign: "center",
-    lineHeight: 20,
-    fontSize: 12,
-    color: theme.colors.textMuted,
-    backgroundColor: theme.colors.surfaceMuted,
-  },
-  chevronExpanded: {
-    transform: [{ rotate: "90deg" }],
   },
   preview: {
     fontSize: 13.1,

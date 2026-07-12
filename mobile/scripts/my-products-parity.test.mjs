@@ -53,7 +53,9 @@ test("my products page uses catalog toolbar, grid and seller card footer", () =>
   assert.match(myProductCard, /ProductCardSellerToolbar/);
   assert.match(myProductCard, /variant="compact"/);
   assert.match(myProductCard, /getProductModerationBadgeLabel/);
-  assert.match(myProductCard, /getProductCardMineStatusBadge/);
+  assert.match(myProductCard, /buildMyProductCompactCardFeatureBadges/);
+  assert.match(myProductCard, /ProductCompactCardStatusPill/);
+  assert.match(myProductCard, /resolveProductPromotionCompactBadge/);
   assert.match(myProductCard, /ProductCompactCardMediaThumb/);
 
   assert.match(productCard, /ProductCardSellerToolbar/);

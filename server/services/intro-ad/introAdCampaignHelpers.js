@@ -1,4 +1,3 @@
-import { APP_INTRO_SETTINGS_KEY } from "../../constants/appIntroSettingsConstants.js";
 import {
   INTRO_AD_CAMPAIGN_STATUS_ACTIVE,
   INTRO_AD_CAMPAIGN_STATUS_CANCELLED,
@@ -10,6 +9,7 @@ import {
   INTRO_AD_CTA_TYPE_PROFILE,
   INTRO_AD_CTA_TYPE_SELLER_PRODUCTS,
   INTRO_AD_DURATION_MS,
+  INTRO_AD_MAX_ACTIVE,
   INTRO_AD_PRICE_POINTS,
   INTRO_AD_NOTIFICATION_KIND_ACTIVATED,
   INTRO_AD_NOTIFICATION_KIND_APPROVED,
@@ -18,7 +18,6 @@ import {
   INTRO_AD_NOTIFICATION_KIND_REJECTED,
 } from "../../constants/introAdCampaignConstants.js";
 import {
-  AppIntroSettingsModel,
   IntroAdCampaignModel,
   ProductModel,
 } from "../../models/index.js";
@@ -97,6 +96,19 @@ export const findActiveIntroAdCampaign = async (session = null) => {
 };
 
 /**
+ * @param {import('mongoose').ClientSession | null | undefined} session
+ */
+export const countActiveIntroAdCampaigns = async (session = null) => {
+  const query = IntroAdCampaignModel.countDocuments({
+    status: INTRO_AD_CAMPAIGN_STATUS_ACTIVE,
+  });
+  if (session) {
+    query.session(session);
+  }
+  return query;
+};
+
+/**
  * @param {Date} now
  */
 const extendActiveUntilForPause = (campaign, now) => {
@@ -118,20 +130,14 @@ export const activateIntroAdCampaignRecord = async (campaignId, session = null) 
   const now = new Date();
   const activeUntil = new Date(now.getTime() + INTRO_AD_DURATION_MS);
 
-  const settings = await AppIntroSettingsModel.findOne({
-    settingsKey: APP_INTRO_SETTINGS_KEY,
-  })
-    .select("prioritizePlatformIntro")
-    .lean();
-
-  const pausedAt = settings?.prioritizePlatformIntro === true ? now : null;
-
+  // Платные ролики больше не ставятся на паузу платформенным интро —
+  // они показываются всегда, после видео админа.
   const update = {
     status: INTRO_AD_CAMPAIGN_STATUS_ACTIVE,
     activatedAt: now,
     activeUntil,
     scheduledStartAt: null,
-    pausedAt,
+    pausedAt: null,
   };
 
   const updated = await IntroAdCampaignModel.findOneAndUpdate(
@@ -155,8 +161,8 @@ export const activateIntroAdCampaignRecord = async (campaignId, session = null) 
  * @param {import('mongoose').ClientSession | null | undefined} [session]
  */
 export const activateNextQueuedIntroAdCampaign = async (session = null) => {
-  const active = await findActiveIntroAdCampaign(session);
-  if (active) {
+  const activeCount = await countActiveIntroAdCampaigns(session);
+  if (activeCount >= INTRO_AD_MAX_ACTIVE) {
     return null;
   }
 
@@ -178,6 +184,23 @@ export const activateNextQueuedIntroAdCampaign = async (session = null) => {
   }
 
   return activateIntroAdCampaignRecord(next._id, session);
+};
+
+/**
+ * Активирует очередь, пока не заполнятся все слоты (INTRO_AD_MAX_ACTIVE) или очередь не иссякнет.
+ * @param {import('mongoose').ClientSession | null | undefined} session
+ * @returns {Promise<boolean>} был ли активирован хотя бы один ролик
+ */
+export const fillIntroAdActiveSlotsFromQueue = async (session = null) => {
+  let activatedAny = false;
+  for (let guard = 0; guard < INTRO_AD_MAX_ACTIVE; guard += 1) {
+    const activated = await activateNextQueuedIntroAdCampaign(session);
+    if (!activated) {
+      break;
+    }
+    activatedAny = true;
+  }
+  return activatedAny;
 };
 
 /**
@@ -267,54 +290,20 @@ export const expireIntroAdCampaignsAndActivateQueue = async (session = null) => 
     anyExpired = true;
   }
 
-  if (anyExpired) {
-    await activateNextQueuedIntroAdCampaign(session);
-  }
+  // Всегда добираем свободные слоты из очереди (до INTRO_AD_MAX_ACTIVE),
+  // независимо от того, что-то истекло или просто освободилось место.
+  await fillIntroAdActiveSlotsFromQueue(session);
+
+  return anyExpired;
 };
 
 export const processIntroAdCampaignCronTasks = async () => {
   try {
     await runInTransaction(async (session) => {
       await expireIntroAdCampaignsAndActivateQueue(session);
-
-      const active = await findActiveIntroAdCampaign(session);
-      if (!active) {
-        await activateNextQueuedIntroAdCampaign(session);
-      }
     });
   } catch (error) {
     console.error("processIntroAdCampaignCronTasks error:", error);
-  }
-};
-
-export const pauseActiveIntroAdCampaignsForPlatformIntro = async () => {
-  const now = new Date();
-  const activeRows = await IntroAdCampaignModel.find({
-    status: INTRO_AD_CAMPAIGN_STATUS_ACTIVE,
-    pausedAt: null,
-  }).lean();
-
-  for (const row of activeRows) {
-    await IntroAdCampaignModel.updateOne(
-      { _id: row._id },
-      { $set: { pausedAt: now } },
-    );
-  }
-};
-
-export const resumePausedIntroAdCampaigns = async () => {
-  const now = new Date();
-  const pausedRows = await IntroAdCampaignModel.find({
-    status: INTRO_AD_CAMPAIGN_STATUS_ACTIVE,
-    pausedAt: { $ne: null },
-  }).lean();
-
-  for (const row of pausedRows) {
-    const activeUntil = extendActiveUntilForPause(row, now);
-    await IntroAdCampaignModel.updateOne(
-      { _id: row._id },
-      { $set: { activeUntil, pausedAt: null } },
-    );
   }
 };
 
@@ -350,27 +339,36 @@ export const assertNoOpenIntroAdCampaignForAdvertiser = async (userId, session =
 };
 
 /**
- * @param {import('mongoose').Types.ObjectId | string | null | undefined} prioritizePlatformIntro
+ * Возвращает до INTRO_AD_MAX_ACTIVE активных платных intro-роликов
+ * в порядке активации (кто раньше активировался — раньше в списке).
+ * Показываются всегда — платформенное интро админа идёт первым на клиенте,
+ * реклама следует за ним.
  */
-export const resolvePaidIntroForPublicPlayback = async (prioritizePlatformIntro) => {
-  if (prioritizePlatformIntro === true) {
-    return null;
-  }
-
+export const resolvePaidIntrosForPublicPlayback = async () => {
   await expireIntroAdCampaignsAndActivateQueue();
 
-  const active = await IntroAdCampaignModel.findOne({
+  const activeRows = await IntroAdCampaignModel.find({
     status: INTRO_AD_CAMPAIGN_STATUS_ACTIVE,
-    pausedAt: null,
-  }).lean();
+  })
+    .sort({ activatedAt: 1, createdAt: 1 })
+    .limit(INTRO_AD_MAX_ACTIVE)
+    .lean();
 
-  if (!active) {
-    return null;
+  const payloads = [];
+  for (const active of activeRows) {
+    const ctaType =
+      active.ctaType ?? (await resolveIntroAdCtaType(active.advertiserId));
+    payloads.push(toIntroAdPaidIntroPayload(active, ctaType));
   }
+  return payloads;
+};
 
-  const ctaType =
-    active.ctaType ?? (await resolveIntroAdCtaType(active.advertiserId));
-  return toIntroAdPaidIntroPayload(active, ctaType);
+/**
+ * Обратная совместимость: одиночный активный ролик (первый в очереди показа).
+ */
+export const resolvePaidIntroForPublicPlayback = async () => {
+  const intros = await resolvePaidIntrosForPublicPlayback();
+  return intros[0] ?? null;
 };
 
 export {
@@ -458,7 +456,7 @@ export const cancelIntroAdCampaignsForAdvertiser = async (advertiserId) => {
     }
 
     if (hadActive) {
-      await activateNextQueuedIntroAdCampaign(session);
+      await fillIntroAdActiveSlotsFromQueue(session);
     }
   });
 };

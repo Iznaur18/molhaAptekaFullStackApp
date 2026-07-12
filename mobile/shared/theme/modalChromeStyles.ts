@@ -311,7 +311,7 @@ export const useStoryViewerModalStyles = createThemedStyles((theme) => ({
     top: 0,
     bottom: 0,
     width: "28%",
-    zIndex: 2,
+    zIndex: 1,
   },
   edgeNext: {
     position: "absolute",
@@ -319,7 +319,7 @@ export const useStoryViewerModalStyles = createThemedStyles((theme) => ({
     top: 0,
     bottom: 0,
     width: "28%",
-    zIndex: 2,
+    zIndex: 1,
   },
   edgeDisabled: {
     pointerEvents: "none",
@@ -329,7 +329,6 @@ export const useStoryViewerModalStyles = createThemedStyles((theme) => ({
     overflow: "hidden",
     borderRadius: USER_STORY_FRAME_BORDER_RADIUS,
     backgroundColor: theme.colors.nearBlack,
-    zIndex: 1,
   },
   closeButton: {
     position: "absolute",
@@ -387,6 +386,7 @@ export const useStoryViewerModalStyles = createThemedStyles((theme) => ({
   },
   mediaLayer: {
     ...StyleSheet.absoluteFillObject,
+    zIndex: 0,
   },
   media: {
     width: "100%",
@@ -433,7 +433,7 @@ export const useStoryViewerModalStyles = createThemedStyles((theme) => ({
     left: 12,
     right: 12,
     bottom: 12,
-    zIndex: 3,
+    zIndex: 4,
     flexDirection: "row",
     justifyContent: "center",
     gap: 8,
@@ -443,6 +443,7 @@ export const useStoryViewerModalStyles = createThemedStyles((theme) => ({
     paddingHorizontal: 16,
     borderRadius: theme.radius.pill,
     backgroundColor: STORY_VIEWER_ACTION_SCRIM,
+    zIndex: 4,
   },
   deleteButton: {
     backgroundColor: STORY_VIEWER_DELETE_SCRIM,
@@ -1008,6 +1009,132 @@ export const useProductPromotionModalStyles = createThemedStyles((theme) => ({
   },
   buttonDisabled: {
     opacity: 0.6,
+  },
+}));
+
+export const useAccountRequirementModalStyles = createThemedStyles((theme) => ({
+  overlay: {
+    flex: 1,
+    backgroundColor: MODAL_BACKDROP_SCRIM,
+    justifyContent: "center",
+    padding: 24,
+  },
+  card: {
+    borderRadius: theme.radius.md,
+    padding: 20,
+    gap: theme.spacing[3],
+    backgroundColor: theme.colors.surface,
+    maxHeight: "90%",
+  },
+  scrollContent: {
+    gap: theme.spacing[2],
+    alignItems: "center",
+  },
+  badge: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: theme.spacing[1],
+  },
+  badgePremium: {
+    backgroundColor: theme.colors.warningSurface,
+    borderWidth: 1,
+    borderColor: theme.colors.warningBorder,
+  },
+  badgeConfirm: {
+    backgroundColor: theme.colors.successSurface,
+    borderWidth: 1,
+    borderColor: theme.colors.success,
+  },
+  badgeIconPremium: {
+    color: theme.colors.warningText,
+  },
+  badgeIconConfirm: {
+    color: theme.colors.successText,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: theme.colors.text,
+    textAlign: "center",
+  },
+  intro: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: theme.colors.text,
+    textAlign: "center",
+  },
+  description: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: theme.colors.textSecondary,
+    textAlign: "center",
+  },
+  benefitsTitle: {
+    alignSelf: "stretch",
+    marginTop: theme.spacing[2],
+    fontSize: 12,
+    fontWeight: "700",
+    letterSpacing: 0.3,
+    textTransform: "uppercase",
+    color: theme.colors.textSecondary,
+  },
+  benefits: {
+    alignSelf: "stretch",
+    gap: theme.spacing[2],
+  },
+  benefitRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: theme.spacing[2],
+  },
+  benefitIcon: {
+    marginTop: 2,
+    color: theme.colors.success,
+  },
+  benefitText: {
+    flex: 1,
+    fontSize: 14,
+    lineHeight: 19,
+    color: theme.colors.text,
+  },
+  actions: {
+    gap: theme.spacing[2],
+    marginTop: theme.spacing[1],
+  },
+  ctaPremium: {
+    borderRadius: 10,
+    paddingVertical: theme.spacing[3],
+    paddingHorizontal: theme.spacing[4],
+    backgroundColor: theme.colors.warning,
+    alignItems: "center",
+  },
+  ctaConfirm: {
+    borderRadius: 10,
+    paddingVertical: theme.spacing[3],
+    paddingHorizontal: theme.spacing[4],
+    backgroundColor: theme.colors.success,
+    alignItems: "center",
+  },
+  ctaText: {
+    color: theme.colors.onContrast,
+    fontWeight: "700",
+    fontSize: 15,
+  },
+  closeButton: {
+    borderRadius: 10,
+    paddingVertical: theme.spacing[3],
+    paddingHorizontal: theme.spacing[4],
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    alignItems: "center",
+  },
+  closeButtonText: {
+    color: theme.colors.textSecondary,
+    fontWeight: "600",
+    fontSize: 14,
   },
 }));
 

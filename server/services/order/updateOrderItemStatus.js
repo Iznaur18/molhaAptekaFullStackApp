@@ -19,7 +19,6 @@ import {
   releaseUnawardedLoyaltyReservesForOrder,
 } from "./orderLoyaltyPoints.js";
 import { settleLoyaltyPointsReservation } from "../loyalty/loyaltyPointsReserve.js";
-import { isPremiumActive } from "../user/premiumAccess.js";
 import { finalizeOffersAfterOrderConfirmed } from "../product/productPriceOfferHelpers.js";
 import { closeProductAuction } from "../product/productAuction.js";
 import { syncRaffleProgressForProductSale } from "../raffle/raffleHelpers.js";
@@ -252,9 +251,9 @@ export async function confirmOrderItemByBuyer({ orderId, itemIndex, buyerId, use
   }
 
   const buyer = await UserModel.findById(buyerId)
-    .select("isPremiumUser premiumExpiresAt")
+    .select("isUserDataConfirmed isBlockedUser")
     .lean();
-  const isPremiumUser = isPremiumActive(buyer);
+  const isUserDataConfirmed = buyer?.isUserDataConfirmed === true;
 
   const itemSellerId = normalizeId(
     targetItem.productId?.productSeller?._id ?? targetItem.productId?.productSeller,
@@ -269,7 +268,7 @@ export async function confirmOrderItemByBuyer({ orderId, itemIndex, buyerId, use
       const earned = prepareLoyaltyPointsForConfirmedOrderItem({
         order,
         itemIndex,
-        isPremiumUser,
+        isUserDataConfirmed,
       });
 
       if (earned > 0) {

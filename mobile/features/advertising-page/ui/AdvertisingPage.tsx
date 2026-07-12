@@ -1,3 +1,4 @@
+import { Feather } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
@@ -17,12 +18,15 @@ import {
   MY_PROFILE_PAGE_UI,
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { pluralizeRuBall } from "@/shared/lib/pluralizeRuBall";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useAdvertisingPageStyles } from "@/shared/theme/advertisingPageStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 export const AdvertisingPage = () => {
   const router = useRouter();
+  const theme = useAppTheme();
   const styles = useAdvertisingPageStyles();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
   const isAuthorized = useIsAuthorized();
@@ -82,13 +86,27 @@ export const AdvertisingPage = () => {
             onPress={() => setNavSheetVisible(true)}
           />
 
-          <Text style={styles.pageLead}>{ADVERTISING_PAGE_UI.PAGE_LEAD}</Text>
-
-          <View style={styles.balanceBar}>
-            <Text style={styles.balanceLabel}>{ADVERTISING_PAGE_UI.BALANCE_LABEL}</Text>
-            <Text style={styles.balanceValue}>
-              {ADVERTISING_PAGE_UI.BALANCE(loyaltyBalance)}
-            </Text>
+          <View
+            style={styles.heroCard}
+            accessibilityLabel={`${ADVERTISING_PAGE_UI.HERO_CAPTION}: ${ADVERTISING_PAGE_UI.BALANCE(loyaltyBalance)}`}
+          >
+            <View style={styles.heroTextBlock}>
+              <Text style={styles.heroCaption}>{ADVERTISING_PAGE_UI.HERO_CAPTION}</Text>
+              <View style={styles.heroRow}>
+                <Text style={styles.heroValue}>{loyaltyBalance}</Text>
+                <Text style={styles.heroUnit}>{pluralizeRuBall(loyaltyBalance)}</Text>
+              </View>
+              <Text style={styles.heroInfo}>{ADVERTISING_PAGE_UI.PAGE_LEAD}</Text>
+            </View>
+            <View style={styles.heroIconWrap}>
+              <Feather
+                name="zap"
+                size={24}
+                color={theme.colors.onContrast}
+                accessibilityElementsHidden
+                importantForAccessibility="no"
+              />
+            </View>
           </View>
 
           <View style={styles.cards}>

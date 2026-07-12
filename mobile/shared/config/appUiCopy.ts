@@ -97,9 +97,9 @@ export const API_CLIENT_UI = {
 export const IMAGE_UPLOAD_UI = {
   UPLOAD_BUTTON: "Выбрать фото",
   UPLOAD_LOADING: "Загрузка…",
-  UPLOAD_HINT: "JPEG, PNG или WebP, до 5 МБ",
+  UPLOAD_HINT: "JPEG, PNG или WebP, до 50 МБ — большие файлы сожмутся автоматически",
   ERROR_TYPE: "Допустимы только JPEG, PNG и WebP",
-  ERROR_SIZE: "Файл не больше 5 МБ",
+  ERROR_SIZE: "Файл не больше 50 МБ",
   ERROR_GENERIC: "Не удалось загрузить файл",
   ERROR_AUTH: "Войдите в аккаунт, чтобы загрузить файл",
   PERMISSION_DENIED: "Нет доступа к галерее",
@@ -256,9 +256,9 @@ export const PRODUCT_CARD_UI = {
   INSTALLMENT_BADGE: "Рассрочка",
   RAFFLE_BADGE: "Розыгрыш",
   HIDDEN_FROM_CATALOG_BADGE: "Скрыт от покупателей",
-  LOYALTY_POINTS_PREMIUM: (points: number) => `+${points} баллов`,
-  LOYALTY_POINTS_WITH_PREMIUM: (points: number) => `+${points} баллов`,
-  LOYALTY_POINTS_GUEST: (points: number) => `+${points} баллов с премиум`,
+  LOYALTY_POINTS_CONFIRMED: (points: number) => `+${points} баллов`,
+  LOYALTY_POINTS_UNCONFIRMED: (points: number) => `+${points} баллов`,
+  LOYALTY_POINTS_GUEST: (points: number) => `+${points} баллов с подтверждением`,
   SELLER_PROFILE_ARIA: (sellerName: string) => `Профиль продавца: ${sellerName}`,
   RATING_LINE: (rating: number, count: number) => `★ ${rating.toFixed(1)} (${count})`,
   PROMOTION_BUTTON: "Управление",
@@ -478,6 +478,8 @@ export const HEADER_USERS_BUTTON_UI = {
   MENU_ARIA: "Действия аккаунта",
   MENU_CLOSE_ARIA: "Закрыть меню",
   MENU_ITEM_USERS_ARIA: "Пользователи",
+  MENU_ITEM_TERMS_ARIA: "Пользовательское соглашение",
+  MENU_ITEM_FAQ_ARIA: "Частые вопросы",
   MENU_ITEM_PLACEHOLDER_ARIA: (index: number) => `Пункт ${index} (скоро)`,
 } as const;
 
@@ -518,6 +520,7 @@ export const RAFFLE_FEATURED_BANNER_UI = {
   COMPLETED: "Завершён",
   OPEN_PRODUCTS: "Товары розыгрыша",
   OPEN_INSTAGRAM: "Итоги в Instagram",
+  DESCRIPTION_LINK: "Описание",
   DESCRIPTION_MODAL_TITLE: "Описание",
   DESCRIPTION_OPEN_ARIA: "Открыть полное описание розыгрыша",
   INFO_TOGGLE_OPEN_ARIA: "Показать название и описание розыгрыша",
@@ -723,6 +726,13 @@ export const CATALOG_FILTER_UI = {
   CLEAR_SEARCH: "Очистить",
 } as const;
 
+export const COMMERCE_CARD_UI = {
+  EXPAND: "раскрыть",
+  COLLAPSE: "свернуть",
+  EXPAND_TOGGLE_LABEL: (expanded: boolean) => (expanded ? "свернуть" : "раскрыть"),
+  EXPAND_TOGGLE_ARIA: (expanded: boolean) => (expanded ? "Свернуть" : "Раскрыть"),
+} as const;
+
 export const ORDER_CARD_UI = {
   ITEMS_HEADING: "Позиции",
   ADDRESS_LABEL: "Адрес доставки",
@@ -742,7 +752,7 @@ export const ORDER_CARD_UI = {
   BUYER_CANCEL_CONFIRM: "Отменить заказ?",
   SELLER_CANCEL_CONFIRM: "Отменить заказ покупателя?",
   DELETED_PRODUCT_NAME: "Товар удалён",
-  LOYALTY_POINTS_LINE: (points: number) => `+${points} баллов за шт. (премиум-покупателю)`,
+  LOYALTY_POINTS_LINE: (points: number) => `+${points} баллов за шт. (подтверждённому покупателю)`,
 } as const;
 
 export const PRODUCT_REPORT_UI = {
@@ -806,12 +816,27 @@ export const EMAIL_VERIFICATION_UI = {
   CLOSE: "Закрыть",
 } as const;
 
+export const FAQ_UI = {
+  TITLE: "Частые вопросы",
+  UPDATED_PREFIX: "Обновлено:",
+  CONTACT_PREFIX: "Не нашли ответ? Напишите:",
+  QUESTION_ARIA: (question: string) => `Вопрос: ${question}`,
+} as const;
+
 export const LEGAL_UI = {
   PRIVACY_TITLE: "Политика конфиденциальности",
   PRIVACY_LINK: "Политика конфиденциальности",
-  PRIVACY_UPDATED_PREFIX: "Обновлено:",
-  PRIVACY_CONTACT_PREFIX: "Контакты:",
-  PRIVACY_OPEN_WEB: "Открыть на сайте",
+  PRIVACY_TAB: "Конфиденциальность",
+  TERMS_TITLE: "Пользовательское соглашение",
+  TERMS_LINK: "Пользовательское соглашение",
+  TERMS_TAB: "Соглашение",
+  LISTING_TITLE: "Правила размещения товаров",
+  LISTING_TAB: "Размещение",
+  OFFER_TITLE: "Публичная оферта",
+  OFFER_TAB: "Оферта",
+  UPDATED_PREFIX: "Обновлено:",
+  CONTACT_PREFIX: "Контакты:",
+  OPEN_WEB: "Открыть на сайте",
 } as const;
 
 export const AUTH_UI = {
@@ -834,6 +859,15 @@ export const AUTH_UI = {
   GO_TO_LOGIN: "Уже есть аккаунт? Войти",
   BACK_BUTTON: "Назад",
   GUEST_STATUS: "Вы не вошли в аккаунт",
+  REGISTER_TERMS_CONSENT_PREFIX: "Я принимаю ",
+  REGISTER_TERMS_LINK: "Пользовательское соглашение",
+  REGISTER_TERMS_CONSENT_AND: " и ",
+  REGISTER_LISTING_LINK: "Правила размещения товаров",
+  REGISTER_PRIVACY_CONSENT_PREFIX: "Я даю ",
+  REGISTER_PRIVACY_CONSENT_LINK: "согласие на обработку персональных данных",
+  REGISTER_PRIVACY_CONSENT_SUFFIX: " в соответствии с ",
+  REGISTER_PRIVACY_LINK: "Политикой конфиденциальности",
+  REGISTER_CONSENT_REQUIRED: "Подтвердите согласие с документами для регистрации",
   GUEST_PROFILE_ACTION_BUTTON: "Перейти",
   PROFILE_TITLE: "Профиль",
   SESSION_CHECK: "Проверка сессии…",
@@ -946,6 +980,7 @@ export const USER_LIST_ROW_UI = {
   USER_DATA_CONFIRMED_LABEL: "Пользователь подтверждён",
   TOTAL_SALES_COUNT_LABEL: "Продаж",
   FOLLOWERS_LABEL: "Подписчики",
+  LOYALTY_POINTS_LABEL: "Баллы",
 } as const;
 
 export const USER_DETAILS_PAGE_UI = {
@@ -1059,6 +1094,9 @@ export const WISHLIST_PAGE_UI = {
   LOGIN_HINT: "Войдите, чтобы видеть «Мои желания».",
   LOGIN_BUTTON: "Войти",
   REMOVE_ARIA: (title: string) => `Убрать «${title}» из желаний`,
+  HERO_CAPTION: "Мои желания",
+  HERO_UNIT_FORMS: ["товар", "товара", "товаров"],
+  HERO_INFO: "Сохранённые товары из каталога — возвращайтесь к ним в любой момент.",
 } as const;
 
 export const WISHLIST_TOGGLE_UI = {
@@ -1072,6 +1110,9 @@ export const SUBSCRIPTIONS_PAGE_UI = {
   FETCH_FALLBACK: "Не удалось загрузить подписки",
   LOGIN_HINT: "Войдите, чтобы видеть список подписок.",
   LOGIN_BUTTON: "Войти",
+  HERO_CAPTION: "Подписки",
+  HERO_UNIT_FORMS: ["продавец", "продавца", "продавцов"],
+  HERO_INFO: "Продавцы, за которыми вы следите. Их товары — в фильтре «Подписки» на главной.",
 } as const;
 
 export const USER_FOLLOW_BUTTON_UI = {
@@ -1144,6 +1185,42 @@ export const SELLER_PRODUCTS_LIMIT_MODAL_UI = {
   CLOSE: "Понятно",
 } as const;
 
+/** Подсказка при попытке действия, требующего премиум или подтверждённый аккаунт. */
+export const ACCOUNT_REQUIREMENT_MODAL_UI = {
+  ARIA_DIALOG: "Требуется доступ",
+  /** @param actionLabel действие, которое пытался выполнить пользователь */
+  INTRO: (actionLabel?: string) =>
+    actionLabel
+      ? `Чтобы ${actionLabel}, нужен ещё один шаг.`
+      : "Для этого действия нужен ещё один шаг.",
+  BENEFITS_TITLE: "Что вы получите:",
+  CLOSE: "Позже",
+  premium: {
+    TITLE: "Нужен премиум",
+    DESCRIPTION:
+      "Действие доступно пользователям с активным премиумом. Его можно оформить за баллы лояльности — срок 1 месяц.",
+    BENEFITS: [
+      "До 30 товаров в каталоге",
+      "Золотая обводка и галочка у имени",
+      "Сторис и фон профиля",
+    ],
+    CTA: "Оформить премиум",
+  },
+  "data-confirmation": {
+    TITLE: "Нужен подтверждённый аккаунт",
+    DESCRIPTION:
+      "Действие доступно после подтверждения данных. Приложите фото с паспортом — модератор проверит заявку.",
+    BENEFITS: [
+      "Отзывы после подтверждённой покупки",
+      "Ставки на аукционе",
+      "Покупка и продажа в рассрочку",
+      "Баллы лояльности за покупки",
+      "Значок подтверждённого аккаунта",
+    ],
+    CTA: "Подтвердить данные",
+  },
+} as const;
+
 export const MY_SALES_PAGE_UI = {
   TITLE: "Мои продажи",
   COUNT: (count: number) => `${count} заказов`,
@@ -1180,6 +1257,15 @@ export const CREATE_PRODUCT_UI = {
   LABEL_NAME: "Название",
   LABEL_DESCRIPTION: "Описание",
   LABEL_PRICE: "Цена, ₽",
+  LABEL_OLD_PRICE: "Старая цена, ₽",
+  HINT_OLD_PRICE: "Старая цена покажет скидку, если она выше текущей.",
+  ERROR_OLD_PRICE: "Старая цена должна быть больше текущей",
+  DISCOUNT_PREVIEW: (percent: number) => `Скидка: −${percent}%`,
+  LABEL_CHARACTERISTICS: "Характеристики",
+  CHARACTERISTIC_KEY_PLACEHOLDER: "Свойство",
+  CHARACTERISTIC_VALUE_PLACEHOLDER: "Значение",
+  ADD_CHARACTERISTIC: "+ Добавить характеристику",
+  REMOVE_CHARACTERISTIC: "Удалить характеристику",
   LABEL_CATEGORY: "Категория",
   CATEGORY_PLACEHOLDER: "Выберите конечную подкатегорию",
   CATEGORY_FIELD_PLACEHOLDER: "Выбрать категорию",
@@ -1192,6 +1278,25 @@ export const CREATE_PRODUCT_UI = {
   CATEGORY_EMPTY_LEVEL: "Подкатегории не найдены",
   LABEL_AVAILABLE: "Товар в наличии",
   LABEL_STOCK: "Количество, шт.",
+  LABEL_LOYALTY_POINTS_PER_UNIT: "Баллов за 1 шт. покупателю",
+  HINT_LOYALTY_POINTS_PER_UNIT: (
+    available: number,
+    catalogCommitted: number,
+    maxPerUnit: number,
+  ) => {
+    const base = `Списание при подтверждении покупки. Свободно: ${available}`;
+    if (catalogCommitted > 0) {
+      return `${base}; на других товарах уже ${catalogCommitted} за штуку — для этого не больше ${maxPerUnit}. 0 — не давать баллов.`;
+    }
+    return `${base}; для этого товара не больше ${maxPerUnit}. 0 — не давать баллов.`;
+  },
+  HINT_LOYALTY_POINTS_ZERO_BALANCE:
+    "Недостаточно свободных баллов (учтены другие товары и заказы в работе). Пополните баллы или уменьшите бонус на других товарах.",
+  ERROR_LOYALTY_POINTS_MAX: (max: number, catalogCommitted = 0) =>
+    catalogCommitted > 0
+      ? `Не больше ${max} (на других товарах уже закреплено ${catalogCommitted} за штуку)`
+      : `Не больше ${max} (доступно на счёте)`,
+  ERROR_LOYALTY_POINTS: "Укажите корректное число баллов (0 или больше)",
   LABEL_IMAGE: "Фото (обязательно)",
   SUBMIT: "Создать",
   SUBMIT_LOADING: "Создаём…",
@@ -1208,6 +1313,7 @@ export const CREATE_PRODUCT_UI = {
   ERROR_NAME: "Название: от 3 до 100 символов",
   ERROR_DESCRIPTION: "Описание — минимум 10 символов",
   ERROR_PRICE: "Укажите цену",
+  ERROR_PRICE_MAX: "Цена не может превышать 999 999 999 ₽",
   ERROR_IMAGE_REQUIRED: "Добавьте хотя бы одно фото товара",
   CATEGORY_BACK: "Назад",
   CATEGORY_SELECT_LEAF: "Выбрать эту категорию",
@@ -1236,7 +1342,7 @@ export const ADVERTISING_PAGE_UI = {
   PAGE_TITLE: "Реклама",
   PAGE_LEAD:
     "Продвигайте магазин через intro-ролик, баннер в шапке и личную плитку в каталоге. Оплата баллами лояльности.",
-  BALANCE_LABEL: "Баланс",
+  HERO_CAPTION: "Реклама · баланс",
   /** @param {number} balance */
   BALANCE: (balance: number) => `${balance} баллов`,
   LOADING: "Загрузка…",
@@ -1472,10 +1578,8 @@ export const PREMIUM_PAGE_UI = {
   BENEFITS_TITLE: "Что входит",
   PLAN_BENEFITS: [
     "До 30 товаров в каталоге (вместо 15)",
-    "Баллы лояльности за покупки",
     "Золотая обводка и галочка у имени",
     "Сторис и фон профиля по ссылке",
-    "Рассрочка для продавца (нужны подтверждённые данные)",
     "Товары в фильтре «Только премиум»",
     "Просмотр покупок других пользователей",
   ],
@@ -1495,7 +1599,7 @@ export const LOYALTY_POINTS_PAGE_UI = {
   FETCH_FALLBACK: "Не удалось загрузить баллы",
   BALANCE_POINTS: (balance: number) => `Ваш баланс: ${balance} ${pluralizeRuBall(balance)}`,
   BALANCE_CAPTION: "Ваш баланс",
-  INFO: "1 балл = 1 ₽. Продавец задаёт бонус за покупку; премиум-покупатель получает баллы после подтверждения получения.",
+  INFO: "1 балл = 1 ₽. Продавец задаёт бонус за покупку; подтверждённый покупатель получает баллы после подтверждения получения.",
   USES_TITLE: "На что тратить баллы",
   PURCHASE_SECTION: "Пополнение",
   PURCHASE_AMOUNT_LABEL: "Сумма, ₽",
@@ -1528,13 +1632,14 @@ export const USER_DATA_CONFIRMATION_PROFILE_PAGE_UI = {
   PLAN_BENEFITS: [
     "Отзывы на товары после подтверждённой покупки",
     "Ставки на аукционе (предложение цены)",
-    "Покупка в рассрочку",
+    "Покупка и продажа в рассрочку",
     "Создание розыгрыша (для продавца)",
     "Товары в фильтре «Подтверждённые продавцы»",
     "Бейдж подтверждения у имени в каталоге",
+    "Баллы лояльности за покупки",
   ],
   PLAN_NOTE:
-    "Не заменяет премиум: баллы за покупки, 30 товаров и золотая обводка — отдельно.",
+    "Не заменяет премиум: 30 товаров, золотая обводка и сторис — отдельно.",
   STATUS_CONFIRMED: "Данные уже подтверждены.",
   STATUS_PENDING: "Заявка на рассмотрении. Дождитесь решения модератора.",
   STATUS_REJECTED: (note: string) =>
@@ -1548,7 +1653,7 @@ export const DATA_CONFIRMATION_MODAL_UI = {
   INTRO:
     "Заполните паспортные данные и приложите фото с паспортом в руках. После проверки модератором у вас появится значок подтверждённого продавца.",
   LABEL_PASSPORT_SELFIE: "Ваше фото с паспортом в руках",
-  HINT_PASSPORT_SELFIE: "JPEG, PNG или WebP, до 5 МБ",
+  HINT_PASSPORT_SELFIE: "JPEG, PNG или WebP, до 50 МБ",
   ERROR_PASSPORT_SELFIE_REQUIRED: "Приложите фото с паспортом в руках",
   ERROR_PASSPORT_SELFIE_UPLOAD: "Не удалось загрузить фото",
   STATUS_PENDING: "Заявка на рассмотрении",

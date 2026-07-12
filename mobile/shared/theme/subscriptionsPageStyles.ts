@@ -5,6 +5,8 @@ import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 const LIST_GAP = 4;
 
+export const SUBSCRIPTION_USER_ROW_BORDER_RADIUS = 16;
+
 export const useSubscriptionsPageStyles = createThemedStyles((theme) => ({
   container: {
     flex: 1,
@@ -19,7 +21,67 @@ export const useSubscriptionsPageStyles = createThemedStyles((theme) => ({
   header: {
     alignSelf: "stretch",
     width: "100%",
-    marginBottom: 4,
+    gap: 14,
+    marginBottom: 10,
+  },
+  heroCard: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 14,
+    padding: 20,
+    borderRadius: 18,
+    backgroundColor: theme.colors.action,
+    shadowColor: theme.colors.ink,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.16,
+    shadowRadius: 14,
+    elevation: 5,
+  },
+  heroTextBlock: {
+    flex: 1,
+    minWidth: 0,
+    gap: 2,
+  },
+  heroCaption: {
+    fontSize: 12,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: 0.8,
+    color: theme.colors.onContrast,
+    opacity: 0.72,
+  },
+  heroRow: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    gap: 6,
+  },
+  heroValue: {
+    fontSize: 34,
+    fontWeight: "800",
+    letterSpacing: -0.5,
+    color: theme.colors.onContrast,
+    fontVariant: ["tabular-nums"],
+  },
+  heroUnit: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: theme.colors.onContrast,
+    opacity: 0.85,
+  },
+  heroInfo: {
+    marginTop: 8,
+    fontSize: 13,
+    lineHeight: 19,
+    color: theme.colors.onContrast,
+    opacity: 0.8,
+  },
+  heroIconWrap: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.16)",
   },
   emptyRoot: {
     flex: 1,
@@ -73,6 +135,9 @@ export const useSubscriptionsPageStyles = createThemedStyles((theme) => ({
 }));
 
 export const useSubscriptionUserRowStyles = createThemedStyles((theme) => ({
+  pressable: {
+    width: "100%",
+  },
   row: {
     flexDirection: "row",
     alignItems: "center",
@@ -80,7 +145,6 @@ export const useSubscriptionUserRowStyles = createThemedStyles((theme) => ({
     width: "100%",
     paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
     backgroundColor: theme.colors.surface,

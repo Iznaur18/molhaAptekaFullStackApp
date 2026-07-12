@@ -124,7 +124,6 @@ export const ProductDetailsDetailsTab = ({
             <ProductLoyaltyPointsBadge
               product={product}
               isAuthorized={isAuthorized}
-              isPremiumUser={isPremiumUser}
               variant="detail"
             />
             <ProductCatalogStatusBadges product={product} showNoStatusPlaceholder={false} />

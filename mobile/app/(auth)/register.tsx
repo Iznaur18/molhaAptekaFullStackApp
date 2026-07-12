@@ -15,6 +15,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { buildRegisterPayload } from "@/entities/session/lib/buildRegisterPayload";
 import { useRegisterMutation } from "@/entities/session/model/useRegisterMutation";
 import { useGuestProfileLoginMenuBannerImageQuery } from "@/entities/site-header-banner/model/useGuestProfileLoginMenuBannerImageQuery";
+import { isRegisterConsentComplete } from "@/features/legal/lib/isRegisterConsentComplete";
+import { RegisterLegalConsentFields } from "@/features/legal/ui/RegisterLegalConsentFields";
 import { API_CLIENT_UI, AUTH_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
@@ -36,12 +38,20 @@ export default function RegisterScreen() {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [personalDataConsentAccepted, setPersonalDataConsentAccepted] = useState(false);
+  const [consentError, setConsentError] = useState("");
   const [focusedField, setFocusedField] = useState<RegisterField | null>(null);
 
   const bannerImageQuery = useGuestProfileLoginMenuBannerImageQuery();
   const bannerImageUri = bannerImageQuery.data
     ? resolveUploadedMediaUrl(bannerImageQuery.data)
     : null;
+
+  const isConsentComplete = isRegisterConsentComplete({
+    termsAccepted,
+    personalDataConsentAccepted,
+  });
 
   // Умеренная высота hero, чтобы поля были выше и не перекрывались клавиатурой.
   const heroHeight = Math.round(Math.min(280, Math.max(170, screenHeight * 0.28)));
@@ -59,6 +69,13 @@ export default function RegisterScreen() {
   };
 
   const handleSubmit = async () => {
+    if (!isConsentComplete) {
+      setConsentError(AUTH_UI.REGISTER_CONSENT_REQUIRED);
+      return;
+    }
+
+    setConsentError("");
+
     try {
       await registerMutation.mutateAsync(
         buildRegisterPayload({ email, userName, password, passwordConfirm }),
@@ -71,7 +88,7 @@ export default function RegisterScreen() {
 
   const errorMessage = registerMutation.isError
     ? formatApiErrorMessage(registerMutation.error, API_CLIENT_UI.REGISTER_FALLBACK)
-    : "";
+    : consentError;
 
   return (
     <KeyboardAvoidingView
@@ -188,6 +205,24 @@ export default function RegisterScreen() {
               />
             </View>
 
+            <RegisterLegalConsentFields
+              termsAccepted={termsAccepted}
+              personalDataConsentAccepted={personalDataConsentAccepted}
+              disabled={registerMutation.isPending}
+              onTermsAcceptedChange={(value) => {
+                setTermsAccepted(value);
+                if (value && personalDataConsentAccepted) {
+                  setConsentError("");
+                }
+              }}
+              onPersonalDataConsentAcceptedChange={(value) => {
+                setPersonalDataConsentAccepted(value);
+                if (value && termsAccepted) {
+                  setConsentError("");
+                }
+              }}
+            />
+
             {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
 
             <AppButton
@@ -195,7 +230,7 @@ export default function RegisterScreen() {
               variant="primary"
               style={styles.submitButton}
               onPress={handleSubmit}
-              disabled={registerMutation.isPending}
+              disabled={registerMutation.isPending || !isConsentComplete}
             />
             <Pressable
               style={styles.registerLink}

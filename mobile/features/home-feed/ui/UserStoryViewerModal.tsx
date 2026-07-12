@@ -194,20 +194,32 @@ export const UserStoryViewerModal = ({
 
           {activeStory && !storiesQuery.isPending ? (
             <View style={styles.stage}>
-              {hasMultiple ? (
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel={USER_STORY_UI.PREV_STORY}
-                  disabled={isReportOpen || activeIndex <= 0}
-                  onPress={handlePrev}
-                  style={[
-                    styles.edgePrev,
-                    (isReportOpen || activeIndex <= 0) && styles.edgeDisabled,
-                  ]}
-                />
-              ) : null}
-
               <View style={[styles.frame, frameSize]}>
+                {hasMultiple ? (
+                  <>
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel={USER_STORY_UI.PREV_STORY}
+                      disabled={isReportOpen || activeIndex <= 0}
+                      onPress={handlePrev}
+                      style={[
+                        styles.edgePrev,
+                        (isReportOpen || activeIndex <= 0) && styles.edgeDisabled,
+                      ]}
+                    />
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel={USER_STORY_UI.NEXT_STORY}
+                      disabled={isReportOpen || activeIndex >= stories.length - 1}
+                      onPress={handleNext}
+                      style={[
+                        styles.edgeNext,
+                        (isReportOpen || activeIndex >= stories.length - 1) && styles.edgeDisabled,
+                      ]}
+                    />
+                  </>
+                ) : null}
+
                 <Pressable
                   accessibilityRole="button"
                   accessibilityLabel={USER_STORY_UI.CLOSE}
@@ -251,7 +263,7 @@ export const UserStoryViewerModal = ({
                   </View>
                 ) : null}
 
-                <View style={styles.mediaLayer}>
+                <View style={styles.mediaLayer} pointerEvents="none">
                   {activeStory.mediaType === USER_STORY_MEDIA_TYPE_VIDEO ? (
                     <ProductPreviewVideo
                       uri={resolvedMediaUrl}
@@ -291,7 +303,7 @@ export const UserStoryViewerModal = ({
                 ) : null}
 
                 {showFooter ? (
-                  <View style={styles.footer}>
+                  <View style={styles.footer} pointerEvents="box-none">
                     {isOwn ? (
                       <Pressable
                         style={[styles.actionButton, styles.deleteButton]}
@@ -315,19 +327,6 @@ export const UserStoryViewerModal = ({
                   </View>
                 ) : null}
               </View>
-
-              {hasMultiple ? (
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel={USER_STORY_UI.NEXT_STORY}
-                  disabled={isReportOpen || activeIndex >= stories.length - 1}
-                  onPress={handleNext}
-                  style={[
-                    styles.edgeNext,
-                    (isReportOpen || activeIndex >= stories.length - 1) && styles.edgeDisabled,
-                  ]}
-                />
-              ) : null}
             </View>
           ) : null}
         </View>

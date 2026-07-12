@@ -4,7 +4,10 @@ import type { ImagePickerAsset } from "expo-image-picker";
 import type { UploadImageFilePayload } from "@/entities/upload/api/uploadImage";
 import {
   UPLOAD_IMAGE_ALLOWED_MIME_TYPES,
+  UPLOAD_IMAGE_COMPRESS_MAX_DIMENSION,
+  UPLOAD_IMAGE_COMPRESS_TARGET_BYTES,
   UPLOAD_IMAGE_MAX_BYTES,
+  UPLOAD_IMAGE_SOURCE_MAX_BYTES,
 } from "@/entities/upload/model/constants";
 import { IMAGE_UPLOAD_UI } from "@/shared/config";
 
@@ -14,6 +17,13 @@ const IOS_INCOMPATIBLE_MIME_TYPES = new Set([
   "image/heic-sequence",
   "image/heif-sequence",
 ]);
+
+/** Шаги качества JPEG при подгонке под целевой размер. */
+const COMPRESS_QUALITY_STEPS = [0.85, 0.7, 0.55, 0.4];
+/** Во сколько раз уменьшаем сторону, если качество уже минимальное. */
+const DIMENSION_STEP_RATIO = 0.75;
+/** Ниже этой стороны не даунскейлим — фото станет нечитаемым. */
+const MIN_DIMENSION = 640;
 
 const buildFileName = (namePrefix: string, mimeType: string): string => {
   if (mimeType === "image/png") {
@@ -38,33 +48,83 @@ const needsJpegConversion = (mimeType: string, asset: ImagePickerAsset): boolean
   isHeicAsset(asset) ||
   !isDirectlyUploadableMimeType(mimeType);
 
-const convertToUploadableJpeg = async (
-  uri: string,
+const getFileSizeAtUri = async (uri: string): Promise<number> => {
+  const response = await fetch(uri);
+  const blob = await response.blob();
+  return blob.size;
+};
+
+/**
+ * Итеративно сжимает изображение в JPEG: даунскейл до максимальной стороны,
+ * затем понижение качества; если не влезло — уменьшение стороны и новый круг.
+ * Практически любое фото укладывается в целевой размер.
+ */
+const compressImageAssetToJpeg = async (
+  asset: ImagePickerAsset,
   namePrefix: string,
 ): Promise<UploadImageFilePayload> => {
-  const manipulated = await ImageManipulator.manipulateAsync(uri, [], {
-    compress: 0.85,
-    format: ImageManipulator.SaveFormat.JPEG,
-  });
+  const sourceWidth = asset.width || UPLOAD_IMAGE_COMPRESS_MAX_DIMENSION;
+  const sourceHeight = asset.height || UPLOAD_IMAGE_COMPRESS_MAX_DIMENSION;
+  const sourceMaxSide = Math.max(sourceWidth, sourceHeight);
+  let maxSide = Math.min(UPLOAD_IMAGE_COMPRESS_MAX_DIMENSION, sourceMaxSide);
+  let smallest: { uri: string; size: number } | null = null;
 
-  const response = await fetch(manipulated.uri);
-  const blob = await response.blob();
+  for (;;) {
+    const actions: ImageManipulator.Action[] =
+      maxSide < sourceMaxSide
+        ? [
+            {
+              resize:
+                sourceWidth >= sourceHeight ? { width: maxSide } : { height: maxSide },
+            },
+          ]
+        : [];
 
-  if (blob.size > UPLOAD_IMAGE_MAX_BYTES) {
-    throw new Error(IMAGE_UPLOAD_UI.ERROR_SIZE);
+    for (const quality of COMPRESS_QUALITY_STEPS) {
+      const manipulated = await ImageManipulator.manipulateAsync(asset.uri, actions, {
+        compress: quality,
+        format: ImageManipulator.SaveFormat.JPEG,
+      });
+      const size = await getFileSizeAtUri(manipulated.uri);
+
+      if (!smallest || size < smallest.size) {
+        smallest = { uri: manipulated.uri, size };
+      }
+      if (size <= UPLOAD_IMAGE_COMPRESS_TARGET_BYTES) {
+        return {
+          uri: manipulated.uri,
+          name: buildFileName(namePrefix, "image/jpeg"),
+          type: "image/jpeg",
+        };
+      }
+    }
+
+    if (maxSide <= MIN_DIMENSION) {
+      break;
+    }
+    maxSide = Math.max(MIN_DIMENSION, Math.round(maxSide * DIMENSION_STEP_RATIO));
   }
 
-  return {
-    uri: manipulated.uri,
-    name: buildFileName(namePrefix, "image/jpeg"),
-    type: "image/jpeg",
-  };
+  // До цели не дожали (экзотика) — отправляем лучшее, пока влезает в серверный лимит.
+  if (smallest && smallest.size <= UPLOAD_IMAGE_MAX_BYTES) {
+    return {
+      uri: smallest.uri,
+      name: buildFileName(namePrefix, "image/jpeg"),
+      type: "image/jpeg",
+    };
+  }
+  throw new Error(IMAGE_UPLOAD_UI.ERROR_SIZE);
 };
 
 type PrepareImageAssetForUploadOptions = {
   namePrefix?: string;
 };
 
+/**
+ * Готовит выбранное изображение к загрузке: исходник принимаем до 50 МБ,
+ * но большие файлы (и HEIC/неизвестный MIME) автоматически пережимаются
+ * в JPEG под целевой размер — на сервер большой оригинал не уходит.
+ */
 export const prepareImageAssetForUpload = async (
   asset: ImagePickerAsset,
   options?: PrepareImageAssetForUploadOptions,
@@ -72,12 +132,17 @@ export const prepareImageAssetForUpload = async (
   const namePrefix = options?.namePrefix ?? "image";
   const mimeType = asset.mimeType ?? "image/jpeg";
 
-  if (needsJpegConversion(mimeType, asset)) {
-    return convertToUploadableJpeg(asset.uri, namePrefix);
+  if (asset.fileSize && asset.fileSize > UPLOAD_IMAGE_SOURCE_MAX_BYTES) {
+    throw new Error(IMAGE_UPLOAD_UI.ERROR_SIZE);
   }
 
-  if (asset.fileSize && asset.fileSize > UPLOAD_IMAGE_MAX_BYTES) {
-    throw new Error(IMAGE_UPLOAD_UI.ERROR_SIZE);
+  const exceedsTargetSize =
+    asset.fileSize != null && asset.fileSize > UPLOAD_IMAGE_COMPRESS_TARGET_BYTES;
+  const exceedsMaxDimension =
+    Math.max(asset.width || 0, asset.height || 0) > UPLOAD_IMAGE_COMPRESS_MAX_DIMENSION;
+
+  if (needsJpegConversion(mimeType, asset) || exceedsTargetSize || exceedsMaxDimension) {
+    return compressImageAssetToJpeg(asset, namePrefix);
   }
 
   const normalizedMimeType = mimeType === "image/jpg" ? "image/jpeg" : mimeType;

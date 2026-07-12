@@ -10,18 +10,21 @@ export const useSiteHeaderBannerCarouselStyles = createThemedStyles((theme) => (
   viewport: {
     position: "relative",
     overflow: "hidden",
+    borderRadius: SITE_HEADER_BANNER_LAYOUT.radius,
   },
   singleSlide: {
     position: "relative",
     width: "100%",
     minHeight: SITE_HEADER_BANNER_LAYOUT.height,
     overflow: "hidden",
+    borderRadius: SITE_HEADER_BANNER_LAYOUT.radius,
   },
   slide: {
     position: "relative",
     width: "100%",
     minHeight: SITE_HEADER_BANNER_LAYOUT.height,
     overflow: "hidden",
+    borderRadius: SITE_HEADER_BANNER_LAYOUT.radius,
   },
   pressable: {
     width: "100%",

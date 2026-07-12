@@ -1,11 +1,7 @@
-import { useMemo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 import { Linking, Pressable, Text, View } from "react-native";
 
-import { getRaffleFeaturedBannerBackdrop } from "@/entities/raffle/lib/getRaffleFeaturedBannerBackdrop";
 import { useRaffleFeaturedBannerMetrics } from "@/entities/raffle/model/useRaffleFeaturedBannerMetrics";
-import { RaffleDescriptionModal } from "@/entities/raffle/ui/RaffleDescriptionModal";
-import { RaffleFeaturedBannerBackdropLayer } from "@/entities/raffle/ui/RaffleFeaturedBannerBackdropLayer";
-import { RaffleFeaturedBannerBackground } from "@/entities/raffle/ui/RaffleFeaturedBannerBackground";
 import {
   RaffleFeaturedBannerInfoPanel,
   RaffleFeaturedBannerInfoToggle,
@@ -20,41 +16,43 @@ import {
 } from "@/shared/theme/raffleFeaturedStyles";
 import { SquircleView } from "@/shared/ui/SquircleView";
 
-const DESCRIPTION_PREVIEW_MAX_LINES = 3;
-
 type RaffleFeaturedBannerProps = {
   raffle: RaffleFromApi;
   cardWidth: number;
   onOpenProducts: (raffleId: string) => void;
   manage?: FeaturedRaffleManage | null;
   inCarousel?: boolean;
+  isVideoActive?: boolean;
 };
 
-export const RaffleFeaturedBanner = ({
+export const RaffleFeaturedBanner = memo(({
   raffle,
   cardWidth,
   onOpenProducts,
   manage = null,
   inCarousel = false,
+  isVideoActive = true,
 }: RaffleFeaturedBannerProps) => {
   const styles = useRaffleFeaturedBannerStyles();
   const hasManage = Boolean(
     manage && (manage.showEdit || manage.showDelete || manage.showPause),
   );
-  const metrics = useRaffleFeaturedBannerMetrics(cardWidth);
-  const backdrop = useMemo(() => getRaffleFeaturedBannerBackdrop(raffle), [raffle]);
+  const metrics = useRaffleFeaturedBannerMetrics(cardWidth, { hasManage });
   const [isInfoOpen, setIsInfoOpen] = useState(false);
-  const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
 
-  const isSplit = metrics.layout === "split";
   const isCompleted = raffle.status === "completed";
-  const hasBackdrop = backdrop.hasBackdrop;
-
   const progress = Number(raffle.salesProgress) || 0;
   const target = Number(raffle.targetSales) || 0;
   const percent = target > 0 ? Math.min(100, Math.round((progress / target) * 100)) : 0;
   const remaining = Math.max(0, target - progress);
-  const copyOnBackdropStyle = undefined;
+
+  const progressLabel = useMemo(() => {
+    const base = RAFFLE_FEATURED_BANNER_UI.PROGRESS(progress, target);
+    if (isCompleted || remaining <= 0) {
+      return base;
+    }
+    return `${base} ${RAFFLE_FEATURED_BANNER_UI.REMAINING(remaining)}`;
+  }, [isCompleted, progress, remaining, target]);
 
   const handleOpenInstagram = async () => {
     const url = raffle.instagramUrl?.trim();
@@ -71,89 +69,54 @@ export const RaffleFeaturedBanner = ({
     }
   };
 
-  const innerStyle = [
-    styles.inner,
-    inCarousel && styles.innerInCarousel,
-    isSplit ? styles.innerSplit : styles.innerStacked,
-    hasBackdrop && styles.innerHasBackdrop,
-    isCompleted && styles.innerCompleted,
-  ];
-
-  const bannerContent = (
-    <>
-      {!hasBackdrop ? <RaffleFeaturedBannerBackground /> : null}
-      <RaffleFeaturedBannerBackdropLayer
-        raffle={raffle}
-        backdrop={backdrop}
-        completed={isCompleted}
-      />
-
-      <View
-        style={[
-          styles.visual,
-          isSplit ? styles.visualSplit : styles.visualStacked,
-          {
-            height: metrics.visualHeight,
-            minHeight: metrics.visualHeight,
-          },
-        ]}
-      >
-        <RafflePrizeMedia raffle={raffle} showSoundToggle />
-        {!isSplit || (hasManage && manage) ? (
-          <View style={styles.visualActionControls}>
-            {hasManage && manage ? (
-              <RaffleFeaturedBannerManageMenu
-                showEdit={manage.showEdit}
-                showDelete={manage.showDelete}
-                showPause={manage.showPause}
-                onEdit={manage.onEdit}
-                onDelete={manage.onDelete}
-                onPause={manage.onPause}
-                busy={manage.busy}
-              />
-            ) : null}
-            {!isSplit ? (
-              <RaffleFeaturedBannerInfoToggle
-                visible={isInfoOpen}
-                onToggle={() => setIsInfoOpen((open) => !open)}
-              />
-            ) : null}
+  return (
+    <View
+      style={[styles.root, inCarousel && styles.rootInCarousel]}
+      accessibilityRole="summary"
+      accessibilityLabel={raffle.title}
+    >
+      <View style={styles.cardStack}>
+        <SquircleView
+          radius={RAFFLE_FEATURED_BANNER_BORDER_RADIUS}
+          style={[styles.visualCard, isCompleted && styles.visualCardCompleted]}
+        >
+          <View
+            style={[
+              styles.visual,
+              {
+                width: metrics.visualWidth,
+                height: metrics.visualHeight,
+              },
+            ]}
+          >
+            <RafflePrizeMedia raffle={raffle} showSoundToggle isVideoActive={isVideoActive} />
+            <View style={styles.visualTopBar} pointerEvents="box-none">
+              <View style={styles.visualTopControls}>
+                {hasManage && manage ? (
+                  <RaffleFeaturedBannerManageMenu
+                    showEdit={manage.showEdit}
+                    showDelete={manage.showDelete}
+                    showPause={manage.showPause}
+                    onEdit={manage.onEdit}
+                    onDelete={manage.onDelete}
+                    onPause={manage.onPause}
+                    busy={manage.busy}
+                  />
+                ) : null}
+                <RaffleFeaturedBannerInfoToggle
+                  visible={isInfoOpen}
+                  onToggle={() => setIsInfoOpen((open) => !open)}
+                />
+              </View>
+            </View>
+            <RaffleFeaturedBannerInfoPanel raffle={raffle} visible={isInfoOpen} />
           </View>
-        ) : null}
-        {!isSplit ? (
-          <RaffleFeaturedBannerInfoPanel
-            raffle={raffle}
-            visible={isInfoOpen}
-            onBackdropText={hasBackdrop}
-          />
-        ) : null}
-      </View>
+        </SquircleView>
 
-      <View style={[styles.body, isSplit ? styles.bodySplit : styles.bodyStacked]}>
-        {metrics.showInlineCopy ? (
-          <>
-            <Text style={[styles.title, copyOnBackdropStyle]} numberOfLines={2}>
-              {raffle.title}
-            </Text>
-
-            {raffle.description ? (
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={RAFFLE_FEATURED_BANNER_UI.DESCRIPTION_OPEN_ARIA}
-                onPress={() => setIsDescriptionOpen(true)}
-              >
-                <Text
-                  style={[styles.description, copyOnBackdropStyle]}
-                  numberOfLines={DESCRIPTION_PREVIEW_MAX_LINES}
-                >
-                  {raffle.description}
-                </Text>
-              </Pressable>
-            ) : null}
-          </>
-        ) : null}
-
-        <View style={styles.progressWrap}>
+        <SquircleView
+          radius={RAFFLE_FEATURED_BANNER_BORDER_RADIUS}
+          style={[styles.footerCard, isCompleted && styles.footerCardCompleted]}
+        >
           <View
             style={[styles.progressBar, isCompleted && styles.progressBarCompleted]}
             accessibilityRole="progressbar"
@@ -171,69 +134,46 @@ export const RaffleFeaturedBanner = ({
               ]}
             />
           </View>
-          <Text style={[styles.progressLabel, copyOnBackdropStyle]} numberOfLines={2}>
-            {RAFFLE_FEATURED_BANNER_UI.PROGRESS(progress, target)}
-            {!isCompleted && remaining > 0
-              ? ` · ${RAFFLE_FEATURED_BANNER_UI.REMAINING(remaining)}`
-              : ""}
-          </Text>
-        </View>
 
-        <View style={styles.actions}>
-          <Pressable
-            style={[styles.btnPrimary, isCompleted && styles.btnPrimaryCompleted]}
-            accessibilityRole="button"
-            onPress={() => onOpenProducts(raffle._id)}
-          >
-            <Text style={[styles.btnPrimaryText, isCompleted && styles.btnPrimaryTextCompleted]}>
-              {RAFFLE_FEATURED_BANNER_UI.OPEN_PRODUCTS}
+          <View style={styles.footerContent}>
+            <Text style={styles.progressLabel} numberOfLines={2}>
+              {progressLabel}
             </Text>
-          </Pressable>
 
-          {isCompleted && raffle.instagramUrl ? (
-            <Pressable
-              style={styles.btnInstagram}
-              accessibilityRole="link"
-              onPress={() => void handleOpenInstagram()}
-            >
-              <Text style={styles.btnInstagramText}>
-                {RAFFLE_FEATURED_BANNER_UI.OPEN_INSTAGRAM}
-              </Text>
-            </Pressable>
-          ) : null}
+            <View style={styles.actions}>
+              <Pressable
+                style={[styles.btnPrimary, isCompleted && styles.btnPrimaryCompleted]}
+                accessibilityRole="button"
+                onPress={() => onOpenProducts(raffle._id)}
+              >
+                <Text
+                  style={[styles.btnPrimaryText, isCompleted && styles.btnPrimaryTextCompleted]}
+                >
+                  {RAFFLE_FEATURED_BANNER_UI.OPEN_PRODUCTS}
+                </Text>
+              </Pressable>
 
-          {isCompleted ? (
-            <Text style={styles.completedLabel}>{RAFFLE_FEATURED_BANNER_UI.COMPLETED}</Text>
-          ) : null}
-        </View>
-      </View>
-    </>
-  );
+              {isCompleted && raffle.instagramUrl ? (
+                <Pressable
+                  style={styles.btnInstagram}
+                  accessibilityRole="link"
+                  onPress={() => void handleOpenInstagram()}
+                >
+                  <Text style={styles.btnInstagramText}>
+                    {RAFFLE_FEATURED_BANNER_UI.OPEN_INSTAGRAM}
+                  </Text>
+                </Pressable>
+              ) : null}
 
-  return (
-    <View
-      style={[styles.root, inCarousel && styles.rootInCarousel]}
-      accessibilityRole="summary"
-      accessibilityLabel={raffle.title}
-    >
-      {inCarousel ? (
-        <View style={innerStyle}>{bannerContent}</View>
-      ) : (
-        <SquircleView
-          radius={RAFFLE_FEATURED_BANNER_BORDER_RADIUS}
-          shadowStyle={styles.innerShadow}
-          style={innerStyle}
-        >
-          {bannerContent}
+              {isCompleted ? (
+                <Text style={styles.completedLabel}>{RAFFLE_FEATURED_BANNER_UI.COMPLETED}</Text>
+              ) : null}
+            </View>
+          </View>
         </SquircleView>
-      )}
-
-      <RaffleDescriptionModal
-        visible={isDescriptionOpen}
-        title={raffle.title}
-        description={raffle.description ?? ""}
-        onClose={() => setIsDescriptionOpen(false)}
-      />
+      </View>
     </View>
   );
-};
+});
+
+RaffleFeaturedBanner.displayName = "RaffleFeaturedBanner";

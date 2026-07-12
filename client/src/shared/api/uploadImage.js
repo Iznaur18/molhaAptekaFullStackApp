@@ -2,17 +2,21 @@ import { apiClient } from "./apiClient.js";
 import { postMultipart } from "@izibuy/shared-api";
 import { formatApiErrorMessage, normalizeUploadUrlForStorage } from "@izibuy/shared-lib";
 import { IMAGE_URL_FIELD_UI } from "../config/appUiCopy.js";
+import { prepareBrowserImageFileForUpload } from "../lib/prepareBrowserImageFileForUpload.js";
 
 /**
  * `POST /upload` — загрузка изображения (cookie auth, multipart, поле `image`).
+ * Перед отправкой файл автоматически сжимается под целевой размер
+ * (повторный вызов для уже сжатого файла — no-op).
  *
  * @param {File} file
  * @returns {Promise<string>} URL для сохранения и отображения
  */
 export async function uploadImage(file) {
   try {
+    const preparedFile = await prepareBrowserImageFileForUpload(file);
     const formData = new FormData();
-    formData.append("image", file);
+    formData.append("image", preparedFile);
 
     /** @type {{ success?: boolean; data?: { url?: string } }} */
     const data = await postMultipart(apiClient, "/upload", formData);

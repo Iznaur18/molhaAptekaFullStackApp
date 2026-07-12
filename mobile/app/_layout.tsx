@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import "react-native-reanimated";
 
 import { createAppQueryClient } from "@/shared/api";
-import { LEGAL_UI } from "@/shared/config";
+import { FAQ_UI, LEGAL_UI } from "@/shared/config";
 import {
   COLD_START_SPLASH_MAX_WAIT_MS,
   releaseColdStartSplash,
@@ -108,6 +108,10 @@ function RootLayoutNav() {
         <Stack.Screen name="user/[id]/edit" options={{ title: "Редактирование" }} />
         <Stack.Screen name="seller/[userId]" options={{ title: "Товары продавца" }} />
         <Stack.Screen name="legal/privacy" options={{ title: LEGAL_UI.PRIVACY_TITLE }} />
+        <Stack.Screen name="legal/terms" options={{ title: LEGAL_UI.TERMS_TITLE }} />
+        <Stack.Screen name="legal/listing" options={{ title: LEGAL_UI.LISTING_TITLE }} />
+        <Stack.Screen name="legal/offer" options={{ title: LEGAL_UI.OFFER_TITLE }} />
+        <Stack.Screen name="faq" options={{ title: FAQ_UI.TITLE }} />
       </Stack>
     </ThemeProvider>
   );

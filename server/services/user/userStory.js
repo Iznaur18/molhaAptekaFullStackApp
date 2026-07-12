@@ -28,7 +28,7 @@ export async function getUserStoriesFeedForViewer({ viewerUserId }) {
   let canPublish = false;
   if (viewerUserId) {
     const user = await UserModel.findById(viewerUserId)
-      .select("isPremiumUser userRole isBlockedUser isActiveUser")
+      .select("isPremiumUser premiumExpiresAt userRole isBlockedUser isActiveUser")
       .lean();
     canPublish = canPublishUserStory(user);
   }
@@ -56,11 +56,11 @@ export async function getUserStoriesByAuthor({ authorUserId }) {
  */
 export async function createUserStory({ authorUserId, body }) {
   const user = await UserModel.findById(authorUserId)
-    .select("isPremiumUser userRole isBlockedUser isActiveUser")
+    .select("isPremiumUser premiumExpiresAt userRole isBlockedUser isActiveUser")
     .lean();
 
   if (!canPublishUserStory(user)) {
-    throw new AppError(403, "Публикация сторис недоступна");
+    throw new AppError(403, "Публикация сторис доступна только премиум-пользователям");
   }
 
   if (!isStaffUnlimitedUserStories(user)) {

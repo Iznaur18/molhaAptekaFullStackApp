@@ -123,8 +123,7 @@ export const useHomeCatalogHeaderStyles = createThemedStyles((theme) => ({
     fontSize: HOME_CATALOG_HEADER_SEARCH_INPUT_FONT_SIZE,
     lineHeight: 20,
     color: theme.colors.text,
-    // iOS search bar fill: тонированный текст ~8%, адаптируется к теме.
-    backgroundColor: `${theme.colors.text}14`,
+    backgroundColor: theme.colors.surfaceMuted,
   },
   usersNavPill: {
     position: "relative",

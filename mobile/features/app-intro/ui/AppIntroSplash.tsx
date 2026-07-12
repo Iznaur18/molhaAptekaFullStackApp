@@ -3,7 +3,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Image, Modal, Pressable, Text, View } from "react-native";
 
 import { fetchAppIntroSettings } from "@/entities/app-intro-settings/api/fetchAppIntroSettings";
-import { resolveAppIntroPlaybackConfig } from "@/entities/app-intro-settings/lib/resolveAppIntroPlaybackConfig";
+import {
+  resolveAppIntroPlaybackConfig,
+  type AppIntroPlaybackConfig,
+} from "@/entities/app-intro-settings/lib/resolveAppIntroPlaybackConfig";
 import { appIntroSettingsQueryKeys } from "@/entities/app-intro-settings/model/types";
 import { useAppIntro } from "@/features/app-intro/model/AppIntroProvider";
 import { APP_INTRO_UI } from "@/shared/config";
@@ -23,103 +26,130 @@ const AppIntroSplashContent = ({ onDismiss }: AppIntroSplashContentProps) => {
     staleTime: 60_000,
   });
 
-  const playbackConfig = useMemo(() => {
-    const response = settingsQuery.data;
-    const paidIntro = response?.paidIntro;
-    const activeSettings = previewSettings ?? paidIntro ?? response?.settings ?? null;
+  // Плейлист интро: платформенное видео админа (если есть) → до 5 платных роликов подряд.
+  const playlist = useMemo<AppIntroPlaybackConfig[]>(() => {
+    if (previewSettings) {
+      return [resolveAppIntroPlaybackConfig(previewSettings, { isPaidIntro: false })];
+    }
 
-    return resolveAppIntroPlaybackConfig(activeSettings, {
-      isPaidIntro: Boolean(paidIntro) && !previewSettings,
-      advertiserId: paidIntro?.advertiserId ?? null,
-      ctaType: paidIntro?.ctaType ?? null,
+    const response = settingsQuery.data;
+    const paidIntros = response?.paidIntros ?? [];
+
+    const items: AppIntroPlaybackConfig[] = [];
+
+    // Платформенное интро админа идёт первым — только если у него есть видео или постер.
+    const platformConfig = resolveAppIntroPlaybackConfig(response?.settings ?? null, {
+      isPaidIntro: false,
     });
+    const platformHasMedia = Boolean(platformConfig.videoMp4Src || platformConfig.posterSrc);
+    if (platformHasMedia) {
+      items.push(platformConfig);
+    }
+
+    // Затем — платные ролики рекламодателей, по очереди.
+    for (const intro of paidIntros) {
+      items.push(
+        resolveAppIntroPlaybackConfig(intro, {
+          isPaidIntro: true,
+          advertiserId: intro.advertiserId,
+          ctaType: intro.ctaType,
+        }),
+      );
+    }
+
+    // Ничего нет — запасной экран платформенного интро.
+    if (items.length === 0) {
+      items.push(platformConfig);
+    }
+
+    return items;
   }, [previewSettings, settingsQuery.data]);
 
+  const [index, setIndex] = useState(0);
+  const indexRef = useRef(0);
   const [isMuted, setIsMuted] = useState(true);
   const [videoFailed, setVideoFailed] = useState(false);
-  const openedAtRef = useRef(Date.now());
   const dismissedRef = useRef(false);
-  const minTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const maxTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const current = playlist[index] ?? null;
 
   const completeDismiss = useCallback(() => {
     if (dismissedRef.current) {
       return;
     }
     dismissedRef.current = true;
-    if (minTimerRef.current) {
-      clearTimeout(minTimerRef.current);
-    }
-    if (maxTimerRef.current) {
-      clearTimeout(maxTimerRef.current);
-    }
     onDismiss();
   }, [onDismiss]);
 
-  const dismissAfterMinDuration = useCallback(() => {
+  // Переход к следующему ролику; после последнего — закрытие интро.
+  const advance = useCallback(() => {
     if (dismissedRef.current) {
       return;
     }
-    const elapsed = Date.now() - openedAtRef.current;
-    const waitMs = Math.max(0, playbackConfig.minMs - elapsed);
-    if (waitMs === 0) {
+    const nextIndex = indexRef.current + 1;
+    if (nextIndex >= playlist.length) {
       completeDismiss();
       return;
     }
-    minTimerRef.current = setTimeout(completeDismiss, waitMs);
-  }, [completeDismiss, playbackConfig.minMs]);
+    indexRef.current = nextIndex;
+    setIndex(nextIndex);
+  }, [completeDismiss, playlist.length]);
 
+  // Страховочный таймер на каждый ролик отдельно — на случай зависшего видео.
   useEffect(() => {
-    maxTimerRef.current = setTimeout(completeDismiss, playbackConfig.maxMs);
-    return () => {
-      if (maxTimerRef.current) {
-        clearTimeout(maxTimerRef.current);
-      }
-      if (minTimerRef.current) {
-        clearTimeout(minTimerRef.current);
-      }
-    };
-  }, [completeDismiss, playbackConfig.maxMs]);
+    if (!current) {
+      completeDismiss();
+      return;
+    }
+    setVideoFailed(false);
+    const timer = setTimeout(advance, current.maxMs);
+    return () => clearTimeout(timer);
+  }, [advance, completeDismiss, current, index]);
 
-  const hasVideo = Boolean(playbackConfig.videoMp4Src) && !videoFailed;
+  const handlePlaybackFailed = useCallback(() => {
+    // Битый платный ролик пропускаем сразу; платформенное/превью интро
+    // показывает постер или запасной экран до страховочного таймера.
+    if (current?.isPaidIntro) {
+      advance();
+      return;
+    }
+    setVideoFailed(true);
+  }, [advance, current?.isPaidIntro]);
+
+  const hasVideo = Boolean(current?.videoMp4Src) && !videoFailed;
 
   return (
     <View style={styles.overlay}>
-      {hasVideo ? (
+      {hasVideo && current ? (
         <LoopingCoverVideo
-          uri={playbackConfig.videoMp4Src}
+          key={index}
+          uri={current.videoMp4Src}
           loop={false}
           isMuted={isMuted}
-          onPlaybackFailed={() => {
-            setVideoFailed(true);
-            dismissAfterMinDuration();
-          }}
-          onEnded={dismissAfterMinDuration}
+          onPlaybackFailed={handlePlaybackFailed}
+          onEnded={advance}
           style={styles.video}
         />
-      ) : playbackConfig.posterSrc ? (
-        <Image source={{ uri: playbackConfig.posterSrc }} style={styles.video} resizeMode="cover" />
+      ) : current?.posterSrc ? (
+        <Image source={{ uri: current.posterSrc }} style={styles.video} resizeMode="cover" />
       ) : (
         <View style={styles.fallback}>
-          <Text style={styles.fallbackTitle}>{playbackConfig.fallbackTitle}</Text>
-          <Text style={styles.fallbackHint}>{playbackConfig.fallbackHint}</Text>
+          <Text style={styles.fallbackTitle}>{current?.fallbackTitle}</Text>
+          <Text style={styles.fallbackHint}>{current?.fallbackHint}</Text>
         </View>
       )}
 
-      <View style={styles.controls}>
-        {hasVideo ? (
+      {hasVideo ? (
+        <View style={styles.controls}>
           <Pressable onPress={() => setIsMuted((value) => !value)}>
             <Text style={styles.controlText}>
               {isMuted ? APP_INTRO_UI.ENABLE_SOUND : APP_INTRO_UI.DISABLE_SOUND}
             </Text>
           </Pressable>
-        ) : null}
-        <Pressable onPress={completeDismiss}>
-          <Text style={styles.controlText}>{APP_INTRO_UI.SKIP}</Text>
-        </Pressable>
-      </View>
+        </View>
+      ) : null}
 
-      {playbackConfig.isPaidIntro ? (
+      {current?.isPaidIntro ? (
         <View style={styles.adBadge}>
           <Text style={styles.adBadgeText}>{APP_INTRO_UI.AD_BADGE}</Text>
         </View>
@@ -127,6 +157,9 @@ const AppIntroSplashContent = ({ onDismiss }: AppIntroSplashContentProps) => {
     </View>
   );
 };
+
+// Интро нельзя пропустить: системная кнопка «Назад» (Android) не закрывает показ.
+const preventBackDismiss = () => {};
 
 export const AppIntroSplash = () => {
   const { isIntroVisible, dismissIntro } = useAppIntro();
@@ -136,7 +169,7 @@ export const AppIntroSplash = () => {
   }
 
   return (
-    <Modal visible animationType="fade" transparent={false} onRequestClose={dismissIntro}>
+    <Modal visible animationType="fade" transparent={false} onRequestClose={preventBackDismiss}>
       <AppIntroSplashContent onDismiss={dismissIntro} />
     </Modal>
   );

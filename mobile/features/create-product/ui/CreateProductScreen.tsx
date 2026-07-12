@@ -880,7 +880,7 @@ function CommerceStep({ form, setForm, disabled, theme, styles }: StepProps) {
           placeholderTextColor={theme.colors.textMuted}
         />
         <Text style={[styles.hint, { color: theme.colors.textSecondary }]}>
-          Начисляются премиум-покупателю после подтверждения получения
+          Начисляются подтверждённому покупателю после подтверждения получения
         </Text>
       </View>
     </View>

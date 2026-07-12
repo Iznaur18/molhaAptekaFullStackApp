@@ -10,6 +10,9 @@ export const HOME_CATALOG_BACKDROP_SOUND_TOGGLE_TOP_GAP = 8;
 
 const HOME_CATALOG_BACKDROP_SOUND_TOGGLE_SIZE = 36;
 
+/** Отступ подсказки «Свайп вверх» от нижнего края hero (над кромкой шторки). */
+export const HOME_CATALOG_BACKDROP_SWIPE_HINT_BOTTOM = 52;
+
 export const useHomeCatalogBackdropStyles = createThemedStyles((theme) => ({
   hero: {
     width: "100%",

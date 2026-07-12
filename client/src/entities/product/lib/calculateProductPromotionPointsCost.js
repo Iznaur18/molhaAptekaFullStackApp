@@ -21,8 +21,8 @@ export const PRODUCT_PROMOTION_TIER_LABELS = {
 /** @type {Record<string, number>} */
 export const PRODUCT_PROMOTION_DURATION_MULT = {
   "24h": 1,
-  "7d": 7,
-  "30d": 30,
+  "7d": 6,
+  "30d": 23,
 };
 
 /**

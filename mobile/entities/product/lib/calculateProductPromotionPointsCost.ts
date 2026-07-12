@@ -21,8 +21,8 @@ export const getProductPromotionTierLabel = (tier: number | null | undefined): s
 
 export const PRODUCT_PROMOTION_DURATION_MULT: Record<string, number> = {
   "24h": 1,
-  "7d": 7,
-  "30d": 30,
+  "7d": 6,
+  "30d": 23,
 };
 
 type CalculatePromotionCostParams = {

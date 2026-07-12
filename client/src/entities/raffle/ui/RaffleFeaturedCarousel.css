@@ -25,7 +25,9 @@
 
 .raffle-featured-carousel .raffle-featured-banner__visual_carousel-drag {
   cursor: grab;
-  touch-action: none;
+  /* Вертикальную прокрутку страницы отдаём браузеру; горизонтальный свайп
+     обрабатывает JS-карусель (с определением направления жеста). */
+  touch-action: pan-y;
   user-select: none;
 }
 

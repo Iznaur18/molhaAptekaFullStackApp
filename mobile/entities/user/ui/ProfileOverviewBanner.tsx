@@ -14,7 +14,11 @@ import { pickUserProfilePhotoUrl } from "@/entities/user/lib/pickUserProfilePhot
 import { resolveUserProfileBackgroundFromUser } from "@/entities/user/lib/resolveUserProfileBackgroundFromUser";
 import { UserPremiumAvatar } from "@/entities/user/ui/UserPremiumAvatar";
 import { MY_PROFILE_PAGE_UI } from "@/shared/config";
-import { useProfileOverviewBannerStyles } from "@/shared/theme/profileChromeStyles";
+import {
+  PROFILE_CARD_SQUIRCLE_RADIUS,
+  useProfileOverviewBannerStyles,
+} from "@/shared/theme/profileChromeStyles";
+import { SquircleView } from "@/shared/ui/SquircleView";
 
 type ProfileOverviewBannerProps = {
   user: Record<string, unknown>;
@@ -55,7 +59,8 @@ export const ProfileOverviewBanner = ({
 
   return (
     <View style={styles.wrap}>
-      <View
+      <SquircleView
+        radius={PROFILE_CARD_SQUIRCLE_RADIUS}
         style={[
           styles.banner,
           profileBackground.kind === "preset" && canShowBackground
@@ -95,7 +100,7 @@ export const ProfileOverviewBanner = ({
             <Feather name="edit-2" size={16} color={semanticColors.text} />
           </Pressable>
         ) : null}
-      </View>
+      </SquircleView>
     </View>
   );
 };

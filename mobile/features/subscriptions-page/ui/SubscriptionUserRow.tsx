@@ -7,7 +7,11 @@ import { DEFAULT_USER_AVATAR_URL } from "@/entities/user/model/constants";
 import { UserPremiumAvatar } from "@/entities/user/ui/UserPremiumAvatar";
 import { UserPremiumDisplayName } from "@/entities/user/ui/UserPremiumDisplayName";
 import { USER_LIST_ROW_UI } from "@/shared/config";
-import { useSubscriptionUserRowStyles } from "@/shared/theme/subscriptionsPageStyles";
+import {
+  SUBSCRIPTION_USER_ROW_BORDER_RADIUS,
+  useSubscriptionUserRowStyles,
+} from "@/shared/theme/subscriptionsPageStyles";
+import { SquircleView } from "@/shared/ui/SquircleView";
 
 type SubscriptionUserRowProps = {
   user: {
@@ -29,28 +33,33 @@ export const SubscriptionUserRow = ({ user, onRowClick }: SubscriptionUserRowPro
 
   return (
     <Pressable
-      style={[styles.row, pressed && styles.rowPressed]}
+      style={styles.pressable}
       onPress={() => onRowClick(user._id)}
       onPressIn={() => setPressed(true)}
       onPressOut={() => setPressed(false)}
       accessibilityRole="button"
     >
-      <UserPremiumAvatar
-        uri={uri}
-        isPremium={user.isPremiumUser === true}
-        focus={getUserAvatarFocus(user)}
-        onError={() => setImgFailed(true)}
-        style={styles.avatar}
-      />
-      <View style={styles.nameWrap}>
-        <UserPremiumDisplayName
-          name={displayName}
+      <SquircleView
+        radius={SUBSCRIPTION_USER_ROW_BORDER_RADIUS}
+        style={[styles.row, pressed && styles.rowPressed]}
+      >
+        <UserPremiumAvatar
+          uri={uri}
           isPremium={user.isPremiumUser === true}
-          isUserDataConfirmed={user.isUserDataConfirmed === true}
-          badgeSize={16}
-          textStyle={styles.nameText}
+          focus={getUserAvatarFocus(user)}
+          onError={() => setImgFailed(true)}
+          style={styles.avatar}
         />
-      </View>
+        <View style={styles.nameWrap}>
+          <UserPremiumDisplayName
+            name={displayName}
+            isPremium={user.isPremiumUser === true}
+            isUserDataConfirmed={user.isUserDataConfirmed === true}
+            badgeSize={16}
+            textStyle={styles.nameText}
+          />
+        </View>
+      </SquircleView>
     </Pressable>
   );
 };

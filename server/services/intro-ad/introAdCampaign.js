@@ -5,15 +5,16 @@ import {
   INTRO_AD_CAMPAIGN_STATUS_QUEUED,
   INTRO_AD_CAMPAIGN_STATUS_REJECTED,
   INTRO_AD_DURATION_MS,
+  INTRO_AD_MAX_ACTIVE,
   INTRO_AD_PRICE_POINTS,
 } from "../../constants/introAdCampaignConstants.js";
 import { IntroAdCampaignModel, UserModel } from "../../models/index.js";
 import { AppError } from "../../errors/AppError.js";
 import {
   activateIntroAdCampaignRecord,
-  activateNextQueuedIntroAdCampaign,
   assertNoOpenIntroAdCampaignForAdvertiser,
-  findActiveIntroAdCampaign,
+  countActiveIntroAdCampaigns,
+  fillIntroAdActiveSlotsFromQueue,
   notifyIntroAdApproved,
   notifyIntroAdCancelledByStaff,
   notifyIntroAdRejected,
@@ -184,7 +185,7 @@ export async function scheduleIntroAdCampaignAfterApproval({
   session = null,
 }) {
   const now = new Date();
-  const active = await findActiveIntroAdCampaign(session);
+  const activeCount = await countActiveIntroAdCampaigns(session);
   const amount = INTRO_AD_PRICE_POINTS;
 
   const campaign = await IntroAdCampaignModel.findById(campaignId);
@@ -206,19 +207,17 @@ export async function scheduleIntroAdCampaignAfterApproval({
   campaign.pointsChargedAt = now;
   campaign.approvedByUserId = approvedByUserId;
 
-  if (active) {
-    campaign.status = INTRO_AD_CAMPAIGN_STATUS_QUEUED;
-    campaign.scheduledStartAt = active.activeUntil;
-    await campaign.save(withMongoSession({}, session));
-    return campaign.toObject();
-  }
-
+  // Ставим в очередь и сразу активируем, если есть свободный слот (до INTRO_AD_MAX_ACTIVE).
   campaign.status = INTRO_AD_CAMPAIGN_STATUS_QUEUED;
   campaign.scheduledStartAt = now;
   await campaign.save(withMongoSession({}, session));
 
-  const activated = await activateIntroAdCampaignRecord(campaign._id, session);
-  return activated ?? campaign.toObject();
+  if (activeCount < INTRO_AD_MAX_ACTIVE) {
+    const activated = await activateIntroAdCampaignRecord(campaign._id, session);
+    return activated ?? campaign.toObject();
+  }
+
+  return campaign.toObject();
 }
 
 export async function countPendingIntroAdCampaigns() {
@@ -399,7 +398,7 @@ export async function cancelIntroAdCampaignByStaff({ staffUserId, campaignId }) 
     );
 
     if (wasActive) {
-      await activateNextQueuedIntroAdCampaign(session);
+      await fillIntroAdActiveSlotsFromQueue(session);
     }
   });
 

@@ -18,6 +18,8 @@ export const HomeCatalogUsersButton = ({
   const [menuOpen, setMenuOpen] = useState(false);
   const menuItems = useMemo(() => buildHomeCatalogUsersMenuItems(), []);
   const isUsersActive = pathname === USERS_ROUTE || pathname.startsWith(`${USERS_ROUTE}/`);
+  const isTermsActive = pathname === "/legal/terms";
+  const isFaqActive = pathname === "/faq";
 
   const handleToggleMenu = useCallback(() => {
     setMenuOpen((current) => !current);
@@ -39,7 +41,9 @@ export const HomeCatalogUsersButton = ({
     <HomeCatalogUsersStretchMenu
       open={menuOpen}
       items={menuItems}
-      activeItemKey={isUsersActive ? "users" : null}
+      activeItemKey={
+        isUsersActive ? "users" : isTermsActive ? "terms" : isFaqActive ? "faq" : null
+      }
       embeddedInForegroundSheet={embeddedInForegroundSheet}
       onToggle={handleToggleMenu}
       onItemPress={handleItemPress}

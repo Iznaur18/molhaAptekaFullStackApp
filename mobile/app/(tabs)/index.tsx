@@ -7,9 +7,10 @@ import {
   type FlatList,
   type ViewStyle,
 } from "react-native";
-import type Animated from "react-native-reanimated";
+import { GestureDetector } from "react-native-gesture-handler";
+import Animated from "react-native-reanimated";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
-import { useFocusEffect, useScrollToTop } from "@react-navigation/native";
+import { useFocusEffect, useNavigation, useScrollToTop } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -24,7 +25,6 @@ import { CatalogGridSkeleton } from "@/features/catalog-grid/ui/CatalogGridSkele
 import { CatalogAnimatedFlatList } from "@/features/catalog-grid/ui/CatalogAnimatedFlatList";
 import { CatalogScrollAnimationProvider } from "@/features/catalog-grid/model/CatalogScrollAnimationContext";
 import { useCatalogBreadcrumbLabel } from "@/features/catalog-filter/model/useCatalogBreadcrumbLabel";
-import { CatalogBreadcrumb } from "@/features/catalog-filter/ui/CatalogBreadcrumb";
 import { consumePendingCatalogFilters } from "@/features/catalog-browser/model/pendingCatalogFilters";
 import { isHomeCuratedProductListsVisible } from "@/entities/curated-product-list/lib/isHomeCuratedProductListsVisible";
 import { isHomeCatalogMainView } from "@/features/home-feed/lib/isHomeCatalogMainView";
@@ -35,20 +35,23 @@ import {
   type HomeCatalogFeedListRow,
 } from "@/features/home-feed/lib/buildHomeCatalogFeedListRows";
 import {
+  homeCatalogFeedListPerformanceProps,
   homeCatalogFeedListScrollProps,
   resolveHomeCatalogFeedListStyle,
 } from "@/features/home-feed/lib/homeCatalogFeedListScrollProps";
+import { HomeCatalogSearchProvider } from "@/features/home-feed/model/HomeCatalogSearchContext";
+import { useHomeFeedIntroTransition } from "@/features/home-feed/model/useHomeFeedIntroTransition";
 import { invalidateHomeFeedQueries } from "@/features/home-feed/model/invalidateHomeFeedQueries";
 import { useHomeFeedContentReady } from "@/features/home-feed/model/useHomeFeedContentReady";
 import {
   EMPTY_HOME_CATALOG_FEED_FILTERS,
   type HomeCatalogFeedFiltersState,
 } from "@/features/home-feed/model/homeCatalogFeedFilters";
-import { HomeFeedHeader } from "@/features/home-feed/ui/HomeFeedHeader";
+import { HomeCatalogEmbeddedSearchRow } from "@/features/home-feed/ui/HomeCatalogEmbeddedSearchRow";
+import { HomeFeedListHeader } from "@/features/home-feed/ui/HomeFeedListHeader";
 import { HomeCatalogFeedSheetCap } from "@/features/home-feed/ui/HomeCatalogFeedSheetCap";
 import { HomeCatalogPrimaryBackdrop } from "@/features/home-feed/ui/HomeCatalogPrimaryBackdrop";
 import { HomeCatalogSearchRow } from "@/features/home-feed/ui/HomeCatalogSearchRow";
-import { HomeCatalogSiteHeaderBannerRow } from "@/features/home-feed/ui/HomeCatalogSiteHeaderBannerRow";
 import { HomeCatalogStickySearchShell } from "@/features/home-feed/ui/HomeCatalogStickySearchShell";
 import {
   API_CLIENT_UI,
@@ -57,7 +60,12 @@ import {
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import {
+  HOME_CATALOG_FOREGROUND_SHEET_CAP_HEIGHT,
+  resolveHomeCatalogPrimaryBackdropHeight,
+} from "@/shared/lib/homeCatalogBackdropLayout";
+import {
   resetHomeCatalogTabBarReveal,
+  setHomeCatalogTabBarProgressDriven,
   setHomeCatalogTabBarScrollLinked,
   syncHomeCatalogTabBarRevealDistance,
 } from "@/shared/model/homeCatalogTabBarVisibility";
@@ -65,7 +73,6 @@ import { useProductGridLayout } from "@/shared/model/useProductGridLayout";
 import { useColdStartSplashGate } from "@/shared/model/coldStartSplashGate";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useFeedScreenStyles } from "@/shared/theme/catalogProductStyles";
-import { HOME_PAGE_UI } from "@/shared/config/homePageUi";
 import { ScreenErrorState } from "@/shared/ui/ScreenStates";
 
 type FeedFiltersState = HomeCatalogFeedFiltersState;
@@ -78,6 +85,7 @@ export default function CatalogScreen() {
   const productGrid = useProductGridLayout();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation();
   const { height: windowHeight } = useWindowDimensions();
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -96,6 +104,15 @@ export default function CatalogScreen() {
   >(null);
 
   useScrollToTop(catalogListRef);
+
+  // Дистанция сдвига шторки: интро (hero) сверху + cap-кромка. Именно на
+  // столько «шторка» с товарами уезжает вниз в состоянии интро.
+  const homeFeedDockOffset = useMemo(
+    () =>
+      resolveHomeCatalogPrimaryBackdropHeight(windowHeight) +
+      HOME_CATALOG_FOREGROUND_SHEET_CAP_HEIGHT,
+    [windowHeight],
+  );
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -172,6 +189,12 @@ export default function CatalogScreen() {
     [debouncedSearch, feedFilters, selectedRootSlug, selectedSubcategoryId, selectedSellerPersonalCategoryId],
   );
 
+  const introTransition = useHomeFeedIntroTransition({
+    dockOffset: homeFeedDockOffset,
+    listRef: catalogListRef,
+    enabled: showHomeFeed,
+  });
+
   const catalogBreadcrumbLabel = useCatalogBreadcrumbLabel({
     enabled: !showHomeFeed,
     search: debouncedSearch,
@@ -221,8 +244,34 @@ export default function CatalogScreen() {
   );
 
   useEffect(() => {
-    setHomeCatalogTabBarScrollLinked(showHomeFeed);
+    if (showHomeFeed) {
+      // Reveal таб-бара теперь ведёт переход интро↔лента (в хуке), не scrollY.
+      setHomeCatalogTabBarProgressDriven();
+    } else {
+      setHomeCatalogTabBarScrollLinked(false);
+    }
   }, [showHomeFeed]);
+
+  // Повторный тап по вкладке «Домой», когда главная УЖЕ открыта, возвращает к
+  // интро. Возврат на главную из другого раздела — не сбрасывает положение
+  // (navigation.isFocused() при этом ещё false, tabPress лишь навигирует сюда).
+  useEffect(() => {
+    if (!showHomeFeed) {
+      return;
+    }
+    // tabPress эмитит таб-навигатор в рантайме; дефолтный тип навигации его не
+    // объявляет — сужаем локально.
+    const unsubscribe = (
+      navigation as unknown as {
+        addListener: (event: "tabPress", callback: () => void) => () => void;
+      }
+    ).addListener("tabPress", () => {
+      if (navigation.isFocused()) {
+        introTransition.resetToIntro();
+      }
+    });
+    return unsubscribe;
+  }, [introTransition, navigation, showHomeFeed]);
 
   const catalogGridRows = useMemo(
     () =>
@@ -266,19 +315,33 @@ export default function CatalogScreen() {
   );
 
   const listHeader = (
-    <View style={styles.listHeader}>
-      {showHomeFeed ? <HomeCatalogSiteHeaderBannerRow visible={showHomeFeed} /> : null}
-      {!showHomeFeed ? <CatalogBreadcrumb label={catalogBreadcrumbLabel} /> : null}
-      {showHomeFeed ? (
-        <HomeFeedHeader
-          enabled={showHomeFeed}
-          showCuratedLists={showCuratedProductLists}
-        />
-      ) : null}
-      {showHomeFeed ? (
-        <CatalogBreadcrumb label={HOME_PAGE_UI.BREADCRUMB_HOME} compactTop />
-      ) : null}
-    </View>
+    <HomeFeedListHeader
+      showHomeFeed={showHomeFeed}
+      showCuratedLists={showCuratedProductLists}
+      catalogBreadcrumbLabel={catalogBreadcrumbLabel}
+      isCatalogEmpty={false}
+      emptyLabel={API_CLIENT_UI.CATALOG_EMPTY}
+      styles={styles}
+    />
+  );
+
+  const feedHeaderElement = useMemo(
+    () => (
+      <HomeFeedListHeader
+        showHomeFeed
+        showCuratedLists={showCuratedProductLists}
+        catalogBreadcrumbLabel={catalogBreadcrumbLabel}
+        isCatalogEmpty={catalogGridRows.length === 0}
+        emptyLabel={API_CLIENT_UI.CATALOG_EMPTY}
+        styles={styles}
+      />
+    ),
+    [
+      catalogBreadcrumbLabel,
+      catalogGridRows.length,
+      showCuratedProductLists,
+      styles,
+    ],
   );
 
   const homeFeedListFooter = (
@@ -303,22 +366,10 @@ export default function CatalogScreen() {
         return null;
       }
 
-      if (item.kind === "hero") {
-        return <HomeCatalogPrimaryBackdrop />;
-      }
-
-      if (item.kind === "cap") {
-        return <HomeCatalogFeedSheetCap />;
-      }
-
       if (item.kind === "search") {
         return (
           <HomeCatalogStickySearchShell>
-            <HomeCatalogSearchRow
-              value={searchInput}
-              onChange={setSearchInput}
-              embeddedInForegroundSheet
-            />
+            <HomeCatalogEmbeddedSearchRow />
           </HomeCatalogStickySearchShell>
         );
       }
@@ -326,12 +377,7 @@ export default function CatalogScreen() {
       if (item.kind === "feed-header") {
         return (
           <View style={[styles.homeFeedRowSurface, styles.homeFeedInsetContent, styles.homeFeedForeground]}>
-            {listHeader}
-            {catalogGridRows.length === 0 ? (
-              <View style={styles.centered}>
-                <Text style={styles.empty}>{API_CLIENT_UI.CATALOG_EMPTY}</Text>
-              </View>
-            ) : null}
+            {feedHeaderElement}
           </View>
         );
       }
@@ -357,17 +403,16 @@ export default function CatalogScreen() {
             gap={productGrid.gap}
             tileWidth={productGrid.tileWidth}
             rowIndex={productRowIndex}
+            disableEntering
           />
         </View>
       );
     },
     [
-      catalogGridRows.length,
-      listHeader,
+      feedHeaderElement,
       productGrid.columns,
       productGrid.gap,
       productGrid.tileWidth,
-      searchInput,
       styles.homeFeedInsetContent,
       styles.homeFeedForeground,
       styles.homeFeedRowSurface,
@@ -470,36 +515,57 @@ export default function CatalogScreen() {
   if (showHomeFeed) {
     return (
       <CatalogScrollAnimationProvider>
-        {renderHomeFeedScene(
-          <CatalogAnimatedFlatList<HomeCatalogFeedListRow>
-            ref={catalogListRef as Ref<Animated.FlatList<HomeCatalogFeedListRow>>}
-            key={`${productGrid.listKey}-home-feed`}
-            data={homeFeedListRows}
-            keyExtractor={(item) => item.key}
-            numColumns={1}
-            stickyHeaderIndices={[HOME_CATALOG_FEED_STICKY_SEARCH_INDEX]}
-            removeClippedSubviews={false}
-            renderItem={renderHomeFeedRow}
-            contentContainerStyle={homeFeedContentContainerStyle}
-            style={resolveHomeCatalogFeedListStyle(styles.flex, styles.homeFeedList)}
-            {...homeCatalogFeedListScrollProps}
-            refreshControl={
-              <ThemedRefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
-            }
-            onEndReached={handleLoadMore}
-            onEndReachedThreshold={0.4}
-            ListFooterComponent={
-              <View style={styles.homeFeedListFooterWrap}>
-                {catalogQuery.isFetchingNextPage ? (
-                  <View style={styles.homeFeedForeground}>
-                    <ActivityIndicator style={styles.footerLoader} />
-                  </View>
-                ) : null}
-                {homeFeedListFooter}
+        <HomeCatalogSearchProvider value={searchInput} onChange={setSearchInput}>
+          {renderHomeFeedScene(
+            <GestureDetector gesture={introTransition.panGesture}>
+              <View style={styles.homeFeedStage}>
+                <View
+                  pointerEvents="box-none"
+                  style={[styles.homeFeedIntroBackdropLayer, { height: homeFeedDockOffset }]}
+                >
+                  <HomeCatalogPrimaryBackdrop
+                    playbackActive={introTransition.backdropPlaybackActive}
+                  />
+                </View>
+                <Animated.View style={[styles.homeFeedSheet, introTransition.sheetStyle]}>
+                  <GestureDetector gesture={introTransition.nativeGesture}>
+                    <CatalogAnimatedFlatList<HomeCatalogFeedListRow>
+                      ref={catalogListRef as Ref<Animated.FlatList<HomeCatalogFeedListRow>>}
+                      key={`${productGrid.listKey}-home-feed`}
+                      data={homeFeedListRows}
+                      keyExtractor={(item) => item.key}
+                      numColumns={1}
+                      stickyHeaderIndices={[HOME_CATALOG_FEED_STICKY_SEARCH_INDEX]}
+                      trackCatalogScroll={false}
+                      renderItem={renderHomeFeedRow}
+                      contentContainerStyle={homeFeedContentContainerStyle}
+                      style={resolveHomeCatalogFeedListStyle(styles.flex, styles.homeFeedList)}
+                      scrollEnabled={introTransition.scrollEnabled}
+                      onScroll={introTransition.onListScroll}
+                      {...homeCatalogFeedListScrollProps}
+                      {...homeCatalogFeedListPerformanceProps}
+                      refreshControl={
+                        <ThemedRefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
+                      }
+                      onEndReached={handleLoadMore}
+                      onEndReachedThreshold={0.4}
+                      ListFooterComponent={
+                        <View style={styles.homeFeedListFooterWrap}>
+                          {catalogQuery.isFetchingNextPage ? (
+                            <View style={styles.homeFeedForeground}>
+                              <ActivityIndicator style={styles.footerLoader} />
+                            </View>
+                          ) : null}
+                          {homeFeedListFooter}
+                        </View>
+                      }
+                    />
+                  </GestureDetector>
+                </Animated.View>
               </View>
-            }
-          />,
-        )}
+            </GestureDetector>,
+          )}
+        </HomeCatalogSearchProvider>
       </CatalogScrollAnimationProvider>
     );
   }

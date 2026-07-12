@@ -46,7 +46,7 @@ test("create order + reserve: резерв продавца увеличивае
   assert.equal(sellerRow.userLoyaltyPoints, 200);
 });
 
-test("confirm: settle баллов продавец → премиум-покупатель", async () => {
+test("confirm: settle баллов продавец → подтверждённый покупатель", async () => {
   const { seller, buyer, product, loyaltyPointsPerUnit } =
     await createOrderLoyaltyFixture();
 
@@ -134,4 +134,25 @@ test("double confirm idempotent: второй confirm не начисляет б
   const sellerFinal = await UserModel.findById(seller._id).lean();
   assert.equal(sellerFinal.userLoyaltyPoints, 200 - loyaltyPointsPerUnit);
   assert.equal(sellerFinal.userLoyaltyPointsReserved, 0);
+});
+
+test("confirm: без подтверждённых данных покупатель не получает баллы", async () => {
+  const { seller, buyer, product, loyaltyPointsPerUnit } =
+    await createOrderLoyaltyFixture({ buyerDataConfirmed: false });
+
+  const order = await createOrderWithReserveTransaction({ buyer, seller, product });
+  await markOrderItemDelivered(order._id, 0);
+
+  const pointsEarned = await confirmOrderItemLoyaltyTransaction({
+    orderId: order._id,
+    itemIndex: 0,
+    buyerId: buyer._id,
+    isUserDataConfirmed: false,
+  });
+
+  assert.equal(pointsEarned, 0);
+
+  const buyerRow = await UserModel.findById(buyer._id).lean();
+  assert.equal(buyerRow.userLoyaltyPoints, 0);
+  assert.equal(buyerRow.isUserDataConfirmed, false);
 });

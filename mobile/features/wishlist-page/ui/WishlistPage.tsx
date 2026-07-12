@@ -1,3 +1,4 @@
+import { Feather } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
@@ -11,7 +12,9 @@ import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMob
 import { WishlistRow } from "@/features/wishlist-page/ui/WishlistRow";
 import { MY_PROFILE_PAGE_UI, WISHLIST_PAGE_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { pluralizeRu } from "@/shared/lib/pluralizeRu";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useWishlistPageStyles } from "@/shared/theme/wishlistPageStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
@@ -25,6 +28,7 @@ type WishlistProduct = {
 
 export const WishlistPage = () => {
   const router = useRouter();
+  const theme = useAppTheme();
   const styles = useWishlistPageStyles();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
   const isAuthorized = useIsAuthorized();
@@ -62,6 +66,31 @@ export const WishlistPage = () => {
         activeLabel={MY_PROFILE_PAGE_UI.TAB_WISHLIST}
         onPress={() => setNavSheetVisible(true)}
       />
+
+      <View
+        style={styles.heroCard}
+        accessibilityLabel={`${WISHLIST_PAGE_UI.HERO_CAPTION}: ${products.length} ${pluralizeRu(products.length, WISHLIST_PAGE_UI.HERO_UNIT_FORMS)}`}
+      >
+        <View style={styles.heroTextBlock}>
+          <Text style={styles.heroCaption}>{WISHLIST_PAGE_UI.HERO_CAPTION}</Text>
+          <View style={styles.heroRow}>
+            <Text style={styles.heroValue}>{products.length}</Text>
+            <Text style={styles.heroUnit}>
+              {pluralizeRu(products.length, WISHLIST_PAGE_UI.HERO_UNIT_FORMS)}
+            </Text>
+          </View>
+          <Text style={styles.heroInfo}>{WISHLIST_PAGE_UI.HERO_INFO}</Text>
+        </View>
+        <View style={styles.heroIconWrap}>
+          <Feather
+            name="heart"
+            size={24}
+            color={theme.colors.onContrast}
+            accessibilityElementsHidden
+            importantForAccessibility="no"
+          />
+        </View>
+      </View>
     </View>
   );
 

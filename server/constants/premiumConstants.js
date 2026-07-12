@@ -1,7 +1,7 @@
 import { rublesToLoyaltyPoints } from "./loyaltyPointsConstants.js";
 
 /** Номинал подписки в рублях (1 ₽ = 1 балл при оплате баллами). */
-export const PREMIUM_PRICE_RUB = 300;
+export const PREMIUM_PRICE_RUB = 149;
 
 export const PREMIUM_PRICE_POINTS = rublesToLoyaltyPoints(PREMIUM_PRICE_RUB);
 

@@ -65,7 +65,7 @@ export function SiteHeaderBannerAdvertisingSection({ isAuthorized, loyaltyBalanc
   const [actionError, setActionError] = useState("");
   const [feedback, setFeedback] = useState("");
 
-  const pricePoints = campaignQuery.data?.pricePoints ?? 10_000;
+  const pricePoints = campaignQuery.data?.pricePoints ?? 7_000;
   const durationDays = campaignQuery.data?.durationDays ?? 7;
   const paidSlotLimit = campaignQuery.data?.paidSlotLimit ?? 3;
   const activePaidSlots = campaignQuery.data?.activePaidSlots ?? 0;

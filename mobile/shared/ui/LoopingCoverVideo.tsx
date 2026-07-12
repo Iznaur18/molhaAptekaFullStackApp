@@ -7,6 +7,7 @@ type LoopingCoverVideoProps = {
   uri: string;
   loop?: boolean;
   isMuted?: boolean;
+  isPlaying?: boolean;
   onPlaybackFailed?: () => void;
   onReady?: () => void;
   onEnded?: () => void;
@@ -17,6 +18,7 @@ export const LoopingCoverVideo = ({
   uri,
   loop = true,
   isMuted = true,
+  isPlaying = true,
   onPlaybackFailed,
   onReady,
   onEnded,
@@ -25,7 +27,9 @@ export const LoopingCoverVideo = ({
   const player = useVideoPlayer(uri, (instance) => {
     instance.loop = loop;
     instance.muted = isMuted;
-    instance.play();
+    if (isPlaying) {
+      instance.play();
+    }
   });
 
   const { status } = useEvent(player, "statusChange", {
@@ -35,6 +39,14 @@ export const LoopingCoverVideo = ({
   useEffect(() => {
     player.muted = isMuted;
   }, [isMuted, player]);
+
+  useEffect(() => {
+    if (isPlaying) {
+      player.play();
+      return;
+    }
+    player.pause();
+  }, [isPlaying, player]);
 
   useEffect(() => {
     if (status === "error") {

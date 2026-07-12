@@ -11,6 +11,7 @@ import { InstallmentContractCounterparty } from "@/entities/installment/ui/Insta
 import { INSTALLMENT_UI } from "@/shared/config";
 import { formatPriceRub } from "@/shared/lib";
 import { useInstallmentContractCardChromeStyles } from "@/shared/theme/installmentContractCardChromeStyles";
+import { CommerceCardExpandToggle } from "@/shared/ui/CommerceCardExpandToggle";
 
 type InstallmentContractCardProps = {
   contract: InstallmentContract;
@@ -169,14 +170,11 @@ export const InstallmentContractCard = ({
             ) : (
               <Text style={styles.titleStatic}>{productName}</Text>
             )}
-            <Pressable
-              style={styles.chevronButton}
-              accessibilityRole="button"
+            <CommerceCardExpandToggle
+              expanded={isExpanded}
               accessibilityLabel={INSTALLMENT_UI.PAYMENTS_EXPAND_TOGGLE(isExpanded)}
               onPress={toggleExpanded}
-            >
-              <Text style={[styles.chevron, isExpanded ? styles.chevronExpanded : null]}>▸</Text>
-            </Pressable>
+            />
           </View>
         ) : handleProductClick && productId ? (
           <Pressable style={styles.titlePressable} onPress={() => handleProductClick(productId)}>

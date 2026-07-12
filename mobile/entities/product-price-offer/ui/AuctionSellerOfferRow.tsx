@@ -17,6 +17,7 @@ import {
 } from "@/shared/config";
 import { formatPriceRub } from "@/shared/lib";
 import { useAuctionDashboardRowStyles } from "@/shared/theme/auctionPageStyles";
+import { CommerceCardExpandToggle } from "@/shared/ui/CommerceCardExpandToggle";
 
 const PRICE_OFFER_STATUS_PENDING = "pending";
 const PRICE_OFFER_STATUS_ACCEPTED = "accepted";
@@ -97,14 +98,11 @@ export const AuctionSellerOfferRow = ({
               </Text>
             )}
             {collapsible ? (
-              <Pressable
-                style={styles.chevronButton}
-                accessibilityRole="button"
+              <CommerceCardExpandToggle
+                expanded={isExpanded}
                 accessibilityLabel={AUCTION_PAGE_UI.EXPAND_TOGGLE(isExpanded)}
                 onPress={toggleExpanded}
-              >
-                <Text style={[styles.chevron, isExpanded ? styles.chevronExpanded : null]}>▸</Text>
-              </Pressable>
+              />
             ) : null}
           </View>
           {isExpanded ? (

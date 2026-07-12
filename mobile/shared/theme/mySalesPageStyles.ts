@@ -3,14 +3,16 @@ import { StyleSheet } from "react-native";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-const TOOLBAR_PADDING_VERTICAL = 10.4;
+const TOOLBAR_PADDING_VERTICAL = 12;
 const TOOLBAR_PADDING_HORIZONTAL = 12;
-const TOOLBAR_RADIUS = 10.4;
+const TOOLBAR_RADIUS = 16;
 const TOOLBAR_GAP = 8;
-const CHIP_GAP = 5.6;
-const CHIP_PADDING_VERTICAL = 3.5;
-const CHIP_PADDING_HORIZONTAL = 8.8;
+const CHIP_GAP = 6;
+const CHIP_PADDING_VERTICAL = 4;
+const CHIP_PADDING_HORIZONTAL = 8;
 const LIST_GAP = 4;
+const OVERVIEW_TILE_RADIUS = 16;
+const SEARCH_RADIUS = 12;
 
 export const useMySalesPageStyles = createThemedStyles((theme) => ({
   container: {
@@ -41,8 +43,8 @@ export const useMySalesPageStyles = createThemedStyles((theme) => ({
     paddingHorizontal: TOOLBAR_PADDING_HORIZONTAL,
     borderRadius: TOOLBAR_RADIUS,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "rgba(34, 197, 94, 0.22)",
-    backgroundColor: theme.colors.successSurface,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surfaceMuted,
   },
   toolbarHead: {
     flexDirection: "row",
@@ -97,7 +99,7 @@ export const useMySalesPageStyles = createThemedStyles((theme) => ({
     minWidth: 0,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
-    borderRadius: theme.radius.sm,
+    borderRadius: SEARCH_RADIUS,
     backgroundColor: theme.colors.surface,
     minHeight: 40,
   },
@@ -143,7 +145,7 @@ export const useMySalesPageStyles = createThemedStyles((theme) => ({
     color: theme.colors.textMuted,
   },
   button: {
-    borderRadius: 10,
+    borderRadius: 16,
     paddingVertical: theme.spacing[3],
     paddingHorizontal: theme.spacing[6],
     backgroundColor: theme.colors.action,
@@ -163,9 +165,9 @@ export const useMySalesPageStyles = createThemedStyles((theme) => ({
     flexBasis: "30%",
     minWidth: 96,
     gap: 2.4,
-    paddingVertical: 8.8,
-    paddingHorizontal: 10.4,
-    borderRadius: 8.8,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderRadius: OVERVIEW_TILE_RADIUS,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
     backgroundColor: theme.colors.surface,

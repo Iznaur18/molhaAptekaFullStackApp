@@ -3,7 +3,23 @@ import { Image, Pressable, Text, View } from "react-native";
 
 import { getUserProfileThumbSrc } from "@/entities/user/lib/getUserProfileThumbSrc";
 import type { UserProfileThumbItem } from "@/entities/user/model/userProfileThumbTypes";
-import { useUserProfileThumbListStyles } from "@/shared/theme/profileChromeStyles";
+import {
+  PROFILE_CARD_SQUIRCLE_RADIUS,
+  USER_PROFILE_THUMB_ROW_SIZE,
+  USER_PROFILE_THUMB_SQUIRCLE_RADIUS,
+  useUserProfileThumbListStyles,
+} from "@/shared/theme/profileChromeStyles";
+import { SquircleView } from "@/shared/ui/SquircleView";
+
+const chunkProfileThumbItems = <TItem,>(items: TItem[], rowSize: number): TItem[][] => {
+  const rows: TItem[][] = [];
+
+  for (let index = 0; index < items.length; index += rowSize) {
+    rows.push(items.slice(index, index + rowSize));
+  }
+
+  return rows;
+};
 
 type UserProfileThumbGridProps = {
   items: UserProfileThumbItem[];
@@ -34,33 +50,48 @@ export const UserProfileThumbGrid = ({
     return null;
   }
 
+  const rows = chunkProfileThumbItems(items, USER_PROFILE_THUMB_ROW_SIZE);
+
   return (
     <>
       <View style={styles.grid}>
-        {items.map((item) => {
-          const isUnavailable = !item.viewable || item.product == null;
-          const thumbSrc = failedThumbIds.has(item.productId)
-            ? null
-            : getUserProfileThumbSrc(item.product);
+        {rows.map((rowItems, rowIndex) => {
+          const isPartialRow = rowItems.length < USER_PROFILE_THUMB_ROW_SIZE;
 
           return (
-            <Pressable
-              key={item.productId}
-              style={[styles.thumbButton, isUnavailable && styles.thumbButtonUnavailable]}
-              onPress={() => onItemPress(item)}
-              accessibilityRole="button"
-              accessibilityLabel={item.productName}
+            <View
+              key={`thumb-row-${rowIndex}`}
+              style={[styles.gridRow, isPartialRow && styles.gridRowPartial]}
             >
-              {thumbSrc ? (
-                <Image
-                  source={{ uri: thumbSrc }}
-                  style={styles.thumb}
-                  onError={() => markThumbFailed(item.productId)}
-                />
-              ) : (
-                <View style={[styles.thumb, styles.thumbPlaceholder]} />
-              )}
-            </Pressable>
+              {rowItems.map((item) => {
+                const isUnavailable = !item.viewable || item.product == null;
+                const thumbSrc = failedThumbIds.has(item.productId)
+                  ? null
+                  : getUserProfileThumbSrc(item.product);
+
+                return (
+                  <Pressable
+                    key={item.productId}
+                    style={[styles.thumbButton, isUnavailable && styles.thumbButtonUnavailable]}
+                    onPress={() => onItemPress(item)}
+                    accessibilityRole="button"
+                    accessibilityLabel={item.productName}
+                  >
+                    <SquircleView radius={USER_PROFILE_THUMB_SQUIRCLE_RADIUS} style={styles.thumbClip}>
+                      {thumbSrc ? (
+                        <Image
+                          source={{ uri: thumbSrc }}
+                          style={styles.thumbImage}
+                          onError={() => markThumbFailed(item.productId)}
+                        />
+                      ) : (
+                        <View style={styles.thumbPlaceholder} />
+                      )}
+                    </SquircleView>
+                  </Pressable>
+                );
+              })}
+            </View>
           );
         })}
       </View>
@@ -135,62 +166,74 @@ export const UserProfileThumbSection = ({
     [isExpanded, items],
   );
 
+  const showMoreFooter =
+    !isExpanded && canExpand && Boolean(showMoreLabel) && typeof onShowMore === "function";
+  const showLessFooter =
+    isExpanded && canExpand && Boolean(showLessLabel) && typeof onShowLess === "function";
+
   return (
-    <View style={styles.root}>
-      <View style={styles.headingRow}>
+    <SquircleView radius={PROFILE_CARD_SQUIRCLE_RADIUS} style={styles.root}>
+      <View style={styles.header}>
         {showViewAll && onHeadingPress ? (
-          <Pressable onPress={onHeadingPress} accessibilityRole="button">
-            <Text style={[styles.heading, styles.headingAction]}>{heading}</Text>
+          <Pressable
+            style={styles.headerTitlePressable}
+            onPress={onHeadingPress}
+            accessibilityRole="button"
+          >
+            <Text style={styles.headerTitle}>{heading}</Text>
           </Pressable>
         ) : (
-          <Text style={styles.heading}>{heading}</Text>
+          <Text style={styles.headerTitle}>{heading}</Text>
         )}
         {showViewAll && viewAllLabel && onViewAllPress ? (
           <Pressable onPress={onViewAllPress} accessibilityRole="button">
-            <Text style={styles.viewAll}>{viewAllLabel}</Text>
+            <Text style={styles.headerAction}>{viewAllLabel}</Text>
           </Pressable>
         ) : null}
       </View>
 
-      {phase === "loading" ? <Text style={styles.state}>{loadingText}</Text> : null}
-      {phase === "error" && items.length === 0 && errorText ? (
-        <Text style={[styles.state, styles.stateError]} accessibilityRole="alert">
-          {errorText}
-        </Text>
-      ) : null}
-      {phase === "success" && items.length === 0 ? (
-        <Text style={styles.state}>{emptyText}</Text>
-      ) : null}
+      <View style={styles.body}>
+        {phase === "loading" ? <Text style={styles.state}>{loadingText}</Text> : null}
+        {phase === "error" && items.length === 0 && errorText ? (
+          <Text style={[styles.state, styles.stateError]} accessibilityRole="alert">
+            {errorText}
+          </Text>
+        ) : null}
+        {phase === "success" && items.length === 0 ? (
+          <Text style={styles.state}>{emptyText}</Text>
+        ) : null}
 
-      <UserProfileThumbGrid
-        items={visibleItems}
-        unavailableHint={unavailableHint}
-        onItemPress={handleItemPress}
-      />
+        <UserProfileThumbGrid
+          items={visibleItems}
+          unavailableHint={unavailableHint}
+          onItemPress={handleItemPress}
+        />
 
-      {!isExpanded && canExpand && showMoreLabel && onShowMore ? (
+        {phase === "error" && items.length > 0 && errorText ? (
+          <Text style={[styles.state, styles.stateError]} accessibilityRole="alert">
+            {errorText}
+          </Text>
+        ) : null}
+      </View>
+
+      {showMoreFooter ? (
         <Pressable
-          style={[styles.moreButton, isLoadingMore && styles.moreButtonDisabled]}
+          style={[styles.footerAction, isLoadingMore && styles.footerActionDisabled]}
           onPress={onShowMore}
           disabled={isLoadingMore}
+          accessibilityRole="button"
         >
-          <Text style={styles.moreButtonText}>
+          <Text style={styles.footerActionText}>
             {isLoadingMore && loadingMoreLabel ? loadingMoreLabel : showMoreLabel}
           </Text>
         </Pressable>
       ) : null}
 
-      {isExpanded && canExpand && showLessLabel && onShowLess ? (
-        <Pressable style={styles.moreButton} onPress={onShowLess}>
-          <Text style={styles.moreButtonText}>{showLessLabel}</Text>
+      {showLessFooter ? (
+        <Pressable style={styles.footerAction} onPress={onShowLess} accessibilityRole="button">
+          <Text style={styles.footerActionText}>{showLessLabel}</Text>
         </Pressable>
       ) : null}
-
-      {phase === "error" && items.length > 0 && errorText ? (
-        <Text style={[styles.state, styles.stateError]} accessibilityRole="alert">
-          {errorText}
-        </Text>
-      ) : null}
-    </View>
+    </SquircleView>
   );
 };

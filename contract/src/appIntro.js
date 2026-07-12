@@ -72,7 +72,10 @@ export const appIntroSettingsSchema = z.object({
 
 export const appIntroSettingsDataSchema = z.object({
   settings: appIntroSettingsSchema,
+  /** Первый активный платный ролик (обратная совместимость, веб-клиент). */
   paidIntro: introAdPaidIntroSchema.nullable().optional(),
+  /** До 5 активных платных роликов, проигрываются подряд. */
+  paidIntros: z.array(introAdPaidIntroSchema).optional().default([]),
 });
 
 export const patchAppIntroSettingsBodySchema = z

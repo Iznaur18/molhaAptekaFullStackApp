@@ -7,6 +7,14 @@ export const homeCatalogFeedListScrollProps = {
   overScrollMode: "never" as const,
 };
 
+/** Тюнинг виртуализации главной ленты — меньше off-screen mount. */
+export const homeCatalogFeedListPerformanceProps = {
+  initialNumToRender: 6,
+  maxToRenderPerBatch: 4,
+  windowSize: 7,
+  removeClippedSubviews: Platform.OS === "android",
+} as const;
+
 export const resolveHomeCatalogFeedListStyle = (
   ...styles: StyleProp<ViewStyle>[]
 ): StyleProp<ViewStyle>[] =>

@@ -11,7 +11,7 @@ import {
   APP_INTRO_MIN_MS_MIN,
 } from "./appIntro.js";
 
-export const INTRO_AD_PRICE_POINTS = 30_000;
+export const INTRO_AD_PRICE_POINTS = 6_000;
 export const INTRO_AD_DURATION_DAYS = 3;
 /** Максимальная длительность intro-ролика: сервер обрезает видео при загрузке. */
 export const INTRO_AD_VIDEO_MAX_DURATION_SEC = 10;

@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 
+import { PRODUCT_CARD_BADGE_COLORS as BC } from "@/entities/product/lib/productCardBadgePalette";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 const THUMB_SIZE = 88;
@@ -124,16 +125,84 @@ export const useProductCompactCardStyles = createThemedStyles((theme) => ({
     gap: 6,
   },
   discountPill: {
-    paddingHorizontal: 5,
-    paddingVertical: 1,
-    borderRadius: 4,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 999,
     backgroundColor: `${theme.colors.danger}14`,
   },
   discountPillText: {
     fontSize: 11,
-    fontWeight: "700",
+    fontWeight: "600",
     lineHeight: 14,
     color: theme.colors.danger,
+  },
+  promotionPill: {
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 999,
+  },
+  promotionPillBoost: {
+    backgroundColor: BC.promotionBoostBg,
+  },
+  promotionPillTop: {
+    backgroundColor: BC.promotionTopBg,
+  },
+  promotionPillBanner: {
+    backgroundColor: BC.promotionBannerBg,
+  },
+  promotionPillText: {
+    fontSize: 11,
+    fontWeight: "600",
+    lineHeight: 14,
+  },
+  promotionPillTextBoost: {
+    color: BC.promotionBoostText,
+  },
+  promotionPillTextTop: {
+    color: BC.promotionTopText,
+  },
+  promotionPillTextBanner: {
+    color: BC.promotionBannerText,
+  },
+  featurePill: {
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 999,
+  },
+  featurePillText: {
+    fontSize: 11,
+    fontWeight: "600",
+    lineHeight: 14,
+  },
+  featurePillAuction: {
+    backgroundColor: BC.auctionBg,
+  },
+  featurePillTextAuction: {
+    color: BC.auctionText,
+  },
+  featurePillInstallment: {
+    backgroundColor: BC.installmentBg,
+  },
+  featurePillTextInstallment: {
+    color: BC.installmentText,
+  },
+  featurePillRaffle: {
+    backgroundColor: BC.raffleBg,
+  },
+  featurePillTextRaffle: {
+    color: BC.raffleText,
+  },
+  featurePillHidden: {
+    backgroundColor: BC.hiddenBg,
+  },
+  featurePillTextHidden: {
+    color: BC.hiddenText,
+  },
+  featurePillLoyaltyOvercommit: {
+    backgroundColor: BC.discountBg,
+  },
+  featurePillTextLoyaltyOvercommit: {
+    color: BC.discountText,
   },
   loyaltyPill: {
     paddingHorizontal: 5,

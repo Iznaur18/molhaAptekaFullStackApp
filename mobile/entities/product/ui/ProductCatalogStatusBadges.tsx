@@ -8,6 +8,7 @@ import {
   type ProductStatusBadgeVariant,
 } from "@/entities/product/lib/productStatusBadgeStyles";
 import { PRODUCT_CARD_UI } from "@/shared/config";
+import { nestedHorizontalScrollProps } from "@/shared/lib/nestedHorizontalScrollProps";
 import { AppText } from "@/shared/ui/AppText";
 
 type ProductCatalogStatusBadgesProps = {
@@ -99,8 +100,7 @@ export const ProductCatalogStatusBadges = ({
       style={productStatusBadgeScrollStyles.root}
       contentContainerStyle={productStatusBadgeScrollStyles.content}
       showsHorizontalScrollIndicator={false}
-      nestedScrollEnabled
-      directionalLockEnabled
+      {...nestedHorizontalScrollProps}
       keyboardShouldPersistTaps="handled"
       accessibilityLabel={PRODUCT_CARD_UI.STATUS_BADGES_ARIA}
     >

@@ -276,6 +276,41 @@ export const useLegalPageStyles = createThemedStyles((theme) => ({
     paddingBottom: theme.spacing[8],
     backgroundColor: theme.colors.bg,
   },
+  documentTabBarRoot: {
+    marginBottom: theme.spacing[4],
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.md,
+    overflow: "hidden",
+  },
+  documentTabBarScrollContent: {
+    flexDirection: "row",
+    gap: theme.spacing[2],
+    paddingHorizontal: theme.spacing[3],
+    paddingVertical: theme.spacing[3],
+  },
+  documentTab: {
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: theme.radius.pill,
+    borderWidth: 1,
+    borderColor: `${theme.colors.action}59`,
+    backgroundColor: theme.colors.surface,
+  },
+  documentTabActive: {
+    borderColor: theme.colors.action,
+    backgroundColor: theme.colors.action,
+  },
+  documentTabText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: theme.colors.action,
+  },
+  documentTabTextActive: {
+    color: theme.colors.onContrast,
+    fontWeight: "600",
+  },
   title: {
     fontSize: 22,
     fontWeight: "700",

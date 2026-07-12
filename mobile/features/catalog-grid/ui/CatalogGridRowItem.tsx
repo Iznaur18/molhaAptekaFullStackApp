@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { View } from "react-native";
 
 import { ProductCard } from "@/entities/product/ui/ProductCard";
@@ -13,14 +14,16 @@ type CatalogGridRowItemProps = {
   gap: number;
   tileWidth: number;
   rowIndex?: number;
+  disableEntering?: boolean;
 };
 
-export const CatalogGridRowItem = ({
+export const CatalogGridRowItem = memo(({
   row,
   columns,
   gap,
   tileWidth,
   rowIndex = 0,
+  disableEntering = false,
 }: CatalogGridRowItemProps) => {
   if (!row) {
     return null;
@@ -44,5 +47,11 @@ export const CatalogGridRowItem = ({
       </View>
     );
 
-  return <CatalogGridRowEnteringShell rowIndex={rowIndex}>{content}</CatalogGridRowEnteringShell>;
-};
+  return (
+    <CatalogGridRowEnteringShell rowIndex={rowIndex} disableEntering={disableEntering}>
+      {content}
+    </CatalogGridRowEnteringShell>
+  );
+});
+
+CatalogGridRowItem.displayName = "CatalogGridRowItem";

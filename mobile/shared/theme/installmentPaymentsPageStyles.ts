@@ -3,14 +3,15 @@ import { StyleSheet } from "react-native";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-const TOOLBAR_PADDING_VERTICAL = 10.4;
+const TOOLBAR_PADDING_VERTICAL = 12;
 const TOOLBAR_PADDING_HORIZONTAL = 12;
-const TOOLBAR_RADIUS = 10.4;
+const TOOLBAR_RADIUS = 16;
 const TOOLBAR_GAP = 8;
-const CHIP_GAP = 5.6;
-const CHIP_PADDING_VERTICAL = 3.5;
-const CHIP_PADDING_HORIZONTAL = 8.8;
+const CHIP_GAP = 6;
+const CHIP_PADDING_VERTICAL = 4;
+const CHIP_PADDING_HORIZONTAL = 8;
 const LIST_GAP = 4;
+const OVERVIEW_TILE_RADIUS = 16;
 
 export const useInstallmentPaymentsPageStyles = createThemedStyles((theme) => ({
   container: {
@@ -38,8 +39,8 @@ export const useInstallmentPaymentsPageStyles = createThemedStyles((theme) => ({
     paddingHorizontal: TOOLBAR_PADDING_HORIZONTAL,
     borderRadius: TOOLBAR_RADIUS,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "rgba(79, 70, 229, 0.28)",
-    backgroundColor: theme.colors.actionSoft,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surfaceMuted,
   },
   toolbarHead: {
     flexDirection: "row",
@@ -99,7 +100,7 @@ export const useInstallmentPaymentsPageStyles = createThemedStyles((theme) => ({
   button: {
     paddingVertical: 10,
     paddingHorizontal: 16,
-    borderRadius: 8,
+    borderRadius: 16,
     backgroundColor: theme.colors.action,
   },
   buttonText: {
@@ -109,22 +110,22 @@ export const useInstallmentPaymentsPageStyles = createThemedStyles((theme) => ({
   overview: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8,
+    gap: 7.2,
   },
   overviewTile: {
     flex: 1,
     minWidth: 0,
-    gap: 2,
-    paddingVertical: 9.6,
-    paddingHorizontal: 10.4,
-    borderRadius: 8.8,
+    gap: 2.4,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderRadius: OVERVIEW_TILE_RADIUS,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
     backgroundColor: theme.colors.surface,
   },
   overviewTileActive: {
-    borderColor: theme.colors.action,
-    backgroundColor: theme.colors.actionSoft,
+    borderColor: theme.colors.success,
+    backgroundColor: theme.colors.successSurface,
   },
   overviewTileAttention: {
     borderColor: "rgba(245, 158, 11, 0.45)",

@@ -1,17 +1,17 @@
 /**
- * Баллы за подтверждённую позицию: премиум-покупатель получает замороженную сумму.
+ * Баллы за подтверждённую позицию: покупатель с подтверждёнными данными получает замороженную сумму.
  *
  * @param {{
  *   order: { items: Array<Record<string, unknown>> };
  *   itemIndex: number;
- *   isPremiumUser: boolean;
+ *   isUserDataConfirmed: boolean;
  * }} params
  * @returns {number}
  */
 export const prepareLoyaltyPointsForConfirmedOrderItem = ({
   order,
   itemIndex,
-  isPremiumUser,
+  isUserDataConfirmed,
 }) => {
   const targetItem = order.items[itemIndex];
   if (!targetItem) {
@@ -24,7 +24,7 @@ export const prepareLoyaltyPointsForConfirmedOrderItem = ({
 
   const reserved = Math.ceil(Number(targetItem.loyaltyPointsReservedTotal) || 0);
   const points =
-    isPremiumUser && reserved > 0 && !targetItem.loyaltyPointsReserveReleased
+    isUserDataConfirmed && reserved > 0 && !targetItem.loyaltyPointsReserveReleased
       ? reserved
       : 0;
 

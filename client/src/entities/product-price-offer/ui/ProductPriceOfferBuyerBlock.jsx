@@ -12,6 +12,11 @@ import {
   PRICE_OFFER_STATUS_PENDING,
 } from "../model/constants.js";
 import { getProductPriceRubMaxError } from "../../product/lib/productPriceRubValidation.js";
+import {
+  clearPriceOfferPayFlowOpened,
+  isPriceOfferPayFlowOpened,
+  markPriceOfferPayFlowOpened,
+} from "../lib/priceOfferPayFlowStorage.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 import {
   INTEGER_INPUT_FIELD_PROPS,
@@ -20,6 +25,10 @@ import {
   parseRubPriceInput,
 } from "../../../shared/lib/numericInput.js";
 import { PRODUCT_PRICE_OFFER_UI } from "../../../shared/config/appUiCopy.js";
+import {
+  AccountRequirementModal,
+  useAccountRequirementModal,
+} from "../../../shared/ui/AccountRequirementModal/index.js";
 import { useAppShellCompactLayout } from "../../../shared/lib/useAppShellCompactLayout.js";
 
 import { ProductPriceOfferHintMessage } from "./ProductPriceOfferHintMessage.jsx";
@@ -69,6 +78,7 @@ export function ProductPriceOfferBuyerBlock({
   const isPaying = createOrderMutation.isPending;
   const isMobileNav = useAppShellCompactLayout();
   const dockSubmit = isMobileNav;
+  const confirmGate = useAccountRequirementModal();
 
   useEffect(() => {
     if (myOffer?.offerPrice != null) {
@@ -317,9 +327,22 @@ export function ProductPriceOfferBuyerBlock({
           ) : null}
 
           {isAuthorized && !isUserDataConfirmed && !isOwnProduct ? (
-            <ProductPriceOfferHintMessage>
-              {PRODUCT_PRICE_OFFER_UI.CONFIRMED_DATA_REQUIRED}
-            </ProductPriceOfferHintMessage>
+            <>
+              <ProductPriceOfferHintMessage>
+                {PRODUCT_PRICE_OFFER_UI.CONFIRMED_DATA_REQUIRED}
+              </ProductPriceOfferHintMessage>
+              <div className="product-price-offer__actions">
+                <button
+                  type="button"
+                  className="product-price-offer__btn product-price-offer__btn--primary"
+                  onClick={() =>
+                    confirmGate.require("data-confirmation", "сделать ставку на аукционе")
+                  }
+                >
+                  {PRODUCT_PRICE_OFFER_UI.CONFIRM_DATA_CTA}
+                </button>
+              </div>
+            </>
           ) : null}
 
           {statusText ? (
@@ -372,6 +395,7 @@ export function ProductPriceOfferBuyerBlock({
         </p>
       ) : null}
       {dockedPrimaryAction}
+      <AccountRequirementModal {...confirmGate.modalProps} />
     </section>
   );
 }

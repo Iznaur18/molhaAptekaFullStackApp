@@ -1,6 +1,10 @@
 import { useCallback, useMemo, useState } from "react";
 
 import { USER_STORY_UI } from "../../../shared/config/appUiCopy.js";
+import {
+  AccountRequirementModal,
+  useAccountRequirementModal,
+} from "../../../shared/ui/AccountRequirementModal/index.js";
 import { resolveUserStoryAvatarUrl } from "../lib/resolveUserStoryMedia.js";
 import { CreateUserStoryModal } from "./CreateUserStoryModal.jsx";
 import { UserStoryViewer } from "./UserStoryViewer.jsx";
@@ -30,6 +34,7 @@ export function UserStoriesStrip({
   onRequestLogin,
 }) {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const storyGate = useAccountRequirementModal();
   const [viewerAuthor, setViewerAuthor] = useState(
     /** @type {import('../model/types.js').UserStoryRingFromApi['author'] | null} */ (
       null
@@ -55,10 +60,11 @@ export function UserStoriesStrip({
       return;
     }
     if (!canPublish) {
+      storyGate.require("premium", "опубликовать сторис");
       return;
     }
     setIsCreateOpen(true);
-  }, [canPublish, isAuthorized, onRequestLogin]);
+  }, [canPublish, isAuthorized, onRequestLogin, storyGate]);
 
   if (!showStrip && sortedRings.length === 0) {
     return null;
@@ -129,6 +135,8 @@ export function UserStoriesStrip({
         onClose={() => setIsCreateOpen(false)}
         onPublished={onRefresh}
       />
+
+      <AccountRequirementModal {...storyGate.modalProps} />
 
       {viewerAuthor ? (
         <UserStoryViewer

@@ -62,6 +62,30 @@ export const useFeedScreenStyles = createThemedStyles((theme) => ({
     width: "100%",
     alignSelf: "stretch",
   },
+  // Корень сцены главной: интро-слой (absolute) + сдвигаемая шторка поверх.
+  homeFeedStage: {
+    flex: 1,
+    width: "100%",
+    alignSelf: "stretch",
+  },
+  // Задний слой с интро-видео — прижат к верху, высоту задаём инлайном (dockOffset).
+  homeFeedIntroBackdropLayer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+  },
+  // Передняя «шторка» с товарами: overflow скрывает контент за скруглённой кромкой.
+  // Непрозрачный фон обязателен: за шторкой лежит интро-бэкдроп (высотой почти
+  // во весь экран), и без заливки он просвечивал в прозрачных зонах списка —
+  // например, снизу под последним рядом при прокрутке вниз. В состоянии интро
+  // шторка сдвинута вниз и бэкдроп остаётся виден НАД её кромкой (заливка не
+  // мешает), а в открытой ленте она полностью перекрывает интро.
+  homeFeedSheet: {
+    flex: 1,
+    overflow: "hidden",
+    backgroundColor: theme.colors.bg,
+  },
   homeFeedListContent: {
     width: "100%",
     alignSelf: "stretch",

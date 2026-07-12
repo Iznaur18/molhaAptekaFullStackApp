@@ -1,4 +1,5 @@
 import { PRODUCT_CARD_UI } from "../../../shared/config/appUiCopy.js";
+import { useAuthSession } from "../../user/model/useAuthSession.js";
 import { resolveProductLoyaltyPointsPerUnit } from "../lib/resolveProductLoyaltyPointsPerUnit.js";
 import { shouldShowProductLoyaltyPointsBadge } from "../lib/shouldShowProductLoyaltyPointsBadge.js";
 
@@ -8,16 +9,17 @@ import "./ProductLoyaltyPointsBadge.css";
  * @param {{
  *   product: import('../model/types.js').ProductFromApi;
  *   isAuthorized?: boolean;
- *   isPremiumUser?: boolean;
  *   variant?: "inline" | "overlay";
  * }} props
  */
 export function ProductLoyaltyPointsBadge({
   product,
   isAuthorized = false,
-  isPremiumUser = false,
   variant = "inline",
 }) {
+  const { user } = useAuthSession();
+  const isUserDataConfirmed = isAuthorized && user?.isUserDataConfirmed === true;
+
   if (!shouldShowProductLoyaltyPointsBadge(product)) {
     return null;
   }
@@ -27,10 +29,10 @@ export function ProductLoyaltyPointsBadge({
     if (!isAuthorized) {
       return PRODUCT_CARD_UI.LOYALTY_POINTS_GUEST(points);
     }
-    if (isPremiumUser) {
-      return PRODUCT_CARD_UI.LOYALTY_POINTS_PREMIUM(points);
+    if (isUserDataConfirmed) {
+      return PRODUCT_CARD_UI.LOYALTY_POINTS_CONFIRMED(points);
     }
-    return PRODUCT_CARD_UI.LOYALTY_POINTS_WITH_PREMIUM(points);
+    return PRODUCT_CARD_UI.LOYALTY_POINTS_UNCONFIRMED(points);
   })();
 
   const className = [

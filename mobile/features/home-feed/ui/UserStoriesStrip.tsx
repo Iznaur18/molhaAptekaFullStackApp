@@ -1,16 +1,22 @@
-import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { FlatList, View } from "react-native";
 
 import type { UserStoryRing } from "@/entities/user-story/api/userStoryApi";
-import { resolveUserStoryAvatarUrl } from "@/entities/user-story/lib/resolveUserStoryAvatarUrl";
 import { CreateUserStoryModal } from "@/features/home-feed/ui/CreateUserStoryModal";
+import { StoryAddButton, StoryRingItem } from "@/features/home-feed/ui/UserStoryStripItems";
 import { UserStoryViewerModal } from "@/features/home-feed/ui/UserStoryViewerModal";
 import { USER_STORY_STRIP_LAYOUT } from "@/entities/user-story/lib/userStoryStripLayout";
-import { HOME_FEED_UI, USER_STORY_UI } from "@/shared/config";
+import { HOME_FEED_UI } from "@/shared/config";
+import { nestedHorizontalScrollProps } from "@/shared/lib/nestedHorizontalScrollProps";
 import { useUserStoriesStripStyles } from "@/shared/theme/catalogProductStyles";
+import {
+  AccountRequirementModal,
+  useAccountRequirementModal,
+} from "@/shared/ui/AccountRequirementModal";
 import { SquircleView } from "@/shared/ui/SquircleView";
+
+const STORIES_WINDOW_SIZE = 5;
 
 type UserStoriesStripProps = {
   rings: UserStoryRing[];
@@ -31,6 +37,7 @@ export const UserStoriesStrip = ({
 }: UserStoriesStripProps) => {
   const router = useRouter();
   const styles = useUserStoriesStripStyles();
+  const storyGate = useAccountRequirementModal();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [viewerAuthor, setViewerAuthor] = useState<UserStoryRing["author"] | null>(null);
 
@@ -53,10 +60,27 @@ export const UserStoriesStrip = ({
       return;
     }
     if (!canPublish) {
+      storyGate.require("premium", "опубликовать сторис");
       return;
     }
     setIsCreateOpen(true);
-  }, [canPublish, isAuthorized, router]);
+  }, [canPublish, isAuthorized, router, storyGate]);
+
+  const handleOpenRing = useCallback((author: UserStoryRing["author"]) => {
+    setViewerAuthor(author);
+  }, []);
+
+  const renderStoryRing = useCallback(
+    ({ item }: { item: UserStoryRing }) => (
+      <StoryRingItem ring={item} onOpen={handleOpenRing} />
+    ),
+    [handleOpenRing],
+  );
+
+  const listHeader = useMemo(
+    () => <StoryAddButton onPress={handleAddPress} />,
+    [handleAddPress],
+  );
 
   if (!showStrip && sortedRings.length === 0) {
     return null;
@@ -69,75 +93,45 @@ export const UserStoriesStrip = ({
           radius={USER_STORY_STRIP_LAYOUT.scrollBorderRadius}
           style={styles.scrollWrapper}
         >
-          <ScrollView
+          <FlatList
             horizontal
+            {...nestedHorizontalScrollProps}
+            data={sortedRings}
+            keyExtractor={(item) => String(item.author._id)}
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.scroll}
-          >
-          <Pressable style={styles.item} onPress={handleAddPress}>
-            <View style={styles.ringAdd}>
-              <Text style={styles.plus}>+</Text>
-            </View>
-            <Text style={styles.label} numberOfLines={1}>
-              {USER_STORY_UI.ADD_LABEL}
-            </Text>
-          </Pressable>
-
-          {sortedRings.map((ring) => {
-            const authorId = String(ring.author._id);
-            const authorName = ring.author.userName?.trim() || authorId;
-            const avatarUrl = resolveUserStoryAvatarUrl(ring.author);
-            const ringStyle =
-              ring.isOwn || ring.isViewed ? [styles.ring, styles.ringViewed] : styles.ring;
-
-            return (
-              <Pressable
-                key={authorId}
-                style={styles.item}
-                onPress={() => setViewerAuthor(ring.author)}
-              >
-                <View style={ringStyle}>
-                  {avatarUrl ? (
-                    <Image source={{ uri: avatarUrl }} style={styles.avatar} contentFit="cover" />
-                  ) : (
-                    <View style={styles.avatarFallback}>
-                      <Text style={styles.avatarFallbackText}>
-                        {authorName.slice(0, 1).toUpperCase()}
-                      </Text>
-                    </View>
-                  )}
-                  {ring.activeCount != null && ring.activeCount > 1 ? (
-                    <View style={styles.countBadge}>
-                      <Text style={styles.countText}>{ring.activeCount}</Text>
-                    </View>
-                  ) : null}
-                </View>
-                <Text style={styles.label} numberOfLines={1}>
-                  {authorName}
-                </Text>
-              </Pressable>
-            );
-          })}
-          </ScrollView>
+            ListHeaderComponent={listHeader}
+            windowSize={STORIES_WINDOW_SIZE}
+            maxToRenderPerBatch={6}
+            initialNumToRender={8}
+            removeClippedSubviews
+            renderItem={renderStoryRing}
+          />
         </SquircleView>
       </View>
 
-      <UserStoryViewerModal
-        authorId={viewerAuthor?._id ?? null}
-        authorName={viewerAuthor?.userName?.trim() || viewerAuthor?._id || ""}
-        authorAvatarUrl={viewerAuthor?.userAvatarUrl ?? null}
-        visible={viewerAuthor != null}
-        isAuthorized={isAuthorized}
-        currentUserId={currentUserId}
-        onClose={() => setViewerAuthor(null)}
-        onStoryDeleted={onPublished}
-      />
+      {viewerAuthor != null ? (
+        <UserStoryViewerModal
+          authorId={viewerAuthor._id ?? null}
+          authorName={viewerAuthor.userName?.trim() || viewerAuthor._id || ""}
+          authorAvatarUrl={viewerAuthor.userAvatarUrl ?? null}
+          visible
+          isAuthorized={isAuthorized}
+          currentUserId={currentUserId}
+          onClose={() => setViewerAuthor(null)}
+          onStoryDeleted={onPublished}
+        />
+      ) : null}
 
-      <CreateUserStoryModal
-        visible={isCreateOpen}
-        onClose={() => setIsCreateOpen(false)}
-        onPublished={onPublished}
-      />
+      {isCreateOpen ? (
+        <CreateUserStoryModal
+          visible
+          onClose={() => setIsCreateOpen(false)}
+          onPublished={onPublished}
+        />
+      ) : null}
+
+      <AccountRequirementModal {...storyGate.modalProps} />
     </>
   );
 };

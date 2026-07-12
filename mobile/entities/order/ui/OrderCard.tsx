@@ -26,6 +26,7 @@ import {
 import { INSTALLMENT_UI, MY_ORDERS_PAGE_UI, ORDER_CARD_UI, PRODUCT_CARD_UI } from "@/shared/config";
 import { formatIsoDateTime, formatPriceRub } from "@/shared/lib";
 import { useOrderCardStyles } from "@/shared/theme/commerceScreenStyles";
+import { CommerceCardExpandToggle } from "@/shared/ui/CommerceCardExpandToggle";
 
 type OrderItemActionContext = {
   orderId: string;
@@ -429,14 +430,11 @@ export const OrderCard = ({
             ) : null}
           </View>
           {collapsible ? (
-            <Pressable
-              style={styles.chevronButton}
-              accessibilityRole="button"
+            <CommerceCardExpandToggle
+              expanded={isExpanded}
               accessibilityLabel={MY_ORDERS_PAGE_UI.EXPAND_TOGGLE(isExpanded)}
               onPress={toggleExpanded}
-            >
-              <Text style={[styles.chevron, isExpanded ? styles.chevronExpanded : null]}>▸</Text>
-            </Pressable>
+            />
           ) : null}
         </View>
         <Text style={styles.total}>{formatPriceRub(order.totalAmount)}</Text>

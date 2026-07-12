@@ -16,10 +16,10 @@ export const COMMON_UI = {
 export const IMAGE_URL_FIELD_UI = {
   UPLOAD_BUTTON: "Выбрать файл",
   UPLOAD_LOADING: "Загрузка…",
-  UPLOAD_HINT: "JPEG, PNG или WebP, до 5 МБ. Можно также вставить ссылку.",
+  UPLOAD_HINT: "JPEG, PNG или WebP, до 50 МБ — большие файлы сожмутся автоматически. Можно также вставить ссылку.",
   UPLOAD_DISABLED_HINT: "Загрузка файла доступна после входа в аккаунт",
   ERROR_TYPE: "Допустимы только JPEG, PNG и WebP",
-  ERROR_SIZE: "Файл не больше 5 МБ",
+  ERROR_SIZE: "Файл не больше 50 МБ",
   ERROR_GENERIC: "Не удалось загрузить файл",
   ERROR_AUTH: "Войдите в аккаунт, чтобы загрузить файл",
   FILE_INPUT_ARIA: "Выбрать изображение с устройства",
@@ -215,6 +215,7 @@ export const PRODUCT_PRICE_OFFER_UI = {
   PAY_ORDER_PLACED: "Заказ по принятой цене оформлен",
   PAY_MODAL_TITLE: "Оплата по ставке",
   CONFIRMED_DATA_REQUIRED: "Доступно только пользователям с подтверждёнными данными",
+  CONFIRM_DATA_CTA: "Подтвердить данные",
   EMPTY_TOP: "Ставок пока нет",
   SELLER_EMPTY: "Предложений пока нет",
   SELLER_LOADING: "Загрузка…",
@@ -572,7 +573,7 @@ export const ORDER_CARD_UI = {
   BUYER_CANCEL_CONFIRM: "Отменить заказ?",
   DELETED_PRODUCT_NAME: "Товар удалён",
   /** @param {number} points */
-  LOYALTY_POINTS_LINE: (points) => `+${points} баллов за шт. (премиум-покупателю)`,
+  LOYALTY_POINTS_LINE: (points) => `+${points} баллов за шт. (подтверждённому покупателю)`,
 };
 
 /** Страница «Мои покупки» */
@@ -929,13 +930,14 @@ export const USER_DATA_CONFIRMATION_PROFILE_PAGE_UI = {
   PLAN_BENEFITS: [
     "Отзывы на товары после подтверждённой покупки",
     "Ставки на аукционе (предложение цены)",
-    "Покупка в рассрочку",
+    "Покупка и продажа в рассрочку",
     "Создание розыгрыша (для продавца)",
     "Товары в фильтре «Подтверждённые продавцы»",
     "Бейдж подтверждения у имени в каталоге",
+    "Баллы лояльности за покупки",
   ],
   PLAN_NOTE:
-    "Не заменяет премиум: баллы за покупки, 30 товаров и золотая обводка — отдельно.",
+    "Не заменяет премиум: 30 товаров, золотая обводка и сторис — отдельно.",
   STATUS_CONFIRMED: "Данные уже подтверждены.",
   STATUS_PENDING: "Заявка на рассмотрении. Дождитесь решения модератора.",
   /** @param {string} note */
@@ -951,7 +953,7 @@ export const DATA_CONFIRMATION_MODAL_UI = {
   INTRO:
     "Заполните паспортные данные и приложите фото с паспортом в руках. После проверки модератором у вас появится значок подтверждённого продавца.",
   LABEL_PASSPORT_SELFIE: "Ваше фото с паспортом в руках",
-  HINT_PASSPORT_SELFIE: "JPEG, PNG или WebP, до 5 МБ",
+  HINT_PASSPORT_SELFIE: "JPEG, PNG или WebP, до 50 МБ",
   ERROR_PASSPORT_SELFIE_REQUIRED: "Приложите фото с паспортом в руках",
   ERROR_PASSPORT_SELFIE_UPLOAD: "Не удалось загрузить фото",
   STATUS_PENDING: "Заявка на рассмотрении",
@@ -1189,6 +1191,45 @@ export const SELLER_PRODUCTS_LIMIT_MODAL_UI = {
     `Достигнут максимальный лимит премиум (${limit} товаров). Чтобы разместить новый товар, удалите один из существующих.`,
   CLOSE: "Понятно",
   ARIA_CLOSE_BACKDROP: "Закрыть",
+};
+
+/**
+ * Подсказка при попытке действия, требующего премиум или подтверждённый аккаунт.
+ * Объясняет, чего не хватает и как это получить, и ведёт в нужный раздел профиля.
+ */
+export const ACCOUNT_REQUIREMENT_MODAL_UI = {
+  ARIA_DIALOG: "Требуется доступ",
+  /** @param {string} [actionLabel] действие, которое пытался выполнить пользователь */
+  INTRO: (actionLabel) =>
+    actionLabel
+      ? `Чтобы ${actionLabel}, нужен ещё один шаг.`
+      : "Для этого действия нужен ещё один шаг.",
+  BENEFITS_TITLE: "Что вы получите:",
+  CLOSE: "Позже",
+  premium: {
+    TITLE: "Нужен премиум",
+    DESCRIPTION:
+      "Действие доступно пользователям с активным премиумом. Его можно оформить за баллы лояльности — срок 1 месяц.",
+    BENEFITS: [
+      "До 30 товаров в каталоге",
+      "Золотая обводка и галочка у имени",
+      "Сторис и фон профиля",
+    ],
+    CTA: "Оформить премиум",
+  },
+  "data-confirmation": {
+    TITLE: "Нужен подтверждённый аккаунт",
+    DESCRIPTION:
+      "Действие доступно после подтверждения данных. Приложите фото с паспортом — модератор проверит заявку.",
+    BENEFITS: [
+      "Отзывы после подтверждённой покупки",
+      "Ставки на аукционе",
+      "Покупка и продажа в рассрочку",
+      "Баллы лояльности за покупки",
+      "Значок подтверждённого аккаунта",
+    ],
+    CTA: "Подтвердить данные",
+  },
 };
 
 /** Модалка создания товара (`POST /product`) */
@@ -1454,16 +1495,16 @@ export const PRODUCT_CARD_UI = {
   PROMOTION_BANNER_BADGE: "Баннер",
   RAFFLE_BADGE: "Розыгрыш",
   AUCTION_BADGE: "Аукцион",
-  LOYALTY_POINTS_TOOLTIP: "Даёт продавец; получает премиум-покупатель",
+  LOYALTY_POINTS_TOOLTIP: "Даёт продавец; получает подтверждённый покупатель",
   /** @param {number} percent */
   DISCOUNT_BADGE: (percent) => `-${percent}%`,
   /** @param {number} points */
-  LOYALTY_POINTS_PREMIUM: (points) => `+${points} ${pluralizeRuBall(points)}`,
+  LOYALTY_POINTS_CONFIRMED: (points) => `+${points} ${pluralizeRuBall(points)}`,
   /** @param {number} points */
-  LOYALTY_POINTS_WITH_PREMIUM: (points) => `+${points} ${pluralizeRuBall(points)}`,
+  LOYALTY_POINTS_UNCONFIRMED: (points) => `+${points} ${pluralizeRuBall(points)}`,
   /** @param {number} points */
   LOYALTY_POINTS_GUEST: (points) =>
-    `+${points} ${pluralizeRuBall(points)} с премиум`,
+    `+${points} ${pluralizeRuBall(points)} с подтверждением`,
   LOYALTY_POINTS_OVERCOMMITTED_BADGE: "Бонус выше доступного остатка баллов",
   RAFFLE_PARTICIPATION_ON: "Участвует в розыгрыше",
   RAFFLE_PARTICIPATION_OFF: "Добавить в розыгрыш",
@@ -1698,6 +1739,7 @@ export const RAFFLE_FEATURED_BANNER_UI = {
   COMPLETED: "Завершён",
   OPEN_PRODUCTS: "Товары розыгрыша",
   OPEN_INSTAGRAM: "Итоги в Instagram",
+  DESCRIPTION_LINK: "Описание",
   DESCRIPTION_MODAL_TITLE: "Описание",
   DESCRIPTION_OPEN_ARIA: "Открыть полное описание розыгрыша",
   INFO_TOGGLE_OPEN_ARIA: "Показать название и описание розыгрыша",
@@ -1917,7 +1959,7 @@ export const LOYALTY_POINTS_PAGE_UI = {
   FETCH_FALLBACK: "Не удалось загрузить баллы",
   /** @param {number} balance */
   BALANCE_POINTS: (balance) => `Ваш баланс: ${balance} ${pluralizeRuBall(balance)}`,
-  INFO: "1 балл = 1 ₽. Продавец задаёт бонус за покупку; премиум-покупатель получает баллы после подтверждения получения.",
+  INFO: "1 балл = 1 ₽. Продавец задаёт бонус за покупку; подтверждённый покупатель получает баллы после подтверждения получения.",
   PURCHASE_SECTION: "Пополнение",
   PURCHASE_AMOUNT_LABEL: "Сумма, ₽",
   PURCHASE_AMOUNT_HINT: "1 ₽ = 1 балл. Укажите, сколько хотите купить.",
@@ -1952,10 +1994,8 @@ export const PREMIUM_PAGE_UI = {
   PLAN_PERIOD: "Срок: 1 календарный месяц",
   PLAN_BENEFITS: [
     "До 30 товаров в каталоге (вместо 15)",
-    "Баллы лояльности за покупки",
     "Золотая обводка и галочка у имени",
     "Сторис и фон профиля по ссылке",
-    "Рассрочка для продавца (нужны подтверждённые данные)",
     "Товары в фильтре «Только премиум»",
     "Просмотр покупок других пользователей",
   ],

@@ -5,11 +5,26 @@ import { CART_LINE_IMAGE_SIZE } from "@/shared/config/cartConstants";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { semanticColors } from "@/shared/theme/semanticColors";
 
+const ORDER_CARD_RADIUS = 12;
+const ORDER_CARD_HEADER_BADGE_FONT_SIZE = 10.24;
+const ORDER_CARD_HEADER_BADGE_PADDING_H = 8.32;
+const ORDER_CARD_HEADER_BADGE_PADDING_V = 3.2;
+const ORDER_CARD_HEADER_BADGE_GAP = 4.8;
+
+const orderCardHeaderBadgeBase = {
+  fontSize: ORDER_CARD_HEADER_BADGE_FONT_SIZE,
+  fontWeight: "600" as const,
+  paddingHorizontal: ORDER_CARD_HEADER_BADGE_PADDING_H,
+  paddingVertical: ORDER_CARD_HEADER_BADGE_PADDING_V,
+  borderRadius: 999,
+  overflow: "hidden" as const,
+};
+
 export const useOrderCardStyles = createThemedStyles((theme) => ({
   card: {
     padding: 14,
     marginBottom: theme.spacing[3],
-    borderRadius: theme.radius.sm,
+    borderRadius: ORDER_CARD_RADIUS,
     backgroundColor: theme.colors.surface,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
@@ -25,24 +40,6 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     alignItems: "flex-start",
     gap: 6,
     minWidth: 0,
-  },
-  chevronButton: {
-    flexShrink: 0,
-    padding: 2,
-  },
-  chevron: {
-    width: 20,
-    height: 20,
-    borderRadius: 999,
-    overflow: "hidden",
-    backgroundColor: theme.colors.surfaceMuted,
-    color: theme.colors.textMuted,
-    fontSize: 12,
-    lineHeight: 20,
-    textAlign: "center",
-  },
-  chevronExpanded: {
-    transform: [{ rotate: "90deg" }],
   },
   collapsedPreview: {
     fontSize: 13.1,
@@ -61,33 +58,18 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     flexDirection: "row",
     flexWrap: "wrap",
     alignItems: "center",
-    gap: 6,
+    gap: ORDER_CARD_HEADER_BADGE_GAP,
   },
   statusBadge: {
-    fontSize: 12.8,
-    fontWeight: "600",
-    paddingHorizontal: 10.4,
-    paddingVertical: 4,
-    borderRadius: 999,
-    overflow: "hidden",
+    ...orderCardHeaderBadgeBase,
   },
   installmentBadge: {
-    fontSize: 12.8,
-    fontWeight: "600",
-    paddingHorizontal: 10.4,
-    paddingVertical: 4,
-    borderRadius: 999,
-    overflow: "hidden",
+    ...orderCardHeaderBadgeBase,
     backgroundColor: semanticColors.actionSoft,
     color: theme.colors.actionHover,
   },
   auctionBadge: {
-    fontSize: 12.8,
-    fontWeight: "600",
-    paddingHorizontal: 10.4,
-    paddingVertical: 4,
-    borderRadius: 999,
-    overflow: "hidden",
+    ...orderCardHeaderBadgeBase,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: semanticColors.actionBorder,
     backgroundColor: semanticColors.infoSoft,
@@ -301,7 +283,7 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
 export const useCartLineItemStyles = createThemedStyles((theme) => ({
   rowOuter: {
     marginHorizontal: 12,
-    marginBottom: 10,
+    marginBottom: 4,
   },
   row: {
     paddingHorizontal: 16,

@@ -8,8 +8,10 @@ import {
   isBooleanProfileRow,
 } from "@/entities/user/lib/groupProfileRows";
 import { getProfileRowIcon } from "@/entities/user/lib/profileRowIcons";
+import { PROFILE_CARD_SQUIRCLE_RADIUS } from "@/shared/theme/profileChromeStyles";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { semanticColors } from "@/shared/theme/semanticColors";
+import { SquircleView } from "@/shared/ui/SquircleView";
 
 type UserProfileInfoPanelProps = {
   rows: ProfileRow[];
@@ -26,48 +28,8 @@ const useStyles = createThemedStyles((theme) => ({
   root: {
     gap: theme.spacing[4],
   },
-  statsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-  },
-  statCard: {
-    width: "48%",
-    minWidth: 130,
-    flexGrow: 1,
-    borderWidth: 1,
-    borderRadius: 12,
-    padding: 14,
-    gap: 4,
-  },
-  statHead: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  statIconWrap: {
-    width: 28,
-    height: 28,
-    borderRadius: 7,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  statValue: {
-    fontSize: 17,
-    fontWeight: "800",
-    letterSpacing: -0.4,
-    lineHeight: 22,
-  },
-  statLabel: {
-    fontSize: 11,
-    fontWeight: "600",
-    lineHeight: 15,
-    paddingLeft: 36,
-  },
   section: {
     borderWidth: 1,
-    borderRadius: 12,
-    overflow: "hidden",
   },
   sectionTitle: {
     fontSize: 11,
@@ -77,9 +39,9 @@ const useStyles = createThemedStyles((theme) => ({
     paddingVertical: 8,
     paddingHorizontal: 14,
     borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  detailsCard: {
-    overflow: "hidden",
+    backgroundColor: theme.colors.ink,
+    color: theme.colors.onContrast,
+    borderBottomColor: theme.colors.ink,
   },
   detailRow: {
     flexDirection: "row",
@@ -143,52 +105,17 @@ export const UserProfileInfoPanel = ({ rows }: UserProfileInfoPanelProps) => {
 
   return (
     <View style={styles.root}>
-      {sections.map((section, sectionIndex) => {
+      {sections.map((section) => {
         const { bg, border, color, iconBg } = PROFILE_INFO_PALETTE;
-        if (section.id === "stats") {
-          return (
-            <View key={section.id} style={styles.statsGrid}>
-              {section.rows.map((row, rowIndex) => {
-                const icon = getProfileRowIcon(row.id);
-                return (
-                  <View
-                    key={row.id}
-                    style={[styles.statCard, { backgroundColor: bg, borderColor: border }]}
-                  >
-                    <View style={styles.statHead}>
-                      {icon ? (
-                        <View style={[styles.statIconWrap, { backgroundColor: iconBg }]}>
-                          <Feather name={icon} size={14} color={color} />
-                        </View>
-                      ) : null}
-                      <Text style={[styles.statValue, { color }]}>{row.value}</Text>
-                    </View>
-                    <Text style={[styles.statLabel, { color }]}>{row.label}</Text>
-                  </View>
-                );
-              })}
-            </View>
-          );
-        }
 
         return (
-          <View
+          <SquircleView
             key={section.id}
+            radius={PROFILE_CARD_SQUIRCLE_RADIUS}
             style={[styles.section, { backgroundColor: bg, borderColor: border }]}
           >
             {section.title ? (
-              <Text
-                style={[
-                  styles.sectionTitle,
-                  {
-                    color,
-                    backgroundColor: iconBg,
-                    borderBottomColor: border,
-                  },
-                ]}
-              >
-                {section.title}
-              </Text>
+              <Text style={styles.sectionTitle}>{section.title}</Text>
             ) : null}
             {section.rows.map((row, index) => {
               const icon = getProfileRowIcon(row.id);
@@ -239,7 +166,7 @@ export const UserProfileInfoPanel = ({ rows }: UserProfileInfoPanelProps) => {
                 </View>
               );
             })}
-          </View>
+          </SquircleView>
         );
       })}
     </View>

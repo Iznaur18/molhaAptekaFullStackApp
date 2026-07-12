@@ -1,11 +1,7 @@
 import { APP_INTRO_SETTINGS_KEY } from "../../constants/appIntroSettingsConstants.js";
 import { AppIntroSettingsModel } from "../../models/AppIntroSettingsModel.js";
 import { cleanupReplacedAppIntroMedia } from "../../services/intro-ad/cleanupReplacedAppIntroMedia.js";
-import {
-  pauseActiveIntroAdCampaignsForPlatformIntro,
-  resolvePaidIntroForPublicPlayback,
-  resumePausedIntroAdCampaigns,
-} from "../../services/intro-ad/introAdCampaignHelpers.js";
+import { resolvePaidIntrosForPublicPlayback } from "../../services/intro-ad/introAdCampaignHelpers.js";
 import { resolveAppIntroSettingsPayload } from "../../services/intro-ad/resolveAppIntroSettingsPayload.js";
 import { successRes } from "../../services/http/index.js";
 
@@ -29,13 +25,12 @@ export const getAppIntroSettingsController = async (_req, res) => {
   }).lean();
 
   const settings = resolveAppIntroSettingsPayload(row);
-  const paidIntro = await resolvePaidIntroForPublicPlayback(
-    settings.prioritizePlatformIntro,
-  );
+  const paidIntros = await resolvePaidIntrosForPublicPlayback();
 
   return successRes(res, {
     settings,
-    paidIntro,
+    paidIntro: paidIntros[0] ?? null,
+    paidIntros,
   });
 };
 
@@ -112,19 +107,12 @@ export const patchAppIntroSettingsController = async (req, res) => {
     { upsert: true, returnDocument: "after", runValidators: true },
   ).lean();
 
-  if (saved?.prioritizePlatformIntro === true) {
-    await pauseActiveIntroAdCampaignsForPlatformIntro();
-  } else if (body.prioritizePlatformIntro === false) {
-    await resumePausedIntroAdCampaigns();
-  }
-
   const settings = resolveAppIntroSettingsPayload(saved);
-  const paidIntro = await resolvePaidIntroForPublicPlayback(
-    settings.prioritizePlatformIntro,
-  );
+  const paidIntros = await resolvePaidIntrosForPublicPlayback();
 
   return successRes(res, {
     settings,
-    paidIntro,
+    paidIntro: paidIntros[0] ?? null,
+    paidIntros,
   });
 };

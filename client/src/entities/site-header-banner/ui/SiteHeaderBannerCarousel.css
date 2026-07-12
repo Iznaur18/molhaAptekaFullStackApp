@@ -6,7 +6,10 @@
 
 .site-header-banner-carousel__viewport {
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: 22px;
+  /* Вертикальный скролл страницы — браузеру; горизонтальный свайп — JS-карусели
+     (с определением направления жеста в обработчиках pointer). */
+  touch-action: pan-y;
 }
 
 .site-header-banner-carousel__track {
@@ -20,7 +23,7 @@
   width: 100%;
   min-height: var(--site-header-banner-height);
   overflow: hidden;
-  border-radius: 10px;
+  border-radius: 22px;
 }
 
 .site-header-banner-carousel__ad-badge {
@@ -82,7 +85,7 @@
 }
 
 .site-header-banner-carousel_single .site-header-banner-carousel__slide {
-  border-radius: 10px;
+  border-radius: 22px;
 }
 
 @container app-viewport (max-width: 640px) {

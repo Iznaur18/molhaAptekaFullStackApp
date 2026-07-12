@@ -17,7 +17,7 @@ const PROFILE_ROW_SECTIONS: Array<{
 }> = [
   {
     id: "stats",
-    title: "Статистика",
+    title: "Основное",
     rowIds: [
       "followersCount",
       "followingCount",

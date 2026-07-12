@@ -21,11 +21,18 @@ const computeUserStoryFrameSize = (viewportWidth, viewportHeight) => {
 
 test("story viewer modal is fullscreen with web-like frame", () => {
   const source = readMobileFile("features/home-feed/ui/UserStoryViewerModal.tsx");
+  const styles = readMobileFile("shared/theme/modalChromeStyles.ts");
 
   assert.match(source, /presentationStyle="fullScreen"/);
   assert.match(source, /computeUserStoryFrameSize/);
   assert.match(source, /contentFit="cover"/);
   assert.match(source, /styles\.edgePrev/);
+  assert.match(source, /styles\.edgeNext/);
+  assert.match(source, /pointerEvents="none"/);
+  assert.match(source, /styles\.footer/);
+  assert.match(source, /<View style=\{\[styles\.frame, frameSize\]\}>[\s\S]*styles\.edgePrev/);
+  assert.match(styles, /footer:[\s\S]*zIndex: 4/);
+  assert.match(styles, /edgePrev:[\s\S]*zIndex: 1/);
 });
 
 test("computeUserStoryFrameSize matches web mobile viewport", () => {

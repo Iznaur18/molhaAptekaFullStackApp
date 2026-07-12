@@ -1,8 +1,9 @@
 import { SITE_HEADER_BANNER_HEIGHT_PX } from "@molha/api-contract";
+import { RAFFLE_FEATURED_CARD_BORDER_RADIUS } from "@izibuy/shared-lib";
 
 export const SITE_HEADER_BANNER_LAYOUT = {
   height: SITE_HEADER_BANNER_HEIGHT_PX,
-  radius: 16,
+  radius: RAFFLE_FEATURED_CARD_BORDER_RADIUS,
   dotSize: 6,
   dotGap: 6,
   dotsBottomInset: 8,

@@ -2,8 +2,9 @@ import { StyleSheet } from "react-native";
 
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-export const useUserListRowStyles = createThemedStyles((theme) => ({
-  row: {
+const USER_LIST_ROW_AVATAR_SIZE = Math.round(52 * 1.2);
+
+export const useUserListRowStyles = createThemedStyles((theme) => ({  row: {
     flex: 1,
     flexDirection: "column",
     alignItems: "stretch",
@@ -23,8 +24,8 @@ export const useUserListRowStyles = createThemedStyles((theme) => ({
     gap: 8,
   },
   avatar: {
-    width: 52,
-    height: 52,
+    width: USER_LIST_ROW_AVATAR_SIZE,
+    height: USER_LIST_ROW_AVATAR_SIZE,
   },
   nameWrap: {
     width: "100%",
@@ -75,9 +76,6 @@ export const useUserListRowStyles = createThemedStyles((theme) => ({
     paddingVertical: 6,
     borderRadius: 8,
     backgroundColor: theme.colors.surfaceMuted,
-  },
-  metricCellWide: {
-    width: "48%",
   },
   metricLabel: {
     fontSize: 10,

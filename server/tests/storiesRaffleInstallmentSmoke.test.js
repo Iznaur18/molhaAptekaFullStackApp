@@ -7,7 +7,6 @@ import {
   approveProductViaApi,
   confirmUserData,
   createProductViaApi,
-  enablePremiumUser,
   ensureProductCategoryTreeSeeded,
   parseSuccessData,
   registerUserAndGetCookie,
@@ -229,7 +228,6 @@ test("installment smoke: program → approve → contract → my list", async ()
   );
   await verifyUserEmail("int-inst-seller@example.com");
   await confirmUserData(seller._id);
-  await enablePremiumUser(seller._id);
 
   const product = await createProductViaApi(request, sellerCookie, {
     productName: "Installment smoke product",

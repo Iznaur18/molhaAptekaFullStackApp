@@ -7,6 +7,7 @@ import {
   hasProductCatalogDiscount,
   resolveProductDiscountPercent,
 } from "@/entities/product/lib/computeProductDiscountPercent";
+import { buildMyProductCompactCardFeatureBadges } from "@/entities/product/lib/buildMyProductCompactCardFeatureBadges";
 import {
   canSellerEditProduct,
   getProductModerationBadgeLabel,
@@ -14,11 +15,11 @@ import {
   getProductModerationRejectionComment,
   isProductModerationPending,
 } from "@/entities/product/lib/getProductModerationUi";
-import { getProductCardMineStatusBadge } from "@/entities/product/lib/getProductCardMineStatusBadge";
+import { resolveProductPromotionCompactBadge } from "@/entities/product/lib/resolveProductPromotionCompactBadge";
 import { resolveProductLoyaltyPointsPerUnit } from "@/entities/product/lib/resolveProductLoyaltyPointsPerUnit";
 import { shouldShowProductLoyaltyPointsBadge } from "@/entities/product/lib/shouldShowProductLoyaltyPointsBadge";
 import { ProductCompactCardMediaThumb } from "@/entities/product/ui/ProductCompactCardMediaThumb";
-import { ProductCardSellerRow } from "@/entities/product/ui/ProductCardSellerRow";
+import { ProductCompactCardStatusPill } from "@/entities/product/ui/ProductCompactCardStatusPill";
 import { ProductCardSellerToolbar } from "@/entities/product/ui/ProductCardSellerToolbar";
 import { ProductPriceDisplay } from "@/entities/product/ui/ProductPriceDisplay";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
@@ -46,7 +47,7 @@ export const MyProductCatalogCard = ({
   const router = useRouter();
   const styles = useProductCompactCardStyles();
   const isAuthorized = useIsAuthorized();
-  const { isPremiumUser } = useUserAccess();
+  const { isUserDataConfirmed } = useUserAccess();
 
   const name = product.productName?.trim() || "Без названия";
   const openProductLabel = PRODUCT_UI.OPEN_ARIA(name);
@@ -57,7 +58,8 @@ export const MyProductCatalogCard = ({
   const moderationLabel = getProductModerationBadgeLabel(product);
   const rejectionComment = getProductModerationRejectionComment(product, true);
   const isPending = isProductModerationPending(product);
-  const mineStatusBadge = getProductCardMineStatusBadge({
+  const promotionBadge = resolveProductPromotionCompactBadge(product);
+  const featureBadges = buildMyProductCompactCardFeatureBadges({
     product,
     isLoyaltyPointsOvercommitted,
   });
@@ -65,9 +67,9 @@ export const MyProductCatalogCard = ({
   const loyaltyPoints = resolveProductLoyaltyPointsPerUnit(product);
   const loyaltyLabel = !isAuthorized
     ? PRODUCT_CARD_UI.LOYALTY_POINTS_GUEST(loyaltyPoints)
-    : isPremiumUser
-      ? PRODUCT_CARD_UI.LOYALTY_POINTS_PREMIUM(loyaltyPoints)
-      : PRODUCT_CARD_UI.LOYALTY_POINTS_WITH_PREMIUM(loyaltyPoints);
+    : isUserDataConfirmed
+      ? PRODUCT_CARD_UI.LOYALTY_POINTS_CONFIRMED(loyaltyPoints)
+      : PRODUCT_CARD_UI.LOYALTY_POINTS_UNCONFIRMED(loyaltyPoints);
 
   const openProduct = () => {
     router.push({ pathname: "/product/[id]", params: { id: product._id } });
@@ -103,6 +105,43 @@ export const MyProductCatalogCard = ({
                 {moderationLabel}
               </Text>
             </View>
+            {hasDiscount && discountPercent != null ? (
+              <View style={styles.discountPill}>
+                <Text style={styles.discountPillText}>-{discountPercent}%</Text>
+              </View>
+            ) : null}
+            {promotionBadge ? (
+              <View
+                style={[
+                  styles.promotionPill,
+                  promotionBadge.tier === "top"
+                    ? styles.promotionPillTop
+                    : promotionBadge.tier === "banner"
+                      ? styles.promotionPillBanner
+                      : styles.promotionPillBoost,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.promotionPillText,
+                    promotionBadge.tier === "top"
+                      ? styles.promotionPillTextTop
+                      : promotionBadge.tier === "banner"
+                        ? styles.promotionPillTextBanner
+                        : styles.promotionPillTextBoost,
+                  ]}
+                >
+                  {promotionBadge.label}
+                </Text>
+              </View>
+            ) : null}
+            {featureBadges.map((badge) => (
+              <ProductCompactCardStatusPill
+                key={badge.key}
+                label={badge.label}
+                variant={badge.variant}
+              />
+            ))}
           </View>
 
           <Pressable
@@ -117,11 +156,6 @@ export const MyProductCatalogCard = ({
 
           <View style={styles.priceRow}>
             <ProductPriceDisplay product={product} showLabel={false} variant="inline" />
-            {hasDiscount && discountPercent != null ? (
-              <View style={styles.discountPill}>
-                <Text style={styles.discountPillText}>-{discountPercent}%</Text>
-              </View>
-            ) : null}
             {showLoyaltyPoints ? (
               <View style={styles.loyaltyPill}>
                 <Text style={styles.loyaltyPillText} numberOfLines={1}>
@@ -136,16 +170,6 @@ export const MyProductCatalogCard = ({
               {reviewLine}
             </Text>
           ) : null}
-
-          {mineStatusBadge ? (
-            <Text style={styles.metaHint} numberOfLines={2}>
-              {mineStatusBadge.label}
-            </Text>
-          ) : null}
-
-          <View style={styles.metaRow}>
-            <ProductCardSellerRow product={product} />
-          </View>
         </View>
       </View>
 

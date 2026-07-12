@@ -1,5 +1,18 @@
 export const UPLOAD_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 
+/**
+ * Исходник изображения на клиенте: принимаем до 50 МБ, перед отправкой
+ * клиент сжимает файл — на сервер большой оригинал не уходит.
+ */
+export const UPLOAD_IMAGE_SOURCE_MAX_MB = 50;
+export const UPLOAD_IMAGE_SOURCE_MAX_BYTES = UPLOAD_IMAGE_SOURCE_MAX_MB * 1024 * 1024;
+
+/** Целевой размер изображения после клиентского сжатия. */
+export const UPLOAD_IMAGE_COMPRESS_TARGET_BYTES = 2 * 1024 * 1024;
+
+/** Максимальная сторона изображения после клиентского сжатия, px. */
+export const UPLOAD_IMAGE_COMPRESS_MAX_DIMENSION = 2560;
+
 export const UPLOAD_IMAGE_MIME_TYPES = [
   "image/jpeg",
   "image/jpg",

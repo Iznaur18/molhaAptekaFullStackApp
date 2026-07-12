@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { memo, useCallback, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 
@@ -74,7 +74,7 @@ type ProductCardProps = {
   isLoyaltyPointsOvercommitted?: boolean;
 };
 
-export const ProductCard = ({
+export const ProductCard = memo(({
   product,
   promotionFullWidth = false,
   layout = "default",
@@ -233,7 +233,6 @@ export const ProductCard = ({
               <ProductLoyaltyPointsBadge
                 product={product}
                 isAuthorized={isAuthorized}
-                isPremiumUser={isPremiumUser}
                 variant="overlay"
               />
             ) : null}
@@ -388,4 +387,6 @@ export const ProductCard = ({
       ) : null}
     </Animated.View>
   );
-};
+});
+
+ProductCard.displayName = "ProductCard";

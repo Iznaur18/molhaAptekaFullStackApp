@@ -1,3 +1,4 @@
+import { Feather } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
@@ -10,12 +11,15 @@ import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMob
 import { SubscriptionUserRow } from "@/features/subscriptions-page/ui/SubscriptionUserRow";
 import { MY_PROFILE_PAGE_UI, SUBSCRIPTIONS_PAGE_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { pluralizeRu } from "@/shared/lib/pluralizeRu";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useSubscriptionsPageStyles } from "@/shared/theme/subscriptionsPageStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 export const SubscriptionsPage = () => {
   const router = useRouter();
+  const theme = useAppTheme();
   const styles = useSubscriptionsPageStyles();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
   const isAuthorized = useIsAuthorized();
@@ -44,6 +48,31 @@ export const SubscriptionsPage = () => {
         activeLabel={MY_PROFILE_PAGE_UI.TAB_SUBSCRIPTIONS}
         onPress={() => setNavSheetVisible(true)}
       />
+
+      <View
+        style={styles.heroCard}
+        accessibilityLabel={`${SUBSCRIPTIONS_PAGE_UI.HERO_CAPTION}: ${users.length} ${pluralizeRu(users.length, SUBSCRIPTIONS_PAGE_UI.HERO_UNIT_FORMS)}`}
+      >
+        <View style={styles.heroTextBlock}>
+          <Text style={styles.heroCaption}>{SUBSCRIPTIONS_PAGE_UI.HERO_CAPTION}</Text>
+          <View style={styles.heroRow}>
+            <Text style={styles.heroValue}>{users.length}</Text>
+            <Text style={styles.heroUnit}>
+              {pluralizeRu(users.length, SUBSCRIPTIONS_PAGE_UI.HERO_UNIT_FORMS)}
+            </Text>
+          </View>
+          <Text style={styles.heroInfo}>{SUBSCRIPTIONS_PAGE_UI.HERO_INFO}</Text>
+        </View>
+        <View style={styles.heroIconWrap}>
+          <Feather
+            name="users"
+            size={24}
+            color={theme.colors.onContrast}
+            accessibilityElementsHidden
+            importantForAccessibility="no"
+          />
+        </View>
+      </View>
     </View>
   );
 

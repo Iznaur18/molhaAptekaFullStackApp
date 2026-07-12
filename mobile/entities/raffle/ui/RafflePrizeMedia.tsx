@@ -16,19 +16,30 @@ import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
 type RafflePrizeVideoProps = {
   uri: string;
   isMuted: boolean;
+  isActive?: boolean;
   style: ReturnType<typeof useRaffleFeaturedBannerStyles>["media"];
 };
 
-const RafflePrizeVideo = ({ uri, isMuted, style }: RafflePrizeVideoProps) => {
+const RafflePrizeVideo = ({ uri, isMuted, isActive = true, style }: RafflePrizeVideoProps) => {
   const player = useVideoPlayer(uri, (instance) => {
     instance.loop = true;
     instance.muted = isMuted;
-    instance.play();
+    if (isActive) {
+      instance.play();
+    }
   });
 
   useEffect(() => {
     player.muted = isMuted;
   }, [isMuted, player]);
+
+  useEffect(() => {
+    if (isActive) {
+      player.play();
+      return;
+    }
+    player.pause();
+  }, [isActive, player]);
 
   return <VideoView player={player} style={style} contentFit="cover" nativeControls={false} />;
 };
@@ -36,9 +47,14 @@ const RafflePrizeVideo = ({ uri, isMuted, style }: RafflePrizeVideoProps) => {
 type RafflePrizeMediaProps = {
   raffle: RaffleFromApi;
   showSoundToggle?: boolean;
+  isVideoActive?: boolean;
 };
 
-export const RafflePrizeMedia = ({ raffle, showSoundToggle = false }: RafflePrizeMediaProps) => {
+export const RafflePrizeMedia = ({
+  raffle,
+  showSoundToggle = false,
+  isVideoActive = true,
+}: RafflePrizeMediaProps) => {
   const styles = useRaffleFeaturedBannerStyles();
   const { theme } = useAppThemeSettings();
   const [isMuted, setIsMuted] = useState(true);
@@ -51,7 +67,7 @@ export const RafflePrizeMedia = ({ raffle, showSoundToggle = false }: RafflePriz
   if (isVideo && videoSrc) {
     return (
       <View style={styles.videoWrap}>
-        <RafflePrizeVideo uri={videoSrc} isMuted={isMuted} style={styles.media} />
+        <RafflePrizeVideo uri={videoSrc} isMuted={isMuted} isActive={isVideoActive} style={styles.media} />
         {showSoundToggle ? (
           <Pressable
             style={styles.soundButton}

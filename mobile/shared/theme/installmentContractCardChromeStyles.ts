@@ -39,24 +39,6 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
     alignItems: "center",
     gap: 8,
   },
-  chevronButton: {
-    flexShrink: 0,
-    alignSelf: "center",
-  },
-  chevron: {
-    width: 20,
-    height: 20,
-    borderRadius: 999,
-    overflow: "hidden",
-    textAlign: "center",
-    lineHeight: 20,
-    fontSize: 12,
-    color: theme.colors.onContrast,
-    backgroundColor: theme.colors.nearBlack,
-  },
-  chevronExpanded: {
-    transform: [{ rotate: "90deg" }],
-  },
   nextDue: {
     fontSize: 13.1,
     color: theme.colors.textSecondary,
@@ -281,8 +263,8 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
     paddingHorizontal: 10.4,
     borderRadius: 6.4,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.borderStrong,
-    backgroundColor: theme.colors.surface,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surfaceMuted,
   },
   btnPrimary: {
     borderColor: theme.colors.action,

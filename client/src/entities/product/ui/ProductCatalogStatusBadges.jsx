@@ -85,7 +85,6 @@ export function ProductCatalogStatusBadges({
         <ProductLoyaltyPointsBadge
           product={product}
           isAuthorized={isAuthorized}
-          isPremiumUser={isPremiumUser}
           variant="inline"
         />
       ) : null}

@@ -205,6 +205,33 @@ export const useLoginScreenStyles = createThemedStyles((theme) => ({
     fontWeight: "600",
     color: theme.colors.link,
   },
+  consentBlock: {
+    gap: theme.spacing[3],
+    marginTop: theme.spacing[1],
+  },
+  consentRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: theme.spacing[2],
+  },
+  consentTextWrap: {
+    flex: 1,
+    gap: theme.spacing[2],
+  },
+  consentText: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: theme.colors.textSecondary,
+  },
+  consentLink: {
+    color: theme.colors.link,
+    fontWeight: "600",
+  },
+  consentSummary: {
+    fontSize: 12,
+    lineHeight: 17,
+    color: theme.colors.textMuted,
+  },
 }));
 
 export const useFormFieldStyles = createThemedStyles((theme) => ({

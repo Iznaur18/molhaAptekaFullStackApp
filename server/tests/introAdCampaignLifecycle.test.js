@@ -6,6 +6,7 @@ import mongoose from "mongoose";
 import {
   INTRO_AD_CAMPAIGN_STATUS_ACTIVE,
   INTRO_AD_CAMPAIGN_STATUS_QUEUED,
+  INTRO_AD_MAX_ACTIVE,
   INTRO_AD_NOTIFICATION_KIND_EXPIRED,
   INTRO_AD_PRICE_POINTS,
 } from "../constants/introAdCampaignConstants.js";
@@ -14,6 +15,8 @@ import {
   activateNextQueuedIntroAdCampaign,
   assertNoOpenIntroAdCampaignForAdvertiser,
   expireIntroAdCampaignsAndActivateQueue,
+  fillIntroAdActiveSlotsFromQueue,
+  resolvePaidIntrosForPublicPlayback,
 } from "../services/intro-ad/introAdCampaignHelpers.js";
 import { assertIntroAdMediaUrlsAreUploadedAssets } from "../services/intro-ad/validateIntroAdMediaUrls.js";
 import {
@@ -75,6 +78,58 @@ test("activateNextQueuedIntroAdCampaign respects scheduledStartAt", async () => 
 
   const activatedPast = await activateNextQueuedIntroAdCampaign();
   assert.equal(activatedPast?.status, INTRO_AD_CAMPAIGN_STATUS_ACTIVE);
+});
+
+test("fillIntroAdActiveSlotsFromQueue activates up to INTRO_AD_MAX_ACTIVE and keeps the rest queued", async () => {
+  await clearMongoCollections();
+
+  const overflow = INTRO_AD_MAX_ACTIVE + 1;
+  const pastStart = new Date(Date.now() - 1000);
+
+  // Создаём с небольшим сдвигом createdAt через scheduledStartAt, чтобы порядок был детерминированным.
+  for (let i = 0; i < overflow; i += 1) {
+    await IntroAdCampaignModel.create({
+      advertiserId: new mongoose.Types.ObjectId(),
+      status: INTRO_AD_CAMPAIGN_STATUS_QUEUED,
+      videoMp4Url: `/uploads/queue-${i}.mp4`,
+      ctaType: "profile",
+      amountPoints: INTRO_AD_PRICE_POINTS,
+      scheduledStartAt: new Date(pastStart.getTime() + i),
+    });
+  }
+
+  await fillIntroAdActiveSlotsFromQueue();
+
+  const activeCount = await IntroAdCampaignModel.countDocuments({
+    status: INTRO_AD_CAMPAIGN_STATUS_ACTIVE,
+  });
+  const queuedCount = await IntroAdCampaignModel.countDocuments({
+    status: INTRO_AD_CAMPAIGN_STATUS_QUEUED,
+  });
+
+  assert.equal(activeCount, INTRO_AD_MAX_ACTIVE);
+  assert.equal(queuedCount, overflow - INTRO_AD_MAX_ACTIVE);
+
+  const intros = await resolvePaidIntrosForPublicPlayback();
+  assert.equal(intros.length, INTRO_AD_MAX_ACTIVE);
+});
+
+test("resolvePaidIntrosForPublicPlayback returns active ads even if pausedAt is set", async () => {
+  await clearMongoCollections();
+
+  await IntroAdCampaignModel.create({
+    advertiserId: new mongoose.Types.ObjectId(),
+    status: INTRO_AD_CAMPAIGN_STATUS_ACTIVE,
+    videoMp4Url: "/uploads/paused-legacy.mp4",
+    ctaType: "profile",
+    amountPoints: INTRO_AD_PRICE_POINTS,
+    activatedAt: new Date(Date.now() - 1000),
+    activeUntil: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    pausedAt: new Date(Date.now() - 500),
+  });
+
+  const intros = await resolvePaidIntrosForPublicPlayback();
+  assert.equal(intros.length, 1);
 });
 
 test("assertIntroAdMediaUrlsAreUploadedAssets rejects external urls", () => {

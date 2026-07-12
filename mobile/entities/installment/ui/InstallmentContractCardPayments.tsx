@@ -4,7 +4,7 @@ import { Pressable, Text, View } from "react-native";
 import type { InstallmentContract } from "@/entities/installment/api/installmentApi";
 import { partitionInstallmentContractPayments } from "@/entities/installment/lib/partitionInstallmentContractPayments";
 import { InstallmentContractCardPaymentRow } from "@/entities/installment/ui/InstallmentContractCardPaymentRow";
-import { INSTALLMENT_UI } from "@/shared/config";
+import { INSTALLMENT_UI, COMMERCE_CARD_UI } from "@/shared/config";
 import { useInstallmentContractCardChromeStyles } from "@/shared/theme/installmentContractCardChromeStyles";
 
 type PaymentStatuses = {
@@ -46,8 +46,7 @@ const PaymentsFold = ({
     <View style={styles.fold}>
       <Pressable style={styles.foldSummary} onPress={() => setExpanded((value) => !value)}>
         <Text style={styles.foldSummaryText}>
-          {expanded ? "▾ " : "▸ "}
-          {title}
+          {COMMERCE_CARD_UI.EXPAND_TOGGLE_LABEL(expanded)} · {title}
         </Text>
       </Pressable>
       {expanded ? <View style={styles.foldBody}>{children}</View> : null}

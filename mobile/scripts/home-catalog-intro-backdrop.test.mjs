@@ -9,28 +9,29 @@ const MOBILE_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const readMobileFile = (relativePath) =>
   readFileSync(join(MOBILE_ROOT, relativePath), "utf8");
 
-test("HomeCatalogIntroVideoBackdrop: platform intro loop, muted toggle, poster fallback", () => {
+test("HomeCatalogIntroVideoBackdrop: intro playlist, muted toggle, poster fallback", () => {
   const backdrop = readMobileFile("features/home-feed/ui/HomeCatalogIntroVideoBackdrop.tsx");
-  const hook = readMobileFile(
-    "entities/app-intro-settings/model/usePlatformIntroPlaybackSource.ts",
+  const playlist = readMobileFile(
+    "entities/app-intro-settings/model/useIntroBackdropPlaylist.ts",
   );
   const styles = readMobileFile("shared/theme/homeCatalogBackdropStyles.ts");
   const reExport = readMobileFile("features/home-feed/ui/HomeCatalogPrimaryBackdrop.tsx");
 
-  assert.match(hook, /settingsQuery\.data\?\.settings/);
-  assert.doesNotMatch(hook, /paidIntro/);
+  assert.match(playlist, /playlist/);
 
-  assert.match(backdrop, /usePlatformIntroPlaybackSource/);
+  assert.match(backdrop, /useIntroBackdropPlaylist/);
   assert.match(backdrop, /LoopingCoverVideo/);
-  assert.match(backdrop, /loop/);
-  assert.match(backdrop, /useState\(false\)/);
+  assert.match(backdrop, /playbackActive/);
+  assert.match(backdrop, /isPlaying=\{playbackActive\}/);
+  assert.match(backdrop, /useState\(true\)/);
   assert.match(backdrop, /volume-off/);
   assert.match(backdrop, /volume-up/);
   assert.match(backdrop, /APP_INTRO_UI\.ENABLE_SOUND/);
   assert.match(backdrop, /accessibilityLabel/);
   assert.match(backdrop, /styles\.soundToggleButton/);
   assert.match(backdrop, /onPlaybackFailed/);
-  assert.match(backdrop, /resizeMode="cover"/);
+  assert.match(backdrop, /contentFit="cover"/);
+  assert.match(backdrop, /cachePolicy="memory-disk"/);
   assert.match(backdrop, /resolveHomeCatalogIntroBackdropHeight/);
   assert.match(backdrop, /marginBottom: -HOME_CATALOG_FOREGROUND_SHEET_CAP_HEIGHT/);
   assert.doesNotMatch(backdrop, /paidIntro/);
@@ -56,6 +57,7 @@ test("LoopingCoverVideo shared by splash and product preview", () => {
   assert.match(splash, /loop=\{false\}/);
   assert.match(preview, /LoopingCoverVideo/);
   assert.match(looping, /instance\.loop = loop/);
+  assert.match(looping, /isPlaying/);
   assert.match(looping, /contentFit="cover"/);
   assert.match(looping, /Platform\.OS === "android"/);
 });

@@ -405,6 +405,75 @@ export const useProductEditorScreenStyles = createThemedStyles((theme) => ({
     fontSize: 14,
     lineHeight: 20,
   },
+  hint: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: theme.colors.textSecondary,
+  },
+  priceGrid: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  priceCol: {
+    flex: 1,
+  },
+  priceInput: {
+    fontVariant: ["tabular-nums"],
+  },
+  discountPreview: {
+    borderRadius: 9,
+    paddingVertical: 7,
+    paddingHorizontal: 10,
+  },
+  discountPreviewText: {
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  charRow: {
+    flexDirection: "row",
+    gap: 8,
+    alignItems: "center",
+    paddingVertical: 9,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderRadius: 10,
+  },
+  charInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    fontSize: 14,
+  },
+  charInputValue: {
+    flex: 1.5,
+  },
+  charRemoveBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 7,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  charRemoveText: {
+    fontSize: 13,
+    fontWeight: "700",
+  },
+  charAddButton: {
+    alignSelf: "flex-start",
+    borderWidth: 1,
+    borderStyle: "dashed",
+    borderRadius: 9,
+    paddingVertical: 7,
+    paddingHorizontal: 14,
+    alignItems: "center",
+  },
+  charAddButtonText: {
+    fontSize: 14,
+    fontWeight: "600",
+  },
   footer: {
     paddingTop: 16,
     borderTopWidth: StyleSheet.hairlineWidth,

@@ -24,7 +24,7 @@ const TEST_SUFFIX = () => `${Date.now()}_${Math.random().toString(36).slice(2, 8
  * @param {{
  *   sellerPoints?: number;
  *   sellerReserved?: number;
- *   buyerPremium?: boolean;
+ *   buyerDataConfirmed?: boolean;
  *   loyaltyPointsPerUnit?: number;
  * }} [options]
  */
@@ -46,8 +46,7 @@ export const createOrderLoyaltyFixture = async (options = {}) => {
     email: `buyer_${suffix}@test.local`,
     passwordHash: "hash",
     userLoyaltyPoints: 0,
-    isPremiumUser: options.buyerPremium !== false,
-    premiumExpiresAt: new Date(Date.now() + 86400000),
+    isUserDataConfirmed: options.buyerDataConfirmed !== false,
   });
 
   const product = await ProductModel.create({
@@ -141,7 +140,7 @@ export const markOrderItemDelivered = async (orderId, itemIndex) => {
  *   orderId: import('mongoose').Types.ObjectId | string;
  *   itemIndex: number;
  *   buyerId: import('mongoose').Types.ObjectId | string;
- *   isPremiumUser?: boolean;
+ *   isUserDataConfirmed?: boolean;
  * }} params
  * @returns {Promise<number>} pointsEarned
  */
@@ -149,7 +148,7 @@ export const confirmOrderItemLoyaltyTransaction = async ({
   orderId,
   itemIndex,
   buyerId,
-  isPremiumUser = true,
+  isUserDataConfirmed = true,
 }) => {
   const order = await OrderModel.findById(orderId).populate(ORDER_ITEMS_POPULATE);
   if (!order) {
@@ -180,7 +179,7 @@ export const confirmOrderItemLoyaltyTransaction = async ({
     const earned = prepareLoyaltyPointsForConfirmedOrderItem({
       order,
       itemIndex,
-      isPremiumUser,
+      isUserDataConfirmed,
     });
 
     if (earned > 0) {

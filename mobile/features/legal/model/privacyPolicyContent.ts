@@ -1,14 +1,14 @@
-export type LegalSection = {
-  title: string;
-  paragraphs: string[];
-};
+import type { LegalSection } from "@/features/legal/model/legalSectionTypes";
+import {
+  LEGAL_CONTACT_EMAIL,
+  LEGAL_OPERATOR_PLACEHOLDER,
+} from "@/features/legal/model/legalSharedConstants";
 
 export const PRIVACY_POLICY_UPDATED_AT = "13 июня 2026";
 
-export const PRIVACY_POLICY_OPERATOR_PLACEHOLDER =
-  "Гужаев Рамзан Ризванович, 201400232973, Чеченская Республика, город Грозный";
+export const PRIVACY_POLICY_OPERATOR_PLACEHOLDER = LEGAL_OPERATOR_PLACEHOLDER;
 
-export const PRIVACY_POLICY_CONTACT_EMAIL = "support@izibuy.ru";
+export const PRIVACY_POLICY_CONTACT_EMAIL = LEGAL_CONTACT_EMAIL;
 
 export const PRIVACY_POLICY_SECTIONS: LegalSection[] = [
   {

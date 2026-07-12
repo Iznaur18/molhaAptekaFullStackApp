@@ -24,15 +24,25 @@ import {
 import { normalizeStoredUploadUrl } from "../upload/buildPublicUploadUrl.js";
 import { canModerateProductsRole } from "../product/productModeration.js";
 import { deleteUploadFileByUrl } from "../upload/deleteUploadFileByUrl.js";
+import { isPremiumActive } from "./premiumAccess.js";
 import { createUserInAppNotification } from "./userInAppNotifications.js";
 
 const UPLOAD_PATH_PREFIX = "/uploads/";
 
 /**
+ * Публиковать сторис могут только пользователи с активным премиумом
+ * (а также сотрудники с неограниченным доступом). Заблокированным — нельзя.
+ *
  * @param {Record<string, unknown> | null | undefined} user
  */
 export function canPublishUserStory(user) {
-  return Boolean(user && user.isBlockedUser !== true);
+  if (!user || user.isBlockedUser === true) {
+    return false;
+  }
+  if (isStaffUnlimitedUserStories(user)) {
+    return true;
+  }
+  return isPremiumActive(user);
 }
 
 /**

@@ -71,7 +71,7 @@ test("HomeCatalogUsersButton opens stretch menu from circle", () => {
   assert.doesNotMatch(button, /onPress=\{\(\) => router\.push\("\/users"/);
 
   assert.match(menu, /usersStretchShell/);
-  assert.match(menu, /name="visibility"/);
+  assert.match(menu, /name="grid-view"/);
   assert.match(menu, /accessibilityRole="menu"/);
   assert.match(menu, /MaterialIcons/);
   assert.match(menu, /accessibilityLabel=\{item\.accessibilityLabel\}/);
@@ -92,7 +92,13 @@ test("HomeCatalogUsersButton opens stretch menu from circle", () => {
   assert.match(menu, /useStickyAnchorFallback/);
 
   assert.match(items, /icon: "people"/);
-  assert.match(items, /placeholder-1/);
+  assert.match(items, /key: "terms"/);
+  assert.match(items, /href: "\/legal\/terms"/);
+  assert.match(items, /icon: "article"/);
+  assert.match(items, /MENU_ITEM_TERMS_ARIA/);
+  assert.match(items, /key: "faq"/);
+  assert.match(items, /href: "\/faq"/);
+  assert.match(items, /icon: "quiz"/);
+  assert.match(items, /MENU_ITEM_FAQ_ARIA/);
   assert.match(items, /help-outline/);
-  assert.match(items, /MENU_ITEM_USERS_ARIA/);
 });

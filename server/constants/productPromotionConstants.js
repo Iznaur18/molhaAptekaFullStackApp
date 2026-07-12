@@ -51,8 +51,8 @@ export const PRODUCT_PROMOTION_TIER_META = [
 
 export const PRODUCT_PROMOTION_DURATION_OPTIONS = [
   { code: "24h", title: "24 часа", durationHours: 24, durationMult: 1 },
-  { code: "7d", title: "7 дней", durationHours: 24 * 7, durationMult: 7 },
-  { code: "30d", title: "30 дней", durationHours: 24 * 30, durationMult: 30 },
+  { code: "7d", title: "7 дней", durationHours: 24 * 7, durationMult: 6 },
+  { code: "30d", title: "30 дней", durationHours: 24 * 30, durationMult: 23 },
 ];
 
 export const PRODUCT_PROMOTION_REMINDER_HOURS = 1;

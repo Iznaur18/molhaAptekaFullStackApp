@@ -42,6 +42,10 @@ export const UserListRow = ({ user, onRowClick }: UserListRowProps) => {
     const value = Number(user.followersCount);
     return Number.isFinite(value) ? String(Math.max(0, Math.floor(value))) : "0";
   }, [user.followersCount]);
+  const loyaltyPointsText = useMemo(() => {
+    const value = Number(user.userLoyaltyPoints);
+    return Number.isFinite(value) ? String(Math.max(0, Math.floor(value))) : "0";
+  }, [user.userLoyaltyPoints]);
 
   const metaBadges = useMemo(() => {
     if (user.isBlockedUser !== true) {
@@ -109,6 +113,11 @@ export const UserListRow = ({ user, onRowClick }: UserListRowProps) => {
         <UserListRowMetric
           label={USER_LIST_ROW_UI.FOLLOWERS_LABEL}
           value={followersText}
+        />
+        <UserListRowMetric
+          label={USER_LIST_ROW_UI.LOYALTY_POINTS_LABEL}
+          value={loyaltyPointsText}
+          accessibilityLabel={`${USER_LIST_ROW_UI.LOYALTY_POINTS_LABEL} ${loyaltyPointsText}`}
         />
       </View>
     </Pressable>

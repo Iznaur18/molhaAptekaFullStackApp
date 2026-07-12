@@ -20,7 +20,10 @@ export const INTRO_AD_CAMPAIGN_OPEN_STATUSES = [
   INTRO_AD_CAMPAIGN_STATUS_ACTIVE,
 ];
 
-export const INTRO_AD_PRICE_POINTS = 30_000;
+export const INTRO_AD_PRICE_POINTS = 6_000;
+
+/** Сколько платных intro-роликов может крутиться одновременно (проигрываются подряд). */
+export const INTRO_AD_MAX_ACTIVE = 5;
 
 export const INTRO_AD_DURATION_MS = 3 * 24 * 60 * 60 * 1000;
 

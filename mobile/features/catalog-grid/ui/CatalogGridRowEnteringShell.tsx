@@ -1,4 +1,4 @@
-import { useMemo, type ReactNode } from "react";
+import { memo, useMemo, type ReactNode } from "react";
 import Animated from "react-native-reanimated";
 
 import { createCatalogGridRowEntering } from "@/features/catalog-grid/lib/catalogGridRowEnteringAnimation";
@@ -7,21 +7,22 @@ import { useCatalogScrollAnimation } from "@/features/catalog-grid/model/Catalog
 type CatalogGridRowEnteringShellProps = {
   children: ReactNode;
   rowIndex?: number;
+  disableEntering?: boolean;
 };
 
 export const CatalogGridRowEnteringShell = ({
   children,
   rowIndex = 0,
+  disableEntering = false,
 }: CatalogGridRowEnteringShellProps) => {
   const scrollAnimation = useCatalogScrollAnimation();
   const entering = useMemo(
     () =>
-      scrollAnimation
+      !disableEntering && scrollAnimation
         ? createCatalogGridRowEntering(scrollAnimation.scrollDirection, rowIndex)
         : undefined,
-    [rowIndex, scrollAnimation],
+    [disableEntering, rowIndex, scrollAnimation],
   );
-
   if (!entering) {
     return children;
   }

@@ -7,6 +7,8 @@ import "./RaffleFeaturedCarousel.css";
 
 const DRAG_THRESHOLD_PX = 48;
 const DRAG_THRESHOLD_RATIO = 0.12;
+/** Люфт в пикселях до того, как решим, горизонтальный жест или вертикальный. */
+const DIRECTION_LOCK_SLOP_PX = 8;
 
 /**
  * @param {{
@@ -33,7 +35,7 @@ export function RaffleFeaturedCarousel({
   getManage,
 }) {
   const viewportRef = useRef(/** @type {HTMLDivElement | null} */ (null));
-  /** @type {import('react').MutableRefObject<{ pointerId: number; startX: number; startIndex: number; captureTarget: HTMLElement } | null>} */
+  /** @type {import('react').MutableRefObject<{ pointerId: number; startX: number; startY: number; startIndex: number; captureTarget: HTMLElement; mode: 'pending' | 'active' } | null>} */
   const dragRef = useRef(null);
   const [isPaused, setIsPaused] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -103,17 +105,17 @@ export function RaffleFeaturedCarousel({
     if (slideCount <= 1 || event.button !== 0) {
       return;
     }
-    const captureTarget = event.currentTarget;
+    // Пока только запоминаем старт. Захват пойнтера и старт перетаскивания —
+    // в handlePointerMove, когда станет ясно, что жест горизонтальный. Иначе
+    // вертикальный свайп должен прокручивать страницу (touch-action: pan-y).
     dragRef.current = {
       pointerId: event.pointerId,
       startX: event.clientX,
+      startY: event.clientY,
       startIndex: safeIndex,
-      captureTarget,
+      captureTarget: event.currentTarget,
+      mode: "pending",
     };
-    setIsDragging(true);
-    setIsPaused(true);
-    setDragOffsetPx(0);
-    captureTarget.setPointerCapture(event.pointerId);
   };
 
   const handlePointerMove = (event) => {
@@ -121,12 +123,39 @@ export function RaffleFeaturedCarousel({
     if (!drag || drag.pointerId !== event.pointerId) {
       return;
     }
-    setDragOffsetPx(event.clientX - drag.startX);
+
+    const deltaX = event.clientX - drag.startX;
+
+    if (drag.mode === "pending") {
+      const deltaY = event.clientY - drag.startY;
+      if (
+        Math.abs(deltaX) < DIRECTION_LOCK_SLOP_PX &&
+        Math.abs(deltaY) < DIRECTION_LOCK_SLOP_PX
+      ) {
+        return;
+      }
+      if (Math.abs(deltaX) <= Math.abs(deltaY)) {
+        // Вертикальный жест — не мешаем прокрутке страницы.
+        dragRef.current = null;
+        return;
+      }
+      drag.mode = "active";
+      drag.captureTarget.setPointerCapture(event.pointerId);
+      setIsDragging(true);
+      setIsPaused(true);
+    }
+
+    setDragOffsetPx(deltaX);
   };
 
   const handlePointerUp = (event) => {
     const drag = dragRef.current;
     if (!drag || drag.pointerId !== event.pointerId) {
+      return;
+    }
+    if (drag.mode !== "active") {
+      // Жест не перешёл в перетаскивание (тап/вертикаль) — просто сбрасываем.
+      dragRef.current = null;
       return;
     }
     if (drag.captureTarget.hasPointerCapture(event.pointerId)) {
@@ -140,7 +169,10 @@ export function RaffleFeaturedCarousel({
     if (!drag || drag.pointerId !== event.pointerId) {
       return;
     }
-    if (drag.captureTarget.hasPointerCapture(event.pointerId)) {
+    if (
+      drag.mode === "active" &&
+      drag.captureTarget.hasPointerCapture(event.pointerId)
+    ) {
       drag.captureTarget.releasePointerCapture(event.pointerId);
     }
     dragRef.current = null;

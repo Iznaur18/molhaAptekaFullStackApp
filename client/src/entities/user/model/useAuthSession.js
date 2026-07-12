@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { fetchCurrentUserProfile } from "../api/fetchCurrentUserProfile.js";
+import { isPremiumActive } from "../lib/isPremiumActive.js";
 import { AUTH_ME_STALE_TIME_MS } from "../../../shared/api/queryClient.js";
 import { clearDeadAuthSession } from "../../../shared/api/apiClient.js";
 import {
@@ -123,7 +124,12 @@ export function useAuthSession() {
   const setIsPremiumUser = useCallback(
     /** @param {boolean} value */
     (value) => {
-      patchAuthMeUser({ isPremiumUser: value });
+      // При включении сбрасываем дату окончания в null («активен, точный срок —
+      // после ближайшего refetch»), чтобы isPremiumActive сразу видел премиум и
+      // не опирался на устаревшую (возможно, прошедшую) дату в кэше.
+      patchAuthMeUser(
+        value ? { isPremiumUser: true, premiumExpiresAt: null } : { isPremiumUser: false },
+      );
     },
     [patchAuthMeUser],
   );
@@ -161,7 +167,7 @@ export function useAuthSession() {
     patchAuthMeNotifications,
     currentUserId: user ? String(user._id) : null,
     currentUserRole: user?.userRole ?? null,
-    isPremiumUser: Boolean(user?.isPremiumUser),
+    isPremiumUser: isPremiumActive(user),
     isEmailVerified: user ? user.isEmailVerified !== false : true,
     currentUserEmail: user ? String(user.email ?? "").trim() : "",
     loyaltyPoints: user ? Number(user.userLoyaltyPoints) || 0 : 0,

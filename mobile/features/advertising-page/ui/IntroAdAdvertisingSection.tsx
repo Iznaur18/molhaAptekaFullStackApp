@@ -51,7 +51,7 @@ export const IntroAdAdvertisingSection = ({ loyaltyBalance }: IntroAdAdvertising
   const [feedback, setFeedback] = useState("");
 
   const campaign = campaignQuery.data?.campaign ?? null;
-  const pricePoints = campaignQuery.data?.pricePoints ?? 30_000;
+  const pricePoints = campaignQuery.data?.pricePoints ?? 6_000;
   const canCancel = campaign?.status === "pending" || campaign?.status === "queued";
   const hasOpenCampaign = Boolean(campaign);
   const isSubmitting = submitMutation.isPending || cancelMutation.isPending;

@@ -7,5 +7,6 @@ export const appIntroSettingsQueryKeys = {
 
 export type AppIntroPublicResponse = z.infer<typeof appIntroSettingsDataSchema>;
 export type AppIntroSettings = AppIntroPublicResponse["settings"];
+export type AppIntroPaidIntro = AppIntroPublicResponse["paidIntros"][number];
 
 export { appIntroSettingsDataSchema };
