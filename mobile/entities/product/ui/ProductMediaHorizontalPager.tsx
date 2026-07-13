@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   FlatList,
+  View,
   type LayoutChangeEvent,
   type NativeScrollEvent,
   type NativeSyntheticEvent,
-  View,
   type StyleProp,
   type ViewStyle,
 } from "react-native";
+
+import { nestedHorizontalScrollProps } from "@/shared/lib/nestedHorizontalScrollProps";
 
 type ProductMediaHorizontalPagerProps = {
   slideCount: number;
@@ -97,12 +99,17 @@ export const ProductMediaHorizontalPager = ({
         <FlatList
           ref={listRef}
           horizontal
+          {...nestedHorizontalScrollProps}
           pagingEnabled
           bounces={false}
           data={slideIndexes}
           keyExtractor={(item) => String(item)}
           showsHorizontalScrollIndicator={false}
           decelerationRate="fast"
+          windowSize={3}
+          maxToRenderPerBatch={1}
+          initialNumToRender={1}
+          removeClippedSubviews
           initialScrollIndex={Math.min(activeIndex, slideCount - 1)}
           getItemLayout={(_, index) => ({
             length: width,

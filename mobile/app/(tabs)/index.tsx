@@ -10,14 +10,16 @@ import {
 import { GestureDetector } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
-import { useFocusEffect, useNavigation, useScrollToTop } from "@react-navigation/native";
+import { useFocusEffect, useIsFocused, useNavigation, useScrollToTop } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import type { CatalogListFilters, CatalogSort } from "@/entities/product/model/catalogListFilters";
+import { buildCatalogListScopeKey } from "@/entities/product/lib/shouldRetainCatalogListPlaceholderData";
 import { useCatalogProductsInfiniteQuery } from "@/entities/product/model/useCatalogProductsInfiniteQuery";
 import { buildCatalogGridRows } from "@/features/catalog-grid/lib/buildCatalogGridRows";
 import type { CatalogGridRow } from "@/features/catalog-grid/lib/buildCatalogGridRows";
+import { catalogGridListPerformanceProps } from "@/features/catalog-grid/lib/catalogGridListPerformanceProps";
 import { resolveCatalogGridListContentStyle } from "@/features/catalog-grid/lib/catalogGridLayout";
 import { shouldShowCatalogTier3Banners } from "@/features/catalog-grid/lib/shouldShowCatalogTier3Banners";
 import { CatalogGridRowItem } from "@/features/catalog-grid/ui/CatalogGridRowItem";
@@ -72,6 +74,12 @@ import {
 import { useProductGridLayout } from "@/shared/model/useProductGridLayout";
 import { useColdStartSplashGate } from "@/shared/model/coldStartSplashGate";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
+import { useAppActive, useTrimImageMemoryOnBackground } from "@/shared/model/useAppActive";
+import {
+  RowVisibilityBoundary,
+  useVisibleRowsController,
+  VisibleRowsProvider,
+} from "@/shared/model/rowVisibility";
 import { useFeedScreenStyles } from "@/shared/theme/catalogProductStyles";
 import { ScreenErrorState } from "@/shared/ui/ScreenStates";
 
@@ -83,9 +91,19 @@ export default function CatalogScreen() {
   const styles = useFeedScreenStyles();
   const queryClient = useQueryClient();
   const productGrid = useProductGridLayout();
-  const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const { centeredContentStyle, contentPaddingBottom, contentMaxWidth } = useScreenLayout();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
+  const appActive = useAppActive();
+  // Уход в фон → чистим in-memory кеш картинок, освобождая RAM на слабых
+  // устройствах (диск-кеш остаётся, сеть не дёргаем при возврате).
+  useTrimImageMemoryOnBackground();
+  // Один контроллер видимости строк на оба списка: onViewableItemsChanged кормит
+  // стор видимыми ключами, а фокус экрана + активность приложения — общий гейт.
+  // Тяжёлые видео в карточках вне вьюпорта, на другой вкладке или в фоне ставятся
+  // на паузу — декодеры не греют CPU/GPU.
+  const rowVisibility = useVisibleRowsController(isFocused && appActive);
   const { height: windowHeight } = useWindowDimensions();
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -171,6 +189,15 @@ export default function CatalogScreen() {
     ],
   );
 
+  const catalogListScopeKey = useMemo(
+    () => buildCatalogListScopeKey(catalogFilters),
+    [catalogFilters],
+  );
+
+  useEffect(() => {
+    catalogListRef.current?.scrollToOffset({ offset: 0, animated: false });
+  }, [catalogListScopeKey]);
+
   const catalogQuery = useCatalogProductsInfiniteQuery(catalogFilters);
 
   const showHomeFeed = useMemo(
@@ -225,6 +252,24 @@ export default function CatalogScreen() {
     enabled: showHomeFeed,
     includeCuratedLists: showCuratedProductLists,
   });
+
+  const hasAutoOpenedHomeFeedRef = useRef(false);
+
+  useEffect(() => {
+    if (!showHomeFeed || !homeFeedContentReady || catalogQuery.isPending) {
+      return;
+    }
+    if (hasAutoOpenedHomeFeedRef.current) {
+      return;
+    }
+    hasAutoOpenedHomeFeedRef.current = true;
+    introTransition.openFeedSheet();
+  }, [
+    catalogQuery.isPending,
+    homeFeedContentReady,
+    introTransition,
+    showHomeFeed,
+  ]);
 
   // Холодный старт: держим нативный сплэш, пока каталог и все секции главной
   // не готовы — экран появляется одним кадром, без поддёргиваний от
@@ -360,6 +405,19 @@ export default function CatalogScreen() {
     [contentPaddingBottom, styles.homeFeedListContent, windowHeight],
   );
 
+  // На планшетах ограничиваем ширину контента и центрируем его, оставляя фон
+  // сцены/шторки во всю ширину. Плитки и баннер розыгрыша считаются под
+  // contentMaxWidth (см. useProductGridLayout / useRaffleFeaturedSlideLayout) —
+  // без этого они расползаются по полной ширине окна. На телефонах
+  // contentMaxWidth === undefined, ограничение не применяется.
+  const homeFeedCenteredWidthStyle = useMemo(
+    (): ViewStyle | null =>
+      contentMaxWidth != null
+        ? { width: "100%", maxWidth: contentMaxWidth, alignSelf: "center" }
+        : null,
+    [contentMaxWidth],
+  );
+
   const renderHomeFeedRow = useCallback(
     ({ item, index }: { item: HomeCatalogFeedListRow; index: number }) => {
       if (!item) {
@@ -389,23 +447,25 @@ export default function CatalogScreen() {
       const productRowIndex = index - HOME_CATALOG_FEED_META_ROW_COUNT;
 
       return (
-        <View
-          style={[
-            styles.homeFeedRowSurface,
-            styles.homeFeedInsetContent,
-            styles.homeFeedForeground,
-            { paddingBottom: productGrid.gap },
-          ]}
-        >
-          <CatalogGridRowItem
-            row={item.row}
-            columns={productGrid.columns}
-            gap={productGrid.gap}
-            tileWidth={productGrid.tileWidth}
-            rowIndex={productRowIndex}
-            disableEntering
-          />
-        </View>
+        <RowVisibilityBoundary rowKey={item.key}>
+          <View
+            style={[
+              styles.homeFeedRowSurface,
+              styles.homeFeedInsetContent,
+              styles.homeFeedForeground,
+              { paddingBottom: productGrid.gap },
+            ]}
+          >
+            <CatalogGridRowItem
+              row={item.row}
+              columns={productGrid.columns}
+              gap={productGrid.gap}
+              tileWidth={productGrid.tileWidth}
+              rowIndex={productRowIndex}
+              disableEntering
+            />
+          </View>
+        </RowVisibilityBoundary>
       );
     },
     [
@@ -428,6 +488,28 @@ export default function CatalogScreen() {
     [contentPaddingBottom, productGrid.gap, styles.listContent],
   );
 
+  const renderCatalogGridRow = useCallback(
+    ({ item, index }: { item: CatalogGridRow; index: number }) => {
+      if (!item) {
+        return null;
+      }
+
+      return (
+        <RowVisibilityBoundary rowKey={item.key}>
+          <CatalogGridRowItem
+            row={item}
+            columns={productGrid.columns}
+            gap={productGrid.gap}
+            tileWidth={productGrid.tileWidth}
+            rowIndex={index}
+            disableEntering
+          />
+        </RowVisibilityBoundary>
+      );
+    },
+    [productGrid.columns, productGrid.gap, productGrid.tileWidth],
+  );
+
   const renderHomeFeedScene = (content: ReactNode) => (
     <View style={[styles.flex, styles.homeFeedScene]}>{content}</View>
   );
@@ -444,7 +526,7 @@ export default function CatalogScreen() {
             <HomeCatalogStickySearchShell>
               {searchRow}
             </HomeCatalogStickySearchShell>
-            <View style={styles.homeFeedInsetContent}>
+            <View style={[styles.homeFeedInsetContent, homeFeedCenteredWidthStyle]}>
               {listHeader}
               <CatalogGridSkeleton
                 columns={productGrid.columns}
@@ -488,7 +570,7 @@ export default function CatalogScreen() {
             <HomeCatalogStickySearchShell>
               {searchRow}
             </HomeCatalogStickySearchShell>
-            <View style={styles.homeFeedInsetContent}>
+            <View style={[styles.homeFeedInsetContent, homeFeedCenteredWidthStyle]}>
               {listHeader}
               <ScreenErrorState
                 message={formatApiErrorMessage(catalogQuery.error, API_CLIENT_UI.CATALOG_ERROR)}
@@ -515,6 +597,7 @@ export default function CatalogScreen() {
   if (showHomeFeed) {
     return (
       <CatalogScrollAnimationProvider>
+        <VisibleRowsProvider store={rowVisibility.store}>
         <HomeCatalogSearchProvider value={searchInput} onChange={setSearchInput}>
           {renderHomeFeedScene(
             <GestureDetector gesture={introTransition.panGesture}>
@@ -524,7 +607,7 @@ export default function CatalogScreen() {
                   style={[styles.homeFeedIntroBackdropLayer, { height: homeFeedDockOffset }]}
                 >
                   <HomeCatalogPrimaryBackdrop
-                    playbackActive={introTransition.backdropPlaybackActive}
+                    playbackActive={introTransition.backdropPlaybackActive && isFocused && appActive}
                   />
                 </View>
                 <Animated.View style={[styles.homeFeedSheet, introTransition.sheetStyle]}>
@@ -538,8 +621,13 @@ export default function CatalogScreen() {
                       stickyHeaderIndices={[HOME_CATALOG_FEED_STICKY_SEARCH_INDEX]}
                       trackCatalogScroll={false}
                       renderItem={renderHomeFeedRow}
+                      onViewableItemsChanged={rowVisibility.onViewableItemsChanged}
+                      viewabilityConfig={rowVisibility.viewabilityConfig}
                       contentContainerStyle={homeFeedContentContainerStyle}
-                      style={resolveHomeCatalogFeedListStyle(styles.flex, styles.homeFeedList)}
+                      style={[
+                        resolveHomeCatalogFeedListStyle(styles.flex, styles.homeFeedList),
+                        homeFeedCenteredWidthStyle,
+                      ]}
                       scrollEnabled={introTransition.scrollEnabled}
                       onScroll={introTransition.onListScroll}
                       {...homeCatalogFeedListScrollProps}
@@ -566,38 +654,29 @@ export default function CatalogScreen() {
             </GestureDetector>,
           )}
         </HomeCatalogSearchProvider>
+        </VisibleRowsProvider>
       </CatalogScrollAnimationProvider>
     );
   }
 
   return (
     <CatalogScrollAnimationProvider>
+      <VisibleRowsProvider store={rowVisibility.store}>
       <View style={[styles.flex, centeredContentStyle]}>
         {searchRow}
         <CatalogAnimatedFlatList<CatalogGridRow>
           ref={catalogListRef as Ref<Animated.FlatList<CatalogGridRow>>}
-          key={productGrid.listKey}
+          key={`${productGrid.listKey}-${catalogListScopeKey}`}
           data={catalogGridRows}
           keyExtractor={(item) => item.key}
           numColumns={1}
           ListHeaderComponent={listHeader}
-          renderItem={({ item, index }) => {
-            if (!item) {
-              return null;
-            }
-
-            return (
-              <CatalogGridRowItem
-                row={item}
-                columns={productGrid.columns}
-                gap={productGrid.gap}
-                tileWidth={productGrid.tileWidth}
-                rowIndex={index}
-              />
-            );
-          }}
+          renderItem={renderCatalogGridRow}
           contentContainerStyle={catalogContentContainerStyle}
           style={styles.flex}
+          {...catalogGridListPerformanceProps}
+          onViewableItemsChanged={rowVisibility.onViewableItemsChanged}
+          viewabilityConfig={rowVisibility.viewabilityConfig}
           refreshControl={
             <ThemedRefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
           }
@@ -615,6 +694,7 @@ export default function CatalogScreen() {
           }
         />
       </View>
+      </VisibleRowsProvider>
     </CatalogScrollAnimationProvider>
   );
 }

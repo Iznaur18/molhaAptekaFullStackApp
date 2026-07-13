@@ -27,7 +27,10 @@ test("home feed pauses intro backdrop video when sheet covers hero", () => {
   const backdrop = readMobileFile("features/home-feed/ui/HomeCatalogIntroVideoBackdrop.tsx");
   const looping = readMobileFile("shared/ui/LoopingCoverVideo.tsx");
 
-  assert.match(index, /playbackActive=\{introTransition\.backdropPlaybackActive\}/);
+  assert.match(
+    index,
+    /playbackActive=\{introTransition\.backdropPlaybackActive && isFocused && appActive\}/,
+  );
   assert.match(transition, /backdropPlaybackActive/);
   assert.match(transition, /BACKDROP_PLAYBACK_THRESHOLD/);
   assert.match(backdrop, /isPlaying=\{playbackActive\}/);
@@ -60,6 +63,17 @@ test("home feed disables catalog row entering animations and clips off-screen ro
   assert.match(rowItem, /disableEntering/);
   assert.match(scrollProps, /removeClippedSubviews/);
   assert.match(flatList, /trackCatalogScroll/);
+});
+
+test("home feed opens sheet on first content ready for immediate scroll", () => {
+  const index = readMobileFile("app/(tabs)/index.tsx");
+  const transition = readMobileFile("features/home-feed/model/useHomeFeedIntroTransition.ts");
+
+  assert.match(index, /hasAutoOpenedHomeFeedRef/);
+  assert.match(index, /openFeedSheet/);
+  assert.match(index, /homeFeedContentReady/);
+  assert.match(transition, /openFeedSheet/);
+  assert.match(transition, /applyScrollEnabledFromMode/);
 });
 
 test("user stories strip uses horizontal FlatList virtualization", () => {

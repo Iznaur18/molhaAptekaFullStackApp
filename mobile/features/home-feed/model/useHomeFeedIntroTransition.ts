@@ -107,6 +107,10 @@ export const useHomeFeedIntroTransition = ({
   const [scrollEnabled, setScrollEnabled] = useState(false);
   const [backdropPlaybackActive, setBackdropPlaybackActive] = useState(true);
 
+  const applyScrollEnabledFromMode = useCallback((nextMode: number) => {
+    setScrollEnabled(nextMode >= 0.5);
+  }, []);
+
   useEffect(() => {
     enabledSv.value = enabled ? 1 : 0;
   }, [enabled, enabledSv]);
@@ -117,7 +121,7 @@ export const useHomeFeedIntroTransition = ({
     () => mode.value,
     (current, previous) => {
       if (current !== previous) {
-        runOnJS(setScrollEnabled)(current === 1);
+        runOnJS(applyScrollEnabledFromMode)(current);
       }
     },
   );
@@ -146,10 +150,12 @@ export const useHomeFeedIntroTransition = ({
   // состоянию перехода, иначе таб-бар остаётся видимым на интро.
   useFocusEffect(
     useCallback(() => {
-      if (enabled) {
-        homeCatalogTabBarRevealProgress.value = clamp01(progress.value);
+      if (!enabled) {
+        return;
       }
-    }, [enabled, progress]),
+      homeCatalogTabBarRevealProgress.value = clamp01(progress.value);
+      applyScrollEnabledFromMode(mode.value);
+    }, [applyScrollEnabledFromMode, enabled, mode, progress]),
   );
 
   const onListScroll = useAnimatedScrollHandler({
@@ -246,6 +252,16 @@ export const useHomeFeedIntroTransition = ({
     progress.value = withTiming(0, RESET_CONFIG);
   }, [listRef, mode, progress]);
 
+  /** Сразу открыть ленту (progress=1): скролл и таб-бар без жеста интро. */
+  const openFeedSheet = useCallback(() => {
+    progress.value = 1;
+    mode.value = 1;
+    applyScrollEnabledFromMode(1);
+    if (enabled) {
+      homeCatalogTabBarRevealProgress.value = 1;
+    }
+  }, [applyScrollEnabledFromMode, enabled, mode, progress]);
+
   return {
     panGesture,
     nativeGesture,
@@ -254,5 +270,6 @@ export const useHomeFeedIntroTransition = ({
     scrollEnabled,
     backdropPlaybackActive,
     resetToIntro,
+    openFeedSheet,
   };
 };

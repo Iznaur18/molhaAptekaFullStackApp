@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import { Alert, ScrollView } from "react-native";
+import { Alert, ScrollView, View } from "react-native";
 
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import { buildResolvedCatalogFeedTileDisplays } from "@/entities/product-category-display/lib/resolveCatalogFeedTileDisplay";
@@ -42,7 +42,7 @@ export const CatalogBrowserPage = () => {
     gap: gridLayout.gap,
     contentWidth: gridLayout.contentWidth,
   };
-  const { contentPaddingTop } = useScreenLayout();
+  const { contentPaddingTop, centeredContentStyle } = useScreenLayout();
   const { isAdmin, isAuthorized } = useUserAccess();
 
   const categoryDisplaysQuery = useProductCategoryDisplaysQuery();
@@ -167,71 +167,73 @@ export const CatalogBrowserPage = () => {
 
   return (
     <>
-      <ScrollView contentContainerStyle={[styles.container, { paddingTop: contentPaddingTop + 16 }]}>
-        <CatalogBrowserTilesGrid
-          title={PRODUCT_CATEGORY_DISPLAY_UI.FEED_SECTION_TITLE}
-          accessibilityLabel={PRODUCT_CATEGORY_DISPLAY_UI.FEED_GRID_ARIA}
-          gap={gridLayout.gap}
-        >
-          {feedTiles.map((item) => (
-            <CatalogBrowserTileCard
-              key={item.tileKey}
-              label={item.label}
-              imageUrl={item.imageUrl}
-              placeholderImageUrl={PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE}
-              {...tileLayoutProps}
-              variant="feed"
-              onPress={() => handleFeedTilePress(item.tileKey)}
-              onEditPress={
-                isAdmin ? () => setEditingFeedTileKey(item.tileKey) : undefined
-              }
-              editAriaLabel={PRODUCT_CATEGORY_DISPLAY_UI.FEED_EDIT_ARIA(item.label)}
-            />
-          ))}
-        </CatalogBrowserTilesGrid>
-
-        {personalCategoryTiles.length > 0 ? (
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+        <View style={[styles.container, centeredContentStyle, { paddingTop: contentPaddingTop + 16 }]}>
           <CatalogBrowserTilesGrid
-            title={SELLER_PERSONAL_CATEGORY_PAGE_UI.TILES_SECTION_TITLE}
+            title={PRODUCT_CATEGORY_DISPLAY_UI.FEED_SECTION_TITLE}
+            accessibilityLabel={PRODUCT_CATEGORY_DISPLAY_UI.FEED_GRID_ARIA}
             gap={gridLayout.gap}
           >
-            {personalCategoryTiles.map((tile) => (
+            {feedTiles.map((item) => (
               <CatalogBrowserTileCard
-                key={tile._id}
-                label={tile.labelRu}
-                imageUrl={tile.imageUrl}
+                key={item.tileKey}
+                label={item.label}
+                imageUrl={item.imageUrl}
                 placeholderImageUrl={PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE}
                 {...tileLayoutProps}
-                onPress={() => handlePersonalCategoryPress(tile._id)}
+                variant="feed"
+                onPress={() => handleFeedTilePress(item.tileKey)}
+                onEditPress={
+                  isAdmin ? () => setEditingFeedTileKey(item.tileKey) : undefined
+                }
+                editAriaLabel={PRODUCT_CATEGORY_DISPLAY_UI.FEED_EDIT_ARIA(item.label)}
               />
             ))}
           </CatalogBrowserTilesGrid>
-        ) : null}
 
-        <CatalogBrowserTilesGrid
-          title={PRODUCT_CATEGORY_DISPLAY_UI.CATEGORIES_SECTION_TITLE}
-          accessibilityLabel={PRODUCT_CATEGORY_DISPLAY_UI.GRID_ARIA}
-          gap={gridLayout.gap}
-        >
-          {categoryItems.map((item) => (
-            <CatalogBrowserTileCard
-              key={item.categorySlug}
-              label={item.label}
-              imageUrl={item.imageUrl}
-              placeholderImageUrl={PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE}
-              {...tileLayoutProps}
-              disabled={subcategoryPicker.resolvingLandingCategoryKey != null}
-              pending={
-                subcategoryPicker.resolvingLandingCategoryKey === resolveCategoryTileKey(item)
-              }
-              onPress={() => handleCategoryPress(item)}
-              onEditPress={
-                isAdmin ? () => setEditingCategorySlug(item.categorySlug) : undefined
-              }
-              editAriaLabel={PRODUCT_CATEGORY_DISPLAY_UI.EDIT_ARIA(item.label)}
-            />
-          ))}
-        </CatalogBrowserTilesGrid>
+          {personalCategoryTiles.length > 0 ? (
+            <CatalogBrowserTilesGrid
+              title={SELLER_PERSONAL_CATEGORY_PAGE_UI.TILES_SECTION_TITLE}
+              gap={gridLayout.gap}
+            >
+              {personalCategoryTiles.map((tile) => (
+                <CatalogBrowserTileCard
+                  key={tile._id}
+                  label={tile.labelRu}
+                  imageUrl={tile.imageUrl}
+                  placeholderImageUrl={PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE}
+                  {...tileLayoutProps}
+                  onPress={() => handlePersonalCategoryPress(tile._id)}
+                />
+              ))}
+            </CatalogBrowserTilesGrid>
+          ) : null}
+
+          <CatalogBrowserTilesGrid
+            title={PRODUCT_CATEGORY_DISPLAY_UI.CATEGORIES_SECTION_TITLE}
+            accessibilityLabel={PRODUCT_CATEGORY_DISPLAY_UI.GRID_ARIA}
+            gap={gridLayout.gap}
+          >
+            {categoryItems.map((item) => (
+              <CatalogBrowserTileCard
+                key={item.categorySlug}
+                label={item.label}
+                imageUrl={item.imageUrl}
+                placeholderImageUrl={PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE}
+                {...tileLayoutProps}
+                disabled={subcategoryPicker.resolvingLandingCategoryKey != null}
+                pending={
+                  subcategoryPicker.resolvingLandingCategoryKey === resolveCategoryTileKey(item)
+                }
+                onPress={() => handleCategoryPress(item)}
+                onEditPress={
+                  isAdmin ? () => setEditingCategorySlug(item.categorySlug) : undefined
+                }
+                editAriaLabel={PRODUCT_CATEGORY_DISPLAY_UI.EDIT_ARIA(item.label)}
+              />
+            ))}
+          </CatalogBrowserTilesGrid>
+        </View>
       </ScrollView>
 
       <EditCategoryDisplayModal

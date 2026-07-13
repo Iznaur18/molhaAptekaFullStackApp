@@ -1864,8 +1864,6 @@ export const useProductDetailTabBarStyles = createThemedStyles((theme) => ({
   },
 }));
 
-import { PRODUCT_DETAIL_DOCK_WARNING_AMBER } from "@/shared/theme/uploadFieldStyles";
-
 export const useProductDetailPurchaseActionsStyles = createThemedStyles((theme) => ({
   root: {
     flexDirection: "row",
@@ -1898,8 +1896,8 @@ export const useProductDetailPurchaseActionsStyles = createThemedStyles((theme) 
     paddingVertical: 10,
     borderRadius: theme.radius.input,
     borderWidth: 1,
-    borderColor: PRODUCT_DETAIL_DOCK_WARNING_AMBER,
-    backgroundColor: PRODUCT_DETAIL_DOCK_WARNING_AMBER,
+    borderColor: theme.colors.nearBlack,
+    backgroundColor: theme.colors.nearBlack,
   },
   shortcutInactive: {
     borderColor: theme.colors.border,
@@ -2652,7 +2650,17 @@ export const useUserStoriesStripStyles = createThemedStyles((theme) => ({
 }));
 
 export const useCatalogBrowserPageStyles = createThemedStyles((theme) => ({
+  // Фон во всю ширину — под центрированным контентом на планшетах.
+  scroll: {
+    backgroundColor: theme.colors.bg,
+  },
+  // Центрируем контентную колонку; ширину ограничивает centeredContentStyle.
+  scrollContent: {
+    alignItems: "center",
+    flexGrow: 1,
+  },
   container: {
+    width: "100%",
     padding: SCREEN_CONTENT_PADDING_HORIZONTAL,
     paddingBottom: SCREEN_CONTENT_PADDING_BOTTOM,
     gap: theme.spacing[2],

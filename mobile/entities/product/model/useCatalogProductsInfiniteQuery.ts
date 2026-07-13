@@ -1,6 +1,7 @@
-import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
+import { shouldRetainCatalogListPlaceholderData } from "@/entities/product/lib/shouldRetainCatalogListPlaceholderData";
 import { catalogQueryKeys } from "@/shared/api";
 
 import { fetchCatalogProductsPage } from "../api/fetchCatalogProductsPage";
@@ -31,10 +32,20 @@ export const useCatalogProductsInfiniteQuery = (filters: CatalogListFilters) => 
       const { page, totalPages } = lastPage.pagination;
       return page < totalPages ? page + 1 : undefined;
     },
-    // При смене фильтра/категории queryKey меняется. Без этого запрос уходит в
-    // isPending и index.tsx мигает скелетоном + перемонтирует список. Держим
-    // предыдущие плитки на экране до прихода новых данных — своп без пустых кадров.
-    placeholderData: keepPreviousData,
+    // При смене категории/поиска не держим старые плитки — иначе массовый swap
+    // ProductCard на JS-потоке даёт фриз. Для смены только sort — плавный переход.
+    placeholderData: (previousData, previousQuery) => {
+      if (!previousData || !previousQuery) {
+        return undefined;
+      }
+
+      const previousParams = previousQuery.queryKey[2] as typeof queryKeyParams;
+      if (!shouldRetainCatalogListPlaceholderData(previousParams, queryKeyParams)) {
+        return undefined;
+      }
+
+      return previousData;
+    },
   });
 
   const products = useMemo(

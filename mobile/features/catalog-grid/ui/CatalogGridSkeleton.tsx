@@ -1,5 +1,6 @@
 import { View } from "react-native";
 
+import { SkeletonShimmer } from "@/shared/ui/SkeletonShimmer";
 import { useHomeFeedSkeletonStyles } from "@/shared/theme/homeFeedSkeletonStyles";
 
 import { catalogGridRowStyles } from "../lib/catalogGridLayout";
@@ -26,7 +27,7 @@ export const CatalogGridSkeleton = ({
   const styles = useHomeFeedSkeletonStyles();
 
   return (
-    <>
+    <SkeletonShimmer>
       {Array.from({ length: rows }, (_, rowIndex) => (
         <View key={rowIndex} style={[catalogGridRowStyles.row, { gap }]}>
           {Array.from({ length: columns }, (_, columnIndex) => (
@@ -42,6 +43,6 @@ export const CatalogGridSkeleton = ({
           ))}
         </View>
       ))}
-    </>
+    </SkeletonShimmer>
   );
 };

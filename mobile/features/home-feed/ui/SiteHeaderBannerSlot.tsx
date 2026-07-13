@@ -1,7 +1,6 @@
-import { View } from "react-native";
-
 import { SiteHeaderBannerCarousel } from "@/entities/site-header-banner/ui/SiteHeaderBannerCarousel";
 import { useSiteHeaderBannerSlidesQuery } from "@/entities/site-header-banner/model/useSiteHeaderBannerSlidesQuery";
+import { SkeletonShimmer } from "@/shared/ui/SkeletonShimmer";
 import { useHomeFeedSkeletonStyles } from "@/shared/theme/homeFeedSkeletonStyles";
 
 type SiteHeaderBannerSlotProps = {
@@ -25,7 +24,7 @@ export const SiteHeaderBannerSlot = ({
   // карусели не сдвигало ленту вниз.
   if (slidesQuery.isPending) {
     return (
-      <View
+      <SkeletonShimmer
         style={[
           skeletonStyles.bannerPlaceholder,
           edgeToEdge ? skeletonStyles.bannerPlaceholderEdgeToEdge : null,

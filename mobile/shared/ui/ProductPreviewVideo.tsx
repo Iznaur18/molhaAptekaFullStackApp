@@ -1,3 +1,4 @@
+import { useRowVisibility } from "@/shared/model/rowVisibility";
 import { LoopingCoverVideo } from "@/shared/ui/LoopingCoverVideo";
 
 type ProductPreviewVideoProps = {
@@ -14,13 +15,21 @@ export const ProductPreviewVideo = ({
   onPlaybackFailed,
   onReady,
   onEnded,
-}: ProductPreviewVideoProps) => (
-  <LoopingCoverVideo
-    uri={uri}
-    loop={loop}
-    isMuted
-    onPlaybackFailed={onPlaybackFailed}
-    onReady={onReady}
-    onEnded={onEnded}
-  />
-);
+}: ProductPreviewVideoProps) => {
+  // В ленте карточка сообщает свою видимость: ушло за экран или экран потерял
+  // фокус — видео на паузе, декодер не греет CPU/GPU. Вне ленты (детальный
+  // экран и пр.) провайдера нет → isVisible === true, поведение как раньше.
+  const isVisible = useRowVisibility();
+
+  return (
+    <LoopingCoverVideo
+      uri={uri}
+      loop={loop}
+      isMuted
+      isPlaying={isVisible}
+      onPlaybackFailed={onPlaybackFailed}
+      onReady={onReady}
+      onEnded={onEnded}
+    />
+  );
+};

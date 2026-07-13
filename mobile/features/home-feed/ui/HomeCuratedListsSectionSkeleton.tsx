@@ -6,6 +6,7 @@ import {
   resolveCuratedCompactCardWidth,
 } from "@/entities/curated-product-list/lib/curatedProductListHomeLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
+import { SkeletonShimmer } from "@/shared/ui/SkeletonShimmer";
 import {
   useCuratedProductCompactCardStyles,
   useHomeCuratedListsStyles,
@@ -30,7 +31,7 @@ export const HomeCuratedListsSectionSkeleton = () => {
   }, [layoutWidth]);
 
   return (
-    <View style={styles.listBlock}>
+    <SkeletonShimmer style={styles.listBlock}>
       <View style={skeletonStyles.curatedTitleLine} />
       <View style={[styles.row, { flexDirection: "row", overflow: "hidden" }]}>
         {Array.from({ length: CURATED_PRODUCT_LIST_HOME_VISIBLE_CARD_MAX }, (_, index) => (
@@ -40,6 +41,6 @@ export const HomeCuratedListsSectionSkeleton = () => {
           </View>
         ))}
       </View>
-    </View>
+    </SkeletonShimmer>
   );
 };

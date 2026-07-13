@@ -88,6 +88,8 @@
     "test:faq": "node --test scripts/faq.test.mjs",
     "test:home-catalog-intro-backdrop": "node --test scripts/home-catalog-intro-backdrop.test.mjs",
     "test:home-feed-perf": "node --test scripts/home-feed-perf.test.mjs",
+    "test:catalog-category-perf": "node --test scripts/catalog-category-perf.test.mjs",
+    "test:feed-video-visibility": "node --test scripts/feed-video-visibility.test.mjs",
     "test:commerce-card-expand-toggle": "node --test scripts/commerce-card-expand-toggle.test.mjs",
     "test:users-page-layout": "node --test scripts/users-page-layout.test.mjs",
     "test:raffle-featured-slide": "node --test scripts/raffle-featured-slide-layout.test.mjs",

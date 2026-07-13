@@ -3,12 +3,17 @@ import { Text, View, type StyleProp } from "react-native";
 
 import { PRODUCT_UI } from "@/shared/config";
 import { useCachedProductImageStyles } from "@/shared/theme/commerceScreenStyles";
+import { PRODUCT_IMAGE_BLURHASH } from "@/shared/ui/productImagePlaceholder";
 
 type CachedProductImageProps = {
   uri?: string | null;
   style?: StyleProp<ImageStyle>;
   fallbackLabel?: string;
   contentFit?: "cover" | "contain";
+  /** Per-image blurhash/thumbhash, если бэкенд его отдаёт. */
+  blurhash?: string | null;
+  /** Приоритет загрузки: для первого экрана — "high". */
+  priority?: "low" | "normal" | "high";
 };
 
 export const CachedProductImage = ({
@@ -16,6 +21,8 @@ export const CachedProductImage = ({
   style,
   fallbackLabel = PRODUCT_UI.NO_IMAGE,
   contentFit = "cover",
+  blurhash,
+  priority = "normal",
 }: CachedProductImageProps) => {
   const styles = useCachedProductImageStyles();
 
@@ -32,7 +39,14 @@ export const CachedProductImage = ({
       source={{ uri }}
       style={[styles.image, style]}
       contentFit={contentFit}
+      // Размытое превью до готовности фото → нет пустого кадра и скачков вёрстки.
+      placeholder={{ blurhash: blurhash ?? PRODUCT_IMAGE_BLURHASH }}
+      placeholderContentFit={contentFit}
       cachePolicy="memory-disk"
+      priority={priority}
+      // Сброс вью при смене источника — без «протекания» чужого фото при
+      // переиспользовании ячеек списка (виртуализация / FlashList).
+      recyclingKey={uri}
       transition={200}
     />
   );
