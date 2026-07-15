@@ -87,9 +87,43 @@
 .data-confirmation-modal__grid input,
 .data-confirmation-modal__grid textarea {
   font: inherit;
-  padding: 0.4rem 0.5rem;
-  border: 1px solid var(--iz-color-border);
-  border-radius: 6px;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--iz-color-border-strong, var(--iz-color-border));
+  border-radius: 8px;
+  background: var(--iz-color-bg);
+  color: var(--iz-color-text);
+}
+
+.data-confirmation-modal__grid input:focus,
+.data-confirmation-modal__grid textarea:focus {
+  outline: 2px solid var(--iz-color-action);
+  outline-offset: 1px;
+}
+
+.data-confirmation-modal__grid input::placeholder,
+.data-confirmation-modal__grid textarea::placeholder {
+  color: var(--iz-color-text-muted);
+}
+
+.data-confirmation-modal__step-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin-bottom: 0.75rem;
+}
+
+.data-confirmation-modal__step-progress {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--iz-color-text-muted);
+}
+
+.data-confirmation-modal__step-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--iz-color-text);
 }
 
 .data-confirmation-modal__selfie {

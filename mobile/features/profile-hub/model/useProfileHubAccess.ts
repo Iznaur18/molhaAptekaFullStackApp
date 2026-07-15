@@ -32,7 +32,6 @@ export type ProfileHubAccess = {
   canUseProductPromotions: boolean;
   canUseRaffles: boolean;
   canUseDataConfirmationQueue: boolean;
-  canUseInstallmentModeration: boolean;
   canUseInstallmentDisputes: boolean;
   canUseAdminOrders: boolean;
   canUseSearchSynonymsAdmin: boolean;
@@ -72,7 +71,6 @@ export const useProfileHubAccess = (): ProfileHubAccess => {
     canUseProductPromotions: isProfileReady && canModerate,
     canUseRaffles: isProfileReady && canModerate,
     canUseDataConfirmationQueue: isProfileReady && canModerate,
-    canUseInstallmentModeration: isProfileReady && canModerate,
     canUseInstallmentDisputes: isProfileReady && canModerate,
     canUseAdminOrders: isProfileReady && isAdmin,
     canUseSearchSynonymsAdmin: isProfileReady && isAdmin,

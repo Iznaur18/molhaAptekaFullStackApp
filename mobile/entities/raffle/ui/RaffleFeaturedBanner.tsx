@@ -91,6 +91,9 @@ export const RaffleFeaturedBanner = memo(({
           >
             <RafflePrizeMedia raffle={raffle} showSoundToggle isVideoActive={isVideoActive} />
             <View style={styles.visualTopBar} pointerEvents="box-none">
+              <View style={styles.badge} accessibilityRole="text">
+                <Text style={styles.badgeLabel}>{RAFFLE_FEATURED_BANNER_UI.BADGE}</Text>
+              </View>
               <View style={styles.visualTopControls}>
                 {hasManage && manage ? (
                   <RaffleFeaturedBannerManageMenu
@@ -117,25 +120,25 @@ export const RaffleFeaturedBanner = memo(({
           radius={RAFFLE_FEATURED_BANNER_BORDER_RADIUS}
           style={[styles.footerCard, isCompleted && styles.footerCardCompleted]}
         >
-          <View
-            style={[styles.progressBar, isCompleted && styles.progressBarCompleted]}
-            accessibilityRole="progressbar"
-            accessibilityValue={{
-              min: 0,
-              max: target,
-              now: progress,
-            }}
-          >
-            <View
-              style={[
-                styles.progressFill,
-                isCompleted ? styles.progressFillCompleted : null,
-                { width: `${percent}%` },
-              ]}
-            />
-          </View>
-
           <View style={styles.footerContent}>
+            <View
+              style={[styles.progressBar, isCompleted && styles.progressBarCompleted]}
+              accessibilityRole="progressbar"
+              accessibilityValue={{
+                min: 0,
+                max: target,
+                now: progress,
+              }}
+            >
+              <View
+                style={[
+                  styles.progressFill,
+                  isCompleted ? styles.progressFillCompleted : null,
+                  { width: `${percent}%` },
+                ]}
+              />
+            </View>
+
             <Text style={styles.progressLabel} numberOfLines={2}>
               {progressLabel}
             </Text>

@@ -1141,6 +1141,23 @@ export const useProductDetailFieldStyles = createThemedStyles((theme) => ({
     fontWeight: "500",
     color: theme.colors.textSecondary,
   },
+  metaValueRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    minWidth: 0,
+  },
+  metaValueText: {
+    flex: 1,
+    minWidth: 0,
+  },
+  copyButton: {
+    padding: 4,
+    borderRadius: theme.radius.input,
+  },
+  copyButtonPressed: {
+    opacity: 0.7,
+  },
   valueMultiline: {
     lineHeight: 21.6,
   },
@@ -1669,7 +1686,7 @@ export const useProductDetailScreenStyles = createThemedStyles((theme) => ({
 /** Паритет с web `ProductPriceOffer.css` + `product-details-modal__auction-section`. */
 export const useProductPriceOfferStyles = createThemedStyles((theme) => ({
   card: {
-    marginTop: 0,
+    marginTop: 16,
     paddingVertical: 13.6,
     paddingHorizontal: 16,
     borderWidth: 1,
@@ -1713,12 +1730,20 @@ export const useProductPriceOfferStyles = createThemedStyles((theme) => ({
     borderRadius: 8,
     backgroundColor: theme.colors.surface,
   },
+  topItemMine: {
+    borderColor: theme.colors.action,
+    backgroundColor: theme.colors.actionSoft,
+  },
   topRank: {
     width: 21.6,
     flexShrink: 0,
     fontSize: 13,
     fontWeight: "600",
     color: theme.colors.textMuted,
+  },
+  topRankMine: {
+    color: theme.colors.action,
+    fontWeight: "700",
   },
   topBuyerPressable: {
     flexShrink: 1,
@@ -1737,6 +1762,9 @@ export const useProductPriceOfferStyles = createThemedStyles((theme) => ({
     fontWeight: "700",
     color: theme.colors.ink,
   },
+  topPriceMine: {
+    color: theme.colors.action,
+  },
   empty: {
     marginBottom: 16,
     fontSize: 14,
@@ -1745,6 +1773,7 @@ export const useProductPriceOfferStyles = createThemedStyles((theme) => ({
   },
   form: {
     marginTop: 13.6,
+    marginBottom: 16,
     padding: 12,
     borderWidth: 1,
     borderColor: theme.colors.border,
@@ -1773,7 +1802,7 @@ export const useProductPriceOfferStyles = createThemedStyles((theme) => ({
     paddingVertical: 8.8,
     paddingHorizontal: 13.6,
     fontSize: 15.2,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.surfaceMuted,
     color: theme.colors.text,
   },
   actions: {
@@ -1829,6 +1858,8 @@ export const useProductPriceOfferStyles = createThemedStyles((theme) => ({
   },
 }));
 
+const PRODUCT_DETAIL_TAB_BAR_INDICATOR_WIDTH = 2.5;
+
 export const useProductDetailTabBarStyles = createThemedStyles((theme) => ({
   root: {
     borderBottomWidth: StyleSheet.hairlineWidth,
@@ -1837,30 +1868,35 @@ export const useProductDetailTabBarStyles = createThemedStyles((theme) => ({
   },
   scrollContent: {
     flexDirection: "row",
-    gap: 8,
+    alignItems: "stretch",
+    gap: 4,
     paddingHorizontal: DETAIL_SPEC_PADDING_H,
-    paddingVertical: 10,
+    paddingTop: 4,
+    paddingBottom: 0,
   },
   tab: {
-    paddingVertical: 6.4,
-    paddingHorizontal: 13.6,
-    borderRadius: theme.radius.pill,
-    borderWidth: 1,
-    borderColor: `${theme.colors.action}59`,
-    backgroundColor: theme.colors.surface,
+    paddingVertical: 11,
+    paddingHorizontal: 12,
+    borderRadius: 0,
+    borderWidth: 0,
+    borderBottomWidth: PRODUCT_DETAIL_TAB_BAR_INDICATOR_WIDTH,
+    borderBottomColor: "transparent",
+    backgroundColor: "transparent",
   },
   tabActive: {
-    borderColor: theme.colors.action,
-    backgroundColor: theme.colors.action,
+    borderBottomColor: theme.colors.action,
+    backgroundColor: "transparent",
   },
   tabText: {
     fontSize: 14,
+    lineHeight: 18,
     fontWeight: "500",
-    color: theme.colors.action,
+    letterSpacing: 0.15,
+    color: theme.colors.textMuted,
   },
   tabTextActive: {
-    color: theme.colors.onContrast,
-    fontWeight: "600",
+    color: theme.colors.text,
+    fontWeight: "700",
   },
 }));
 
@@ -1876,13 +1912,6 @@ export const useProductDetailPurchaseActionsStyles = createThemedStyles((theme) 
   shortcutsRow: {
     flexDirection: "row",
     gap: 7.2,
-  },
-  shortcutsRowStacked: {
-    flexDirection: "column",
-  },
-  shortcutFullWidth: {
-    flex: undefined,
-    width: "100%",
   },
   cartSlot: {
     width: "100%",

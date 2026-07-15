@@ -29,7 +29,7 @@ test("home feed pauses intro backdrop video when sheet covers hero", () => {
 
   assert.match(
     index,
-    /playbackActive=\{introTransition\.backdropPlaybackActive && isFocused && appActive\}/,
+    /playbackActive=\{\s*introTransition\.backdropPlaybackActive && isFocused && appActive\s*\}/,
   );
   assert.match(transition, /backdropPlaybackActive/);
   assert.match(transition, /BACKDROP_PLAYBACK_THRESHOLD/);

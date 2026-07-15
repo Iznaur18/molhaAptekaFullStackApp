@@ -96,7 +96,6 @@ import {
 import { patchAppIntroSettingsValidation } from "./appIntro/appIntroSettingsValidation.js";
 import {
   upsertProductInstallmentProgramValidation,
-  rejectInstallmentModerationValidation,
   createInstallmentContractValidation,
   installmentContractIdParamValidation,
   installmentPaymentIndexParamValidation,
@@ -185,7 +184,6 @@ export {
   patchProductManageToggleDisplayValidation,
   patchAppIntroSettingsValidation,
   upsertProductInstallmentProgramValidation,
-  rejectInstallmentModerationValidation,
   createInstallmentContractValidation,
   installmentContractIdParamValidation,
   installmentPaymentIndexParamValidation,

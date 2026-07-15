@@ -10,15 +10,6 @@ export function invalidateInstallmentQueries(queryClient) {
 /**
  * @param {import('@tanstack/react-query').QueryClient} queryClient
  */
-export function invalidateInstallmentModerationPending(queryClient) {
-  return queryClient.invalidateQueries({
-    queryKey: installmentQueryKeys.moderationPending(),
-  });
-}
-
-/**
- * @param {import('@tanstack/react-query').QueryClient} queryClient
- */
 export function invalidateInstallmentDisputesPending(queryClient) {
   return queryClient.invalidateQueries({
     queryKey: installmentQueryKeys.disputesPending(),

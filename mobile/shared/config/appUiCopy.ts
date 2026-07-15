@@ -124,10 +124,10 @@ export const EDIT_PROFILE_UI = {
   LABEL_PHONE: "Телефон",
   LABEL_AVATAR: "Аватар",
   LABEL_BIRTH_DATE: "Дата рождения",
-  PLACEHOLDER_BIRTH_DATE: "ГГГГ-ММ-ДД",
+  PLACEHOLDER_BIRTH_DATE: "ДД.ММ.ГГГГ",
   LABEL_GENDER: "Пол",
   LABEL_NOTIFICATIONS: "Уведомления по email",
-  LABEL_NOTES: "Заметки",
+  LABEL_NOTES: "О себе",
   CHARS_USED: (used: number, max: number) => `${used} / ${max}`,
   LABEL_BACKGROUND: "Фон профиля",
   BG_MODE_PRESET: "Цвет",
@@ -209,6 +209,25 @@ export const CART_PAGE_UI = {
   CHECKOUT_SHEET_CLOSE: "Закрыть",
 } as const;
 
+/** Выигранные аукционные лоты в корзине */
+export const CART_AUCTION_UI = {
+  SECTION_TITLE: "Выигранные лоты",
+  SECTION_HINT: "Каждый лот оформляется отдельным заказом",
+  BADGE: "Аукцион",
+  PRICE_LABEL: "Принятая цена",
+  DEADLINE_LABEL: "Оплатить до",
+  CHECKOUT: "Оформить",
+  REMOVE: "Убрать",
+  REMOVE_PENDING: "Убираем…",
+  REMOVE_CONFIRM_TITLE: "Убрать лот из корзины?",
+  REMOVE_CONFIRM_MESSAGE:
+    "Ставка будет отменена, продавец сможет принять предложение другого покупателя.",
+  REMOVE_CONFIRM_CANCEL: "Отмена",
+  REMOVE_CONFIRM_OK: "Убрать",
+  ORDER_PLACED: "Заказ по принятой цене оформлен",
+  ERROR_GENERIC: "Не удалось выполнить действие",
+} as const;
+
 export const FORMAT_BOOLEAN_RU = {
   YES: "Да",
   NO: "Нет",
@@ -243,6 +262,9 @@ export const PRODUCT_DETAILS_MODAL_UI = {
   CHARACTERISTICS_TITLE: "Характеристики",
   CHARACTERISTICS_SECTION_ARIA: "Характеристики товара",
   DESCRIPTION_SECTION_ARIA: "Описание товара",
+  COPY_ID_ARIA: "Скопировать ID",
+  COPY_ID_DONE_ARIA: "ID скопирован",
+  COPY_ID_FAILED: "Не удалось скопировать ID",
 } as const;
 
 export const PRODUCT_CARD_UI = {
@@ -369,7 +391,8 @@ export const PRODUCT_PRICE_OFFER_UI = {
   CANCEL: "Отменить предложение",
   SUBMIT_LOADING: "Отправка…",
   STATUS_PENDING: "Ожидает решения продавца",
-  STATUS_ACCEPTED: "Принято — оформите оплату",
+  STATUS_ACCEPTED: "Ставка принята — товар в корзине",
+  STATUS_ORDERED: "Заказ по принятой цене оформлен",
   STATUS_REJECTED: "Отклонено",
   CONFIRMED_DATA_REQUIRED: "Доступно только пользователям с подтверждёнными данными",
   LOGIN_TO_BID: "Войдите, чтобы предложить цену",
@@ -377,8 +400,7 @@ export const PRODUCT_PRICE_OFFER_UI = {
   ACTION_REJECT: "Отклонить",
   ACTION_PENDING: "Сохраняем…",
   ACCEPTED_BADGE: "Ожидает оплаты",
-  PAY_BUTTON: "Оплатить по принятой цене",
-  PAY_ORDER_PLACED: "Заказ по принятой цене оформлен",
+  GO_TO_CART: "Перейти в корзину",
 } as const;
 
 export const AUCTION_PAGE_UI = {
@@ -406,7 +428,7 @@ export const AUCTION_PAGE_UI = {
   COLLAPSE_ALL: "Свернуть все",
   REFRESH: "Обновить",
   ATTENTION_FILTER_HINT: "Показаны ставки, где нужно ваше действие",
-  COLLAPSED_BUYER_PAY: (price: string) => `Оплатить ${price}`,
+  COLLAPSED_BUYER_PAY: (price: string) => `В корзине: ${price}`,
   COLLAPSED_BUYER_PENDING: "Ожидает ответа продавца",
   COLLAPSED_SELLER_REVIEW: (price: string) => `Подтвердите ставку ${price}`,
   EXPAND_TOGGLE: (expanded: boolean) => (expanded ? "Свернуть" : "Развернуть"),
@@ -492,6 +514,8 @@ export const HOME_FEED_UI = {
   CURATED_SECTION_ARIA: "Подборки товаров",
   RAFFLES_SECTION_TITLE: "Розыгрыш",
   RAFFLES_SECTION_ARIA: "Розыгрыши",
+  SHOW_RAFFLES: "Участвуй в розыгрыше",
+  HIDE_RAFFLES: "Скрыть розыгрыш",
   STORIES_SECTION_ARIA: "Сторисы",
 } as const;
 
@@ -577,16 +601,7 @@ export const INSTALLMENT_UI = {
   SELLER_TAB_HINT: "Настройте планы в «Изменить товар» → «Продать в рассрочку».",
   SELLER_PROFILE_ARIA: (sellerName: string) => `Профиль продавца: ${sellerName}`,
   CONTRACT_PRODUCT: "Товар",
-  MODERATION_PAGE_TITLE: "Рассрочка — модерация",
-  MODERATION_PAGE_LOADING: "Загрузка очереди…",
-  MODERATION_PAGE_EMPTY: "Нет программ на модерации.",
-  MODERATION_APPROVE: "Одобрить",
-  MODERATION_REJECT: "Отклонить",
-  MODERATION_REJECT_COMMENT: "Комментарий (необязательно)",
-  MODERATION_REJECT_PLACEHOLDER: "Комментарий для продавца…",
   BUYER_PROFILE_ARIA: (buyerName: string) => `Профиль покупателя: ${buyerName}`,
-  BUYERS_LABEL: "Покупатели",
-  COUNT_PROGRAMS: (count: number) => `${count} программ`,
   DISPUTES_PAGE_TITLE: "Споры по рассрочке",
   DISPUTES_PAGE_LOADING: "Загрузка споров…",
   DISPUTES_PAGE_EMPTY: "Нет открытых споров.",
@@ -652,8 +667,8 @@ export const INSTALLMENT_UI = {
   CONTRACT_STATUS_FILTER_CANCELLED: "Отменённые",
   LOGIN_HINT: "Войдите, чтобы видеть рассрочки.",
   LOGIN_BUTTON: "Войти",
-  PROGRAM_MODAL_PENDING_HINT: "Программа на модерации — изменения сохранятся после проверки.",
-  PROGRAM_MODAL_REJECTED_HINT: "Программа отклонена — исправьте планы и сохраните снова.",
+  PROGRAM_MODAL_REJECTED_HINT:
+    "Программа была отклонена ранее. Исправьте планы и сохраните снова — рассрочка сразу станет доступна покупателям.",
   PROGRAM_MODAL_APPROVED_HINT: "Рассрочка активна — покупатели могут оформить её на этот товар.",
   PROGRAM_MODAL_TITLE: "Рассрочка на товар",
   PROGRAM_MODAL_ENABLED: "Включить рассрочку",
@@ -682,7 +697,7 @@ export const INSTALLMENT_UI = {
   PROGRAM_MODAL_SAVE: "Сохранить",
   PROGRAM_MODAL_SAVING: "Сохраняем…",
   PROGRAM_MODAL_MAX_PLANS: (max: number) => `Не больше ${max} планов`,
-  PROGRAM_MODAL_SUCCESS: "Программа сохранена",
+  PROGRAM_MODAL_SUCCESS: "Программа сохранена и активна",
   PROGRAM_MODAL_CLOSE: "Закрыть",
   CONTRACT_STATUS_LABEL: {
     pending_first_payment: "Ожидает первый платёж",
@@ -745,7 +760,7 @@ export const ORDER_CARD_UI = {
   DETAILS_FOLD_SUMMARY: "Подробности заказа",
   ACTION_CONFIRM: "Подтвердить получение",
   ACTION_CANCEL: "Отменить",
-  ACTION_SHIPPED: "Отправлен",
+  ACTION_SHIPPED: "Принять",
   ACTION_DELIVERED: "Доставлен",
   ACTION_PENDING: "Сохраняем…",
   CANCEL_CONFIRM: "Отменить заказ покупателя?",
@@ -902,7 +917,6 @@ export const MY_PROFILE_PAGE_UI = {
   TAB_DATA_CONFIRMATION: "Подтверждение",
   TAB_INSTALLMENT_PAYMENTS: "Покупки - Рассрочка",
   TAB_INSTALLMENT_SALES: "Продажи - Рассрочка",
-  TAB_INSTALLMENT_MODERATION: "Рассрочка — модерация",
   TAB_INSTALLMENT_DISPUTES: "Споры",
   TAB_SUBSCRIPTIONS: "Подписки",
   TAB_WISHLIST: "Мои желания",
@@ -937,7 +951,7 @@ export const USER_PROFILE_COPY = {
     userRole: "Роль",
     notificationsEnabled: "Уведомления",
     isPremiumUser: "Премиум",
-    notesAboutUser: "Заметки",
+    notesAboutUser: "О себе",
     userLoyaltyPoints: "Баллы лояльности",
     userRatingByVotes: "Рейтинг по голосам",
     followersCount: "Подписчики",
@@ -1023,17 +1037,22 @@ export const SELLER_PRODUCTS_PAGE_UI = {
 export const USER_VOTE_RATING_UI = {
   COLLAPSE_SUMMARY: "Оценить пользователя",
   TITLE: "Оценка",
-  CURRENT_AGGREGATE: "Сейчас в профиле",
-  RANGE_LABEL: "Ваша оценка",
+  OUT_OF_MAX: "из 10",
+  VOTES_FORMS: ["оценка", "оценки", "оценок"] as const,
+  RANGE_LABEL: "Ваш голос",
+  SCALE_LOW: "Плохо",
+  SCALE_HIGH: "Отлично",
   SUBMIT: "Отправить оценку",
   SUBMIT_LOADING: "Отправка…",
-  ALREADY_RATED: "Вы уже оценили пользователя",
+  ALREADY_RATED_TITLE: "Спасибо за оценку",
+  YOUR_SCORE: (score: number) => `Ваша оценка: ${score}`,
   LOGIN_HINT: "Войдите, чтобы поставить оценку.",
   LOGIN_BUTTON: "Войти",
   SELF_HINT: "Нельзя оценить свой профиль.",
   ME_LOADING: "Загрузка…",
   MY_VOTE_RESOLVING: "Проверяем вашу оценку…",
   SUCCESS: "Оценка сохранена",
+  SUCCESS_CHECKMARK: "✓",
   SUCCESS_FLASH_MS: 2800,
 } as const;
 
@@ -1387,6 +1406,7 @@ export const INTRO_VIDEO_UPLOAD_UI = {
 
 export const INTRO_AD_PAGE_UI = {
   CARD_TITLE: "Intro-ролик",
+  TEMPORARILY_UNAVAILABLE: "Временно не работает",
   PAGE_ARIA: "Реклама в intro",
   LOGIN_HINT: "Войдите, чтобы оформить рекламу в intro.",
   LOGIN_BUTTON: "Войти",
@@ -1534,6 +1554,26 @@ export const CREATE_RAFFLE_MODAL_UI = {
   SECTION_BASIC: "Основное",
   SECTION_PRIZE: "Приз",
   SECTION_CONDITIONS: "Условия",
+  STEP_SUBTITLE_BASIC: "Название и описание для баннера и карточки розыгрыша.",
+  STEP_SUBTITLE_PRIZE: "Фото или видео приза — то, что увидят покупатели.",
+  STEP_SUBTITLE_CONDITIONS: "Цель продаж и при желании ссылка Instagram.",
+  WIZARD_PROGRESS_ARIA: "Прогресс создания розыгрыша",
+  WIZARD_STEP_OF: (current: number, total: number) => `Шаг ${current} из ${total}`,
+  BTN_NEXT: "Далее",
+  BTN_BACK: "Назад",
+  BTN_CANCEL: "Отмена",
+  DISCARD_TITLE: "Сбросить создание?",
+  DISCARD_MESSAGE: "Введённые данные не сохранятся.",
+  DISCARD_CONFIRM: "Сбросить",
+  DISCARD_KEEP: "Продолжить",
+  EXISTING_PENDING: (title: string) =>
+    `У вас уже есть розыгрыш «${title}» на модерации. Новый нельзя отправить, пока не отзовёте текущий.`,
+  EXISTING_IN_PROGRESS: (title: string) =>
+    `У вас уже есть розыгрыш «${title}» в работе. Новый создать нельзя, пока текущий не завершится.`,
+  BTN_WITHDRAW: "Отозвать с модерации",
+  WITHDRAW_CONFIRM_TITLE: "Отозвать заявку?",
+  WITHDRAW_CONFIRM: "Розыгрыш будет удалён с модерации. Восстановить нельзя.",
+  WITHDRAW_SUCCESS: "Заявка отозвана. Можно создать новый розыгрыш.",
   LABEL_TITLE: "Название",
   LABEL_DESCRIPTION: "Описание",
   LABEL_PRIZE_MEDIA: "Медиа приза (фото или видео)",
@@ -1562,7 +1602,7 @@ export const CREATE_RAFFLE_MODAL_UI = {
   HINT_TARGET:
     "Сколько подтверждённых продаж нужно для завершения розыгрыша. Целое число от 1 до 100 000.",
   HINT_INSTAGRAM:
-    "Ссылка на ваш профиль Instagram — покупатели увидят её после завершения розыгрыша.",
+    "Необязательно. Ссылка на Instagram — покупатели увидят её после завершения розыгрыша.",
 } as const;
 
 export const PREMIUM_PAGE_UI = {
@@ -1652,6 +1692,12 @@ export const DATA_CONFIRMATION_MODAL_UI = {
   TITLE: "Подтверждение данных",
   INTRO:
     "Заполните паспортные данные и приложите фото с паспортом в руках. После проверки модератором у вас появится значок подтверждённого продавца.",
+  STEP_PROGRESS: (current: number, total: number) => `Шаг ${current} из ${total}`,
+  STEP_IDENTITY: "ФИО и дата рождения",
+  STEP_PASSPORT: "Паспортные данные",
+  STEP_SELFIE: "Фото с паспортом",
+  NEXT: "Далее",
+  BACK: "Назад",
   LABEL_PASSPORT_SELFIE: "Ваше фото с паспортом в руках",
   HINT_PASSPORT_SELFIE: "JPEG, PNG или WebP, до 50 МБ",
   ERROR_PASSPORT_SELFIE_REQUIRED: "Приложите фото с паспортом в руках",
@@ -1669,6 +1715,7 @@ export const DATA_CONFIRMATION_MODAL_UI = {
   LABEL_ISSUED_AT: "Дата выдачи",
   LABEL_DEPARTMENT_CODE: "Код подразделения",
   PLACEHOLDER_DEPARTMENT_CODE: "000-000",
+  PLACEHOLDER_DATE: "ДД.ММ.ГГГГ",
   SUBMIT: "Отправить заявку",
   SUBMIT_LOADING: "Отправка…",
   CANCEL: "Закрыть",

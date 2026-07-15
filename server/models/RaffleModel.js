@@ -81,7 +81,8 @@ const RaffleSchema = new Schema(
     },
     instagramUrl: {
       type: String,
-      required: true,
+      required: false,
+      default: "",
       trim: true,
       maxlength: 500,
     },

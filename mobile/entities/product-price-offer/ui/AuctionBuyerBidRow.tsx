@@ -1,8 +1,7 @@
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
-import { useCreateOrderMutation } from "@/entities/order/model/useCreateOrderMutation";
-import type { OrderPaymentMethod } from "@/entities/order/model/constants";
 import type { MyPriceOfferBid } from "@/entities/product-price-offer/api/incomingPriceOffersApi";
 import {
   bidNeedsAttention,
@@ -12,8 +11,6 @@ import { usePriceOfferMutations } from "@/entities/product-price-offer/model/use
 import { AuctionDashboardBuyerPriceEditor } from "@/entities/product-price-offer/ui/AuctionDashboardBuyerPriceEditor";
 import { AuctionDashboardProductThumb } from "@/entities/product-price-offer/ui/AuctionDashboardProductThumb";
 import { AuctionDashboardRowStatus } from "@/entities/product-price-offer/ui/AuctionDashboardRowStatus";
-import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
-import { CheckoutForm } from "@/features/checkout/ui/CheckoutForm";
 import {
   AUCTION_PAGE_UI,
   PRODUCT_PRICE_OFFER_UI,
@@ -51,16 +48,11 @@ export const AuctionBuyerBidRow = ({
   onExpandedChange,
 }: AuctionBuyerBidRowProps) => {
   const styles = useAuctionDashboardRowStyles();
-  const sessionQuery = useAuthSessionQuery();
+  const router = useRouter();
   const [priceInput, setPriceInput] = useState(() => formatIntegerGroupRu(bid.offerPrice ?? ""));
   const [error, setError] = useState("");
   const { patchMutation, cancelMutation } = usePriceOfferMutations(bid.productId);
-  const createOrderMutation = useCreateOrderMutation();
   const isBusy = patchMutation.isPending || cancelMutation.isPending;
-  const isPaying = createOrderMutation.isPending;
-  const [showPay, setShowPay] = useState(false);
-  const [payError, setPayError] = useState("");
-  const [paySuccess, setPaySuccess] = useState("");
 
   const productName = bid.product?.productName ?? "Товар";
   const isPending = bid.status === PRICE_OFFER_STATUS_PENDING;
@@ -107,29 +99,8 @@ export const AuctionBuyerBidRow = ({
     }
   };
 
-  const handlePay = async (payload: {
-    deliveryAddress: string;
-    deliveryAddressFlat: string;
-    paymentMethod: OrderPaymentMethod;
-  }) => {
-    setPayError("");
-    setPaySuccess("");
-    try {
-      await createOrderMutation.mutateAsync({
-        items: [{ productId: bid.productId, quantity: 1 }],
-        priceOfferId: bid._id,
-        deliveryAddress: payload.deliveryAddress,
-        deliveryAddressFlat: payload.deliveryAddressFlat,
-        paymentMethod: payload.paymentMethod,
-      });
-      setPaySuccess(PRODUCT_PRICE_OFFER_UI.PAY_ORDER_PLACED);
-      setShowPay(false);
-      onChanged?.();
-    } catch (payErrorValue) {
-      setPayError(
-        payErrorValue instanceof Error ? payErrorValue.message : AUCTION_PAGE_UI.ERROR_GENERIC,
-      );
-    }
+  const handleGoToCart = () => {
+    router.push("/(tabs)/cart");
   };
 
   return (
@@ -168,7 +139,7 @@ export const AuctionBuyerBidRow = ({
               <AuctionDashboardRowStatus isPending={isPending} isAccepted={isAccepted}>
                 {isPending
                   ? PRODUCT_PRICE_OFFER_UI.STATUS_PENDING
-                  : isAccepted && !showPay
+                  : isAccepted
                     ? PRODUCT_PRICE_OFFER_UI.STATUS_ACCEPTED
                     : null}
               </AuctionDashboardRowStatus>
@@ -209,22 +180,10 @@ export const AuctionBuyerBidRow = ({
             />
           ) : null}
 
-          {isAccepted && !showPay ? (
-            <Pressable style={styles.cta} onPress={() => setShowPay(true)}>
-              <Text style={styles.ctaText}>{PRODUCT_PRICE_OFFER_UI.PAY_BUTTON}</Text>
+          {isAccepted ? (
+            <Pressable style={styles.cta} onPress={handleGoToCart}>
+              <Text style={styles.ctaText}>{PRODUCT_PRICE_OFFER_UI.GO_TO_CART}</Text>
             </Pressable>
-          ) : null}
-
-          {isAccepted && showPay ? (
-            <View style={styles.checkout}>
-              <CheckoutForm
-                defaultUser={sessionQuery.data?.user ?? null}
-                isSubmitting={isPaying}
-                submitError={payError}
-                submitSuccess={paySuccess}
-                onSubmit={handlePay}
-              />
-            </View>
           ) : null}
 
           {error ? (

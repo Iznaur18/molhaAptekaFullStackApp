@@ -1,6 +1,13 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Alert, ScrollView, Text, View } from "react-native";
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -24,6 +31,7 @@ import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import { ProductDetailPurchaseActions } from "@/features/product-detail/ui/ProductDetailPurchaseActions";
+import { ProductDetailMediaSection } from "@/features/product-detail/ui/ProductDetailMediaSection";
 import { ProductDetailTabBar } from "@/features/product-detail/ui/ProductDetailTabBar";
 import { ProductDetailsDetailsTab } from "@/features/product-detail/ui/ProductDetailsDetailsTab";
 import { ProductAuctionTab, type ProductAuctionDockFooter } from "@/features/product-detail/ui/ProductAuctionTab";
@@ -41,6 +49,7 @@ import {
   PRODUCT_REPORT_UI,
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { useVisualViewportKeyboardBottomInset } from "@/shared/lib/useVisualViewportKeyboardBottomInset";
 import { useProductDetailScreenStyles } from "@/shared/theme/catalogProductStyles";
 import { AppButton } from "@/shared/ui/AppButton";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
@@ -50,6 +59,7 @@ export default function ProductDetailScreen() {
   const insets = useSafeAreaInsets();
   const styles = useProductDetailScreenStyles();
   const queryClient = useQueryClient();
+  const keyboardBottomInset = useVisualViewportKeyboardBottomInset();
   const { id } = useLocalSearchParams<{ id: string }>();
   const productId = Array.isArray(id) ? id[0] : id ?? "";
   const productQuery = useCatalogProductQuery(productId);
@@ -316,28 +326,41 @@ export default function ProductDetailScreen() {
 
   return (
     <View style={[styles.screen, { paddingTop: insets.top }]}>
-      {showTabs ? (
-        <ProductDetailTabBar tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
-      ) : null}
-
-      <ScrollView
+      <KeyboardAvoidingView
         style={styles.scrollArea}
-        contentContainerStyle={[
-          styles.container,
-          !showMobilePurchaseDock && !showInstallmentDock && !showAuctionDock && styles.containerNoDock,
-        ]}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.OS === "ios" ? insets.top : 0}
       >
+        <ScrollView
+          style={styles.scrollArea}
+          contentContainerStyle={[
+            styles.container,
+            !showMobilePurchaseDock && !showInstallmentDock && !showAuctionDock && styles.containerNoDock,
+            keyboardBottomInset > 0 ? { paddingBottom: keyboardBottomInset } : null,
+          ]}
+          keyboardShouldPersistTaps="handled"
+          automaticallyAdjustKeyboardInsets={Platform.OS !== "web"}
+          automaticallyAdjustsScrollIndicatorInsets={Platform.OS !== "web"}
+        >
+        <ProductDetailMediaSection
+          product={productRecord}
+          productId={productId}
+          imageUrls={imageUrls}
+          previewVideoUrl={previewVideoUrl}
+          isOwnProduct={isOwnProduct}
+          onReportPress={handleReportPress}
+          reportDisabled={isAuthorized && hasPendingReport}
+        />
+
+        {showTabs ? (
+          <ProductDetailTabBar tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
+        ) : null}
+
         <View style={[styles.tabPanel, isAltTab && styles.tabPanelInset]}>
           {activeTab === "details" ? (
             <ProductDetailsDetailsTab
               product={productRecord}
-              productId={productId}
-              imageUrls={imageUrls}
-              previewVideoUrl={previewVideoUrl}
-              isOwnProduct={isOwnProduct}
               topStatFieldKeys={topStatFieldKeys}
-              onReportPress={handleReportPress}
-              reportDisabled={isAuthorized && hasPendingReport}
             />
           ) : null}
           {activeTab === "reviews" ? (
@@ -395,8 +418,9 @@ export default function ProductDetailScreen() {
           <Text style={styles.reportSuccess}>{reportSuccessMessage}</Text>
         ) : null}
       </ScrollView>
+      </KeyboardAvoidingView>
 
-      {showMobilePurchaseDock ? (
+      {showMobilePurchaseDock && keyboardBottomInset === 0 ? (
         <View style={[styles.purchaseDock, { paddingBottom: Math.max(insets.bottom, 10.4) }]}>
           <ProductDetailPurchaseActions
             productId={productId}
@@ -411,7 +435,7 @@ export default function ProductDetailScreen() {
         </View>
       ) : null}
 
-      {showInstallmentDock && installmentDock ? (
+      {showInstallmentDock && installmentDock && keyboardBottomInset === 0 ? (
         <View style={[styles.installmentDock, { paddingBottom: Math.max(insets.bottom, 10.4) }]}>
           <AppButton
             label={installmentDock.label}
@@ -424,7 +448,7 @@ export default function ProductDetailScreen() {
         </View>
       ) : null}
 
-      {showAuctionDock && auctionDock ? (
+      {showAuctionDock && auctionDock && keyboardBottomInset === 0 ? (
         <View style={[styles.installmentDock, { paddingBottom: Math.max(insets.bottom, 10.4) }]}>
           <AppButton
             label={auctionDock.label}

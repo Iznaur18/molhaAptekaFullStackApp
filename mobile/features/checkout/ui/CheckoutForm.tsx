@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Text, TextInput, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { addressValueFromUser } from "@/entities/address/lib/addressValueFromUser";
 import { validateRuDeliveryAddressForm } from "@/entities/address/lib/validateRuDeliveryAddressForm";
@@ -22,6 +23,8 @@ type CheckoutFormProps = {
   submitSuccess: string;
   isDisabled?: boolean;
   showHeading?: boolean;
+  /** Sheet layout: fields сверху, кнопка прижата к низу панели. */
+  pinSubmitToBottom?: boolean;
   onSubmit: (payload: {
     deliveryAddress: string;
     deliveryAddressFlat: string;
@@ -36,9 +39,11 @@ export const CheckoutForm = ({
   submitSuccess,
   isDisabled = false,
   showHeading = true,
+  pinSubmitToBottom = false,
   onSubmit,
 }: CheckoutFormProps) => {
   const theme = useAppTheme();
+  const insets = useSafeAreaInsets();
   const checkoutStyles = useCheckoutFormStyles();
   const [deliveryAddress, setDeliveryAddress] = useState<RuDeliveryAddressValue>(() =>
     addressValueFromUser(defaultUser),
@@ -68,47 +73,53 @@ export const CheckoutForm = ({
   const displayError = localError || submitError;
 
   return (
-    <View style={checkoutStyles.form}>
-      {showHeading ? (
-        <Text style={checkoutStyles.heading}>{CHECKOUT_FORM_UI.HEADING}</Text>
-      ) : null}
+    <View style={[checkoutStyles.form, pinSubmitToBottom && checkoutStyles.formPinned]}>
+      <View style={checkoutStyles.fields}>
+        {showHeading ? (
+          <Text style={checkoutStyles.heading}>{CHECKOUT_FORM_UI.HEADING}</Text>
+        ) : null}
 
-      <AddressSuggestInput
-        value={deliveryAddress}
-        onChange={setDeliveryAddress}
-        disabled={isDisabled || isSubmitting}
-        placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_DELIVERY_ADDRESS}
-        containerStyle={checkoutStyles.fieldGroup}
-        labelStyle={checkoutStyles.fieldLabel}
-        inputStyle={checkoutStyles.fieldInput}
-      />
+        <AddressSuggestInput
+          value={deliveryAddress}
+          onChange={setDeliveryAddress}
+          disabled={isDisabled || isSubmitting}
+          placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_DELIVERY_ADDRESS}
+          containerStyle={checkoutStyles.fieldGroup}
+          labelStyle={checkoutStyles.fieldLabel}
+          inputStyle={checkoutStyles.fieldInput}
+        />
 
-      <Text style={checkoutStyles.fieldLabel}>{CHECKOUT_FORM_UI.LABEL_FLAT}</Text>
-      <TextInput
-        style={checkoutStyles.fieldInput}
-        value={deliveryAddress.flat}
-        onChangeText={(flat) => setDeliveryAddress((prev) => ({ ...prev, flat }))}
-        placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_FLAT}
-        placeholderTextColor={theme.colors.textMuted}
-        editable={!isDisabled && !isSubmitting}
-        keyboardType="default"
-      />
+        <Text style={checkoutStyles.fieldLabel}>{CHECKOUT_FORM_UI.LABEL_FLAT}</Text>
+        <TextInput
+          style={checkoutStyles.fieldInput}
+          value={deliveryAddress.flat}
+          onChangeText={(flat) => setDeliveryAddress((prev) => ({ ...prev, flat }))}
+          placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_FLAT}
+          placeholderTextColor={theme.colors.textMuted}
+          editable={!isDisabled && !isSubmitting}
+          keyboardType="default"
+        />
 
-      <CheckoutPaymentMethodPicker
-        value={paymentMethod}
-        onChange={setPaymentMethod}
-        disabled={isDisabled || isSubmitting}
-      />
+        <CheckoutPaymentMethodPicker
+          value={paymentMethod}
+          onChange={setPaymentMethod}
+          disabled={isDisabled || isSubmitting}
+        />
 
-      {displayError ? <Text style={checkoutStyles.feedbackError}>{displayError}</Text> : null}
-      {submitSuccess ? <Text style={checkoutStyles.feedbackSuccess}>{submitSuccess}</Text> : null}
+        {displayError ? <Text style={checkoutStyles.feedbackError}>{displayError}</Text> : null}
+        {submitSuccess ? <Text style={checkoutStyles.feedbackSuccess}>{submitSuccess}</Text> : null}
+      </View>
 
       <AppButton
         label={CHECKOUT_FORM_UI.SUBMIT_IDLE}
         variant="primary"
         onPress={handleSubmit}
         disabled={isFormDisabled}
-        style={checkoutStyles.submitSpacer}
+        style={[
+          checkoutStyles.submitSpacer,
+          pinSubmitToBottom && checkoutStyles.submitDocked,
+          pinSubmitToBottom ? { marginBottom: Math.max(insets.bottom, 12) } : null,
+        ]}
       />
     </View>
   );

@@ -11,6 +11,7 @@ import type { FeaturedRaffleManage, RaffleFromApi } from "@/entities/raffle/mode
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { RaffleFeaturedCarousel } from "@/entities/raffle/ui/RaffleFeaturedCarousel";
 import { CreateRaffleModal } from "@/features/create-raffle-page/ui/CreateRaffleModal";
+import { HomeFeaturedRafflesRevealButton } from "@/features/home-feed/ui/HomeFeaturedRafflesRevealButton";
 import { raffleQueryKeys } from "@/shared/api";
 import { HOME_FEED_UI, PRODUCT_REPORT_UI, RAFFLE_MANAGE_UI } from "@/shared/config";
 import { useRaffleFeaturedSectionStyles } from "@/shared/theme/raffleFeaturedStyles";
@@ -28,11 +29,13 @@ export const HomeFeaturedRafflesSection = ({ raffles }: HomeFeaturedRafflesSecti
   const { pauseMyMutation, deleteMyMutation } = useMyRaffleMutations();
   const { deleteStaffMutation } = useRaffleStaffMutations();
   const [isBusy, setIsBusy] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [editingRaffle, setEditingRaffle] = useState<RaffleFromApi | null>(null);
   const [editUseStaffApi, setEditUseStaffApi] = useState(false);
 
   const currentUserId =
     sessionQuery.data?.user?._id != null ? String(sessionQuery.data.user._id) : null;
+  const hasRaffles = raffles.length > 0;
 
   const handleOpenProducts = useCallback(
     (raffleId: string) => {
@@ -40,6 +43,10 @@ export const HomeFeaturedRafflesSection = ({ raffles }: HomeFeaturedRafflesSecti
     },
     [router],
   );
+
+  const toggleExpanded = useCallback(() => {
+    setIsExpanded((prev) => !prev);
+  }, []);
 
   const getManage = useCallback(
     (raffle: RaffleFromApi): FeaturedRaffleManage | null => {
@@ -122,13 +129,19 @@ export const HomeFeaturedRafflesSection = ({ raffles }: HomeFeaturedRafflesSecti
 
   return (
     <>
-      {raffles.length > 0 ? (
+      {hasRaffles ? (
         <View style={sectionStyles.root} accessibilityLabel={HOME_FEED_UI.RAFFLES_SECTION_ARIA}>
-          <RaffleFeaturedCarousel
-            raffles={raffles}
-            onOpenProducts={handleOpenProducts}
-            getManage={getManage}
+          <HomeFeaturedRafflesRevealButton
+            isExpanded={isExpanded}
+            onPress={toggleExpanded}
           />
+          {isExpanded ? (
+            <RaffleFeaturedCarousel
+              raffles={raffles}
+              onOpenProducts={handleOpenProducts}
+              getManage={getManage}
+            />
+          ) : null}
         </View>
       ) : null}
 

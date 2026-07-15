@@ -25,6 +25,8 @@
     "test:smtp": "node scripts/testSmtp.js",
     "audit:routes": "node scripts/auditRouteBodyValidation.js",
     "create-admin": "node scripts/createAdmin.js",
+    "seed:product-reviews": "node scripts/seedProductReviews.js",
+    "seed:auction-bids": "node scripts/seedProductAuctionBids.js",
     "delete-products-without-images": "node scripts/deleteProductsWithoutImages.js",
     "delete-products-without-images:apply": "node scripts/deleteProductsWithoutImages.js --apply"
   },

@@ -36,3 +36,9 @@ export const ORDER_STATUS_LABEL_RU: Record<OrderStatus, string> = {
   [ORDER_STATUS_DELIVERED]: "Доставлен",
   [ORDER_STATUS_CANCELLED]: "Отменён",
 };
+
+/** Лейблы статусов в «Мои продажи» (seller): shipped → «Принять». */
+export const SALES_ORDER_STATUS_LABEL_RU: Record<OrderStatus, string> = {
+  ...ORDER_STATUS_LABEL_RU,
+  [ORDER_STATUS_SHIPPED]: "Принять",
+};

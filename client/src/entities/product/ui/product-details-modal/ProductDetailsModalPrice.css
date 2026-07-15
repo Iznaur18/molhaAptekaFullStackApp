@@ -157,9 +157,9 @@
   min-height: 2.5rem;
   margin: 0;
   padding: 0.45rem var(--iz-space-2);
-  border: 1px solid var(--iz-color-warning);
+  border: 1px solid var(--iz-color-ink);
   border-radius: var(--iz-radius-input);
-  background: var(--iz-color-warning);
+  background: var(--iz-color-ink);
   color: var(--iz-color-on-contrast);
   font: inherit;
   font-size: 0.9rem;
@@ -171,8 +171,8 @@
 }
 
 .product-details-modal__auction-btn:hover:not(:disabled) {
-  background: var(--iz-color-warning);
-  border-color: var(--iz-color-warning);
+  background: var(--iz-color-ink);
+  border-color: var(--iz-color-ink);
 }
 
 .product-details-modal__auction-btn--inactive,

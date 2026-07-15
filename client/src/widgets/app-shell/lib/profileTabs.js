@@ -27,7 +27,6 @@ export const PROFILE_TAB_RAFFLES = "raffles";
 export const PROFILE_TAB_DATA_CONFIRMATION_REQUESTS = "data-confirmation-requests";
 export const PROFILE_TAB_INSTALLMENT_PAYMENTS = "installment-payments";
 export const PROFILE_TAB_INSTALLMENT_SALES = "installment-sales";
-export const PROFILE_TAB_INSTALLMENT_MODERATION = "installment-moderation";
 export const PROFILE_TAB_INSTALLMENT_DISPUTES = "installment-disputes";
 
 export const PROFILE_FULL_WIDTH_CATALOG_TABS = new Set([
@@ -69,7 +68,6 @@ export const PROFILE_TAB_VALUES = [
   PROFILE_TAB_DATA_CONFIRMATION_REQUESTS,
   PROFILE_TAB_INSTALLMENT_PAYMENTS,
   PROFILE_TAB_INSTALLMENT_SALES,
-  PROFILE_TAB_INSTALLMENT_MODERATION,
   PROFILE_TAB_INSTALLMENT_DISPUTES,
 ];
 

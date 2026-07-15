@@ -56,12 +56,17 @@ test("ProfileOverviewBanner supports image focus like web", () => {
   const banner = readMobileFile("entities/user/ui/ProfileOverviewBanner.tsx");
   const focus = readMobileFile("entities/user/lib/profileImageFocus.ts");
   const avatar = readMobileFile("entities/user/ui/UserPremiumAvatar.tsx");
+  const chrome = readMobileFile("shared/theme/profileChromeStyles.ts");
 
   assert.match(focus, /getUserAvatarFocus/);
   assert.match(focus, /getUserBackgroundFocus/);
   assert.match(banner, /UserPremiumAvatar/);
   assert.match(banner, /contentPosition/);
+  assert.match(banner, /avatarWrapPremium/);
+  assert.match(banner, /isPremium \? styles\.avatarWrapPremium/);
   assert.match(avatar, /contentPosition/);
+  assert.match(chrome, /avatarWrapPremium:/);
+  assert.match(chrome, /borderColor: theme\.colors\.premium/);
 });
 
 test("user profile product thumb seeds catalog cache before product screen", () => {

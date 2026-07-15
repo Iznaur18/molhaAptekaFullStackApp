@@ -11,7 +11,6 @@ import {
   PROFILE_TAB_DATA_CONFIRMATION,
   PROFILE_TAB_DATA_CONFIRMATION_REQUESTS,
   PROFILE_TAB_INSTALLMENT_DISPUTES,
-  PROFILE_TAB_INSTALLMENT_MODERATION,
   PROFILE_TAB_INSTALLMENT_PAYMENTS,
   PROFILE_TAB_INSTALLMENT_SALES,
   PROFILE_TAB_LOYALTY_POINTS,
@@ -85,10 +84,6 @@ export const useHomeProfileNavigation = ({
 
   const handleInstallmentSalesFromProfile = useCallback(() => {
     navigateFromProfileTab(PROFILE_TAB_INSTALLMENT_SALES);
-  }, [navigateFromProfileTab]);
-
-  const handleInstallmentModerationFromProfile = useCallback(() => {
-    navigateFromProfileTab(PROFILE_TAB_INSTALLMENT_MODERATION);
   }, [navigateFromProfileTab]);
 
   const handleInstallmentDisputesFromProfile = useCallback(() => {
@@ -193,8 +188,6 @@ export const useHomeProfileNavigation = ({
     handleInstallmentPaymentsFromProfile,
 
     handleInstallmentSalesFromProfile,
-
-    handleInstallmentModerationFromProfile,
 
     handleInstallmentDisputesFromProfile,
 

@@ -94,6 +94,9 @@ export function RaffleFeaturedBanner({
           <div className="raffle-featured-banner__visual">
             {prizeMedia}
             <div className="raffle-featured-banner__visual-top" onPointerDown={stopCarouselDrag}>
+              <span className="raffle-featured-banner__badge">
+                {RAFFLE_FEATURED_BANNER_UI.BADGE}
+              </span>
               <div className="raffle-featured-banner__visual-top-controls">
                 {hasManage ? (
                   <RaffleManageActions
@@ -147,19 +150,19 @@ export function RaffleFeaturedBanner({
         </div>
 
         <div className="raffle-featured-banner__footer-card">
-          <div
-            className="raffle-featured-banner__progress-bar"
-            role="progressbar"
-            aria-valuenow={progress}
-            aria-valuemin={0}
-            aria-valuemax={target}
-          >
-            <span
-              className="raffle-featured-banner__progress-fill"
-              style={{ width: `${percent}%` }}
-            />
-          </div>
           <div className="raffle-featured-banner__footer-content">
+            <div
+              className="raffle-featured-banner__progress-bar"
+              role="progressbar"
+              aria-valuenow={progress}
+              aria-valuemin={0}
+              aria-valuemax={target}
+            >
+              <span
+                className="raffle-featured-banner__progress-fill"
+                style={{ width: `${percent}%` }}
+              />
+            </div>
             <p className="raffle-featured-banner__progress-label">{progressLabel}</p>
             <div className="raffle-featured-banner__actions">
               <button

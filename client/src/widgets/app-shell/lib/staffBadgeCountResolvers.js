@@ -187,25 +187,6 @@ export function resolveProductPromotionsStaffBadgeCount(queryClient, fetchCount)
  * @param {import('@tanstack/react-query').QueryClient} queryClient
  * @param {() => Promise<number>} fetchCount
  */
-export function resolveInstallmentModerationStaffBadgeCount(queryClient, fetchCount) {
-  return resolveStaffBadgeCount(
-    queryClient,
-    installmentQueryKeys.moderationPendingCount(),
-    (client) => {
-      const cached = readSuccessfulQueryData(
-        client,
-        installmentQueryKeys.moderationPending(),
-      );
-      return Array.isArray(cached?.programs) ? cached.programs.length : undefined;
-    },
-    fetchCount,
-  );
-}
-
-/**
- * @param {import('@tanstack/react-query').QueryClient} queryClient
- * @param {() => Promise<number>} fetchCount
- */
 export function resolveInstallmentDisputesStaffBadgeCount(queryClient, fetchCount) {
   return resolveStaffBadgeCount(
     queryClient,

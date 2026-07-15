@@ -12,6 +12,7 @@ import {
 } from "react-native";
 
 import { ADDRESS_DELIVERY_UI } from "@/shared/config";
+import { textInputFocusScrollProps } from "@/shared/lib/scrollTextInputIntoViewOnFocus";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useAddressSuggestStyles, useFormFieldStyles } from "@/shared/theme/formChromeStyles";
 
@@ -108,6 +109,7 @@ export const AddressSuggestInput = ({
         placeholderTextColor={theme.colors.textMuted}
         editable={!disabled}
         autoCorrect={false}
+        {...textInputFocusScrollProps}
       />
 
       {suggestEnabled && suggestionsQuery.isPending ? (

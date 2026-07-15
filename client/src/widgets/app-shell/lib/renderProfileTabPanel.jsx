@@ -5,7 +5,6 @@ import {
   LazyDataConfirmationPage,
   LazyDataConfirmationRequestsPage,
   LazyInstallmentDisputesPage,
-  LazyInstallmentModerationPage,
   LazyInstallmentPaymentsPage,
   LazyInstallmentSalesPage,
   LazyLoyaltyPointsPage,
@@ -53,7 +52,6 @@ export function renderProfileTabPanel(mainView, props) {
     refreshPendingProductReportsCount,
     refreshPendingRafflesCount,
     refreshPendingDataConfirmationCount,
-    refreshPendingInstallmentModerationCount,
     refreshPendingInstallmentDisputesCount,
     refreshRaffleSurfaces,
     refreshCatalogFeed,
@@ -225,12 +223,6 @@ export function renderProfileTabPanel(mainView, props) {
         <LazyDataConfirmationRequestsPage
           onApplicantClick={onSellerNameClick}
           onQueueChanged={() => void refreshPendingDataConfirmationCount()}
-        />
-      );
-    case "installment-moderation":
-      return (
-        <LazyInstallmentModerationPage
-          onQueueChanged={refreshPendingInstallmentModerationCount}
         />
       );
     case "installment-disputes":

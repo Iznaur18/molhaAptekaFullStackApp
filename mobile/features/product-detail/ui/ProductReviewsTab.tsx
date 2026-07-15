@@ -11,6 +11,7 @@ import { ProductReviewListItem } from "@/entities/product-review/ui/ProductRevie
 import { ProductReviewSummary } from "@/entities/product-review/ui/ProductReviewSummary";
 import { PRODUCT_REVIEW_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { textInputFocusScrollProps } from "@/shared/lib/scrollTextInputIntoViewOnFocus";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useProductDetailTabStyles } from "@/shared/theme/catalogProductStyles";
 import { AppButton } from "@/shared/ui/AppButton";
@@ -118,6 +119,7 @@ export const ProductReviewsTab = ({
           placeholder={PRODUCT_REVIEW_UI.TEXT_PLACEHOLDER}
           placeholderTextColor={theme.colors.textMuted}
           multiline
+          {...textInputFocusScrollProps}
         />
         {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
         <AppButton

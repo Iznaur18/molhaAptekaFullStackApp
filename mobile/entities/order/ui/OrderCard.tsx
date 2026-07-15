@@ -13,15 +13,14 @@ import {
 } from "@/entities/order/lib/orderNeedsSellerAttention";
 import { resolveOrderLineItemName } from "@/entities/order/lib/resolveOrderLineItemName";
 import { resolveOrderStatusBadgeStyle } from "@/entities/order/lib/resolveOrderStatusBadgeStyle";
+import { resolveOrderStatusLabelRu } from "@/entities/order/lib/resolveOrderStatusLabelRu";
 import { OrderCardLineItemThumb } from "@/entities/order/ui/OrderCardLineItemThumb";
 import {
   ORDER_PAYMENT_METHOD_LABEL_RU,
   ORDER_STATUS_DELIVERED,
   ORDER_STATUS_PENDING,
   ORDER_STATUS_SHIPPED,
-  ORDER_STATUS_LABEL_RU,
   type OrderPaymentMethod,
-  type OrderStatus,
 } from "@/entities/order/model/constants";
 import { INSTALLMENT_UI, MY_ORDERS_PAGE_UI, ORDER_CARD_UI, PRODUCT_CARD_UI } from "@/shared/config";
 import { formatIsoDateTime, formatPriceRub } from "@/shared/lib";
@@ -72,9 +71,6 @@ type OrderCardProps = {
   attentionRole?: "buyer" | "seller";
   style?: StyleProp<ViewStyle>;
 };
-
-const formatStatus = (status?: string) =>
-  ORDER_STATUS_LABEL_RU[status as OrderStatus] ?? status ?? "—";
 
 const formatPayment = (method?: string) =>
   ORDER_PAYMENT_METHOD_LABEL_RU[method as OrderPaymentMethod] ?? method ?? "—";
@@ -222,7 +218,7 @@ export const OrderCard = ({
           </Text>
         ) : null}
         <Text style={styles.itemStatus}>
-          {ORDER_CARD_UI.ITEM_STATUS_LABEL}: {formatStatus(source.status)}
+          {ORDER_CARD_UI.ITEM_STATUS_LABEL}: {resolveOrderStatusLabelRu(source.status, attentionRole)}
         </Text>
         {deliveredAtText ? (
           <Text style={styles.itemTimestamp}>
@@ -308,7 +304,7 @@ export const OrderCard = ({
 
             {showSecondaryInline ? (
               <Text style={styles.itemStatus}>
-                {ORDER_CARD_UI.ITEM_STATUS_LABEL}: {formatStatus(source.status)}
+                {ORDER_CARD_UI.ITEM_STATUS_LABEL}: {resolveOrderStatusLabelRu(source.status, attentionRole)}
               </Text>
             ) : null}
 
@@ -420,7 +416,7 @@ export const OrderCard = ({
                 },
               ]}
             >
-              {formatStatus(order.status)}
+              {resolveOrderStatusLabelRu(order.status, attentionRole)}
             </Text>
             {isAuctionOrder ? (
               <Text style={styles.auctionBadge}>{PRODUCT_CARD_UI.AUCTION_BADGE}</Text>

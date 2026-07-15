@@ -27,10 +27,17 @@ const INFO_TOGGLE_FONT_SIZE = 15 * VISUAL_ACTION_BUTTON_SIZE_SCALE;
 const INFO_TOGGLE_LINE_HEIGHT = 16 * VISUAL_ACTION_BUTTON_SIZE_SCALE;
 const MANAGE_TOGGLE_FONT_SIZE = 18 * VISUAL_ACTION_BUTTON_SIZE_SCALE;
 const MANAGE_TOGGLE_LINE_HEIGHT = 18 * VISUAL_ACTION_BUTTON_SIZE_SCALE;
+const BADGE_MAX_WIDTH_PERCENT = "70%";
+const BADGE_PADDING_HORIZONTAL = 8 * VISUAL_ACTION_BUTTON_SIZE_SCALE;
+const BADGE_BORDER_RADIUS = 999;
+const BADGE_FONT_SIZE = 12 * VISUAL_ACTION_BUTTON_SIZE_SCALE;
+const BADGE_LINE_HEIGHT = 14 * VISUAL_ACTION_BUTTON_SIZE_SCALE;
 const BANNER_BOTTOM_MARGIN = HOME_FEED_SECTION_GAP;
 
 /** @deprecated Секция без внешней обёртки — оставлено для совместимости импортов. */
-export const RAFFLE_SECTION_CARD_BORDER_RADIUS = 16;
+export const RAFFLE_SECTION_CARD_BORDER_RADIUS = 36;
+
+export const RAFFLE_REVEAL_BUTTON_BORDER_RADIUS = 16;
 
 export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
   root: {
@@ -90,13 +97,36 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     zIndex: 5,
     flexDirection: "row",
     alignItems: "flex-start",
-    justifyContent: "flex-end",
+    justifyContent: "space-between",
+    gap: VISUAL_CONTROL_GAP,
+  },
+  badge: {
+    maxWidth: BADGE_MAX_WIDTH_PERCENT,
+    minHeight: VISUAL_ACTION_BUTTON_SIZE,
+    paddingHorizontal: BADGE_PADDING_HORIZONTAL,
+    paddingVertical: 0,
+    borderRadius: BADGE_BORDER_RADIUS,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: `rgba(255, 255, 255, ${VISUAL_ACTION_BUTTON_BACKGROUND_OPACITY})`,
+    shadowColor: theme.colors.ink,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: VISUAL_ACTION_BUTTON_SHADOW_OPACITY,
+    shadowRadius: VISUAL_ACTION_BUTTON_SHADOW_RADIUS,
+    elevation: VISUAL_ACTION_BUTTON_ELEVATION,
+  },
+  badgeLabel: {
+    color: theme.colors.ink,
+    fontSize: BADGE_FONT_SIZE,
+    fontWeight: "700",
+    lineHeight: BADGE_LINE_HEIGHT,
   },
   visualTopControls: {
     flexDirection: "row",
     alignItems: "center",
     gap: VISUAL_CONTROL_GAP,
     flexShrink: 0,
+    marginLeft: "auto",
   },
   infoToggleButton: {
     width: VISUAL_ACTION_BUTTON_SIZE,
@@ -162,11 +192,12 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     gap: L.footerContentGap,
     paddingHorizontal: L.footerPaddingHorizontal,
     paddingBottom: L.footerPaddingBottom,
-    paddingTop: L.progressLabelMarginTop,
+    paddingTop: L.footerPaddingTop,
   },
   progressBar: {
+    width: "100%",
     height: L.progressBarHeight,
-    borderRadius: 0,
+    borderRadius: L.progressBarBorderRadius,
     backgroundColor: theme.colors.actionBorder,
     overflow: "hidden",
   },
@@ -175,7 +206,7 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
   },
   progressFill: {
     height: "100%",
-    borderRadius: 0,
+    borderRadius: L.progressBarBorderRadius,
     backgroundColor: theme.colors.action,
   },
   progressFillCompleted: {
@@ -434,9 +465,38 @@ export const useRaffleDescriptionModalStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useRaffleFeaturedSectionStyles = createThemedStyles(() => ({
+export const useRaffleFeaturedSectionStyles = createThemedStyles((theme) => ({
   root: {
     width: "100%",
+    gap: 8,
+  },
+  revealButtonPressable: {
+    width: "100%",
+  },
+  revealButton: {
+    position: "relative",
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+  },
+  revealButtonFlow: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  revealButtonPressed: {
+    opacity: 0.92,
+  },
+  revealButtonText: {
+    zIndex: 1,
+    fontSize: 15,
+    lineHeight: 20,
+    fontWeight: "700",
+    color: theme.colors.onContrast,
   },
 }));
 

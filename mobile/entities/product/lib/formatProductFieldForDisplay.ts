@@ -1,11 +1,11 @@
 import { PRODUCT_DETAILS_MODAL_UI } from "@/shared/config";
-import { formatIsoDateTime } from "@/shared/lib";
-import { formatPriceRub } from "@/shared/lib";
+import { formatIsoDateTime, formatPriceRub } from "@/shared/lib";
 
 import { getProductSellerDisplayName } from "./getProductSellerDisplayName";
 import { PRODUCT_CATEGORY_LABEL_RU } from "./productCategoryLabels";
 
-const EM_DASH = "—";
+export const PRODUCT_FIELD_EMPTY_DISPLAY = "—";
+const EM_DASH = PRODUCT_FIELD_EMPTY_DISPLAY;
 
 export const formatProductFieldForDisplay = (
   key: string,

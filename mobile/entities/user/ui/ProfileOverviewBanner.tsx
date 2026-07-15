@@ -52,6 +52,7 @@ export const ProfileOverviewBanner = ({
     (profileBackground.kind === "image" && !backgroundLoadFailed);
   const showBanner =
     canShowBackground || (Boolean(photoUrl) && !avatarLoadFailed);
+  const isPremium = isPremiumActive(user);
 
   if (!showBanner) {
     return null;
@@ -84,10 +85,10 @@ export const ProfileOverviewBanner = ({
         {photoUrl && !avatarLoadFailed ? (
           <UserPremiumAvatar
             uri={photoUrl}
-            isPremium={isPremiumActive(user)}
+            isPremium={isPremium}
             focus={avatarFocus}
             onError={() => setAvatarLoadFailed(true)}
-            style={styles.avatarOnBanner}
+            style={[styles.avatarOnBanner, isPremium ? styles.avatarWrapPremium : null]}
           />
         ) : null}
 

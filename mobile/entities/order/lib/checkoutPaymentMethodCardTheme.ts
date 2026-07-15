@@ -6,8 +6,8 @@ import {
 } from "@/entities/order/model/constants";
 
 export const CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT = {
-  width: 148,
   minHeight: 84,
+  minWidth: 120,
   borderRadius: 16,
   gap: 12,
   selectedBorderWidth: 2,

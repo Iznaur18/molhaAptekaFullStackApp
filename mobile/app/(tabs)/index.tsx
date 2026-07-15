@@ -42,6 +42,7 @@ import {
   resolveHomeCatalogFeedListStyle,
 } from "@/features/home-feed/lib/homeCatalogFeedListScrollProps";
 import { HomeCatalogSearchProvider } from "@/features/home-feed/model/HomeCatalogSearchContext";
+import { IS_HOME_FEED_INTRO_BACKDROP_ENABLED } from "@/features/home-feed/model/isHomeFeedIntroBackdropEnabled";
 import { useHomeFeedIntroTransition } from "@/features/home-feed/model/useHomeFeedIntroTransition";
 import { invalidateHomeFeedQueries } from "@/features/home-feed/model/invalidateHomeFeedQueries";
 import { useHomeFeedContentReady } from "@/features/home-feed/model/useHomeFeedContentReady";
@@ -61,6 +62,7 @@ import {
   CATALOG_SEARCH_MIN_LENGTH,
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { setCatalogCategoryView } from "@/shared/lib/catalogCategoryViewStore";
 import {
   HOME_CATALOG_FOREGROUND_SHEET_CAP_HEIGHT,
   resolveHomeCatalogPrimaryBackdropHeight,
@@ -86,6 +88,15 @@ import { ScreenErrorState } from "@/shared/ui/ScreenStates";
 type FeedFiltersState = HomeCatalogFeedFiltersState;
 
 const EMPTY_FEED_FILTERS = EMPTY_HOME_CATALOG_FEED_FILTERS;
+
+const resolveHomeFeedDockOffset = (windowHeight: number): number => {
+  if (!IS_HOME_FEED_INTRO_BACKDROP_ENABLED) {
+    return 0;
+  }
+  return (
+    resolveHomeCatalogPrimaryBackdropHeight(windowHeight) + HOME_CATALOG_FOREGROUND_SHEET_CAP_HEIGHT
+  );
+};
 
 export default function CatalogScreen() {
   const styles = useFeedScreenStyles();
@@ -126,9 +137,7 @@ export default function CatalogScreen() {
   // Дистанция сдвига шторки: интро (hero) сверху + cap-кромка. Именно на
   // столько «шторка» с товарами уезжает вниз в состоянии интро.
   const homeFeedDockOffset = useMemo(
-    () =>
-      resolveHomeCatalogPrimaryBackdropHeight(windowHeight) +
-      HOME_CATALOG_FOREGROUND_SHEET_CAP_HEIGHT,
+    () => resolveHomeFeedDockOffset(windowHeight),
     [windowHeight],
   );
 
@@ -220,6 +229,7 @@ export default function CatalogScreen() {
     dockOffset: homeFeedDockOffset,
     listRef: catalogListRef,
     enabled: showHomeFeed,
+    introBackdropEnabled: IS_HOME_FEED_INTRO_BACKDROP_ENABLED,
   });
 
   const catalogBreadcrumbLabel = useCatalogBreadcrumbLabel({
@@ -256,7 +266,14 @@ export default function CatalogScreen() {
   const hasAutoOpenedHomeFeedRef = useRef(false);
 
   useEffect(() => {
-    if (!showHomeFeed || !homeFeedContentReady || catalogQuery.isPending) {
+    if (!showHomeFeed) {
+      return;
+    }
+    if (!IS_HOME_FEED_INTRO_BACKDROP_ENABLED) {
+      introTransition.openFeedSheet();
+      return;
+    }
+    if (!homeFeedContentReady || catalogQuery.isPending) {
       return;
     }
     if (hasAutoOpenedHomeFeedRef.current) {
@@ -291,19 +308,36 @@ export default function CatalogScreen() {
   useEffect(() => {
     if (showHomeFeed) {
       // Reveal таб-бара теперь ведёт переход интро↔лента (в хуке), не scrollY.
-      setHomeCatalogTabBarProgressDriven();
+      // Без hero сразу стартуем с видимым таб-баром — иначе кадр «интро» даёт дыру.
+      setHomeCatalogTabBarProgressDriven(IS_HOME_FEED_INTRO_BACKDROP_ENABLED ? 0 : 1);
     } else {
       setHomeCatalogTabBarScrollLinked(false);
     }
   }, [showHomeFeed]);
 
-  // Повторный тап по вкладке «Домой», когда главная УЖЕ открыта, возвращает к
-  // интро. Возврат на главную из другого раздела — не сбрасывает положение
-  // (navigation.isFocused() при этом ещё false, tabPress лишь навигирует сюда).
+  /** Сброс категории/поиска/фильтров — вкладка index возвращается к главной ленте. */
+  const resetToHomeMainView = useCallback(() => {
+    setSearchInput("");
+    setDebouncedSearch("");
+    setSelectedRootSlug(null);
+    setSelectedSubcategoryId(null);
+    setSelectedSellerPersonalCategoryId(null);
+    setFeedFilters(EMPTY_FEED_FILTERS);
+  }, []);
+
+  // Пока на вкладке index открыта категория/фильтр, нижний навбар подсвечивает
+  // «Каталог», а не «Домой» (флаг читает MobileBottomTabBar).
   useEffect(() => {
-    if (!showHomeFeed) {
-      return;
-    }
+    setCatalogCategoryView(!showHomeFeed);
+  }, [showHomeFeed]);
+
+  useEffect(() => () => setCatalogCategoryView(false), []);
+
+  // Тап по вкладке «Домой»: из категории/фильтра — всегда возврат на главную
+  // ленту (в т.ч. если жать с другой вкладки — там navigation.isFocused() ещё
+  // false, tabPress лишь навигирует сюда). Если главная УЖЕ открыта — повторный
+  // тап возвращает к интро.
+  useEffect(() => {
     // tabPress эмитит таб-навигатор в рантайме; дефолтный тип навигации его не
     // объявляет — сужаем локально.
     const unsubscribe = (
@@ -311,12 +345,16 @@ export default function CatalogScreen() {
         addListener: (event: "tabPress", callback: () => void) => () => void;
       }
     ).addListener("tabPress", () => {
+      if (!showHomeFeed) {
+        resetToHomeMainView();
+        return;
+      }
       if (navigation.isFocused()) {
         introTransition.resetToIntro();
       }
     });
     return unsubscribe;
-  }, [introTransition, navigation, showHomeFeed]);
+  }, [introTransition, navigation, resetToHomeMainView, showHomeFeed]);
 
   const catalogGridRows = useMemo(
     () =>
@@ -520,7 +558,7 @@ export default function CatalogScreen() {
     if (showHomeFeed) {
       return renderHomeFeedScene(
         <View style={styles.homeFeedPendingRoot}>
-          <HomeCatalogPrimaryBackdrop />
+          {IS_HOME_FEED_INTRO_BACKDROP_ENABLED ? <HomeCatalogPrimaryBackdrop /> : null}
           <View style={[styles.homeFeedPendingSheet, styles.homeFeedForeground]}>
             <HomeCatalogFeedSheetCap />
             <HomeCatalogStickySearchShell>
@@ -564,7 +602,7 @@ export default function CatalogScreen() {
     if (showHomeFeed) {
       return renderHomeFeedScene(
         <View style={styles.homeFeedPendingRoot}>
-          <HomeCatalogPrimaryBackdrop />
+          {IS_HOME_FEED_INTRO_BACKDROP_ENABLED ? <HomeCatalogPrimaryBackdrop /> : null}
           <View style={[styles.homeFeedPendingSheet, styles.homeFeedForeground]}>
             <HomeCatalogFeedSheetCap />
             <HomeCatalogStickySearchShell>
@@ -602,14 +640,18 @@ export default function CatalogScreen() {
           {renderHomeFeedScene(
             <GestureDetector gesture={introTransition.panGesture}>
               <View style={styles.homeFeedStage}>
-                <View
-                  pointerEvents="box-none"
-                  style={[styles.homeFeedIntroBackdropLayer, { height: homeFeedDockOffset }]}
-                >
-                  <HomeCatalogPrimaryBackdrop
-                    playbackActive={introTransition.backdropPlaybackActive && isFocused && appActive}
-                  />
-                </View>
+                {IS_HOME_FEED_INTRO_BACKDROP_ENABLED ? (
+                  <View
+                    pointerEvents="box-none"
+                    style={[styles.homeFeedIntroBackdropLayer, { height: homeFeedDockOffset }]}
+                  >
+                    <HomeCatalogPrimaryBackdrop
+                      playbackActive={
+                        introTransition.backdropPlaybackActive && isFocused && appActive
+                      }
+                    />
+                  </View>
+                ) : null}
                 <Animated.View style={[styles.homeFeedSheet, introTransition.sheetStyle]}>
                   <GestureDetector gesture={introTransition.nativeGesture}>
                     <CatalogAnimatedFlatList<HomeCatalogFeedListRow>

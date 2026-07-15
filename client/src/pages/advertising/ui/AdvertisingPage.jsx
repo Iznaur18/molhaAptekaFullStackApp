@@ -23,6 +23,7 @@ import {
   validateAppIntroAdminForm,
 } from "../../../entities/intro-ad/lib/index.js";
 
+import { IS_INTRO_AD_ADVERTISING_ENABLED } from "../model/isIntroAdAdvertisingEnabled.js";
 import { SellerPersonalCategoryAdvertisingSection } from "./SellerPersonalCategoryAdvertisingSection.jsx";
 import { SiteHeaderBannerAdvertisingSection } from "./SiteHeaderBannerAdvertisingSection.jsx";
 
@@ -220,7 +221,23 @@ export function AdvertisingPage({ isAuthorized, onRequestLogin }) {
       </div>
 
       <div className="advertising-page__cards">
-        <article className="advertising-page__card advertising-page__card_intro">
+        {!IS_INTRO_AD_ADVERTISING_ENABLED ? (
+          <article
+            className="advertising-page__card advertising-page__card_intro advertising-page__card_disabled"
+            aria-disabled="true"
+          >
+            <div className="advertising-page__card-head">
+              <h2 className="advertising-page__card-title">{INTRO_AD_PAGE_UI.CARD_TITLE}</h2>
+              <span className="advertising-page__card-badge advertising-page__card-badge_disabled">
+                {INTRO_AD_PAGE_UI.TEMPORARILY_UNAVAILABLE}
+              </span>
+            </div>
+            <p className="advertising-page__unavailable">
+              {INTRO_AD_PAGE_UI.TEMPORARILY_UNAVAILABLE}
+            </p>
+          </article>
+        ) : (
+          <article className="advertising-page__card advertising-page__card_intro">
           <div className="advertising-page__card-head">
             <h2 className="advertising-page__card-title">{INTRO_AD_PAGE_UI.CARD_TITLE}</h2>
             <span className="advertising-page__card-badge">3 дня</span>
@@ -378,6 +395,7 @@ export function AdvertisingPage({ isAuthorized, onRequestLogin }) {
             </p>
           ) : null}
         </article>
+        )}
 
         <SellerPersonalCategoryAdvertisingSection
           isAuthorized={isAuthorized}

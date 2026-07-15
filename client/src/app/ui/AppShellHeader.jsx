@@ -61,7 +61,6 @@ const NON_CATALOG_VIEW_TITLES = {
   "data-confirmation-requests": HOME_PAGE_UI.TITLE_DATA_CONFIRMATION,
   "installment-payments": HOME_PAGE_UI.TITLE_INSTALLMENT_PAYMENTS,
   "installment-sales": HOME_PAGE_UI.TITLE_INSTALLMENT_SALES,
-  "installment-moderation": HOME_PAGE_UI.TITLE_INSTALLMENT_MODERATION,
   "installment-disputes": HOME_PAGE_UI.TITLE_INSTALLMENT_DISPUTES,
   notifications: HOME_PAGE_UI.TITLE_NOTIFICATIONS,
 };
@@ -94,7 +93,6 @@ const NON_CATALOG_VIEW_TITLES = {
  *   showHiddenCatalogProducts: boolean;
  *   onShowHiddenCatalogProductsToggle: () => void;
  *   pendingModerationCount?: number;
- *   pendingInstallmentModerationCount?: number;
  *   pendingInstallmentDisputesCount?: number;
  *   pendingProductReportsCount?: number;
  *   pendingDataConfirmationCount?: number;
@@ -128,7 +126,6 @@ export function AppShellHeader({
   showHiddenCatalogProducts,
   onShowHiddenCatalogProductsToggle,
   pendingModerationCount = 0,
-  pendingInstallmentModerationCount = 0,
   pendingInstallmentDisputesCount = 0,
   pendingProductReportsCount = 0,
   pendingDataConfirmationCount = 0,
@@ -174,12 +171,6 @@ export function AppShellHeader({
     }
     if (mainView === "data-confirmation-requests" && pendingDataConfirmationCount > 0) {
       return `${base} (${DATA_CONFIRMATION_PAGE_UI.TAB_BADGE(pendingDataConfirmationCount)})`;
-    }
-    if (
-      mainView === "installment-moderation" &&
-      pendingInstallmentModerationCount > 0
-    ) {
-      return `${base} (${INSTALLMENT_UI.TAB_BADGE(pendingInstallmentModerationCount)})`;
     }
     if (mainView === "installment-disputes" && pendingInstallmentDisputesCount > 0) {
       return `${base} (${INSTALLMENT_UI.TAB_BADGE(pendingInstallmentDisputesCount)})`;

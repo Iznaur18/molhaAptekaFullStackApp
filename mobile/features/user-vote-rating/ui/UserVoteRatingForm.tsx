@@ -1,9 +1,9 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
-import { userProfileQueryKeys } from "@/entities/user/model/userProfileQueryKeys";
+import { parseUserRatingAggregate } from "@/entities/user-vote-rating/lib/parseUserRatingAggregate";
 import {
   USER_VOTE_RATING_VALUE_MAX,
   USER_VOTE_RATING_VALUE_MIN,
@@ -11,14 +11,12 @@ import {
 import { userVoteQueryKeys } from "@/entities/user-vote-rating/model/userVoteQueryKeys";
 import { useMyVoteForTargetQuery } from "@/entities/user-vote-rating/model/useMyVoteForTargetQuery";
 import { useSubmitUserVoteRatingMutation } from "@/entities/user-vote-rating/model/useSubmitUserVoteRatingMutation";
-import {
-  API_CLIENT_UI,
-  USER_PROFILE_COPY,
-  USER_VOTE_RATING_UI,
-} from "@/shared/config";
+import { API_CLIENT_UI, USER_VOTE_RATING_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
-import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { pluralizeRu } from "@/shared/lib/pluralizeRu";
 import { useUserVoteRatingStyles } from "@/shared/theme/accountFeatureStyles";
+
+import { VoteScoreChip } from "./VoteScoreChip";
 
 const DEFAULT_SCORE = 5;
 
@@ -34,22 +32,11 @@ type UserVoteRatingFormProps = {
   onRated: (snapshot: Record<string, unknown>) => void;
 };
 
-const formatAggregateLine = (userRatingByVotes: unknown): string => {
-  if (!userRatingByVotes || typeof userRatingByVotes !== "object") {
-    return USER_PROFILE_COPY.RATING_NONE;
+const formatVotesCaption = (countVotes: number): string => {
+  if (countVotes <= 0) {
+    return `0 ${USER_VOTE_RATING_UI.VOTES_FORMS[2]}`;
   }
-
-  const raw = userRatingByVotes as { countVotes?: number; totalRating?: number };
-  const countVotes = Number(raw.countVotes) || 0;
-  const totalRating = Number(raw.totalRating) || 0;
-
-  if (countVotes === 0) {
-    return USER_PROFILE_COPY.RATING_NONE;
-  }
-
-  const avg = totalRating / countVotes;
-  const rounded = Math.round(avg * 10) / 10;
-  return `${rounded} · ${countVotes}`;
+  return `${countVotes} ${pluralizeRu(countVotes, USER_VOTE_RATING_UI.VOTES_FORMS)}`;
 };
 
 export const UserVoteRatingForm = ({
@@ -58,7 +45,6 @@ export const UserVoteRatingForm = ({
   isAuthorized,
   onRated,
 }: UserVoteRatingFormProps) => {
-  const theme = useAppTheme();
   const styles = useUserVoteRatingStyles();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -77,10 +63,13 @@ export const UserVoteRatingForm = ({
     enabled: isAuthorized && currentUserId != null && !isSelf,
   });
 
-  const aggregateText = useMemo(
-    () => formatAggregateLine(targetUser.userRatingByVotes),
+  const aggregate = useMemo(
+    () => parseUserRatingAggregate(targetUser.userRatingByVotes),
     [targetUser.userRatingByVotes],
   );
+
+  const votesCaption = formatVotesCaption(aggregate.countVotes);
+  const hasAverage = aggregate.average != null;
 
   const myVoteResolved =
     !isAuthorized || currentUserId == null || isSelf || !myVoteQuery.isLoading;
@@ -146,6 +135,60 @@ export const UserVoteRatingForm = ({
     }
   };
 
+  const renderAggregateHero = () => (
+    <View style={styles.aggregateHero}>
+      <Text style={styles.aggregateValue}>{aggregate.averageLabel}</Text>
+      <View style={styles.aggregateMeta}>
+        <Text style={styles.aggregateOutOf}>{USER_VOTE_RATING_UI.OUT_OF_MAX}</Text>
+        <Text style={styles.aggregateVotes}>{votesCaption}</Text>
+      </View>
+    </View>
+  );
+
+  const renderRatedCard = () => (
+    <View style={styles.ratedCard}>
+      <Text style={styles.ratedCheck}>{USER_VOTE_RATING_UI.SUCCESS_CHECKMARK}</Text>
+      <Text style={styles.ratedTitle}>{USER_VOTE_RATING_UI.ALREADY_RATED_TITLE}</Text>
+      <Text style={styles.ratedScore}>{USER_VOTE_RATING_UI.YOUR_SCORE(score)}</Text>
+      {flashMessage ? <Text style={styles.flash}>{flashMessage}</Text> : null}
+    </View>
+  );
+
+  const renderVoteControls = () => (
+    <>
+      <Text style={styles.rangeLabel}>
+        {USER_VOTE_RATING_UI.RANGE_LABEL}: {score}
+      </Text>
+      <View style={styles.scaleEdgeRow}>
+        <Text style={styles.scaleEdgeLabel}>{USER_VOTE_RATING_UI.SCALE_LOW}</Text>
+        <Text style={styles.scaleEdgeLabel}>{USER_VOTE_RATING_UI.SCALE_HIGH}</Text>
+      </View>
+      <View style={styles.scoreGrid}>
+        {SCORE_OPTIONS.map((value) => (
+          <VoteScoreChip
+            key={value}
+            value={value}
+            selected={value === score}
+            disabled={submitVoteMutation.isPending}
+            onPress={setScore}
+          />
+        ))}
+      </View>
+      {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
+      <Pressable
+        style={styles.button}
+        disabled={submitVoteMutation.isPending}
+        onPress={() => void handleSubmit()}
+      >
+        <Text style={styles.buttonText}>
+          {submitVoteMutation.isPending
+            ? USER_VOTE_RATING_UI.SUBMIT_LOADING
+            : USER_VOTE_RATING_UI.SUBMIT}
+        </Text>
+      </Pressable>
+    </>
+  );
+
   const renderBody = () => {
     if (!isAuthorized) {
       return (
@@ -159,20 +202,27 @@ export const UserVoteRatingForm = ({
     }
 
     if (currentUserId == null) {
-      return <Text style={styles.hint}>{USER_VOTE_RATING_UI.ME_LOADING}</Text>;
+      return (
+        <View style={styles.body}>
+          <Text style={styles.hint}>{USER_VOTE_RATING_UI.ME_LOADING}</Text>
+        </View>
+      );
     }
 
     if (isSelf) {
-      return <Text style={styles.hint}>{USER_VOTE_RATING_UI.SELF_HINT}</Text>;
+      return (
+        <View style={styles.body}>
+          {renderAggregateHero()}
+          <Text style={styles.hint}>{USER_VOTE_RATING_UI.SELF_HINT}</Text>
+        </View>
+      );
     }
 
     if (!myVoteResolved) {
       return (
         <View style={styles.body}>
           <Text style={styles.title}>{USER_VOTE_RATING_UI.TITLE}</Text>
-          <Text style={styles.aggregate}>
-            {USER_VOTE_RATING_UI.CURRENT_AGGREGATE}: {aggregateText}
-          </Text>
+          {renderAggregateHero()}
           <Text style={styles.hint}>{USER_VOTE_RATING_UI.MY_VOTE_RESOLVING}</Text>
         </View>
       );
@@ -181,57 +231,31 @@ export const UserVoteRatingForm = ({
     return (
       <View style={styles.body}>
         <Text style={styles.title}>{USER_VOTE_RATING_UI.TITLE}</Text>
-        <Text style={styles.aggregate}>
-          {USER_VOTE_RATING_UI.CURRENT_AGGREGATE}: {aggregateText}
-        </Text>
-        <Text style={styles.rangeLabel}>
-          {USER_VOTE_RATING_UI.RANGE_LABEL}: {score}
-        </Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scoreRow}>
-          {SCORE_OPTIONS.map((value) => {
-            const selected = value === score;
-            return (
-              <Pressable
-                key={value}
-                style={[styles.scoreChip, selected && styles.scoreChipSelected]}
-                disabled={submitVoteMutation.isPending || voteSubmitted}
-                onPress={() => setScore(value)}
-              >
-                <Text style={[styles.scoreChipText, selected && styles.scoreChipTextSelected]}>
-                  {value}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </ScrollView>
-        {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
-        {flashMessage ? <Text style={styles.flash}>{flashMessage}</Text> : null}
-        {voteSubmitted ? (
-          <Pressable style={[styles.button, styles.buttonDisabled]} disabled>
-            <Text style={styles.buttonText}>{USER_VOTE_RATING_UI.ALREADY_RATED}</Text>
-          </Pressable>
-        ) : (
-          <Pressable
-            style={styles.button}
-            disabled={submitVoteMutation.isPending}
-            onPress={() => void handleSubmit()}
-          >
-            <Text style={styles.buttonText}>
-              {submitVoteMutation.isPending
-                ? USER_VOTE_RATING_UI.SUBMIT_LOADING
-                : USER_VOTE_RATING_UI.SUBMIT}
-            </Text>
-          </Pressable>
-        )}
+        {renderAggregateHero()}
+        {voteSubmitted ? renderRatedCard() : renderVoteControls()}
       </View>
     );
   };
 
   return (
     <View style={styles.root}>
-      <Pressable style={styles.summary} onPress={() => setExpanded((value) => !value)}>
-        <Text style={styles.summaryText}>{USER_VOTE_RATING_UI.COLLAPSE_SUMMARY}</Text>
-        <Text style={{ color: theme.colors.textMuted }}>{expanded ? "▲" : "▼"}</Text>
+      <Pressable
+        style={styles.summary}
+        onPress={() => setExpanded((value) => !value)}
+        accessibilityRole="button"
+        accessibilityState={{ expanded }}
+      >
+        <View style={styles.summaryMain}>
+          <Text style={styles.summaryText}>{USER_VOTE_RATING_UI.COLLAPSE_SUMMARY}</Text>
+          <View style={styles.summaryMeta}>
+            <Text style={[styles.summaryAvg, !hasAverage && styles.summaryAvgMuted]}>
+              {aggregate.averageLabel}
+            </Text>
+            <Text style={styles.summaryOutOf}>{USER_VOTE_RATING_UI.OUT_OF_MAX}</Text>
+            <Text style={styles.summaryVotes}>· {votesCaption}</Text>
+          </View>
+        </View>
+        <Text style={styles.chevron}>{expanded ? "▲" : "▼"}</Text>
       </Pressable>
       {expanded ? renderBody() : null}
     </View>

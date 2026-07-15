@@ -16,6 +16,7 @@ import { ProductPriceOfferSellerTab } from "../../../product-price-offer/ui/Prod
  *   onOpenSellerProfile?: (userId: string) => void;
  *   onRequestLogin: () => void;
  *   onOffersChanged: () => void;
+ *   onCloseModal?: () => void;
  *   showSellerArchive: boolean;
  * }} props
  */
@@ -30,6 +31,7 @@ export function ProductDetailsModalAuctionTab({
   onOpenSellerProfile,
   onRequestLogin,
   onOffersChanged,
+  onCloseModal,
   showSellerArchive,
 }) {
   if (isSellerView) {
@@ -66,6 +68,7 @@ export function ProductDetailsModalAuctionTab({
           onOpenBuyer={onOpenSellerProfile}
           onRequestLogin={onRequestLogin}
           onOffersChanged={onOffersChanged}
+          onCloseModal={onCloseModal}
         />
       ) : auctionUi.buyerMessage === "ended" ? (
         <p className="product-price-offer__hint">{PRODUCT_PRICE_OFFER_UI.AUCTION_ENDED}</p>

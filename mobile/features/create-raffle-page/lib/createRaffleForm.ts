@@ -4,8 +4,12 @@ import {
 } from "@/entities/raffle/lib/raffleConstants";
 import { DEFAULT_RAFFLE_PRIZE_IMAGE_FOCUS, getRafflePrizeImageFocus } from "@/entities/raffle/lib/rafflePrizeImageFocus";
 import type { RaffleFromApi } from "@/entities/raffle/model/types";
-import { CREATE_RAFFLE_PAGE_UI } from "@/shared/config";
 import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
+
+import {
+  CREATE_RAFFLE_WIZARD_STEPS,
+  validateCreateRaffleFormStep,
+} from "./createRaffleWizardSteps";
 
 export type PrizeMediaType =
   | typeof RAFFLE_PRIZE_MEDIA_TYPE_IMAGE
@@ -62,28 +66,22 @@ export const buildCreateRaffleSubmitBody = (form: CreateRaffleFormState) => ({
   instagramUrl: form.instagramUrl.trim(),
 });
 
+export const isCreateRaffleFormDirty = (form: CreateRaffleFormState): boolean =>
+  form.title.trim() !== "" ||
+  form.description.trim() !== "" ||
+  form.prizeImageUrl.trim() !== "" ||
+  form.prizeVideoUrl.trim() !== "" ||
+  form.targetSales.trim() !== "" ||
+  form.instagramUrl.trim() !== "" ||
+  form.prizeMediaType !== INITIAL_CREATE_RAFFLE_FORM.prizeMediaType;
+
 export const validateCreateRaffleForm = (form: CreateRaffleFormState): string | null => {
-  if (!form.title.trim()) {
-    return CREATE_RAFFLE_PAGE_UI.ERROR_TITLE;
+  for (const stepId of CREATE_RAFFLE_WIZARD_STEPS) {
+    const stepError = validateCreateRaffleFormStep(stepId, form);
+    if (stepError) {
+      return stepError;
+    }
   }
-
-  const targetSales = Number(form.targetSales);
-  if (!Number.isFinite(targetSales) || targetSales < 1) {
-    return CREATE_RAFFLE_PAGE_UI.ERROR_TARGET;
-  }
-
-  if (!form.instagramUrl.trim()) {
-    return CREATE_RAFFLE_PAGE_UI.ERROR_INSTAGRAM;
-  }
-
-  if (form.prizeMediaType === RAFFLE_PRIZE_MEDIA_TYPE_VIDEO && !form.prizeVideoUrl.trim()) {
-    return CREATE_RAFFLE_PAGE_UI.ERROR_PRIZE_VIDEO;
-  }
-
-  if (form.prizeMediaType === RAFFLE_PRIZE_MEDIA_TYPE_IMAGE && !form.prizeImageUrl.trim()) {
-    return CREATE_RAFFLE_PAGE_UI.ERROR_PRIZE_IMAGE;
-  }
-
   return null;
 };
 
@@ -102,3 +100,10 @@ export const applyCreateRaffleMediaTypeChange = (
       ? { ...DEFAULT_RAFFLE_PRIZE_IMAGE_FOCUS }
       : prev.prizeImageFocus,
 });
+
+export {
+  CREATE_RAFFLE_WIZARD_STEPS,
+  resolveCreateRaffleWizardStepCopy,
+  validateCreateRaffleFormStep,
+  type CreateRaffleWizardStepId,
+} from "./createRaffleWizardSteps";

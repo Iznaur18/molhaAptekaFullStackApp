@@ -3,11 +3,7 @@ export { getMyProducts } from "./getMyProducts.js";
 export { postProduct } from "./postProduct.js";
 export { patchMyProduct } from "./patchMyProduct.js";
 export {
-  approveInstallmentModeration,
-  countPendingInstallmentModeration,
-  getPendingInstallmentModeration,
   getProductInstallmentProgram,
-  rejectInstallmentModeration,
   upsertProductInstallmentProgram,
 } from "./productInstallment.js";
 export {

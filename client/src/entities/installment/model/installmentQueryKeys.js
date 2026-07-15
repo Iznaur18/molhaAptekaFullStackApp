@@ -8,13 +8,6 @@ export const installmentQueryKeys = {
    * @param {{ status?: string }} params
    */
   mySales: (params) => [...installmentQueryKeys.all, "my-sales", params],
-  moderationPending: () => [...installmentQueryKeys.all, "moderation", "pending"],
-  moderationPendingCount: () => [
-    ...installmentQueryKeys.all,
-    "moderation",
-    "pending",
-    "count",
-  ],
   disputesPending: () => [...installmentQueryKeys.all, "disputes", "pending"],
   disputesPendingCount: () => [
     ...installmentQueryKeys.all,

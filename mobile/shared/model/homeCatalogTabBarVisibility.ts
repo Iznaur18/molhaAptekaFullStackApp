@@ -36,11 +36,12 @@ export const setHomeCatalogTabBarScrollLinked = (linked: boolean): void => {
 
 /**
  * Главная лента: reveal таб-бара ведёт прогресс перехода интро↔лента, а не
- * scrollY. Отвязываем от скролла и стартуем скрытым (начальное состояние — интро).
+ * scrollY. Отвязываем от скролла. `initialReveal` = 0 при старте с интро,
+ * 1 — когда hero выключен и лента сразу на переднем фоне.
  */
-export const setHomeCatalogTabBarProgressDriven = (): void => {
+export const setHomeCatalogTabBarProgressDriven = (initialReveal = 0): void => {
   homeCatalogTabBarScrollEnabled.value = 0;
-  homeCatalogTabBarRevealProgress.value = 0;
+  homeCatalogTabBarRevealProgress.value = initialReveal;
 };
 
 export const resetHomeCatalogTabBarReveal = (): void => {

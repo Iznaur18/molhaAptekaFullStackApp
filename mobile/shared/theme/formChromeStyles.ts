@@ -340,6 +340,13 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
   form: {
     gap: 14,
   },
+  formPinned: {
+    flex: 1,
+    justifyContent: "space-between",
+  },
+  fields: {
+    gap: 14,
+  },
   heading: {
     fontSize: 17,
     fontWeight: "700",
@@ -412,6 +419,9 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
     shadowRadius: 6,
     elevation: 4,
   },
+  submitDocked: {
+    marginTop: 0,
+  },
 }));
 
 export const useCheckoutPaymentMethodPickerStyles = createThemedStyles((theme) => ({
@@ -424,12 +434,16 @@ export const useCheckoutPaymentMethodPickerStyles = createThemedStyles((theme) =
     fontWeight: "600",
     color: theme.colors.textSecondary,
   },
-  scrollContent: {
+  row: {
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.gap,
-    paddingRight: theme.spacing[1],
   },
   card: {
-    width: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.width,
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: 0,
+    minWidth: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.minWidth,
     minHeight: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.minHeight,
     borderRadius: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.borderRadius,
     paddingHorizontal: 12,
@@ -498,16 +512,19 @@ export const useBottomSheetFormStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
   },
   checkoutSheet: {
-    maxHeight: "78%",
+    height: "88%",
+    maxHeight: "88%",
     paddingBottom: 0,
     borderTopLeftRadius: theme.radius.lg,
     borderTopRightRadius: theme.radius.lg,
   },
   checkoutScroll: {
-    flexGrow: 0,
+    flex: 1,
+    flexGrow: 1,
     flexShrink: 1,
   },
   checkoutForm: {
+    flexGrow: 1,
     gap: 16,
     paddingTop: theme.spacing[3],
   },
@@ -542,6 +559,44 @@ export const useBottomSheetFormStyles = createThemedStyles((theme) => ({
     paddingHorizontal: theme.spacing[4],
     paddingBottom: theme.spacing[6],
     gap: 10,
+  },
+  /** Контраст к фону sheet (surface): фон = bg страницы, бордер сильнее. */
+  passportInput: {
+    borderWidth: 1,
+    borderColor: theme.colors.borderStrong,
+    borderRadius: theme.radius.button,
+    paddingHorizontal: theme.spacing[3],
+    paddingVertical: 12,
+    fontSize: 16,
+    backgroundColor: theme.colors.bg,
+    color: theme.colors.text,
+  },
+  stepMeta: {
+    gap: 4,
+    marginBottom: theme.spacing[1],
+  },
+  stepProgress: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: theme.colors.textMuted,
+  },
+  stepTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: theme.colors.text,
+  },
+  stepActions: {
+    flexDirection: "row",
+    gap: theme.spacing[2],
+    marginTop: theme.spacing[2],
+  },
+  stepActionFlex: {
+    flex: 1,
+  },
+  keyboardAvoid: {
+    flexGrow: 1,
+    flexShrink: 1,
+    minHeight: 0,
   },
   selfieSection: {
     gap: theme.spacing[2],

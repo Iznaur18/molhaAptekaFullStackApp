@@ -19,6 +19,7 @@ export const RAFFLE_FEATURED_BANNER_CHROME = {
   cardPanelGap: RAFFLE_FEATURED_CARD_PANEL_GAP,
   cardBorderRadius: RAFFLE_FEATURED_CARD_BORDER_RADIUS,
   footerPaddingHorizontal: 16,
+  footerPaddingTop: 12,
   footerPaddingBottom: 14,
   footerContentGap: 10,
   titleBadgeInset: 10,
@@ -35,7 +36,8 @@ export const RAFFLE_FEATURED_BANNER_CHROME = {
   titleMarginBottom: 5,
   descriptionLineHeight: 20,
   descriptionMarginBottom: 10,
-  progressBarHeight: 9,
+  progressBarHeight: 12,
+  progressBarBorderRadius: 999,
   progressLabelMarginTop: 10,
   progressLabelLineHeight: 17,
   progressMarginBottom: 0,
@@ -94,7 +96,7 @@ export const resolveRaffleFeaturedDescriptionSlotHeight = (): number =>
 
 export const resolveRaffleFeaturedProgressSlotHeight = (): number =>
   RAFFLE_FEATURED_BANNER_CHROME.progressBarHeight +
-  RAFFLE_FEATURED_BANNER_CHROME.progressLabelMarginTop +
+  RAFFLE_FEATURED_BANNER_CHROME.footerContentGap +
   RAFFLE_FEATURED_BANNER_CHROME.progressLabelLineHeight +
   RAFFLE_FEATURED_BANNER_CHROME.progressMarginBottom;
 
@@ -113,8 +115,10 @@ export const resolveRaffleFeaturedBodyMinHeight = (
   const chrome = RAFFLE_FEATURED_BANNER_CHROME;
 
   return (
+    chrome.footerPaddingTop +
     chrome.footerPaddingBottom +
     resolveRaffleFeaturedProgressSlotHeight() +
+    chrome.footerContentGap +
     resolveRaffleFeaturedActionsSlotHeight()
   );
 };

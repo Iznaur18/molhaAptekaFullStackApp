@@ -183,7 +183,7 @@ export const AdminEditUserPage = () => {
         />
       </View>
 
-      <Text style={[styles.labelStrong, { marginTop: 16 }]}>Заметки</Text>
+      <Text style={[styles.labelStrong, { marginTop: 16 }]}>{EDIT_PROFILE_UI.LABEL_NOTES}</Text>
       <TextInput
         style={[styles.input, { minHeight: 96, textAlignVertical: "top" }]}
         value={form.notesAboutUser}

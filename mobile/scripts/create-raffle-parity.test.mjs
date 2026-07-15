@@ -26,10 +26,16 @@ test("create raffle page mirrors web modal form and hub chrome", () => {
   assert.match(formBody, /SECTION_BASIC/);
   assert.match(formBody, /SECTION_PRIZE/);
   assert.match(formBody, /SECTION_CONDITIONS/);
+  assert.match(formBody, /step\?:/);
+  assert.match(formBody, /showFooter\?:/);
+  assert.match(page, /CreateRaffleWizardProgress/);
+  assert.match(page, /CREATE_RAFFLE_WIZARD_STEPS/);
+  assert.match(page, /BTN_NEXT/);
 
   assert.match(styles, /sectionTitle/);
   assert.match(styles, /actionSoft/);
   assert.match(styles, /previewFrame/);
+  assert.match(styles, /wizardProgress/);
 });
 
 test("create raffle modal mirrors web edit flow", () => {
@@ -47,9 +53,11 @@ test("create raffle modal mirrors web edit flow", () => {
   assert.match(modal, /patchStaffMutation/);
   assert.match(modal, /patchMyMutation/);
   assert.match(modal, /useStaffApi/);
+  assert.doesNotMatch(modal, /CREATE_RAFFLE_WIZARD_STEPS/);
   assert.match(formBody, /CreateRaffleFormBody/);
   assert.match(webModal, /create-raffle-modal__section/);
   assert.match(webModal, /SECTION_BASIC/);
+  assert.match(webModal, /ProductWizardProgress/);
   assert.match(home, /CreateRaffleModal/);
   assert.match(home, /setEditingRaffle/);
   assert.match(home, /editUseStaffApi/);
@@ -65,6 +73,7 @@ test("create raffle ui copy matches web modal", () => {
   assert.match(copy, /SECTION_BASIC/);
   assert.match(copy, /SECTION_PRIZE/);
   assert.match(copy, /SECTION_CONDITIONS/);
+  assert.match(copy, /STEP_SUBTITLE_BASIC/);
   assert.match(copy, /Короткое название для баннера/);
   assert.match(copy, /После одобрения staff включите участие/);
 });

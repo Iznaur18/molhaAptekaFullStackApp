@@ -8,11 +8,13 @@ import { allProductsQueryKeys } from "../../../entities/product/model/allProduct
 import { useAllProductsQuery } from "../../../entities/product/model/useAllProductsQuery.js";
 import { isCurrentUserProductSeller } from "../../../entities/product/lib/isCurrentUserProductSeller.js";
 import { ProductDetailsModal } from "../../../entities/product/ui/ProductDetailsModal.jsx";
+import { useMyAcceptedBidsQuery } from "../../../entities/product-price-offer/model/useMyAcceptedBidsQuery.js";
 import { useAuthSession } from "../../../entities/user/model/useAuthSession.js";
 import { CART_PAGE_UI, CHECKOUT_FORM_UI } from "../../../shared/config/appUiCopy.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 import { CheckoutForm } from "../../../shared/ui/CheckoutForm/CheckoutForm.jsx";
 
+import { CartAuctionSection } from "./CartAuctionSection.jsx";
 import { CartLineItem } from "./CartLineItem.jsx";
 
 import "./CartPage.css";
@@ -39,7 +41,10 @@ export function CartPage({
   const queryClient = useQueryClient();
   const createOrderMutation = useCreateOrderMutation();
   const productsQuery = useAllProductsQuery();
+  const acceptedBidsQuery = useMyAcceptedBidsQuery({ enabled: isAuthorized });
   const { user } = useAuthSession();
+
+  const auctionBids = acceptedBidsQuery.data ?? [];
 
   const products = productsQuery.data ?? [];
   const phase = productsQuery.isPending
@@ -110,7 +115,7 @@ export function CartPage({
     [lines, currentUserId],
   );
 
-  const isCartEmpty = lines.length === 0;
+  const isCartEmpty = lines.length === 0 && auctionBids.length === 0;
   const canCheckout = isAuthorized && purchasableLines.length > 0;
 
   const handleCheckoutSubmit = async ({
@@ -174,33 +179,45 @@ export function CartPage({
 
   return (
     <div className="cart-page">
-      <ul className="cart-page__list" role="list">
-        {lines.map((line) => (
-          <li key={line.productId} className="cart-page__item" role="listitem">
-            <CartLineItem line={line} onProductClick={setSelectedProduct} />
-          </li>
-        ))}
-      </ul>
+      <CartAuctionSection
+        bids={auctionBids}
+        defaultDeliveryAddress={defaultAddress}
+        onCheckoutSuccess={onCheckoutSuccess}
+      />
 
-      <div className="cart-page__summary">
-        <span className="cart-page__total-label">{CART_PAGE_UI.TOTAL_LABEL}</span>
-        <span className="cart-page__total-value">{formatPriceRub(total)}</span>
-        <button type="button" className="cart-page__clear-button" onClick={clearCart}>
-          {CART_PAGE_UI.CLEAR_ALL}
-        </button>
-      </div>
+      {lines.length > 0 ? (
+        <>
+          <ul className="cart-page__list" role="list">
+            {lines.map((line) => (
+              <li key={line.productId} className="cart-page__item" role="listitem">
+                <CartLineItem line={line} onProductClick={setSelectedProduct} />
+              </li>
+            ))}
+          </ul>
+
+          <div className="cart-page__summary">
+            <span className="cart-page__total-label">{CART_PAGE_UI.TOTAL_LABEL}</span>
+            <span className="cart-page__total-value">{formatPriceRub(total)}</span>
+            <button type="button" className="cart-page__clear-button" onClick={clearCart}>
+              {CART_PAGE_UI.CLEAR_ALL}
+            </button>
+          </div>
+        </>
+      ) : null}
 
       {isAuthorized ? (
-        <div className="cart-page__checkout-zone">
-          <CheckoutForm
-            defaultDeliveryAddress={defaultAddress}
-            isSubmitting={submitState.isSubmitting}
-            submitError={submitState.error}
-            submitSuccess={submitState.success}
-            onSubmit={handleCheckoutSubmit}
-            isDisabled={!canCheckout}
-          />
-        </div>
+        lines.length > 0 ? (
+          <div className="cart-page__checkout-zone">
+            <CheckoutForm
+              defaultDeliveryAddress={defaultAddress}
+              isSubmitting={submitState.isSubmitting}
+              submitError={submitState.error}
+              submitSuccess={submitState.success}
+              onSubmit={handleCheckoutSubmit}
+              isDisabled={!canCheckout}
+            />
+          </div>
+        ) : null
       ) : (
         <div className="cart-page__auth-wall">
           <p>{CART_PAGE_UI.AUTH_REQUIRED}</p>

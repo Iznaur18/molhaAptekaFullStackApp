@@ -10,7 +10,7 @@ export const PRICE_OFFER_STATUSES = [
   PRICE_OFFER_STATUS_CANCELLED,
 ];
 
-export const PRICE_OFFER_TOP_PUBLIC_LIMIT = 10;
+export const PRICE_OFFER_TOP_PUBLIC_LIMIT = 50;
 
 /** POST/PATCH предложений цены с одного аккаунта за час. */
 export const PRICE_OFFER_RATE_LIMIT_PER_HOUR = 15;

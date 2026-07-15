@@ -1,20 +1,10 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import {
-  approveInstallmentModeration,
   fetchPendingInstallmentDisputes,
-  fetchPendingInstallmentModeration,
-  rejectInstallmentModeration,
   resolveInstallmentDispute,
 } from "@/entities/installment/api/installmentStaffApi";
 import { installmentQueryKeys } from "@/shared/api";
-
-export const usePendingInstallmentModerationQuery = (enabled = true) =>
-  useQuery({
-    queryKey: installmentQueryKeys.moderationPending(),
-    queryFn: fetchPendingInstallmentModeration,
-    enabled,
-  });
 
 export const usePendingInstallmentDisputesQuery = (enabled = true) =>
   useQuery({
@@ -24,15 +14,6 @@ export const usePendingInstallmentDisputesQuery = (enabled = true) =>
   });
 
 export const useInstallmentStaffMutations = () => {
-  const approveModerationMutation = useMutation({
-    mutationFn: (productId: string) => approveInstallmentModeration(productId),
-  });
-
-  const rejectModerationMutation = useMutation({
-    mutationFn: ({ productId, comment }: { productId: string; comment?: string }) =>
-      rejectInstallmentModeration(productId, comment ?? ""),
-  });
-
   const resolveDisputeMutation = useMutation({
     mutationFn: ({
       disputeId,
@@ -44,8 +25,6 @@ export const useInstallmentStaffMutations = () => {
   });
 
   return {
-    approveModerationMutation,
-    rejectModerationMutation,
     resolveDisputeMutation,
   };
 };

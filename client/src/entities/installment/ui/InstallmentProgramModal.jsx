@@ -6,7 +6,6 @@ import { useProductInstallmentProgramQuery } from "../model/useProductInstallmen
 import { validateInstallmentProgramPlans } from "../lib/validateInstallmentProgramPlans.js";
 import {
   INSTALLMENT_MODERATION_APPROVED,
-  INSTALLMENT_MODERATION_PENDING,
   INSTALLMENT_MODERATION_REJECTED,
   INSTALLMENT_MONTHLY_PAYMENT_MIN_RUB,
   INSTALLMENT_MONTHS_MAX,
@@ -67,14 +66,12 @@ export function InstallmentProgramModal({
   const isLoading = programQuery.isLoading;
   const programModerationStatus = programQuery.data?.moderationStatus;
   const moderationHint =
-    programModerationStatus === INSTALLMENT_MODERATION_PENDING
-      ? INSTALLMENT_UI.PROGRAM_MODAL_PENDING_HINT
-      : programModerationStatus === INSTALLMENT_MODERATION_REJECTED
-        ? INSTALLMENT_UI.PROGRAM_MODAL_REJECTED_HINT
-        : programModerationStatus === INSTALLMENT_MODERATION_APPROVED &&
-            programQuery.data?.isEnabled
-          ? INSTALLMENT_UI.PROGRAM_MODAL_APPROVED_HINT
-          : null;
+    programModerationStatus === INSTALLMENT_MODERATION_REJECTED
+      ? INSTALLMENT_UI.PROGRAM_MODAL_REJECTED_HINT
+      : programModerationStatus === INSTALLMENT_MODERATION_APPROVED &&
+          programQuery.data?.isEnabled
+        ? INSTALLMENT_UI.PROGRAM_MODAL_APPROVED_HINT
+        : null;
 
   useScrollLock(isOpen);
   useDialogFocusTrap(panelRef, {

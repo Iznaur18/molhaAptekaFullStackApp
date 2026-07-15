@@ -64,7 +64,7 @@ export const resolveSiteHeaderBannerMobileRoute = (linkPath: string): string | n
   }
 
   const staffHubMatch = normalized.match(
-    /^\/(moderation-products|moderation-intro-ad|moderation-seller-categories|product-reports|staff-raffles|data-confirmation-requests|installment-moderation|installment-disputes|admin-orders|search-synonyms-admin|category-tree-admin|app-intro-admin|site-header-banner-admin|product-manage-toggle-display-admin|profile\/popular-products-admin)$/i,
+    /^\/(moderation-products|moderation-intro-ad|moderation-seller-categories|product-reports|staff-raffles|data-confirmation-requests|installment-disputes|admin-orders|search-synonyms-admin|category-tree-admin|app-intro-admin|site-header-banner-admin|product-manage-toggle-display-admin|profile\/popular-products-admin)$/i,
   );
   if (staffHubMatch?.[1]) {
     const staffPathMap: Record<string, string> = {
@@ -74,7 +74,6 @@ export const resolveSiteHeaderBannerMobileRoute = (linkPath: string): string | n
       "product-reports": "/hub/product-reports",
       "staff-raffles": "/hub/raffles",
       "data-confirmation-requests": "/hub/data-confirmation-requests",
-      "installment-moderation": "/hub/installment-moderation",
       "installment-disputes": "/hub/installment-disputes",
       "admin-orders": "/hub/admin-orders",
       "search-synonyms-admin": "/hub/search-synonyms-admin",

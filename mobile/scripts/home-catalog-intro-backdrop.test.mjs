@@ -45,6 +45,8 @@ test("HomeCatalogFeedSheetCap: transparent underlay for video corners", () => {
   const cap = readMobileFile("features/home-feed/ui/HomeCatalogFeedSheetCap.tsx");
 
   assert.match(cap, /backgroundColor: "transparent"/);
+  assert.match(cap, /IS_HOME_FEED_INTRO_BACKDROP_ENABLED/);
+  assert.match(cap, /styles\.homeFeedForeground/);
   assert.doesNotMatch(cap, /HOME_CATALOG_PRIMARY_BACKDROP_COLOR/);
 });
 

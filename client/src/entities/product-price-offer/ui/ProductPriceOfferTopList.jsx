@@ -11,9 +11,10 @@ import "./ProductPriceOffer.css";
  * @param {{
  *   top: import('../model/types.js').PriceOfferTopEntry[];
  *   onOpenBuyer?: (userId: string) => void;
+ *   highlightedOfferId?: string | null;
  * }} props
  */
-export function ProductPriceOfferTopList({ top, onOpenBuyer }) {
+export function ProductPriceOfferTopList({ top, onOpenBuyer, highlightedOfferId = null }) {
   if (top.length === 0) {
     return (
       <p className="product-price-offer__empty">{PRODUCT_PRICE_OFFER_UI.EMPTY_TOP}</p>
@@ -27,9 +28,19 @@ export function ProductPriceOfferTopList({ top, onOpenBuyer }) {
         const userId = buyer?._id != null ? String(buyer._id) : null;
         const name = buyer?.userName?.trim() || USER_LIST_ROW_UI.MISSING_NAME;
         const canOpen = userId && typeof onOpenBuyer === "function";
+        const isMine =
+          highlightedOfferId != null && String(row._id) === String(highlightedOfferId);
 
         return (
-          <li key={String(row._id)} className="product-price-offer__top-item">
+          <li
+            key={String(row._id)}
+            className={[
+              "product-price-offer__top-item",
+              isMine ? "product-price-offer__top-item--mine" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+          >
             <span className="product-price-offer__top-rank">{index + 1}</span>
             {canOpen ? (
               <button

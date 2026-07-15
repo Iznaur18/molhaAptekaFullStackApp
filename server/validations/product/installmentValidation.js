@@ -6,7 +6,6 @@ import {
   installmentDisputeIdParamsSchema,
   installmentPaymentIndexParamsSchema,
   installmentSellerMessageBodySchema,
-  rejectInstallmentModerationBodySchema,
   resolveInstallmentDisputeBodySchema,
   upsertProductInstallmentProgramBodySchema,
 } from "@molha/api-contract";
@@ -17,10 +16,6 @@ import { validateRuDeliveryAddress } from "../../middlewares/validateRuDeliveryA
 
 export const upsertProductInstallmentProgramValidation = [
   validateBodyZod(upsertProductInstallmentProgramBodySchema),
-];
-
-export const rejectInstallmentModerationValidation = [
-  validateBodyZod(rejectInstallmentModerationBodySchema),
 ];
 
 export const createInstallmentContractValidation = [

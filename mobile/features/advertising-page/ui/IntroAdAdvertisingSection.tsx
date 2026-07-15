@@ -19,6 +19,7 @@ import {
   createIntroAdFormState,
   type IntroAdFormState,
 } from "@/features/advertising-page/lib/mapIntroAdFormDefaults";
+import { IS_INTRO_AD_ADVERTISING_ENABLED } from "@/features/advertising-page/model/isIntroAdAdvertisingEnabled";
 import { validateIntroAdForm } from "@/features/advertising-page/lib/validateIntroAdForm";
 import { IntroVideoUploadField } from "@/features/image-upload/ui/IntroVideoUploadField";
 import { ImageUrlUploadField } from "@/features/image-upload/ui/ImageUrlUploadField";
@@ -104,6 +105,23 @@ export const IntroAdAdvertisingSection = ({ loyaltyBalance }: IntroAdAdvertising
       setActionError(error instanceof Error ? error.message : INTRO_AD_PAGE_UI.CANCEL_FALLBACK);
     }
   };
+
+  if (!IS_INTRO_AD_ADVERTISING_ENABLED) {
+    return (
+      <View
+        style={[styles.card, styles.cardIntro, styles.cardDisabled]}
+        accessibilityState={{ disabled: true }}
+      >
+        <View style={styles.cardHead}>
+          <Text style={styles.cardTitle}>{INTRO_AD_PAGE_UI.CARD_TITLE}</Text>
+          <Text style={[styles.cardBadge, styles.cardBadgeDisabled]}>
+            {INTRO_AD_PAGE_UI.TEMPORARILY_UNAVAILABLE}
+          </Text>
+        </View>
+        <Text style={styles.unavailableNotice}>{INTRO_AD_PAGE_UI.TEMPORARILY_UNAVAILABLE}</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.card, styles.cardIntro]}>

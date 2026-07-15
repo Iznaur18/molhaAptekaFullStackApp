@@ -26,6 +26,7 @@ import { up as normalizeProductUploadUrlsUp } from "./20260614-normalize-product
 import { up as productCategoryRootsUp } from "./20260615-product-category-roots.js";
 import { up as productCategoryDisplayNodeIndexesUp } from "./20260616-product-category-display-node-indexes.js";
 import { up as removeFurnitureFiguresCategoriesUp } from "./20260617-remove-furniture-figures-categories.js";
+import { up as approvePendingInstallmentProgramsUp } from "./20260714-approve-pending-installment-programs.js";
 
 export const MIGRATIONS = [
   {
@@ -167,5 +168,10 @@ export const MIGRATIONS = [
     id: "20260617-remove-furniture-figures-categories",
     description: "Remove furniture and figures from ProductCategory tree and displays",
     up: removeFurnitureFiguresCategoriesUp,
+  },
+  {
+    id: "20260714-approve-pending-installment-programs",
+    description: "Auto-approve pending product installment programs (staff queue removed)",
+    up: approvePendingInstallmentProgramsUp,
   },
 ];

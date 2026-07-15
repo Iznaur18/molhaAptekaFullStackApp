@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 
 import { HomeCuratedProductListsSection } from "../../../entities/curated-product-list/ui/HomeCuratedProductListsSection.jsx";
 import { CuratedProductListCarouselSkeleton } from "../../../entities/curated-product-list/ui/CuratedProductListCarouselSkeleton.jsx";
-import { RaffleFeaturedCarousel } from "../../../entities/raffle/ui/RaffleFeaturedCarousel.jsx";
+import { RaffleFeaturedHomeSection } from "../../../entities/raffle/ui/RaffleFeaturedHomeSection.jsx";
 import { UserStoriesStrip } from "../../../entities/user-story/ui/UserStoriesStrip.jsx";
 import { CatalogCityFilterBanner } from "../../../entities/product/ui/CatalogCityFilterBanner.jsx";
 import { CatalogBrowserLanding } from "../../../entities/product-category-display/ui/CatalogBrowserLanding.jsx";
@@ -141,7 +141,7 @@ export function AppShellCatalogGridSection({
   return (
     <>
       {isHomeCatalogMainView && featuredRaffles.length > 0 ? (
-        <RaffleFeaturedCarousel
+        <RaffleFeaturedHomeSection
           raffles={featuredRaffles}
           activeIndex={featuredRaffleIndex}
           onActiveIndexChange={onFeaturedRaffleIndexChange}

@@ -16,6 +16,7 @@ import {
 import { CheckoutPaymentMethodPicker } from "@/features/checkout/ui/CheckoutPaymentMethodPicker";
 import { INSTALLMENT_UI, PRODUCT_UI } from "@/shared/config";
 import { formatPriceRub } from "@/shared/lib";
+import { textInputFocusScrollProps } from "@/shared/lib/scrollTextInputIntoViewOnFocus";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useProductDetailTabStyles } from "@/shared/theme/catalogProductStyles";
 import { ScreenLoadingState } from "@/shared/ui/ScreenStates";
@@ -244,6 +245,7 @@ export const ProductInstallmentTab = ({
           onChangeText={setQuantity}
           keyboardType="number-pad"
           placeholderTextColor={theme.colors.textMuted}
+          {...textInputFocusScrollProps}
         />
       </View>
 

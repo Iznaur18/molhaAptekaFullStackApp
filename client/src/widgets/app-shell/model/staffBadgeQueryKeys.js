@@ -18,7 +18,6 @@ export const staffBadgeQueryKeys = {
   dataConfirmation: pendingDataConfirmationQueryKeys.count(),
   productPromotions: productPromotionQueryKeys.staffPendingCount(),
   raffles: raffleQueryKeys.staffPendingCount(),
-  installmentModeration: installmentQueryKeys.moderationPendingCount(),
   installmentDisputes: installmentQueryKeys.disputesPendingCount(),
   introAdModeration: introAdQueryKeys.moderationCount(),
   sellerPersonalCategoryModeration: sellerPersonalCategoryQueryKeys.moderationCount(),

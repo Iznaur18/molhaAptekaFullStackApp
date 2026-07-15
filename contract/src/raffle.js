@@ -150,9 +150,9 @@ export const createRaffleBodySchema = rafflePrizeFieldsSchema
     instagramUrl: z
       .string()
       .trim()
-      .min(1, "Укажите ссылку на Instagram")
       .max(RAFFLE_INSTAGRAM_URL_MAX_LENGTH)
-      .refine(isHttpUrl, "Укажите корректную ссылку Instagram"),
+      .refine((value) => value.length === 0 || isHttpUrl(value), "Укажите корректную ссылку Instagram")
+      .default(""),
   })
   .superRefine(assertCreatePrizeMedia);
 
@@ -180,9 +180,8 @@ export const patchRaffleBodySchema = rafflePrizeFieldsSchema
     instagramUrl: z
       .string()
       .trim()
-      .min(1)
       .max(RAFFLE_INSTAGRAM_URL_MAX_LENGTH)
-      .refine((value) => value === undefined || isHttpUrl(value), "Укажите корректную ссылку Instagram")
+      .refine((value) => value.length === 0 || isHttpUrl(value), "Укажите корректную ссылку Instagram")
       .optional(),
     prizeImageUrl: optionalHttpMediaUrl,
     prizeVideoUrl: optionalHttpMediaUrl,

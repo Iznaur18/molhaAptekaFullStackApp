@@ -46,7 +46,7 @@ export function validateEditProfileForm(form, options = {}) {
   const addressError = validateRuStructuredDeliveryAddressForm(form.structuredAddress);
   if (addressError) return addressError;
   if (String(form.notesAboutUser).length > NOTES_ABOUT_USER_MAX_CHARS) {
-    return `Заметки: не больше ${NOTES_ABOUT_USER_MAX_CHARS} символов`;
+    return `О себе: не больше ${NOTES_ABOUT_USER_MAX_CHARS} символов`;
   }
 
   const av = String(form.userAvatarUrl).trim();

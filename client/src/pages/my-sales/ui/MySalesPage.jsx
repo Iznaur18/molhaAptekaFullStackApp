@@ -14,7 +14,7 @@ import {
   ORDER_STATUS_SHIPPED,
   ORDER_STATUS_DELIVERED,
   ORDER_STATUSES,
-  ORDER_STATUS_LABEL_RU,
+  SALES_ORDER_STATUS_LABEL_RU,
 } from "../../../entities/order/model/constants.js";
 import { OrderCard } from "../../../entities/order/ui/OrderCard.jsx";
 import { useCatalogProductDetailsOpener } from "../../../entities/product/lib/useCatalogProductDetailsOpener.js";
@@ -440,7 +440,7 @@ const SALES_STATUS_FILTER_OPTIONS = [
   { value: "", label: MY_SALES_PAGE_UI.STATUS_FILTER_ALL },
   ...ORDER_STATUSES.map((status) => ({
     value: status,
-    label: ORDER_STATUS_LABEL_RU[status],
+    label: SALES_ORDER_STATUS_LABEL_RU[status],
   })),
 ];
 

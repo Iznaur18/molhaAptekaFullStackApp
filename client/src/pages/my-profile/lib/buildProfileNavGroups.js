@@ -27,7 +27,6 @@ export function buildProfileNavGroups({
   canUseProductPromotions,
   canUseRaffles,
   canUseDataConfirmationQueue,
-  canUseInstallmentModeration,
   canUseInstallmentDisputes,
   canUseAdminOrders,
   canUseSearchSynonymsAdmin,
@@ -56,7 +55,6 @@ export function buildProfileNavGroups({
   pendingProductPromotionsCount,
   pendingRafflesCount,
   pendingDataConfirmationCount,
-  pendingInstallmentModerationCount,
   pendingInstallmentDisputesCount,
   onTabChange,
   onCreateRaffleClick,
@@ -73,7 +71,6 @@ export function buildProfileNavGroups({
   onProductPromotionsClick,
   onRafflesClick,
   onDataConfirmationQueueClick,
-  onInstallmentModerationClick,
   onInstallmentDisputesClick,
   onAdminOrdersClick,
   onSearchSynonymsAdminClick,
@@ -298,17 +295,6 @@ export function buildProfileNavGroups({
             badgeCount: pendingDataConfirmationCount,
             onClick: () =>
               selectTab("data-confirmation-requests", onDataConfirmationQueueClick),
-          },
-        ]
-      : []),
-    ...(canUseInstallmentModeration
-      ? [
-          {
-            tab: "installment-moderation",
-            label: "Рассрочка (модерация)",
-            badgeCount: pendingInstallmentModerationCount,
-            onClick: () =>
-              selectTab("installment-moderation", onInstallmentModerationClick),
           },
         ]
       : []),

@@ -5,7 +5,6 @@ import {
   fetchInstallmentBuyerActionCount,
   fetchInstallmentSellerActionCount,
   fetchPendingInstallmentDisputesCount,
-  fetchPendingInstallmentModerationCount,
 } from "../../../entities/installment/api/installmentApi.js";
 import { fetchMyOrdersActionCount } from "../../../entities/order/api/fetchMyOrdersActionCount.js";
 import { fetchMySalesActionCount } from "../../../entities/order/api/fetchMySalesActionCount.js";
@@ -27,7 +26,6 @@ import {
   resolveInstallmentDisputesStaffBadgeCount,
   resolveInstallmentBuyerActionCount,
   resolveInstallmentSellerActionCount,
-  resolveInstallmentModerationStaffBadgeCount,
   resolveIntroAdModerationStaffBadgeCount,
   resolveSellerPersonalCategoryModerationStaffBadgeCount,
   resolveModerationStaffBadgeCount,
@@ -41,7 +39,6 @@ import {
   invalidateAllStaffBadges,
   syncDataConfirmationQueueCaches,
   syncInstallmentDisputesQueueCaches,
-  syncInstallmentModerationQueueCaches,
   syncModerationQueueCaches,
   syncProductReportsQueueCaches,
   syncProductPromotionsStaffQueueCaches,
@@ -123,16 +120,6 @@ export function useStaffBadgeQueries({
         ...STAFF_MODERATOR_QUERY_OPTIONS,
       },
       {
-        queryKey: [...staffBadgeQueryKeys.installmentModeration, mainView],
-        queryFn: () =>
-          resolveInstallmentModerationStaffBadgeCount(
-            queryClient,
-            fetchPendingInstallmentModerationCount,
-          ),
-        enabled: staffEnabled,
-        ...STAFF_MODERATOR_QUERY_OPTIONS,
-      },
-      {
         queryKey: [...staffBadgeQueryKeys.installmentDisputes, mainView],
         queryFn: () =>
           resolveInstallmentDisputesStaffBadgeCount(
@@ -207,7 +194,6 @@ export function useStaffBadgeQueries({
     dataConfirmationQuery,
     rafflesQuery,
     productPromotionsQuery,
-    installmentModerationQuery,
     installmentDisputesQuery,
     introAdModerationQuery,
     sellerPersonalCategoryModerationQuery,
@@ -242,8 +228,6 @@ export function useStaffBadgeQueries({
       refreshPendingRafflesCount: () => syncRafflesStaffQueueCaches(queryClient),
       refreshPendingProductPromotionsCount: () =>
         syncProductPromotionsStaffQueueCaches(queryClient),
-      refreshPendingInstallmentModerationCount: () =>
-        syncInstallmentModerationQueueCaches(queryClient),
       refreshPendingInstallmentDisputesCount: () =>
         syncInstallmentDisputesQueueCaches(queryClient),
       refreshUserProfileActionBadgeCounts: () =>
@@ -261,7 +245,6 @@ export function useStaffBadgeQueries({
     pendingDataConfirmationCount: dataConfirmationQuery.data ?? 0,
     pendingRafflesCount: rafflesQuery.data ?? 0,
     pendingProductPromotionsCount: productPromotionsQuery.data ?? 0,
-    pendingInstallmentModerationCount: installmentModerationQuery.data ?? 0,
     pendingInstallmentDisputesCount: installmentDisputesQuery.data ?? 0,
     pendingIncomingPriceOffersCount:
       userProfileActions.pendingIncomingPriceOffersCount,

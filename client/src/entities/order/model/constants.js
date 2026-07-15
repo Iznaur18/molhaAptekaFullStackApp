@@ -35,6 +35,12 @@ export const ORDER_STATUS_LABEL_RU = {
   [ORDER_STATUS_CANCELLED]: "Отменён",
 };
 
+/** Лейблы статусов в «Мои продажи» (seller): shipped → «Принять». */
+export const SALES_ORDER_STATUS_LABEL_RU = {
+  ...ORDER_STATUS_LABEL_RU,
+  [ORDER_STATUS_SHIPPED]: "Принять",
+};
+
 export const ORDER_LINE_ITEM_QUANTITY_MIN = 1;
 
 export const CART_STORAGE_KEY = "rassro:cart";

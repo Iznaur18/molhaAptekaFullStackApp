@@ -76,9 +76,6 @@ export const fetchPendingRafflesCount = () =>
 export const fetchPendingProductPromotionsCount = () =>
   fetchCount("/product/promotions/pending/count", "count");
 
-export const fetchPendingInstallmentModerationCount = () =>
-  fetchCount("/product/installment/moderation/pending/count", "count");
-
 export const fetchPendingInstallmentDisputesCount = () =>
   fetchCount("/installment/disputes/pending/count", "count");
 

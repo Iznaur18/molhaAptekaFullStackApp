@@ -74,13 +74,6 @@ const resolveProfileStaffNavItem = (
       badgeCount: badgeCounts["data-confirmation-requests"],
     };
   }
-  if (sectionId === "installment-moderation" && access.canUseInstallmentModeration) {
-    return {
-      sectionId,
-      label: "Рассрочка (модерация)",
-      badgeCount: badgeCounts["installment-moderation"],
-    };
-  }
   if (sectionId === "installment-disputes" && access.canUseInstallmentDisputes) {
     return {
       sectionId,

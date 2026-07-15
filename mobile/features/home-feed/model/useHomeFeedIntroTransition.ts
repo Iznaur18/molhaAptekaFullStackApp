@@ -68,6 +68,11 @@ type UseHomeFeedIntroTransitionParams = {
   listRef: RefObject<ScrollableToOffset | null>;
   /** true только на главной ленте: вне её переход не управляет таб-баром. */
   enabled: boolean;
+  /**
+   * false — интро-фон выключен: лента сразу открыта, жест/сброс в hero no-op.
+   * @see IS_HOME_FEED_INTRO_BACKDROP_ENABLED
+   */
+  introBackdropEnabled?: boolean;
 };
 
 /**
@@ -87,12 +92,15 @@ export const useHomeFeedIntroTransition = ({
   dockOffset,
   listRef,
   enabled,
+  introBackdropEnabled = true,
 }: UseHomeFeedIntroTransitionParams) => {
   // 0 — интро (задний фон), 1 — лента (передний фон). Во время жеста — дробное.
-  const progress = useSharedValue(0);
+  // При выключенном hero сразу стартуем с ленты — без мигания фона на загрузке.
+  const initialOpen = introBackdropEnabled ? 0 : 1;
+  const progress = useSharedValue(initialOpen);
   // Осевшее состояние (0/1), меняется только по завершении анимации — от него
   // зависит scrollEnabled, чтобы прокрутка не дёргалась на дробном progress.
-  const mode = useSharedValue(0);
+  const mode = useSharedValue(initialOpen);
   // 1 — список у верхнего края (разрешает закрытие свайпом вниз).
   const atTop = useSharedValue(1);
   // 1 — активна главная лента (иначе не трогаем таб-бар).
@@ -104,8 +112,8 @@ export const useHomeFeedIntroTransition = ({
   const dragStartProgress = useSharedValue(0);
   const dragStartAtTop = useSharedValue(1);
 
-  const [scrollEnabled, setScrollEnabled] = useState(false);
-  const [backdropPlaybackActive, setBackdropPlaybackActive] = useState(true);
+  const [scrollEnabled, setScrollEnabled] = useState(initialOpen >= 0.5);
+  const [backdropPlaybackActive, setBackdropPlaybackActive] = useState(introBackdropEnabled);
 
   const applyScrollEnabledFromMode = useCallback((nextMode: number) => {
     setScrollEnabled(nextMode >= 0.5);
@@ -169,6 +177,7 @@ export const useHomeFeedIntroTransition = ({
   const nativeGesture = Gesture.Native();
 
   const panGesture = Gesture.Pan()
+    .enabled(introBackdropEnabled)
     .activeOffsetY([-PAN_ACTIVATE_Y, PAN_ACTIVATE_Y])
     .failOffsetX([-PAN_FAIL_X, PAN_FAIL_X])
     .simultaneousWithExternalGesture(nativeGesture)
@@ -246,11 +255,14 @@ export const useHomeFeedIntroTransition = ({
 
   // Возврат к интро (тап по вкладке «Домой», когда уже на ленте).
   const resetToIntro = useCallback(() => {
+    if (!introBackdropEnabled) {
+      return;
+    }
     listRef.current?.scrollToOffset({ offset: 0, animated: false });
     // mode сразу в интро — прокрутка выключается на время анимации.
     mode.value = 0;
     progress.value = withTiming(0, RESET_CONFIG);
-  }, [listRef, mode, progress]);
+  }, [introBackdropEnabled, listRef, mode, progress]);
 
   /** Сразу открыть ленту (progress=1): скролл и таб-бар без жеста интро. */
   const openFeedSheet = useCallback(() => {

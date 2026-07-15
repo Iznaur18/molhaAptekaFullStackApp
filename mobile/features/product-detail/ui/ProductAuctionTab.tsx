@@ -13,6 +13,7 @@ import {
   parseRubPriceInput,
   RUB_PRICE_INPUT_MAX_DIGITS,
 } from "@/shared/lib/rubPriceInput";
+import { textInputFocusScrollProps } from "@/shared/lib/scrollTextInputIntoViewOnFocus";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useProductPriceOfferStyles } from "@/shared/theme/catalogProductStyles";
 import { AppButton } from "@/shared/ui/AppButton";
@@ -207,11 +208,20 @@ export const ProductAuctionTab = ({
 
   const offers = offersQuery.data ?? [];
 
+  const hasLinkedOrder =
+    myOffer?.orderId != null && String(myOffer.orderId).trim() !== "";
+
+  /** Ставка принята и ждёт оплаты — товар лежит в корзине. */
+  const showGoToCartButton =
+    myOffer?.status === PRICE_OFFER_STATUS_ACCEPTED && !hasLinkedOrder;
+
   const statusText =
     myOffer?.status === PRICE_OFFER_STATUS_PENDING
       ? PRODUCT_PRICE_OFFER_UI.STATUS_PENDING
       : myOffer?.status === PRICE_OFFER_STATUS_ACCEPTED
-        ? PRODUCT_PRICE_OFFER_UI.STATUS_ACCEPTED
+        ? hasLinkedOrder
+          ? PRODUCT_PRICE_OFFER_UI.STATUS_ORDERED
+          : PRODUCT_PRICE_OFFER_UI.STATUS_ACCEPTED
         : myOffer?.status === "rejected"
           ? PRODUCT_PRICE_OFFER_UI.STATUS_REJECTED
           : null;
@@ -228,15 +238,12 @@ export const ProductAuctionTab = ({
   return (
     <View style={styles.card} accessibilityLabel={PRODUCT_PRICE_OFFER_UI.TAB_AUCTION}>
       <Text style={styles.pageTitle}>{PRODUCT_PRICE_OFFER_UI.TAB_AUCTION}</Text>
-      <Text style={styles.heading}>{PRODUCT_PRICE_OFFER_UI.SECTION_TOP_TITLE}</Text>
-      <ProductPriceOfferTopList top={offers} />
 
       {!isOwnProduct ? (
         <>
           {showForm ? (
             <View style={styles.form}>
               <Text style={styles.formHeading}>{PRODUCT_PRICE_OFFER_UI.SECTION_FORM_TITLE}</Text>
-              <Text style={styles.label}>{PRODUCT_PRICE_OFFER_UI.LABEL_PRICE}</Text>
               <TextInput
                 style={styles.input}
                 value={priceInput}
@@ -245,6 +252,8 @@ export const ProductAuctionTab = ({
                 editable={!isBusy}
                 placeholder={PRODUCT_PRICE_OFFER_UI.INPUT_PLACEHOLDER}
                 placeholderTextColor={theme.colors.textMuted}
+                accessibilityLabel={PRODUCT_PRICE_OFFER_UI.LABEL_PRICE}
+                {...textInputFocusScrollProps}
               />
               <View style={styles.actions}>
                 {!showDockPrimaryAction ? (
@@ -286,9 +295,24 @@ export const ProductAuctionTab = ({
             <Text style={[styles.status, statusStyle]}>{statusText}</Text>
           ) : null}
 
+          {showGoToCartButton ? (
+            <AppButton
+              label={PRODUCT_PRICE_OFFER_UI.GO_TO_CART}
+              variant="contrast"
+              onPress={() => router.push("/(tabs)/cart")}
+              style={styles.inlinePrimaryButton}
+            />
+          ) : null}
+
           {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
         </>
       ) : null}
+
+      <Text style={styles.heading}>{PRODUCT_PRICE_OFFER_UI.SECTION_TOP_TITLE}</Text>
+      <ProductPriceOfferTopList
+        top={offers}
+        highlightedOfferId={myOffer?._id ?? null}
+      />
     </View>
   );
 };

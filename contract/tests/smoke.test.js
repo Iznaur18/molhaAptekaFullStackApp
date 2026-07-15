@@ -287,6 +287,26 @@ test("createRaffleBodySchema validates image prize raffle", () => {
   assert.equal(parsed.prizeMediaType, undefined);
 });
 
+test("createRaffleBodySchema allows empty instagramUrl", () => {
+  const parsed = createRaffleBodySchema.parse({
+    title: "No IG",
+    targetSales: 10,
+    prizeImageUrl: "/uploads/prize.png",
+  });
+  assert.equal(parsed.instagramUrl, "");
+});
+
+test("createRaffleBodySchema rejects invalid non-empty instagramUrl", () => {
+  assert.throws(() =>
+    createRaffleBodySchema.parse({
+      title: "Bad IG",
+      targetSales: 10,
+      instagramUrl: "not-a-url",
+      prizeImageUrl: "/uploads/prize.png",
+    }),
+  );
+});
+
 test("createUserStoryBodySchema validates media payload", () => {
   const parsed = createUserStoryBodySchema.parse({
     mediaType: "image",

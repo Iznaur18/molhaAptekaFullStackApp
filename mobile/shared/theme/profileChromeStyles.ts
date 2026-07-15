@@ -212,8 +212,31 @@ export const useProfileOverviewBannerStyles = createThemedStyles((theme) => ({
   },
 }));
 
+const PROFILE_MOBILE_NAV_TOGGLE = {
+  borderWidth: 2,
+  borderRadius: 16,
+  iconSize: 36,
+  iconRadius: 10,
+  iconBorderWidth: 2,
+  paddingVertical: 12,
+  paddingHorizontal: 14,
+  shadowOpacity: 0.18,
+  shadowRadius: 14,
+  shadowOffsetY: 4,
+  elevation: 3,
+  captionSize: 11,
+  labelSize: 16,
+  letterSpacing: 0.8,
+} as const;
+
+export const PROFILE_MOBILE_NAV_TOGGLE_BORDER_RADIUS =
+  PROFILE_MOBILE_NAV_TOGGLE.borderRadius;
+
 export const useProfileMobileNavToggleStyles = createThemedStyles((theme) => ({
   outer: {
+    alignSelf: "stretch",
+  },
+  pressable: {
     alignSelf: "stretch",
   },
   root: {
@@ -221,25 +244,28 @@ export const useProfileMobileNavToggleStyles = createThemedStyles((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing[3],
-    paddingVertical: 11,
-    paddingHorizontal: 14,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    backgroundColor: theme.colors.actionSurface,
+    paddingVertical: PROFILE_MOBILE_NAV_TOGGLE.paddingVertical,
+    paddingHorizontal: PROFILE_MOBILE_NAV_TOGGLE.paddingHorizontal,
+    borderWidth: PROFILE_MOBILE_NAV_TOGGLE.borderWidth,
+    borderColor: theme.colors.actionHover,
+    backgroundColor: theme.colors.action,
+  },
+  shadow: {
     shadowColor: theme.colors.action,
-    shadowOpacity: 0.1,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 2,
+    shadowOpacity: PROFILE_MOBILE_NAV_TOGGLE.shadowOpacity,
+    shadowRadius: PROFILE_MOBILE_NAV_TOGGLE.shadowRadius,
+    shadowOffset: { width: 0, height: PROFILE_MOBILE_NAV_TOGGLE.shadowOffsetY },
+    elevation: PROFILE_MOBILE_NAV_TOGGLE.elevation,
   },
   iconWrap: {
-    width: 34,
-    height: 34,
-    borderRadius: 9,
+    width: PROFILE_MOBILE_NAV_TOGGLE.iconSize,
+    height: PROFILE_MOBILE_NAV_TOGGLE.iconSize,
+    borderRadius: PROFILE_MOBILE_NAV_TOGGLE.iconRadius,
+    borderWidth: PROFILE_MOBILE_NAV_TOGGLE.iconBorderWidth,
+    borderColor: theme.colors.action,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: theme.colors.actionSurface,
+    backgroundColor: theme.colors.surface,
   },
   textWrap: {
     flex: 1,
@@ -247,16 +273,16 @@ export const useProfileMobileNavToggleStyles = createThemedStyles((theme) => ({
     gap: 2,
   },
   caption: {
-    fontSize: 11,
+    fontSize: PROFILE_MOBILE_NAV_TOGGLE.captionSize,
     fontWeight: "700",
     textTransform: "uppercase",
-    letterSpacing: 0.8,
-    color: theme.colors.primaryBright,
+    letterSpacing: PROFILE_MOBILE_NAV_TOGGLE.letterSpacing,
+    color: theme.colors.onContrast,
   },
   label: {
-    fontSize: 15,
+    fontSize: PROFILE_MOBILE_NAV_TOGGLE.labelSize,
     fontWeight: "700",
-    color: theme.colors.primary,
+    color: theme.colors.onContrast,
   },
 }));
 

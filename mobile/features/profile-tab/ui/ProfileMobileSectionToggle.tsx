@@ -4,7 +4,11 @@ import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-na
 
 import { MY_PROFILE_PAGE_UI } from "@/shared/config";
 import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
-import { useProfileMobileNavToggleStyles } from "@/shared/theme/profileChromeStyles";
+import {
+  PROFILE_MOBILE_NAV_TOGGLE_BORDER_RADIUS,
+  useProfileMobileNavToggleStyles,
+} from "@/shared/theme/profileChromeStyles";
+import { SquircleView } from "@/shared/ui/SquircleView";
 
 type ProfileMobileSectionToggleProps = {
   activeLabel: string;
@@ -22,25 +26,35 @@ export const ProfileMobileSectionToggle = ({
 
   return (
     <Animated.View style={[styles.outer, animatedStyle]}>
-    <Pressable
-      style={styles.root}
-      accessibilityRole="button"
-      accessibilityLabel={MY_PROFILE_PAGE_UI.MOBILE_NAV_TOGGLE_ARIA}
-      onPress={onPress}
-      onPressIn={() => { scale.value = withSpring(0.97, { damping: 18, stiffness: 350 }); }}
-      onPressOut={() => { scale.value = withSpring(1, { damping: 18, stiffness: 350 }); }}
-    >
-      <View style={styles.iconWrap}>
-        <MaterialIcons name="menu" size={20} color={theme.colors.action} />
-      </View>
-      <View style={styles.textWrap}>
-        <Text style={styles.caption}>{MY_PROFILE_PAGE_UI.MOBILE_NAV_CURRENT_SECTION}</Text>
-        <Text style={styles.label} numberOfLines={1}>
-          {activeLabel}
-        </Text>
-      </View>
-      <MaterialIcons name="chevron-right" size={22} color={theme.colors.textMuted} />
-    </Pressable>
+      <Pressable
+        style={styles.pressable}
+        accessibilityRole="button"
+        accessibilityLabel={MY_PROFILE_PAGE_UI.MOBILE_NAV_TOGGLE_ARIA}
+        onPress={onPress}
+        onPressIn={() => {
+          scale.value = withSpring(0.97, { damping: 18, stiffness: 350 });
+        }}
+        onPressOut={() => {
+          scale.value = withSpring(1, { damping: 18, stiffness: 350 });
+        }}
+      >
+        <SquircleView
+          radius={PROFILE_MOBILE_NAV_TOGGLE_BORDER_RADIUS}
+          style={styles.root}
+          shadowStyle={styles.shadow}
+        >
+          <View style={styles.iconWrap}>
+            <MaterialIcons name="menu" size={20} color={theme.colors.action} />
+          </View>
+          <View style={styles.textWrap}>
+            <Text style={styles.caption}>{MY_PROFILE_PAGE_UI.MOBILE_NAV_CURRENT_SECTION}</Text>
+            <Text style={styles.label} numberOfLines={1}>
+              {activeLabel}
+            </Text>
+          </View>
+          <MaterialIcons name="expand-more" size={24} color={theme.colors.onContrast} />
+        </SquircleView>
+      </Pressable>
     </Animated.View>
   );
 };

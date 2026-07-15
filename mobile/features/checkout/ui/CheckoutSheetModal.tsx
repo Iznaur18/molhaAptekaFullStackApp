@@ -1,5 +1,4 @@
 import { Modal, Pressable, ScrollView, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import type { OrderPaymentMethod } from "@/entities/order/model/constants";
 import { CheckoutForm } from "@/features/checkout/ui/CheckoutForm";
@@ -33,7 +32,6 @@ export const CheckoutSheetModal = ({
   onSubmit,
 }: CheckoutSheetModalProps) => {
   const sheetStyles = useBottomSheetFormStyles();
-  const insets = useSafeAreaInsets();
 
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
@@ -52,11 +50,7 @@ export const CheckoutSheetModal = ({
             showsVerticalScrollIndicator={false}
             bounces={false}
             style={sheetStyles.checkoutScroll}
-            contentContainerStyle={[
-              sheetStyles.form,
-              sheetStyles.checkoutForm,
-              { paddingBottom: Math.max(insets.bottom, 20) },
-            ]}
+            contentContainerStyle={[sheetStyles.form, sheetStyles.checkoutForm]}
           >
             <CheckoutForm
               key={defaultUser?._id != null ? String(defaultUser._id) : "guest"}
@@ -66,6 +60,7 @@ export const CheckoutSheetModal = ({
               submitSuccess={submitSuccess}
               isDisabled={isDisabled}
               showHeading={false}
+              pinSubmitToBottom
               onSubmit={onSubmit}
             />
           </ScrollView>

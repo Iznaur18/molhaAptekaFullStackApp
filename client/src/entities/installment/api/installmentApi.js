@@ -261,61 +261,6 @@ export async function openInstallmentDispute(contractId, reason) {
   }
 }
 
-export async function fetchPendingInstallmentModeration() {
-  try {
-    const { data } = await apiClient.get("/product/installment/moderation/pending");
-    if (!data?.success || !Array.isArray(data.data?.programs)) {
-      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
-    }
-    return data.data;
-  } catch (e) {
-    const message = e?.response?.data?.message ?? e?.message ?? "Ошибка";
-    throw new Error(message);
-  }
-}
-
-export async function fetchPendingInstallmentModerationCount() {
-  try {
-    const { data } = await apiClient.get(
-      "/product/installment/moderation/pending/count",
-    );
-    if (!data?.success) {
-      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
-    }
-    return Number(data.data?.count) || 0;
-  } catch {
-    return 0;
-  }
-}
-
-/**
- * @param {string} productId
- */
-export async function approveInstallmentModeration(productId) {
-  const { data } = await apiClient.patch(
-    `/product/${productId}/installment/moderation/approve`,
-  );
-  if (!data?.success) {
-    throw new Error(data?.message ?? "Ошибка");
-  }
-  return data.data;
-}
-
-/**
- * @param {string} productId
- * @param {string} [moderationComment]
- */
-export async function rejectInstallmentModeration(productId, moderationComment) {
-  const { data } = await apiClient.patch(
-    `/product/${productId}/installment/moderation/reject`,
-    { moderationComment },
-  );
-  if (!data?.success) {
-    throw new Error(data?.message ?? "Ошибка");
-  }
-  return data.data;
-}
-
 export async function fetchPendingInstallmentDisputes() {
   try {
     const { data } = await apiClient.get("/installment/disputes/pending");

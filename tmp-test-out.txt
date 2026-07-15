@@ -1,0 +1,598 @@
+тЬЦ product detail tabs sit under media hero inside scroll (2.2215ms)
+тЬФ web mobile bottom nav hidden while product details modal is open (0.271ms)
+тЬФ web product details modal uses full viewport and dock without nav offset (0.4452ms)
+тЬФ mobile product detail stat rows match web modal stats grid layout (1.0302ms)
+тЬФ mobile product description panel matches web content-switcher chrome (0.4892ms)
+тЬФ mobile product characteristics row matches web key-value layout (0.469ms)
+тЬФ mobile seller preview matches web product-details-seller-preview chrome (0.3487ms)
+тЬФ mobile premium display name aligns from start like web user-premium-name (0.2047ms)
+тЬФ mobile product review item header matches web author name and badge (0.5221ms)
+тЬЦ mobile product review summary matches web gradient chrome (0.7288ms)
+тЬФ mobile product detail screen is outside tabs and uses dock-only scroll padding (0.6391ms)
+тЬЦ mobile installment tab matches web buyer hint and docked submit (0.6151ms)
+тЬФ mobile auction tab matches web price-offer layout and docked submit (0.6513ms)
+тД╣ tests 13
+тД╣ suites 0
+тД╣ pass 10
+тД╣ fail 3
+тД╣ cancelled 0
+тД╣ skipped 0
+тД╣ todo 0
+тД╣ duration_ms 72.1492
+
+тЬЦ failing tests:
+
+test at scripts\product-detail-chrome.test.mjs:13:1
+тЬЦ product detail tabs sit under media hero inside scroll (2.2215ms)
+  AssertionError [ERR_ASSERTION]: The input was expected to not match the regular expression /ProductDetailTabBar[\s\S]*ProductDetailMediaHero/. Input:
+  
+  'import { useLocalSearchParams, useRouter } from "expo-router";\r\n' +
+    'import { useCallback, useEffect, useRef, useState } from "react";\r\n' +
+    'import { Alert, ScrollView, Text, View } from "react-native";\r\n' +
+    'import { useSafeAreaInsets } from "react-native-safe-area-context";\r\n' +
+    'import { useQueryClient } from "@tanstack/react-query";\r\n' +
+    '\r\n' +
+    'import { resolveProductImageUrls } from "@/entities/product/lib/resolveProductImageUrls";\r\n' +
+    'import { resolveProductPreviewVideoUrl } from "@/entities/product/lib/resolveProductPreviewVideoUrl";\r\n' +
+    'import {\r\n' +
+    '  canSellerEditProduct,\r\n' +
+    '  canSellerToggleCatalogVisibility,\r\n' +
+    '} from "@/entities/product/lib/getProductModerationUi";\r\n' +
+    'import { getProductPurchaseLimit } from "@/entities/product/lib/getProductPurchaseLimit";\r\n' +
+    'import { isCatalogPromotionActive } from "@/entities/product/lib/productPromotionStatus";\r\n' +
+    'import { useCatalogProductQuery } from "@/entities/product/model/useCatalogProductQuery";\r\n' +
+    'import { useMyProductMutations } from "@/entities/product/model/useMyProductMutations";\r\n' +
+    'import { useProductDetailTabs } from "@/entities/product/model/useProductDetailTabs";\r\n' +
+    'import { useProductPromotionTariffsQuery } from "@/entities/product/model/useProductPromotionTariffsQuery";\r\n' +
+    'import { useRecordProductViewMutation } from "@/entities/product/model/useRecordProductViewMutation";\r\n' +
+    'import { useRequestProductPromotionMutation } from "@/entities/product/model/useRequestProductPromotionMutation";\r\n' +
+    'import { useMyProductReportStatusQuery } from "@/entities/product-report/model/useMyProductReportStatusQuery";\r\n' +
+    'import { useMyLoyaltyPointsStatusQuery } from "@/entities/user/model/useMyLoyaltyPointsStatusQuery";\r\n' +
+    'import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";\r\n' +
+    'import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";\r\n' +
+    'import { useUserAccess } from "@/entities/access/model/useUserAccess";\r\n' +
+    'import { ProductDetailMediaHero } from "@/features/product-detail/ui/ProductDetailMediaHero";\r\n' +
+    'import { ProductDetailPurchaseActions } from "@/features/product-detail/ui/ProductDetailPurchaseActions";\r\n' +
+    'import { ProductDetailTabBar } from "@/features/product-detail/ui/ProductDetailTabBar";\r\n' +
+    'import { ProductDetailsDetailsTab } from "@/features/product-detail/ui/ProductDetailsDetailsTab";\r\n' +
+    'import { ProductAuctionTab, type ProductAuctionDockFooter } from "@/features/product-detail/ui/ProductAuctionTab";\r\n' +
+    'import { ProductInstallmentTab, type ProductInstallmentDockFooter } from "@/features/product-detail/ui/ProductInstallmentTab";\r\n' +
+    'import { ProductReviewsTab } from "@/features/product-detail/ui/ProductReviewsTab";\r\n' +
+    'import { ProductPromotionModal } from "@/features/product-promotion/ui/ProductPromotionModal";\r\n' +
+    'import { useProductPromotionManageSupport } from "@/features/product-promotion/model/useProductPromotionManageSupport";\r\n' +
+    'import { ReportProductModal } from "@/features/product-report/ui/ReportProductModal";\r\n' +
+    'import { catalogQueryKeys, loyaltyPointsQueryKeys, myProductsQueryKeys } from "@/shared/api";\r\n' +
+    'import {\r\n' +
+    '  API_CLIENT_UI,\r\n' +
+    '  INSTALLMENT_UI,\r\n' +
+    '  PRODUCT_CARD_UI,\r\n' +
+    '  PRODUCT_PROMOTION_UI,\r\n' +
+    '  PRODUCT_REPORT_UI,\r\n' +
+    '} from "@/shared/config";\r\n' +
+    'import { formatApiErrorMessage } from "@/shared/lib";\r\n' +
+    'import { useProductDetailScreenStyles } from "@/shared/theme/catalogProductStyles";\r\n' +
+    'import { AppButton } from "@/shared/ui/AppButton";\r\n' +
+    'import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";\r\n' +
+    '\r\n' +
+    'export default function ProductDetailScreen() {\r\n' +
+    '  const router = useRouter();\r\n' +
+    '  const insets = useSafeAreaInsets();\r\n' +
+    '  const styles = useProductDetailScreenStyles();\r\n' +
+    '  const queryClient = useQueryClient();\r\n' +
+    '  const { id } = useLocalSearchParams<{ id: string }>();\r\n' +
+    '  const productId = Array.isArray(id) ? id[0] : id ?? "";\r\n' +
+    '  const productQuery = useCatalogProductQuery(productId);\r\n' +
+    '  const isAuthorized = useIsAuthorized();\r\n' +
+    '  const sessionQuery = useAuthSessionQuery();\r\n' +
+    '  const recordViewMutation = useRecordProductViewMutation();\r\n' +
+    '  const recordProductViewRef = useRef(recordViewMutation.mutate);\r\n' +
+    '  recordProductViewRef.current = recordViewMutation.mutate;\r\n' +
+    '  const requestPromotionMutation = useRequestProductPromotionMutation();\r\n' +
+    '  const { patchMutation } = useMyProductMutations();\r\n' +
+    '  const { isAdmin } = useUserAccess();\r\n' +
+    '  const reportStatusQuery = useMyProductReportStatusQuery({\r\n' +
+    '    productId,\r\n' +
+    '    enabled: isAuthorized,\r\n' +
+    '  });\r\n' +
+    '  const [reportModalVisible, setReportModalVisible] = useState(false);\r\n' +
+    '  const [promotionModalVisible, setPromotionModalVisible] = useState(false);\r\n' +
+    '  const [installmentDock, setInstallmentDock] = useState<ProductInstallmentDockFooter | null>(\r\n' +
+    '    null,\r\n' +
+    '  );\r\n' +
+    '  const [auctionDock, setAuctionDock] = useState<ProductAuctionDockFooter | null>(null);\r\n' +
+    '  const [promotionErrorMessage, setPromotionErrorMessage] = useState("");\r\n' +
+    '  const [manageErrorMessage, setManageErrorMessage] = useState("");\r\n' +
+    '  const [isAvailabilityTogglePending, setIsAvailabilityTogglePending] = useState(false);\r\n' +
+    '  const [isAuctionTogglePending, setIsAuctionTogglePending] = useState(false);\r\n' +
+    '  const [reportSuccessMessage, setReportSuccessMessage] = useState("");\r\n' +
+    '  const [viewerCount, setViewerCount] = useState<number | null>(null);\r\n' +
+    '\r\n' +
+    '  const promotionTariffsQuery = useProductPromotionTariffsQuery(promotionModalVisible);\r\n' +
+    '  const loyaltyPointsQuery = useMyLoyaltyPointsStatusQuery(\r\n' +
+    '    promotionModalVisible && isAuthorized,\r\n' +
+    '  );\r\n' +
+    '\r\n' +
+    '  const product = productQuery.data as Record<string, unknown> | undefined;\r\n' +
+    '  const currentUserId = sessionQuery.data?.user?._id ?? null;\r\n' +
+    '\r\n' +
+    '  const syncPromotionProduct = useCallback(\r\n' +
+    '    (updated: Record<string, unknown> & { _id: string }) => {\r\n' +
+    '      queryClient.setQueryData(catalogQueryKeys.product(productId), (prev) =>\r\n' +
+    '        prev && typeof prev === "object" ? { ...(prev as Record<string, unknown>), ...updated } : prev,\r\n' +
+    '      );\r\n' +
+    '    },\r\n' +
+    '    [productId, queryClient],\r\n' +
+    '  );\r\n' +
+    '\r\n' +
+    '  const {\r\n' +
+    '    activeTab,\r\n' +
+    '    setActiveTab,\r\n' +
+    '    tabs,\r\n' +
+    '    showTabs,\r\n' +
+    '    isOwnProduct,\r\n' +
+    '    auctionUi,\r\n' +
+    '    installmentActive,\r\n' +
+    '    topStatFieldKeys,\r\n' +
+    '    handleAuctionShortcut,\r\n' +
+    '    handleInstallmentShortcut,\r\n' +
+    '  } = useProductDetailTabs({\r\n' +
+    '    product,\r\n' +
+    '    currentUserId,\r\n' +
+    '  });\r\n' +
+    '\r\n' +
+    '  const promotionProduct =\r\n' +
+    '    isOwnProduct && product?._id != null\r\n' +
+    '      ? (product as Record<string, unknown> & { _id: string })\r\n' +
+    '      : null;\r\n' +
+    '\r\n' +
+    '  const manageSupport = useProductPromotionManageSupport({\r\n' +
+    '    product: promotionProduct,\r\n' +
+    '    syncProduct: syncPromotionProduct,\r\n' +
+    '    setManageErrorMessage,\r\n' +
+    '    enabled: promotionModalVisible && isOwnProduct,\r\n' +
+    '  });\r\n' +
+    '\r\n' +
+    '  useEffect(() => {\r\n' +
+    '    if (!isAuthorized || !productId || isOwnProduct) {\r\n' +
+    '      return;\r\n' +
+    '    }\r\n' +
+    '    recordProductViewRef.current(productId, {\r\n' +
+    '      onSuccess: (result) => {\r\n' +
+    '        setViewerCount(result.uniqueViewerCount);\r\n' +
+    '      },\r\n' +
+    '    });\r\n' +
+    '  }, [isAuthorized, isOwnProduct, productId]);\r\n' +
+    '\r\n' +
+    '  const handleInstallmentDockChange = useCallback((footer: ProductInstallmentDockFooter | null) => {\r\n' +
+    '    setInstallmentDock((prev) => {\r\n' +
+    '      if (footer === null) {\r\n' +
+    '        return prev === null ? prev : null;\r\n' +
+    '      }\r\n' +
+    '      if (prev !== null && prev.disabled === footer.disabled && prev.label === footer.label) {\r\n' +
+    '        return prev;\r\n' +
+    '      }\r\n' +
+    '      return footer;\r\n' +
+    '    });\r\n' +
+    '  }, []);\r\n' +
+    '\r\n' +
+    '  const handleAuctionDockChange = useCallback((footer: ProductAuctionDockFooter | null) => {\r\n' +
+    '    setAuctionDock((prev) => {\r\n' +
+    '      if (footer === null) {\r\n' +
+    '        return prev === null ? prev : null;\r\n' +
+    '      }\r\n' +
+    '      if (prev !== null && prev.disabled === footer.disabled && prev.label === footer.label) {\r\n' +
+    '        return prev;\r\n' +
+    '      }\r\n' +
+    '      return footer;\r\n' +
+    '    });\r\n' +
+    '  }, []);\r\n' +
+    '\r\n' +
+    '  useEffect(() => {\r\n' +
+    '    if (activeTab !== "installment") {\r\n' +
+    '      setInstallmentDock(null);\r\n' +
+    '    }\r\n' +
+    '  }, [activeTab]);\r\n' +
+    '\r\n' +
+    '  useEffect(() => {\r\n' +
+    '    if (activeTab !== "auction") {\r\n' +
+    '      setAuctionDock(null);\r\n' +
+    '    }\r\n' +
+    '  }, [activeTab]);\r\n' +
+    '\r\n' +
+    '  const handleClosePromotionModal = useCallback(() => {\r\n' +
+    '    setPromotionModalVisible(false);\r\n' +
+    '    setPromotionErrorMessage("");\r\n' +
+    '    setManageErrorMessage("");\r\n' +
+    '  }, []);\r\n' +
+    '\r\n' +
+    '  const handleInstallmentProgramSaved = useCallback(\r\n' +
+    '    async (productPatch?: Record<string, unknown>) => {\r\n' +
+    '      manageSupport.handleInstallmentProgramSaved(productPatch);\r\n' +
+    '      await Promise.all([\r\n' +
+    '        queryClient.invalidateQueries({ queryKey: myProductsQueryKeys.all }),\r\n' +
+    '        queryClient.invalidateQueries({ queryKey: catalogQueryKeys.all }),\r\n' +
+    '      ]);\r\n' +
+    '      handleClosePromotionModal();\r\n' +
+    '      router.replace("/hub/my-products");\r\n' +
+    '    },\r\n' +
+    '    [handleClosePromotionModal, manageSupport, queryClient, router],\r\n' +
+    '  );\r\n' +
+    '\r\n' +
+    '  if (productQuery.isPending) {\r\n' +
+    '    return <ScreenLoadingState />;\r\n' +
+    '  }\r\n' +
+    '\r\n' +
+    '  if (productQuery.isError || !product) {\r\n' +
+    '    return (\r\n' +
+    '      <ScreenErrorState\r\n' +
+    '        message={formatApiErrorMessage(\r\n' +
+    '          productQuery.error,\r\n' +
+    '          API_CLIENT_UI.FETCH_CATALOG_PRODUCT_FALLBACK,\r\n' +
+    '        )}\r\n' +
+    '        onRetry={() => productQuery.refetch()}\r\n' +
+    '      />\r\n' +
+    '    );\r\n' +
+    '  }\r\n' +
+    '\r\n' +
+    '  const productRecord: Record<string, unknown> = {\r\n' +
+    '    ...(product as Record<string, unknown>),\r\n' +
+    '    ...(viewerCount != null ? { uniqueViewerCount: viewerCount } : {}),\r\n' +
+    '  };\r\n' +
+    '\r\n' +
+    '  const imageUrls = resolveProductImageUrls(productRecord);\r\n' +
+    '  const previewVideoUrl = resolveProductPreviewVideoUrl(productRecord);\r\n' +
+    '  const name = String(productRecord.productName ?? "").trim() || "╨С╨╡╨╖ ╨╜╨░╨╖╨▓╨░╨╜╨╕╤П";\r\n' +
+    '  const isAvailable = productRecord.productIsAvailable !== false;\r\n' +
+    '  const hasPendingReport = reportStatusQuery.data?.hasPendingReport ?? false;\r\n' +
+    '  const isPromotionActive = isCatalogPromotionActive(productRecord);\r\n' +
+    '  const canPromoteProduct =\r\n' +
+    '    isOwnProduct && isAvailable && !isPromotionActive && isAuthorized;\r\n' +
+    '  const loyaltyPointsBalance = loyaltyPointsQuery.data?.loyaltyPointsBalance ?? 0;\r\n' +
+    '  const productPrice = Number(productRecord.productPrice) || 0;\r\n' +
+    '  const purchaseLimit = getProductPurchaseLimit(productRecord);\r\n' +
+    '  const canShowAddToCart = !isOwnProduct && isAvailable && purchaseLimit > 0;\r\n' +
+    '  const showMobilePurchaseDock =\r\n' +
+    '    activeTab === "details" && (canShowAddToCart || '... 9997 more characters
+  
+      at TestContext.<anonymous> (file:///C:/Users/IznaWork/Documents/molhaAptekaFullStackApp/mobile/scripts/product-detail-chrome.test.mjs:30:10)
+      at Test.runInAsyncScope (node:async_hooks:214:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.start (node:internal/test_runner/test:1003:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:358:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'import { useLocalSearchParams, useRouter } from "expo-router";\r\nimport { useCallback, useEffect, useRef, useState } from "react";\r\nimport { Alert, ScrollView, Text, View } from "react-native";\r\nimport { useSafeAreaInsets } from "react-native-safe-area-context";\r\nimport { useQueryClient } from "@tanstack/react-query";\r\n\r\nimport { resolveProductImageUrls } from "@/entities/product/lib/resolveProductImageUrls";\r\nimport { resolveProductPreviewVideoUrl } from "@/entities/product/lib/resolveProductPreviewVideoUrl";\r\nimport {\r\n  canSellerEditProduct,\r\n  canSellerToggleCatalogVisibility,\r\n} from "@/entities/product/lib/getProductModerationUi";\r\nimport { getProductPurchaseLimit } from "@/entities/product/lib/getProductPurchaseLimit";\r\nimport { isCatalogPromotionActive } from "@/entities/product/lib/productPromotionStatus";\r\nimport { useCatalogProductQuery } from "@/entities/product/model/useCatalogProductQuery";\r\nimport { useMyProductMutations } from "@/entities/product/model/useMyProductMutations";\r\nimport { useProductDetailTabs } from "@/entities/product/model/useProductDetailTabs";\r\nimport { useProductPromotionTariffsQuery } from "@/entities/product/model/useProductPromotionTariffsQuery";\r\nimport { useRecordProductViewMutation } from "@/entities/product/model/useRecordProductViewMutation";\r\nimport { useRequestProductPromotionMutation } from "@/entities/product/model/useRequestProductPromotionMutation";\r\nimport { useMyProductReportStatusQuery } from "@/entities/product-report/model/useMyProductReportStatusQuery";\r\nimport { useMyLoyaltyPointsStatusQuery } from "@/entities/user/model/useMyLoyaltyPointsStatusQuery";\r\nimport { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";\r\nimport { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";\r\nimport { useUserAccess } from "@/entities/access/model/useUserAccess";\r\nimport { ProductDetailMediaHero } from "@/features/product-detail/ui/ProductDetailMediaHero";\r\nimport { ProductDetailPurchaseActions } from "@/features/product-detail/ui/ProductDetailPurchaseActions";\r\nimport { ProductDetailTabBar } from "@/features/product-detail/ui/ProductDetailTabBar";\r\nimport { ProductDetailsDetailsTab } from "@/features/product-detail/ui/ProductDetailsDetailsTab";\r\nimport { ProductAuctionTab, type ProductAuctionDockFooter } from "@/features/product-detail/ui/ProductAuctionTab";\r\nimport { ProductInstallmentTab, type ProductInstallmentDockFooter } from "@/features/product-detail/ui/ProductInstallmentTab";\r\nimport { ProductReviewsTab } from "@/features/product-detail/ui/ProductReviewsTab";\r\nimport { ProductPromotionModal } from "@/features/product-promotion/ui/ProductPromotionModal";\r\nimport { useProductPromotionManageSupport } from "@/features/product-promotion/model/useProductPromotionManageSupport";\r\nimport { ReportProductModal } from "@/features/product-report/ui/ReportProductModal";\r\nimport { catalogQueryKeys, loyaltyPointsQueryKeys, myProductsQueryKeys } from "@/shared/api";\r\nimport {\r\n  API_CLIENT_UI,\r\n  INSTALLMENT_UI,\r\n  PRODUCT_CARD_UI,\r\n  PRODUCT_PROMOTION_UI,\r\n  PRODUCT_REPORT_UI,\r\n} from "@/shared/config";\r\nimport { formatApiErrorMessage } from "@/shared/lib";\r\nimport { useProductDetailScreenStyles } from "@/shared/theme/catalogProductStyles";\r\nimport { AppButton } from "@/shared/ui/AppButton";\r\nimport { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";\r\n\r\nexport default function ProductDetailScreen() {\r\n  const router = useRouter();\r\n  const insets = useSafeAreaInsets();\r\n  const styles = useProductDetailScreenStyles();\r\n  const queryClient = useQueryClient();\r\n  const { id } = useLocalSearchParams<{ id: string }>();\r\n  const productId = Array.isArray(id) ? id[0] : id ?? "";\r\n  const productQuery = useCatalogProductQuery(productId);\r\n  const isAuthorized = useIsAuthorized();\r\n  const sessionQuery = useAuthSessionQuery();\r\n  const recordViewMutation = useRecordProductViewMutation();\r\n  const recordProductViewRef = useRef(recordViewMutation.mutate);\r\n  recordProductViewRef.current = recordViewMutation.mutate;\r\n  const requestPromotionMutation = useRequestProductPromotionMutation();\r\n  const { patchMutation } = useMyProductMutations();\r\n  const { isAdmin } = useUserAccess();\r\n  const reportStatusQuery = useMyProductReportStatusQuery({\r\n    productId,\r\n    enabled: isAuthorized,\r\n  });\r\n  const [reportModalVisible, setReportModalVisible] = useState(false);\r\n  const [promotionModalVisible, setPromotionModalVisible] = useState(false);\r\n  const [installmentDock, setInstallmentDock] = useState<ProductInstallmentDockFooter | null>(\r\n    null,\r\n  );\r\n  const [auctionDock, setAuctionDock] = useState<ProductAuctionDockFooter | null>(null);\r\n  const [promotionErrorMessage, setPromotionErrorMessage] = useState("");\r\n  const [manageErrorMessage, setManageErrorMessage] = useState("");\r\n  const [isAvailabilityTogglePending, setIsAvailabilityTogglePending] = useState(false);\r\n  const [isAuctionTogglePending, setIsAuctionTogglePending] = useState(false);\r\n  const [reportSuccessMessage, setReportSuccessMessage] = useState("");\r\n  const [viewerCount, setViewerCount] = useState<number | null>(null);\r\n\r\n  const promotionTariffsQuery = useProductPromotionTariffsQuery(promotionModalVisible);\r\n  const loyaltyPointsQuery = useMyLoyaltyPointsStatusQuery(\r\n    promotionModalVisible && isAuthorized,\r\n  );\r\n\r\n  const product = productQuery.data as Record<string, unknown> | undefined;\r\n  const currentUserId = sessionQuery.data?.user?._id ?? null;\r\n\r\n  const syncPromotionProduct = useCallback(\r\n    (updated: Record<string, unknown> & { _id: string }) => {\r\n      queryClient.setQueryData(catalogQueryKeys.product(productId), (prev) =>\r\n        prev && typeof prev === "object" ? { ...(prev as Record<string, unknown>), ...updated } : prev,\r\n      );\r\n    },\r\n    [productId, queryClient],\r\n  );\r\n\r\n  const {\r\n    activeTab,\r\n    setActiveTab,\r\n    tabs,\r\n    showTabs,\r\n    isOwnProduct,\r\n    auctionUi,\r\n    installmentActive,\r\n    topStatFieldKeys,\r\n    handleAuctionShortcut,\r\n    handleInstallmentShortcut,\r\n  } = useProductDetailTabs({\r\n    product,\r\n    currentUserId,\r\n  });\r\n\r\n  const promotionProduct =\r\n    isOwnProduct && product?._id != null\r\n      ? (product as Record<string, unknown> & { _id: string })\r\n      : null;\r\n\r\n  const manageSupport = useProductPromotionManageSupport({\r\n    product: promotionProduct,\r\n    syncProduct: syncPromotionProduct,\r\n    setManageErrorMessage,\r\n    enabled: promotionModalVisible && isOwnProduct,\r\n  });\r\n\r\n  useEffect(() => {\r\n    if (!isAuthorized || !productId || isOwnProduct) {\r\n      return;\r\n    }\r\n    recordProductViewRef.current(productId, {\r\n      onSuccess: (result) => {\r\n        setViewerCount(result.uniqueViewerCount);\r\n      },\r\n    });\r\n  }, [isAuthorized, isOwnProduct, productId]);\r\n\r\n  const handleInstallmentDockChange = useCallback((footer: ProductInstallmentDockFooter | null) => {\r\n    setInstallmentDock((prev) => {\r\n      if (footer === null) {\r\n        return prev === null ? prev : null;\r\n      }\r\n      if (prev !== null && prev.disabled === footer.disabled && prev.label === footer.label) {\r\n        return prev;\r\n      }\r\n      return footer;\r\n    });\r\n  }, []);\r\n\r\n  const handleAuctionDockChange = useCallback((footer: ProductAuctionDockFooter | null) => {\r\n    setAuctionDock((prev) => {\r\n      if (footer === null) {\r\n        return prev === null ? prev : null;\r\n      }\r\n      if (prev !== null && prev.disabled === footer.disabled && prev.label === footer.label) {\r\n        return prev;\r\n      }\r\n      return footer;\r\n    });\r\n  }, []);\r\n\r\n  useEffect(() => {\r\n    if (activeTab !== "installment") {\r\n      setInstallmentDock(null);\r\n    }\r\n  }, [activeTab]);\r\n\r\n  useEffect(() => {\r\n    if (activeTab !== "auction") {\r\n      setAuctionDock(null);\r\n    }\r\n  }, [activeTab]);\r\n\r\n  const handleClosePromotionModal = useCallback(() => {\r\n    setPromotionModalVisible(false);\r\n    setPromotionErrorMessage("");\r\n    setManageErrorMessage("");\r\n  }, []);\r\n\r\n  const handleInstallmentProgramSaved = useCallback(\r\n    async (productPatch?: Record<string, unknown>) => {\r\n      manageSupport.handleInstallmentProgramSaved(productPatch);\r\n      await Promise.all([\r\n        queryClient.invalidateQueries({ queryKey: myProductsQueryKeys.all }),\r\n        queryClient.invalidateQueries({ queryKey: catalogQueryKeys.all }),\r\n      ]);\r\n      handleClosePromotionModal();\r\n      router.replace("/hub/my-products");\r\n    },\r\n    [handleClosePromotionModal, manageSupport, queryClient, router],\r\n  );\r\n\r\n  if (productQuery.isPending) {\r\n    return <ScreenLoadingState />;\r\n  }\r\n\r\n  if (productQuery.isError || !product) {\r\n    return (\r\n      <ScreenErrorState\r\n        message={formatApiErrorMessage(\r\n          productQuery.error,\r\n          API_CLIENT_UI.FETCH_CATALOG_PRODUCT_FALLBACK,\r\n        )}\r\n        onRetry={() => productQuery.refetch()}\r\n      />\r\n    );\r\n  }\r\n\r\n  const productRecord: Record<string, unknown> = {\r\n    ...(product as Record<string, unknown>),\r\n    ...(viewerCount != null ? { uniqueViewerCount: viewerCount } : {}),\r\n  };\r\n\r\n  const imageUrls = resolveProductImageUrls(productRecord);\r\n  const previewVideoUrl = resolveProductPreviewVideoUrl(productRecord);\r\n  const name = String(productRecord.productName ?? "").trim() || "╨С╨╡╨╖ ╨╜╨░╨╖╨▓╨░╨╜╨╕╤П";\r\n  const isAvailable = productRecord.productIsAvailable !== false;\r\n  const hasPendingReport = reportStatusQuery.data?.hasPendingReport ?? false;\r\n  const isPromotionActive = isCatalogPromotionActive(productRecord);\r\n  const canPromoteProduct =\r\n    isOwnProduct && isAvailable && !isPromotionActive && isAuthorized;\r\n  const loyaltyPointsBalance = loyaltyPointsQuery.data?.loyaltyPointsBalance ?? 0;\r\n  const productPrice = Number(productRecord.productPrice) || 0;\r\n  const purchaseLimit = getProductPurchaseLimit(productRecord);\r\n  const canShowAddToCart = !isOwnProduct && isAvailable && purchaseLimit > 0;\r\n  const showMobilePurchaseDock =\r\n    activeTab === "details" && (canShowAddToCart || '... 9997 more characters,
+    expected: /ProductDetailTabBar[\s\S]*ProductDetailMediaHero/,
+    operator: 'doesNotMatch',
+    diff: 'simple'
+  }
+
+test at scripts\product-detail-chrome.test.mjs:170:1
+тЬЦ mobile product review summary matches web gradient chrome (0.7288ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /warning-amber/. Input:
+  
+  '.product-review-summary {\n' +
+    '  display: flex;\n' +
+    '  align-items: center;\n' +
+    '  gap: var(--iz-space-3);\n' +
+    '  margin: 0;\n' +
+    '  padding: var(--iz-space-3) var(--iz-space-4);\n' +
+    '  border: 1px solid color-mix(in srgb, var(--iz-color-warning) 28%, var(--iz-color-border));\n' +
+    '  border-radius: 0.75rem;\n' +
+    '  background: linear-gradient(\n' +
+    '    145deg,\n' +
+    '    var(--iz-color-surface-elevated) 0%,\n' +
+    '    color-mix(in srgb, var(--iz-color-warning) 10%, var(--iz-color-surface-elevated)) 100%\n' +
+    '  );\n' +
+    '  box-shadow: 0 1px 3px color-mix(in srgb, var(--iz-color-ink) 8%, transparent);\n' +
+    '}\n' +
+    '\n' +
+    '.product-review-summary__score {\n' +
+    '  display: flex;\n' +
+    '  align-items: center;\n' +
+    '  justify-content: center;\n' +
+    '  flex: 0 0 auto;\n' +
+    '  min-width: 3.25rem;\n' +
+    '  font-size: 2.35rem;\n' +
+    '  font-weight: 800;\n' +
+    '  line-height: 1;\n' +
+    '  letter-spacing: -0.04em;\n' +
+    '  font-variant-numeric: tabular-nums;\n' +
+    '  color: var(--iz-color-ink);\n' +
+    '}\n' +
+    '\n' +
+    '.product-review-summary__meta {\n' +
+    '  display: flex;\n' +
+    '  flex-direction: column;\n' +
+    '  align-items: flex-start;\n' +
+    '  gap: 0.3rem;\n' +
+    '  min-width: 0;\n' +
+    '}\n' +
+    '\n' +
+    '.product-review-summary__count {\n' +
+    '  font-size: 0.9rem;\n' +
+    '  font-weight: 600;\n' +
+    '  line-height: 1.25;\n' +
+    '  color: var(--iz-color-text-muted);\n' +
+    '}\n' +
+    '\n' +
+    '.product-review-summary .product-review-stars__star--filled {\n' +
+    '  color: var(--iz-color-warning-text);\n' +
+    '}\n'
+  
+      at TestContext.<anonymous> (file:///C:/Users/IznaWork/Documents/molhaAptekaFullStackApp/mobile/scripts/product-detail-chrome.test.mjs:182:10)
+      at Test.runInAsyncScope (node:async_hooks:214:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:788:18)
+      at Test.postRun (node:internal/test_runner/test:1235:19)
+      at Test.run (node:internal/test_runner/test:1163:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '.product-review-summary {\n  display: flex;\n  align-items: center;\n  gap: var(--iz-space-3);\n  margin: 0;\n  padding: var(--iz-space-3) var(--iz-space-4);\n  border: 1px solid color-mix(in srgb, var(--iz-color-warning) 28%, var(--iz-color-border));\n  border-radius: 0.75rem;\n  background: linear-gradient(\n    145deg,\n    var(--iz-color-surface-elevated) 0%,\n    color-mix(in srgb, var(--iz-color-warning) 10%, var(--iz-color-surface-elevated)) 100%\n  );\n  box-shadow: 0 1px 3px color-mix(in srgb, var(--iz-color-ink) 8%, transparent);\n}\n\n.product-review-summary__score {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  flex: 0 0 auto;\n  min-width: 3.25rem;\n  font-size: 2.35rem;\n  font-weight: 800;\n  line-height: 1;\n  letter-spacing: -0.04em;\n  font-variant-numeric: tabular-nums;\n  color: var(--iz-color-ink);\n}\n\n.product-review-summary__meta {\n  display: flex;\n  flex-direction: column;\n  align-items: flex-start;\n  gap: 0.3rem;\n  min-width: 0;\n}\n\n.product-review-summary__count {\n  font-size: 0.9rem;\n  font-weight: 600;\n  line-height: 1.25;\n  color: var(--iz-color-text-muted);\n}\n\n.product-review-summary .product-review-stars__star--filled {\n  color: var(--iz-color-warning-text);\n}\n',
+    expected: /warning-amber/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at scripts\product-detail-chrome.test.mjs:209:1
+тЬЦ mobile installment tab matches web buyer hint and docked submit (0.6151ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /--iz-color-info-navy/. Input:
+  
+  '.installment-buyer-block {\n' +
+    '  display: flex;\n' +
+    '  flex-direction: column;\n' +
+    '  gap: 0.75rem;\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__hint {\n' +
+    '  margin: 0;\n' +
+    '  padding: 0.65rem 0.75rem;\n' +
+    '  border: 1px solid var(--iz-color-action-border);\n' +
+    '  border-radius: 0.65rem;\n' +
+    '  background: var(--iz-color-action-soft);\n' +
+    '  font-size: 0.85rem;\n' +
+    '  line-height: 1.45;\n' +
+    '  color: var(--iz-color-info-deep);\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__form {\n' +
+    '  display: flex;\n' +
+    '  flex-direction: column;\n' +
+    '  gap: 0.85rem;\n' +
+    '  padding: 0.85rem;\n' +
+    '  border: 1px solid var(--iz-color-border);\n' +
+    '  border-radius: 0.75rem;\n' +
+    '  background: var(--iz-color-surface-elevated);\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__legend,\n' +
+    '.installment-buyer-block__label {\n' +
+    '  font-size: 0.82rem;\n' +
+    '  font-weight: 600;\n' +
+    '  color: var(--iz-color-text-secondary);\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__plans {\n' +
+    '  margin: 0;\n' +
+    '  padding: 0;\n' +
+    '  border: none;\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__plan-list {\n' +
+    '  display: flex;\n' +
+    '  flex-direction: column;\n' +
+    '  gap: 0.5rem;\n' +
+    '  margin-top: 0.45rem;\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__plan-card {\n' +
+    '  display: grid;\n' +
+    '  grid-template-columns: auto 1fr;\n' +
+    '  grid-template-areas:\n' +
+    '    "input title"\n' +
+    '    "input meta"\n' +
+    '    "input note";\n' +
+    '  column-gap: 0.55rem;\n' +
+    '  row-gap: 0.15rem;\n' +
+    '  padding: 0.65rem 0.75rem;\n' +
+    '  border: 1px solid var(--iz-color-border);\n' +
+    '  border-radius: 0.6rem;\n' +
+    '  background: var(--iz-color-surface);\n' +
+    '  cursor: pointer;\n' +
+    '  transition:\n' +
+    '    border-color 0.15s ease,\n' +
+    '    box-shadow 0.15s ease,\n' +
+    '    background-color 0.15s ease;\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__plan-card:hover {\n' +
+    '  border-color: var(--iz-color-action-soft);\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__plan-card_selected {\n' +
+    '  border-color: var(--iz-color-link);\n' +
+    '  background: var(--iz-color-action-soft);\n' +
+    '  box-shadow: 0 0 0 2px var(--iz-color-focus-ring);\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__plan-input {\n' +
+    '  grid-area: input;\n' +
+    '  width: 1rem;\n' +
+    '  height: 1rem;\n' +
+    '  margin: 0.15rem 0 0;\n' +
+    '  accent-color: var(--iz-color-link);\n' +
+    '  cursor: pointer;\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__plan-title {\n' +
+    '  grid-area: title;\n' +
+    '  font-size: 0.92rem;\n' +
+    '  font-weight: 700;\n' +
+    '  color: var(--iz-color-ink);\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__plan-meta {\n' +
+    '  grid-area: meta;\n' +
+    '  font-size: 0.84rem;\n' +
+    '  color: var(--iz-color-text-muted);\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__plan-note {\n' +
+    '  grid-area: note;\n' +
+    '  font-size: 0.78rem;\n' +
+    '  color: var(--iz-color-text-muted);\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__row {\n' +
+    '  display: flex;\n' +
+    '  flex-direction: column;\n' +
+    '  gap: 0.65rem;\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__field_quantity {\n' +
+    '  max-width: 8rem;\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__field {\n' +
+    '  display: flex;\n' +
+    '  flex-direction: column;\n' +
+    '  gap: 0.3rem;\n' +
+    '  min-width: 0;\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__input {\n' +
+    '  box-sizing: border-box;\n' +
+    '  width: 100%;\n' +
+    '  padding: 0.5rem 0.6rem;\n' +
+    '  border: 1px solid var(--iz-color-border);\n' +
+    '  border-radius: 0.45rem;\n' +
+    '  background: var(--iz-color-surface);\n' +
+    '  font: inherit;\n' +
+    '  font-size: 0.9rem;\n' +
+    '  color: var(--iz-color-ink);\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__input:focus {\n' +
+    '  outline: 2px solid var(--iz-color-focus-ring);\n' +
+    '  border-color: var(--iz-color-link);\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__input:disabled {\n' +
+    '  background: var(--iz-color-surface-elevated);\n' +
+    '  color: var(--iz-color-text-muted);\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__select {\n' +
+    '  cursor: pointer;\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__totals {\n' +
+    '  display: flex;\n' +
+    '  flex-direction: column;\n' +
+    '  gap: 0.5rem;\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__total-item {\n' +
+    '  display: flex;\n' +
+    '  flex-direction: column;\n' +
+    '  gap: 0.2rem;\n' +
+    '  padding: 0.55rem 0.65rem;\n' +
+    '  border: 1px dashed var(--iz-color-border);\n' +
+    '  border-radius: 0.45rem;\n' +
+    '  background: var(--iz-color-surface);\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__total-label {\n' +
+    '  font-size: 0.78rem;\n' +
+    '  font-weight: 600;\n' +
+    '  color: var(--iz-color-text-muted);\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__total-value {\n' +
+    '  font-size: 0.95rem;\n' +
+    '  font-weight: 700;\n' +
+    '  color: var(--iz-color-ink);\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__section {\n' +
+    '  display: flex;\n' +
+    '  flex-direction: column;\n' +
+    '  gap: 0.65rem;\n' +
+    '  padding: 0.75rem;\n' +
+    '  border: 1px solid var(--iz-color-border);\n' +
+    '  border-radius: 0.6rem;\n' +
+    '  background: var(--iz-color-surface);\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__address .address-delivery-fields {\n' +
+    '  gap: 0.55rem;\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__address .address-delivery-fields label > span:first-child {\n' +
+    '  display: block;\n' +
+    '  margin-bottom: 0.3rem;\n' +
+    '  font-size: 0.82rem;\n' +
+    '  font-weight: 600;\n' +
+    '  color: var(--iz-color-text-secondary);\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__error {\n' +
+    '  margin: 0;\n' +
+    '  padding: 0.55rem 0.65rem;\n' +
+    '  border-radius: 0.45rem;\n' +
+    '  background: var(--iz-color-danger-surface);\n' +
+    '  color: var(--iz-color-danger);\n' +
+    '  font-size: 0.85rem;\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__success {\n' +
+    '  margin: 0;\n' +
+    '  padding: 0.55rem 0.65rem;\n' +
+    '  border-radius: 0.45rem;\n' +
+    '  background: var(--iz-color-success-surface);\n' +
+    '  color: var(--iz-color-success);\n' +
+    '  font-size: 0.85rem;\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__submit {\n' +
+    '  width: 100%;\n' +
+    '  margin: 0;\n' +
+    '  padding: 0.65rem 1rem;\n' +
+    '  border: 1px solid var(--iz-color-link);\n' +
+    '  border-radius: 0.5rem;\n' +
+    '  background: var(--iz-color-link);\n' +
+    '  color: var(--iz-color-on-contrast);\n' +
+    '  font: inherit;\n' +
+    '  font-size: 0.95rem;\n' +
+    '  font-weight: 600;\n' +
+    '  cursor: pointer;\n' +
+    '  transition: background-color 0.15s ease;\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__submit:hover:not(:disabled) {\n' +
+    '  background: var(--iz-color-action-hover);\n' +
+    '  border-color: var(--iz-color-action-hover);\n' +
+    '}\n' +
+    '\n' +
+    '.installment-buyer-block__submit:disabled {\n' +
+    '  opacity: 0.6;\n' +
+    '  cursor: not-allowed;\n' +
+    '}\n' +
+    '\n' +
+    '@import "./InstallmentBuyerBlockMobile.css";\n'
+  
+      at TestContext.<anonymous> (file:///C:/Users/IznaWork/Documents/molhaAptekaFullStackApp/mobile/scripts/product-detail-chrome.test.mjs:217:10)
+      at Test.runInAsyncScope (node:async_hooks:214:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:788:18)
+      at Test.postRun (node:internal/test_runner/test:1235:19)
+      at Test.run (node:internal/test_runner/test:1163:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '.installment-buyer-block {\n  display: flex;\n  flex-direction: column;\n  gap: 0.75rem;\n}\n\n.installment-buyer-block__hint {\n  margin: 0;\n  padding: 0.65rem 0.75rem;\n  border: 1px solid var(--iz-color-action-border);\n  border-radius: 0.65rem;\n  background: var(--iz-color-action-soft);\n  font-size: 0.85rem;\n  line-height: 1.45;\n  color: var(--iz-color-info-deep);\n}\n\n.installment-buyer-block__form {\n  display: flex;\n  flex-direction: column;\n  gap: 0.85rem;\n  padding: 0.85rem;\n  border: 1px solid var(--iz-color-border);\n  border-radius: 0.75rem;\n  background: var(--iz-color-surface-elevated);\n}\n\n.installment-buyer-block__legend,\n.installment-buyer-block__label {\n  font-size: 0.82rem;\n  font-weight: 600;\n  color: var(--iz-color-text-secondary);\n}\n\n.installment-buyer-block__plans {\n  margin: 0;\n  padding: 0;\n  border: none;\n}\n\n.installment-buyer-block__plan-list {\n  display: flex;\n  flex-direction: column;\n  gap: 0.5rem;\n  margin-top: 0.45rem;\n}\n\n.installment-buyer-block__plan-card {\n  display: grid;\n  grid-template-columns: auto 1fr;\n  grid-template-areas:\n    "input title"\n    "input meta"\n    "input note";\n  column-gap: 0.55rem;\n  row-gap: 0.15rem;\n  padding: 0.65rem 0.75rem;\n  border: 1px solid var(--iz-color-border);\n  border-radius: 0.6rem;\n  background: var(--iz-color-surface);\n  cursor: pointer;\n  transition:\n    border-color 0.15s ease,\n    box-shadow 0.15s ease,\n    background-color 0.15s ease;\n}\n\n.installment-buyer-block__plan-card:hover {\n  border-color: var(--iz-color-action-soft);\n}\n\n.installment-buyer-block__plan-card_selected {\n  border-color: var(--iz-color-link);\n  background: var(--iz-color-action-soft);\n  box-shadow: 0 0 0 2px var(--iz-color-focus-ring);\n}\n\n.installment-buyer-block__plan-input {\n  grid-area: input;\n  width: 1rem;\n  height: 1rem;\n  margin: 0.15rem 0 0;\n  accent-color: var(--iz-color-link);\n  cursor: pointer;\n}\n\n.installment-buyer-block__plan-title {\n  grid-area: title;\n  font-size: 0.92rem;\n  font-weight: 700;\n  color: var(--iz-color-ink);\n}\n\n.installment-buyer-block__plan-meta {\n  grid-area: meta;\n  font-size: 0.84rem;\n  color: var(--iz-color-text-muted);\n}\n\n.installment-buyer-block__plan-note {\n  grid-area: note;\n  font-size: 0.78rem;\n  color: var(--iz-color-text-muted);\n}\n\n.installment-buyer-block__row {\n  display: flex;\n  flex-direction: column;\n  gap: 0.65rem;\n}\n\n.installment-buyer-block__field_quantity {\n  max-width: 8rem;\n}\n\n.installment-buyer-block__field {\n  display: flex;\n  flex-direction: column;\n  gap: 0.3rem;\n  min-width: 0;\n}\n\n.installment-buyer-block__input {\n  box-sizing: border-box;\n  width: 100%;\n  padding: 0.5rem 0.6rem;\n  border: 1px solid var(--iz-color-border);\n  border-radius: 0.45rem;\n  background: var(--iz-color-surface);\n  font: inherit;\n  font-size: 0.9rem;\n  color: var(--iz-color-ink);\n}\n\n.installment-buyer-block__input:focus {\n  outline: 2px solid var(--iz-color-focus-ring);\n  border-color: var(--iz-color-link);\n}\n\n.installment-buyer-block__input:disabled {\n  background: var(--iz-color-surface-elevated);\n  color: var(--iz-color-text-muted);\n}\n\n.installment-buyer-block__select {\n  cursor: pointer;\n}\n\n.installment-buyer-block__totals {\n  display: flex;\n  flex-direction: column;\n  gap: 0.5rem;\n}\n\n.installment-buyer-block__total-item {\n  display: flex;\n  flex-direction: column;\n  gap: 0.2rem;\n  padding: 0.55rem 0.65rem;\n  border: 1px dashed var(--iz-color-border);\n  border-radius: 0.45rem;\n  background: var(--iz-color-surface);\n}\n\n.installment-buyer-block__total-label {\n  font-size: 0.78rem;\n  font-weight: 600;\n  color: var(--iz-color-text-muted);\n}\n\n.installment-buyer-block__total-value {\n  font-size: 0.95rem;\n  font-weight: 700;\n  color: var(--iz-color-ink);\n}\n\n.installment-buyer-block__section {\n  display: flex;\n  flex-direction: column;\n  gap: 0.65rem;\n  padding: 0.75rem;\n  border: 1px solid var(--iz-color-border);\n  border-radius: 0.6rem;\n  background: var(--iz-color-surface);\n}\n\n.installment-buyer-block__address .address-delivery-fields {\n  gap: 0.55rem;\n}\n\n.installment-buyer-block__address .address-delivery-fields label > span:first-child {\n  display: block;\n  margin-bottom: 0.3rem;\n  font-size: 0.82rem;\n  font-weight: 600;\n  color: var(--iz-color-text-secondary);\n}\n\n.installment-buyer-block__error {\n  margin: 0;\n  padding: 0.55rem 0.65rem;\n  border-radius: 0.45rem;\n  background: var(--iz-color-danger-surface);\n  color: var(--iz-color-danger);\n  font-size: 0.85rem;\n}\n\n.installment-buyer-block__success {\n  margin: 0;\n  padding: 0.55rem 0.65rem;\n  border-radius: 0.45rem;\n  background: var(--iz-color-success-surface);\n  color: var(--iz-color-success);\n  font-size: 0.85rem;\n}\n\n.installment-buyer-block__submit {\n  width: 100%;\n  margin: 0;\n  padding: 0.65rem 1rem;\n  border: 1px solid var(--iz-color-link);\n  border-radius: 0.5rem;\n  background: var(--iz-color-link);\n  color: var(--iz-color-on-contrast);\n  font: inherit;\n  font-size: 0.95rem;\n  font-weight: 600;\n  cursor: pointer;\n  transition: background-color 0.15s ease;\n}\n\n.installment-buyer-block__submit:hover:not(:disabled) {\n  background: var(--iz-color-action-hover);\n  border-color: var(--iz-color-action-hover);\n}\n\n.installment-buyer-block__submit:disabled {\n  opacity: 0.6;\n  cursor: not-allowed;\n}\n\n@import "./InstallmentBuyerBlockMobile.css";\n',
+    expected: /--iz-color-info-navy/,
+    operator: 'match',
+    diff: 'simple'
+  }

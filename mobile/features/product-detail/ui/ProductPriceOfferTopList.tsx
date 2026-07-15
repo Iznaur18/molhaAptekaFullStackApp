@@ -9,9 +9,13 @@ import { useProductPriceOfferStyles } from "@/shared/theme/catalogProductStyles"
 
 type ProductPriceOfferTopListProps = {
   top: TopPriceOffer[];
+  highlightedOfferId?: string | null;
 };
 
-export const ProductPriceOfferTopList = ({ top }: ProductPriceOfferTopListProps) => {
+export const ProductPriceOfferTopList = ({
+  top,
+  highlightedOfferId = null,
+}: ProductPriceOfferTopListProps) => {
   const router = useRouter();
   const styles = useProductPriceOfferStyles();
 
@@ -26,10 +30,17 @@ export const ProductPriceOfferTopList = ({ top }: ProductPriceOfferTopListProps)
         const userId = buyer?._id != null ? String(buyer._id) : null;
         const name = buyer?.userName?.trim() || USER_LIST_ROW_UI.MISSING_NAME;
         const canOpen = Boolean(userId);
+        const isMine =
+          highlightedOfferId != null && String(row._id) === String(highlightedOfferId);
 
         return (
-          <View key={String(row._id)} style={styles.topItem}>
-            <Text style={styles.topRank}>{index + 1}</Text>
+          <View
+            key={String(row._id)}
+            style={[styles.topItem, isMine ? styles.topItemMine : null]}
+          >
+            <Text style={[styles.topRank, isMine ? styles.topRankMine : null]}>
+              {index + 1}
+            </Text>
             {canOpen ? (
               <Pressable
                 style={styles.topBuyerPressable}
@@ -53,7 +64,9 @@ export const ProductPriceOfferTopList = ({ top }: ProductPriceOfferTopListProps)
                 />
               </View>
             )}
-            <Text style={styles.topPrice}>{formatPriceRub(row.offerPrice)}</Text>
+            <Text style={[styles.topPrice, isMine ? styles.topPriceMine : null]}>
+              {formatPriceRub(row.offerPrice)}
+            </Text>
           </View>
         );
       })}

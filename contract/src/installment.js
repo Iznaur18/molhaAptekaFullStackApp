@@ -57,14 +57,6 @@ export const upsertProductInstallmentProgramBodySchema = z.object({
     .max(INSTALLMENT_PLANS_MAX, `plans: от 1 до ${INSTALLMENT_PLANS_MAX} элементов`),
 });
 
-export const rejectInstallmentModerationBodySchema = z.object({
-  moderationComment: z
-    .string()
-    .trim()
-    .max(INSTALLMENT_TEXT_MAX_LENGTH)
-    .optional(),
-});
-
 /** Тело `POST .../installment-contracts` (структура; DaData — отдельно на сервере). */
 export const createInstallmentContractBodySchema = z.object({
   planId: mongoIdSchema,

@@ -5,8 +5,15 @@ import {
   getProductFieldReadLayout,
   isProductFieldMultilineRead,
 } from "../lib/productFieldRegistry";
-import { formatProductFieldForDisplay } from "../lib/formatProductFieldForDisplay";
+import {
+  formatProductFieldForDisplay,
+  PRODUCT_FIELD_EMPTY_DISPLAY,
+} from "../lib/formatProductFieldForDisplay";
 import { useProductDetailFieldStyles } from "@/shared/theme/catalogProductStyles";
+
+import { ProductDetailIdCopyButton } from "./ProductDetailIdCopyButton";
+
+const PRODUCT_ID_FIELD_KEY = "_id";
 
 type ProductDetailFieldRowsProps = {
   product: Record<string, unknown>;
@@ -54,6 +61,10 @@ export const ProductDetailFieldRows = ({
 
         const isStatRow = readLayout === "stat";
         const displayValue = formatProductFieldForDisplay(key, product);
+        const showIdCopy =
+          key === PRODUCT_ID_FIELD_KEY &&
+          displayValue !== PRODUCT_FIELD_EMPTY_DISPLAY &&
+          displayValue.length > 0;
 
         return (
           <View key={key} style={rowStyle}>
@@ -64,13 +75,27 @@ export const ProductDetailFieldRows = ({
             >
               {getProductFieldLabel(key)}
             </Text>
-            <Text
-              style={valueStyle}
-              numberOfLines={isStatRow ? 1 : undefined}
-              ellipsizeMode={isStatRow ? "tail" : undefined}
-            >
-              {displayValue}
-            </Text>
+            {showIdCopy ? (
+              <View style={styles.metaValueRow}>
+                <Text
+                  style={[valueStyle, styles.metaValueText]}
+                  numberOfLines={1}
+                  ellipsizeMode="middle"
+                  selectable
+                >
+                  {displayValue}
+                </Text>
+                <ProductDetailIdCopyButton productId={displayValue} />
+              </View>
+            ) : (
+              <Text
+                style={valueStyle}
+                numberOfLines={isStatRow ? 1 : undefined}
+                ellipsizeMode={isStatRow ? "tail" : undefined}
+              >
+                {displayValue}
+              </Text>
+            )}
           </View>
         );
       })}

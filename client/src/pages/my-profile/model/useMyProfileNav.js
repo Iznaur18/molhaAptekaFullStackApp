@@ -18,7 +18,6 @@ import { getActiveProfileNavLabel } from "../lib/getActiveProfileNavLabel.js";
  *   pendingMyOrdersActionCount?: number;
  *   pendingInstallmentBuyerActionCount?: number;
  *   pendingInstallmentSellerActionCount?: number;
- *   pendingInstallmentModerationCount?: number;
  *   pendingInstallmentDisputesCount?: number;
  *   pendingProductReportsCount?: number;
  *   pendingProductPromotionsCount?: number;
@@ -39,7 +38,6 @@ import { getActiveProfileNavLabel } from "../lib/getActiveProfileNavLabel.js";
  *   onProductPromotionsClick?: () => void;
  *   onRafflesClick?: () => void;
  *   onDataConfirmationQueueClick?: () => void;
- *   onInstallmentModerationClick?: () => void;
  *   onInstallmentDisputesClick?: () => void;
  *   onAdminOrdersClick?: () => void;
  *   onSearchSynonymsAdminClick?: () => void;
@@ -69,7 +67,6 @@ export function useMyProfileNav({
   pendingMyOrdersActionCount = 0,
   pendingInstallmentBuyerActionCount = 0,
   pendingInstallmentSellerActionCount = 0,
-  pendingInstallmentModerationCount = 0,
   pendingInstallmentDisputesCount = 0,
   pendingProductReportsCount = 0,
   pendingProductPromotionsCount = 0,
@@ -90,7 +87,6 @@ export function useMyProfileNav({
   onProductPromotionsClick,
   onRafflesClick,
   onDataConfirmationQueueClick,
-  onInstallmentModerationClick,
   onInstallmentDisputesClick,
   onAdminOrdersClick,
   onSearchSynonymsAdminClick,
@@ -161,8 +157,6 @@ export function useMyProfileNav({
     Boolean(onCreateRaffleClick);
   const canUseDataConfirmationQueue =
     !isRegularUser && isProfileReady && Boolean(onDataConfirmationQueueClick);
-  const canUseInstallmentModeration =
-    !isRegularUser && isProfileReady && Boolean(onInstallmentModerationClick);
   const canUseInstallmentDisputes =
     !isRegularUser && isProfileReady && Boolean(onInstallmentDisputesClick);
   const canUseSubscriptions = isProfileReady && Boolean(onSubscriptionsClick);
@@ -183,7 +177,6 @@ export function useMyProfileNav({
         canUseProductPromotions,
         canUseRaffles,
         canUseDataConfirmationQueue,
-        canUseInstallmentModeration,
         canUseInstallmentDisputes,
         canUseAdminOrders,
         canUseSearchSynonymsAdmin,
@@ -212,7 +205,6 @@ export function useMyProfileNav({
         pendingProductPromotionsCount,
         pendingRafflesCount,
         pendingDataConfirmationCount,
-        pendingInstallmentModerationCount,
         pendingInstallmentDisputesCount,
         onTabChange,
         onCreateRaffleClick,
@@ -229,7 +221,6 @@ export function useMyProfileNav({
         onProductPromotionsClick,
         onRafflesClick,
         onDataConfirmationQueueClick,
-        onInstallmentModerationClick,
         onInstallmentDisputesClick,
         onAdminOrdersClick,
         onSearchSynonymsAdminClick,
@@ -257,7 +248,6 @@ export function useMyProfileNav({
       isUserDataConfirmed,
       canUseEditProfile,
       canUseInstallmentDisputes,
-      canUseInstallmentModeration,
       canUseInstallmentPayments,
       canUseInstallmentSales,
       canUseLoyaltyPoints,
@@ -284,7 +274,6 @@ export function useMyProfileNav({
       onDataConfirmationQueueClick,
       onEditProfileClick,
       onInstallmentDisputesClick,
-      onInstallmentModerationClick,
       onInstallmentPaymentsClick,
       onInstallmentSalesClick,
       onLoyaltyPointsClick,
@@ -307,7 +296,6 @@ export function useMyProfileNav({
       pendingIncomingPriceOffersCount,
       pendingInstallmentBuyerActionCount,
       pendingInstallmentDisputesCount,
-      pendingInstallmentModerationCount,
       pendingInstallmentSellerActionCount,
       pendingModerationCount,
       pendingIntroAdModerationCount,

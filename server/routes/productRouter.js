@@ -81,10 +81,6 @@ import {
   rejectRaffleController,
   getProductInstallmentProgramController,
   upsertProductInstallmentProgramController,
-  getPendingInstallmentModerationController,
-  getPendingInstallmentModerationCountController,
-  approveInstallmentModerationController,
-  rejectInstallmentModerationController,
   createInstallmentContractController,
 } from "../controllers/index.js";
 import {
@@ -141,7 +137,6 @@ import {
   productManageToggleKeyParamValidation,
   patchProductManageToggleDisplayValidation,
   upsertProductInstallmentProgramValidation,
-  rejectInstallmentModerationValidation,
   createInstallmentContractValidation,
 } from "../validations/index.js";
 
@@ -457,18 +452,6 @@ router.patch(
   resolveProductReportsForProductController,
 );
 router.get(
-  "/installment/moderation/pending/count",
-  checkAuthMW,
-  checkProductModeratorMW,
-  getPendingInstallmentModerationCountController,
-);
-router.get(
-  "/installment/moderation/pending",
-  checkAuthMW,
-  checkProductModeratorMW,
-  getPendingInstallmentModerationController,
-);
-router.get(
   "/:productId/installment-program",
   checkOptionalAuthMW,
   productIdParamValidation,
@@ -487,21 +470,6 @@ router.post(
   productIdParamValidation,
   createInstallmentContractValidation,
   createInstallmentContractController,
-);
-router.patch(
-  "/:productId/installment/moderation/approve",
-  checkAuthMW,
-  checkProductModeratorMW,
-  productIdParamValidation,
-  approveInstallmentModerationController,
-);
-router.patch(
-  "/:productId/installment/moderation/reject",
-  checkAuthMW,
-  checkProductModeratorMW,
-  productIdParamValidation,
-  rejectInstallmentModerationValidation,
-  rejectInstallmentModerationController,
 );
 router.get(
   "/:productId/price-offers/top",

@@ -14,10 +14,13 @@ import { useMyCartQuery } from "@/entities/cart/model/useMyCartQuery";
 import { CartLineItem } from "@/entities/cart/ui/CartLineItem";
 import type { OrderPaymentMethod } from "@/entities/order/model/constants";
 import { useCreateOrderMutation } from "@/entities/order/model/useCreateOrderMutation";
+import type { MyPriceOfferBid } from "@/entities/product-price-offer/api/incomingPriceOffersApi";
+import { useMyAcceptedBidsQuery } from "@/entities/product-price-offer/model/useMyAcceptedBidsQuery";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
+import { CartAuctionSection } from "@/features/cart-auction/ui/CartAuctionSection";
 import { CheckoutSheetModal } from "@/features/checkout/ui/CheckoutSheetModal";
-import { orderQueryKeys } from "@/shared/api";
-import { API_CLIENT_UI, AUTH_UI, CART_PAGE_UI, CHECKOUT_FORM_UI } from "@/shared/config";
+import { orderQueryKeys, priceOfferQueryKeys } from "@/shared/api";
+import { API_CLIENT_UI, AUTH_UI, CART_AUCTION_UI, CART_PAGE_UI, CHECKOUT_FORM_UI } from "@/shared/config";
 import { formatApiErrorMessage, formatPriceRub } from "@/shared/lib";
 import { resolveMobileBottomNavLayoutHeight } from "@/shared/lib/mobileBottomNavLayout";
 import { useCartScreenStyles } from "@/shared/theme/catalogProductStyles";
@@ -43,6 +46,7 @@ export default function CartScreen() {
   const createOrderMutation = useCreateOrderMutation();
 
   const [checkoutSheetOpen, setCheckoutSheetOpen] = useState(false);
+  const [auctionCheckoutBid, setAuctionCheckoutBid] = useState<MyPriceOfferBid | null>(null);
   const [submitState, setSubmitState] = useState({
     isSubmitting: false,
     error: "",
@@ -51,6 +55,8 @@ export default function CartScreen() {
 
   const productIds = useMemo(() => Object.keys(cartQuery.data ?? {}), [cartQuery.data]);
   const productsQuery = useCartProductsQuery(productIds);
+  const acceptedBidsQuery = useMyAcceptedBidsQuery(isAuthorized);
+  const auctionBids = useMemo(() => acceptedBidsQuery.data ?? [], [acceptedBidsQuery.data]);
   const currentUserId = sessionQuery.data?.user?._id;
 
   const { lines } = useMemo(
@@ -74,8 +80,47 @@ export default function CartScreen() {
   const canCheckout = checkoutSummary.purchasableLines.length > 0;
 
   const handleRefresh = useCallback(async () => {
-    await Promise.all([cartQuery.refetch(), productsQuery.refetch()]);
-  }, [cartQuery, productsQuery]);
+    await Promise.all([cartQuery.refetch(), productsQuery.refetch(), acceptedBidsQuery.refetch()]);
+  }, [acceptedBidsQuery, cartQuery, productsQuery]);
+
+  const handleOpenAuctionCheckout = (bid: MyPriceOfferBid) => {
+    setSubmitState({ isSubmitting: false, error: "", success: "" });
+    setAuctionCheckoutBid(bid);
+  };
+
+  const handleAuctionCheckoutSubmit = async (payload: {
+    deliveryAddress: string;
+    deliveryAddressFlat: string;
+    paymentMethod: OrderPaymentMethod;
+  }) => {
+    if (!auctionCheckoutBid) {
+      return;
+    }
+    setSubmitState({ isSubmitting: true, error: "", success: "" });
+    try {
+      await createOrderMutation.mutateAsync({
+        items: [{ productId: auctionCheckoutBid.productId, quantity: 1 }],
+        priceOfferId: auctionCheckoutBid._id,
+        deliveryAddress: payload.deliveryAddress,
+        deliveryAddressFlat: payload.deliveryAddressFlat,
+        paymentMethod: payload.paymentMethod,
+      });
+      setAuctionCheckoutBid(null);
+      setSubmitState({ isSubmitting: false, error: "", success: CART_AUCTION_UI.ORDER_PLACED });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: priceOfferQueryKeys.myBids() }),
+        queryClient.invalidateQueries({ queryKey: orderQueryKeys.my() }),
+        queryClient.invalidateQueries({ queryKey: orderQueryKeys.myActionCount() }),
+      ]);
+      router.replace("/orders");
+    } catch (error) {
+      setSubmitState({
+        isSubmitting: false,
+        error: error instanceof Error ? error.message : CHECKOUT_FORM_UI.ERROR_GENERIC,
+        success: "",
+      });
+    }
+  };
 
   const handleCheckoutSubmit = async (payload: {
     deliveryAddress: string;
@@ -152,7 +197,7 @@ export default function CartScreen() {
     );
   }
 
-  if (lines.length === 0) {
+  if (lines.length === 0 && auctionBids.length === 0) {
     return (
       <View style={styles.centered}>
         <Text style={styles.message}>{CART_PAGE_UI.EMPTY}</Text>
@@ -165,7 +210,7 @@ export default function CartScreen() {
     );
   }
 
-  if (visibleLines.length === 0) {
+  if (visibleLines.length === 0 && auctionBids.length === 0) {
     return (
       <View style={styles.centered}>
         <Text style={styles.message}>{CART_PAGE_UI.CHECKOUT_BLOCKED_ALL_UNAVAILABLE}</Text>
@@ -229,22 +274,31 @@ export default function CartScreen() {
         data={visibleLines}
         keyExtractor={(line) => line.productId}
         renderItem={({ item }) => <CartLineItem line={item} />}
+        ListHeaderComponent={
+          <CartAuctionSection bids={auctionBids} onCheckout={handleOpenAuctionCheckout} />
+        }
         contentContainerStyle={[
           styles.list,
           {
             paddingTop: contentPaddingTop + 8,
-            paddingBottom: bottomNavLayoutHeight + CART_STICKY_FOOTER_HEIGHT,
+            paddingBottom:
+              bottomNavLayoutHeight +
+              (visibleLines.length > 0 ? CART_STICKY_FOOTER_HEIGHT : 0),
           },
         ]}
         refreshControl={
           <ThemedRefreshControl
-            refreshing={cartQuery.isRefetching || productsQuery.isRefetching}
+            refreshing={
+              cartQuery.isRefetching ||
+              productsQuery.isRefetching ||
+              acceptedBidsQuery.isRefetching
+            }
             onRefresh={handleRefresh}
           />
         }
       />
 
-      {checkoutFooter}
+      {visibleLines.length > 0 ? checkoutFooter : null}
 
       <CheckoutSheetModal
         visible={checkoutSheetOpen}
@@ -255,6 +309,16 @@ export default function CartScreen() {
         isDisabled={!canCheckout}
         onClose={() => setCheckoutSheetOpen(false)}
         onSubmit={handleCheckoutSubmit}
+      />
+
+      <CheckoutSheetModal
+        visible={auctionCheckoutBid != null}
+        defaultUser={sessionQuery.data?.user}
+        isSubmitting={submitState.isSubmitting}
+        submitError={submitState.error}
+        submitSuccess={submitState.success}
+        onClose={() => setAuctionCheckoutBid(null)}
+        onSubmit={handleAuctionCheckoutSubmit}
       />
     </View>
   );

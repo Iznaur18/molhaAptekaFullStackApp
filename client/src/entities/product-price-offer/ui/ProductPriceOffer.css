@@ -42,6 +42,16 @@
   background: var(--iz-color-surface);
 }
 
+.product-price-offer__top-item--mine {
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action-soft);
+}
+
+.product-price-offer__top-item--mine .product-price-offer__top-rank,
+.product-price-offer__top-item--mine .product-price-offer__top-price {
+  color: var(--iz-color-action);
+}
+
 .product-price-offer__top-rank {
   flex-shrink: 0;
   width: 1.35rem;

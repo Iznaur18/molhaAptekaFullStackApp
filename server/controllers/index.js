@@ -191,10 +191,6 @@ import {
 import {
   getProductInstallmentProgramController,
   upsertProductInstallmentProgramController,
-  getPendingInstallmentModerationController,
-  getPendingInstallmentModerationCountController,
-  approveInstallmentModerationController,
-  rejectInstallmentModerationController,
 } from "./Product/productInstallmentControllers.js";
 import {
   createInstallmentContractController,
@@ -360,10 +356,6 @@ export {
   resolveUserStoryReportsController,
   getProductInstallmentProgramController,
   upsertProductInstallmentProgramController,
-  getPendingInstallmentModerationController,
-  getPendingInstallmentModerationCountController,
-  approveInstallmentModerationController,
-  rejectInstallmentModerationController,
   createInstallmentContractController,
   getMyInstallmentContractsController,
   getMyInstallmentSalesController,

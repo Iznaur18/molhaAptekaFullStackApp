@@ -5,7 +5,7 @@ import { isStaffStandaloneMainView } from "./staffMainViews.js";
  * проксирует `/cart` и `/user/...` на Express (см. vite.config.js).
  * Путь `/user-list` ок: не совпадает с API `/user` (иначе F5 → 404 JSON).
  *
- * @typedef {'catalog' | 'catalog-browser' | 'my-profile' | 'my-products' | 'users' | 'subscriptions' | 'wishlist' | 'notifications' | 'cart' | 'my-sales' | 'my-orders' | 'auction' | 'data-confirmation' | 'premium' | 'loyalty-points' | 'advertising' | 'admin-orders' | 'search-synonyms-admin' | 'category-tree-admin' | 'app-intro-admin' | 'site-header-banner-admin' | 'product-manage-toggle-display-admin' | 'popular-products-admin' | 'product-moderation' | 'intro-ad-moderation' | 'seller-personal-category-moderation' | 'product-reports' | 'staff-raffles' | 'data-confirmation-requests' | 'installment-payments' | 'installment-sales' | 'installment-moderation' | 'installment-disputes'} HomeMainView
+ * @typedef {'catalog' | 'catalog-browser' | 'my-profile' | 'my-products' | 'users' | 'subscriptions' | 'wishlist' | 'notifications' | 'cart' | 'my-sales' | 'my-orders' | 'auction' | 'data-confirmation' | 'premium' | 'loyalty-points' | 'advertising' | 'admin-orders' | 'search-synonyms-admin' | 'category-tree-admin' | 'app-intro-admin' | 'site-header-banner-admin' | 'product-manage-toggle-display-admin' | 'popular-products-admin' | 'product-moderation' | 'intro-ad-moderation' | 'seller-personal-category-moderation' | 'product-reports' | 'staff-raffles' | 'data-confirmation-requests' | 'installment-payments' | 'installment-sales' | 'installment-disputes'} HomeMainView
  */
 
 /** @type {Record<HomeMainView, string>} */
@@ -42,7 +42,6 @@ export const HOME_MAIN_VIEW_PATH = {
   "data-confirmation-requests": "/data-confirmation-requests",
   "installment-payments": "/installment-payments",
   "installment-sales": "/installment-sales",
-  "installment-moderation": "/installment-moderation",
   "installment-disputes": "/installment-disputes",
 };
 

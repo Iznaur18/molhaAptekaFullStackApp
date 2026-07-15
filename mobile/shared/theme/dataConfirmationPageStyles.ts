@@ -1,8 +1,10 @@
 import { StyleSheet } from "react-native";
 
+import { MODAL_BACKDROP_SCRIM } from "@/shared/theme/formChromeStyles";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
+const DIALOG_MAX_WIDTH = 420;
 export const useDataConfirmationPageStyles = createThemedStyles((theme) => ({
   container: {
     flex: 1,
@@ -161,5 +163,128 @@ export const useDataConfirmationPageStyles = createThemedStyles((theme) => ({
     color: theme.colors.onContrast,
     fontWeight: "600",
     fontSize: 15.2,
+  },
+}));
+
+/** Центрированный dialog (не bottom-sheet): fade + тап по затемнению. */
+export const useDataConfirmationRequestModalStyles = createThemedStyles((theme) => ({
+  root: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: MODAL_BACKDROP_SCRIM,
+  },
+  keyboardHost: {
+    width: "100%",
+    maxWidth: DIALOG_MAX_WIDTH,
+    maxHeight: "88%",
+  },
+  card: {
+    width: "100%",
+    maxHeight: "100%",
+    borderRadius: theme.radius.lg,
+    backgroundColor: theme.colors.surface,
+    overflow: "hidden",
+    shadowColor: theme.colors.ink,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.2,
+    shadowRadius: 24,
+    elevation: 10,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: theme.spacing[4],
+    paddingTop: theme.spacing[4],
+    paddingBottom: theme.spacing[3],
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: theme.colors.border,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "700",
+    flex: 1,
+    color: theme.colors.text,
+  },
+  intro: {
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: theme.spacing[2],
+    color: theme.colors.textMuted,
+  },
+  form: {
+    paddingHorizontal: theme.spacing[4],
+    paddingTop: theme.spacing[3],
+    paddingBottom: theme.spacing[5],
+    gap: 10,
+  },
+  passportInput: {
+    borderWidth: 1,
+    borderColor: theme.colors.borderStrong,
+    borderRadius: theme.radius.button,
+    paddingHorizontal: theme.spacing[3],
+    paddingVertical: 12,
+    fontSize: 16,
+    backgroundColor: theme.colors.bg,
+    color: theme.colors.text,
+  },
+  stepMeta: {
+    gap: 4,
+    marginBottom: theme.spacing[1],
+  },
+  stepProgress: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: theme.colors.textMuted,
+  },
+  stepTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: theme.colors.text,
+  },
+  stepActions: {
+    flexDirection: "row",
+    gap: theme.spacing[2],
+    marginTop: theme.spacing[2],
+  },
+  stepActionFlex: {
+    flex: 1,
+  },
+  selfieSection: {
+    gap: theme.spacing[2],
+    marginTop: theme.spacing[1],
+  },
+  selfieHint: {
+    fontSize: 13,
+    color: theme.colors.textMuted,
+  },
+  preview: {
+    width: "100%",
+    height: 180,
+    borderRadius: theme.radius.sm,
+    backgroundColor: theme.colors.surfaceMuted,
+  },
+  fileName: {
+    fontSize: 13,
+    color: theme.colors.textMuted,
+  },
+  rejectBlock: {
+    paddingHorizontal: theme.spacing[4],
+    paddingVertical: theme.spacing[3],
+    gap: 6,
+  },
+  staffNote: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: theme.colors.textMuted,
+  },
+  statusPadding: {
+    paddingHorizontal: theme.spacing[4],
+    paddingVertical: theme.spacing[3],
   },
 }));

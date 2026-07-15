@@ -6,10 +6,10 @@ import {
 } from "../../../entities/order/model/constants.js";
 
 export const CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT = {
-  widthPx: 148,
   minHeightPx: 84,
   borderRadiusPx: 16,
   gapPx: 12,
+  minWidthPx: 120,
 };
 
 export const CHECKOUT_PAYMENT_METHOD_CARD_THEME = {

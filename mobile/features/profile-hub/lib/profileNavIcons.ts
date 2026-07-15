@@ -26,7 +26,6 @@ const PROFILE_NAV_ICON_MAP: Partial<Record<ProfileSectionId | "logout", ProfileN
   "product-promotions": "trending-up",
   raffles: "confirmation-number",
   "data-confirmation-requests": "person-search",
-  "installment-moderation": "balance",
   "installment-disputes": "report-problem",
   "admin-orders": "format-list-numbered",
   "search-synonyms-admin": "search",

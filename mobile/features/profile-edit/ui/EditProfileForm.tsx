@@ -235,7 +235,7 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
         />
       </View>
 
-      {/* Заметки */}
+      {/* О себе */}
       <Text style={[styles.labelStrong, { marginTop: 16 }]}>{EDIT_PROFILE_UI.LABEL_NOTES}</Text>
       <TextInput
         style={[styles.input, styles.inputMultiline]}

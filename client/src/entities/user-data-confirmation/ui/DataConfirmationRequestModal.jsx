@@ -3,7 +3,19 @@ import { createPortal } from "react-dom";
 
 import { useSubmitDataConfirmationRequestMutation } from "../model/useSubmitDataConfirmationRequestMutation.js";
 import { emptyPassportForm } from "../lib/emptyPassportForm.js";
+import {
+  maskPassportDateInput,
+  parsePassportDateInputToIso,
+} from "../lib/passportDateInputMask.js";
+import { maskPassportDepartmentCodeInput } from "../lib/passportDepartmentCodeInputMask.js";
 import { validatePassportForm } from "../lib/validatePassportForm.js";
+import {
+  PASSPORT_FORM_STEP_COUNT,
+  PASSPORT_FORM_STEP_IDENTITY,
+  PASSPORT_FORM_STEP_PASSPORT,
+  PASSPORT_FORM_STEP_SELFIE,
+  validatePassportFormStep,
+} from "../lib/validatePassportFormStep.js";
 import { useMyDataConfirmationStatusQuery } from "../model/useMyDataConfirmationStatusQuery.js";
 import {
   USER_DATA_CONFIRMATION_STATUS_PENDING,
@@ -28,6 +40,12 @@ import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
 
 import "./DataConfirmationRequestModal.css";
 
+const STEP_TITLES = [
+  DATA_CONFIRMATION_MODAL_UI.STEP_IDENTITY,
+  DATA_CONFIRMATION_MODAL_UI.STEP_PASSPORT,
+  DATA_CONFIRMATION_MODAL_UI.STEP_SELFIE,
+];
+
 /**
  * @param {{
  *   isOpen: boolean;
@@ -43,6 +61,7 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
   const [selfieFile, setSelfieFile] = useState(/** @type {File | null} */ (null));
   const [selfiePreviewUrl, setSelfiePreviewUrl] = useState("");
   const [error, setError] = useState("");
+  const [step, setStep] = useState(PASSPORT_FORM_STEP_IDENTITY);
   const isSubmitting =
     submitRequestMutation.isPending || uploadImageMutation.isPending;
   const selfieFileInputRef = useRef(/** @type {HTMLInputElement | null} */ (null));
@@ -83,6 +102,7 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
     setError("");
     setSelfieFile(null);
     setForm(emptyPassportForm());
+    setStep(PASSPORT_FORM_STEP_IDENTITY);
   }, [isOpen, statusQuery.dataUpdatedAt]);
 
   useScrollLock(isOpen);
@@ -93,8 +113,32 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
     !isUserDataConfirmed && requestStatus !== USER_DATA_CONFIRMATION_STATUS_PENDING;
   const displayError = error || (phase === "error" ? fetchError : "");
 
+  const updateField = (key, value) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleNextStep = () => {
+    const stepError = validatePassportFormStep(form, step);
+    if (stepError) {
+      setError(stepError);
+      return;
+    }
+    setError("");
+    setStep((prev) => Math.min(prev + 1, PASSPORT_FORM_STEP_SELFIE));
+  };
+
+  const handleBackStep = () => {
+    setError("");
+    setStep((prev) => Math.max(prev - 1, PASSPORT_FORM_STEP_IDENTITY));
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (step !== PASSPORT_FORM_STEP_SELFIE) {
+      handleNextStep();
+      return;
+    }
+
     const validationError = validatePassportForm(form);
     if (validationError) {
       setError(validationError);
@@ -108,6 +152,13 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
     const fileError = validateUploadImageFile(selfieFile);
     if (fileError) {
       setError(fileError);
+      return;
+    }
+
+    const birthDateIso = parsePassportDateInputToIso(form.birthDate);
+    const issuedAtIso = parsePassportDateInputToIso(form.issuedAt);
+    if (!birthDateIso || !issuedAtIso) {
+      setError("Проверьте даты: ДД.ММ.ГГГГ");
       return;
     }
 
@@ -130,9 +181,11 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
           lastName: form.lastName.trim(),
           firstName: form.firstName.trim(),
           middleName: form.middleName.trim(),
+          birthDate: birthDateIso,
           series: form.series.trim(),
           number: form.number.trim(),
           issuedBy: form.issuedBy.trim(),
+          issuedAt: issuedAtIso,
           departmentCode: form.departmentCode.trim(),
         },
         passportSelfiePhotoUrl,
@@ -142,10 +195,6 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
     } catch (e) {
       setError(e instanceof Error ? e.message : "Ошибка");
     }
-  };
-
-  const updateField = (key, value) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleSelfieFileChange = (event) => {
@@ -237,129 +286,166 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
               {DATA_CONFIRMATION_MODAL_UI.INTRO}
             </p>
             <form className="data-confirmation-modal__form" onSubmit={handleSubmit}>
-              <div className="data-confirmation-modal__grid">
-                <label>
-                  {DATA_CONFIRMATION_MODAL_UI.LABEL_LAST_NAME}
-                  <input
-                    type="text"
-                    value={form.lastName}
-                    onChange={(e) => updateField("lastName", e.target.value)}
-                    autoComplete="family-name"
-                  />
-                </label>
-                <label>
-                  {DATA_CONFIRMATION_MODAL_UI.LABEL_FIRST_NAME}
-                  <input
-                    type="text"
-                    value={form.firstName}
-                    onChange={(e) => updateField("firstName", e.target.value)}
-                    autoComplete="given-name"
-                  />
-                </label>
-                <label>
-                  {DATA_CONFIRMATION_MODAL_UI.LABEL_MIDDLE_NAME}
-                  <input
-                    type="text"
-                    value={form.middleName}
-                    onChange={(e) => updateField("middleName", e.target.value)}
-                    autoComplete="additional-name"
-                  />
-                </label>
-                <label>
-                  {DATA_CONFIRMATION_MODAL_UI.LABEL_BIRTH_DATE}
-                  <input
-                    type="date"
-                    value={form.birthDate}
-                    onChange={(e) => updateField("birthDate", e.target.value)}
-                  />
-                </label>
-                <label>
-                  {DATA_CONFIRMATION_MODAL_UI.LABEL_SERIES}
-                  <input
-                    {...INTEGER_INPUT_FIELD_PROPS}
-                    maxLength={4}
-                    value={form.series}
-                    onChange={(e) =>
-                      updateField("series", keepDigitsOnly(e.target.value))
-                    }
-                  />
-                </label>
-                <label>
-                  {DATA_CONFIRMATION_MODAL_UI.LABEL_NUMBER}
-                  <input
-                    {...INTEGER_INPUT_FIELD_PROPS}
-                    maxLength={6}
-                    value={form.number}
-                    onChange={(e) =>
-                      updateField("number", keepDigitsOnly(e.target.value))
-                    }
-                  />
-                </label>
-                <label className="data-confirmation-modal__field_wide">
-                  {DATA_CONFIRMATION_MODAL_UI.LABEL_ISSUED_BY}
-                  <textarea
-                    rows={2}
-                    value={form.issuedBy}
-                    onChange={(e) => updateField("issuedBy", e.target.value)}
-                  />
-                </label>
-                <label>
-                  {DATA_CONFIRMATION_MODAL_UI.LABEL_ISSUED_AT}
-                  <input
-                    type="date"
-                    value={form.issuedAt}
-                    onChange={(e) => updateField("issuedAt", e.target.value)}
-                  />
-                </label>
-                <label>
-                  {DATA_CONFIRMATION_MODAL_UI.LABEL_DEPARTMENT_CODE}
-                  <input
-                    type="text"
-                    placeholder={DATA_CONFIRMATION_MODAL_UI.PLACEHOLDER_DEPARTMENT_CODE}
-                    value={form.departmentCode}
-                    onChange={(e) => updateField("departmentCode", e.target.value)}
-                  />
-                </label>
+              <div className="data-confirmation-modal__step-meta">
+                <p className="data-confirmation-modal__step-progress">
+                  {DATA_CONFIRMATION_MODAL_UI.STEP_PROGRESS(
+                    step + 1,
+                    PASSPORT_FORM_STEP_COUNT,
+                  )}
+                </p>
+                <p className="data-confirmation-modal__step-title">{STEP_TITLES[step]}</p>
               </div>
 
-              <label className="data-confirmation-modal__selfie">
-                <span>{DATA_CONFIRMATION_MODAL_UI.LABEL_PASSPORT_SELFIE}</span>
-                <span className="data-confirmation-modal__selfie-hint">
-                  {DATA_CONFIRMATION_MODAL_UI.HINT_PASSPORT_SELFIE}
-                </span>
-                <div className="data-confirmation-modal__selfie-upload">
-                  <button
-                    type="button"
-                    className="data-confirmation-modal__file-btn"
-                    onClick={handlePickSelfieFile}
-                    disabled={isSubmitting}
-                  >
-                    {IMAGE_URL_FIELD_UI.UPLOAD_BUTTON}
-                  </button>
-                  {selfieFile ? (
-                    <span className="data-confirmation-modal__file-name">
-                      {selfieFile.name}
-                    </span>
-                  ) : null}
+              {step === PASSPORT_FORM_STEP_IDENTITY ? (
+                <div className="data-confirmation-modal__grid">
+                  <label>
+                    {DATA_CONFIRMATION_MODAL_UI.LABEL_LAST_NAME}
+                    <input
+                      type="text"
+                      value={form.lastName}
+                      onChange={(e) => updateField("lastName", e.target.value)}
+                      autoComplete="family-name"
+                    />
+                  </label>
+                  <label>
+                    {DATA_CONFIRMATION_MODAL_UI.LABEL_FIRST_NAME}
+                    <input
+                      type="text"
+                      value={form.firstName}
+                      onChange={(e) => updateField("firstName", e.target.value)}
+                      autoComplete="given-name"
+                    />
+                  </label>
+                  <label>
+                    {DATA_CONFIRMATION_MODAL_UI.LABEL_MIDDLE_NAME}
+                    <input
+                      type="text"
+                      value={form.middleName}
+                      onChange={(e) => updateField("middleName", e.target.value)}
+                      autoComplete="additional-name"
+                    />
+                  </label>
+                  <label>
+                    {DATA_CONFIRMATION_MODAL_UI.LABEL_BIRTH_DATE}
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="bday"
+                      placeholder={DATA_CONFIRMATION_MODAL_UI.PLACEHOLDER_DATE}
+                      maxLength={10}
+                      value={form.birthDate}
+                      onChange={(e) =>
+                        updateField("birthDate", maskPassportDateInput(e.target.value))
+                      }
+                    />
+                  </label>
                 </div>
-                <input
-                  ref={selfieFileInputRef}
-                  className="data-confirmation-modal__file-input"
-                  type="file"
-                  accept={UPLOAD_FILE_INPUT_ACCEPT}
-                  aria-label={IMAGE_URL_FIELD_UI.FILE_INPUT_ARIA}
-                  tabIndex={-1}
-                  onChange={handleSelfieFileChange}
-                  disabled={isSubmitting}
-                />
-                {selfiePreviewUrl ? (
-                  <img
-                    className="data-confirmation-modal__selfie-preview"
-                    src={resolveImageUrlForDisplay(selfiePreviewUrl)}
-                    alt=""
+              ) : null}
+
+              {step === PASSPORT_FORM_STEP_PASSPORT ? (
+                <div className="data-confirmation-modal__grid">
+                  <label>
+                    {DATA_CONFIRMATION_MODAL_UI.LABEL_SERIES}
+                    <input
+                      {...INTEGER_INPUT_FIELD_PROPS}
+                      maxLength={4}
+                      value={form.series}
+                      onChange={(e) =>
+                        updateField("series", keepDigitsOnly(e.target.value))
+                      }
+                    />
+                  </label>
+                  <label>
+                    {DATA_CONFIRMATION_MODAL_UI.LABEL_NUMBER}
+                    <input
+                      {...INTEGER_INPUT_FIELD_PROPS}
+                      maxLength={6}
+                      value={form.number}
+                      onChange={(e) =>
+                        updateField("number", keepDigitsOnly(e.target.value))
+                      }
+                    />
+                  </label>
+                  <label className="data-confirmation-modal__field_wide">
+                    {DATA_CONFIRMATION_MODAL_UI.LABEL_ISSUED_BY}
+                    <textarea
+                      rows={2}
+                      value={form.issuedBy}
+                      onChange={(e) => updateField("issuedBy", e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    {DATA_CONFIRMATION_MODAL_UI.LABEL_ISSUED_AT}
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      placeholder={DATA_CONFIRMATION_MODAL_UI.PLACEHOLDER_DATE}
+                      maxLength={10}
+                      value={form.issuedAt}
+                      onChange={(e) =>
+                        updateField("issuedAt", maskPassportDateInput(e.target.value))
+                      }
+                    />
+                  </label>
+                  <label>
+                    {DATA_CONFIRMATION_MODAL_UI.LABEL_DEPARTMENT_CODE}
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      placeholder={DATA_CONFIRMATION_MODAL_UI.PLACEHOLDER_DEPARTMENT_CODE}
+                      maxLength={7}
+                      value={form.departmentCode}
+                      onChange={(e) =>
+                        updateField(
+                          "departmentCode",
+                          maskPassportDepartmentCodeInput(e.target.value),
+                        )
+                      }
+                    />
+                  </label>
+                </div>
+              ) : null}
+
+              {step === PASSPORT_FORM_STEP_SELFIE ? (
+                <label className="data-confirmation-modal__selfie">
+                  <span>{DATA_CONFIRMATION_MODAL_UI.LABEL_PASSPORT_SELFIE}</span>
+                  <span className="data-confirmation-modal__selfie-hint">
+                    {DATA_CONFIRMATION_MODAL_UI.HINT_PASSPORT_SELFIE}
+                  </span>
+                  <div className="data-confirmation-modal__selfie-upload">
+                    <button
+                      type="button"
+                      className="data-confirmation-modal__file-btn"
+                      onClick={handlePickSelfieFile}
+                      disabled={isSubmitting}
+                    >
+                      {IMAGE_URL_FIELD_UI.UPLOAD_BUTTON}
+                    </button>
+                    {selfieFile ? (
+                      <span className="data-confirmation-modal__file-name">
+                        {selfieFile.name}
+                      </span>
+                    ) : null}
+                  </div>
+                  <input
+                    ref={selfieFileInputRef}
+                    className="data-confirmation-modal__file-input"
+                    type="file"
+                    accept={UPLOAD_FILE_INPUT_ACCEPT}
+                    aria-label={IMAGE_URL_FIELD_UI.FILE_INPUT_ARIA}
+                    tabIndex={-1}
+                    onChange={handleSelfieFileChange}
+                    disabled={isSubmitting}
                   />
-                ) : null}
-              </label>
+                  {selfiePreviewUrl ? (
+                    <img
+                      className="data-confirmation-modal__selfie-preview"
+                      src={resolveImageUrlForDisplay(selfiePreviewUrl)}
+                      alt=""
+                    />
+                  ) : null}
+                </label>
+              ) : null}
 
               {displayError ? (
                 <p className="data-confirmation-modal__state_error" role="alert">
@@ -367,18 +453,40 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
                 </p>
               ) : null}
               <div className="data-confirmation-modal__actions">
-                <button type="button" className="app-btn app-btn--cancel" onClick={onClose}>
-                  {DATA_CONFIRMATION_MODAL_UI.CANCEL}
-                </button>
-                <button
-                  type="submit"
-                  className="app-btn app-btn--primary"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting
-                    ? DATA_CONFIRMATION_MODAL_UI.SUBMIT_LOADING
-                    : DATA_CONFIRMATION_MODAL_UI.SUBMIT}
-                </button>
+                {step > PASSPORT_FORM_STEP_IDENTITY ? (
+                  <button
+                    type="button"
+                    className="app-btn app-btn--cancel"
+                    onClick={handleBackStep}
+                    disabled={isSubmitting}
+                  >
+                    {DATA_CONFIRMATION_MODAL_UI.BACK}
+                  </button>
+                ) : (
+                  <button type="button" className="app-btn app-btn--cancel" onClick={onClose}>
+                    {DATA_CONFIRMATION_MODAL_UI.CANCEL}
+                  </button>
+                )}
+                {step < PASSPORT_FORM_STEP_SELFIE ? (
+                  <button
+                    type="button"
+                    className="app-btn app-btn--primary"
+                    onClick={handleNextStep}
+                    disabled={isSubmitting}
+                  >
+                    {DATA_CONFIRMATION_MODAL_UI.NEXT}
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    className="app-btn app-btn--primary"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting
+                      ? DATA_CONFIRMATION_MODAL_UI.SUBMIT_LOADING
+                      : DATA_CONFIRMATION_MODAL_UI.SUBMIT}
+                  </button>
+                )}
               </div>
             </form>
           </>

@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { useNavigate } from "react-router-dom";
 
-import { addressValueFromUser } from "../../address/lib/addressValueFromUser.js";
-import { useCreateOrderMutation } from "../../order/model/useCreateOrderMutation.js";
-import { useAuthSession } from "../../user/model/useAuthSession.js";
-import { CheckoutForm } from "../../../shared/ui/CheckoutForm/CheckoutForm.jsx";
 import { useMyPriceOfferQuery } from "../model/useMyPriceOfferQuery.js";
 import { usePriceOfferMutations } from "../model/usePriceOfferMutations.js";
 import {
@@ -12,12 +9,7 @@ import {
   PRICE_OFFER_STATUS_PENDING,
 } from "../model/constants.js";
 import { getProductPriceRubMaxError } from "../../product/lib/productPriceRubValidation.js";
-import {
-  clearPriceOfferPayFlowOpened,
-  isPriceOfferPayFlowOpened,
-  markPriceOfferPayFlowOpened,
-} from "../lib/priceOfferPayFlowStorage.js";
-import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
+import { HOME_MAIN_VIEW_PATH } from "../../../shared/lib/homeMainViewPaths.js";
 import {
   INTEGER_INPUT_FIELD_PROPS,
   formatIntegerGroupRu,
@@ -47,6 +39,7 @@ import "./ProductPriceOffer.css";
  *   onOpenBuyer?: (userId: string) => void;
  *   onRequestLogin?: () => void;
  *   onOffersChanged?: () => void;
+ *   onCloseModal?: () => void;
  * }} props
  */
 export function ProductPriceOfferBuyerBlock({
@@ -58,24 +51,20 @@ export function ProductPriceOfferBuyerBlock({
   onOpenBuyer,
   onRequestLogin,
   onOffersChanged,
+  onCloseModal,
 }) {
+  const navigate = useNavigate();
   const myOfferQuery = useMyPriceOfferQuery({
     productId,
     enabled: isAuthorized,
   });
   const { submitMutation, patchMutation, cancelMutation } =
     usePriceOfferMutations(productId);
-  const createOrderMutation = useCreateOrderMutation();
   const myOffer = myOfferQuery.data ?? null;
   const [priceInput, setPriceInput] = useState("");
   const [error, setError] = useState("");
-  const [showPay, setShowPay] = useState(false);
-  const [payError, setPayError] = useState("");
-  const [paySuccess, setPaySuccess] = useState("");
-  const [defaultAddress, setDefaultAddress] = useState({});
   const isBusy =
     submitMutation.isPending || patchMutation.isPending || cancelMutation.isPending;
-  const isPaying = createOrderMutation.isPending;
   const isMobileNav = useAppShellCompactLayout();
   const dockSubmit = isMobileNav;
   const confirmGate = useAccountRequirementModal();
@@ -90,33 +79,8 @@ export function ProductPriceOfferBuyerBlock({
     }
   }, [myOffer?._id, myOffer?.offerPrice, myOfferQuery.isLoading]);
 
-  const offerId = myOffer?._id != null ? String(myOffer._id) : null;
   const hasLinkedOrder =
     myOffer?.orderId != null && String(myOffer.orderId).trim() !== "";
-
-  useEffect(() => {
-    if (myOffer?.status !== PRICE_OFFER_STATUS_ACCEPTED || offerId == null) {
-      return;
-    }
-    if (hasLinkedOrder) {
-      clearPriceOfferPayFlowOpened(productId, offerId);
-      setShowPay(false);
-      return;
-    }
-    if (isPriceOfferPayFlowOpened(productId, offerId)) {
-      setShowPay(true);
-    }
-  }, [myOffer?.status, offerId, hasLinkedOrder, productId]);
-
-  const { user } = useAuthSession();
-
-  useEffect(() => {
-    if (!showPay || !isAuthorized || !user) {
-      return undefined;
-    }
-    setDefaultAddress(addressValueFromUser(user));
-    return undefined;
-  }, [isAuthorized, showPay, user]);
 
   const handleSubmitOffer = async () => {
     if (!isAuthorized) {
@@ -158,40 +122,15 @@ export function ProductPriceOfferBuyerBlock({
     }
   };
 
-  const handlePay = async (payload) => {
-    if (!myOffer?._id) return;
-    setPayError("");
-    setPaySuccess("");
-    try {
-      await createOrderMutation.mutateAsync({
-        items: [{ productId, quantity: 1 }],
-        priceOfferId: String(myOffer._id),
-        deliveryAddress: payload.deliveryAddress,
-        deliveryAddressFlat: payload.deliveryAddressFlat,
-        paymentMethod: payload.paymentMethod,
-      });
-      setPaySuccess("Заказ оформлен");
-      if (myOffer?._id != null) {
-        clearPriceOfferPayFlowOpened(productId, String(myOffer._id));
-      }
-      onOffersChanged?.();
-      void myOfferQuery.refetch();
-    } catch (e) {
-      setPayError(e instanceof Error ? e.message : "Ошибка");
-    }
-  };
-
   const showForm =
     !isOwnProduct &&
     isAuthorized &&
     isUserDataConfirmed &&
     myOffer?.status !== PRICE_OFFER_STATUS_ACCEPTED;
 
-  const handleOpenPay = () => {
-    setShowPay(true);
-    if (offerId != null) {
-      markPriceOfferPayFlowOpened(productId, offerId);
-    }
+  const handleGoToCart = () => {
+    onCloseModal?.();
+    navigate(HOME_MAIN_VIEW_PATH.cart);
   };
 
   const statusText =
@@ -199,19 +138,15 @@ export function ProductPriceOfferBuyerBlock({
       ? PRODUCT_PRICE_OFFER_UI.STATUS_PENDING
       : myOffer?.status === PRICE_OFFER_STATUS_ACCEPTED
         ? hasLinkedOrder
-          ? PRODUCT_PRICE_OFFER_UI.PAY_ORDER_PLACED
-          : showPay
-            ? null
-            : PRODUCT_PRICE_OFFER_UI.STATUS_ACCEPTED
+          ? PRODUCT_PRICE_OFFER_UI.STATUS_ORDERED
+          : PRODUCT_PRICE_OFFER_UI.STATUS_ACCEPTED
         : myOffer?.status === "rejected"
           ? PRODUCT_PRICE_OFFER_UI.STATUS_REJECTED
           : null;
 
-  const showPayButton =
-    myOffer?.status === PRICE_OFFER_STATUS_ACCEPTED && !hasLinkedOrder && !showPay;
-
-  const showPayCheckout =
-    myOffer?.status === PRICE_OFFER_STATUS_ACCEPTED && !hasLinkedOrder && showPay;
+  /** Ставка принята и ждёт оплаты — товар лежит в корзине. */
+  const showGoToCartButton =
+    myOffer?.status === PRICE_OFFER_STATUS_ACCEPTED && !hasLinkedOrder;
 
   const offerSubmitLabel = isBusy
     ? PRODUCT_PRICE_OFFER_UI.SUBMIT_LOADING
@@ -220,13 +155,13 @@ export function ProductPriceOfferBuyerBlock({
       : PRODUCT_PRICE_OFFER_UI.SUBMIT;
 
   const dockPrimaryAction = (() => {
-    if (!dockSubmit || isOwnProduct || showPayCheckout) {
+    if (!dockSubmit || isOwnProduct) {
       return null;
     }
-    if (showPayButton) {
+    if (showGoToCartButton) {
       return {
-        label: `${PRODUCT_PRICE_OFFER_UI.PAY_BUTTON} (${formatPriceRub(myOffer.offerPrice)})`,
-        onClick: handleOpenPay,
+        label: PRODUCT_PRICE_OFFER_UI.GO_TO_CART,
+        onClick: handleGoToCart,
         disabled: false,
       };
     }
@@ -273,10 +208,6 @@ export function ProductPriceOfferBuyerBlock({
   return (
     <section className="product-price-offer">
       <ProductPriceOfferSectionTitle />
-      <h2 className="product-price-offer__heading">
-        {PRODUCT_PRICE_OFFER_UI.SECTION_TOP_TITLE}
-      </h2>
-      <ProductPriceOfferTopList top={top} onOpenBuyer={onOpenBuyer} />
 
       {!isOwnProduct ? (
         <>
@@ -364,26 +295,13 @@ export function ProductPriceOfferBuyerBlock({
             </p>
           ) : null}
 
-          {showPayButton && !showDockPrimaryAction ? (
+          {showGoToCartButton && !showDockPrimaryAction ? (
             <div className="product-price-offer__pay">
               {renderPrimaryButton({
-                label: `${PRODUCT_PRICE_OFFER_UI.PAY_BUTTON} (${formatPriceRub(myOffer.offerPrice)})`,
-                onClick: handleOpenPay,
+                label: PRODUCT_PRICE_OFFER_UI.GO_TO_CART,
+                onClick: handleGoToCart,
                 disabled: false,
               })}
-            </div>
-          ) : null}
-
-          {showPayCheckout ? (
-            <div className="product-price-offer__pay">
-              <CheckoutForm
-                defaultDeliveryAddress={defaultAddress}
-                isSubmitting={isPaying}
-                submitError={payError}
-                submitSuccess={paySuccess}
-                onSubmit={handlePay}
-                dockSubmit={dockSubmit}
-              />
             </div>
           ) : null}
         </>
@@ -394,6 +312,16 @@ export function ProductPriceOfferBuyerBlock({
           {error}
         </p>
       ) : null}
+
+      <h2 className="product-price-offer__heading">
+        {PRODUCT_PRICE_OFFER_UI.SECTION_TOP_TITLE}
+      </h2>
+      <ProductPriceOfferTopList
+        top={top}
+        onOpenBuyer={onOpenBuyer}
+        highlightedOfferId={myOffer?._id ?? null}
+      />
+
       {dockedPrimaryAction}
       <AccountRequirementModal {...confirmGate.modalProps} />
     </section>

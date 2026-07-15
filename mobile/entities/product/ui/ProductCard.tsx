@@ -1,7 +1,6 @@
 import { useRouter } from "expo-router";
 import { memo, useCallback, useState } from "react";
 import { Pressable, Text, View } from "react-native";
-import Animated from "react-native-reanimated";
 
 import { formatProductReviewRatingLine } from "@/entities/product-review/lib/formatProductReviewRatingLine";
 import {
@@ -13,7 +12,6 @@ import {
 } from "@/entities/product/lib/getProductModerationUi";
 import { isCurrentUserProductSeller } from "@/entities/product/lib/isCurrentUserProductSeller";
 import { useProductCardImageTapActions } from "@/entities/product/lib/useProductCardImageTapActions";
-import { useProductCardPressFeedback } from "@/entities/product/lib/useProductCardPressFeedback";
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useProductCardChromeFlags } from "@/entities/product/lib/useProductCardChromeFlags";
@@ -96,7 +94,6 @@ export const ProductCard = memo(({
   const isAuthorized = useIsAuthorized();
   const sessionQuery = useAuthSessionQuery();
   const { isInWishlist, toggleItem } = useWishlist();
-  const { cardAnimatedStyle, onCardPressIn, onCardPressOut } = useProductCardPressFeedback();
   const [wishlistBurstToken, setWishlistBurstToken] = useState(0);
   const flags = useProductCardChromeFlags(product, {
     promotionFullWidth,
@@ -128,11 +125,6 @@ export const ProductCard = memo(({
     onDoubleTap: handleDoubleTapWishlist,
     doubleTapEnabled: canDoubleTapWishlist,
   });
-
-  const cardPressHandlers = {
-    onPressIn: onCardPressIn,
-    onPressOut: onCardPressOut,
-  };
 
   if (flags.showBannerLayout) {
     return <ProductCardBanner product={product} />;
@@ -175,13 +167,12 @@ export const ProductCard = memo(({
   const isWishlisted = isInWishlist(product._id);
 
   return (
-    <Animated.View
+    <View
       style={[
         styles.card,
         isCatalogGrid && styles.cardCatalogGrid,
         isCatalogGrid && isModerationQueue && styles.cardCatalogGridModerationQueue,
         promotionFrameStyle,
-        cardAnimatedStyle,
       ]}
     >
       {showPromotionFrame && flags.promotionFrameTier ? (
@@ -202,7 +193,6 @@ export const ProductCard = memo(({
             <Pressable
               style={cardMediaStyles.frame}
               onPress={handleImagePress}
-              {...cardPressHandlers}
               accessibilityRole="button"
               accessibilityLabel={openProductLabel}
               accessibilityHint={
@@ -251,7 +241,6 @@ export const ProductCard = memo(({
         <Pressable
           style={styles.contentPressable}
           onPress={handlePress}
-          {...cardPressHandlers}
           accessibilityRole="button"
           accessibilityLabel={openProductLabel}
         >
@@ -296,7 +285,6 @@ export const ProductCard = memo(({
               <Pressable
                 style={styles.contentPressable}
                 onPress={handlePress}
-                {...cardPressHandlers}
                 accessibilityRole="button"
                 accessibilityLabel={openProductLabel}
                 importantForAccessibility="no-hide-descendants"
@@ -325,7 +313,6 @@ export const ProductCard = memo(({
             <Pressable
               style={styles.contentPressable}
               onPress={handlePress}
-              {...cardPressHandlers}
               accessibilityRole="button"
               accessibilityLabel={openProductLabel}
               importantForAccessibility="no-hide-descendants"
@@ -385,7 +372,7 @@ export const ProductCard = memo(({
           <WishlistToggleButton productId={product._id} product={product} variant="card" />
         </View>
       ) : null}
-    </Animated.View>
+    </View>
   );
 });
 

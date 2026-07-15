@@ -9,7 +9,6 @@ import {
   fetchMySalesActionCount,
   fetchPendingDataConfirmationCount,
   fetchPendingInstallmentDisputesCount,
-  fetchPendingInstallmentModerationCount,
   fetchPendingAdModerationNavBadgeCount,
   fetchPendingModerationProductsCount,
   fetchPendingRafflesCount,
@@ -65,12 +64,6 @@ export const useStaffHubBadgeCounts = (
         ...BADGE_QUERY_OPTIONS,
       },
       {
-        queryKey: [...staffBadgeQueryKeys.all, "installment-moderation"],
-        queryFn: fetchPendingInstallmentModerationCount,
-        enabled: staffEnabled && hubAccess.canUseInstallmentModeration,
-        ...BADGE_QUERY_OPTIONS,
-      },
-      {
         queryKey: [...staffBadgeQueryKeys.all, "installment-disputes"],
         queryFn: fetchPendingInstallmentDisputesCount,
         enabled: staffEnabled && hubAccess.canUseInstallmentDisputes,
@@ -113,7 +106,6 @@ export const useStaffHubBadgeCounts = (
       productReportsQuery,
       dataConfirmationQuery,
       rafflesQuery,
-      installmentModerationQuery,
       installmentDisputesQuery,
       userActionsQuery,
     ] = queries;
@@ -146,10 +138,6 @@ export const useStaffHubBadgeCounts = (
 
     if (hubAccess.canUseRaffles) {
       counts.raffles = rafflesQuery.data ?? 0;
-    }
-
-    if (hubAccess.canUseInstallmentModeration) {
-      counts["installment-moderation"] = installmentModerationQuery.data ?? 0;
     }
 
     if (hubAccess.canUseInstallmentDisputes) {

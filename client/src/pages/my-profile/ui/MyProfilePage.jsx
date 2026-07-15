@@ -27,7 +27,6 @@ import "./MyProfilePage.css";
  * onMySalesClick?: () => void;
  * onInstallmentPaymentsClick?: () => void;
  * onInstallmentSalesClick?: () => void;
- * onInstallmentModerationClick?: () => void;
  * onInstallmentDisputesClick?: () => void;
  * onMyOrdersClick?: () => void;
  * onAuctionClick?: () => void;
@@ -57,7 +56,6 @@ import "./MyProfilePage.css";
  * pendingMyOrdersActionCount?: number;
  * pendingInstallmentBuyerActionCount?: number;
  * pendingInstallmentSellerActionCount?: number;
- * pendingInstallmentModerationCount?: number;
  * pendingInstallmentDisputesCount?: number;
  * pendingProductReportsCount?: number;
  * pendingProductPromotionsCount?: number;
@@ -81,7 +79,6 @@ export function MyProfilePage({
   onMySalesClick,
   onInstallmentPaymentsClick,
   onInstallmentSalesClick,
-  onInstallmentModerationClick,
   onInstallmentDisputesClick,
   onMyOrdersClick,
   onAuctionClick,
@@ -111,7 +108,6 @@ export function MyProfilePage({
   pendingMyOrdersActionCount = 0,
   pendingInstallmentBuyerActionCount = 0,
   pendingInstallmentSellerActionCount = 0,
-  pendingInstallmentModerationCount = 0,
   pendingInstallmentDisputesCount = 0,
   pendingProductReportsCount = 0,
   pendingProductPromotionsCount = 0,
@@ -166,7 +162,6 @@ export function MyProfilePage({
     pendingMyOrdersActionCount,
     pendingInstallmentBuyerActionCount,
     pendingInstallmentSellerActionCount,
-    pendingInstallmentModerationCount,
     pendingInstallmentDisputesCount,
     pendingProductReportsCount,
     pendingProductPromotionsCount,
@@ -187,7 +182,6 @@ export function MyProfilePage({
     onProductPromotionsClick,
     onRafflesClick,
     onDataConfirmationQueueClick,
-    onInstallmentModerationClick,
     onInstallmentDisputesClick,
     onAdminOrdersClick,
     onSearchSynonymsAdminClick,

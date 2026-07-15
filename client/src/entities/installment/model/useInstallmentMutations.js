@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import {
-  approveInstallmentModeration,
   cancelInstallmentEarlyPayoff,
   confirmInstallmentEarlyPayoff,
   confirmInstallmentPayment,
@@ -10,14 +9,12 @@ import {
   markInstallmentPaymentPaid,
   openInstallmentDispute,
   rejectInstallmentEarlyPayoff,
-  rejectInstallmentModeration,
   rejectInstallmentPayment,
   resolveInstallmentDispute,
   upsertProductInstallmentProgram,
 } from "../api/installmentApi.js";
 import {
   invalidateInstallmentDisputesPending,
-  invalidateInstallmentModerationPending,
   invalidateInstallmentQueries,
   invalidateInstallmentUserActionCounts,
 } from "../lib/installmentQueryCache.js";
@@ -46,20 +43,6 @@ export function useInstallmentMutations() {
     },
   });
 
-  const approveModerationMutation = useMutation({
-    mutationFn: (productId) => approveInstallmentModeration(productId),
-    onSuccess: () => {
-      void invalidateInstallmentModerationPending(queryClient);
-    },
-  });
-
-  const rejectModerationMutation = useMutation({
-    mutationFn: ({ productId, comment }) => rejectInstallmentModeration(productId, comment),
-    onSuccess: () => {
-      void invalidateInstallmentModerationPending(queryClient);
-    },
-  });
-
   const resolveDisputeMutation = useMutation({
     mutationFn: ({ disputeId, body }) => resolveInstallmentDispute(disputeId, body),
     onSuccess: () => {
@@ -71,8 +54,6 @@ export function useInstallmentMutations() {
   return {
     createContractMutation,
     upsertProgramMutation,
-    approveModerationMutation,
-    rejectModerationMutation,
     resolveDisputeMutation,
   };
 }

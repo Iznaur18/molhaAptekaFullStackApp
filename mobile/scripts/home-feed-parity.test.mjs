@@ -58,12 +58,18 @@ test("home feed sections share one vertical gap constant", () => {
   assert.doesNotMatch(raffle, /marginTop: HOME_FEED_SECTION_GAP/);
 });
 
-test("raffle carousel section uses home feed surface card", () => {
+test("raffle carousel section uses reveal toggle on home feed", () => {
   const styles = readMobileFile("shared/theme/raffleFeaturedStyles.ts");
   const section = readMobileFile("features/home-feed/ui/HomeFeaturedRafflesSection.tsx");
+  const reveal = readMobileFile("features/home-feed/ui/HomeFeaturedRafflesRevealButton.tsx");
+  const flow = readMobileFile("shared/ui/RainbowFlowBackdrop.tsx");
 
-  assert.match(styles, /sectionCard/);
-  assert.match(styles, /backgroundColor: theme\.colors\.surface/);
-  assert.match(section, /sectionStyles\.sectionCard/);
-  assert.match(section, /HOME_FEED_UI\.RAFFLES_SECTION_TITLE/);
+  assert.match(styles, /revealButton/);
+  assert.match(section, /HomeFeaturedRafflesRevealButton/);
+  assert.match(section, /isExpanded/);
+  assert.match(reveal, /HOME_FEED_UI\.SHOW_RAFFLES/);
+  assert.match(reveal, /HOME_FEED_UI\.HIDE_RAFFLES/);
+  assert.match(reveal, /RainbowFlowBackdrop/);
+  assert.match(flow, /raffle-reveal-rainbow/);
+  assert.match(flow, /saturate\(2\)/);
 });

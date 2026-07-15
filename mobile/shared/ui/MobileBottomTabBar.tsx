@@ -11,6 +11,7 @@ import { useCartTotalCount } from "@/entities/cart/model/useCartTotalCount";
 import { SellerProductsLimitModal } from "@/entities/product/ui/SellerProductsLimitModal";
 import { useUnreadNotificationsCount } from "@/entities/notification/model/useInAppNotifications";
 import { useAppIntro } from "@/features/app-intro/model/AppIntroProvider";
+import { IS_HOME_FEED_INTRO_BACKDROP_ENABLED } from "@/features/home-feed/model/isHomeFeedIntroBackdropEnabled";
 import { usePlaceProductPress } from "@/features/place-product/model/usePlaceProductPress";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { CART_PAGE_UI, MOBILE_BOTTOM_NAV_UI } from "@/shared/config";
@@ -177,6 +178,9 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
   }, []);
 
   const startIntroHoldTimer = useCallback(() => {
+    if (!IS_HOME_FEED_INTRO_BACKDROP_ENABLED) {
+      return;
+    }
     clearIntroHoldTimer();
     introHoldTimerRef.current = setTimeout(() => {
       introHoldTimerRef.current = null;
@@ -237,17 +241,24 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
     });
   };
 
+  const homeRouteIndex = state.routes.findIndex((route) => route.name === HOME_TAB_ROUTE);
+  const isHomeTabActive =
+    (homeRouteIndex >= 0 && state.index === homeRouteIndex) || isHomeTabBarContext;
+  // Флаг категории живёт на вкладке index, поэтому «Каталог» подсвечиваем по нему
+  // только пока эта вкладка активна — иначе он светился бы и в корзине, и в профиле.
+  const isCategoryOnHomeTab = isCatalogCategoryView && isHomeTabActive;
+
   const items = TAB_ITEMS.map((item) => {
     const routeIndex = state.routes.findIndex((route) => route.name === item.routeName);
     const isRouteActive = routeIndex >= 0 && state.index === routeIndex;
     let isFocused: boolean;
     if (item.routeName === PLACE_PRODUCT_ROUTE) {
       isFocused = false;
-    } else if (item.routeName === "index") {
+    } else if (item.routeName === HOME_TAB_ROUTE) {
       // Пока на index открыт список категории, «Домой» не активна (активен «Каталог»).
-      isFocused = !isCatalogCategoryView && (isRouteActive || isHomeTabBarContext);
+      isFocused = isHomeTabActive && !isCategoryOnHomeTab;
     } else if (item.routeName === "catalog") {
-      isFocused = isRouteActive || isCatalogCategoryView;
+      isFocused = isRouteActive || isCategoryOnHomeTab;
     } else if (item.routeName === "profile") {
       isFocused = isRouteActive || isProfileTabBarContext;
     } else {

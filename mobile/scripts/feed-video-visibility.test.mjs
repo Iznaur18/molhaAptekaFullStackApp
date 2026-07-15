@@ -65,7 +65,7 @@ test("app lifecycle gates heavy media and trims image memory in background", () 
   assert.match(index, /useTrimImageMemoryOnBackground\(\)/);
   assert.match(
     index,
-    /playbackActive=\{introTransition\.backdropPlaybackActive && isFocused && appActive\}/,
+    /playbackActive=\{\s*introTransition\.backdropPlaybackActive && isFocused && appActive\s*\}/,
   );
 });
 

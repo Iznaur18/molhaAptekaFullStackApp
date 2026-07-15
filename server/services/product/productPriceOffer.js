@@ -139,13 +139,22 @@ export async function patchMyProductPriceOffer({ buyerId, productId, offerPrice:
  * }} input
  */
 export async function cancelMyProductPriceOffer({ buyerId, productId }) {
+  await releaseExpiredAcceptedOffers(productId);
+
   const offer = await ProductPriceOfferModel.findOneAndUpdate(
     {
       productId,
       buyerUserId: buyerId,
-      status: PRICE_OFFER_STATUS_PENDING,
+      status: { $in: [PRICE_OFFER_STATUS_PENDING, PRICE_OFFER_STATUS_ACCEPTED] },
+      orderId: null,
     },
-    { $set: { status: PRICE_OFFER_STATUS_CANCELLED } },
+    {
+      $set: {
+        status: PRICE_OFFER_STATUS_CANCELLED,
+        acceptedAt: null,
+        paymentDeadlineAt: null,
+      },
+    },
     { returnDocument: "after" },
   );
 

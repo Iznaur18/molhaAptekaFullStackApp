@@ -18,7 +18,6 @@ import {
 } from "@/entities/installment/model/programConstants";
 import {
   INSTALLMENT_MODERATION_APPROVED,
-  INSTALLMENT_MODERATION_PENDING,
   INSTALLMENT_MODERATION_REJECTED,
 } from "@/entities/installment/model/moderationConstants";
 import { useInstallmentMutations } from "@/entities/installment/model/useInstallmentMutations";
@@ -104,14 +103,12 @@ export const InstallmentProgramModal = ({
   );
 
   const moderationHint =
-    programModerationStatus === INSTALLMENT_MODERATION_PENDING
-      ? INSTALLMENT_UI.PROGRAM_MODAL_PENDING_HINT
-      : programModerationStatus === INSTALLMENT_MODERATION_REJECTED
-        ? INSTALLMENT_UI.PROGRAM_MODAL_REJECTED_HINT
-        : programModerationStatus === INSTALLMENT_MODERATION_APPROVED &&
-            programQuery.data?.isEnabled
-          ? INSTALLMENT_UI.PROGRAM_MODAL_APPROVED_HINT
-          : null;
+    programModerationStatus === INSTALLMENT_MODERATION_REJECTED
+      ? INSTALLMENT_UI.PROGRAM_MODAL_REJECTED_HINT
+      : programModerationStatus === INSTALLMENT_MODERATION_APPROVED &&
+          programQuery.data?.isEnabled
+        ? INSTALLMENT_UI.PROGRAM_MODAL_APPROVED_HINT
+        : null;
 
   useEffect(() => {
     if (!visible) {

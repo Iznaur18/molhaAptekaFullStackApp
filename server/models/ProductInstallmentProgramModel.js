@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 import {
-  INSTALLMENT_MODERATION_PENDING,
+  INSTALLMENT_MODERATION_APPROVED,
   INSTALLMENT_MODERATION_STATUSES,
   INSTALLMENT_MONTHS_MAX,
   INSTALLMENT_MONTHS_MIN,
@@ -57,7 +57,7 @@ const ProductInstallmentProgramSchema = new mongoose.Schema(
     moderationStatus: {
       type: String,
       enum: INSTALLMENT_MODERATION_STATUSES,
-      default: INSTALLMENT_MODERATION_PENDING,
+      default: INSTALLMENT_MODERATION_APPROVED,
     },
     moderationComment: {
       type: String,

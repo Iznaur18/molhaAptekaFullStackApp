@@ -553,11 +553,11 @@ npx eas submit --platform ios
 - [x] `/hub/installment-sales` — продажи продавца, confirm/reject оплат
 - [x] `/raffle/[id]` — товары розыгрыша
 - [x] `/hub/create-raffle` — форма `POST /product/raffles`
-- [x] staff raffles moderation / installment moderation (через hub)
+- [x] staff raffles moderation / installment disputes (через hub)
 
 ### MP-4 — Staff/admin
 
-- [x] 12 staff-экранов: product/intro-ad/personal-category moderation, product-reports (+ story reports), raffles, data-confirmation-requests, installment-moderation/disputes, admin-orders, search-synonyms-admin, category-tree-admin, app-intro-admin, popular-products-admin
+- [x] 11 staff-экранов: product/intro-ad/personal-category moderation, product-reports (+ story reports), raffles, data-confirmation-requests, installment-disputes, admin-orders, search-synonyms-admin, category-tree-admin, app-intro-admin, popular-products-admin
 - [x] `useStaffHubBadgeCounts` + badge в `ProfileHubMenu`
 
 ### MP-5 — Polish
@@ -630,7 +630,6 @@ npx eas submit --platform ios
 | `data-confirmation-requests` | `/data-confirmation-requests` | `/hub/data-confirmation-requests` | **full** | approve/reject |
 | `installment-payments` | `/installment-payments` | `/hub/installment-payments` | **full** | mark-paid |
 | `installment-sales` | `/installment-sales` | `/hub/installment-sales` | **full** | confirm/reject |
-| `installment-moderation` | `/installment-moderation` | `/hub/installment-moderation` | **full** | — |
 | `installment-disputes` | `/installment-disputes` | `/hub/installment-disputes` | **full** | — |
 
 #### Stack / modal маршруты (вне `HOME_MAIN_VIEW_PATH`)
@@ -778,7 +777,7 @@ Samsung cold-open deep links:
 - [ ] `/hub/product-moderation`, `/hub/intro-ad-moderation`, `/hub/seller-personal-category-moderation`
 - [ ] `/hub/product-reports` — фильтр Все/Товары/Сторисы, resolve
 - [ ] `/hub/raffles`, `/hub/product-promotions`, `/hub/data-confirmation-requests`
-- [ ] `/hub/installment-moderation`, `/hub/installment-disputes`
+- [ ] `/hub/installment-disputes`
 - [ ] `/hub/admin-orders`
 - [ ] `/hub/search-synonyms-admin` — create/edit/delete
 - [ ] `/hub/category-tree-admin` — create/edit/delete (+ reassign)
@@ -904,7 +903,7 @@ const useStyles = createThemedStyles((theme) => ({
 |----------|------|
 | Queue styles | `mobile/shared/theme/staffQueueStyles.ts` (`useStaffQueueStyles`, `useStaffFilterChipStyles`) |
 | Admin CRUD styles | `mobile/shared/theme/staffAdminStyles.ts` |
-| Moderation queues | `product-moderation`, `intro-ad-moderation`, `seller-personal-category-moderation`, `installment-moderation`, `data-confirmation-requests` |
+| Moderation queues | `product-moderation`, `intro-ad-moderation`, `seller-personal-category-moderation`, `data-confirmation-requests` |
 | Disputes / reports | `installment-disputes-page`, `product-reports-page` (+ `UserStoryReportGroupRow`) |
 | Admin orders | `admin-orders-page` |
 | Admin CRUD | `category-tree-admin`, `search-synonyms-admin`, `app-intro-admin`, `popular-products-admin` (+ `CuratedProductListAdminCard`) |

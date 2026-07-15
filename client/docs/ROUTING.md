@@ -72,8 +72,6 @@
 
 | `/data-confirmation-requests` | `DataConfirmationRequestsRoutePage` + guard | data-confirmation-requests |
 
-| `/installment-moderation` | `InstallmentModerationRoutePage` + guard | installment-moderation |
-
 | `/installment-disputes` | `InstallmentDisputesRoutePage` + guard | installment-disputes |
 
 | `/users` | redirect → `/user-list` | — |

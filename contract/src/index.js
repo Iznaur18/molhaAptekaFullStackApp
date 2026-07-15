@@ -137,7 +137,6 @@ export {
 } from "./productManageToggleDisplay.js";
 export {
   upsertProductInstallmentProgramBodySchema,
-  rejectInstallmentModerationBodySchema,
   createInstallmentContractBodySchema,
   installmentContractIdParamsSchema,
   installmentPaymentIndexParamsSchema,

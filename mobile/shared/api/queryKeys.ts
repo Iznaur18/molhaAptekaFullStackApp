@@ -117,9 +117,6 @@ export const installmentQueryKeys = {
   myContracts: (status: string) =>
     [...installmentQueryKeys.all, "contracts", "my", status] as const,
   mySales: (status: string) => [...installmentQueryKeys.all, "sales", status] as const,
-  moderationPending: () => [...installmentQueryKeys.all, "moderation", "pending"] as const,
-  moderationPendingCount: () =>
-    [...installmentQueryKeys.all, "moderation", "pending-count"] as const,
   disputesPending: () => [...installmentQueryKeys.all, "disputes", "pending"] as const,
   disputesPendingCount: () =>
     [...installmentQueryKeys.all, "disputes", "pending-count"] as const,

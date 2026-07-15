@@ -96,31 +96,89 @@ export const useUserVoteRatingStyles = createThemedStyles((theme) => ({
     borderRadius: theme.radius.sm,
     overflow: "hidden",
     borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
   },
   summary: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    gap: theme.spacing[3],
     paddingHorizontal: 14,
     paddingVertical: theme.spacing[3],
+  },
+  summaryMain: {
+    flex: 1,
+    gap: 4,
   },
   summaryText: {
     fontSize: 15,
     fontWeight: "600",
     color: theme.colors.text,
   },
+  summaryMeta: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    flexWrap: "wrap",
+    gap: 6,
+  },
+  summaryAvg: {
+    fontSize: 20,
+    fontWeight: "800",
+    color: theme.colors.text,
+    letterSpacing: -0.3,
+  },
+  summaryAvgMuted: {
+    color: theme.colors.textMuted,
+  },
+  summaryOutOf: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: theme.colors.textMuted,
+  },
+  summaryVotes: {
+    fontSize: 13,
+    color: theme.colors.textMuted,
+  },
+  chevron: {
+    color: theme.colors.textMuted,
+    fontSize: 12,
+  },
   body: {
     paddingHorizontal: 14,
-    paddingBottom: 14,
-    gap: 10,
+    paddingBottom: 16,
+    gap: 12,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: theme.colors.border,
+    paddingTop: 14,
   },
   title: {
     fontSize: 16,
     fontWeight: "700",
     color: theme.colors.text,
   },
-  aggregate: {
+  aggregateHero: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: 10,
+  },
+  aggregateValue: {
+    fontSize: 40,
+    fontWeight: "800",
+    color: theme.colors.text,
+    letterSpacing: -1,
+    lineHeight: 44,
+  },
+  aggregateMeta: {
+    paddingBottom: 6,
+    gap: 2,
+  },
+  aggregateOutOf: {
     fontSize: 14,
+    fontWeight: "700",
+    color: theme.colors.textMuted,
+  },
+  aggregateVotes: {
+    fontSize: 13,
     color: theme.colors.textMuted,
   },
   rangeLabel: {
@@ -128,66 +186,101 @@ export const useUserVoteRatingStyles = createThemedStyles((theme) => ({
     fontWeight: "600",
     color: theme.colors.text,
   },
-  scoreRow: {
-    gap: theme.spacing[2],
-    paddingVertical: 4,
+  scaleEdgeRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  scaleEdgeLabel: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: theme.colors.textMuted,
+  },
+  scoreGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    rowGap: 8,
+  },
+  scoreChipWrap: {
+    width: "18%",
   },
   scoreChip: {
-    minWidth: 36,
-    paddingVertical: 6,
-    paddingHorizontal: 10,
+    width: "100%",
+    aspectRatio: 1,
     borderRadius: theme.radius.button,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
+    borderWidth: 1.5,
     alignItems: "center",
-    backgroundColor: theme.colors.surface,
+    justifyContent: "center",
   },
-  scoreChipSelected: {
-    backgroundColor: theme.colors.nearBlack,
-    borderColor: theme.colors.nearBlack,
-  },
+
   scoreChipText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: theme.colors.text,
+    fontSize: 17,
+    fontWeight: "800",
   },
-  scoreChipTextSelected: {
-    color: theme.colors.onContrast,
+  scoreChipSelectedRing: {
+    shadowColor: theme.colors.nearBlack,
+    shadowOpacity: 0.18,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
   },
   hint: {
     fontSize: 14,
     color: theme.colors.textMuted,
+    lineHeight: 20,
   },
   button: {
-    alignSelf: "flex-start",
+    alignSelf: "stretch",
     borderRadius: theme.radius.button,
-    paddingVertical: 10,
+    paddingVertical: 13,
     paddingHorizontal: 14,
     backgroundColor: theme.colors.nearBlack,
+    alignItems: "center",
   },
   buttonDisabled: {
     backgroundColor: theme.colors.textMuted,
   },
   buttonText: {
     color: theme.colors.onContrast,
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: 15,
+    fontWeight: "700",
   },
-  neutralChip: {
-    backgroundColor: theme.colors.textMuted,
-    borderColor: theme.colors.textMuted,
+  ratedCard: {
+    borderRadius: theme.radius.button,
+    borderWidth: 1,
+    borderColor: `${theme.colors.success}55`,
+    backgroundColor: theme.colors.successSurface,
+    paddingVertical: 16,
+    paddingHorizontal: 14,
+    alignItems: "center",
+    gap: 6,
+  },
+  ratedCheck: {
+    fontSize: 28,
+    fontWeight: "700",
+    color: theme.colors.success,
+    lineHeight: 32,
+  },
+  ratedTitle: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: theme.colors.successText,
+  },
+  ratedScore: {
+    fontSize: 22,
+    fontWeight: "800",
+    color: theme.colors.text,
   },
   error: {
     color: theme.colors.danger,
     fontSize: 13,
   },
-  success: {
-    color: theme.colors.success,
-    fontSize: 13,
-  },
   flash: {
     color: theme.colors.success,
     fontSize: 13,
+    fontWeight: "600",
+    textAlign: "center",
   },
 }));
 

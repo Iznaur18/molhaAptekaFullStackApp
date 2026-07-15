@@ -4,15 +4,13 @@ import {
 } from "../lib/auctionDashboardAttention.js";
 
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import { addressValueFromUser } from "../../address/lib/addressValueFromUser.js";
-import { useCreateOrderMutation } from "../../order/model/useCreateOrderMutation.js";
-import { useAuthSession } from "../../user/model/useAuthSession.js";
-import { CheckoutForm } from "../../../shared/ui/CheckoutForm/CheckoutForm.jsx";
 import { usePriceOfferMutations } from "../model/usePriceOfferMutations.js";
 import { getProductPriceRubMaxError } from "../../product/lib/productPriceRubValidation.js";
 import { formatIsoDateTime } from "../../../shared/lib/formatIsoDateTime.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
+import { HOME_MAIN_VIEW_PATH } from "../../../shared/lib/homeMainViewPaths.js";
 import {
   formatIntegerGroupRu,
   formatRubPriceInput,
@@ -52,18 +50,13 @@ export function AuctionBuyerBidRow({
   expanded = true,
   onExpandedChange,
 }) {
+  const navigate = useNavigate();
   const [priceInput, setPriceInput] = useState(() =>
     formatIntegerGroupRu(bid.offerPrice ?? ""),
   );
   const [error, setError] = useState("");
   const { patchMutation, cancelMutation } = usePriceOfferMutations(bid.productId);
-  const createOrderMutation = useCreateOrderMutation();
   const isBusy = patchMutation.isPending || cancelMutation.isPending;
-  const isPaying = createOrderMutation.isPending;
-  const [showPay, setShowPay] = useState(false);
-  const [payError, setPayError] = useState("");
-  const [paySuccess, setPaySuccess] = useState("");
-  const [defaultAddress, setDefaultAddress] = useState({});
 
   const productName = bid.product?.productName ?? "Товар";
   const imageUrl = bid.product?.productImageUrl ?? null;
@@ -80,16 +73,6 @@ export function AuctionBuyerBidRow({
   useEffect(() => {
     setPriceInput(formatIntegerGroupRu(bid.offerPrice ?? ""));
   }, [bid.offerPrice, bid._id]);
-
-  const { user } = useAuthSession();
-
-  useEffect(() => {
-    if (!showPay || !user) {
-      return undefined;
-    }
-    setDefaultAddress(addressValueFromUser(user));
-    return undefined;
-  }, [showPay, user]);
 
   const handleUpdate = async () => {
     const price = parseRubPriceInput(priceInput);
@@ -122,23 +105,8 @@ export function AuctionBuyerBidRow({
     }
   };
 
-  const handlePay = async (payload) => {
-    setPayError("");
-    setPaySuccess("");
-    try {
-      await createOrderMutation.mutateAsync({
-        items: [{ productId: bid.productId, quantity: 1 }],
-        priceOfferId: bid._id,
-        deliveryAddress: payload.deliveryAddress,
-        deliveryAddressFlat: payload.deliveryAddressFlat,
-        paymentMethod: payload.paymentMethod,
-      });
-      setPaySuccess(PRODUCT_PRICE_OFFER_UI.PAY_ORDER_PLACED);
-      setShowPay(false);
-      onChanged?.();
-    } catch (e) {
-      setPayError(e instanceof Error ? e.message : AUCTION_PAGE_UI.ERROR_GENERIC);
-    }
+  const handleGoToCart = () => {
+    navigate(HOME_MAIN_VIEW_PATH.cart);
   };
 
   return (
@@ -206,7 +174,7 @@ export function AuctionBuyerBidRow({
               <AuctionDashboardRowStatus isPending={isPending} isAccepted={isAccepted}>
                 {isPending
                   ? PRODUCT_PRICE_OFFER_UI.STATUS_PENDING
-                  : isAccepted && !showPay
+                  : isAccepted
                     ? PRODUCT_PRICE_OFFER_UI.STATUS_ACCEPTED
                     : null}
               </AuctionDashboardRowStatus>
@@ -248,26 +216,14 @@ export function AuctionBuyerBidRow({
             />
           ) : null}
 
-          {isAccepted && !showPay ? (
+          {isAccepted ? (
             <button
               type="button"
               className="auction-dashboard-row__cta"
-              onClick={() => setShowPay(true)}
+              onClick={handleGoToCart}
             >
-              {PRODUCT_PRICE_OFFER_UI.PAY_BUTTON}
+              {PRODUCT_PRICE_OFFER_UI.GO_TO_CART}
             </button>
-          ) : null}
-
-          {isAccepted && showPay ? (
-            <div className="auction-dashboard-row__checkout">
-              <CheckoutForm
-                defaultDeliveryAddress={defaultAddress}
-                isSubmitting={isPaying}
-                submitError={payError}
-                submitSuccess={paySuccess}
-                onSubmit={handlePay}
-              />
-            </div>
           ) : null}
 
           {error ? (

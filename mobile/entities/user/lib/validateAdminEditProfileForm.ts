@@ -25,7 +25,7 @@ export const validateAdminEditProfileForm = (
   }
 
   if (form.notesAboutUser.length > NOTES_ABOUT_USER_MAX_CHARS) {
-    return `Заметки: не больше ${NOTES_ABOUT_USER_MAX_CHARS} символов`;
+    return `О себе: не больше ${NOTES_ABOUT_USER_MAX_CHARS} символов`;
   }
 
   const loyaltyPoints = Math.floor(Number(form.userLoyaltyPoints.trim()));

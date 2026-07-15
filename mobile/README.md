@@ -95,7 +95,6 @@ npm run smoke:buyer-path     # API smoke (server + e2e seed)
 | `product-promotions` | `features/product-promotions-staff-page` | moderator | `/product-promotions` |
 | `raffles` | `features/raffles-staff-page` | moderator | `/staff-raffles` |
 | `data-confirmation-requests` | `features/data-confirmation-requests-page` | moderator | `/data-confirmation-requests` |
-| `installment-moderation` | `features/installment-moderation-page` | moderator | `/installment-moderation` |
 | `installment-disputes` | `features/installment-disputes-page` | moderator | `/installment-disputes` |
 | `admin-orders` | `features/admin-orders-page` | admin | `/admin-orders` |
 | `search-synonyms-admin` | `features/search-synonyms-admin-page` | admin | `/search-synonyms-admin` |

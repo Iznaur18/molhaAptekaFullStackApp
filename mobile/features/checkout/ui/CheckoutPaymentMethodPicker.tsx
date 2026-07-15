@@ -1,14 +1,11 @@
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import {
   ORDER_PAYMENT_METHOD_LABEL_RU,
   ORDER_PAYMENT_METHODS,
   type OrderPaymentMethod,
 } from "@/entities/order/model/constants";
-import {
-  CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT,
-  CHECKOUT_PAYMENT_METHOD_CARD_THEME,
-} from "@/entities/order/lib/checkoutPaymentMethodCardTheme";
+import { CHECKOUT_PAYMENT_METHOD_CARD_THEME } from "@/entities/order/lib/checkoutPaymentMethodCardTheme";
 import { CHECKOUT_FORM_UI } from "@/shared/config";
 import { useCheckoutPaymentMethodPickerStyles } from "@/shared/theme/formChromeStyles";
 
@@ -28,12 +25,7 @@ export const CheckoutPaymentMethodPicker = ({
   return (
     <View style={styles.root}>
       <Text style={styles.legend}>{CHECKOUT_FORM_UI.LABEL_PAYMENT_METHOD}</Text>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-      >
+      <View style={styles.row} accessibilityRole="radiogroup">
         {ORDER_PAYMENT_METHODS.map((method) => {
           const isSelected = value === method;
           const cardTheme = CHECKOUT_PAYMENT_METHOD_CARD_THEME[method];
@@ -67,7 +59,7 @@ export const CheckoutPaymentMethodPicker = ({
             </Pressable>
           );
         })}
-      </ScrollView>
+      </View>
     </View>
   );
 };

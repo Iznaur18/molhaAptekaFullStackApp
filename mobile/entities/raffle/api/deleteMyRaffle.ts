@@ -4,7 +4,7 @@ import { formatApiErrorMessage } from "@/shared/lib";
 
 export const deleteMyRaffle = async (raffleId: string) => {
   try {
-    const { data } = await apiClient.delete(`/product/raffles/${raffleId}`);
+    const { data } = await apiClient.delete(`/product/raffles/my/${raffleId}`);
     if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }

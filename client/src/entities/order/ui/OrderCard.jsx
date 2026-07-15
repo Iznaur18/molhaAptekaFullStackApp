@@ -3,7 +3,6 @@ import {
   ORDER_STATUS_DELIVERED,
   ORDER_STATUS_SHIPPED,
   ORDER_PAYMENT_METHOD_LABEL_RU,
-  ORDER_STATUS_LABEL_RU,
 } from "../model/constants.js";
 import {
   orderNeedsBuyerAttention,
@@ -13,6 +12,7 @@ import {
   orderNeedsSellerAttention,
   resolveSellerOrderCollapsedPreview,
 } from "../lib/orderNeedsSellerAttention.js";
+import { resolveOrderStatusLabelRu } from "../lib/resolveOrderStatusLabelRu.js";
 import {
   COMMON_UI,
   INSTALLMENT_UI,
@@ -32,9 +32,6 @@ import "./OrderCard.css";
 
 const formatPaymentMethod = (method) =>
   ORDER_PAYMENT_METHOD_LABEL_RU[method] ?? method ?? COMMON_UI.EM_DASH;
-
-const formatStatus = (status) =>
-  ORDER_STATUS_LABEL_RU[status] ?? status ?? COMMON_UI.EM_DASH;
 
 const formatBuyer = (buyer) => {
   if (buyer == null || typeof buyer === "string") return COMMON_UI.EM_DASH;
@@ -147,6 +144,7 @@ function OrderCardLineItem({
   onConfirmDelivered,
   pendingActionKey = null,
   itemActionErrors = {},
+  attentionRole = "buyer",
 }) {
   const itemIndex = typeof item.itemIndex === "number" ? item.itemIndex : index;
   const actionKey = `${orderId}:${itemIndex}`;
@@ -240,7 +238,8 @@ function OrderCardLineItem({
               </span>
             ) : null}
             <span className="order-card__item-status">
-              {ORDER_CARD_UI.ITEM_STATUS_LABEL}: {formatStatus(item.status)}
+              {ORDER_CARD_UI.ITEM_STATUS_LABEL}:{" "}
+              {resolveOrderStatusLabelRu(item.status, attentionRole)}
             </span>
             {deliveredAtText ? (
               <span className="order-card__item-timestamp">
@@ -378,6 +377,7 @@ export function OrderCard({
     onConfirmDelivered,
     pendingActionKey,
     itemActionErrors,
+    attentionRole,
   };
 
   return (
@@ -394,7 +394,7 @@ export function OrderCard({
         <div className="order-card__header-main">
           <div className="order-card__header-badges">
             <span className={`order-card__status order-card__status_${order.status}`}>
-              {formatStatus(order.status)}
+              {resolveOrderStatusLabelRu(order.status, attentionRole)}
             </span>
             {isAuctionOrder ? (
               <span className="order-card__auction-badge">{PRODUCT_CARD_UI.AUCTION_BADGE}</span>

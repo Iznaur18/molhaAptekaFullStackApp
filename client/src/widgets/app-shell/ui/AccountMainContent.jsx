@@ -37,7 +37,6 @@ export function AccountMainContent({
   pendingMyOrdersActionCount,
   pendingInstallmentBuyerActionCount,
   pendingInstallmentSellerActionCount,
-  pendingInstallmentModerationCount,
   pendingInstallmentDisputesCount,
   pendingProductReportsCount,
   pendingProductPromotionsCount,
@@ -52,7 +51,6 @@ export function AccountMainContent({
   handleMySalesFromProfile,
   handleInstallmentPaymentsFromProfile,
   handleInstallmentSalesFromProfile,
-  handleInstallmentModerationFromProfile,
   handleInstallmentDisputesFromProfile,
   handleMyOrdersFromProfile,
   handleAuctionFromProfile,
@@ -86,7 +84,6 @@ export function AccountMainContent({
   refreshPendingProductPromotionsCount,
   refreshPendingRafflesCount,
   refreshPendingDataConfirmationCount,
-  refreshPendingInstallmentModerationCount,
   refreshPendingInstallmentDisputesCount,
   refreshRaffleSurfaces,
   refreshCatalogFeed,
@@ -129,7 +126,6 @@ export function AccountMainContent({
       refreshPendingProductPromotionsCount,
       refreshPendingRafflesCount,
       refreshPendingDataConfirmationCount,
-      refreshPendingInstallmentModerationCount,
       refreshPendingInstallmentDisputesCount,
       refreshRaffleSurfaces,
       refreshCatalogFeed,
@@ -166,9 +162,6 @@ export function AccountMainContent({
         }
         onInstallmentSalesClick={
           isAuthorized ? handleInstallmentSalesFromProfile : undefined
-        }
-        onInstallmentModerationClick={
-          canModerateProducts ? handleInstallmentModerationFromProfile : undefined
         }
         onInstallmentDisputesClick={
           canModerateProducts ? handleInstallmentDisputesFromProfile : undefined
@@ -231,7 +224,6 @@ export function AccountMainContent({
         pendingMyOrdersActionCount={pendingMyOrdersActionCount}
         pendingInstallmentBuyerActionCount={pendingInstallmentBuyerActionCount}
         pendingInstallmentSellerActionCount={pendingInstallmentSellerActionCount}
-        pendingInstallmentModerationCount={pendingInstallmentModerationCount}
         pendingInstallmentDisputesCount={pendingInstallmentDisputesCount}
         pendingProductReportsCount={pendingProductReportsCount}
         pendingProductPromotionsCount={pendingProductPromotionsCount}

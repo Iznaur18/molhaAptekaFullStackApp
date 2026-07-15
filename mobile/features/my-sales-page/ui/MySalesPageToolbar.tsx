@@ -2,7 +2,7 @@ import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 
 
 import {
   ORDER_STATUSES,
-  ORDER_STATUS_LABEL_RU,
+  SALES_ORDER_STATUS_LABEL_RU,
 } from "@/entities/order/model/constants";
 import { resolveMySalesStatusFilterChipActiveColors } from "@/entities/order/lib/resolveMySalesStatusFilterChipColors";
 import { MY_SALES_PAGE_UI } from "@/shared/config";
@@ -13,7 +13,7 @@ const STATUS_FILTER_OPTIONS = [
   { value: "", label: MY_SALES_PAGE_UI.STATUS_FILTER_ALL },
   ...ORDER_STATUSES.map((status) => ({
     value: status,
-    label: ORDER_STATUS_LABEL_RU[status],
+    label: SALES_ORDER_STATUS_LABEL_RU[status],
   })),
 ];
 

@@ -18,7 +18,7 @@ const resolveVisualHeight = (cardWidth) => Math.max(0, Math.round(cardWidth));
 
 const resolveInnerMinHeight = (cardWidth) => {
   const visualHeight = resolveVisualHeight(cardWidth);
-  const footerMin = 9 + 10 + 17 + 14 + 32;
+  const footerMin = 12 + 12 + 10 + 17 + 10 + 32 + 14;
   return visualHeight + RAFFLE_FEATURED_CARD_PANEL_GAP + footerMin;
 };
 
@@ -31,6 +31,8 @@ test("RaffleFeaturedBanner: split-card layout with square visual", () => {
   assert.match(banner, /visualCard/);
   assert.match(banner, /footerCard/);
   assert.match(banner, /visualTopControls/);
+  assert.match(banner, /styles\.badge/);
+  assert.match(banner, /RAFFLE_FEATURED_BANNER_UI\.BADGE/);
   assert.match(banner, /SquircleView/);
   assert.doesNotMatch(banner, /titleBadge/);
   assert.doesNotMatch(banner, /DESCRIPTION_LINK/);
@@ -38,11 +40,14 @@ test("RaffleFeaturedBanner: split-card layout with square visual", () => {
   assert.doesNotMatch(banner, /RaffleFeaturedBannerBackdropLayer/);
 
   assert.match(styles, /cardStack/);
+  assert.match(styles, /badgeLabel/);
   assert.match(styles, /borderRadius: 999/);
   assert.match(styles, /RAFFLE_FEATURED_CARD_BORDER_RADIUS/);
 
   assert.doesNotMatch(section, /SquircleView/);
   assert.doesNotMatch(section, /RAFFLES_SECTION_TITLE/);
+  assert.match(section, /HomeFeaturedRafflesRevealButton/);
+  assert.match(section, /isExpanded/);
 });
 
 test("shared-lib metrics: always stacked square visual", () => {

@@ -38,6 +38,7 @@ export function ProductDetailsModalTabPanel({
     isOwnProduct,
     isSellerView,
     auctionUi,
+    fieldHandlers,
     installmentUi,
     installmentProgram,
     isInstallmentProgramLoading,
@@ -88,6 +89,7 @@ export function ProductDetailsModalTabPanel({
         onOpenSellerProfile={handleOpenSellerProfile}
         onRequestLogin={onRequestLogin}
         onOffersChanged={onOffersChanged}
+        onCloseModal={fieldHandlers.onClose}
         showSellerArchive={false}
       />
     );

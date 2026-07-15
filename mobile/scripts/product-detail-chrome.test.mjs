@@ -10,6 +10,57 @@ const CLIENT_ROOT = join(MOBILE_ROOT, "..", "client");
 const readFile = (root, relativePath) =>
   readFileSync(join(root, relativePath), "utf8");
 
+test("product detail section tabs sit below media inside scroll", () => {
+  const screen = readFile(MOBILE_ROOT, "app/product/[id].tsx");
+  const detailsTab = readFile(
+    MOBILE_ROOT,
+    "features/product-detail/ui/ProductDetailsDetailsTab.tsx",
+  );
+  const mediaSection = readFile(
+    MOBILE_ROOT,
+    "features/product-detail/ui/ProductDetailMediaSection.tsx",
+  );
+
+  assert.match(mediaSection, /ProductMediaGallery/);
+  assert.match(screen, /ProductDetailMediaSection/);
+  assert.match(screen, /ProductDetailTabBar/);
+  const mediaIndex = screen.indexOf("<ProductDetailMediaSection");
+  const tabBarIndex = screen.indexOf("<ProductDetailTabBar");
+  const scrollIndex = screen.indexOf("<ScrollView");
+  assert.ok(scrollIndex >= 0);
+  assert.ok(mediaIndex > scrollIndex);
+  assert.ok(tabBarIndex > mediaIndex);
+  assert.doesNotMatch(detailsTab, /ProductMediaGallery/);
+  assert.doesNotMatch(detailsTab, /onReportPress/);
+});
+
+test("product detail section tabs use underline chrome instead of pill chips", () => {
+  const styles = readFile(MOBILE_ROOT, "shared/theme/catalogProductStyles.ts");
+  const tabBar = readFile(
+    MOBILE_ROOT,
+    "features/product-detail/ui/ProductDetailTabBar.tsx",
+  );
+  const webTabsCss = readFile(
+    CLIENT_ROOT,
+    "src/entities/product/ui/product-details-modal/ProductDetailsModalTabs.css",
+  );
+  const tabBarStylesBlock =
+    styles.match(/export const useProductDetailTabBarStyles[\s\S]*?}\)\);/)?.[0] ?? "";
+  const tabBlock = tabBarStylesBlock.match(/tab:\s*\{([^}]*)\}/)?.[1] ?? "";
+  const tabActiveBlock = tabBarStylesBlock.match(/tabActive:\s*\{([^}]*)\}/)?.[1] ?? "";
+
+  assert.match(tabBar, /useProductDetailTabBarStyles/);
+  assert.match(tabBlock, /borderBottomWidth:\s*PRODUCT_DETAIL_TAB_BAR_INDICATOR_WIDTH/);
+  assert.match(tabBlock, /backgroundColor:\s*"transparent"/);
+  assert.doesNotMatch(tabBlock, /radius\.pill/);
+  assert.doesNotMatch(tabBlock, /borderWidth:\s*1/);
+  assert.match(tabActiveBlock, /borderBottomColor:\s*theme\.colors\.action/);
+  assert.doesNotMatch(tabActiveBlock, /backgroundColor:\s*theme\.colors\.action/);
+  assert.match(webTabsCss, /\.product-details-modal__tabs \.modal-section-tabs__tab/);
+  assert.match(webTabsCss, /border-bottom:\s*2\.5px solid transparent/);
+  assert.match(webTabsCss, /border-radius:\s*0/);
+});
+
 test("web mobile bottom nav hidden while product details modal is open", () => {
   const navCss = readFile(
     CLIENT_ROOT,
@@ -153,12 +204,12 @@ test("mobile product review summary matches web gradient chrome", () => {
   const summaryCardBlock = tabStyles.match(/summaryCard:\s*\{([^}]*)\}/)?.[1] ?? "";
 
   assert.match(webCss, /linear-gradient/);
-  assert.match(webCss, /warning-amber/);
+  assert.match(webCss, /--iz-color-warning/);
   assert.match(summary, /buildProductReviewSummaryCardStyle/);
   assert.match(background, /buildProductReviewSummaryCardStyle/);
   assert.match(background, /linear-gradient\(145deg/);
-  assert.match(palette, /#f8fafc/);
-  assert.match(palette, /#f0eee1/);
+  assert.match(palette, /surfaceElevated/);
+  assert.match(palette, /warningSurface/);
   assert.match(summaryCardBlock, /overflow:\s*"hidden"/);
   assert.doesNotMatch(summaryCardBlock, /backgroundColor/);
 
@@ -188,7 +239,7 @@ test("mobile installment tab matches web buyer hint and docked submit", () => {
 
   assert.match(webCss, /installment-buyer-block__hint/);
   assert.match(webCss, /--iz-color-action-soft/);
-  assert.match(webCss, /--iz-color-info-navy/);
+  assert.match(webCss, /--iz-color-info-deep/);
   assert.match(styles, /installmentBuyerHint/);
   assert.match(styles, /actionSoft/);
   assert.match(styles, /infoNavy/);

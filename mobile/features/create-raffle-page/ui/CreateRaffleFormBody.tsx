@@ -12,6 +12,7 @@ import type {
   CreateRaffleFormState,
   PrizeMediaType,
 } from "@/features/create-raffle-page/lib/createRaffleForm";
+import type { CreateRaffleWizardStepId } from "@/features/create-raffle-page/lib/createRaffleWizardSteps";
 import { CreateRaffleFormSection } from "@/features/create-raffle-page/ui/CreateRaffleFormSection";
 import { ImageUrlUploadField } from "@/features/image-upload/ui/ImageUrlUploadField";
 import { VideoUrlUploadField } from "@/features/image-upload/ui/VideoUrlUploadField";
@@ -55,8 +56,11 @@ type CreateRaffleFormBodyProps = {
   isSubmitting: boolean;
   hintText?: string | null;
   errorMessage?: string;
-  submitLabel: string;
-  onSubmit: () => void;
+  submitLabel?: string;
+  onSubmit?: () => void;
+  /** `all` = edit/legacy single page; иначе один шаг wizard. */
+  step?: CreateRaffleWizardStepId | "all";
+  showFooter?: boolean;
 };
 
 export const CreateRaffleFormBody = ({
@@ -66,12 +70,17 @@ export const CreateRaffleFormBody = ({
   isSubmitting,
   hintText = null,
   errorMessage = "",
-  submitLabel,
+  submitLabel = "",
   onSubmit,
+  step = "all",
+  showFooter = true,
 }: CreateRaffleFormBodyProps) => {
   const theme = useAppTheme();
   const styles = useCreateRafflePageStyles();
   const isVideoMedia = form.prizeMediaType === RAFFLE_PRIZE_MEDIA_TYPE_VIDEO;
+  const showBasic = step === "all" || step === "basic";
+  const showPrize = step === "all" || step === "prize";
+  const showConditions = step === "all" || step === "conditions";
 
   const prizeFocusImageUrl = isDisplayableMediaUrl(resolveUploadedMediaUrl(form.prizeImageUrl))
     ? resolveUploadedMediaUrl(form.prizeImageUrl)
@@ -96,7 +105,8 @@ export const CreateRaffleFormBody = ({
 
   return (
     <View style={styles.form}>
-      <CreateRaffleFormSection title={CREATE_RAFFLE_MODAL_UI.SECTION_BASIC}>
+      {showBasic ? (
+      <CreateRaffleFormSection title={CREATE_RAFFLE_MODAL_UI.SECTION_BASIC} hideTitle={step !== "all"}>
         <View style={styles.field}>
           <Text style={styles.fieldLabel}>{CREATE_RAFFLE_MODAL_UI.LABEL_TITLE} *</Text>
           <TextInput
@@ -122,8 +132,10 @@ export const CreateRaffleFormBody = ({
           <Text style={styles.fieldHint}>{CREATE_RAFFLE_MODAL_UI.HINT_DESCRIPTION}</Text>
         </View>
       </CreateRaffleFormSection>
+      ) : null}
 
-      <CreateRaffleFormSection title={CREATE_RAFFLE_MODAL_UI.SECTION_PRIZE}>
+      {showPrize ? (
+      <CreateRaffleFormSection title={CREATE_RAFFLE_MODAL_UI.SECTION_PRIZE} hideTitle={step !== "all"}>
         <View style={styles.mediaType}>
           <Text style={styles.mediaTypeLegend}>{CREATE_RAFFLE_MODAL_UI.LABEL_PRIZE_MEDIA}</Text>
           <View style={styles.mediaTypeOptions}>
@@ -188,8 +200,13 @@ export const CreateRaffleFormBody = ({
           </View>
         ) : null}
       </CreateRaffleFormSection>
+      ) : null}
 
-      <CreateRaffleFormSection title={CREATE_RAFFLE_MODAL_UI.SECTION_CONDITIONS}>
+      {showConditions ? (
+      <CreateRaffleFormSection
+        title={CREATE_RAFFLE_MODAL_UI.SECTION_CONDITIONS}
+        hideTitle={step !== "all"}
+      >
         <View style={styles.field}>
           <Text style={styles.fieldLabel}>{CREATE_RAFFLE_MODAL_UI.LABEL_TARGET} *</Text>
           <TextInput
@@ -205,7 +222,7 @@ export const CreateRaffleFormBody = ({
         </View>
 
         <View style={styles.field}>
-          <Text style={styles.fieldLabel}>{CREATE_RAFFLE_MODAL_UI.LABEL_INSTAGRAM} *</Text>
+          <Text style={styles.fieldLabel}>{CREATE_RAFFLE_MODAL_UI.LABEL_INSTAGRAM}</Text>
           <TextInput
             style={styles.input}
             value={form.instagramUrl}
@@ -219,6 +236,7 @@ export const CreateRaffleFormBody = ({
           <Text style={styles.fieldHint}>{CREATE_RAFFLE_MODAL_UI.HINT_INSTAGRAM}</Text>
         </View>
       </CreateRaffleFormSection>
+      ) : null}
 
       {hintText ? <Text style={styles.pageHint}>{hintText}</Text> : null}
       {errorMessage ? (
@@ -227,6 +245,7 @@ export const CreateRaffleFormBody = ({
         </Text>
       ) : null}
 
+      {showFooter && onSubmit ? (
       <View style={styles.actions}>
         <Pressable
           style={[styles.submit, isSubmitting && styles.submitDisabled]}
@@ -240,6 +259,7 @@ export const CreateRaffleFormBody = ({
           )}
         </Pressable>
       </View>
+      ) : null}
     </View>
   );
 };

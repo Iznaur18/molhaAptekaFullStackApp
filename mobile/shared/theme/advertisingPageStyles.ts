@@ -131,6 +131,11 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
     borderTopWidth: 3,
     borderTopColor: theme.colors.action,
   },
+  cardDisabled: {
+    opacity: 0.55,
+    borderTopColor: theme.colors.textMuted,
+    backgroundColor: theme.colors.surfaceElevated,
+  },
   cardCategory: {
     borderTopWidth: 3,
     borderTopColor: theme.colors.action,
@@ -162,9 +167,19 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
     fontWeight: "700",
     overflow: "hidden",
   },
+  cardBadgeDisabled: {
+    backgroundColor: theme.colors.border,
+    color: theme.colors.textMuted,
+  },
   lead: {
     fontSize: 14.4,
     lineHeight: 20.8,
+    color: theme.colors.textMuted,
+  },
+  unavailableNotice: {
+    fontSize: 14.4,
+    lineHeight: 20.8,
+    fontWeight: "700",
     color: theme.colors.textMuted,
   },
   state: {

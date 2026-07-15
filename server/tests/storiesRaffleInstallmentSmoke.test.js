@@ -219,7 +219,7 @@ test("raffle smoke: featured → create → approve → my", async () => {
   assert.equal(myData.raffle.status, "active");
 });
 
-test("installment smoke: program → approve → contract → my list", async () => {
+test("installment smoke: program → contract → my list", async () => {
   await ensureProductCategoryTreeSeeded();
 
   const { cookie: sellerCookie, user: seller } = await registerUserAndGetCookie(
@@ -252,21 +252,8 @@ test("installment smoke: program → approve → contract → my list", async ()
       body: JSON.stringify(buildInstallmentProgramBody()),
     }),
   );
-  assert.equal(programData.program.moderationStatus, "pending");
+  assert.equal(programData.program.moderationStatus, "approved");
   const planId = programData.program.plans[0]._id;
-
-  await parseSuccessData(
-    await request("/product/installment/moderation/pending/count", {
-      headers: { Cookie: modCookie },
-    }),
-  );
-
-  await parseSuccessData(
-    await request(`/product/${productId}/installment/moderation/approve`, {
-      method: "PATCH",
-      headers: { Cookie: modCookie },
-    }),
-  );
 
   const { cookie: buyerCookie, user: buyer } = await registerUserAndGetCookie(
     request,

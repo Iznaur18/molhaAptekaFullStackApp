@@ -79,6 +79,13 @@
   background: var(--iz-color-surface);
 }
 
+.advertising-page__card_disabled {
+  opacity: 0.55;
+  border-top-color: var(--iz-color-text-muted);
+  background: var(--iz-color-surface-elevated, var(--iz-color-surface));
+  pointer-events: none;
+}
+
 .advertising-page__card-head {
   display: flex;
   flex-wrap: wrap;
@@ -103,6 +110,19 @@
   color: var(--adv-accent-strong);
   font-size: 0.75rem;
   font-weight: 700;
+}
+
+.advertising-page__card-badge_disabled {
+  background: var(--iz-color-border);
+  color: var(--iz-color-text-muted);
+}
+
+.advertising-page__unavailable {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  font-weight: 700;
+  color: var(--iz-color-text-muted);
 }
 
 .advertising-page__lead,

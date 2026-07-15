@@ -1,7 +1,6 @@
-import { Pressable, useWindowDimensions, View } from "react-native";
+import { Pressable, View } from "react-native";
 
 import { AddToCartButton } from "@/features/cart-add/ui/AddToCartButton";
-import { SCREEN_NARROW_MAX_WIDTH as CATALOG_BROWSER_GRID_NARROW_MAX_WIDTH } from "@/shared/lib/screenBreakpoints";
 import { INSTALLMENT_UI, PRODUCT_PRICE_OFFER_UI } from "@/shared/config";
 import { useProductDetailPurchaseActionsStyles } from "@/shared/theme/catalogProductStyles";
 import { AppText } from "@/shared/ui/AppText";
@@ -28,8 +27,6 @@ export const ProductDetailPurchaseActions = ({
   variant = "inline",
 }: ProductDetailPurchaseActionsProps) => {
   const styles = useProductDetailPurchaseActionsStyles();
-  const { width: screenWidth } = useWindowDimensions();
-  const isNarrowDock = screenWidth <= CATALOG_BROWSER_GRID_NARROW_MAX_WIDTH;
 
   if (variant === "inline") {
     return null;
@@ -42,13 +39,9 @@ export const ProductDetailPurchaseActions = ({
           <AddToCartButton productId={productId} product={product} variant="detailDock" />
         </View>
       ) : null}
-      <View style={[styles.shortcutsRow, isNarrowDock && styles.shortcutsRowStacked]}>
+      <View style={styles.shortcutsRow}>
         <Pressable
-          style={[
-            styles.shortcut,
-            isNarrowDock && styles.shortcutFullWidth,
-            !auctionActive && styles.shortcutInactive,
-          ]}
+          style={[styles.shortcut, !auctionActive && styles.shortcutInactive]}
           onPress={onAuctionPress}
           disabled={!auctionActive}
         >
@@ -57,11 +50,7 @@ export const ProductDetailPurchaseActions = ({
           </AppText>
         </Pressable>
         <Pressable
-          style={[
-            styles.shortcut,
-            isNarrowDock && styles.shortcutFullWidth,
-            !installmentActive && styles.shortcutInactive,
-          ]}
+          style={[styles.shortcut, !installmentActive && styles.shortcutInactive]}
           onPress={onInstallmentPress}
           disabled={!installmentActive}
         >
