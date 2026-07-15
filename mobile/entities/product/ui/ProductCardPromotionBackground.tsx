@@ -2,11 +2,12 @@ import { StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
 import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg";
 
 import {
-  PRODUCT_CARD_PROMOTION_BANNER_INNER_FRAME,
-  PRODUCT_CARD_PROMOTION_COMPACT_FRAME,
-  PRODUCT_CARD_PROMOTION_PREMIUM_COMPACT_FRAME,
+  resolveProductCardPromotionBannerInnerFrame,
+  resolveProductCardPromotionCompactFrame,
+  resolveProductCardPromotionPremiumCompactFrame,
   type ProductCardPromotionTier,
 } from "@/entities/product/lib/productCardPromotionFramePalette";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 
 type ProductCardPromotionBackgroundProps = {
   tier: ProductCardPromotionTier;
@@ -23,10 +24,11 @@ export const ProductCardPromotionBackground = ({
   borderRadius = 14,
   style,
 }: ProductCardPromotionBackgroundProps) => {
+  const theme = useAppTheme();
   const gradientId = `productPromotion-${variant}-${tier}-${isPremium ? "premium" : "base"}`;
 
   if (variant === "banner-inner") {
-    const palette = PRODUCT_CARD_PROMOTION_BANNER_INNER_FRAME;
+    const palette = resolveProductCardPromotionBannerInnerFrame(theme.colors);
 
     return (
       <View style={[StyleSheet.absoluteFill, { borderRadius }, style]} pointerEvents="none">
@@ -45,8 +47,8 @@ export const ProductCardPromotionBackground = ({
   }
 
   const palette = isPremium
-    ? PRODUCT_CARD_PROMOTION_PREMIUM_COMPACT_FRAME[tier]
-    : PRODUCT_CARD_PROMOTION_COMPACT_FRAME[tier];
+    ? resolveProductCardPromotionPremiumCompactFrame(theme.colors)[tier]
+    : resolveProductCardPromotionCompactFrame(theme.colors)[tier];
 
   return (
     <View style={[StyleSheet.absoluteFill, { borderRadius }, style]} pointerEvents="none">

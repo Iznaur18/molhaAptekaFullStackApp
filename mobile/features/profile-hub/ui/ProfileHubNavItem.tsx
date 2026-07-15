@@ -4,7 +4,7 @@ import { Pressable, Text, View } from "react-native";
 import { buildProfileNavItemPresentation } from "@/features/profile-hub/lib/profileNavItemPresentation";
 import type { EnrichedProfileNavItem } from "@/features/profile-hub/lib/enrichProfileNavItem";
 import { MY_PROFILE_PAGE_UI } from "@/shared/config";
-import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
 import { useProfileHubMenuStyles } from "@/shared/theme/profileChromeStyles";
 
 type ProfileHubNavItemProps = {
@@ -14,11 +14,16 @@ type ProfileHubNavItemProps = {
 };
 
 export const ProfileHubNavItem = ({ item, isActive, onPress }: ProfileHubNavItemProps) => {
-  const theme = useAppTheme();
+  const { theme, colorScheme } = useAppThemeSettings();
   const styles = useProfileHubMenuStyles();
   const isCta = item.variant === "cta";
   const isDisabled = item.disabled === true;
-  const presentation = buildProfileNavItemPresentation(item.tone, { isActive, isCta });
+  const presentation = buildProfileNavItemPresentation(item.tone, {
+    isActive,
+    isCta,
+    colorScheme,
+    onContrastColor: theme.colors.onContrast,
+  });
 
   return (
     <Pressable

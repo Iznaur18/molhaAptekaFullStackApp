@@ -2056,6 +2056,7 @@ export const THEME_SETTINGS_UI = {
   SYSTEM: "Системная",
   LIGHT: "Светлая",
   DARK: "Тёмная",
+  CUSTOM: "Пользовательский",
 } as const;
 
 export const POPULAR_PRODUCTS_ADMIN_PAGE_UI = {

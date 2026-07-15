@@ -17,6 +17,17 @@ test("profile nav tones: overview uses blue", () => {
   });
 });
 
+test("profile nav tones: dark soft is not near-white", () => {
+  const darkBlue = resolveProfileNavTonePalette("blue", "dark");
+  assert.equal(darkBlue.soft, "#405577");
+  assert.equal(darkBlue.main, "#8589AC");
+});
+
+test("profile nav tones: dark purple CTA soft is structural deep", () => {
+  const darkPurple = resolveProfileNavTonePalette("purple", "dark");
+  assert.equal(darkPurple.soft, "#405577");
+});
+
 test("profile nav tones: moderation uses amber", () => {
   assert.equal(resolveProfileNavSectionTone(PROFILE_SECTION_PRODUCT_MODERATION), "amber");
 });

@@ -43,10 +43,16 @@ export type { ProfileSectionId } from "./profileSections.js";
 export {
   PROFILE_NAV_TONE_IDS,
   PROFILE_NAV_TONE_PALETTE,
+  PROFILE_NAV_TONE_PALETTE_CUSTOM,
+  PROFILE_NAV_TONE_PALETTE_DARK,
   resolveProfileNavSectionTone,
   resolveProfileNavTonePalette,
 } from "./profileNavTones.js";
-export type { ProfileNavToneId, ProfileNavTonePalette } from "./profileNavTones.js";
+export type {
+  ProfileNavColorScheme,
+  ProfileNavToneId,
+  ProfileNavTonePalette,
+} from "./profileNavTones.js";
 export {
   PRODUCT_MANAGE_TOGGLE_KEY_VALUES,
   PRODUCT_MANAGE_TOGGLE_PALETTE,

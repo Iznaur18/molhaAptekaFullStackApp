@@ -1,5 +1,6 @@
 import { BlurView } from "expo-blur";
 import { Platform, StyleSheet, View } from "react-native";
+import { isDimColorScheme } from "@izibuy/design-tokens";
 
 import {
   HOME_CATALOG_HEADER_PANEL_BLUR_RADIUS,
@@ -33,7 +34,7 @@ export const HomeCatalogHeaderGlassLayer = () => {
     <>
       <BlurView
         intensity={HOME_CATALOG_HEADER_PANEL_BLUR_RADIUS * 4}
-        tint={colorScheme === "dark" ? "dark" : "light"}
+        tint={isDimColorScheme(colorScheme) ? "dark" : "light"}
         style={StyleSheet.absoluteFillObject}
       />
       <View

@@ -1,4 +1,6 @@
-import { semanticColors } from "@/shared/theme/semanticColors";
+import { izColors, type IzTheme } from "@izibuy/design-tokens";
+
+type ThemeColors = IzTheme["colors"];
 
 /** Синхронизировано с client ProductCardFrame.css + designTokens.css */
 export const PRODUCT_CARD_PROMOTION_TIER = {
@@ -11,13 +13,17 @@ export type ProductCardPromotionTier =
   (typeof PRODUCT_CARD_PROMOTION_TIER)[keyof typeof PRODUCT_CARD_PROMOTION_TIER];
 
 /** Паритет с ProductCardFrame.css — нейтральная «плавающая» тень карточки */
-export const PRODUCT_CARD_SOFT_ELEVATION_SHADOW = {
-  shadowColor: semanticColors.text,
-  shadowOpacity: 0.06,
-  shadowRadius: 12,
-  shadowOffsetY: 4,
-  elevation: 2,
-} as const;
+export const resolveProductCardSoftElevationShadow = (c: ThemeColors) =>
+  ({
+    shadowColor: c.text,
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    shadowOffsetY: 4,
+    elevation: 2,
+  }) as const;
+
+/** @deprecated light snapshot — prefer resolveProductCardSoftElevationShadow */
+export const PRODUCT_CARD_SOFT_ELEVATION_SHADOW = resolveProductCardSoftElevationShadow(izColors);
 
 export type ProductCardPromotionFramePalette = {
   borderWidth: number;
@@ -31,17 +37,16 @@ export type ProductCardPromotionFramePalette = {
   elevation: number;
 };
 
-/** color-mix из ProductCardFrame.css — precomputed для RN */
-export const PRODUCT_CARD_PROMOTION_COMPACT_FRAME: Record<
-  ProductCardPromotionTier,
-  ProductCardPromotionFramePalette
-> = {
+/** color-mix из ProductCardFrame.css — paper fill = surface (не onContrast) */
+export const resolveProductCardPromotionCompactFrame = (
+  c: ThemeColors,
+): Record<ProductCardPromotionTier, ProductCardPromotionFramePalette> => ({
   [PRODUCT_CARD_PROMOTION_TIER.GOLD]: {
     borderWidth: 2,
-    borderColor: `${semanticColors.warning}ad`,
-    gradientStart: semanticColors.onContrast,
-    gradientEnd: semanticColors.onContrast,
-    shadowColor: semanticColors.warning,
+    borderColor: `${c.warning}ad`,
+    gradientStart: c.surface,
+    gradientEnd: c.surface,
+    shadowColor: c.warning,
     shadowOpacity: 0.14,
     shadowRadius: 12,
     shadowOffsetY: 2,
@@ -49,10 +54,10 @@ export const PRODUCT_CARD_PROMOTION_COMPACT_FRAME: Record<
   },
   [PRODUCT_CARD_PROMOTION_TIER.TOP]: {
     borderWidth: 2,
-    borderColor: `${semanticColors.accent}c7`,
-    gradientStart: semanticColors.accentSoft,
-    gradientEnd: semanticColors.accentSoft,
-    shadowColor: semanticColors.accent,
+    borderColor: `${c.accent}c7`,
+    gradientStart: c.accentSoft,
+    gradientEnd: c.accentSoft,
+    shadowColor: c.accent,
     shadowOpacity: 0.28,
     shadowRadius: 16,
     shadowOffsetY: 4,
@@ -60,16 +65,16 @@ export const PRODUCT_CARD_PROMOTION_COMPACT_FRAME: Record<
   },
   [PRODUCT_CARD_PROMOTION_TIER.BANNER]: {
     borderWidth: 2,
-    borderColor: `${semanticColors.danger}b8`,
-    gradientStart: semanticColors.dangerSurface,
-    gradientEnd: semanticColors.onContrast,
-    shadowColor: semanticColors.danger,
+    borderColor: `${c.danger}b8`,
+    gradientStart: c.dangerSurface,
+    gradientEnd: c.surface,
+    shadowColor: c.danger,
     shadowOpacity: 0.18,
     shadowRadius: 24,
     shadowOffsetY: 6,
     elevation: 4,
   },
-};
+});
 
 export type ProductCardPromotionFrameSurface = Pick<
   ProductCardPromotionFramePalette,
@@ -85,28 +90,29 @@ export type ProductCardPromotionFrameSurface = Pick<
 };
 
 /** product-card-premium-frame > .product-card */
-export const PRODUCT_CARD_PREMIUM_ONLY_FRAME: ProductCardPromotionFrameSurface = {
+export const resolveProductCardPremiumOnlyFrame = (
+  c: ThemeColors,
+): ProductCardPromotionFrameSurface => ({
   borderWidth: 2,
-  borderColor: semanticColors.warning,
-  backgroundColor: semanticColors.onContrast,
+  borderColor: c.warning,
+  backgroundColor: c.surface,
   shadowColor: "transparent",
   shadowOpacity: 0,
   shadowRadius: 0,
   shadowOffsetY: 0,
   elevation: 0,
-};
+});
 
 /** product-card-promotion-frame.product-card-premium-frame--tier-* */
-export const PRODUCT_CARD_PROMOTION_PREMIUM_COMPACT_FRAME: Record<
-  ProductCardPromotionTier,
-  ProductCardPromotionFramePalette
-> = {
+export const resolveProductCardPromotionPremiumCompactFrame = (
+  c: ThemeColors,
+): Record<ProductCardPromotionTier, ProductCardPromotionFramePalette> => ({
   [PRODUCT_CARD_PROMOTION_TIER.GOLD]: {
     borderWidth: 2,
-    borderColor: semanticColors.warning,
-    gradientStart: semanticColors.onContrast,
-    gradientEnd: semanticColors.onContrast,
-    shadowColor: semanticColors.warning,
+    borderColor: c.warning,
+    gradientStart: c.surface,
+    gradientEnd: c.surface,
+    shadowColor: c.warning,
     shadowOpacity: 0.14,
     shadowRadius: 12,
     shadowOffsetY: 2,
@@ -114,10 +120,10 @@ export const PRODUCT_CARD_PROMOTION_PREMIUM_COMPACT_FRAME: Record<
   },
   [PRODUCT_CARD_PROMOTION_TIER.TOP]: {
     borderWidth: 2,
-    borderColor: semanticColors.accent,
-    gradientStart: semanticColors.onContrast,
-    gradientEnd: semanticColors.onContrast,
-    shadowColor: semanticColors.accent,
+    borderColor: c.accent,
+    gradientStart: c.surface,
+    gradientEnd: c.surface,
+    shadowColor: c.accent,
     shadowOpacity: 0.28,
     shadowRadius: 16,
     shadowOffsetY: 4,
@@ -125,27 +131,45 @@ export const PRODUCT_CARD_PROMOTION_PREMIUM_COMPACT_FRAME: Record<
   },
   [PRODUCT_CARD_PROMOTION_TIER.BANNER]: {
     borderWidth: 2,
-    borderColor: semanticColors.warning,
-    gradientStart: semanticColors.dangerSurface,
-    gradientEnd: semanticColors.onContrast,
-    shadowColor: semanticColors.danger,
+    borderColor: c.warning,
+    gradientStart: c.dangerSurface,
+    gradientEnd: c.surface,
+    shadowColor: c.danger,
     shadowOpacity: 0.18,
     shadowRadius: 24,
     shadowOffsetY: 6,
     elevation: 4,
   },
-};
+});
 
 /** ProductCardBannerLayout.css — inner banner card (без красной обводки на mobile). */
-export const PRODUCT_CARD_PROMOTION_BANNER_INNER_FRAME = {
-  borderWidth: 0,
-  borderColor: "transparent",
-  gradientStart: semanticColors.onContrast,
-  gradientMid: semanticColors.dangerSurface,
-  gradientEnd: semanticColors.dangerSurface,
-  shadowColor: PRODUCT_CARD_SOFT_ELEVATION_SHADOW.shadowColor,
-  shadowOpacity: PRODUCT_CARD_SOFT_ELEVATION_SHADOW.shadowOpacity,
-  shadowRadius: PRODUCT_CARD_SOFT_ELEVATION_SHADOW.shadowRadius,
-  shadowOffsetY: PRODUCT_CARD_SOFT_ELEVATION_SHADOW.shadowOffsetY,
-  elevation: PRODUCT_CARD_SOFT_ELEVATION_SHADOW.elevation,
-} as const;
+export const resolveProductCardPromotionBannerInnerFrame = (c: ThemeColors) => {
+  const soft = resolveProductCardSoftElevationShadow(c);
+  return {
+    borderWidth: 0,
+    borderColor: "transparent",
+    gradientStart: c.surface,
+    gradientMid: c.dangerSurface,
+    gradientEnd: c.dangerSurface,
+    shadowColor: soft.shadowColor,
+    shadowOpacity: soft.shadowOpacity,
+    shadowRadius: soft.shadowRadius,
+    shadowOffsetY: soft.shadowOffsetY,
+    elevation: soft.elevation,
+  } as const;
+};
+
+/** @deprecated light snapshot */
+export const PRODUCT_CARD_PROMOTION_COMPACT_FRAME =
+  resolveProductCardPromotionCompactFrame(izColors);
+
+/** @deprecated light snapshot */
+export const PRODUCT_CARD_PREMIUM_ONLY_FRAME = resolveProductCardPremiumOnlyFrame(izColors);
+
+/** @deprecated light snapshot */
+export const PRODUCT_CARD_PROMOTION_PREMIUM_COMPACT_FRAME =
+  resolveProductCardPromotionPremiumCompactFrame(izColors);
+
+/** @deprecated light snapshot */
+export const PRODUCT_CARD_PROMOTION_BANNER_INNER_FRAME =
+  resolveProductCardPromotionBannerInnerFrame(izColors);

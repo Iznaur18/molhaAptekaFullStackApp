@@ -4,7 +4,7 @@ import { useProductCardChromeFlags } from "@/entities/product/lib/useProductCard
 import { getProductCardMineStatusBadge } from "@/entities/product/lib/getProductCardMineStatusBadge";
 import {
   productStatusBadgeScrollStyles,
-  productStatusBadgeVariantStyles,
+  useProductStatusBadgeVariantStyles,
   type ProductStatusBadgeVariant,
 } from "@/entities/product/lib/productStatusBadgeStyles";
 import { PRODUCT_CARD_UI } from "@/shared/config";
@@ -33,6 +33,7 @@ export const ProductCatalogStatusBadges = ({
   isLoyaltyPointsOvercommitted = false,
 }: ProductCatalogStatusBadgesProps) => {
   const flags = useProductCardChromeFlags(product, { isMineMode });
+  const productStatusBadgeVariantStyles = useProductStatusBadgeVariantStyles();
 
   const badges: StatusBadgeItem[] = [];
   const mineBadge = isMineMode

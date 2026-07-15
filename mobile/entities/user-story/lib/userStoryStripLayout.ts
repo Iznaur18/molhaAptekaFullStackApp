@@ -1,13 +1,4 @@
-import { semanticColors } from "@/shared/theme/semanticColors";
-/** Плашка сториз — фон/рамка через theme в useUserStoriesStripStyles. */
-
-export const USER_STORY_STRIP_COLORS = {
-  scrollBackground: semanticColors.onContrast,
-  ringActive: semanticColors.action,
-  ringViewed: semanticColors.textMuted,
-  avatarBorder: semanticColors.onContrast,
-  countBackground: semanticColors.link,
-} as const;
+/** Плашка сториз — цвета только через theme в useUserStoriesStripStyles. */
 
 export const USER_STORY_STRIP_LAYOUT = {
   marginBottom: 0,

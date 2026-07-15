@@ -10,19 +10,11 @@ import {
 import { getProfileRowIcon } from "@/entities/user/lib/profileRowIcons";
 import { PROFILE_CARD_SQUIRCLE_RADIUS } from "@/shared/theme/profileChromeStyles";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
-import { semanticColors } from "@/shared/theme/semanticColors";
 import { SquircleView } from "@/shared/ui/SquircleView";
 
 type UserProfileInfoPanelProps = {
   rows: ProfileRow[];
 };
-
-const PROFILE_INFO_PALETTE = {
-  bg: semanticColors.surface,
-  border: semanticColors.border,
-  color: semanticColors.textSecondary,
-  iconBg: semanticColors.surfaceMuted,
-} as const;
 
 const useStyles = createThemedStyles((theme) => ({
   root: {
@@ -30,6 +22,8 @@ const useStyles = createThemedStyles((theme) => ({
   },
   section: {
     borderWidth: 1,
+    backgroundColor: theme.colors.surface,
+    borderColor: theme.colors.border,
   },
   sectionTitle: {
     fontSize: 11,
@@ -39,9 +33,9 @@ const useStyles = createThemedStyles((theme) => ({
     paddingVertical: 8,
     paddingHorizontal: 14,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    backgroundColor: theme.colors.ink,
-    color: theme.colors.onContrast,
-    borderBottomColor: theme.colors.ink,
+    backgroundColor: theme.colors.surfaceMuted,
+    color: theme.colors.text,
+    borderBottomColor: theme.colors.border,
   },
   detailRow: {
     flexDirection: "row",
@@ -53,6 +47,7 @@ const useStyles = createThemedStyles((theme) => ({
     paddingHorizontal: 14,
     paddingVertical: 11,
     borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: theme.colors.border,
   },
   detailLabelRow: {
     flexDirection: "row",
@@ -69,11 +64,13 @@ const useStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
+    backgroundColor: theme.colors.surfaceMuted,
   },
   detailLabel: {
     fontSize: 13,
     fontWeight: "600",
     flexShrink: 1,
+    color: theme.colors.textSecondary,
   },
   detailValue: {
     fontSize: 14,
@@ -82,16 +79,24 @@ const useStyles = createThemedStyles((theme) => ({
     textAlign: "right",
     flexShrink: 0,
     marginLeft: "auto",
+    color: theme.colors.textSecondary,
   },
   detailValuePositive: {
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 999,
+    backgroundColor: theme.colors.surfaceMuted,
+    color: theme.colors.textSecondary,
   },
   detailValueMuted: {
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 999,
+    backgroundColor: theme.colors.surfaceMuted,
+    color: theme.colors.textMuted,
+  },
+  iconColor: {
+    color: theme.colors.textSecondary,
   },
 }));
 
@@ -105,70 +110,49 @@ export const UserProfileInfoPanel = ({ rows }: UserProfileInfoPanelProps) => {
 
   return (
     <View style={styles.root}>
-      {sections.map((section) => {
-        const { bg, border, color, iconBg } = PROFILE_INFO_PALETTE;
+      {sections.map((section) => (
+        <SquircleView
+          key={section.id}
+          radius={PROFILE_CARD_SQUIRCLE_RADIUS}
+          style={styles.section}
+        >
+          {section.title ? (
+            <Text style={styles.sectionTitle}>{section.title}</Text>
+          ) : null}
+          {section.rows.map((row, index) => {
+            const icon = getProfileRowIcon(row.id);
+            const isLast = index === section.rows.length - 1;
+            const isBoolean = isBooleanProfileRow(row.id);
+            const isYes = row.value === "Да";
+            const isNo = row.value === "Нет";
 
-        return (
-          <SquircleView
-            key={section.id}
-            radius={PROFILE_CARD_SQUIRCLE_RADIUS}
-            style={[styles.section, { backgroundColor: bg, borderColor: border }]}
-          >
-            {section.title ? (
-              <Text style={styles.sectionTitle}>{section.title}</Text>
-            ) : null}
-            {section.rows.map((row, index) => {
-              const icon = getProfileRowIcon(row.id);
-              const isLast = index === section.rows.length - 1;
-              const isBoolean = isBooleanProfileRow(row.id);
-              const isYes = row.value === "Да";
-              const isNo = row.value === "Нет";
-
-              return (
-                <View
-                  key={row.id}
+            return (
+              <View
+                key={row.id}
+                style={[styles.detailRow, isLast && { borderBottomWidth: 0 }]}
+              >
+                <View style={styles.detailLabelRow}>
+                  {icon ? (
+                    <View style={styles.detailIconWrap}>
+                      <Feather name={icon} size={13} color={styles.iconColor.color} />
+                    </View>
+                  ) : null}
+                  <Text style={styles.detailLabel}>{row.label}</Text>
+                </View>
+                <Text
                   style={[
-                    styles.detailRow,
-                    { borderBottomColor: border },
-                    isLast && { borderBottomWidth: 0 },
+                    styles.detailValue,
+                    isBoolean && isYes && styles.detailValuePositive,
+                    isBoolean && isNo && styles.detailValueMuted,
                   ]}
                 >
-                  <View style={styles.detailLabelRow}>
-                    {icon ? (
-                      <View style={[styles.detailIconWrap, { backgroundColor: iconBg }]}>
-                        <Feather name={icon} size={13} color={color} />
-                      </View>
-                    ) : null}
-                    <Text style={[styles.detailLabel, { color }]}>{row.label}</Text>
-                  </View>
-                  <Text
-                    style={[
-                      styles.detailValue,
-                      { color: isBoolean ? undefined : semanticColors.textSecondary },
-                      isBoolean && isYes && [
-                        styles.detailValuePositive,
-                        {
-                          backgroundColor: semanticColors.surfaceMuted,
-                          color: semanticColors.textSecondary,
-                        },
-                      ],
-                      isBoolean && isNo && [
-                        styles.detailValueMuted,
-                        {
-                          backgroundColor: semanticColors.surfaceMuted,
-                          color: semanticColors.textMuted,
-                        },
-                      ],
-                    ]}
-                  >
-                    {row.value}
-                  </Text>
-                </View>
-              );
-            })}
-          </SquircleView>
-        );
-      })}
+                  {row.value}
+                </Text>
+              </View>
+            );
+          })}
+        </SquircleView>
+      ))}
     </View>
   );
 };

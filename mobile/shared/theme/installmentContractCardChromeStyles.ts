@@ -62,7 +62,7 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
     fontSize: 15.2,
     lineHeight: 21,
     fontWeight: "600",
-    color: theme.colors.action,
+    color: theme.colors.text,
   },
   titleStatic: {
     flex: 1,
@@ -81,7 +81,7 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
   statusPillText: {
     fontSize: 12.8,
     fontWeight: "600",
-    color: theme.colors.actionHover,
+    color: theme.colors.text,
   },
   statusPillActive: {
     backgroundColor: theme.colors.actionBorder,
@@ -136,7 +136,7 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
   counterpartyName: {
     fontSize: 13.6,
     fontWeight: "600",
-    color: theme.colors.actionHover,
+    color: theme.colors.text,
   },
   counterpartyNameStatic: {
     color: theme.colors.text,

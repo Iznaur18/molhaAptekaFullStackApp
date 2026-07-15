@@ -1,12 +1,14 @@
 import { StyleSheet } from "react-native";
 
-import { PRODUCT_CARD_BADGE_COLORS as BC } from "@/entities/product/lib/productCardBadgePalette";
+import { resolveProductCardBadgeColors } from "@/entities/product/lib/productCardBadgePalette";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 const THUMB_SIZE = 88;
 const THUMB_RADIUS = 10;
 
-export const useProductCompactCardStyles = createThemedStyles((theme) => ({
+export const useProductCompactCardStyles = createThemedStyles((theme) => {
+  const BC = resolveProductCardBadgeColors(theme.colors);
+  return {
   card: {
     gap: 10,
     padding: 12,
@@ -247,7 +249,8 @@ export const useProductCompactCardStyles = createThemedStyles((theme) => ({
     height: StyleSheet.hairlineWidth,
     backgroundColor: theme.colors.border,
   },
-}));
+  };
+});
 
 /** @deprecated use useProductCompactCardStyles */
 export const useProductModerationQueueCardStyles = useProductCompactCardStyles;

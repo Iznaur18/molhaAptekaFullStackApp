@@ -291,7 +291,7 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
   title: {
     fontSize: 15.2,
     fontWeight: "600",
-    color: theme.colors.actionHover,
+    color: theme.colors.text,
     flexShrink: 1,
   },
   titleStatic: {
@@ -317,7 +317,7 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
   metaBuyerNameLink: {
     fontSize: 13.6,
     fontWeight: "600",
-    color: theme.colors.actionHover,
+    color: theme.colors.text,
   },
   metaDate: {
     fontSize: 13.6,
@@ -346,6 +346,7 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
     fontWeight: "600",
     lineHeight: 14.4,
     flexShrink: 1,
+    color: theme.colors.text,
   },
   statusPillTextPending: {
     color: theme.colors.warningText,
@@ -368,12 +369,12 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
     fontWeight: "700",
     letterSpacing: 0.48,
     textTransform: "uppercase",
-    color: theme.colors.textMuted,
+    color: theme.colors.text,
   },
   price: {
     fontSize: 16.32,
     fontWeight: "800",
-    color: theme.colors.link,
+    color: theme.colors.text,
     fontVariant: ["tabular-nums"],
     flexShrink: 0,
   },
@@ -385,7 +386,7 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
     fontWeight: "700",
     letterSpacing: 0.48,
     textTransform: "uppercase",
-    color: theme.colors.textMuted,
+    color: theme.colors.text,
   },
   composer: {
     flexDirection: "row",

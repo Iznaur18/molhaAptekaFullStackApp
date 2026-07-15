@@ -2,20 +2,20 @@ import { StyleSheet } from "react-native";
 
 import { PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO } from "@izibuy/design-tokens";
 
-import { PRODUCT_CARD_BADGE_COLORS as BC } from "@/entities/product/lib/productCardBadgePalette";
-import { PRODUCT_CARD_SOFT_ELEVATION_SHADOW } from "@/entities/product/lib/productCardPromotionFramePalette";
 import {
   PRODUCT_CARD_BADGE_LAYOUT as BL,
-  PRODUCT_CARD_BANNER_CHROME as BANNER,
-  PRODUCT_CARD_IMAGE_BADGE_OVERLAY as BO,
+  PRODUCT_CARD_DETAIL_BADGE_ROW_CHROME as DBRC,
   PRODUCT_CARD_IMAGE_BADGE_OVERLAY_LAYOUT as BOL,
   PRODUCT_CARD_MOBILE_LAYOUT,
-  PRODUCT_CARD_DETAIL_BADGE_ROW_CHROME as DBRC,
   PRODUCT_CARD_STATUS_BADGE_OVERLAY_LAYOUT as BSOL,
+  resolveProductCardBadgeColors,
+  resolveProductCardBannerChrome,
+  resolveProductCardImageBadgeOverlay,
 } from "@/entities/product/lib/productCardBadgePalette";
+import { resolveProductCardSoftElevationShadow } from "@/entities/product/lib/productCardPromotionFramePalette";
 import { PRODUCT_CARD_MOBILE_CATALOG_LAYOUT as MCL } from "@/entities/product/lib/productCardMobileCatalogLayout";
 import { HOME_FEED_SECTION_GAP } from "@/features/home-feed/lib/homeFeedSectionLayout";
-import { CURATED_COMPACT_CARD_COLORS as C } from "@/entities/curated-product-list/lib/curatedCompactCardColors";
+import { resolveCuratedCompactCardColors } from "@/entities/curated-product-list/lib/curatedCompactCardColors";
 import {
   CURATED_PRODUCT_LIST_HOME_CARD_GAP,
   CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_BOTTOM,
@@ -28,7 +28,6 @@ import {
   CURATED_PRODUCT_LIST_HOME_TITLE_PADDING_X,
 } from "@/entities/curated-product-list/lib/curatedProductListHomeLayout";
 import {
-  USER_STORY_STRIP_COLORS,
   USER_STORY_STRIP_INNER_SIZE,
   USER_STORY_STRIP_LAYOUT,
 } from "@/entities/user-story/lib/userStoryStripLayout";
@@ -290,7 +289,10 @@ export const useCatalogSubcategoryChipStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useProductCardStyles = createThemedStyles((theme) => ({
+export const useProductCardStyles = createThemedStyles((theme) => {
+  const BC = resolveProductCardBadgeColors(theme.colors);
+  const soft = resolveProductCardSoftElevationShadow(theme.colors);
+  return {
   card: {
     flex: 1,
     position: "relative",
@@ -298,11 +300,11 @@ export const useProductCardStyles = createThemedStyles((theme) => ({
     paddingBottom: 7,
     borderRadius: 16,
     backgroundColor: theme.colors.surface,
-    shadowColor: PRODUCT_CARD_SOFT_ELEVATION_SHADOW.shadowColor,
-    shadowOffset: { width: 0, height: PRODUCT_CARD_SOFT_ELEVATION_SHADOW.shadowOffsetY },
-    shadowOpacity: PRODUCT_CARD_SOFT_ELEVATION_SHADOW.shadowOpacity,
-    shadowRadius: PRODUCT_CARD_SOFT_ELEVATION_SHADOW.shadowRadius,
-    elevation: PRODUCT_CARD_SOFT_ELEVATION_SHADOW.elevation,
+    shadowColor: soft.shadowColor,
+    shadowOffset: { width: 0, height: soft.shadowOffsetY },
+    shadowOpacity: soft.shadowOpacity,
+    shadowRadius: soft.shadowRadius,
+    elevation: soft.elevation,
     overflow: "hidden",
   },
   cardCatalogGrid: {
@@ -473,9 +475,12 @@ export const useProductCardStyles = createThemedStyles((theme) => ({
   moderationPreviewValueMultiline: {
     lineHeight: 20,
   },
-}));
+  };
+});
 
-export const useProductCardBannerStyles = createThemedStyles((theme) => ({
+export const useProductCardBannerStyles = createThemedStyles((theme) => {
+  const BANNER = resolveProductCardBannerChrome(theme.colors);
+  return {
   frame: {
     width: "100%",
   },
@@ -554,7 +559,8 @@ export const useProductCardBannerStyles = createThemedStyles((theme) => ({
     right: 10,
     zIndex: 3,
   },
-}));
+  };
+});
 
 export const useProductCardSellerToolbarStyles = createThemedStyles((theme) => ({
   toolbar: {
@@ -822,7 +828,10 @@ export const useProductCardSellerRowStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useProductLoyaltyPointsBadgeStyles = createThemedStyles(() => ({
+export const useProductLoyaltyPointsBadgeStyles = createThemedStyles((theme) => {
+  const BC = resolveProductCardBadgeColors(theme.colors);
+  const BO = resolveProductCardImageBadgeOverlay(theme.colors);
+  return {
   badge: {
     paddingHorizontal: BL.paddingHorizontal,
     paddingVertical: BL.paddingVertical,
@@ -871,9 +880,13 @@ export const useProductLoyaltyPointsBadgeStyles = createThemedStyles(() => ({
     lineHeight: BSOL.lineHeight,
     fontWeight: "800",
   },
-}));
+  };
+});
 
-export const useProductPriceStyles = createThemedStyles((theme) => ({
+export const useProductPriceStyles = createThemedStyles((theme) => {
+  const BC = resolveProductCardBadgeColors(theme.colors);
+  const BO = resolveProductCardImageBadgeOverlay(theme.colors);
+  return {
   cardRoot: {
     flexDirection: "row",
     flexWrap: "nowrap",
@@ -914,7 +927,7 @@ export const useProductPriceStyles = createThemedStyles((theme) => ({
   cardOld: {
     fontSize: 11.5,
     fontWeight: "600",
-    color: "rgba(17, 24, 39, 0.52)",
+    color: BC.priceOld,
   },
   badge: {
     paddingHorizontal: BL.paddingHorizontal,
@@ -1034,7 +1047,8 @@ export const useProductPriceStyles = createThemedStyles((theme) => ({
     fontWeight: "600",
     lineHeight: 15,
   },
-}));
+  };
+});
 
 const PRODUCT_DETAILS_GAP = 12;
 const DETAIL_SPEC_PADDING_H = 16;
@@ -2507,7 +2521,9 @@ export const useCartScreenStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const useCuratedProductCompactCardStyles = createThemedStyles(() => ({
+export const useCuratedProductCompactCardStyles = createThemedStyles((theme) => {
+  const C = resolveCuratedCompactCardColors(theme.colors);
+  return {
   card: {
     borderWidth: 1,
     borderColor: C.border,
@@ -2543,7 +2559,8 @@ export const useCuratedProductCompactCardStyles = createThemedStyles(() => ({
     lineHeight: 19,
     color: C.priceText,
   },
-}));
+  };
+});
 
 export const useHomeCuratedListsStyles = createThemedStyles((theme) => ({
   section: {
@@ -2553,7 +2570,7 @@ export const useHomeCuratedListsStyles = createThemedStyles((theme) => ({
     marginBottom: 0,
     paddingHorizontal: CURATED_PRODUCT_LIST_HOME_SECTION_PADDING_HORIZONTAL,
     paddingVertical: CURATED_PRODUCT_LIST_HOME_SECTION_PADDING_VERTICAL,
-    backgroundColor: theme.colors.onContrast,
+    backgroundColor: theme.colors.surface,
     borderWidth: 0,
     borderColor: "transparent",
   },
@@ -2583,7 +2600,7 @@ export const useUserStoriesStripStyles = createThemedStyles((theme) => ({
     minHeight: 119,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
-    backgroundColor: USER_STORY_STRIP_COLORS.scrollBackground,
+    backgroundColor: theme.colors.surface,
   },
   scroll: {
     flexDirection: "row",
@@ -2606,20 +2623,20 @@ export const useUserStoriesStripStyles = createThemedStyles((theme) => ({
     height: USER_STORY_STRIP_LAYOUT.ringSize,
     borderRadius: USER_STORY_STRIP_LAYOUT.ringSize / 2,
     padding: USER_STORY_STRIP_LAYOUT.ringPadding,
-    backgroundColor: USER_STORY_STRIP_COLORS.ringActive,
+    backgroundColor: theme.colors.action,
     alignItems: "center",
     justifyContent: "center",
     position: "relative",
   },
   ringViewed: {
-    backgroundColor: USER_STORY_STRIP_COLORS.ringViewed,
+    backgroundColor: theme.colors.textMuted,
   },
   ringAdd: {
     width: USER_STORY_STRIP_LAYOUT.ringSize,
     height: USER_STORY_STRIP_LAYOUT.ringSize,
     borderRadius: USER_STORY_STRIP_LAYOUT.ringSize / 2,
     padding: USER_STORY_STRIP_LAYOUT.ringPadding,
-    backgroundColor: USER_STORY_STRIP_COLORS.ringActive,
+    backgroundColor: theme.colors.action,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -2634,14 +2651,14 @@ export const useUserStoriesStripStyles = createThemedStyles((theme) => ({
     height: USER_STORY_STRIP_INNER_SIZE,
     borderRadius: USER_STORY_STRIP_INNER_SIZE / 2,
     borderWidth: USER_STORY_STRIP_LAYOUT.avatarBorderWidth,
-    borderColor: USER_STORY_STRIP_COLORS.avatarBorder,
+    borderColor: theme.colors.surface,
   },
   avatarFallback: {
     width: USER_STORY_STRIP_INNER_SIZE,
     height: USER_STORY_STRIP_INNER_SIZE,
     borderRadius: USER_STORY_STRIP_INNER_SIZE / 2,
     borderWidth: USER_STORY_STRIP_LAYOUT.avatarBorderWidth,
-    borderColor: USER_STORY_STRIP_COLORS.avatarBorder,
+    borderColor: theme.colors.surface,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: theme.colors.textSecondary,
@@ -2659,7 +2676,7 @@ export const useUserStoriesStripStyles = createThemedStyles((theme) => ({
     height: USER_STORY_STRIP_LAYOUT.countHeight,
     paddingHorizontal: USER_STORY_STRIP_LAYOUT.countPaddingHorizontal,
     borderRadius: USER_STORY_STRIP_LAYOUT.countHeight / 2,
-    backgroundColor: USER_STORY_STRIP_COLORS.countBackground,
+    backgroundColor: theme.colors.link,
     alignItems: "center",
     justifyContent: "center",
   },

@@ -15,10 +15,9 @@ import {
 } from "@/entities/product/ui/ProductPriceDisplay";
 import { WishlistToggleButton } from "@/features/wishlist-toggle/ui/WishlistToggleButton";
 import { PRODUCT_CARD_UI, PRODUCT_UI } from "@/shared/config";
-import { PRODUCT_CARD_BANNER_CHROME as BANNER_CHROME } from "@/entities/product/lib/productCardBadgePalette";
+import { resolveProductCardBannerChrome } from "@/entities/product/lib/productCardBadgePalette";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useProductCardBannerStyles } from "@/shared/theme/catalogProductStyles";
-
-const BANNER_OUTER_RADIUS = BANNER_CHROME.outerRadius;
 
 type ProductCardBannerProps = {
   product: Record<string, unknown> & {
@@ -35,9 +34,11 @@ type ProductCardBannerProps = {
 
 export const ProductCardBanner = ({ product }: ProductCardBannerProps) => {
   const router = useRouter();
+  const theme = useAppTheme();
   const styles = useProductCardBannerStyles();
   const flags = useProductCardChromeFlags(product, { promotionFullWidth: true });
   const cardMedia = useProductCardMediaState(product);
+  const bannerChrome = resolveProductCardBannerChrome(theme.colors);
   const name = product.productName?.trim() || "Без названия";
   const reviewLine = formatProductReviewRatingLine(product.averageRating, product.reviewCount);
   const hasReviewRating = reviewLine.length > 0;
@@ -50,6 +51,7 @@ export const ProductCardBanner = ({ product }: ProductCardBannerProps) => {
   const bannerInnerFrameStyle = resolveProductCardPromotionFrameStyle(
     PRODUCT_CARD_PROMOTION_TIER.BANNER,
     "banner-inner",
+    { colors: theme.colors },
   );
 
   return (
@@ -67,7 +69,7 @@ export const ProductCardBanner = ({ product }: ProductCardBannerProps) => {
         <ProductCardPromotionBackground
           tier={PRODUCT_CARD_PROMOTION_TIER.BANNER}
           variant="banner-inner"
-          borderRadius={BANNER_OUTER_RADIUS - 1}
+          borderRadius={bannerChrome.outerRadius - 1}
         />
 
         <View style={styles.imageWrap}>

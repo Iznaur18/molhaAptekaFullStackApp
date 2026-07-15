@@ -43,6 +43,7 @@ import { WishlistToggleButton } from "@/features/wishlist-toggle/ui/WishlistTogg
 import { useWishlist } from "@/entities/wishlist/model/WishlistProvider";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { PRODUCT_MODERATION_PAGE_UI, PRODUCT_CARD_UI, PRODUCT_REVIEW_UI, PRODUCT_UI } from "@/shared/config";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useProductCardStyles } from "@/shared/theme/catalogProductStyles";
 
 type ProductCardProps = {
@@ -89,6 +90,7 @@ export const ProductCard = memo(({
   isLoyaltyPointsOvercommitted = false,
 }: ProductCardProps) => {
   const router = useRouter();
+  const theme = useAppTheme();
   const styles = useProductCardStyles();
   const { isPremiumUser } = useUserAccess();
   const isAuthorized = useIsAuthorized();
@@ -145,6 +147,7 @@ export const ProductCard = memo(({
   const promotionFrameStyle = showCardChrome
     ? resolveProductCardPromotionFrameStyle(flags.promotionFrameTier, "compact", {
         isPremium: flags.showPremiumChrome,
+        colors: theme.colors,
       })
     : null;
 

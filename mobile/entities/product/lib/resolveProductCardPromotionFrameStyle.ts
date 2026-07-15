@@ -1,40 +1,47 @@
+import type { IzTheme } from "@izibuy/design-tokens";
+
 import {
-  PRODUCT_CARD_PREMIUM_ONLY_FRAME,
-  PRODUCT_CARD_PROMOTION_BANNER_INNER_FRAME,
-  PRODUCT_CARD_PROMOTION_COMPACT_FRAME,
-  PRODUCT_CARD_PROMOTION_PREMIUM_COMPACT_FRAME,
-  PRODUCT_CARD_SOFT_ELEVATION_SHADOW,
+  resolveProductCardPremiumOnlyFrame,
+  resolveProductCardPromotionBannerInnerFrame,
+  resolveProductCardPromotionCompactFrame,
+  resolveProductCardPromotionPremiumCompactFrame,
+  resolveProductCardSoftElevationShadow,
   type ProductCardPromotionTier,
 } from "./productCardPromotionFramePalette";
 
+type ThemeColors = IzTheme["colors"];
 type PromotionFrameVariant = "compact" | "banner-outer" | "banner-inner";
 
 type ResolveProductCardPromotionFrameOptions = {
   isPremium?: boolean;
+  colors: ThemeColors;
 };
 
 const withProductCardPremiumSoftElevationFrame = (
+  colors: ThemeColors,
   frameStyle: {
     backgroundColor?: string;
   } = {},
-) =>
-  ({
+) => {
+  const soft = resolveProductCardSoftElevationShadow(colors);
+  return {
     borderWidth: 0,
     backgroundColor: frameStyle.backgroundColor,
-    shadowColor: PRODUCT_CARD_SOFT_ELEVATION_SHADOW.shadowColor,
-    shadowOpacity: PRODUCT_CARD_SOFT_ELEVATION_SHADOW.shadowOpacity,
-    shadowRadius: PRODUCT_CARD_SOFT_ELEVATION_SHADOW.shadowRadius,
-    shadowOffset: { width: 0, height: PRODUCT_CARD_SOFT_ELEVATION_SHADOW.shadowOffsetY },
-    elevation: PRODUCT_CARD_SOFT_ELEVATION_SHADOW.elevation,
-  }) as const;
+    shadowColor: soft.shadowColor,
+    shadowOpacity: soft.shadowOpacity,
+    shadowRadius: soft.shadowRadius,
+    shadowOffset: { width: 0, height: soft.shadowOffsetY },
+    elevation: soft.elevation,
+  } as const;
+};
 
 export const resolveProductCardPromotionFrameStyle = (
   tier: ProductCardPromotionTier | null,
   variant: PromotionFrameVariant = "compact",
-  { isPremium = false }: ResolveProductCardPromotionFrameOptions = {},
+  { isPremium = false, colors }: ResolveProductCardPromotionFrameOptions,
 ) => {
   if (variant === "banner-inner") {
-    const palette = PRODUCT_CARD_PROMOTION_BANNER_INNER_FRAME;
+    const palette = resolveProductCardPromotionBannerInnerFrame(colors);
 
     return {
       borderWidth: palette.borderWidth,
@@ -53,17 +60,18 @@ export const resolveProductCardPromotionFrameStyle = (
       return null;
     }
 
-    return withProductCardPremiumSoftElevationFrame({
-      backgroundColor: PRODUCT_CARD_PREMIUM_ONLY_FRAME.backgroundColor,
+    const premiumOnly = resolveProductCardPremiumOnlyFrame(colors);
+    return withProductCardPremiumSoftElevationFrame(colors, {
+      backgroundColor: premiumOnly.backgroundColor,
     });
   }
 
   const palette = isPremium
-    ? PRODUCT_CARD_PROMOTION_PREMIUM_COMPACT_FRAME[tier]
-    : PRODUCT_CARD_PROMOTION_COMPACT_FRAME[tier];
+    ? resolveProductCardPromotionPremiumCompactFrame(colors)[tier]
+    : resolveProductCardPromotionCompactFrame(colors)[tier];
 
   if (isPremium) {
-    return withProductCardPremiumSoftElevationFrame({
+    return withProductCardPremiumSoftElevationFrame(colors, {
       backgroundColor: "transparent",
     });
   }

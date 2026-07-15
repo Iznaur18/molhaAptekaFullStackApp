@@ -1,7 +1,6 @@
-import { semanticColors } from "@/shared/theme/semanticColors";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
-import { Pressable, StyleSheet } from "react-native";
+import { Pressable } from "react-native";
 
 import { isCurrentUserProductSeller } from "@/entities/product/lib/isCurrentUserProductSeller";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
@@ -9,6 +8,7 @@ import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useWishlist } from "@/entities/wishlist/model/WishlistProvider";
 import { WISHLIST_TOGGLE_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 type WishlistToggleButtonProps = {
   productId: string;
@@ -18,6 +18,43 @@ type WishlistToggleButtonProps = {
   variant?: "card" | "inline" | "detailHero" | "detailHeroInline";
 };
 
+const useWishlistToggleStyles = createThemedStyles((theme) => ({
+  root: {
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 20,
+    padding: 6,
+  },
+  card: {
+    backgroundColor: theme.colors.surface,
+  },
+  detailHero: {
+    position: "absolute",
+    top: 10.4,
+    right: 10.4,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: theme.colors.surface,
+    shadowColor: theme.colors.ink,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  detailHeroInline: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: theme.colors.surface,
+    shadowColor: theme.colors.ink,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+}));
+
 export const WishlistToggleButton = ({
   productId,
   product = null,
@@ -25,6 +62,7 @@ export const WishlistToggleButton = ({
 }: WishlistToggleButtonProps) => {
   const router = useRouter();
   const theme = useAppTheme();
+  const styles = useWishlistToggleStyles();
   const isAuthorized = useIsAuthorized();
   const sessionQuery = useAuthSessionQuery();
   const { isInWishlist, toggleItem } = useWishlist();
@@ -67,40 +105,3 @@ export const WishlistToggleButton = ({
     </Pressable>
   );
 };
-
-const styles = StyleSheet.create({
-  root: {
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 20,
-    padding: 6,
-  },
-  card: {
-    backgroundColor: "rgba(255,255,255,0.92)",
-  },
-  detailHero: {
-    position: "absolute",
-    top: 10.4,
-    right: 10.4,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(255,255,255,0.92)",
-    shadowColor: semanticColors.ink,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.12,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  detailHeroInline: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(255,255,255,0.92)",
-    shadowColor: semanticColors.ink,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.12,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-});

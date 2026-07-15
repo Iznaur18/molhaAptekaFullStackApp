@@ -90,17 +90,17 @@ const useTabBarStyles = createThemedStyles((theme) => ({
   /** Ozon-стиль: плоский бар во всю ширину, отделён тонкой линией сверху. */
   navShadow: {
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: "rgba(17, 24, 39, 0.08)",
+    borderTopColor: theme.colors.border,
   },
   navBlur: {
     overflow: "hidden",
     paddingVertical: MOBILE_BOTTOM_NAV_PADDING_VERTICAL,
     paddingHorizontal: NAV_PADDING_HORIZONTAL,
   },
-  /** Почти непрозрачный белый слой поверх blur — Ozon-стиль. */
+  /** Почти непрозрачный surface поверх blur. */
   navOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(255, 255, 255, 0.96)",
+    backgroundColor: theme.colors.surface,
   },
   navRow: {
     flexDirection: "row",
@@ -153,7 +153,7 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
   const pathname = usePathname();
   const insets = useSafeAreaInsets();
   const styles = useTabBarStyles();
-  const { theme } = useAppThemeSettings();
+  const { theme, colorScheme } = useAppThemeSettings();
   const sessionQuery = useAuthSessionQuery();
   const cartCount = useCartTotalCount();
   const unreadNotifications = useUnreadNotificationsCount();
@@ -325,7 +325,7 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
           <View style={styles.navShadow}>
             <BlurView
               intensity={Platform.OS === "web" ? 0 : 85}
-              tint="light"
+              tint={colorScheme === "dark" ? "dark" : "light"}
               style={[
                 styles.navBlur,
                 {

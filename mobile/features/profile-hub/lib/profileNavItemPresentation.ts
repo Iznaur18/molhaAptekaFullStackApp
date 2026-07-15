@@ -2,13 +2,15 @@ import type { TextStyle, ViewStyle } from "react-native";
 
 import {
   resolveProfileNavTonePalette,
+  type ProfileNavColorScheme,
   type ProfileNavToneId,
 } from "@izibuy/shared-lib";
-import { semanticColors } from "@/shared/theme/semanticColors";
 
 type ProfileNavItemVisualState = {
   isActive: boolean;
   isCta: boolean;
+  colorScheme: ProfileNavColorScheme;
+  onContrastColor: string;
 };
 
 export type ProfileNavItemPresentation = {
@@ -22,9 +24,9 @@ const withAlpha = (hex: string, alphaHex: string): string => `${hex}${alphaHex}`
 
 export const buildProfileNavItemPresentation = (
   tone: ProfileNavToneId,
-  { isActive, isCta }: ProfileNavItemVisualState,
+  { isActive, isCta, colorScheme, onContrastColor }: ProfileNavItemVisualState,
 ): ProfileNavItemPresentation => {
-  const palette = resolveProfileNavTonePalette(tone);
+  const palette = resolveProfileNavTonePalette(tone, colorScheme);
   const highlighted = isActive || isCta;
 
   const container: ViewStyle = {
@@ -43,7 +45,7 @@ export const buildProfileNavItemPresentation = (
         borderColor: withAlpha(palette.main, "2E"),
       };
 
-  const iconColor = highlighted ? semanticColors.onContrast : palette.main;
+  const iconColor = highlighted ? onContrastColor : palette.main;
 
   const label: TextStyle = {
     color: highlighted ? palette.strong : undefined,

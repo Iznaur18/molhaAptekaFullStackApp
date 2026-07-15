@@ -1,4 +1,3 @@
-import { semanticColors } from "@/shared/theme/semanticColors";
 import { Feather } from "@expo/vector-icons";
 import { useMemo, useState } from "react";
 import { Image } from "expo-image";
@@ -14,6 +13,7 @@ import { pickUserProfilePhotoUrl } from "@/entities/user/lib/pickUserProfilePhot
 import { resolveUserProfileBackgroundFromUser } from "@/entities/user/lib/resolveUserProfileBackgroundFromUser";
 import { UserPremiumAvatar } from "@/entities/user/ui/UserPremiumAvatar";
 import { MY_PROFILE_PAGE_UI } from "@/shared/config";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import {
   PROFILE_CARD_SQUIRCLE_RADIUS,
   useProfileOverviewBannerStyles,
@@ -31,6 +31,7 @@ export const ProfileOverviewBanner = ({
   showEditButton = false,
   onEditPress,
 }: ProfileOverviewBannerProps) => {
+  const theme = useAppTheme();
   const styles = useProfileOverviewBannerStyles();
   const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
   const [backgroundLoadFailed, setBackgroundLoadFailed] = useState(false);
@@ -98,7 +99,7 @@ export const ProfileOverviewBanner = ({
             onPress={onEditPress}
             accessibilityLabel={MY_PROFILE_PAGE_UI.EDIT_PROFILE}
           >
-            <Feather name="edit-2" size={16} color={semanticColors.text} />
+            <Feather name="edit-2" size={16} color={theme.colors.text} />
           </Pressable>
         ) : null}
       </SquircleView>
