@@ -9,9 +9,14 @@ import { useHomeCatalogHeaderStyles } from "@/shared/theme/homeCatalogHeaderStyl
 type HomeCatalogHeaderSearchProps = {
   value: string;
   onChange: (value: string) => void;
+  onSubmit: () => void;
 };
 
-export const HomeCatalogHeaderSearch = ({ value, onChange }: HomeCatalogHeaderSearchProps) => {
+export const HomeCatalogHeaderSearch = ({
+  value,
+  onChange,
+  onSubmit,
+}: HomeCatalogHeaderSearchProps) => {
   const styles = useHomeCatalogHeaderStyles();
   const theme = useAppTheme();
 
@@ -28,6 +33,8 @@ export const HomeCatalogHeaderSearch = ({ value, onChange }: HomeCatalogHeaderSe
         style={styles.searchInput}
         value={value}
         onChangeText={onChange}
+        onSubmitEditing={onSubmit}
+        returnKeyType="search"
         placeholder={CATALOG_FILTER_UI.SEARCH_PLACEHOLDER}
         placeholderTextColor={theme.colors.textMuted}
         autoCorrect={false}

@@ -56,11 +56,7 @@ import { HomeCatalogFeedSheetCap } from "@/features/home-feed/ui/HomeCatalogFeed
 import { HomeCatalogPrimaryBackdrop } from "@/features/home-feed/ui/HomeCatalogPrimaryBackdrop";
 import { HomeCatalogSearchRow } from "@/features/home-feed/ui/HomeCatalogSearchRow";
 import { HomeCatalogStickySearchShell } from "@/features/home-feed/ui/HomeCatalogStickySearchShell";
-import {
-  API_CLIENT_UI,
-  CATALOG_SEARCH_DEBOUNCE_MS,
-  CATALOG_SEARCH_MIN_LENGTH,
-} from "@/shared/config";
+import { API_CLIENT_UI, CATALOG_SEARCH_MIN_LENGTH } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { setCatalogCategoryView } from "@/shared/lib/catalogCategoryViewStore";
 import {
@@ -117,7 +113,7 @@ export default function CatalogScreen() {
   const rowVisibility = useVisibleRowsController(isFocused && appActive);
   const { height: windowHeight } = useWindowDimensions();
   const [searchInput, setSearchInput] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [submittedSearch, setSubmittedSearch] = useState("");
   const [selectedRootSlug, setSelectedRootSlug] = useState<string | null>(null);
   const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<string | null>(null);
   const [selectedSellerPersonalCategoryId, setSelectedSellerPersonalCategoryId] = useState<
@@ -141,15 +137,18 @@ export default function CatalogScreen() {
     [windowHeight],
   );
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const trimmed = searchInput.trim();
-      setDebouncedSearch(
-        trimmed.length >= CATALOG_SEARCH_MIN_LENGTH || trimmed.length === 0 ? trimmed : "",
-      );
-    }, CATALOG_SEARCH_DEBOUNCE_MS);
+  // Набор текста сам по себе ничего не ищет: запрос уходит только по «Найти» на
+  // клавиатуре. Пустое поле — не поиск, а отмена: каталог возвращается сразу.
+  const handleSearchInputChange = useCallback((next: string) => {
+    setSearchInput(next);
+    if (next.trim() === "") {
+      setSubmittedSearch("");
+    }
+  }, []);
 
-    return () => clearTimeout(timer);
+  const handleSearchSubmit = useCallback(() => {
+    const trimmed = searchInput.trim();
+    setSubmittedSearch(trimmed.length >= CATALOG_SEARCH_MIN_LENGTH ? trimmed : "");
   }, [searchInput]);
 
   useFocusEffect(
@@ -161,7 +160,7 @@ export default function CatalogScreen() {
 
       const nextSearch = pending.search ?? "";
       setSearchInput(nextSearch);
-      setDebouncedSearch(nextSearch);
+      setSubmittedSearch(nextSearch);
       setSelectedRootSlug(pending.productCategory ?? null);
       setSelectedSubcategoryId(pending.categoryId ?? null);
       setSelectedSellerPersonalCategoryId(pending.sellerPersonalCategoryId ?? null);
@@ -178,7 +177,7 @@ export default function CatalogScreen() {
   const catalogFilters = useMemo(
     (): CatalogListFilters => ({
       view: "main",
-      search: debouncedSearch || undefined,
+      search: submittedSearch || undefined,
       productCategory:
         selectedRootSlug && !selectedSubcategoryId ? selectedRootSlug : undefined,
       categoryId: selectedSubcategoryId ?? undefined,
@@ -190,7 +189,7 @@ export default function CatalogScreen() {
       saleOnly: feedFilters.saleOnly || undefined,
     }),
     [
-      debouncedSearch,
+      submittedSearch,
       feedFilters,
       selectedRootSlug,
       selectedSubcategoryId,
@@ -212,7 +211,7 @@ export default function CatalogScreen() {
   const showHomeFeed = useMemo(
     () =>
       isHomeCatalogMainView({
-        search: debouncedSearch,
+        search: submittedSearch,
         selectedRootSlug,
         selectedSubcategoryId,
         sellerPersonalCategoryId: selectedSellerPersonalCategoryId,
@@ -222,7 +221,7 @@ export default function CatalogScreen() {
         installmentOnly: feedFilters.installmentOnly === true,
         saleOnly: feedFilters.saleOnly === true,
       }),
-    [debouncedSearch, feedFilters, selectedRootSlug, selectedSubcategoryId, selectedSellerPersonalCategoryId],
+    [submittedSearch, feedFilters, selectedRootSlug, selectedSubcategoryId, selectedSellerPersonalCategoryId],
   );
 
   const introTransition = useHomeFeedIntroTransition({
@@ -234,7 +233,7 @@ export default function CatalogScreen() {
 
   const catalogBreadcrumbLabel = useCatalogBreadcrumbLabel({
     enabled: !showHomeFeed,
-    search: debouncedSearch,
+    search: submittedSearch,
     selectedRootSlug,
     selectedSubcategoryId,
     selectedSellerPersonalCategoryId,
@@ -249,13 +248,13 @@ export default function CatalogScreen() {
         isHomeCatalogMainView: showHomeFeed,
         selectedProductCategory: selectedRootSlug,
         selectedCategoryId: selectedSubcategoryId,
-        hasProductSearchQuery: Boolean(debouncedSearch),
+        hasProductSearchQuery: Boolean(submittedSearch),
         catalogFollowingOnly: feedFilters.followingOnly === true,
         catalogAuctionOnly: feedFilters.auctionOnly === true,
         catalogInstallmentOnly: feedFilters.installmentOnly === true,
         catalogSaleOnly: feedFilters.saleOnly === true,
       }),
-    [debouncedSearch, feedFilters, selectedRootSlug, selectedSubcategoryId, showHomeFeed],
+    [submittedSearch, feedFilters, selectedRootSlug, selectedSubcategoryId, showHomeFeed],
   );
 
   const homeFeedContentReady = useHomeFeedContentReady({
@@ -318,7 +317,7 @@ export default function CatalogScreen() {
   /** Сброс категории/поиска/фильтров — вкладка index возвращается к главной ленте. */
   const resetToHomeMainView = useCallback(() => {
     setSearchInput("");
-    setDebouncedSearch("");
+    setSubmittedSearch("");
     setSelectedRootSlug(null);
     setSelectedSubcategoryId(null);
     setSelectedSellerPersonalCategoryId(null);
@@ -392,7 +391,8 @@ export default function CatalogScreen() {
   const searchRow = (
     <HomeCatalogSearchRow
       value={searchInput}
-      onChange={setSearchInput}
+      onChange={handleSearchInputChange}
+      onSubmit={handleSearchSubmit}
       embeddedInForegroundSheet={showHomeFeed}
     />
   );
@@ -636,7 +636,11 @@ export default function CatalogScreen() {
     return (
       <CatalogScrollAnimationProvider>
         <VisibleRowsProvider store={rowVisibility.store}>
-        <HomeCatalogSearchProvider value={searchInput} onChange={setSearchInput}>
+        <HomeCatalogSearchProvider
+          value={searchInput}
+          onChange={handleSearchInputChange}
+          onSubmit={handleSearchSubmit}
+        >
           {renderHomeFeedScene(
             <GestureDetector gesture={introTransition.panGesture}>
               <View style={styles.homeFeedStage}>

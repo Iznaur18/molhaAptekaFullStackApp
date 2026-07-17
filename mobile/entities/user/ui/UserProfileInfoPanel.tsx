@@ -1,6 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import { useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { izColors } from "@izibuy/design-tokens";
 
 import type { ProfileRow } from "@/entities/user/lib/getUserProfileRows";
 import {
@@ -15,6 +16,10 @@ import { SquircleView } from "@/shared/ui/SquircleView";
 type UserProfileInfoPanelProps = {
   rows: ProfileRow[];
 };
+
+/** Section chrome stays black/white in all themes (dark remaps `ink` to white). */
+const PROFILE_INFO_SECTION_TITLE_BG = izColors.nearBlack;
+const PROFILE_INFO_SECTION_TITLE_FG = izColors.onContrast;
 
 const useStyles = createThemedStyles((theme) => ({
   root: {
@@ -33,9 +38,9 @@ const useStyles = createThemedStyles((theme) => ({
     paddingVertical: 8,
     paddingHorizontal: 14,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    backgroundColor: theme.colors.surfaceMuted,
-    color: theme.colors.text,
-    borderBottomColor: theme.colors.border,
+    backgroundColor: PROFILE_INFO_SECTION_TITLE_BG,
+    color: PROFILE_INFO_SECTION_TITLE_FG,
+    borderBottomColor: PROFILE_INFO_SECTION_TITLE_BG,
   },
   detailRow: {
     flexDirection: "row",

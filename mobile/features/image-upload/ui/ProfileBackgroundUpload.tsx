@@ -5,20 +5,28 @@ import { Image } from "expo-image";
 
 import { useUploadImageMutation } from "@/entities/upload/model/useUploadImageMutation";
 import { USER_BACKGROUND_PRESETS } from "@/entities/user/model/userBackgroundPresets";
+import {
+  DEFAULT_USER_BACKGROUND_FOCUS,
+  formatProfileImageContentPosition,
+  type ProfileImageFocus,
+} from "@/entities/user/lib/profileImageFocus";
 import { resolveBackgroundForPreview, type BackgroundMode } from "@/entities/user/lib/userBackgroundValue";
-import { pickGalleryImageAsset } from "@/features/image-upload/lib/pickGalleryImageAsset";
+import { pickProfileBackgroundAsset } from "@/features/image-upload/lib/pickProfileBackgroundAsset";
 import { EDIT_PROFILE_UI, IMAGE_UPLOAD_UI } from "@/shared/config";
 import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { PROFILE_BANNER_HEIGHT } from "@/shared/theme/profileChromeStyles";
 
 type ProfileBackgroundUploadProps = {
   mode: BackgroundMode;
   presetId: string;
   imageUrl: string;
+  focus: ProfileImageFocus;
   disabled?: boolean;
   onModeChange: (mode: BackgroundMode) => void;
   onPresetChange: (presetId: string) => void;
   onImageUrlChange: (url: string) => void;
+  onFocusChange: (focus: ProfileImageFocus) => void;
   onError?: (message: string) => void;
 };
 
@@ -26,10 +34,12 @@ export const ProfileBackgroundUpload = ({
   mode,
   presetId,
   imageUrl,
+  focus,
   disabled = false,
   onModeChange,
   onPresetChange,
   onImageUrlChange,
+  onFocusChange,
   onError,
 }: ProfileBackgroundUploadProps) => {
   const theme = useAppTheme();
@@ -38,15 +48,17 @@ export const ProfileBackgroundUpload = ({
   const isBusy = uploadMutation.isPending;
 
   const preview = resolveBackgroundForPreview(mode, { presetId, imageUrl });
+  const backgroundContentPosition = formatProfileImageContentPosition(focus);
 
   const handlePickAndUpload = async () => {
     if (disabled || isBusy) return;
     setLocalError("");
     try {
-      const asset = await pickGalleryImageAsset();
+      const asset = await pickProfileBackgroundAsset();
       if (!asset) return;
       const storedUrl = await uploadMutation.mutateAsync(asset);
       onImageUrlChange(storedUrl);
+      onFocusChange(DEFAULT_USER_BACKGROUND_FOCUS);
     } catch (error) {
       const message = error instanceof Error ? error.message : IMAGE_UPLOAD_UI.ERROR_GENERIC;
       setLocalError(message);
@@ -88,13 +100,14 @@ export const ProfileBackgroundUpload = ({
         })}
       </View>
 
-      {/* Preview strip */}
+      {/* Превью размером с шапку профиля: позиция кадрируется при выборе фото. */}
       <View style={styles.previewWrap}>
         {preview.kind === "image" ? (
           <Image
             source={{ uri: resolveUploadedMediaUrl(preview.imageUrl) }}
             style={styles.preview}
             contentFit="cover"
+            contentPosition={backgroundContentPosition}
           />
         ) : (
           <View style={[styles.preview, { backgroundColor: preview.color }]} />
@@ -223,7 +236,7 @@ const styles = StyleSheet.create({
   },
   preview: {
     width: "100%",
-    height: 80,
+    height: PROFILE_BANNER_HEIGHT,
     borderRadius: 8,
   },
   legend: {

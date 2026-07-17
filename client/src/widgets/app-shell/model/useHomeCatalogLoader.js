@@ -20,7 +20,7 @@ export const useHomeCatalogLoader = ({
   isAuthorized,
   canModerateProducts,
   setIsLoginModalOpen,
-  productSearchTerm,
+  submittedProductSearchTerm,
   myProductsModerationFilter,
   setMyProductsModerationFilter,
   setMyProductsCatalogError,
@@ -35,7 +35,7 @@ export const useHomeCatalogLoader = ({
     isMyProductsRoute,
     isCatalogBrowserMainViewActive,
     isCatalogShellView,
-    productSearchTerm,
+    submittedProductSearchTerm,
     initialCatalogQuery,
     isAuthorized,
     setIsLoginModalOpen,
@@ -97,13 +97,20 @@ export const useHomeCatalogLoader = ({
     activeCatalogBrowserCategory: filters.activeCatalogBrowserCategory,
     activeCatalogBrowserCategoryId: filters.activeCatalogBrowserCategoryId,
     catalogQueryFromUrl: filters.catalogQueryFromUrl,
-    debouncedProductSearchTerm: filters.debouncedProductSearchTerm,
+    appliedProductSearchTerm: filters.appliedProductSearchTerm,
     selectedProductCategory: filters.selectedProductCategory,
     catalogSort: filters.catalogSort,
     myProductsModerationFilter,
     canModerateProducts,
     showHiddenCatalogProducts: filters.showHiddenCatalogProducts,
   });
+
+  // Спиннер в поле поиска — про реальную загрузку отправленного запроса
+  // (дебаунса, который раньше «висел» между вводом и запросом, больше нет).
+  const isProductSearchPending =
+    filters.hasProductSearchQuery &&
+    catalogQuery.query.isFetching &&
+    !catalogQuery.query.isFetchingNextPage;
 
   const handleProductCategorySelect = useCallback(
     (category) => {
@@ -145,8 +152,8 @@ export const useHomeCatalogLoader = ({
     catalogHasMore: catalogQuery.catalogHasMore,
     isCatalogLoadingMore: catalogQuery.isCatalogLoadingMore,
     catalogLoadMoreError: catalogQuery.catalogLoadMoreError,
-    debouncedProductSearchTerm: filters.debouncedProductSearchTerm,
-    isProductSearchPending: filters.isProductSearchPending,
+    appliedProductSearchTerm: filters.appliedProductSearchTerm,
+    isProductSearchPending,
     hasProductSearchQuery: filters.hasProductSearchQuery,
     isMineMode: filters.isMineMode,
     activeCatalogBrowserCategory: filters.activeCatalogBrowserCategory,

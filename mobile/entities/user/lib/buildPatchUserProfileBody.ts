@@ -1,6 +1,7 @@
 import { DEFAULT_USER_AVATAR_URL } from "@/entities/user/model/constants";
 import { normalizeUploadUrlForStorage } from "@/shared/lib";
 
+import { getUserBackgroundFocus } from "./profileImageFocus";
 import { normalizeRuPhoneInput } from "./ruPhone";
 import { EMPTY_STRUCTURED_ADDRESS, type EditProfileFormState } from "./mapUserToEditProfileForm";
 import { serializeUserBackground } from "./userBackgroundValue";
@@ -91,6 +92,19 @@ export const buildPatchUserProfileBody = (
     } catch {
       // skip if not yet valid (e.g. image mode with empty url)
     }
+  }
+
+  const nextBackgroundFocus = getUserBackgroundFocus({
+    userBackgroundFocus: form.userBackgroundFocus,
+  });
+  const initialBackgroundFocus = getUserBackgroundFocus({
+    userBackgroundFocus: initial.userBackgroundFocus,
+  });
+  if (
+    nextBackgroundFocus.x !== initialBackgroundFocus.x ||
+    nextBackgroundFocus.y !== initialBackgroundFocus.y
+  ) {
+    body.userBackgroundFocus = nextBackgroundFocus;
   }
 
   const notes = form.notesAboutUser.trim();

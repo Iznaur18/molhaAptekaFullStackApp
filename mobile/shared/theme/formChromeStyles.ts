@@ -8,6 +8,8 @@ export const MODAL_BACKDROP_SCRIM = "rgba(0,0,0,0.45)";
 
 export const EMAIL_VERIFY_MODAL_CORNER_RADIUS = 36;
 
+export const PASSWORD_TOGGLE_ICON_SIZE = 22;
+
 export const useAuthFormStyles = createThemedStyles((theme) => ({
   flex: {
     flex: 1,
@@ -177,6 +179,37 @@ export const useLoginScreenStyles = createThemedStyles((theme) => ({
     fontSize: 16,
     backgroundColor: theme.colors.surface,
     color: theme.colors.text,
+  },
+  passwordWrap: {
+    position: "relative",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: theme.colors.borderStrong,
+    borderRadius: theme.radius.button,
+    backgroundColor: theme.colors.surface,
+  },
+  passwordWrapFocused: {
+    borderColor: theme.colors.action,
+  },
+  passwordInput: {
+    width: "100%",
+    borderWidth: 0,
+    paddingLeft: theme.spacing[4],
+    paddingRight: 48,
+    paddingVertical: 14,
+    fontSize: 16,
+    color: theme.colors.text,
+    backgroundColor: "transparent",
+  },
+  passwordToggle: {
+    position: "absolute",
+    right: 4,
+    top: 0,
+    bottom: 0,
+    width: 40,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 1,
   },
   inputFocused: {
     borderColor: theme.colors.action,

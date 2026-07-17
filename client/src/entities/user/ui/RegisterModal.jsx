@@ -8,6 +8,7 @@ import { validateUserNameField } from "../lib/validateUserName.js";
 import { LOGIN_MODAL_UI, REGISTER_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { isAuthSessionError } from "../../../shared/lib/isAuthSessionError.js";
 import { FormFieldLabel } from "../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
+import { PasswordInputField } from "../../../shared/ui/PasswordInputField/PasswordInputField.jsx";
 import { ProductModalShell } from "../../../shared/ui/ProductModalShell/ProductModalShell.jsx";
 
 import "./RegisterModal.css";
@@ -158,19 +159,20 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
             )}
           >
             <FormFieldLabel required>{REGISTER_MODAL_UI.LABEL_PASSWORD}</FormFieldLabel>
-            <input
+            <PasswordInputField
               className={withInvalidFieldClass(
                 "register-modal__input",
                 "password",
                 invalidFields,
               )}
-              type="password"
               name="password"
               value={form.password}
               onChange={handleChange}
               aria-required="true"
               aria-invalid={invalidFields.has("password")}
               autoComplete="new-password"
+              showPasswordAria={REGISTER_MODAL_UI.SHOW_PASSWORD_ARIA}
+              hidePasswordAria={REGISTER_MODAL_UI.HIDE_PASSWORD_ARIA}
             />
           </label>
           <label
@@ -183,19 +185,20 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
             <FormFieldLabel required>
               {REGISTER_MODAL_UI.LABEL_PASSWORD_CONFIRM}
             </FormFieldLabel>
-            <input
+            <PasswordInputField
               className={withInvalidFieldClass(
                 "register-modal__input",
                 "passwordConfirm",
                 invalidFields,
               )}
-              type="password"
               name="passwordConfirm"
               value={form.passwordConfirm}
               onChange={handleChange}
               aria-required="true"
               aria-invalid={invalidFields.has("passwordConfirm")}
               autoComplete="new-password"
+              showPasswordAria={REGISTER_MODAL_UI.SHOW_PASSWORD_ARIA}
+              hidePasswordAria={REGISTER_MODAL_UI.HIDE_PASSWORD_ARIA}
             />
           </label>
           <label

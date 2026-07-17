@@ -9,15 +9,22 @@ const MOBILE_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const readMobileFile = (relativePath) =>
   readFileSync(join(MOBILE_ROOT, relativePath), "utf8");
 
-test("UsersPage mirrors web: debounced search + split body", () => {
+test("UsersPage mirrors web: search on submit + split body", () => {
   const source = readMobileFile("features/users-page/ui/UsersPage.tsx");
+  const input = readMobileFile("shared/ui/UsersSearchInput.tsx");
 
   assert.match(source, /useScreenLayout/);
   assert.match(source, /contentPaddingTop/);
-  assert.match(source, /useDebouncedValue/);
   assert.match(source, /UsersPageSearchBar/);
   assert.match(source, /UsersPageBody/);
   assert.doesNotMatch(source, /TextInput/);
+
+  // Запрос уходит только по «Найти»: ни дебаунса, ни поиска по вводу.
+  assert.doesNotMatch(source, /useDebouncedValue/);
+  assert.match(source, /submittedSearch/);
+  assert.match(source, /search: submittedSearch/);
+  assert.match(input, /onSubmitEditing=\{onSubmit\}/);
+  assert.match(input, /returnKeyType="search"/);
 });
 
 test("UsersPageBody renders user grid with UserListRow cards", () => {
@@ -29,13 +36,18 @@ test("UsersPageBody renders user grid with UserListRow cards", () => {
   assert.match(source, /onRowClick/);
 });
 
-test("UserListRow uses card layout like web", () => {
-  const source = readMobileFile("entities/user/ui/UserListRow.tsx");
+test("UserListRow stacks metrics full-width on narrow cards", () => {
+  const row = readMobileFile("entities/user/ui/UserListRow.tsx");
+  const styles = readMobileFile("shared/theme/userListRowStyles.ts");
 
-  assert.match(source, /UserPremiumAvatar/);
-  assert.match(source, /UserPremiumDisplayName/);
-  assert.match(source, /UserListRowMetric/);
-  assert.match(source, /onRowClick/);
+  assert.match(row, /resolveUserListRowMetricsStacked/);
+  assert.match(row, /onLayout/);
+  assert.match(row, /stacked=\{metricsStacked\}/);
+  assert.match(row, /metricsStacked && styles\.metricsStacked/);
+  assert.match(styles, /metricCellStacked/);
+  assert.match(styles, /metricsStacked/);
+  assert.match(styles, /USER_LIST_ROW_METRICS_STACK_MAX_CARD_WIDTH/);
+  assert.match(styles, /resolveUserListRowMetricsStacked/);
 });
 
 test("UsersSearchInput exposes pending spinner and clear a11y", () => {

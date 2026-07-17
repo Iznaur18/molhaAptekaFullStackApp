@@ -4,12 +4,13 @@ import { useHomeCatalogSearch } from "@/features/home-feed/model/HomeCatalogSear
 import { HomeCatalogSearchRow } from "@/features/home-feed/ui/HomeCatalogSearchRow";
 
 export const HomeCatalogEmbeddedSearchRow = memo(() => {
-  const { value, onChange } = useHomeCatalogSearch();
+  const { value, onChange, onSubmit } = useHomeCatalogSearch();
 
   return (
     <HomeCatalogSearchRow
       value={value}
       onChange={onChange}
+      onSubmit={onSubmit}
       embeddedInForegroundSheet
     />
   );

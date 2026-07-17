@@ -41,7 +41,7 @@ const OUTPUT_PROFILES = [
 
 const GUEST_SCREENS = [
   { file: "01-catalog", path: "/", waitForText: "Каталог" },
-  { file: "02-product", path: null, waitForText: "Войти, чтобы добавить" },
+  { file: "02-product", path: null, waitForText: "Войти, чтобы купить" },
   { file: "03-cart-guest", path: "/cart", waitForText: "Войдите" },
   { file: "04-login", path: "/login", waitForText: "Войти" },
   { file: "05-register", path: "/register", waitForText: "Зарегистрироваться" },

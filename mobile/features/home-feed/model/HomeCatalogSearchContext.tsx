@@ -3,6 +3,8 @@ import { createContext, useContext, useMemo, type ReactNode } from "react";
 type HomeCatalogSearchContextValue = {
   value: string;
   onChange: (value: string) => void;
+  /** Запуск поиска: только по «Найти» на клавиатуре, не по вводу. */
+  onSubmit: () => void;
 };
 
 const HomeCatalogSearchContext = createContext<HomeCatalogSearchContextValue | null>(null);
@@ -10,20 +12,23 @@ const HomeCatalogSearchContext = createContext<HomeCatalogSearchContextValue | n
 type HomeCatalogSearchProviderProps = {
   value: string;
   onChange: (value: string) => void;
+  onSubmit: () => void;
   children: ReactNode;
 };
 
 export const HomeCatalogSearchProvider = ({
   value,
   onChange,
+  onSubmit,
   children,
 }: HomeCatalogSearchProviderProps) => {
   const contextValue = useMemo(
     () => ({
       value,
       onChange,
+      onSubmit,
     }),
-    [onChange, value],
+    [onChange, onSubmit, value],
   );
 
   return (

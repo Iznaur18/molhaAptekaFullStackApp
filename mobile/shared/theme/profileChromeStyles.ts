@@ -11,7 +11,8 @@ import {
 export const PROFILE_CONTENT_MAX_WIDTH = PROFILE_CONTENT_MAX_WIDTH_PHONE;
 export const PROFILE_ACTIONS_MAX_WIDTH = 320;
 const PROFILE_AVATAR_SIZE = 72;
-const PROFILE_BANNER_HEIGHT = PROFILE_AVATAR_SIZE * 3;
+/** Высота шапки-баннера профиля. Переиспользуется превью фона в редакторе. */
+export const PROFILE_BANNER_HEIGHT = PROFILE_AVATAR_SIZE * 3;
 export const PROFILE_CARD_SQUIRCLE_RADIUS = 24;
 const GUEST_BODY_PADDING_TOP = 0;
 const GUEST_BODY_MARGIN_TOP = 36;

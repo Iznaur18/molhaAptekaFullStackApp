@@ -1,9 +1,5 @@
 export { API_BASE_URL } from "./apiBaseUrl";
-export {
-  CATALOG_PAGE_SIZE,
-  CATALOG_SEARCH_DEBOUNCE_MS,
-  CATALOG_SEARCH_MIN_LENGTH,
-} from "./catalogConstants";
+export { CATALOG_PAGE_SIZE, CATALOG_SEARCH_MIN_LENGTH } from "./catalogConstants";
 export {
   CART_LINE_CARD_BORDER_RADIUS,
   CART_LINE_ITEM_QUANTITY_MAX,

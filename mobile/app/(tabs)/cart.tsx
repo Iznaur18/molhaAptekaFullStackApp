@@ -9,9 +9,11 @@ import { selectCartCheckoutSummary } from "@/entities/cart/lib/selectCartCheckou
 import { selectCartLines } from "@/entities/cart/lib/selectCartLines";
 import { useCartActions } from "@/entities/cart/model/useCartActions";
 import { useCartProductsQuery } from "@/entities/cart/model/useCartProductsQuery";
+import { useCartSelection } from "@/entities/cart/model/useCartSelection";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useMyCartQuery } from "@/entities/cart/model/useMyCartQuery";
 import { CartLineItem } from "@/entities/cart/ui/CartLineItem";
+import { CartSelectAllRow } from "@/entities/cart/ui/CartSelectAllRow";
 import type { OrderPaymentMethod } from "@/entities/order/model/constants";
 import { useCreateOrderMutation } from "@/entities/order/model/useCreateOrderMutation";
 import type { MyPriceOfferBid } from "@/entities/product-price-offer/api/incomingPriceOffersApi";
@@ -42,7 +44,7 @@ export default function CartScreen() {
   const isAuthorized = useIsAuthorized();
   const sessionQuery = useAuthSessionQuery();
   const cartQuery = useMyCartQuery();
-  const { clearCart, isUpdating } = useCartActions();
+  const { clearCart, removeItems, isUpdating } = useCartActions();
   const createOrderMutation = useCreateOrderMutation();
 
   const [checkoutSheetOpen, setCheckoutSheetOpen] = useState(false);
@@ -72,12 +74,19 @@ export default function CartScreen() {
     [lines, currentUserId],
   );
 
+  const purchasableIds = useMemo(
+    () => visibleLines.map((line) => line.productId),
+    [visibleLines],
+  );
+  const { deselectedIds, isLineSelected, toggleLine, toggleAll, areAllSelected, selectedCount } =
+    useCartSelection(purchasableIds);
+
   const checkoutSummary = useMemo(
-    () => selectCartCheckoutSummary(lines, currentUserId),
-    [lines, currentUserId],
+    () => selectCartCheckoutSummary(lines, currentUserId, deselectedIds),
+    [lines, currentUserId, deselectedIds],
   );
 
-  const canCheckout = checkoutSummary.purchasableLines.length > 0;
+  const canCheckout = checkoutSummary.selectedLines.length > 0;
 
   const handleRefresh = useCallback(async () => {
     await Promise.all([cartQuery.refetch(), productsQuery.refetch(), acceptedBidsQuery.refetch()]);
@@ -128,9 +137,10 @@ export default function CartScreen() {
     paymentMethod: OrderPaymentMethod;
   }) => {
     setSubmitState({ isSubmitting: true, error: "", success: "" });
+    const orderedProductIds = checkoutSummary.selectedLines.map((line) => line.productId);
     try {
       await createOrderMutation.mutateAsync({
-        items: checkoutSummary.purchasableLines.map((line) => ({
+        items: checkoutSummary.selectedLines.map((line) => ({
           productId: line.productId,
           quantity: line.quantity,
         })),
@@ -138,7 +148,8 @@ export default function CartScreen() {
         deliveryAddressFlat: payload.deliveryAddressFlat,
         paymentMethod: payload.paymentMethod,
       });
-      await clearCart();
+      // Невыбранные строки остаются в корзине.
+      await removeItems(orderedProductIds);
       setCheckoutSheetOpen(false);
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: orderQueryKeys.my() }),
@@ -155,7 +166,7 @@ export default function CartScreen() {
     }
   };
 
-  const totalLabel = checkoutSummary.hasExcludedLines
+  const totalLabel = checkoutSummary.hasPartialSelection
     ? CART_PAGE_UI.PURCHASABLE_TOTAL_LABEL
     : CART_PAGE_UI.TOTAL_LABEL;
 
@@ -236,9 +247,9 @@ export default function CartScreen() {
         <View style={styles.footerTotalBlock}>
           <Text style={styles.footerTotalLabel}>{totalLabel}</Text>
           <Text style={styles.footerTotalValue} numberOfLines={1}>
-            {formatPriceRub(checkoutSummary.displayTotal)}
+            {formatPriceRub(checkoutSummary.selectedTotal)}
           </Text>
-          {checkoutSummary.hasExcludedLines ? (
+          {checkoutSummary.hasPartialSelection ? (
             <Text style={styles.footerFullTotalHint} numberOfLines={1}>
               {formatPriceRub(checkoutSummary.fullTotal)}
             </Text>
@@ -273,9 +284,25 @@ export default function CartScreen() {
         style={styles.container}
         data={visibleLines}
         keyExtractor={(line) => line.productId}
-        renderItem={({ item }) => <CartLineItem line={item} />}
+        renderItem={({ item }) => (
+          <CartLineItem
+            line={item}
+            selected={isLineSelected(item.productId)}
+            onToggleSelected={toggleLine}
+          />
+        )}
         ListHeaderComponent={
-          <CartAuctionSection bids={auctionBids} onCheckout={handleOpenAuctionCheckout} />
+          <>
+            <CartAuctionSection bids={auctionBids} onCheckout={handleOpenAuctionCheckout} />
+            {visibleLines.length > 0 ? (
+              <CartSelectAllRow
+                selectedCount={selectedCount}
+                totalCount={visibleLines.length}
+                areAllSelected={areAllSelected}
+                onToggleAll={toggleAll}
+              />
+            ) : null}
+          </>
         }
         contentContainerStyle={[
           styles.list,

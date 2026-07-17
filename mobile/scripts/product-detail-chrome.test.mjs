@@ -218,6 +218,23 @@ test("mobile product review summary matches web gradient chrome", () => {
   assert.doesNotMatch(reviewsTab, /styles\.summaryCard/);
 });
 
+test("product detail dock CTAs use SquircleView", () => {
+  const purchaseActions = readFile(
+    MOBILE_ROOT,
+    "features/product-detail/ui/ProductDetailPurchaseActions.tsx",
+  );
+  const addToCart = readFile(MOBILE_ROOT, "features/cart-add/ui/AddToCartButton.tsx");
+  const cartStyles = readFile(MOBILE_ROOT, "shared/theme/uploadFieldStyles.ts");
+  const catalogStyles = readFile(MOBILE_ROOT, "shared/theme/catalogProductStyles.ts");
+
+  assert.match(purchaseActions, /SquircleView/);
+  assert.match(purchaseActions, /PRODUCT_DETAIL_SHORTCUT_BORDER_RADIUS/);
+  assert.match(addToCart, /SquircleView/);
+  assert.match(addToCart, /PRODUCT_DETAIL_DOCK_CTA_BORDER_RADIUS/);
+  assert.match(cartStyles, /PRODUCT_DETAIL_DOCK_CTA_BORDER_RADIUS = 11\.2/);
+  assert.match(catalogStyles, /PRODUCT_DETAIL_SHORTCUT_BORDER_RADIUS = 8/);
+});
+
 test("mobile product detail screen is outside tabs and uses dock-only scroll padding", () => {
   const rootLayout = readFile(MOBILE_ROOT, "app/_layout.tsx");
   const layoutLib = readFile(MOBILE_ROOT, "shared/lib/productDetailScreenLayout.ts");

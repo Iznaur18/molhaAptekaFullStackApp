@@ -1,15 +1,6 @@
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  useWindowDimensions,
-  View,
-} from "react-native";
+import { Pressable, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { buildRegisterPayload } from "@/entities/session/lib/buildRegisterPayload";
@@ -20,19 +11,22 @@ import { RegisterLegalConsentFields } from "@/features/legal/ui/RegisterLegalCon
 import { API_CLIENT_UI, AUTH_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
+import { useStableAuthHeroHeight } from "@/shared/lib/useStableAuthHeroHeight";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useLoginScreenStyles } from "@/shared/theme/formChromeStyles";
 import { AppButton } from "@/shared/ui/AppButton";
+import { AuthScreenScroll } from "@/shared/ui/AuthScreenScroll";
 import { CachedProductImage } from "@/shared/ui/CachedProductImage";
+import { PasswordTextInput } from "@/shared/ui/PasswordTextInput";
 
-type RegisterField = "email" | "userName" | "password" | "passwordConfirm";
+type RegisterField = "email" | "userName";
 
 export default function RegisterScreen() {
   const router = useRouter();
   const theme = useAppTheme();
   const styles = useLoginScreenStyles();
   const insets = useSafeAreaInsets();
-  const { height: screenHeight } = useWindowDimensions();
+  const heroHeight = useStableAuthHeroHeight();
   const registerMutation = useRegisterMutation();
   const [email, setEmail] = useState("");
   const [userName, setUserName] = useState("");
@@ -52,9 +46,6 @@ export default function RegisterScreen() {
     termsAccepted,
     personalDataConsentAccepted,
   });
-
-  // Умеренная высота hero, чтобы поля были выше и не перекрывались клавиатурой.
-  const heroHeight = Math.round(Math.min(280, Math.max(170, screenHeight * 0.28)));
 
   const handleBack = useCallback(() => {
     if (router.canGoBack()) {
@@ -91,10 +82,7 @@ export default function RegisterScreen() {
     : consentError;
 
   return (
-    <KeyboardAvoidingView
-      style={styles.flex}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
+    <View style={styles.flex}>
       <Pressable
         style={[
           styles.backButtonOverlay,
@@ -111,13 +99,7 @@ export default function RegisterScreen() {
         <Text style={styles.backButtonOverlayText}>{AUTH_UI.BACK_BUTTON}</Text>
       </Pressable>
 
-      <ScrollView
-        style={styles.flex}
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-        automaticallyAdjustKeyboardInsets
-      >
+      <AuthScreenScroll style={styles.flex} contentContainerStyle={styles.scrollContent}>
         <View style={[styles.hero, { height: heroHeight }]}>
           {bannerImageUri ? (
             <CachedProductImage
@@ -171,35 +153,22 @@ export default function RegisterScreen() {
 
             <View style={styles.field}>
               <Text style={styles.label}>{AUTH_UI.PASSWORD_LABEL}</Text>
-              <TextInput
-                style={[styles.input, focusedField === "password" && styles.inputFocused]}
+              <PasswordTextInput
                 value={password}
                 onChangeText={setPassword}
-                onFocus={() => setFocusedField("password")}
-                onBlur={() => setFocusedField(null)}
-                secureTextEntry
                 textContentType="newPassword"
-                placeholder={AUTH_UI.PASSWORD_PLACEHOLDER}
-                placeholderTextColor={theme.colors.textMuted}
                 returnKeyType="next"
               />
             </View>
 
             <View style={styles.field}>
               <Text style={styles.label}>{AUTH_UI.PASSWORD_CONFIRM_LABEL}</Text>
-              <TextInput
-                style={[
-                  styles.input,
-                  focusedField === "passwordConfirm" && styles.inputFocused,
-                ]}
+              <PasswordTextInput
                 value={passwordConfirm}
                 onChangeText={setPasswordConfirm}
-                onFocus={() => setFocusedField("passwordConfirm")}
-                onBlur={() => setFocusedField(null)}
-                secureTextEntry
                 textContentType="newPassword"
                 placeholder={AUTH_UI.PASSWORD_CONFIRM_PLACEHOLDER}
-                placeholderTextColor={theme.colors.textMuted}
+                accessibilityLabel={AUTH_UI.PASSWORD_CONFIRM_LABEL}
                 returnKeyType="go"
                 onSubmitEditing={handleSubmit}
               />
@@ -241,7 +210,7 @@ export default function RegisterScreen() {
             </Pressable>
           </View>
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </AuthScreenScroll>
+    </View>
   );
 }

@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
-import { FlatList, View } from "react-native";
+import { FlatList, Text, View } from "react-native";
 
 import type { UserStoryRing } from "@/entities/user-story/api/userStoryApi";
 import { CreateUserStoryModal } from "@/features/home-feed/ui/CreateUserStoryModal";
@@ -93,6 +93,7 @@ export const UserStoriesStrip = ({
           radius={USER_STORY_STRIP_LAYOUT.scrollBorderRadius}
           style={styles.scrollWrapper}
         >
+          <Text style={styles.title}>{HOME_FEED_UI.STORIES_SECTION_TITLE}</Text>
           <FlatList
             horizontal
             {...nestedHorizontalScrollProps}

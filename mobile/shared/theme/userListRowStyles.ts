@@ -4,6 +4,12 @@ import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 const USER_LIST_ROW_AVATAR_SIZE = Math.round(52 * 1.2);
 
+/** Узкая плитка users-grid (2 колонки на телефоне) — метрики в одну колонку. */
+export const USER_LIST_ROW_METRICS_STACK_MAX_CARD_WIDTH = 240;
+
+export const resolveUserListRowMetricsStacked = (cardWidth: number): boolean =>
+  cardWidth > 0 && cardWidth <= USER_LIST_ROW_METRICS_STACK_MAX_CARD_WIDTH;
+
 export const useUserListRowStyles = createThemedStyles((theme) => ({  row: {
     flex: 1,
     flexDirection: "column",
@@ -69,6 +75,10 @@ export const useUserListRowStyles = createThemedStyles((theme) => ({  row: {
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: theme.colors.border,
   },
+  metricsStacked: {
+    flexDirection: "column",
+    flexWrap: "nowrap",
+  },
   metricCell: {
     width: "48%",
     gap: 2,
@@ -76,6 +86,12 @@ export const useUserListRowStyles = createThemedStyles((theme) => ({  row: {
     paddingVertical: 6,
     borderRadius: 8,
     backgroundColor: theme.colors.surfaceMuted,
+  },
+  metricCellStacked: {
+    width: "100%",
+    alignSelf: "stretch",
+    flexGrow: 0,
+    flexShrink: 0,
   },
   metricLabel: {
     fontSize: 10,

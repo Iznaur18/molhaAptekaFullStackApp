@@ -1,15 +1,6 @@
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  Text,
-  TextInput,
-  useWindowDimensions,
-  View,
-} from "react-native";
-
+import { Pressable, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useLoginMutation } from "@/entities/session/model/useLoginMutation";
@@ -17,29 +8,29 @@ import { useGuestProfileLoginMenuBannerImageQuery } from "@/entities/site-header
 import { API_CLIENT_UI, AUTH_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
+import { useStableAuthHeroHeight } from "@/shared/lib/useStableAuthHeroHeight";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useLoginScreenStyles } from "@/shared/theme/formChromeStyles";
 import { AppButton } from "@/shared/ui/AppButton";
+import { AuthScreenScroll } from "@/shared/ui/AuthScreenScroll";
 import { CachedProductImage } from "@/shared/ui/CachedProductImage";
+import { PasswordTextInput } from "@/shared/ui/PasswordTextInput";
 
 export default function LoginScreen() {
   const router = useRouter();
   const theme = useAppTheme();
   const styles = useLoginScreenStyles();
   const insets = useSafeAreaInsets();
-  const { height: screenHeight } = useWindowDimensions();
+  const heroHeight = useStableAuthHeroHeight();
   const loginMutation = useLoginMutation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [focusedField, setFocusedField] = useState<"email" | "password" | null>(null);
+  const [emailFocused, setEmailFocused] = useState(false);
 
   const bannerImageQuery = useGuestProfileLoginMenuBannerImageQuery();
   const bannerImageUri = bannerImageQuery.data
     ? resolveUploadedMediaUrl(bannerImageQuery.data)
     : null;
-
-  // Умеренная высота hero, чтобы поля были выше и не перекрывались клавиатурой.
-  const heroHeight = Math.round(Math.min(280, Math.max(170, screenHeight * 0.28)));
 
   const handleBack = useCallback(() => {
     if (router.canGoBack()) {
@@ -63,10 +54,7 @@ export default function LoginScreen() {
     : "";
 
   return (
-    <KeyboardAvoidingView
-      style={styles.flex}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
+    <View style={styles.flex}>
       <Pressable
         style={[
           styles.backButtonOverlay,
@@ -83,7 +71,7 @@ export default function LoginScreen() {
         <Text style={styles.backButtonOverlayText}>{AUTH_UI.BACK_BUTTON}</Text>
       </Pressable>
 
-      <View style={[styles.flex, styles.page]}>
+      <AuthScreenScroll style={styles.flex} contentContainerStyle={styles.scrollContent}>
         <View style={[styles.hero, { height: heroHeight }]}>
           {bannerImageUri ? (
             <CachedProductImage
@@ -104,11 +92,11 @@ export default function LoginScreen() {
             <View style={styles.field}>
               <Text style={styles.label}>{AUTH_UI.EMAIL_LABEL}</Text>
               <TextInput
-                style={[styles.input, focusedField === "email" && styles.inputFocused]}
+                style={[styles.input, emailFocused && styles.inputFocused]}
                 value={email}
                 onChangeText={setEmail}
-                onFocus={() => setFocusedField("email")}
-                onBlur={() => setFocusedField(null)}
+                onFocus={() => setEmailFocused(true)}
+                onBlur={() => setEmailFocused(false)}
                 autoCapitalize="none"
                 autoCorrect={false}
                 keyboardType="email-address"
@@ -121,16 +109,9 @@ export default function LoginScreen() {
 
             <View style={styles.field}>
               <Text style={styles.label}>{AUTH_UI.PASSWORD_LABEL}</Text>
-              <TextInput
-                style={[styles.input, focusedField === "password" && styles.inputFocused]}
+              <PasswordTextInput
                 value={password}
                 onChangeText={setPassword}
-                onFocus={() => setFocusedField("password")}
-                onBlur={() => setFocusedField(null)}
-                secureTextEntry
-                textContentType="password"
-                placeholder={AUTH_UI.PASSWORD_PLACEHOLDER}
-                placeholderTextColor={theme.colors.textMuted}
                 returnKeyType="go"
                 onSubmitEditing={handleSubmit}
               />
@@ -154,7 +135,7 @@ export default function LoginScreen() {
             </Pressable>
           </View>
         </View>
-      </View>
-    </KeyboardAvoidingView>
+      </AuthScreenScroll>
+    </View>
   );
 }

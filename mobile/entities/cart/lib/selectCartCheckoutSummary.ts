@@ -5,14 +5,16 @@ import type { CartLine } from "./selectCartLines";
 import { selectPurchasableCartLines } from "./selectPurchasableCartLines";
 
 export type CartCheckoutSummary = {
-  purchasableLines: CartLine[];
-  excludedCount: number;
+  /** Строки, которые уйдут в заказ: доступные к покупке и отмеченные галочкой. */
+  selectedLines: CartLine[];
   checkoutBlockReason: string | null;
-  displayTotal: number;
+  selectedTotal: number;
   fullTotal: number;
-  purchasableTotal: number;
-  hasExcludedLines: boolean;
+  /** Итог к оформлению меньше итога по корзине: часть строк исключена или не выбрана. */
+  hasPartialSelection: boolean;
 };
+
+const EMPTY_DESELECTION: ReadonlySet<string> = new Set();
 
 const sumLineTotals = (lines: CartLine[]) =>
   lines.reduce((sum, line) => sum + line.lineTotal, 0);
@@ -20,10 +22,15 @@ const sumLineTotals = (lines: CartLine[]) =>
 const resolveCheckoutBlockReason = (
   lines: CartLine[],
   purchasableLines: CartLine[],
+  selectedLines: CartLine[],
   currentUserId?: string | null,
 ): string | null => {
-  if (lines.length === 0 || purchasableLines.length > 0) {
+  if (lines.length === 0 || selectedLines.length > 0) {
     return null;
+  }
+
+  if (purchasableLines.length > 0) {
+    return CART_PAGE_UI.CHECKOUT_BLOCKED_NOTHING_SELECTED;
   }
 
   const reasons = lines.map((line) => getCartLineExclusionReason(line, currentUserId));
@@ -42,19 +49,23 @@ const resolveCheckoutBlockReason = (
 export const selectCartCheckoutSummary = (
   lines: CartLine[],
   currentUserId?: string | null,
+  deselectedIds: ReadonlySet<string> = EMPTY_DESELECTION,
 ): CartCheckoutSummary => {
   const purchasableLines = selectPurchasableCartLines(lines, currentUserId);
-  const excludedCount = lines.length - purchasableLines.length;
-  const fullTotal = sumLineTotals(lines);
-  const purchasableTotal = sumLineTotals(purchasableLines);
+  const selectedLines = purchasableLines.filter(
+    (line) => !deselectedIds.has(line.productId),
+  );
 
   return {
-    purchasableLines,
-    excludedCount,
-    checkoutBlockReason: resolveCheckoutBlockReason(lines, purchasableLines, currentUserId),
-    displayTotal: excludedCount > 0 ? purchasableTotal : fullTotal,
-    fullTotal,
-    purchasableTotal,
-    hasExcludedLines: excludedCount > 0,
+    selectedLines,
+    checkoutBlockReason: resolveCheckoutBlockReason(
+      lines,
+      purchasableLines,
+      selectedLines,
+      currentUserId,
+    ),
+    selectedTotal: sumLineTotals(selectedLines),
+    fullTotal: sumLineTotals(lines),
+    hasPartialSelection: selectedLines.length < lines.length,
   };
 };

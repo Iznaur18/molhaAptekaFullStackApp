@@ -7,12 +7,15 @@ import { useUsersSearchInputStyles } from "@/shared/theme/usersSearchInputStyles
 type UsersSearchInputProps = {
   value: string;
   onChange: (next: string) => void;
+  /** Запуск поиска: только по «Найти» на клавиатуре, не по вводу. */
+  onSubmit: () => void;
   isPending?: boolean;
 };
 
 export const UsersSearchInput = ({
   value,
   onChange,
+  onSubmit,
   isPending = false,
 }: UsersSearchInputProps) => {
   const styles = useUsersSearchInputStyles();
@@ -25,6 +28,8 @@ export const UsersSearchInput = ({
         style={styles.field}
         value={value}
         onChangeText={onChange}
+        onSubmitEditing={onSubmit}
+        returnKeyType="search"
         placeholder={USER_SEARCH_INPUT_UI.PLACEHOLDER}
         placeholderTextColor={theme.colors.textMuted}
         accessibilityLabel={USER_SEARCH_INPUT_UI.ARIA_LABEL}

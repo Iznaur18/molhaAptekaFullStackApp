@@ -81,6 +81,7 @@ const NON_CATALOG_VIEW_TITLES = {
  *   onProductCategoryFilterToggle: () => void;
  *   onCloseProductCategoryFilter: () => void;
  *   onProductSearchTermChange: (next: string) => void;
+ *   onProductSearchSubmit: () => void;
  *   onPlaceProductClick: () => void;
  *   onMyProfileClick: () => void;
  *   onNotificationsClick: () => void;
@@ -114,6 +115,7 @@ export function AppShellHeader({
   onProductCategoryFilterToggle,
   onCloseProductCategoryFilter,
   onProductSearchTermChange,
+  onProductSearchSubmit,
   onPlaceProductClick,
   onMyProfileClick,
   onNotificationsClick,
@@ -244,6 +246,7 @@ export function AppShellHeader({
                 <SearchInput
                   value={productSearchTerm}
                   onChange={onProductSearchTermChange}
+                  onSubmit={onProductSearchSubmit}
                   placeholder={PRODUCT_SEARCH_INPUT_UI.PLACEHOLDER}
                   ariaLabel={PRODUCT_SEARCH_INPUT_UI.ARIA_LABEL}
                   clearAriaLabel={PRODUCT_SEARCH_INPUT_UI.CLEAR_ARIA}

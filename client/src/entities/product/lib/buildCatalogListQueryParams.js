@@ -9,14 +9,14 @@ export function buildCatalogListQueryParams({
   activeCatalogBrowserCategory,
   activeCatalogBrowserCategoryId,
   catalogQueryFromUrl,
-  debouncedProductSearchTerm,
+  appliedProductSearchTerm,
   selectedProductCategory,
   catalogSort,
   myProductsModerationFilter,
   canModerateProducts,
   showHiddenCatalogProducts,
 }) {
-  const search = debouncedProductSearchTerm.trim();
+  const search = appliedProductSearchTerm.trim();
   const sellerPersonalCategoryId = isCatalogBrowserMainViewActive
     ? (catalogQueryFromUrl.sellerPersonalCategoryId ?? null)
     : null;

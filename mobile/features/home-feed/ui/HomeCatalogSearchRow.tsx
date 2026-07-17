@@ -13,6 +13,7 @@ import { useHomeCatalogHeaderStyles } from "@/shared/theme/homeCatalogHeaderStyl
 type HomeCatalogSearchRowProps = {
   value: string;
   onChange: (value: string) => void;
+  onSubmit: () => void;
   /** Safe-area уже учтён spacer'ом foreground-sheet. */
   embeddedInForegroundSheet?: boolean;
 };
@@ -20,6 +21,7 @@ type HomeCatalogSearchRowProps = {
 export const HomeCatalogSearchRow = ({
   value,
   onChange,
+  onSubmit,
   embeddedInForegroundSheet = false,
 }: HomeCatalogSearchRowProps) => {
   const insets = useSafeAreaInsets();
@@ -31,7 +33,7 @@ export const HomeCatalogSearchRow = ({
   return (
     <HomeCatalogHeaderPanel paddingTop={paddingTop} flatSheet={embeddedInForegroundSheet}>
       <View style={styles.topRow}>
-        <HomeCatalogHeaderSearch value={value} onChange={onChange} />
+        <HomeCatalogHeaderSearch value={value} onChange={onChange} onSubmit={onSubmit} />
         <HomeCatalogUsersButton embeddedInForegroundSheet={embeddedInForegroundSheet} />
       </View>
     </HomeCatalogHeaderPanel>

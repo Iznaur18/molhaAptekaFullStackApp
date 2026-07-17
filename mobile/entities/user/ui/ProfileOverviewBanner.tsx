@@ -43,9 +43,19 @@ export const ProfileOverviewBanner = ({
   );
   const avatarFocus = useMemo(() => getUserAvatarFocus(user), [user]);
   const backgroundFocus = useMemo(() => getUserBackgroundFocus(user), [user]);
+  // Мемоизируем по координатам (не по ссылке focus): фоновый рефетч сессии
+  // пересоздаёт объект focus с теми же x/y — вью не должна передёргиваться.
   const backgroundContentPosition = useMemo(
     () => formatProfileImageContentPosition(backgroundFocus),
-    [backgroundFocus],
+    [backgroundFocus.x, backgroundFocus.y],
+  );
+  const backgroundImageUrl =
+    profileBackground.kind === "image" ? profileBackground.url : null;
+  // Стабильная ссылка на source по строке uri — иначе новый {uri} каждый рендер
+  // заставляет expo-image сравнивать источник и мигать при обновлении данных.
+  const backgroundSource = useMemo(
+    () => (backgroundImageUrl ? { uri: backgroundImageUrl } : null),
+    [backgroundImageUrl],
   );
 
   const canShowBackground =
@@ -71,12 +81,14 @@ export const ProfileOverviewBanner = ({
           !canShowBackground && styles.bannerFallback,
         ]}
       >
-        {profileBackground.kind === "image" && canShowBackground ? (
+        {profileBackground.kind === "image" && canShowBackground && backgroundSource ? (
           <Image
-            source={{ uri: profileBackground.url }}
+            source={backgroundSource}
             style={styles.bannerImage}
             contentFit="cover"
             contentPosition={backgroundContentPosition}
+            cachePolicy="memory-disk"
+            recyclingKey={backgroundImageUrl}
             onError={() => setBackgroundLoadFailed(true)}
           />
         ) : null}

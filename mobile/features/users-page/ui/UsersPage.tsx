@@ -6,8 +6,6 @@ import { View } from "react-native";
 import { useUsersSearchQuery } from "@/entities/user/model/useUsersSearchQuery";
 import { UsersPageBody } from "@/features/users-page/ui/UsersPageBody";
 import { UsersPageSearchBar } from "@/features/users-page/ui/UsersPageSearchBar";
-import { USER_SEARCH_UI } from "@/shared/config";
-import { useDebouncedValue } from "@/shared/lib/useDebouncedValue";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useUsersPageStyles } from "@/shared/theme/usersPageStyles";
 
@@ -16,15 +14,29 @@ export const UsersPage = () => {
   const styles = useUsersPageStyles();
   const { contentPaddingTop } = useScreenLayout();
   const [searchTerm, setSearchTerm] = useState("");
-  const debouncedSearch = useDebouncedValue(searchTerm, USER_SEARCH_UI.DEBOUNCE_MS);
-  const isSearchPending = searchTerm !== debouncedSearch;
-  const normalizedSearch = debouncedSearch.trim();
+  const [submittedSearch, setSubmittedSearch] = useState("");
+  const normalizedSearch = submittedSearch.trim();
   const hasSearchQuery = normalizedSearch.length >= USER_SEARCH_MIN_LENGTH;
 
   const { phase, users, error, refetch, isRefetching, isSearchInputTooShort } =
     useUsersSearchQuery({
-      search: debouncedSearch,
+      search: submittedSearch,
     });
+
+  const isSearchPending = hasSearchQuery && phase === "loading";
+
+  // Ввод не ищет сам по себе — запрос уходит по «Найти» на клавиатуре. Пустое
+  // поле не поиск, а отмена: список возвращается к общему сразу.
+  const handleSearchTermChange = (next: string) => {
+    setSearchTerm(next);
+    if (next.trim() === "") {
+      setSubmittedSearch("");
+    }
+  };
+
+  const handleSearchSubmit = () => {
+    setSubmittedSearch(searchTerm);
+  };
 
   const handleUserPress = (userId: string) => {
     router.push({ pathname: "/user/[id]", params: { id: userId } });
@@ -36,7 +48,8 @@ export const UsersPage = () => {
     <View style={[styles.screen, { paddingTop: contentPaddingTop }]}>
       <UsersPageSearchBar
         value={searchTerm}
-        onChange={setSearchTerm}
+        onChange={handleSearchTermChange}
+        onSubmit={handleSearchSubmit}
         isPending={isSearchPending}
       />
       <UsersPageBody

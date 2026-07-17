@@ -7,6 +7,7 @@ type UserListRowMetricProps = {
   value: string;
   variant?: "amount" | "muted";
   accessibilityLabel?: string;
+  stacked?: boolean;
 };
 
 export const UserListRowMetric = ({
@@ -14,13 +15,17 @@ export const UserListRowMetric = ({
   value,
   variant = "amount",
   accessibilityLabel,
+  stacked = false,
 }: UserListRowMetricProps) => {
   const styles = useUserListRowStyles();
   const valueStyle =
     variant === "muted" ? styles.metricValueMuted : styles.metricValueAmount;
 
   return (
-    <View style={styles.metricCell} accessibilityLabel={accessibilityLabel}>
+    <View
+      style={[styles.metricCell, stacked && styles.metricCellStacked]}
+      accessibilityLabel={accessibilityLabel}
+    >
       <Text style={styles.metricLabel}>{label}</Text>
       <Text style={[styles.metricValue, valueStyle]} numberOfLines={1}>
         {value}

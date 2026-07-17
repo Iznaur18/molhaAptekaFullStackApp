@@ -35,5 +35,7 @@ export type IzTheme = {
 
 export type ColorScheme = "light" | "dark";
 
+export const isDimColorScheme = (scheme: ColorScheme): boolean => scheme === "dark";
+
 export const resolveIzTheme = (scheme: ColorScheme): IzTheme =>
   scheme === "dark" ? (izThemeDark as IzTheme) : (izTheme as IzTheme);

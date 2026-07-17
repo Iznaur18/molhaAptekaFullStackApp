@@ -177,6 +177,9 @@ export const useProductPhotoGridStyles = createThemedStyles((theme) => ({
 /** Совпадает с --iz-color-warning-amber в designTokens.css */
 export const PRODUCT_DETAIL_DOCK_WARNING_AMBER = semanticColors.warning;
 
+/** Squircle radius для CTA в product-detail dock */
+export const PRODUCT_DETAIL_DOCK_CTA_BORDER_RADIUS = 11.2;
+
 export const useAddToCartButtonStyles = createThemedStyles((theme) => ({
   addButton: {
     marginTop: theme.spacing[4],
@@ -190,13 +193,15 @@ export const useAddToCartButtonStyles = createThemedStyles((theme) => ({
     fontWeight: "600",
     fontSize: 15,
   },
+  detailDockPressable: {
+    width: "100%",
+  },
   detailDockAddButton: {
     marginTop: 0,
     width: "100%",
     minHeight: 48,
     paddingVertical: 12,
     paddingHorizontal: 16,
-    borderRadius: 11.2,
     borderWidth: 1,
     borderColor: theme.colors.action,
     backgroundColor: theme.colors.action,
@@ -214,7 +219,6 @@ export const useAddToCartButtonStyles = createThemedStyles((theme) => ({
     minHeight: 48,
     paddingVertical: 12,
     paddingHorizontal: 16,
-    borderRadius: 11.2,
     borderWidth: 1,
     borderColor: theme.colors.action,
     backgroundColor: theme.colors.action,
@@ -236,7 +240,6 @@ export const useAddToCartButtonStyles = createThemedStyles((theme) => ({
     gap: 10,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 11.2,
     borderWidth: 1,
     borderColor: theme.colors.action,
     backgroundColor: theme.colors.actionSurface,

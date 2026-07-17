@@ -23,6 +23,7 @@ import { INTEGER_INPUT_FIELD_PROPS } from "../../../shared/lib/numericInput.js";
 import { ImageUrlField } from "../../../shared/ui/ImageUrlField/ImageUrlField.jsx";
 import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
 import { ProfileImageFocusEditor } from "./ProfileImageFocusEditor.jsx";
+import { DEFAULT_USER_BACKGROUND_FOCUS } from "../lib/profileImageFocus.js";
 import { UserBackgroundPresetPicker } from "./UserBackgroundPresetPicker.jsx";
 import { UserBackgroundPreview } from "./UserBackgroundPreview.jsx";
 import { AdminPremiumStaffControl } from "./AdminPremiumStaffControl.jsx";
@@ -236,7 +237,14 @@ export function EditProfileModal({
                     name="backgroundImageUrl"
                     value={form.backgroundImageUrl}
                     onChange={(backgroundImageUrl) =>
-                      setForm((prev) => ({ ...prev, backgroundImageUrl }))
+                      setForm((prev) => ({
+                        ...prev,
+                        backgroundImageUrl,
+                        userBackgroundFocus:
+                          backgroundImageUrl.trim() !== prev.backgroundImageUrl.trim()
+                            ? DEFAULT_USER_BACKGROUND_FOCUS
+                            : prev.userBackgroundFocus,
+                      }))
                     }
                     disabled={isSubmitting}
                     inputClassName="edit-profile-modal__input"

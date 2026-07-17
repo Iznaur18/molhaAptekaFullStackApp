@@ -9,8 +9,6 @@ import {
   CATALOG_SORT_VIEWS,
   MY_PRODUCTS_MODERATION_FILTER_ALL,
 } from "../../../entities/product/model/productConstants.js";
-import { PRODUCT_SEARCH_UI } from "../../../shared/config/appUiCopy.js";
-import { useDebouncedValue } from "../../../shared/lib/useDebouncedValue.js";
 import { parseCatalogQueryFromSearchParams } from "../../../entities/product/lib/catalogCatalogQuery.js";
 import {
   readInitialCatalogCategory,
@@ -26,7 +24,7 @@ export function useCatalogFilterState({
   isMyProductsRoute,
   isCatalogBrowserMainViewActive,
   isCatalogShellView,
-  productSearchTerm,
+  submittedProductSearchTerm,
   initialCatalogQuery,
   isAuthorized,
   setIsLoginModalOpen,
@@ -57,18 +55,14 @@ export function useCatalogFilterState({
     () => initialCatalogQuery?.saleOnly ?? false,
   );
 
-  const debouncedProductSearchTerm = useDebouncedValue(
-    productSearchTerm,
-    PRODUCT_SEARCH_UI.DEBOUNCE_MS,
-  );
-
   const catalogQueryFromUrl = useMemo(
     () => parseCatalogQueryFromSearchParams(new URLSearchParams(location.search)),
     [location.search],
   );
 
-  const isProductSearchPending = productSearchTerm !== debouncedProductSearchTerm;
-  const hasProductSearchQuery = debouncedProductSearchTerm.trim() !== "";
+  // Каталог фильтруется отправленным запросом («Найти»), а не текстом в поле.
+  const appliedProductSearchTerm = submittedProductSearchTerm;
+  const hasProductSearchQuery = appliedProductSearchTerm.trim() !== "";
   const isMineMode = isMyProductsRoute;
   const activeCatalogBrowserCategory =
     catalogMainView === "catalog-browser" ? catalogQueryFromUrl.category : null;
@@ -201,9 +195,8 @@ export function useCatalogFilterState({
     setCatalogInstallmentOnly,
     catalogSaleOnly,
     setCatalogSaleOnly,
-    debouncedProductSearchTerm,
+    appliedProductSearchTerm,
     catalogQueryFromUrl,
-    isProductSearchPending,
     hasProductSearchQuery,
     isMineMode,
     activeCatalogBrowserCategory,

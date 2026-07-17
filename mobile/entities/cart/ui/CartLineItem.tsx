@@ -10,6 +10,7 @@ import { getProductPurchaseLimit } from "@/entities/product/lib/getProductPurcha
 import { CART_LINE_CARD_BORDER_RADIUS, CART_PAGE_UI } from "@/shared/config";
 import { formatPriceRub } from "@/shared/lib";
 import { useCartLineItemStyles } from "@/shared/theme/commerceScreenStyles";
+import { AppCheckbox } from "@/shared/ui/AppCheckbox";
 import { CachedProductImage } from "@/shared/ui/CachedProductImage";
 import { SquircleView } from "@/shared/ui/SquircleView";
 
@@ -17,9 +18,11 @@ import type { CartLine } from "../lib/selectCartLines";
 
 type CartLineItemProps = {
   line: CartLine;
+  selected: boolean;
+  onToggleSelected: (productId: string) => void;
 };
 
-export const CartLineItem = ({ line }: CartLineItemProps) => {
+export const CartLineItem = ({ line, selected, onToggleSelected }: CartLineItemProps) => {
   const router = useRouter();
   const styles = useCartLineItemStyles();
   const { setItemQuantity, removeItem, isUpdating } = useCartActions();
@@ -118,6 +121,13 @@ export const CartLineItem = ({ line }: CartLineItemProps) => {
         <Text style={styles.lineTotal}>{formatPriceRub(line.lineTotal)}</Text>
       </View>
       </SquircleView>
+
+      <AppCheckbox
+        checked={selected}
+        onPress={() => onToggleSelected(line.productId)}
+        accessibilityLabel={CART_PAGE_UI.SELECT_LINE_ARIA}
+        style={styles.selectCheckbox}
+      />
     </View>
   );
 };

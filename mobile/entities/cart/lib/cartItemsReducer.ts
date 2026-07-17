@@ -50,4 +50,14 @@ export const removeCartItem = (
   productId: string,
 ): CartItemsByProductId => removeKey(items, productId);
 
+export const removeCartItems = (
+  items: CartItemsByProductId,
+  productIds: readonly string[],
+): CartItemsByProductId => {
+  const removed = new Set(productIds);
+  return Object.fromEntries(
+    Object.entries(items).filter(([productId]) => !removed.has(productId)),
+  );
+};
+
 export const clearCartItems = (): CartItemsByProductId => ({});

@@ -95,6 +95,7 @@
     "test:catalog-category-perf": "node --test scripts/catalog-category-perf.test.mjs",
     "test:feed-video-visibility": "node --test scripts/feed-video-visibility.test.mjs",
     "test:commerce-card-expand-toggle": "node --test scripts/commerce-card-expand-toggle.test.mjs",
+    "test:cart-line-selection": "node --test scripts/cart-line-selection.test.mjs",
     "test:users-page-layout": "node --test scripts/users-page-layout.test.mjs",
     "test:raffle-featured-slide": "node --test scripts/raffle-featured-slide-layout.test.mjs",
     "test:raffle-featured-banner": "npm run build --prefix ../packages/shared-lib && node --test scripts/raffle-featured-banner-layout.test.mjs",

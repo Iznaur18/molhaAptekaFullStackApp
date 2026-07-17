@@ -1914,6 +1914,9 @@ export const useProductDetailTabBarStyles = createThemedStyles((theme) => ({
   },
 }));
 
+/** Squircle radius для «В аукцион» / «В рассрочку» в product-detail dock */
+export const PRODUCT_DETAIL_SHORTCUT_BORDER_RADIUS = 8;
+
 export const useProductDetailPurchaseActionsStyles = createThemedStyles((theme) => ({
   root: {
     flexDirection: "row",
@@ -1930,14 +1933,15 @@ export const useProductDetailPurchaseActionsStyles = createThemedStyles((theme) 
   cartSlot: {
     width: "100%",
   },
-  shortcut: {
+  shortcutPressable: {
     flex: 1,
+  },
+  shortcut: {
     minHeight: 40,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 8,
     paddingVertical: 10,
-    borderRadius: theme.radius.input,
     borderWidth: 1,
     borderColor: theme.colors.nearBlack,
     backgroundColor: theme.colors.nearBlack,
@@ -2597,10 +2601,19 @@ export const useUserStoriesStripStyles = createThemedStyles((theme) => ({
     paddingBottom: USER_STORY_STRIP_LAYOUT.paddingBottom,
   },
   scrollWrapper: {
-    minHeight: 119,
+    paddingHorizontal: USER_STORY_STRIP_LAYOUT.blockPaddingHorizontal,
+    paddingVertical: USER_STORY_STRIP_LAYOUT.blockPaddingVertical,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
     backgroundColor: theme.colors.surface,
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: "600",
+    letterSpacing: -0.4,
+    color: theme.colors.ink,
+    marginBottom: USER_STORY_STRIP_LAYOUT.titleMarginBottom,
+    paddingHorizontal: USER_STORY_STRIP_LAYOUT.titlePaddingHorizontal,
   },
   scroll: {
     flexDirection: "row",

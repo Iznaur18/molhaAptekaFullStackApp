@@ -1,4 +1,5 @@
 import { Image } from "expo-image";
+import { useMemo } from "react";
 import { View, type StyleProp, type ViewStyle } from "react-native";
 
 import {
@@ -24,15 +25,24 @@ export const UserPremiumAvatar = ({
   style,
 }: UserPremiumAvatarProps) => {
   const styles = useUserPremiumAvatarStyles();
-  const contentPosition = formatProfileImageContentPosition(focus ?? getUserAvatarFocus(null));
+  const resolvedFocus = focus ?? getUserAvatarFocus(null);
+  // Мемоизация по координатам/строке uri: фоновый рефетч данных не должен
+  // передёргивать вью аватара при неизменных фото и позиции.
+  const contentPosition = useMemo(
+    () => formatProfileImageContentPosition(resolvedFocus),
+    [resolvedFocus.x, resolvedFocus.y],
+  );
+  const source = useMemo(() => ({ uri }), [uri]);
 
   return (
     <View style={[styles.wrap, isPremium && styles.wrapPremium, style]}>
       <Image
-        source={{ uri }}
+        source={source}
         style={styles.image}
         contentFit="cover"
         contentPosition={contentPosition}
+        cachePolicy="memory-disk"
+        recyclingKey={uri}
         onError={onError}
         accessibilityIgnoresInvertColors
       />

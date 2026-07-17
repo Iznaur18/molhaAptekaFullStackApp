@@ -8,7 +8,7 @@ const baseInput = {
   activeCatalogBrowserCategory: null,
   activeCatalogBrowserCategoryId: null,
   catalogQueryFromUrl: {},
-  debouncedProductSearchTerm: "",
+  appliedProductSearchTerm: "",
   selectedProductCategory: null,
   catalogSort: null,
   myProductsModerationFilter: null,
@@ -20,7 +20,7 @@ describe("buildCatalogListQueryParams", () => {
   it("builds public catalog params with filters from URL", () => {
     const params = buildCatalogListQueryParams({
       ...baseInput,
-      debouncedProductSearchTerm: "  аспирин ",
+      appliedProductSearchTerm: "  аспирин ",
       catalogQueryFromUrl: {
         sort: "price_asc",
         auctionOnly: true,

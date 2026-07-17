@@ -7,6 +7,7 @@ import {
   addCartItem,
   clearCartItems,
   removeCartItem,
+  removeCartItems,
   setCartItemQuantity,
 } from "../lib/cartItemsReducer";
 import type { CartItemsByProductId } from "./types";
@@ -51,6 +52,13 @@ export const useCartActions = () => {
     [commitItems, getItems],
   );
 
+  const removeItems = useCallback(
+    async (productIds: readonly string[]) => {
+      await commitItems(removeCartItems(getItems(), productIds));
+    },
+    [commitItems, getItems],
+  );
+
   const clearCart = useCallback(async () => {
     await commitItems(clearCartItems());
   }, [commitItems]);
@@ -60,6 +68,7 @@ export const useCartActions = () => {
     addItem,
     setItemQuantity,
     removeItem,
+    removeItems,
     clearCart,
     isUpdating: replaceMutation.isPending,
   };

@@ -277,7 +277,6 @@ export const AUCTION_PAGE_UI = {
 /** Поиск пользователей (`GET /user/search`) */
 export const USER_SEARCH_UI = {
   API_PAGE_LIMIT: 100,
-  DEBOUNCE_MS: 350,
 };
 
 /** Поле поиска пользователей */
@@ -286,11 +285,6 @@ export const USER_SEARCH_INPUT_UI = {
   ARIA_LABEL: "Поиск пользователей",
   CLEAR_ARIA: "Очистить поле поиска",
   PENDING_ARIA: "Идёт поиск",
-};
-
-/** Поиск товаров (`GET /product` и `GET /product/my`) */
-export const PRODUCT_SEARCH_UI = {
-  DEBOUNCE_MS: 350,
 };
 
 /** Поле поиска товаров */
@@ -464,7 +458,7 @@ export const PRODUCT_CATEGORY_DISPLAY_UI = {
 /** Кнопка добавления товара в корзину */
 export const ADD_TO_CART_UI = {
   ADD: "В корзину",
-  LOGIN_TO_ADD: "Войти, чтобы добавить",
+  LOGIN_TO_ADD: "Войти, чтобы купить",
   DECREASE_ARIA: "Уменьшить количество",
   INCREASE_ARIA: "Увеличить количество",
   QUANTITY_ARIA: "Количество в корзине",
@@ -872,6 +866,7 @@ export const PRODUCT_REPORTS_PAGE_UI = {
 
 /** Сторисы пользователей на главной */
 export const USER_STORY_UI = {
+  SECTION_TITLE: "История",
   ADD_LABEL: "Ваша история",
   LOADING: "Загрузка…",
   MEDIA_LOADING: "Загружаем медиа…",
@@ -1766,7 +1761,7 @@ export const SITE_HEADER_BANNER_UI = {
 export const RAFFLE_FEATURED_CAROUSEL_UI = {
   PREV: "Предыдущий розыгрыш",
   NEXT: "Следующий розыгрыш",
-  SHOW: "Участвуй в розыгрыше",
+  SHOW: "Открыть розыгрыш",
   HIDE: "Скрыть розыгрыш",
   /** @param {number} index @param {number} total */
   SLIDE_ARIA: (index, total) => `Слайд ${index} из ${total}`,
@@ -1914,6 +1909,8 @@ export const LOGIN_MODAL_UI = {
   TITLE: "Вход",
   LABEL_EMAIL: "Email",
   LABEL_PASSWORD: "Пароль",
+  SHOW_PASSWORD_ARIA: "Показать пароль",
+  HIDE_PASSWORD_ARIA: "Скрыть пароль",
   SUBMIT_IDLE: "Войти",
   SUBMIT_LOADING: "Входим…",
   REGISTER_BUTTON: "Зарегистрироваться",
@@ -1932,6 +1929,8 @@ export const REGISTER_MODAL_UI = {
   LABEL_EMAIL: "Email",
   LABEL_PASSWORD: "Пароль",
   LABEL_PASSWORD_CONFIRM: "Повторите пароль",
+  SHOW_PASSWORD_ARIA: "Показать пароль",
+  HIDE_PASSWORD_ARIA: "Скрыть пароль",
   LABEL_USERNAME: "Никнейм",
   USERNAME_HINT:
     "Только a–z и 0–9, без пробелов, 3–30 символов (как одно слово в нижнем регистре).",

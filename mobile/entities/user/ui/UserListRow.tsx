@@ -10,7 +10,10 @@ import { UserListRowMetric } from "@/entities/user/ui/UserListRowMetric";
 import { UserPremiumAvatar } from "@/entities/user/ui/UserPremiumAvatar";
 import { UserPremiumDisplayName } from "@/entities/user/ui/UserPremiumDisplayName";
 import { USER_LIST_ROW_UI } from "@/shared/config";
-import { useUserListRowStyles } from "@/shared/theme/userListRowStyles";
+import {
+  resolveUserListRowMetricsStacked,
+  useUserListRowStyles,
+} from "@/shared/theme/userListRowStyles";
 
 type UserListRowProps = {
   user: UserSearchListItem;
@@ -20,6 +23,8 @@ type UserListRowProps = {
 export const UserListRow = ({ user, onRowClick }: UserListRowProps) => {
   const styles = useUserListRowStyles();
   const [imgFailed, setImgFailed] = useState(false);
+  const [cardWidth, setCardWidth] = useState(0);
+  const metricsStacked = resolveUserListRowMetricsStacked(cardWidth);
 
   const picked = pickUserProfilePhotoUrl(user);
   const src = !imgFailed && picked ? picked : DEFAULT_USER_AVATAR_URL;
@@ -58,9 +63,18 @@ export const UserListRow = ({ user, onRowClick }: UserListRowProps) => {
     onRowClick?.(String(user._id));
   };
 
+  const handleCardLayout = (width: number) => {
+    if (width !== cardWidth) {
+      setCardWidth(width);
+    }
+  };
+
   return (
     <Pressable
       style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
+      onLayout={(event) => {
+        handleCardLayout(event.nativeEvent.layout.width);
+      }}
       onPress={handlePress}
       accessibilityRole="button"
     >
@@ -98,25 +112,29 @@ export const UserListRow = ({ user, onRowClick }: UserListRowProps) => {
         </View>
       ) : null}
 
-      <View style={styles.metrics}>
+      <View style={[styles.metrics, metricsStacked && styles.metricsStacked]}>
         <UserListRowMetric
           label={USER_LIST_ROW_UI.TOTAL_SALES_COUNT_LABEL}
           value={totalSalesCountText}
+          stacked={metricsStacked}
           accessibilityLabel={`${USER_LIST_ROW_UI.TOTAL_SALES_COUNT_LABEL} ${totalSalesCountText}`}
         />
         <UserListRowMetric
           label={USER_LIST_ROW_UI.RATING_SCORE_LABEL}
           value={ratingText}
           variant="muted"
+          stacked={metricsStacked}
           accessibilityLabel={`${USER_LIST_ROW_UI.RATING_SCORE_LABEL} ${ratingText}`}
         />
         <UserListRowMetric
           label={USER_LIST_ROW_UI.FOLLOWERS_LABEL}
           value={followersText}
+          stacked={metricsStacked}
         />
         <UserListRowMetric
           label={USER_LIST_ROW_UI.LOYALTY_POINTS_LABEL}
           value={loyaltyPointsText}
+          stacked={metricsStacked}
           accessibilityLabel={`${USER_LIST_ROW_UI.LOYALTY_POINTS_LABEL} ${loyaltyPointsText}`}
         />
       </View>

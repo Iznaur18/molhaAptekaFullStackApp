@@ -118,6 +118,11 @@ export const SCREEN_STATE_UI = {
 export const EDIT_PROFILE_UI = {
   TITLE: "Редактирование профиля",
   EDIT_BUTTON: "Редактировать профиль",
+  SECTION_APPEARANCE: "Оформление",
+  SECTION_ACCOUNT: "Аккаунт",
+  SECTION_PERSONAL: "Личные данные",
+  SECTION_NOTIFICATIONS: "Уведомления",
+  SECTION_ABOUT: "О себе",
   LABEL_EMAIL: "Email (нельзя изменить)",
   LABEL_USERNAME: "Никнейм",
   USERNAME_HINT: "Только a–z и 0–9, без пробелов, 3–30 символов",
@@ -179,7 +184,7 @@ export const ADMIN_EDIT_USER_UI = {
 
 export const ADD_TO_CART_UI = {
   ADD: "В корзину",
-  LOGIN_TO_ADD: "Войти, чтобы добавить",
+  LOGIN_TO_ADD: "Войти, чтобы купить",
   DECREASE_ARIA: "Уменьшить количество",
   INCREASE_ARIA: "Увеличить количество",
   QUANTITY_ARIA: "Количество в корзине",
@@ -194,6 +199,9 @@ export const CART_PAGE_UI = {
   PURCHASABLE_TOTAL_LABEL: "К оформлению",
   FULL_TOTAL_HINT: "Итого в корзине",
   REMOVE_LINE_ARIA: "Удалить из корзины",
+  SELECT_LINE_ARIA: "Выбрать товар для оформления",
+  SELECT_ALL: "Выбрать все",
+  SELECTED_COUNT: (selected: number, total: number) => `Выбрано ${selected} из ${total}`,
   CLEAR_ALL: "Очистить корзину",
   GO_TO_CATALOG: "Перейти в каталог",
   AUTH_REQUIRED: "Войдите, чтобы пользоваться корзиной",
@@ -201,6 +209,7 @@ export const CART_PAGE_UI = {
   PRODUCT_DELETED_OR_HIDDEN: "Товар недоступен",
   LINE_OWN_PRODUCT: "Ваш товар",
   CHECKOUT_BLOCKED_NO_PURCHASABLE: "Нет позиций для оформления",
+  CHECKOUT_BLOCKED_NOTHING_SELECTED: "Выберите товары для оформления",
   CHECKOUT_BLOCKED_ALL_UNAVAILABLE: "Все товары недоступны",
   CHECKOUT_BLOCKED_OWN_PRODUCTS_ONLY: "Нельзя оформить заказ на свои товары",
   STOCK_REMAINING: (left: number) => `Осталось ${left} шт`,
@@ -514,8 +523,9 @@ export const HOME_FEED_UI = {
   CURATED_SECTION_ARIA: "Подборки товаров",
   RAFFLES_SECTION_TITLE: "Розыгрыш",
   RAFFLES_SECTION_ARIA: "Розыгрыши",
-  SHOW_RAFFLES: "Участвуй в розыгрыше",
+  SHOW_RAFFLES: "Открыть розыгрыш",
   HIDE_RAFFLES: "Скрыть розыгрыш",
+  STORIES_SECTION_TITLE: "История",
   STORIES_SECTION_ARIA: "Сторисы",
 } as const;
 
@@ -865,6 +875,8 @@ export const AUTH_UI = {
   PASSWORD_PLACEHOLDER: "••••••••",
   PASSWORD_CONFIRM_LABEL: "Повторите пароль",
   PASSWORD_CONFIRM_PLACEHOLDER: "••••••••",
+  SHOW_PASSWORD_ARIA: "Показать пароль",
+  HIDE_PASSWORD_ARIA: "Скрыть пароль",
   USER_NAME_LABEL: "Имя пользователя",
   USER_NAME_PLACEHOLDER: "username",
   LOGIN_BUTTON: "Войти",
@@ -965,7 +977,6 @@ export const USER_PROFILE_COPY = {
 
 export const USER_SEARCH_UI = {
   API_PAGE_LIMIT: 100,
-  DEBOUNCE_MS: 350,
 } as const;
 
 export const USER_SEARCH_INPUT_UI = {

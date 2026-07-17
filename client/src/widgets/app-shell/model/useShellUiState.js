@@ -3,7 +3,8 @@ import { useCallback, useEffect, useState } from "react";
 /** @typedef {import('../../entities/product/model/types.js').ProductFromApi} ProductFromApi */
 
 export function useShellUiState() {
-  const [productSearchTerm, setProductSearchTerm] = useState("");
+  const [productSearchTerm, setProductSearchTermState] = useState("");
+  const [submittedProductSearchTerm, setSubmittedProductSearchTerm] = useState("");
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [isProductCategoryListOpen, setIsProductCategoryListOpen] = useState(false);
@@ -70,9 +71,29 @@ export function useShellUiState() {
     setStaffActionNotice(message);
   }, []);
 
+  /**
+   * Ввод в поле поиска. Запрос по нему не уходит — каталог ждёт «Найти»
+   * (`submitProductSearch`). Пустое поле — не поиск, а отмена: сбрасываем
+   * отправленный запрос сразу, чтобы каталог не остался отфильтрованным.
+   *
+   * @param {string} next
+   */
+  const setProductSearchTerm = useCallback((next) => {
+    setProductSearchTermState(next);
+    if (next.trim() === "") {
+      setSubmittedProductSearchTerm("");
+    }
+  }, []);
+
+  const submitProductSearch = useCallback(() => {
+    setSubmittedProductSearchTerm(productSearchTerm);
+  }, [productSearchTerm]);
+
   return {
     productSearchTerm,
     setProductSearchTerm,
+    submittedProductSearchTerm,
+    submitProductSearch,
     isLoginModalOpen,
     setIsLoginModalOpen,
     isRegisterModalOpen,

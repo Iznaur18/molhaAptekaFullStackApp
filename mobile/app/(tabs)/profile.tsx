@@ -41,6 +41,10 @@ export default function ProfileScreen() {
   const sessionQuery = useAuthSessionQuery();
   const [emailModalVisible, setEmailModalVisible] = useState(false);
   const [navSheetVisible, setNavSheetVisible] = useState(false);
+  // Отдельный флаг ручного pull-to-refresh: спиннер не должен реагировать на
+  // фоновый поллинг сессии (useInAppNotificationsPoll рефетчит тот же ключ
+  // каждые 30 с) — иначе RefreshControl программно дёргает контент.
+  const [isManualRefreshing, setIsManualRefreshing] = useState(false);
 
   const guestHeroWidth = useMemo(
     () =>
@@ -73,6 +77,15 @@ export default function ProfileScreen() {
   const handleOverviewPress = () => {
     scrollRef.current?.scrollTo({ y: 0, animated: true });
   };
+
+  const handleManualRefresh = useCallback(async () => {
+    setIsManualRefreshing(true);
+    try {
+      await sessionQuery.refetch();
+    } finally {
+      setIsManualRefreshing(false);
+    }
+  }, [sessionQuery]);
 
   if (isSessionLoading) {
     return (
@@ -168,8 +181,8 @@ export default function ProfileScreen() {
           ]}
           refreshControl={
             <ThemedRefreshControl
-              refreshing={sessionQuery.isRefetching}
-              onRefresh={sessionQuery.refetch}
+              refreshing={isManualRefreshing}
+              onRefresh={handleManualRefresh}
             />
           }
         >

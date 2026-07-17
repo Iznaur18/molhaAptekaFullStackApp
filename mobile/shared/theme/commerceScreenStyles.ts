@@ -280,6 +280,34 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
   },
 }));
 
+export const useCartSelectAllRowStyles = createThemedStyles((theme) => ({
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginHorizontal: 12,
+    marginBottom: 8,
+    /** Ставит чекбокс в одну колонку с чекбоксами карточек ниже. */
+    paddingRight: 12,
+  },
+  count: {
+    fontSize: 13,
+    fontWeight: "500",
+    color: theme.colors.textMuted,
+  },
+  toggle: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingVertical: 6,
+  },
+  toggleLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: theme.colors.text,
+  },
+}));
+
 export const useCartLineItemStyles = createThemedStyles((theme) => ({
   rowOuter: {
     marginHorizontal: 12,
@@ -316,6 +344,13 @@ export const useCartLineItemStyles = createThemedStyles((theme) => ({
     flex: 1,
     minWidth: 0,
     gap: 4,
+    /** Место под чекбокс выбора в правом верхнем углу карточки. */
+    paddingRight: 28,
+  },
+  selectCheckbox: {
+    position: "absolute",
+    top: 12,
+    right: 12,
   },
   stockHint: {
     fontSize: 12,

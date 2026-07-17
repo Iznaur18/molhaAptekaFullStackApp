@@ -73,6 +73,7 @@ export function UserStoriesStrip({
   return (
     <>
       <section className="user-stories-strip" aria-label="Сторисы">
+        <h2 className="user-stories-strip__title">{USER_STORY_UI.SECTION_TITLE}</h2>
         <div className="user-stories-strip__scroll">
           <button
             type="button"

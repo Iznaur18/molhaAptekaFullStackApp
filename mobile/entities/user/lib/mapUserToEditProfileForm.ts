@@ -1,3 +1,4 @@
+import { getUserBackgroundFocus } from "@/entities/user/lib/profileImageFocus";
 import { DEFAULT_USER_AVATAR_URL, USER_GENDER_NO_SELECTED } from "@/entities/user/model/constants";
 import { DEFAULT_USER_BACKGROUND_PRESET_ID } from "@/entities/user/model/userBackgroundPresets";
 import {
@@ -5,6 +6,7 @@ import {
   resolveBackgroundModeFromUser,
   type BackgroundMode,
 } from "@/entities/user/lib/userBackgroundValue";
+import type { ProfileImageFocus } from "@/entities/user/lib/profileImageFocus";
 
 export type StructuredAddress = {
   city: string;
@@ -24,6 +26,7 @@ export type EditProfileFormState = {
   backgroundMode: BackgroundMode;
   backgroundPresetId: string;
   backgroundImageUrl: string;
+  userBackgroundFocus: ProfileImageFocus;
   notificationsEnabled: boolean;
   notesAboutUser: string;
 };
@@ -70,6 +73,7 @@ export const mapUserToEditProfileForm = (
     backgroundMode: bgMode,
     backgroundPresetId: bgFields.presetId || DEFAULT_USER_BACKGROUND_PRESET_ID,
     backgroundImageUrl: bgFields.imageUrl,
+    userBackgroundFocus: getUserBackgroundFocus(user),
     notificationsEnabled: user.notificationsEnabled !== false,
     notesAboutUser: typeof user.notesAboutUser === "string" ? user.notesAboutUser : "",
   };

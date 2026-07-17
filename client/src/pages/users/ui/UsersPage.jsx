@@ -4,12 +4,7 @@ import { USER_SEARCH_MIN_LENGTH, isUsersSearchInputTooShort } from "@molha/api-c
 
 import { useUsersSearchQuery } from "../../../entities/user/model/useUsersSearchQuery.js";
 import { UserListRow } from "../../../entities/user/ui/UserListRow.jsx";
-import {
-  USER_SEARCH_INPUT_UI,
-  USER_SEARCH_UI,
-  USERS_PAGE_UI,
-} from "../../../shared/config/appUiCopy.js";
-import { useDebouncedValue } from "../../../shared/lib/useDebouncedValue.js";
+import { USER_SEARCH_INPUT_UI, USERS_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { SearchInput } from "../../../shared/ui/SearchInput/SearchInput.jsx";
 
 import "./UsersPage.css";
@@ -19,18 +14,32 @@ import "./UsersPage.css";
  */
 export function UsersPage({ onUserRowClick }) {
   const [searchTerm, setSearchTerm] = useState("");
-  const debouncedSearch = useDebouncedValue(searchTerm, USER_SEARCH_UI.DEBOUNCE_MS);
-  const isSearchPending = searchTerm !== debouncedSearch;
-  const hasSearchQuery = debouncedSearch.trim().length >= USER_SEARCH_MIN_LENGTH;
-  const isSearchInputTooShort = isUsersSearchInputTooShort(debouncedSearch);
+  const [submittedSearch, setSubmittedSearch] = useState("");
+  const hasSearchQuery = submittedSearch.trim().length >= USER_SEARCH_MIN_LENGTH;
+  const isSearchInputTooShort = isUsersSearchInputTooShort(submittedSearch);
 
-  const { phase, users, error } = useUsersSearchQuery({ search: debouncedSearch });
+  const { phase, users, error } = useUsersSearchQuery({ search: submittedSearch });
+  const isSearchPending = hasSearchQuery && phase === "loading";
+
+  // Ввод не ищет сам по себе — запрос уходит по «Найти». Пустое поле не поиск,
+  // а отмена: список возвращается к общему сразу.
+  const handleSearchTermChange = (next) => {
+    setSearchTerm(next);
+    if (next.trim() === "") {
+      setSubmittedSearch("");
+    }
+  };
+
+  const handleSearchSubmit = () => {
+    setSubmittedSearch(searchTerm);
+  };
 
   return (
     <div className="users-page">
       <SearchInput
         value={searchTerm}
-        onChange={setSearchTerm}
+        onChange={handleSearchTermChange}
+        onSubmit={handleSearchSubmit}
         placeholder={USER_SEARCH_INPUT_UI.PLACEHOLDER}
         ariaLabel={USER_SEARCH_INPUT_UI.ARIA_LABEL}
         clearAriaLabel={USER_SEARCH_INPUT_UI.CLEAR_ARIA}

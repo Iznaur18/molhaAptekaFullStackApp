@@ -19,6 +19,7 @@ export const useHomeHeaderProps = () => {
     isCatalogSubcategoryPickerActive,
     productSearchTerm,
     setProductSearchTerm,
+    submitProductSearch,
     isProductSearchPending,
     isAuthorized,
     goToMainView,
@@ -83,15 +84,18 @@ export const useHomeHeaderProps = () => {
     setIsRegisterModalOpen(true);
   }, [setIsRegisterModalOpen]);
 
-  const handleProductSearchTermChange = useCallback(
-    (next) => {
-      setProductSearchTerm(next);
-      if (next.trim() !== "" && !isCatalogHeaderMainView(mainView)) {
-        handleNavigateToFullCatalogFromBreadcrumb();
-      }
-    },
-    [mainView, setProductSearchTerm, handleNavigateToFullCatalogFromBreadcrumb],
-  );
+  // Ввод только пишется в поле: ни запроса, ни перехода в каталог до «Найти».
+  const handleProductSearchSubmit = useCallback(() => {
+    submitProductSearch();
+    if (productSearchTerm.trim() !== "" && !isCatalogHeaderMainView(mainView)) {
+      handleNavigateToFullCatalogFromBreadcrumb();
+    }
+  }, [
+    mainView,
+    productSearchTerm,
+    submitProductSearch,
+    handleNavigateToFullCatalogFromBreadcrumb,
+  ]);
 
   return useMemo(
     () => ({
@@ -112,7 +116,8 @@ export const useHomeHeaderProps = () => {
       onProductCategorySelect: handleProductCategorySelect,
       onProductCategoryFilterToggle: handleProductCategoryFilterToggle,
       onCloseProductCategoryFilter: handleCloseProductCategoryFilter,
-      onProductSearchTermChange: handleProductSearchTermChange,
+      onProductSearchTermChange: setProductSearchTerm,
+      onProductSearchSubmit: handleProductSearchSubmit,
       onPlaceProductClick: handleMobilePlaceProductClick,
       pendingModerationCount,
       pendingInstallmentDisputesCount,
@@ -149,7 +154,8 @@ export const useHomeHeaderProps = () => {
       handleProductCategorySelect,
       handleProductCategoryFilterToggle,
       handleCloseProductCategoryFilter,
-      handleProductSearchTermChange,
+      setProductSearchTerm,
+      handleProductSearchSubmit,
       closeCatalogProductDetails,
       pendingModerationCount,
       pendingInstallmentDisputesCount,

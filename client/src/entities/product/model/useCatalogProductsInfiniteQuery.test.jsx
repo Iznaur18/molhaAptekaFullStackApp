@@ -35,7 +35,7 @@ const baseParams = {
   activeCatalogBrowserCategory: null,
   activeCatalogBrowserCategoryId: null,
   catalogQueryFromUrl: {},
-  debouncedProductSearchTerm: "",
+  appliedProductSearchTerm: "",
   selectedProductCategory: null,
   catalogSort: null,
   myProductsModerationFilter: null,

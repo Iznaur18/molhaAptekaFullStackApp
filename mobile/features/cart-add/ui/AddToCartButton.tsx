@@ -9,7 +9,11 @@ import { getProductPurchaseLimit } from "@/entities/product/lib/getProductPurcha
 import { ADD_TO_CART_UI } from "@/shared/config";
 import { FIXED_FONT_PROPS } from "@/shared/lib/fixedTypography";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
-import { useAddToCartButtonStyles } from "@/shared/theme/uploadFieldStyles";
+import {
+  PRODUCT_DETAIL_DOCK_CTA_BORDER_RADIUS,
+  useAddToCartButtonStyles,
+} from "@/shared/theme/uploadFieldStyles";
+import { SquircleView } from "@/shared/ui/SquircleView";
 
 type AddToCartButtonProps = {
   productId: string;
@@ -47,42 +51,65 @@ export const AddToCartButton = ({
   };
 
   if (!isAuthorized) {
+    if (isDetailDock) {
+      return (
+        <Pressable style={styles.detailDockPressable} onPress={handleLogin}>
+          <SquircleView
+            radius={PRODUCT_DETAIL_DOCK_CTA_BORDER_RADIUS}
+            style={styles.detailDockLoginButton}
+          >
+            <Text style={styles.detailDockLoginButtonText} {...fixedFontProps}>
+              {ADD_TO_CART_UI.LOGIN_TO_ADD}
+            </Text>
+          </SquircleView>
+        </Pressable>
+      );
+    }
+
     return (
-      <Pressable
-        style={isDetailDock ? styles.detailDockLoginButton : styles.loginButton}
-        onPress={handleLogin}
-      >
-        <Text
-          style={isDetailDock ? styles.detailDockLoginButtonText : styles.loginButtonText}
-          {...fixedFontProps}
-        >
-          {ADD_TO_CART_UI.LOGIN_TO_ADD}
-        </Text>
+      <Pressable style={styles.loginButton} onPress={handleLogin}>
+        <Text style={styles.loginButtonText}>{ADD_TO_CART_UI.LOGIN_TO_ADD}</Text>
       </Pressable>
     );
   }
 
   if (quantity === 0) {
     const outOfStock = hasStockLimit && purchaseLimit < 1;
+    const disabled = outOfStock || isUpdating;
+
+    if (isDetailDock) {
+      return (
+        <Pressable
+          style={styles.detailDockPressable}
+          onPress={() => addItem(productId, 1)}
+          disabled={disabled}
+        >
+          <SquircleView
+            radius={PRODUCT_DETAIL_DOCK_CTA_BORDER_RADIUS}
+            style={[styles.detailDockAddButton, disabled && styles.buttonDisabled]}
+          >
+            {isUpdating ? (
+              <ActivityIndicator color={theme.colors.onContrast} />
+            ) : (
+              <Text style={styles.detailDockAddButtonText} {...fixedFontProps}>
+                {ADD_TO_CART_UI.ADD}
+              </Text>
+            )}
+          </SquircleView>
+        </Pressable>
+      );
+    }
 
     return (
       <Pressable
-        style={[
-          isDetailDock ? styles.detailDockAddButton : styles.addButton,
-          (outOfStock || isUpdating) && styles.buttonDisabled,
-        ]}
+        style={[styles.addButton, disabled && styles.buttonDisabled]}
         onPress={() => addItem(productId, 1)}
-        disabled={outOfStock || isUpdating}
+        disabled={disabled}
       >
         {isUpdating ? (
           <ActivityIndicator color={theme.colors.onContrast} />
         ) : (
-          <Text
-            style={isDetailDock ? styles.detailDockAddButtonText : styles.addButtonText}
-            {...fixedFontProps}
-          >
-            {ADD_TO_CART_UI.ADD}
-          </Text>
+          <Text style={styles.addButtonText}>{ADD_TO_CART_UI.ADD}</Text>
         )}
       </Pressable>
     );
@@ -109,8 +136,8 @@ export const AddToCartButton = ({
   const stepButtonTextStyle = isDetailDock ? styles.detailDockStepButtonText : styles.stepButtonText;
   const quantityStyle = isDetailDock ? styles.detailDockQuantity : styles.quantity;
 
-  return (
-    <View style={stepperStyle}>
+  const stepperBody = (
+    <>
       <Pressable
         style={stepButtonStyle}
         onPress={handleDecrease}
@@ -138,6 +165,16 @@ export const AddToCartButton = ({
           +
         </Text>
       </Pressable>
-    </View>
+    </>
   );
+
+  if (isDetailDock) {
+    return (
+      <SquircleView radius={PRODUCT_DETAIL_DOCK_CTA_BORDER_RADIUS} style={stepperStyle}>
+        {stepperBody}
+      </SquircleView>
+    );
+  }
+
+  return <View style={stepperStyle}>{stepperBody}</View>;
 };

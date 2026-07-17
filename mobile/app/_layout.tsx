@@ -4,6 +4,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack, usePathname } from "expo-router";
+import Constants from "expo-constants";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
 import "react-native-reanimated";
@@ -20,7 +21,9 @@ import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
 export { ErrorBoundary } from "expo-router";
 
 SplashScreen.preventAutoHideAsync();
-SplashScreen.setOptions({ fade: true, duration: 300 });
+if (Constants.appOwnership !== "expo") {
+  SplashScreen.setOptions({ fade: true, duration: 300 });
+}
 
 function RootLayout() {
   const [queryClient] = useState(() => createAppQueryClient());

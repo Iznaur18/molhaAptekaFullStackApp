@@ -3,6 +3,7 @@ import { useState } from "react";
 import { LOGIN_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { isAuthSessionError } from "../../../shared/lib/isAuthSessionError.js";
 import { FormFieldLabel } from "../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
+import { PasswordInputField } from "../../../shared/ui/PasswordInputField/PasswordInputField.jsx";
 import { ProductModalShell } from "../../../shared/ui/ProductModalShell/ProductModalShell.jsx";
 import { useLoginMutation } from "../model/useLoginMutation.js";
 
@@ -93,15 +94,16 @@ export function LoginModal({ isOpen, onClose, onSuccess, onRegisterClick }) {
         </label>
         <label className="login-modal__label">
           <FormFieldLabel required>{LOGIN_MODAL_UI.LABEL_PASSWORD}</FormFieldLabel>
-          <input
+          <PasswordInputField
             className="login-modal__input"
-            type="password"
             name="password"
             value={form.password}
             onChange={handleChange}
             required
             minLength={LOGIN_MODAL_UI.PASSWORD_MIN_LENGTH}
             autoComplete="current-password"
+            showPasswordAria={LOGIN_MODAL_UI.SHOW_PASSWORD_ARIA}
+            hidePasswordAria={LOGIN_MODAL_UI.HIDE_PASSWORD_ARIA}
           />
         </label>
         {status.kind === "error" ? (

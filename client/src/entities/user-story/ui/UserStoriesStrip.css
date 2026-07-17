@@ -1,6 +1,18 @@
 .user-stories-strip {
   margin: 0 0 16px;
-  padding: 8px 0 4px;
+  padding: 8px 12px;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 20px;
+  background-color: var(--iz-color-surface);
+}
+
+.user-stories-strip__title {
+  margin: 0 0 10px;
+  padding: 0 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.4px;
+  color: var(--iz-color-ink);
 }
 
 .user-stories-strip__scroll {
@@ -8,11 +20,10 @@
   gap: 14px;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 12px 4px 12px 12px;
-  border: 1px solid transparent;
-  border-image: none;
-  border-radius: 20px;
-  background-color: rgba(32, 35, 40, 1);
+  padding: 4px 4px 8px;
+  border: none;
+  border-radius: 0;
+  background-color: transparent;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -103,5 +114,5 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 0.75rem;
-  color: var(--iz-color-on-contrast);
+  color: var(--iz-color-text);
 }
