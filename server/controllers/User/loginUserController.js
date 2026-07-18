@@ -2,10 +2,10 @@ import bcrypt from "bcrypt";
 import { bumpUserAuthTokenVersion } from "../../services/auth/userAuthTokenVersion.js";
 import { resolveLogoutUserId } from "../../services/auth/resolveLogoutUserId.js";
 import mongoose from "mongoose";
-import { UserModel, UserVoteRatingModel } from "../../models/index.js";
-import { deleteAllFollowsForUser } from "../../services/user/userFollowHelpers.js";
+import { UserModel } from "../../models/index.js";
 import { errorRes, successRes } from "../../services/http/index.js";
 import { sendUserWithToken } from "../../services/auth/sendUserWithToken.js";
+import { resolveLoginEmailVerificationGate } from "../../services/auth/pendingRegistration.js";
 import { clearAuthCookie, clearRefreshCookie } from "../../utils/authCookie.js";
 import {
   USER_DATA,
@@ -16,11 +16,8 @@ import {
   ALLOWED_FIELDS_FOR_MODERATOR_SELF,
 } from "../../constants/constants.js";
 import { isStaffRole } from "../../services/access/adminUserGuard.js";
-import {
-  assertCanDeleteUser,
-  assertCanSetUserRole,
-} from "../../services/access/adminUserGuard.js";
-import { deleteSellerProductsAndRelatedData } from "../../services/user/deleteUserCascade.js";
+import { assertCanSetUserRole } from "../../services/access/adminUserGuard.js";
+import { deleteProfile } from "../../services/user/deleteProfile.js";
 import { cancelIntroAdCampaignsForAdvertiser } from "../../services/intro-ad/introAdCampaignHelpers.js";
 import { getOptionalViewerFromRequest } from "../../services/user/optionalViewerFromRequest.js";
 import { sanitizeUserProfileForViewer } from "../../services/user/userProfileVisibility.js";
@@ -56,30 +53,61 @@ export const loginUserController = async (req, res) => {
 
     const user = await UserModel.findOne({ email }).select("+passwordHash"); // ищем пользователя по email и выбираем поле passwordHash для сравнения пароля с переданным паролем из запроса
 
-    if (!user) {
-      // если пользователь не найден, возвращаем ошибку
+    if (user) {
+      const isValidPassword = await bcrypt.compare(password, user.passwordHash);
+
+      if (!isValidPassword) {
+        return errorRes(res, 400, "Неверный email или пароль");
+      }
+
+      if (user.isBlockedUser) {
+        return errorRes(res, 403, "Аккаунт заблокирован");
+      }
+
+      if (user.isActiveUser === false) {
+        return errorRes(res, 403, "Аккаунт отключён администратором");
+      }
+
+      if (user.isEmailVerified !== true) {
+        const gate = await resolveLoginEmailVerificationGate(email, password);
+        if (gate.kind === "needs_verification") {
+          return errorRes(res, 403, gate.message, {
+            needsEmailVerification: true,
+            pendingToken: gate.pendingToken,
+            email: gate.email,
+          });
+        }
+        if (gate.kind === "expired") {
+          return errorRes(res, 400, gate.message);
+        }
+        return errorRes(res, 403, "Подтвердите email, чтобы войти");
+      }
+
+      user.userLastLoginAt = new Date();
+      await user.save({ validateBeforeSave: false });
+
+      return sendUserWithToken(user, res);
+    }
+
+    const gate = await resolveLoginEmailVerificationGate(email, password);
+
+    if (gate.kind === "needs_verification") {
+      return errorRes(res, 403, gate.message, {
+        needsEmailVerification: true,
+        pendingToken: gate.pendingToken,
+        email: gate.email,
+      });
+    }
+
+    if (gate.kind === "expired") {
+      return errorRes(res, 400, gate.message);
+    }
+
+    if (gate.kind === "invalid_credentials") {
       return errorRes(res, 400, "Неверный email или пароль");
     }
 
-    const isValidPassword = await bcrypt.compare(password, user.passwordHash); // сравниваем пароль из запроса с паролем из базы данных
-
-    if (!isValidPassword) {
-      // если пароль из запроса не совпадает с паролем из базы данных, возвращаем ошибку
-      return errorRes(res, 400, "Неверный email или пароль");
-    }
-
-    if (user.isBlockedUser) {
-      return errorRes(res, 403, "Аккаунт заблокирован");
-    }
-
-    if (user.isActiveUser === false) {
-      return errorRes(res, 403, "Аккаунт отключён администратором");
-    }
-
-    user.userLastLoginAt = new Date();
-    await user.save({ validateBeforeSave: false });
-
-    return sendUserWithToken(user, res); // отправляем пользователя с токеном вход по email + пароль
+    return errorRes(res, 400, "Неверный email или пароль");
   } catch (error) {
     console.error(error);
     return errorRes(res, 500, "Ошибка при входе"); // если произошла ошибка, возвращаем ошибку
@@ -552,106 +580,22 @@ export const userUpdateProfileController = async (req, res) => {
 };
 
 /** Удаление профиля пользователя. DELETE /user/:userId (требует Authorization: Bearer <token>) */
+/**
+ * Удаление профиля: владельцем (самоудаление) либо админом — чужого.
+ * Права, каскад и аудит-лог живут в services/user/deleteProfile.js.
+ * DELETE /user/:userIdClient
+ */
 export const userDeleteProfileController = async (req, res) => {
-  try {
-    const currentUserId = req.userId; // кто удаляет (id из auth middleware) Прошел ли JWT авторизацию
-    const targetUserId = req.params.userIdClient; // кого удаляем (id из URL) ID пользователя которого удаляем (валидация выполняется в middleware userIdParamValidation)
+  const currentUserId = req.userId;
+  const targetUserId = req.params.userIdClient;
 
-    // 1. Проверка существования текущего пользователя
-    const currentUserRole = await UserModel.findById(currentUserId)
-      .select("userRole")
-      .lean();
-    if (!currentUserRole) {
-      return errorRes(res, 401, "Текущий пользователь не найден. Токен недействителен");
-    }
+  const { isSelfDelete } = await deleteProfile({ currentUserId, targetUserId });
 
-    // 3. Проверка существования целевого пользователя
-    const targetUser = await UserModel.findById(targetUserId)
-      .select("_id userName")
-      .lean();
-    if (!targetUser) {
-      return errorRes(res, 404, "Пользователь для удаления не найден");
-    }
-
-    const isCurrentUserOwner = String(currentUserId) === String(targetUserId);
-    const isCurrentUserAdmin = currentUserRole.userRole === "admin";
-
-    if (isCurrentUserOwner) {
-      return errorRes(res, 403, "Нельзя удалить свой аккаунт");
-    }
-
-    if (!isCurrentUserAdmin) {
-      return errorRes(res, 403, "У вас нет прав на удаление этого профиля");
-    }
-
-    try {
-      await assertCanDeleteUser(targetUserId);
-    } catch (e) {
-      return errorRes(
-        res,
-        400,
-        e instanceof Error ? e.message : "Нельзя удалить пользователя",
-      );
-    }
-
-    // 4. Логирование удаления (для аудита)
-    console.log(
-      `[DELETE PROFILE] User ${currentUserId} deleting profile ${targetUserId} (${targetUser.userName || "N/A"})`,
-    );
-
-    let cascadeSummary = { deletedProductCount: 0, updatedCarts: 0 };
-    try {
-      cascadeSummary = await deleteSellerProductsAndRelatedData(targetUserId);
-    } catch (cascadeError) {
-      const statusCode =
-        cascadeError &&
-        typeof cascadeError === "object" &&
-        "statusCode" in cascadeError &&
-        cascadeError.statusCode === 409
-          ? 409
-          : 500;
-      const message =
-        cascadeError instanceof Error
-          ? cascadeError.message
-          : "Ошибка при удалении товаров пользователя";
-      return errorRes(res, statusCode, message);
-    }
-    console.log(
-      `[DELETE PROFILE] Deleted ${cascadeSummary.deletedProductCount} products, updated ${cascadeSummary.updatedCarts} carts for user ${targetUserId}`,
-    );
-
-    // Каскад: голоса
-    const deletedVotes = await UserVoteRatingModel.deleteMany({
-      $or: [{ userVoter: targetUserId }, { userVoteTarget: targetUserId }],
-    });
-    console.log(
-      `[DELETE PROFILE] Deleted ${deletedVotes.deletedCount} vote records for user ${targetUserId}`,
-    );
-
-    await deleteAllFollowsForUser(targetUserId);
-    console.log(`[DELETE PROFILE] Deleted follow records for user ${targetUserId}`);
-
-    try {
-      await cancelIntroAdCampaignsForAdvertiser(String(targetUserId));
-    } catch (introAdCancelError) {
-      console.error("cancelIntroAdCampaignsForAdvertiser error:", introAdCancelError);
-    }
-
-    // Удаление профиля пользователя
-    const deletedUser = await UserModel.findByIdAndDelete(targetUserId);
-    if (!deletedUser) {
-      return errorRes(res, 404, "Пользователь не найден или уже был удален");
-    }
-
-    return successRes(res, { message: "Профиль успешно удален" });
-  } catch (error) {
-    console.error("userDeleteProfile error:", error);
-
-    // Обработка специфичных ошибок MongoDB
-    if (error.name === "CastError") {
-      return errorRes(res, 400, "Неверный формат данных");
-    }
-
-    return errorRes(res, 500, "Ошибка при удалении профиля");
+  // Самоудаление: своя сессия уже мертва — гасим cookie, как при логауте.
+  if (isSelfDelete) {
+    clearAuthCookie(res);
+    clearRefreshCookie(res);
   }
+
+  return successRes(res, { message: "Профиль успешно удален" });
 };

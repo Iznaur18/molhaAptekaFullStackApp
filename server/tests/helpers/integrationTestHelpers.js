@@ -63,13 +63,44 @@ export const parseErrorMessage = async (response) => {
  * @param {string} suffix
  */
 export const registerUserAndGetCookie = async (request, suffix) => {
-  const response = await request("/auth/register", {
+  const payload = buildRegisterPayload(suffix);
+  const registerResponse = await request("/auth/register", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(buildRegisterPayload(suffix)),
+    body: JSON.stringify(payload),
   });
-  assert.equal(response.status, 200);
-  const cookie = buildCookieHeader(response.headers);
+  assert.equal(registerResponse.status, 200);
+  const registerData = await parseSuccessData(registerResponse);
+  assert.equal(registerData.needsEmailVerification, true);
+  assert.ok(typeof registerData.pendingToken === "string");
+
+  const knownCode = "123456";
+  const { hashEmailVerificationSecret } = await import(
+    "../../services/auth/emailVerification.js"
+  );
+  const { PendingRegistrationModel } = await import("../../models/index.js");
+  const tokenHash = hashEmailVerificationSecret(registerData.pendingToken);
+  await PendingRegistrationModel.findOneAndUpdate(
+    { pendingTokenHash: tokenHash },
+    {
+      $set: {
+        emailVerificationTokenHash: hashEmailVerificationSecret(knownCode),
+        emailVerificationExpiresAt: new Date(Date.now() + 60 * 60 * 1000),
+        emailVerificationAttemptCount: 0,
+      },
+    },
+  );
+
+  const verifyResponse = await request("/auth/verify-email", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      code: knownCode,
+      pendingToken: registerData.pendingToken,
+    }),
+  });
+  assert.equal(verifyResponse.status, 200, await verifyResponse.clone().text());
+  const cookie = buildCookieHeader(verifyResponse.headers);
   const meData = await parseSuccessData(
     await request("/auth/me", { headers: { Cookie: cookie } }),
   );

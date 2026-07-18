@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { after, afterEach, before, test } from "node:test";
 
 import { ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY } from "../constants/orderConstants.js";
-import { ProductModel, UserModel } from "../models/index.js";
+import { ProductModel } from "../models/index.js";
 import { PRODUCT_MODERATION_APPROVED } from "../constants/productModerationConstants.js";
 import {
   buildCookieHeader,
@@ -12,6 +12,7 @@ import {
 import {
   buildTestProductPayload,
   ensureProductCategoryTreeSeeded,
+  registerUserAndGetCookie,
 } from "./helpers/integrationTestHelpers.js";
 import {
   clearMongoCollections,
@@ -75,24 +76,32 @@ const parseSuccessData = async (response) => {
   return body.data;
 };
 
-test("auth smoke: register → me → logout → me guest", async () => {
+test("auth smoke: register pending → verify → me → logout → me guest", async () => {
   const registerResponse = await request("/auth/register", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(registerPayload("auth")),
   });
   assert.equal(registerResponse.status, 200);
+  const pending = await parseSuccessData(registerResponse);
+  assert.equal(pending.needsEmailVerification, true);
+  assert.ok(typeof pending.pendingToken === "string");
+  assert.equal(buildCookieHeader(registerResponse.headers), "");
 
-  const authCookie = buildCookieHeader(registerResponse.headers);
+  const { cookie: authCookie, user } = await registerUserAndGetCookie(
+    request,
+    "auth2",
+  );
+  assert.equal(user.email, "int-auth2@example.com");
   assert.ok(authCookie.includes("access_token"));
-  assert.ok(authCookie.includes("refresh_token"));
 
   const meData = await parseSuccessData(
     await request("/auth/me", {
       headers: { Cookie: authCookie },
     }),
   );
-  assert.equal(meData.user.email, "smoke-auth@example.com");
+  assert.equal(meData.user.email, "int-auth2@example.com");
+  assert.equal(meData.user.isEmailVerified, true);
 
   const logoutResponse = await request("/auth/logout", {
     method: "POST",
@@ -107,15 +116,11 @@ test("auth smoke: register → me → logout → me guest", async () => {
   assert.deepEqual(guestMe.inAppNotifications, []);
 });
 
-test("auth refresh: register → refresh → me", async () => {
-  const registerResponse = await request("/auth/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(registerPayload("refresh")),
-  });
-  assert.equal(registerResponse.status, 200);
-
-  const registerCookies = buildCookieHeader(registerResponse.headers);
+test("auth refresh: register+verify → refresh → me", async () => {
+  const { cookie: registerCookies, user } = await registerUserAndGetCookie(
+    request,
+    "refresh",
+  );
   assert.ok(registerCookies.includes("refresh_token"));
 
   const refreshResponse = await request("/auth/refresh", {
@@ -132,18 +137,14 @@ test("auth refresh: register → refresh → me", async () => {
       headers: { Cookie: refreshedCookies },
     }),
   );
-  assert.equal(meData.user.email, "smoke-refresh@example.com");
+  assert.equal(meData.user.email, user.email);
 });
 
 test("GET /user/search without search: returns user listing for auth viewer", async () => {
-  const registerResponse = await request("/auth/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(registerPayload("userlist")),
-  });
-  assert.equal(registerResponse.status, 200);
-
-  const authCookie = buildCookieHeader(registerResponse.headers);
+  const { cookie: authCookie } = await registerUserAndGetCookie(
+    request,
+    "userlist",
+  );
   const searchResponse = await request("/user/search?page=1&limit=10", {
     headers: { Cookie: authCookie },
   });
@@ -154,18 +155,28 @@ test("GET /user/search without search: returns user listing for auth viewer", as
   assert.ok(data.users.length >= 1);
   assert.equal(typeof data.total, "number");
   assert.ok(data.total >= 1);
-  assert.ok(data.users.some((user) => user.userName === "smokeuseruserlist"));
+  assert.ok(data.users.some((u) => u.userName === "intuseruserlist"));
 });
 
 test("auth refresh rotation: old refresh token rejected", async () => {
-  const registerResponse = await request("/auth/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(registerPayload("rotation")),
-  });
-  assert.equal(registerResponse.status, 200);
+  const verifyResponse = await (async () => {
+    const { cookie } = await registerUserAndGetCookie(request, "rotation");
+    const me = await parseSuccessData(
+      await request("/auth/me", { headers: { Cookie: cookie } }),
+    );
+    const loginResponse = await request("/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: me.user.email,
+        password: "secret12",
+      }),
+    });
+    return loginResponse;
+  })();
+  assert.equal(verifyResponse.status, 200);
 
-  const session = await parseSuccessData(registerResponse);
+  const session = await parseSuccessData(verifyResponse);
   const oldRefreshToken = session.refreshToken;
 
   const refreshResponse = await request("/auth/refresh", {
@@ -187,15 +198,21 @@ test("auth refresh rotation: old refresh token rejected", async () => {
 });
 
 test("auth refresh: body token wins over stale cookie after rotation", async () => {
-  const registerResponse = await request("/auth/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(registerPayload("bodyovercookie")),
-  });
-  assert.equal(registerResponse.status, 200);
+  const loginResponse = await (async () => {
+    const { user } = await registerUserAndGetCookie(request, "bodyovercookie");
+    return request("/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: user.email,
+        password: "secret12",
+      }),
+    });
+  })();
+  assert.equal(loginResponse.status, 200);
 
-  const staleCookies = buildCookieHeader(registerResponse.headers);
-  const session = await parseSuccessData(registerResponse);
+  const staleCookies = buildCookieHeader(loginResponse.headers);
+  const session = await parseSuccessData(loginResponse);
 
   const rotatedResponse = await request("/auth/refresh", {
     method: "POST",
@@ -221,16 +238,20 @@ test("auth refresh: body token wins over stale cookie after rotation", async () 
   assert.equal(desyncRefreshResponse.status, 200);
 });
 
-test("auth mobile: tokens in JSON, bearer me, refresh by body", async () => {
-  const registerResponse = await request("/auth/register", {
+test("auth mobile: tokens in JSON after verify, bearer me, refresh by body", async () => {
+  const { cookie, user } = await registerUserAndGetCookie(request, "mobile");
+  const loginResponse = await request("/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(registerPayload("mobile")),
+    body: JSON.stringify({
+      email: user.email,
+      password: "secret12",
+    }),
   });
-  assert.equal(registerResponse.status, 200);
+  assert.equal(loginResponse.status, 200);
 
-  const session = await parseSuccessData(registerResponse);
-  assert.equal(session.email, "smoke-mobile@example.com");
+  const session = await parseSuccessData(loginResponse);
+  assert.equal(session.email, user.email);
   assert.ok(typeof session.accessToken === "string" && session.accessToken.length > 20);
   assert.ok(typeof session.refreshToken === "string" && session.refreshToken.length > 20);
 
@@ -239,7 +260,7 @@ test("auth mobile: tokens in JSON, bearer me, refresh by body", async () => {
       headers: { Authorization: `Bearer ${session.accessToken}` },
     }),
   );
-  assert.equal(meData.user.email, "smoke-mobile@example.com");
+  assert.equal(meData.user.email, user.email);
 
   const refreshResponse = await request("/auth/refresh", {
     method: "POST",
@@ -257,7 +278,8 @@ test("auth mobile: tokens in JSON, bearer me, refresh by body", async () => {
       headers: { Authorization: `Bearer ${refreshedSession.accessToken}` },
     }),
   );
-  assert.equal(meAfterRefresh.user.email, "smoke-mobile@example.com");
+  assert.equal(meAfterRefresh.user.email, user.email);
+  assert.ok(cookie.includes("access_token"));
 });
 
 test("auth refresh: без cookie и body → 401", async () => {
@@ -271,13 +293,10 @@ test("product smoke: GET /product публичный, POST /product с auth", as
   const catalogData = await parseSuccessData(await request("/product"));
   assert.ok(Array.isArray(catalogData.products));
 
-  const registerResponse = await request("/auth/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(registerPayload("product")),
-  });
-  assert.equal(registerResponse.status, 200);
-  const authCookie = buildCookieHeader(registerResponse.headers);
+  const { cookie: authCookie } = await registerUserAndGetCookie(
+    request,
+    "product",
+  );
 
   const createData = await parseSuccessData(
     await request("/product", {
@@ -292,29 +311,20 @@ test("product smoke: GET /product публичный, POST /product с auth", as
   assert.ok(createData.product?._id);
 });
 
-test("order smoke: без verify email → 403", async () => {
+test("order smoke: без сессии → 401", async () => {
   await ensureProductCategoryTreeSeeded();
 
-  const registerResponse = await request("/auth/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(registerPayload("order")),
-  });
-  assert.equal(registerResponse.status, 200);
-  const authCookie = buildCookieHeader(registerResponse.headers);
-  const meData = await parseSuccessData(
-    await request("/auth/me", { headers: { Cookie: authCookie } }),
+  const { cookie: sellerCookie } = await registerUserAndGetCookie(
+    request,
+    "orderseller",
   );
-  const sellerId = meData.user._id;
-
-  await UserModel.findByIdAndUpdate(sellerId, { isEmailVerified: true });
 
   const createProductData = await parseSuccessData(
     await request("/product", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Cookie: authCookie,
+        Cookie: sellerCookie,
       },
       body: JSON.stringify(productPayload()),
     }),
@@ -324,18 +334,10 @@ test("order smoke: без verify email → 403", async () => {
     productModerationStatus: PRODUCT_MODERATION_APPROVED,
   });
 
-  const buyerResponse = await request("/auth/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(registerPayload("buyer")),
-  });
-  const buyerCookie = buildCookieHeader(buyerResponse.headers);
-
   const orderResponse = await request("/order", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Cookie: buyerCookie,
     },
     body: JSON.stringify({
       items: [{ productId: String(product._id), quantity: 1 }],
@@ -344,5 +346,28 @@ test("order smoke: без verify email → 403", async () => {
       paymentMethod: ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
     }),
   });
-  assert.equal(orderResponse.status, 403);
+  assert.equal(orderResponse.status, 401);
+});
+
+test("login pending registration → needsEmailVerification", async () => {
+  const registerResponse = await request("/auth/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(registerPayload("pendinglogin")),
+  });
+  assert.equal(registerResponse.status, 200);
+
+  const loginResponse = await request("/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email: "smoke-pendinglogin@example.com",
+      password: "secret12",
+    }),
+  });
+  assert.equal(loginResponse.status, 403);
+  const body = await loginResponse.json();
+  assert.equal(body.needsEmailVerification, true);
+  assert.ok(typeof body.pendingToken === "string");
+  assert.equal(body.email, "smoke-pendinglogin@example.com");
 });

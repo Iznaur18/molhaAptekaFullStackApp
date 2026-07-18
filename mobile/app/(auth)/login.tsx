@@ -4,6 +4,7 @@ import { Pressable, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useLoginMutation } from "@/entities/session/model/useLoginMutation";
+import { isNeedsEmailVerificationError } from "@/entities/session/lib/NeedsEmailVerificationError";
 import { useGuestProfileLoginMenuBannerImageQuery } from "@/entities/site-header-banner/model/useGuestProfileLoginMenuBannerImageQuery";
 import { API_CLIENT_UI, AUTH_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
@@ -44,8 +45,16 @@ export default function LoginScreen() {
     try {
       await loginMutation.mutateAsync({ email: email.trim(), password });
       router.replace("/(tabs)");
-    } catch {
-      // error shown via mutation state
+    } catch (error) {
+      if (isNeedsEmailVerificationError(error)) {
+        router.replace({
+          pathname: "/(auth)/verify-email",
+          params: {
+            pendingToken: error.pendingToken,
+            email: error.email,
+          },
+        });
+      }
     }
   };
 

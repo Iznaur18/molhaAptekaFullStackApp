@@ -18,6 +18,8 @@ const EMAIL_VERIFICATION_CODE_PATTERN = new RegExp(`^\\d{${EMAIL_VERIFICATION_CO
 const hashEmailVerificationSecret = (rawSecret) =>
   crypto.createHash("sha256").update(String(rawSecret)).digest("hex");
 
+export { hashEmailVerificationSecret };
+
 export const generateEmailVerificationToken = () =>
   crypto.randomBytes(32).toString("hex");
 

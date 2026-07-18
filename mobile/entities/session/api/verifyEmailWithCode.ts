@@ -1,15 +1,34 @@
-import { apiClient } from "@/shared/api";
+import {
+  apiClient,
+  parseAuthSessionData,
+  setAuthTokens,
+} from "@/shared/api";
 import { API_CLIENT_UI, EMAIL_VERIFICATION_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 
-export const verifyEmailWithCode = async (code: string) => {
+export type VerifyEmailWithCodePayload = {
+  code: string;
+  pendingToken: string;
+};
+
+export const verifyEmailWithCode = async ({
+  code,
+  pendingToken,
+}: VerifyEmailWithCodePayload) => {
   try {
-    const { data } = await apiClient.post("/auth/verify-email", { code });
-    if (!data?.success) {
-      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
-    }
-    return typeof data.message === "string" ? data.message : EMAIL_VERIFICATION_UI.VERIFIED_SUCCESS;
+    const { data } = await apiClient.post("/auth/verify-email", {
+      code,
+      pendingToken,
+    });
+    const session = parseAuthSessionData(data);
+    await setAuthTokens({
+      accessToken: session.accessToken,
+      refreshToken: session.refreshToken,
+    });
+    return session;
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, EMAIL_VERIFICATION_UI.CONFIRM_ERROR));
+    throw new Error(
+      formatApiErrorMessage(error, EMAIL_VERIFICATION_UI.CONFIRM_ERROR),
+    );
   }
 };

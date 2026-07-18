@@ -7,7 +7,6 @@ import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { useGuestProfileLoginMenuBannerImageQuery } from "@/entities/site-header-banner/model/useGuestProfileLoginMenuBannerImageQuery";
-import { EmailVerificationModal } from "@/features/email-verify/ui/EmailVerificationModal";
 import { PROFILE_SECTION_OVERVIEW } from "@/features/profile-hub/model/profileSections";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
@@ -15,7 +14,6 @@ import { ProfileTabOverviewSection } from "@/features/profile-tab/ui/ProfileTabO
 import { ThemePreferenceToggle } from "@/features/theme-settings/ui/ThemePreferenceToggle";
 import {
   AUTH_UI,
-  EMAIL_VERIFICATION_UI,
   LEGAL_UI,
   MY_PROFILE_PAGE_UI,
 } from "@/shared/config";
@@ -39,7 +37,6 @@ export default function ProfileScreen() {
   } = useScreenLayout();
   const safeAreaInsets = useSafeAreaInsets();
   const sessionQuery = useAuthSessionQuery();
-  const [emailModalVisible, setEmailModalVisible] = useState(false);
   const [navSheetVisible, setNavSheetVisible] = useState(false);
   // Отдельный флаг ручного pull-to-refresh: спиннер не должен реагировать на
   // фоновый поллинг сессии (useInAppNotificationsPoll рефетчит тот же ключ
@@ -59,7 +56,6 @@ export default function ProfileScreen() {
 
   const user = sessionQuery.data?.user;
   const isLoggedIn = Boolean(user);
-  const needsEmailVerification = isLoggedIn && user?.isEmailVerified === false;
   const isSessionLoading = sessionQuery.isPending && sessionQuery.data === undefined;
 
   const guestProfileLoginMenuBannerImageQuery = useGuestProfileLoginMenuBannerImageQuery({

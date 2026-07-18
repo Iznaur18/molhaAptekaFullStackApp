@@ -2,6 +2,8 @@ import Svg, { Path } from "react-native-svg";
 
 import { izColors } from "@izibuy/design-tokens";
 
+import { decorativeSvgA11yProps } from "@/shared/lib/decorativeSvgA11yProps";
+
 const PREMIUM_STAR_PATH =
   "M20 6.15 24.05 14.75 33.35 14.75 26.15 20.55 29.15 30.05 20 24.95 10.85 30.05 13.85 20.55 6.65 14.75 15.95 14.75 20 6.15Z";
 
@@ -12,7 +14,7 @@ type UserPremiumVerifiedBadgeProps = {
 };
 
 export const UserPremiumVerifiedBadge = ({ size = 18 }: UserPremiumVerifiedBadgeProps) => (
-  <Svg width={size} height={size} viewBox="0 0 40 40" accessible={false}>
+  <Svg width={size} height={size} viewBox="0 0 40 40" {...decorativeSvgA11yProps}>
     <Path
       d={PREMIUM_STAR_PATH}
       fill={PREMIUM_STAR_FILL}

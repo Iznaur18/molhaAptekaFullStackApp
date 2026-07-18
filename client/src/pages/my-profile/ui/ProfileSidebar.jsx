@@ -3,6 +3,7 @@ import { AppIcon } from "../../../shared/ui/icon/index.js";
 import { ProfileTabAlert } from "./ProfileTabAlert.jsx";
 import { ProfileTabBadge } from "./ProfileTabBadge.jsx";
 import { ProfileSidebarLogout } from "./ProfileSidebarLogout.jsx";
+import { ProfileSidebarDeleteAccount } from "./ProfileSidebarDeleteAccount.jsx";
 
 /**
  * @typedef {{
@@ -32,10 +33,11 @@ import { ProfileSidebarLogout } from "./ProfileSidebarLogout.jsx";
  *   activeTab: string;
  *   onItemSelect?: () => void;
  *   onLogout?: () => void | Promise<void>;
+ *   user?: import('../../../entities/user/model/types.js').UserPublicProfile | null;
  *   id?: string;
  * }} props
  */
-export function ProfileSidebar({ groups, activeTab, onItemSelect, onLogout, id }) {
+export function ProfileSidebar({ groups, activeTab, onItemSelect, onLogout, user, id }) {
   const handleItemClick = (onClick) => {
     onClick();
     onItemSelect?.();
@@ -103,6 +105,11 @@ export function ProfileSidebar({ groups, activeTab, onItemSelect, onLogout, id }
               <li className="my-profile-page__nav-item">
                 <ProfileSidebarLogout onLogout={onLogout} />
               </li>
+              {user ? (
+                <li className="my-profile-page__nav-item">
+                  <ProfileSidebarDeleteAccount user={user} />
+                </li>
+              ) : null}
             </ul>
           </div>
         ) : null}

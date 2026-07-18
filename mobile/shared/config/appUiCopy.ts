@@ -147,6 +147,18 @@ export const EDIT_PROFILE_UI = {
   AUTH_REQUIRED: "Войдите, чтобы редактировать профиль",
 } as const;
 
+export const DELETE_ACCOUNT_UI = {
+  SECTION: "Удаление аккаунта",
+  DESCRIPTION:
+    "Аккаунт и связанные данные — товары, отзывы, подписки и рейтинги — будут удалены безвозвратно. Отменить это действие нельзя.",
+  BUTTON: "Удалить аккаунт",
+  CONFIRM_QUESTION: "Точно удалить аккаунт? Восстановить его будет невозможно.",
+  CONFIRM_YES: "Да, удалить",
+  CONFIRM_CANCEL: "Отмена",
+  UNKNOWN_USER: "Не удалось определить пользователя",
+  FALLBACK_ERROR: "Не удалось удалить аккаунт",
+} as const;
+
 export const ADDRESS_STRUCTURED_UI = {
   SECTION_LABEL: "Адрес",
   LABEL_CITY: "Город",
@@ -839,6 +851,7 @@ export const EMAIL_VERIFICATION_UI = {
   RESEND_ERROR: "Не удалось отправить письмо",
   VERIFIED_SUCCESS: "Email подтверждён",
   CLOSE: "Закрыть",
+  MODAL_EMAIL_FALLBACK: "ваш email",
 } as const;
 
 export const FAQ_UI = {

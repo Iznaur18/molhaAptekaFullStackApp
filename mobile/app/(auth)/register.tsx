@@ -68,10 +68,16 @@ export default function RegisterScreen() {
     setConsentError("");
 
     try {
-      await registerMutation.mutateAsync(
+      const pending = await registerMutation.mutateAsync(
         buildRegisterPayload({ email, userName, password, passwordConfirm }),
       );
-      router.replace("/(tabs)");
+      router.replace({
+        pathname: "/(auth)/verify-email",
+        params: {
+          pendingToken: pending.pendingToken,
+          email: pending.email,
+        },
+      });
     } catch {
       // error shown via mutation state
     }

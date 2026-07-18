@@ -8,6 +8,7 @@ import WishlistModel from "./WishlistModel.js";
 import ProductReportModel from "./ProductReportModel.js";
 import UserInAppNotificationModel from "./UserInAppNotificationModel.js";
 import UserDataConfirmationRequestModel from "./UserDataConfirmationRequestModel.js";
+import PendingRegistrationModel from "./PendingRegistrationModel.js";
 import ProductPriceOfferModel from "./ProductPriceOfferModel.js";
 import UserFollowModel from "./UserFollowModel.js";
 import ProductReviewModel from "./ProductReviewModel.js";
@@ -43,6 +44,7 @@ export {
   ProductReportModel,
   UserInAppNotificationModel,
   UserDataConfirmationRequestModel,
+  PendingRegistrationModel,
   ProductPriceOfferModel,
   UserFollowModel,
   ProductReviewModel,

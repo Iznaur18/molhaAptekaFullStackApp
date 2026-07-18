@@ -14,6 +14,7 @@ import {
 } from "../controllers/index.js";
 import { registerUserValidation, loginUserValidation } from "../validations/index.js";
 import { verifyEmailWithCodeValidation } from "../validations/user/verifyEmailWithCodeValidation.js";
+import { resendEmailVerificationValidation } from "../validations/user/resendEmailVerificationValidation.js";
 import { refreshAuthValidation } from "../validations/user/refreshAuthValidation.js";
 import { verifyEmailTokenValidation } from "../validations/user/verifyEmailTokenValidation.js";
 import {
@@ -65,15 +66,14 @@ router.post("/refresh", refreshAuthRateLimiter, refreshAuthValidation, refreshAu
 router.get("/verify-email", verifyEmailTokenValidation, verifyEmailController);
 router.post(
   "/verify-email",
-  checkAuthMW,
+  authRateLimiter,
   verifyEmailWithCodeValidation,
   verifyEmailWithCodeController,
 );
 router.post(
   "/resend-verification",
-  checkAuthMW,
   emailVerificationResendRateLimiter,
-  emptyBodyValidation,
+  resendEmailVerificationValidation,
   resendEmailVerificationController,
 );
 

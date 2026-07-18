@@ -1172,6 +1172,19 @@ export const ADMIN_EDIT_USER_UI = {
   DELETE_LOADING: "Удаление…",
 };
 
+/** Самоудаление аккаунта обычным пользователем (не админское удаление чужого). */
+export const DELETE_ACCOUNT_UI = {
+  NAV_BUTTON: "Удалить аккаунт",
+  DELETE_CONFIRM_TITLE: "Удалить аккаунт?",
+  /** @param {string} token */
+  DELETE_CONFIRM_HINT: (token) =>
+    `Аккаунт и связанные данные — товары, отзывы, подписки и рейтинги — будут удалены безвозвратно. Введите «${token}» для подтверждения.`,
+  DELETE_CONFIRM_PLACEHOLDER: "Подтверждение",
+  DELETE_SUBMIT: "Удалить аккаунт",
+  DELETE_CANCEL: "Отмена",
+  DELETE_LOADING: "Удаление…",
+};
+
 /** Визуал премиум-пользователя (галочка, золотая обводка аватара). */
 export const USER_PREMIUM_UI = {
   CHECK_GLYPH: "✓",

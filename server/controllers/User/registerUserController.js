@@ -1,14 +1,17 @@
 import bcrypt from "bcrypt";
-import { UserModel } from "../../models/index.js";
-import { errorRes } from "../../services/http/index.js";
-import { sendUserWithToken } from "../../services/auth/sendUserWithToken.js";
-import { enqueueSendEmailVerification } from "../../queues/enqueueSendEmailVerification.js";
+
 import { DEFAULT_AVATAR_URL } from "../../constants/constants.js";
+import { PENDING_REGISTRATION_OCCUPIED_MESSAGE } from "../../constants/emailVerificationConstants.js";
 import {
   formatUserBackgroundPresetValue,
   getDefaultUserBackgroundStoredValue,
   isUserBackgroundPresetId,
 } from "../../constants/userBackgroundPresets.js";
+import { errorRes, successRes } from "../../services/http/index.js";
+import {
+  assertRegistrationIdentityAvailable,
+  createPendingRegistration,
+} from "../../services/auth/pendingRegistration.js";
 
 function pickUrlOrDefault(value, defaultUrl) {
   if (value == null || String(value).trim() === "") return defaultUrl;
@@ -24,69 +27,68 @@ function resolveRegisterBackground(presetId) {
   return formatUserBackgroundPresetValue(id);
 }
 
-/** Регистрация по email + пароль и опциональные поля профиля. POST /auth/register */
+/** Регистрация: pending + код на email, без User и без JWT. POST /auth/register */
 export const registerUserController = async (req, res) => {
-const {
+  const {
+    email,
+    password,
+    userName,
+    phoneNumber,
+    avatarUrl,
+    backgroundPresetId,
+    userBirthDate,
+    userGender,
+    notificationsEnabled,
+  } = req.body;
+
+  const normalizedUserName = String(userName).trim().toLowerCase();
+  const userPhoneNumber =
+    phoneNumber != null && phoneNumber !== ""
+      ? String(phoneNumber).trim()
+      : undefined;
+
+  try {
+    await assertRegistrationIdentityAvailable(
       email,
-      password,
-      userName,
-      phoneNumber,
-      avatarUrl,
-      backgroundPresetId,
-      userBirthDate,
-      userGender,
-      notificationsEnabled,
-    } = req.body;
+      normalizedUserName,
+      userPhoneNumber,
+    );
+  } catch (availabilityError) {
+    return errorRes(
+      res,
+      availabilityError?.statusCode ?? 400,
+      availabilityError instanceof Error
+        ? availabilityError.message
+        : PENDING_REGISTRATION_OCCUPIED_MESSAGE,
+    );
+  }
 
-    const normalizedUserName = String(userName).trim().toLowerCase();
-    const orConditions = [{ email }, { userName: normalizedUserName }];
-    if (phoneNumber != null && phoneNumber !== "") {
-      orConditions.push({ userPhoneNumber: String(phoneNumber).trim() });
-    }
-    const exists = await UserModel.findOne({ $or: orConditions });
-    if (exists) {
-      return errorRes(
-        res,
-        400,
-        "Пользователь с таким email или userName или userPhoneNumber уже существует",
-      );
-    }
+  const salt = await bcrypt.genSalt(10);
+  const passwordHash = await bcrypt.hash(password, salt);
 
-    const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(password, salt);
-
-    const userPhoneNumber =
-      phoneNumber != null && phoneNumber !== ""
-        ? String(phoneNumber).trim()
-        : undefined;
-
-    const doc = new UserModel({
+  try {
+    const pending = await createPendingRegistration({
       email,
       passwordHash,
       userName: normalizedUserName,
       userPhoneNumber,
       userAvatarUrl: pickUrlOrDefault(avatarUrl, DEFAULT_AVATAR_URL),
       userBackgroundUrl: resolveRegisterBackground(backgroundPresetId),
-      ...(userBirthDate ? { userBirthDate: new Date(userBirthDate) } : {}),
-      ...(userGender ? { userGender } : {}),
-      ...(req.verifiedDeliveryAddress
-        ? {
-            userAddress: req.verifiedDeliveryAddress.displayAddress,
-            userAddressFlat: req.verifiedDeliveryAddress.flat,
-            userAddressFiasId: req.verifiedDeliveryAddress.fiasId,
-            userAddressGeo: req.verifiedDeliveryAddress.geo,
-          }
-        : {}),
-      ...(typeof notificationsEnabled === "boolean" ? { notificationsEnabled } : {}),
+      userBirthDate,
+      userGender,
+      notificationsEnabled,
+      verifiedDeliveryAddress: req.verifiedDeliveryAddress,
     });
 
-    const user = await doc.save();
-
-    try {
-      await enqueueSendEmailVerification(user._id);
-    } catch (verificationError) {
-      console.error("enqueueSendEmailVerification error:", verificationError);
+    return successRes(res, {
+      needsEmailVerification: true,
+      pendingToken: pending.pendingToken,
+      email: pending.email,
+    });
+  } catch (createError) {
+    if (createError?.code === 11000) {
+      return errorRes(res, 400, PENDING_REGISTRATION_OCCUPIED_MESSAGE);
     }
-
-    return sendUserWithToken(user, res);
+    throw createError;
+  }
 };

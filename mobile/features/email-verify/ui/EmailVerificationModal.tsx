@@ -35,6 +35,7 @@ const { enterMs, exitMs, sheetSlideDistance, sheetRestOffsetRatio } =
 type EmailVerificationModalProps = {
   visible: boolean;
   email: string;
+  pendingToken: string;
   onClose: () => void;
   onVerified?: () => void;
 };
@@ -44,6 +45,7 @@ const keepDigitsOnly = (value: string): string => value.replace(/\D/g, "");
 export const EmailVerificationModal = ({
   visible,
   email,
+  pendingToken,
   onClose,
   onVerified,
 }: EmailVerificationModalProps) => {
@@ -128,12 +130,16 @@ export const EmailVerificationModal = ({
   };
 
   const handleVerify = async () => {
+    if (!pendingToken) {
+      setErrorMessage(EMAIL_VERIFICATION_UI.CONFIRM_ERROR);
+      return;
+    }
     if (code.length !== CODE_LENGTH) {
       setErrorMessage(EMAIL_VERIFICATION_UI.CODE_REQUIRED);
       return;
     }
     try {
-      await verifyMutation.mutateAsync(code);
+      await verifyMutation.mutateAsync({ code, pendingToken });
       setCode("");
       setSuccessMessage(EMAIL_VERIFICATION_UI.VERIFIED_SUCCESS);
       onVerified?.();
@@ -144,8 +150,12 @@ export const EmailVerificationModal = ({
   };
 
   const handleResend = async () => {
+    if (!pendingToken) {
+      setErrorMessage(EMAIL_VERIFICATION_UI.RESEND_ERROR);
+      return;
+    }
     try {
-      const message = await resendMutation.mutateAsync();
+      const message = await resendMutation.mutateAsync(pendingToken);
       setCode("");
       setErrorMessage("");
       setSuccessMessage(message || EMAIL_VERIFICATION_UI.RESENT);

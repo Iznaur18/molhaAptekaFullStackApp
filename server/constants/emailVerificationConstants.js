@@ -27,3 +27,12 @@ export const EMAIL_VERIFICATION_ATTEMPTS_EXCEEDED_MESSAGE =
 export const EMAIL_VERIFICATION_SENT_MESSAGE = "Письмо с подтверждением отправлено";
 
 export const EMAIL_VERIFICATION_SUCCESS_MESSAGE = "Email успешно подтверждён";
+
+export const EMAIL_VERIFICATION_REQUIRED_FOR_LOGIN_MESSAGE =
+  "Подтвердите email, чтобы войти";
+
+export const EMAIL_VERIFICATION_PENDING_EXPIRED_MESSAGE =
+  "Срок подтверждения истёк, зарегистрируйтесь заново";
+
+export const PENDING_REGISTRATION_OCCUPIED_MESSAGE =
+  "Пользователь с таким email или userName или userPhoneNumber уже существует";

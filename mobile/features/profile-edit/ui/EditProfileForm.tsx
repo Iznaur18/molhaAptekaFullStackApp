@@ -24,6 +24,7 @@ import {
 } from "@/entities/user/model/constants";
 import { ProfileAvatarUpload } from "@/features/image-upload/ui/ProfileAvatarUpload";
 import { ProfileBackgroundUpload } from "@/features/image-upload/ui/ProfileBackgroundUpload";
+import { DeleteAccountSection } from "@/features/profile-edit/ui/DeleteAccountSection";
 import { ADDRESS_STRUCTURED_UI, EDIT_PROFILE_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useEditProfileFormStyles } from "@/shared/theme/editProfileFormStyles";
@@ -323,6 +324,8 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
         disabled={isSubmitting}
         style={styles.submit}
       />
+
+      <DeleteAccountSection userId={user._id} />
     </ScrollView>
   );
 };
