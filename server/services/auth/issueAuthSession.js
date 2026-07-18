@@ -56,7 +56,7 @@ export const buildAuthSessionData = (user, accessToken, refreshToken, req) => {
 };
 
 /**
- * Cookies для web + токены в JSON только для mobile (`X-Auth-Client: mobile`).
+ * Cookies для web + токены в JSON для mobile / web-dev (`X-Auth-Client`).
  *
  * @param {import('mongoose').Document} user
  * @param {import('express').Response} res

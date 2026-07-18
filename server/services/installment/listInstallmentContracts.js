@@ -1,4 +1,6 @@
+import { INSTALLMENT_CONTRACT_STATUS_PENDING_FIRST_PAYMENT } from "../../constants/installmentConstants.js";
 import { InstallmentContractModel } from "../../models/index.js";
+import { sortByPriorityStatusFirst } from "../../utils/sortByPriorityStatusFirst.js";
 import {
   buildInstallmentContractPayloads,
   repairInstallmentPaymentStatusDrift,
@@ -28,5 +30,11 @@ export async function listInstallmentContracts({ userId, statusFilter, role }) {
     await repairInstallmentPaymentStatusDrift(row);
   }
 
-  return buildInstallmentContractPayloads(rows);
+  const orderedRows = normalizedStatus
+    ? rows
+    : sortByPriorityStatusFirst(rows, {
+        priorityStatus: INSTALLMENT_CONTRACT_STATUS_PENDING_FIRST_PAYMENT,
+      });
+
+  return buildInstallmentContractPayloads(orderedRows);
 }

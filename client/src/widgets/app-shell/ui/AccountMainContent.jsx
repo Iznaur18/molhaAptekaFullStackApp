@@ -1,4 +1,3 @@
-import { RaffleSellerOverview } from "../../../entities/raffle/ui/RaffleSellerOverview.jsx";
 import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { isRoleRestrictedMainView } from "../../../shared/lib/homeMainViewPaths.js";
 import { isStaffMainViewAllowed } from "../../../shared/lib/staffMainViews.js";
@@ -132,20 +131,9 @@ export function AccountMainContent({
       setRaffleModal,
     };
 
-    const profileOverviewContent = (
-      <RaffleSellerOverview
-        onChanged={() => {
-          void refreshRaffleSurfaces();
-        }}
-        onEditRaffle={(raffle) =>
-          setRaffleModal({ mode: "edit", raffle, useStaffApi: false })
-        }
-      />
-    );
-
     const tabContent =
       mainView === "my-profile"
-        ? profileOverviewContent
+        ? null
         : renderProfileTabPanel(mainView, profileTabPanelProps);
 
     return (

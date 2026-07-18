@@ -240,6 +240,10 @@
     right: 0;
     bottom: env(safe-area-inset-bottom, 0px);
     z-index: calc(var(--iz-z-modal-shell) + 2);
+    box-sizing: border-box;
+    width: 100%;
+    max-width: none;
+    margin-inline: 0;
     padding: 0.55rem var(--iz-space-3) 0.65rem;
     border-top: 1px solid var(--iz-color-border);
     background: color-mix(in srgb, var(--iz-color-surface) 94%, transparent);

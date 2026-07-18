@@ -1,8 +1,8 @@
 /**
- * Мобильный каталог (≤903px): карточки одной ширины колонки; фото 1:1 (--product-card-image-aspect-ratio).
- * Бейджи/цена/отзывы не влияют на размер — фиксированная сетка строк под фото.
+ * Компактные карточки каталога (mobile + tablet ≤1023px).
+ * Фото 1:1 (--product-card-image-aspect-ratio); бейджи/цена — фиксированная сетка строк.
  */
-@container app-viewport (max-width: 903px) {
+@container app-viewport (max-width: 1023px) {
   .product-card:not(.product-card--banner-layout),
   .app-shell__cell:not(.app-shell__cell--tier3-full-width) {
     --product-card-mobile-heading-height: 1.25rem;

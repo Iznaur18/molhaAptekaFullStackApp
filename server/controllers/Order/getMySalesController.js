@@ -7,6 +7,10 @@ import { loadInstallmentPlanSummariesByIds } from "../../services/installment/in
 
 import { ORDER_BUYER_PUBLIC_FIELDS, ORDER_ITEMS_POPULATE } from "./orderQueries.js";
 import {
+  fetchMySalesOrderPageIds,
+  orderRowsByIds,
+} from "../../services/order/fetchMySalesOrderPageIds.js";
+import {
   buildOrderStatusFromItems,
   normalizeOrderItemsForRuntime,
 } from "../../services/order/orderStatus.js";
@@ -129,16 +133,23 @@ const sellerId = String(req.userId);
       "items.productId": { $in: queryProductIds },
       ...(buyerIds ? { userBuyerId: { $in: buyerIds } } : {}),
     };
-    const [rawOrders, total] = await Promise.all([
-      OrderModel.find(query)
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit)
-        .populate("userBuyerId", ORDER_BUYER_PUBLIC_FIELDS)
-        .populate(ORDER_ITEMS_POPULATE)
-        .lean(),
-      OrderModel.countDocuments(query),
-    ]);
+    const pendingFirst = !status;
+    const { orderIds, total } = await fetchMySalesOrderPageIds({
+      query,
+      sellerProductIds: queryProductIds,
+      pendingFirst,
+      skip,
+      limit,
+    });
+
+    const rawOrdersUnordered =
+      orderIds.length === 0
+        ? []
+        : await OrderModel.find({ _id: { $in: orderIds } })
+            .populate("userBuyerId", ORDER_BUYER_PUBLIC_FIELDS)
+            .populate(ORDER_ITEMS_POPULATE)
+            .lean();
+    const rawOrders = orderRowsByIds(orderIds, rawOrdersUnordered);
 
     const orders = rawOrders
       .map((order) => {

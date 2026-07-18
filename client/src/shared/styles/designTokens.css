@@ -226,7 +226,7 @@
   --iz-z-toast: 1100;
 
   --iz-catalog-grid-gap: 16px;
-  --iz-catalog-grid-min-column: 280px;
+  --iz-catalog-grid-min-column: 200px;
   --iz-catalog-grid-mobile-columns: 3;
-  --iz-catalog-grid-breakpoint: 903px;
+  --iz-catalog-grid-breakpoint: 640px;
 }

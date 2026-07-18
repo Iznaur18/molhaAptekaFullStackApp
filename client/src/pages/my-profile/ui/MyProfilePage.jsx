@@ -1,6 +1,7 @@
 import { UserPremiumAvatar } from "../../../entities/user/ui/UserPremiumAvatar.jsx";
 import { isPremiumActive } from "../../../entities/user/lib/isPremiumActive.js";
 import { USER_ROLE_USER } from "../../../entities/user/model/userConstants.js";
+import { ThemePreferenceToggle } from "../../../features/theme-settings/ui/ThemePreferenceToggle.jsx";
 import {
   MY_PROFILE_PAGE_UI,
   USER_DETAILS_MODAL_UI,
@@ -9,7 +10,7 @@ import { PROFILE_TAB_OVERVIEW } from "../../../widgets/app-shell/lib/profileTabs
 import { MyProductsCatalogToolbar } from "../../../widgets/my-products-catalog-toolbar/ui/MyProductsCatalogToolbar.jsx";
 import { useMyProfileNav } from "../model/useMyProfileNav.js";
 import { useMyProfilePageUi } from "../model/useMyProfilePageUi.js";
-import { AppIcon, Menu, Pencil } from "../../../shared/ui/icon/index.js";
+import { AppIcon, ChevronDown, Menu, Pencil } from "../../../shared/ui/icon/index.js";
 import { UserProfileInfoPanel } from "../../../entities/user/ui/UserProfileInfoPanel.jsx";
 import { ProfileSidebar } from "./ProfileSidebar.jsx";
 
@@ -256,6 +257,9 @@ export function MyProfilePage({
               </span>
               <span className="my-profile-page__mobile-nav-toggle-label">{activeNavLabel}</span>
             </span>
+            <span className="my-profile-page__mobile-nav-toggle-chevron" aria-hidden="true">
+              <ChevronDown size={24} strokeWidth={2.25} />
+            </span>
           </button>
           {isFullWidthCatalogTab ? (
             <>
@@ -351,6 +355,12 @@ export function MyProfilePage({
                     </div>
                   ) : null}
                   <UserProfileInfoPanel rows={rows} />
+                  <div className="my-profile-page__overview-footer">
+                    <a className="my-profile-page__privacy-link" href="/privacy.html">
+                      {MY_PROFILE_PAGE_UI.PRIVACY_LINK}
+                    </a>
+                    <ThemePreferenceToggle />
+                  </div>
                 </>
               ) : null}
               {isProfileReady && activeTab !== PROFILE_TAB_OVERVIEW ? (

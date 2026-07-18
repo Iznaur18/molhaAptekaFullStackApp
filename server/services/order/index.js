@@ -25,6 +25,15 @@ export {
   countMyOrdersActionItems,
   countMySalesActionItems,
 } from "./orderActionCounts.js";
+export {
+  buildMySalesSortStage,
+  buildSellerItemsPendingFirstAddFieldsStage,
+  SELLER_ITEMS_PENDING_FIRST_FIELD,
+} from "./buildSellerItemsPendingFirstSort.js";
+export {
+  fetchMySalesOrderPageIds,
+  orderRowsByIds,
+} from "./fetchMySalesOrderPageIds.js";
 export { resolveOrderLineItemProductName } from "./orderLineItemDisplay.js";
 export {
   getSellerCommerceStatsBySellerIds,

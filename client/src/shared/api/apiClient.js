@@ -19,6 +19,10 @@ export const apiClient = createJsonApiClient({
   withCredentials: true,
 });
 
+/** В Vite DEV сервер отдаёт JWT в JSON при `X-Auth-Client: web-dev` (см. LAN-dev-access.md). */
+if (import.meta.env.DEV) {
+  apiClient.defaults.headers.common["X-Auth-Client"] = "web-dev";
+}
 /** Удаляет legacy JWT из localStorage после перехода на httpOnly cookie. */
 export const clearLegacyAuthTokenStorage = () => {
   try {

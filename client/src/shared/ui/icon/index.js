@@ -3,6 +3,7 @@ export { ModalCloseIcon } from "./ModalCloseIcon.jsx";
 export { ICON_SIZE_PX } from "./iconSizes.js";
 export {
   Bell,
+  ChevronDown,
   CircleAlert,
   Eye,
   Heart,

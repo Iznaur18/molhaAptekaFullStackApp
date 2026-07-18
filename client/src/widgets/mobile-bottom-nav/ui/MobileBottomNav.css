@@ -1,23 +1,11 @@
-@container app-viewport (max-width: 40rem) {
-  body:has(.product-details-modal) .mobile-bottom-nav {
-    display: none;
-  }
-}
-
 .mobile-bottom-nav {
   --mobile-bottom-nav-icon-size: 1.5rem;
   --mobile-bottom-nav-horizontal-inset: 0.75rem;
   --mobile-bottom-nav-float-offset: 0.625rem;
 
   position: fixed;
-  left: calc(
-    var(--app-viewport-side-inset, 0px) +
-      max(var(--mobile-bottom-nav-horizontal-inset), env(safe-area-inset-left, 0px))
-  );
-  right: calc(
-    var(--app-viewport-side-inset, 0px) +
-      max(var(--mobile-bottom-nav-horizontal-inset), env(safe-area-inset-right, 0px))
-  );
+  left: max(var(--mobile-bottom-nav-horizontal-inset), env(safe-area-inset-left, 0px));
+  right: max(var(--mobile-bottom-nav-horizontal-inset), env(safe-area-inset-right, 0px));
   bottom: calc(
     var(--mobile-bottom-nav-float-offset) + env(safe-area-inset-bottom, 0px)
   );
@@ -53,6 +41,7 @@
   color: var(--iz-color-text-secondary);
   cursor: pointer;
   font: inherit;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .mobile-bottom-nav__item:hover {
@@ -63,6 +52,11 @@
 .mobile-bottom-nav__item--active {
   color: var(--iz-color-action);
   background: var(--iz-color-action-soft);
+}
+
+.mobile-bottom-nav__item:focus-visible {
+  outline: 2px solid var(--iz-color-action);
+  outline-offset: 2px;
 }
 
 .mobile-bottom-nav__icon-wrap {
@@ -76,6 +70,7 @@
   display: block;
   width: var(--mobile-bottom-nav-icon-size);
   height: var(--mobile-bottom-nav-icon-size);
+  flex-shrink: 0;
 }
 
 .mobile-bottom-nav__badge {
@@ -94,4 +89,10 @@
   font-size: 0.55rem;
   font-weight: 700;
   line-height: 1;
+}
+
+@container app-viewport (max-width: 40rem) {
+  body:has(.product-details-modal) .mobile-bottom-nav {
+    display: none;
+  }
 }

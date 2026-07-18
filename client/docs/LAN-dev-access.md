@@ -27,7 +27,7 @@ npm run dev
 Cookie **привязаны к адресу в строке браузера**. `127.0.0.1`, `localhost` и `192.168.x.x` — **разные сайты**.
 
 - С телефона / по Wi‑Fi: смотри cookie для **`http://192.168.x.x`** в DevTools → Application → Cookies (не для `127.0.0.1`).
-- На LAN Chrome часто **не сохраняет** httpOnly cookie по IP — в dev сессия дублируется в `sessionStorage` (Bearer), вкладка Application → Session Storage → `dev_access_token`.
+- На LAN Chrome часто **не сохраняет** httpOnly cookie по IP — в Vite DEV клиент шлёт `X-Auth-Client: web-dev`, сервер кладёт JWT в JSON, клиент пишет их в `sessionStorage` (Bearer). Application → Session Storage → `dev_access_token`.
 - После смены адреса (LAN ↔ localhost) — **выйди и войди снова** на том же URL.
 
 ---

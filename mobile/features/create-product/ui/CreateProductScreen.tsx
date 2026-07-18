@@ -19,6 +19,10 @@ import { ProductPhotoGrid } from "@/features/image-upload/ui/ProductPhotoGrid";
 import { ProductPreviewVideoUploadField } from "@/features/image-upload/ui/ProductPreviewVideoUploadField";
 import { CreateProductCategoryPicker } from "@/features/create-product/ui/CreateProductCategoryPicker";
 import { CREATE_PRODUCT_UI } from "@/shared/config";
+import {
+  formatRubPriceInput,
+  parseRubPriceInput,
+} from "@/shared/lib/rubPriceInput";
 import { textInputFocusScrollProps } from "@/shared/lib/scrollTextInputIntoViewOnFocus";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
@@ -141,8 +145,8 @@ function validateStep(stepId: WizardStepId, form: WizardForm): string | null {
       return null;
     }
     case "commerce": {
-      const price = parseFloat(form.productPrice.replace(/\s/g, "").replace(",", "."));
-      if (!Number.isFinite(price) || price < 0) {
+      const price = parseRubPriceInput(form.productPrice);
+      if (price == null || price < 0) {
         return CREATE_PRODUCT_UI.ERROR_PRICE;
       }
       if (price > PRODUCT_PRICE_RUB_MAX) {
@@ -150,8 +154,8 @@ function validateStep(stepId: WizardStepId, form: WizardForm): string | null {
       }
       const oldPriceRaw = form.productOldPrice.trim();
       if (oldPriceRaw) {
-        const oldPrice = parseFloat(oldPriceRaw.replace(/\s/g, "").replace(",", "."));
-        if (!Number.isFinite(oldPrice) || oldPrice <= price) {
+        const oldPrice = parseRubPriceInput(form.productOldPrice);
+        if (oldPrice == null || oldPrice <= price) {
           return "Старая цена должна быть больше текущей";
         }
         if (oldPrice > PRODUCT_PRICE_RUB_MAX) {
@@ -190,9 +194,9 @@ let _charId = 0;
 const nextCharId = () => ++_charId;
 
 function computeDiscount(price: string, oldPrice: string): number | null {
-  const p = parseFloat(price.replace(/\s/g, "").replace(",", "."));
-  const op = parseFloat(oldPrice.replace(/\s/g, "").replace(",", "."));
-  if (Number.isFinite(p) && Number.isFinite(op) && op > p && p > 0) {
+  const p = parseRubPriceInput(price);
+  const op = parseRubPriceInput(oldPrice);
+  if (p != null && op != null && op > p && p > 0) {
     return Math.round(((op - p) / op) * 100);
   }
   return null;
@@ -250,11 +254,8 @@ export const CreateProductScreen = () => {
     setStepError("");
     setIsSubmitting(true);
     try {
-      const price = Math.floor(Number(form.productPrice.replace(/\s/g, "").replace(",", ".")));
-      const oldPriceRaw = form.productOldPrice.trim();
-      const oldPrice = oldPriceRaw
-        ? Math.floor(Number(oldPriceRaw.replace(/\s/g, "").replace(",", ".")))
-        : null;
+      const price = parseRubPriceInput(form.productPrice) ?? 0;
+      const oldPrice = parseRubPriceInput(form.productOldPrice);
       const loyalty = Math.floor(Number(form.loyaltyPointsPerUnit));
 
       await createMutation.mutateAsync({
@@ -785,7 +786,7 @@ function CommerceStep({ form, setForm, disabled, theme, styles }: StepProps) {
             style={[styles.input, styles.priceInput, { color: theme.colors.text, backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
             value={form.productPrice}
             onChangeText={(text) =>
-              setForm((prev) => ({ ...prev, productPrice: keepDigits(text) }))
+              setForm((prev) => ({ ...prev, productPrice: formatRubPriceInput(text) }))
             }
             editable={!disabled}
             keyboardType="number-pad"
@@ -800,7 +801,7 @@ function CommerceStep({ form, setForm, disabled, theme, styles }: StepProps) {
             style={[styles.input, styles.priceInput, { color: theme.colors.text, backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
             value={form.productOldPrice}
             onChangeText={(text) =>
-              setForm((prev) => ({ ...prev, productOldPrice: keepDigits(text) }))
+              setForm((prev) => ({ ...prev, productOldPrice: formatRubPriceInput(text) }))
             }
             editable={!disabled}
             keyboardType="number-pad"

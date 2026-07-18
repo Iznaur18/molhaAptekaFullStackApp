@@ -9,8 +9,9 @@ body,
 }
 
 :root {
-  --app-viewport-max-width: 430px;
-  --app-viewport-effective-width: min(var(--app-viewport-max-width), 100vw);
+  /* Desktop content cap (~1200px). Mobile/tablet = 100vw. */
+  --app-shell-max-width: 75rem;
+  --app-viewport-effective-width: min(var(--app-shell-max-width), 100vw);
   --app-viewport-side-inset: max(
     0px,
     calc((100vw - var(--app-viewport-effective-width)) / 2)
@@ -29,19 +30,12 @@ html {
   scrollbar-gutter: stable;
   box-sizing: border-box;
   width: 100%;
-  max-width: var(--app-viewport-max-width);
-  margin-inline: auto;
+  max-width: none;
+  margin: 0;
   container-type: inline-size;
   container-name: app-viewport;
   min-height: 100%;
-}
-
-@media (min-width: 431px) {
-  html {
-    box-shadow:
-      0 0 0 1px color-mix(in srgb, var(--iz-color-border) 80%, transparent),
-      0 12px 48px -12px color-mix(in srgb, var(--iz-color-ink) 14%, transparent);
-  }
+  overflow-x: clip;
 }
 
 body {
@@ -50,4 +44,12 @@ body {
   color: var(--iz-color-text);
   min-width: 320px;
   min-height: 100vh;
+  overflow-x: clip;
+}
+
+#root {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }

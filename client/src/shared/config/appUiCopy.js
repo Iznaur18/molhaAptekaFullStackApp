@@ -2126,6 +2126,14 @@ export const MY_PROFILE_PAGE_UI = {
   MOBILE_NAV_TOGGLE_ARIA: "Открыть меню разделов профиля",
   MOBILE_NAV_CLOSE_ARIA: "Закрыть меню разделов",
   MOBILE_NAV_CURRENT_SECTION: "Раздел",
+  PRIVACY_LINK: "Политика конфиденциальности",
+};
+
+export const THEME_SETTINGS_UI = {
+  LABEL: "Тема оформления",
+  SYSTEM: "Системная",
+  LIGHT: "Светлая",
+  DARK: "Тёмная",
 };
 
 /** Модалка редактирования своего профиля (`PATCH /user/:id`) */

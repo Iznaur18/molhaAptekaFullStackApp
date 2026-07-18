@@ -4,8 +4,7 @@ import { APP_SHELL_MOBILE_NAV_BREAKPOINT_PX } from "./appShellMobileNavConstants
 import { resolveAppViewportWidth } from "./resolveAppViewportWidth.js";
 
 /**
- * Компактный layout (mobile nav, mobile header): ширина веб-приложения
- * ограничена `WEB_APP_SHELL_MAX_WIDTH_PX`, поэтому на десктопе тоже mobile UX.
+ * Компактный layout (bottom nav + mobile header): viewport ≤ 640px.
  *
  * @returns {boolean}
  */
@@ -20,7 +19,9 @@ export function useAppShellCompactLayout() {
 
   useEffect(() => {
     const syncLayout = () => {
-      setIsCompact(resolveAppViewportWidth(window.innerWidth) <= APP_SHELL_MOBILE_NAV_BREAKPOINT_PX);
+      setIsCompact(
+        resolveAppViewportWidth(window.innerWidth) <= APP_SHELL_MOBILE_NAV_BREAKPOINT_PX,
+      );
     };
 
     window.addEventListener("resize", syncLayout);

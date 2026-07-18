@@ -7,7 +7,7 @@
 
   box-sizing: border-box;
   width: 100%;
-  max-width: 100%;
+  max-width: var(--app-shell-max-width, 75rem);
   margin: 0 auto;
   padding: var(--iz-space-6) var(--app-shell-content-inline-padding) 2.5rem;
 }
@@ -239,7 +239,7 @@
 
 .app-shell__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 1rem;
   align-items: stretch;
 }
@@ -253,28 +253,40 @@
   min-height: 14rem;
 }
 
-/* до ~904px: всегда 3 карточки в ряд (~667px, ~900px и т.д.) */
-@container app-viewport (max-width: 903px) {
+/* tablet: 4 колонки */
+@container app-viewport (max-width: 1023px) {
   .app-shell__grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.15rem;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.5rem;
   }
 }
 
-/* узкий мобильный: 2 карточки в ряд, безопаснее inset от краёв */
-@container app-viewport (max-width: 667px) {
+/* mobile: 3 колонки + edge bleed + место под bottom nav */
+@container app-viewport (max-width: 640px) {
   .app-shell {
     --app-shell-content-inline-padding: max(
-      1rem,
+      0.75rem,
       env(safe-area-inset-left, 0px),
       env(safe-area-inset-right, 0px)
     );
+    --app-shell-catalog-edge-inset: 0.05rem;
     padding-left: var(--app-shell-content-inline-padding);
     padding-right: var(--app-shell-content-inline-padding);
   }
 
+  .app-shell__grid,
+  .app-shell__grid-virtual-host {
+    box-sizing: border-box;
+    margin-inline: calc(
+      -1 * (var(--app-shell-content-inline-padding) - var(--app-shell-catalog-edge-inset))
+    );
+    width: calc(
+      100% + 2 * (var(--app-shell-content-inline-padding) - var(--app-shell-catalog-edge-inset))
+    );
+  }
+
   .app-shell__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.1rem;
   }
 }
@@ -497,7 +509,7 @@
 @container app-viewport (max-width: 640px) {
   .app-shell {
     --app-shell-content-inline-padding: max(
-      1rem,
+      0.75rem,
       env(safe-area-inset-left, 0px),
       env(safe-area-inset-right, 0px)
     );

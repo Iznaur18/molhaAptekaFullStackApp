@@ -1,15 +1,15 @@
 import {
-  CATALOG_GRID_COLUMN_BREAKPOINT_PX,
   CATALOG_GRID_GAP_PX,
   CATALOG_GRID_MIN_COLUMN_PX,
+  CATALOG_GRID_MOBILE_BREAKPOINT_PX,
   CATALOG_GRID_MOBILE_COLUMNS,
-  CATALOG_GRID_NARROW_MOBILE_BREAKPOINT_PX,
-  CATALOG_GRID_NARROW_MOBILE_COLUMNS,
+  CATALOG_GRID_TABLET_BREAKPOINT_PX,
+  CATALOG_GRID_TABLET_COLUMNS,
 } from "./catalogGridVirtualizationConstants.js";
 
 /**
- * Число колонок для `grid-template-columns: repeat(auto-fill, minmax(280px, 1fr))`,
- * 3 колонок на планшетах и 2 — на узком мобильном.
+ * Число колонок сетки каталога (паритет с `AppShell.css`).
+ * ≤640 → 3 · ≤1023 → 4 · desktop → auto-fill по minmax(200px).
  *
  * @param {number} containerWidth
  * @returns {number}
@@ -19,16 +19,16 @@ export function getCatalogGridColumnCount(containerWidth) {
     return 1;
   }
 
-  if (containerWidth <= CATALOG_GRID_NARROW_MOBILE_BREAKPOINT_PX) {
-    return CATALOG_GRID_NARROW_MOBILE_COLUMNS;
-  }
-
-  if (containerWidth <= CATALOG_GRID_COLUMN_BREAKPOINT_PX) {
+  if (containerWidth <= CATALOG_GRID_MOBILE_BREAKPOINT_PX) {
     return CATALOG_GRID_MOBILE_COLUMNS;
   }
 
+  if (containerWidth <= CATALOG_GRID_TABLET_BREAKPOINT_PX) {
+    return CATALOG_GRID_TABLET_COLUMNS;
+  }
+
   return Math.max(
-    1,
+    CATALOG_GRID_TABLET_COLUMNS,
     Math.floor(
       (containerWidth + CATALOG_GRID_GAP_PX) /
         (CATALOG_GRID_MIN_COLUMN_PX + CATALOG_GRID_GAP_PX),

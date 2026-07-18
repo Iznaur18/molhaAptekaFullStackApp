@@ -50,6 +50,17 @@ test("mobile auth session includes tokens with X-Auth-Client", () => {
   assert.equal(data.refreshToken, "refresh.token.value");
 });
 
+test("web-dev auth session includes tokens with X-Auth-Client web-dev", () => {
+  const data = buildAuthSessionData(
+    { _id: "aaaaaaaaaaaaaaaaaaaaaaaa", userName: "a", email: "a@b.c" },
+    "access.token.value",
+    "refresh.token.value",
+    { get: (name) => (String(name).toLowerCase() === "x-auth-client" ? "web-dev" : "") },
+  );
+  assert.equal(data.accessToken, "access.token.value");
+  assert.equal(data.refreshToken, "refresh.token.value");
+});
+
 test("parseUploadFilenameFromMediaUrl rejects path traversal", () => {
   assert.equal(
     parseUploadFilenameFromMediaUrl("/uploads/..\\..\\windows\\system32\\x"),

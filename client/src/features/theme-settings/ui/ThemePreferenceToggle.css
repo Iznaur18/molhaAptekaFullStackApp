@@ -1,0 +1,44 @@
+.theme-preference-toggle {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.theme-preference-toggle__label {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--iz-color-text);
+}
+
+.theme-preference-toggle__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.theme-preference-toggle__chip {
+  margin: 0;
+  padding: 0.5rem 0.875rem;
+  border: 1px solid var(--iz-color-border-strong);
+  border-radius: var(--iz-radius-pill);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.theme-preference-toggle__chip--active {
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast);
+}
+
+.theme-preference-toggle__chip:hover:not(.theme-preference-toggle__chip--active) {
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action-soft);
+}

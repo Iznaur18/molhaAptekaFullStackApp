@@ -2,8 +2,8 @@
   box-sizing: border-box;
   width: 100%;
   max-width: 100%;
-  margin: 2rem auto 0;
-  padding: 0 1rem 2rem;
+  margin: 1.5rem auto 0;
+  padding: 0 0.25rem 0.5rem;
   text-align: center;
 }
 
@@ -15,7 +15,7 @@
   background: none;
   color: var(--iz-color-text-muted);
   font: inherit;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   text-decoration: underline;
   text-underline-offset: 0.15em;
   cursor: pointer;
@@ -23,10 +23,17 @@
 
 .site-footer__legal-link {
   display: inline-block;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
 }
 
 .site-footer__legal-link:hover,
 .site-footer__intro-link:hover {
   color: var(--iz-color-action);
+}
+
+@container app-viewport (max-width: 640px) {
+  .site-footer {
+    margin-top: 1rem;
+    padding-bottom: 0.25rem;
+  }
 }

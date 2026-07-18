@@ -1,5 +1,12 @@
 import { resolveIzTheme } from "@izibuy/design-tokens";
 
+import {
+  loadThemePreference,
+  saveThemePreference,
+} from "./themePreferenceStorage.js";
+
+/** @typedef {import('./themePreferenceStorage.js').ThemePreference} ThemePreference */
+
 const COLOR_VAR_MAP = {
   text: "--iz-color-text",
   textMuted: "--iz-color-text-muted",
@@ -39,7 +46,38 @@ const COLOR_VAR_MAP = {
   focusRing: "--iz-color-focus-ring",
 };
 
-const applyThemeToRoot = (scheme) => {
+/** @type {ThemePreference} */
+let themePreference = "system";
+
+/** @type {Set<(preference: ThemePreference) => void>} */
+const preferenceListeners = new Set();
+
+/**
+ * @returns {boolean}
+ */
+function isSystemDark() {
+  return (
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches
+  );
+}
+
+/**
+ * @param {ThemePreference} preference
+ * @returns {"light" | "dark"}
+ */
+function resolveScheme(preference) {
+  if (preference === "light" || preference === "dark") {
+    return preference;
+  }
+  return isSystemDark() ? "dark" : "light";
+}
+
+/**
+ * @param {"light" | "dark"} scheme
+ */
+function applyThemeToRoot(scheme) {
   if (typeof document === "undefined") {
     return;
   }
@@ -53,16 +91,54 @@ const applyThemeToRoot = (scheme) => {
       rootStyle.setProperty(cssVar, tokenValue);
     }
   }
-};
+
+  document.documentElement.dataset.theme = scheme;
+}
+
+function applyCurrentTheme() {
+  applyThemeToRoot(resolveScheme(themePreference));
+}
+
+/**
+ * @returns {ThemePreference}
+ */
+export function getThemePreference() {
+  return themePreference;
+}
+
+/**
+ * @param {ThemePreference} preference
+ */
+export function setThemePreference(preference) {
+  themePreference = preference;
+  saveThemePreference(preference);
+  applyCurrentTheme();
+  preferenceListeners.forEach((listener) => listener(preference));
+}
+
+/**
+ * @param {(preference: ThemePreference) => void} listener
+ * @returns {() => void}
+ */
+export function subscribeThemePreference(listener) {
+  preferenceListeners.add(listener);
+  return () => {
+    preferenceListeners.delete(listener);
+  };
+}
 
 export const initRuntimeDesignTokens = () => {
   if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
     return;
   }
 
-  const media = window.matchMedia("(prefers-color-scheme: dark)");
-  const apply = () => applyThemeToRoot(media.matches ? "dark" : "light");
+  themePreference = loadThemePreference();
+  applyCurrentTheme();
 
-  apply();
-  media.addEventListener("change", apply);
+  const media = window.matchMedia("(prefers-color-scheme: dark)");
+  media.addEventListener("change", () => {
+    if (themePreference === "system") {
+      applyCurrentTheme();
+    }
+  });
 };

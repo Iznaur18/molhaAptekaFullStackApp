@@ -31,7 +31,11 @@ import { CreateProductCategoryPicker } from "@/features/create-product/ui/Create
 import { ProductPhotoGrid } from "@/features/image-upload/ui/ProductPhotoGrid";
 import { API_CLIENT_UI, CREATE_PRODUCT_UI, PRODUCT_REPORT_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
-import { keepDigitsOnly } from "@/shared/lib/rubPriceInput";
+import {
+  formatRubPriceInput,
+  keepDigitsOnly,
+  parseRubPriceInput,
+} from "@/shared/lib/rubPriceInput";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useProductEditorScreenStyles } from "@/shared/theme/sellerFlowStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
@@ -48,8 +52,12 @@ type EditProductScreenProps = {
   productId: string;
 };
 
-const parsePositiveInt = (value: string): number | null => {
-  const parsed = Number.parseInt(value.trim(), 10);
+const parseStockQuantity = (value: string): number | null => {
+  const digits = keepDigitsOnly(value);
+  if (!digits) {
+    return null;
+  }
+  const parsed = Number.parseInt(digits, 10);
   return Number.isFinite(parsed) ? parsed : null;
 };
 
@@ -84,10 +92,12 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
     const product = productQuery.data as Record<string, unknown>;
     setProductName(String(product.productName ?? "").trim());
     setProductDescription(String(product.productDescription ?? "").trim());
-    setProductPrice(String(product.productPrice ?? ""));
+    setProductPrice(formatRubPriceInput(product.productPrice ?? ""));
     const oldPrice = product.productOldPrice;
     setProductOldPrice(
-      oldPrice != null && Number.isFinite(Number(oldPrice)) ? String(Math.floor(Number(oldPrice))) : "",
+      oldPrice != null && Number.isFinite(Number(oldPrice))
+        ? formatRubPriceInput(Math.floor(Number(oldPrice)))
+        : "",
     );
     setProductIsAvailable(product.productIsAvailable !== false);
     setProductStockQuantity(String(product.productStockQuantity ?? 1));
@@ -133,12 +143,12 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
   const loyaltyFieldDisabled = loyaltyBudget.maxPerUnit <= 0;
 
   const discountPercent = useMemo(() => {
-    const price = parsePositiveInt(productPrice);
+    const price = parseRubPriceInput(productPrice);
     const oldPriceRaw = productOldPrice.trim();
     if (price == null || !oldPriceRaw) {
       return null;
     }
-    const oldPrice = parsePositiveInt(oldPriceRaw);
+    const oldPrice = parseRubPriceInput(productOldPrice);
     return computeProductDiscountPercent(oldPrice, price);
   }, [productOldPrice, productPrice]);
 
@@ -150,7 +160,7 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
     if (productDescription.trim().length < PRODUCT_DESCRIPTION_MIN_CHARS) {
       return CREATE_PRODUCT_UI.ERROR_DESCRIPTION;
     }
-    const price = parsePositiveInt(productPrice);
+    const price = parseRubPriceInput(productPrice);
     if (price == null || price < 0) {
       return CREATE_PRODUCT_UI.ERROR_PRICE;
     }
@@ -159,7 +169,7 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
     }
     const oldPriceRaw = productOldPrice.trim();
     if (oldPriceRaw) {
-      const oldPrice = parsePositiveInt(oldPriceRaw);
+      const oldPrice = parseRubPriceInput(productOldPrice);
       if (oldPrice == null || oldPrice <= price) {
         return CREATE_PRODUCT_UI.ERROR_OLD_PRICE;
       }
@@ -174,7 +184,7 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
       return CREATE_PRODUCT_UI.ERROR_IMAGE_REQUIRED;
     }
     if (productIsAvailable) {
-      const stock = parsePositiveInt(productStockQuantity);
+      const stock = parseStockQuantity(productStockQuantity);
       if (
         stock == null ||
         stock < PRODUCT_STOCK_QUANTITY_MIN ||
@@ -209,7 +219,7 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
     setSuccessMessage("");
 
     const oldPriceRaw = productOldPrice.trim();
-    const oldPrice = oldPriceRaw ? parsePositiveInt(oldPriceRaw) : null;
+    const oldPrice = oldPriceRaw ? parseRubPriceInput(productOldPrice) : null;
 
     try {
       await patchMutation.mutateAsync({
@@ -217,12 +227,12 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
         body: {
           productName: productName.trim(),
           productDescription: productDescription.trim(),
-          productPrice: parsePositiveInt(productPrice) ?? 0,
+          productPrice: parseRubPriceInput(productPrice) ?? 0,
           productOldPrice: oldPriceRaw ? oldPrice : null,
           productCategoryId: productCategoryId ?? undefined,
           productIsAvailable,
           productStockQuantity: productIsAvailable
-            ? (parsePositiveInt(productStockQuantity) ?? PRODUCT_STOCK_QUANTITY_MIN)
+            ? (parseStockQuantity(productStockQuantity) ?? PRODUCT_STOCK_QUANTITY_MIN)
             : undefined,
           productImageUrls,
           productCharacteristics: serializeProductCharacteristicRows(characteristicRows),
@@ -321,7 +331,7 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
                 <TextInput
                   style={[styles.input, styles.priceInput]}
                   value={productPrice}
-                  onChangeText={(text) => setProductPrice(keepDigits(text))}
+                  onChangeText={(text) => setProductPrice(formatRubPriceInput(text))}
                   keyboardType="number-pad"
                   editable={!isBusy}
                   placeholderTextColor={theme.colors.textMuted}
@@ -332,7 +342,7 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
                 <TextInput
                   style={[styles.input, styles.priceInput]}
                   value={productOldPrice}
-                  onChangeText={(text) => setProductOldPrice(keepDigits(text))}
+                  onChangeText={(text) => setProductOldPrice(formatRubPriceInput(text))}
                   keyboardType="number-pad"
                   editable={!isBusy}
                   placeholder="0"

@@ -1,6 +1,8 @@
 import { WEB_APP_SHELL_MAX_WIDTH_PX } from "./appShellLayoutConstants.js";
 
 /**
+ * Эффективная ширина контента app-shell (окно, но не шире desktop cap).
+ *
  * @param {number} windowWidth
  * @returns {number}
  */

@@ -355,13 +355,13 @@
   margin-inline: var(--my-profile-shell-content-gutter, 0);
 }
 
-@container app-viewport (max-width: 903px) {
+@container app-viewport (max-width: 1023px) {
   .my-profile-page--catalog-grid-tab {
     --my-profile-mobile-inline-inset: 0.1rem;
     --my-profile-shell-content-gutter: calc(
       var(--app-shell-content-inline-padding) - var(--my-profile-mobile-inline-inset)
     );
-    --my-profile-catalog-grid-gap: 0.15rem;
+    --my-profile-catalog-grid-gap: 0.5rem;
 
     margin-inline: calc(
       -1 * (var(--app-shell-content-inline-padding) - var(--my-profile-mobile-inline-inset))
@@ -379,7 +379,7 @@
   }
 }
 
-@container app-viewport (max-width: 667px) {
+@container app-viewport (max-width: 640px) {
   .my-profile-page--catalog-grid-tab {
     --my-profile-mobile-inline-inset: 0.05rem;
     --my-profile-catalog-grid-gap: 0.1rem;
@@ -556,6 +556,35 @@
   color: var(--iz-color-primary);
 }
 
+.my-profile-page__mobile-nav-toggle-chevron {
+  display: none;
+  flex-shrink: 0;
+  margin-left: auto;
+  color: var(--iz-color-on-contrast);
+  line-height: 0;
+}
+
+.my-profile-page__overview-footer {
+  display: none;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.my-profile-page__privacy-link {
+  align-self: flex-start;
+  margin: 0;
+  padding: 0.5rem 0;
+  color: var(--iz-color-link);
+  font-size: 0.875rem;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.my-profile-page__privacy-link:hover {
+  color: var(--iz-color-action);
+}
+
 .my-profile-page__mobile-nav-backdrop {
   position: fixed;
   inset: 0;
@@ -624,6 +653,87 @@
     border-radius: 0;
     background: transparent;
     box-shadow: none;
+  }
+}
+
+/* Phone ≤640: паритет Expo — filled toggle + sheet справа */
+@container app-viewport (max-width: 640px) {
+  .my-profile-page {
+    --modal-avatar-lead-size: 4.5rem;
+  }
+
+  .my-profile-page__mobile-nav-toggle {
+    gap: 0.75rem;
+    padding: 0.75rem 0.875rem;
+    border: 2px solid var(--iz-color-action-hover);
+    border-radius: 1rem;
+    background: var(--iz-color-action);
+    color: var(--iz-color-on-contrast);
+    box-shadow:
+      0 4px 14px color-mix(in srgb, var(--iz-color-action) 35%, transparent),
+      0 1px 2px color-mix(in srgb, var(--iz-color-action) 20%, transparent);
+  }
+
+  .my-profile-page__mobile-nav-toggle:active {
+    transform: scale(0.97);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .my-profile-page__mobile-nav-toggle:active {
+      transform: none;
+    }
+
+    .my-profile-page__sidebar-wrap {
+      transition: none;
+    }
+  }
+
+  .my-profile-page__mobile-nav-toggle-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 2px solid var(--iz-color-action);
+    border-radius: 0.625rem;
+    background: var(--iz-color-surface);
+    color: var(--iz-color-action);
+  }
+
+  .my-profile-page__mobile-nav-toggle-caption {
+    letter-spacing: 0.05em;
+    color: var(--iz-color-on-contrast);
+  }
+
+  .my-profile-page__mobile-nav-toggle-label {
+    font-size: 1rem;
+    color: var(--iz-color-on-contrast);
+  }
+
+  .my-profile-page__mobile-nav-toggle-chevron {
+    display: inline-flex;
+  }
+
+  .my-profile-page__sidebar-wrap {
+    left: auto;
+    right: 0;
+    width: min(18rem, 88vw);
+    max-width: min(18rem, 88vw);
+    padding: 0.75rem 0.65rem 0.75rem 0.75rem;
+    border-radius: 1rem 0 0 1rem;
+    background: var(--iz-color-surface);
+    box-shadow: -12px 0 32px color-mix(in srgb, var(--iz-color-ink) 18%, transparent);
+    transform: translateX(calc(100% + 0.75rem));
+  }
+
+  .my-profile-page__sidebar-wrap--open {
+    transform: translateX(0);
+  }
+
+  .my-profile-page__body .user-details-modal__banner {
+    border-radius: 1.5rem;
+    overflow: hidden;
+  }
+
+  .my-profile-page__overview-footer {
+    display: flex;
   }
 }
 
