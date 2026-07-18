@@ -14,7 +14,7 @@ function corsOptionsWithRequestId(origin) {
 }
 
 /**
- * Production: только FRONTEND_URL.
+ * Production: только FRONTEND_URL (fail-hard без allowlist).
  * Dev: любой origin (localhost, 127.0.0.1, LAN :5173/:4173) — иначе POST на :4444 → Network Error.
  *
  * @param {boolean} isProduction
@@ -22,8 +22,16 @@ function corsOptionsWithRequestId(origin) {
 export function resolveApiCorsMiddleware(isProduction) {
   const frontendUrl = process.env.FRONTEND_URL?.trim();
 
-  if (isProduction && frontendUrl) {
-    const allowedOrigins = frontendUrl.split(",").map((u) => u.trim());
+  if (isProduction) {
+    if (!frontendUrl) {
+      throw new Error(
+        "FRONTEND_URL обязателен при NODE_ENV=production (CORS + credentials)",
+      );
+    }
+    const allowedOrigins = frontendUrl.split(",").map((u) => u.trim()).filter(Boolean);
+    if (allowedOrigins.length === 0) {
+      throw new Error("FRONTEND_URL пуст после trim — задайте хотя бы один origin");
+    }
     const origin = allowedOrigins.length === 1 ? allowedOrigins[0] : allowedOrigins;
     return cors(corsOptionsWithRequestId(origin));
   }

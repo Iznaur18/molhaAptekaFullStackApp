@@ -145,6 +145,10 @@ export const useInstallmentContractCardChromeStyles = createThemedStyles((theme)
     fontSize: 12.8,
     color: theme.colors.textMuted,
   },
+  counterpartyPhoneLink: {
+    color: theme.colors.link,
+    textDecorationLine: "underline",
+  },
   summary: {
     flexDirection: "row",
     flexWrap: "wrap",

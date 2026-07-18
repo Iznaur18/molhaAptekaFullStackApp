@@ -7,8 +7,6 @@ export const INVALID_EDITOR_TOKEN_MESSAGE =
 export const PROFILE_UPDATE_FORBIDDEN_MESSAGE =
   "У вас нет прав на обновление этого профиля";
 
-export const PROFILE_DELETE_SELF_FORBIDDEN_MESSAGE = "Нельзя удалить свой аккаунт";
-
 export const PROFILE_DELETE_FORBIDDEN_MESSAGE =
   "У вас нет прав на удаление этого профиля";
 

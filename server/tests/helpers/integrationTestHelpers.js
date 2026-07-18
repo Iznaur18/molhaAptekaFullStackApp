@@ -2,9 +2,13 @@ import assert from "node:assert/strict";
 
 import { ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY } from "../../constants/orderConstants.js";
 import { SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE } from "../../constants/productConstants.js";
-import { UserModel } from "../../models/index.js";
+import { PendingRegistrationModel, UserModel } from "../../models/index.js";
+import { hashEmailVerificationSecret } from "../../services/auth/emailVerification.js";
 import { seedProductCategoryTree } from "../../utils/seedProductCategoryTree.js";
 import { buildCookieHeader } from "./httpTestApp.js";
+
+/** Фиксированный код для confirm в интеграционных тестах (хеш пишется в PendingRegistration). */
+export const TEST_REGISTRATION_CODE = "424242";
 
 /** Идемпотентный seed пилотного дерева (нужен для POST /product с legacy productCategory). */
 export const ensureProductCategoryTreeSeeded = async () => {
@@ -59,21 +63,84 @@ export const parseErrorMessage = async (response) => {
 };
 
 /**
- * @param {(path: string, init?: RequestInit) => Promise<Response>} request
- * @param {string} suffix
+ * @param {string} registrationId
  */
-export const registerUserAndGetCookie = async (request, suffix) => {
-  const response = await request("/auth/register", {
+export const seedPendingRegistrationCode = async (registrationId) => {
+  await PendingRegistrationModel.findByIdAndUpdate(registrationId, {
+    codeHash: hashEmailVerificationSecret(TEST_REGISTRATION_CODE),
+    codeAttemptCount: 0,
+  });
+};
+
+import {
+  AUTH_CLIENT_HEADER,
+  AUTH_CLIENT_MOBILE,
+} from "../../constants/authClientConstants.js";
+
+/**
+ * register → confirm (с тестовым кодом) → session + cookie.
+ *
+ * @param {(path: string, init?: RequestInit) => Promise<Response>} request
+ * @param {Record<string, unknown>} payload
+ * @param {{ includeMobileAuthClient?: boolean }} [options]
+ */
+export const completeRegistrationFlow = async (
+  request,
+  payload,
+  options = {},
+) => {
+  const registerResponse = await request("/auth/register", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(buildRegisterPayload(suffix)),
+    body: JSON.stringify(payload),
   });
-  assert.equal(response.status, 200);
-  const cookie = buildCookieHeader(response.headers);
+  assert.equal(registerResponse.status, 200, "register should succeed");
+  const registerData = await parseSuccessData(registerResponse);
+  assert.ok(registerData.registrationId, "registrationId required");
+
+  await seedPendingRegistrationCode(registerData.registrationId);
+
+  /** @type {Record<string, string>} */
+  const confirmHeaders = { "Content-Type": "application/json" };
+  if (options.includeMobileAuthClient) {
+    confirmHeaders[AUTH_CLIENT_HEADER] = AUTH_CLIENT_MOBILE;
+  }
+
+  const confirmResponse = await request("/auth/register/confirm", {
+    method: "POST",
+    headers: confirmHeaders,
+    body: JSON.stringify({
+      registrationId: registerData.registrationId,
+      code: TEST_REGISTRATION_CODE,
+    }),
+  });
+  assert.equal(confirmResponse.status, 200, "confirm should succeed");
+  const session = await parseSuccessData(confirmResponse);
+  assert.equal(session.passwordHash, undefined);
+  assert.equal(session.authTokenVersion, undefined);
+
+  const cookie = buildCookieHeader(confirmResponse.headers);
+  return { cookie, session, payload, confirmResponse };
+};
+
+/**
+ * register → confirm → cookie сессии + /auth/me user.
+ *
+ * @param {(path: string, init?: RequestInit) => Promise<Response>} request
+ * @param {string} suffix
+ * @param {Record<string, unknown>} [payloadOverrides]
+ */
+export const registerUserAndGetCookie = async (
+  request,
+  suffix,
+  payloadOverrides = {},
+) => {
+  const payload = { ...buildRegisterPayload(suffix), ...payloadOverrides };
+  const { cookie, session } = await completeRegistrationFlow(request, payload);
   const meData = await parseSuccessData(
     await request("/auth/me", { headers: { Cookie: cookie } }),
   );
-  return { cookie, user: meData.user };
+  return { cookie, user: meData.user, payload, session };
 };
 
 /**

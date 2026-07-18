@@ -7,6 +7,7 @@ import { checkProductModeratorMW } from "./checkProductModeratorMW.js";
 import {
   generalRateLimiter,
   authRateLimiter,
+  registerAuthRateLimiter,
   refreshAuthRateLimiter,
   updateProfileRateLimiter,
   voteRateLimiter,
@@ -25,6 +26,7 @@ import {
   addressSuggestRateLimiter,
   userSearchRateLimiter,
 } from "./rateLimitMW.js";
+import { csrfCookieOriginCheckMW } from "./csrfCookieOriginCheckMW.js";
 import {
   errorHandler,
   notFoundHandler,
@@ -42,8 +44,10 @@ export {
   checkOptionalAuthMW,
   checkAdminMW,
   checkProductModeratorMW,
+  csrfCookieOriginCheckMW,
   generalRateLimiter,
   authRateLimiter,
+  registerAuthRateLimiter,
   refreshAuthRateLimiter,
   updateProfileRateLimiter,
   voteRateLimiter,

@@ -257,7 +257,10 @@ export function UserDetailsModal({
                   </>
                 ) : null}
                 {notificationsSlot}
-                <UserProfileInfoPanel rows={rows} />
+                <UserProfileInfoPanel
+                  rows={rows}
+                  hidePhoneUntilReveal={isOtherUserProfile}
+                />
               </div>
             ) : null}
           </div>

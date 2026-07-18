@@ -3,7 +3,7 @@ import { useLayoutEffect } from "react";
 import { ScrollView, Switch, Text, TextInput, View } from "react-native";
 
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
-import { limitRuPhoneInput } from "@/entities/user/lib/ruPhone";
+import { maskRuPhoneInput } from "@/entities/user/lib/ruPhone";
 import { AdminPremiumStaffControl } from "@/entities/user/ui/AdminPremiumStaffControl";
 import { AdminUserRolePicker } from "@/entities/user/ui/AdminUserRolePicker";
 import { useAdminEditUserForm } from "@/features/admin-edit-user-page/model/useAdminEditUserForm";
@@ -94,9 +94,10 @@ export const AdminEditUserPage = () => {
       <TextInput
         style={styles.input}
         value={form.userPhoneNumber}
-        onChangeText={(value) => updateField("userPhoneNumber", limitRuPhoneInput(value))}
+        onChangeText={(value) => updateField("userPhoneNumber", maskRuPhoneInput(value))}
         keyboardType="phone-pad"
         editable={!isSubmitting}
+        placeholder="8 (912) 345-67-89"
         placeholderTextColor={theme.colors.textMuted}
       />
 

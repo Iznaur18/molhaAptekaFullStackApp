@@ -96,6 +96,32 @@
   color: var(--iz-color-danger);
 }
 
+.register-modal__message_success {
+  color: var(--iz-color-text-muted);
+}
+
+.register-modal__code-text {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}
+
+.register-modal__secondary {
+  align-self: flex-start;
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 0.875rem;
+  color: var(--iz-color-action);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.register-modal__secondary:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
 .register-modal__submit {
   flex-shrink: 0;
   border: 1px solid var(--iz-color-action);

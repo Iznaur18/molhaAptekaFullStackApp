@@ -12,14 +12,19 @@ import { prepareBrowserImageFileForUpload } from "../lib/prepareBrowserImageFile
  * @param {File} file
  * @returns {Promise<string>} URL для сохранения и отображения
  */
-export async function uploadImage(file) {
+export async function uploadImage(file, purpose) {
   try {
     const preparedFile = await prepareBrowserImageFileForUpload(file);
     const formData = new FormData();
     formData.append("image", preparedFile);
 
+    const path =
+      purpose != null && String(purpose).trim() !== ""
+        ? `/upload?purpose=${encodeURIComponent(String(purpose).trim())}`
+        : "/upload";
+
     /** @type {{ success?: boolean; data?: { url?: string } }} */
-    const data = await postMultipart(apiClient, "/upload", formData);
+    const data = await postMultipart(apiClient, path, formData);
 
     if (!data?.success || typeof data.data?.url !== "string") {
       throw new Error(IMAGE_URL_FIELD_UI.ERROR_GENERIC);

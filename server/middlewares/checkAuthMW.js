@@ -5,6 +5,7 @@ import {
   getAuthTokenFromRequest,
 } from "../utils/authCookie.js";
 import { verifyAccessToken } from "../services/auth/authTokens.js";
+import { isRefreshTokenVersionValid } from "../services/auth/userAuthTokenVersion.js";
 import { errorRes } from "../services/http/index.js";
 
 const BLOCKED_ACCOUNT_MESSAGE = "Аккаунт заблокирован";
@@ -41,11 +42,19 @@ async function attachUserIdFromAccessToken(req, res) {
   const token = getAuthTokenFromRequest(req);
   const decoded = verifyAccessToken(token);
   const user = await UserModel.findById(decoded._id)
-    .select("isBlockedUser isActiveUser")
+    .select("+authTokenVersion isBlockedUser isActiveUser")
     .lean();
 
   if (!user) {
     return errorRes(res, 401, "Не авторизован");
+  }
+
+  // Отзыв сессии (logout / ротация refresh) должен гасить и access-токен.
+  // Токены, выпущенные до появления `tv`, невалидны — клиент прозрачно
+  // переполучит пару через /auth/refresh по действующему refresh-токену.
+  if (!isRefreshTokenVersionValid(decoded.tv, user)) {
+    clearAuthSessionCookies(res);
+    return errorRes(res, 401, "Сессия истекла");
   }
 
   const inactiveResponse = rejectInactiveAccount(res, user);

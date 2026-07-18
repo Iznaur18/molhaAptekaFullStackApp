@@ -12,7 +12,12 @@ import {
   USER_DATA_CONFIRMATION_STATUS_REJECTED,
 } from "../../constants/userDataConfirmationConstants.js";
 import { UserDataConfirmationRequestModel, UserModel } from "../../models/index.js";
+import {
+  PRIVATE_UPLOAD_API_PATH_PREFIX,
+} from "../../constants/privateUploadConstants.js";
 import { normalizeStoredUploadUrl } from "../upload/buildPublicUploadUrl.js";
+import { parsePrivateUploadFilenameFromUrl } from "../upload/privateUploadPaths.js";
+import { buildPrivateUploadApiUrl } from "../upload/privateUploadPaths.js";
 import { runInTransaction } from "../../utils/mongoTransaction.js";
 import {
   maskPassportForBuyerApi,
@@ -27,11 +32,18 @@ const UPLOAD_PATH_PREFIX = "/uploads/";
  * @param {unknown} value
  */
 export const normalizePassportSelfiePhotoUrl = (value) => {
-  const url = normalizeStoredUploadUrl(String(value ?? "").trim());
-  if (!url.includes(UPLOAD_PATH_PREFIX)) {
-    throw new Error("Загрузите фото с паспортом в руках");
+  const raw = String(value ?? "").trim();
+  const privateFilename = parsePrivateUploadFilenameFromUrl(raw);
+  if (privateFilename) {
+    return buildPrivateUploadApiUrl(privateFilename);
   }
-  return url;
+
+  const url = normalizeStoredUploadUrl(raw);
+  // Legacy публичные selfie до private-upload — ещё принимаем.
+  if (url.includes(UPLOAD_PATH_PREFIX) || url.includes(PRIVATE_UPLOAD_API_PATH_PREFIX)) {
+    return url;
+  }
+  throw new Error("Загрузите фото с паспортом в руках");
 };
 
 const PENDING_USER_SELECT = "_id userName userAvatarUrl isPremiumUser createdAt";

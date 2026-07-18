@@ -51,6 +51,11 @@ import {
   canFetchUsersSearch,
   isUsersSearchInputTooShort,
   userSellerProductsQuerySchema,
+  maskRuPhoneInput,
+  formatRuPhoneDisplay,
+  formatRuPhoneDisplayOrEmpty,
+  toRuPhoneTelHref,
+  RU_PHONE_EMPTY_LABEL,
 } from "../src/index.js";
 
 test("loginBodySchema validates credentials", () => {
@@ -61,14 +66,21 @@ test("loginBodySchema validates credentials", () => {
   assert.equal(parsed.email, "user@example.com");
 });
 
-test("authSessionDataSchema includes bearer tokens", () => {
-  const parsed = authSessionDataSchema.parse({
+test("authSessionDataSchema includes optional bearer tokens", () => {
+  const withTokens = authSessionDataSchema.parse({
     _id: "507f1f77bcf86cd799439011",
     email: "user@example.com",
     accessToken: "access.jwt.token",
     refreshToken: "refresh.jwt.token",
   });
-  assert.equal(parsed.accessToken, "access.jwt.token");
+  assert.equal(withTokens.accessToken, "access.jwt.token");
+
+  const cookieOnly = authSessionDataSchema.parse({
+    _id: "507f1f77bcf86cd799439011",
+    email: "user@example.com",
+  });
+  assert.equal(cookieOnly.accessToken, undefined);
+
   assert.equal(refreshAuthBodySchema.parse({}).refreshToken, undefined);
   assert.deepEqual(refreshAuthBodySchema.parse(undefined), {});
   assert.equal(
@@ -87,6 +99,20 @@ test("registerBodySchema normalizes phone and userName", () => {
   });
   assert.equal(parsed.userName, "tester");
   assert.equal(parsed.phoneNumber, "+79123456789");
+});
+
+test("ru phone mask / display / tel href", () => {
+  assert.equal(maskRuPhoneInput("+79123456789"), "8 (912) 345-67-89");
+  assert.equal(maskRuPhoneInput("9123456789"), "8 (912) 345-67-89");
+  assert.equal(maskRuPhoneInput("8"), "8");
+  assert.equal(maskRuPhoneInput("89"), "8 (9");
+  assert.equal(formatRuPhoneDisplay(""), "");
+  assert.equal(formatRuPhoneDisplayOrEmpty(null), RU_PHONE_EMPTY_LABEL);
+  assert.equal(formatRuPhoneDisplayOrEmpty("+79123456789"), "8 (912) 345-67-89");
+  assert.equal(toRuPhoneTelHref("+79123456789"), "tel:+79123456789");
+  assert.equal(toRuPhoneTelHref("8 (912) 345-67-89"), "tel:+79123456789");
+  assert.equal(toRuPhoneTelHref(""), null);
+  assert.equal(toRuPhoneTelHref("8 (912)"), null);
 });
 
 test("route param schemas accept mongo ids", () => {

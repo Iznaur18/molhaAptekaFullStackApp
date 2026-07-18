@@ -25,12 +25,20 @@ const appendImageToFormData = async (
   formData.append("image", file as unknown as Blob);
 };
 
-export const uploadImage = async (file: UploadImageFilePayload): Promise<string> => {
+export const uploadImage = async (
+  file: UploadImageFilePayload,
+  purpose?: string,
+): Promise<string> => {
   try {
     const formData = new FormData();
     await appendImageToFormData(formData, file);
 
-    const data = await postMultipart(apiClient, "/upload", formData);
+    const path =
+      purpose != null && purpose.trim() !== ""
+        ? `/upload?purpose=${encodeURIComponent(purpose.trim())}`
+        : "/upload";
+
+    const data = await postMultipart(apiClient, path, formData);
 
     const parsed = parseUploadImageData(data);
     return normalizeUploadUrlForStorage(parsed.url);

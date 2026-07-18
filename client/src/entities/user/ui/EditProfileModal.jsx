@@ -146,6 +146,7 @@ export function EditProfileModal({
                 onChange={handleChange}
                 autoComplete="tel"
                 inputMode="tel"
+                placeholder="8 (912) 345-67-89"
               />
             </label>
             <label className="edit-profile-modal__label">

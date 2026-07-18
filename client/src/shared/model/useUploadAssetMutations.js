@@ -5,7 +5,12 @@ import { uploadVideo } from "../api/uploadVideo.js";
 
 export function useUploadAssetMutations() {
   const uploadImageMutation = useMutation({
-    mutationFn: uploadImage,
+    mutationFn: (variables) => {
+      if (variables instanceof File) {
+        return uploadImage(variables);
+      }
+      return uploadImage(variables?.file ?? variables, variables?.purpose);
+    },
   });
 
   const uploadVideoMutation = useMutation({

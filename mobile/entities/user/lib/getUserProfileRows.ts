@@ -4,6 +4,10 @@ import {
 } from "@/entities/user/lib/formatSearchRowTotalSales";
 import { isPremiumActive } from "@/entities/user/lib/isPremiumActive";
 import {
+  formatRuPhoneDisplayOrEmpty,
+  toRuPhoneTelHref,
+} from "@/entities/user/lib/ruPhone";
+import {
   USER_GENDER_LABEL_RU,
   USER_ROLE_ADMIN,
   USER_ROLE_LABEL_RU,
@@ -16,6 +20,7 @@ export type ProfileRow = {
   id: string;
   label: string;
   value: string;
+  href?: string;
 };
 
 const EM_DASH = "—";
@@ -142,7 +147,8 @@ export const getUserProfileRows = (
     {
       id: "userPhoneNumber",
       label: USER_PROFILE_COPY.LABELS.userPhoneNumber,
-      value: dashIfEmpty(user.userPhoneNumber),
+      value: formatRuPhoneDisplayOrEmpty(user.userPhoneNumber),
+      href: toRuPhoneTelHref(user.userPhoneNumber) ?? undefined,
     },
     {
       id: "isUserDataConfirmed",

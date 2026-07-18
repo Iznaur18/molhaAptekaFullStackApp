@@ -1,6 +1,10 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-import { COMMON_UI, FORMAT_BOOLEAN_RU } from "../../../shared/config/appUiCopy.js";
+import {
+  COMMON_UI,
+  FORMAT_BOOLEAN_RU,
+  USER_PROFILE_COPY,
+} from "../../../shared/config/appUiCopy.js";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
 import {
   groupProfileRows,
@@ -8,16 +12,24 @@ import {
 } from "../lib/groupProfileRows.js";
 import { getProfileSectionTone } from "../lib/profileRowColors.js";
 import { getProfileRowIcon } from "../lib/profileRowIcons.js";
+import { RU_PHONE_EMPTY_LABEL } from "../lib/ruPhone.js";
 
 import "./UserProfileInfoPanel.css";
 
+const PHONE_ROW_ID = "userPhoneNumber";
+
 /**
  * @param {{
- * rows: { id: string; label: string; value: string }[];
+ * rows: { id: string; label: string; value: string; href?: string }[];
  * className?: string;
+ * hidePhoneUntilReveal?: boolean;
  * }} props
  */
-export function UserProfileInfoPanel({ rows, className = "" }) {
+export function UserProfileInfoPanel({
+  rows,
+  className = "",
+  hidePhoneUntilReveal = false,
+}) {
   const sections = useMemo(() => groupProfileRows(rows), [rows]);
 
   if (sections.length === 0) {
@@ -39,6 +51,7 @@ export function UserProfileInfoPanel({ rows, className = "" }) {
             sectionId={section.id}
             title={section.title}
             rows={section.rows}
+            hidePhoneUntilReveal={hidePhoneUntilReveal}
           />
         ),
       )}
@@ -49,7 +62,7 @@ export function UserProfileInfoPanel({ rows, className = "" }) {
 /**
  * @param {{
  * sectionId: string;
- * rows: { id: string; label: string; value: string }[];
+ * rows: { id: string; label: string; value: string; href?: string }[];
  * }} props
  */
 function ProfileStatsSection({ sectionId, rows }) {
@@ -86,10 +99,11 @@ function ProfileStatsSection({ sectionId, rows }) {
  * @param {{
  * sectionId: string;
  * title: string | null;
- * rows: { id: string; label: string; value: string }[];
+ * rows: { id: string; label: string; value: string; href?: string }[];
+ * hidePhoneUntilReveal: boolean;
  * }} props
  */
-function ProfileDetailsSection({ sectionId, title, rows }) {
+function ProfileDetailsSection({ sectionId, title, rows, hidePhoneUntilReveal }) {
   const sectionTone = getProfileSectionTone(sectionId);
 
   return (
@@ -98,7 +112,8 @@ function ProfileDetailsSection({ sectionId, title, rows }) {
       <dl className="user-profile-info__details">
         {rows.map((row) => {
           const icon = getProfileRowIcon(row.id);
-          const isEmpty = row.value === COMMON_UI.EM_DASH;
+          const isEmpty =
+            row.value === COMMON_UI.EM_DASH || row.value === RU_PHONE_EMPTY_LABEL;
 
           return (
             <div key={row.id} className="user-profile-info__detail-row">
@@ -121,7 +136,10 @@ function ProfileDetailsSection({ sectionId, title, rows }) {
                   .filter(Boolean)
                   .join(" ")}
               >
-                {row.value}
+                <ProfileDetailValue
+                  row={row}
+                  hidePhoneUntilReveal={hidePhoneUntilReveal}
+                />
               </dd>
             </div>
           );
@@ -129,6 +147,44 @@ function ProfileDetailsSection({ sectionId, title, rows }) {
       </dl>
     </section>
   );
+}
+
+/**
+ * @param {{
+ * row: { id: string; value: string; href?: string };
+ * hidePhoneUntilReveal: boolean;
+ * }} props
+ */
+function ProfileDetailValue({ row, hidePhoneUntilReveal }) {
+  const [phoneRevealed, setPhoneRevealed] = useState(false);
+  const needsReveal =
+    hidePhoneUntilReveal && row.id === PHONE_ROW_ID && Boolean(row.href);
+
+  useEffect(() => {
+    setPhoneRevealed(false);
+  }, [row.href, row.value]);
+
+  if (needsReveal && !phoneRevealed) {
+    return (
+      <button
+        type="button"
+        className="user-profile-info__reveal-phone"
+        onClick={() => setPhoneRevealed(true)}
+      >
+        {USER_PROFILE_COPY.SHOW_PHONE_NUMBER}
+      </button>
+    );
+  }
+
+  if (row.href) {
+    return (
+      <a className="user-profile-info__detail-link" href={row.href}>
+        {row.value}
+      </a>
+    );
+  }
+
+  return row.value;
 }
 
 /**

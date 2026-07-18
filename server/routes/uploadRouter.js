@@ -2,14 +2,25 @@ import { createAsyncRouter } from "../utils/createAsyncRouter.js";
 import {
   uploadMW,
   checkAuthMW,
+  checkProductModeratorMW,
   uploadRateLimiter,
   uploadVideoMW,
-} from "../middlewares/index.js"; // Импортируем uploadMW и checkAuthMW из middlewares/index.js. Он будет использоваться для загрузки файла.
-import { uploadController, uploadVideoController } from "../controllers/index.js";
+} from "../middlewares/index.js";
+import {
+  uploadController,
+  uploadVideoController,
+  getPrivateUploadController,
+} from "../controllers/index.js";
 
 const router = createAsyncRouter();
 
-// Rate limiting для загрузки файлов (защита от перегрузки сервера)
+router.get(
+  "/private/:filename",
+  checkAuthMW,
+  checkProductModeratorMW,
+  getPrivateUploadController,
+);
+
 router.post(
   "/",
   checkAuthMW,
@@ -26,4 +37,4 @@ router.post(
   uploadVideoController,
 );
 
-export { router as uploadRouter }; // Получаем в файле index.js и используем в app.use('/upload', uploadRouter);
+export { router as uploadRouter };

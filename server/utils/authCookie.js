@@ -55,17 +55,27 @@ export const setRefreshCookie = (res, token) => {
 };
 
 /**
+ * Атрибуты удаления должны совпадать с атрибутами установки: при
+ * SameSite=None; Secure браузер отвергнет стирающую Set-Cookie с Lax/без
+ * Secure, и кука логина переживёт logout.
+ */
+const getClearCookieOptions = () => {
+  const { maxAge: _maxAge, ...rest } = getCookieOptions(0);
+  return rest;
+};
+
+/**
  * @param {import('express').Response} res
  */
 export const clearAuthCookie = (res) => {
-  res.clearCookie(AUTH_COOKIE_NAME, { path: "/" });
+  res.clearCookie(AUTH_COOKIE_NAME, getClearCookieOptions());
 };
 
 /**
  * @param {import('express').Response} res
  */
 export const clearRefreshCookie = (res) => {
-  res.clearCookie(REFRESH_COOKIE_NAME, { path: "/" });
+  res.clearCookie(REFRESH_COOKIE_NAME, getClearCookieOptions());
 };
 
 /**

@@ -1,6 +1,11 @@
 import { uploadController } from "./User/uploadController.js";
+import { getPrivateUploadController } from "./User/getPrivateUploadController.js";
 import { uploadVideoController } from "./User/uploadVideoController.js";
-import { registerUserController } from "./User/registerUserController.js";
+import {
+  registerUserController,
+  confirmRegistrationController,
+  resendRegistrationCodeController,
+} from "./User/registerUserController.js";
 import {
   loginUserController,
   logoutUserController,
@@ -215,8 +220,11 @@ import {
 
 export {
   uploadController,
+  getPrivateUploadController,
   uploadVideoController,
   registerUserController,
+  confirmRegistrationController,
+  resendRegistrationCodeController,
   loginUserController,
   logoutUserController,
   refreshAuthController,

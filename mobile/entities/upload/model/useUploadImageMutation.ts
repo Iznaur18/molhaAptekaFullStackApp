@@ -4,5 +4,10 @@ import { uploadImage, type UploadImageFilePayload } from "@/entities/upload/api/
 
 export const useUploadImageMutation = () =>
   useMutation({
-    mutationFn: (file: UploadImageFilePayload) => uploadImage(file),
+    mutationFn: (variables: UploadImageFilePayload | { file: UploadImageFilePayload; purpose?: string }) => {
+      if ("file" in variables && variables.file) {
+        return uploadImage(variables.file, variables.purpose);
+      }
+      return uploadImage(variables as UploadImageFilePayload);
+    },
   });

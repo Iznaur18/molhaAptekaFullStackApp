@@ -234,6 +234,7 @@ export function MyProfilePage({
             activeTab={activeTab}
             onItemSelect={closeMobileNav}
             onLogout={onLogout}
+            user={user}
           />
         </div>
 

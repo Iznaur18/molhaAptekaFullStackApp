@@ -25,6 +25,7 @@ import {
   Store,
   Ticket,
   ToggleLeft,
+  Trash2,
   UserCheck,
   TrendingUp,
   Users,
@@ -66,6 +67,7 @@ export const PROFILE_NAV_ITEM_META = {
   "product-manage-toggle-display-admin": { icon: ToggleLeft },
   "popular-products-admin": { icon: Star },
   logout: { icon: LogOut },
+  "delete-account": { icon: Trash2 },
 };
 
 /**

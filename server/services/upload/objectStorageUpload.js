@@ -49,6 +49,12 @@ export const buildObjectStorageKey = (filename) =>
   `${UPLOAD_OBJECT_KEY_PREFIX}${filename}`;
 
 /**
+ * @param {string} filename
+ */
+export const buildPrivateObjectStorageKey = (filename) =>
+  `${UPLOAD_OBJECT_KEY_PREFIX}private/${filename}`;
+
+/**
  * @param {import('express').Request['file']} file
  */
 export const resolveUploadFilename = (file) => {
@@ -65,6 +71,37 @@ export const resolveUploadFilename = (file) => {
 export const persistUploadToObjectStorage = async (file) => {
   const filename = resolveUploadFilename(file);
   const key = buildObjectStorageKey(filename);
+  const body = file.buffer;
+
+  if (!body || !Buffer.isBuffer(body)) {
+    throw new Error("Object storage upload requires in-memory file buffer");
+  }
+
+  const bucket = process.env.S3_BUCKET?.trim();
+  if (!bucket) {
+    throw new Error("S3_BUCKET не задан");
+  }
+
+  await getS3Client().send(
+    new PutObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      Body: body,
+      ContentType: resolveUploadContentType(filename, file.mimetype),
+    }),
+  );
+
+  return filename;
+};
+
+/**
+ * Чувствительные файлы (passport selfie) — ключ `uploads/private/{filename}`.
+ *
+ * @param {import('express').Request['file']} file
+ */
+export const persistPrivateUploadToObjectStorage = async (file) => {
+  const filename = resolveUploadFilename(file);
+  const key = buildPrivateObjectStorageKey(filename);
   const body = file.buffer;
 
   if (!body || !Buffer.isBuffer(body)) {

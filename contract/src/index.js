@@ -105,6 +105,11 @@ export {
   verifyEmailTokenQuerySchema,
   EMAIL_VERIFICATION_TOKEN_HEX_LENGTH,
 } from "./emailVerification.js";
+export {
+  pendingRegistrationDataSchema,
+  confirmRegistrationBodySchema,
+  resendRegistrationCodeBodySchema,
+} from "./registration.js";
 export { addressSuggestBodySchema } from "./addressSuggest.js";
 export { adminCatalogDisplayPatchBodySchema } from "./adminDisplay.js";
 export {
@@ -152,7 +157,16 @@ export {
   USER_NAME_MAX_LENGTH,
   USER_GENDER_VALUES,
   USER_BACKGROUND_PRESET_IDS,
+  RU_PHONE_E164_REGEX,
+  RU_PHONE_MAX_DIGITS,
+  RU_PHONE_EMPTY_LABEL,
   normalizeRuPhoneInput,
+  maskRuPhoneInput,
+  formatRuPhoneDisplay,
+  formatRuPhoneDisplayOrEmpty,
+  toRuPhoneTelHref,
+  assertRuPhoneFormat,
+  validateRuPhoneField,
   normalizeUserNameInput,
   userNameFieldSchema,
 } from "./userFields.js";

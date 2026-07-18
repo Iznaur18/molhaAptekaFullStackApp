@@ -27,3 +27,16 @@ export const EMAIL_VERIFICATION_ATTEMPTS_EXCEEDED_MESSAGE =
 export const EMAIL_VERIFICATION_SENT_MESSAGE = "Письмо с подтверждением отправлено";
 
 export const EMAIL_VERIFICATION_SUCCESS_MESSAGE = "Email успешно подтверждён";
+
+/**
+ * Срок жизни заявки на регистрацию до подтверждения email.
+ * По истечении MongoDB удаляет заявку по TTL-индексу — данные
+ * неподтверждённой регистрации не остаются в базе.
+ */
+export const PENDING_REGISTRATION_TTL_MS = EMAIL_VERIFICATION_TOKEN_TTL_MS;
+
+export const PENDING_REGISTRATION_NOT_FOUND_MESSAGE =
+  "Заявка на регистрацию не найдена или устарела. Зарегистрируйтесь заново";
+
+export const PENDING_REGISTRATION_TAKEN_MESSAGE =
+  "Пользователь с таким email или userName или userPhoneNumber уже существует";

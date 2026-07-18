@@ -1,9 +1,12 @@
-import { ADMIN_ROLE } from "../access/adminUserGuard.js";
+import { ADMIN_ROLE, isStaffRole } from "../access/adminUserGuard.js";
 
-/** Поля, видимые только владельцу или admin. */
+/**
+ * Поля только для self/admin.
+ * Телефон и баллы лояльности — публичны в карточке профиля (номер — через «Показать номер» на клиенте).
+ * Search по-прежнему режет телефон отдельно.
+ */
 const USER_PRIVATE_PROFILE_FIELDS = [
   "email",
-  "userPhoneNumber",
   "userAddress",
   "userAddressFlat",
   "userAddressDistrict",
@@ -27,6 +30,15 @@ function stripPrivateProfileFields(user) {
   for (const field of USER_PRIVATE_PROFILE_FIELDS) {
     delete out[field];
   }
+  return out;
+}
+
+/**
+ * @param {Record<string, unknown>} user
+ */
+function stripPhoneNumber(user) {
+  const out = { ...user };
+  delete out.userPhoneNumber;
   return out;
 }
 
@@ -75,11 +87,22 @@ export function sanitizeUserProfileForViewer(user, ctx) {
  * @param {{ viewer?: { userRole?: string; isBlockedUser?: boolean } | null; roleFilter?: string }} ctx
  */
 export function applyAdminVisibilityToUsersSearchQuery(usersQuery, ctx) {
-  const { roleFilter } = ctx;
+  const { roleFilter, viewer } = ctx;
 
-  if (roleFilter) {
-    usersQuery.userRole = roleFilter;
+  if (!roleFilter) {
+    return;
   }
+
+  const canFilterByRole =
+    Boolean(viewer) &&
+    isStaffRole(viewer.userRole) &&
+    !viewer.isBlockedUser;
+
+  if (!canFilterByRole) {
+    return;
+  }
+
+  usersQuery.userRole = roleFilter;
 }
 
 /**
@@ -92,7 +115,7 @@ export function sanitizeUsersSearchList(users, ctx) {
   }
 
   return users.map((row) => {
-    const item = stripPrivateProfileFields(row);
+    const item = stripPhoneNumber(stripPrivateProfileFields(row));
     delete item.userRole;
     delete item.isActiveUser;
     delete item.isBlockedUser;

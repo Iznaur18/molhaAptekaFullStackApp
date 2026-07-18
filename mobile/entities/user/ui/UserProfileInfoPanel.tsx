@@ -1,6 +1,6 @@
 import { Feather } from "@expo/vector-icons";
-import { useMemo } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { useEffect, useMemo, useState } from "react";
+import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
 import { izColors } from "@izibuy/design-tokens";
 
 import type { ProfileRow } from "@/entities/user/lib/getUserProfileRows";
@@ -9,12 +9,17 @@ import {
   isBooleanProfileRow,
 } from "@/entities/user/lib/groupProfileRows";
 import { getProfileRowIcon } from "@/entities/user/lib/profileRowIcons";
+import { RU_PHONE_EMPTY_LABEL } from "@/entities/user/lib/ruPhone";
+import { USER_PROFILE_COPY } from "@/shared/config";
 import { PROFILE_CARD_SQUIRCLE_RADIUS } from "@/shared/theme/profileChromeStyles";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { SquircleView } from "@/shared/ui/SquircleView";
 
+const PHONE_ROW_ID = "userPhoneNumber";
+
 type UserProfileInfoPanelProps = {
   rows: ProfileRow[];
+  hidePhoneUntilReveal?: boolean;
 };
 
 /** Section chrome stays black/white in all themes (dark remaps `ink` to white). */
@@ -86,6 +91,18 @@ const useStyles = createThemedStyles((theme) => ({
     marginLeft: "auto",
     color: theme.colors.textSecondary,
   },
+  detailValueEmpty: {
+    fontWeight: "500",
+    color: theme.colors.textMuted,
+  },
+  detailValueLink: {
+    color: theme.colors.link,
+    textDecorationLine: "underline",
+  },
+  revealPhone: {
+    color: theme.colors.link,
+    fontWeight: "700",
+  },
   detailValuePositive: {
     paddingHorizontal: 8,
     paddingVertical: 2,
@@ -105,7 +122,68 @@ const useStyles = createThemedStyles((theme) => ({
   },
 }));
 
-export const UserProfileInfoPanel = ({ rows }: UserProfileInfoPanelProps) => {
+const openProfileRowHref = (href: string) => {
+  void Linking.openURL(href).catch(() => undefined);
+};
+
+type ProfileDetailValueProps = {
+  row: ProfileRow;
+  hidePhoneUntilReveal: boolean;
+  styles: ReturnType<typeof useStyles>;
+};
+
+const ProfileDetailValue = ({
+  row,
+  hidePhoneUntilReveal,
+  styles,
+}: ProfileDetailValueProps) => {
+  const [phoneRevealed, setPhoneRevealed] = useState(false);
+  const needsReveal =
+    hidePhoneUntilReveal && row.id === PHONE_ROW_ID && Boolean(row.href);
+  const isBoolean = isBooleanProfileRow(row.id);
+  const isYes = row.value === "Да";
+  const isNo = row.value === "Нет";
+  const isEmpty = row.value === "—" || row.value === RU_PHONE_EMPTY_LABEL;
+
+  useEffect(() => {
+    setPhoneRevealed(false);
+  }, [row.href, row.value]);
+
+  if (needsReveal && !phoneRevealed) {
+    return (
+      <Pressable onPress={() => setPhoneRevealed(true)}>
+        <Text style={[styles.detailValue, styles.revealPhone]}>
+          {USER_PROFILE_COPY.SHOW_PHONE_NUMBER}
+        </Text>
+      </Pressable>
+    );
+  }
+
+  const valueNode = (
+    <Text
+      style={[
+        styles.detailValue,
+        isEmpty && styles.detailValueEmpty,
+        Boolean(row.href) && styles.detailValueLink,
+        isBoolean && isYes && styles.detailValuePositive,
+        isBoolean && isNo && styles.detailValueMuted,
+      ]}
+    >
+      {row.value}
+    </Text>
+  );
+
+  if (row.href) {
+    return <Pressable onPress={() => openProfileRowHref(row.href!)}>{valueNode}</Pressable>;
+  }
+
+  return valueNode;
+};
+
+export const UserProfileInfoPanel = ({
+  rows,
+  hidePhoneUntilReveal = false,
+}: UserProfileInfoPanelProps) => {
   const styles = useStyles();
   const sections = useMemo(() => groupProfileRows(rows), [rows]);
 
@@ -127,9 +205,6 @@ export const UserProfileInfoPanel = ({ rows }: UserProfileInfoPanelProps) => {
           {section.rows.map((row, index) => {
             const icon = getProfileRowIcon(row.id);
             const isLast = index === section.rows.length - 1;
-            const isBoolean = isBooleanProfileRow(row.id);
-            const isYes = row.value === "Да";
-            const isNo = row.value === "Нет";
 
             return (
               <View
@@ -144,15 +219,11 @@ export const UserProfileInfoPanel = ({ rows }: UserProfileInfoPanelProps) => {
                   ) : null}
                   <Text style={styles.detailLabel}>{row.label}</Text>
                 </View>
-                <Text
-                  style={[
-                    styles.detailValue,
-                    isBoolean && isYes && styles.detailValuePositive,
-                    isBoolean && isNo && styles.detailValueMuted,
-                  ]}
-                >
-                  {row.value}
-                </Text>
+                <ProfileDetailValue
+                  row={row}
+                  hidePhoneUntilReveal={hidePhoneUntilReveal}
+                  styles={styles}
+                />
               </View>
             );
           })}

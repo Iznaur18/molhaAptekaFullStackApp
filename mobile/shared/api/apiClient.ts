@@ -49,10 +49,12 @@ const getRefreshSessionOnce = createRefreshSessionQueue(refreshAuthSession);
 setupAuthSessionInterceptors(apiClient, {
   getAccessToken,
   refreshSession: getRefreshSessionOnce,
-  onRequest: () => {
+  onRequest: (config) => {
     if (!API_BASE_URL) {
       throw new Error(API_CLIENT_UI.API_URL_MISSING);
     }
+    config.headers = config.headers ?? {};
+    config.headers["X-Auth-Client"] = "mobile";
   },
   onRefreshFailure: clearAuthTokens,
 });

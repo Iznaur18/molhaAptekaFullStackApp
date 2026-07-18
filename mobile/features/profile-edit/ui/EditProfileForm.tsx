@@ -7,7 +7,7 @@ import {
   type EditProfileFormState,
   type StructuredAddress,
 } from "@/entities/user/lib/mapUserToEditProfileForm";
-import { limitRuPhoneInput } from "@/entities/user/lib/ruPhone";
+import { maskRuPhoneInput } from "@/entities/user/lib/ruPhone";
 import { validateEditProfileForm } from "@/entities/user/lib/validateEditProfileForm";
 import { usePatchUserProfileMutation } from "@/entities/user/model/usePatchUserProfileMutation";
 import {
@@ -24,6 +24,7 @@ import {
 } from "@/entities/user/model/constants";
 import { ProfileAvatarUpload } from "@/features/image-upload/ui/ProfileAvatarUpload";
 import { ProfileBackgroundUpload } from "@/features/image-upload/ui/ProfileBackgroundUpload";
+import { DeleteAccountSection } from "@/features/profile-edit/ui/DeleteAccountSection";
 import { ADDRESS_STRUCTURED_UI, EDIT_PROFILE_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useEditProfileFormStyles } from "@/shared/theme/editProfileFormStyles";
@@ -213,9 +214,10 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
             <TextInput
               style={styles.input}
               value={form.userPhoneNumber}
-              onChangeText={(value) => updateField("userPhoneNumber", limitRuPhoneInput(value))}
+              onChangeText={(value) => updateField("userPhoneNumber", maskRuPhoneInput(value))}
               keyboardType="phone-pad"
               editable={!isSubmitting}
+              placeholder="8 (912) 345-67-89"
               placeholderTextColor={theme.colors.textMuted}
             />
           </View>
@@ -323,6 +325,8 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
         disabled={isSubmitting}
         style={styles.submit}
       />
+
+      <DeleteAccountSection userId={user._id} />
     </ScrollView>
   );
 };

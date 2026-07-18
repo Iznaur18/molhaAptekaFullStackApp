@@ -1172,6 +1172,23 @@ export const ADMIN_EDIT_USER_UI = {
   DELETE_LOADING: "Удаление…",
 };
 
+/**
+ * Самоудаление аккаунта владельцем (не админское удаление чужого).
+ * Состав данных синхронен с server/services/user/runProfileDeleteCascade.js
+ * и с mobile DELETE_ACCOUNT_UI.
+ */
+export const DELETE_ACCOUNT_UI = {
+  NAV_BUTTON: "Удалить аккаунт",
+  DELETE_CONFIRM_TITLE: "Удалить аккаунт?",
+  /** @param {string} token */
+  DELETE_CONFIRM_HINT: (token) =>
+    `Безвозвратно удалим профиль и личные данные, ваши товары, оценки и отзывы, подписки, избранное и корзину. История заказов и договоры рассрочки сохранятся — этого требует бухгалтерская и налоговая отчётность. Восстановить аккаунт будет невозможно. Введите «${token}» для подтверждения.`,
+  DELETE_CONFIRM_PLACEHOLDER: "Подтверждение",
+  DELETE_SUBMIT: "Удалить аккаунт",
+  DELETE_CANCEL: "Отмена",
+  DELETE_LOADING: "Удаление…",
+};
+
 /** Визуал премиум-пользователя (галочка, золотая обводка аватара). */
 export const USER_PREMIUM_UI = {
   CHECK_GLYPH: "✓",
@@ -1938,6 +1955,18 @@ export const REGISTER_MODAL_UI = {
   SUBMIT_LOADING: "Регистрация…",
   ERROR_GENERIC: "Ошибка при регистрации",
   ERROR_REQUIRED_FIELDS: "Заполните обязательные поля",
+  CODE_STEP_TEXT: (email) =>
+    `Мы отправили 6-значный код на ${email}. Аккаунт будет создан только после подтверждения почты.`,
+  CODE_STEP_EMAIL_FALLBACK: "ваш email",
+  LABEL_CODE: "Код из письма",
+  CODE_PLACEHOLDER: "000000",
+  CODE_REQUIRED: "Введите 6-значный код из письма",
+  CONFIRM_IDLE: "Подтвердить почту",
+  CONFIRM_LOADING: "Проверка…",
+  RESEND_BUTTON: "Отправить код повторно",
+  RESEND_LOADING: "Отправка…",
+  RESENT: "Письмо отправлено. Проверьте почту.",
+  BACK_TO_FORM: "Изменить данные регистрации",
   ERROR_PASSWORD_MISMATCH: "Пароли не совпадают",
   ERROR_PASSWORD_TOO_SHORT: "Пароль должен быть не менее 6 символов",
   PASSWORD_MIN_LENGTH: 6,
@@ -2164,6 +2193,7 @@ export const USER_PROFILE_COPY = {
     createdAt: "Создан",
     updatedAt: "Обновлён",
   },
+  SHOW_PHONE_NUMBER: "Показать номер",
   RATING_NONE: "Нет оценок",
   BACKGROUND_CUSTOM_IMAGE: "Своё изображение",
   DATE_FORMAT_OPTIONS: { dateStyle: "short", timeStyle: "short" },

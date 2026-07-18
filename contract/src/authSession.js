@@ -2,11 +2,12 @@ import { z } from "zod";
 
 import { userPublicProfileSchema } from "./authMe.js";
 
-/** `data` ответов `POST /auth/login`, `/auth/register`, `/auth/refresh`. */
+/** `data` ответов `POST /auth/login`, `/auth/register`, `/auth/refresh`.
+ * Токены обязательны для mobile (`X-Auth-Client: mobile`); web — только cookies. */
 export const authSessionDataSchema = userPublicProfileSchema
   .extend({
-    accessToken: z.string().min(1),
-    refreshToken: z.string().min(1),
+    accessToken: z.string().min(1).optional(),
+    refreshToken: z.string().min(1).optional(),
   })
   .passthrough();
 

@@ -15,11 +15,11 @@ import { isSmtpConfigured, sendSmtpMail } from "../../utils/smtpMail.js";
 
 const EMAIL_VERIFICATION_CODE_PATTERN = new RegExp(`^\\d{${EMAIL_VERIFICATION_CODE_LENGTH}}$`);
 
-const hashEmailVerificationSecret = (rawSecret) =>
-  crypto.createHash("sha256").update(String(rawSecret)).digest("hex");
+/** Высокоэнтропийный токен ссылки: 32 байта hex (см. verifyEmailTokenQuerySchema). */
+const EMAIL_VERIFICATION_LINK_TOKEN_PATTERN = /^[a-f0-9]{64}$/i;
 
-export const generateEmailVerificationToken = () =>
-  crypto.randomBytes(32).toString("hex");
+export const hashEmailVerificationSecret = (rawSecret) =>
+  crypto.createHash("sha256").update(String(rawSecret)).digest("hex");
 
 export const generateEmailVerificationCode = () =>
   String(crypto.randomInt(10 ** (EMAIL_VERIFICATION_CODE_LENGTH - 1), 10 ** EMAIL_VERIFICATION_CODE_LENGTH));
@@ -78,6 +78,15 @@ export const markUserEmailVerified = async (userId) => {
 export const verifyEmailByToken = async (rawToken) => {
   const token = String(rawToken ?? "").trim();
   if (!token) {
+    throw new Error(EMAIL_VERIFICATION_INVALID_TOKEN_MESSAGE);
+  }
+
+  // Этот путь — неаутентифицированный GET без счётчика попыток, поэтому
+  // принимаем только высокоэнтропийный токен ссылки.
+  // Иначе сюда подошёл бы 6-значный код из письма: пространство 10^6 при
+  // общем лимите 50k запросов/15 мин с IP брутфорсится за часы, и любой
+  // ожидающий подтверждения email можно было подтвердить без доступа к почте.
+  if (!EMAIL_VERIFICATION_LINK_TOKEN_PATTERN.test(token)) {
     throw new Error(EMAIL_VERIFICATION_INVALID_TOKEN_MESSAGE);
   }
 
@@ -150,29 +159,36 @@ export const verifyEmailByCodeForUser = async (userId, rawCode) => {
  * @param {{ email: string; userName?: string; code: string }} params
  */
 export const deliverEmailVerification = async ({ email, userName, code }) => {
-  if (isSmtpConfigured()) {
-    try {
-      const greeting = userName ? `Здравствуйте, ${userName}!` : "Здравствуйте!";
-      const text = `${greeting}\n\nКод подтверждения email: ${code}\n\nКод действует 24 часа.`;
-      await sendSmtpMail({
-        to: email,
-        subject: EMAIL_VERIFICATION_SUBJECT,
-        text,
-        html: `<p>${greeting}</p><p>Код подтверждения email:</p><p><strong>${code}</strong></p><p>Код действует 24 часа.</p>`,
-      });
-      console.info(`[email-verify] Письмо с кодом отправлено на ${email}`);
-      return;
-    } catch (error) {
-      console.error("[email-verify] SMTP send error:", error);
-      console.info(`[email-verify] Fallback код для ${email}:`, code);
-      return;
+  const isProduction = process.env.NODE_ENV === "production";
+
+  if (!isSmtpConfigured()) {
+    if (isProduction) {
+      throw new Error("EMAIL_DELIVERY_UNAVAILABLE");
     }
+    console.info(
+      `[email-verify] Код для ${email}${userName ? ` (${userName})` : ""}:`,
+      code,
+    );
+    return;
   }
 
-  console.info(
-    `[email-verify] Код для ${email}${userName ? ` (${userName})` : ""}:`,
-    code,
-  );
+  try {
+    const greeting = userName ? `Здравствуйте, ${userName}!` : "Здравствуйте!";
+    const text = `${greeting}\n\nКод подтверждения email: ${code}\n\nКод действует 24 часа.`;
+    await sendSmtpMail({
+      to: email,
+      subject: EMAIL_VERIFICATION_SUBJECT,
+      text,
+      html: `<p>${greeting}</p><p>Код подтверждения email:</p><p><strong>${code}</strong></p><p>Код действует 24 часа.</p>`,
+    });
+    console.info(`[email-verify] Письмо с кодом отправлено на ${email}`);
+  } catch (error) {
+    console.error("[email-verify] SMTP send error:", error);
+    if (isProduction) {
+      throw new Error("EMAIL_DELIVERY_UNAVAILABLE");
+    }
+    console.info(`[email-verify] Fallback код для ${email}:`, code);
+  }
 };
 
 /**

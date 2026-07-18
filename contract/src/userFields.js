@@ -8,6 +8,9 @@ const USER_NAME_REGEX = /^[a-z0-9]+$/;
 /** Синхрон с `server/validations/user/ruPhoneRules.js`. */
 export const RU_PHONE_E164_REGEX = /^\+79\d{9}$/;
 export const RU_PHONE_MAX_DIGITS = 11;
+/** Display / empty placeholder (UI). Storage остаётся E.164. */
+export const RU_PHONE_EMPTY_LABEL = "не указан";
+const RU_PHONE_LOCAL_DIGITS = 10;
 
 export const USER_GENDER_VALUES = ["male", "female", "noSelected"];
 
@@ -25,6 +28,83 @@ export const USER_BACKGROUND_PRESET_IDS = [
 /** Синхрон с `server/constants/dadataConstants.js`. */
 export const ADDRESS_LINE_MAX_LENGTH = 100;
 export const ADDRESS_FLAT_MAX_LENGTH = 20;
+
+/**
+ * Цифры для маски ввода: ведущая `8`, максимум 11.
+ * @param {unknown} raw
+ * @returns {string}
+ */
+function digitsForRuPhoneMask(raw) {
+  let digits = String(raw ?? "").replace(/\D/g, "");
+  if (digits.startsWith("7")) {
+    digits = `8${digits.slice(1)}`;
+  } else if (digits.length > 0 && digits.startsWith("9")) {
+    digits = `8${digits}`;
+  }
+  return digits.slice(0, RU_PHONE_MAX_DIGITS);
+}
+
+/**
+ * As-you-type: `8 (912) 345-67-89`.
+ * @param {unknown} raw
+ * @returns {string}
+ */
+export function maskRuPhoneInput(raw) {
+  const digits = digitsForRuPhoneMask(raw);
+  if (digits === "") return "";
+
+  let result = digits[0] ?? "";
+  const local = digits.slice(1, 1 + RU_PHONE_LOCAL_DIGITS);
+  if (local.length === 0) return result;
+
+  result += ` (${local.slice(0, 3)}`;
+  if (local.length <= 3) return result;
+
+  result += `) ${local.slice(3, 6)}`;
+  if (local.length <= 6) return result;
+
+  result += `-${local.slice(6, 8)}`;
+  if (local.length <= 8) return result;
+
+  return `${result}-${local.slice(8, 10)}`;
+}
+
+/**
+ * Pretty display без empty-label. Пустой / без цифр → `""`.
+ * @param {unknown} raw
+ * @returns {string}
+ */
+export function formatRuPhoneDisplay(raw) {
+  if (raw == null || String(raw).trim() === "") return "";
+  return maskRuPhoneInput(raw);
+}
+
+/**
+ * Pretty или {@link RU_PHONE_EMPTY_LABEL}.
+ * @param {unknown} raw
+ * @returns {string}
+ */
+export function formatRuPhoneDisplayOrEmpty(raw) {
+  return formatRuPhoneDisplay(raw) || RU_PHONE_EMPTY_LABEL;
+}
+
+/**
+ * `tel:+79…` только для валидного E.164, иначе `null`.
+ * @param {unknown} raw
+ * @returns {string | null}
+ */
+export function toRuPhoneTelHref(raw) {
+  if (raw == null || String(raw).trim() === "") return null;
+  try {
+    const normalized = normalizeRuPhoneInput(raw);
+    if (normalized && RU_PHONE_E164_REGEX.test(normalized)) {
+      return `tel:${normalized}`;
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
 
 /**
  * @param {unknown} raw
@@ -49,6 +129,36 @@ export function normalizeRuPhoneInput(raw) {
     digits = `7${digits.slice(1)}`;
   }
   return `+${digits}`;
+}
+
+/**
+ * @param {string} normalized
+ */
+export function assertRuPhoneFormat(normalized) {
+  if (typeof normalized !== "string") {
+    throw new Error("Номер телефона должен быть строкой");
+  }
+  if (!RU_PHONE_E164_REGEX.test(normalized)) {
+    throw new Error(
+      "Номер РФ: +7 9XX XXX XX XX (можно 8…, 9XXXXXXXXX или с пробелами/скобками)",
+    );
+  }
+}
+
+/**
+ * @param {unknown} raw
+ * @returns {string | null} сообщение об ошибке или null
+ */
+export function validateRuPhoneField(raw) {
+  const trimmed = String(raw ?? "").trim();
+  if (trimmed === "") return null;
+  try {
+    const normalized = normalizeRuPhoneInput(trimmed);
+    assertRuPhoneFormat(normalized);
+    return null;
+  } catch (error) {
+    return error instanceof Error ? error.message : "Неверный номер телефона";
+  }
 }
 
 /**

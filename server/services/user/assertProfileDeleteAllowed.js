@@ -5,13 +5,16 @@ import { assertCanDeleteUser } from "../access/adminUserGuard.js";
 import {
   INVALID_EDITOR_TOKEN_MESSAGE,
   PROFILE_DELETE_FORBIDDEN_MESSAGE,
-  PROFILE_DELETE_SELF_FORBIDDEN_MESSAGE,
   PROFILE_DELETE_TARGET_NOT_FOUND_MESSAGE,
 } from "./updateProfileConstants.js";
 
 /**
+ * Удалять профиль может владелец (самоудаление — требование App Store 5.1.1(v)
+ * и Google Play) либо админ — чужой профиль.
+ *
  * @param {string} currentUserId
  * @param {string} targetUserId
+ * @returns {Promise<{ targetUser: { _id: unknown; userName?: string }; isSelfDelete: boolean }>}
  */
 export async function assertProfileDeleteAllowed(currentUserId, targetUserId) {
   const currentUserRole = await UserModel.findById(currentUserId)
@@ -30,14 +33,10 @@ export async function assertProfileDeleteAllowed(currentUserId, targetUserId) {
     throw new AppError(404, PROFILE_DELETE_TARGET_NOT_FOUND_MESSAGE);
   }
 
-  const isCurrentUserOwner = String(currentUserId) === String(targetUserId);
+  const isSelfDelete = String(currentUserId) === String(targetUserId);
   const isCurrentUserAdmin = currentUserRole.userRole === "admin";
 
-  if (isCurrentUserOwner) {
-    throw new AppError(403, PROFILE_DELETE_SELF_FORBIDDEN_MESSAGE);
-  }
-
-  if (!isCurrentUserAdmin) {
+  if (!isSelfDelete && !isCurrentUserAdmin) {
     throw new AppError(403, PROFILE_DELETE_FORBIDDEN_MESSAGE);
   }
 
@@ -50,5 +49,5 @@ export async function assertProfileDeleteAllowed(currentUserId, targetUserId) {
     );
   }
 
-  return targetUser;
+  return { targetUser, isSelfDelete };
 }

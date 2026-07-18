@@ -43,11 +43,8 @@ export const ALLOWED_FIELDS_FOR_MODERATOR = [
   "userLoyaltyPoints",
 ];
 
-/** Собственный профиль модератора (без блокировок и роли). */
-export const ALLOWED_FIELDS_FOR_MODERATOR_SELF = [
-  ...ALLOWED_FIELDS_FOR_USER,
-  "userLoyaltyPoints",
-];
+/** Собственный профиль модератора (без блокировок, роли и начисления баллов себе). */
+export const ALLOWED_FIELDS_FOR_MODERATOR_SELF = [...ALLOWED_FIELDS_FOR_USER];
 
 /** Разрешённые поля для администратора */
 export const ALLOWED_FIELDS_FOR_ADMIN = [
@@ -57,7 +54,7 @@ export const ALLOWED_FIELDS_FOR_ADMIN = [
   "premiumExpiresAt",
 ];
 
-/** Собственный профиль администратора (без смены роли и блокировок). */
+/** Собственный профиль администратора (без смены роли, блокировок и self-loyalty). */
 export const ALLOWED_FIELDS_FOR_ADMIN_SELF = [
   ...ALLOWED_FIELDS_FOR_MODERATOR_SELF,
   "isPremiumUser",

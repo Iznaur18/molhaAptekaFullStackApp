@@ -85,6 +85,26 @@ export function initRateLimitMiddlewares(store) {
     store,
   );
 
+  handlers.registerAuth = buildLimiter(
+    {
+      ...RATE_LIMIT_DEFAULTS,
+      windowMs: 15 * 60 * 1000,
+      max: 20,
+      message: {
+        success: false,
+        message: "Слишком много попыток регистрации. Попробуйте через 15 минут",
+      },
+      keyGenerator: (req) => {
+        const email = String(req.body?.email ?? "")
+          .trim()
+          .toLowerCase();
+        const ip = String(req.ip ?? req.socket?.remoteAddress ?? "unknown");
+        return email ? `reg:${ip}:${email}` : `reg:${ip}`;
+      },
+    },
+    store,
+  );
+
   handlers.refreshAuth = buildLimiter(
     {
       ...RATE_LIMIT_DEFAULTS,
@@ -326,6 +346,10 @@ export const generalRateLimiter = (req, res, next) => handlers.general(req, res,
 
 /** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
 export const authRateLimiter = (req, res, next) => handlers.auth(req, res, next);
+
+/** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
+export const registerAuthRateLimiter = (req, res, next) =>
+  handlers.registerAuth(req, res, next);
 
 /** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
 export const refreshAuthRateLimiter = (req, res, next) =>

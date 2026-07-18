@@ -2,6 +2,7 @@ export type ProfileRow = {
   id: string;
   label: string;
   value: string;
+  href?: string;
 };
 
 export type ProfileRowSection = {

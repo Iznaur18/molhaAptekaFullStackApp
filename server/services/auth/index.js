@@ -20,7 +20,6 @@ export {
 export { resolveLogoutUserId } from "./resolveLogoutUserId.js";
 export { sendUserWithToken } from "./sendUserWithToken.js";
 export {
-  generateEmailVerificationToken,
   generateEmailVerificationCode,
   issueEmailVerificationCode,
   verifyEmailByCodeForUser,

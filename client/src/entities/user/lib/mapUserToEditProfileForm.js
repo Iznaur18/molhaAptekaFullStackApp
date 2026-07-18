@@ -2,6 +2,7 @@ import { addressStructuredValueFromUser } from "../../address/lib/addressStructu
 import { getUserAvatarFocus, getUserBackgroundFocus } from "./profileImageFocus.js";
 import { parseUserBackgroundFormFields } from "./userBackgroundValue.js";
 import { formatPremiumExpiresAtForInput } from "./formatPremiumExpiresAtForInput.js";
+import { maskRuPhoneInput } from "./ruPhone.js";
 import {
   DEFAULT_USER_AVATAR_URL,
   DEFAULT_USER_BACKGROUND_PRESET_ID,
@@ -48,7 +49,7 @@ export function mapUserToEditProfileForm(user) {
     userBirthDate: birthInput,
     userGender: user.userGender ?? USER_GENDER_NO_SELECTED,
     structuredAddress: addressStructuredValueFromUser(user),
-    userPhoneNumber: user.userPhoneNumber ?? "",
+    userPhoneNumber: maskRuPhoneInput(user.userPhoneNumber ?? ""),
     userAvatarUrl: user.userAvatarUrl ?? DEFAULT_USER_AVATAR_URL,
     userAvatarFocus: getUserAvatarFocus(user),
     backgroundPresetId: presetId || DEFAULT_USER_BACKGROUND_PRESET_ID,

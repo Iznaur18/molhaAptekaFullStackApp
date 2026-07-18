@@ -12,10 +12,13 @@ import { PROFILE_DELETE_ALREADY_REMOVED_MESSAGE } from "./updateProfileConstants
  * }} input
  */
 export async function deleteProfile({ currentUserId, targetUserId }) {
-  const targetUser = await assertProfileDeleteAllowed(currentUserId, targetUserId);
+  const { targetUser, isSelfDelete } = await assertProfileDeleteAllowed(
+    currentUserId,
+    targetUserId,
+  );
 
   console.log(
-    `[DELETE PROFILE] User ${currentUserId} deleting profile ${targetUserId} (${targetUser.userName || "N/A"})`,
+    `[DELETE PROFILE] User ${currentUserId} deleting profile ${targetUserId} (${targetUser.userName || "N/A"})${isSelfDelete ? " [self]" : ""}`,
   );
 
   await runProfileDeleteCascade(targetUserId);
@@ -24,4 +27,6 @@ export async function deleteProfile({ currentUserId, targetUserId }) {
   if (!deletedUser) {
     throw new AppError(404, PROFILE_DELETE_ALREADY_REMOVED_MESSAGE);
   }
+
+  return { isSelfDelete };
 }

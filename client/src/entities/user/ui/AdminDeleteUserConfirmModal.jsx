@@ -17,14 +17,31 @@ function deleteConfirmToken(user) {
 }
 
 /**
+ * Подтверждение удаления профиля вводом ника. Используется и админом (чужой
+ * профиль), и владельцем (самоудаление) — тексты приходят через `copy`.
+ *
  * @param {{
  *   isOpen: boolean;
  *   user: import('../model/types.js').UserPublicProfile | null;
  *   onClose: () => void;
  *   onDeleted: () => void;
+ *   copy?: {
+ *     DELETE_CONFIRM_TITLE: string;
+ *     DELETE_CONFIRM_HINT: (token: string) => string;
+ *     DELETE_CONFIRM_PLACEHOLDER: string;
+ *     DELETE_SUBMIT: string;
+ *     DELETE_CANCEL: string;
+ *     DELETE_LOADING: string;
+ *   };
  * }} props
  */
-export function AdminDeleteUserConfirmModal({ isOpen, user, onClose, onDeleted }) {
+export function AdminDeleteUserConfirmModal({
+  isOpen,
+  user,
+  onClose,
+  onDeleted,
+  copy = ADMIN_EDIT_USER_UI,
+}) {
   const { deleteMutation } = useUserProfileMutations();
   const [confirmText, setConfirmText] = useState("");
   const [phase, setPhase] = useState(/** @type {'idle'|'loading'|'error'} */ ("idle"));
@@ -67,7 +84,7 @@ export function AdminDeleteUserConfirmModal({ isOpen, user, onClose, onDeleted }
       onClose();
     } catch (e) {
       setPhase("error");
-      setError(e instanceof Error ? e.message : ADMIN_EDIT_USER_UI.DELETE_SUBMIT);
+      setError(e instanceof Error ? e.message : copy.DELETE_SUBMIT);
     }
   };
 
@@ -81,10 +98,10 @@ export function AdminDeleteUserConfirmModal({ isOpen, user, onClose, onDeleted }
         aria-labelledby="admin-delete-user-title"
       >
         <h2 id="admin-delete-user-title" className="admin-delete-user__title">
-          {ADMIN_EDIT_USER_UI.DELETE_CONFIRM_TITLE}
+          {copy.DELETE_CONFIRM_TITLE}
         </h2>
         <p className="admin-delete-user__hint">
-          {ADMIN_EDIT_USER_UI.DELETE_CONFIRM_HINT(token)}
+          {copy.DELETE_CONFIRM_HINT(token)}
         </p>
         <form className="admin-delete-user__form" onSubmit={handleSubmit}>
           <input
@@ -92,7 +109,7 @@ export function AdminDeleteUserConfirmModal({ isOpen, user, onClose, onDeleted }
             type="text"
             value={confirmText}
             onChange={(e) => setConfirmText(e.target.value)}
-            placeholder={ADMIN_EDIT_USER_UI.DELETE_CONFIRM_PLACEHOLDER}
+            placeholder={copy.DELETE_CONFIRM_PLACEHOLDER}
             autoComplete="off"
             disabled={phase === "loading"}
           />
@@ -108,7 +125,7 @@ export function AdminDeleteUserConfirmModal({ isOpen, user, onClose, onDeleted }
               onClick={onClose}
               disabled={phase === "loading"}
             >
-              {ADMIN_EDIT_USER_UI.DELETE_CANCEL}
+              {copy.DELETE_CANCEL}
             </button>
             <button
               type="submit"
@@ -116,8 +133,8 @@ export function AdminDeleteUserConfirmModal({ isOpen, user, onClose, onDeleted }
               disabled={!canSubmit || phase === "loading"}
             >
               {phase === "loading"
-                ? ADMIN_EDIT_USER_UI.DELETE_LOADING
-                : ADMIN_EDIT_USER_UI.DELETE_SUBMIT}
+                ? copy.DELETE_LOADING
+                : copy.DELETE_SUBMIT}
             </button>
           </div>
         </form>

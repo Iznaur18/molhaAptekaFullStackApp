@@ -15,6 +15,10 @@ import { formatUserBackgroundForDisplay } from "./userBackgroundValue.js";
 import { formatSearchRowTotalSalesCount } from "./formatSearchRowTotalSalesCount.js";
 import { formatSearchRowTotalSales } from "./formatSearchRowTotalSales.js";
 import { isPremiumActive } from "./isPremiumActive.js";
+import {
+  formatRuPhoneDisplayOrEmpty,
+  toRuPhoneTelHref,
+} from "./ruPhone.js";
 
 const DATE_TIME_FORMAT = new Intl.DateTimeFormat(
   COMMON_UI.LOCALE_RU,
@@ -63,7 +67,7 @@ const INTERNAL_ROW_IDS = new Set(["notesAboutUser"]);
 /**
  * @param {import('../model/types.js').UserPublicProfile} user
  * @param {{ showAdminRole?: boolean; hideMediaUrls?: boolean }} [options]
- * @returns {{ id: string, label: string, value: string }[]}
+ * @returns {{ id: string, label: string, value: string, href?: string }[]}
  */
 export function getUserProfileRows(user, options = {}) {
   const { showAdminRole = false, hideMediaUrls = true } = options;
@@ -125,7 +129,8 @@ export function getUserProfileRows(user, options = {}) {
     {
       id: "userPhoneNumber",
       label: L.userPhoneNumber,
-      value: dashIfEmpty(user.userPhoneNumber),
+      value: formatRuPhoneDisplayOrEmpty(user.userPhoneNumber),
+      href: toRuPhoneTelHref(user.userPhoneNumber) ?? undefined,
     },
     {
       id: "isUserDataConfirmed",

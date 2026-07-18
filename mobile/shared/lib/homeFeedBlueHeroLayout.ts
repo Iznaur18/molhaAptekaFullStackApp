@@ -1,0 +1,25 @@
+/** Геометрия и палитра blue-hero главной (mobile). Откат — флаг isHomeFeedBlueHeroEnabled. */
+
+export const HOME_FEED_BLUE_HERO_SCENE = "#1E6CF0";
+export const HOME_FEED_BLUE_HERO_SCENE_DEEP = "#1557D0";
+export const HOME_FEED_BLUE_HERO_SHEET = "#F2F4F7";
+
+export const HOME_FEED_BLUE_HERO_SHEET_TOP_RADIUS = 28;
+export const HOME_FEED_BLUE_HERO_MODULE_RADIUS = 20;
+export const HOME_FEED_BLUE_HERO_SEARCH_PILL_RADIUS = 999;
+export const HOME_FEED_BLUE_HERO_CATEGORIES_RADIUS = 12;
+
+export const HOME_FEED_BLUE_HERO_SHEET_PADDING_TOP = 12;
+export const HOME_FEED_BLUE_HERO_MODULE_MARGIN_BOTTOM = 8;
+
+export const HOME_FEED_BLUE_HERO = {
+  scene: HOME_FEED_BLUE_HERO_SCENE,
+  sceneDeep: HOME_FEED_BLUE_HERO_SCENE_DEEP,
+  sheet: HOME_FEED_BLUE_HERO_SHEET,
+  sheetTopRadius: HOME_FEED_BLUE_HERO_SHEET_TOP_RADIUS,
+  moduleRadius: HOME_FEED_BLUE_HERO_MODULE_RADIUS,
+  searchPillRadius: HOME_FEED_BLUE_HERO_SEARCH_PILL_RADIUS,
+  categoriesRadius: HOME_FEED_BLUE_HERO_CATEGORIES_RADIUS,
+  sheetPaddingTop: HOME_FEED_BLUE_HERO_SHEET_PADDING_TOP,
+  moduleMarginBottom: HOME_FEED_BLUE_HERO_MODULE_MARGIN_BOTTOM,
+} as const;

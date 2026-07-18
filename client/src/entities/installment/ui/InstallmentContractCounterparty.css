@@ -37,3 +37,12 @@ span.installment-contract-counterparty__name {
 .installment-contract-counterparty__detail {
   color: var(--iz-color-text-muted);
 }
+
+.installment-contract-counterparty__phone {
+  color: var(--iz-color-link);
+  text-decoration: none;
+}
+
+.installment-contract-counterparty__phone:hover {
+  text-decoration: underline;
+}

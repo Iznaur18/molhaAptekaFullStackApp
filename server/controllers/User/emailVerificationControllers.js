@@ -1,5 +1,4 @@
 import {
-  EMAIL_VERIFICATION_ALREADY_VERIFIED_MESSAGE,
   EMAIL_VERIFICATION_INVALID_CODE_MESSAGE,
   EMAIL_VERIFICATION_INVALID_TOKEN_MESSAGE,
   EMAIL_VERIFICATION_SENT_MESSAGE,
@@ -46,9 +45,7 @@ const userId = req.userId;
     } catch (sendError) {
       const message =
         sendError instanceof Error ? sendError.message : "Не удалось отправить письмо";
-      const status =
-        message === EMAIL_VERIFICATION_ALREADY_VERIFIED_MESSAGE ? 400 : 400;
-      return errorRes(res, status, message);
+      return errorRes(res, 400, message);
     }
 
     return successRes(res, { message: EMAIL_VERIFICATION_SENT_MESSAGE });
@@ -71,22 +68,5 @@ const userId = req.userId;
       );
     }
 
-    return successRes(res, { message: EMAIL_VERIFICATION_SUCCESS_MESSAGE });
-};
-
-/** `GET /auth/verify-email/status` — JSON-подтверждение (для клиента без redirect). */
-export const verifyEmailJsonController = async (req, res) => {
-const token = req.query?.token;
-    try {
-      await verifyEmailByToken(token);
-    } catch (verificationError) {
-      return errorRes(
-        res,
-        400,
-        verificationError instanceof Error
-          ? verificationError.message
-          : EMAIL_VERIFICATION_INVALID_TOKEN_MESSAGE,
-      );
-    }
     return successRes(res, { message: EMAIL_VERIFICATION_SUCCESS_MESSAGE });
 };

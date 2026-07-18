@@ -1,13 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import {
-  assertAuthenticatedProfile,
-  fetchCurrentUserProfile,
-} from "../api/fetchCurrentUserProfile.js";
 import { registerUser } from "../api/registerUser.js";
 import { resetAuthSessionState } from "../../../shared/api/apiClient.js";
-import { hydrateAuthMeCache } from "../lib/authMeQueryCache.js";
 
+/**
+ * Начало регистрации: возвращает `{ registrationId, email }` заявки.
+ * Сессия появляется только после `useConfirmRegistrationMutation`.
+ */
 export function useRegisterMutation() {
   const queryClient = useQueryClient();
 
@@ -16,12 +15,6 @@ export function useRegisterMutation() {
       resetAuthSessionState();
       await queryClient.cancelQueries();
     },
-    mutationFn: async (payload) => {
-      await registerUser(payload);
-      return assertAuthenticatedProfile(await fetchCurrentUserProfile());
-    },
-    onSuccess: (data) => {
-      hydrateAuthMeCache(queryClient, data);
-    },
+    mutationFn: (payload) => registerUser(payload),
   });
 }

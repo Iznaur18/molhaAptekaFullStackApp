@@ -8,6 +8,7 @@
     "mobile"
   ],
   "scripts": {
+    "postinstall": "patch-package",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
@@ -36,6 +37,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
+    "patch-package": "^8.0.1",
     "prettier": "^3.5.3",
     "sharp": "^0.35.1"
   }

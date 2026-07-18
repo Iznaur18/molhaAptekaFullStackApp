@@ -6,7 +6,11 @@ import {
   applyPremiumExpiryAdminUpdate,
   resolvePremiumFlagsFromExpiry,
 } from "./premiumAccess.js";
-import { canStaffManageTargetPremium } from "../access/premiumStaffAccess.js";
+import {
+  canStaffManageTargetPremium,
+  canStaffManageTargetUser,
+  updateTouchesAdminProtectedFields,
+} from "../access/premiumStaffAccess.js";
 import { normalizeUserBackgroundForSave } from "./userBackgroundValue.js";
 
 import { EMPTY_PROFILE_UPDATE_MESSAGE } from "./updateProfileConstants.js";
@@ -79,9 +83,38 @@ const assertPremiumChangeAllowed = (
   }
 };
 
-const assertLoyaltyChangeAllowed = (updateData, isCurrentUserStaff) => {
-  if (updateData.userLoyaltyPoints !== undefined && !isCurrentUserStaff) {
+const assertLoyaltyChangeAllowed = (updateData, editorContext) => {
+  if (updateData.userLoyaltyPoints === undefined) {
+    return;
+  }
+  const { isCurrentUserStaff, isCurrentUserOwner } = editorContext;
+  if (!isCurrentUserStaff) {
     throw new AppError(403, "Только staff может менять баллы лояльности");
+  }
+  if (isCurrentUserOwner) {
+    throw new AppError(403, "Нельзя менять свои баллы лояльности");
+  }
+};
+
+const assertAdminProtectedFieldsAllowed = (
+  updateData,
+  editorContext,
+  targetUserBeforeUpdate,
+) => {
+  const { isCurrentUserOwner, editorRole } = editorContext;
+  if (isCurrentUserOwner || !updateTouchesAdminProtectedFields(updateData)) {
+    return;
+  }
+  if (
+    !canStaffManageTargetUser({
+      editorRole,
+      targetRole: targetUserBeforeUpdate.userRole,
+    })
+  ) {
+    throw new AppError(
+      403,
+      "Модератор не может менять эти поля у администратора",
+    );
   }
 };
 
@@ -191,7 +224,7 @@ export async function assertProfileUpdateRules({
     throw new AppError(400, EMPTY_PROFILE_UPDATE_MESSAGE);
   }
 
-  const { isCurrentUserAdmin, isCurrentUserStaff } = editorContext;
+  const { isCurrentUserAdmin } = editorContext;
 
   await assertRoleChangeAllowed(updateData, isCurrentUserAdmin, targetUserId);
   assertDiscountChangeAllowed(updateData, isCurrentUserAdmin);
@@ -207,7 +240,12 @@ export async function assertProfileUpdateRules({
   }
 
   assertPremiumChangeAllowed(updateData, editorContext, targetUserBeforeUpdate);
-  assertLoyaltyChangeAllowed(updateData, isCurrentUserStaff);
+  assertLoyaltyChangeAllowed(updateData, editorContext);
+  assertAdminProtectedFieldsAllowed(
+    updateData,
+    editorContext,
+    targetUserBeforeUpdate,
+  );
   await assertUniqueProfileFields(updateData, targetUserId);
 
   const premiumState = applyPremiumAndBackgroundRules(

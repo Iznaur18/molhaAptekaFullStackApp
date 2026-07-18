@@ -172,4 +172,41 @@ export const useEditProfileFormStyles = createThemedStyles((theme) => ({
   submit: {
     marginTop: theme.spacing[1],
   },
+
+  /** Danger-зона: та же карточка, но обведена danger — необратимое действие. */
+  dangerCard: {
+    borderColor: theme.colors.danger,
+  },
+  dangerAccent: {
+    backgroundColor: theme.colors.danger,
+  },
+  dangerTitle: {
+    color: theme.colors.danger,
+  },
+  dangerText: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: theme.colors.textSecondary,
+  },
+  dangerListTitle: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: theme.colors.text,
+  },
+  dangerListItem: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: theme.colors.textSecondary,
+    paddingLeft: theme.spacing[2],
+  },
+  dangerGroup: {
+    gap: 2,
+  },
+  dangerActions: {
+    flexDirection: "row",
+    gap: theme.spacing[3],
+  },
+  dangerActionItem: {
+    flex: 1,
+  },
 }));

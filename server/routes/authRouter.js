@@ -1,6 +1,8 @@
 import { createAsyncRouter } from "../utils/createAsyncRouter.js";
 import {
   registerUserController,
+  confirmRegistrationController,
+  resendRegistrationCodeController,
   loginUserController,
   logoutUserController,
   refreshAuthController,
@@ -14,6 +16,10 @@ import {
 } from "../controllers/index.js";
 import { registerUserValidation, loginUserValidation } from "../validations/index.js";
 import { verifyEmailWithCodeValidation } from "../validations/user/verifyEmailWithCodeValidation.js";
+import {
+  confirmRegistrationValidation,
+  resendRegistrationCodeValidation,
+} from "../validations/user/confirmRegistrationValidation.js";
 import { refreshAuthValidation } from "../validations/user/refreshAuthValidation.js";
 import { verifyEmailTokenValidation } from "../validations/user/verifyEmailTokenValidation.js";
 import {
@@ -25,6 +31,7 @@ import {
   checkAuthMW,
   checkAuthMeMW,
   authRateLimiter,
+  registerAuthRateLimiter,
   refreshAuthRateLimiter,
   emailVerificationResendRateLimiter,
 } from "../middlewares/index.js";
@@ -52,12 +59,24 @@ router.delete(
   removePushTokenController,
 );
 
-// Rate limiting для авторизации (защита от брутфорса)
+// Rate limiting для авторизации (защита от брутфорса / email bombing)
 router.post(
   "/register",
-  authRateLimiter,
+  registerAuthRateLimiter,
   registerUserValidation,
   registerUserController,
+);
+router.post(
+  "/register/confirm",
+  registerAuthRateLimiter,
+  confirmRegistrationValidation,
+  confirmRegistrationController,
+);
+router.post(
+  "/register/resend",
+  emailVerificationResendRateLimiter,
+  resendRegistrationCodeValidation,
+  resendRegistrationCodeController,
 );
 router.post("/login", authRateLimiter, loginUserValidation, loginUserController);
 router.post("/logout", logoutUserController);

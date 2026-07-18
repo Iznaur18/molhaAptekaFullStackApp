@@ -1,4 +1,4 @@
-/** @typedef {{ id: string; label: string; value: string }} ProfileRow */
+/** @typedef {{ id: string; label: string; value: string; href?: string }} ProfileRow */
 
 /** @typedef {{ id: string; title: string | null; rows: ProfileRow[] }} ProfileRowSection */
 

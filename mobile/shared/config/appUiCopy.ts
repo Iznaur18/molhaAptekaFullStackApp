@@ -147,6 +147,34 @@ export const EDIT_PROFILE_UI = {
   AUTH_REQUIRED: "Войдите, чтобы редактировать профиль",
 } as const;
 
+/**
+ * Самоудаление аккаунта. Раскрытие состава данных обязательно по требованиям
+ * App Store 5.1.1(v) и Google Play — список синхронен с
+ * server/services/user/runProfileDeleteCascade.js.
+ */
+export const DELETE_ACCOUNT_UI = {
+  SECTION: "Удаление аккаунта",
+  INTRO: "Удаление аккаунта необратимо. Восстановить его будет невозможно.",
+  REMOVED_TITLE: "Будет удалено безвозвратно:",
+  REMOVED_ITEMS: [
+    "профиль и личные данные",
+    "ваши товары и их просмотры",
+    "оценки, отзывы и рейтинг",
+    "подписки, избранное и корзина",
+    "рекламные кампании",
+  ],
+  KEPT_TITLE: "Будет сохранено:",
+  KEPT_ITEMS: [
+    "история заказов и договоры рассрочки — этого требуют бухгалтерская и налоговая отчётность",
+  ],
+  BUTTON: "Удалить аккаунт",
+  CONFIRM_QUESTION: "Точно удалить аккаунт? Действие необратимо.",
+  CONFIRM_YES: "Да, удалить",
+  CONFIRM_CANCEL: "Отмена",
+  UNKNOWN_USER: "Не удалось определить пользователя",
+  FALLBACK_ERROR: "Не удалось удалить аккаунт",
+} as const;
+
 export const ADDRESS_STRUCTURED_UI = {
   SECTION_LABEL: "Адрес",
   LABEL_CITY: "Город",
@@ -952,6 +980,7 @@ export const USER_PROFILE_COPY = {
   NO: "Нет",
   RATING_NONE: "—",
   RATING_VOTES_PREFIX: "голосов",
+  SHOW_PHONE_NUMBER: "Показать номер",
   LABELS: {
     userName: "Никнейм",
     email: "Email",

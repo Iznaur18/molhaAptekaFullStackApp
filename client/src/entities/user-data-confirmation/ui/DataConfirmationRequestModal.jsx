@@ -166,7 +166,10 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
     try {
       let passportSelfiePhotoUrl;
       try {
-        passportSelfiePhotoUrl = await uploadImageMutation.mutateAsync(selfieFile);
+        passportSelfiePhotoUrl = await uploadImageMutation.mutateAsync({
+          file: selfieFile,
+          purpose: "passport-selfie",
+        });
       } catch (uploadError) {
         throw new Error(
           uploadError instanceof Error

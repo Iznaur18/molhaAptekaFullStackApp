@@ -1,4 +1,5 @@
 import { UserModel } from "./UserModel.js";
+import { PendingRegistrationModel } from "./PendingRegistrationModel.js";
 import { UserVoteRatingModel } from "./UserVoteRatingModel.js";
 import OrderModel from "./OrderModel.js";
 import ProductModel from "./ProductModel.js";
@@ -34,6 +35,7 @@ import { SellerPersonalCategoryCampaignModel } from "./SellerPersonalCategoryCam
 
 export {
   UserModel,
+  PendingRegistrationModel,
   UserVoteRatingModel,
   OrderModel,
   ProductModel,

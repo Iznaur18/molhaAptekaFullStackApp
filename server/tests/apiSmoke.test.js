@@ -11,6 +11,7 @@ import {
 } from "./helpers/httpTestApp.js";
 import {
   buildTestProductPayload,
+  completeRegistrationFlow,
   ensureProductCategoryTreeSeeded,
 } from "./helpers/integrationTestHelpers.js";
 import {
@@ -75,17 +76,14 @@ const parseSuccessData = async (response) => {
   return body.data;
 };
 
-test("auth smoke: register → me → logout → me guest", async () => {
-  const registerResponse = await request("/auth/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(registerPayload("auth")),
-  });
-  assert.equal(registerResponse.status, 200);
+const registerAndGetSession = (suffix, options = {}) =>
+  completeRegistrationFlow(request, registerPayload(suffix), options);
 
-  const authCookie = buildCookieHeader(registerResponse.headers);
+test("auth smoke: register → me → logout → me guest", async () => {
+  const { cookie: authCookie, session } = await registerAndGetSession("auth");
   assert.ok(authCookie.includes("access_token"));
   assert.ok(authCookie.includes("refresh_token"));
+  assert.equal(session.passwordHash, undefined);
 
   const meData = await parseSuccessData(
     await request("/auth/me", {
@@ -108,14 +106,7 @@ test("auth smoke: register → me → logout → me guest", async () => {
 });
 
 test("auth refresh: register → refresh → me", async () => {
-  const registerResponse = await request("/auth/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(registerPayload("refresh")),
-  });
-  assert.equal(registerResponse.status, 200);
-
-  const registerCookies = buildCookieHeader(registerResponse.headers);
+  const { cookie: registerCookies } = await registerAndGetSession("refresh");
   assert.ok(registerCookies.includes("refresh_token"));
 
   const refreshResponse = await request("/auth/refresh", {
@@ -136,14 +127,7 @@ test("auth refresh: register → refresh → me", async () => {
 });
 
 test("GET /user/search without search: returns user listing for auth viewer", async () => {
-  const registerResponse = await request("/auth/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(registerPayload("userlist")),
-  });
-  assert.equal(registerResponse.status, 200);
-
-  const authCookie = buildCookieHeader(registerResponse.headers);
+  const { cookie: authCookie } = await registerAndGetSession("userlist");
   const searchResponse = await request("/user/search?page=1&limit=10", {
     headers: { Cookie: authCookie },
   });
@@ -158,14 +142,9 @@ test("GET /user/search without search: returns user listing for auth viewer", as
 });
 
 test("auth refresh rotation: old refresh token rejected", async () => {
-  const registerResponse = await request("/auth/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(registerPayload("rotation")),
+  const { session } = await registerAndGetSession("rotation", {
+    includeMobileAuthClient: true,
   });
-  assert.equal(registerResponse.status, 200);
-
-  const session = await parseSuccessData(registerResponse);
   const oldRefreshToken = session.refreshToken;
 
   const refreshResponse = await request("/auth/refresh", {
@@ -187,20 +166,15 @@ test("auth refresh rotation: old refresh token rejected", async () => {
 });
 
 test("auth refresh: body token wins over stale cookie after rotation", async () => {
-  const registerResponse = await request("/auth/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(registerPayload("bodyovercookie")),
-  });
-  assert.equal(registerResponse.status, 200);
-
-  const staleCookies = buildCookieHeader(registerResponse.headers);
-  const session = await parseSuccessData(registerResponse);
-
+  const { cookie: staleCookies, session } = await registerAndGetSession(
+    "bodyovercookie",
+    { includeMobileAuthClient: true },
+  );
   const rotatedResponse = await request("/auth/refresh", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "X-Auth-Client": "mobile",
       Cookie: staleCookies,
     },
     body: JSON.stringify({ refreshToken: session.refreshToken }),
@@ -208,12 +182,14 @@ test("auth refresh: body token wins over stale cookie after rotation", async () 
   assert.equal(rotatedResponse.status, 200);
 
   const rotatedSession = await parseSuccessData(rotatedResponse);
+  assert.ok(rotatedSession.refreshToken);
   assert.notEqual(rotatedSession.refreshToken, session.refreshToken);
 
   const desyncRefreshResponse = await request("/auth/refresh", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "X-Auth-Client": "mobile",
       Cookie: staleCookies,
     },
     body: JSON.stringify({ refreshToken: rotatedSession.refreshToken }),
@@ -222,14 +198,9 @@ test("auth refresh: body token wins over stale cookie after rotation", async () 
 });
 
 test("auth mobile: tokens in JSON, bearer me, refresh by body", async () => {
-  const registerResponse = await request("/auth/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(registerPayload("mobile")),
+  const { session } = await registerAndGetSession("mobile", {
+    includeMobileAuthClient: true,
   });
-  assert.equal(registerResponse.status, 200);
-
-  const session = await parseSuccessData(registerResponse);
   assert.equal(session.email, "smoke-mobile@example.com");
   assert.ok(typeof session.accessToken === "string" && session.accessToken.length > 20);
   assert.ok(typeof session.refreshToken === "string" && session.refreshToken.length > 20);
@@ -243,7 +214,10 @@ test("auth mobile: tokens in JSON, bearer me, refresh by body", async () => {
 
   const refreshResponse = await request("/auth/refresh", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "X-Auth-Client": "mobile",
+    },
     body: JSON.stringify({ refreshToken: session.refreshToken }),
   });
   assert.equal(refreshResponse.status, 200);
@@ -271,13 +245,7 @@ test("product smoke: GET /product публичный, POST /product с auth", as
   const catalogData = await parseSuccessData(await request("/product"));
   assert.ok(Array.isArray(catalogData.products));
 
-  const registerResponse = await request("/auth/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(registerPayload("product")),
-  });
-  assert.equal(registerResponse.status, 200);
-  const authCookie = buildCookieHeader(registerResponse.headers);
+  const { cookie: authCookie } = await registerAndGetSession("product");
 
   const createData = await parseSuccessData(
     await request("/product", {
@@ -295,26 +263,14 @@ test("product smoke: GET /product публичный, POST /product с auth", as
 test("order smoke: без verify email → 403", async () => {
   await ensureProductCategoryTreeSeeded();
 
-  const registerResponse = await request("/auth/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(registerPayload("order")),
-  });
-  assert.equal(registerResponse.status, 200);
-  const authCookie = buildCookieHeader(registerResponse.headers);
-  const meData = await parseSuccessData(
-    await request("/auth/me", { headers: { Cookie: authCookie } }),
-  );
-  const sellerId = meData.user._id;
-
-  await UserModel.findByIdAndUpdate(sellerId, { isEmailVerified: true });
+  const { cookie: sellerCookie } = await registerAndGetSession("order");
 
   const createProductData = await parseSuccessData(
     await request("/product", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Cookie: authCookie,
+        Cookie: sellerCookie,
       },
       body: JSON.stringify(productPayload()),
     }),
@@ -324,12 +280,11 @@ test("order smoke: без verify email → 403", async () => {
     productModerationStatus: PRODUCT_MODERATION_APPROVED,
   });
 
-  const buyerResponse = await request("/auth/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(registerPayload("buyer")),
+  const { cookie: buyerCookie, session: buyerSession } =
+    await registerAndGetSession("buyer");
+  await UserModel.findByIdAndUpdate(buyerSession._id, {
+    isEmailVerified: false,
   });
-  const buyerCookie = buildCookieHeader(buyerResponse.headers);
 
   const orderResponse = await request("/order", {
     method: "POST",

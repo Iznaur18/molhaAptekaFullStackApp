@@ -2,7 +2,9 @@ Upload (префикс /upload)
 POST /upload — загрузка файла (JWT)
 Auth (префикс /auth)
 GET /auth/me — текущий пользователь (JWT)
-POST /auth/register — регистрация
+POST /auth/register — начало регистрации (заявка + код на email, аккаунт ещё не создан)
+POST /auth/register/confirm — подтверждение кода, создание аккаунта и вход
+POST /auth/register/resend — повторная отправка кода регистрации
 POST /auth/login — вход
 User (префикс /user)
 GET /user/search — поиск пользователей

@@ -26,6 +26,7 @@ import {
   errorHandler,
   notFoundHandler,
   requestIdMW,
+  csrfCookieOriginCheckMW,
 } from "./middlewares/index.js";
 import { buildApiHelmetOptions } from "./utils/buildApiHelmetOptions.js";
 import { buildHealthPayload } from "./utils/buildHealthPayload.js";
@@ -43,16 +44,29 @@ export const createApp = () => {
   app.use(express.json({ limit: API_JSON_BODY_LIMIT }));
   app.use(cookieParser());
   app.use(resolveApiCorsMiddleware(isProduction));
+  app.use(csrfCookieOriginCheckMW);
   app.use(helmet(buildApiHelmetOptions({ isProduction })));
 
   app.use(generalRateLimiter);
 
   app.get("/health", (_req, res) => {
     const health = buildHealthPayload();
-    res.status(health.status === "ok" ? 200 : 503).json(health);
+    const statusCode = health.status === "ok" ? 200 : 503;
+    if (isProduction) {
+      return res.status(statusCode).json({ status: health.status });
+    }
+    return res.status(statusCode).json(health);
   });
 
   // Локальные файлы (UPLOAD_STORAGE=disk) и legacy после миграции на S3/CDN.
+  // `/uploads/private/*` закрыт — только `GET /upload/private/:filename` (staff).
+  app.use("/uploads", (req, res, next) => {
+    const requestPath = String(req.path ?? "").replaceAll("\\", "/");
+    if (requestPath === "/private" || requestPath.startsWith("/private/")) {
+      return res.status(404).end();
+    }
+    return next();
+  });
   app.use(
     "/uploads",
     express.static(UPLOADS_DIR, {
@@ -86,12 +100,6 @@ export const createApp = () => {
 
   app.use(notFoundHandler);
   app.use(errorHandler);
-
-  if (isProduction && !process.env.FRONTEND_URL) {
-    console.warn(
-      "createApp: FRONTEND_URL не задан в production — CORS может быть небезопасен",
-    );
-  }
 
   return app;
 };

@@ -7,6 +7,7 @@ import {
   type BackgroundMode,
 } from "@/entities/user/lib/userBackgroundValue";
 import type { ProfileImageFocus } from "@/entities/user/lib/profileImageFocus";
+import { maskRuPhoneInput } from "@/entities/user/lib/ruPhone";
 
 export type StructuredAddress = {
   city: string;
@@ -65,7 +66,10 @@ export const mapUserToEditProfileForm = (
       house: typeof user.userAddressHouse === "string" ? user.userAddressHouse.trim() : "",
       flat: typeof user.userAddressFlat === "string" ? user.userAddressFlat.trim() : "",
     },
-    userPhoneNumber: typeof user.userPhoneNumber === "string" ? user.userPhoneNumber : "",
+    userPhoneNumber:
+      typeof user.userPhoneNumber === "string"
+        ? maskRuPhoneInput(user.userPhoneNumber)
+        : "",
     userAvatarUrl:
       typeof user.userAvatarUrl === "string" && user.userAvatarUrl.trim()
         ? user.userAvatarUrl

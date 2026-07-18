@@ -54,6 +54,29 @@ export const assertProductionEnv = () => {
     }
   }
 
+  const accessSecret = process.env.JWT_ACCESS_SECRET?.trim();
+  const refreshSecret = process.env.JWT_REFRESH_SECRET?.trim();
+  if (accessSecret && accessSecret.length < MIN_JWT_SECRET_LENGTH) {
+    errors.push(
+      `JWT_ACCESS_SECRET слишком короткий (нужно ≥ ${MIN_JWT_SECRET_LENGTH})`,
+    );
+  }
+  if (refreshSecret && refreshSecret.length < MIN_JWT_SECRET_LENGTH) {
+    errors.push(
+      `JWT_REFRESH_SECRET слишком короткий (нужно ≥ ${MIN_JWT_SECRET_LENGTH})`,
+    );
+  }
+  if (isProduction && accessSecret && refreshSecret && accessSecret === refreshSecret) {
+    warnings.push(
+      "JWT_ACCESS_SECRET и JWT_REFRESH_SECRET совпадают — лучше разные секреты",
+    );
+  }
+  if (isProduction && (!accessSecret || !refreshSecret)) {
+    warnings.push(
+      "Задайте JWT_ACCESS_SECRET и JWT_REFRESH_SECRET (иначе используется JWT_SECRET для обоих)",
+    );
+  }
+
   if (isBlank(process.env.MONGO_URI)) {
     errors.push("MONGO_URI не задан");
   } else if (mongoUriLooksLikeStandaloneDev(process.env.MONGO_URI)) {
@@ -104,8 +127,8 @@ export const assertProductionEnv = () => {
     );
   }
   if (isProduction && !smtpComplete) {
-    warnings.push(
-      "SMTP не настроен — ссылка подтверждения email только в логах сервера ([email-verify])",
+    errors.push(
+      "SMTP обязателен при NODE_ENV=production (SMTP_HOST, SMTP_USER, SMTP_PASS)",
     );
   }
 

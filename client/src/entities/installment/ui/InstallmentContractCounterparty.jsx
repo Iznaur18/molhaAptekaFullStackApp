@@ -1,4 +1,8 @@
 import { COMMON_UI } from "../../../shared/config/appUiCopy.js";
+import {
+  formatRuPhoneDisplayOrEmpty,
+  toRuPhoneTelHref,
+} from "../../user/lib/ruPhone.js";
 
 import "./InstallmentContractCounterparty.css";
 
@@ -26,6 +30,8 @@ export function InstallmentContractCounterparty({ label, counterparty, onUserCli
 
   const displayName = formatDisplayName(counterparty);
   const canLink = typeof onUserClick === "function";
+  const phoneDisplay = formatRuPhoneDisplayOrEmpty(counterparty.userPhoneNumber);
+  const phoneHref = toRuPhoneTelHref(counterparty.userPhoneNumber);
 
   return (
     <div className="installment-contract-counterparty">
@@ -41,11 +47,13 @@ export function InstallmentContractCounterparty({ label, counterparty, onUserCli
       ) : (
         <span className="installment-contract-counterparty__name">{displayName}</span>
       )}
-      {counterparty.userPhoneNumber ? (
-        <span className="installment-contract-counterparty__detail">
-          {counterparty.userPhoneNumber}
-        </span>
-      ) : null}
+      {phoneHref ? (
+        <a className="installment-contract-counterparty__phone" href={phoneHref}>
+          {phoneDisplay}
+        </a>
+      ) : (
+        <span className="installment-contract-counterparty__detail">{phoneDisplay}</span>
+      )}
       {counterparty.email ? (
         <span className="installment-contract-counterparty__detail">
           {counterparty.email}

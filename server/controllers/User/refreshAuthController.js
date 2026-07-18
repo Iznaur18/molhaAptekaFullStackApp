@@ -56,6 +56,6 @@ export const refreshAuthController = async (req, res) => {
     return res.status(403).json({ success: false, message: DISABLED_ACCOUNT_MESSAGE });
   }
 
-  const data = await issueRotatedAuthSession(user, res);
+  const data = await issueRotatedAuthSession(user, res, req);
   return res.status(200).json({ success: true, data });
 };

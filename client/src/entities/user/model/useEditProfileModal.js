@@ -7,7 +7,7 @@ import { isPremiumExpiresAtInputActive } from "../lib/computeStaffPremiumExpiry.
 import { willFormDisablePremium } from "../lib/willFormDisablePremium.js";
 import { addressStructuredValueFromUser } from "../../address/lib/addressStructuredValueFromUser.js";
 import { mapUserToEditProfileForm } from "../lib/mapUserToEditProfileForm.js";
-import { limitRuPhoneInput } from "../lib/ruPhone.js";
+import { maskRuPhoneInput } from "../lib/ruPhone.js";
 import { keepDigitsOnly } from "../../../shared/lib/numericInput.js";
 import { validateEditProfileForm } from "../lib/validateEditProfileForm.js";
 import { ADMIN_EDIT_USER_UI, EDIT_PROFILE_MODAL_UI } from "../../../shared/config/appUiCopy.js";
@@ -103,7 +103,7 @@ export function useEditProfileModal({
       nextValue = nextValue.toLowerCase().replace(/[^a-z0-9]/g, "");
     }
     if (name === "userPhoneNumber" && typeof nextValue === "string") {
-      nextValue = limitRuPhoneInput(nextValue);
+      nextValue = maskRuPhoneInput(nextValue);
     }
     if (
       (name === "userLoyaltyPoints" || name === "userDiscountPercent") &&
