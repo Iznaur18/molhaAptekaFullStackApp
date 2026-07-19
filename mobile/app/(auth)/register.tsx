@@ -3,12 +3,14 @@ import { useCallback, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { resendRegistrationCode } from "@/entities/session/api/resendRegistrationCode";
 import { buildRegisterPayload } from "@/entities/session/lib/buildRegisterPayload";
+import { useConfirmRegistrationMutation } from "@/entities/session/model/useConfirmRegistrationMutation";
 import { useRegisterMutation } from "@/entities/session/model/useRegisterMutation";
 import { useGuestProfileLoginMenuBannerImageQuery } from "@/entities/site-header-banner/model/useGuestProfileLoginMenuBannerImageQuery";
 import { isRegisterConsentComplete } from "@/features/legal/lib/isRegisterConsentComplete";
 import { RegisterLegalConsentFields } from "@/features/legal/ui/RegisterLegalConsentFields";
-import { API_CLIENT_UI, AUTH_UI } from "@/shared/config";
+import { API_CLIENT_UI, AUTH_UI, EMAIL_VERIFICATION_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
 import { useStableAuthHeroHeight } from "@/shared/lib/useStableAuthHeroHeight";
@@ -19,7 +21,9 @@ import { AuthScreenScroll } from "@/shared/ui/AuthScreenScroll";
 import { CachedProductImage } from "@/shared/ui/CachedProductImage";
 import { PasswordTextInput } from "@/shared/ui/PasswordTextInput";
 
-type RegisterField = "email" | "userName";
+type RegisterField = "email" | "userName" | "code";
+
+const REGISTER_CODE_LENGTH = 6;
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -28,6 +32,15 @@ export default function RegisterScreen() {
   const insets = useSafeAreaInsets();
   const heroHeight = useStableAuthHeroHeight();
   const registerMutation = useRegisterMutation();
+  const confirmMutation = useConfirmRegistrationMutation();
+  const [pendingRegistration, setPendingRegistration] = useState<{
+    registrationId: string;
+    email: string;
+  } | null>(null);
+  const [code, setCode] = useState("");
+  const [codeError, setCodeError] = useState("");
+  const [codeNotice, setCodeNotice] = useState("");
+  const [isResending, setIsResending] = useState(false);
   const [email, setEmail] = useState("");
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
@@ -48,12 +61,21 @@ export default function RegisterScreen() {
   });
 
   const handleBack = useCallback(() => {
+    // с шага кода «назад» возвращает к форме, а не выкидывает с экрана:
+    // заявка останется в базе до TTL, аккаунт не создан
+    if (pendingRegistration) {
+      setPendingRegistration(null);
+      setCode("");
+      setCodeError("");
+      setCodeNotice("");
+      return;
+    }
     if (router.canGoBack()) {
       router.back();
       return;
     }
     router.replace("/(tabs)");
-  }, [router]);
+  }, [pendingRegistration, router]);
 
   const handleUserNameChange = (value: string) => {
     setUserName(value.toLowerCase().replace(/[^a-z0-9]/g, ""));
@@ -68,18 +90,67 @@ export default function RegisterScreen() {
     setConsentError("");
 
     try {
-      await registerMutation.mutateAsync(
+      const pending = await registerMutation.mutateAsync(
         buildRegisterPayload({ email, userName, password, passwordConfirm }),
       );
-      router.replace("/(tabs)");
+      // аккаунта ещё нет — переходим к вводу кода, в приложение не пускаем
+      setPendingRegistration(pending);
+      setCode("");
+      setCodeError("");
+      setCodeNotice("");
     } catch {
       // error shown via mutation state
     }
   };
 
-  const errorMessage = registerMutation.isError
-    ? formatApiErrorMessage(registerMutation.error, API_CLIENT_UI.REGISTER_FALLBACK)
-    : consentError;
+  const handleConfirmCode = async () => {
+    if (!pendingRegistration) return;
+
+    if (code.length !== REGISTER_CODE_LENGTH) {
+      setCodeError(AUTH_UI.REGISTER_CODE_REQUIRED);
+      return;
+    }
+
+    setCodeError("");
+    setCodeNotice("");
+
+    try {
+      await confirmMutation.mutateAsync({
+        registrationId: pendingRegistration.registrationId,
+        code,
+      });
+      router.replace("/(tabs)");
+    } catch (error) {
+      setCodeError(formatApiErrorMessage(error, EMAIL_VERIFICATION_UI.CONFIRM_ERROR));
+    }
+  };
+
+  const handleResendCode = async () => {
+    if (!pendingRegistration) return;
+
+    setIsResending(true);
+    setCodeError("");
+    setCodeNotice("");
+
+    try {
+      const message = await resendRegistrationCode(pendingRegistration.registrationId);
+      setCode("");
+      setCodeNotice(message || EMAIL_VERIFICATION_UI.RESENT);
+    } catch (error) {
+      setCodeError(formatApiErrorMessage(error, EMAIL_VERIFICATION_UI.RESEND_ERROR));
+    } finally {
+      setIsResending(false);
+    }
+  };
+
+  const isCodeStep = pendingRegistration != null;
+  const isCodeBusy = confirmMutation.isPending || isResending;
+
+  const errorMessage = isCodeStep
+    ? codeError
+    : registerMutation.isError
+      ? formatApiErrorMessage(registerMutation.error, API_CLIENT_UI.REGISTER_FALLBACK)
+      : consentError;
 
   return (
     <View style={styles.flex}>
@@ -92,7 +163,7 @@ export default function RegisterScreen() {
           },
         ]}
         onPress={handleBack}
-        disabled={registerMutation.isPending}
+        disabled={registerMutation.isPending || isCodeBusy}
         accessibilityRole="button"
         accessibilityLabel={AUTH_UI.BACK_BUTTON}
       >
@@ -112,6 +183,71 @@ export default function RegisterScreen() {
           )}
         </View>
 
+        {isCodeStep ? (
+          <View style={styles.body}>
+            <Text style={styles.title}>{AUTH_UI.REGISTER_CODE_TITLE}</Text>
+            <Text style={styles.subtitle}>
+              {AUTH_UI.REGISTER_CODE_SUBTITLE(pendingRegistration.email || email)}
+            </Text>
+
+            <View style={styles.form}>
+              <View style={styles.field}>
+                <Text style={styles.label}>{AUTH_UI.REGISTER_CODE_LABEL}</Text>
+                <TextInput
+                  style={[styles.input, focusedField === "code" && styles.inputFocused]}
+                  value={code}
+                  onChangeText={(value) => {
+                    setCode(value.replace(/\D/g, "").slice(0, REGISTER_CODE_LENGTH));
+                    setCodeError("");
+                  }}
+                  onFocus={() => setFocusedField("code")}
+                  onBlur={() => setFocusedField(null)}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  keyboardType="number-pad"
+                  textContentType="oneTimeCode"
+                  maxLength={REGISTER_CODE_LENGTH}
+                  placeholder={AUTH_UI.REGISTER_CODE_PLACEHOLDER}
+                  placeholderTextColor={theme.colors.textMuted}
+                  returnKeyType="go"
+                  onSubmitEditing={handleConfirmCode}
+                  editable={!isCodeBusy}
+                />
+              </View>
+
+              {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
+              {codeNotice ? <Text style={styles.subtitle}>{codeNotice}</Text> : null}
+
+              <AppButton
+                label={AUTH_UI.REGISTER_CODE_CONFIRM_BUTTON}
+                variant="primary"
+                style={styles.submitButton}
+                onPress={handleConfirmCode}
+                disabled={isCodeBusy}
+              />
+              <Pressable
+                style={styles.registerLink}
+                onPress={handleResendCode}
+                disabled={isCodeBusy}
+              >
+                <Text style={styles.registerLinkText}>
+                  {isResending
+                    ? EMAIL_VERIFICATION_UI.RESEND_LOADING
+                    : AUTH_UI.REGISTER_CODE_RESEND_BUTTON}
+                </Text>
+              </Pressable>
+              <Pressable
+                style={styles.registerLink}
+                onPress={handleBack}
+                disabled={isCodeBusy}
+              >
+                <Text style={styles.registerLinkText}>
+                  {AUTH_UI.REGISTER_CODE_BACK_BUTTON}
+                </Text>
+              </Pressable>
+            </View>
+          </View>
+        ) : (
         <View style={styles.body}>
           <Text style={styles.title}>{AUTH_UI.REGISTER_TITLE}</Text>
           <Text style={styles.subtitle}>{AUTH_UI.REGISTER_SUBTITLE}</Text>
@@ -210,6 +346,7 @@ export default function RegisterScreen() {
             </Pressable>
           </View>
         </View>
+        )}
       </AuthScreenScroll>
     </View>
   );
