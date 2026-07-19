@@ -2,7 +2,12 @@ import assert from "node:assert/strict";
 
 import { ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY } from "../../constants/orderConstants.js";
 import { SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE } from "../../constants/productConstants.js";
-import { PendingRegistrationModel, UserModel } from "../../models/index.js";
+import { USER_DATA_CONFIRMATION_STATUS_APPROVED } from "../../constants/userDataConfirmationConstants.js";
+import {
+  PendingRegistrationModel,
+  UserDataConfirmationRequestModel,
+  UserModel,
+} from "../../models/index.js";
 import { hashEmailVerificationSecret } from "../../services/auth/emailVerification.js";
 import { seedProductCategoryTree } from "../../utils/seedProductCategoryTree.js";
 import { buildCookieHeader } from "./httpTestApp.js";
@@ -154,10 +159,31 @@ export const verifyUserEmail = async (email) => {
 };
 
 /**
+ * Полное подтверждение данных: флаг на пользователе + approved-заявка с
+ * паспортом и селфи (её требует передача паспорта продавцу при рассрочке,
+ * см. loadApprovedBuyerPassportShareSnapshot).
+ *
  * @param {string} userId
  */
 export const confirmUserData = async (userId) => {
   await UserModel.findByIdAndUpdate(userId, { isUserDataConfirmed: true });
+  await UserDataConfirmationRequestModel.create({
+    userId,
+    status: USER_DATA_CONFIRMATION_STATUS_APPROVED,
+    reviewedAt: new Date(),
+    passport: {
+      lastName: "Иванов",
+      firstName: "Иван",
+      middleName: "Иванович",
+      birthDate: "1990-01-01",
+      series: "1234",
+      number: "567890",
+      issuedBy: "УФМС",
+      departmentCode: "123-456",
+      issuedAt: "2010-01-01",
+    },
+    passportSelfiePhotoUrl: "/uploads/selfie.jpg",
+  });
 };
 
 /**

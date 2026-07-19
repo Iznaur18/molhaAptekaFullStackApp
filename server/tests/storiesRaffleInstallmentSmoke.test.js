@@ -7,6 +7,7 @@ import {
   approveProductViaApi,
   confirmUserData,
   createProductViaApi,
+  enablePremiumUser,
   ensureProductCategoryTreeSeeded,
   parseSuccessData,
   registerUserAndGetCookie,
@@ -68,7 +69,7 @@ after(async () => {
   await disconnectMongoTestReplSet();
 });
 
-test("stories smoke: feed → create (any user) → author → view", async () => {
+test("stories smoke: feed → create (премиум/сотрудник) → author → view", async () => {
   const feedData = await parseSuccessData(await request("/user/stories/feed"));
   assert.ok(Array.isArray(feedData.rings));
   assert.equal(feedData.showStrip, true);
@@ -78,6 +79,8 @@ test("stories smoke: feed → create (any user) → author → view", async () =
     request,
     "story-user",
   );
+  // публикация сторис доступна только премиуму (см. canPublishUserStory)
+  await enablePremiumUser(user._id);
 
   const authedFeed = await parseSuccessData(
     await request("/user/stories/feed", {
@@ -275,10 +278,26 @@ test("installment smoke: program → contract → my list", async () => {
         deliveryAddress: "Москва, Тверская 1",
         deliveryAddressFlat: "1",
         paymentMethod: ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
+        passportShareConsent: true,
       }),
     }),
   );
   assert.ok(contractData.contract?._id);
+
+  // до «Принять» продавцом живой контракт скрыт из списков
+  const beforeAccept = await parseSuccessData(
+    await request("/installment/contracts/my", {
+      headers: { Cookie: buyerCookie },
+    }),
+  );
+  assert.equal(beforeAccept.contracts.length, 0);
+
+  await parseSuccessData(
+    await request(`/order/${contractData.contract.orderId}/items/0/shipped`, {
+      method: "PATCH",
+      headers: { Cookie: sellerCookie },
+    }),
+  );
 
   const myContracts = await parseSuccessData(
     await request("/installment/contracts/my", {
