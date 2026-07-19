@@ -10,6 +10,34 @@ import {
   ORDER_STATUS_PENDING,
 } from "../constants/orderConstants.js";
 
+const BuyerPassportShareSchema = new mongoose.Schema(
+  {
+    passport: {
+      lastName: { type: String, required: true, trim: true, maxlength: 80 },
+      firstName: { type: String, required: true, trim: true, maxlength: 80 },
+      middleName: { type: String, trim: true, maxlength: 80, default: "" },
+      birthDate: { type: Date, required: true },
+      series: { type: String, required: true, trim: true, maxlength: 4 },
+      number: { type: String, required: true, trim: true, maxlength: 6 },
+      issuedBy: { type: String, required: true, trim: true, maxlength: 200 },
+      issuedAt: { type: Date, required: true },
+      departmentCode: {
+        type: String,
+        required: true,
+        trim: true,
+        maxlength: 7,
+      },
+    },
+    passportSelfiePhotoUrl: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 500,
+    },
+  },
+  { _id: false },
+);
+
 const OrderLineItemSchema = new mongoose.Schema(
   {
     productId: {
@@ -144,6 +172,16 @@ const OrderSchema = new mongoose.Schema(
     installmentContractId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "InstallmentContract",
+      default: null,
+    },
+    /** Audit: buyer consented to share passport with seller (no PII values). */
+    passportShareConsentAt: {
+      type: Date,
+      default: null,
+    },
+    /** Snapshot at installment checkout; cleared on cancel. */
+    buyerPassportShare: {
+      type: BuyerPassportShareSchema,
       default: null,
     },
   },

@@ -33,6 +33,7 @@ const BADGE_BORDER_RADIUS = 999;
 const BADGE_FONT_SIZE = 12 * VISUAL_ACTION_BUTTON_SIZE_SCALE;
 const BADGE_LINE_HEIGHT = 14 * VISUAL_ACTION_BUTTON_SIZE_SCALE;
 const BANNER_BOTTOM_MARGIN = HOME_FEED_SECTION_GAP;
+const MENU_GAP_INLINE = 4;
 
 /** @deprecated Секция без внешней обёртки — оставлено для совместимости импортов. */
 export const RAFFLE_SECTION_CARD_BORDER_RADIUS = 36;
@@ -346,6 +347,36 @@ export const useRaffleFeaturedBannerManageMenuStyles = createThemedStyles((theme
     marginTop: -1,
     opacity: 0.88,
   },
+  inlineRoot: {
+    position: "relative",
+    zIndex: 30,
+  },
+  inlineDismiss: {
+    position: "absolute",
+    top: -800,
+    right: -800,
+    bottom: -800,
+    left: -800,
+    zIndex: 31,
+  },
+  inlineMenu: {
+    position: "absolute",
+    top: "100%",
+    right: 0,
+    marginTop: MENU_GAP_INLINE,
+    zIndex: 32,
+    minWidth: 168,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: P.premiumPurpleMuted,
+    backgroundColor: P.accentPinkSurface,
+    shadowColor: theme.colors.ink,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.16,
+    shadowRadius: 12,
+    elevation: 8,
+    overflow: "hidden",
+  },
   menuBackdrop: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "transparent",
@@ -474,7 +505,6 @@ export const useRaffleFeaturedSectionStyles = createThemedStyles((theme) => ({
     width: "100%",
   },
   revealButton: {
-    position: "relative",
     width: "100%",
     alignItems: "center",
     justifyContent: "center",
@@ -483,16 +513,12 @@ export const useRaffleFeaturedSectionStyles = createThemedStyles((theme) => ({
     paddingHorizontal: 16,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surface,
-  },
-  revealButtonFlow: {
-    ...StyleSheet.absoluteFillObject,
+    backgroundColor: theme.colors.action,
   },
   revealButtonPressed: {
     opacity: 0.92,
   },
   revealButtonText: {
-    zIndex: 1,
     fontSize: 15,
     lineHeight: 20,
     fontWeight: "700",
@@ -510,6 +536,210 @@ export const useRaffleFeaturedCarouselStyles = createThemedStyles(() => ({
     width: "100%",
     maxWidth: "100%",
     overflow: "hidden",
+  },
+}));
+
+const FEATURED_RAFFLE_MODAL_BACKDROP = "rgba(0, 0, 0, 0.62)";
+
+export const useFeaturedRaffleModalStyles = createThemedStyles((theme) => ({
+  overlay: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 16,
+    backgroundColor: FEATURED_RAFFLE_MODAL_BACKDROP,
+  },
+  backdropPressable: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  dialog: {
+    position: "relative",
+    borderRadius: 20,
+    overflow: "hidden",
+    backgroundColor: theme.colors.surface,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    shadowColor: theme.colors.ink,
+    shadowOffset: { width: 0, height: 16 },
+    shadowOpacity: 0.28,
+    shadowRadius: 28,
+    elevation: 12,
+  },
+  header: {
+    alignItems: "flex-end",
+    paddingTop: 8,
+    paddingHorizontal: 8,
+    paddingBottom: 4,
+  },
+  closeButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: theme.colors.surfaceMuted,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+  },
+  closeButtonText: {
+    fontSize: 13,
+    lineHeight: 16,
+    fontWeight: "600",
+    color: theme.colors.text,
+  },
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 16,
+    paddingHorizontal: 0,
+  },
+  carousel: {
+    width: "100%",
+    overflow: "hidden",
+  },
+  footer: {
+    paddingHorizontal: 12,
+    paddingTop: 10,
+    paddingBottom: 12,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+  },
+  footerButton: {
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 14,
+    backgroundColor: theme.colors.action,
+  },
+  footerButtonText: {
+    fontSize: 15,
+    lineHeight: 20,
+    fontWeight: "700",
+    color: P.onContrast,
+  },
+}));
+
+export const useFeaturedRaffleModalCardStyles = createThemedStyles((theme) => ({
+  root: {
+    width: "100%",
+    gap: L.cardPanelGap,
+  },
+  visualWrap: {
+    position: "relative",
+    alignSelf: "center",
+    zIndex: 2,
+    overflow: "visible",
+  },
+  visualCard: {
+    overflow: "hidden",
+    backgroundColor: theme.colors.surfaceMuted,
+  },
+  visualCardCompleted: {
+    backgroundColor: theme.colors.surfaceMuted,
+  },
+  visual: {
+    position: "relative",
+    overflow: "hidden",
+    backgroundColor: theme.colors.surfaceMuted,
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
+  },
+  visualTopBar: {
+    position: "absolute",
+    top: L.visualControlInset,
+    left: L.visualControlInset,
+    right: L.visualControlInset,
+    zIndex: 5,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: 4,
+    overflow: "visible",
+  },
+  badge: {
+    maxWidth: "70%",
+    minHeight: 21,
+    paddingHorizontal: 6,
+    paddingVertical: 0,
+    borderRadius: 999,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.72)",
+  },
+  badgeLabel: {
+    color: theme.colors.ink,
+    fontSize: 9,
+    fontWeight: "700",
+    lineHeight: 11,
+  },
+  body: {
+    gap: L.footerContentGap,
+    paddingHorizontal: 12,
+  },
+  progressBar: {
+    width: "100%",
+    height: L.progressBarHeight,
+    borderRadius: L.progressBarBorderRadius,
+    backgroundColor: theme.colors.actionBorder,
+    overflow: "hidden",
+  },
+  progressBarCompleted: {
+    backgroundColor: theme.colors.successSurface,
+  },
+  progressFill: {
+    height: "100%",
+    borderRadius: L.progressBarBorderRadius,
+    backgroundColor: theme.colors.action,
+  },
+  progressFillCompleted: {
+    backgroundColor: theme.colors.success,
+  },
+  progressLabel: {
+    fontSize: 13.6,
+    lineHeight: L.progressLabelLineHeight,
+    fontWeight: "600",
+    color: theme.colors.text,
+  },
+  title: {
+    fontSize: 17,
+    lineHeight: 22,
+    fontWeight: "700",
+    color: theme.colors.text,
+  },
+  description: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: theme.colors.text,
+    opacity: 0.88,
+  },
+  secondaryActions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: L.actionsGap,
+    marginTop: 4,
+  },
+  btnInstagram: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: P.accentPink,
+    backgroundColor: P.accentPinkSoft,
+  },
+  btnInstagramText: {
+    fontSize: 13.2,
+    fontWeight: "600",
+    color: P.accentPinkDeep,
+  },
+  completedLabel: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: P.successDeep,
   },
 }));
 

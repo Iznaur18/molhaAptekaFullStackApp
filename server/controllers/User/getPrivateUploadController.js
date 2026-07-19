@@ -15,6 +15,7 @@ import {
   resolvePrivateUploadDiskPath,
 } from "../../services/upload/privateUploadPaths.js";
 import { isSafeUploadFilename } from "../../services/upload/parseUploadFilenameFromMediaUrl.js";
+import { UPLOADS_DIR } from "../../utils/uploadsDir.js";
 
 /**
  * Staff-only: `GET /upload/private/:filename`
@@ -35,6 +36,7 @@ export async function getPrivateUploadController(req, res) {
 
   res.setHeader("Cache-Control", "private, no-store");
   res.setHeader("Content-Type", resolveUploadContentType(filename));
+  res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
 
   if (isObjectStorageUploadEnabled()) {
     const bucket = process.env.S3_BUCKET?.trim();
@@ -71,6 +73,20 @@ export async function getPrivateUploadController(req, res) {
     await fs.promises.access(filePath);
     return res.sendFile(path.resolve(filePath));
   } catch {
-    return errorRes(res, 404, "Файл не найден");
+    // Legacy: URL уже private, файл остался в публичной uploads/
+    try {
+      const legacyPath = path.resolve(UPLOADS_DIR, filename);
+      const uploadsRoot = path.resolve(UPLOADS_DIR);
+      if (
+        !legacyPath.startsWith(`${uploadsRoot}${path.sep}`) &&
+        legacyPath !== uploadsRoot
+      ) {
+        return errorRes(res, 404, "Файл не найден");
+      }
+      await fs.promises.access(legacyPath);
+      return res.sendFile(legacyPath);
+    } catch {
+      return errorRes(res, 404, "Файл не найден");
+    }
   }
 }

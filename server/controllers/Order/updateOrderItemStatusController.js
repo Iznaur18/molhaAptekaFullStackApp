@@ -5,6 +5,10 @@ import {
   markOrderItemShippedBySeller,
 } from "../../services/order/updateOrderItemStatus.js";
 import { parseItemIndex } from "../../services/order/orderItemStatusHelpers.js";
+import {
+  sanitizeOrderForBuyerApi,
+  sanitizeOrderForSellerApi,
+} from "../../services/order/buyerPassportShare.js";
 import { successRes } from "../../services/http/index.js";
 
 /** `PATCH /order/:orderId/items/:itemIndex/delivered` — продавец помечает позицию как доставленную. */
@@ -17,7 +21,10 @@ export const markOrderItemDeliveredBySellerController = async (req, res) => {
     userId: req.userId,
   });
 
-  return successRes(res, result);
+  return successRes(res, {
+    ...result,
+    order: sanitizeOrderForSellerApi(result.order),
+  });
 };
 
 /** `PATCH /order/:orderId/items/:itemIndex/cancelled` — покупатель или продавец отменяет позицию в обработке. */
@@ -31,7 +38,9 @@ export const markOrderItemCancelledController = async (req, res) => {
     reason: req.body?.reason,
   });
 
-  return successRes(res, result);
+  return successRes(res, {
+    order: sanitizeOrderForBuyerApi(result.order),
+  });
 };
 
 export const markOrderItemCancelledBySellerController = markOrderItemCancelledController;
@@ -45,7 +54,10 @@ export const markOrderItemShippedBySellerController = async (req, res) => {
     sellerId: String(req.userId),
   });
 
-  return successRes(res, result);
+  return successRes(res, {
+    ...result,
+    order: sanitizeOrderForSellerApi(result.order),
+  });
 };
 
 /** `PATCH /order/:orderId/items/:itemIndex/confirm` — покупатель подтверждает доставленную позицию. */
@@ -58,5 +70,8 @@ export const confirmOrderItemByBuyerController = async (req, res) => {
     userId: req.userId,
   });
 
-  return successRes(res, result);
+  return successRes(res, {
+    ...result,
+    order: sanitizeOrderForBuyerApi(result.order),
+  });
 };

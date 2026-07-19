@@ -44,7 +44,7 @@ export const resolveProductPromotionTierCardStyle = (
     return {
       card: {
         borderColor: semanticColors.border,
-        backgroundColor: semanticColors.onContrast,
+        backgroundColor: semanticColors.surface,
       },
       badge: {
         backgroundColor: chrome.soft,
@@ -60,14 +60,15 @@ export const resolveProductPromotionTierCardStyle = (
 
   return {
     card: {
-      borderColor: `${chrome.accent}8c`,
+      borderColor: chrome.accent,
       backgroundColor: chrome.soft,
+      borderWidth: 2,
     },
     badge: {
-      backgroundColor: chrome.soft,
+      backgroundColor: chrome.accent,
     },
     badgeText: {
-      color: chrome.badgeText,
+      color: semanticColors.onContrast,
     },
     title: {
       color: chrome.accent,
@@ -83,7 +84,7 @@ export const resolveProductPromotionDurationChipStyle = (
     return {
       chip: {
         borderColor: semanticColors.border,
-        backgroundColor: semanticColors.onContrast,
+        backgroundColor: semanticColors.surface,
       },
       price: {
         color: semanticColors.link,
@@ -96,6 +97,7 @@ export const resolveProductPromotionDurationChipStyle = (
       chip: {
         borderColor: semanticColors.danger,
         backgroundColor: semanticColors.dangerSurface,
+        borderWidth: 2,
       },
       price: {
         color: semanticColors.danger,
@@ -105,8 +107,9 @@ export const resolveProductPromotionDurationChipStyle = (
 
   return {
     chip: {
-      borderColor: semanticColors.link,
+      borderColor: semanticColors.action,
       backgroundColor: semanticColors.actionSoft,
+      borderWidth: 2,
     },
     price: {
       color: semanticColors.link,

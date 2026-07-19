@@ -39,33 +39,24 @@ export const patchProductCategoryAdmin = async (
   }
 };
 
-export type DeleteProductCategoryOptions = {
-  reassignProductCategoryId?: string;
-  detachProducts?: boolean;
+export type DeleteProductCategoryResult = {
+  deletedId: string;
+  deletedIds: string[];
 };
 
 export const deleteProductCategoryAdmin = async (
   categoryId: string,
-  options: DeleteProductCategoryOptions = {},
-) => {
+): Promise<DeleteProductCategoryResult> => {
   try {
-    const reassignProductCategoryId = String(options.reassignProductCategoryId ?? "").trim();
-    const detachProducts = options.detachProducts === true;
-    const payload =
-      reassignProductCategoryId || detachProducts
-        ? {
-            ...(reassignProductCategoryId ? { reassignProductCategoryId } : {}),
-            ...(detachProducts ? { detachProducts: true } : {}),
-          }
-        : undefined;
-
-    const { data } = await apiClient.delete(
-      `/product/admin/categories/${categoryId}`,
-      payload ? { data: payload } : undefined,
-    );
+    const { data } = await apiClient.delete(`/product/admin/categories/${categoryId}`);
     if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
+    const deletedId = String(data?.data?.deletedId ?? categoryId);
+    const deletedIds = Array.isArray(data?.data?.deletedIds)
+      ? data.data.deletedIds.map(String)
+      : [deletedId];
+    return { deletedId, deletedIds };
   } catch (error) {
     throw new Error(formatApiErrorMessage(error, "Не удалось удалить категорию"));
   }

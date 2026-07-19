@@ -1,7 +1,9 @@
 import {
+  INSTALLMENT_BUYER_PASSPORT_NOT_AVAILABLE_MESSAGE,
   INSTALLMENT_CONTRACT_STATUS_ACTIVE,
   INSTALLMENT_CONTRACT_STATUS_PENDING_FIRST_PAYMENT,
   INSTALLMENT_MODERATION_APPROVED,
+  INSTALLMENT_PASSPORT_SHARE_CONSENT_REQUIRED_MESSAGE,
   INSTALLMENT_PROGRAM_NOT_AVAILABLE_MESSAGE,
 } from "../../constants/installmentConstants.js";
 import { ORDER_STATUS_PENDING } from "../../constants/orderConstants.js";
@@ -19,6 +21,10 @@ import {
   buildInstallmentPaymentSchedule,
   notifySellerNewInstallmentContract,
 } from "./installmentHelpers.js";
+import {
+  loadApprovedBuyerPassportShareSnapshot,
+  sanitizeOrderForBuyerApi,
+} from "../order/buyerPassportShare.js";
 import {
   buildOrderLineLoyaltySnapshot,
   reserveLoyaltyPointsForNewOrder,
@@ -41,6 +47,7 @@ import { appendOrderToUserBuyList } from "./installmentContractHelpers.js";
  *   planId: string;
  *   quantity: number;
  *   paymentMethod: string;
+ *   passportShareConsent: boolean;
  *   verifiedDeliveryAddress: {
  *     displayAddress: string;
  *     flat?: string;
@@ -54,8 +61,13 @@ export async function createInstallmentContract({
   planId,
   quantity,
   paymentMethod,
+  passportShareConsent,
   verifiedDeliveryAddress,
 }) {
+  if (passportShareConsent !== true) {
+    throw new AppError(400, INSTALLMENT_PASSPORT_SHARE_CONSENT_REQUIRED_MESSAGE);
+  }
+
   try {
     await assertUserCanBuyInstallment(buyerUserId);
   } catch (error) {
@@ -65,6 +77,12 @@ export async function createInstallmentContract({
   const emailCheck = await checkUserEmailVerified(buyerUserId);
   if (!emailCheck.ok) {
     throw new AppError(403, emailCheck.message);
+  }
+
+  const passportShareSnapshot =
+    await loadApprovedBuyerPassportShareSnapshot(buyerUserId);
+  if (!passportShareSnapshot) {
+    throw new AppError(400, INSTALLMENT_BUYER_PASSPORT_NOT_AVAILABLE_MESSAGE);
   }
 
   const program = await ProductInstallmentProgramModel.findOne({
@@ -180,6 +198,8 @@ export async function createInstallmentContract({
             paymentMethod,
             status: ORDER_STATUS_PENDING,
             installmentContractId: createdContract._id,
+            passportShareConsentAt: new Date(),
+            buyerPassportShare: passportShareSnapshot,
           },
         ],
         withMongoSession({}, session),
@@ -221,6 +241,6 @@ export async function createInstallmentContract({
   return {
     message: "Рассрочка оформлена",
     contract: await buildInstallmentContractPayload(contract),
-    order,
+    order: sanitizeOrderForBuyerApi(order),
   };
 }

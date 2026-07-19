@@ -1,7 +1,6 @@
 import { useState } from "react";
 
 import { isProductRaffleParticipant } from "../../raffle/lib/isProductRaffleParticipant.js";
-import { useProductManageToggleImagesByVariant } from "../../product-manage-toggle-display/model/useProductManageToggleImagesByVariant.js";
 import { PRODUCT_CARD_UI } from "../../../shared/config/appUiCopy.js";
 import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 
@@ -53,7 +52,6 @@ export function ProductEditManageSection({
   canOpenInstallmentProgram = true,
 }) {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
-  const { imageByVariant } = useProductManageToggleImagesByVariant();
 
   const isListedForOthers = product.productIsAvailable !== false;
   const hasOpenSalesLocked = product.hasOpenSales === true;
@@ -104,18 +102,11 @@ export function ProductEditManageSection({
         {showAuctionToggle ? (
           <ProductManageToggleRow
             title={CREATE_PRODUCT_MODAL_UI.MANAGE_AUCTION_TITLE}
-            titleStatus={
-              isAuctionEnabled
-                ? CREATE_PRODUCT_MODAL_UI.MANAGE_AUCTION_STATUS_ACTIVE
-                : CREATE_PRODUCT_MODAL_UI.MANAGE_AUCTION_STATUS_INACTIVE
-            }
             description={CREATE_PRODUCT_MODAL_UI.MANAGE_AUCTION_HINT}
             checked={isAuctionEnabled}
             disabled={actionsLocked}
             pending={isAuctionTogglePending}
             pendingLabel={PRODUCT_CARD_UI.AUCTION_TOGGLE_PENDING}
-            variant="auction"
-            imageUrl={imageByVariant.auction}
             onCheckedChange={() => {
               if (product._id == null || actionsLocked) return;
               void onSetAuction(String(product._id), !isAuctionEnabled);
@@ -136,8 +127,6 @@ export function ProductEditManageSection({
             }
             pending={isRaffleParticipationPending}
             pendingLabel={PRODUCT_CARD_UI.RAFFLE_PARTICIPATION_PENDING}
-            variant="raffle"
-            imageUrl={imageByVariant.raffle}
             onCheckedChange={() => {
               onToggleRaffleParticipation?.(product, !isRaffleParticipant);
             }}
@@ -157,7 +146,6 @@ export function ProductEditManageSection({
               !canOpenInstallmentProgram
             }
             variant="installment"
-            imageUrl={imageByVariant.installment}
             onPress={() => onOpenInstallmentProgram?.()}
           />
         ) : null}
@@ -204,11 +192,6 @@ export function ProductEditManageSection({
         {showVisibility ? (
           <ProductManageToggleRow
             title={CREATE_PRODUCT_MODAL_UI.MANAGE_VISIBILITY_TITLE_VISIBLE}
-            titleStatus={
-              isListedForOthers
-                ? CREATE_PRODUCT_MODAL_UI.MANAGE_VISIBILITY_STATUS_VISIBLE
-                : CREATE_PRODUCT_MODAL_UI.MANAGE_VISIBILITY_STATUS_HIDDEN
-            }
             description={
               isListedForOthers
                 ? CREATE_PRODUCT_MODAL_UI.MANAGE_VISIBILITY_HINT_VISIBLE
@@ -218,7 +201,6 @@ export function ProductEditManageSection({
             disabled={actionsLocked}
             pending={isAvailabilityTogglePending}
             pendingLabel={PRODUCT_CARD_UI.AVAILABILITY_TOGGLE_PENDING}
-            imageUrl={imageByVariant.default}
             onCheckedChange={() => {
               if (product._id == null || actionsLocked) return;
               void onSetAvailability(String(product._id), !isListedForOthers);

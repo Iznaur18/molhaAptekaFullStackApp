@@ -14,11 +14,8 @@ import { normalizeProductCategorySearchKeywords } from "../../services/product/n
 import { rebuildProductCategorySubtreePaths } from "../../services/product/rebuildProductCategorySubtreePaths.js";
 import { syncProductsDenormForCategorySubtree } from "../../services/product/syncProductsDenormForCategorySubtree.js";
 import {
-  cleanupProductCategoryDisplayForDeletedCategory,
-  detachProductsFromCategoryLeaf,
-  getProductCategoryDeleteBlocker,
-  reassignProductsFromCategoryLeaf,
-  syncParentLeafFlagAfterChildDelete,
+  deleteProductCategoryCascade,
+  getProductCategoryCascadeDeleteBlocker,
 } from "../../services/product/productCategoryDeleteHelpers.js";
 import { errorRes, successRes } from "../../services/http/index.js";
 
@@ -282,7 +279,7 @@ export async function patchProductCategoryAdminController(req, res) {
   successRes(res, { category: toCategoryAdminPayload(doc.toObject()) });
 }
 
-/** DELETE /product/admin/categories/:categoryId */
+/** DELETE /product/admin/categories/:categoryId — cascade: узел + всё поддерево */
 export async function deleteProductCategoryAdminController(req, res) {
   const categoryId = String(req.params.categoryId ?? "");
   const doc = await ProductCategoryModel.findById(categoryId).lean();
@@ -290,43 +287,12 @@ export async function deleteProductCategoryAdminController(req, res) {
     return errorRes(res, 404, "Категория не найдена");
   }
 
-  const reassignProductCategoryId = String(
-    req.body?.reassignProductCategoryId ?? "",
-  ).trim();
-  const detachProducts = req.body?.detachProducts === true;
-
-  let blocker = await getProductCategoryDeleteBlocker(doc);
-  if (blocker?.code === "products" && doc.isLeaf === true) {
-    if (reassignProductCategoryId && detachProducts) {
-      return errorRes(res, 400, "Укажите либо перенос товаров, либо отвязку от дерева");
-    }
-
-    if (reassignProductCategoryId) {
-      const target = await ProductCategoryModel.findById(
-        reassignProductCategoryId,
-      ).lean();
-      if (!target || target.isLeaf !== true) {
-        return errorRes(res, 400, "Укажите конечную категорию для переноса товаров");
-      }
-      if (String(target._id) === categoryId) {
-        return errorRes(res, 400, "Категория переназначения совпадает с удаляемой");
-      }
-
-      await reassignProductsFromCategoryLeaf(categoryId, target._id);
-      blocker = await getProductCategoryDeleteBlocker(doc);
-    } else if (detachProducts) {
-      await detachProductsFromCategoryLeaf(doc);
-      blocker = await getProductCategoryDeleteBlocker(doc);
-    }
-  }
-
+  const blocker = await getProductCategoryCascadeDeleteBlocker(doc);
   if (blocker) {
     return errorRes(res, 400, blocker.message);
   }
 
-  await ProductCategoryModel.findByIdAndDelete(categoryId);
-  await cleanupProductCategoryDisplayForDeletedCategory(doc);
-  await syncParentLeafFlagAfterChildDelete(doc.parentId);
+  const { deletedIds } = await deleteProductCategoryCascade(doc);
 
-  successRes(res, { deletedId: categoryId });
+  successRes(res, { deletedId: categoryId, deletedIds });
 }

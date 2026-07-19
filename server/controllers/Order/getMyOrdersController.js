@@ -1,5 +1,6 @@
 import { ORDER_STATUS_PENDING } from "../../constants/orderConstants.js";
 import { OrderModel } from "../../models/index.js";
+import { sanitizeOrderForBuyerApi } from "../../services/order/buyerPassportShare.js";
 import { syncOrderStatusFromItems } from "../../services/order/orderStatus.js";
 import { successRes } from "../../services/http/index.js";
 import { sortByPriorityStatusFirst } from "../../utils/sortByPriorityStatusFirst.js";
@@ -16,7 +17,7 @@ export const getMyOrdersController = async (req, res) => {
 
   const sortedOrders = sortByPriorityStatusFirst(orders, {
     priorityStatus: ORDER_STATUS_PENDING,
-  });
+  }).map((order) => sanitizeOrderForBuyerApi(order));
 
   return successRes(res, { orders: sortedOrders });
 };

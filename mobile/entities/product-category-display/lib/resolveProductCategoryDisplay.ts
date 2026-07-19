@@ -1,7 +1,3 @@
-import {
-  PRODUCT_CATEGORIES,
-  PRODUCT_CATEGORY_LABEL_RU,
-} from "@/entities/product/lib/productCategoryLabels";
 import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
 
 import type { ProductCategoryRootNode } from "../model/types";
@@ -19,7 +15,7 @@ export type ProductCategoryDisplayFromApi = {
 
 export type ResolvedProductCategoryDisplay = {
   categoryId: string | null;
-  /** Legacy / navigation slug (PRODUCT_CATEGORIES slot). */
+  /** Legacy slug или slug корня для навигации/фильтра. */
   categorySlug: string;
   /** Ключ PATCH /product/category-displays/:slug — совпадает с lookup override. */
   displaySlug: string;
@@ -84,69 +80,35 @@ const resolveCatalogCategoryDisplayFields = (
   };
 };
 
-const findRootForLegacySlug = (
-  roots: ProductCategoryRootNode[],
-  legacySlug: string,
-): ProductCategoryRootNode | null =>
-  roots.find(
-    (root) => root.legacyProductCategory === legacySlug || root.slug === legacySlug,
-  ) ?? null;
-
+/** Только корни из админ-дерева. Без ghost-слотов legacy enum. */
 export const buildResolvedProductCategoryDisplaysFromRoots = (
   roots: ProductCategoryRootNode[],
   displays: ProductCategoryDisplayFromApi[],
 ): ResolvedProductCategoryDisplay[] => {
   const overridesBySlug = mapCategoryDisplaysBySlug(displays);
   const overridesById = mapCategoryDisplaysById(displays);
-  const matchedRootIds = new Set<string>();
-  const items: ResolvedProductCategoryDisplay[] = [];
 
-  for (const legacySlug of PRODUCT_CATEGORIES) {
-    const root = findRootForLegacySlug(roots, legacySlug);
-    if (root) {
-      matchedRootIds.add(root.id);
-    }
-
-    const displaySlug = root?.slug ?? legacySlug;
-    const fields = resolveCatalogCategoryDisplayFields(
-      displaySlug,
-      overridesBySlug,
-      overridesById,
-      root?.id ?? null,
-      root?.labelRu ?? PRODUCT_CATEGORY_LABEL_RU[legacySlug] ?? legacySlug,
-      legacySlug,
-    );
-
-    items.push({
-      categoryId: root?.id ?? null,
-      categorySlug: legacySlug,
-      displaySlug,
-      ...fields,
-    });
-  }
-
-  for (const root of roots) {
-    if (matchedRootIds.has(root.id)) {
-      continue;
-    }
-
+  return roots.map((root) => {
+    const legacySlug =
+      typeof root.legacyProductCategory === "string" && root.legacyProductCategory.trim()
+        ? root.legacyProductCategory.trim()
+        : null;
     const fields = resolveCatalogCategoryDisplayFields(
       root.slug,
       overridesBySlug,
       overridesById,
       root.id,
       root.labelRu || root.slug,
+      legacySlug,
     );
 
-    items.push({
+    return {
       categoryId: root.id,
-      categorySlug: root.slug,
+      categorySlug: legacySlug ?? root.slug,
       displaySlug: root.slug,
       ...fields,
-    });
-  }
-
-  return items;
+    };
+  });
 };
 
 export const resolveCategoryDisplayTileImageUri = (

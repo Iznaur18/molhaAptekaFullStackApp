@@ -1,0 +1,55 @@
+.installment-passport-share-consent__body {
+  padding-block: 0.25rem 0.5rem;
+}
+
+.installment-passport-share-consent__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  max-height: min(50vh, 22rem);
+  overflow: auto;
+}
+
+.installment-passport-share-consent__text p {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--iz-color-text);
+}
+
+.installment-passport-share-consent__actions {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.installment-passport-share-consent__cancel,
+.installment-passport-share-consent__confirm {
+  min-height: 2.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.installment-passport-share-consent__cancel {
+  flex-shrink: 0;
+  border: 1px solid var(--iz-color-border);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
+}
+
+.installment-passport-share-consent__confirm {
+  flex: 1;
+  border: none;
+  background: var(--iz-color-primary, #1a7a4c);
+  color: #fff;
+}
+
+.installment-passport-share-consent__cancel:disabled,
+.installment-passport-share-consent__confirm:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}

@@ -8,6 +8,7 @@ import { InstallmentContractCardPayments } from "@/entities/installment/ui/Insta
 import { InstallmentContractProgressBar } from "@/entities/installment/ui/InstallmentContractProgressBar";
 import { InstallmentContractCardSummary } from "@/entities/installment/ui/InstallmentContractCardSummary";
 import { InstallmentContractCounterparty } from "@/entities/installment/ui/InstallmentContractCounterparty";
+import { BuyerPassportSharePanel } from "@/entities/installment/ui/BuyerPassportSharePanel";
 import { INSTALLMENT_UI } from "@/shared/config";
 import { formatPriceRub } from "@/shared/lib";
 import { useInstallmentContractCardChromeStyles } from "@/shared/theme/installmentContractCardChromeStyles";
@@ -120,6 +121,9 @@ export const InstallmentContractCard = ({
             ? (contract.seller?.userName ?? "—")
             : (contract.buyer?.userName ?? "—")}
         </Text>
+        {role === "seller" && contract.buyerPassportShare ? (
+          <BuyerPassportSharePanel share={contract.buyerPassportShare} />
+        ) : null}
         <Text style={styles.meta}>
           {INSTALLMENT_UI.CONTRACT_STATUS}: {card.statusLabel}
         </Text>
@@ -219,6 +223,10 @@ export const InstallmentContractCard = ({
           onUserClick={onCounterpartyClick}
         />
       )}
+
+      {role === "seller" && contract.buyerPassportShare ? (
+        <BuyerPassportSharePanel share={contract.buyerPassportShare} />
+      ) : null}
 
       <InstallmentContractCardSummary
         contract={contract}

@@ -12,7 +12,10 @@ import {
   USER_DATA_CONFIRMATION_RESOLUTION_REJECT,
 } from "../model/constants.js";
 import { formatIsoDateTime } from "../../../shared/lib/formatIsoDateTime.js";
-import { resolveImageUrlForDisplay } from "../../../shared/lib/resolveUploadedImageUrl.js";
+import {
+  PRIVATE_UPLOAD_LOAD_FAILED,
+  usePrivateUploadDisplayUrl,
+} from "../../../shared/lib/usePrivateUploadDisplayUrl.js";
 import {
   DATA_CONFIRMATION_PAGE_UI,
   USER_LIST_ROW_UI,
@@ -37,9 +40,7 @@ export function DataConfirmationRequestCard({ request, onResolved, onOpenUser })
   const displayName = applicant?.userName?.trim() || USER_LIST_ROW_UI.MISSING_NAME;
   const passport = request.passport;
   const selfiePhotoUrl = request.passportSelfiePhotoUrl?.trim() ?? "";
-  const selfieDisplayUrl = selfiePhotoUrl
-    ? resolveImageUrlForDisplay(selfiePhotoUrl)
-    : "";
+  const selfieDisplayUrl = usePrivateUploadDisplayUrl(selfiePhotoUrl);
 
   const handleResolve = async (resolution) => {
     if (resolution === USER_DATA_CONFIRMATION_RESOLUTION_REJECT) {
@@ -125,7 +126,7 @@ export function DataConfirmationRequestCard({ request, onResolved, onOpenUser })
       </section>
       <section className="data-confirmation-card__selfie">
         <h4>{DATA_CONFIRMATION_PAGE_UI.PASSPORT_SELFIE_SECTION}</h4>
-        {selfieDisplayUrl ? (
+        {selfieDisplayUrl && selfieDisplayUrl !== PRIVATE_UPLOAD_LOAD_FAILED ? (
           <a
             className="data-confirmation-card__selfie-link"
             href={selfieDisplayUrl}
@@ -139,6 +140,12 @@ export function DataConfirmationRequestCard({ request, onResolved, onOpenUser })
             />
             <span>{DATA_CONFIRMATION_PAGE_UI.PASSPORT_SELFIE_OPEN}</span>
           </a>
+        ) : selfieDisplayUrl === PRIVATE_UPLOAD_LOAD_FAILED ? (
+          <p className="data-confirmation-card__selfie-missing">
+            {DATA_CONFIRMATION_PAGE_UI.PASSPORT_SELFIE_LOAD_ERROR}
+          </p>
+        ) : selfiePhotoUrl ? (
+          <p className="data-confirmation-card__selfie-missing">Загрузка фото…</p>
         ) : (
           <p className="data-confirmation-card__selfie-missing">
             {DATA_CONFIRMATION_PAGE_UI.PASSPORT_SELFIE_MISSING}

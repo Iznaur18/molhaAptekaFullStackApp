@@ -10,6 +10,7 @@ import {
 import {
   assertActiveInstallmentContract,
   assertInstallmentBuyer,
+  assertInstallmentOrderAcceptedForPayments,
   assertInstallmentSellerOrAdmin,
   findContractPayment,
   loadInstallmentContractOrThrow,
@@ -26,6 +27,7 @@ export async function markInstallmentPaymentPaid({ userId, contractId, paymentIn
   const contract = await loadInstallmentContractOrThrow(contractId);
   assertInstallmentBuyer(userId, contract);
   assertActiveInstallmentContract(contract);
+  await assertInstallmentOrderAcceptedForPayments(contract);
 
   const payment = findContractPayment(contract, paymentIndex);
   if (!payment) {
@@ -65,6 +67,7 @@ export async function rejectInstallmentPayment({ userId, contractId, paymentInde
   const contract = await loadInstallmentContractOrThrow(contractId);
   await assertInstallmentSellerOrAdmin(userId, contract);
   assertActiveInstallmentContract(contract);
+  await assertInstallmentOrderAcceptedForPayments(contract);
 
   try {
     rejectInstallmentPaymentPendingConfirmation(contract, paymentIndex);
@@ -94,6 +97,7 @@ export async function rejectInstallmentPayment({ userId, contractId, paymentInde
 export async function confirmInstallmentPayment({ userId, contractId, paymentIndex }) {
   const contract = await loadInstallmentContractOrThrow(contractId);
   await assertInstallmentSellerOrAdmin(userId, contract);
+  await assertInstallmentOrderAcceptedForPayments(contract);
 
   const payment = findContractPayment(contract, paymentIndex);
   if (!payment) {

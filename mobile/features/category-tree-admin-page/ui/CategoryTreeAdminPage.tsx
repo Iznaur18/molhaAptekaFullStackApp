@@ -5,11 +5,6 @@ import { Alert, FlatList, Pressable, Switch, Text, TextInput, View } from "react
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import type { ProductCategoryAdminRow } from "@/entities/product-category-tree/model/adminTypes";
-import {
-  findAnyLeafForReassign,
-  formatCategoryLegacyDetachLabel,
-  formatCategoryPath,
-} from "@/features/category-tree-admin-page/lib/categoryTreeAdminUtils";
 import { useCategoryTreeAdminPage } from "@/features/category-tree-admin-page/model/useCategoryTreeAdminPage";
 import { CategoryTreeAdminCard } from "@/features/category-tree-admin-page/ui/CategoryTreeAdminCard";
 import { CategoryTreeLegacyPicker } from "@/features/category-tree-admin-page/ui/CategoryTreeLegacyPicker";
@@ -83,73 +78,11 @@ export const CategoryTreeAdminPage = () => {
           text: CATEGORY_TREE_ADMIN_PAGE_UI.DELETE_BUTTON,
           style: "destructive",
           onPress: () => {
-            void (async () => {
-              try {
-                await runDelete(row);
-              } catch (error) {
-                const message =
-                  error instanceof Error ? error.message : CATEGORY_TREE_ADMIN_PAGE_UI.DELETE_ERROR;
-                const hasProducts = /привязаны товары/i.test(message);
-                if (!hasProducts) {
-                  setActionError(message);
-                  return;
-                }
-
-                const reassignLeaf = findAnyLeafForReassign(row, rows);
-                if (reassignLeaf) {
-                  Alert.alert(
-                    CATEGORY_TREE_ADMIN_PAGE_UI.DELETE_BUTTON,
-                    CATEGORY_TREE_ADMIN_PAGE_UI.DELETE_REASSIGN_CONFIRM(
-                      message,
-                      formatCategoryPath(reassignLeaf),
-                    ),
-                    [
-                      { text: CATEGORY_TREE_ADMIN_PAGE_UI.CANCEL_BUTTON, style: "cancel" },
-                      {
-                        text: CATEGORY_TREE_ADMIN_PAGE_UI.DELETE_BUTTON,
-                        style: "destructive",
-                        onPress: () => {
-                          void runDelete(row, {
-                            reassignProductCategoryId: reassignLeaf._id,
-                          }).catch((retryError) => {
-                            setActionError(
-                              retryError instanceof Error
-                                ? retryError.message
-                                : CATEGORY_TREE_ADMIN_PAGE_UI.DELETE_ERROR,
-                            );
-                          });
-                        },
-                      },
-                    ],
-                  );
-                  return;
-                }
-
-                Alert.alert(
-                  CATEGORY_TREE_ADMIN_PAGE_UI.DELETE_BUTTON,
-                  CATEGORY_TREE_ADMIN_PAGE_UI.DELETE_DETACH_CONFIRM(
-                    message,
-                    formatCategoryLegacyDetachLabel(row),
-                  ),
-                  [
-                    { text: CATEGORY_TREE_ADMIN_PAGE_UI.CANCEL_BUTTON, style: "cancel" },
-                    {
-                      text: CATEGORY_TREE_ADMIN_PAGE_UI.DELETE_BUTTON,
-                      style: "destructive",
-                      onPress: () => {
-                        void runDelete(row, { detachProducts: true }).catch((retryError) => {
-                          setActionError(
-                            retryError instanceof Error
-                              ? retryError.message
-                              : CATEGORY_TREE_ADMIN_PAGE_UI.DELETE_ERROR,
-                          );
-                        });
-                      },
-                    },
-                  ],
-                );
-              }
-            })();
+            void runDelete(row).catch((error) => {
+              setActionError(
+                error instanceof Error ? error.message : CATEGORY_TREE_ADMIN_PAGE_UI.DELETE_ERROR,
+              );
+            });
           },
         },
       ],

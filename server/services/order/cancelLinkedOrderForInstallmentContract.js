@@ -1,6 +1,7 @@
 import { ORDER_STATUS_CANCELLED } from "../../constants/orderConstants.js";
 import { OrderModel } from "../../models/index.js";
 import { applySoldQuantityDeltaForItemStatusChange } from "../product/productSoldQuantityDenorm.js";
+import { clearBuyerPassportShareOnOrder } from "./buyerPassportShare.js";
 import { ORDER_ITEMS_POPULATE } from "./orderQueries.js";
 import {
   buildOrderStatusFromItems,
@@ -60,6 +61,7 @@ export const cancelLinkedOrderForInstallmentContract = async (
   }
 
   order.status = buildOrderStatusFromItems(order.items);
+  clearBuyerPassportShareOnOrder(order);
   await order.save(session ? { session } : undefined);
 
   if (releaseLines.length > 0) {

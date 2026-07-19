@@ -2,7 +2,7 @@ import { createAsyncRouter } from "../utils/createAsyncRouter.js";
 import {
   uploadMW,
   checkAuthMW,
-  checkProductModeratorMW,
+  checkPrivateUploadAccessMW,
   uploadRateLimiter,
   uploadVideoMW,
 } from "../middlewares/index.js";
@@ -17,7 +17,7 @@ const router = createAsyncRouter();
 router.get(
   "/private/:filename",
   checkAuthMW,
-  checkProductModeratorMW,
+  checkPrivateUploadAccessMW,
   getPrivateUploadController,
 );
 

@@ -14,6 +14,7 @@ import {
 import {
   assertActiveInstallmentContract,
   assertInstallmentBuyer,
+  assertInstallmentOrderAcceptedForPayments,
   assertInstallmentSellerOrAdmin,
   loadInstallmentContractOrThrow,
 } from "./installmentContractHelpers.js";
@@ -25,6 +26,7 @@ export async function rejectInstallmentEarlyPayoff({ userId, contractId }) {
   const contract = await loadInstallmentContractOrThrow(contractId);
   await assertInstallmentSellerOrAdmin(userId, contract);
   assertActiveInstallmentContract(contract);
+  await assertInstallmentOrderAcceptedForPayments(contract);
 
   if (!isEarlyPayoffPendingConfirmation(contract)) {
     throw new AppError(409, "Нет досрочного погашения для отклонения");
@@ -47,6 +49,7 @@ export async function markInstallmentEarlyPayoff({ userId, contractId }) {
   const contract = await loadInstallmentContractOrThrow(contractId);
   assertInstallmentBuyer(userId, contract);
   assertActiveInstallmentContract(contract);
+  await assertInstallmentOrderAcceptedForPayments(contract);
 
   const remaining = (contract.payments ?? []).filter(
     (payment) => payment.status !== INSTALLMENT_PAYMENT_STATUS_PAID,
@@ -77,6 +80,7 @@ export async function cancelInstallmentEarlyPayoff({ userId, contractId }) {
   const contract = await loadInstallmentContractOrThrow(contractId);
   assertInstallmentBuyer(userId, contract);
   assertActiveInstallmentContract(contract);
+  await assertInstallmentOrderAcceptedForPayments(contract);
 
   if (!isEarlyPayoffPendingConfirmation(contract)) {
     throw new AppError(409, "Нет досрочного погашения для отмены");
@@ -98,6 +102,7 @@ export async function cancelInstallmentEarlyPayoff({ userId, contractId }) {
 export async function confirmInstallmentEarlyPayoff({ userId, contractId }) {
   const contract = await loadInstallmentContractOrThrow(contractId);
   await assertInstallmentSellerOrAdmin(userId, contract);
+  await assertInstallmentOrderAcceptedForPayments(contract);
 
   const pending = (contract.payments ?? []).filter(
     (payment) => payment.status === INSTALLMENT_PAYMENT_STATUS_PENDING_CONFIRMATION,

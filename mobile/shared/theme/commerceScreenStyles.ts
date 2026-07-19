@@ -280,6 +280,57 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
   },
 }));
 
+export const useBuyerPassportSharePanelStyles = createThemedStyles((theme) => ({
+  panel: {
+    marginTop: theme.spacing[3],
+    padding: theme.spacing[3],
+    borderRadius: 10,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surfaceMuted,
+    gap: theme.spacing[2],
+  },
+  title: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: theme.colors.text,
+  },
+  field: {
+    gap: 2,
+  },
+  label: {
+    fontSize: 12,
+    color: theme.colors.textMuted,
+  },
+  value: {
+    fontSize: 14,
+    color: theme.colors.text,
+  },
+  selfieTitle: {
+    marginTop: theme.spacing[1],
+    fontSize: 13,
+    fontWeight: "600",
+    color: theme.colors.text,
+  },
+  selfieImage: {
+    width: 160,
+    height: 160,
+    borderRadius: 8,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    marginTop: theme.spacing[1],
+  },
+  selfieLink: {
+    fontSize: 13,
+    color: theme.colors.link,
+    marginTop: theme.spacing[1],
+  },
+  selfieMissing: {
+    fontSize: 13,
+    color: theme.colors.textMuted,
+  },
+}));
+
 export const useCartSelectAllRowStyles = createThemedStyles((theme) => ({
   row: {
     flexDirection: "row",

@@ -1,5 +1,3 @@
-import { resolveProductManageTogglePalette, resolveUploadedImageUrlForBrowser } from "@izibuy/shared-lib";
-
 import "./ProductManageToggleRow.css";
 
 /**
@@ -29,8 +27,6 @@ export function ProductManageToggleRow({
   pendingLabel = "",
   variant = "default",
   ariaLabel,
-  titleStatus = "",
-  imageUrl = null,
 }) {
   if (pending) {
     return (
@@ -43,22 +39,14 @@ export function ProductManageToggleRow({
     );
   }
 
-  const palette = resolveProductManageTogglePalette(variant, checked);
-  const resolvedImageUrl =
-    imageUrl != null && String(imageUrl).trim()
-      ? resolveUploadedImageUrlForBrowser(String(imageUrl).trim())
-      : null;
+  const isDanger = variant === "danger";
+  const showChevron = variant === "installment" && typeof onPress === "function";
+  const showSwitch = !isDanger && !showChevron;
 
-  const className = [
-    "product-manage-toggle-row",
-    variant === "danger" ? "product-manage-toggle-row_danger" : "",
-    disabled ? "product-manage-toggle-row_disabled" : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
-
-  const handleClick = () => {
-    if (disabled) return;
+  const handleActivate = () => {
+    if (disabled) {
+      return;
+    }
     if (onPress) {
       onPress();
       return;
@@ -66,48 +54,67 @@ export function ProductManageToggleRow({
     onCheckedChange?.(!checked);
   };
 
+  const handleSwitchChange = (event) => {
+    if (disabled) {
+      return;
+    }
+    const next = event.target.checked;
+    if (onPress) {
+      onPress();
+      return;
+    }
+    onCheckedChange?.(next);
+  };
+
+  const className = [
+    "product-manage-toggle-row",
+    isDanger ? "product-manage-toggle-row_danger" : "",
+    disabled ? "product-manage-toggle-row_disabled" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
     <button
       type="button"
       className={className}
       disabled={disabled}
-      aria-label={ariaLabel ?? (titleStatus ? `${title} ${titleStatus}` : title)}
-      role={onPress ? undefined : "switch"}
-      aria-checked={onPress ? undefined : checked}
-      style={
-        palette
-          ? {
-              backgroundColor: palette.background,
-              color: palette.title,
-            }
-          : undefined
-      }
-      onClick={handleClick}
+      aria-label={ariaLabel ?? title}
+      role={showSwitch ? "switch" : "button"}
+      aria-checked={showSwitch ? checked : undefined}
+      onClick={handleActivate}
     >
-      <span className="product-manage-toggle-row__content">
-        <span className="product-manage-toggle-row__text">
-          <span
-            className="product-manage-toggle-row__title"
-            style={palette ? { color: palette.title } : undefined}
-          >
-            {title}
-            {titleStatus ? (
-              <span className="product-manage-toggle-row__title-status">{` ${titleStatus}`}</span>
-            ) : null}
-          </span>
-          <span
-            className="product-manage-toggle-row__description"
-            style={palette ? { color: palette.description } : undefined}
-          >
-            {description}
+      <span className="product-manage-toggle-row__text">
+        <span className="product-manage-toggle-row__title">{title}</span>
+        <span className="product-manage-toggle-row__description">{description}</span>
+      </span>
+
+      {showSwitch ? (
+        <span
+          className="product-manage-toggle-row__switch"
+          onClick={(event) => event.stopPropagation()}
+          onKeyDown={(event) => event.stopPropagation()}
+        >
+          <input
+            type="checkbox"
+            className="product-manage-toggle-row__switch-input"
+            checked={checked}
+            disabled={disabled}
+            tabIndex={-1}
+            aria-hidden="true"
+            onChange={handleSwitchChange}
+          />
+          <span className="product-manage-toggle-row__switch-track" aria-hidden="true">
+            <span className="product-manage-toggle-row__switch-thumb" />
           </span>
         </span>
-        {resolvedImageUrl ? (
-          <span className="product-manage-toggle-row__artwork" aria-hidden="true">
-            <img src={resolvedImageUrl} alt="" />
-          </span>
-        ) : null}
-      </span>
+      ) : null}
+
+      {showChevron ? (
+        <span className="product-manage-toggle-row__chevron" aria-hidden="true">
+          ›
+        </span>
+      ) : null}
     </button>
   );
 }

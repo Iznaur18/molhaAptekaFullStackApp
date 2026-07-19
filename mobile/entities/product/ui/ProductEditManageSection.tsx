@@ -1,11 +1,12 @@
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Text, View } from "react-native";
 
 import { isProductRaffleParticipant } from "@/entities/raffle/lib/isProductRaffleParticipant";
-import { useProductManageToggleImagesByVariant } from "@/entities/product-manage-toggle-display/model/useProductManageToggleImagesByVariant";
 import { ProductManageToggleRow } from "@/entities/product/ui/ProductManageToggleRow";
 import { PRODUCT_MODERATION_APPROVED } from "@/entities/product/model/productModerationConstants";
 import { CREATE_PRODUCT_UI, PRODUCT_CARD_UI } from "@/shared/config";
 import { useProductEditManageSectionStyles } from "@/shared/theme/modalChromeStyles";
+import { semanticColors } from "@/shared/theme/semanticColors";
 
 type CatalogProduct = Record<string, unknown> & { _id: string };
 
@@ -43,7 +44,6 @@ export const ProductEditManageSection = ({
   disabled = false,
 }: ProductEditManageSectionProps) => {
   const styles = useProductEditManageSectionStyles();
-  const { imageByVariant } = useProductManageToggleImagesByVariant();
 
   const isListedForOthers = product.productIsAvailable !== false;
   const hasOpenSalesLocked = product.hasOpenSales === true;
@@ -76,32 +76,27 @@ export const ProductEditManageSection = ({
       style={styles.root}
       accessibilityLabel={CREATE_PRODUCT_UI.MANAGE_SECTION_ARIA}
     >
-      <Text style={styles.title}>{CREATE_PRODUCT_UI.MANAGE_SECTION_TITLE}</Text>
       {errorMessage ? (
         <Text style={styles.error} accessibilityRole="alert">
           {errorMessage}
         </Text>
       ) : null}
       {showOpenSalesHint ? (
-        <Text style={styles.openSalesHint}>{PRODUCT_CARD_UI.OPEN_SALES_LOCKED_HINT}</Text>
+        <View style={styles.warningBanner} accessibilityRole="alert">
+          <MaterialIcons name="info-outline" size={20} color={semanticColors.warningText} />
+          <Text style={styles.warningBannerText}>{PRODUCT_CARD_UI.OPEN_SALES_LOCKED_HINT}</Text>
+        </View>
       ) : null}
       <View style={styles.toggles}>
         {showAuctionToggle ? (
           <ProductManageToggleRow
             title={CREATE_PRODUCT_UI.MANAGE_AUCTION_TITLE}
-            titleStatus={
-              isAuctionEnabled
-                ? CREATE_PRODUCT_UI.MANAGE_AUCTION_STATUS_ACTIVE
-                : CREATE_PRODUCT_UI.MANAGE_AUCTION_STATUS_INACTIVE
-            }
             description={CREATE_PRODUCT_UI.MANAGE_AUCTION_HINT}
             checked={isAuctionEnabled}
             disabled={auctionActionsLocked}
             pending={isAuctionTogglePending}
             pendingLabel={PRODUCT_CARD_UI.AUCTION_TOGGLE_PENDING}
-            variant="auction"
-            imageUrl={imageByVariant.auction}
-            onPress={() => {
+            onCheckedChange={() => {
               if (product._id == null || auctionActionsLocked) {
                 return;
               }
@@ -112,9 +107,6 @@ export const ProductEditManageSection = ({
         {showRaffleToggle ? (
           <ProductManageToggleRow
             title={CREATE_PRODUCT_UI.MANAGE_RAFFLE_TITLE}
-            titleStatus={
-              isRaffleParticipant ? CREATE_PRODUCT_UI.MANAGE_RAFFLE_STATUS_ACTIVE : undefined
-            }
             description={CREATE_PRODUCT_UI.MANAGE_RAFFLE_HINT}
             checked={isRaffleParticipant}
             disabled={
@@ -125,9 +117,7 @@ export const ProductEditManageSection = ({
             }
             pending={isRaffleParticipationPending}
             pendingLabel={PRODUCT_CARD_UI.RAFFLE_PARTICIPATION_PENDING}
-            variant="raffle"
-            imageUrl={imageByVariant.raffle}
-            onPress={() => {
+            onCheckedChange={() => {
               onToggleRaffleParticipation?.(product, !isRaffleParticipant);
             }}
           />
@@ -145,22 +135,12 @@ export const ProductEditManageSection = ({
               !canOpenInstallment
             }
             variant="installment"
-            imageUrl={imageByVariant.installment}
             onPress={() => onOpenInstallmentProgram?.()}
           />
         ) : null}
         {showVisibility ? (
           <ProductManageToggleRow
-            title={
-              isListedForOthers
-                ? CREATE_PRODUCT_UI.MANAGE_VISIBILITY_TITLE_VISIBLE
-                : CREATE_PRODUCT_UI.MANAGE_VISIBILITY_TITLE_HIDDEN
-            }
-            titleStatus={
-              isListedForOthers
-                ? CREATE_PRODUCT_UI.MANAGE_VISIBILITY_STATUS_VISIBLE
-                : CREATE_PRODUCT_UI.MANAGE_VISIBILITY_STATUS_HIDDEN
-            }
+            title={CREATE_PRODUCT_UI.MANAGE_VISIBILITY_TITLE_VISIBLE}
             description={
               isListedForOthers
                 ? CREATE_PRODUCT_UI.MANAGE_VISIBILITY_HINT_VISIBLE
@@ -170,8 +150,7 @@ export const ProductEditManageSection = ({
             disabled={visibilityActionsLocked}
             pending={isAvailabilityTogglePending}
             pendingLabel={PRODUCT_CARD_UI.AVAILABILITY_TOGGLE_PENDING}
-            imageUrl={imageByVariant.default}
-            onPress={() => {
+            onCheckedChange={() => {
               if (product._id == null || visibilityActionsLocked) {
                 return;
               }

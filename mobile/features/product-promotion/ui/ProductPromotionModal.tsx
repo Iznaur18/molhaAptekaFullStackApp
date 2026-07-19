@@ -19,6 +19,7 @@ import {
   PRODUCT_PROMOTION_TIER_TOP,
 } from "@/entities/product/lib/calculateProductPromotionPointsCost";
 import {
+  getProductPromotionTierChrome,
   resolveProductPromotionDurationChipStyle,
   resolveProductPromotionTierCardStyle,
 } from "@/entities/product/lib/productPromotionTierChrome";
@@ -190,133 +191,128 @@ export const ProductPromotionModal = ({
 
     return (
       <>
-        <View style={styles.productBox}>
-          <Text style={styles.subtitle}>
-            {PRODUCT_PROMOTION_UI.MODAL_SUBTITLE(resolvedProductName)}
-          </Text>
-        </View>
-
         <View
           style={[
-            styles.balanceCard,
-            hasEnoughFunds ? styles.balanceCardOk : styles.balanceCardInsufficient,
+            styles.overviewCard,
+            hasEnoughFunds ? styles.overviewCardOk : styles.overviewCardInsufficient,
           ]}
         >
-          <Text style={styles.balanceLabel}>
-            {PRODUCT_PROMOTION_UI.BALANCE_LABEL}
-          </Text>
-          <Text style={styles.balanceValue}>
-            {PRODUCT_PROMOTION_UI.BALANCE_POINTS(loyaltyPoints)}
-          </Text>
+          <View>
+            <Text style={styles.overviewProductLabel}>{PRODUCT_PROMOTION_UI.PRODUCT_LABEL}</Text>
+            <Text style={styles.overviewProductName} numberOfLines={2}>
+              {resolvedProductName}
+            </Text>
+          </View>
+          <View style={styles.overviewDivider} />
+          <View style={styles.overviewBalanceRow}>
+            <Text style={styles.balanceLabel}>{PRODUCT_PROMOTION_UI.BALANCE_LABEL}</Text>
+            <Text style={styles.balanceValue}>
+              {PRODUCT_PROMOTION_UI.BALANCE_POINTS(loyaltyPoints)}
+            </Text>
+          </View>
+          <Text style={styles.hint}>{PRODUCT_PROMOTION_UI.PAYMENT_HINT_POINTS}</Text>
         </View>
 
-        <Text style={styles.hint}>
-          {PRODUCT_PROMOTION_UI.PAYMENT_HINT_POINTS}
-        </Text>
+        <View>
+          <Text style={styles.sectionTitle}>{PRODUCT_PROMOTION_UI.TIER_LABEL}</Text>
+          <View style={styles.tierGrid}>
+            {tiers.map((tier) => {
+              const isSelected = selectedTier === tier.tier;
+              const ratePercent = formatProductPromotionTierRatePercent(tier.tier);
+              const tierStyle = resolveProductPromotionTierCardStyle(tier.tier, isSelected);
+              const chrome = getProductPromotionTierChrome(tier.tier);
+              return (
+                <Pressable
+                  key={tier.tier}
+                  style={[styles.tierCard, tierStyle.card]}
+                  disabled={isSubmitting}
+                  onPress={() => setSelectedTier(tier.tier)}
+                >
+                  {isSelected ? (
+                    <View style={[styles.tierCheck, { backgroundColor: chrome.accent }]}>
+                      <MaterialIcons name="check" size={14} color={theme.colors.onContrast} />
+                    </View>
+                  ) : null}
+                  <Text
+                    style={[
+                      styles.tierBadge,
+                      { backgroundColor: tierStyle.badge.backgroundColor },
+                      tierStyle.badgeText,
+                    ]}
+                  >
+                    {TIER_BADGE_LABELS[tier.tier] ?? tier.title}
+                  </Text>
+                  {ratePercent ? (
+                    <Text style={styles.tierRate}>
+                      {PRODUCT_PROMOTION_UI.TIER_RATE_HINT(ratePercent)}
+                    </Text>
+                  ) : null}
+                  <Text style={styles.tierDescription}>{tier.description}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
 
-        <Text style={styles.sectionTitle}>
-          {PRODUCT_PROMOTION_UI.TIER_LABEL}
-        </Text>
-        <View style={styles.tierGrid}>
-          {tiers.map((tier) => {
-            const isSelected = selectedTier === tier.tier;
-            const ratePercent = formatProductPromotionTierRatePercent(tier.tier);
-            const tierStyle = resolveProductPromotionTierCardStyle(tier.tier, isSelected);
-            return (
-              <Pressable
-                key={tier.tier}
-                style={[styles.tierCard, tierStyle.card]}
-                disabled={isSubmitting}
-                onPress={() => setSelectedTier(tier.tier)}
-              >
+        <View style={styles.planCard}>
+          <Text style={styles.sectionTitle}>{PRODUCT_PROMOTION_UI.DURATION_LABEL}</Text>
+          <View style={styles.durationRow}>
+            {durations.map((duration) => {
+              const pricePoints = calculateProductPromotionPointsCost({
+                productPrice: resolvedProductPrice,
+                tier: selectedTier,
+                durationCode: duration.code,
+              });
+              const isSelected = selectedDurationCode === duration.code;
+              const durationStyle = resolveProductPromotionDurationChipStyle(
+                isSelected,
+                selectedTier,
+              );
+              return (
+                <Pressable
+                  key={duration.code}
+                  style={[styles.durationChip, durationStyle.chip]}
+                  disabled={isSubmitting}
+                  onPress={() => setSelectedDurationCode(duration.code)}
+                >
+                  <Text style={styles.durationTitle}>{duration.title}</Text>
+                  <Text style={[styles.durationPrice, durationStyle.price]}>
+                    {PRODUCT_PROMOTION_UI.DURATION_PRICE_POINTS(pricePoints)}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+
+          {selectedDuration && selectedTierMeta ? (
+            <>
+              <View style={styles.planDivider} />
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>{PRODUCT_PROMOTION_UI.SUMMARY_TIER}</Text>
+                <Text style={styles.summaryValueStrong}>{selectedTierMeta.title}</Text>
+              </View>
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>{PRODUCT_PROMOTION_UI.SUMMARY_DURATION}</Text>
+                <Text style={styles.summaryValueStrong}>
+                  {PRODUCT_PROMOTION_UI.TARIFF_DURATION(selectedDuration.durationHours)}
+                </Text>
+              </View>
+              <View style={[styles.summaryRow, styles.summaryTotalRow]}>
+                <Text style={styles.summaryValueBold}>{PRODUCT_PROMOTION_UI.TOTAL_LABEL}</Text>
                 <Text
                   style={[
-                    styles.tierBadge,
-                    { backgroundColor: tierStyle.badge.backgroundColor },
-                    tierStyle.badgeText,
+                    styles.summaryTotalValue,
+                    selectedTier === PRODUCT_PROMOTION_TIER_BANNER && {
+                      color: semanticColors.danger,
+                    },
                   ]}
                 >
-                  {TIER_BADGE_LABELS[tier.tier] ?? tier.title}
+                  {PRODUCT_PROMOTION_UI.TOTAL_POINTS(selectedPricePoints)}
                 </Text>
-                {ratePercent ? (
-                  <Text style={styles.tierRate}>
-                    {PRODUCT_PROMOTION_UI.TIER_RATE_HINT(ratePercent)}
-                  </Text>
-                ) : null}
-                <Text style={styles.tierDescription}>
-                  {tier.description}
-                </Text>
-              </Pressable>
-            );
-          })}
+              </View>
+            </>
+          ) : null}
         </View>
-
-        <Text style={styles.sectionTitle}>
-          {PRODUCT_PROMOTION_UI.DURATION_LABEL}
-        </Text>
-        <View style={styles.durationRow}>
-          {durations.map((duration) => {
-            const pricePoints = calculateProductPromotionPointsCost({
-              productPrice: resolvedProductPrice,
-              tier: selectedTier,
-              durationCode: duration.code,
-            });
-            const isSelected = selectedDurationCode === duration.code;
-            const durationStyle = resolveProductPromotionDurationChipStyle(
-              isSelected,
-              selectedTier,
-            );
-            return (
-              <Pressable
-                key={duration.code}
-                style={[styles.durationChip, durationStyle.chip]}
-                disabled={isSubmitting}
-                onPress={() => setSelectedDurationCode(duration.code)}
-              >
-                <Text style={styles.durationTitle}>
-                  {duration.title}
-                </Text>
-                <Text style={[styles.durationPrice, durationStyle.price]}>
-                  {PRODUCT_PROMOTION_UI.DURATION_PRICE_POINTS(pricePoints)}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
-
-        {selectedDuration && selectedTierMeta ? (
-          <View style={styles.summary}>
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>
-                {PRODUCT_PROMOTION_UI.SUMMARY_TIER}
-              </Text>
-              <Text style={styles.summaryValueStrong}>
-                {selectedTierMeta.title}
-              </Text>
-            </View>
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>
-                {PRODUCT_PROMOTION_UI.SUMMARY_DURATION}
-              </Text>
-              <Text style={styles.summaryValueStrong}>
-                {PRODUCT_PROMOTION_UI.TARIFF_DURATION(selectedDuration.durationHours)}
-              </Text>
-            </View>
-            <View style={[styles.summaryRow, styles.summaryTotalRow]}>
-              <Text style={styles.summaryValueBold}>
-                {PRODUCT_PROMOTION_UI.TOTAL_LABEL}
-              </Text>
-              <Text
-                style={[
-                  styles.summaryTotalValue,
-                  selectedTier === PRODUCT_PROMOTION_TIER_BANNER && { color: semanticColors.danger },
-                ]}
-              >
-                {PRODUCT_PROMOTION_UI.TOTAL_POINTS(selectedPricePoints)}
-              </Text>
-            </View>
-          </View>
-        ) : null}
 
         {insufficientMessage ? (
           <View style={styles.errorBox} accessibilityRole="alert">

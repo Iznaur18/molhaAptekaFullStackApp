@@ -5,6 +5,7 @@ import type { ProductCategoryAdminRow } from "@/entities/product-category-tree/m
 import { useProductCategoriesAdminQuery } from "@/entities/product-category-tree/model/useProductCategoriesAdminQuery";
 import { useProductCategoryAdminMutations } from "@/entities/product-category-tree/model/useProductCategoryAdminMutations";
 import {
+  collectCategorySubtreeIdsFromRows,
   filterCategoryRows,
   formatCategoryPath,
   isCategoryStructureChanged,
@@ -12,7 +13,7 @@ import {
   parseKeywordsCsv,
   sortCategoryRows,
 } from "@/features/category-tree-admin-page/lib/categoryTreeAdminUtils";
-import { categoryAdminQueryKeys } from "@/shared/api";
+import { categoryAdminQueryKeys, categoryDisplayQueryKeys, categoryTreeQueryKeys } from "@/shared/api";
 import { CATEGORY_TREE_ADMIN_PAGE_UI } from "@/shared/config";
 
 type EditDraft = Record<string, string | boolean>;
@@ -186,31 +187,36 @@ export const useCategoryTreeAdminPage = () => {
     }
   };
 
-  const removeCategoryRow = useCallback(
-    (categoryId: string) => {
-      updateRows((prev) => prev.filter((row) => row._id !== categoryId));
-      if (editingId === categoryId) {
+  const removeCategorySubtree = useCallback(
+    (categoryId: string, allRows: ProductCategoryAdminRow[]) => {
+      const subtreeIds = collectCategorySubtreeIdsFromRows(categoryId, allRows);
+      updateRows((prev) => prev.filter((row) => !subtreeIds.has(row._id)));
+      if (editingId && subtreeIds.has(editingId)) {
         cancelEdit();
       }
     },
     [cancelEdit, editingId, updateRows],
   );
 
+  const invalidateCatalogCategorySurfaces = useCallback(() => {
+    void queryClient.invalidateQueries({ queryKey: [...categoryTreeQueryKeys.all, "roots"] });
+    void queryClient.invalidateQueries({ queryKey: categoryTreeQueryKeys.all });
+    void queryClient.invalidateQueries({ queryKey: categoryDisplayQueryKeys.all });
+  }, [queryClient]);
+
   const runDelete = useCallback(
-    async (
-      row: ProductCategoryAdminRow,
-      options: { reassignProductCategoryId?: string; detachProducts?: boolean } = {},
-    ) => {
+    async (row: ProductCategoryAdminRow) => {
       setPendingId(row._id);
       setActionError("");
       try {
-        await deleteMutation.mutateAsync({ categoryId: row._id, options });
-        removeCategoryRow(row._id);
+        await deleteMutation.mutateAsync({ categoryId: row._id });
+        removeCategorySubtree(row._id, rows);
+        invalidateCatalogCategorySurfaces();
       } finally {
         setPendingId(null);
       }
     },
-    [deleteMutation, removeCategoryRow],
+    [deleteMutation, invalidateCatalogCategorySurfaces, removeCategorySubtree, rows],
   );
 
   const displayError = actionError || (phase === "error" ? queryError : "");

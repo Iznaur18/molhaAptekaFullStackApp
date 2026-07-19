@@ -100,8 +100,7 @@ const ManageToggleAdminCard = ({
           title={title}
           description={description}
           checked
-          variant={variant}
-          imageUrl={draftImageUrl.trim() || imageUrl}
+          variant={variant === "installment" ? "default" : variant}
           disabled
         />
       </View>

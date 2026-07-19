@@ -17,9 +17,11 @@ type CatalogSubcategoryPickerProps = {
   displays: ProductCategoryDisplayFromApi[];
   loadError: string | null;
   resolvingCategoryId: string | null;
+  isAdmin?: boolean;
   onBack: () => void;
   onViewAll: (categoryId: string) => void;
   onCategoryClick: (node: { id: string; labelRu: string }) => void;
+  onEditCategoryPress?: (categoryId: string, fallbackLabel: string) => void;
 };
 
 export const CatalogSubcategoryPicker = ({
@@ -27,9 +29,11 @@ export const CatalogSubcategoryPicker = ({
   displays,
   loadError,
   resolvingCategoryId,
+  isAdmin = false,
   onBack,
   onViewAll,
   onCategoryClick,
+  onEditCategoryPress,
 }: CatalogSubcategoryPickerProps) => {
   const styles = useCatalogSubcategoryPickerStyles();
   const gridLayout = useCatalogBrowserGridLayout();
@@ -129,18 +133,29 @@ export const CatalogSubcategoryPicker = ({
         </View>
       ) : (
         <View style={[styles.grid, { gap: gridLayout.gap }]}>
-          {tiles.map((item) => (
-            <CatalogBrowserTileCard
-              key={item.key}
-              label={item.label}
-              imageUrl={item.imageUrl}
-              placeholderImageUrl={PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE}
-              {...tileLayoutProps}
-              disabled={resolvingCategoryId != null}
-              pending={resolvingCategoryId === item.categoryId}
-              onPress={() => handleTilePress(item)}
-            />
-          ))}
+          {tiles.map((item) => {
+            const fallbackLabel =
+              categories.find((row) => row.id === item.categoryId)?.labelRu ?? item.label;
+
+            return (
+              <CatalogBrowserTileCard
+                key={item.key}
+                label={item.label}
+                imageUrl={item.imageUrl}
+                placeholderImageUrl={PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE}
+                {...tileLayoutProps}
+                disabled={resolvingCategoryId != null}
+                pending={resolvingCategoryId === item.categoryId}
+                onPress={() => handleTilePress(item)}
+                onEditPress={
+                  isAdmin && item.isEditable && onEditCategoryPress
+                    ? () => onEditCategoryPress(item.categoryId, fallbackLabel)
+                    : undefined
+                }
+                editAriaLabel={PRODUCT_CATEGORY_DISPLAY_UI.SUBCATEGORY_NODE_EDIT_ARIA(item.label)}
+              />
+            );
+          })}
         </View>
       )}
     </ScrollView>

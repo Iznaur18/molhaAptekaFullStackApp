@@ -47,6 +47,7 @@ export async function upsertProductInstallmentProgram(productId, body) {
  *   deliveryAddress: string;
  *   deliveryAddressFlat: string;
  *   paymentMethod: string;
+ *   passportShareConsent: true;
  * }} body
  */
 export async function createInstallmentContract(productId, body) {

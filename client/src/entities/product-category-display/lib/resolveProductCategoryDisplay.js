@@ -1,7 +1,4 @@
-import {
-  PRODUCT_CATEGORIES,
-  PRODUCT_CATEGORY_LABEL_RU,
-} from "../../product/model/productConstants.js";
+import { PRODUCT_CATEGORY_LABEL_RU } from "../../product/model/productConstants.js";
 
 /** SVG data-uri — нейтральная иконка категории до кастома admin. */
 export const PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE =
@@ -98,19 +95,7 @@ export function resolveProductCategoryDisplay(categorySlug, overridesBySlug) {
 }
 
 /**
- * @param {import('../../product-category-tree/model/types.js').ProductCategoryNode[]} roots
- * @param {string} legacySlug
- */
-function findRootForLegacySlug(roots, legacySlug) {
-  return (
-    roots.find(
-      (root) => root.legacyProductCategory === legacySlug || root.slug === legacySlug,
-    ) ?? null
-  );
-}
-
-/**
- * Базовый список PRODUCT_CATEGORIES + новые корневые из БД, которых нет в legacy.
+ * Только корни из админ-дерева (GET /categories/roots). Без ghost-слотов legacy enum.
  *
  * @param {import('../../product-category-tree/model/types.js').ProductCategoryNode[]} roots
  * @param {import('./types.js').ProductCategoryDisplayFromApi[]} displays
@@ -119,56 +104,28 @@ function findRootForLegacySlug(roots, legacySlug) {
 export function buildResolvedProductCategoryDisplaysFromRoots(roots, displays) {
   const overridesBySlug = mapCategoryDisplaysBySlug(displays);
   const overridesById = mapCategoryDisplaysById(displays);
-  const matchedRootIds = new Set();
-  /** @type {import('./types.js').ResolvedProductCategoryDisplay[]} */
-  const items = [];
 
-  for (const legacySlug of PRODUCT_CATEGORIES) {
-    const root = findRootForLegacySlug(roots, legacySlug);
-    if (root) {
-      matchedRootIds.add(root.id);
-    }
-
-    const displaySlug = root?.slug ?? legacySlug;
-    const fields = resolveCatalogCategoryDisplayFields(
-      displaySlug,
-      overridesBySlug,
-      overridesById,
-      root?.id ?? null,
-      root?.labelRu ?? PRODUCT_CATEGORY_LABEL_RU[legacySlug] ?? legacySlug,
-      legacySlug,
-    );
-
-    items.push({
-      categoryId: root?.id ?? null,
-      categorySlug: legacySlug,
-      displaySlug,
-      ...fields,
-    });
-  }
-
-  for (const root of roots) {
-    if (matchedRootIds.has(root.id)) {
-      continue;
-    }
-
+  return roots.map((root) => {
+    const legacySlug =
+      typeof root.legacyProductCategory === "string" && root.legacyProductCategory.trim()
+        ? root.legacyProductCategory.trim()
+        : null;
     const fields = resolveCatalogCategoryDisplayFields(
       root.slug,
       overridesBySlug,
       overridesById,
       root.id,
       root.labelRu ?? root.slug,
+      legacySlug,
     );
 
-    items.push({
+    return {
       categoryId: root.id,
-      categorySlug: root.slug,
+      categorySlug: legacySlug ?? root.slug,
       displaySlug: root.slug,
       ...fields,
-    });
-  }
-
-  return items;
+    };
+  });
 }
 
 /**

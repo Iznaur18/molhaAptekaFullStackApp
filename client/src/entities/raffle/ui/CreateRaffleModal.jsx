@@ -1,4 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
+import {
+  RAFFLE_DESCRIPTION_MAX_LENGTH,
+  RAFFLE_TITLE_MAX_LENGTH,
+} from "@molha/api-contract";
 
 import { useRaffleMutations } from "../model/useRaffleMutations.js";
 import { useMyRaffleQuery } from "../model/useMyRaffleQuery.js";
@@ -380,7 +384,7 @@ export function CreateRaffleModal({
                       type="text"
                       value={form.title}
                       required
-                      maxLength={120}
+                      maxLength={RAFFLE_TITLE_MAX_LENGTH}
                       onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
                     />
                   </FormFieldLabel>
@@ -393,7 +397,7 @@ export function CreateRaffleModal({
                     <textarea
                       value={form.description}
                       rows={4}
-                      maxLength={4000}
+                      maxLength={RAFFLE_DESCRIPTION_MAX_LENGTH}
                       onChange={(e) =>
                         setForm((prev) => ({ ...prev, description: e.target.value }))
                       }

@@ -72,6 +72,28 @@ const sortLeafRows = (items) =>
   );
 
 /**
+ * @param {string} rootId
+ * @param {{ _id: string; parentId: string | null }[]} rows
+ * @returns {Set<string>}
+ */
+export const collectCategorySubtreeIdsFromRows = (rootId, rows) => {
+  const ids = new Set([String(rootId)]);
+  let grew = true;
+  while (grew) {
+    grew = false;
+    for (const row of rows) {
+      const id = String(row._id);
+      const parentId = row.parentId ? String(row.parentId) : "";
+      if (parentId && ids.has(parentId) && !ids.has(id)) {
+        ids.add(id);
+        grew = true;
+      }
+    }
+  }
+  return ids;
+};
+
+/**
  * @param {import('../../../entities/product-category-tree/model/adminTypes.js').ProductCategoryAdminRow} row
  * @param {import('../../../entities/product-category-tree/model/adminTypes.js').ProductCategoryAdminRow[]} rows
  */

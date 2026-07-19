@@ -20,6 +20,7 @@ import { CatalogBrowserTileCard } from "@/features/catalog-browser/ui/CatalogBro
 import { CatalogBrowserTilesGrid } from "@/features/catalog-browser/ui/CatalogBrowserTilesGrid";
 import { CatalogSubcategoryPicker } from "@/features/catalog-browser/ui/CatalogSubcategoryPicker";
 import { EditCategoryDisplayModal } from "@/features/catalog-browser/ui/EditCategoryDisplayModal";
+import { EditCategoryNodeDisplayModal } from "@/features/catalog-browser/ui/EditCategoryNodeDisplayModal";
 import { EditFeedTileDisplayModal } from "@/features/catalog-browser/ui/EditFeedTileDisplayModal";
 import { useCatalogSubcategoryPicker } from "@/features/catalog-browser/model/useCatalogSubcategoryPicker";
 import {
@@ -52,6 +53,10 @@ export const CatalogBrowserPage = () => {
 
   const [editingCategorySlug, setEditingCategorySlug] = useState<string | null>(null);
   const [editingFeedTileKey, setEditingFeedTileKey] = useState<string | null>(null);
+  const [editingCategoryNode, setEditingCategoryNode] = useState<{
+    categoryId: string;
+    fallbackLabel: string;
+  } | null>(null);
 
   const categoryDisplays = categoryDisplaysQuery.data ?? [];
   const feedTileDisplays = feedTileDisplaysQuery.data ?? [];
@@ -153,15 +158,29 @@ export const CatalogBrowserPage = () => {
 
   if (subcategoryPicker.isCatalogSubcategoryPickerActive) {
     return (
-      <CatalogSubcategoryPicker
-        trail={subcategoryPicker.pickerTrail}
-        displays={categoryDisplays}
-        loadError={subcategoryPicker.pickerLoadError}
-        resolvingCategoryId={subcategoryPicker.resolvingPickerCategoryId}
-        onBack={subcategoryPicker.handleSubcategoryPickerBack}
-        onViewAll={subcategoryPicker.handleSubcategoryPickerViewAll}
-        onCategoryClick={subcategoryPicker.handleSubcategoryPickerCategoryClick}
-      />
+      <>
+        <CatalogSubcategoryPicker
+          trail={subcategoryPicker.pickerTrail}
+          displays={categoryDisplays}
+          loadError={subcategoryPicker.pickerLoadError}
+          resolvingCategoryId={subcategoryPicker.resolvingPickerCategoryId}
+          isAdmin={isAdmin}
+          onBack={subcategoryPicker.handleSubcategoryPickerBack}
+          onViewAll={subcategoryPicker.handleSubcategoryPickerViewAll}
+          onCategoryClick={subcategoryPicker.handleSubcategoryPickerCategoryClick}
+          onEditCategoryPress={(categoryId, fallbackLabel) =>
+            setEditingCategoryNode({ categoryId, fallbackLabel })
+          }
+        />
+        <EditCategoryNodeDisplayModal
+          visible={editingCategoryNode != null}
+          categoryId={editingCategoryNode?.categoryId ?? null}
+          fallbackLabel={editingCategoryNode?.fallbackLabel ?? null}
+          displays={categoryDisplays}
+          onClose={() => setEditingCategoryNode(null)}
+          onSaved={handleRefreshDisplays}
+        />
+      </>
     );
   }
 

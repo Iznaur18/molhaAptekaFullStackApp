@@ -1,3 +1,12 @@
+export {
+  attachSellerBuyerPassportShareToContracts,
+  clearBuyerPassportShareOnOrder,
+  isOrderCancelledForPassportShare,
+  loadApprovedBuyerPassportShareSnapshot,
+  resolveSellerBuyerPassportShare,
+  sanitizeOrderForBuyerApi,
+  sanitizeOrderForSellerApi,
+} from "./buyerPassportShare.js";
 export { createOrder } from "./createOrder.js";
 export { cancelLinkedOrderForInstallmentContract } from "./cancelLinkedOrderForInstallmentContract.js";
 export {

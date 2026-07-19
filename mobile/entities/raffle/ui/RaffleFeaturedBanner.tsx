@@ -1,6 +1,7 @@
 import { memo, useMemo, useState } from "react";
 import { Linking, Pressable, Text, View } from "react-native";
 
+import { buildFeaturedRaffleProgress } from "@/entities/raffle/lib/buildFeaturedRaffleProgressLabel";
 import { useRaffleFeaturedBannerMetrics } from "@/entities/raffle/model/useRaffleFeaturedBannerMetrics";
 import {
   RaffleFeaturedBannerInfoPanel,
@@ -40,19 +41,10 @@ export const RaffleFeaturedBanner = memo(({
   const metrics = useRaffleFeaturedBannerMetrics(cardWidth, { hasManage });
   const [isInfoOpen, setIsInfoOpen] = useState(false);
 
-  const isCompleted = raffle.status === "completed";
-  const progress = Number(raffle.salesProgress) || 0;
-  const target = Number(raffle.targetSales) || 0;
-  const percent = target > 0 ? Math.min(100, Math.round((progress / target) * 100)) : 0;
-  const remaining = Math.max(0, target - progress);
-
-  const progressLabel = useMemo(() => {
-    const base = RAFFLE_FEATURED_BANNER_UI.PROGRESS(progress, target);
-    if (isCompleted || remaining <= 0) {
-      return base;
-    }
-    return `${base} ${RAFFLE_FEATURED_BANNER_UI.REMAINING(remaining)}`;
-  }, [isCompleted, progress, remaining, target]);
+  const { isCompleted, progress, target, percent, label: progressLabel } = useMemo(
+    () => buildFeaturedRaffleProgress(raffle),
+    [raffle],
+  );
 
   const handleOpenInstagram = async () => {
     const url = raffle.instagramUrl?.trim();

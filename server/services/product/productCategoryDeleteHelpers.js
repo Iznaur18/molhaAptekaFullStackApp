@@ -2,6 +2,7 @@ import ProductCategoryDisplayModel from "../../models/ProductCategoryDisplayMode
 import ProductCategoryModel from "../../models/ProductCategoryModel.js";
 import ProductModel from "../../models/ProductModel.js";
 import { applyProductSearchBlobToSet } from "./applyProductSearchBlobToProductWrite.js";
+import { getProductCategoryDescendantIds } from "./getProductCategoryDescendantIds.js";
 import {
   resolveProductCategoryWriteFromId,
   resolveProductCategoryWriteFromLegacySlugOnly,
@@ -64,6 +65,87 @@ export const getProductCategoryDeleteBlocker = async (doc) => {
   }
 
   return null;
+};
+
+/**
+ * @param {string | import('mongoose').Types.ObjectId} categoryId
+ */
+export const listProductCategorySubtreeDocs = async (categoryId) => {
+  const subtreeIds = await getProductCategoryDescendantIds(String(categoryId));
+  if (subtreeIds.length === 0) {
+    return [];
+  }
+
+  return ProductCategoryModel.find({ _id: { $in: subtreeIds } }).lean();
+};
+
+/**
+ * @param {import('mongoose').LeanDocument<import('../models/ProductCategoryModel.js').default>[]} subtreeDocs
+ */
+export const countProductsBlockingCategorySubtree = async (subtreeDocs) => {
+  if (!Array.isArray(subtreeDocs) || subtreeDocs.length === 0) {
+    return 0;
+  }
+
+  const categoryIds = subtreeDocs.map((doc) => doc._id);
+  const directCount = await ProductModel.countDocuments({
+    productCategoryId: { $in: categoryIds },
+  });
+
+  let orphanLegacyCount = 0;
+  for (const doc of subtreeDocs) {
+    if (doc.parentId != null) {
+      continue;
+    }
+    const legacySlugs = collectCategoryLegacySlugs(doc);
+    orphanLegacyCount += await ProductModel.countDocuments({
+      productCategoryId: null,
+      productCategory: { $in: [...legacySlugs] },
+    });
+  }
+
+  return directCount + orphanLegacyCount;
+};
+
+/**
+ * Cascade: блок только если в ветке есть товары (дети удаляются вместе с узлом).
+ *
+ * @param {import('mongoose').LeanDocument<import('../models/ProductCategoryModel.js').default>} doc
+ */
+export const getProductCategoryCascadeDeleteBlocker = async (doc) => {
+  const subtreeDocs = await listProductCategorySubtreeDocs(doc._id);
+  const productCount = await countProductsBlockingCategorySubtree(subtreeDocs);
+  if (productCount > 0) {
+    return {
+      code: "products",
+      message: `В ветке категории есть товары (${productCount}). Сначала перенесите или удалите товары.`,
+      productCount,
+      subtreeSize: subtreeDocs.length,
+    };
+  }
+
+  return null;
+};
+
+/**
+ * @param {import('mongoose').LeanDocument<import('../models/ProductCategoryModel.js').default>} doc
+ * @returns {Promise<{ deletedIds: string[] }>}
+ */
+export const deleteProductCategoryCascade = async (doc) => {
+  const subtreeDocs = await listProductCategorySubtreeDocs(doc._id);
+  const deletedIds = subtreeDocs.map((node) => String(node._id));
+
+  for (const node of subtreeDocs) {
+    await cleanupProductCategoryDisplayForDeletedCategory(node);
+  }
+
+  if (deletedIds.length > 0) {
+    await ProductCategoryModel.deleteMany({ _id: { $in: deletedIds } });
+  }
+
+  await syncParentLeafFlagAfterChildDelete(doc.parentId);
+
+  return { deletedIds };
 };
 
 /**

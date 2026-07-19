@@ -1,18 +1,15 @@
 import { describe, expect, it } from "vitest";
 
-import { PRODUCT_CATEGORIES } from "../../product/model/productConstants.js";
 import { buildResolvedProductCategoryDisplaysFromRoots } from "./resolveProductCategoryDisplay.js";
 
 describe("buildResolvedProductCategoryDisplaysFromRoots", () => {
-  it("always keeps legacy PRODUCT_CATEGORIES slots", () => {
+  it("returns empty list when there are no db roots", () => {
     const items = buildResolvedProductCategoryDisplaysFromRoots([], []);
 
-    expect(items).toHaveLength(PRODUCT_CATEGORIES.length);
-    expect(items[0].categorySlug).toBe(PRODUCT_CATEGORIES[0]);
-    expect(items[0].categoryId).toBeNull();
+    expect(items).toEqual([]);
   });
 
-  it("appends new db roots after legacy list", () => {
+  it("builds tiles only from db roots", () => {
     const items = buildResolvedProductCategoryDisplaysFromRoots(
       [
         {
@@ -31,24 +28,25 @@ describe("buildResolvedProductCategoryDisplaysFromRoots", () => {
       [],
     );
 
-    expect(items).toHaveLength(PRODUCT_CATEGORIES.length + 1);
-    expect(items.at(-1)).toMatchObject({
+    expect(items).toHaveLength(1);
+    expect(items[0]).toMatchObject({
       categoryId: "64f1",
       categorySlug: "custom-pets",
+      displaySlug: "custom-pets",
       label: "Питомцы+",
     });
   });
 
-  it("binds legacy slug to matching db root id", () => {
+  it("uses legacyProductCategory as categorySlug when present", () => {
     const items = buildResolvedProductCategoryDisplaysFromRoots(
       [
         {
           id: "abc123",
-          slug: "electronics",
+          slug: "electronics-v2",
           labelRu: "Электроника",
           parentId: null,
           depth: 0,
-          pathSlugs: ["electronics"],
+          pathSlugs: ["electronics-v2"],
           pathLabelRu: ["Электроника"],
           isLeaf: false,
           legacyProductCategory: "electronics",
@@ -58,9 +56,13 @@ describe("buildResolvedProductCategoryDisplaysFromRoots", () => {
       [],
     );
 
-    const electronics = items.find((item) => item.categorySlug === "electronics");
-    expect(electronics?.categoryId).toBe("abc123");
-    expect(items).toHaveLength(PRODUCT_CATEGORIES.length);
+    expect(items).toHaveLength(1);
+    expect(items[0]).toMatchObject({
+      categoryId: "abc123",
+      categorySlug: "electronics",
+      displaySlug: "electronics-v2",
+      label: "Электроника",
+    });
   });
 
   it("resolves display override saved under legacy slug", () => {
@@ -154,5 +156,27 @@ describe("buildResolvedProductCategoryDisplaysFromRoots", () => {
     const appliances = items.find((item) => item.categorySlug === "appliances");
     expect(appliances?.imageUrl).toBe("/uploads/appliances.jpg");
     expect(appliances?.categoryId).toBe("abc123");
+  });
+
+  it("does not invent tiles for legacy slugs missing from roots", () => {
+    const items = buildResolvedProductCategoryDisplaysFromRoots(
+      [
+        {
+          id: "only-one",
+          slug: "grocery",
+          labelRu: "Продукты",
+          parentId: null,
+          depth: 0,
+          pathSlugs: ["grocery"],
+          pathLabelRu: ["Продукты"],
+          isLeaf: false,
+          legacyProductCategory: "grocery",
+          searchKeywords: [],
+        },
+      ],
+      [],
+    );
+
+    expect(items.map((item) => item.categorySlug)).toEqual(["grocery"]);
   });
 });

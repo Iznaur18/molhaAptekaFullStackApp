@@ -4,6 +4,7 @@ import { OrderModel, ProductModel, UserModel } from "../../models/index.js";
 import { errorRes, successRes } from "../../services/http/index.js";
 import { buildRegexSearchOr } from "../../utils/buildRegexSearchOr.js";
 import { loadInstallmentPlanSummariesByIds } from "../../services/installment/installmentHelpers.js";
+import { sanitizeOrderForSellerApi } from "../../services/order/buyerPassportShare.js";
 
 import { ORDER_BUYER_PUBLIC_FIELDS, ORDER_ITEMS_POPULATE } from "./orderQueries.js";
 import {
@@ -191,7 +192,10 @@ const sellerId = String(req.userId);
       const installmentContract =
         contractId != null ? (planSummaryByContractId[contractId] ?? null) : null;
 
-      return installmentContract ? { ...order, installmentContract } : order;
+      const withPlan = installmentContract
+        ? { ...order, installmentContract }
+        : order;
+      return sanitizeOrderForSellerApi(withPlan);
     });
 
     return successRes(res, {

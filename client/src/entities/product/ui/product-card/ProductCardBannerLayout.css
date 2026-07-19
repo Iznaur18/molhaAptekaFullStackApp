@@ -1,19 +1,14 @@
 .product-card-promotion-frame--tier-3 > .product-card.product-card--banner-layout {
   --product-card-banner-outer-radius: calc(var(--product-card-radius) * 1.08);
-  border: 1px solid var(--product-card-banner-accent);
+  border: 1px solid var(--iz-color-border);
   border-radius: calc(var(--product-card-radius) * 1.08);
-  background: linear-gradient(
-    105deg,
-    var(--iz-color-on-contrast) 0%,
-    color-mix(in srgb, var(--iz-color-on-contrast) 88%, var(--product-card-banner-accent-soft)) 52%,
-    var(--product-card-banner-gradient-end) 100%
-  );
-  box-shadow: 0 2px 14px color-mix(in srgb, var(--product-card-banner-accent) 12%, transparent);
+  background: var(--iz-color-surface);
+  box-shadow: 0 2px 14px color-mix(in srgb, var(--iz-color-text) 6%, transparent);
 }
 
 .product-card-promotion-frame--tier-3 > .product-card.product-card--banner-layout:hover {
-  border-color: var(--product-card-banner-accent);
-  box-shadow: 0 4px 18px color-mix(in srgb, var(--product-card-banner-accent) 18%, transparent);
+  border-color: var(--iz-color-border-strong);
+  box-shadow: 0 4px 18px color-mix(in srgb, var(--iz-color-text) 8%, transparent);
 }
 
 .product-card--banner-layout {

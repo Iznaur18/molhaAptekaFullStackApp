@@ -1,7 +1,6 @@
-import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Linking, Pressable, Text, TextInput, View } from "react-native";
+import { Pressable, Text, TextInput, View } from "react-native";
 
 import type { DataConfirmationRequest } from "@/entities/user-data-confirmation/api/dataConfirmationStaffApi";
 import { countWords } from "@/entities/user-data-confirmation/lib/countWords";
@@ -16,8 +15,10 @@ import {
 import { useResolveDataConfirmationRequestMutation } from "@/entities/user-data-confirmation/model/useDataConfirmationStaffMutations";
 import { UserPremiumDisplayName } from "@/entities/user/ui/UserPremiumDisplayName";
 import { DATA_CONFIRMATION_PAGE_UI, USER_LIST_ROW_UI } from "@/shared/config";
-import { formatIsoDateTime, resolveUploadedMediaUrl } from "@/shared/lib";
+import { formatIsoDateTime } from "@/shared/lib";
+import { usePrivateUploadDisplayUrl } from "@/shared/lib/usePrivateUploadDisplayUrl";
 import { useDataConfirmationRequestsPageStyles } from "@/shared/theme/dataConfirmationRequestsPageStyles";
+import { PrivateUploadImage } from "@/shared/ui/PrivateUploadImage";
 
 type PassportFieldProps = {
   label: string;
@@ -54,8 +55,36 @@ export const DataConfirmationRequestCard = ({
   const displayName = applicant?.userName?.trim() || USER_LIST_ROW_UI.MISSING_NAME;
   const passport = request.passport ?? {};
   const selfiePhotoUrl = request.passportSelfiePhotoUrl?.trim() ?? "";
-  const selfieDisplayUrl = selfiePhotoUrl ? resolveUploadedMediaUrl(selfiePhotoUrl) : "";
+  const selfieState = usePrivateUploadDisplayUrl(selfiePhotoUrl);
   const isBusy = resolveRequestMutation.isPending;
+
+  const renderSelfieBlock = () => {
+    if (selfieState.status === "ready" && selfieState.url) {
+      return (
+        <View style={styles.selfieLink}>
+          <PrivateUploadImage
+            uri={selfieState.url}
+            style={styles.selfieImage}
+            accessibilityLabel={DATA_CONFIRMATION_PAGE_UI.PASSPORT_SELFIE_SECTION}
+          />
+        </View>
+      );
+    }
+    if (selfieState.status === "error") {
+      return (
+        <Text style={styles.selfieMissing}>
+          {DATA_CONFIRMATION_PAGE_UI.PASSPORT_SELFIE_LOAD_ERROR}
+          {selfieState.error ? ` (${selfieState.error})` : ""}
+        </Text>
+      );
+    }
+    if (selfiePhotoUrl || selfieState.status === "loading") {
+      return <Text style={styles.selfieMissing}>Загрузка фото…</Text>;
+    }
+    return (
+      <Text style={styles.selfieMissing}>{DATA_CONFIRMATION_PAGE_UI.PASSPORT_SELFIE_MISSING}</Text>
+    );
+  };
 
   const handleResolve = async (resolution: string) => {
     if (resolution === USER_DATA_CONFIRMATION_RESOLUTION_REJECT) {
@@ -84,17 +113,6 @@ export const DataConfirmationRequestCard = ({
     }
   };
 
-  const openSelfie = async () => {
-    if (!selfieDisplayUrl) {
-      return;
-    }
-    try {
-      await Linking.openURL(selfieDisplayUrl);
-    } catch {
-      // noop — URL may be invalid in dev
-    }
-  };
-
   return (
     <View style={styles.card}>
       <View style={styles.cardHeader}>
@@ -111,7 +129,9 @@ export const DataConfirmationRequestCard = ({
       {applicant?._id ? (
         <Pressable
           style={styles.applicantLink}
-          onPress={() => router.push({ pathname: "/user/[id]", params: { id: String(applicant._id) } })}
+          onPress={() =>
+            router.push({ pathname: "/user/[id]", params: { id: String(applicant._id) } })
+          }
         >
           <Text style={styles.applicantLinkText}>{DATA_CONFIRMATION_PAGE_UI.OPEN_APPLICANT}</Text>
         </Pressable>
@@ -128,20 +148,16 @@ export const DataConfirmationRequestCard = ({
           />
           <PassportField label="Кем выдан" value={passport.issuedBy?.trim() || "—"} />
           <PassportField label="Дата выдачи" value={formatPassportDate(passport.issuedAt)} />
-          <PassportField label="Код подразделения" value={passport.departmentCode?.trim() || "—"} />
+          <PassportField
+            label="Код подразделения"
+            value={passport.departmentCode?.trim() || "—"}
+          />
         </View>
       </View>
 
       <View style={styles.selfieSection}>
         <Text style={styles.sectionTitle}>{DATA_CONFIRMATION_PAGE_UI.PASSPORT_SELFIE_SECTION}</Text>
-        {selfieDisplayUrl ? (
-          <Pressable style={styles.selfieLink} onPress={() => void openSelfie()}>
-            <Image source={{ uri: selfieDisplayUrl }} style={styles.selfieImage} contentFit="contain" />
-            <Text style={styles.selfieOpenText}>{DATA_CONFIRMATION_PAGE_UI.PASSPORT_SELFIE_OPEN}</Text>
-          </Pressable>
-        ) : (
-          <Text style={styles.selfieMissing}>{DATA_CONFIRMATION_PAGE_UI.PASSPORT_SELFIE_MISSING}</Text>
-        )}
+        {renderSelfieBlock()}
       </View>
 
       <View style={styles.staffLabel}>
@@ -169,7 +185,9 @@ export const DataConfirmationRequestCard = ({
           onPress={() => void handleResolve(USER_DATA_CONFIRMATION_RESOLUTION_APPROVE)}
         >
           <Text style={styles.actionPrimaryText}>
-            {isBusy ? DATA_CONFIRMATION_PAGE_UI.ACTION_PENDING : DATA_CONFIRMATION_PAGE_UI.ACTION_APPROVE}
+            {isBusy
+              ? DATA_CONFIRMATION_PAGE_UI.ACTION_PENDING
+              : DATA_CONFIRMATION_PAGE_UI.ACTION_APPROVE}
           </Text>
         </Pressable>
         <Pressable

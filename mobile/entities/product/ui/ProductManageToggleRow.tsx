@@ -1,12 +1,8 @@
-import { Image } from "expo-image";
-import { Platform, Pressable, Text, View } from "react-native";
-import { resolveProductManageTogglePalette } from "@izibuy/shared-lib";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { Pressable, Switch, Text, View } from "react-native";
 
-import {
-  resolveProductManageToggleRowVisualStyles,
-  type ProductManageToggleRowVariant,
-} from "@/entities/product/lib/resolveProductManageToggleRowVisualStyles";
-import { isDisplayableMediaUrl, resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
+import type { ProductManageToggleRowVariant } from "@/entities/product/lib/resolveProductManageToggleRowVisualStyles";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useProductManageToggleRowStyles } from "@/shared/theme/modalChromeStyles";
 
 type ProductManageToggleRowProps = {
@@ -20,8 +16,23 @@ type ProductManageToggleRowProps = {
   pendingLabel?: string;
   variant?: ProductManageToggleRowVariant;
   ariaLabel?: string;
+  /** @deprecated статус только через Switch */
   titleStatus?: string;
+  /** @deprecated artwork убран из UI */
   imageUrl?: string | null;
+};
+
+const resolveControl = (
+  variant: ProductManageToggleRowVariant,
+  onPress?: () => void,
+): "switch" | "chevron" | "none" => {
+  if (variant === "danger") {
+    return "none";
+  }
+  if (variant === "installment" && onPress) {
+    return "chevron";
+  }
+  return "switch";
 };
 
 export const ProductManageToggleRow = ({
@@ -35,15 +46,11 @@ export const ProductManageToggleRow = ({
   pendingLabel = "",
   variant = "default",
   ariaLabel,
-  titleStatus = "",
-  imageUrl = null,
 }: ProductManageToggleRowProps) => {
+  const theme = useAppTheme();
   const styles = useProductManageToggleRowStyles();
-  const palette = resolveProductManageTogglePalette(variant, checked);
-  const resolvedImageUrl =
-    imageUrl != null && isDisplayableMediaUrl(imageUrl)
-      ? resolveUploadedMediaUrl(String(imageUrl))
-      : "";
+  const control = resolveControl(variant, onPress);
+  const isDanger = variant === "danger";
 
   if (pending) {
     return (
@@ -53,7 +60,7 @@ export const ProductManageToggleRow = ({
     );
   }
 
-  const handlePress = () => {
+  const handleActivate = () => {
     if (disabled) {
       return;
     }
@@ -64,50 +71,87 @@ export const ProductManageToggleRow = ({
     onCheckedChange?.(!checked);
   };
 
-  const visualStyles = resolveProductManageToggleRowVisualStyles(styles, variant);
-  const rowBackgroundStyle =
-    palette != null
-      ? { backgroundColor: palette.background }
-      : undefined;
+  const handleSwitchChange = (next: boolean) => {
+    if (disabled) {
+      return;
+    }
+    if (onPress) {
+      onPress();
+      return;
+    }
+    onCheckedChange?.(next);
+  };
+
+  if (control === "switch") {
+    return (
+      <View
+        style={[styles.row, disabled && styles.rowDisabled]}
+        accessibilityRole="switch"
+        accessibilityState={{ disabled, checked }}
+        accessibilityLabel={ariaLabel ?? title}
+      >
+        <Pressable
+          style={styles.textPressable}
+          disabled={disabled}
+          onPress={handleActivate}
+          accessibilityRole="button"
+          accessibilityLabel={ariaLabel ?? title}
+        >
+          <Text style={styles.title} numberOfLines={1}>
+            {title}
+          </Text>
+          <Text style={styles.description} numberOfLines={2}>
+            {description}
+          </Text>
+        </Pressable>
+        <Switch
+          value={checked}
+          disabled={disabled}
+          onValueChange={handleSwitchChange}
+          trackColor={{
+            false: theme.colors.actionBorder,
+            true: theme.colors.action,
+          }}
+          thumbColor={theme.colors.onContrast}
+          ios_backgroundColor={theme.colors.actionBorder}
+        />
+      </View>
+    );
+  }
 
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityState={{ disabled }}
-      accessibilityLabel={ariaLabel ?? (titleStatus ? `${title} ${titleStatus}` : title)}
+      accessibilityLabel={ariaLabel ?? title}
       disabled={disabled}
       style={({ pressed }) => [
         styles.row,
-        ...visualStyles,
-        rowBackgroundStyle,
+        isDanger && styles.rowDanger,
         disabled && styles.rowDisabled,
         pressed && !disabled && styles.rowPressed,
-        Platform.OS === "web" && !disabled && styles.rowWebClickable,
       ]}
-      onPress={handlePress}
+      onPress={handleActivate}
     >
-      <View style={styles.rowContent} pointerEvents="none">
-        <View style={styles.textBlock}>
-          <Text style={[styles.title, palette ? { color: palette.title } : null]}>
-            {title}
-            {titleStatus ? <Text style={styles.titleStatus}>{` ${titleStatus}`}</Text> : null}
-          </Text>
-          <Text style={[styles.description, palette ? { color: palette.description } : null]}>
-            {description}
-          </Text>
-        </View>
-        {resolvedImageUrl ? (
-          <View style={styles.artwork}>
-            <Image
-              source={{ uri: resolvedImageUrl }}
-              style={styles.artworkImage}
-              contentFit="contain"
-              contentPosition="right center"
-              accessibilityIgnoresInvertColors
-            />
-          </View>
-        ) : null}
+      <View style={styles.textBlock} pointerEvents="none">
+        <Text style={[styles.title, isDanger && styles.titleDanger]} numberOfLines={1}>
+          {title}
+        </Text>
+        <Text
+          style={[styles.description, isDanger && styles.descriptionDanger]}
+          numberOfLines={2}
+        >
+          {description}
+        </Text>
       </View>
+      {control === "chevron" ? (
+        <MaterialIcons
+          name="chevron-right"
+          size={22}
+          color={theme.colors.action}
+          accessibilityElementsHidden
+        />
+      ) : null}
     </Pressable>
   );
 };

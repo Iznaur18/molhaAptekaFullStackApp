@@ -27,6 +27,7 @@ export const createInstallmentContractController = async (req, res) => {
     planId: req.body.planId,
     quantity: req.body.quantity,
     paymentMethod: req.body.paymentMethod,
+    passportShareConsent: req.body.passportShareConsent,
     verifiedDeliveryAddress: req.verifiedDeliveryAddress,
   });
 

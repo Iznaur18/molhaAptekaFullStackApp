@@ -11,8 +11,8 @@
   --product-card-banner-image-min-height: 11.5rem;
   --product-card-banner-image-flex-basis: 50%;
   --product-card-banner-accent: var(--iz-color-danger);
-  --product-card-banner-accent-soft: var(--iz-color-danger-surface);
-  --product-card-banner-gradient-end: var(--iz-color-danger-surface);
+  --product-card-banner-accent-soft: var(--iz-color-surface);
+  --product-card-banner-gradient-end: var(--iz-color-surface);
   --product-card-banner-action: var(--product-card-banner-accent);
   --product-card-banner-action-hover: var(--iz-color-danger);
   --product-card-banner-badge-text: var(--iz-color-danger-text);

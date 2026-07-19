@@ -5,7 +5,6 @@ import {
   Easing,
   runOnJS,
   useAnimatedReaction,
-  useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -28,15 +27,6 @@ const RUBBER_RESIST = 0.55;
 /** Наклон/старт вертикального жеста — иначе горизонтальные ленты внутри работают свободно. */
 const PAN_ACTIVATE_Y = 14;
 const PAN_FAIL_X = 18;
-/**
- * Мёртвая зона закрытия (px): протяжка вниз с самого верха ленты начинает
- * раскрывать интро только пройдя этот порог. Без неё быстрый короткий рывок
- * вниз у верхнего края на миг показывал полосу заднего фона и отпружинивал —
- * при быстрой прокрутке это читалось как мигание интро.
- */
-const CLOSE_ACTIVATE_TRAVEL = 48;
-/** Список считаем «в самом верху» при таком scrollY. */
-const AT_TOP_EPSILON = 2;
 /** Ниже этого progress шторка закрывает hero — фоновое видео можно ставить на паузу. */
 const BACKDROP_PLAYBACK_THRESHOLD = 0.9;
 
@@ -84,7 +74,8 @@ type UseHomeFeedIntroTransitionParams = {
  * дальше порога (или резкий флик) → доводим до края пружиной, иначе — упруго
  * откатываем назад. Механика двусторонняя:
  *   - из интро тянем вверх → открываем ленту;
- *   - из переднего фона, когда список в самом верху, тянем вниз → в интро.
+ *   - из переднего фона сброс в интро — тап по вкладке «Главная» (`resetToIntro`),
+ *     а не pull-down (pull-down оставлен под RefreshControl).
  * Вне этих условий (свайп внутри ленты) жест перехода не вмешивается — работает
  * обычная нативная прокрутка.
  */
@@ -101,16 +92,13 @@ export const useHomeFeedIntroTransition = ({
   // Осевшее состояние (0/1), меняется только по завершении анимации — от него
   // зависит scrollEnabled, чтобы прокрутка не дёргалась на дробном progress.
   const mode = useSharedValue(initialOpen);
-  // 1 — список у верхнего края (разрешает закрытие свайпом вниз).
-  const atTop = useSharedValue(1);
   // 1 — активна главная лента (иначе не трогаем таб-бар).
   const enabledSv = useSharedValue(enabled ? 1 : 0);
 
   // Снимок на старте жеста — чтобы следование было без скачка и с учётом того,
-  // откуда начали (интро/лента, верх ли списка).
+  // откуда начали (интро/лента).
   const dragActive = useSharedValue(0);
   const dragStartProgress = useSharedValue(0);
-  const dragStartAtTop = useSharedValue(1);
 
   const [scrollEnabled, setScrollEnabled] = useState(initialOpen >= 0.5);
   const [backdropPlaybackActive, setBackdropPlaybackActive] = useState(introBackdropEnabled);
@@ -166,12 +154,6 @@ export const useHomeFeedIntroTransition = ({
     }, [applyScrollEnabledFromMode, enabled, mode, progress]),
   );
 
-  const onListScroll = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      atTop.value = event.contentOffset.y <= AT_TOP_EPSILON ? 1 : 0;
-    },
-  });
-
   // Нативный жест самой ленты. Pan работает поверх экрана ОДНОВРЕМЕННО с ним,
   // иначе Pan перехватывал бы прокрутку. Связываем их через simultaneous.
   const nativeGesture = Gesture.Native();
@@ -184,11 +166,9 @@ export const useHomeFeedIntroTransition = ({
     .onStart(() => {
       "worklet";
       dragStartProgress.value = progress.value;
-      dragStartAtTop.value = atTop.value;
-      // Жест перехода — если из интро (любой вертикальный) или из переднего фона
-      // с самого верха. Иначе это обычная прокрутка ленты, не вмешиваемся.
-      dragActive.value =
-        dragStartProgress.value <= 0.5 || dragStartAtTop.value === 1 ? 1 : 0;
+      // Жест перехода только из интро (открытие вверх). С ленты pull-down —
+      // RefreshControl, не закрытие в hero.
+      dragActive.value = dragStartProgress.value <= 0.5 ? 1 : 0;
     })
     .onUpdate((event) => {
       "worklet";
@@ -200,17 +180,6 @@ export const useHomeFeedIntroTransition = ({
         // Открытие: тянем вверх (translationY < 0), прогресс растёт с сопротивлением.
         const raw = -event.translationY / dockOffset;
         progress.value = clamp01(start + (1 - start) * rubber(raw));
-      } else {
-        // Закрытие: тянем вниз (translationY > 0) с верха ленты. Пока палец не
-        // прошёл мёртвую зону — прогресс держим на месте, интро не раскрываем
-        // (иначе быстрый рывок вниз мигает полосой заднего фона).
-        const pulled = event.translationY - CLOSE_ACTIVATE_TRAVEL;
-        if (pulled <= 0) {
-          progress.value = start;
-          return;
-        }
-        const raw = pulled / dockOffset;
-        progress.value = clamp01(start * (1 - rubber(raw)));
       }
     })
     .onFinalize((event) => {
@@ -221,20 +190,8 @@ export const useHomeFeedIntroTransition = ({
       dragActive.value = 0;
 
       const travel = dockOffset * COMMIT_TRAVEL;
-      let target: number;
-      if (dragStartProgress.value <= 0.5) {
-        const commit = -event.translationY >= travel || event.velocityY <= -SWIPE_VELOCITY;
-        target = commit ? 1 : 0;
-      } else {
-        // Коммит в интро — только если палец реально прошёл мёртвую зону.
-        // Короткий быстрый рывок вниз (внутри зоны) остаётся на ленте: полоса
-        // заднего фона не мелькает и переход не срабатывает случайно.
-        const pulledPastDeadZone = event.translationY > CLOSE_ACTIVATE_TRAVEL;
-        const commit =
-          pulledPastDeadZone &&
-          (event.translationY >= travel || event.velocityY >= SWIPE_VELOCITY);
-        target = commit ? 0 : 1;
-      }
+      const commit = -event.translationY >= travel || event.velocityY <= -SWIPE_VELOCITY;
+      const target = commit ? 1 : 0;
 
       progress.value = withSpring(target, SPRING_CONFIG, (finished) => {
         if (finished) {
@@ -278,7 +235,6 @@ export const useHomeFeedIntroTransition = ({
     panGesture,
     nativeGesture,
     sheetStyle,
-    onListScroll,
     scrollEnabled,
     backdropPlaybackActive,
     resetToIntro,

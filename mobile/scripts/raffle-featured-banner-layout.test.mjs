@@ -47,7 +47,8 @@ test("RaffleFeaturedBanner: split-card layout with square visual", () => {
   assert.doesNotMatch(section, /SquircleView/);
   assert.doesNotMatch(section, /RAFFLES_SECTION_TITLE/);
   assert.match(section, /HomeFeaturedRafflesRevealButton/);
-  assert.match(section, /isExpanded/);
+  assert.match(section, /HomeFeaturedRaffleModal/);
+  assert.doesNotMatch(section, /isExpanded/);
 });
 
 test("shared-lib metrics: always stacked square visual", () => {

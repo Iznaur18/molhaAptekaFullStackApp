@@ -29,6 +29,7 @@ import {
 } from "../product/productStock.js";
 import { buildOrderStatusFromItems } from "./orderStatus.js";
 
+import { clearBuyerPassportShareOnOrder } from "./buyerPassportShare.js";
 import {
   assertSellerOwnsOrderItem,
   getPopulatedOrderItemOrThrow,
@@ -150,9 +151,14 @@ export async function markOrderItemCancelled({
     );
   }
 
-  if (isBuyer && order.installmentContractId) {
+  // Рассрочный заказ: отмена buyer ИЛИ seller должна гасить и Order, и InstallmentContract.
+  // Раньше seller-cancel через Order оставлял контракт pending/active → «призраки» в списках рассрочки.
+  if (order.installmentContractId) {
+    const defaultReason = isBuyer
+      ? "Отменено покупателем"
+      : "Отменено продавцом";
     const cancellationReason =
-      String(reason ?? "Отменено покупателем").trim() || "Отменено покупателем";
+      String(reason ?? defaultReason).trim() || defaultReason;
 
     await runInTransaction(async (session) => {
       const contract = await InstallmentContractModel.findById(
@@ -183,6 +189,9 @@ export async function markOrderItemCancelled({
       targetItem.status = ORDER_STATUS_CANCELLED;
       markOrderLineLoyaltyReserveReleased(targetItem);
       order.status = buildOrderStatusFromItems(order.items);
+      if (order.status === ORDER_STATUS_CANCELLED) {
+        clearBuyerPassportShareOnOrder(order);
+      }
       await order.save({ session });
       await releaseUnawardedLoyaltyReservesForOrder([releaseLine], session);
     });

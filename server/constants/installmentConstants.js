@@ -85,6 +85,12 @@ export const INSTALLMENT_PROGRAM_NOT_AVAILABLE_MESSAGE =
   "Рассрочка для этого товара недоступна";
 export const INSTALLMENT_HAS_CONTRACTS_BLOCK_MESSAGE =
   "Нельзя изменить планы: есть активные контракты рассрочки";
+export const INSTALLMENT_PASSPORT_SHARE_CONSENT_REQUIRED_MESSAGE =
+  "Нужно разрешение на передачу паспортных данных продавцу";
+export const INSTALLMENT_BUYER_PASSPORT_NOT_AVAILABLE_MESSAGE =
+  "Нет подтверждённых паспортных данных для передачи продавцу";
+export const INSTALLMENT_ORDER_NOT_ACCEPTED_BY_SELLER_MESSAGE =
+  "Рассрочка станет доступна после того, как продавец примет заказ";
 
 /** In-app notification kinds. */
 export const IN_APP_NOTIFICATION_KIND_INSTALLMENT_NEW_FOR_SELLER =

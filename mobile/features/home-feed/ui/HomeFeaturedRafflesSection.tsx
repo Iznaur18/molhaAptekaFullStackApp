@@ -9,8 +9,8 @@ import { useMyRaffleMutations } from "@/entities/raffle/model/useMyRaffleMutatio
 import { useRaffleStaffMutations } from "@/entities/raffle/model/useRaffleStaffMutations";
 import type { FeaturedRaffleManage, RaffleFromApi } from "@/entities/raffle/model/types";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
-import { RaffleFeaturedCarousel } from "@/entities/raffle/ui/RaffleFeaturedCarousel";
 import { CreateRaffleModal } from "@/features/create-raffle-page/ui/CreateRaffleModal";
+import { HomeFeaturedRaffleModal } from "@/features/home-feed/ui/HomeFeaturedRaffleModal";
 import { HomeFeaturedRafflesRevealButton } from "@/features/home-feed/ui/HomeFeaturedRafflesRevealButton";
 import { raffleQueryKeys } from "@/shared/api";
 import { HOME_FEED_UI, PRODUCT_REPORT_UI, RAFFLE_MANAGE_UI } from "@/shared/config";
@@ -29,7 +29,7 @@ export const HomeFeaturedRafflesSection = ({ raffles }: HomeFeaturedRafflesSecti
   const { pauseMyMutation, deleteMyMutation } = useMyRaffleMutations();
   const { deleteStaffMutation } = useRaffleStaffMutations();
   const [isBusy, setIsBusy] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRaffle, setEditingRaffle] = useState<RaffleFromApi | null>(null);
   const [editUseStaffApi, setEditUseStaffApi] = useState(false);
 
@@ -44,8 +44,12 @@ export const HomeFeaturedRafflesSection = ({ raffles }: HomeFeaturedRafflesSecti
     [router],
   );
 
-  const toggleExpanded = useCallback(() => {
-    setIsExpanded((prev) => !prev);
+  const openModal = useCallback(() => {
+    setIsModalOpen(true);
+  }, []);
+
+  const closeModal = useCallback(() => {
+    setIsModalOpen(false);
   }, []);
 
   const getManage = useCallback(
@@ -68,47 +72,51 @@ export const HomeFeaturedRafflesSection = ({ raffles }: HomeFeaturedRafflesSecti
         showPause: isOwner && raffle.status === "active",
         busy: isBusy,
         onEdit: () => {
+          setIsModalOpen(false);
           setEditUseStaffApi(canModerate && !isOwner);
           setEditingRaffle(raffle);
         },
         onDelete: () => {
-          Alert.alert(
-            RAFFLE_MANAGE_UI.DELETE,
-            useStaffDelete
-              ? RAFFLE_MANAGE_UI.DELETE_CONFIRM_STAFF
-              : RAFFLE_MANAGE_UI.DELETE_CONFIRM_OWNER,
-            [
-              { text: PRODUCT_REPORT_UI.CANCEL, style: "cancel" },
-              {
-                text: RAFFLE_MANAGE_UI.DELETE,
-                style: "destructive",
-                onPress: () => {
-                  void (async () => {
-                    try {
-                      setIsBusy(true);
-                      if (useStaffDelete) {
-                        await deleteStaffMutation.mutateAsync(String(raffle._id));
-                        await Promise.all([
-                          queryClient.invalidateQueries({
-                            queryKey: raffleQueryKeys.featured(),
-                          }),
-                          queryClient.invalidateQueries({
-                            queryKey: raffleQueryKeys.staffQueue(),
-                          }),
-                        ]);
-                      } else {
-                        await deleteMyMutation.mutateAsync(raffle._id);
+          setIsModalOpen(false);
+          setTimeout(() => {
+            Alert.alert(
+              RAFFLE_MANAGE_UI.DELETE,
+              useStaffDelete
+                ? RAFFLE_MANAGE_UI.DELETE_CONFIRM_STAFF
+                : RAFFLE_MANAGE_UI.DELETE_CONFIRM_OWNER,
+              [
+                { text: PRODUCT_REPORT_UI.CANCEL, style: "cancel" },
+                {
+                  text: RAFFLE_MANAGE_UI.DELETE,
+                  style: "destructive",
+                  onPress: () => {
+                    void (async () => {
+                      try {
+                        setIsBusy(true);
+                        if (useStaffDelete) {
+                          await deleteStaffMutation.mutateAsync(String(raffle._id));
+                          await Promise.all([
+                            queryClient.invalidateQueries({
+                              queryKey: raffleQueryKeys.featured(),
+                            }),
+                            queryClient.invalidateQueries({
+                              queryKey: raffleQueryKeys.staffQueue(),
+                            }),
+                          ]);
+                        } else {
+                          await deleteMyMutation.mutateAsync(raffle._id);
+                        }
+                      } catch {
+                        // mutation error surfaces via query state elsewhere
+                      } finally {
+                        setIsBusy(false);
                       }
-                    } catch {
-                      // mutation error surfaces via query state elsewhere
-                    } finally {
-                      setIsBusy(false);
-                    }
-                  })();
+                    })();
+                  },
                 },
-              },
-            ],
-          );
+              ],
+            );
+          }, 80);
         },
         onPause: () => {
           void (async () => {
@@ -131,19 +139,17 @@ export const HomeFeaturedRafflesSection = ({ raffles }: HomeFeaturedRafflesSecti
     <>
       {hasRaffles ? (
         <View style={sectionStyles.root} accessibilityLabel={HOME_FEED_UI.RAFFLES_SECTION_ARIA}>
-          <HomeFeaturedRafflesRevealButton
-            isExpanded={isExpanded}
-            onPress={toggleExpanded}
-          />
-          {isExpanded ? (
-            <RaffleFeaturedCarousel
-              raffles={raffles}
-              onOpenProducts={handleOpenProducts}
-              getManage={getManage}
-            />
-          ) : null}
+          <HomeFeaturedRafflesRevealButton onPress={openModal} />
         </View>
       ) : null}
+
+      <HomeFeaturedRaffleModal
+        visible={isModalOpen && hasRaffles}
+        raffles={raffles}
+        onClose={closeModal}
+        onOpenProducts={handleOpenProducts}
+        getManage={getManage}
+      />
 
       <CreateRaffleModal
         visible={editingRaffle != null}

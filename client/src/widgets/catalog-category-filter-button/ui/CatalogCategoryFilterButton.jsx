@@ -30,7 +30,7 @@ export function CatalogCategoryFilterButton({
     }
     if (selectedProductCategory) {
       return HOME_PAGE_UI.FILTER_BUTTON_ARIA_SELECTED(
-        PRODUCT_CATEGORY_LABEL_RU[selectedProductCategory],
+        PRODUCT_CATEGORY_LABEL_RU[selectedProductCategory] ?? selectedProductCategory,
       );
     }
     return HOME_PAGE_UI.FILTER_BUTTON_ARIA;

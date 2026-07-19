@@ -44,6 +44,13 @@ test("interleave + full-width gate matches web catalog feed", () => {
   );
 
   assert.equal(banner?._id, "b1");
+  assert.equal(
+    shouldShowProductTier3BannerFullWidth(tier3Product("b1"), {
+      isMineMode: true,
+      showFullWidthTier3Banners: true,
+    }),
+    false,
+  );
 });
 
 test("catalog screen wires tier3 banner grid rows", () => {

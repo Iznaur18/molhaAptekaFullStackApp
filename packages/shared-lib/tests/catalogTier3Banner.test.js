@@ -45,9 +45,9 @@ test("shouldShowProductTier3BannerFullWidth respects mine mode and catalog flag"
   assert.equal(
     shouldShowProductTier3BannerFullWidth(product, {
       isMineMode: true,
-      showFullWidthTier3Banners: false,
+      showFullWidthTier3Banners: true,
     }),
-    true,
+    false,
   );
 });
 

@@ -59,6 +59,11 @@
  * @property {boolean} hasOverduePayment
  * @property {InstallmentCounterpartyFromApi | null} [seller]
  * @property {InstallmentCounterpartyFromApi | null} [buyer]
+ * @property {{
+ *   passport: import('../../user-data-confirmation/model/types.js').PassportSnapshot;
+ *   passportSelfiePhotoUrl?: string;
+ *   consentAt?: string | null;
+ * } | null} [buyerPassportShare]
  */
 
 export {};

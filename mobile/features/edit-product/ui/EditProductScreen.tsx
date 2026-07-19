@@ -3,7 +3,6 @@ import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Pressable,
   ScrollView,
   Switch,
@@ -31,6 +30,7 @@ import { CreateProductCategoryPicker } from "@/features/create-product/ui/Create
 import { ProductPhotoGrid } from "@/features/image-upload/ui/ProductPhotoGrid";
 import { API_CLIENT_UI, CREATE_PRODUCT_UI, PRODUCT_REPORT_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { confirmDestructiveAction } from "@/shared/lib/confirmDestructiveAction";
 import {
   formatRubPriceInput,
   keepDigitsOnly,
@@ -246,16 +246,15 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
   };
 
   const handleDelete = () => {
-    Alert.alert(CREATE_PRODUCT_UI.DELETE, CREATE_PRODUCT_UI.DELETE_CONFIRM, [
-      { text: PRODUCT_REPORT_UI.CANCEL, style: "cancel" },
-      {
-        text: CREATE_PRODUCT_UI.DELETE,
-        style: "destructive",
-        onPress: () => {
-          void runDelete();
-        },
+    confirmDestructiveAction({
+      title: CREATE_PRODUCT_UI.DELETE,
+      message: CREATE_PRODUCT_UI.DELETE_CONFIRM,
+      confirmLabel: CREATE_PRODUCT_UI.DELETE,
+      cancelLabel: PRODUCT_REPORT_UI.CANCEL,
+      onConfirm: () => {
+        void runDelete();
       },
-    ]);
+    });
   };
 
   const runDelete = async () => {

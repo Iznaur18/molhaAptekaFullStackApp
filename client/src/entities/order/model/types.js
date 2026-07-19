@@ -50,6 +50,11 @@
  * @property {string | null} [priceOfferId]
  * @property {string | null} [installmentContractId]
  * @property {OrderInstallmentContractSummary | null} [installmentContract]
+ * @property {{
+ *   passport: import('../../user-data-confirmation/model/types.js').PassportSnapshot;
+ *   passportSelfiePhotoUrl?: string;
+ *   consentAt?: string | null;
+ * } | null} [buyerPassportShare]
  * @property {string} createdAt
  * @property {string} updatedAt
  */

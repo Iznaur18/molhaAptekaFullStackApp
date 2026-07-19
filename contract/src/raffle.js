@@ -6,8 +6,8 @@ import { nullableProfileImageFocusSchema, profileImageFocusSchema } from "./user
 /** Синхрон с `server/constants/raffleConstants.js`. */
 export const RAFFLE_TARGET_SALES_MIN = 1;
 export const RAFFLE_TARGET_SALES_MAX = 100_000;
-export const RAFFLE_TITLE_MAX_LENGTH = 120;
-export const RAFFLE_DESCRIPTION_MAX_LENGTH = 4000;
+export const RAFFLE_TITLE_MAX_LENGTH = 100;
+export const RAFFLE_DESCRIPTION_MAX_LENGTH = 200;
 export const RAFFLE_INSTAGRAM_URL_MAX_LENGTH = 500;
 export const RAFFLE_PRIZE_MEDIA_TYPE_IMAGE = "image";
 export const RAFFLE_PRIZE_MEDIA_TYPE_VIDEO = "video";

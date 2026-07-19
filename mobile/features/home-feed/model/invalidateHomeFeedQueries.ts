@@ -1,6 +1,11 @@
 import type { QueryClient } from "@tanstack/react-query";
 
-import { curatedProductListQueryKeys, raffleQueryKeys, userStoriesQueryKeys } from "@/shared/api";
+import { siteHeaderBannerQueryKeys } from "@/entities/site-header-banner/model/siteHeaderBannerQueryKeys";
+import {
+  curatedProductListQueryKeys,
+  raffleQueryKeys,
+  userStoriesQueryKeys,
+} from "@/shared/api";
 
 export const invalidateHomeFeedQueries = async (queryClient: QueryClient) => {
   await Promise.all([
@@ -9,5 +14,7 @@ export const invalidateHomeFeedQueries = async (queryClient: QueryClient) => {
     queryClient.invalidateQueries({
       queryKey: curatedProductListQueryKeys.home(false),
     }),
+    queryClient.invalidateQueries({ queryKey: siteHeaderBannerQueryKeys.slides() }),
+    queryClient.invalidateQueries({ queryKey: siteHeaderBannerQueryKeys.settings() }),
   ]);
 };

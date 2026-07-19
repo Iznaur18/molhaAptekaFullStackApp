@@ -69,6 +69,10 @@ export {
   rejectRaffleBodySchema,
   raffleProductsQuerySchema,
   setProductRaffleParticipationBodySchema,
+  RAFFLE_DESCRIPTION_MAX_LENGTH,
+  RAFFLE_TITLE_MAX_LENGTH,
+  RAFFLE_TARGET_SALES_MIN,
+  RAFFLE_TARGET_SALES_MAX,
 } from "./raffle.js";
 export { updateProfileBodySchema } from "./userProfile.js";
 export {

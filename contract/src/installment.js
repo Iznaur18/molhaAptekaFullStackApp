@@ -76,6 +76,11 @@ export const createInstallmentContractBodySchema = z.object({
     .optional()
     .default(""),
   paymentMethod: z.enum(ORDER_PAYMENT_METHODS),
+  passportShareConsent: z.literal(true, {
+    errorMap: () => ({
+      message: "Нужно разрешение на передачу паспортных данных продавцу",
+    }),
+  }),
 });
 
 export const installmentContractIdParamsSchema = z.object({

@@ -68,17 +68,11 @@
   --product-card-promotion-accent: var(--product-card-banner-accent);
   --product-card-promotion-accent-soft: var(--product-card-banner-accent-soft);
 
-  border: 2px solid
-    color-mix(in srgb, var(--product-card-banner-accent) 72%, transparent);
-  background: linear-gradient(
-    165deg,
-    color-mix(in srgb, var(--product-card-banner-gradient-end) 92%, var(--product-card-banner-accent-soft)),
-    color-mix(in srgb, var(--iz-color-surface) 88%, var(--product-card-banner-accent-soft))
-  );
+  border: 2px solid var(--iz-color-border);
+  background: var(--iz-color-surface);
   box-shadow:
-    0 0 0 1px
-      color-mix(in srgb, var(--product-card-banner-accent-soft) 40%, transparent),
-    0 6px 24px color-mix(in srgb, var(--product-card-banner-accent) 18%, transparent);
+    0 0 0 1px color-mix(in srgb, var(--iz-color-border) 40%, transparent),
+    0 4px 12px color-mix(in srgb, var(--iz-color-text) 6%, transparent);
 }
 
 .product-card-promotion-frame--tier-1 > .product-card:hover,
@@ -130,11 +124,7 @@
 
 .product-card-promotion-frame.product-card-premium-frame.product-card-promotion-frame--tier-3
   > .product-card {
-  background: linear-gradient(
-    165deg,
-    color-mix(in srgb, var(--product-card-banner-gradient-end) 88%, var(--product-card-banner-accent-soft)),
-    color-mix(in srgb, var(--iz-color-surface) 84%, var(--product-card-banner-accent-soft))
-  );
+  background: var(--iz-color-surface);
 }
 
 .product-card--raffle-participant {

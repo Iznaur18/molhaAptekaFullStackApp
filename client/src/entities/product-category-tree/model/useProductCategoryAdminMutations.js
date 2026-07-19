@@ -27,11 +27,7 @@ export function useProductCategoryAdminMutations() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: ({ categoryId, reassignProductCategoryId, detachProducts }) =>
-      deleteProductCategoryAdmin(categoryId, {
-        reassignProductCategoryId,
-        detachProducts,
-      }),
+    mutationFn: ({ categoryId }) => deleteProductCategoryAdmin(categoryId),
     onSuccess: invalidateCatalogCategorySurfaces,
   });
 

@@ -1,4 +1,4 @@
-import { CREATE_PRODUCT_UI, PRODUCT_PROMOTION_UI } from "@/shared/config";
+import { PRODUCT_PROMOTION_UI } from "@/shared/config";
 import { ModalSectionTabs } from "@/shared/ui/ModalSectionTabs";
 
 import {
@@ -24,7 +24,7 @@ export const ProductPromotionModalTabs = ({
   if (showManageTab) {
     tabs.push({
       id: PRODUCT_PROMOTION_MODAL_TAB_MANAGE,
-      label: CREATE_PRODUCT_UI.MANAGE_SECTION_TITLE,
+      label: PRODUCT_PROMOTION_UI.TAB_MANAGE,
     });
   }
 
@@ -34,7 +34,7 @@ export const ProductPromotionModalTabs = ({
       activeTabId={activeTabId}
       onTabChange={onTabChange}
       ariaLabel={PRODUCT_PROMOTION_UI.TABS_ARIA}
-      variant="inHeader"
+      variant="segment"
     />
   );
 };

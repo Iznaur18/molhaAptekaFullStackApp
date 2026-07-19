@@ -24,9 +24,13 @@ test("catalog browser opens subcategory picker before leaf category products", (
   assert.match(hook, /fetchCategoryChildren/);
   assert.match(hook, /categoryId/);
   assert.match(hook, /openPickerForCategory/);
-  assert.match(picker, /SUBCATEGORY_BACK/);
-  assert.match(picker, /view-all:/);
+  assert.match(page, /EditCategoryNodeDisplayModal/);
+  assert.match(page, /editingCategoryNode/);
+  assert.match(picker, /onEditCategoryPress/);
+  assert.match(picker, /isAdmin/);
+  assert.match(picker, /SUBCATEGORY_NODE_EDIT_ARIA/);
   assert.match(tiles, /SUBCATEGORY_VIEW_ALL/);
+  assert.match(tiles, /isEditable: true/);
 });
 
 test("home catalog consumes categoryId from pending filters", () => {

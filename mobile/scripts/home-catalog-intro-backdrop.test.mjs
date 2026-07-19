@@ -80,15 +80,17 @@ test("home feed tab bar reveals on scroll past intro hero", () => {
   assert.match(tabBar, /translateY/);
 });
 
-test("home feed index locks top overscroll for intro video", () => {
+test("home feed index enables bounce for pull-to-refresh", () => {
   const index = readMobileFile("app/(tabs)/index.tsx");
   const scrollProps = readMobileFile("features/home-feed/lib/homeCatalogFeedListScrollProps.ts");
+  const invalidate = readMobileFile("features/home-feed/model/invalidateHomeFeedQueries.ts");
 
   assert.match(index, /homeCatalogFeedListScrollProps/);
-  assert.match(index, /resolveHomeCatalogFeedListStyle/);
-  assert.match(scrollProps, /bounces: false/);
-  assert.match(scrollProps, /overScrollMode: "never"/);
-  assert.match(scrollProps, /overscrollBehavior: "none"/);
+  assert.match(index, /ThemedRefreshControl/);
+  assert.match(index, /isPullRefreshing/);
+  assert.match(scrollProps, /bounces: true/);
+  assert.match(scrollProps, /alwaysBounceVertical: true/);
+  assert.match(invalidate, /siteHeaderBannerQueryKeys\.slides/);
 });
 
 test("home feed index still mounts HomeCatalogPrimaryBackdrop", () => {

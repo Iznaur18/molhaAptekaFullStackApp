@@ -41,26 +41,18 @@ export function useProductCardChromeFlags(props, currentUserId) {
     isMineMode,
     isModerationQueue,
   });
-  const showTier3BannerPreview =
-    isMineMode &&
-    promotionFullWidth &&
-    isPromotionActive &&
-    promotionTier === PRODUCT_PROMOTION_TIER_BANNER;
   const showPromotionChrome =
-    (highlightCatalogPromotion &&
-      !isMineMode &&
-      !isModerationQueue &&
-      isPromotionActive &&
-      promotionTier > 0) ||
-    showTier3BannerPreview;
+    highlightCatalogPromotion &&
+    !isMineMode &&
+    !isModerationQueue &&
+    isPromotionActive &&
+    promotionTier > 0;
   const showPromotionBoostBadge =
     showPromotionChrome && promotionTier === PRODUCT_PROMOTION_TIER_GOLD;
   const showPromotionTopBadge =
     showPromotionChrome && promotionTier === PRODUCT_PROMOTION_TIER_TOP;
   const showPromotionBannerBadge =
-    showPromotionChrome &&
-    promotionTier === PRODUCT_PROMOTION_TIER_BANNER &&
-    !(isMineMode && isPromotionActive);
+    showPromotionChrome && promotionTier === PRODUCT_PROMOTION_TIER_BANNER;
   const showRaffleBadge = !isModerationQueue && isProductRaffleParticipant(product);
   const showAuctionBadge = !isModerationQueue && auctionActive;
   const showInstallmentBadge =

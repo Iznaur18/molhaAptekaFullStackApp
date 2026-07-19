@@ -25,6 +25,7 @@ import {
   resolveOrderLineItemProductName,
 } from "../lib/resolveOrderLineItemProductName.js";
 import { OrderCardLineItemThumb } from "./OrderCardLineItemThumb.jsx";
+import { BuyerPassportSharePanel } from "../../installment/ui/BuyerPassportSharePanel.jsx";
 import { formatIsoDateTime } from "../../../shared/lib/formatIsoDateTime.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 
@@ -435,12 +436,17 @@ export function OrderCard({
       {isExpanded ? (
         <>
           {compact ? null : (
-            <OrderCardMeta
-              order={order}
-              showBuyer={showBuyer}
-              onBuyerNameClick={onBuyerNameClick}
-              isInstallmentOrder={isInstallmentOrder}
-            />
+            <>
+              <OrderCardMeta
+                order={order}
+                showBuyer={showBuyer}
+                onBuyerNameClick={onBuyerNameClick}
+                isInstallmentOrder={isInstallmentOrder}
+              />
+              {showBuyer && order.buyerPassportShare ? (
+                <BuyerPassportSharePanel share={order.buyerPassportShare} />
+              ) : null}
+            </>
           )}
 
           <h3 className="order-card__items-heading">{ORDER_CARD_UI.ITEMS_HEADING}</h3>
@@ -467,6 +473,9 @@ export function OrderCard({
                   onBuyerNameClick={onBuyerNameClick}
                   isInstallmentOrder={isInstallmentOrder}
                 />
+                {showBuyer && order.buyerPassportShare ? (
+                  <BuyerPassportSharePanel share={order.buyerPassportShare} />
+                ) : null}
                 {order.items.map((item, index) => (
                   <OrderCardLineItem
                     key={`${order._id}-extras-${index}`}

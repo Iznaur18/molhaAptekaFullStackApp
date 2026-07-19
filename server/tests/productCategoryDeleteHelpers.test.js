@@ -3,6 +3,7 @@ import test from "node:test";
 
 import {
   collectCategoryLegacySlugs,
+  countProductsBlockingCategorySubtree,
   resolveLegacySlugForDetachedProducts,
 } from "../utils/productCategoryDeleteHelpers.js";
 
@@ -31,4 +32,9 @@ test("resolveLegacySlugForDetachedProducts falls back to leaf slug", async () =>
   });
 
   assert.equal(slug, "electronics-phones-mobile-feature");
+});
+
+test("countProductsBlockingCategorySubtree returns 0 for empty subtree", async () => {
+  const count = await countProductsBlockingCategorySubtree([]);
+  assert.equal(count, 0);
 });

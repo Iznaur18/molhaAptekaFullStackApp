@@ -6,7 +6,6 @@ import {
   patchProductCategoryAdmin,
 } from "@/entities/product-category-tree/api/categoryAdminMutationsApi";
 import type { ProductCategoryAdminWritePayload } from "@/entities/product-category-tree/model/adminTypes";
-import type { DeleteProductCategoryOptions } from "@/entities/product-category-tree/api/categoryAdminMutationsApi";
 
 export const useProductCategoryAdminMutations = () => {
   const createMutation = useMutation({
@@ -24,13 +23,7 @@ export const useProductCategoryAdminMutations = () => {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: ({
-      categoryId,
-      options,
-    }: {
-      categoryId: string;
-      options?: DeleteProductCategoryOptions;
-    }) => deleteProductCategoryAdmin(categoryId, options),
+    mutationFn: ({ categoryId }: { categoryId: string }) => deleteProductCategoryAdmin(categoryId),
   });
 
   return { createMutation, patchMutation, deleteMutation };

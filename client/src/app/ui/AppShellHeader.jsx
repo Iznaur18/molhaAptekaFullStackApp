@@ -1,9 +1,6 @@
 import { useEffect, useRef } from "react";
 
-import {
-  PRODUCT_CATEGORIES,
-  PRODUCT_CATEGORY_LABEL_RU,
-} from "../../entities/product/model/productConstants.js";
+import { useProductCategoryRootsQuery } from "../../entities/product-category-tree/model/useProductCategoryRootsQuery.js";
 import { CatalogCategoryFilterButton } from "../../widgets/catalog-category-filter-button/ui/CatalogCategoryFilterButton.jsx";
 import { CatalogMenuButton } from "../../widgets/catalog-menu-button/ui/CatalogMenuButton.jsx";
 import { HeaderCartButton } from "../../widgets/header-cart-button/ui/HeaderCartButton.jsx";
@@ -33,6 +30,19 @@ import { useScrollLock } from "../../shared/lib/useScrollLock.js";
 import { SearchInput } from "../../shared/ui/SearchInput/SearchInput.jsx";
 import { SiteHeaderBannerCarousel } from "../../entities/site-header-banner/ui/SiteHeaderBannerCarousel.jsx";
 import { useSiteHeaderBannerSlidesQuery } from "../../entities/site-header-banner/model/useSiteHeaderBannerSlidesQuery.js";
+
+/**
+ * @param {import('../../entities/product-category-tree/model/types.js').ProductCategoryNode} root
+ */
+function getCatalogHeaderFilterCategoryValue(root) {
+  if (
+    typeof root.legacyProductCategory === "string" &&
+    root.legacyProductCategory.trim()
+  ) {
+    return root.legacyProductCategory.trim();
+  }
+  return root.slug;
+}
 
 const PRODUCT_CATEGORY_FILTER_LIST_ID = HOME_PAGE_UI.PRODUCT_CATEGORY_FILTER_LIST_ID;
 
@@ -309,6 +319,11 @@ function CatalogHeaderFilter({
   onProductCategorySelect,
   productCategoryFilterRef,
 }) {
+  const categoryRootsQuery = useProductCategoryRootsQuery({
+    enabled: !isPublicCatalogHeader,
+  });
+  const categoryRoots = categoryRootsQuery.data ?? [];
+
   return (
     <div
       className={[
@@ -346,17 +361,21 @@ function CatalogHeaderFilter({
                   {HOME_PAGE_UI.CATEGORY_ALL}
                 </button>
               </li>
-              {PRODUCT_CATEGORIES.map((category) => (
-                <li key={category} className="app-shell__category-item">
-                  <button
-                    type="button"
-                    className="app-shell__category-option"
-                    onClick={() => onProductCategorySelect(category)}
-                  >
-                    {PRODUCT_CATEGORY_LABEL_RU[category]}
-                  </button>
-                </li>
-              ))}
+              {categoryRoots.map((root) => {
+                const categoryValue = getCatalogHeaderFilterCategoryValue(root);
+
+                return (
+                  <li key={root.id} className="app-shell__category-item">
+                    <button
+                      type="button"
+                      className="app-shell__category-option"
+                      onClick={() => onProductCategorySelect(categoryValue)}
+                    >
+                      {root.labelRu || root.slug}
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           ) : null}
         </>

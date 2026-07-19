@@ -6,7 +6,7 @@ const DATE_FORMAT = new Intl.DateTimeFormat("ru-RU", {
   dateStyle: "medium",
 });
 
-export const formatPassportDate = (iso: string | undefined | null) => {
+export const formatPassportDate = (iso: string | Date | undefined | null) => {
   if (iso == null || iso === "") {
     return EM_DASH;
   }

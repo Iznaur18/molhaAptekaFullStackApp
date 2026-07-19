@@ -56,6 +56,28 @@ export const isCategoryStructureChanged = (
   String(draft.labelRu ?? "") !== row.labelRu ||
   String(draft.parentId ?? "") !== String(row.parentId ?? "");
 
+export const collectCategorySubtreeIdsFromRows = <
+  T extends { _id: string; parentId: string | null },
+>(
+  rootId: string,
+  rows: T[],
+): Set<string> => {
+  const ids = new Set([String(rootId)]);
+  let grew = true;
+  while (grew) {
+    grew = false;
+    for (const row of rows) {
+      const id = String(row._id);
+      const parentId = row.parentId ? String(row.parentId) : "";
+      if (parentId && ids.has(parentId) && !ids.has(id)) {
+        ids.add(id);
+        grew = true;
+      }
+    }
+  }
+  return ids;
+};
+
 export const findAnyLeafForReassign = <
   T extends {
     _id: string;

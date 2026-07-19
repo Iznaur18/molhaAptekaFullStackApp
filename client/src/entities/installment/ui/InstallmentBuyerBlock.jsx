@@ -11,8 +11,10 @@ import {
 } from "../../order/model/constants.js";
 import { useInstallmentMutations } from "../model/useInstallmentMutations.js";
 import { INSTALLMENT_UI } from "../../../shared/config/appUiCopy.js";
+import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 import { useAppShellCompactLayout } from "../../../shared/lib/useAppShellCompactLayout.js";
 import { getProductPurchaseLimit } from "../../product/lib/getProductPurchaseLimit.js";
+import { InstallmentPassportShareConsentModal } from "./InstallmentPassportShareConsentModal.jsx";
 
 import "./InstallmentBuyerBlock.css";
 
@@ -53,6 +55,7 @@ export function InstallmentBuyerBlock({
   const isSubmitting = createContractMutation.isPending;
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isConsentOpen, setIsConsentOpen] = useState(false);
 
   const purchaseLimit = getProductPurchaseLimit(product);
   const selectedPlan = program.plans.find(
@@ -68,18 +71,14 @@ export function InstallmentBuyerBlock({
     setSelectedPlanId(program.plans[0]?._id ?? "");
   }, [program.plans]);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setError("");
-    setSuccess("");
-
+  const validateCheckoutForm = () => {
     if (!isAuthorized) {
       onRequestLogin?.();
-      return;
+      return false;
     }
     if (!isUserDataConfirmed) {
       setError(INSTALLMENT_UI.BUYER_REQUIRES_CONFIRMED);
-      return;
+      return false;
     }
 
     const addressError = validateRuDeliveryAddressForm(deliveryAddress, {
@@ -87,13 +86,28 @@ export function InstallmentBuyerBlock({
     });
     if (addressError) {
       setError(addressError);
-      return;
+      return false;
     }
     if (!selectedPlanId) {
       setError(INSTALLMENT_UI.SELECT_PLAN);
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    setError("");
+    setSuccess("");
+    if (!validateCheckoutForm()) {
       return;
     }
+    setIsConsentOpen(true);
+  };
 
+  const handleConsentConfirm = async () => {
+    setError("");
+    setSuccess("");
     try {
       await createContractMutation.mutateAsync({
         productId: String(product._id),
@@ -103,11 +117,14 @@ export function InstallmentBuyerBlock({
           deliveryAddress: deliveryAddress.line,
           deliveryAddressFlat: "",
           paymentMethod,
+          passportShareConsent: true,
         },
       });
+      setIsConsentOpen(false);
       setSuccess(INSTALLMENT_UI.CONTRACT_SUCCESS);
       onSuccess?.();
     } catch (e) {
+      setIsConsentOpen(false);
       setError(e instanceof Error ? e.message : INSTALLMENT_UI.ERROR_GENERIC);
     }
   };
@@ -269,6 +286,14 @@ export function InstallmentBuyerBlock({
         {!dockSubmit ? renderSubmitButton(false) : null}
       </form>
       {dockedSubmit}
+      <InstallmentPassportShareConsentModal
+        isOpen={isConsentOpen}
+        isConfirming={isSubmitting}
+        onClose={() => setIsConsentOpen(false)}
+        onConfirm={() => {
+          void handleConsentConfirm();
+        }}
+      />
     </section>
   );
 }

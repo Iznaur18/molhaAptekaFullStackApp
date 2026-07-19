@@ -4,6 +4,7 @@ import { checkAuthMW, checkAuthMeMW } from "./checkAuthMW.js";
 import { checkOptionalAuthMW } from "./checkOptionalAuthMW.js";
 import { checkAdminMW } from "./checkAdminMW.js";
 import { checkProductModeratorMW } from "./checkProductModeratorMW.js";
+import { checkPrivateUploadAccessMW } from "./checkPrivateUploadAccessMW.js";
 import {
   generalRateLimiter,
   authRateLimiter,
@@ -44,6 +45,7 @@ export {
   checkOptionalAuthMW,
   checkAdminMW,
   checkProductModeratorMW,
+  checkPrivateUploadAccessMW,
   csrfCookieOriginCheckMW,
   generalRateLimiter,
   authRateLimiter,

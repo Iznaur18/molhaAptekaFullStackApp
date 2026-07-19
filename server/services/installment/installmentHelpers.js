@@ -35,11 +35,13 @@ import mongoose from "mongoose";
 import { INSTALLMENT_COUNTERPARTY_PUBLIC_SELECT } from "../../constants/installmentConstants.js";
 import {
   InstallmentContractModel,
+  OrderModel,
   ProductInstallmentProgramModel,
   ProductModel,
   UserModel,
 } from "../../models/index.js";
 import { createUserInAppNotification } from "../user/userInAppNotifications.js";
+import { isInstallmentOrderAcceptedBySeller } from "./installmentOrderAcceptGate.js";
 
 const ACTIVE_CONTRACT_STATUSES = [
   INSTALLMENT_CONTRACT_STATUS_PENDING_FIRST_PAYMENT,
@@ -855,8 +857,29 @@ export const countInstallmentBuyerActionItems = async (buyerUserId) => {
     status: { $in: ACTIVE_CONTRACT_STATUSES },
   });
 
+  const orderIds = [
+    ...new Set(
+      contracts
+        .map((row) => (row.orderId ? String(row.orderId) : ""))
+        .filter(Boolean),
+    ),
+  ];
+  const orders =
+    orderIds.length > 0
+      ? await OrderModel.find({ _id: { $in: orderIds } })
+          .select("status items.status")
+          .lean()
+      : [];
+  const orderById = new Map(orders.map((order) => [String(order._id), order]));
+
   let count = 0;
   for (const contract of contracts) {
+    const order = contract.orderId
+      ? orderById.get(String(contract.orderId))
+      : null;
+    if (!isInstallmentOrderAcceptedBySeller(order)) {
+      continue;
+    }
     await repairInstallmentPaymentStatusDrift(contract);
     recomputeContractOverdueFlags(contract);
     for (const payment of contract.payments ?? []) {
@@ -877,8 +900,29 @@ export const countInstallmentSellerActionItems = async (sellerUserId) => {
     status: { $in: ACTIVE_CONTRACT_STATUSES },
   });
 
+  const orderIds = [
+    ...new Set(
+      contracts
+        .map((row) => (row.orderId ? String(row.orderId) : ""))
+        .filter(Boolean),
+    ),
+  ];
+  const orders =
+    orderIds.length > 0
+      ? await OrderModel.find({ _id: { $in: orderIds } })
+          .select("status items.status")
+          .lean()
+      : [];
+  const orderById = new Map(orders.map((order) => [String(order._id), order]));
+
   let count = 0;
   for (const contract of contracts) {
+    const order = contract.orderId
+      ? orderById.get(String(contract.orderId))
+      : null;
+    if (!isInstallmentOrderAcceptedBySeller(order)) {
+      continue;
+    }
     await repairInstallmentPaymentStatusDrift(contract);
     recomputeContractOverdueFlags(contract);
     if (isEarlyPayoffPendingConfirmation(contract)) {

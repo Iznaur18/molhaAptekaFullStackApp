@@ -114,6 +114,7 @@ export default function CatalogScreen() {
   const { height: windowHeight } = useWindowDimensions();
   const [searchInput, setSearchInput] = useState("");
   const [submittedSearch, setSubmittedSearch] = useState("");
+  const [isPullRefreshing, setIsPullRefreshing] = useState(false);
   const [selectedRootSlug, setSelectedRootSlug] = useState<string | null>(null);
   const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<string | null>(null);
   const [selectedSellerPersonalCategoryId, setSelectedSellerPersonalCategoryId] = useState<
@@ -369,6 +370,7 @@ export default function CatalogScreen() {
   );
 
   const handleRefresh = useCallback(async () => {
+    setIsPullRefreshing(true);
     try {
       const tasks: Promise<unknown>[] = [catalogQuery.refetch()];
       if (showHomeFeed) {
@@ -377,10 +379,12 @@ export default function CatalogScreen() {
       await Promise.all(tasks);
     } catch {
       // individual queries surface errors via query state
+    } finally {
+      setIsPullRefreshing(false);
     }
   }, [catalogQuery, queryClient, showHomeFeed]);
 
-  const isRefreshing = catalogQuery.isRefetching;
+  const isRefreshing = isPullRefreshing || catalogQuery.isRefetching;
 
   const handleLoadMore = () => {
     if (catalogQuery.hasNextPage && !catalogQuery.isFetchingNextPage) {
@@ -675,7 +679,6 @@ export default function CatalogScreen() {
                         homeFeedCenteredWidthStyle,
                       ]}
                       scrollEnabled={introTransition.scrollEnabled}
-                      onScroll={introTransition.onListScroll}
                       {...homeCatalogFeedListScrollProps}
                       {...homeCatalogFeedListPerformanceProps}
                       refreshControl={

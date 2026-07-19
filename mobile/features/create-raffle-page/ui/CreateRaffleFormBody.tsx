@@ -1,4 +1,8 @@
 import { ActivityIndicator, Pressable, Text, TextInput, View } from "react-native";
+import {
+  RAFFLE_DESCRIPTION_MAX_LENGTH,
+  RAFFLE_TITLE_MAX_LENGTH,
+} from "@molha/api-contract";
 
 import {
   RAFFLE_PRIZE_MEDIA_TYPE_IMAGE,
@@ -112,7 +116,7 @@ export const CreateRaffleFormBody = ({
           <TextInput
             style={styles.input}
             value={form.title}
-            maxLength={120}
+            maxLength={RAFFLE_TITLE_MAX_LENGTH}
             onChangeText={(title) => onFormChange({ title })}
             editable={!isSubmitting}
           />
@@ -124,7 +128,7 @@ export const CreateRaffleFormBody = ({
           <TextInput
             style={[styles.input, styles.textarea]}
             value={form.description}
-            maxLength={4000}
+            maxLength={RAFFLE_DESCRIPTION_MAX_LENGTH}
             multiline
             onChangeText={(description) => onFormChange({ description })}
             editable={!isSubmitting}

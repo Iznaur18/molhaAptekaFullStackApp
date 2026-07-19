@@ -14,6 +14,7 @@ import {
   type OrderPaymentMethod,
 } from "@/entities/order/model/constants";
 import { CheckoutPaymentMethodPicker } from "@/features/checkout/ui/CheckoutPaymentMethodPicker";
+import { InstallmentPassportShareConsentModal } from "@/entities/installment/ui/InstallmentPassportShareConsentModal";
 import { INSTALLMENT_UI, PRODUCT_UI } from "@/shared/config";
 import { formatPriceRub } from "@/shared/lib";
 import { textInputFocusScrollProps } from "@/shared/lib/scrollTextInputIntoViewOnFocus";
@@ -69,30 +70,33 @@ export const ProductInstallmentTab = ({
   );
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [isConsentOpen, setIsConsentOpen] = useState(false);
 
-  const handleSubmit = useCallback(async () => {
-    setErrorMessage("");
-    setSuccessMessage("");
-
+  const validateCheckoutForm = useCallback(() => {
     if (!isAuthorized) {
       setErrorMessage(INSTALLMENT_UI.BUYER_REQUIRES_CONFIRMED);
-      return;
+      return false;
     }
     if (!isUserDataConfirmed) {
       setErrorMessage(INSTALLMENT_UI.BUYER_REQUIRES_CONFIRMED);
-      return;
+      return false;
     }
     if (!selectedPlanId) {
       setErrorMessage(INSTALLMENT_UI.SELECT_PLAN);
-      return;
+      return false;
     }
 
     const addressError = validateRuDeliveryAddressForm(deliveryAddress, { required: true });
     if (addressError) {
       setErrorMessage(addressError);
-      return;
+      return false;
     }
+    return true;
+  }, [deliveryAddress, isAuthorized, isUserDataConfirmed, selectedPlanId]);
 
+  const handleConsentConfirm = useCallback(async () => {
+    setErrorMessage("");
+    setSuccessMessage("");
     const qty = Math.max(1, Number.parseInt(quantity, 10) || 1);
 
     try {
@@ -104,22 +108,32 @@ export const ProductInstallmentTab = ({
           deliveryAddress: deliveryAddress.line.trim(),
           deliveryAddressFlat: deliveryAddress.flat.trim() || undefined,
           paymentMethod,
+          passportShareConsent: true,
         },
       });
+      setIsConsentOpen(false);
       setSuccessMessage(INSTALLMENT_UI.CONTRACT_SUCCESS);
     } catch (error) {
+      setIsConsentOpen(false);
       setErrorMessage(error instanceof Error ? error.message : INSTALLMENT_UI.ERROR_GENERIC);
     }
   }, [
     createInstallmentContract,
     deliveryAddress,
-    isAuthorized,
-    isUserDataConfirmed,
     paymentMethod,
     productId,
     quantity,
     selectedPlanId,
   ]);
+
+  const handleSubmit = useCallback(() => {
+    setErrorMessage("");
+    setSuccessMessage("");
+    if (!validateCheckoutForm()) {
+      return;
+    }
+    setIsConsentOpen(true);
+  }, [validateCheckoutForm]);
 
   const handleSubmitRef = useRef(handleSubmit);
   handleSubmitRef.current = handleSubmit;
@@ -290,6 +304,15 @@ export const ProductInstallmentTab = ({
 
       {successMessage ? <Text style={styles.success}>{successMessage}</Text> : null}
       {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
+
+      <InstallmentPassportShareConsentModal
+        visible={isConsentOpen}
+        isConfirming={isCreateContractPending}
+        onClose={() => setIsConsentOpen(false)}
+        onConfirm={() => {
+          void handleConsentConfirm();
+        }}
+      />
     </View>
   );
 };

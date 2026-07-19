@@ -15,8 +15,10 @@ const modalSource = readFileSync(
 );
 
 assert.match(resolveSource, /displaySlug: string/);
-assert.match(resolveSource, /displaySlug,/);
+assert.match(resolveSource, /displaySlug: root\.slug/);
 assert.match(modalSource, /patchResolvedCategoryMutation/);
 assert.match(resolveSource, /mapCategoryDisplaysById/);
+assert.match(resolveSource, /Только корни из админ-дерева/);
+assert.doesNotMatch(resolveSource, /for \(const legacySlug of PRODUCT_CATEGORIES\)/);
 
 console.log("category-display-patch-slug.test.mjs: ok");

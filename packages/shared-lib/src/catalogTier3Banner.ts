@@ -34,7 +34,7 @@ export const shouldShowProductTier3BannerFullWidth = (
     return false;
   }
   if (isMineMode) {
-    return true;
+    return false;
   }
   return showFullWidthTier3Banners;
 };

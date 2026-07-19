@@ -65,14 +65,14 @@ export const resolveProductCardPromotionCompactFrame = (
   },
   [PRODUCT_CARD_PROMOTION_TIER.BANNER]: {
     borderWidth: 2,
-    borderColor: `${c.danger}b8`,
-    gradientStart: c.dangerSurface,
+    borderColor: c.border,
+    gradientStart: c.surface,
     gradientEnd: c.surface,
-    shadowColor: c.danger,
-    shadowOpacity: 0.18,
-    shadowRadius: 24,
-    shadowOffsetY: 6,
-    elevation: 4,
+    shadowColor: c.text,
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    shadowOffsetY: 4,
+    elevation: 2,
   },
 });
 
@@ -131,26 +131,26 @@ export const resolveProductCardPromotionPremiumCompactFrame = (
   },
   [PRODUCT_CARD_PROMOTION_TIER.BANNER]: {
     borderWidth: 2,
-    borderColor: c.warning,
-    gradientStart: c.dangerSurface,
+    borderColor: c.border,
+    gradientStart: c.surface,
     gradientEnd: c.surface,
-    shadowColor: c.danger,
-    shadowOpacity: 0.18,
-    shadowRadius: 24,
-    shadowOffsetY: 6,
-    elevation: 4,
+    shadowColor: c.text,
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    shadowOffsetY: 4,
+    elevation: 2,
   },
 });
 
-/** ProductCardBannerLayout.css — inner banner card (без красной обводки на mobile). */
+/** ProductCardBannerLayout.css — inner banner card (нейтральный fill, без danger wash). */
 export const resolveProductCardPromotionBannerInnerFrame = (c: ThemeColors) => {
   const soft = resolveProductCardSoftElevationShadow(c);
   return {
     borderWidth: 0,
     borderColor: "transparent",
     gradientStart: c.surface,
-    gradientMid: c.dangerSurface,
-    gradientEnd: c.dangerSurface,
+    gradientMid: c.surface,
+    gradientEnd: c.surface,
     shadowColor: soft.shadowColor,
     shadowOpacity: soft.shadowOpacity,
     shadowRadius: soft.shadowRadius,

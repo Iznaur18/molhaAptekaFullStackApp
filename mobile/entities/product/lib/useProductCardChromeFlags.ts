@@ -31,7 +31,6 @@ export const useProductCardChromeFlags = (
   return useMemo(() => {
     const promotionChrome = resolveProductCardPromotionChrome(product, {
       highlightCatalogPromotion,
-      promotionFullWidth,
       isMineMode,
       isModerationQueue,
     });

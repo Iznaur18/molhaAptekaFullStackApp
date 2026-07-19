@@ -15,6 +15,7 @@ import { resolveOrderLineItemName } from "@/entities/order/lib/resolveOrderLineI
 import { resolveOrderStatusBadgeStyle } from "@/entities/order/lib/resolveOrderStatusBadgeStyle";
 import { resolveOrderStatusLabelRu } from "@/entities/order/lib/resolveOrderStatusLabelRu";
 import { OrderCardLineItemThumb } from "@/entities/order/ui/OrderCardLineItemThumb";
+import { BuyerPassportSharePanel } from "@/entities/installment/ui/BuyerPassportSharePanel";
 import {
   ORDER_PAYMENT_METHOD_LABEL_RU,
   ORDER_STATUS_DELIVERED,
@@ -48,6 +49,11 @@ type OrderCardOrder = {
     planTitle?: string;
     monthsCount?: number;
     monthlyPaymentRub?: number;
+  } | null;
+  buyerPassportShare?: {
+    passport?: Record<string, unknown>;
+    passportSelfiePhotoUrl?: string;
+    consentAt?: string | null;
   } | null;
   items?: { status?: string }[];
 };
@@ -441,12 +447,17 @@ export const OrderCard = ({
       {isExpanded ? (
         <>
           {!compact ? (
-            <OrderCardMeta
-              order={order}
-              showBuyer={showBuyer}
-              onBuyerNameClick={onBuyerNameClick}
-              isInstallmentOrder={isInstallmentOrder}
-            />
+            <>
+              <OrderCardMeta
+                order={order}
+                showBuyer={showBuyer}
+                onBuyerNameClick={onBuyerNameClick}
+                isInstallmentOrder={isInstallmentOrder}
+              />
+              {showBuyer && order.buyerPassportShare ? (
+                <BuyerPassportSharePanel share={order.buyerPassportShare} />
+              ) : null}
+            </>
           ) : null}
 
           <View style={styles.itemsList}>
@@ -469,6 +480,9 @@ export const OrderCard = ({
                     onBuyerNameClick={onBuyerNameClick}
                     isInstallmentOrder={isInstallmentOrder}
                   />
+                  {showBuyer && order.buyerPassportShare ? (
+                    <BuyerPassportSharePanel share={order.buyerPassportShare} />
+                  ) : null}
                   {items.map((item, index) =>
                     renderLineItemSecondary(item, index, { showName: true }),
                   )}

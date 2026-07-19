@@ -8,6 +8,7 @@ import { InstallmentContractCounterparty } from "./InstallmentContractCounterpar
 import { InstallmentContractCardSummary } from "./InstallmentContractCardSummary.jsx";
 import { InstallmentContractCardPayments } from "./InstallmentContractCardPayments.jsx";
 import { InstallmentContractProgressBar } from "./InstallmentContractProgressBar.jsx";
+import { BuyerPassportSharePanel } from "./BuyerPassportSharePanel.jsx";
 
 import "./InstallmentContractCard.css";
 
@@ -177,6 +178,10 @@ export function InstallmentContractCard({
           onUserClick={onCounterpartyClick}
         />
       )}
+
+      {role === "seller" && contract.buyerPassportShare ? (
+        <BuyerPassportSharePanel share={contract.buyerPassportShare} />
+      ) : null}
 
       {compact ? (
         <InstallmentContractCardSummary

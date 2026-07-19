@@ -1,11 +1,15 @@
 import { INSTALLMENT_CONTRACT_STATUS_PENDING_FIRST_PAYMENT } from "../../constants/installmentConstants.js";
-import { InstallmentContractModel } from "../../models/index.js";
+import { InstallmentContractModel, OrderModel } from "../../models/index.js";
 import { sortByPriorityStatusFirst } from "../../utils/sortByPriorityStatusFirst.js";
+import {
+  attachSellerBuyerPassportShareToContracts,
+} from "../order/buyerPassportShare.js";
 import {
   buildInstallmentContractPayloads,
   repairInstallmentPaymentStatusDrift,
   resolveInstallmentContractStatusQuery,
 } from "./installmentHelpers.js";
+import { isInstallmentContractVisibleInLists } from "./installmentOrderAcceptGate.js";
 
 /**
  * @param {{
@@ -30,11 +34,48 @@ export async function listInstallmentContracts({ userId, statusFilter, role }) {
     await repairInstallmentPaymentStatusDrift(row);
   }
 
+  const orderIds = [
+    ...new Set(
+      rows
+        .map((row) => (row.orderId ? String(row.orderId) : ""))
+        .filter(Boolean),
+    ),
+  ];
+  const orders =
+    orderIds.length > 0
+      ? await OrderModel.find({ _id: { $in: orderIds } })
+          .select("buyerPassportShare passportShareConsentAt status items.status")
+          .lean()
+      : [];
+  const orderById = new Map(orders.map((order) => [String(order._id), order]));
+
+  const visibleRows = rows.filter((row) => {
+    const orderId = row.orderId ? String(row.orderId) : "";
+    const order = orderId ? orderById.get(orderId) : null;
+    return isInstallmentContractVisibleInLists(row, order);
+  });
+
   const orderedRows = normalizedStatus
-    ? rows
-    : sortByPriorityStatusFirst(rows, {
+    ? visibleRows
+    : sortByPriorityStatusFirst(visibleRows, {
         priorityStatus: INSTALLMENT_CONTRACT_STATUS_PENDING_FIRST_PAYMENT,
       });
 
-  return buildInstallmentContractPayloads(orderedRows);
+  const payloads = await buildInstallmentContractPayloads(orderedRows);
+  const payloadsWithOrderStatus = payloads.map((payload) => {
+    const order = payload.orderId ? orderById.get(payload.orderId) : null;
+    return {
+      ...payload,
+      orderStatus: order?.status ? String(order.status) : null,
+    };
+  });
+
+  if (role !== "seller") {
+    return payloadsWithOrderStatus;
+  }
+
+  return attachSellerBuyerPassportShareToContracts(
+    payloadsWithOrderStatus,
+    orderById,
+  );
 }

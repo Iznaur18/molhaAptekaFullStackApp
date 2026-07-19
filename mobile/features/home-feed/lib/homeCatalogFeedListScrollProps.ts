@@ -1,10 +1,13 @@
 import { Platform, type StyleProp, type ViewStyle } from "react-native";
 
-/** На y=0 не даём тянуть ленту вниз — intro-видео остаётся на месте. */
+/**
+ * Bounce нужен для pull-to-refresh (`RefreshControl`).
+ * На web overscroll отключаем — иначе появляется rubber-band без нативного PTR.
+ */
 export const homeCatalogFeedListScrollProps = {
-  bounces: false,
-  alwaysBounceVertical: false,
-  overScrollMode: "never" as const,
+  bounces: true,
+  alwaysBounceVertical: true,
+  overScrollMode: "auto" as const,
 };
 
 /** Тюнинг виртуализации главной ленты — меньше off-screen mount. */

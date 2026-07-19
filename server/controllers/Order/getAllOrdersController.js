@@ -2,6 +2,7 @@ import { OrderModel } from "../../models/index.js";
 import { successRes } from "../../services/http/index.js";
 
 import { ORDER_BUYER_PUBLIC_FIELDS, ORDER_ITEMS_POPULATE } from "./orderQueries.js";
+import { sanitizeOrderForBuyerApi } from "../../services/order/buyerPassportShare.js";
 import { syncOrderStatusFromItems } from "../../services/order/orderStatus.js";
 
 const DEFAULT_PAGE = 1;
@@ -19,20 +20,25 @@ const buildOrdersQuery = ({ status }) => (status ? { status } : {});
 
 /** `GET /order/all` — все заказы (только админ), пагинация и опц. фильтр по `status`. */
 export const getAllOrdersController = async (req, res) => {
-const { page, limit, skip } = parsePagination(req.query);
-    const ordersQuery = buildOrdersQuery(req.query);
+  const { page, limit, skip } = parsePagination(req.query);
+  const ordersQuery = buildOrdersQuery(req.query);
 
-    const [orders, total] = await Promise.all([
-      OrderModel.find(ordersQuery)
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit)
-        .populate("userBuyerId", ORDER_BUYER_PUBLIC_FIELDS)
-        .populate(ORDER_ITEMS_POPULATE)
-        .lean(),
-      OrderModel.countDocuments(ordersQuery),
-    ]);
-    orders.forEach((order) => syncOrderStatusFromItems(order));
+  const [orders, total] = await Promise.all([
+    OrderModel.find(ordersQuery)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate("userBuyerId", ORDER_BUYER_PUBLIC_FIELDS)
+      .populate(ORDER_ITEMS_POPULATE)
+      .lean(),
+    OrderModel.countDocuments(ordersQuery),
+  ]);
+  orders.forEach((order) => syncOrderStatusFromItems(order));
 
-    return successRes(res, { orders, total, page, limit });
+  return successRes(res, {
+    orders: orders.map((order) => sanitizeOrderForBuyerApi(order)),
+    total,
+    page,
+    limit,
+  });
 };

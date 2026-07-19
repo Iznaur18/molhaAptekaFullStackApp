@@ -1,9 +1,11 @@
 import mongoose from "mongoose";
 
 import { AppError } from "../../errors/AppError.js";
-import { InstallmentContractModel, UserModel } from "../../models/index.js";
+import { InstallmentContractModel, OrderModel, UserModel } from "../../models/index.js";
 import { isUserAdmin } from "../access/adminUserGuard.js";
+import { INSTALLMENT_ORDER_NOT_ACCEPTED_BY_SELLER_MESSAGE } from "../../constants/installmentConstants.js";
 import { repairInstallmentPaymentStatusDrift } from "./installmentHelpers.js";
+import { isInstallmentOrderAcceptedBySeller } from "./installmentOrderAcceptGate.js";
 
 import { ACTIVE_INSTALLMENT_CONTRACT_STATUSES } from "./installmentContractConstants.js";
 
@@ -87,5 +89,24 @@ export const assertInstallmentParticipant = (userId, contract) => {
   const isSeller = String(contract.sellerUserId) === String(userId);
   if (!isBuyer && !isSeller) {
     throw new AppError(403, "Нет прав");
+  }
+};
+
+/**
+ * Платежи / early payoff только после seller «Принять» (shipped+).
+ *
+ * @param {import('mongoose').Document} contract
+ */
+export const assertInstallmentOrderAcceptedForPayments = async (contract) => {
+  const orderId = contract.orderId;
+  if (!orderId) {
+    throw new AppError(409, INSTALLMENT_ORDER_NOT_ACCEPTED_BY_SELLER_MESSAGE);
+  }
+
+  const order = await OrderModel.findById(orderId)
+    .select("status items.status")
+    .lean();
+  if (!isInstallmentOrderAcceptedBySeller(order)) {
+    throw new AppError(409, INSTALLMENT_ORDER_NOT_ACCEPTED_BY_SELLER_MESSAGE);
   }
 };

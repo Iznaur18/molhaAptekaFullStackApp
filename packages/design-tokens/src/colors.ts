@@ -1,3 +1,14 @@
+import {
+  formatHexColor,
+  hslToRgb,
+  mirrorLightness,
+  parseHexColor,
+  rgbToHsl,
+  setLightness,
+  shiftLightness,
+  toRgbCss,
+} from "./invertColorLightness.ts";
+
 /** Синхронизировано с client/src/shared/styles/designTokens.css (canonical v2) */
 const izColorsCanonical = {
   text: "#111827",
@@ -38,54 +49,101 @@ const izColorsCanonical = {
   focusRing: "rgb(31 111 235 / 15%)",
 } as const;
 
-/** Dark structural palette — chrome hues + white for readable text */
-const darkPalette = {
-  light: "#8589AC",
-  mid: "#596F9A",
-  deep: "#405577",
-  surface: "#303147",
-  bg: "#101115",
-  white: "#ffffff",
-} as const;
+/** Hard blues — identical in dark (brand/interactive). */
+export const DARK_THEME_HARD_BLUE_KEYS = [
+  "primary",
+  "action",
+  "actionHover",
+  "link",
+  "info",
+  "infoDeep",
+] as const;
 
-const izColorsDarkCanonical = {
-  text: darkPalette.white,
-  textMuted: darkPalette.light,
-  textSecondary: darkPalette.white,
-  textPlaceholder: darkPalette.mid,
-  ink: darkPalette.white,
-  bg: darkPalette.bg,
-  surface: darkPalette.surface,
-  surfaceMuted: darkPalette.deep,
-  surfaceElevated: darkPalette.deep,
-  onContrast: darkPalette.white,
-  primary: darkPalette.light,
-  action: darkPalette.mid,
-  actionHover: darkPalette.light,
-  actionSoft: darkPalette.deep,
-  actionBorder: darkPalette.mid,
-  link: darkPalette.light,
-  success: "#4ade80",
-  successSurface: "#064e3b",
-  successText: "#86efac",
-  warning: "#fbbf24",
-  warningSurface: "#422006",
-  warningText: "#fde68a",
-  danger: "#f87171",
-  dangerSurface: "#450a0a",
-  dangerText: "#fecaca",
-  info: "#38bdf8",
-  infoSoft: "#0c4a6e",
-  infoDeep: "#bfdbfe",
-  border: darkPalette.deep,
-  borderStrong: darkPalette.mid,
-  accent: darkPalette.light,
-  accentSoft: darkPalette.deep,
-  overlay: "rgb(16 17 21 / 55%)",
-  overlayStrong: "rgb(16 17 21 / 72%)",
-  overlaySubtle: "rgb(133 137 172 / 8%)",
-  focusRing: "rgb(89 111 154 / 25%)",
-} as const;
+const SOFT_BLUE_FILL_LIGHTNESS = 0.18;
+const SOFT_BLUE_BORDER_LIGHTNESS = 0.32;
+const STATUS_SOLID_BRIGHTEN = 0.14;
+const STATUS_TEXT_BRIGHTEN = 0.22;
+const FOCUS_RING_ALPHA = 0.22;
+const OVERLAY_ALPHA = 0.55;
+const OVERLAY_STRONG_ALPHA = 0.72;
+const OVERLAY_SUBTLE_ALPHA = 0.08;
+/** Keep cards above page bg after HSL mirror (white→black otherwise sinks under bg). */
+const SURFACE_ABOVE_BG = 0.06;
+const SURFACE_MUTED_ABOVE_BG = 0.03;
+const SURFACE_ELEVATED_ABOVE_BG = 0.08;
+
+const clamp01 = (value: number): number => Math.min(1, Math.max(0, value));
+
+const elevateAboveBg = (hex: string, bgHex: string, delta: number): string => {
+  const colorHsl = rgbToHsl(parseHexColor(hex));
+  const bgHsl = rgbToHsl(parseHexColor(bgHex));
+  const minLightness = clamp01(bgHsl.l + delta);
+  if (colorHsl.l >= minLightness) {
+    return hex;
+  }
+  return formatHexColor(hslToRgb({ ...colorHsl, l: minLightness }));
+};
+
+const buildDarkCanonicalFromLight = (
+  light: typeof izColorsCanonical,
+): Record<keyof typeof izColorsCanonical, string> => {
+  const bg = mirrorLightness(light.bg);
+  const text = mirrorLightness(light.text);
+
+  return {
+    text,
+    textMuted: mirrorLightness(light.textMuted),
+    textSecondary: mirrorLightness(light.textSecondary),
+    textPlaceholder: mirrorLightness(light.textPlaceholder),
+    ink: mirrorLightness(light.ink),
+    bg,
+    surface: elevateAboveBg(mirrorLightness(light.surface), bg, SURFACE_ABOVE_BG),
+    surfaceMuted: elevateAboveBg(
+      mirrorLightness(light.surfaceMuted),
+      bg,
+      SURFACE_MUTED_ABOVE_BG,
+    ),
+    surfaceElevated: elevateAboveBg(
+      mirrorLightness(light.surfaceElevated),
+      bg,
+      SURFACE_ELEVATED_ABOVE_BG,
+    ),
+    onContrast: light.onContrast,
+
+    primary: light.primary,
+    action: light.action,
+    actionHover: light.actionHover,
+    actionSoft: setLightness(light.actionSoft, SOFT_BLUE_FILL_LIGHTNESS),
+    actionBorder: setLightness(light.actionBorder, SOFT_BLUE_BORDER_LIGHTNESS),
+    link: light.link,
+
+    success: shiftLightness(light.success, STATUS_SOLID_BRIGHTEN),
+    successSurface: mirrorLightness(light.successSurface),
+    successText: shiftLightness(light.successText, STATUS_TEXT_BRIGHTEN),
+    warning: shiftLightness(light.warning, STATUS_SOLID_BRIGHTEN),
+    warningSurface: mirrorLightness(light.warningSurface),
+    warningText: shiftLightness(light.warningText, STATUS_TEXT_BRIGHTEN),
+    danger: shiftLightness(light.danger, STATUS_SOLID_BRIGHTEN),
+    dangerSurface: mirrorLightness(light.dangerSurface),
+    dangerText: shiftLightness(light.dangerText, STATUS_TEXT_BRIGHTEN),
+
+    info: light.info,
+    infoSoft: setLightness(light.infoSoft, SOFT_BLUE_FILL_LIGHTNESS),
+    infoDeep: light.infoDeep,
+
+    border: mirrorLightness(light.border),
+    borderStrong: mirrorLightness(light.borderStrong),
+    accent: light.accent,
+    accentSoft: mirrorLightness(light.accentSoft),
+
+    overlay: toRgbCss(bg, OVERLAY_ALPHA),
+    overlayStrong: toRgbCss(bg, OVERLAY_STRONG_ALPHA),
+    overlaySubtle: toRgbCss(text, OVERLAY_SUBTLE_ALPHA),
+    focusRing: toRgbCss(light.action, FOCUS_RING_ALPHA),
+  };
+};
+
+const izColorsDarkCanonical = buildDarkCanonicalFromLight(izColorsCanonical);
 
 /** @deprecated mobile compat — merged into canonical tokens */
 const izColorsCompat = {

@@ -106,8 +106,8 @@ export const resolveProductCardBannerChrome = (c: ThemeColors) =>
   ({
     accent: c.danger,
     accentHover: c.danger,
-    accentSoft: c.dangerSurface,
-    gradientEnd: c.dangerSurface,
+    accentSoft: c.surface,
+    gradientEnd: c.surface,
     imageAspectRatio: 1,
     outerRadius: 15,
     contentPaddingX: 12,

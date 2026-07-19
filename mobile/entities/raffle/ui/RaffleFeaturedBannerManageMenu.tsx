@@ -13,8 +13,12 @@ import { RAFFLE_MANAGE_UI } from "@/shared/config";
 import { useRaffleFeaturedBannerManageMenuStyles } from "@/shared/theme/raffleFeaturedStyles";
 
 const MENU_GAP = 4;
+const ACTION_AFTER_CLOSE_MS = 50;
 
-type RaffleFeaturedBannerManageMenuProps = FeaturedRaffleManage;
+type RaffleFeaturedBannerManageMenuProps = FeaturedRaffleManage & {
+  /** `inline` — без второго Modal (нужно внутри уже открытой модалки). */
+  placement?: "portal" | "inline";
+};
 
 type ManageMenuItem = {
   key: "edit" | "delete" | "pause";
@@ -31,6 +35,7 @@ export const RaffleFeaturedBannerManageMenu = ({
   onDelete,
   onPause,
   busy = false,
+  placement = "portal",
 }: RaffleFeaturedBannerManageMenuProps) => {
   const styles = useRaffleFeaturedBannerManageMenuStyles();
   const toggleRef = useRef<View>(null);
@@ -39,14 +44,19 @@ export const RaffleFeaturedBannerManageMenu = ({
 
   const closeMenu = useCallback(() => {
     setMenuOpen(false);
+    setMenuAnchor(null);
   }, []);
 
   const openMenu = useCallback(() => {
+    if (placement === "inline") {
+      setMenuOpen(true);
+      return;
+    }
     toggleRef.current?.measureInWindow((x, y, width, height) => {
       setMenuAnchor({ x, y, width, height });
       setMenuOpen(true);
     });
-  }, []);
+  }, [placement]);
 
   const handleToggleMenu = useCallback(() => {
     if (busy) {
@@ -62,7 +72,9 @@ export const RaffleFeaturedBannerManageMenu = ({
   const handleAction = useCallback(
     (action: () => void) => {
       closeMenu();
-      action();
+      setTimeout(() => {
+        action();
+      }, ACTION_AFTER_CLOSE_MS);
     },
     [closeMenu],
   );
@@ -97,19 +109,69 @@ export const RaffleFeaturedBannerManageMenu = ({
     return null;
   }
 
+  const menuItems = items.map((item, index) => {
+    const isLast = index === items.length - 1;
+    return (
+      <Pressable
+        key={item.key}
+        style={[
+          styles.menuItem,
+          item.tone === "edit" && styles.menuItemEdit,
+          item.tone === "delete" && styles.menuItemDelete,
+          item.tone === "pause" && styles.menuItemPause,
+          isLast && styles.menuItemLast,
+        ]}
+        onPress={() => handleAction(item.onPress)}
+      >
+        <Text
+          style={[
+            styles.menuItemText,
+            item.tone === "edit" && styles.menuItemTextEdit,
+            item.tone === "delete" && styles.menuItemTextDelete,
+            item.tone === "pause" && styles.menuItemTextPause,
+          ]}
+        >
+          {item.label}
+        </Text>
+      </Pressable>
+    );
+  });
+
+  const toggle = (
+    <Pressable
+      ref={toggleRef}
+      style={[styles.toggle, menuOpen && styles.toggleOpen, busy && styles.toggleDisabled]}
+      accessibilityRole="button"
+      accessibilityLabel={RAFFLE_MANAGE_UI.GROUP_LABEL}
+      accessibilityState={{ expanded: menuOpen, disabled: busy }}
+      disabled={busy}
+      onPress={handleToggleMenu}
+    >
+      <Text style={styles.toggleText}>⋯</Text>
+    </Pressable>
+  );
+
+  if (placement === "inline") {
+    return (
+      <View style={styles.inlineRoot}>
+        {toggle}
+        {menuOpen ? (
+          <>
+            <Pressable
+              style={styles.inlineDismiss}
+              onPress={closeMenu}
+              accessibilityLabel={RAFFLE_MANAGE_UI.MENU_CLOSE_ARIA}
+            />
+            <View style={styles.inlineMenu}>{menuItems}</View>
+          </>
+        ) : null}
+      </View>
+    );
+  }
+
   return (
     <>
-      <Pressable
-        ref={toggleRef}
-        style={[styles.toggle, menuOpen && styles.toggleOpen, busy && styles.toggleDisabled]}
-        accessibilityRole="button"
-        accessibilityLabel={RAFFLE_MANAGE_UI.GROUP_LABEL}
-        accessibilityState={{ expanded: menuOpen, disabled: busy }}
-        disabled={busy}
-        onPress={handleToggleMenu}
-      >
-        <Text style={styles.toggleText}>⋯</Text>
-      </Pressable>
+      {toggle}
 
       <Modal
         visible={menuOpen}
@@ -133,33 +195,7 @@ export const RaffleFeaturedBannerManageMenu = ({
               },
             ]}
           >
-            {items.map((item, index) => {
-              const isLast = index === items.length - 1;
-              return (
-                <Pressable
-                  key={item.key}
-                  style={[
-                    styles.menuItem,
-                    item.tone === "edit" && styles.menuItemEdit,
-                    item.tone === "delete" && styles.menuItemDelete,
-                    item.tone === "pause" && styles.menuItemPause,
-                    isLast && styles.menuItemLast,
-                  ]}
-                  onPress={() => handleAction(item.onPress)}
-                >
-                  <Text
-                    style={[
-                      styles.menuItemText,
-                      item.tone === "edit" && styles.menuItemTextEdit,
-                      item.tone === "delete" && styles.menuItemTextDelete,
-                      item.tone === "pause" && styles.menuItemTextPause,
-                    ]}
-                  >
-                    {item.label}
-                  </Text>
-                </Pressable>
-              );
-            })}
+            {menuItems}
           </View>
         ) : null}
       </Modal>

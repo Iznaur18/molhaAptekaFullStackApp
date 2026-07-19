@@ -5,6 +5,8 @@ import {
   RAFFLE_STATUS_PENDING_STAFF,
   RAFFLE_TARGET_SALES_MAX,
   RAFFLE_TARGET_SALES_MIN,
+  RAFFLE_DESCRIPTION_MAX_LENGTH,
+  RAFFLE_TITLE_MAX_LENGTH,
   RAFFLE_PRIZE_MEDIA_TYPES,
   RAFFLE_PRIZE_MEDIA_TYPE_IMAGE,
 } from "../constants/raffleConstants.js";
@@ -46,13 +48,13 @@ const RaffleSchema = new Schema(
       type: String,
       required: true,
       trim: true,
-      maxlength: 120,
+      maxlength: RAFFLE_TITLE_MAX_LENGTH,
     },
     description: {
       type: String,
       default: "",
       trim: true,
-      maxlength: 4000,
+      maxlength: RAFFLE_DESCRIPTION_MAX_LENGTH,
     },
     prizeImageUrl: {
       type: String,

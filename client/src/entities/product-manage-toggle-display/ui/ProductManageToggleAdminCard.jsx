@@ -100,8 +100,7 @@ export function ProductManageToggleAdminCard({
           title={title}
           description={description}
           checked={checked}
-          variant={variant}
-          imageUrl={draftImageUrl.trim() || imageUrl}
+          variant={variant === "installment" ? "default" : variant}
           disabled
         />
       </div>

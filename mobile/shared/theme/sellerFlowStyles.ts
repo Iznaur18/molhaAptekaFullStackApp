@@ -318,7 +318,7 @@ export const useProductEditorScreenStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
   },
   zoneInventory: {
-    backgroundColor: theme.colors.actionSurface,
+    backgroundColor: theme.colors.surface,
   },
   zoneMedia: {
     backgroundColor: theme.colors.surfaceMuted,

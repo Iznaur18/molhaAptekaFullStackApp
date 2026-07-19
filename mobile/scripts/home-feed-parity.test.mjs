@@ -30,11 +30,14 @@ test("curated home layout uses web card gap", () => {
 test("home catalog screen wires home-feed refresh", () => {
   const index = readMobileFile("app/(tabs)/index.tsx");
   const header = readMobileFile("features/home-feed/ui/HomeFeedHeader.tsx");
+  const invalidate = readMobileFile("features/home-feed/model/invalidateHomeFeedQueries.ts");
 
   assert.match(index, /invalidateHomeFeedQueries/);
+  assert.match(index, /ThemedRefreshControl/);
+  assert.match(index, /isPullRefreshing/);
   assert.match(index, /isHomeCuratedProductListsVisible/);
-  assert.match(index, /HOME_PAGE_UI\.BREADCRUMB_HOME/);
   assert.match(header, /showCuratedLists/);
+  assert.match(invalidate, /siteHeaderBannerQueryKeys/);
   assert.doesNotMatch(header, /CatalogCityFilterBanner/);
 });
 
@@ -80,18 +83,27 @@ test("stories strip section title matches curated list title chrome", () => {
   assert.match(curatedTitle, /letterSpacing:\s*-0\.4/);
 });
 
-test("raffle carousel section uses reveal toggle on home feed", () => {
+test("raffle section opens featured modal from reveal button", () => {
   const styles = readMobileFile("shared/theme/raffleFeaturedStyles.ts");
   const section = readMobileFile("features/home-feed/ui/HomeFeaturedRafflesSection.tsx");
   const reveal = readMobileFile("features/home-feed/ui/HomeFeaturedRafflesRevealButton.tsx");
-  const flow = readMobileFile("shared/ui/RainbowFlowBackdrop.tsx");
+  const modal = readMobileFile("features/home-feed/ui/HomeFeaturedRaffleModal.tsx");
+  const card = readMobileFile("entities/raffle/ui/FeaturedRaffleModalCard.tsx");
 
   assert.match(styles, /revealButton/);
+  assert.match(styles, /theme\.colors\.action/);
+  assert.match(styles, /useFeaturedRaffleModalStyles/);
   assert.match(section, /HomeFeaturedRafflesRevealButton/);
-  assert.match(section, /isExpanded/);
+  assert.match(section, /HomeFeaturedRaffleModal/);
+  assert.match(section, /isModalOpen/);
+  assert.doesNotMatch(section, /isExpanded/);
+  assert.doesNotMatch(section, /RaffleFeaturedCarousel/);
   assert.match(reveal, /HOME_FEED_UI\.SHOW_RAFFLES/);
-  assert.match(reveal, /HOME_FEED_UI\.HIDE_RAFFLES/);
-  assert.match(reveal, /RainbowFlowBackdrop/);
-  assert.match(flow, /raffle-reveal-rainbow/);
-  assert.match(flow, /saturate\(2\)/);
+  assert.doesNotMatch(reveal, /HIDE_RAFFLES/);
+  assert.doesNotMatch(reveal, /RainbowFlowBackdrop/);
+  assert.match(modal, /transparent/);
+  assert.match(modal, /FeaturedRaffleModalCard/);
+  assert.match(modal, /styles\.footerButton/);
+  assert.match(modal, /OPEN_PRODUCTS/);
+  assert.doesNotMatch(card, /OPEN_PRODUCTS/);
 });

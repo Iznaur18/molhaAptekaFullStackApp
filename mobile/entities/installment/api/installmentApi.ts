@@ -53,6 +53,11 @@ export type InstallmentContract = {
   buyer?: InstallmentCounterparty;
   seller?: InstallmentCounterparty;
   payments?: InstallmentPayment[];
+  buyerPassportShare?: {
+    passport?: Record<string, unknown>;
+    passportSelfiePhotoUrl?: string;
+    consentAt?: string | null;
+  } | null;
 };
 
 export const fetchProductInstallmentProgram = async (productId: string) => {
@@ -100,6 +105,7 @@ export const createInstallmentContract = async (
     deliveryAddress: string;
     deliveryAddressFlat?: string;
     paymentMethod: string;
+    passportShareConsent: true;
   },
 ) => {
   try {

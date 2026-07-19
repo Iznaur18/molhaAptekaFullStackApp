@@ -18,6 +18,7 @@ import {
   markOrderLineLoyaltyReserveReleased,
   releaseUnawardedLoyaltyReservesForOrder,
 } from "../../services/order/orderLoyaltyPoints.js";
+import { clearBuyerPassportShareOnOrder } from "../../services/order/buyerPassportShare.js";
 import {
   normalizeOrderDocumentForRuntime,
   normalizeOrderItemsForRuntime,
@@ -105,6 +106,7 @@ const { orderId } = req.params;
           item.confirmedBy = null;
         });
         order.status = status;
+        clearBuyerPassportShareOnOrder(order);
         await order.save({ session });
 
         await order.populate(ORDER_ITEMS_POPULATE);
