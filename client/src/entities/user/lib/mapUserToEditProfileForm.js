@@ -1,3 +1,5 @@
+import { USER_SOCIAL_LINK_FIELD_IDS } from "@molha/api-contract";
+
 import { addressStructuredValueFromUser } from "../../address/lib/addressStructuredValueFromUser.js";
 import { getUserAvatarFocus, getUserBackgroundFocus } from "./profileImageFocus.js";
 import { parseUserBackgroundFormFields } from "./userBackgroundValue.js";
@@ -24,6 +26,12 @@ import {
  * @property {string} backgroundImageUrl
  * @property {boolean} notificationsEnabled
  * @property {string} notesAboutUser
+ * @property {string} socialTelegramUrl
+ * @property {string} socialInstagramUrl
+ * @property {string} socialVkUrl
+ * @property {string} socialYoutubeUrl
+ * @property {string} socialWhatsappUrl
+ * @property {string} socialWebsiteUrl
  * @property {'user'|'admin'|'moderator'} userRole
  * @property {string} userDiscountPercent
  * @property {string} userLoyaltyPoints
@@ -44,6 +52,13 @@ export function mapUserToEditProfileForm(user) {
 
   const { presetId, imageUrl } = parseUserBackgroundFormFields(user.userBackgroundUrl);
 
+  /** @type {Record<string, string>} */
+  const socialLinks = {};
+  for (const fieldId of USER_SOCIAL_LINK_FIELD_IDS) {
+    const raw = user[fieldId];
+    socialLinks[fieldId] = typeof raw === "string" ? raw : "";
+  }
+
   return {
     userName: user.userName ?? "",
     userBirthDate: birthInput,
@@ -57,6 +72,7 @@ export function mapUserToEditProfileForm(user) {
     userBackgroundFocus: getUserBackgroundFocus(user),
     notificationsEnabled: Boolean(user.notificationsEnabled),
     notesAboutUser: user.notesAboutUser ?? "",
+    ...socialLinks,
     userRole: user.userRole ?? USER_ROLE_USER,
     userDiscountPercent:
       user.userDiscountPercent != null ? String(user.userDiscountPercent) : "0",

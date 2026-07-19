@@ -27,6 +27,7 @@ import { DEFAULT_USER_BACKGROUND_FOCUS } from "../lib/profileImageFocus.js";
 import { UserBackgroundPresetPicker } from "./UserBackgroundPresetPicker.jsx";
 import { UserBackgroundPreview } from "./UserBackgroundPreview.jsx";
 import { AdminPremiumStaffControl } from "./AdminPremiumStaffControl.jsx";
+import { EditProfileSocialLinksFields } from "./EditProfileSocialLinksFields.jsx";
 
 import "./EditProfileModal.css";
 
@@ -404,6 +405,14 @@ export function EditProfileModal({
                 )}
               </span>
             </label>
+            <EditProfileSocialLinksFields
+              form={form}
+              onChange={handleChange}
+              onClear={(fieldId) =>
+                setForm((prev) => ({ ...prev, [fieldId]: "" }))
+              }
+              disabled={isSubmitting}
+            />
           </div>
           <div className="edit-profile-modal__footer">
             <div className="edit-profile-modal__feedback">

@@ -236,6 +236,42 @@ const UserSchema = new mongoose.Schema(
       trim: true,
       maxlength: 500,
     },
+    socialTelegramUrl: {
+      type: String,
+      default: null,
+      trim: true,
+      maxlength: 500,
+    },
+    socialInstagramUrl: {
+      type: String,
+      default: null,
+      trim: true,
+      maxlength: 500,
+    },
+    socialVkUrl: {
+      type: String,
+      default: null,
+      trim: true,
+      maxlength: 500,
+    },
+    socialYoutubeUrl: {
+      type: String,
+      default: null,
+      trim: true,
+      maxlength: 500,
+    },
+    socialWhatsappUrl: {
+      type: String,
+      default: null,
+      trim: true,
+      maxlength: 500,
+    },
+    socialWebsiteUrl: {
+      type: String,
+      default: null,
+      trim: true,
+      maxlength: 500,
+    },
     userLoyaltyPoints: {
       // количество баллов лояльности
       type: Number,

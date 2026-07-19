@@ -22,6 +22,18 @@ const PROFILE_ROW_SECTIONS = [
     rowIds: ["userName", "email", "userPhoneNumber", "userAddress"],
   },
   {
+    id: "social",
+    title: "Соцсети",
+    rowIds: [
+      "socialTelegramUrl",
+      "socialInstagramUrl",
+      "socialVkUrl",
+      "socialYoutubeUrl",
+      "socialWhatsappUrl",
+      "socialWebsiteUrl",
+    ],
+  },
+  {
     id: "personal",
     title: "Личные данные",
     rowIds: ["userBirthDate", "userGender"],

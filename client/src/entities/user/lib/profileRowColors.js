@@ -2,6 +2,7 @@
 export const PROFILE_SECTION_TONES = {
   stats: "accent",
   identity: "accent",
+  social: "accent",
   personal: "calm",
   account: "calm",
   other: "calm",

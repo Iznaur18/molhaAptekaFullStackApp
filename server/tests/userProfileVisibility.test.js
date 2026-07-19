@@ -50,6 +50,20 @@ test("sanitizeUserProfileForViewer: self keeps phone and private fields", () => 
   assert.equal(out.email, "seller@example.com");
 });
 
+test("sanitizeUserProfileForViewer: guest keeps public social links", () => {
+  const out = sanitizeUserProfileForViewer(
+    {
+      ...TARGET,
+      socialTelegramUrl: "https://t.me/seller",
+      socialWebsiteUrl: "https://example.com",
+    },
+    { viewer: null, viewerId: null },
+  );
+  assert.equal(out.socialTelegramUrl, "https://t.me/seller");
+  assert.equal(out.socialWebsiteUrl, "https://example.com");
+  assert.equal(out.notesAboutUser, undefined);
+});
+
 test("sanitizeUsersSearchList: non-admin never gets phone", () => {
   const [row] = sanitizeUsersSearchList([TARGET], {
     viewer: { _id: "bbbbbbbbbbbbbbbbbbbbbbbb", userRole: "user" },

@@ -1,4 +1,8 @@
 import {
+  USER_SOCIAL_LINK_FIELDS,
+  formatSocialLinkDisplay,
+} from "@molha/api-contract";
+import {
   formatSearchRowTotalSales,
   formatSearchRowTotalSalesCount,
 } from "@/entities/user/lib/formatSearchRowTotalSales";
@@ -91,6 +95,25 @@ export const getUserProfileRows = (
     | null
     | undefined;
 
+  const socialRows: ProfileRow[] = USER_SOCIAL_LINK_FIELDS.flatMap((field) => {
+    const raw = user[field.id];
+    if (typeof raw !== "string" || raw.trim() === "") {
+      return [];
+    }
+    const href = raw.trim();
+    const label =
+      USER_PROFILE_COPY.LABELS[field.id as keyof typeof USER_PROFILE_COPY.LABELS] ??
+      field.labelRu;
+    return [
+      {
+        id: field.id,
+        label,
+        value: formatSocialLinkDisplay(href),
+        href,
+      },
+    ];
+  });
+
   const rows: ProfileRow[] = [
     { id: "userName", label: USER_PROFILE_COPY.LABELS.userName, value: dashIfEmpty(user.userName) },
     {
@@ -150,6 +173,7 @@ export const getUserProfileRows = (
       value: formatRuPhoneDisplayOrEmpty(user.userPhoneNumber),
       href: toRuPhoneTelHref(user.userPhoneNumber) ?? undefined,
     },
+    ...socialRows,
     {
       id: "isUserDataConfirmed",
       label: USER_PROFILE_COPY.LABELS.isUserDataConfirmed,

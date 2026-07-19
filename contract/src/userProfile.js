@@ -15,6 +15,7 @@ import {
   RU_PHONE_E164_REGEX,
 } from "./userFields.js";
 import { isStoredMediaUrl } from "./storedMediaUrl.js";
+import { userSocialLinksBodyShape } from "./userSocialLinks.js";
 
 /** Синхрон с `server/constants/profileImageFocusConstants.js`. */
 export const PROFILE_IMAGE_FOCUS_MIN = 0;
@@ -253,4 +254,5 @@ export const updateProfileBodySchema = z.object({
       (value) => value === undefined || value === null || value.length <= NOTES_ABOUT_USER_MAX_CHARS,
       `Слишком длинный текст`,
     ),
+  ...userSocialLinksBodyShape,
 });

@@ -1,3 +1,4 @@
+import { USER_SOCIAL_LINK_FIELD_IDS } from "@molha/api-contract";
 import { getUserBackgroundFocus } from "@/entities/user/lib/profileImageFocus";
 import { DEFAULT_USER_AVATAR_URL, USER_GENDER_NO_SELECTED } from "@/entities/user/model/constants";
 import { DEFAULT_USER_BACKGROUND_PRESET_ID } from "@/entities/user/model/userBackgroundPresets";
@@ -30,6 +31,12 @@ export type EditProfileFormState = {
   userBackgroundFocus: ProfileImageFocus;
   notificationsEnabled: boolean;
   notesAboutUser: string;
+  socialTelegramUrl: string;
+  socialInstagramUrl: string;
+  socialVkUrl: string;
+  socialYoutubeUrl: string;
+  socialWhatsappUrl: string;
+  socialWebsiteUrl: string;
 };
 
 export const EMPTY_STRUCTURED_ADDRESS: StructuredAddress = {
@@ -51,6 +58,21 @@ export const mapUserToEditProfileForm = (
   const stored = typeof user.userBackgroundUrl === "string" ? user.userBackgroundUrl : null;
   const bgFields = parseUserBackgroundFormFields(stored);
   const bgMode = resolveBackgroundModeFromUser(stored);
+
+  const socialLinks = Object.fromEntries(
+    USER_SOCIAL_LINK_FIELD_IDS.map((fieldId) => {
+      const raw = user[fieldId];
+      return [fieldId, typeof raw === "string" ? raw : ""];
+    }),
+  ) as Pick<
+    EditProfileFormState,
+    | "socialTelegramUrl"
+    | "socialInstagramUrl"
+    | "socialVkUrl"
+    | "socialYoutubeUrl"
+    | "socialWhatsappUrl"
+    | "socialWebsiteUrl"
+  >;
 
   return {
     userName: typeof user.userName === "string" ? user.userName : "",
@@ -80,5 +102,6 @@ export const mapUserToEditProfileForm = (
     userBackgroundFocus: getUserBackgroundFocus(user),
     notificationsEnabled: user.notificationsEnabled !== false,
     notesAboutUser: typeof user.notesAboutUser === "string" ? user.notesAboutUser : "",
+    ...socialLinks,
   };
 };

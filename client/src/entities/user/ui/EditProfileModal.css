@@ -221,3 +221,30 @@
   font-weight: 600;
   color: var(--iz-color-text-secondary);
 }
+
+.edit-profile-modal__social-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.edit-profile-modal__social-row .edit-profile-modal__input {
+  flex: 1;
+  min-width: 0;
+}
+
+.edit-profile-modal__social-clear {
+  flex-shrink: 0;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 0.4rem;
+  background: var(--iz-color-surface-muted, transparent);
+  color: var(--iz-color-text-secondary);
+  padding: 0.45rem 0.65rem;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.edit-profile-modal__social-clear:disabled {
+  opacity: 0.7;
+  cursor: default;
+}

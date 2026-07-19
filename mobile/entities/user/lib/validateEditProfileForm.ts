@@ -1,4 +1,8 @@
 import {
+  USER_SOCIAL_LINK_FIELD_IDS,
+  isHttpUrl,
+} from "@molha/api-contract";
+import {
   USER_NAME_MAX_LENGTH,
   USER_NAME_MIN_LENGTH,
   USER_NAME_PATTERN,
@@ -18,5 +22,16 @@ export const validateEditProfileForm = (form: EditProfileFormState): string | nu
     }
   }
 
-  return validateRuPhoneField(form.userPhoneNumber);
+  const phoneError = validateRuPhoneField(form.userPhoneNumber);
+  if (phoneError) return phoneError;
+
+  for (const fieldId of USER_SOCIAL_LINK_FIELD_IDS) {
+    const link = form[fieldId].trim();
+    if (link === "") continue;
+    if (!isHttpUrl(link)) {
+      return "Соцсети: укажите корректную ссылку (http:// или https://)";
+    }
+  }
+
+  return null;
 };

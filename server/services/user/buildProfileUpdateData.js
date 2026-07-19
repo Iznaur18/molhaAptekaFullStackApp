@@ -56,7 +56,13 @@ const convertProfileFieldValue = (field, value) => {
     field === "userAddress" ||
     field === "userAddressFlat" ||
     field === "userAddressFiasId" ||
-    field === "notesAboutUser"
+    field === "notesAboutUser" ||
+    field === "socialTelegramUrl" ||
+    field === "socialInstagramUrl" ||
+    field === "socialVkUrl" ||
+    field === "socialYoutubeUrl" ||
+    field === "socialWhatsappUrl" ||
+    field === "socialWebsiteUrl"
   ) {
     return typeof value === "string" ? value.trim() : value;
   }

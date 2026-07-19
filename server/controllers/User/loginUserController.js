@@ -243,7 +243,13 @@ export const userUpdateProfileController = async (req, res) => {
           field === "userAddress" ||
           field === "userAddressFlat" ||
           field === "userAddressFiasId" ||
-          field === "notesAboutUser"
+          field === "notesAboutUser" ||
+          field === "socialTelegramUrl" ||
+          field === "socialInstagramUrl" ||
+          field === "socialVkUrl" ||
+          field === "socialYoutubeUrl" ||
+          field === "socialWhatsappUrl" ||
+          field === "socialWebsiteUrl"
         ) {
           // Для строковых полей применяем trim (валидация уже выполнена в middleware)
           updateData[field] = typeof value === "string" ? value.trim() : value;

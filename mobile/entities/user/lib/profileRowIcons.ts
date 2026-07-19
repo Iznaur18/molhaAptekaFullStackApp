@@ -21,6 +21,12 @@ export const PROFILE_ROW_ICONS: Record<string, FeatherIconName> = {
   totalPurchasesAmount: "shopping-cart",
   userRatingByVotes: "star",
   createdAt: "calendar",
+  socialTelegramUrl: "send",
+  socialInstagramUrl: "camera",
+  socialVkUrl: "users",
+  socialYoutubeUrl: "play",
+  socialWhatsappUrl: "message-circle",
+  socialWebsiteUrl: "globe",
 };
 
 export const getProfileRowIcon = (rowId: string): FeatherIconName | null =>

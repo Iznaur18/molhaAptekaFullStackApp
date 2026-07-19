@@ -135,6 +135,33 @@ test("updateProfileBodySchema clears nullable fields", () => {
   assert.equal(parsed.userPhoneNumber, null);
 });
 
+test("updateProfileBodySchema accepts and clears social links", () => {
+  const parsed = updateProfileBodySchema.parse({
+    socialTelegramUrl: "https://t.me/demo",
+    socialInstagramUrl: "",
+    socialWebsiteUrl: null,
+  });
+  assert.equal(parsed.socialTelegramUrl, "https://t.me/demo");
+  assert.equal(parsed.socialInstagramUrl, null);
+  assert.equal(parsed.socialWebsiteUrl, null);
+});
+
+test("updateProfileBodySchema rejects invalid social url", () => {
+  assert.throws(() =>
+    updateProfileBodySchema.parse({
+      socialVkUrl: "not-a-url",
+    }),
+  );
+});
+
+test("formatSocialLinkDisplay strips protocol", async () => {
+  const { formatSocialLinkDisplay } = await import("../src/userSocialLinks.js");
+  assert.equal(
+    formatSocialLinkDisplay("https://t.me/demo/"),
+    "t.me/demo",
+  );
+});
+
 test("order query schemas coerce pagination", () => {
   const parsed = getAllOrdersQuerySchema.parse({ page: "2", limit: "50", status: "pending" });
   assert.equal(parsed.page, 2);

@@ -1,5 +1,6 @@
 import { validateRuStructuredDeliveryAddressForm } from "../../address/lib/validateRuStructuredDeliveryAddressForm.js";
 import { isStoredUploadOrHttpImageUrl } from "../../../shared/lib/resolveUploadedImageUrl.js";
+import { validateSocialLinksInForm } from "./buildPatchUserProfileBody.js";
 import { validateRuPhoneField } from "./ruPhone.js";
 import {
   NOTES_ABOUT_USER_MAX_CHARS,
@@ -48,6 +49,9 @@ export function validateEditProfileForm(form, options = {}) {
   if (String(form.notesAboutUser).length > NOTES_ABOUT_USER_MAX_CHARS) {
     return `О себе: не больше ${NOTES_ABOUT_USER_MAX_CHARS} символов`;
   }
+
+  const socialError = validateSocialLinksInForm(form);
+  if (socialError) return socialError;
 
   const av = String(form.userAvatarUrl).trim();
   if (av !== "" && !isStoredUploadOrHttpImageUrl(av)) {

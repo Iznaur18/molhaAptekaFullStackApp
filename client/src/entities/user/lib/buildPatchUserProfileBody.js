@@ -1,5 +1,9 @@
 import { appendStructuredAddressToPayload } from "../../address/lib/appendStructuredAddressToPayload.js";
 import { isStructuredAddressEqual } from "../../address/lib/isStructuredAddressEqual.js";
+import {
+  USER_SOCIAL_LINK_FIELD_IDS,
+  isHttpUrl,
+} from "@molha/api-contract";
 import { normalizeUploadUrlForStorage } from "@izibuy/shared-lib";
 import { normalizeRuPhoneInput } from "./ruPhone.js";
 import { getUserAvatarFocus, getUserBackgroundFocus } from "./profileImageFocus.js";
@@ -88,6 +92,11 @@ export function buildPatchUserProfileBody(form, options = {}) {
   const notes = String(form.notesAboutUser).trim();
   body.notesAboutUser = notes === "" ? null : notes;
 
+  for (const fieldId of USER_SOCIAL_LINK_FIELD_IDS) {
+    const link = String(form[fieldId] ?? "").trim();
+    body[fieldId] = link === "" ? null : link;
+  }
+
   if (includePremium) {
     const premiumExpiresAtRaw = String(form.premiumExpiresAt ?? "").trim();
     body.premiumExpiresAt =
@@ -101,4 +110,19 @@ export function buildPatchUserProfileBody(form, options = {}) {
   }
 
   return body;
+}
+
+/**
+ * @param {import('./mapUserToEditProfileForm.js').EditProfileFormState} form
+ * @returns {string | null}
+ */
+export function validateSocialLinksInForm(form) {
+  for (const fieldId of USER_SOCIAL_LINK_FIELD_IDS) {
+    const link = String(form[fieldId] ?? "").trim();
+    if (link === "") continue;
+    if (!isHttpUrl(link)) {
+      return "Соцсети: укажите корректную ссылку (http:// или https://)";
+    }
+  }
+  return null;
 }

@@ -76,6 +76,14 @@ export {
 } from "./raffle.js";
 export { updateProfileBodySchema } from "./userProfile.js";
 export {
+  USER_SOCIAL_LINK_FIELDS,
+  USER_SOCIAL_LINK_FIELD_IDS,
+  USER_SOCIAL_LINK_URL_MAX_LENGTH,
+  clearableSocialHttpUrlSchema,
+  formatSocialLinkDisplay,
+  isHttpUrl,
+} from "./userSocialLinks.js";
+export {
   ADDRESS_CITY_MAX_LENGTH,
   ADDRESS_DISTRICT_MAX_LENGTH,
   ADDRESS_HOUSE_MAX_LENGTH,

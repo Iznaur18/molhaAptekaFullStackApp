@@ -1,4 +1,8 @@
 import {
+  USER_SOCIAL_LINK_FIELDS,
+  formatSocialLinkDisplay,
+} from "@molha/api-contract";
+import {
   COMMON_UI,
   FORMAT_BOOLEAN_RU,
   USER_PROFILE_COPY,
@@ -158,6 +162,21 @@ export function getUserProfileRows(user, options = {}) {
       label: L.notesAboutUser,
       value: dashIfEmpty(user.notesAboutUser),
     },
+    ...USER_SOCIAL_LINK_FIELDS.flatMap((field) => {
+      const raw = user[field.id];
+      if (typeof raw !== "string" || raw.trim() === "") {
+        return [];
+      }
+      const href = raw.trim();
+      return [
+        {
+          id: field.id,
+          label: L[field.id] ?? field.labelRu,
+          value: formatSocialLinkDisplay(href),
+          href,
+        },
+      ];
+    }),
     {
       id: "userLoyaltyPoints",
       label: L.userLoyaltyPoints,

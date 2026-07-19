@@ -177,8 +177,15 @@ function ProfileDetailValue({ row, hidePhoneUntilReveal }) {
   }
 
   if (row.href) {
+    const isExternalHttp = /^https?:\/\//i.test(row.href);
     return (
-      <a className="user-profile-info__detail-link" href={row.href}>
+      <a
+        className="user-profile-info__detail-link"
+        href={row.href}
+        {...(isExternalHttp
+          ? { target: "_blank", rel: "noopener noreferrer" }
+          : {})}
+      >
         {row.value}
       </a>
     );

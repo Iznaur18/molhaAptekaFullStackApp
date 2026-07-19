@@ -1,3 +1,4 @@
+import { USER_SOCIAL_LINK_FIELD_IDS } from "@molha/api-contract";
 import { DEFAULT_USER_AVATAR_URL } from "@/entities/user/model/constants";
 import { normalizeUploadUrlForStorage } from "@/shared/lib";
 
@@ -111,6 +112,14 @@ export const buildPatchUserProfileBody = (
   const initialNotes = initial.notesAboutUser.trim();
   if (notes !== initialNotes) {
     body.notesAboutUser = notes === "" ? null : notes;
+  }
+
+  for (const fieldId of USER_SOCIAL_LINK_FIELD_IDS) {
+    const next = form[fieldId].trim();
+    const prev = initial[fieldId].trim();
+    if (next !== prev) {
+      body[fieldId] = next === "" ? null : next;
+    }
   }
 
   return body;
