@@ -1,15 +1,21 @@
 .app-shell {
   --app-shell-dropdown-z-index: var(--iz-z-dropdown);
   --app-shell-category-list-max-height: min(22rem, 70vh);
+  /* floating pill bottom nav */
   --app-shell-mobile-bottom-nav-height: 3.1rem;
   --app-shell-mobile-bottom-nav-float-offset: 0.625rem;
   --app-shell-content-inline-padding: var(--iz-space-4);
 
   box-sizing: border-box;
   width: 100%;
-  max-width: var(--app-shell-max-width, 75rem);
+  max-width: var(--app-shell-max-width, 60rem);
   margin: 0 auto;
-  padding: var(--iz-space-6) var(--app-shell-content-inline-padding) 2.5rem;
+  padding: var(--iz-space-6) var(--app-shell-content-inline-padding)
+    calc(
+      var(--app-shell-mobile-bottom-nav-height) +
+        var(--app-shell-mobile-bottom-nav-float-offset) + env(safe-area-inset-bottom, 0px) +
+        1rem
+    );
 }
 
 .app-shell__header {
@@ -239,7 +245,8 @@
 
 .app-shell__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  /* ≥1280 viewport: 4 колонки (паритет с mobile) */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1rem;
   align-items: stretch;
 }
@@ -253,16 +260,24 @@
   min-height: 14rem;
 }
 
-/* tablet: 4 колонки */
-@container app-viewport (max-width: 1023px) {
+/* <1280: 3 колонки */
+@container app-viewport (max-width: 1279px) {
   .app-shell__grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0.5rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
   }
 }
 
-/* mobile: 3 колонки + edge bleed + место под bottom nav */
-@container app-viewport (max-width: 640px) {
+/* ≤903: 3 колонки, узкий gap */
+@container app-viewport (max-width: 903px) {
+  .app-shell__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.15rem;
+  }
+}
+
+/* ≤667: 2 колонки + edge bleed + место под bottom nav */
+@container app-viewport (max-width: 667px) {
   .app-shell {
     --app-shell-content-inline-padding: max(
       0.75rem,
@@ -286,7 +301,7 @@
   }
 
   .app-shell__grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.1rem;
   }
 }
@@ -515,11 +530,6 @@
     );
     padding-left: var(--app-shell-content-inline-padding);
     padding-right: var(--app-shell-content-inline-padding);
-    padding-bottom: calc(
-      var(--app-shell-mobile-bottom-nav-height) +
-        var(--app-shell-mobile-bottom-nav-float-offset) + env(safe-area-inset-bottom, 0px) +
-        1rem
-    );
   }
 
   .app-shell__header-top {
@@ -811,12 +821,12 @@
   outline-offset: 2px;
 }
 
-@container app-viewport (max-width: 640px) {
-  /* с баннером внутри липкость выключаем, иначе баннер «прилипает» вместе с панелью */
-  .app-shell--header-v2 .app-shell__header--v2:has(.site-header-banner-carousel) {
-    position: static;
-  }
+/* с баннером внутри липкость выключаем, иначе баннер «прилипает» вместе с панелью */
+.app-shell--header-v2 .app-shell__header--v2:has(.site-header-banner-carousel) {
+  position: static;
+}
 
+@container app-viewport (max-width: 640px) {
   .app-shell--header-v2 .app-shell__header-panel {
     border-radius: 16px;
     padding: 0.55rem 0.65rem;

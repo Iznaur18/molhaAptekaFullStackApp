@@ -1,5 +1,6 @@
 import { useRowVisibility } from "@/shared/model/rowVisibility";
 import { LoopingCoverVideo } from "@/shared/ui/LoopingCoverVideo";
+import { StyleSheet, View } from "react-native";
 
 type ProductPreviewVideoProps = {
   uri: string;
@@ -9,6 +10,10 @@ type ProductPreviewVideoProps = {
   onEnded?: () => void;
 };
 
+/**
+ * Превью без hit-testing: native/HTML video на Android/web перехватывает тапы
+ * и ломает Pressable карточки. Касания уходят родителю.
+ */
 export const ProductPreviewVideo = ({
   uri,
   loop = true,
@@ -22,14 +27,23 @@ export const ProductPreviewVideo = ({
   const isVisible = useRowVisibility();
 
   return (
-    <LoopingCoverVideo
-      uri={uri}
-      loop={loop}
-      isMuted
-      isPlaying={isVisible}
-      onPlaybackFailed={onPlaybackFailed}
-      onReady={onReady}
-      onEnded={onEnded}
-    />
+    <View style={styles.wrap} pointerEvents="none">
+      <LoopingCoverVideo
+        uri={uri}
+        loop={loop}
+        isMuted
+        isPlaying={isVisible}
+        onPlaybackFailed={onPlaybackFailed}
+        onReady={onReady}
+        onEnded={onEnded}
+      />
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  wrap: {
+    width: "100%",
+    height: "100%",
+  },
+});

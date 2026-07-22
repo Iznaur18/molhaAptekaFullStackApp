@@ -2,6 +2,9 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 
 import {
   approveSellerPersonalCategoryCampaign,
+  cancelSellerPersonalCategoryCampaignByStaff,
+  deleteSellerPersonalCategoryCampaignByStaff,
+  fetchManagedSellerPersonalCategoryCampaigns,
   fetchPendingSellerPersonalCategoryCampaigns,
   rejectSellerPersonalCategoryCampaign,
 } from "@/entities/seller-personal-category/api/sellerPersonalCategoryModerationApi";
@@ -21,6 +24,13 @@ export const usePendingSellerPersonalCategoryCampaignsQuery = (enabled = true) =
     enabled,
   });
 
+export const useManagedSellerPersonalCategoryCampaignsQuery = (enabled = true) =>
+  useQuery({
+    queryKey: sellerPersonalCategoryQueryKeys.moderationManaged(),
+    queryFn: fetchManagedSellerPersonalCategoryCampaigns,
+    enabled,
+  });
+
 export const useSellerPersonalCategoryModerationMutations = () => {
   const approveMutation = useMutation({
     mutationFn: (campaignId: string) => approveSellerPersonalCategoryCampaign(campaignId),
@@ -31,5 +41,18 @@ export const useSellerPersonalCategoryModerationMutations = () => {
       rejectSellerPersonalCategoryCampaign(campaignId, reason ?? ""),
   });
 
-  return { approveMutation, rejectMutation };
+  const staffUnpublishMutation = useMutation({
+    mutationFn: (campaignId: string) => cancelSellerPersonalCategoryCampaignByStaff(campaignId),
+  });
+
+  const staffDeleteMutation = useMutation({
+    mutationFn: (campaignId: string) => deleteSellerPersonalCategoryCampaignByStaff(campaignId),
+  });
+
+  return {
+    approveMutation,
+    rejectMutation,
+    staffUnpublishMutation,
+    staffDeleteMutation,
+  };
 };

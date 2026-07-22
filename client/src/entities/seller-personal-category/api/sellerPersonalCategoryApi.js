@@ -1,11 +1,13 @@
 import {
   approveSellerPersonalCategoryCampaignDataSchema,
   cancelSellerPersonalCategoryCampaignDataSchema,
+  managedSellerPersonalCategoryCampaignsDataSchema,
   mySellerPersonalCategoryCampaignDataSchema,
   pendingSellerPersonalCategoryCampaignsCountDataSchema,
   pendingSellerPersonalCategoryCampaignsDataSchema,
   rejectSellerPersonalCategoryCampaignDataSchema,
   sellerPersonalCategoryCatalogTilesDataSchema,
+  staffSellerPersonalCategoryCampaignActionDataSchema,
   submitSellerPersonalCategoryCampaignBodySchema,
   submitSellerPersonalCategoryCampaignDataSchema,
 } from "@molha/api-contract";
@@ -166,6 +168,67 @@ export async function rejectSellerPersonalCategoryCampaign(campaignId, reason = 
       e?.response?.data?.message ??
       e?.message ??
       SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.REJECT_FALLBACK;
+    throw new Error(message);
+  }
+}
+
+export async function fetchManagedSellerPersonalCategoryCampaigns() {
+  try {
+    const { data } = await apiClient.get("/seller-personal-category/moderation/managed");
+    const parsed = parseApiContractData(
+      data,
+      managedSellerPersonalCategoryCampaignsDataSchema,
+    );
+    return parsed.campaigns;
+  } catch (e) {
+    const message =
+      e?.response?.data?.message ??
+      e?.message ??
+      SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.MANAGED_FETCH_FALLBACK;
+    throw new Error(message);
+  }
+}
+
+/**
+ * @param {string} campaignId
+ */
+export async function cancelSellerPersonalCategoryCampaignByStaff(campaignId) {
+  try {
+    const { data } = await apiClient.post(
+      `/seller-personal-category/moderation/${campaignId}/cancel`,
+    );
+    const parsed = parseApiContractData(
+      data,
+      staffSellerPersonalCategoryCampaignActionDataSchema,
+    );
+    return parsed.message;
+  } catch (e) {
+    const message =
+      e?.response?.data?.message ??
+      e?.message ??
+      SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.STAFF_UNPUBLISH_FALLBACK;
+    throw new Error(message);
+  }
+}
+
+/**
+ * @param {string} campaignId
+ */
+export async function deleteSellerPersonalCategoryCampaignByStaff(campaignId) {
+  try {
+    const { data } = await apiClient.delete(
+      `/seller-personal-category/moderation/${campaignId}/staff`,
+    );
+    const parsed = parseApiContractData(
+      data,
+      staffSellerPersonalCategoryCampaignActionDataSchema,
+    );
+    return parsed.message;
+  } catch (e) {
+    const message =
+      e?.response?.data?.message ??
+      e?.message ??
+      SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.STAFF_DELETE_FALLBACK;
     throw new Error(message);
   }
 }

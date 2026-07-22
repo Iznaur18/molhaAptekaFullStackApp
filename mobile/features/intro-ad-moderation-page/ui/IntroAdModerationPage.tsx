@@ -18,6 +18,8 @@ import {
 } from "@/entities/intro-ad/ui/IntroAdModerationCampaignCard";
 import { usePendingSellerPersonalCategoryCampaignsQuery } from "@/entities/seller-personal-category/model/useSellerPersonalCategoryModerationMutations";
 import { usePendingSiteHeaderBannerCampaignsQuery } from "@/entities/site-header-banner-campaign/model/useSiteHeaderBannerCampaignModerationMutations";
+import { useStaffRafflesQueueQuery } from "@/entities/raffle/model/useRaffleStaffMutations";
+import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import { useAppIntro } from "@/features/app-intro/model/AppIntroProvider";
 import { filterPendingModerationCampaigns } from "@/features/intro-ad-moderation-page/lib/filterPendingModerationCampaigns";
 import {
@@ -25,14 +27,19 @@ import {
   INTRO_AD_MODERATION_SECTION_BANNER,
   INTRO_AD_MODERATION_SECTION_INTRO,
   INTRO_AD_MODERATION_SECTION_PERSONAL,
+  INTRO_AD_MODERATION_SECTION_RAFFLE,
+  INTRO_AD_MODERATION_SECTION_USERS_RAFFLE,
   isIntroAdModerationSectionVisible,
 } from "@/features/intro-ad-moderation-page/lib/introAdModerationSectionFilters";
+import { resolveIntroAdModerationListPanelStyles } from "@/features/intro-ad-moderation-page/lib/introAdModerationSectionZone";
 import { summarizeIntroAdModerationHub } from "@/features/intro-ad-moderation-page/lib/summarizeIntroAdModerationHub";
 import { IntroAdModerationPageOverview } from "@/features/intro-ad-moderation-page/ui/IntroAdModerationPageOverview";
 import { IntroAdModerationPageToolbar } from "@/features/intro-ad-moderation-page/ui/IntroAdModerationPageToolbar";
 import { ModerationSectionTitle } from "@/features/intro-ad-moderation-page/ui/ModerationSectionTitle";
+import { RaffleModerationSection } from "@/features/intro-ad-moderation-page/ui/RaffleModerationSection";
 import { SellerPersonalCategoryCampaignModerationSection } from "@/features/intro-ad-moderation-page/ui/SellerPersonalCategoryCampaignModerationSection";
 import { SiteHeaderBannerCampaignModerationSection } from "@/features/intro-ad-moderation-page/ui/SiteHeaderBannerCampaignModerationSection";
+import { UsersLoyaltyRaffleAdminModerationSection } from "@/features/intro-ad-moderation-page/ui/UsersLoyaltyRaffleAdminModerationSection";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import { introAdQueryKeys, staffBadgeQueryKeys } from "@/shared/api";
@@ -49,10 +56,12 @@ export const IntroAdModerationPage = () => {
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
   const queryClient = useQueryClient();
   const { previewIntro } = useAppIntro();
+  const { isAdmin } = useUserAccess();
   const queueQuery = usePendingIntroAdCampaignsQuery();
   const managedQuery = useManagedIntroAdCampaignsQuery();
   const bannerPendingQuery = usePendingSiteHeaderBannerCampaignsQuery();
   const personalPendingQuery = usePendingSellerPersonalCategoryCampaignsQuery();
+  const raffleQueueQuery = useStaffRafflesQueueQuery();
   const { approveMutation, rejectMutation, staffCancelMutation } = useIntroAdModerationMutations();
   const [navSheetVisible, setNavSheetVisible] = useState(false);
   const [sectionFilter, setSectionFilter] = useState("");
@@ -66,6 +75,7 @@ export const IntroAdModerationPage = () => {
   const managedCampaigns = managedQuery.data ?? [];
   const bannerPendingCampaigns = bannerPendingQuery.data ?? [];
   const personalPendingCampaigns = personalPendingQuery.data ?? [];
+  const rafflePendingCount = raffleQueueQuery.data?.pendingRaffles?.length ?? 0;
 
   const summary = useMemo(
     () =>
@@ -73,8 +83,9 @@ export const IntroAdModerationPage = () => {
         introPending: pendingCampaigns,
         bannerPending: bannerPendingCampaigns,
         personalPending: personalPendingCampaigns,
+        rafflePendingCount,
       }),
-    [bannerPendingCampaigns, pendingCampaigns, personalPendingCampaigns],
+    [bannerPendingCampaigns, pendingCampaigns, personalPendingCampaigns, rafflePendingCount],
   );
 
   const filteredIntroPending = useMemo(
@@ -94,6 +105,13 @@ export const IntroAdModerationPage = () => {
     sectionFilter,
     INTRO_AD_MODERATION_SECTION_PERSONAL,
   );
+  const showRaffleSection = isIntroAdModerationSectionVisible(
+    sectionFilter,
+    INTRO_AD_MODERATION_SECTION_RAFFLE,
+  );
+  const showUsersRaffleSection =
+    isAdmin &&
+    isIntroAdModerationSectionVisible(sectionFilter, INTRO_AD_MODERATION_SECTION_USERS_RAFFLE);
 
   const totalPendingAll = summary.pendingTotal;
   const visiblePendingCount =
@@ -103,7 +121,8 @@ export const IntroAdModerationPage = () => {
       : 0) +
     (showPersonalSection
       ? filterPendingModerationCampaigns(personalPendingCampaigns, { attentionOnly }).length
-      : 0);
+      : 0) +
+    (showRaffleSection && !attentionOnly ? rafflePendingCount : 0);
 
   const hasFilters = Boolean(sectionFilter) || attentionOnly;
   const summaryCountLabel = hasFilters
@@ -114,7 +133,8 @@ export const IntroAdModerationPage = () => {
     queueQuery.isFetching ||
     managedQuery.isFetching ||
     bannerPendingQuery.isFetching ||
-    personalPendingQuery.isFetching;
+    personalPendingQuery.isFetching ||
+    raffleQueueQuery.isFetching;
 
   useFocusEffect(
     useCallback(() => {
@@ -122,11 +142,13 @@ export const IntroAdModerationPage = () => {
       void managedQuery.refetch();
       void bannerPendingQuery.refetch();
       void personalPendingQuery.refetch();
+      void raffleQueueQuery.refetch();
     }, [
       bannerPendingQuery.refetch,
       managedQuery.refetch,
       personalPendingQuery.refetch,
       queueQuery.refetch,
+      raffleQueueQuery.refetch,
     ]),
   );
 
@@ -203,6 +225,16 @@ export const IntroAdModerationPage = () => {
     setAttentionOnly(false);
   }, []);
 
+  const handleRaffleFilterClick = useCallback(() => {
+    setSectionFilter(INTRO_AD_MODERATION_SECTION_RAFFLE);
+    setAttentionOnly(false);
+  }, []);
+
+  const handleUsersRaffleFilterClick = useCallback(() => {
+    setSectionFilter(INTRO_AD_MODERATION_SECTION_USERS_RAFFLE);
+    setAttentionOnly(false);
+  }, []);
+
   const removeFromPendingQueue = useCallback(
     (campaignId: string) => {
       queryClient.setQueryData(
@@ -261,6 +293,7 @@ export const IntroAdModerationPage = () => {
       managedQuery.refetch(),
       bannerPendingQuery.refetch(),
       personalPendingQuery.refetch(),
+      raffleQueueQuery.refetch(),
     ]);
     await refreshModerationQueries();
   }, [
@@ -268,6 +301,7 @@ export const IntroAdModerationPage = () => {
     managedQuery,
     personalPendingQuery,
     queueQuery,
+    raffleQueueQuery,
     refreshModerationQueries,
   ]);
 
@@ -345,6 +379,7 @@ export const IntroAdModerationPage = () => {
       summaryCountLabel={summaryCountLabel}
       sectionFilter={sectionFilter}
       onSectionFilterChange={setSectionFilter}
+      showUsersRaffleSection={isAdmin}
       isRefreshing={isRefreshing}
       onRefresh={() => {
         void reload();
@@ -357,11 +392,15 @@ export const IntroAdModerationPage = () => {
       pendingTotal={summary.pendingTotal}
       introPendingCount={summary.introPendingCount}
       bannerPendingCount={summary.bannerPendingCount}
+      rafflePendingCount={summary.rafflePendingCount}
       attentionCount={summary.attentionCount}
       attentionOnly={attentionOnly}
       onPendingFilterClick={handlePendingFilterClick}
       onIntroFilterClick={handleIntroFilterClick}
       onBannerFilterClick={handleBannerFilterClick}
+      onRaffleFilterClick={handleRaffleFilterClick}
+      showUsersRaffleOverview={isAdmin}
+      onUsersRaffleFilterClick={handleUsersRaffleFilterClick}
       onAttentionFilterChange={setAttentionOnly}
     />
   );
@@ -413,7 +452,7 @@ export const IntroAdModerationPage = () => {
       {showIntroSection && !attentionOnly && managedCampaigns.length > 0 ? (
         <View style={styles.section}>
           <ModerationSectionTitle title={INTRO_AD_MODERATION_PAGE_UI.INTRO_MANAGED_TITLE} />
-          <View style={styles.list}>
+          <View style={resolveIntroAdModerationListPanelStyles(INTRO_AD_MODERATION_SECTION_INTRO, styles)}>
             {managedCampaigns.map((campaign) => {
               const campaignId = String(campaign._id);
               return (
@@ -439,7 +478,7 @@ export const IntroAdModerationPage = () => {
             title={INTRO_AD_MODERATION_PAGE_UI.INTRO_PENDING_TITLE}
             pendingCount={filteredIntroPending.length}
           />
-          <View style={styles.list}>
+          <View style={resolveIntroAdModerationListPanelStyles(INTRO_AD_MODERATION_SECTION_INTRO, styles)}>
             {filteredIntroPending.map((campaign) => {
               const campaignId = String(campaign._id);
               const rowId = buildModerationCampaignRowId("intro", campaignId);
@@ -488,15 +527,23 @@ export const IntroAdModerationPage = () => {
         />
       ) : null}
 
+      {showRaffleSection && !attentionOnly ? (
+        <RaffleModerationSection onActionError={setActionError} />
+      ) : null}
+
+      {showUsersRaffleSection ? <UsersLoyaltyRaffleAdminModerationSection /> : null}
+
       {!introHasVisibleContent &&
       !showBannerSection &&
       !showPersonalSection &&
+      !showRaffleSection &&
+      !showUsersRaffleSection &&
       totalPendingAll === 0 &&
       isIntroEmpty ? (
         <Text style={styles.empty}>{INTRO_AD_MODERATION_PAGE_UI.EMPTY}</Text>
       ) : null}
 
-      {hasFilters && visiblePendingCount === 0 && !attentionOnly && totalPendingAll > 0 ? (
+      {hasFilters && visiblePendingCount === 0 && !attentionOnly && !showUsersRaffleSection && totalPendingAll > 0 ? (
         <Text style={styles.empty}>{emptyMessage}</Text>
       ) : null}
 

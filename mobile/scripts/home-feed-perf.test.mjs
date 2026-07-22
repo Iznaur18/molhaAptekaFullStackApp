@@ -42,12 +42,16 @@ test("raffle carousel plays only visible prize video", () => {
   const carousel = readMobileFile("entities/raffle/ui/RaffleFeaturedCarousel.tsx");
   const prizeMedia = readMobileFile("entities/raffle/ui/RafflePrizeMedia.tsx");
   const banner = readMobileFile("entities/raffle/ui/RaffleFeaturedBanner.tsx");
+  const loopingVideo = readMobileFile("shared/ui/LoopingCoverVideo.tsx");
 
   assert.match(carousel, /onViewableItemsChanged/);
   assert.match(carousel, /windowSize=\{CAROUSEL_WINDOW_SIZE\}/);
+  assert.match(carousel, /ActiveRaffleCarouselIndexContext/);
   assert.match(carousel, /isVideoActive=\{isActive\}/);
+  assert.match(carousel, /if \(activeIndexRef\.current === nextIndex\)/);
   assert.match(prizeMedia, /isVideoActive/);
-  assert.match(prizeMedia, /player\.pause\(\)/);
+  assert.match(prizeMedia, /isPlaying=\{isVideoActive\}/);
+  assert.match(loopingVideo, /isPlaying/);
   assert.match(banner, /memo\(/);
 });
 

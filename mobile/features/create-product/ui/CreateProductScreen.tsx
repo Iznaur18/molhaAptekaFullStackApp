@@ -9,6 +9,7 @@ import {
   Switch,
   Text,
   TextInput,
+  useWindowDimensions,
   View,
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
@@ -26,6 +27,7 @@ import {
 import { textInputFocusScrollProps } from "@/shared/lib/scrollTextInputIntoViewOnFocus";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
+import { resolveWizardFooterPaddingBottom } from "@/shared/theme/screenContentLayout";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -209,6 +211,7 @@ export const CreateProductScreen = () => {
   const theme = useAppTheme();
   const styles = useStyles();
   const insets = useSafeAreaInsets();
+  const { width: screenWidth } = useWindowDimensions();
   const createMutation = useCreateProductMutation();
 
   const [form, setForm] = useState<WizardForm>(INITIAL_FORM);
@@ -359,7 +362,7 @@ export const CreateProductScreen = () => {
           {
             borderTopColor: theme.colors.border + "cc", // 80%
             backgroundColor: theme.colors.surfaceMuted,
-            paddingBottom: insets.bottom,
+            paddingBottom: resolveWizardFooterPaddingBottom(insets.bottom, screenWidth),
           },
         ]}>
         {!isFirstStep ? (

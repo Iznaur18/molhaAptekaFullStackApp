@@ -63,6 +63,11 @@ export default function HubSectionScreen() {
       return;
     }
 
+    if (sectionId === "raffles") {
+      router.replace("/hub/intro-ad-moderation" as never);
+      return;
+    }
+
     // Удалённая секция "Продвижение" → объединённая модерация "Продукты".
     if (sectionId === "product-promotions") {
       router.replace("/hub/product-moderation" as never);

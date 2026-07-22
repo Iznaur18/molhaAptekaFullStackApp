@@ -1,0 +1,20 @@
+diff --git a/node_modules/@expo/cli/build/src/start/server/middleware/resolvePlatform.js b/node_modules/@expo/cli/build/src/start/server/middleware/resolvePlatform.js
+index ed69e01..f94c1a3 100644
+--- a/node_modules/@expo/cli/build/src/start/server/middleware/resolvePlatform.js
++++ b/node_modules/@expo/cli/build/src/start/server/middleware/resolvePlatform.js
+@@ -49,6 +49,15 @@ function resolvePlatformFromUserAgentHeader(req) {
+     if (userAgent == null ? void 0 : userAgent.match(/iPhone|iPad/i)) {
+         platform = 'ios';
+     }
++    // iPadOS Safari "Request Desktop Website" reports Macintosh without "iPad".
++    // Without this, /_expo/loading and /_expo/link throw PLATFORM_HEADER.
++    if (!platform && (userAgent == null ? void 0 : userAgent.match(/Macintosh/i)) && (userAgent == null ? void 0 : userAgent.match(/Safari/i)) && !(userAgent == null ? void 0 : userAgent.match(/Chrome|Chromium|Edg|Firefox/i))) {
++        platform = 'ios';
++    }
++    // Generic browser clients (Metro --web, desktop preview) still need a platform.
++    if (!platform && (userAgent == null ? void 0 : userAgent.match(/Mozilla/i))) {
++        platform = 'web';
++    }
+     debug(`Resolved platform ${platform} from user-agent header: ${userAgent}`);
+     return platform;
+ }

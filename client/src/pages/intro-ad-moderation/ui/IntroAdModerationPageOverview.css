@@ -55,6 +55,10 @@
   color: var(--iz-color-warning-text);
 }
 
+.intro-ad-moderation-overview__value_muted {
+  color: var(--iz-color-text-muted);
+}
+
 @container app-viewport (max-width: 720px) {
   .intro-ad-moderation-overview {
     grid-template-columns: repeat(2, minmax(0, 1fr));

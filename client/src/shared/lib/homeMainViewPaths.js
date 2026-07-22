@@ -57,6 +57,7 @@ const PATH_TO_VIEW = new Map(
 const LEGACY_PATH_TO_VIEW = new Map([
   ["/users", "users"],
   ["/moderation-seller-categories", "intro-ad-moderation"],
+  ["/staff-raffles", "intro-ad-moderation"],
   ["/product-manage-toggle-display-admin", "site-header-banner-admin"],
 ]);
 

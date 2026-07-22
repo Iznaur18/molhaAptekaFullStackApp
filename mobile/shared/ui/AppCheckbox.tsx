@@ -1,6 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import { Pressable, View, type StyleProp, type ViewStyle } from "react-native";
 
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useAppCheckboxStyles } from "@/shared/theme/appCheckboxStyles";
 
 const CHECKBOX_HIT_SLOP = 10;
@@ -21,6 +22,7 @@ export const CheckboxBox = ({
   disabled = false,
   style,
 }: CheckboxBoxProps) => {
+  const theme = useAppTheme();
   const styles = useAppCheckboxStyles();
   const isFilled = checked || indeterminate;
 
@@ -32,7 +34,7 @@ export const CheckboxBox = ({
         <Feather
           name={indeterminate ? "minus" : "check"}
           size={CHECK_ICON_SIZE}
-          color={styles.checkIcon.color}
+          color={theme.colors.onContrast}
         />
       ) : null}
     </View>

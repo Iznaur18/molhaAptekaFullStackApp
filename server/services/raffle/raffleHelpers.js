@@ -17,42 +17,151 @@ import {
   applyRafflePrizeMediaFields,
   normalizePrizeMediaType,
 } from "./rafflePrizeMedia.js";
+import { pickWeightedRaffleWinnerUserId } from "./pickWeightedRaffleWinner.js";
+import { getCompletedRaffleExpiryCutoff } from "./getCompletedRaffleExpiryCutoff.js";
 
 const RAFFLE_SALE_COUNT_ITEM_STATUSES = [ORDER_STATUS_CONFIRMED];
+const WINNER_FALLBACK_USER_NAME = "Пользователь";
+
+export { getCompletedRaffleExpiryCutoff };
 
 export const RAFFLE_NOTIFICATION_KIND_GOAL_REACHED = "raffle_goal_reached";
 export const RAFFLE_NOTIFICATION_KIND_COMPLETED = "raffle_completed";
+export const RAFFLE_NOTIFICATION_KIND_WINNER = "raffle_winner";
 
 /**
- * @param {import('mongoose').Types.ObjectId | string} productId
- * @param {Date} participationStartAt
+ * @param {Array<{ productId: import('mongoose').Types.ObjectId | string; participationStartAt: Date }>} productWindows
+ * @returns {Promise<{ soldQuantity: number; participantsCount: number }>}
  */
-const countRaffleSalesForProductSince = async (productId, participationStartAt) => {
-  const objectId = new mongoose.Types.ObjectId(String(productId));
-  const startMs = participationStartAt.getTime();
+const countRaffleSalesAndParticipants = async (productWindows) => {
+  if (!Array.isArray(productWindows) || productWindows.length === 0) {
+    return { soldQuantity: 0, participantsCount: 0 };
+  }
+
+  const orClauses = productWindows.map(({ productId, participationStartAt }) => ({
+    $and: [
+      { "items.productId": new mongoose.Types.ObjectId(String(productId)) },
+      { "items.status": { $in: RAFFLE_SALE_COUNT_ITEM_STATUSES } },
+      { "items.confirmedAt": { $ne: null, $gte: participationStartAt } },
+    ],
+  }));
 
   const rows = await OrderModel.aggregate([
     { $unwind: "$items" },
-    {
-      $match: {
-        "items.productId": objectId,
-        "items.status": { $in: RAFFLE_SALE_COUNT_ITEM_STATUSES },
-      },
-    },
-    {
-      $match: {
-        "items.confirmedAt": { $ne: null, $gte: participationStartAt },
-      },
-    },
+    { $match: { $or: orClauses } },
     {
       $group: {
         _id: null,
         soldQuantity: { $sum: "$items.quantity" },
+        buyerIds: { $addToSet: "$userBuyerId" },
+      },
+    },
+    {
+      $project: {
+        soldQuantity: 1,
+        participantsCount: { $size: "$buyerIds" },
       },
     },
   ]);
 
-  return Number(rows[0]?.soldQuantity) || 0;
+  return {
+    soldQuantity: Number(rows[0]?.soldQuantity) || 0,
+    participantsCount: Number(rows[0]?.participantsCount) || 0,
+  };
+};
+
+/**
+ * @param {Array<{ productId: import('mongoose').Types.ObjectId | string; participationStartAt: Date }>} productWindows
+ * @returns {Promise<Array<{ userId: string; ticketCount: number }>>}
+ */
+export const listRaffleBuyerTicketCounts = async (productWindows) => {
+  if (!Array.isArray(productWindows) || productWindows.length === 0) {
+    return [];
+  }
+
+  const orClauses = productWindows.map(({ productId, participationStartAt }) => ({
+    $and: [
+      { "items.productId": new mongoose.Types.ObjectId(String(productId)) },
+      { "items.status": { $in: RAFFLE_SALE_COUNT_ITEM_STATUSES } },
+      { "items.confirmedAt": { $ne: null, $gte: participationStartAt } },
+    ],
+  }));
+
+  const rows = await OrderModel.aggregate([
+    { $unwind: "$items" },
+    { $match: { $or: orClauses } },
+    {
+      $group: {
+        _id: "$userBuyerId",
+        ticketCount: { $sum: "$items.quantity" },
+      },
+    },
+  ]);
+
+  return rows
+    .map((row) => ({
+      userId: row._id != null ? String(row._id) : "",
+      ticketCount: Math.max(0, Math.floor(Number(row.ticketCount) || 0)),
+    }))
+    .filter((row) => row.userId.length > 0 && row.ticketCount > 0);
+};
+
+/**
+ * @param {string | null} winnerUserId
+ * @returns {Promise<{ winnerUserId: string | null; winnerUserName: string; winnerUserAvatarUrl: string; winnerSelectedAt: Date | null }>}
+ */
+const resolveRaffleWinnerSnapshot = async (winnerUserId) => {
+  if (!winnerUserId) {
+    return {
+      winnerUserId: null,
+      winnerUserName: "",
+      winnerUserAvatarUrl: "",
+      winnerSelectedAt: null,
+    };
+  }
+
+  const user = await UserModel.findById(winnerUserId)
+    .select("userName userAvatarUrl")
+    .lean();
+
+  return {
+    winnerUserId: String(winnerUserId),
+    winnerUserName:
+      typeof user?.userName === "string" && user.userName.trim()
+        ? user.userName.trim()
+        : WINNER_FALLBACK_USER_NAME,
+    winnerUserAvatarUrl:
+      typeof user?.userAvatarUrl === "string" ? user.userAvatarUrl.trim() : "",
+    winnerSelectedAt: new Date(),
+  };
+};
+
+/**
+ * @param {Record<string, unknown>} raffle
+ * @returns {Promise<Array<{ productId: import('mongoose').Types.ObjectId; participationStartAt: Date }>>}
+ */
+const buildRaffleProductSaleWindows = async (raffle) => {
+  const activatedAt = raffle.approvedAt;
+  if (!activatedAt) {
+    return [];
+  }
+
+  const products = await ProductModel.find({
+    activeRaffleId: raffle._id,
+    raffleParticipationEnabledAt: { $ne: null },
+  })
+    .select("_id raffleParticipationEnabledAt")
+    .lean();
+
+  return products.map((product) => ({
+    productId: product._id,
+    participationStartAt: new Date(
+      Math.max(
+        new Date(activatedAt).getTime(),
+        new Date(product.raffleParticipationEnabledAt).getTime(),
+      ),
+    ),
+  }));
 };
 
 /**
@@ -64,40 +173,21 @@ export const recalculateRaffleSalesProgress = async (raffleId) => {
     return raffle;
   }
 
-  const activatedAt = raffle.approvedAt;
-  if (!activatedAt) {
-    return raffle;
-  }
-
-  const products = await ProductModel.find({
-    activeRaffleId: raffleId,
-    raffleParticipationEnabledAt: { $ne: null },
-  })
-    .select("_id raffleParticipationEnabledAt")
-    .lean();
-
-  let salesProgress = 0;
-  for (const product of products) {
-    const participationStartAt = new Date(
-      Math.max(
-        new Date(activatedAt).getTime(),
-        new Date(product.raffleParticipationEnabledAt).getTime(),
-      ),
-    );
-    salesProgress += await countRaffleSalesForProductSince(
-      product._id,
-      participationStartAt,
-    );
-  }
+  const productWindows = await buildRaffleProductSaleWindows(raffle);
+  const { soldQuantity: salesProgress, participantsCount } =
+    await countRaffleSalesAndParticipants(productWindows);
 
   const targetSales = Number(raffle.targetSales) || 0;
 
   if (salesProgress >= targetSales && targetSales > 0) {
-    await completeRaffleById(raffleId, salesProgress);
+    await completeRaffleById(raffleId, salesProgress, participantsCount);
     return RaffleModel.findById(raffleId).lean();
   }
 
-  await RaffleModel.updateOne({ _id: raffleId }, { $set: { salesProgress } });
+  await RaffleModel.updateOne(
+    { _id: raffleId },
+    { $set: { salesProgress, participantsCount } },
+  );
 
   return RaffleModel.findById(raffleId).lean();
 };
@@ -105,8 +195,9 @@ export const recalculateRaffleSalesProgress = async (raffleId) => {
 /**
  * @param {import('mongoose').Types.ObjectId | string} raffleId
  * @param {number} [salesProgress]
+ * @param {number} [participantsCount]
  */
-export const completeRaffleById = async (raffleId, salesProgress) => {
+export const completeRaffleById = async (raffleId, salesProgress, participantsCount) => {
   const raffle = await RaffleModel.findById(raffleId).lean();
   if (!raffle || raffle.status === RAFFLE_STATUS_COMPLETED) {
     return raffle;
@@ -114,32 +205,68 @@ export const completeRaffleById = async (raffleId, salesProgress) => {
 
   const progress =
     salesProgress != null ? salesProgress : Number(raffle.salesProgress) || 0;
+  const participants =
+    participantsCount != null
+      ? participantsCount
+      : Number(raffle.participantsCount) || 0;
 
-  await RaffleModel.updateOne(
-    { _id: raffleId },
+  const productWindows = await buildRaffleProductSaleWindows(raffle);
+  const ticketEntries = await listRaffleBuyerTicketCounts(productWindows);
+  const winnerUserId = pickWeightedRaffleWinnerUserId(ticketEntries);
+  const winnerSnapshot = await resolveRaffleWinnerSnapshot(winnerUserId);
+
+  const completed = await RaffleModel.findOneAndUpdate(
+    {
+      _id: raffleId,
+      status: { $ne: RAFFLE_STATUS_COMPLETED },
+    },
     {
       $set: {
         status: RAFFLE_STATUS_COMPLETED,
         salesProgress: progress,
+        participantsCount: participants,
         completedAt: new Date(),
+        winnerUserId: winnerSnapshot.winnerUserId,
+        winnerUserName: winnerSnapshot.winnerUserName,
+        winnerUserAvatarUrl: winnerSnapshot.winnerUserAvatarUrl,
+        winnerSelectedAt: winnerSnapshot.winnerSelectedAt,
       },
     },
-  );
+    { new: true },
+  ).lean();
+
+  if (!completed) {
+    return RaffleModel.findById(raffleId).lean();
+  }
 
   await clearRaffleParticipationFromProducts(raffleId);
 
   try {
+    const winnerLabel = winnerSnapshot.winnerUserName || WINNER_FALLBACK_USER_NAME;
+    const sellerMessage = winnerSnapshot.winnerUserId
+      ? `Розыгрыш «${raffle.title}» завершён. Победитель: ${winnerLabel}`
+      : `Розыгрыш «${raffle.title}» завершён`;
+
     await createUserInAppNotification({
       userId: raffle.sellerId,
       kind: RAFFLE_NOTIFICATION_KIND_GOAL_REACHED,
-      message: `Розыгрыш «${raffle.title}» завершён`,
+      message: sellerMessage,
     });
+
+    if (winnerSnapshot.winnerUserId) {
+      await createUserInAppNotification({
+        userId: winnerSnapshot.winnerUserId,
+        kind: RAFFLE_NOTIFICATION_KIND_WINNER,
+        message: `Вы победили в розыгрыше «${raffle.title}»`,
+      });
+    }
+
     await notifyFollowersOfSellerRaffleCompleted(raffle);
   } catch (error) {
     console.error("completeRaffleById notifications error:", error);
   }
 
-  return RaffleModel.findById(raffleId).lean();
+  return completed;
 };
 
 /**
@@ -199,11 +326,26 @@ export const toPublicRafflePayload = (raffle, options = {}) => {
     prizeImageFocus: normalizeRafflePrizeImageFocus(raffle.prizeImageFocus),
     targetSales: Number(raffle.targetSales) || 0,
     salesProgress: Number(raffle.salesProgress) || 0,
+    participantsCount: Number(raffle.participantsCount) || 0,
     status,
     instagramUrl: showInstagram ? raffle.instagramUrl : null,
     moderationComment: status === "rejected" ? (raffle.moderationComment ?? "") : "",
     approvedAt: raffle.approvedAt ?? null,
     completedAt: raffle.completedAt ?? null,
+    winner: raffle.winnerUserId
+      ? {
+          _id: String(raffle.winnerUserId),
+          userName:
+            typeof raffle.winnerUserName === "string" && raffle.winnerUserName.trim()
+              ? raffle.winnerUserName.trim()
+              : WINNER_FALLBACK_USER_NAME,
+          userAvatarUrl:
+            typeof raffle.winnerUserAvatarUrl === "string"
+              ? raffle.winnerUserAvatarUrl.trim()
+              : "",
+        }
+      : null,
+    winnerSelectedAt: raffle.winnerSelectedAt ?? null,
     createdAt: raffle.createdAt,
     updatedAt: raffle.updatedAt,
     seller: seller
@@ -263,6 +405,28 @@ export const getSellerActiveRaffle = async (sellerId) => {
     .lean();
 };
 
+/**
+ * Hard-delete completed старше TTL. Лениво с featured.
+ * @param {Date} [now]
+ * @returns {Promise<number>} сколько удалено
+ */
+export const purgeExpiredCompletedRaffles = async (now = new Date()) => {
+  const cutoff = getCompletedRaffleExpiryCutoff(now);
+  const expired = await RaffleModel.find({
+    status: RAFFLE_STATUS_COMPLETED,
+    completedAt: { $lte: cutoff },
+  })
+    .select("_id")
+    .lean();
+
+  for (const row of expired) {
+    await clearRaffleParticipationFromProducts(row._id);
+    await RaffleModel.deleteOne({ _id: row._id });
+  }
+
+  return expired.length;
+};
+
 /** @deprecated используйте getFeaturedSiteRaffles */
 export const getFeaturedSiteRaffle = async () => {
   const rows = await getFeaturedSiteRaffles();
@@ -270,17 +434,36 @@ export const getFeaturedSiteRaffle = async () => {
 };
 
 export const getFeaturedSiteRaffles = async () => {
+  await purgeExpiredCompletedRaffles();
+
   const actives = await RaffleModel.find({ status: RAFFLE_STATUS_ACTIVE })
     .sort({ approvedAt: -1 })
     .limit(SITE_RAFFLES_ACTIVE_VITRINE_MAX)
     .lean();
 
-  const completed = await RaffleModel.find({ status: RAFFLE_STATUS_COMPLETED })
+  const refreshedActives = [];
+  for (const raffle of actives) {
+    const salesProgress = Number(raffle.salesProgress) || 0;
+    const participantsCount = Number(raffle.participantsCount) || 0;
+    const needsParticipantsSync = salesProgress > 0 && participantsCount === 0;
+    if (needsParticipantsSync) {
+      const fresh = await recalculateRaffleSalesProgress(raffle._id);
+      refreshedActives.push(fresh ?? raffle);
+      continue;
+    }
+    refreshedActives.push(raffle);
+  }
+
+  const completedCutoff = getCompletedRaffleExpiryCutoff();
+  const completed = await RaffleModel.find({
+    status: RAFFLE_STATUS_COMPLETED,
+    completedAt: { $gt: completedCutoff },
+  })
     .sort({ completedAt: -1 })
     .limit(SITE_RAFFLES_COMPLETED_VITRINE_MAX)
     .lean();
 
-  return [...actives, ...completed];
+  return [...refreshedActives, ...completed];
 };
 
 export const assertSiteActiveRafflesWithinLimit = async (excludeRaffleId) => {

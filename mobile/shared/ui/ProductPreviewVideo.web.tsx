@@ -8,6 +8,10 @@ type ProductPreviewVideoProps = {
   onPlaybackFailed?: () => void;
 };
 
+/**
+ * Web: `<video>` перехватывает pointer events на Android tablet —
+ * `pointerEvents: none`, чтобы тап открывал карточку товара.
+ */
 export const ProductPreviewVideo = ({ uri, onPlaybackFailed }: ProductPreviewVideoProps) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
@@ -32,7 +36,7 @@ export const ProductPreviewVideo = ({ uri, onPlaybackFailed }: ProductPreviewVid
   }, [uri, onPlaybackFailed]);
 
   return (
-    <View style={styles.wrap}>
+    <View style={styles.wrap} pointerEvents="none">
       {createElement(
         "video",
         {
@@ -62,5 +66,6 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     objectFit: "cover",
+    pointerEvents: "none",
   },
 });

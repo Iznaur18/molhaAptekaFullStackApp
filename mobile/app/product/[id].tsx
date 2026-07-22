@@ -38,6 +38,7 @@ import { ProductAuctionTab, type ProductAuctionDockFooter } from "@/features/pro
 import { ProductInstallmentTab, type ProductInstallmentDockFooter } from "@/features/product-detail/ui/ProductInstallmentTab";
 import { ProductReviewsTab } from "@/features/product-detail/ui/ProductReviewsTab";
 import { ProductPromotionModal } from "@/features/product-promotion/ui/ProductPromotionModal";
+import { SquircleView } from "@/shared/ui/SquircleView";
 import { useProductPromotionManageSupport } from "@/features/product-promotion/model/useProductPromotionManageSupport";
 import { ReportProductModal } from "@/features/product-report/ui/ReportProductModal";
 import { catalogQueryKeys, loyaltyPointsQueryKeys, myProductsQueryKeys } from "@/shared/api";
@@ -50,7 +51,8 @@ import {
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { useVisualViewportKeyboardBottomInset } from "@/shared/lib/useVisualViewportKeyboardBottomInset";
-import { useProductDetailScreenStyles } from "@/shared/theme/catalogProductStyles";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
+import { PRODUCT_DETAIL_PURCHASE_DOCK_TOP_RADIUS, useProductDetailScreenStyles } from "@/shared/theme/catalogProductStyles";
 import { AppButton } from "@/shared/ui/AppButton";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
@@ -58,6 +60,7 @@ export default function ProductDetailScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const styles = useProductDetailScreenStyles();
+  const { centeredContentStyle } = useScreenLayout();
   const queryClient = useQueryClient();
   const keyboardBottomInset = useVisualViewportKeyboardBottomInset();
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -326,140 +329,146 @@ export default function ProductDetailScreen() {
 
   return (
     <View style={[styles.screen, { paddingTop: insets.top }]}>
-      <KeyboardAvoidingView
-        style={styles.scrollArea}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        keyboardVerticalOffset={Platform.OS === "ios" ? insets.top : 0}
-      >
-        <ScrollView
+      <View style={[styles.scrollArea, centeredContentStyle]}>
+        <KeyboardAvoidingView
           style={styles.scrollArea}
-          contentContainerStyle={[
-            styles.container,
-            !showMobilePurchaseDock && !showInstallmentDock && !showAuctionDock && styles.containerNoDock,
-            keyboardBottomInset > 0 ? { paddingBottom: keyboardBottomInset } : null,
-          ]}
-          keyboardShouldPersistTaps="handled"
-          automaticallyAdjustKeyboardInsets={Platform.OS !== "web"}
-          automaticallyAdjustsScrollIndicatorInsets={Platform.OS !== "web"}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          keyboardVerticalOffset={Platform.OS === "ios" ? insets.top : 0}
         >
-        <ProductDetailMediaSection
-          product={productRecord}
-          productId={productId}
-          imageUrls={imageUrls}
-          previewVideoUrl={previewVideoUrl}
-          isOwnProduct={isOwnProduct}
-          onReportPress={handleReportPress}
-          reportDisabled={isAuthorized && hasPendingReport}
-        />
+          <ScrollView
+            style={styles.scrollArea}
+            contentContainerStyle={[
+              styles.container,
+              !showMobilePurchaseDock && !showInstallmentDock && !showAuctionDock && styles.containerNoDock,
+              keyboardBottomInset > 0 ? { paddingBottom: keyboardBottomInset } : null,
+            ]}
+            keyboardShouldPersistTaps="handled"
+            automaticallyAdjustKeyboardInsets={Platform.OS !== "web"}
+            automaticallyAdjustsScrollIndicatorInsets={Platform.OS !== "web"}
+          >
+          <ProductDetailMediaSection
+            product={productRecord}
+            productId={productId}
+            imageUrls={imageUrls}
+            previewVideoUrl={previewVideoUrl}
+            isOwnProduct={isOwnProduct}
+            onReportPress={handleReportPress}
+            reportDisabled={isAuthorized && hasPendingReport}
+          />
 
-        {showTabs ? (
-          <ProductDetailTabBar tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
+          {showTabs ? (
+            <ProductDetailTabBar tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
+          ) : null}
+
+          <View style={[styles.tabPanel, isAltTab && styles.tabPanelInset]}>
+            {activeTab === "details" ? (
+              <ProductDetailsDetailsTab
+                product={productRecord}
+                topStatFieldKeys={topStatFieldKeys}
+              />
+            ) : null}
+            {activeTab === "reviews" ? (
+              <ProductReviewsTab
+                productId={productId}
+                isAuthorized={isAuthorized}
+                isUserDataConfirmed={sessionQuery.data?.user?.isUserDataConfirmed === true}
+                isOwnProduct={isOwnProduct}
+              />
+            ) : null}
+            {activeTab === "auction" ? (
+              <ProductAuctionTab
+                productId={productId}
+                auctionActive={auctionUi.auctionActive}
+                completedOnce={auctionUi.completedOnce}
+                isAuthorized={isAuthorized}
+                isUserDataConfirmed={sessionQuery.data?.user?.isUserDataConfirmed === true}
+                isOwnProduct={isOwnProduct}
+                onDockFooterChange={handleAuctionDockChange}
+              />
+            ) : null}
+            {activeTab === "installment" ? (
+              <ProductInstallmentTab
+                productId={productId}
+                productPrice={productPrice}
+                installmentEnabled={productRecord.productInstallmentEnabled === true}
+                isAuthorized={isAuthorized}
+                isUserDataConfirmed={sessionQuery.data?.user?.isUserDataConfirmed === true}
+                isOwnProduct={isOwnProduct}
+                defaultUser={sessionQuery.data?.user ?? null}
+                onDockFooterChange={handleInstallmentDockChange}
+              />
+            ) : null}
+          </View>
+
+          {isOwnProduct && activeTab === "details" ? (
+            <View style={styles.mobileInlineActions}>
+              <AppButton
+                label={PRODUCT_CARD_UI.PROMOTION_BUTTON}
+                variant="contrast"
+                onPress={handleOpenPromotionModal}
+                disabled={!canPromoteProduct}
+                style={[styles.sellerActionButton, !canPromoteProduct && styles.promoteButtonDisabled]}
+              />
+              <AppButton
+                label={PRODUCT_CARD_UI.EDIT_PRODUCT}
+                variant="outline"
+                onPress={() => router.push(`/edit-product/${productId}`)}
+                style={styles.sellerActionButton}
+              />
+            </View>
+          ) : null}
+
+          {reportSuccessMessage ? (
+            <Text style={styles.reportSuccess}>{reportSuccessMessage}</Text>
+          ) : null}
+        </ScrollView>
+        </KeyboardAvoidingView>
+
+        {showMobilePurchaseDock && keyboardBottomInset === 0 ? (
+          <SquircleView
+            radius={PRODUCT_DETAIL_PURCHASE_DOCK_TOP_RADIUS}
+            outerStyle={styles.purchaseDock}
+            style={[styles.purchaseDockInner, { paddingBottom: Math.max(insets.bottom, 10.4) }]}
+          >
+            <ProductDetailPurchaseActions
+              productId={productId}
+              product={productRecord}
+              canShowAddToCart={canShowAddToCart}
+              auctionActive={auctionUi.auctionActive}
+              installmentActive={installmentActive}
+              onAuctionPress={handleAuctionShortcut}
+              onInstallmentPress={handleInstallmentShortcut}
+              variant="dock"
+            />
+          </SquircleView>
         ) : null}
 
-        <View style={[styles.tabPanel, isAltTab && styles.tabPanelInset]}>
-          {activeTab === "details" ? (
-            <ProductDetailsDetailsTab
-              product={productRecord}
-              topStatFieldKeys={topStatFieldKeys}
-            />
-          ) : null}
-          {activeTab === "reviews" ? (
-            <ProductReviewsTab
-              productId={productId}
-              isAuthorized={isAuthorized}
-              isUserDataConfirmed={sessionQuery.data?.user?.isUserDataConfirmed === true}
-              isOwnProduct={isOwnProduct}
-            />
-          ) : null}
-          {activeTab === "auction" ? (
-            <ProductAuctionTab
-              productId={productId}
-              auctionActive={auctionUi.auctionActive}
-              completedOnce={auctionUi.completedOnce}
-              isAuthorized={isAuthorized}
-              isUserDataConfirmed={sessionQuery.data?.user?.isUserDataConfirmed === true}
-              isOwnProduct={isOwnProduct}
-              onDockFooterChange={handleAuctionDockChange}
-            />
-          ) : null}
-          {activeTab === "installment" ? (
-            <ProductInstallmentTab
-              productId={productId}
-              productPrice={productPrice}
-              installmentEnabled={productRecord.productInstallmentEnabled === true}
-              isAuthorized={isAuthorized}
-              isUserDataConfirmed={sessionQuery.data?.user?.isUserDataConfirmed === true}
-              isOwnProduct={isOwnProduct}
-              defaultUser={sessionQuery.data?.user ?? null}
-              onDockFooterChange={handleInstallmentDockChange}
-            />
-          ) : null}
-        </View>
-
-        {isOwnProduct && activeTab === "details" ? (
-          <View style={styles.mobileInlineActions}>
+        {showInstallmentDock && installmentDock && keyboardBottomInset === 0 ? (
+          <View style={[styles.installmentDock, { paddingBottom: Math.max(insets.bottom, 10.4) }]}>
             <AppButton
-              label={PRODUCT_CARD_UI.PROMOTION_BUTTON}
-              variant="contrast"
-              onPress={handleOpenPromotionModal}
-              disabled={!canPromoteProduct}
-              style={[styles.sellerActionButton, !canPromoteProduct && styles.promoteButtonDisabled]}
-            />
-            <AppButton
-              label={PRODUCT_CARD_UI.EDIT_PRODUCT}
-              variant="outline"
-              onPress={() => router.push(`/edit-product/${productId}`)}
-              style={styles.sellerActionButton}
+              label={installmentDock.label}
+              variant="primary"
+              onPress={installmentDock.onSubmit}
+              disabled={installmentDock.disabled}
+              style={styles.installmentDockButton}
+              accessibilityLabel={INSTALLMENT_UI.SUBMIT}
             />
           </View>
         ) : null}
 
-        {reportSuccessMessage ? (
-          <Text style={styles.reportSuccess}>{reportSuccessMessage}</Text>
+        {showAuctionDock && auctionDock && keyboardBottomInset === 0 ? (
+          <View style={[styles.installmentDock, { paddingBottom: Math.max(insets.bottom, 10.4) }]}>
+            <AppButton
+              label={auctionDock.label}
+              variant="primary"
+              onPress={auctionDock.onSubmit}
+              disabled={auctionDock.disabled}
+              style={styles.installmentDockButton}
+              accessibilityLabel={auctionDock.label}
+            />
+          </View>
         ) : null}
-      </ScrollView>
-      </KeyboardAvoidingView>
-
-      {showMobilePurchaseDock && keyboardBottomInset === 0 ? (
-        <View style={[styles.purchaseDock, { paddingBottom: Math.max(insets.bottom, 10.4) }]}>
-          <ProductDetailPurchaseActions
-            productId={productId}
-            product={productRecord}
-            canShowAddToCart={canShowAddToCart}
-            auctionActive={auctionUi.auctionActive}
-            installmentActive={installmentActive}
-            onAuctionPress={handleAuctionShortcut}
-            onInstallmentPress={handleInstallmentShortcut}
-            variant="dock"
-          />
-        </View>
-      ) : null}
-
-      {showInstallmentDock && installmentDock && keyboardBottomInset === 0 ? (
-        <View style={[styles.installmentDock, { paddingBottom: Math.max(insets.bottom, 10.4) }]}>
-          <AppButton
-            label={installmentDock.label}
-            variant="primary"
-            onPress={installmentDock.onSubmit}
-            disabled={installmentDock.disabled}
-            style={styles.installmentDockButton}
-            accessibilityLabel={INSTALLMENT_UI.SUBMIT}
-          />
-        </View>
-      ) : null}
-
-      {showAuctionDock && auctionDock && keyboardBottomInset === 0 ? (
-        <View style={[styles.installmentDock, { paddingBottom: Math.max(insets.bottom, 10.4) }]}>
-          <AppButton
-            label={auctionDock.label}
-            variant="primary"
-            onPress={auctionDock.onSubmit}
-            disabled={auctionDock.disabled}
-            style={styles.installmentDockButton}
-            accessibilityLabel={auctionDock.label}
-          />
-        </View>
-      ) : null}
+      </View>
 
       <ReportProductModal
         visible={reportModalVisible}

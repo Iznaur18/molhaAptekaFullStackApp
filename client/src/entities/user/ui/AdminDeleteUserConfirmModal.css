@@ -12,7 +12,7 @@
 .admin-delete-user__backdrop {
   position: absolute;
   inset: 0;
-  background: var(--iz-color-overlay);
+  background: var(--iz-color-modal-scrim);
 }
 
 .admin-delete-user__card {

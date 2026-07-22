@@ -26,6 +26,7 @@ import { renderProductDetailsFieldRows } from "./renderProductDetailsFieldRows.j
  *   currentUserId?: string | null;
  *   mobileReportOverlay?: import('react').ReactNode;
  *   productTitleId?: string;
+ *   embedMediaGallery?: boolean;
  *   ctrl: ReturnType<import('./useProductDetailsModalController.js').useProductDetailsModalController>;
  * }} props
  */
@@ -39,6 +40,7 @@ export function ProductDetailsModalDetailsTab({
   currentUserId = null,
   mobileReportOverlay = null,
   productTitleId,
+  embedMediaGallery = true,
   ctrl,
 }) {
   const {
@@ -60,79 +62,75 @@ export function ProductDetailsModalDetailsTab({
     isOwnProduct,
   } = ctrl;
 
-  return (
-    <>
-      <div className="product-details-modal__row-top">
-        <ProductMediaGalleryReadonly
-          imageUrls={imageUrls}
-          previewVideoUrl={previewVideoUrl}
-          isActive={isOpen}
-          resetToken={product._id}
-          onBack={fieldHandlers.onClose}
-          heroOverlay={
-            !isOwnProduct || mobileReportOverlay ? (
-              <div className="product-media-gallery-readonly__hero-actions">
-                {mobileReportOverlay ? (
-                  <div className="product-media-gallery-readonly__report-slot">
-                    {mobileReportOverlay}
-                  </div>
-                ) : null}
-                {!isOwnProduct ? (
-                  <WishlistToggleButton
-                    productId={String(product._id)}
-                    product={product}
-                    isAuthorized={isAuthorized}
-                    onRequestLogin={onRequestLogin}
-                    currentUserId={currentUserId}
-                    onProductStatsUpdate={onProductStatsUpdate}
-                    variant="card"
-                  />
-                ) : null}
-              </div>
-            ) : null
-          }
+  const priceBlock = showPriceBlock ? (
+    <div className="product-details-modal__price-block product-details-modal__price-block--inline-actions">
+      <h3 id={productTitleId} className="product-details-modal__product-name">
+        {product.productName?.trim() || "Товар"}
+      </h3>
+      <ProductPriceDisplay
+        product={product}
+        showLabel={false}
+        className="product-details-modal__price-display"
+      />
+      <div className="product-details-modal__price-badge-row">
+        <ProductDiscountBadge
+          discountPercent={resolveProductDiscountPercent(product)}
+          className="product-details-modal__price-discount"
         />
-        <div className="product-details-modal__spec">
-          {showPriceBlock ? (
-            <div className="product-details-modal__price-block product-details-modal__price-block--inline-actions">
-              <h3
-                id={productTitleId}
-                className="product-details-modal__product-name"
-              >
-                {product.productName?.trim() || "Товар"}
-              </h3>
-              <ProductPriceDisplay
-                product={product}
-                showLabel={false}
-                className="product-details-modal__price-display"
-              />
-              <div className="product-details-modal__price-badge-row">
-                <ProductDiscountBadge
-                  discountPercent={resolveProductDiscountPercent(product)}
-                  className="product-details-modal__price-discount"
-                />
-                <ProductCatalogStatusBadges
-                  product={product}
-                  isAuthorized={isAuthorized}
-                  isPremiumUser={isPremiumUser}
-                />
+        <ProductCatalogStatusBadges
+          product={product}
+          isAuthorized={isAuthorized}
+          isPremiumUser={isPremiumUser}
+        />
+      </div>
+      <ProductDetailsModalPurchaseActions
+        productId={String(product._id)}
+        isAuthorized={isAuthorized}
+        onRequestLogin={onRequestLogin}
+        purchaseLimit={purchaseLimit}
+        canShowAddToCart={canShowAddToCart}
+        auctionUi={auctionUi}
+        installmentUi={installmentUi}
+        onAuctionClick={handleAuctionShortcutClick}
+        onInstallmentClick={handleInstallmentShortcutClick}
+      />
+    </div>
+  ) : null;
+
+  const mediaGallery = (
+    <ProductMediaGalleryReadonly
+      imageUrls={imageUrls}
+      previewVideoUrl={previewVideoUrl}
+      isActive={isOpen}
+      resetToken={product._id}
+      onBack={fieldHandlers.onClose}
+      heroOverlay={
+        !isOwnProduct || mobileReportOverlay ? (
+          <div className="product-media-gallery-readonly__hero-actions">
+            {mobileReportOverlay ? (
+              <div className="product-media-gallery-readonly__report-slot">
+                {mobileReportOverlay}
               </div>
-              <ProductDetailsModalPurchaseActions
+            ) : null}
+            {!isOwnProduct ? (
+              <WishlistToggleButton
                 productId={String(product._id)}
+                product={product}
                 isAuthorized={isAuthorized}
                 onRequestLogin={onRequestLogin}
-                purchaseLimit={purchaseLimit}
-                canShowAddToCart={canShowAddToCart}
-                auctionUi={auctionUi}
-                installmentUi={installmentUi}
-                onAuctionClick={handleAuctionShortcutClick}
-                onInstallmentClick={handleInstallmentShortcutClick}
+                currentUserId={currentUserId}
+                onProductStatsUpdate={onProductStatsUpdate}
+                variant="card"
               />
-            </div>
-          ) : null}
-        </div>
-      </div>
+            ) : null}
+          </div>
+        ) : null
+      }
+    />
+  );
 
+  const detailsBelow = (
+    <>
       {topStatFieldKeys.length > 0 ? (
         <dl className="product-details-modal__stats-grid product-details-modal__stats-grid--standalone">
           {renderProductDetailsFieldRows(product, topStatFieldKeys, fieldHandlers)}
@@ -171,6 +169,25 @@ export function ProductDetailsModalDetailsTab({
           ) : null}
         </section>
       ) : null}
+    </>
+  );
+
+  if (!embedMediaGallery) {
+    return (
+      <>
+        <div className="product-details-modal__spec">{priceBlock}</div>
+        {detailsBelow}
+      </>
+    );
+  }
+
+  return (
+    <>
+      <div className="product-details-modal__row-top">
+        {mediaGallery}
+        <div className="product-details-modal__spec">{priceBlock}</div>
+      </div>
+      {detailsBelow}
     </>
   );
 }

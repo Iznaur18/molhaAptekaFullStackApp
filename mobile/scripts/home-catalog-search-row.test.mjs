@@ -39,9 +39,12 @@ test("home catalog header panel matches web mobile-split chrome", () => {
   assert.match(styles, /paddingHorizontal: HOME_CATALOG_HEADER_PANEL_PADDING\.horizontal/);
   assert.match(styles, /paddingBottom: HOME_CATALOG_HEADER_PANEL_PADDING\.bottom/);
   assert.match(styles, /HOME_CATALOG_HEADER_SEARCH_INPUT_MIN_HEIGHT/);
-  // Full-bleed: панель от края до края, safe-area в paddingTop.
+  // Full-bleed (категория): верх без радиуса. Overlay home: panelFloating.
   assert.match(styles, /borderTopLeftRadius: 0/);
   assert.match(styles, /borderBottomLeftRadius: HOME_CATALOG_HEADER_PANEL_RADIUS/);
+  assert.match(styles, /panelFloating/);
+  assert.match(styles, /MOBILE_BOTTOM_NAV_BORDER_RADIUS/);
+  assert.match(searchRow, /floating=\{embeddedInForegroundSheet\}/);
   assert.match(searchRow, /resolveHomeCatalogHeaderPanelPaddingTop/);
   assert.match(layout, /HOME_CATALOG_HEADER_PANEL_TOP_GAP = 0/);
   assert.match(layout, /horizontal: HOME_CATALOG_HEADER_SHELL_HORIZONTAL_INSET/);
@@ -52,6 +55,22 @@ test("home catalog header panel matches web mobile-split chrome", () => {
   assert.doesNotMatch(searchRow, /marginHorizontal/);
   assert.match(layout, /HOME_CATALOG_HEADER_PANEL_BLUR_RADIUS = 18/);
   assert.match(layout, /HOME_CATALOG_HEADER_BOTTOM_MARGIN = 0/);
+});
+
+test("HomeCatalogStickySearchShell insets match bottom nav", () => {
+  const shell = readMobileFile("features/home-feed/ui/HomeCatalogStickySearchShell.tsx");
+  const layout = readMobileFile("shared/lib/homeCatalogHeaderLayout.ts");
+  const index = readMobileFile("app/(tabs)/index.tsx");
+
+  assert.match(shell, /resolveMobileBottomNavHorizontalInset/);
+  assert.match(shell, /MOBILE_BOTTOM_NAV_FLOAT_OFFSET/);
+  assert.match(shell, /resolveContentMaxWidth/);
+  assert.match(shell, /paddingHorizontal: horizontalInset/);
+  assert.match(shell, /barWrap/);
+  assert.match(layout, /resolveHomeCatalogOverlayContentInsetTop/);
+  assert.match(layout, /resolveHomeCatalogOverlaySearchPanelHeight/);
+  assert.match(index, /resolveHomeCatalogOverlayContentInsetTop/);
+  assert.match(index, /paddingTop: homeFeedOverlayInsetTop/);
 });
 
 test("HomeCatalogUsersButton opens stretch menu from circle", () => {

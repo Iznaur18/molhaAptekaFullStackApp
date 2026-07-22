@@ -4,30 +4,20 @@ import {
   pathnameToMainView,
   isRoleRestrictedMainView,
 } from "../../../shared/lib/homeMainViewPaths.js";
-
+import { isProductDetailsPath } from "../../../shared/lib/productDetailsPaths.js";
 import { isRaffleProductsPath } from "../../../shared/lib/rafflePaths.js";
-
 import { isSellerProductsPath } from "../../../shared/lib/sellerPaths.js";
 
 /**
-
  * @param {object} params
-
  */
-
 export const useHomeRouteGuards = ({
   location,
-
   navigate,
-
   mainView,
-
   goToMainView,
-
   isSessionReady,
-
   isAdmin,
-
   canModerateProducts,
 }) => {
   useEffect(() => {
@@ -40,6 +30,10 @@ export const useHomeRouteGuards = ({
     }
 
     if (isSellerProductsPath(location.pathname)) {
+      return undefined;
+    }
+
+    if (isProductDetailsPath(location.pathname)) {
       return undefined;
     }
 

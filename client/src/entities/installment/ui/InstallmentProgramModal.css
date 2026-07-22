@@ -6,7 +6,7 @@
   align-items: stretch;
   justify-content: center;
   padding: 0;
-  background: var(--iz-color-overlay);
+  background: var(--iz-color-modal-scrim);
 }
 
 .installment-program-modal {

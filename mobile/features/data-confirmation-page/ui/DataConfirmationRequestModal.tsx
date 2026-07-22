@@ -43,6 +43,7 @@ import {
   USER_DATA_CONFIRMATION_PROFILE_PAGE_UI,
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { resolveDialogAccessibilityProps } from "@/shared/lib/resolveDialogAccessibilityProps";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useCancelButtonStyles } from "@/shared/theme/cancelButtonChromeStyles";
 import { useDataConfirmationRequestModalStyles } from "@/shared/theme/dataConfirmationPageStyles";
@@ -208,7 +209,7 @@ export const DataConfirmationRequestModal = ({
           behavior={Platform.OS === "ios" ? "padding" : undefined}
           keyboardVerticalOffset={Platform.OS === "ios" ? 24 : 0}
         >
-          <View style={styles.card} accessibilityRole="dialog">
+          <View style={styles.card} {...resolveDialogAccessibilityProps()}>
             <View style={styles.header}>
               <Text style={styles.title}>{DATA_CONFIRMATION_MODAL_UI.TITLE}</Text>
               <Pressable

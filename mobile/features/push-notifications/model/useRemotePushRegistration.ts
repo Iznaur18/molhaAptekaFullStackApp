@@ -1,6 +1,5 @@
 import Constants from "expo-constants";
 import * as Device from "expo-device";
-import * as Notifications from "expo-notifications";
 import { useRouter } from "expo-router";
 import { useEffect, useRef } from "react";
 import { Platform } from "react-native";
@@ -11,10 +10,16 @@ import {
   type PushTokenPlatform,
 } from "@/entities/push-token/api/pushTokenApi";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
+import {
+  canUseExpoNotificationsModule,
+  getExpoNotificationsModule,
+} from "@/features/push-notifications/lib/expoNotificationsModule";
 import { resolvePushNotificationRoute } from "@/features/push-notifications/lib/resolvePushNotificationRoute";
 import type { PushNotificationData } from "@/features/push-notifications/lib/resolvePushNotificationRoute";
 
-if (Platform.OS !== "web") {
+const Notifications = getExpoNotificationsModule();
+
+if (Notifications) {
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
       shouldShowAlert: true,
@@ -45,15 +50,16 @@ const resolveExpoProjectId = (): string | undefined => {
 };
 
 const requestNativePushToken = async (): Promise<string | null> => {
-  if (Platform.OS === "web" || !Device.isDevice) {
+  const notifications = getExpoNotificationsModule();
+  if (!notifications || !Device.isDevice) {
     return null;
   }
 
-  const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  const { status: existingStatus } = await notifications.getPermissionsAsync();
   let finalStatus = existingStatus;
 
   if (existingStatus !== "granted") {
-    const { status } = await Notifications.requestPermissionsAsync();
+    const { status } = await notifications.requestPermissionsAsync();
     finalStatus = status;
   }
 
@@ -62,14 +68,14 @@ const requestNativePushToken = async (): Promise<string | null> => {
   }
 
   if (Platform.OS === "android") {
-    await Notifications.setNotificationChannelAsync("default", {
+    await notifications.setNotificationChannelAsync("default", {
       name: "iziBuy",
-      importance: Notifications.AndroidImportance.DEFAULT,
+      importance: notifications.AndroidImportance.DEFAULT,
     });
   }
 
   const projectId = resolveExpoProjectId();
-  const tokenResponse = await Notifications.getExpoPushTokenAsync(
+  const tokenResponse = await notifications.getExpoPushTokenAsync(
     projectId ? { projectId } : undefined,
   );
 
@@ -83,10 +89,10 @@ const parsePushData = (raw: unknown): PushNotificationData | null => {
   return raw as PushNotificationData;
 };
 
-const isNativePushSupported = (): boolean => Platform.OS !== "web";
-
 const resolveRouteFromNotificationResponse = (
-  response: Notifications.NotificationResponse | null | undefined,
+  response: {
+    notification: { request: { content: { data: unknown } } };
+  } | null | undefined,
 ) => {
   if (!response) {
     return null;
@@ -99,12 +105,13 @@ const resolveRouteFromNotificationResponse = (
 const openColdStartNotificationRoute = async (
   router: ReturnType<typeof useRouter>,
 ): Promise<void> => {
-  if (!isNativePushSupported()) {
+  const notifications = getExpoNotificationsModule();
+  if (!notifications) {
     return;
   }
 
   try {
-    const response = await Notifications.getLastNotificationResponseAsync();
+    const response = await notifications.getLastNotificationResponseAsync();
     const route = resolveRouteFromNotificationResponse(response);
     if (route) {
       router.push(route);
@@ -118,9 +125,13 @@ export const useRemotePushRegistration = (): void => {
   const isAuthorized = useIsAuthorized();
   const router = useRouter();
   const registeredTokenRef = useRef<string | null>(null);
-  const responseListenerRef = useRef<Notifications.EventSubscription | null>(null);
+  const responseListenerRef = useRef<{ remove: () => void } | null>(null);
 
   useEffect(() => {
+    if (!canUseExpoNotificationsModule()) {
+      return;
+    }
+
     if (!isAuthorized) {
       const token = registeredTokenRef.current;
       if (token) {
@@ -156,11 +167,12 @@ export const useRemotePushRegistration = (): void => {
   }, [isAuthorized]);
 
   useEffect(() => {
-    if (!isNativePushSupported()) {
+    const notifications = getExpoNotificationsModule();
+    if (!notifications) {
       return undefined;
     }
 
-    responseListenerRef.current = Notifications.addNotificationResponseReceivedListener(
+    responseListenerRef.current = notifications.addNotificationResponseReceivedListener(
       (response) => {
         const route = resolveRouteFromNotificationResponse(response);
         if (route) {

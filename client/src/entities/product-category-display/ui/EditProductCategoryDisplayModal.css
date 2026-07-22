@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  background: var(--iz-color-overlay);
+  background: var(--iz-color-modal-scrim);
   animation: edit-category-display-modal-backdrop-in 0.28s ease-out;
 }
 
@@ -91,13 +91,12 @@
   font-size: 0.9375rem;
 }
 
+/* Геометрия — из базового слоя controls.css (useAdminEditModalStyles.input) */
 .edit-category-display-modal__input {
   box-sizing: border-box;
   width: 100%;
-  padding: 0.625rem 0.75rem;
-  border: 1px solid var(--iz-color-border);
-  border-radius: 8px;
   font: inherit;
+  font-size: var(--iz-control-input-font);
 }
 
 .edit-category-display-modal__hint {

@@ -9,6 +9,7 @@ import { resolveProductImageUrl } from "@/entities/product/lib/resolveProductIma
 import { getProductPurchaseLimit } from "@/entities/product/lib/getProductPurchaseLimit";
 import { CART_LINE_CARD_BORDER_RADIUS, CART_PAGE_UI } from "@/shared/config";
 import { formatPriceRub } from "@/shared/lib";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useCartLineItemStyles } from "@/shared/theme/commerceScreenStyles";
 import { AppCheckbox } from "@/shared/ui/AppCheckbox";
 import { CachedProductImage } from "@/shared/ui/CachedProductImage";
@@ -24,6 +25,7 @@ type CartLineItemProps = {
 
 export const CartLineItem = ({ line, selected, onToggleSelected }: CartLineItemProps) => {
   const router = useRouter();
+  const theme = useAppTheme();
   const styles = useCartLineItemStyles();
   const { setItemQuantity, removeItem, isUpdating } = useCartActions();
 
@@ -95,7 +97,7 @@ export const CartLineItem = ({ line, selected, onToggleSelected }: CartLineItemP
           disabled={isUpdating}
           accessibilityLabel={CART_PAGE_UI.REMOVE_LINE_ARIA}
         >
-          <Feather name="trash-2" size={20} color={styles.removeIcon.color} />
+          <Feather name="trash-2" size={20} color={theme.colors.textMuted} />
         </Pressable>
 
         <View style={styles.stepperWrap}>

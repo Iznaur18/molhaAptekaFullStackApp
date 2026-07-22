@@ -1,7 +1,6 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Image } from "expo-image";
-import { useVideoPlayer, VideoView } from "expo-video";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Pressable, View } from "react-native";
 
 import { formatRafflePrizeContentPosition } from "@/entities/raffle/lib/rafflePrizeImageFocus";
@@ -10,39 +9,9 @@ import { resolveRafflePrizeImageUrl } from "@/entities/raffle/lib/resolveRaffleP
 import { resolveRafflePrizeVideoUrl } from "@/entities/raffle/lib/resolveRafflePrizeVideoUrl";
 import type { RaffleFromApi } from "@/entities/raffle/model/types";
 import { RAFFLE_PRIZE_MEDIA_UI } from "@/shared/config";
-import { useRaffleFeaturedBannerStyles } from "@/shared/theme/raffleFeaturedStyles";
 import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
-
-type RafflePrizeVideoProps = {
-  uri: string;
-  isMuted: boolean;
-  isActive?: boolean;
-  style: ReturnType<typeof useRaffleFeaturedBannerStyles>["media"];
-};
-
-const RafflePrizeVideo = ({ uri, isMuted, isActive = true, style }: RafflePrizeVideoProps) => {
-  const player = useVideoPlayer(uri, (instance) => {
-    instance.loop = true;
-    instance.muted = isMuted;
-    if (isActive) {
-      instance.play();
-    }
-  });
-
-  useEffect(() => {
-    player.muted = isMuted;
-  }, [isMuted, player]);
-
-  useEffect(() => {
-    if (isActive) {
-      player.play();
-      return;
-    }
-    player.pause();
-  }, [isActive, player]);
-
-  return <VideoView player={player} style={style} contentFit="cover" nativeControls={false} />;
-};
+import { useRaffleFeaturedBannerStyles } from "@/shared/theme/raffleFeaturedStyles";
+import { LoopingCoverVideo } from "@/shared/ui/LoopingCoverVideo";
 
 type RafflePrizeMediaProps = {
   raffle: RaffleFromApi;
@@ -66,8 +35,13 @@ export const RafflePrizeMedia = ({
 
   if (isVideo && videoSrc) {
     return (
-      <View style={styles.videoWrap}>
-        <RafflePrizeVideo uri={videoSrc} isMuted={isMuted} isActive={isVideoActive} style={styles.media} />
+      <View style={styles.videoWrap} collapsable={false} pointerEvents="box-none">
+        <LoopingCoverVideo
+          uri={videoSrc}
+          isMuted={isMuted}
+          isPlaying={isVideoActive}
+          style={styles.media}
+        />
         {showSoundToggle ? (
           <Pressable
             style={styles.soundButton}

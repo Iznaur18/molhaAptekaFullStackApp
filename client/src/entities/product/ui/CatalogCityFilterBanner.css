@@ -7,7 +7,7 @@
   padding: 10px 14px;
   border-radius: 10px;
   background: var(--color-surface-muted, #f3f4f6);
-  border: 1px solid var(--color-border-subtle, #e5e7eb);
+  border: 1px solid var(--iz-color-border);
 }
 
 .catalog-city-filter-banner__text {
@@ -20,7 +20,7 @@
   flex-shrink: 0;
   border: 0;
   background: transparent;
-  color: var(--color-link, #2563eb);
+  color: var(--iz-color-link);
   font: inherit;
   font-weight: 600;
   cursor: pointer;
@@ -29,7 +29,7 @@
 }
 
 .catalog-city-filter-banner__action:hover {
-  color: var(--color-link-hover, #1d4ed8);
+  color: var(--iz-color-action-hover);
 }
 
 @container app-viewport (max-width: 640px) {

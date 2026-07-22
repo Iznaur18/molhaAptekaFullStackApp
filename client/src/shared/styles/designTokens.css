@@ -229,4 +229,99 @@
   --iz-catalog-grid-min-column: 200px;
   --iz-catalog-grid-mobile-columns: 3;
   --iz-catalog-grid-breakpoint: 640px;
+
+  /* ===========================================================================
+   * Mobile parity scale
+   * ---------------------------------------------------------------------------
+   * Значения 1:1 с мобильным приложением (mobile/shared/theme/*.ts).
+   * Шкала в целых px — приложение фиксирует масштаб шрифта (FIXED_FONT_PROPS),
+   * поэтому web не должен «плыть» от системного размера.
+   * Менять только вместе с mobile.
+   * ======================================================================== */
+
+  /* --- Typography scale (px, как в RN StyleSheet) --- */
+  --iz-font-2xs: 11px; /* tierBadge, микро-подписи */
+  --iz-font-xs: 12px; /* hint, charCount, stepProgress */
+  --iz-font-sm: 13px; /* description, label малый */
+  --iz-font-base: 14px; /* body small, fieldLabel */
+  --iz-font-md: 15px; /* label кнопки, body */
+  --iz-font-lg: 16px; /* input text, sizeMd */
+  --iz-font-xl: 17px; /* heading малый */
+  --iz-font-2xl: 18px; /* modal title */
+  --iz-font-3xl: 20px; /* title */
+  --iz-font-4xl: 22px;
+  --iz-font-5xl: 24px;
+  --iz-font-6xl: 26px; /* login title */
+  --iz-font-7xl: 28px; /* auth hero title */
+
+  /* --- Line heights (абсолютные, как lineHeight в RN) --- */
+  --iz-leading-2xs: 16px; /* 12/16 */
+  --iz-leading-xs: 17px; /* 12/17 */
+  --iz-leading-sm: 18px; /* 13/18 */
+  --iz-leading-base: 20px; /* 14/20, 15/20 */
+  --iz-leading-lg: 22px; /* 16/22 */
+  --iz-leading-xl: 24px; /* 18/24 */
+  /* Для многострочного текста без фикс. высоты в мобиле */
+  --iz-leading-relaxed: 1.35;
+
+  --iz-weight-regular: 400;
+  --iz-weight-medium: 500;
+  --iz-weight-semibold: 600;
+  --iz-weight-bold: 700;
+
+  /* --- Radius (дополняет существующие, значения из mobile) --- */
+  --iz-radius-segment-tab: 11px;
+  --iz-radius-card: 14px;
+  --iz-radius-card-lg: 16px;
+
+  /* --- Border widths --- */
+  /* RN StyleSheet.hairlineWidth → 1px на web (DPR-независимо) */
+  --iz-border-hairline: 1px;
+  --iz-border: 1px;
+  --iz-border-strong: 1.5px; /* tierCard, durationChip */
+  --iz-border-selected: 2px; /* выбранная карточка оплаты */
+
+  /* --- Control metrics: AppButton (mobile/shared/ui/AppButton.tsx) --- */
+  --iz-control-btn-padding-y: 12px;
+  --iz-control-btn-padding-x: 20px;
+  --iz-control-btn-radius: var(--iz-radius-button); /* 10px */
+  --iz-control-btn-font: var(--iz-font-md); /* 15px */
+  --iz-control-btn-weight: var(--iz-weight-semibold);
+
+  /* Кнопка действия в модалке: paddingVertical 14 + minHeight 48 */
+  --iz-control-btn-modal-padding-y: 14px;
+  --iz-control-btn-modal-min-height: 48px;
+
+  /* --- Control metrics: inputs --- */
+  /* auth/login: px 16, py 14, font 16, border 1px borderStrong */
+  --iz-control-input-padding-y: 14px;
+  --iz-control-input-padding-x: 16px;
+  --iz-control-input-radius: var(--iz-radius-button); /* 10px */
+  --iz-control-input-font: var(--iz-font-lg); /* 16px */
+  /* form field (useFormFieldStyles): px 12, py 10 */
+  --iz-control-field-padding-y: 10px;
+  --iz-control-field-padding-x: 12px;
+  /* checkout (useCheckoutFormStyles): px 14, py 9, radius 8, font 15 */
+  --iz-control-checkout-padding-y: 9px;
+  --iz-control-checkout-padding-x: 14px;
+
+  /* --- Interactive states (mobile Pressable/AppButton) --- */
+  --iz-state-disabled-opacity: 0.55; /* AppButton.disabled */
+  --iz-state-pressed-opacity: 0.85; /* Pressable pressed в модалках */
+  --iz-state-pressed-scale: 0.96; /* AppButton withSpring */
+  /* withSpring({ damping: 18, stiffness: 350 }) ≈ ~180ms с лёгким перелётом */
+  --iz-transition-press: 180ms cubic-bezier(0.34, 1.36, 0.64, 1);
+  --iz-transition-base: 150ms ease;
+
+  /**
+   * Затемнение под модалкой. В мобиле это КОНСТАНТА `MODAL_BACKDROP_SCRIM`
+   * (`rgba(0,0,0,0.45)` в modalChromeStyles.ts) — она не меняется вместе с темой,
+   * поэтому здесь тоже не токен-производная, а фиксированное значение.
+   */
+  --iz-color-modal-scrim: rgb(0 0 0 / 45%);
+
+  /* Фокус инпута: borderColor action + shadow action 0 2px 8px @ 0.14 */
+  --iz-shadow-input-focus: 0 2px 8px color-mix(in srgb, var(--iz-color-action) 14%, transparent);
+  /* segmentTabActive: shadowOffset 0/1, opacity .08, radius 3 */
+  --iz-shadow-segment-active: 0 1px 3px var(--iz-color-overlay-subtle);
 }

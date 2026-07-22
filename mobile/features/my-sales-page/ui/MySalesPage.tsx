@@ -9,6 +9,10 @@ import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { getOrderItemIndex } from "@/entities/order/lib/getOrderItemIndex";
 import { filterMySales } from "@/entities/order/lib/filterMySales";
+import {
+  buildAttentionOrderIdsKey,
+  mergeExpandedIdsFromKey,
+} from "@/entities/order/lib/expandedOrderIds";
 import { orderNeedsSellerAttention } from "@/entities/order/lib/orderNeedsSellerAttention";
 import { resolveOrderLineProductId } from "@/entities/order/lib/resolveOrderLineProductId";
 import { summarizeMySales } from "@/entities/order/lib/summarizeMySales";
@@ -43,6 +47,8 @@ import { useMySalesPageStyles } from "@/shared/theme/mySalesPageStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 type OrderRecord = z.infer<typeof orderFromApiSchema>;
+
+const EMPTY_ORDERS: OrderRecord[] = [];
 
 export const MySalesPage = () => {
   const router = useRouter();
@@ -86,12 +92,16 @@ export const MySalesPage = () => {
     [sessionQuery.data?.user?.totalSalesCount],
   );
 
-  const allOrders = overviewQuery.data?.orders ?? [];
-  const serverOrders = salesQuery.data?.orders ?? [];
+  const allOrders = overviewQuery.data?.orders ?? EMPTY_ORDERS;
+  const serverOrders = salesQuery.data?.orders ?? EMPTY_ORDERS;
   const summary = useMemo(() => summarizeMySales(allOrders), [allOrders]);
   const filteredOrders = useMemo(
     () => filterMySales(serverOrders, { statusFilter, attentionOnly }),
     [serverOrders, statusFilter, attentionOnly],
+  );
+  const attentionOrderIdsKey = useMemo(
+    () => buildAttentionOrderIdsKey(allOrders, orderNeedsSellerAttention),
+    [allOrders],
   );
 
   const totalServer = serverOrders.length;
@@ -113,12 +123,8 @@ export const MySalesPage = () => {
   );
 
   useEffect(() => {
-    setExpandedIds((prev) => {
-      const next = new Set(prev);
-      allOrders.filter(orderNeedsSellerAttention).forEach((order) => next.add(String(order._id)));
-      return next;
-    });
-  }, [allOrders]);
+    setExpandedIds((prev) => mergeExpandedIdsFromKey(prev, attentionOrderIdsKey));
+  }, [attentionOrderIdsKey]);
 
   const invalidateSalesQueues = useCallback(async () => {
     await queryClient.invalidateQueries({ queryKey: orderQueryKeys.salesActionCount() });

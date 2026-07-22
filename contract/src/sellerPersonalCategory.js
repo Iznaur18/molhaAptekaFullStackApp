@@ -105,3 +105,15 @@ export const approveSellerPersonalCategoryCampaignDataSchema = z.object({
 export const rejectSellerPersonalCategoryCampaignDataSchema = z.object({
   message: z.string(),
 });
+
+export const managedSellerPersonalCategoryCampaignsDataSchema = z.object({
+  campaigns: z.array(
+    sellerPersonalCategoryCampaignSchema.extend({
+      seller: z.record(z.unknown()).nullable().optional(),
+    }),
+  ),
+});
+
+export const staffSellerPersonalCategoryCampaignActionDataSchema = z.object({
+  message: z.string(),
+});

@@ -17,13 +17,11 @@
   color: var(--iz-color-text-muted);
 }
 
+/* useFormFieldStyles.inputMultiline: minHeight 72, остальное — базовый слой */
 .product-review-form__textarea {
-  min-height: 5.5rem;
-  padding: 0.55rem 0.65rem;
-  border: 1px solid var(--iz-color-border);
-  border-radius: 0.5rem;
+  min-height: 72px;
   font: inherit;
-  font-size: 0.9rem;
+  font-size: var(--iz-control-input-font);
   resize: vertical;
 }
 

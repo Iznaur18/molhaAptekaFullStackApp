@@ -16,6 +16,7 @@ import {
   installmentRouter,
   priceOfferRouter,
   appIntroRouter,
+  usersLoyaltyRaffleRouter,
   siteHeaderBannerRouter,
   siteHeaderBannerCampaignRouter,
   introAdRouter,
@@ -93,6 +94,7 @@ export const createApp = () => {
   app.use("/installment", installmentRouter);
   app.use("/price-offers", priceOfferRouter);
   app.use("/app-intro", appIntroRouter);
+  app.use("/users-loyalty-raffle", usersLoyaltyRaffleRouter);
   app.use("/site-header-banner", siteHeaderBannerRouter);
   app.use("/site-header-banner-campaign", siteHeaderBannerCampaignRouter);
   app.use("/intro-ad", introAdRouter);

@@ -9,6 +9,8 @@ import { API_CLIENT_UI, AUTH_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
 import { useStableAuthHeroHeight } from "@/shared/lib/useStableAuthHeroHeight";
+import { releaseColdStartSplash } from "@/shared/model/coldStartSplashGate";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useLoginScreenStyles } from "@/shared/theme/formChromeStyles";
 import { AppButton } from "@/shared/ui/AppButton";
@@ -21,6 +23,7 @@ export default function LoginScreen() {
   const theme = useAppTheme();
   const styles = useLoginScreenStyles();
   const insets = useSafeAreaInsets();
+  const { centeredContentStyle } = useScreenLayout();
   const heroHeight = useStableAuthHeroHeight();
   const loginMutation = useLoginMutation();
   const [email, setEmail] = useState("");
@@ -43,6 +46,7 @@ export default function LoginScreen() {
   const handleSubmit = async () => {
     try {
       await loginMutation.mutateAsync({ email: email.trim(), password });
+      releaseColdStartSplash();
       router.replace("/(tabs)");
     } catch {
       // error shown via mutation state
@@ -84,7 +88,7 @@ export default function LoginScreen() {
           )}
         </View>
 
-        <View style={styles.body}>
+        <View style={[styles.body, centeredContentStyle]}>
           <Text style={styles.title}>{AUTH_UI.LOGIN_TITLE}</Text>
           <Text style={styles.subtitle}>{AUTH_UI.LOGIN_SUBTITLE}</Text>
 

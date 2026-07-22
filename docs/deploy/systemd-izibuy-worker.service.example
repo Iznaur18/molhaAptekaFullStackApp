@@ -1,0 +1,48 @@
+# Izibuy Worker — systemd unit (BullMQ consumer + cron leader)
+#
+# Отдельный процесс от API: фоновые задачи (email, уведомления, denorm-отчёты)
+# и scheduled-задачи (завершение розыгрышей, дедлайны рассрочки, истечение
+# промо/баннеров/премиума, чистка сторис).
+#
+# ВАЖНО про cron-координацию:
+#   - worker.js сам выставляет CRON_LEADER=true → scheduled-задачи идут здесь.
+#   - На API-инстансах задай CRON_LEADER=false (или не задавай — в prod default
+#     «не запускать cron»), иначе задачи выполнятся дважды.
+#   - Если REDIS_URL задан — задачи идут через BullMQ (репитабл-джобы на воркере);
+#     если нет — worker крутит cron через setInterval. И то, и другое работает.
+#
+# Установка:
+#   sudo cp docs/deploy/systemd-izibuy-worker.service.example /etc/systemd/system/izibuy-worker.service
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable izibuy-worker
+#   sudo systemctl start izibuy-worker
+#   sudo systemctl status izibuy-worker
+#   journalctl -u izibuy-worker -f      # логи/heartbeat
+#
+# Тот же env-файл, что у API: /var/www/izibuy/server/.env (chmod 600)
+
+[Unit]
+Description=Izibuy Worker (BullMQ + cron)
+After=network.target
+# Если Redis/Mongo локальные на этом же хосте — добавь их сюда:
+# After=network.target redis-server.service mongod.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/izibuy/server
+EnvironmentFile=/var/www/izibuy/server/.env
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node worker.js
+Restart=on-failure
+RestartSec=5
+# Дать воркеру время на graceful shutdown (дренаж текущих джоб) при stop/деплое.
+# worker.js слушает SIGTERM и закрывает BullMQ/Redis/Mongo.
+TimeoutStopSec=30
+
+# Лимиты (опционально)
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target

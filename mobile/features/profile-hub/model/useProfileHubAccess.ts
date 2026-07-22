@@ -82,7 +82,8 @@ export const useProfileHubAccess = (): ProfileHubAccess => {
 };
 
 const STAFF_SECTION_ALIASES: Partial<Record<string, StaffSectionId>> = {
-  raffles: "staff-raffles",
+  raffles: "intro-ad-moderation",
+  "seller-personal-category-moderation": "intro-ad-moderation",
   "product-manage-toggle-display-admin": "site-header-banner-admin",
 };
 

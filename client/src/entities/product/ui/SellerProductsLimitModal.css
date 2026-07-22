@@ -12,7 +12,7 @@
 .seller-products-limit-modal__backdrop {
   position: absolute;
   inset: 0;
-  background: var(--iz-color-overlay);
+  background: var(--iz-color-modal-scrim);
 }
 
 .seller-products-limit-modal__card {

@@ -1,13 +1,19 @@
+import { useMemo } from "react";
 import { FlatList, Text, View } from "react-native";
-import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
+import { excludeUsersPodiumFromList, rankUsersForPodium } from "@izibuy/shared-lib";
 
 import type { UserSearchListItem } from "@/entities/user/api/fetchUsersSearchPage";
+import { useUsersMonthlyLoyaltyPointsQuery } from "@/entities/user/model/useUsersMonthlyLoyaltyPointsQuery";
 import { UserListRow } from "@/entities/user/ui/UserListRow";
 import { useUsersGridLayout } from "@/features/users-page/model/useUsersGridLayout";
+import { UsersMonthlyLoyaltyLoadBar } from "@/features/users-page/ui/UsersMonthlyLoyaltyLoadBar";
+import { UsersPodium } from "@/features/users-page/ui/UsersPodium";
 import { USERS_PAGE_UI } from "@/shared/config";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useUsersPageStyles } from "@/shared/theme/usersPageStyles";
+import { useUsersPagePodiumListStyles } from "@/shared/theme/usersPodiumStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
+import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 type UsersPageBodyProps = {
   phase: "loading" | "success" | "error";
@@ -33,8 +39,59 @@ export const UsersPageBody = ({
   canRefresh = true,
 }: UsersPageBodyProps) => {
   const styles = useUsersPageStyles();
+  const podiumListStyles = useUsersPagePodiumListStyles();
   const { contentPaddingBottom } = useScreenLayout();
   const grid = useUsersGridLayout();
+
+  const showPodium = !hasActiveFilters && !isSearchInputTooShort;
+  const monthlyLoyaltyQuery = useUsersMonthlyLoyaltyPointsQuery({ enabled: showPodium });
+
+  const podiumEntries = useMemo(
+    () => (showPodium ? rankUsersForPodium(users) : []),
+    [showPodium, users],
+  );
+  const listUsers = useMemo(
+    () => excludeUsersPodiumFromList(users, podiumEntries),
+    [users, podiumEntries],
+  );
+
+  const listHeader = useMemo(() => {
+    if (!showPodium) {
+      return null;
+    }
+
+    const pointsAwarded = monthlyLoyaltyQuery.data?.pointsAwarded ?? 0;
+    const goal = monthlyLoyaltyQuery.data?.goal ?? 0;
+    const description = monthlyLoyaltyQuery.data?.description ?? "";
+
+    return (
+      <View style={podiumListStyles.listHeader}>
+        {podiumEntries.length > 0 ? (
+          <UsersPodium entries={podiumEntries} onUserPress={onUserRowClick} />
+        ) : null}
+        <UsersMonthlyLoyaltyLoadBar
+          pointsAwarded={pointsAwarded}
+          goal={goal}
+          description={description}
+          isLoading={monthlyLoyaltyQuery.isPending && monthlyLoyaltyQuery.data == null}
+        />
+      </View>
+    );
+  }, [
+    monthlyLoyaltyQuery.data,
+    monthlyLoyaltyQuery.isPending,
+    onUserRowClick,
+    podiumEntries,
+    podiumListStyles.listHeader,
+    showPodium,
+  ]);
+
+  const handleRefresh = () => {
+    onRefresh?.();
+    if (showPodium) {
+      void monthlyLoyaltyQuery.refetch();
+    }
+  };
 
   if (phase === "loading") {
     return <ScreenLoadingState message={USERS_PAGE_UI.LOADING} />;
@@ -62,15 +119,22 @@ export const UsersPageBody = ({
   return (
     <FlatList
       key={grid.listKey}
-      data={users}
+      data={listUsers}
       numColumns={grid.columns}
       keyExtractor={(item) => String(item._id)}
       style={styles.listFlex}
-      contentContainerStyle={[styles.list, { gap: grid.gap, paddingBottom: contentPaddingBottom }]}
+      contentContainerStyle={[
+        styles.list,
+        { gap: grid.gap, paddingBottom: contentPaddingBottom },
+      ]}
       columnWrapperStyle={grid.columns > 1 ? { gap: grid.gap } : undefined}
+      ListHeaderComponent={listHeader}
       refreshControl={
         canRefresh && onRefresh ? (
-          <ThemedRefreshControl refreshing={isRefetching} onRefresh={onRefresh} />
+          <ThemedRefreshControl
+            refreshing={isRefetching || monthlyLoyaltyQuery.isRefetching}
+            onRefresh={handleRefresh}
+          />
         ) : undefined
       }
       renderItem={({ item }) => (

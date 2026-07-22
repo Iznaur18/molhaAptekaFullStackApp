@@ -41,6 +41,10 @@ export const SELLER_PERSONAL_CATEGORY_NOTIFICATION_KIND_REMINDER_1_DAY =
   "seller_personal_category_reminder_1_day";
 export const SELLER_PERSONAL_CATEGORY_NOTIFICATION_KIND_REMINDER_1_HOUR =
   "seller_personal_category_reminder_1_hour";
+export const SELLER_PERSONAL_CATEGORY_NOTIFICATION_KIND_CANCELLED_BY_STAFF =
+  "seller_personal_category_cancelled_by_staff";
+export const SELLER_PERSONAL_CATEGORY_NOTIFICATION_KIND_DELETED_BY_STAFF =
+  "seller_personal_category_deleted_by_staff";
 
 /**
  * @param {string} code

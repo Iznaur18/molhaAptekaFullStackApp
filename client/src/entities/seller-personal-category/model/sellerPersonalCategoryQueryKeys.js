@@ -3,6 +3,7 @@ export const sellerPersonalCategoryQueryKeys = {
   myCampaign: () => [...sellerPersonalCategoryQueryKeys.all, "my-campaign"],
   catalogTiles: () => [...sellerPersonalCategoryQueryKeys.all, "catalog-tiles"],
   moderationPending: () => [...sellerPersonalCategoryQueryKeys.all, "moderation", "pending"],
+  moderationManaged: () => [...sellerPersonalCategoryQueryKeys.all, "moderation", "managed"],
   moderationCount: () => [
     ...sellerPersonalCategoryQueryKeys.all,
     "moderation",

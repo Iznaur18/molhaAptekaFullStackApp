@@ -37,6 +37,7 @@ export function renderProfileTabPanel(mainView, props) {
     isAuthorized,
     currentUserId,
     isPremiumUser = false,
+    isAdmin = false,
     onRequestLogin,
     onSellerNameClick,
     onCatalogProductClick,
@@ -56,6 +57,7 @@ export function renderProfileTabPanel(mainView, props) {
     refreshRaffleSurfaces,
     refreshCatalogFeed,
     setRaffleModal,
+    onLoyaltyPointsBalanceChange,
   } = props;
 
   switch (mainView) {
@@ -95,7 +97,9 @@ export function renderProfileTabPanel(mainView, props) {
       return (
         <LazyLoyaltyPointsPage
           isAuthorized={isAuthorized}
+          isAdmin={isAdmin}
           onRequestLogin={onRequestLogin}
+          onLoyaltyPointsBalanceChange={onLoyaltyPointsBalanceChange}
         />
       );
     case "advertising":
@@ -103,6 +107,7 @@ export function renderProfileTabPanel(mainView, props) {
         <LazyAdvertisingPage
           isAuthorized={isAuthorized}
           onRequestLogin={onRequestLogin}
+          onOpenCreateRaffle={() => setRaffleModal({ mode: "create" })}
         />
       );
     case "subscriptions":
@@ -188,13 +193,29 @@ export function renderProfileTabPanel(mainView, props) {
     case "intro-ad-moderation":
       return (
         <LazyIntroAdModerationPage
-          onQueueChanged={refreshPendingIntroAdModerationCount}
+          onQueueChanged={() => {
+            refreshPendingIntroAdModerationCount?.();
+            void refreshPendingRafflesCount?.();
+            void refreshRaffleSurfaces?.();
+            void refreshCatalogFeed?.();
+          }}
+          onEditRaffle={(raffle) =>
+            setRaffleModal({ mode: "edit", raffle, useStaffApi: true })
+          }
         />
       );
     case "seller-personal-category-moderation":
       return (
         <LazyIntroAdModerationPage
-          onQueueChanged={refreshPendingIntroAdModerationCount}
+          onQueueChanged={() => {
+            refreshPendingIntroAdModerationCount?.();
+            void refreshPendingRafflesCount?.();
+            void refreshRaffleSurfaces?.();
+            void refreshCatalogFeed?.();
+          }}
+          onEditRaffle={(raffle) =>
+            setRaffleModal({ mode: "edit", raffle, useStaffApi: true })
+          }
         />
       );
     case "product-reports":
@@ -207,11 +228,12 @@ export function renderProfileTabPanel(mainView, props) {
       );
     case "staff-raffles":
       return (
-        <LazyRafflesStaffPage
+        <LazyIntroAdModerationPage
           onQueueChanged={() => {
-            void refreshPendingRafflesCount();
-            void refreshRaffleSurfaces();
-            void refreshCatalogFeed();
+            refreshPendingIntroAdModerationCount?.();
+            void refreshPendingRafflesCount?.();
+            void refreshRaffleSurfaces?.();
+            void refreshCatalogFeed?.();
           }}
           onEditRaffle={(raffle) =>
             setRaffleModal({ mode: "edit", raffle, useStaffApi: true })

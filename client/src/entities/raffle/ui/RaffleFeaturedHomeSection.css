@@ -6,63 +6,41 @@
   margin: 0 0 1.25rem;
 }
 
+/**
+ * Паритет с mobile/shared/theme/raffleFeaturedStyles.ts → revealButton:
+ *   backgroundColor action (сплошная заливка, без радуги)
+ *   paddingVertical 14 / paddingHorizontal 16
+ *   borderWidth hairline, borderColor border
+ *   radius 16 (RAFFLE_REVEAL_BUTTON_BORDER_RADIUS)
+ *   текст 15/20, 700, onContrast · pressed opacity .92
+ */
 .raffle-featured-home-section__reveal {
-  --raffle-reveal-rainbow: repeating-linear-gradient(
-    70deg,
-    rgba(0, 149, 255, 0.56) 0%,
-    rgba(231, 77, 255, 0.77) 12.5%,
-    rgba(255, 0, 0, 0.73) 25%,
-    rgba(131, 255, 166, 0.66) 37.5%,
-    rgba(0, 149, 255, 0.56) 50%
-  );
-
-  position: relative;
   box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   margin: 0;
-  padding: 0.875rem 1rem;
+  padding: 14px var(--iz-space-4);
   overflow: hidden;
-  border: 1px solid var(--iz-color-border, rgba(0, 0, 0, 0.12));
-  border-radius: 0.75rem;
-  background: var(--iz-color-surface, #fff);
-  color: var(--iz-color-on-contrast, #fff);
-  font-size: 0.9375rem;
-  font-weight: 700;
-  line-height: 1.25;
+  border: var(--iz-border-hairline) solid var(--iz-color-border);
+  border-radius: var(--iz-radius-card-lg);
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast);
+  font-size: var(--iz-font-md);
+  font-weight: var(--iz-weight-bold);
+  line-height: var(--iz-leading-base);
   cursor: pointer;
-  isolation: isolate;
-}
-
-.raffle-featured-home-section__reveal::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background-image: var(--raffle-reveal-rainbow);
-  background-size: 200% 100%;
-  filter: saturate(2);
-  animation: raffle-reveal-rainbow 20s linear infinite;
-  pointer-events: none;
-}
-
-.raffle-featured-home-section__reveal-label {
-  position: relative;
-  z-index: 1;
+  transition:
+    background var(--iz-transition-base),
+    opacity var(--iz-transition-base);
 }
 
 .raffle-featured-home-section__reveal:hover {
-  opacity: 0.96;
+  background: var(--iz-color-action-hover);
 }
 
-.raffle-featured-home-section .raffle-featured-carousel {
-  margin-bottom: 0;
-}
-
-@keyframes raffle-reveal-rainbow {
-  from {
-    background-position: 0% 0;
-  }
-  to {
-    background-position: 100% 0;
-  }
+/* revealButtonPressed: opacity .92 */
+.raffle-featured-home-section__reveal:active {
+  opacity: 0.92;
 }

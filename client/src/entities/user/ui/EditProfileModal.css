@@ -92,30 +92,50 @@
   gap: 0.5rem;
 }
 
+/**
+ * mobile/shared/theme/editProfileFormStyles.ts → input:
+ * hairline border `border`, radius.input (8), bg surfaceMuted, px 12, py 9, 15px
+ */
 .edit-profile-modal__input {
   box-sizing: border-box;
   width: 100%;
-  border: 1px solid var(--iz-color-border-strong);
-  border-radius: 0.5rem;
-  padding: 0.5rem 0.625rem;
-  font-size: 0.9375rem;
+  padding: 9px var(--iz-control-field-padding-x);
+  border: var(--iz-border-hairline) solid var(--iz-color-border);
+  border-radius: var(--iz-radius-input);
+  background: var(--iz-color-surface-muted);
+  color: var(--iz-color-text);
+  font-size: var(--iz-font-md);
 }
 
+.edit-profile-modal__input:focus {
+  border-color: var(--iz-color-action);
+  outline: none;
+  box-shadow: var(--iz-shadow-input-focus);
+}
+
+/* inputReadOnly: только приглушённый текст — фон уже surfaceMuted */
 .edit-profile-modal__input_readonly {
-  background: var(--iz-color-surface-muted);
   color: var(--iz-color-text-muted);
 }
 
 .edit-profile-modal__textarea {
   box-sizing: border-box;
   width: 100%;
-  min-height: 4.5rem;
-  border: 1px solid var(--iz-color-border-strong);
-  border-radius: 0.5rem;
-  padding: 0.5rem 0.625rem;
+  min-height: 72px;
+  padding: 9px var(--iz-control-field-padding-x);
+  border: var(--iz-border-hairline) solid var(--iz-color-border);
+  border-radius: var(--iz-radius-input);
+  background: var(--iz-color-surface-muted);
+  color: var(--iz-color-text);
   font: inherit;
-  font-size: 0.9375rem;
+  font-size: var(--iz-font-md);
   resize: none;
+}
+
+.edit-profile-modal__textarea:focus {
+  border-color: var(--iz-color-action);
+  outline: none;
+  box-shadow: var(--iz-shadow-input-focus);
 }
 
 .edit-profile-modal__background-block {

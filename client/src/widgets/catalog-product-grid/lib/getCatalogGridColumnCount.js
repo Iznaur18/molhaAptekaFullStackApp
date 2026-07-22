@@ -1,37 +1,35 @@
 import {
-  CATALOG_GRID_GAP_PX,
-  CATALOG_GRID_MIN_COLUMN_PX,
-  CATALOG_GRID_MOBILE_BREAKPOINT_PX,
-  CATALOG_GRID_MOBILE_COLUMNS,
-  CATALOG_GRID_TABLET_BREAKPOINT_PX,
-  CATALOG_GRID_TABLET_COLUMNS,
+  CATALOG_GRID_2_COL_MAX_PX,
+  CATALOG_GRID_3_COL_MAX_PX,
+  CATALOG_GRID_4_COL_MIN_PX,
+  CATALOG_GRID_COLUMNS_COMPACT,
+  CATALOG_GRID_COLUMNS_MEDIUM,
+  CATALOG_GRID_COLUMNS_WIDE,
 } from "./catalogGridVirtualizationConstants.js";
 
 /**
- * Число колонок сетки каталога (паритет с `AppShell.css`).
- * ≤640 → 3 · ≤1023 → 4 · desktop → auto-fill по minmax(200px).
+ * Число колонок сетки каталога (паритет с mobile `resolveProductGridColumns`).
+ * Ширина — viewport (`documentElement` / окно), не ширина уже сжатой колонки.
  *
- * @param {number} containerWidth
+ * @param {number} viewportWidth
  * @returns {number}
  */
-export function getCatalogGridColumnCount(containerWidth) {
-  if (!Number.isFinite(containerWidth) || containerWidth <= 0) {
+export function getCatalogGridColumnCount(viewportWidth) {
+  if (!Number.isFinite(viewportWidth) || viewportWidth <= 0) {
     return 1;
   }
 
-  if (containerWidth <= CATALOG_GRID_MOBILE_BREAKPOINT_PX) {
-    return CATALOG_GRID_MOBILE_COLUMNS;
+  if (viewportWidth <= CATALOG_GRID_2_COL_MAX_PX) {
+    return CATALOG_GRID_COLUMNS_COMPACT;
   }
 
-  if (containerWidth <= CATALOG_GRID_TABLET_BREAKPOINT_PX) {
-    return CATALOG_GRID_TABLET_COLUMNS;
+  if (viewportWidth <= CATALOG_GRID_3_COL_MAX_PX) {
+    return CATALOG_GRID_COLUMNS_MEDIUM;
   }
 
-  return Math.max(
-    CATALOG_GRID_TABLET_COLUMNS,
-    Math.floor(
-      (containerWidth + CATALOG_GRID_GAP_PX) /
-        (CATALOG_GRID_MIN_COLUMN_PX + CATALOG_GRID_GAP_PX),
-    ),
-  );
+  if (viewportWidth < CATALOG_GRID_4_COL_MIN_PX) {
+    return CATALOG_GRID_COLUMNS_MEDIUM;
+  }
+
+  return CATALOG_GRID_COLUMNS_WIDE;
 }

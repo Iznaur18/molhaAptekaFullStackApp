@@ -87,6 +87,7 @@ export function AccountMainContent({
   refreshRaffleSurfaces,
   refreshCatalogFeed,
   setRaffleModal,
+  setLoyaltyPoints,
   handleInAppNotificationClick,
   handleNotificationsCleared,
   onOpenProductDetails,
@@ -109,6 +110,7 @@ export function AccountMainContent({
       isAuthorized,
       currentUserId,
       isPremiumUser,
+      isAdmin,
       onRequestLogin,
       onSellerNameClick,
       onCatalogProductClick,
@@ -129,6 +131,7 @@ export function AccountMainContent({
       refreshRaffleSurfaces,
       refreshCatalogFeed,
       setRaffleModal,
+      onLoyaltyPointsBalanceChange: setLoyaltyPoints,
     };
 
     const tabContent =

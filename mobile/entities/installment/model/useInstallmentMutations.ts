@@ -25,6 +25,7 @@ export const useInstallmentMutations = () => {
         deliveryAddress: string;
         deliveryAddressFlat?: string;
         paymentMethod: string;
+        passportShareConsent: true;
       };
     }) => createInstallmentContract(productId, body),
     onSuccess: () => {

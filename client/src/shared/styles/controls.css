@@ -1,0 +1,397 @@
+/**
+ * Примитивы форм и контейнеров — паритет с мобильным приложением.
+ *
+ * Источники (mobile/shared/theme/):
+ *   .iz-input          ← useLoginScreenStyles.input        (px 16, py 14, r 10, 16px)
+ *   .iz-input--field   ← useFormFieldStyles.input          (px 12, py 10, r 10, 16px)
+ *   .iz-input--compact ← useCheckoutFormStyles.fieldInput  (px 14, py 9,  r 8,  15px)
+ *   .iz-textarea       ← useBottomSheetReportModalStyles.input
+ *   .iz-card           ← useProductPromotionModalStyles.planCard / overviewCard
+ *   .iz-chip           ← useModalSectionTabsStyles.tab
+ *   .iz-segment        ← useModalSectionTabsStyles.segmentTrack / segmentTab
+ *   .iz-radio          ← useCheckoutFormStyles.radio
+ *
+ * Геометрия в целых px — 1:1 с RN StyleSheet.
+ */
+
+/* ============================== Поля ввода ============================== */
+
+/**
+ * Базовый слой: любое поле ввода по умолчанию получает геометрию мобильного
+ * `useFormFieldStyles.input` (px 12, py 10, r 10, 16px, hairline border).
+ * Селектор по элементу — специфичность 0,0,1, поэтому компонентные классы
+ * по-прежнему могут переопределить что нужно, но «молчаливые» поля
+ * (без своих стилей) больше не выпадают из общего вида.
+ *
+ * checkbox/radio/file/range/color исключены — у них своя механика.
+ */
+input:where(
+    :not([type="checkbox"], [type="radio"], [type="file"], [type="range"], [type="color"], [type="submit"], [type="button"], [type="reset"])
+  ),
+textarea,
+select {
+  box-sizing: border-box;
+  padding: var(--iz-control-field-padding-y) var(--iz-control-field-padding-x);
+  border: var(--iz-border-hairline) solid var(--iz-color-border);
+  border-radius: var(--iz-control-input-radius);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
+  font-family: inherit;
+  font-size: var(--iz-control-input-font);
+  line-height: var(--iz-leading-lg);
+  transition:
+    border-color var(--iz-transition-base),
+    box-shadow var(--iz-transition-base),
+    background var(--iz-transition-base);
+}
+
+input:where(
+    :not([type="checkbox"], [type="radio"], [type="file"], [type="range"], [type="color"], [type="submit"], [type="button"], [type="reset"])
+  ):focus,
+textarea:focus,
+select:focus {
+  border-color: var(--iz-color-action);
+  outline: none;
+  box-shadow: var(--iz-shadow-input-focus);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--iz-color-text-placeholder);
+}
+
+/* inputReadOnly: bg surfaceMuted, color textMuted */
+:where(input:disabled, input[readonly], textarea:disabled, textarea[readonly], select:disabled) {
+  background: var(--iz-color-surface-muted);
+  color: var(--iz-color-text-muted);
+  cursor: not-allowed;
+}
+
+/* Явные классы — для полей, которым нужна не «field»-геометрия. */
+.iz-input,
+.iz-textarea,
+.iz-select {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: var(--iz-control-input-padding-y) var(--iz-control-input-padding-x);
+  border: var(--iz-border) solid var(--iz-color-border-strong);
+  border-radius: var(--iz-control-input-radius);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
+  font-family: inherit;
+  font-size: var(--iz-control-input-font);
+  line-height: var(--iz-leading-lg);
+  transition:
+    border-color var(--iz-transition-base),
+    box-shadow var(--iz-transition-base),
+    background var(--iz-transition-base);
+}
+
+.iz-input::placeholder,
+.iz-textarea::placeholder {
+  color: var(--iz-color-text-placeholder);
+}
+
+/* inputFocused: borderColor action + shadow action */
+.iz-input:focus,
+.iz-textarea:focus,
+.iz-select:focus {
+  border-color: var(--iz-color-action);
+  outline: none;
+  box-shadow: var(--iz-shadow-input-focus);
+}
+
+/* inputReadOnly: bg surfaceMuted, color textMuted */
+.iz-input:disabled,
+.iz-input[readonly],
+.iz-textarea:disabled,
+.iz-textarea[readonly],
+.iz-select:disabled {
+  background: var(--iz-color-surface-muted);
+  color: var(--iz-color-text-muted);
+  cursor: not-allowed;
+}
+
+.iz-input--invalid,
+.iz-textarea--invalid {
+  border-color: var(--iz-color-danger);
+}
+
+.iz-input--invalid:focus,
+.iz-textarea--invalid:focus {
+  border-color: var(--iz-color-danger);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--iz-color-danger) 14%, transparent);
+}
+
+/* useFormFieldStyles.input — hairline border, компактнее */
+.iz-input--field {
+  padding: var(--iz-control-field-padding-y) var(--iz-control-field-padding-x);
+  border-width: var(--iz-border-hairline);
+  border-color: var(--iz-color-border);
+}
+
+/* useCheckoutFormStyles.fieldInput */
+.iz-input--compact {
+  padding: var(--iz-control-checkout-padding-y) var(--iz-control-checkout-padding-x);
+  border-color: var(--iz-color-border);
+  border-radius: var(--iz-radius-input);
+  font-size: var(--iz-font-md);
+}
+
+/* useBottomSheetFormStyles.passportInput — контраст к фону sheet */
+.iz-input--on-surface {
+  background: var(--iz-color-bg);
+}
+
+/* inputCode: fontSize 20, letterSpacing 4, по центру */
+.iz-input--code {
+  font-size: var(--iz-font-3xl);
+  letter-spacing: 4px;
+  text-align: center;
+}
+
+/* Модальный textarea: bg surfaceMuted, padding 12, 15px, minHeight 100 */
+.iz-textarea {
+  min-height: 100px;
+  padding: var(--iz-space-3);
+  border-width: var(--iz-border-hairline);
+  border-color: var(--iz-color-border);
+  background: var(--iz-color-surface-muted);
+  font-size: var(--iz-font-md);
+  line-height: var(--iz-leading-base);
+  resize: vertical;
+}
+
+/* inputMultiline: minHeight 72 */
+.iz-textarea--short {
+  min-height: 72px;
+}
+
+/* ============================ Подписи полей ============================ */
+
+.iz-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--iz-space-1);
+}
+
+/* useFormFieldStyles.labelStrong: 14/600 textSecondary, mb 6 */
+.iz-label {
+  display: block;
+  margin: 0 0 6px;
+  color: var(--iz-color-text-secondary);
+  font-size: var(--iz-font-base);
+  font-weight: var(--iz-weight-semibold);
+  line-height: var(--iz-leading-base);
+}
+
+/* useFormFieldStyles.label — без bold */
+.iz-label--regular {
+  font-weight: var(--iz-weight-regular);
+}
+
+/* useFormFieldStyles.hint: 12 textMuted */
+.iz-hint {
+  margin: var(--iz-space-1) 0 0;
+  color: var(--iz-color-text-muted);
+  font-size: var(--iz-font-xs);
+  line-height: var(--iz-leading-xs);
+}
+
+/* useAdminEditModalStyles.error: 13 danger */
+.iz-error {
+  margin: 0;
+  color: var(--iz-color-danger);
+  font-size: var(--iz-font-sm);
+  line-height: var(--iz-leading-sm);
+}
+
+.iz-success {
+  margin: 0;
+  color: var(--iz-color-success);
+  font-size: var(--iz-font-base);
+  line-height: var(--iz-leading-base);
+}
+
+/* ============================== Карточки ============================== */
+
+/* useAdminEditModalStyles.card / planCard: radius 12–16, border 1, bg surface */
+.iz-card {
+  box-sizing: border-box;
+  border: var(--iz-border) solid var(--iz-color-border);
+  border-radius: var(--iz-radius-md);
+  background: var(--iz-color-surface);
+}
+
+.iz-card--lg {
+  border-radius: var(--iz-radius-card-lg);
+}
+
+/* useAuthFormStyles.card: radius 17 + тень */
+.iz-card--elevated {
+  border-width: var(--iz-border-hairline);
+  border-radius: var(--iz-radius-lg);
+  box-shadow: var(--iz-shadow-card);
+}
+
+/* useProductPromotionModalStyles.planCard */
+.iz-card--muted {
+  background: var(--iz-color-surface-elevated);
+}
+
+/* Модальный заголовок: 18/700 */
+.iz-modal-title {
+  margin: 0;
+  color: var(--iz-color-text);
+  font-size: var(--iz-font-2xl);
+  font-weight: var(--iz-weight-bold);
+  line-height: var(--iz-leading-xl);
+}
+
+/* sectionTitle: 14/700 */
+.iz-section-title {
+  margin: 0;
+  color: var(--iz-color-text);
+  font-size: var(--iz-font-base);
+  font-weight: var(--iz-weight-bold);
+  line-height: var(--iz-leading-base);
+}
+
+/* ========================= Чипы / табы модалок ========================= */
+
+/* useModalSectionTabsStyles.tab: py 8, px 14, r 999, 1px, 14/500, action */
+.iz-chip {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 8px 14px;
+  border: var(--iz-border) solid var(--iz-color-border);
+  border-radius: var(--iz-radius-pill);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-action);
+  font-family: inherit;
+  font-size: var(--iz-font-base);
+  font-weight: var(--iz-weight-medium);
+  line-height: var(--iz-leading-base);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background var(--iz-transition-base),
+    border-color var(--iz-transition-base),
+    color var(--iz-transition-base);
+}
+
+/* tabPressed → на web это hover */
+.iz-chip:hover:not(:disabled):not(.iz-chip--active) {
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action-soft);
+}
+
+/* tabActive: bg action, label onContrast */
+.iz-chip--active {
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast);
+}
+
+.iz-chip:disabled {
+  opacity: var(--iz-state-disabled-opacity);
+  cursor: not-allowed;
+}
+
+/* ========================== Segmented control ========================== */
+
+/* segmentTrack: padding 4, gap 4, r 14, bg surfaceMuted, hairline */
+.iz-segment {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  gap: var(--iz-space-1);
+  padding: var(--iz-space-1);
+  border: var(--iz-border-hairline) solid var(--iz-color-border);
+  border-radius: var(--iz-radius-card);
+  background: var(--iz-color-surface-muted);
+}
+
+/* segmentTab: flex 1, minHeight 40, py 9, px 10, r 11, 14/600 textMuted */
+.iz-segment__tab {
+  box-sizing: border-box;
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  margin: 0;
+  padding: 9px 10px;
+  border: none;
+  border-radius: var(--iz-radius-segment-tab);
+  background: transparent;
+  color: var(--iz-color-text-muted);
+  font-family: inherit;
+  font-size: var(--iz-font-base);
+  font-weight: var(--iz-weight-semibold);
+  line-height: var(--iz-leading-base);
+  cursor: pointer;
+  transition:
+    background var(--iz-transition-base),
+    color var(--iz-transition-base);
+}
+
+/* segmentTabPressed → hover */
+.iz-segment__tab:hover:not(.iz-segment__tab--active) {
+  background: var(--iz-color-surface-elevated);
+}
+
+/* segmentTabActive: bg surface + лёгкая тень, color text */
+.iz-segment__tab--active {
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
+  box-shadow: var(--iz-shadow-segment-active);
+}
+
+/* ============================ Radio / checkbox ============================ */
+
+/* useCheckoutFormStyles.radio: 18×18, r 9, border 2 textMuted */
+.iz-radio {
+  box-sizing: border-box;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  border: var(--iz-border-selected) solid var(--iz-color-text-muted);
+  border-radius: var(--iz-radius-pill);
+  background: transparent;
+  appearance: none;
+  cursor: pointer;
+  transition:
+    border-color var(--iz-transition-base),
+    background var(--iz-transition-base);
+}
+
+.iz-radio:checked {
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action);
+}
+
+.iz-radio:focus-visible {
+  outline: var(--iz-border-selected) solid var(--iz-color-action);
+  outline-offset: 2px;
+}
+
+/* radioRow: gap 10, minHeight 44 */
+.iz-radio-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+}
+
+/* radioLabel: 15 text */
+.iz-radio-row__label {
+  color: var(--iz-color-text);
+  font-size: var(--iz-font-md);
+  line-height: var(--iz-leading-base);
+}

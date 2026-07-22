@@ -11,7 +11,6 @@ import {
   fetchPendingInstallmentDisputesCount,
   fetchPendingAdModerationNavBadgeCount,
   fetchPendingModerationProductsCount,
-  fetchPendingRafflesCount,
   fetchStaffProductReportsBadgeCount,
 } from "@/features/profile-hub/api/staffBadgeApi";
 import type { ProfileSectionId } from "@/features/profile-hub/model/profileSections";
@@ -58,12 +57,6 @@ export const useStaffHubBadgeCounts = (
         ...BADGE_QUERY_OPTIONS,
       },
       {
-        queryKey: [...staffBadgeQueryKeys.all, "raffles"],
-        queryFn: fetchPendingRafflesCount,
-        enabled: staffEnabled && hubAccess.canUseRaffles,
-        ...BADGE_QUERY_OPTIONS,
-      },
-      {
         queryKey: [...staffBadgeQueryKeys.all, "installment-disputes"],
         queryFn: fetchPendingInstallmentDisputesCount,
         enabled: staffEnabled && hubAccess.canUseInstallmentDisputes,
@@ -105,7 +98,6 @@ export const useStaffHubBadgeCounts = (
       introAdQuery,
       productReportsQuery,
       dataConfirmationQuery,
-      rafflesQuery,
       installmentDisputesQuery,
       userActionsQuery,
     ] = queries;
@@ -134,10 +126,6 @@ export const useStaffHubBadgeCounts = (
 
     if (hubAccess.canUseDataConfirmationQueue) {
       counts["data-confirmation-requests"] = dataConfirmationQuery.data ?? 0;
-    }
-
-    if (hubAccess.canUseRaffles) {
-      counts.raffles = rafflesQuery.data ?? 0;
     }
 
     if (hubAccess.canUseInstallmentDisputes) {

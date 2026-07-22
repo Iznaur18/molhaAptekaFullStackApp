@@ -1,4 +1,4 @@
-/** Умеренная высота hero auth-экранов (login / register). */
+/** Умеренная высота hero auth-экранов (login / register / guest profile). */
 export const AUTH_HERO_HEIGHT_MIN = 170;
 export const AUTH_HERO_HEIGHT_MAX = 280;
 export const AUTH_HERO_HEIGHT_RATIO = 0.28;

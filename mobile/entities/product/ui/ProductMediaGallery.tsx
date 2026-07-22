@@ -1,11 +1,12 @@
 import { useMemo, useState, type ReactNode } from "react";
-import { Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 import { buildProductMediaSlides } from "@/entities/product/lib/buildProductMediaSlides";
 import { ProductMediaHorizontalPager } from "@/entities/product/ui/ProductMediaHorizontalPager";
 import { ProductMediaSlideContent } from "@/entities/product/ui/ProductMediaSlideContent";
 import { PRODUCT_DETAILS_MODAL_UI } from "@/shared/config";
+import { resolveProductDetailHeroSize } from "@/shared/lib/productDetailScreenLayout";
 import { useProductMediaGalleryStyles } from "@/shared/theme/catalogProductStyles";
 import { CachedProductImage } from "@/shared/ui/CachedProductImage";
 
@@ -27,7 +28,6 @@ export const ProductMediaGallery = ({
   reportOverlay = null,
 }: ProductMediaGalleryProps) => {
   const styles = useProductMediaGalleryStyles();
-  const { height: screenHeight } = useWindowDimensions();
   const [previewVideoFailed, setPreviewVideoFailed] = useState(false);
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const isDetail = variant === "detail";
@@ -45,9 +45,16 @@ export const ProductMediaGallery = ({
   const pagerSlideCount = Math.max(mediaSlides.length, 1);
   const hasMultipleSlides = mediaSlides.length > 1;
 
-  const heroHeight = Math.min(screenHeight * 0.52, 400);
+  const detailHeroSize = useMemo(() => resolveProductDetailHeroSize(), []);
   const heroStyle = isDetail
-    ? [styles.detailHero, { height: heroHeight }]
+    ? [
+        styles.detailHero,
+        {
+          width: detailHeroSize.width,
+          aspectRatio: detailHeroSize.aspectRatio,
+          alignSelf: detailHeroSize.alignSelf,
+        },
+      ]
     : styles.hero;
   const rootStyle = isDetail ? styles.detailRoot : styles.root;
   const counterStyle = isDetail ? styles.detailCounter : styles.counter;

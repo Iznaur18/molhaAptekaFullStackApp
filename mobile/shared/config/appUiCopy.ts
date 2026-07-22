@@ -56,6 +56,13 @@ export const API_CLIENT_UI = {
   PURCHASE_PREMIUM_FALLBACK: "Не удалось оформить премиум",
   PREMIUM_PURCHASE_SUCCESS: "Премиум оформлен",
   FETCH_LOYALTY_POINTS_STATUS_FALLBACK: "Не удалось загрузить баллы",
+  FETCH_MONTHLY_LOYALTY_POINTS_FALLBACK: "Не удалось загрузить прогресс баллов за месяц",
+  LOYALTY_POINTS_PURCHASE_SUCCESS: "Баллы зачислены",
+  ADMIN_FREE_CREDIT_LOYALTY_POINTS_FALLBACK: "Не удалось начислить баллы",
+  FETCH_USERS_LOYALTY_RAFFLE_SETTINGS_FALLBACK:
+    "Не удалось загрузить настройки розыгрыша среди пользователей",
+  PATCH_USERS_LOYALTY_RAFFLE_SETTINGS_FALLBACK:
+    "Не удалось сохранить настройки розыгрыша среди пользователей",
   FETCH_DATA_CONFIRMATION_STATUS_FALLBACK: "Не удалось загрузить статус",
   SUBMIT_DATA_CONFIRMATION_FALLBACK: "Не удалось отправить заявку",
   SUBMIT_PRODUCT_REVIEW_FALLBACK: "Не удалось опубликовать отзыв",
@@ -68,6 +75,9 @@ export const API_CLIENT_UI = {
   CREATE_RAFFLE_FALLBACK: "Не удалось создать розыгрыш",
   PATCH_RAFFLE_FALLBACK: "Не удалось сохранить розыгрыш",
   FETCH_MY_RAFFLE_FALLBACK: "Не удалось загрузить розыгрыш",
+  FETCH_RAFFLE_CREATE_ADVERTISING_FALLBACK: "Не удалось загрузить услугу «Розыгрыш»",
+  UNLOCK_RAFFLE_CREATE_FALLBACK: "Не удалось оплатить создание розыгрыша",
+  CANCEL_RAFFLE_CREATE_FALLBACK: "Не удалось отменить создание розыгрыша",
   PAUSE_RAFFLE_FALLBACK: "Не удалось снять розыгрыш с витрины",
   DELETE_RAFFLE_FALLBACK: "Не удалось удалить розыгрыш",
   FETCH_MODERATION_QUEUE_FALLBACK: "Не удалось загрузить очередь модерации",
@@ -585,7 +595,14 @@ export const RAFFLE_FEATURED_BANNER_UI = {
   BADGE: "Розыгрыш",
   PROGRESS: (progress: number, target: number) => `${progress} / ${target} продаж`,
   REMAINING: (left: number) => `Осталось ${left}`,
+  STAT_GOAL: "Цель",
+  STAT_SOLD: "Продано",
+  STAT_PARTICIPANTS: "Участники",
+  STAT_SOLD_VALUE: (sold: number, target: number) => `${sold} из ${target}`,
   COMPLETED: "Завершён",
+  WINNER_TITLE: "Победитель розыгрыша",
+  WINNER_FALLBACK_NAME: "Пользователь",
+  WINNER_OPEN_PROFILE_ARIA: (userName: string) => `Открыть профиль ${userName}`,
   OPEN_PRODUCTS: "Товары розыгрыша",
   OPEN_INSTAGRAM: "Итоги в Instagram",
   DESCRIPTION_LINK: "Описание",
@@ -1061,6 +1078,33 @@ export const USERS_PAGE_UI = {
   FETCH_FALLBACK: "Не удалось загрузить пользователей",
 } as const;
 
+export const USERS_PODIUM_UI = {
+  TITLE: "Лидеры",
+  PLACE_1: "1 место",
+  PLACE_2: "2 место",
+  PLACE_3: "3 место",
+} as const;
+
+export const USERS_MONTHLY_LOYALTY_LOADBAR_UI = {
+  TITLE: "Баллы за месяц",
+  PROGRESS_ARIA: (pointsLabel: string, goalLabel: string) =>
+    `Начислено покупателям ${pointsLabel} из ${goalLabel} баллов за месяц`,
+  COUNTER: (pointsLabel: string, goalLabel: string) => `${pointsLabel} / ${goalLabel}`,
+} as const;
+
+export const USERS_LOYALTY_RAFFLE_ADMIN_UI = {
+  TAB_MODERATION: "Модерация",
+  TAB_USERS_RAFFLE: "Среди пользователей",
+  TITLE: "Розыгрыш среди пользователей",
+  DESCRIPTION_LABEL: "Описание",
+  DESCRIPTION_PLACEHOLDER: "Текст под прогресс-баром на странице пользователей",
+  GOAL_LABEL: "Цель баллов",
+  SAVE: "Сохранить",
+  SAVING: "Сохраняем…",
+  SAVED: "Сохранено",
+  LOADING: "Загрузка…",
+} as const;
+
 export const USER_LIST_ROW_UI = {
   BADGE_BLOCKED: "Блок",
   MISSING_NAME: "—",
@@ -1436,7 +1480,7 @@ export const CREATE_PRODUCT_UI = {
 export const ADVERTISING_PAGE_UI = {
   PAGE_TITLE: "Реклама",
   PAGE_LEAD:
-    "Продвигайте магазин через intro-ролик, баннер в шапке и личную плитку в каталоге. Оплата баллами лояльности.",
+    "Продвигайте магазин через intro-ролик, баннер в шапке, личную плитку в каталоге и розыгрыш. Оплата баллами лояльности.",
   HERO_CAPTION: "Реклама · баланс",
   /** @param {number} balance */
   BALANCE: (balance: number) => `${balance} баллов`,
@@ -1446,6 +1490,31 @@ export const ADVERTISING_PAGE_UI = {
   INTRO_SECTION: "Intro-ролик",
   PERSONAL_CATEGORY_SECTION: "Личная категория",
   NO_CAMPAIGN: "Активной заявки нет",
+} as const;
+
+export const RAFFLE_ADVERTISING_PAGE_UI = {
+  CARD_TITLE: "Розыгрыш",
+  CARD_BADGE: "цель",
+  LOADING: "Загрузка…",
+  FETCH_FALLBACK: "Не удалось загрузить услугу «Розыгрыш»",
+  UNLOCK_FALLBACK: "Не удалось оплатить создание розыгрыша",
+  UNLOCK_SUCCESS: "Баллы зарезервированы. Заполните розыгрыш.",
+  DESCRIPTION:
+    "Создайте розыгрыш для своих товаров. После оплаты 3000 баллов откроется форма заявки. После модерации розыгрыш появится на витрине. При отклонении баллы возвращаются.",
+  /** @param {number} price */
+  PRICE: (price: number) => `${price} баллов`,
+  COST_LABEL: "Стоимость",
+  MODERATION_LABEL: "Модерация",
+  MODERATION_VALUE: "Обязательна",
+  STATUS_PENDING: "На модерации.",
+  STATUS_ACTIVE: "Розыгрыш активен.",
+  STATUS_PAUSED: "Розыгрыш на паузе.",
+  PAY_AND_CREATE: "Оплатить 3000 баллов",
+  /** @param {number} price */
+  PAY_AND_CREATE_WITH_PRICE: (price: number) => `Оплатить ${price} баллов`,
+  CONTINUE_CREATE: "Заполнить розыгрыш",
+  INSUFFICIENT_POINTS: "Недостаточно баллов для оплаты.",
+  DATA_CONFIRMATION_REQUIRED: "Подтвердите данные профиля, чтобы создать розыгрыш.",
 } as const;
 
 export const VIDEO_URL_FIELD_UI = {
@@ -1601,6 +1670,8 @@ export const CREATE_RAFFLE_PAGE_UI = {
   LOGIN_HINT: "Войдите, чтобы создать розыгрыш.",
   LOGIN_BUTTON: "Войти",
   CONFIRMED_DATA_REQUIRED: "Нужны подтверждённые данные.",
+  UNLOCK_REQUIRED: "Сначала оплатите создание розыгрыша в разделе «Реклама».",
+  GO_TO_ADVERTISING: "Перейти в «Рекламу»",
   HINT: "После одобрения staff включите участие на своих товарах в «Мои товары».",
   LABEL_TITLE: "Название",
   LABEL_DESCRIPTION: "Описание",
@@ -1638,6 +1709,11 @@ export const CREATE_RAFFLE_MODAL_UI = {
   BTN_NEXT: "Далее",
   BTN_BACK: "Назад",
   BTN_CANCEL: "Отмена",
+  CANCEL_CREATE_TITLE: "Отменить создание?",
+  CANCEL_CREATE_MESSAGE: (pricePoints: number) =>
+    `Зарезервированные ${pricePoints} баллов разблокируются. Введённые данные не сохранятся.`,
+  CANCEL_CREATE_CONFIRM: "Отменить",
+  CANCEL_CREATE_SUCCESS: "Создание отменено. Баллы разблокированы.",
   DISCARD_TITLE: "Сбросить создание?",
   DISCARD_MESSAGE: "Введённые данные не сохранятся.",
   DISCARD_CONFIRM: "Сбросить",
@@ -1727,6 +1803,15 @@ export const LOYALTY_POINTS_PAGE_UI = {
   COMING_SOON: "Пополнение картой и по QR — скоро.",
   COMING_SOON_AMOUNT: (rub: number, points: number) =>
     `Пополнение на ${rub} ₽ (${points} баллов) картой и по QR — скоро.`,
+  ADMIN_FREE_SECTION: "Бесплатное пополнение (admin)",
+  ADMIN_FREE_AMOUNT_LABEL: "Сумма, баллы",
+  ADMIN_FREE_AMOUNT_HINT: "Начислить на свой баланс без оплаты.",
+  ADMIN_FREE_AMOUNT_MIN: (min: number) => `Минимум ${min}`,
+  ADMIN_FREE_AMOUNT_MAX: (max: number) => `Не больше ${max}`,
+  ADMIN_FREE_SUBMIT: "Начислить бесплатно",
+  ADMIN_FREE_SUBMITTING: "Начисление…",
+  ADMIN_FREE_SUCCESS: (credited: number, balance: number) =>
+    `Начислено ${credited}. Баланс: ${balance}`,
   USES: [
     "Оплата премиум-подписки",
     "Продвижение товаров в каталоге",
@@ -1831,9 +1916,13 @@ export const INTRO_AD_MODERATION_PAGE_UI = {
   SECTION_FILTER_INTRO: "Intro",
   SECTION_FILTER_BANNER: "Баннер",
   SECTION_FILTER_PERSONAL: "Личные",
+  SECTION_FILTER_RAFFLE: "Розыгрыш",
+  SECTION_FILTER_USERS_RAFFLE: "Среди пользователей",
   OVERVIEW_PENDING: "На модерации",
   OVERVIEW_INTRO: "Intro",
   OVERVIEW_BANNER: "Баннер",
+  OVERVIEW_RAFFLE: "Розыгрыш",
+  OVERVIEW_USERS_RAFFLE: "Среди пользователей",
   OVERVIEW_ATTENTION: "Нужно действие",
   EXPAND_ALL: "Развернуть все",
   COLLAPSE_ALL: "Свернуть все",
@@ -1876,6 +1965,13 @@ export const SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI = {
   APPROVE: "Одобрить",
   REJECT: "Отклонить",
   ACTION_PENDING: "Сохраняем…",
+  MANAGED_TITLE: "Личные категории — опубликованы",
+  STATUS_ACTIVE: "Активна",
+  STAFF_UNPUBLISH: "Снять с публикации",
+  STAFF_DELETE: "Удалить",
+  STAFF_UNPUBLISH_FALLBACK: "Не удалось снять категорию",
+  STAFF_DELETE_FALLBACK: "Не удалось удалить категорию",
+  MANAGED_FETCH_FALLBACK: "Не удалось загрузить опубликованные категории",
   FETCH_FALLBACK: "Не удалось загрузить очередь личных категорий",
   APPROVE_FALLBACK: "Не удалось одобрить заявку",
   REJECT_FALLBACK: "Не удалось отклонить заявку",

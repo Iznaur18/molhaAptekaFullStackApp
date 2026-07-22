@@ -1,8 +1,9 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { patchProductInAllCatalogCaches } from "../../../entities/product/lib/catalogProductsQueryCache.js";
-import { ProductDetailsModal } from "../../../entities/product/ui/ProductDetailsModal.jsx";
+import { navigateToProductDetails } from "../../../entities/product/lib/navigateToProductDetails.js";
 import { useMyFavoritesQuery } from "../../../entities/wishlist/model/useMyFavoritesQuery.js";
 import { useWishlist } from "../../../entities/wishlist/model/useWishlist.js";
 import { WISHLIST_PAGE_UI } from "../../../shared/config/appUiCopy.js";
@@ -26,9 +27,9 @@ export function WishlistPage({
   onRequestLogin,
 }) {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const favoritesQuery = useMyFavoritesQuery({ enabled: isAuthorized });
   const { items } = useWishlist();
-  const [selectedProduct, setSelectedProduct] = useState(null);
 
   const productsFromQuery = favoritesQuery.data?.products ?? [];
   const products = useMemo(() => {
@@ -39,15 +40,15 @@ export function WishlistPage({
       .filter(Boolean);
   }, [items, productsFromQuery]);
 
-  const handleCloseDetails = useCallback(() => {
-    setSelectedProduct(null);
-  }, []);
+  const handleProductClick = useCallback(
+    (product) => {
+      navigateToProductDetails(navigate, product);
+    },
+    [navigate],
+  );
 
   const handleProductStatsUpdate = useCallback(
     (productId, stats) => {
-      setSelectedProduct((prev) =>
-        prev && String(prev._id) === productId ? { ...prev, ...stats } : prev,
-      );
       patchProductInAllCatalogCaches(queryClient, productId, (product) => ({
         ...product,
         ...stats,
@@ -90,31 +91,18 @@ export function WishlistPage({
   }
 
   return (
-    <>
-      <section className="wishlist-page">
-        <ul className="wishlist-page__list" role="list">
-          {products.map((product) => (
-            <li key={product._id} role="listitem">
-              <WishlistRow
-                product={product}
-                onProductClick={setSelectedProduct}
-                onProductStatsUpdate={handleProductStatsUpdate}
-              />
-            </li>
-          ))}
-        </ul>
-      </section>
-      <ProductDetailsModal
-        isOpen={selectedProduct != null}
-        product={selectedProduct}
-        onClose={handleCloseDetails}
-        isAuthorized={isAuthorized}
-        onRequestLogin={onRequestLogin}
-        currentUserId={currentUserId}
-        isPremiumUser={isPremiumUser}
-        showAddToCart
-        onProductStatsUpdate={handleProductStatsUpdate}
-      />
-    </>
+    <section className="wishlist-page">
+      <ul className="wishlist-page__list" role="list">
+        {products.map((product) => (
+          <li key={product._id} role="listitem">
+            <WishlistRow
+              product={product}
+              onProductClick={handleProductClick}
+              onProductStatsUpdate={handleProductStatsUpdate}
+            />
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

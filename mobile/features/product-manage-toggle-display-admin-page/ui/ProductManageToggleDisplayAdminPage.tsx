@@ -56,9 +56,8 @@ export const ProductManageToggleDisplayAdminPage = () => {
   return (
     <>
       <ProfileMobileSectionToggle
-        activeSectionId="product-manage-toggle-display-admin"
-        title={MY_PROFILE_PAGE_UI.TAB_PRODUCT_MANAGE_TOGGLE_DISPLAY_ADMIN}
-        onOpenNav={() => setNavSheetVisible(true)}
+        activeLabel={MY_PROFILE_PAGE_UI.TAB_PRODUCT_MANAGE_TOGGLE_DISPLAY_ADMIN}
+        onPress={() => setNavSheetVisible(true)}
       />
       <ScrollView
         contentContainerStyle={[
@@ -82,11 +81,9 @@ export const ProductManageToggleDisplayAdminPage = () => {
       </ScrollView>
       <ProfileMobileNavSheet
         visible={navSheetVisible}
+        activeSectionId="product-manage-toggle-display-admin"
         onClose={() => setNavSheetVisible(false)}
-        onNavigate={(sectionId) => {
-          setNavSheetVisible(false);
-          router.push(`/hub/${sectionId}` as never);
-        }}
+        onOverviewPress={() => router.replace("/(tabs)/profile")}
       />
     </>
   );

@@ -282,6 +282,11 @@ const UserSchema = new mongoose.Schema(
       default: 0,
       min: 0,
     },
+    /** Оплачен доступ к форме создания розыгрыша (до первого submit). */
+    raffleCreateUnlockAt: {
+      type: Date,
+      default: null,
+    },
     userRubBalance: {
       type: Number,
       default: 0,

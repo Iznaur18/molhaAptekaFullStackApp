@@ -1,27 +1,32 @@
+/* Status/meta badges — паритет с mobile PRODUCT_CARD_STATUS_BADGE_OVERLAY_LAYOUT */
+
 .product-card__hidden-badge {
-  margin: .2rem 0 0;
-  padding: 0.15rem 0.45rem;
+  margin: 0.2rem 0 0;
+  padding: var(--product-card-overlay-badge-pad-y, 2px)
+    var(--product-card-overlay-badge-pad-x, 10px);
   width: fit-content;
-  border-radius: 0.35rem;
+  border-radius: var(--product-card-overlay-badge-radius, 6px);
+  border: none;
   background: var(--iz-color-warning-surface);
   color: var(--iz-color-warning-text);
-  font-size: 0.72rem;
-  font-weight: 600;
-  line-height: 1.3;
+  font-size: var(--product-card-overlay-badge-font-size, 10px);
+  font-weight: 800;
+  line-height: var(--product-card-overlay-badge-line-height, 12px);
 }
 
 .product-card__promotion-badge {
   margin: 0.2rem 0 0;
-  padding: 0.2rem 0.5rem;
+  padding: var(--product-card-overlay-badge-pad-y, 2px)
+    var(--product-card-overlay-badge-pad-x, 10px);
   width: fit-content;
   max-width: none;
-  border-radius: 0.35rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-warning) 35%, transparent);
+  border-radius: var(--product-card-overlay-badge-radius, 6px);
+  border: none;
   background: var(--iz-color-warning-surface);
   color: var(--iz-color-warning-text);
-  font-size: 0.72rem;
-  font-weight: 600;
-  line-height: 1.35;
+  font-size: var(--product-card-overlay-badge-font-size, 10px);
+  font-weight: 800;
+  line-height: var(--product-card-overlay-badge-line-height, 12px);
   white-space: nowrap;
 }
 
@@ -32,106 +37,114 @@
 
 .product-card__loyalty-overcommitted-badge {
   margin: 0.2rem 0 0;
-  padding: 0.2rem 0.5rem;
+  padding: var(--product-card-overlay-badge-pad-y, 2px)
+    var(--product-card-overlay-badge-pad-x, 10px);
   width: fit-content;
-  border-radius: 0.35rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-danger) 40%, transparent);
+  border-radius: var(--product-card-overlay-badge-radius, 6px);
+  border: none;
   background: var(--iz-color-danger-surface);
   color: var(--iz-color-danger-text);
-  font-size: 0.72rem;
-  font-weight: 600;
-  line-height: 1.35;
+  font-size: var(--product-card-overlay-badge-font-size, 10px);
+  font-weight: 800;
+  line-height: var(--product-card-overlay-badge-line-height, 12px);
 }
 
 .product-card__auction-badge {
   margin: 0;
-  padding: 0.2rem 0.5rem;
+  padding: var(--product-card-overlay-badge-pad-y, 2px)
+    var(--product-card-overlay-badge-pad-x, 10px);
   width: fit-content;
-  border-radius: 0.35rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-info) 40%, transparent);
+  border-radius: var(--product-card-overlay-badge-radius, 6px);
+  border: none;
   background: var(--iz-color-info-soft);
   color: var(--iz-color-info);
-  font-size: 0.72rem;
-  font-weight: 600;
-  line-height: 1.35;
+  font-size: var(--product-card-overlay-badge-font-size, 10px);
+  font-weight: 800;
+  line-height: var(--product-card-overlay-badge-line-height, 12px);
 }
 
 .product-card__installment-badge {
   margin: 0;
-  padding: 0.2rem 0.5rem;
+  padding: var(--product-card-overlay-badge-pad-y, 2px)
+    var(--product-card-overlay-badge-pad-x, 10px);
   width: fit-content;
-  border-radius: 0.35rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-success) 40%, transparent);
+  border-radius: var(--product-card-overlay-badge-radius, 6px);
+  border: none;
   background: var(--iz-color-success-surface);
-  color: var(--iz-color-success);
-  font-size: 0.72rem;
-  font-weight: 600;
-  line-height: 1.35;
+  color: var(--iz-color-success-text);
+  font-size: var(--product-card-overlay-badge-font-size, 10px);
+  font-weight: 800;
+  line-height: var(--product-card-overlay-badge-line-height, 12px);
 }
 
 .product-card__promotion-boost-badge {
   margin: 0;
-  padding: 0.2rem 0.55rem;
+  padding: var(--product-card-overlay-badge-pad-y, 2px)
+    var(--product-card-overlay-badge-pad-x, 10px);
   width: fit-content;
-  border-radius: 0.35rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-warning) 45%, transparent);
+  border-radius: var(--product-card-overlay-badge-radius, 6px);
+  border: none;
   background: var(--iz-color-warning-surface);
   color: var(--iz-color-warning-text);
-  font-size: 0.72rem;
-  font-weight: 700;
-  line-height: 1.35;
+  font-size: var(--product-card-overlay-badge-font-size, 10px);
+  font-weight: 800;
+  line-height: var(--product-card-overlay-badge-line-height, 12px);
 }
 
 .product-card__promotion-top-badge {
   margin: 0;
-  padding: 0.2rem 0.55rem;
+  padding: var(--product-card-overlay-badge-pad-y, 2px)
+    var(--product-card-overlay-badge-pad-x, 10px);
   width: fit-content;
-  border-radius: 0.35rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-accent) 45%, transparent);
+  border-radius: var(--product-card-overlay-badge-radius, 6px);
+  border: none;
   background: var(--iz-color-accent-soft);
   color: var(--iz-color-accent);
-  font-size: 0.72rem;
-  font-weight: 700;
-  line-height: 1.35;
+  font-size: var(--product-card-overlay-badge-font-size, 10px);
+  font-weight: 800;
+  line-height: var(--product-card-overlay-badge-line-height, 12px);
 }
 
 .product-card__promotion-banner-badge {
   margin: 0;
-  padding: 0.2rem 0.55rem;
+  padding: var(--product-card-overlay-badge-pad-y, 2px)
+    var(--product-card-overlay-badge-pad-x, 10px);
   width: fit-content;
-  border-radius: 0.35rem;
-  border: 1px solid color-mix(in srgb, var(--product-card-banner-accent) 45%, transparent);
+  border-radius: var(--product-card-overlay-badge-radius, 6px);
+  border: none;
   background: var(--product-card-banner-accent-soft);
   color: var(--product-card-banner-badge-text);
-  font-size: 0.72rem;
-  font-weight: 700;
-  line-height: 1.35;
+  font-size: var(--product-card-overlay-badge-font-size, 10px);
+  font-weight: 800;
+  line-height: var(--product-card-overlay-badge-line-height, 12px);
 }
 
 .product-card__raffle-badge {
   margin: 0.2rem 0 0;
-  padding: 0.2rem 0.5rem;
+  padding: var(--product-card-overlay-badge-pad-y, 2px)
+    var(--product-card-overlay-badge-pad-x, 10px);
   width: fit-content;
-  border-radius: 0.35rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-accent) 40%, transparent);
+  border-radius: var(--product-card-overlay-badge-radius, 6px);
+  border: none;
   background: var(--iz-color-accent-soft);
   color: var(--iz-color-accent);
-  font-size: 0.72rem;
-  font-weight: 600;
-  line-height: 1.35;
+  font-size: var(--product-card-overlay-badge-font-size, 10px);
+  font-weight: 800;
+  line-height: var(--product-card-overlay-badge-line-height, 12px);
 }
 
 .product-card__status-badge-placeholder {
   margin: 0;
-  padding: 0.2rem 0.5rem;
+  padding: var(--product-card-overlay-badge-pad-y, 2px)
+    var(--product-card-overlay-badge-pad-x, 10px);
   width: fit-content;
-  border-radius: 0.35rem;
-  border: 1px solid var(--iz-color-border);
+  border-radius: var(--product-card-overlay-badge-radius, 6px);
+  border: none;
   background: var(--iz-color-surface-muted);
   color: var(--iz-color-text-muted);
-  font-size: 0.72rem;
-  font-weight: 500;
-  line-height: 1.35;
+  font-size: var(--product-card-overlay-badge-font-size, 10px);
+  font-weight: 800;
+  line-height: var(--product-card-overlay-badge-line-height, 12px);
 }
 
 .product-card__catalog-badges--web {
@@ -151,7 +164,7 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
-    min-height: calc(1.25rem + 2px + 0.72rem * 1.35 + 0.4rem + 2px);
+    min-height: calc(1.25rem + 2px + 16px);
     height: auto;
     font-size: 1rem;
   }
@@ -166,9 +179,9 @@
   justify-content: flex-start;
   align-items: center;
   flex-wrap: nowrap;
-  gap: 6px;
+  gap: var(--product-card-status-badge-row-gap, 2px);
   min-width: 0;
-  min-height: calc(0.72rem * 1.35 + 0.4rem + 2px);
+  min-height: 16px;
   max-width: 100%;
   overflow-x: scroll;
   overflow-y: visible;
@@ -209,12 +222,13 @@
 .product-card__status-slot--reserved {
   box-sizing: border-box;
   width: fit-content;
-  min-height: 1.35rem;
-  padding: 0.2rem 0.5rem;
-  border: 1px solid transparent;
-  border-radius: 0.35rem;
-  font-size: 0.72rem;
-  line-height: 1.35;
+  min-height: 16px;
+  padding: var(--product-card-overlay-badge-pad-y, 2px)
+    var(--product-card-overlay-badge-pad-x, 10px);
+  border: none;
+  border-radius: var(--product-card-overlay-badge-radius, 6px);
+  font-size: var(--product-card-overlay-badge-font-size, 10px);
+  line-height: var(--product-card-overlay-badge-line-height, 12px);
   visibility: hidden;
 }
 
@@ -231,4 +245,3 @@
   font-weight: 500;
   color: color-mix(in srgb, currentColor 48%, transparent);
 }
-

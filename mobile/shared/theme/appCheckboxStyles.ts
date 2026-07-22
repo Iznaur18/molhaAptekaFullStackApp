@@ -23,7 +23,4 @@ export const useAppCheckboxStyles = createThemedStyles((theme) => ({
   boxDisabled: {
     opacity: 0.4,
   },
-  checkIcon: {
-    color: theme.colors.onContrast,
-  },
 }));

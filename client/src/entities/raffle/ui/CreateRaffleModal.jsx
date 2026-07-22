@@ -6,6 +6,8 @@ import {
 
 import { useRaffleMutations } from "../model/useRaffleMutations.js";
 import { useMyRaffleQuery } from "../model/useMyRaffleQuery.js";
+import { useRaffleCreateAdvertisingQuery } from "../model/useRaffleCreateAdvertisingQuery.js";
+import { useCancelRaffleCreateMutation } from "../model/useCancelRaffleCreateMutation.js";
 import { isHttpProfileImageUrl } from "../../user/lib/profileImageFocus.js";
 import {
   resolveImageUrlForDisplay,
@@ -98,8 +100,10 @@ export function CreateRaffleModal({
 }) {
   const { createMutation, patchMyMutation, patchStaffMutation, deleteMyMutation } =
     useRaffleMutations();
+  const cancelCreateMutation = useCancelRaffleCreateMutation();
   const isEdit = mode === "edit" && raffleToEdit != null;
   const myRaffleQuery = useMyRaffleQuery({ enabled: isOpen && !isEdit });
+  const createAccessQuery = useRaffleCreateAdvertisingQuery({ enabled: isOpen && !isEdit });
   const [form, setForm] = useState(INITIAL_FORM);
   const [status, setStatus] = useState({ kind: "idle", message: "" });
   const [stepIndex, setStepIndex] = useState(0);
@@ -125,6 +129,7 @@ export function CreateRaffleModal({
   );
   const isCreateBlocked = Boolean(blockNotice);
   const isWithdrawing = deleteMyMutation.isPending;
+  const isCancelling = cancelCreateMutation.isPending;
 
   const prizeFocusImageUrl = useMemo(() => {
     const url = resolveImageUrlForDisplay(form.prizeImageUrl ?? "");
@@ -150,7 +155,7 @@ export function CreateRaffleModal({
 
   if (!isOpen) return null;
 
-  const isSubmitting = status.kind === "loading" || isWithdrawing;
+  const isSubmitting = status.kind === "loading" || isWithdrawing || isCancelling;
   const wizardActionsDisabled = isSubmitting || isCreateBlocked;
   const modalTitle = isEdit
     ? CREATE_RAFFLE_MODAL_UI.TITLE_EDIT
@@ -205,6 +210,79 @@ export function CreateRaffleModal({
       return;
     }
     onClose();
+  };
+
+  const resetWizard = () => {
+    setForm(INITIAL_FORM);
+    setStepIndex(0);
+    setStatus({ kind: "idle", message: "" });
+  };
+
+  const runCancelCreate = async () => {
+    try {
+      setStatus({ kind: "idle", message: "" });
+      const hasPaidUnlock = createAccessQuery.data?.hasPaidUnlock === true;
+      if (hasPaidUnlock) {
+        await cancelCreateMutation.mutateAsync();
+      }
+      resetWizard();
+      onClose();
+    } catch (error) {
+      setStatus({
+        kind: "error",
+        message: error?.message ?? API_CLIENT_UI.CANCEL_RAFFLE_CREATE_FALLBACK,
+      });
+    }
+  };
+
+  const handleCancelCreate = () => {
+    if (isEdit) {
+      requestClose();
+      return;
+    }
+
+    if (blockNotice?.canWithdraw && existingRaffle?._id) {
+      if (
+        !window.confirm(
+          `${CREATE_RAFFLE_MODAL_UI.WITHDRAW_CONFIRM_TITLE}\n\n${CREATE_RAFFLE_MODAL_UI.WITHDRAW_CONFIRM}`,
+        )
+      ) {
+        return;
+      }
+      void (async () => {
+        try {
+          setStatus({ kind: "idle", message: "" });
+          await deleteMyMutation.mutateAsync(existingRaffle._id);
+          resetWizard();
+          onClose();
+        } catch (error) {
+          setStatus({
+            kind: "error",
+            message: error?.message ?? API_CLIENT_UI.DELETE_RAFFLE_FALLBACK,
+          });
+        }
+      })();
+      return;
+    }
+
+    const hasPaidUnlock = createAccessQuery.data?.hasPaidUnlock === true;
+    const pricePoints = createAccessQuery.data?.pricePoints ?? 3_000;
+    const shouldConfirmDiscard = isCreateRaffleFormDirty(form) || stepIndex > 0;
+
+    if (hasPaidUnlock) {
+      const message = shouldConfirmDiscard
+        ? `${CREATE_RAFFLE_MODAL_UI.CANCEL_CREATE_MESSAGE(pricePoints)}\n\n${CREATE_RAFFLE_MODAL_UI.DISCARD_MESSAGE}`
+        : CREATE_RAFFLE_MODAL_UI.CANCEL_CREATE_MESSAGE(pricePoints);
+      if (
+        !window.confirm(`${CREATE_RAFFLE_MODAL_UI.CANCEL_CREATE_TITLE}\n\n${message}`)
+      ) {
+        return;
+      }
+      void runCancelCreate();
+      return;
+    }
+
+    requestClose();
   };
 
   const goNext = () => {
@@ -331,7 +409,7 @@ export function CreateRaffleModal({
             type="button"
             className="create-raffle-modal__close"
             aria-label={CREATE_RAFFLE_MODAL_UI.ARIA_CLOSE}
-            onClick={requestClose}
+            onClick={handleCancelCreate}
           >
             <ModalCloseIcon />
           </button>
@@ -589,7 +667,7 @@ export function CreateRaffleModal({
             <button
               type="button"
               className="app-btn app-btn--cancel"
-              onClick={requestClose}
+              onClick={handleCancelCreate}
               disabled={isSubmitting}
             >
               {CREATE_RAFFLE_MODAL_UI.BTN_CANCEL}

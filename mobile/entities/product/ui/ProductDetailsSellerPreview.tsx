@@ -1,14 +1,20 @@
+import { Feather } from "@expo/vector-icons";
+import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 
 import { formatSearchRowRatingCompact } from "@/entities/user/lib/formatSearchRowRating";
 import { formatSearchRowTotalSales } from "@/entities/user/lib/formatSearchRowTotalSales";
+import { pickUserProfilePhotoUrl } from "@/entities/user/lib/pickUserProfilePhotoUrl";
+import { DEFAULT_USER_AVATAR_URL } from "@/entities/user/model/constants";
+import { UserPremiumAvatar } from "@/entities/user/ui/UserPremiumAvatar";
 import { UserPremiumDisplayName } from "@/entities/user/ui/UserPremiumDisplayName";
 import {
   PRODUCT_SELLER_PREVIEW_UI,
   USER_LIST_ROW_UI,
   USER_PROFILE_COPY,
 } from "@/shared/config";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useProductDetailsSellerPreviewStyles } from "@/shared/theme/catalogProductStyles";
 
 type SellerObject = {
@@ -37,7 +43,9 @@ const formatFollowersCount = (value?: number): string => {
 
 export const ProductDetailsSellerPreview = ({ seller }: ProductDetailsSellerPreviewProps) => {
   const router = useRouter();
+  const theme = useAppTheme();
   const styles = useProductDetailsSellerPreviewStyles();
+  const [avatarFailed, setAvatarFailed] = useState(false);
 
   if (seller == null || typeof seller !== "object" || !("_id" in seller)) {
     return null;
@@ -53,6 +61,10 @@ export const ProductDetailsSellerPreview = ({ seller }: ProductDetailsSellerPrev
   const listedProductsText = Number.isFinite(listedCount)
     ? String(Math.max(0, Math.floor(listedCount)))
     : "0";
+
+  const pickedAvatar = pickUserProfilePhotoUrl(sellerObj);
+  const avatarUri =
+    !avatarFailed && pickedAvatar ? pickedAvatar : DEFAULT_USER_AVATAR_URL;
 
   const metrics = [
     {
@@ -88,19 +100,37 @@ export const ProductDetailsSellerPreview = ({ seller }: ProductDetailsSellerPrev
       accessibilityRole="button"
       accessibilityLabel={PRODUCT_SELLER_PREVIEW_UI.OPEN_PROFILE_ARIA}
     >
-      <Text style={styles.label}>{PRODUCT_SELLER_PREVIEW_UI.SECTION_LABEL}</Text>
-      <UserPremiumDisplayName
-        name={displayName}
-        isPremium={isPremium}
-        isUserDataConfirmed={isConfirmed}
-        textStyle={styles.nameText}
-        badgeSize={16}
-      />
+      <View style={styles.header}>
+        <UserPremiumAvatar
+          uri={avatarUri}
+          isPremium={isPremium}
+          onError={() => setAvatarFailed(true)}
+          style={styles.avatar}
+        />
+        <View style={styles.headerText}>
+          <Text style={styles.label}>{PRODUCT_SELLER_PREVIEW_UI.SECTION_LABEL}</Text>
+          <UserPremiumDisplayName
+            name={displayName}
+            isPremium={isPremium}
+            isUserDataConfirmed={isConfirmed}
+            textStyle={styles.nameText}
+            badgeSize={16}
+          />
+        </View>
+        <Feather name="chevron-right" size={20} color={theme.colors.textMuted} />
+      </View>
+
+      <View style={styles.divider} />
+
       <View style={styles.metrics}>
         {metrics.map((row) => (
           <View key={row.key} style={styles.metric}>
-            <Text style={styles.metricKey}>{row.label}</Text>
-            <Text style={styles.metricValue}>{row.value}</Text>
+            <Text style={styles.metricValue} numberOfLines={1}>
+              {row.value}
+            </Text>
+            <Text style={styles.metricKey} numberOfLines={1}>
+              {row.label}
+            </Text>
           </View>
         ))}
       </View>

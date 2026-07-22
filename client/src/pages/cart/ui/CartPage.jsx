@@ -1,13 +1,12 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { selectCartLines } from "../../../entities/cart/lib/selectCartLines.js";
 import { useCart } from "../../../entities/cart/model/useCart.js";
 import { useCreateOrderMutation } from "../../../entities/order/model/useCreateOrderMutation.js";
-import { allProductsQueryKeys } from "../../../entities/product/model/allProductsQueryKeys.js";
 import { useAllProductsQuery } from "../../../entities/product/model/useAllProductsQuery.js";
 import { isCurrentUserProductSeller } from "../../../entities/product/lib/isCurrentUserProductSeller.js";
-import { ProductDetailsModal } from "../../../entities/product/ui/ProductDetailsModal.jsx";
+import { navigateToProductDetails } from "../../../entities/product/lib/navigateToProductDetails.js";
 import { useMyAcceptedBidsQuery } from "../../../entities/product-price-offer/model/useMyAcceptedBidsQuery.js";
 import { useAuthSession } from "../../../entities/user/model/useAuthSession.js";
 import { CART_PAGE_UI, CHECKOUT_FORM_UI } from "../../../shared/config/appUiCopy.js";
@@ -26,7 +25,6 @@ import "./CartPage.css";
  *   onRequestLogin: () => void;
  *   onGoToCatalog: () => void;
  *   onCheckoutSuccess: () => void;
- *   onSellerNameClick?: (userId: string) => void;
  * }} props
  */
 export function CartPage({
@@ -35,10 +33,9 @@ export function CartPage({
   onRequestLogin,
   onGoToCatalog,
   onCheckoutSuccess,
-  onSellerNameClick,
 }) {
   const { items, clearCart } = useCart();
-  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const createOrderMutation = useCreateOrderMutation();
   const productsQuery = useAllProductsQuery();
   const acceptedBidsQuery = useMyAcceptedBidsQuery({ enabled: isAuthorized });
@@ -69,34 +66,17 @@ export function CartPage({
     };
   }, [isAuthorized, user]);
 
-  const patchProductStats = useCallback(
-    (productId, patch) => {
-      queryClient.setQueryData(allProductsQueryKeys.list({}), (old) => {
-        if (!Array.isArray(old)) {
-          return old;
-        }
-        return old.map((product) =>
-          String(product._id) === productId ? { ...product, ...patch } : product,
-        );
-      });
-    },
-    [queryClient],
-  );
   const [submitState, setSubmitState] = useState({
     isSubmitting: false,
     error: "",
     success: "",
   });
-  const [selectedProduct, setSelectedProduct] = useState(null);
 
-  const handleProductStatsUpdate = useCallback(
-    (productId, stats) => {
-      patchProductStats(productId, stats);
-      setSelectedProduct((prev) =>
-        prev && String(prev._id) === productId ? { ...prev, ...stats } : prev,
-      );
+  const handleProductClick = useCallback(
+    (product) => {
+      navigateToProductDetails(navigate, product);
     },
-    [patchProductStats],
+    [navigate],
   );
 
   const { lines, total } = useMemo(
@@ -190,7 +170,7 @@ export function CartPage({
           <ul className="cart-page__list" role="list">
             {lines.map((line) => (
               <li key={line.productId} className="cart-page__item" role="listitem">
-                <CartLineItem line={line} onProductClick={setSelectedProduct} />
+                <CartLineItem line={line} onProductClick={handleProductClick} />
               </li>
             ))}
           </ul>
@@ -230,20 +210,6 @@ export function CartPage({
           </button>
         </div>
       )}
-      <ProductDetailsModal
-        isOpen={selectedProduct != null}
-        product={selectedProduct}
-        onClose={() => setSelectedProduct(null)}
-        onSellerNameClick={onSellerNameClick}
-        isAuthorized={isAuthorized}
-        currentUserId={currentUserId}
-        onProductStatsUpdate={handleProductStatsUpdate}
-        showAddToCart={
-          selectedProduct != null &&
-          !isCurrentUserProductSeller(selectedProduct, currentUserId)
-        }
-        onRequestLogin={onRequestLogin}
-      />
     </div>
   );
 }

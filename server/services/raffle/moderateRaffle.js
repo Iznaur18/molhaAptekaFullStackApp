@@ -4,12 +4,17 @@ import {
   RAFFLE_STATUS_REJECTED,
 } from "../../constants/raffleConstants.js";
 import { AppError } from "../../errors/AppError.js";
+import { InsufficientLoyaltyPointsError } from "../loyalty/loyaltyPointsSpend.js";
+import { runInTransaction } from "../../utils/mongoTransaction.js";
 import {
   assertSiteActiveRafflesWithinLimit,
   clearRaffleParticipationFromProducts,
   toPublicRafflePayload,
 } from "./raffleHelpers.js";
-
+import {
+  chargeRaffleCreatePriceOnApproval,
+  refundRaffleCreatePriceIfNeeded,
+} from "./raffleCreateAccess.js";
 import { loadRaffleOrThrow } from "./raffleServiceHelpers.js";
 
 /**
@@ -30,11 +35,29 @@ export async function approveRaffle({ staffId, raffleId }) {
     throw new AppError(409, globalCheck.message);
   }
 
-  raffle.status = RAFFLE_STATUS_ACTIVE;
-  raffle.approvedByUserId = staffId;
-  raffle.approvedAt = new Date();
-  raffle.moderationComment = "";
-  await raffle.save();
+  try {
+    await runInTransaction(async (session) => {
+      await chargeRaffleCreatePriceOnApproval({
+        sellerId: String(raffle.sellerId),
+        raffle: raffle.toObject(),
+        session,
+      });
+
+      raffle.status = RAFFLE_STATUS_ACTIVE;
+      raffle.approvedByUserId = staffId;
+      raffle.approvedAt = new Date();
+      raffle.moderationComment = "";
+      await raffle.save({ session });
+    });
+  } catch (error) {
+    if (error instanceof InsufficientLoyaltyPointsError) {
+      throw new AppError(
+        409,
+        `Недостаточно баллов у продавца. Нужно: ${error.required}, доступно: ${error.available}`,
+      );
+    }
+    throw error;
+  }
 
   return {
     message: "Розыгрыш одобрен",
@@ -55,10 +78,17 @@ export async function rejectRaffle({ raffleId, comment }) {
     throw new AppError(409, "Розыгрыш уже обработан");
   }
 
-  raffle.status = RAFFLE_STATUS_REJECTED;
-  raffle.rejectedAt = new Date();
-  raffle.moderationComment = String(comment ?? "").trim();
-  await raffle.save();
+  await runInTransaction(async (session) => {
+    raffle.status = RAFFLE_STATUS_REJECTED;
+    raffle.rejectedAt = new Date();
+    raffle.moderationComment = String(comment ?? "").trim();
+    await raffle.save({ session });
+    await refundRaffleCreatePriceIfNeeded({
+      sellerId: String(raffle.sellerId),
+      raffle: raffle.toObject(),
+      session,
+    });
+  });
   await clearRaffleParticipationFromProducts(raffle._id);
 
   return {

@@ -105,6 +105,34 @@ sudo systemctl status izibuy-api
 
 ---
 
+## 4a. systemd (Worker) — фоновые + scheduled задачи
+
+Отдельный процесс от API. Нужен, когда используешь Redis/BullMQ **или** хочешь,
+чтобы cron-задачи (завершение розыгрышей, дедлайны рассрочки, истечение
+промо/баннеров/премиума) шли на выделенном процессе.
+
+```bash
+sudo cp /var/www/izibuy/docs/deploy/systemd-izibuy-worker.service.example \
+  /etc/systemd/system/izibuy-worker.service
+sudo systemctl daemon-reload
+sudo systemctl enable izibuy-worker
+sudo systemctl start izibuy-worker
+sudo systemctl status izibuy-worker
+```
+
+Логи/heartbeat: `journalctl -u izibuy-worker -f` (строки `[worker] heartbeat …`).
+
+**Координация cron (обязательно, если запускаешь worker):** на API задай
+`CRON_LEADER=false` в `server/.env` (или не задавай — в prod дефолт «не запускать
+cron на API»). worker сам ставит `CRON_LEADER=true`. Иначе scheduled-задачи
+выполнятся дважды. Если worker **не** запускаешь — API при старте предупредит,
+что задачи нигде не идут.
+
+> Один VPS: API и worker — два systemd-юнита рядом. `worker.js` умеет graceful
+> shutdown (SIGTERM), поэтому `systemctl stop`/деплой дренирует текущие задачи.
+
+---
+
 ## 5. nginx + SSL
 
 ```bash
@@ -158,6 +186,8 @@ cd contract && npm ci
 cd server && npm ci && npm run migrate:apply
 cd ../client && npm ci && npm run build
 sudo systemctl restart izibuy-api
+# Если запущен worker (Redis/BullMQ или cron-leader) — рестартни и его:
+sudo systemctl restart izibuy-worker   # пропусти, если юнита нет
 sudo nginx -t && sudo systemctl reload nginx
 curl -sS https://izibuy.ru/health
 ```

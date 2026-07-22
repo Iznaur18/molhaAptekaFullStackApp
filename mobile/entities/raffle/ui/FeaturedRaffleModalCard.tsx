@@ -3,6 +3,7 @@ import { Linking, Pressable, Text, View, type StyleProp, type ViewStyle } from "
 
 import { buildFeaturedRaffleProgress } from "@/entities/raffle/lib/buildFeaturedRaffleProgressLabel";
 import type { FeaturedRaffleManage, RaffleFromApi } from "@/entities/raffle/model/types";
+import { FeaturedRaffleWinnerCard } from "@/entities/raffle/ui/FeaturedRaffleWinnerCard";
 import { RaffleFeaturedBannerManageMenu } from "@/entities/raffle/ui/RaffleFeaturedBannerManageMenu";
 import { RafflePrizeMedia } from "@/entities/raffle/ui/RafflePrizeMedia";
 import { RAFFLE_FEATURED_BANNER_UI } from "@/shared/config";
@@ -29,7 +30,7 @@ export const FeaturedRaffleModalCard = memo(
     style,
   }: FeaturedRaffleModalCardProps) => {
     const styles = useFeaturedRaffleModalCardStyles();
-    const { isCompleted, progress, target, percent, label } = useMemo(
+    const { isCompleted, progress, target, percent, label, participantsCount } = useMemo(
       () => buildFeaturedRaffleProgress(raffle),
       [raffle],
     );
@@ -55,7 +56,7 @@ export const FeaturedRaffleModalCard = memo(
 
     return (
       <View style={[styles.root, style]} accessibilityRole="summary" accessibilityLabel={raffle.title}>
-        <View style={[styles.visualWrap, { width: visualSize }]}>
+        <View style={[styles.visualWrap, { width: visualSize, height: visualSize }]}>
           <SquircleView
             radius={RAFFLE_FEATURED_BANNER_BORDER_RADIUS}
             style={[
@@ -64,7 +65,10 @@ export const FeaturedRaffleModalCard = memo(
               { width: visualSize, height: visualSize },
             ]}
           >
-            <View style={[styles.visual, { width: visualSize, height: visualSize }]}>
+            <View
+              style={[styles.visual, { width: visualSize, height: visualSize }]}
+              collapsable={false}
+            >
               <RafflePrizeMedia raffle={raffle} showSoundToggle isVideoActive={isVideoActive} />
             </View>
           </SquircleView>
@@ -103,9 +107,26 @@ export const FeaturedRaffleModalCard = memo(
             />
           </View>
 
-          <Text style={styles.progressLabel} numberOfLines={2}>
-            {label}
-          </Text>
+          {isCompleted && raffle.winner?._id ? (
+            <FeaturedRaffleWinnerCard winner={raffle.winner} />
+          ) : null}
+
+          <View style={styles.stats} accessibilityLabel={label}>
+            <View style={styles.stat}>
+              <Text style={styles.statLabel}>{RAFFLE_FEATURED_BANNER_UI.STAT_GOAL}</Text>
+              <Text style={styles.statValue}>{target}</Text>
+            </View>
+            <View style={[styles.stat, styles.statAccent]}>
+              <Text style={styles.statLabel}>{RAFFLE_FEATURED_BANNER_UI.STAT_SOLD}</Text>
+              <Text style={[styles.statValue, styles.statValueAccent]}>
+                {RAFFLE_FEATURED_BANNER_UI.STAT_SOLD_VALUE(progress, target)}
+              </Text>
+            </View>
+            <View style={styles.stat}>
+              <Text style={styles.statLabel}>{RAFFLE_FEATURED_BANNER_UI.STAT_PARTICIPANTS}</Text>
+              <Text style={styles.statValue}>{participantsCount}</Text>
+            </View>
+          </View>
 
           <Text style={styles.title} numberOfLines={3}>
             {raffle.title}

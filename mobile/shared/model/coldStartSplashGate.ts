@@ -1,5 +1,6 @@
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
+import { Platform } from "react-native";
 
 /**
  * Максимум удержания нативного сплэша: если контент не успел загрузиться
@@ -8,15 +9,46 @@ import { useEffect } from "react";
  */
 export const COLD_START_SPLASH_MAX_WAIT_MS = 5000;
 
-let isSplashReleased = false;
+const canUseNativeSplash = Platform.OS !== "web";
 
-/** Прячет нативный сплэш один раз за жизнь процесса; повторные вызовы — no-op. */
-export const releaseColdStartSplash = () => {
-  if (isSplashReleased) {
+let isSplashReleased = false;
+let hideSplashPromise: Promise<void> | null = null;
+
+/**
+ * Регистрирует удержание нативного сплэша на cold start.
+ * На web — no-op.
+ */
+export const prepareColdStartSplash = (): void => {
+  if (!canUseNativeSplash) {
     return;
   }
-  isSplashReleased = true;
-  void SplashScreen.hideAsync();
+  void SplashScreen.preventAutoHideAsync().catch(() => {});
+};
+
+/**
+ * Прячет нативный сплэш. При смене view controller (auth → tabs на iOS)
+ * первый hideAsync может упасть — флаг success ставим только после resolve,
+ * чтобы повторный вызов после login/replace снова попробовал скрыть.
+ */
+export const releaseColdStartSplash = (): void => {
+  if (isSplashReleased || !canUseNativeSplash) {
+    return;
+  }
+
+  if (hideSplashPromise) {
+    return;
+  }
+
+  hideSplashPromise = SplashScreen.hideAsync()
+    .then(() => {
+      isSplashReleased = true;
+    })
+    .catch(() => {
+      // VC сменился (login/register) — сплэш ещё не зарегистрирован для текущего.
+    })
+    .finally(() => {
+      hideSplashPromise = null;
+    });
 };
 
 /**

@@ -15,6 +15,7 @@ import {
 } from "./user/pushTokenValidation.js";
 import { refreshAuthValidation } from "./user/refreshAuthValidation.js";
 import { verifyEmailTokenValidation } from "./user/verifyEmailTokenValidation.js";
+import { adminCreditLoyaltyPointsValidation } from "./user/adminCreditLoyaltyPointsValidation.js";
 import { makeProductValidation } from "./product/makeProductValidation.js";
 import { productIdParamValidation } from "./product/productIdParamValidation.js";
 import { productsSearchValidation } from "./product/productsSearchValidation.js";
@@ -125,6 +126,7 @@ export {
   userFollowListValidation,
   refreshAuthValidation,
   verifyEmailTokenValidation,
+  adminCreditLoyaltyPointsValidation,
   registerPushTokenValidation,
   removePushTokenValidation,
   makeProductValidation,

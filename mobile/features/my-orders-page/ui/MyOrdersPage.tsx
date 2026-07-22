@@ -9,6 +9,10 @@ import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { getOrderItemIndex } from "@/entities/order/lib/getOrderItemIndex";
 import { filterMyOrders } from "@/entities/order/lib/filterMyOrders";
+import {
+  buildAttentionOrderIdsKey,
+  mergeExpandedIdsFromKey,
+} from "@/entities/order/lib/expandedOrderIds";
 import { orderNeedsBuyerAttention } from "@/entities/order/lib/orderNeedsBuyerAttention";
 import { resolveOrderLineProductId } from "@/entities/order/lib/resolveOrderLineProductId";
 import { summarizeMyOrders } from "@/entities/order/lib/summarizeMyOrders";
@@ -41,6 +45,8 @@ import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 type OrderRecord = z.infer<typeof orderFromApiSchema>;
 
+const EMPTY_ORDERS: OrderRecord[] = [];
+
 export const MyOrdersPage = () => {
   const router = useRouter();
   const styles = useMyOrdersPageStyles();
@@ -57,11 +63,15 @@ export const MyOrdersPage = () => {
   const [itemActionErrors, setItemActionErrors] = useState<Record<string, string>>({});
   const [loyaltyFlash, setLoyaltyFlash] = useState("");
 
-  const allOrders = ordersQuery.data ?? [];
+  const allOrders = ordersQuery.data ?? EMPTY_ORDERS;
   const summary = useMemo(() => summarizeMyOrders(allOrders), [allOrders]);
   const filteredOrders = useMemo(
     () => filterMyOrders(allOrders, { status: statusFilter, attentionOnly }),
     [allOrders, statusFilter, attentionOnly],
+  );
+  const attentionOrderIdsKey = useMemo(
+    () => buildAttentionOrderIdsKey(allOrders, orderNeedsBuyerAttention),
+    [allOrders],
   );
 
   const totalAll = allOrders.length;
@@ -88,12 +98,8 @@ export const MyOrdersPage = () => {
   );
 
   useEffect(() => {
-    setExpandedIds((prev) => {
-      const next = new Set(prev);
-      allOrders.filter(orderNeedsBuyerAttention).forEach((order) => next.add(String(order._id)));
-      return next;
-    });
-  }, [allOrders]);
+    setExpandedIds((prev) => mergeExpandedIdsFromKey(prev, attentionOrderIdsKey));
+  }, [attentionOrderIdsKey]);
 
   const patchOrders = useCallback(
     (updater: (orders: OrderRecord[]) => OrderRecord[]) => {

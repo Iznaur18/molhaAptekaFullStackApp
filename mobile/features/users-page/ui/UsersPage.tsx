@@ -12,7 +12,7 @@ import { useUsersPageStyles } from "@/shared/theme/usersPageStyles";
 export const UsersPage = () => {
   const router = useRouter();
   const styles = useUsersPageStyles();
-  const { contentPaddingTop } = useScreenLayout();
+  const { contentPaddingTop, centeredContentStyle } = useScreenLayout();
   const [searchTerm, setSearchTerm] = useState("");
   const [submittedSearch, setSubmittedSearch] = useState("");
   const normalizedSearch = submittedSearch.trim();
@@ -45,26 +45,28 @@ export const UsersPage = () => {
   const canRefreshList = !isSearchInputTooShort;
 
   return (
-    <View style={[styles.screen, { paddingTop: contentPaddingTop }]}>
-      <UsersPageSearchBar
-        value={searchTerm}
-        onChange={handleSearchTermChange}
-        onSubmit={handleSearchSubmit}
-        isPending={isSearchPending}
-      />
-      <UsersPageBody
-        phase={phase}
-        users={users}
-        error={error}
-        hasActiveFilters={hasSearchQuery}
-        isSearchInputTooShort={isSearchInputTooShort}
-        onUserRowClick={handleUserPress}
-        onRefresh={() => {
-          void refetch();
-        }}
-        isRefetching={isRefetching}
-        canRefresh={canRefreshList}
-      />
+    <View style={styles.screen}>
+      <View style={[styles.screen, centeredContentStyle, { paddingTop: contentPaddingTop }]}>
+        <UsersPageSearchBar
+          value={searchTerm}
+          onChange={handleSearchTermChange}
+          onSubmit={handleSearchSubmit}
+          isPending={isSearchPending}
+        />
+        <UsersPageBody
+          phase={phase}
+          users={users}
+          error={error}
+          hasActiveFilters={hasSearchQuery}
+          isSearchInputTooShort={isSearchInputTooShort}
+          onUserRowClick={handleUserPress}
+          onRefresh={() => {
+            void refetch();
+          }}
+          isRefetching={isRefetching}
+          canRefresh={canRefreshList}
+        />
+      </View>
     </View>
   );
 };

@@ -72,7 +72,7 @@ export const resolveSiteHeaderBannerMobileRoute = (linkPath: string): string | n
       "moderation-intro-ad": "/hub/intro-ad-moderation",
       "moderation-seller-categories": "/hub/seller-personal-category-moderation",
       "product-reports": "/hub/product-reports",
-      "staff-raffles": "/hub/raffles",
+      "staff-raffles": "/hub/intro-ad-moderation",
       "data-confirmation-requests": "/hub/data-confirmation-requests",
       "installment-disputes": "/hub/installment-disputes",
       "admin-orders": "/hub/admin-orders",

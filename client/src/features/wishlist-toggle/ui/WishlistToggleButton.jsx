@@ -82,7 +82,8 @@ export function WishlistToggleButton({
       aria-pressed={active}
       onClick={handleClick}
     >
-      <AppIcon icon={Heart} size="sm" strokeWidth={2.1} className="wishlist-toggle__icon" />
+      {/* size lg = 20px — как в мобильном WishlistToggleButton */}
+      <AppIcon icon={Heart} size="lg" strokeWidth={2.1} className="wishlist-toggle__icon" />
     </button>
   );
 }

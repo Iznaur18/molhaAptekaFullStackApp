@@ -120,25 +120,24 @@
   min-width: 0;
 }
 
+/* Геометрия — базовый слой controls.css (useFormFieldStyles.input) */
 .installment-buyer-block__input {
   box-sizing: border-box;
   width: 100%;
-  padding: 0.5rem 0.6rem;
-  border: 1px solid var(--iz-color-border);
-  border-radius: 0.45rem;
-  background: var(--iz-color-surface);
   font: inherit;
-  font-size: 0.9rem;
-  color: var(--iz-color-ink);
+  font-size: var(--iz-control-input-font);
+  color: var(--iz-color-text);
 }
 
+/* inputFocused: borderColor action + тень, как в мобиле */
 .installment-buyer-block__input:focus {
-  outline: 2px solid var(--iz-color-focus-ring);
-  border-color: var(--iz-color-link);
+  border-color: var(--iz-color-action);
+  outline: none;
+  box-shadow: var(--iz-shadow-input-focus);
 }
 
 .installment-buyer-block__input:disabled {
-  background: var(--iz-color-surface-elevated);
+  background: var(--iz-color-surface-muted);
   color: var(--iz-color-text-muted);
 }
 

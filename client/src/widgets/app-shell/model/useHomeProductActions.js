@@ -25,9 +25,7 @@ export const useHomeProductActions = ({
   setIsSellerProductsLimitModalOpen,
   setIsCreateProductModalOpen,
   setProductToEdit,
-  setCatalogProductDetails,
   setProductDetailsAdminError,
-  catalogProductDetails,
   isMineMode,
   showHiddenCatalogProducts,
   selectedProductCategory,
@@ -86,14 +84,6 @@ export const useHomeProductActions = ({
   const syncCatalogProductState = useCallback(
     (product) => {
       const id = String(product._id);
-      setCatalogProductDetails((prev) =>
-        prev && String(prev._id) === id
-          ? {
-              ...product,
-              hasOpenSales: prev.hasOpenSales ?? product.hasOpenSales,
-            }
-          : prev,
-      );
 
       if (
         product.productIsAvailable === false &&
@@ -121,7 +111,6 @@ export const useHomeProductActions = ({
       isMineMode,
       removeCatalogProduct,
       selectedProductCategory,
-      setCatalogProductDetails,
       showHiddenCatalogProducts,
       updateCatalogProduct,
     ],
@@ -183,12 +172,8 @@ export const useHomeProductActions = ({
   );
 
   const handleAdminOpenEditProductFromDetails = useCallback(() => {
-    if (!catalogProductDetails) {
-      return;
-    }
-    setIsCreateProductModalOpen(false);
-    setProductToEdit(catalogProductDetails);
-  }, [catalogProductDetails, setIsCreateProductModalOpen, setProductToEdit]);
+    /* edit открывается со страницы /product/:id через setProductToEdit */
+  }, []);
 
   const handleSetMyProductAvailability = useCallback(
     async (productId, isAvailable) => {
@@ -269,9 +254,6 @@ export const useHomeProductActions = ({
         setPromotionProduct((prev) =>
           prev && String(prev._id) === productId ? null : prev,
         );
-        setCatalogProductDetails((prev) =>
-          prev && String(prev._id) === productId ? null : prev,
-        );
         void refreshCatalogFeed();
       } catch (e) {
         setMyProductsCatalogError(
@@ -285,7 +267,6 @@ export const useHomeProductActions = ({
       deleteMutation,
       refreshCatalogFeed,
       removeCatalogProduct,
-      setCatalogProductDetails,
       setDeletingProductId,
       setMyProductsCatalogError,
       setProductToEdit,

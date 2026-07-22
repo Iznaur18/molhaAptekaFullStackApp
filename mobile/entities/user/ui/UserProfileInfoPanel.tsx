@@ -11,6 +11,7 @@ import {
 import { getProfileRowIcon } from "@/entities/user/lib/profileRowIcons";
 import { RU_PHONE_EMPTY_LABEL } from "@/entities/user/lib/ruPhone";
 import { USER_PROFILE_COPY } from "@/shared/config";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { PROFILE_CARD_SQUIRCLE_RADIUS } from "@/shared/theme/profileChromeStyles";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { SquircleView } from "@/shared/ui/SquircleView";
@@ -117,9 +118,6 @@ const useStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surfaceMuted,
     color: theme.colors.textMuted,
   },
-  iconColor: {
-    color: theme.colors.textSecondary,
-  },
 }));
 
 const openProfileRowHref = (href: string) => {
@@ -184,6 +182,7 @@ export const UserProfileInfoPanel = ({
   rows,
   hidePhoneUntilReveal = false,
 }: UserProfileInfoPanelProps) => {
+  const theme = useAppTheme();
   const styles = useStyles();
   const sections = useMemo(() => groupProfileRows(rows), [rows]);
 
@@ -214,7 +213,7 @@ export const UserProfileInfoPanel = ({
                 <View style={styles.detailLabelRow}>
                   {icon ? (
                     <View style={styles.detailIconWrap}>
-                      <Feather name={icon} size={13} color={styles.iconColor.color} />
+                      <Feather name={icon} size={13} color={theme.colors.textSecondary} />
                     </View>
                   ) : null}
                   <Text style={styles.detailLabel}>{row.label}</Text>

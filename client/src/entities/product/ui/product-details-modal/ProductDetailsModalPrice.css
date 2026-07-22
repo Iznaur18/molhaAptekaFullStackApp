@@ -61,8 +61,9 @@
   padding: 0.25rem 0.625rem;
   border: 0;
   border-radius: 0.375rem;
-  background: #fbdcea;
-  color: #f1117e;
+  /* mobile productCardBadgePalette: discountBg = dangerSurface, discountText = dangerText */
+  background: var(--iz-color-danger-surface);
+  color: var(--iz-color-danger-text);
   font-size: 0.625rem;
   font-weight: 800;
   line-height: 1.2;
@@ -79,19 +80,21 @@
   line-height: 1.2;
 }
 
+/* Те же токены, что и у базовых бейджей (ProductCardBadges.css) — иначе
+   цвет «зашит» и не переключается вместе с темой, в отличие от мобилы. */
 .product-details-modal__price-badge-row .product-card__auction-badge {
-  background: #e0f2fe;
-  color: #0369a1;
+  background: var(--iz-color-info-soft);
+  color: var(--iz-color-info);
 }
 
 .product-details-modal__price-badge-row .product-card__installment-badge {
-  background: #ecfdf5;
-  color: #047857;
+  background: var(--iz-color-success-surface);
+  color: var(--iz-color-success-text);
 }
 
 .product-details-modal__price-badge-row .product-card__raffle-badge {
-  background: #ede9fe;
-  color: #5b21b6;
+  background: var(--iz-color-accent-soft);
+  color: var(--iz-color-accent);
 }
 
 .product-details-modal__price-badge-row .product-catalog-status-badges {

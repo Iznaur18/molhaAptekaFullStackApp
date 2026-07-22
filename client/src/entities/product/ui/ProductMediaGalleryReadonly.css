@@ -22,13 +22,8 @@
 }
 
 .product-media-gallery-readonly__hero--multi {
-  touch-action: pan-y;
-  cursor: grab;
+  /* Свайп картинок — scroll-snap в ProductMediaHorizontalPager (touch-action: pan-x) */
   user-select: none;
-}
-
-.product-media-gallery-readonly__hero--multi:active {
-  cursor: grabbing;
 }
 
 .product-media-gallery-readonly__back-btn {

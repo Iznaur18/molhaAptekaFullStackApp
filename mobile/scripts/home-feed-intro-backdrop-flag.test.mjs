@@ -41,9 +41,10 @@ test("disabled intro backdrop starts feed open without docking offset", () => {
   assert.match(flag, /= false/);
   assert.match(index, /if \(!IS_HOME_FEED_INTRO_BACKDROP_ENABLED\) \{\s*return 0;/);
   assert.match(transition, /const initialOpen = introBackdropEnabled \? 0 : 1/);
+  assert.match(index, /hasAutoOpenedHomeFeedRef/);
   assert.match(
     index,
-    /if \(!IS_HOME_FEED_INTRO_BACKDROP_ENABLED\) \{\s*introTransition\.openFeedSheet\(\);\s*return;/,
+    /if \(!IS_HOME_FEED_INTRO_BACKDROP_ENABLED\) \{\s*hasAutoOpenedHomeFeedRef\.current = true;\s*openFeedSheet\(\);\s*return;/,
   );
   assert.match(visibility, /setHomeCatalogTabBarProgressDriven = \(initialReveal = 0\)/);
 });

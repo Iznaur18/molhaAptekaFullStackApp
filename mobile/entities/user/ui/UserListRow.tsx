@@ -9,7 +9,7 @@ import { DEFAULT_USER_AVATAR_URL } from "@/entities/user/model/constants";
 import { UserListRowMetric } from "@/entities/user/ui/UserListRowMetric";
 import { UserPremiumAvatar } from "@/entities/user/ui/UserPremiumAvatar";
 import { UserPremiumDisplayName } from "@/entities/user/ui/UserPremiumDisplayName";
-import { USER_LIST_ROW_UI } from "@/shared/config";
+import { USER_LIST_ROW_UI, USERS_PODIUM_UI } from "@/shared/config";
 import {
   resolveUserListRowMetricsStacked,
   useUserListRowStyles,
@@ -18,9 +18,10 @@ import {
 type UserListRowProps = {
   user: UserSearchListItem;
   onRowClick?: (userId: string) => void;
+  podiumPlace?: 1 | 2 | 3;
 };
 
-export const UserListRow = ({ user, onRowClick }: UserListRowProps) => {
+export const UserListRow = ({ user, onRowClick, podiumPlace }: UserListRowProps) => {
   const styles = useUserListRowStyles();
   const [imgFailed, setImgFailed] = useState(false);
   const [cardWidth, setCardWidth] = useState(0);
@@ -53,11 +54,19 @@ export const UserListRow = ({ user, onRowClick }: UserListRowProps) => {
   }, [user.userLoyaltyPoints]);
 
   const metaBadges = useMemo(() => {
-    if (user.isBlockedUser !== true) {
-      return [];
+    const badges: string[] = [];
+    if (podiumPlace === 1) {
+      badges.push(USERS_PODIUM_UI.PLACE_1);
+    } else if (podiumPlace === 2) {
+      badges.push(USERS_PODIUM_UI.PLACE_2);
+    } else if (podiumPlace === 3) {
+      badges.push(USERS_PODIUM_UI.PLACE_3);
     }
-    return [USER_LIST_ROW_UI.BADGE_BLOCKED];
-  }, [user.isBlockedUser]);
+    if (user.isBlockedUser === true) {
+      badges.push(USER_LIST_ROW_UI.BADGE_BLOCKED);
+    }
+    return badges;
+  }, [podiumPlace, user.isBlockedUser]);
 
   const handlePress = () => {
     onRowClick?.(String(user._id));
@@ -71,7 +80,13 @@ export const UserListRow = ({ user, onRowClick }: UserListRowProps) => {
 
   return (
     <Pressable
-      style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
+      style={({ pressed }) => [
+        styles.row,
+        podiumPlace === 1 && styles.rowPodium1,
+        podiumPlace === 2 && styles.rowPodium2,
+        podiumPlace === 3 && styles.rowPodium3,
+        pressed && styles.rowPressed,
+      ]}
       onLayout={(event) => {
         handleCardLayout(event.nativeEvent.layout.width);
       }}
@@ -105,8 +120,26 @@ export const UserListRow = ({ user, onRowClick }: UserListRowProps) => {
       {metaBadges.length > 0 ? (
         <View style={styles.badges}>
           {metaBadges.map((label) => (
-            <View key={label} style={styles.badge}>
-              <Text style={styles.badgeText}>{label}</Text>
+            <View
+              key={label}
+              style={[
+                styles.badge,
+                label === USERS_PODIUM_UI.PLACE_1 && styles.badgePodium1,
+                label === USERS_PODIUM_UI.PLACE_2 && styles.badgePodium2,
+                label === USERS_PODIUM_UI.PLACE_3 && styles.badgePodium3,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.badgeText,
+                  (label === USERS_PODIUM_UI.PLACE_1 ||
+                    label === USERS_PODIUM_UI.PLACE_2 ||
+                    label === USERS_PODIUM_UI.PLACE_3) &&
+                    styles.badgePodiumText,
+                ]}
+              >
+                {label}
+              </Text>
             </View>
           ))}
         </View>

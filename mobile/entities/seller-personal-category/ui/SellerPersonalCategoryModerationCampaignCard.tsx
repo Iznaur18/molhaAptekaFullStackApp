@@ -20,16 +20,20 @@ export type SellerPersonalCategoryModerationCampaign = {
   imageUrl?: string | null;
   amountPoints?: number | null;
   tariffCode?: string | null;
+  activeUntil?: string | Date | null;
   createdAt?: string | Date | null;
 };
 
 type SellerPersonalCategoryModerationCampaignCardProps = {
   campaign: SellerPersonalCategoryModerationCampaign;
+  mode: "pending" | "managed";
   isPending: boolean;
-  rejectReason: string;
-  onRejectReasonChange: (value: string) => void;
-  onApprove: () => void;
-  onReject: () => void;
+  rejectReason?: string;
+  onRejectReasonChange?: (value: string) => void;
+  onApprove?: () => void;
+  onReject?: () => void;
+  onStaffUnpublish?: () => void;
+  onStaffDelete?: () => void;
   errorMessage?: string;
   collapsible?: boolean;
   expanded?: boolean;
@@ -38,11 +42,14 @@ type SellerPersonalCategoryModerationCampaignCardProps = {
 
 export const SellerPersonalCategoryModerationCampaignCard = ({
   campaign,
+  mode,
   isPending,
-  rejectReason,
+  rejectReason = "",
   onRejectReasonChange,
   onApprove,
   onReject,
+  onStaffUnpublish,
+  onStaffDelete,
   errorMessage = "",
   collapsible = false,
   expanded = true,
@@ -52,7 +59,7 @@ export const SellerPersonalCategoryModerationCampaignCard = ({
   const sellerName = resolveSellerPersonalCategorySellerName(campaign);
   const title = sellerName || String(campaign.sellerId ?? "—");
   const imageSrc = campaign.imageUrl ? resolveUploadedMediaUrl(campaign.imageUrl) : "";
-  const needsAttention = campaignModerationNeedsAttention(campaign);
+  const needsAttention = mode === "pending" && campaignModerationNeedsAttention(campaign);
   const collapsedPreview = resolveModerationCampaignCollapsedPreview(campaign);
   const createdLabel = campaign.createdAt ? formatIsoDateTime(campaign.createdAt) : null;
 
@@ -71,6 +78,13 @@ export const SellerPersonalCategoryModerationCampaignCard = ({
 
       <Text style={styles.meta}>{formatSellerPersonalCategoryCampaignSummary(campaign)}</Text>
 
+      {mode === "managed" && campaign.activeUntil ? (
+        <Text style={styles.meta}>
+          {SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.STATUS_ACTIVE} · до{" "}
+          {formatIsoDateTime(campaign.activeUntil)}
+        </Text>
+      ) : null}
+
       {imageSrc ? (
         <Image
           source={{ uri: imageSrc }}
@@ -80,37 +94,76 @@ export const SellerPersonalCategoryModerationCampaignCard = ({
         />
       ) : null}
 
-      <TextInput
-        style={styles.rejectInput}
-        value={rejectReason}
-        multiline
-        numberOfLines={3}
-        editable={!isPending}
-        placeholder={SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.REJECT_REASON_PLACEHOLDER}
-        onChangeText={onRejectReasonChange}
-      />
+      {mode === "pending" && onRejectReasonChange ? (
+        <TextInput
+          style={styles.rejectInput}
+          value={rejectReason}
+          multiline
+          numberOfLines={3}
+          editable={!isPending}
+          placeholder={SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.REJECT_REASON_PLACEHOLDER}
+          onChangeText={onRejectReasonChange}
+        />
+      ) : null}
 
       <View style={styles.actions}>
-        <Pressable
-          style={[styles.primaryButton, isPending && styles.buttonDisabled]}
-          onPress={onApprove}
-          disabled={isPending}
-        >
-          <Text style={styles.primaryButtonText}>
-            {isPending
-              ? SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.ACTION_PENDING
-              : SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.APPROVE}
-          </Text>
-        </Pressable>
-        <Pressable
-          style={[styles.secondaryButton, isPending && styles.buttonDisabled]}
-          onPress={onReject}
-          disabled={isPending}
-        >
-          <Text style={styles.secondaryButtonText}>
-            {SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.REJECT}
-          </Text>
-        </Pressable>
+        {mode === "pending" && onApprove ? (
+          <Pressable
+            style={[styles.primaryButton, isPending && styles.buttonDisabled]}
+            onPress={onApprove}
+            disabled={isPending}
+          >
+            <Text style={styles.primaryButtonText}>
+              {isPending
+                ? SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.ACTION_PENDING
+                : SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.APPROVE}
+            </Text>
+          </Pressable>
+        ) : null}
+        {mode === "pending" && onReject ? (
+          <Pressable
+            style={[styles.secondaryButton, isPending && styles.buttonDisabled]}
+            onPress={onReject}
+            disabled={isPending}
+          >
+            <Text style={styles.secondaryButtonText}>
+              {SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.REJECT}
+            </Text>
+          </Pressable>
+        ) : null}
+        {mode === "pending" && onStaffDelete ? (
+          <Pressable
+            style={[styles.dangerButton, isPending && styles.buttonDisabled]}
+            onPress={onStaffDelete}
+            disabled={isPending}
+          >
+            <Text style={styles.dangerButtonText}>
+              {SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.STAFF_DELETE}
+            </Text>
+          </Pressable>
+        ) : null}
+        {mode === "managed" && onStaffUnpublish ? (
+          <Pressable
+            style={[styles.secondaryButton, isPending && styles.buttonDisabled]}
+            onPress={onStaffUnpublish}
+            disabled={isPending}
+          >
+            <Text style={styles.secondaryButtonText}>
+              {SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.STAFF_UNPUBLISH}
+            </Text>
+          </Pressable>
+        ) : null}
+        {mode === "managed" && onStaffDelete ? (
+          <Pressable
+            style={[styles.dangerButton, isPending && styles.buttonDisabled]}
+            onPress={onStaffDelete}
+            disabled={isPending}
+          >
+            <Text style={styles.dangerButtonText}>
+              {SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.STAFF_DELETE}
+            </Text>
+          </Pressable>
+        ) : null}
       </View>
     </View>
   );

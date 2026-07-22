@@ -1,9 +1,15 @@
 import Feather from "@expo/vector-icons/Feather";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { BlurView } from "expo-blur";
-import { usePathname, useRouter } from "expo-router";
-import { useCallback, useEffect, useRef } from "react";
-import { Platform, Pressable, StyleSheet, View } from "react-native";
+import { usePathname } from "expo-router";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import {
+  Platform,
+  Pressable,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -19,11 +25,15 @@ import { useCatalogCategoryView } from "@/shared/lib/catalogCategoryViewStore";
 import { isHomeTabBarRoute } from "@/shared/lib/isHomeTabBarRoute";
 import { isProfileTabBarRoute } from "@/shared/lib/isProfileTabBarRoute";
 import {
-  MOBILE_BOTTOM_NAV_FLOAT_OFFSET,
+  MOBILE_BOTTOM_NAV_BORDER_RADIUS,
+  MOBILE_BOTTOM_NAV_ITEM_MIN_HEIGHT,
+  MOBILE_BOTTOM_NAV_PADDING_HORIZONTAL,
   MOBILE_BOTTOM_NAV_PADDING_VERTICAL,
   resolveMobileBottomNavHorizontalInset,
   resolveMobileBottomNavLayoutHeight,
+  resolveMobileBottomNavPaddingBottom,
 } from "@/shared/lib/mobileBottomNavLayout";
+import { resolveContentMaxWidth } from "@/shared/lib/screenBreakpoints";
 import { homeCatalogTabBarRevealProgress } from "@/shared/model/homeCatalogTabBarVisibility";
 import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
@@ -32,14 +42,10 @@ import { AppText } from "@/shared/ui/AppText";
 const TAB_ICON_SIZE = 24;
 const PLACE_PRODUCT_ROUTE = "place-product";
 const HOME_TAB_ROUTE = "index";
-
-/** Удержание кнопки «Домой» дольше этого времени запускает повтор интро-ролика. */
+const NAV_ITEMS_GAP = 2;
 const INTRO_REPLAY_HOLD_MS = 1000;
 
-/** Ozon-стиль: плоский бар, табы вплотную. */
-const NAV_ITEMS_GAP = 0;
-/** Горизонтальный паддинг плоского бара. */
-const NAV_PADDING_HORIZONTAL = 8;
+const withAlpha = (hex: string, alphaHex: string): string => `${hex}${alphaHex}`;
 
 type TabItemConfig = {
   routeName: string;
@@ -82,49 +88,82 @@ const TAB_ITEMS: TabItemConfig[] = [
 ];
 
 const useTabBarStyles = createThemedStyles((theme) => ({
+  /** Absolute overlay: не резервирует высоту сцены — карточки до края экрана. */
   shell: {
-    paddingTop: MOBILE_BOTTOM_NAV_FLOAT_OFFSET,
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: "transparent",
     pointerEvents: "box-none",
   },
-  /** Ozon-стиль: плоский бар во всю ширину, отделён тонкой линией сверху. */
-  navShadow: {
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: theme.colors.border,
+  pillWrap: {
+    width: "100%",
+    alignSelf: "center",
+    pointerEvents: "box-none",
+  },
+  /** Liquid-glass pill — паритет с web MobileBottomNav.css */
+  navPill: {
+    overflow: "hidden",
+    borderRadius: MOBILE_BOTTOM_NAV_BORDER_RADIUS,
+    borderWidth: StyleSheet.hairlineWidth * 2,
+    borderColor: withAlpha(theme.colors.onContrast, "6B"),
+    backgroundColor: withAlpha(theme.colors.surface, "8C"),
+    shadowColor: theme.colors.ink,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
+    elevation: 10,
   },
   navBlur: {
     overflow: "hidden",
+    borderRadius: MOBILE_BOTTOM_NAV_BORDER_RADIUS,
     paddingVertical: MOBILE_BOTTOM_NAV_PADDING_VERTICAL,
-    paddingHorizontal: NAV_PADDING_HORIZONTAL,
+    paddingHorizontal: MOBILE_BOTTOM_NAV_PADDING_HORIZONTAL,
   },
-  /** Почти непрозрачный surface поверх blur. */
-  navOverlay: {
+  liquidOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: withAlpha(theme.colors.onContrast, "24"),
+  },
+  liquidSheen: {
+    position: "absolute",
+    top: 1,
+    left: "12%",
+    right: "12%",
+    height: "42%",
+    borderRadius: MOBILE_BOTTOM_NAV_BORDER_RADIUS,
+    backgroundColor: withAlpha(theme.colors.onContrast, "3D"),
+    opacity: 0.55,
   },
   navRow: {
+    zIndex: 1,
     flexDirection: "row",
-    alignItems: "stretch",
+    alignItems: "center",
     gap: NAV_ITEMS_GAP,
   },
   item: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    minHeight: 48,
-    paddingVertical: 6,
-    paddingHorizontal: 4,
-  },
-  /** Ozon-стиль: активный таб показывает только цвет иконки, без подложки. */
-  itemActive: {
+    minHeight: MOBILE_BOTTOM_NAV_ITEM_MIN_HEIGHT,
+    paddingVertical: 2,
+    paddingHorizontal: 2,
+    borderRadius: MOBILE_BOTTOM_NAV_BORDER_RADIUS,
     backgroundColor: "transparent",
+  },
+  itemActive: {
+    backgroundColor: withAlpha(theme.colors.onContrast, "6B"),
+    shadowColor: theme.colors.ink,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
+    elevation: 1,
   },
   iconWrap: {
     position: "relative",
     alignItems: "center",
     justifyContent: "center",
   },
-  /** 0.95rem = 15.2px — паритет с web */
   badge: {
     position: "absolute",
     top: -5,
@@ -137,7 +176,6 @@ const useTabBarStyles = createThemedStyles((theme) => ({
     justifyContent: "center",
     backgroundColor: theme.colors.danger,
   },
-  /** 0.55rem = 8.8px — паритет с web */
   badgeText: {
     fontSize: 8.8,
     fontWeight: "700",
@@ -149,9 +187,9 @@ const useTabBarStyles = createThemedStyles((theme) => ({
 const formatBadge = (count: number) => (count > 99 ? "99+" : String(count));
 
 export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => {
-  const router = useRouter();
   const pathname = usePathname();
   const insets = useSafeAreaInsets();
+  const { width: windowWidth } = useWindowDimensions();
   const styles = useTabBarStyles();
   const { theme, colorScheme } = useAppThemeSettings();
   const sessionQuery = useAuthSessionQuery();
@@ -160,7 +198,6 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
   const isAuthorized = sessionQuery.data?.user != null;
   const isProfileTabBarContext = isProfileTabBarRoute(pathname);
   const isHomeTabBarContext = isHomeTabBarRoute(pathname);
-  // На вкладке index может быть открыт список категории — тогда активен «Каталог».
   const isCatalogCategoryView = useCatalogCategoryView();
 
   const cartBadge = cartCount > 0 ? formatBadge(cartCount) : null;
@@ -169,6 +206,13 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
   const placeProduct = usePlaceProductPress();
   const { replayIntro } = useAppIntro();
   const introHoldTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const contentMaxWidth = useMemo(
+    () => resolveContentMaxWidth(windowWidth),
+    [windowWidth],
+  );
+  const horizontalInset = resolveMobileBottomNavHorizontalInset(insets);
+  const tabBarLayoutHeight = resolveMobileBottomNavLayoutHeight(insets.bottom);
 
   const clearIntroHoldTimer = useCallback(() => {
     if (introHoldTimerRef.current != null) {
@@ -190,7 +234,6 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
 
   useEffect(() => clearIntroHoldTimer, [clearIntroHoldTimer]);
 
-  const tabBarLayoutHeight = resolveMobileBottomNavLayoutHeight(insets.bottom);
   const animatedShellStyle = useAnimatedStyle(
     () => ({
       transform: [
@@ -244,8 +287,6 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
   const homeRouteIndex = state.routes.findIndex((route) => route.name === HOME_TAB_ROUTE);
   const isHomeTabActive =
     (homeRouteIndex >= 0 && state.index === homeRouteIndex) || isHomeTabBarContext;
-  // Флаг категории живёт на вкладке index, поэтому «Каталог» подсвечиваем по нему
-  // только пока эта вкладка активна — иначе он светился бы и в корзине, и в профиле.
   const isCategoryOnHomeTab = isCatalogCategoryView && isHomeTabActive;
 
   const items = TAB_ITEMS.map((item) => {
@@ -255,7 +296,6 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
     if (item.routeName === PLACE_PRODUCT_ROUTE) {
       isFocused = false;
     } else if (item.routeName === HOME_TAB_ROUTE) {
-      // Пока на index открыт список категории, «Домой» не активна (активен «Каталог»).
       isFocused = isHomeTabActive && !isCategoryOnHomeTab;
     } else if (item.routeName === "catalog") {
       isFocused = isRouteActive || isCategoryOnHomeTab;
@@ -317,24 +357,27 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
         style={[
           styles.shell,
           {
-            paddingHorizontal: resolveMobileBottomNavHorizontalInset(insets),
+            paddingHorizontal: horizontalInset,
+            paddingBottom: resolveMobileBottomNavPaddingBottom(insets.bottom),
           },
         ]}
       >
-        <Animated.View pointerEvents="box-none" style={animatedShellStyle}>
-          <View style={styles.navShadow}>
+        <Animated.View
+          pointerEvents="box-none"
+          style={[
+            styles.pillWrap,
+            animatedShellStyle,
+            contentMaxWidth != null ? { maxWidth: contentMaxWidth } : null,
+          ]}
+        >
+          <View style={styles.navPill}>
             <BlurView
-              intensity={Platform.OS === "web" ? 0 : 85}
+              intensity={Platform.OS === "web" ? 0 : 72}
               tint={colorScheme === "dark" ? "dark" : "light"}
-              style={[
-                styles.navBlur,
-                {
-                  paddingBottom:
-                    MOBILE_BOTTOM_NAV_PADDING_VERTICAL + Math.max(insets.bottom, 4),
-                },
-              ]}
+              style={styles.navBlur}
             >
-              <View style={styles.navOverlay} />
+              <View style={styles.liquidOverlay} pointerEvents="none" />
+              <View style={styles.liquidSheen} pointerEvents="none" />
               <View style={styles.navRow}>{items}</View>
             </BlurView>
           </View>

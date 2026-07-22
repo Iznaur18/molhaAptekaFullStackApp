@@ -7,17 +7,31 @@ export const CATALOG_VIRTUAL_ROW_HEIGHT_PX = 520;
 /** Дополнительные строки сверху/снизу видимой области. */
 export const CATALOG_VIRTUAL_OVERSCAN_ROWS = 2;
 
-/** Mobile: `@container app-viewport (max-width: 640px)` → 3 колонки. */
-export const CATALOG_GRID_MOBILE_BREAKPOINT_PX = 640;
+/**
+ * Паритет с mobile `resolveProductGridColumns` / `screenBreakpoints.ts`.
+ * ≤667 → 2 · ≤903 / <1280 → 3 · ≥1280 → 4.
+ */
+export const CATALOG_GRID_2_COL_MAX_PX = 667;
+export const CATALOG_GRID_3_COL_MAX_PX = 903;
+export const CATALOG_GRID_4_COL_MIN_PX = 1280;
 
-export const CATALOG_GRID_MOBILE_COLUMNS = 3;
+export const CATALOG_GRID_COLUMNS_COMPACT = 2;
+export const CATALOG_GRID_COLUMNS_MEDIUM = 3;
+export const CATALOG_GRID_COLUMNS_WIDE = 4;
 
-/** Tablet: `@container app-viewport (max-width: 1023px)` → 4 колонки. */
-export const CATALOG_GRID_TABLET_BREAKPOINT_PX = 1023;
+/** @deprecated alias — compact (2 col) band */
+export const CATALOG_GRID_MOBILE_BREAKPOINT_PX = CATALOG_GRID_2_COL_MAX_PX;
 
-export const CATALOG_GRID_TABLET_COLUMNS = 4;
+/** @deprecated alias */
+export const CATALOG_GRID_MOBILE_COLUMNS = CATALOG_GRID_COLUMNS_COMPACT;
 
-/** Desktop auto-fill min column (marketplace density). */
+/** @deprecated alias — medium (3 col) upper before wide */
+export const CATALOG_GRID_TABLET_BREAKPOINT_PX = CATALOG_GRID_4_COL_MIN_PX - 1;
+
+/** @deprecated alias */
+export const CATALOG_GRID_TABLET_COLUMNS = CATALOG_GRID_COLUMNS_MEDIUM;
+
+/** Desktop min column (legacy auto-fill). */
 export const CATALOG_GRID_MIN_COLUMN_PX = 200;
 
 export const CATALOG_GRID_GAP_PX = 16;
@@ -26,4 +40,4 @@ export const CATALOG_GRID_GAP_PX = 16;
 export const CATALOG_GRID_COLUMN_BREAKPOINT_PX = CATALOG_GRID_MOBILE_BREAKPOINT_PX;
 
 /** @deprecated alias — narrow gap band, not column switch */
-export const CATALOG_GRID_NARROW_MOBILE_BREAKPOINT_PX = 667;
+export const CATALOG_GRID_NARROW_MOBILE_BREAKPOINT_PX = CATALOG_GRID_2_COL_MAX_PX;

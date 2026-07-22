@@ -32,13 +32,6 @@ const resolveProfileStaffNavItem = (
   access: ProfileHubAccess,
   badgeCounts: Partial<Record<ProfileSectionId, number>>,
 ): ProfileNavItem | null => {
-  if (sectionId === "create-raffle" && access.canUseCreateRaffle) {
-    return {
-      sectionId,
-      label: MY_PROFILE_PAGE_UI.TAB_CREATE_RAFFLE,
-      variant: "cta",
-    };
-  }
   if (sectionId === "product-moderation" && access.canUseProductModeration) {
     return {
       sectionId,
@@ -58,13 +51,6 @@ const resolveProfileStaffNavItem = (
       sectionId,
       label: "Жалоба (модерация)",
       badgeCount: badgeCounts["product-reports"],
-    };
-  }
-  if (sectionId === "raffles" && access.canUseRaffles) {
-    return {
-      sectionId,
-      label: "Розыгрыш (модерация)",
-      badgeCount: badgeCounts.raffles,
     };
   }
   if (sectionId === "data-confirmation-requests" && access.canUseDataConfirmationQueue) {

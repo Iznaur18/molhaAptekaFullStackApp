@@ -40,6 +40,12 @@ export const ADMIN_EDIT_MODAL_ANIMATION = {
   sheetSlideDistance: 360,
 } as const;
 
+/** Checkout sheet ~70% высоты — слайд на полный экран, иначе sheet торчит при старте. */
+export const CHECKOUT_SHEET_MODAL_ANIMATION = {
+  enterMs: 280,
+  exitMs: 220,
+} as const;
+
 export const useBottomSheetReportModalStyles = createThemedStyles((theme) => ({
   root: {
     flex: 1,

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
   FlatList,
   Modal,
@@ -16,6 +16,7 @@ import type { FeaturedRaffleManage, RaffleFromApi } from "@/entities/raffle/mode
 import { FeaturedRaffleModalCard } from "@/entities/raffle/ui/FeaturedRaffleModalCard";
 import { HOME_FEED_UI, RAFFLE_FEATURED_BANNER_UI, RAFFLE_FEATURED_CAROUSEL_UI } from "@/shared/config";
 import { nestedHorizontalScrollProps } from "@/shared/lib/nestedHorizontalScrollProps";
+import { resolveDialogAccessibilityProps } from "@/shared/lib/resolveDialogAccessibilityProps";
 import {
   RAFFLE_FEATURED_LAYOUT,
   useFeaturedRaffleModalStyles,
@@ -28,12 +29,50 @@ const VISUAL_SIZE_RATIO = 0.94;
 const CAROUSEL_WINDOW_SIZE = 3;
 const CAROUSEL_VIEWABILITY_THRESHOLD = 60;
 
+const ActiveRaffleSlideIndexContext = createContext(0);
+
 type HomeFeaturedRaffleModalProps = {
   visible: boolean;
   raffles: RaffleFromApi[];
   onClose: () => void;
   onOpenProducts: (raffleId: string) => void;
   getManage?: (raffle: RaffleFromApi) => FeaturedRaffleManage | null;
+};
+
+type HomeFeaturedRaffleModalSlideProps = {
+  raffle: RaffleFromApi;
+  index: number;
+  cardWidth: number;
+  visualSize: number;
+  visible: boolean;
+  getManage?: (raffle: RaffleFromApi) => FeaturedRaffleManage | null;
+};
+
+const HomeFeaturedRaffleModalSlide = ({
+  raffle,
+  index,
+  cardWidth,
+  visualSize,
+  visible,
+  getManage,
+}: HomeFeaturedRaffleModalSlideProps) => {
+  const activeIndex = useContext(ActiveRaffleSlideIndexContext);
+  const isActive = index === activeIndex;
+
+  return (
+    <View
+      style={{ width: cardWidth }}
+      accessibilityElementsHidden={!isActive}
+      importantForAccessibility={isActive ? "auto" : "no-hide-descendants"}
+    >
+      <FeaturedRaffleModalCard
+        raffle={raffle}
+        visualSize={visualSize}
+        manage={getManage?.(raffle) ?? null}
+        isVideoActive={visible && isActive}
+      />
+    </View>
+  );
 };
 
 export const HomeFeaturedRaffleModal = ({
@@ -106,6 +145,9 @@ export const HomeFeaturedRaffleModal = ({
         Math.max(nextIndex, 0),
         Math.max(raffles.length - 1, 0),
       );
+      if (activeIndexRef.current === clampedIndex) {
+        return;
+      }
       activeIndexRef.current = clampedIndex;
       setActiveIndex(clampedIndex);
     },
@@ -118,8 +160,12 @@ export const HomeFeaturedRaffleModal = ({
       if (firstVisible?.index == null) {
         return;
       }
-      activeIndexRef.current = firstVisible.index;
-      setActiveIndex(firstVisible.index);
+      const nextIndex = firstVisible.index;
+      if (activeIndexRef.current === nextIndex) {
+        return;
+      }
+      activeIndexRef.current = nextIndex;
+      setActiveIndex(nextIndex);
     },
   ).current;
 
@@ -129,20 +175,16 @@ export const HomeFeaturedRaffleModal = ({
 
   const renderItem = useCallback(
     ({ item, index }: { item: RaffleFromApi; index: number }) => (
-      <View
-        style={{ width: cardWidth }}
-        accessibilityElementsHidden={index !== activeIndex}
-        importantForAccessibility={index === activeIndex ? "auto" : "no-hide-descendants"}
-      >
-        <FeaturedRaffleModalCard
-          raffle={item}
-          visualSize={visualSize}
-          manage={getManage?.(item) ?? null}
-          isVideoActive={visible && index === activeIndex}
-        />
-      </View>
+      <HomeFeaturedRaffleModalSlide
+        raffle={item}
+        index={index}
+        cardWidth={cardWidth}
+        visualSize={visualSize}
+        getManage={getManage}
+        visible={visible}
+      />
     ),
-    [activeIndex, cardWidth, getManage, visible, visualSize],
+    [cardWidth, getManage, visible, visualSize],
   );
 
   if (raffles.length === 0) {
@@ -164,27 +206,30 @@ export const HomeFeaturedRaffleModal = ({
         onTouchEnd={() => setIsPaused(false)}
         onTouchCancel={() => setIsPaused(false)}
       >
-        <FlatList
-          ref={listRef}
-          horizontal
-          {...nestedHorizontalScrollProps}
-          data={raffles}
-          keyExtractor={(item) => item._id}
-          showsHorizontalScrollIndicator={false}
-          decelerationRate="fast"
-          snapToInterval={snapInterval}
-          snapToAlignment="start"
-          disableIntervalMomentum
-          windowSize={CAROUSEL_WINDOW_SIZE}
-          maxToRenderPerBatch={1}
-          initialNumToRender={1}
-          removeClippedSubviews
-          contentContainerStyle={contentContainerStyle}
-          onMomentumScrollEnd={handleMomentumScrollEnd}
-          onViewableItemsChanged={handleViewableItemsChanged}
-          viewabilityConfig={viewabilityConfig}
-          renderItem={renderItem}
-        />
+        <ActiveRaffleSlideIndexContext.Provider value={activeIndex}>
+          <FlatList
+            ref={listRef}
+            horizontal
+            {...nestedHorizontalScrollProps}
+            data={raffles}
+            keyExtractor={(item) => item._id}
+            showsHorizontalScrollIndicator={false}
+            decelerationRate="fast"
+            snapToInterval={snapInterval}
+            snapToAlignment="start"
+            disableIntervalMomentum
+            windowSize={CAROUSEL_WINDOW_SIZE}
+            maxToRenderPerBatch={1}
+            initialNumToRender={1}
+            removeClippedSubviews
+            extraData={activeIndex}
+            contentContainerStyle={contentContainerStyle}
+            onMomentumScrollEnd={handleMomentumScrollEnd}
+            onViewableItemsChanged={handleViewableItemsChanged}
+            viewabilityConfig={viewabilityConfig}
+            renderItem={renderItem}
+          />
+        </ActiveRaffleSlideIndexContext.Provider>
       </View>
     );
 
@@ -205,7 +250,7 @@ export const HomeFeaturedRaffleModal = ({
         />
         <View
           style={[styles.dialog, { width: cardWidth, height: dialogHeight }]}
-          accessibilityRole="dialog"
+          {...resolveDialogAccessibilityProps()}
           accessibilityLabel={HOME_FEED_UI.RAFFLES_SECTION_ARIA}
         >
           <View style={styles.header}>

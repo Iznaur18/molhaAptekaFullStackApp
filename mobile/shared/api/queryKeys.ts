@@ -58,6 +58,8 @@ export const sellerPersonalCategoryQueryKeys = {
   catalogTiles: () => [...sellerPersonalCategoryQueryKeys.all, "catalog-tiles"] as const,
   moderationPending: (limit = 50) =>
     [...sellerPersonalCategoryQueryKeys.all, "moderation", "pending", limit] as const,
+  moderationManaged: () =>
+    [...sellerPersonalCategoryQueryKeys.all, "moderation", "managed"] as const,
   moderationCount: () =>
     [...sellerPersonalCategoryQueryKeys.all, "moderation", "count"] as const,
 };
@@ -70,6 +72,7 @@ export const premiumQueryKeys = {
 export const loyaltyPointsQueryKeys = {
   all: ["loyalty-points"] as const,
   status: () => [...loyaltyPointsQueryKeys.all, "status"] as const,
+  monthlyAwarded: () => [...loyaltyPointsQueryKeys.all, "monthly-awarded"] as const,
 };
 
 export const dataConfirmationQueryKeys = {
@@ -94,6 +97,7 @@ export const raffleQueryKeys = {
   all: ["raffles"] as const,
   featured: () => [...raffleQueryKeys.all, "featured"] as const,
   my: () => [...raffleQueryKeys.all, "my"] as const,
+  createAdvertising: () => [...raffleQueryKeys.all, "create-advertising"] as const,
   products: (raffleId: string) => [...raffleQueryKeys.all, "products", raffleId] as const,
   staffQueue: () => [...raffleQueryKeys.all, "staff", "queue"] as const,
   pendingCount: () => [...raffleQueryKeys.all, "staff", "pending-count"] as const,

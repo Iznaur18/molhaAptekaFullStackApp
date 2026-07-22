@@ -11,6 +11,8 @@ type HomeCatalogHeaderPanelProps = {
   style?: StyleProp<ViewStyle>;
   /** Без рамки, тени и inset-линии — для sticky foreground-sheet. */
   flatSheet?: boolean;
+  /** Inset-контейнер (паритет bottom nav): полное скругление. */
+  floating?: boolean;
 };
 
 export const HomeCatalogHeaderPanel = ({
@@ -18,18 +20,28 @@ export const HomeCatalogHeaderPanel = ({
   paddingTop,
   style,
   flatSheet = false,
+  floating = false,
 }: HomeCatalogHeaderPanelProps) => {
   const styles = useHomeCatalogHeaderStyles();
 
   return (
-    <View style={[styles.panel, flatSheet && styles.panelFlatSheet, { paddingTop }, style]}>
-      {flatSheet ? null : (
+    <View
+      style={[
+        styles.panel,
+        floating && styles.panelFloating,
+        flatSheet && styles.panelFlatSheet,
+        { paddingTop },
+        style,
+      ]}
+    >
+      {flatSheet || floating ? null : (
         <>
           <HomeCatalogHeaderGlassLayer />
           <HomeCatalogHeaderAccent />
           <View style={styles.panelInsetLine} pointerEvents="none" />
         </>
       )}
+      {floating && !flatSheet ? <HomeCatalogHeaderGlassLayer /> : null}
       <View style={styles.panelContent}>{children}</View>
     </View>
   );

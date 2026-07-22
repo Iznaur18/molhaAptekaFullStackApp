@@ -101,7 +101,6 @@ export const PasswordTextInput = ({
         accessibilityRole="button"
         accessibilityLabel={toggleAria}
         hitSlop={8}
-        // @ts-expect-error RN-web: не забираем tab/focus у input
         tabIndex={-1}
         focusable={false}
       >

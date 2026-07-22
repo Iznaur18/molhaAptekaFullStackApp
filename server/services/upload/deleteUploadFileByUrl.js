@@ -3,15 +3,13 @@ import path from "path";
 
 import { PRIVATE_UPLOAD_SUBDIR } from "../../constants/privateUploadConstants.js";
 import {
-  buildPrivateObjectStorageKey,
+  deletePrivateUploadFromObjectStorage,
   deleteUploadFromObjectStorage,
-  getS3Client,
   isObjectStorageUploadEnabled,
 } from "./objectStorageUpload.js";
 import { parseUploadFilenameFromMediaUrl } from "./parseUploadFilenameFromMediaUrl.js";
 import { parsePrivateUploadFilenameFromUrl } from "./privateUploadPaths.js";
 import { UPLOADS_DIR } from "./uploadsDir.js";
-import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 
 /**
  * @param {string | null | undefined} mediaUrl
@@ -21,14 +19,7 @@ export async function deleteUploadFileByUrl(mediaUrl) {
   if (privateFilename) {
     if (isObjectStorageUploadEnabled()) {
       try {
-        const bucket = process.env.S3_BUCKET?.trim();
-        if (!bucket) return;
-        await getS3Client().send(
-          new DeleteObjectCommand({
-            Bucket: bucket,
-            Key: buildPrivateObjectStorageKey(privateFilename),
-          }),
-        );
+        await deletePrivateUploadFromObjectStorage(privateFilename);
       } catch (error) {
         console.error("deleteUploadFileByUrl private s3 error:", error);
       }

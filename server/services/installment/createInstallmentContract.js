@@ -30,7 +30,10 @@ import {
   reserveLoyaltyPointsForNewOrder,
 } from "../order/orderLoyaltyPoints.js";
 import { runInTransaction, withMongoSession } from "../../utils/mongoTransaction.js";
-import { assertOrderItemsWithinAvailableStock } from "../product/productStock.js";
+import {
+  assertOrderItemsWithinAvailableStock,
+  guardOrderItemsStockInTransaction,
+} from "../product/productStock.js";
 
 import {
   ORDER_BUYER_PUBLIC_FIELDS,
@@ -157,6 +160,8 @@ export async function createInstallmentContract({
 
   try {
     ({ contract, order } = await runInTransaction(async (session) => {
+      // Авторитетная проверка остатка внутри транзакции (закрывает гонку оверселла).
+      await guardOrderItemsStockInTransaction(items, buyerUserId, session);
       await reserveLoyaltyPointsForNewOrder(itemsForReserve, session);
 
       const [createdContract] = await InstallmentContractModel.create(

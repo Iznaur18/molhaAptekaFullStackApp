@@ -32,15 +32,16 @@ export const useRafflesStaffPageStyles = createThemedStyles((theme) => ({
     gap: 12,
   },
   row: {
-    padding: 12,
+    gap: 10,
+    padding: 16,
     borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
-    gap: 8,
+    backgroundColor: theme.colors.surface,
   },
   rowLive: {
-    borderColor: theme.colors.accentSoft,
-    backgroundColor: theme.colors.accentSoft,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
   },
   rowMain: {
     flexDirection: "row",

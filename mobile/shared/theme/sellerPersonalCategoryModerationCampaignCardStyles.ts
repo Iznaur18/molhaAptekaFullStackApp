@@ -75,6 +75,19 @@ export const useSellerPersonalCategoryModerationCampaignCardStyles = createTheme
       fontWeight: "500",
       color: theme.colors.text,
     },
+    dangerButton: {
+      paddingVertical: 7.2,
+      paddingHorizontal: 13.6,
+      borderRadius: 8,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: DANGER_STRONG,
+      backgroundColor: theme.colors.surface,
+    },
+    dangerButtonText: {
+      fontSize: 14,
+      fontWeight: "500",
+      color: DANGER_STRONG,
+    },
     error: {
       fontSize: 14,
       lineHeight: 20,

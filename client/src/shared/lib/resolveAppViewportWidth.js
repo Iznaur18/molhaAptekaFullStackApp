@@ -1,7 +1,10 @@
-import { WEB_APP_SHELL_MAX_WIDTH_PX } from "./appShellLayoutConstants.js";
+import {
+  resolveWebContentMaxWidth,
+  WEB_APP_SHELL_MAX_WIDTH_PX,
+} from "./appShellLayoutConstants.js";
 
 /**
- * Эффективная ширина контента app-shell (окно, но не шире desktop cap).
+ * Эффективная ширина контента app-shell (паритет с mobile layout column).
  *
  * @param {number} windowWidth
  * @returns {number}
@@ -11,5 +14,5 @@ export function resolveAppViewportWidth(windowWidth) {
     return WEB_APP_SHELL_MAX_WIDTH_PX;
   }
 
-  return Math.min(windowWidth, WEB_APP_SHELL_MAX_WIDTH_PX);
+  return Math.min(windowWidth, resolveWebContentMaxWidth(windowWidth));
 }

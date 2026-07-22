@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1062.0",
+    "@izibuy/shared-lib": "file:../packages/shared-lib",
     "@molha/api-contract": "file:../contract",
     "@sentry/node": "^10.63.0",
     "bcrypt": "^6.0.0",

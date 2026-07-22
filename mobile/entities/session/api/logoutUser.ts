@@ -1,12 +1,12 @@
 import { apiClient, clearAuthTokens, getRefreshToken } from "@/shared/api";
 import { removePushToken } from "@/entities/push-token/api/pushTokenApi";
+import { getExpoNotificationsModule } from "@/features/push-notifications/lib/expoNotificationsModule";
 import { API_CLIENT_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
-import * as Notifications from "expo-notifications";
-import { Platform } from "react-native";
 
 const resolveStoredPushToken = async (): Promise<string | null> => {
-  if (Platform.OS === "web") {
+  const Notifications = getExpoNotificationsModule();
+  if (!Notifications) {
     return null;
   }
   try {

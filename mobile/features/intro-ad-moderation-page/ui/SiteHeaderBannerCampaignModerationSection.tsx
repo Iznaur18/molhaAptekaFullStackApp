@@ -10,7 +10,9 @@ import {
 } from "@/entities/site-header-banner-campaign/model/useSiteHeaderBannerCampaignModerationMutations";
 import { SiteHeaderBannerCampaignModerationCard } from "@/entities/site-header-banner-campaign/ui/SiteHeaderBannerCampaignModerationCard";
 import { filterPendingModerationCampaigns } from "@/features/intro-ad-moderation-page/lib/filterPendingModerationCampaigns";
+import { INTRO_AD_MODERATION_SECTION_BANNER } from "@/features/intro-ad-moderation-page/lib/introAdModerationSectionFilters";
 import { buildModerationCampaignRowId } from "@/features/intro-ad-moderation-page/lib/introAdModerationSectionFilters";
+import { resolveIntroAdModerationListPanelStyles } from "@/features/intro-ad-moderation-page/lib/introAdModerationSectionZone";
 import { ModerationSectionTitle } from "@/features/intro-ad-moderation-page/ui/ModerationSectionTitle";
 import { SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
@@ -161,7 +163,7 @@ export const SiteHeaderBannerCampaignModerationSection = ({
             title={SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.PENDING_TITLE}
             pendingCount={filteredPendingCampaigns.length}
           />
-          <View style={styles.list}>
+          <View style={resolveIntroAdModerationListPanelStyles(INTRO_AD_MODERATION_SECTION_BANNER, styles)}>
             {filteredPendingCampaigns.map((campaign) => {
               const campaignId = String(campaign._id);
               const rowId = buildModerationCampaignRowId("banner", campaignId);

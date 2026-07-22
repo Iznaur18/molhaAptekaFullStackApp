@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 
 import { RAFFLE_PRIZE_MEDIA_UI } from "../../../shared/config/appUiCopy.js";
@@ -18,6 +18,7 @@ import "./RafflePrizeMedia.css";
  *   videoClassName?: string;
  *   autoplayVideo?: boolean;
  *   showSoundToggle?: boolean;
+ *   isVideoActive?: boolean;
  * }} props
  */
 export function RafflePrizeMedia({
@@ -27,6 +28,7 @@ export function RafflePrizeMedia({
   videoClassName = "",
   autoplayVideo = true,
   showSoundToggle = false,
+  isVideoActive = true,
 }) {
   const videoRef = useRef(/** @type {HTMLVideoElement | null} */ (null));
   const [isMuted, setIsMuted] = useState(true);
@@ -38,6 +40,21 @@ export function RafflePrizeMedia({
     () => formatRafflePrizeImageObjectPosition(raffle),
     [raffle],
   );
+  const shouldPlay = autoplayVideo && isVideoActive;
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !isVideo || !videoSrc) {
+      return;
+    }
+
+    if (shouldPlay) {
+      void video.play().catch(() => {});
+      return;
+    }
+
+    video.pause();
+  }, [isVideo, shouldPlay, videoSrc]);
 
   const handleToggleSound = () => {
     const video = videoRef.current;
@@ -65,9 +82,10 @@ export function RafflePrizeMedia({
     if (!showSoundToggle) {
       return (
         <video
+          ref={videoRef}
           className={videoClassNames}
           src={videoSrc}
-          autoPlay={autoplayVideo}
+          autoPlay={shouldPlay}
           loop
           muted
           playsInline
@@ -86,7 +104,7 @@ export function RafflePrizeMedia({
           ref={videoRef}
           className="raffle-prize-media raffle-prize-media_video"
           src={videoSrc}
-          autoPlay={autoplayVideo}
+          autoPlay={shouldPlay}
           loop
           muted={isMuted}
           playsInline

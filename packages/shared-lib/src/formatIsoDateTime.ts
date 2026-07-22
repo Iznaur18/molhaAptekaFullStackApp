@@ -11,10 +11,14 @@ export const formatIsoDateTime = (iso?: string | Date | null): string => {
     return "—";
   }
 
-  const date = iso instanceof Date ? iso : new Date(iso);
-  if (Number.isNaN(date.getTime())) {
+  try {
+    const date = iso instanceof Date ? iso : new Date(iso);
+    if (Number.isNaN(date.getTime())) {
+      return typeof iso === "string" ? iso : "—";
+    }
+
+    return DATE_TIME_FORMAT_RU.format(date);
+  } catch {
     return typeof iso === "string" ? iso : "—";
   }
-
-  return DATE_TIME_FORMAT_RU.format(date);
 };

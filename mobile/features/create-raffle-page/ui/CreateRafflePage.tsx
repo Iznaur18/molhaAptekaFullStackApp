@@ -5,8 +5,10 @@ import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from "rea
 
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import { useCreateRaffleMutation } from "@/entities/raffle/model/useCreateRaffleMutation";
+import { useCancelRaffleCreateMutation } from "@/entities/raffle/model/useCancelRaffleCreateMutation";
 import { useMyRaffleMutations } from "@/entities/raffle/model/useMyRaffleMutations";
 import { useMyRaffleQuery } from "@/entities/raffle/model/useMyRaffleQuery";
+import { useRaffleCreateAdvertisingQuery } from "@/entities/raffle/model/useRaffleCreateAdvertisingQuery";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import {
   applyCreateRaffleMediaTypeChange,
@@ -45,13 +47,16 @@ export const CreateRafflePage = () => {
   const isAuthorized = useIsAuthorized();
   const { isUserDataConfirmed } = useUserAccess();
   const createMutation = useCreateRaffleMutation();
+  const cancelCreateMutation = useCancelRaffleCreateMutation();
+  const createAccessQuery = useRaffleCreateAdvertisingQuery({
+    enabled: isAuthorized && isUserDataConfirmed,
+  });
   const myRaffleQuery = useMyRaffleQuery({ enabled: isAuthorized && isUserDataConfirmed });
   const { deleteMyMutation } = useMyRaffleMutations();
   const [navSheetVisible, setNavSheetVisible] = useState(false);
   const [form, setForm] = useState<CreateRaffleFormState>(INITIAL_CREATE_RAFFLE_FORM);
   const [stepIndex, setStepIndex] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
 
   const stepId = CREATE_RAFFLE_WIZARD_STEPS[stepIndex];
   const stepCopy = resolveCreateRaffleWizardStepCopy(stepId);
@@ -64,13 +69,15 @@ export const CreateRafflePage = () => {
     [existingRaffle],
   );
   const isCreateBlocked = Boolean(blockNotice);
+  const needsPaidUnlock =
+    !isCreateBlocked && createAccessQuery.data?.canOpenForm !== true;
   const isWithdrawing = deleteMyMutation.isPending;
-  const wizardActionsDisabled = isSubmitting || isWithdrawing || isCreateBlocked;
+  const isCancelling = cancelCreateMutation.isPending;
+  const wizardActionsDisabled = isSubmitting || isWithdrawing || isCancelling || isCreateBlocked;
 
   useFocusEffect(
     useCallback(() => {
       setErrorMessage("");
-      setSuccessMessage("");
     }, []),
   );
 
@@ -136,10 +143,77 @@ export const CreateRafflePage = () => {
     try {
       setErrorMessage("");
       await deleteMyMutation.mutateAsync(raffleId);
-      setSuccessMessage(CREATE_RAFFLE_MODAL_UI.WITHDRAW_SUCCESS);
+      resetWizard();
+      router.replace("/hub/advertising");
     } catch (error) {
       setErrorMessage(formatApiErrorMessage(error, API_CLIENT_UI.DELETE_RAFFLE_FALLBACK));
     }
+  };
+
+  const navigateToAdvertising = () => {
+    router.replace("/hub/advertising");
+  };
+
+  const runCancelCreate = async () => {
+    try {
+      setErrorMessage("");
+      const hasPaidUnlock = createAccessQuery.data?.hasPaidUnlock === true;
+      if (hasPaidUnlock) {
+        await cancelCreateMutation.mutateAsync();
+      }
+      resetWizard();
+      navigateToAdvertising();
+    } catch (error) {
+      setErrorMessage(formatApiErrorMessage(error, API_CLIENT_UI.CANCEL_RAFFLE_CREATE_FALLBACK));
+    }
+  };
+
+  const handleCancel = () => {
+    if (blockNotice?.canWithdraw && existingRaffle?._id) {
+      Alert.alert(
+        CREATE_RAFFLE_MODAL_UI.WITHDRAW_CONFIRM_TITLE,
+        CREATE_RAFFLE_MODAL_UI.WITHDRAW_CONFIRM,
+        [
+          { text: CREATE_RAFFLE_MODAL_UI.BTN_CANCEL, style: "cancel" },
+          {
+            text: CREATE_RAFFLE_MODAL_UI.BTN_WITHDRAW,
+            style: "destructive",
+            onPress: () => {
+              void runWithdraw(String(existingRaffle._id));
+            },
+          },
+        ],
+      );
+      return;
+    }
+
+    const hasPaidUnlock = createAccessQuery.data?.hasPaidUnlock === true;
+    const pricePoints = createAccessQuery.data?.pricePoints ?? 3_000;
+    const shouldConfirmDiscard = isCreateRaffleFormDirty(form) || stepIndex > 0;
+
+    const confirmCancel = () => {
+      void runCancelCreate();
+    };
+
+    if (hasPaidUnlock) {
+      Alert.alert(
+        CREATE_RAFFLE_MODAL_UI.CANCEL_CREATE_TITLE,
+        shouldConfirmDiscard
+          ? `${CREATE_RAFFLE_MODAL_UI.CANCEL_CREATE_MESSAGE(pricePoints)}\n\n${CREATE_RAFFLE_MODAL_UI.DISCARD_MESSAGE}`
+          : CREATE_RAFFLE_MODAL_UI.CANCEL_CREATE_MESSAGE(pricePoints),
+        [
+          { text: CREATE_RAFFLE_MODAL_UI.DISCARD_KEEP, style: "cancel" },
+          {
+            text: CREATE_RAFFLE_MODAL_UI.CANCEL_CREATE_CONFIRM,
+            style: "destructive",
+            onPress: confirmCancel,
+          },
+        ],
+      );
+      return;
+    }
+
+    requestDiscard(navigateToAdvertising);
   };
 
   const goBack = () => {
@@ -153,7 +227,6 @@ export const CreateRafflePage = () => {
     }
 
     setErrorMessage("");
-    setSuccessMessage("");
 
     const validationError = validateCreateRaffleForm(form);
     if (validationError) {
@@ -163,8 +236,8 @@ export const CreateRafflePage = () => {
 
     try {
       await createMutation.mutateAsync(buildCreateRaffleSubmitBody(form));
-      setSuccessMessage(CREATE_RAFFLE_PAGE_UI.SUCCESS);
       resetWizard();
+      navigateToAdvertising();
     } catch (error) {
       setErrorMessage(
         error instanceof Error ? error.message : CREATE_RAFFLE_PAGE_UI.SUBMIT_FALLBACK,
@@ -208,6 +281,40 @@ export const CreateRafflePage = () => {
             />
           </View>
           <Text style={styles.state}>{CREATE_RAFFLE_PAGE_UI.CONFIRMED_DATA_REQUIRED}</Text>
+        </View>
+        {hubChrome}
+      </>
+    );
+  }
+
+  if (createAccessQuery.isPending) {
+    return (
+      <>
+        <View style={[styles.container, centeredContentStyle, styles.centered]}>
+          <ActivityIndicator color={theme.colors.action} />
+        </View>
+        {hubChrome}
+      </>
+    );
+  }
+
+  if (needsPaidUnlock) {
+    return (
+      <>
+        <View style={[styles.container, centeredContentStyle, styles.centered]}>
+          <View style={styles.header}>
+            <ProfileMobileSectionToggle
+              activeLabel={MY_PROFILE_PAGE_UI.TAB_CREATE_RAFFLE}
+              onPress={() => setNavSheetVisible(true)}
+            />
+          </View>
+          <Text style={styles.state}>{CREATE_RAFFLE_PAGE_UI.UNLOCK_REQUIRED}</Text>
+          <Pressable
+            style={styles.loginButton}
+            onPress={() => router.push("/hub/advertising")}
+          >
+            <Text style={styles.loginButtonText}>{CREATE_RAFFLE_PAGE_UI.GO_TO_ADVERTISING}</Text>
+          </Pressable>
         </View>
         {hubChrome}
       </>
@@ -262,18 +369,12 @@ export const CreateRafflePage = () => {
           showFooter={false}
         />
 
-        {successMessage ? (
-          <Text style={styles.success} accessibilityRole="text">
-            {successMessage}
-          </Text>
-        ) : null}
-
         <View style={styles.wizardFooter}>
           {isFirstStep ? (
             <Pressable
               style={[styles.wizardSecondaryBtn, styles.wizardCancelBtn]}
-              onPress={() => requestDiscard(() => undefined)}
-              disabled={isSubmitting || isWithdrawing}
+              onPress={handleCancel}
+              disabled={isSubmitting || isWithdrawing || isCancelling}
             >
               <Text style={[styles.wizardSecondaryBtnText, { color: theme.colors.danger }]}>
                 {CREATE_RAFFLE_MODAL_UI.BTN_CANCEL}
@@ -283,7 +384,7 @@ export const CreateRafflePage = () => {
             <Pressable
               style={styles.wizardSecondaryBtn}
               onPress={goBack}
-              disabled={isSubmitting || isWithdrawing}
+              disabled={isSubmitting || isWithdrawing || isCancelling}
             >
               <Text style={styles.wizardSecondaryBtnText}>{CREATE_RAFFLE_MODAL_UI.BTN_BACK}</Text>
             </Pressable>

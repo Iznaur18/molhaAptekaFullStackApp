@@ -99,6 +99,33 @@ const RaffleSchema = new Schema(
       default: 0,
       min: 0,
     },
+    /** Уникальные покупатели (confirmed), не сумма quantity. */
+    participantsCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    winnerUserId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+      index: true,
+    },
+    winnerUserName: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: 64,
+    },
+    winnerUserAvatarUrl: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    winnerSelectedAt: {
+      type: Date,
+      default: null,
+    },
     moderationComment: {
       type: String,
       default: "",
@@ -123,6 +150,19 @@ const RaffleSchema = new Schema(
       default: null,
     },
     rejectedAt: {
+      type: Date,
+      default: null,
+    },
+    createPricePoints: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    createPriceChargedAt: {
+      type: Date,
+      default: null,
+    },
+    createPriceRefundedAt: {
       type: Date,
       default: null,
     },

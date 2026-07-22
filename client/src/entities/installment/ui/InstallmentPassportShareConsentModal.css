@@ -44,8 +44,9 @@
 .installment-passport-share-consent__confirm {
   flex: 1;
   border: none;
-  background: var(--iz-color-primary, #1a7a4c);
-  color: #fff;
+  /* mobile: confirmButton.backgroundColor = nearBlack (ink), текст onContrast */
+  background: var(--iz-color-ink);
+  color: var(--iz-color-on-contrast);
 }
 
 .installment-passport-share-consent__cancel:disabled,

@@ -72,7 +72,13 @@ export const SiteHeaderBannerManageToggleAdminSection = ({
           <ManageToggleAdminCard
             key={card.toggleKey}
             toggleKey={card.toggleKey}
-            variant={card.variant}
+            variant={
+              card.variant === "auction" ||
+              card.variant === "installment" ||
+              card.variant === "raffle"
+                ? card.variant
+                : "default"
+            }
             title={card.title}
             description={card.description}
             imageUrl={displaysByKey.get(card.toggleKey) ?? null}

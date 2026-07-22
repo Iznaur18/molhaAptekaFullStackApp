@@ -7,7 +7,7 @@ import {
   setLightness,
   shiftLightness,
   toRgbCss,
-} from "./invertColorLightness.ts";
+} from "./invertColorLightness";
 
 /** Синхронизировано с client/src/shared/styles/designTokens.css (canonical v2) */
 const izColorsCanonical = {

@@ -1,8 +1,13 @@
+import { useCallback, useRef } from "react";
+
 import { WishlistToggleButton } from "../../../../features/wishlist-toggle/ui/WishlistToggleButton.jsx";
 import { PRODUCT_CARD_UI, PRODUCT_MODERATION_PAGE_UI } from "../../../../shared/config/appUiCopy.js";
+import { useHorizontalSwipeNavigation } from "../../../../shared/lib/useHorizontalSwipeNavigation.js";
 import { ProductMediaSlideContent } from "../ProductMediaSlideContent.jsx";
 import { ProductDiscountBadge } from "../ProductPriceDisplay.jsx";
 import { ProductLoyaltyPointsBadge } from "../ProductLoyaltyPointsBadge.jsx";
+
+import { ProductCardGalleryDots } from "./ProductCardGalleryDots.jsx";
 
 /**
  * @param {{
@@ -11,6 +16,36 @@ import { ProductLoyaltyPointsBadge } from "../ProductLoyaltyPointsBadge.jsx";
  */
 export function ProductCardMedia({ vm }) {
   const hasSlideMedia = vm.renderedSlide != null;
+  const slideCount = vm.mediaSlides.length;
+  const hasMultipleSlides = slideCount > 1;
+  const setCardSlideIndex = vm.setCardSlideIndex;
+  const suppressOpenAfterSwipeRef = useRef(false);
+
+  const goToPreviousSlide = useCallback(() => {
+    setCardSlideIndex((index) => Math.max(0, index - 1));
+  }, [setCardSlideIndex]);
+
+  const goToNextSlide = useCallback(() => {
+    setCardSlideIndex((index) => Math.min(slideCount - 1, index + 1));
+  }, [setCardSlideIndex, slideCount]);
+
+  const gallerySwipeHandlers = useHorizontalSwipeNavigation({
+    enabled: hasMultipleSlides,
+    onSwipeLeft: goToNextSlide,
+    onSwipeRight: goToPreviousSlide,
+    onSwipe: () => {
+      suppressOpenAfterSwipeRef.current = true;
+    },
+  });
+
+  const handleGalleryClickCapture = useCallback((event) => {
+    if (!suppressOpenAfterSwipeRef.current) {
+      return;
+    }
+    suppressOpenAfterSwipeRef.current = false;
+    event.preventDefault();
+    event.stopPropagation();
+  }, []);
 
   const promotionRibbon = vm.showPromotionBoostBadge
     ? { tier: 1, label: PRODUCT_CARD_UI.PROMOTED_BADGE }
@@ -20,19 +55,24 @@ export function ProductCardMedia({ vm }) {
         ? { tier: 3, label: PRODUCT_CARD_UI.PROMOTION_BANNER_BADGE }
         : null;
 
+  const canGoPrevious = vm.cardSlideIndex > 0;
+  const canGoNext = vm.cardSlideIndex < slideCount - 1;
+
   return (
     <div
       className={[
         "product-card__image-frame",
-        vm.mediaSlides.length > 1 ? "product-card__image-frame--gallery" : "",
+        hasMultipleSlides ? "product-card__image-frame--gallery" : "",
         hasSlideMedia ? "" : "product-card__image-frame--empty",
       ]
         .filter(Boolean)
         .join(" ")}
-      {...(vm.mediaSlides.length > 1
+      {...(hasMultipleSlides
         ? {
             role: "region",
             "aria-label": PRODUCT_CARD_UI.GALLERY_REGION_ARIA,
+            onClickCapture: handleGalleryClickCapture,
+            ...gallerySwipeHandlers,
           }
         : {})}
     >
@@ -90,18 +130,17 @@ export function ProductCardMedia({ vm }) {
           ) : null}
         </div>
       ) : null}
-      {vm.mediaSlides.length > 1 ? (
+      {hasMultipleSlides ? (
         <>
           <div className="product-card__image-nav">
             <button
               type="button"
               className="product-card__image-nav-btn"
               aria-label={PRODUCT_CARD_UI.GALLERY_PREV}
+              disabled={!canGoPrevious}
               onClick={(event) => {
                 event.stopPropagation();
-                const count = vm.mediaSlides.length;
-                if (count <= 1) return;
-                vm.setCardSlideIndex((index) => (index - 1 + count) % count);
+                goToPreviousSlide();
               }}
             >
               ‹
@@ -110,26 +149,19 @@ export function ProductCardMedia({ vm }) {
               type="button"
               className="product-card__image-nav-btn"
               aria-label={PRODUCT_CARD_UI.GALLERY_NEXT}
+              disabled={!canGoNext}
               onClick={(event) => {
                 event.stopPropagation();
-                const count = vm.mediaSlides.length;
-                if (count <= 1) return;
-                vm.setCardSlideIndex((index) => (index + 1) % count);
+                goToNextSlide();
               }}
             >
               ›
             </button>
           </div>
-          <span
-            className="product-card__image-counter"
-            aria-live="polite"
-            aria-label={PRODUCT_CARD_UI.GALLERY_COUNTER_ARIA(
-              vm.cardSlideIndex + 1,
-              vm.mediaSlides.length,
-            )}
-          >
-            {vm.cardSlideIndex + 1} / {vm.mediaSlides.length}
-          </span>
+          <ProductCardGalleryDots
+            slideIndex={vm.cardSlideIndex}
+            slideCount={slideCount}
+          />
         </>
       ) : null}
     </div>

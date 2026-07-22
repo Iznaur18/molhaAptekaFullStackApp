@@ -1,10 +1,19 @@
-/** Токены карточки каталога (layout — в ProductCardFrame.css). */
+/** Токены карточки каталога (layout — в ProductCardFrame.css).
+ * Overlay-бейджи: паритет с mobile `PRODUCT_CARD_IMAGE_BADGE_OVERLAY_LAYOUT`.
+ */
 .product-card {
   --product-card-delete-accent: var(--iz-color-danger);
-  --product-card-radius: var(--iz-radius-lg);
-  --product-card-inner-radius: calc(var(--product-card-radius) * 10 / 14);
+  --product-card-radius: var(--iz-radius-card-lg);
+  --product-card-inner-radius: calc(var(--product-card-radius) * 10 / 16);
   --product-card-image-bleed-x: var(--iz-space-2);
   --product-card-image-bleed-top: 0.38rem;
+  --product-card-overlay-badge-radius: 6px;
+  --product-card-overlay-badge-pad-y: 2px;
+  --product-card-overlay-badge-pad-x: 10px;
+  --product-card-overlay-badge-font-size: 10px;
+  --product-card-overlay-badge-line-height: 12px;
+  --product-card-overlay-badge-gap: 0;
+  --product-card-status-badge-row-gap: 2px;
   --product-card-promotion-accent: var(--iz-color-warning);
   --product-card-promotion-accent-soft: var(--iz-color-warning);
   --product-card-banner-min-height: 12.5rem;

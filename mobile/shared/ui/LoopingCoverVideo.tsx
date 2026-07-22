@@ -74,6 +74,7 @@ export const LoopingCoverVideo = ({
       contentFit="cover"
       nativeControls={false}
       allowsPictureInPicture={false}
+      pointerEvents="none"
       {...(Platform.OS === "android" ? { surfaceType: "textureView" as const } : {})}
     />
   );

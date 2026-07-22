@@ -1,17 +1,24 @@
+/**
+ * Паритет с mobile/shared/theme/formChromeStyles.ts → useCheckoutFormStyles.
+ *   form gap 14 · heading 17/700 · fieldLabel 14/600 textSecondary mb 4
+ *   fieldInput px 14 py 9 r 8 15px border 1 border
+ *   radioRow gap 10 minHeight 44 · radioLabel 15
+ *   feedback 14 · submit minHeight 52 py 14 r 10 + тень action
+ */
 .checkout-form {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
-  padding: 1rem;
-  border: 1px solid var(--iz-color-border);
-  border-radius: 0.6rem;
+  gap: 14px;
+  padding: var(--iz-space-4);
+  border: var(--iz-border) solid var(--iz-color-border);
+  border-radius: var(--iz-radius-button);
   background: var(--iz-color-surface);
 }
 
 .checkout-form__heading {
   margin: 0;
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: var(--iz-font-xl);
+  font-weight: var(--iz-weight-bold);
   color: var(--iz-color-text);
 }
 
@@ -19,7 +26,7 @@
 .checkout-form__fieldset {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 4px;
   margin: 0;
   padding: 0;
   border: none;
@@ -27,28 +34,29 @@
 
 .checkout-form__label,
 .checkout-form__legend {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--iz-color-text-secondary);
   padding: 0;
+  font-size: var(--iz-font-base);
+  font-weight: var(--iz-weight-semibold);
+  color: var(--iz-color-text-secondary);
 }
 
+/* useCheckoutFormStyles.fieldInput */
 .checkout-form__input {
   box-sizing: border-box;
   width: 100%;
-  padding: 0.55rem 0.85rem;
-  border: 1px solid var(--iz-color-border);
-  border-radius: 0.5rem;
+  padding: var(--iz-control-checkout-padding-y) var(--iz-control-checkout-padding-x);
+  border: var(--iz-border) solid var(--iz-color-border);
+  border-radius: var(--iz-radius-input);
   background: var(--iz-color-surface);
-  font: inherit;
-  font-size: 0.95rem;
   color: var(--iz-color-text);
+  font: inherit;
+  font-size: var(--iz-font-md);
   outline: none;
 }
 
 .checkout-form__input:focus {
   border-color: var(--iz-color-action);
-  box-shadow: 0 0 0 3px var(--iz-color-focus-ring);
+  box-shadow: var(--iz-shadow-input-focus);
 }
 
 .checkout-form__input:disabled {
@@ -56,11 +64,13 @@
   color: var(--iz-color-text-muted);
 }
 
+/* useCheckoutFormStyles.radioRow / radioLabel */
 .checkout-form__radio {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.95rem;
+  gap: 10px;
+  min-height: 44px;
+  font-size: var(--iz-font-md);
   color: var(--iz-color-text);
   cursor: pointer;
 }
@@ -68,35 +78,54 @@
 .checkout-form__error {
   margin: 0;
   color: var(--iz-color-danger);
-  font-size: 0.9rem;
+  font-size: var(--iz-font-base);
 }
 
 .checkout-form__success {
   margin: 0;
   color: var(--iz-color-success);
-  font-size: 0.9rem;
+  font-size: var(--iz-font-base);
 }
 
+/* useCheckoutFormStyles.submitSpacer — minHeight 52, тень action */
 .checkout-form__submit {
   align-self: flex-start;
-  margin: 0.25rem 0 0;
-  padding: 0.6rem 1.2rem;
-  border: 1px solid var(--iz-color-action);
-  border-radius: 0.5rem;
+  min-height: 52px;
+  margin: var(--iz-space-1) 0 0;
+  padding: var(--iz-control-btn-modal-padding-y) var(--iz-control-btn-padding-x);
+  border: var(--iz-border) solid var(--iz-color-action);
+  border-radius: var(--iz-radius-button);
   background: var(--iz-color-action);
   color: var(--iz-color-on-contrast);
   font: inherit;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: var(--iz-control-btn-font);
+  font-weight: var(--iz-weight-semibold);
+  box-shadow: 0 3px 6px color-mix(in srgb, var(--iz-color-action) 22%, transparent);
   cursor: pointer;
+  transition:
+    background var(--iz-transition-base),
+    border-color var(--iz-transition-base),
+    opacity var(--iz-transition-base),
+    transform var(--iz-transition-press);
 }
 
 .checkout-form__submit:hover:not(:disabled) {
-  background: var(--iz-color-action-hover);
   border-color: var(--iz-color-action-hover);
+  background: var(--iz-color-action-hover);
+}
+
+.checkout-form__submit:active:not(:disabled) {
+  transform: scale(var(--iz-state-pressed-scale));
 }
 
 .checkout-form__submit:disabled {
-  opacity: 0.6;
+  opacity: var(--iz-state-disabled-opacity);
   cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .checkout-form__submit:active:not(:disabled) {
+    transform: none;
+    opacity: var(--iz-state-pressed-opacity);
+  }
 }

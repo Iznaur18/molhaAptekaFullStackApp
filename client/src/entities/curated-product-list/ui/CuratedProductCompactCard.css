@@ -1,11 +1,20 @@
+/**
+ * Паритет с mobile/entities/curated-product-list/lib/curatedCompactCardColors.ts
+ * и useCuratedProductCompactCardStyles (catalogProductStyles.ts):
+ *   card      border 1 `border`, radius 16, bg transparent
+ *   imageBg   surfaceElevated   (было surfaceMuted)
+ *   priceBg   action            (было info — отсюда тёмно-бирюзовая плашка)
+ *   priceWrap minHeight 32, px 8, py 6
+ *   price     15.6/19, 700, onContrast
+ */
 .curated-product-compact-card {
-  --curated-card-image-bg: var(--iz-color-surface-muted);
-  --curated-card-price-bg: var(--iz-color-info);
+  --curated-card-image-bg: var(--iz-color-surface-elevated);
+  --curated-card-price-bg: var(--iz-color-action);
   display: flex;
   flex-direction: column;
   gap: 0;
-  border: 1px solid var(--iz-color-border, #e5e7eb);
-  border-radius: 12px;
+  border: var(--iz-border) solid var(--iz-color-border);
+  border-radius: var(--iz-radius-card-lg);
   background: transparent;
   padding: 0;
   overflow: hidden;
@@ -45,7 +54,7 @@
   display: flex;
   align-items: center;
   width: 100%;
-  min-height: 2rem;
+  min-height: 32px;
   padding: 6px 8px;
   border: none;
   background: var(--curated-card-price-bg);
@@ -60,16 +69,17 @@
 }
 
 .curated-product-compact-card__price-wrap:focus-visible {
-  outline: 2px solid var(--iz-color-info);
+  outline: var(--iz-border-selected) solid var(--iz-color-action);
   outline-offset: -2px;
 }
 
+/* price: 15.6/19, 700, onContrast */
 .curated-product-compact-card__price {
   flex-shrink: 0;
   width: 100%;
   font-size: 0.975rem;
-  font-weight: 700;
-  line-height: 1.2;
+  font-weight: var(--iz-weight-bold);
+  line-height: 19px;
   color: var(--iz-color-on-contrast);
   overflow: hidden;
   text-overflow: ellipsis;

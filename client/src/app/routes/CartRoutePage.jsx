@@ -9,7 +9,6 @@ export function CartRoutePage() {
     currentUserId,
     refreshUserProfileActionBadgeCounts,
     onRequestLogin,
-    onSellerNameClick,
   } = mainContentProps;
 
   return (
@@ -22,7 +21,6 @@ export function CartRoutePage() {
         void refreshUserProfileActionBadgeCounts();
         goToMainView("my-orders");
       }}
-      onSellerNameClick={onSellerNameClick}
     />
   );
 }

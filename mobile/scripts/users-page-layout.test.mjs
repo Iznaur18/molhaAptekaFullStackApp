@@ -15,6 +15,7 @@ test("UsersPage mirrors web: search on submit + split body", () => {
 
   assert.match(source, /useScreenLayout/);
   assert.match(source, /contentPaddingTop/);
+  assert.match(source, /centeredContentStyle/);
   assert.match(source, /UsersPageSearchBar/);
   assert.match(source, /UsersPageBody/);
   assert.doesNotMatch(source, /TextInput/);
@@ -68,7 +69,10 @@ test("users grid gap matches web breakpoints", () => {
   assert.match(constants, /USERS_GRID_GAP_DEFAULT = 16/);
   assert.match(resolver, /resolveUsersGridGap/);
   assert.match(body, /contentPaddingBottom/);
-  assert.match(body, /contentContainerStyle=\{\[styles\.list, \{ gap: grid\.gap, paddingBottom: contentPaddingBottom \}\]\}/);
+  assert.match(body, /contentContainerStyle=\{/);
+  assert.match(body, /styles\.list/);
+  assert.match(body, /gap: grid\.gap/);
+  assert.match(body, /paddingBottom: contentPaddingBottom/);
   assert.match(body, /columnWrapperStyle=\{grid\.columns > 1 \? \{ gap: grid\.gap \} : undefined\}/);
 });
 
@@ -91,4 +95,28 @@ test("users grid keeps two columns on phone", () => {
 
   assert.match(source, /USERS_GRID_COLUMNS_PHONE/);
   assert.match(source, /USERS_GRID_TILE_MIN_WIDTH/);
+  assert.match(source, /resolveLayoutContentWidth/);
+});
+
+test("users page shows podium leaders above the list", () => {
+  const body = readMobileFile("features/users-page/ui/UsersPageBody.tsx");
+  const podium = readMobileFile("features/users-page/ui/UsersPodium.tsx");
+  const copy = readMobileFile("shared/config/appUiCopy.ts");
+
+  assert.match(body, /rankUsersForPodium/);
+  assert.match(body, /UsersPodium/);
+  assert.match(body, /ListHeaderComponent/);
+  assert.match(body, /!hasActiveFilters/);
+  assert.match(body, /excludeUsersPodiumFromList/);
+  assert.match(body, /data=\{listUsers\}/);
+  assert.doesNotMatch(body, /podiumPlace=/);
+  assert.match(body, /UsersMonthlyLoyaltyLoadBar/);
+  assert.match(body, /useUsersMonthlyLoyaltyPointsQuery/);
+  assert.match(body, /description=\{description\}/);
+  assert.match(podium, /orderUsersPodiumForDisplay/);
+  assert.match(podium, /USERS_PODIUM_UI\.TITLE/);
+  assert.match(copy, /USERS_PODIUM_UI/);
+  assert.match(copy, /TITLE: "Лидеры"/);
+  assert.match(copy, /USERS_MONTHLY_LOYALTY_LOADBAR_UI/);
+  assert.match(copy, /USERS_LOYALTY_RAFFLE_ADMIN_UI/);
 });

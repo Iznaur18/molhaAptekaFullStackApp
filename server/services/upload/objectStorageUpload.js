@@ -43,6 +43,34 @@ const getS3Client = () => {
 export { getS3Client };
 
 /**
+ * Публичный бакет (раздаётся через CDN, `PUBLIC_UPLOAD_BASE_URL`).
+ * @returns {string}
+ */
+export const getPublicUploadBucket = () => {
+  const bucket = process.env.S3_BUCKET?.trim();
+  if (!bucket) {
+    throw new Error("S3_BUCKET не задан");
+  }
+  return bucket;
+};
+
+/**
+ * Бакет для приватных PII-файлов (селфи паспорта). ДОЛЖЕН быть отдельным
+ * НЕпубличным бакетом, не за CDN — иначе `uploads/private/*` утекает по
+ * прямой ссылке в обход auth+ACL. Fallback на публичный бакет — только для
+ * dev/обратной совместимости; prod-preflight требует `S3_PRIVATE_BUCKET`,
+ * отличный от `S3_BUCKET` (см. `validateObjectStorageEnv`).
+ * @returns {string}
+ */
+export const getPrivateUploadBucket = () => {
+  const priv = process.env.S3_PRIVATE_BUCKET?.trim();
+  if (priv) {
+    return priv;
+  }
+  return getPublicUploadBucket();
+};
+
+/**
  * @param {string} filename
  */
 export const buildObjectStorageKey = (filename) =>
@@ -77,10 +105,7 @@ export const persistUploadToObjectStorage = async (file) => {
     throw new Error("Object storage upload requires in-memory file buffer");
   }
 
-  const bucket = process.env.S3_BUCKET?.trim();
-  if (!bucket) {
-    throw new Error("S3_BUCKET не задан");
-  }
+  const bucket = getPublicUploadBucket();
 
   await getS3Client().send(
     new PutObjectCommand({
@@ -95,7 +120,8 @@ export const persistUploadToObjectStorage = async (file) => {
 };
 
 /**
- * Чувствительные файлы (passport selfie) — ключ `uploads/private/{filename}`.
+ * Чувствительные файлы (passport selfie) — ключ `uploads/private/{filename}`
+ * в ОТДЕЛЬНОМ непубличном бакете (`S3_PRIVATE_BUCKET`), не за CDN.
  *
  * @param {import('express').Request['file']} file
  */
@@ -108,10 +134,7 @@ export const persistPrivateUploadToObjectStorage = async (file) => {
     throw new Error("Object storage upload requires in-memory file buffer");
   }
 
-  const bucket = process.env.S3_BUCKET?.trim();
-  if (!bucket) {
-    throw new Error("S3_BUCKET не задан");
-  }
+  const bucket = getPrivateUploadBucket();
 
   await getS3Client().send(
     new PutObjectCommand({
@@ -129,16 +152,28 @@ export const persistPrivateUploadToObjectStorage = async (file) => {
  * @param {string} filename
  */
 export const deleteUploadFromObjectStorage = async (filename) => {
-  const bucket = process.env.S3_BUCKET?.trim();
-  if (!bucket) {
-    throw new Error("S3_BUCKET не задан");
-  }
+  const bucket = getPublicUploadBucket();
 
   const key = buildObjectStorageKey(filename);
   await getS3Client().send(
     new DeleteObjectCommand({
       Bucket: bucket,
       Key: key,
+    }),
+  );
+};
+
+/**
+ * Удаление приватного файла из непубличного бакета (`S3_PRIVATE_BUCKET`).
+ * @param {string} filename
+ */
+export const deletePrivateUploadFromObjectStorage = async (filename) => {
+  const bucket = getPrivateUploadBucket();
+
+  await getS3Client().send(
+    new DeleteObjectCommand({
+      Bucket: bucket,
+      Key: buildPrivateObjectStorageKey(filename),
     }),
   );
 };
@@ -211,6 +246,23 @@ export const validateObjectStorageEnv = () => {
     } else {
       warnings.push(message);
     }
+  }
+
+  // Приватный бакет для PII (селфи паспорта) должен быть отдельным и НЕ за CDN.
+  const publicBucket = String(process.env.S3_BUCKET ?? "").trim();
+  const privateBucket = String(process.env.S3_PRIVATE_BUCKET ?? "").trim();
+  if (!privateBucket) {
+    const message =
+      "S3_PRIVATE_BUCKET не задан — приватные PII-файлы (селфи паспорта) попадут в публичный CDN-бакет и утекут по прямой ссылке. Заведите отдельный непубличный бакет.";
+    if (process.env.NODE_ENV === "production") {
+      errors.push(message);
+    } else {
+      warnings.push(message);
+    }
+  } else if (publicBucket && privateBucket === publicBucket) {
+    errors.push(
+      "S3_PRIVATE_BUCKET совпадает с S3_BUCKET — приватные файлы окажутся в публичном CDN-бакете. Нужен отдельный непубличный бакет.",
+    );
   }
 
   const base = String(process.env.PUBLIC_UPLOAD_BASE_URL ?? "").trim();

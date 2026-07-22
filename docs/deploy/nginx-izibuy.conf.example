@@ -62,6 +62,8 @@ server {
 
         expires 7d;
         add_header Cache-Control "public, max-age=604800";
+        # Загруженный файл нельзя MIME-sniff'ить в HTML/JS (защита от stored-XSS).
+        add_header X-Content-Type-Options "nosniff" always;
     }
 
     # POST /upload и POST /upload/video (поле image / video)
@@ -130,6 +132,11 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
+    # SPA: /product/:mongoId — до общего /product/ API (см. productDetailsPaths.js)
+    location ~ ^/product/[a-f\d]{24}$ {
+        try_files $uri /index.html;
+    }
+
     location /product/ {
         proxy_pass http://izibuy_api;
         proxy_http_version 1.1;
@@ -172,6 +179,7 @@ server {
         try_files $uri =404;
         expires 1y;
         add_header Cache-Control "public, immutable";
+        add_header X-Content-Type-Options "nosniff" always;
         access_log off;
     }
 
@@ -188,6 +196,13 @@ server {
 
     location / {
         add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https: https://cdn.izibuy.ru; media-src 'self' blob: https: https://cdn.izibuy.ru; font-src 'self' data:; connect-src 'self' https://*.ingest.sentry.io; frame-ancestors 'self'; form-action 'self'; upgrade-insecure-requests;" always;
+        # Доп. security-заголовки (defense-in-depth к CSP).
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+        add_header Permissions-Policy "camera=(), microphone=()" always;
+        # HSTS — только по HTTPS (браузер игнорирует по HTTP). Если certbot уже
+        # добавляет Strict-Transport-Security — удали эту строку, чтобы не дублировать.
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
         try_files $uri $uri/ /index.html;
     }
 
@@ -204,4 +219,5 @@ server {
 #     expires 7d;
 #     add_header Cache-Control "public, max-age=604800";
 #     add_header Cross-Origin-Resource-Policy cross-origin;
+#     add_header X-Content-Type-Options "nosniff" always;
 # }

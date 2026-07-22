@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
   FlatList,
   View,
@@ -6,7 +6,6 @@ import {
   type NativeScrollEvent,
   type NativeSyntheticEvent,
   type ViewToken,
-  type ViewStyle,
 } from "react-native";
 
 import { useRaffleFeaturedSlideLayout } from "@/entities/raffle/lib/useRaffleFeaturedSlideLayout";
@@ -22,6 +21,8 @@ import {
 const CAROUSEL_WINDOW_SIZE = 3;
 const CAROUSEL_VIEWABILITY_THRESHOLD = 60;
 
+const ActiveRaffleCarouselIndexContext = createContext(0);
+
 type RaffleFeaturedCarouselProps = {
   raffles: RaffleFromApi[];
   onOpenProducts: (raffleId: string) => void;
@@ -30,28 +31,39 @@ type RaffleFeaturedCarouselProps = {
 
 type RaffleCarouselSlideProps = {
   raffle: RaffleFromApi;
+  index: number;
   cardWidth: number;
-  isActive: boolean;
   onOpenProducts: (raffleId: string) => void;
   getManage?: (raffle: RaffleFromApi) => FeaturedRaffleManage | null;
 };
 
 const RaffleCarouselSlide = ({
   raffle,
+  index,
   cardWidth,
-  isActive,
   onOpenProducts,
   getManage,
-}: RaffleCarouselSlideProps) => (
-  <RaffleFeaturedBanner
-    raffle={raffle}
-    cardWidth={cardWidth}
-    onOpenProducts={onOpenProducts}
-    manage={getManage?.(raffle) ?? null}
-    inCarousel
-    isVideoActive={isActive}
-  />
-);
+}: RaffleCarouselSlideProps) => {
+  const activeIndex = useContext(ActiveRaffleCarouselIndexContext);
+  const isActive = index === activeIndex;
+
+  return (
+    <View
+      style={{ width: cardWidth }}
+      accessibilityElementsHidden={!isActive}
+      importantForAccessibility={isActive ? "auto" : "no-hide-descendants"}
+    >
+      <RaffleFeaturedBanner
+        raffle={raffle}
+        cardWidth={cardWidth}
+        onOpenProducts={onOpenProducts}
+        manage={getManage?.(raffle) ?? null}
+        inCarousel
+        isVideoActive={isActive}
+      />
+    </View>
+  );
+};
 
 export const RaffleFeaturedCarousel = ({
   raffles,
@@ -67,13 +79,6 @@ export const RaffleFeaturedCarousel = ({
   const activeIndexRef = useRef(0);
   const cardWidth = viewportWidth > 0 ? viewportWidth : slideWidth;
 
-  const slideWidthStyle = useMemo(
-    (): ViewStyle => ({
-      width: cardWidth,
-    }),
-    [cardWidth],
-  );
-
   const contentContainerStyle = useMemo(
     () => ({
       gap: RAFFLE_FEATURED_LAYOUT.slideGap,
@@ -83,9 +88,10 @@ export const RaffleFeaturedCarousel = ({
 
   const handleViewportLayout = useCallback((event: LayoutChangeEvent) => {
     const nextWidth = Math.round(event.nativeEvent.layout.width);
-    if (nextWidth > 0) {
-      setViewportWidth(nextWidth);
+    if (nextWidth <= 0) {
+      return;
     }
+    setViewportWidth((prev) => (prev === nextWidth ? prev : nextWidth));
   }, []);
 
   useEffect(() => {
@@ -116,6 +122,9 @@ export const RaffleFeaturedCarousel = ({
       const offsetX = event.nativeEvent.contentOffset.x;
       const nextIndex = Math.round(offsetX / snapInterval);
       const clampedIndex = Math.min(Math.max(nextIndex, 0), Math.max(raffles.length - 1, 0));
+      if (activeIndexRef.current === clampedIndex) {
+        return;
+      }
       activeIndexRef.current = clampedIndex;
       setActiveIndex(clampedIndex);
     },
@@ -128,8 +137,12 @@ export const RaffleFeaturedCarousel = ({
       if (firstVisible?.index == null) {
         return;
       }
-      activeIndexRef.current = firstVisible.index;
-      setActiveIndex(firstVisible.index);
+      const nextIndex = firstVisible.index;
+      if (activeIndexRef.current === nextIndex) {
+        return;
+      }
+      activeIndexRef.current = nextIndex;
+      setActiveIndex(nextIndex);
     },
   ).current;
 
@@ -139,21 +152,15 @@ export const RaffleFeaturedCarousel = ({
 
   const renderItem = useCallback(
     ({ item, index }: { item: RaffleFromApi; index: number }) => (
-      <View
-        style={slideWidthStyle}
-        accessibilityElementsHidden={index !== activeIndex}
-        importantForAccessibility={index === activeIndex ? "auto" : "no-hide-descendants"}
-      >
-        <RaffleCarouselSlide
-          raffle={item}
-          cardWidth={cardWidth}
-          isActive={index === activeIndex}
-          onOpenProducts={onOpenProducts}
-          getManage={getManage}
-        />
-      </View>
+      <RaffleCarouselSlide
+        raffle={item}
+        index={index}
+        cardWidth={cardWidth}
+        onOpenProducts={onOpenProducts}
+        getManage={getManage}
+      />
     ),
-    [activeIndex, cardWidth, getManage, onOpenProducts, slideWidthStyle],
+    [cardWidth, getManage, onOpenProducts],
   );
 
   if (raffles.length === 0) {
@@ -164,13 +171,15 @@ export const RaffleFeaturedCarousel = ({
     const raffle = raffles[0];
     return (
       <View style={styles.singleSlide} onLayout={handleViewportLayout}>
-        <RaffleCarouselSlide
-          raffle={raffle}
-          cardWidth={cardWidth}
-          isActive
-          onOpenProducts={onOpenProducts}
-          getManage={getManage}
-        />
+        <ActiveRaffleCarouselIndexContext.Provider value={0}>
+          <RaffleCarouselSlide
+            raffle={raffle}
+            index={0}
+            cardWidth={cardWidth}
+            onOpenProducts={onOpenProducts}
+            getManage={getManage}
+          />
+        </ActiveRaffleCarouselIndexContext.Provider>
       </View>
     );
   }
@@ -183,27 +192,30 @@ export const RaffleFeaturedCarousel = ({
       onTouchEnd={() => setIsPaused(false)}
       onTouchCancel={() => setIsPaused(false)}
     >
-      <FlatList
-        ref={listRef}
-        horizontal
-        {...nestedHorizontalScrollProps}
-        data={raffles}
-        keyExtractor={(item) => item._id}
-        showsHorizontalScrollIndicator={false}
-        decelerationRate="fast"
-        snapToInterval={snapInterval}
-        snapToAlignment="start"
-        disableIntervalMomentum
-        windowSize={CAROUSEL_WINDOW_SIZE}
-        maxToRenderPerBatch={1}
-        initialNumToRender={1}
-        removeClippedSubviews
-        contentContainerStyle={contentContainerStyle}
-        onMomentumScrollEnd={handleMomentumScrollEnd}
-        onViewableItemsChanged={handleViewableItemsChanged}
-        viewabilityConfig={viewabilityConfig}
-        renderItem={renderItem}
-      />
+      <ActiveRaffleCarouselIndexContext.Provider value={activeIndex}>
+        <FlatList
+          ref={listRef}
+          horizontal
+          {...nestedHorizontalScrollProps}
+          data={raffles}
+          keyExtractor={(item) => item._id}
+          showsHorizontalScrollIndicator={false}
+          decelerationRate="fast"
+          snapToInterval={snapInterval}
+          snapToAlignment="start"
+          disableIntervalMomentum
+          windowSize={CAROUSEL_WINDOW_SIZE}
+          maxToRenderPerBatch={1}
+          initialNumToRender={1}
+          removeClippedSubviews
+          extraData={activeIndex}
+          contentContainerStyle={contentContainerStyle}
+          onMomentumScrollEnd={handleMomentumScrollEnd}
+          onViewableItemsChanged={handleViewableItemsChanged}
+          viewabilityConfig={viewabilityConfig}
+          renderItem={renderItem}
+        />
+      </ActiveRaffleCarouselIndexContext.Provider>
     </View>
   );
 };

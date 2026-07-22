@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { useRaffleMutations } from "../../../entities/raffle/model/useRaffleMutations.js";
 import { canSellerEditRaffle } from "../../../entities/raffle/lib/canSellerEditRaffle.js";
@@ -41,7 +41,6 @@ export function useHomeFeaturedContent({
 }) {
   const queryClient = useQueryClient();
   const { deleteMyMutation, deleteStaffMutation, pauseMyMutation } = useRaffleMutations();
-  const [featuredRaffleIndex, setFeaturedRaffleIndex] = useState(0);
   const [isFeaturedRaffleBusy, setIsFeaturedRaffleBusy] = useState(false);
 
   const featuredQuery = useFeaturedRafflesQuery({ enabled: isHomeCatalogMainView });
@@ -55,10 +54,6 @@ export function useHomeFeaturedContent({
     () => (isHomeCatalogMainView ? (featuredQuery.data ?? []) : []),
     [featuredQuery.data, isHomeCatalogMainView],
   );
-
-  useEffect(() => {
-    setFeaturedRaffleIndex(0);
-  }, [featuredRaffles.length, featuredQuery.dataUpdatedAt]);
 
   const sellerRaffleActive = myRaffleQuery.data?.raffle?.status === "active";
 
@@ -188,8 +183,6 @@ export function useHomeFeaturedContent({
 
   return {
     featuredRaffles,
-    featuredRaffleIndex,
-    setFeaturedRaffleIndex,
     userStoriesFeed,
     handleUserStoriesRefresh,
     sellerRaffleActive,

@@ -28,12 +28,22 @@
   font-size: 0.875rem;
 }
 
+/* useBottomSheetReportModalStyles.input — тот же bottom-sheet, что и у жалобы на товар */
 .report-user-story-modal__textarea {
-  min-height: 96px;
-  padding: 8px 10px;
-  border: 1px solid var(--iz-color-border-strong);
-  border-radius: 8px;
+  min-height: 100px;
+  padding: var(--iz-space-3);
+  border: var(--iz-border-hairline) solid var(--iz-color-border);
+  border-radius: var(--iz-radius-button);
+  background: var(--iz-color-surface-muted);
+  color: var(--iz-color-text);
+  font-size: var(--iz-font-md);
   resize: vertical;
+}
+
+.report-user-story-modal__textarea:focus {
+  border-color: var(--iz-color-action);
+  outline: none;
+  box-shadow: var(--iz-shadow-input-focus);
 }
 
 .report-user-story-modal__actions {

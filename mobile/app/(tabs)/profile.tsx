@@ -1,8 +1,8 @@
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
@@ -21,6 +21,7 @@ import {
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
+import { useStableAuthHeroHeight } from "@/shared/lib/useStableAuthHeroHeight";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useProfileScreenStyles } from "@/shared/theme/profileChromeStyles";
 import { AppButton } from "@/shared/ui/AppButton";
@@ -35,9 +36,8 @@ export default function ProfileScreen() {
     centeredContentStyle,
     contentPaddingBottom,
     contentPaddingHorizontal,
-    width: screenWidth,
   } = useScreenLayout();
-  const safeAreaInsets = useSafeAreaInsets();
+  const guestHeroHeight = useStableAuthHeroHeight();
   const sessionQuery = useAuthSessionQuery();
   const [emailModalVisible, setEmailModalVisible] = useState(false);
   const [navSheetVisible, setNavSheetVisible] = useState(false);
@@ -45,17 +45,6 @@ export default function ProfileScreen() {
   // фоновый поллинг сессии (useInAppNotificationsPoll рефетчит тот же ключ
   // каждые 30 с) — иначе RefreshControl программно дёргает контент.
   const [isManualRefreshing, setIsManualRefreshing] = useState(false);
-
-  const guestHeroWidth = useMemo(
-    () =>
-      Math.max(
-        0,
-        Math.round(
-          screenWidth - (safeAreaInsets.left ?? 0) - (safeAreaInsets.right ?? 0),
-        ),
-      ),
-    [screenWidth, safeAreaInsets.left, safeAreaInsets.right],
-  );
 
   const user = sessionQuery.data?.user;
   const isLoggedIn = Boolean(user);
@@ -113,15 +102,10 @@ export default function ProfileScreen() {
       ? resolveUploadedMediaUrl(guestProfileLoginMenuBannerImageUrl)
       : null;
 
-    const guestHeroHeight =
-      guestHeroWidth > 0
-        ? Math.round(guestHeroWidth + (safeAreaInsets.top ?? 0))
-        : undefined;
-
     return (
       <SafeAreaView edges={["left", "right", "bottom"]} style={styles.guestSafeArea}>
         <View style={styles.guestContent}>
-          <View style={[styles.guestHero, guestHeroHeight ? { height: guestHeroHeight } : null]}>
+          <View style={[styles.guestHero, { height: guestHeroHeight }]}>
             {guestProfileLoginMenuBannerImageUri ? (
               <CachedProductImage
                 uri={guestProfileLoginMenuBannerImageUri}
@@ -141,7 +125,7 @@ export default function ProfileScreen() {
             ]}
             showsVerticalScrollIndicator={false}
           >
-            <View style={styles.guestBody}>
+            <View style={[styles.guestBody, centeredContentStyle]}>
               <Text style={styles.title}>{AUTH_UI.PROFILE_TITLE}</Text>
               <Text style={styles.subtitle}>{AUTH_UI.GUEST_STATUS}</Text>
               <View style={styles.actions}>
@@ -168,51 +152,53 @@ export default function ProfileScreen() {
   return (
     <>
       <SafeAreaView edges={["top"]} style={styles.safeArea}>
-        <ScrollView
-          ref={scrollRef}
-          scrollEnabled
-          style={centeredContentStyle}
-          contentContainerStyle={[
-            styles.scrollContent,
-            {
-              paddingHorizontal: contentPaddingHorizontal,
-              paddingBottom: contentPaddingBottom,
-            },
-          ]}
-          refreshControl={
-            <ThemedRefreshControl
-              refreshing={isManualRefreshing}
-              onRefresh={handleManualRefresh}
-            />
-          }
-        >
-          <ProfileMobileSectionToggle
-            activeLabel={MY_PROFILE_PAGE_UI.TAB_OVERVIEW}
-            onPress={() => setNavSheetVisible(true)}
-          />
-
-          {needsEmailVerification ? (
-            <View style={styles.emailBanner}>
-              <Text style={styles.emailBannerText}>{EMAIL_VERIFICATION_UI.BANNER}</Text>
-              <AppButton
-                label={EMAIL_VERIFICATION_UI.OPEN_BUTTON}
-                variant="ghost"
-                onPress={() => setEmailModalVisible(true)}
-                style={styles.emailBannerButton}
+        <View style={[styles.safeArea, centeredContentStyle]}>
+          <ScrollView
+            ref={scrollRef}
+            scrollEnabled
+            style={styles.safeArea}
+            contentContainerStyle={[
+              styles.scrollContent,
+              {
+                paddingHorizontal: contentPaddingHorizontal,
+                paddingBottom: contentPaddingBottom,
+              },
+            ]}
+            refreshControl={
+              <ThemedRefreshControl
+                refreshing={isManualRefreshing}
+                onRefresh={handleManualRefresh}
               />
-            </View>
-          ) : null}
+            }
+          >
+            <ProfileMobileSectionToggle
+              activeLabel={MY_PROFILE_PAGE_UI.TAB_OVERVIEW}
+              onPress={() => setNavSheetVisible(true)}
+            />
 
-          <ProfileTabOverviewSection
-            onEditPress={() => router.push({ pathname: "/profile/edit" })}
-          />
+            {needsEmailVerification ? (
+              <View style={styles.emailBanner}>
+                <Text style={styles.emailBannerText}>{EMAIL_VERIFICATION_UI.BANNER}</Text>
+                <AppButton
+                  label={EMAIL_VERIFICATION_UI.OPEN_BUTTON}
+                  variant="ghost"
+                  onPress={() => setEmailModalVisible(true)}
+                  style={styles.emailBannerButton}
+                />
+              </View>
+            ) : null}
 
-          <Pressable style={styles.legalLink} onPress={() => router.push("/legal/privacy")}>
-            <Text style={styles.legalLinkText}>{LEGAL_UI.PRIVACY_LINK}</Text>
-          </Pressable>
+            <ProfileTabOverviewSection
+              onEditPress={() => router.push({ pathname: "/profile/edit" })}
+            />
 
-          <ThemePreferenceToggle />
-        </ScrollView>
+            <Pressable style={styles.legalLink} onPress={() => router.push("/legal/privacy")}>
+              <Text style={styles.legalLinkText}>{LEGAL_UI.PRIVACY_LINK}</Text>
+            </Pressable>
+
+            <ThemePreferenceToggle />
+          </ScrollView>
+        </View>
       </SafeAreaView>
 
       <ProfileMobileNavSheet

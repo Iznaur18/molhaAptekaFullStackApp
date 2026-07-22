@@ -11,9 +11,10 @@ import {
 import { assertProductionEnv } from "./utils/assertProductionEnv.js";
 import { isObjectStorageUploadEnabled } from "./utils/objectStorageUpload.js";
 import { ensureUploadsDir } from "./utils/uploadsDir.js";
-import { connectMongoRead } from "./db/mongoReadConnection.js";
+import { connectMongoRead, closeMongoRead } from "./db/mongoReadConnection.js";
 import { syncCriticalIndexes } from "./db/syncCriticalIndexes.js";
 import { startCronIntervals } from "./jobs/startCronIntervals.js";
+import { isBullMqEnabled } from "./queues/bullMqEnabled.js";
 
 if (!isObjectStorageUploadEnabled()) {
   ensureUploadsDir();
@@ -50,6 +51,52 @@ if (isProduction) {
 const app = createApp();
 const PORT = process.env.PORT ?? 4444;
 
+/** Мягкое время на дренаж соединений перед принудительным выходом. */
+const SHUTDOWN_FORCE_EXIT_MS = 10_000;
+
+/** @type {import('node:http').Server | null} */
+let httpServer = null;
+let isShuttingDown = false;
+
+/**
+ * Graceful shutdown: перестаём принимать новые запросы, дренируем текущие,
+ * закрываем соединения (Mongo write/read, Redis rate-limit), затем выходим.
+ * Критично под нагрузкой: при деплое/рестарте не рвём in-flight запросы.
+ *
+ * @param {string} signal
+ */
+async function shutdown(signal) {
+  if (isShuttingDown) {
+    return;
+  }
+  isShuttingDown = true;
+  console.log(`[shutdown] получен ${signal}, завершаемся…`);
+
+  // Подстраховка: если дренаж завис (keep-alive и т.п.) — принудительный выход.
+  const forceTimer = setTimeout(() => {
+    console.error("[shutdown] таймаут дренажа — принудительный выход");
+    process.exit(1);
+  }, SHUTDOWN_FORCE_EXIT_MS);
+  forceTimer.unref();
+
+  try {
+    if (httpServer) {
+      await new Promise((resolve) => httpServer.close(() => resolve(undefined)));
+    }
+    await Promise.allSettled([
+      mongoose.disconnect(),
+      closeMongoRead(),
+      closeRateLimitRedisStore(),
+    ]);
+    console.log("[shutdown] соединения закрыты, выходим");
+    clearTimeout(forceTimer);
+    process.exit(0);
+  } catch (error) {
+    console.error("[shutdown] ошибка:", error);
+    process.exit(1);
+  }
+}
+
 async function start() {
   try {
     const rateLimitStore = await initRateLimitRedisStore();
@@ -62,16 +109,25 @@ async function start() {
 
     await connectMongoRead();
 
-    startCronIntervals();
+    const cronStarted = startCronIntervals();
+    if (isProduction && !cronStarted && !isBullMqEnabled()) {
+      console.warn(
+        "[cron] ВНИМАНИЕ: scheduled-задачи (завершение розыгрышей, дедлайны рассрочки, " +
+          "истечение промо/баннеров/премиума, чистка сторис) НЕ запущены на этом процессе. " +
+          "Убедитесь, что ровно один процесс их выполняет: запустите worker.js или задайте CRON_LEADER=true.",
+      );
+    }
 
-    app
-      .listen(PORT, () => {
-        console.log(`Сервер успешно запущен на ${PORT}.`);
-      })
-      .on("error", (err) => {
-        console.error("Ошибка запуска сервера:", err);
-        process.exit(1);
-      });
+    httpServer = app.listen(PORT, () => {
+      console.log(`Сервер успешно запущен на ${PORT}.`);
+    });
+    httpServer.on("error", (err) => {
+      console.error("Ошибка запуска сервера:", err);
+      process.exit(1);
+    });
+
+    process.on("SIGTERM", () => void shutdown("SIGTERM"));
+    process.on("SIGINT", () => void shutdown("SIGINT"));
   } catch (err) {
     console.error("Ошибка подключения к MongoDB:", err);
     process.exit(1);

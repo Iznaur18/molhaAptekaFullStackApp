@@ -1,5 +1,6 @@
 .catalog-feed-tiles {
-  margin-bottom: 1.5rem;
+  /* mobile SCREEN_CONTENT_SECTION_GAP ≈ 8px */
+  margin-bottom: 0.5rem;
 }
 
 .catalog-feed-tiles__title,
@@ -12,30 +13,6 @@
 
 .catalog-feed-tiles__card {
   border-style: dashed;
-}
-
-.catalog-feed-tiles__icon-wrap {
-  position: absolute;
-  inset: -1px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--iz-gradient-feed-indigo);
-}
-
-.catalog-feed-tiles__icon-wrap_filter {
-  background: var(--iz-gradient-feed-gold);
-}
-
-.catalog-feed-tiles__icon-text {
-  color: var(--iz-color-action);
-  font-size: 1.25rem;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.catalog-feed-tiles__icon-wrap_filter .catalog-feed-tiles__icon-text {
-  color: var(--iz-color-warning);
 }
 
 .catalog-browser-landing__categories {

@@ -2,6 +2,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { filterMySales } from "../../../entities/order/lib/filterMySales.js";
+import {
+  buildAttentionOrderIdsKey,
+  mergeExpandedIdsFromKey,
+} from "../../../entities/order/lib/expandedOrderIds.js";
 import { orderNeedsSellerAttention } from "../../../entities/order/lib/orderNeedsSellerAttention.js";
 import { summarizeMySales } from "../../../entities/order/lib/summarizeMySales.js";
 import { MY_ORDERS_LIST_FILTER_IN_PROGRESS } from "../../../entities/order/model/myOrdersListFilters.js";
@@ -18,7 +22,6 @@ import {
 } from "../../../entities/order/model/constants.js";
 import { OrderCard } from "../../../entities/order/ui/OrderCard.jsx";
 import { useCatalogProductDetailsOpener } from "../../../entities/product/lib/useCatalogProductDetailsOpener.js";
-import { ProductDetailsModal } from "../../../entities/product/ui/ProductDetailsModal.jsx";
 import {
   API_CLIENT_UI,
   MY_SALES_PAGE_UI,
@@ -34,10 +37,11 @@ import "./MySalesPage.css";
 import "./MySalesPageOverview.css";
 import "../../../shared/ui/profileQueueContentPanel.css";
 
+const EMPTY_ORDERS = [];
+
 /**
  * @param {{
  *   isAuthorized: boolean;
- *   currentUserId?: string | null;
  *   totalSalesCount?: number;
  *   onSellerNameClick?: (userId: string) => void;
  *   onQueueChanged?: () => void;
@@ -45,7 +49,6 @@ import "../../../shared/ui/profileQueueContentPanel.css";
  */
 export function MySalesPage({
   isAuthorized,
-  currentUserId = null,
   totalSalesCount = 0,
   onSellerNameClick,
   onQueueChanged,
@@ -63,12 +66,7 @@ export function MySalesPage({
 
   const queryClient = useQueryClient();
   const { cancelItemMutation, shipItemMutation, deliverItemMutation } = useOrderMutations();
-  const {
-    catalogProduct,
-    openCatalogProductFromOrderLine,
-    closeCatalogProduct,
-    patchCatalogProduct,
-  } = useCatalogProductDetailsOpener();
+  const { openCatalogProductFromOrderLine } = useCatalogProductDetailsOpener();
   const [pendingActionKey, setPendingActionKey] = useState(null);
   const [itemActionErrors, setItemActionErrors] = useState({});
 
@@ -95,12 +93,16 @@ export function MySalesPage({
     enabled: isAuthorized,
   });
 
-  const allOrders = overviewQuery.data?.orders ?? [];
-  const serverOrders = salesQuery.data?.orders ?? [];
+  const allOrders = overviewQuery.data?.orders ?? EMPTY_ORDERS;
+  const serverOrders = salesQuery.data?.orders ?? EMPTY_ORDERS;
   const summary = useMemo(() => summarizeMySales(allOrders), [allOrders]);
   const filteredOrders = useMemo(
     () => filterMySales(serverOrders, { statusFilter, attentionOnly }),
     [serverOrders, statusFilter, attentionOnly],
+  );
+  const attentionOrderIdsKey = useMemo(
+    () => buildAttentionOrderIdsKey(allOrders, orderNeedsSellerAttention),
+    [allOrders],
   );
 
   const totalServer = serverOrders.length;
@@ -131,12 +133,8 @@ export function MySalesPage({
   useRefetchOnVisible(reloadSales, phase === "success");
 
   useEffect(() => {
-    setExpandedIds((prev) => {
-      const next = new Set(prev);
-      allOrders.filter(orderNeedsSellerAttention).forEach((order) => next.add(String(order._id)));
-      return next;
-    });
-  }, [allOrders]);
+    setExpandedIds((prev) => mergeExpandedIdsFromKey(prev, attentionOrderIdsKey));
+  }, [attentionOrderIdsKey]);
 
   const toggleExpanded = useCallback((orderId) => {
     setExpandedIds((prev) => {
@@ -423,15 +421,6 @@ export function MySalesPage({
           })}
         </ul>
       )}
-      <ProductDetailsModal
-        isOpen={catalogProduct != null}
-        product={catalogProduct}
-        onClose={closeCatalogProduct}
-        onSellerNameClick={onSellerNameClick}
-        isAuthorized={isAuthorized}
-        onProductStatsUpdate={patchCatalogProduct}
-        currentUserId={currentUserId}
-      />
     </div>
   );
 }

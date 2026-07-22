@@ -69,6 +69,9 @@ import {
   getRaffleProductsController,
   createRaffleController,
   getMyRaffleController,
+  getRaffleCreateAdvertisingController,
+  unlockRaffleCreateController,
+  cancelRaffleCreateController,
   patchMyRaffleController,
   patchRaffleByStaffController,
   deleteMyRaffleController,
@@ -307,6 +310,9 @@ router.patch(
 router.get("/my", checkAuthMW, productsSearchValidation, getMyProductsController);
 router.get("/raffles/featured", getFeaturedRaffleController);
 router.get("/raffles/my", checkAuthMW, getMyRaffleController);
+router.get("/raffles/create-advertising", checkAuthMW, getRaffleCreateAdvertisingController);
+router.post("/raffles/unlock-create", checkAuthMW, unlockRaffleCreateController);
+router.post("/raffles/cancel-create", checkAuthMW, cancelRaffleCreateController);
 router.get(
   "/raffles/pending/count",
   checkAuthMW,

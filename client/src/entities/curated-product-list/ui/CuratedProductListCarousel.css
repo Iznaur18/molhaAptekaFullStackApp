@@ -1,17 +1,31 @@
+/**
+ * Паритет с mobile HomeCuratedListsSection + useHomeCuratedListsStyles:
+ *   listBlock — SquircleView radius 16, bg surface, padding 12/8, БЕЗ рамки
+ *   title     — 16/600, letterSpacing -0.4, color ink, mb 10, paddingX 4
+ *   row       — padding 4/4/8, gap 12
+ *   section   — gap 8 (HOME_FEED_SECTION_GAP)
+ * Константы: entities/curated-product-list/lib/curatedProductListHomeLayout.ts
+ */
 .curated-product-list-carousel {
-  margin: 0 0 16px;
+  box-sizing: border-box;
+  margin: 0 0 8px;
+  padding: 8px 12px;
+  border-radius: var(--iz-radius-card-lg);
+  background: var(--iz-color-surface);
 }
 
 .curated-product-list-carousel__title {
   margin: 0 0 10px;
   padding: 0 4px;
-  font-size: 1.125rem;
-  font-weight: 700;
+  font-size: var(--iz-font-lg);
+  font-weight: var(--iz-weight-semibold);
+  letter-spacing: -0.4px;
+  color: var(--iz-color-ink);
 }
 
 .curated-product-list-carousel__scroll {
   --curated-visible-cards: 10;
-  --curated-card-gap: 8px;
+  --curated-card-gap: 12px;
   --curated-card-min-width: 86px;
   --curated-card-max-width: 168px;
   display: flex;

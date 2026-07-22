@@ -144,6 +144,9 @@ import {
   getRaffleProductsController,
   createRaffleController,
   getMyRaffleController,
+  getRaffleCreateAdvertisingController,
+  unlockRaffleCreateController,
+  cancelRaffleCreateController,
   patchMyRaffleController,
   patchRaffleByStaffController,
   deleteMyRaffleController,
@@ -171,7 +174,8 @@ import {
   getMyPremiumStatusController,
   purchasePremiumController,
 } from "./User/premiumControllers.js";
-import { getMyLoyaltyPointsStatusController } from "./User/loyaltyPointsPurchaseControllers.js";
+import { getMyLoyaltyPointsStatusController, adminCreditOwnLoyaltyPointsController } from "./User/loyaltyPointsPurchaseControllers.js";
+import { getMonthlyLoyaltyPointsAwardedController } from "./User/monthlyLoyaltyPointsControllers.js";
 import {
   followUserController,
   unfollowUserController,
@@ -324,6 +328,9 @@ export {
   getRaffleProductsController,
   createRaffleController,
   getMyRaffleController,
+  getRaffleCreateAdvertisingController,
+  unlockRaffleCreateController,
+  cancelRaffleCreateController,
   patchMyRaffleController,
   patchRaffleByStaffController,
   deleteMyRaffleController,
@@ -345,6 +352,8 @@ export {
   getMyPremiumStatusController,
   purchasePremiumController,
   getMyLoyaltyPointsStatusController,
+  adminCreditOwnLoyaltyPointsController,
+  getMonthlyLoyaltyPointsAwardedController,
   followUserController,
   unfollowUserController,
   listMyFollowingController,

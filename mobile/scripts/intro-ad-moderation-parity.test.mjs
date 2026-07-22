@@ -34,8 +34,10 @@ test("intro ad moderation page mirrors web hub chrome and filters", () => {
   assert.doesNotMatch(page, /StaffModerationActions/);
   assert.doesNotMatch(page, /staffQueueStyles/);
 
-  assert.match(styles, /overviewTile/);
-  assert.match(styles, /sectionChip/);
+  assert.match(styles, /overviewTileRaffle/);
+  assert.match(styles, /listContentPanelRaffle/);
+  assert.match(styles, /listContentPanelUsersRaffle/);
+  assert.match(styles, /sectionChipActiveRaffle/);
   assert.match(styles, /listActions/);
 });
 
@@ -51,6 +53,10 @@ test("intro ad moderation campaign card supports collapsible queue rows", () => 
 });
 
 test("intro ad moderation sub-sections support attention filter and expand state", () => {
+  const page = readMobileFile("features/intro-ad-moderation-page/ui/IntroAdModerationPage.tsx");
+  const raffleSection = readMobileFile(
+    "features/intro-ad-moderation-page/ui/RaffleModerationSection.tsx",
+  );
   const bannerSection = readMobileFile(
     "features/intro-ad-moderation-page/ui/SiteHeaderBannerCampaignModerationSection.tsx",
   );
@@ -61,9 +67,19 @@ test("intro ad moderation sub-sections support attention filter and expand state
   assert.match(bannerSection, /attentionOnly/);
   assert.match(bannerSection, /expandedIds/);
   assert.match(bannerSection, /collapsible/);
-  assert.match(personalSection, /attentionOnly/);
+  assert.match(personalSection, /useManagedSellerPersonalCategoryCampaignsQuery/);
+  assert.match(personalSection, /STAFF_UNPUBLISH/);
+  assert.match(personalSection, /STAFF_DELETE/);
   assert.match(personalSection, /expandedIds/);
   assert.match(personalSection, /collapsible/);
+  assert.match(raffleSection, /resolveIntroAdModerationListPanelStyles/);
+  assert.match(raffleSection, /INTRO_AD_MODERATION_SECTION_RAFFLE/);
+  assert.match(raffleSection, /RafflesStaffPendingRow/);
+  assert.match(page, /RaffleModerationSection/);
+  assert.match(page, /INTRO_AD_MODERATION_SECTION_RAFFLE/);
+  assert.match(page, /INTRO_AD_MODERATION_SECTION_USERS_RAFFLE/);
+  assert.match(page, /UsersLoyaltyRaffleAdminModerationSection/);
+  assert.match(page, /showUsersRaffleSection/);
 });
 
 test("intro ad moderation ui copy matches web page", () => {
@@ -71,6 +87,10 @@ test("intro ad moderation ui copy matches web page", () => {
 
   assert.match(copy, /OVERVIEW_PENDING: "На модерации"/);
   assert.match(copy, /SECTION_FILTER_BANNER: "Баннер"/);
+  assert.match(copy, /SECTION_FILTER_RAFFLE: "Розыгрыш"/);
+  assert.match(copy, /OVERVIEW_RAFFLE: "Розыгрыш"/);
+  assert.match(copy, /SECTION_FILTER_USERS_RAFFLE: "Среди пользователей"/);
+  assert.match(copy, /OVERVIEW_USERS_RAFFLE: "Среди пользователей"/);
   assert.match(copy, /EXPAND_ALL: "Развернуть все"/);
   assert.match(copy, /ATTENTION_FILTER_HINT:/);
 });

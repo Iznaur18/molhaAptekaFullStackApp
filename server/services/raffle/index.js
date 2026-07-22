@@ -4,6 +4,13 @@ export { approveRaffle, rejectRaffle } from "./moderateRaffle.js";
 export { patchMyRaffle, patchRaffleByStaff } from "./patchRaffle.js";
 export { pauseMyRaffle } from "./pauseRaffle.js";
 export {
+  cancelRaffleCreateUnlock,
+  chargeRaffleCreatePriceOnApproval,
+  getRaffleCreateAdvertisingStatus,
+  releaseRaffleCreatePriceIfNeeded,
+  unlockRaffleCreate,
+} from "./raffleCreateAccess.js";
+export {
   countPendingRaffles,
   getFeaturedRaffles,
   getMyRaffleOverview,

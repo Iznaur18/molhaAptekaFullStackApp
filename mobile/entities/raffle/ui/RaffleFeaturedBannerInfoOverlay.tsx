@@ -8,7 +8,6 @@ type RaffleFeaturedBannerInfoOverlayProps = {
   raffle: RaffleFromApi;
   visible: boolean;
   onToggle: () => void;
-  onBackdropText?: boolean;
 };
 
 export const RaffleFeaturedBannerInfoToggle = ({
@@ -65,14 +64,9 @@ export const RaffleFeaturedBannerInfoOverlay = ({
   raffle,
   visible,
   onToggle,
-  onBackdropText = false,
 }: RaffleFeaturedBannerInfoOverlayProps) => (
   <>
     <RaffleFeaturedBannerInfoToggle visible={visible} onToggle={onToggle} />
-    <RaffleFeaturedBannerInfoPanel
-      raffle={raffle}
-      visible={visible}
-      onBackdropText={onBackdropText}
-    />
+    <RaffleFeaturedBannerInfoPanel raffle={raffle} visible={visible} />
   </>
 );

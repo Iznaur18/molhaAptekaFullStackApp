@@ -4,6 +4,7 @@ import react from "@vitejs/plugin-react";
 import { visualizer } from "rollup-plugin-visualizer";
 
 import { buildSpaContentSecurityPolicy } from "../server/utils/buildSpaContentSecurityPolicy.js";
+import { shouldProxyProductPathToApi } from "./src/shared/lib/productDetailsPaths.js";
 
 /**
  * LAN-доступ (вариант C): см. `client/docs/LAN-dev-access.md`
@@ -47,6 +48,9 @@ const shouldProxyToApi = (prefix, pathname) => {
   }
   if (prefix === "/site-header-banner") {
     return /^\/site-header-banner(?:\/|$)/.test(pathname);
+  }
+  if (prefix === "/product") {
+    return shouldProxyProductPathToApi(pathname);
   }
   return pathname === prefix || pathname.startsWith(`${prefix}/`);
 };

@@ -1,6 +1,7 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { Pressable, ScrollView, Switch, Text, TextInput, View } from "react-native";
 
+import { maskBirthDateInput } from "@/entities/user/lib/birthDateInputMask";
 import { buildPatchUserProfileBody } from "@/entities/user/lib/buildPatchUserProfileBody";
 import {
   mapUserToEditProfileForm,
@@ -89,14 +90,14 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
       return;
     }
 
-    const body = buildPatchUserProfileBody(form, baselineForm);
-    if (Object.keys(body).length === 0) {
-      setErrorMessage(EDIT_PROFILE_UI.NOTHING_TO_SAVE);
-      return;
-    }
-
     setErrorMessage("");
     try {
+      const body = buildPatchUserProfileBody(form, baselineForm);
+      if (Object.keys(body).length === 0) {
+        setErrorMessage(EDIT_PROFILE_UI.NOTHING_TO_SAVE);
+        return;
+      }
+
       const updatedUser = await patchMutation.mutateAsync({ userId: user._id, body });
       const nextForm = mapUserToEditProfileForm(updatedUser);
       setBaselineForm(nextForm);
@@ -227,11 +228,11 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
             <TextInput
               style={styles.input}
               value={form.userBirthDate}
-              onChangeText={(value) => updateField("userBirthDate", value)}
+              onChangeText={(value) => updateField("userBirthDate", maskBirthDateInput(value))}
               placeholder={EDIT_PROFILE_UI.PLACEHOLDER_BIRTH_DATE}
               placeholderTextColor={theme.colors.textMuted}
               editable={!isSubmitting}
-              keyboardType="numbers-and-punctuation"
+              keyboardType="number-pad"
               maxLength={10}
             />
           </View>

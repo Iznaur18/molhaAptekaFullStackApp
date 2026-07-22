@@ -35,8 +35,25 @@ export function buildPatchUserProfileBody(form, options = {}) {
   if (form.userBirthDate === "") {
     body.userBirthDate = null;
   } else if (form.userBirthDate) {
-    const iso = new Date(`${form.userBirthDate}T12:00:00.000Z`).toISOString();
-    body.userBirthDate = iso;
+    const raw = String(form.userBirthDate).trim();
+    const dotted = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(raw);
+    const isoDay = /^(\d{4})-(\d{2})-(\d{2})$/.exec(raw);
+    let ymd = null;
+    if (dotted) {
+      ymd = `${dotted[3]}-${dotted[2]}-${dotted[1]}`;
+    } else if (isoDay) {
+      ymd = raw;
+    } else if (raw.length >= 10 && /^\d{4}-\d{2}-\d{2}/.test(raw)) {
+      ymd = raw.slice(0, 10);
+    }
+    if (!ymd) {
+      throw new Error("Дата рождения: ДД.ММ.ГГГГ");
+    }
+    const probe = new Date(`${ymd}T12:00:00.000Z`);
+    if (Number.isNaN(probe.getTime())) {
+      throw new Error("Дата рождения: ДД.ММ.ГГГГ");
+    }
+    body.userBirthDate = `${ymd}T12:00:00.000Z`;
   }
 
   body.userGender = form.userGender;

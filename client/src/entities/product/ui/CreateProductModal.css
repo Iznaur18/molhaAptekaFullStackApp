@@ -152,37 +152,26 @@
   font-size: 0.875rem;
 }
 
+/**
+ * Геометрия наследуется от базового слоя shared/styles/controls.css,
+ * который повторяет mobile useAdminEditModalStyles.input
+ * (hairline border, r 10, px 12, py 10, 16px, bg surface) — дублировать не нужно.
+ */
 .create-product-modal__input,
 .create-product-modal__textarea {
   box-sizing: border-box;
   width: 100%;
-  border: 1px solid var(--iz-color-border);
-  border-radius: 0.5rem;
-  padding: 0.5rem 0.65rem;
-  font-size: 1rem;
-  background: var(--iz-color-surface);
-  color: var(--iz-color-text);
-  transition:
-    border-color 0.15s ease,
-    box-shadow 0.15s ease;
-}
-
-.create-product-modal__input:focus,
-.create-product-modal__textarea:focus {
-  outline: none;
-  border-color: var(--iz-color-action);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--iz-color-action) 18%, transparent);
 }
 
 .create-product-modal__input_price {
   font-variant-numeric: tabular-nums;
-  font-weight: 600;
+  font-weight: var(--iz-weight-semibold);
 }
 
+/* inputMultiline: minHeight 72, textAlignVertical top */
 .create-product-modal__textarea {
-  min-height: 5.5rem;
+  min-height: 72px;
   resize: vertical;
-  line-height: 1.45;
 }
 
 .create-product-modal__check {

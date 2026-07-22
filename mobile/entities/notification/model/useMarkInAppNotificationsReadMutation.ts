@@ -1,8 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import * as Notifications from "expo-notifications";
-import { Platform } from "react-native";
 
 import { authMeQueryKeys } from "@/shared/api";
+import { getExpoNotificationsModule } from "@/features/push-notifications/lib/expoNotificationsModule";
 
 import {
   markInAppNotificationsRead,
@@ -10,7 +9,8 @@ import {
 import { patchAuthMeInAppNotifications } from "../lib/patchAuthMeInAppNotifications";
 
 const clearNativeBadge = async (): Promise<void> => {
-  if (Platform.OS === "web") {
+  const Notifications = getExpoNotificationsModule();
+  if (!Notifications) {
     return;
   }
 

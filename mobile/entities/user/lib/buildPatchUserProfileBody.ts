@@ -2,6 +2,10 @@ import { USER_SOCIAL_LINK_FIELD_IDS } from "@molha/api-contract";
 import { DEFAULT_USER_AVATAR_URL } from "@/entities/user/model/constants";
 import { normalizeUploadUrlForStorage } from "@/shared/lib";
 
+import {
+  birthDateIsoDateToApiValue,
+  parseBirthDateInputToIsoDate,
+} from "./birthDateInputMask";
 import { getUserBackgroundFocus } from "./profileImageFocus";
 import { normalizeRuPhoneInput } from "./ruPhone";
 import { EMPTY_STRUCTURED_ADDRESS, type EditProfileFormState } from "./mapUserToEditProfileForm";
@@ -37,7 +41,10 @@ export const buildPatchUserProfileBody = (
       body.userBirthDate = null;
     }
   } else if (form.userBirthDate !== initial.userBirthDate) {
-    body.userBirthDate = new Date(`${form.userBirthDate}T12:00:00.000Z`).toISOString();
+    const isoDate = parseBirthDateInputToIsoDate(form.userBirthDate);
+    if (isoDate) {
+      body.userBirthDate = birthDateIsoDateToApiValue(isoDate);
+    }
   }
 
   if (form.userGender !== initial.userGender) {
@@ -114,7 +121,10 @@ export const buildPatchUserProfileBody = (
     body.notesAboutUser = notes === "" ? null : notes;
   }
 
-  for (const fieldId of USER_SOCIAL_LINK_FIELD_IDS) {
+  for (const fieldId of USER_SOCIAL_LINK_FIELD_IDS as readonly Extract<
+    keyof EditProfileFormState,
+    `social${string}`
+  >[]) {
     const next = form[fieldId].trim();
     const prev = initial[fieldId].trim();
     if (next !== prev) {

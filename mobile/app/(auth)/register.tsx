@@ -14,6 +14,8 @@ import { API_CLIENT_UI, AUTH_UI, EMAIL_VERIFICATION_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
 import { useStableAuthHeroHeight } from "@/shared/lib/useStableAuthHeroHeight";
+import { releaseColdStartSplash } from "@/shared/model/coldStartSplashGate";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useLoginScreenStyles } from "@/shared/theme/formChromeStyles";
 import { AppButton } from "@/shared/ui/AppButton";
@@ -30,6 +32,7 @@ export default function RegisterScreen() {
   const theme = useAppTheme();
   const styles = useLoginScreenStyles();
   const insets = useSafeAreaInsets();
+  const { centeredContentStyle } = useScreenLayout();
   const heroHeight = useStableAuthHeroHeight();
   const registerMutation = useRegisterMutation();
   const confirmMutation = useConfirmRegistrationMutation();
@@ -119,6 +122,7 @@ export default function RegisterScreen() {
         registrationId: pendingRegistration.registrationId,
         code,
       });
+      releaseColdStartSplash();
       router.replace("/(tabs)");
     } catch (error) {
       setCodeError(formatApiErrorMessage(error, EMAIL_VERIFICATION_UI.CONFIRM_ERROR));
@@ -184,7 +188,7 @@ export default function RegisterScreen() {
         </View>
 
         {isCodeStep ? (
-          <View style={styles.body}>
+          <View style={[styles.body, centeredContentStyle]}>
             <Text style={styles.title}>{AUTH_UI.REGISTER_CODE_TITLE}</Text>
             <Text style={styles.subtitle}>
               {AUTH_UI.REGISTER_CODE_SUBTITLE(pendingRegistration.email || email)}
@@ -248,7 +252,7 @@ export default function RegisterScreen() {
             </View>
           </View>
         ) : (
-        <View style={styles.body}>
+        <View style={[styles.body, centeredContentStyle]}>
           <Text style={styles.title}>{AUTH_UI.REGISTER_TITLE}</Text>
           <Text style={styles.subtitle}>{AUTH_UI.REGISTER_SUBTITLE}</Text>
 

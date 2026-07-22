@@ -1,4 +1,8 @@
 import { Feather } from "@expo/vector-icons";
+import {
+  LOYALTY_POINTS_ADMIN_FREE_CREDIT_MAX,
+  LOYALTY_POINTS_ADMIN_FREE_CREDIT_MIN,
+} from "@molha/api-contract";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
@@ -11,8 +15,10 @@ import {
   type AccessibilityState,
 } from "react-native";
 
-import { useMyLoyaltyPointsStatusQuery } from "@/entities/user/model/useMyLoyaltyPointsStatusQuery";
+import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
+import { useAdminCreditOwnLoyaltyPointsMutation } from "@/entities/user/model/useAdminCreditOwnLoyaltyPointsMutation";
+import { useMyLoyaltyPointsStatusQuery } from "@/entities/user/model/useMyLoyaltyPointsStatusQuery";
 import {
   LOYALTY_POINTS_PURCHASE_MAX_RUB,
   LOYALTY_POINTS_PURCHASE_MIN_RUB,
@@ -44,11 +50,16 @@ export const LoyaltyPointsPage = () => {
   const styles = useLoyaltyPointsPageStyles();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
   const isAuthorized = useIsAuthorized();
+  const { isAdmin } = useUserAccess();
   const statusQuery = useMyLoyaltyPointsStatusQuery(isAuthorized);
+  const adminCreditMutation = useAdminCreditOwnLoyaltyPointsMutation();
   const [navSheetVisible, setNavSheetVisible] = useState(false);
   const [purchaseAmountInput, setPurchaseAmountInput] = useState("");
   const [purchaseValidationError, setPurchaseValidationError] = useState("");
   const [comingSoonMessage, setComingSoonMessage] = useState("");
+  const [adminAmountInput, setAdminAmountInput] = useState("");
+  const [adminValidationError, setAdminValidationError] = useState("");
+  const [adminSuccessMessage, setAdminSuccessMessage] = useState("");
 
   useFocusEffect(
     useCallback(() => {
@@ -70,10 +81,21 @@ export const LoyaltyPointsPage = () => {
     return rublesToLoyaltyPoints(purchaseAmountRub);
   }, [purchaseAmountRub]);
 
+  const adminAmountPoints = useMemo(
+    () => parseRubPriceInput(adminAmountInput),
+    [adminAmountInput],
+  );
+
   const handlePurchaseAmountChange = (value: string) => {
     setPurchaseAmountInput(formatRubPriceInput(value));
     setPurchaseValidationError("");
     setComingSoonMessage("");
+  };
+
+  const handleAdminAmountChange = (value: string) => {
+    setAdminAmountInput(formatRubPriceInput(value));
+    setAdminValidationError("");
+    setAdminSuccessMessage("");
   };
 
   const handlePurchaseSubmit = () => {
@@ -98,6 +120,46 @@ export const LoyaltyPointsPage = () => {
     setComingSoonMessage(
       LOYALTY_POINTS_PAGE_UI.COMING_SOON_AMOUNT(purchaseAmountRub, purchasePointsPreview),
     );
+  };
+
+  const handleAdminFreeCreditSubmit = async () => {
+    setAdminSuccessMessage("");
+    if (adminAmountPoints == null) {
+      setAdminValidationError(
+        LOYALTY_POINTS_PAGE_UI.ADMIN_FREE_AMOUNT_MIN(LOYALTY_POINTS_ADMIN_FREE_CREDIT_MIN),
+      );
+      return;
+    }
+    if (adminAmountPoints < LOYALTY_POINTS_ADMIN_FREE_CREDIT_MIN) {
+      setAdminValidationError(
+        LOYALTY_POINTS_PAGE_UI.ADMIN_FREE_AMOUNT_MIN(LOYALTY_POINTS_ADMIN_FREE_CREDIT_MIN),
+      );
+      return;
+    }
+    if (adminAmountPoints > LOYALTY_POINTS_ADMIN_FREE_CREDIT_MAX) {
+      setAdminValidationError(
+        LOYALTY_POINTS_PAGE_UI.ADMIN_FREE_AMOUNT_MAX(LOYALTY_POINTS_ADMIN_FREE_CREDIT_MAX),
+      );
+      return;
+    }
+
+    setAdminValidationError("");
+    try {
+      const result = await adminCreditMutation.mutateAsync({
+        amount: adminAmountPoints,
+      });
+      setAdminSuccessMessage(
+        LOYALTY_POINTS_PAGE_UI.ADMIN_FREE_SUCCESS(
+          result.credited,
+          result.loyaltyPointsBalance,
+        ),
+      );
+      setAdminAmountInput("");
+    } catch (error) {
+      setAdminValidationError(
+        formatApiErrorMessage(error, LOYALTY_POINTS_PAGE_UI.FETCH_FALLBACK),
+      );
+    }
   };
 
   if (!isAuthorized) {
@@ -129,6 +191,11 @@ export const LoyaltyPointsPage = () => {
     purchaseAmountRub != null &&
     purchaseAmountRub >= LOYALTY_POINTS_PURCHASE_MIN_RUB &&
     purchaseAmountRub <= LOYALTY_POINTS_PURCHASE_MAX_RUB;
+  const canSubmitAdminCredit =
+    adminAmountPoints != null &&
+    adminAmountPoints >= LOYALTY_POINTS_ADMIN_FREE_CREDIT_MIN &&
+    adminAmountPoints <= LOYALTY_POINTS_ADMIN_FREE_CREDIT_MAX &&
+    !adminCreditMutation.isPending;
 
   return (
     <>
@@ -208,6 +275,56 @@ export const LoyaltyPointsPage = () => {
               </Text>
             ) : null}
           </View>
+
+          {isAdmin ? (
+            <View style={styles.purchase}>
+              <Text style={styles.purchaseTitle}>
+                {LOYALTY_POINTS_PAGE_UI.ADMIN_FREE_SECTION}
+              </Text>
+              <Text style={styles.purchaseLabel}>
+                {LOYALTY_POINTS_PAGE_UI.ADMIN_FREE_AMOUNT_LABEL}
+              </Text>
+              <TextInput
+                style={styles.purchaseInput}
+                value={adminAmountInput}
+                onChangeText={handleAdminAmountChange}
+                keyboardType="number-pad"
+                inputMode="numeric"
+                placeholder={String(LOYALTY_POINTS_ADMIN_FREE_CREDIT_MIN)}
+                placeholderTextColor={theme.colors.textMuted}
+                editable={!adminCreditMutation.isPending}
+                accessibilityState={
+                  { invalid: Boolean(adminValidationError) } as unknown as AccessibilityState
+                }
+              />
+              <Text style={styles.purchaseHint}>
+                {LOYALTY_POINTS_PAGE_UI.ADMIN_FREE_AMOUNT_HINT}
+              </Text>
+              {adminValidationError ? (
+                <Text style={styles.purchaseError} accessibilityRole="alert">
+                  {adminValidationError}
+                </Text>
+              ) : null}
+              {adminSuccessMessage ? (
+                <Text style={styles.soon} accessibilityRole="text">
+                  {adminSuccessMessage}
+                </Text>
+              ) : null}
+              <AppButton
+                label={
+                  adminCreditMutation.isPending
+                    ? LOYALTY_POINTS_PAGE_UI.ADMIN_FREE_SUBMITTING
+                    : LOYALTY_POINTS_PAGE_UI.ADMIN_FREE_SUBMIT
+                }
+                variant="primary"
+                style={styles.buyButton}
+                onPress={() => {
+                  void handleAdminFreeCreditSubmit();
+                }}
+                disabled={!canSubmitAdminCredit}
+              />
+            </View>
+          ) : null}
 
           <View style={styles.usesCard}>
             <Text style={styles.usesTitle}>{LOYALTY_POINTS_PAGE_UI.USES_TITLE}</Text>

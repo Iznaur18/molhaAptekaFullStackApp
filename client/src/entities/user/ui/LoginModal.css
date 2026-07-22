@@ -8,18 +8,30 @@
   gap: 0.75rem;
 }
 
+/* useLoginScreenStyles.field/label: gap 6, label 13/600 textSecondary */
 .login-modal__label {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  font-size: 0.875rem;
+  gap: 6px;
+  font-size: var(--iz-font-sm);
+  font-weight: var(--iz-weight-semibold);
+  color: var(--iz-color-text-secondary);
 }
 
+/* useLoginScreenStyles.input: border 1 borderStrong, r 10, px 16, py 14, 16px */
 .login-modal__input {
-  border: 1px solid var(--iz-color-border-strong);
-  border-radius: 0.5rem;
-  padding: 0.5rem 0.625rem;
-  font-size: 0.9375rem;
+  padding: var(--iz-control-input-padding-y) var(--iz-control-input-padding-x);
+  border: var(--iz-border) solid var(--iz-color-border-strong);
+  border-radius: var(--iz-control-input-radius);
+  background: var(--iz-color-surface);
+  font-size: var(--iz-control-input-font);
+}
+
+/* inputFocused: borderColor action + тень action */
+.login-modal__input:focus {
+  border-color: var(--iz-color-action);
+  outline: none;
+  box-shadow: var(--iz-shadow-input-focus);
 }
 
 .login-modal__message {

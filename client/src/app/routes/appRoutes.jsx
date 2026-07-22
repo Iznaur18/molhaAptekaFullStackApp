@@ -8,6 +8,7 @@ import { AccountRoutePage } from "./AccountRoutePage.jsx";
 import { CartRoutePage } from "./CartRoutePage.jsx";
 import { CatalogRoutePage } from "./CatalogRoutePage.jsx";
 import { MyProductsRoutePage } from "./MyProductsRoutePage.jsx";
+import { ProductRoutePage } from "./ProductRoutePage.jsx";
 import { RaffleProductsRoutePage } from "./RaffleProductsRoutePage.jsx";
 import { SellerProductsRoutePage } from "./SellerProductsRoutePage.jsx";
 
@@ -37,6 +38,7 @@ export function renderAppShellRoutes() {
       <Route path="/raffle/:raffleId" element={<RaffleProductsRoutePage />} />
       <Route path="/" element={<CatalogRoutePage />} />
       <Route path="/catalog" element={<CatalogRoutePage />} />
+      <Route path="/product/:productId" element={<ProductRoutePage />} />
       <Route path="/my-products" element={<MyProductsRoutePage />} />
       {ACCOUNT_MAIN_VIEW_ROUTES.map((path) => (
         <Route key={path} path={path} element={<AccountRoutePage />} />

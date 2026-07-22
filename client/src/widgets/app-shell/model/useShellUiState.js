@@ -42,8 +42,6 @@ export function useShellUiState() {
   const [productToEdit, setProductToEdit] = useState(null);
   const [isAdminEditUserOpen, setIsAdminEditUserOpen] = useState(false);
   const [isAdminDeleteUserOpen, setIsAdminDeleteUserOpen] = useState(false);
-  /** @type {[ProductFromApi | null, import('react').Dispatch<import('react').SetStateAction<ProductFromApi | null>>]} */
-  const [catalogProductDetails, setCatalogProductDetails] = useState(null);
   const [productDetailsAdminError, setProductDetailsAdminError] = useState("");
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [raffleParticipationPendingProductId, setRaffleParticipationPendingProductId] =
@@ -54,7 +52,6 @@ export function useShellUiState() {
     ),
   );
   const [isDataConfirmationModalOpen, setIsDataConfirmationModalOpen] = useState(false);
-  const [isReportProductModalOpen, setIsReportProductModalOpen] = useState(false);
   const [promotionProduct, setPromotionProduct] = useState(
     /** @type {ProductFromApi | null} */ (null),
   );
@@ -128,8 +125,6 @@ export function useShellUiState() {
     setIsAdminEditUserOpen,
     isAdminDeleteUserOpen,
     setIsAdminDeleteUserOpen,
-    catalogProductDetails,
-    setCatalogProductDetails,
     productDetailsAdminError,
     setProductDetailsAdminError,
     isEditProfileOpen,
@@ -140,8 +135,6 @@ export function useShellUiState() {
     setRaffleModal,
     isDataConfirmationModalOpen,
     setIsDataConfirmationModalOpen,
-    isReportProductModalOpen,
-    setIsReportProductModalOpen,
     promotionProduct,
     setPromotionProduct,
     promotionConfig,

@@ -50,12 +50,13 @@ export const fetchPendingSellerPersonalCategoryCampaignsCount = async (): Promis
 };
 
 export const fetchPendingAdModerationNavBadgeCount = async (): Promise<number> => {
-  const [introCount, bannerCount, personalCategoryCount] = await Promise.all([
+  const [introCount, bannerCount, personalCategoryCount, raffleCount] = await Promise.all([
     fetchPendingIntroAdCampaignsOnlyCount(),
     fetchPendingSiteHeaderBannerCampaignsCount(),
     fetchPendingSellerPersonalCategoryCampaignsCount(),
+    fetchPendingRafflesCount(),
   ]);
-  return introCount + bannerCount + personalCategoryCount;
+  return introCount + bannerCount + personalCategoryCount + raffleCount;
 };
 
 /** @deprecated используйте fetchPendingIntroAdCampaignsOnlyCount или fetchPendingAdModerationNavBadgeCount */

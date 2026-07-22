@@ -27,10 +27,13 @@ import {
   getMyPremiumStatusController,
   purchasePremiumController,
   getMyLoyaltyPointsStatusController,
+  adminCreditOwnLoyaltyPointsController,
+  getMonthlyLoyaltyPointsAwardedController,
 } from "../controllers/index.js";
 import {
   checkAuthMW,
   checkOptionalAuthMW,
+  checkAdminMW,
   checkProductModeratorMW,
   updateProfileRateLimiter,
   userDataConfirmationRateLimiter,
@@ -50,6 +53,7 @@ import {
   createUserStoryValidation,
   submitUserStoryReportValidation,
   resolveUserStoryReportsValidation,
+  adminCreditLoyaltyPointsValidation,
 } from "../validations/index.js";
 
 const router = createAsyncRouter();
@@ -170,6 +174,19 @@ router.get(
   "/me/loyalty-points/status",
   checkAuthMW,
   getMyLoyaltyPointsStatusController,
+);
+
+router.post(
+  "/me/loyalty-points/admin-free-credit",
+  checkAuthMW,
+  checkAdminMW,
+  adminCreditLoyaltyPointsValidation,
+  adminCreditOwnLoyaltyPointsController,
+);
+
+router.get(
+  "/loyalty-points/monthly-awarded",
+  getMonthlyLoyaltyPointsAwardedController,
 );
 
 router.get(

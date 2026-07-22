@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
+import { useAuthSession } from "../../../entities/user/model/useAuthSession.js";
 import { useRaffleMutations } from "../../../entities/raffle/model/useRaffleMutations.js";
 import { syncRafflesStaffQueueCaches } from "../../../widgets/app-shell/lib/staffBadgeQueryCache.js";
 import { raffleQueryKeys } from "../../../entities/raffle/model/raffleQueryKeys.js";
@@ -11,9 +12,14 @@ import {
   API_CLIENT_UI,
   RAFFLE_MANAGE_UI,
   RAFFLES_STAFF_PAGE_UI,
+  USERS_LOYALTY_RAFFLE_ADMIN_UI,
 } from "../../../shared/config/appUiCopy.js";
+import { UsersLoyaltyRaffleAdminPanel } from "./UsersLoyaltyRaffleAdminPanel.jsx";
 
 import "./RafflesStaffPage.css";
+
+const TAB_MODERATION = "moderation";
+const TAB_USERS_RAFFLE = "users-raffle";
 
 /**
  * @param {{
@@ -23,8 +29,11 @@ import "./RafflesStaffPage.css";
  */
 export function RafflesStaffPage({ onQueueChanged, onEditRaffle }) {
   const queryClient = useQueryClient();
+  const { user } = useAuthSession();
+  const isAdmin = user?.userRole === "admin";
   const { approveMutation, rejectMutation, deleteStaffMutation } = useRaffleMutations();
   const queueQuery = useStaffRafflesQueueQuery();
+  const [activeTabId, setActiveTabId] = useState(TAB_MODERATION);
   const [pendingId, setPendingId] = useState(null);
   const [rowErrors, setRowErrors] = useState(
     /** @type {Record<string, string>} */ ({}),
@@ -32,6 +41,19 @@ export function RafflesStaffPage({ onQueueChanged, onEditRaffle }) {
   const [clearedLiveRaffleId, setClearedLiveRaffleId] = useState(
     /** @type {string | null} */ (null),
   );
+
+  const tabs = useMemo(
+    () =>
+      isAdmin
+        ? [
+            { id: TAB_MODERATION, label: USERS_LOYALTY_RAFFLE_ADMIN_UI.TAB_MODERATION },
+            { id: TAB_USERS_RAFFLE, label: USERS_LOYALTY_RAFFLE_ADMIN_UI.TAB_USERS_RAFFLE },
+          ]
+        : [{ id: TAB_MODERATION, label: USERS_LOYALTY_RAFFLE_ADMIN_UI.TAB_MODERATION }],
+    [isAdmin],
+  );
+
+  const showUsersRaffleTab = isAdmin && activeTabId === TAB_USERS_RAFFLE;
 
   const raffles = queueQuery.data?.pendingRaffles ?? [];
   const liveRaffleFromQuery = queueQuery.data?.liveRaffle ?? null;
@@ -126,11 +148,11 @@ export function RafflesStaffPage({ onQueueChanged, onEditRaffle }) {
     }
   };
 
-  if (queueQuery.isPending) {
+  if (!showUsersRaffleTab && queueQuery.isPending) {
     return <p className="raffles-staff-page__state">{RAFFLES_STAFF_PAGE_UI.LOADING}</p>;
   }
 
-  if (queueQuery.isError) {
+  if (!showUsersRaffleTab && queueQuery.isError) {
     const message =
       queueQuery.error instanceof Error
         ? queueQuery.error.message
@@ -149,127 +171,158 @@ export function RafflesStaffPage({ onQueueChanged, onEditRaffle }) {
 
   return (
     <div className="raffles-staff-page">
-      {liveRaffle ? (
-        <section className="raffles-staff-page__live">
-          <h3 className="raffles-staff-page__live-title">
-            {RAFFLE_MANAGE_UI.LIVE_SECTION_TITLE}
-          </h3>
-          <div className="raffles-staff-page__row raffles-staff-page__row_live">
-            <div className="raffles-staff-page__row-main">
-              <RafflePrizeMedia
-                raffle={liveRaffle}
-                className="raffles-staff-page__thumb"
-                imageClassName="raffles-staff-page__thumb"
-                videoClassName="raffles-staff-page__thumb raffles-staff-page__thumb_video"
-              />
-              <div>
-                <p className="raffles-staff-page__title">{liveRaffle.title}</p>
-                <p className="raffles-staff-page__meta">
-                  {RAFFLES_STAFF_PAGE_UI.ROW_SELLER}:{" "}
-                  {liveRaffle.seller?.userName ?? "—"}
-                </p>
-                <p className="raffles-staff-page__meta">
-                  {RAFFLES_STAFF_PAGE_UI.ROW_TARGET}: {liveRaffle.targetSales}
-                  {liveRaffle.status === "active" || liveRaffle.status === "completed"
-                    ? ` · ${liveRaffle.salesProgress} / ${liveRaffle.targetSales}`
-                    : ""}
-                </p>
-              </div>
-            </div>
-            {rowErrors[liveRaffle._id] ? (
-              <p className="raffles-staff-page__row-error" role="alert">
-                {rowErrors[liveRaffle._id]}
-              </p>
-            ) : null}
-            <RaffleManageActions
-              className="raffles-staff-page__manage"
-              showEdit={Boolean(onEditRaffle)}
-              showDelete
-              onEdit={onEditRaffle ? () => onEditRaffle(liveRaffle) : undefined}
-              onDelete={() => void handleDelete(liveRaffle._id, { clearLive: true })}
-              busy={liveBusy}
-            />
-          </div>
-        </section>
+      {tabs.length > 1 ? (
+        <div className="raffles-staff-page__tabs" role="tablist" aria-label={RAFFLES_STAFF_PAGE_UI.TITLE}>
+          {tabs.map((tab) => {
+            const isActive = tab.id === activeTabId;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                className={[
+                  "raffles-staff-page__tab",
+                  isActive && "raffles-staff-page__tab_active",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                onClick={() => setActiveTabId(tab.id)}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
       ) : null}
 
-      <h3 className="raffles-staff-page__queue-title">
-        {RAFFLES_STAFF_PAGE_UI.QUEUE_TITLE}
-      </h3>
-
-      {raffles.length === 0 ? (
-        <p className="raffles-staff-page__state">{RAFFLES_STAFF_PAGE_UI.EMPTY}</p>
+      {showUsersRaffleTab ? (
+        <UsersLoyaltyRaffleAdminPanel />
       ) : (
-        <ul className="raffles-staff-page__list">
-          {raffles.map((raffle) => {
-            const busy = pendingId === raffle._id;
-            return (
-              <li key={raffle._id} className="raffles-staff-page__row">
+        <>
+          {liveRaffle ? (
+            <section className="raffles-staff-page__live">
+              <h3 className="raffles-staff-page__live-title">
+                {RAFFLE_MANAGE_UI.LIVE_SECTION_TITLE}
+              </h3>
+              <div className="raffles-staff-page__row raffles-staff-page__row_live">
                 <div className="raffles-staff-page__row-main">
                   <RafflePrizeMedia
-                    raffle={raffle}
+                    raffle={liveRaffle}
                     className="raffles-staff-page__thumb"
                     imageClassName="raffles-staff-page__thumb"
                     videoClassName="raffles-staff-page__thumb raffles-staff-page__thumb_video"
                   />
                   <div>
-                    <p className="raffles-staff-page__title">{raffle.title}</p>
+                    <p className="raffles-staff-page__title">{liveRaffle.title}</p>
                     <p className="raffles-staff-page__meta">
                       {RAFFLES_STAFF_PAGE_UI.ROW_SELLER}:{" "}
-                      {raffle.seller?.userName ?? "—"}
+                      {liveRaffle.seller?.userName ?? "—"}
                     </p>
                     <p className="raffles-staff-page__meta">
-                      {RAFFLES_STAFF_PAGE_UI.ROW_TARGET}: {raffle.targetSales}
+                      {RAFFLES_STAFF_PAGE_UI.ROW_TARGET}: {liveRaffle.targetSales}
+                      {liveRaffle.status === "active" || liveRaffle.status === "completed"
+                        ? ` · ${liveRaffle.salesProgress} / ${liveRaffle.targetSales}`
+                        : ""}
                     </p>
                   </div>
                 </div>
-                {rowErrors[raffle._id] ? (
+                {rowErrors[liveRaffle._id] ? (
                   <p className="raffles-staff-page__row-error" role="alert">
-                    {rowErrors[raffle._id]}
+                    {rowErrors[liveRaffle._id]}
                   </p>
                 ) : null}
-                <div className="raffles-staff-page__actions">
-                  <button
-                    type="button"
-                    className="app-btn app-btn--primary"
-                    disabled={busy}
-                    onClick={() => void handleApprove(raffle._id)}
-                  >
-                    {busy
-                      ? RAFFLES_STAFF_PAGE_UI.PENDING
-                      : RAFFLES_STAFF_PAGE_UI.APPROVE}
-                  </button>
-                  <button
-                    type="button"
-                    className="raffles-staff-page__reject"
-                    disabled={busy}
-                    onClick={() => void handleReject(raffle._id)}
-                  >
-                    {RAFFLES_STAFF_PAGE_UI.REJECT}
-                  </button>
-                  {onEditRaffle ? (
-                    <button
-                      type="button"
-                      className="raffles-staff-page__edit"
-                      disabled={busy}
-                      onClick={() => onEditRaffle(raffle)}
-                    >
-                      {RAFFLES_STAFF_PAGE_UI.EDIT}
-                    </button>
-                  ) : null}
-                  <button
-                    type="button"
-                    className="raffles-staff-page__delete"
-                    disabled={busy}
-                    onClick={() => void handleDelete(raffle._id)}
-                  >
-                    {RAFFLES_STAFF_PAGE_UI.DELETE}
-                  </button>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+                <RaffleManageActions
+                  className="raffles-staff-page__manage"
+                  showEdit={Boolean(onEditRaffle)}
+                  showDelete
+                  onEdit={onEditRaffle ? () => onEditRaffle(liveRaffle) : undefined}
+                  onDelete={() => void handleDelete(liveRaffle._id, { clearLive: true })}
+                  busy={liveBusy}
+                />
+              </div>
+            </section>
+          ) : null}
+
+          <h3 className="raffles-staff-page__queue-title">
+            {RAFFLES_STAFF_PAGE_UI.QUEUE_TITLE}
+          </h3>
+
+          {raffles.length === 0 ? (
+            <p className="raffles-staff-page__state">{RAFFLES_STAFF_PAGE_UI.EMPTY}</p>
+          ) : (
+            <ul className="raffles-staff-page__list">
+              {raffles.map((raffle) => {
+                const busy = pendingId === raffle._id;
+                return (
+                  <li key={raffle._id} className="raffles-staff-page__row">
+                    <div className="raffles-staff-page__row-main">
+                      <RafflePrizeMedia
+                        raffle={raffle}
+                        className="raffles-staff-page__thumb"
+                        imageClassName="raffles-staff-page__thumb"
+                        videoClassName="raffles-staff-page__thumb raffles-staff-page__thumb_video"
+                      />
+                      <div>
+                        <p className="raffles-staff-page__title">{raffle.title}</p>
+                        <p className="raffles-staff-page__meta">
+                          {RAFFLES_STAFF_PAGE_UI.ROW_SELLER}:{" "}
+                          {raffle.seller?.userName ?? "—"}
+                        </p>
+                        <p className="raffles-staff-page__meta">
+                          {RAFFLES_STAFF_PAGE_UI.ROW_TARGET}: {raffle.targetSales}
+                        </p>
+                      </div>
+                    </div>
+                    {rowErrors[raffle._id] ? (
+                      <p className="raffles-staff-page__row-error" role="alert">
+                        {rowErrors[raffle._id]}
+                      </p>
+                    ) : null}
+                    <div className="raffles-staff-page__actions">
+                      <button
+                        type="button"
+                        className="app-btn app-btn--primary"
+                        disabled={busy}
+                        onClick={() => void handleApprove(raffle._id)}
+                      >
+                        {busy
+                          ? RAFFLES_STAFF_PAGE_UI.PENDING
+                          : RAFFLES_STAFF_PAGE_UI.APPROVE}
+                      </button>
+                      <button
+                        type="button"
+                        className="raffles-staff-page__reject"
+                        disabled={busy}
+                        onClick={() => void handleReject(raffle._id)}
+                      >
+                        {RAFFLES_STAFF_PAGE_UI.REJECT}
+                      </button>
+                      {onEditRaffle ? (
+                        <button
+                          type="button"
+                          className="raffles-staff-page__edit"
+                          disabled={busy}
+                          onClick={() => onEditRaffle(raffle)}
+                        >
+                          {RAFFLES_STAFF_PAGE_UI.EDIT}
+                        </button>
+                      ) : null}
+                      <button
+                        type="button"
+                        className="raffles-staff-page__delete"
+                        disabled={busy}
+                        onClick={() => void handleDelete(raffle._id)}
+                      >
+                        {RAFFLES_STAFF_PAGE_UI.DELETE}
+                      </button>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </>
       )}
     </div>
   );

@@ -432,9 +432,6 @@ export const useCartLineItemStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
   },
-  removeIcon: {
-    color: theme.colors.textMuted,
-  },
   stepperWrap: {
     flex: 1,
     alignItems: "center",

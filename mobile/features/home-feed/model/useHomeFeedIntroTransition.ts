@@ -104,7 +104,8 @@ export const useHomeFeedIntroTransition = ({
   const [backdropPlaybackActive, setBackdropPlaybackActive] = useState(introBackdropEnabled);
 
   const applyScrollEnabledFromMode = useCallback((nextMode: number) => {
-    setScrollEnabled(nextMode >= 0.5);
+    const nextEnabled = nextMode >= 0.5;
+    setScrollEnabled((prev) => (prev === nextEnabled ? prev : nextEnabled));
   }, []);
 
   useEffect(() => {

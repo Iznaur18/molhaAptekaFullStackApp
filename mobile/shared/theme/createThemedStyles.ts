@@ -9,6 +9,8 @@ type NamedStyles<T> = { [P in keyof T]: ViewStyle | TextStyle | ImageStyle };
 export const createThemedStyles = <T extends NamedStyles<T>>(factory: (theme: IzTheme) => T) => {
   return function useThemedStyles(): T {
     const theme = useAppTheme();
-    return useMemo(() => StyleSheet.create(factory(theme)), [theme]);
+    // `factory` в deps: после Fast Refresh модуляля стилей старые StyleSheet id
+    // иначе остаются в useMemo и Text падает с "Cannot read property 'color' of undefined".
+    return useMemo(() => StyleSheet.create(factory(theme)), [theme, factory]);
   };
 };

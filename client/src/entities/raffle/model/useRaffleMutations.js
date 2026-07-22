@@ -9,11 +9,13 @@ import { patchRaffleByStaff } from "../api/patchRaffleByStaff.js";
 import { pauseMyRaffle } from "../api/pauseMyRaffle.js";
 import { rejectRaffle } from "../api/rejectRaffle.js";
 import { setProductRaffleParticipation } from "../api/setProductRaffleParticipation.js";
+import { loyaltyPointsQueryKeys } from "../../../entities/user/model/loyaltyPointsQueryKeys.js";
 import {
   invalidateAllRaffleQueries,
   invalidateMyRaffle,
   invalidateStaffRafflesQueue,
 } from "../lib/raffleQueryCache.js";
+import { raffleQueryKeys } from "./raffleQueryKeys.js";
 
 export function useRaffleMutations() {
   const queryClient = useQueryClient();
@@ -42,9 +44,11 @@ export function useRaffleMutations() {
   });
 
   const deleteMyMutation = useMutation({
-    mutationFn: (raffleId) => deleteMyRaffle(raffleId),
+    mutationFn: deleteMyRaffle,
     onSuccess: () => {
       void invalidateMyRaffle(queryClient);
+      void queryClient.invalidateQueries({ queryKey: raffleQueryKeys.createAdvertising() });
+      void queryClient.invalidateQueries({ queryKey: loyaltyPointsQueryKeys.all });
       invalidateRaffles();
     },
   });

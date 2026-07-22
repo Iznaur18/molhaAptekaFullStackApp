@@ -117,7 +117,12 @@ export const API_CLIENT_UI = {
   PURCHASE_PREMIUM_FALLBACK: "Не удалось купить премиум",
   PREMIUM_PURCHASE_SUCCESS: "Премиум активирован",
   FETCH_LOYALTY_POINTS_STATUS_FALLBACK: "Не удалось загрузить раздел баллов",
+  FETCH_USERS_LOYALTY_RAFFLE_SETTINGS_FALLBACK:
+    "Не удалось загрузить настройки розыгрыша среди пользователей",
+  PATCH_USERS_LOYALTY_RAFFLE_SETTINGS_FALLBACK:
+    "Не удалось сохранить настройки розыгрыша среди пользователей",
   PURCHASE_LOYALTY_POINTS_FALLBACK: "Не удалось купить баллы",
+  ADMIN_FREE_CREDIT_LOYALTY_POINTS_FALLBACK: "Не удалось начислить баллы",
   LOYALTY_POINTS_PURCHASE_SUCCESS: "Баллы зачислены",
   SUBMIT_PRICE_OFFER_FALLBACK: "Не удалось отправить предложение цены",
   FETCH_PRICE_OFFER_FALLBACK: "Не удалось загрузить предложение цены",
@@ -148,6 +153,9 @@ export const API_CLIENT_UI = {
   FETCH_RAFFLE_PRODUCTS_FALLBACK: "Не удалось загрузить товары розыгрыша",
   CREATE_RAFFLE_FALLBACK: "Не удалось создать розыгрыш",
   FETCH_MY_RAFFLE_FALLBACK: "Не удалось загрузить ваш розыгрыш",
+  FETCH_RAFFLE_CREATE_ADVERTISING_FALLBACK: "Не удалось загрузить услугу «Розыгрыш»",
+  UNLOCK_RAFFLE_CREATE_FALLBACK: "Не удалось оплатить создание розыгрыша",
+  CANCEL_RAFFLE_CREATE_FALLBACK: "Не удалось отменить создание розыгрыша",
   PATCH_RAFFLE_FALLBACK: "Не удалось сохранить розыгрыш",
   DELETE_RAFFLE_FALLBACK: "Не удалось удалить розыгрыш",
   FETCH_CATEGORY_DISPLAYS_FALLBACK: "Не удалось загрузить категории",
@@ -635,9 +643,13 @@ export const INTRO_AD_MODERATION_PAGE_UI = {
   SECTION_FILTER_INTRO: "Intro",
   SECTION_FILTER_BANNER: "Баннер",
   SECTION_FILTER_PERSONAL: "Личные",
+  SECTION_FILTER_RAFFLE: "Розыгрыш",
+  SECTION_FILTER_USERS_RAFFLE: "Среди пользователей",
   OVERVIEW_PENDING: "На модерации",
   OVERVIEW_INTRO: "Intro",
   OVERVIEW_BANNER: "Баннер",
+  OVERVIEW_RAFFLE: "Розыгрыш",
+  OVERVIEW_USERS_RAFFLE: "Среди пользователей",
   OVERVIEW_ATTENTION: "Нужно действие",
   EXPAND_ALL: "Развернуть все",
   COLLAPSE_ALL: "Свернуть все",
@@ -677,7 +689,7 @@ export const INTRO_AD_MODERATION_PAGE_UI = {
 export const ADVERTISING_PAGE_UI = {
   PAGE_TITLE: "Реклама",
   PAGE_LEAD:
-    "Продвигайте магазин через intro-ролик, баннер в шапке и личную плитку в каталоге. Оплата баллами лояльности.",
+    "Продвигайте магазин через intro-ролик, баннер в шапке, личную плитку в каталоге и розыгрыш. Оплата баллами лояльности.",
   /** @param {number} balance */
   BALANCE: (balance) => `${balance} баллов`,
   BALANCE_LABEL: "Баланс",
@@ -733,6 +745,32 @@ export const SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI = {
   CANCEL: "Отменить заявку",
   PREVIEW: "Предпросмотр",
   OPEN_FORM: "Оформить баннер",
+};
+
+/** Создание розыгрыша (вкладка «Реклама») */
+export const RAFFLE_ADVERTISING_PAGE_UI = {
+  CARD_TITLE: "Розыгрыш",
+  CARD_BADGE: "цель",
+  LOADING: "Загрузка…",
+  FETCH_FALLBACK: "Не удалось загрузить услугу «Розыгрыш»",
+  UNLOCK_FALLBACK: "Не удалось оплатить создание розыгрыша",
+  UNLOCK_SUCCESS: "Баллы зарезервированы. Заполните розыгрыш.",
+  DESCRIPTION:
+    "Создайте розыгрыш для своих товаров. После оплаты 3000 баллов откроется форма заявки. После модерации розыгрыш появится на витрине. При отклонении баллы возвращаются.",
+  /** @param {number} price */
+  PRICE: (price) => `${price} баллов`,
+  COST_LABEL: "Стоимость",
+  MODERATION_LABEL: "Модерация",
+  MODERATION_VALUE: "Обязательна",
+  STATUS_PENDING: "На модерации.",
+  STATUS_ACTIVE: "Розыгрыш активен.",
+  STATUS_PAUSED: "Розыгрыш на паузе.",
+  PAY_AND_CREATE: "Оплатить 3000 баллов",
+  /** @param {number} price */
+  PAY_AND_CREATE_WITH_PRICE: (price) => `Оплатить ${price} баллов`,
+  CONTINUE_CREATE: "Заполнить розыгрыш",
+  INSUFFICIENT_POINTS: "Недостаточно баллов для оплаты.",
+  DATA_CONFIRMATION_REQUIRED: "Подтвердите данные профиля, чтобы создать розыгрыш.",
 };
 
 /** Модерация баннера в шапке (вкладка intro-ad-moderation) */
@@ -811,6 +849,13 @@ export const SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI = {
   REJECT_REASON_PLACEHOLDER: "Комментарий для продавца…",
   APPROVE: "Одобрить",
   REJECT: "Отклонить",
+  MANAGED_TITLE: "Личные категории — опубликованы",
+  STATUS_ACTIVE: "Активна",
+  STAFF_UNPUBLISH: "Снять с публикации",
+  STAFF_DELETE: "Удалить",
+  STAFF_UNPUBLISH_FALLBACK: "Не удалось снять категорию",
+  STAFF_DELETE_FALLBACK: "Не удалось удалить категорию",
+  MANAGED_FETCH_FALLBACK: "Не удалось загрузить опубликованные категории",
   FETCH_FALLBACK: "Не удалось загрузить очередь личных категорий",
   APPROVE_FALLBACK: "Не удалось одобрить заявку",
   REJECT_FALLBACK: "Не удалось отклонить заявку",
@@ -1737,6 +1782,11 @@ export const CREATE_RAFFLE_MODAL_UI = {
   BTN_NEXT: "Далее",
   BTN_BACK: "Назад",
   BTN_CANCEL: "Отмена",
+  CANCEL_CREATE_TITLE: "Отменить создание?",
+  CANCEL_CREATE_MESSAGE: (pricePoints) =>
+    `Зарезервированные ${pricePoints} баллов разблокируются. Введённые данные не сохранятся.`,
+  CANCEL_CREATE_CONFIRM: "Отменить",
+  CANCEL_CREATE_SUCCESS: "Создание отменено. Баллы разблокированы.",
   DISCARD_TITLE: "Сбросить создание?",
   DISCARD_MESSAGE: "Введённые данные не сохранятся.",
   DISCARD_CONFIRM: "Сбросить",
@@ -1745,6 +1795,8 @@ export const CREATE_RAFFLE_MODAL_UI = {
     `У вас уже есть розыгрыш «${title}» на модерации. Новый нельзя отправить, пока не отзовёте текущий.`,
   EXISTING_IN_PROGRESS: (title) =>
     `У вас уже есть розыгрыш «${title}» в работе. Новый создать нельзя, пока текущий не завершится.`,
+  UNLOCK_REQUIRED: "Сначала оплатите создание розыгрыша в разделе «Реклама».",
+  GO_TO_ADVERTISING: "Перейти в «Рекламу»",
   BTN_WITHDRAW: "Отозвать с модерации",
   WITHDRAW_CONFIRM_TITLE: "Отозвать заявку?",
   WITHDRAW_CONFIRM: "Розыгрыш будет удалён с модерации. Восстановить нельзя.",
@@ -1792,12 +1844,8 @@ export const SITE_HEADER_BANNER_UI = {
 };
 
 export const RAFFLE_FEATURED_CAROUSEL_UI = {
-  PREV: "Предыдущий розыгрыш",
-  NEXT: "Следующий розыгрыш",
   SHOW: "Открыть розыгрыш",
-  HIDE: "Скрыть розыгрыш",
-  /** @param {number} index @param {number} total */
-  SLIDE_ARIA: (index, total) => `Слайд ${index} из ${total}`,
+  SECTION_ARIA: "Розыгрыши",
   AUTOPLAY_MS: 6000,
 };
 
@@ -1806,14 +1854,17 @@ export const RAFFLE_FEATURED_BANNER_UI = {
   /** @param {number} progress @param {number} target */
   PROGRESS: (progress, target) => `${progress} / ${target} продаж`,
   REMAINING: (left) => `Осталось ${left}`,
+  STAT_GOAL: "Цель",
+  STAT_SOLD: "Продано",
+  STAT_PARTICIPANTS: "Участники",
+  /** @param {number} sold @param {number} target */
+  STAT_SOLD_VALUE: (sold, target) => `${sold} из ${target}`,
   COMPLETED: "Завершён",
+  WINNER_TITLE: "Победитель розыгрыша",
+  WINNER_FALLBACK_NAME: "Пользователь",
+  WINNER_OPEN_PROFILE_ARIA: (userName) => `Открыть профиль ${userName}`,
   OPEN_PRODUCTS: "Товары розыгрыша",
   OPEN_INSTAGRAM: "Итоги в Instagram",
-  DESCRIPTION_LINK: "Описание",
-  DESCRIPTION_MODAL_TITLE: "Описание",
-  DESCRIPTION_OPEN_ARIA: "Открыть полное описание розыгрыша",
-  INFO_TOGGLE_OPEN_ARIA: "Показать название и описание розыгрыша",
-  INFO_TOGGLE_CLOSE_ARIA: "Скрыть название и описание розыгрыша",
   CLOSE: "Закрыть",
 };
 
@@ -1865,6 +1916,19 @@ export const RAFFLES_STAFF_PAGE_UI = {
   TAB_BADGE: (count) => (count > 99 ? "99+" : String(count)),
   ROW_SELLER: "Продавец",
   ROW_TARGET: "Цель",
+};
+
+export const USERS_LOYALTY_RAFFLE_ADMIN_UI = {
+  TAB_MODERATION: "Модерация",
+  TAB_USERS_RAFFLE: "Среди пользователей",
+  TITLE: "Розыгрыш среди пользователей",
+  DESCRIPTION_LABEL: "Описание",
+  DESCRIPTION_PLACEHOLDER: "Текст под прогресс-баром на странице пользователей",
+  GOAL_LABEL: "Цель баллов",
+  SAVE: "Сохранить",
+  SAVING: "Сохраняем…",
+  SAVED: "Сохранено",
+  LOADING: "Загрузка…",
 };
 
 export const RAFFLE_PRODUCTS_PAGE_UI = {
@@ -2058,6 +2122,18 @@ export const LOYALTY_POINTS_PAGE_UI = {
   /** @param {number} rub @param {number} points */
   COMING_SOON_AMOUNT: (rub, points) =>
     `Пополнение на ${rub} ₽ (${points} баллов) картой и по QR — скоро.`,
+  ADMIN_FREE_SECTION: "Бесплатное пополнение (admin)",
+  ADMIN_FREE_AMOUNT_LABEL: "Сумма, баллы",
+  ADMIN_FREE_AMOUNT_HINT: "Начислить на свой баланс без оплаты.",
+  /** @param {number} min */
+  ADMIN_FREE_AMOUNT_MIN: (min) => `Минимум ${min}`,
+  /** @param {number} max */
+  ADMIN_FREE_AMOUNT_MAX: (max) => `Не больше ${max}`,
+  ADMIN_FREE_SUBMIT: "Начислить бесплатно",
+  ADMIN_FREE_SUBMITTING: "Начисление…",
+  /** @param {number} credited @param {number} balance */
+  ADMIN_FREE_SUCCESS: (credited, balance) =>
+    `Начислено ${credited}. Баланс: ${balance}`,
   USES: [
     "Оплата премиум-подписки",
     "Продвижение товаров в каталоге",

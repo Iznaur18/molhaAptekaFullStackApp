@@ -5,6 +5,9 @@ const VERTICAL_DRIFT_RATIO = 1.25;
 const SCROLL_DRIFT_TOLERANCE_PX = 12;
 const INTERACTIVE_SELECTOR =
   "input, textarea, select, button, a, label, [contenteditable='true']";
+/** Горизонтальный pager/галерея — свайп вправо листает фото, не закрывает экран. */
+const HORIZONTAL_SWIPE_IGNORE_SELECTOR =
+  ".product-media-horizontal-pager, .product-media-gallery-readonly, .product-media-gallery-readonly__hero";
 
 /**
  * @param {import("react").RefObject<HTMLElement | null>} containerRef
@@ -48,6 +51,10 @@ export function useSwipeRightToDismiss(
 
       const target = /** @type {Element | null} */ (event.target);
       if (target?.closest(INTERACTIVE_SELECTOR)) {
+        resetTouchStart();
+        return;
+      }
+      if (target?.closest(HORIZONTAL_SWIPE_IGNORE_SELECTOR)) {
         resetTouchStart();
         return;
       }

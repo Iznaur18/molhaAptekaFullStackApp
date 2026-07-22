@@ -12,6 +12,7 @@ type SummarizeIntroAdModerationHubInput = {
   introPending?: PendingCampaign[];
   bannerPending?: PendingCampaign[];
   personalPending?: PendingCampaign[];
+  rafflePendingCount?: number;
 };
 
 export const summarizeIntroAdModerationHub = (
@@ -19,6 +20,7 @@ export const summarizeIntroAdModerationHub = (
     introPending = [],
     bannerPending = [],
     personalPending = [],
+    rafflePendingCount = 0,
   }: SummarizeIntroAdModerationHubInput,
   nowMs = Date.now(),
 ) => {
@@ -32,10 +34,11 @@ export const summarizeIntroAdModerationHub = (
   }
 
   return {
-    pendingTotal: allPending.length,
+    pendingTotal: allPending.length + rafflePendingCount,
     introPendingCount: introPending.length,
     bannerPendingCount: bannerPending.length,
     personalPendingCount: personalPending.length,
+    rafflePendingCount,
     attentionCount,
     staleCount: allPending.filter((campaign) => campaignModerationIsStale(campaign, nowMs)).length,
   };

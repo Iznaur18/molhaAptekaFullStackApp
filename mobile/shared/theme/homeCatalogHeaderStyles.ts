@@ -22,6 +22,7 @@ import {
   HOME_CATALOG_HEADER_USERS_STRETCH_ITEM_GAP,
   HOME_CATALOG_HEADER_USERS_STRETCH_TOGGLE_GAP,
 } from "@/shared/lib/homeCatalogHeaderLayout";
+import { MOBILE_BOTTOM_NAV_BORDER_RADIUS } from "@/shared/lib/mobileBottomNavLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 const panelShadowStyle =
@@ -37,11 +38,11 @@ const panelShadowStyle =
 export const useHomeCatalogHeaderStyles = createThemedStyles((theme) => ({
   panel: {
     position: "relative",
-    overflow: "visible",
+    overflow: "hidden",
     marginBottom: HOME_CATALOG_HEADER_BOTTOM_MARGIN,
     paddingHorizontal: HOME_CATALOG_HEADER_PANEL_PADDING.horizontal,
     paddingBottom: HOME_CATALOG_HEADER_PANEL_PADDING.bottom,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: HOME_CATALOG_HEADER_PANEL_BORDER_COLOR,
     borderTopLeftRadius: 0,
     borderTopRightRadius: 0,
@@ -50,7 +51,16 @@ export const useHomeCatalogHeaderStyles = createThemedStyles((theme) => ({
     backgroundColor: "transparent",
     ...panelShadowStyle,
   },
+  /** Floating overlay: pill как у bottom nav (`borderRadius: 999`). */
+  panelFloating: {
+    borderRadius: MOBILE_BOTTOM_NAV_BORDER_RADIUS,
+    borderTopLeftRadius: MOBILE_BOTTOM_NAV_BORDER_RADIUS,
+    borderTopRightRadius: MOBILE_BOTTOM_NAV_BORDER_RADIUS,
+    borderBottomLeftRadius: MOBILE_BOTTOM_NAV_BORDER_RADIUS,
+    borderBottomRightRadius: MOBILE_BOTTOM_NAV_BORDER_RADIUS,
+  },
   panelFlatSheet: {
+    overflow: "visible",
     borderWidth: 0,
     borderColor: "transparent",
     marginBottom: 0,

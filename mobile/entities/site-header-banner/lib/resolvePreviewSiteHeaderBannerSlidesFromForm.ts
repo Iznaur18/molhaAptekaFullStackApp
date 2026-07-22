@@ -3,7 +3,7 @@ import type { SiteHeaderBannerSlide } from "@/entities/site-header-banner/model/
 import type { SiteHeaderBannerAdminForm } from "./siteHeaderBannerAdminForm";
 
 export const resolvePreviewSiteHeaderBannerSlidesFromForm = (
-  form: SiteHeaderBannerAdminForm,
+  form: Pick<SiteHeaderBannerAdminForm, "enabled" | "items">,
 ): SiteHeaderBannerSlide[] => {
   if (!form.enabled) {
     return [];

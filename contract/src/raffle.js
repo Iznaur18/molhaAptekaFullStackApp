@@ -17,6 +17,9 @@ export const RAFFLE_PRIZE_MEDIA_TYPES = [
 ];
 export const RAFFLE_REJECT_COMMENT_MAX_CHARS = 2000;
 
+/** Стоимость создания розыгрыша (оплата баллами до формы). */
+export const RAFFLE_CREATE_PRICE_POINTS = 3_000;
+
 /**
  * @param {unknown} value
  */

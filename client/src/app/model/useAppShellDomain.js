@@ -92,9 +92,7 @@ export function useAppShellDomain(
     setIsSellerProductsLimitModalOpen: shell.setIsSellerProductsLimitModalOpen,
     setIsCreateProductModalOpen: shell.setIsCreateProductModalOpen,
     setProductToEdit: shell.setProductToEdit,
-    setCatalogProductDetails: shell.setCatalogProductDetails,
     setProductDetailsAdminError: shell.setProductDetailsAdminError,
-    catalogProductDetails: shell.catalogProductDetails,
     isMineMode: catalogLoader.isMineMode,
     showHiddenCatalogProducts: catalogLoader.showHiddenCatalogProducts,
     selectedProductCategory: catalogLoader.selectedProductCategory,
@@ -114,14 +112,6 @@ export function useAppShellDomain(
   });
 
   const catalogProductDetailsState = useHomeCatalogProductDetails({
-    isAuthorized: shell.isAuthorized,
-    currentUserId: shell.currentUserId,
-    isAdmin: shell.isAdmin,
-    isMineMode: catalogLoader.isMineMode,
-    products: catalogLoader.products,
-    catalogProductDetails: shell.catalogProductDetails,
-    setCatalogProductDetails: shell.setCatalogProductDetails,
-    setProductDetailsAdminError: shell.setProductDetailsAdminError,
     onBeforeOpenDetails: () => {
       shell.setProductToEdit(null);
       shell.setIsCreateProductModalOpen(false);
@@ -134,8 +124,6 @@ export function useAppShellDomain(
     goToMainView: shell.goToMainView,
     setIsLoginModalOpen: shell.setIsLoginModalOpen,
     handleSellerNameClick: shell.handleSellerNameClick,
-    products: catalogLoader.products,
-    setCatalogProductDetails: shell.setCatalogProductDetails,
     inAppNotifications: shell.inAppNotifications,
     invalidateAuthMe: shell.invalidateAuthMe,
     patchAuthMeNotifications: shell.patchAuthMeNotifications,

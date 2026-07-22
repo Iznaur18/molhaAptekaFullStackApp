@@ -62,8 +62,11 @@ test("profile staff web paths: product-moderation stays in-app", () => {
   assert.equal(isProfileStaffWebOnlySection(PROFILE_SECTION_PRODUCT_MODERATION), false);
 });
 
-test("profile staff web paths: create-raffle stays in-app on mobile", () => {
-  assert.ok(PROFILE_STAFF_IN_APP_SECTION_IDS.includes(PROFILE_SECTION_CREATE_RAFFLE));
+test("profile staff web paths: create-raffle opens via hub, not staff nav", () => {
+  assert.equal(
+    PROFILE_STAFF_SECTION_ORDER.includes(PROFILE_SECTION_CREATE_RAFFLE),
+    false,
+  );
   assert.equal(isProfileStaffWebOnlySection(PROFILE_SECTION_CREATE_RAFFLE), false);
 });
 

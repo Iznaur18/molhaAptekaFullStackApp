@@ -1,5 +1,4 @@
-import MaskedView from "@react-native-masked-view/masked-view";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import {
   Platform,
   View,
@@ -8,9 +7,7 @@ import {
   type ViewProps,
   type ViewStyle,
 } from "react-native";
-import Svg, { Path } from "react-native-svg";
 
-import { getSquircleSvgPath } from "@/shared/lib/squircle/getSquircleSvgPath";
 import { resolveSquircleRadius } from "@/shared/lib/squircle/resolveSquircleRadius";
 
 export type SquircleCornerRadii = {
@@ -58,48 +55,20 @@ const buildOuterRadiusStyle = (corners: SquircleCornerRadii): ViewStyle => ({
   ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
 });
 
-const buildIosSquircleStyle = (corners: SquircleCornerRadii): ViewStyle => ({
-  borderTopLeftRadius: corners.topLeft,
-  borderTopRightRadius: corners.topRight,
-  borderBottomLeftRadius: corners.bottomLeft,
-  borderBottomRightRadius: corners.bottomRight,
-  borderCurve: "continuous",
-  overflow: "hidden",
-  position: "relative",
-});
-
-const buildFallbackRadiusStyle = (corners: SquircleCornerRadii): ViewStyle => ({
+const buildClipStyle = (corners: SquircleCornerRadii): ViewStyle => ({
   borderTopLeftRadius: corners.topLeft,
   borderTopRightRadius: corners.topRight,
   borderBottomLeftRadius: corners.bottomLeft,
   borderBottomRightRadius: corners.bottomRight,
   overflow: "hidden",
-  position: "relative",
+  ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
 });
 
-type SquircleMaskProps = {
-  width: number;
-  height: number;
-  corners: SquircleCornerRadii;
-};
-
-const SquircleMask = ({ width, height, corners }: SquircleMaskProps) => {
-  const path = getSquircleSvgPath({
-    width,
-    height,
-    topLeftCornerRadius: corners.topLeft,
-    topRightCornerRadius: corners.topRight,
-    bottomLeftCornerRadius: corners.bottomLeft,
-    bottomRightCornerRadius: corners.bottomRight,
-  });
-
-  return (
-    <Svg width={width} height={height}>
-      <Path d={path} fill="#000000" />
-    </Svg>
-  );
-};
-
+/**
+ * Скруглённый контейнер. На всех платформах — borderRadius + overflow.
+ * outerStyle всегда на отдельном слое: на Android overflow+absolute на одном View
+ * ломает клип углов (особенно планшеты).
+ */
 export const SquircleView = ({
   radius,
   cornerRadii: cornerRadiiProp,
@@ -111,87 +80,34 @@ export const SquircleView = ({
   ...rest
 }: SquircleViewProps) => {
   const corners = resolveCornerRadii(radius, cornerRadiiProp);
-  const [layout, setLayout] = useState({ width: 0, height: 0 });
+  const clipStyle = buildClipStyle(corners);
 
   const handleLayout = useCallback(
     (event: LayoutChangeEvent) => {
-      const { width, height } = event.nativeEvent.layout;
-      if (width > 0 && height > 0) {
-        setLayout({ width, height });
-      }
       onLayout?.(event);
     },
     [onLayout],
   );
 
-  const wrapperStyle: StyleProp<ViewStyle> = [
-    outerStyle,
-    shadowStyle ? buildOuterRadiusStyle(corners) : null,
-    shadowStyle,
-  ];
-
-  const clipStyle = Platform.OS === "ios" ? buildIosSquircleStyle(corners) : buildFallbackRadiusStyle(corners);
-
-  if (Platform.OS === "web") {
-    if (!shadowStyle) {
-      return (
-        <View style={[clipStyle, style, outerStyle]} {...rest}>
-          {children}
-        </View>
-      );
-    }
-
+  if (outerStyle != null || shadowStyle != null) {
     return (
-      <View style={wrapperStyle}>
+      <View
+        style={[
+          outerStyle,
+          shadowStyle != null ? [buildOuterRadiusStyle(corners), shadowStyle] : null,
+        ]}
+        onLayout={handleLayout}
+      >
         <View style={[clipStyle, style]} {...rest}>
           {children}
         </View>
       </View>
     );
   }
-
-  if (Platform.OS === "ios") {
-    if (!shadowStyle) {
-      return (
-        <View style={[clipStyle, style, outerStyle]} {...rest}>
-          {children}
-        </View>
-      );
-    }
-
-    return (
-      <View style={wrapperStyle}>
-        <View style={[clipStyle, style]} {...rest}>
-          {children}
-        </View>
-      </View>
-    );
-  }
-
-  const hasLayout = layout.width > 0 && layout.height > 0;
 
   return (
-    <View style={wrapperStyle} onLayout={handleLayout} {...rest}>
-      {hasLayout ? (
-        <MaskedView
-          style={[{ width: layout.width, height: layout.height }, style]}
-          maskElement={
-            <View
-              style={{
-                width: layout.width,
-                height: layout.height,
-                backgroundColor: "#000000",
-              }}
-            >
-              <SquircleMask width={layout.width} height={layout.height} corners={corners} />
-            </View>
-          }
-        >
-          <View style={{ width: layout.width, height: layout.height }}>{children}</View>
-        </MaskedView>
-      ) : (
-        <View style={style}>{children}</View>
-      )}
+    <View style={[clipStyle, style]} onLayout={handleLayout} {...rest}>
+      {children}
     </View>
   );
 };

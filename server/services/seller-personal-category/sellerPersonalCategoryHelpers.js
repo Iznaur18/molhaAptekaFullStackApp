@@ -5,6 +5,8 @@ import {
   SELLER_PERSONAL_CATEGORY_NOTIFICATION_KIND_REJECTED,
   SELLER_PERSONAL_CATEGORY_NOTIFICATION_KIND_REMINDER_1_DAY,
   SELLER_PERSONAL_CATEGORY_NOTIFICATION_KIND_REMINDER_1_HOUR,
+  SELLER_PERSONAL_CATEGORY_NOTIFICATION_KIND_CANCELLED_BY_STAFF,
+  SELLER_PERSONAL_CATEGORY_NOTIFICATION_KIND_DELETED_BY_STAFF,
   SELLER_PERSONAL_CATEGORY_OPEN_STATUSES,
   SELLER_PERSONAL_CATEGORY_REMINDER_1_DAY_MS,
   SELLER_PERSONAL_CATEGORY_REMINDER_1_HOUR_MS,
@@ -222,6 +224,28 @@ export const notifySellerPersonalCategoryExpired = async (campaign) => {
     userId: campaign.sellerId,
     kind: SELLER_PERSONAL_CATEGORY_NOTIFICATION_KIND_EXPIRED,
     message: `Срок личной категории «${campaign.labelRu}» истёк`,
+  });
+};
+
+/**
+ * @param {Record<string, unknown>} campaign
+ */
+export const notifySellerPersonalCategoryCancelledByStaff = async (campaign) => {
+  await createUserInAppNotification({
+    userId: campaign.sellerId,
+    kind: SELLER_PERSONAL_CATEGORY_NOTIFICATION_KIND_CANCELLED_BY_STAFF,
+    message: `Личная категория «${campaign.labelRu}» снята модератором с публикации`,
+  });
+};
+
+/**
+ * @param {Record<string, unknown>} campaign
+ */
+export const notifySellerPersonalCategoryDeletedByStaff = async (campaign) => {
+  await createUserInAppNotification({
+    userId: campaign.sellerId,
+    kind: SELLER_PERSONAL_CATEGORY_NOTIFICATION_KIND_DELETED_BY_STAFF,
+    message: `Личная категория «${campaign.labelRu}» удалена модератором`,
   });
 };
 

@@ -9,17 +9,42 @@ import {
 
 import { ADMIN_EDIT_MODAL_ANIMATION } from "@/shared/theme/modalChromeStyles";
 
-const { enterMs, exitMs, sheetSlideDistance } = ADMIN_EDIT_MODAL_ANIMATION;
+type UseSheetModalAnimationOptions = {
+  onDismissed?: () => void;
+  sheetSlideDistance?: number;
+  enterMs?: number;
+  exitMs?: number;
+};
 
-export const useAdminEditModalAnimation = (visible: boolean, onDismissed?: () => void) => {
+export const useAdminEditModalAnimation = (
+  visible: boolean,
+  onDismissedOrOptions?: (() => void) | UseSheetModalAnimationOptions,
+) => {
+  const options: UseSheetModalAnimationOptions =
+    typeof onDismissedOrOptions === "function"
+      ? { onDismissed: onDismissedOrOptions }
+      : (onDismissedOrOptions ?? {});
+
+  const enterMs = options.enterMs ?? ADMIN_EDIT_MODAL_ANIMATION.enterMs;
+  const exitMs = options.exitMs ?? ADMIN_EDIT_MODAL_ANIMATION.exitMs;
+  const slideDistance =
+    options.sheetSlideDistance ?? ADMIN_EDIT_MODAL_ANIMATION.sheetSlideDistance;
+
   const [modalVisible, setModalVisible] = useState(false);
   const backdropOpacity = useSharedValue(0);
-  const sheetTranslateY = useSharedValue<number>(sheetSlideDistance);
+  const sheetTranslateY = useSharedValue<number>(slideDistance);
   const wasVisibleRef = useRef(false);
   const modalVisibleRef = useRef(false);
-  const onDismissedRef = useRef(onDismissed);
-  onDismissedRef.current = onDismissed;
+  const onDismissedRef = useRef(options.onDismissed);
+  const slideDistanceRef = useRef(slideDistance);
+  const enterMsRef = useRef(enterMs);
+  const exitMsRef = useRef(exitMs);
+
+  onDismissedRef.current = options.onDismissed;
   modalVisibleRef.current = modalVisible;
+  slideDistanceRef.current = slideDistance;
+  enterMsRef.current = enterMs;
+  exitMsRef.current = exitMs;
 
   const finishClose = useCallback(() => {
     if (!modalVisibleRef.current) {
@@ -32,17 +57,20 @@ export const useAdminEditModalAnimation = (visible: boolean, onDismissed?: () =>
   useEffect(() => {
     const wasVisible = wasVisibleRef.current;
     wasVisibleRef.current = visible;
+    const distance = slideDistanceRef.current;
+    const enterDuration = enterMsRef.current;
+    const exitDuration = exitMsRef.current;
 
     if (visible && !wasVisible) {
       setModalVisible(true);
       backdropOpacity.value = 0;
-      sheetTranslateY.value = sheetSlideDistance;
+      sheetTranslateY.value = distance;
       backdropOpacity.value = withTiming(1, {
-        duration: enterMs,
+        duration: enterDuration,
         easing: Easing.out(Easing.cubic),
       });
       sheetTranslateY.value = withTiming(0, {
-        duration: enterMs,
+        duration: enterDuration,
         easing: Easing.out(Easing.cubic),
       });
       return;
@@ -50,13 +78,13 @@ export const useAdminEditModalAnimation = (visible: boolean, onDismissed?: () =>
 
     if (!visible && wasVisible && modalVisibleRef.current) {
       backdropOpacity.value = withTiming(0, {
-        duration: exitMs,
+        duration: exitDuration,
         easing: Easing.in(Easing.cubic),
       });
       sheetTranslateY.value = withTiming(
-        sheetSlideDistance,
+        distance,
         {
-          duration: exitMs,
+          duration: exitDuration,
           easing: Easing.in(Easing.cubic),
         },
         (finished) => {
@@ -66,7 +94,7 @@ export const useAdminEditModalAnimation = (visible: boolean, onDismissed?: () =>
         },
       );
 
-      const fallbackMs = exitMs + 80;
+      const fallbackMs = exitDuration + 80;
       const timeoutId = setTimeout(() => {
         if (!wasVisibleRef.current && modalVisibleRef.current) {
           finishClose();

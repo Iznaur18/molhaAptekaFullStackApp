@@ -1,14 +1,15 @@
 import { USER_SOCIAL_LINK_FIELD_IDS } from "@molha/api-contract";
+import { formatBirthDateForInput } from "@/entities/user/lib/birthDateInputMask";
 import { getUserBackgroundFocus } from "@/entities/user/lib/profileImageFocus";
-import { DEFAULT_USER_AVATAR_URL, USER_GENDER_NO_SELECTED } from "@/entities/user/model/constants";
-import { DEFAULT_USER_BACKGROUND_PRESET_ID } from "@/entities/user/model/userBackgroundPresets";
+import type { ProfileImageFocus } from "@/entities/user/lib/profileImageFocus";
+import { maskRuPhoneInput } from "@/entities/user/lib/ruPhone";
 import {
   parseUserBackgroundFormFields,
   resolveBackgroundModeFromUser,
   type BackgroundMode,
 } from "@/entities/user/lib/userBackgroundValue";
-import type { ProfileImageFocus } from "@/entities/user/lib/profileImageFocus";
-import { maskRuPhoneInput } from "@/entities/user/lib/ruPhone";
+import { DEFAULT_USER_AVATAR_URL, USER_GENDER_NO_SELECTED } from "@/entities/user/model/constants";
+import { DEFAULT_USER_BACKGROUND_PRESET_ID } from "@/entities/user/model/userBackgroundPresets";
 
 export type StructuredAddress = {
   city: string;
@@ -50,10 +51,6 @@ export const EMPTY_STRUCTURED_ADDRESS: StructuredAddress = {
 export const mapUserToEditProfileForm = (
   user: Record<string, unknown>,
 ): EditProfileFormState => {
-  const birth = user.userBirthDate;
-  const birthInput =
-    typeof birth === "string" && birth.length >= 10 ? birth.slice(0, 10) : "";
-
   const city = typeof user.userAddressCity === "string" ? user.userAddressCity.trim() : "";
   const stored = typeof user.userBackgroundUrl === "string" ? user.userBackgroundUrl : null;
   const bgFields = parseUserBackgroundFormFields(stored);
@@ -76,7 +73,7 @@ export const mapUserToEditProfileForm = (
 
   return {
     userName: typeof user.userName === "string" ? user.userName : "",
-    userBirthDate: birthInput,
+    userBirthDate: formatBirthDateForInput(user.userBirthDate),
     userGender:
       user.userGender === "male" || user.userGender === "female"
         ? user.userGender

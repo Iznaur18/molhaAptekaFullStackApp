@@ -14,9 +14,21 @@
   cursor: help;
 }
 
+/* Ozon-overlay: accentSoft/accent — паритет с mobile resolveProductCardImageBadgeOverlay */
 .product-loyalty-points-badge--overlay {
-  box-shadow: 0 1px 6px var(--iz-shadow-badge);
-  white-space: normal;
-  max-width: min(100%, 9.5rem);
+  box-shadow: none;
+  border: none;
+  border-radius: var(--product-card-overlay-badge-radius, 6px);
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  padding: var(--product-card-overlay-badge-pad-y, 2px)
+    var(--product-card-overlay-badge-pad-x, 10px);
+  background: var(--iz-color-accent-soft);
+  color: var(--iz-color-accent);
+  font-size: var(--product-card-overlay-badge-font-size, 10px);
+  line-height: var(--product-card-overlay-badge-line-height, 12px);
+  font-weight: 800;
+  white-space: nowrap;
+  max-width: none;
   text-align: left;
 }

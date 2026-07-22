@@ -131,6 +131,14 @@ const ProductSchema = new Schema(
       min: 0,
       max: 9999,
     },
+    // Точка сериализации параллельных заказов по одному товару: инкрементируется
+    // внутри транзакции создания заказа, чтобы конкурентные транзакции конфликтовали
+    // (write-conflict) и перепроверяли доступный остаток на свежем снапшоте. Так
+    // закрывается TOCTOU-гонка оверселла (два заказа на последнюю единицу).
+    stockReserveGuardTick: {
+      type: Number,
+      default: 0,
+    },
     productAuctionEnabled: {
       type: Boolean,
       default: false,

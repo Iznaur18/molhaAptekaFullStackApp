@@ -7,6 +7,7 @@ import {
   getFeaturedRaffles,
   getMyRaffleOverview,
   getRaffleById,
+  getRaffleCreateAdvertisingStatus,
   getRaffleProducts,
   listPendingRaffles,
   patchMyRaffle,
@@ -14,6 +15,8 @@ import {
   pauseMyRaffle,
   rejectRaffle,
   setProductRaffleParticipation,
+  cancelRaffleCreateUnlock,
+  unlockRaffleCreate,
 } from "../../services/raffle/index.js";
 import { successRes } from "../../services/http/index.js";
 
@@ -48,6 +51,21 @@ export const createRaffleController = async (req, res) => {
   });
 
   return successRes(res, result, 201);
+};
+
+export const getRaffleCreateAdvertisingController = async (req, res) => {
+  const result = await getRaffleCreateAdvertisingStatus(String(req.userId));
+  return successRes(res, result);
+};
+
+export const unlockRaffleCreateController = async (req, res) => {
+  const result = await unlockRaffleCreate({ sellerId: String(req.userId) });
+  return successRes(res, result);
+};
+
+export const cancelRaffleCreateController = async (req, res) => {
+  const result = await cancelRaffleCreateUnlock({ sellerId: String(req.userId) });
+  return successRes(res, result);
 };
 
 export const getMyRaffleController = async (req, res) => {

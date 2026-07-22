@@ -105,30 +105,28 @@
   color: var(--iz-color-text-secondary);
 }
 
+/* useCheckoutFormStyles.fieldInput: px 14, py 9, r 8, 15px */
 .product-price-offer__input {
   box-sizing: border-box;
   width: 100%;
   margin: 0;
-  padding: 0.55rem 0.85rem;
-  border: 1px solid var(--iz-color-border);
-  border-radius: 0.5rem;
+  padding: var(--iz-control-checkout-padding-y) var(--iz-control-checkout-padding-x);
+  border: var(--iz-border) solid var(--iz-color-border);
+  border-radius: var(--iz-radius-input);
   background: var(--iz-color-surface);
-  font: inherit;
-  font-size: 0.95rem;
   color: var(--iz-color-text);
+  font: inherit;
+  font-size: var(--iz-font-md);
   outline: none;
-  transition:
-    border-color 0.15s ease,
-    box-shadow 0.15s ease;
 }
 
 .product-price-offer__input:focus {
   border-color: var(--iz-color-action);
-  box-shadow: 0 0 0 3px var(--iz-color-focus-ring);
+  box-shadow: var(--iz-shadow-input-focus);
 }
 
 .product-price-offer__input:disabled {
-  opacity: 0.65;
+  opacity: var(--iz-state-disabled-opacity);
   cursor: not-allowed;
 }
 

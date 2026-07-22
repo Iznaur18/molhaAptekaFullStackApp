@@ -38,7 +38,6 @@ export const useHomeMainContentProps = () => {
     handleSellerNameClick,
     handleCatalogProductClick,
     handleOpenCatalogProductDetails,
-    setCatalogProductDetails,
     setMyProfileTab,
     handleLogout,
     setIsEditProfileOpen,
@@ -84,6 +83,7 @@ export const useHomeMainContentProps = () => {
     refreshCatalogFeed,
     handleInAppNotificationClick,
     handleNotificationsCleared,
+    setLoyaltyPoints,
   } = ctx;
 
   const myProductsCatalogToolbarProps = useMemo(
@@ -199,6 +199,7 @@ export const useHomeMainContentProps = () => {
       refreshRaffleSurfaces,
       refreshCatalogFeed,
       setRaffleModal,
+      setLoyaltyPoints,
       handleInAppNotificationClick,
       handleNotificationsCleared,
     }),
@@ -231,7 +232,6 @@ export const useHomeMainContentProps = () => {
       handleSellerNameClick,
       handleCatalogProductClick,
       handleOpenCatalogProductDetails,
-      setCatalogProductDetails,
       setMyProfileTab,
       handleLogout,
       onEditProfileClick,
@@ -276,6 +276,7 @@ export const useHomeMainContentProps = () => {
       refreshRaffleSurfaces,
       refreshCatalogFeed,
       setRaffleModal,
+      setLoyaltyPoints,
       handleInAppNotificationClick,
       handleNotificationsCleared,
     ],

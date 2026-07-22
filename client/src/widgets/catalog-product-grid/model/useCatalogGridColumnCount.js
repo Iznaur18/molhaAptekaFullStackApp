@@ -14,23 +14,21 @@ function applyCatalogGridColumnCount(width, setColumnCount) {
 }
 
 /**
- * @param {import('react').RefObject<HTMLElement | null>} containerRef
+ * Колонки по ширине viewport (как mobile), не по сжатому `.app-shell`.
+ *
+ * @param {import('react').RefObject<HTMLElement | null>} _containerRef
  * @param {boolean} enabled
  * @returns {number}
  */
-export function useCatalogGridColumnCount(containerRef, enabled) {
+export function useCatalogGridColumnCount(_containerRef, enabled) {
   const [columnCount, setColumnCount] = useState(1);
 
   useLayoutEffect(() => {
-    if (!enabled) {
+    if (!enabled || typeof document === "undefined") {
       return undefined;
     }
 
-    const element = containerRef.current;
-    if (!element) {
-      return undefined;
-    }
-
+    const viewportEl = document.documentElement;
     let frameId = /** @type {number | null} */ (null);
 
     const scheduleUpdate = () => {
@@ -39,18 +37,15 @@ export function useCatalogGridColumnCount(containerRef, enabled) {
       }
       frameId = requestAnimationFrame(() => {
         frameId = null;
-        if (!containerRef.current) {
-          return;
-        }
-        applyCatalogGridColumnCount(containerRef.current.clientWidth, setColumnCount);
+        applyCatalogGridColumnCount(viewportEl.clientWidth, setColumnCount);
       });
     };
 
     // Синхронно до первой отрисовки: иначе первый кадр раскладывается с
     // columnCount = 1, а после замера баннеры перепрыгивают на другие ряды (CLS).
-    applyCatalogGridColumnCount(element.clientWidth, setColumnCount);
+    applyCatalogGridColumnCount(viewportEl.clientWidth, setColumnCount);
     const observer = new ResizeObserver(scheduleUpdate);
-    observer.observe(element);
+    observer.observe(viewportEl);
 
     return () => {
       observer.disconnect();
@@ -58,7 +53,7 @@ export function useCatalogGridColumnCount(containerRef, enabled) {
         cancelAnimationFrame(frameId);
       }
     };
-  }, [containerRef, enabled]);
+  }, [enabled]);
 
   return columnCount;
 }

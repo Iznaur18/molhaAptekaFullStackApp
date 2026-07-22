@@ -56,15 +56,15 @@
   height: 68px;
   border-radius: 999px;
   padding: 3px;
-  background: var(--iz-color-info);
+  background: var(--iz-color-action);
 }
 
 .user-stories-strip__ring_viewed {
-  background: var(--iz-color-text-placeholder);
+  background: var(--iz-color-text-muted);
 }
 
 .user-stories-strip__ring_add {
-  background: var(--iz-color-info);
+  background: var(--iz-color-action);
   border: none;
 }
 
@@ -80,7 +80,7 @@
   height: 100%;
   border-radius: 999px;
   object-fit: cover;
-  border: 2px solid var(--iz-color-on-contrast);
+  border: 2px solid var(--iz-color-surface);
 }
 
 .user-stories-strip__avatar-fallback {

@@ -1,4 +1,5 @@
 @import "./shared/styles/designTokens.css";
+@import "./shared/styles/controls.css";
 @import "./shared/styles/cancelButton.css";
 @import "./shared/ui/AppButton/AppButton.css";
 
@@ -9,9 +10,12 @@ body,
 }
 
 :root {
-  /* Desktop content cap (~1200px). Mobile/tablet = 100vw. */
-  --app-shell-max-width: 75rem;
-  --app-viewport-effective-width: min(var(--app-shell-max-width), 100vw);
+  /*
+   * Паритет с mobile content max-width:
+   * phone — 100vw; ≥600 → 520; ≥768 → 720; ≥1024 → 960.
+   */
+  --app-shell-max-width: 100%;
+  --app-viewport-effective-width: 100vw;
   --app-viewport-side-inset: max(
     0px,
     calc((100vw - var(--app-viewport-effective-width)) / 2)
@@ -24,6 +28,25 @@ body,
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@media (min-width: 600px) {
+  :root {
+    --app-shell-max-width: 32.5rem; /* 520px */
+    --app-viewport-effective-width: min(var(--app-shell-max-width), 100vw);
+  }
+}
+
+@media (min-width: 768px) {
+  :root {
+    --app-shell-max-width: 45rem; /* 720px */
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --app-shell-max-width: 60rem; /* 960px */
+  }
 }
 
 html {

@@ -3,6 +3,7 @@ import { Home, Menu, Plus, ShoppingCart, User } from "lucide-react";
 import { useCart } from "../../../entities/cart/model/useCart.js";
 import {
   HEADER_CART_BUTTON_UI,
+  HEADER_NOTIFICATIONS_BUTTON_UI,
   HEADER_PLACE_PRODUCT_BUTTON_UI,
   HEADER_PROFILE_BUTTON_UI,
   HOME_PAGE_UI,
@@ -18,6 +19,7 @@ import "./MobileBottomNav.css";
  *   isCartActive: boolean;
  *   isProfileActive: boolean;
  *   isAuthorized: boolean;
+ *   unreadNotificationsCount?: number;
  *   onHomeClick: () => void;
  *   onCatalogClick: () => void;
  *   onPlaceProductClick: () => void;
@@ -32,6 +34,7 @@ export function MobileBottomNav({
   isCartActive,
   isProfileActive,
   isAuthorized,
+  unreadNotificationsCount = 0,
   onHomeClick,
   onCatalogClick,
   onPlaceProductClick,
@@ -41,6 +44,8 @@ export function MobileBottomNav({
 }) {
   const { totalCount } = useCart();
   const cartBadge = totalCount > 0 ? totalCount : null;
+  const profileBadge =
+    isAuthorized && unreadNotificationsCount > 0 ? unreadNotificationsCount : null;
 
   const handlePlaceProductClick = () => {
     if (isAuthorized) {
@@ -97,6 +102,10 @@ export function MobileBottomNav({
         ariaLabel={HEADER_PROFILE_BUTTON_UI.ARIA}
         icon={User}
         isActive={isProfileActive}
+        badgeContent={profileBadge}
+        badgeAriaLabel={
+          profileBadge != null ? HEADER_NOTIFICATIONS_BUTTON_UI.COUNT_ARIA : undefined
+        }
         onClick={handleProfileClick}
       />
     </nav>

@@ -21,8 +21,6 @@ import { HomeCatalogGrid } from "../../catalog-product-grid/ui/HomeCatalogGrid.j
  *   products: ProductFromApi[];
  *   isHomeCatalogMainView: boolean;
  *   featuredRaffles: import('../../../entities/raffle/model/types.js').RaffleFromApi[];
- *   featuredRaffleIndex: number;
- *   onFeaturedRaffleIndexChange: (index: number) => void;
  *   getFeaturedRaffleManage: (raffle: import('../../../entities/raffle/model/types.js').RaffleFromApi) => object | null;
  *   userStoriesFeed: import('../../../entities/user-story/model/types.js').UserStoriesFeedFromApi;
  *   isAuthorized: boolean;
@@ -76,8 +74,6 @@ export function AppShellCatalogGridSection({
   products,
   isHomeCatalogMainView,
   featuredRaffles,
-  featuredRaffleIndex,
-  onFeaturedRaffleIndexChange,
   getFeaturedRaffleManage,
   userStoriesFeed,
   isAuthorized,
@@ -143,8 +139,6 @@ export function AppShellCatalogGridSection({
       {isHomeCatalogMainView && featuredRaffles.length > 0 ? (
         <RaffleFeaturedHomeSection
           raffles={featuredRaffles}
-          activeIndex={featuredRaffleIndex}
-          onActiveIndexChange={onFeaturedRaffleIndexChange}
           onOpenProducts={(raffleId) => navigate(buildRafflePath(raffleId))}
           getManage={getFeaturedRaffleManage}
         />

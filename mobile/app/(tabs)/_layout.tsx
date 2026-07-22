@@ -21,11 +21,13 @@ export default function TabLayout() {
       tabBar={(props) => <MobileBottomTabBar {...props} />}
       screenOptions={{
         tabBarShowLabel: false,
+        // height: 0 — tab bar не резервирует место в сцене; pill рисуется absolute overlay.
         tabBarStyle: {
           position: "absolute",
           left: 0,
           right: 0,
           bottom: 0,
+          height: 0,
           backgroundColor: "transparent",
           borderTopWidth: 0,
           elevation: 0,

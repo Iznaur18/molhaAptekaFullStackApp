@@ -2,10 +2,10 @@ import { ChevronLeft } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { PRODUCT_DETAILS_MODAL_UI } from "../../../shared/config/appUiCopy.js";
-import { useHorizontalSwipeNavigation } from "../../../shared/lib/useHorizontalSwipeNavigation.js";
 import { ICON_SIZE_PX } from "../../../shared/ui/icon/iconSizes.js";
 import { buildProductMediaSlides } from "../lib/buildProductMediaSlides.js";
 import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../model/productConstants.js";
+import { ProductMediaHorizontalPager } from "./ProductMediaHorizontalPager.jsx";
 import { ProductMediaSlideContent } from "./ProductMediaSlideContent.jsx";
 
 import "./ProductMediaGalleryReadonly.css";
@@ -45,11 +45,9 @@ export function ProductMediaGalleryReadonly({
       : [{ type: "image", url: PRODUCT_IMAGE_PLACEHOLDER_URL }];
   }, [imageUrls, previewVideoUrl, previewVideoFailed]);
 
-  const safeSlideIndex = Math.min(
-    activeSlideIndex,
-    Math.max(0, mediaSlides.length - 1),
-  );
-  const activeSlide = mediaSlides[safeSlideIndex] ?? null;
+  const slideCount = mediaSlides.length;
+  const hasMultipleSlides = slideCount > 1;
+  const safeSlideIndex = Math.min(activeSlideIndex, Math.max(0, slideCount - 1));
 
   useEffect(() => {
     setActiveSlideIndex(0);
@@ -57,30 +55,27 @@ export function ProductMediaGalleryReadonly({
   }, [resetToken]);
 
   useEffect(() => {
-    setActiveSlideIndex((index) => Math.min(index, Math.max(0, mediaSlides.length - 1)));
-  }, [mediaSlides.length]);
+    setActiveSlideIndex((index) => Math.min(index, Math.max(0, slideCount - 1)));
+  }, [slideCount]);
 
   useEffect(() => {
     setPreviewVideoFailed(false);
   }, [previewVideoUrl]);
 
   useEffect(() => {
-    if (!isActive) {
+    if (!isActive || !hasMultipleSlides) {
       return undefined;
     }
 
-    const slideCount = mediaSlides.length;
     const onKeyDown = (event) => {
-      if (slideCount <= 1) {
-        return;
-      }
       if (event.key === "ArrowLeft") {
         event.preventDefault();
-        setActiveSlideIndex((index) => (index - 1 + slideCount) % slideCount);
+        setActiveSlideIndex((index) => Math.max(0, index - 1));
+        return;
       }
       if (event.key === "ArrowRight") {
         event.preventDefault();
-        setActiveSlideIndex((index) => (index + 1) % slideCount);
+        setActiveSlideIndex((index) => Math.min(slideCount - 1, index + 1));
       }
     };
 
@@ -88,30 +83,22 @@ export function ProductMediaGalleryReadonly({
     return () => {
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [isActive, mediaSlides.length]);
+  }, [hasMultipleSlides, isActive, slideCount]);
 
-  const slideCount = mediaSlides.length;
-  const hasMultipleSlides = slideCount > 1;
-
-  const goToPreviousSlide = useCallback(() => {
-    if (!hasMultipleSlides) {
-      return;
-    }
-    setActiveSlideIndex((index) => (index - 1 + slideCount) % slideCount);
-  }, [hasMultipleSlides, slideCount]);
-
-  const goToNextSlide = useCallback(() => {
-    if (!hasMultipleSlides) {
-      return;
-    }
-    setActiveSlideIndex((index) => (index + 1) % slideCount);
-  }, [hasMultipleSlides, slideCount]);
-
-  const gallerySwipeHandlers = useHorizontalSwipeNavigation({
-    enabled: hasMultipleSlides && isActive,
-    onSwipeLeft: goToNextSlide,
-    onSwipeRight: goToPreviousSlide,
-  });
+  const renderSlide = useCallback(
+    (index) => {
+      const slide = mediaSlides[index] ?? null;
+      return (
+        <ProductMediaSlideContent
+          slide={slide}
+          playVideoWhenVisible={false}
+          imageClassName="product-media-gallery-readonly__image product-media-gallery-readonly__image--fill-hero"
+          onVideoFailed={() => setPreviewVideoFailed(true)}
+        />
+      );
+    },
+    [mediaSlides],
+  );
 
   const rootClass = ["product-media-gallery-readonly", className].filter(Boolean).join(" ");
 
@@ -127,7 +114,6 @@ export function ProductMediaGalleryReadonly({
           ? {
               role: "region",
               "aria-label": PRODUCT_DETAILS_MODAL_UI.SLIDER_REGION_ARIA,
-              ...gallerySwipeHandlers,
             }
           : {})}
       >
@@ -150,17 +136,17 @@ export function ProductMediaGalleryReadonly({
             className="product-media-gallery-readonly__slider-counter"
             aria-live="polite"
           >
-            {safeSlideIndex + 1} / {mediaSlides.length}
+            {safeSlideIndex + 1} / {slideCount}
           </span>
         ) : null}
-        <ProductMediaSlideContent
-          slide={activeSlide}
-          playVideoWhenVisible={false}
-          imageClassName="product-media-gallery-readonly__image product-media-gallery-readonly__image--fill-hero"
-          onVideoFailed={() => setPreviewVideoFailed(true)}
+        <ProductMediaHorizontalPager
+          slideCount={slideCount}
+          activeIndex={safeSlideIndex}
+          onIndexChange={setActiveSlideIndex}
+          renderSlide={renderSlide}
         />
       </div>
-      {mediaSlides.length > 1 ? (
+      {hasMultipleSlides ? (
         <div
           className="product-media-gallery-readonly__thumbs"
           role="tablist"

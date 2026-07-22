@@ -7,6 +7,7 @@ import { errorRes } from "../../services/http/index.js";
 import { resolveUploadContentType } from "../../utils/resolveUploadContentType.js";
 import {
   buildPrivateObjectStorageKey,
+  getPrivateUploadBucket,
   getS3Client,
   isObjectStorageUploadEnabled,
 } from "../../services/upload/objectStorageUpload.js";
@@ -39,9 +40,11 @@ export async function getPrivateUploadController(req, res) {
   res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
 
   if (isObjectStorageUploadEnabled()) {
-    const bucket = process.env.S3_BUCKET?.trim();
-    if (!bucket) {
-      return errorRes(res, 500, "S3_BUCKET не задан");
+    let bucket;
+    try {
+      bucket = getPrivateUploadBucket();
+    } catch {
+      return errorRes(res, 500, "S3-бакет для приватных файлов не задан");
     }
 
     try {

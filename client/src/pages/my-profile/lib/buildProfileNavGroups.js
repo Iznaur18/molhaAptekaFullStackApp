@@ -241,16 +241,6 @@ export function buildProfileNavGroups({
   ];
 
   const staffItems = [
-    ...(canUseCreateRaffle
-      ? [
-          {
-            tab: "create-raffle",
-            label: MY_PROFILE_PAGE_UI.TAB_CREATE_RAFFLE,
-            variant: "cta",
-            onClick: () => onCreateRaffleClick?.(),
-          },
-        ]
-      : []),
     ...(canUseProductModeration
       ? [
           {
@@ -274,16 +264,6 @@ export function buildProfileNavGroups({
             label: "Жалоба (модерация)",
             badgeCount: pendingProductReportsCount,
             onClick: () => selectTab("product-reports", onProductReportsClick),
-          },
-        ]
-      : []),
-    ...(canUseRaffles
-      ? [
-          {
-            tab: "raffles",
-            label: "Розыгрыш (модерация)",
-            badgeCount: pendingRafflesCount,
-            onClick: () => selectTab("raffles", onRafflesClick),
           },
         ]
       : []),

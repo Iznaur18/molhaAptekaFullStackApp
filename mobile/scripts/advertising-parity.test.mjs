@@ -55,4 +55,16 @@ test("advertising ui copy matches web page", () => {
   assert.match(copy, /PAGE_ARIA: "Реклама в intro"/);
   assert.match(copy, /intro-ролик при входе/);
   assert.match(copy, /Все одобренные товары попадают/);
+  assert.match(copy, /RAFFLE_ADVERTISING_PAGE_UI/);
+});
+
+test("raffle advertising section is wired on advertising page", () => {
+  const page = readMobileFile("features/advertising-page/ui/AdvertisingPage.tsx");
+  const section = readMobileFile("features/advertising-page/ui/RaffleAdvertisingSection.tsx");
+
+  assert.match(page, /RaffleAdvertisingSection/);
+  assert.match(section, /useUnlockRaffleCreateMutation/);
+  assert.match(section, /PAY_AND_CREATE_WITH_PRICE/);
+  assert.match(section, /CONTINUE_CREATE/);
+  assert.match(section, /hub\/create-raffle/);
 });

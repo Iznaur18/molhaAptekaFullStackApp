@@ -36,7 +36,6 @@ import { ADMIN_EDIT_USER_UI } from "../../../shared/config/appUiCopy.js";
  *   setLoyaltyPoints: (value: number) => void;
  *   isAdminEditUserOpen: boolean;
  *   isAdminDeleteUserOpen: boolean;
- *   setCatalogProductDetails: (product: ProductFromApi | null) => void;
  *   handleUserProfileProductClick: (product: ProductFromApi) => void;
  *   refreshCatalogFeed: () => void;
  *   setStaffActionNotice: (message: string) => void;
@@ -69,7 +68,6 @@ export function AppShellUserModals({
   setLoyaltyPoints,
   isAdminEditUserOpen,
   isAdminDeleteUserOpen,
-  setCatalogProductDetails,
   handleUserProfileProductClick,
   refreshCatalogFeed,
   setStaffActionNotice,
@@ -194,7 +192,6 @@ export function AppShellUserModals({
         onClose={() => setIsAdminDeleteUserOpen(false)}
         onDeleted={() => {
           closeSellerModal();
-          setCatalogProductDetails(null);
           void refreshUsersList();
           void refreshCatalogFeed();
         }}

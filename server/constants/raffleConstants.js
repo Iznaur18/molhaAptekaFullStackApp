@@ -32,3 +32,9 @@ export const SITE_RAFFLES_ACTIVE_VITRINE_MAX = 10;
 
 /** Сколько недавних completed показывать после active */
 export const SITE_RAFFLES_COMPLETED_VITRINE_MAX = 10;
+
+/** Через сколько после completedAt hard-delete с витрины (лениво при GET featured) */
+export const SITE_RAFFLES_COMPLETED_VITRINE_TTL_MS = 12 * 60 * 60 * 1000;
+
+/** Стоимость создания розыгрыша (резерв при оплате, списание при одобрении staff). */
+export const RAFFLE_CREATE_PRICE_POINTS = 3_000;

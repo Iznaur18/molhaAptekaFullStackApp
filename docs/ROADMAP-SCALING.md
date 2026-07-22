@@ -36,6 +36,9 @@
 | BullMQ + worker | ✅ | `server/worker.js`, `queues/` |
 | Read replica hook | ✅ | `MONGO_URI_READ`, `mongoReadConnection.js` |
 | S3/R2 медиа | ✅ | `UPLOAD_STORAGE=s3`, `PROD-S3-CDN.md` |
+| Отдельный **приватный** бакет для PII | ✅ | `S3_PRIVATE_BUCKET` (обязателен в prod, ≠ `S3_BUCKET`) |
+| Graceful shutdown API (drain + close) | ✅ | `index.js` (SIGTERM/SIGINT) |
+| Warning, если cron нигде не запущен | ✅ | `index.js` (prod + не BullMQ + не leader) |
 | FSD клиент (23 entities) | ✅ | `client/src/entities/` |
 | CI: lint, server tests, e2e | ✅ | `.github/workflows/` |
 | Горизонтальный план | ✅ | `HORIZONTAL-SCALING.md` |
@@ -246,7 +249,7 @@ Worker (systemd) ──► CRON_LEADER=true, BullMQ consumer
 
 - Kubernetes до 2+ VPS и боли с деплоем
 - Шардирование Mongo
-- Микросервисы (order-service, catalog-service)
+- Микросервисы (order-service, catalog-service) — план и триггеры в [`MICROSERVICES.md`](MICROSERVICES.md)
 - GraphQL/BFF только ради масштаба
 
 ---
@@ -349,7 +352,7 @@ MONGO_URI_READ=mongodb+srv://.../?readPreference=secondaryPreferred
 | H-5 | Денорм `soldQuantity` | 0–2 | ✅ |
 | H-6 | Cron promotions вне hot path | 0 | ✅ |
 | R-1 | Client unit tests в CI | 1 | ⬜ |
-| R-2 | systemd unit для worker (example) | 1 | ⬜ |
+| R-2 | systemd unit для worker (example) + heartbeat + DEPLOY §4a | 1 | ✅ |
 | R-3 | Staging env + deploy doc | 1 | ⬜ |
 | R-4 | Staff audit log | 1–2 | ⬜ |
 | R-5 | Redis catalog cache (вместо in-memory) | 2 | ⬜ |
@@ -378,6 +381,7 @@ MONGO_URI_READ=mongodb+srv://.../?readPreference=secondaryPreferred
 
 - [`deploy/DEPLOY.md`](deploy/DEPLOY.md)
 - [`deploy/PROD-S3-CDN.md`](deploy/PROD-S3-CDN.md)
+- [`MICROSERVICES.md`](MICROSERVICES.md) — что/когда/как выделять (и почему не сейчас)
 - [`../server/docs/PRODUCTION-AND-ARCHITECTURE.md`](../server/docs/PRODUCTION-AND-ARCHITECTURE.md)
 - [`../server/docs/HORIZONTAL-SCALING.md`](../server/docs/HORIZONTAL-SCALING.md)
 - [`../server/docs/OBSERVABILITY.md`](../server/docs/OBSERVABILITY.md)

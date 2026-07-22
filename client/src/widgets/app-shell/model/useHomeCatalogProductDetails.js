@@ -1,103 +1,29 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { patchProductInAllCatalogCaches } from "../../../entities/product/lib/catalogProductsQueryCache.js";
-import { resolveCatalogDetailsShowAddToCart } from "../lib/resolveCatalogDetailsShowAddToCart.js";
-import { useEnsureCatalogProduct } from "../../../entities/product/model/useEnsureCatalogProduct.js";
-import { isCurrentUserProductSeller } from "../../../entities/product/lib/isCurrentUserProductSeller.js";
-import { PRODUCT_MODERATION_APPROVED } from "../../../entities/product/model/productModerationConstants.js";
-import { useMyProductReportStatusQuery } from "../../../entities/product-report/model/useMyProductReportStatusQuery.js";
-import { productReportQueryKeys } from "../../../entities/product-report/model/productReportQueryKeys.js";
+import { navigateToProductDetails } from "../../../entities/product/lib/navigateToProductDetails.js";
 
 /** @typedef {import('../../../entities/product/model/types.js').ProductFromApi} ProductFromApi */
 
 /**
+ * Открытие деталей товара — navigate на `/product/:id` (не модалка).
+ *
  * @param {object} params
- * @param {() => void} [params.onBeforeOpenDetails] — закрыть edit/create overlay
+ * @param {() => void} [params.onBeforeOpenDetails]
  */
-export const useHomeCatalogProductDetails = ({
-  isAuthorized,
-  currentUserId,
-  isAdmin,
-  isMineMode,
-  products,
-  catalogProductDetails,
-  setCatalogProductDetails,
-  setProductDetailsAdminError,
-  onBeforeOpenDetails,
-}) => {
+export const useHomeCatalogProductDetails = ({ onBeforeOpenDetails }) => {
   const queryClient = useQueryClient();
-  const ensureCatalogProduct = useEnsureCatalogProduct();
-  const [catalogProductDetailsTab, setCatalogProductDetailsTab] = useState(
-    /** @type {'details' | 'auction' | 'reviews' | 'installment'} */ ("details"),
-  );
+  const navigate = useNavigate();
 
-  const reportStatusQuery = useMyProductReportStatusQuery({
-    productId: catalogProductDetails?._id,
-    enabled: Boolean(catalogProductDetails?._id && isAuthorized),
-  });
-  const catalogProductHasPendingReport =
-    reportStatusQuery.data?.hasPendingReport ?? false;
-
-  const canReportCatalogProduct = useMemo(() => {
-    if (!isAuthorized || !catalogProductDetails || !currentUserId) {
-      return false;
-    }
-    if (catalogProductDetails.productModerationStatus !== PRODUCT_MODERATION_APPROVED) {
-      return false;
-    }
-    return !isCurrentUserProductSeller(catalogProductDetails, currentUserId);
-  }, [isAuthorized, catalogProductDetails, currentUserId]);
-
-  const showCatalogProductManageFooter = useMemo(() => {
-    const product = catalogProductDetails;
-    if (!product || !isAuthorized || !currentUserId) {
-      return false;
-    }
-    if (isAdmin) {
-      return true;
-    }
-    if (isMineMode) {
-      return false;
-    }
-    return isCurrentUserProductSeller(product, currentUserId);
-  }, [catalogProductDetails, isAuthorized, currentUserId, isAdmin, isMineMode]);
-
-  const catalogDetailsShowAddToCart = useMemo(
-    () =>
-      resolveCatalogDetailsShowAddToCart({
-        product: catalogProductDetails,
-        isMineMode,
-        currentUserId,
-      }),
-    [catalogProductDetails, currentUserId, isMineMode],
-  );
-
-  /** @param {string} productId @param {ProductFromApi | null | undefined} [seedProduct] */
+  /** @param {string} productId @param {ProductFromApi | null | undefined} [_seedProduct] */
   const openCatalogProductDetails = useCallback(
-    (productId, seedProduct = null) => {
+    (productId, _seedProduct = null) => {
       onBeforeOpenDetails?.();
-      setCatalogProductDetailsTab("details");
-
-      const inList = products.find((row) => String(row._id) === String(productId));
-      if (inList) {
-        setCatalogProductDetails(inList);
-        return;
-      }
-
-      if (seedProduct) {
-        setCatalogProductDetails(seedProduct);
-      }
-
-      void ensureCatalogProduct(String(productId))
-        .then((product) => {
-          setCatalogProductDetails(product);
-        })
-        .catch(() => {
-          setCatalogProductDetails(null);
-        });
+      navigateToProductDetails(navigate, productId);
     },
-    [ensureCatalogProduct, onBeforeOpenDetails, products, setCatalogProductDetails],
+    [navigate, onBeforeOpenDetails],
   );
 
   /** @param {string} productId */
@@ -123,48 +49,19 @@ export const useHomeCatalogProductDetails = ({
 
   const handleProductStatsUpdate = useCallback(
     (productId, stats) => {
-      setCatalogProductDetails((prev) =>
-        prev && String(prev._id) === productId ? { ...prev, ...stats } : prev,
-      );
       patchProductInAllCatalogCaches(queryClient, productId, (product) => ({
         ...product,
         ...stats,
       }));
     },
-    [queryClient, setCatalogProductDetails],
+    [queryClient],
   );
 
-  const closeCatalogProductDetails = useCallback(() => {
-    setCatalogProductDetails(null);
-    setCatalogProductDetailsTab("details");
-    setProductDetailsAdminError("");
-  }, [
-    setCatalogProductDetails,
-    setCatalogProductDetailsTab,
-    setProductDetailsAdminError,
-  ]);
-
-  const setCatalogProductHasPendingReport = useCallback(
-    (value) => {
-      if (!catalogProductDetails?._id) {
-        return;
-      }
-      queryClient.setQueryData(productReportQueryKeys.myStatus(String(catalogProductDetails._id)), {
-        hasPendingReport: value,
-      });
-    },
-    [catalogProductDetails?._id, queryClient],
-  );
+  /** No-op: детали — отдельный роут; header всё ещё вызывает при смене view. */
+  const closeCatalogProductDetails = useCallback(() => {}, []);
 
   return {
     closeCatalogProductDetails,
-    catalogProductDetailsTab,
-    setCatalogProductDetailsTab,
-    catalogProductHasPendingReport,
-    setCatalogProductHasPendingReport,
-    canReportCatalogProduct,
-    showCatalogProductManageFooter,
-    catalogDetailsShowAddToCart,
     handleCatalogProductClick,
     handleOpenCatalogProductDetails,
     handleUserProfileProductClick,

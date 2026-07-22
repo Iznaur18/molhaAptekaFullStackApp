@@ -10,12 +10,24 @@ import { closeBullMqRedisConnection } from "./queues/redisConnection.js";
 
 process.env.CRON_LEADER = "true";
 
+/** Периодический heartbeat в лог (journalctl) — liveness без HTTP-сервера. */
+const WORKER_HEARTBEAT_MS = Math.max(
+  60_000,
+  Number(process.env.WORKER_HEARTBEAT_MS) || 5 * 60_000,
+);
+/** @type {ReturnType<typeof setInterval> | null} */
+let heartbeatTimer = null;
+
 if (!process.env.MONGO_URI) {
   console.error("MONGO_URI не задан в .env");
   process.exit(1);
 }
 
 async function shutdown() {
+  if (heartbeatTimer) {
+    clearInterval(heartbeatTimer);
+    heartbeatTimer = null;
+  }
   await closeBullMqWorkers();
   await closeAppQueue();
   await closeBullMqRedisConnection();
@@ -37,7 +49,16 @@ async function start() {
       }
     }
 
-    console.log("Worker running (no HTTP server)");
+    const mode = isBullMqEnabled() ? "bullmq" : "cron-intervals";
+    console.log(`Worker running (no HTTP server) — mode=${mode}`);
+
+    heartbeatTimer = setInterval(() => {
+      const mem = Math.round(process.memoryUsage().rss / 1024 / 1024);
+      console.log(
+        `[worker] heartbeat mode=${mode} uptime=${Math.round(process.uptime())}s rss=${mem}MB`,
+      );
+    }, WORKER_HEARTBEAT_MS);
+    heartbeatTimer.unref();
   } catch (error) {
     console.error("Worker startup error:", error);
     process.exit(1);

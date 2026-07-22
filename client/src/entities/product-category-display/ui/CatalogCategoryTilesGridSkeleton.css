@@ -1,16 +1,18 @@
 .catalog-category-tiles-grid-skeleton__card {
-  display: flex;
-  flex-direction: column;
-  padding: 0.5rem;
+  position: relative;
+  box-sizing: border-box;
+  aspect-ratio: 1;
+  overflow: hidden;
   border: 1px solid var(--iz-color-border);
-  border-radius: 12px;
-  background: var(--iz-color-surface);
+  border-radius: 0.75rem;
+  background: var(--iz-color-surface-elevated);
 }
 
 .catalog-category-tiles-grid-skeleton__image {
+  position: absolute;
+  inset: -1px;
   display: block;
-  aspect-ratio: 1;
-  border-radius: 8px;
+  border-radius: 0;
   background: linear-gradient(
     90deg,
     var(--iz-color-surface-elevated) 0%,
@@ -22,11 +24,16 @@
 }
 
 .catalog-category-tiles-grid-skeleton__label {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 1;
   display: block;
+  width: 55%;
+  max-width: 78%;
   height: 0.875rem;
-  margin: 0.625rem auto 0;
-  width: 70%;
-  border-radius: 999px;
+  margin: 0;
+  border-radius: 0.25rem;
   background: linear-gradient(
     90deg,
     var(--iz-color-surface-elevated) 0%,

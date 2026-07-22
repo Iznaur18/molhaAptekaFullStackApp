@@ -62,9 +62,10 @@ export const resolveProductStockQuantityForWrite = (listedInCatalog, rawStock) =
 
 /**
  * @param {string[]} productIds
+ * @param {import('mongoose').ClientSession | null} [session]
  * @returns {Promise<Record<string, number>>}
  */
-export const getReservedQuantityByProductIds = async (productIds) => {
+export const getReservedQuantityByProductIds = async (productIds, session = null) => {
   const ids = [
     ...new Set(
       productIds.map((id) => String(id)).filter((id) => mongoose.isValidObjectId(id)),
@@ -75,7 +76,7 @@ export const getReservedQuantityByProductIds = async (productIds) => {
   }
 
   const objectIds = ids.map((id) => new mongoose.Types.ObjectId(id));
-  const rows = await OrderModel.aggregate([
+  const aggregation = OrderModel.aggregate([
     { $unwind: "$items" },
     {
       $match: {
@@ -90,6 +91,10 @@ export const getReservedQuantityByProductIds = async (productIds) => {
       },
     },
   ]);
+  if (session) {
+    aggregation.session(session);
+  }
+  const rows = await aggregation;
 
   return Object.fromEntries(
     rows.map((row) => [String(row._id), Number(row.reservedQuantity) || 0]),
@@ -133,17 +138,24 @@ export const assertProductStockPatchAllowed = async (productId, nextStock) => {
 /**
  * @param {Array<{ productId: string; quantity: number }>} items
  * @param {string} buyerUserId
+ * @param {import('mongoose').ClientSession | null} [session]
  */
-export const assertOrderItemsWithinAvailableStock = async (items, buyerUserId) => {
+export const assertOrderItemsWithinAvailableStock = async (
+  items,
+  buyerUserId,
+  session = null,
+) => {
   const productIds = [...new Set(items.map((item) => String(item.productId)))];
-  const products = await ProductModel.find({
+  const productsQuery = ProductModel.find({
     _id: { $in: productIds },
     productModerationStatus: PRODUCT_MODERATION_APPROVED,
     productIsAvailable: { $ne: false },
     productStockQuantity: { $gt: 0 },
-  })
-    .select("_id productStockQuantity productSeller")
-    .lean();
+  }).select("_id productStockQuantity productSeller");
+  if (session) {
+    productsQuery.session(session);
+  }
+  const products = await productsQuery.lean();
 
   if (products.length !== productIds.length) {
     throw new Error("Один или несколько товаров не найдены или недоступны");
@@ -155,7 +167,7 @@ export const assertOrderItemsWithinAvailableStock = async (items, buyerUserId) =
     }
   }
 
-  const reservedById = await getReservedQuantityByProductIds(productIds);
+  const reservedById = await getReservedQuantityByProductIds(productIds, session);
   const requestedById = items.reduce((acc, item) => {
     const id = String(item.productId);
     acc[id] = (acc[id] ?? 0) + item.quantity;
@@ -170,6 +182,45 @@ export const assertOrderItemsWithinAvailableStock = async (items, buyerUserId) =
       throw new Error(PRODUCT_STOCK_INSUFFICIENT_MESSAGE);
     }
   }
+};
+
+/**
+ * Авторитетная проверка остатка ВНУТРИ транзакции создания заказа.
+ *
+ * Инкремент `stockReserveGuardTick` на документах товаров — это точка сериализации:
+ * две параллельные транзакции, оформляющие один и тот же товар, конфликтуют на общем
+ * документе (WriteConflict). `withTransaction` ретраит проигравшую транзакцию, и её
+ * повторная проверка `assertOrderItemsWithinAvailableStock` уже видит зафиксированный
+ * конкурентный заказ в reserved → корректно падает при оверселле последней единицы.
+ *
+ * Без активной сессии (dev без replica set) деградирует до обычной проверки.
+ *
+ * @param {Array<{ productId: string; quantity: number }>} items
+ * @param {string} buyerUserId
+ * @param {import('mongoose').ClientSession | null} [session]
+ */
+export const guardOrderItemsStockInTransaction = async (
+  items,
+  buyerUserId,
+  session = null,
+) => {
+  if (session) {
+    const productObjectIds = [
+      ...new Set(items.map((item) => String(item.productId))),
+    ]
+      .filter((id) => mongoose.isValidObjectId(id))
+      .map((id) => new mongoose.Types.ObjectId(id));
+
+    if (productObjectIds.length > 0) {
+      await ProductModel.updateMany(
+        { _id: { $in: productObjectIds } },
+        { $inc: { stockReserveGuardTick: 1 } },
+        { session },
+      );
+    }
+  }
+
+  await assertOrderItemsWithinAvailableStock(items, buyerUserId, session);
 };
 
 /**

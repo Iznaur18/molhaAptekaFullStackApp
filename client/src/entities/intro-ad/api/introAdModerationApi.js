@@ -7,6 +7,7 @@ import {
 import { apiClient } from "../../../shared/api/index.js";
 import { parseApiContractData } from "../../../shared/api/parseApiContract.js";
 import { INTRO_AD_MODERATION_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import { fetchPendingRafflesCount } from "../../raffle/api/fetchPendingRafflesCount.js";
 import { fetchPendingSiteHeaderBannerCampaignsCount } from "../../site-header-banner-campaign/api/siteHeaderBannerCampaignModerationApi.js";
 import { fetchPendingSellerPersonalCategoryCampaignsCount } from "../../seller-personal-category/api/sellerPersonalCategoryApi.js";
 
@@ -45,12 +46,13 @@ export async function fetchPendingIntroAdCampaignsOnlyCount() {
  * @returns {Promise<number>}
  */
 export async function fetchPendingAdModerationNavBadgeCount() {
-  const [introCount, bannerCount, personalCategoryCount] = await Promise.all([
+  const [introCount, bannerCount, personalCategoryCount, raffleCount] = await Promise.all([
     fetchPendingIntroAdCampaignsOnlyCount(),
     fetchPendingSiteHeaderBannerCampaignsCount().catch(() => 0),
     fetchPendingSellerPersonalCategoryCampaignsCount().catch(() => 0),
+    fetchPendingRafflesCount().catch(() => 0),
   ]);
-  return introCount + bannerCount + personalCategoryCount;
+  return introCount + bannerCount + personalCategoryCount + raffleCount;
 }
 
 /**

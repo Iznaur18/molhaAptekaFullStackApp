@@ -1,6 +1,9 @@
 import {
   approveSellerPersonalCategoryCampaign,
+  cancelSellerPersonalCategoryCampaignByStaff,
   countPendingSellerPersonalCategoryCampaigns,
+  deleteSellerPersonalCategoryCampaignByStaff,
+  getManagedSellerPersonalCategoryCampaigns,
   getPendingSellerPersonalCategoryCampaigns,
   rejectSellerPersonalCategoryCampaign,
 } from "../../services/seller-personal-category/sellerPersonalCategoryStaff.js";
@@ -29,6 +32,28 @@ export const rejectSellerPersonalCategoryCampaignController = async (req, res) =
   const result = await rejectSellerPersonalCategoryCampaign({
     campaignId: req.params.campaignId,
     reason: req.body?.reason,
+  });
+
+  return successRes(res, result);
+};
+
+export const getManagedSellerPersonalCategoryCampaignsController = async (req, res) => {
+  const result = await getManagedSellerPersonalCategoryCampaigns();
+  return successRes(res, result);
+};
+
+export const cancelSellerPersonalCategoryCampaignByStaffController = async (req, res) => {
+  const result = await cancelSellerPersonalCategoryCampaignByStaff({
+    staffUserId: req.userId,
+    campaignId: req.params.campaignId,
+  });
+
+  return successRes(res, result);
+};
+
+export const deleteSellerPersonalCategoryCampaignByStaffController = async (req, res) => {
+  const result = await deleteSellerPersonalCategoryCampaignByStaff({
+    campaignId: req.params.campaignId,
   });
 
   return successRes(res, result);

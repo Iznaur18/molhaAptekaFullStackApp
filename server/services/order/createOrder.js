@@ -17,7 +17,10 @@ import {
   reserveLoyaltyPointsForNewOrder,
 } from "./orderLoyaltyPoints.js";
 import { resolveAcceptedOfferForOrder } from "../product/productPriceOfferHelpers.js";
-import { assertOrderItemsWithinAvailableStock } from "../product/productStock.js";
+import {
+  assertOrderItemsWithinAvailableStock,
+  guardOrderItemsStockInTransaction,
+} from "../product/productStock.js";
 
 import { buildOrderStatusFromItems } from "./orderStatus.js";
 
@@ -198,6 +201,8 @@ export async function createOrder({
 
   try {
     return await runInTransaction(async (session) => {
+      // Авторитетная проверка остатка внутри транзакции (закрывает гонку оверселла).
+      await guardOrderItemsStockInTransaction(items, userId, session);
       await reserveLoyaltyPointsForNewOrder(itemsForReserve, session);
 
       const [created] = await OrderModel.create(

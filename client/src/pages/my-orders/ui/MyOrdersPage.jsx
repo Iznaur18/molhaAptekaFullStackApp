@@ -2,6 +2,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { filterMyOrders } from "../../../entities/order/lib/filterMyOrders.js";
+import {
+  buildAttentionOrderIdsKey,
+  mergeExpandedIdsFromKey,
+} from "../../../entities/order/lib/expandedOrderIds.js";
 import { orderNeedsBuyerAttention } from "../../../entities/order/lib/orderNeedsBuyerAttention.js";
 import { summarizeMyOrders } from "../../../entities/order/lib/summarizeMyOrders.js";
 import { MY_ORDERS_LIST_FILTER_IN_PROGRESS } from "../../../entities/order/model/myOrdersListFilters.js";
@@ -15,9 +19,7 @@ import {
   ORDER_STATUS_LABEL_RU,
 } from "../../../entities/order/model/constants.js";
 import { OrderCard } from "../../../entities/order/ui/OrderCard.jsx";
-import { isCurrentUserProductSeller } from "../../../entities/product/lib/isCurrentUserProductSeller.js";
 import { useCatalogProductDetailsOpener } from "../../../entities/product/lib/useCatalogProductDetailsOpener.js";
-import { ProductDetailsModal } from "../../../entities/product/ui/ProductDetailsModal.jsx";
 import {
   API_CLIENT_UI,
   MY_ORDERS_PAGE_UI,
@@ -31,26 +33,19 @@ import "./MyOrdersPage.css";
 import "./MyOrdersPageOverview.css";
 import "../../../shared/ui/profileQueueContentPanel.css";
 
+const EMPTY_ORDERS = [];
+
 /**
  * @param {{
  *   isAuthorized: boolean;
- *   currentUserId?: string | null;
- *   onSellerNameClick?: (userId: string) => void;
- *   onRequestLogin?: () => void;
  *   onQueueChanged?: () => void;
  * }} props
  */
-export function MyOrdersPage({
-  isAuthorized,
-  currentUserId = null,
-  onSellerNameClick,
-  onRequestLogin = () => {},
-  onQueueChanged,
-}) {
+export function MyOrdersPage({ isAuthorized, onQueueChanged }) {
   const queryClient = useQueryClient();
   const { confirmItemMutation, cancelItemMutation } = useOrderMutations();
   const ordersQuery = useMyOrdersQuery({ enabled: isAuthorized });
-  const allOrders = ordersQuery.data ?? [];
+  const allOrders = ordersQuery.data ?? EMPTY_ORDERS;
   const [statusFilter, setStatusFilter] = useState("");
   const [attentionOnly, setAttentionOnly] = useState(false);
   const [expandedIds, setExpandedIds] = useState(() => new Set());
@@ -59,7 +54,10 @@ export function MyOrdersPage({
   const [loyaltyFlash, setLoyaltyFlash] = useState("");
 
   const summary = useMemo(() => summarizeMyOrders(allOrders), [allOrders]);
-  const filteredOrders = useMemo(
+  const attentionOrderIdsKey = useMemo(
+    () => buildAttentionOrderIdsKey(allOrders, orderNeedsBuyerAttention),
+    [allOrders],
+  );  const filteredOrders = useMemo(
     () => filterMyOrders(allOrders, { status: statusFilter, attentionOnly }),
     [allOrders, statusFilter, attentionOnly],
   );
@@ -82,14 +80,7 @@ export function MyOrdersPage({
       : API_CLIENT_UI.FETCH_MY_ORDERS_FALLBACK;
   const isRefreshing = ordersQuery.isFetching;
 
-  const {
-    catalogProduct,
-    catalogProductPhase,
-    catalogProductError,
-    openCatalogProductFromOrderLine,
-    closeCatalogProduct,
-    patchCatalogProduct,
-  } = useCatalogProductDetailsOpener();
+  const { openCatalogProductFromOrderLine } = useCatalogProductDetailsOpener();
 
   const reloadOrders = useCallback(async () => {
     await ordersQuery.refetch();
@@ -105,12 +96,8 @@ export function MyOrdersPage({
   }, [loyaltyFlash]);
 
   useEffect(() => {
-    setExpandedIds((prev) => {
-      const next = new Set(prev);
-      allOrders.filter(orderNeedsBuyerAttention).forEach((order) => next.add(String(order._id)));
-      return next;
-    });
-  }, [allOrders]);
+    setExpandedIds((prev) => mergeExpandedIdsFromKey(prev, attentionOrderIdsKey));
+  }, [attentionOrderIdsKey]);
 
   const toggleExpanded = useCallback((orderId) => {
     setExpandedIds((prev) => {
@@ -229,10 +216,6 @@ export function MyOrdersPage({
     }
   };
 
-  const productDetailsShowAddToCart =
-    catalogProduct != null &&
-    !isCurrentUserProductSeller(catalogProduct, currentUserId);
-
   const emptyMessage =
     totalAll === 0
       ? MY_ORDERS_PAGE_UI.EMPTY
@@ -340,27 +323,6 @@ export function MyOrdersPage({
           })}
         </ul>
       )}
-      {catalogProductPhase === "loading" ? (
-        <p className="my-orders-page__product-loading" role="status">
-          {MY_ORDERS_PAGE_UI.PRODUCT_DETAILS_LOADING}
-        </p>
-      ) : null}
-      {catalogProductPhase === "error" ? (
-        <p className="my-orders-page__product-error" role="alert">
-          {catalogProductError}
-        </p>
-      ) : null}
-      <ProductDetailsModal
-        isOpen={catalogProduct != null}
-        product={catalogProduct}
-        onClose={closeCatalogProduct}
-        onSellerNameClick={onSellerNameClick}
-        isAuthorized={isAuthorized}
-        onProductStatsUpdate={patchCatalogProduct}
-        showAddToCart={productDetailsShowAddToCart}
-        onRequestLogin={onRequestLogin}
-        currentUserId={currentUserId}
-      />
     </div>
   );
 }

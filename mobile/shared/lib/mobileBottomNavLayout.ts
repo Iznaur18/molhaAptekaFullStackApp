@@ -1,30 +1,64 @@
-import { StyleSheet } from "react-native";
+/** Паритет с web `--mobile-bottom-nav-horizontal-inset: 0.75rem`. */
+export const MOBILE_BOTTOM_NAV_HORIZONTAL_INSET = 12;
 
-/** Ozon-стиль: плоский бар во всю ширину, без боковых полей. */
-export const MOBILE_BOTTOM_NAV_HORIZONTAL_INSET = 0;
+/**
+ * Зазор над safe-area (или над min-edge, если safe-area = 0).
+ * На iPhone home-indicator уже даёт большой inset — float держим умеренным.
+ */
+export const MOBILE_BOTTOM_NAV_FLOAT_OFFSET = 6;
 
-/** Ozon-стиль: бар прижат к низу, «плавающий» зазор убран. */
-export const MOBILE_BOTTOM_NAV_FLOAT_OFFSET = 0;
+/**
+ * Мин. расстояние от нижнего края экрана до pill, когда `safeAreaBottom === 0`
+ * (типичный Android tablet / gesture nav без inset). Паритет с боковым inset.
+ */
+export const MOBILE_BOTTOM_NAV_MIN_EDGE_GAP = MOBILE_BOTTOM_NAV_HORIZONTAL_INSET;
 
-/** Вертикальный паддинг blur-контейнера таббара. */
-export const MOBILE_BOTTOM_NAV_PADDING_VERTICAL = 4;
+/** Вертикальный паддинг pill-контейнера (~0.35rem). */
+export const MOBILE_BOTTOM_NAV_PADDING_VERTICAL = 6;
 
-/** Ozon-стиль: высокий тач-таргет табов. */
-export const MOBILE_BOTTOM_NAV_ITEM_MIN_HEIGHT = 48;
+/** Горизонтальный паддинг pill-контейнера (~0.45rem). */
+export const MOBILE_BOTTOM_NAV_PADDING_HORIZONTAL = 7;
 
-/** Shell `paddingBottom` floor when safe-area inset is zero. */
-export const MOBILE_BOTTOM_NAV_SHELL_MIN_PADDING_BOTTOM = 4;
+/** Мин. высота таба (~2.5rem web). */
+export const MOBILE_BOTTOM_NAV_ITEM_MIN_HEIGHT = 40;
 
-/** Фактическая высота таббара — паритет с `MobileBottomTabBar`. */
-export const resolveMobileBottomNavLayoutHeight = (safeAreaBottom = 0): number =>
-  MOBILE_BOTTOM_NAV_FLOAT_OFFSET +
-  StyleSheet.hairlineWidth +
+/** Скругление pill — паритет с `--iz-radius-pill`. */
+export const MOBILE_BOTTOM_NAV_BORDER_RADIUS = 999;
+
+/** Высота только pill (без float / safe-area). */
+export const resolveMobileBottomNavPillHeight = (): number =>
   MOBILE_BOTTOM_NAV_PADDING_VERTICAL +
   MOBILE_BOTTOM_NAV_ITEM_MIN_HEIGHT +
-  MOBILE_BOTTOM_NAV_PADDING_VERTICAL +
-  Math.max(safeAreaBottom, MOBILE_BOTTOM_NAV_SHELL_MIN_PADDING_BOTTOM);
+  MOBILE_BOTTOM_NAV_PADDING_VERTICAL;
 
-/** Высота зоны таббара — для `paddingBottom` скролла под floating nav. */
+/**
+ * Единая формула зазора от нижнего края устройства до pill:
+ *   FLOAT_OFFSET + max(safeAreaBottom, MIN_EDGE_GAP)
+ *
+ * iPhone:  6 + max(34, 12) = 40
+ * Android: 6 + max(0, 12)  = 18  (не прилипает к краю)
+ */
+export const resolveMobileBottomNavPaddingBottom = (safeAreaBottom = 0): number =>
+  MOBILE_BOTTOM_NAV_FLOAT_OFFSET +
+  Math.max(safeAreaBottom, MOBILE_BOTTOM_NAV_MIN_EDGE_GAP);
+
+/**
+ * Высота зоны таббара под контент:
+ * paddingBottom + pill.
+ * Для hide-анимации и absolute footer над баром.
+ */
+export const resolveMobileBottomNavLayoutHeight = (safeAreaBottom = 0): number =>
+  resolveMobileBottomNavPaddingBottom(safeAreaBottom) + resolveMobileBottomNavPillHeight();
+
+/**
+ * Inset списка под overlay-nav: высота pill + float/safe-area зона.
+ * Дополнительный зазор между последним контентом и pill — в screenContentLayout.
+ */
+export const resolveMobileBottomNavOverlayContentInset = (
+  safeAreaBottom = 0,
+): number => resolveMobileBottomNavLayoutHeight(safeAreaBottom);
+
+/** @deprecated используйте resolveMobileBottomNavLayoutHeight / OverlayContentInset */
 export const resolveMobileBottomNavReservedHeight = (safeAreaBottom = 0): number =>
   resolveMobileBottomNavLayoutHeight(safeAreaBottom);
 

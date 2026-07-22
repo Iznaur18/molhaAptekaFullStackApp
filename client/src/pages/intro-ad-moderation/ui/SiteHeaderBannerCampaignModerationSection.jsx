@@ -16,6 +16,8 @@ import { SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI } from "../../../shared/
 import { campaignModerationNeedsAttention } from "../../../shared/lib/campaignModerationAttention.js";
 
 import { filterPendingModerationCampaigns } from "../lib/filterPendingModerationCampaigns.js";
+import { INTRO_AD_MODERATION_SECTION_BANNER } from "../lib/introAdModerationSectionFilters.js";
+import { buildIntroAdModerationZonePanelClass } from "../lib/introAdModerationSectionZone.js";
 import { buildModerationCampaignRowId } from "../lib/introAdModerationSectionFilters.js";
 import { resolveModerationCampaignCollapsedPreview } from "../lib/resolveModerationCampaignCollapsedPreview.js";
 import { ModerationCampaignCollapsibleFrame } from "./ModerationCampaignCollapsibleFrame.jsx";
@@ -341,7 +343,9 @@ export function SiteHeaderBannerCampaignModerationSection({
             title={SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.PENDING_TITLE}
             pendingCount={filteredPendingCampaigns.length}
           />
-          <ul className="intro-ad-moderation-page__list profile-queue-content-panel">
+          <ul
+            className={`intro-ad-moderation-page__list ${buildIntroAdModerationZonePanelClass(INTRO_AD_MODERATION_SECTION_BANNER)}`}
+          >
             {filteredPendingCampaigns.map((campaign) => {
               const campaignId = String(campaign._id);
               const rowId = buildModerationCampaignRowId("banner", campaignId);

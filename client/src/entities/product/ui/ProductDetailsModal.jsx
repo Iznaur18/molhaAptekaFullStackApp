@@ -1,6 +1,7 @@
 import { useAppShellCompactLayout } from "../../../shared/lib/useAppShellCompactLayout.js";
 import { useSwipeRightToDismiss } from "../../../shared/lib/useSwipeRightToDismiss.js";
 import { ProductModalShell } from "../../../shared/ui/ProductModalShell/ProductModalShell.jsx";
+import { ProductDetailsModalPinnedGallery } from "./product-details-modal/ProductDetailsModalPinnedGallery.jsx";
 import { ProductDetailsModalPurchaseActions } from "./product-details-modal/ProductDetailsModalPurchaseActions.jsx";
 import { ProductDetailsModalTabPanel } from "./product-details-modal/ProductDetailsModalTabPanel.jsx";
 import { ProductDetailsModalTabs } from "./product-details-modal/ProductDetailsModalTabs.jsx";
@@ -10,7 +11,7 @@ import "./ProductDetailsModal.css";
 
 /**
  * @param {{
- *   isOpen: boolean;
+ *   isOpen?: boolean;
  *   onClose: () => void;
  *   product: import("../model/types.js").ProductFromApi | null;
  *   onSellerNameClick?: (userId: string) => void;
@@ -33,10 +34,11 @@ import "./ProductDetailsModal.css";
  *   initialDetailsTab?: 'details' | 'auction' | 'reviews' | 'installment';
  *   isPremiumUser?: boolean;
  *   onProfileActionBadgesChanged?: () => void;
+ *   presentation?: 'modal' | 'page';
  * }} props
  */
 export function ProductDetailsModal({
-  isOpen,
+  isOpen = true,
   onClose,
   product,
   onSellerNameClick,
@@ -51,9 +53,11 @@ export function ProductDetailsModal({
   initialDetailsTab = "details",
   isPremiumUser = false,
   onProfileActionBadgesChanged,
+  presentation = "modal",
 }) {
+  const isPage = presentation === "page";
   const ctrl = useProductDetailsModalController({
-    isOpen,
+    isOpen: isPage ? Boolean(product) : isOpen,
     onClose,
     product,
     onSellerNameClick,
@@ -66,14 +70,24 @@ export function ProductDetailsModal({
     onProfileActionBadgesChanged,
   });
 
-  const isMobileNav = useAppShellCompactLayout();
+  const isCompactLayout = useAppShellCompactLayout();
+  /** Page always uses app-like column + sticky dock (plan 1A). */
+  const isMobileNav = isPage || isCompactLayout;
+  /** Как в app: галерея сверху, табы под ней, контент ниже. */
+  const pinGalleryAboveTabs = isMobileNav;
 
   useSwipeRightToDismiss(isMobileNav ? ctrl.tabPanelRef : ctrl.modalBodyRef, {
-    enabled: isOpen && Boolean(product) && isMobileNav,
+    /* На page-экране назад — кнопка/history; свайп по галерее не должен закрывать. */
+    enabled: !isPage && isOpen && Boolean(product) && isMobileNav,
     onDismiss: onClose,
   });
 
-  if (!isOpen || !product) return null;
+  if (!product) {
+    return null;
+  }
+  if (!isPage && !isOpen) {
+    return null;
+  }
 
   const title = product.productName?.trim() || "Товар";
   const showMobilePurchaseDock =
@@ -112,8 +126,11 @@ export function ProductDetailsModal({
       {secondaryFooter}
     </div>
   ) : null;
-  const mobileReportOverlay =
-    isMobileNav && secondaryFooter && ctrl.detailsTab === "details" ? secondaryFooter : null;
+  const galleryReportOverlay = pinGalleryAboveTabs ? secondaryFooter : null;
+  const detailsReportOverlay =
+    !pinGalleryAboveTabs && isMobileNav && secondaryFooter && ctrl.detailsTab === "details"
+      ? secondaryFooter
+      : null;
   const hasMobileInlineActions =
     isMobileNav && adminFooter && ctrl.detailsTab === "details";
   const isAltDetailsTab =
@@ -126,6 +143,94 @@ export function ProductDetailsModal({
   ]
     .filter(Boolean)
     .join(" ");
+
+  const tabs =
+    ctrl.showProductDetailsTabs ? (
+      <ProductDetailsModalTabs
+        detailsTab={ctrl.detailsTab}
+        setDetailsTab={ctrl.setDetailsTab}
+        showAuctionTab={ctrl.showAuctionTab}
+        showInstallmentTab={ctrl.showInstallmentTab}
+        showReviewsTab={ctrl.showReviewsTab}
+        reviewsTabLabel={ctrl.reviewsTabLabel}
+      />
+    ) : null;
+
+  const tabPanel = (
+    <div
+      ref={ctrl.tabPanelRef}
+      className={tabPanelClassName}
+      style={
+        ctrl.showProductDetailsTabs && ctrl.tabPanelMinHeight > 0 && !isMobileNav
+          ? { minHeight: `${ctrl.tabPanelMinHeight}px` }
+          : undefined
+      }
+    >
+      <ProductDetailsModalTabPanel
+        product={product}
+        isOpen={isPage || isOpen}
+        isAuthorized={isAuthorized}
+        isPremiumUser={isPremiumUser}
+        onRequestLogin={onRequestLogin}
+        onProductStatsUpdate={onProductStatsUpdate}
+        currentUserId={currentUserId}
+        mobileReportOverlay={detailsReportOverlay}
+        productTitleId={isMobileNav ? undefined : "product-details-modal-title"}
+        embedMediaGallery={!pinGalleryAboveTabs}
+        ctrl={ctrl}
+      />
+    </div>
+  );
+
+  const body = pinGalleryAboveTabs ? (
+    <>
+      <ProductDetailsModalPinnedGallery
+        product={product}
+        isOpen={isPage || isOpen}
+        isAuthorized={isAuthorized}
+        onRequestLogin={onRequestLogin}
+        onProductStatsUpdate={onProductStatsUpdate}
+        currentUserId={currentUserId}
+        reportOverlay={galleryReportOverlay}
+        ctrl={ctrl}
+      />
+      {tabs}
+      {tabPanel}
+      {hasMobileInlineActions ? (
+        <div className="product-details-modal__mobile-inline-actions">{adminFooter}</div>
+      ) : null}
+    </>
+  ) : (
+    <>
+      {tabs}
+      {tabPanel}
+      {hasMobileInlineActions ? (
+        <div className="product-details-modal__mobile-inline-actions">{adminFooter}</div>
+      ) : null}
+    </>
+  );
+
+  if (isPage) {
+    return (
+      <div
+        className={[
+          "product-details-page",
+          "product-details-modal",
+          "product-details-modal--page",
+          showMobileDock ? "product-details-modal--mobile-dock-active" : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+      >
+        <div ref={ctrl.modalBodyRef} className="product-details-modal__body product-details-page__body">
+          {body}
+        </div>
+        {mobilePurchaseDock ? (
+          <div className="product-details-page__docked-footer">{mobilePurchaseDock}</div>
+        ) : null}
+      </div>
+    );
+  }
 
   return (
     <ProductModalShell
@@ -148,47 +253,7 @@ export function ProductDetailsModal({
       footerClassName="product-details-modal__footer"
       closeOnEscape={false}
     >
-      {ctrl.showProductDetailsTabs ? (
-        <ProductDetailsModalTabs
-          detailsTab={ctrl.detailsTab}
-          setDetailsTab={ctrl.setDetailsTab}
-          showAuctionTab={ctrl.showAuctionTab}
-          showInstallmentTab={ctrl.showInstallmentTab}
-          showReviewsTab={ctrl.showReviewsTab}
-          reviewsTabLabel={ctrl.reviewsTabLabel}
-        />
-      ) : null}
-
-      <div
-        ref={ctrl.tabPanelRef}
-        className={tabPanelClassName}
-        style={
-          ctrl.showProductDetailsTabs &&
-          ctrl.tabPanelMinHeight > 0 &&
-          !isMobileNav
-            ? { minHeight: `${ctrl.tabPanelMinHeight}px` }
-            : undefined
-        }
-      >
-        <ProductDetailsModalTabPanel
-          product={product}
-          isOpen={isOpen}
-          isAuthorized={isAuthorized}
-          isPremiumUser={isPremiumUser}
-          onRequestLogin={onRequestLogin}
-          onProductStatsUpdate={onProductStatsUpdate}
-          currentUserId={currentUserId}
-          mobileReportOverlay={mobileReportOverlay}
-          productTitleId={isMobileNav ? undefined : "product-details-modal-title"}
-          ctrl={ctrl}
-        />
-      </div>
-
-      {hasMobileInlineActions ? (
-        <div className="product-details-modal__mobile-inline-actions">
-          {adminFooter}
-        </div>
-      ) : null}
+      {body}
     </ProductModalShell>
   );
 }

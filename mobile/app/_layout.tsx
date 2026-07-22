@@ -13,6 +13,7 @@ import { createAppQueryClient } from "@/shared/api";
 import { FAQ_UI, LEGAL_UI } from "@/shared/config";
 import {
   COLD_START_SPLASH_MAX_WAIT_MS,
+  prepareColdStartSplash,
   releaseColdStartSplash,
 } from "@/shared/model/coldStartSplashGate";
 import { AppProviders } from "@/shared/providers/AppProviders";
@@ -20,7 +21,7 @@ import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
 
 export { ErrorBoundary } from "expo-router";
 
-SplashScreen.preventAutoHideAsync();
+prepareColdStartSplash();
 if (Constants.appOwnership !== "expo") {
   SplashScreen.setOptions({ fade: true, duration: 300 });
 }
@@ -56,8 +57,7 @@ function RootLayoutNav() {
   const { colorScheme, theme } = useAppThemeSettings();
   const pathname = usePathname();
 
-  // Контентный гейт сплэша есть только у главной ("/"): холодный старт по
-  // deep link на другой экран прячет сплэш сразу, как раньше.
+  // Deep link / auth / другие вкладки: прячем сплэш сразу. На "/" — гейт главной.
   useEffect(() => {
     if (pathname !== "/") {
       releaseColdStartSplash();

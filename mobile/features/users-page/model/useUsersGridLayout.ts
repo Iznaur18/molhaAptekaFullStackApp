@@ -6,7 +6,10 @@ import {
   USERS_GRID_TILE_MIN_WIDTH,
 } from "@/features/users-page/lib/usersGridConstants";
 import { resolveUsersGridGap } from "@/features/users-page/lib/resolveUsersGridGap";
-import { SCREEN_SMALL_TABLET_MIN_WIDTH } from "@/shared/lib/screenBreakpoints";
+import {
+  resolveLayoutContentWidth,
+  SCREEN_SMALL_TABLET_MIN_WIDTH,
+} from "@/shared/lib/screenBreakpoints";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 
 export type UsersGridLayout = {
@@ -23,7 +26,8 @@ export const useUsersGridLayout = (
   const { width } = useWindowDimensions();
 
   return useMemo(() => {
-    const contentWidth = width - pagePadding * 2;
+    const layoutWidth = resolveLayoutContentWidth(width);
+    const contentWidth = layoutWidth - pagePadding * 2;
     const gap = resolveUsersGridGap(width);
     const autoColumns = Math.max(
       1,

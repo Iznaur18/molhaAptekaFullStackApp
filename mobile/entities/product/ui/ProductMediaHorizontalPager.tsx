@@ -118,7 +118,9 @@ export const ProductMediaHorizontalPager = ({
           })}
           onMomentumScrollEnd={handleMomentumScrollEnd}
           onScrollEndDrag={handleScrollEndDrag}
-          renderItem={({ item }) => <View style={{ width }}>{renderSlide(item, width)}</View>}
+          renderItem={({ item }) => (
+            <View style={{ width, height: width }}>{renderSlide(item, width)}</View>
+          )}
         />
       ) : null}
     </View>

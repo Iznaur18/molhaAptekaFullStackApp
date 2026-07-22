@@ -76,7 +76,8 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
   guestHero: {
     width: "100%",
     backgroundColor: theme.colors.surfaceMuted,
-    borderRadius: 32,
+    borderBottomLeftRadius: 32,
+    borderBottomRightRadius: 32,
     overflow: "hidden",
   },
   guestHeroImage: {
@@ -87,7 +88,8 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
     width: "100%",
     height: "100%",
     backgroundColor: theme.colors.surfaceMuted,
-    borderRadius: 32,
+    borderBottomLeftRadius: 32,
+    borderBottomRightRadius: 32,
   },
   guestBody: {
     alignItems: "center",

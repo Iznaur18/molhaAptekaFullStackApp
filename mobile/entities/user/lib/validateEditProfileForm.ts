@@ -8,6 +8,7 @@ import {
   USER_NAME_PATTERN,
 } from "@/entities/user/model/constants";
 
+import { isBirthDateInputComplete, parseBirthDateInputToIsoDate } from "./birthDateInputMask";
 import { validateRuPhoneField } from "./ruPhone";
 import type { EditProfileFormState } from "./mapUserToEditProfileForm";
 
@@ -22,10 +23,24 @@ export const validateEditProfileForm = (form: EditProfileFormState): string | nu
     }
   }
 
+  const birthDate = form.userBirthDate.trim();
+  if (birthDate !== "") {
+    if (!isBirthDateInputComplete(birthDate)) {
+      return "Дата рождения: ДД.ММ.ГГГГ";
+    }
+    const isoDate = parseBirthDateInputToIsoDate(birthDate);
+    if (isoDate && new Date(`${isoDate}T12:00:00.000Z`) > new Date()) {
+      return "Дата рождения не может быть в будущем";
+    }
+  }
+
   const phoneError = validateRuPhoneField(form.userPhoneNumber);
   if (phoneError) return phoneError;
 
-  for (const fieldId of USER_SOCIAL_LINK_FIELD_IDS) {
+  for (const fieldId of USER_SOCIAL_LINK_FIELD_IDS as readonly Extract<
+    keyof EditProfileFormState,
+    `social${string}`
+  >[]) {
     const link = form[fieldId].trim();
     if (link === "") continue;
     if (!isHttpUrl(link)) {

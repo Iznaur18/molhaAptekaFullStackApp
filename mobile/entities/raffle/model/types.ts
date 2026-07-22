@@ -18,11 +18,18 @@ export type RaffleFromApi = {
   prizeImageFocus?: { x?: number; y?: number };
   targetSales: number;
   salesProgress: number;
+  participantsCount?: number;
   status: RaffleStatus;
   instagramUrl?: string | null;
   moderationComment?: string;
   approvedAt?: string | null;
   completedAt?: string | null;
+  winner?: {
+    _id: string;
+    userName?: string | null;
+    userAvatarUrl?: string | null;
+  } | null;
+  winnerSelectedAt?: string | null;
   createdAt?: string;
   updatedAt?: string;
   seller?: { _id: string; userName?: string | null } | null;

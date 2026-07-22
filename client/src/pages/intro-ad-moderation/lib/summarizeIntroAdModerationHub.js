@@ -5,11 +5,12 @@ import { campaignModerationIsStale, campaignModerationNeedsAttention } from "../
  *   introPending?: Array<{ createdAt?: string | Date | null }>;
  *   bannerPending?: Array<{ createdAt?: string | Date | null }>;
  *   personalPending?: Array<{ createdAt?: string | Date | null; imageUrl?: string | null }>;
+ *   rafflePendingCount?: number;
  * }} queues
  * @param {number} [nowMs]
  */
 export function summarizeIntroAdModerationHub(
-  { introPending = [], bannerPending = [], personalPending = [] },
+  { introPending = [], bannerPending = [], personalPending = [], rafflePendingCount = 0 },
   nowMs = Date.now(),
 ) {
   const allPending = [...introPending, ...bannerPending, ...personalPending];
@@ -22,10 +23,11 @@ export function summarizeIntroAdModerationHub(
   }
 
   return {
-    pendingTotal: allPending.length,
+    pendingTotal: allPending.length + rafflePendingCount,
     introPendingCount: introPending.length,
     bannerPendingCount: bannerPending.length,
     personalPendingCount: personalPending.length,
+    rafflePendingCount,
     attentionCount,
     staleCount: allPending.filter((campaign) => campaignModerationIsStale(campaign, nowMs)).length,
   };

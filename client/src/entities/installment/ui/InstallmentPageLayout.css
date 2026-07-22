@@ -221,18 +221,17 @@
   color: var(--iz-color-text-secondary);
 }
 
+/* Геометрия — базовый слой; фон surfaceMuted как у модальных полей мобилы */
 .installment-queue-card__textarea,
 .installment-queue-card__input {
   width: 100%;
-  padding: 0.4rem 0.5rem;
-  border: 1px solid var(--iz-color-border);
-  border-radius: 0.4rem;
-  font: inherit;
   background: var(--iz-color-surface-muted);
+  font: inherit;
+  font-size: var(--iz-control-input-font);
 }
 
 .installment-queue-card__textarea {
-  min-height: 2.75rem;
+  min-height: 72px;
   resize: vertical;
 }
 

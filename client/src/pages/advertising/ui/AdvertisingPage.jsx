@@ -26,6 +26,7 @@ import {
 import { IS_INTRO_AD_ADVERTISING_ENABLED } from "../model/isIntroAdAdvertisingEnabled.js";
 import { SellerPersonalCategoryAdvertisingSection } from "./SellerPersonalCategoryAdvertisingSection.jsx";
 import { SiteHeaderBannerAdvertisingSection } from "./SiteHeaderBannerAdvertisingSection.jsx";
+import { RaffleAdvertisingSection } from "./RaffleAdvertisingSection.jsx";
 
 import "./AdvertisingPage.css";
 
@@ -62,9 +63,10 @@ function resolveStatusPanelClass(status) {
  * @param {{
  *   isAuthorized: boolean;
  *   onRequestLogin: () => void;
+ *   onOpenCreateRaffle?: () => void;
  * }} props
  */
-export function AdvertisingPage({ isAuthorized, onRequestLogin }) {
+export function AdvertisingPage({ isAuthorized, onRequestLogin, onOpenCreateRaffle }) {
   const queryClient = useQueryClient();
   const campaignQuery = useMyIntroAdCampaignQuery({ enabled: isAuthorized });
   const loyaltyQuery = useMyLoyaltyPointsStatusQuery({ enabled: isAuthorized });
@@ -405,6 +407,12 @@ export function AdvertisingPage({ isAuthorized, onRequestLogin }) {
         <SiteHeaderBannerAdvertisingSection
           isAuthorized={isAuthorized}
           loyaltyBalance={loyaltyBalance}
+        />
+
+        <RaffleAdvertisingSection
+          isAuthorized={isAuthorized}
+          loyaltyBalance={loyaltyBalance}
+          onOpenCreateRaffle={onOpenCreateRaffle}
         />
       </div>
     </section>

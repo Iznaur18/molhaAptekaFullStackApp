@@ -1,9 +1,13 @@
-import { Modal, Pressable, ScrollView, Text, View } from "react-native";
+import { useMemo } from "react";
+import { Dimensions, Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import Animated from "react-native-reanimated";
 
 import type { OrderPaymentMethod } from "@/entities/order/model/constants";
 import { CheckoutForm } from "@/features/checkout/ui/CheckoutForm";
 import { CHECKOUT_FORM_UI, CART_PAGE_UI } from "@/shared/config";
+import { useAdminEditModalAnimation } from "@/shared/model/useAdminEditModalAnimation";
 import { useBottomSheetFormStyles } from "@/shared/theme/formChromeStyles";
+import { CHECKOUT_SHEET_MODAL_ANIMATION } from "@/shared/theme/modalChromeStyles";
 import { ModalSheetGradientBackdrop } from "@/shared/ui/ModalSheetGradientBackdrop";
 
 type CheckoutSheetModalProps = {
@@ -32,13 +36,35 @@ export const CheckoutSheetModal = ({
   onSubmit,
 }: CheckoutSheetModalProps) => {
   const sheetStyles = useBottomSheetFormStyles();
+  const sheetSlideDistance = useMemo(() => Dimensions.get("window").height, []);
+  const { modalVisible, backdropAnimatedStyle, sheetAnimatedStyle } =
+    useAdminEditModalAnimation(visible, {
+      sheetSlideDistance,
+      enterMs: CHECKOUT_SHEET_MODAL_ANIMATION.enterMs,
+      exitMs: CHECKOUT_SHEET_MODAL_ANIMATION.exitMs,
+    });
+
+  if (!modalVisible) {
+    return null;
+  }
 
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+    <Modal visible={modalVisible} animationType="none" transparent onRequestClose={onClose}>
       <View style={sheetStyles.backdrop}>
-        <ModalSheetGradientBackdrop />
-        <Pressable style={sheetStyles.backdropDismiss} onPress={onClose} accessibilityRole="button" />
-        <View style={[sheetStyles.sheet, sheetStyles.checkoutSheet]}>
+        <Animated.View
+          style={[StyleSheet.absoluteFillObject, backdropAnimatedStyle]}
+          pointerEvents="none"
+        >
+          <ModalSheetGradientBackdrop />
+        </Animated.View>
+        <Pressable
+          style={sheetStyles.backdropDismiss}
+          onPress={onClose}
+          accessibilityRole="button"
+        />
+        <Animated.View
+          style={[sheetStyles.sheet, sheetStyles.checkoutSheet, sheetAnimatedStyle]}
+        >
           <View style={sheetStyles.header}>
             <Text style={sheetStyles.title}>{CHECKOUT_FORM_UI.HEADING}</Text>
             <Pressable onPress={onClose} hitSlop={8}>
@@ -64,7 +90,7 @@ export const CheckoutSheetModal = ({
               onSubmit={onSubmit}
             />
           </ScrollView>
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );

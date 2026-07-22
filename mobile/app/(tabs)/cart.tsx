@@ -22,23 +22,30 @@ import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuer
 import { CartAuctionSection } from "@/features/cart-auction/ui/CartAuctionSection";
 import { CheckoutSheetModal } from "@/features/checkout/ui/CheckoutSheetModal";
 import { orderQueryKeys, priceOfferQueryKeys } from "@/shared/api";
-import { API_CLIENT_UI, AUTH_UI, CART_AUCTION_UI, CART_PAGE_UI, CHECKOUT_FORM_UI } from "@/shared/config";
+import { API_CLIENT_UI, AUTH_UI, CART_AUCTION_UI, CART_PAGE_UI, CART_STICKY_FOOTER_TOP_RADIUS, CHECKOUT_FORM_UI } from "@/shared/config";
 import { formatApiErrorMessage, formatPriceRub } from "@/shared/lib";
 import { resolveMobileBottomNavLayoutHeight } from "@/shared/lib/mobileBottomNavLayout";
 import { useCartScreenStyles } from "@/shared/theme/catalogProductStyles";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { AppButton } from "@/shared/ui/AppButton";
+import { SquircleView } from "@/shared/ui/SquircleView";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
-/** Примерная высота закреплённого footer (итог + CTA). */
-const CART_STICKY_FOOTER_HEIGHT = 132;
+/** Примерная высота закреплённой карточки footer (итог + CTA) с паддингами. */
+const CART_STICKY_FOOTER_HEIGHT = 160;
+
+/** Боковой инсет плавающей карточки — паритет с карточками товаров (rowOuter marginHorizontal). */
+const CART_STICKY_FOOTER_FLOAT_INSET = 12;
+
+/** Зазор между карточкой footer и навбаром. */
+const CART_STICKY_FOOTER_FLOAT_GAP = 8;
 
 export default function CartScreen() {
   const router = useRouter();
   const styles = useCartScreenStyles();
   const insets = useSafeAreaInsets();
-  const { contentPaddingTop, contentPaddingHorizontal } = useScreenLayout();
+  const { contentPaddingTop, centeredContentStyle } = useScreenLayout();
   const bottomNavLayoutHeight = resolveMobileBottomNavLayoutHeight(insets.bottom);
   const queryClient = useQueryClient();
   const isAuthorized = useIsAuthorized();
@@ -235,14 +242,26 @@ export default function CartScreen() {
     );
   }
 
-  const stickyFooterStyle = {
-    bottom: 0,
-    paddingHorizontal: contentPaddingHorizontal,
-    paddingBottom: 0,
-  };
-
   const checkoutFooter = (
-    <View style={[styles.stickyFooter, stickyFooterStyle]}>
+    <SquircleView
+      cornerRadii={{
+        topLeft: CART_STICKY_FOOTER_TOP_RADIUS,
+        topRight: CART_STICKY_FOOTER_TOP_RADIUS,
+        bottomLeft: CART_STICKY_FOOTER_TOP_RADIUS,
+        bottomRight: CART_STICKY_FOOTER_TOP_RADIUS,
+      }}
+      outerStyle={[
+        styles.stickyFooter,
+        {
+          left: CART_STICKY_FOOTER_FLOAT_INSET,
+          right: CART_STICKY_FOOTER_FLOAT_INSET,
+          bottom: bottomNavLayoutHeight + CART_STICKY_FOOTER_FLOAT_GAP,
+        },
+      ]}
+      style={styles.stickyFooterInner}
+      shadowStyle={styles.stickyFooterShadow}
+    >
+      <View style={styles.stickyFooterAccentBar} pointerEvents="none" />
       <View style={styles.footerTopRow}>
         <View style={styles.footerTotalBlock}>
           <Text style={styles.footerTotalLabel}>{totalLabel}</Text>
@@ -275,57 +294,59 @@ export default function CartScreen() {
         disabled={!canCheckout || isUpdating}
         onPress={() => setCheckoutSheetOpen(true)}
       />
-    </View>
+    </SquircleView>
   );
 
   return (
     <View style={styles.container}>
-      <FlatList
-        style={styles.container}
-        data={visibleLines}
-        keyExtractor={(line) => line.productId}
-        renderItem={({ item }) => (
-          <CartLineItem
-            line={item}
-            selected={isLineSelected(item.productId)}
-            onToggleSelected={toggleLine}
-          />
-        )}
-        ListHeaderComponent={
-          <>
-            <CartAuctionSection bids={auctionBids} onCheckout={handleOpenAuctionCheckout} />
-            {visibleLines.length > 0 ? (
-              <CartSelectAllRow
-                selectedCount={selectedCount}
-                totalCount={visibleLines.length}
-                areAllSelected={areAllSelected}
-                onToggleAll={toggleAll}
-              />
-            ) : null}
-          </>
-        }
-        contentContainerStyle={[
-          styles.list,
-          {
-            paddingTop: contentPaddingTop + 8,
-            paddingBottom:
-              bottomNavLayoutHeight +
-              (visibleLines.length > 0 ? CART_STICKY_FOOTER_HEIGHT : 0),
-          },
-        ]}
-        refreshControl={
-          <ThemedRefreshControl
-            refreshing={
-              cartQuery.isRefetching ||
-              productsQuery.isRefetching ||
-              acceptedBidsQuery.isRefetching
-            }
-            onRefresh={handleRefresh}
-          />
-        }
-      />
+      <View style={[styles.container, centeredContentStyle]}>
+        <FlatList
+          style={styles.container}
+          data={visibleLines}
+          keyExtractor={(line) => line.productId}
+          renderItem={({ item }) => (
+            <CartLineItem
+              line={item}
+              selected={isLineSelected(item.productId)}
+              onToggleSelected={toggleLine}
+            />
+          )}
+          ListHeaderComponent={
+            <>
+              <CartAuctionSection bids={auctionBids} onCheckout={handleOpenAuctionCheckout} />
+              {visibleLines.length > 0 ? (
+                <CartSelectAllRow
+                  selectedCount={selectedCount}
+                  totalCount={visibleLines.length}
+                  areAllSelected={areAllSelected}
+                  onToggleAll={toggleAll}
+                />
+              ) : null}
+            </>
+          }
+          contentContainerStyle={[
+            styles.list,
+            {
+              paddingTop: contentPaddingTop + 8,
+              paddingBottom:
+                bottomNavLayoutHeight +
+                (visibleLines.length > 0 ? CART_STICKY_FOOTER_HEIGHT : 0),
+            },
+          ]}
+          refreshControl={
+            <ThemedRefreshControl
+              refreshing={
+                cartQuery.isRefetching ||
+                productsQuery.isRefetching ||
+                acceptedBidsQuery.isRefetching
+              }
+              onRefresh={handleRefresh}
+            />
+          }
+        />
 
-      {visibleLines.length > 0 ? checkoutFooter : null}
+        {visibleLines.length > 0 ? checkoutFooter : null}
+      </View>
 
       <CheckoutSheetModal
         visible={checkoutSheetOpen}

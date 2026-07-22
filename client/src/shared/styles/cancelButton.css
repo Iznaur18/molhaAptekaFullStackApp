@@ -1,3 +1,8 @@
+/**
+ * Общая «отмена» для legacy-классов, не переведённых на .app-btn--cancel.
+ * Паритет с mobile: solid `danger` + label `onContrast`, disabled opacity .55,
+ * нажатие scale(0.96) — см. shared/ui/AppButton/AppButton.css.
+ */
 .app-btn--cancel,
 .iz-cancel-btn,
 .product-card__delete-confirm-cancel,
@@ -10,9 +15,14 @@
 .product-price-offer__btn--cancel,
 .auction-dashboard-row__editor-cancel,
 .installment-queue-card__btn_cancel {
-  border: 1px solid var(--iz-color-danger);
+  border: var(--iz-border) solid var(--iz-color-danger);
   background: var(--iz-color-danger);
   color: var(--iz-color-on-contrast);
+  transition:
+    background var(--iz-transition-base),
+    border-color var(--iz-transition-base),
+    opacity var(--iz-transition-base),
+    transform var(--iz-transition-press);
 }
 
 .app-btn--cancel:hover:not(:disabled),
@@ -27,8 +37,22 @@
 .product-price-offer__btn--cancel:hover:not(:disabled),
 .auction-dashboard-row__editor-cancel:hover:not(:disabled),
 .installment-queue-card__btn_cancel:hover:not(:disabled) {
-  border-color: var(--iz-color-danger);
-  background: var(--iz-color-danger);
+  border-color: color-mix(in srgb, var(--iz-color-danger) 85%, var(--iz-color-ink));
+  background: color-mix(in srgb, var(--iz-color-danger) 85%, var(--iz-color-ink));
+}
+
+.iz-cancel-btn:active:not(:disabled),
+.product-card__delete-confirm-cancel:active:not(:disabled),
+.my-profile-page__logout-cancel:active:not(:disabled),
+.order-card__item-action-button_cancel:active:not(:disabled),
+.report-product-modal__cancel:active:not(:disabled),
+.edit-profile-modal__cancel:active:not(:disabled),
+.product-reviews-section__cancel-edit:active:not(:disabled),
+.admin-delete-user__btn_secondary:active:not(:disabled),
+.product-price-offer__btn--cancel:active:not(:disabled),
+.auction-dashboard-row__editor-cancel:active:not(:disabled),
+.installment-queue-card__btn_cancel:active:not(:disabled) {
+  transform: scale(var(--iz-state-pressed-scale));
 }
 
 .app-btn--cancel:disabled,
@@ -43,18 +67,35 @@
 .product-price-offer__btn--cancel:disabled,
 .auction-dashboard-row__editor-cancel:disabled,
 .installment-queue-card__btn_cancel:disabled {
-  opacity: 0.65;
+  opacity: var(--iz-state-disabled-opacity);
   cursor: not-allowed;
 }
 
 .auction-dashboard-row__editor-cancel {
   align-self: flex-start;
   margin: 0;
-  padding: 0.35rem 0.65rem;
-  border-radius: 0.4rem;
+  padding: var(--iz-control-btn-padding-y) var(--iz-control-btn-padding-x);
+  border-radius: var(--iz-control-btn-radius);
   font: inherit;
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-size: var(--iz-control-btn-font);
+  font-weight: var(--iz-control-btn-weight);
   text-decoration: none;
   cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iz-cancel-btn:active:not(:disabled),
+  .product-card__delete-confirm-cancel:active:not(:disabled),
+  .my-profile-page__logout-cancel:active:not(:disabled),
+  .order-card__item-action-button_cancel:active:not(:disabled),
+  .report-product-modal__cancel:active:not(:disabled),
+  .edit-profile-modal__cancel:active:not(:disabled),
+  .product-reviews-section__cancel-edit:active:not(:disabled),
+  .admin-delete-user__btn_secondary:active:not(:disabled),
+  .product-price-offer__btn--cancel:active:not(:disabled),
+  .auction-dashboard-row__editor-cancel:active:not(:disabled),
+  .installment-queue-card__btn_cancel:active:not(:disabled) {
+    transform: none;
+    opacity: var(--iz-state-pressed-opacity);
+  }
 }

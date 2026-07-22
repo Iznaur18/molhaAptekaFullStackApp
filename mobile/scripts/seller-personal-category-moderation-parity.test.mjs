@@ -18,8 +18,9 @@ test("seller personal category moderation page mirrors web queue and hub chrome"
   assert.match(page, /ProfileMobileSectionToggle/);
   assert.match(page, /ProfileMobileNavSheet/);
   assert.match(page, /contentPaddingBottom/);
-  assert.match(page, /removeFromQueue/);
-  assert.match(page, /catalogTiles/);
+  assert.match(page, /SellerPersonalCategoryCampaignModerationSection/);
+  assert.match(page, /useManagedSellerPersonalCategoryCampaignsQuery/);
+  assert.doesNotMatch(page, /removeFromQueue/);
   assert.match(page, /activeSectionId="seller-personal-category-moderation"/);
   assert.match(page, /TAB_SELLER_PERSONAL_CATEGORY_MODERATION/);
   assert.doesNotMatch(page, /StaffModerationActions/);
@@ -37,6 +38,9 @@ test("seller personal category moderation campaign card mirrors web", () => {
   assert.match(card, /REJECT_REASON_PLACEHOLDER/);
   assert.match(card, /resolveUploadedMediaUrl/);
   assert.match(card, /formatSellerPersonalCategoryCampaignSummary/);
+  assert.match(card, /STAFF_UNPUBLISH/);
+  assert.match(card, /STAFF_DELETE/);
+  assert.match(card, /mode: "pending" \| "managed"/);
 });
 
 test("seller personal category moderation ui copy matches web page", () => {
@@ -45,4 +49,7 @@ test("seller personal category moderation ui copy matches web page", () => {
   assert.match(copy, /TITLE: "Личные категории"/);
   assert.match(copy, /APPROVE_FALLBACK: "Не удалось одобрить заявку"/);
   assert.match(copy, /REJECT_FALLBACK: "Не удалось отклонить заявку"/);
+  assert.match(copy, /STAFF_UNPUBLISH:/);
+  assert.match(copy, /STAFF_DELETE:/);
+  assert.match(copy, /MANAGED_TITLE:/);
 });

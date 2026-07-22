@@ -1054,6 +1054,12 @@ const PRODUCT_DETAILS_GAP = 12;
 const DETAIL_SPEC_PADDING_H = 16;
 const DETAIL_DOCK_SCROLL_PADDING = PRODUCT_DETAIL_DOCK_SCROLL_PADDING;
 
+/** Верхние / все углы purchase-dock (сквиркл). */
+export const PRODUCT_DETAIL_PURCHASE_DOCK_TOP_RADIUS = 20;
+
+/** Отступ плавающего purchase-dock от краёв колонки (углы читаются на bg). */
+export const PRODUCT_DETAIL_PURCHASE_DOCK_INSET = 12;
+
 /** Parity: client ProductDetailsModalFields.css `.product-details-modal__stats-grid` */
 const PRODUCT_DETAILS_STAT_GRID_GAP = 2;
 const PRODUCT_DETAILS_STAT_ROW_GAP = 12;
@@ -1187,54 +1193,73 @@ export const useProductDetailsSellerPreviewStyles = createThemedStyles((theme) =
   root: {
     marginTop: 8,
     marginHorizontal: DETAIL_SPEC_PADDING_H,
-    paddingTop: 13.6,
-    paddingBottom: 13.6,
-    paddingLeft: 16,
-    paddingRight: 16,
+    padding: 14,
     borderWidth: 1,
-    borderColor: `${theme.colors.link}29`,
-    borderRadius: 10.4,
-    backgroundColor: theme.colors.actionSurface,
-    gap: 6.6,
+    borderColor: `${theme.colors.ink}12`,
+    borderRadius: 16,
+    backgroundColor: theme.colors.surfaceElevated,
+    gap: 12,
   },
   rootPressed: {
-    borderColor: `${theme.colors.link}52`,
+    borderColor: `${theme.colors.action}59`,
     backgroundColor: theme.colors.actionSurface,
   },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  avatar: {
+    width: 52,
+    height: 52,
+  },
+  headerText: {
+    flex: 1,
+    minWidth: 0,
+    gap: 3,
+  },
   label: {
-    fontSize: 11.5,
-    fontWeight: "600",
+    fontSize: 11,
+    fontWeight: "700",
     color: theme.colors.textMuted,
     textTransform: "uppercase",
-    letterSpacing: 0.46,
+    letterSpacing: 0.6,
   },
   nameText: {
     fontSize: 16,
     fontWeight: "700",
     color: theme.colors.text,
-    lineHeight: 20.8,
+    lineHeight: 21,
+  },
+  divider: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: `${theme.colors.ink}12`,
   },
   metrics: {
     flexDirection: "row",
     flexWrap: "wrap",
-    margin: -6,
+    justifyContent: "space-between",
+    rowGap: 8,
   },
   metric: {
-    width: "50%",
-    padding: 6,
-    gap: 1.9,
-  },
-  metricKey: {
-    fontSize: 10.9,
-    fontWeight: "600",
-    color: theme.colors.textMuted,
-    lineHeight: 13.6,
+    width: "48%",
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    backgroundColor: `${theme.colors.text}0D`,
+    gap: 2,
   },
   metricValue: {
-    fontSize: 13.1,
-    fontWeight: "500",
+    fontSize: 16,
+    fontWeight: "700",
     color: theme.colors.text,
-    lineHeight: 17,
+    lineHeight: 20,
+  },
+  metricKey: {
+    fontSize: 11,
+    fontWeight: "500",
+    color: theme.colors.textMuted,
+    lineHeight: 14,
   },
 }));
 
@@ -1667,17 +1692,21 @@ export const useProductDetailScreenStyles = createThemedStyles((theme) => ({
   },
   purchaseDock: {
     position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
+    left: PRODUCT_DETAIL_PURCHASE_DOCK_INSET,
+    right: PRODUCT_DETAIL_PURCHASE_DOCK_INSET,
+    bottom: PRODUCT_DETAIL_PURCHASE_DOCK_INSET,
     zIndex: 10,
-    elevation: 10,
+    elevation: 0,
+    shadowColor: "transparent",
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    shadowOffset: { width: 0, height: 0 },
+  },
+  purchaseDockInner: {
     paddingTop: 8.8,
     paddingHorizontal: 12,
     paddingBottom: 10.4,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: theme.colors.border,
-    backgroundColor: `${theme.colors.surface}F0`,
+    backgroundColor: theme.colors.surface,
   },
   installmentDock: {
     position: "absolute",
@@ -1873,6 +1902,8 @@ export const useProductPriceOfferStyles = createThemedStyles((theme) => ({
 }));
 
 const PRODUCT_DETAIL_TAB_BAR_INDICATOR_WIDTH = 2.5;
+/** Паритет с `detailHero.borderRadius` — скругление таббара на планшете. */
+export const PRODUCT_DETAIL_TAB_BAR_TABLET_RADIUS = 13.6;
 
 export const useProductDetailTabBarStyles = createThemedStyles((theme) => ({
   root: {
@@ -1880,11 +1911,26 @@ export const useProductDetailTabBarStyles = createThemedStyles((theme) => ({
     borderBottomColor: theme.colors.border,
     backgroundColor: theme.colors.surface,
   },
+  rootTablet: {
+    width: "100%",
+    alignSelf: "stretch",
+    backgroundColor: theme.colors.surface,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: theme.colors.border,
+  },
   scrollContent: {
     flexDirection: "row",
     alignItems: "stretch",
     gap: 4,
     paddingHorizontal: DETAIL_SPEC_PADDING_H,
+    paddingTop: 4,
+    paddingBottom: 0,
+  },
+  rowTablet: {
+    flexDirection: "row",
+    alignItems: "stretch",
+    width: "100%",
+    gap: 4,
     paddingTop: 4,
     paddingBottom: 0,
   },
@@ -1896,6 +1942,11 @@ export const useProductDetailTabBarStyles = createThemedStyles((theme) => ({
     borderBottomWidth: PRODUCT_DETAIL_TAB_BAR_INDICATOR_WIDTH,
     borderBottomColor: "transparent",
     backgroundColor: "transparent",
+  },
+  tabTablet: {
+    flex: 1,
+    alignItems: "center",
+    paddingHorizontal: 8,
   },
   tabActive: {
     borderBottomColor: theme.colors.action,
@@ -2467,16 +2518,33 @@ export const useCartScreenStyles = createThemedStyles((theme) => ({
     left: 0,
     right: 0,
     bottom: 0,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: theme.colors.border,
-    backgroundColor: theme.colors.surface,
-    paddingTop: 16,
+    // Фон + бордер на внешнем (не-overflow) слое: RN скругляет их нативно по
+    // borderRadius. На Android-планшетах borderWidth+overflow:hidden+borderRadius
+    // на одном View ломает рендер — поэтому клип держим отдельно (внутренний View).
+    borderWidth: 1,
+    borderColor: `${theme.colors.ink}14`,
+    backgroundColor: theme.colors.surfaceElevated,
+  },
+  stickyFooterInner: {
+    paddingTop: 18,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
     gap: 10,
-    shadowColor: theme.colors.text,
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: -2 },
-    elevation: 8,
+  },
+  stickyFooterAccentBar: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 3,
+    backgroundColor: theme.colors.action,
+  },
+  stickyFooterShadow: {
+    shadowColor: theme.colors.ink,
+    shadowOpacity: 0.14,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 14,
   },
   footerTopRow: {
     flexDirection: "row",
@@ -2494,9 +2562,10 @@ export const useCartScreenStyles = createThemedStyles((theme) => ({
     color: theme.colors.textMuted,
   },
   footerTotalValue: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "800",
-    color: theme.colors.text,
+    letterSpacing: -0.3,
+    color: theme.colors.ink,
   },
   footerFullTotalHint: {
     fontSize: 12,
@@ -2508,7 +2577,11 @@ export const useCartScreenStyles = createThemedStyles((theme) => ({
   clearButton: {
     flexShrink: 0,
     paddingVertical: 8,
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
   },
   clearButtonText: {
     color: theme.colors.danger,

@@ -20,11 +20,14 @@
  * @property {{ x?: number; y?: number }} [prizeImageFocus]
  * @property {number} targetSales
  * @property {number} salesProgress
+ * @property {number} [participantsCount]
  * @property {RaffleStatus} status
  * @property {string | null} instagramUrl
  * @property {string} [moderationComment]
  * @property {string | null} [approvedAt]
  * @property {string | null} [completedAt]
+ * @property {{ _id: string; userName?: string | null; userAvatarUrl?: string | null } | null} [winner]
+ * @property {string | null} [winnerSelectedAt]
  * @property {string} [createdAt]
  * @property {string} [updatedAt]
  * @property {{ _id: string; userName?: string | null } | null} [seller]

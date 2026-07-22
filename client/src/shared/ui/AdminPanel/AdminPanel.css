@@ -125,27 +125,26 @@
   color: var(--iz-color-text-secondary);
 }
 
+/* Геометрия — базовый слой controls.css (useAdminEditModalStyles.input) */
 .admin-panel__field input,
 .admin-panel__field select,
 .admin-panel__field textarea {
   box-sizing: border-box;
   width: 100%;
-  padding: 0.5rem 0.65rem;
-  border: 1px solid var(--admin-panel-border);
-  border-radius: 0.5rem;
-  background: var(--iz-color-surface);
+  border-color: var(--admin-panel-border);
   font: inherit;
-  font-size: 0.875rem;
-  font-weight: 400;
+  font-size: var(--iz-control-input-font);
+  font-weight: var(--iz-weight-regular);
   color: var(--iz-color-text);
 }
 
+/* Фокус: action, а не accent — в мобиле inputFocused всегда синий */
 .admin-panel__field input:focus,
 .admin-panel__field select:focus,
 .admin-panel__field textarea:focus {
+  border-color: var(--iz-color-action);
   outline: none;
-  border-color: var(--iz-color-accent);
-  box-shadow: 0 0 0 3px var(--iz-color-status-purple-soft);
+  box-shadow: var(--iz-shadow-input-focus);
 }
 
 .admin-panel__field-hint {

@@ -31,7 +31,11 @@ export const HomeCatalogSearchRow = ({
     : resolveHomeCatalogHeaderPanelPaddingTop(insets.top);
 
   return (
-    <HomeCatalogHeaderPanel paddingTop={paddingTop} flatSheet={embeddedInForegroundSheet}>
+    <HomeCatalogHeaderPanel
+      paddingTop={paddingTop}
+      flatSheet={false}
+      floating={embeddedInForegroundSheet}
+    >
       <View style={styles.topRow}>
         <HomeCatalogHeaderSearch value={value} onChange={onChange} onSubmit={onSubmit} />
         <HomeCatalogUsersButton embeddedInForegroundSheet={embeddedInForegroundSheet} />

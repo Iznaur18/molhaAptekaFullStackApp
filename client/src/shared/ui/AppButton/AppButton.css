@@ -1,90 +1,201 @@
+/**
+ * Паритет с mobile/shared/ui/AppButton.tsx.
+ * База: radius 10, padding 12/20, label 15px/600, disabled opacity .55,
+ * нажатие — scale(0.96) (в мобиле withSpring damping 18 / stiffness 350).
+ * hover — web-only состояние, повторяет press-feedback приложения (затемнение).
+ *
+ * Важно: в мобиле варианты `cancel` и `danger` дают одну и ту же заливку
+ * (solid `danger` + label `onContrast`), поэтому web-вариант `--danger`
+ * больше не «мягкий» (dangerSurface/dangerText), а сплошной.
+ */
 .app-btn,
 .app-btn--primary,
 .app-btn--secondary,
 .app-btn--ghost,
 .app-btn--danger,
+.app-btn--success,
+.app-btn--contrast,
+.app-btn--outline,
 button:not([class]) {
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   margin: 0;
-  padding: 0.45rem var(--iz-space-3);
-  border: 1px solid transparent;
-  border-radius: var(--iz-radius-button);
+  padding: var(--iz-control-btn-padding-y) var(--iz-control-btn-padding-x);
+  border: var(--iz-border) solid transparent;
+  border-radius: var(--iz-control-btn-radius);
   font: inherit;
-  font-size: 0.85rem;
-  font-weight: 600;
-  line-height: 1.35;
+  font-size: var(--iz-control-btn-font);
+  font-weight: var(--iz-control-btn-weight);
+  line-height: var(--iz-leading-base);
   text-decoration: none;
   cursor: pointer;
   transition:
-    background 0.15s ease,
-    border-color 0.15s ease,
-    opacity 0.15s ease;
+    background var(--iz-transition-base),
+    border-color var(--iz-transition-base),
+    opacity var(--iz-transition-base),
+    transform var(--iz-transition-press);
 }
 
+/* Нажатие: scale(0.96) — как withSpring в AppButton */
+.app-btn:active:not(:disabled),
+.app-btn--primary:active:not(:disabled),
+.app-btn--secondary:active:not(:disabled),
+.app-btn--ghost:active:not(:disabled),
+.app-btn--cancel:active:not(:disabled),
+.app-btn--danger:active:not(:disabled),
+.app-btn--success:active:not(:disabled),
+.app-btn--contrast:active:not(:disabled),
+.app-btn--outline:active:not(:disabled),
+button:not([class]):active:not(:disabled) {
+  transform: scale(var(--iz-state-pressed-scale));
+}
+
+/* --- primary: backgroundColor action, label onContrast --- */
+.app-btn--primary {
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast);
+}
+
+.app-btn--primary:hover:not(:disabled) {
+  border-color: var(--iz-color-action-hover);
+  background: var(--iz-color-action-hover);
+}
+
+/* --- secondary: surfaceMuted + border, label text --- */
 .app-btn--secondary,
 button:not([class]) {
-  border-color: color-mix(in srgb, currentColor 22%, transparent);
-  background: color-mix(in srgb, currentColor 5%, transparent);
-  color: inherit;
+  border-color: var(--iz-color-border);
+  background: var(--iz-color-surface-muted);
+  color: var(--iz-color-text);
 }
 
 .app-btn--secondary:hover:not(:disabled),
 button:not([class]):hover:not(:disabled) {
-  background: color-mix(in srgb, currentColor 9%, transparent);
+  border-color: var(--iz-color-border-strong);
+  background: var(--iz-color-surface-elevated);
 }
 
-.app-btn--primary {
-  border-color: var(--iz-color-accent);
-  background: var(--iz-color-accent-soft);
-  color: var(--iz-color-accent);
-}
-
-.app-btn--primary:hover:not(:disabled) {
-  background: var(--iz-color-accent-soft);
-}
-
-.app-btn--cancel {
+/* --- cancel / danger: backgroundColor danger, label onContrast --- */
+.app-btn--cancel,
+.app-btn--danger {
   border-color: var(--iz-color-danger);
   background: var(--iz-color-danger);
   color: var(--iz-color-on-contrast);
 }
 
-.app-btn--cancel:hover:not(:disabled) {
-  border-color: var(--iz-color-danger);
-  background: var(--iz-color-danger);
-}
-
-.app-btn--danger {
-  border-color: var(--iz-color-danger);
-  background: var(--iz-color-danger-surface);
-  color: var(--iz-color-danger-text);
-}
-
+.app-btn--cancel:hover:not(:disabled),
 .app-btn--danger:hover:not(:disabled) {
-  background: var(--iz-color-danger-border);
+  border-color: color-mix(in srgb, var(--iz-color-danger) 85%, var(--iz-color-ink));
+  background: color-mix(in srgb, var(--iz-color-danger) 85%, var(--iz-color-ink));
 }
 
+/* --- success --- */
+.app-btn--success {
+  border-color: var(--iz-color-success);
+  background: var(--iz-color-success);
+  color: var(--iz-color-on-contrast);
+}
+
+.app-btn--success:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--iz-color-success) 85%, var(--iz-color-ink));
+  background: color-mix(in srgb, var(--iz-color-success) 85%, var(--iz-color-ink));
+}
+
+/* --- ghost: transparent, label link --- */
 .app-btn--ghost {
-  padding: var(--iz-space-1) var(--iz-space-2);
   border-color: transparent;
   background: transparent;
-  font-weight: 500;
+  color: var(--iz-color-link);
 }
 
 .app-btn--ghost:hover:not(:disabled) {
-  background: color-mix(in srgb, currentColor 8%, transparent);
+  background: color-mix(in srgb, var(--iz-color-link) 8%, transparent);
 }
 
+/* --- contrast: backgroundColor ink (nearBlack), label onContrast --- */
+.app-btn--contrast {
+  border-color: var(--iz-color-ink);
+  background: var(--iz-color-ink);
+  color: var(--iz-color-on-contrast);
+}
+
+.app-btn--contrast:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--iz-color-ink) 85%, var(--iz-color-on-contrast));
+  background: color-mix(in srgb, var(--iz-color-ink) 85%, var(--iz-color-on-contrast));
+}
+
+/* --- outline: surface + border ink, label ink --- */
+.app-btn--outline {
+  border-color: var(--iz-color-ink);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-ink);
+}
+
+.app-btn--outline:hover:not(:disabled) {
+  background: var(--iz-color-surface-muted);
+}
+
+/* --- focus-visible: кольцо action (в мобиле — inputFocused borderColor action) --- */
+.app-btn:focus-visible,
+.app-btn--primary:focus-visible,
+.app-btn--secondary:focus-visible,
+.app-btn--ghost:focus-visible,
+.app-btn--cancel:focus-visible,
+.app-btn--danger:focus-visible,
+.app-btn--success:focus-visible,
+.app-btn--contrast:focus-visible,
+.app-btn--outline:focus-visible,
+button:not([class]):focus-visible {
+  outline: var(--iz-border-selected) solid var(--iz-color-action);
+  outline-offset: 2px;
+}
+
+/* --- disabled: opacity .55 --- */
 .app-btn:disabled,
 .app-btn--primary:disabled,
 .app-btn--secondary:disabled,
 .app-btn--cancel:disabled,
 .app-btn--ghost:disabled,
 .app-btn--danger:disabled,
+.app-btn--success:disabled,
+.app-btn--contrast:disabled,
+.app-btn--outline:disabled,
 button:not([class]):disabled {
-  opacity: 0.65;
+  opacity: var(--iz-state-disabled-opacity);
   cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-btn,
+  .app-btn--primary,
+  .app-btn--secondary,
+  .app-btn--ghost,
+  .app-btn--cancel,
+  .app-btn--danger,
+  .app-btn--success,
+  .app-btn--contrast,
+  .app-btn--outline,
+  button:not([class]) {
+    transition:
+      background var(--iz-transition-base),
+      border-color var(--iz-transition-base),
+      opacity var(--iz-transition-base);
+  }
+
+  .app-btn:active:not(:disabled),
+  .app-btn--primary:active:not(:disabled),
+  .app-btn--secondary:active:not(:disabled),
+  .app-btn--ghost:active:not(:disabled),
+  .app-btn--cancel:active:not(:disabled),
+  .app-btn--danger:active:not(:disabled),
+  .app-btn--success:active:not(:disabled),
+  .app-btn--contrast:active:not(:disabled),
+  .app-btn--outline:active:not(:disabled),
+  button:not([class]):active:not(:disabled) {
+    transform: none;
+    opacity: var(--iz-state-pressed-opacity);
+  }
 }

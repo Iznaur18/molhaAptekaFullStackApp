@@ -1,29 +1,31 @@
 .site-header-banner-carousel {
-  --site-header-banner-height: 7.5rem;
-  display: none;
+  /* Паритет с mobile SITE_HEADER_BANNER_HEIGHT_PX / radius 22 */
+  --site-header-banner-height: 11.25rem; /* 180px */
+  --site-header-banner-radius: 22px;
+  display: block;
   width: 100%;
+  margin-top: 0.5rem;
 }
 
 .site-header-banner-carousel__viewport {
+  position: relative;
   overflow: hidden;
-  border-radius: 22px;
-  /* Вертикальный скролл страницы — браузеру; горизонтальный свайп — JS-карусели
-     (с определением направления жеста в обработчиках pointer). */
+  border-radius: var(--site-header-banner-radius);
   touch-action: pan-y;
 }
 
 .site-header-banner-carousel__track {
   display: flex;
-  width: 100%;
+  width: max-content;
+  will-change: transform;
 }
 
 .site-header-banner-carousel__slide {
   position: relative;
-  flex: 0 0 100%;
-  width: 100%;
+  flex: 0 0 auto;
   min-height: var(--site-header-banner-height);
   overflow: hidden;
-  border-radius: 22px;
+  border-radius: var(--site-header-banner-radius);
 }
 
 .site-header-banner-carousel__ad-badge {
@@ -64,32 +66,37 @@
 }
 
 .site-header-banner-carousel__dots {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 8px;
+  z-index: 5;
   display: flex;
   justify-content: center;
-  gap: 0.35rem;
-  margin-top: 0.35rem;
+  gap: 6px;
+  pointer-events: none;
 }
 
 .site-header-banner-carousel__dot {
-  width: 0.45rem;
-  height: 0.45rem;
+  width: 6px;
+  height: 6px;
   padding: 0;
   border: 0;
   border-radius: 999px;
-  background: var(--iz-color-border-strong, #cbd5e1);
+  background: rgb(255 255 255 / 40%);
   cursor: pointer;
+  pointer-events: auto;
 }
 
 .site-header-banner-carousel__dot_active {
-  background: var(--iz-color-brand, #2563eb);
+  background: rgb(255 255 255 / 100%);
 }
 
 .site-header-banner-carousel_single .site-header-banner-carousel__slide {
-  border-radius: 22px;
+  width: 100%;
+  border-radius: var(--site-header-banner-radius);
 }
 
-@container app-viewport (max-width: 640px) {
-  .site-header-banner-carousel {
-    display: block;
-  }
+.site-header-banner-carousel_single .site-header-banner-carousel__viewport {
+  border-radius: var(--site-header-banner-radius);
 }

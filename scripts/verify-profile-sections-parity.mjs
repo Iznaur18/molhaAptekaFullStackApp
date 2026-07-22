@@ -4,7 +4,10 @@ import { fileURLToPath } from "node:url";
 
 import { PROFILE_SECTION_IDS } from "@izibuy/shared-lib";
 
-const WEB_VIEW_TO_MOBILE_SECTION_ALIAS = new Map([["staff-raffles", "raffles"]]);
+const WEB_VIEW_TO_MOBILE_SECTION_ALIAS = new Map([
+  ["staff-raffles", "intro-ad-moderation"],
+  ["seller-personal-category-moderation", "intro-ad-moderation"],
+]);
 
 const WEB_VIEWS_OUTSIDE_PROFILE_HUB = new Set([
   "catalog",
@@ -16,6 +19,14 @@ const WEB_VIEWS_OUTSIDE_PROFILE_HUB = new Set([
 ]);
 
 const MOBILE_ONLY_PROFILE_SECTIONS = new Set(["overview", "create-raffle", "edit-profile"]);
+
+/** Legacy mobile section ids — redirect into merged hub screens on web. */
+const LEGACY_MOBILE_PROFILE_SECTIONS = new Set([
+  "raffles",
+  "seller-personal-category-moderation",
+  "product-promotions",
+  "product-manage-toggle-display-admin",
+]);
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const homeMainViewsPath = path.resolve(
@@ -40,7 +51,9 @@ const unknownInWeb = webProfileSections.filter((sectionId) => !mobileProfileSect
 
 const missingInWeb = PROFILE_SECTION_IDS.filter(
   (sectionId) =>
-    !webProfileSectionSet.has(sectionId) && !MOBILE_ONLY_PROFILE_SECTIONS.has(sectionId),
+    !webProfileSectionSet.has(sectionId) &&
+    !MOBILE_ONLY_PROFILE_SECTIONS.has(sectionId) &&
+    !LEGACY_MOBILE_PROFILE_SECTIONS.has(sectionId),
 );
 
 if (unknownInWeb.length > 0 || missingInWeb.length > 0) {

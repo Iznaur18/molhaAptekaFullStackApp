@@ -6,7 +6,8 @@
   align-items: center;
   justify-content: center;
   padding: var(--iz-space-4);
-  background: var(--iz-color-overlay);
+  /* mobile MODAL_BACKDROP_SCRIM — константа, одинаковая в обеих темах */
+  background: var(--iz-color-modal-scrim);
 }
 
 .product-modal-shell__panel {
@@ -37,8 +38,9 @@
   align-items: stretch;
   gap: var(--iz-space-2);
   min-width: 0;
-  padding: 0.85rem var(--iz-space-4);
-  border-bottom: 1px solid var(--iz-color-border);
+  /* useBottomSheetFormStyles.header: px 16, pt 16, pb 12, hairline border */
+  padding: var(--iz-space-4) var(--iz-space-4) var(--iz-space-3);
+  border-bottom: var(--iz-border-hairline) solid var(--iz-color-border);
 }
 
 .product-modal-shell__header-addon {
@@ -61,30 +63,42 @@
   padding-bottom: 0.65rem;
 }
 
+/* Заголовок модалки в мобиле — 18/700 (modalChromeStyles: title) */
 .product-modal-shell__title {
   margin: 0;
-  font-size: 1.05rem;
-  font-weight: 700;
+  font-size: var(--iz-font-2xl);
+  font-weight: var(--iz-weight-bold);
+  line-height: var(--iz-leading-xl);
   color: var(--iz-color-text);
 }
 
+/* useProductPromotionModalStyles.closeCircleButton: 32×32, pill, 1px border, surfaceMuted */
 .product-modal-shell__close {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  width: 32px;
+  height: 32px;
   padding: 0;
-  border: none;
-  border-radius: 50%;
-  background: transparent;
+  border: var(--iz-border) solid var(--iz-color-border);
+  border-radius: var(--iz-radius-pill);
+  background: var(--iz-color-surface-muted);
   color: var(--iz-color-text-muted);
   cursor: pointer;
+  transition:
+    background var(--iz-transition-base),
+    opacity var(--iz-transition-base);
 }
 
+/* closeCircleButtonPressed: opacity .85 + surfaceElevated */
 .product-modal-shell__close:hover {
-  background: var(--iz-color-overlay-subtle);
+  background: var(--iz-color-surface-elevated);
   color: var(--iz-color-text);
+}
+
+.product-modal-shell__close:active {
+  opacity: var(--iz-state-pressed-opacity);
 }
 
 .product-modal-shell__body {

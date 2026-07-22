@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  CATALOG_GRID_MOBILE_BREAKPOINT_PX,
-  CATALOG_GRID_MOBILE_COLUMNS,
-  CATALOG_GRID_TABLET_BREAKPOINT_PX,
-  CATALOG_GRID_TABLET_COLUMNS,
+  CATALOG_GRID_2_COL_MAX_PX,
+  CATALOG_GRID_3_COL_MAX_PX,
+  CATALOG_GRID_4_COL_MIN_PX,
+  CATALOG_GRID_COLUMNS_COMPACT,
+  CATALOG_GRID_COLUMNS_MEDIUM,
+  CATALOG_GRID_COLUMNS_WIDE,
 } from "./catalogGridVirtualizationConstants.js";
 import { getCatalogGridColumnCount } from "./getCatalogGridColumnCount.js";
 
@@ -15,26 +17,32 @@ describe("getCatalogGridColumnCount", () => {
     expect(getCatalogGridColumnCount(Number.NaN)).toBe(1);
   });
 
-  it("returns 3 columns on mobile widths", () => {
-    expect(getCatalogGridColumnCount(320)).toBe(CATALOG_GRID_MOBILE_COLUMNS);
-    expect(getCatalogGridColumnCount(430)).toBe(CATALOG_GRID_MOBILE_COLUMNS);
-    expect(getCatalogGridColumnCount(CATALOG_GRID_MOBILE_BREAKPOINT_PX)).toBe(
-      CATALOG_GRID_MOBILE_COLUMNS,
+  it("returns 2 columns on compact widths", () => {
+    expect(getCatalogGridColumnCount(320)).toBe(CATALOG_GRID_COLUMNS_COMPACT);
+    expect(getCatalogGridColumnCount(430)).toBe(CATALOG_GRID_COLUMNS_COMPACT);
+    expect(getCatalogGridColumnCount(CATALOG_GRID_2_COL_MAX_PX)).toBe(
+      CATALOG_GRID_COLUMNS_COMPACT,
     );
   });
 
-  it("returns 4 columns on tablet widths", () => {
-    expect(getCatalogGridColumnCount(641)).toBe(CATALOG_GRID_TABLET_COLUMNS);
-    expect(getCatalogGridColumnCount(900)).toBe(CATALOG_GRID_TABLET_COLUMNS);
-    expect(getCatalogGridColumnCount(CATALOG_GRID_TABLET_BREAKPOINT_PX)).toBe(
-      CATALOG_GRID_TABLET_COLUMNS,
+  it("returns 3 columns on medium widths", () => {
+    expect(getCatalogGridColumnCount(CATALOG_GRID_2_COL_MAX_PX + 1)).toBe(
+      CATALOG_GRID_COLUMNS_MEDIUM,
+    );
+    expect(getCatalogGridColumnCount(900)).toBe(CATALOG_GRID_COLUMNS_MEDIUM);
+    expect(getCatalogGridColumnCount(CATALOG_GRID_3_COL_MAX_PX)).toBe(
+      CATALOG_GRID_COLUMNS_MEDIUM,
+    );
+    expect(getCatalogGridColumnCount(CATALOG_GRID_4_COL_MIN_PX - 1)).toBe(
+      CATALOG_GRID_COLUMNS_MEDIUM,
     );
   });
 
-  it("uses denser auto-fill on desktop", () => {
-    expect(getCatalogGridColumnCount(1024)).toBeGreaterThanOrEqual(
-      CATALOG_GRID_TABLET_COLUMNS,
+  it("returns 4 columns on wide desktop viewports", () => {
+    expect(getCatalogGridColumnCount(CATALOG_GRID_4_COL_MIN_PX)).toBe(
+      CATALOG_GRID_COLUMNS_WIDE,
     );
-    expect(getCatalogGridColumnCount(1200)).toBeGreaterThanOrEqual(5);
+    expect(getCatalogGridColumnCount(1440)).toBe(CATALOG_GRID_COLUMNS_WIDE);
+    expect(getCatalogGridColumnCount(1920)).toBe(CATALOG_GRID_COLUMNS_WIDE);
   });
 });

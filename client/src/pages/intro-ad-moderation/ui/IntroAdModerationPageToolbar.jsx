@@ -2,24 +2,46 @@ import {
   INTRO_AD_MODERATION_SECTION_BANNER,
   INTRO_AD_MODERATION_SECTION_INTRO,
   INTRO_AD_MODERATION_SECTION_PERSONAL,
+  INTRO_AD_MODERATION_SECTION_RAFFLE,
+  INTRO_AD_MODERATION_SECTION_USERS_RAFFLE,
 } from "../lib/introAdModerationSectionFilters.js";
+import { buildIntroAdModerationSectionChipClass } from "../lib/introAdModerationSectionZone.js";
 import { INTRO_AD_MODERATION_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
-const SECTION_FILTER_OPTIONS = [
-  { value: "", label: INTRO_AD_MODERATION_PAGE_UI.SECTION_FILTER_ALL },
-  { value: INTRO_AD_MODERATION_SECTION_INTRO, label: INTRO_AD_MODERATION_PAGE_UI.SECTION_FILTER_INTRO },
-  { value: INTRO_AD_MODERATION_SECTION_BANNER, label: INTRO_AD_MODERATION_PAGE_UI.SECTION_FILTER_BANNER },
-  {
-    value: INTRO_AD_MODERATION_SECTION_PERSONAL,
-    label: INTRO_AD_MODERATION_PAGE_UI.SECTION_FILTER_PERSONAL,
-  },
-];
+/**
+ * @param {{ showUsersRaffleSection?: boolean }} params
+ */
+function buildSectionFilterOptions({ showUsersRaffleSection = false } = {}) {
+  const options = [
+    { value: "", label: INTRO_AD_MODERATION_PAGE_UI.SECTION_FILTER_ALL },
+    { value: INTRO_AD_MODERATION_SECTION_INTRO, label: INTRO_AD_MODERATION_PAGE_UI.SECTION_FILTER_INTRO },
+    { value: INTRO_AD_MODERATION_SECTION_BANNER, label: INTRO_AD_MODERATION_PAGE_UI.SECTION_FILTER_BANNER },
+    {
+      value: INTRO_AD_MODERATION_SECTION_PERSONAL,
+      label: INTRO_AD_MODERATION_PAGE_UI.SECTION_FILTER_PERSONAL,
+    },
+    {
+      value: INTRO_AD_MODERATION_SECTION_RAFFLE,
+      label: INTRO_AD_MODERATION_PAGE_UI.SECTION_FILTER_RAFFLE,
+    },
+  ];
+
+  if (showUsersRaffleSection) {
+    options.push({
+      value: INTRO_AD_MODERATION_SECTION_USERS_RAFFLE,
+      label: INTRO_AD_MODERATION_PAGE_UI.SECTION_FILTER_USERS_RAFFLE,
+    });
+  }
+
+  return options;
+}
 
 /**
  * @param {{
  *   summaryCountLabel: string;
  *   sectionFilter: string;
  *   onSectionFilterChange: (value: string) => void;
+ *   showUsersRaffleSection?: boolean;
  *   isRefreshing?: boolean;
  *   onRefresh?: () => void;
  * }} props
@@ -28,9 +50,12 @@ export function IntroAdModerationPageToolbar({
   summaryCountLabel,
   sectionFilter,
   onSectionFilterChange,
+  showUsersRaffleSection = false,
   isRefreshing = false,
   onRefresh,
 }) {
+  const sectionFilterOptions = buildSectionFilterOptions({ showUsersRaffleSection });
+
   return (
     <div className="intro-ad-moderation-page__toolbar">
       <div className="intro-ad-moderation-page__toolbar-head">
@@ -55,7 +80,7 @@ export function IntroAdModerationPageToolbar({
         role="tablist"
         aria-label={INTRO_AD_MODERATION_PAGE_UI.SECTION_FILTER_LABEL}
       >
-        {SECTION_FILTER_OPTIONS.map((option) => {
+        {sectionFilterOptions.map((option) => {
           const isActive = sectionFilter === option.value;
           return (
             <button
@@ -63,12 +88,7 @@ export function IntroAdModerationPageToolbar({
               type="button"
               role="tab"
               aria-selected={isActive}
-              className={[
-                "intro-ad-moderation-page__section-chip",
-                isActive ? "intro-ad-moderation-page__section-chip_active" : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
+              className={buildIntroAdModerationSectionChipClass(option.value, isActive)}
               onClick={() => onSectionFilterChange(option.value)}
             >
               {option.label}

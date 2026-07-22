@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
-import { useEnsureCatalogProduct } from "../../../entities/product/model/useEnsureCatalogProduct.js";
+import { navigateToProductDetails } from "../../../entities/product/lib/navigateToProductDetails.js";
 import { useMarkInAppNotificationsReadMutation } from "../../../entities/user/model/useMarkInAppNotificationsReadMutation.js";
 import {
   IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_NEW_PRODUCT,
@@ -20,13 +21,11 @@ export const useHomeNotifications = ({
   goToMainView,
   setIsLoginModalOpen,
   handleSellerNameClick,
-  products,
-  setCatalogProductDetails,
   inAppNotifications,
   invalidateAuthMe,
   patchAuthMeNotifications,
 }) => {
-  const ensureCatalogProduct = useEnsureCatalogProduct();
+  const navigate = useNavigate();
   const { mutate: markNotificationsRead } = useMarkInAppNotificationsReadMutation();
   const isNotificationsView = mainView === "notifications" && isAuthorized;
   const markedReadRef = useRef(false);
@@ -103,28 +102,10 @@ export const useHomeNotifications = ({
           item.kind === IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_PRODUCT_DISCOUNT) &&
         item.productId
       ) {
-        goToMainView("catalog");
-        const inList = products.find((p) => String(p._id) === String(item.productId));
-        if (inList) {
-          setCatalogProductDetails(inList);
-          return;
-        }
-        void ensureCatalogProduct(String(item.productId))
-          .then((found) => {
-            setCatalogProductDetails(found);
-          })
-          .catch(() => {
-            // каталог открыт без модалки
-          });
+        navigateToProductDetails(navigate, item.productId);
       }
     },
-    [
-      ensureCatalogProduct,
-      goToMainView,
-      handleSellerNameClick,
-      products,
-      setCatalogProductDetails,
-    ],
+    [handleSellerNameClick, navigate],
   );
 
   const notificationsPageItems = isNotificationsView ? inAppNotifications : [];

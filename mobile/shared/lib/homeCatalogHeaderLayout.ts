@@ -1,3 +1,8 @@
+import {
+  MOBILE_BOTTOM_NAV_FLOAT_OFFSET,
+  resolveMobileBottomNavHorizontalInset,
+} from "@/shared/lib/mobileBottomNavLayout";
+
 /** Выравнивание контента ленты (карусели, баннеры) — не менять вместе с панелью. */
 export const HOME_CATALOG_HEADER_SHELL_HORIZONTAL_INSET = 16;
 
@@ -26,8 +31,8 @@ export const HOME_CATALOG_HEADER_PANEL_BORDER_COLOR = "rgba(17, 24, 39, 0.06)";
 /** Blur остаётся для контента, уезжающего под панель. */
 export const HOME_CATALOG_HEADER_PANEL_BLUR_RADIUS = 18;
 
-/** Ozon-стиль: почти непрозрачная белая карта. */
-export const HOME_CATALOG_HEADER_PANEL_GLASS_OPACITY = 0.96;
+/** Liquid-glass: полупрозрачный tint (паритет с bottom nav). */
+export const HOME_CATALOG_HEADER_PANEL_GLASS_OPACITY = 0.55;
 
 /** Web `color-mix(in srgb, var(--iz-color-on-contrast) 80%, transparent)`. */
 export const resolveHomeCatalogHeaderGlassTint = (
@@ -166,6 +171,26 @@ export const resolveHomeCatalogHeaderPanelTopMargin = (): number =>
 export const resolveHomeCatalogHeaderPanelPaddingTop = (safeAreaTop: number): number =>
   safeAreaTop + HOME_CATALOG_HEADER_PANEL_PADDING.top;
 
+/**
+ * Высота glass-панели поиска без safe-area (embedded overlay).
+ * top pad + поле поиска + bottom pad.
+ */
+export const resolveHomeCatalogOverlaySearchPanelHeight = (): number =>
+  HOME_CATALOG_HEADER_PANEL_PADDING.top +
+  HOME_CATALOG_HEADER_SEARCH_INPUT_MIN_HEIGHT +
+  HOME_CATALOG_HEADER_PANEL_PADDING.bottom;
+
+/**
+ * Inset контента ленты под absolute top-bar:
+ * safe-area + float + панель + зазор до контента.
+ * Без этого баннер/карточки стартуют под полупрозрачной шапкой.
+ */
+export const resolveHomeCatalogOverlayContentInsetTop = (safeAreaTop = 0): number =>
+  Math.max(safeAreaTop, 0) +
+  MOBILE_BOTTOM_NAV_FLOAT_OFFSET +
+  resolveHomeCatalogOverlaySearchPanelHeight() +
+  HOME_CATALOG_HEADER_BANNER_BELOW_PANEL_MARGIN;
+
 type HomeCatalogUsersMenuPortalAnchor = {
   x: number;
   y: number;
@@ -179,7 +204,7 @@ export const resolveHomeCatalogUsersMenuPortalTop = (
   embeddedInForegroundSheet = false,
 ): number =>
   embeddedInForegroundSheet
-    ? safeAreaTop + HOME_CATALOG_HEADER_PANEL_PADDING.top
+    ? safeAreaTop + MOBILE_BOTTOM_NAV_FLOAT_OFFSET + HOME_CATALOG_HEADER_PANEL_PADDING.top
     : resolveHomeCatalogHeaderPanelPaddingTop(safeAreaTop);
 
 const isStaleStickyMenuAnchorY = (anchorY: number, fallbackTop: number): boolean =>
@@ -208,7 +233,10 @@ export const resolveHomeCatalogUsersMenuPortalStyle = (
     safeAreaTop,
     embeddedInForegroundSheet,
   );
-  const fallbackRight = resolveHomeCatalogHeaderShellInset(safeAreaInsets);
+  const fallbackRight = embeddedInForegroundSheet
+    ? resolveMobileBottomNavHorizontalInset(safeAreaInsets) +
+      HOME_CATALOG_HEADER_PANEL_PADDING.horizontal
+    : resolveHomeCatalogHeaderShellInset(safeAreaInsets);
   const measuredRight = windowWidth - anchor.x - anchor.width;
 
   const top =

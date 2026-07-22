@@ -1,5 +1,10 @@
 import { useMemo, useState } from "react";
+import {
+  LOYALTY_POINTS_ADMIN_FREE_CREDIT_MAX,
+  LOYALTY_POINTS_ADMIN_FREE_CREDIT_MIN,
+} from "@molha/api-contract";
 
+import { useAdminCreditOwnLoyaltyPointsMutation } from "../../../entities/user/model/useAdminCreditOwnLoyaltyPointsMutation.js";
 import { useMyLoyaltyPointsStatusQuery } from "../../../entities/user/model/useMyLoyaltyPointsStatusQuery.js";
 import { LOYALTY_POINTS_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import {
@@ -25,14 +30,27 @@ function parsePurchaseAmountRub(raw) {
 /**
  * @param {{
  *   isAuthorized: boolean;
+ *   isAdmin?: boolean;
  *   onRequestLogin: () => void;
+ *   onLoyaltyPointsBalanceChange?: (balance: number) => void;
  * }} props
  */
-export function LoyaltyPointsPage({ isAuthorized, onRequestLogin }) {
+export function LoyaltyPointsPage({
+  isAuthorized,
+  isAdmin = false,
+  onRequestLogin,
+  onLoyaltyPointsBalanceChange,
+}) {
   const statusQuery = useMyLoyaltyPointsStatusQuery({ enabled: isAuthorized });
+  const adminCreditMutation = useAdminCreditOwnLoyaltyPointsMutation({
+    onBalanceChange: onLoyaltyPointsBalanceChange,
+  });
   const [purchaseAmountInput, setPurchaseAmountInput] = useState("");
   const [purchaseValidationError, setPurchaseValidationError] = useState("");
   const [comingSoonMessage, setComingSoonMessage] = useState("");
+  const [adminAmountInput, setAdminAmountInput] = useState("");
+  const [adminValidationError, setAdminValidationError] = useState("");
+  const [adminSuccessMessage, setAdminSuccessMessage] = useState("");
 
   const loyaltyPointsBalance = statusQuery.data?.loyaltyPointsBalance ?? 0;
   const phase = !isAuthorized
@@ -59,10 +77,21 @@ export function LoyaltyPointsPage({ isAuthorized, onRequestLogin }) {
     return rublesToLoyaltyPoints(purchaseAmountRub);
   }, [purchaseAmountRub]);
 
+  const adminAmountPoints = useMemo(
+    () => parsePurchaseAmountRub(adminAmountInput),
+    [adminAmountInput],
+  );
+
   const handlePurchaseAmountChange = (event) => {
     setPurchaseAmountInput(formatRubPriceInput(event.target.value));
     setPurchaseValidationError("");
     setComingSoonMessage("");
+  };
+
+  const handleAdminAmountChange = (event) => {
+    setAdminAmountInput(formatRubPriceInput(event.target.value));
+    setAdminValidationError("");
+    setAdminSuccessMessage("");
   };
 
   const handlePurchaseSubmit = () => {
@@ -91,6 +120,54 @@ export function LoyaltyPointsPage({ isAuthorized, onRequestLogin }) {
         purchasePointsPreview,
       ),
     );
+  };
+
+  const handleAdminFreeCreditSubmit = async () => {
+    setAdminSuccessMessage("");
+    if (adminAmountPoints == null) {
+      setAdminValidationError(
+        LOYALTY_POINTS_PAGE_UI.ADMIN_FREE_AMOUNT_MIN(
+          LOYALTY_POINTS_ADMIN_FREE_CREDIT_MIN,
+        ),
+      );
+      return;
+    }
+    if (adminAmountPoints < LOYALTY_POINTS_ADMIN_FREE_CREDIT_MIN) {
+      setAdminValidationError(
+        LOYALTY_POINTS_PAGE_UI.ADMIN_FREE_AMOUNT_MIN(
+          LOYALTY_POINTS_ADMIN_FREE_CREDIT_MIN,
+        ),
+      );
+      return;
+    }
+    if (adminAmountPoints > LOYALTY_POINTS_ADMIN_FREE_CREDIT_MAX) {
+      setAdminValidationError(
+        LOYALTY_POINTS_PAGE_UI.ADMIN_FREE_AMOUNT_MAX(
+          LOYALTY_POINTS_ADMIN_FREE_CREDIT_MAX,
+        ),
+      );
+      return;
+    }
+
+    setAdminValidationError("");
+    try {
+      const result = await adminCreditMutation.mutateAsync({
+        amount: adminAmountPoints,
+      });
+      setAdminSuccessMessage(
+        LOYALTY_POINTS_PAGE_UI.ADMIN_FREE_SUCCESS(
+          result.credited,
+          result.loyaltyPointsBalance,
+        ),
+      );
+      setAdminAmountInput("");
+    } catch (error) {
+      setAdminValidationError(
+        error instanceof Error
+          ? error.message
+          : LOYALTY_POINTS_PAGE_UI.FETCH_FALLBACK,
+      );
+    }
   };
 
   if (!isAuthorized) {
@@ -130,6 +207,12 @@ export function LoyaltyPointsPage({ isAuthorized, onRequestLogin }) {
     purchaseAmountRub >= LOYALTY_POINTS_PURCHASE_MIN_RUB &&
     purchaseAmountRub <= LOYALTY_POINTS_PURCHASE_MAX_RUB;
 
+  const canSubmitAdminCredit =
+    adminAmountPoints != null &&
+    adminAmountPoints >= LOYALTY_POINTS_ADMIN_FREE_CREDIT_MIN &&
+    adminAmountPoints <= LOYALTY_POINTS_ADMIN_FREE_CREDIT_MAX &&
+    !adminCreditMutation.isPending;
+
   return (
     <section
       className="loyalty-points-page"
@@ -158,8 +241,8 @@ export function LoyaltyPointsPage({ isAuthorized, onRequestLogin }) {
             value={purchaseAmountInput}
             onChange={handlePurchaseAmountChange}
             inputMode="numeric"
-            placeholder={String(LOYALTY_POINTS_PURCHASE_MIN_RUB)}
             aria-invalid={purchaseValidationError ? true : undefined}
+            placeholder={String(LOYALTY_POINTS_PURCHASE_MIN_RUB)}
           />
         </label>
         <p className="loyalty-points-page__purchase-hint">
@@ -189,6 +272,53 @@ export function LoyaltyPointsPage({ isAuthorized, onRequestLogin }) {
           </p>
         ) : null}
       </div>
+
+      {isAdmin ? (
+        <div className="loyalty-points-page__purchase loyalty-points-page__admin-credit">
+          <h3 className="loyalty-points-page__purchase-title">
+            {LOYALTY_POINTS_PAGE_UI.ADMIN_FREE_SECTION}
+          </h3>
+          <label className="loyalty-points-page__purchase-label">
+            {LOYALTY_POINTS_PAGE_UI.ADMIN_FREE_AMOUNT_LABEL}
+            <input
+              {...INTEGER_INPUT_FIELD_PROPS}
+              className="loyalty-points-page__purchase-input"
+              name="adminFreeCreditAmount"
+              value={adminAmountInput}
+              onChange={handleAdminAmountChange}
+              inputMode="numeric"
+              aria-invalid={adminValidationError ? true : undefined}
+              placeholder={String(LOYALTY_POINTS_ADMIN_FREE_CREDIT_MIN)}
+              disabled={adminCreditMutation.isPending}
+            />
+          </label>
+          <p className="loyalty-points-page__purchase-hint">
+            {LOYALTY_POINTS_PAGE_UI.ADMIN_FREE_AMOUNT_HINT}
+          </p>
+          {adminValidationError ? (
+            <p className="loyalty-points-page__purchase-error" role="alert">
+              {adminValidationError}
+            </p>
+          ) : null}
+          {adminSuccessMessage ? (
+            <p className="loyalty-points-page__soon" role="status">
+              {adminSuccessMessage}
+            </p>
+          ) : null}
+          <button
+            type="button"
+            className="loyalty-points-page__buy app-btn app-btn--primary"
+            onClick={() => {
+              void handleAdminFreeCreditSubmit();
+            }}
+            disabled={!canSubmitAdminCredit}
+          >
+            {adminCreditMutation.isPending
+              ? LOYALTY_POINTS_PAGE_UI.ADMIN_FREE_SUBMITTING
+              : LOYALTY_POINTS_PAGE_UI.ADMIN_FREE_SUBMIT}
+          </button>
+        </div>
+      ) : null}
     </section>
   );
 }

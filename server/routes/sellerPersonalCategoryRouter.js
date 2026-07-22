@@ -9,6 +9,9 @@ import {
 } from "../controllers/SellerPersonalCategory/sellerPersonalCategoryControllers.js";
 import {
   approveSellerPersonalCategoryCampaignController,
+  cancelSellerPersonalCategoryCampaignByStaffController,
+  deleteSellerPersonalCategoryCampaignByStaffController,
+  getManagedSellerPersonalCategoryCampaignsController,
   getPendingSellerPersonalCategoryCampaignsController,
   getPendingSellerPersonalCategoryCampaignsCountController,
   rejectSellerPersonalCategoryCampaignController,
@@ -49,6 +52,26 @@ router.get(
   checkAuthMW,
   checkProductModeratorMW,
   getPendingSellerPersonalCategoryCampaignsController,
+);
+router.get(
+  "/moderation/managed",
+  checkAuthMW,
+  checkProductModeratorMW,
+  getManagedSellerPersonalCategoryCampaignsController,
+);
+router.post(
+  "/moderation/:campaignId/cancel",
+  checkAuthMW,
+  checkProductModeratorMW,
+  sellerPersonalCategoryCampaignIdParamValidation,
+  cancelSellerPersonalCategoryCampaignByStaffController,
+);
+router.delete(
+  "/moderation/:campaignId/staff",
+  checkAuthMW,
+  checkProductModeratorMW,
+  sellerPersonalCategoryCampaignIdParamValidation,
+  deleteSellerPersonalCategoryCampaignByStaffController,
 );
 router.post(
   "/moderation/:campaignId/approve",

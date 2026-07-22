@@ -21,6 +21,7 @@ import { installmentRouter } from "./installmentRouter.js";
 import { priceOfferRouter } from "./priceOfferRouter.js";
 
 import { appIntroRouter } from "./appIntroRouter.js";
+import { usersLoyaltyRaffleRouter } from "./usersLoyaltyRaffleRouter.js";
 import { siteHeaderBannerRouter } from "./siteHeaderBannerRouter.js";
 import { siteHeaderBannerCampaignRouter } from "./siteHeaderBannerCampaignRouter.js";
 import { introAdRouter } from "./introAdRouter.js";
@@ -39,6 +40,7 @@ export {
   installmentRouter,
   priceOfferRouter,
   appIntroRouter,
+  usersLoyaltyRaffleRouter,
   siteHeaderBannerRouter,
   siteHeaderBannerCampaignRouter,
   introAdRouter,

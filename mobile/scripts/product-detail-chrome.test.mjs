@@ -243,7 +243,7 @@ test("mobile product detail screen is outside tabs and uses dock-only scroll pad
 
   assert.match(rootLayout, /name="product\/\[id\]"/);
   assert.doesNotMatch(tabLayout, /product\/\[id\]/);
-  assert.match(layoutLib, /PRODUCT_DETAIL_DOCK_SCROLL_PADDING = 88/);
+  assert.match(layoutLib, /PRODUCT_DETAIL_DOCK_SCROLL_PADDING = 100/);
   assert.match(styles, /PRODUCT_DETAIL_DOCK_SCROLL_PADDING/);
   assert.doesNotMatch(styles, /DETAIL_DOCK_SCROLL_PADDING = 124/);
 });

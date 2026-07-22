@@ -11,3 +11,6 @@ export const CART_LINE_IMAGE_SIZE = 72;
 
 /** Сквиркл-радиус карточки строки корзины. */
 export const CART_LINE_CARD_BORDER_RADIUS = 14;
+
+/** Верхние углы sticky-футера корзины (как sheet). */
+export const CART_STICKY_FOOTER_TOP_RADIUS = 20;

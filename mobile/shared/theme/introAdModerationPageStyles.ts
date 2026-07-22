@@ -89,6 +89,51 @@ export const useIntroAdModerationPageStyles = createThemedStyles((theme) => ({
   sectionChipTextActive: {
     color: theme.colors.accent,
   },
+  sectionChipIntro: {},
+  sectionChipBanner: {},
+  sectionChipPersonal: {},
+  sectionChipRaffle: {},
+  sectionChipUsersRaffle: {},
+  sectionChipTextIntro: {},
+  sectionChipTextBanner: {},
+  sectionChipTextPersonal: {},
+  sectionChipTextRaffle: {},
+  sectionChipTextUsersRaffle: {},
+  sectionChipActiveIntro: {
+    borderColor: theme.colors.info,
+    backgroundColor: theme.colors.infoSoft,
+  },
+  sectionChipActiveBanner: {
+    borderColor: theme.colors.danger,
+    backgroundColor: theme.colors.dangerSurface,
+  },
+  sectionChipActivePersonal: {
+    borderColor: theme.colors.action,
+    backgroundColor: theme.colors.actionSoft,
+  },
+  sectionChipActiveRaffle: {
+    borderColor: theme.colors.accent,
+    backgroundColor: theme.colors.accentSoft,
+  },
+  sectionChipActiveUsersRaffle: {
+    borderColor: theme.colors.success,
+    backgroundColor: theme.colors.successSurface,
+  },
+  sectionChipTextActiveIntro: {
+    color: theme.colors.infoDeep,
+  },
+  sectionChipTextActiveBanner: {
+    color: theme.colors.dangerText,
+  },
+  sectionChipTextActivePersonal: {
+    color: theme.colors.actionHover,
+  },
+  sectionChipTextActiveRaffle: {
+    color: theme.colors.accent,
+  },
+  sectionChipTextActiveUsersRaffle: {
+    color: theme.colors.successText,
+  },
   overview: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -110,6 +155,26 @@ export const useIntroAdModerationPageStyles = createThemedStyles((theme) => ({
     borderColor: theme.colors.accent,
     backgroundColor: theme.colors.accentSoft,
   },
+  overviewTileIntro: {
+    borderTopWidth: 3,
+    borderTopColor: theme.colors.info,
+  },
+  overviewTileBanner: {
+    borderTopWidth: 3,
+    borderTopColor: theme.colors.danger,
+  },
+  overviewTilePersonal: {
+    borderTopWidth: 3,
+    borderTopColor: theme.colors.action,
+  },
+  overviewTileRaffle: {
+    borderTopWidth: 3,
+    borderTopColor: theme.colors.accent,
+  },
+  overviewTileUsersRaffle: {
+    borderTopWidth: 3,
+    borderTopColor: theme.colors.success,
+  },
   overviewTileAttention: {
     borderColor: "rgba(245, 158, 11, 0.45)",
   },
@@ -128,6 +193,11 @@ export const useIntroAdModerationPageStyles = createThemedStyles((theme) => ({
   },
   overviewValueAttention: {
     color: theme.colors.warningText,
+  },
+  overviewValueMuted: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: theme.colors.textMuted,
   },
   listActions: {
     flexDirection: "row",
@@ -185,6 +255,45 @@ export const useIntroAdModerationPageStyles = createThemedStyles((theme) => ({
   },
   list: {
     gap: 16,
+  },
+  listContentPanel: {
+    gap: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    borderRadius: 13.6,
+    backgroundColor: theme.colors.surfaceMuted,
+  },
+  listContentPanelIntro: {
+    borderTopWidth: 3,
+    borderTopColor: theme.colors.info,
+    borderColor: "rgba(3, 105, 161, 0.24)",
+    backgroundColor: theme.colors.infoSoft,
+  },
+  listContentPanelBanner: {
+    borderTopWidth: 3,
+    borderTopColor: theme.colors.danger,
+    borderColor: "rgba(198, 40, 40, 0.24)",
+    backgroundColor: theme.colors.dangerSurface,
+  },
+  listContentPanelPersonal: {
+    borderTopWidth: 3,
+    borderTopColor: theme.colors.action,
+    borderColor: "rgba(31, 111, 235, 0.24)",
+    backgroundColor: theme.colors.actionSoft,
+  },
+  listContentPanelRaffle: {
+    borderTopWidth: 3,
+    borderTopColor: theme.colors.accent,
+    borderColor: "rgba(124, 58, 237, 0.24)",
+    backgroundColor: theme.colors.accentSoft,
+  },
+  listContentPanelUsersRaffle: {
+    borderTopWidth: 3,
+    borderTopColor: theme.colors.success,
+    borderColor: "rgba(22, 163, 74, 0.24)",
+    backgroundColor: theme.colors.successSurface,
   },
   cardAttention: {
     borderRadius: 12,

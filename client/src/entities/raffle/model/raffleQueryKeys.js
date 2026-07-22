@@ -2,6 +2,7 @@ export const raffleQueryKeys = {
   all: ["raffles"],
   featured: () => [...raffleQueryKeys.all, "featured"],
   my: () => [...raffleQueryKeys.all, "my"],
+  createAdvertising: () => [...raffleQueryKeys.all, "create-advertising"],
   staffQueue: () => [...raffleQueryKeys.all, "staff", "queue"],
   staffPendingCount: () => [...raffleQueryKeys.all, "staff", "pending", "count"],
   /**

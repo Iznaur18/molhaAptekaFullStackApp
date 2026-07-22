@@ -1,0 +1,55 @@
+.featured-raffle-winner-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--iz-color-success) 28%, var(--iz-color-border));
+  border-radius: 0.75rem;
+  background: linear-gradient(
+    160deg,
+    var(--iz-color-success-surface) 0%,
+    var(--iz-color-surface) 88%
+  );
+}
+
+.featured-raffle-winner-card__title {
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--iz-color-success-text);
+}
+
+.featured-raffle-winner-card__row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.featured-raffle-winner-card__avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  border-radius: 999px;
+  object-fit: cover;
+  background: var(--iz-color-surface-muted);
+}
+
+.featured-raffle-winner-card__name {
+  min-width: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--iz-color-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

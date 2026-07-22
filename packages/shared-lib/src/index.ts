@@ -128,3 +128,21 @@ export type {
   ProductCharacteristicLike,
   ProductDetailsContentLike,
 } from "./productDetailsContent.js";
+export {
+  buildUsersPodiumPlaceById,
+  excludeUsersPodiumFromList,
+  getUserPodiumAverageRating,
+  orderUsersPodiumForDisplay,
+  rankUsersForPodium,
+  sortUsersByPodiumCriteria,
+} from "./rankUsersForPodium.js";
+export type {
+  UsersPodiumCandidate,
+  UsersPodiumEntry,
+  UsersPodiumPlace,
+} from "./rankUsersForPodium.js";
+export {
+  formatLoyaltyPointsCount,
+  resolveLoyaltyPointsProgressPercent,
+  USERS_MONTHLY_LOYALTY_POINTS_GOAL,
+} from "./usersMonthlyLoyaltyPoints.js";

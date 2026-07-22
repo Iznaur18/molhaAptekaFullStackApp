@@ -14,7 +14,6 @@ import { InstallmentSalesPage } from "@/features/installment-sales-page/ui/Insta
 import { ProductModerationPage } from "@/features/product-moderation-page/ui/ProductModerationPage";
 import { IntroAdModerationPage } from "@/features/intro-ad-moderation-page/ui/IntroAdModerationPage";
 import { ProductReportsPage } from "@/features/product-reports-page/ui/ProductReportsPage";
-import { RafflesStaffPage } from "@/features/raffles-staff-page/ui/RafflesStaffPage";
 import { DataConfirmationRequestsPage } from "@/features/data-confirmation-requests-page/ui/DataConfirmationRequestsPage";
 import { InstallmentDisputesPage } from "@/features/installment-disputes-page/ui/InstallmentDisputesPage";
 import { AdminOrdersPage } from "@/features/admin-orders-page/ui/AdminOrdersPage";
@@ -73,6 +72,8 @@ export const HubSectionContent = ({
       return <IntroAdModerationPage />;
     case "seller-personal-category-moderation":
       return <IntroAdModerationPage />;
+    case "raffles":
+      return <IntroAdModerationPage />;
     case "product-reports":
       return <ProductReportsPage />;
     case "product-promotions":
@@ -83,8 +84,6 @@ export const HubSectionContent = ({
           onBack={onBack}
         />
       );
-    case "raffles":
-      return <RafflesStaffPage />;
     case "data-confirmation-requests":
       return <DataConfirmationRequestsPage />;
     case "installment-disputes":

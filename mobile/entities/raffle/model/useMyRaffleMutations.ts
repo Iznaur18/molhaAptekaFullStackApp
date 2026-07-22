@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { raffleQueryKeys } from "@/shared/api";
+import { loyaltyPointsQueryKeys, raffleQueryKeys } from "@/shared/api";
 
 import { deleteMyRaffle } from "../api/deleteMyRaffle";
 import { patchMyRaffle } from "../api/patchMyRaffle";
@@ -14,6 +14,8 @@ export const useMyRaffleMutations = () => {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: raffleQueryKeys.my() }),
       queryClient.invalidateQueries({ queryKey: raffleQueryKeys.featured() }),
+      queryClient.invalidateQueries({ queryKey: raffleQueryKeys.createAdvertising() }),
+      queryClient.invalidateQueries({ queryKey: loyaltyPointsQueryKeys.all }),
     ]);
   };
 

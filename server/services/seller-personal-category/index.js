@@ -7,7 +7,10 @@ export {
 } from "./sellerPersonalCategory.js";
 export {
   approveSellerPersonalCategoryCampaign,
+  cancelSellerPersonalCategoryCampaignByStaff,
   countPendingSellerPersonalCategoryCampaigns,
+  deleteSellerPersonalCategoryCampaignByStaff,
+  getManagedSellerPersonalCategoryCampaigns,
   getPendingSellerPersonalCategoryCampaigns,
   rejectSellerPersonalCategoryCampaign,
 } from "./sellerPersonalCategoryStaff.js";

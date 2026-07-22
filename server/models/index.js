@@ -27,6 +27,7 @@ import ProductInstallmentProgramModel from "./ProductInstallmentProgramModel.js"
 import InstallmentContractModel from "./InstallmentContractModel.js";
 import InstallmentDisputeModel from "./InstallmentDisputeModel.js";
 import { AppIntroSettingsModel } from "./AppIntroSettingsModel.js";
+import { UsersLoyaltyRaffleSettingsModel } from "./UsersLoyaltyRaffleSettingsModel.js";
 import { SiteHeaderBannerSettingsModel } from "./SiteHeaderBannerSettingsModel.js";
 import { SiteHeaderBannerCampaignModel } from "./SiteHeaderBannerCampaignModel.js";
 import { IntroAdCampaignModel } from "./IntroAdCampaignModel.js";
@@ -63,6 +64,7 @@ export {
   InstallmentContractModel,
   InstallmentDisputeModel,
   AppIntroSettingsModel,
+  UsersLoyaltyRaffleSettingsModel,
   SiteHeaderBannerSettingsModel,
   SiteHeaderBannerCampaignModel,
   IntroAdCampaignModel,

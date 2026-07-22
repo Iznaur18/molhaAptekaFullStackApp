@@ -21,6 +21,21 @@ export const useUserListRowStyles = createThemedStyles((theme) => ({  row: {
     borderColor: theme.colors.border,
     backgroundColor: theme.colors.surface,
   },
+  rowPodium1: {
+    borderWidth: 1.5,
+    borderColor: theme.colors.warning,
+    backgroundColor: theme.colors.warningSurface,
+  },
+  rowPodium2: {
+    borderWidth: 1.5,
+    borderColor: `${theme.colors.textMuted}99`,
+    backgroundColor: theme.colors.surfaceElevated,
+  },
+  rowPodium3: {
+    borderWidth: 1.5,
+    borderColor: `${theme.colors.warningText}99`,
+    backgroundColor: theme.colors.warningSurface,
+  },
   rowPressed: {
     borderColor: theme.colors.action,
     opacity: 0.96,
@@ -61,10 +76,23 @@ export const useUserListRowStyles = createThemedStyles((theme) => ({  row: {
     borderRadius: 4,
     backgroundColor: theme.colors.surfaceMuted,
   },
+  badgePodium1: {
+    backgroundColor: theme.colors.warning,
+  },
+  badgePodium2: {
+    backgroundColor: theme.colors.textMuted,
+  },
+  badgePodium3: {
+    backgroundColor: theme.colors.warningText,
+  },
   badgeText: {
     fontSize: 11,
     fontWeight: "600",
     color: theme.colors.textMuted,
+  },
+  badgePodiumText: {
+    color: theme.colors.onContrast,
+    fontWeight: "800",
   },
   metrics: {
     flexDirection: "row",

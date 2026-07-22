@@ -73,6 +73,8 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
   },
   media: {
     ...StyleSheet.absoluteFillObject,
+    width: "100%",
+    height: "100%",
   },
   videoWrap: {
     ...StyleSheet.absoluteFillObject,
@@ -273,47 +275,42 @@ export const useRaffleManageActionsStyles = createThemedStyles((theme) => ({
   },
   btn: {
     minHeight: 32,
-    paddingVertical: 7,
-    paddingHorizontal: 14,
-    borderRadius: 10,
-    borderWidth: 1,
+    paddingVertical: 7.2,
+    paddingHorizontal: 13.6,
+    borderRadius: 8,
+    borderWidth: StyleSheet.hairlineWidth,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: theme.colors.ink,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 2,
-    elevation: 1,
   },
   btnDisabled: {
-    opacity: 0.55,
+    opacity: 0.65,
   },
   btnEdit: {
-    borderColor: P.accentPurple,
-    backgroundColor: P.accentPurpleSoft,
+    borderColor: theme.colors.borderStrong,
+    backgroundColor: theme.colors.surface,
   },
   btnDelete: {
-    borderColor: P.dangerAccent,
-    backgroundColor: P.dangerSoft,
+    borderColor: theme.colors.danger,
+    backgroundColor: theme.colors.danger,
   },
   btnPause: {
-    borderColor: P.warning,
-    backgroundColor: P.warningPeach,
+    borderColor: theme.colors.borderStrong,
+    backgroundColor: theme.colors.surface,
   },
   btnEditText: {
     fontSize: 14,
-    fontWeight: "700",
-    color: P.accentPurpleText,
+    fontWeight: "500",
+    color: theme.colors.text,
   },
   btnDeleteText: {
     fontSize: 14,
-    fontWeight: "700",
-    color: P.dangerText,
+    fontWeight: "500",
+    color: theme.colors.onContrast,
   },
   btnPauseText: {
     fontSize: 14,
-    fontWeight: "700",
-    color: P.warningBrownDeep,
+    fontWeight: "500",
+    color: theme.colors.text,
   },
 }));
 
@@ -633,7 +630,8 @@ export const useFeaturedRaffleModalCardStyles = createThemedStyles((theme) => ({
     position: "relative",
     alignSelf: "center",
     zIndex: 2,
-    overflow: "visible",
+    // Android VideoView иначе вылезает из квадрата и ломает модалку.
+    overflow: "hidden",
   },
   visualCard: {
     overflow: "hidden",
@@ -698,11 +696,43 @@ export const useFeaturedRaffleModalCardStyles = createThemedStyles((theme) => ({
   progressFillCompleted: {
     backgroundColor: theme.colors.success,
   },
-  progressLabel: {
-    fontSize: 13.6,
-    lineHeight: L.progressLabelLineHeight,
-    fontWeight: "600",
-    color: theme.colors.text,
+  stats: {
+    flexDirection: "row",
+    gap: 6.4,
+  },
+  stat: {
+    flex: 1,
+    minWidth: 0,
+    gap: 2.4,
+    paddingVertical: 8.8,
+    paddingHorizontal: 6.4,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    borderRadius: 12,
+    backgroundColor: theme.colors.surfaceMuted,
+    alignItems: "center",
+  },
+  statAccent: {
+    borderColor: "rgba(124, 58, 237, 0.35)",
+    backgroundColor: theme.colors.accentSoft,
+  },
+  statLabel: {
+    fontSize: 10.4,
+    fontWeight: "700",
+    letterSpacing: 0.4,
+    textTransform: "uppercase",
+    color: theme.colors.textMuted,
+    textAlign: "center",
+  },
+  statValue: {
+    fontSize: 14.4,
+    fontWeight: "800",
+    fontVariant: ["tabular-nums"],
+    color: theme.colors.ink,
+    textAlign: "center",
+  },
+  statValueAccent: {
+    color: theme.colors.accent,
   },
   title: {
     fontSize: 17,
@@ -740,6 +770,43 @@ export const useFeaturedRaffleModalCardStyles = createThemedStyles((theme) => ({
     fontSize: 13,
     fontWeight: "700",
     color: P.successDeep,
+  },
+}));
+
+export const useFeaturedRaffleWinnerCardStyles = createThemedStyles((theme) => ({
+  root: {
+    gap: 7,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.success,
+    backgroundColor: theme.colors.successSurface,
+  },
+  title: {
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 0.4,
+    textTransform: "uppercase",
+    color: theme.colors.successText,
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: theme.colors.surfaceMuted,
+  },
+  name: {
+    flex: 1,
+    minWidth: 0,
+    fontSize: 15,
+    fontWeight: "700",
+    color: theme.colors.text,
   },
 }));
 
