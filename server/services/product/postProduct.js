@@ -23,6 +23,10 @@ import {
 } from "./productDiscount.js";
 import { assertSellerCanSetProductLoyaltyPointsPerUnit } from "./assertProductLoyaltyPointsPerUnit.js";
 import { normalizeProductCharacteristics } from "./normalizeProductCharacteristics.js";
+import { resolveProductReturnWriteFromBody } from "./normalizeProductReturnTerms.js";
+import { normalizeProductListingOrigin } from "./normalizeProductListingOrigin.js";
+import { normalizeProductIsOriginal } from "./normalizeProductIsOriginal.js";
+import { PRODUCT_PRICE_MARKET_STATUS_DEFAULT } from "../../constants/productPriceMarketStatusConstants.js";
 import { buildProductSearchBlobFromFields } from "./buildProductSearchBlob.js";
 import { resolveProductCategoryWriteFromBody } from "./resolveProductCategoryWrite.js";
 import { resolveActiveSellerPersonalCategoryId } from "../seller-personal-category/sellerPersonalCategoryHelpers.js";
@@ -73,6 +77,14 @@ const resolveCreateCharacteristics = (body) => {
     return normalizeProductCharacteristics(body?.productCharacteristics);
   } catch (characteristicsError) {
     throwFieldError(characteristicsError, "Некорректные характеристики товара");
+  }
+};
+
+const resolveCreateReturnPolicy = (body) => {
+  try {
+    return resolveProductReturnWriteFromBody(body);
+  } catch (returnError) {
+    throwFieldError(returnError, "Некорректные условия возврата");
   }
 };
 
@@ -159,6 +171,13 @@ export async function postProduct({ userId, body }) {
 
   const loyaltyPointsPerUnit = await resolveCreateLoyaltyPoints(userId, body);
   const productCharacteristics = resolveCreateCharacteristics(body);
+  const { productReturnEnabled, productReturnTerms } = resolveCreateReturnPolicy(body);
+  const productListingOrigin = normalizeProductListingOrigin(body.productListingOrigin, {
+    required: true,
+  });
+  const productIsOriginal = normalizeProductIsOriginal(body.productIsOriginal, {
+    required: true,
+  });
   const categoryWrite = await resolveCreateCategory(body);
 
   const productSearchBlob = buildProductSearchBlobFromFields({
@@ -202,6 +221,11 @@ export async function postProduct({ userId, body }) {
     productModerationComment: "",
     loyaltyPointsPerUnit,
     productCharacteristics,
+    productListingOrigin,
+    productIsOriginal,
+    productPriceMarketStatus: PRODUCT_PRICE_MARKET_STATUS_DEFAULT,
+    productReturnEnabled,
+    productReturnTerms,
   });
 
   await product.populate("productSeller", PRODUCT_SELLER_PUBLIC_SELECT);

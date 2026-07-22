@@ -4,11 +4,14 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import { seedCatalogProductQueryCache } from "@/entities/product/lib/seedCatalogProductQueryCache";
 
-import { USER_PROFILE_PRODUCTS_PAGE_SIZE } from "@/entities/user/model/constants";
+import { USER_PROFILE_PRODUCTS_API_LIMIT_MAX } from "@/entities/user/model/constants";
 import { useUserProfileProductsAllPagesQuery } from "@/entities/user/model/useUserProfileProductsAllPagesQuery";
 import { useUserProfileProductsQuery } from "@/entities/user/model/useUserProfileProductsQuery";
 import type { UserProfileThumbItem } from "@/entities/user/model/userProfileThumbTypes";
-import { UserProfileThumbSection } from "@/entities/user/ui/UserProfileThumbSection";
+import {
+  UserProfileThumbSection,
+  type UserProfileThumbSectionLayout,
+} from "@/entities/user/ui/UserProfileThumbSection";
 import {
   API_CLIENT_UI,
   USER_PROFILE_PRODUCTS_UI,
@@ -18,34 +21,45 @@ import { formatApiErrorMessage } from "@/shared/lib";
 type UserProfileProductsListProps = {
   targetUserId: string;
   onViewAllProducts?: () => void;
+  hideWhenEmpty?: boolean;
+  heading?: string;
+  layout?: UserProfileThumbSectionLayout;
 };
 
 export const UserProfileProductsList = ({
   targetUserId,
   onViewAllProducts,
+  hideWhenEmpty = false,
+  heading = USER_PROFILE_PRODUCTS_UI.HEADING,
+  layout = "grid",
 }: UserProfileProductsListProps) => {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const previewQuery = useUserProfileProductsQuery({ userId: targetUserId });
-  const [loadAllPages, setLoadAllPages] = useState(false);
+  const isHorizontal = layout === "horizontal";
+  const previewQuery = useUserProfileProductsQuery({
+    userId: targetUserId,
+    limit: USER_PROFILE_PRODUCTS_API_LIMIT_MAX,
+    enabled: !isHorizontal,
+  });
+  const [loadAllPages, setLoadAllPages] = useState(isHorizontal);
   const [isExpanded, setIsExpanded] = useState(false);
   const [error, setError] = useState("");
   const allPagesQuery = useUserProfileProductsAllPagesQuery({
     userId: targetUserId,
-    enabled: loadAllPages,
+    enabled: loadAllPages || isHorizontal,
   });
 
   useEffect(() => {
     setIsExpanded(false);
-    setLoadAllPages(false);
+    setLoadAllPages(isHorizontal);
     setError("");
-  }, [targetUserId]);
+  }, [isHorizontal, targetUserId]);
 
   useEffect(() => {
-    if (allPagesQuery.isSuccess && loadAllPages) {
+    if (allPagesQuery.isSuccess && loadAllPages && !isHorizontal) {
       setIsExpanded(true);
     }
-  }, [allPagesQuery.isSuccess, loadAllPages]);
+  }, [allPagesQuery.isSuccess, isHorizontal, loadAllPages]);
 
   useEffect(() => {
     if (allPagesQuery.isError) {
@@ -55,31 +69,46 @@ export const UserProfileProductsList = ({
 
   const previewItems = (previewQuery.data?.items ?? []) as UserProfileThumbItem[];
   const previewTotal = previewQuery.data?.pagination?.total ?? previewItems.length;
-  const expandedItems = (allPagesQuery.data?.items ?? previewItems) as UserProfileThumbItem[];
-  const expandedTotal = allPagesQuery.data?.pagination?.total ?? previewTotal;
-  const items = isExpanded ? expandedItems : previewItems;
-  const total = isExpanded ? expandedTotal : previewTotal;
+  const allItems = (allPagesQuery.data?.items ?? []) as UserProfileThumbItem[];
+  const allTotal = allPagesQuery.data?.pagination?.total ?? allItems.length;
 
-  const phase = previewQuery.isPending
-    ? "loading"
-    : previewQuery.isError && previewItems.length === 0
-      ? "error"
-      : "success";
+  const items = isHorizontal
+    ? allItems.length > 0
+      ? allItems
+      : previewItems
+    : isExpanded
+      ? allItems.length > 0
+        ? allItems
+        : previewItems
+      : previewItems;
+  const total = isHorizontal
+    ? allTotal || previewTotal
+    : isExpanded
+      ? allTotal || previewTotal
+      : previewTotal;
+
+  const isPending = isHorizontal ? allPagesQuery.isPending : previewQuery.isPending;
+  const isError = isHorizontal
+    ? allPagesQuery.isError && items.length === 0
+    : previewQuery.isError && previewItems.length === 0;
+  const phase = isPending ? "loading" : isError ? "error" : "success";
 
   const fetchError = formatApiErrorMessage(
-    previewQuery.error,
+    isHorizontal ? allPagesQuery.error : previewQuery.error,
     API_CLIENT_UI.FETCH_USER_PRODUCTS_FALLBACK,
   );
   const displayError = error || (phase === "error" ? fetchError : "");
 
-  const canExpand = total > USER_PROFILE_PRODUCTS_PAGE_SIZE;
+  if (hideWhenEmpty && phase === "success" && total === 0) {
+    return null;
+  }
 
   const handleShowMore = () => {
-    if (!canExpand || allPagesQuery.isFetching) {
+    if (isHorizontal || allPagesQuery.isFetching) {
       return;
     }
     setError("");
-    if (previewItems.length >= previewTotal) {
+    if (allPagesQuery.data != null || previewItems.length >= previewTotal) {
       setIsExpanded(true);
       return;
     }
@@ -97,9 +126,11 @@ export const UserProfileProductsList = ({
 
   return (
     <UserProfileThumbSection
-      heading={USER_PROFILE_PRODUCTS_UI.HEADING}
+      heading={heading}
       phase={phase}
       items={items}
+      totalCount={total}
+      layout={layout}
       loadingText={USER_PROFILE_PRODUCTS_UI.LOADING}
       emptyText={USER_PROFILE_PRODUCTS_UI.EMPTY}
       errorText={displayError}
@@ -108,14 +139,13 @@ export const UserProfileProductsList = ({
       onHeadingPress={onViewAllProducts}
       viewAllLabel={USER_PROFILE_PRODUCTS_UI.VIEW_ALL}
       onViewAllPress={onViewAllProducts}
-      showMoreLabel={USER_PROFILE_PRODUCTS_UI.SHOW_MORE}
-      showLessLabel={USER_PROFILE_PRODUCTS_UI.SHOW_LESS}
+      showMoreLabel={isHorizontal ? undefined : USER_PROFILE_PRODUCTS_UI.SHOW_MORE}
+      showLessLabel={isHorizontal ? undefined : USER_PROFILE_PRODUCTS_UI.SHOW_LESS}
       loadingMoreLabel={USER_PROFILE_PRODUCTS_UI.LOADING_MORE}
-      canExpand={canExpand}
       isExpanded={isExpanded}
       isLoadingMore={allPagesQuery.isFetching}
-      onShowMore={handleShowMore}
-      onShowLess={() => setIsExpanded(false)}
+      onShowMore={isHorizontal ? undefined : handleShowMore}
+      onShowLess={isHorizontal ? undefined : () => setIsExpanded(false)}
     />
   );
 };

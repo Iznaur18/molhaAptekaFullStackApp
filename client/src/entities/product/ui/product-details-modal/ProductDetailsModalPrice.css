@@ -39,70 +39,195 @@
 
 .product-details-modal__price-badge-row {
   display: flex;
+  flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
   align-self: stretch;
   width: 100%;
-  gap: 0.125rem;
+  gap: 0.375rem;
   padding: 0.375rem 0.5rem;
   border-radius: 0.625rem;
   background: color-mix(in srgb, currentColor 4%, transparent);
+  overflow: visible;
 }
 
-/* Совпадает с APP_SHELL_MOBILE_NAV_BREAKPOINT_PX (640px): бейджи только на мобиле. */
-@container app-viewport (min-width: 641px) {
-  .product-details-modal .product-details-modal__price-badge-row {
-    display: none;
-  }
+.product-details-modal__meta-info-row {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  align-self: stretch;
+  width: 100%;
+  gap: 0.375rem;
+  padding: 0.375rem 0.5rem;
+  border-radius: 0.625rem;
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.product-details-modal__meta-info-row::-webkit-scrollbar {
+  display: none;
+}
+
+.product-details-modal__above-name-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  align-self: flex-start;
+  gap: 0.35rem;
+  width: fit-content;
+}
+
+.product-details-modal__meta-info-chip {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.27rem;
+  margin: 0;
+  padding: 0.225rem 0.5625rem;
+  border: 0;
+  border-radius: 0.4rem;
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
+  font-size: 0.675rem;
+  font-weight: 800;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.product-details-modal__meta-info-chip--above-price {
+  align-self: flex-start;
+  width: fit-content;
+}
+
+.product-details-modal__meta-info-chip--above-name {
+  align-self: flex-start;
+  width: fit-content;
+}
+
+.product-details-modal__price-display .product-price-display__discount,
+.product-details-modal__price-display .product-discount-badge,
+.product-details-modal__price-display .product-loyalty-points-badge {
+  align-self: center;
+}
+
+.product-details-modal__price-display .product-discount-badge {
+  padding: 0.17rem 0.45rem;
+  border-radius: 0.28rem;
+  border: 0;
+  background: #ffe4e6;
+  color: #be123c;
+  font-size: 0.5rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.product-details-modal__price-display .product-loyalty-points-badge--detail {
+  padding: 0.17rem 0.45rem;
+  border-radius: 0.28rem;
+  border: 0;
+  background: #fef3c7;
+  color: #b45309;
+  font-size: 0.5rem;
+  font-weight: 800;
+  line-height: 1.2;
+  cursor: help;
+}
+
+.product-details-modal__meta-info-chip--listing-origin {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.product-details-modal__meta-info-chip--original {
+  background: var(--iz-color-success-surface);
+  color: var(--iz-color-success-text);
+}
+
+.product-details-modal__meta-info-chip--price-status {
+  background: #9ca3af;
+  color: #111827;
+}
+
+.product-details-modal__meta-info-chip-icon {
+  flex-shrink: 0;
 }
 
 .product-details-modal__price-badge-row .product-discount-badge {
   margin: 0;
-  padding: 0.25rem 0.625rem;
+  padding: 0.17rem 0.45rem;
   border: 0;
-  border-radius: 0.375rem;
-  /* mobile productCardBadgePalette: discountBg = dangerSurface, discountText = dangerText */
-  background: var(--iz-color-danger-surface);
-  color: var(--iz-color-danger-text);
-  font-size: 0.625rem;
+  border-radius: 0.28rem;
+  background: #ffe4e6;
+  color: #be123c;
+  font-size: 0.5rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.product-details-modal__price-badge-row .product-loyalty-points-badge {
+  margin: 0;
+  padding: 0.17rem 0.45rem;
+  border: 0;
+  border-radius: 0.28rem;
+  background: #fef3c7;
+  color: #b45309;
+  font-size: 0.5rem;
   font-weight: 800;
   line-height: 1.2;
 }
 
 .product-details-modal__price-badge-row .product-card__auction-badge,
 .product-details-modal__price-badge-row .product-card__installment-badge,
-.product-details-modal__price-badge-row .product-card__raffle-badge {
+.product-details-modal__price-badge-row .product-card__raffle-badge,
+.product-details-modal__price-badge-row .product-card__promotion-boost-badge,
+.product-details-modal__price-badge-row .product-card__promotion-top-badge,
+.product-details-modal__price-badge-row .product-card__promotion-banner-badge {
   border: 0;
-  border-radius: 0.375rem;
-  padding: 0.25rem 0.625rem;
-  font-size: 0.625rem;
+  border-radius: 0.28rem;
+  padding: 0.17rem 0.45rem;
+  font-size: 0.5rem;
   font-weight: 800;
   line-height: 1.2;
 }
 
-/* Те же токены, что и у базовых бейджей (ProductCardBadges.css) — иначе
-   цвет «зашит» и не переключается вместе с темой, в отличие от мобилы. */
 .product-details-modal__price-badge-row .product-card__auction-badge {
-  background: var(--iz-color-info-soft);
-  color: var(--iz-color-info);
+  background: #dbeafe;
+  color: #1d4ed8;
 }
 
 .product-details-modal__price-badge-row .product-card__installment-badge {
-  background: var(--iz-color-success-surface);
-  color: var(--iz-color-success-text);
+  background: #ccfbf1;
+  color: #0f766e;
 }
 
 .product-details-modal__price-badge-row .product-card__raffle-badge {
-  background: var(--iz-color-accent-soft);
-  color: var(--iz-color-accent);
+  background: #fce7f3;
+  color: #9d174d;
+}
+
+.product-details-modal__price-badge-row .product-card__promotion-boost-badge {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
+.product-details-modal__price-badge-row .product-card__promotion-top-badge {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.product-details-modal__price-badge-row .product-card__promotion-banner-badge {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.product-details-modal__price-badge-row .product-details-modal__meta-info-chip--listing-origin {
+  background: #e0f2fe;
+  color: #0369a1;
 }
 
 .product-details-modal__price-badge-row .product-catalog-status-badges {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.35rem 0.45rem;
-  min-width: 0;
+  display: contents;
 }
 
 .product-details-modal__price-badge-row .product-card__promotion-boost-badge,

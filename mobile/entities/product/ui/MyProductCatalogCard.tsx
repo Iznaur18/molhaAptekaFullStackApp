@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import { formatProductReviewRatingLine } from "@/entities/product-review/lib/formatProductReviewRatingLine";
@@ -24,6 +24,7 @@ import { ProductCardSellerToolbar } from "@/entities/product/ui/ProductCardSelle
 import { ProductPriceDisplay } from "@/entities/product/ui/ProductPriceDisplay";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { PRODUCT_CARD_UI, PRODUCT_MODERATION_PAGE_UI, PRODUCT_UI } from "@/shared/config";
+import { nestedHorizontalScrollProps } from "@/shared/lib/nestedHorizontalScrollProps";
 import { useProductCompactCardStyles } from "@/shared/theme/productCompactCardStyles";
 
 type MyProductCatalogCardProps = {
@@ -86,7 +87,14 @@ export const MyProductCatalogCard = ({
         />
 
         <View style={styles.summary}>
-          <View style={styles.statusRow}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.statusRowScroll}
+            contentContainerStyle={styles.statusRow}
+            {...nestedHorizontalScrollProps}
+            keyboardShouldPersistTaps="handled"
+          >
             <View
               style={[
                 styles.statusPill,
@@ -142,7 +150,7 @@ export const MyProductCatalogCard = ({
                 variant={badge.variant}
               />
             ))}
-          </View>
+          </ScrollView>
 
           <Pressable
             onPress={openProduct}

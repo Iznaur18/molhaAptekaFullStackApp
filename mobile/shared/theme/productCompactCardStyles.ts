@@ -81,9 +81,14 @@ export const useProductCompactCardStyles = createThemedStyles((theme) => {
     minWidth: 0,
     gap: 4,
   },
+  statusRowScroll: {
+    alignSelf: "stretch",
+    maxWidth: "100%",
+    flexGrow: 0,
+  },
   statusRow: {
     flexDirection: "row",
-    flexWrap: "wrap",
+    flexWrap: "nowrap",
     gap: 4,
     alignItems: "center",
   },

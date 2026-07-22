@@ -19,6 +19,8 @@ export async function createProduct(body) {
       productPrice: body.productPrice,
       productOldPrice: body.productOldPrice ?? null,
       productIsAvailable: body.productIsAvailable,
+      productListingOrigin: body.productListingOrigin,
+      productIsOriginal: body.productIsOriginal === true,
     };
     if (body.productCategoryId) {
       payload.productCategoryId = body.productCategoryId;
@@ -48,6 +50,17 @@ export async function createProduct(body) {
     }
     if (Array.isArray(body.productCharacteristics)) {
       payload.productCharacteristics = body.productCharacteristics;
+    }
+    const saleCity = body.productSaleCity?.trim();
+    if (saleCity) {
+      payload.productSaleCity = saleCity;
+    }
+    if (body.productReturnEnabled != null) {
+      payload.productReturnEnabled = body.productReturnEnabled === true;
+      payload.productReturnTerms =
+        payload.productReturnEnabled && Array.isArray(body.productReturnTerms)
+          ? body.productReturnTerms
+          : [];
     }
     const legacy = body.productImageUrl?.trim();
     if (legacy && urls.length === 0) {

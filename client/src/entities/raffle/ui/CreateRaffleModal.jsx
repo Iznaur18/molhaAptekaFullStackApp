@@ -23,7 +23,6 @@ import {
   RAFFLE_PRIZE_MEDIA_TYPE_IMAGE,
   RAFFLE_PRIZE_MEDIA_TYPE_VIDEO,
 } from "../lib/isRafflePrizeVideo.js";
-import { resolveRafflePrizeVideoUrl } from "../lib/resolveRafflePrizeVideoUrl.js";
 import {
   CREATE_RAFFLE_WIZARD_STEPS,
   isCreateRaffleFormDirty,
@@ -31,7 +30,6 @@ import {
   validateCreateRaffleFormStep,
 } from "../lib/createRaffleWizard.js";
 import { resolveCreateRaffleBlockNotice } from "../lib/resolveCreateRaffleBlockNotice.js";
-import { RafflePrizeMedia } from "./RafflePrizeMedia.jsx";
 import {
   API_CLIENT_UI,
   CREATE_RAFFLE_MODAL_UI,
@@ -135,23 +133,6 @@ export function CreateRaffleModal({
     const url = resolveImageUrlForDisplay(form.prizeImageUrl ?? "");
     return isHttpProfileImageUrl(url) ? url : "";
   }, [form.prizeImageUrl]);
-
-  const previewRaffle = useMemo(
-    () => ({
-      prizeMediaType: form.prizeMediaType,
-      prizeImageUrl: resolveUploadedImageUrl(form.prizeImageUrl.trim()),
-      prizeVideoUrl: resolveUploadedImageUrl(form.prizeVideoUrl.trim()),
-      prizeImageFocus: form.prizeImageFocus,
-    }),
-    [form.prizeImageFocus, form.prizeImageUrl, form.prizeMediaType, form.prizeVideoUrl],
-  );
-
-  const showPreview = useMemo(() => {
-    if (isVideoMedia) {
-      return Boolean(resolveRafflePrizeVideoUrl(previewRaffle));
-    }
-    return Boolean(prizeFocusImageUrl || form.prizeImageUrl.trim());
-  }, [form.prizeImageUrl, isVideoMedia, previewRaffle, prizeFocusImageUrl]);
 
   if (!isOpen) return null;
 
@@ -580,21 +561,6 @@ export function CreateRaffleModal({
                     }
                     disabled={isSubmitting}
                   />
-                ) : null}
-                {showPreview ? (
-                  <div className="create-raffle-modal__preview">
-                    <span className="create-raffle-modal__preview-label">
-                      {CREATE_RAFFLE_MODAL_UI.PREVIEW_LABEL}
-                    </span>
-                    <div className="create-raffle-modal__preview-frame">
-                      <RafflePrizeMedia
-                        raffle={previewRaffle}
-                        className="raffle-prize-media"
-                        videoClassName="raffle-prize-media raffle-prize-media_video"
-                        imageClassName="raffle-prize-media"
-                      />
-                    </div>
-                  </div>
                 ) : null}
               </div>
             </section>

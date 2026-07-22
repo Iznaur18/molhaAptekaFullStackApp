@@ -252,21 +252,6 @@ export const useCreateRafflePageStyles = createThemedStyles((theme) => ({
     borderRadius: 4,
     backgroundColor: theme.colors.action,
   },
-  preview: {
-    gap: 5.6,
-  },
-  previewLabel: {
-    fontSize: 12.8,
-    color: theme.colors.textMuted,
-  },
-  previewFrame: {
-    height: 144,
-    borderRadius: 10,
-    overflow: "hidden",
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surfaceMuted,
-  },
   pageHint: {
     fontSize: 12.8,
     lineHeight: 17.9,

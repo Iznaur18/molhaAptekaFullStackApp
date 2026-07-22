@@ -7,6 +7,8 @@ import {
   ScrollView,
   Text,
   View,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useQueryClient } from "@tanstack/react-query";
@@ -37,6 +39,10 @@ import { ProductDetailsDetailsTab } from "@/features/product-detail/ui/ProductDe
 import { ProductAuctionTab, type ProductAuctionDockFooter } from "@/features/product-detail/ui/ProductAuctionTab";
 import { ProductInstallmentTab, type ProductInstallmentDockFooter } from "@/features/product-detail/ui/ProductInstallmentTab";
 import { ProductReviewsTab } from "@/features/product-detail/ui/ProductReviewsTab";
+import {
+  isProductSimilarScrollNearEnd,
+  ProductSimilarTab,
+} from "@/features/product-detail/ui/ProductSimilarTab";
 import { ProductPromotionModal } from "@/features/product-promotion/ui/ProductPromotionModal";
 import { SquircleView } from "@/shared/ui/SquircleView";
 import { useProductPromotionManageSupport } from "@/features/product-promotion/model/useProductPromotionManageSupport";
@@ -202,6 +208,38 @@ export default function ProductDetailScreen() {
     [handleClosePromotionModal, manageSupport, queryClient, router],
   );
 
+  const isSimilarTab = activeTab === "similar";
+  const similarLoadMoreRef = useRef<(() => void) | null>(null);
+  const similarLoadMoreLockUntilRef = useRef(0);
+
+  const handleRegisterSimilarLoadMore = useCallback((loadMore: (() => void) | null) => {
+    similarLoadMoreRef.current = loadMore;
+  }, []);
+
+  const handleProductScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      if (!isSimilarTab) {
+        return;
+      }
+      const now = Date.now();
+      if (now < similarLoadMoreLockUntilRef.current) {
+        return;
+      }
+      const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
+      if (
+        isProductSimilarScrollNearEnd({
+          contentOffsetY: contentOffset.y,
+          contentHeight: contentSize.height,
+          layoutHeight: layoutMeasurement.height,
+        })
+      ) {
+        similarLoadMoreLockUntilRef.current = now + 800;
+        similarLoadMoreRef.current?.();
+      }
+    },
+    [isSimilarTab],
+  );
+
   if (productQuery.isPending) {
     return <ScreenLoadingState />;
   }
@@ -239,7 +277,11 @@ export default function ProductDetailScreen() {
     activeTab === "details" && (canShowAddToCart || auctionUi.auctionActive || installmentActive);
   const showInstallmentDock = activeTab === "installment" && installmentDock != null;
   const showAuctionDock = activeTab === "auction" && auctionDock != null;
-  const isAltTab = activeTab === "reviews" || activeTab === "auction" || activeTab === "installment";
+  const isAltTab =
+    activeTab === "reviews" ||
+    activeTab === "similar" ||
+    activeTab === "auction" ||
+    activeTab === "installment";
 
   const handleReportPress = () => {
     if (!isAuthorized) {
@@ -339,89 +381,116 @@ export default function ProductDetailScreen() {
             style={styles.scrollArea}
             contentContainerStyle={[
               styles.container,
-              !showMobilePurchaseDock && !showInstallmentDock && !showAuctionDock && styles.containerNoDock,
+              !showMobilePurchaseDock &&
+                !showInstallmentDock &&
+                !showAuctionDock &&
+                styles.containerNoDock,
               keyboardBottomInset > 0 ? { paddingBottom: keyboardBottomInset } : null,
             ]}
             keyboardShouldPersistTaps="handled"
             automaticallyAdjustKeyboardInsets={Platform.OS !== "web"}
             automaticallyAdjustsScrollIndicatorInsets={Platform.OS !== "web"}
+            onScroll={handleProductScroll}
+            scrollEventThrottle={16}
           >
-          <ProductDetailMediaSection
-            product={productRecord}
-            productId={productId}
-            imageUrls={imageUrls}
-            previewVideoUrl={previewVideoUrl}
-            isOwnProduct={isOwnProduct}
-            onReportPress={handleReportPress}
-            reportDisabled={isAuthorized && hasPendingReport}
-          />
+            <ProductDetailMediaSection
+              product={productRecord}
+              productId={productId}
+              imageUrls={imageUrls}
+              previewVideoUrl={previewVideoUrl}
+              isOwnProduct={isOwnProduct}
+              onReportPress={handleReportPress}
+              reportDisabled={isAuthorized && hasPendingReport}
+            />
+            {showTabs ? (
+              <ProductDetailTabBar tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
+            ) : null}
 
-          {showTabs ? (
-            <ProductDetailTabBar tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
-          ) : null}
-
-          <View style={[styles.tabPanel, isAltTab && styles.tabPanelInset]}>
-            {activeTab === "details" ? (
-              <ProductDetailsDetailsTab
+            {isSimilarTab ? (
+              <ProductSimilarTab
                 product={productRecord}
-                topStatFieldKeys={topStatFieldKeys}
+                excludeProductId={productId}
+                enabled
+                onRegisterLoadMore={handleRegisterSimilarLoadMore}
               />
             ) : null}
-            {activeTab === "reviews" ? (
-              <ProductReviewsTab
-                productId={productId}
-                isAuthorized={isAuthorized}
-                isUserDataConfirmed={sessionQuery.data?.user?.isUserDataConfirmed === true}
-                isOwnProduct={isOwnProduct}
-              />
-            ) : null}
-            {activeTab === "auction" ? (
-              <ProductAuctionTab
-                productId={productId}
-                auctionActive={auctionUi.auctionActive}
-                completedOnce={auctionUi.completedOnce}
-                isAuthorized={isAuthorized}
-                isUserDataConfirmed={sessionQuery.data?.user?.isUserDataConfirmed === true}
-                isOwnProduct={isOwnProduct}
-                onDockFooterChange={handleAuctionDockChange}
-              />
-            ) : null}
-            {activeTab === "installment" ? (
-              <ProductInstallmentTab
-                productId={productId}
-                productPrice={productPrice}
-                installmentEnabled={productRecord.productInstallmentEnabled === true}
-                isAuthorized={isAuthorized}
-                isUserDataConfirmed={sessionQuery.data?.user?.isUserDataConfirmed === true}
-                isOwnProduct={isOwnProduct}
-                defaultUser={sessionQuery.data?.user ?? null}
-                onDockFooterChange={handleInstallmentDockChange}
-              />
-            ) : null}
-          </View>
 
-          {isOwnProduct && activeTab === "details" ? (
-            <View style={styles.mobileInlineActions}>
-              <AppButton
-                label={PRODUCT_CARD_UI.PROMOTION_BUTTON}
-                variant="contrast"
-                onPress={handleOpenPromotionModal}
-                disabled={!canPromoteProduct}
-                style={[styles.sellerActionButton, !canPromoteProduct && styles.promoteButtonDisabled]}
-              />
-              <AppButton
-                label={PRODUCT_CARD_UI.EDIT_PRODUCT}
-                variant="outline"
-                onPress={() => router.push(`/edit-product/${productId}`)}
-                style={styles.sellerActionButton}
-              />
+            <View
+              style={[
+                styles.tabPanel,
+                isAltTab && styles.tabPanelInset,
+                isSimilarTab && styles.productTabPanelHidden,
+              ]}
+              pointerEvents={isSimilarTab ? "none" : "auto"}
+              collapsable={false}
+            >
+              {activeTab === "details" ? (
+                <ProductDetailsDetailsTab
+                  product={productRecord}
+                  topStatFieldKeys={topStatFieldKeys}
+                  onOpenInstallmentTab={handleInstallmentShortcut}
+                  onOpenAuctionTab={handleAuctionShortcut}
+                  auctionActive={auctionUi.auctionActive}
+                />
+              ) : null}
+              {activeTab === "reviews" ? (
+                <ProductReviewsTab
+                  productId={productId}
+                  isAuthorized={isAuthorized}
+                  isUserDataConfirmed={sessionQuery.data?.user?.isUserDataConfirmed === true}
+                  isOwnProduct={isOwnProduct}
+                />
+              ) : null}
+              {activeTab === "auction" ? (
+                <ProductAuctionTab
+                  productId={productId}
+                  auctionActive={auctionUi.auctionActive}
+                  completedOnce={auctionUi.completedOnce}
+                  isAuthorized={isAuthorized}
+                  isUserDataConfirmed={sessionQuery.data?.user?.isUserDataConfirmed === true}
+                  isOwnProduct={isOwnProduct}
+                  onDockFooterChange={handleAuctionDockChange}
+                />
+              ) : null}
+              {activeTab === "installment" ? (
+                <ProductInstallmentTab
+                  productId={productId}
+                  productPrice={productPrice}
+                  installmentEnabled={productRecord.productInstallmentEnabled === true}
+                  isAuthorized={isAuthorized}
+                  isUserDataConfirmed={sessionQuery.data?.user?.isUserDataConfirmed === true}
+                  isOwnProduct={isOwnProduct}
+                  defaultUser={sessionQuery.data?.user ?? null}
+                  onDockFooterChange={handleInstallmentDockChange}
+                />
+              ) : null}
             </View>
-          ) : null}
 
-          {reportSuccessMessage ? (
-            <Text style={styles.reportSuccess}>{reportSuccessMessage}</Text>
-          ) : null}
-        </ScrollView>
+            {isOwnProduct && activeTab === "details" ? (
+              <View style={styles.mobileInlineActions}>
+                <AppButton
+                  label={PRODUCT_CARD_UI.PROMOTION_BUTTON}
+                  variant="contrast"
+                  onPress={handleOpenPromotionModal}
+                  disabled={!canPromoteProduct}
+                  style={[
+                    styles.sellerActionButton,
+                    !canPromoteProduct && styles.promoteButtonDisabled,
+                  ]}
+                />
+                <AppButton
+                  label={PRODUCT_CARD_UI.EDIT_PRODUCT}
+                  variant="outline"
+                  onPress={() => router.push(`/edit-product/${productId}`)}
+                  style={styles.sellerActionButton}
+                />
+              </View>
+            ) : null}
+
+            {reportSuccessMessage ? (
+              <Text style={styles.reportSuccess}>{reportSuccessMessage}</Text>
+            ) : null}
+          </ScrollView>
         </KeyboardAvoidingView>
 
         {showMobilePurchaseDock && keyboardBottomInset === 0 ? (
@@ -434,10 +503,6 @@ export default function ProductDetailScreen() {
               productId={productId}
               product={productRecord}
               canShowAddToCart={canShowAddToCart}
-              auctionActive={auctionUi.auctionActive}
-              installmentActive={installmentActive}
-              onAuctionPress={handleAuctionShortcut}
-              onInstallmentPress={handleInstallmentShortcut}
               variant="dock"
             />
           </SquircleView>

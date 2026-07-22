@@ -126,8 +126,8 @@
   width: fit-content;
   border-radius: var(--product-card-overlay-badge-radius, 6px);
   border: none;
-  background: var(--iz-color-accent-soft);
-  color: var(--iz-color-accent);
+  background: #fdf2f8;
+  color: #be185d;
   font-size: var(--product-card-overlay-badge-font-size, 10px);
   font-weight: 800;
   line-height: var(--product-card-overlay-badge-line-height, 12px);

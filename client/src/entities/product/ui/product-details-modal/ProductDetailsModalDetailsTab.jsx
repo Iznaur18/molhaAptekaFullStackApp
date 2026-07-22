@@ -1,13 +1,10 @@
 import { PRODUCT_DETAILS_MODAL_UI } from "../../../../shared/config/appUiCopy.js";
 import { WishlistToggleButton } from "../../../../features/wishlist-toggle/ui/WishlistToggleButton.jsx";
-import { resolveProductDiscountPercent } from "../../lib/computeProductDiscountPercent.js";
-import { ProductCatalogStatusBadges } from "../ProductCatalogStatusBadges.jsx";
+import { ProductDetailsAboveNameChips } from "../ProductDetailsAboveNameChips.jsx";
+import { ProductDetailsBadgeStack } from "../ProductDetailsBadgeStack.jsx";
 import { ProductDetailsSellerPreview } from "../ProductDetailsSellerPreview.jsx";
 import { ProductMediaGalleryReadonly } from "../ProductMediaGalleryReadonly.jsx";
-import {
-  ProductDiscountBadge,
-  ProductPriceDisplay,
-} from "../ProductPriceDisplay.jsx";
+import { ProductPriceDisplay } from "../ProductPriceDisplay.jsx";
 import { ProductDetailsContentSwitcher } from "./ProductDetailsContentSwitcher.jsx";
 import { ProductDetailsModalPurchaseActions } from "./ProductDetailsModalPurchaseActions.jsx";
 import { renderProductDetailsFieldRows } from "./renderProductDetailsFieldRows.jsx";
@@ -64,25 +61,19 @@ export function ProductDetailsModalDetailsTab({
 
   const priceBlock = showPriceBlock ? (
     <div className="product-details-modal__price-block product-details-modal__price-block--inline-actions">
-      <h3 id={productTitleId} className="product-details-modal__product-name">
-        {product.productName?.trim() || "Товар"}
-      </h3>
       <ProductPriceDisplay
         product={product}
         showLabel={false}
         className="product-details-modal__price-display"
+        showDiscountBadge
+        showLoyaltyBadge
+        isAuthorized={isAuthorized}
       />
-      <div className="product-details-modal__price-badge-row">
-        <ProductDiscountBadge
-          discountPercent={resolveProductDiscountPercent(product)}
-          className="product-details-modal__price-discount"
-        />
-        <ProductCatalogStatusBadges
-          product={product}
-          isAuthorized={isAuthorized}
-          isPremiumUser={isPremiumUser}
-        />
-      </div>
+      <ProductDetailsAboveNameChips product={product} />
+      <h3 id={productTitleId} className="product-details-modal__product-name">
+        {product.productName?.trim() || "Товар"}
+      </h3>
+      <ProductDetailsBadgeStack product={product} />
       <ProductDetailsModalPurchaseActions
         productId={String(product._id)}
         isAuthorized={isAuthorized}

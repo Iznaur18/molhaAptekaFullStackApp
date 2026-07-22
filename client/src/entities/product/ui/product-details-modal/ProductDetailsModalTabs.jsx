@@ -25,16 +25,16 @@ export function ProductDetailsModalTabs({
   /** @type {Array<{ id: 'details' | 'auction' | 'reviews' | 'installment'; label: string }>} */
   const tabs = [{ id: "details", label: PRODUCT_PRICE_OFFER_UI.TAB_DETAILS }];
 
-  if (showAuctionTab) {
-    tabs.push({ id: "auction", label: PRODUCT_PRICE_OFFER_UI.TAB_AUCTION });
+  if (showReviewsTab) {
+    tabs.push({ id: "reviews", label: reviewsTabLabel });
   }
 
   if (showInstallmentTab) {
     tabs.push({ id: "installment", label: INSTALLMENT_UI.TAB });
   }
 
-  if (showReviewsTab) {
-    tabs.push({ id: "reviews", label: reviewsTabLabel });
+  if (showAuctionTab) {
+    tabs.push({ id: "auction", label: PRODUCT_PRICE_OFFER_UI.TAB_AUCTION });
   }
 
   return (

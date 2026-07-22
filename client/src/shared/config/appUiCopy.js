@@ -394,7 +394,7 @@ export const HOME_PAGE_UI = {
   CATEGORY_FILTER_LABEL: "Категория",
   CATALOG_FILTERS_SECTION_LABEL: "Фильтры",
   EMPTY_FOLLOWING_FILTER: "Нет товаров от ваших подписок с текущими фильтрами.",
-  EMPTY_SALE_FILTER: "Нет товаров в распродаже от 50%.",
+  EMPTY_SALE_FILTER: "Нет товаров в распродаже от 35%.",
   EMPTY_INSTALLMENT_FILTER: "Нет товаров с рассрочкой с текущими фильтрами.",
   LOGIN_FOR_FOLLOWING_FILTER: "Войдите, чтобы включить фильтр «только от подписок».",
   NAV_TO_CART: "Корзина",
@@ -1331,6 +1331,17 @@ export const CREATE_PRODUCT_MODAL_UI = {
   CANCEL: "Отмена",
   LABEL_NAME: "Название",
   LABEL_DESCRIPTION: "Описание (до 2000 символов)",
+  LABEL_LISTING_ORIGIN: "Статус товара",
+  LISTING_ORIGIN_OWN: "Продаю свое",
+  LISTING_ORIGIN_RESALE: "Приобретен на продажу",
+  LISTING_ORIGIN_MANUFACTURER: "Являюсь производителем",
+  ERROR_LISTING_ORIGIN: "Выберите статус товара",
+  ORIGINALITY_STATEMENT:
+    "Я как официальный продавец, заявляю что продаю официальный товар",
+  ORIGINALITY_YES: "Да",
+  ORIGINALITY_NO: "Нет",
+  ERROR_ORIGINALITY: "Выберите: оригинал или нет",
+  LABEL_ORIGINALITY: "Оригинал",
   CHARS_USED: (n, max) => `Символов: ${n} / ${max}`,
   LABEL_IMAGE_URLS: "Изображения (обязательно, до 5 — ссылка или файл)",
   IMAGE_ORDER_HINT: "Перетащите за ⋮⋮ — порядок в каталоге (1 — главное фото).",
@@ -1414,6 +1425,8 @@ export const CREATE_PRODUCT_MODAL_UI = {
   WIZARD_ERROR_NAME: "Название: от 3 до 100 символов",
   WIZARD_STEP_BASIC_TITLE: "О товаре",
   WIZARD_STEP_BASIC_SUBTITLE: "Название и описание — первое, что видит покупатель",
+  WIZARD_STEP_ORIGINALITY_TITLE: "Оригинал",
+  WIZARD_STEP_ORIGINALITY_SUBTITLE: "Подтвердите, что продаёте официальный товар",
   WIZARD_STEP_MEDIA_TITLE: "Фото и видео",
   WIZARD_STEP_MEDIA_SUBTITLE: "Добавьте до 5 фото. Первое фото станет обложкой",
   WIZARD_STEP_CATEGORY_TITLE: "Категория и город",
@@ -1471,6 +1484,7 @@ export const CREATE_PRODUCT_MODAL_UI = {
   /** @param {number} current @param {number} total */
   WIZARD_STEP_OF: (current, total) => `Шаг ${current} из ${total}`,
   WIZARD_STEP_LABEL_BASIC: "О товаре",
+  WIZARD_STEP_LABEL_ORIGINALITY: "Оригинал",
   WIZARD_STEP_LABEL_MEDIA: "Медиа",
   WIZARD_STEP_LABEL_CATEGORY: "Категория",
   WIZARD_STEP_LABEL_COMMERCE: "Цена",
@@ -1517,6 +1531,15 @@ export const PRODUCT_DETAILS_MODAL_UI = {
   OPEN_GALLERY_FULLSCREEN: "Просмотреть все фото в полном экране",
   SLIDER_REGION_ARIA: "Слайдер фотографий товара",
   DETAILS_SECTION_ARIA: "Описание и служебная информация о товаре",
+  LISTING_ORIGIN_UNSPECIFIED: "Не указано",
+  LISTING_ORIGIN_SLOT_ARIA: "Статус товара",
+  PRICE_MARKET_STATUS_SLOT_ARIA: "Статус цены",
+  PRICE_MARKET_STATUS_ABOVE: "Цена выше рыночной",
+  PRICE_MARKET_STATUS_AT: "Цена по рыночной стоимости",
+  PRICE_MARKET_STATUS_BELOW: "Цена ниже рыночной",
+  PRICE_MARKET_STATUS_UNKNOWN: "Статус цены не определен",
+  ORIGINAL_BADGE: "Оригинал",
+  ORIGINAL_BADGE_ARIA: "Оригинальный товар",
   CONTENT_SWITCHER_ARIA: "Описание и характеристики товара",
   DESCRIPTION_SECTION_ARIA: "Описание товара",
   SALE_CITY_ALL: "Во всех городах",
@@ -1579,13 +1602,17 @@ export const PRODUCT_CARD_UI = {
   LOYALTY_POINTS_TOOLTIP: "Даёт продавец; получает подтверждённый покупатель",
   /** @param {number} percent */
   DISCOUNT_BADGE: (percent) => `-${percent}%`,
+  /** @param {number} percent */
+  DISCOUNT_BADGE_DETAIL: (percent) => `-${percent}%`,
   /** @param {number} points */
   LOYALTY_POINTS_CONFIRMED: (points) => `+${points} ${pluralizeRuBall(points)}`,
   /** @param {number} points */
   LOYALTY_POINTS_UNCONFIRMED: (points) => `+${points} ${pluralizeRuBall(points)}`,
   /** @param {number} points */
   LOYALTY_POINTS_GUEST: (points) =>
-    `+${points} ${pluralizeRuBall(points)} с подтверждением`,
+    `+${points} ${pluralizeRuBall(points)}`,
+  /** @param {number} points */
+  LOYALTY_POINTS_DETAIL: (points) => `+${points} Б`,
   LOYALTY_POINTS_OVERCOMMITTED_BADGE: "Бонус выше доступного остатка баллов",
   RAFFLE_PARTICIPATION_ON: "Участвует в розыгрыше",
   RAFFLE_PARTICIPATION_OFF: "Добавить в розыгрыш",

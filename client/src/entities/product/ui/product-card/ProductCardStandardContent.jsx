@@ -75,6 +75,11 @@ export function ProductCardStandardContent({ vm }) {
             {...vm.statusBadgesDragScrollProps}
           >
             <ProductCardStatusSlot vm={vm} />
+            {vm.showRaffleBadge ? (
+              <p className="product-card__raffle-badge" role="status">
+                {PRODUCT_CARD_UI.RAFFLE_BADGE}
+              </p>
+            ) : null}
             {vm.showAuctionBadge ? (
               <p className="product-card__auction-badge" role="status">
                 {PRODUCT_CARD_UI.AUCTION_BADGE}
@@ -83,11 +88,6 @@ export function ProductCardStandardContent({ vm }) {
             {vm.showInstallmentBadge ? (
               <p className="product-card__installment-badge" role="status">
                 {PRODUCT_CARD_UI.INSTALLMENT_BADGE}
-              </p>
-            ) : null}
-            {vm.showRaffleBadge ? (
-              <p className="product-card__raffle-badge" role="status">
-                {PRODUCT_CARD_UI.RAFFLE_BADGE}
               </p>
             ) : null}
             {!hasCatalogStatusBadges ? (

@@ -8,11 +8,16 @@ import { fetchCatalogProductsPage } from "../api/fetchCatalogProductsPage";
 import { flattenCatalogProducts } from "../lib/flattenCatalogProducts";
 import { buildCatalogListQueryKey, type CatalogListFilters } from "./catalogListFilters";
 
-export const useCatalogProductsInfiniteQuery = (filters: CatalogListFilters) => {
+export const useCatalogProductsInfiniteQuery = (
+  filters: CatalogListFilters,
+  options: { enabled?: boolean } = {},
+) => {
   const queryKeyParams = buildCatalogListQueryKey(filters);
+  const enabled = options.enabled !== false;
 
   const query = useInfiniteQuery({
     queryKey: catalogQueryKeys.list(queryKeyParams),
+    enabled,
     queryFn: ({ pageParam }) =>
       fetchCatalogProductsPage({
         page: pageParam,

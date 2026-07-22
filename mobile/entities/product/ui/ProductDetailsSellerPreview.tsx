@@ -1,11 +1,12 @@
 import { Feather } from "@expo/vector-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 
 import { formatSearchRowRatingCompact } from "@/entities/user/lib/formatSearchRowRating";
 import { formatSearchRowTotalSales } from "@/entities/user/lib/formatSearchRowTotalSales";
 import { pickUserProfilePhotoUrl } from "@/entities/user/lib/pickUserProfilePhotoUrl";
+import { getUserAvatarFocus } from "@/entities/user/lib/profileImageFocus";
 import { DEFAULT_USER_AVATAR_URL } from "@/entities/user/model/constants";
 import { UserPremiumAvatar } from "@/entities/user/ui/UserPremiumAvatar";
 import { UserPremiumDisplayName } from "@/entities/user/ui/UserPremiumDisplayName";
@@ -20,6 +21,8 @@ import { useProductDetailsSellerPreviewStyles } from "@/shared/theme/catalogProd
 type SellerObject = {
   _id: string;
   userName?: string;
+  userAvatarUrl?: string;
+  userAvatarFocus?: { x?: number; y?: number };
   isPremiumUser?: boolean;
   isUserDataConfirmed?: boolean;
   userRatingByVotes?: { countVotes?: number; totalRating?: number };
@@ -47,12 +50,20 @@ export const ProductDetailsSellerPreview = ({ seller }: ProductDetailsSellerPrev
   const styles = useProductDetailsSellerPreviewStyles();
   const [avatarFailed, setAvatarFailed] = useState(false);
 
-  if (seller == null || typeof seller !== "object" || !("_id" in seller)) {
+  const sellerObj =
+    seller != null && typeof seller === "object" && "_id" in seller
+      ? (seller as SellerObject)
+      : null;
+  const sellerId = sellerObj != null ? String(sellerObj._id) : "";
+
+  useEffect(() => {
+    setAvatarFailed(false);
+  }, [sellerId]);
+
+  if (sellerObj == null || !sellerId) {
     return null;
   }
 
-  const sellerObj = seller as SellerObject;
-  const sellerId = String(sellerObj._id);
   const displayName = sellerObj.userName?.trim() || USER_LIST_ROW_UI.MISSING_NAME;
   const isPremium = sellerObj.isPremiumUser === true;
   const isConfirmed = sellerObj.isUserDataConfirmed === true;
@@ -104,6 +115,7 @@ export const ProductDetailsSellerPreview = ({ seller }: ProductDetailsSellerPrev
         <UserPremiumAvatar
           uri={avatarUri}
           isPremium={isPremium}
+          focus={getUserAvatarFocus(sellerObj)}
           onError={() => setAvatarFailed(true)}
           style={styles.avatar}
         />

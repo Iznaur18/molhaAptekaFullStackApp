@@ -179,26 +179,6 @@
   accent-color: var(--iz-color-accent);
 }
 
-.create-raffle-modal__preview {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-
-.create-raffle-modal__preview-label {
-  font-size: 0.8rem;
-  opacity: 0.75;
-}
-
-.create-raffle-modal__preview-frame {
-  position: relative;
-  height: 9rem;
-  border: 1px solid var(--iz-color-accent-ring);
-  border-radius: 10px;
-  overflow: hidden;
-  background: var(--iz-color-accent-soft);
-}
-
 .create-raffle-modal__wizard {
   display: flex;
   flex-direction: column;

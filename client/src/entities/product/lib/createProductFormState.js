@@ -4,9 +4,12 @@ import { resolveProductImageUrls } from "./resolveProductImageUrls.js";
 import { characteristicRowsFromApi } from "./characteristicRowsFromApi.js";
 import { formatIntegerGroupRu } from "../../../shared/lib/numericInput.js";
 import { resolveProductLoyaltyPointsPerUnit } from "./resolveProductLoyaltyPointsPerUnit.js";
+import { isProductListingOrigin } from "./productListingOrigin.js";
 
 export const CREATE_PRODUCT_INITIAL_FORM = {
   productName: "",
+  productListingOrigin: null,
+  productIsOriginal: null,
   productDescription: "",
   productImageRows: [createImageRow("")],
   productPreviewVideoUrl: "",
@@ -37,6 +40,10 @@ export function createProductFormStateFromProduct(product) {
       : "";
   return {
     productName: product.productName?.trim() ?? "",
+    productListingOrigin: isProductListingOrigin(product.productListingOrigin)
+      ? product.productListingOrigin
+      : null,
+    productIsOriginal: product.productIsOriginal === true,
     productDescription: product.productDescription?.trim() ?? "",
     productImageRows: imageRowsFromUrls(urls),
     productPreviewVideoUrl: product.productPreviewVideoUrl?.trim() ?? "",

@@ -14,6 +14,8 @@ const PROFILE_AVATAR_SIZE = 72;
 /** Высота шапки-баннера профиля. Переиспользуется превью фона в редакторе. */
 export const PROFILE_BANNER_HEIGHT = PROFILE_AVATAR_SIZE * 3;
 export const PROFILE_CARD_SQUIRCLE_RADIUS = 24;
+/** Паритет с `PRODUCT_CARD_DETAIL_BADGE_ROW_CHROME.borderRadius` на карточке товара. */
+export const PRODUCT_DETAIL_SECTION_RADIUS = 12;
 const GUEST_BODY_PADDING_TOP = 0;
 const GUEST_BODY_MARGIN_TOP = 36;
 const GUEST_BODY_MARGIN_BOTTOM = 36;
@@ -493,7 +495,23 @@ export const useThemePreferenceToggleStyles = createThemedStyles((theme) => ({
 
 const USER_PROFILE_THUMB_SIZE = 64;
 export const USER_PROFILE_THUMB_SQUIRCLE_RADIUS = 14;
+export const USER_PROFILE_THUMB_GAP = 10;
+/** До первого onLayout — запасной размер ряда. */
 export const USER_PROFILE_THUMB_ROW_SIZE = 5;
+
+export const resolveUserProfileThumbColumns = (contentWidth: number): number => {
+  if (contentWidth <= 0) {
+    return USER_PROFILE_THUMB_ROW_SIZE;
+  }
+
+  return Math.max(
+    1,
+    Math.floor(
+      (contentWidth + USER_PROFILE_THUMB_GAP) /
+        (USER_PROFILE_THUMB_SIZE + USER_PROFILE_THUMB_GAP),
+    ),
+  );
+};
 
 export const useUserProfileThumbListStyles = createThemedStyles((theme) => ({
   root: {
@@ -501,6 +519,15 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
+  },
+  rootHorizontal: {
+    marginBottom: 0,
+    backgroundColor: theme.colors.surfaceMuted,
+    borderColor: theme.colors.border,
+  },
+  rootHorizontalRadius: {
+    borderRadius: PRODUCT_DETAIL_SECTION_RADIUS,
+    overflow: "hidden",
   },
   header: {
     flexDirection: "row",
@@ -513,6 +540,11 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.ink,
     borderBottomColor: theme.colors.ink,
   },
+  headerHorizontal: {
+    backgroundColor: "transparent",
+    borderBottomWidth: 0,
+    paddingBottom: 4,
+  },
   headerTitle: {
     flex: 1,
     minWidth: 0,
@@ -521,6 +553,13 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme) => ({
     letterSpacing: 0.9,
     textTransform: "uppercase",
     color: theme.colors.onContrast,
+  },
+  headerTitleHorizontal: {
+    fontSize: 13,
+    fontWeight: "700",
+    letterSpacing: 0.2,
+    textTransform: "none",
+    color: theme.colors.text,
   },
   headerTitlePressable: {
     flex: 1,
@@ -539,6 +578,10 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme) => ({
     paddingVertical: 12,
     gap: theme.spacing[2],
   },
+  bodyHorizontal: {
+    paddingTop: 4,
+    backgroundColor: "transparent",
+  },
   state: {
     fontSize: 14,
     textAlign: "center",
@@ -556,7 +599,15 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme) => ({
   },
   gridRowPartial: {
     justifyContent: "flex-start",
-    gap: 10,
+    gap: USER_PROFILE_THUMB_GAP,
+  },
+  scrollRow: {
+    flexGrow: 0,
+  },
+  scrollRowContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: USER_PROFILE_THUMB_GAP,
   },
   thumbButton: {
     width: USER_PROFILE_THUMB_SIZE,

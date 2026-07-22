@@ -10,6 +10,15 @@ import {
   PRODUCT_CHARACTERISTIC_VALUE_MAX_CHARS,
 } from "../constants/productCharacteristicsConstants.js";
 import {
+  PRODUCT_RETURN_TERM_KEY_MAX_CHARS,
+  PRODUCT_RETURN_TERM_VALUE_MAX_CHARS,
+} from "../constants/productReturnConstants.js";
+import { PRODUCT_LISTING_ORIGIN_VALUES } from "../constants/productListingOriginConstants.js";
+import {
+  PRODUCT_PRICE_MARKET_STATUS_DEFAULT,
+  PRODUCT_PRICE_MARKET_STATUS_VALUES,
+} from "../constants/productPriceMarketStatusConstants.js";
+import {
   PRODUCT_MODERATION_APPROVED,
   PRODUCT_MODERATION_STATUSES,
 } from "../constants/productModerationConstants.js";
@@ -43,6 +52,43 @@ const ProductSchema = new Schema(
             required: true,
             trim: true,
             maxlength: PRODUCT_CHARACTERISTIC_VALUE_MAX_CHARS,
+          },
+        },
+      ],
+      default: [],
+    },
+    productListingOrigin: {
+      type: String,
+      enum: PRODUCT_LISTING_ORIGIN_VALUES,
+      required: false,
+    },
+    productPriceMarketStatus: {
+      type: String,
+      enum: PRODUCT_PRICE_MARKET_STATUS_VALUES,
+      default: PRODUCT_PRICE_MARKET_STATUS_DEFAULT,
+    },
+    productIsOriginal: {
+      type: Boolean,
+      default: false,
+    },
+    productReturnEnabled: {
+      type: Boolean,
+      default: false,
+    },
+    productReturnTerms: {
+      type: [
+        {
+          key: {
+            type: String,
+            required: true,
+            trim: true,
+            maxlength: PRODUCT_RETURN_TERM_KEY_MAX_CHARS,
+          },
+          value: {
+            type: String,
+            required: true,
+            trim: true,
+            maxlength: PRODUCT_RETURN_TERM_VALUE_MAX_CHARS,
           },
         },
       ],

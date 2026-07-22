@@ -1,5 +1,7 @@
+import type { ReactNode } from "react";
 import { View } from "react-native";
 
+import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { PRODUCT_CARD_UI } from "@/shared/config";
 import { formatPriceRub } from "@/shared/lib";
 import { useProductPriceStyles } from "@/shared/theme/catalogProductStyles";
@@ -10,6 +12,7 @@ import {
   resolveProductDiscountPercent,
 } from "../lib/computeProductDiscountPercent";
 import { getProductFieldLabel } from "../lib/productFieldRegistry";
+import { ProductLoyaltyPointsBadge } from "./ProductLoyaltyPointsBadge";
 
 type ProductPriceDisplayProps = {
   product: {
@@ -20,14 +23,18 @@ type ProductPriceDisplayProps = {
   };
   showLabel?: boolean;
   variant?: "card" | "inline" | "detail" | "banner" | "cart";
+  /** После скидки, иначе сразу после текущей цены (detail). */
+  afterPriceSlot?: ReactNode;
 };
 
 export const ProductPriceDisplay = ({
   product,
   showLabel = false,
   variant = "card",
+  afterPriceSlot = null,
 }: ProductPriceDisplayProps) => {
   const styles = useProductPriceStyles();
+  const isAuthorized = useIsAuthorized();
   const hasDiscount = hasProductCatalogDiscount(product);
   const currentPriceText = formatPriceRub(Math.floor(Number(product.productPrice)));
   const isDetail = variant === "detail";
@@ -70,6 +77,15 @@ export const ProductPriceDisplay = ({
           {formatPriceRub(Math.floor(Number(product.productOldPrice)))}
         </AppText>
       ) : null}
+      {isDetail ? <ProductDiscountBadge product={product} variant="detail" /> : null}
+      {isDetail ? (
+        <ProductLoyaltyPointsBadge
+          product={product}
+          variant="detail"
+          isAuthorized={isAuthorized}
+        />
+      ) : null}
+      {isDetail ? afterPriceSlot : null}
     </View>
   );
 };

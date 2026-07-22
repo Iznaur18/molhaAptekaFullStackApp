@@ -35,19 +35,29 @@ export function CreateProductReviewSection({
       multiline: true,
     },
     {
+      label: CREATE_PRODUCT_MODAL_UI.LABEL_ORIGINALITY,
+      value:
+        form.productIsOriginal === true
+          ? CREATE_PRODUCT_MODAL_UI.ORIGINALITY_YES
+          : form.productIsOriginal === false
+            ? CREATE_PRODUCT_MODAL_UI.ORIGINALITY_NO
+            : CREATE_PRODUCT_MODAL_UI.WIZARD_REVIEW_EMPTY,
+      stepIndex: 1,
+    },
+    {
       label: CREATE_PRODUCT_MODAL_UI.SECTION_MEDIA,
       value: CREATE_PRODUCT_MODAL_UI.WIZARD_REVIEW_MEDIA(imageCount, form.productPreviewVideoUrl),
-      stepIndex: 1,
+      stepIndex: 2,
     },
     {
       label: CREATE_PRODUCT_MODAL_UI.LABEL_CATEGORY,
       value: categoryLabel,
-      stepIndex: 2,
+      stepIndex: 3,
     },
     {
       label: CREATE_PRODUCT_MODAL_UI.LABEL_SALE_CITY,
       value: String(form.productSaleCity ?? "").trim() || CREATE_PRODUCT_MODAL_UI.WIZARD_REVIEW_ALL_CITIES,
-      stepIndex: 2,
+      stepIndex: 3,
     },
     {
       label: getProductFieldEditLabel("productPrice"),
@@ -56,14 +66,14 @@ export function CreateProductReviewSection({
           ? ` (−${discountPreviewPercent}%)`
           : ""
       }`,
-      stepIndex: 3,
+      stepIndex: 4,
     },
     {
       label: getProductFieldEditLabel("productStockQuantity"),
       value: form.productIsAvailable
         ? `${String(form.productStockQuantity ?? "").trim()} шт.`
         : CREATE_PRODUCT_MODAL_UI.WIZARD_REVIEW_HIDDEN,
-      stepIndex: 3,
+      stepIndex: 4,
     },
   ];
 

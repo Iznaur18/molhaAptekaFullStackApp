@@ -410,6 +410,26 @@ export const useProductEditorScreenStyles = createThemedStyles((theme) => ({
     lineHeight: 18,
     color: theme.colors.textSecondary,
   },
+  returnChoiceRow: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  returnChoiceChip: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  returnChoiceChipText: {
+    fontSize: 15,
+    fontWeight: "700",
+  },
+  returnTermBlock: {
+    gap: 12,
+    marginTop: 4,
+  },
   priceGrid: {
     flexDirection: "row",
     gap: 12,

@@ -21,10 +21,41 @@ describe("validateCreateProductWizardStep", () => {
     const validBasic = {
       ...CREATE_PRODUCT_INITIAL_FORM,
       productName: "Тестовый товар",
+      productListingOrigin: "own",
       productDescription: "Описание товара достаточной длины для проверки.",
     };
 
     expect(validateCreateProductWizardStep("basic", validBasic, validationContext)).toBeNull();
+  });
+
+  it("requires listing origin on basic step", () => {
+    const form = {
+      ...CREATE_PRODUCT_INITIAL_FORM,
+      productName: "Тестовый товар",
+      productDescription: "Описание товара достаточной длины для проверки.",
+    };
+
+    expect(validateCreateProductWizardStep("basic", form, validationContext)).toBe(
+      CREATE_PRODUCT_MODAL_UI.ERROR_LISTING_ORIGIN,
+    );
+  });
+
+  it("requires originality choice on originality step", () => {
+    expect(
+      validateCreateProductWizardStep(
+        "originality",
+        CREATE_PRODUCT_INITIAL_FORM,
+        validationContext,
+      ),
+    ).toBe(CREATE_PRODUCT_MODAL_UI.ERROR_ORIGINALITY);
+
+    expect(
+      validateCreateProductWizardStep(
+        "originality",
+        { ...CREATE_PRODUCT_INITIAL_FORM, productIsOriginal: true },
+        validationContext,
+      ),
+    ).toBeNull();
   });
 
   it("validates commerce step price and stock", () => {

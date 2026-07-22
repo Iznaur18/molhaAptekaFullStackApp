@@ -15,8 +15,14 @@ export const createProduct = async (body: CreateProductBody) => {
       productDescription: parsedBody.productDescription.trim(),
       productPrice: parsedBody.productPrice,
       productIsAvailable: parsedBody.productIsAvailable,
+      productListingOrigin: parsedBody.productListingOrigin,
+      productIsOriginal: parsedBody.productIsOriginal === true,
       productCategoryId: parsedBody.productCategoryId,
     };
+
+    if (parsedBody.productCategory) {
+      payload.productCategory = parsedBody.productCategory;
+    }
 
     if (parsedBody.productOldPrice != null) {
       payload.productOldPrice = parsedBody.productOldPrice;
@@ -57,6 +63,18 @@ export const createProduct = async (body: CreateProductBody) => {
       : [];
     if (characteristics.length > 0) {
       payload.productCharacteristics = characteristics;
+    }
+
+    payload.productReturnEnabled = parsedBody.productReturnEnabled === true;
+    if (payload.productReturnEnabled) {
+      const returnTerms = Array.isArray(parsedBody.productReturnTerms)
+        ? parsedBody.productReturnTerms.filter(
+            (row) => row.key.trim() && row.value.trim(),
+          )
+        : [];
+      payload.productReturnTerms = returnTerms;
+    } else {
+      payload.productReturnTerms = [];
     }
 
     const { data } = await apiClient.post("/product", payload);

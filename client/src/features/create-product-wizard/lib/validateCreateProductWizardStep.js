@@ -12,6 +12,8 @@ import { prepareCreateProductSubmit } from "../../../entities/product/lib/prepar
 import { validateProductCharacteristicsRows } from "../../../entities/product/lib/validateProductCharacteristicsRows.js";
 import { validateProductDescription } from "../../../entities/product/lib/validateProductDescription.js";
 import { validateProductName } from "../../../entities/product/lib/validateProductName.js";
+import { isProductListingOrigin } from "../../../entities/product/lib/productListingOrigin.js";
+import { isProductIsOriginalSelected } from "../../../entities/product/lib/productIsOriginal.js";
 import {
   PRODUCT_STOCK_QUANTITY_MAX,
   PRODUCT_STOCK_QUANTITY_MIN,
@@ -36,12 +38,23 @@ export function validateCreateProductWizardStep(stepId, form, context) {
         return nameError;
       }
 
+      if (!isProductListingOrigin(form.productListingOrigin)) {
+        return CREATE_PRODUCT_MODAL_UI.ERROR_LISTING_ORIGIN;
+      }
+
       const descriptionError = validateProductDescription(form.productDescription);
       if (descriptionError) {
         return descriptionError;
       }
 
       return validateProductCharacteristicsRows(form.productCharacteristicRows);
+    }
+
+    case "originality": {
+      if (!isProductIsOriginalSelected(form.productIsOriginal)) {
+        return CREATE_PRODUCT_MODAL_UI.ERROR_ORIGINALITY;
+      }
+      return null;
     }
 
     case "media": {

@@ -50,12 +50,11 @@ test("product detail section tabs use underline chrome instead of pill chips", (
   const tabActiveBlock = tabBarStylesBlock.match(/tabActive:\s*\{([^}]*)\}/)?.[1] ?? "";
 
   assert.match(tabBar, /useProductDetailTabBarStyles/);
-  assert.match(tabBlock, /borderBottomWidth:\s*PRODUCT_DETAIL_TAB_BAR_INDICATOR_WIDTH/);
   assert.match(tabBlock, /backgroundColor:\s*"transparent"/);
+  assert.match(tabBlock, /borderRadius:\s*8/);
   assert.doesNotMatch(tabBlock, /radius\.pill/);
   assert.doesNotMatch(tabBlock, /borderWidth:\s*1/);
-  assert.match(tabActiveBlock, /borderBottomColor:\s*theme\.colors\.action/);
-  assert.doesNotMatch(tabActiveBlock, /backgroundColor:\s*theme\.colors\.action/);
+  assert.match(tabActiveBlock, /backgroundColor:\s*theme\.colors\.action/);
   assert.match(webTabsCss, /\.product-details-modal__tabs \.modal-section-tabs__tab/);
   assert.match(webTabsCss, /border-bottom:\s*2\.5px solid transparent/);
   assert.match(webTabsCss, /border-radius:\s*0/);
@@ -120,14 +119,18 @@ test("mobile product description panel matches web content-switcher chrome", () 
     "src/entities/product/ui/product-details-modal/ProductDetailsContentSwitcher.css",
   );
   const panelBlock = styles.match(/contentSwitcherPanel:\s*\{([^}]*)\}/)?.[1] ?? "";
+  const tabActiveBlock = styles.match(/contentSwitcherTabActive:\s*\{([^}]*)\}/)?.[1] ?? "";
 
   assert.match(webCss, /product-details-content-switcher__panel/);
   assert.match(webCss, /border:\s*1px solid/);
+  assert.match(webCss, /background:\s*var\(--iz-color-ink\)/);
   assert.match(detailsTab, /contentSwitcherPanel/);
   assert.match(detailsTab, /descriptionText/);
   assert.match(panelBlock, /borderWidth:\s*1/);
   assert.match(panelBlock, /borderColor:\s*theme\.colors\.border/);
   assert.match(panelBlock, /backgroundColor:\s*theme\.colors\.surface/);
+  assert.match(tabActiveBlock, /backgroundColor:\s*theme\.colors\.ink/);
+  assert.match(tabActiveBlock, /borderColor:\s*theme\.colors\.ink/);
 });
 
 test("mobile product characteristics row matches web key-value layout", () => {
@@ -218,21 +221,21 @@ test("mobile product review summary matches web gradient chrome", () => {
   assert.doesNotMatch(reviewsTab, /styles\.summaryCard/);
 });
 
-test("product detail dock CTAs use SquircleView", () => {
+test("product detail dock CTA uses AddToCartButton only", () => {
   const purchaseActions = readFile(
     MOBILE_ROOT,
     "features/product-detail/ui/ProductDetailPurchaseActions.tsx",
   );
   const addToCart = readFile(MOBILE_ROOT, "features/cart-add/ui/AddToCartButton.tsx");
   const cartStyles = readFile(MOBILE_ROOT, "shared/theme/uploadFieldStyles.ts");
-  const catalogStyles = readFile(MOBILE_ROOT, "shared/theme/catalogProductStyles.ts");
 
-  assert.match(purchaseActions, /SquircleView/);
-  assert.match(purchaseActions, /PRODUCT_DETAIL_SHORTCUT_BORDER_RADIUS/);
+  assert.match(purchaseActions, /AddToCartButton/);
+  assert.doesNotMatch(purchaseActions, /AUCTION_SHORTCUT/);
+  assert.doesNotMatch(purchaseActions, /INSTALLMENT_UI\.SHORTCUT/);
+  assert.doesNotMatch(purchaseActions, /shortcutsRow/);
   assert.match(addToCart, /SquircleView/);
   assert.match(addToCart, /PRODUCT_DETAIL_DOCK_CTA_BORDER_RADIUS/);
   assert.match(cartStyles, /PRODUCT_DETAIL_DOCK_CTA_BORDER_RADIUS = 11\.2/);
-  assert.match(catalogStyles, /PRODUCT_DETAIL_SHORTCUT_BORDER_RADIUS = 8/);
 });
 
 test("mobile product detail screen is outside tabs and uses dock-only scroll padding", () => {

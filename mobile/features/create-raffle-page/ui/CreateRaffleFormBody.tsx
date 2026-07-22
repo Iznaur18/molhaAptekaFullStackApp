@@ -9,9 +9,6 @@ import {
   RAFFLE_PRIZE_MEDIA_TYPE_VIDEO,
 } from "@/entities/raffle/lib/raffleConstants";
 import { DEFAULT_RAFFLE_PRIZE_IMAGE_FOCUS } from "@/entities/raffle/lib/rafflePrizeImageFocus";
-import { resolveRafflePrizeVideoUrl } from "@/entities/raffle/lib/resolveRafflePrizeVideoUrl";
-import type { RaffleFromApi } from "@/entities/raffle/model/types";
-import { RafflePrizeMedia } from "@/entities/raffle/ui/RafflePrizeMedia";
 import type {
   CreateRaffleFormState,
   PrizeMediaType,
@@ -21,9 +18,7 @@ import { CreateRaffleFormSection } from "@/features/create-raffle-page/ui/Create
 import { ImageUrlUploadField } from "@/features/image-upload/ui/ImageUrlUploadField";
 import { VideoUrlUploadField } from "@/features/image-upload/ui/VideoUrlUploadField";
 import { CREATE_RAFFLE_MODAL_UI } from "@/shared/config";
-import { isDisplayableMediaUrl } from "@/shared/lib";
 import { keepDigitsOnly } from "@/shared/lib/rubPriceInput";
-import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useCreateRafflePageStyles } from "@/shared/theme/createRafflePageStyles";
 
@@ -85,27 +80,6 @@ export const CreateRaffleFormBody = ({
   const showBasic = step === "all" || step === "basic";
   const showPrize = step === "all" || step === "prize";
   const showConditions = step === "all" || step === "conditions";
-
-  const prizeFocusImageUrl = isDisplayableMediaUrl(resolveUploadedMediaUrl(form.prizeImageUrl))
-    ? resolveUploadedMediaUrl(form.prizeImageUrl)
-    : "";
-
-  const previewRaffle: RaffleFromApi = {
-    _id: "preview",
-    sellerId: "preview",
-    title: form.title,
-    prizeMediaType: form.prizeMediaType,
-    prizeImageUrl: resolveUploadedMediaUrl(form.prizeImageUrl.trim()),
-    prizeVideoUrl: resolveUploadedMediaUrl(form.prizeVideoUrl.trim()),
-    prizeImageFocus: form.prizeImageFocus,
-    targetSales: Number(form.targetSales) || 1,
-    salesProgress: 0,
-    status: "pending_staff",
-  };
-
-  const showPreview = isVideoMedia
-    ? Boolean(resolveRafflePrizeVideoUrl(previewRaffle))
-    : Boolean(prizeFocusImageUrl || form.prizeImageUrl.trim());
 
   return (
     <View style={styles.form}>
@@ -194,15 +168,6 @@ export const CreateRaffleFormBody = ({
               : CREATE_RAFFLE_MODAL_UI.HINT_PRIZE_IMAGE}
           </Text>
         </View>
-
-        {showPreview ? (
-          <View style={styles.preview}>
-            <Text style={styles.previewLabel}>{CREATE_RAFFLE_MODAL_UI.PREVIEW_LABEL}</Text>
-            <View style={styles.previewFrame}>
-              <RafflePrizeMedia raffle={previewRaffle} />
-            </View>
-          </View>
-        ) : null}
       </CreateRaffleFormSection>
       ) : null}
 

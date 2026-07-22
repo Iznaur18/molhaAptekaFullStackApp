@@ -47,6 +47,35 @@ export const PRODUCT_PRICE_RUB_MAX = 999_999_999;
 export const PRODUCT_STOCK_QUANTITY_MIN = 1;
 export const PRODUCT_STOCK_QUANTITY_MAX = 9999;
 export const PRODUCT_CHARACTERISTICS_MAX_ITEMS = 10;
+export const PRODUCT_RETURN_TERMS_MAX_ITEMS = 5;
+
+export const PRODUCT_LISTING_ORIGIN_OWN = "own";
+export const PRODUCT_LISTING_ORIGIN_RESALE = "resale";
+export const PRODUCT_LISTING_ORIGIN_MANUFACTURER = "manufacturer";
+
+/** @type {readonly ["own", "resale", "manufacturer"]} */
+export const PRODUCT_LISTING_ORIGIN_VALUES = [
+  PRODUCT_LISTING_ORIGIN_OWN,
+  PRODUCT_LISTING_ORIGIN_RESALE,
+  PRODUCT_LISTING_ORIGIN_MANUFACTURER,
+];
+
+export const PRODUCT_PRICE_MARKET_STATUS_ABOVE = "above_market";
+export const PRODUCT_PRICE_MARKET_STATUS_AT = "at_market";
+export const PRODUCT_PRICE_MARKET_STATUS_BELOW = "below_market";
+export const PRODUCT_PRICE_MARKET_STATUS_UNKNOWN = "unknown";
+
+/** @type {readonly ["above_market", "at_market", "below_market", "unknown"]} */
+export const PRODUCT_PRICE_MARKET_STATUS_VALUES = [
+  PRODUCT_PRICE_MARKET_STATUS_ABOVE,
+  PRODUCT_PRICE_MARKET_STATUS_AT,
+  PRODUCT_PRICE_MARKET_STATUS_BELOW,
+  PRODUCT_PRICE_MARKET_STATUS_UNKNOWN,
+];
+
+export const PRODUCT_PRICE_MARKET_STATUS_DEFAULT = PRODUCT_PRICE_MARKET_STATUS_UNKNOWN;
+
+const productListingOriginSchema = z.enum(PRODUCT_LISTING_ORIGIN_VALUES);
 
 const productNameFieldSchema = z
   .string()
@@ -69,6 +98,31 @@ const productCharacteristicSchema = z.object({
   key: z.string().trim().min(1).max(50),
   value: z.string().trim().min(1).max(200),
 });
+
+const productReturnTermSchema = z.object({
+  key: z.string().trim().min(1).max(50),
+  value: z.string().trim().min(1).max(200),
+});
+
+const assertReturnPolicy = (body, ctx) => {
+  if (body.productReturnEnabled !== true) {
+    return;
+  }
+  const terms = Array.isArray(body.productReturnTerms) ? body.productReturnTerms : [];
+  const valid = terms.filter(
+    (row) =>
+      row != null &&
+      String(row.key ?? "").trim().length > 0 &&
+      String(row.value ?? "").trim().length > 0,
+  );
+  if (valid.length === 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["productReturnTerms"],
+      message: "При возврате укажите условие (ключ и значение)",
+    });
+  }
+};
 
 const legacyCategorySchema = z
   .string()
@@ -156,11 +210,19 @@ export const createProductBodySchema = z
       .array(productCharacteristicSchema)
       .max(PRODUCT_CHARACTERISTICS_MAX_ITEMS)
       .optional(),
+    productListingOrigin: productListingOriginSchema,
+    productIsOriginal: z.coerce.boolean(),
+    productReturnEnabled: z.coerce.boolean().optional(),
+    productReturnTerms: z
+      .array(productReturnTermSchema)
+      .max(PRODUCT_RETURN_TERMS_MAX_ITEMS)
+      .optional(),
     productSaleCity: productSaleCityFieldSchema,
   })
   .superRefine(assertCategoryIdOrLegacy)
   .superRefine(assertCreateProductRequiresPhoto)
-  .superRefine((body, ctx) => assertOldPricePair(body, ctx, true));
+  .superRefine((body, ctx) => assertOldPricePair(body, ctx, true))
+  .superRefine(assertReturnPolicy);
 
 const patchFieldShape = {
   productName: productNameFieldSchema.optional(),
@@ -190,6 +252,13 @@ const patchFieldShape = {
     .array(productCharacteristicSchema)
     .max(PRODUCT_CHARACTERISTICS_MAX_ITEMS)
     .optional(),
+  productListingOrigin: productListingOriginSchema.optional(),
+  productIsOriginal: z.coerce.boolean().optional(),
+  productReturnEnabled: z.coerce.boolean().optional(),
+  productReturnTerms: z
+    .array(productReturnTermSchema)
+    .max(PRODUCT_RETURN_TERMS_MAX_ITEMS)
+    .optional(),
   productSaleCity: productSaleCityFieldSchema,
 };
 
@@ -211,7 +280,8 @@ export const patchMyProductBodySchema = z
   })
   .superRefine((body, ctx) =>
     assertOldPricePair(body, ctx, Object.hasOwn(body, "productPrice")),
-  );
+  )
+  .superRefine(assertReturnPolicy);
 
 export const productModerationFromApiSchema = productFromApiSchema.extend({
   productModerationStatus: z.enum(PRODUCT_MODERATION_STATUSES),

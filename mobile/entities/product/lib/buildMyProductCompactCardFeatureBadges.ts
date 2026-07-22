@@ -27,6 +27,14 @@ export const buildMyProductCompactCardFeatureBadges = ({
   const badges: ProductCompactCardFeatureBadge[] = [];
   const { auctionActive } = resolveAuctionUiState(product);
 
+  if (Boolean(product.activeRaffleId) && Boolean(product.raffleParticipationEnabledAt)) {
+    badges.push({
+      key: "raffle",
+      label: PRODUCT_CARD_UI.RAFFLE_BADGE,
+      variant: "raffle",
+    });
+  }
+
   if (auctionActive) {
     badges.push({
       key: "auction",
@@ -40,14 +48,6 @@ export const buildMyProductCompactCardFeatureBadges = ({
       key: "installment",
       label: PRODUCT_CARD_UI.INSTALLMENT_BADGE,
       variant: "installment",
-    });
-  }
-
-  if (Boolean(product.activeRaffleId) && Boolean(product.raffleParticipationEnabledAt)) {
-    badges.push({
-      key: "raffle",
-      label: PRODUCT_CARD_UI.RAFFLE_BADGE,
-      variant: "raffle",
     });
   }
 

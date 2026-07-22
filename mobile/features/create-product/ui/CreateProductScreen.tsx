@@ -16,6 +16,21 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { useCreateProductMutation } from "@/entities/product/model/useCreateProductMutation";
 import { validateProductName } from "@/entities/product/lib/validateProductName";
+import {
+  createProductReturnTermRow,
+  PRODUCT_RETURN_TERM_KEY_MAX,
+  PRODUCT_RETURN_TERM_VALUE_MAX,
+  PRODUCT_RETURN_TERMS_MAX_ITEMS,
+  serializeProductReturnTermRows,
+  validateProductReturnTermRows,
+  type ProductReturnTermRow,
+} from "@/entities/product/lib/productReturnTermRows";
+import {
+  isProductListingOrigin,
+  type ProductListingOrigin,
+} from "@/entities/product/lib/productListingOrigin";
+import { isProductIsOriginalSelected } from "@/entities/product/lib/productIsOriginal";
+import { ProductListingOriginChips } from "@/entities/product/ui/ProductListingOriginChips";
 import { ProductPhotoGrid } from "@/features/image-upload/ui/ProductPhotoGrid";
 import { ProductPreviewVideoUploadField } from "@/features/image-upload/ui/ProductPreviewVideoUploadField";
 import { CreateProductCategoryPicker } from "@/features/create-product/ui/CreateProductCategoryPicker";
@@ -41,7 +56,7 @@ const PRODUCT_PRICE_RUB_MAX = 999_999_999;
 const LOYALTY_POINTS_MAX_LENGTH = 8;
 const CHARACTERISTICS_MAX = 10;
 
-const WIZARD_STEPS = ["basic", "media", "category", "commerce", "review"] as const;
+const WIZARD_STEPS = ["basic", "originality", "media", "category", "commerce", "returns", "review"] as const;
 type WizardStepId = (typeof WIZARD_STEPS)[number];
 
 const STEP_COPY: Record<WizardStepId, { title: string; subtitle: string; label: string }> = {
@@ -49,6 +64,11 @@ const STEP_COPY: Record<WizardStepId, { title: string; subtitle: string; label: 
     title: "О товаре",
     subtitle: "Название и описание — первое, что видит покупатель",
     label: "О товаре",
+  },
+  originality: {
+    title: "Оригинал",
+    subtitle: "Подтвердите, что продаёте официальный товар",
+    label: "Оригинал",
   },
   media: {
     title: "Фото и видео",
@@ -65,6 +85,11 @@ const STEP_COPY: Record<WizardStepId, { title: string; subtitle: string; label: 
     subtitle: "Укажите стоимость и сколько единиц готовы продать",
     label: "Цена",
   },
+  returns: {
+    title: "Возврат",
+    subtitle: "Скажите покупателю, можно ли вернуть товар",
+    label: "Возврат",
+  },
   review: {
     title: "Проверка",
     subtitle: "Всё верно? Отправим товар на модерацию",
@@ -78,6 +103,8 @@ type CharacteristicRow = { id: number; key: string; value: string };
 
 type WizardForm = {
   productName: string;
+  productListingOrigin: ProductListingOrigin | null;
+  productIsOriginal: boolean | null;
   productDescription: string;
   characteristicRows: CharacteristicRow[];
   imageUrls: string[];
@@ -91,6 +118,8 @@ type WizardForm = {
   productIsAvailable: boolean;
   productStockQuantity: string;
   loyaltyPointsPerUnit: string;
+  productReturnEnabled: boolean | null;
+  returnTermRows: ProductReturnTermRow[];
 };
 
 // Default legacy category mirrors web's PRODUCT_CATEGORY_ELECTRONICS default
@@ -98,6 +127,8 @@ const DEFAULT_PRODUCT_CATEGORY = "electronics";
 
 const INITIAL_FORM: WizardForm = {
   productName: "",
+  productListingOrigin: null,
+  productIsOriginal: null,
   productDescription: "",
   characteristicRows: [],
   imageUrls: [],
@@ -111,6 +142,8 @@ const INITIAL_FORM: WizardForm = {
   productIsAvailable: true,
   productStockQuantity: "1",
   loyaltyPointsPerUnit: "",
+  productReturnEnabled: null,
+  returnTermRows: [],
 };
 
 // ─── Validation ──────────────────────────────────────────────────────────────
@@ -120,12 +153,21 @@ function validateStep(stepId: WizardStepId, form: WizardForm): string | null {
     case "basic": {
       const nameError = validateProductName(form.productName);
       if (nameError) return nameError;
+      if (!isProductListingOrigin(form.productListingOrigin)) {
+        return CREATE_PRODUCT_UI.ERROR_LISTING_ORIGIN;
+      }
       const descLen = form.productDescription.trim().length;
       if (descLen < PRODUCT_DESCRIPTION_MIN_CHARS) {
         return `Описание — минимум ${PRODUCT_DESCRIPTION_MIN_CHARS} символов`;
       }
       if (descLen > PRODUCT_DESCRIPTION_MAX_CHARS) {
         return `Описание — не более ${PRODUCT_DESCRIPTION_MAX_CHARS} символов`;
+      }
+      return null;
+    }
+    case "originality": {
+      if (!isProductIsOriginalSelected(form.productIsOriginal)) {
+        return CREATE_PRODUCT_UI.ERROR_ORIGINALITY;
       }
       return null;
     }
@@ -176,12 +218,23 @@ function validateStep(stepId: WizardStepId, form: WizardForm): string | null {
       }
       return null;
     }
+    case "returns": {
+      if (form.productReturnEnabled == null) {
+        return "Выберите: есть ли возврат";
+      }
+      if (form.productReturnEnabled) {
+        return validateProductReturnTermRows(form.returnTermRows);
+      }
+      return null;
+    }
     case "review": {
       return (
         validateStep("basic", form) ??
+        validateStep("originality", form) ??
         validateStep("media", form) ??
         validateStep("category", form) ??
-        validateStep("commerce", form)
+        validateStep("commerce", form) ??
+        validateStep("returns", form)
       );
     }
     default:
@@ -263,6 +316,8 @@ export const CreateProductScreen = () => {
 
       await createMutation.mutateAsync({
         productName: form.productName.trim(),
+        productListingOrigin: form.productListingOrigin!,
+        productIsOriginal: form.productIsOriginal!,
         productDescription: form.productDescription.trim(),
         productPrice: price,
         productOldPrice: oldPrice ?? undefined,
@@ -279,6 +334,11 @@ export const CreateProductScreen = () => {
         productCharacteristics: form.characteristicRows
           .filter((r) => r.key.trim() && r.value.trim())
           .map((r) => ({ key: r.key.trim(), value: r.value.trim() })),
+        productReturnEnabled: form.productReturnEnabled === true,
+        productReturnTerms:
+          form.productReturnEnabled === true
+            ? serializeProductReturnTermRows(form.returnTermRows)
+            : [],
       });
 
       router.replace("/hub/my-products");
@@ -326,6 +386,9 @@ export const CreateProductScreen = () => {
         {stepId === "basic" && (
           <BasicStep form={form} setForm={setForm} disabled={isSubmitting} theme={theme} styles={styles} />
         )}
+        {stepId === "originality" && (
+          <OriginalityStep form={form} setForm={setForm} disabled={isSubmitting} theme={theme} styles={styles} />
+        )}
         {stepId === "media" && (
           <MediaStep form={form} setForm={setForm} disabled={isSubmitting} theme={theme} styles={styles} />
         )}
@@ -334,6 +397,9 @@ export const CreateProductScreen = () => {
         )}
         {stepId === "commerce" && (
           <CommerceStep form={form} setForm={setForm} disabled={isSubmitting} theme={theme} styles={styles} />
+        )}
+        {stepId === "returns" && (
+          <ReturnsStep form={form} setForm={setForm} disabled={isSubmitting} theme={theme} styles={styles} />
         )}
         {stepId === "review" && (
           <ReviewStep form={form} onEditStep={goToStep} theme={theme} styles={styles} />
@@ -608,6 +674,14 @@ function BasicStep({ form, setForm, disabled, theme, styles }: StepProps) {
         />
       </View>
 
+      <ProductListingOriginChips
+        value={form.productListingOrigin}
+        onChange={(productListingOrigin) =>
+          setForm((prev) => ({ ...prev, productListingOrigin }))
+        }
+        disabled={disabled}
+      />
+
       {/* Description field */}
       <View style={styles.fieldLabel}>
         <Text style={[styles.label, { color: theme.colors.text }]}>
@@ -692,6 +766,64 @@ function BasicStep({ form, setForm, disabled, theme, styles }: StepProps) {
             </Text>
           </Pressable>
         ) : null}
+      </View>
+    </View>
+  );
+}
+
+// ─── OriginalityStep ──────────────────────────────────────────────────────────
+
+function OriginalityStep({ form, setForm, disabled, theme, styles }: StepProps) {
+  const yesSelected = form.productIsOriginal === true;
+  const noSelected = form.productIsOriginal === false;
+
+  return (
+    <View style={styles.section}>
+      <Text style={[styles.lead, { color: theme.colors.textSecondary }]}>
+        {CREATE_PRODUCT_UI.ORIGINALITY_STATEMENT}
+      </Text>
+
+      <View style={styles.returnChoiceRow}>
+        <Pressable
+          disabled={disabled}
+          onPress={() => setForm((prev) => ({ ...prev, productIsOriginal: true }))}
+          style={[
+            styles.returnChoiceChip,
+            {
+              borderColor: yesSelected ? theme.colors.action : theme.colors.border,
+              backgroundColor: yesSelected ? theme.colors.action : theme.colors.surface,
+            },
+          ]}
+        >
+          <Text
+            style={[
+              styles.returnChoiceChipText,
+              { color: yesSelected ? theme.colors.onContrast : theme.colors.text },
+            ]}
+          >
+            {CREATE_PRODUCT_UI.ORIGINALITY_YES}
+          </Text>
+        </Pressable>
+        <Pressable
+          disabled={disabled}
+          onPress={() => setForm((prev) => ({ ...prev, productIsOriginal: false }))}
+          style={[
+            styles.returnChoiceChip,
+            {
+              borderColor: noSelected ? theme.colors.action : theme.colors.border,
+              backgroundColor: noSelected ? theme.colors.action : theme.colors.surface,
+            },
+          ]}
+        >
+          <Text
+            style={[
+              styles.returnChoiceChipText,
+              { color: noSelected ? theme.colors.onContrast : theme.colors.text },
+            ]}
+          >
+            {CREATE_PRODUCT_UI.ORIGINALITY_NO}
+          </Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -891,6 +1023,187 @@ function CommerceStep({ form, setForm, disabled, theme, styles }: StepProps) {
   );
 }
 
+// ─── ReturnsStep ──────────────────────────────────────────────────────────────
+
+function ReturnsStep({ form, setForm, disabled, theme, styles }: StepProps) {
+  const yesSelected = form.productReturnEnabled === true;
+  const noSelected = form.productReturnEnabled === false;
+
+  const addReturnRow = () => {
+    if (form.returnTermRows.length >= PRODUCT_RETURN_TERMS_MAX_ITEMS) {
+      return;
+    }
+    setForm((prev) => ({
+      ...prev,
+      returnTermRows: [...prev.returnTermRows, createProductReturnTermRow()],
+    }));
+  };
+
+  const removeReturnRow = (id: number) => {
+    setForm((prev) => ({
+      ...prev,
+      returnTermRows: prev.returnTermRows.filter((row) => row.id !== id),
+    }));
+  };
+
+  const updateReturnRow = (id: number, field: "key" | "value", text: string) => {
+    setForm((prev) => ({
+      ...prev,
+      returnTermRows: prev.returnTermRows.map((row) =>
+        row.id === id ? { ...row, [field]: text } : row,
+      ),
+    }));
+  };
+
+  return (
+    <View style={styles.section}>
+      <Text style={[styles.lead, { color: theme.colors.textSecondary }]}>
+        Есть ли возврат?
+      </Text>
+
+      <View style={styles.returnChoiceRow}>
+        <Pressable
+          disabled={disabled}
+          onPress={() =>
+            setForm((prev) => ({
+              ...prev,
+              productReturnEnabled: true,
+              returnTermRows:
+                prev.returnTermRows.length > 0
+                  ? prev.returnTermRows
+                  : [createProductReturnTermRow()],
+            }))
+          }
+          style={[
+            styles.returnChoiceChip,
+            {
+              borderColor: yesSelected ? theme.colors.action : theme.colors.border,
+              backgroundColor: yesSelected ? theme.colors.action : theme.colors.surface,
+            },
+          ]}
+        >
+          <Text
+            style={[
+              styles.returnChoiceChipText,
+              { color: yesSelected ? theme.colors.onContrast : theme.colors.text },
+            ]}
+          >
+            Да
+          </Text>
+        </Pressable>
+        <Pressable
+          disabled={disabled}
+          onPress={() =>
+            setForm((prev) => ({
+              ...prev,
+              productReturnEnabled: false,
+              returnTermRows: [],
+            }))
+          }
+          style={[
+            styles.returnChoiceChip,
+            {
+              borderColor: noSelected ? theme.colors.action : theme.colors.border,
+              backgroundColor: noSelected ? theme.colors.action : theme.colors.surface,
+            },
+          ]}
+        >
+          <Text
+            style={[
+              styles.returnChoiceChipText,
+              { color: noSelected ? theme.colors.onContrast : theme.colors.text },
+            ]}
+          >
+            Нет
+          </Text>
+        </Pressable>
+      </View>
+
+      {yesSelected ? (
+        <View style={styles.returnTermBlock}>
+          <Text style={[styles.hint, { color: theme.colors.textMuted }]}>
+            Пример: возврат в течение — 15 дней
+          </Text>
+          {form.returnTermRows.map((row) => (
+            <View
+              key={row.id}
+              style={[
+                styles.charRow,
+                {
+                  borderColor: `${theme.colors.border}cc`,
+                  backgroundColor: theme.colors.surfaceElevated,
+                },
+              ]}
+            >
+              <TextInput
+                {...textInputFocusScrollProps}
+                style={[
+                  styles.charInput,
+                  {
+                    color: theme.colors.text,
+                    backgroundColor: theme.colors.surface,
+                    borderColor: theme.colors.border,
+                  },
+                ]}
+                value={row.key}
+                onChangeText={(text) => updateReturnRow(row.id, "key", text)}
+                editable={!disabled}
+                placeholder="Свойство"
+                placeholderTextColor={theme.colors.textMuted}
+                maxLength={PRODUCT_RETURN_TERM_KEY_MAX}
+              />
+              <TextInput
+                {...textInputFocusScrollProps}
+                style={[
+                  styles.charInput,
+                  styles.charInputValue,
+                  {
+                    color: theme.colors.text,
+                    backgroundColor: theme.colors.surface,
+                    borderColor: theme.colors.border,
+                  },
+                ]}
+                value={row.value}
+                onChangeText={(text) => updateReturnRow(row.id, "value", text)}
+                editable={!disabled}
+                placeholder="Значение"
+                placeholderTextColor={theme.colors.textMuted}
+                maxLength={PRODUCT_RETURN_TERM_VALUE_MAX}
+              />
+              <Pressable
+                style={[styles.charRemoveBtn, { borderColor: theme.colors.border }]}
+                onPress={() => removeReturnRow(row.id)}
+                disabled={disabled}
+              >
+                <Text style={[styles.charRemoveText, { color: theme.colors.danger }]}>✕</Text>
+              </Pressable>
+            </View>
+          ))}
+          {form.returnTermRows.length < PRODUCT_RETURN_TERMS_MAX_ITEMS ? (
+            <Pressable
+              style={({ pressed }) => [
+                styles.charAddButton,
+                {
+                  borderColor: pressed ? theme.colors.action : theme.colors.actionBorder,
+                  backgroundColor: pressed
+                    ? theme.colors.actionSoft
+                    : theme.colors.actionSurface,
+                },
+              ]}
+              onPress={addReturnRow}
+              disabled={disabled}
+            >
+              <Text style={[styles.charAddButtonText, { color: theme.colors.action }]}>
+                + Добавить условие
+              </Text>
+            </Pressable>
+          ) : null}
+        </View>
+      ) : null}
+    </View>
+  );
+}
+
 // ─── ReviewStep ───────────────────────────────────────────────────────────────
 
 function ReviewStep({
@@ -911,26 +1224,49 @@ function ReviewStep({
     { label: "Название", value: form.productName.trim() || "—", stepIndex: 0 },
     { label: "Описание", value: form.productDescription.trim() || "—", stepIndex: 0, multiline: true },
     {
+      label: CREATE_PRODUCT_UI.LABEL_ORIGINALITY,
+      value:
+        form.productIsOriginal === true
+          ? CREATE_PRODUCT_UI.ORIGINALITY_YES
+          : form.productIsOriginal === false
+            ? CREATE_PRODUCT_UI.ORIGINALITY_NO
+            : "—",
+      stepIndex: 1,
+    },
+    {
       label: "Фото и видео",
       value:
         imageCount > 0
           ? `${imageCount} фото${form.productPreviewVideoUrl.trim() ? " + видео" : ""}`
           : form.productPreviewVideoUrl.trim() ? "Только видео" : "Нет фото",
-      stepIndex: 1,
+      stepIndex: 2,
     },
-    { label: "Категория", value: form.productCategoryLabel || "—", stepIndex: 2 },
-    { label: "Город продажи", value: form.productSaleCity.trim() || "Все города", stepIndex: 2 },
+    { label: "Категория", value: form.productCategoryLabel || "—", stepIndex: 3 },
+    { label: "Город продажи", value: form.productSaleCity.trim() || "Все города", stepIndex: 3 },
     {
       label: "Цена, ₽",
       value: `${form.productPrice.trim() || "0"} ₽${discountPercent != null ? ` (−${discountPercent}%)` : ""}`,
-      stepIndex: 3,
+      stepIndex: 4,
     },
     {
       label: "Количество",
       value: form.productIsAvailable
         ? `${form.productStockQuantity.trim()} шт.`
         : "Скрыт из каталога",
-      stepIndex: 3,
+      stepIndex: 4,
+    },
+    {
+      label: "Возврат",
+      value:
+        form.productReturnEnabled === true
+          ? serializeProductReturnTermRows(form.returnTermRows)
+              .map((term) => `${term.key}: ${term.value}`)
+              .join("; ") || "—"
+          : form.productReturnEnabled === false
+            ? "Нет"
+            : "—",
+      stepIndex: 5,
+      multiline: true,
     },
   ];
 
@@ -1159,6 +1495,27 @@ const useStyles = createThemedStyles((theme) => ({
   checkLabel: {
     fontSize: 15, // 0.92rem
     fontWeight: "500",
+  },
+
+  returnChoiceRow: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  returnChoiceChip: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  returnChoiceChipText: {
+    fontSize: 15,
+    fontWeight: "700",
+  },
+  returnTermBlock: {
+    gap: 12,
+    marginTop: 4,
   },
 
   // ── Review rows — mirrors .create-product-review ──

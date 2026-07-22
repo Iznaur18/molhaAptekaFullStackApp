@@ -5,6 +5,7 @@ import {
   hasProductCatalogDiscount,
   resolveProductDiscountPercent,
 } from "../lib/computeProductDiscountPercent.js";
+import { ProductLoyaltyPointsBadge } from "./ProductLoyaltyPointsBadge.jsx";
 
 import "./ProductPriceDisplay.css";
 
@@ -18,6 +19,10 @@ import "./ProductPriceDisplay.css";
  *   showLabel?: boolean;
  *   className?: string;
  *   variant?: "card" | "inline";
+ *   showDiscountBadge?: boolean;
+ *   showLoyaltyBadge?: boolean;
+ *   isAuthorized?: boolean;
+ *   afterPriceSlot?: import("react").ReactNode;
  * }} props
  */
 export function ProductPriceDisplay({
@@ -25,6 +30,10 @@ export function ProductPriceDisplay({
   showLabel = true,
   className = "",
   variant = "card",
+  showDiscountBadge = false,
+  showLoyaltyBadge = false,
+  isAuthorized = false,
+  afterPriceSlot = null,
 }) {
   const discountPercent = resolveProductDiscountPercent(product);
   const hasDiscount = hasProductCatalogDiscount(product);
@@ -54,6 +63,21 @@ export function ProductPriceDisplay({
       {hasDiscount ? (
         <span className="product-price-display__old">{oldPriceText}</span>
       ) : null}
+      {showDiscountBadge ? (
+        <ProductDiscountBadge
+          discountPercent={discountPercent}
+          className="product-price-display__discount"
+        />
+      ) : null}
+      {showLoyaltyBadge ? (
+        <ProductLoyaltyPointsBadge
+          product={product}
+          isAuthorized={isAuthorized}
+          variant="detail"
+          className="product-price-display__loyalty"
+        />
+      ) : null}
+      {afterPriceSlot}
     </p>
   );
 }
@@ -62,7 +86,7 @@ export function ProductPriceDisplay({
  * @param {{
  *   discountPercent: number | null | undefined;
  *   className?: string;
- *   variant?: "inline" | "overlay" | "banner";
+ *   variant?: "inline" | "overlay" | "banner" | "detail";
  * }} props
  */
 export function ProductDiscountBadge({
@@ -76,7 +100,9 @@ export function ProductDiscountBadge({
 
   const percent = Math.floor(discountPercent);
   const badgeText =
-    variant === "banner" ? `-${percent}%` : PRODUCT_CARD_UI.DISCOUNT_BADGE(percent);
+    variant === "banner"
+      ? `-${percent}%`
+      : PRODUCT_CARD_UI.DISCOUNT_BADGE(percent);
   const ariaLabel = PRODUCT_CARD_UI.DISCOUNT_BADGE(percent);
 
   const rootClassName = [

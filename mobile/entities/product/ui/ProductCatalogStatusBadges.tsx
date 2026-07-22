@@ -3,8 +3,9 @@ import { ScrollView, View } from "react-native";
 import { useProductCardChromeFlags } from "@/entities/product/lib/useProductCardChromeFlags";
 import { getProductCardMineStatusBadge } from "@/entities/product/lib/getProductCardMineStatusBadge";
 import {
-  productStatusBadgeScrollStyles,
+  getProductStatusBadgeScrollStyles,
   useProductStatusBadgeVariantStyles,
+  type ProductStatusBadgeSize,
   type ProductStatusBadgeVariant,
 } from "@/entities/product/lib/productStatusBadgeStyles";
 import { PRODUCT_CARD_UI } from "@/shared/config";
@@ -17,6 +18,11 @@ type ProductCatalogStatusBadgesProps = {
   showNoStatusPlaceholder?: boolean;
   isMineMode?: boolean;
   isLoyaltyPointsOvercommitted?: boolean;
+  size?: ProductStatusBadgeSize;
+  /** false — без собственного ScrollView (для общей горизонтальной ленты). */
+  scrollable?: boolean;
+  showAuctionBadge?: boolean;
+  showInstallmentBadge?: boolean;
 };
 
 type StatusBadgeItem = {
@@ -31,9 +37,14 @@ export const ProductCatalogStatusBadges = ({
   showNoStatusPlaceholder = true,
   isMineMode = false,
   isLoyaltyPointsOvercommitted = false,
+  size = "compact",
+  scrollable = true,
+  showAuctionBadge = true,
+  showInstallmentBadge = true,
 }: ProductCatalogStatusBadgesProps) => {
   const flags = useProductCardChromeFlags(product, { isMineMode });
-  const productStatusBadgeVariantStyles = useProductStatusBadgeVariantStyles();
+  const productStatusBadgeVariantStyles = useProductStatusBadgeVariantStyles(size);
+  const scrollStyles = getProductStatusBadgeScrollStyles(size);
 
   const badges: StatusBadgeItem[] = [];
   const mineBadge = isMineMode
@@ -55,25 +66,44 @@ export const ProductCatalogStatusBadges = ({
         variant: "hidden",
       });
     }
-    if (flags.showAuctionBadge) {
+    if (flags.showRaffleBadge) {
+      badges.push({
+        key: "raffle",
+        label: PRODUCT_CARD_UI.RAFFLE_BADGE,
+        variant: "raffle",
+      });
+    }
+    if (showAuctionBadge && flags.showAuctionBadge) {
       badges.push({
         key: "auction",
         label: PRODUCT_CARD_UI.AUCTION_BADGE,
         variant: "auction",
       });
     }
-    if (flags.showInstallmentBadge) {
+    if (showInstallmentBadge && flags.showInstallmentBadge) {
       badges.push({
         key: "installment",
         label: PRODUCT_CARD_UI.INSTALLMENT_BADGE,
         variant: "installment",
       });
     }
-    if (flags.showRaffleBadge) {
+    if (flags.showPromotionBoostBadge) {
       badges.push({
-        key: "raffle",
-        label: PRODUCT_CARD_UI.RAFFLE_BADGE,
-        variant: "raffle",
+        key: "promotion-boost",
+        label: PRODUCT_CARD_UI.PROMOTED_BADGE,
+        variant: "promotionBoost",
+      });
+    } else if (flags.showPromotionTopBadge) {
+      badges.push({
+        key: "promotion-top",
+        label: PRODUCT_CARD_UI.PROMOTION_TOP_BADGE,
+        variant: "promotionTop",
+      });
+    } else if (flags.showPromotionBannerBadge) {
+      badges.push({
+        key: "promotion-banner",
+        label: PRODUCT_CARD_UI.PROMOTION_BANNER_BADGE,
+        variant: "promotionBanner",
       });
     }
   }
@@ -95,31 +125,41 @@ export const ProductCatalogStatusBadges = ({
     return null;
   }
 
+  const badgeNodes = visibleBadges.map((badge) => {
+    const variantStyle = productStatusBadgeVariantStyles[badge.variant];
+    return (
+      <View
+        key={badge.key}
+        style={variantStyle.badge}
+        accessibilityRole="text"
+        accessibilityLabel={
+          badge.variant === "placeholder" ? PRODUCT_CARD_UI.NO_STATUS_BADGE : badge.label
+        }
+      >
+        <AppText style={variantStyle.text}>{badge.label}</AppText>
+      </View>
+    );
+  });
+
+  if (!scrollable) {
+    return (
+      <View style={scrollStyles.content} accessibilityLabel={PRODUCT_CARD_UI.STATUS_BADGES_ARIA}>
+        {badgeNodes}
+      </View>
+    );
+  }
+
   return (
     <ScrollView
       horizontal
-      style={productStatusBadgeScrollStyles.root}
-      contentContainerStyle={productStatusBadgeScrollStyles.content}
+      style={scrollStyles.root}
+      contentContainerStyle={scrollStyles.content}
       showsHorizontalScrollIndicator={false}
       {...nestedHorizontalScrollProps}
       keyboardShouldPersistTaps="handled"
       accessibilityLabel={PRODUCT_CARD_UI.STATUS_BADGES_ARIA}
     >
-      {visibleBadges.map((badge) => {
-        const variantStyle = productStatusBadgeVariantStyles[badge.variant];
-        return (
-          <View
-            key={badge.key}
-            style={variantStyle.badge}
-            accessibilityRole="text"
-            accessibilityLabel={
-              badge.variant === "placeholder" ? PRODUCT_CARD_UI.NO_STATUS_BADGE : badge.label
-            }
-          >
-            <AppText style={variantStyle.text}>{badge.label}</AppText>
-          </View>
-        );
-      })}
+      {badgeNodes}
     </ScrollView>
   );
 };

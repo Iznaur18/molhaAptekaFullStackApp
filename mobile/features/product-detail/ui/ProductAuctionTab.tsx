@@ -145,9 +145,7 @@ export const ProductAuctionTab = ({
       : PRODUCT_PRICE_OFFER_UI.SUBMIT;
 
   const showDockPrimaryAction =
-    dockSubmit &&
-    !isOwnProduct &&
-    (showForm || !isAuthorized);
+    dockSubmit && !isOwnProduct && (showForm || !isAuthorized);
 
   const dockLabel = !isAuthorized ? PRODUCT_PRICE_OFFER_UI.SUBMIT : offerSubmitLabel;
   const dockDisabled = isAuthorized ? isBusy : false;
@@ -207,11 +205,8 @@ export const ProductAuctionTab = ({
   }
 
   const offers = offersQuery.data ?? [];
-
   const hasLinkedOrder =
     myOffer?.orderId != null && String(myOffer.orderId).trim() !== "";
-
-  /** Ставка принята и ждёт оплаты — товар лежит в корзине. */
   const showGoToCartButton =
     myOffer?.status === PRICE_OFFER_STATUS_ACCEPTED && !hasLinkedOrder;
 
@@ -236,79 +231,75 @@ export const ProductAuctionTab = ({
           : undefined;
 
   return (
-    <View style={styles.card} accessibilityLabel={PRODUCT_PRICE_OFFER_UI.TAB_AUCTION}>
+    <View style={styles.root} accessibilityLabel={PRODUCT_PRICE_OFFER_UI.TAB_AUCTION}>
       <Text style={styles.pageTitle}>{PRODUCT_PRICE_OFFER_UI.TAB_AUCTION}</Text>
 
-      {!isOwnProduct ? (
+      {showForm ? (
         <>
-          {showForm ? (
-            <View style={styles.form}>
-              <Text style={styles.formHeading}>{PRODUCT_PRICE_OFFER_UI.SECTION_FORM_TITLE}</Text>
-              <TextInput
-                style={styles.input}
-                value={priceInput}
-                onChangeText={(value) => setPriceInput(formatRubPriceInput(value))}
-                keyboardType="number-pad"
-                editable={!isBusy}
-                placeholder={PRODUCT_PRICE_OFFER_UI.INPUT_PLACEHOLDER}
-                placeholderTextColor={theme.colors.textMuted}
-                accessibilityLabel={PRODUCT_PRICE_OFFER_UI.LABEL_PRICE}
-                {...textInputFocusScrollProps}
-              />
-              <View style={styles.actions}>
-                {!showDockPrimaryAction ? (
-                  <AppButton
-                    label={offerSubmitLabel}
-                    variant="contrast"
-                    onPress={() => void handleSubmitOffer()}
-                    disabled={isBusy}
-                    style={styles.inlinePrimaryButton}
-                  />
-                ) : null}
-                {myOffer?.status === PRICE_OFFER_STATUS_PENDING ? (
-                  <AppButton
-                    label={PRODUCT_PRICE_OFFER_UI.CANCEL}
-                    variant="cancel"
-                    onPress={() => void handleCancel()}
-                    disabled={isBusy}
-                    style={styles.inlinePrimaryButton}
-                  />
-                ) : null}
-              </View>
+          <Text style={styles.sectionLabel}>{PRODUCT_PRICE_OFFER_UI.SECTION_FORM_TITLE}</Text>
+          <TextInput
+            style={styles.input}
+            value={priceInput}
+            onChangeText={(value) => setPriceInput(formatRubPriceInput(value))}
+            keyboardType="number-pad"
+            editable={!isBusy}
+            placeholder={PRODUCT_PRICE_OFFER_UI.INPUT_PLACEHOLDER}
+            placeholderTextColor={theme.colors.textMuted}
+            accessibilityLabel={PRODUCT_PRICE_OFFER_UI.LABEL_PRICE}
+            {...textInputFocusScrollProps}
+          />
+          {myOffer?.status === PRICE_OFFER_STATUS_PENDING || !showDockPrimaryAction ? (
+            <View style={styles.actions}>
+              {!showDockPrimaryAction ? (
+                <AppButton
+                  label={offerSubmitLabel}
+                  variant="contrast"
+                  onPress={() => void handleSubmitOffer()}
+                  disabled={isBusy}
+                  style={styles.inlinePrimaryButton}
+                />
+              ) : null}
+              {myOffer?.status === PRICE_OFFER_STATUS_PENDING ? (
+                <AppButton
+                  label={PRODUCT_PRICE_OFFER_UI.CANCEL}
+                  variant="cancel"
+                  onPress={() => void handleCancel()}
+                  disabled={isBusy}
+                  style={styles.inlinePrimaryButton}
+                />
+              ) : null}
             </View>
           ) : null}
-
-          {!isAuthorized && !showDockPrimaryAction ? (
-            <AppButton
-              label={PRODUCT_PRICE_OFFER_UI.SUBMIT}
-              variant="contrast"
-              onPress={() => router.push("/(auth)/login")}
-              style={styles.inlinePrimaryButton}
-            />
-          ) : null}
-
-          {isAuthorized && !isUserDataConfirmed ? (
-            <Text style={styles.hint}>{PRODUCT_PRICE_OFFER_UI.CONFIRMED_DATA_REQUIRED}</Text>
-          ) : null}
-
-          {statusText ? (
-            <Text style={[styles.status, statusStyle]}>{statusText}</Text>
-          ) : null}
-
-          {showGoToCartButton ? (
-            <AppButton
-              label={PRODUCT_PRICE_OFFER_UI.GO_TO_CART}
-              variant="contrast"
-              onPress={() => router.push("/(tabs)/cart")}
-              style={styles.inlinePrimaryButton}
-            />
-          ) : null}
-
-          {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
         </>
       ) : null}
 
-      <Text style={styles.heading}>{PRODUCT_PRICE_OFFER_UI.SECTION_TOP_TITLE}</Text>
+      {!isOwnProduct && !isAuthorized && !showDockPrimaryAction ? (
+        <AppButton
+          label={PRODUCT_PRICE_OFFER_UI.SUBMIT}
+          variant="contrast"
+          onPress={() => router.push("/(auth)/login")}
+          style={styles.inlinePrimaryButton}
+        />
+      ) : null}
+
+      {!isOwnProduct && isAuthorized && !isUserDataConfirmed ? (
+        <Text style={styles.hint}>{PRODUCT_PRICE_OFFER_UI.CONFIRMED_DATA_REQUIRED}</Text>
+      ) : null}
+
+      {statusText ? <Text style={[styles.status, statusStyle]}>{statusText}</Text> : null}
+
+      {showGoToCartButton ? (
+        <AppButton
+          label={PRODUCT_PRICE_OFFER_UI.GO_TO_CART}
+          variant="contrast"
+          onPress={() => router.push("/(tabs)/cart")}
+          style={styles.inlinePrimaryButton}
+        />
+      ) : null}
+
+      {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
+
+      <Text style={styles.sectionLabel}>{PRODUCT_PRICE_OFFER_UI.SECTION_TOP_TITLE}</Text>
       <ProductPriceOfferTopList
         top={offers}
         highlightedOfferId={myOffer?._id ?? null}

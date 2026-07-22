@@ -32,9 +32,10 @@ export const resolveProductCardBadgeColors = (c: ThemeColors) =>
     installmentBorder: `${c.success}66`,
     installmentBg: c.successSurface,
     installmentText: c.successText,
-    raffleBorder: `${c.accent}66`,
-    raffleBg: c.accentSoft,
-    raffleText: c.accent,
+    /** Розыгрыш — розовая палитра (не warning/жёлтый). */
+    raffleBorder: "#f9a8d466",
+    raffleBg: "#fdf2f8",
+    raffleText: "#be185d",
     statusPlaceholderBorder: c.border,
     statusPlaceholderBg: c.surfaceMuted,
     statusPlaceholderText: `${c.text}7a`,
@@ -88,11 +89,21 @@ export const PRODUCT_CARD_STATUS_BADGE_OVERLAY_LAYOUT = {
   rowGap: 2,
 } as const;
 
+/** Бейджи в блоке цены на экране товара — крупнее overlay на карточке. */
+export const PRODUCT_CARD_DETAIL_BADGE_LAYOUT = {
+  borderRadius: 6,
+  paddingVertical: 3.5,
+  paddingHorizontal: 9,
+  fontSize: 10.4,
+  lineHeight: 12.5,
+  rowGap: 4.5,
+} as const;
+
 /** Подложка строки бейджей на экране товара. */
 export const PRODUCT_CARD_DETAIL_BADGE_ROW_CHROME = {
-  paddingHorizontal: 8,
-  paddingVertical: 6,
-  borderRadius: 10,
+  paddingHorizontal: 10,
+  paddingVertical: 8,
+  borderRadius: 12,
 } as const;
 
 export const PRODUCT_CARD_MOBILE_LAYOUT = {

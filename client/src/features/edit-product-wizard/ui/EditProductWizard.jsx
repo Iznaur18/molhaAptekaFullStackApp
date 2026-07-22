@@ -1,5 +1,6 @@
 import { useCreateProductForm } from "../../../entities/product/model/useCreateProductForm.js";
 import { CreateProductBasicSection } from "../../../entities/product/ui/create-product-sections/CreateProductBasicSection.jsx";
+import { CreateProductOriginalitySection } from "../../../entities/product/ui/create-product-sections/CreateProductOriginalitySection.jsx";
 import { CreateProductCategorySection } from "../../../entities/product/ui/create-product-sections/CreateProductCategorySection.jsx";
 import { CreateProductCommerceSection } from "../../../entities/product/ui/create-product-sections/CreateProductCommerceSection.jsx";
 import "../../../entities/product/ui/create-product-sections/CreateProductSections.css";
@@ -171,6 +172,9 @@ export function EditProductWizard({
             subtitle={stepCopy.subtitle}
           />
           {wizard.stepId === "basic" ? <CreateProductBasicSection {...sectionProps} /> : null}
+          {wizard.stepId === "originality" ? (
+            <CreateProductOriginalitySection {...sectionProps} />
+          ) : null}
           {wizard.stepId === "media" ? (
             <CreateProductWizardMediaStep
               form={form}

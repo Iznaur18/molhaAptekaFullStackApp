@@ -11,6 +11,8 @@ import {
 import { getProductPriceRubMaxError } from "./productPriceRubValidation.js";
 import { validateProductDescription } from "./validateProductDescription.js";
 import { validateProductName } from "./validateProductName.js";
+import { isProductListingOrigin } from "./productListingOrigin.js";
+import { isProductIsOriginalSelected } from "./productIsOriginal.js";
 import {
   productCharacteristicsFromRows,
   validateProductCharacteristicsRows,
@@ -65,6 +67,14 @@ export function prepareCreateProductSubmit({
   const nameError = validateProductName(form.productName);
   if (nameError) {
     return { ok: false, message: nameError };
+  }
+
+  if (!isProductListingOrigin(form.productListingOrigin)) {
+    return { ok: false, message: CREATE_PRODUCT_MODAL_UI.ERROR_LISTING_ORIGIN };
+  }
+
+  if (!isProductIsOriginalSelected(form.productIsOriginal)) {
+    return { ok: false, message: CREATE_PRODUCT_MODAL_UI.ERROR_ORIGINALITY };
   }
 
   const descriptionError = validateProductDescription(form.productDescription);
@@ -155,6 +165,8 @@ export function prepareCreateProductSubmit({
   if (isEdit) {
     const patchBody = {
       productName: String(form.productName).trim(),
+      productListingOrigin: form.productListingOrigin,
+      productIsOriginal: form.productIsOriginal === true,
       productDescription: String(form.productDescription).trim(),
       productImageUrls: urls,
       productPreviewVideoUrl: previewVideoUrl,
@@ -185,6 +197,8 @@ export function prepareCreateProductSubmit({
     ok: true,
     createBody: {
       productName: form.productName,
+      productListingOrigin: form.productListingOrigin,
+      productIsOriginal: form.productIsOriginal === true,
       productDescription: form.productDescription,
       productImageUrls: urls,
       productPreviewVideoUrl: previewVideoUrl || undefined,

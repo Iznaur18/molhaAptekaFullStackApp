@@ -1,8 +1,9 @@
-/** @typedef {'basic' | 'media' | 'category' | 'commerce'} EditProductWizardStepId */
+/** @typedef {'basic' | 'originality' | 'media' | 'category' | 'commerce'} EditProductWizardStepId */
 
 /** @type {readonly EditProductWizardStepId[]} */
 export const EDIT_PRODUCT_WIZARD_STEP_IDS = [
   "basic",
+  "originality",
   "media",
   "category",
   "commerce",

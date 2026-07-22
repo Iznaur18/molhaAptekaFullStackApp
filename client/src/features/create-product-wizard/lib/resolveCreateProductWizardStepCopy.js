@@ -9,6 +9,12 @@ export function resolveCreateProductWizardStepCopy(stepId) {
         subtitle: CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_BASIC_SUBTITLE,
         shortLabel: CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_LABEL_BASIC,
       };
+    case "originality":
+      return {
+        title: CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_ORIGINALITY_TITLE,
+        subtitle: CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_ORIGINALITY_SUBTITLE,
+        shortLabel: CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_LABEL_ORIGINALITY,
+      };
     case "media":
       return {
         title: CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_MEDIA_TITLE,

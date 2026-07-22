@@ -18,6 +18,9 @@ import { ProductLoyaltyPointsBadge } from "./ProductLoyaltyPointsBadge.jsx";
  *   isPremiumUser?: boolean;
  *   isLoyaltyPointsOvercommitted?: boolean;
  *   className?: string;
+ *   showAuctionBadge?: boolean;
+ *   showInstallmentBadge?: boolean;
+ *   showLoyaltyPointsBadge?: boolean;
  * }} props
  */
 export function ProductCatalogStatusBadges({
@@ -29,6 +32,9 @@ export function ProductCatalogStatusBadges({
   isPremiumUser = false,
   isLoyaltyPointsOvercommitted = false,
   className = "",
+  showAuctionBadge = true,
+  showInstallmentBadge = true,
+  showLoyaltyPointsBadge = true,
 }) {
   const flags = useProductCardChromeFlags(
     {
@@ -66,22 +72,37 @@ export function ProductCatalogStatusBadges({
       aria-label={PRODUCT_CARD_UI.STATUS_BADGES_ARIA}
     >
       <ProductCardStatusSlot vm={statusSlotVm} />
-      {flags.showAuctionBadge ? (
-        <p className="product-card__auction-badge" role="status">
-          {PRODUCT_CARD_UI.AUCTION_BADGE}
-        </p>
-      ) : null}
-      {flags.showInstallmentBadge ? (
-        <p className="product-card__installment-badge" role="status">
-          {PRODUCT_CARD_UI.INSTALLMENT_BADGE}
-        </p>
-      ) : null}
       {flags.showRaffleBadge ? (
         <p className="product-card__raffle-badge" role="status">
           {PRODUCT_CARD_UI.RAFFLE_BADGE}
         </p>
       ) : null}
-      {flags.showLoyaltyPointsBadge ? (
+      {showAuctionBadge && flags.showAuctionBadge ? (
+        <p className="product-card__auction-badge" role="status">
+          {PRODUCT_CARD_UI.AUCTION_BADGE}
+        </p>
+      ) : null}
+      {showInstallmentBadge && flags.showInstallmentBadge ? (
+        <p className="product-card__installment-badge" role="status">
+          {PRODUCT_CARD_UI.INSTALLMENT_BADGE}
+        </p>
+      ) : null}
+      {flags.showPromotionBoostBadge ? (
+        <p className="product-card__promotion-boost-badge" role="status">
+          {PRODUCT_CARD_UI.PROMOTED_BADGE}
+        </p>
+      ) : null}
+      {flags.showPromotionTopBadge ? (
+        <p className="product-card__promotion-top-badge" role="status">
+          {PRODUCT_CARD_UI.PROMOTION_TOP_BADGE}
+        </p>
+      ) : null}
+      {flags.showPromotionBannerBadge ? (
+        <p className="product-card__promotion-banner-badge" role="status">
+          {PRODUCT_CARD_UI.PROMOTION_BANNER_BADGE}
+        </p>
+      ) : null}
+      {showLoyaltyPointsBadge && flags.showLoyaltyPointsBadge ? (
         <ProductLoyaltyPointsBadge
           product={product}
           isAuthorized={isAuthorized}

@@ -9,13 +9,15 @@ import "./ProductLoyaltyPointsBadge.css";
  * @param {{
  *   product: import('../model/types.js').ProductFromApi;
  *   isAuthorized?: boolean;
- *   variant?: "inline" | "overlay";
+ *   variant?: "inline" | "overlay" | "detail";
+ *   className?: string;
  * }} props
  */
 export function ProductLoyaltyPointsBadge({
   product,
   isAuthorized = false,
   variant = "inline",
+  className: classNameProp = "",
 }) {
   const { user } = useAuthSession();
   const isUserDataConfirmed = isAuthorized && user?.isUserDataConfirmed === true;
@@ -25,19 +27,24 @@ export function ProductLoyaltyPointsBadge({
   }
 
   const points = resolveProductLoyaltyPointsPerUnit(product);
-  const label = (() => {
-    if (!isAuthorized) {
-      return PRODUCT_CARD_UI.LOYALTY_POINTS_GUEST(points);
-    }
-    if (isUserDataConfirmed) {
-      return PRODUCT_CARD_UI.LOYALTY_POINTS_CONFIRMED(points);
-    }
-    return PRODUCT_CARD_UI.LOYALTY_POINTS_UNCONFIRMED(points);
-  })();
+  const label =
+    variant === "detail"
+      ? PRODUCT_CARD_UI.LOYALTY_POINTS_DETAIL(points)
+      : (() => {
+          if (!isAuthorized) {
+            return PRODUCT_CARD_UI.LOYALTY_POINTS_GUEST(points);
+          }
+          if (isUserDataConfirmed) {
+            return PRODUCT_CARD_UI.LOYALTY_POINTS_CONFIRMED(points);
+          }
+          return PRODUCT_CARD_UI.LOYALTY_POINTS_UNCONFIRMED(points);
+        })();
 
   const className = [
     "product-loyalty-points-badge",
     variant === "overlay" ? "product-loyalty-points-badge--overlay" : "",
+    variant === "detail" ? "product-loyalty-points-badge--detail" : "",
+    classNameProp,
   ]
     .filter(Boolean)
     .join(" ");

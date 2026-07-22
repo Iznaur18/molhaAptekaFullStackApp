@@ -14,12 +14,16 @@ type ProductCharacteristicsDetailsProps = {
   items?: CharacteristicItem[] | null;
   showTitle?: boolean;
   embedded?: boolean;
+  title?: string;
+  accessibilityLabel?: string;
 };
 
 export const ProductCharacteristicsDetails = ({
   items,
   showTitle = true,
   embedded = false,
+  title = PRODUCT_DETAILS_MODAL_UI.CHARACTERISTICS_TITLE,
+  accessibilityLabel = PRODUCT_DETAILS_MODAL_UI.CHARACTERISTICS_SECTION_ARIA,
 }: ProductCharacteristicsDetailsProps) => {
   const styles = useProductCharacteristicsDetailsStyles();
   const rows = getProductNonEmptyCharacteristics(items);
@@ -31,19 +35,21 @@ export const ProductCharacteristicsDetails = ({
   return (
     <View
       style={embedded ? styles.rootEmbedded : styles.root}
-      accessibilityLabel={PRODUCT_DETAILS_MODAL_UI.CHARACTERISTICS_SECTION_ARIA}
+      accessibilityLabel={accessibilityLabel}
     >
-      {showTitle ? (
-        <Text style={styles.title}>{PRODUCT_DETAILS_MODAL_UI.CHARACTERISTICS_TITLE}</Text>
-      ) : null}
+      {showTitle ? <Text style={styles.title}>{title}</Text> : null}
       <View style={styles.list}>
         {rows.map((item, index) => (
           <View
             key={item.key}
             style={[styles.row, index === rows.length - 1 ? styles.rowLast : null]}
           >
-            <Text style={styles.key}>{item.key}</Text>
-            <Text style={styles.value}>{item.value}</Text>
+            <View style={styles.keyCell}>
+              <Text style={styles.key}>{item.key}</Text>
+            </View>
+            <View style={styles.valueCell}>
+              <Text style={styles.value}>{item.value}</Text>
+            </View>
           </View>
         ))}
       </View>

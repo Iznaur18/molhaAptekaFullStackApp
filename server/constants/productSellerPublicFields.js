@@ -5,6 +5,8 @@ export const PRODUCT_SELLER_PUBLIC_FIELD_NAMES = [
   "email",
   "userPhoneNumber",
   "userAddress",
+  "userAvatarUrl",
+  "userAvatarFocus",
   "userRatingByVotes",
   "isPremiumUser",
   "isUserDataConfirmed",

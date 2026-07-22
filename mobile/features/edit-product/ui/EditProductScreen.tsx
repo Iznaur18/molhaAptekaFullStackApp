@@ -17,6 +17,18 @@ import {
   type ProductCharacteristicRow,
   serializeProductCharacteristicRows,
 } from "@/entities/product/lib/productCharacteristicRows";
+import {
+  createProductReturnTermRow,
+  mapProductReturnTermsToRows,
+  serializeProductReturnTermRows,
+  validateProductReturnTermRows,
+  type ProductReturnTermRow,
+} from "@/entities/product/lib/productReturnTermRows";
+import {
+  isProductListingOrigin,
+  type ProductListingOrigin,
+} from "@/entities/product/lib/productListingOrigin";
+import { ProductListingOriginChips } from "@/entities/product/ui/ProductListingOriginChips";
 import { resolveProductImageUrls } from "@/entities/product/lib/resolveProductImageUrls";
 import { resolveProductLoyaltyPointsPerUnit } from "@/entities/product/lib/resolveProductLoyaltyPointsPerUnit";
 import { resolveSellerMaxLoyaltyPointsPerUnit } from "@/entities/product/lib/resolveSellerMaxLoyaltyPointsPerUnit";
@@ -25,6 +37,7 @@ import { useCatalogProductQuery } from "@/entities/product/model/useCatalogProdu
 import { useMyProductMutations } from "@/entities/product/model/useMyProductMutations";
 import { useMyProductsInfiniteQuery } from "@/entities/product/model/useMyProductsInfiniteQuery";
 import { ProductCharacteristicsEditor } from "@/entities/product/ui/ProductCharacteristicsEditor";
+import { ProductReturnTermsEditor } from "@/entities/product/ui/ProductReturnTermsEditor";
 import { useMyLoyaltyPointsStatusQuery } from "@/entities/user/model/useMyLoyaltyPointsStatusQuery";
 import { CreateProductCategoryPicker } from "@/features/create-product/ui/CreateProductCategoryPicker";
 import { ProductPhotoGrid } from "@/features/image-upload/ui/ProductPhotoGrid";
@@ -45,6 +58,20 @@ const PRODUCT_STOCK_QUANTITY_MIN = 1;
 const PRODUCT_STOCK_QUANTITY_MAX = 9999;
 const PRODUCT_PRICE_RUB_MAX = 999_999_999;
 const LOYALTY_POINTS_MAX_LENGTH = 8;
+
+const resolveReturnPolicyPrefill = (
+  product: Record<string, unknown>,
+): { enabled: boolean; rows: ProductReturnTermRow[] } => {
+  const enabled = product.productReturnEnabled === true;
+  if (!enabled) {
+    return { enabled: false, rows: [] };
+  }
+  const rows = mapProductReturnTermsToRows(product.productReturnTerms);
+  return {
+    enabled: true,
+    rows: rows.length > 0 ? rows : [createProductReturnTermRow()],
+  };
+};
 
 const keepDigits = (value: string) => keepDigitsOnly(value);
 
@@ -71,6 +98,10 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
   const sellerProductsQuery = useMyProductsInfiniteQuery({ enabled: Boolean(productId) });
 
   const [productName, setProductName] = useState("");
+  const [productListingOrigin, setProductListingOrigin] = useState<ProductListingOrigin | null>(
+    null,
+  );
+  const [productIsOriginal, setProductIsOriginal] = useState(false);
   const [productDescription, setProductDescription] = useState("");
   const [productPrice, setProductPrice] = useState("");
   const [productOldPrice, setProductOldPrice] = useState("");
@@ -81,6 +112,8 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
   const [productCategoryLabel, setProductCategoryLabel] = useState("");
   const [productImageUrls, setProductImageUrls] = useState<string[]>([]);
   const [characteristicRows, setCharacteristicRows] = useState<ProductCharacteristicRow[]>([]);
+  const [productReturnEnabled, setProductReturnEnabled] = useState(false);
+  const [returnTermRows, setReturnTermRows] = useState<ProductReturnTermRow[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isInitialized, setIsInitialized] = useState(false);
@@ -91,6 +124,10 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
     }
     const product = productQuery.data as Record<string, unknown>;
     setProductName(String(product.productName ?? "").trim());
+    setProductListingOrigin(
+      isProductListingOrigin(product.productListingOrigin) ? product.productListingOrigin : null,
+    );
+    setProductIsOriginal(product.productIsOriginal === true);
     setProductDescription(String(product.productDescription ?? "").trim());
     setProductPrice(formatRubPriceInput(product.productPrice ?? ""));
     const oldPrice = product.productOldPrice;
@@ -109,6 +146,9 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
     }
     setProductImageUrls(resolveProductImageUrls(product));
     setCharacteristicRows(mapProductCharacteristicsToRows(product.productCharacteristics));
+    const returnPrefill = resolveReturnPolicyPrefill(product);
+    setProductReturnEnabled(returnPrefill.enabled);
+    setReturnTermRows(returnPrefill.rows);
     setIsInitialized(true);
   }, [isInitialized, productQuery.data]);
 
@@ -157,6 +197,9 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
     if (nameError) {
       return nameError;
     }
+    if (!isProductListingOrigin(productListingOrigin)) {
+      return CREATE_PRODUCT_UI.ERROR_LISTING_ORIGIN;
+    }
     if (productDescription.trim().length < PRODUCT_DESCRIPTION_MIN_CHARS) {
       return CREATE_PRODUCT_UI.ERROR_DESCRIPTION;
     }
@@ -203,6 +246,12 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
         loyaltyBudget.catalogCommitted,
       );
     }
+    if (productReturnEnabled) {
+      const returnError = validateProductReturnTermRows(returnTermRows);
+      if (returnError) {
+        return returnError;
+      }
+    }
     return null;
   };
 
@@ -226,6 +275,8 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
         productId,
         body: {
           productName: productName.trim(),
+          productListingOrigin: productListingOrigin!,
+          productIsOriginal,
           productDescription: productDescription.trim(),
           productPrice: parseRubPriceInput(productPrice) ?? 0,
           productOldPrice: oldPriceRaw ? oldPrice : null,
@@ -237,6 +288,10 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
           productImageUrls,
           productCharacteristics: serializeProductCharacteristicRows(characteristicRows),
           loyaltyPointsPerUnit: Math.floor(Number(loyaltyPointsPerUnit)) || 0,
+          productReturnEnabled,
+          productReturnTerms: productReturnEnabled
+            ? serializeProductReturnTermRows(returnTermRows)
+            : [],
         },
       });
       setSuccessMessage(CREATE_PRODUCT_UI.SAVED);
@@ -304,6 +359,74 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
               />
             </View>
 
+            <ProductListingOriginChips
+              value={productListingOrigin}
+              onChange={setProductListingOrigin}
+              disabled={isBusy}
+            />
+
+            <View style={styles.field}>
+              <Text style={styles.label}>{CREATE_PRODUCT_UI.ORIGINALITY_STATEMENT}</Text>
+              <View style={styles.returnChoiceRow}>
+                <Pressable
+                  disabled={isBusy}
+                  onPress={() => setProductIsOriginal(true)}
+                  style={[
+                    styles.returnChoiceChip,
+                    {
+                      borderColor: productIsOriginal
+                        ? theme.colors.action
+                        : theme.colors.border,
+                      backgroundColor: productIsOriginal
+                        ? theme.colors.action
+                        : theme.colors.surface,
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.returnChoiceChipText,
+                      {
+                        color: productIsOriginal
+                          ? theme.colors.onContrast
+                          : theme.colors.text,
+                      },
+                    ]}
+                  >
+                    {CREATE_PRODUCT_UI.ORIGINALITY_YES}
+                  </Text>
+                </Pressable>
+                <Pressable
+                  disabled={isBusy}
+                  onPress={() => setProductIsOriginal(false)}
+                  style={[
+                    styles.returnChoiceChip,
+                    {
+                      borderColor: !productIsOriginal
+                        ? theme.colors.action
+                        : theme.colors.border,
+                      backgroundColor: !productIsOriginal
+                        ? theme.colors.action
+                        : theme.colors.surface,
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.returnChoiceChipText,
+                      {
+                        color: !productIsOriginal
+                          ? theme.colors.onContrast
+                          : theme.colors.text,
+                      },
+                    ]}
+                  >
+                    {CREATE_PRODUCT_UI.ORIGINALITY_NO}
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+
             <View style={styles.field}>
               <Text style={styles.label}>{CREATE_PRODUCT_UI.LABEL_DESCRIPTION}</Text>
               <TextInput
@@ -321,6 +444,83 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
               onChange={setCharacteristicRows}
               disabled={isBusy}
             />
+
+            <View style={styles.field}>
+              <Text style={styles.label}>Есть ли возврат?</Text>
+              <View style={styles.returnChoiceRow}>
+                <Pressable
+                  disabled={isBusy}
+                  onPress={() => {
+                    setProductReturnEnabled(true);
+                    setReturnTermRows((prev) =>
+                      prev.length > 0 ? prev : [createProductReturnTermRow()],
+                    );
+                  }}
+                  style={[
+                    styles.returnChoiceChip,
+                    {
+                      borderColor: productReturnEnabled
+                        ? theme.colors.action
+                        : theme.colors.border,
+                      backgroundColor: productReturnEnabled
+                        ? theme.colors.action
+                        : theme.colors.surfaceMuted,
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.returnChoiceChipText,
+                      {
+                        color: productReturnEnabled
+                          ? theme.colors.onContrast
+                          : theme.colors.text,
+                      },
+                    ]}
+                  >
+                    Да
+                  </Text>
+                </Pressable>
+                <Pressable
+                  disabled={isBusy}
+                  onPress={() => {
+                    setProductReturnEnabled(false);
+                    setReturnTermRows([]);
+                  }}
+                  style={[
+                    styles.returnChoiceChip,
+                    {
+                      borderColor: !productReturnEnabled
+                        ? theme.colors.action
+                        : theme.colors.border,
+                      backgroundColor: !productReturnEnabled
+                        ? theme.colors.action
+                        : theme.colors.surfaceMuted,
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.returnChoiceChipText,
+                      {
+                        color: !productReturnEnabled
+                          ? theme.colors.onContrast
+                          : theme.colors.text,
+                      },
+                    ]}
+                  >
+                    Нет
+                  </Text>
+                </Pressable>
+              </View>
+              {productReturnEnabled ? (
+                <ProductReturnTermsEditor
+                  rows={returnTermRows}
+                  onChange={setReturnTermRows}
+                  disabled={isBusy}
+                />
+              ) : null}
+            </View>
 
             <Text style={styles.hint}>{CREATE_PRODUCT_UI.HINT_OLD_PRICE}</Text>
 

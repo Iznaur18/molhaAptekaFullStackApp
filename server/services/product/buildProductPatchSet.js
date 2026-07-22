@@ -17,6 +17,9 @@ import {
 } from "./productDiscount.js";
 import { assertSellerCanSetProductLoyaltyPointsPerUnit } from "./assertProductLoyaltyPointsPerUnit.js";
 import { normalizeProductCharacteristics } from "./normalizeProductCharacteristics.js";
+import { resolveProductReturnWriteFromBody } from "./normalizeProductReturnTerms.js";
+import { normalizeProductListingOrigin } from "./normalizeProductListingOrigin.js";
+import { normalizeProductIsOriginal } from "./normalizeProductIsOriginal.js";
 import { resolveProductCategoryWriteFromBody } from "./resolveProductCategoryWrite.js";
 import { normalizeProductSaleCity } from "./productSaleCity.js";
 import { resolveProductSaleCityNormalized } from "./ruCityNormalized.js";
@@ -59,6 +62,58 @@ const applyCharacteristicsField = (body, $set) => {
     );
   } catch (error) {
     throwFieldError(error, "Некорректные характеристики товара");
+  }
+};
+
+const applyReturnPolicyFields = (body, $set, existing) => {
+  if (
+    !hasBodyField(body, "productReturnEnabled") &&
+    !hasBodyField(body, "productReturnTerms")
+  ) {
+    return;
+  }
+
+  try {
+    const next = resolveProductReturnWriteFromBody({
+      productReturnEnabled: hasBodyField(body, "productReturnEnabled")
+        ? body.productReturnEnabled
+        : existing.productReturnEnabled === true,
+      productReturnTerms: hasBodyField(body, "productReturnTerms")
+        ? body.productReturnTerms
+        : existing.productReturnTerms,
+    });
+    $set.productReturnEnabled = next.productReturnEnabled;
+    $set.productReturnTerms = next.productReturnTerms;
+  } catch (error) {
+    throwFieldError(error, "Некорректные условия возврата");
+  }
+};
+
+const applyListingOriginField = (body, $set) => {
+  if (!hasBodyField(body, "productListingOrigin")) {
+    return;
+  }
+
+  try {
+    $set.productListingOrigin = normalizeProductListingOrigin(body.productListingOrigin, {
+      required: true,
+    });
+  } catch (error) {
+    throwFieldError(error, "Некорректный статус товара");
+  }
+};
+
+const applyIsOriginalField = (body, $set) => {
+  if (!hasBodyField(body, "productIsOriginal")) {
+    return;
+  }
+
+  try {
+    $set.productIsOriginal = normalizeProductIsOriginal(body.productIsOriginal, {
+      required: true,
+    });
+  } catch (error) {
+    throwFieldError(error, "Некорректный признак оригинала");
   }
 };
 
@@ -289,6 +344,9 @@ export async function buildProductPatchSet({ existing, body, isAdmin, productId 
 
   applyTextFields(body, $set);
   applyCharacteristicsField(body, $set);
+  applyReturnPolicyFields(body, $set, existing);
+  applyListingOriginField(body, $set);
+  applyIsOriginalField(body, $set);
   applyPriceFields(body, $set, existing);
   applySaleCityField(body, $set);
   await applyCategoryFields(body, $set, existing);

@@ -11,9 +11,10 @@ const validationContext = {
 };
 
 describe("EDIT_PRODUCT_WIZARD_STEP_IDS", () => {
-  it("contains four form steps without manage", () => {
+  it("contains form steps without manage", () => {
     expect(EDIT_PRODUCT_WIZARD_STEP_IDS).toEqual([
       "basic",
+      "originality",
       "media",
       "category",
       "commerce",
