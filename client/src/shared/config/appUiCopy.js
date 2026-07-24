@@ -1694,6 +1694,9 @@ export const PRODUCT_DETAILS_MODAL_UI = {
   DELIVERY_TITLE: "Доставка",
   DELIVERY_SECTION_ARIA: "Доставка",
   DELIVERY_IN_DEVELOPMENT: "В разработке",
+  COPY_ID_ARIA: "Скопировать ID",
+  COPY_ID_DONE_ARIA: "ID скопирован",
+  COPY_ID_FAILED: "Не удалось скопировать ID",
 };
 
 /** Превью продавца в модалке товара */
@@ -2388,6 +2391,46 @@ export const LOYALTY_POINTS_PAGE_UI = {
   ],
 };
 
+/** Раздел «Партнёрская программа» в профиле */
+export const PARTNER_PROGRAM_PAGE_UI = {
+  ARIA: "Партнёрская программа",
+  LOGIN_HINT: "Войдите, чтобы открыть партнёрскую программу.",
+  LOGIN_BUTTON: "Войти",
+  LOADING: "Загрузка…",
+  LOAD_ERROR: "Не удалось загрузить партнёрскую программу",
+  BALANCE_CAPTION: "Партнёрский баланс",
+  BALANCE_UNIT: "ед.",
+  /** @param {number} percent */
+  INFO: (percent) =>
+    `${percent}% от трат приглашённых на услуги платформы. Конвертация в баллы 1:1.`,
+  STATS_TITLE: "Сводка",
+  STAT_REFERRALS: "Рефералы",
+  STAT_SPEND: "Их траты",
+  STAT_EARNED: "Ваш кэшбэк",
+  INVITE_TITLE: "Ваша ссылка",
+  INVITE_HINT: "Отправьте друзьям — кэшбэк начисляется с их трат на услуги платформы.",
+  COPY_BUTTON: "Копировать",
+  SHARE_BUTTON: "Поделиться",
+  COPIED: "Ссылка скопирована",
+  SHARED: "Готово",
+  SHARE_COPIED: "Ссылка скопирована — вставьте в мессенджер",
+  COPY_FAILED: "Не удалось скопировать",
+  SHARE_FAILED: "Не удалось поделиться",
+  CONVERT_SECTION: "Конвертация в баллы",
+  CONVERT_LABEL: "Сумма",
+  CONVERT_HINT: "1 партнёрская единица = 1 балл лояльности. Вывод наличными недоступен.",
+  CONVERT_BUTTON: "Конвертировать",
+  CONVERT_PENDING: "Конвертируем…",
+  CONVERT_SUCCESS: "Готово: баланс конвертирован в баллы",
+  CONVERT_ERROR: "Не удалось конвертировать",
+  LIST_TITLE: "Ваши рефералы",
+  LIST_EMPTY: "Пока никого нет — поделитесь ссылкой",
+  COL_NAME: "Ник",
+  COL_DATE: "Регистрация",
+  COL_SPEND: "Траты",
+  COL_CASHBACK: "Кэшбэк",
+};
+
 /** Раздел «Премиум» в профиле */
 export const PREMIUM_PAGE_UI = {
   PAGE_ARIA: "Премиум",
@@ -2435,6 +2478,7 @@ export const MY_PROFILE_PAGE_UI = {
   /** @param {number} count */
   TAB_BADGE: (count) => (count > 99 ? "99+" : String(count)),
   TAB_ADMIN_ORDERS: "Все заказы",
+  TAB_STAFF_AUDIT_LOG_ADMIN: "Журнал действий",
   TAB_SEARCH_SYNONYMS_ADMIN: "Синонимы поиска",
   TAB_POPULAR_PRODUCTS_ADMIN: "Популярные товары",
   TAB_CATEGORY_TREE_ADMIN: "Категории",
@@ -2456,6 +2500,7 @@ export const MY_PROFILE_PAGE_UI = {
   DATA_CONFIRMATION: "Подтверждение данных",
   TAB_PREMIUM: "Премиум",
   TAB_LOYALTY_POINTS: "Баллы",
+  TAB_PARTNER_PROGRAM: "Партнёрская программа",
   TAB_ADVERTISING: "Реклама",
   EDIT_PROFILE: "Изменить профиль",
   LOGOUT: "Выйти",
@@ -2621,6 +2666,38 @@ export const POPULAR_PRODUCTS_ADMIN_PAGE_UI = {
   EMPTY_LIST: "В списке пока нет товаров",
   MOVE_UP_ARIA: "Поднять список",
   MOVE_DOWN_ARIA: "Опустить список",
+};
+
+/** Админка: журнал действий сотрудников (audit log) */
+export const STAFF_AUDIT_LOG_ADMIN_PAGE_UI = {
+  TITLE: "Журнал действий сотрудников",
+  HINT: "Каждое действие модератора и админа (одобрение, отклонение, споры, удаление). Только чтение.",
+  LOADING: "Загрузка…",
+  LOAD_ERROR: "Не удалось загрузить журнал аудита",
+  EMPTY: "Записей пока нет",
+  EMPTY_FILTER: "По фильтру ничего не найдено",
+  REFRESH: "Обновить",
+  FILTER_ACTION_PLACEHOLDER: "Действие (напр. approve)…",
+  FILTER_FROM: "С даты",
+  FILTER_TO: "По дату",
+  APPLY: "Применить",
+  RESET: "Сбросить",
+  FILTER_BY_ACTOR: "Только этот сотрудник",
+  CLEAR_ACTOR: "Показать всех",
+  COL_TIME: "Время",
+  COL_ACTOR: "Сотрудник",
+  COL_ACTION: "Действие",
+  COL_STATUS: "Статус",
+  DETAILS: "Детали",
+  DETAILS_PATH: "Путь",
+  DETAILS_PARAMS: "Параметры",
+  DETAILS_BODY: "Тело запроса",
+  DETAILS_REQUEST_ID: "Request ID",
+  UNKNOWN_ACTOR: "—",
+  COUNT: (total) => `Всего записей: ${total}`,
+  PAGE_LABEL: (page, pages) => `Стр. ${page} из ${pages}`,
+  PREV: "Назад",
+  NEXT: "Вперёд",
 };
 
 /** Админка: синонимы умного поиска */

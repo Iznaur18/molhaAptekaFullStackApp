@@ -29,6 +29,7 @@ export function buildProfileNavGroups({
   canUseDataConfirmationQueue,
   canUseInstallmentDisputes,
   canUseAdminOrders,
+  canUseStaffAuditLogAdmin,
   canUseSearchSynonymsAdmin,
   canUseCategoryTreeAdmin,
   canUseAppIntroAdmin,
@@ -40,6 +41,7 @@ export function buildProfileNavGroups({
   isUserDataConfirmed,
   canUsePremium,
   canUseLoyaltyPoints,
+  canUsePartnerProgram,
   canUseAdvertising,
   canUseEditProfile,
   showEditOnBanner,
@@ -83,6 +85,7 @@ export function buildProfileNavGroups({
   onDataConfirmationClick,
   onPremiumClick,
   onLoyaltyPointsClick,
+  onPartnerProgramClick,
   onAdvertisingClick,
   onEditProfileClick,
 }) {
@@ -218,6 +221,15 @@ export function buildProfileNavGroups({
               },
             ]
           : []),
+        ...(canUsePartnerProgram
+          ? [
+              {
+                tab: "partner-program",
+                label: MY_PROFILE_PAGE_UI.TAB_PARTNER_PROGRAM,
+                onClick: () => selectTab("partner-program", onPartnerProgramClick),
+              },
+            ]
+          : []),
         ...(canUseAdvertising
           ? [
               {
@@ -344,6 +356,16 @@ export function buildProfileNavGroups({
             tab: "admin-orders",
             label: MY_PROFILE_PAGE_UI.TAB_ADMIN_ORDERS,
             onClick: () => selectTab("admin-orders", onAdminOrdersClick),
+          },
+        ]
+      : []),
+    ...(canUseStaffAuditLogAdmin
+      ? [
+          {
+            tab: "staff-audit-log-admin",
+            label: MY_PROFILE_PAGE_UI.TAB_STAFF_AUDIT_LOG_ADMIN,
+            // Без prefetch-колбэка: страница read-only и грузит данные сама.
+            onClick: () => selectTab("staff-audit-log-admin"),
           },
         ]
       : []),

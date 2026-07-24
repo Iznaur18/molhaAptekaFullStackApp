@@ -1,26 +1,29 @@
 import ProductCategoryDisplayModel from "../models/ProductCategoryDisplayModel.js";
+import { UserModel, ReferralLedgerEntryModel } from "../models/index.js";
+import { logServerEvent } from "../utils/logServerEvent.js";
 
 /**
- * Пересоздаёт индексы моделей, у которых в схеме менялись ОПЦИИ индексов.
- * Mongoose создаёт недостающие индексы, но НЕ меняет опции уже существующих
- * (например, переход sparse → partialFilterExpression). `syncIndexes()` дропает
- * несовпадающие индексы в БД и создаёт их заново по текущей схеме.
- *
- * Пока синхронизируем только ProductCategoryDisplay: старый уникальный индекс
- * { categorySlug, sparse } конфликтовал на categorySlug: null у нескольких
- * категорий (E11000 «Переопределение отображения уже существует»). Новый индекс
- * использует partialFilterExpression и не индексирует null.
- *
- * Коллекция небольшая, поэтому синхронизация на старте безопасна и дёшева.
+ * Пересоздаёт индексы моделей, у которых в схеме менялись ОПЦИИ индексов,
+ * или которые критичны для идемпотентности денег (prod: autoIndex=false).
  */
-export async function syncCriticalIndexes() {
+async function syncModelIndexes(model, modelName) {
   try {
-    await ProductCategoryDisplayModel.syncIndexes();
-    console.log("[indexes] ProductCategoryDisplay: индексы синхронизированы");
+    await model.syncIndexes();
+    logServerEvent("info", {
+      event: "indexes_synced",
+      model: modelName,
+    });
   } catch (err) {
-    console.error(
-      "[indexes] Не удалось синхронизировать индексы ProductCategoryDisplay:",
-      err?.message ?? err,
-    );
+    logServerEvent("error", {
+      event: "indexes_sync_failed",
+      model: modelName,
+      error: err instanceof Error ? err.message : String(err),
+    });
   }
+}
+
+export async function syncCriticalIndexes() {
+  await syncModelIndexes(ProductCategoryDisplayModel, "ProductCategoryDisplay");
+  await syncModelIndexes(UserModel, "User");
+  await syncModelIndexes(ReferralLedgerEntryModel, "ReferralLedgerEntry");
 }

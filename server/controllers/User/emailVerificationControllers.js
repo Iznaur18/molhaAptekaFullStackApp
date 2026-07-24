@@ -10,14 +10,12 @@ import {
   verifyEmailByCodeForUser,
   verifyEmailByToken,
 } from "../../services/auth/emailVerification.js";
+import { resolveFrontendOrigin } from "../../utils/resolveFrontendOrigin.js";
 
 /** `GET /auth/verify-email?token=...` — подтверждение email по ссылке. */
 export const verifyEmailController = async (req, res) => {
 const token = req.query?.token;
-    const frontendUrl = (process.env.FRONTEND_URL ?? "http://127.0.0.1:5173").replace(
-      /\/$/,
-      "",
-    );
+    const frontendUrl = resolveFrontendOrigin();
 
     try {
       await verifyEmailByToken(token);

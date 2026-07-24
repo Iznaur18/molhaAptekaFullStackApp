@@ -2,6 +2,7 @@ import {
   DEFAULT_USER_BACKGROUND_PRESET_ID,
   USER_GENDER_NO_SELECTED,
 } from "../model/userConstants.js";
+import { readPersistedReferralCode } from "../../../shared/lib/referralCodeStorage.js";
 
 /**
  * @param {{
@@ -13,6 +14,7 @@ import {
  * @returns {import('../model/types.js').RegisterUserPayload}
  */
 export function buildRegisterUserPayload(form) {
+  const referralCode = readPersistedReferralCode();
   return {
     email: form.email.trim(),
     password: form.password,
@@ -21,5 +23,6 @@ export function buildRegisterUserPayload(form) {
     backgroundPresetId: DEFAULT_USER_BACKGROUND_PRESET_ID,
     userGender: USER_GENDER_NO_SELECTED,
     notificationsEnabled: true,
+    ...(referralCode ? { referralCode } : {}),
   };
 }

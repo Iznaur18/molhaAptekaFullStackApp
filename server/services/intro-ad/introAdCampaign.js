@@ -30,6 +30,12 @@ import {
   InsufficientLoyaltyPointsError,
   refundLoyaltyPoints,
 } from "../loyalty/loyaltyPointsSpend.js";
+import {
+  creditReferralCashbackFromSpend,
+  notifyReferralCashbackCredited,
+} from "../referral/creditReferralCashbackFromSpend.js";
+import { reverseReferralCashbackForSource } from "../referral/reverseReferralCashbackForSource.js";
+import { REFERRAL_SOURCE_KIND_INTRO_AD } from "../../constants/referralConstants.js";
 import { runInTransaction, withMongoSession } from "../../utils/mongoTransaction.js";
 
 import { parseIntroAdMediaBody } from "./introAdCampaignServiceHelpers.js";
@@ -153,6 +159,11 @@ export async function cancelMyIntroAdCampaign({ userId, campaignId }) {
       await releaseLoyaltyPointsReservation({ userId, amount, session });
     } else if (campaign.pointsChargedAt) {
       await refundLoyaltyPoints({ userId, amount, session });
+      await reverseReferralCashbackForSource({
+        sourceKind: REFERRAL_SOURCE_KIND_INTRO_AD,
+        sourceId: String(campaign._id),
+        session,
+      });
     }
 
     await IntroAdCampaignModel.updateOne(
@@ -202,6 +213,14 @@ export async function scheduleIntroAdCampaignAfterApproval({
     session,
   });
 
+  const cashback = await creditReferralCashbackFromSpend({
+    spenderUserId: String(campaign.advertiserId),
+    pointsSpent: amount,
+    sourceKind: REFERRAL_SOURCE_KIND_INTRO_AD,
+    sourceId: String(campaign._id),
+    session,
+  });
+
   const ctaType = await resolveIntroAdCtaType(campaign.advertiserId);
   campaign.ctaType = ctaType;
   campaign.pointsChargedAt = now;
@@ -212,12 +231,13 @@ export async function scheduleIntroAdCampaignAfterApproval({
   campaign.scheduledStartAt = now;
   await campaign.save(withMongoSession({}, session));
 
+  let result = campaign.toObject();
   if (activeCount < INTRO_AD_MAX_ACTIVE) {
     const activated = await activateIntroAdCampaignRecord(campaign._id, session);
-    return activated ?? campaign.toObject();
+    result = activated ?? result;
   }
 
-  return campaign.toObject();
+  return { campaign: result, cashback };
 }
 
 export async function countPendingIntroAdCampaigns() {
@@ -274,13 +294,21 @@ export async function approveIntroAdCampaign({ staffUserId, campaignId }) {
   }
 
   try {
-    const saved = await runInTransaction(async (session) =>
+    const { campaign: saved, cashback } = await runInTransaction(async (session) =>
       scheduleIntroAdCampaignAfterApproval({
         campaignId,
         approvedByUserId: staffUserId,
         session,
       }),
     );
+
+    if (cashback?.deferNotification) {
+      await notifyReferralCashbackCredited({
+        referrerUserId: cashback.referrerUserId,
+        amount: cashback.amount,
+        spenderUserId: String(campaign.advertiserId),
+      });
+    }
 
     await notifyIntroAdApproved(saved);
 

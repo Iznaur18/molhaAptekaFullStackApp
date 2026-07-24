@@ -10,6 +10,7 @@ export type RegisterPayload = {
   backgroundPresetId?: string;
   userGender?: string;
   notificationsEnabled?: boolean;
+  referralCode?: string;
 };
 
 export type PendingRegistration = {

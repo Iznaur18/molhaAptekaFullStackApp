@@ -63,6 +63,10 @@ const matchNamedRoute = (pathname: string): string | null => {
     return "/(auth)/login";
   }
 
+  if (pathname === "/register") {
+    return "/(auth)/register";
+  }
+
   if (pathname === "/" || pathname === "/(tabs)") {
     return "/(tabs)";
   }

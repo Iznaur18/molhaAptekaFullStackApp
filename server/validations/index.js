@@ -1,3 +1,4 @@
+import { staffAuditListValidation } from "./audit/staffAuditListValidation.js";
 import { loginUserValidation } from "./user/loginUserValidation.js";
 import { registerUserValidation } from "./user/registerUserValidation.js";
 import { updateProfileValidation } from "./user/updateProfileValidation.js";
@@ -16,6 +17,7 @@ import {
 import { refreshAuthValidation } from "./user/refreshAuthValidation.js";
 import { verifyEmailTokenValidation } from "./user/verifyEmailTokenValidation.js";
 import { adminCreditLoyaltyPointsValidation } from "./user/adminCreditLoyaltyPointsValidation.js";
+import { convertPartnerBalanceValidation } from "./user/referralValidation.js";
 import { makeProductValidation } from "./product/makeProductValidation.js";
 import { productIdParamValidation } from "./product/productIdParamValidation.js";
 import { productsSearchValidation } from "./product/productsSearchValidation.js";
@@ -127,6 +129,7 @@ export {
   refreshAuthValidation,
   verifyEmailTokenValidation,
   adminCreditLoyaltyPointsValidation,
+  convertPartnerBalanceValidation,
   registerPushTokenValidation,
   removePushTokenValidation,
   makeProductValidation,
@@ -196,4 +199,5 @@ export {
   installmentCancelValidation,
   getMyInstallmentContractsListValidation,
   getMyInstallmentSalesValidation,
+  staffAuditListValidation,
 };

@@ -15,6 +15,7 @@ import {
   chargeRaffleCreatePriceOnApproval,
   refundRaffleCreatePriceIfNeeded,
 } from "./raffleCreateAccess.js";
+import { notifyReferralCashbackCredited } from "../referral/creditReferralCashbackFromSpend.js";
 import { loadRaffleOrThrow } from "./raffleServiceHelpers.js";
 
 /**
@@ -36,8 +37,8 @@ export async function approveRaffle({ staffId, raffleId }) {
   }
 
   try {
-    await runInTransaction(async (session) => {
-      await chargeRaffleCreatePriceOnApproval({
+    const { cashback } = await runInTransaction(async (session) => {
+      const chargeResult = await chargeRaffleCreatePriceOnApproval({
         sellerId: String(raffle.sellerId),
         raffle: raffle.toObject(),
         session,
@@ -48,7 +49,16 @@ export async function approveRaffle({ staffId, raffleId }) {
       raffle.approvedAt = new Date();
       raffle.moderationComment = "";
       await raffle.save({ session });
+      return chargeResult;
     });
+
+    if (cashback?.deferNotification) {
+      await notifyReferralCashbackCredited({
+        referrerUserId: cashback.referrerUserId,
+        amount: cashback.amount,
+        spenderUserId: String(raffle.sellerId),
+      });
+    }
   } catch (error) {
     if (error instanceof InsufficientLoyaltyPointsError) {
       throw new AppError(

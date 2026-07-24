@@ -21,6 +21,7 @@ import {
   siteHeaderBannerCampaignRouter,
   introAdRouter,
   sellerPersonalCategoryRouter,
+  auditRouter,
 } from "./routes/index.js";
 import {
   generalRateLimiter,
@@ -28,6 +29,7 @@ import {
   notFoundHandler,
   requestIdMW,
   csrfCookieOriginCheckMW,
+  auditStaffActionMW,
 } from "./middlewares/index.js";
 import { buildApiHelmetOptions } from "./utils/buildApiHelmetOptions.js";
 import { buildHealthPayload } from "./utils/buildHealthPayload.js";
@@ -82,6 +84,10 @@ export const createApp = () => {
     }),
   );
 
+  // Сквозной аудит staff-мутаций: слушатель на finish, пишет только если запрос
+  // прошёл staff-гейт (req.staffAudit). Ставится до роутеров.
+  app.use(auditStaffActionMW);
+
   app.use("/upload", uploadRouter);
   app.use("/auth", authRouter);
   app.use("/vote", voteRouter);
@@ -99,6 +105,7 @@ export const createApp = () => {
   app.use("/site-header-banner-campaign", siteHeaderBannerCampaignRouter);
   app.use("/intro-ad", introAdRouter);
   app.use("/seller-personal-category", sellerPersonalCategoryRouter);
+  app.use("/audit", auditRouter);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

@@ -20,6 +20,12 @@ import {
   releaseLoyaltyPointsReservation,
 } from "../loyalty/loyaltyPointsReserve.js";
 import { refundLoyaltyPoints } from "../loyalty/loyaltyPointsSpend.js";
+import {
+  creditReferralCashbackFromSpend,
+  notifyReferralCashbackCredited,
+} from "../referral/creditReferralCashbackFromSpend.js";
+import { reverseReferralCashbackForSource } from "../referral/reverseReferralCashbackForSource.js";
+import { REFERRAL_SOURCE_KIND_SITE_HEADER_BANNER } from "../../constants/referralConstants.js";
 import { runInTransaction, withMongoSession } from "../../utils/mongoTransaction.js";
 
 const DEFAULT_MODERATION_LIMIT = 50;
@@ -103,7 +109,7 @@ export async function approveSiteHeaderBannerCampaign({ staffUserId, campaignId 
   );
 
   try {
-    const saved = await runInTransaction(async (session) => {
+    const { saved, cashback } = await runInTransaction(async (session) => {
       await assertSiteHeaderBannerCampaignSlotAvailable(session);
 
       const fresh = await SiteHeaderBannerCampaignModel.findById(campaignId).session(session);
@@ -117,14 +123,30 @@ export async function approveSiteHeaderBannerCampaign({ staffUserId, campaignId 
         session,
       });
 
+      const cashback = await creditReferralCashbackFromSpend({
+        spenderUserId: String(fresh.advertiserId),
+        pointsSpent: amount,
+        sourceKind: REFERRAL_SOURCE_KIND_SITE_HEADER_BANNER,
+        sourceId: String(fresh._id),
+        session,
+      });
+
       const now = new Date();
       fresh.pointsChargedAt = now;
       fresh.approvedByUserId = staffUserId;
       await fresh.save(withMongoSession({}, session));
 
       const activated = await activateSiteHeaderBannerCampaignRecord(fresh._id, session);
-      return activated;
+      return { saved: activated, cashback };
     });
+
+    if (cashback?.deferNotification) {
+      await notifyReferralCashbackCredited({
+        referrerUserId: cashback.referrerUserId,
+        amount: cashback.amount,
+        spenderUserId: String(campaign.advertiserId),
+      });
+    }
 
     if (saved) {
       await notifySiteHeaderBannerCampaignApproved(saved);
@@ -213,6 +235,11 @@ export async function cancelSiteHeaderBannerCampaignByStaff({ staffUserId, campa
       await refundLoyaltyPoints({
         userId: String(campaign.advertiserId),
         amount,
+        session,
+      });
+      await reverseReferralCashbackForSource({
+        sourceKind: REFERRAL_SOURCE_KIND_SITE_HEADER_BANNER,
+        sourceId: String(campaign._id),
         session,
       });
     }

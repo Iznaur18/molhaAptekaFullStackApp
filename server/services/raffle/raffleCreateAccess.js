@@ -13,6 +13,11 @@ import {
   refundLoyaltyPoints,
 } from "../loyalty/loyaltyPointsSpend.js";
 import { getSellerLoyaltyPointsAvailable } from "../loyalty/loyaltyPointsSeller.js";
+import {
+  creditReferralCashbackFromSpend,
+} from "../referral/creditReferralCashbackFromSpend.js";
+import { reverseReferralCashbackForSource } from "../referral/reverseReferralCashbackForSource.js";
+import { REFERRAL_SOURCE_KIND_RAFFLE_CREATE_UNLOCK } from "../../constants/referralConstants.js";
 
 import {
   assertSellerCanCreateRaffle,
@@ -249,12 +254,12 @@ export const releaseRaffleCreatePriceIfNeeded = async ({ sellerId, raffle, sessi
  */
 export const chargeRaffleCreatePriceOnApproval = async ({ sellerId, raffle, session }) => {
   if (raffle.createPriceChargedAt != null || raffle.createPriceRefundedAt != null) {
-    return;
+    return { cashback: null };
   }
 
   const pricePoints = Math.ceil(Number(raffle.createPricePoints) || RAFFLE_CREATE_PRICE_POINTS);
   if (pricePoints <= 0) {
-    return;
+    return { cashback: null };
   }
 
   try {
@@ -274,11 +279,21 @@ export const chargeRaffleCreatePriceOnApproval = async ({ sellerId, raffle, sess
     });
   }
 
+  const cashback = await creditReferralCashbackFromSpend({
+    spenderUserId: sellerId,
+    pointsSpent: pricePoints,
+    sourceKind: REFERRAL_SOURCE_KIND_RAFFLE_CREATE_UNLOCK,
+    sourceId: String(raffle._id),
+    session,
+  });
+
   await RaffleModel.updateOne(
     { _id: raffle._id },
     { $set: { createPriceChargedAt: new Date() } },
     { session: session ?? undefined },
   );
+
+  return { cashback };
 };
 
 /**
@@ -296,6 +311,11 @@ export const refundRaffleCreatePriceIfNeeded = async ({ sellerId, raffle, sessio
 
   if (raffle.createPriceChargedAt != null) {
     await refundLoyaltyPoints({ userId: sellerId, amount: pricePoints, session });
+    await reverseReferralCashbackForSource({
+      sourceKind: REFERRAL_SOURCE_KIND_RAFFLE_CREATE_UNLOCK,
+      sourceId: String(raffle._id),
+      session,
+    });
   } else {
     await releaseLoyaltyPointsReservation({ userId: sellerId, amount: pricePoints, session });
   }

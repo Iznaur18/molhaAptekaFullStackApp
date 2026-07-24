@@ -97,6 +97,13 @@ const PendingRegistrationSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+    /** Код реферера на момент заявки (применяется только при confirm). */
+    referralCode: {
+      type: String,
+      default: null,
+      trim: true,
+      uppercase: true,
+    },
   },
   { timestamps: true },
 );

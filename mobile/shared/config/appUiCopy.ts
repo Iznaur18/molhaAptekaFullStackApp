@@ -1053,6 +1053,7 @@ export const MY_PROFILE_PAGE_UI = {
   TAB_WISHLIST: "Мои желания",
   TAB_PREMIUM: "Премиум",
   TAB_LOYALTY_POINTS: "Баллы",
+  TAB_PARTNER_PROGRAM: "Партнёрская программа",
   TAB_ADVERTISING: "Реклама",
   EDIT_PROFILE: "Изменить профиль",
   LOGOUT: "Выйти",
@@ -1873,6 +1874,40 @@ export const LOYALTY_POINTS_PAGE_UI = {
     "Реклама в intro",
     "Бонус за покупку у продавца (поле на товаре)",
   ],
+} as const;
+
+export const PARTNER_PROGRAM_PAGE_UI = {
+  ARIA: "Партнёрская программа",
+  LOGIN_HINT: "Войдите, чтобы открыть партнёрскую программу.",
+  LOGIN_BUTTON: "Войти",
+  LOADING: "Загрузка…",
+  LOAD_ERROR: "Не удалось загрузить партнёрскую программу",
+  BALANCE_CAPTION: "Партнёрский баланс",
+  BALANCE_UNIT: "ед.",
+  INFO: (percent: number) =>
+    `${percent}% от трат приглашённых на услуги платформы. Конвертация в баллы 1:1.`,
+  STATS_TITLE: "Сводка",
+  STAT_REFERRALS: "Рефералы",
+  STAT_SPEND: "Их траты",
+  STAT_EARNED: "Ваш кэшбэк",
+  INVITE_TITLE: "Ваша ссылка",
+  INVITE_HINT: "Отправьте друзьям — кэшбэк начисляется с их трат на услуги платформы.",
+  COPY_BUTTON: "Копировать",
+  SHARE_BUTTON: "Поделиться",
+  COPIED: "Ссылка скопирована",
+  COPY_FAILED: "Не удалось скопировать",
+  CONVERT_SECTION: "Конвертация в баллы",
+  CONVERT_LABEL: "Сумма",
+  CONVERT_HINT: "1 партнёрская единица = 1 балл лояльности. Вывод наличными недоступен.",
+  CONVERT_BUTTON: "Конвертировать",
+  CONVERT_PENDING: "Конвертируем…",
+  CONVERT_SUCCESS: "Готово: баланс конвертирован в баллы",
+  CONVERT_ERROR: "Не удалось конвертировать",
+  LIST_TITLE: "Ваши рефералы",
+  LIST_EMPTY: "Пока никого нет — поделитесь ссылкой",
+  COL_DATE: "Регистрация",
+  COL_SPEND: "Траты",
+  COL_CASHBACK: "Кэшбэк",
 } as const;
 
 export const USER_DATA_CONFIRMATION_PROFILE_PAGE_UI = {

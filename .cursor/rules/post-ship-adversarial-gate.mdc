@@ -1,0 +1,58 @@
+---
+description: Жёсткий gate после фичи/рефактора — adversarial smoke до «готово», без silent fail и env-локальных иллюзий
+alwaysApply: true
+---
+
+# Post-ship gate (adversarial)
+
+Когда пользователь говорит **«перепроверь» / «на 100%» / «готово?» / «проверь по шпаргалкам»** — **не отвечай «ок»**. Сначала пройди gate и выдай отчёт. Без green gate — статус **не ready**.
+
+## Обязательный отчёт (коротко)
+
+```
+GATE:
+- env matrix: …
+- money/auth path: …
+- silent catch: …
+- deps/resolve: …
+- tests run: …
+VERDICT: ready | blocked (что чинить)
+```
+
+## Чеклист (все релевантные пункты)
+
+### 1. Env matrix (не только localhost)
+- Web: `localhost` **и** LAN `http://192.168.x.x` (не secure context).
+- Не полагайся на `crypto.randomUUID`, `navigator.clipboard`, `navigator.share` без fallback.
+- Env-списки через запятую (`FRONTEND_URL=a,b,c`) — для URL/redirect бери **первый origin**, не всю строку.
+
+### 2. Money / auth / ledger
+- Convert / credit / refund / reverse: идемпотентность, txn или явный fallback без replica.
+- После успеха UI **обновляет баланс** (invalidate query / callback).
+- Ошибки **видимы** пользователю (не пустой `catch {}`).
+
+### 3. Silent failure ban
+```js
+// ❌
+try { await doThing(); } catch {}
+
+// ✅
+try { await doThing(); } catch (e) { showError(e); throw/log; }
+```
+
+### 4. Deps & bundle
+- Новый import → пакет есть в `package.json` целевого app (mobile/client).
+- Не тяни native-only пакет, если в проекте уже есть SecureStore/localStorage паттерн.
+
+### 5. Client ↔ mobile parity
+- Одинаковый UX-критпуть (copy/share/convert) на обеих платформах, shared constants где надо.
+
+### 6. Runtime proof
+- Хотя бы один реальный вызов API/unit/integration по критичному пути **или** явный ручной smoke-скрипт в отчёте.
+- «Прочитал код» ≠ proof.
+
+## Анти-паттерны ревью
+
+- «Выглядит правильно» без прогона пути.
+- Чинить только то, что пользователь уже нашёл, игноря соседний тот же класс бага.
+- Считать localhost-поведение достаточным для LAN/prod.

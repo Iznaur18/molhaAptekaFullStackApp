@@ -230,6 +230,14 @@ export const buildProfileNavGroups = (
         },
       ];
     }
+    if (sectionId === "partner-program" && access.canUsePartnerProgram) {
+      return [
+        {
+          sectionId,
+          label: MY_PROFILE_PAGE_UI.TAB_PARTNER_PROGRAM,
+        },
+      ];
+    }
     if (sectionId === "advertising" && access.canUseAdvertising) {
       return [
         {

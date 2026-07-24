@@ -293,6 +293,27 @@ const UserSchema = new mongoose.Schema(
       min: 0,
     },
 
+    /** Уникальный код партнёрской ссылки (выдаётся лениво). */
+    referralCode: {
+      type: String,
+      default: null,
+      trim: true,
+      uppercase: true,
+    },
+    /** Кто пригласил пользователя (один раз при регистрации). */
+    referredByUserId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+      index: true,
+    },
+    /** Партнёрский баланс (кэшбэк) — конвертация 1:1 в баллы. */
+    partnerBalance: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
     // - - - Сессия / refresh rotation - - -
     authTokenVersion: {
       type: Number,
@@ -344,5 +365,18 @@ UserSchema.index({ userLastLoginAt: -1 });
 // Индекс для поиска премиум пользователей
 UserSchema.index({ isPremiumUser: 1 });
 UserSchema.index({ isPremiumUser: 1, premiumExpiresAt: 1 });
+
+// Уникальность только среди реальных кодов (не null) — иначе duplicate null на sparse.
+UserSchema.index(
+  { referralCode: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { referralCode: { $type: "string" } },
+  },
+);
+
+// Список рефералов партнёрки: filter by referrer + sort by registration date.
+UserSchema.index({ referredByUserId: 1, createdAt: -1 });
+
 
 export const UserModel = mongoose.model("User", UserSchema); // Модель пользователя для MongoDB

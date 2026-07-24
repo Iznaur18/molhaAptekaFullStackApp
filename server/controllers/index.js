@@ -74,6 +74,7 @@ import {
   patchProductSearchSynonymAdminController,
   deleteProductSearchSynonymAdminController,
 } from "./Product/productSearchSynonymAdminControllers.js";
+import { listStaffAuditLogController } from "./Audit/staffAuditControllers.js";
 import {
   getHomeCuratedProductListsController,
   listCuratedProductListsAdminController,
@@ -175,6 +176,10 @@ import {
   purchasePremiumController,
 } from "./User/premiumControllers.js";
 import { getMyLoyaltyPointsStatusController, adminCreditOwnLoyaltyPointsController } from "./User/loyaltyPointsPurchaseControllers.js";
+import {
+  getMyReferralProgramController,
+  convertPartnerBalanceController,
+} from "./User/referralControllers.js";
 import { getMonthlyLoyaltyPointsAwardedController } from "./User/monthlyLoyaltyPointsControllers.js";
 import {
   followUserController,
@@ -353,6 +358,8 @@ export {
   purchasePremiumController,
   getMyLoyaltyPointsStatusController,
   adminCreditOwnLoyaltyPointsController,
+  getMyReferralProgramController,
+  convertPartnerBalanceController,
   getMonthlyLoyaltyPointsAwardedController,
   followUserController,
   unfollowUserController,
@@ -391,4 +398,5 @@ export {
   getPendingInstallmentDisputesController,
   getPendingInstallmentDisputesCountController,
   resolveInstallmentDisputeController,
+  listStaffAuditLogController,
 };

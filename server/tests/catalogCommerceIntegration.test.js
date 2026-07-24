@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { after, afterEach, before, test } from "node:test";
 
 import { PRODUCT_MODERATION_PENDING } from "../constants/productModerationConstants.js";
+import { SELLER_PRODUCTS_LIMIT_REGULAR } from "../constants/productConstants.js";
 import { ProductModel } from "../models/index.js";
 import { startHttpTestServer, stopHttpTestServer } from "./helpers/httpTestApp.js";
 import {
@@ -105,7 +106,7 @@ test("commerce: PUT /cart → POST /order (approved product)", async () => {
   assert.equal(orderData.order.items.length, 1);
 });
 
-test("seller limit: 16-й POST /product → 403", async () => {
+test("seller limit: POST /product сверх лимита → 403", async () => {
   await seedCatalogFixture();
 
   const { cookie: sellerCookie } = await registerUserAndGetCookie(
@@ -114,7 +115,7 @@ test("seller limit: 16-й POST /product → 403", async () => {
   );
   await verifyUserEmail("int-seller-limit@example.com");
 
-  for (let i = 0; i < 15; i += 1) {
+  for (let i = 0; i < SELLER_PRODUCTS_LIMIT_REGULAR; i += 1) {
     const response = await request("/product", {
       method: "POST",
       headers: {
@@ -136,7 +137,11 @@ test("seller limit: 16-й POST /product → 403", async () => {
       "Content-Type": "application/json",
       Cookie: sellerCookie,
     },
-    body: JSON.stringify(buildTestProductPayload({ productName: "Limit Product 16" })),
+    body: JSON.stringify(
+      buildTestProductPayload({
+        productName: `Limit Product ${SELLER_PRODUCTS_LIMIT_REGULAR + 1}`,
+      }),
+    ),
   });
   assert.equal(blocked.status, 403);
   const message = await parseErrorMessage(blocked);

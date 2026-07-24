@@ -13,6 +13,9 @@ import {
   generateEmailVerificationCode,
   hashEmailVerificationSecret,
 } from "./emailVerification.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
+import { attachReferralAttribution } from "../referral/attachReferralAttribution.js";
+import { ensureUserReferralCode } from "../referral/ensureUserReferralCode.js";
 
 const PENDING_CODE_PATTERN = new RegExp(`^\\d{${EMAIL_VERIFICATION_CODE_LENGTH}}$`);
 
@@ -48,6 +51,7 @@ function buildTakenConditions({ email, userName, userPhoneNumber }) {
  *   userAddressFlat?: string;
  *   userAddressFiasId?: string;
  *   userAddressGeo?: { lat: number; lon: number } | null;
+ *   referralCode?: string | null;
  * }} fields
  * @returns {Promise<{ registrationId: string; email: string }>}
  */
@@ -69,12 +73,18 @@ export async function createPendingRegistration(fields) {
   const codeHash = hashEmailVerificationSecret(code);
   const expiresAt = new Date(Date.now() + PENDING_REGISTRATION_TTL_MS);
 
+  const referralCodeRaw = String(fields.referralCode ?? "")
+    .trim()
+    .toUpperCase();
+  const referralCode = referralCodeRaw || null;
+
   const pending = await PendingRegistrationModel.findOneAndUpdate(
     { email },
     {
       $set: {
         ...fields,
         email,
+        referralCode,
         codeHash,
         codeAttemptCount: 0,
         expiresAt,
@@ -195,6 +205,23 @@ export async function confirmPendingRegistration(registrationId, rawCode) {
   }
 
   await PendingRegistrationModel.findByIdAndDelete(pending._id);
+
+  // Аккаунт уже создан — attribution/code не должны откатывать confirm.
+  try {
+    if (pending.referralCode) {
+      await attachReferralAttribution({
+        userId: String(user._id),
+        referralCode: pending.referralCode,
+      });
+    }
+    await ensureUserReferralCode(String(user._id));
+  } catch (error) {
+    logServerEvent("error", {
+      event: "referral_post_registration_failed",
+      userId: String(user._id),
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
 
   return user;
 }

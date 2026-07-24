@@ -5,6 +5,7 @@ import { MyProductsPage } from "@/features/my-products-page/ui/MyProductsPage";
 import { MySalesPage } from "@/features/my-sales-page/ui/MySalesPage";
 import { AdvertisingPage } from "@/features/advertising-page/ui/AdvertisingPage";
 import { PremiumPage } from "@/features/premium-page/ui/PremiumPage";
+import { PartnerProgramPage } from "@/features/partner-program-page/ui/PartnerProgramPage";
 import { LoyaltyPointsPage } from "@/features/loyalty-points-page/ui/LoyaltyPointsPage";
 import { DataConfirmationPage } from "@/features/data-confirmation-page/ui/DataConfirmationPage";
 import { CreateRafflePage } from "@/features/create-raffle-page/ui/CreateRafflePage";
@@ -56,6 +57,8 @@ export const HubSectionContent = ({
       return <PremiumPage />;
     case "loyalty-points":
       return <LoyaltyPointsPage />;
+    case "partner-program":
+      return <PartnerProgramPage />;
     case "data-confirmation":
       return <DataConfirmationPage />;
     case "auction":

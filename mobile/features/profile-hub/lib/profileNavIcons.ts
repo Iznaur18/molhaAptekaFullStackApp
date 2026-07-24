@@ -16,6 +16,7 @@ const PROFILE_NAV_ICON_MAP: Partial<Record<ProfileSectionId | "logout", ProfileN
   "data-confirmation": "verified-user",
   premium: "workspace-premium",
   "loyalty-points": "auto-awesome",
+  "partner-program": "group",
   advertising: "campaign",
   "edit-profile": "edit",
   "create-raffle": "card-giftcard",

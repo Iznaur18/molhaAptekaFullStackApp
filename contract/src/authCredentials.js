@@ -40,6 +40,14 @@ export const registerBodySchema = z
     userAddress: deliveryAddressLineFieldSchema,
     userAddressFlat: deliveryAddressFlatFieldSchema,
     notificationsEnabled: z.boolean().optional(),
+    referralCode: z
+      .string()
+      .trim()
+      .max(32)
+      .optional()
+      .or(z.literal(""))
+      .or(z.null())
+      .optional(),
   })
   .superRefine((data, ctx) => {
     if (data.passwordConfirm !== data.password) {

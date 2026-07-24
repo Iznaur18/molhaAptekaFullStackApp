@@ -10,11 +10,16 @@ import {
   PREMIUM_EXPIRY_REMINDER_DAYS,
   PREMIUM_PRICE_POINTS,
 } from "../../constants/premiumConstants.js";
+import { REFERRAL_SOURCE_KIND_PREMIUM } from "../../constants/referralConstants.js";
 import { runInTransaction } from "../../utils/mongoTransaction.js";
 import {
   deductLoyaltyPoints,
   InsufficientLoyaltyPointsError,
 } from "../loyalty/loyaltyPointsSpend.js";
+import {
+  creditReferralCashbackFromSpend,
+  notifyReferralCashbackCredited,
+} from "../referral/creditReferralCashbackFromSpend.js";
 import { backgroundValueAfterPremiumChange } from "./userBackgroundValue.js";
 import { createUserInAppNotification } from "./userInAppNotifications.js";
 
@@ -182,7 +187,27 @@ export const purchasePremiumSubscription = async (userId) => {
       { session },
     );
 
-    return { loyaltyPointsBalance, premiumExpiresAt };
+    const cashback = await creditReferralCashbackFromSpend({
+      spenderUserId: userId,
+      pointsSpent: PREMIUM_PRICE_POINTS,
+      sourceKind: REFERRAL_SOURCE_KIND_PREMIUM,
+      sourceId: `premium:${userId}:${premiumExpiresAt.toISOString()}`,
+      session,
+    });
+
+    return { loyaltyPointsBalance, premiumExpiresAt, cashback };
+  }).then(async (result) => {
+    if (result.cashback?.deferNotification) {
+      await notifyReferralCashbackCredited({
+        referrerUserId: result.cashback.referrerUserId,
+        amount: result.cashback.amount,
+        spenderUserId: userId,
+      });
+    }
+    return {
+      loyaltyPointsBalance: result.loyaltyPointsBalance,
+      premiumExpiresAt: result.premiumExpiresAt,
+    };
   });
 };
 

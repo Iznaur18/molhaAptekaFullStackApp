@@ -154,6 +154,22 @@
   word-break: break-all;
 }
 
+.product-details-modal__meta-value-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  word-break: normal;
+}
+
+.product-details-modal__meta-value-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .product-details-modal__key {
   margin: 0;
 }

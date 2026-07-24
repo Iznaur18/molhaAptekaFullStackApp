@@ -7,9 +7,11 @@ import {
   PRODUCT_PROMOTION_STATUS_CANCELLED_BY_ADMIN,
   PRODUCT_PROMOTION_STATUS_EXPIRED,
 } from "../../constants/productPromotionConstants.js";
-import { withMongoSession } from "../../utils/mongoTransaction.js";
+import { runInTransaction, withMongoSession } from "../../utils/mongoTransaction.js";
 import { refundLoyaltyPoints } from "../loyalty/loyaltyPointsSpend.js";
 import { refundRubBalance } from "../loyalty/rubBalanceSpend.js";
+import { reverseReferralCashbackForSource } from "../referral/reverseReferralCashbackForSource.js";
+import { REFERRAL_SOURCE_KIND_PRODUCT_PROMOTION } from "../../constants/referralConstants.js";
 import { createUserInAppNotification } from "../user/userInAppNotifications.js";
 
 export const PRODUCT_PROMOTION_NOTIFICATION_KIND_REMINDER =
@@ -61,27 +63,36 @@ export const setProductPromotionForProduct = async ({
  */
 export const refundProductPromotionPointsIfNeeded = async (promotionId) => {
   const now = new Date();
-  const promotion = await ProductPromotionModel.findOneAndUpdate(
-    {
-      _id: promotionId,
-      paymentMethod: PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS,
-      pointsChargedAt: { $ne: null },
-      pointsRefundedAt: null,
-      activatedAt: null,
-      amountPoints: { $gt: 0 },
-    },
-    { $set: { pointsRefundedAt: now } },
-  ).lean();
+  return runInTransaction(async (session) => {
+    const promotion = await ProductPromotionModel.findOneAndUpdate(
+      {
+        _id: promotionId,
+        paymentMethod: PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS,
+        pointsChargedAt: { $ne: null },
+        pointsRefundedAt: null,
+        activatedAt: null,
+        amountPoints: { $gt: 0 },
+      },
+      { $set: { pointsRefundedAt: now } },
+      withMongoSession({}, session),
+    ).lean();
 
-  if (!promotion) {
-    return false;
-  }
+    if (!promotion) {
+      return false;
+    }
 
-  await refundLoyaltyPoints({
-    userId: String(promotion.sellerId),
-    amount: promotion.amountPoints,
+    await refundLoyaltyPoints({
+      userId: String(promotion.sellerId),
+      amount: promotion.amountPoints,
+      session,
+    });
+    await reverseReferralCashbackForSource({
+      sourceKind: REFERRAL_SOURCE_KIND_PRODUCT_PROMOTION,
+      sourceId: String(promotion._id),
+      session,
+    });
+    return true;
   });
-  return true;
 };
 
 /**

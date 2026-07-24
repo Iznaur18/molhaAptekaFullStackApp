@@ -35,9 +35,11 @@ import {
   AppError,
 } from "./errorHandlerMW.js";
 import { requestIdMW } from "./requestIdMW.js";
+import { auditStaffActionMW } from "./auditStaffActionMW.js";
 
 export {
   requestIdMW,
+  auditStaffActionMW,
   uploadMW,
   uploadVideoMW,
   checkAuthMW,

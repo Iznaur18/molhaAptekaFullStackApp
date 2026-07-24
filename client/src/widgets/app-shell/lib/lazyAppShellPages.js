@@ -55,6 +55,11 @@ export const LazyAdminOrdersPage = lazyNamedExport(
   "AdminOrdersPage",
 );
 
+export const LazyStaffAuditLogAdminPage = lazyNamedExport(
+  () => import("../../../pages/staff-audit-log-admin/ui/StaffAuditLogAdminPage.jsx"),
+  "StaffAuditLogAdminPage",
+);
+
 export const LazySearchSynonymsAdminPage = lazyNamedExport(
   () => import("../../../pages/search-synonyms-admin/ui/SearchSynonymsAdminPage.jsx"),
   "SearchSynonymsAdminPage",
@@ -133,6 +138,11 @@ export const LazyPremiumPage = lazyNamedExport(
 export const LazyLoyaltyPointsPage = lazyNamedExport(
   () => import("../../../pages/loyalty-points/ui/LoyaltyPointsPage.jsx"),
   "LoyaltyPointsPage",
+);
+
+export const LazyPartnerProgramPage = lazyNamedExport(
+  () => import("../../../pages/partner-program/ui/PartnerProgramPage.jsx"),
+  "PartnerProgramPage",
 );
 
 export const LazyAdvertisingPage = lazyNamedExport(

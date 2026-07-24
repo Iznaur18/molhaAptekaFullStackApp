@@ -19,6 +19,7 @@ export const checkAdminMW = async (req, res, next) => {
     }
 
     req.userRole = user.userRole;
+    req.staffAudit = { role: user.userRole };
     return next();
   } catch (error) {
     return next(error);

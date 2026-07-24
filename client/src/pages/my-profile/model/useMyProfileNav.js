@@ -50,6 +50,7 @@ import { getActiveProfileNavLabel } from "../lib/getActiveProfileNavLabel.js";
  *   onDataConfirmationClick?: () => void;
  *   onPremiumClick?: () => void;
  *   onLoyaltyPointsClick?: () => void;
+ *   onPartnerProgramClick?: () => void;
  *   onAdvertisingClick?: () => void;
  *   onEditProfileClick?: () => void;
  * }} params
@@ -99,6 +100,7 @@ export function useMyProfileNav({
   onDataConfirmationClick,
   onPremiumClick,
   onLoyaltyPointsClick,
+  onPartnerProgramClick,
   onAdvertisingClick,
   onEditProfileClick,
 }) {
@@ -118,6 +120,9 @@ export function useMyProfileNav({
     isProfileReady &&
     user?.userRole === "admin" &&
     Boolean(onAdminOrdersClick);
+  // Read-only журнал аудита: без prefetch-колбэка, гейт только по роли admin.
+  const canUseStaffAuditLogAdmin =
+    !isRegularUser && isProfileReady && user?.userRole === "admin";
   const canUseSearchSynonymsAdmin =
     !isRegularUser &&
     isProfileReady &&
@@ -143,6 +148,7 @@ export function useMyProfileNav({
   const canUseDataConfirmation = isProfileReady && Boolean(onDataConfirmationClick);
   const canUsePremium = isProfileReady && Boolean(onPremiumClick);
   const canUseLoyaltyPoints = isProfileReady && Boolean(onLoyaltyPointsClick);
+  const canUsePartnerProgram = isProfileReady && Boolean(onPartnerProgramClick);
   const canUseAdvertising = isProfileReady && Boolean(onAdvertisingClick);
   const canUseProductModeration =
     !isRegularUser && isProfileReady && Boolean(onProductModerationClick);
@@ -179,6 +185,7 @@ export function useMyProfileNav({
         canUseDataConfirmationQueue,
         canUseInstallmentDisputes,
         canUseAdminOrders,
+        canUseStaffAuditLogAdmin,
         canUseSearchSynonymsAdmin,
         canUseCategoryTreeAdmin,
         canUseAppIntroAdmin,
@@ -190,6 +197,7 @@ export function useMyProfileNav({
         isUserDataConfirmed,
         canUsePremium,
         canUseLoyaltyPoints,
+        canUsePartnerProgram,
         canUseAdvertising,
         canUseEditProfile,
         showEditOnBanner,
@@ -233,6 +241,7 @@ export function useMyProfileNav({
         onDataConfirmationClick,
         onPremiumClick,
         onLoyaltyPointsClick,
+        onPartnerProgramClick,
         onAdvertisingClick,
         onEditProfileClick,
       }),
@@ -251,6 +260,7 @@ export function useMyProfileNav({
       canUseInstallmentPayments,
       canUseInstallmentSales,
       canUseLoyaltyPoints,
+      canUsePartnerProgram,
       canUseAdvertising,
       canUseMyOrders,
       canUseMyProducts,
@@ -260,6 +270,7 @@ export function useMyProfileNav({
       canUseProductReports,
       canUseProductPromotions,
       canUseRaffles,
+      canUseStaffAuditLogAdmin,
       canUseSearchSynonymsAdmin,
       canUseSubscriptions,
       canUseWishlist,
@@ -277,6 +288,7 @@ export function useMyProfileNav({
       onInstallmentPaymentsClick,
       onInstallmentSalesClick,
       onLoyaltyPointsClick,
+      onPartnerProgramClick,
       onAdvertisingClick,
       onIntroAdModerationClick,
       onSellerPersonalCategoryModerationClick,

@@ -33,6 +33,8 @@ import { SiteHeaderBannerCampaignModel } from "./SiteHeaderBannerCampaignModel.j
 import { IntroAdCampaignModel } from "./IntroAdCampaignModel.js";
 import { SellerPersonalCategoryModel } from "./SellerPersonalCategoryModel.js";
 import { SellerPersonalCategoryCampaignModel } from "./SellerPersonalCategoryCampaignModel.js";
+import StaffAuditLogModel from "./StaffAuditLogModel.js";
+import ReferralLedgerEntryModel from "./ReferralLedgerEntryModel.js";
 
 export {
   UserModel,
@@ -70,4 +72,6 @@ export {
   IntroAdCampaignModel,
   SellerPersonalCategoryModel,
   SellerPersonalCategoryCampaignModel,
+  StaffAuditLogModel,
+  ReferralLedgerEntryModel,
 };

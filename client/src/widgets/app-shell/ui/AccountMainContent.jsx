@@ -72,6 +72,7 @@ export function AccountMainContent({
   handlePremiumFromProfile,
   handlePremiumPurchased,
   handleLoyaltyPointsFromProfile,
+  handlePartnerProgramFromProfile,
   handleAdvertisingFromProfile,
   handleIntroAdModerationFromProfile,
   handleSellerPersonalCategoryModerationFromProfile,
@@ -203,6 +204,7 @@ export function AccountMainContent({
         }
         onPremiumClick={isAuthorized ? handlePremiumFromProfile : undefined}
         onLoyaltyPointsClick={isAuthorized ? handleLoyaltyPointsFromProfile : undefined}
+        onPartnerProgramClick={isAuthorized ? handlePartnerProgramFromProfile : undefined}
         onAdvertisingClick={isAuthorized ? handleAdvertisingFromProfile : undefined}
         onIntroAdModerationClick={
           canModerateProducts ? handleIntroAdModerationFromProfile : undefined

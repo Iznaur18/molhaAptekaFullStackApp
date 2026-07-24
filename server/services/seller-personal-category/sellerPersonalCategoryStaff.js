@@ -26,6 +26,12 @@ import {
 } from "../loyalty/loyaltyPointsReserve.js";
 import { refundLoyaltyPoints } from "../loyalty/loyaltyPointsSpend.js";
 import { InsufficientLoyaltyPointsError } from "../loyalty/loyaltyPointsSpend.js";
+import {
+  creditReferralCashbackFromSpend,
+  notifyReferralCashbackCredited,
+} from "../referral/creditReferralCashbackFromSpend.js";
+import { reverseReferralCashbackForSource } from "../referral/reverseReferralCashbackForSource.js";
+import { REFERRAL_SOURCE_KIND_SELLER_PERSONAL_CATEGORY } from "../../constants/referralConstants.js";
 import { runInTransaction, withMongoSession } from "../../utils/mongoTransaction.js";
 
 const DEFAULT_MODERATION_LIMIT = 50;
@@ -91,10 +97,18 @@ export async function approveSellerPersonalCategoryCampaign({ staffUserId, campa
     .lean();
 
   try {
-    const saved = await runInTransaction(async (session) => {
+    const { saved, cashback } = await runInTransaction(async (session) => {
       await chargeReservedLoyaltyPoints({
         userId: String(campaign.sellerId),
         amount,
+        session,
+      });
+
+      const cashback = await creditReferralCashbackFromSpend({
+        spenderUserId: String(campaign.sellerId),
+        pointsSpent: amount,
+        sourceKind: REFERRAL_SOURCE_KIND_SELLER_PERSONAL_CATEGORY,
+        sourceId: String(campaignId),
         session,
       });
 
@@ -110,8 +124,16 @@ export async function approveSellerPersonalCategoryCampaign({ staffUserId, campa
         withMongoSession({}, session),
       );
 
-      return activated;
+      return { saved: activated, cashback };
     });
+
+    if (cashback?.deferNotification) {
+      await notifyReferralCashbackCredited({
+        referrerUserId: cashback.referrerUserId,
+        amount: cashback.amount,
+        spenderUserId: String(campaign.sellerId),
+      });
+    }
 
     await notifySellerPersonalCategoryApproved(saved);
 
@@ -197,6 +219,11 @@ const refundSellerPersonalCategoryCampaignIfCharged = async ({ campaign, session
   await refundLoyaltyPoints({
     userId: String(campaign.sellerId),
     amount,
+    session,
+  });
+  await reverseReferralCashbackForSource({
+    sourceKind: REFERRAL_SOURCE_KIND_SELLER_PERSONAL_CATEGORY,
+    sourceId: String(campaign._id),
     session,
   });
 };

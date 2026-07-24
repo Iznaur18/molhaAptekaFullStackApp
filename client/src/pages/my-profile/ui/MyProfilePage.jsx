@@ -48,6 +48,7 @@ import "./MyProfilePage.css";
  * onDataConfirmationClick?: () => void;
  * onPremiumClick?: () => void;
  * onLoyaltyPointsClick?: () => void;
+ * onPartnerProgramClick?: () => void;
  * onAdvertisingClick?: () => void;
  * onIntroAdModerationClick?: () => void;
  * onSellerPersonalCategoryModerationClick?: () => void;
@@ -100,6 +101,7 @@ export function MyProfilePage({
   onDataConfirmationClick,
   onPremiumClick,
   onLoyaltyPointsClick,
+  onPartnerProgramClick,
   onAdvertisingClick,
   onIntroAdModerationClick,
   onSellerPersonalCategoryModerationClick,
@@ -200,6 +202,7 @@ export function MyProfilePage({
     onDataConfirmationClick,
     onPremiumClick,
     onLoyaltyPointsClick,
+    onPartnerProgramClick,
     onAdvertisingClick,
     onEditProfileClick,
   });

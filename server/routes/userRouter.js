@@ -28,6 +28,8 @@ import {
   purchasePremiumController,
   getMyLoyaltyPointsStatusController,
   adminCreditOwnLoyaltyPointsController,
+  getMyReferralProgramController,
+  convertPartnerBalanceController,
   getMonthlyLoyaltyPointsAwardedController,
 } from "../controllers/index.js";
 import {
@@ -54,6 +56,7 @@ import {
   submitUserStoryReportValidation,
   resolveUserStoryReportsValidation,
   adminCreditLoyaltyPointsValidation,
+  convertPartnerBalanceValidation,
 } from "../validations/index.js";
 
 const router = createAsyncRouter();
@@ -182,6 +185,14 @@ router.post(
   checkAdminMW,
   adminCreditLoyaltyPointsValidation,
   adminCreditOwnLoyaltyPointsController,
+);
+
+router.get("/me/referral", checkAuthMW, getMyReferralProgramController);
+router.post(
+  "/me/referral/convert",
+  checkAuthMW,
+  convertPartnerBalanceValidation,
+  convertPartnerBalanceController,
 );
 
 router.get(

@@ -4,10 +4,9 @@ export const PRODUCT_IMAGE_URLS_MAX = 5;
 /** Максимальная длительность превью-видео на карточке товара (сек). */
 export const PRODUCT_PREVIEW_VIDEO_MAX_DURATION_SEC = 3;
 
-export const SELLER_PRODUCTS_LIMIT_REGULAR = 15;
-export const SELLER_PRODUCTS_LIMIT_PREMIUM = 30;
-export const SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE =
-  "Достигнут лимит товаров: 15 для обычных пользователей, 30 для премиум.";
+export const SELLER_PRODUCTS_LIMIT_REGULAR = 50;
+export const SELLER_PRODUCTS_LIMIT_PREMIUM = 100;
+export const SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE = `Достигнут лимит товаров: ${SELLER_PRODUCTS_LIMIT_REGULAR} для обычных пользователей, ${SELLER_PRODUCTS_LIMIT_PREMIUM} для премиум.`;
 
 export const PRODUCT_NAME_MIN_LENGTH = 3;
 export const PRODUCT_NAME_MAX_LENGTH = 100;

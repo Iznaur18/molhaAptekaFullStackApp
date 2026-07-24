@@ -17,6 +17,8 @@ import {
   releaseLoyaltyPointsReservation,
 } from "../loyalty/loyaltyPointsReserve.js";
 import { refundLoyaltyPoints } from "../loyalty/loyaltyPointsSpend.js";
+import { reverseReferralCashbackForSource } from "../referral/reverseReferralCashbackForSource.js";
+import { REFERRAL_SOURCE_KIND_SITE_HEADER_BANNER } from "../../constants/referralConstants.js";
 import { runInTransaction, withMongoSession } from "../../utils/mongoTransaction.js";
 
 /**
@@ -256,6 +258,11 @@ export const cancelSiteHeaderBannerCampaignsForAdvertiser = async (advertiserId)
         await refundLoyaltyPoints({
           userId: String(advertiserId),
           amount,
+          session,
+        });
+        await reverseReferralCashbackForSource({
+          sourceKind: REFERRAL_SOURCE_KIND_SITE_HEADER_BANNER,
+          sourceId: String(row._id),
           session,
         });
       }

@@ -3,6 +3,7 @@ import * as Linking from "expo-linking";
 import { useEffect } from "react";
 
 import { parseAppDeepLink } from "@/features/deep-linking/lib/parseAppDeepLink";
+import { captureReferralCodeFromUrl } from "@/shared/lib/referralCodeStorage";
 
 const navigateToDeepLink = (
   router: ReturnType<typeof useRouter>,
@@ -21,6 +22,7 @@ export const useAppDeepLinking = (): void => {
 
   useEffect(() => {
     const handleUrl = (url: string) => {
+      void captureReferralCodeFromUrl(url);
       navigateToDeepLink(router, url);
     };
 

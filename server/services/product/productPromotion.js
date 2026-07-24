@@ -25,6 +25,11 @@ import {
   deductLoyaltyPoints,
   InsufficientLoyaltyPointsError,
 } from "../loyalty/loyaltyPointsSpend.js";
+import {
+  creditReferralCashbackFromSpend,
+  notifyReferralCashbackCredited,
+} from "../referral/creditReferralCashbackFromSpend.js";
+import { REFERRAL_SOURCE_KIND_PRODUCT_PROMOTION } from "../../constants/referralConstants.js";
 import { runInTransaction, withMongoSession } from "../../utils/mongoTransaction.js";
 import { createUserInAppNotification } from "../user/userInAppNotifications.js";
 
@@ -105,41 +110,59 @@ export async function requestProductPromotion({ userId, productId, tier: rawTier
   const promotionMessage = "Продвижение товара активировано";
 
   try {
-    const { promotion, loyaltyPointsBalance } = await runInTransaction(async (session) => {
-      const loyaltyPointsBalance = await deductLoyaltyPoints({
-        userId,
-        amount: amountPoints,
-        session,
+    const { promotion, loyaltyPointsBalance, cashback } = await runInTransaction(
+      async (session) => {
+        const loyaltyPointsBalance = await deductLoyaltyPoints({
+          userId,
+          amount: amountPoints,
+          session,
+        });
+
+        const [promotion] = await ProductPromotionModel.create(
+          [
+            {
+              productId,
+              sellerId: userId,
+              status: PRODUCT_PROMOTION_STATUS_ACTIVE,
+              tier,
+              tariffCode: duration.code,
+              tariffTitle: duration.title,
+              durationHours: duration.durationHours,
+              amountRub,
+              paymentMethod: PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS,
+              amountPoints,
+              pointsChargedAt: chargedAt,
+              rubChargedAt: null,
+            },
+          ],
+          withMongoSession({}, session),
+        );
+
+        await activateProductPromotionRecord(promotion, {
+          notificationMessage: promotionMessage,
+          session,
+          skipNotification: true,
+        });
+
+        const cashback = await creditReferralCashbackFromSpend({
+          spenderUserId: userId,
+          pointsSpent: amountPoints,
+          sourceKind: REFERRAL_SOURCE_KIND_PRODUCT_PROMOTION,
+          sourceId: String(promotion._id),
+          session,
+        });
+
+        return { promotion, loyaltyPointsBalance, cashback };
+      },
+    );
+
+    if (cashback?.deferNotification) {
+      await notifyReferralCashbackCredited({
+        referrerUserId: cashback.referrerUserId,
+        amount: cashback.amount,
+        spenderUserId: userId,
       });
-
-      const [promotion] = await ProductPromotionModel.create(
-        [
-          {
-            productId,
-            sellerId: userId,
-            status: PRODUCT_PROMOTION_STATUS_ACTIVE,
-            tier,
-            tariffCode: duration.code,
-            tariffTitle: duration.title,
-            durationHours: duration.durationHours,
-            amountRub,
-            paymentMethod: PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS,
-            amountPoints,
-            pointsChargedAt: chargedAt,
-            rubChargedAt: null,
-          },
-        ],
-        withMongoSession({}, session),
-      );
-
-      await activateProductPromotionRecord(promotion, {
-        notificationMessage: promotionMessage,
-        session,
-        skipNotification: true,
-      });
-
-      return { promotion, loyaltyPointsBalance };
-    });
+    }
 
     await createUserInAppNotification({
       userId: promotion.sellerId,

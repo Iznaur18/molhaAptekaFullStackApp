@@ -10,6 +10,7 @@ import { validateUserNameField } from "../lib/validateUserName.js";
 import { LOGIN_MODAL_UI, REGISTER_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { isAuthSessionError } from "../../../shared/lib/isAuthSessionError.js";
 import { keepDigitsOnly } from "../../../shared/lib/numericInput.js";
+import { clearPersistedReferralCode } from "../../../shared/lib/referralCodeStorage.js";
 import { FormFieldLabel } from "../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
 import { PasswordInputField } from "../../../shared/ui/PasswordInputField/PasswordInputField.jsx";
 import { ProductModalShell } from "../../../shared/ui/ProductModalShell/ProductModalShell.jsx";
@@ -145,6 +146,7 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
         registrationId: pendingRegistration.registrationId,
         code,
       });
+      clearPersistedReferralCode();
       setForm(INITIAL_FORM);
       setPendingRegistration(null);
       setCode("");

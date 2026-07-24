@@ -8,6 +8,7 @@ import {
   LazyInstallmentPaymentsPage,
   LazyInstallmentSalesPage,
   LazyLoyaltyPointsPage,
+  LazyPartnerProgramPage,
   LazyAdvertisingPage,
   LazyEditProfilePage,
   LazyIntroAdModerationPage,
@@ -18,6 +19,7 @@ import {
   LazyProductModerationPage,
   LazyProductReportsPage,
   LazyRafflesStaffPage,
+  LazyStaffAuditLogAdminPage,
   LazySearchSynonymsAdminPage,
   LazyAppIntroAdminPage,
   LazySiteHeaderBannerAdminPage,
@@ -106,6 +108,14 @@ export function renderProfileTabPanel(mainView, props) {
           onLoyaltyPointsBalanceChange={onLoyaltyPointsBalanceChange}
         />
       );
+    case "partner-program":
+      return (
+        <LazyPartnerProgramPage
+          isAuthorized={isAuthorized}
+          onRequestLogin={onRequestLogin}
+          onLoyaltyPointsBalanceChange={onLoyaltyPointsBalanceChange}
+        />
+      );
     case "advertising":
       return (
         <LazyAdvertisingPage
@@ -188,6 +198,8 @@ export function renderProfileTabPanel(mainView, props) {
       );
     case "admin-orders":
       return <LazyAdminOrdersPage />;
+    case "staff-audit-log-admin":
+      return <LazyStaffAuditLogAdminPage />;
     case "search-synonyms-admin":
       return <LazySearchSynonymsAdminPage />;
     case "category-tree-admin":

@@ -47,6 +47,7 @@
  * @property {string} [userAddress]
  * @property {string} [userAddressFlat]
  * @property {boolean} notificationsEnabled
+ * @property {string} [referralCode]
  */
 
 /**

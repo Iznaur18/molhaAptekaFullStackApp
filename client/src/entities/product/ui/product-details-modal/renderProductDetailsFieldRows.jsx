@@ -6,6 +6,9 @@ import {
   getProductDetailsModalValueClassName,
   getProductFieldLabel,
 } from "../../lib/productFieldRegistry.js";
+import { ProductDetailIdCopyButton } from "../ProductDetailIdCopyButton.jsx";
+
+const PRODUCT_ID_FIELD_KEY = "_id";
 
 /**
  * @param {import("../../model/types.js").ProductFromApi} product
@@ -26,6 +29,10 @@ export function renderProductDetailsFieldRows(product, keys, handlers) {
       typeof raw === "object" &&
       raw._id != null &&
       display !== COMMON_UI.EM_DASH;
+    const showIdCopy =
+      key === PRODUCT_ID_FIELD_KEY &&
+      display !== COMMON_UI.EM_DASH &&
+      display.length > 0;
 
     const ddClass = getProductDetailsModalValueClassName(key);
 
@@ -59,6 +66,13 @@ export function renderProductDetailsFieldRows(product, keys, handlers) {
             </li>
           ))}
         </ul>
+      );
+    } else if (showIdCopy) {
+      valueNode = (
+        <div className="product-details-modal__meta-value-row">
+          <span className="product-details-modal__meta-value-text">{display}</span>
+          <ProductDetailIdCopyButton productId={display} />
+        </div>
       );
     } else {
       valueNode = display;

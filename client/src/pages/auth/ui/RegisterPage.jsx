@@ -21,6 +21,7 @@ import {
 import { AUTH_LOGIN_PATH } from "../../../shared/lib/authPaths.js";
 import { isAuthSessionError } from "../../../shared/lib/isAuthSessionError.js";
 import { keepDigitsOnly } from "../../../shared/lib/numericInput.js";
+import { clearPersistedReferralCode } from "../../../shared/lib/referralCodeStorage.js";
 import { resolveUploadedImageUrl } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { useStableAuthHeroHeight } from "../../../shared/lib/useStableAuthHeroHeight.js";
 import { AuthHeroBanner } from "../../../shared/ui/AuthHeroBanner/AuthHeroBanner.jsx";
@@ -197,6 +198,7 @@ export function RegisterPage() {
         registrationId: pendingRegistration.registrationId,
         code,
       });
+      clearPersistedReferralCode();
       setForm(INITIAL_FORM);
       setPendingRegistration(null);
       setCode("");

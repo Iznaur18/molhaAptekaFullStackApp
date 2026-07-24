@@ -43,6 +43,7 @@ export const registerUserController = async (req, res) => {
     userBirthDate,
     userGender,
     notificationsEnabled,
+    referralCode,
   } = req.body;
 
   const normalizedUserName = String(userName).trim().toLowerCase();
@@ -72,6 +73,7 @@ export const registerUserController = async (req, res) => {
       userAddressFlat: req.verifiedDeliveryAddress?.flat ?? "",
       userAddressFiasId: req.verifiedDeliveryAddress?.fiasId ?? "",
       userAddressGeo: req.verifiedDeliveryAddress?.geo ?? null,
+      referralCode: referralCode ?? null,
     });
   } catch (registrationError) {
     const message =

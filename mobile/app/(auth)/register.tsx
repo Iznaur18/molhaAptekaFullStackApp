@@ -12,6 +12,7 @@ import { isRegisterConsentComplete } from "@/features/legal/lib/isRegisterConsen
 import { RegisterLegalConsentFields } from "@/features/legal/ui/RegisterLegalConsentFields";
 import { API_CLIENT_UI, AUTH_UI, EMAIL_VERIFICATION_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { clearPersistedReferralCode } from "@/shared/lib/referralCodeStorage";
 import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
 import { useStableAuthHeroHeight } from "@/shared/lib/useStableAuthHeroHeight";
 import { releaseColdStartSplash } from "@/shared/model/coldStartSplashGate";
@@ -94,7 +95,7 @@ export default function RegisterScreen() {
 
     try {
       const pending = await registerMutation.mutateAsync(
-        buildRegisterPayload({ email, userName, password, passwordConfirm }),
+        await buildRegisterPayload({ email, userName, password, passwordConfirm }),
       );
       // аккаунта ещё нет — переходим к вводу кода, в приложение не пускаем
       setPendingRegistration(pending);
@@ -122,6 +123,7 @@ export default function RegisterScreen() {
         registrationId: pendingRegistration.registrationId,
         code,
       });
+      await clearPersistedReferralCode();
       releaseColdStartSplash();
       router.replace("/(tabs)");
     } catch (error) {

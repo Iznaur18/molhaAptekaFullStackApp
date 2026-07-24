@@ -14,6 +14,7 @@ import {
   PROFILE_TAB_INSTALLMENT_PAYMENTS,
   PROFILE_TAB_INSTALLMENT_SALES,
   PROFILE_TAB_LOYALTY_POINTS,
+  PROFILE_TAB_PARTNER_PROGRAM,
   PROFILE_TAB_ADVERTISING,
   PROFILE_TAB_EDIT_PROFILE,
   PROFILE_TAB_MY_ORDERS,
@@ -151,6 +152,10 @@ export const useHomeProfileNavigation = ({
     navigateFromProfileTab(PROFILE_TAB_LOYALTY_POINTS);
   }, [navigateFromProfileTab]);
 
+  const handlePartnerProgramFromProfile = useCallback(() => {
+    navigateFromProfileTab(PROFILE_TAB_PARTNER_PROGRAM);
+  }, [navigateFromProfileTab]);
+
   const handleAdvertisingFromProfile = useCallback(() => {
     navigateFromProfileTab(PROFILE_TAB_ADVERTISING);
   }, [navigateFromProfileTab]);
@@ -225,6 +230,8 @@ export const useHomeProfileNavigation = ({
     handlePremiumFromProfile,
 
     handleLoyaltyPointsFromProfile,
+
+    handlePartnerProgramFromProfile,
 
     handleAdvertisingFromProfile,
 
