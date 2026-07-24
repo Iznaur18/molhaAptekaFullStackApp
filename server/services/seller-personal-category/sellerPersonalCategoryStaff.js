@@ -2,6 +2,7 @@ import {
   SELLER_PERSONAL_CATEGORY_STATUS_ACTIVE,
   SELLER_PERSONAL_CATEGORY_STATUS_CANCELLED,
   SELLER_PERSONAL_CATEGORY_STATUS_PENDING,
+  SELLER_PERSONAL_CATEGORY_STATUS_REJECTED,
 } from "../../constants/sellerPersonalCategoryConstants.js";
 import {
   SellerPersonalCategoryCampaignModel,
