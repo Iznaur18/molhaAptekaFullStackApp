@@ -51,13 +51,8 @@ export function InstallmentContractCounterparty({ label, counterparty, onUserCli
         <a className="installment-contract-counterparty__phone" href={phoneHref}>
           {phoneDisplay}
         </a>
-      ) : (
+      ) : phoneDisplay ? (
         <span className="installment-contract-counterparty__detail">{phoneDisplay}</span>
-      )}
-      {counterparty.email ? (
-        <span className="installment-contract-counterparty__detail">
-          {counterparty.email}
-        </span>
       ) : null}
     </div>
   );

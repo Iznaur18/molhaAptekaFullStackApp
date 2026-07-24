@@ -15,6 +15,7 @@ import {
   ADVERTISING_PAGE_UI,
   INTRO_AD_PAGE_UI,
 } from "../../../shared/config/appUiCopy.js";
+import { pluralizeRuBall } from "../../../shared/lib/pluralizeRuBall.js";
 import { ImageUrlField } from "../../../shared/ui/ImageUrlField/ImageUrlField.jsx";
 import { IntroVideoUploadField } from "../../../shared/ui/IntroVideoUploadField/IntroVideoUploadField.jsx";
 import {
@@ -29,6 +30,14 @@ import { SiteHeaderBannerAdvertisingSection } from "./SiteHeaderBannerAdvertisin
 import { RaffleAdvertisingSection } from "./RaffleAdvertisingSection.jsx";
 
 import "./AdvertisingPage.css";
+
+function ZapIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+    </svg>
+  );
+}
 
 /**
  * @param {string | null | undefined} status
@@ -172,10 +181,7 @@ export function AdvertisingPage({ isAuthorized, onRequestLogin, onOpenCreateRaff
 
   if (!isAuthorized) {
     return (
-      <section className="advertising-page">
-        <header className="advertising-page__header">
-          <h1 className="advertising-page__title">{ADVERTISING_PAGE_UI.PAGE_TITLE}</h1>
-        </header>
+      <section className="advertising-page advertising-page_centered">
         <p className="advertising-page__hint">{INTRO_AD_PAGE_UI.LOGIN_HINT}</p>
         <button
           type="button"
@@ -210,16 +216,23 @@ export function AdvertisingPage({ isAuthorized, onRequestLogin, onOpenCreateRaff
 
   return (
     <section className="advertising-page" aria-label={INTRO_AD_PAGE_UI.PAGE_ARIA}>
-      <header className="advertising-page__header">
-        <h1 className="advertising-page__title">{ADVERTISING_PAGE_UI.PAGE_TITLE}</h1>
-        <p className="advertising-page__page-lead">{ADVERTISING_PAGE_UI.PAGE_LEAD}</p>
-      </header>
-
-      <div className="advertising-page__balance-bar">
-        <p className="advertising-page__balance-label">{ADVERTISING_PAGE_UI.BALANCE_LABEL}</p>
-        <p className="advertising-page__balance-value">
-          {ADVERTISING_PAGE_UI.BALANCE(loyaltyBalance)}
-        </p>
+      <div
+        className="advertising-page__hero"
+        aria-label={`${ADVERTISING_PAGE_UI.HERO_CAPTION}: ${ADVERTISING_PAGE_UI.BALANCE(loyaltyBalance)}`}
+      >
+        <div className="advertising-page__hero-text">
+          <p className="advertising-page__hero-caption">{ADVERTISING_PAGE_UI.HERO_CAPTION}</p>
+          <p className="advertising-page__hero-row">
+            <span className="advertising-page__hero-value">{loyaltyBalance}</span>
+            <span className="advertising-page__hero-unit">
+              {pluralizeRuBall(loyaltyBalance)}
+            </span>
+          </p>
+          <p className="advertising-page__hero-info">{ADVERTISING_PAGE_UI.PAGE_LEAD}</p>
+        </div>
+        <div className="advertising-page__hero-icon" aria-hidden="true">
+          <ZapIcon />
+        </div>
       </div>
 
       <div className="advertising-page__cards">

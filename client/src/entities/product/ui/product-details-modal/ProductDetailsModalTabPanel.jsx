@@ -2,6 +2,7 @@ import { ProductDetailsModalAuctionTab } from "./ProductDetailsModalAuctionTab.j
 import { ProductDetailsModalDetailsTab } from "./ProductDetailsModalDetailsTab.jsx";
 import { ProductDetailsModalInstallmentTab } from "./ProductDetailsModalInstallmentTab.jsx";
 import { ProductDetailsModalReviewsTab } from "./ProductDetailsModalReviewsTab.jsx";
+import { ProductDetailsModalSimilarTab } from "./ProductDetailsModalSimilarTab.jsx";
 
 /**
  * @param {{
@@ -18,6 +19,8 @@ import { ProductDetailsModalReviewsTab } from "./ProductDetailsModalReviewsTab.j
  *   mobileReportOverlay?: import('react').ReactNode;
  *   productTitleId?: string;
  *   embedMediaGallery?: boolean;
+ *   showInlinePurchaseActions?: boolean;
+ *   dockSubmit?: boolean;
  *   ctrl: ReturnType<import('./useProductDetailsModalController.js').useProductDetailsModalController>;
  * }} props
  */
@@ -32,6 +35,8 @@ export function ProductDetailsModalTabPanel({
   mobileReportOverlay = null,
   productTitleId,
   embedMediaGallery = true,
+  showInlinePurchaseActions = false,
+  dockSubmit = false,
   ctrl,
 }) {
   const {
@@ -46,6 +51,7 @@ export function ProductDetailsModalTabPanel({
     isInstallmentProgramLoading,
     topOffers,
     showReviewsTab,
+    showSimilarTab,
     showAuctionTab,
     showInstallmentTab,
     handleReviewStatsChange,
@@ -74,6 +80,19 @@ export function ProductDetailsModalTabPanel({
         isOwnProduct={isOwnProduct}
         onRequestLogin={onRequestLogin}
         onStatsChange={handleReviewStatsChange}
+      />
+    );
+  }
+
+  if (detailsTab === "similar" && showSimilarTab) {
+    return (
+      <ProductDetailsModalSimilarTab
+        product={product}
+        excludeProductId={productId}
+        enabled={isOpen}
+        isAuthorized={isAuthorized}
+        onRequestLoginAddToCart={onRequestLogin}
+        currentUserId={currentUserId}
       />
     );
   }
@@ -109,6 +128,7 @@ export function ProductDetailsModalTabPanel({
         isUserDataConfirmed={isUserDataConfirmed}
         onRequestLogin={onRequestLogin}
         onSuccess={onInstallmentSuccess}
+        dockSubmit={dockSubmit}
       />
     );
   }
@@ -126,6 +146,7 @@ export function ProductDetailsModalTabPanel({
         mobileReportOverlay={embedMediaGallery ? mobileReportOverlay : null}
         productTitleId={productTitleId}
         embedMediaGallery={embedMediaGallery}
+        showInlinePurchaseActions={showInlinePurchaseActions}
         ctrl={ctrl}
       />
       {isSellerView && auctionUi.showSellerArchive ? (

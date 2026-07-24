@@ -63,7 +63,7 @@ export function ProductCharacteristicsEditor({ rows, onRowsChange, disabled }) {
               aria-label={CREATE_PRODUCT_MODAL_UI.CHARACTERISTIC_ROW_ARIA(index + 1)}
             >
               <input
-                className="create-product-section__input product-characteristics-editor__input"
+                className="create-product-section__input product-characteristics-editor__input product-characteristics-editor__input_key"
                 type="text"
                 value={row.key}
                 onChange={(event) =>
@@ -75,7 +75,7 @@ export function ProductCharacteristicsEditor({ rows, onRowsChange, disabled }) {
                 autoComplete="off"
               />
               <input
-                className="create-product-section__input product-characteristics-editor__input"
+                className="create-product-section__input product-characteristics-editor__input product-characteristics-editor__input_value"
                 type="text"
                 value={row.value}
                 onChange={(event) =>
@@ -95,7 +95,7 @@ export function ProductCharacteristicsEditor({ rows, onRowsChange, disabled }) {
                   index + 1,
                 )}
               >
-                ×
+                ✕
               </button>
             </li>
           ))}

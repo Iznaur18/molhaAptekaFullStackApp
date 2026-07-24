@@ -35,7 +35,6 @@ import { MySalesPageOverview } from "./MySalesPageOverview.jsx";
 
 import "./MySalesPage.css";
 import "./MySalesPageOverview.css";
-import "../../../shared/ui/profileQueueContentPanel.css";
 
 const EMPTY_ORDERS = [];
 

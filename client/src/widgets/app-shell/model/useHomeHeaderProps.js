@@ -8,7 +8,7 @@ export const useHomeHeaderProps = () => {
   const {
     mainView,
     catalogMainView,
-    isHomeCatalogMainView,
+    showHomeCatalogFeed,
     isMineMode,
     activeCatalogBrowserCategory,
     selectedProductCategory,
@@ -132,7 +132,8 @@ export const useHomeHeaderProps = () => {
       canModerateProducts,
       showHiddenCatalogProducts,
       onShowHiddenCatalogProductsToggle: handleShowHiddenCatalogProductsToggle,
-      showSiteHeaderBanner: isHomeCatalogMainView && mainView === "catalog",
+      showSiteHeaderBanner: Boolean(showHomeCatalogFeed) && mainView === "catalog",
+      isCatalogBrowserLanding,
     }),
     [
       mainView,
@@ -169,7 +170,7 @@ export const useHomeHeaderProps = () => {
       canModerateProducts,
       showHiddenCatalogProducts,
       handleShowHiddenCatalogProductsToggle,
-      isHomeCatalogMainView,
+      showHomeCatalogFeed,
     ],
   );
 };

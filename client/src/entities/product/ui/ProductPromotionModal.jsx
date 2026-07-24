@@ -27,7 +27,6 @@ const PRODUCT_PROMOTION_MODAL_TITLE_ID = "product-promotion-modal-title";
  *   errorMessage?: string;
  *   onClose: () => void;
  *   onSubmit: (tier: number, tariffCode: string) => void | Promise<void>;
- *   onDeleteProduct?: (productId: string) => void | Promise<void>;
  *   onSetProductAvailability?: (
  *     productId: string,
  *     productIsAvailable: boolean,
@@ -36,12 +35,10 @@ const PRODUCT_PROMOTION_MODAL_TITLE_ID = "product-promotion-modal-title";
  *     productId: string,
  *     productAuctionEnabled: boolean,
  *   ) => void | Promise<void>;
- *   isDeletePending?: boolean;
  *   isAvailabilityTogglePending?: boolean;
  *   isAuctionTogglePending?: boolean;
  *   manageErrorMessage?: string;
  *   canManageEdit?: boolean;
- *   canManageDelete?: boolean;
  *   canManageToggleVisibility?: boolean;
  *   sellerRaffleActive?: boolean;
  *   onToggleRaffleParticipation?: (
@@ -63,15 +60,12 @@ export function ProductPromotionModal({
   errorMessage = "",
   onClose,
   onSubmit,
-  onDeleteProduct,
   onSetProductAvailability,
   onSetProductAuction,
-  isDeletePending = false,
   isAvailabilityTogglePending = false,
   isAuctionTogglePending = false,
   manageErrorMessage = "",
   canManageEdit = true,
-  canManageDelete = true,
   canManageToggleVisibility = true,
   sellerRaffleActive = false,
   onToggleRaffleParticipation,
@@ -81,7 +75,9 @@ export function ProductPromotionModal({
   const resolvedProductPrice =
     product?.productPrice != null ? Number(product.productPrice) || 0 : productPrice;
   const showManageSection =
-    product != null && typeof onDeleteProduct === "function";
+    product != null &&
+    (typeof onSetProductAvailability === "function" ||
+      typeof onSetProductAuction === "function");
   const { activeTabId, setActiveTabId, isPromotionTab } = useProductPromotionModalTab({
     isOpen,
     showManageTab: showManageSection,
@@ -219,15 +215,12 @@ export function ProductPromotionModal({
         ) : (
           <ProductPromotionManageTab
             product={product}
-            onDelete={onDeleteProduct}
             onSetAvailability={onSetProductAvailability}
             onSetAuction={onSetProductAuction}
-            isDeletePending={isDeletePending}
             isAvailabilityTogglePending={isAvailabilityTogglePending}
             isAuctionTogglePending={isAuctionTogglePending}
             errorMessage={manageErrorMessage}
             canEdit={canManageEdit}
-            canDelete={canManageDelete}
             canToggleVisibility={canManageToggleVisibility}
             sellerRaffleActive={sellerRaffleActive}
             onToggleRaffleParticipation={onToggleRaffleParticipation}

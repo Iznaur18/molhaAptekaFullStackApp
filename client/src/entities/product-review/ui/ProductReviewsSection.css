@@ -1,8 +1,13 @@
+/* Паритет с mobile `useProductDetailTabStyles` (reviews tab). */
 .product-reviews-section {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--iz-space-3);
   scroll-margin-top: 0.75rem;
+}
+
+.product-reviews-section--tab {
+  padding-top: var(--iz-space-2);
 }
 
 .product-reviews-section__title {
@@ -14,16 +19,42 @@
 
 .product-reviews-section__subheading {
   margin: 0 0 0.35rem;
-  font-size: 0.95rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   color: var(--iz-color-text-secondary);
 }
 
-
-.product-reviews-section__state {
+.product-reviews-section__panel-title {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--iz-color-text);
+}
+
+.product-reviews-section__state,
+.product-reviews-section__empty {
+  margin: 0;
+  font-size: 0.9375rem;
   color: var(--iz-color-text-muted);
+}
+
+.product-reviews-section__hint {
+  margin: 0;
+  padding: 0.5rem 0.625rem;
+  border-radius: var(--iz-radius-input);
+  background: var(--iz-color-surface-muted);
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: var(--iz-color-text-secondary);
+}
+
+.product-reviews-section__error {
+  margin: 0;
+  padding: 0.5rem 0.625rem;
+  border-radius: var(--iz-radius-input);
+  background: color-mix(in srgb, var(--iz-color-danger) 10%, transparent);
+  font-size: 0.8125rem;
+  color: var(--iz-color-danger);
 }
 
 .product-reviews-section__list {
@@ -38,20 +69,27 @@
 .product-reviews-section__composer {
   display: flex;
   flex-direction: column;
+  gap: var(--iz-space-2);
+  padding: var(--iz-space-3);
+  border-radius: var(--iz-radius-button);
+  background: var(--iz-color-surface-elevated);
+}
+
+.product-reviews-section__composer .product-review-form {
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+.product-reviews-section__my-review {
+  display: flex;
+  flex-direction: column;
   gap: 0.35rem;
 }
 
 .product-reviews-section__login {
-  align-self: flex-start;
-  padding: 0.45rem 1rem;
-  border: 1px solid var(--iz-color-action);
-  border-radius: 0.5rem;
-  background: var(--iz-color-surface);
-  color: var(--iz-color-action);
-  font: inherit;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
+  align-self: stretch;
 }
 
 .product-reviews-section__more {
@@ -67,49 +105,6 @@
 }
 
 .product-reviews-section__more:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
-
-.product-reviews-section__my-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.product-reviews-section__edit,
-.product-reviews-section__delete,
-.product-reviews-section__cancel-edit {
-  padding: 0.35rem 0.75rem;
-  border-radius: 0.5rem;
-  font: inherit;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.product-reviews-section__edit {
-  border: 1px solid var(--iz-color-action);
-  background: var(--iz-color-surface);
-  color: var(--iz-color-action);
-}
-
-.product-reviews-section__delete {
-  border: 1px solid var(--iz-color-danger-border);
-  background: var(--iz-color-surface);
-  color: var(--iz-color-danger);
-}
-
-.product-reviews-section__cancel-edit {
-  align-self: flex-start;
-  border: 1px solid var(--iz-color-danger);
-  background: var(--iz-color-danger);
-  color: var(--iz-color-on-contrast);
-}
-
-.product-reviews-section__edit:disabled,
-.product-reviews-section__delete:disabled,
-.product-reviews-section__cancel-edit:disabled {
   opacity: 0.6;
   cursor: default;
 }

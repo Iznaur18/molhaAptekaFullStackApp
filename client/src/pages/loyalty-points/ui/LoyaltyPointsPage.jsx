@@ -7,18 +7,78 @@ import {
 import { useAdminCreditOwnLoyaltyPointsMutation } from "../../../entities/user/model/useAdminCreditOwnLoyaltyPointsMutation.js";
 import { useMyLoyaltyPointsStatusQuery } from "../../../entities/user/model/useMyLoyaltyPointsStatusQuery.js";
 import { LOYALTY_POINTS_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import { rublesToLoyaltyPoints } from "../../../shared/config/loyaltyPointsConstants.js";
 import {
   INTEGER_INPUT_FIELD_PROPS,
   formatRubPriceInput,
   parseRubPriceInput,
 } from "../../../shared/lib/numericInput.js";
-import { rublesToLoyaltyPoints } from "../../../shared/config/loyaltyPointsConstants.js";
+import { pluralizeRuBall } from "../../../shared/lib/pluralizeRuBall.js";
 import {
   LOYALTY_POINTS_PURCHASE_MAX_RUB,
   LOYALTY_POINTS_PURCHASE_MIN_RUB,
 } from "../model/loyaltyPointsPurchaseUiConstants.js";
 
 import "./LoyaltyPointsPage.css";
+
+/** Иконки пунктов «на что тратить» — по порядку LOYALTY_POINTS_PAGE_UI.USES. */
+const USE_ICON_KEYS = ["award", "trending-up", "play-circle", "gift"];
+
+function AwardIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+      <circle cx="12" cy="8" r="6" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M8.21 13.89L7 22l5-3 5 3-1.21-8.11" />
+    </svg>
+  );
+}
+
+function TrendingUpIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M23 6l-9.5 9.5-5-5L1 18" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M17 6h6v6" />
+    </svg>
+  );
+}
+
+function PlayCircleIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M10 8l6 4-6 4V8z" />
+    </svg>
+  );
+}
+
+function GiftIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+      <rect x="3" y="8" width="18" height="4" rx="1" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v13M19 12v9H5v-9" />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M7.5 8a2.5 2.5 0 010-5C10 3 12 8 12 8s2-5 4.5-5a2.5 2.5 0 010 5"
+      />
+    </svg>
+  );
+}
+
+/** @param {string} key */
+function UseIcon({ keyName }) {
+  switch (keyName) {
+    case "trending-up":
+      return <TrendingUpIcon />;
+    case "play-circle":
+      return <PlayCircleIcon />;
+    case "gift":
+      return <GiftIcon />;
+    case "award":
+    default:
+      return <AwardIcon />;
+  }
+}
 
 /**
  * @param {string} raw
@@ -115,10 +175,7 @@ export function LoyaltyPointsPage({
 
     setPurchaseValidationError("");
     setComingSoonMessage(
-      LOYALTY_POINTS_PAGE_UI.COMING_SOON_AMOUNT(
-        purchaseAmountRub,
-        purchasePointsPreview,
-      ),
+      LOYALTY_POINTS_PAGE_UI.COMING_SOON_AMOUNT(purchaseAmountRub, purchasePointsPreview),
     );
   };
 
@@ -126,25 +183,19 @@ export function LoyaltyPointsPage({
     setAdminSuccessMessage("");
     if (adminAmountPoints == null) {
       setAdminValidationError(
-        LOYALTY_POINTS_PAGE_UI.ADMIN_FREE_AMOUNT_MIN(
-          LOYALTY_POINTS_ADMIN_FREE_CREDIT_MIN,
-        ),
+        LOYALTY_POINTS_PAGE_UI.ADMIN_FREE_AMOUNT_MIN(LOYALTY_POINTS_ADMIN_FREE_CREDIT_MIN),
       );
       return;
     }
     if (adminAmountPoints < LOYALTY_POINTS_ADMIN_FREE_CREDIT_MIN) {
       setAdminValidationError(
-        LOYALTY_POINTS_PAGE_UI.ADMIN_FREE_AMOUNT_MIN(
-          LOYALTY_POINTS_ADMIN_FREE_CREDIT_MIN,
-        ),
+        LOYALTY_POINTS_PAGE_UI.ADMIN_FREE_AMOUNT_MIN(LOYALTY_POINTS_ADMIN_FREE_CREDIT_MIN),
       );
       return;
     }
     if (adminAmountPoints > LOYALTY_POINTS_ADMIN_FREE_CREDIT_MAX) {
       setAdminValidationError(
-        LOYALTY_POINTS_PAGE_UI.ADMIN_FREE_AMOUNT_MAX(
-          LOYALTY_POINTS_ADMIN_FREE_CREDIT_MAX,
-        ),
+        LOYALTY_POINTS_PAGE_UI.ADMIN_FREE_AMOUNT_MAX(LOYALTY_POINTS_ADMIN_FREE_CREDIT_MAX),
       );
       return;
     }
@@ -163,16 +214,14 @@ export function LoyaltyPointsPage({
       setAdminAmountInput("");
     } catch (error) {
       setAdminValidationError(
-        error instanceof Error
-          ? error.message
-          : LOYALTY_POINTS_PAGE_UI.FETCH_FALLBACK,
+        error instanceof Error ? error.message : LOYALTY_POINTS_PAGE_UI.FETCH_FALLBACK,
       );
     }
   };
 
   if (!isAuthorized) {
     return (
-      <section className="loyalty-points-page">
+      <section className="loyalty-points-page loyalty-points-page_centered">
         <p className="loyalty-points-page__hint">{LOYALTY_POINTS_PAGE_UI.LOGIN_HINT}</p>
         <button
           type="button"
@@ -187,18 +236,22 @@ export function LoyaltyPointsPage({
 
   if (phase === "loading") {
     return (
-      <p className="loyalty-points-page__state">{LOYALTY_POINTS_PAGE_UI.LOADING}</p>
+      <section className="loyalty-points-page">
+        <p className="loyalty-points-page__state">{LOYALTY_POINTS_PAGE_UI.LOADING}</p>
+      </section>
     );
   }
 
   if (phase === "error") {
     return (
-      <p
-        className="loyalty-points-page__state loyalty-points-page__state_error"
-        role="alert"
-      >
-        {errorMessage}
-      </p>
+      <section className="loyalty-points-page">
+        <p
+          className="loyalty-points-page__state loyalty-points-page__state_error"
+          role="alert"
+        >
+          {errorMessage}
+        </p>
+      </section>
     );
   }
 
@@ -218,15 +271,26 @@ export function LoyaltyPointsPage({
       className="loyalty-points-page"
       aria-label={LOYALTY_POINTS_PAGE_UI.PAGE_ARIA}
     >
-      <p className="loyalty-points-page__balance">
-        {LOYALTY_POINTS_PAGE_UI.BALANCE_POINTS(loyaltyPointsBalance)}
-      </p>
-      <p className="loyalty-points-page__hint">{LOYALTY_POINTS_PAGE_UI.INFO}</p>
-      <ul className="loyalty-points-page__uses">
-        {LOYALTY_POINTS_PAGE_UI.USES.map((item) => (
-          <li key={item}>{item}</li>
-        ))}
-      </ul>
+      <div
+        className="loyalty-points-page__hero"
+        aria-label={LOYALTY_POINTS_PAGE_UI.BALANCE_POINTS(loyaltyPointsBalance)}
+      >
+        <div className="loyalty-points-page__hero-text">
+          <p className="loyalty-points-page__hero-caption">
+            {LOYALTY_POINTS_PAGE_UI.BALANCE_CAPTION}
+          </p>
+          <p className="loyalty-points-page__hero-row">
+            <span className="loyalty-points-page__hero-value">{loyaltyPointsBalance}</span>
+            <span className="loyalty-points-page__hero-unit">
+              {pluralizeRuBall(loyaltyPointsBalance)}
+            </span>
+          </p>
+          <p className="loyalty-points-page__hero-info">{LOYALTY_POINTS_PAGE_UI.INFO}</p>
+        </div>
+        <div className="loyalty-points-page__hero-icon" aria-hidden="true">
+          <AwardIcon />
+        </div>
+      </div>
 
       <div className="loyalty-points-page__purchase">
         <h3 className="loyalty-points-page__purchase-title">
@@ -319,6 +383,20 @@ export function LoyaltyPointsPage({
           </button>
         </div>
       ) : null}
+
+      <article className="loyalty-points-page__uses-card">
+        <h3 className="loyalty-points-page__uses-title">{LOYALTY_POINTS_PAGE_UI.USES_TITLE}</h3>
+        <ul className="loyalty-points-page__uses">
+          {LOYALTY_POINTS_PAGE_UI.USES.map((item, index) => (
+            <li key={item} className="loyalty-points-page__use-row">
+              <span className="loyalty-points-page__use-icon" aria-hidden="true">
+                <UseIcon keyName={USE_ICON_KEYS[index] ?? "award"} />
+              </span>
+              <span className="loyalty-points-page__use-text">{item}</span>
+            </li>
+          ))}
+        </ul>
+      </article>
     </section>
   );
 }

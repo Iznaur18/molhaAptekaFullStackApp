@@ -26,6 +26,7 @@ import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
  *   staffCanEditPremium?: boolean;
  *   allowStaffLoyaltyEdit?: boolean;
  *   onPremiumRevoked?: () => void;
+ *   variant?: 'modal' | 'page';
  * }} params
  */
 export function useEditProfileModal({
@@ -38,7 +39,9 @@ export function useEditProfileModal({
   staffCanEditPremium = false,
   allowStaffLoyaltyEdit = false,
   onPremiumRevoked,
+  variant = "modal",
 }) {
+  const isPageVariant = variant === "page";
   const { patchMutation } = useUserProfileMutations();
   const [form, setForm] = useState(() => mapUserToEditProfileForm({ _id: "" }));
   const [feedback, setFeedback] = useState({ kind: "idle", message: "" });
@@ -63,16 +66,16 @@ export function useEditProfileModal({
     return undefined;
   }, [isOpen, user]);
 
-  useScrollLock(isOpen);
+  useScrollLock(isOpen && !isPageVariant);
 
   useEffect(() => {
-    if (!isOpen) return undefined;
+    if (!isOpen || isPageVariant) return undefined;
     const onKeyDown = (event) => {
       if (event.key === "Escape") onClose();
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, [isOpen, onClose]);
+  }, [isOpen, isPageVariant, onClose]);
 
   const notesChars = useMemo(
     () => String(form.notesAboutUser ?? "").length,
@@ -167,8 +170,12 @@ export function useEditProfileModal({
       if (premiumWillBeDisabled) {
         onPremiumRevoked?.();
       }
-      handleClose();
       onSaved(updated);
+      if (isPageVariant) {
+        setFeedback({ kind: "success", message: EDIT_PROFILE_MODAL_UI.SAVED });
+        return;
+      }
+      handleClose();
     } catch (e) {
       const message =
         e instanceof Error ? e.message : EDIT_PROFILE_MODAL_UI.SUBMIT_IDLE;

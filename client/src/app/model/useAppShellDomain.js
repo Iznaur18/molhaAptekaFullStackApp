@@ -72,10 +72,11 @@ export function useAppShellDomain(
   });
 
   const curatedProductListsState = useHomeCuratedProductLists({
-    isHomeCatalogMainView: shell.isHomeCatalogMainView,
+    isHomeCatalogMainView: shell.showHomeCatalogFeed ?? shell.isHomeCatalogMainView,
     isMineMode: catalogLoader.isMineMode,
     selectedProductCategory: catalogLoader.selectedProductCategory,
     selectedCategoryId: catalogLoader.selectedCategoryId,
+    sellerPersonalCategoryId: catalogLoader.sellerPersonalCategoryId,
     hasProductSearchQuery: catalogLoader.hasProductSearchQuery,
     catalogFollowingOnly: catalogLoader.catalogFollowingOnly,
     catalogAuctionOnly: catalogLoader.catalogAuctionOnly,
@@ -136,8 +137,8 @@ export function useAppShellDomain(
     isAdmin: shell.isAdmin,
     canModerateProducts: shell.canModerateProducts,
     goToMainView: shell.goToMainView,
+    navigate,
     setMyProfilePage: shell.setMyProfilePage,
-    setIsLoginModalOpen: shell.setIsLoginModalOpen,
     setMyProductsCatalogError: shell.setMyProductsCatalogError,
     setMyProductsModerationFilter: shell.setMyProductsModerationFilter,
     resetCatalogFollowingOnLogout: catalogLoader.resetCatalogFollowingOnLogout,
@@ -151,7 +152,6 @@ export function useAppShellDomain(
     navigate,
     clearAuthSession: shell.clearAuthSession,
     setMyProfilePage: shell.setMyProfilePage,
-    setIsEditProfileOpen: shell.setIsEditProfileOpen,
     clearInAppNotifications: notifications.clearInAppNotifications,
   });
 

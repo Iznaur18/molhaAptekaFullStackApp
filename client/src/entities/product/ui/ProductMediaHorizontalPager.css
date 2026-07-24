@@ -12,11 +12,12 @@
   overflow-x: auto;
   overflow-y: hidden;
   scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  overscroll-behavior-x: none;
-  overscroll-behavior-y: none;
+  /* User finger scroll stays native; smooth only for programmatic scrollTo. */
+  scroll-behavior: auto;
+  overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
-  touch-action: pan-x;
+  /* pan-y обязателен: иначе вертикальный скролл страницы на mobile web мёртв */
+  touch-action: pan-x pan-y;
   scrollbar-width: none;
   cursor: grab;
 }

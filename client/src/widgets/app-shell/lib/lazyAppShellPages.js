@@ -140,6 +140,11 @@ export const LazyAdvertisingPage = lazyNamedExport(
   "AdvertisingPage",
 );
 
+export const LazyEditProfilePage = lazyNamedExport(
+  () => import("../../../pages/edit-profile/ui/EditProfilePage.jsx"),
+  "EditProfilePage",
+);
+
 export const LazySellerPersonalCategoryModerationPage = lazyNamedExport(
   () =>
     import("../../../pages/seller-personal-category-moderation/ui/SellerPersonalCategoryModerationPage.jsx"),

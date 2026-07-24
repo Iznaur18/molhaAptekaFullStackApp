@@ -3,7 +3,8 @@
   flex-direction: column;
   gap: 0.5rem;
   width: 100%;
-  margin: 0 0 1.25rem;
+  /* Паритет mobile HOME_FEED_SECTION_GAP = 8 */
+  margin: 0 0 var(--iz-space-2);
 }
 
 /**

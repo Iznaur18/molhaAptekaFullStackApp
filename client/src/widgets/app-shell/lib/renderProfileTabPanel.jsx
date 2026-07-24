@@ -9,6 +9,7 @@ import {
   LazyInstallmentSalesPage,
   LazyLoyaltyPointsPage,
   LazyAdvertisingPage,
+  LazyEditProfilePage,
   LazyIntroAdModerationPage,
   LazySellerPersonalCategoryModerationPage,
   LazyMyOrdersPage,
@@ -58,6 +59,9 @@ export function renderProfileTabPanel(mainView, props) {
     refreshCatalogFeed,
     setRaffleModal,
     onLoyaltyPointsBalanceChange,
+    canModerateProducts = false,
+    onEditProfileCancel,
+    onEditProfileSaved,
   } = props;
 
   switch (mainView) {
@@ -108,6 +112,17 @@ export function renderProfileTabPanel(mainView, props) {
           isAuthorized={isAuthorized}
           onRequestLogin={onRequestLogin}
           onOpenCreateRaffle={() => setRaffleModal({ mode: "create" })}
+        />
+      );
+    case "edit-profile":
+      return (
+        <LazyEditProfilePage
+          isAuthorized={isAuthorized}
+          onRequestLogin={onRequestLogin}
+          user={myProfilePage.phase === "success" ? myProfilePage.user : null}
+          allowStaffLoyaltyEdit={canModerateProducts}
+          onCancel={onEditProfileCancel}
+          onSaved={onEditProfileSaved}
         />
       );
     case "subscriptions":

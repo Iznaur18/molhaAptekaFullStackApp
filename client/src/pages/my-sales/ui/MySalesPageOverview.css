@@ -9,9 +9,9 @@
   flex-direction: column;
   gap: 0.15rem;
   min-width: 0;
-  padding: 0.55rem 0.65rem;
+  padding: 0.5rem 0.625rem;
   border: 1px solid var(--iz-color-border);
-  border-radius: 0.55rem;
+  border-radius: 16px;
   background: var(--iz-color-surface);
   text-align: left;
   cursor: pointer;
@@ -50,8 +50,8 @@
 }
 
 .my-sales-overview__label {
-  font-size: 0.72rem;
-  font-weight: 600;
+  font-size: 0.7rem;
+  font-weight: 700;
   letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--iz-color-text-muted);
@@ -112,10 +112,4 @@
   font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
-}
-
-@container app-viewport (max-width: 640px) {
-  .my-sales-overview {
-    grid-template-columns: 1fr;
-  }
 }

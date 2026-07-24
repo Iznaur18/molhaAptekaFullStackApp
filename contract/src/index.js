@@ -80,9 +80,14 @@ export {
   USER_SOCIAL_LINK_FIELDS,
   USER_SOCIAL_LINK_FIELD_IDS,
   USER_SOCIAL_LINK_URL_MAX_LENGTH,
+  USER_SOCIAL_LINK_HANDLE_MAX_LENGTH,
   clearableSocialHttpUrlSchema,
+  createSocialLinkBodySchema,
   formatSocialLinkDisplay,
   isHttpUrl,
+  normalizeSocialLinkToStoredUrl,
+  storedSocialUrlToInputValue,
+  validateSocialLinkInput,
 } from "./userSocialLinks.js";
 export {
   ADDRESS_CITY_MAX_LENGTH,

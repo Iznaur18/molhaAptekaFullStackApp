@@ -1,4 +1,4 @@
-import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import { AUTH_UI, HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { isRoleRestrictedMainView } from "../../../shared/lib/homeMainViewPaths.js";
 import { isStaffMainViewAllowed } from "../../../shared/lib/staffMainViews.js";
 import {
@@ -46,6 +46,8 @@ export function AccountMainContent({
   setMyProfileTab,
   handleLogout,
   onEditProfileClick,
+  onEditProfileCancel,
+  onEditProfileSaved,
   handleMyProductsFromProfile,
   handleMySalesFromProfile,
   handleInstallmentPaymentsFromProfile,
@@ -99,6 +101,10 @@ export function AccountMainContent({
   }
 
   if (isProfileTabMainView(mainView)) {
+    if (!isSessionReady && mainView === "my-profile") {
+      return <p className="app-shell__state">{AUTH_UI.SESSION_CHECK}</p>;
+    }
+
     if (
       isSessionReady &&
       !isStaffMainViewAllowed(mainView, { isAdmin, canModerateProducts })
@@ -132,6 +138,9 @@ export function AccountMainContent({
       refreshCatalogFeed,
       setRaffleModal,
       onLoyaltyPointsBalanceChange: setLoyaltyPoints,
+      canModerateProducts,
+      onEditProfileCancel,
+      onEditProfileSaved,
     };
 
     const tabContent =

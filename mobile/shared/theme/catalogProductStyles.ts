@@ -1610,18 +1610,18 @@ export const useProductDetailScreenStyles = createThemedStyles((theme) => ({
   priceBadgeRow: {
     alignSelf: "stretch",
     width: "100%",
-    paddingHorizontal: DBRC.paddingHorizontal,
-    paddingVertical: DBRC.paddingVertical,
     borderRadius: DBRC.borderRadius,
     backgroundColor: `${theme.colors.text}0A`,
+    overflow: "hidden",
   },
   priceBadgeRowContent: {
     flexDirection: "row",
-    flexWrap: "wrap",
+    flexWrap: "nowrap",
     alignItems: "center",
     gap: BDETAIL.rowGap,
     columnGap: BDETAIL.rowGap,
-    rowGap: BDETAIL.rowGap,
+    paddingHorizontal: DBRC.paddingHorizontal,
+    paddingVertical: DBRC.paddingVertical,
   },
   installmentTeaser: {
     marginTop: 0,

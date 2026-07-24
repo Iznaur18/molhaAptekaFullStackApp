@@ -67,8 +67,6 @@ export function SiteHeaderBannerAdvertisingSection({ isAuthorized, loyaltyBalanc
 
   const pricePoints = campaignQuery.data?.pricePoints ?? 7_000;
   const durationDays = campaignQuery.data?.durationDays ?? 7;
-  const paidSlotLimit = campaignQuery.data?.paidSlotLimit ?? 3;
-  const activePaidSlots = campaignQuery.data?.activePaidSlots ?? 0;
 
   const previewSlides = useMemo(
     () =>
@@ -215,12 +213,6 @@ export function SiteHeaderBannerAdvertisingSection({ isAuthorized, loyaltyBalanc
         <div className="advertising-page__meta-item">
           <span className="advertising-page__meta-label">Срок</span>
           <span className="advertising-page__meta-value">{durationDays} дней</span>
-        </div>
-        <div className="advertising-page__meta-item">
-          <span className="advertising-page__meta-label">Слоты</span>
-          <span className="advertising-page__meta-value">
-            {activePaidSlots}/{paidSlotLimit}
-          </span>
         </div>
       </div>
 

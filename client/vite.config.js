@@ -5,6 +5,7 @@ import { visualizer } from "rollup-plugin-visualizer";
 
 import { buildSpaContentSecurityPolicy } from "../server/utils/buildSpaContentSecurityPolicy.js";
 import { shouldProxyProductPathToApi } from "./src/shared/lib/productDetailsPaths.js";
+import { shouldServeUserProfileAsSpa } from "./src/shared/lib/userProfilePaths.js";
 
 /**
  * LAN-доступ (вариант C): см. `client/docs/LAN-dev-access.md`
@@ -98,6 +99,9 @@ const devApiProxy = Object.fromEntries(
       configure: stripSecureFromProxySetCookie,
       bypass(req) {
         const pathname = (req.url ?? "").split("?")[0];
+        if (prefix === "/user" && shouldServeUserProfileAsSpa(pathname, req.headers.accept)) {
+          return "/index.html";
+        }
         if (!shouldProxyToApi(prefix, pathname)) {
           return "/index.html";
         }

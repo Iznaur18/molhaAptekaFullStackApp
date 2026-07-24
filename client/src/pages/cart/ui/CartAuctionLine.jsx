@@ -1,70 +1,36 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
 
-import { useCreateOrderMutation } from "../../../entities/order/model/useCreateOrderMutation.js";
-import { invalidatePriceOfferQueries } from "../../../entities/product-price-offer/lib/priceOfferQueryCache.js";
 import { usePriceOfferMutations } from "../../../entities/product-price-offer/model/usePriceOfferMutations.js";
+import { invalidatePriceOfferQueries } from "../../../entities/product-price-offer/lib/priceOfferQueryCache.js";
 import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../../../entities/product/model/productConstants.js";
 import { CART_AUCTION_UI } from "../../../shared/config/appUiCopy.js";
 import { formatIsoDateTime } from "../../../shared/lib/formatIsoDateTime.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
-import { CheckoutForm } from "../../../shared/ui/CheckoutForm/CheckoutForm.jsx";
 
 /**
- * Строка выигранного лота: оформляется отдельным заказом по цене принятой ставки.
+ * Строка выигранного лота: оформление через общий checkout sheet.
  *
  * @param {{
  *   bid: import('../../../entities/product-price-offer/model/types.js').PriceOfferBuyerBidRow;
- *   defaultDeliveryAddress: Record<string, unknown>;
- *   onCheckoutSuccess: () => void;
+ *   onCheckout: (bid: import('../../../entities/product-price-offer/model/types.js').PriceOfferBuyerBidRow) => void;
  * }} props
  */
-export function CartAuctionLine({ bid, defaultDeliveryAddress, onCheckoutSuccess }) {
+export function CartAuctionLine({ bid, onCheckout }) {
   const queryClient = useQueryClient();
-  const createOrderMutation = useCreateOrderMutation();
   const { cancelMutation } = usePriceOfferMutations(bid.productId);
-
-  const [showCheckout, setShowCheckout] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   const imageUrl = bid.product?.productImageUrl ?? PRODUCT_IMAGE_PLACEHOLDER_URL;
   const productName = bid.product?.productName ?? "";
-
-  const handleCheckoutSubmit = async ({
-    deliveryAddress,
-    deliveryAddressFlat,
-    paymentMethod,
-  }) => {
-    setError("");
-    setSuccess("");
-    try {
-      await createOrderMutation.mutateAsync({
-        items: [{ productId: bid.productId, quantity: 1 }],
-        priceOfferId: bid._id,
-        deliveryAddress,
-        deliveryAddressFlat,
-        paymentMethod,
-      });
-      setSuccess(CART_AUCTION_UI.ORDER_PLACED);
-      setShowCheckout(false);
-      void invalidatePriceOfferQueries(queryClient);
-      onCheckoutSuccess();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : CART_AUCTION_UI.ERROR_GENERIC);
-    }
-  };
 
   const handleRemove = async () => {
     if (!window.confirm(CART_AUCTION_UI.REMOVE_CONFIRM)) {
       return;
     }
-    setError("");
     try {
       await cancelMutation.mutateAsync();
       void invalidatePriceOfferQueries(queryClient);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : CART_AUCTION_UI.ERROR_GENERIC);
+    } catch {
+      // ошибка уходит в mutation; UI линии без inline-формы
     }
   };
 
@@ -91,7 +57,8 @@ export function CartAuctionLine({ bid, defaultDeliveryAddress, onCheckoutSuccess
           </p>
           {bid.paymentDeadlineAt ? (
             <p className="cart-auction-line__deadline">
-              {CART_AUCTION_UI.DEADLINE_LABEL}: {formatIsoDateTime(bid.paymentDeadlineAt)}
+              {CART_AUCTION_UI.DEADLINE_LABEL}:{" "}
+              {formatIsoDateTime(bid.paymentDeadlineAt)}
             </p>
           ) : null}
         </div>
@@ -101,9 +68,9 @@ export function CartAuctionLine({ bid, defaultDeliveryAddress, onCheckoutSuccess
         <button
           type="button"
           className="cart-auction-line__checkout"
-          onClick={() => setShowCheckout((prev) => !prev)}
+          onClick={() => onCheckout(bid)}
         >
-          {showCheckout ? CART_AUCTION_UI.CHECKOUT_CANCEL : CART_AUCTION_UI.CHECKOUT}
+          {CART_AUCTION_UI.CHECKOUT}
         </button>
         <button
           type="button"
@@ -117,25 +84,12 @@ export function CartAuctionLine({ bid, defaultDeliveryAddress, onCheckoutSuccess
         </button>
       </div>
 
-      {showCheckout ? (
-        <div className="cart-auction-line__checkout-zone">
-          <CheckoutForm
-            defaultDeliveryAddress={defaultDeliveryAddress}
-            isSubmitting={createOrderMutation.isPending}
-            submitError={error}
-            submitSuccess={success}
-            onSubmit={handleCheckoutSubmit}
-          />
-        </div>
-      ) : null}
-
-      {!showCheckout && error ? (
+      {cancelMutation.isError ? (
         <p className="cart-auction-line__error" role="alert">
-          {error}
+          {cancelMutation.error instanceof Error
+            ? cancelMutation.error.message
+            : CART_AUCTION_UI.ERROR_GENERIC}
         </p>
-      ) : null}
-      {!showCheckout && success ? (
-        <p className="cart-auction-line__success">{success}</p>
       ) : null}
     </article>
   );

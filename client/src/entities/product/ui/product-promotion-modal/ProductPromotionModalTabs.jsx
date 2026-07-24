@@ -1,4 +1,4 @@
-import { CREATE_PRODUCT_MODAL_UI, PRODUCT_PROMOTION_UI } from "../../../../shared/config/appUiCopy.js";
+import { PRODUCT_PROMOTION_UI } from "../../../../shared/config/appUiCopy.js";
 import { ModalSectionTabs } from "../../../../shared/ui/ModalSectionTabs/ModalSectionTabs.jsx";
 import {
   PRODUCT_PROMOTION_MODAL_TAB_MANAGE,
@@ -24,7 +24,7 @@ export function ProductPromotionModalTabs({
   if (showManageTab) {
     tabs.push({
       id: PRODUCT_PROMOTION_MODAL_TAB_MANAGE,
-      label: CREATE_PRODUCT_MODAL_UI.MANAGE_SECTION_TITLE,
+      label: PRODUCT_PROMOTION_UI.TAB_MANAGE,
     });
   }
 

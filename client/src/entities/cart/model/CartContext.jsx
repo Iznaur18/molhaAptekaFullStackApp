@@ -34,6 +34,18 @@ export function CartProvider({ children }) {
     dispatch({ type: CART_ACTION_REMOVE, productId });
   }, []);
 
+  const removeItems = useCallback((productIds) => {
+    const idSet = new Set(productIds);
+    if (idSet.size === 0) {
+      return;
+    }
+    const next = { ...itemsRef.current };
+    for (const productId of idSet) {
+      delete next[productId];
+    }
+    dispatch({ type: CART_ACTION_HYDRATE, payload: next });
+  }, []);
+
   const clearCart = useCallback(() => {
     dispatch({ type: CART_ACTION_CLEAR });
   }, []);
@@ -63,6 +75,7 @@ export function CartProvider({ children }) {
       addItem,
       setItemQuantity,
       removeItem,
+      removeItems,
       clearCart,
       hydrateCart,
       flushRemoteCart,
@@ -73,6 +86,7 @@ export function CartProvider({ children }) {
       addItem,
       setItemQuantity,
       removeItem,
+      removeItems,
       clearCart,
       hydrateCart,
       flushRemoteCart,

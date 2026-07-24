@@ -18,7 +18,7 @@ import "./ProductPriceDisplay.css";
  *   };
  *   showLabel?: boolean;
  *   className?: string;
- *   variant?: "card" | "inline";
+ *   variant?: "card" | "inline" | "cart";
  *   showDiscountBadge?: boolean;
  *   showLoyaltyBadge?: boolean;
  *   isAuthorized?: boolean;

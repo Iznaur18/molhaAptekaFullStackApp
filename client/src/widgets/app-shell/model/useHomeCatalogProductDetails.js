@@ -49,10 +49,12 @@ export const useHomeCatalogProductDetails = ({ onBeforeOpenDetails }) => {
 
   const handleProductStatsUpdate = useCallback(
     (productId, stats) => {
-      patchProductInAllCatalogCaches(queryClient, productId, (product) => ({
-        ...product,
-        ...stats,
-      }));
+      patchProductInAllCatalogCaches(queryClient, productId, (product) => {
+        const next = { ...product, ...stats };
+        const keys = Object.keys(stats);
+        const unchanged = keys.every((key) => Object.is(product[key], next[key]));
+        return unchanged ? product : next;
+      });
     },
     [queryClient],
   );

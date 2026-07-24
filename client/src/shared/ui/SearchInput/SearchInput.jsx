@@ -1,9 +1,9 @@
-import { ModalCloseIcon } from "../icon/index.js";
+import { AppIcon, ModalCloseIcon, Search } from "../icon/index.js";
 
 import "./SearchInput.css";
 
 /**
- * Универсальное поле поиска с кнопкой очистки и индикатором ожидания.
+ * Универсальное поле поиска с кнопкой очистки и индикатором ожиждения.
  *
  * `onSubmit` вызывается по Enter («Найти»/«Search» на экранной клавиатуре).
  * Enter ловится на самом поле, а не только неявной отправкой формы: последняя
@@ -19,6 +19,7 @@ import "./SearchInput.css";
  *   clearAriaLabel: string;
  *   pendingAriaLabel: string;
  *   isPending?: boolean;
+ *   showLeadingIcon?: boolean;
  * }} props
  */
 export function SearchInput({
@@ -30,6 +31,7 @@ export function SearchInput({
   clearAriaLabel,
   pendingAriaLabel,
   isPending = false,
+  showLeadingIcon = false,
 }) {
   const handleChange = (event) => onChange(event.target.value);
   const handleClear = () => onChange("");
@@ -46,9 +48,20 @@ export function SearchInput({
     onSubmit?.();
   };
   const showClearButton = value !== "";
+  const rootClassName = [
+    "search-input",
+    showLeadingIcon && "search-input--leading-icon",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
-    <form className="search-input" role="search" onSubmit={handleSubmit}>
+    <form className={rootClassName} role="search" onSubmit={handleSubmit}>
+      {showLeadingIcon ? (
+        <span className="search-input__leading-icon" aria-hidden="true">
+          <AppIcon icon={Search} size="lg" />
+        </span>
+      ) : null}
       <input
         type="search"
         className="search-input__field"

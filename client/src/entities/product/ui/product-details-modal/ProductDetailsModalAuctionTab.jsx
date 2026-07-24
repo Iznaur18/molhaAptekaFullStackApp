@@ -1,8 +1,9 @@
 import { PRODUCT_PRICE_OFFER_UI } from "../../../../shared/config/appUiCopy.js";
 import { ProductPriceOfferBuyerBlock } from "../../../product-price-offer/ui/ProductPriceOfferBuyerBlock.jsx";
-import { ProductPriceOfferHintMessage } from "../../../product-price-offer/ui/ProductPriceOfferHintMessage.jsx";
 import { ProductPriceOfferSellerArchive } from "../../../product-price-offer/ui/ProductPriceOfferSellerArchive.jsx";
 import { ProductPriceOfferSellerTab } from "../../../product-price-offer/ui/ProductPriceOfferSellerTab.jsx";
+
+import "../../../product-price-offer/ui/ProductPriceOffer.css";
 
 /**
  * @param {{
@@ -70,13 +71,13 @@ export function ProductDetailsModalAuctionTab({
           onOffersChanged={onOffersChanged}
           onCloseModal={onCloseModal}
         />
-      ) : auctionUi.buyerMessage === "ended" ? (
-        <p className="product-price-offer__hint">{PRODUCT_PRICE_OFFER_UI.AUCTION_ENDED}</p>
-      ) : auctionUi.buyerMessage === "notHeld" ? (
-        <ProductPriceOfferHintMessage>
-          {PRODUCT_PRICE_OFFER_UI.AUCTION_NOT_HELD}
-        </ProductPriceOfferHintMessage>
-      ) : null}
+      ) : (
+        <p className="product-price-offer__inactive-hint">
+          {auctionUi.completedOnce
+            ? PRODUCT_PRICE_OFFER_UI.AUCTION_ENDED
+            : PRODUCT_PRICE_OFFER_UI.AUCTION_EMPTY}
+        </p>
+      )}
     </section>
   );
 }

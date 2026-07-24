@@ -232,7 +232,7 @@ export function buildProfileNavGroups({
               {
                 tab: "edit-profile",
                 label: MY_PROFILE_PAGE_UI.EDIT_PROFILE,
-                onClick: () => onEditProfileClick?.(),
+                onClick: () => selectTab("edit-profile", onEditProfileClick),
               },
             ]
           : []),

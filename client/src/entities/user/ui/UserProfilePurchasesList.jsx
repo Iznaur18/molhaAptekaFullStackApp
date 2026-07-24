@@ -10,7 +10,7 @@ import {
 
 import "./UserProfilePurchasesList.css";
 
-const PURCHASE_THUMB_SIZE_PX = 48;
+const PURCHASE_THUMB_SIZE_PX = 64;
 
 /**
  * @param {import('../model/userPurchaseTypes.js').UserPurchaseListItem} item

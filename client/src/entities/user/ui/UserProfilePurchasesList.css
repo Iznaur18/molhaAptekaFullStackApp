@@ -1,45 +1,63 @@
 .user-profile-purchases-section {
+  --user-profile-purchases-thumb-size: 64px;
+  --user-profile-purchases-thumb-radius: 14px;
+  --user-profile-purchases-tile-gap: 10px;
+  --user-profile-purchases-section-radius: 24px;
+
   margin-bottom: 1rem;
 }
 
 .user-profile-purchases {
-  --user-profile-purchases-thumb-size: 48px;
-  --user-profile-purchases-tile-gap: 0.5rem;
-
   margin-bottom: 0;
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--iz-color-text) 4%, var(--iz-color-surface));
-  border: 1px solid color-mix(in srgb, var(--iz-color-text) 12%, transparent);
+  padding: 0.75rem 0.875rem;
+  border-radius: var(--user-profile-purchases-section-radius);
+  background: var(--iz-color-surface);
+  border: 1px solid var(--iz-color-border);
+  overflow: hidden;
 }
 
 .user-profile-purchases-section > .user-profile-purchases__heading,
 .user-profile-purchases-section > .user-profile-purchases__heading_action {
   display: block;
   width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0.5rem 0.875rem;
+  border: 1px solid var(--iz-color-ink);
+  border-bottom: none;
+  border-radius: var(--user-profile-purchases-section-radius)
+    var(--user-profile-purchases-section-radius) 0 0;
+  background: var(--iz-color-ink);
+  color: var(--iz-color-on-contrast);
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: left;
 }
 
-.user-profile-purchases__heading {
-  margin: 0 0 0.5rem;
-  font-size: 0.95rem;
-  font-weight: 600;
-  text-align: center;
+.user-profile-purchases-section:has(> .user-profile-purchases__heading)
+  > .user-profile-purchases,
+.user-profile-purchases-section:has(> .user-profile-purchases__heading_action)
+  > .user-profile-purchases {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }
 
 .user-profile-purchases__heading_action {
-  padding: 0;
-  border: none;
-  background: none;
-  color: inherit;
   cursor: pointer;
   text-decoration: none;
+}
+
+.user-profile-purchases__heading_action:hover {
+  opacity: 0.9;
 }
 
 .user-profile-purchases__state {
   margin: 0;
   font-size: 0.875rem;
   text-align: center;
-  color: color-mix(in srgb, var(--iz-color-text) 70%, transparent);
+  color: var(--iz-color-text-muted);
 }
 
 .user-profile-purchases__state_error {
@@ -54,27 +72,29 @@
   display: grid;
   grid-template-columns: repeat(
     auto-fill,
-    minmax(var(--user-profile-purchases-thumb-size), 1fr)
+    var(--user-profile-purchases-thumb-size)
   );
-  justify-items: center;
+  justify-content: start;
   gap: var(--user-profile-purchases-tile-gap);
 }
 
 .user-profile-purchases__item {
   margin: 0;
-  width: 100%;
+  width: var(--user-profile-purchases-thumb-size);
 }
 
 .user-profile-purchases__row {
   display: block;
-  width: 100%;
+  width: var(--user-profile-purchases-thumb-size);
+  height: var(--user-profile-purchases-thumb-size);
   margin: 0;
   padding: 0;
   border: none;
   background: none;
   cursor: pointer;
-  border-radius: 6px;
+  border-radius: var(--user-profile-purchases-thumb-radius);
   line-height: 0;
+  overflow: hidden;
 }
 
 .user-profile-purchases__row:hover .user-profile-purchases__thumb {
@@ -83,13 +103,13 @@
 }
 
 .user-profile-purchases__thumb {
-  flex-shrink: 0;
+  display: block;
   width: var(--user-profile-purchases-thumb-size);
   height: var(--user-profile-purchases-thumb-size);
-  border-radius: 6px;
+  border-radius: var(--user-profile-purchases-thumb-radius);
   object-fit: cover;
-  background: color-mix(in srgb, var(--iz-color-text) 8%, var(--iz-color-surface));
-  border: 1px solid color-mix(in srgb, var(--iz-color-text) 14%, transparent);
+  background: var(--iz-color-surface-muted);
+  border: 1px solid var(--iz-color-border);
 }
 
 .user-profile-purchases__row_unavailable .user-profile-purchases__thumb {
@@ -105,21 +125,23 @@
 
 .user-profile-purchases__more {
   display: block;
-  margin-top: 0.5rem;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 0.35rem 0.75rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-text) 20%, transparent);
-  border-radius: 6px;
-  background: color-mix(in srgb, var(--iz-color-text) 4%, var(--iz-color-surface));
+  width: 100%;
+  margin-top: 0.75rem;
+  margin-left: 0;
+  margin-right: 0;
+  padding: 0.7rem 0.875rem;
+  border: none;
+  border-top: 1px solid var(--iz-color-border);
+  border-radius: 0;
+  background: var(--iz-color-surface-muted);
   color: inherit;
   font: inherit;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
+  font-weight: 600;
   cursor: pointer;
 }
 
 .user-profile-purchases__more:hover:not(:disabled) {
-  border-color: var(--iz-color-link);
   color: var(--iz-color-link);
 }
 

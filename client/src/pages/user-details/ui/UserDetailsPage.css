@@ -1,0 +1,151 @@
+/**
+ * Паритет mobile:
+ * - Stack.Screen title «Профиль» + back (`app/user/[id]`)
+ * - `useUserDetailsPageStyles.scrollContent`: paddingH 16, top 12, bottom 18, gap 8
+ * Горизонталь: shell уже даёт `--app-shell-content-inline-padding`;
+ * добираем только до 16px на узких экранах (там shell = 12px).
+ */
+.user-details-page {
+  --modal-avatar-lead-size: 4.5rem;
+  --modal-profile-banner-height-mult: 3;
+  --modal-banner-avatar-inset: 0.75rem;
+  --modal-profile-banner-radius: 24px;
+  --modal-profile-banner-scrim: rgba(0, 0, 0, 0.28);
+  --user-details-screen-padding-x: var(--iz-space-4);
+  --user-details-screen-padding-top: var(--iz-space-3);
+  --user-details-screen-padding-bottom: 18px;
+  --user-details-screen-gap: var(--iz-space-2);
+  --user-details-nav-height: 2.75rem;
+
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 40rem;
+  margin: 0 auto;
+  padding-top: var(--user-details-screen-padding-top);
+  padding-bottom: var(--user-details-screen-padding-bottom);
+  padding-inline: max(
+    0px,
+    calc(
+      var(--user-details-screen-padding-x) -
+        var(--app-shell-content-inline-padding, var(--iz-space-4))
+    )
+  );
+  display: flex;
+  flex-direction: column;
+  gap: var(--user-details-screen-gap);
+}
+
+/* Паритет native Stack header (`options={{ title: "Профиль" }}`) */
+.user-details-page__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--iz-space-1);
+  min-height: var(--user-details-nav-height);
+  margin: calc(-1 * var(--user-details-screen-padding-top)) 0 0;
+  padding: 0;
+}
+
+.user-details-page__back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: var(--iz-radius-md, 10px);
+  background: transparent;
+  color: var(--iz-color-action);
+  cursor: pointer;
+}
+
+.user-details-page__back:hover {
+  background: color-mix(in srgb, var(--iz-color-action) 10%, transparent);
+}
+
+.user-details-page__back:focus-visible {
+  outline: 2px solid var(--iz-color-action);
+  outline-offset: 2px;
+}
+
+.user-details-page__nav-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--iz-color-text);
+}
+
+.user-details-page__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--user-details-screen-gap);
+}
+
+.user-details-page__title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--user-details-screen-gap);
+}
+
+.user-details-page__title {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  font-size: 1.375rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--iz-color-text);
+}
+
+.user-details-page__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--user-details-screen-gap);
+}
+
+.user-details-page__state {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--iz-color-text-muted);
+}
+
+.user-details-page__state_error {
+  color: var(--iz-color-danger);
+}
+
+.user-details-page__retry {
+  align-self: flex-start;
+}
+
+.user-details-page__staff {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--iz-space-3);
+}
+
+.user-details-page__staff-btn {
+  flex: 1 1 auto;
+  min-width: 8rem;
+}
+
+.user-details-page .user-details-modal__banner {
+  margin-bottom: 0;
+  border-radius: var(--modal-profile-banner-radius);
+}
+
+/* Gap родителя уже spacing[2] — без лишних margin как в app */
+.user-details-page .user-profile-purchases-section {
+  margin-bottom: 0;
+}
+
+.user-details-page .user-profile-info {
+  margin-top: 0;
+}

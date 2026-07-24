@@ -25,6 +25,17 @@ export const IMAGE_URL_FIELD_UI = {
   FILE_INPUT_ARIA: "Выбрать изображение с устройства",
 };
 
+/** Квадратный кроп перед upload (аватар, как системный picker в приложении) */
+export const SQUARE_IMAGE_CROP_UI = {
+  TITLE: "Кадрирование аватара",
+  HINT: "Перетащите фото и увеличьте масштаб, чтобы выбрать видимую область.",
+  ZOOM: "Масштаб",
+  CONFIRM: "Готово",
+  CONFIRM_LOADING: "Обработка…",
+  CANCEL: "Отмена",
+  ERROR_GENERIC: "Не удалось обрезать изображение",
+};
+
 /** Загрузка intro-ролика: одна кнопка, сервер пережимает в MP4. */
 export const INTRO_VIDEO_UPLOAD_UI = {
   PICK_BUTTON: "Выбрать видео",
@@ -78,6 +89,8 @@ export const API_CLIENT_UI = {
   FETCH_USER_PURCHASES_FALLBACK: "Не удалось загрузить покупки",
   FETCH_USER_PRODUCTS_FALLBACK: "Не удалось загрузить товары",
   FETCH_USERS_SEARCH_FALLBACK: "Не удалось загрузить пользователей",
+  FETCH_MONTHLY_LOYALTY_POINTS_FALLBACK:
+    "Не удалось загрузить прогресс баллов за месяц",
   FETCH_MY_PRODUCTS_FALLBACK: "Не удалось загрузить ваши товары",
   FETCH_CATALOG_PRODUCT_FALLBACK: "Не удалось загрузить карточку товара",
   DELETE_MY_PRODUCT_FALLBACK: "Не удалось удалить товар",
@@ -209,6 +222,12 @@ export const PRODUCT_PRICE_OFFER_UI = {
   TAB_DETAILS: "О товаре",
   TAB_AUCTION: "Аукцион",
   AUCTION_SHORTCUT: "В аукцион",
+  DETAILS_TEASER_TITLE: "Аукцион",
+  /** @param {string} priceLabel */
+  DETAILS_TEASER_BEST_OFFER: (priceLabel) => `Топ ставка: ${priceLabel}`,
+  DETAILS_TEASER_NO_OFFERS: "Топ ставка: ставок пока нет",
+  DETAILS_TEASER_GO: "Предложить цену",
+  DETAILS_TEASER_ARIA: "Открыть вкладку аукциона",
   LABEL_PRICE: "Ваша цена, ₽",
   INPUT_PLACEHOLDER: "Предложите свою цену",
   ERROR_PRICE_MAX: "Цена не может превышать 999 999 999 ₽",
@@ -227,6 +246,7 @@ export const PRODUCT_PRICE_OFFER_UI = {
   SELLER_EMPTY: "Предложений пока нет",
   SELLER_LOADING: "Загрузка…",
   AUCTION_NOT_HELD: "Аукцион не проводится",
+  AUCTION_EMPTY: "Аукцион не проводится",
   AUCTION_ENDED: "Аукцион завершён",
   ARCHIVE_SECTION_TITLE: "История ставок",
   ARCHIVE_EMPTY: "Архив пуст",
@@ -234,6 +254,21 @@ export const PRODUCT_PRICE_OFFER_UI = {
   ACTION_REJECT: "Отклонить",
   ACTION_PENDING: "Сохраняем…",
   ACCEPTED_BADGE: "Ожидает оплаты",
+};
+
+export const PRODUCT_SIMILAR_UI = {
+  TAB: "Похожие",
+  LOADING: "Загрузка похожих товаров…",
+  EMPTY: "Нет похожих товаров в этой категории.",
+  FETCH_FALLBACK: "Не удалось загрузить похожие товары",
+};
+
+export const PRODUCT_SALE_UI = {
+  DETAILS_TEASER_TITLE: "Распродажа",
+  /** @param {number} count */
+  DETAILS_TEASER_REMAINING: (count) => `Осталось ${count} шт.`,
+  DETAILS_TEASER_GO: "Купить сейчас",
+  DETAILS_TEASER_ARIA: "Открыть товары продавца",
 };
 
 /** Вкладка «Аукцион» в профиле */
@@ -489,9 +524,41 @@ export const HEADER_PROFILE_BUTTON_UI = {
   ARIA: "Мой профиль",
 };
 
-/** Кнопка «Пользователи» в шапке */
+/** Кнопка «Пользователи» / stretch-меню в шапке */
 export const HEADER_USERS_BUTTON_UI = {
   ARIA: "Пользователи",
+  TOGGLE_ARIA: "Действия аккаунта",
+  MENU_ARIA: "Действия аккаунта",
+  MENU_CLOSE_ARIA: "Закрыть меню",
+  MENU_ITEM_USERS_ARIA: "Пользователи",
+  MENU_ITEM_TERMS_ARIA: "Пользовательское соглашение",
+  MENU_ITEM_FAQ_ARIA: "Частые вопросы",
+  MENU_ITEM_PLACEHOLDER_ARIA: (index) => `Пункт ${index} (скоро)`,
+};
+
+/** Страница FAQ */
+export const FAQ_UI = {
+  TITLE: "Частые вопросы",
+  UPDATED_PREFIX: "Обновлено:",
+  CONTACT_PREFIX: "Не нашли ответ? Напишите:",
+  /** @param {string} question */
+  QUESTION_ARIA: (question) => `Вопрос: ${question}`,
+};
+
+/** Юридические документы */
+export const LEGAL_UI = {
+  PRIVACY_TITLE: "Политика конфиденциальности",
+  PRIVACY_LINK: "Политика конфиденциальности",
+  PRIVACY_TAB: "Конфиденциальность",
+  TERMS_TITLE: "Пользовательское соглашение",
+  TERMS_LINK: "Пользовательское соглашение",
+  TERMS_TAB: "Соглашение",
+  LISTING_TITLE: "Правила размещения товаров",
+  LISTING_TAB: "Размещение",
+  OFFER_TITLE: "Публичная оферта",
+  OFFER_TAB: "Оферта",
+  UPDATED_PREFIX: "Обновлено:",
+  CONTACT_PREFIX: "Контакты:",
 };
 
 /** Кнопка «Показывать скрытые товары» в шапке (staff) */
@@ -506,12 +573,27 @@ export const CART_PAGE_UI = {
   EMPTY: "Корзина пуста.",
   LOADING: "Загрузка корзины…",
   TOTAL_LABEL: "Итого",
+  PURCHASABLE_TOTAL_LABEL: "К оформлению",
+  FULL_TOTAL_HINT: "Итого в корзине",
   REMOVE_LINE_ARIA: "Удалить из корзины",
+  SELECT_LINE_ARIA: "Выбрать товар для оформления",
+  SELECT_ALL: "Выбрать все",
+  /** @param {number} selected @param {number} total */
+  SELECTED_COUNT: (selected, total) => `Выбрано ${selected} из ${total}`,
   CLEAR_ALL: "Очистить корзину",
   GO_TO_CATALOG: "Перейти в каталог",
   AUTH_REQUIRED: "Войдите, чтобы оформить заказ.",
   AUTH_LOGIN: "Войти",
   PRODUCT_DELETED_OR_HIDDEN: "Товар недоступен",
+  CHECKOUT_BLOCKED_NO_PURCHASABLE: "Нет позиций для оформления",
+  CHECKOUT_BLOCKED_NOTHING_SELECTED: "Выберите товары для оформления",
+  CHECKOUT_BLOCKED_ALL_UNAVAILABLE: "Все товары недоступны",
+  CHECKOUT_BLOCKED_OWN_PRODUCTS_ONLY: "Нельзя оформить заказ на свои товары",
+  /** @param {number} left */
+  STOCK_REMAINING: (left) => `Осталось ${left} шт`,
+  STOCK_QUANTITY_LIMITED: "Количество ограничено",
+  CHECKOUT_OPEN: "Оформить заказ",
+  CHECKOUT_SHEET_CLOSE: "Закрыть",
 };
 
 /** Секция выигранных аукционных лотов в корзине */
@@ -560,6 +642,8 @@ export const CHECKOUT_FORM_UI = {
   HEADING: "Оформление заказа",
   LABEL_DELIVERY_ADDRESS: "Адрес доставки",
   PLACEHOLDER_DELIVERY_ADDRESS: "Город, улица, дом",
+  LABEL_FLAT: "Квартира / офис",
+  PLACEHOLDER_FLAT: "Необязательно",
   LABEL_PAYMENT_METHOD: "Способ оплаты",
   SUBMIT_IDLE: "Оформить заказ",
   SUBMIT_LOADING: "Оформляем…",
@@ -690,6 +774,7 @@ export const ADVERTISING_PAGE_UI = {
   PAGE_TITLE: "Реклама",
   PAGE_LEAD:
     "Продвигайте магазин через intro-ролик, баннер в шапке, личную плитку в каталоге и розыгрыш. Оплата баллами лояльности.",
+  HERO_CAPTION: "Реклама · баланс",
   /** @param {number} balance */
   BALANCE: (balance) => `${balance} баллов`,
   BALANCE_LABEL: "Баланс",
@@ -984,6 +1069,7 @@ export const USER_DATA_CONFIRMATION_PROFILE_PAGE_UI = {
   PLAN_TITLE: "Подтверждение данных",
   PLAN_INTRO:
     "После проверки паспорта модератором появится значок подтверждённого аккаунта.",
+  BENEFITS_TITLE: "Что даёт подтверждение",
   PLAN_BENEFITS: [
     "Отзывы на товары после подтверждённой покупки",
     "Ставки на аукционе (предложение цены)",
@@ -1094,6 +1180,10 @@ export const WISHLIST_PAGE_UI = {
   LOGIN_BUTTON: "Войти",
   /** @param {string} title */
   REMOVE_ARIA: (title) => `Убрать «${title}» из желаний`,
+  HERO_CAPTION: "Мои желания",
+  /** @type {readonly [string, string, string]} */
+  HERO_UNIT_FORMS: ["товар", "товара", "товаров"],
+  HERO_INFO: "Сохранённые товары из каталога — возвращайтесь к ним в любой момент.",
 };
 
 export const WISHLIST_TOGGLE_UI = {
@@ -1112,6 +1202,10 @@ export const SUBSCRIPTIONS_PAGE_UI = {
   FETCH_FALLBACK: "Не удалось загрузить подписки",
   LOGIN_HINT: "Войдите, чтобы видеть список подписок.",
   LOGIN_BUTTON: "Войти",
+  HERO_CAPTION: "Подписки",
+  /** @type {readonly [string, string, string]} */
+  HERO_UNIT_FORMS: ["продавец", "продавца", "продавцов"],
+  HERO_INFO: "Продавцы, за которыми вы следите. Их товары — в фильтре «Подписки» на главной.",
 };
 
 /** Страница «Мои продажи» */
@@ -1174,6 +1268,24 @@ export const USERS_PAGE_UI = {
   EMPTY: "Пользователей пока нет.",
   EMPTY_BY_QUERY: "Никого не нашли по этому запросу.",
   SEARCH_TOO_SHORT: "Введите не менее 3 символов для поиска.",
+};
+
+/** Подиум лидеров на странице пользователей */
+export const USERS_PODIUM_UI = {
+  TITLE: "Лидеры",
+  PLACE_1: "1 место",
+  PLACE_2: "2 место",
+  PLACE_3: "3 место",
+};
+
+/** Прогресс-бар месячных баллов на странице пользователей */
+export const USERS_MONTHLY_LOYALTY_LOADBAR_UI = {
+  TITLE: "Баллы за месяц",
+  /** @param {string} pointsLabel @param {string} goalLabel */
+  PROGRESS_ARIA: (pointsLabel, goalLabel) =>
+    `Начислено покупателям ${pointsLabel} из ${goalLabel} баллов за месяц`,
+  /** @param {string} pointsLabel @param {string} goalLabel */
+  COUNTER: (pointsLabel, goalLabel) => `${pointsLabel} / ${goalLabel}`,
 };
 
 /** Админ: редактирование чужого профиля */
@@ -1261,6 +1373,7 @@ export const USER_LIST_ROW_UI = {
   RATING_LABEL: "Рейтинг",
   USER_DATA_CONFIRMED_LABEL: "Пользователь подтверждён",
   FOLLOWERS_LABEL: "Подписчики",
+  LOYALTY_POINTS_LABEL: "Баллы",
 };
 
 /** Модалка при достижении лимита товаров продавца */
@@ -1323,7 +1436,7 @@ export const CREATE_PRODUCT_MODAL_UI = {
   TITLE_EDIT: "Редактирование товара",
   EDIT_WIZARD_PROGRESS_ARIA: "Шаги редактирования товара",
   EDIT_WIZARD_STEP_MANAGE_TITLE: "Управление товаром",
-  EDIT_WIZARD_STEP_MANAGE_SUBTITLE: "Видимость, аукцион, рассрочка и удаление",
+  EDIT_WIZARD_STEP_MANAGE_SUBTITLE: "Видимость, аукцион и рассрочка",
   EDIT_WIZARD_STEP_LABEL_MANAGE: "Ещё",
   SECTION_BASIC: "Основное",
   SECTION_MEDIA: "Фото и видео",
@@ -1418,7 +1531,7 @@ export const CREATE_PRODUCT_MODAL_UI = {
   CHARACTERISTICS_SECTION_ARIA: "Характеристики товара",
   HINT_CHARACTERISTICS: (max) =>
     `До ${max} пар «ключ — значение». Пустые строки не сохраняются.`,
-  PLACEHOLDER_CHARACTERISTIC_KEY: "Ключ",
+  PLACEHOLDER_CHARACTERISTIC_KEY: "Свойство",
   PLACEHOLDER_CHARACTERISTIC_VALUE: "Значение",
   ADD_CHARACTERISTIC_ROW: "+ Характеристика",
   CHARACTERISTIC_ROW_ARIA: (index) => `Характеристика ${index}`,
@@ -1428,19 +1541,38 @@ export const CREATE_PRODUCT_MODAL_UI = {
   WIZARD_STEP_ORIGINALITY_TITLE: "Оригинал",
   WIZARD_STEP_ORIGINALITY_SUBTITLE: "Подтвердите, что продаёте официальный товар",
   WIZARD_STEP_MEDIA_TITLE: "Фото и видео",
-  WIZARD_STEP_MEDIA_SUBTITLE: "Добавьте до 5 фото. Первое фото станет обложкой",
+  WIZARD_STEP_MEDIA_SUBTITLE:
+    "До 5 фото, можно выбрать несколько сразу. Первое — обложка",
   WIZARD_STEP_CATEGORY_TITLE: "Категория и город",
   WIZARD_STEP_CATEGORY_SUBTITLE: "Помогите покупателям найти товар в каталоге",
   WIZARD_STEP_COMMERCE_TITLE: "Цена и наличие",
   WIZARD_STEP_COMMERCE_SUBTITLE: "Укажите стоимость и сколько единиц готовы продать",
+  WIZARD_STEP_RETURNS_TITLE: "Возврат",
+  WIZARD_STEP_RETURNS_SUBTITLE: "Есть ли возврат и какие условия",
   WIZARD_STEP_REVIEW_TITLE: "Проверка",
   WIZARD_STEP_REVIEW_SUBTITLE: "Всё верно? Отправим товар на модерацию",
+  WIZARD_RETURNS_LEAD: "Есть ли возврат?",
+  LABEL_RETURN_ENABLED: "Возврат",
+  RETURN_YES: "Да",
+  RETURN_NO: "Нет",
+  HINT_RETURN_TERMS: "Пример: возврат в течение — 15 дней",
+  PLACEHOLDER_RETURN_TERM_KEY: "Свойство",
+  PLACEHOLDER_RETURN_TERM_VALUE: "Значение",
+  ADD_RETURN_TERM_ROW: "+ Добавить условие",
+  RETURN_TERMS_SECTION_ARIA: "Условия возврата",
+  RETURN_TERM_ROW_ARIA: (index) => `Условие возврата ${index}`,
+  REMOVE_RETURN_TERM_ROW_ARIA: (index) => `Удалить условие возврата ${index}`,
+  ERROR_RETURN_CHOICE: "Выберите: есть ли возврат",
   WIZARD_MEDIA_LEAD: "Добавьте хотя бы одно фото — без него товар не опубликуется.",
+  WIZARD_MEDIA_COVER_BADGE: "Обложка",
   WIZARD_MEDIA_COVER_LABEL: "Обложка в каталоге",
   WIZARD_MEDIA_COVER_EMPTY: "Добавьте фото — первое станет обложкой",
   WIZARD_MEDIA_GALLERY_LABEL: "Галерея",
   WIZARD_MEDIA_GALLERY_HINT:
     "Листайте галерею и меняйте порядок стрелками. Первое фото — главное. В каталоге обложка показывается в квадрате — центр кадра попадёт в превью.",
+  WIZARD_MEDIA_CROP_HINT:
+    "В каталоге обложка показывается в квадрате — центр кадра попадёт в превью.",
+  WIZARD_MEDIA_TAP_TO_COVER_HINT: "Нажмите на фото, чтобы сделать его обложкой",
   WIZARD_MEDIA_MOVE_EARLIER: "Левее",
   WIZARD_MEDIA_MOVE_EARLIER_ARIA: "Сдвинуть фото левее",
   WIZARD_MEDIA_MOVE_LATER: "Правее",
@@ -1448,12 +1580,21 @@ export const CREATE_PRODUCT_MODAL_UI = {
   WIZARD_MEDIA_SLOT_ARIA: (index) => `Фото ${index}`,
   WIZARD_MEDIA_SLOT_EMPTY: "Пусто",
   WIZARD_MEDIA_ADD_SLOT: "Добавить фото",
+  WIZARD_MEDIA_ADD_PHOTO_TILE: "Фото",
+  WIZARD_MEDIA_ADD_PHOTO_ARIA: "Добавить фото",
   WIZARD_MEDIA_EDITOR_LABEL: (index, isCover) =>
     isCover ? `Фото ${index} · обложка` : `Фото ${index}`,
   WIZARD_MEDIA_REMOVE: "Удалить фото",
   WIZARD_MEDIA_VIDEO_TITLE: "Видео-превью",
   WIZARD_MEDIA_VIDEO_OPTIONAL: "Необязательно",
+  WIZARD_MEDIA_VIDEO_OPTIONAL_TAG: "(необязательно)",
   WIZARD_MEDIA_VIDEO_LEAD: "Короткий ролик помогает показать товар в движении.",
+  WIZARD_MEDIA_VIDEO_DURATION_HINT:
+    "До 3 секунд: более длинный ролик автоматически обрежется при загрузке. Нужно хотя бы одно фото товара.",
+  WIZARD_MEDIA_VIDEO_PICK: "Выбрать видео",
+  WIZARD_MEDIA_VIDEO_REPLACE: "Заменить видео",
+  WIZARD_MEDIA_VIDEO_CLEAR: "Убрать видео",
+  WIZARD_MEDIA_VIDEO_UPLOAD_LOADING: "Загружаем…",
   WIZARD_MEDIA_VIDEO_TOGGLE_OPEN: "Добавить видео",
   WIZARD_MEDIA_VIDEO_TOGGLE_CLOSE: "Скрыть блок видео",
   WIZARD_MEDIA_FILLED_COUNT: (count, max) => `${count} из ${max} фото`,
@@ -1488,6 +1629,7 @@ export const CREATE_PRODUCT_MODAL_UI = {
   WIZARD_STEP_LABEL_MEDIA: "Медиа",
   WIZARD_STEP_LABEL_CATEGORY: "Категория",
   WIZARD_STEP_LABEL_COMMERCE: "Цена",
+  WIZARD_STEP_LABEL_RETURNS: "Возврат",
   WIZARD_STEP_LABEL_REVIEW: "Проверка",
   REMOVE_CHARACTERISTIC_ROW_ARIA: (index) => `Удалить характеристику ${index}`,
   ERROR_CHARACTERISTIC_PAIR: "У каждой характеристики должны быть и ключ, и значение",
@@ -1545,6 +1687,13 @@ export const PRODUCT_DETAILS_MODAL_UI = {
   SALE_CITY_ALL: "Во всех городах",
   CHARACTERISTICS_TITLE: "Характеристики",
   CHARACTERISTICS_SECTION_ARIA: "Характеристики товара",
+  RETURNS_TITLE: "Возврат",
+  RETURNS_SECTION_ARIA: "Условия возврата",
+  RETURNS_PLACEHOLDER: "Сведения о возврате появятся позже.",
+  RETURNS_NONE: "Возврат не предусмотрен.",
+  DELIVERY_TITLE: "Доставка",
+  DELIVERY_SECTION_ARIA: "Доставка",
+  DELIVERY_IN_DEVELOPMENT: "В разработке",
 };
 
 /** Превью продавца в модалке товара */
@@ -1631,9 +1780,16 @@ export const INSTALLMENT_UI = {
   BADGE: "Рассрочка",
   TAB: "Рассрочка",
   SHORTCUT: "В рассрочку",
+  DETAILS_TEASER_TITLE: "Рассрочка",
+  /** @param {string} monthlyLabel */
+  DETAILS_TEASER_FROM_MONTHLY: (monthlyLabel) => `от ${monthlyLabel} / мес`,
+  DETAILS_TEASER_GO: "Оформить сейчас",
+  DETAILS_TEASER_ARIA: "Открыть вкладку рассрочки",
   BUYER_HINT: "Оформление рассрочки доступно пользователям с подтверждёнными данными.",
   BUYER_REQUIRES_CONFIRMED:
     "Рассрочка доступна только пользователям с подтверждёнными данными.",
+  BUYER_PRODUCT_PRICE_LABEL: "Цена товара",
+  BUYER_MARKUP_LABEL: "Переплата",
   PLANS_LABEL: "План рассрочки",
   FIRST_PAYMENT_LATER: "первый платёж позже",
   QUANTITY_LABEL: "Количество",
@@ -1965,13 +2121,15 @@ export const RAFFLE_PRODUCTS_PAGE_UI = {
 };
 
 export const SELLER_PRODUCTS_PAGE_UI = {
+  TITLE: "Товары продавца",
+  BACK_ARIA: "Назад",
   LOADING: "Загрузка…",
   LOGIN_HINT: "Войдите, чтобы посмотреть товары продавца.",
   LOGIN_BUTTON: "Войти",
   FETCH_PROFILE_FALLBACK: "Не удалось загрузить профиль продавца",
   EMPTY: "У продавца пока нет товаров в каталоге.",
   /** @param {string} userName */
-  TITLE: (userName) => `Товары ${userName}`,
+  TITLE_FOR: (userName) => `Товары ${userName}`,
 };
 
 export const PRODUCT_PROMOTIONS_STAFF_PAGE_UI = {
@@ -1995,6 +2153,7 @@ export const PRODUCT_PROMOTIONS_STAFF_PAGE_UI = {
 export const PRODUCT_PROMOTION_UI = {
   MODAL_TITLE: "Продвижение товара",
   TAB_PROMOTION: "Продвижение",
+  TAB_MANAGE: "Управление",
   TABS_ARIA: "Разделы модалки продвижения",
   MODAL_SUBTITLE: (productName) => `Товар: ${productName || "Без названия"}`,
   BALANCE_LABEL: "Ваш баланс",
@@ -2024,6 +2183,53 @@ export const PRODUCT_PROMOTION_UI = {
   SUBMIT_PENDING: "Отправка…",
   CANCEL: "Отмена",
   CLOSE: "Закрыть",
+};
+
+/** Full-screen auth (parity with mobile AUTH_UI) */
+export const AUTH_UI = {
+  LOGIN_TITLE: "Вход",
+  LOGIN_SUBTITLE: "Войдите, чтобы продолжить покупки",
+  REGISTER_TITLE: "Регистрация",
+  REGISTER_SUBTITLE: "Создайте аккаунт за пару минут",
+  EMAIL_LABEL: "Email",
+  EMAIL_PLACEHOLDER: "you@example.com",
+  PASSWORD_LABEL: "Пароль",
+  PASSWORD_PLACEHOLDER: "••••••••",
+  PASSWORD_CONFIRM_LABEL: "Повторите пароль",
+  PASSWORD_CONFIRM_PLACEHOLDER: "••••••••",
+  SHOW_PASSWORD_ARIA: "Показать пароль",
+  HIDE_PASSWORD_ARIA: "Скрыть пароль",
+  USER_NAME_LABEL: "Имя пользователя",
+  USER_NAME_PLACEHOLDER: "username",
+  LOGIN_BUTTON: "Войти",
+  REGISTER_BUTTON: "Зарегистрироваться",
+  LOGOUT_BUTTON: "Выйти",
+  GO_TO_REGISTER: "Создать аккаунт",
+  GO_TO_LOGIN: "Уже есть аккаунт? Войти",
+  BACK_BUTTON: "Назад",
+  GUEST_STATUS: "Вы не вошли в аккаунт",
+  REGISTER_TERMS_CONSENT_PREFIX: "Я принимаю ",
+  REGISTER_TERMS_LINK: "Пользовательское соглашение",
+  REGISTER_TERMS_CONSENT_AND: " и ",
+  REGISTER_LISTING_LINK: "Правила размещения товаров",
+  REGISTER_PRIVACY_CONSENT_PREFIX: "Я даю ",
+  REGISTER_PRIVACY_CONSENT_LINK: "согласие на обработку персональных данных",
+  REGISTER_PRIVACY_CONSENT_SUFFIX: " в соответствии с ",
+  REGISTER_PRIVACY_LINK: "Политикой конфиденциальности",
+  REGISTER_CONSENT_REQUIRED: "Подтвердите согласие с документами для регистрации",
+  REGISTER_CODE_TITLE: "Подтвердите почту",
+  REGISTER_CODE_SUBTITLE: (email) =>
+    `Мы отправили 6-значный код на ${email}. Аккаунт будет создан только после подтверждения почты.`,
+  REGISTER_CODE_LABEL: "Код из письма",
+  REGISTER_CODE_PLACEHOLDER: "000000",
+  REGISTER_CODE_REQUIRED: "Введите 6-значный код из письма",
+  REGISTER_CODE_CONFIRM_BUTTON: "Подтвердить почту",
+  REGISTER_CODE_RESEND_BUTTON: "Отправить код повторно",
+  REGISTER_CODE_BACK_BUTTON: "Изменить данные регистрации",
+  GUEST_PROFILE_ACTION_BUTTON: "Перейти",
+  PROFILE_TITLE: "Профиль",
+  SESSION_CHECK: "Проверка сессии…",
+  SESSION_ERROR: "Ошибка сессии",
 };
 
 /** Модалка входа */
@@ -2108,6 +2314,17 @@ export const USER_DETAILS_MODAL_UI = {
   ARIA_CLOSE: "Закрыть",
 };
 
+/** Страница чужого профиля (`/user/:id`) — паритет с mobile */
+export const USER_DETAILS_PAGE_UI = {
+  TITLE: "Профиль",
+  BACK_ARIA: "Назад",
+  LOADING: "Загрузка профиля…",
+  FETCH_FALLBACK: "Не удалось загрузить профиль",
+  SELF_REDIRECT_HINT: "Это ваш профиль",
+  OPEN_OVERVIEW: "Мой обзор",
+  RETRY: "Повторить",
+};
+
 /** Блок покупок в чужом профиле (авторизованный зритель). */
 export const USER_PROFILE_PURCHASES_UI = {
   HEADING: "Список покупок",
@@ -2136,7 +2353,9 @@ export const LOYALTY_POINTS_PAGE_UI = {
   FETCH_FALLBACK: "Не удалось загрузить баллы",
   /** @param {number} balance */
   BALANCE_POINTS: (balance) => `Ваш баланс: ${balance} ${pluralizeRuBall(balance)}`,
+  BALANCE_CAPTION: "Ваш баланс",
   INFO: "1 балл = 1 ₽. Продавец задаёт бонус за покупку; подтверждённый покупатель получает баллы после подтверждения получения.",
+  USES_TITLE: "На что тратить баллы",
   PURCHASE_SECTION: "Пополнение",
   PURCHASE_AMOUNT_LABEL: "Сумма, ₽",
   PURCHASE_AMOUNT_HINT: "1 ₽ = 1 балл. Укажите, сколько хотите купить.",
@@ -2181,6 +2400,7 @@ export const PREMIUM_PAGE_UI = {
   /** @param {number} price */
   PLAN_PRICE: (price) => `${price} баллов`,
   PLAN_PERIOD: "Срок: 1 календарный месяц",
+  BENEFITS_TITLE: "Что входит",
   PLAN_BENEFITS: [
     "До 30 товаров в каталоге (вместо 15)",
     "Золотая обводка и галочка у имени",
@@ -2255,11 +2475,20 @@ export const THEME_SETTINGS_UI = {
   DARK: "Тёмная",
 };
 
-/** Модалка редактирования своего профиля (`PATCH /user/:id`) */
+/** Редактирование своего профиля (`PATCH /user/:id`) — страница и админ-модалка */
 export const EDIT_PROFILE_MODAL_UI = {
   ARIA_DIALOG: "Редактирование профиля",
   ARIA_CLOSE_BACKDROP: "Закрыть без сохранения",
   TITLE: "Редактирование профиля",
+  HERO_INTRO: "Обновите оформление, контакты и данные профиля.",
+  AUTH_REQUIRED: "Войдите, чтобы редактировать профиль",
+  LOGIN_BUTTON: "Войти",
+  SECTION_APPEARANCE: "Оформление",
+  SECTION_ACCOUNT: "Аккаунт",
+  SECTION_PERSONAL: "Личные данные",
+  SECTION_NOTIFICATIONS: "Уведомления",
+  SECTION_ABOUT: "О себе",
+  SECTION_SOCIAL: "Соцсети",
   LABEL_EMAIL: "Email (нельзя изменить)",
   LABEL_USERNAME: "Никнейм",
   USERNAME_HINT:
@@ -2268,14 +2497,21 @@ export const EDIT_PROFILE_MODAL_UI = {
   LABEL_BIRTH: "Дата рождения",
   LABEL_GENDER: "Пол",
   LABEL_ADDRESS: "Адрес",
+  LABEL_AVATAR: "Аватар",
   LABEL_AVATAR_URL: "Аватар (ссылка или файл)",
+  LABEL_BACKGROUND: "Фон профиля",
   LABEL_BG_PRESET: "Цвет фона",
   LABEL_BG_URL: "Фон — изображение (премиум, ссылка или файл)",
   LABEL_BG_PREVIEW: "Предпросмотр",
   LABEL_BG_URL_ADMIN: "Фон — изображение (приоритет над цветом, ссылка или файл)",
+  BG_UPLOAD_BUTTON: "Загрузить фото фона",
+  BG_REMOVE_IMAGE: "Убрать фото",
+  UPLOAD_BUTTON: "Выбрать фото",
+  UPLOAD_LOADING: "Загрузка…",
+  UPLOAD_HINT: "JPEG, PNG или WebP, до 50 МБ — большие файлы сожмутся автоматически",
+  UPLOAD_ERROR: "Не удалось загрузить файл",
   LABEL_NOTIFICATIONS: "Уведомления по email",
   LABEL_NOTES: "О себе",
-  SECTION_SOCIAL: "Соцсети",
   CLEAR_FIELD: "Очистить",
   CLEAR_SOCIAL_LINK: (label) => `Очистить ссылку ${label}`,
   WORDS_USED: (n, max) => `Слов: ${n} / ${max}`,
@@ -2283,6 +2519,7 @@ export const EDIT_PROFILE_MODAL_UI = {
   PLACEHOLDER_HTTPS: "https://…",
   SUBMIT_IDLE: "Сохранить",
   SUBMIT_LOADING: "Сохранение…",
+  SAVED: "Профиль сохранён",
   CANCEL: "Отмена",
 };
 

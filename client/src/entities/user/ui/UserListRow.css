@@ -149,6 +149,11 @@
   grid-row: 2;
 }
 
+.user-list-row__metric_loyalty {
+  grid-column: 2;
+  grid-row: 2;
+}
+
 .user-list-row__metric-label_long {
   line-height: 1.15;
   white-space: normal;

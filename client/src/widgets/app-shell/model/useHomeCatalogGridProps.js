@@ -10,7 +10,7 @@ export const useHomeCatalogGridProps = () => {
   const {
     catalogStatus,
     products,
-    isHomeCatalogMainView,
+    showHomeCatalogFeed,
     featuredRaffles,
     getFeaturedRaffleManage,
     userStoriesFeed,
@@ -57,17 +57,19 @@ export const useHomeCatalogGridProps = () => {
     homeCuratedProductLists,
     showCuratedProductLists,
     curatedListsQuery,
+    handlePlaceProductClick,
   } = ctx;
 
   const catalogCityFilterLabel = String(authUser?.userAddressCity ?? "").trim();
   const isCuratedProductListsLoading =
     showCuratedProductLists && curatedListsQuery.isPending;
+  const isUserDataConfirmed = authUser?.isUserDataConfirmed === true;
 
   return useMemo(
     () => ({
       catalogStatus,
       products,
-      isHomeCatalogMainView,
+      isHomeCatalogMainView: Boolean(showHomeCatalogFeed),
       featuredRaffles,
       getFeaturedRaffleManage,
       userStoriesFeed,
@@ -113,24 +115,19 @@ export const useHomeCatalogGridProps = () => {
         catalogSort !== CATALOG_SORT_CITY,
       catalogCityFilterLabel,
       onShowAllCatalogCities: handleShowAllCatalogCities,
-      showFullWidthTier3Banners:
-        !isMineMode &&
-        !selectedProductCategory &&
-        !hasProductSearchQuery &&
-        !catalogFollowingOnly &&
-        !catalogAuctionOnly &&
-        !catalogInstallmentOnly &&
-        !catalogSaleOnly,
+      showFullWidthTier3Banners: Boolean(showHomeCatalogFeed) && !isMineMode,
       sellerRaffleActive,
       raffleParticipationPendingProductId,
       homeCuratedProductLists,
       showCuratedProductLists,
       isCuratedProductListsLoading,
+      isUserDataConfirmed,
+      onPlaceProductClick: handlePlaceProductClick,
     }),
     [
       catalogStatus,
       products,
-      isHomeCatalogMainView,
+      showHomeCatalogFeed,
       featuredRaffles,
       getFeaturedRaffleManage,
       userStoriesFeed,
@@ -172,12 +169,13 @@ export const useHomeCatalogGridProps = () => {
       catalogSort,
       catalogCityFilterLabel,
       handleShowAllCatalogCities,
-      authUser,
       sellerRaffleActive,
       raffleParticipationPendingProductId,
       homeCuratedProductLists,
       showCuratedProductLists,
       isCuratedProductListsLoading,
+      isUserDataConfirmed,
+      handlePlaceProductClick,
     ],
   );
 };

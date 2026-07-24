@@ -5,19 +5,16 @@
   gap: 0.4rem;
   height: 100%;
   padding: 0.55rem 0.75rem 0.65rem;
-  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  border: none;
   border-radius: var(--product-card-radius);
   overflow: hidden;
   text-align: left;
   background: var(--iz-color-surface);
   box-shadow: 0 4px 12px color-mix(in srgb, var(--iz-color-text) 6%, transparent);
-  transition:
-    border-color 0.15s ease,
-    box-shadow 0.15s ease;
+  transition: box-shadow 0.15s ease;
 }
 
 .product-card:hover {
-  border-color: color-mix(in srgb, currentColor 24%, transparent);
   box-shadow: 0 6px 16px color-mix(in srgb, var(--iz-color-text) 8%, transparent);
 }
 
@@ -32,17 +29,17 @@
   height: auto;
 }
 
+/*
+ * Паритет mobile resolveProductCardPromotionFrameStyle:
+ * fill = surface / transparent, акцент только border + shadow (без цветной заливки).
+ */
 .product-card-promotion-frame--tier-1 > .product-card {
   --product-card-promotion-accent: var(--iz-color-warning);
   --product-card-promotion-accent-soft: var(--iz-color-warning);
 
   border: 2px solid
     color-mix(in srgb, var(--product-card-promotion-accent) 68%, transparent);
-  background: linear-gradient(
-    165deg,
-    color-mix(in srgb, var(--iz-color-warning-surface) 90%, var(--product-card-promotion-accent-soft)),
-    color-mix(in srgb, var(--iz-color-surface) 86%, var(--iz-color-warning-surface))
-  );
+  background: var(--iz-color-surface);
   box-shadow:
     0 0 0 1px
       color-mix(in srgb, var(--product-card-promotion-accent-soft) 32%, transparent),
@@ -54,11 +51,7 @@
   --product-card-promotion-accent-soft: var(--iz-color-accent-soft);
 
   border: 2px solid color-mix(in srgb, var(--product-card-promotion-accent) 78%, transparent);
-  background: linear-gradient(
-    165deg,
-    color-mix(in srgb, var(--iz-color-accent-soft) 45%, var(--iz-color-accent)),
-    color-mix(in srgb, var(--iz-color-accent) 28%, var(--iz-color-accent-soft))
-  );
+  background: var(--iz-color-surface);
   box-shadow:
     0 0 0 1px color-mix(in srgb, var(--product-card-promotion-accent-soft) 52%, transparent),
     0 4px 16px color-mix(in srgb, var(--product-card-promotion-accent) 28%, transparent);
@@ -85,6 +78,7 @@
     0 8px 22px color-mix(in srgb, var(--product-card-promotion-accent) 24%, transparent);
 }
 
+/* Premium-only / promo+premium: soft elevation, без цветной заливки (как mobile). */
 .product-card-premium-frame > .product-card {
   background: var(--iz-color-surface);
   box-shadow: 0 4px 12px color-mix(in srgb, var(--iz-color-text) 6%, transparent);
@@ -95,43 +89,17 @@
 }
 
 .product-card-promotion-frame.product-card-premium-frame > .product-card {
-  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  background: var(--iz-color-surface);
   box-shadow: 0 4px 12px color-mix(in srgb, var(--iz-color-text) 6%, transparent);
 }
 
 .product-card-promotion-frame.product-card-premium-frame > .product-card:hover {
-  border-color: color-mix(in srgb, currentColor 24%, transparent);
   box-shadow: 0 6px 16px color-mix(in srgb, var(--iz-color-text) 8%, transparent);
 }
 
-.product-card-promotion-frame.product-card-premium-frame.product-card-promotion-frame--tier-1
-  > .product-card {
-  background: linear-gradient(
-    165deg,
-    color-mix(in srgb, var(--iz-color-warning-surface) 88%, var(--product-card-promotion-accent-soft)),
-    color-mix(in srgb, var(--iz-color-surface) 84%, var(--iz-color-warning-surface))
-  );
-}
-
-.product-card-promotion-frame.product-card-premium-frame.product-card-promotion-frame--tier-2
-  > .product-card {
-  background: linear-gradient(
-    165deg,
-    color-mix(in srgb, var(--iz-color-accent-soft) 42%, var(--iz-color-accent)),
-    color-mix(in srgb, var(--iz-color-accent) 26%, var(--iz-color-accent-soft))
-  );
-}
-
-.product-card-promotion-frame.product-card-premium-frame.product-card-promotion-frame--tier-3
-  > .product-card {
-  background: var(--iz-color-surface);
-}
-
 .product-card--raffle-participant {
-  border-color: color-mix(in srgb, var(--iz-color-warning) 45%, transparent);
-  background: linear-gradient(
-    165deg,
-    color-mix(in srgb, var(--iz-color-accent-soft) 88%, var(--iz-color-surface)),
-    color-mix(in srgb, var(--iz-color-surface) 90%, var(--iz-color-accent-soft))
-  );
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--iz-color-warning) 45%, transparent),
+    0 4px 12px color-mix(in srgb, var(--iz-color-text) 6%, transparent);
+  background: var(--iz-color-surface);
 }

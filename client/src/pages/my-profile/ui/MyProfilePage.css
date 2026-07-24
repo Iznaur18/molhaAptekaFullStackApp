@@ -5,10 +5,12 @@
   --my-profile-mobile-nav-width: min(18rem, 88vw);
   --my-profile-mobile-nav-z-index: var(--iz-z-dropdown);
   --my-profile-nav-accent-width: 3px;
-  --my-profile-surface-radius: var(--iz-radius-modal);
+  --my-profile-surface-radius: 24px;
   --modal-avatar-lead-size: 4.5rem;
   --modal-profile-banner-height-mult: 3;
   --modal-banner-avatar-inset: 0.75rem;
+  --modal-profile-banner-radius: 24px;
+  --modal-profile-banner-scrim: rgba(0, 0, 0, 0.28);
 
   box-sizing: border-box;
   display: flex;
@@ -355,6 +357,27 @@
   margin-inline: var(--my-profile-shell-content-gutter, 0);
 }
 
+/* Compact «Мои товары»: без edge-bleed сетки каталога, padding как в app (16px). */
+.my-profile-page--my-products.my-profile-page--catalog-grid-tab {
+  --my-profile-shell-content-gutter: 0;
+  margin-inline: 0;
+  width: 100%;
+}
+
+.my-profile-page--my-products .my-products-catalog-toolbar,
+.my-profile-page--my-products .my-profile-page__catalog-shell {
+  width: 100%;
+  margin-inline: 0;
+}
+
+.my-profile-page--my-products .my-products-catalog-section {
+  gap: 12px;
+}
+
+.my-profile-page--my-products .my-products-catalog-section__list {
+  gap: 10px;
+}
+
 @container app-viewport (max-width: 1023px) {
   .my-profile-page--catalog-grid-tab {
     --my-profile-mobile-inline-inset: 0.1rem;
@@ -369,6 +392,12 @@
     width: calc(
       100% + 2 * (var(--app-shell-content-inline-padding) - var(--my-profile-mobile-inline-inset))
     );
+  }
+
+  .my-profile-page--my-products.my-profile-page--catalog-grid-tab {
+    --my-profile-shell-content-gutter: 0;
+    margin-inline: 0;
+    width: 100%;
   }
 
   .my-profile-page--catalog-grid-tab .my-profile-page__catalog-shell .app-shell__grid,
@@ -390,6 +419,12 @@
     width: calc(
       100% + 2 * (var(--app-shell-content-inline-padding) - var(--my-profile-mobile-inline-inset))
     );
+  }
+
+  .my-profile-page--my-products.my-profile-page--catalog-grid-tab {
+    --my-profile-shell-content-gutter: 0;
+    margin-inline: 0;
+    width: 100%;
   }
 }
 
@@ -416,7 +451,7 @@
 }
 
 .my-profile-page .user-details-modal__banner {
-  border-radius: var(--my-profile-surface-radius);
+  border-radius: var(--modal-profile-banner-radius);
 }
 
 .my-profile-page__banner-edit {
@@ -620,6 +655,12 @@
     margin-inline: var(--my-profile-shell-content-gutter, 0);
   }
 
+  .my-profile-page--my-products.my-profile-page--catalog-grid-tab
+    .my-profile-page__mobile-nav-toggle {
+    width: 100%;
+    margin-inline: 0;
+  }
+
   .my-profile-page__mobile-nav-backdrop {
     display: block;
   }
@@ -728,7 +769,7 @@
   }
 
   .my-profile-page__body .user-details-modal__banner {
-    border-radius: 1.5rem;
+    border-radius: var(--modal-profile-banner-radius);
     overflow: hidden;
   }
 

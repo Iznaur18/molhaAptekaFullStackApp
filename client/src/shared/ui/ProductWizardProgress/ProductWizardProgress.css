@@ -77,8 +77,7 @@
   color: var(--iz-color-text-secondary);
 }
 
-@container app-viewport (max-width: 560px) {
-  .product-wizard-progress__step-label {
-    display: none;
-  }
+.product-wizard-progress__step_active .product-wizard-progress__step-label {
+  color: var(--iz-color-text);
+  font-weight: 600;
 }

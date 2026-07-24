@@ -3,6 +3,7 @@ import { isPremiumActive } from "../../../entities/user/lib/isPremiumActive.js";
 import { USER_ROLE_USER } from "../../../entities/user/model/userConstants.js";
 import { ThemePreferenceToggle } from "../../../features/theme-settings/ui/ThemePreferenceToggle.jsx";
 import {
+  AUTH_UI,
   MY_PROFILE_PAGE_UI,
   USER_DETAILS_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
@@ -12,6 +13,7 @@ import { useMyProfileNav } from "../model/useMyProfileNav.js";
 import { useMyProfilePageUi } from "../model/useMyProfilePageUi.js";
 import { AppIcon, ChevronDown, Menu, Pencil } from "../../../shared/ui/icon/index.js";
 import { UserProfileInfoPanel } from "../../../entities/user/ui/UserProfileInfoPanel.jsx";
+import { GuestProfilePanel } from "./GuestProfilePanel.jsx";
 import { ProfileSidebar } from "./ProfileSidebar.jsx";
 
 import "../../../entities/user/ui/UserDetailsModal.css";
@@ -121,6 +123,9 @@ export function MyProfilePage({
   tabContent = null,
   myProductsCatalogToolbarProps = null,
 }) {
+  const isGuestProfile =
+    !user && !isLoading && !errorMessage && activeTab === PROFILE_TAB_OVERVIEW;
+  const isGuestOtherTab = !user && !isLoading && !errorMessage && !isGuestProfile;
   const isProfileReady = Boolean(user) && !isLoading && !errorMessage;
   const canUseEditProfile = isProfileReady && Boolean(onEditProfileClick);
   const isRegularUser = user?.userRole === USER_ROLE_USER;
@@ -199,11 +204,24 @@ export function MyProfilePage({
     onEditProfileClick,
   });
 
+  if (isGuestProfile) {
+    return <GuestProfilePanel />;
+  }
+
+  if (isGuestOtherTab) {
+    return (
+      <p className="my-profile-page__state" role="status">
+        {AUTH_UI.GUEST_STATUS}
+      </p>
+    );
+  }
+
   return (
     <section
       className={[
         "my-profile-page",
         isFullWidthCatalogTab ? "my-profile-page--catalog-grid-tab" : "",
+        isMyProductsTab ? "my-profile-page--my-products" : "",
       ]
         .filter(Boolean)
         .join(" ")}

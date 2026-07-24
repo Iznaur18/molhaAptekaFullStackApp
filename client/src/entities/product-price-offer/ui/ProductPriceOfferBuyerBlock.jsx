@@ -54,9 +54,10 @@ export function ProductPriceOfferBuyerBlock({
   onCloseModal,
 }) {
   const navigate = useNavigate();
+  const myOfferQueryEnabled = isAuthorized && !isOwnProduct;
   const myOfferQuery = useMyPriceOfferQuery({
     productId,
-    enabled: isAuthorized,
+    enabled: myOfferQueryEnabled,
   });
   const { submitMutation, patchMutation, cancelMutation } =
     usePriceOfferMutations(productId);
@@ -74,10 +75,10 @@ export function ProductPriceOfferBuyerBlock({
       setPriceInput(formatIntegerGroupRu(myOffer.offerPrice));
       return;
     }
-    if (!myOfferQuery.isLoading) {
+    if (!myOfferQueryEnabled || !myOfferQuery.isLoading) {
       setPriceInput("");
     }
-  }, [myOffer?._id, myOffer?.offerPrice, myOfferQuery.isLoading]);
+  }, [myOffer?._id, myOffer?.offerPrice, myOfferQuery.isLoading, myOfferQueryEnabled]);
 
   const hasLinkedOrder =
     myOffer?.orderId != null && String(myOffer.orderId).trim() !== "";
@@ -154,40 +155,27 @@ export function ProductPriceOfferBuyerBlock({
       ? PRODUCT_PRICE_OFFER_UI.UPDATE
       : PRODUCT_PRICE_OFFER_UI.SUBMIT;
 
-  const dockPrimaryAction = (() => {
-    if (!dockSubmit || isOwnProduct) {
-      return null;
-    }
-    if (showGoToCartButton) {
-      return {
-        label: PRODUCT_PRICE_OFFER_UI.GO_TO_CART,
-        onClick: handleGoToCart,
-        disabled: false,
-      };
-    }
-    if (showForm) {
-      return {
-        label: offerSubmitLabel,
-        onClick: () => void handleSubmitOffer(),
-        disabled: isBusy,
-      };
-    }
-    if (!isAuthorized) {
-      return {
-        label: PRODUCT_PRICE_OFFER_UI.SUBMIT,
-        onClick: () => onRequestLogin?.(),
-        disabled: false,
-      };
-    }
-    return null;
-  })();
+  const showDockPrimaryAction =
+    dockSubmit && !isOwnProduct && (showForm || !isAuthorized);
 
-  const showDockPrimaryAction = dockPrimaryAction != null;
+  const dockPrimaryAction = showDockPrimaryAction
+    ? {
+        label: !isAuthorized ? PRODUCT_PRICE_OFFER_UI.SUBMIT : offerSubmitLabel,
+        onClick: () => {
+          if (!isAuthorized) {
+            onRequestLogin?.();
+            return;
+          }
+          void handleSubmitOffer();
+        },
+        disabled: isAuthorized ? isBusy : false,
+      }
+    : null;
 
   const renderPrimaryButton = ({ label, onClick, disabled }) => (
     <button
       type="button"
-      className="product-price-offer__btn product-price-offer__btn--primary"
+      className="app-btn app-btn--contrast product-price-offer__btn"
       disabled={disabled}
       onClick={onClick}
     >
@@ -196,7 +184,7 @@ export function ProductPriceOfferBuyerBlock({
   );
 
   const dockedPrimaryAction =
-    showDockPrimaryAction && typeof document !== "undefined"
+    dockPrimaryAction != null && typeof document !== "undefined"
       ? createPortal(
           <div className="product-modal-shell__docked-footer product-price-offer__docked-footer">
             {renderPrimaryButton(dockPrimaryAction)}
@@ -213,51 +201,51 @@ export function ProductPriceOfferBuyerBlock({
         <>
           {showForm ? (
             <div className="product-price-offer__form">
-              <h2 className="product-price-offer__heading">
+              <h2 className="product-price-offer__section-label">
                 {PRODUCT_PRICE_OFFER_UI.SECTION_FORM_TITLE}
               </h2>
-              <label className="product-price-offer__label">
-                {PRODUCT_PRICE_OFFER_UI.LABEL_PRICE}
-                <input
-                  {...INTEGER_INPUT_FIELD_PROPS}
-                  className="product-price-offer__input"
-                  placeholder={PRODUCT_PRICE_OFFER_UI.INPUT_PLACEHOLDER}
-                  value={priceInput}
-                  onChange={(e) => setPriceInput(formatRubPriceInput(e.target.value))}
-                  disabled={isBusy}
-                />
-              </label>
-              <div className="product-price-offer__actions">
-                {!showDockPrimaryAction ? (
-                  renderPrimaryButton({
-                    label: offerSubmitLabel,
-                    onClick: () => void handleSubmitOffer(),
-                    disabled: isBusy,
-                  })
-                ) : null}
-                {myOffer?.status === PRICE_OFFER_STATUS_PENDING ? (
-                  <button
-                    type="button"
-                    className="product-price-offer__btn product-price-offer__btn--cancel"
-                    disabled={isBusy}
-                    onClick={() => void handleCancel()}
-                  >
-                    {PRODUCT_PRICE_OFFER_UI.CANCEL}
-                  </button>
-                ) : null}
-              </div>
+              <input
+                {...INTEGER_INPUT_FIELD_PROPS}
+                className="product-price-offer__input"
+                aria-label={PRODUCT_PRICE_OFFER_UI.LABEL_PRICE}
+                placeholder={PRODUCT_PRICE_OFFER_UI.INPUT_PLACEHOLDER}
+                value={priceInput}
+                onChange={(e) => setPriceInput(formatRubPriceInput(e.target.value))}
+                disabled={isBusy}
+              />
+              {myOffer?.status === PRICE_OFFER_STATUS_PENDING || !showDockPrimaryAction ? (
+                <div className="product-price-offer__actions">
+                  {!showDockPrimaryAction
+                    ? renderPrimaryButton({
+                        label: offerSubmitLabel,
+                        onClick: () => void handleSubmitOffer(),
+                        disabled: isBusy,
+                      })
+                    : null}
+                  {myOffer?.status === PRICE_OFFER_STATUS_PENDING ? (
+                    <button
+                      type="button"
+                      className="app-btn app-btn--cancel product-price-offer__btn product-price-offer__btn--cancel"
+                      disabled={isBusy}
+                      onClick={() => void handleCancel()}
+                    >
+                      {PRODUCT_PRICE_OFFER_UI.CANCEL}
+                    </button>
+                  ) : null}
+                </div>
+              ) : null}
             </div>
           ) : null}
 
-          {!isAuthorized && !showDockPrimaryAction ? (
-            renderPrimaryButton({
-              label: PRODUCT_PRICE_OFFER_UI.SUBMIT,
-              onClick: () => onRequestLogin?.(),
-              disabled: false,
-            })
-          ) : null}
+          {!isAuthorized && !showDockPrimaryAction
+            ? renderPrimaryButton({
+                label: PRODUCT_PRICE_OFFER_UI.SUBMIT,
+                onClick: () => onRequestLogin?.(),
+                disabled: false,
+              })
+            : null}
 
-          {isAuthorized && !isUserDataConfirmed && !isOwnProduct ? (
+          {isAuthorized && !isUserDataConfirmed ? (
             <>
               <ProductPriceOfferHintMessage>
                 {PRODUCT_PRICE_OFFER_UI.CONFIRMED_DATA_REQUIRED}
@@ -265,7 +253,7 @@ export function ProductPriceOfferBuyerBlock({
               <div className="product-price-offer__actions">
                 <button
                   type="button"
-                  className="product-price-offer__btn product-price-offer__btn--primary"
+                  className="app-btn app-btn--contrast product-price-offer__btn"
                   onClick={() =>
                     confirmGate.require("data-confirmation", "сделать ставку на аукционе")
                   }
@@ -295,7 +283,7 @@ export function ProductPriceOfferBuyerBlock({
             </p>
           ) : null}
 
-          {showGoToCartButton && !showDockPrimaryAction ? (
+          {showGoToCartButton ? (
             <div className="product-price-offer__pay">
               {renderPrimaryButton({
                 label: PRODUCT_PRICE_OFFER_UI.GO_TO_CART,
@@ -313,7 +301,7 @@ export function ProductPriceOfferBuyerBlock({
         </p>
       ) : null}
 
-      <h2 className="product-price-offer__heading">
+      <h2 className="product-price-offer__section-label">
         {PRODUCT_PRICE_OFFER_UI.SECTION_TOP_TITLE}
       </h2>
       <ProductPriceOfferTopList

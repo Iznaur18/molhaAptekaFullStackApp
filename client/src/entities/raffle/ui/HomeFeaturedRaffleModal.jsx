@@ -7,6 +7,7 @@ import {
 } from "../../../shared/config/appUiCopy.js";
 import { useDialogFocusTrap } from "../../../shared/lib/useDialogFocusTrap.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
+import { useHomeFeaturedRaffleModalAnimation } from "../model/useHomeFeaturedRaffleModalAnimation.js";
 import { FeaturedRaffleModalCard } from "./FeaturedRaffleModalCard.jsx";
 
 import "./HomeFeaturedRaffleModal.css";
@@ -39,6 +40,7 @@ export function HomeFeaturedRaffleModal({
   const closeButtonRef = useRef(/** @type {HTMLButtonElement | null} */ (null));
   /** @type {import('react').MutableRefObject<{ pointerId: number; startX: number; startY: number; startIndex: number; captureTarget: HTMLElement; mode: 'pending' | 'active' } | null>} */
   const dragRef = useRef(null);
+  const { mounted, isVisible } = useHomeFeaturedRaffleModalAnimation(visible);
   const [viewportWidth, setViewportWidth] = useState(() =>
     typeof window !== "undefined" ? window.innerWidth : 0,
   );
@@ -59,15 +61,16 @@ export function HomeFeaturedRaffleModal({
   const visualSize = Math.round(cardWidth * VISUAL_SIZE_RATIO);
   const stride = cardWidth + SLIDE_GAP_PX;
   const activeRaffle = raffles[activeIndex] ?? raffles[0] ?? null;
+  const isInteractive = visible && isVisible;
 
-  useScrollLock(visible);
+  useScrollLock(mounted);
   useDialogFocusTrap(dialogRef, {
-    active: visible,
+    active: isInteractive,
     initialFocusRef: closeButtonRef,
   });
 
   useLayoutEffect(() => {
-    if (!visible) {
+    if (!mounted) {
       return undefined;
     }
 
@@ -79,7 +82,7 @@ export function HomeFeaturedRaffleModal({
     syncViewport();
     window.addEventListener("resize", syncViewport);
     return () => window.removeEventListener("resize", syncViewport);
-  }, [visible]);
+  }, [mounted]);
 
   useEffect(() => {
     if (!visible) {
@@ -91,7 +94,7 @@ export function HomeFeaturedRaffleModal({
   }, [visible]);
 
   useEffect(() => {
-    if (!visible || slideCount <= 1 || isPaused || isDragging || stride <= 0) {
+    if (!isInteractive || slideCount <= 1 || isPaused || isDragging || stride <= 0) {
       return undefined;
     }
 
@@ -100,10 +103,10 @@ export function HomeFeaturedRaffleModal({
     }, RAFFLE_FEATURED_CAROUSEL_UI.AUTOPLAY_MS);
 
     return () => window.clearInterval(timerId);
-  }, [isDragging, isPaused, slideCount, stride, visible]);
+  }, [isDragging, isInteractive, isPaused, slideCount, stride]);
 
   useEffect(() => {
-    if (!visible) {
+    if (!isInteractive) {
       return undefined;
     }
 
@@ -115,7 +118,7 @@ export function HomeFeaturedRaffleModal({
 
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, [onClose, visible]);
+  }, [isInteractive, onClose]);
 
   const settleIndex = useCallback(
     (nextIndex) => {
@@ -232,7 +235,7 @@ export function HomeFeaturedRaffleModal({
     onOpenProducts(String(activeRaffle._id));
   };
 
-  if (!visible || slideCount === 0 || typeof document === "undefined") {
+  if (!mounted || slideCount === 0 || typeof document === "undefined") {
     return null;
   }
 
@@ -241,6 +244,12 @@ export function HomeFeaturedRaffleModal({
     transform: `translateX(${trackOffsetPx}px)`,
     transition: isDragging ? "none" : "transform 0.45s ease",
   };
+  const backdropClassName = [
+    "home-featured-raffle-modal__backdrop",
+    isVisible ? "home-featured-raffle-modal__backdrop--open" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   const body =
     slideCount === 1 ? (
@@ -248,7 +257,7 @@ export function HomeFeaturedRaffleModal({
         raffle={raffles[0]}
         visualSize={visualSize}
         manage={getManage?.(raffles[0]) ?? null}
-        isVideoActive
+        isVideoActive={isInteractive}
       />
     ) : (
       <div
@@ -280,7 +289,7 @@ export function HomeFeaturedRaffleModal({
                 raffle={raffle}
                 visualSize={visualSize}
                 manage={getManage?.(raffle) ?? null}
-                isVideoActive={index === activeIndex}
+                isVideoActive={isInteractive && index === activeIndex}
               />
             </div>
           ))}
@@ -289,7 +298,7 @@ export function HomeFeaturedRaffleModal({
     );
 
   return createPortal(
-    <div className="home-featured-raffle-modal__backdrop" role="presentation">
+    <div className={backdropClassName} role="presentation">
       <button
         type="button"
         className="home-featured-raffle-modal__scrim"

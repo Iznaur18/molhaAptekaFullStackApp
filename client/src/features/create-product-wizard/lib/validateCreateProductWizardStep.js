@@ -18,6 +18,7 @@ import {
   PRODUCT_STOCK_QUANTITY_MAX,
   PRODUCT_STOCK_QUANTITY_MIN,
 } from "../../../entities/product/model/productStockConstants.js";
+import { validateProductReturnTermRows } from "../../../entities/product/lib/productReturnTermRows.js";
 import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { CREATE_PRODUCT_WIZARD_STEP_IDS } from "./createProductWizardSteps.js";
 
@@ -128,6 +129,18 @@ export function validateCreateProductWizardStep(stepId, form, context) {
         );
       }
 
+      return null;
+    }
+
+    case "returns": {
+      if (form.productReturnEnabled == null) {
+        return CREATE_PRODUCT_MODAL_UI.ERROR_RETURN_CHOICE;
+      }
+      if (form.productReturnEnabled === true) {
+        return validateProductReturnTermRows(
+          Array.isArray(form.returnTermRows) ? form.returnTermRows : [],
+        );
+      }
       return null;
     }
 

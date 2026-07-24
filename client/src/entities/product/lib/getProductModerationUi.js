@@ -21,9 +21,27 @@ export function getProductModerationBadgeLabel(product) {
 
 /**
  * @param {import('../model/types.js').ProductFromApi} product
+ * @returns {"pending" | "approved" | "rejected"}
+ */
+export function getProductModerationBadgeVariant(product) {
+  const status = product.productModerationStatus ?? PRODUCT_MODERATION_APPROVED;
+  if (status === PRODUCT_MODERATION_PENDING) {
+    return "pending";
+  }
+  if (status === PRODUCT_MODERATION_REJECTED) {
+    return "rejected";
+  }
+  return "approved";
+}
+
+/**
+ * @param {import('../model/types.js').ProductFromApi} product
  */
 export function isProductModerationPending(product) {
-  return (product.productModerationStatus ?? PRODUCT_MODERATION_APPROVED) === PRODUCT_MODERATION_PENDING;
+  return (
+    (product.productModerationStatus ?? PRODUCT_MODERATION_APPROVED) ===
+    PRODUCT_MODERATION_PENDING
+  );
 }
 
 /**
@@ -71,4 +89,20 @@ export function canSellerToggleCatalogVisibility(product) {
     (product.productModerationStatus ?? PRODUCT_MODERATION_APPROVED) ===
     PRODUCT_MODERATION_APPROVED
   );
+}
+
+/**
+ * @param {import('../model/types.js').ProductFromApi} product
+ * @param {boolean} isMineMode
+ * @returns {string | null}
+ */
+export function getProductModerationRejectionComment(product, isMineMode) {
+  if (
+    !isMineMode ||
+    product.productModerationStatus !== PRODUCT_MODERATION_REJECTED
+  ) {
+    return null;
+  }
+  const comment = String(product.productModerationComment ?? "").trim();
+  return comment || null;
 }

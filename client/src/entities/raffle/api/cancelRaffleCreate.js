@@ -1,6 +1,6 @@
 import { apiClient } from "../../../shared/api/index.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
-import { formatApiErrorMessage } from "../../../shared/lib/formatApiErrorMessage.js";
+import { formatApiErrorMessage } from "@izibuy/shared-lib";
 
 /**
  * @returns {Promise<{ message: string; loyaltyPointsBalance: number; hasPaidUnlock: boolean }>}

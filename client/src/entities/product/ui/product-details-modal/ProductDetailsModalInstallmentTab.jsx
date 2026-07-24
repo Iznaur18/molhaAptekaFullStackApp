@@ -16,6 +16,7 @@ import {
  *   isUserDataConfirmed: boolean;
  *   onRequestLogin: () => void;
  *   onSuccess: () => void;
+ *   dockSubmit?: boolean;
  * }} props
  */
 export function ProductDetailsModalInstallmentTab({
@@ -28,6 +29,7 @@ export function ProductDetailsModalInstallmentTab({
   isUserDataConfirmed,
   onRequestLogin,
   onSuccess,
+  dockSubmit = false,
 }) {
   if (isSellerView) {
     return (
@@ -56,6 +58,7 @@ export function ProductDetailsModalInstallmentTab({
         isUserDataConfirmed={isUserDataConfirmed}
         onRequestLogin={onRequestLogin}
         onSuccess={onSuccess}
+        dockSubmit={dockSubmit}
       />
     );
   }

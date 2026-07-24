@@ -14,11 +14,13 @@ const validForm = {
   ...CREATE_PRODUCT_INITIAL_FORM,
   productName: "Тестовый товар",
   productListingOrigin: "own",
+  productIsOriginal: true,
   productDescription: "Описание товара достаточной длины для проверки.",
   productPrice: "1500",
   productStockQuantity: "2",
   productImageRows: [{ id: "1", url: "https://cdn.example.com/product.jpg" }],
   productCategoryId: "507f1f77bcf86cd799439011",
+  productReturnEnabled: false,
 };
 
 describe("create product with productListingOrigin", () => {

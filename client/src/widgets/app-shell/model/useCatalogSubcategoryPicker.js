@@ -5,7 +5,7 @@ import { fetchProductCategoryChildren } from "../../../entities/product-category
 import { IS_CATALOG_BROWSER_SUBCATEGORY_FILTER_ENABLED } from "../../../entities/product-category-tree/lib/isCatalogBrowserSubcategoryFilterEnabled.js";
 import { findCategoryRootIdForLegacySlug } from "../../../entities/product-category-tree/lib/findCategoryRootIdForLegacySlug.js";
 import { productCategoryTreeQueryKeys } from "../../../entities/product-category-tree/model/productCategoryTreeQueryKeys.js";
-import { buildCatalogBrowserLocation } from "../../../entities/product-category-display/lib/catalogBrowserPaths.js";
+import { buildCatalogProductsLocation } from "../../../entities/product-category-display/lib/catalogBrowserPaths.js";
 import { CATALOG_SORT_NEWEST } from "../../../entities/product/model/productConstants.js";
 import { PRODUCT_CATEGORY_TREE_UI } from "../../../shared/config/appUiCopy.js";
 
@@ -16,6 +16,7 @@ import { PRODUCT_CATEGORY_TREE_UI } from "../../../shared/config/appUiCopy.js";
  */
 export function useCatalogSubcategoryPicker({
   isCatalogBrowserLanding,
+  isCompactLayout,
   categoryRootsRef,
   applyCatalogQueryState,
   navigate,
@@ -98,9 +99,9 @@ export function useCatalogSubcategoryPicker({
       setCategoryTreeLabel(null);
       setPickerTrail([]);
       setPickerLoadError(null);
-      navigate(buildCatalogBrowserLocation(nextQuery));
+      navigate(buildCatalogProductsLocation(nextQuery, { compact: isCompactLayout }));
     },
-    [applyCatalogQueryState, navigate, setCategoryTreeLabel],
+    [applyCatalogQueryState, isCompactLayout, navigate, setCategoryTreeLabel],
   );
 
   const openPickerForCategory = useCallback((step) => {
@@ -108,22 +109,29 @@ export function useCatalogSubcategoryPicker({
     setPickerTrail([step]);
   }, []);
 
+  const navigateWithLegacyCategorySlug = useCallback(
+    (categorySlug) => {
+      const nextQuery = {
+        sort: CATALOG_SORT_NEWEST,
+        category: categorySlug,
+        categoryId: null,
+        sellerPersonalCategoryId: null,
+        followingOnly: false,
+        auctionOnly: false,
+        installmentOnly: false,
+        saleOnly: false,
+      };
+      applyCatalogQueryState(nextQuery);
+      setCategoryTreeLabel(null);
+      navigate(buildCatalogProductsLocation(nextQuery, { compact: isCompactLayout }));
+    },
+    [applyCatalogQueryState, isCompactLayout, navigate, setCategoryTreeLabel],
+  );
+
   const handleCatalogCategoryGridClick = useCallback(
     async (item) => {
       if (!IS_CATALOG_BROWSER_SUBCATEGORY_FILTER_ENABLED) {
-        const nextQuery = {
-          sort: CATALOG_SORT_NEWEST,
-          category: item.categorySlug,
-          categoryId: null,
-          sellerPersonalCategoryId: null,
-          followingOnly: false,
-          auctionOnly: false,
-          installmentOnly: false,
-          saleOnly: false,
-        };
-        applyCatalogQueryState(nextQuery);
-        setCategoryTreeLabel(null);
-        navigate(buildCatalogBrowserLocation(nextQuery));
+        navigateWithLegacyCategorySlug(item.categorySlug);
         return;
       }
 
@@ -136,19 +144,7 @@ export function useCatalogSubcategoryPicker({
         findCategoryRootIdForLegacySlug(categoryRootsRef.current, item.categorySlug);
 
       if (!rootId) {
-        const nextQuery = {
-          sort: CATALOG_SORT_NEWEST,
-          category: item.categorySlug,
-          categoryId: null,
-          sellerPersonalCategoryId: null,
-          followingOnly: false,
-          auctionOnly: false,
-          installmentOnly: false,
-          saleOnly: false,
-        };
-        applyCatalogQueryState(nextQuery);
-        setCategoryTreeLabel(null);
-        navigate(buildCatalogBrowserLocation(nextQuery));
+        navigateWithLegacyCategorySlug(item.categorySlug);
         return;
       }
 
@@ -173,14 +169,12 @@ export function useCatalogSubcategoryPicker({
       }
     },
     [
-      applyCatalogQueryState,
       categoryRootsRef,
       fetchCategoryChildren,
-      navigate,
       navigateToCategoryProducts,
+      navigateWithLegacyCategorySlug,
       openPickerForCategory,
       reportChildrenLoadError,
-      setCategoryTreeLabel,
     ],
   );
 
@@ -236,4 +230,4 @@ export function useCatalogSubcategoryPicker({
     handleSubcategoryPickerViewAll,
     handleSubcategoryPickerCategoryClick,
   };
-}
+};

@@ -9,11 +9,10 @@ import "./CartAuctionSection.css";
  *
  * @param {{
  *   bids: import('../../../entities/product-price-offer/model/types.js').PriceOfferBuyerBidRow[];
- *   defaultDeliveryAddress: Record<string, unknown>;
- *   onCheckoutSuccess: () => void;
+ *   onCheckout: (bid: import('../../../entities/product-price-offer/model/types.js').PriceOfferBuyerBidRow) => void;
  * }} props
  */
-export function CartAuctionSection({ bids, defaultDeliveryAddress, onCheckoutSuccess }) {
+export function CartAuctionSection({ bids, onCheckout }) {
   if (bids.length === 0) {
     return null;
   }
@@ -27,11 +26,7 @@ export function CartAuctionSection({ bids, defaultDeliveryAddress, onCheckoutSuc
       <ul className="cart-auction__list" role="list">
         {bids.map((bid) => (
           <li key={bid._id} className="cart-auction__item" role="listitem">
-            <CartAuctionLine
-              bid={bid}
-              defaultDeliveryAddress={defaultDeliveryAddress}
-              onCheckoutSuccess={onCheckoutSuccess}
-            />
+            <CartAuctionLine bid={bid} onCheckout={onCheckout} />
           </li>
         ))}
       </ul>

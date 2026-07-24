@@ -4,6 +4,7 @@ import { contractNeedsSellerAttention } from "../lib/contractNeedsSellerAttentio
 import { INSTALLMENT_CONTRACT_STATUS_COMPLETED } from "../model/constants.js";
 import { INSTALLMENT_UI } from "../../../shared/config/appUiCopy.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
+import { resolveImageUrlForDisplay } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { InstallmentContractCounterparty } from "./InstallmentContractCounterparty.jsx";
 import { InstallmentContractCardSummary } from "./InstallmentContractCardSummary.jsx";
 import { InstallmentContractCardPayments } from "./InstallmentContractCardPayments.jsx";
@@ -11,6 +12,59 @@ import { InstallmentContractProgressBar } from "./InstallmentContractProgressBar
 import { BuyerPassportSharePanel } from "./BuyerPassportSharePanel.jsx";
 
 import "./InstallmentContractCard.css";
+
+/**
+ * @param {import("../model/types.js").InstallmentContractFromApi} contract
+ * @param {(productId: string) => void} [onProductClick]
+ */
+function renderProductTitle(contract, onProductClick) {
+  const title = contract.productNameAtContract;
+  const imageUrl = resolveImageUrlForDisplay(String(contract.productImageUrl ?? "").trim());
+  const hasImage = Boolean(imageUrl);
+  const titleClass = onProductClick
+    ? "installment-contract-card__title installment-contract-card__title_link"
+    : "installment-contract-card__title";
+
+  const titleNode = onProductClick ? (
+    <span
+      className={titleClass}
+      role="link"
+      tabIndex={0}
+      onClick={(event) => {
+        event.stopPropagation();
+        onProductClick(String(contract.productId));
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          event.stopPropagation();
+          onProductClick(String(contract.productId));
+        }
+      }}
+    >
+      {title}
+    </span>
+  ) : (
+    <span className={titleClass}>{title}</span>
+  );
+
+  return (
+    <div className="installment-contract-card__product">
+      {hasImage ? (
+        <img
+          className="installment-contract-card__thumb"
+          src={imageUrl}
+          alt=""
+          loading="lazy"
+          decoding="async"
+        />
+      ) : (
+        <span className="installment-contract-card__thumb installment-contract-card__thumb_empty" aria-hidden="true" />
+      )}
+      {titleNode}
+    </div>
+  );
+}
 
 /**
  * @param {{
@@ -86,30 +140,7 @@ export function InstallmentContractCard({
             aria-expanded={isExpanded}
             onClick={toggleExpanded}
           >
-            {typeof onProductClick === "function" ? (
-              <span
-                className="installment-contract-card__title installment-contract-card__title_link"
-                role="link"
-                tabIndex={0}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onProductClick(String(contract.productId));
-                }}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    onProductClick(String(contract.productId));
-                  }
-                }}
-              >
-                {contract.productNameAtContract}
-              </span>
-            ) : (
-              <span className="installment-contract-card__title">
-                {contract.productNameAtContract}
-              </span>
-            )}
+            {renderProductTitle(contract, onProductClick)}
             <span
               className={[
                 "installment-contract-card__chevron",
@@ -125,15 +156,13 @@ export function InstallmentContractCard({
         ) : typeof onProductClick === "function" ? (
           <button
             type="button"
-            className="installment-contract-card__title installment-contract-card__title_link"
+            className="installment-contract-card__product-button"
             onClick={() => onProductClick(String(contract.productId))}
           >
-            {contract.productNameAtContract}
+            {renderProductTitle(contract)}
           </button>
         ) : (
-          <h3 className="installment-contract-card__title">
-            {contract.productNameAtContract}
-          </h3>
+          renderProductTitle(contract)
         )}
         {compact ? (
           <span

@@ -1,0 +1,96 @@
+.product-details-seller-products-carousel {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 12px;
+  background: var(--iz-color-surface-muted);
+  overflow: hidden;
+}
+
+.product-details-seller-products-carousel__heading {
+  margin: 0;
+  padding: 8px 14px 4px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  line-height: 1.25;
+  color: var(--iz-color-text);
+}
+
+.product-details-seller-products-carousel__scroll {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+}
+
+.product-details-seller-products-carousel__scroll::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+  background: transparent;
+}
+
+.product-details-seller-products-carousel__track {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 10px;
+  width: max-content;
+  min-width: 100%;
+  margin: 0;
+  padding: 4px 14px 12px;
+  list-style: none;
+}
+
+.product-details-seller-products-carousel__item {
+  flex: 0 0 auto;
+}
+
+.product-details-seller-products-carousel__thumb-btn {
+  box-sizing: border-box;
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 14px;
+  background: var(--iz-color-surface-muted);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.product-details-seller-products-carousel__thumb-btn--unavailable {
+  opacity: 0.72;
+  cursor: default;
+}
+
+.product-details-seller-products-carousel__thumb {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-details-seller-products-carousel__error {
+  margin: 0;
+  padding: 0 14px 10px;
+  font-size: 0.75rem;
+  color: var(--iz-color-danger);
+}

@@ -1,4 +1,4 @@
-import { USER_SOCIAL_LINK_FIELD_IDS } from "@molha/api-contract";
+import { USER_SOCIAL_LINK_FIELD_IDS, storedSocialUrlToInputValue } from "@molha/api-contract";
 
 import { addressStructuredValueFromUser } from "../../address/lib/addressStructuredValueFromUser.js";
 import { getUserAvatarFocus, getUserBackgroundFocus } from "./profileImageFocus.js";
@@ -55,8 +55,7 @@ export function mapUserToEditProfileForm(user) {
   /** @type {Record<string, string>} */
   const socialLinks = {};
   for (const fieldId of USER_SOCIAL_LINK_FIELD_IDS) {
-    const raw = user[fieldId];
-    socialLinks[fieldId] = typeof raw === "string" ? raw : "";
+    socialLinks[fieldId] = storedSocialUrlToInputValue(fieldId, user[fieldId]);
   }
 
   return {

@@ -1,6 +1,6 @@
 import {
   USER_SOCIAL_LINK_FIELD_IDS,
-  isHttpUrl,
+  validateSocialLinkInput,
 } from "@molha/api-contract";
 import {
   USER_NAME_MAX_LENGTH,
@@ -41,11 +41,8 @@ export const validateEditProfileForm = (form: EditProfileFormState): string | nu
     keyof EditProfileFormState,
     `social${string}`
   >[]) {
-    const link = form[fieldId].trim();
-    if (link === "") continue;
-    if (!isHttpUrl(link)) {
-      return "Соцсети: укажите корректную ссылку (http:// или https://)";
-    }
+    const error = validateSocialLinkInput(fieldId, form[fieldId]);
+    if (error) return error;
   }
 
   return null;

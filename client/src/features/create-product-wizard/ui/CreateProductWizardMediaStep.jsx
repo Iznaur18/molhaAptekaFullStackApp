@@ -1,12 +1,10 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 
 import {
-  countFilledProductImageRows,
-  resolveProductImageSelectionAfterRemove,
-  resolveProductImageSelectionAfterReorder,
-} from "../../../entities/product/lib/resolveProductImageCoverPreview.js";
-import { useProductImageUrlRows } from "../../../entities/product/model/useProductImageUrlRows.js";
-import { CreateProductWizardMediaEditor } from "./CreateProductWizardMediaEditor.jsx";
+  imageRowsFromUrls,
+  urlsFromImageRows,
+} from "../../../entities/product/lib/productImageRowHelpers.js";
+import { PRODUCT_IMAGE_URLS_MAX } from "../../../entities/product/model/productConstants.js";
 import { CreateProductWizardMediaGrid } from "./CreateProductWizardMediaGrid.jsx";
 import { CreateProductWizardMediaVideoCard } from "./CreateProductWizardMediaVideoCard.jsx";
 
@@ -23,83 +21,27 @@ export function CreateProductWizardMediaStep({ form, setForm, isSubmitting }) {
   const rows = /** @type {import('../../../entities/product/lib/productImageRowHelpers.js').ProductImageRow[]} */ (
     form.productImageRows
   );
-  const [selectedIndex, setSelectedIndex] = useState(0);
 
-  const onRowsChange = useCallback(
-    (productImageRows) => {
-      setForm((prev) => ({ ...prev, productImageRows }));
+  const urls = useMemo(() => urlsFromImageRows(rows), [rows]);
+
+  const handleUrlsChange = useCallback(
+    (nextUrls) => {
+      setForm((prev) => ({
+        ...prev,
+        productImageRows: imageRowsFromUrls(nextUrls),
+      }));
     },
     [setForm],
   );
 
-  const imageRows = useProductImageUrlRows(rows, onRowsChange);
-  const filledCount = useMemo(() => countFilledProductImageRows(rows), [rows]);
-  const selectedRow = rows[selectedIndex] ?? rows[0];
-
-  const handleMoveSelected = useCallback(
-    (delta) => {
-      if (!selectedRow) {
-        return;
-      }
-
-      const result = imageRows.moveRow(selectedRow.id, delta);
-      if (!result) {
-        return;
-      }
-
-      setSelectedIndex((current) =>
-        resolveProductImageSelectionAfterReorder(result.oldIndex, result.newIndex, current),
-      );
-    },
-    [imageRows, selectedRow],
-  );
-
-  const handleAdd = useCallback(() => {
-    const newIndex = imageRows.addRow();
-    if (newIndex >= 0) {
-      setSelectedIndex(newIndex);
-    }
-  }, [imageRows]);
-
-  const handleRemoveSelected = useCallback(() => {
-    if (!selectedRow) {
-      return;
-    }
-
-    const removeIndex = imageRows.removeRow(selectedRow.id);
-    const nextLength = rows.length <= 1 ? 1 : rows.length - 1;
-    setSelectedIndex((current) =>
-      resolveProductImageSelectionAfterRemove(removeIndex, current, nextLength),
-    );
-  }, [imageRows, rows.length, selectedRow]);
-
   return (
     <div className="create-product-wizard-media-step">
       <CreateProductWizardMediaGrid
-        rows={rows}
-        selectedIndex={selectedIndex}
-        canAddRow={imageRows.canAddRow}
-        maxRows={imageRows.maxRows}
+        urls={urls}
+        onChange={handleUrlsChange}
+        maxCount={PRODUCT_IMAGE_URLS_MAX}
         disabled={isSubmitting}
-        onSelect={setSelectedIndex}
-        onAdd={handleAdd}
-        filledCount={filledCount}
       />
-      {selectedRow ? (
-        <CreateProductWizardMediaEditor
-          index={selectedIndex}
-          isCover={selectedIndex === 0}
-          url={selectedRow.url}
-          canRemove={rows.length > 1 || Boolean(selectedRow.url.trim())}
-          canMoveEarlier={selectedIndex > 0}
-          canMoveLater={selectedIndex < rows.length - 1}
-          disabled={isSubmitting}
-          onUrlChange={(url) => imageRows.updateRowUrl(selectedRow.id, url)}
-          onRemove={handleRemoveSelected}
-          onMoveEarlier={() => handleMoveSelected(-1)}
-          onMoveLater={() => handleMoveSelected(1)}
-        />
-      ) : null}
       <CreateProductWizardMediaVideoCard
         value={String(form.productPreviewVideoUrl ?? "")}
         onChange={(productPreviewVideoUrl) =>

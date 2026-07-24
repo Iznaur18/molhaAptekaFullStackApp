@@ -33,6 +33,12 @@ export function resolveCreateProductWizardStepCopy(stepId) {
         subtitle: CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_COMMERCE_SUBTITLE,
         shortLabel: CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_LABEL_COMMERCE,
       };
+    case "returns":
+      return {
+        title: CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_RETURNS_TITLE,
+        subtitle: CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_RETURNS_SUBTITLE,
+        shortLabel: CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_LABEL_RETURNS,
+      };
     case "review":
       return {
         title: CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_REVIEW_TITLE,

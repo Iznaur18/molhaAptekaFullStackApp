@@ -15,6 +15,28 @@
   background: var(--iz-color-surface);
 }
 
+.checkout-form--embedded {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+.checkout-form--pinned {
+  justify-content: space-between;
+  gap: 16px;
+  flex: 1 0 auto;
+  min-height: 100%;
+}
+
+.checkout-form__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
 .checkout-form__heading {
   margin: 0;
   font-size: var(--iz-font-xl);
@@ -107,6 +129,12 @@
     border-color var(--iz-transition-base),
     opacity var(--iz-transition-base),
     transform var(--iz-transition-press);
+}
+
+.checkout-form__submit--docked {
+  align-self: stretch;
+  width: 100%;
+  margin-top: 0;
 }
 
 .checkout-form__submit:hover:not(:disabled) {

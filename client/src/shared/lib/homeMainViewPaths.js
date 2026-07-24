@@ -1,11 +1,11 @@
 import { isStaffStandaloneMainView } from "./staffMainViews.js";
 
 /**
- * Пути экранов главной SPA. Не использовать `/cart` и `/users`: в dev Vite
- * проксирует `/cart` и `/user/...` на Express (см. vite.config.js).
- * Путь `/user-list` ок: не совпадает с API `/user` (иначе F5 → 404 JSON).
+ * Пути экранов главной SPA. Не использовать `/cart`: в dev Vite проксирует
+ * `/cart` на Express. `/user/:mongoId` — SPA-профиль (Accept: text/html) и
+ * API (XHR); `/user-list` ок для списка пользователей.
  *
- * @typedef {'catalog' | 'catalog-browser' | 'my-profile' | 'my-products' | 'users' | 'subscriptions' | 'wishlist' | 'notifications' | 'cart' | 'my-sales' | 'my-orders' | 'auction' | 'data-confirmation' | 'premium' | 'loyalty-points' | 'advertising' | 'admin-orders' | 'search-synonyms-admin' | 'category-tree-admin' | 'app-intro-admin' | 'site-header-banner-admin' | 'product-manage-toggle-display-admin' | 'popular-products-admin' | 'product-moderation' | 'intro-ad-moderation' | 'seller-personal-category-moderation' | 'product-reports' | 'staff-raffles' | 'data-confirmation-requests' | 'installment-payments' | 'installment-sales' | 'installment-disputes'} HomeMainView
+ * @typedef {'catalog' | 'catalog-browser' | 'my-profile' | 'my-products' | 'users' | 'subscriptions' | 'wishlist' | 'notifications' | 'cart' | 'my-sales' | 'my-orders' | 'auction' | 'data-confirmation' | 'premium' | 'loyalty-points' | 'advertising' | 'edit-profile' | 'admin-orders' | 'search-synonyms-admin' | 'category-tree-admin' | 'app-intro-admin' | 'site-header-banner-admin' | 'product-manage-toggle-display-admin' | 'popular-products-admin' | 'product-moderation' | 'intro-ad-moderation' | 'seller-personal-category-moderation' | 'product-reports' | 'staff-raffles' | 'data-confirmation-requests' | 'installment-payments' | 'installment-sales' | 'installment-disputes'} HomeMainView
  */
 
 /** @type {Record<HomeMainView, string>} */
@@ -28,6 +28,7 @@ export const HOME_MAIN_VIEW_PATH = {
   premium: "/premium",
   "loyalty-points": "/loyalty-points",
   advertising: "/profile/advertising",
+  "edit-profile": "/profile/edit-profile",
   "admin-orders": "/admin-orders",
   "search-synonyms-admin": "/search-synonyms-admin",
   "category-tree-admin": "/category-tree-admin",

@@ -1,0 +1,71 @@
+.profile-background-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.profile-background-upload__label {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--iz-color-text-secondary, var(--iz-color-text-muted));
+}
+
+.profile-background-upload__preview .user-background-preview {
+  height: 7.5rem;
+}
+
+.profile-background-upload__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.profile-background-upload__upload,
+.profile-background-upload__remove {
+  flex: 1 1 8rem;
+  margin: 0;
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.profile-background-upload__upload {
+  border: 1px solid var(--iz-color-border-strong, var(--iz-color-border));
+  background: var(--iz-color-surface);
+  color: var(--iz-color-action);
+}
+
+.profile-background-upload__remove {
+  border: 1px solid var(--iz-color-danger);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-danger);
+}
+
+.profile-background-upload__upload:disabled,
+.profile-background-upload__remove:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.profile-background-upload__error {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--iz-color-danger);
+}
+
+.profile-background-upload__file {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

@@ -40,10 +40,7 @@ export function useShellUiState() {
     useState(false);
   /** @type {[ProductFromApi | null, import('react').Dispatch<import('react').SetStateAction<ProductFromApi | null>>]} */
   const [productToEdit, setProductToEdit] = useState(null);
-  const [isAdminEditUserOpen, setIsAdminEditUserOpen] = useState(false);
-  const [isAdminDeleteUserOpen, setIsAdminDeleteUserOpen] = useState(false);
   const [productDetailsAdminError, setProductDetailsAdminError] = useState("");
-  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [raffleParticipationPendingProductId, setRaffleParticipationPendingProductId] =
     useState(null);
   const [raffleModal, setRaffleModal] = useState(
@@ -121,14 +118,8 @@ export function useShellUiState() {
     setIsSellerProductsLimitModalOpen,
     productToEdit,
     setProductToEdit,
-    isAdminEditUserOpen,
-    setIsAdminEditUserOpen,
-    isAdminDeleteUserOpen,
-    setIsAdminDeleteUserOpen,
     productDetailsAdminError,
     setProductDetailsAdminError,
-    isEditProfileOpen,
-    setIsEditProfileOpen,
     raffleParticipationPendingProductId,
     setRaffleParticipationPendingProductId,
     raffleModal,

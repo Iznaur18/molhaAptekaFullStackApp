@@ -1,4 +1,5 @@
 import { urlsFromImageRows } from "../../lib/productImageRowHelpers.js";
+import { serializeProductReturnTermRows } from "../../lib/productReturnTermRows.js";
 import { CREATE_PRODUCT_MODAL_UI } from "../../../../shared/config/appUiCopy.js";
 import { getProductFieldEditLabel } from "../../lib/productFieldRegistry.js";
 
@@ -21,6 +22,17 @@ export function CreateProductReviewSection({
     String(form.categoryBreadcrumbRu ?? "").trim() ||
     String(form.productCategory ?? "").trim() ||
     CREATE_PRODUCT_MODAL_UI.WIZARD_REVIEW_EMPTY;
+
+  const returnSummary =
+    form.productReturnEnabled === true
+      ? serializeProductReturnTermRows(
+          Array.isArray(form.returnTermRows) ? form.returnTermRows : [],
+        )
+          .map((term) => `${term.key}: ${term.value}`)
+          .join("; ") || CREATE_PRODUCT_MODAL_UI.WIZARD_REVIEW_EMPTY
+      : form.productReturnEnabled === false
+        ? CREATE_PRODUCT_MODAL_UI.RETURN_NO
+        : CREATE_PRODUCT_MODAL_UI.WIZARD_REVIEW_EMPTY;
 
   const rows = [
     {
@@ -74,6 +86,12 @@ export function CreateProductReviewSection({
         ? `${String(form.productStockQuantity ?? "").trim()} шт.`
         : CREATE_PRODUCT_MODAL_UI.WIZARD_REVIEW_HIDDEN,
       stepIndex: 4,
+    },
+    {
+      label: CREATE_PRODUCT_MODAL_UI.LABEL_RETURN_ENABLED,
+      value: returnSummary,
+      stepIndex: 5,
+      multiline: true,
     },
   ];
 

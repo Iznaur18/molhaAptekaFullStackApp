@@ -9,7 +9,6 @@ import {
   areCatalogSearchParamsEqual,
   buildCatalogBrowserSearchParams,
   buildCatalogSearchParams,
-  CATALOG_QUERY_PARAM_CATEGORY,
   parseCatalogQueryFromSearchParams,
 } from "../../../entities/product/lib/catalogCatalogQuery.js";
 
@@ -20,9 +19,11 @@ export function useCatalogQuerySync({
   catalogMainView,
   location,
   navigate,
+  isCompactLayout,
   catalogSort,
   selectedProductCategory,
   selectedCategoryId,
+  sellerPersonalCategoryId,
   catalogFollowingOnly,
   catalogAuctionOnly,
   catalogInstallmentOnly,
@@ -31,6 +32,7 @@ export function useCatalogQuerySync({
   setCatalogSort,
   setSelectedProductCategory,
   setSelectedCategoryId,
+  setSellerPersonalCategoryId,
   setCategoryTreeLabel,
   setCatalogFollowingOnly,
   setCatalogAuctionOnly,
@@ -39,21 +41,26 @@ export function useCatalogQuerySync({
   categoryRootsRef,
 }) {
   useEffect(() => {
-    if (catalogMainView !== "catalog") {
+    if (catalogMainView !== "catalog" || isCompactLayout) {
       return;
     }
-    const params = new URLSearchParams(location.search);
-    if (!params.has(CATALOG_QUERY_PARAM_CATEGORY)) {
+    const parsed = parseCatalogQueryFromSearchParams(
+      new URLSearchParams(location.search),
+    );
+    const hasScopedProductFilters =
+      Boolean(parsed.category) ||
+      Boolean(parsed.categoryId) ||
+      Boolean(parsed.sellerPersonalCategoryId);
+    if (!hasScopedProductFilters) {
       return;
     }
-    const parsed = parseCatalogQueryFromSearchParams(params);
     const built = buildCatalogBrowserSearchParams(parsed);
     const search = built.toString();
     navigate(
       `${catalogMainViewToPathname("catalog-browser")}${search ? `?${search}` : ""}`,
       { replace: true },
     );
-  }, [catalogMainView, location.search, navigate]);
+  }, [catalogMainView, isCompactLayout, location.search, navigate]);
 
   useEffect(() => {
     if (catalogMainView !== "catalog" && catalogMainView !== "catalog-browser") {
@@ -63,7 +70,9 @@ export function useCatalogQuerySync({
       new URLSearchParams(location.search),
     );
     setCatalogSort((prev) => (prev === parsed.sort ? prev : parsed.sort));
-    if (catalogMainView === "catalog-browser") {
+    const applyScopedFilters =
+      catalogMainView === "catalog-browser" || isCompactLayout;
+    if (applyScopedFilters) {
       setSelectedProductCategory((prev) =>
         prev === parsed.category ? prev : parsed.category,
       );
@@ -73,9 +82,15 @@ export function useCatalogQuerySync({
           : null;
         return prev === nextId ? prev : nextId;
       });
+      setSellerPersonalCategoryId((prev) =>
+        prev === parsed.sellerPersonalCategoryId
+          ? prev
+          : parsed.sellerPersonalCategoryId,
+      );
     } else {
       setSelectedProductCategory(null);
       setSelectedCategoryId(null);
+      setSellerPersonalCategoryId(null);
       setCategoryTreeLabel(null);
     }
     setCatalogFollowingOnly((prev) =>
@@ -91,6 +106,7 @@ export function useCatalogQuerySync({
   }, [
     location.search,
     catalogMainView,
+    isCompactLayout,
     setCatalogAuctionOnly,
     setCatalogFollowingOnly,
     setCatalogInstallmentOnly,
@@ -99,48 +115,48 @@ export function useCatalogQuerySync({
     setCategoryTreeLabel,
     setSelectedCategoryId,
     setSelectedProductCategory,
+    setSellerPersonalCategoryId,
   ]);
 
   useEffect(() => {
     if (catalogMainView !== "catalog" && catalogMainView !== "catalog-browser") {
       return;
     }
+    const scopedOnHome = catalogMainView === "catalog" && isCompactLayout;
+    const writeScopedFilters =
+      catalogMainView === "catalog-browser" || scopedOnHome;
+    const nextCategory = writeScopedFilters ? selectedProductCategory : null;
+    const nextCategoryId = writeScopedFilters ? selectedCategoryId : null;
+    const nextSellerPersonalCategoryId = writeScopedFilters
+      ? sellerPersonalCategoryId
+      : null;
     const isDefaultNewestFeed =
       catalogSort === CATALOG_SORT_NEWEST &&
-      !selectedProductCategory &&
-      !selectedCategoryId &&
+      !nextCategory &&
+      !nextCategoryId &&
+      !nextSellerPersonalCategoryId &&
       !catalogFollowingOnly &&
       !catalogAuctionOnly &&
       !catalogInstallmentOnly &&
       !catalogSaleOnly &&
       !catalogQueryFromUrl.allCities;
     const omitDefaultSort =
-      isDefaultNewestFeed &&
-      !isExplicitCatalogNewestFeedSearch(location.search);
+      isDefaultNewestFeed && !isExplicitCatalogNewestFeedSearch(location.search);
+    const queryPayload = {
+      sort: catalogSort,
+      category: nextCategory,
+      categoryId: nextCategoryId,
+      sellerPersonalCategoryId: nextSellerPersonalCategoryId,
+      followingOnly: catalogFollowingOnly,
+      auctionOnly: catalogAuctionOnly,
+      installmentOnly: catalogInstallmentOnly,
+      saleOnly: catalogSaleOnly,
+      allCities: catalogQueryFromUrl.allCities,
+    };
     const built =
       catalogMainView === "catalog-browser"
-        ? buildCatalogBrowserSearchParams(
-            {
-              sort: catalogSort,
-              category: selectedProductCategory,
-              categoryId: selectedCategoryId,
-              followingOnly: catalogFollowingOnly,
-              auctionOnly: catalogAuctionOnly,
-              installmentOnly: catalogInstallmentOnly,
-              saleOnly: catalogSaleOnly,
-              allCities: catalogQueryFromUrl.allCities,
-            },
-            { omitDefaultSort },
-          )
-        : buildCatalogSearchParams({
-            sort: catalogSort,
-            category: null,
-            followingOnly: catalogFollowingOnly,
-            auctionOnly: catalogAuctionOnly,
-            installmentOnly: catalogInstallmentOnly,
-            saleOnly: catalogSaleOnly,
-            allCities: catalogQueryFromUrl.allCities,
-          });
+        ? buildCatalogBrowserSearchParams(queryPayload, { omitDefaultSort })
+        : buildCatalogSearchParams(queryPayload);
     const current = new URLSearchParams(location.search);
     if (areCatalogSearchParamsEqual(built, current)) {
       return;
@@ -155,9 +171,11 @@ export function useCatalogQuerySync({
     );
   }, [
     catalogMainView,
+    isCompactLayout,
     catalogSort,
     selectedProductCategory,
     selectedCategoryId,
+    sellerPersonalCategoryId,
     catalogFollowingOnly,
     catalogAuctionOnly,
     catalogInstallmentOnly,
@@ -167,7 +185,7 @@ export function useCatalogQuerySync({
   ]);
 
   useEffect(() => {
-    if (catalogMainView !== "catalog-browser") {
+    if (catalogMainView !== "catalog-browser" && !(catalogMainView === "catalog" && isCompactLayout)) {
       return;
     }
     const parsed = catalogQueryFromUrl;
@@ -185,7 +203,7 @@ export function useCatalogQuerySync({
       }
       navigate(
         {
-          pathname: catalogMainViewToPathname("catalog-browser"),
+          pathname: catalogMainViewToPathname(catalogMainView),
           search: `?${built.toString()}`,
         },
         { replace: true },
@@ -216,13 +234,14 @@ export function useCatalogQuerySync({
     }
     navigate(
       {
-        pathname: catalogMainViewToPathname("catalog-browser"),
+        pathname: catalogMainViewToPathname(catalogMainView),
         search: `?${built.toString()}`,
       },
       { replace: true },
     );
   }, [
     catalogMainView,
+    isCompactLayout,
     catalogQueryFromUrl,
     location.search,
     navigate,

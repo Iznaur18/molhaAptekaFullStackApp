@@ -7,6 +7,19 @@ export const ORDER_PAYMENT_METHODS = [
   ORDER_PAYMENT_METHOD_CARD_PREPAID,
 ];
 
+/**
+ * Способы оплаты, реально доступные покупателю сейчас. `cardPrepaid` скрыт
+ * до интеграции эквайринга: без провайдера заказ создавался бы без списания
+ * средств. Вернуть способ — добавить его сюда (enum выше и server/contract
+ * трогать не нужно).
+ */
+export const ORDER_PAYMENT_METHODS_SELECTABLE = [
+  ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
+];
+
+/** Способ оплаты по умолчанию в формах чекаута. */
+export const ORDER_PAYMENT_METHOD_DEFAULT = ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY;
+
 export const ORDER_PAYMENT_METHOD_LABEL_RU = {
   [ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY]: "Наличными при получении",
   [ORDER_PAYMENT_METHOD_CARD_PREPAID]: "Картой заранее",

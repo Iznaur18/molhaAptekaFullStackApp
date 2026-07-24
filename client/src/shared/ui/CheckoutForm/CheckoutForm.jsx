@@ -5,9 +5,7 @@ import { AddressDeliveryFields } from "../../../entities/address/ui/AddressDeliv
 import { CheckoutPaymentMethodPicker } from "../../../features/checkout/ui/CheckoutPaymentMethodPicker.jsx";
 import { addressValueFromUser } from "../../../entities/address/lib/addressValueFromUser.js";
 import { validateRuDeliveryAddressForm } from "../../../entities/address/lib/validateRuDeliveryAddressForm.js";
-import {
-  ORDER_PAYMENT_METHOD_CARD_PREPAID,
-} from "../../../entities/order/model/constants.js";
+import { ORDER_PAYMENT_METHOD_DEFAULT } from "../../../entities/order/model/constants.js";
 import { CHECKOUT_FORM_UI } from "../../config/appUiCopy.js";
 
 import "./CheckoutForm.css";
@@ -30,6 +28,8 @@ import "./CheckoutForm.css";
  *   }) => void | Promise<void>;
  *   isDisabled?: boolean;
  *   dockSubmit?: boolean;
+ *   pinSubmitToBottom?: boolean;
+ *   showHeading?: boolean;
  * }} props
  */
 export function CheckoutForm({
@@ -40,12 +40,14 @@ export function CheckoutForm({
   onSubmit,
   isDisabled = false,
   dockSubmit = false,
+  pinSubmitToBottom = false,
+  showHeading = true,
 }) {
   const formId = useId();
   const [deliveryAddress, setDeliveryAddress] = useState(() =>
     addressValueFromUser(defaultDeliveryAddress),
   );
-  const [paymentMethod, setPaymentMethod] = useState(ORDER_PAYMENT_METHOD_CARD_PREPAID);
+  const [paymentMethod, setPaymentMethod] = useState(ORDER_PAYMENT_METHOD_DEFAULT);
   const [localError, setLocalError] = useState("");
 
   useEffect(() => {
@@ -64,7 +66,7 @@ export function CheckoutForm({
     setLocalError("");
     void onSubmit({
       deliveryAddress: deliveryAddress.line.trim(),
-      deliveryAddressFlat: "",
+      deliveryAddressFlat: deliveryAddress.flat.trim(),
       paymentMethod,
     });
   };
@@ -77,10 +79,25 @@ export function CheckoutForm({
     ? CHECKOUT_FORM_UI.SUBMIT_LOADING
     : CHECKOUT_FORM_UI.SUBMIT_IDLE;
 
+  const formClassName = [
+    "checkout-form",
+    pinSubmitToBottom ? "checkout-form--pinned" : "",
+    pinSubmitToBottom || !showHeading ? "checkout-form--embedded" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const submitClassName = [
+    "checkout-form__submit",
+    pinSubmitToBottom ? "checkout-form__submit--docked" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   const renderSubmitButton = (linkedToForm) => (
     <button
       type="submit"
-      className="checkout-form__submit"
+      className={submitClassName}
       form={linkedToForm ? formId : undefined}
       disabled={isFormDisabled}
     >
@@ -89,7 +106,7 @@ export function CheckoutForm({
   );
 
   const dockedSubmit =
-    dockSubmit && typeof document !== "undefined"
+    dockSubmit && !pinSubmitToBottom && typeof document !== "undefined"
       ? createPortal(
           <div className="product-modal-shell__docked-footer checkout-form__docked-footer">
             {renderSubmitButton(true)}
@@ -100,38 +117,60 @@ export function CheckoutForm({
 
   return (
     <>
-      <form id={formId} className="checkout-form" onSubmit={handleSubmit}>
-      <h2 className="checkout-form__heading">{CHECKOUT_FORM_UI.HEADING}</h2>
+      <form id={formId} className={formClassName} onSubmit={handleSubmit}>
+        <div className="checkout-form__fields">
+          {showHeading ? (
+            <h2 className="checkout-form__heading">{CHECKOUT_FORM_UI.HEADING}</h2>
+          ) : null}
 
-      <AddressDeliveryFields
-        value={deliveryAddress}
-        onChange={setDeliveryAddress}
-        disabled={isDisabled || isSubmitting}
-        lineInputClassName="checkout-form__input"
-        labels={{
-          line: CHECKOUT_FORM_UI.LABEL_DELIVERY_ADDRESS,
-        }}
-      />
+          <AddressDeliveryFields
+            value={deliveryAddress}
+            onChange={setDeliveryAddress}
+            disabled={isDisabled || isSubmitting}
+            lineInputClassName="checkout-form__input"
+            labels={{
+              line: CHECKOUT_FORM_UI.LABEL_DELIVERY_ADDRESS,
+            }}
+          />
 
-      <CheckoutPaymentMethodPicker
-        value={paymentMethod}
-        onChange={setPaymentMethod}
-        disabled={isDisabled || isSubmitting}
-        legend={CHECKOUT_FORM_UI.LABEL_PAYMENT_METHOD}
-      />
+          <label className="checkout-form__field">
+            <span className="checkout-form__label">{CHECKOUT_FORM_UI.LABEL_FLAT}</span>
+            <input
+              type="text"
+              className="checkout-form__input"
+              value={deliveryAddress.flat}
+              onChange={(event) =>
+                setDeliveryAddress((prev) => ({
+                  ...prev,
+                  flat: event.target.value,
+                }))
+              }
+              disabled={isDisabled || isSubmitting}
+              placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_FLAT}
+              autoComplete="address-line2"
+            />
+          </label>
 
-      {displayError ? (
-        <p className="checkout-form__error" role="alert">
-          {displayError}
-        </p>
-      ) : null}
-      {submitSuccess ? (
-        <p className="checkout-form__success" role="status">
-          {submitSuccess}
-        </p>
-      ) : null}
+          <CheckoutPaymentMethodPicker
+            value={paymentMethod}
+            onChange={setPaymentMethod}
+            disabled={isDisabled || isSubmitting}
+            legend={CHECKOUT_FORM_UI.LABEL_PAYMENT_METHOD}
+          />
 
-      {!dockSubmit ? renderSubmitButton(false) : null}
+          {displayError ? (
+            <p className="checkout-form__error" role="alert">
+              {displayError}
+            </p>
+          ) : null}
+          {submitSuccess ? (
+            <p className="checkout-form__success" role="status">
+              {submitSuccess}
+            </p>
+          ) : null}
+        </div>
+
+        {!dockSubmit || pinSubmitToBottom ? renderSubmitButton(false) : null}
       </form>
       {dockedSubmit}
     </>

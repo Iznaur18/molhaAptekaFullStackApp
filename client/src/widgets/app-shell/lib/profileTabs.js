@@ -9,6 +9,7 @@ export const PROFILE_TAB_DATA_CONFIRMATION = "data-confirmation";
 export const PROFILE_TAB_PREMIUM = "premium";
 export const PROFILE_TAB_LOYALTY_POINTS = "loyalty-points";
 export const PROFILE_TAB_ADVERTISING = "advertising";
+export const PROFILE_TAB_EDIT_PROFILE = "edit-profile";
 export const PROFILE_TAB_ADMIN_ORDERS = "admin-orders";
 export const PROFILE_TAB_SEARCH_SYNONYMS_ADMIN = "search-synonyms-admin";
 export const PROFILE_TAB_CATEGORY_TREE_ADMIN = "category-tree-admin";
@@ -53,6 +54,7 @@ export const PROFILE_TAB_VALUES = [
   PROFILE_TAB_PREMIUM,
   PROFILE_TAB_LOYALTY_POINTS,
   PROFILE_TAB_ADVERTISING,
+  PROFILE_TAB_EDIT_PROFILE,
   PROFILE_TAB_ADMIN_ORDERS,
   PROFILE_TAB_SEARCH_SYNONYMS_ADMIN,
   PROFILE_TAB_CATEGORY_TREE_ADMIN,

@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from "react";
 
+import { PROFILE_TAB_OVERVIEW } from "../lib/profileTabs.js";
 import { useAppShellStateContext } from "./AppShellStateContext.jsx";
 
 export const useHomeMainContentProps = () => {
@@ -14,6 +15,7 @@ export const useHomeMainContentProps = () => {
     isAdmin,
     canModerateProducts,
     myProfilePage,
+    setMyProfilePage,
     notificationsPageItems,
     pendingRafflesCount,
     pendingProductPromotionsCount,
@@ -40,7 +42,6 @@ export const useHomeMainContentProps = () => {
     handleOpenCatalogProductDetails,
     setMyProfileTab,
     handleLogout,
-    setIsEditProfileOpen,
     handleMyProductsFromProfile,
     handleMySalesFromProfile,
     handleInstallmentPaymentsFromProfile,
@@ -66,6 +67,7 @@ export const useHomeMainContentProps = () => {
     handlePremiumPurchased,
     handleLoyaltyPointsFromProfile,
     handleAdvertisingFromProfile,
+    handleEditProfileFromProfile,
     handleIntroAdModerationFromProfile,
     handleSellerPersonalCategoryModerationFromProfile,
     handleSubscriptionsFromProfile,
@@ -84,6 +86,7 @@ export const useHomeMainContentProps = () => {
     handleInAppNotificationClick,
     handleNotificationsCleared,
     setLoyaltyPoints,
+    setIsPremiumUser,
   } = ctx;
 
   const myProductsCatalogToolbarProps = useMemo(
@@ -111,9 +114,28 @@ export const useHomeMainContentProps = () => {
     setIsLoginModalOpen(true);
   }, [setIsLoginModalOpen]);
 
-  const onEditProfileClick = useCallback(() => {
-    setIsEditProfileOpen(true);
-  }, [setIsEditProfileOpen]);
+  const onEditProfileClick = handleEditProfileFromProfile;
+
+  const onEditProfileCancel = useCallback(() => {
+    setMyProfileTab(PROFILE_TAB_OVERVIEW);
+  }, [setMyProfileTab]);
+
+  const onEditProfileSaved = useCallback(
+    (updatedUser) => {
+      setMyProfilePage((prev) =>
+        prev.phase === "success" && prev.user
+          ? { ...prev, user: { ...prev.user, ...updatedUser } }
+          : prev,
+      );
+      if (updatedUser.isPremiumUser !== undefined) {
+        setIsPremiumUser(Boolean(updatedUser.isPremiumUser));
+      }
+      if (updatedUser.userLoyaltyPoints != null) {
+        setLoyaltyPoints(Number(updatedUser.userLoyaltyPoints) || 0);
+      }
+    },
+    [setIsPremiumUser, setLoyaltyPoints, setMyProfilePage],
+  );
 
   const onCreateRaffleClick = useMemo(() => {
     if (
@@ -158,6 +180,8 @@ export const useHomeMainContentProps = () => {
       setMyProfileTab,
       handleLogout,
       onEditProfileClick,
+      onEditProfileCancel,
+      onEditProfileSaved,
       handleMyProductsFromProfile,
       handleMySalesFromProfile,
       handleInstallmentPaymentsFromProfile,
@@ -235,6 +259,8 @@ export const useHomeMainContentProps = () => {
       setMyProfileTab,
       handleLogout,
       onEditProfileClick,
+      onEditProfileCancel,
+      onEditProfileSaved,
       handleMyProductsFromProfile,
       handleMySalesFromProfile,
       handleInstallmentPaymentsFromProfile,

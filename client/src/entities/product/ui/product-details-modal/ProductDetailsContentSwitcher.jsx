@@ -36,10 +36,36 @@ export function ProductDetailsContentSwitcher({ product, contentPanels }) {
         label: PRODUCT_DETAILS_MODAL_UI.CHARACTERISTICS_TITLE,
       });
     }
+    items.push({
+      id: PRODUCT_DETAILS_CONTENT_PANEL.RETURNS,
+      label: PRODUCT_DETAILS_MODAL_UI.RETURNS_TITLE,
+    });
+    items.push({
+      id: PRODUCT_DETAILS_CONTENT_PANEL.DELIVERY,
+      label: PRODUCT_DETAILS_MODAL_UI.DELIVERY_TITLE,
+    });
     return items;
   }, [hasCharacteristics, hasDescription]);
 
   const descriptionText = String(product.productDescription ?? "").trim();
+  const returnTerms = Array.isArray(product.productReturnTerms)
+    ? product.productReturnTerms
+    : [];
+  const hasReturnTerms = product.productReturnEnabled === true && returnTerms.length > 0;
+  const showDescription =
+    activePanel === PRODUCT_DETAILS_CONTENT_PANEL.DESCRIPTION && hasDescription;
+  const showCharacteristics =
+    activePanel === PRODUCT_DETAILS_CONTENT_PANEL.CHARACTERISTICS && hasCharacteristics;
+  const showReturns = activePanel === PRODUCT_DETAILS_CONTENT_PANEL.RETURNS;
+  const showDelivery = activePanel === PRODUCT_DETAILS_CONTENT_PANEL.DELIVERY;
+
+  const panelAriaLabel = showDelivery
+    ? PRODUCT_DETAILS_MODAL_UI.DELIVERY_SECTION_ARIA
+    : showReturns
+      ? PRODUCT_DETAILS_MODAL_UI.RETURNS_SECTION_ARIA
+      : showCharacteristics
+        ? PRODUCT_DETAILS_MODAL_UI.CHARACTERISTICS_SECTION_ARIA
+        : PRODUCT_DETAILS_MODAL_UI.DESCRIPTION_SECTION_ARIA;
 
   return (
     <section
@@ -60,21 +86,35 @@ export function ProductDetailsContentSwitcher({ product, contentPanels }) {
       <div
         className="product-details-content-switcher__panel"
         role={showSwitcher ? "tabpanel" : undefined}
-        aria-label={
-          activePanel === PRODUCT_DETAILS_CONTENT_PANEL.CHARACTERISTICS
-            ? PRODUCT_DETAILS_MODAL_UI.CHARACTERISTICS_SECTION_ARIA
-            : PRODUCT_DETAILS_MODAL_UI.DESCRIPTION_SECTION_ARIA
-        }
+        aria-label={panelAriaLabel}
       >
-        {activePanel === PRODUCT_DETAILS_CONTENT_PANEL.DESCRIPTION && hasDescription ? (
+        {showDescription ? (
           <p className="product-details-content-switcher__description">{descriptionText}</p>
         ) : null}
-        {activePanel === PRODUCT_DETAILS_CONTENT_PANEL.CHARACTERISTICS &&
-        hasCharacteristics ? (
+        {showCharacteristics ? (
           <ProductCharacteristicsDetails
             items={product.productCharacteristics}
             showTitle={false}
           />
+        ) : null}
+        {showReturns ? (
+          hasReturnTerms ? (
+            <ProductCharacteristicsDetails
+              items={returnTerms}
+              showTitle={false}
+            />
+          ) : (
+            <p className="product-details-content-switcher__description">
+              {product.productReturnEnabled === true
+                ? PRODUCT_DETAILS_MODAL_UI.RETURNS_PLACEHOLDER
+                : PRODUCT_DETAILS_MODAL_UI.RETURNS_NONE}
+            </p>
+          )
+        ) : null}
+        {showDelivery ? (
+          <p className="product-details-content-switcher__description">
+            {PRODUCT_DETAILS_MODAL_UI.DELIVERY_IN_DEVELOPMENT}
+          </p>
         ) : null}
       </div>
     </section>

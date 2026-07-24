@@ -568,6 +568,62 @@ export const attachCounterpartiesToInstallmentContractPayload = (payload, userMa
 });
 
 /**
+ * @param {{ productImageUrls?: unknown; productImageUrl?: unknown }} product
+ * @returns {string | null}
+ */
+const resolveInstallmentProductCoverImageUrl = (product) => {
+  const urls = Array.isArray(product.productImageUrls) ? product.productImageUrls : [];
+  for (const url of urls) {
+    const trimmed = String(url ?? "").trim();
+    if (trimmed) {
+      return trimmed;
+    }
+  }
+  const legacy = String(product.productImageUrl ?? "").trim();
+  return legacy || null;
+};
+
+/**
+ * @param {unknown[]} productIds
+ * @returns {Promise<Map<string, string | null>>}
+ */
+export const loadInstallmentProductImageMap = async (productIds) => {
+  const uniqueProductIds = [
+    ...new Set(
+      productIds
+        .map((id) => String(id ?? ""))
+        .filter((id) => mongoose.isValidObjectId(id)),
+    ),
+  ];
+  if (uniqueProductIds.length === 0) {
+    return new Map();
+  }
+
+  const products = await ProductModel.find({ _id: { $in: uniqueProductIds } })
+    .select("productImageUrls productImageUrl")
+    .lean();
+
+  /** @type {Map<string, string | null>} */
+  const imageByProductId = new Map();
+  for (const product of products) {
+    imageByProductId.set(
+      String(product._id),
+      resolveInstallmentProductCoverImageUrl(product),
+    );
+  }
+  return imageByProductId;
+};
+
+/**
+ * @param {Record<string, unknown>} payload
+ * @param {Map<string, string | null>} imageMap
+ */
+export const attachProductImageToInstallmentContractPayload = (payload, imageMap) => ({
+  ...payload,
+  productImageUrl: imageMap.get(String(payload.productId)) ?? null,
+});
+
+/**
  * @param {import('mongoose').Document | Record<string, unknown>} contract
  */
 export const buildInstallmentContractPayload = async (contract) => {
@@ -575,11 +631,14 @@ export const buildInstallmentContractPayload = async (contract) => {
     typeof contract.toObject === "function" ? contract.toObject() : contract;
   recomputeContractOverdueFlags(plain);
   const base = toInstallmentContractPayload(plain);
-  const userMap = await loadInstallmentCounterpartyMap([
-    base.sellerUserId,
-    base.buyerUserId,
+  const [userMap, imageMap] = await Promise.all([
+    loadInstallmentCounterpartyMap([base.sellerUserId, base.buyerUserId]),
+    loadInstallmentProductImageMap([base.productId]),
   ]);
-  return attachCounterpartiesToInstallmentContractPayload(base, userMap);
+  return attachProductImageToInstallmentContractPayload(
+    attachCounterpartiesToInstallmentContractPayload(base, userMap),
+    imageMap,
+  );
 };
 
 /**
@@ -593,11 +652,17 @@ export const buildInstallmentContractPayloads = async (contracts) => {
     recomputeContractOverdueFlags(plain);
   }
   const bases = plains.map((row) => toInstallmentContractPayload(row));
-  const userMap = await loadInstallmentCounterpartyMap(
-    bases.flatMap((row) => [row.sellerUserId, row.buyerUserId]),
-  );
+  const [userMap, imageMap] = await Promise.all([
+    loadInstallmentCounterpartyMap(
+      bases.flatMap((row) => [row.sellerUserId, row.buyerUserId]),
+    ),
+    loadInstallmentProductImageMap(bases.map((row) => row.productId)),
+  ]);
   return bases.map((row) =>
-    attachCounterpartiesToInstallmentContractPayload(row, userMap),
+    attachProductImageToInstallmentContractPayload(
+      attachCounterpartiesToInstallmentContractPayload(row, userMap),
+      imageMap,
+    ),
   );
 };
 

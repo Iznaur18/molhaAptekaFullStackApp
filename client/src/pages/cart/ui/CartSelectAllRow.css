@@ -1,0 +1,62 @@
+/* Паритет mobile `useCartSelectAllRowStyles` */
+.cart-select-all {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0 var(--cart-page-content-inset, 12px) 8px;
+  padding: 0 12px 0 0;
+}
+
+.cart-select-all__count {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--iz-color-text-muted);
+}
+
+.cart-select-all__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 6px 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.cart-select-all__toggle-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--iz-color-text);
+}
+
+.cart-select-all__box {
+  box-sizing: border-box;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid var(--iz-color-border-strong);
+  border-radius: 0.3rem;
+  background: var(--iz-color-surface);
+}
+
+.cart-select-all__box_checked {
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='white' stroke-width='2.2'%3E%3Cpath d='M3.5 8.5 6.5 11.5 12.5 4.5'/%3E%3C/svg%3E");
+  background-size: 0.85rem;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.cart-select-all__box_indeterminate {
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='white' stroke-width='2.2'%3E%3Cpath d='M3.5 8h9'/%3E%3C/svg%3E");
+  background-size: 0.85rem;
+  background-position: center;
+  background-repeat: no-repeat;
+}

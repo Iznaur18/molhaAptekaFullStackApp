@@ -1,0 +1,147 @@
+/**
+ * Паритет mobile checkout sheet (`useBottomSheetFormStyles` + `CHECKOUT_SHEET_HEIGHT_PERCENT=60`):
+ *   gradient backdrop, sheet 60% height, radius lg (17), header 16/16/12,
+ *   close = text link, form pinSubmitToBottom
+ * Анимация: enter 280ms / exit 220ms ease-out/in cubic
+ * Scrim opacity и panel translateY — раздельно (иначе enter «съедается» opacity родителя).
+ */
+.checkout-sheet-modal__backdrop {
+  --checkout-sheet-enter-ms: 280ms;
+  --checkout-sheet-exit-ms: 220ms;
+  --checkout-sheet-enter-ease: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --checkout-sheet-exit-ease: cubic-bezier(0.55, 0.055, 0.675, 1);
+  --checkout-sheet-height: 70%;
+  --checkout-sheet-radius: var(--iz-radius-lg, 17px);
+
+  position: fixed;
+  inset: 0;
+  z-index: var(--iz-z-modal, 1000);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: transparent;
+}
+
+/* Паритет ModalSheetGradientBackdrop — fade отдельно от sheet */
+.checkout-sheet-modal__scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--iz-color-ink) 28%, transparent) 0%,
+    color-mix(in srgb, var(--iz-color-ink) 48%, transparent) 38%,
+    color-mix(in srgb, var(--iz-color-ink) 68%, transparent) 68%,
+    color-mix(in srgb, var(--iz-color-ink) 82%, transparent) 100%
+  );
+  opacity: 0;
+  transition: opacity var(--checkout-sheet-exit-ms) var(--checkout-sheet-exit-ease);
+}
+
+.checkout-sheet-modal__backdrop--open .checkout-sheet-modal__scrim {
+  opacity: 1;
+  transition: opacity var(--checkout-sheet-enter-ms) var(--checkout-sheet-enter-ease);
+}
+
+.checkout-sheet-modal__dismiss {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.checkout-sheet-modal__panel {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: var(--checkout-sheet-height);
+  max-height: var(--checkout-sheet-height);
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: var(--checkout-sheet-radius) var(--checkout-sheet-radius) 0 0;
+  background: var(--iz-color-surface);
+  box-shadow: 0 -12px 40px color-mix(in srgb, var(--iz-color-ink) 18%, transparent);
+  overflow: hidden;
+  transform: translate3d(0, 100%, 0);
+  transition: transform var(--checkout-sheet-exit-ms) var(--checkout-sheet-exit-ease);
+  will-change: transform;
+}
+
+.checkout-sheet-modal__backdrop--open .checkout-sheet-modal__panel {
+  transform: translate3d(0, 0, 0);
+  transition: transform var(--checkout-sheet-enter-ms) var(--checkout-sheet-enter-ease);
+}
+
+.checkout-sheet-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-shrink: 0;
+  padding: var(--iz-space-4) var(--iz-space-4) var(--iz-space-3);
+  border-bottom: 1px solid var(--iz-color-border);
+}
+
+.checkout-sheet-modal__title {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--iz-color-text);
+}
+
+.checkout-sheet-modal__close {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0.25rem 0.15rem;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--iz-color-link);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.checkout-sheet-modal__close:hover {
+  text-decoration: underline;
+}
+
+.checkout-sheet-modal__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--iz-space-3) var(--iz-space-4)
+    max(12px, env(safe-area-inset-bottom, 0px));
+}
+
+.checkout-sheet-modal__body > .checkout-form {
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .checkout-sheet-modal__scrim,
+  .checkout-sheet-modal__panel {
+    transition: none;
+  }
+
+  .checkout-sheet-modal__panel {
+    transform: none;
+  }
+
+  .checkout-sheet-modal__scrim {
+    opacity: 1;
+  }
+}

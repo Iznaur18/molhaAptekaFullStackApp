@@ -71,6 +71,20 @@ describe("validateCreateProductWizardStep", () => {
     );
   });
 
+  it("requires return choice on returns step", () => {
+    expect(
+      validateCreateProductWizardStep("returns", CREATE_PRODUCT_INITIAL_FORM, validationContext),
+    ).toBe(CREATE_PRODUCT_MODAL_UI.ERROR_RETURN_CHOICE);
+
+    expect(
+      validateCreateProductWizardStep(
+        "returns",
+        { ...CREATE_PRODUCT_INITIAL_FORM, productReturnEnabled: false },
+        validationContext,
+      ),
+    ).toBeNull();
+  });
+
   it("covers all wizard steps", () => {
     for (const stepId of CREATE_PRODUCT_WIZARD_STEP_IDS) {
       assert.doesNotThrow(() => {

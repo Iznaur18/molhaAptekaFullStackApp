@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { canSellerEditProduct } from "../../../entities/product/lib/getProductModerationUi.js";
+import { isCatalogPromotionActive } from "../../../entities/product/lib/productPromotionStatus.js";
 import { isCurrentUserProductSeller } from "../../../entities/product/lib/isCurrentUserProductSeller.js";
 import { patchProductInAllCatalogCaches } from "../../../entities/product/lib/catalogProductsQueryCache.js";
 import { PRODUCT_MODERATION_APPROVED } from "../../../entities/product/model/productModerationConstants.js";
@@ -104,11 +105,21 @@ export function ProductDetailsPage() {
 
   const handleProductStatsUpdate = useCallback(
     (id, stats) => {
-      setProductPatch((prev) => ({ ...prev, ...stats }));
-      patchProductInAllCatalogCaches(queryClient, id, (row) => ({ ...row, ...stats }));
+      setProductPatch((prev) => {
+        const next = { ...prev, ...stats };
+        const keys = Object.keys(stats);
+        const unchanged = keys.every((key) => Object.is(prev[key], next[key]));
+        return unchanged ? prev : next;
+      });
+      patchProductInAllCatalogCaches(queryClient, id, (row) => {
+        const next = { ...row, ...stats };
+        const keys = Object.keys(stats);
+        const unchanged = keys.every((key) => Object.is(row[key], next[key]));
+        return unchanged ? row : next;
+      });
       shell.handleProductStatsUpdate?.(id, stats);
     },
-    [queryClient, shell],
+    [queryClient, shell.handleProductStatsUpdate],
   );
 
   const handleEdit = useCallback(() => {
@@ -117,6 +128,26 @@ export function ProductDetailsPage() {
     }
     shell.setIsCreateProductModalOpen?.(false);
     shell.setProductToEdit?.(product);
+  }, [product, shell]);
+
+  const canPromote = useMemo(() => {
+    if (!product || !shell.isAuthorized || !shell.currentUserId) {
+      return false;
+    }
+    if (!isCurrentUserProductSeller(product, shell.currentUserId)) {
+      return false;
+    }
+    if (product.productIsAvailable === false) {
+      return false;
+    }
+    return !isCatalogPromotionActive(product);
+  }, [product, shell.currentUserId, shell.isAuthorized]);
+
+  const handlePromote = useCallback(() => {
+    if (!product) {
+      return;
+    }
+    shell.handleOpenPromotionModal?.(product);
   }, [product, shell]);
 
   if (!productId) {
@@ -137,15 +168,17 @@ export function ProductDetailsPage() {
 
   if (productQuery.isError || !product) {
     return (
-      <div className="product-details-page__state-wrap">
-        <p className="product-details-page__state product-details-page__state_error" role="alert">
-          {productQuery.error instanceof Error
-            ? productQuery.error.message
-            : API_CLIENT_UI.FETCH_CATALOG_PRODUCT_FALLBACK}
-        </p>
-        <button type="button" className="product-details-page__back" onClick={handleClose}>
-          Назад
-        </button>
+      <div className="product-details-page product-details-page--state">
+        <div className="product-details-page__state-wrap">
+          <p className="product-details-page__state product-details-page__state_error" role="alert">
+            {productQuery.error instanceof Error
+              ? productQuery.error.message
+              : API_CLIENT_UI.FETCH_CATALOG_PRODUCT_FALLBACK}
+          </p>
+          <button type="button" className="product-details-page__back" onClick={handleClose}>
+            Назад
+          </button>
+        </div>
       </div>
     );
   }
@@ -196,7 +229,9 @@ export function ProductDetailsPage() {
           showManageFooter ? (
             <ProductDetailsAdminFooter
               onEdit={handleEdit}
+              onPromote={handlePromote}
               canEdit={shell.isAdmin || canSellerEditProduct(product)}
+              canPromote={canPromote}
               isDeletePending={
                 shell.deletingProductId != null &&
                 shell.deletingProductId === String(product._id)

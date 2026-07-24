@@ -4,7 +4,10 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { productCategoryDisplayQueryKeys } from "../../../entities/product-category-display/model/productCategoryDisplayQueryKeys.js";
 import { useProductCatalogFeedTileDisplaysQuery } from "../../../entities/product-category-display/model/useProductCatalogFeedTileDisplaysQuery.js";
 import { useProductCategoryDisplaysQuery } from "../../../entities/product-category-display/model/useProductCategoryDisplaysQuery.js";
-import { buildCatalogBrowserLocation } from "../../../entities/product-category-display/lib/catalogBrowserPaths.js";
+import {
+  buildCatalogBrowserLocation,
+  buildCatalogProductsLocation,
+} from "../../../entities/product-category-display/lib/catalogBrowserPaths.js";
 import { buildQueryForCatalogFeedTile } from "../../../entities/product-category-display/lib/buildQueryForCatalogFeedTile.js";
 import { resolveActiveCatalogFeedLabel } from "../../../entities/product-category-display/lib/resolveActiveCatalogFeedLabel.js";
 import { resolveProductCategoryDisplay } from "../../../entities/product-category-display/lib/resolveProductCategoryDisplay.js";
@@ -12,9 +15,9 @@ import { IS_CATALOG_BROWSER_SUBCATEGORY_FILTER_ENABLED } from "../../../entities
 import { useProductCategoryBreadcrumbQuery } from "../../../entities/product-category-tree/model/useProductCategoryBreadcrumbQuery.js";
 import { useProductCategoryRootsQuery } from "../../../entities/product-category-tree/model/useProductCategoryRootsQuery.js";
 import { useSellerPersonalCategoryCatalogTilesQuery } from "../../../entities/seller-personal-category/model/useSellerPersonalCategoryCatalogTilesQuery.js";
+import { CATALOG_SORT_NEWEST } from "../../../entities/product/model/productConstants.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 import { catalogMainViewToPathname } from "../../../shared/lib/catalogMainViewPaths.js";
-import { buildSellerProductsPath } from "../../../shared/lib/sellerPaths.js";
 import { CATALOG_LANDING_QUERY } from "./catalogLoaderConstants.js";
 import { useCatalogSubcategoryPicker } from "./useCatalogSubcategoryPicker.js";
 
@@ -23,6 +26,7 @@ import { useCatalogSubcategoryPicker } from "./useCatalogSubcategoryPicker.js";
  */
 export function useCatalogBrowserLanding({
   navigate,
+  isCompactLayout,
   isCatalogBrowserMainViewActive,
   isCatalogBrowserLanding,
   isCatalogBrowserProductsView,
@@ -72,6 +76,7 @@ export function useCatalogBrowserLanding({
 
   const subcategoryPicker = useCatalogSubcategoryPicker({
     isCatalogBrowserLanding,
+    isCompactLayout,
     categoryRootsRef,
     applyCatalogQueryState,
     navigate,
@@ -185,12 +190,29 @@ export function useCatalogBrowserLanding({
 
   const handleSellerPersonalCategoryTileClick = useCallback(
     (tile) => {
-      if (!tile.sellerId) {
+      if (!tile._id) {
         return;
       }
-      navigate(buildSellerProductsPath(tile.sellerId));
+      const nextQuery = {
+        sort: CATALOG_SORT_NEWEST,
+        category: null,
+        categoryId: null,
+        sellerPersonalCategoryId: tile._id,
+        followingOnly: false,
+        auctionOnly: false,
+        installmentOnly: false,
+        saleOnly: false,
+      };
+      applyCatalogQueryState(nextQuery);
+      subcategoryPicker.clearPickerTrail();
+      navigate(buildCatalogProductsLocation(nextQuery, { compact: isCompactLayout }));
     },
-    [navigate],
+    [
+      applyCatalogQueryState,
+      isCompactLayout,
+      navigate,
+      subcategoryPicker.clearPickerTrail,
+    ],
   );
 
   const handleCatalogFeedTileClick = useCallback(
@@ -201,9 +223,22 @@ export function useCatalogBrowserLanding({
         return;
       }
       applyCatalogQueryState(nextQuery);
-      navigate(buildCatalogBrowserLocation(nextQuery, { omitDefaultSort: false }));
+      subcategoryPicker.clearPickerTrail();
+      navigate(
+        buildCatalogProductsLocation(nextQuery, {
+          compact: isCompactLayout,
+          omitDefaultSort: false,
+        }),
+      );
     },
-    [applyCatalogQueryState, isAuthorized, navigate, setIsLoginModalOpen],
+    [
+      applyCatalogQueryState,
+      isAuthorized,
+      isCompactLayout,
+      navigate,
+      setIsLoginModalOpen,
+      subcategoryPicker.clearPickerTrail,
+    ],
   );
 
 

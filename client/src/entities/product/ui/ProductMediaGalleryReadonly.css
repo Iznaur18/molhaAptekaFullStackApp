@@ -22,7 +22,7 @@
 }
 
 .product-media-gallery-readonly__hero--multi {
-  /* Свайп картинок — scroll-snap в ProductMediaHorizontalPager (touch-action: pan-x) */
+  /* Свайп картинок — scroll-snap в ProductMediaHorizontalPager (touch-action: pan-x pan-y) */
   user-select: none;
 }
 

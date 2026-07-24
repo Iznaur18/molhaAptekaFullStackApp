@@ -1,6 +1,6 @@
 import {
   ORDER_PAYMENT_METHOD_LABEL_RU,
-  ORDER_PAYMENT_METHODS,
+  ORDER_PAYMENT_METHODS_SELECTABLE,
 } from "../lib/checkoutPaymentMethodCardTheme.js";
 
 import "./CheckoutPaymentMethodPicker.css";
@@ -23,7 +23,7 @@ export function CheckoutPaymentMethodPicker({
     <div className="checkout-payment-method-picker">
       <div className="checkout-payment-method-picker__legend">{legend}</div>
       <div className="checkout-payment-method-picker__scroll" role="radiogroup" aria-label={legend}>
-        {ORDER_PAYMENT_METHODS.map((method) => {
+        {ORDER_PAYMENT_METHODS_SELECTABLE.map((method) => {
           const isSelected = value === method;
           const cardClassName = [
             "checkout-payment-method-picker__card",

@@ -34,6 +34,7 @@ export function useProductDetailsModalController({
   currentUserId = null,
   initialDetailsTab = "details",
   onProfileActionBadgesChanged,
+  closeBeforeSellerOpen = true,
 }) {
   const imageUrls = useMemo(
     () => (product ? resolveProductImageUrls(product) : []),
@@ -103,7 +104,9 @@ export function useProductDetailsModalController({
   const handleOpenSellerProfile =
     typeof onSellerNameClick === "function"
       ? (userId) => {
-          onClose();
+          if (closeBeforeSellerOpen) {
+            onClose();
+          }
           onSellerNameClick(userId);
         }
       : undefined;

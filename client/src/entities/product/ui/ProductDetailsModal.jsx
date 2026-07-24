@@ -68,6 +68,7 @@ export function ProductDetailsModal({
     currentUserId,
     initialDetailsTab,
     onProfileActionBadgesChanged,
+    closeBeforeSellerOpen: !isPage,
   });
 
   const isCompactLayout = useAppShellCompactLayout();
@@ -91,7 +92,10 @@ export function ProductDetailsModal({
 
   const title = product.productName?.trim() || "Товар";
   const showMobilePurchaseDock =
-    isMobileNav && ctrl.detailsTab === "details" && ctrl.showPriceBlock;
+    isMobileNav &&
+    ctrl.detailsTab === "details" &&
+    ctrl.showPriceBlock &&
+    ctrl.canShowAddToCart;
   const showMobileInstallmentDock =
     isMobileNav &&
     ctrl.detailsTab === "installment" &&
@@ -112,10 +116,6 @@ export function ProductDetailsModal({
       onRequestLogin={onRequestLogin}
       purchaseLimit={ctrl.purchaseLimit}
       canShowAddToCart={ctrl.canShowAddToCart}
-      auctionUi={ctrl.auctionUi}
-      installmentUi={ctrl.installmentUi}
-      onAuctionClick={ctrl.handleAuctionShortcutClick}
-      onInstallmentClick={ctrl.handleInstallmentShortcutClick}
       className="product-details-modal__price-actions--mobile-dock"
     />
   ) : null;
@@ -135,6 +135,7 @@ export function ProductDetailsModal({
     isMobileNav && adminFooter && ctrl.detailsTab === "details";
   const isAltDetailsTab =
     ctrl.detailsTab === "reviews" ||
+    ctrl.detailsTab === "similar" ||
     ctrl.detailsTab === "auction" ||
     ctrl.detailsTab === "installment";
   const tabPanelClassName = [
@@ -152,6 +153,7 @@ export function ProductDetailsModal({
         showAuctionTab={ctrl.showAuctionTab}
         showInstallmentTab={ctrl.showInstallmentTab}
         showReviewsTab={ctrl.showReviewsTab}
+        showSimilarTab={ctrl.showSimilarTab}
         reviewsTabLabel={ctrl.reviewsTabLabel}
       />
     ) : null;
@@ -177,6 +179,8 @@ export function ProductDetailsModal({
         mobileReportOverlay={detailsReportOverlay}
         productTitleId={isMobileNav ? undefined : "product-details-modal-title"}
         embedMediaGallery={!pinGalleryAboveTabs}
+        showInlinePurchaseActions={!isMobileNav}
+        dockSubmit={isMobileNav}
         ctrl={ctrl}
       />
     </div>

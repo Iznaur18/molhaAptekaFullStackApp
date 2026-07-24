@@ -1,0 +1,182 @@
+.users-podium {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-bottom: 0.25rem;
+}
+
+.users-podium__title {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--iz-color-text-muted);
+}
+
+.users-podium__row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.users-podium__slot {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0.75rem 0.5rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 1rem;
+  background: var(--iz-color-surface);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  text-align: center;
+}
+
+.users-podium__slot:hover {
+  border-color: var(--iz-color-action);
+}
+
+.users-podium__slot_place-1 {
+  padding-top: 1.125rem;
+  padding-bottom: 1rem;
+  border-color: var(--iz-color-warning);
+  background: var(--iz-color-warning-surface);
+}
+
+.users-podium__slot_place-2 {
+  border-color: color-mix(in srgb, var(--iz-color-text-muted) 40%, transparent);
+  background: var(--iz-color-surface-elevated, var(--iz-color-surface-muted));
+}
+
+.users-podium__slot_place-3 {
+  border-color: color-mix(in srgb, var(--iz-color-warning-text) 35%, transparent);
+  background: var(--iz-color-warning-surface);
+}
+
+.users-podium__place-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 0.5rem;
+  border-radius: 999px;
+  color: var(--iz-color-on-contrast);
+}
+
+.users-podium__place-badge_1 {
+  background: var(--iz-color-warning);
+}
+
+.users-podium__place-badge_2 {
+  background: var(--iz-color-text-muted);
+}
+
+.users-podium__place-badge_3 {
+  background: var(--iz-color-warning-text);
+}
+
+.users-podium__place-badge-text {
+  font-size: 0.75rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.users-podium__avatar {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.users-podium__avatar_place-1 {
+  width: 4.5rem;
+  height: 4.5rem;
+}
+
+.users-podium__avatar_place-other {
+  width: 3.5rem;
+  height: 3.5rem;
+}
+
+.users-podium__name {
+  width: 100%;
+  justify-content: center;
+}
+
+.users-podium__name-text {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: center;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.users-podium__place-label {
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: var(--iz-color-text-muted);
+}
+
+.users-podium__metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 100%;
+}
+
+.users-podium__metric-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.users-podium__metric-label {
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  color: var(--iz-color-text-muted);
+  text-align: left;
+}
+
+.users-podium__metric-value {
+  flex-shrink: 0;
+  font-size: 0.625rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--iz-color-text);
+}
+
+@container app-viewport (max-width: 640px) {
+  .users-podium__row {
+    gap: 0.35rem;
+  }
+
+  .users-podium__slot {
+    padding: 0.55rem 0.35rem;
+    gap: 0.35rem;
+  }
+
+  .users-podium__avatar_place-1 {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+
+  .users-podium__avatar_place-other {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+}

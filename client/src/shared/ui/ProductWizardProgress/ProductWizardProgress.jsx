@@ -46,7 +46,9 @@ export function ProductWizardProgress({
                 .join(" ")}
               aria-current={isActive ? "step" : undefined}
             >
-              <span className="product-wizard-progress__step-index">{index + 1}</span>
+              <span className="product-wizard-progress__step-index" aria-hidden={isComplete}>
+                {isComplete ? "✓" : index + 1}
+              </span>
               <span className="product-wizard-progress__step-label">{copy.shortLabel}</span>
             </li>
           );

@@ -138,17 +138,14 @@
 
 .create-product-wizard__primary {
   border: 1px solid var(--iz-color-action);
-  background: linear-gradient(
-    165deg,
-    var(--iz-color-action) 0%,
-    color-mix(in srgb, var(--iz-color-action) 82%, var(--iz-color-primary)) 100%
-  );
+  border-radius: 0.7rem;
+  background: var(--iz-color-action);
   color: var(--iz-color-on-contrast);
-  box-shadow: 0 8px 20px color-mix(in srgb, var(--iz-color-action) 24%, transparent);
+  box-shadow: none;
 }
 
 .create-product-wizard__primary:hover:not(:disabled) {
-  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--iz-color-action) 88%, var(--iz-color-ink));
 }
 
 .create-product-wizard__back:disabled,

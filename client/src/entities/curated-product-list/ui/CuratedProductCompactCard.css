@@ -30,7 +30,7 @@
   overflow: hidden;
   background: var(--curated-card-image-bg);
   cursor: grab;
-  touch-action: pan-x;
+  touch-action: pan-x pan-y;
   user-select: none;
 }
 

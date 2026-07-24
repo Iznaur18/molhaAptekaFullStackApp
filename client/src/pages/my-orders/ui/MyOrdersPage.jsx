@@ -31,7 +31,6 @@ import { MyOrdersPageOverview } from "./MyOrdersPageOverview.jsx";
 
 import "./MyOrdersPage.css";
 import "./MyOrdersPageOverview.css";
-import "../../../shared/ui/profileQueueContentPanel.css";
 
 const EMPTY_ORDERS = [];
 
@@ -57,7 +56,8 @@ export function MyOrdersPage({ isAuthorized, onQueueChanged }) {
   const attentionOrderIdsKey = useMemo(
     () => buildAttentionOrderIdsKey(allOrders, orderNeedsBuyerAttention),
     [allOrders],
-  );  const filteredOrders = useMemo(
+  );
+  const filteredOrders = useMemo(
     () => filterMyOrders(allOrders, { status: statusFilter, attentionOnly }),
     [allOrders, statusFilter, attentionOnly],
   );

@@ -3,6 +3,7 @@
  * @property {string} _id
  * @property {string} userName
  * @property {boolean} isUserDataConfirmed
+ * @property {boolean} [isPremiumUser]
  */
 
 /**

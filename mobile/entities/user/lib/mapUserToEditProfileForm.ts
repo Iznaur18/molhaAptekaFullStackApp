@@ -1,4 +1,4 @@
-import { USER_SOCIAL_LINK_FIELD_IDS } from "@molha/api-contract";
+import { USER_SOCIAL_LINK_FIELD_IDS, storedSocialUrlToInputValue } from "@molha/api-contract";
 import { formatBirthDateForInput } from "@/entities/user/lib/birthDateInputMask";
 import { getUserBackgroundFocus } from "@/entities/user/lib/profileImageFocus";
 import type { ProfileImageFocus } from "@/entities/user/lib/profileImageFocus";
@@ -57,10 +57,10 @@ export const mapUserToEditProfileForm = (
   const bgMode = resolveBackgroundModeFromUser(stored);
 
   const socialLinks = Object.fromEntries(
-    USER_SOCIAL_LINK_FIELD_IDS.map((fieldId) => {
-      const raw = user[fieldId];
-      return [fieldId, typeof raw === "string" ? raw : ""];
-    }),
+    USER_SOCIAL_LINK_FIELD_IDS.map((fieldId) => [
+      fieldId,
+      storedSocialUrlToInputValue(fieldId, user[fieldId]),
+    ]),
   ) as Pick<
     EditProfileFormState,
     | "socialTelegramUrl"

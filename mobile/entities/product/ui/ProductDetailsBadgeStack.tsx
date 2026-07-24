@@ -1,5 +1,5 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 
 import {
   buildProductDetailsBadgeItems,
@@ -10,6 +10,8 @@ import {
   PRODUCT_DETAILS_SOFT_BADGE_LAYOUT,
 } from "@/entities/product/lib/productDetailsBadgeSoftPalette";
 import { PRODUCT_DETAILS_MODAL_UI } from "@/shared/config";
+import { nestedHorizontalScrollProps } from "@/shared/lib/nestedHorizontalScrollProps";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useProductDetailScreenStyles } from "@/shared/theme/catalogProductStyles";
 import { AppText } from "@/shared/ui/AppText";
 
@@ -34,10 +36,35 @@ const softBadgeText = {
 const renderBadge = ({
   item,
   styles,
+  theme,
 }: {
   item: ProductDetailsBadgeItem;
   styles: ReturnType<typeof useProductDetailScreenStyles>;
+  theme: ReturnType<typeof useAppTheme>;
 }) => {
+  if (item.kind === "original") {
+    return (
+      <View
+        key={item.key}
+        style={[
+          styles.metaInfoChip,
+          styles.metaInfoChipRow,
+          styles.metaInfoChipOriginal,
+          softBadgeChrome,
+        ]}
+        accessibilityLabel={PRODUCT_DETAILS_MODAL_UI.ORIGINAL_BADGE_ARIA}
+      >
+        <MaterialIcons name="check-circle" size={14} color={theme.colors.success} />
+        <Text
+          style={[softBadgeText, styles.metaInfoChipOriginalText]}
+          numberOfLines={1}
+        >
+          {item.label}
+        </Text>
+      </View>
+    );
+  }
+
   if (item.kind === "raffle") {
     const tone = PRODUCT_DETAILS_BADGE_SOFT_COLORS.raffle;
     return (
@@ -52,7 +79,27 @@ const renderBadge = ({
     );
   }
 
-  const tone = PRODUCT_DETAILS_BADGE_SOFT_COLORS.listingOrigin;
+  if (item.kind === "listingOrigin") {
+    const tone = PRODUCT_DETAILS_BADGE_SOFT_COLORS.listingOrigin;
+    return (
+      <View
+        key={item.key}
+        style={[
+          styles.metaInfoChip,
+          styles.metaInfoChipRow,
+          softBadgeChrome,
+          { backgroundColor: tone.backgroundColor },
+        ]}
+        accessibilityLabel={PRODUCT_DETAILS_MODAL_UI.LISTING_ORIGIN_SLOT_ARIA}
+      >
+        <MaterialIcons name={item.iconName} size={14} color={tone.color} />
+        <Text style={[softBadgeText, { color: tone.color }]} numberOfLines={1}>
+          {item.label}
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <View
       key={item.key}
@@ -60,12 +107,12 @@ const renderBadge = ({
         styles.metaInfoChip,
         styles.metaInfoChipRow,
         softBadgeChrome,
-        { backgroundColor: tone.backgroundColor },
+        { backgroundColor: item.backgroundColor },
       ]}
-      accessibilityLabel={PRODUCT_DETAILS_MODAL_UI.LISTING_ORIGIN_SLOT_ARIA}
+      accessibilityLabel={PRODUCT_DETAILS_MODAL_UI.PRICE_MARKET_STATUS_SLOT_ARIA}
     >
-      <MaterialIcons name={item.iconName} size={14} color={tone.color} />
-      <Text style={[softBadgeText, { color: tone.color }]} numberOfLines={1}>
+      <MaterialIcons name="sell" size={14} color={item.color} />
+      <Text style={[softBadgeText, { color: item.color }]} numberOfLines={1}>
         {item.label}
       </Text>
     </View>
@@ -74,11 +121,20 @@ const renderBadge = ({
 
 export const ProductDetailsBadgeStack = ({ product }: ProductDetailsBadgeStackProps) => {
   const styles = useProductDetailScreenStyles();
+  const theme = useAppTheme();
   const items = buildProductDetailsBadgeItems({ product });
 
   return (
-    <View style={[styles.priceBadgeRow, styles.priceBadgeRowContent]}>
-      {items.map((item) => renderBadge({ item, styles }))}
+    <View style={styles.priceBadgeRow}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.priceBadgeRowContent}
+        {...nestedHorizontalScrollProps}
+        keyboardShouldPersistTaps="handled"
+      >
+        {items.map((item) => renderBadge({ item, styles, theme }))}
+      </ScrollView>
     </View>
   );
 };

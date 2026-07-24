@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { renderWithProviders } from "../../../test/renderWithProviders.jsx";
 import { CHECKOUT_FORM_UI } from "../../config/appUiCopy.js";
+import { ORDER_PAYMENT_METHOD_DEFAULT } from "../../../entities/order/model/constants.js";
 import { CheckoutForm } from "./CheckoutForm.jsx";
 
 vi.mock("../../../shared/config/featureFlags.js", () => ({
@@ -54,7 +55,7 @@ describe("CheckoutForm", () => {
     expect(onSubmit).toHaveBeenCalledWith({
       deliveryAddress: "г Москва, ул Ленина, д 1",
       deliveryAddressFlat: "",
-      paymentMethod: "cardPrepaid",
+      paymentMethod: ORDER_PAYMENT_METHOD_DEFAULT,
     });
   });
 

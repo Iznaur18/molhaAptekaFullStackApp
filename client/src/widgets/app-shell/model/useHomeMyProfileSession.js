@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 
 import { MY_PRODUCTS_MODERATION_FILTER_ALL } from "../../../entities/product/model/productConstants.js";
+import { AUTH_LOGIN_PATH } from "../../../shared/lib/authPaths.js";
 import { isRoleRestrictedMainView } from "../../../shared/lib/homeMainViewPaths.js";
 import { isProfileTabMainView } from "../lib/profileTabToMainView.js";
 import { EMPTY_MY_PROFILE_PAGE } from "../lib/catalogShellConstants.js";
@@ -15,8 +16,8 @@ export const useHomeMyProfileSession = ({
   isAdmin,
   canModerateProducts,
   goToMainView,
+  navigate,
   setMyProfilePage,
-  setIsLoginModalOpen,
   setMyProductsCatalogError,
   setMyProductsModerationFilter,
   resetCatalogFollowingOnLogout,
@@ -33,18 +34,25 @@ export const useHomeMyProfileSession = ({
       setMyProductsCatalogError("");
       setMyProductsModerationFilter(MY_PRODUCTS_MODERATION_FILTER_ALL);
       resetCatalogFollowingOnLogout();
-      if (isProfileTabMainView(mainView) || mainView === "notifications") {
-        setIsLoginModalOpen(true);
+
+      if (mainView === "notifications") {
+        navigate(AUTH_LOGIN_PATH);
         goToMainView("catalog");
+        return;
+      }
+
+      if (isProfileTabMainView(mainView) && mainView !== "my-profile") {
+        navigate(AUTH_LOGIN_PATH);
+        goToMainView("my-profile");
       }
     }
   }, [
     isAuthorized,
     mainView,
     goToMainView,
+    navigate,
     isSessionReady,
     resetCatalogFollowingOnLogout,
-    setIsLoginModalOpen,
     setMyProductsCatalogError,
     setMyProductsModerationFilter,
     clearInAppNotifications,

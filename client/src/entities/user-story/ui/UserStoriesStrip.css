@@ -1,5 +1,6 @@
 .user-stories-strip {
-  margin: 0 0 16px;
+  /* Паритет mobile HOME_FEED_SECTION_GAP = 8 */
+  margin: 0 0 var(--iz-space-2);
   padding: 8px 12px;
   border: 1px solid var(--iz-color-border);
   border-radius: 20px;
@@ -48,14 +49,22 @@
 }
 
 .user-stories-strip__ring {
+  /* Паритет mobile USER_STORY_STRIP_LAYOUT: ring 68, padding 3 → inner 62 */
+  --user-story-ring-size: 68px;
+  --user-story-ring-padding: 3px;
+  --user-story-avatar-size: 62px;
+  --user-story-avatar-gap: 2px;
+
+  box-sizing: border-box;
   position: relative;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  width: 68px;
-  height: 68px;
-  border-radius: 999px;
-  padding: 3px;
+  flex-shrink: 0;
+  width: var(--user-story-ring-size);
+  height: var(--user-story-ring-size);
+  border-radius: 50%;
+  padding: var(--user-story-ring-padding);
   background: var(--iz-color-action);
 }
 
@@ -76,11 +85,14 @@
 
 .user-stories-strip__avatar,
 .user-stories-strip__avatar-fallback {
-  width: 100%;
-  height: 100%;
-  border-radius: 999px;
+  box-sizing: border-box;
+  display: block;
+  flex-shrink: 0;
+  width: var(--user-story-avatar-size);
+  height: var(--user-story-avatar-size);
+  border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--iz-color-surface);
+  border: var(--user-story-avatar-gap) solid var(--iz-color-surface);
 }
 
 .user-stories-strip__avatar-fallback {

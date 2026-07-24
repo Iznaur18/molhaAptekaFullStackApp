@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { BrowserRouter, Routes } from "react-router-dom";
 
 import { AppQueryProvider } from "../shared/api/AppQueryProvider.jsx";
@@ -9,6 +10,16 @@ import { AppIntroSplash } from "../features/app-intro/ui/AppIntroSplash.jsx";
 import { renderAppShellRoutes } from "./routes/appRoutes.jsx";
 
 import "./App.css";
+
+const APP_INTERFACE_ERROR_MESSAGE = "Ошибка интерфейса. Обновите страницу.";
+
+function AppInterfaceErrorFallback() {
+  useEffect(() => {
+    window.location.replace("/");
+  }, []);
+
+  return <p className="app-error-fallback">{APP_INTERFACE_ERROR_MESSAGE}</p>;
+}
 
 function AppRoutes() {
   return (
@@ -29,9 +40,7 @@ function AppRoutes() {
 
 function App() {
   return (
-    <ClientAppErrorBoundary
-      fallback={<p className="app-error-fallback">Ошибка интерфейса. Обновите страницу.</p>}
-    >
+    <ClientAppErrorBoundary fallback={<AppInterfaceErrorFallback />}>
       <AppQueryProvider>
         <AppRoutes />
       </AppQueryProvider>

@@ -8,11 +8,11 @@ import { PRODUCT_DETAILS_CONTENT_PANEL } from "../../lib/productDetailsContentPa
  */
 export function useProductDetailsContentPanel(defaultPanel, productId) {
   const [activePanel, setActivePanel] = useState(
-    defaultPanel ?? PRODUCT_DETAILS_CONTENT_PANEL.DESCRIPTION,
+    defaultPanel ?? PRODUCT_DETAILS_CONTENT_PANEL.RETURNS,
   );
 
   useEffect(() => {
-    setActivePanel(defaultPanel ?? PRODUCT_DETAILS_CONTENT_PANEL.DESCRIPTION);
+    setActivePanel(defaultPanel ?? PRODUCT_DETAILS_CONTENT_PANEL.RETURNS);
   }, [defaultPanel, productId]);
 
   return [activePanel, setActivePanel];

@@ -7,15 +7,12 @@ import "./ProductPromotionManageSection.css";
 /**
  * @typedef {Object} ProductPromotionManageSectionProps
  * @property {import("../model/types.js").ProductFromApi} product
- * @property {(productId: string) => void | Promise<void>} onDelete
  * @property {(productId: string, productIsAvailable: boolean) => void | Promise<void>} [onSetAvailability]
  * @property {(productId: string, productAuctionEnabled: boolean) => void | Promise<void>} [onSetAuction]
- * @property {boolean} [isDeletePending]
  * @property {boolean} [isAvailabilityTogglePending]
  * @property {boolean} [isAuctionTogglePending]
  * @property {string} [errorMessage]
  * @property {boolean} [canEdit]
- * @property {boolean} [canDelete]
  * @property {boolean} [canToggleVisibility]
  * @property {boolean} [sellerRaffleActive]
  * @property {(product: import("../model/types.js").ProductFromApi, enabled: boolean) => void} [onToggleRaffleParticipation]
@@ -30,15 +27,12 @@ import "./ProductPromotionManageSection.css";
  */
 export function ProductPromotionManageSection({
   product,
-  onDelete,
   onSetAvailability,
   onSetAuction,
-  isDeletePending = false,
   isAvailabilityTogglePending = false,
   isAuctionTogglePending = false,
   errorMessage = "",
   canEdit = true,
-  canDelete = true,
   canToggleVisibility = true,
   sellerRaffleActive = false,
   onToggleRaffleParticipation,
@@ -71,15 +65,12 @@ export function ProductPromotionManageSection({
       )}
       <ProductEditManageSection
         product={product}
-        onDelete={onDelete}
         onSetAvailability={onSetAvailability}
         onSetAuction={onSetAuction}
-        isDeletePending={isDeletePending}
         isAvailabilityTogglePending={isAvailabilityTogglePending}
         isAuctionTogglePending={isAuctionTogglePending}
         errorMessage={errorMessage}
         canEdit={canEdit}
-        canDelete={canDelete}
         canToggleVisibility={canToggleVisibility}
         sellerRaffleActive={sellerRaffleActive}
         onToggleRaffleParticipation={onToggleRaffleParticipation}
@@ -87,7 +78,8 @@ export function ProductPromotionManageSection({
         disabled={isSubmitting}
         onOpenInstallmentProgram={onOpenInstallmentProgram}
         canOpenInstallmentProgram={
-          product.productModerationStatus === PRODUCT_MODERATION_APPROVED
+          (product.productModerationStatus ?? PRODUCT_MODERATION_APPROVED) ===
+          PRODUCT_MODERATION_APPROVED
         }
       />
     </section>

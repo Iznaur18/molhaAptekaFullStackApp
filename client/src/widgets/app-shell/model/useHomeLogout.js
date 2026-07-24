@@ -13,7 +13,6 @@ export const useHomeLogout = ({
   navigate,
   clearAuthSession,
   setMyProfilePage,
-  setIsEditProfileOpen,
   clearInAppNotifications,
 }) => {
   const logoutMutation = useLogoutMutation();
@@ -29,7 +28,6 @@ export const useHomeLogout = ({
     }
     clearAuthSession();
     setMyProfilePage(EMPTY_MY_PROFILE_PAGE);
-    setIsEditProfileOpen(false);
     clearInAppNotifications();
     navigate("/", { replace: true });
   }, [
@@ -39,7 +37,6 @@ export const useHomeLogout = ({
     flushRemoteWishlist,
     logoutMutation,
     navigate,
-    setIsEditProfileOpen,
     setMyProfilePage,
   ]);
 };

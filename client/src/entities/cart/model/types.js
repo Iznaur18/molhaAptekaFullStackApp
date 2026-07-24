@@ -10,6 +10,7 @@
  * @property {(productId: string, quantity?: number) => void} addItem
  * @property {(productId: string, quantity: number) => void} setItemQuantity
  * @property {(productId: string) => void} removeItem
+ * @property {(productIds: string[]) => void} removeItems
  * @property {() => void} clearCart
  * @property {(payload: CartItemsByProductId) => void} hydrateCart
  * @property {() => Promise<void>} flushRemoteCart

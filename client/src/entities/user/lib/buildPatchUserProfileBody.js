@@ -1,14 +1,15 @@
-import { appendStructuredAddressToPayload } from "../../address/lib/appendStructuredAddressToPayload.js";
-import { isStructuredAddressEqual } from "../../address/lib/isStructuredAddressEqual.js";
 import {
   USER_SOCIAL_LINK_FIELD_IDS,
-  isHttpUrl,
+  normalizeSocialLinkToStoredUrl,
+  validateSocialLinkInput,
 } from "@molha/api-contract";
 import { normalizeUploadUrlForStorage } from "@izibuy/shared-lib";
 import { normalizeRuPhoneInput } from "./ruPhone.js";
 import { getUserAvatarFocus, getUserBackgroundFocus } from "./profileImageFocus.js";
 import { serializeUserBackgroundForForm } from "./userBackgroundValue.js";
 import { DEFAULT_USER_AVATAR_URL } from "../model/userConstants.js";
+import { appendStructuredAddressToPayload } from "../../address/lib/appendStructuredAddressToPayload.js";
+import { isStructuredAddressEqual } from "../../address/lib/isStructuredAddressEqual.js";
 
 /**
  * Тело `PATCH /user/:id` (только разрешённые пользователю поля).
@@ -111,7 +112,15 @@ export function buildPatchUserProfileBody(form, options = {}) {
 
   for (const fieldId of USER_SOCIAL_LINK_FIELD_IDS) {
     const link = String(form[fieldId] ?? "").trim();
-    body[fieldId] = link === "" ? null : link;
+    if (link === "") {
+      body[fieldId] = null;
+      continue;
+    }
+    const normalized = normalizeSocialLinkToStoredUrl(fieldId, link);
+    if (!normalized.ok) {
+      throw new Error(normalized.message);
+    }
+    body[fieldId] = normalized.url;
   }
 
   if (includePremium) {
@@ -135,11 +144,8 @@ export function buildPatchUserProfileBody(form, options = {}) {
  */
 export function validateSocialLinksInForm(form) {
   for (const fieldId of USER_SOCIAL_LINK_FIELD_IDS) {
-    const link = String(form[fieldId] ?? "").trim();
-    if (link === "") continue;
-    if (!isHttpUrl(link)) {
-      return "Соцсети: укажите корректную ссылку (http:// или https://)";
-    }
+    const error = validateSocialLinkInput(fieldId, form[fieldId]);
+    if (error) return error;
   }
   return null;
 }

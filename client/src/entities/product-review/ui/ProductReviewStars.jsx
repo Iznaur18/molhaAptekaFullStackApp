@@ -11,7 +11,7 @@ import "./ProductReviewStars.css";
  *   value: number;
  *   onChange?: (value: number) => void;
  *   disabled?: boolean;
- *   size?: 'sm' | 'md';
+ *   size?: 'sm' | 'md' | 'lg';
  * }} props
  */
 export function ProductReviewStars({ value, onChange, disabled = false, size = "md" }) {

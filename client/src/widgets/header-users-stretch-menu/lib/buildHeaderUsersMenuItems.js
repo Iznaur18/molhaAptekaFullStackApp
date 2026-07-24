@@ -1,0 +1,43 @@
+import { BadgeHelp, CircleHelp, Newspaper, Users } from "../../../shared/ui/icon/index.js";
+import { HEADER_USERS_BUTTON_UI } from "../../../shared/config/appUiCopy.js";
+
+/**
+ * @typedef {"users" | "terms" | "faq" | "placeholder-3"} HeaderUsersMenuItemKey
+ * @typedef {"users" | "terms" | "faq"} HeaderUsersMenuItemAction
+ *
+ * @typedef {{
+ *   key: HeaderUsersMenuItemKey;
+ *   icon: import("lucide-react").LucideIcon;
+ *   accessibilityLabel: string;
+ *   action?: HeaderUsersMenuItemAction;
+ * }} HeaderUsersMenuItem
+ */
+
+/** @returns {HeaderUsersMenuItem[]} */
+export function buildHeaderUsersMenuItems() {
+  return [
+    {
+      key: "users",
+      icon: Users,
+      accessibilityLabel: HEADER_USERS_BUTTON_UI.MENU_ITEM_USERS_ARIA,
+      action: "users",
+    },
+    {
+      key: "terms",
+      icon: Newspaper,
+      accessibilityLabel: HEADER_USERS_BUTTON_UI.MENU_ITEM_TERMS_ARIA,
+      action: "terms",
+    },
+    {
+      key: "faq",
+      icon: BadgeHelp,
+      accessibilityLabel: HEADER_USERS_BUTTON_UI.MENU_ITEM_FAQ_ARIA,
+      action: "faq",
+    },
+    {
+      key: "placeholder-3",
+      icon: CircleHelp,
+      accessibilityLabel: HEADER_USERS_BUTTON_UI.MENU_ITEM_PLACEHOLDER_ARIA(3),
+    },
+  ];
+}

@@ -5,6 +5,21 @@
   width: 100%;
 }
 
+.search-input__leading-icon {
+  position: absolute;
+  left: 0.875rem;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--iz-color-text-muted);
+  pointer-events: none;
+}
+
+.search-input--leading-icon .search-input__field {
+  padding-left: 2.375rem;
+}
+
 .search-input__field {
   box-sizing: border-box;
   width: 100%;

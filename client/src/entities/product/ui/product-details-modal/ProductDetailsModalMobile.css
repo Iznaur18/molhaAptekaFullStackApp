@@ -161,10 +161,35 @@
   }
 
   .product-details-modal__price-block--inline-actions {
-    padding: 0.35rem 0 0.85rem;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 5.6px 0 0;
     border: none;
     border-radius: 0;
     background: transparent;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .product-details-modal__price-block--inline-actions
+    .product-details-modal__price-badge-row,
+  .product-details-modal__price-block--inline-actions
+    .product-details-seller-products-carousel {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .product-details-modal__price-block--inline-actions
+    .product-details-modal__product-name {
+    margin: 0;
+  }
+
+  .product-details-modal__price-block--inline-actions
+    .product-details-modal__seller-extras {
+    gap: 12px;
+    padding: 0;
   }
 
   .product-details-modal__product-name {
@@ -230,6 +255,10 @@
     padding: 0;
   }
 
+  .product-details-modal .product-details-modal__meta-grid {
+    margin-inline: var(--iz-space-4);
+  }
+
   .product-details-modal--mobile-dock-active .product-details-modal__footer {
     display: none;
   }
@@ -261,20 +290,21 @@
     padding: 0.25rem var(--iz-space-4) 0.75rem;
   }
 
-  .product-details-modal__mobile-inline-actions .product-details-modal__footer-btn--edit {
+  .product-details-modal__mobile-inline-actions .product-details-modal__footer-btn--edit,
+  .product-details-modal__mobile-inline-actions .product-details-modal__footer-btn--promote {
     flex: 1 1 auto;
     min-width: min(100%, 9rem);
     box-shadow: none;
   }
 
   .product-details-modal__price-actions--mobile-dock {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.45rem;
+    display: block;
+    width: 100%;
   }
 
   .product-details-modal__price-actions--mobile-dock
     .product-details-modal__price-actions-cart {
-    grid-column: 1 / -1;
+    grid-column: auto;
   }
 
   .product-details-modal__price-actions--mobile-dock .add-to-cart,
@@ -285,11 +315,6 @@
     border-radius: 0.7rem;
   }
 
-  .product-details-modal__price-actions--mobile-dock .product-details-modal__auction-btn {
-    min-height: 2.5rem;
-    font-size: 0.82rem;
-  }
-
   .installment-buyer-block__docked-footer .installment-buyer-block__submit {
     width: 100%;
     min-height: 3rem;
@@ -298,6 +323,7 @@
     border-radius: 0.7rem;
   }
 
+  .product-price-offer__docked-footer .app-btn--contrast,
   .product-price-offer__docked-footer .product-price-offer__btn--primary,
   .checkout-form__docked-footer .checkout-form__submit {
     box-sizing: border-box;

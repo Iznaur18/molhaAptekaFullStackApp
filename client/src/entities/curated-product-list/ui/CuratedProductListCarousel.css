@@ -8,7 +8,7 @@
  */
 .curated-product-list-carousel {
   box-sizing: border-box;
-  margin: 0 0 8px;
+  margin: 0 0 var(--iz-space-2);
   padding: 8px 12px;
   border-radius: var(--iz-radius-card-lg);
   background: var(--iz-color-surface);
@@ -34,6 +34,7 @@
   padding: 4px 4px 8px;
   overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }

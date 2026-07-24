@@ -12,6 +12,8 @@ import "./ImageUrlField.css";
  * @param {{
  *   value: string;
  *   onChange: (url: string) => void;
+ *   onUploaded?: (url: string) => void;
+ *   transformFileBeforeUpload?: (file: File) => Promise<File | null>;
  *   disabled?: boolean;
  *   canUpload?: boolean;
  *   compact?: boolean;
@@ -26,6 +28,8 @@ import "./ImageUrlField.css";
 export function ImageUrlField({
   value,
   onChange,
+  onUploaded,
+  transformFileBeforeUpload,
   disabled = false,
   canUpload = true,
   compact = false,
@@ -57,7 +61,16 @@ export function ImageUrlField({
 
     setUploadError("");
     try {
-      const file = await prepareBrowserImageFileForUpload(rawFile);
+      let fileForUpload = rawFile;
+      if (transformFileBeforeUpload) {
+        const transformed = await transformFileBeforeUpload(rawFile);
+        if (!transformed) {
+          return;
+        }
+        fileForUpload = transformed;
+      }
+
+      const file = await prepareBrowserImageFileForUpload(fileForUpload);
       const validationError = validateUploadImageFile(file);
       if (validationError) {
         setUploadError(validationError);
@@ -66,6 +79,7 @@ export function ImageUrlField({
 
       const url = await uploadImageMutation.mutateAsync(file);
       onChange(url);
+      onUploaded?.(url);
     } catch (error) {
       const message =
         error instanceof Error ? error.message : IMAGE_URL_FIELD_UI.ERROR_GENERIC;

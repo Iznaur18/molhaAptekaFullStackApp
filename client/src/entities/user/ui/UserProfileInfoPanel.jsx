@@ -38,60 +38,16 @@ export function UserProfileInfoPanel({
 
   return (
     <div className={["user-profile-info", className].filter(Boolean).join(" ")}>
-      {sections.map((section) =>
-        section.id === "stats" ? (
-          <ProfileStatsSection
-            key={section.id}
-            sectionId={section.id}
-            rows={section.rows}
-          />
-        ) : (
-          <ProfileDetailsSection
-            key={section.id}
-            sectionId={section.id}
-            title={section.title}
-            rows={section.rows}
-            hidePhoneUntilReveal={hidePhoneUntilReveal}
-          />
-        ),
-      )}
+      {sections.map((section) => (
+        <ProfileDetailsSection
+          key={section.id}
+          sectionId={section.id}
+          title={section.title}
+          rows={section.rows}
+          hidePhoneUntilReveal={hidePhoneUntilReveal}
+        />
+      ))}
     </div>
-  );
-}
-
-/**
- * @param {{
- * sectionId: string;
- * rows: { id: string; label: string; value: string; href?: string }[];
- * }} props
- */
-function ProfileStatsSection({ sectionId, rows }) {
-  const sectionTone = getProfileSectionTone(sectionId);
-
-  return (
-    <section
-      className="user-profile-info__stats"
-      data-tone={sectionTone}
-      aria-label="Статистика профиля"
-    >
-      {rows.map((row) => {
-        const icon = getProfileRowIcon(row.id);
-
-        return (
-          <article key={row.id} className="user-profile-info__stat-card">
-            <div className="user-profile-info__stat-head">
-              {icon ? (
-                <span className="user-profile-info__stat-icon" aria-hidden="true">
-                  <AppIcon icon={icon} size="sm" strokeWidth={2.1} />
-                </span>
-              ) : null}
-              <p className="user-profile-info__stat-value">{row.value}</p>
-            </div>
-            <p className="user-profile-info__stat-label">{row.label}</p>
-          </article>
-        );
-      })}
-    </section>
   );
 }
 

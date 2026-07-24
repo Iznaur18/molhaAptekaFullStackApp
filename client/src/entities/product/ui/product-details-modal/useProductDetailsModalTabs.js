@@ -3,6 +3,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from "reac
 import { resolveAuctionUiState } from "../../lib/resolveAuctionUiState.js";
 import { resolveInstallmentUiState } from "../../../installment/lib/resolveInstallmentUiState.js";
 import { isCurrentUserProductSeller } from "../../lib/isCurrentUserProductSeller.js";
+import { resolveProductSimilarCatalogFilters } from "../../lib/resolveProductSimilarCatalogFilters.js";
 import { PRODUCT_MODERATION_APPROVED } from "../../model/productModerationConstants.js";
 
 /**
@@ -10,7 +11,7 @@ import { PRODUCT_MODERATION_APPROVED } from "../../model/productModerationConsta
  *   isOpen: boolean;
  *   product: import("../../model/types.js").ProductFromApi | null;
  *   currentUserId: string | null;
- *   initialDetailsTab: 'details' | 'auction' | 'reviews' | 'installment';
+ *   initialDetailsTab: 'details' | 'auction' | 'reviews' | 'installment' | 'similar';
  *   installmentProgram: import('../../../installment/model/types.js').InstallmentProgramFromApi | null;
  *   tabPanelRef: import('react').RefObject<HTMLDivElement | null>;
  * }} params
@@ -34,10 +35,15 @@ export function useProductDetailsModalTabs({
     () => resolveInstallmentUiState(product, installmentProgram),
     [product, installmentProgram],
   );
+  const similarFilters = useMemo(
+    () => resolveProductSimilarCatalogFilters(product),
+    [product],
+  );
 
   const showReviewsTab =
     product?._id != null &&
     (product.productModerationStatus === PRODUCT_MODERATION_APPROVED || isSellerView);
+  const showSimilarTab = product?._id != null && similarFilters != null;
   const showAuctionTab =
     product?._id != null &&
     (isSellerView
@@ -48,7 +54,8 @@ export function useProductDetailsModalTabs({
     (isSellerView
       ? installmentUi.showInstallmentTab
       : product.productInstallmentEnabled === true || installmentUi.installmentActive);
-  const showProductDetailsTabs = showAuctionTab || showReviewsTab || showInstallmentTab;
+  const showProductDetailsTabs =
+    showAuctionTab || showReviewsTab || showInstallmentTab || showSimilarTab;
 
   const handleAuctionShortcutClick = useCallback(() => {
     if (!auctionUi.auctionActive) return;
@@ -56,9 +63,19 @@ export function useProductDetailsModalTabs({
   }, [auctionUi.auctionActive]);
 
   const handleInstallmentShortcutClick = useCallback(() => {
-    if (!installmentUi.installmentActive) return;
+    if (
+      !installmentUi.installmentActive &&
+      !installmentUi.showInstallmentTab &&
+      product?.productInstallmentEnabled !== true
+    ) {
+      return;
+    }
     setDetailsTab("installment");
-  }, [installmentUi.installmentActive]);
+  }, [
+    installmentUi.installmentActive,
+    installmentUi.showInstallmentTab,
+    product?.productInstallmentEnabled,
+  ]);
 
   useEffect(() => {
     setDetailsTab(initialDetailsTab);
@@ -71,6 +88,7 @@ export function useProductDetailsModalTabs({
     const showReviews =
       product._id != null &&
       (product.productModerationStatus === PRODUCT_MODERATION_APPROVED || isOwnProduct);
+    const showSimilar = product._id != null && similarFilters != null;
     const showAuction =
       product._id != null &&
       (isSellerView ? auctionUi.showSellerAuctionTab : product.productAuctionEnabled === true);
@@ -81,6 +99,7 @@ export function useProductDetailsModalTabs({
         : product.productInstallmentEnabled === true || installmentUi.installmentActive);
 
     if (detailsTab === "reviews" && !showReviews) setDetailsTab("details");
+    if (detailsTab === "similar" && !showSimilar) setDetailsTab("details");
     if (detailsTab === "auction" && !showAuction) setDetailsTab("details");
     if (detailsTab === "installment" && !showInstallment) setDetailsTab("details");
   }, [
@@ -92,6 +111,7 @@ export function useProductDetailsModalTabs({
     isOwnProduct,
     isSellerView,
     product,
+    similarFilters,
   ]);
 
   useLayoutEffect(() => {
@@ -145,6 +165,7 @@ export function useProductDetailsModalTabs({
     auctionUi,
     installmentUi,
     showReviewsTab,
+    showSimilarTab,
     showAuctionTab,
     showInstallmentTab,
     showProductDetailsTabs,

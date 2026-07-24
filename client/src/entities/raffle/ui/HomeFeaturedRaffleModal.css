@@ -1,4 +1,16 @@
+/**
+ * HomeFeaturedRaffleModal chrome + dissolve:
+ *   scrim — opacity fade
+ *   dialog — scale 0.96→1 + blur 8→0 (enter 280ms / exit 220ms)
+ */
 .home-featured-raffle-modal__backdrop {
+  --raffle-modal-enter-ms: 280ms;
+  --raffle-modal-exit-ms: 220ms;
+  --raffle-modal-enter-ease: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --raffle-modal-exit-ease: cubic-bezier(0.55, 0.055, 0.675, 1);
+  --raffle-modal-scale-from: 0.96;
+  --raffle-modal-blur-from: 8px;
+
   position: fixed;
   inset: 0;
   z-index: var(--iz-z-modal-shell);
@@ -6,7 +18,7 @@
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  background: rgb(0 0 0 / 62%);
+  background: transparent;
 }
 
 .home-featured-raffle-modal__scrim {
@@ -15,8 +27,15 @@
   margin: 0;
   padding: 0;
   border: 0;
-  background: transparent;
+  background: rgb(0 0 0 / 62%);
   cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--raffle-modal-exit-ms) var(--raffle-modal-exit-ease);
+}
+
+.home-featured-raffle-modal__backdrop--open .home-featured-raffle-modal__scrim {
+  opacity: 1;
+  transition: opacity var(--raffle-modal-enter-ms) var(--raffle-modal-enter-ease);
 }
 
 .home-featured-raffle-modal__dialog {
@@ -30,6 +49,21 @@
   border-radius: 20px;
   background: var(--iz-color-surface);
   box-shadow: var(--iz-shadow-modal);
+  transform: scale(var(--raffle-modal-scale-from));
+  filter: blur(var(--raffle-modal-blur-from));
+  opacity: 1;
+  transition:
+    transform var(--raffle-modal-exit-ms) var(--raffle-modal-exit-ease),
+    filter var(--raffle-modal-exit-ms) var(--raffle-modal-exit-ease);
+  will-change: transform, filter;
+}
+
+.home-featured-raffle-modal__backdrop--open .home-featured-raffle-modal__dialog {
+  transform: scale(1);
+  filter: blur(0);
+  transition:
+    transform var(--raffle-modal-enter-ms) var(--raffle-modal-enter-ease),
+    filter var(--raffle-modal-enter-ms) var(--raffle-modal-enter-ease);
 }
 
 .home-featured-raffle-modal__header {
@@ -103,4 +137,20 @@
 
 .home-featured-raffle-modal__footer-btn:hover {
   background: var(--iz-color-action-hover);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-featured-raffle-modal__scrim,
+  .home-featured-raffle-modal__dialog {
+    transition: none;
+  }
+
+  .home-featured-raffle-modal__dialog {
+    transform: none;
+    filter: none;
+  }
+
+  .home-featured-raffle-modal__scrim {
+    opacity: 1;
+  }
 }

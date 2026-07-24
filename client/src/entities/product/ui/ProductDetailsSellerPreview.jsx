@@ -1,13 +1,22 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { ChevronRight } from "lucide-react";
 
-import { formatSearchRowRating } from "../../user/lib/formatSearchRowRating.js";
+import { formatSearchRowRatingCompact } from "../../user/lib/formatSearchRowRating.js";
 import { formatSearchRowTotalSales } from "../../user/lib/formatSearchRowTotalSales.js";
+import {
+  formatProfileImageObjectPosition,
+  getUserAvatarFocus,
+} from "../../user/lib/profileImageFocus.js";
+import { pickUserProfilePhotoUrl } from "../../user/lib/pickUserProfilePhotoUrl.js";
+import { UserPremiumAvatar } from "../../user/ui/UserPremiumAvatar.jsx";
 import { UserPremiumDisplayName } from "../../user/ui/UserPremiumDisplayName.jsx";
+import { DEFAULT_USER_AVATAR_URL } from "../../user/model/userConstants.js";
 import {
   PRODUCT_SELLER_PREVIEW_UI,
   USER_LIST_ROW_UI,
   USER_PROFILE_COPY,
 } from "../../../shared/config/appUiCopy.js";
+import { AppIcon } from "../../../shared/ui/icon/index.js";
 
 import "./ProductDetailsSellerPreview.css";
 
@@ -29,29 +38,42 @@ function formatFollowersCount(value) {
  * }} props
  */
 export function ProductDetailsSellerPreview({ seller, onOpenProfile }) {
+  const [avatarFailed, setAvatarFailed] = useState(false);
+
+  const sellerObj =
+    seller != null && typeof seller === "object" && seller._id != null ? seller : null;
+  const sellerId = sellerObj != null ? String(sellerObj._id) : "";
+
+  useEffect(() => {
+    setAvatarFailed(false);
+  }, [sellerId]);
+
   const ratingText = useMemo(
-    () =>
-      formatSearchRowRating(
-        seller != null && typeof seller === "object"
-          ? seller.userRatingByVotes
-          : undefined,
-      ),
-    [seller],
+    () => formatSearchRowRatingCompact(sellerObj?.userRatingByVotes),
+    [sellerObj],
   );
 
-  if (seller == null || typeof seller !== "object" || seller._id == null) {
+  if (sellerObj == null || !sellerId) {
     return null;
   }
 
-  const userName = seller.userName?.trim() ?? "";
+  const userName = sellerObj.userName?.trim() ?? "";
   const displayName = userName || USER_LIST_ROW_UI.MISSING_NAME;
-  const isPremium = seller.isPremiumUser === true;
-  const isConfirmed = seller.isUserDataConfirmed === true;
+  const isPremium = sellerObj.isPremiumUser === true;
+  const isConfirmed = sellerObj.isUserDataConfirmed === true;
   const canOpenProfile = typeof onOpenProfile === "function";
-  const listedCount = Number(seller.sellerListedProductCount);
+  const listedRaw = sellerObj.sellerListedProductCount;
+  const listedCount = Number(listedRaw);
   const listedProductsText = Number.isFinite(listedCount)
     ? String(Math.max(0, Math.floor(listedCount)))
     : "0";
+
+  const pickedAvatar = pickUserProfilePhotoUrl(sellerObj);
+  const avatarSrc =
+    !avatarFailed && pickedAvatar ? pickedAvatar : DEFAULT_USER_AVATAR_URL;
+  const avatarObjectPosition = formatProfileImageObjectPosition(
+    getUserAvatarFocus(sellerObj),
+  );
 
   const metrics = [
     {
@@ -62,7 +84,7 @@ export function ProductDetailsSellerPreview({ seller, onOpenProfile }) {
     {
       key: "totalSales",
       label: USER_PROFILE_COPY.LABELS.totalSalesAmount,
-      value: formatSearchRowTotalSales(seller.totalSalesAmount),
+      value: formatSearchRowTotalSales(sellerObj.totalSalesAmount),
     },
     {
       key: "listed",
@@ -72,34 +94,57 @@ export function ProductDetailsSellerPreview({ seller, onOpenProfile }) {
     {
       key: "followers",
       label: USER_LIST_ROW_UI.FOLLOWERS_LABEL,
-      value: formatFollowersCount(seller.followersCount),
+      value: formatFollowersCount(sellerObj.followersCount),
     },
   ];
 
   const handleClick = () => {
     if (!canOpenProfile) return;
-    onOpenProfile(String(seller._id));
+    onOpenProfile(sellerId);
   };
 
   const content = (
     <>
-      <span className="product-details-seller-preview__label">
-        {PRODUCT_SELLER_PREVIEW_UI.SECTION_LABEL}
+      <span className="product-details-seller-preview__header">
+        <UserPremiumAvatar
+          className="product-details-seller-preview__avatar"
+          src={avatarSrc}
+          isPremium={isPremium}
+          objectPosition={avatarObjectPosition}
+          decoding="async"
+          onError={() => setAvatarFailed(true)}
+        />
+        <span className="product-details-seller-preview__header-text">
+          <span className="product-details-seller-preview__label">
+            {PRODUCT_SELLER_PREVIEW_UI.SECTION_LABEL}
+          </span>
+          <UserPremiumDisplayName
+            name={displayName}
+            isPremium={isPremium}
+            isUserDataConfirmed={isConfirmed}
+            className="product-details-seller-preview__name"
+            textClassName="product-details-seller-preview__name-text"
+          />
+        </span>
+        {canOpenProfile ? (
+          <AppIcon
+            icon={ChevronRight}
+            size="sm"
+            strokeWidth={2.15}
+            className="product-details-seller-preview__chevron"
+          />
+        ) : null}
       </span>
-      <UserPremiumDisplayName
-        name={displayName}
-        isPremium={isPremium}
-        isUserDataConfirmed={isConfirmed}
-        className="product-details-seller-preview__name"
-        textClassName="product-details-seller-preview__name-text"
-      />
+
+      <span className="product-details-seller-preview__divider" aria-hidden />
+
       <dl className="product-details-seller-preview__metrics">
         {metrics.map((row) => (
           <div key={row.key} className="product-details-seller-preview__metric">
-            <dt className="product-details-seller-preview__metric-key">{row.label}</dt>
             <dd className="product-details-seller-preview__metric-value">
               {row.value}
             </dd>
+            <dt className="product-details-seller-preview__metric-key">{row.label}</dt>
           </div>
         ))}
       </dl>

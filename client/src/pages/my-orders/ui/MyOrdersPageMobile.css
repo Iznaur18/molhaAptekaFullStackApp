@@ -1,19 +1,13 @@
 @container app-viewport (max-width: 640px) {
   .my-orders-page {
-    --profile-queue-list-gap: 1.15rem;
-  }
-
-  .my-orders-page > .my-orders-page__state {
-    font-size: 0.92rem;
-    text-align: center;
-    color: var(--iz-color-text-secondary);
+    --profile-queue-list-gap: 4px;
   }
 
   .my-orders-page__status-chips {
     flex-wrap: nowrap;
-    gap: 0.35rem;
-    margin: 0 calc(-1 * var(--app-shell-content-inline-padding, 1rem));
-    padding: 0.15rem var(--app-shell-content-inline-padding, 1rem) 0.25rem;
+    gap: 0.375rem;
+    margin: 0 -0.75rem;
+    padding: 0.15rem 0.75rem 0.25rem;
     overflow-x: auto;
     overscroll-behavior-x: contain;
     scrollbar-width: none;

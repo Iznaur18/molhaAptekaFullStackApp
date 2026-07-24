@@ -1,16 +1,20 @@
-import { PRODUCT_CARD_UI } from "@/shared/config";
+import { PRODUCT_CARD_UI, PRODUCT_DETAILS_MODAL_UI } from "@/shared/config";
 
+import { isProductOriginalBadgeVisible } from "./productIsOriginal";
 import {
   resolveProductListingOriginPresentation,
   type ProductListingOriginIconName,
 } from "./productListingOrigin";
+import { resolveProductPriceMarketStatusPresentation } from "./productPriceMarketStatus";
 
 export type ProductDetailsBadgeItem = {
   key: string;
   label: string;
 } & (
+  | { kind: "original" }
   | { kind: "raffle" }
   | { kind: "listingOrigin"; iconName: ProductListingOriginIconName }
+  | { kind: "priceMarket"; backgroundColor: string; color: string }
 );
 
 type BuildProductDetailsBadgeItemsInput = {
@@ -35,6 +39,14 @@ export const buildProductDetailsBadgeItems = ({
 }: BuildProductDetailsBadgeItemsInput): ProductDetailsBadgeItem[] => {
   const items: ProductDetailsBadgeItem[] = [];
 
+  if (isProductOriginalBadgeVisible(product.productIsOriginal)) {
+    items.push({
+      key: "original",
+      kind: "original",
+      label: PRODUCT_DETAILS_MODAL_UI.ORIGINAL_BADGE,
+    });
+  }
+
   if (
     Boolean(product.activeRaffleId) &&
     Boolean(product.raffleParticipationEnabledAt)
@@ -54,6 +66,17 @@ export const buildProductDetailsBadgeItems = ({
     kind: "listingOrigin",
     iconName: listingOrigin.iconName,
     label: listingOrigin.label,
+  });
+
+  const priceMarket = resolveProductPriceMarketStatusPresentation(
+    product.productPriceMarketStatus,
+  );
+  items.push({
+    key: "price-market",
+    kind: "priceMarket",
+    label: priceMarket.label,
+    backgroundColor: priceMarket.backgroundColor,
+    color: priceMarket.color,
   });
 
   return sortProductDetailsBadgesByLabelLength(items);

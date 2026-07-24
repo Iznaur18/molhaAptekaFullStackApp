@@ -135,21 +135,29 @@ test("updateProfileBodySchema clears nullable fields", () => {
   assert.equal(parsed.userPhoneNumber, null);
 });
 
-test("updateProfileBodySchema accepts and clears social links", () => {
+test("updateProfileBodySchema accepts handle and stores telegram url", () => {
   const parsed = updateProfileBodySchema.parse({
-    socialTelegramUrl: "https://t.me/demo",
+    socialTelegramUrl: "@demo_user",
     socialInstagramUrl: "",
     socialWebsiteUrl: null,
   });
-  assert.equal(parsed.socialTelegramUrl, "https://t.me/demo");
+  assert.equal(parsed.socialTelegramUrl, "https://t.me/demo_user");
   assert.equal(parsed.socialInstagramUrl, null);
   assert.equal(parsed.socialWebsiteUrl, null);
 });
 
-test("updateProfileBodySchema rejects invalid social url", () => {
+test("updateProfileBodySchema rejects raw https for telegram handle fields", () => {
   assert.throws(() =>
     updateProfileBodySchema.parse({
-      socialVkUrl: "not-a-url",
+      socialTelegramUrl: "https://t.me/demo",
+    }),
+  );
+});
+
+test("updateProfileBodySchema rejects invalid social handle", () => {
+  assert.throws(() =>
+    updateProfileBodySchema.parse({
+      socialVkUrl: "!!",
     }),
   );
 });
@@ -160,6 +168,24 @@ test("formatSocialLinkDisplay strips protocol", async () => {
     formatSocialLinkDisplay("https://t.me/demo/"),
     "t.me/demo",
   );
+});
+
+test("normalizeSocialLinkToStoredUrl builds whatsapp and reverses", async () => {
+  const {
+    normalizeSocialLinkToStoredUrl,
+    storedSocialUrlToInputValue,
+  } = await import("../src/userSocialLinks.js");
+  const wa = normalizeSocialLinkToStoredUrl("socialWhatsappUrl", "+7 (900) 111-22-33");
+  assert.equal(wa.ok, true);
+  assert.equal(wa.url, "https://wa.me/79001112233");
+  assert.equal(
+    storedSocialUrlToInputValue("socialWhatsappUrl", wa.url),
+    "+79001112233",
+  );
+  const tg = normalizeSocialLinkToStoredUrl("socialTelegramUrl", "demo_user");
+  assert.equal(tg.ok, true);
+  assert.equal(tg.url, "https://t.me/demo_user");
+  assert.equal(storedSocialUrlToInputValue("socialTelegramUrl", tg.url), "demo_user");
 });
 
 test("order query schemas coerce pagination", () => {

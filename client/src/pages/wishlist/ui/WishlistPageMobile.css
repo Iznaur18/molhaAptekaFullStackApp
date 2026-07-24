@@ -1,17 +1,6 @@
 @container app-viewport (max-width: 640px) {
-  .wishlist-page {
-    --profile-queue-list-gap: 1.15rem;
-  }
-
   .wishlist-page__state,
   .wishlist-page__hint {
     padding: 0.35rem 0.15rem;
-    font-size: 0.92rem;
-    text-align: center;
-  }
-
-  .wishlist-page__login {
-    align-self: stretch;
-    min-height: 2.55rem;
   }
 }

@@ -52,6 +52,7 @@
  * @property {number} totalAmountRub
  * @property {number} paidAmountRub
  * @property {string} productNameAtContract
+ * @property {string | null} [productImageUrl]
  * @property {string} status
  * @property {InstallmentPaymentFromApi[]} payments
  * @property {string} finalDueAt

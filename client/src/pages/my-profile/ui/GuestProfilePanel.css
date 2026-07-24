@@ -1,0 +1,52 @@
+.guest-profile {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-height: 100%;
+  margin-inline: calc(-1 * var(--app-shell-content-inline-padding, 1rem));
+  width: calc(100% + 2 * var(--app-shell-content-inline-padding, 1rem));
+  background: var(--iz-color-surface);
+}
+
+/* Как /login: hero вплотную к верху viewport (без padding-top shell). */
+body:has(.guest-profile) .app-shell,
+body:has(.guest-profile) .app-shell.app-shell--header-v1,
+body:has(.guest-profile) .app-shell.app-shell--header-v2 {
+  padding-top: 0 !important;
+}
+
+.guest-profile__body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 24px calc(32px + env(safe-area-inset-bottom, 0px));
+  text-align: center;
+}
+
+.guest-profile__title {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--iz-color-text);
+}
+
+.guest-profile__subtitle {
+  margin: 0 0 8px;
+  font-size: 15px;
+  line-height: 1.35;
+  color: var(--iz-color-text-muted);
+}
+
+.guest-profile__action {
+  width: 100%;
+  max-width: 320px;
+}
+
+.guest-profile__legal {
+  margin-top: 12px;
+  font-size: 14px;
+  color: var(--iz-color-link);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

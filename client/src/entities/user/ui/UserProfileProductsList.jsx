@@ -12,7 +12,7 @@ import {
 
 import "./UserProfilePurchasesList.css";
 
-const THUMB_SIZE_PX = 48;
+const THUMB_SIZE_PX = 64;
 
 /**
  * @param {import('../model/userProfileProductThumbTypes.js').UserProfileProductThumbItem} item

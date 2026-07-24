@@ -5,6 +5,7 @@ import { useCatalogFilterState } from "./useCatalogFilterState.js";
 import { useCatalogQuerySync } from "./useCatalogQuerySync.js";
 import { useCatalogProductsInfiniteQuery } from "../../../entities/product/model/useCatalogProductsInfiniteQuery.js";
 import { CATALOG_QUERY_PARAM_ALL_CITIES } from "../../../entities/product/lib/catalogCatalogQuery.js";
+import { useAppShellCompactLayout } from "../../../shared/lib/useAppShellCompactLayout.js";
 
 /**
  * @param {object} params
@@ -29,6 +30,8 @@ export const useHomeCatalogLoader = ({
   initialCatalogQuery,
   onCatalogError,
 }) => {
+  const isCompactLayout = useAppShellCompactLayout();
+
   const filters = useCatalogFilterState({
     location,
     catalogMainView,
@@ -45,6 +48,7 @@ export const useHomeCatalogLoader = ({
 
   const browser = useCatalogBrowserLanding({
     navigate,
+    isCompactLayout,
     isCatalogBrowserMainViewActive,
     isCatalogBrowserLanding: filters.isCatalogBrowserLanding,
     isCatalogBrowserProductsView: filters.isCatalogBrowserProductsView,
@@ -71,9 +75,11 @@ export const useHomeCatalogLoader = ({
     catalogMainView,
     location,
     navigate,
+    isCompactLayout,
     catalogSort: filters.catalogSort,
     selectedProductCategory: filters.selectedProductCategory,
     selectedCategoryId: filters.selectedCategoryId,
+    sellerPersonalCategoryId: filters.sellerPersonalCategoryId,
     catalogFollowingOnly: filters.catalogFollowingOnly,
     catalogAuctionOnly: filters.catalogAuctionOnly,
     catalogInstallmentOnly: filters.catalogInstallmentOnly,
@@ -82,6 +88,7 @@ export const useHomeCatalogLoader = ({
     setCatalogSort: filters.setCatalogSort,
     setSelectedProductCategory: filters.setSelectedProductCategory,
     setSelectedCategoryId: filters.setSelectedCategoryId,
+    setSellerPersonalCategoryId: filters.setSellerPersonalCategoryId,
     setCategoryTreeLabel: filters.setCategoryTreeLabel,
     setCatalogFollowingOnly: filters.setCatalogFollowingOnly,
     setCatalogAuctionOnly: filters.setCatalogAuctionOnly,
@@ -159,6 +166,7 @@ export const useHomeCatalogLoader = ({
     activeCatalogBrowserCategory: filters.activeCatalogBrowserCategory,
     activeCatalogBrowserCategoryId: filters.activeCatalogBrowserCategoryId,
     selectedCategoryId: filters.selectedCategoryId,
+    sellerPersonalCategoryId: filters.sellerPersonalCategoryId,
     categoryTreeLabel: filters.categoryTreeLabel,
     isCatalogBrowserLanding: filters.isCatalogBrowserLanding,
     isCatalogBrowserProductsView: filters.isCatalogBrowserProductsView,

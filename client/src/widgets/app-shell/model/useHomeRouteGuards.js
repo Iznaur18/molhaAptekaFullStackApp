@@ -4,9 +4,12 @@ import {
   pathnameToMainView,
   isRoleRestrictedMainView,
 } from "../../../shared/lib/homeMainViewPaths.js";
+import { isAuthPagePath } from "../../../shared/lib/authPaths.js";
 import { isProductDetailsPath } from "../../../shared/lib/productDetailsPaths.js";
+import { isInfoPagePath } from "../../../shared/lib/infoPagePaths.js";
 import { isRaffleProductsPath } from "../../../shared/lib/rafflePaths.js";
 import { isSellerProductsPath } from "../../../shared/lib/sellerPaths.js";
+import { isUserProfileSpaPath } from "../../../shared/lib/userProfilePaths.js";
 
 /**
  * @param {object} params
@@ -34,6 +37,18 @@ export const useHomeRouteGuards = ({
     }
 
     if (isProductDetailsPath(location.pathname)) {
+      return undefined;
+    }
+
+    if (isUserProfileSpaPath(location.pathname)) {
+      return undefined;
+    }
+
+    if (isInfoPagePath(location.pathname)) {
+      return undefined;
+    }
+
+    if (isAuthPagePath(location.pathname)) {
       return undefined;
     }
 

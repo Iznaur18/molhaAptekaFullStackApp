@@ -1,33 +1,36 @@
 .installment-buyer-block {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 12px;
 }
 
 .installment-buyer-block__hint {
   margin: 0;
-  padding: 0.65rem 0.75rem;
-  border: 1px solid var(--iz-color-action-border);
-  border-radius: 0.65rem;
-  background: var(--iz-color-action-soft);
-  font-size: 0.85rem;
+  padding: 10.4px 12px;
+  border-radius: 10.4px;
+  background: var(--iz-color-surface-muted);
+  font-size: 13.12px;
   line-height: 1.45;
-  color: var(--iz-color-info-deep);
+  color: var(--iz-color-text-secondary);
+}
+
+.installment-buyer-block__hint--blocked {
+  border: none;
 }
 
 .installment-buyer-block__form {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
-  padding: 0.85rem;
-  border: 1px solid var(--iz-color-border);
-  border-radius: 0.75rem;
-  background: var(--iz-color-surface-elevated);
+  gap: 12px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
 }
 
 .installment-buyer-block__legend,
 .installment-buyer-block__label {
-  font-size: 0.82rem;
+  font-size: 13px;
   font-weight: 600;
   color: var(--iz-color-text-secondary);
 }
@@ -41,23 +44,22 @@
 .installment-buyer-block__plan-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin-top: 0.45rem;
+  gap: 8px;
+  margin-top: 6px;
 }
 
 .installment-buyer-block__plan-card {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-areas:
-    "input title"
-    "input meta"
-    "input note";
-  column-gap: 0.55rem;
-  row-gap: 0.15rem;
-  padding: 0.65rem 0.75rem;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 12px 14px;
   border: 1px solid var(--iz-color-border);
-  border-radius: 0.6rem;
-  background: var(--iz-color-surface);
+  border-radius: var(--iz-radius-button, 0.75rem);
+  background: var(--iz-color-surface-muted);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--iz-color-ink) 4%, transparent);
   cursor: pointer;
   transition:
     border-color 0.15s ease,
@@ -66,47 +68,70 @@
 }
 
 .installment-buyer-block__plan-card:hover {
-  border-color: var(--iz-color-action-soft);
+  border-color: color-mix(in srgb, var(--iz-color-action) 35%, var(--iz-color-border));
 }
 
 .installment-buyer-block__plan-card_selected {
-  border-color: var(--iz-color-link);
-  background: var(--iz-color-action-soft);
-  box-shadow: 0 0 0 2px var(--iz-color-focus-ring);
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-surface-muted);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--iz-color-action) 15%, transparent);
 }
 
 .installment-buyer-block__plan-input {
-  grid-area: input;
-  width: 1rem;
-  height: 1rem;
-  margin: 0.15rem 0 0;
-  accent-color: var(--iz-color-link);
-  cursor: pointer;
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+}
+
+.installment-buyer-block__plan-radio {
+  box-sizing: border-box;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--iz-color-border-strong);
+  border-radius: 50%;
+}
+
+.installment-buyer-block__plan-radio_selected {
+  border-color: var(--iz-color-action);
+}
+
+.installment-buyer-block__plan-radio-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--iz-color-action);
+}
+
+.installment-buyer-block__plan-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
 .installment-buyer-block__plan-title {
-  grid-area: title;
-  font-size: 0.92rem;
+  font-size: 15px;
   font-weight: 700;
-  color: var(--iz-color-ink);
+  color: var(--iz-color-text);
 }
 
 .installment-buyer-block__plan-meta {
-  grid-area: meta;
-  font-size: 0.84rem;
-  color: var(--iz-color-text-muted);
+  font-size: 13px;
+  color: var(--iz-color-text-secondary);
 }
 
 .installment-buyer-block__plan-note {
-  grid-area: note;
-  font-size: 0.78rem;
-  color: var(--iz-color-text-muted);
-}
-
-.installment-buyer-block__row {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
+  font-size: 13px;
+  color: var(--iz-color-text-secondary);
 }
 
 .installment-buyer-block__field_quantity {
@@ -116,11 +141,10 @@
 .installment-buyer-block__field {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 6px;
   min-width: 0;
 }
 
-/* Геометрия — базовый слой controls.css (useFormFieldStyles.input) */
 .installment-buyer-block__input {
   box-sizing: border-box;
   width: 100%;
@@ -129,7 +153,6 @@
   color: var(--iz-color-text);
 }
 
-/* inputFocused: borderColor action + тень, как в мобиле */
 .installment-buyer-block__input:focus {
   border-color: var(--iz-color-action);
   outline: none;
@@ -141,14 +164,10 @@
   color: var(--iz-color-text-muted);
 }
 
-.installment-buyer-block__select {
-  cursor: pointer;
-}
-
 .installment-buyer-block__totals {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 8px;
 }
 
 .installment-buyer-block__total-item {
@@ -156,9 +175,9 @@
   flex-direction: column;
   gap: 0.2rem;
   padding: 0.55rem 0.65rem;
-  border: 1px dashed var(--iz-color-border);
-  border-radius: 0.45rem;
-  background: var(--iz-color-surface);
+  border: 1px solid var(--iz-color-border);
+  border-radius: 0.65rem;
+  background: var(--iz-color-surface-muted);
 }
 
 .installment-buyer-block__total-label {
@@ -176,11 +195,11 @@
 .installment-buyer-block__section {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
-  padding: 0.75rem;
-  border: 1px solid var(--iz-color-border);
-  border-radius: 0.6rem;
-  background: var(--iz-color-surface);
+  gap: 12px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
 }
 
 .installment-buyer-block__address .address-delivery-fields {
@@ -216,13 +235,14 @@
 .installment-buyer-block__submit {
   width: 100%;
   margin: 0;
-  padding: 0.65rem 1rem;
-  border: 1px solid var(--iz-color-link);
-  border-radius: 0.5rem;
-  background: var(--iz-color-link);
+  padding: 0.75rem 1rem;
+  min-height: 3rem;
+  border: 1px solid var(--iz-color-action);
+  border-radius: 11.2px;
+  background: var(--iz-color-action);
   color: var(--iz-color-on-contrast);
   font: inherit;
-  font-size: 0.95rem;
+  font-size: 1.02rem;
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.15s ease;

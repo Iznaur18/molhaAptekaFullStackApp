@@ -5,6 +5,7 @@ import { characteristicRowsFromApi } from "./characteristicRowsFromApi.js";
 import { formatIntegerGroupRu } from "../../../shared/lib/numericInput.js";
 import { resolveProductLoyaltyPointsPerUnit } from "./resolveProductLoyaltyPointsPerUnit.js";
 import { isProductListingOrigin } from "./productListingOrigin.js";
+import { mapProductReturnTermsToRows } from "./productReturnTermRows.js";
 
 export const CREATE_PRODUCT_INITIAL_FORM = {
   productName: "",
@@ -23,6 +24,8 @@ export const CREATE_PRODUCT_INITIAL_FORM = {
   loyaltyPointsPerUnit: "0",
   productCharacteristicRows: [],
   productSaleCity: "",
+  productReturnEnabled: null,
+  returnTermRows: [],
 };
 
 /**
@@ -60,5 +63,10 @@ export function createProductFormStateFromProduct(product) {
     loyaltyPointsPerUnit: String(resolveProductLoyaltyPointsPerUnit(product)),
     productCharacteristicRows: characteristicRowsFromApi(product.productCharacteristics),
     productSaleCity: product.productSaleCity?.trim() ?? "",
+    productReturnEnabled: product.productReturnEnabled === true,
+    returnTermRows:
+      product.productReturnEnabled === true
+        ? mapProductReturnTermsToRows(product.productReturnTerms)
+        : [],
   };
 }

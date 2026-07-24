@@ -17,6 +17,10 @@ import {
   productCharacteristicsFromRows,
   validateProductCharacteristicsRows,
 } from "./validateProductCharacteristicsRows.js";
+import {
+  serializeProductReturnTermRows,
+  validateProductReturnTermRows,
+} from "./productReturnTermRows.js";
 import { urlsFromImageRows } from "./productImageRowHelpers.js";
 import { PRODUCT_STOCK_QUANTITY_MAX, PRODUCT_STOCK_QUANTITY_MIN } from "../model/productStockConstants.js";
 
@@ -162,6 +166,24 @@ export function prepareCreateProductSubmit({
     return { ok: false, message: CREATE_PRODUCT_MODAL_UI.ERROR_SALE_CITY_MAX };
   }
 
+  if (form.productReturnEnabled == null) {
+    return { ok: false, message: CREATE_PRODUCT_MODAL_UI.ERROR_RETURN_CHOICE };
+  }
+
+  const productReturnEnabled = form.productReturnEnabled === true;
+  let productReturnTerms = [];
+  if (productReturnEnabled) {
+    const returnTermsError = validateProductReturnTermRows(
+      Array.isArray(form.returnTermRows) ? form.returnTermRows : [],
+    );
+    if (returnTermsError) {
+      return { ok: false, message: returnTermsError };
+    }
+    productReturnTerms = serializeProductReturnTermRows(
+      Array.isArray(form.returnTermRows) ? form.returnTermRows : [],
+    );
+  }
+
   if (isEdit) {
     const patchBody = {
       productName: String(form.productName).trim(),
@@ -175,6 +197,8 @@ export function prepareCreateProductSubmit({
       loyaltyPointsPerUnit,
       productCharacteristics,
       productSaleCity,
+      productReturnEnabled,
+      productReturnTerms,
     };
 
     if (IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED && form.productCategoryId) {
@@ -212,6 +236,8 @@ export function prepareCreateProductSubmit({
       loyaltyPointsPerUnit,
       productCharacteristics,
       productSaleCity: productSaleCity || undefined,
+      productReturnEnabled,
+      productReturnTerms,
     },
   };
 }

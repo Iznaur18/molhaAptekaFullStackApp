@@ -84,4 +84,32 @@ describe("buildCatalogListQueryParams", () => {
     expect(params.productCategory).toBeNull();
     expect(params.categoryId).toBe("64abc");
   });
+
+  it("applies home URL category filters without browser main view", () => {
+    const params = buildCatalogListQueryParams({
+      ...baseInput,
+      isCatalogBrowserMainViewActive: false,
+      activeCatalogBrowserCategoryId: "64abc",
+      catalogQueryFromUrl: {
+        sellerPersonalCategoryId: null,
+        sort: "newest",
+      },
+    });
+
+    expect(params.categoryId).toBe("64abc");
+    expect(params.sellerPersonalCategoryId).toBeNull();
+  });
+
+  it("applies seller personal category from URL on home", () => {
+    const params = buildCatalogListQueryParams({
+      ...baseInput,
+      isCatalogBrowserMainViewActive: false,
+      catalogQueryFromUrl: {
+        sellerPersonalCategoryId: "64bbbbbbbbbbbbbbbbbbbbbb",
+        sort: "newest",
+      },
+    });
+
+    expect(params.sellerPersonalCategoryId).toBe("64bbbbbbbbbbbbbbbbbbbbbb");
+  });
 });

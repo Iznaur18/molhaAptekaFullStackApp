@@ -1,12 +1,23 @@
 .data-confirmation-page {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.875rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.data-confirmation-page_centered {
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 12rem;
 }
 
 .data-confirmation-page__state {
   margin: 0;
   color: var(--iz-color-text-muted);
+  font-size: 0.92rem;
+  text-align: center;
 }
 
 .data-confirmation-page__state_error {
@@ -16,90 +27,194 @@
 .data-confirmation-page__hint {
   margin: 0;
   color: var(--iz-color-text-muted);
+  font-size: 0.92rem;
+  text-align: center;
 }
 
 .data-confirmation-page__login {
-  align-self: flex-start;
+  align-self: stretch;
 }
 
-.data-confirmation-page__plan {
+.data-confirmation-page__hero {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  padding: 1.25rem;
+  border-radius: 1.125rem;
+  background: var(--iz-color-info);
+  color: var(--iz-color-on-contrast);
+}
+
+.data-confirmation-page__hero-text {
+  flex: 1 1 auto;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
-  padding: 1rem;
-  border: 1px solid var(--iz-color-info-soft);
-  border-radius: 12px;
-  background: var(--iz-gradient-info-panel);
+  gap: 0.125rem;
 }
 
-.data-confirmation-page__plan-title {
+.data-confirmation-page__hero-title {
   margin: 0;
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--iz-color-info);
+  font-size: 1.375rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
-.data-confirmation-page__plan-intro {
-  margin: 0;
-  font-size: 0.9rem;
-  color: var(--iz-color-text-muted);
+.data-confirmation-page__hero-intro {
+  margin: 0.5rem 0 0;
+  font-size: 0.8125rem;
   line-height: 1.45;
+  opacity: 0.8;
+}
+
+.data-confirmation-page__hero-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--iz-color-on-contrast) 16%, transparent);
+  color: var(--iz-color-on-contrast);
+}
+
+.data-confirmation-page__hero-icon svg {
+  display: block;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.data-confirmation-page__benefits-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 0.875rem;
+  background: var(--iz-color-surface);
+}
+
+.data-confirmation-page__benefits-title {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--iz-color-text);
 }
 
 .data-confirmation-page__benefits {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
   margin: 0;
-  padding-left: 1.15rem;
+  padding: 0;
+  list-style: none;
+}
+
+.data-confirmation-page__benefit-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.data-confirmation-page__benefit-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.625rem;
+  background: var(--iz-color-info-soft);
+  color: var(--iz-color-info);
+}
+
+.data-confirmation-page__benefit-icon svg {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+}
+
+.data-confirmation-page__benefit-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-top: 0.35rem;
+  font-size: 0.90625rem;
+  line-height: 1.4;
   color: var(--iz-color-text-secondary);
-  font-size: 0.92rem;
-  line-height: 1.45;
 }
 
 .data-confirmation-page__plan-note {
   margin: 0;
-  font-size: 0.82rem;
-  color: var(--iz-color-text-muted);
+  font-size: 0.8125rem;
   line-height: 1.4;
+  color: var(--iz-color-text-muted);
 }
 
 .data-confirmation-page__status {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
   margin: 0;
-  padding: 0.65rem 0.75rem;
-  border-radius: 8px;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.625rem;
+  border: 1px solid transparent;
+}
+
+.data-confirmation-page__status-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.data-confirmation-page__status-icon svg {
+  display: block;
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.data-confirmation-page__status-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
   font-size: 0.9rem;
   line-height: 1.4;
 }
 
 .data-confirmation-page__status_ok {
-  border: 1px solid var(--iz-color-success-surface);
+  border-color: var(--iz-color-success-surface);
   background: var(--iz-color-success-surface);
-  color: var(--iz-color-success);
+  color: var(--iz-color-success-text);
 }
 
 .data-confirmation-page__status_pending {
-  border: 1px solid var(--iz-color-warning-surface);
-  background: var(--iz-color-surface)beb;
+  border-color: var(--iz-color-warning-border);
+  background: var(--iz-color-warning-surface);
   color: var(--iz-color-warning-text);
 }
 
 .data-confirmation-page__status_rejected {
-  border: 1px solid var(--iz-color-danger-border);
+  border-color: var(--iz-color-danger-surface);
   background: var(--iz-color-danger-surface);
   color: var(--iz-color-danger);
 }
 
 .data-confirmation-page__submit {
-  align-self: flex-start;
+  align-self: stretch;
+  width: 100%;
   margin: 0;
-  padding: 0.55rem 1.1rem;
+  padding: 0.75rem 1.25rem;
   border: 1px solid var(--iz-color-info);
-  border-radius: 10px;
-  background: var(--iz-color-info-soft);
-  color: var(--iz-color-info);
+  border-radius: 0.625rem;
+  background: var(--iz-color-info);
+  color: var(--iz-color-on-contrast);
   font: inherit;
-  font-weight: 700;
+  font-size: 0.9375rem;
+  font-weight: 600;
   cursor: pointer;
 }
 
 .data-confirmation-page__submit:hover:not(:disabled) {
-  background: var(--iz-color-info-soft);
+  background: color-mix(in srgb, var(--iz-color-info) 88%, var(--iz-color-ink));
 }

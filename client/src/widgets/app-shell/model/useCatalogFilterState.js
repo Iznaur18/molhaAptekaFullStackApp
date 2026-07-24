@@ -37,6 +37,9 @@ export function useCatalogFilterState({
   const [selectedCategoryId, setSelectedCategoryId] = useState(
     () => readInitialCatalogQuery()?.categoryId ?? null,
   );
+  const [sellerPersonalCategoryId, setSellerPersonalCategoryId] = useState(
+    () => readInitialCatalogQuery()?.sellerPersonalCategoryId ?? null,
+  );
   const [categoryTreeLabel, setCategoryTreeLabel] = useState(null);
   const [catalogSort, setCatalogSort] = useState(
     () => initialCatalogQuery?.sort ?? CATALOG_SORT_NEWEST,
@@ -64,11 +67,13 @@ export function useCatalogFilterState({
   const appliedProductSearchTerm = submittedProductSearchTerm;
   const hasProductSearchQuery = appliedProductSearchTerm.trim() !== "";
   const isMineMode = isMyProductsRoute;
-  const activeCatalogBrowserCategory =
-    catalogMainView === "catalog-browser" ? catalogQueryFromUrl.category : null;
+  const isCatalogUrlFilterSurface =
+    catalogMainView === "catalog-browser" || catalogMainView === "catalog";
+  const activeCatalogBrowserCategory = isCatalogUrlFilterSurface
+    ? catalogQueryFromUrl.category
+    : null;
   const activeCatalogBrowserCategoryId =
-    catalogMainView === "catalog-browser" &&
-    IS_CATALOG_BROWSER_SUBCATEGORY_FILTER_ENABLED
+    isCatalogUrlFilterSurface && IS_CATALOG_BROWSER_SUBCATEGORY_FILTER_ENABLED
       ? catalogQueryFromUrl.categoryId
       : null;
   const isCatalogBrowserLanding =
@@ -132,7 +137,7 @@ export function useCatalogFilterState({
       sort,
       category,
       categoryId,
-      sellerPersonalCategoryId = null,
+      sellerPersonalCategoryId: nextSellerPersonalCategoryId = null,
       followingOnly,
       auctionOnly,
       installmentOnly,
@@ -141,7 +146,8 @@ export function useCatalogFilterState({
       setCatalogSort(sort);
       setSelectedProductCategory(category);
       setSelectedCategoryId(categoryId);
-      if (!categoryId && !sellerPersonalCategoryId) {
+      setSellerPersonalCategoryId(nextSellerPersonalCategoryId);
+      if (!categoryId && !nextSellerPersonalCategoryId) {
         setCategoryTreeLabel(null);
       }
       setCatalogFollowingOnly(followingOnly);
@@ -182,6 +188,8 @@ export function useCatalogFilterState({
     setSelectedProductCategory,
     selectedCategoryId,
     setSelectedCategoryId,
+    sellerPersonalCategoryId,
+    setSellerPersonalCategoryId,
     categoryTreeLabel,
     setCategoryTreeLabel,
     catalogSort,

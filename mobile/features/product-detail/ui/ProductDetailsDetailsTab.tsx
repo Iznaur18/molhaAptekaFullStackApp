@@ -10,7 +10,6 @@ import {
 import { getProductSellerId } from "@/entities/product/lib/getProductSellerId";
 import { ProductCharacteristicsDetails } from "@/entities/product/ui/ProductCharacteristicsDetails";
 import { ProductDetailFieldRows } from "@/entities/product/ui/ProductDetailFieldRows";
-import { ProductDetailsAboveNameChips } from "@/entities/product/ui/ProductDetailsAboveNameChips";
 import { ProductDetailsBadgeStack } from "@/entities/product/ui/ProductDetailsBadgeStack";
 import { ProductDetailsSellerPreview } from "@/entities/product/ui/ProductDetailsSellerPreview";
 import { ProductPriceDisplay } from "@/entities/product/ui/ProductPriceDisplay";
@@ -89,7 +88,6 @@ export const ProductDetailsDetailsTab = ({
       <View style={styles.spec}>
         <View style={styles.priceBlock}>
           <ProductPriceDisplay product={product} showLabel={false} variant="detail" />
-          <ProductDetailsAboveNameChips product={product} />
           <Text style={styles.productName}>{name}</Text>
           <ProductDetailsBadgeStack product={product} />
           {(sellerId ||

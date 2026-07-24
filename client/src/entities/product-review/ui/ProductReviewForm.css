@@ -1,10 +1,10 @@
 .product-review-form {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: var(--iz-space-2);
   padding: 0.85rem;
   border: 1px solid var(--iz-color-border);
-  border-radius: 0.65rem;
+  border-radius: var(--iz-radius-button);
   background: var(--iz-color-surface-elevated);
 }
 
@@ -12,56 +12,43 @@
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  font-size: 0.82rem;
+  font-size: 0.875rem;
   font-weight: 600;
-  color: var(--iz-color-text-muted);
+  color: var(--iz-color-text-secondary);
 }
 
-/* useFormFieldStyles.inputMultiline: minHeight 72, остальное — базовый слой */
 .product-review-form__textarea {
-  min-height: 72px;
+  box-sizing: border-box;
+  min-height: 80px;
+  padding: 10px;
+  border: 1px solid var(--iz-color-border);
+  border-radius: var(--iz-radius-input);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
   font: inherit;
-  font-size: var(--iz-control-input-font);
+  font-size: 0.9375rem;
+  line-height: 1.35;
   resize: vertical;
 }
 
-.product-review-form__meter {
-  align-self: flex-end;
-  font-size: 0.78rem;
-  color: var(--iz-color-text-muted);
+.product-review-form__textarea:disabled {
+  opacity: 0.6;
 }
 
-.product-review-form__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+.product-review-form__error {
+  margin: 0;
+  padding: 0.5rem 0.625rem;
+  border-radius: var(--iz-radius-input);
+  background: color-mix(in srgb, var(--iz-color-danger) 10%, transparent);
+  font-size: 0.8125rem;
+  color: var(--iz-color-danger);
 }
 
 .product-review-form__submit {
-  padding: 0.45rem 1rem;
-  border: 1px solid var(--iz-color-action);
-  border-radius: 0.5rem;
-  background: var(--iz-color-action);
-  color: var(--iz-color-on-contrast);
-  font: inherit;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
+  align-self: stretch;
 }
 
 .product-review-form__submit:disabled {
   opacity: 0.55;
   cursor: default;
-}
-
-.product-review-form__delete {
-  padding: 0.45rem 1rem;
-  border: 1px solid var(--iz-color-border);
-  border-radius: 0.5rem;
-  background: var(--iz-color-surface);
-  color: var(--iz-color-danger);
-  font: inherit;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
 }

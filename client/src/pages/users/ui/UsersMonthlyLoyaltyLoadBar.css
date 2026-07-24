@@ -1,0 +1,53 @@
+.users-monthly-loyalty-loadbar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+}
+
+.users-monthly-loyalty-loadbar__title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.users-monthly-loyalty-loadbar__title {
+  margin: 0;
+  flex-shrink: 1;
+  min-width: 0;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--iz-color-text-muted);
+}
+
+.users-monthly-loyalty-loadbar__counter {
+  margin: 0;
+  flex-shrink: 0;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--iz-color-text);
+}
+
+.users-monthly-loyalty-loadbar__track {
+  height: 0.625rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--iz-color-surface-muted);
+}
+
+.users-monthly-loyalty-loadbar__fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--iz-color-action);
+}
+
+.users-monthly-loyalty-loadbar__description {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--iz-color-text-secondary);
+}

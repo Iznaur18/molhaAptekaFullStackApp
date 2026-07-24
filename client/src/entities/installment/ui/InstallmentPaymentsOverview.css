@@ -9,9 +9,9 @@
   flex-direction: column;
   gap: 0.15rem;
   min-width: 0;
-  padding: 0.55rem 0.65rem;
+  padding: 0.5rem 0.625rem;
   border: 1px solid var(--iz-color-border);
-  border-radius: 0.55rem;
+  border-radius: 16px;
   background: var(--iz-color-surface);
   text-align: left;
   cursor: pointer;
@@ -22,8 +22,8 @@
 }
 
 .installment-payments-overview__tile:hover {
-  border-color: color-mix(in srgb, var(--iz-color-action) 35%, var(--iz-color-border));
-  background: var(--iz-color-action-soft);
+  border-color: color-mix(in srgb, var(--iz-color-success) 35%, var(--iz-color-border));
+  background: var(--iz-color-success-surface);
 }
 
 .installment-payments-overview__tile:active {
@@ -41,8 +41,8 @@
 }
 
 .installment-payments-overview__tile_active {
-  border-color: var(--iz-color-action);
-  background: var(--iz-color-action-soft);
+  border-color: var(--iz-color-success);
+  background: var(--iz-color-success-surface);
 }
 
 .installment-payments-overview__tile_attention:not(.installment-payments-overview__tile_active) {
@@ -50,8 +50,8 @@
 }
 
 .installment-payments-overview__label {
-  font-size: 0.72rem;
-  font-weight: 600;
+  font-size: 0.7rem;
+  font-weight: 700;
   letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--iz-color-text-muted);
@@ -90,12 +90,13 @@
 }
 
 .installment-page__list-action:hover {
-  border-color: var(--iz-color-action);
-  background: var(--iz-color-action-soft);
+  border-color: var(--iz-color-success);
+  background: var(--iz-color-success-surface);
 }
 
 .installment-page__filter-hint {
   margin: 0;
+  flex-basis: 100%;
   font-size: 0.82rem;
   color: var(--iz-color-text-muted);
 }
@@ -124,8 +125,8 @@
   width: 1.25rem;
   height: 1.25rem;
   border-radius: 999px;
-  background: var(--iz-color-ink);
-  color: var(--iz-color-on-contrast);
+  background: var(--iz-color-surface-muted);
+  color: var(--iz-color-text-muted);
   font-size: 0.75rem;
   line-height: 1.25rem;
   text-align: center;
@@ -144,11 +145,5 @@
 
 .installment-contract-card_attention {
   border-left-color: var(--iz-color-warning);
-  box-shadow: 0 1px 4px color-mix(in srgb, var(--iz-color-warning) 18%, transparent);
-}
-
-@container app-viewport (max-width: 640px) {
-  .installment-payments-overview {
-    grid-template-columns: 1fr;
-  }
+  box-shadow: none;
 }

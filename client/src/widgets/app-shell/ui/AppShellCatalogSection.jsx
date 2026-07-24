@@ -12,6 +12,7 @@ import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
 import { CatalogGridSkeleton } from "../../catalog-product-grid/ui/CatalogGridSkeleton.jsx";
 import { HomeCatalogGrid } from "../../catalog-product-grid/ui/HomeCatalogGrid.jsx";
+import { MyProductsCatalogSection } from "../../my-products-page/ui/MyProductsCatalogSection.jsx";
 
 /** @typedef {import('../../../entities/product/model/types.js').ProductFromApi} ProductFromApi */
 
@@ -67,6 +68,8 @@ import { HomeCatalogGrid } from "../../catalog-product-grid/ui/HomeCatalogGrid.j
  *   homeCuratedProductLists: import('../../../entities/curated-product-list/model/types.js').HomeCuratedProductListFromApi[];
  *   showCuratedProductLists: boolean;
  *   isCuratedProductListsLoading: boolean;
+ *   isUserDataConfirmed?: boolean;
+ *   onPlaceProductClick?: () => void;
  * }} props
  */
 export function AppShellCatalogGridSection({
@@ -120,8 +123,38 @@ export function AppShellCatalogGridSection({
   homeCuratedProductLists,
   showCuratedProductLists,
   isCuratedProductListsLoading = false,
+  isUserDataConfirmed = false,
+  onPlaceProductClick,
 }) {
   const navigate = useNavigate();
+
+  if (isMineMode) {
+    return (
+      <MyProductsCatalogSection
+        catalogStatus={catalogStatus}
+        products={products}
+        isAuthorized={isAuthorized}
+        isUserDataConfirmed={isUserDataConfirmed}
+        deletingProductId={deletingProductId}
+        onEditMyProduct={onEditMyProduct}
+        onPromoteMyProduct={onPromoteMyProduct}
+        myProductsCatalogError={myProductsCatalogError}
+        myProductsCatalogNotice={myProductsCatalogNotice}
+        onOpenProductDetails={onOpenProductDetails}
+        togglingAvailabilityProductId={togglingAvailabilityProductId}
+        togglingAuctionProductId={togglingAuctionProductId}
+        catalogSentinelRef={catalogSentinelRef}
+        catalogHasMore={catalogHasMore}
+        isCatalogLoadingMore={isCatalogLoadingMore}
+        catalogLoadMoreError={catalogLoadMoreError}
+        onRetryCatalogLoadMore={onRetryCatalogLoadMore}
+        myProductsModerationFilter={myProductsModerationFilter}
+        sellerLoyaltyPointsBalance={sellerLoyaltyPointsBalance}
+        sellerLoyaltyPointsReserved={sellerLoyaltyPointsReserved}
+        onPlaceProductClick={onPlaceProductClick}
+      />
+    );
+  }
 
   const isCatalogInitialLoading =
     catalogStatus.kind === "loading" && products.length === 0;

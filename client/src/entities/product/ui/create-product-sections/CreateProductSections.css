@@ -84,19 +84,21 @@
   padding: 0.65rem 0.75rem;
   border: 1px solid color-mix(in srgb, var(--iz-color-border) 85%, transparent);
   border-radius: 0.65rem;
-  background: var(--iz-color-surface);
+  background: color-mix(in srgb, var(--iz-color-ink) 5%, var(--iz-color-surface));
   color: var(--iz-color-text);
   font: inherit;
   font-size: 0.95rem;
   transition:
     border-color 0.15s ease,
-    box-shadow 0.15s ease;
+    box-shadow 0.15s ease,
+    background-color 0.15s ease;
 }
 
 .create-product-section__input:focus,
 .create-product-section__textarea:focus {
   outline: none;
   border-color: var(--iz-color-action);
+  background: var(--iz-color-surface);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--iz-color-action) 18%, transparent);
 }
 

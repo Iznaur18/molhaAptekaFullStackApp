@@ -5,7 +5,7 @@
 const PROFILE_ROW_SECTIONS = [
   {
     id: "stats",
-    title: "Статистика",
+    title: "Основное",
     rowIds: [
       "followersCount",
       "followingCount",

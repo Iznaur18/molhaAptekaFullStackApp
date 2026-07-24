@@ -17,6 +17,7 @@ export function isHomeCuratedProductListsVisible({
   isMineMode,
   selectedProductCategory,
   selectedCategoryId,
+  sellerPersonalCategoryId = null,
   hasProductSearchQuery,
   catalogFollowingOnly,
   catalogAuctionOnly,
@@ -29,6 +30,7 @@ export function isHomeCuratedProductListsVisible({
     !isMineMode &&
     !selectedProductCategory &&
     !selectedCategoryId &&
+    !sellerPersonalCategoryId &&
     !hasProductSearchQuery &&
     !catalogFollowingOnly &&
     !catalogAuctionOnly &&

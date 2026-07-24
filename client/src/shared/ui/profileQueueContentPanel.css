@@ -1,8 +1,4 @@
-.profile-queue-content-panel,
-.my-sales-page > .my-sales-page__state,
-.my-orders-page > .my-orders-page__state,
-.auction-page > .auction-page__state,
-.installment-page > .installment-page__state {
+.profile-queue-content-panel {
   --profile-queue-list-gap: 1rem;
   --profile-queue-content-padding-block: 1rem;
 
@@ -16,19 +12,8 @@
   padding-block: 0.15rem;
 }
 
-.my-sales-page > .my-sales-page__state,
-.my-orders-page > .my-orders-page__state,
-.auction-page > .auction-page__state,
-.installment-page > .installment-page__state {
-  margin: 0;
-}
-
 @container app-viewport (max-width: 640px) {
-  .profile-queue-content-panel,
-  .my-sales-page > .my-sales-page__state,
-  .my-orders-page > .my-orders-page__state,
-  .auction-page > .auction-page__state,
-  .installment-page > .installment-page__state {
+  .profile-queue-content-panel {
     --profile-queue-list-gap: 1.15rem;
     --profile-queue-content-padding-block: 1.1rem;
 

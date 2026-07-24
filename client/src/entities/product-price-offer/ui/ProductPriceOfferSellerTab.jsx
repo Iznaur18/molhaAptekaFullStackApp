@@ -106,7 +106,7 @@ export function ProductPriceOfferSellerTab({ productId, onOpenBuyer, onChanged }
   return (
     <section className="product-price-offer">
       <ProductPriceOfferSectionTitle />
-      <h2 className="product-price-offer__heading">
+      <h2 className="product-price-offer__section-label">
         {PRODUCT_PRICE_OFFER_UI.SECTION_TOP_TITLE}
       </h2>
       <ul className="product-price-offer__seller-list" role="list">

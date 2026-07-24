@@ -1,0 +1,181 @@
+.auth-page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100dvh;
+  background: var(--iz-color-surface);
+}
+
+.auth-page__back {
+  position: absolute;
+  z-index: 10;
+  top: calc(8px + env(safe-area-inset-top, 0px));
+  left: max(16px, env(safe-area-inset-left, 0px));
+  padding: 8px 12px;
+  border: none;
+  border-radius: var(--iz-control-btn-radius, 10px);
+  background: rgba(255, 255, 255, 0.92);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--iz-color-link);
+  cursor: pointer;
+}
+
+.auth-page__back:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.auth-page__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 24px 24px calc(32px + env(safe-area-inset-bottom, 0px));
+  max-width: 420px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.auth-page__title {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--iz-color-text);
+  text-align: center;
+}
+
+.auth-page__subtitle {
+  margin: 0 0 8px;
+  font-size: 15px;
+  line-height: 1.35;
+  color: var(--iz-color-text-muted);
+  text-align: center;
+}
+
+.auth-page__form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.auth-page__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.auth-page__label {
+  margin: 0 0 0 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--iz-color-text-secondary);
+}
+
+.auth-page__input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--iz-color-border-strong, #d1d5db);
+  border-radius: var(--iz-control-btn-radius, 10px);
+  background: var(--iz-color-surface);
+  font: inherit;
+  font-size: 15px;
+  color: var(--iz-color-text);
+}
+
+.auth-page__input:focus {
+  outline: 2px solid var(--iz-color-action-border);
+  outline-offset: 1px;
+  border-color: var(--iz-color-action);
+}
+
+.auth-page__input--invalid {
+  border-color: var(--iz-color-danger);
+}
+
+.auth-page__hint {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--iz-color-text-muted);
+}
+
+.auth-page__error {
+  margin: 0;
+  font-size: 14px;
+  color: var(--iz-color-danger);
+}
+
+.auth-page__success {
+  margin: 0;
+  font-size: 14px;
+  color: var(--iz-color-success-text);
+}
+
+.auth-page__submit {
+  width: 100%;
+}
+
+.auth-page__link {
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--iz-color-link);
+  text-align: center;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.auth-page__link:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.auth-page__ghost {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 10px 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--iz-color-text-secondary);
+  cursor: pointer;
+}
+
+.auth-page__ghost:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+body:has(.auth-page) .app-shell__header,
+body:has(.auth-page) .mobile-bottom-nav {
+  display: none !important;
+}
+
+body:has(.auth-page) {
+  background: var(--iz-color-surface);
+  overscroll-behavior-x: none;
+}
+
+/* Бить `.app-shell--header-v2 { padding-top: 0.5rem }` — иначе на /login сверху полоска. */
+body:has(.auth-page) .app-shell,
+body:has(.auth-page) .app-shell.app-shell--header-v1,
+body:has(.auth-page) .app-shell.app-shell--header-v2 {
+  padding: 0 !important;
+  margin: 0;
+  max-width: none;
+  background: var(--iz-color-surface);
+  min-height: 100dvh;
+}

@@ -1,0 +1,279 @@
+.my-product-compact-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-sizing: border-box;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--iz-color-border, #e5e7eb);
+  background: var(--iz-color-surface);
+}
+
+.my-product-compact-card__top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.my-product-compact-card__summary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.my-product-compact-card__status-row {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.my-product-compact-card__status-row::-webkit-scrollbar {
+  display: none;
+}
+
+.my-product-compact-card__status-pill,
+.my-product-compact-card__discount-pill,
+.my-product-compact-card__promotion-pill,
+.my-product-compact-card__feature-pill {
+  flex-shrink: 0;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 14px;
+  white-space: nowrap;
+}
+
+.my-product-compact-card__status-pill {
+  background: var(--iz-color-warning-surface);
+  color: var(--iz-color-warning-text);
+}
+
+.my-product-compact-card__status-pill--approved {
+  background: color-mix(in srgb, var(--iz-color-success) 10%, transparent);
+  color: var(--iz-color-success);
+}
+
+.my-product-compact-card__status-pill--rejected {
+  background: color-mix(in srgb, var(--iz-color-danger) 8%, transparent);
+  color: var(--iz-color-danger);
+}
+
+.my-product-compact-card__discount-pill {
+  background: color-mix(in srgb, var(--iz-color-danger) 8%, transparent);
+  color: var(--iz-color-danger);
+}
+
+.my-product-compact-card__promotion-pill--boost {
+  background: color-mix(in srgb, var(--iz-color-warning) 18%, transparent);
+  color: var(--iz-color-warning-text);
+}
+
+.my-product-compact-card__promotion-pill--top {
+  background: color-mix(in srgb, #ca8a04 22%, transparent);
+  color: #854d0e;
+}
+
+.my-product-compact-card__promotion-pill--banner {
+  background: color-mix(in srgb, var(--iz-color-action) 14%, transparent);
+  color: var(--iz-color-action);
+}
+
+.my-product-compact-card__feature-pill--auction {
+  background: color-mix(in srgb, #7c3aed 14%, transparent);
+  color: #5b21b6;
+}
+
+.my-product-compact-card__feature-pill--installment {
+  background: color-mix(in srgb, #0d9488 14%, transparent);
+  color: #0f766e;
+}
+
+.my-product-compact-card__feature-pill--raffle {
+  background: color-mix(in srgb, #db2777 14%, transparent);
+  color: #9d174d;
+}
+
+.my-product-compact-card__feature-pill--hidden {
+  background: var(--iz-color-warning-surface);
+  color: var(--iz-color-warning-text);
+}
+
+.my-product-compact-card__feature-pill--loyaltyOvercommit {
+  background: color-mix(in srgb, var(--iz-color-danger) 8%, transparent);
+  color: var(--iz-color-danger);
+}
+
+.my-product-compact-card__title {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  text-align: left;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 20px;
+  color: var(--iz-color-text);
+  cursor: pointer;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.my-product-compact-card__price-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.my-product-compact-card__loyalty-pill {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--iz-color-action) 8%, transparent);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 14px;
+  color: var(--iz-color-action);
+}
+
+.my-product-compact-card__meta {
+  margin: 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--iz-color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.my-product-compact-card__rejection {
+  margin: 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--iz-color-danger);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.my-product-compact-card__divider {
+  height: 1px;
+  background: var(--iz-color-border, #e5e7eb);
+}
+
+.my-product-compact-card__toolbar {
+  display: flex;
+  gap: 8px;
+}
+
+.my-product-compact-card__promote,
+.my-product-compact-card__edit {
+  flex: 1 1 0;
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: var(--iz-control-btn-radius, 10px);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.my-product-compact-card__promote {
+  border: none;
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast, #fff);
+}
+
+.my-product-compact-card__edit {
+  border: 1px solid var(--iz-color-border-strong, #d1d5db);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
+}
+
+.my-product-compact-card__promote:disabled,
+.my-product-compact-card__edit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.my-product-compact-thumb {
+  position: relative;
+  flex-shrink: 0;
+  width: 88px;
+  height: 88px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--iz-color-surface-muted);
+}
+
+.my-product-compact-thumb--dimmed {
+  opacity: 0.72;
+}
+
+.my-product-compact-thumb__press {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.my-product-compact-thumb__media {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.my-product-compact-thumb__counter {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 12px;
+  color: #fff;
+  background: rgba(15, 23, 42, 0.72);
+  pointer-events: none;
+}
+
+.my-product-compact-thumb__nav {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2px;
+  pointer-events: none;
+}
+
+.my-product-compact-thumb__nav-btn {
+  pointer-events: auto;
+  width: 22px;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 18px;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+}

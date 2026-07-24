@@ -44,6 +44,10 @@ export function UserListRow({ user, onRowClick }) {
     const n = Number(user.followersCount);
     return Number.isFinite(n) ? String(Math.max(0, Math.floor(n))) : "0";
   }, [user.followersCount]);
+  const loyaltyPointsText = useMemo(() => {
+    const n = Number(user.userLoyaltyPoints);
+    return Number.isFinite(n) ? String(Math.max(0, Math.floor(n))) : "0";
+  }, [user.userLoyaltyPoints]);
   const metaBadges = useMemo(() => {
     if (!user.isBlockedUser) {
       return [];
@@ -117,6 +121,17 @@ export function UserListRow({ user, onRowClick }) {
           </span>
           <span className="user-list-row__metric-value user-list-row__metric-value_amount">
             {followersText}
+          </span>
+        </span>
+        <span
+          className="user-list-row__metric user-list-row__metric_loyalty"
+          aria-label={`${USER_LIST_ROW_UI.LOYALTY_POINTS_LABEL} ${loyaltyPointsText}`}
+        >
+          <span className="user-list-row__metric-label">
+            {USER_LIST_ROW_UI.LOYALTY_POINTS_LABEL}
+          </span>
+          <span className="user-list-row__metric-value user-list-row__metric-value_amount">
+            {loyaltyPointsText}
           </span>
         </span>
       </span>

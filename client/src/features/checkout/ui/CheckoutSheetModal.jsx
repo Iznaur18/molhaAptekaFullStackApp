@@ -1,0 +1,120 @@
+import { createPortal } from "react-dom";
+import { useEffect, useId, useRef } from "react";
+
+import { CART_PAGE_UI, CHECKOUT_FORM_UI } from "../../../shared/config/appUiCopy.js";
+import { useDialogFocusTrap } from "../../../shared/lib/useDialogFocusTrap.js";
+import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
+import { CheckoutForm } from "../../../shared/ui/CheckoutForm/CheckoutForm.jsx";
+import { useCheckoutSheetModalAnimation } from "../model/useCheckoutSheetModalAnimation.js";
+
+import "./CheckoutSheetModal.css";
+
+/**
+ * @param {{
+ *   isOpen: boolean;
+ *   onClose: () => void;
+ *   defaultDeliveryAddress: Record<string, unknown>;
+ *   isSubmitting: boolean;
+ *   submitError: string;
+ *   submitSuccess: string;
+ *   isDisabled?: boolean;
+ *   onSubmit: (payload: {
+ *     deliveryAddress: string;
+ *     deliveryAddressFlat: string;
+ *     paymentMethod: string;
+ *   }) => void | Promise<void>;
+ * }} props
+ */
+export function CheckoutSheetModal({
+  isOpen,
+  onClose,
+  defaultDeliveryAddress,
+  isSubmitting,
+  submitError,
+  submitSuccess,
+  isDisabled = false,
+  onSubmit,
+}) {
+  const titleId = useId();
+  const panelRef = useRef(/** @type {HTMLDivElement | null} */ (null));
+  const closeButtonRef = useRef(/** @type {HTMLButtonElement | null} */ (null));
+  const { mounted, isVisible } = useCheckoutSheetModalAnimation(isOpen);
+
+  useScrollLock(mounted);
+  useDialogFocusTrap(panelRef, {
+    active: isOpen && isVisible,
+    initialFocusRef: closeButtonRef,
+  });
+
+  useEffect(() => {
+    if (!isOpen) {
+      return undefined;
+    }
+
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [isOpen, onClose]);
+
+  if (!mounted) {
+    return null;
+  }
+
+  const backdropClassName = [
+    "checkout-sheet-modal__backdrop",
+    isVisible ? "checkout-sheet-modal__backdrop--open" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  return createPortal(
+    <div className={backdropClassName} role="presentation">
+      <div className="checkout-sheet-modal__scrim" aria-hidden="true" />
+      <button
+        type="button"
+        className="checkout-sheet-modal__dismiss"
+        aria-label={CART_PAGE_UI.CHECKOUT_SHEET_CLOSE}
+        onClick={onClose}
+      />
+      <div
+        ref={panelRef}
+        className="checkout-sheet-modal__panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+      >
+        <header className="checkout-sheet-modal__header">
+          <h2 id={titleId} className="checkout-sheet-modal__title">
+            {CHECKOUT_FORM_UI.HEADING}
+          </h2>
+          <button
+            ref={closeButtonRef}
+            type="button"
+            className="checkout-sheet-modal__close"
+            onClick={onClose}
+          >
+            {CART_PAGE_UI.CHECKOUT_SHEET_CLOSE}
+          </button>
+        </header>
+        <div className="checkout-sheet-modal__body">
+          <CheckoutForm
+            defaultDeliveryAddress={defaultDeliveryAddress}
+            isSubmitting={isSubmitting}
+            submitError={submitError}
+            submitSuccess={submitSuccess}
+            isDisabled={isDisabled}
+            showHeading={false}
+            pinSubmitToBottom
+            onSubmit={onSubmit}
+          />
+        </div>
+      </div>
+    </div>,
+    document.body,
+  );
+}

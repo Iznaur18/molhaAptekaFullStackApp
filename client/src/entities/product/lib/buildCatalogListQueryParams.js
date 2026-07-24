@@ -17,19 +17,17 @@ export function buildCatalogListQueryParams({
   showHiddenCatalogProducts,
 }) {
   const search = appliedProductSearchTerm.trim();
-  const sellerPersonalCategoryId = isCatalogBrowserMainViewActive
-    ? (catalogQueryFromUrl.sellerPersonalCategoryId ?? null)
-    : null;
+  const sellerPersonalCategoryId = isMineMode
+    ? null
+    : (catalogQueryFromUrl.sellerPersonalCategoryId ?? null);
+  const categoryId = isMineMode ? null : (activeCatalogBrowserCategoryId ?? null);
   const productCategory = isMineMode
     ? (selectedProductCategory ?? null)
-    : isCatalogBrowserMainViewActive &&
-        !activeCatalogBrowserCategoryId &&
-        !sellerPersonalCategoryId
-      ? (activeCatalogBrowserCategory ?? null)
+    : !categoryId && !sellerPersonalCategoryId
+      ? (activeCatalogBrowserCategory ??
+        (!isCatalogBrowserMainViewActive ? selectedProductCategory : null) ??
+        null)
       : null;
-  const categoryId = isCatalogBrowserMainViewActive
-    ? (activeCatalogBrowserCategoryId ?? null)
-    : null;
 
   return {
     scope: isMineMode ? "my" : "catalog",

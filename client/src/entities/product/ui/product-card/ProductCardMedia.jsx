@@ -2,7 +2,7 @@ import { useCallback, useRef } from "react";
 
 import { WishlistToggleButton } from "../../../../features/wishlist-toggle/ui/WishlistToggleButton.jsx";
 import { PRODUCT_CARD_UI, PRODUCT_MODERATION_PAGE_UI } from "../../../../shared/config/appUiCopy.js";
-import { useHorizontalSwipeNavigation } from "../../../../shared/lib/useHorizontalSwipeNavigation.js";
+import { ProductMediaHorizontalPager } from "../ProductMediaHorizontalPager.jsx";
 import { ProductMediaSlideContent } from "../ProductMediaSlideContent.jsx";
 import { ProductDiscountBadge } from "../ProductPriceDisplay.jsx";
 import { ProductLoyaltyPointsBadge } from "../ProductLoyaltyPointsBadge.jsx";
@@ -15,28 +15,19 @@ import { ProductCardGalleryDots } from "./ProductCardGalleryDots.jsx";
  * }} props
  */
 export function ProductCardMedia({ vm }) {
-  const hasSlideMedia = vm.renderedSlide != null;
-  const slideCount = vm.mediaSlides.length;
+  const slideCount = Math.max(vm.mediaSlides.length, 0);
+  const hasSlideMedia = slideCount > 0;
   const hasMultipleSlides = slideCount > 1;
   const setCardSlideIndex = vm.setCardSlideIndex;
   const suppressOpenAfterSwipeRef = useRef(false);
 
-  const goToPreviousSlide = useCallback(() => {
-    setCardSlideIndex((index) => Math.max(0, index - 1));
-  }, [setCardSlideIndex]);
-
-  const goToNextSlide = useCallback(() => {
-    setCardSlideIndex((index) => Math.min(slideCount - 1, index + 1));
-  }, [setCardSlideIndex, slideCount]);
-
-  const gallerySwipeHandlers = useHorizontalSwipeNavigation({
-    enabled: hasMultipleSlides,
-    onSwipeLeft: goToNextSlide,
-    onSwipeRight: goToPreviousSlide,
-    onSwipe: () => {
+  const handleIndexChange = useCallback(
+    (index) => {
       suppressOpenAfterSwipeRef.current = true;
+      setCardSlideIndex(index);
     },
-  });
+    [setCardSlideIndex],
+  );
 
   const handleGalleryClickCapture = useCallback((event) => {
     if (!suppressOpenAfterSwipeRef.current) {
@@ -47,6 +38,29 @@ export function ProductCardMedia({ vm }) {
     event.stopPropagation();
   }, []);
 
+  const renderSlide = useCallback(
+    (index) => {
+      const slide = vm.mediaSlides[index] ?? null;
+      if (slide == null) {
+        return <div className="product-card__image-placeholder" aria-hidden="true" />;
+      }
+
+      return (
+        <ProductMediaSlideContent
+          slide={slide}
+          imageClassName="product-card__image"
+          onImageError={() => {
+            if (!vm.useFallbackImage) {
+              vm.setUseFallbackImage(true);
+            }
+          }}
+          onVideoFailed={() => vm.setPreviewVideoFailed(true)}
+        />
+      );
+    },
+    [vm],
+  );
+
   const promotionRibbon = vm.showPromotionBoostBadge
     ? { tier: 1, label: PRODUCT_CARD_UI.PROMOTED_BADGE }
     : vm.showPromotionTopBadge
@@ -54,9 +68,6 @@ export function ProductCardMedia({ vm }) {
       : vm.showPromotionBannerBadge
         ? { tier: 3, label: PRODUCT_CARD_UI.PROMOTION_BANNER_BADGE }
         : null;
-
-  const canGoPrevious = vm.cardSlideIndex > 0;
-  const canGoNext = vm.cardSlideIndex < slideCount - 1;
 
   return (
     <div
@@ -72,20 +83,16 @@ export function ProductCardMedia({ vm }) {
             role: "region",
             "aria-label": PRODUCT_CARD_UI.GALLERY_REGION_ARIA,
             onClickCapture: handleGalleryClickCapture,
-            ...gallerySwipeHandlers,
           }
         : {})}
     >
       {hasSlideMedia ? (
-        <ProductMediaSlideContent
-          slide={vm.renderedSlide}
-          imageClassName="product-card__image"
-          onImageError={() => {
-            if (!vm.useFallbackImage) {
-              vm.setUseFallbackImage(true);
-            }
-          }}
-          onVideoFailed={() => vm.setPreviewVideoFailed(true)}
+        <ProductMediaHorizontalPager
+          className="product-card__media-pager"
+          slideCount={slideCount}
+          activeIndex={vm.cardSlideIndex}
+          onIndexChange={handleIndexChange}
+          renderSlide={renderSlide}
         />
       ) : (
         <div className="product-card__image-placeholder" aria-hidden="true" />
@@ -131,38 +138,10 @@ export function ProductCardMedia({ vm }) {
         </div>
       ) : null}
       {hasMultipleSlides ? (
-        <>
-          <div className="product-card__image-nav">
-            <button
-              type="button"
-              className="product-card__image-nav-btn"
-              aria-label={PRODUCT_CARD_UI.GALLERY_PREV}
-              disabled={!canGoPrevious}
-              onClick={(event) => {
-                event.stopPropagation();
-                goToPreviousSlide();
-              }}
-            >
-              ‹
-            </button>
-            <button
-              type="button"
-              className="product-card__image-nav-btn"
-              aria-label={PRODUCT_CARD_UI.GALLERY_NEXT}
-              disabled={!canGoNext}
-              onClick={(event) => {
-                event.stopPropagation();
-                goToNextSlide();
-              }}
-            >
-              ›
-            </button>
-          </div>
-          <ProductCardGalleryDots
-            slideIndex={vm.cardSlideIndex}
-            slideCount={slideCount}
-          />
-        </>
+        <ProductCardGalleryDots
+          slideIndex={vm.cardSlideIndex}
+          slideCount={slideCount}
+        />
       ) : null}
     </div>
   );

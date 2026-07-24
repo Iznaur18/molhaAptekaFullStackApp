@@ -2,7 +2,6 @@ import { CreateProductModal } from "../../../entities/product/ui/CreateProductMo
 import { ProductPromotionModal } from "../../../entities/product/ui/ProductPromotionModal.jsx";
 import { SellerProductsLimitModal } from "../../../entities/product/ui/SellerProductsLimitModal.jsx";
 import {
-  canSellerDeleteProduct,
   canSellerEditProduct,
   canSellerToggleCatalogVisibility,
 } from "../../../entities/product/lib/getProductModerationUi.js";
@@ -29,10 +28,8 @@ export function AppShellProductModals({
   productToEdit,
   handleCloseEditProductModal,
   handleEditProductSuccess,
-  handleDeleteMyProduct,
   handleSetMyProductAvailability,
   handleSetProductAuction,
-  deletingProductId,
   togglingAvailabilityProductId,
   togglingAuctionProductId,
   myProductsCatalogError,
@@ -89,13 +86,8 @@ export function AppShellProductModals({
         isSubmitting={isPromotionSubmitPending}
         onClose={handleClosePromotionModal}
         onSubmit={handleSubmitPromotionRequest}
-        onDeleteProduct={handleDeleteMyProduct}
         onSetProductAvailability={handleSetMyProductAvailability}
         onSetProductAuction={handleSetProductAuction}
-        isDeletePending={
-          promotionProduct?._id != null &&
-          deletingProductId === String(promotionProduct._id)
-        }
         isAvailabilityTogglePending={
           promotionProduct?._id != null &&
           togglingAvailabilityProductId === String(promotionProduct._id)
@@ -107,9 +99,6 @@ export function AppShellProductModals({
         manageErrorMessage={myProductsCatalogError || productDetailsAdminError}
         canManageEdit={
           promotionProduct != null && (isAdmin || canSellerEditProduct(promotionProduct))
-        }
-        canManageDelete={
-          promotionProduct != null && (isAdmin || canSellerDeleteProduct(promotionProduct))
         }
         canManageToggleVisibility={
           promotionProduct != null &&

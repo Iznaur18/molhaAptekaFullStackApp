@@ -7,7 +7,7 @@ import { VIDEO_URL_FIELD_UI } from "../config/appUiCopy.js";
  * `POST /upload/video` — загрузка видео (cookie auth, multipart, поле `video`).
  *
  * @param {File} file
- * @param {{ purpose?: 'intro' | 'story' }} [options]
+ * @param {{ purpose?: 'intro' | 'story' | 'product-preview' }} [options]
  * @returns {Promise<string>}
  */
 export async function uploadVideo(file, { purpose } = {}) {

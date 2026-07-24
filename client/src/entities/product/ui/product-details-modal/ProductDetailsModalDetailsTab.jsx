@@ -1,12 +1,16 @@
 import { PRODUCT_DETAILS_MODAL_UI } from "../../../../shared/config/appUiCopy.js";
 import { WishlistToggleButton } from "../../../../features/wishlist-toggle/ui/WishlistToggleButton.jsx";
-import { ProductDetailsAboveNameChips } from "../ProductDetailsAboveNameChips.jsx";
+import { getProductSellerId } from "../../lib/getProductSellerId.js";
 import { ProductDetailsBadgeStack } from "../ProductDetailsBadgeStack.jsx";
 import { ProductDetailsSellerPreview } from "../ProductDetailsSellerPreview.jsx";
 import { ProductMediaGalleryReadonly } from "../ProductMediaGalleryReadonly.jsx";
 import { ProductPriceDisplay } from "../ProductPriceDisplay.jsx";
+import { ProductDetailsAuctionTeaser } from "./ProductDetailsAuctionTeaser.jsx";
 import { ProductDetailsContentSwitcher } from "./ProductDetailsContentSwitcher.jsx";
+import { ProductDetailsInstallmentTeaser } from "./ProductDetailsInstallmentTeaser.jsx";
 import { ProductDetailsModalPurchaseActions } from "./ProductDetailsModalPurchaseActions.jsx";
+import { ProductDetailsSaleTeaser } from "./ProductDetailsSaleTeaser.jsx";
+import { ProductDetailsSellerProductsCarousel } from "./ProductDetailsSellerProductsCarousel.jsx";
 import { renderProductDetailsFieldRows } from "./renderProductDetailsFieldRows.jsx";
 
 /**
@@ -24,6 +28,7 @@ import { renderProductDetailsFieldRows } from "./renderProductDetailsFieldRows.j
  *   mobileReportOverlay?: import('react').ReactNode;
  *   productTitleId?: string;
  *   embedMediaGallery?: boolean;
+ *   showInlinePurchaseActions?: boolean;
  *   ctrl: ReturnType<import('./useProductDetailsModalController.js').useProductDetailsModalController>;
  * }} props
  */
@@ -31,20 +36,20 @@ export function ProductDetailsModalDetailsTab({
   product,
   isOpen,
   isAuthorized,
-  isPremiumUser = false,
+  isPremiumUser: _isPremiumUser = false,
   onRequestLogin,
   onProductStatsUpdate,
   currentUserId = null,
   mobileReportOverlay = null,
   productTitleId,
   embedMediaGallery = true,
+  showInlinePurchaseActions = false,
   ctrl,
 }) {
   const {
     imageUrls,
     previewVideoUrl,
     auctionUi,
-    installmentUi,
     fieldHandlers,
     handleOpenSellerProfile,
     showPriceBlock,
@@ -59,6 +64,10 @@ export function ProductDetailsModalDetailsTab({
     isOwnProduct,
   } = ctrl;
 
+  const sellerId = getProductSellerId(product) ?? "";
+  const productId = String(product._id);
+  const installmentEnabled = product.productInstallmentEnabled === true;
+
   const priceBlock = showPriceBlock ? (
     <div className="product-details-modal__price-block product-details-modal__price-block--inline-actions">
       <ProductPriceDisplay
@@ -69,22 +78,50 @@ export function ProductDetailsModalDetailsTab({
         showLoyaltyBadge
         isAuthorized={isAuthorized}
       />
-      <ProductDetailsAboveNameChips product={product} />
       <h3 id={productTitleId} className="product-details-modal__product-name">
         {product.productName?.trim() || "Товар"}
       </h3>
       <ProductDetailsBadgeStack product={product} />
-      <ProductDetailsModalPurchaseActions
-        productId={String(product._id)}
-        isAuthorized={isAuthorized}
-        onRequestLogin={onRequestLogin}
-        purchaseLimit={purchaseLimit}
-        canShowAddToCart={canShowAddToCart}
-        auctionUi={auctionUi}
-        installmentUi={installmentUi}
-        onAuctionClick={handleAuctionShortcutClick}
-        onInstallmentClick={handleInstallmentShortcutClick}
-      />
+      {sellerId ||
+      (productId && handleInstallmentShortcutClick) ||
+      (auctionUi.auctionActive && handleAuctionShortcutClick) ? (
+        <div className="product-details-modal__seller-extras">
+          {sellerId ? (
+            <ProductDetailsSellerProductsCarousel
+              sellerId={sellerId}
+              excludeProductId={productId}
+            />
+          ) : null}
+          {productId ? (
+            <ProductDetailsInstallmentTeaser
+              productId={productId}
+              installmentEnabled={installmentEnabled}
+              onPress={handleInstallmentShortcutClick}
+            />
+          ) : null}
+          <ProductDetailsAuctionTeaser
+            productId={productId}
+            auctionActive={auctionUi.auctionActive}
+            onPress={handleAuctionShortcutClick}
+          />
+          {sellerId && typeof handleOpenSellerProfile === "function" ? (
+            <ProductDetailsSaleTeaser
+              product={product}
+              sellerId={sellerId}
+              onOpenSeller={handleOpenSellerProfile}
+            />
+          ) : null}
+        </div>
+      ) : null}
+      {showInlinePurchaseActions ? (
+        <ProductDetailsModalPurchaseActions
+          productId={productId}
+          isAuthorized={isAuthorized}
+          onRequestLogin={onRequestLogin}
+          purchaseLimit={purchaseLimit}
+          canShowAddToCart={canShowAddToCart}
+        />
+      ) : null}
     </div>
   ) : null;
 
@@ -105,7 +142,7 @@ export function ProductDetailsModalDetailsTab({
             ) : null}
             {!isOwnProduct ? (
               <WishlistToggleButton
-                productId={String(product._id)}
+                productId={productId}
                 product={product}
                 isAuthorized={isAuthorized}
                 onRequestLogin={onRequestLogin}
@@ -122,17 +159,6 @@ export function ProductDetailsModalDetailsTab({
 
   const detailsBelow = (
     <>
-      {topStatFieldKeys.length > 0 ? (
-        <dl className="product-details-modal__stats-grid product-details-modal__stats-grid--standalone">
-          {renderProductDetailsFieldRows(product, topStatFieldKeys, fieldHandlers)}
-        </dl>
-      ) : null}
-
-      <ProductDetailsSellerPreview
-        seller={product.productSeller}
-        onOpenProfile={handleOpenSellerProfile}
-      />
-
       {hasDetailsSection ? (
         <section
           className="product-details-modal__details"
@@ -153,12 +179,24 @@ export function ProductDetailsModalDetailsTab({
               )}
             </dl>
           ) : null}
-          {bottomMetaFieldKeys.length > 0 ? (
-            <dl className="product-details-modal__meta-grid">
-              {renderProductDetailsFieldRows(product, bottomMetaFieldKeys, fieldHandlers)}
-            </dl>
-          ) : null}
         </section>
+      ) : null}
+
+      <ProductDetailsSellerPreview
+        seller={product.productSeller}
+        onOpenProfile={handleOpenSellerProfile}
+      />
+
+      {topStatFieldKeys.length > 0 ? (
+        <dl className="product-details-modal__stats-grid product-details-modal__stats-grid--standalone">
+          {renderProductDetailsFieldRows(product, topStatFieldKeys, fieldHandlers)}
+        </dl>
+      ) : null}
+
+      {contentPanels && bottomMetaFieldKeys.length > 0 ? (
+        <dl className="product-details-modal__meta-grid">
+          {renderProductDetailsFieldRows(product, bottomMetaFieldKeys, fieldHandlers)}
+        </dl>
       ) : null}
     </>
   );

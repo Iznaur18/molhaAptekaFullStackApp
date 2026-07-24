@@ -4,14 +4,27 @@
   gap: 0.75rem;
 }
 
+.users-page__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.users-page__list-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
 .users-page__grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1rem;
   align-items: stretch;
 }
 
-@container app-viewport (max-width: 667px) {
+@container app-viewport (max-width: 640px) {
   .users-page__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.5rem;

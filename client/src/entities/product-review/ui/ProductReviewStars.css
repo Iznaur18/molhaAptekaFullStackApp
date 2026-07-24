@@ -9,7 +9,7 @@
   padding: 0;
   border: none;
   background: transparent;
-  color: var(--iz-color-border);
+  color: var(--iz-color-border-strong);
   line-height: 1;
 }
 
@@ -17,8 +17,16 @@
   font-size: 1.35rem;
 }
 
+.product-review-stars--lg .product-review-stars__star {
+  font-size: 1.75rem;
+}
+
 .product-review-stars--sm .product-review-stars__star {
-  font-size: 1rem;
+  font-size: 0.8125rem;
+}
+
+.product-review-stars--interactive {
+  gap: var(--iz-space-2);
 }
 
 .product-review-stars__star--filled {

@@ -1,0 +1,20 @@
+.auth-hero {
+  width: 100%;
+  overflow: hidden;
+  background: var(--iz-color-surface-muted);
+  border-bottom-left-radius: 32px;
+  border-bottom-right-radius: 32px;
+}
+
+.auth-hero__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.auth-hero__skeleton {
+  width: 100%;
+  height: 100%;
+  background: var(--iz-color-surface-muted);
+}

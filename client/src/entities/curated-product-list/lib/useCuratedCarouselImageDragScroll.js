@@ -4,12 +4,13 @@ const DRAG_THRESHOLD_PX = 4;
 const IMAGE_DRAG_HANDLE_SELECTOR = ".curated-product-compact-card__image-wrap";
 
 /**
- * Горизонтальный скролл карусели только при drag/клике по зоне картинки.
+ * Горизонтальный скролл карусели при drag мышью по зоне картинки.
+ * Touch/pen — нативный overflow-x + touch-action: pan-x pan-y (иначе ломается вертикальный скролл страницы).
  */
 export function useCuratedCarouselImageDragScroll() {
   const ref = useRef(/** @type {HTMLDivElement | null} */ (null));
   const dragStateRef = useRef(
-    /** @type {{ isActive: boolean; didDrag: boolean; pointerId: number; startX: number; scrollLeft: number } | null} */ (
+    /** @type {{ isActive: boolean; didDrag: boolean; pointerId: number; startX: number; startY: number; scrollLeft: number } | null} */ (
       null
     ),
   );
@@ -49,7 +50,12 @@ export function useCuratedCarouselImageDragScroll() {
   const onPointerDown = useCallback(
     (event) => {
       const el = ref.current;
-      if (!el || event.button !== 0 || !isImageDragTarget(event.target)) {
+      if (
+        !el ||
+        event.button !== 0 ||
+        event.pointerType !== "mouse" ||
+        !isImageDragTarget(event.target)
+      ) {
         return;
       }
 
@@ -58,6 +64,7 @@ export function useCuratedCarouselImageDragScroll() {
         didDrag: false,
         pointerId: event.pointerId,
         startX: event.clientX,
+        startY: event.clientY,
         scrollLeft: el.scrollLeft,
       };
     },
@@ -72,11 +79,19 @@ export function useCuratedCarouselImageDragScroll() {
     }
 
     const deltaX = event.clientX - state.startX;
-    if (!state.didDrag && Math.abs(deltaX) < DRAG_THRESHOLD_PX) {
-      return;
-    }
+    const deltaY = event.clientY - state.startY;
 
     if (!state.didDrag) {
+      const absX = Math.abs(deltaX);
+      const absY = Math.abs(deltaY);
+      if (absX < DRAG_THRESHOLD_PX && absY < DRAG_THRESHOLD_PX) {
+        return;
+      }
+      if (absY > absX) {
+        dragStateRef.current = null;
+        return;
+      }
+
       state.didDrag = true;
       el.classList.add("is-drag-scrolling");
       try {

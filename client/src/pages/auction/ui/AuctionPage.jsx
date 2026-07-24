@@ -13,7 +13,6 @@ import { AuctionBuyerBidRow } from "../../../entities/product-price-offer/ui/Auc
 import { AuctionSellerOfferRow } from "../../../entities/product-price-offer/ui/AuctionSellerOfferRow.jsx";
 import { AUCTION_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { useRefetchOnVisible } from "../../../shared/lib/useRefetchOnVisible.js";
-import "../../../shared/ui/profileQueueContentPanel.css";
 
 import { AuctionPageOverview } from "./AuctionPageOverview.jsx";
 import { AuctionPageSection } from "./AuctionPageSection.jsx";

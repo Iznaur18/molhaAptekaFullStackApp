@@ -1,42 +1,130 @@
+/**
+ * Паритет mobile `useSellerProductsPageStyles` + Stack.Screen title «Товары продавца»:
+ *   list paddingH 16 / top 12; header gap 8, marginBottom 12;
+ *   sellerMetaZone: row, py 12, px 14, radius sm, actionSurface, border
+ */
 .seller-products-page {
   --modal-avatar-lead-size: 4.5rem;
   --modal-profile-banner-height-mult: 3;
   --modal-banner-avatar-inset: 0.75rem;
+  --modal-profile-banner-radius: 24px;
+  --modal-profile-banner-scrim: rgba(0, 0, 0, 0.28);
+  --seller-products-screen-padding-x: var(--iz-space-4);
+  --seller-products-screen-padding-top: var(--iz-space-3);
+  --seller-products-screen-gap: var(--iz-space-2);
+  --seller-products-nav-height: 2.75rem;
+
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0 auto;
+  padding-top: var(--seller-products-screen-padding-top);
+  padding-bottom: 18px;
+  padding-inline: max(
+    0px,
+    calc(
+      var(--seller-products-screen-padding-x) -
+        var(--app-shell-content-inline-padding, var(--iz-space-4))
+    )
+  );
+  display: flex;
+  flex-direction: column;
+  gap: var(--seller-products-screen-gap);
+}
+
+.seller-products-page__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--iz-space-1);
+  min-height: var(--seller-products-nav-height);
+  margin: calc(-1 * var(--seller-products-screen-padding-top)) 0 0;
+  padding: 0;
+}
+
+.seller-products-page__back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: var(--iz-radius-md, 10px);
+  background: transparent;
+  color: var(--iz-color-action);
+  cursor: pointer;
+}
+
+.seller-products-page__back:hover {
+  background: color-mix(in srgb, var(--iz-color-action) 10%, transparent);
+}
+
+.seller-products-page__back:focus-visible {
+  outline: 2px solid var(--iz-color-action);
+  outline-offset: 2px;
+}
+
+.seller-products-page__nav-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--iz-color-text);
 }
 
 .seller-products-page__header {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
+  gap: var(--seller-products-screen-gap);
+  margin-bottom: var(--iz-space-3);
 }
 
-.seller-products-page__title {
-  margin: 0;
-  font-size: 1.35rem;
+.seller-products-page .user-details-modal__banner {
+  margin-bottom: 0;
+  border-radius: var(--modal-profile-banner-radius);
 }
 
-.seller-products-page__seller {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
+/* Паритет mobile sellerMetaZone */
 .seller-products-page__seller-meta {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
-  gap: 0.65rem 1rem;
+  justify-content: space-between;
+  gap: var(--iz-space-2);
+  padding: 12px 14px;
+  border-radius: var(--iz-radius-sm, 8px);
+  border: 1px solid var(--iz-color-border);
+  background: var(--iz-color-action-soft);
 }
 
 .seller-products-page__seller-name {
+  flex: 1 1 auto;
+  min-width: 0;
   margin: 0;
-  font-size: 1.05rem;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--iz-color-text);
+}
+
+.seller-products-page__seller-meta .user-follow-button {
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.seller-products-page__seller-meta .user-follow-button__btn {
+  border-radius: var(--iz-radius-button, 10px);
+  padding: 0.5rem 0.875rem;
   font-weight: 600;
 }
 
 .seller-products-page__state {
   margin: 0;
+  text-align: center;
+  color: var(--iz-color-text-muted);
 }
 
 .seller-products-page__state_error {

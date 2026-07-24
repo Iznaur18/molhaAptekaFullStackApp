@@ -38,6 +38,23 @@
   font-size: 1rem;
 }
 
+/* Паритет mobile `cartRoot` / `cartCurrent` / `cartOld` */
+.product-price-display--cart {
+  gap: 0.125rem 0.5rem;
+}
+
+.product-price-display--cart .product-price-display__current {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--iz-color-link, var(--iz-color-action));
+}
+
+.product-price-display--cart .product-price-display__old {
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
 .product-discount-badge {
   margin: 0;
   padding: 0.2rem 0.5rem;

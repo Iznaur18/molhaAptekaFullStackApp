@@ -1,5 +1,6 @@
 import {
   USER_SOCIAL_LINK_FIELDS,
+  USER_SOCIAL_LINK_HANDLE_MAX_LENGTH,
   USER_SOCIAL_LINK_URL_MAX_LENGTH,
 } from "@molha/api-contract";
 import { Pressable, Text, TextInput, View } from "react-native";
@@ -28,6 +29,7 @@ export const EditProfileSocialLinksFields = ({
       {USER_SOCIAL_LINK_FIELDS.map((field) => {
         const fieldId = field.id as keyof EditProfileFormState;
         const value = String(form[fieldId] ?? "");
+        const isWebsite = field.id === "socialWebsiteUrl";
         return (
           <View key={field.id} style={styles.field}>
             <Text style={styles.label}>{field.labelRu}</Text>
@@ -36,13 +38,17 @@ export const EditProfileSocialLinksFields = ({
                 style={[styles.input, { flex: 1 }]}
                 value={value}
                 onChangeText={(next) => onChange(fieldId, next)}
-                placeholder={EDIT_PROFILE_UI.PLACEHOLDER_HTTPS}
+                placeholder={field.placeholderRu}
                 placeholderTextColor={theme.colors.textMuted}
-                maxLength={USER_SOCIAL_LINK_URL_MAX_LENGTH}
+                maxLength={
+                  isWebsite
+                    ? USER_SOCIAL_LINK_URL_MAX_LENGTH
+                    : USER_SOCIAL_LINK_HANDLE_MAX_LENGTH
+                }
                 editable={!disabled}
                 autoCapitalize="none"
                 autoCorrect={false}
-                keyboardType="url"
+                keyboardType={field.id === "socialWhatsappUrl" ? "phone-pad" : "default"}
               />
               {value.trim() !== "" ? (
                 <Pressable

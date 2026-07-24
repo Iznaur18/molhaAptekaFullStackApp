@@ -4,7 +4,6 @@ import { Outlet, useLocation } from "react-router-dom";
 import { CartServerSync } from "../../entities/cart/ui/CartServerSync.jsx";
 import { WishlistServerSync } from "../../entities/wishlist/ui/WishlistServerSync.jsx";
 import { EmailVerificationNotice } from "../../entities/user/ui/EmailVerificationNotice.jsx";
-import { SiteFooter } from "../../widgets/site-footer/ui/SiteFooter.jsx";
 import { getAppShellVariantClass } from "../lib/appShellVariant.js";
 import { buildAppShellRouteKey } from "../lib/buildAppShellRouteKey.js";
 import { useAppShell } from "../model/AppShellContext.jsx";
@@ -20,6 +19,12 @@ const LazyAppShellModalsLayer = lazy(() =>
   })),
 );
 
+/** Главный экран каталога `/` — единственное место с панелью шапки. */
+function isHomeCatalogPathname(pathname) {
+  const normalized = pathname.replace(/\/+$/, "") || "/";
+  return normalized === "/";
+}
+
 export function AppShellLayout() {
   const location = useLocation();
   const {
@@ -31,11 +36,13 @@ export function AppShellLayout() {
     modalsLayerProps,
   } = useAppShell();
 
+  const showAppShellHeader = isHomeCatalogPathname(location.pathname);
+
   return (
     <div className={`app-shell ${getAppShellVariantClass()}`}>
       <CartServerSync isAuthorized={isAuthorized} />
       <WishlistServerSync isAuthorized={isAuthorized} />
-      <AppShellHeader {...headerProps} />
+      <AppShellHeader {...headerProps} showHeaderPanel={showAppShellHeader} />
 
       <EmailVerificationNotice
         notice={emailVerificationNotice}
@@ -51,8 +58,6 @@ export function AppShellLayout() {
       <AppShellRouteSuspense routeKey={buildAppShellRouteKey(location)}>
         <Outlet />
       </AppShellRouteSuspense>
-
-      <SiteFooter />
 
       <Suspense fallback={null}>
         <LazyAppShellModalsLayer {...modalsLayerProps} />

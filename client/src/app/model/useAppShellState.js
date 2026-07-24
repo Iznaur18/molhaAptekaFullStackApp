@@ -1,9 +1,12 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { useAuthSession } from "../../entities/user/model/useAuthSession.js";
 import { useMyProductsTotalQuery } from "../../entities/product/model/useMyProductsTotalQuery.js";
 import { USER_ROLE_ADMIN } from "../../entities/user/model/userConstants.js";
 import { MY_PRODUCTS_MODERATION_FILTER_ALL } from "../../entities/product/model/productConstants.js";
+import { parseCatalogQueryFromSearchParams } from "../../entities/product/lib/catalogCatalogQuery.js";
+import { isHomeCatalogFeedVisible } from "../../entities/product/lib/isHomeCatalogFeedVisible.js";
+import { AUTH_LOGIN_PATH, AUTH_REGISTER_PATH } from "../../shared/lib/authPaths.js";
 import { useCatalogMainView } from "../../widgets/app-shell/model/useCatalogMainView.js";
 import { useHomeEmailVerifiedRedirect } from "../../widgets/app-shell/model/useHomeEmailVerifiedRedirect.js";
 import { useHomeFeaturedContent } from "../../widgets/app-shell/model/useHomeFeaturedContent.js";
@@ -28,6 +31,33 @@ export function useAppShellState(location, navigate) {
   const navigation = useAppShellNavigation(location, navigate);
   const catalogView = useCatalogMainView(location);
   const shellUi = useShellUiState();
+  const {
+    setIsLoginModalOpen: setLoginModalOpenState,
+    setIsRegisterModalOpen: setRegisterModalOpenState,
+  } = shellUi;
+
+  const setIsLoginModalOpen = useCallback(
+    (open) => {
+      if (open) {
+        navigate(AUTH_LOGIN_PATH);
+        return;
+      }
+      setLoginModalOpenState(false);
+    },
+    [navigate, setLoginModalOpenState],
+  );
+
+  const setIsRegisterModalOpen = useCallback(
+    (open) => {
+      if (open) {
+        navigate(AUTH_REGISTER_PATH);
+        return;
+      }
+      setRegisterModalOpenState(false);
+    },
+    [navigate, setRegisterModalOpenState],
+  );
+
   const authSession = useAuthSession();
 
   const {
@@ -97,18 +127,30 @@ export function useAppShellState(location, navigate) {
 
   const sellerModalState = useHomeSellerModal({
     currentUserId,
-    isAuthorized,
     navigate,
     goToMainView: navigation.goToMainView,
-    setIsLoginModalOpen: shellUi.setIsLoginModalOpen,
-    setIsAdminEditUserOpen: shellUi.setIsAdminEditUserOpen,
-    setIsAdminDeleteUserOpen: shellUi.setIsAdminDeleteUserOpen,
   });
 
   const queryRefreshers = useHomeQueryRefreshers();
 
-  const featuredContent = useHomeFeaturedContent({
+  const catalogQueryFromUrl = useMemo(
+    () => parseCatalogQueryFromSearchParams(new URLSearchParams(location.search)),
+    [location.search],
+  );
+  const showHomeCatalogFeed = isHomeCatalogFeedVisible({
     isHomeCatalogMainView: catalogView.isHomeCatalogMainView,
+    hasProductSearchQuery: shellUi.submittedProductSearchTerm.trim() !== "",
+    selectedProductCategory: catalogQueryFromUrl.category,
+    selectedCategoryId: catalogQueryFromUrl.categoryId,
+    sellerPersonalCategoryId: catalogQueryFromUrl.sellerPersonalCategoryId,
+    catalogFollowingOnly: catalogQueryFromUrl.followingOnly,
+    catalogAuctionOnly: catalogQueryFromUrl.auctionOnly,
+    catalogInstallmentOnly: catalogQueryFromUrl.installmentOnly,
+    catalogSaleOnly: catalogQueryFromUrl.saleOnly,
+  });
+
+  const featuredContent = useHomeFeaturedContent({
+    isHomeCatalogMainView: showHomeCatalogFeed,
     isAuthorized,
     currentUserId,
     canModerateProducts,
@@ -124,7 +166,10 @@ export function useAppShellState(location, navigate) {
     ...navigation,
     ...catalogView,
     isCatalogShellView,
+    showHomeCatalogFeed,
     ...shellUi,
+    setIsLoginModalOpen,
+    setIsRegisterModalOpen,
     initialCatalogQuery,
     myProfilePage,
     setMyProfilePage,

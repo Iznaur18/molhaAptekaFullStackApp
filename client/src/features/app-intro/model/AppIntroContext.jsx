@@ -1,10 +1,4 @@
-import { useQueryClient } from "@tanstack/react-query";
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-
-import { fetchAppIntroSettings } from "../../../entities/app-intro-settings/api/fetchAppIntroSettings.js";
-import { appIntroSettingsQueryKeys } from "../../../entities/app-intro-settings/model/appIntroSettingsQueryKeys.js";
-import { markAppIntroSeen, hasSeenAppIntro } from "../lib/introStorage.js";
-import { prefersReducedMotion } from "../lib/prefersReducedMotion.js";
+import { createContext, useCallback, useContext, useMemo, useState } from "react";
 
 /** @typedef {import('../../../entities/app-intro-settings/model/types.js').AppIntroSettings} AppIntroSettings */
 
@@ -18,47 +12,18 @@ import { prefersReducedMotion } from "../lib/prefersReducedMotion.js";
 const AppIntroContext = createContext(null);
 
 /**
+ * Web: авто-интро при заходе отключено.
+ * Preview/replay остаются для admin / advertising / moderation.
+ *
  * @param {{ children: import('react').ReactNode }} props
  */
 export function AppIntroProvider({ children }) {
-  const queryClient = useQueryClient();
   const [isReplay, setIsReplay] = useState(false);
   const [previewSettings, setPreviewSettings] = useState(
     /** @type {AppIntroSettings | null} */ (null),
   );
-  const [isFirstVisitVisible, setIsFirstVisitVisible] = useState(false);
-
-  useEffect(() => {
-    if (prefersReducedMotion()) {
-      markAppIntroSeen();
-      return undefined;
-    }
-
-    let cancelled = false;
-
-    void queryClient
-      .fetchQuery({
-        queryKey: appIntroSettingsQueryKeys.public(),
-        queryFn: fetchAppIntroSettings,
-        staleTime: 60_000,
-      })
-      .finally(() => {
-        if (cancelled || hasSeenAppIntro()) {
-          return;
-        }
-        setIsFirstVisitVisible(true);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [queryClient]);
-
-  const isIntroVisible = isFirstVisitVisible || isReplay;
 
   const dismissIntro = useCallback(() => {
-    markAppIntroSeen();
-    setIsFirstVisitVisible(false);
     setIsReplay(false);
     setPreviewSettings(null);
   }, []);
@@ -75,13 +40,13 @@ export function AppIntroProvider({ children }) {
 
   const value = useMemo(
     () => ({
-      isIntroVisible,
+      isIntroVisible: isReplay,
       previewSettings,
       dismissIntro,
       replayIntro,
       previewIntro,
     }),
-    [dismissIntro, isIntroVisible, previewIntro, previewSettings, replayIntro],
+    [dismissIntro, isReplay, previewIntro, previewSettings, replayIntro],
   );
 
   return <AppIntroContext.Provider value={value}>{children}</AppIntroContext.Provider>;

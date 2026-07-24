@@ -1,4 +1,4 @@
-/** @typedef {'basic' | 'originality' | 'media' | 'category' | 'commerce' | 'review'} CreateProductWizardStepId */
+/** @typedef {'basic' | 'originality' | 'media' | 'category' | 'commerce' | 'returns' | 'review'} CreateProductWizardStepId */
 
 /** @type {readonly CreateProductWizardStepId[]} */
 export const CREATE_PRODUCT_WIZARD_STEP_IDS = [
@@ -7,6 +7,7 @@ export const CREATE_PRODUCT_WIZARD_STEP_IDS = [
   "media",
   "category",
   "commerce",
+  "returns",
   "review",
 ];
 

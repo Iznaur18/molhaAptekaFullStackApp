@@ -3,6 +3,7 @@ import { CreateProductBasicSection } from "../../../entities/product/ui/create-p
 import { CreateProductOriginalitySection } from "../../../entities/product/ui/create-product-sections/CreateProductOriginalitySection.jsx";
 import { CreateProductCategorySection } from "../../../entities/product/ui/create-product-sections/CreateProductCategorySection.jsx";
 import { CreateProductCommerceSection } from "../../../entities/product/ui/create-product-sections/CreateProductCommerceSection.jsx";
+import { CreateProductReturnsSection } from "../../../entities/product/ui/create-product-sections/CreateProductReturnsSection.jsx";
 import { CreateProductWizardMediaStep } from "./CreateProductWizardMediaStep.jsx";
 import { CreateProductReviewSection } from "../../../entities/product/ui/create-product-sections/CreateProductReviewSection.jsx";
 import "../../../entities/product/ui/create-product-sections/CreateProductSections.css";
@@ -180,6 +181,7 @@ export function CreateProductWizard({
           ) : null}
           {wizard.stepId === "category" ? <CreateProductCategorySection {...sectionProps} /> : null}
           {wizard.stepId === "commerce" ? <CreateProductCommerceSection {...sectionProps} /> : null}
+          {wizard.stepId === "returns" ? <CreateProductReturnsSection {...sectionProps} /> : null}
           {wizard.stepId === "review" ? (
             <CreateProductReviewSection
               form={form}

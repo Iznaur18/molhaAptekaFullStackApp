@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-import { ProductPriceOfferHintMessage } from "../../product-price-offer/ui/ProductPriceOfferHintMessage.jsx";
 import { useProductReviewMutations } from "../model/useProductReviewMutations.js";
 import { useProductReviewsQuery } from "../model/useProductReviewsQuery.js";
 import { PRODUCT_REVIEW_UI } from "../../../shared/config/appUiCopy.js";
@@ -11,6 +10,16 @@ import { ProductReviewSummary } from "./ProductReviewSummary.jsx";
 import "./ProductReviewsSection.css";
 
 /**
+ * @param {{ averageRating: number; reviewCount: number }} a
+ * @param {{ averageRating: number; reviewCount: number }} b
+ */
+function isSameReviewStats(a, b) {
+  return a.averageRating === b.averageRating && a.reviewCount === b.reviewCount;
+}
+
+/**
+ * Паритет с mobile `ProductReviewsTab`: summary → мой отзыв → composer → список.
+ *
  * @param {{
  *   productId: string;
  *   isAuthorized: boolean;
@@ -40,23 +49,31 @@ export function ProductReviewsSection({
     isLoadingMore,
     error,
   } = useProductReviewsQuery({ productId });
-  const { submitMutation, patchMutation, deleteMutation } =
-    useProductReviewMutations(productId);
+  const { submitMutation } = useProductReviewMutations(productId);
   const summary = summaryQuery.data ?? null;
-  const [isEditingMyReview, setIsEditingMyReview] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const isSubmitting =
-    submitMutation.isPending || patchMutation.isPending || deleteMutation.isPending;
+  const isSubmitting = submitMutation.isPending;
+  const lastPushedStatsRef = useRef(/** @type {{ averageRating: number; reviewCount: number } | null} */ (null));
 
   const applyStats = useCallback(
     (averageRating, reviewCount) => {
-      onStatsChange?.({
+      const next = {
         averageRating: Number(averageRating) || 0,
         reviewCount: Number(reviewCount) || 0,
-      });
+      };
+      const prev = lastPushedStatsRef.current;
+      if (prev && isSameReviewStats(prev, next)) {
+        return;
+      }
+      lastPushedStatsRef.current = next;
+      onStatsChange?.(next);
     },
     [onStatsChange],
   );
+
+  useEffect(() => {
+    lastPushedStatsRef.current = null;
+  }, [productId]);
 
   useEffect(() => {
     if (summary) {
@@ -65,7 +82,7 @@ export function ProductReviewsSection({
   }, [applyStats, summary]);
 
   useEffect(() => {
-    setIsEditingMyReview(false);
+    setErrorMessage("");
   }, [productId]);
 
   const handleSubmitNew = async (payload) => {
@@ -75,30 +92,6 @@ export function ProductReviewsSection({
       applyStats(data.averageRating, data.reviewCount);
     } catch (e) {
       setErrorMessage(e instanceof Error ? e.message : PRODUCT_REVIEW_UI.SUBMIT);
-    }
-  };
-
-  const handleSubmitEdit = async (payload) => {
-    setErrorMessage("");
-    try {
-      const data = await patchMutation.mutateAsync(payload);
-      applyStats(data.averageRating, data.reviewCount);
-    } catch (e) {
-      setErrorMessage(e instanceof Error ? e.message : PRODUCT_REVIEW_UI.SAVE);
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!window.confirm(PRODUCT_REVIEW_UI.DELETE_CONFIRM)) {
-      return;
-    }
-    setErrorMessage("");
-    try {
-      const data = await deleteMutation.mutateAsync();
-      applyStats(data.averageRating, data.reviewCount);
-      setIsEditingMyReview(false);
-    } catch (e) {
-      setErrorMessage(e instanceof Error ? e.message : PRODUCT_REVIEW_UI.DELETE);
     }
   };
 
@@ -113,84 +106,22 @@ export function ProductReviewsSection({
     }
   };
 
-  const myReviewId = summary?.myReview?._id;
-  const visibleReviews = myReviewId
+  const myReview = summary?.myReview ?? null;
+  const myReviewId = myReview?._id;
+  const otherReviews = myReviewId
     ? reviews.filter((review) => review._id !== myReviewId)
     : reviews;
 
   const renderComposer = () => {
-    if (isOwnProduct) {
+    if (isOwnProduct || myReview) {
       return null;
-    }
-
-    if (summary?.myReview) {
-      const showEditForm = summary.myReview.canEdit && isEditingMyReview;
-
-      return (
-        <div className="product-reviews-section__composer">
-          <h3 className="product-reviews-section__subheading">
-            {PRODUCT_REVIEW_UI.YOUR_REVIEW}
-          </h3>
-          {showEditForm ? (
-            <>
-              <ProductReviewForm
-                initialRating={summary.myReview.rating}
-                initialText={summary.myReview.text}
-                submitLabel={PRODUCT_REVIEW_UI.SAVE}
-                onSubmit={async (payload) => {
-                  await handleSubmitEdit(payload);
-                  setIsEditingMyReview(false);
-                }}
-                onDelete={handleDelete}
-                isBusy={isSubmitting}
-                errorMessage={errorMessage}
-              />
-              <button
-                type="button"
-                className="product-reviews-section__cancel-edit"
-                disabled={isSubmitting}
-                onClick={() => {
-                  setIsEditingMyReview(false);
-                  setErrorMessage("");
-                }}
-              >
-                {PRODUCT_REVIEW_UI.CANCEL_EDIT}
-              </button>
-            </>
-          ) : (
-            <>
-              <ProductReviewListItem review={summary.myReview} />
-              {summary.myReview.canEdit ? (
-                <div className="product-reviews-section__my-actions">
-                  <button
-                    type="button"
-                    className="product-reviews-section__edit"
-                    disabled={isSubmitting}
-                    onClick={() => setIsEditingMyReview(true)}
-                  >
-                    {PRODUCT_REVIEW_UI.EDIT}
-                  </button>
-                  <button
-                    type="button"
-                    className="product-reviews-section__delete"
-                    disabled={isSubmitting}
-                    onClick={() => void handleDelete()}
-                  >
-                    {PRODUCT_REVIEW_UI.DELETE}
-                  </button>
-                </div>
-              ) : null}
-            </>
-          )}
-        </div>
-      );
     }
 
     if (!isAuthorized) {
       return (
         <button
           type="button"
-          className="product-reviews-section__login"
+          className="app-btn app-btn--primary product-reviews-section__login"
           onClick={onRequestLogin}
         >
           {PRODUCT_REVIEW_UI.LOGIN_TO_REVIEW}
@@ -200,43 +131,70 @@ export function ProductReviewsSection({
 
     if (!isUserDataConfirmed) {
       return (
-        <ProductPriceOfferHintMessage>
+        <p className="product-reviews-section__hint">
           {PRODUCT_REVIEW_UI.CONFIRMED_DATA_REQUIRED}
-        </ProductPriceOfferHintMessage>
+        </p>
       );
     }
 
-    if (summary?.canReview) {
+    if (!summary?.canReview) {
       return (
-        <div className="product-reviews-section__composer">
-          <h3 className="product-reviews-section__subheading">
-            {PRODUCT_REVIEW_UI.LEAVE_REVIEW}
-          </h3>
-          <ProductReviewForm
-            submitLabel={PRODUCT_REVIEW_UI.SUBMIT}
-            onSubmit={handleSubmitNew}
-            isBusy={isSubmitting}
-            errorMessage={errorMessage}
-          />
-        </div>
+        <p className="product-reviews-section__hint">{PRODUCT_REVIEW_UI.NOT_DELIVERED}</p>
       );
     }
 
-    if (isAuthorized && !summary?.canReview && !summary?.myReview) {
-      return (
-        <ProductPriceOfferHintMessage>
-          {PRODUCT_REVIEW_UI.NOT_DELIVERED}
-        </ProductPriceOfferHintMessage>
-      );
-    }
-
-    return null;
+    return (
+      <div className="product-reviews-section__composer">
+        <h3 className="product-reviews-section__panel-title">
+          {PRODUCT_REVIEW_UI.LEAVE_REVIEW}
+        </h3>
+        <ProductReviewForm
+          submitLabel={PRODUCT_REVIEW_UI.SUBMIT}
+          onSubmit={handleSubmitNew}
+          isBusy={isSubmitting}
+          errorMessage={errorMessage}
+        />
+      </div>
+    );
   };
+
+  const rootClassName = [
+    "product-reviews-section",
+    embeddedInTab ? "product-reviews-section--tab" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  if (isLoading) {
+    return (
+      <section
+        id="product-details-reviews"
+        className={rootClassName}
+        aria-label={PRODUCT_REVIEW_UI.SECTION_TITLE}
+      >
+        <p className="product-reviews-section__state">{PRODUCT_REVIEW_UI.LOADING}</p>
+      </section>
+    );
+  }
+
+  if (error && !summary) {
+    return (
+      <section
+        id="product-details-reviews"
+        className={rootClassName}
+        aria-label={PRODUCT_REVIEW_UI.SECTION_TITLE}
+      >
+        <p className="product-reviews-section__state" role="alert">
+          {error instanceof Error ? error.message : PRODUCT_REVIEW_UI.LOADING}
+        </p>
+      </section>
+    );
+  }
 
   return (
     <section
       id="product-details-reviews"
-      className="product-reviews-section"
+      className={rootClassName}
       aria-label={PRODUCT_REVIEW_UI.SECTION_TITLE}
     >
       {embeddedInTab ? null : (
@@ -244,45 +202,47 @@ export function ProductReviewsSection({
           {PRODUCT_REVIEW_UI.SECTION_TITLE}
         </h2>
       )}
-      {summary && summary.reviewCount > 0 ? (
+
+      {summary ? (
         <ProductReviewSummary
           averageRating={summary.averageRating}
           reviewCount={summary.reviewCount}
         />
       ) : null}
-      {isLoading ? (
-        <p className="product-reviews-section__state">{PRODUCT_REVIEW_UI.LOADING}</p>
-      ) : error && !summary ? (
-        <p className="product-reviews-section__state" role="alert">
-          {error instanceof Error ? error.message : PRODUCT_REVIEW_UI.LOADING}
-        </p>
-      ) : (
-        <>
-          {renderComposer()}
-          <ul className="product-reviews-section__list">
-            {visibleReviews.map((review) => (
-              <li key={review._id}>
-                <ProductReviewListItem review={review} />
-              </li>
-            ))}
-          </ul>
-          {!isLoading && visibleReviews.length === 0 && !summary?.myReview ? (
-            <p className="product-reviews-section__state">
-              {PRODUCT_REVIEW_UI.NO_REVIEWS}
-            </p>
-          ) : null}
-          {currentPage < totalPages ? (
-            <button
-              type="button"
-              className="product-reviews-section__more"
-              disabled={isLoadingMore}
-              onClick={() => void handleLoadMore()}
-            >
-              {isLoadingMore ? PRODUCT_REVIEW_UI.LOADING : PRODUCT_REVIEW_UI.LOAD_MORE}
-            </button>
-          ) : null}
-        </>
-      )}
+
+      {myReview ? (
+        <div className="product-reviews-section__my-review">
+          <h3 className="product-reviews-section__subheading">
+            {PRODUCT_REVIEW_UI.YOUR_REVIEW}
+          </h3>
+          <ProductReviewListItem review={myReview} />
+        </div>
+      ) : null}
+
+      {renderComposer()}
+
+      {otherReviews.length === 0 && !myReview ? (
+        <p className="product-reviews-section__empty">{PRODUCT_REVIEW_UI.NO_REVIEWS}</p>
+      ) : otherReviews.length > 0 ? (
+        <ul className="product-reviews-section__list">
+          {otherReviews.map((review) => (
+            <li key={review._id}>
+              <ProductReviewListItem review={review} />
+            </li>
+          ))}
+        </ul>
+      ) : null}
+
+      {currentPage < totalPages ? (
+        <button
+          type="button"
+          className="product-reviews-section__more"
+          disabled={isLoadingMore}
+          onClick={() => void handleLoadMore()}
+        >
+          {isLoadingMore ? PRODUCT_REVIEW_UI.LOADING : PRODUCT_REVIEW_UI.LOAD_MORE}
+        </button>
+      ) : null}
     </section>
   );
 }

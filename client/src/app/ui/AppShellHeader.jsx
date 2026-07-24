@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
 
+import { useNavigate, useLocation } from "react-router-dom";
+
 import { useProductCategoryRootsQuery } from "../../entities/product-category-tree/model/useProductCategoryRootsQuery.js";
 import { CatalogCategoryFilterButton } from "../../widgets/catalog-category-filter-button/ui/CatalogCategoryFilterButton.jsx";
 import { CatalogMenuButton } from "../../widgets/catalog-menu-button/ui/CatalogMenuButton.jsx";
@@ -7,6 +9,7 @@ import { HeaderWishlistButton } from "../../widgets/header-wishlist-button/ui/He
 import { HeaderNotificationsButton } from "../../widgets/header-notifications-button/ui/HeaderNotificationsButton.jsx";
 import { HeaderShowHiddenProductsButton } from "../../widgets/header-show-hidden-products-button/ui/HeaderShowHiddenProductsButton.jsx";
 import { HeaderUsersButton } from "../../widgets/header-users-button/ui/HeaderUsersButton.jsx";
+import { HeaderUsersStretchMenu } from "../../widgets/header-users-stretch-menu/ui/HeaderUsersStretchMenu.jsx";
 import {
   DATA_CONFIRMATION_PAGE_UI,
   HOME_PAGE_UI,
@@ -27,6 +30,10 @@ import { useScrollLock } from "../../shared/lib/useScrollLock.js";
 import { SearchInput } from "../../shared/ui/SearchInput/SearchInput.jsx";
 import { SiteHeaderBannerCarousel } from "../../entities/site-header-banner/ui/SiteHeaderBannerCarousel.jsx";
 import { useSiteHeaderBannerSlidesQuery } from "../../entities/site-header-banner/model/useSiteHeaderBannerSlidesQuery.js";
+import {
+  isFaqPath,
+  parseLegalKindFromPathname,
+} from "../../shared/lib/infoPagePaths.js";
 
 /**
  * @param {import('../../entities/product-category-tree/model/types.js').ProductCategoryNode} root
@@ -105,6 +112,8 @@ const NON_CATALOG_VIEW_TITLES = {
  *   pendingProductReportsCount?: number;
  *   pendingDataConfirmationCount?: number;
  *   showSiteHeaderBanner?: boolean;
+ *   isCatalogBrowserLanding?: boolean;
+ *   showHeaderPanel?: boolean;
  * }} props
  */
 export function AppShellHeader({
@@ -139,9 +148,13 @@ export function AppShellHeader({
   pendingProductReportsCount = 0,
   pendingDataConfirmationCount = 0,
   showSiteHeaderBanner = false,
+  isCatalogBrowserLanding = false,
+  showHeaderPanel = true,
 }) {
   /** @type {import('react').RefObject<HTMLDivElement | null>} */
   const productCategoryFilterRef = useRef(null);
+  const isMobileNav = useAppShellCompactLayout();
+  const hideProductSearch = isMobileNav && isCatalogBrowserLanding;
 
   useEffect(() => {
     if (!isProductCategoryListOpen) return undefined;
@@ -189,16 +202,22 @@ export function AppShellHeader({
 
   const headerViewTitle = isHeaderViewTitleHidden(mainView) ? "" : nonCatalogTitle;
 
-  const isMobileNav = useAppShellCompactLayout();
   const slidesQuery = useSiteHeaderBannerSlidesQuery({
     enabled: showSiteHeaderBanner,
   });
   const siteHeaderBannerSlides = showSiteHeaderBanner ? (slidesQuery.data ?? []) : [];
 
+  const hideHeaderPanel =
+    !showHeaderPanel ||
+    isProfileTabMainView(mainView) ||
+    mainView === "cart" ||
+    mainView === "catalog-browser";
+
   const headerClassName = [
     "app-shell__header",
     getAppShellHeaderVariantClass(),
     isMobileNav && "app-shell__header--mobile-split",
+    hideHeaderPanel && "app-shell__header--no-panel",
   ]
     .filter(Boolean)
     .join(" ");
@@ -229,43 +248,52 @@ export function AppShellHeader({
 
   return (
     <>
-      <header className={headerClassName}>
-        <div className="app-shell__header-panel">
-          <div className="app-shell__header-top">
-            <div className="app-shell__header-main">
-              <HomeHeaderTitleRow
-                isCatalogHeaderView={isCatalogHeaderView}
-                headerViewTitle={headerViewTitle}
-                onNavigateToFullCatalogFromBreadcrumb={
-                  onNavigateToFullCatalogFromBreadcrumb
-                }
-              />
-              <div className="app-shell__header-search">
-                <SearchInput
-                  value={productSearchTerm}
-                  onChange={onProductSearchTermChange}
-                  onSubmit={onProductSearchSubmit}
-                  placeholder={PRODUCT_SEARCH_INPUT_UI.PLACEHOLDER}
-                  ariaLabel={PRODUCT_SEARCH_INPUT_UI.ARIA_LABEL}
-                  clearAriaLabel={PRODUCT_SEARCH_INPUT_UI.CLEAR_ARIA}
-                  pendingAriaLabel={PRODUCT_SEARCH_INPUT_UI.PENDING_ARIA}
-                  isPending={isProductSearchPending}
+      {showHeaderPanel ? (
+        <header className={headerClassName}>
+          {hideHeaderPanel ? null : (
+            <div className="app-shell__header-panel">
+              <div className="app-shell__header-top">
+                <div className="app-shell__header-main">
+                  {isMobileNav ? null : (
+                    <HomeHeaderTitleRow
+                      isCatalogHeaderView={isCatalogHeaderView}
+                      headerViewTitle={headerViewTitle}
+                      onNavigateToFullCatalogFromBreadcrumb={
+                        onNavigateToFullCatalogFromBreadcrumb
+                      }
+                    />
+                  )}
+                  <div className="app-shell__header-search">
+                    {hideProductSearch ? null : (
+                      <SearchInput
+                        value={productSearchTerm}
+                        onChange={onProductSearchTermChange}
+                        onSubmit={onProductSearchSubmit}
+                        placeholder={PRODUCT_SEARCH_INPUT_UI.PLACEHOLDER}
+                        ariaLabel={PRODUCT_SEARCH_INPUT_UI.ARIA_LABEL}
+                        clearAriaLabel={PRODUCT_SEARCH_INPUT_UI.CLEAR_ARIA}
+                        pendingAriaLabel={PRODUCT_SEARCH_INPUT_UI.PENDING_ARIA}
+                        isPending={isProductSearchPending}
+                        showLeadingIcon={isMobileNav}
+                      />
+                    )}
+                  </div>
+                  {isCatalogHeaderView && !isMobileNav ? (
+                    <CatalogHeaderFilter {...catalogFilterProps} />
+                  ) : null}
+                </div>
+                <HeaderNavActions
+                  {...navActionsProps}
+                  variant={isMobileNav ? "mobile-top" : "desktop"}
                 />
               </div>
-              {isCatalogHeaderView && !isMobileNav ? (
-                <CatalogHeaderFilter {...catalogFilterProps} />
-              ) : null}
             </div>
-            <HeaderNavActions
-              {...navActionsProps}
-              variant={isMobileNav ? "mobile-top" : "desktop"}
-            />
-          </div>
-        </div>
-        {siteHeaderBannerSlides.length > 0 ? (
-          <SiteHeaderBannerCarousel slides={siteHeaderBannerSlides} />
-        ) : null}
-      </header>
+          )}
+          {siteHeaderBannerSlides.length > 0 ? (
+            <SiteHeaderBannerCarousel slides={siteHeaderBannerSlides} />
+          ) : null}
+        </header>
+      ) : null}
       <MobileBottomNav
         isHomeActive={isHomeNavActive}
         isCatalogActive={isCatalogNavActive}
@@ -400,6 +428,32 @@ function HeaderNavActions({
   unreadNotificationsCount,
   onNotificationsClick,
 }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isTermsNavActive = parseLegalKindFromPathname(location.pathname) === "terms";
+  const isFaqNavActive = isFaqPath(location.pathname);
+  const stretchActiveItemKey = isUsersNavActive
+    ? "users"
+    : isTermsNavActive
+      ? "terms"
+      : isFaqNavActive
+        ? "faq"
+        : null;
+
+  const handleStretchItemAction = (action) => {
+    if (action === "users") {
+      onSetMainView("users");
+      return;
+    }
+    if (action === "terms") {
+      navigate("/legal/terms");
+      return;
+    }
+    if (action === "faq") {
+      navigate("/faq");
+    }
+  };
+
   const navClassName = [
     "app-shell__auth-actions",
     variant === "mobile-top" && "app-shell__auth-actions--mobile-top",
@@ -417,9 +471,9 @@ function HeaderNavActions({
             onClick={onShowHiddenCatalogProductsToggle}
           />
         ) : null}
-        <HeaderUsersButton
-          isActive={isUsersNavActive}
-          onClick={() => onSetMainView("users")}
+        <HeaderUsersStretchMenu
+          activeItemKey={stretchActiveItemKey}
+          onItemAction={handleStretchItemAction}
         />
       </nav>
     );

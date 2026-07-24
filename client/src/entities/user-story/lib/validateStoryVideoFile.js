@@ -2,15 +2,14 @@ import { STORY_UPLOAD_VIDEO_MAX_BYTES } from "../../../shared/config/uploadConst
 import { buildUploadVideoSizeError } from "../../../shared/lib/formatUploadBytesAsMb.js";
 import { isAllowedUploadVideoFile } from "../../../shared/lib/isAllowedUploadVideoFile.js";
 import { USER_STORY_UI } from "../../../shared/config/appUiCopy.js";
-import { USER_STORY_ASPECT_RATIO } from "../model/constants.js";
-
-const ASPECT_TOLERANCE = 0.06;
 
 /**
+ * Паритет mobile `pickVideoAsset`: type + size, без aspect-check.
+ *
  * @param {File} file
- * @returns {Promise<string | null>}
+ * @returns {string | null}
  */
-export async function validateStoryVideoFile(file) {
+export function validateStoryVideoFile(file) {
   if (!isAllowedUploadVideoFile(file)) {
     return USER_STORY_UI.ERROR_VIDEO_TYPE;
   }
@@ -19,39 +18,5 @@ export async function validateStoryVideoFile(file) {
     return buildUploadVideoSizeError(file.size, STORY_UPLOAD_VIDEO_MAX_BYTES);
   }
 
-  try {
-    const metadata = await readVideoMetadata(file);
-    const ratio = metadata.width / metadata.height;
-    if (Math.abs(ratio - USER_STORY_ASPECT_RATIO) > ASPECT_TOLERANCE) {
-      return USER_STORY_UI.ERROR_VIDEO_ASPECT;
-    }
-
-    return null;
-  } catch {
-    return USER_STORY_UI.ERROR_VIDEO_READ;
-  }
-}
-
-/**
- * @param {File} file
- */
-function readVideoMetadata(file) {
-  return new Promise((resolve, reject) => {
-    const video = document.createElement("video");
-    const objectUrl = URL.createObjectURL(file);
-
-    video.preload = "metadata";
-    video.onloadedmetadata = () => {
-      URL.revokeObjectURL(objectUrl);
-      resolve({
-        width: video.videoWidth,
-        height: video.videoHeight,
-      });
-    };
-    video.onerror = () => {
-      URL.revokeObjectURL(objectUrl);
-      reject(new Error("video metadata"));
-    };
-    video.src = objectUrl;
-  });
+  return null;
 }

@@ -29,6 +29,15 @@ describe("isHomeCuratedProductListsVisible", () => {
     ).toBe(false);
   });
 
+  it("hides with seller personal category filter", () => {
+    expect(
+      isHomeCuratedProductListsVisible({
+        ...baseParams,
+        sellerPersonalCategoryId: "664f1c2a3b4c5d6e7f8a9b0c",
+      }),
+    ).toBe(false);
+  });
+
   it("hides for staff hidden toggle", () => {
     expect(
       isHomeCuratedProductListsVisible({

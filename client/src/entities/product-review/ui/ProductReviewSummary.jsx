@@ -20,6 +20,8 @@ export function ProductReviewSummary({ averageRating, reviewCount }) {
 
   const avg = Number(averageRating) || 0;
   const displayRating = Math.round(avg * 10) / 10;
+  const displayRatingLabel =
+    displayRating % 1 === 0 ? String(displayRating) : displayRating.toFixed(1);
   const starsValue = Math.min(5, Math.max(0, Math.round(avg)));
   const ratingLine = formatProductReviewRatingLine(avg, count);
   const countLabel = formatProductReviewCountLabel(count);
@@ -27,7 +29,7 @@ export function ProductReviewSummary({ averageRating, reviewCount }) {
   return (
     <div className="product-review-summary" aria-label={ratingLine}>
       <strong className="product-review-summary__score" aria-hidden="true">
-        {displayRating}
+        {displayRatingLabel}
       </strong>
       <div className="product-review-summary__meta">
         <ProductReviewStars value={starsValue} size="md" />

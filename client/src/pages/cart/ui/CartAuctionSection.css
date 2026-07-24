@@ -1,10 +1,11 @@
 .cart-auction {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
-  padding: 0.85rem;
-  border: 1.5px solid var(--iz-color-warning);
-  border-radius: 0.75rem;
+  gap: 10px;
+  margin: 0 var(--cart-page-content-inset, 12px) 12px;
+  padding: 12px;
+  border: 1px solid var(--iz-color-warning);
+  border-radius: 14px;
   background: var(--iz-color-warning-surface);
 }
 

@@ -1,7 +1,9 @@
-import { useCallback, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useUploadAssetMutations } from "../../../shared/model/useUploadAssetMutations.js";
 import { USER_STORY_UI } from "../../../shared/config/appUiCopy.js";
+import { useDialogFocusTrap } from "../../../shared/lib/useDialogFocusTrap.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import {
   UPLOAD_FILE_INPUT_ACCEPT,
@@ -9,7 +11,7 @@ import {
 } from "../../../shared/config/uploadConstants.js";
 import { validateUploadImageFile } from "../../../shared/lib/validateUploadImageFile.js";
 import { useUserStoryMutations } from "../model/useUserStoryMutations.js";
-import { cropImageToAspectRatio } from "../lib/cropImageToAspectRatio.js";
+import { useCreateUserStoryModalAnimation } from "../model/useCreateUserStoryModalAnimation.js";
 import { validateStoryVideoFile } from "../lib/validateStoryVideoFile.js";
 import {
   USER_STORY_CAPTION_MAX_CHARS,
@@ -29,6 +31,8 @@ import "./CreateUserStoryModal.css";
 export function CreateUserStoryModal({ isOpen, onClose, onPublished }) {
   const { createMutation } = useUserStoryMutations();
   const { uploadImageMutation, uploadVideoMutation } = useUploadAssetMutations();
+  const panelRef = useRef(/** @type {HTMLDivElement | null} */ (null));
+  const closeButtonRef = useRef(/** @type {HTMLButtonElement | null} */ (null));
   const imageInputRef = useRef(/** @type {HTMLInputElement | null} */ (null));
   const videoInputRef = useRef(/** @type {HTMLInputElement | null} */ (null));
   const [captionText, setCaptionText] = useState("");
@@ -37,16 +41,34 @@ export function CreateUserStoryModal({ isOpen, onClose, onPublished }) {
     /** @type {'image' | 'video' | null} */ (null),
   );
   const [selectedFile, setSelectedFile] = useState(/** @type {File | null} */ (null));
-  const [isBusy, setIsBusy] = useState(false);
   const [error, setError] = useState("");
+  const { mounted, isVisible } = useCreateUserStoryModalAnimation(isOpen);
 
   const isFormBusy =
-    isBusy ||
     uploadImageMutation.isPending ||
     uploadVideoMutation.isPending ||
     createMutation.isPending;
 
-  useScrollLock(isOpen);
+  useScrollLock(mounted);
+  useDialogFocusTrap(panelRef, {
+    active: isOpen && isVisible,
+    initialFocusRef: closeButtonRef,
+  });
+
+  useEffect(() => {
+    if (!isOpen) {
+      return undefined;
+    }
+
+    const onKeyDown = (event) => {
+      if (event.key === "Escape" && !isFormBusy) {
+        onClose();
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [isFormBusy, isOpen, onClose]);
 
   const resetForm = useCallback(() => {
     if (previewUrl.startsWith("blob:")) {
@@ -59,12 +81,29 @@ export function CreateUserStoryModal({ isOpen, onClose, onPublished }) {
     setError("");
   }, [previewUrl]);
 
+  useEffect(() => {
+    if (!mounted && !isOpen) {
+      resetForm();
+    }
+  }, [isOpen, mounted, resetForm]);
+
   const handleClose = () => {
-    resetForm();
+    if (isFormBusy) {
+      return;
+    }
     onClose();
   };
 
-  const handleImagePick = async (event) => {
+  const replacePreview = (file, nextMediaType) => {
+    if (previewUrl.startsWith("blob:")) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setSelectedFile(file);
+    setMediaType(nextMediaType);
+    setPreviewUrl(URL.createObjectURL(file));
+  };
+
+  const handleImagePick = (event) => {
     const file = event.target.files?.[0];
     event.target.value = "";
     if (!file) {
@@ -78,47 +117,24 @@ export function CreateUserStoryModal({ isOpen, onClose, onPublished }) {
     }
 
     setError("");
-    setIsBusy(true);
-    try {
-      const cropped = await cropImageToAspectRatio(file);
-      if (previewUrl.startsWith("blob:")) {
-        URL.revokeObjectURL(previewUrl);
-      }
-      setSelectedFile(cropped);
-      setMediaType(USER_STORY_MEDIA_TYPE_IMAGE);
-      setPreviewUrl(URL.createObjectURL(cropped));
-    } catch {
-      setError(USER_STORY_UI.ERROR_IMAGE);
-    } finally {
-      setIsBusy(false);
-    }
+    replacePreview(file, USER_STORY_MEDIA_TYPE_IMAGE);
   };
 
-  const handleVideoPick = async (event) => {
+  const handleVideoPick = (event) => {
     const file = event.target.files?.[0];
     event.target.value = "";
     if (!file) {
       return;
     }
 
-    setError("");
-    setIsBusy(true);
-    try {
-      const validationError = await validateStoryVideoFile(file);
-      if (validationError) {
-        setError(validationError);
-        return;
-      }
-
-      if (previewUrl.startsWith("blob:")) {
-        URL.revokeObjectURL(previewUrl);
-      }
-      setSelectedFile(file);
-      setMediaType(USER_STORY_MEDIA_TYPE_VIDEO);
-      setPreviewUrl(URL.createObjectURL(file));
-    } finally {
-      setIsBusy(false);
+    const validationError = validateStoryVideoFile(file);
+    if (validationError) {
+      setError(validationError);
+      return;
     }
+
+    setError("");
+    replacePreview(file, USER_STORY_MEDIA_TYPE_VIDEO);
   };
 
   const handlePublish = async () => {
@@ -146,7 +162,6 @@ export function CreateUserStoryModal({ isOpen, onClose, onPublished }) {
         captionText: caption,
       });
 
-      resetForm();
       onPublished();
       onClose();
     } catch (e) {
@@ -159,120 +174,143 @@ export function CreateUserStoryModal({ isOpen, onClose, onPublished }) {
       return;
     }
 
-    node.muted = false;
+    node.muted = true;
     node.loop = true;
     void node.play().catch(() => {});
   }, []);
 
-  if (!isOpen) {
+  if (!mounted) {
     return null;
   }
 
-  return (
-    <div className="create-user-story-modal__backdrop" role="presentation">
+  const backdropClassName = [
+    "create-user-story-modal__backdrop",
+    isVisible ? "create-user-story-modal__backdrop--open" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  return createPortal(
+    <div className={backdropClassName} role="presentation">
+      <div className="create-user-story-modal__scrim" aria-hidden="true" />
+      <button
+        type="button"
+        className="create-user-story-modal__dismiss"
+        aria-label={USER_STORY_UI.CLOSE}
+        disabled={isFormBusy}
+        onClick={handleClose}
+      />
       <div
+        ref={panelRef}
         className="create-user-story-modal"
         role="dialog"
         aria-modal="true"
         aria-labelledby="create-user-story-title"
       >
-        <header className="create-user-story-modal__header">
-          <h2 id="create-user-story-title" className="create-user-story-modal__title">
-            {USER_STORY_UI.CREATE_TITLE}
-          </h2>
-          <button
-            type="button"
-            className="create-user-story-modal__close"
-            onClick={handleClose}
-            aria-label={USER_STORY_UI.CLOSE}
-          >
-            ×
-          </button>
-        </header>
+        <div className="create-user-story-modal__body">
+          <header className="create-user-story-modal__header">
+            <h2 id="create-user-story-title" className="create-user-story-modal__title">
+              {USER_STORY_UI.CREATE_TITLE}
+            </h2>
+            <button
+              ref={closeButtonRef}
+              type="button"
+              className="create-user-story-modal__close"
+              onClick={handleClose}
+              disabled={isFormBusy}
+            >
+              {USER_STORY_UI.CLOSE}
+            </button>
+          </header>
 
-        <div className="create-user-story-modal__preview">
-          {previewUrl ? (
-            mediaType === USER_STORY_MEDIA_TYPE_VIDEO ? (
-              <video
-                ref={handlePreviewVideoRef}
-                className="create-user-story-modal__media"
-                src={previewUrl}
-                playsInline
-                loop
-              />
+          <div className="create-user-story-modal__preview">
+            {previewUrl ? (
+              mediaType === USER_STORY_MEDIA_TYPE_VIDEO ? (
+                <video
+                  ref={handlePreviewVideoRef}
+                  className="create-user-story-modal__media"
+                  src={previewUrl}
+                  muted
+                  playsInline
+                  loop
+                />
+              ) : (
+                <img className="create-user-story-modal__media" src={previewUrl} alt="" />
+              )
             ) : (
-              <img className="create-user-story-modal__media" src={previewUrl} alt="" />
-            )
-          ) : (
-            <p className="create-user-story-modal__placeholder">
-              {USER_STORY_UI.ERROR_MEDIA_REQUIRED}
+              <p className="create-user-story-modal__placeholder">
+                {USER_STORY_UI.ERROR_MEDIA_REQUIRED}
+              </p>
+            )}
+          </div>
+
+          <div className="create-user-story-modal__pickers">
+            <button
+              type="button"
+              className="create-user-story-modal__pick"
+              disabled={isFormBusy}
+              onClick={() => imageInputRef.current?.click()}
+            >
+              {USER_STORY_UI.PICK_PHOTO}
+            </button>
+            <button
+              type="button"
+              className="create-user-story-modal__pick"
+              disabled={isFormBusy}
+              onClick={() => videoInputRef.current?.click()}
+            >
+              {USER_STORY_UI.PICK_VIDEO}
+            </button>
+            <input
+              ref={imageInputRef}
+              type="file"
+              accept={UPLOAD_FILE_INPUT_ACCEPT}
+              hidden
+              onChange={handleImagePick}
+            />
+            <input
+              ref={videoInputRef}
+              type="file"
+              accept={UPLOAD_VIDEO_FILE_INPUT_ACCEPT}
+              hidden
+              onChange={handleVideoPick}
+            />
+          </div>
+
+          <p className="create-user-story-modal__video-hint">{USER_STORY_UI.VIDEO_DURATION_HINT}</p>
+
+          <label className="create-user-story-modal__caption-label">
+            {USER_STORY_UI.CAPTION_LABEL}
+            <textarea
+              className="create-user-story-modal__caption"
+              value={captionText}
+              onChange={(event) => setCaptionText(event.target.value)}
+              placeholder={USER_STORY_UI.CAPTION_PLACEHOLDER}
+              maxLength={USER_STORY_CAPTION_MAX_CHARS}
+              rows={2}
+              disabled={isFormBusy}
+            />
+          </label>
+
+          {error ? (
+            <p className="create-user-story-modal__error" role="alert">
+              {error}
             </p>
-          )}
+          ) : null}
         </div>
 
-        <div className="create-user-story-modal__pickers">
+        <div className="create-user-story-modal__footer">
           <button
             type="button"
-            className="create-user-story-modal__pick"
+            className="create-user-story-modal__submit"
             disabled={isFormBusy}
-            onClick={() => imageInputRef.current?.click()}
+            onClick={() => void handlePublish()}
           >
-            {USER_STORY_UI.PICK_PHOTO}
+            {isFormBusy ? USER_STORY_UI.PUBLISHING : USER_STORY_UI.PUBLISH}
           </button>
-          <button
-            type="button"
-            className="create-user-story-modal__pick"
-            disabled={isFormBusy}
-            onClick={() => videoInputRef.current?.click()}
-          >
-            {USER_STORY_UI.PICK_VIDEO}
-          </button>
-          <input
-            ref={imageInputRef}
-            type="file"
-            accept={UPLOAD_FILE_INPUT_ACCEPT}
-            hidden
-            onChange={(event) => void handleImagePick(event)}
-          />
-          <input
-            ref={videoInputRef}
-            type="file"
-            accept={UPLOAD_VIDEO_FILE_INPUT_ACCEPT}
-            hidden
-            onChange={(event) => void handleVideoPick(event)}
-          />
         </div>
-
-        <p className="create-user-story-modal__video-hint">{USER_STORY_UI.VIDEO_DURATION_HINT}</p>
-
-        <label className="create-user-story-modal__caption-label">
-          {USER_STORY_UI.CAPTION_LABEL}
-          <textarea
-            className="create-user-story-modal__caption"
-            value={captionText}
-            onChange={(event) => setCaptionText(event.target.value)}
-            placeholder={USER_STORY_UI.CAPTION_PLACEHOLDER}
-            maxLength={USER_STORY_CAPTION_MAX_CHARS}
-            rows={2}
-            disabled={isFormBusy}
-          />
-        </label>
-
-        {error ? (
-          <p className="create-user-story-modal__error" role="alert">
-            {error}
-          </p>
-        ) : null}
-
-        <button
-          type="button"
-          className="create-user-story-modal__submit"
-          disabled={isFormBusy}
-          onClick={() => void handlePublish()}
-        >
-          {isFormBusy ? USER_STORY_UI.PUBLISHING : USER_STORY_UI.PUBLISH}
-        </button>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

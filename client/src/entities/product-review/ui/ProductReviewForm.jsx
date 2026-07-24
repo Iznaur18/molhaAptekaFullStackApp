@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-import { ProductPriceOfferHintMessage } from "../../product-price-offer/ui/ProductPriceOfferHintMessage.jsx";
 import { PRODUCT_REVIEW_TEXT_MAX_LENGTH } from "../model/constants.js";
 import { PRODUCT_REVIEW_UI } from "../../../shared/config/appUiCopy.js";
 import { ProductReviewStars } from "./ProductReviewStars.jsx";
@@ -8,12 +7,13 @@ import { ProductReviewStars } from "./ProductReviewStars.jsx";
 import "./ProductReviewForm.css";
 
 /**
+ * Паритет с mobile composer в `ProductReviewsTab`.
+ *
  * @param {{
  *   initialRating?: number;
  *   initialText?: string;
  *   submitLabel: string;
  *   onSubmit: (payload: { rating: number; text: string }) => Promise<void>;
- *   onDelete?: () => Promise<void>;
  *   isBusy?: boolean;
  *   errorMessage?: string;
  * }} props
@@ -23,7 +23,6 @@ export function ProductReviewForm({
   initialText = "",
   submitLabel,
   onSubmit,
-  onDelete,
   isBusy = false,
   errorMessage = "",
 }) {
@@ -35,21 +34,25 @@ export function ProductReviewForm({
     if (rating < 1 || isBusy) {
       return;
     }
-    await onSubmit({ rating, text: text.trim() });
-  };
-
-  const handleDelete = async () => {
-    if (!onDelete || isBusy) {
-      return;
+    try {
+      await onSubmit({ rating, text: text.trim() });
+      setRating(0);
+      setText("");
+    } catch {
+      /* errorMessage приходит снаружи */
     }
-    await onDelete();
   };
 
   return (
     <form className="product-review-form" onSubmit={handleSubmit}>
       <label className="product-review-form__label">
         {PRODUCT_REVIEW_UI.LABEL_RATING}
-        <ProductReviewStars value={rating} onChange={setRating} disabled={isBusy} />
+        <ProductReviewStars
+          value={rating}
+          onChange={setRating}
+          disabled={isBusy}
+          size="lg"
+        />
       </label>
       <label className="product-review-form__label">
         {PRODUCT_REVIEW_UI.LABEL_TEXT}
@@ -62,35 +65,19 @@ export function ProductReviewForm({
           disabled={isBusy}
           onChange={(event) => setText(event.target.value)}
         />
-        <span className="product-review-form__meter">
-          {PRODUCT_REVIEW_UI.TEXT_CHARS_USED(
-            text.length,
-            PRODUCT_REVIEW_TEXT_MAX_LENGTH,
-          )}
-        </span>
       </label>
       {errorMessage ? (
-        <ProductPriceOfferHintMessage>{errorMessage}</ProductPriceOfferHintMessage>
+        <p className="product-review-form__error" role="alert">
+          {errorMessage}
+        </p>
       ) : null}
-      <div className="product-review-form__actions">
-        <button
-          type="submit"
-          className="product-review-form__submit"
-          disabled={isBusy || rating < 1}
-        >
-          {submitLabel}
-        </button>
-        {onDelete ? (
-          <button
-            type="button"
-            className="product-review-form__delete"
-            disabled={isBusy}
-            onClick={() => void handleDelete()}
-          >
-            {PRODUCT_REVIEW_UI.DELETE}
-          </button>
-        ) : null}
-      </div>
+      <button
+        type="submit"
+        className="app-btn app-btn--contrast product-review-form__submit"
+        disabled={isBusy || rating < 1}
+      >
+        {submitLabel}
+      </button>
     </form>
   );
 }

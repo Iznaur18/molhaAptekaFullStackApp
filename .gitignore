@@ -1,1 +1,44 @@
-node_modules
+# Зависимости
+node_modules/
+
+# Секреты и окружение (примеры остаются в репозитории)
+.env
+.env.*
+!.env.example
+!.env.production.example
+
+# Сборка и вывод
+dist/
+build/
+client/dist/
+*.tsbuildinfo
+
+# Тесты и покрытие
+coverage/
+playwright-report/
+test-results/
+.nyc_output/
+
+# Пользовательские данные и медиа (в т.ч. ПДн)
+server/uploads/
+
+# Логи
+*.log
+npm-debug.log*
+logs/
+
+# Expo (генерируемые артефакты)
+.expo*/
+mobile/.expo*/
+web-build/
+
+# Временные файлы
+tmp/
+*.tmp
+tmp-*.txt
+
+# ОС и редакторы
+.DS_Store
+Thumbs.db
+*.swp
+.idea/

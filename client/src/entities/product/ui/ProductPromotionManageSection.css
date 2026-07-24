@@ -28,10 +28,6 @@
   border-top: none;
 }
 
-.product-promotion-manage .product-edit-manage__title {
-  display: none;
-}
-
 .product-promotion-manage--embedded {
   padding: 0;
   border: none;

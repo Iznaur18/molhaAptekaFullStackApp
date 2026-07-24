@@ -117,10 +117,6 @@ export function RaffleAdvertisingSection({
           <dt>{RAFFLE_ADVERTISING_PAGE_UI.COST_LABEL}</dt>
           <dd>{RAFFLE_ADVERTISING_PAGE_UI.PRICE(pricePoints)}</dd>
         </div>
-        <div className="advertising-page__meta-item">
-          <dt>{RAFFLE_ADVERTISING_PAGE_UI.MODERATION_LABEL}</dt>
-          <dd>{RAFFLE_ADVERTISING_PAGE_UI.MODERATION_VALUE}</dd>
-        </div>
       </dl>
 
       {raffle ? (
