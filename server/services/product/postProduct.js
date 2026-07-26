@@ -104,6 +104,14 @@ const resolveCreateSaleCity = (body) => {
   }
 };
 
+const resolveCreateRegionCode = (body) => {
+  const code = String(body?.productRegionCode ?? "").trim();
+  if (!code) {
+    throwFieldError(new Error("required"), "Укажите регион продажи");
+  }
+  return code;
+};
+
 const resolvePreviewVideo = (body, productImageUrls) => {
   const productPreviewVideoUrl = normalizeProductPreviewVideoUrl(
     body?.productPreviewVideoUrl,
@@ -195,7 +203,8 @@ export async function postProduct({ userId, body }) {
       ? await resolveActiveSellerPersonalCategoryId(userId)
       : null;
 
-  const { productSaleCity, productSaleCityNormalized } = resolveCreateSaleCity(body);
+  const { productSaleCity, productSaleCityNormalized } = resolveCreateSaleCity({});
+  const productRegionCode = resolveCreateRegionCode(body);
 
   const product = await ProductModel.create({
     productName,
@@ -208,6 +217,7 @@ export async function postProduct({ userId, body }) {
     productSeller: userId,
     productSaleCity,
     productSaleCityNormalized,
+    productRegionCode,
     productCategory: categoryWrite.productCategory,
     productCategoryId: categoryWrite.productCategoryId,
     categoryPathIds: categoryWrite.categoryPathIds,

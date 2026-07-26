@@ -28,7 +28,6 @@ export function useCatalogFilterState({
   initialCatalogQuery,
   isAuthorized,
   setIsLoginModalOpen,
-  canModerateProducts,
   setMyProductsModerationFilter,
 }) {
   const [selectedProductCategory, setSelectedProductCategory] = useState(() =>
@@ -44,7 +43,6 @@ export function useCatalogFilterState({
   const [catalogSort, setCatalogSort] = useState(
     () => initialCatalogQuery?.sort ?? CATALOG_SORT_NEWEST,
   );
-  const [showHiddenCatalogProducts, setShowHiddenCatalogProducts] = useState(false);
   const [catalogFollowingOnly, setCatalogFollowingOnly] = useState(
     () => initialCatalogQuery?.followingOnly ?? false,
   );
@@ -92,10 +90,6 @@ export function useCatalogFilterState({
     },
     [catalogAuctionOnly],
   );
-
-  const handleShowHiddenCatalogProductsToggle = useCallback(() => {
-    setShowHiddenCatalogProducts((prev) => !prev);
-  }, []);
 
   const handleCatalogFollowingOnlyToggle = useCallback(() => {
     if (!isAuthorized) {
@@ -173,12 +167,6 @@ export function useCatalogFilterState({
     }
   }, [isMineMode, catalogSort]);
 
-  useEffect(() => {
-    if (!canModerateProducts) {
-      setShowHiddenCatalogProducts(false);
-    }
-  }, [canModerateProducts]);
-
   const resetCatalogFollowingOnLogout = useCallback(() => {
     setCatalogFollowingOnly(false);
   }, []);
@@ -194,7 +182,6 @@ export function useCatalogFilterState({
     setCategoryTreeLabel,
     catalogSort,
     setCatalogSort,
-    showHiddenCatalogProducts,
     catalogFollowingOnly,
     setCatalogFollowingOnly,
     catalogAuctionOnly,
@@ -213,7 +200,6 @@ export function useCatalogFilterState({
     isCatalogBrowserProductsView,
     isCatalogProductsView,
     handleCatalogSortChange,
-    handleShowHiddenCatalogProductsToggle,
     handleCatalogFollowingOnlyToggle,
     handleCatalogAuctionOnlyToggle,
     handleCatalogSaleOnlyToggle,

@@ -12,8 +12,6 @@ const baseInput = {
   selectedProductCategory: null,
   catalogSort: null,
   myProductsModerationFilter: null,
-  canModerateProducts: false,
-  showHiddenCatalogProducts: false,
 };
 
 describe("buildCatalogListQueryParams", () => {
@@ -37,7 +35,6 @@ describe("buildCatalogListQueryParams", () => {
       sellerPersonalCategoryId: null,
       sort: "price_asc",
       moderationStatus: null,
-      includeHidden: null,
       followingOnly: true,
       auctionOnly: true,
       installmentOnly: null,
@@ -53,8 +50,6 @@ describe("buildCatalogListQueryParams", () => {
       selectedProductCategory: "supplements",
       catalogSort: "newest",
       myProductsModerationFilter: "pending",
-      canModerateProducts: true,
-      showHiddenCatalogProducts: true,
     });
 
     expect(params).toEqual({
@@ -65,7 +60,6 @@ describe("buildCatalogListQueryParams", () => {
       sellerPersonalCategoryId: null,
       sort: "newest",
       moderationStatus: "pending",
-      includeHidden: null,
       followingOnly: null,
       auctionOnly: null,
       installmentOnly: null,

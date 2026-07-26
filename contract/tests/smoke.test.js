@@ -146,12 +146,11 @@ test("updateProfileBodySchema accepts handle and stores telegram url", () => {
   assert.equal(parsed.socialWebsiteUrl, null);
 });
 
-test("updateProfileBodySchema rejects raw https for telegram handle fields", () => {
-  assert.throws(() =>
-    updateProfileBodySchema.parse({
-      socialTelegramUrl: "https://t.me/demo",
-    }),
-  );
+test("updateProfileBodySchema accepts https telegram url and stores canonical", () => {
+  const parsed = updateProfileBodySchema.parse({
+    socialTelegramUrl: "https://t.me/demo_user",
+  });
+  assert.equal(parsed.socialTelegramUrl, "https://t.me/demo_user");
 });
 
 test("updateProfileBodySchema rejects invalid social handle", () => {
@@ -186,6 +185,24 @@ test("normalizeSocialLinkToStoredUrl builds whatsapp and reverses", async () => 
   assert.equal(tg.ok, true);
   assert.equal(tg.url, "https://t.me/demo_user");
   assert.equal(storedSocialUrlToInputValue("socialTelegramUrl", tg.url), "demo_user");
+
+  const tgHttps = normalizeSocialLinkToStoredUrl(
+    "socialTelegramUrl",
+    "https://t.me/demo_user",
+  );
+  assert.equal(tgHttps.ok, true);
+  assert.equal(tgHttps.url, "https://t.me/demo_user");
+
+  const igWww = normalizeSocialLinkToStoredUrl(
+    "socialInstagramUrl",
+    "www.instagram.com/demo.user",
+  );
+  assert.equal(igWww.ok, true);
+  assert.equal(igWww.url, "https://instagram.com/demo.user");
+
+  const siteBare = normalizeSocialLinkToStoredUrl("socialWebsiteUrl", "example.com");
+  assert.equal(siteBare.ok, true);
+  assert.equal(siteBare.url, "https://example.com");
 });
 
 test("order query schemas coerce pagination", () => {
@@ -361,9 +378,11 @@ test("createRaffleBodySchema validates image prize raffle", () => {
     targetSales: "100",
     instagramUrl: "https://instagram.com/shop",
     prizeImageUrl: "/uploads/prize.png",
+    regionCode: "RU-MOW",
   });
   assert.equal(parsed.targetSales, 100);
   assert.equal(parsed.prizeMediaType, undefined);
+  assert.equal(parsed.regionCode, "RU-MOW");
 });
 
 test("createRaffleBodySchema allows empty instagramUrl", () => {
@@ -371,6 +390,7 @@ test("createRaffleBodySchema allows empty instagramUrl", () => {
     title: "No IG",
     targetSales: 10,
     prizeImageUrl: "/uploads/prize.png",
+    regionCode: "RU-CE",
   });
   assert.equal(parsed.instagramUrl, "");
 });
@@ -382,6 +402,7 @@ test("createRaffleBodySchema rejects invalid non-empty instagramUrl", () => {
       targetSales: 10,
       instagramUrl: "not-a-url",
       prizeImageUrl: "/uploads/prize.png",
+      regionCode: "RU-MOW",
     }),
   );
 });
@@ -493,8 +514,12 @@ test("createProductBodySchema accepts relative /uploads image urls", () => {
     productIsAvailable: true,
     productCategory: "pharmacy",
     productImageUrls: ["/uploads/photo.webp"],
+    productListingOrigin: "own",
+    productIsOriginal: true,
+    productRegionCode: "RU-MOW",
   });
   assert.deepEqual(parsed.productImageUrls, ["/uploads/photo.webp"]);
+  assert.equal(parsed.productRegionCode, "RU-MOW");
 });
 
 test("createProductBodySchema rejects productName longer than 100 chars", () => {
@@ -506,6 +531,9 @@ test("createProductBodySchema rejects productName longer than 100 chars", () => 
       productIsAvailable: true,
       productCategory: "pharmacy",
       productImageUrls: ["/uploads/photo.webp"],
+      productListingOrigin: "own",
+      productIsOriginal: true,
+      productRegionCode: "RU-MOW",
     });
   });
 });
@@ -518,6 +546,9 @@ test("createProductBodySchema requires at least one product image", () => {
       productPrice: 100,
       productIsAvailable: true,
       productCategory: "pharmacy",
+      productListingOrigin: "own",
+      productIsOriginal: true,
+      productRegionCode: "RU-MOW",
     });
   });
 });
@@ -530,6 +561,9 @@ test("createProductBodySchema requires category id or legacy slug", () => {
       productPrice: 100,
       productIsAvailable: true,
       productImageUrls: ["/uploads/photo.webp"],
+      productListingOrigin: "own",
+      productIsOriginal: true,
+      productRegionCode: "RU-MOW",
     });
   });
 });

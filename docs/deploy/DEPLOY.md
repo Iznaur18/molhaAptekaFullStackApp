@@ -16,7 +16,8 @@
 ## 0. Что нужно заранее
 
 - VPS (Ubuntu 22+), домен → A-запись на IP VPS
-- **MongoDB Atlas** (M0+, replica set) или свой `mongod --replSet`
+- **MongoDB Atlas** (M0+, replica set, **с auth**) или свой `mongod --replSet` с пользователем  
+  — корневой `docker-compose.yml` (Mongo без auth) **только** local/dev, не на VPS
 - Node.js **20 LTS** на VPS
 - nginx + certbot
 

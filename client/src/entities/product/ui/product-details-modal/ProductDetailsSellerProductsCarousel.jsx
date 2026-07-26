@@ -1,7 +1,8 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useUserProfileProductsAllPagesQuery } from "../../../user/model/useUserProfileProductsAllPagesQuery.js";
-import { resolveProductImageUrls } from "../../lib/resolveProductImageUrls.js";
+import { resolveProductImageUrl } from "../../lib/resolveProductImageUrl.js";
 import { navigateToProductDetails } from "../../lib/navigateToProductDetails.js";
 import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../../model/productConstants.js";
 import {
@@ -26,10 +27,12 @@ export function ProductDetailsSellerProductsCarousel({ sellerId, excludeProductI
     userId: sellerId,
     enabled: sellerId.trim().length > 0,
   });
-
-  const items = (productsQuery.data?.items ?? []).filter(
-    (item) => String(item.productId) !== String(excludeProductId).trim(),
+  const [failedThumbIds, setFailedThumbIds] = useState(
+    /** @type {Set<string>} */ () => new Set(),
   );
+
+  const currentProductId = String(excludeProductId).trim();
+  const items = productsQuery.data?.items ?? [];
 
   if (productsQuery.isPending) {
     return null;
@@ -54,12 +57,13 @@ export function ProductDetailsSellerProductsCarousel({ sellerId, excludeProductI
       <div className="product-details-seller-products-carousel__scroll">
         <ul className="product-details-seller-products-carousel__track" role="list">
           {items.map((item) => {
-            const urls = resolveProductImageUrls(
-              /** @type {import('../../model/types.js').ProductFromApi | null} */ (
-                item.product
-              ),
-            );
-            const thumbSrc = urls[0] ?? PRODUCT_IMAGE_PLACEHOLDER_URL;
+            const resolved = resolveProductImageUrl(item.product);
+            const thumbSrc = failedThumbIds.has(item.productId)
+              ? PRODUCT_IMAGE_PLACEHOLDER_URL
+              : resolved || PRODUCT_IMAGE_PLACEHOLDER_URL;
+            const isCurrent =
+              currentProductId.length > 0 &&
+              String(item.productId) === currentProductId;
             const isUnavailable = !item.viewable || item.product == null;
 
             return (
@@ -68,6 +72,9 @@ export function ProductDetailsSellerProductsCarousel({ sellerId, excludeProductI
                   type="button"
                   className={[
                     "product-details-seller-products-carousel__thumb-btn",
+                    isCurrent
+                      ? "product-details-seller-products-carousel__thumb-btn--current"
+                      : "",
                     isUnavailable
                       ? "product-details-seller-products-carousel__thumb-btn--unavailable"
                       : "",
@@ -75,9 +82,10 @@ export function ProductDetailsSellerProductsCarousel({ sellerId, excludeProductI
                     .filter(Boolean)
                     .join(" ")}
                   aria-label={item.productName || USER_PROFILE_PRODUCTS_UI.UNAVAILABLE}
-                  disabled={isUnavailable}
+                  aria-current={isCurrent ? "page" : undefined}
+                  disabled={isUnavailable || isCurrent}
                   onClick={() => {
-                    if (isUnavailable || item.product == null) {
+                    if (isUnavailable || isCurrent || item.product == null) {
                       return;
                     }
                     navigateToProductDetails(navigate, item.product);
@@ -91,6 +99,14 @@ export function ProductDetailsSellerProductsCarousel({ sellerId, excludeProductI
                     height={THUMB_SIZE_PX}
                     loading="lazy"
                     decoding="async"
+                    onError={() => {
+                      setFailedThumbIds((prev) => {
+                        if (prev.has(item.productId)) return prev;
+                        const next = new Set(prev);
+                        next.add(item.productId);
+                        return next;
+                      });
+                    }}
                   />
                 </button>
               </li>

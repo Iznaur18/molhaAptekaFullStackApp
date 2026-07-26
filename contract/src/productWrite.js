@@ -1,6 +1,8 @@
 import { z } from "zod";
 
-import { productSaleCityFieldSchema } from "./addressStructured.js";
+import {
+  requiredRuRegionCodeFieldSchema,
+} from "./ruRegions.js";
 import { mongoIdSchema } from "./mongoId.js";
 import { PRODUCT_MODERATION_STATUSES, productFromApiSchema } from "./productFromApi.js";
 import { storedMediaUrlOrEmptySchema, storedMediaUrlSchema } from "./storedMediaUrl.js";
@@ -217,7 +219,7 @@ export const createProductBodySchema = z
       .array(productReturnTermSchema)
       .max(PRODUCT_RETURN_TERMS_MAX_ITEMS)
       .optional(),
-    productSaleCity: productSaleCityFieldSchema,
+    productRegionCode: requiredRuRegionCodeFieldSchema,
   })
   .superRefine(assertCategoryIdOrLegacy)
   .superRefine(assertCreateProductRequiresPhoto)
@@ -259,7 +261,7 @@ const patchFieldShape = {
     .array(productReturnTermSchema)
     .max(PRODUCT_RETURN_TERMS_MAX_ITEMS)
     .optional(),
-  productSaleCity: productSaleCityFieldSchema,
+  productRegionCode: requiredRuRegionCodeFieldSchema.optional(),
 };
 
 const PATCH_BODY_KEYS = Object.keys(patchFieldShape);

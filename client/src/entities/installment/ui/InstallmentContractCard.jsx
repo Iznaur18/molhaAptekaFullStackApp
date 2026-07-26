@@ -2,6 +2,7 @@ import { useInstallmentContractCard } from "../model/useInstallmentContractCard.
 import { contractNeedsBuyerAttention } from "../lib/contractNeedsBuyerAttention.js";
 import { contractNeedsSellerAttention } from "../lib/contractNeedsSellerAttention.js";
 import { INSTALLMENT_CONTRACT_STATUS_COMPLETED } from "../model/constants.js";
+import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../../product/model/productConstants.js";
 import { INSTALLMENT_UI } from "../../../shared/config/appUiCopy.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 import { resolveImageUrlForDisplay } from "../../../shared/lib/resolveUploadedImageUrl.js";
@@ -19,8 +20,8 @@ import "./InstallmentContractCard.css";
  */
 function renderProductTitle(contract, onProductClick) {
   const title = contract.productNameAtContract;
-  const imageUrl = resolveImageUrlForDisplay(String(contract.productImageUrl ?? "").trim());
-  const hasImage = Boolean(imageUrl);
+  const resolved = resolveImageUrlForDisplay(String(contract.productImageUrl ?? "").trim());
+  const imageUrl = resolved || PRODUCT_IMAGE_PLACEHOLDER_URL;
   const titleClass = onProductClick
     ? "installment-contract-card__title installment-contract-card__title_link"
     : "installment-contract-card__title";
@@ -50,17 +51,13 @@ function renderProductTitle(contract, onProductClick) {
 
   return (
     <div className="installment-contract-card__product">
-      {hasImage ? (
-        <img
-          className="installment-contract-card__thumb"
-          src={imageUrl}
-          alt=""
-          loading="lazy"
-          decoding="async"
-        />
-      ) : (
-        <span className="installment-contract-card__thumb installment-contract-card__thumb_empty" aria-hidden="true" />
-      )}
+      <img
+        className="installment-contract-card__thumb"
+        src={imageUrl}
+        alt=""
+        loading="lazy"
+        decoding="async"
+      />
       {titleNode}
     </div>
   );

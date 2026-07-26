@@ -7,12 +7,11 @@ import {
   PRODUCT_SORT_CONFIRMED,
   PRODUCT_SORT_PREMIUM,
   PRODUCT_SORT_REVIEWS,
-  PRODUCT_SORT_CITY,
 } from "../../constants/productCatalogSort.js";
 import {
-  buildProductSaleCityMatch,
-  resolveBuyerCityFilter,
-} from "../user/userCityCatalogFilter.js";
+  buildProductRegionMatch,
+  resolveViewerRegionCodeForRequest,
+} from "../user/userRegionCatalogFilter.js";
 import { getHiddenSellerIds, isUserStaff } from "../access/adminUserGuard.js";
 import { getConfirmedSellerIds } from "./confirmedSellerCatalog.js";
 import {
@@ -156,15 +155,11 @@ async function loadCatalogProducts({ userId, query }) {
     catalogBaseQuery.productStockQuantity = { $gt: 0 };
   }
 
-  const buyerCity = await resolveBuyerCityFilter(userId);
-  const allCities = parseTruthyQueryFlag(query.allCities);
-  const applyBuyerCityFilter =
-    Boolean(buyerCity) && sort !== PRODUCT_SORT_CITY && !allCities;
-  const buyerCityMatch =
-    applyBuyerCityFilter && buyerCity ? buildProductSaleCityMatch(buyerCity) : null;
-  if (buyerCityMatch) {
-    catalogBaseQuery.$and = [...(catalogBaseQuery.$and ?? []), buyerCityMatch];
-  }
+  const viewerRegionCode = await resolveViewerRegionCodeForRequest({
+    userId,
+    queryRegionCode: query.regionCode,
+  });
+  Object.assign(catalogBaseQuery, buildProductRegionMatch(viewerRegionCode));
 
   if (premiumOnly) {
     const premiumSellerIds = filterSellerIdsExcludingHidden(
@@ -214,7 +209,7 @@ async function loadCatalogProducts({ userId, query }) {
     return emptyCatalogPage(page, limit);
   }
 
-  const catalogSortBuyerCity = sort === PRODUCT_SORT_CITY ? buyerCity : null;
+  const catalogSortBuyerCity = null;
 
   const [products, total] = await Promise.all([
     findCatalogProductsPage(catalogSearchResult, sort, skip, limit, catalogSortBuyerCity),

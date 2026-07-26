@@ -208,6 +208,18 @@ export const useAddToCartButtonStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
   },
+  detailDockGoToCartButton: {
+    marginTop: 0,
+    width: "100%",
+    minHeight: 48,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: theme.colors.success,
+    backgroundColor: theme.colors.success,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   detailDockAddButtonText: {
     color: theme.colors.onContrast,
     fontWeight: "600",

@@ -433,10 +433,17 @@ export const getFeaturedSiteRaffle = async () => {
   return rows[0] ?? null;
 };
 
-export const getFeaturedSiteRaffles = async () => {
+export const getFeaturedSiteRaffles = async (viewerRegionCode) => {
   await purgeExpiredCompletedRaffles();
 
-  const actives = await RaffleModel.find({ status: RAFFLE_STATUS_ACTIVE })
+  const regionFilter = viewerRegionCode
+    ? { regionCode: String(viewerRegionCode).trim() }
+    : {};
+
+  const actives = await RaffleModel.find({
+    status: RAFFLE_STATUS_ACTIVE,
+    ...regionFilter,
+  })
     .sort({ approvedAt: -1 })
     .limit(SITE_RAFFLES_ACTIVE_VITRINE_MAX)
     .lean();
@@ -458,6 +465,7 @@ export const getFeaturedSiteRaffles = async () => {
   const completed = await RaffleModel.find({
     status: RAFFLE_STATUS_COMPLETED,
     completedAt: { $gt: completedCutoff },
+    ...regionFilter,
   })
     .sort({ completedAt: -1 })
     .limit(SITE_RAFFLES_COMPLETED_VITRINE_MAX)

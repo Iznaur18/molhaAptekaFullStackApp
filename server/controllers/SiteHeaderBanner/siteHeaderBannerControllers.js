@@ -20,15 +20,22 @@ const normalizeOptionalString = (value) => {
 };
 
 /** GET /site-header-banner */
-export const getSiteHeaderBannerSlidesController = async (_req, res) => {
+export const getSiteHeaderBannerSlidesController = async (req, res) => {
   const row = await SiteHeaderBannerSettingsModel.findOne({
     settingsKey: SITE_HEADER_BANNER_SETTINGS_KEY,
   }).lean();
 
   const settingsPayload = resolveSiteHeaderBannerSettingsPayload(row);
+  const { resolveViewerRegionCodeForRequest } = await import(
+    "../../services/user/userRegionCatalogFilter.js"
+  );
+  const viewerRegionCode = await resolveViewerRegionCodeForRequest({
+    userId: req.userId,
+    queryRegionCode: req.query.regionCode,
+  });
 
   return successRes(res, {
-    slides: await resolveMergedPublicSiteHeaderBannerSlides(row),
+    slides: await resolveMergedPublicSiteHeaderBannerSlides(row, viewerRegionCode),
     guestProfileLoginMenuBannerImageUrl:
       settingsPayload.guestProfileLoginMenuBannerImageUrl,
   });

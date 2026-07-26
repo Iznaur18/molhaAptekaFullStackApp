@@ -23,6 +23,7 @@ import { checkAuthMW, checkProductModeratorMW } from "../middlewares/index.js";
 import {
   installmentContractIdParamValidation,
   installmentPaymentIndexParamValidation,
+  installmentIdempotencyBodyValidation,
   installmentSellerMessageValidation,
   installmentDisputeValidation,
   installmentDisputeIdParamValidation,
@@ -61,42 +62,49 @@ router.patch(
   "/contracts/:contractId/payments/:paymentIndex/mark-paid",
   checkAuthMW,
   installmentPaymentIndexParamValidation,
+  installmentIdempotencyBodyValidation,
   markInstallmentPaymentPaidController,
 );
 router.patch(
   "/contracts/:contractId/payments/:paymentIndex/confirm",
   checkAuthMW,
   installmentPaymentIndexParamValidation,
+  installmentIdempotencyBodyValidation,
   confirmInstallmentPaymentController,
 );
 router.patch(
   "/contracts/:contractId/payments/:paymentIndex/reject",
   checkAuthMW,
   installmentPaymentIndexParamValidation,
+  installmentIdempotencyBodyValidation,
   rejectInstallmentPaymentController,
 );
 router.patch(
   "/contracts/:contractId/pay-early",
   checkAuthMW,
   installmentContractIdParamValidation,
+  installmentIdempotencyBodyValidation,
   markInstallmentEarlyPayoffController,
 );
 router.patch(
   "/contracts/:contractId/pay-early/cancel",
   checkAuthMW,
   installmentContractIdParamValidation,
+  installmentIdempotencyBodyValidation,
   cancelInstallmentEarlyPayoffController,
 );
 router.patch(
   "/contracts/:contractId/pay-early/reject",
   checkAuthMW,
   installmentContractIdParamValidation,
+  installmentIdempotencyBodyValidation,
   rejectInstallmentEarlyPayoffController,
 );
 router.patch(
   "/contracts/:contractId/pay-early/confirm",
   checkAuthMW,
   installmentContractIdParamValidation,
+  installmentIdempotencyBodyValidation,
   confirmInstallmentEarlyPayoffController,
 );
 router.patch(

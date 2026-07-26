@@ -107,6 +107,7 @@ import {
   installmentDisputeIdParamValidation,
   resolveInstallmentDisputeValidation,
   installmentCancelValidation,
+  installmentIdempotencyBodyValidation,
 } from "./product/installmentValidation.js";
 import {
   getMyInstallmentContractsListValidation,
@@ -197,6 +198,7 @@ export {
   installmentDisputeIdParamValidation,
   resolveInstallmentDisputeValidation,
   installmentCancelValidation,
+  installmentIdempotencyBodyValidation,
   getMyInstallmentContractsListValidation,
   getMyInstallmentSalesValidation,
   staffAuditListValidation,

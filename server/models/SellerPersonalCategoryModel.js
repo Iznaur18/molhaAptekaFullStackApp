@@ -25,6 +25,12 @@ const SellerPersonalCategorySchema = new mongoose.Schema(
       trim: true,
       maxlength: SELLER_PERSONAL_CATEGORY_IMAGE_URL_MAX_LENGTH,
     },
+    regionCode: {
+      type: String,
+      trim: true,
+      default: "RU-MOW",
+      index: true,
+    },
     activeUntil: {
       type: Date,
       default: null,

@@ -88,6 +88,12 @@ const RaffleSchema = new Schema(
       trim: true,
       maxlength: 500,
     },
+    regionCode: {
+      type: String,
+      trim: true,
+      default: "RU-MOW",
+      index: true,
+    },
     status: {
       type: String,
       enum: RAFFLE_STATUSES,

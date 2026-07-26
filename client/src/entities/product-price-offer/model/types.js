@@ -3,7 +3,12 @@
  * @property {string} _id
  * @property {string} productName
  * @property {string | null} [productImageUrl]
+ * @property {string[]} [productImageUrls]
  * @property {boolean} [auctionActive]
+ */
+
+/**
+ * @typedef {PriceOfferDashboardProduct} PriceOfferProductPreview
  */
 
 /**

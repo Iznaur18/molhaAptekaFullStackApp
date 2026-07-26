@@ -19,7 +19,6 @@ import {
   connectMongoTestReplSet,
   disconnectMongoTestReplSet,
 } from "./helpers/mongoTestDb.js";
-import { resolveUserAddressCityNormalized } from "../services/product/ruCityNormalized.js";
 
 process.env.JWT_SECRET =
   process.env.JWT_SECRET ?? "integration-test-jwt-secret-min-32-chars";
@@ -63,11 +62,11 @@ const seedCuratedFixture = async () => {
 
   const moscowProduct = await createProductViaApi(request, sellerCookie, {
     productName: "Curated Moscow",
-    productSaleCity: "г Москва",
+    productRegionCode: "RU-MOW",
   });
-  const kazanProduct = await createProductViaApi(request, sellerCookie, {
-    productName: "Curated Kazan",
-    productSaleCity: "Казань",
+  const chechnyaProduct = await createProductViaApi(request, sellerCookie, {
+    productName: "Curated Chechnya",
+    productRegionCode: "RU-CE",
   });
 
   const { cookie: modCookie, user: modUser } = await registerUserAndGetCookie(
@@ -76,7 +75,7 @@ const seedCuratedFixture = async () => {
   );
   await setUserRole(modUser._id, "moderator");
   await approveProductViaApi(request, modCookie, String(moscowProduct._id));
-  await approveProductViaApi(request, modCookie, String(kazanProduct._id));
+  await approveProductViaApi(request, modCookie, String(chechnyaProduct._id));
 
   const { cookie: buyerCookie, user: buyer } = await registerUserAndGetCookie(
     request,
@@ -84,8 +83,7 @@ const seedCuratedFixture = async () => {
   );
   await verifyUserEmail("int-curated-buyer@example.com");
   await UserModel.findByIdAndUpdate(buyer._id, {
-    userAddressCity: "Москва",
-    userAddressCityNormalized: resolveUserAddressCityNormalized("Москва"),
+    userRegionCode: "RU-MOW",
   });
 
   return {
@@ -93,7 +91,7 @@ const seedCuratedFixture = async () => {
     buyerCookie,
     productIds: {
       moscow: String(moscowProduct._id),
-      kazan: String(kazanProduct._id),
+      chechnya: String(chechnyaProduct._id),
     },
   };
 };
@@ -159,7 +157,7 @@ test("curated lists: admin CRUD, duplicate reject, reorder requires full set", a
   assert.equal(fullReorder.status, 200);
 });
 
-test("curated lists home: city filter for buyer and allCities bypass", async () => {
+test("curated lists home: region filter for buyer and query override", async () => {
   const { adminCookie, buyerCookie, productIds } = await seedCuratedFixture();
   const list = await createCuratedList(adminCookie, "Подборка");
 
@@ -180,7 +178,7 @@ test("curated lists home: city filter for buyer and allCities bypass", async () 
         "Content-Type": "application/json",
         Cookie: adminCookie,
       },
-      body: JSON.stringify({ productId: productIds.kazan }),
+      body: JSON.stringify({ productId: productIds.chechnya }),
     }),
   );
 
@@ -195,12 +193,13 @@ test("curated lists home: city filter for buyer and allCities bypass", async () 
     [productIds.moscow],
   );
 
-  const allCitiesData = await parseSuccessData(
-    await request("/product/curated-lists/home?allCities=true", {
+  const chechnyaData = await parseSuccessData(
+    await request("/product/curated-lists/home?regionCode=RU-CE", {
       headers: { Cookie: buyerCookie },
     }),
   );
-  assert.equal(allCitiesData.lists[0].products.length, 2);
+  assert.equal(chechnyaData.lists[0].products.length, 1);
+  assert.equal(String(chechnyaData.lists[0].products[0]._id), productIds.chechnya);
 });
 
 test("curated lists home: autopurge removes unavailable product ids", async () => {
@@ -218,10 +217,10 @@ test("curated lists home: autopurge removes unavailable product ids", async () =
     }),
   );
 
-  await ProductModel.findByIdAndUpdate(productIds.kazan, { productIsAvailable: false });
+  await ProductModel.findByIdAndUpdate(productIds.chechnya, { productIsAvailable: false });
   await CuratedProductListModel.updateOne(
     { _id: list._id },
-    { $set: { productIds: [productIds.moscow, productIds.kazan] } },
+    { $set: { productIds: [productIds.moscow, productIds.chechnya] } },
   );
 
   const homeData = await parseSuccessData(await request("/product/curated-lists/home"));

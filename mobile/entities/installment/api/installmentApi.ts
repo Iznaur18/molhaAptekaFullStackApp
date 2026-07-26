@@ -147,10 +147,19 @@ export const fetchMyInstallmentSales = async (status?: string) => {
   }
 };
 
-export const markInstallmentPaymentPaid = async (contractId: string, paymentIndex: number) => {
+export const markInstallmentPaymentPaid = async (
+  contractId: string,
+  paymentIndex: number,
+  idempotencyKey?: string,
+) => {
   try {
+    const body: { idempotencyKey?: string } = {};
+    if (idempotencyKey) {
+      body.idempotencyKey = idempotencyKey;
+    }
     const { data } = await apiClient.patch(
       `/installment/contracts/${contractId}/payments/${paymentIndex}/mark-paid`,
+      body,
     );
     if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
@@ -161,10 +170,19 @@ export const markInstallmentPaymentPaid = async (contractId: string, paymentInde
   }
 };
 
-export const confirmInstallmentPayment = async (contractId: string, paymentIndex: number) => {
+export const confirmInstallmentPayment = async (
+  contractId: string,
+  paymentIndex: number,
+  idempotencyKey?: string,
+) => {
   try {
+    const body: { idempotencyKey?: string } = {};
+    if (idempotencyKey) {
+      body.idempotencyKey = idempotencyKey;
+    }
     const { data } = await apiClient.patch(
       `/installment/contracts/${contractId}/payments/${paymentIndex}/confirm`,
+      body,
     );
     if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
@@ -175,10 +193,19 @@ export const confirmInstallmentPayment = async (contractId: string, paymentIndex
   }
 };
 
-export const rejectInstallmentPayment = async (contractId: string, paymentIndex: number) => {
+export const rejectInstallmentPayment = async (
+  contractId: string,
+  paymentIndex: number,
+  idempotencyKey?: string,
+) => {
   try {
+    const body: { idempotencyKey?: string } = {};
+    if (idempotencyKey) {
+      body.idempotencyKey = idempotencyKey;
+    }
     const { data } = await apiClient.patch(
       `/installment/contracts/${contractId}/payments/${paymentIndex}/reject`,
+      body,
     );
     if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
@@ -189,9 +216,19 @@ export const rejectInstallmentPayment = async (contractId: string, paymentIndex:
   }
 };
 
-export const markInstallmentEarlyPayoff = async (contractId: string) => {
+export const markInstallmentEarlyPayoff = async (
+  contractId: string,
+  idempotencyKey?: string,
+) => {
   try {
-    const { data } = await apiClient.patch(`/installment/contracts/${contractId}/pay-early`);
+    const body: { idempotencyKey?: string } = {};
+    if (idempotencyKey) {
+      body.idempotencyKey = idempotencyKey;
+    }
+    const { data } = await apiClient.patch(
+      `/installment/contracts/${contractId}/pay-early`,
+      body,
+    );
     if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
@@ -201,10 +238,18 @@ export const markInstallmentEarlyPayoff = async (contractId: string) => {
   }
 };
 
-export const confirmInstallmentEarlyPayoff = async (contractId: string) => {
+export const confirmInstallmentEarlyPayoff = async (
+  contractId: string,
+  idempotencyKey?: string,
+) => {
   try {
+    const body: { idempotencyKey?: string } = {};
+    if (idempotencyKey) {
+      body.idempotencyKey = idempotencyKey;
+    }
     const { data } = await apiClient.patch(
       `/installment/contracts/${contractId}/pay-early/confirm`,
+      body,
     );
     if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
@@ -215,10 +260,18 @@ export const confirmInstallmentEarlyPayoff = async (contractId: string) => {
   }
 };
 
-export const cancelInstallmentEarlyPayoff = async (contractId: string) => {
+export const cancelInstallmentEarlyPayoff = async (
+  contractId: string,
+  idempotencyKey?: string,
+) => {
   try {
+    const body: { idempotencyKey?: string } = {};
+    if (idempotencyKey) {
+      body.idempotencyKey = idempotencyKey;
+    }
     const { data } = await apiClient.patch(
       `/installment/contracts/${contractId}/pay-early/cancel`,
+      body,
     );
     if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
@@ -229,10 +282,18 @@ export const cancelInstallmentEarlyPayoff = async (contractId: string) => {
   }
 };
 
-export const rejectInstallmentEarlyPayoff = async (contractId: string) => {
+export const rejectInstallmentEarlyPayoff = async (
+  contractId: string,
+  idempotencyKey?: string,
+) => {
   try {
+    const body: { idempotencyKey?: string } = {};
+    if (idempotencyKey) {
+      body.idempotencyKey = idempotencyKey;
+    }
     const { data } = await apiClient.patch(
       `/installment/contracts/${contractId}/pay-early/reject`,
+      body,
     );
     if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);

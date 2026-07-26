@@ -6,6 +6,7 @@
   "exports": {
     ".": "./src/index.js",
     "./types": "./src/apiTypes.js",
+    "./ruRegions.json": "./src/ruRegions.json",
     "./openapi.yaml": "./openapi.yaml"
   },
   "scripts": {

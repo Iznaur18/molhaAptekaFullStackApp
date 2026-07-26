@@ -1,3 +1,5 @@
+import { isRuRegionCode } from "@molha/api-contract";
+
 import { findSellerPersonalCategoryDuration } from "../../constants/sellerPersonalCategoryConstants.js";
 import { AppError } from "../../errors/AppError.js";
 import { assertSellerPersonalCategoryImageUrlIsUploadedAsset } from "./validateSellerPersonalCategoryImageUrl.js";
@@ -9,12 +11,16 @@ export const parseSellerPersonalCategorySubmitBody = (body) => {
   const labelRu = String(body?.labelRu ?? "").trim();
   const imageUrl = String(body?.imageUrl ?? "").trim();
   const tariffCode = String(body?.tariffCode ?? "").trim();
+  const regionCode = String(body?.regionCode ?? "").trim();
 
   if (!labelRu) {
     throw new AppError(400, "Укажите название категории");
   }
   if (!tariffCode) {
     throw new AppError(400, "Выберите срок");
+  }
+  if (!isRuRegionCode(regionCode)) {
+    throw new AppError(400, "Укажите регион из списка");
   }
 
   try {
@@ -41,6 +47,7 @@ export const parseSellerPersonalCategorySubmitBody = (body) => {
     labelRu,
     imageUrl,
     tariffCode,
+    regionCode,
     durationHours: duration.durationHours,
     amountPoints: duration.pricePoints,
   };

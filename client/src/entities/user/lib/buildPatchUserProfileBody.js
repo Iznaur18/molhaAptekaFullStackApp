@@ -120,7 +120,8 @@ export function buildPatchUserProfileBody(form, options = {}) {
     if (!normalized.ok) {
       throw new Error(normalized.message);
     }
-    body[fieldId] = normalized.url;
+    // API ждёт ник/телефон (не готовый https) — нормализацию делает `updateProfileBodySchema`.
+    body[fieldId] = link;
   }
 
   if (includePremium) {

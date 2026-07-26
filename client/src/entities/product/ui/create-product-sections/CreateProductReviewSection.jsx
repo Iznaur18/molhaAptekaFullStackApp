@@ -1,3 +1,5 @@
+import { getRuRegionByCode } from "@molha/api-contract";
+
 import { urlsFromImageRows } from "../../lib/productImageRowHelpers.js";
 import { serializeProductReturnTermRows } from "../../lib/productReturnTermRows.js";
 import { CREATE_PRODUCT_MODAL_UI } from "../../../../shared/config/appUiCopy.js";
@@ -67,8 +69,10 @@ export function CreateProductReviewSection({
       stepIndex: 3,
     },
     {
-      label: CREATE_PRODUCT_MODAL_UI.LABEL_SALE_CITY,
-      value: String(form.productSaleCity ?? "").trim() || CREATE_PRODUCT_MODAL_UI.WIZARD_REVIEW_ALL_CITIES,
+      label: CREATE_PRODUCT_MODAL_UI.LABEL_SALE_REGION,
+      value:
+        getRuRegionByCode(String(form.productRegionCode ?? "").trim())?.name ||
+        CREATE_PRODUCT_MODAL_UI.WIZARD_REVIEW_EMPTY,
       stepIndex: 3,
     },
     {

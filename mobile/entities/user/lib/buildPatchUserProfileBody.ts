@@ -140,7 +140,8 @@ export const buildPatchUserProfileBody = (
     if (!normalized.ok) {
       throw new Error(normalized.message);
     }
-    body[fieldId] = normalized.url;
+    // API ждёт ник/телефон (не готовый https) — нормализацию делает серверный schema.
+    body[fieldId] = next;
   }
 
   return body;

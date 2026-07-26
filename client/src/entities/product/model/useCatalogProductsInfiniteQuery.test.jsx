@@ -39,8 +39,6 @@ const baseParams = {
   selectedProductCategory: null,
   catalogSort: null,
   myProductsModerationFilter: null,
-  canModerateProducts: false,
-  showHiddenCatalogProducts: false,
 };
 
 describe("useCatalogProductsInfiniteQuery", () => {

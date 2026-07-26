@@ -9,6 +9,7 @@ import {
   UPLOAD_OBJECT_KEY_PREFIX,
   UPLOAD_STORAGE_S3,
 } from "../../constants/uploadStorageConstants.js";
+import { buildS3ServerSideEncryptionParams } from "./buildS3ServerSideEncryptionParams.js";
 import { buildUploadFilename } from "./buildUploadFilename.js";
 import { resolveUploadContentType } from "./resolveUploadContentType.js";
 
@@ -113,6 +114,7 @@ export const persistUploadToObjectStorage = async (file) => {
       Key: key,
       Body: body,
       ContentType: resolveUploadContentType(filename, file.mimetype),
+      ...buildS3ServerSideEncryptionParams(),
     }),
   );
 
@@ -142,6 +144,7 @@ export const persistPrivateUploadToObjectStorage = async (file) => {
       Key: key,
       Body: body,
       ContentType: resolveUploadContentType(filename, file.mimetype),
+      ...buildS3ServerSideEncryptionParams(),
     }),
   );
 
@@ -269,6 +272,13 @@ export const validateObjectStorageEnv = () => {
   if (base && !base.startsWith("https://")) {
     warnings.push(
       "PUBLIC_UPLOAD_BASE_URL без https:// — CDN для медиа в production должен быть HTTPS",
+    );
+  }
+
+  const sse = String(process.env.S3_SERVER_SIDE_ENCRYPTION ?? "").trim();
+  if (process.env.NODE_ENV === "production" && !sse) {
+    warnings.push(
+      "S3_SERVER_SIDE_ENCRYPTION не задан — для AWS S3 задайте AES256 (или aws:kms); Cloudflare R2 шифрует at rest по умолчанию",
     );
   }
 

@@ -33,6 +33,7 @@ export const toSellerPersonalCategoryCampaignPayload = (row) => ({
   labelRu: row?.labelRu ?? null,
   imageUrl: row?.imageUrl ?? null,
   tariffCode: row?.tariffCode ?? null,
+  regionCode: row?.regionCode ?? null,
   durationHours: row?.durationHours ?? null,
   amountPoints: row?.amountPoints ?? null,
   pointsReservedAt: row?.pointsReservedAt ?? null,
@@ -58,6 +59,7 @@ export const toSellerPersonalCategoryTilePayload = (row) => ({
   sellerId: String(row?.sellerId),
   labelRu: row?.labelRu ?? "",
   imageUrl: row?.imageUrl ?? null,
+  regionCode: row?.regionCode ?? null,
   activeUntil: row?.activeUntil ?? null,
 });
 
@@ -167,6 +169,7 @@ export const activateSellerPersonalCategoryCampaign = async ({
         sellerId: campaign.sellerId,
         labelRu: campaign.labelRu,
         imageUrl: campaign.imageUrl,
+        regionCode: campaign.regionCode,
         activeUntil,
         activeCampaignId: campaign._id,
       },

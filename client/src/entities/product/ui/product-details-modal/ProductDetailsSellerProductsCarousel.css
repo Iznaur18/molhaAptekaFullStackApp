@@ -76,6 +76,12 @@
   cursor: pointer;
 }
 
+.product-details-seller-products-carousel__thumb-btn--current {
+  outline: 2px solid var(--iz-color-action);
+  outline-offset: 1px;
+  cursor: default;
+}
+
 .product-details-seller-products-carousel__thumb-btn--unavailable {
   opacity: 0.72;
   cursor: default;

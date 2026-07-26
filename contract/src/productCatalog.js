@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { paginationSchema } from "./pagination.js";
 import { productFromApiSchema } from "./productFromApi.js";
+import { optionalRuRegionCodeFieldSchema } from "./ruRegions.js";
 
 export const PRODUCT_CATALOG_SORT_VALUES = [
   "newest",
@@ -87,6 +88,7 @@ export const catalogProductsQuerySchema = z.object({
   installmentOnly: optionalTruthyFlag,
   saleOnly: optionalTruthyFlag,
   moderationStatus: z.enum(["pending", "rejected"]).optional(),
+  regionCode: optionalRuRegionCodeFieldSchema,
 });
 
 export const catalogProductsPageDataSchema = z.object({

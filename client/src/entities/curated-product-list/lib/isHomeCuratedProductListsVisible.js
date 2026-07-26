@@ -9,7 +9,6 @@
  *   catalogAuctionOnly: boolean;
  *   catalogInstallmentOnly: boolean;
  *   catalogSaleOnly: boolean;
- *   showHiddenCatalogProducts: boolean;
  * }} params
  */
 export function isHomeCuratedProductListsVisible({
@@ -23,7 +22,6 @@ export function isHomeCuratedProductListsVisible({
   catalogAuctionOnly,
   catalogInstallmentOnly,
   catalogSaleOnly,
-  showHiddenCatalogProducts,
 }) {
   return (
     isHomeCatalogMainView &&
@@ -35,7 +33,6 @@ export function isHomeCuratedProductListsVisible({
     !catalogFollowingOnly &&
     !catalogAuctionOnly &&
     !catalogInstallmentOnly &&
-    !catalogSaleOnly &&
-    !showHiddenCatalogProducts
+    !catalogSaleOnly
   );
 }

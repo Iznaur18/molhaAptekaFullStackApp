@@ -1,6 +1,6 @@
 import {
+  isStoredUploadOrHttpImageUrl,
   resolveImageUrlForDisplay,
-  isHttpImageUrl,
 } from "../../../shared/lib/resolveUploadedImageUrl.js";
 
 /**
@@ -9,8 +9,9 @@ import {
  */
 export function pickUserProfileBackgroundUrl(user) {
   if (!user) return null;
-  if (isHttpImageUrl(user.userBackgroundUrl)) {
-    return resolveImageUrlForDisplay(user.userBackgroundUrl);
+  const raw = String(user.userBackgroundUrl ?? "").trim();
+  if (raw && isStoredUploadOrHttpImageUrl(raw)) {
+    return resolveImageUrlForDisplay(raw);
   }
   return null;
 }

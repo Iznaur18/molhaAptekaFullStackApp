@@ -105,7 +105,8 @@
 
 ### Docker на фазе 0
 
-**Не нужен** для prod. `docker-compose.yml` — локальная Mongo RS для dev/CI.
+**Не нужен** для prod. `docker-compose.yml` — локальная Mongo RS **без auth** для dev/CI.  
+Production: Atlas (`mongodb+srv` + credentials); `assertProductionEnv` режет localhost / URI без auth.
 
 **Выход из фазы 0:** prod работает 7+ дней, smoke зелёный, Sentry ловит ошибки, есть план бэкапа.
 

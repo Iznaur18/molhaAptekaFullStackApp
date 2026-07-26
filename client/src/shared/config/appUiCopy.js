@@ -445,7 +445,6 @@ export const HOME_PAGE_UI = {
     `Фильтр по категории: ${categoryLabel}`,
   SORT_LABEL: "Сортировка",
   MODERATION_STATUS_FILTER_LABEL: "Статус",
-  SHOW_HIDDEN_PRODUCTS: "Показывать скрытые товары",
   CATEGORY_ALL: "Все категории",
   EMPTY_MY_BY_MODERATION_STATUS: "Нет товаров с выбранным статусом.",
   MY_PRODUCTS_QUOTA_LABEL: "Товаров",
@@ -501,6 +500,7 @@ export const PRODUCT_CATEGORY_DISPLAY_UI = {
 /** Кнопка добавления товара в корзину */
 export const ADD_TO_CART_UI = {
   ADD: "В корзину",
+  GO_TO_CART: "Перейти в корзину",
   LOGIN_TO_ADD: "Войти, чтобы купить",
   DECREASE_ARIA: "Уменьшить количество",
   INCREASE_ARIA: "Увеличить количество",
@@ -559,12 +559,6 @@ export const LEGAL_UI = {
   OFFER_TAB: "Оферта",
   UPDATED_PREFIX: "Обновлено:",
   CONTACT_PREFIX: "Контакты:",
-};
-
-/** Кнопка «Показывать скрытые товары» в шапке (staff) */
-export const HEADER_SHOW_HIDDEN_PRODUCTS_BUTTON_UI = {
-  ARIA: "Показывать скрытые товары",
-  ARIA_ACTIVE: "Скрытые товары показаны",
 };
 
 /** Страница «Корзина» */
@@ -1135,7 +1129,7 @@ export const PRODUCT_REPORT_MODAL_UI = {
   SUBMIT: "Отправить",
   SUBMIT_LOADING: "Отправка…",
   CANCEL: "Отмена",
-  ALREADY_REPORTED: "Вы уже жаловались",
+  ALREADY_REPORTED: "Жалоба уже отправлена",
   SUCCESS: "Жалоба принята",
   REPORT_BUTTON: "Пожаловаться",
   CHARS_USED: (current, max) => `${current} / ${max} символов`,
@@ -1280,7 +1274,7 @@ export const USERS_PODIUM_UI = {
 
 /** Прогресс-бар месячных баллов на странице пользователей */
 export const USERS_MONTHLY_LOYALTY_LOADBAR_UI = {
-  TITLE: "Баллы за месяц",
+  TITLE: "Баллы необходимые достигнуть",
   /** @param {string} pointsLabel @param {string} goalLabel */
   PROGRESS_ARIA: (pointsLabel, goalLabel) =>
     `Начислено покупателям ${pointsLabel} из ${goalLabel} баллов за месяц`,
@@ -1471,6 +1465,10 @@ export const CREATE_PRODUCT_MODAL_UI = {
   PLACEHOLDER_SALE_CITY: "Город, где продаётся товар",
   HINT_SALE_CITY: "Пусто — товар виден во всех городах",
   ERROR_SALE_CITY_MAX: `Город продажи не длиннее ${80} символов`,
+  LABEL_SALE_REGION: "Регион продажи",
+  PLACEHOLDER_SALE_REGION: "Выберите регион",
+  HINT_SALE_REGION: "Товар будет виден покупателям этого региона",
+  ERROR_SALE_REGION_REQUIRED: "Выберите регион продажи",
   ERROR_CATEGORY_LEAF: "Выберите конечную подкатегорию в дереве категорий",
   LABEL_AVAILABLE: "Товар в наличии",
   LABEL_STOCK_QUANTITY: "Количество в наличии (шт.)",
@@ -1543,7 +1541,7 @@ export const CREATE_PRODUCT_MODAL_UI = {
   WIZARD_STEP_MEDIA_TITLE: "Фото и видео",
   WIZARD_STEP_MEDIA_SUBTITLE:
     "До 5 фото, можно выбрать несколько сразу. Первое — обложка",
-  WIZARD_STEP_CATEGORY_TITLE: "Категория и город",
+  WIZARD_STEP_CATEGORY_TITLE: "Категория и регион",
   WIZARD_STEP_CATEGORY_SUBTITLE: "Помогите покупателям найти товар в каталоге",
   WIZARD_STEP_COMMERCE_TITLE: "Цена и наличие",
   WIZARD_STEP_COMMERCE_SUBTITLE: "Укажите стоимость и сколько единиц готовы продать",

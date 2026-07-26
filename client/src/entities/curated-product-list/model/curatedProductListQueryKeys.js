@@ -1,5 +1,5 @@
 export const curatedProductListQueryKeys = {
   all: ["curated-product-lists"],
-  home: (allCities = false) => [...curatedProductListQueryKeys.all, "home", { allCities }],
+  home: (regionCode = "") => [...curatedProductListQueryKeys.all, "home", { regionCode }],
   admin: () => [...curatedProductListQueryKeys.all, "admin"],
 };

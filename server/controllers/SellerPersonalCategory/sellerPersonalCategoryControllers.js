@@ -13,7 +13,14 @@ export const getSellerPersonalCategoryConfigController = async (req, res) => {
 };
 
 export const getSellerPersonalCategoryCatalogTilesController = async (req, res) => {
-  const result = await getSellerPersonalCategoryCatalogTiles();
+  const { resolveViewerRegionCodeForRequest } = await import(
+    "../../services/user/userRegionCatalogFilter.js"
+  );
+  const viewerRegionCode = await resolveViewerRegionCodeForRequest({
+    userId: req.userId,
+    queryRegionCode: req.query.regionCode,
+  });
+  const result = await getSellerPersonalCategoryCatalogTiles({ viewerRegionCode });
   return successRes(res, result);
 };
 

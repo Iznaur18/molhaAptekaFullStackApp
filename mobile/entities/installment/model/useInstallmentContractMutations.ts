@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { installmentQueryKeys, staffBadgeQueryKeys } from "@/shared/api";
+import { createClientIdempotencyKey } from "@/shared/lib/createClientIdempotencyKey";
 
 import {
   cancelInstallmentEarlyPayoff,
@@ -26,37 +27,56 @@ export const useInstallmentContractMutations = (contractId: string) => {
   const invalidate = () => invalidateInstallmentQueues(queryClient);
 
   const markPaidMutation = useMutation({
-    mutationFn: (paymentIndex: number) => markInstallmentPaymentPaid(contractId, paymentIndex),
+    mutationFn: (paymentIndex: number) =>
+      markInstallmentPaymentPaid(
+        contractId,
+        paymentIndex,
+        createClientIdempotencyKey(),
+      ),
     onSuccess: invalidate,
   });
 
   const confirmPaymentMutation = useMutation({
-    mutationFn: (paymentIndex: number) => confirmInstallmentPayment(contractId, paymentIndex),
+    mutationFn: (paymentIndex: number) =>
+      confirmInstallmentPayment(
+        contractId,
+        paymentIndex,
+        createClientIdempotencyKey(),
+      ),
     onSuccess: invalidate,
   });
 
   const rejectPaymentMutation = useMutation({
-    mutationFn: (paymentIndex: number) => rejectInstallmentPayment(contractId, paymentIndex),
+    mutationFn: (paymentIndex: number) =>
+      rejectInstallmentPayment(
+        contractId,
+        paymentIndex,
+        createClientIdempotencyKey(),
+      ),
     onSuccess: invalidate,
   });
 
   const markEarlyPayoffMutation = useMutation({
-    mutationFn: () => markInstallmentEarlyPayoff(contractId),
+    mutationFn: () =>
+      markInstallmentEarlyPayoff(contractId, createClientIdempotencyKey()),
     onSuccess: invalidate,
   });
 
   const confirmEarlyPayoffMutation = useMutation({
-    mutationFn: () => confirmInstallmentEarlyPayoff(contractId),
+    mutationFn: () =>
+      confirmInstallmentEarlyPayoff(contractId, createClientIdempotencyKey()),
     onSuccess: invalidate,
   });
 
   const cancelEarlyPayoffMutation = useMutation({
-    mutationFn: () => cancelInstallmentEarlyPayoff(contractId),
+    mutationFn: () =>
+      cancelInstallmentEarlyPayoff(contractId, createClientIdempotencyKey()),
     onSuccess: invalidate,
   });
 
   const rejectEarlyPayoffMutation = useMutation({
-    mutationFn: () => rejectInstallmentEarlyPayoff(contractId),
+    mutationFn: () =>
+      rejectInstallmentEarlyPayoff(contractId, createClientIdempotencyKey()),
     onSuccess: invalidate,
   });
 

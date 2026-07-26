@@ -19,7 +19,6 @@ export const useHomeCatalogLoader = ({
   isCatalogBrowserMainViewActive,
   isCatalogShellView,
   isAuthorized,
-  canModerateProducts,
   setIsLoginModalOpen,
   submittedProductSearchTerm,
   myProductsModerationFilter,
@@ -42,7 +41,6 @@ export const useHomeCatalogLoader = ({
     initialCatalogQuery,
     isAuthorized,
     setIsLoginModalOpen,
-    canModerateProducts,
     setMyProductsModerationFilter,
   });
 
@@ -108,8 +106,6 @@ export const useHomeCatalogLoader = ({
     selectedProductCategory: filters.selectedProductCategory,
     catalogSort: filters.catalogSort,
     myProductsModerationFilter,
-    canModerateProducts,
-    showHiddenCatalogProducts: filters.showHiddenCatalogProducts,
   });
 
   // Спиннер в поле поиска — про реальную загрузку отправленного запроса
@@ -144,7 +140,6 @@ export const useHomeCatalogLoader = ({
     setSelectedProductCategory: filters.setSelectedProductCategory,
     catalogSort: filters.catalogSort,
     setCatalogSort: filters.setCatalogSort,
-    showHiddenCatalogProducts: filters.showHiddenCatalogProducts,
     catalogFollowingOnly: filters.catalogFollowingOnly,
     catalogAuctionOnly: filters.catalogAuctionOnly,
     catalogInstallmentOnly: filters.catalogInstallmentOnly,
@@ -172,8 +167,6 @@ export const useHomeCatalogLoader = ({
     isCatalogBrowserProductsView: filters.isCatalogBrowserProductsView,
     isCatalogProductsView: filters.isCatalogProductsView,
     handleCatalogSortChange: filters.handleCatalogSortChange,
-    handleShowHiddenCatalogProductsToggle:
-      filters.handleShowHiddenCatalogProductsToggle,
     handleCatalogFollowingOnlyToggle: filters.handleCatalogFollowingOnlyToggle,
     handleCatalogAuctionOnlyToggle: filters.handleCatalogAuctionOnlyToggle,
     handleCatalogSaleOnlyToggle: filters.handleCatalogSaleOnlyToggle,

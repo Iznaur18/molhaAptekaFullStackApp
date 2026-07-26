@@ -59,9 +59,15 @@ export function renderProductDetailsFieldRows(product, keys, handlers) {
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="product-details-modal__image-url-link"
+                className="product-details-modal__image-url-thumb-link"
               >
-                {url}
+                <img
+                  className="product-details-modal__image-url-thumb"
+                  src={url}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                />
               </a>
             </li>
           ))}

@@ -36,6 +36,12 @@ const SellerPersonalCategoryCampaignSchema = new mongoose.Schema(
       trim: true,
       maxlength: SELLER_PERSONAL_CATEGORY_IMAGE_URL_MAX_LENGTH,
     },
+    regionCode: {
+      type: String,
+      trim: true,
+      default: "RU-MOW",
+      index: true,
+    },
     tariffCode: {
       type: String,
       required: true,

@@ -5,26 +5,10 @@ import {
   USER_DATA_CONFIRMATION_STATUS_PENDING,
 } from "../constants/userDataConfirmationConstants.js";
 
-const PassportSnapshotSchema = new mongoose.Schema(
-  {
-    lastName: { type: String, required: true, trim: true, maxlength: 80 },
-    firstName: { type: String, required: true, trim: true, maxlength: 80 },
-    middleName: { type: String, trim: true, maxlength: 80, default: "" },
-    birthDate: { type: Date, required: true },
-    series: { type: String, required: true, trim: true, maxlength: 4 },
-    number: { type: String, required: true, trim: true, maxlength: 6 },
-    issuedBy: { type: String, required: true, trim: true, maxlength: 200 },
-    issuedAt: { type: Date, required: true },
-    departmentCode: {
-      type: String,
-      required: true,
-      trim: true,
-      maxlength: 7,
-    },
-  },
-  { _id: false },
-);
-
+/**
+ * Plain passport snapshot или AES-GCM vault blob (`__vault: 1`).
+ * Валидация plain — в `normalizePassportPayload` до `sealPassportPlain`.
+ */
 const UserDataConfirmationRequestSchema = new mongoose.Schema(
   {
     userId: {
@@ -33,7 +17,7 @@ const UserDataConfirmationRequestSchema = new mongoose.Schema(
       required: true,
     },
     passport: {
-      type: PassportSnapshotSchema,
+      type: mongoose.Schema.Types.Mixed,
       required: true,
     },
     passportSelfiePhotoUrl: {

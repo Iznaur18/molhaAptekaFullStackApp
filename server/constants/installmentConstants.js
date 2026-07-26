@@ -113,3 +113,24 @@ export const IN_APP_NOTIFICATION_MESSAGE_INSTALLMENT_OVERDUE =
   "Просрочка платежа по рассрочке";
 export const IN_APP_NOTIFICATION_MESSAGE_INSTALLMENT_EARLY_PAYOFF =
   "Покупатель досрочно закрыл рассрочку";
+
+/** Журнал операций рассрочки (audit + idempotency). */
+export const INSTALLMENT_OP_MARK_PAYMENT_PAID = "mark_payment_paid";
+export const INSTALLMENT_OP_CONFIRM_PAYMENT = "confirm_payment";
+export const INSTALLMENT_OP_REJECT_PAYMENT = "reject_payment";
+export const INSTALLMENT_OP_MARK_EARLY_PAYOFF = "mark_early_payoff";
+export const INSTALLMENT_OP_CONFIRM_EARLY_PAYOFF = "confirm_early_payoff";
+export const INSTALLMENT_OP_REJECT_EARLY_PAYOFF = "reject_early_payoff";
+export const INSTALLMENT_OP_CANCEL_EARLY_PAYOFF = "cancel_early_payoff";
+
+export const INSTALLMENT_OPERATION_ACTIONS = [
+  INSTALLMENT_OP_MARK_PAYMENT_PAID,
+  INSTALLMENT_OP_CONFIRM_PAYMENT,
+  INSTALLMENT_OP_REJECT_PAYMENT,
+  INSTALLMENT_OP_MARK_EARLY_PAYOFF,
+  INSTALLMENT_OP_CONFIRM_EARLY_PAYOFF,
+  INSTALLMENT_OP_REJECT_EARLY_PAYOFF,
+  INSTALLMENT_OP_CANCEL_EARLY_PAYOFF,
+];
+
+export const INSTALLMENT_IDEMPOTENCY_KEY_MAX_LENGTH = 64;

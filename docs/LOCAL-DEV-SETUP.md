@@ -119,6 +119,8 @@ cd ..
 
 Нужен [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Windows/Mac) или Docker Engine (Linux).
 
+> **Только local/dev/CI.** Корневой `docker-compose.yml` — Mongo **без auth** на `127.0.0.1:27017`. Не деплоить на VPS. Production — Atlas с `user:password` (`server/.env.production.example`); `preflight:prod` отклонит localhost URI.
+
 ```powershell
 # из корня репозитория
 npm run mongo:up

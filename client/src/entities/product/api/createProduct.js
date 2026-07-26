@@ -51,9 +51,9 @@ export async function createProduct(body) {
     if (Array.isArray(body.productCharacteristics)) {
       payload.productCharacteristics = body.productCharacteristics;
     }
-    const saleCity = body.productSaleCity?.trim();
-    if (saleCity) {
-      payload.productSaleCity = saleCity;
+    const saleRegion = body.productRegionCode?.trim();
+    if (saleRegion) {
+      payload.productRegionCode = saleRegion;
     }
     if (body.productReturnEnabled != null) {
       payload.productReturnEnabled = body.productReturnEnabled === true;

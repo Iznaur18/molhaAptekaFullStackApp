@@ -7,7 +7,6 @@ import { CatalogCategoryFilterButton } from "../../widgets/catalog-category-filt
 import { CatalogMenuButton } from "../../widgets/catalog-menu-button/ui/CatalogMenuButton.jsx";
 import { HeaderWishlistButton } from "../../widgets/header-wishlist-button/ui/HeaderWishlistButton.jsx";
 import { HeaderNotificationsButton } from "../../widgets/header-notifications-button/ui/HeaderNotificationsButton.jsx";
-import { HeaderShowHiddenProductsButton } from "../../widgets/header-show-hidden-products-button/ui/HeaderShowHiddenProductsButton.jsx";
 import { HeaderUsersButton } from "../../widgets/header-users-button/ui/HeaderUsersButton.jsx";
 import { HeaderUsersStretchMenu } from "../../widgets/header-users-stretch-menu/ui/HeaderUsersStretchMenu.jsx";
 import {
@@ -104,9 +103,6 @@ const NON_CATALOG_VIEW_TITLES = {
  *   onRegisterClick: () => void;
  *   onNavigateToFullCatalogFromBreadcrumb: () => void;
  *   onMobileCartClick: () => void;
- *   canModerateProducts?: boolean;
- *   showHiddenCatalogProducts: boolean;
- *   onShowHiddenCatalogProductsToggle: () => void;
  *   pendingModerationCount?: number;
  *   pendingInstallmentDisputesCount?: number;
  *   pendingProductReportsCount?: number;
@@ -140,9 +136,6 @@ export function AppShellHeader({
   onRegisterClick: _onRegisterClick,
   onNavigateToFullCatalogFromBreadcrumb,
   onMobileCartClick,
-  canModerateProducts = false,
-  showHiddenCatalogProducts,
-  onShowHiddenCatalogProductsToggle,
   pendingModerationCount = 0,
   pendingInstallmentDisputesCount = 0,
   pendingProductReportsCount = 0,
@@ -223,9 +216,6 @@ export function AppShellHeader({
     .join(" ");
 
   const navActionsProps = {
-    canModerateProducts,
-    showHiddenCatalogProducts,
-    onShowHiddenCatalogProductsToggle,
     isUsersNavActive,
     onSetMainView,
     isWishlistNavActive,
@@ -403,9 +393,6 @@ function CatalogHeaderFilter({
  * Secondary header actions. Primary nav (home/catalog/+/cart/profile) — в bottom bar.
  * @param {{
  *   variant: "desktop" | "mobile-top";
- *   canModerateProducts: boolean;
- *   showHiddenCatalogProducts: boolean;
- *   onShowHiddenCatalogProductsToggle: () => void;
  *   isUsersNavActive: boolean;
  *   onSetMainView: (view: import('../../shared/lib/homeMainViewPaths.js').HomeMainView) => void;
  *   isWishlistNavActive: boolean;
@@ -417,9 +404,6 @@ function CatalogHeaderFilter({
  */
 function HeaderNavActions({
   variant,
-  canModerateProducts,
-  showHiddenCatalogProducts,
-  onShowHiddenCatalogProductsToggle,
   isUsersNavActive,
   onSetMainView,
   isWishlistNavActive,
@@ -465,12 +449,6 @@ function HeaderNavActions({
   if (variant === "mobile-top") {
     return (
       <nav className={navClassName} aria-label={HOME_PAGE_UI.NAV_AUTH_ARIA}>
-        {canModerateProducts ? (
-          <HeaderShowHiddenProductsButton
-            isActive={showHiddenCatalogProducts}
-            onClick={onShowHiddenCatalogProductsToggle}
-          />
-        ) : null}
         <HeaderUsersStretchMenu
           activeItemKey={stretchActiveItemKey}
           onItemAction={handleStretchItemAction}
@@ -481,12 +459,6 @@ function HeaderNavActions({
 
   return (
     <nav className={navClassName} aria-label={HOME_PAGE_UI.NAV_AUTH_ARIA}>
-      {canModerateProducts ? (
-        <HeaderShowHiddenProductsButton
-          isActive={showHiddenCatalogProducts}
-          onClick={onShowHiddenCatalogProductsToggle}
-        />
-      ) : null}
       <HeaderUsersButton
         isActive={isUsersNavActive}
         onClick={() => onSetMainView("users")}

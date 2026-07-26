@@ -29,10 +29,14 @@ export function getSellerPersonalCategoryConfig() {
   };
 }
 
-export async function getSellerPersonalCategoryCatalogTiles() {
+export async function getSellerPersonalCategoryCatalogTiles({
+  viewerRegionCode,
+} = {}) {
   const now = new Date();
+  const regionCode = String(viewerRegionCode ?? "").trim();
   const rows = await SellerPersonalCategoryModel.find({
     activeUntil: { $gt: now },
+    ...(regionCode ? { regionCode } : {}),
   })
     .sort({ activeUntil: -1, updatedAt: -1 })
     .lean();

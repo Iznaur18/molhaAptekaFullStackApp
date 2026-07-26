@@ -1,7 +1,8 @@
-import { resolveProductImageUrls } from "../../../entities/product/lib/resolveProductImageUrls.js";
-import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../../../entities/product/model/productConstants.js";
+import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
+import { resolveProductImageUrl } from "../../../entities/product/lib/resolveProductImageUrl.js";
+import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../../../entities/product/model/productConstants.js";
 import { patchProductWishlistCount } from "../../../entities/wishlist/lib/patchProductWishlistCount.js";
 import { useWishlist } from "../../../entities/wishlist/model/useWishlist.js";
 import { COMMON_UI, WISHLIST_PAGE_UI } from "../../../shared/config/appUiCopy.js";
@@ -9,13 +10,6 @@ import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
 
 import "./WishlistRow.css";
-
-const pickImageUrl = (product) => {
-  const first = resolveProductImageUrls(product)[0];
-  return typeof first === "string" && /^https?:\/\//i.test(first.trim())
-    ? first.trim()
-    : PRODUCT_IMAGE_PLACEHOLDER_URL;
-};
 
 /**
  * @param {{
@@ -30,8 +24,14 @@ const pickImageUrl = (product) => {
 export function WishlistRow({ product, onProductClick, onProductStatsUpdate }) {
   const queryClient = useQueryClient();
   const { removeItem } = useWishlist();
+  const [imageFailed, setImageFailed] = useState(false);
   const heading = product.productName?.trim() || COMMON_UI.EM_DASH;
   const priceText = formatPriceRub(product.productPrice);
+  const resolvedImage = resolveProductImageUrl(product);
+  const imageUrl =
+    imageFailed || !resolvedImage
+      ? PRODUCT_IMAGE_PLACEHOLDER_URL
+      : resolvedImage;
 
   const handleRemove = () => {
     const productId = String(product._id);
@@ -47,10 +47,11 @@ export function WishlistRow({ product, onProductClick, onProductStatsUpdate }) {
     <article className="wishlist-row">
       <img
         className="wishlist-row__image"
-        src={pickImageUrl(product)}
+        src={imageUrl}
         alt=""
         loading="lazy"
         decoding="async"
+        onError={() => setImageFailed(true)}
       />
       <div className="wishlist-row__info">
         <button

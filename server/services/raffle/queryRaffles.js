@@ -24,8 +24,8 @@ import {
   loadRaffleSeller,
 } from "./raffleServiceHelpers.js";
 
-export async function getFeaturedRaffles() {
-  const rows = await getFeaturedSiteRaffles();
+export async function getFeaturedRaffles({ viewerRegionCode } = {}) {
+  const rows = await getFeaturedSiteRaffles(viewerRegionCode);
   const raffles = await mapVitrineRaffles(rows);
 
   return {

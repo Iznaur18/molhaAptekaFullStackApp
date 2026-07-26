@@ -1,5 +1,7 @@
+import { DEFAULT_VIEWER_REGION_CODE } from "@molha/api-contract";
+
 import { CreateProductCategoryPicker } from "../../../product-category-tree/ui/CreateProductCategoryPicker.jsx";
-import { PRODUCT_SALE_CITY_MAX_LENGTH } from "../../../address/model/constants.js";
+import { RuRegionSelect } from "../../../region/ui/RuRegionSelect.jsx";
 import { CREATE_PRODUCT_MODAL_UI } from "../../../../shared/config/appUiCopy.js";
 import { FormFieldLabel } from "../../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
 
@@ -8,7 +10,7 @@ import { FormFieldLabel } from "../../../../shared/ui/FormFieldLabel/FormFieldLa
  *   form: Record<string, unknown>;
  *   setForm: import('react').Dispatch<import('react').SetStateAction<Record<string, unknown>>>;
  *   isSubmitting: boolean;
- *   handleChange: import('react').ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
+ *   handleChange?: import('react').ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
  *   className?: string;
  * }} props
  */
@@ -16,7 +18,6 @@ export function CreateProductCategorySection({
   form,
   setForm,
   isSubmitting,
-  handleChange,
   className = "",
 }) {
   return (
@@ -39,18 +40,19 @@ export function CreateProductCategorySection({
         }
       />
       <label className="create-product-section__label">
-        <FormFieldLabel>{CREATE_PRODUCT_MODAL_UI.LABEL_SALE_CITY}</FormFieldLabel>
-        <input
-          type="text"
+        <FormFieldLabel>{CREATE_PRODUCT_MODAL_UI.LABEL_SALE_REGION}</FormFieldLabel>
+        <RuRegionSelect
           className="create-product-section__input"
-          name="productSaleCity"
-          value={String(form.productSaleCity ?? "")}
-          onChange={handleChange}
+          value={String(form.productRegionCode || DEFAULT_VIEWER_REGION_CODE)}
           disabled={isSubmitting}
-          maxLength={PRODUCT_SALE_CITY_MAX_LENGTH}
-          placeholder={CREATE_PRODUCT_MODAL_UI.PLACEHOLDER_SALE_CITY}
+          required
+          onChange={(productRegionCode) =>
+            setForm((prev) => ({ ...prev, productRegionCode }))
+          }
         />
-        <span className="create-product-section__hint">{CREATE_PRODUCT_MODAL_UI.HINT_SALE_CITY}</span>
+        <span className="create-product-section__hint">
+          {CREATE_PRODUCT_MODAL_UI.HINT_SALE_REGION}
+        </span>
       </label>
     </div>
   );

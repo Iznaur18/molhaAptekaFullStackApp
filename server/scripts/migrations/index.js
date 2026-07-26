@@ -27,6 +27,7 @@ import { up as productCategoryRootsUp } from "./20260615-product-category-roots.
 import { up as productCategoryDisplayNodeIndexesUp } from "./20260616-product-category-display-node-indexes.js";
 import { up as removeFurnitureFiguresCategoriesUp } from "./20260617-remove-furniture-figures-categories.js";
 import { up as approvePendingInstallmentProgramsUp } from "./20260714-approve-pending-installment-programs.js";
+import { up as backfillRegionCodesUp } from "./20260725-backfill-region-codes.js";
 
 export const MIGRATIONS = [
   {
@@ -173,5 +174,10 @@ export const MIGRATIONS = [
     id: "20260714-approve-pending-installment-programs",
     description: "Auto-approve pending product installment programs (staff queue removed)",
     up: approvePendingInstallmentProgramsUp,
+  },
+  {
+    id: "20260725-backfill-region-codes",
+    description: "Backfill product/user/campaign region codes to Moscow (RU-MOW)",
+    up: backfillRegionCodesUp,
   },
 ];

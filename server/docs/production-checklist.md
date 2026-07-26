@@ -29,6 +29,7 @@ npm run preflight:prod
 | ------------------------ | ------------------------------------------ | -------------------------------------------- |
 | `NODE_ENV`               | `production`                               | Secure cookie, скрытие деталей 5xx           |
 | `JWT_SECRET`             | ≥32 символов, `crypto.randomBytes(32).hex` | подпись access/refresh JWT                   |
+| `PASSPORT_VAULT_KEK`     | 64 hex (`randomBytes(32).hex`)             | AES-256-GCM паспортных ПДн в Mongo           |
 | `MONGO_URI`              | **Atlas или replica set**                  | без RS транзакции баллов/заказов не работают |
 | `FRONTEND_URL`           | `https://ваш-домен.ru`                     | CORS + ссылки verify email                   |
 | `PUBLIC_UPLOAD_BASE_URL` | `https://ваш-домен.ru`                     | полные URL фото/видео в БД (вариант A)       |
@@ -53,10 +54,16 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 ## 2. MongoDB
 
-- [ ] **Replica set** — Atlas M0+ или `mongod --replSet rs0` на VPS
+- [ ] **Replica set** — Atlas M0+ (предпочтительно) или свой `mongod --replSet` на VPS **с auth**
+- [ ] `MONGO_URI` = `mongodb+srv://USER:PASS@...` (или `mongodb://USER:PASS@host/...`) — **не** `127.0.0.1` / compose без auth
+- [ ] **Не** поднимать корневой `docker-compose.yml` на production VPS (он только для local/dev)
 - [ ] После первого деплоя: `cd server && npm run migrate:apply`
 - [ ] Бэкапы: Atlas Continuous Backup или cron `mongodump`
 - [ ] IP whitelist (Atlas) или firewall (VPS)
+- [ ] **Encryption at Rest** в Atlas (включено по умолчанию на M10+; на M0 — disk encryption провайдера)
+- [ ] `PASSPORT_VAULT_KEK` задан и сохранён вне git (ротация = новый `PASSPORT_VAULT_KEY_ID` + re-seal)
+
+`npm run preflight:prod` / `validate:prod` падает, если `MONGO_URI` — localhost или без credentials.
 
 Проверка транзакций: integration-тесты в CI (`npm test`) используют memory-server с RS.
 

@@ -166,6 +166,17 @@ const applySaleCityField = (body, $set) => {
   }
 };
 
+const applyRegionCodeField = (body, $set) => {
+  if (!hasBodyField(body, "productRegionCode")) {
+    return;
+  }
+  const code = String(body.productRegionCode ?? "").trim();
+  if (!code) {
+    throwFieldError(new Error("required"), "Укажите регион продажи");
+  }
+  $set.productRegionCode = code;
+};
+
 const applyCategoryFields = async (body, $set, existing) => {
   if (!hasBodyField(body, "productCategoryId") && !hasBodyField(body, "productCategory")) {
     return;
@@ -349,6 +360,7 @@ export async function buildProductPatchSet({ existing, body, isAdmin, productId 
   applyIsOriginalField(body, $set);
   applyPriceFields(body, $set, existing);
   applySaleCityField(body, $set);
+  applyRegionCodeField(body, $set);
   await applyCategoryFields(body, $set, existing);
   await applyLoyaltyField(body, $set, existing, productId);
   applyImageFields(body, $set);

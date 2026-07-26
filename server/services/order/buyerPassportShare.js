@@ -1,6 +1,14 @@
 import { ORDER_STATUS_CANCELLED } from "../../constants/orderConstants.js";
+import {
+  PASSPORT_VAULT_ACCESS_PURPOSE_INSTALLMENT_SNAPSHOT,
+} from "../../constants/passportVaultConstants.js";
 import { USER_DATA_CONFIRMATION_STATUS_APPROVED } from "../../constants/userDataConfirmationConstants.js";
 import { UserDataConfirmationRequestModel } from "../../models/index.js";
+import {
+  openPassportStored,
+  recordPassportVaultAccess,
+  sealPassportPlain,
+} from "../passport-vault/index.js";
 import { maskPassportForBuyerApi } from "../user/maskPassportForApi.js";
 
 /**
@@ -31,7 +39,7 @@ export const isOrderCancelledForPassportShare = (order) => {
 };
 
 /**
- * Approved passport snapshot for installment consent flow.
+ * Approved passport snapshot for installment consent flow (sealed for Mongo).
  *
  * @param {string} buyerUserId
  * @returns {Promise<{
@@ -52,8 +60,20 @@ export async function loadApprovedBuyerPassportShareSnapshot(buyerUserId) {
     return null;
   }
 
+  const passportPlain = openPassportStored(row.passport);
+  if (!passportPlain) {
+    return null;
+  }
+
+  await recordPassportVaultAccess({
+    actorUserId: buyerUserId,
+    purpose: PASSPORT_VAULT_ACCESS_PURPOSE_INSTALLMENT_SNAPSHOT,
+    resourceType: "UserDataConfirmationRequest",
+    resourceId: String(row._id),
+  });
+
   return {
-    passport: { ...row.passport },
+    passport: sealPassportPlain(passportPlain),
     passportSelfiePhotoUrl: String(row.passportSelfiePhotoUrl).trim(),
   };
 }
@@ -78,8 +98,13 @@ export const resolveSellerBuyerPassportShare = (order) => {
     return null;
   }
 
+  const passportPlain = openPassportStored(share.passport);
+  if (!passportPlain) {
+    return null;
+  }
+
   return {
-    passport: maskPassportForBuyerApi(share.passport),
+    passport: maskPassportForBuyerApi(passportPlain),
     passportSelfiePhotoUrl: selfieUrl,
     consentAt: order.passportShareConsentAt ?? null,
   };

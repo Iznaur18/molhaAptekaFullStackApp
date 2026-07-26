@@ -25,6 +25,11 @@ import {
 } from "./maskPassportForApi.js";
 import { createUserInAppNotification } from "./userInAppNotifications.js";
 import { assertMinWords } from "./maxWordsText.js";
+import {
+  openPassportStored,
+  recordPassportVaultAccess,
+} from "../passport-vault/index.js";
+import { PASSPORT_VAULT_ACCESS_PURPOSE_STAFF_PENDING } from "../../constants/passportVaultConstants.js";
 
 const UPLOAD_PATH_PREFIX = "/uploads/";
 
@@ -106,13 +111,23 @@ export const getPendingDataConfirmationRequests = async () => {
     .lean();
   const userById = new Map(users.map((u) => [String(u._id), u]));
 
-  const requests = rows.map((row) => ({
-    ...row,
-    _id: String(row._id),
-    userId: String(row.userId),
-    passport: maskPassportForBuyerApi(row.passport),
-    user: userById.get(String(row.userId)) ?? null,
-  }));
+  const requests = [];
+  for (const row of rows) {
+    const passportPlain = openPassportStored(row.passport);
+    await recordPassportVaultAccess({
+      actorUserId: null,
+      purpose: PASSPORT_VAULT_ACCESS_PURPOSE_STAFF_PENDING,
+      resourceType: "UserDataConfirmationRequest",
+      resourceId: String(row._id),
+    });
+    requests.push({
+      ...row,
+      _id: String(row._id),
+      userId: String(row.userId),
+      passport: maskPassportForBuyerApi(passportPlain),
+      user: userById.get(String(row.userId)) ?? null,
+    });
+  }
 
   return { requests, totalPending: rows.length };
 };

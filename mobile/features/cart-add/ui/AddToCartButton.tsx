@@ -115,6 +115,26 @@ export const AddToCartButton = ({
     );
   }
 
+  if (isDetailDock) {
+    return (
+      <Pressable
+        style={styles.detailDockPressable}
+        onPress={() => {
+          router.push("/(tabs)/cart");
+        }}
+      >
+        <SquircleView
+          radius={PRODUCT_DETAIL_DOCK_CTA_BORDER_RADIUS}
+          style={styles.detailDockGoToCartButton}
+        >
+          <Text style={styles.detailDockAddButtonText} {...fixedFontProps}>
+            {ADD_TO_CART_UI.GO_TO_CART}
+          </Text>
+        </SquircleView>
+      </Pressable>
+    );
+  }
+
   const handleDecrease = () => {
     if (quantity <= 1) {
       void removeItem(productId);
@@ -131,50 +151,28 @@ export const AddToCartButton = ({
   };
 
   const increaseDisabled = isUpdating || (hasStockLimit && quantity >= purchaseLimit);
-  const stepperStyle = isDetailDock ? styles.detailDockStepper : styles.stepper;
-  const stepButtonStyle = isDetailDock ? styles.detailDockStepButton : styles.stepButton;
-  const stepButtonTextStyle = isDetailDock ? styles.detailDockStepButtonText : styles.stepButtonText;
-  const quantityStyle = isDetailDock ? styles.detailDockQuantity : styles.quantity;
 
-  const stepperBody = (
-    <>
+  return (
+    <View style={styles.stepper}>
       <Pressable
-        style={stepButtonStyle}
+        style={styles.stepButton}
         onPress={handleDecrease}
         disabled={isUpdating}
         accessibilityLabel={ADD_TO_CART_UI.DECREASE_ARIA}
       >
-        <Text style={stepButtonTextStyle} {...fixedFontProps}>
-          −
-        </Text>
+        <Text style={styles.stepButtonText}>−</Text>
       </Pressable>
-      <Text
-        style={quantityStyle}
-        accessibilityLabel={ADD_TO_CART_UI.QUANTITY_ARIA}
-        {...fixedFontProps}
-      >
+      <Text style={styles.quantity} accessibilityLabel={ADD_TO_CART_UI.QUANTITY_ARIA}>
         {quantity}
       </Text>
       <Pressable
-        style={[stepButtonStyle, increaseDisabled && styles.buttonDisabled]}
+        style={[styles.stepButton, increaseDisabled && styles.buttonDisabled]}
         onPress={handleIncrease}
         disabled={increaseDisabled}
         accessibilityLabel={ADD_TO_CART_UI.INCREASE_ARIA}
       >
-        <Text style={stepButtonTextStyle} {...fixedFontProps}>
-          +
-        </Text>
+        <Text style={styles.stepButtonText}>+</Text>
       </Pressable>
-    </>
+    </View>
   );
-
-  if (isDetailDock) {
-    return (
-      <SquircleView radius={PRODUCT_DETAIL_DOCK_CTA_BORDER_RADIUS} style={stepperStyle}>
-        {stepperBody}
-      </SquircleView>
-    );
-  }
-
-  return <View style={stepperStyle}>{stepperBody}</View>;
 };

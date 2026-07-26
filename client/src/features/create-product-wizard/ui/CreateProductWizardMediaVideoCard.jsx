@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 
 import { validateUploadVideoFile } from "../../../shared/lib/validateUploadVideoFile.js";
+import { resolveImageUrlForDisplay } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { useUploadAssetMutations } from "../../../shared/model/useUploadAssetMutations.js";
 import { UPLOAD_VIDEO_FILE_INPUT_ACCEPT } from "../../../shared/config/uploadConstants.js";
 import { CREATE_PRODUCT_MODAL_UI, VIDEO_URL_FIELD_UI } from "../../../shared/config/appUiCopy.js";
@@ -21,7 +22,7 @@ export function CreateProductWizardMediaVideoCard({ value, onChange, disabled = 
   const { uploadVideoMutation } = useUploadAssetMutations();
   const [errorMessage, setErrorMessage] = useState("");
 
-  const previewUrl = String(value ?? "").trim();
+  const previewUrl = resolveImageUrlForDisplay(String(value ?? "").trim());
   const hasVideo = previewUrl.length > 0;
   const isBusy = uploadVideoMutation.isPending;
 

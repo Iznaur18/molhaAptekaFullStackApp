@@ -14,6 +14,7 @@ import {
   normalizeUserNameInput,
   RU_PHONE_E164_REGEX,
 } from "./userFields.js";
+import { optionalRuRegionCodeFieldSchema } from "./ruRegions.js";
 import { isStoredMediaUrl } from "./storedMediaUrl.js";
 import { userSocialLinksBodyShape } from "./userSocialLinks.js";
 
@@ -221,6 +222,7 @@ export const updateProfileBodySchema = z.object({
   userAddressDistrict: userAddressDistrictFieldSchema,
   userAddressStreet: userAddressStreetFieldSchema,
   userAddressHouse: userAddressHouseFieldSchema,
+  userRegionCode: optionalRuRegionCodeFieldSchema,
   notificationsEnabled: clearableBooleanSchema,
   userRole: z.union([z.enum(USER_ROLE_VALUES), z.null()]).optional(),
   isActiveUser: clearableBooleanSchema,

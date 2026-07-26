@@ -1,8 +1,8 @@
 import { normalizeUploadUrlForStorage } from "@izibuy/shared-lib";
 
 import { IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED } from "../../product-category-tree/lib/isProductCategoryTreePickerEnabled.js";
-import { PRODUCT_SALE_CITY_MAX_LENGTH } from "../../address/model/constants.js";
 import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
+import { isRuRegionCode } from "@molha/api-contract";
 import {
   computeProductDiscountPercent,
   parseProductPriceInput,
@@ -161,9 +161,9 @@ export function prepareCreateProductSubmit({
     return { ok: false, message: CREATE_PRODUCT_MODAL_UI.ERROR_CATEGORY_LEAF };
   }
 
-  const productSaleCity = String(form.productSaleCity ?? "").trim();
-  if (productSaleCity.length > PRODUCT_SALE_CITY_MAX_LENGTH) {
-    return { ok: false, message: CREATE_PRODUCT_MODAL_UI.ERROR_SALE_CITY_MAX };
+  const productRegionCode = String(form.productRegionCode ?? "").trim();
+  if (!isRuRegionCode(productRegionCode)) {
+    return { ok: false, message: CREATE_PRODUCT_MODAL_UI.ERROR_SALE_REGION_REQUIRED };
   }
 
   if (form.productReturnEnabled == null) {
@@ -196,7 +196,7 @@ export function prepareCreateProductSubmit({
       productOldPrice,
       loyaltyPointsPerUnit,
       productCharacteristics,
-      productSaleCity,
+      productRegionCode,
       productReturnEnabled,
       productReturnTerms,
     };
@@ -235,7 +235,7 @@ export function prepareCreateProductSubmit({
       productStockQuantity,
       loyaltyPointsPerUnit,
       productCharacteristics,
-      productSaleCity: productSaleCity || undefined,
+      productRegionCode,
       productReturnEnabled,
       productReturnTerms,
     },

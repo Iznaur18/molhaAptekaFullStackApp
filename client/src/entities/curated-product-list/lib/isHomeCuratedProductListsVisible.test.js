@@ -12,7 +12,6 @@ const baseParams = {
   catalogAuctionOnly: false,
   catalogInstallmentOnly: false,
   catalogSaleOnly: false,
-  showHiddenCatalogProducts: false,
 };
 
 describe("isHomeCuratedProductListsVisible", () => {
@@ -34,15 +33,6 @@ describe("isHomeCuratedProductListsVisible", () => {
       isHomeCuratedProductListsVisible({
         ...baseParams,
         sellerPersonalCategoryId: "664f1c2a3b4c5d6e7f8a9b0c",
-      }),
-    ).toBe(false);
-  });
-
-  it("hides for staff hidden toggle", () => {
-    expect(
-      isHomeCuratedProductListsVisible({
-        ...baseParams,
-        showHiddenCatalogProducts: true,
       }),
     ).toBe(false);
   });

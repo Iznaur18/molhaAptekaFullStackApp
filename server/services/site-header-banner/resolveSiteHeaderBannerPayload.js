@@ -69,11 +69,15 @@ export const resolvePublicSiteHeaderBannerSlides = (row) => {
  *   backgroundColor: string | null;
  * }>>}
  */
-export const resolveActivePaidSiteHeaderBannerCampaignSlides = async () => {
+export const resolveActivePaidSiteHeaderBannerCampaignSlides = async (
+  viewerRegionCode,
+) => {
   const now = new Date();
+  const regionCode = String(viewerRegionCode ?? "").trim();
   const rows = await SiteHeaderBannerCampaignModel.find({
     status: SITE_HEADER_BANNER_CAMPAIGN_STATUS_ACTIVE,
     activeUntil: { $gt: now },
+    ...(regionCode ? { regionCode } : {}),
   })
     .sort({ activatedAt: 1, createdAt: 1 })
     .lean();
@@ -97,9 +101,14 @@ export const resolveActivePaidSiteHeaderBannerCampaignSlides = async () => {
 
 /**
  * @param {import('mongoose').LeanDocument<any> | null | undefined} row
+ * @param {string | null | undefined} [viewerRegionCode]
  */
-export const resolveMergedPublicSiteHeaderBannerSlides = async (row) => {
+export const resolveMergedPublicSiteHeaderBannerSlides = async (
+  row,
+  viewerRegionCode,
+) => {
   const staffSlides = resolvePublicSiteHeaderBannerSlides(row);
-  const paidSlides = await resolveActivePaidSiteHeaderBannerCampaignSlides();
+  const paidSlides =
+    await resolveActivePaidSiteHeaderBannerCampaignSlides(viewerRegionCode);
   return [...staffSlides, ...paidSlides];
 };

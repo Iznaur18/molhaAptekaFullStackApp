@@ -11,6 +11,7 @@ export const parseSiteHeaderBannerCampaignSubmitBody = (body) => {
     imageAlt: parsed.imageAlt,
     linkPath: parsed.linkPath ?? null,
     backgroundColor: parsed.backgroundColor ?? null,
+    regionCode: parsed.regionCode,
     amountPoints: undefined,
   };
 };

@@ -27,7 +27,6 @@ export const useHomeProductActions = ({
   setProductToEdit,
   setProductDetailsAdminError,
   isMineMode,
-  showHiddenCatalogProducts,
   selectedProductCategory,
   setDeletingProductId,
   setTogglingAvailabilityProductId,
@@ -85,11 +84,7 @@ export const useHomeProductActions = ({
     (product) => {
       const id = String(product._id);
 
-      if (
-        product.productIsAvailable === false &&
-        !isMineMode &&
-        !showHiddenCatalogProducts
-      ) {
+      if (product.productIsAvailable === false && !isMineMode) {
         removeCatalogProduct(id);
         return;
       }
@@ -111,7 +106,6 @@ export const useHomeProductActions = ({
       isMineMode,
       removeCatalogProduct,
       selectedProductCategory,
-      showHiddenCatalogProducts,
       updateCatalogProduct,
     ],
   );

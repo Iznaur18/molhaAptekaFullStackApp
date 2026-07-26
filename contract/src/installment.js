@@ -11,6 +11,7 @@ export const INSTALLMENT_MONTHS_MAX = 24;
 export const INSTALLMENT_MONTHLY_PAYMENT_MIN_RUB = 100;
 export const INSTALLMENT_PLAN_TITLE_MAX_LENGTH = 80;
 export const INSTALLMENT_TEXT_MAX_LENGTH = 2000;
+export const INSTALLMENT_IDEMPOTENCY_KEY_MAX_LENGTH = 64;
 
 export const INSTALLMENT_SALES_LIST_FILTER_IN_PROGRESS = "in_progress";
 export const INSTALLMENT_CONTRACT_STATUS_COMPLETED = "completed";
@@ -113,6 +114,19 @@ export const resolveInstallmentDisputeBodySchema = z.object({
 export const installmentCancelBodySchema = z.object({
   reason: z.string().trim().max(INSTALLMENT_TEXT_MAX_LENGTH).optional(),
 });
+
+/** Тело PATCH мутаций платежей / early payoff (ключ опционален). */
+export const installmentIdempotencyBodySchema = z
+  .object({
+    idempotencyKey: z
+      .string()
+      .trim()
+      .min(1)
+      .max(INSTALLMENT_IDEMPOTENCY_KEY_MAX_LENGTH)
+      .optional(),
+  })
+  .strict()
+  .default({});
 
 export const getMyInstallmentContractsListQuerySchema = z.object({
   status: z.enum(INSTALLMENT_SALES_LIST_FILTERS).optional(),

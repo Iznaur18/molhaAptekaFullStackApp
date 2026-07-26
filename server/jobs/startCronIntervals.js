@@ -1,3 +1,4 @@
+import { BUYER_PASSPORT_SHARE_PURGE_CRON_INTERVAL_MS } from "../constants/passportVaultConstants.js";
 import { INSTALLMENT_CRON_INTERVAL_MS } from "../constants/installmentConstants.js";
 import { INTRO_AD_CRON_INTERVAL_MS } from "../constants/introAdCampaignConstants.js";
 import { PREMIUM_CRON_INTERVAL_MS } from "../constants/premiumConstants.js";
@@ -11,6 +12,7 @@ import { expireProductPromotionsAndSendNotifications } from "../utils/productPro
 import { processIntroAdCampaignCronTasks } from "../services/intro-ad/introAdCampaignHelpers.js";
 import { processSellerPersonalCategoryCronTasks } from "../services/seller-personal-category/sellerPersonalCategoryHelpers.js";
 import { processSiteHeaderBannerCampaignCronTasks } from "../services/site-header-banner-campaign/siteHeaderBannerCampaignHelpers.js";
+import { purgeExpiredBuyerPassportShares } from "../services/passport-vault/index.js";
 
 import { isBullMqEnabled } from "../queues/bullMqEnabled.js";
 
@@ -77,6 +79,12 @@ export function startCronIntervals() {
       console.error("processSiteHeaderBannerCampaignCronTasks error:", error);
     });
   }, SITE_HEADER_BANNER_CAMPAIGN_CRON_INTERVAL_MS);
+
+  setInterval(() => {
+    void purgeExpiredBuyerPassportShares().catch((error) => {
+      console.error("purgeExpiredBuyerPassportShares error:", error);
+    });
+  }, BUYER_PASSPORT_SHARE_PURGE_CRON_INTERVAL_MS);
 
   return true;
 }

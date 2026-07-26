@@ -428,21 +428,16 @@ export const resolveContractStatusAfterPayment = (contract) => {
 };
 
 /**
+ * Сдвиг графика после того, как платёж уже помечен paid (CAS) и сумма уже учтена.
  * @param {import('mongoose').Document} contract
  * @param {number} paymentIndex
  * @param {Date} paidAt
  */
-export const applyConfirmedInstallmentPayment = (contract, paymentIndex, paidAt) => {
-  const payment = contract.payments.find((row) => row.paymentIndex === paymentIndex);
-  if (!payment) {
-    throw new Error("Платёж не найден");
-  }
-
-  payment.status = INSTALLMENT_PAYMENT_STATUS_PAID;
-  payment.paidAt = paidAt;
-  contract.paidAmountRub =
-    (Number(contract.paidAmountRub) || 0) + (Number(payment.amountRub) || 0);
-
+export const advanceInstallmentScheduleAfterPaymentMarkedPaid = (
+  contract,
+  paymentIndex,
+  paidAt,
+) => {
   const nextScheduled = contract.payments.find(
     (row) =>
       row.paymentIndex > paymentIndex &&
@@ -464,6 +459,25 @@ export const applyConfirmedInstallmentPayment = (contract, paymentIndex, paidAt)
   }
 
   resolveContractStatusAfterPayment(contract);
+};
+
+/**
+ * @param {import('mongoose').Document} contract
+ * @param {number} paymentIndex
+ * @param {Date} paidAt
+ */
+export const applyConfirmedInstallmentPayment = (contract, paymentIndex, paidAt) => {
+  const payment = contract.payments.find((row) => row.paymentIndex === paymentIndex);
+  if (!payment) {
+    throw new Error("Платёж не найден");
+  }
+
+  payment.status = INSTALLMENT_PAYMENT_STATUS_PAID;
+  payment.paidAt = paidAt;
+  contract.paidAmountRub =
+    (Number(contract.paidAmountRub) || 0) + (Number(payment.amountRub) || 0);
+
+  advanceInstallmentScheduleAfterPaymentMarkedPaid(contract, paymentIndex, paidAt);
 };
 
 /**

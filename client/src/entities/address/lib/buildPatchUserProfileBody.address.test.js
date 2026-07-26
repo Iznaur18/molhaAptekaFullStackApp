@@ -64,4 +64,20 @@ describe("buildPatchUserProfileBody", () => {
     expect(body.userAddressStreet).toBeNull();
     expect(body.userAddress).toBeNull();
   });
+
+  it("шлёт ник соцсети, а не готовый https URL", () => {
+    const form = mapUserToEditProfileForm({ _id: "1" });
+    form.socialTelegramUrl = "@demo_user";
+    form.socialInstagramUrl = "demo.insta";
+    form.userPhoneNumber = "";
+
+    const body = buildPatchUserProfileBody(form, {
+      initialStructuredAddress: form.structuredAddress,
+      initialPhoneNumber: "",
+    });
+
+    expect(body.socialTelegramUrl).toBe("@demo_user");
+    expect(body.socialInstagramUrl).toBe("demo.insta");
+    expect(String(body.socialTelegramUrl)).not.toMatch(/^https?:\/\//i);
+  });
 });

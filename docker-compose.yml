@@ -1,3 +1,7 @@
+# LOCAL DEV / CI ONLY — не деплоить на VPS и не использовать как production Mongo.
+# Без auth намеренно: удобный localhost-flow (`npm run mongo:up`).
+# Production: MongoDB Atlas (mongodb+srv с user/password) — см. server/.env.production.example
+# и server/docs/production-checklist.md § MongoDB.
 services:
   mongo:
     image: mongo:7

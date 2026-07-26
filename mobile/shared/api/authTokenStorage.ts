@@ -10,20 +10,59 @@ export type AuthTokens = {
   refreshToken: string;
 };
 
-const webGet = (key: string): string | null => {
+/**
+ * Web: sessionStorage (не localStorage) — токены не переживают закрытие вкладки
+ * и меньше живут при XSS. Миграция: один раз переносим из legacy localStorage.
+ */
+const webStorage = (): Storage | null => {
   try {
-    return globalThis.localStorage?.getItem(key) ?? null;
+    return globalThis.sessionStorage ?? null;
+  } catch {
+    return null;
+  }
+};
+
+const migrateLegacyLocalStorageTokens = (): void => {
+  try {
+    const legacy = globalThis.localStorage;
+    const session = webStorage();
+    if (!legacy || !session) {
+      return;
+    }
+    for (const key of [ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY]) {
+      const value = legacy.getItem(key);
+      if (value && !session.getItem(key)) {
+        session.setItem(key, value);
+      }
+      legacy.removeItem(key);
+    }
+  } catch {
+    // storage недоступен
+  }
+};
+
+const webGet = (key: string): string | null => {
+  migrateLegacyLocalStorageTokens();
+  try {
+    return webStorage()?.getItem(key) ?? null;
   } catch {
     return null;
   }
 };
 
 const webSet = (key: string, value: string): void => {
-  globalThis.localStorage?.setItem(key, value);
+  migrateLegacyLocalStorageTokens();
+  webStorage()?.setItem(key, value);
+  try {
+    globalThis.localStorage?.removeItem(key);
+  } catch {
+    // ignore
+  }
 };
 
 const webDelete = (key: string): void => {
   try {
+    webStorage()?.removeItem(key);
     globalThis.localStorage?.removeItem(key);
   } catch {
     // storage недоступен

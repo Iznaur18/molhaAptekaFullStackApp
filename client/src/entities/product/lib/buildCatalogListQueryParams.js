@@ -13,8 +13,6 @@ export function buildCatalogListQueryParams({
   selectedProductCategory,
   catalogSort,
   myProductsModerationFilter,
-  canModerateProducts,
-  showHiddenCatalogProducts,
 }) {
   const search = appliedProductSearchTerm.trim();
   const sellerPersonalCategoryId = isMineMode
@@ -37,12 +35,10 @@ export function buildCatalogListQueryParams({
     sellerPersonalCategoryId,
     sort: isMineMode ? catalogSort || null : catalogQueryFromUrl.sort || null,
     moderationStatus: isMineMode ? myProductsModerationFilter || null : null,
-    includeHidden:
-      canModerateProducts && !isMineMode && showHiddenCatalogProducts ? true : null,
     followingOnly: catalogQueryFromUrl.followingOnly ? true : null,
     auctionOnly: catalogQueryFromUrl.auctionOnly ? true : null,
     installmentOnly: catalogQueryFromUrl.installmentOnly ? true : null,
     saleOnly: catalogQueryFromUrl.saleOnly ? true : null,
-    allCities: catalogQueryFromUrl.allCities ? true : null,
+    regionCode: catalogQueryFromUrl.regionCode || null,
   };
 }

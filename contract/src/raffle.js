@@ -1,6 +1,10 @@
 import { z } from "zod";
 
 import { optionalLimitQuery, optionalPageQuery } from "./queryHelpers.js";
+import {
+  optionalRuRegionCodeFieldSchema,
+  requiredRuRegionCodeFieldSchema,
+} from "./ruRegions.js";
 import { nullableProfileImageFocusSchema, profileImageFocusSchema } from "./userProfile.js";
 
 /** Синхрон с `server/constants/raffleConstants.js`. */
@@ -156,6 +160,7 @@ export const createRaffleBodySchema = rafflePrizeFieldsSchema
       .max(RAFFLE_INSTAGRAM_URL_MAX_LENGTH)
       .refine((value) => value.length === 0 || isHttpUrl(value), "Укажите корректную ссылку Instagram")
       .default(""),
+    regionCode: requiredRuRegionCodeFieldSchema,
   })
   .superRefine(assertCreatePrizeMedia);
 
@@ -189,6 +194,7 @@ export const patchRaffleBodySchema = rafflePrizeFieldsSchema
     prizeImageUrl: optionalHttpMediaUrl,
     prizeVideoUrl: optionalHttpMediaUrl,
     prizeImageFocus: z.union([profileImageFocusSchema, z.null()]).optional(),
+    regionCode: optionalRuRegionCodeFieldSchema,
   });
 
 export const rejectRaffleBodySchema = z.object({

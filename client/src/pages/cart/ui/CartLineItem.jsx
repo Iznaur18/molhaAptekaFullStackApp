@@ -1,7 +1,9 @@
+import { useState } from "react";
+
 import { useCart } from "../../../entities/cart/model/useCart.js";
 import { getCartLineStockHint } from "../../../entities/cart/lib/getCartLineStockHint.js";
 import { getProductPurchaseLimit } from "../../../entities/product/lib/getProductPurchaseLimit.js";
-import { resolveProductImageUrls } from "../../../entities/product/lib/resolveProductImageUrls.js";
+import { resolveProductImageUrl } from "../../../entities/product/lib/resolveProductImageUrl.js";
 import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../../../entities/product/model/productConstants.js";
 import { ProductPriceDisplay } from "../../../entities/product/ui/ProductPriceDisplay.jsx";
 import { CART_PAGE_UI, COMMON_UI } from "../../../shared/config/appUiCopy.js";
@@ -12,13 +14,6 @@ import "./CartLineItem.css";
 
 /** Паритет mobile `CART_LINE_IMAGE_SIZE`. */
 const CART_LINE_IMAGE_SIZE_PX = 72;
-
-const pickImageUrl = (product) => {
-  const first = resolveProductImageUrls(product)[0];
-  return typeof first === "string" && /^https?:\/\//i.test(first.trim())
-    ? first.trim()
-    : PRODUCT_IMAGE_PLACEHOLDER_URL;
-};
 
 /**
  * @param {{
@@ -35,12 +30,17 @@ export function CartLineItem({
   onProductClick,
 }) {
   const { setItemQuantity, removeItem } = useCart();
+  const [imageFailed, setImageFailed] = useState(false);
   const product = line.product;
   const heading = product?.productName?.trim() || COMMON_UI.EM_DASH;
   const lineTotalText = formatPriceRub(line.lineTotal);
   const purchaseLimit = getProductPurchaseLimit(product);
   const stockHint = getCartLineStockHint(purchaseLimit, line.quantity);
-  const imageUrl = pickImageUrl(product);
+  const resolvedImage = resolveProductImageUrl(product);
+  const imageUrl =
+    imageFailed || !resolvedImage
+      ? PRODUCT_IMAGE_PLACEHOLDER_URL
+      : resolvedImage;
 
   const handleDecrease = () => {
     if (line.quantity <= 1) {
@@ -84,6 +84,7 @@ export function CartLineItem({
                 height={CART_LINE_IMAGE_SIZE_PX}
                 loading="lazy"
                 decoding="async"
+                onError={() => setImageFailed(true)}
               />
             </button>
           ) : (
@@ -96,6 +97,7 @@ export function CartLineItem({
                 height={CART_LINE_IMAGE_SIZE_PX}
                 loading="lazy"
                 decoding="async"
+                onError={() => setImageFailed(true)}
               />
             </span>
           )}

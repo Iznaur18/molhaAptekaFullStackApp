@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 
 import { PRODUCT_IMAGE_URLS_MAX } from "../../../entities/product/model/productConstants.js";
 import { useUploadAssetMutations } from "../../../shared/model/useUploadAssetMutations.js";
+import { resolveImageUrlForDisplay } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { validateUploadImageFile } from "../../../shared/lib/validateUploadImageFile.js";
 import { UPLOAD_FILE_INPUT_ACCEPT } from "../../../shared/config/uploadConstants.js";
 import { CREATE_PRODUCT_MODAL_UI, IMAGE_URL_FIELD_UI } from "../../../shared/config/appUiCopy.js";
@@ -110,7 +111,7 @@ export function CreateProductWizardMediaGrid({
             >
               <img
                 className="create-product-wizard-media-grid__tile-image"
-                src={url}
+                src={resolveImageUrlForDisplay(url)}
                 alt=""
               />
               {index === 0 ? (

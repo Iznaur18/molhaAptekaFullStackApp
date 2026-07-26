@@ -40,6 +40,7 @@ export async function createRaffle({ sellerId, body }) {
           prizeImageFocus: normalizeRafflePrizeImageFocus(body.prizeImageFocus),
           targetSales: Number(body.targetSales),
           instagramUrl: String(body.instagramUrl).trim(),
+          regionCode: String(body.regionCode).trim(),
           status: RAFFLE_STATUS_PENDING_STAFF,
           createPricePoints: RAFFLE_CREATE_PRICE_POINTS,
         },

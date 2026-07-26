@@ -3,6 +3,8 @@ import fs from "fs/promises";
 import path from "path";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 
+import { buildS3ServerSideEncryptionParams } from "../services/upload/buildS3ServerSideEncryptionParams.js";
+
 import {
   buildObjectStorageKey,
   getS3Client,
@@ -87,6 +89,7 @@ async function main() {
         Key: key,
         Body: body,
         ContentType: contentType,
+        ...buildS3ServerSideEncryptionParams(),
       }),
     );
     uploaded += 1;

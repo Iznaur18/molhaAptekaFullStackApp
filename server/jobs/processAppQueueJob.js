@@ -6,6 +6,7 @@ import {
   JOB_PROCESS_PREMIUM_CRON,
   JOB_PROCESS_SELLER_PERSONAL_CATEGORY_CRON,
   JOB_PROCESS_SITE_HEADER_BANNER_CAMPAIGN_CRON,
+  JOB_PURGE_EXPIRED_BUYER_PASSPORT_SHARES,
   JOB_SEND_EMAIL_VERIFICATION,
 } from "../queues/queueConstants.js";
 import { sendEmailVerificationForUser } from "../services/auth/emailVerification.js";
@@ -15,6 +16,7 @@ import { processPremiumCronTasks } from "../utils/premiumAccess.js";
 import { expireProductPromotionsAndSendNotifications } from "../utils/productPromotionHelpers.js";
 import { processSellerPersonalCategoryCronTasks } from "../services/seller-personal-category/sellerPersonalCategoryHelpers.js";
 import { processSiteHeaderBannerCampaignCronTasks } from "../services/site-header-banner-campaign/siteHeaderBannerCampaignHelpers.js";
+import { purgeExpiredBuyerPassportShares } from "../services/passport-vault/index.js";
 import { expireStaleUserStories } from "../utils/userStoryHelpers.js";
 
 /**
@@ -38,6 +40,8 @@ export async function processAppQueueJob(job) {
       return processSellerPersonalCategoryCronTasks();
     case JOB_PROCESS_SITE_HEADER_BANNER_CAMPAIGN_CRON:
       return processSiteHeaderBannerCampaignCronTasks();
+    case JOB_PURGE_EXPIRED_BUYER_PASSPORT_SHARES:
+      return purgeExpiredBuyerPassportShares();
     default:
       throw new Error(`Unknown BullMQ job: ${job.name}`);
   }

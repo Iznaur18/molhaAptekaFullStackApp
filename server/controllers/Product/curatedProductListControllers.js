@@ -9,23 +9,22 @@ import {
   reorderCuratedProductLists,
   toCuratedProductListPayload,
 } from "../../services/product/curatedProductListHelpers.js";
-import { resolveBuyerCityFilter } from "../../services/user/userCityCatalogFilter.js";
+import { resolveViewerRegionCodeForRequest } from "../../services/user/userRegionCatalogFilter.js";
 import { errorRes, successRes } from "../../services/http/index.js";
 
 const sortCuratedLists = { sortOrder: 1, createdAt: 1 };
 
-const parseTruthyQueryFlag = (raw) =>
-  raw != null && String(raw).trim().toLowerCase() === "true";
-
 /** GET /product/curated-lists/home */
 export async function getHomeCuratedProductListsController(req, res) {
   const hiddenSellerIds = await getHiddenSellerIds();
-  const allCities = parseTruthyQueryFlag(req.query.allCities);
-  const buyerCityKey = allCities ? null : await resolveBuyerCityFilter(req.userId);
+  const viewerRegionCode = await resolveViewerRegionCodeForRequest({
+    userId: req.userId,
+    queryRegionCode: req.query.regionCode,
+  });
 
   const lists = await CuratedProductListModel.find().sort(sortCuratedLists).lean();
   const curatedLists = await buildHomeCuratedListsResponse(lists, hiddenSellerIds, {
-    buyerCityKey,
+    viewerRegionCode,
   });
   successRes(res, { lists: curatedLists });
 }

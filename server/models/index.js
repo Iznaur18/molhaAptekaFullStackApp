@@ -26,6 +26,7 @@ import CuratedProductListModel from "./CuratedProductListModel.js";
 import ProductInstallmentProgramModel from "./ProductInstallmentProgramModel.js";
 import InstallmentContractModel from "./InstallmentContractModel.js";
 import InstallmentDisputeModel from "./InstallmentDisputeModel.js";
+import InstallmentOperationLogModel from "./InstallmentOperationLogModel.js";
 import { AppIntroSettingsModel } from "./AppIntroSettingsModel.js";
 import { UsersLoyaltyRaffleSettingsModel } from "./UsersLoyaltyRaffleSettingsModel.js";
 import { SiteHeaderBannerSettingsModel } from "./SiteHeaderBannerSettingsModel.js";
@@ -34,6 +35,7 @@ import { IntroAdCampaignModel } from "./IntroAdCampaignModel.js";
 import { SellerPersonalCategoryModel } from "./SellerPersonalCategoryModel.js";
 import { SellerPersonalCategoryCampaignModel } from "./SellerPersonalCategoryCampaignModel.js";
 import StaffAuditLogModel from "./StaffAuditLogModel.js";
+import PassportVaultAccessLogModel from "./PassportVaultAccessLogModel.js";
 import ReferralLedgerEntryModel from "./ReferralLedgerEntryModel.js";
 
 export {
@@ -65,6 +67,7 @@ export {
   ProductInstallmentProgramModel,
   InstallmentContractModel,
   InstallmentDisputeModel,
+  InstallmentOperationLogModel,
   AppIntroSettingsModel,
   UsersLoyaltyRaffleSettingsModel,
   SiteHeaderBannerSettingsModel,
@@ -73,5 +76,6 @@ export {
   SellerPersonalCategoryModel,
   SellerPersonalCategoryCampaignModel,
   StaffAuditLogModel,
+  PassportVaultAccessLogModel,
   ReferralLedgerEntryModel,
 };

@@ -18,6 +18,7 @@ import {
 } from "../../../shared/config/appUiCopy.js";
 import { UserPremiumDisplayName } from "../../user/ui/UserPremiumDisplayName.jsx";
 
+import { AuctionDashboardProductThumb } from "./AuctionDashboardProductThumb.jsx";
 import { AuctionDashboardRowStatus } from "./AuctionDashboardRowStatus.jsx";
 import { AuctionDashboardSellerActions } from "./AuctionDashboardSellerActions.jsx";
 
@@ -51,7 +52,6 @@ export function AuctionSellerOfferRow({
   const isBusy = acceptMutation.isPending || rejectMutation.isPending;
 
   const productName = offer.product?.productName ?? "Товар";
-  const imageUrl = offer.product?.productImageUrl ?? null;
   const buyer = offer.buyer;
   const buyerId = buyer?._id != null ? String(buyer._id) : null;
   const buyerName = buyer?.userName?.trim() || USER_LIST_ROW_UI.MISSING_NAME;
@@ -95,18 +95,7 @@ export function AuctionSellerOfferRow({
         .join(" ")}
     >
       <div className="auction-dashboard-row__head">
-        {imageUrl ? (
-          <img
-            className="auction-dashboard-row__thumb"
-            src={imageUrl}
-            alt=""
-            loading="lazy"
-          />
-        ) : (
-          <span className="auction-dashboard-row__thumb auction-dashboard-row__thumb_placeholder">
-            —
-          </span>
-        )}
+        <AuctionDashboardProductThumb product={offer.product} />
         <div className="auction-dashboard-row__main">
           <div className="auction-dashboard-row__head-line">
             {typeof onProductClick === "function" ? (

@@ -4,6 +4,7 @@ import {
   installmentContractIdParamsSchema,
   installmentDisputeBodySchema,
   installmentDisputeIdParamsSchema,
+  installmentIdempotencyBodySchema,
   installmentPaymentIndexParamsSchema,
   installmentSellerMessageBodySchema,
   resolveInstallmentDisputeBodySchema,
@@ -33,6 +34,10 @@ export const installmentContractIdParamValidation = [
 
 export const installmentPaymentIndexParamValidation = [
   validateParamsZod(installmentPaymentIndexParamsSchema),
+];
+
+export const installmentIdempotencyBodyValidation = [
+  validateBodyZod(installmentIdempotencyBodySchema),
 ];
 
 export const installmentSellerMessageValidation = [

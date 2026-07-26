@@ -701,6 +701,13 @@
   background: color-mix(in srgb, var(--iz-color-text) 6%, transparent);
 }
 
+.app-shell--header-v2
+  .app-shell__header-search
+  .search-input--leading-icon
+  .search-input__field {
+  padding-left: 2.375rem;
+}
+
 .app-shell--header-v2 .app-shell__header-search .search-input__field:hover {
   background: color-mix(in srgb, var(--iz-color-text) 9%, transparent);
 }

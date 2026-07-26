@@ -4,6 +4,7 @@ import {
   SITE_HEADER_BANNER_IMAGE_ALT_MAX_LENGTH,
   SITE_HEADER_BANNER_LINK_PATH_MAX_LENGTH,
 } from "./siteHeaderBanner.js";
+import { requiredRuRegionCodeFieldSchema } from "./ruRegions.js";
 
 export const SITE_HEADER_BANNER_CAMPAIGN_PRICE_POINTS = 7_000;
 export const SITE_HEADER_BANNER_CAMPAIGN_DURATION_DAYS = 7;
@@ -49,6 +50,7 @@ export const submitSiteHeaderBannerCampaignBodySchema = z.object({
   imageAlt: z.string().trim().min(1).max(SITE_HEADER_BANNER_IMAGE_ALT_MAX_LENGTH),
   linkPath: optionalTrimmedText(SITE_HEADER_BANNER_LINK_PATH_MAX_LENGTH),
   backgroundColor: hexColorSchema,
+  regionCode: requiredRuRegionCodeFieldSchema,
 });
 
 export const rejectSiteHeaderBannerCampaignBodySchema = z.object({
@@ -67,6 +69,7 @@ export const siteHeaderBannerCampaignSchema = z.object({
   imageAlt: z.string(),
   linkPath: z.string().nullable(),
   backgroundColor: z.string().nullable(),
+  regionCode: z.string(),
   amountPoints: z.coerce.number(),
   pointsReservedAt: z.union([z.string(), z.date(), z.null()]).optional().nullable(),
   pointsChargedAt: z.union([z.string(), z.date(), z.null()]).optional().nullable(),

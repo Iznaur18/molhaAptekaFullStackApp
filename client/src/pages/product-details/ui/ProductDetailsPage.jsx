@@ -219,9 +219,6 @@ export function ProductDetailsPage() {
               }}
             >
               <AppIcon icon={Flag} size="sm" strokeWidth={2.15} />
-              {hasPendingReport
-                ? PRODUCT_REPORT_MODAL_UI.ALREADY_REPORTED
-                : PRODUCT_REPORT_MODAL_UI.REPORT_BUTTON}
             </button>
           ) : null
         }

@@ -23,7 +23,7 @@ export const CREATE_PRODUCT_INITIAL_FORM = {
   productStockQuantity: "1",
   loyaltyPointsPerUnit: "0",
   productCharacteristicRows: [],
-  productSaleCity: "",
+  productRegionCode: "RU-MOW",
   productReturnEnabled: null,
   returnTermRows: [],
 };
@@ -62,7 +62,7 @@ export function createProductFormStateFromProduct(product) {
         : "1",
     loyaltyPointsPerUnit: String(resolveProductLoyaltyPointsPerUnit(product)),
     productCharacteristicRows: characteristicRowsFromApi(product.productCharacteristics),
-    productSaleCity: product.productSaleCity?.trim() ?? "",
+    productRegionCode: product.productRegionCode?.trim() || "RU-MOW",
     productReturnEnabled: product.productReturnEnabled === true,
     returnTermRows:
       product.productReturnEnabled === true

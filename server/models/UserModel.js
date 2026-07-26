@@ -104,6 +104,13 @@ const UserSchema = new mongoose.Schema(
       default: "",
       index: true,
     },
+    userRegionCode: {
+      type: String,
+      trim: true,
+      required: false,
+      default: "",
+      index: true,
+    },
     userAddressDistrict: {
       type: String,
       trim: true,

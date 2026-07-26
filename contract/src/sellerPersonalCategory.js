@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { requiredRuRegionCodeFieldSchema } from "./ruRegions.js";
+
 export const SELLER_PERSONAL_CATEGORY_LABEL_MAX_LENGTH = 80;
 
 export const SELLER_PERSONAL_CATEGORY_DURATION_CODES = ["24h", "7d", "30d"];
@@ -12,6 +14,7 @@ export const submitSellerPersonalCategoryCampaignBodySchema = z.object({
     .max(SELLER_PERSONAL_CATEGORY_LABEL_MAX_LENGTH),
   imageUrl: z.string().trim().min(1, "Загрузите картинку категории").max(2048),
   tariffCode: z.enum(SELLER_PERSONAL_CATEGORY_DURATION_CODES),
+  regionCode: requiredRuRegionCodeFieldSchema,
 });
 
 export const rejectSellerPersonalCategoryCampaignBodySchema = z.object({
@@ -37,6 +40,7 @@ export const sellerPersonalCategoryCampaignSchema = z.object({
   labelRu: z.string().nullable().optional(),
   imageUrl: z.string().nullable().optional(),
   tariffCode: z.string().nullable().optional(),
+  regionCode: z.string().nullable().optional(),
   durationHours: z.number().nullable().optional(),
   amountPoints: z.number().nullable().optional(),
   pointsReservedAt: z.union([z.string(), z.date(), z.null()]).optional().nullable(),
@@ -59,6 +63,7 @@ export const sellerPersonalCategoryTileSchema = z.object({
   sellerId: z.string(),
   labelRu: z.string(),
   imageUrl: z.string().nullable().optional(),
+  regionCode: z.string().nullable().optional(),
   activeUntil: z.union([z.string(), z.date(), z.null()]).optional().nullable(),
 });
 

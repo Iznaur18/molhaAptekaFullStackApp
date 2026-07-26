@@ -25,8 +25,9 @@ import {
   PRICE_OFFER_STATUS_PENDING,
 } from "../model/constants.js";
 
-import { AuctionDashboardRowStatus } from "./AuctionDashboardRowStatus.jsx";
 import { AuctionDashboardBuyerPriceEditor } from "./AuctionDashboardBuyerPriceEditor.jsx";
+import { AuctionDashboardProductThumb } from "./AuctionDashboardProductThumb.jsx";
+import { AuctionDashboardRowStatus } from "./AuctionDashboardRowStatus.jsx";
 
 import "./AuctionDashboard.css";
 
@@ -59,7 +60,6 @@ export function AuctionBuyerBidRow({
   const isBusy = patchMutation.isPending || cancelMutation.isPending;
 
   const productName = bid.product?.productName ?? "Товар";
-  const imageUrl = bid.product?.productImageUrl ?? null;
   const isPending = bid.status === PRICE_OFFER_STATUS_PENDING;
   const isAccepted = bid.status === PRICE_OFFER_STATUS_ACCEPTED;
   const isExpanded = !collapsible || expanded;
@@ -119,18 +119,7 @@ export function AuctionBuyerBidRow({
         .join(" ")}
     >
       <div className="auction-dashboard-row__head">
-        {imageUrl ? (
-          <img
-            className="auction-dashboard-row__thumb"
-            src={imageUrl}
-            alt=""
-            loading="lazy"
-          />
-        ) : (
-          <span className="auction-dashboard-row__thumb auction-dashboard-row__thumb_placeholder">
-            —
-          </span>
-        )}
+        <AuctionDashboardProductThumb product={bid.product} />
         <div className="auction-dashboard-row__main">
           <div className="auction-dashboard-row__head-line">
             {typeof onProductClick === "function" ? (

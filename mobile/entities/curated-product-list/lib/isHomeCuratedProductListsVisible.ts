@@ -9,7 +9,6 @@ export type HomeCuratedProductListsVisibilityParams = {
   catalogAuctionOnly: boolean;
   catalogInstallmentOnly: boolean;
   catalogSaleOnly: boolean;
-  showHiddenCatalogProducts?: boolean;
 };
 
 export const isHomeCuratedProductListsVisible = ({
@@ -22,7 +21,6 @@ export const isHomeCuratedProductListsVisible = ({
   catalogAuctionOnly,
   catalogInstallmentOnly,
   catalogSaleOnly,
-  showHiddenCatalogProducts = false,
 }: HomeCuratedProductListsVisibilityParams): boolean =>
   isHomeCatalogMainView &&
   !isMineMode &&
@@ -32,5 +30,4 @@ export const isHomeCuratedProductListsVisible = ({
   !catalogFollowingOnly &&
   !catalogAuctionOnly &&
   !catalogInstallmentOnly &&
-  !catalogSaleOnly &&
-  !showHiddenCatalogProducts;
+  !catalogSaleOnly;

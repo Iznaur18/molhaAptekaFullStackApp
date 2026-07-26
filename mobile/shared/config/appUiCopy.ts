@@ -226,6 +226,7 @@ export const ADMIN_EDIT_USER_UI = {
 
 export const ADD_TO_CART_UI = {
   ADD: "В корзину",
+  GO_TO_CART: "Перейти в корзину",
   LOGIN_TO_ADD: "Войти, чтобы купить",
   DECREASE_ARIA: "Уменьшить количество",
   INCREASE_ARIA: "Увеличить количество",
@@ -1131,7 +1132,7 @@ export const USERS_PODIUM_UI = {
 } as const;
 
 export const USERS_MONTHLY_LOYALTY_LOADBAR_UI = {
-  TITLE: "Баллы за месяц",
+  TITLE: "Баллы необходимые достигнуть",
   PROGRESS_ARIA: (pointsLabel: string, goalLabel: string) =>
     `Начислено покупателям ${pointsLabel} из ${goalLabel} баллов за месяц`,
   COUNTER: (pointsLabel: string, goalLabel: string) => `${pointsLabel} / ${goalLabel}`,

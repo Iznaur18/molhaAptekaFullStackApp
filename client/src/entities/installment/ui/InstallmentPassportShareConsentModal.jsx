@@ -27,6 +27,7 @@ export function InstallmentPassportShareConsentModal({
       titleId={TITLE_ID}
       ariaLabel={INSTALLMENT_UI.PASSPORT_SHARE_CONSENT_TITLE}
       size="md"
+      panelClassName="installment-passport-share-consent"
       bodyClassName="installment-passport-share-consent__body"
       footer={
         <div className="installment-passport-share-consent__actions">

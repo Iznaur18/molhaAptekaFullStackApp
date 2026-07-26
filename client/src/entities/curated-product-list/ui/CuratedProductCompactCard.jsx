@@ -1,7 +1,10 @@
+import { useState } from "react";
+
 import { resolveProductCatalogPriceRub } from "../../product/lib/resolveProductCatalogPriceRub.js";
-import { resolveProductImageUrls } from "../../product/lib/resolveProductImageUrls.js";
-import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
+import { resolveProductImageUrl } from "../../product/lib/resolveProductImageUrl.js";
+import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../../product/model/productConstants.js";
 import { CURATED_PRODUCT_COMPACT_CARD_UI } from "../../../shared/config/appUiCopy.js";
+import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 
 import "./CuratedProductCompactCard.css";
 
@@ -12,27 +15,23 @@ import "./CuratedProductCompactCard.css";
  * }} props
  */
 export function CuratedProductCompactCard({ product, onOpen }) {
-  const imageUrls = resolveProductImageUrls(product);
-  const imageUrl = imageUrls[0] ?? "";
+  const [failed, setFailed] = useState(false);
+  const resolved = resolveProductImageUrl(product);
+  const imageUrl = failed || !resolved ? PRODUCT_IMAGE_PLACEHOLDER_URL : resolved;
   const priceLabel = formatPriceRub(resolveProductCatalogPriceRub(product));
 
   return (
     <article className="curated-product-compact-card">
       <div className="curated-product-compact-card__image-wrap">
-        {imageUrl ? (
-          <img
-            className="curated-product-compact-card__image"
-            src={imageUrl}
-            alt=""
-            loading="lazy"
-            decoding="async"
-            draggable={false}
-          />
-        ) : (
-          <span className="curated-product-compact-card__image-fallback" aria-hidden="true">
-            {CURATED_PRODUCT_COMPACT_CARD_UI.NO_IMAGE}
-          </span>
-        )}
+        <img
+          className="curated-product-compact-card__image"
+          src={imageUrl}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          draggable={false}
+          onError={() => setFailed(true)}
+        />
       </div>
       <button
         type="button"

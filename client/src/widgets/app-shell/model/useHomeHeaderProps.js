@@ -35,9 +35,6 @@ export const useHomeHeaderProps = () => {
     setIsRegisterModalOpen,
     handleNavigateToFullCatalogFromBreadcrumb,
     closeCatalogProductDetails,
-    canModerateProducts,
-    showHiddenCatalogProducts,
-    handleShowHiddenCatalogProductsToggle,
   } = ctx;
 
   const inAppNotificationsCount = inAppNotifications.length;
@@ -129,9 +126,6 @@ export const useHomeHeaderProps = () => {
       onLoginClick: handleLoginClick,
       onRegisterClick: handleRegisterClick,
       onNavigateToFullCatalogFromBreadcrumb: handleMobileHomeClick,
-      canModerateProducts,
-      showHiddenCatalogProducts,
-      onShowHiddenCatalogProductsToggle: handleShowHiddenCatalogProductsToggle,
       showSiteHeaderBanner: Boolean(showHomeCatalogFeed) && mainView === "catalog",
       isCatalogBrowserLanding,
     }),
@@ -167,9 +161,6 @@ export const useHomeHeaderProps = () => {
       inAppNotificationsCount,
       handleLoginClick,
       handleRegisterClick,
-      canModerateProducts,
-      showHiddenCatalogProducts,
-      handleShowHiddenCatalogProductsToggle,
       showHomeCatalogFeed,
     ],
   );

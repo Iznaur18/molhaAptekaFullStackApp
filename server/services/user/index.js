@@ -60,6 +60,11 @@ export {
   buildProductSaleCityMatch,
 } from "./userCityCatalogFilter.js";
 export {
+  resolveViewerRegionCodeForRequest,
+  buildProductRegionMatch,
+  buildEntityRegionMatch,
+} from "./userRegionCatalogFilter.js";
+export {
   attachUserListCommerceStats,
   attachUserCommerceStatsToUser,
 } from "./attachUserListCommerceStats.js";

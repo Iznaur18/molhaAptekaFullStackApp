@@ -36,6 +36,7 @@ export function ProductDetailsModalPurchaseActions({
           isAuthorized={isAuthorized}
           onRequestLogin={onRequestLogin}
           maxQuantity={purchaseLimit}
+          variant="detail"
         />
       </div>
     </div>

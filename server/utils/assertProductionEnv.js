@@ -1,3 +1,13 @@
+import {
+  isObjectStorageUploadEnabled,
+  validateObjectStorageEnv,
+} from "./objectStorageUpload.js";
+import {
+  isPassportVaultEnabled,
+  resolvePassportVaultKekHex,
+} from "../services/passport-vault/passportVaultKey.js";
+import { PASSPORT_VAULT_KEK_HEX_LENGTH } from "../constants/passportVaultConstants.js";
+
 const PLACEHOLDER_JWT_SECRETS = new Set([
   "REPLACE_WITH_crypto_randomBytes_32_hex",
   "smoke-test-jwt-secret-min-32-chars-long",
@@ -24,10 +34,19 @@ const mongoUriLooksLikeStandaloneDev = (mongoUri) => {
   return /^mongodb:\/\/(localhost|127\.0\.0\.1)/.test(uri);
 };
 
-import {
-  isObjectStorageUploadEnabled,
-  validateObjectStorageEnv,
-} from "./objectStorageUpload.js";
+/** Host из docker-compose / локального mongod — нельзя в production. */
+const LOCAL_MONGO_HOST_RE =
+  /^mongodb(\+srv)?:\/\/(?:[^/@]+@)?(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?(?:\/|\?|$)/i;
+
+/**
+ * @param {string | undefined} mongoUri
+ */
+const mongoUriLooksLikeLocalhost = (mongoUri) =>
+  LOCAL_MONGO_HOST_RE.test(String(mongoUri ?? ""));
+
+/** user:pass@host или user@host — иначе URI как у compose без auth. */
+const mongoUriHasCredentials = (mongoUri) =>
+  /^mongodb(\+srv)?:\/\/[^/@]+@/.test(String(mongoUri ?? ""));
 
 /**
  * Проверка env перед production-деплоем.
@@ -85,6 +104,18 @@ export const assertProductionEnv = () => {
     );
   }
 
+  if (isProduction && !isBlank(process.env.MONGO_URI)) {
+    if (mongoUriLooksLikeLocalhost(process.env.MONGO_URI)) {
+      errors.push(
+        "MONGO_URI указывает на localhost — корневой docker-compose.yml только для dev; в production нужен Atlas (mongodb+srv) или удалённый mongod",
+      );
+    } else if (!mongoUriHasCredentials(process.env.MONGO_URI)) {
+      errors.push(
+        "MONGO_URI без credentials (user:password@) — в production обязателен auth (Atlas или свой mongod с пользователем)",
+      );
+    }
+  }
+
   if (isProduction) {
     if (isBlank(process.env.FRONTEND_URL)) {
       errors.push(
@@ -139,6 +170,32 @@ export const assertProductionEnv = () => {
   if (isProduction && !isObjectStorageUploadEnabled()) {
     warnings.push(
       "UPLOAD_STORAGE не s3 — медиа на диске VPS; для масштаба задайте UPLOAD_STORAGE=s3 и CDN (PUBLIC_UPLOAD_BASE_URL)",
+    );
+  }
+
+  const vaultKek = resolvePassportVaultKekHex();
+  if (isProduction) {
+    if (!vaultKek) {
+      errors.push(
+        "PASSPORT_VAULT_KEK обязателен при NODE_ENV=production (64 hex = 32 байта AES key)",
+      );
+    } else if (vaultKek.length !== PASSPORT_VAULT_KEK_HEX_LENGTH) {
+      errors.push(
+        `PASSPORT_VAULT_KEK должен быть ${PASSPORT_VAULT_KEK_HEX_LENGTH} hex-символов`,
+      );
+    } else if (!isPassportVaultEnabled()) {
+      errors.push("PASSPORT_VAULT_KEK невалиден (ожидается hex)");
+    }
+  } else if (!vaultKek) {
+    warnings.push(
+      "PASSPORT_VAULT_KEK не задан — паспортные ПДн пишутся plaintext (только для local/dev)",
+    );
+  }
+
+  const redisUrl = process.env.REDIS_URL?.trim();
+  if (isProduction && redisUrl && !redisUrl.startsWith("rediss://")) {
+    warnings.push(
+      "REDIS_URL без rediss:// — в production предпочтителен TLS (Upstash/ElastiCache TLS)",
     );
   }
 

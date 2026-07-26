@@ -13,3 +13,5 @@ export const JOB_PROCESS_SELLER_PERSONAL_CATEGORY_CRON =
   "processSellerPersonalCategoryCronTasks";
 export const JOB_PROCESS_SITE_HEADER_BANNER_CAMPAIGN_CRON =
   "processSiteHeaderBannerCampaignCronTasks";
+export const JOB_PURGE_EXPIRED_BUYER_PASSPORT_SHARES =
+  "purgeExpiredBuyerPassportShares";

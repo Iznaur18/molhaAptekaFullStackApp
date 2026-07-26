@@ -44,6 +44,7 @@ export const toSiteHeaderBannerCampaignPayload = (row) => ({
   imageAlt: String(row.imageAlt ?? ""),
   linkPath: row.linkPath == null ? null : String(row.linkPath),
   backgroundColor: row.backgroundColor == null ? null : String(row.backgroundColor),
+  regionCode: String(row.regionCode ?? "RU-MOW"),
   amountPoints: Math.ceil(Number(row.amountPoints) || SITE_HEADER_BANNER_CAMPAIGN_PRICE_POINTS),
   pointsReservedAt: toIsoDateString(row.pointsReservedAt),
   pointsChargedAt: toIsoDateString(row.pointsChargedAt),

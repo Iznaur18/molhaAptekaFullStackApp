@@ -139,6 +139,12 @@ const ProductSchema = new Schema(
       default: "",
       index: true,
     },
+    productRegionCode: {
+      type: String,
+      trim: true,
+      default: "",
+      index: true,
+    },
     productCategory: {
       type: String,
       required: true,

@@ -1,3 +1,4 @@
+import { BUYER_PASSPORT_SHARE_PURGE_CRON_INTERVAL_MS } from "../constants/passportVaultConstants.js";
 import { INSTALLMENT_CRON_INTERVAL_MS } from "../constants/installmentConstants.js";
 import { INTRO_AD_CRON_INTERVAL_MS } from "../constants/introAdCampaignConstants.js";
 import { PREMIUM_CRON_INTERVAL_MS } from "../constants/premiumConstants.js";
@@ -12,6 +13,7 @@ import {
   JOB_PROCESS_PREMIUM_CRON,
   JOB_PROCESS_SELLER_PERSONAL_CATEGORY_CRON,
   JOB_PROCESS_SITE_HEADER_BANNER_CAMPAIGN_CRON,
+  JOB_PURGE_EXPIRED_BUYER_PASSPORT_SHARES,
 } from "../queues/queueConstants.js";
 
 const USER_STORY_CLEANUP_INTERVAL_MS = 15 * 60 * 1000;
@@ -30,5 +32,9 @@ export const CRON_JOB_DEFINITIONS = [
   {
     name: JOB_PROCESS_SITE_HEADER_BANNER_CAMPAIGN_CRON,
     intervalMs: SITE_HEADER_BANNER_CAMPAIGN_CRON_INTERVAL_MS,
+  },
+  {
+    name: JOB_PURGE_EXPIRED_BUYER_PASSPORT_SHARES,
+    intervalMs: BUYER_PASSPORT_SHARE_PURGE_CRON_INTERVAL_MS,
   },
 ];

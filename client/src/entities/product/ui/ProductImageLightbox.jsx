@@ -3,14 +3,20 @@ import { createPortal } from "react-dom";
 
 import { PRODUCT_CARD_UI } from "../../../shared/config/appUiCopy.js";
 import { useDialogFocusTrap } from "../../../shared/lib/useDialogFocusTrap.js";
+import {
+  isDisplayableProductImageUrl,
+  resolveImageUrlForDisplay,
+} from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
 
 import "./ProductImageLightbox.css";
 
-function filterHttpImageUrls(imageUrls) {
+function filterDisplayableImageUrls(imageUrls) {
   if (!Array.isArray(imageUrls)) return [];
-  return imageUrls.map((s) => String(s).trim()).filter((u) => /^https?:\/\//i.test(u));
+  return imageUrls
+    .map((s) => resolveImageUrlForDisplay(String(s).trim()))
+    .filter((u) => u.length > 0 && isDisplayableProductImageUrl(u));
 }
 
 /**
@@ -25,7 +31,7 @@ function filterHttpImageUrls(imageUrls) {
 export function ProductImageLightbox({ onClose, imageUrls, startIndex = 0 }) {
   const dialogRef = useRef(/** @type {HTMLDivElement | null} */ (null));
   const closeButtonRef = useRef(/** @type {HTMLButtonElement | null} */ (null));
-  const urls = useMemo(() => filterHttpImageUrls(imageUrls), [imageUrls]);
+  const urls = useMemo(() => filterDisplayableImageUrls(imageUrls), [imageUrls]);
   const [index, setIndex] = useState(0);
 
   useEffect(() => {

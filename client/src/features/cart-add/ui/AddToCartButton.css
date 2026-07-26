@@ -22,6 +22,16 @@
   border-color: var(--iz-color-action-hover);
 }
 
+.add-to-cart--in-cart {
+  border-color: var(--iz-color-success);
+  background: var(--iz-color-success);
+}
+
+.add-to-cart--in-cart:hover {
+  border-color: color-mix(in srgb, var(--iz-color-success) 85%, var(--iz-color-ink));
+  background: color-mix(in srgb, var(--iz-color-success) 85%, var(--iz-color-ink));
+}
+
 .add-to-cart__stepper {
   display: inline-flex;
   align-items: center;

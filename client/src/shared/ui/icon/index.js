@@ -8,7 +8,6 @@ export {
   ChevronUp,
   CircleAlert,
   CircleHelp,
-  Eye,
   FileText,
   Heart,
   HelpCircle,

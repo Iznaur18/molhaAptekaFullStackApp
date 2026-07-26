@@ -2,13 +2,13 @@ import { apiClient } from "../../../shared/api/index.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 
 /**
- * @param {{ allCities?: boolean }} [params]
+ * @param {{ regionCode?: string }} [params]
  * @returns {Promise<import('../model/types.js').HomeCuratedProductListFromApi[]>}
  */
-export async function fetchHomeCuratedProductLists({ allCities = false } = {}) {
+export async function fetchHomeCuratedProductLists({ regionCode } = {}) {
   try {
     const { data } = await apiClient.get("/product/curated-lists/home", {
-      params: allCities ? { allCities: "true" } : undefined,
+      params: regionCode ? { regionCode } : undefined,
     });
     if (!data?.success || !Array.isArray(data.data?.lists)) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);

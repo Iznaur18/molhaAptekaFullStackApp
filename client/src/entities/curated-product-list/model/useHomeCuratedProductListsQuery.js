@@ -4,12 +4,12 @@ import { fetchHomeCuratedProductLists } from "../api/fetchHomeCuratedProductList
 import { curatedProductListQueryKeys } from "./curatedProductListQueryKeys.js";
 
 /**
- * @param {{ enabled?: boolean; allCities?: boolean }} [params]
+ * @param {{ enabled?: boolean; regionCode?: string }} [params]
  */
-export function useHomeCuratedProductListsQuery({ enabled = true, allCities = false } = {}) {
+export function useHomeCuratedProductListsQuery({ enabled = true, regionCode = "" } = {}) {
   return useQuery({
-    queryKey: curatedProductListQueryKeys.home(allCities),
+    queryKey: curatedProductListQueryKeys.home(regionCode),
     enabled,
-    queryFn: () => fetchHomeCuratedProductLists({ allCities }),
+    queryFn: () => fetchHomeCuratedProductLists({ regionCode: regionCode || undefined }),
   });
 }

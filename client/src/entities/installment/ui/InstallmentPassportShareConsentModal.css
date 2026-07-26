@@ -1,36 +1,58 @@
+/* parity: mobile useInstallmentPassportShareConsentModalStyles */
+.installment-passport-share-consent.product-modal-shell__panel {
+  max-height: 90%;
+}
+
+.installment-passport-share-consent .product-modal-shell__body {
+  flex: 0 1 auto;
+  overflow: hidden;
+  padding: var(--iz-space-4);
+}
+
+.installment-passport-share-consent .product-modal-shell__footer {
+  padding: var(--iz-space-3) var(--iz-space-4) var(--iz-space-5);
+}
+
 .installment-passport-share-consent__body {
-  padding-block: 0.25rem 0.5rem;
+  padding-block: 0;
 }
 
 .installment-passport-share-consent__text {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
-  max-height: min(50vh, 22rem);
+  gap: var(--iz-space-2);
+  max-height: 280px;
   overflow: auto;
+  padding-bottom: var(--iz-space-1);
+  overscroll-behavior: contain;
 }
 
 .installment-passport-share-consent__text p {
   margin: 0;
-  font-size: 0.875rem;
-  line-height: 1.45;
-  color: var(--iz-color-text);
+  font-size: var(--iz-font-base);
+  line-height: var(--iz-leading-base);
+  color: var(--iz-color-text-secondary);
 }
 
 .installment-passport-share-consent__actions {
   display: flex;
   flex-wrap: nowrap;
-  gap: 0.5rem;
+  gap: var(--iz-space-2);
   align-items: stretch;
 }
 
 .installment-passport-share-consent__cancel,
 .installment-passport-share-consent__confirm {
-  min-height: 2.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: var(--iz-space-3) var(--iz-space-4);
+  border-radius: var(--iz-radius-button);
   font: inherit;
+  font-size: var(--iz-font-base);
   font-weight: 600;
+  line-height: var(--iz-leading-base);
   cursor: pointer;
 }
 
@@ -38,15 +60,15 @@
   flex-shrink: 0;
   border: 1px solid var(--iz-color-border);
   background: var(--iz-color-surface);
-  color: var(--iz-color-text);
+  color: var(--iz-color-text-secondary);
 }
 
 .installment-passport-share-consent__confirm {
   flex: 1;
   border: none;
-  /* mobile: confirmButton.backgroundColor = nearBlack (ink), текст onContrast */
   background: var(--iz-color-ink);
   color: var(--iz-color-on-contrast);
+  text-align: center;
 }
 
 .installment-passport-share-consent__cancel:disabled,

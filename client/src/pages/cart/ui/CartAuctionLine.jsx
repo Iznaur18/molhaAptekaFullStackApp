@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { usePriceOfferMutations } from "../../../entities/product-price-offer/model/usePriceOfferMutations.js";
 import { invalidatePriceOfferQueries } from "../../../entities/product-price-offer/lib/priceOfferQueryCache.js";
+import { resolveProductImageUrl } from "../../../entities/product/lib/resolveProductImageUrl.js";
 import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../../../entities/product/model/productConstants.js";
 import { CART_AUCTION_UI } from "../../../shared/config/appUiCopy.js";
 import { formatIsoDateTime } from "../../../shared/lib/formatIsoDateTime.js";
@@ -18,8 +20,13 @@ import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 export function CartAuctionLine({ bid, onCheckout }) {
   const queryClient = useQueryClient();
   const { cancelMutation } = usePriceOfferMutations(bid.productId);
+  const [imageFailed, setImageFailed] = useState(false);
 
-  const imageUrl = bid.product?.productImageUrl ?? PRODUCT_IMAGE_PLACEHOLDER_URL;
+  const resolvedImage = resolveProductImageUrl(bid.product);
+  const imageUrl =
+    imageFailed || !resolvedImage
+      ? PRODUCT_IMAGE_PLACEHOLDER_URL
+      : resolvedImage;
   const productName = bid.product?.productName ?? "";
 
   const handleRemove = async () => {
@@ -29,8 +36,9 @@ export function CartAuctionLine({ bid, onCheckout }) {
     try {
       await cancelMutation.mutateAsync();
       void invalidatePriceOfferQueries(queryClient);
-    } catch {
-      // ошибка уходит в mutation; UI линии без inline-формы
+    } catch (error) {
+      // mutation.error показывается ниже
+      void error;
     }
   };
 
@@ -43,6 +51,7 @@ export function CartAuctionLine({ bid, onCheckout }) {
           alt=""
           loading="lazy"
           decoding="async"
+          onError={() => setImageFailed(true)}
         />
         <div className="cart-auction-line__info">
           <span className="cart-auction-line__badge">{CART_AUCTION_UI.BADGE}</span>

@@ -59,7 +59,6 @@ export function useAppShellDomain(
     isCatalogBrowserMainViewActive: shell.isCatalogBrowserMainViewActive,
     isCatalogShellView: shell.isCatalogShellView,
     isAuthorized: shell.isAuthorized,
-    canModerateProducts: shell.canModerateProducts,
     setIsLoginModalOpen: shell.setIsLoginModalOpen,
     submittedProductSearchTerm: shell.submittedProductSearchTerm,
     myProductsModerationFilter: shell.myProductsModerationFilter,
@@ -82,7 +81,6 @@ export function useAppShellDomain(
     catalogAuctionOnly: catalogLoader.catalogAuctionOnly,
     catalogInstallmentOnly: catalogLoader.catalogInstallmentOnly,
     catalogSaleOnly: catalogLoader.catalogSaleOnly,
-    showHiddenCatalogProducts: catalogLoader.showHiddenCatalogProducts,
     catalogAllCities: catalogLoader.catalogAllCities,
   });
 
@@ -95,7 +93,6 @@ export function useAppShellDomain(
     setProductToEdit: shell.setProductToEdit,
     setProductDetailsAdminError: shell.setProductDetailsAdminError,
     isMineMode: catalogLoader.isMineMode,
-    showHiddenCatalogProducts: catalogLoader.showHiddenCatalogProducts,
     selectedProductCategory: catalogLoader.selectedProductCategory,
     setDeletingProductId: shell.setDeletingProductId,
     setTogglingAvailabilityProductId: shell.setTogglingAvailabilityProductId,

@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { catalogQueryKeys, installmentQueryKeys } from "@/shared/api";
+import { createClientIdempotencyKey } from "@/shared/lib/createClientIdempotencyKey";
 
 import {
   confirmInstallmentPayment,
@@ -40,7 +41,12 @@ export const useInstallmentMutations = () => {
     }: {
       contractId: string;
       paymentIndex: number;
-    }) => markInstallmentPaymentPaid(contractId, paymentIndex),
+    }) =>
+      markInstallmentPaymentPaid(
+        contractId,
+        paymentIndex,
+        createClientIdempotencyKey(),
+      ),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: installmentQueryKeys.all });
     },
@@ -53,7 +59,12 @@ export const useInstallmentMutations = () => {
     }: {
       contractId: string;
       paymentIndex: number;
-    }) => confirmInstallmentPayment(contractId, paymentIndex),
+    }) =>
+      confirmInstallmentPayment(
+        contractId,
+        paymentIndex,
+        createClientIdempotencyKey(),
+      ),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: installmentQueryKeys.all });
     },
@@ -66,7 +77,12 @@ export const useInstallmentMutations = () => {
     }: {
       contractId: string;
       paymentIndex: number;
-    }) => rejectInstallmentPayment(contractId, paymentIndex),
+    }) =>
+      rejectInstallmentPayment(
+        contractId,
+        paymentIndex,
+        createClientIdempotencyKey(),
+      ),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: installmentQueryKeys.all });
     },

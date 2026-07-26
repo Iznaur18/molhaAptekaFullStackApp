@@ -7,7 +7,7 @@ import { ProductModel } from "../../models/index.js";
 import { getHiddenSellerIds } from "../access/adminUserGuard.js";
 import { attachProductSellerSnapshots } from "./attachProductSellerSnapshots.js";
 import { enrichProductApiFields } from "./productDiscount.js";
-import { buildProductSaleCityMatch } from "../user/userCityCatalogFilter.js";
+import { buildProductRegionMatch } from "../user/userRegionCatalogFilter.js";
 
 /**
  * @param {string[]} hiddenSellerIds
@@ -28,18 +28,16 @@ export const buildCatalogVisibleProductFilter = (hiddenSellerIds) => {
 
 /**
  * @param {string[]} hiddenSellerIds
- * @param {string | null | undefined} buyerCityKey
+ * @param {string | null | undefined} viewerRegionCode
  */
-const buildCatalogVisibleProductQuery = (hiddenSellerIds, buyerCityKey = null) => {
+const buildCatalogVisibleProductQuery = (hiddenSellerIds, viewerRegionCode = null) => {
   const filter = buildCatalogVisibleProductFilter(hiddenSellerIds);
-  const cityMatch = buyerCityKey ? buildProductSaleCityMatch(buyerCityKey) : null;
-
-  if (!cityMatch) {
+  if (!viewerRegionCode) {
     return filter;
   }
 
   return {
-    $and: [filter, cityMatch],
+    $and: [filter, buildProductRegionMatch(viewerRegionCode)],
   };
 };
 
@@ -86,7 +84,7 @@ export const normalizeCuratedProductListTitle = (rawTitle) => {
 /**
  * @param {string[]} productIds
  * @param {string[]} hiddenSellerIds
- * @param {{ buyerCityKey?: string | null }} [options]
+ * @param {{ viewerRegionCode?: string | null }} [options]
  */
 const fetchCatalogVisibleProductsByIds = async (
   productIds,
@@ -103,7 +101,7 @@ const fetchCatalogVisibleProductsByIds = async (
 
   const rows = await ProductModel.find({
     _id: { $in: normalizedIds },
-    ...buildCatalogVisibleProductQuery(hiddenSellerIds, options.buyerCityKey),
+    ...buildCatalogVisibleProductQuery(hiddenSellerIds, options.viewerRegionCode),
   }).lean();
 
   const enrichedRows = await attachProductSellerSnapshots(rows);
@@ -169,7 +167,7 @@ const resolveOrderedListProducts = (list, productsById) => {
 /**
  * @param {import('mongoose').LeanDocument<import('../models/CuratedProductListModel.js').default>[]} lists
  * @param {string[]} hiddenSellerIds
- * @param {{ buyerCityKey?: string | null }} [options]
+ * @param {{ viewerRegionCode?: string | null }} [options]
  */
 export const buildHomeCuratedListsResponse = async (
   lists,

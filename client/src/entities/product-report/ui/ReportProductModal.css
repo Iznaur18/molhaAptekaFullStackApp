@@ -1,75 +1,93 @@
+/* parity: mobile useBottomSheetReportModalStyles + REPORT_PRODUCT_MODAL_ANIMATION */
 .report-product-modal {
+  --report-product-enter-ms: 280ms;
+  --report-product-enter-ease: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --report-product-sheet-rest-offset: 40vh;
+
   position: fixed;
   inset: 0;
-  z-index: 1400;
+  z-index: var(--iz-z-modal-shell, 1400);
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  padding: 1rem;
   box-sizing: border-box;
+  padding: 0 0 var(--report-product-sheet-rest-offset);
+  pointer-events: none;
 }
 
 .report-product-modal__backdrop {
   position: absolute;
   inset: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
   background: var(--iz-color-modal-scrim);
+  cursor: pointer;
+  pointer-events: auto;
+  animation: report-product-modal-backdrop-in var(--report-product-enter-ms)
+    var(--report-product-enter-ease) both;
+}
+
+.report-product-modal__backdrop:disabled {
+  cursor: not-allowed;
 }
 
 .report-product-modal__card {
   position: relative;
   z-index: 1;
+  box-sizing: border-box;
   width: 100%;
   max-width: 28rem;
-  border-radius: 0.75rem;
-  border: 1px solid var(--iz-color-border);
+  margin: 0 var(--iz-space-4);
+  padding: 20px;
+  padding-bottom: var(--iz-space-8);
+  overflow: hidden;
+  border: none;
+  border-radius: var(--iz-radius-md);
   background: var(--iz-color-surface);
-  padding: 1rem;
-  box-shadow: 0 20px 45px var(--iz-shadow-dialog);
-}
-
-.report-product-modal__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
+  pointer-events: auto;
+  animation: report-product-modal-sheet-in var(--report-product-enter-ms)
+    var(--report-product-enter-ease) both;
 }
 
 .report-product-modal__title {
   margin: 0;
-  font-size: 1.125rem;
-}
-
-.report-product-modal__close {
-  border: 0;
-  background: transparent;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: var(--iz-color-text-muted);
+  font-size: var(--iz-font-2xl);
+  font-weight: 700;
+  line-height: var(--iz-leading-xl);
+  color: var(--iz-color-text);
 }
 
 .report-product-modal__product-name {
-  margin: 0 0 0.75rem;
-  font-size: 0.9rem;
-  color: var(--iz-color-text-secondary);
-}
-
-.report-product-modal__already {
-  margin: 0.5rem 0 0;
+  margin: 6px 0 0;
+  font-size: var(--iz-font-base);
+  line-height: var(--iz-leading-base);
   color: var(--iz-color-text-muted);
 }
 
-.report-product-modal__label {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  font-size: 0.875rem;
+.report-product-modal__already {
+  margin: var(--iz-space-4) 0 0;
+  font-size: var(--iz-font-base);
+  color: var(--iz-color-text-muted);
 }
 
-/**
- * mobile/shared/theme/modalChromeStyles.ts → useBottomSheetReportModalStyles.input:
- * minHeight 100, hairline border `border`, r 10, padding 12, 15px, bg surfaceMuted
- */
+.report-product-modal__form {
+  margin: 0;
+}
+
+.report-product-modal__label {
+  display: block;
+  margin-top: var(--iz-space-4);
+  font-size: var(--iz-font-base);
+  font-weight: 600;
+  color: var(--iz-color-action);
+}
+
 .report-product-modal__textarea {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: var(--iz-space-2);
   min-height: 100px;
   padding: var(--iz-space-3);
   border: var(--iz-border-hairline) solid var(--iz-color-border);
@@ -78,6 +96,7 @@
   color: var(--iz-color-text);
   font: inherit;
   font-size: var(--iz-font-md);
+  font-weight: 400;
   resize: none;
 }
 
@@ -87,55 +106,88 @@
   box-shadow: var(--iz-shadow-input-focus);
 }
 
-/* inputError: borderColor danger */
 .report-product-modal__textarea_error {
   border-color: var(--iz-color-danger);
 }
 
 .report-product-modal__meter {
-  font-size: 0.78rem;
+  margin-top: 6px;
+  font-size: var(--iz-font-xs);
+  font-weight: 400;
   color: var(--iz-color-text-muted);
+  text-align: right;
 }
 
 .report-product-modal__meter_overflow {
   color: var(--iz-color-danger);
-  font-weight: 600;
 }
 
 .report-product-modal__error {
-  margin: 0.5rem 0 0;
+  margin: var(--iz-space-2) 0 0;
+  font-size: var(--iz-font-sm);
   color: var(--iz-color-danger);
-  font-size: 0.875rem;
 }
 
 .report-product-modal__actions {
   display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
+  gap: var(--iz-space-3);
+  margin-top: 20px;
 }
 
 .report-product-modal__cancel,
 .report-product-modal__submit {
-  border-radius: 0.5rem;
-  padding: 0.5rem 0.85rem;
-  font-size: 0.9375rem;
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 14px var(--iz-space-4);
+  border-radius: var(--iz-radius-button);
+  font: inherit;
+  font-size: var(--iz-font-md);
+  font-weight: 600;
   cursor: pointer;
 }
 
+/* цвета cancel — cancelButton.css (danger + onContrast) */
 .report-product-modal__cancel {
-  border: 1px solid var(--iz-color-danger);
-  background: var(--iz-color-danger);
-  color: var(--iz-color-on-contrast);
+  border: var(--iz-border) solid var(--iz-color-danger);
 }
 
 .report-product-modal__submit {
-  border: 1px solid var(--iz-color-action);
+  border: none;
   background: var(--iz-color-action);
   color: var(--iz-color-on-contrast);
 }
 
 .report-product-modal__submit:disabled {
-  opacity: 0.6;
-  cursor: default;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@keyframes report-product-modal-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes report-product-modal-sheet-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .report-product-modal__backdrop,
+  .report-product-modal__card {
+    animation: none;
+  }
 }

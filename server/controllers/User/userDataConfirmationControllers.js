@@ -11,6 +11,7 @@ import {
   resolveDataConfirmationRequest,
 } from "../../services/user/userDataConfirmationHelpers.js";
 import { normalizePassportPayload } from "../../services/user/validatePassportPayload.js";
+import { sealPassportPlain } from "../../services/passport-vault/index.js";
 import { errorRes, successRes } from "../../services/http/index.js";
 
 /**
@@ -73,7 +74,7 @@ export const submitDataConfirmationRequestController = async (req, res) => {
 
     await UserDataConfirmationRequestModel.create({
       userId,
-      passport,
+      passport: sealPassportPlain(passport),
       passportSelfiePhotoUrl,
     });
 

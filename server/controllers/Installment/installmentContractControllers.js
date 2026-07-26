@@ -62,6 +62,7 @@ export const markInstallmentPaymentPaidController = async (req, res) => {
     userId: req.userId,
     contractId: req.params.contractId,
     paymentIndex: req.params.paymentIndex,
+    idempotencyKey: req.body?.idempotencyKey,
   });
 
   return successRes(res, result);
@@ -73,6 +74,7 @@ export const rejectInstallmentPaymentController = async (req, res) => {
     userId: req.userId,
     contractId: req.params.contractId,
     paymentIndex: req.params.paymentIndex,
+    idempotencyKey: req.body?.idempotencyKey,
   });
 
   return successRes(res, result);
@@ -83,6 +85,7 @@ export const rejectInstallmentEarlyPayoffController = async (req, res) => {
   const result = await rejectInstallmentEarlyPayoff({
     userId: req.userId,
     contractId: req.params.contractId,
+    idempotencyKey: req.body?.idempotencyKey,
   });
 
   return successRes(res, result);
@@ -94,6 +97,7 @@ export const confirmInstallmentPaymentController = async (req, res) => {
     userId: req.userId,
     contractId: req.params.contractId,
     paymentIndex: req.params.paymentIndex,
+    idempotencyKey: req.body?.idempotencyKey,
   });
 
   return successRes(res, result);
@@ -104,6 +108,7 @@ export const markInstallmentEarlyPayoffController = async (req, res) => {
   const result = await markInstallmentEarlyPayoff({
     userId: req.userId,
     contractId: req.params.contractId,
+    idempotencyKey: req.body?.idempotencyKey,
   });
 
   return successRes(res, result);
@@ -114,6 +119,7 @@ export const cancelInstallmentEarlyPayoffController = async (req, res) => {
   const result = await cancelInstallmentEarlyPayoff({
     userId: req.userId,
     contractId: req.params.contractId,
+    idempotencyKey: req.body?.idempotencyKey,
   });
 
   return successRes(res, result);
@@ -124,6 +130,7 @@ export const confirmInstallmentEarlyPayoffController = async (req, res) => {
   const result = await confirmInstallmentEarlyPayoff({
     userId: req.userId,
     contractId: req.params.contractId,
+    idempotencyKey: req.body?.idempotencyKey,
   });
 
   return successRes(res, result);

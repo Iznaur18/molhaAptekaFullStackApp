@@ -1,15 +1,26 @@
 import {
+  INSTALLMENT_CONTRACT_STATUS_ACTIVE,
   INSTALLMENT_CONTRACT_STATUS_COMPLETED,
+  INSTALLMENT_CONTRACT_STATUS_PENDING_FIRST_PAYMENT,
+  INSTALLMENT_OP_CANCEL_EARLY_PAYOFF,
+  INSTALLMENT_OP_CONFIRM_EARLY_PAYOFF,
+  INSTALLMENT_OP_MARK_EARLY_PAYOFF,
+  INSTALLMENT_OP_REJECT_EARLY_PAYOFF,
+  INSTALLMENT_PAYMENT_STATUS_DUE,
+  INSTALLMENT_PAYMENT_STATUS_OVERDUE,
   INSTALLMENT_PAYMENT_STATUS_PAID,
   INSTALLMENT_PAYMENT_STATUS_PENDING_CONFIRMATION,
+  INSTALLMENT_PAYMENT_STATUS_SCHEDULED,
 } from "../../constants/installmentConstants.js";
 import { AppError } from "../../errors/AppError.js";
+import { InstallmentContractModel } from "../../models/index.js";
 import {
   buildInstallmentContractPayload,
   isEarlyPayoffPendingConfirmation,
   notifySellerEarlyPayoff,
-  revertInstallmentPaymentsAfterEarlyPayoffCancel,
+  restoreInstallmentScheduleAfterPendingMarksReverted,
 } from "./installmentHelpers.js";
+import { runInstallmentIdempotentMutation } from "./runInstallmentIdempotentMutation.js";
 
 import {
   assertActiveInstallmentContract,
@@ -19,33 +30,90 @@ import {
   loadInstallmentContractOrThrow,
 } from "./installmentContractHelpers.js";
 
+const ACTIVE_FOR_EARLY_PAYOFF = [
+  INSTALLMENT_CONTRACT_STATUS_PENDING_FIRST_PAYMENT,
+  INSTALLMENT_CONTRACT_STATUS_ACTIVE,
+];
+
 /**
- * @param {{ userId: string; contractId: string }} input
+ * @param {{
+ *   userId: string;
+ *   contractId: string;
+ *   idempotencyKey?: string | null;
+ * }} input
  */
-export async function rejectInstallmentEarlyPayoff({ userId, contractId }) {
+export async function rejectInstallmentEarlyPayoff({
+  userId,
+  contractId,
+  idempotencyKey = null,
+}) {
   const contract = await loadInstallmentContractOrThrow(contractId);
   await assertInstallmentSellerOrAdmin(userId, contract);
   assertActiveInstallmentContract(contract);
   await assertInstallmentOrderAcceptedForPayments(contract);
 
-  if (!isEarlyPayoffPendingConfirmation(contract)) {
-    throw new AppError(409, "Нет досрочного погашения для отклонения");
-  }
+  const successMessage = "Досрочное погашение отклонено";
 
-  revertInstallmentPaymentsAfterEarlyPayoffCancel(contract);
-  contract.markModified("payments");
-  await contract.save();
+  return runInstallmentIdempotentMutation({
+    actorUserId: userId,
+    contractId,
+    action: INSTALLMENT_OP_REJECT_EARLY_PAYOFF,
+    idempotencyKey,
+    successMessage,
+    execute: async () => {
+      const claimed = await InstallmentContractModel.findOneAndUpdate(
+        {
+          _id: contractId,
+          status: { $in: ACTIVE_FOR_EARLY_PAYOFF },
+          payments: {
+            $elemMatch: {
+              status: INSTALLMENT_PAYMENT_STATUS_PENDING_CONFIRMATION,
+            },
+          },
+        },
+        {
+          $set: {
+            "payments.$[p].status": INSTALLMENT_PAYMENT_STATUS_SCHEDULED,
+            "payments.$[p].buyerMarkedPaidAt": null,
+            "payments.$[p].confirmedByUserId": null,
+          },
+        },
+        {
+          arrayFilters: [
+            { "p.status": INSTALLMENT_PAYMENT_STATUS_PENDING_CONFIRMATION },
+          ],
+          returnDocument: "after",
+        },
+      );
 
-  return {
-    message: "Досрочное погашение отклонено",
-    contract: await buildInstallmentContractPayload(contract),
-  };
+      if (!claimed) {
+        throw new AppError(409, "Нет досрочного погашения для отклонения");
+      }
+
+      restoreInstallmentScheduleAfterPendingMarksReverted(claimed);
+      claimed.markModified("payments");
+      await claimed.save();
+
+      return {
+        message: successMessage,
+        contract: await buildInstallmentContractPayload(claimed),
+      };
+    },
+  });
 }
 
 /**
- * @param {{ userId: string; contractId: string }} input
+ * @param {{
+ *   userId: string;
+ *   contractId: string;
+ *   idempotencyKey?: string | null;
+ * }} input
  */
-export async function markInstallmentEarlyPayoff({ userId, contractId }) {
+export async function markInstallmentEarlyPayoff({
+  userId,
+  contractId,
+  idempotencyKey = null,
+}) {
   const contract = await loadInstallmentContractOrThrow(contractId);
   assertInstallmentBuyer(userId, contract);
   assertActiveInstallmentContract(contract);
@@ -54,52 +122,166 @@ export async function markInstallmentEarlyPayoff({ userId, contractId }) {
   const remaining = (contract.payments ?? []).filter(
     (payment) => payment.status !== INSTALLMENT_PAYMENT_STATUS_PAID,
   );
-  if (remaining.length === 0) {
+  if (isEarlyPayoffPendingConfirmation(contract)) {
+    // Уже отмечено — идём в idempotency (повтор ключа → duplicate).
+  } else if (remaining.length === 0) {
     throw new AppError(409, "Долг уже погашен");
   }
 
-  for (const payment of remaining) {
-    payment.status = INSTALLMENT_PAYMENT_STATUS_PENDING_CONFIRMATION;
-    payment.buyerMarkedPaidAt = new Date();
-  }
+  const successMessage = "Досрочное погашение ожидает подтверждения";
+  const markableStatuses = [
+    INSTALLMENT_PAYMENT_STATUS_DUE,
+    INSTALLMENT_PAYMENT_STATUS_OVERDUE,
+    INSTALLMENT_PAYMENT_STATUS_SCHEDULED,
+  ];
 
-  contract.markModified("payments");
-  await contract.save();
+  return runInstallmentIdempotentMutation({
+    actorUserId: userId,
+    contractId,
+    action: INSTALLMENT_OP_MARK_EARLY_PAYOFF,
+    idempotencyKey,
+    successMessage,
+    execute: async () => {
+      const markedAt = new Date();
+      const claimed = await InstallmentContractModel.findOneAndUpdate(
+        {
+          _id: contractId,
+          status: { $in: ACTIVE_FOR_EARLY_PAYOFF },
+          payments: {
+            $elemMatch: {
+              status: { $in: markableStatuses },
+            },
+          },
+        },
+        {
+          $set: {
+            "payments.$[p].status": INSTALLMENT_PAYMENT_STATUS_PENDING_CONFIRMATION,
+            "payments.$[p].buyerMarkedPaidAt": markedAt,
+          },
+        },
+        {
+          arrayFilters: [
+            {
+              "p.status": { $in: markableStatuses },
+            },
+          ],
+          returnDocument: "after",
+        },
+      );
 
-  return {
-    message: "Досрочное погашение ожидает подтверждения",
-    contract: await buildInstallmentContractPayload(contract),
-    remainingAmountRub: remaining.reduce((sum, payment) => sum + payment.amountRub, 0),
-  };
+      if (!claimed) {
+        const fresh = await loadInstallmentContractOrThrow(contractId);
+        if (isEarlyPayoffPendingConfirmation(fresh)) {
+          const unpaid = (fresh.payments ?? []).filter(
+            (payment) => payment.status !== INSTALLMENT_PAYMENT_STATUS_PAID,
+          );
+          return {
+            message: successMessage,
+            contract: await buildInstallmentContractPayload(fresh),
+            remainingAmountRub: unpaid.reduce(
+              (sum, payment) => sum + (Number(payment.amountRub) || 0),
+              0,
+            ),
+          };
+        }
+        throw new AppError(409, "Долг уже погашен");
+      }
+
+      const unpaid = (claimed.payments ?? []).filter(
+        (payment) => payment.status !== INSTALLMENT_PAYMENT_STATUS_PAID,
+      );
+
+      return {
+        message: successMessage,
+        contract: await buildInstallmentContractPayload(claimed),
+        remainingAmountRub: unpaid.reduce(
+          (sum, payment) => sum + (Number(payment.amountRub) || 0),
+          0,
+        ),
+      };
+    },
+  });
 }
 
 /**
- * @param {{ userId: string; contractId: string }} input
+ * @param {{
+ *   userId: string;
+ *   contractId: string;
+ *   idempotencyKey?: string | null;
+ * }} input
  */
-export async function cancelInstallmentEarlyPayoff({ userId, contractId }) {
+export async function cancelInstallmentEarlyPayoff({
+  userId,
+  contractId,
+  idempotencyKey = null,
+}) {
   const contract = await loadInstallmentContractOrThrow(contractId);
   assertInstallmentBuyer(userId, contract);
   assertActiveInstallmentContract(contract);
   await assertInstallmentOrderAcceptedForPayments(contract);
 
-  if (!isEarlyPayoffPendingConfirmation(contract)) {
-    throw new AppError(409, "Нет досрочного погашения для отмены");
-  }
+  const successMessage = "Досрочное погашение отменено";
 
-  revertInstallmentPaymentsAfterEarlyPayoffCancel(contract);
-  contract.markModified("payments");
-  await contract.save();
+  return runInstallmentIdempotentMutation({
+    actorUserId: userId,
+    contractId,
+    action: INSTALLMENT_OP_CANCEL_EARLY_PAYOFF,
+    idempotencyKey,
+    successMessage,
+    execute: async () => {
+      const claimed = await InstallmentContractModel.findOneAndUpdate(
+        {
+          _id: contractId,
+          status: { $in: ACTIVE_FOR_EARLY_PAYOFF },
+          payments: {
+            $elemMatch: {
+              status: INSTALLMENT_PAYMENT_STATUS_PENDING_CONFIRMATION,
+            },
+          },
+        },
+        {
+          $set: {
+            "payments.$[p].status": INSTALLMENT_PAYMENT_STATUS_SCHEDULED,
+            "payments.$[p].buyerMarkedPaidAt": null,
+            "payments.$[p].confirmedByUserId": null,
+          },
+        },
+        {
+          arrayFilters: [
+            { "p.status": INSTALLMENT_PAYMENT_STATUS_PENDING_CONFIRMATION },
+          ],
+          returnDocument: "after",
+        },
+      );
 
-  return {
-    message: "Досрочное погашение отменено",
-    contract: await buildInstallmentContractPayload(contract),
-  };
+      if (!claimed) {
+        throw new AppError(409, "Нет досрочного погашения для отмены");
+      }
+
+      restoreInstallmentScheduleAfterPendingMarksReverted(claimed);
+      claimed.markModified("payments");
+      await claimed.save();
+
+      return {
+        message: successMessage,
+        contract: await buildInstallmentContractPayload(claimed),
+      };
+    },
+  });
 }
 
 /**
- * @param {{ userId: string; contractId: string }} input
+ * @param {{
+ *   userId: string;
+ *   contractId: string;
+ *   idempotencyKey?: string | null;
+ * }} input
  */
-export async function confirmInstallmentEarlyPayoff({ userId, contractId }) {
+export async function confirmInstallmentEarlyPayoff({
+  userId,
+  contractId,
+  idempotencyKey = null,
+}) {
   const contract = await loadInstallmentContractOrThrow(contractId);
   await assertInstallmentSellerOrAdmin(userId, contract);
   await assertInstallmentOrderAcceptedForPayments(contract);
@@ -107,29 +289,77 @@ export async function confirmInstallmentEarlyPayoff({ userId, contractId }) {
   const pending = (contract.payments ?? []).filter(
     (payment) => payment.status === INSTALLMENT_PAYMENT_STATUS_PENDING_CONFIRMATION,
   );
-  if (pending.length === 0) {
+  if (
+    pending.length === 0 &&
+    contract.status !== INSTALLMENT_CONTRACT_STATUS_COMPLETED
+  ) {
     throw new AppError(409, "Нет ожидающих платежей");
   }
 
-  const paidAt = new Date();
-  for (const payment of pending) {
-    payment.status = INSTALLMENT_PAYMENT_STATUS_PAID;
-    payment.paidAt = paidAt;
-    payment.confirmedByUserId = userId;
-    contract.paidAmountRub =
-      (Number(contract.paidAmountRub) || 0) + (Number(payment.amountRub) || 0);
-  }
+  const successMessage = "Досрочное погашение подтверждено";
 
-  contract.status = INSTALLMENT_CONTRACT_STATUS_COMPLETED;
-  contract.completedAt = paidAt;
-  contract.nextPaymentDueAt = null;
-  contract.hasOverduePayment = false;
-  await contract.save();
+  return runInstallmentIdempotentMutation({
+    actorUserId: userId,
+    contractId,
+    action: INSTALLMENT_OP_CONFIRM_EARLY_PAYOFF,
+    idempotencyKey,
+    successMessage,
+    execute: async () => {
+      const paidAt = new Date();
+      const claimed = await InstallmentContractModel.findOneAndUpdate(
+        {
+          _id: contractId,
+          status: { $in: ACTIVE_FOR_EARLY_PAYOFF },
+          payments: {
+            $elemMatch: {
+              status: INSTALLMENT_PAYMENT_STATUS_PENDING_CONFIRMATION,
+            },
+          },
+        },
+        {
+          $set: {
+            "payments.$[p].status": INSTALLMENT_PAYMENT_STATUS_PAID,
+            "payments.$[p].paidAt": paidAt,
+            "payments.$[p].confirmedByUserId": userId,
+            status: INSTALLMENT_CONTRACT_STATUS_COMPLETED,
+            completedAt: paidAt,
+            nextPaymentDueAt: null,
+            hasOverduePayment: false,
+          },
+        },
+        {
+          arrayFilters: [
+            { "p.status": INSTALLMENT_PAYMENT_STATUS_PENDING_CONFIRMATION },
+          ],
+          returnDocument: "after",
+        },
+      );
 
-  await notifySellerEarlyPayoff(String(contract.sellerUserId), String(contract.productId));
+      if (!claimed) {
+        const fresh = await loadInstallmentContractOrThrow(contractId);
+        if (fresh.status === INSTALLMENT_CONTRACT_STATUS_COMPLETED) {
+          return {
+            message: successMessage,
+            contract: await buildInstallmentContractPayload(fresh),
+          };
+        }
+        throw new AppError(409, "Нет ожидающих платежей");
+      }
 
-  return {
-    message: "Досрочное погашение подтверждено",
-    contract: await buildInstallmentContractPayload(contract),
-  };
+      claimed.paidAmountRub = (claimed.payments ?? [])
+        .filter((payment) => payment.status === INSTALLMENT_PAYMENT_STATUS_PAID)
+        .reduce((sum, payment) => sum + (Number(payment.amountRub) || 0), 0);
+      await claimed.save();
+
+      await notifySellerEarlyPayoff(
+        String(claimed.sellerUserId),
+        String(claimed.productId),
+      );
+
+      return {
+        message: successMessage,
+        contract: await buildInstallmentContractPayload(claimed),
+      };
+    },
+  });
 }

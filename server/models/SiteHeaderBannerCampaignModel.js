@@ -49,6 +49,12 @@ const SiteHeaderBannerCampaignSchema = new mongoose.Schema(
       trim: true,
       maxlength: 7,
     },
+    regionCode: {
+      type: String,
+      trim: true,
+      default: "RU-MOW",
+      index: true,
+    },
     amountPoints: {
       type: Number,
       default: SITE_HEADER_BANNER_CAMPAIGN_PRICE_POINTS,

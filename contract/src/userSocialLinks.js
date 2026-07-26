@@ -11,12 +11,12 @@ export const USER_SOCIAL_LINK_HANDLE_MAX_LENGTH = 100;
  * @type {ReadonlyArray<{ id: string; labelRu: string; placeholderRu: string }>}
  */
 export const USER_SOCIAL_LINK_FIELDS = Object.freeze([
-  { id: "socialTelegramUrl", labelRu: "Telegram", placeholderRu: "@ник или ник" },
-  { id: "socialInstagramUrl", labelRu: "Instagram", placeholderRu: "ник" },
-  { id: "socialVkUrl", labelRu: "VK", placeholderRu: "ник или id123" },
-  { id: "socialYoutubeUrl", labelRu: "YouTube", placeholderRu: "@канал" },
+  { id: "socialTelegramUrl", labelRu: "Telegram", placeholderRu: "ник или t.me/ник" },
+  { id: "socialInstagramUrl", labelRu: "Instagram", placeholderRu: "ник или ссылка" },
+  { id: "socialVkUrl", labelRu: "VK", placeholderRu: "ник, id123 или ссылка" },
+  { id: "socialYoutubeUrl", labelRu: "YouTube", placeholderRu: "@канал или ссылка" },
   { id: "socialWhatsappUrl", labelRu: "WhatsApp", placeholderRu: "+7…" },
-  { id: "socialWebsiteUrl", labelRu: "Сайт", placeholderRu: "https://…" },
+  { id: "socialWebsiteUrl", labelRu: "Сайт", placeholderRu: "example.com" },
 ]);
 
 /** @type {readonly string[]} */
@@ -84,6 +84,12 @@ const firstPathSegment = (pathname) => {
 };
 
 /**
+ * @param {string} host
+ * @returns {string}
+ */
+const stripWww = (host) => host.replace(/^www\./i, "").toLowerCase();
+
+/**
  * @param {string} raw
  * @param {readonly string[]} hosts
  * @returns {string | null}
@@ -92,11 +98,13 @@ const tryExtractHandleFromHostPath = (raw, hosts) => {
   const normalized = raw.replace(/^\/+/, "");
   const lower = normalized.toLowerCase();
   for (const host of hosts) {
-    const prefix = `${host}/`;
-    if (lower === host || lower.startsWith(prefix)) {
-      const path = normalized.slice(host.length).replace(/^\//, "");
-      const handle = path.split(/[/?#]/)[0] ?? "";
-      return handle.length > 0 ? decodeURIComponent(handle) : null;
+    for (const candidate of [host, `www.${host}`]) {
+      const prefix = `${candidate}/`;
+      if (lower === candidate || lower.startsWith(prefix)) {
+        const path = normalized.slice(candidate.length).replace(/^\//, "");
+        const handle = path.split(/[/?#]/)[0] ?? "";
+        return handle.length > 0 ? decodeURIComponent(handle) : null;
+      }
     }
   }
   return null;
@@ -111,12 +119,30 @@ const tryExtractHandleFromHttpUrl = (raw, hosts) => {
   try {
     const parsed = new URL(raw);
     if (!/^https?:$/i.test(parsed.protocol)) return null;
-    const host = parsed.hostname.replace(/^www\./i, "").toLowerCase();
+    const host = stripWww(parsed.hostname);
     if (!hosts.includes(host)) return null;
     return firstPathSegment(parsed.pathname);
   } catch {
     return null;
   }
+};
+
+/**
+ * YouTube: @handle, /c/name, /user/name — иначе null (channel/UC… храним как URL).
+ * @param {string} pathname
+ * @returns {string | null}
+ */
+const extractYoutubeHandleFromPath = (pathname) => {
+  const parts = pathname.replace(/^\/+|\/+$/g, "").split("/").filter(Boolean);
+  if (parts.length === 0) return null;
+  if (parts[0].startsWith("@")) return parts[0];
+  if ((parts[0] === "c" || parts[0] === "user") && parts[1]) {
+    return parts[1];
+  }
+  if (parts[0] === "channel" || parts[0] === "watch" || parts[0] === "shorts") {
+    return null;
+  }
+  return parts[0];
 };
 
 /**
@@ -138,31 +164,55 @@ export function normalizeSocialLinkToStoredUrl(fieldId, raw) {
   }
 
   if (fieldId === "socialWebsiteUrl") {
-    if (!isHttpUrl(trimmed)) {
+    const candidate = isHttpUrl(trimmed)
+      ? trimmed
+      : hasUrlScheme(trimmed)
+        ? trimmed
+        : `https://${trimmed}`;
+    if (!isHttpUrl(candidate)) {
       return {
         ok: false,
-        message: "Сайт: укажите корректную ссылку (http:// или https://)",
+        message: "Сайт: укажите корректную ссылку (например https://example.com)",
       };
     }
     try {
-      const parsed = new URL(trimmed);
+      const parsed = new URL(candidate);
       return { ok: true, url: parsed.toString().replace(/\/$/, "") };
     } catch {
       return {
         ok: false,
-        message: "Сайт: укажите корректную ссылку (http:// или https://)",
+        message: "Сайт: укажите корректную ссылку (например https://example.com)",
       };
     }
   }
 
   if (fieldId === "socialWhatsappUrl") {
-    if (hasUrlScheme(trimmed) || /wa\.me\//i.test(trimmed)) {
+    let digits = "";
+    if (isHttpUrl(trimmed) || /^(?:www\.)?wa\.me\//i.test(trimmed)) {
+      const rawUrl = isHttpUrl(trimmed) ? trimmed : `https://${trimmed.replace(/^\/+/, "")}`;
+      try {
+        const parsed = new URL(rawUrl);
+        if (stripWww(parsed.hostname) !== "wa.me") {
+          return {
+            ok: false,
+            message: "WhatsApp: укажите номер телефона или ссылку wa.me",
+          };
+        }
+        digits = digitsOnly(parsed.pathname);
+      } catch {
+        return {
+          ok: false,
+          message: "WhatsApp: укажите номер телефона или ссылку wa.me",
+        };
+      }
+    } else if (hasUrlScheme(trimmed)) {
       return {
         ok: false,
-        message: "WhatsApp: укажите номер телефона, не ссылку",
+        message: "WhatsApp: укажите номер телефона или ссылку wa.me",
       };
+    } else {
+      digits = digitsOnly(trimmed);
     }
-    const digits = digitsOnly(trimmed);
     if (digits.length < 10 || digits.length > 15) {
       return {
         ok: false,
@@ -173,28 +223,34 @@ export function normalizeSocialLinkToStoredUrl(fieldId, raw) {
   }
 
   if (hasUrlScheme(trimmed) && !isHttpUrl(trimmed)) {
-    return { ok: false, message: "Укажите ник без ссылки" };
+    return {
+      ok: false,
+      message: "Укажите ник или http(s)-ссылку на профиль",
+    };
   }
 
-  /** @type {Record<string, { hosts: string[]; build: (handle: string) => string; validate: (handle: string) => boolean; label: string }>} */
+  /** @type {Record<string, { hosts: string[]; build: (handle: string) => string; validate: (handle: string) => boolean; label: string; hint: string }>} */
   const networks = {
     socialTelegramUrl: {
       hosts: ["t.me", "telegram.me"],
       build: (handle) => `https://t.me/${handle}`,
       validate: (handle) => TELEGRAM_HANDLE_RE.test(handle),
       label: "Telegram",
+      hint: "латиница, 5–32 символа (например nick_name)",
     },
     socialInstagramUrl: {
       hosts: ["instagram.com"],
       build: (handle) => `https://instagram.com/${handle}`,
       validate: (handle) => INSTAGRAM_HANDLE_RE.test(handle),
       label: "Instagram",
+      hint: "латиница, цифры, точка или _ (например nick.name)",
     },
     socialVkUrl: {
       hosts: ["vk.com", "vk.ru", "m.vk.com"],
       build: (handle) => `https://vk.com/${handle}`,
       validate: (handle) => VK_SCREEN_RE.test(handle),
       label: "VK",
+      hint: "ник или id123",
     },
     socialYoutubeUrl: {
       hosts: ["youtube.com", "m.youtube.com", "youtu.be"],
@@ -204,6 +260,7 @@ export function normalizeSocialLinkToStoredUrl(fieldId, raw) {
       },
       validate: (handle) => YOUTUBE_HANDLE_RE.test(handle),
       label: "YouTube",
+      hint: "@канал или ник канала",
     },
   };
 
@@ -212,22 +269,53 @@ export function normalizeSocialLinkToStoredUrl(fieldId, raw) {
     return { ok: false, message: "Неизвестное поле соцсети" };
   }
 
+  /** @type {string | null} */
   let handle = null;
+
   if (isHttpUrl(trimmed)) {
-    return {
-      ok: false,
-      message: `${network.label}: укажите ник, не ссылку`,
-    };
+    try {
+      const parsed = new URL(trimmed);
+      const host = stripWww(parsed.hostname);
+      if (!network.hosts.includes(host)) {
+        return {
+          ok: false,
+          message: `${network.label}: ссылка должна вести на ${network.hosts[0]}`,
+        };
+      }
+      if (fieldId === "socialYoutubeUrl") {
+        const ytHandle = extractYoutubeHandleFromPath(parsed.pathname);
+        if (ytHandle == null) {
+          return { ok: true, url: parsed.toString().replace(/\/$/, "") };
+        }
+        handle = ytHandle;
+      } else {
+        handle = firstPathSegment(parsed.pathname);
+      }
+    } catch {
+      return {
+        ok: false,
+        message: `${network.label}: некорректная ссылка`,
+      };
+    }
+  } else {
+    handle =
+      tryExtractHandleFromHostPath(trimmed, network.hosts) ?? stripAt(trimmed);
   }
 
-  handle = tryExtractHandleFromHostPath(trimmed, network.hosts) ?? stripAt(trimmed);
-  handle = String(handle).trim();
+  handle = String(handle ?? "").trim();
   if (
     fieldId === "socialYoutubeUrl" ||
     fieldId === "socialTelegramUrl" ||
     fieldId === "socialInstagramUrl"
   ) {
     handle = stripAt(handle);
+  }
+
+  if (handle.length === 0) {
+    return {
+      ok: false,
+      message: `${network.label}: укажите ник (${network.hint})`,
+    };
   }
 
   if (handle.length > USER_SOCIAL_LINK_HANDLE_MAX_LENGTH) {
@@ -240,7 +328,7 @@ export function normalizeSocialLinkToStoredUrl(fieldId, raw) {
   if (!network.validate(handle)) {
     return {
       ok: false,
-      message: `${network.label}: некорректный ник`,
+      message: `${network.label}: некорректный ник (${network.hint})`,
     };
   }
 
@@ -287,9 +375,23 @@ export function storedSocialUrlToInputValue(fieldId, stored) {
   if (!hosts) return "";
 
   const handle = isHttpUrl(trimmed)
-    ? tryExtractHandleFromHttpUrl(trimmed, hosts)
+    ? fieldId === "socialYoutubeUrl"
+      ? (() => {
+          try {
+            const parsed = new URL(trimmed);
+            return extractYoutubeHandleFromPath(parsed.pathname);
+          } catch {
+            return null;
+          }
+        })()
+      : tryExtractHandleFromHttpUrl(trimmed, hosts)
     : null;
-  if (handle == null) return "";
+  if (handle == null) {
+    if (fieldId === "socialYoutubeUrl" && isHttpUrl(trimmed)) {
+      return trimmed;
+    }
+    return "";
+  }
 
   if (fieldId === "socialYoutubeUrl") {
     return handle.startsWith("@") ? handle : `@${handle}`;

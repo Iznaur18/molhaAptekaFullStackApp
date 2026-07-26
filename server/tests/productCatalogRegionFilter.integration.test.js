@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { after, afterEach, before, test } from "node:test";
 
-import { PRODUCT_SORT_CITY } from "../constants/productCatalogSort.js";
 import { UserModel } from "../models/index.js";
 import { startHttpTestServer, stopHttpTestServer } from "./helpers/httpTestApp.js";
 import {
@@ -18,7 +17,6 @@ import {
   connectMongoTestReplSet,
   disconnectMongoTestReplSet,
 } from "./helpers/mongoTestDb.js";
-import { resolveUserAddressCityNormalized } from "../services/product/ruCityNormalized.js";
 
 process.env.JWT_SECRET =
   process.env.JWT_SECRET ?? "integration-test-jwt-secret-min-32-chars";
@@ -47,51 +45,44 @@ after(async () => {
   await disconnectMongoTestReplSet();
 });
 
-const seedCityCatalogFixture = async () => {
+const seedRegionCatalogFixture = async () => {
   await ensureProductCategoryTreeSeeded();
 
-  const { cookie: sellerCookie } = await registerUserAndGetCookie(request, "city-seller");
-  await verifyUserEmail("int-city-seller@example.com");
+  const { cookie: sellerCookie } = await registerUserAndGetCookie(request, "region-seller");
+  await verifyUserEmail("int-region-seller@example.com");
 
   const moscowProduct = await createProductViaApi(request, sellerCookie, {
     productName: "Moscow Product",
-    productSaleCity: "г Москва",
+    productRegionCode: "RU-MOW",
   });
-  const kazanProduct = await createProductViaApi(request, sellerCookie, {
-    productName: "Kazan Product",
-    productSaleCity: "Казань",
-  });
-  const everywhereProduct = await createProductViaApi(request, sellerCookie, {
-    productName: "Everywhere Product",
-    productSaleCity: "",
+  const chechnyaProduct = await createProductViaApi(request, sellerCookie, {
+    productName: "Chechnya Product",
+    productRegionCode: "RU-CE",
   });
 
   const { cookie: modCookie, user: modUser } = await registerUserAndGetCookie(
     request,
-    "city-mod",
+    "region-mod",
   );
   await setUserRole(modUser._id, "moderator");
 
   await approveProductViaApi(request, modCookie, String(moscowProduct._id));
-  await approveProductViaApi(request, modCookie, String(kazanProduct._id));
-  await approveProductViaApi(request, modCookie, String(everywhereProduct._id));
+  await approveProductViaApi(request, modCookie, String(chechnyaProduct._id));
 
   const { cookie: buyerCookie, user: buyer } = await registerUserAndGetCookie(
     request,
-    "city-buyer",
+    "region-buyer",
   );
-  await verifyUserEmail("int-city-buyer@example.com");
+  await verifyUserEmail("int-region-buyer@example.com");
   await UserModel.findByIdAndUpdate(buyer._id, {
-    userAddressCity: "Москва",
-    userAddressCityNormalized: resolveUserAddressCityNormalized("Москва"),
+    userRegionCode: "RU-MOW",
   });
 
   return {
     buyerCookie,
     productIds: {
       moscow: String(moscowProduct._id),
-      kazan: String(kazanProduct._id),
-      everywhere: String(everywhereProduct._id),
+      chechnya: String(chechnyaProduct._id),
     },
   };
 };
@@ -105,32 +96,32 @@ const fetchCatalogProductIds = async (cookie, query = "") => {
   return data.products.map((product) => String(product._id));
 };
 
-test("GET /product auto-filters by buyer city with normalized match", async () => {
-  const { buyerCookie, productIds } = await seedCityCatalogFixture();
+test("GET /product filters by profile region", async () => {
+  const { buyerCookie, productIds } = await seedRegionCatalogFixture();
 
-  const ids = await fetchCatalogProductIds(buyerCookie);
+  const ids = await fetchCatalogProductIds(buyerCookie, "?limit=100");
   assert.ok(ids.includes(productIds.moscow));
-  assert.ok(ids.includes(productIds.everywhere));
-  assert.equal(ids.includes(productIds.kazan), false);
+  assert.equal(ids.includes(productIds.chechnya), false);
 });
 
-test("GET /product?sort=city shows all cities with buyer city first", async () => {
-  const { buyerCookie, productIds } = await seedCityCatalogFixture();
+test("GET /product?regionCode= overrides profile region", async () => {
+  const { buyerCookie, productIds } = await seedRegionCatalogFixture();
 
   const ids = await fetchCatalogProductIds(
     buyerCookie,
-    `?sort=${PRODUCT_SORT_CITY}&limit=100`,
+    "?regionCode=RU-CE&limit=100",
   );
-  assert.equal(ids.length, 3);
-  assert.equal(ids[0], productIds.moscow);
-  assert.ok(ids.includes(productIds.kazan));
-  assert.ok(ids.includes(productIds.everywhere));
+  assert.ok(ids.includes(productIds.chechnya));
+  assert.equal(ids.includes(productIds.moscow), false);
 });
 
-test("GET /product?allCities=true disables auto city filter", async () => {
-  const { buyerCookie, productIds } = await seedCityCatalogFixture();
+test("GET /product guest defaults to Moscow region", async () => {
+  const { productIds } = await seedRegionCatalogFixture();
 
-  const ids = await fetchCatalogProductIds(buyerCookie, "?allCities=true&limit=100");
-  assert.equal(ids.length, 3);
-  assert.ok(ids.includes(productIds.kazan));
+  const response = await request("/product?limit=100");
+  assert.equal(response.status, 200);
+  const data = await parseSuccessData(response);
+  const ids = data.products.map((product) => String(product._id));
+  assert.ok(ids.includes(productIds.moscow));
+  assert.equal(ids.includes(productIds.chechnya), false);
 });

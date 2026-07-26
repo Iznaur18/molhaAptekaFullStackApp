@@ -46,6 +46,9 @@ export const buildTestProductPayload = (overrides = {}) => ({
   productCategory: "electronics",
   productIsAvailable: true,
   productStockQuantity: 5,
+  productListingOrigin: "own",
+  productIsOriginal: true,
+  productRegionCode: "RU-MOW",
   ...overrides,
 });
 

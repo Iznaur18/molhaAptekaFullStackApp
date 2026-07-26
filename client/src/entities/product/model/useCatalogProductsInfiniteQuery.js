@@ -24,8 +24,6 @@ export function useCatalogProductsInfiniteQuery({
   selectedProductCategory,
   catalogSort,
   myProductsModerationFilter,
-  canModerateProducts,
-  showHiddenCatalogProducts,
 }) {
   const catalogSentinelRef = useRef(/** @type {HTMLDivElement | null} */ (null));
 
@@ -41,8 +39,6 @@ export function useCatalogProductsInfiniteQuery({
         selectedProductCategory,
         catalogSort,
         myProductsModerationFilter,
-        canModerateProducts,
-        showHiddenCatalogProducts,
       }),
     [
       isMineMode,
@@ -54,8 +50,6 @@ export function useCatalogProductsInfiniteQuery({
       selectedProductCategory,
       catalogSort,
       myProductsModerationFilter,
-      canModerateProducts,
-      showHiddenCatalogProducts,
     ],
   );
 
@@ -90,12 +84,12 @@ export function useCatalogProductsInfiniteQuery({
         categoryId,
         sellerPersonalCategoryId,
         sort: listParams.sort ?? undefined,
-        includeHidden: Boolean(listParams.includeHidden),
         followingOnly: Boolean(listParams.followingOnly),
         auctionOnly: Boolean(listParams.auctionOnly),
         installmentOnly: Boolean(listParams.installmentOnly),
         saleOnly: Boolean(listParams.saleOnly),
         allCities: Boolean(listParams.allCities),
+        regionCode: listParams.regionCode || undefined,
       });
     },
     getNextPageParam: (lastPage) => {
