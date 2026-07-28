@@ -137,6 +137,12 @@ const OrderSchema = new mongoose.Schema(
       trim: true,
       default: "",
     },
+    fulfillmentMethod: {
+      type: String,
+      required: true,
+      enum: ["pickup", "delivery"],
+      default: "pickup",
+    },
     paymentMethod: {
       type: String,
       required: true,

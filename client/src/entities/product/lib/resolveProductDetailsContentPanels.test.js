@@ -27,7 +27,7 @@ test("showSwitcher when only description exists", () => {
 test("otherBlockFieldKeys exclude productDescription", () => {
   const panels = resolveProductDetailsContentPanels(product, [
     "productDescription",
-    "productImageUrls",
+    "_id",
   ]);
-  expect(panels.otherBlockFieldKeys).toEqual(["productImageUrls"]);
+  expect(panels.otherBlockFieldKeys).toEqual(["_id"]);
 });

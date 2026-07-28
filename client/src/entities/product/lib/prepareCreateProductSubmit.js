@@ -4,6 +4,10 @@ import { IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED } from "../../product-category-
 import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { isRuRegionCode } from "@molha/api-contract";
 import {
+  PRODUCT_PICKUP_ADDRESS_MIN_LENGTH,
+  PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE,
+} from "@molha/api-contract";
+import {
   computeProductDiscountPercent,
   parseProductPriceInput,
   validateProductOldPricePair,
@@ -12,7 +16,6 @@ import { getProductPriceRubMaxError } from "./productPriceRubValidation.js";
 import { validateProductDescription } from "./validateProductDescription.js";
 import { validateProductName } from "./validateProductName.js";
 import { isProductListingOrigin } from "./productListingOrigin.js";
-import { isProductIsOriginalSelected } from "./productIsOriginal.js";
 import {
   productCharacteristicsFromRows,
   validateProductCharacteristicsRows,
@@ -75,10 +78,6 @@ export function prepareCreateProductSubmit({
 
   if (!isProductListingOrigin(form.productListingOrigin)) {
     return { ok: false, message: CREATE_PRODUCT_MODAL_UI.ERROR_LISTING_ORIGIN };
-  }
-
-  if (!isProductIsOriginalSelected(form.productIsOriginal)) {
-    return { ok: false, message: CREATE_PRODUCT_MODAL_UI.ERROR_ORIGINALITY };
   }
 
   const descriptionError = validateProductDescription(form.productDescription);
@@ -157,14 +156,34 @@ export function prepareCreateProductSubmit({
     if (!form.productCategoryId && !form.productCategory) {
       return { ok: false, message: CREATE_PRODUCT_MODAL_UI.ERROR_CATEGORY_LEAF };
     }
-  } else if (!form.productCategory) {
+  } else if (!form.productCategoryId && !form.productCategory) {
     return { ok: false, message: CREATE_PRODUCT_MODAL_UI.ERROR_CATEGORY_LEAF };
   }
+
+  const productCategoryId =
+    form.productCategoryId != null && String(form.productCategoryId).trim() !== ""
+      ? String(form.productCategoryId).trim()
+      : "";
 
   const productRegionCode = String(form.productRegionCode ?? "").trim();
   if (!isRuRegionCode(productRegionCode)) {
     return { ok: false, message: CREATE_PRODUCT_MODAL_UI.ERROR_SALE_REGION_REQUIRED };
   }
+
+  const productPickupAddress = String(form.productPickupAddress ?? "").trim();
+  if (productPickupAddress.length < PRODUCT_PICKUP_ADDRESS_MIN_LENGTH) {
+    return { ok: false, message: PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE };
+  }
+
+  const pickupLatRaw = form.productPickupLat;
+  const pickupLonRaw = form.productPickupLon;
+  const hasLat = pickupLatRaw != null && Number.isFinite(Number(pickupLatRaw));
+  const hasLon = pickupLonRaw != null && Number.isFinite(Number(pickupLonRaw));
+  if (hasLat !== hasLon) {
+    return { ok: false, message: CREATE_PRODUCT_MODAL_UI.ERROR_PICKUP_COORDS };
+  }
+  const productPickupLat = hasLat ? Number(pickupLatRaw) : null;
+  const productPickupLon = hasLon ? Number(pickupLonRaw) : null;
 
   if (form.productReturnEnabled == null) {
     return { ok: false, message: CREATE_PRODUCT_MODAL_UI.ERROR_RETURN_CHOICE };
@@ -197,12 +216,16 @@ export function prepareCreateProductSubmit({
       loyaltyPointsPerUnit,
       productCharacteristics,
       productRegionCode,
+      productPickupAddress,
+      productPickupLat,
+      productPickupLon,
+      productDeliveryEnabled: false,
       productReturnEnabled,
       productReturnTerms,
     };
 
-    if (IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED && form.productCategoryId) {
-      patchBody.productCategoryId = form.productCategoryId;
+    if (IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED && productCategoryId) {
+      patchBody.productCategoryId = productCategoryId;
     } else {
       patchBody.productCategory = form.productCategory;
     }
@@ -228,14 +251,18 @@ export function prepareCreateProductSubmit({
       productPreviewVideoUrl: previewVideoUrl || undefined,
       productPrice,
       productOldPrice,
-      ...(IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED && form.productCategoryId
-        ? { productCategoryId: form.productCategoryId }
+      ...(IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED && productCategoryId
+        ? { productCategoryId }
         : { productCategory: form.productCategory }),
       productIsAvailable: form.productIsAvailable,
       productStockQuantity,
       loyaltyPointsPerUnit,
       productCharacteristics,
       productRegionCode,
+      productPickupAddress,
+      productPickupLat,
+      productPickupLon,
+      productDeliveryEnabled: false,
       productReturnEnabled,
       productReturnTerms,
     },

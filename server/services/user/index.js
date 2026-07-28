@@ -63,6 +63,12 @@ export {
   resolveViewerRegionCodeForRequest,
   buildProductRegionMatch,
   buildEntityRegionMatch,
+  buildCatalogRegionPriorityCodes,
+  buildCatalogRegionSortPriorityStage,
+  withCatalogRegionPrioritySort,
+  CATALOG_DEFAULT_REGION_PRIORITY_CODES,
+  CATALOG_REGION_SORT_OTHER,
+  CATALOG_REGION_SORT_EMPTY,
 } from "./userRegionCatalogFilter.js";
 export {
   attachUserListCommerceStats,

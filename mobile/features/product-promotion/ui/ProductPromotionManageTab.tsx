@@ -6,10 +6,13 @@ type ProductPromotionManageTabProps = {
   product: CatalogProduct;
   onSetAvailability?: (productId: string, productIsAvailable: boolean) => void | Promise<void>;
   onSetAuction?: (productId: string, productAuctionEnabled: boolean) => void | Promise<void>;
+  onDelete?: (productId: string) => void | Promise<void>;
   isAvailabilityTogglePending?: boolean;
   isAuctionTogglePending?: boolean;
+  isDeletePending?: boolean;
   errorMessage?: string;
   canEdit?: boolean;
+  canDelete?: boolean;
   canToggleVisibility?: boolean;
   sellerRaffleActive?: boolean;
   onToggleRaffleParticipation?: (product: CatalogProduct, enabled: boolean) => void;

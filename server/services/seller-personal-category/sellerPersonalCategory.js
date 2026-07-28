@@ -1,4 +1,5 @@
 import {
+  SELLER_PERSONAL_CATEGORY_ACTIVE_SLOT_LIMIT,
   SELLER_PERSONAL_CATEGORY_DURATION_OPTIONS,
   SELLER_PERSONAL_CATEGORY_OPEN_STATUSES,
   SELLER_PERSONAL_CATEGORY_STATUS_CANCELLED,
@@ -11,6 +12,7 @@ import {
 import { AppError } from "../../errors/AppError.js";
 import {
   assertNoOpenSellerPersonalCategoryCampaign,
+  countActiveSellerPersonalCategorySlots,
   toSellerPersonalCategoryCampaignPayload,
   toSellerPersonalCategoryTilePayload,
 } from "./sellerPersonalCategoryHelpers.js";
@@ -23,9 +25,12 @@ import { runInTransaction, withMongoSession } from "../../utils/mongoTransaction
 
 import { parseSellerPersonalCategorySubmitBody } from "./sellerPersonalCategoryServiceHelpers.js";
 
-export function getSellerPersonalCategoryConfig() {
+export async function getSellerPersonalCategoryConfig() {
+  const activeSlots = await countActiveSellerPersonalCategorySlots();
   return {
     durations: SELLER_PERSONAL_CATEGORY_DURATION_OPTIONS,
+    activeSlotLimit: SELLER_PERSONAL_CATEGORY_ACTIVE_SLOT_LIMIT,
+    activeSlots,
   };
 }
 
@@ -39,6 +44,7 @@ export async function getSellerPersonalCategoryCatalogTiles({
     ...(regionCode ? { regionCode } : {}),
   })
     .sort({ activeUntil: -1, updatedAt: -1 })
+    .limit(SELLER_PERSONAL_CATEGORY_ACTIVE_SLOT_LIMIT)
     .lean();
 
   return {

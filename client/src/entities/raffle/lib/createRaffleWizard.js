@@ -3,6 +3,7 @@ import {
   RAFFLE_PRIZE_MEDIA_TYPE_VIDEO,
 } from "../lib/isRafflePrizeVideo.js";
 import { CREATE_RAFFLE_MODAL_UI } from "../../../shared/config/appUiCopy.js";
+import { isRuRegionCode } from "@molha/api-contract";
 
 /** @typedef {'basic' | 'prize' | 'conditions'} CreateRaffleWizardStepId */
 
@@ -53,6 +54,7 @@ export function resolveCreateRaffleWizardStepCopy(stepId) {
  *   prizeVideoUrl: string;
  *   targetSales: string;
  *   instagramUrl: string;
+ *   regionCode?: string;
  * }} form
  * @returns {string | null}
  */
@@ -60,6 +62,9 @@ export function validateCreateRaffleFormStep(stepId, form) {
   if (stepId === "basic") {
     if (!String(form.title ?? "").trim()) {
       return CREATE_RAFFLE_MODAL_UI.ERROR_TITLE;
+    }
+    if (!isRuRegionCode(form.regionCode)) {
+      return CREATE_RAFFLE_MODAL_UI.ERROR_REGION_REQUIRED;
     }
     return null;
   }
@@ -96,6 +101,7 @@ export function validateCreateRaffleFormStep(stepId, form) {
  *   prizeVideoUrl: string;
  *   targetSales: string;
  *   instagramUrl: string;
+ *   regionCode?: string;
  * }} form
  */
 export function isCreateRaffleFormDirty(form) {
@@ -106,6 +112,7 @@ export function isCreateRaffleFormDirty(form) {
     String(form.prizeVideoUrl ?? "").trim() !== "" ||
     String(form.targetSales ?? "").trim() !== "" ||
     String(form.instagramUrl ?? "").trim() !== "" ||
-    form.prizeMediaType !== RAFFLE_PRIZE_MEDIA_TYPE_IMAGE
+    form.prizeMediaType !== RAFFLE_PRIZE_MEDIA_TYPE_IMAGE ||
+    (Boolean(form.regionCode) && form.regionCode !== "RU-MOW")
   );
 }

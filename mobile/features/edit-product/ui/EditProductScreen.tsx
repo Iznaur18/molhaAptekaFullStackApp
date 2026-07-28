@@ -1,4 +1,4 @@
-import { PRODUCT_IMAGE_URLS_MAX, PRODUCT_NAME_MAX_LENGTH } from "@molha/api-contract";
+import { PRODUCT_IMAGE_URLS_MAX, PRODUCT_NAME_MAX_LENGTH, DEFAULT_VIEWER_REGION_CODE, PRODUCT_PICKUP_ADDRESS_MIN_LENGTH, PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE, isRuRegionCode } from "@molha/api-contract";
 import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -37,7 +37,9 @@ import { useCatalogProductQuery } from "@/entities/product/model/useCatalogProdu
 import { useMyProductMutations } from "@/entities/product/model/useMyProductMutations";
 import { useMyProductsInfiniteQuery } from "@/entities/product/model/useMyProductsInfiniteQuery";
 import { ProductCharacteristicsEditor } from "@/entities/product/ui/ProductCharacteristicsEditor";
+import { ProductPickupLocationFields } from "@/entities/product/ui/ProductPickupLocationFields";
 import { ProductReturnTermsEditor } from "@/entities/product/ui/ProductReturnTermsEditor";
+import { RuRegionSelect } from "@/entities/region/ui/RuRegionSelect";
 import { useMyLoyaltyPointsStatusQuery } from "@/entities/user/model/useMyLoyaltyPointsStatusQuery";
 import { CreateProductCategoryPicker } from "@/features/create-product/ui/CreateProductCategoryPicker";
 import { ProductPhotoGrid } from "@/features/image-upload/ui/ProductPhotoGrid";
@@ -110,6 +112,10 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
   const [loyaltyPointsPerUnit, setLoyaltyPointsPerUnit] = useState("0");
   const [productCategoryId, setProductCategoryId] = useState<string | null>(null);
   const [productCategoryLabel, setProductCategoryLabel] = useState("");
+  const [productRegionCode, setProductRegionCode] = useState(DEFAULT_VIEWER_REGION_CODE);
+  const [productPickupAddress, setProductPickupAddress] = useState("");
+  const [productPickupLat, setProductPickupLat] = useState<number | null>(null);
+  const [productPickupLon, setProductPickupLon] = useState<number | null>(null);
   const [productImageUrls, setProductImageUrls] = useState<string[]>([]);
   const [characteristicRows, setCharacteristicRows] = useState<ProductCharacteristicRow[]>([]);
   const [productReturnEnabled, setProductReturnEnabled] = useState(false);
@@ -144,6 +150,18 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
       setProductCategoryId(categoryId);
       setProductCategoryLabel(String(product.productCategoryLabelRu ?? categoryId));
     }
+    const regionRaw =
+      typeof product.productRegionCode === "string" ? product.productRegionCode.trim() : "";
+    setProductRegionCode(isRuRegionCode(regionRaw) ? regionRaw : DEFAULT_VIEWER_REGION_CODE);
+    setProductPickupAddress(String(product.productPickupAddress ?? "").trim());
+    const latRaw = product.productPickupLat;
+    const lonRaw = product.productPickupLon;
+    setProductPickupLat(
+      latRaw != null && Number.isFinite(Number(latRaw)) ? Number(latRaw) : null,
+    );
+    setProductPickupLon(
+      lonRaw != null && Number.isFinite(Number(lonRaw)) ? Number(lonRaw) : null,
+    );
     setProductImageUrls(resolveProductImageUrls(product));
     setCharacteristicRows(mapProductCharacteristicsToRows(product.productCharacteristics));
     const returnPrefill = resolveReturnPolicyPrefill(product);
@@ -223,6 +241,18 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
     if (!productCategoryId) {
       return CREATE_PRODUCT_UI.ERROR_CATEGORY;
     }
+    if (!isRuRegionCode(productRegionCode)) {
+      return CREATE_PRODUCT_UI.ERROR_SALE_REGION_REQUIRED;
+    }
+    const pickupAddress = productPickupAddress.trim();
+    if (pickupAddress.length < PRODUCT_PICKUP_ADDRESS_MIN_LENGTH) {
+      return PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE;
+    }
+    const hasLat = productPickupLat != null && Number.isFinite(productPickupLat);
+    const hasLon = productPickupLon != null && Number.isFinite(productPickupLon);
+    if (hasLat !== hasLon) {
+      return CREATE_PRODUCT_UI.ERROR_PICKUP_COORDS;
+    }
     if (productImageUrls.length === 0) {
       return CREATE_PRODUCT_UI.ERROR_IMAGE_REQUIRED;
     }
@@ -269,6 +299,8 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
 
     const oldPriceRaw = productOldPrice.trim();
     const oldPrice = oldPriceRaw ? parseRubPriceInput(productOldPrice) : null;
+    const hasLat = productPickupLat != null && Number.isFinite(productPickupLat);
+    const hasLon = productPickupLon != null && Number.isFinite(productPickupLon);
 
     try {
       await patchMutation.mutateAsync({
@@ -281,6 +313,11 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
           productPrice: parseRubPriceInput(productPrice) ?? 0,
           productOldPrice: oldPriceRaw ? oldPrice : null,
           productCategoryId: productCategoryId ?? undefined,
+          productRegionCode: productRegionCode.trim(),
+          productPickupAddress: productPickupAddress.trim(),
+          productPickupLat: hasLat ? productPickupLat : null,
+          productPickupLon: hasLon ? productPickupLon : null,
+          productDeliveryEnabled: false,
           productIsAvailable,
           productStockQuantity: productIsAvailable
             ? (parseStockQuantity(productStockQuantity) ?? PRODUCT_STOCK_QUANTITY_MIN)
@@ -566,6 +603,29 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
               onSelect={(categoryId, label) => {
                 setProductCategoryId(categoryId);
                 setProductCategoryLabel(label);
+              }}
+            />
+
+            <RuRegionSelect
+              value={productRegionCode}
+              disabled={isBusy}
+              required
+              label={CREATE_PRODUCT_UI.LABEL_SALE_REGION}
+              onChange={setProductRegionCode}
+            />
+            <Text style={[styles.hint, { color: theme.colors.textSecondary }]}>
+              {CREATE_PRODUCT_UI.HINT_SALE_REGION}
+            </Text>
+
+            <ProductPickupLocationFields
+              address={productPickupAddress}
+              lat={productPickupLat}
+              lon={productPickupLon}
+              disabled={isBusy}
+              onChange={(next) => {
+                setProductPickupAddress(next.productPickupAddress);
+                setProductPickupLat(next.productPickupLat);
+                setProductPickupLon(next.productPickupLon);
               }}
             />
           </View>

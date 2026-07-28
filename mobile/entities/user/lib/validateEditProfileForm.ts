@@ -1,12 +1,14 @@
 import {
   USER_SOCIAL_LINK_FIELD_IDS,
   validateSocialLinkInput,
+  isRuRegionCode,
 } from "@molha/api-contract";
 import {
   USER_NAME_MAX_LENGTH,
   USER_NAME_MIN_LENGTH,
   USER_NAME_PATTERN,
 } from "@/entities/user/model/constants";
+import { EDIT_PROFILE_UI } from "@/shared/config";
 
 import { isBirthDateInputComplete, parseBirthDateInputToIsoDate } from "./birthDateInputMask";
 import { validateRuPhoneField } from "./ruPhone";
@@ -36,6 +38,10 @@ export const validateEditProfileForm = (form: EditProfileFormState): string | nu
 
   const phoneError = validateRuPhoneField(form.userPhoneNumber);
   if (phoneError) return phoneError;
+
+  if (!isRuRegionCode(form.userRegionCode)) {
+    return EDIT_PROFILE_UI.ERROR_REGION_REQUIRED;
+  }
 
   for (const fieldId of USER_SOCIAL_LINK_FIELD_IDS as readonly Extract<
     keyof EditProfileFormState,

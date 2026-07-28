@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
+import { DEFAULT_VIEWER_REGION_CODE, isRuRegionCode } from "@molha/api-contract";
 
 import {
   cancelSellerPersonalCategoryCampaign,
@@ -7,6 +8,7 @@ import {
 } from "../../../entities/seller-personal-category/api/sellerPersonalCategoryApi.js";
 import { useMySellerPersonalCategoryCampaignQuery } from "../../../entities/seller-personal-category/model/useMySellerPersonalCategoryCampaignQuery.js";
 import { sellerPersonalCategoryQueryKeys } from "../../../entities/seller-personal-category/model/sellerPersonalCategoryQueryKeys.js";
+import { RuRegionSelect } from "../../../entities/region/ui/RuRegionSelect.jsx";
 import { loyaltyPointsQueryKeys } from "../../../entities/user/model/loyaltyPointsQueryKeys.js";
 import { SELLER_PERSONAL_CATEGORY_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { ImageUrlField } from "../../../shared/ui/ImageUrlField/ImageUrlField.jsx";
@@ -55,6 +57,7 @@ export function SellerPersonalCategoryAdvertisingSection({
   const [labelRu, setLabelRu] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [tariffCode, setTariffCode] = useState("7d");
+  const [regionCode, setRegionCode] = useState(DEFAULT_VIEWER_REGION_CODE);
   const [showForm, setShowForm] = useState(false);
   const [actionError, setActionError] = useState("");
   const [feedback, setFeedback] = useState("");
@@ -79,7 +82,7 @@ export function SellerPersonalCategoryAdvertisingSection({
           queryKey: sellerPersonalCategoryQueryKeys.myCampaign(),
         }),
         queryClient.invalidateQueries({
-          queryKey: sellerPersonalCategoryQueryKeys.catalogTiles(),
+          queryKey: [...sellerPersonalCategoryQueryKeys.all, "catalog-tiles"],
         }),
         queryClient.invalidateQueries({ queryKey: loyaltyPointsQueryKeys.all }),
       ]);
@@ -110,6 +113,10 @@ export function SellerPersonalCategoryAdvertisingSection({
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (!isRuRegionCode(regionCode)) {
+      setActionError(SELLER_PERSONAL_CATEGORY_PAGE_UI.ERROR_REGION_REQUIRED);
+      return;
+    }
     try {
       setActionError("");
       setFeedback("");
@@ -117,6 +124,7 @@ export function SellerPersonalCategoryAdvertisingSection({
         labelRu: labelRu.trim(),
         imageUrl: imageUrl.trim(),
         tariffCode,
+        regionCode,
       });
     } catch (error) {
       setActionError(
@@ -251,6 +259,19 @@ export function SellerPersonalCategoryAdvertisingSection({
               value={imageUrl}
               onChange={setImageUrl}
             />
+            <label className="advertising-page__field">
+              {SELLER_PERSONAL_CATEGORY_PAGE_UI.LABEL_REGION}
+              <RuRegionSelect
+                className="advertising-page__input"
+                value={regionCode}
+                disabled={isSubmitting}
+                required
+                onChange={setRegionCode}
+              />
+              <span className="advertising-page__hint">
+                {SELLER_PERSONAL_CATEGORY_PAGE_UI.HINT_REGION}
+              </span>
+            </label>
             <fieldset className="advertising-page__field">
               <legend>{SELLER_PERSONAL_CATEGORY_PAGE_UI.LABEL_DURATION}</legend>
               <div className="advertising-page__tariffs">

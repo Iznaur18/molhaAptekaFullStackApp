@@ -31,6 +31,7 @@ import { buildProductSearchBlobFromFields } from "./buildProductSearchBlob.js";
 import { resolveProductCategoryWriteFromBody } from "./resolveProductCategoryWrite.js";
 import { resolveActiveSellerPersonalCategoryId } from "../seller-personal-category/sellerPersonalCategoryHelpers.js";
 import { applyProductSaleCityFields } from "./ruCityNormalized.js";
+import { resolveCreateProductPickupFields } from "./productPickup.js";
 
 const throwFieldError = (error, fallback) => {
   throw new AppError(
@@ -205,6 +206,7 @@ export async function postProduct({ userId, body }) {
 
   const { productSaleCity, productSaleCityNormalized } = resolveCreateSaleCity({});
   const productRegionCode = resolveCreateRegionCode(body);
+  const pickupFields = resolveCreateProductPickupFields(body);
 
   const product = await ProductModel.create({
     productName,
@@ -218,6 +220,7 @@ export async function postProduct({ userId, body }) {
     productSaleCity,
     productSaleCityNormalized,
     productRegionCode,
+    ...pickupFields,
     productCategory: categoryWrite.productCategory,
     productCategoryId: categoryWrite.productCategoryId,
     categoryPathIds: categoryWrite.categoryPathIds,

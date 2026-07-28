@@ -70,7 +70,8 @@ export const catalogProductsQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).optional().default(10),
   productCategory: optionalTrimmedString.refine(
     (slug) =>
-      slug === undefined || /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug),
+      slug === undefined ||
+      PRODUCT_CATEGORY_SLUGS.includes(/** @type {(typeof PRODUCT_CATEGORY_SLUGS)[number]} */ (slug)),
     { message: "Указана неизвестная категория" },
   ),
   categoryId: optionalTrimmedString.refine(

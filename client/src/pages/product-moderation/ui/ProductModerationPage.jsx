@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
+import { useMyProductMutations } from "../../../entities/product/model/useMyProductMutations.js";
 import { useProductModerationMutations } from "../../../entities/product/model/useProductModerationMutations.js";
 import { moderationQueryKeys } from "../../../entities/product/model/moderationQueryKeys.js";
 import { usePendingModerationProductsQuery } from "../../../entities/product/model/usePendingModerationProductsQuery.js";
@@ -18,11 +19,17 @@ const MODERATION_QUEUE_LIMIT = 100;
  * @param {{
  *   onSellerNameClick?: (userId: string) => void;
  *   onQueueChanged?: () => void;
+ *   isAdmin?: boolean;
  * }} props
  */
-export function ProductModerationPage({ onSellerNameClick, onQueueChanged }) {
+export function ProductModerationPage({
+  onSellerNameClick,
+  onQueueChanged,
+  isAdmin = false,
+}) {
   const queryClient = useQueryClient();
   const { approveMutation, rejectMutation } = useProductModerationMutations();
+  const { deleteMutation } = useMyProductMutations();
   const queueQuery = usePendingModerationProductsQuery({ limit: MODERATION_QUEUE_LIMIT });
   const [actionError, setActionError] = useState("");
   const [pendingProductId, setPendingProductId] = useState(null);
@@ -110,6 +117,24 @@ export function ProductModerationPage({ onSellerNameClick, onQueueChanged }) {
     }
   };
 
+  const handleDelete = async (productId) => {
+    try {
+      setPendingProductId(productId);
+      setActionError("");
+      setCardErrors((prev) => ({ ...prev, [productId]: "" }));
+      await deleteMutation.mutateAsync(productId);
+      removeFromQueue(productId);
+      onQueueChanged?.();
+    } catch (e) {
+      const message =
+        e instanceof Error ? e.message : API_CLIENT_UI.DELETE_MY_PRODUCT_FALLBACK;
+      setActionError(message);
+      setCardErrors((prev) => ({ ...prev, [productId]: message }));
+    } finally {
+      setPendingProductId(null);
+    }
+  };
+
   if (phase === "loading") {
     return (
       <p className="product-moderation-page__state">
@@ -148,7 +173,7 @@ export function ProductModerationPage({ onSellerNameClick, onQueueChanged }) {
         </p>
       ) : null}
       <div
-        className="app-shell__grid"
+        className="product-moderation-page__list"
         role="list"
         aria-label={PRODUCT_MODERATION_PAGE_UI.PRODUCTS_LIST_ARIA}
       >
@@ -157,7 +182,7 @@ export function ProductModerationPage({ onSellerNameClick, onQueueChanged }) {
           const isBusy = pendingProductId === id;
 
           return (
-            <div key={id} className="app-shell__cell" role="listitem">
+            <div key={id} className="product-moderation-page__item" role="listitem">
               <ProductCard
                 product={product}
                 onSellerNameClick={onSellerNameClick}
@@ -168,6 +193,9 @@ export function ProductModerationPage({ onSellerNameClick, onQueueChanged }) {
                     setRejectComments((prev) => ({ ...prev, [id]: value })),
                   onApprove: () => void handleApprove(id),
                   onReject: () => void handleReject(id),
+                  onDelete: isAdmin ? () => void handleDelete(id) : undefined,
+                  canDelete: isAdmin,
+                  hasOpenSales: product.hasOpenSales === true,
                   isBusy,
                   errorMessage: cardErrors[id] ?? "",
                 }}

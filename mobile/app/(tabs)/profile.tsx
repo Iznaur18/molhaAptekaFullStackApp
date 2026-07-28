@@ -192,10 +192,6 @@ export default function ProfileScreen() {
               onEditPress={() => router.push({ pathname: "/profile/edit" })}
             />
 
-            <Pressable style={styles.legalLink} onPress={() => router.push("/legal/privacy")}>
-              <Text style={styles.legalLinkText}>{LEGAL_UI.PRIVACY_LINK}</Text>
-            </Pressable>
-
             <ThemePreferenceToggle />
           </ScrollView>
         </View>

@@ -18,6 +18,9 @@ import { ReportUserStoryModal } from "./ReportUserStoryModal.jsx";
 
 import "./UserStoryViewer.css";
 
+const STORY_DIM_MS = 260;
+const STORY_REVEAL_MS = 380;
+
 /**
  * @param {{
  *   author: import('../model/types.js').UserStoryRingFromApi['author'];
@@ -41,10 +44,17 @@ export function UserStoryViewer({
   const { deleteMutation, markViewedMutation } = useUserStoryMutations();
   const markStoryViewed = markViewedMutation.mutate;
   const markedViewedStoryIdsRef = useRef(/** @type {Set<string>} */ (new Set()));
+  const dimTimerRef = useRef(/** @type {ReturnType<typeof setTimeout> | null} */ (null));
+  const revealTimerRef = useRef(/** @type {ReturnType<typeof setTimeout> | null} */ (null));
+  const revealRafRef = useRef(/** @type {number | null} */ (null));
   const [activeIndex, setActiveIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [actionError, setActionError] = useState("");
+  const [isDimmed, setIsDimmed] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [incomingRevealed, setIncomingRevealed] = useState(false);
+  const [pendingIndex, setPendingIndex] = useState(/** @type {number | null} */ (null));
 
   const authorId = String(author._id);
   const isOwn = currentUserId != null && authorId === String(currentUserId);
@@ -69,20 +79,85 @@ export function UserStoryViewer({
       ? storiesQuery.error.message
       : USER_STORY_UI.ERROR_GENERIC;
 
+  const clearTransitionTimers = useCallback(() => {
+    if (dimTimerRef.current != null) {
+      window.clearTimeout(dimTimerRef.current);
+      dimTimerRef.current = null;
+    }
+    if (revealTimerRef.current != null) {
+      window.clearTimeout(revealTimerRef.current);
+      revealTimerRef.current = null;
+    }
+    if (revealRafRef.current != null) {
+      window.cancelAnimationFrame(revealRafRef.current);
+      revealRafRef.current = null;
+    }
+  }, []);
+
+  const resetTransitionState = useCallback(() => {
+    clearTransitionTimers();
+    setIsDimmed(false);
+    setIsTransitioning(false);
+    setIncomingRevealed(false);
+    setPendingIndex(null);
+  }, [clearTransitionTimers]);
+
   useEffect(() => {
     if (isOpen) {
       setActiveIndex(0);
+      resetTransitionState();
     }
-  }, [authorId, isOpen]);
+  }, [authorId, isOpen, resetTransitionState]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      resetTransitionState();
+    }
+  }, [isOpen, resetTransitionState]);
 
   const activeStory = stories[activeIndex] ?? null;
+
+  const goToIndex = useCallback(
+    (nextIndex) => {
+      if (
+        isTransitioning ||
+        nextIndex === activeIndex ||
+        nextIndex < 0 ||
+        nextIndex >= stories.length
+      ) {
+        return;
+      }
+
+      clearTransitionTimers();
+      setIsTransitioning(true);
+      setPendingIndex(nextIndex);
+      setIsDimmed(false);
+
+      // Затемнение текущего кадра → чёрный экран.
+      revealRafRef.current = window.requestAnimationFrame(() => {
+        revealRafRef.current = window.requestAnimationFrame(() => {
+          setIsDimmed(true);
+          revealRafRef.current = null;
+        });
+      });
+
+      dimTimerRef.current = window.setTimeout(() => {
+        setIncomingRevealed(false);
+        setActiveIndex(nextIndex);
+        setPendingIndex(null);
+        dimTimerRef.current = null;
+      }, STORY_DIM_MS);
+    },
+    [activeIndex, clearTransitionTimers, isTransitioning, stories.length],
+  );
+
   const advanceStoryOrClose = useCallback(() => {
     if (activeIndex < stories.length - 1) {
-      setActiveIndex((index) => index + 1);
+      goToIndex(activeIndex + 1);
       return;
     }
     onClose();
-  }, [activeIndex, onClose, stories.length]);
+  }, [activeIndex, goToIndex, onClose, stories.length]);
 
   const isStoryMediaActive =
     isOpen && phase === "ready" && activeStory != null && !isReportOpen;
@@ -102,7 +177,9 @@ export function UserStoryViewer({
   });
 
   const isVideoStoryReady =
-    isStoryMediaActive && activeStory?.mediaType === USER_STORY_MEDIA_TYPE_VIDEO;
+    isStoryMediaActive &&
+    activeStory?.mediaType === USER_STORY_MEDIA_TYPE_VIDEO &&
+    incomingRevealed;
   const { videoRef, resumeIfPaused } = useUserStoryVideoPlayback({
     enabled: isVideoStoryReady,
     storyId: activeStory?._id,
@@ -138,8 +215,10 @@ export function UserStoryViewer({
       phase !== "ready" ||
       !activeStory ||
       isReportOpen ||
+      isTransitioning ||
       activeStory.mediaType !== USER_STORY_MEDIA_TYPE_IMAGE ||
-      !isMediaReady
+      !isMediaReady ||
+      !incomingRevealed
     ) {
       return;
     }
@@ -152,14 +231,68 @@ export function UserStoryViewer({
     return () => {
       window.clearTimeout(timerId);
     };
-  }, [activeStory, advanceStoryOrClose, isMediaReady, isOpen, isReportOpen, phase]);
+  }, [
+    activeStory,
+    advanceStoryOrClose,
+    incomingRevealed,
+    isMediaReady,
+    isOpen,
+    isReportOpen,
+    isTransitioning,
+    phase,
+  ]);
+
+  useEffect(() => {
+    if (!isMediaReady || !activeStory || pendingIndex != null) {
+      return undefined;
+    }
+
+    // Появление из чёрного: картинка всплывает, вуаль одновременно уходит.
+    revealRafRef.current = window.requestAnimationFrame(() => {
+      revealRafRef.current = window.requestAnimationFrame(() => {
+        setIncomingRevealed(true);
+        setIsDimmed(false);
+        revealRafRef.current = null;
+
+        if (isTransitioning) {
+          revealTimerRef.current = window.setTimeout(() => {
+            setIsTransitioning(false);
+            revealTimerRef.current = null;
+          }, STORY_REVEAL_MS);
+        }
+      });
+    });
+
+    return () => {
+      if (revealRafRef.current != null) {
+        window.cancelAnimationFrame(revealRafRef.current);
+        revealRafRef.current = null;
+      }
+    };
+  }, [activeStory, isMediaReady, isTransitioning, pendingIndex]);
+
+  useEffect(() => {
+    if (!isOpen || phase !== "ready") {
+      return;
+    }
+
+    for (const offset of [1, -1, 2]) {
+      const story = stories[activeIndex + offset];
+      if (story == null || story.mediaType !== USER_STORY_MEDIA_TYPE_IMAGE) {
+        continue;
+      }
+      const prefetch = new window.Image();
+      prefetch.decoding = "async";
+      prefetch.src = resolveUserStoryMediaUrl(story.mediaUrl);
+    }
+  }, [activeIndex, isOpen, phase, stories]);
 
   const handlePrev = () => {
-    setActiveIndex((index) => Math.max(0, index - 1));
+    goToIndex(activeIndex - 1);
   };
 
   const handleNext = () => {
-    setActiveIndex((index) => Math.min(stories.length - 1, index + 1));
+    goToIndex(activeIndex + 1);
   };
 
   const handleDelete = async () => {
@@ -189,6 +322,22 @@ export function UserStoryViewer({
   const canReport = isAuthorized && !isOwn && activeStory != null && phase === "ready";
   const hasMultiple = stories.length > 1;
   const displayError = actionError || (phase === "error" ? error : "");
+  const showLoadingOverlay = isMediaLoading && !isTransitioning && !incomingRevealed;
+
+  const activeLayerClassName = [
+    "user-story-viewer__media-layer",
+    "user-story-viewer__media-layer_active",
+    incomingRevealed ? "user-story-viewer__media-layer_revealed" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const dimVeilClassName = [
+    "user-story-viewer__dim-veil",
+    isDimmed ? "user-story-viewer__dim-veil_on" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <>
@@ -217,7 +366,7 @@ export function UserStoryViewer({
                 type="button"
                 className="user-story-viewer__edge user-story-viewer__edge_prev"
                 aria-label={USER_STORY_UI.PREV_STORY}
-                disabled={isReportOpen || activeIndex <= 0}
+                disabled={isReportOpen || isTransitioning || activeIndex <= 0}
                 onClick={handlePrev}
               />
             ) : null}
@@ -252,7 +401,7 @@ export function UserStoryViewer({
                 </button>
               </header>
 
-              {isMediaLoading ? (
+              {showLoadingOverlay ? (
                 <div className="user-story-viewer__media-state" aria-live="polite">
                   <span className="user-story-viewer__spinner" aria-hidden />
                   <p className="user-story-viewer__media-state-text">
@@ -272,30 +421,40 @@ export function UserStoryViewer({
                 </div>
               ) : null}
 
-              {activeStory.mediaType === USER_STORY_MEDIA_TYPE_VIDEO ? (
-                <video
-                  ref={videoRef}
-                  className={
-                    isMediaLoading
-                      ? "user-story-viewer__media user-story-viewer__media_hidden"
-                      : "user-story-viewer__media"
-                  }
-                  src={resolveUserStoryMediaUrl(activeStory.mediaUrl)}
-                  playsInline
-                />
-              ) : (
-                <img
-                  className={
-                    isMediaLoading
-                      ? "user-story-viewer__media user-story-viewer__media_hidden"
-                      : "user-story-viewer__media"
-                  }
-                  src={resolveUserStoryMediaUrl(activeStory.mediaUrl)}
-                  alt=""
-                  onLoad={handleImageLoad}
-                  onError={handleImageError}
-                />
-              )}
+              <div className="user-story-viewer__media-stack">
+                <div className={activeLayerClassName}>
+                  {activeStory.mediaType === USER_STORY_MEDIA_TYPE_VIDEO ? (
+                    <video
+                      key={activeStory._id}
+                      ref={videoRef}
+                      className="user-story-viewer__media"
+                      src={resolveUserStoryMediaUrl(activeStory.mediaUrl)}
+                      playsInline
+                    />
+                  ) : (
+                    <img
+                      key={activeStory._id}
+                      className="user-story-viewer__media"
+                      src={resolveUserStoryMediaUrl(activeStory.mediaUrl)}
+                      alt=""
+                      draggable={false}
+                      decoding="async"
+                      onLoad={handleImageLoad}
+                      onError={handleImageError}
+                      ref={(node) => {
+                        if (
+                          node != null &&
+                          node.complete &&
+                          node.naturalWidth > 0
+                        ) {
+                          handleImageLoad();
+                        }
+                      }}
+                    />
+                  )}
+                </div>
+                <div className={dimVeilClassName} aria-hidden />
+              </div>
 
               {activeStory.captionText ? (
                 <p
@@ -315,7 +474,7 @@ export function UserStoryViewer({
                     <button
                       type="button"
                       className="user-story-viewer__action user-story-viewer__action_delete"
-                      disabled={isDeleting}
+                      disabled={isDeleting || isTransitioning}
                       onClick={() => void handleDelete()}
                     >
                       {isDeleting ? USER_STORY_UI.DELETING : USER_STORY_UI.DELETE}
@@ -325,6 +484,7 @@ export function UserStoryViewer({
                     <button
                       type="button"
                       className="user-story-viewer__action"
+                      disabled={isTransitioning}
                       onClick={() => setIsReportOpen(true)}
                     >
                       {USER_STORY_UI.REPORT}
@@ -339,7 +499,9 @@ export function UserStoryViewer({
                 type="button"
                 className="user-story-viewer__edge user-story-viewer__edge_next"
                 aria-label={USER_STORY_UI.NEXT_STORY}
-                disabled={isReportOpen || activeIndex >= stories.length - 1}
+                disabled={
+                  isReportOpen || isTransitioning || activeIndex >= stories.length - 1
+                }
                 onClick={handleNext}
               />
             ) : null}

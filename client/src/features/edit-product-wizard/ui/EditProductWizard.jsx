@@ -2,7 +2,10 @@ import { useCreateProductForm } from "../../../entities/product/model/useCreateP
 import { CreateProductBasicSection } from "../../../entities/product/ui/create-product-sections/CreateProductBasicSection.jsx";
 import { CreateProductOriginalitySection } from "../../../entities/product/ui/create-product-sections/CreateProductOriginalitySection.jsx";
 import { CreateProductCategorySection } from "../../../entities/product/ui/create-product-sections/CreateProductCategorySection.jsx";
+import { CreateProductPickupSection } from "../../../entities/product/ui/create-product-sections/CreateProductPickupSection.jsx";
 import { CreateProductCommerceSection } from "../../../entities/product/ui/create-product-sections/CreateProductCommerceSection.jsx";
+import { CreateProductReturnsSection } from "../../../entities/product/ui/create-product-sections/CreateProductReturnsSection.jsx";
+import { CreateProductReviewSection } from "../../../entities/product/ui/create-product-sections/CreateProductReviewSection.jsx";
 import "../../../entities/product/ui/create-product-sections/CreateProductSections.css";
 import { ProductModalShell } from "../../../shared/ui/ProductModalShell/ProductModalShell.jsx";
 import { ProductWizardProgress } from "../../../shared/ui/ProductWizardProgress/ProductWizardProgress.jsx";
@@ -17,6 +20,9 @@ import "../../create-product-wizard/ui/CreateProductWizard.css";
 const EDIT_PRODUCT_WIZARD_FORM_ID = "edit-product-wizard-form";
 
 /**
+ * Edit wizard = create steps 1:1 (returns + review), submit с «Проверка».
+ * Manage вне wizard.
+ *
  * @param {{
  *   isOpen: boolean;
  *   onClose: () => void;
@@ -110,6 +116,9 @@ export function EditProductWizard({
   };
 
   const stepCopy = resolveEditProductWizardStepCopy(wizard.stepId);
+  const showStepHeadline = !["basic", "originality", "pickup", "commerce", "returns"].includes(
+    wizard.stepId,
+  );
 
   return (
     <ProductModalShell
@@ -167,10 +176,12 @@ export function EditProductWizard({
         onSubmit={handlePrimaryAction}
       >
         <div key={wizard.stepId} className="create-product-wizard__step-panel">
-          <ProductWizardStepHeadline
-            title={stepCopy.title}
-            subtitle={stepCopy.subtitle}
-          />
+          {showStepHeadline ? (
+            <ProductWizardStepHeadline
+              title={stepCopy.title}
+              subtitle={stepCopy.subtitle}
+            />
+          ) : null}
           {wizard.stepId === "basic" ? <CreateProductBasicSection {...sectionProps} /> : null}
           {wizard.stepId === "originality" ? (
             <CreateProductOriginalitySection {...sectionProps} />
@@ -185,11 +196,28 @@ export function EditProductWizard({
           {wizard.stepId === "category" ? (
             <CreateProductCategorySection {...sectionProps} />
           ) : null}
+          {wizard.stepId === "pickup" ? (
+            <CreateProductPickupSection
+              form={form}
+              setForm={setForm}
+              isSubmitting={isSubmitting}
+            />
+          ) : null}
           {wizard.stepId === "commerce" ? (
             <CreateProductCommerceSection
               {...sectionProps}
               showCatalogAvailabilityToggle={showCatalogAvailabilityToggle}
               isEdit
+            />
+          ) : null}
+          {wizard.stepId === "returns" ? (
+            <CreateProductReturnsSection {...sectionProps} />
+          ) : null}
+          {wizard.stepId === "review" ? (
+            <CreateProductReviewSection
+              form={form}
+              discountPreviewPercent={discountPreviewPercent}
+              onEditStep={wizard.goToStep}
             />
           ) : null}
         </div>

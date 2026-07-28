@@ -5,6 +5,7 @@ import { formatApiErrorMessage } from "@/shared/lib";
 export type CuratedListAdminRow = {
   _id: string;
   title: string;
+  regionCode: string;
   productIds: string[];
   sortOrder?: number;
   updatedAt?: string | null;

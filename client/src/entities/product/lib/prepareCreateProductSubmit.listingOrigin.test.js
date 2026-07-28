@@ -20,7 +20,11 @@ const validForm = {
   productStockQuantity: "2",
   productImageRows: [{ id: "1", url: "https://cdn.example.com/product.jpg" }],
   productCategoryId: "507f1f77bcf86cd799439011",
+  productRegionCode: "RU-MOW",
   productReturnEnabled: false,
+  productPickupAddress: "Москва, Тверская улица, 1",
+  productPickupLat: 55.75,
+  productPickupLon: 37.62,
 };
 
 describe("create product with productListingOrigin", () => {

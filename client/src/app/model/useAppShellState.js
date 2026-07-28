@@ -6,6 +6,7 @@ import { USER_ROLE_ADMIN } from "../../entities/user/model/userConstants.js";
 import { MY_PRODUCTS_MODERATION_FILTER_ALL } from "../../entities/product/model/productConstants.js";
 import { parseCatalogQueryFromSearchParams } from "../../entities/product/lib/catalogCatalogQuery.js";
 import { isHomeCatalogFeedVisible } from "../../entities/product/lib/isHomeCatalogFeedVisible.js";
+import { useViewerRegionController } from "../../entities/region/model/useViewerRegionController.js";
 import { AUTH_LOGIN_PATH, AUTH_REGISTER_PATH } from "../../shared/lib/authPaths.js";
 import { useCatalogMainView } from "../../widgets/app-shell/model/useCatalogMainView.js";
 import { useHomeEmailVerifiedRedirect } from "../../widgets/app-shell/model/useHomeEmailVerifiedRedirect.js";
@@ -84,6 +85,8 @@ export function useAppShellState(location, navigate) {
     user: authUser,
   } = authSession;
 
+  const viewerRegion = useViewerRegionController(authUser?.userRegionCode);
+
   const initialCatalogQuery = useMemo(() => readInitialCatalogQuery(), []);
   const [myProfilePage, setMyProfilePage] = useState(EMPTY_MY_PROFILE_PAGE);
   const [myProductsModerationFilter, setMyProductsModerationFilter] = useState(
@@ -155,6 +158,7 @@ export function useAppShellState(location, navigate) {
     currentUserId,
     canModerateProducts,
     mainView: navigation.mainView,
+    viewerRegionCode: viewerRegion.viewerRegionCode,
     onCatalogError: shellUi.onCatalogError,
     setRaffleModal: shellUi.setRaffleModal,
     refreshPendingRafflesCount: staffBadges.refreshPendingRafflesCount,
@@ -193,6 +197,7 @@ export function useAppShellState(location, navigate) {
     setIsEmailVerified,
     isSessionReady,
     authUser,
+    ...viewerRegion,
     isAdmin,
     canModerateProducts,
     sellerProductsLimit,

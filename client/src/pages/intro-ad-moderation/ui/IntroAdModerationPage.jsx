@@ -50,6 +50,7 @@ import "./IntroAdModerationPageOverview.css";
 import "../../../shared/ui/profileQueueContentPanel.css";
 
 const MODERATION_QUEUE_LIMIT = 50;
+const EMPTY_CAMPAIGNS = [];
 
 /**
  * @param {{
@@ -101,10 +102,10 @@ export function IntroAdModerationPage({ onQueueChanged, onEditRaffle }) {
     mutationFn: cancelIntroAdCampaignByStaff,
   });
 
-  const pendingCampaigns = queueQuery.data?.campaigns ?? [];
-  const managedCampaigns = managedQuery.data?.campaigns ?? [];
-  const bannerPendingCampaigns = bannerPendingQuery.data?.campaigns ?? [];
-  const personalPendingCampaigns = personalPendingQuery.data?.campaigns ?? [];
+  const pendingCampaigns = queueQuery.data?.campaigns ?? EMPTY_CAMPAIGNS;
+  const managedCampaigns = managedQuery.data?.campaigns ?? EMPTY_CAMPAIGNS;
+  const bannerPendingCampaigns = bannerPendingQuery.data?.campaigns ?? EMPTY_CAMPAIGNS;
+  const personalPendingCampaigns = personalPendingQuery.data?.campaigns ?? EMPTY_CAMPAIGNS;
   const rafflePendingCount = raffleQueueQuery.data?.pendingRaffles?.length ?? 0;
 
   const summary = useMemo(
@@ -176,12 +177,12 @@ export function IntroAdModerationPage({ onQueueChanged, onEditRaffle }) {
     ]);
     onQueueChanged?.();
   }, [
-    bannerPendingQuery,
-    managedQuery,
+    bannerPendingQuery.refetch,
+    managedQuery.refetch,
     onQueueChanged,
-    personalPendingQuery,
-    queueQuery,
-    raffleQueueQuery,
+    personalPendingQuery.refetch,
+    queueQuery.refetch,
+    raffleQueueQuery.refetch,
   ]);
 
   useRefetchOnVisible(reload, !queueQuery.isPending && !managedQuery.isPending);
@@ -189,15 +190,22 @@ export function IntroAdModerationPage({ onQueueChanged, onEditRaffle }) {
   useEffect(() => {
     setExpandedIds((prev) => {
       const next = new Set(prev);
+      let changed = false;
       const register = (prefix, campaigns) => {
         campaigns
           .filter(campaignModerationNeedsAttention)
-          .forEach((campaign) => next.add(buildModerationCampaignRowId(prefix, String(campaign._id))));
+          .forEach((campaign) => {
+            const rowId = buildModerationCampaignRowId(prefix, String(campaign._id));
+            if (!next.has(rowId)) {
+              next.add(rowId);
+              changed = true;
+            }
+          });
       };
       register("intro", pendingCampaigns);
       register("banner", bannerPendingCampaigns);
       register("personal", personalPendingCampaigns);
-      return next;
+      return changed ? next : prev;
     });
   }, [bannerPendingCampaigns, pendingCampaigns, personalPendingCampaigns]);
 

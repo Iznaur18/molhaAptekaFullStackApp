@@ -9,12 +9,13 @@ import { useHomeCuratedProductListsQuery } from "../../../entities/curated-produ
  *   isMineMode: boolean;
  *   selectedProductCategory: string | null;
  *   selectedCategoryId: string | null;
+ *   sellerPersonalCategoryId?: string | null;
  *   hasProductSearchQuery: boolean;
  *   catalogFollowingOnly: boolean;
  *   catalogAuctionOnly: boolean;
  *   catalogInstallmentOnly: boolean;
  *   catalogSaleOnly: boolean;
- *   catalogAllCities: boolean;
+ *   viewerRegionCode: string;
  * }} params
  */
 export function useHomeCuratedProductLists({
@@ -28,7 +29,7 @@ export function useHomeCuratedProductLists({
   catalogAuctionOnly,
   catalogInstallmentOnly,
   catalogSaleOnly,
-  catalogAllCities,
+  viewerRegionCode,
 }) {
   const showCuratedProductLists = isHomeCuratedProductListsVisible({
     isHomeCatalogMainView,
@@ -45,7 +46,7 @@ export function useHomeCuratedProductLists({
 
   const curatedListsQuery = useHomeCuratedProductListsQuery({
     enabled: showCuratedProductLists,
-    allCities: catalogAllCities,
+    regionCode: viewerRegionCode,
   });
 
   const homeCuratedProductLists = useMemo(

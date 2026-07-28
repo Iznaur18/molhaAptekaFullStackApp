@@ -4,7 +4,9 @@ import { raffleQueryKeys } from "../model/raffleQueryKeys.js";
  * @param {import('@tanstack/react-query').QueryClient} queryClient
  */
 export async function invalidateFeaturedRaffles(queryClient) {
-  await queryClient.invalidateQueries({ queryKey: raffleQueryKeys.featured() });
+  await queryClient.invalidateQueries({
+    queryKey: [...raffleQueryKeys.all, "featured"],
+  });
 }
 
 /**

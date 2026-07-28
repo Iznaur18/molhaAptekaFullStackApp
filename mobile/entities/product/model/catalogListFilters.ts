@@ -13,7 +13,7 @@ export type CatalogListFilters = {
   auctionOnly?: boolean;
   installmentOnly?: boolean;
   saleOnly?: boolean;
-  allCities?: boolean;
+  regionCode?: string;
 };
 
 export const buildCatalogListQueryKey = (filters: CatalogListFilters) => ({
@@ -27,5 +27,5 @@ export const buildCatalogListQueryKey = (filters: CatalogListFilters) => ({
   auctionOnly: filters.auctionOnly === true ? true : undefined,
   installmentOnly: filters.installmentOnly === true ? true : undefined,
   saleOnly: filters.saleOnly === true ? true : undefined,
-  allCities: filters.allCities === true ? true : undefined,
+  regionCode: filters.regionCode?.trim() || undefined,
 });

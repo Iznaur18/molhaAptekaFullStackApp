@@ -58,6 +58,10 @@ export const createOrderLoyaltyFixture = async (options = {}) => {
     productStockQuantity: 10,
     productModerationStatus: PRODUCT_MODERATION_APPROVED,
     loyaltyPointsPerUnit,
+    productPickupAddress: "Москва, Тверская улица, д 1",
+    productPickupLat: 55.757,
+    productPickupLon: 37.615,
+    productDeliveryEnabled: false,
   });
 
   return { seller, buyer, product, loyaltyPointsPerUnit };

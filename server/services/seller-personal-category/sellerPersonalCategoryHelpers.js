@@ -13,6 +13,7 @@ import {
   SELLER_PERSONAL_CATEGORY_STATUS_ACTIVE,
   SELLER_PERSONAL_CATEGORY_STATUS_EXPIRED,
   SELLER_PERSONAL_CATEGORY_STATUS_PENDING,
+  SELLER_PERSONAL_CATEGORY_ACTIVE_SLOT_LIMIT,
 } from "../../constants/sellerPersonalCategoryConstants.js";
 import {
   ProductModel,
@@ -80,6 +81,31 @@ export const assertNoOpenSellerPersonalCategoryCampaign = async (sellerId, sessi
   const existing = await query;
   if (existing) {
     throw new Error("SELLER_PERSONAL_CATEGORY_CAMPAIGN_ALREADY_OPEN");
+  }
+};
+
+/**
+ * @param {import('mongoose').ClientSession | null | undefined} [session]
+ */
+export const countActiveSellerPersonalCategorySlots = async (session = null) => {
+  const now = new Date();
+  const query = SellerPersonalCategoryCampaignModel.countDocuments({
+    status: SELLER_PERSONAL_CATEGORY_STATUS_ACTIVE,
+    activeUntil: { $gt: now },
+  });
+  if (session) {
+    query.session(session);
+  }
+  return query;
+};
+
+/**
+ * @param {import('mongoose').ClientSession | null | undefined} [session]
+ */
+export const assertSellerPersonalCategorySlotAvailable = async (session = null) => {
+  const activeCount = await countActiveSellerPersonalCategorySlots(session);
+  if (activeCount >= SELLER_PERSONAL_CATEGORY_ACTIVE_SLOT_LIMIT) {
+    throw new Error("SELLER_PERSONAL_CATEGORY_SLOTS_FULL");
   }
 };
 

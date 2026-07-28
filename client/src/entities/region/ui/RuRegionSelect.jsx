@@ -1,6 +1,14 @@
-import { getRuRegionByCode, listRuRegions } from "@molha/api-contract";
+import { useId, useRef, useState } from "react";
+import { getRuRegionByCode } from "@molha/api-contract";
+
+import { REGION_UI } from "../../../shared/config/appUiCopy.js";
+import { ViewerRegionPickerSheet } from "./ViewerRegionPickerSheet.jsx";
+
+import "./RuRegionSelect.css";
 
 /**
+ * Поле региона с bottom sheet + поиск (паритет mobile RuRegionSelect / ViewerRegionPickerSheet).
+ *
  * @param {{
  *   value: string;
  *   onChange: (code: string) => void;
@@ -8,6 +16,7 @@ import { getRuRegionByCode, listRuRegions } from "@molha/api-contract";
  *   id?: string;
  *   className?: string;
  *   required?: boolean;
+ *   name?: string;
  * }} props
  */
 export function RuRegionSelect({
@@ -17,27 +26,74 @@ export function RuRegionSelect({
   id,
   className = "",
   required = false,
+  name,
 }) {
-  const options = listRuRegions();
+  const sheetId = useId();
+  const triggerRef = useRef(/** @type {HTMLButtonElement | null} */ (null));
+  const [open, setOpen] = useState(false);
   const selected = String(value ?? "").trim();
   const label = getRuRegionByCode(selected)?.name;
 
   return (
-    <select
-      id={id}
-      className={className}
-      value={selected}
-      disabled={disabled}
-      required={required}
-      aria-label={label || "Регион"}
-      onChange={(event) => onChange(event.target.value)}
-    >
-      {!selected ? <option value="">Выберите регион</option> : null}
-      {options.map((region) => (
-        <option key={region.code} value={region.code}>
-          {region.name}
-        </option>
-      ))}
-    </select>
+    <div className="ru-region-select">
+      <input
+        type="text"
+        tabIndex={-1}
+        aria-hidden="true"
+        name={name}
+        value={selected}
+        required={required}
+        readOnly
+        className="ru-region-select__native"
+        onChange={() => {}}
+        onInvalid={(event) => {
+          event.preventDefault();
+          triggerRef.current?.focus();
+          if (!disabled) {
+            setOpen(true);
+          }
+        }}
+      />
+      <button
+        ref={triggerRef}
+        type="button"
+        id={id}
+        className={["ru-region-select__trigger", className].filter(Boolean).join(" ")}
+        disabled={disabled}
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        aria-controls={open ? sheetId : undefined}
+        aria-label={label || REGION_UI.PLACEHOLDER}
+        onClick={() => {
+          if (!disabled) {
+            setOpen(true);
+          }
+        }}
+      >
+        <span
+          className={[
+            "ru-region-select__value",
+            !label ? "ru-region-select__value--placeholder" : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        >
+          {label || REGION_UI.PLACEHOLDER}
+        </span>
+        <span className="ru-region-select__chevron" aria-hidden="true">
+          ›
+        </span>
+      </button>
+      <ViewerRegionPickerSheet
+        id={sheetId}
+        isOpen={open}
+        value={selected}
+        onClose={() => setOpen(false)}
+        onSelect={(code) => {
+          onChange(code);
+          setOpen(false);
+        }}
+      />
+    </div>
   );
 }

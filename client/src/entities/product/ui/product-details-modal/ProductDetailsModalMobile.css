@@ -157,7 +157,7 @@
   }
 
   .product-details-modal__spec {
-    padding: 0 var(--iz-space-4) var(--iz-space-3);
+    padding: 0 var(--iz-space-4) 0;
   }
 
   .product-details-modal__price-block--inline-actions {

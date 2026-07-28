@@ -68,6 +68,7 @@ export function useAppShellDomain(
     setProductSearchTerm: shell.setProductSearchTerm,
     initialCatalogQuery: shell.initialCatalogQuery,
     onCatalogError: shell.onCatalogError,
+    viewerRegionCode: shell.viewerRegionCode,
   });
 
   const curatedProductListsState = useHomeCuratedProductLists({
@@ -81,7 +82,7 @@ export function useAppShellDomain(
     catalogAuctionOnly: catalogLoader.catalogAuctionOnly,
     catalogInstallmentOnly: catalogLoader.catalogInstallmentOnly,
     catalogSaleOnly: catalogLoader.catalogSaleOnly,
-    catalogAllCities: catalogLoader.catalogAllCities,
+    viewerRegionCode: shell.viewerRegionCode,
   });
 
   const productActions = useHomeProductActions({

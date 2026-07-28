@@ -49,6 +49,10 @@ export const buildTestProductPayload = (overrides = {}) => ({
   productListingOrigin: "own",
   productIsOriginal: true,
   productRegionCode: "RU-MOW",
+  productPickupAddress: "Москва, Тверская улица, д 1",
+  productPickupLat: 55.757,
+  productPickupLon: 37.615,
+  productDeliveryEnabled: false,
   ...overrides,
 });
 

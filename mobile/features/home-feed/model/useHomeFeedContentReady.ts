@@ -1,5 +1,6 @@
 import { useHomeCuratedProductListsQuery } from "@/entities/curated-product-list/model/useHomeCuratedProductListsQuery";
 import { useFeaturedRafflesQuery } from "@/entities/raffle/model/useFeaturedRafflesQuery";
+import { useViewerRegion } from "@/entities/region/model/ViewerRegionProvider";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { useSiteHeaderBannerSlidesQuery } from "@/entities/site-header-banner/model/useSiteHeaderBannerSlidesQuery";
 import { useUserStoriesFeedQuery } from "@/entities/user-story/model/useUserStoriesFeedQuery";
@@ -21,12 +22,20 @@ export const useHomeFeedContentReady = ({
   enabled,
   includeCuratedLists,
 }: HomeFeedContentReadyParams): boolean => {
+  const { viewerRegionCode } = useViewerRegion();
   const sessionQuery = useAuthSessionQuery();
-  const bannerSlidesQuery = useSiteHeaderBannerSlidesQuery({ enabled });
+  const bannerSlidesQuery = useSiteHeaderBannerSlidesQuery({
+    enabled,
+    regionCode: viewerRegionCode,
+  });
   const storiesQuery = useUserStoriesFeedQuery(enabled);
-  const rafflesQuery = useFeaturedRafflesQuery(enabled);
+  const rafflesQuery = useFeaturedRafflesQuery({
+    enabled,
+    regionCode: viewerRegionCode,
+  });
   const curatedListsQuery = useHomeCuratedProductListsQuery({
     enabled: enabled && includeCuratedLists,
+    regionCode: viewerRegionCode,
   });
 
   return (

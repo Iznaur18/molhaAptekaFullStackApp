@@ -39,6 +39,7 @@ export const ProductSimilarTab = ({
   const filters = resolveProductSimilarCatalogFilters(product);
   const catalogQuery = useCatalogProductsInfiniteQuery(
     {
+      view: "main",
       categoryId: filters?.categoryId,
       productCategory: filters?.productCategory,
     },

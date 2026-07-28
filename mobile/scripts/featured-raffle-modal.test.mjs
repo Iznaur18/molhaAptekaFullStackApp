@@ -24,22 +24,27 @@ test("buildFeaturedRaffleProgress: shared label helper used by banner and modal 
   assert.doesNotMatch(card, /OPEN_PRODUCTS/);
 });
 
-test("HomeFeaturedRaffleModal: dimmed overlay, close, sticky full-width CTA", () => {
+test("HomeFeaturedRaffleModal: bottom sheet slide-up, squircle, sticky CTA", () => {
   const modal = readMobileFile("features/home-feed/ui/HomeFeaturedRaffleModal.tsx");
   const styles = readMobileFile("shared/theme/raffleFeaturedStyles.ts");
 
-  assert.match(modal, /animationType="fade"/);
+  assert.match(modal, /animationType="none"/);
   assert.match(modal, /transparent/);
   assert.match(modal, /onRequestClose=\{onClose\}/);
-  assert.match(modal, /styles\.closeButton/);
-  assert.match(modal, /onClose\(\)/);
-  assert.match(modal, /MODAL_HEIGHT_RATIO/);
+  assert.match(modal, /useAdminEditModalAnimation/);
+  assert.match(modal, /SquircleView/);
+  assert.match(modal, /FEATURED_RAFFLE_MODAL_ANIMATION/);
   assert.match(modal, /dialogHeight/);
   assert.match(modal, /height: dialogHeight/);
   assert.match(modal, /styles\.footer/);
   assert.match(modal, /styles\.footerButton/);
+  assert.match(modal, /styles\.footerClose/);
   assert.match(modal, /OPEN_PRODUCTS/);
+  assert.match(modal, /onClose\(\)/);
   assert.match(styles, /FEATURED_RAFFLE_MODAL_BACKDROP/);
+  assert.match(styles, /FEATURED_RAFFLE_MODAL_ANIMATION/);
+  assert.match(styles, /enterMs: 420/);
+  assert.match(styles, /justifyContent: "flex-end"/);
   assert.match(styles, /useFeaturedRaffleModalCardStyles/);
   assert.match(styles, /footerButton:/);
 });

@@ -1,7 +1,7 @@
 .create-raffle-modal__backdrop {
   position: fixed;
   inset: 0;
-  z-index: 50;
+  z-index: var(--iz-z-modal);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -90,6 +90,16 @@
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
+  min-width: 0;
+  width: 100%;
+}
+
+.create-raffle-modal__field .form-field-label {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  min-width: 0;
 }
 
 .create-raffle-modal__field-hint {
@@ -100,14 +110,19 @@
 }
 
 .create-raffle-modal__form input,
-.create-raffle-modal__form textarea {
+.create-raffle-modal__form textarea,
+.create-raffle-modal__form select,
+.create-raffle-modal__form .ru-region-select__trigger {
   box-sizing: border-box;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   padding: 0.45rem 0.55rem;
   border: 1px solid var(--iz-color-accent-ring);
   border-radius: 8px;
   font: inherit;
   background: var(--iz-color-accent-soft);
+  color: inherit;
 }
 
 .create-raffle-modal__hint {

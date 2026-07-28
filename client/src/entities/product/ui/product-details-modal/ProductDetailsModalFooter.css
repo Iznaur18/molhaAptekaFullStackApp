@@ -61,6 +61,17 @@
   background: color-mix(in srgb, var(--iz-color-ink) 88%, white);
 }
 
+.product-details-modal__footer-btn--delete {
+  border: 1px solid var(--iz-color-danger);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-danger);
+  box-shadow: none;
+}
+
+.product-details-modal__footer-btn--delete:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--iz-color-danger) 8%, transparent);
+}
+
 .product-details-modal__footer-btn--report {
   border: 1px dashed var(--iz-color-danger);
   background: transparent;

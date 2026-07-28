@@ -76,76 +76,78 @@ export function LoginPage() {
 
   return (
     <section className="auth-page">
-      <button
-        type="button"
-        className="auth-page__back"
-        onClick={handleBack}
-        disabled={loginMutation.isPending}
-      >
-        {AUTH_UI.BACK_BUTTON}
-      </button>
+      <div className="auth-page__column">
+        <button
+          type="button"
+          className="auth-page__back"
+          onClick={handleBack}
+          disabled={loginMutation.isPending}
+        >
+          {AUTH_UI.BACK_BUTTON}
+        </button>
 
-      <AuthHeroBanner height={heroHeight} imageUrl={bannerImageUrl} />
+        <AuthHeroBanner height={heroHeight} imageUrl={bannerImageUrl} />
 
-      <div className="auth-page__body">
-        <h1 className="auth-page__title">{AUTH_UI.LOGIN_TITLE}</h1>
-        <p className="auth-page__subtitle">{AUTH_UI.LOGIN_SUBTITLE}</p>
+        <div className="auth-page__body">
+          <h1 className="auth-page__title">{AUTH_UI.LOGIN_TITLE}</h1>
+          <p className="auth-page__subtitle">{AUTH_UI.LOGIN_SUBTITLE}</p>
 
-        <form className="auth-page__form" onSubmit={handleSubmit}>
-          <label className="auth-page__field">
-            <span className="auth-page__label">{AUTH_UI.EMAIL_LABEL}</span>
-            <input
-              className="auth-page__input"
-              type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              required
-              autoComplete="email"
-              placeholder={AUTH_UI.EMAIL_PLACEHOLDER}
-            />
-          </label>
+          <form className="auth-page__form" onSubmit={handleSubmit}>
+            <label className="auth-page__field">
+              <span className="auth-page__label">{AUTH_UI.EMAIL_LABEL}</span>
+              <input
+                className="auth-page__input"
+                type="email"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                required
+                autoComplete="email"
+                placeholder={AUTH_UI.EMAIL_PLACEHOLDER}
+              />
+            </label>
 
-          <label className="auth-page__field">
-            <span className="auth-page__label">{AUTH_UI.PASSWORD_LABEL}</span>
-            <PasswordInputField
-              className="auth-page__input"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-              required
-              minLength={LOGIN_MODAL_UI.PASSWORD_MIN_LENGTH}
-              autoComplete="current-password"
-              showPasswordAria={AUTH_UI.SHOW_PASSWORD_ARIA}
-              hidePasswordAria={AUTH_UI.HIDE_PASSWORD_ARIA}
-            />
-          </label>
+            <label className="auth-page__field">
+              <span className="auth-page__label">{AUTH_UI.PASSWORD_LABEL}</span>
+              <PasswordInputField
+                className="auth-page__input"
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                required
+                minLength={LOGIN_MODAL_UI.PASSWORD_MIN_LENGTH}
+                autoComplete="current-password"
+                showPasswordAria={AUTH_UI.SHOW_PASSWORD_ARIA}
+                hidePasswordAria={AUTH_UI.HIDE_PASSWORD_ARIA}
+              />
+            </label>
 
-          {errorMessage ? (
-            <p className="auth-page__error" role="alert">
-              {errorMessage}
-            </p>
-          ) : null}
+            {errorMessage ? (
+              <p className="auth-page__error" role="alert">
+                {errorMessage}
+              </p>
+            ) : null}
 
-          <button
-            type="submit"
-            className="app-btn app-btn--primary auth-page__submit"
-            disabled={loginMutation.isPending}
-          >
-            {loginMutation.isPending
-              ? LOGIN_MODAL_UI.SUBMIT_LOADING
-              : AUTH_UI.LOGIN_BUTTON}
-          </button>
+            <button
+              type="submit"
+              className="app-btn app-btn--primary auth-page__submit"
+              disabled={loginMutation.isPending}
+            >
+              {loginMutation.isPending
+                ? LOGIN_MODAL_UI.SUBMIT_LOADING
+                : AUTH_UI.LOGIN_BUTTON}
+            </button>
 
-          <button
-            type="button"
-            className="auth-page__link"
-            disabled={loginMutation.isPending}
-            onClick={() => navigate(AUTH_REGISTER_PATH)}
-          >
-            {AUTH_UI.GO_TO_REGISTER}
-          </button>
-        </form>
+            <button
+              type="button"
+              className="auth-page__link"
+              disabled={loginMutation.isPending}
+              onClick={() => navigate(AUTH_REGISTER_PATH)}
+            >
+              {AUTH_UI.GO_TO_REGISTER}
+            </button>
+          </form>
+        </div>
       </div>
     </section>
   );

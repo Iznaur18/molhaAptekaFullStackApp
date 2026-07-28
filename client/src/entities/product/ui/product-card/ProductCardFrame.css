@@ -30,52 +30,40 @@
 }
 
 /*
- * Паритет mobile resolveProductCardPromotionFrameStyle:
- * fill = surface / transparent, акцент только border + shadow (без цветной заливки).
+ * Продвижение: без обводки (как обычная карточка).
+ * Акцент — ribbon / corner flag, не border.
  */
 .product-card-promotion-frame--tier-1 > .product-card {
   --product-card-promotion-accent: var(--iz-color-warning);
   --product-card-promotion-accent-soft: var(--iz-color-warning);
 
-  border: 2px solid
-    color-mix(in srgb, var(--product-card-promotion-accent) 68%, transparent);
+  border: none;
   background: var(--iz-color-surface);
-  box-shadow:
-    0 0 0 1px
-      color-mix(in srgb, var(--product-card-promotion-accent-soft) 32%, transparent),
-    0 2px 12px color-mix(in srgb, var(--product-card-promotion-accent) 14%, transparent);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--iz-color-text) 6%, transparent);
 }
 
 .product-card-promotion-frame--tier-2 > .product-card {
   --product-card-promotion-accent: var(--iz-color-accent);
   --product-card-promotion-accent-soft: var(--iz-color-accent-soft);
 
-  border: 2px solid color-mix(in srgb, var(--product-card-promotion-accent) 78%, transparent);
+  border: none;
   background: var(--iz-color-surface);
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--product-card-promotion-accent-soft) 52%, transparent),
-    0 4px 16px color-mix(in srgb, var(--product-card-promotion-accent) 28%, transparent);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--iz-color-text) 6%, transparent);
 }
 
 .product-card-promotion-frame--tier-3 > .product-card {
   --product-card-promotion-accent: var(--product-card-banner-accent);
   --product-card-promotion-accent-soft: var(--product-card-banner-accent-soft);
 
-  border: 2px solid var(--iz-color-border);
+  border: none;
   background: var(--iz-color-surface);
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--iz-color-border) 40%, transparent),
-    0 4px 12px color-mix(in srgb, var(--iz-color-text) 6%, transparent);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--iz-color-text) 6%, transparent);
 }
 
 .product-card-promotion-frame--tier-1 > .product-card:hover,
 .product-card-promotion-frame--tier-2 > .product-card:hover,
 .product-card-promotion-frame--tier-3 > .product-card:hover {
-  border-color: var(--product-card-promotion-accent);
-  box-shadow:
-    0 0 0 1px
-      color-mix(in srgb, var(--product-card-promotion-accent-soft) 48%, transparent),
-    0 8px 22px color-mix(in srgb, var(--product-card-promotion-accent) 24%, transparent);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--iz-color-text) 8%, transparent);
 }
 
 /* Premium-only / promo+premium: soft elevation, без цветной заливки (как mobile). */

@@ -157,28 +157,25 @@ export function UserDetailsPage() {
 
   return (
     <div className="user-details-page">
-      {/* Паритет mobile Stack.Screen title: "Профиль" */}
-      <header className="user-details-page__nav">
-        <button
-          type="button"
-          className="user-details-page__back"
-          aria-label={USER_DETAILS_PAGE_UI.BACK_ARIA}
-          onClick={() => navigateBackOrHome(navigate)}
-        >
-          <AppIcon icon={ChevronLeft} size="md" strokeWidth={2.25} />
-        </button>
-        <h1 className="user-details-page__nav-title">{USER_DETAILS_PAGE_UI.TITLE}</h1>
-      </header>
-
       <div className="user-details-page__header">
         <div className="user-details-page__title-row">
-          <p className="user-details-page__title">
-            <UserPremiumDisplayName
-              name={displayName}
-              isPremium={user.isPremiumUser === true}
-              isUserDataConfirmed={user.isUserDataConfirmed === true}
-            />
-          </p>
+          <div className="user-details-page__title-leading">
+            <button
+              type="button"
+              className="user-details-page__back"
+              aria-label={USER_DETAILS_PAGE_UI.BACK_ARIA}
+              onClick={() => navigateBackOrHome(navigate)}
+            >
+              <AppIcon icon={ChevronLeft} size="md" strokeWidth={2.25} />
+            </button>
+            <p className="user-details-page__title">
+              <UserPremiumDisplayName
+                name={displayName}
+                isPremium={user.isPremiumUser === true}
+                isUserDataConfirmed={user.isUserDataConfirmed === true}
+              />
+            </p>
+          </div>
           <UserFollowButton
             targetUserId={userId}
             isFollowing={isFollowing}

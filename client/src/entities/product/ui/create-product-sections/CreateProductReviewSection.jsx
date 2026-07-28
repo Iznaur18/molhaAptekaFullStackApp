@@ -76,25 +76,30 @@ export function CreateProductReviewSection({
       stepIndex: 3,
     },
     {
+      label: CREATE_PRODUCT_MODAL_UI.LABEL_PICKUP_ADDRESS,
+      value: String(form.productPickupAddress ?? "").trim() || CREATE_PRODUCT_MODAL_UI.WIZARD_REVIEW_EMPTY,
+      stepIndex: 4,
+    },
+    {
       label: getProductFieldEditLabel("productPrice"),
       value: `${String(form.productPrice ?? "").trim()} ₽${
         discountPreviewPercent != null
           ? ` (−${discountPreviewPercent}%)`
           : ""
       }`,
-      stepIndex: 4,
+      stepIndex: 5,
     },
     {
       label: getProductFieldEditLabel("productStockQuantity"),
       value: form.productIsAvailable
         ? `${String(form.productStockQuantity ?? "").trim()} шт.`
         : CREATE_PRODUCT_MODAL_UI.WIZARD_REVIEW_HIDDEN,
-      stepIndex: 4,
+      stepIndex: 5,
     },
     {
       label: CREATE_PRODUCT_MODAL_UI.LABEL_RETURN_ENABLED,
       value: returnSummary,
-      stepIndex: 5,
+      stepIndex: 6,
       multiline: true,
     },
   ];

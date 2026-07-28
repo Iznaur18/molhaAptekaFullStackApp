@@ -16,11 +16,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import { resolveProductImageUrls } from "@/entities/product/lib/resolveProductImageUrls";
 import { resolveProductPreviewVideoUrl } from "@/entities/product/lib/resolveProductPreviewVideoUrl";
 import {
+  canSellerDeleteProduct,
   canSellerEditProduct,
   canSellerToggleCatalogVisibility,
 } from "@/entities/product/lib/getProductModerationUi";
 import { getProductPurchaseLimit } from "@/entities/product/lib/getProductPurchaseLimit";
-import { isCatalogPromotionActive } from "@/entities/product/lib/productPromotionStatus";
 import { useCatalogProductQuery } from "@/entities/product/model/useCatalogProductQuery";
 import { useMyProductMutations } from "@/entities/product/model/useMyProductMutations";
 import { useProductDetailTabs } from "@/entities/product/model/useProductDetailTabs";
@@ -55,6 +55,7 @@ import {
   PRODUCT_PROMOTION_UI,
   PRODUCT_REPORT_UI,
 } from "@/shared/config";
+import { confirmDestructiveAction } from "@/shared/lib/confirmDestructiveAction";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { useVisualViewportKeyboardBottomInset } from "@/shared/lib/useVisualViewportKeyboardBottomInset";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
@@ -78,7 +79,7 @@ export default function ProductDetailScreen() {
   const recordProductViewRef = useRef(recordViewMutation.mutate);
   recordProductViewRef.current = recordViewMutation.mutate;
   const requestPromotionMutation = useRequestProductPromotionMutation();
-  const { patchMutation } = useMyProductMutations();
+  const { patchMutation, deleteMutation } = useMyProductMutations();
   const { isAdmin } = useUserAccess();
   const reportStatusQuery = useMyProductReportStatusQuery({
     productId,
@@ -266,13 +267,12 @@ export default function ProductDetailScreen() {
   const name = String(productRecord.productName ?? "").trim() || "Без названия";
   const isAvailable = productRecord.productIsAvailable !== false;
   const hasPendingReport = reportStatusQuery.data?.hasPendingReport ?? false;
-  const isPromotionActive = isCatalogPromotionActive(productRecord);
-  const canPromoteProduct =
-    isOwnProduct && isAvailable && !isPromotionActive && isAuthorized;
   const loyaltyPointsBalance = loyaltyPointsQuery.data?.loyaltyPointsBalance ?? 0;
   const productPrice = Number(productRecord.productPrice) || 0;
   const purchaseLimit = getProductPurchaseLimit(productRecord);
   const canShowAddToCart = !isOwnProduct && isAvailable && purchaseLimit > 0;
+  const showManageActions = (isOwnProduct || isAdmin) && activeTab === "details";
+  const hasOpenSalesLocked = productRecord.hasOpenSales === true;
   const showMobilePurchaseDock =
     activeTab === "details" && (canShowAddToCart || auctionUi.auctionActive || installmentActive);
   const showInstallmentDock = activeTab === "installment" && installmentDock != null;
@@ -282,6 +282,35 @@ export default function ProductDetailScreen() {
     activeTab === "similar" ||
     activeTab === "auction" ||
     activeTab === "installment";
+
+  const handleAdminDelete = () => {
+    if (!isAdmin || hasOpenSalesLocked || deleteMutation.isPending) {
+      return;
+    }
+    confirmDestructiveAction({
+      title: PRODUCT_CARD_UI.DELETE_PRODUCT,
+      message: PRODUCT_CARD_UI.DELETE_CONFIRM_QUESTION,
+      confirmLabel: PRODUCT_CARD_UI.DELETE_CONFIRM_YES,
+      cancelLabel: PRODUCT_CARD_UI.DELETE_CONFIRM_CANCEL,
+      onConfirm: () => {
+        void (async () => {
+          try {
+            await deleteMutation.mutateAsync(productId);
+            if (router.canGoBack()) {
+              router.back();
+            } else {
+              router.replace("/(tabs)");
+            }
+          } catch (error) {
+            Alert.alert(
+              PRODUCT_CARD_UI.DELETE_PRODUCT,
+              formatApiErrorMessage(error, API_CLIENT_UI.DELETE_MY_PRODUCT_FALLBACK),
+            );
+          }
+        })();
+      },
+    });
+  };
 
   const handleReportPress = () => {
     if (!isAuthorized) {
@@ -466,24 +495,42 @@ export default function ProductDetailScreen() {
               ) : null}
             </View>
 
-            {isOwnProduct && activeTab === "details" ? (
+            {showManageActions ? (
               <View style={styles.mobileInlineActions}>
-                <AppButton
-                  label={PRODUCT_CARD_UI.PROMOTION_BUTTON}
-                  variant="contrast"
-                  onPress={handleOpenPromotionModal}
-                  disabled={!canPromoteProduct}
-                  style={[
-                    styles.sellerActionButton,
-                    !canPromoteProduct && styles.promoteButtonDisabled,
-                  ]}
-                />
-                <AppButton
-                  label={PRODUCT_CARD_UI.EDIT_PRODUCT}
-                  variant="outline"
-                  onPress={() => router.push(`/edit-product/${productId}`)}
-                  style={styles.sellerActionButton}
-                />
+                {isOwnProduct ? (
+                  <AppButton
+                    label={PRODUCT_CARD_UI.PROMOTION_BUTTON}
+                    variant="contrast"
+                    onPress={handleOpenPromotionModal}
+                    disabled={deleteMutation.isPending}
+                    style={styles.sellerActionButton}
+                  />
+                ) : null}
+                {isOwnProduct || isAdmin ? (
+                  <AppButton
+                    label={PRODUCT_CARD_UI.EDIT_PRODUCT}
+                    variant="outline"
+                    onPress={() => router.push(`/edit-product/${productId}`)}
+                    disabled={deleteMutation.isPending}
+                    style={styles.sellerActionButton}
+                  />
+                ) : null}
+                {isAdmin ? (
+                  <AppButton
+                    label={
+                      deleteMutation.isPending
+                        ? PRODUCT_CARD_UI.DELETE_PRODUCT_PENDING
+                        : PRODUCT_CARD_UI.DELETE_PRODUCT
+                    }
+                    variant="outline"
+                    onPress={handleAdminDelete}
+                    disabled={hasOpenSalesLocked || deleteMutation.isPending}
+                    style={styles.sellerActionButton}
+                  />
+                ) : null}
+                {hasOpenSalesLocked && isAdmin ? (
+                  <Text style={styles.reportSuccess}>{PRODUCT_CARD_UI.OPEN_SALES_LOCKED_HINT}</Text>
+                ) : null}
               </View>
             ) : null}
 
@@ -563,10 +610,35 @@ export default function ProductDetailScreen() {
         onSubmit={handleSubmitPromotion}
         onSetProductAvailability={isOwnProduct ? handleSetMyProductAvailability : undefined}
         onSetProductAuction={isOwnProduct ? handleSetProductAuction : undefined}
+        onDeleteProduct={
+          isOwnProduct || isAdmin
+            ? async (id) => {
+                try {
+                  await deleteMutation.mutateAsync(id);
+                  handleClosePromotionModal();
+                  if (router.canGoBack()) {
+                    router.back();
+                  } else {
+                    router.replace("/(tabs)");
+                  }
+                } catch (error) {
+                  setManageErrorMessage(
+                    formatApiErrorMessage(error, API_CLIENT_UI.DELETE_MY_PRODUCT_FALLBACK),
+                  );
+                }
+              }
+            : undefined
+        }
         isAvailabilityTogglePending={isAvailabilityTogglePending}
         isAuctionTogglePending={isAuctionTogglePending}
+        isDeletePending={deleteMutation.isPending}
         manageErrorMessage={manageErrorMessage}
-        canManageEdit={isOwnProduct && (isAdmin || canSellerEditProduct(productRecord))}
+        canManageEdit={
+          (isOwnProduct || isAdmin) && (isAdmin || canSellerEditProduct(productRecord))
+        }
+        canManageDelete={
+          (isOwnProduct || isAdmin) && (isAdmin || canSellerDeleteProduct(productRecord))
+        }
         canManageToggleVisibility={
           isOwnProduct && (isAdmin || canSellerToggleCatalogVisibility(productRecord))
         }

@@ -138,8 +138,7 @@ export function useCatalogQuerySync({
       !catalogFollowingOnly &&
       !catalogAuctionOnly &&
       !catalogInstallmentOnly &&
-      !catalogSaleOnly &&
-      !catalogQueryFromUrl.allCities;
+      !catalogSaleOnly;
     const omitDefaultSort =
       isDefaultNewestFeed && !isExplicitCatalogNewestFeedSearch(location.search);
     const queryPayload = {
@@ -151,7 +150,6 @@ export function useCatalogQuerySync({
       auctionOnly: catalogAuctionOnly,
       installmentOnly: catalogInstallmentOnly,
       saleOnly: catalogSaleOnly,
-      allCities: catalogQueryFromUrl.allCities,
     };
     const built =
       catalogMainView === "catalog-browser"
@@ -180,7 +178,6 @@ export function useCatalogQuerySync({
     catalogAuctionOnly,
     catalogInstallmentOnly,
     catalogSaleOnly,
-    catalogQueryFromUrl.allCities,
     navigate,
   ]);
 

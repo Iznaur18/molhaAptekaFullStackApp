@@ -23,6 +23,7 @@ import {
   ADDRESS_FLAT_MAX_LENGTH,
   NOTES_ABOUT_USER_MAX_CHARS,
 } from "@/entities/user/model/constants";
+import { RuRegionSelect } from "@/entities/region/ui/RuRegionSelect";
 import { ProfileAvatarUpload } from "@/features/image-upload/ui/ProfileAvatarUpload";
 import { ProfileBackgroundUpload } from "@/features/image-upload/ui/ProfileBackgroundUpload";
 import { DeleteAccountSection } from "@/features/profile-edit/ui/DeleteAccountSection";
@@ -259,6 +260,14 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
               })}
             </View>
           </View>
+          <RuRegionSelect
+            value={form.userRegionCode}
+            disabled={isSubmitting}
+            required
+            label={EDIT_PROFILE_UI.LABEL_REGION}
+            onChange={(userRegionCode) => updateField("userRegionCode", userRegionCode)}
+          />
+          <Text style={styles.hint}>{EDIT_PROFILE_UI.HINT_REGION}</Text>
         </>,
       )}
 

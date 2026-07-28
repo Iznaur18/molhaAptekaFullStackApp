@@ -7,9 +7,13 @@ import { apiClient, parseApiContractData } from "@/shared/api";
 
 import type { SiteHeaderBannerSettings, SiteHeaderBannerSlide } from "../model/types";
 
-export const fetchSiteHeaderBannerSlides = async (): Promise<SiteHeaderBannerSlide[]> => {
+export const fetchSiteHeaderBannerSlides = async ({
+  regionCode,
+}: { regionCode?: string } = {}): Promise<SiteHeaderBannerSlide[]> => {
   try {
-    const { data } = await apiClient.get("/site-header-banner");
+    const { data } = await apiClient.get("/site-header-banner", {
+      params: regionCode ? { regionCode } : undefined,
+    });
     const parsed = parseApiContractData(data, siteHeaderBannerSlidesDataSchema);
     return parsed.slides;
   } catch (error) {

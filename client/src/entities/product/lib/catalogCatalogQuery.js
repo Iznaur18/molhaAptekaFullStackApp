@@ -12,7 +12,6 @@ export const CATALOG_QUERY_PARAM_FOLLOWING_ONLY = "followingOnly";
 export const CATALOG_QUERY_PARAM_AUCTION_ONLY = "auctionOnly";
 export const CATALOG_QUERY_PARAM_INSTALLMENT_ONLY = "installmentOnly";
 export const CATALOG_QUERY_PARAM_SALE_ONLY = "saleOnly";
-export const CATALOG_QUERY_PARAM_ALL_CITIES = "allCities";
 export const CATALOG_QUERY_PARAM_SELLER_PERSONAL_CATEGORY_ID =
   "sellerPersonalCategoryId";
 
@@ -63,7 +62,6 @@ export function parseCatalogQueryFromSearchParams(searchParams) {
   const installmentOnly =
     searchParams.get(CATALOG_QUERY_PARAM_INSTALLMENT_ONLY) === "true";
   const saleOnly = searchParams.get(CATALOG_QUERY_PARAM_SALE_ONLY) === "true";
-  const allCities = searchParams.get(CATALOG_QUERY_PARAM_ALL_CITIES) === "true";
 
   const categoryId = parseCatalogCategoryId(
     searchParams.get(CATALOG_QUERY_PARAM_CATEGORY_ID),
@@ -81,7 +79,6 @@ export function parseCatalogQueryFromSearchParams(searchParams) {
     auctionOnly,
     installmentOnly,
     saleOnly,
-    allCities,
   };
 }
 
@@ -95,7 +92,6 @@ export function parseCatalogQueryFromSearchParams(searchParams) {
  *   auctionOnly: boolean;
  *   installmentOnly: boolean;
  *   saleOnly: boolean;
- *   allCities: boolean;
  * }}
  */
 export function buildCatalogSearchParams({
@@ -107,7 +103,6 @@ export function buildCatalogSearchParams({
   auctionOnly,
   installmentOnly,
   saleOnly,
-  allCities,
 }) {
   const params = new URLSearchParams();
 
@@ -136,9 +131,6 @@ export function buildCatalogSearchParams({
   if (saleOnly) {
     params.set(CATALOG_QUERY_PARAM_SALE_ONLY, "true");
   }
-  if (allCities) {
-    params.set(CATALOG_QUERY_PARAM_ALL_CITIES, "true");
-  }
 
   return params;
 }
@@ -157,7 +149,6 @@ export function buildCatalogSearchParams({
  *   auctionOnly: boolean;
  *   installmentOnly: boolean;
  *   saleOnly: boolean;
- *   allCities: boolean;
  * }} query
  * @param {{ omitDefaultSort?: boolean }} [options]
  */
@@ -171,7 +162,6 @@ export function buildCatalogBrowserSearchParams(
     auctionOnly,
     installmentOnly,
     saleOnly,
-    allCities,
   },
   { omitDefaultSort = true } = {},
 ) {
@@ -202,9 +192,6 @@ export function buildCatalogBrowserSearchParams(
   }
   if (saleOnly) {
     params.set(CATALOG_QUERY_PARAM_SALE_ONLY, "true");
-  }
-  if (allCities) {
-    params.set(CATALOG_QUERY_PARAM_ALL_CITIES, "true");
   }
 
   return params;

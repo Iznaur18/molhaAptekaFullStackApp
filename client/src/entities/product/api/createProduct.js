@@ -55,6 +55,17 @@ export async function createProduct(body) {
     if (saleRegion) {
       payload.productRegionCode = saleRegion;
     }
+    const pickupAddress = body.productPickupAddress?.trim();
+    if (pickupAddress) {
+      payload.productPickupAddress = pickupAddress;
+    }
+    if (body.productPickupLat != null && Number.isFinite(Number(body.productPickupLat))) {
+      payload.productPickupLat = Number(body.productPickupLat);
+    }
+    if (body.productPickupLon != null && Number.isFinite(Number(body.productPickupLon))) {
+      payload.productPickupLon = Number(body.productPickupLon);
+    }
+    payload.productDeliveryEnabled = body.productDeliveryEnabled === true;
     if (body.productReturnEnabled != null) {
       payload.productReturnEnabled = body.productReturnEnabled === true;
       payload.productReturnTerms =

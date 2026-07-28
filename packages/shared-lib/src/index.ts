@@ -152,3 +152,10 @@ export {
   resolveLoyaltyPointsProgressPercent,
   USERS_MONTHLY_LOYALTY_POINTS_GOAL,
 } from "./usersMonthlyLoyaltyPoints.js";
+export {
+  buildYandexMapsAppUrl,
+  buildYandexMapsWebUrl,
+  buildYandexNavigatorAppUrl,
+  resolveYandexMapsOpenCandidates,
+} from "./yandexMapsLinks.js";
+export type { YandexMapsPointInput } from "./yandexMapsLinks.js";

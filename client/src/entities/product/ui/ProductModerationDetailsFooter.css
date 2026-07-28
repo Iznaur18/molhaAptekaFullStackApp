@@ -26,6 +26,7 @@
   padding: 0.5rem 0.625rem;
   font: inherit;
   font-size: 0.9375rem;
+  resize: none;
 }
 
 .product-moderation-details-footer__actions {
@@ -53,6 +54,25 @@
   border: 1px solid var(--iz-color-danger);
   background: var(--iz-color-surface);
   color: var(--iz-color-danger);
+}
+
+.product-moderation-details-footer__btn_delete {
+  border: 1px solid var(--iz-color-danger);
+  background: color-mix(in srgb, var(--iz-color-danger) 10%, var(--iz-color-surface));
+  color: var(--iz-color-danger);
+}
+
+.product-moderation-details-footer__open-sales-hint,
+.product-moderation-details-footer__delete-confirm-question {
+  margin: 0;
+  flex: 1 1 100%;
+  font-size: 0.84rem;
+  line-height: 1.4;
+  color: var(--iz-color-text-secondary);
+}
+
+.product-moderation-details-footer__delete-confirm-question {
+  color: var(--iz-color-text);
 }
 
 .product-moderation-details-footer__btn:disabled {

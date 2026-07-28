@@ -6,6 +6,7 @@
  * @typedef {Object} CuratedProductListFromApi
  * @property {string} _id
  * @property {string} title
+ * @property {string} regionCode
  * @property {string[]} productIds
  * @property {number} sortOrder
  * @property {string | null} [createdAt]

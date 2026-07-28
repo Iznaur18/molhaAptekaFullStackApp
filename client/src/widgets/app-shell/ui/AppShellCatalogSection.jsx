@@ -4,7 +4,6 @@ import { HomeCuratedProductListsSection } from "../../../entities/curated-produc
 import { CuratedProductListCarouselSkeleton } from "../../../entities/curated-product-list/ui/CuratedProductListCarouselSkeleton.jsx";
 import { RaffleFeaturedHomeSection } from "../../../entities/raffle/ui/RaffleFeaturedHomeSection.jsx";
 import { UserStoriesStrip } from "../../../entities/user-story/ui/UserStoriesStrip.jsx";
-import { CatalogCityFilterBanner } from "../../../entities/product/ui/CatalogCityFilterBanner.jsx";
 import { CatalogBrowserLanding } from "../../../entities/product-category-display/ui/CatalogBrowserLanding.jsx";
 import { CatalogSubcategoryPicker } from "../../../entities/product-category-display/ui/CatalogSubcategoryPicker.jsx";
 import { buildRafflePath } from "../../../shared/lib/rafflePaths.js";
@@ -58,9 +57,6 @@ import { MyProductsCatalogSection } from "../../my-products-page/ui/MyProductsCa
  *   catalogAuctionOnly: boolean;
  *   catalogInstallmentOnly: boolean;
  *   catalogSaleOnly: boolean;
- *   showCatalogCityFilterBanner?: boolean;
- *   catalogCityFilterLabel?: string | null;
- *   onShowAllCatalogCities?: () => void;
  *   showFullWidthTier3Banners?: boolean;
  *   sellerRaffleActive: boolean;
  *   onToggleRaffleParticipation: (productId: string, participate: boolean) => void;
@@ -113,9 +109,6 @@ export function AppShellCatalogGridSection({
   catalogAuctionOnly,
   catalogInstallmentOnly,
   catalogSaleOnly,
-  showCatalogCityFilterBanner = false,
-  catalogCityFilterLabel = null,
-  onShowAllCatalogCities,
   showFullWidthTier3Banners = false,
   sellerRaffleActive,
   onToggleRaffleParticipation,
@@ -195,12 +188,6 @@ export function AppShellCatalogGridSection({
         />
       ) : showCuratedProductLists && isCuratedProductListsLoading ? (
         <CuratedProductListCarouselSkeleton />
-      ) : null}
-      {showCatalogCityFilterBanner && catalogCityFilterLabel && onShowAllCatalogCities ? (
-        <CatalogCityFilterBanner
-          cityLabel={catalogCityFilterLabel}
-          onShowAllCities={onShowAllCatalogCities}
-        />
       ) : null}
       {isCatalogInitialLoading ? (
         <CatalogGridSkeleton />

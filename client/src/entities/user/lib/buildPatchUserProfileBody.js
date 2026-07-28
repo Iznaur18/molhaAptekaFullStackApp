@@ -2,6 +2,7 @@ import {
   USER_SOCIAL_LINK_FIELD_IDS,
   normalizeSocialLinkToStoredUrl,
   validateSocialLinkInput,
+  isRuRegionCode,
 } from "@molha/api-contract";
 import { normalizeUploadUrlForStorage } from "@izibuy/shared-lib";
 import { normalizeRuPhoneInput } from "./ruPhone.js";
@@ -68,6 +69,11 @@ export function buildPatchUserProfileBody(form, options = {}) {
   };
   if (!isStructuredAddressEqual(form.structuredAddress, addressBaseline)) {
     appendStructuredAddressToPayload(body, form.structuredAddress);
+  }
+
+  const regionCode = String(form.userRegionCode ?? "").trim();
+  if (isRuRegionCode(regionCode)) {
+    body.userRegionCode = regionCode;
   }
 
   const phoneRaw = String(form.userPhoneNumber).trim();

@@ -1,4 +1,4 @@
-import { USER_SOCIAL_LINK_FIELD_IDS, storedSocialUrlToInputValue } from "@molha/api-contract";
+import { USER_SOCIAL_LINK_FIELD_IDS, storedSocialUrlToInputValue, DEFAULT_VIEWER_REGION_CODE, isRuRegionCode } from "@molha/api-contract";
 import { formatBirthDateForInput } from "@/entities/user/lib/birthDateInputMask";
 import { getUserBackgroundFocus } from "@/entities/user/lib/profileImageFocus";
 import type { ProfileImageFocus } from "@/entities/user/lib/profileImageFocus";
@@ -24,6 +24,7 @@ export type EditProfileFormState = {
   userBirthDate: string;
   userGender: "male" | "female" | "noSelected";
   structuredAddress: StructuredAddress;
+  userRegionCode: string;
   userPhoneNumber: string;
   userAvatarUrl: string;
   backgroundMode: BackgroundMode;
@@ -55,6 +56,8 @@ export const mapUserToEditProfileForm = (
   const stored = typeof user.userBackgroundUrl === "string" ? user.userBackgroundUrl : null;
   const bgFields = parseUserBackgroundFormFields(stored);
   const bgMode = resolveBackgroundModeFromUser(stored);
+  const regionRaw =
+    typeof user.userRegionCode === "string" ? user.userRegionCode.trim() : "";
 
   const socialLinks = Object.fromEntries(
     USER_SOCIAL_LINK_FIELD_IDS.map((fieldId) => [
@@ -85,6 +88,7 @@ export const mapUserToEditProfileForm = (
       house: typeof user.userAddressHouse === "string" ? user.userAddressHouse.trim() : "",
       flat: typeof user.userAddressFlat === "string" ? user.userAddressFlat.trim() : "",
     },
+    userRegionCode: isRuRegionCode(regionRaw) ? regionRaw : DEFAULT_VIEWER_REGION_CODE,
     userPhoneNumber:
       typeof user.userPhoneNumber === "string"
         ? maskRuPhoneInput(user.userPhoneNumber)

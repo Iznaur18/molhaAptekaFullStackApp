@@ -4,6 +4,9 @@ import { requiredRuRegionCodeFieldSchema } from "./ruRegions.js";
 
 export const SELLER_PERSONAL_CATEGORY_LABEL_MAX_LENGTH = 80;
 
+/** Макс. одновременно active личных категорий на сайте */
+export const SELLER_PERSONAL_CATEGORY_ACTIVE_SLOT_LIMIT = 200;
+
 export const SELLER_PERSONAL_CATEGORY_DURATION_CODES = ["24h", "7d", "30d"];
 
 export const submitSellerPersonalCategoryCampaignBodySchema = z.object({
@@ -69,6 +72,8 @@ export const sellerPersonalCategoryTileSchema = z.object({
 
 export const sellerPersonalCategoryConfigDataSchema = z.object({
   durations: z.array(sellerPersonalCategoryDurationSchema),
+  activeSlotLimit: z.number().int().positive().optional(),
+  activeSlots: z.number().int().nonnegative().optional(),
 });
 
 export const sellerPersonalCategoryCatalogTilesDataSchema = z.object({

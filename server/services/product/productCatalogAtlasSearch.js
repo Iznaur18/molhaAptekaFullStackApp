@@ -1,9 +1,6 @@
-import {
-  PRODUCT_SORT_NEWEST,
-  PRODUCT_SORT_PURCHASES,
-  PRODUCT_SORT_VIEWS,
-} from "../../constants/productCatalogSort.js";
+import { PRODUCT_SORT_NEWEST } from "../../constants/productCatalogSort.js";
 import { getCatalogProductModel } from "../../db/mongoReadConnection.js";
+import { withCatalogRegionPrioritySort } from "../user/userRegionCatalogFilter.js";
 
 import { attachProductSellerSnapshots } from "./attachProductSellerSnapshots.js";
 import { buildProductAtlasSearchStage } from "./buildProductAtlasSearchStage.js";
@@ -37,8 +34,13 @@ const sellerLookupStages = () => [
 /**
  * @param {string} sort
  * @param {string | null} [buyerCity]
+ * @param {string | null} [viewerRegionCode]
  */
-const sortStagesForAtlasCatalog = (sort, buyerCity = null) => {
+const sortStagesForAtlasCatalog = (
+  sort,
+  buyerCity = null,
+  viewerRegionCode = null,
+) => {
   const stages = [];
   if (sort === PRODUCT_SORT_NEWEST) {
     stages.push(catalogPromotionSortBoostAddFieldsStage);
@@ -56,7 +58,7 @@ const sortStagesForAtlasCatalog = (sort, buyerCity = null) => {
     stages.push(sortStage);
   }
 
-  return stages;
+  return withCatalogRegionPrioritySort(stages, viewerRegionCode);
 };
 
 /**
@@ -65,6 +67,7 @@ const sortStagesForAtlasCatalog = (sort, buyerCity = null) => {
  * @param {number} skip
  * @param {number} limit
  * @param {string | null} [buyerCity]
+ * @param {string | null} [viewerRegionCode]
  */
 export const findCatalogProductsPageAtlas = async (
   searchResult,
@@ -72,6 +75,7 @@ export const findCatalogProductsPageAtlas = async (
   skip,
   limit,
   buyerCity = null,
+  viewerRegionCode = null,
 ) => {
   if (!searchResult.atlasSearch) {
     throw new Error("findCatalogProductsPageAtlas requires atlasSearch");
@@ -83,11 +87,18 @@ export const findCatalogProductsPageAtlas = async (
     buildProductAtlasSearchStage(searchResult.atlasSearch),
     { $addFields: { _searchScore: { $meta: "searchScore" } } },
     { $match: normalizeProductsQueryForAggregate(searchResult.baseQuery) },
-    ...sortStagesForAtlasCatalog(sort, buyerCity),
+    ...sortStagesForAtlasCatalog(sort, buyerCity, viewerRegionCode),
     { $skip: skip },
     { $limit: limit },
     ...sellerLookupStages(),
-    { $project: { _searchScore: 0, _promotionSortTier: 0, _citySortPriority: 0 } },
+    {
+      $project: {
+        _searchScore: 0,
+        _promotionSortTier: 0,
+        _citySortPriority: 0,
+        _regionSortPriority: 0,
+      },
+    },
   ]);
 
   return attachProductSellerSnapshots(products);

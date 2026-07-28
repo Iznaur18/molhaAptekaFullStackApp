@@ -1,0 +1,80 @@
+.product-pickup-location-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.product-pickup-location-fields__legend {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--iz-color-text);
+}
+
+.product-pickup-location-fields__choice-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.product-pickup-location-fields__chip {
+  flex: 1 1 8rem;
+  min-width: 7rem;
+  margin: 0;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid color-mix(in srgb, var(--iz-color-border) 85%, transparent);
+  border-radius: 0.65rem;
+  background: var(--iz-color-surface-muted, #f9fafb);
+  color: var(--iz-color-text);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.product-pickup-location-fields__chip:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--iz-color-action) 45%, transparent);
+}
+
+.product-pickup-location-fields__chip_active {
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast, #fff);
+}
+
+.product-pickup-location-fields__chip_soon:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  color: var(--iz-color-text-secondary);
+}
+
+.product-pickup-location-fields__chip:disabled:not(.product-pickup-location-fields__chip_soon) {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.product-pickup-location-fields__hint {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--iz-color-text-secondary);
+}
+
+.product-pickup-location-fields .address-delivery-fields__line-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--iz-color-text);
+}
+
+.product-pickup-location-fields .address-delivery-fields__line-wrap .create-product-section__input {
+  font-weight: 400;
+}

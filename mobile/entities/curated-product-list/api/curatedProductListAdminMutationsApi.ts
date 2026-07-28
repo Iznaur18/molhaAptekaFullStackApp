@@ -6,6 +6,7 @@ import type { CuratedListAdminRow } from "./curatedProductListAdminApi";
 
 export const createCuratedProductListAdmin = async (body: {
   title: string;
+  regionCode: string;
 }): Promise<CuratedListAdminRow> => {
   try {
     const { data } = await apiClient.post("/product/admin/curated-lists", body);
@@ -20,7 +21,7 @@ export const createCuratedProductListAdmin = async (body: {
 
 export const patchCuratedProductListAdmin = async (
   listId: string,
-  body: { title?: string },
+  body: { title?: string; regionCode?: string },
 ): Promise<CuratedListAdminRow> => {
   try {
     const { data } = await apiClient.patch(`/product/admin/curated-lists/${listId}`, body);

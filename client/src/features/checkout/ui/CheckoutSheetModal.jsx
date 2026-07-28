@@ -14,11 +14,13 @@ import "./CheckoutSheetModal.css";
  *   isOpen: boolean;
  *   onClose: () => void;
  *   defaultDeliveryAddress: Record<string, unknown>;
+ *   pickupAddressSummary?: string;
  *   isSubmitting: boolean;
  *   submitError: string;
  *   submitSuccess: string;
  *   isDisabled?: boolean;
  *   onSubmit: (payload: {
+ *     fulfillmentMethod: string;
  *     deliveryAddress: string;
  *     deliveryAddressFlat: string;
  *     paymentMethod: string;
@@ -29,6 +31,7 @@ export function CheckoutSheetModal({
   isOpen,
   onClose,
   defaultDeliveryAddress,
+  pickupAddressSummary = "",
   isSubmitting,
   submitError,
   submitSuccess,
@@ -104,6 +107,7 @@ export function CheckoutSheetModal({
         <div className="checkout-sheet-modal__body">
           <CheckoutForm
             defaultDeliveryAddress={defaultDeliveryAddress}
+            pickupAddressSummary={pickupAddressSummary}
             isSubmitting={isSubmitting}
             submitError={submitError}
             submitSuccess={submitSuccess}

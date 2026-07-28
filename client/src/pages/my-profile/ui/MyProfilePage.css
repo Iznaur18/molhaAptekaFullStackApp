@@ -3,7 +3,8 @@
 .my-profile-page {
   --my-profile-sidebar-width: 16.25rem;
   --my-profile-mobile-nav-width: min(18rem, 88vw);
-  --my-profile-mobile-nav-z-index: var(--iz-z-dropdown);
+  /* выше .mobile-bottom-nav (iz-z-dropdown + 10), иначе drawer/backdrop под nav */
+  --my-profile-mobile-nav-z-index: calc(var(--iz-z-dropdown) + 20);
   --my-profile-nav-accent-width: 3px;
   --my-profile-surface-radius: 24px;
   --modal-avatar-lead-size: 4.5rem;
@@ -606,20 +607,6 @@
   margin-top: 0.5rem;
 }
 
-.my-profile-page__privacy-link {
-  align-self: flex-start;
-  margin: 0;
-  padding: 0.5rem 0;
-  color: var(--iz-color-link);
-  font-size: 0.875rem;
-  text-decoration: underline;
-  text-underline-offset: 0.15em;
-}
-
-.my-profile-page__privacy-link:hover {
-  color: var(--iz-color-action);
-}
-
 .my-profile-page__mobile-nav-backdrop {
   position: fixed;
   inset: 0;
@@ -682,10 +669,13 @@
     overflow-y: auto;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
+    /* закрытый drawer не перехватывает тапы по bottom nav */
+    pointer-events: none;
   }
 
   .my-profile-page__sidebar-wrap--open {
     transform: translateX(0);
+    pointer-events: auto;
   }
 
   .my-profile-page__sidebar {

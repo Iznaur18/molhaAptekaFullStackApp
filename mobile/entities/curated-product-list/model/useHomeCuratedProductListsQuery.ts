@@ -6,15 +6,15 @@ import { fetchHomeCuratedProductLists } from "../api/fetchHomeCuratedProductList
 
 type HomeCuratedProductListsQueryOptions = {
   enabled?: boolean;
-  allCities?: boolean;
+  regionCode?: string;
 };
 
 export const useHomeCuratedProductListsQuery = ({
   enabled = true,
-  allCities = false,
+  regionCode = "",
 }: HomeCuratedProductListsQueryOptions = {}) =>
   useQuery({
-    queryKey: curatedProductListQueryKeys.home(allCities),
-    queryFn: () => fetchHomeCuratedProductLists({ allCities }),
+    queryKey: curatedProductListQueryKeys.home(regionCode),
+    queryFn: () => fetchHomeCuratedProductLists({ regionCode: regionCode || undefined }),
     enabled,
   });

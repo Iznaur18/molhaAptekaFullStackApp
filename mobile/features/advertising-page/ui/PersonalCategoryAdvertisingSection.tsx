@@ -6,7 +6,9 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { DEFAULT_VIEWER_REGION_CODE, isRuRegionCode } from "@molha/api-contract";
 
+import { RuRegionSelect } from "@/entities/region/ui/RuRegionSelect";
 import { useMySellerPersonalCategoryCampaignQuery } from "@/entities/seller-personal-category/model/useMySellerPersonalCategoryCampaignQuery";
 import { useSellerPersonalCategoryMutations } from "@/entities/seller-personal-category/model/useSellerPersonalCategoryMutations";
 import { resolvePersonalCategoryStatusPanelStyle } from "@/features/advertising-page/lib/resolveAdvertisingStatusPanelStyle";
@@ -36,6 +38,7 @@ export const PersonalCategoryAdvertisingSection = ({
   const [labelRu, setLabelRu] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [tariffCode, setTariffCode] = useState("7d");
+  const [regionCode, setRegionCode] = useState(DEFAULT_VIEWER_REGION_CODE);
   const [showForm, setShowForm] = useState(false);
   const [actionError, setActionError] = useState("");
   const [feedback, setFeedback] = useState("");
@@ -55,6 +58,10 @@ export const PersonalCategoryAdvertisingSection = ({
   const showTariffQuote = !hasOpenCampaign || showForm;
 
   const handleSubmit = async () => {
+    if (!isRuRegionCode(regionCode)) {
+      setActionError(SELLER_PERSONAL_CATEGORY_PAGE_UI.ERROR_REGION_REQUIRED);
+      return;
+    }
     try {
       setActionError("");
       setFeedback("");
@@ -62,6 +69,7 @@ export const PersonalCategoryAdvertisingSection = ({
         labelRu: labelRu.trim(),
         imageUrl: imageUrl.trim(),
         tariffCode,
+        regionCode,
       });
       setShowForm(false);
       setFeedback(SELLER_PERSONAL_CATEGORY_PAGE_UI.SUBMIT_SUCCESS);
@@ -193,6 +201,14 @@ export const PersonalCategoryAdvertisingSection = ({
               onChange={setImageUrl}
               disabled={isSubmitting}
             />
+            <RuRegionSelect
+              value={regionCode}
+              disabled={isSubmitting}
+              required
+              label={SELLER_PERSONAL_CATEGORY_PAGE_UI.LABEL_REGION}
+              onChange={setRegionCode}
+            />
+            <Text style={styles.timingHint}>{SELLER_PERSONAL_CATEGORY_PAGE_UI.HINT_REGION}</Text>
             <View style={styles.field}>
               <Text style={styles.fieldLabel}>
                 {SELLER_PERSONAL_CATEGORY_PAGE_UI.LABEL_DURATION}

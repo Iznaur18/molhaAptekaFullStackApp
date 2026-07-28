@@ -7,7 +7,6 @@ import {
 import { ProductCharacteristicsEditor } from "../ProductCharacteristicsEditor.jsx";
 import { CREATE_PRODUCT_MODAL_UI } from "../../../../shared/config/appUiCopy.js";
 import { getProductFieldEditLabel } from "../../lib/productFieldRegistry.js";
-import { PRODUCT_LISTING_ORIGIN_OPTIONS } from "../../lib/productListingOrigin.js";
 import { FormFieldLabel } from "../../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
 
 /**
@@ -45,40 +44,6 @@ export function CreateProductBasicSection({
           placeholder={CREATE_PRODUCT_MODAL_UI.WIZARD_PLACEHOLDER_NAME}
         />
       </label>
-
-      <fieldset className="create-product-section__listing-origin" disabled={isSubmitting}>
-        <legend className="create-product-section__listing-origin-legend">
-          <FormFieldLabel required>{CREATE_PRODUCT_MODAL_UI.LABEL_LISTING_ORIGIN}</FormFieldLabel>
-        </legend>
-        <div
-          className="create-product-section__listing-origin-chips"
-          role="radiogroup"
-          aria-label={CREATE_PRODUCT_MODAL_UI.LABEL_LISTING_ORIGIN}
-        >
-          {PRODUCT_LISTING_ORIGIN_OPTIONS.map((option) => {
-            const selected = form.productListingOrigin === option.value;
-            return (
-              <button
-                key={option.value}
-                type="button"
-                className={[
-                  "create-product-section__listing-origin-chip",
-                  selected ? "create-product-section__listing-origin-chip_active" : "",
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
-                aria-pressed={selected}
-                disabled={isSubmitting}
-                onClick={() =>
-                  setForm((prev) => ({ ...prev, productListingOrigin: option.value }))
-                }
-              >
-                {option.label}
-              </button>
-            );
-          })}
-        </div>
-      </fieldset>
 
       <label className="create-product-section__label">
         <FormFieldLabel required>{getProductFieldEditLabel("productDescription")}</FormFieldLabel>

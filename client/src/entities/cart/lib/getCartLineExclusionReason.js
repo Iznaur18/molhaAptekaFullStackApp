@@ -1,7 +1,7 @@
 import { isCurrentUserProductSeller } from "../../product/lib/isCurrentUserProductSeller.js";
 
 /**
- * @typedef {"missing" | "unavailable" | "own_product"} CartLineExclusionReason
+ * @typedef {"missing" | "unavailable" | "own_product" | "missing_pickup"} CartLineExclusionReason
  */
 
 /**
@@ -20,6 +20,11 @@ export function getCartLineExclusionReason(line, currentUserId) {
 
   if (isCurrentUserProductSeller(line.product, currentUserId)) {
     return "own_product";
+  }
+
+  const pickup = String(line.product?.productPickupAddress ?? "").trim();
+  if (!pickup) {
+    return "missing_pickup";
   }
 
   return null;

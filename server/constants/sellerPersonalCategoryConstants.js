@@ -19,6 +19,8 @@ export const SELLER_PERSONAL_CATEGORY_OPEN_STATUSES = [
 
 export const SELLER_PERSONAL_CATEGORY_LABEL_MAX_LENGTH = 80;
 export const SELLER_PERSONAL_CATEGORY_IMAGE_URL_MAX_LENGTH = 2048;
+/** Макс. одновременно active личных категорий на сайте */
+export const SELLER_PERSONAL_CATEGORY_ACTIVE_SLOT_LIMIT = 200;
 
 export const SELLER_PERSONAL_CATEGORY_DURATION_OPTIONS = [
   { code: "24h", title: "24 часа", durationHours: 24, pricePoints: 1_000 },

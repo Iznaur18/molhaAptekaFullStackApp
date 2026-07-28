@@ -1,8 +1,10 @@
+import { MessageSquare } from "lucide-react";
 import {
   PRODUCT_CARD_UI,
   PRODUCT_MODERATION_PAGE_UI,
   PRODUCT_REVIEW_UI,
 } from "../../../../shared/config/appUiCopy.js";
+import { AppIcon } from "../../../../shared/ui/icon/index.js";
 import { formatProductFieldForDisplay } from "../../lib/formatProductFieldForDisplay.js";
 import {
   getProductModerationBadgeClassName,
@@ -65,7 +67,28 @@ export function ProductCardStandardContent({ vm }) {
               vm.hasReviewRating ? vm.reviewRatingLine : PRODUCT_REVIEW_UI.NO_REVIEWS
             }
           >
-            {vm.hasReviewRating ? vm.reviewRatingLine : PRODUCT_REVIEW_UI.NO_REVIEWS}
+            {vm.hasReviewRating && vm.reviewRatingParts ? (
+              <>
+                <span className="product-card__rating-score" aria-hidden="true">
+                  ★ {vm.reviewRatingParts.rating}
+                </span>
+                <span className="product-card__rating-sep" aria-hidden="true">
+                  ·
+                </span>
+                <span className="product-card__rating-count" aria-hidden="true">
+                  <AppIcon
+                    icon={MessageSquare}
+                    size="xs"
+                    strokeWidth={0}
+                    fill="currentColor"
+                    className="product-card__rating-count-icon"
+                  />
+                  {vm.reviewRatingParts.count}
+                </span>
+              </>
+            ) : (
+              PRODUCT_REVIEW_UI.NO_REVIEWS
+            )}
           </p>
           <div
             ref={vm.statusBadgesRowRef}

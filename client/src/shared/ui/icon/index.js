@@ -23,5 +23,6 @@ export {
   Trophy,
   User,
   Users,
+  MapPin,
   X,
 } from "lucide-react";

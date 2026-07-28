@@ -22,6 +22,17 @@
   color: var(--iz-color-action-hover);
 }
 
+.header-circle-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.header-circle-button:disabled:hover {
+  border-color: var(--iz-color-focus-ring);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-action);
+}
+
 .header-circle-button--active,
 .header-circle-button--active:hover {
   border-color: var(--iz-color-action);

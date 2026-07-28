@@ -4,7 +4,8 @@
   --site-header-banner-radius: 22px;
   display: block;
   width: 100%;
-  margin-top: 0.5rem;
+  /* gap до/после — у родителя (header gap / HOME_FEED_SECTION_GAP = 8) */
+  margin: 0;
 }
 
 .site-header-banner-carousel__viewport {
@@ -93,8 +94,17 @@
 }
 
 .site-header-banner-carousel_single .site-header-banner-carousel__slide {
+  box-sizing: border-box;
   width: 100%;
+  max-width: 100%;
   border-radius: var(--site-header-banner-radius);
+}
+
+.site-header-banner-carousel_single .site-header-banner-carousel__link,
+.site-header-banner-carousel_single .site-header-banner-carousel__static,
+.site-header-banner-carousel_single .site-header-banner-carousel__image {
+  width: 100%;
+  max-width: 100%;
 }
 
 .site-header-banner-carousel_single .site-header-banner-carousel__viewport {

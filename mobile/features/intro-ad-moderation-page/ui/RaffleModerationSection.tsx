@@ -69,7 +69,9 @@ export const RaffleModerationSection = ({ onActionError }: RaffleModerationSecti
   const syncStaffQueueCaches = useCallback(async () => {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: raffleQueryKeys.staffQueue() }),
-      queryClient.invalidateQueries({ queryKey: raffleQueryKeys.featured() }),
+      queryClient.invalidateQueries({
+        queryKey: [...raffleQueryKeys.all, "featured"],
+      }),
       queryClient.invalidateQueries({ queryKey: introAdQueryKeys.moderationCount() }),
       queryClient.invalidateQueries({ queryKey: [...staffBadgeQueryKeys.all, "intro-ad"] }),
     ]);

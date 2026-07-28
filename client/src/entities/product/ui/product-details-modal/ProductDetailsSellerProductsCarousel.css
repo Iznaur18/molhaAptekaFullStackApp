@@ -34,7 +34,7 @@
   scrollbar-width: none;
   -ms-overflow-style: none;
   -webkit-overflow-scrolling: touch;
-  touch-action: pan-x;
+  touch-action: pan-x pan-y;
 }
 
 .product-details-seller-products-carousel__scroll::-webkit-scrollbar {

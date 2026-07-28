@@ -46,3 +46,92 @@
   flex-direction: column;
   gap: 0.45rem;
 }
+
+.product-edit-manage__delete {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.product-edit-manage__delete-btn {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  width: 100%;
+  margin: 0;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--iz-color-danger);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--iz-color-danger) 8%, var(--iz-color-surface));
+  color: var(--iz-color-danger);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.product-edit-manage__delete-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--iz-color-danger) 14%, var(--iz-color-surface));
+}
+
+.product-edit-manage__delete-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.product-edit-manage__delete-btn-title {
+  font-size: 0.9375rem;
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+.product-edit-manage__delete-btn-hint {
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  opacity: 0.9;
+}
+
+.product-edit-manage__delete-pending,
+.product-edit-manage__delete-confirm-question {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--iz-color-text);
+}
+
+.product-edit-manage__delete-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.product-edit-manage__delete-confirm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.product-edit-manage__delete-confirm-yes,
+.product-edit-manage__delete-confirm-cancel {
+  margin: 0;
+  padding: 0.55rem 0.85rem;
+  border-radius: 0.5rem;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.product-edit-manage__delete-confirm-yes {
+  border: 1px solid var(--iz-color-danger);
+  background: var(--iz-color-danger);
+  color: var(--iz-color-on-contrast);
+}
+
+.product-edit-manage__delete-confirm-cancel {
+  border: 1px solid var(--iz-color-border-strong);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
+}
+

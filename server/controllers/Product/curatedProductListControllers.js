@@ -2,9 +2,10 @@ import { CURATED_PRODUCT_LIST_TITLE_MAX_LENGTH } from "../../constants/curatedPr
 import CuratedProductListModel from "../../models/CuratedProductListModel.js";
 import { getHiddenSellerIds } from "../../services/access/adminUserGuard.js";
 import {
-  assertCuratedListProductCatalogVisible,
+  assertCuratedListProductMatchesRegion,
   buildAdminCuratedListsResponse,
   buildHomeCuratedListsResponse,
+  normalizeCuratedProductListRegionCode,
   normalizeCuratedProductListTitle,
   reorderCuratedProductLists,
   toCuratedProductListPayload,
@@ -22,7 +23,9 @@ export async function getHomeCuratedProductListsController(req, res) {
     queryRegionCode: req.query.regionCode,
   });
 
-  const lists = await CuratedProductListModel.find().sort(sortCuratedLists).lean();
+  const lists = await CuratedProductListModel.find({ regionCode: viewerRegionCode })
+    .sort(sortCuratedLists)
+    .lean();
   const curatedLists = await buildHomeCuratedListsResponse(lists, hiddenSellerIds, {
     viewerRegionCode,
   });
@@ -44,6 +47,8 @@ export async function createCuratedProductListAdminController(req, res) {
     return errorRes(res, 400, "Слишком длинный заголовок");
   }
 
+  const regionCode = normalizeCuratedProductListRegionCode(req.body?.regionCode);
+
   const maxSortOrder = await CuratedProductListModel.findOne()
     .sort({ sortOrder: -1 })
     .select("sortOrder")
@@ -52,6 +57,7 @@ export async function createCuratedProductListAdminController(req, res) {
 
   const doc = await CuratedProductListModel.create({
     title,
+    regionCode,
     sortOrder,
     updatedBy: req.userId ?? null,
   });
@@ -91,6 +97,10 @@ export async function patchCuratedProductListAdminController(req, res) {
     doc.title = title;
   }
 
+  if (req.body?.regionCode !== undefined) {
+    doc.regionCode = normalizeCuratedProductListRegionCode(req.body.regionCode);
+  }
+
   doc.updatedBy = req.userId ?? null;
   await doc.save();
   successRes(res, { list: toCuratedProductListPayload(doc.toObject()) });
@@ -116,7 +126,7 @@ export async function addCuratedProductListItemAdminController(req, res) {
     return errorRes(res, 404, "Список не найден");
   }
 
-  await assertCuratedListProductCatalogVisible(productId);
+  await assertCuratedListProductMatchesRegion(productId, doc.regionCode);
 
   const existingIds = (doc.productIds ?? []).map((id) => String(id));
   if (existingIds.includes(productId)) {

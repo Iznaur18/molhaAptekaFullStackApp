@@ -242,6 +242,24 @@ export {
   catalogProductsPageDataSchema,
 } from "./productCatalog.js";
 export {
+  PRODUCT_PICKUP_ADDRESS_MIN_LENGTH,
+  PRODUCT_PICKUP_ADDRESS_MAX_LENGTH,
+  ORDER_FULFILLMENT_PICKUP,
+  ORDER_FULFILLMENT_DELIVERY,
+  ORDER_FULFILLMENT_METHODS,
+  PRODUCT_DELIVERY_FULFILLMENT_ENABLED,
+  PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE,
+  PRODUCT_DELIVERY_NOT_AVAILABLE_MESSAGE,
+  PRODUCT_PICKUP_MISSING_FOR_ORDER_MESSAGE,
+  productPickupAddressFieldSchema,
+  productPickupLatFieldSchema,
+  productPickupLonFieldSchema,
+  productPickupCreateFieldsSchema,
+  productPickupPatchFieldsSchema,
+  orderFulfillmentMethodSchema,
+  assertPickupCoordsPair,
+} from "./productPickup.js";
+export {
   userSellerProductsQuerySchema,
   userSellerProductThumbItemSchema,
   userSellerProductsPageDataSchema,
@@ -331,6 +349,7 @@ export {
 export {
   SELLER_PERSONAL_CATEGORY_DURATION_CODES,
   SELLER_PERSONAL_CATEGORY_LABEL_MAX_LENGTH,
+  SELLER_PERSONAL_CATEGORY_ACTIVE_SLOT_LIMIT,
   approveSellerPersonalCategoryCampaignDataSchema,
   cancelSellerPersonalCategoryCampaignDataSchema,
   mySellerPersonalCategoryCampaignDataSchema,

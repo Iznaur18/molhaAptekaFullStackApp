@@ -11,6 +11,7 @@ export type CreateRaffleBody = {
   prizeImageFocus?: { x: number; y: number };
   targetSales: number;
   instagramUrl: string;
+  regionCode: string;
 };
 
 export const createRaffle = async (body: CreateRaffleBody) => {

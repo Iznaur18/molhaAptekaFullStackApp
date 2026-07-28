@@ -1,7 +1,7 @@
 /**
  * Паритет mobile `useSellerProductsPageStyles` + Stack.Screen title «Товары продавца»:
- *   list paddingH 16 / top 12; header gap 8, marginBottom 12;
- *   sellerMetaZone: row, py 12, px 14, radius sm, actionSurface, border
+ *   list paddingH 16 / top 12; header/page gap 8;
+ *   sellerMetaZone: row, py 12, px 14, radius, actionSurface, border
  */
 .seller-products-page {
   --modal-avatar-lead-size: 4.5rem;
@@ -79,7 +79,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--seller-products-screen-gap);
-  margin-bottom: var(--iz-space-3);
 }
 
 .seller-products-page .user-details-modal__banner {
@@ -95,7 +94,7 @@
   justify-content: space-between;
   gap: var(--iz-space-2);
   padding: 12px 14px;
-  border-radius: var(--iz-radius-sm, 8px);
+  border-radius: 1.25rem;
   border: 1px solid var(--iz-color-border);
   background: var(--iz-color-action-soft);
 }

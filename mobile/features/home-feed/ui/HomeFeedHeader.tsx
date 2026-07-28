@@ -3,6 +3,7 @@ import { memo, useCallback } from "react";
 
 import { useHomeCuratedProductListsQuery } from "@/entities/curated-product-list/model/useHomeCuratedProductListsQuery";
 import { useFeaturedRafflesQuery } from "@/entities/raffle/model/useFeaturedRafflesQuery";
+import { useViewerRegion } from "@/entities/region/model/ViewerRegionProvider";
 import { useUserStoriesFeedQuery } from "@/entities/user-story/model/useUserStoriesFeedQuery";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { HomeCuratedListsSection } from "@/features/home-feed/ui/HomeCuratedListsSection";
@@ -21,12 +22,17 @@ export const HomeFeedHeader = memo(({
   showCuratedLists,
 }: HomeFeedHeaderProps) => {
   const queryClient = useQueryClient();
+  const { viewerRegionCode } = useViewerRegion();
   const sessionQuery = useAuthSessionQuery();
   const storiesQuery = useUserStoriesFeedQuery(enabled);
   const curatedQuery = useHomeCuratedProductListsQuery({
     enabled: enabled && showCuratedLists,
+    regionCode: viewerRegionCode,
   });
-  const rafflesQuery = useFeaturedRafflesQuery(enabled);
+  const rafflesQuery = useFeaturedRafflesQuery({
+    enabled,
+    regionCode: viewerRegionCode,
+  });
 
   const feed = storiesQuery.data;
   const isAuthorized = sessionQuery.data?.user != null;

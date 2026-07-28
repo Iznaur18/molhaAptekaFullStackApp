@@ -100,12 +100,15 @@ export {
 } from "./isProductViewableForProfile.js";
 export {
   assertCuratedListProductCatalogVisible,
+  assertCuratedListProductMatchesRegion,
   autopurgeCuratedProductList,
   autopurgeCuratedProductLists,
   buildAdminCuratedListsResponse,
   buildCatalogVisibleProductFilter,
   buildHomeCuratedListsResponse,
+  filterCuratedListsForViewerRegion,
   isProductCatalogVisible,
+  normalizeCuratedProductListRegionCode,
   normalizeCuratedProductListTitle,
   reorderCuratedProductLists,
   toCuratedProductListPayload,

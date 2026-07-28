@@ -22,6 +22,7 @@ import {
   useAccountRequirementModal,
 } from "../../../shared/ui/AccountRequirementModal/index.js";
 import { useAppShellCompactLayout } from "../../../shared/lib/useAppShellCompactLayout.js";
+import { useProductDetailsPageDockHost } from "../../../shared/lib/productDetailsPageDockHostContext.js";
 
 import { ProductPriceOfferHintMessage } from "./ProductPriceOfferHintMessage.jsx";
 import { ProductPriceOfferSectionTitle } from "./ProductPriceOfferSectionTitle.jsx";
@@ -67,7 +68,8 @@ export function ProductPriceOfferBuyerBlock({
   const isBusy =
     submitMutation.isPending || patchMutation.isPending || cancelMutation.isPending;
   const isMobileNav = useAppShellCompactLayout();
-  const dockSubmit = isMobileNav;
+  const pageDockHost = useProductDetailsPageDockHost();
+  const dockSubmit = pageDockHost !== undefined || isMobileNav;
   const confirmGate = useAccountRequirementModal();
 
   useEffect(() => {
@@ -183,13 +185,23 @@ export function ProductPriceOfferBuyerBlock({
     </button>
   );
 
+  const portalTarget =
+    pageDockHost === undefined
+      ? typeof document !== "undefined"
+        ? document.body
+        : null
+      : pageDockHost;
   const dockedPrimaryAction =
-    dockPrimaryAction != null && typeof document !== "undefined"
+    dockPrimaryAction != null && portalTarget
       ? createPortal(
-          <div className="product-modal-shell__docked-footer product-price-offer__docked-footer">
-            {renderPrimaryButton(dockPrimaryAction)}
-          </div>,
-          document.body,
+          pageDockHost ? (
+            renderPrimaryButton(dockPrimaryAction)
+          ) : (
+            <div className="product-modal-shell__docked-footer product-price-offer__docked-footer">
+              {renderPrimaryButton(dockPrimaryAction)}
+            </div>
+          ),
+          portalTarget,
         )
       : null;
 

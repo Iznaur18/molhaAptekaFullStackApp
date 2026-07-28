@@ -3,7 +3,7 @@ export type ProductFieldReadLayout = "price" | "stat" | "block" | "meta" | "defa
 const FIELD_LAYOUTS: Record<string, ProductFieldReadLayout> = {
   productPrice: "price",
   productCategory: "stat",
-  productSaleCity: "stat",
+  productRegionCode: "stat",
   productStockQuantity: "stat",
   soldQuantity: "stat",
   uniqueViewerCount: "stat",
@@ -17,7 +17,7 @@ const FIELD_LAYOUTS: Record<string, ProductFieldReadLayout> = {
 export const PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS = [
   "productPrice",
   "productCategory",
-  "productSaleCity",
+  "productRegionCode",
   "productStockQuantity",
   "soldQuantity",
   "uniqueViewerCount",
@@ -46,7 +46,7 @@ export const PRODUCT_CARD_MODERATION_PREVIEW_FIELD_KEYS_WITHOUT_PRICE =
 /** @deprecated use PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS without productPrice */
 export const PRODUCT_DETAILS_TOP_ROW_FIELD_KEYS = [
   "productCategory",
-  "productSaleCity",
+  "productRegionCode",
   "productStockQuantity",
   "soldQuantity",
   "uniqueViewerCount",
@@ -61,7 +61,7 @@ export const isProductFieldMultilineRead = (key: string): boolean => key === "pr
 export const getProductFieldLabel = (key: string): string => {
   const labels: Record<string, string> = {
     productCategory: "Категория",
-    productSaleCity: "Город продажи",
+    productRegionCode: "Регион продажи",
     productStockQuantity: "В наличии (шт.)",
     soldQuantity: "Продано",
     uniqueViewerCount: "Просмотры",

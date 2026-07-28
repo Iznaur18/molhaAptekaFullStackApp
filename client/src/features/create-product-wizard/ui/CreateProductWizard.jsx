@@ -2,6 +2,7 @@ import { useCreateProductForm } from "../../../entities/product/model/useCreateP
 import { CreateProductBasicSection } from "../../../entities/product/ui/create-product-sections/CreateProductBasicSection.jsx";
 import { CreateProductOriginalitySection } from "../../../entities/product/ui/create-product-sections/CreateProductOriginalitySection.jsx";
 import { CreateProductCategorySection } from "../../../entities/product/ui/create-product-sections/CreateProductCategorySection.jsx";
+import { CreateProductPickupSection } from "../../../entities/product/ui/create-product-sections/CreateProductPickupSection.jsx";
 import { CreateProductCommerceSection } from "../../../entities/product/ui/create-product-sections/CreateProductCommerceSection.jsx";
 import { CreateProductReturnsSection } from "../../../entities/product/ui/create-product-sections/CreateProductReturnsSection.jsx";
 import { CreateProductWizardMediaStep } from "./CreateProductWizardMediaStep.jsx";
@@ -104,6 +105,9 @@ export function CreateProductWizard({
   };
 
   const stepCopy = resolveCreateProductWizardStepCopy(wizard.stepId);
+  const showStepHeadline = !["basic", "originality", "pickup", "commerce", "returns"].includes(
+    wizard.stepId,
+  );
 
   return (
     <ProductModalShell
@@ -164,10 +168,12 @@ export function CreateProductWizard({
         onSubmit={handlePrimaryAction}
       >
         <div key={wizard.stepId} className="create-product-wizard__step-panel">
-          <ProductWizardStepHeadline
-            title={stepCopy.title}
-            subtitle={stepCopy.subtitle}
-          />
+          {showStepHeadline ? (
+            <ProductWizardStepHeadline
+              title={stepCopy.title}
+              subtitle={stepCopy.subtitle}
+            />
+          ) : null}
           {wizard.stepId === "basic" ? <CreateProductBasicSection {...sectionProps} /> : null}
           {wizard.stepId === "originality" ? (
             <CreateProductOriginalitySection {...sectionProps} />
@@ -180,6 +186,13 @@ export function CreateProductWizard({
             />
           ) : null}
           {wizard.stepId === "category" ? <CreateProductCategorySection {...sectionProps} /> : null}
+          {wizard.stepId === "pickup" ? (
+            <CreateProductPickupSection
+              form={form}
+              setForm={setForm}
+              isSubmitting={isSubmitting}
+            />
+          ) : null}
           {wizard.stepId === "commerce" ? <CreateProductCommerceSection {...sectionProps} /> : null}
           {wizard.stepId === "returns" ? <CreateProductReturnsSection {...sectionProps} /> : null}
           {wizard.stepId === "review" ? (

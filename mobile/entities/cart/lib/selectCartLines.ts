@@ -2,9 +2,10 @@ import type { CartItemsByProductId } from "../model/types";
 
 type CatalogProduct = {
   _id: string;
-  productName?: string;
-  productPrice?: number;
-  productIsAvailable?: boolean;
+  productName?: string | null;
+  productPrice?: number | null;
+  productIsAvailable?: boolean | null;
+  productPickupAddress?: string | null;
 };
 
 export type CartLine = {

@@ -19,20 +19,24 @@ export function GuestProfilePanel() {
 
   return (
     <section className="guest-profile">
-      <AuthHeroBanner height={heroHeight} imageUrl={bannerImageUrl} />
-      <div className="guest-profile__body">
-        <h1 className="guest-profile__title">{AUTH_UI.PROFILE_TITLE}</h1>
-        <p className="guest-profile__subtitle">{AUTH_UI.GUEST_STATUS}</p>
-        <button
-          type="button"
-          className="app-btn app-btn--primary guest-profile__action"
-          onClick={() => navigate(AUTH_LOGIN_PATH)}
-        >
-          {AUTH_UI.GUEST_PROFILE_ACTION_BUTTON}
-        </button>
-        <Link className="guest-profile__legal" to="/legal/privacy">
-          {LEGAL_UI.PRIVACY_LINK}
-        </Link>
+      <div className="guest-profile__column">
+        <AuthHeroBanner height={heroHeight} imageUrl={bannerImageUrl} />
+        <div className="guest-profile__body">
+          <h1 className="guest-profile__title">{AUTH_UI.PROFILE_TITLE}</h1>
+          <p className="guest-profile__subtitle">{AUTH_UI.GUEST_STATUS}</p>
+          <div className="guest-profile__actions">
+            <button
+              type="button"
+              className="app-btn app-btn--primary guest-profile__action"
+              onClick={() => navigate(AUTH_LOGIN_PATH)}
+            >
+              {AUTH_UI.GUEST_PROFILE_ACTION_BUTTON}
+            </button>
+          </div>
+          <Link className="guest-profile__legal" to="/legal/privacy">
+            {LEGAL_UI.PRIVACY_LINK}
+          </Link>
+        </div>
       </div>
     </section>
   );

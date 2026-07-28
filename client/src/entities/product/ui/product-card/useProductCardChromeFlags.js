@@ -88,10 +88,11 @@ export function useProductCardChromeFlags(props, currentUserId) {
         "product-card",
         showRaffleParticipantChrome ? "product-card--raffle-participant" : "",
         showBannerLayout ? "product-card--banner-layout" : "",
+        isModerationQueue ? "product-card--list" : "",
       ]
         .filter(Boolean)
         .join(" "),
-    [showBannerLayout, showRaffleParticipantChrome],
+    [isModerationQueue, showBannerLayout, showRaffleParticipantChrome],
   );
 
   const frameClassName = useMemo(

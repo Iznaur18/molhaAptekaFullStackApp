@@ -1,7 +1,37 @@
-
 .product-details-admin-footer__error {
   margin: 0;
+  flex: 1 1 100%;
   font-size: 0.84rem;
   line-height: 1.4;
   color: var(--iz-color-danger);
+}
+
+.product-details-admin-footer__open-sales-hint,
+.product-details-admin-footer__delete-pending {
+  margin: 0;
+  flex: 1 1 100%;
+  font-size: 0.84rem;
+  line-height: 1.4;
+  color: var(--iz-color-text-secondary);
+}
+
+.product-details-admin-footer__delete-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  flex: 1 1 100%;
+}
+
+.product-details-admin-footer__delete-confirm-question {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.4;
+  color: var(--iz-color-text);
+}
+
+.product-details-admin-footer__delete-confirm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  width: 100%;
 }

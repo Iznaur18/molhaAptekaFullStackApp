@@ -30,7 +30,7 @@ export const useCatalogProductsInfiniteQuery = (
         auctionOnly: filters.auctionOnly,
         installmentOnly: filters.installmentOnly,
         saleOnly: filters.saleOnly,
-        allCities: filters.allCities,
+        regionCode: filters.regionCode,
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {

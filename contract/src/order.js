@@ -2,6 +2,10 @@ import { z } from "zod";
 
 import { mongoIdSchema } from "./mongoId.js";
 import { optionalLimitQuery, optionalPageQuery, optionalTrimmedString } from "./queryHelpers.js";
+import {
+  ORDER_FULFILLMENT_PICKUP,
+  orderFulfillmentMethodSchema,
+} from "./productPickup.js";
 
 /** Синхрон с `server/constants/orderConstants.js`. */
 export const ORDER_PAYMENT_METHODS = ["cashOnDelivery", "cardPrepaid"];
@@ -24,23 +28,40 @@ const orderLineItemInputSchema = z.object({
   quantity: z.coerce.number().int().min(ORDER_LINE_ITEM_QUANTITY_MIN).max(999),
 });
 
-/** Тело `POST /order` (структура; DaData — отдельно на сервере). */
-export const createOrderBodySchema = z.object({
-  items: z.array(orderLineItemInputSchema).min(1).max(ORDER_ITEMS_MAX),
-  deliveryAddress: z
-    .string()
-    .trim()
-    .min(1, "Адрес доставки обязателен")
-    .max(ORDER_DELIVERY_ADDRESS_MAX_LENGTH),
-  deliveryAddressFlat: z
-    .string()
-    .trim()
-    .max(ORDER_DELIVERY_FLAT_MAX_LENGTH)
-    .optional()
-    .default(""),
-  paymentMethod: z.enum(ORDER_PAYMENT_METHODS),
-  priceOfferId: mongoIdSchema.optional(),
-});
+/** Тело `POST /order` (структура; DaData — отдельно на сервере для delivery). */
+export const createOrderBodySchema = z
+  .object({
+    items: z.array(orderLineItemInputSchema).min(1).max(ORDER_ITEMS_MAX),
+    fulfillmentMethod: orderFulfillmentMethodSchema
+      .optional()
+      .default(ORDER_FULFILLMENT_PICKUP),
+    deliveryAddress: z
+      .string()
+      .trim()
+      .max(ORDER_DELIVERY_ADDRESS_MAX_LENGTH)
+      .optional()
+      .default(""),
+    deliveryAddressFlat: z
+      .string()
+      .trim()
+      .max(ORDER_DELIVERY_FLAT_MAX_LENGTH)
+      .optional()
+      .default(""),
+    paymentMethod: z.enum(ORDER_PAYMENT_METHODS),
+    priceOfferId: mongoIdSchema.optional(),
+  })
+  .superRefine((body, ctx) => {
+    if (body.fulfillmentMethod === "delivery") {
+      const line = String(body.deliveryAddress ?? "").trim();
+      if (!line) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["deliveryAddress"],
+          message: "Адрес доставки обязателен",
+        });
+      }
+    }
+  });
 
 export const orderLineItemSchema = z
   .object({

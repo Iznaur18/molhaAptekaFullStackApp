@@ -1,5 +1,10 @@
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
+import {
+  ORDER_FULFILLMENT_DELIVERY,
+  ORDER_FULFILLMENT_PICKUP,
+  PRODUCT_DELIVERY_FULFILLMENT_ENABLED,
+} from "@molha/api-contract";
 
 import { AddressDeliveryFields } from "../../../entities/address/ui/AddressDeliveryFields.jsx";
 import { CheckoutPaymentMethodPicker } from "../../../features/checkout/ui/CheckoutPaymentMethodPicker.jsx";
@@ -18,10 +23,12 @@ import "./CheckoutForm.css";
  *     userAddressFiasId?: string;
  *     userAddressGeo?: { lat?: number; lon?: number } | null;
  *   }>;
+ *   pickupAddressSummary?: string;
  *   isSubmitting: boolean;
  *   submitError: string;
  *   submitSuccess: string;
  *   onSubmit: (payload: {
+ *     fulfillmentMethod: string;
  *     deliveryAddress: string;
  *     deliveryAddressFlat: string;
  *     paymentMethod: string;
@@ -34,6 +41,7 @@ import "./CheckoutForm.css";
  */
 export function CheckoutForm({
   defaultDeliveryAddress,
+  pickupAddressSummary = "",
   isSubmitting,
   submitError,
   submitSuccess,
@@ -44,6 +52,7 @@ export function CheckoutForm({
   showHeading = true,
 }) {
   const formId = useId();
+  const [fulfillmentMethod, setFulfillmentMethod] = useState(ORDER_FULFILLMENT_PICKUP);
   const [deliveryAddress, setDeliveryAddress] = useState(() =>
     addressValueFromUser(defaultDeliveryAddress),
   );
@@ -54,8 +63,38 @@ export function CheckoutForm({
     setDeliveryAddress(addressValueFromUser(defaultDeliveryAddress));
   }, [defaultDeliveryAddress]);
 
+  const isPickup = fulfillmentMethod === ORDER_FULFILLMENT_PICKUP;
+  const pickupReady = String(pickupAddressSummary ?? "").trim().length > 0;
+
+  const isAddressValid = useMemo(() => {
+    if (isPickup) {
+      return pickupReady;
+    }
+    return validateRuDeliveryAddressForm(deliveryAddress, { required: true }) === null;
+  }, [deliveryAddress, isPickup, pickupReady]);
+
   const handleSubmit = (event) => {
     event.preventDefault();
+    if (isPickup) {
+      if (!pickupReady) {
+        setLocalError(CHECKOUT_FORM_UI.ERROR_PICKUP_REQUIRED);
+        return;
+      }
+      setLocalError("");
+      void onSubmit({
+        fulfillmentMethod: ORDER_FULFILLMENT_PICKUP,
+        deliveryAddress: "",
+        deliveryAddressFlat: "",
+        paymentMethod,
+      });
+      return;
+    }
+
+    if (!PRODUCT_DELIVERY_FULFILLMENT_ENABLED) {
+      setLocalError(CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY_SOON);
+      return;
+    }
+
     const validationError = validateRuDeliveryAddressForm(deliveryAddress, {
       required: true,
     });
@@ -65,14 +104,13 @@ export function CheckoutForm({
     }
     setLocalError("");
     void onSubmit({
+      fulfillmentMethod: ORDER_FULFILLMENT_DELIVERY,
       deliveryAddress: deliveryAddress.line.trim(),
       deliveryAddressFlat: deliveryAddress.flat.trim(),
       paymentMethod,
     });
   };
 
-  const isAddressValid =
-    validateRuDeliveryAddressForm(deliveryAddress, { required: true }) === null;
   const isFormDisabled = isDisabled || isSubmitting || !isAddressValid;
   const displayError = localError || submitError;
   const submitLabel = isSubmitting
@@ -123,33 +161,79 @@ export function CheckoutForm({
             <h2 className="checkout-form__heading">{CHECKOUT_FORM_UI.HEADING}</h2>
           ) : null}
 
-          <AddressDeliveryFields
-            value={deliveryAddress}
-            onChange={setDeliveryAddress}
-            disabled={isDisabled || isSubmitting}
-            lineInputClassName="checkout-form__input"
-            labels={{
-              line: CHECKOUT_FORM_UI.LABEL_DELIVERY_ADDRESS,
-            }}
-          />
+          <fieldset className="checkout-form__fulfillment">
+            <legend className="checkout-form__label">{CHECKOUT_FORM_UI.LABEL_FULFILLMENT}</legend>
+            <label className="checkout-form__fulfillment-option">
+              <input
+                type="radio"
+                name={`${formId}-fulfillment`}
+                checked={isPickup}
+                onChange={() => setFulfillmentMethod(ORDER_FULFILLMENT_PICKUP)}
+                disabled={isDisabled || isSubmitting}
+              />
+              <span>{CHECKOUT_FORM_UI.FULFILLMENT_PICKUP}</span>
+            </label>
+            <label className="checkout-form__fulfillment-option checkout-form__fulfillment-option--disabled">
+              <input
+                type="radio"
+                name={`${formId}-fulfillment`}
+                checked={!isPickup}
+                disabled={!PRODUCT_DELIVERY_FULFILLMENT_ENABLED || isDisabled || isSubmitting}
+                onChange={() => {
+                  if (!PRODUCT_DELIVERY_FULFILLMENT_ENABLED) {
+                    return;
+                  }
+                  setFulfillmentMethod(ORDER_FULFILLMENT_DELIVERY);
+                }}
+              />
+              <span>
+                {CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY}
+                <span className="checkout-form__soon">
+                  {" "}
+                  ({CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY_SOON})
+                </span>
+              </span>
+            </label>
+          </fieldset>
 
-          <label className="checkout-form__field">
-            <span className="checkout-form__label">{CHECKOUT_FORM_UI.LABEL_FLAT}</span>
-            <input
-              type="text"
-              className="checkout-form__input"
-              value={deliveryAddress.flat}
-              onChange={(event) =>
-                setDeliveryAddress((prev) => ({
-                  ...prev,
-                  flat: event.target.value,
-                }))
-              }
-              disabled={isDisabled || isSubmitting}
-              placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_FLAT}
-              autoComplete="address-line2"
-            />
-          </label>
+          {isPickup ? (
+            <div className="checkout-form__pickup">
+              <span className="checkout-form__label">{CHECKOUT_FORM_UI.PICKUP_ADDRESS_LABEL}</span>
+              <p className="checkout-form__pickup-address">
+                {pickupReady ? pickupAddressSummary : CHECKOUT_FORM_UI.ERROR_PICKUP_REQUIRED}
+              </p>
+            </div>
+          ) : (
+            <>
+              <AddressDeliveryFields
+                value={deliveryAddress}
+                onChange={setDeliveryAddress}
+                disabled={isDisabled || isSubmitting}
+                lineInputClassName="checkout-form__input"
+                labels={{
+                  line: CHECKOUT_FORM_UI.LABEL_DELIVERY_ADDRESS,
+                }}
+              />
+
+              <label className="checkout-form__field">
+                <span className="checkout-form__label">{CHECKOUT_FORM_UI.LABEL_FLAT}</span>
+                <input
+                  type="text"
+                  className="checkout-form__input"
+                  value={deliveryAddress.flat}
+                  onChange={(event) =>
+                    setDeliveryAddress((prev) => ({
+                      ...prev,
+                      flat: event.target.value,
+                    }))
+                  }
+                  disabled={isDisabled || isSubmitting}
+                  placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_FLAT}
+                  autoComplete="address-line2"
+                />
+              </label>
+            </>
+          )}
 
           <CheckoutPaymentMethodPicker
             value={paymentMethod}

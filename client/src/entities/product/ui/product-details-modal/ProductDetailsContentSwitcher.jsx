@@ -5,9 +5,11 @@ import { ModalSectionTabs } from "../../../../shared/ui/ModalSectionTabs/ModalSe
 import { getProductFieldLabel } from "../../lib/productFieldRegistry.js";
 import { PRODUCT_DETAILS_CONTENT_PANEL } from "../../lib/productDetailsContentPanelConstants.js";
 import { ProductCharacteristicsDetails } from "../ProductCharacteristicsDetails.jsx";
+import { ProductPickupDetailsPanel } from "./ProductPickupDetailsPanel.jsx";
 import { useProductDetailsContentPanel } from "./useProductDetailsContentPanel.js";
 
 import "./ProductDetailsContentSwitcher.css";
+import "./ProductPickupDetailsPanel.css";
 
 /**
  * @param {{
@@ -30,6 +32,10 @@ export function ProductDetailsContentSwitcher({ product, contentPanels }) {
         label: getProductFieldLabel("productDescription"),
       });
     }
+    items.push({
+      id: PRODUCT_DETAILS_CONTENT_PANEL.DELIVERY,
+      label: PRODUCT_DETAILS_MODAL_UI.DELIVERY_TITLE,
+    });
     if (hasCharacteristics) {
       items.push({
         id: PRODUCT_DETAILS_CONTENT_PANEL.CHARACTERISTICS,
@@ -39,10 +45,6 @@ export function ProductDetailsContentSwitcher({ product, contentPanels }) {
     items.push({
       id: PRODUCT_DETAILS_CONTENT_PANEL.RETURNS,
       label: PRODUCT_DETAILS_MODAL_UI.RETURNS_TITLE,
-    });
-    items.push({
-      id: PRODUCT_DETAILS_CONTENT_PANEL.DELIVERY,
-      label: PRODUCT_DETAILS_MODAL_UI.DELIVERY_TITLE,
     });
     return items;
   }, [hasCharacteristics, hasDescription]);
@@ -111,11 +113,7 @@ export function ProductDetailsContentSwitcher({ product, contentPanels }) {
             </p>
           )
         ) : null}
-        {showDelivery ? (
-          <p className="product-details-content-switcher__description">
-            {PRODUCT_DETAILS_MODAL_UI.DELIVERY_IN_DEVELOPMENT}
-          </p>
-        ) : null}
+        {showDelivery ? <ProductPickupDetailsPanel product={product} /> : null}
       </div>
     </section>
   );

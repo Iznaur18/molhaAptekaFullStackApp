@@ -47,6 +47,7 @@ export function useCatalogBrowserLanding({
   setIsProductCategoryListOpen,
   setProductSearchTerm,
   onCatalogError,
+  viewerRegionCode,
 }) {
   const queryClient = useQueryClient();
   const categoryRootsRef = useRef(
@@ -68,6 +69,7 @@ export function useCatalogBrowserLanding({
   const categoryRootsQuery = useProductCategoryRootsQuery({ enabled: rootsEnabled });
   const personalCategoryTilesQuery = useSellerPersonalCategoryCatalogTilesQuery({
     enabled: displaysEnabled,
+    regionCode: viewerRegionCode,
   });
   const breadcrumbQuery = useProductCategoryBreadcrumbQuery({
     categoryId: activeCatalogBrowserCategoryId,

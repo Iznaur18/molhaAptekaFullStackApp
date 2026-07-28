@@ -1,0 +1,34 @@
+.product-pickup-details-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.product-pickup-details-panel__title {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.product-pickup-details-panel__address {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}
+
+.product-pickup-details-panel__route {
+  align-self: flex-start;
+  appearance: none;
+  border: 1px solid #2f6fed;
+  background: #2f6fed;
+  color: #fff;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.product-pickup-details-panel__route:hover {
+  filter: brightness(1.05);
+}

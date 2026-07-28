@@ -2,6 +2,7 @@ import { createPortal } from "react-dom";
 
 import { useEditProfileModal } from "../model/useEditProfileModal.js";
 import { AddressStructuredFields } from "../../address/ui/AddressStructuredFields.jsx";
+import { RuRegionSelect } from "../../region/ui/RuRegionSelect.jsx";
 import {
   NOTES_ABOUT_USER_MAX_CHARS,
   USER_GENDER_FEMALE,
@@ -174,6 +175,21 @@ export function EditProfileModal({
                   </option>
                 ))}
               </select>
+            </label>
+            <label className="edit-profile-modal__label">
+              {EDIT_PROFILE_MODAL_UI.LABEL_REGION}
+              <RuRegionSelect
+                className="edit-profile-modal__input"
+                value={form.userRegionCode}
+                disabled={isSubmitting}
+                required
+                onChange={(userRegionCode) =>
+                  setForm((prev) => ({ ...prev, userRegionCode }))
+                }
+              />
+              <span className="edit-profile-modal__hint">
+                {EDIT_PROFILE_MODAL_UI.HINT_REGION}
+              </span>
             </label>
             <AddressStructuredFields
               value={form.structuredAddress}

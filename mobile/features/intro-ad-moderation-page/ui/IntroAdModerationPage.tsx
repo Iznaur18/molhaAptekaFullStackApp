@@ -50,6 +50,8 @@ import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useIntroAdModerationPageStyles } from "@/shared/theme/introAdModerationPageStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
+const EMPTY_CAMPAIGNS: never[] = [];
+
 export const IntroAdModerationPage = () => {
   const router = useRouter();
   const styles = useIntroAdModerationPageStyles();
@@ -71,10 +73,10 @@ export const IntroAdModerationPage = () => {
   const [pendingCampaignId, setPendingCampaignId] = useState<string | null>(null);
   const [rejectReasons, setRejectReasons] = useState<Record<string, string>>({});
 
-  const pendingCampaigns = queueQuery.data ?? [];
-  const managedCampaigns = managedQuery.data ?? [];
-  const bannerPendingCampaigns = bannerPendingQuery.data ?? [];
-  const personalPendingCampaigns = personalPendingQuery.data ?? [];
+  const pendingCampaigns = queueQuery.data ?? EMPTY_CAMPAIGNS;
+  const managedCampaigns = managedQuery.data ?? EMPTY_CAMPAIGNS;
+  const bannerPendingCampaigns = bannerPendingQuery.data ?? EMPTY_CAMPAIGNS;
+  const personalPendingCampaigns = personalPendingQuery.data ?? EMPTY_CAMPAIGNS;
   const rafflePendingCount = raffleQueueQuery.data?.pendingRaffles?.length ?? 0;
 
   const summary = useMemo(
@@ -155,15 +157,22 @@ export const IntroAdModerationPage = () => {
   useEffect(() => {
     setExpandedIds((prev) => {
       const next = new Set(prev);
+      let changed = false;
       const register = (prefix: string, campaigns: IntroAdModerationCampaign[]) => {
         campaigns
           .filter(campaignModerationNeedsAttention)
-          .forEach((campaign) => next.add(buildModerationCampaignRowId(prefix, String(campaign._id))));
+          .forEach((campaign) => {
+            const rowId = buildModerationCampaignRowId(prefix, String(campaign._id));
+            if (!next.has(rowId)) {
+              next.add(rowId);
+              changed = true;
+            }
+          });
       };
       register("intro", pendingCampaigns);
       register("banner", bannerPendingCampaigns);
       register("personal", personalPendingCampaigns);
-      return next;
+      return changed ? next : prev;
     });
   }, [bannerPendingCampaigns, pendingCampaigns, personalPendingCampaigns]);
 

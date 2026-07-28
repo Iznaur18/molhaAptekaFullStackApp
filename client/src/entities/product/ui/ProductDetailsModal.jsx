@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { useAppShellCompactLayout } from "../../../shared/lib/useAppShellCompactLayout.js";
 import { useSwipeRightToDismiss } from "../../../shared/lib/useSwipeRightToDismiss.js";
 import { ProductModalShell } from "../../../shared/ui/ProductModalShell/ProductModalShell.jsx";
@@ -5,6 +7,7 @@ import { ProductDetailsModalPinnedGallery } from "./product-details-modal/Produc
 import { ProductDetailsModalPurchaseActions } from "./product-details-modal/ProductDetailsModalPurchaseActions.jsx";
 import { ProductDetailsModalTabPanel } from "./product-details-modal/ProductDetailsModalTabPanel.jsx";
 import { ProductDetailsModalTabs } from "./product-details-modal/ProductDetailsModalTabs.jsx";
+import { ProductDetailsPageDockHostContext } from "../../../shared/lib/productDetailsPageDockHostContext.js";
 import { useProductDetailsModalController } from "./product-details-modal/useProductDetailsModalController.js";
 
 import "./ProductDetailsModal.css";
@@ -74,6 +77,8 @@ export function ProductDetailsModal({
   const isCompactLayout = useAppShellCompactLayout();
   /** Page always uses app-like column + sticky dock (plan 1A). */
   const isMobileNav = isPage || isCompactLayout;
+  /** @type {[HTMLElement | null, import('react').Dispatch<import('react').SetStateAction<HTMLElement | null>>]} */
+  const [pageDockHost, setPageDockHost] = useState(null);
   /** Как в app: галерея сверху, табы под ней, контент ниже. */
   const pinGalleryAboveTabs = isMobileNav;
 
@@ -216,23 +221,37 @@ export function ProductDetailsModal({
 
   if (isPage) {
     return (
-      <div
-        className={[
-          "product-details-page",
-          "product-details-modal",
-          "product-details-modal--page",
-          showMobileDock ? "product-details-modal--mobile-dock-active" : "",
-        ]
-          .filter(Boolean)
-          .join(" ")}
-      >
-        <div ref={ctrl.modalBodyRef} className="product-details-modal__body product-details-page__body">
-          {body}
+      <ProductDetailsPageDockHostContext.Provider value={pageDockHost}>
+        <div
+          className={[
+            "product-details-page",
+            "product-details-modal",
+            "product-details-modal--page",
+            showMobileDock ? "product-details-modal--mobile-dock-active" : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        >
+          <div
+            ref={ctrl.modalBodyRef}
+            className="product-details-modal__body product-details-page__body"
+          >
+            {body}
+          </div>
+          {showMobileDock ? (
+            <div className="product-details-page__docked-footer">
+              {mobilePurchaseDock ? (
+                mobilePurchaseDock
+              ) : (
+                <div
+                  className="product-details-page__docked-footer-slot"
+                  ref={setPageDockHost}
+                />
+              )}
+            </div>
+          ) : null}
         </div>
-        {mobilePurchaseDock ? (
-          <div className="product-details-page__docked-footer">{mobilePurchaseDock}</div>
-        ) : null}
-      </div>
+      </ProductDetailsPageDockHostContext.Provider>
     );
   }
 

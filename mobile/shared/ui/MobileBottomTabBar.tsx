@@ -1,7 +1,7 @@
 import Feather from "@expo/vector-icons/Feather";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { BlurView } from "expo-blur";
-import { usePathname } from "expo-router";
+import { usePathname, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import {
   Platform,
@@ -188,6 +188,7 @@ const formatBadge = (count: number) => (count > 99 ? "99+" : String(count));
 
 export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => {
   const pathname = usePathname();
+  const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width: windowWidth } = useWindowDimensions();
   const styles = useTabBarStyles();
@@ -263,9 +264,18 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
       canPreventDefault: true,
     });
 
-    if (!event.defaultPrevented) {
-      navigation.navigate(route.name);
+    if (event.defaultPrevented) {
+      return;
     }
+
+    // С hub/* (реклама и др.) navigate("index") часто не переключает таб —
+    // явный путь главной (как CatalogBrowserPage → "/(tabs)").
+    if (routeName === HOME_TAB_ROUTE && isProfileTabBarContext) {
+      router.navigate("/(tabs)");
+      return;
+    }
+
+    navigation.navigate(route.name);
   };
 
   const handleLongPress = (routeName: string) => {

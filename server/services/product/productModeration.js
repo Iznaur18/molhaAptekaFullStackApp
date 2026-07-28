@@ -17,6 +17,7 @@ const CONTENT_PATCH_KEYS = new Set([
   "productImageUrls",
   "productImageUrl",
   "productPreviewVideoUrl",
+  "productRegionCode",
 ]);
 
 /**

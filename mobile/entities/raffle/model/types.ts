@@ -20,6 +20,7 @@ export type RaffleFromApi = {
   salesProgress: number;
   participantsCount?: number;
   status: RaffleStatus;
+  regionCode?: string;
   instagramUrl?: string | null;
   moderationComment?: string;
   approvedAt?: string | null;

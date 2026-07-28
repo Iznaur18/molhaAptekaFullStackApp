@@ -12,10 +12,11 @@ const baseInput = {
   selectedProductCategory: null,
   catalogSort: null,
   myProductsModerationFilter: null,
+  viewerRegionCode: "RU-MOW",
 };
 
 describe("buildCatalogListQueryParams", () => {
-  it("builds public catalog params with filters from URL", () => {
+  it("builds public catalog params with filters from URL + viewer region", () => {
     const params = buildCatalogListQueryParams({
       ...baseInput,
       appliedProductSearchTerm: "  аспирин ",
@@ -25,6 +26,7 @@ describe("buildCatalogListQueryParams", () => {
         followingOnly: true,
       },
       activeCatalogBrowserCategory: "medicines",
+      viewerRegionCode: "RU-CE",
     });
 
     expect(params).toEqual({
@@ -39,11 +41,11 @@ describe("buildCatalogListQueryParams", () => {
       auctionOnly: true,
       installmentOnly: null,
       saleOnly: null,
-      allCities: null,
+      regionCode: "RU-CE",
     });
   });
 
-  it("builds mine-mode params with moderation filter", () => {
+  it("builds mine-mode params with moderation filter (no region)", () => {
     const params = buildCatalogListQueryParams({
       ...baseInput,
       isMineMode: true,
@@ -64,7 +66,7 @@ describe("buildCatalogListQueryParams", () => {
       auctionOnly: null,
       installmentOnly: null,
       saleOnly: null,
-      allCities: null,
+      regionCode: null,
     });
   });
 

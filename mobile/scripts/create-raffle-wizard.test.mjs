@@ -24,8 +24,13 @@ test("create raffle wizard: 3 steps + per-step validate (mobile)", () => {
   assert.match(steps, /"prize"/);
   assert.match(steps, /"conditions"/);
   assert.match(steps, /validateCreateRaffleFormStep/);
+  assert.match(steps, /isRuRegionCode/);
+  assert.match(form, /regionCode/);
+  assert.match(form, /DEFAULT_VIEWER_REGION_CODE/);
   assert.match(form, /validateCreateRaffleFormStep/);
   assert.match(form, /isCreateRaffleFormDirty/);
+  assert.match(body, /RuRegionSelect/);
+  assert.match(body, /LABEL_REGION/);
   assert.match(page, /CreateRaffleWizardProgress/);
   assert.match(page, /validateCreateRaffleFormStep/);
   assert.match(page, /BTN_NEXT/);

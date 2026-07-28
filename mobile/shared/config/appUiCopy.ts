@@ -75,6 +75,8 @@ export const API_CLIENT_UI = {
   CREATE_RAFFLE_FALLBACK: "Не удалось создать розыгрыш",
   PATCH_RAFFLE_FALLBACK: "Не удалось сохранить розыгрыш",
   FETCH_MY_RAFFLE_FALLBACK: "Не удалось загрузить розыгрыш",
+  FETCH_RAFFLE_FALLBACK: "Не удалось загрузить розыгрыш",
+  FETCH_RAFFLE_PRODUCTS_FALLBACK: "Не удалось загрузить товары розыгрыша",
   FETCH_RAFFLE_CREATE_ADVERTISING_FALLBACK: "Не удалось загрузить услугу «Розыгрыш»",
   UNLOCK_RAFFLE_CREATE_FALLBACK: "Не удалось оплатить создание розыгрыша",
   CANCEL_RAFFLE_CREATE_FALLBACK: "Не удалось отменить создание розыгрыша",
@@ -138,6 +140,10 @@ export const EDIT_PROFILE_UI = {
   LABEL_USERNAME: "Никнейм",
   USERNAME_HINT: "Только a–z и 0–9, без пробелов, 3–30 символов",
   LABEL_PHONE: "Телефон",
+  LABEL_REGION: "Регион просмотра",
+  HINT_REGION:
+    "Товары, баннеры и розыгрыши на главной показываются для этого региона. Адрес доставки — отдельно.",
+  ERROR_REGION_REQUIRED: "Выберите регион",
   LABEL_AVATAR: "Аватар",
   LABEL_BIRTH_DATE: "Дата рождения",
   PLACEHOLDER_BIRTH_DATE: "ДД.ММ.ГГГГ",
@@ -159,6 +165,18 @@ export const EDIT_PROFILE_UI = {
   SAVE_ERROR: "Не удалось сохранить",
   NOTHING_TO_SAVE: "Нет изменений для сохранения",
   AUTH_REQUIRED: "Войдите, чтобы редактировать профиль",
+} as const;
+
+/** Регион просмотра / продажи */
+export const REGION_UI = {
+  LABEL: "Регион",
+  VIEWER_LABEL: "Регион",
+  VIEWER_ARIA: "Регион просмотра каталога",
+  PLACEHOLDER: "Выберите регион",
+  SHEET_TITLE: "Регион",
+  SHEET_CLOSE: "Закрыть",
+  SEARCH_PLACEHOLDER: "Поиск региона…",
+  SEARCH_EMPTY: "Ничего не найдено",
 } as const;
 
 /**
@@ -255,6 +273,8 @@ export const CART_PAGE_UI = {
   CHECKOUT_BLOCKED_NOTHING_SELECTED: "Выберите товары для оформления",
   CHECKOUT_BLOCKED_ALL_UNAVAILABLE: "Все товары недоступны",
   CHECKOUT_BLOCKED_OWN_PRODUCTS_ONLY: "Нельзя оформить заказ на свои товары",
+  CHECKOUT_BLOCKED_MISSING_PICKUP:
+    "У товаров нет адреса самовывоза — оформить заказ нельзя",
   STOCK_REMAINING: (left: number) => `Осталось ${left} шт`,
   STOCK_QUANTITY_LIMITED: "Количество ограничено",
   CHECKOUT_OPEN: "Оформить заказ",
@@ -385,6 +405,7 @@ export const PRODUCT_CARD_UI = {
   AVAILABILITY_TOGGLE_PENDING: "Обновление…",
   AUCTION_TOGGLE_PENDING: "Обновление…",
   RAFFLE_PARTICIPATION_PENDING: "Сохраняем…",
+  DELETE_PRODUCT: "Удалить товар",
   DELETE_PRODUCT_PENDING: "Удаление…",
   DELETE_CONFIRM_QUESTION: "Вы уверены, что хотите удалить этот товар?",
   DELETE_CONFIRM_YES: "Да, удалить",
@@ -672,6 +693,8 @@ export const RAFFLE_MANAGE_UI = {
 } as const;
 
 export const RAFFLE_PRODUCTS_PAGE_UI = {
+  TITLE: "Товары розыгрыша",
+  EYEBROW: "Розыгрыш",
   LOADING: "Загрузка…",
   EMPTY: "Нет товаров в этом розыгрыше.",
   FETCH_FALLBACK: "Не удалось загрузить товары розыгрыша",
@@ -838,6 +861,11 @@ export const INSTALLMENT_UI = {
 
 export const CHECKOUT_FORM_UI = {
   HEADING: "Оформление заказа",
+  LABEL_FULFILLMENT: "Способ получения",
+  FULFILLMENT_PICKUP: "Самовывоз",
+  FULFILLMENT_DELIVERY: "Доставка",
+  FULFILLMENT_DELIVERY_SOON: "Скоро",
+  PICKUP_ADDRESS_LABEL: "Адрес самовывоза",
   LABEL_DELIVERY_ADDRESS: "Адрес доставки",
   PLACEHOLDER_DELIVERY_ADDRESS: "Город, улица, дом",
   LABEL_FLAT: "Квартира / офис",
@@ -847,6 +875,23 @@ export const CHECKOUT_FORM_UI = {
   SUBMIT_LOADING: "Оформляем…",
   SUCCESS: "Заказ успешно оформлен",
   ERROR_GENERIC: "Не удалось оформить заказ",
+  ERROR_PICKUP_REQUIRED: "У товара нет адреса самовывоза — оформить заказ нельзя",
+} as const;
+
+export const PRODUCT_PICKUP_UI = {
+  FULFILLMENT_LEGEND: "Как покупатель получит товар",
+  FULFILLMENT_PICKUP: "Самовывоз",
+  FULFILLMENT_DELIVERY: "Доставка",
+  SOON_BADGE: " · скоро",
+  PICKUP_HINT: "Укажите адрес и отметьте точку на карте (или выберите из подсказок).",
+  ADDRESS_LABEL: "Адрес самовывоза",
+  MAP_ARIA: "Карта точки самовывоза",
+  MAP_KEY_MISSING:
+    "Карта появится после добавления EXPO_PUBLIC_YANDEX_MAPS_API_KEY. Пока укажите адрес текстом или из подсказки.",
+  DETAILS_TITLE: "Самовывоз",
+  DETAILS_ROUTE: "Маршрут",
+  DETAILS_OPEN_MAP: "Открыть на карте",
+  DETAILS_NO_ADDRESS: "Адрес самовывоза не указан",
 } as const;
 
 export const ADDRESS_DELIVERY_UI = {
@@ -1452,6 +1497,8 @@ export const CREATE_PRODUCT_UI = {
   ORIGINALITY_NO: "Нет",
   ERROR_ORIGINALITY: "Выберите: оригинал или нет",
   LABEL_ORIGINALITY: "Оригинал",
+  WIZARD_STEP_ORIGINALITY_SUBTITLE: "Подтвердите, что продаёте официальный товар",
+  WIZARD_STEP_RETURNS_SUBTITLE: "Есть ли возврат и какие условия",
   LABEL_PRICE: "Цена, ₽",
   LABEL_OLD_PRICE: "Старая цена, ₽",
   HINT_OLD_PRICE: "Старая цена покажет скидку, если она выше текущей.",
@@ -1463,6 +1510,9 @@ export const CREATE_PRODUCT_UI = {
   ADD_CHARACTERISTIC: "+ Добавить характеристику",
   REMOVE_CHARACTERISTIC: "Удалить характеристику",
   LABEL_CATEGORY: "Категория",
+  LABEL_SALE_REGION: "Регион продажи",
+  HINT_SALE_REGION: "Товар будет виден покупателям этого региона",
+  ERROR_SALE_REGION_REQUIRED: "Выберите регион продажи",
   CATEGORY_PLACEHOLDER: "Выберите конечную подкатегорию",
   CATEGORY_FIELD_PLACEHOLDER: "Выбрать категорию",
   CATEGORY_SHEET_TITLE: "Категория",
@@ -1511,6 +1561,7 @@ export const CREATE_PRODUCT_UI = {
   ERROR_PRICE: "Укажите цену",
   ERROR_PRICE_MAX: "Цена не может превышать 999 999 999 ₽",
   ERROR_IMAGE_REQUIRED: "Добавьте хотя бы одно фото товара",
+  ERROR_PICKUP_COORDS: "Укажите точку на карте или выберите адрес из подсказки",
   CATEGORY_BACK: "Назад",
   CATEGORY_SELECT_LEAF: "Выбрать эту категорию",
   MANAGE_SECTION_TITLE: "Управление товаром",
@@ -1557,7 +1608,7 @@ export const RAFFLE_ADVERTISING_PAGE_UI = {
   UNLOCK_FALLBACK: "Не удалось оплатить создание розыгрыша",
   UNLOCK_SUCCESS: "Баллы зарезервированы. Заполните розыгрыш.",
   DESCRIPTION:
-    "Создайте розыгрыш для своих товаров. После оплаты 3000 баллов откроется форма заявки. После модерации розыгрыш появится на витрине. При отклонении баллы возвращаются.",
+    "Создайте розыгрыш для своих товаров. После оплаты 3000 баллов откроется форма заявки. После модерации розыгрыш появится на витрине (до 200 активных одновременно). При отклонении баллы возвращаются.",
   /** @param {number} price */
   PRICE: (price: number) => `${price} баллов`,
   COST_LABEL: "Стоимость",
@@ -1650,13 +1701,16 @@ export const SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI = {
   CANCEL_FALLBACK: "Не удалось отменить заявку",
   CANCEL_SUCCESS: "Заявка отменена. Баллы возвращены.",
   DESCRIPTION:
-    "Ваш баннер появится в карусели под шапкой на главной после модерации. Показ длится 7 дней. Одновременно доступно до 3 платных слотов.",
+    "Ваш баннер появится в карусели под шапкой на главной после модерации. Показ длится 7 дней. Одновременно доступно до 200 платных слотов.",
   STATUS_PENDING: "На модерации. Баллы зарезервированы.",
   STATUS_ACTIVE: "Показ активен.",
   SUBMIT: "Отправить на модерацию",
   CANCEL: "Отменить заявку",
   PREVIEW: "Предпросмотр",
   OPEN_FORM: "Оформить баннер",
+  LABEL_REGION: "Регион показа",
+  HINT_REGION: "Баннер увидят покупатели только этого региона.",
+  ERROR_REGION_REQUIRED: "Выберите регион показа",
 } as const;
 
 export const SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI = {
@@ -1686,7 +1740,7 @@ export const SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI = {
 export const SELLER_PERSONAL_CATEGORY_PAGE_UI = {
   SECTION_TITLE: "Личная категория",
   SECTION_LEAD:
-    "Отдельная плитка в каталоге с вашим названием и картинкой. Все одобренные товары попадают и в глобальную категорию, и в личную. После модерации баллы списываются.",
+    "Отдельная плитка в каталоге с вашим названием и картинкой. Все одобренные товары попадают и в глобальную категорию, и в личную. После модерации баллы списываются. Одновременно на сайте до 200 активных личных категорий.",
   FETCH_FALLBACK: "Не удалось загрузить заявку на личную категорию",
   FETCH_TILES_FALLBACK: "Не удалось загрузить личные категории",
   TILES_SECTION_TITLE: "Магазины продавцов",
@@ -1699,6 +1753,9 @@ export const SELLER_PERSONAL_CATEGORY_PAGE_UI = {
   CANCEL: "Отменить заявку",
   LABEL_NAME: "Название категории",
   LABEL_IMAGE: "Картинка плитки",
+  LABEL_REGION: "Регион показа",
+  HINT_REGION: "Плитка появится в каталоге только у покупателей этого региона.",
+  ERROR_REGION_REQUIRED: "Выберите регион показа",
   LABEL_DURATION: "Срок",
   /** @param {number} balance */
   BALANCE: (balance: number) => `Доступно: ${balance} баллов`,
@@ -1731,6 +1788,9 @@ export const CREATE_RAFFLE_PAGE_UI = {
   GO_TO_ADVERTISING: "Перейти в «Рекламу»",
   HINT: "После одобрения staff включите участие на своих товарах в «Мои товары».",
   LABEL_TITLE: "Название",
+  LABEL_REGION: "Регион показа",
+  HINT_REGION: "Розыгрыш увидят покупатели только этого региона.",
+  ERROR_REGION_REQUIRED: "Выберите регион показа",
   LABEL_DESCRIPTION: "Описание",
   LABEL_PRIZE_MEDIA: "Медиа приза",
   LABEL_PRIZE_MEDIA_TYPE_IMAGE: "Фото",
@@ -1783,6 +1843,13 @@ export const CREATE_RAFFLE_MODAL_UI = {
   WITHDRAW_CONFIRM_TITLE: "Отозвать заявку?",
   WITHDRAW_CONFIRM: "Розыгрыш будет удалён с модерации. Восстановить нельзя.",
   WITHDRAW_SUCCESS: "Заявка отозвана. Можно создать новый розыгрыш.",
+  ERROR_TITLE: "Укажите название",
+  ERROR_REGION_REQUIRED: "Выберите регион показа",
+  LABEL_REGION: "Регион показа",
+  HINT_REGION: "Розыгрыш увидят покупатели только этого региона.",
+  ERROR_TARGET: "Укажите цель продаж (число ≥ 1)",
+  ERROR_PRIZE_IMAGE: "Загрузите фото приза",
+  ERROR_PRIZE_VIDEO: "Загрузите видео приза",
   LABEL_TITLE: "Название",
   LABEL_DESCRIPTION: "Описание",
   LABEL_PRIZE_MEDIA: "Медиа приза (фото или видео)",

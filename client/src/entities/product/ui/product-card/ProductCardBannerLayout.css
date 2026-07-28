@@ -1,13 +1,12 @@
 .product-card-promotion-frame--tier-3 > .product-card.product-card--banner-layout {
   --product-card-banner-outer-radius: calc(var(--product-card-radius) * 1.08);
-  border: 1px solid var(--iz-color-border);
+  border: none;
   border-radius: calc(var(--product-card-radius) * 1.08);
   background: var(--iz-color-surface);
   box-shadow: 0 2px 14px color-mix(in srgb, var(--iz-color-text) 6%, transparent);
 }
 
 .product-card-promotion-frame--tier-3 > .product-card.product-card--banner-layout:hover {
-  border-color: var(--iz-color-border-strong);
   box-shadow: 0 4px 18px color-mix(in srgb, var(--iz-color-text) 8%, transparent);
 }
 

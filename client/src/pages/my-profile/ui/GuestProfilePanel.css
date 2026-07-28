@@ -1,50 +1,99 @@
 .guest-profile {
+  --guest-profile-column-max: 420px;
+  --guest-profile-body-gap: 16px;
+  --guest-profile-body-margin-y: 36px;
+  --guest-profile-body-pad-x: 16px;
+
   display: flex;
   flex-direction: column;
+  align-items: center;
   box-sizing: border-box;
   min-height: 100%;
-  margin-inline: calc(-1 * var(--app-shell-content-inline-padding, 1rem));
-  width: calc(100% + 2 * var(--app-shell-content-inline-padding, 1rem));
+  width: 100%;
   background: var(--iz-color-surface);
 }
 
-/* Как /login: hero вплотную к верху viewport (без padding-top shell). */
+/* Как /login: без верхнего chrome; bottom nav остаётся (паритет с tab bar app). */
+body:has(.guest-profile) .app-shell__header {
+  display: none !important;
+}
+
+/* Белый fill везде — иначе body `--iz-color-bg` (#e5eef2) бьётся с surface. */
+body:has(.guest-profile),
+body:has(.guest-profile) #root {
+  background: var(--iz-color-surface);
+}
+
 body:has(.guest-profile) .app-shell,
 body:has(.guest-profile) .app-shell.app-shell--header-v1,
 body:has(.guest-profile) .app-shell.app-shell--header-v2 {
   padding-top: 0 !important;
+  background: var(--iz-color-surface);
+  min-height: 100dvh;
+}
+
+.guest-profile__column {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--guest-profile-column-max);
+  min-height: 100%;
+  background: var(--iz-color-surface);
+}
+
+.guest-profile .auth-hero,
+.guest-profile .auth-hero__skeleton {
+  background: var(--iz-color-surface);
 }
 
 .guest-profile__body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 24px 24px calc(32px + env(safe-area-inset-bottom, 0px));
+  gap: var(--guest-profile-body-gap);
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: var(--guest-profile-body-margin-y);
+  margin-bottom: var(--guest-profile-body-margin-y);
+  padding: 0 var(--guest-profile-body-pad-x)
+    calc(
+      var(--app-shell-mobile-bottom-nav-height, 3.1rem) +
+        var(--app-shell-mobile-bottom-nav-float-offset, 0.625rem) +
+        env(safe-area-inset-bottom, 0px) + 1rem
+    );
   text-align: center;
 }
 
 .guest-profile__title {
   margin: 0;
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 700;
+  line-height: 1.2;
   color: var(--iz-color-text);
 }
 
 .guest-profile__subtitle {
-  margin: 0 0 8px;
-  font-size: 15px;
+  margin: 0;
+  font-size: 16px;
   line-height: 1.35;
   color: var(--iz-color-text-muted);
 }
 
+.guest-profile__actions {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: var(--guest-profile-body-gap);
+}
+
 .guest-profile__action {
   width: 100%;
-  max-width: 320px;
 }
 
 .guest-profile__legal {
-  margin-top: 12px;
+  margin: 0;
+  padding: 8px 0;
   font-size: 14px;
   color: var(--iz-color-link);
   text-decoration: underline;

@@ -17,6 +17,15 @@
   gap: 0.4rem;
 }
 
+/* Match ProductWizardStepHeadline title */
+.create-product-section .form-field-label {
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--iz-color-primary);
+}
+
 .create-product-section__listing-origin {
   margin: 0;
   padding: 0;

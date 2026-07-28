@@ -6,6 +6,12 @@ import {
 import { mongoIdSchema } from "./mongoId.js";
 import { PRODUCT_MODERATION_STATUSES, productFromApiSchema } from "./productFromApi.js";
 import { storedMediaUrlOrEmptySchema, storedMediaUrlSchema } from "./storedMediaUrl.js";
+import {
+  assertPickupCoordsPair,
+  productPickupAddressFieldSchema,
+  productPickupLatFieldSchema,
+  productPickupLonFieldSchema,
+} from "./productPickup.js";
 
 /** Синхрон с `server/constants/productConstants.js` (legacy slug). */
 export const PRODUCT_CATEGORY_VALUES = [
@@ -129,9 +135,10 @@ const assertReturnPolicy = (body, ctx) => {
 const legacyCategorySchema = z
   .string()
   .trim()
-  .min(2)
-  .max(80)
-  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Некорректный slug категории");
+  .refine(
+    (value) => PRODUCT_CATEGORY_VALUES.includes(value),
+    "Некорректный slug категории",
+  );
 
 const assertCategoryIdOrLegacy = (body, ctx) => {
   const hasId =
@@ -220,11 +227,16 @@ export const createProductBodySchema = z
       .max(PRODUCT_RETURN_TERMS_MAX_ITEMS)
       .optional(),
     productRegionCode: requiredRuRegionCodeFieldSchema,
+    productPickupAddress: productPickupAddressFieldSchema,
+    productPickupLat: productPickupLatFieldSchema.nullable().optional(),
+    productPickupLon: productPickupLonFieldSchema.nullable().optional(),
+    productDeliveryEnabled: z.coerce.boolean().optional(),
   })
   .superRefine(assertCategoryIdOrLegacy)
   .superRefine(assertCreateProductRequiresPhoto)
   .superRefine((body, ctx) => assertOldPricePair(body, ctx, true))
-  .superRefine(assertReturnPolicy);
+  .superRefine(assertReturnPolicy)
+  .superRefine((body, ctx) => assertPickupCoordsPair(body, ctx));
 
 const patchFieldShape = {
   productName: productNameFieldSchema.optional(),
@@ -262,6 +274,10 @@ const patchFieldShape = {
     .max(PRODUCT_RETURN_TERMS_MAX_ITEMS)
     .optional(),
   productRegionCode: requiredRuRegionCodeFieldSchema.optional(),
+  productPickupAddress: productPickupAddressFieldSchema.optional(),
+  productPickupLat: productPickupLatFieldSchema.nullable().optional(),
+  productPickupLon: productPickupLonFieldSchema.nullable().optional(),
+  productDeliveryEnabled: z.coerce.boolean().optional(),
 };
 
 const PATCH_BODY_KEYS = Object.keys(patchFieldShape);
@@ -283,11 +299,19 @@ export const patchMyProductBodySchema = z
   .superRefine((body, ctx) =>
     assertOldPricePair(body, ctx, Object.hasOwn(body, "productPrice")),
   )
-  .superRefine(assertReturnPolicy);
+  .superRefine(assertReturnPolicy)
+  .superRefine((body, ctx) => {
+    if (
+      Object.prototype.hasOwnProperty.call(body, "productPickupLat") ||
+      Object.prototype.hasOwnProperty.call(body, "productPickupLon")
+    ) {
+      assertPickupCoordsPair(body, ctx);
+    }
+  });
 
 export const productModerationFromApiSchema = productFromApiSchema.extend({
   productModerationStatus: z.enum(PRODUCT_MODERATION_STATUSES),
-  productModerationComment: z.string().optional(),
+  productModerationComment: z.string().nullish(),
 });
 
 /** `data` ответа `POST /product` и `PATCH /product/:id`. */

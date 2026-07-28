@@ -1,4 +1,4 @@
-import { PRODUCT_IMAGE_URLS_MAX, PRODUCT_NAME_MAX_LENGTH } from "@molha/api-contract";
+import { DEFAULT_VIEWER_REGION_CODE, isRuRegionCode, PRODUCT_IMAGE_URLS_MAX, PRODUCT_NAME_MAX_LENGTH, PRODUCT_PICKUP_ADDRESS_MIN_LENGTH, PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE, getRuRegionByCode } from "@molha/api-contract";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import {
@@ -29,8 +29,9 @@ import {
   isProductListingOrigin,
   type ProductListingOrigin,
 } from "@/entities/product/lib/productListingOrigin";
-import { isProductIsOriginalSelected } from "@/entities/product/lib/productIsOriginal";
 import { ProductListingOriginChips } from "@/entities/product/ui/ProductListingOriginChips";
+import { ProductPickupLocationFields } from "@/entities/product/ui/ProductPickupLocationFields";
+import { RuRegionSelect } from "@/entities/region/ui/RuRegionSelect";
 import { ProductPhotoGrid } from "@/features/image-upload/ui/ProductPhotoGrid";
 import { ProductPreviewVideoUploadField } from "@/features/image-upload/ui/ProductPreviewVideoUploadField";
 import { CreateProductCategoryPicker } from "@/features/create-product/ui/CreateProductCategoryPicker";
@@ -51,12 +52,11 @@ const PRODUCT_DESCRIPTION_MIN_CHARS = 10;
 const PRODUCT_DESCRIPTION_MAX_CHARS = 2000;
 const PRODUCT_STOCK_QUANTITY_MIN = 1;
 const PRODUCT_STOCK_QUANTITY_MAX = 9999;
-const PRODUCT_SALE_CITY_MAX_LENGTH = 80;
 const PRODUCT_PRICE_RUB_MAX = 999_999_999;
 const LOYALTY_POINTS_MAX_LENGTH = 8;
 const CHARACTERISTICS_MAX = 10;
 
-const WIZARD_STEPS = ["basic", "originality", "media", "category", "commerce", "returns", "review"] as const;
+const WIZARD_STEPS = ["basic", "originality", "media", "category", "pickup", "commerce", "returns", "review"] as const;
 type WizardStepId = (typeof WIZARD_STEPS)[number];
 
 const STEP_COPY: Record<WizardStepId, { title: string; subtitle: string; label: string }> = {
@@ -67,7 +67,7 @@ const STEP_COPY: Record<WizardStepId, { title: string; subtitle: string; label: 
   },
   originality: {
     title: "Оригинал",
-    subtitle: "Подтвердите, что продаёте официальный товар",
+    subtitle: "",
     label: "Оригинал",
   },
   media: {
@@ -76,9 +76,14 @@ const STEP_COPY: Record<WizardStepId, { title: string; subtitle: string; label: 
     label: "Медиа",
   },
   category: {
-    title: "Категория и город",
+    title: "Категория и регион",
     subtitle: "Помогите покупателям найти товар в каталоге",
     label: "Категория",
+  },
+  pickup: {
+    title: "Самовывоз",
+    subtitle: "Укажите адрес, где покупатель заберёт товар",
+    label: "Самовывоз",
   },
   commerce: {
     title: "Цена и наличие",
@@ -87,7 +92,7 @@ const STEP_COPY: Record<WizardStepId, { title: string; subtitle: string; label: 
   },
   returns: {
     title: "Возврат",
-    subtitle: "Скажите покупателю, можно ли вернуть товар",
+    subtitle: "",
     label: "Возврат",
   },
   review: {
@@ -112,7 +117,10 @@ type WizardForm = {
   productCategoryId: string | null;
   productCategoryLabel: string;
   productCategory: string; // legacy fallback, mirrors web default
-  productSaleCity: string;
+  productRegionCode: string;
+  productPickupAddress: string;
+  productPickupLat: number | null;
+  productPickupLon: number | null;
   productPrice: string;
   productOldPrice: string;
   productIsAvailable: boolean;
@@ -136,7 +144,10 @@ const INITIAL_FORM: WizardForm = {
   productCategoryId: null,
   productCategoryLabel: "",
   productCategory: DEFAULT_PRODUCT_CATEGORY,
-  productSaleCity: "",
+  productRegionCode: DEFAULT_VIEWER_REGION_CODE,
+  productPickupAddress: "",
+  productPickupLat: null,
+  productPickupLon: null,
   productPrice: "",
   productOldPrice: "",
   productIsAvailable: true,
@@ -153,9 +164,6 @@ function validateStep(stepId: WizardStepId, form: WizardForm): string | null {
     case "basic": {
       const nameError = validateProductName(form.productName);
       if (nameError) return nameError;
-      if (!isProductListingOrigin(form.productListingOrigin)) {
-        return CREATE_PRODUCT_UI.ERROR_LISTING_ORIGIN;
-      }
       const descLen = form.productDescription.trim().length;
       if (descLen < PRODUCT_DESCRIPTION_MIN_CHARS) {
         return `Описание — минимум ${PRODUCT_DESCRIPTION_MIN_CHARS} символов`;
@@ -166,8 +174,8 @@ function validateStep(stepId: WizardStepId, form: WizardForm): string | null {
       return null;
     }
     case "originality": {
-      if (!isProductIsOriginalSelected(form.productIsOriginal)) {
-        return CREATE_PRODUCT_UI.ERROR_ORIGINALITY;
+      if (!isProductListingOrigin(form.productListingOrigin)) {
+        return CREATE_PRODUCT_UI.ERROR_LISTING_ORIGIN;
       }
       return null;
     }
@@ -183,8 +191,20 @@ function validateStep(stepId: WizardStepId, form: WizardForm): string | null {
       if (!form.productCategoryId && !form.productCategory.trim()) {
         return CREATE_PRODUCT_UI.ERROR_CATEGORY;
       }
-      if (form.productSaleCity.trim().length > PRODUCT_SALE_CITY_MAX_LENGTH) {
-        return `Город продажи — не длиннее ${PRODUCT_SALE_CITY_MAX_LENGTH} символов`;
+      if (!isRuRegionCode(form.productRegionCode)) {
+        return CREATE_PRODUCT_UI.ERROR_SALE_REGION_REQUIRED;
+      }
+      return null;
+    }
+    case "pickup": {
+      const address = form.productPickupAddress.trim();
+      if (address.length < PRODUCT_PICKUP_ADDRESS_MIN_LENGTH) {
+        return PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE;
+      }
+      const hasLat = form.productPickupLat != null && Number.isFinite(form.productPickupLat);
+      const hasLon = form.productPickupLon != null && Number.isFinite(form.productPickupLon);
+      if (hasLat !== hasLon) {
+        return CREATE_PRODUCT_UI.ERROR_PICKUP_COORDS;
       }
       return null;
     }
@@ -233,6 +253,7 @@ function validateStep(stepId: WizardStepId, form: WizardForm): string | null {
         validateStep("originality", form) ??
         validateStep("media", form) ??
         validateStep("category", form) ??
+        validateStep("pickup", form) ??
         validateStep("commerce", form) ??
         validateStep("returns", form)
       );
@@ -317,7 +338,7 @@ export const CreateProductScreen = () => {
       await createMutation.mutateAsync({
         productName: form.productName.trim(),
         productListingOrigin: form.productListingOrigin!,
-        productIsOriginal: form.productIsOriginal!,
+        productIsOriginal: form.productIsOriginal === true,
         productDescription: form.productDescription.trim(),
         productPrice: price,
         productOldPrice: oldPrice ?? undefined,
@@ -329,7 +350,11 @@ export const CreateProductScreen = () => {
           : undefined,
         productImageUrls: form.imageUrls.filter(Boolean),
         productPreviewVideoUrl: form.productPreviewVideoUrl.trim() || undefined,
-        productSaleCity: form.productSaleCity.trim() || undefined,
+        productRegionCode: form.productRegionCode.trim(),
+        productPickupAddress: form.productPickupAddress.trim(),
+        productPickupLat: form.productPickupLat,
+        productPickupLon: form.productPickupLon,
+        productDeliveryEnabled: false,
         loyaltyPointsPerUnit: Number.isFinite(loyalty) && loyalty > 0 ? loyalty : undefined,
         productCharacteristics: form.characteristicRows
           .filter((r) => r.key.trim() && r.value.trim())
@@ -394,6 +419,9 @@ export const CreateProductScreen = () => {
         )}
         {stepId === "category" && (
           <CategoryStep form={form} setForm={setForm} disabled={isSubmitting} theme={theme} styles={styles} />
+        )}
+        {stepId === "pickup" && (
+          <PickupStep form={form} setForm={setForm} disabled={isSubmitting} />
         )}
         {stepId === "commerce" && (
           <CommerceStep form={form} setForm={setForm} disabled={isSubmitting} theme={theme} styles={styles} />
@@ -674,14 +702,6 @@ function BasicStep({ form, setForm, disabled, theme, styles }: StepProps) {
         />
       </View>
 
-      <ProductListingOriginChips
-        value={form.productListingOrigin}
-        onChange={(productListingOrigin) =>
-          setForm((prev) => ({ ...prev, productListingOrigin }))
-        }
-        disabled={disabled}
-      />
-
       {/* Description field */}
       <View style={styles.fieldLabel}>
         <Text style={[styles.label, { color: theme.colors.text }]}>
@@ -779,6 +799,17 @@ function OriginalityStep({ form, setForm, disabled, theme, styles }: StepProps) 
 
   return (
     <View style={styles.section}>
+      <ProductListingOriginChips
+        value={form.productListingOrigin}
+        onChange={(productListingOrigin) =>
+          setForm((prev) => ({ ...prev, productListingOrigin }))
+        }
+        disabled={disabled}
+      />
+
+      <Text style={[styles.lead, { color: theme.colors.textSecondary }]}>
+        {CREATE_PRODUCT_UI.WIZARD_STEP_ORIGINALITY_SUBTITLE}
+      </Text>
       <Text style={[styles.lead, { color: theme.colors.textSecondary }]}>
         {CREATE_PRODUCT_UI.ORIGINALITY_STATEMENT}
       </Text>
@@ -875,24 +906,50 @@ function CategoryStep({ form, setForm, disabled, theme, styles }: StepProps) {
         }
       />
 
-      {/* Sale city */}
-      <View style={styles.fieldLabel}>
-        <Text style={[styles.label, { color: theme.colors.text }]}>Город продажи</Text>
-        <TextInput
-          {...textInputFocusScrollProps}
-          style={[styles.input, { color: theme.colors.text, backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
-          value={form.productSaleCity}
-          onChangeText={(text) => setForm((prev) => ({ ...prev, productSaleCity: text }))}
-          editable={!disabled}
-          placeholder="Москва"
-          placeholderTextColor={theme.colors.textMuted}
-          maxLength={PRODUCT_SALE_CITY_MAX_LENGTH}
-        />
-        {/* Hint — mirrors .create-product-section__hint */}
-        <Text style={[styles.hint, { color: theme.colors.textSecondary }]}>
-          Пусто — товар виден во всех городах
-        </Text>
-      </View>
+      {/* Sale region */}
+      <RuRegionSelect
+        value={form.productRegionCode}
+        disabled={disabled}
+        required
+        label={CREATE_PRODUCT_UI.LABEL_SALE_REGION}
+        onChange={(productRegionCode) =>
+          setForm((prev) => ({ ...prev, productRegionCode }))
+        }
+      />
+      <Text style={[styles.hint, { color: theme.colors.textSecondary }]}>
+        {CREATE_PRODUCT_UI.HINT_SALE_REGION}
+      </Text>
+    </View>
+  );
+}
+
+// ─── PickupStep ───────────────────────────────────────────────────────────────
+
+function PickupStep({
+  form,
+  setForm,
+  disabled,
+}: {
+  form: WizardForm;
+  setForm: React.Dispatch<React.SetStateAction<WizardForm>>;
+  disabled: boolean;
+}) {
+  return (
+    <View style={{ gap: 16 }}>
+      <ProductPickupLocationFields
+        address={form.productPickupAddress}
+        lat={form.productPickupLat}
+        lon={form.productPickupLon}
+        disabled={disabled}
+        onChange={(next) => {
+          setForm((prev) => ({
+            ...prev,
+            productPickupAddress: next.productPickupAddress,
+            productPickupLat: next.productPickupLat,
+            productPickupLon: next.productPickupLon,
+          }));
+        }}
+      />
     </View>
   );
 }
@@ -1057,8 +1114,12 @@ function ReturnsStep({ form, setForm, disabled, theme, styles }: StepProps) {
 
   return (
     <View style={styles.section}>
+      <Text style={[styles.label, { color: theme.colors.text }]}>
+        Возврат{" "}
+        <Text style={{ color: theme.colors.danger }}>*</Text>
+      </Text>
       <Text style={[styles.lead, { color: theme.colors.textSecondary }]}>
-        Есть ли возврат?
+        {CREATE_PRODUCT_UI.WIZARD_STEP_RETURNS_SUBTITLE}
       </Text>
 
       <View style={styles.returnChoiceRow}>
@@ -1242,18 +1303,29 @@ function ReviewStep({
       stepIndex: 2,
     },
     { label: "Категория", value: form.productCategoryLabel || "—", stepIndex: 3 },
-    { label: "Город продажи", value: form.productSaleCity.trim() || "Все города", stepIndex: 3 },
+    {
+      label: CREATE_PRODUCT_UI.LABEL_SALE_REGION,
+      value:
+        getRuRegionByCode(form.productRegionCode)?.name || form.productRegionCode || "—",
+      stepIndex: 3,
+    },
+    {
+      label: "Адрес самовывоза",
+      value: form.productPickupAddress.trim() || "—",
+      stepIndex: 4,
+      multiline: true,
+    },
     {
       label: "Цена, ₽",
       value: `${form.productPrice.trim() || "0"} ₽${discountPercent != null ? ` (−${discountPercent}%)` : ""}`,
-      stepIndex: 4,
+      stepIndex: 5,
     },
     {
       label: "Количество",
       value: form.productIsAvailable
         ? `${form.productStockQuantity.trim()} шт.`
         : "Скрыт из каталога",
-      stepIndex: 4,
+      stepIndex: 5,
     },
     {
       label: "Возврат",
@@ -1265,7 +1337,7 @@ function ReviewStep({
           : form.productReturnEnabled === false
             ? "Нет"
             : "—",
-      stepIndex: 5,
+      stepIndex: 6,
       multiline: true,
     },
   ];

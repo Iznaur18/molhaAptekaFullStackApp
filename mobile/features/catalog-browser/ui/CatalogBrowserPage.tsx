@@ -11,6 +11,7 @@ import {
 import { useProductCatalogFeedTileDisplaysQuery } from "@/entities/product-category-display/model/useProductCatalogFeedTileDisplaysQuery";
 import { useProductCategoryDisplaysQuery } from "@/entities/product-category-display/model/useProductCategoryDisplaysQuery";
 import { useProductCategoryRootsQuery } from "@/entities/product-category-tree/model/useProductCategoryRootsQuery";
+import { useViewerRegion } from "@/entities/region/model/ViewerRegionProvider";
 import { useSellerPersonalCategoryCatalogTilesQuery } from "@/entities/seller-personal-category/model/useSellerPersonalCategoryCatalogTilesQuery";
 import type { CatalogListFilters } from "@/entities/product/model/catalogListFilters";
 import { buildQueryForCatalogFeedTile } from "@/features/catalog-browser/model/buildQueryForCatalogFeedTile";
@@ -45,11 +46,14 @@ export const CatalogBrowserPage = () => {
   };
   const { contentPaddingTop, centeredContentStyle } = useScreenLayout();
   const { isAdmin, isAuthorized } = useUserAccess();
+  const { viewerRegionCode } = useViewerRegion();
 
   const categoryDisplaysQuery = useProductCategoryDisplaysQuery();
   const feedTileDisplaysQuery = useProductCatalogFeedTileDisplaysQuery();
   const categoryRootsQuery = useProductCategoryRootsQuery();
-  const personalCategoryTilesQuery = useSellerPersonalCategoryCatalogTilesQuery();
+  const personalCategoryTilesQuery = useSellerPersonalCategoryCatalogTilesQuery({
+    regionCode: viewerRegionCode,
+  });
 
   const [editingCategorySlug, setEditingCategorySlug] = useState<string | null>(null);
   const [editingFeedTileKey, setEditingFeedTileKey] = useState<string | null>(null);

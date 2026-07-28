@@ -5,7 +5,9 @@ import { useCallback, useMemo, useState } from "react";
 import { Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
+import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import type { ModerationProduct } from "@/entities/product/api/productModerationApi";
+import { useMyProductMutations } from "@/entities/product/model/useMyProductMutations";
 import {
   usePendingModerationProductsQuery,
   useProductModerationMutations,
@@ -39,8 +41,10 @@ export const ProductModerationPage = () => {
   const productGrid = useProductGridLayout(undefined, moderationQueueGridResolvers);
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
   const queryClient = useQueryClient();
+  const { isAdmin } = useUserAccess();
   const queueQuery = usePendingModerationProductsQuery();
   const { approveMutation, rejectMutation } = useProductModerationMutations();
+  const { deleteMutation } = useMyProductMutations();
   const [navSheetVisible, setNavSheetVisible] = useState(false);
   const [actionError, setActionError] = useState("");
   const [pendingProductId, setPendingProductId] = useState<string | null>(null);
@@ -128,6 +132,23 @@ export const ProductModerationPage = () => {
         error,
         API_CLIENT_UI.REJECT_PRODUCT_MODERATION_FALLBACK,
       );
+      setActionError(message);
+      setCardErrors((prev) => ({ ...prev, [productId]: message }));
+    } finally {
+      setPendingProductId(null);
+    }
+  };
+
+  const handleDelete = async (productId: string) => {
+    try {
+      setPendingProductId(productId);
+      setActionError("");
+      setCardErrors((prev) => ({ ...prev, [productId]: "" }));
+      await deleteMutation.mutateAsync(productId);
+      removeFromQueue(productId);
+      await handleQueueChanged();
+    } catch (error) {
+      const message = formatApiErrorMessage(error, API_CLIENT_UI.DELETE_MY_PRODUCT_FALLBACK);
       setActionError(message);
       setCardErrors((prev) => ({ ...prev, [productId]: message }));
     } finally {
@@ -254,6 +275,14 @@ export const ProductModerationPage = () => {
             onReject={(productId) => {
               void handleReject(productId);
             }}
+            canDelete={isAdmin}
+            onDelete={
+              isAdmin
+                ? (productId) => {
+                    void handleDelete(productId);
+                  }
+                : undefined
+            }
           />
         )}
         />

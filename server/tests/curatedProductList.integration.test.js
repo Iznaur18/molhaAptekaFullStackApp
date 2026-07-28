@@ -96,7 +96,7 @@ const seedCuratedFixture = async () => {
   };
 };
 
-const createCuratedList = async (adminCookie, title) => {
+const createCuratedList = async (adminCookie, title, regionCode = "RU-MOW") => {
   const data = await parseSuccessData(
     await request("/product/admin/curated-lists", {
       method: "POST",
@@ -104,7 +104,7 @@ const createCuratedList = async (adminCookie, title) => {
         "Content-Type": "application/json",
         Cookie: adminCookie,
       },
-      body: JSON.stringify({ title }),
+      body: JSON.stringify({ title, regionCode }),
     }),
   );
   return data.list;
@@ -123,6 +123,17 @@ test("curated lists: admin CRUD, duplicate reject, reorder requires full set", a
     body: JSON.stringify({ productId: productIds.moscow }),
   });
   assert.equal(addResponse.status, 200);
+
+  const wrongRegionResponse = await request(`/product/admin/curated-lists/${list._id}/products`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Cookie: adminCookie,
+    },
+    body: JSON.stringify({ productId: productIds.chechnya }),
+  });
+  assert.equal(wrongRegionResponse.status, 400);
+  assert.match(await parseErrorMessage(wrongRegionResponse), /регион/i);
 
   const duplicateResponse = await request(`/product/admin/curated-lists/${list._id}/products`, {
     method: "POST",
@@ -157,12 +168,13 @@ test("curated lists: admin CRUD, duplicate reject, reorder requires full set", a
   assert.equal(fullReorder.status, 200);
 });
 
-test("curated lists home: region filter for buyer and query override", async () => {
+test("curated lists home: list region matches viewer region", async () => {
   const { adminCookie, buyerCookie, productIds } = await seedCuratedFixture();
-  const list = await createCuratedList(adminCookie, "Подборка");
+  const moscowList = await createCuratedList(adminCookie, "Москва", "RU-MOW");
+  const chechnyaList = await createCuratedList(adminCookie, "Чечня", "RU-CE");
 
   await parseSuccessData(
-    await request(`/product/admin/curated-lists/${list._id}/products`, {
+    await request(`/product/admin/curated-lists/${moscowList._id}/products`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -172,7 +184,7 @@ test("curated lists home: region filter for buyer and query override", async () 
     }),
   );
   await parseSuccessData(
-    await request(`/product/admin/curated-lists/${list._id}/products`, {
+    await request(`/product/admin/curated-lists/${chechnyaList._id}/products`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -188,6 +200,7 @@ test("curated lists home: region filter for buyer and query override", async () 
     }),
   );
   assert.equal(moscowOnlyData.lists.length, 1);
+  assert.equal(String(moscowOnlyData.lists[0]._id), moscowList._id);
   assert.deepEqual(
     moscowOnlyData.lists[0].products.map((product) => String(product._id)),
     [productIds.moscow],
@@ -198,7 +211,8 @@ test("curated lists home: region filter for buyer and query override", async () 
       headers: { Cookie: buyerCookie },
     }),
   );
-  assert.equal(chechnyaData.lists[0].products.length, 1);
+  assert.equal(chechnyaData.lists.length, 1);
+  assert.equal(String(chechnyaData.lists[0]._id), chechnyaList._id);
   assert.equal(String(chechnyaData.lists[0].products[0]._id), productIds.chechnya);
 });
 

@@ -11,7 +11,10 @@ import {
 import { getProductPurchaseLimit } from "../../lib/getProductPurchaseLimit.js";
 import { getProductPromotionTierLabel } from "../../lib/calculateProductPromotionPointsCost.js";
 import { formatPromotionExpiresAt } from "../../lib/productPromotionStatus.js";
-import { formatProductReviewRatingLine } from "../../../product-review/lib/formatProductReviewRatingLine.js";
+import {
+  formatProductReviewRatingLine,
+  getProductReviewRatingParts,
+} from "../../../product-review/lib/formatProductReviewRatingLine.js";
 import {
   PRODUCT_CARD_MODERATION_PREVIEW_FIELD_KEYS,
   PRODUCT_CARD_PREVIEW_FIELD_KEYS,
@@ -82,6 +85,10 @@ export function useProductCardViewModel(props) {
       ? String(product.productModerationComment).trim()
       : "";
 
+  const reviewRatingParts = getProductReviewRatingParts(
+    product.averageRating ?? 0,
+    product.reviewCount ?? 0,
+  );
   const reviewRatingLine = formatProductReviewRatingLine(
     product.averageRating ?? 0,
     product.reviewCount ?? 0,
@@ -120,8 +127,9 @@ export function useProductCardViewModel(props) {
     sellerCanToggleVisibility,
     rejectionComment,
     showModerationPendingOverlay,
+    reviewRatingParts,
     reviewRatingLine,
-    hasReviewRating: reviewRatingLine.length > 0,
+    hasReviewRating: reviewRatingParts != null,
     previewFieldKeysWithoutPrice,
     purchaseLimit,
     sellerDisplayName,

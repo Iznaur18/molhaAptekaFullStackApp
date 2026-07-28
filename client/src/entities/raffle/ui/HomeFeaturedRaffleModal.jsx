@@ -12,9 +12,6 @@ import { FeaturedRaffleModalCard } from "./FeaturedRaffleModalCard.jsx";
 
 import "./HomeFeaturedRaffleModal.css";
 
-const MODAL_HORIZONTAL_PADDING_PX = 16;
-const MODAL_MAX_WIDTH_PX = 480;
-const MODAL_HEIGHT_RATIO = 0.8;
 const VISUAL_SIZE_RATIO = 0.94;
 const SLIDE_GAP_PX = 12;
 const DRAG_THRESHOLD_PX = 48;
@@ -44,21 +41,15 @@ export function HomeFeaturedRaffleModal({
   const [viewportWidth, setViewportWidth] = useState(() =>
     typeof window !== "undefined" ? window.innerWidth : 0,
   );
-  const [viewportHeight, setViewportHeight] = useState(() =>
-    typeof window !== "undefined" ? window.innerHeight : 0,
-  );
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffsetPx, setDragOffsetPx] = useState(0);
 
   const slideCount = raffles.length;
-  const cardWidth = Math.min(
-    Math.max(0, viewportWidth - MODAL_HORIZONTAL_PADDING_PX * 2),
-    MODAL_MAX_WIDTH_PX,
-  );
-  const dialogHeight = Math.round(viewportHeight * MODAL_HEIGHT_RATIO);
+  const cardWidth = Math.max(0, viewportWidth);
   const visualSize = Math.round(cardWidth * VISUAL_SIZE_RATIO);
+  const visualInsetPx = Math.max(0, Math.round((cardWidth - visualSize) / 2));
   const stride = cardWidth + SLIDE_GAP_PX;
   const activeRaffle = raffles[activeIndex] ?? raffles[0] ?? null;
   const isInteractive = visible && isVisible;
@@ -76,7 +67,6 @@ export function HomeFeaturedRaffleModal({
 
     const syncViewport = () => {
       setViewportWidth(window.innerWidth);
-      setViewportHeight(window.innerHeight);
     };
 
     syncViewport();
@@ -311,23 +301,13 @@ export function HomeFeaturedRaffleModal({
         role="dialog"
         aria-modal="true"
         aria-label={RAFFLE_FEATURED_CAROUSEL_UI.SECTION_ARIA}
-        style={{
-          width: cardWidth > 0 ? `${cardWidth}px` : undefined,
-          height: dialogHeight > 0 ? `${dialogHeight}px` : "80vh",
-        }}
       >
-        <div className="home-featured-raffle-modal__header">
-          <button
-            ref={closeButtonRef}
-            type="button"
-            className="home-featured-raffle-modal__close"
-            onClick={onClose}
-          >
-            {RAFFLE_FEATURED_BANNER_UI.CLOSE}
-          </button>
+        <div
+          className="home-featured-raffle-modal__scroll"
+          style={{ paddingTop: visualInsetPx > 0 ? `${visualInsetPx}px` : undefined }}
+        >
+          {body}
         </div>
-
-        <div className="home-featured-raffle-modal__scroll">{body}</div>
 
         <div className="home-featured-raffle-modal__footer">
           <button
@@ -336,6 +316,14 @@ export function HomeFeaturedRaffleModal({
             onClick={handleOpenProducts}
           >
             {RAFFLE_FEATURED_BANNER_UI.OPEN_PRODUCTS}
+          </button>
+          <button
+            ref={closeButtonRef}
+            type="button"
+            className="home-featured-raffle-modal__footer-close"
+            onClick={onClose}
+          >
+            {RAFFLE_FEATURED_BANNER_UI.CLOSE}
           </button>
         </div>
       </div>

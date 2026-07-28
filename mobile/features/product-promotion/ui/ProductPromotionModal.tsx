@@ -69,12 +69,15 @@ type ProductPromotionModalProps = {
   ) => void | Promise<void>;
   isAvailabilityTogglePending?: boolean;
   isAuctionTogglePending?: boolean;
+  isDeletePending?: boolean;
   manageErrorMessage?: string;
   canManageEdit?: boolean;
+  canManageDelete?: boolean;
   canManageToggleVisibility?: boolean;
   sellerRaffleActive?: boolean;
   onToggleRaffleParticipation?: (product: CatalogProduct, enabled: boolean) => void;
   isRaffleParticipationPending?: boolean;
+  onDeleteProduct?: (productId: string) => void | Promise<void>;
   onInstallmentProgramSaved?: (productPatch?: Record<string, unknown>) => void;
 };
 
@@ -95,10 +98,13 @@ export const ProductPromotionModal = ({
   onSubmit,
   onSetProductAvailability,
   onSetProductAuction,
+  onDeleteProduct,
   isAvailabilityTogglePending = false,
   isAuctionTogglePending = false,
+  isDeletePending = false,
   manageErrorMessage = "",
   canManageEdit = true,
+  canManageDelete = false,
   canManageToggleVisibility = true,
   sellerRaffleActive = false,
   onToggleRaffleParticipation,
@@ -112,7 +118,9 @@ export const ProductPromotionModal = ({
     product?.productPrice != null ? Number(product.productPrice) || 0 : productPrice;
   const showManageSection =
     product != null &&
-    (typeof onSetProductAvailability === "function" || typeof onSetProductAuction === "function");
+    (typeof onSetProductAvailability === "function" ||
+      typeof onSetProductAuction === "function" ||
+      typeof onDeleteProduct === "function");
   const { activeTabId, setActiveTabId, isPromotionTab } = useProductPromotionModalTab({
     visible,
     showManageTab: showManageSection,
@@ -342,10 +350,13 @@ export const ProductPromotionModal = ({
         product={product}
         onSetAvailability={onSetProductAvailability}
         onSetAuction={onSetProductAuction}
+        onDelete={onDeleteProduct}
         isAvailabilityTogglePending={isAvailabilityTogglePending}
         isAuctionTogglePending={isAuctionTogglePending}
+        isDeletePending={isDeletePending}
         errorMessage={manageErrorMessage}
         canEdit={canManageEdit}
+        canDelete={canManageDelete}
         canToggleVisibility={canManageToggleVisibility}
         sellerRaffleActive={sellerRaffleActive}
         onToggleRaffleParticipation={onToggleRaffleParticipation}

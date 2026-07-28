@@ -1,5 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
+import { DEFAULT_VIEWER_REGION_CODE } from "@molha/api-contract";
 
 import type { CuratedListAdminRow } from "@/entities/curated-product-list/api/curatedProductListAdminApi";
 import { invalidateCuratedProductLists } from "@/entities/curated-product-list/lib/invalidateCuratedProductLists";
@@ -91,7 +92,10 @@ export const usePopularProductsAdminPage = () => {
     }
 
     try {
-      const created = await createMutation.mutateAsync({ title });
+      const created = await createMutation.mutateAsync({
+        title,
+        regionCode: DEFAULT_VIEWER_REGION_CODE,
+      });
       updateListsCache((rows) => [...rows, created]);
       setNewTitle("");
       setIsCreateOpen(false);

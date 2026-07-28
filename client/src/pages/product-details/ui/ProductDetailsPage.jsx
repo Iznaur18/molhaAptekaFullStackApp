@@ -3,8 +3,7 @@ import { Flag } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { canSellerEditProduct } from "../../../entities/product/lib/getProductModerationUi.js";
-import { isCatalogPromotionActive } from "../../../entities/product/lib/productPromotionStatus.js";
+import { canSellerDeleteProduct, canSellerEditProduct } from "../../../entities/product/lib/getProductModerationUi.js";
 import { isCurrentUserProductSeller } from "../../../entities/product/lib/isCurrentUserProductSeller.js";
 import { patchProductInAllCatalogCaches } from "../../../entities/product/lib/catalogProductsQueryCache.js";
 import { PRODUCT_MODERATION_APPROVED } from "../../../entities/product/model/productModerationConstants.js";
@@ -137,10 +136,8 @@ export function ProductDetailsPage() {
     if (!isCurrentUserProductSeller(product, shell.currentUserId)) {
       return false;
     }
-    if (product.productIsAvailable === false) {
-      return false;
-    }
-    return !isCatalogPromotionActive(product);
+    // Owner can open manage (incl. delete) even while pending / unavailable.
+    return true;
   }, [product, shell.currentUserId, shell.isAuthorized]);
 
   const handlePromote = useCallback(() => {
@@ -149,6 +146,22 @@ export function ProductDetailsPage() {
     }
     shell.handleOpenPromotionModal?.(product);
   }, [product, shell]);
+
+  const handleDelete = useCallback(async () => {
+    if (!product?._id || typeof shell.handleDeleteMyProduct !== "function") {
+      return;
+    }
+    const ok = await shell.handleDeleteMyProduct(String(product._id));
+    if (ok) {
+      navigateBackOrHome(navigate);
+    }
+  }, [navigate, product, shell]);
+
+  const isOwnProduct = Boolean(
+    product && shell.currentUserId && isCurrentUserProductSeller(product, shell.currentUserId),
+  );
+  const canDeleteProduct =
+    Boolean(shell.isAdmin) || (isOwnProduct && canSellerDeleteProduct(product));
 
   if (!productId) {
     return (
@@ -227,12 +240,16 @@ export function ProductDetailsPage() {
             <ProductDetailsAdminFooter
               onEdit={handleEdit}
               onPromote={handlePromote}
+              onDelete={canDeleteProduct ? handleDelete : undefined}
               canEdit={shell.isAdmin || canSellerEditProduct(product)}
               canPromote={canPromote}
+              canDelete={canDeleteProduct}
+              hasOpenSales={product.hasOpenSales === true}
               isDeletePending={
                 shell.deletingProductId != null &&
                 shell.deletingProductId === String(product._id)
               }
+              errorMessage={shell.productDetailsAdminError ?? ""}
             />
           ) : null
         }

@@ -3,31 +3,36 @@
  * (gallery column + sticky dock), including desktop widths.
  */
 .product-details-page {
+  /* fixed inset — не 100dvh внутри 100vh: на iOS Safari иначе дыра под CTA */
+  position: fixed;
+  inset: 0;
+  z-index: var(--iz-z-modal);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100dvh;
-  max-height: 100dvh;
+  height: auto;
+  max-height: none;
   max-width: var(--app-shell-max-width, 60rem);
   margin-inline: auto;
   padding-top: env(safe-area-inset-top, 0px);
-  overflow-x: clip;
-  overflow-y: auto;
+  overflow: hidden;
   overscroll-behavior-x: none;
-  overscroll-behavior-y: contain;
-  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: none;
   background: var(--iz-color-surface);
 }
 
 .product-details-page__body {
   display: flex;
-  flex: 1 0 auto;
+  flex: 1 1 auto;
   flex-direction: column;
   min-height: 0;
   padding: 0;
   gap: 0;
-  overflow: visible;
+  overflow-x: clip;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .product-details-modal--page .product-details-modal__tabs {
@@ -56,6 +61,14 @@
 .product-details-modal--page.product-details-modal--mobile-dock-active
   .product-details-modal__tab-panel {
   padding-bottom: var(--product-details-modal-mobile-scroll-padding);
+}
+
+/* Purchase CTA — flex-sibling внизу страницы, не overlay: не резервируем высоту dock. */
+.product-details-modal--page.product-details-modal--mobile-dock-active:has(
+    > .product-details-page__docked-footer
+  )
+  .product-details-modal__tab-panel {
+  padding-bottom: var(--iz-space-3);
 }
 
 .product-details-modal--page:not(.product-details-modal--mobile-dock-active)
@@ -105,7 +118,7 @@
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  padding: 0 var(--iz-space-4) var(--iz-space-3);
+  padding: 0 var(--iz-space-4) 0;
   overflow-x: clip;
 }
 
@@ -297,17 +310,22 @@
   padding: 0.75rem var(--iz-space-4) calc(0.75rem + env(safe-area-inset-bottom, 0px));
 }
 
+/* Flex-sibling у низа fixed-страницы; бар тянется в home-indicator. */
 .product-details-page__docked-footer {
-  position: sticky;
-  bottom: 0;
+  flex-shrink: 0;
   z-index: 20;
   box-sizing: border-box;
   width: 100%;
-  padding: 0.55rem var(--iz-space-3) calc(0.65rem + env(safe-area-inset-bottom, 0px));
+  padding: 0.55rem var(--iz-space-3) max(0.65rem, env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--iz-color-border);
   background: color-mix(in srgb, var(--iz-color-surface) 94%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+}
+
+.product-details-page__docked-footer-slot {
+  display: block;
+  width: 100%;
 }
 
 .product-details-page__docked-footer .product-details-modal__price-actions--mobile-dock {
@@ -332,7 +350,20 @@
   border-radius: 0.7rem;
 }
 
-/* Installment / auction sticky CTA on page (any viewport width). */
+/* Installment / auction CTA: flex-sibling dock (same as purchase), not body overlay. */
+.product-details-page__docked-footer .installment-buyer-block__submit,
+.product-details-page__docked-footer .app-btn--contrast,
+.product-details-page__docked-footer .product-price-offer__btn--primary,
+.product-details-page__docked-footer .checkout-form__submit {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.75rem 1rem;
+  font-size: 1.02rem;
+  border-radius: 0.7rem;
+}
+
+/* Legacy: body-portaled docked footers under page (modal compact only). */
 .product-details-page .product-modal-shell__docked-footer {
   position: fixed;
   left: 0;
@@ -370,6 +401,7 @@ body:has(.product-details-page) .mobile-bottom-nav {
 
 body:has(.product-details-page) {
   background: var(--iz-color-surface);
+  overflow: hidden;
   overscroll-behavior-x: none;
 }
 
@@ -377,7 +409,7 @@ body:has(.product-details-page) .app-shell {
   padding: 0;
   max-width: none;
   background: var(--iz-color-surface);
-  min-height: 100dvh;
+  min-height: 0;
 }
 
 .product-details-page--state {

@@ -145,6 +145,30 @@ const ProductSchema = new Schema(
       default: "",
       index: true,
     },
+    /** Адрес точки самовывоза (текст). */
+    productPickupAddress: {
+      type: String,
+      trim: true,
+      default: "",
+      maxlength: 100,
+    },
+    productPickupLat: {
+      type: Number,
+      default: null,
+      min: -90,
+      max: 90,
+    },
+    productPickupLon: {
+      type: Number,
+      default: null,
+      min: -180,
+      max: 180,
+    },
+    /** Доставка продавцом; пока всегда false до интеграции. */
+    productDeliveryEnabled: {
+      type: Boolean,
+      default: false,
+    },
     productCategory: {
       type: String,
       required: true,

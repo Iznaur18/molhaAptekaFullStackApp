@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import {
+  DEFAULT_VIEWER_REGION_CODE,
   RAFFLE_DESCRIPTION_MAX_LENGTH,
   RAFFLE_TITLE_MAX_LENGTH,
+  isRuRegionCode,
 } from "@molha/api-contract";
 
 import { useRaffleMutations } from "../model/useRaffleMutations.js";
@@ -45,6 +47,7 @@ import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
 import { ProductWizardProgress } from "../../../shared/ui/ProductWizardProgress/ProductWizardProgress.jsx";
 import { ProductWizardStepHeadline } from "../../../shared/ui/ProductWizardProgress/ProductWizardStepHeadline.jsx";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
+import { RuRegionSelect } from "../../region/ui/RuRegionSelect.jsx";
 
 import "./CreateRaffleModal.css";
 
@@ -57,6 +60,7 @@ const INITIAL_FORM = {
   prizeImageFocus: { ...DEFAULT_RAFFLE_PRIZE_IMAGE_FOCUS },
   targetSales: "",
   instagramUrl: "",
+  regionCode: DEFAULT_VIEWER_REGION_CODE,
 };
 
 const LAST_WIZARD_STEP_INDEX = CREATE_RAFFLE_WIZARD_STEPS.length - 1;
@@ -66,6 +70,7 @@ const LAST_WIZARD_STEP_INDEX = CREATE_RAFFLE_WIZARD_STEPS.length - 1;
  */
 function formFromRaffle(raffle) {
   const prizeMediaType = normalizeRafflePrizeMediaType(raffle.prizeMediaType);
+  const regionRaw = String(raffle.regionCode ?? "").trim();
   return {
     title: raffle.title ?? "",
     description: raffle.description ?? "",
@@ -75,6 +80,7 @@ function formFromRaffle(raffle) {
     prizeImageFocus: getRafflePrizeImageFocus(raffle),
     targetSales: String(raffle.targetSales ?? ""),
     instagramUrl: raffle.instagramUrl ?? "",
+    regionCode: isRuRegionCode(regionRaw) ? regionRaw : DEFAULT_VIEWER_REGION_CODE,
   };
 }
 
@@ -328,6 +334,7 @@ export function CreateRaffleModal({
       prizeImageFocus: form.prizeImageFocus,
       targetSales,
       instagramUrl: form.instagramUrl.trim(),
+      regionCode: form.regionCode,
     };
 
     try {
@@ -449,6 +456,21 @@ export function CreateRaffleModal({
                   </FormFieldLabel>
                   <p className="create-raffle-modal__field-hint">
                     {CREATE_RAFFLE_MODAL_UI.HINT_TITLE}
+                  </p>
+                </div>
+                <div className="create-raffle-modal__field">
+                  <FormFieldLabel label={CREATE_RAFFLE_MODAL_UI.LABEL_REGION} required>
+                    <RuRegionSelect
+                      value={form.regionCode}
+                      disabled={isSubmitting}
+                      required
+                      onChange={(regionCode) =>
+                        setForm((prev) => ({ ...prev, regionCode }))
+                      }
+                    />
+                  </FormFieldLabel>
+                  <p className="create-raffle-modal__field-hint">
+                    {CREATE_RAFFLE_MODAL_UI.HINT_REGION}
                   </p>
                 </div>
                 <div className="create-raffle-modal__field">

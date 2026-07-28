@@ -4,13 +4,18 @@ import { fetchSellerPersonalCategoryCatalogTiles } from "../api/sellerPersonalCa
 import { sellerPersonalCategoryQueryKeys } from "./sellerPersonalCategoryQueryKeys.js";
 
 /**
- * @param {{ enabled?: boolean }} [options]
+ * @param {{ enabled?: boolean; regionCode?: string }} [options]
  */
-export function useSellerPersonalCategoryCatalogTilesQuery({ enabled = true } = {}) {
+export function useSellerPersonalCategoryCatalogTilesQuery({
+  enabled = true,
+  regionCode = "",
+} = {}) {
   return useQuery({
-    queryKey: sellerPersonalCategoryQueryKeys.catalogTiles(),
+    queryKey: sellerPersonalCategoryQueryKeys.catalogTiles(regionCode),
     queryFn: async () => {
-      const result = await fetchSellerPersonalCategoryCatalogTiles();
+      const result = await fetchSellerPersonalCategoryCatalogTiles({
+        regionCode: regionCode || undefined,
+      });
       return result.tiles;
     },
     enabled,

@@ -231,7 +231,7 @@ export const PartnerProgramPage = () => {
             />
             <AppButton
               label={PARTNER_PROGRAM_PAGE_UI.SHARE_BUTTON}
-              variant="secondary"
+              variant="primary"
               style={styles.actionButton}
               onPress={handleShare}
             />

@@ -4,9 +4,22 @@ import { raffleQueryKeys } from "@/shared/api";
 
 import { fetchRaffleProducts } from "../api/fetchRaffleProducts";
 
-export const useRaffleProductsQuery = (raffleId: string, enabled = true) =>
-  useQuery({
-    queryKey: raffleQueryKeys.products(raffleId),
-    queryFn: () => fetchRaffleProducts(raffleId),
-    enabled: Boolean(raffleId) && enabled,
+const DEFAULT_RAFFLE_PRODUCTS_LIMIT = 60;
+
+export const useRaffleProductsQuery = ({
+  raffleId,
+  limit = DEFAULT_RAFFLE_PRODUCTS_LIMIT,
+  enabled = true,
+}: {
+  raffleId: string;
+  limit?: number;
+  enabled?: boolean;
+}) => {
+  const params = { limit };
+
+  return useQuery({
+    queryKey: raffleQueryKeys.products(raffleId, params),
+    enabled: enabled && Boolean(raffleId),
+    queryFn: () => fetchRaffleProducts(raffleId, params),
   });
+};

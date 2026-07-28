@@ -5,6 +5,7 @@ import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import {
+  canSellerDeleteProduct,
   canSellerEditProduct,
   canSellerToggleCatalogVisibility,
 } from "@/entities/product/lib/getProductModerationUi";
@@ -250,11 +251,16 @@ export const MyProductsPage = () => {
         onSubmit={pageActions.handleSubmitPromotion}
         onSetProductAvailability={pageActions.handleSetMyProductAvailability}
         onSetProductAuction={pageActions.handleSetProductAuction}
+        onDeleteProduct={pageActions.handleDeleteProduct}
         isAvailabilityTogglePending={pageActions.isAvailabilityTogglePending}
         isAuctionTogglePending={pageActions.isAuctionTogglePending}
+        isDeletePending={pageActions.isDeletePending}
         manageErrorMessage={pageActions.manageErrorMessage}
         canManageEdit={
           promotionProduct != null && (isAdmin || canSellerEditProduct(promotionProduct))
+        }
+        canManageDelete={
+          promotionProduct != null && (isAdmin || canSellerDeleteProduct(promotionProduct))
         }
         canManageToggleVisibility={
           promotionProduct != null &&

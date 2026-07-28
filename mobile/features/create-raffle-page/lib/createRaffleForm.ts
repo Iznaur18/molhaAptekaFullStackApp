@@ -1,4 +1,9 @@
 import {
+  DEFAULT_VIEWER_REGION_CODE,
+  isRuRegionCode,
+} from "@molha/api-contract";
+
+import {
   RAFFLE_PRIZE_MEDIA_TYPE_IMAGE,
   RAFFLE_PRIZE_MEDIA_TYPE_VIDEO,
 } from "@/entities/raffle/lib/raffleConstants";
@@ -24,6 +29,7 @@ export type CreateRaffleFormState = {
   prizeImageFocus: { x: number; y: number };
   targetSales: string;
   instagramUrl: string;
+  regionCode: string;
 };
 
 export const INITIAL_CREATE_RAFFLE_FORM: CreateRaffleFormState = {
@@ -35,6 +41,7 @@ export const INITIAL_CREATE_RAFFLE_FORM: CreateRaffleFormState = {
   prizeImageFocus: { ...DEFAULT_RAFFLE_PRIZE_IMAGE_FOCUS },
   targetSales: "",
   instagramUrl: "",
+  regionCode: DEFAULT_VIEWER_REGION_CODE,
 };
 
 export const formFromRaffle = (raffle: RaffleFromApi): CreateRaffleFormState => {
@@ -42,6 +49,7 @@ export const formFromRaffle = (raffle: RaffleFromApi): CreateRaffleFormState => 
     raffle.prizeMediaType === RAFFLE_PRIZE_MEDIA_TYPE_VIDEO
       ? RAFFLE_PRIZE_MEDIA_TYPE_VIDEO
       : RAFFLE_PRIZE_MEDIA_TYPE_IMAGE;
+  const regionRaw = typeof raffle.regionCode === "string" ? raffle.regionCode.trim() : "";
 
   return {
     title: raffle.title ?? "",
@@ -52,6 +60,7 @@ export const formFromRaffle = (raffle: RaffleFromApi): CreateRaffleFormState => 
     prizeImageFocus: getRafflePrizeImageFocus(raffle),
     targetSales: String(raffle.targetSales ?? ""),
     instagramUrl: raffle.instagramUrl ?? "",
+    regionCode: isRuRegionCode(regionRaw) ? regionRaw : DEFAULT_VIEWER_REGION_CODE,
   };
 };
 
@@ -64,6 +73,7 @@ export const buildCreateRaffleSubmitBody = (form: CreateRaffleFormState) => ({
   prizeImageFocus: form.prizeImageFocus,
   targetSales: Number(form.targetSales),
   instagramUrl: form.instagramUrl.trim(),
+  regionCode: form.regionCode.trim(),
 });
 
 export const isCreateRaffleFormDirty = (form: CreateRaffleFormState): boolean =>
@@ -73,7 +83,8 @@ export const isCreateRaffleFormDirty = (form: CreateRaffleFormState): boolean =>
   form.prizeVideoUrl.trim() !== "" ||
   form.targetSales.trim() !== "" ||
   form.instagramUrl.trim() !== "" ||
-  form.prizeMediaType !== INITIAL_CREATE_RAFFLE_FORM.prizeMediaType;
+  form.prizeMediaType !== INITIAL_CREATE_RAFFLE_FORM.prizeMediaType ||
+  (Boolean(form.regionCode) && form.regionCode !== DEFAULT_VIEWER_REGION_CODE);
 
 export const validateCreateRaffleForm = (form: CreateRaffleFormState): string | null => {
   for (const stepId of CREATE_RAFFLE_WIZARD_STEPS) {

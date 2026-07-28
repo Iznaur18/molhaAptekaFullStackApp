@@ -13,6 +13,7 @@ import {
   buildCatalogPromotionSortStage,
   catalogPromotionSortBoostAddFieldsStage,
 } from "./productCatalogPromotionSort.js";
+import { withCatalogRegionPrioritySort } from "../user/userRegionCatalogFilter.js";
 
 const { ObjectId } = mongoose.Types;
 
@@ -107,7 +108,12 @@ const sellerLookupStages = () => [
   },
 ];
 
-const sortStageForCatalog = (sort, searchRank, buyerCity = null) => {
+const sortStageForCatalog = (
+  sort,
+  searchRank,
+  buyerCity = null,
+  viewerRegionCode = null,
+) => {
   const useSearchRank = Boolean(searchRank?.escapedRegexPattern);
   const stages = [];
 
@@ -127,7 +133,7 @@ const sortStageForCatalog = (sort, searchRank, buyerCity = null) => {
     stages.push(sortStage);
   }
 
-  return stages;
+  return withCatalogRegionPrioritySort(stages, viewerRegionCode);
 };
 
 /**
@@ -172,6 +178,7 @@ const searchRankAddFieldsStage = (searchRank) => ({
  * @param {number} limit
  * @param {{ escapedRegexPattern: string; categorySlugs: string[] } | null} [searchRank]
  * @param {string | null} [buyerCity]
+ * @param {string | null} [viewerRegionCode]
  */
 export const findProductsPage = async (
   productsQuery,
@@ -180,12 +187,18 @@ export const findProductsPage = async (
   limit,
   searchRank = null,
   buyerCity = null,
+  viewerRegionCode = null,
 ) => {
   const rankStage = searchRank?.escapedRegexPattern
     ? [searchRankAddFieldsStage(searchRank)]
     : [];
 
-  const sortPipeline = sortStageForCatalog(sort, searchRank, buyerCity);
+  const sortPipeline = sortStageForCatalog(
+    sort,
+    searchRank,
+    buyerCity,
+    viewerRegionCode,
+  );
 
   const Product = getCatalogProductModel();
 
@@ -196,7 +209,14 @@ export const findProductsPage = async (
     { $skip: skip },
     { $limit: limit },
     ...sellerLookupStages(),
-    { $project: { _searchRank: 0, _promotionSortTier: 0, _citySortPriority: 0 } },
+    {
+      $project: {
+        _searchRank: 0,
+        _promotionSortTier: 0,
+        _citySortPriority: 0,
+        _regionSortPriority: 0,
+      },
+    },
   ]);
 
   return attachProductSellerSnapshots(products);

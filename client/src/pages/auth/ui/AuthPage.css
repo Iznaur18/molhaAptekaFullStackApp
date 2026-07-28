@@ -1,9 +1,23 @@
 .auth-page {
+  --auth-page-column-max: 420px;
+
   position: relative;
   display: flex;
   flex-direction: column;
+  align-items: center;
   width: 100%;
   min-height: 100dvh;
+  background: var(--iz-color-surface);
+}
+
+.auth-page__column {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--auth-page-column-max);
+  min-height: 100%;
   background: var(--iz-color-surface);
 }
 
@@ -33,9 +47,7 @@
   flex-direction: column;
   gap: 8px;
   padding: 24px 24px calc(32px + env(safe-area-inset-bottom, 0px));
-  max-width: 420px;
   width: 100%;
-  margin: 0 auto;
   box-sizing: border-box;
 }
 

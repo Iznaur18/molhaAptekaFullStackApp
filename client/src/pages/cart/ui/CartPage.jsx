@@ -128,6 +128,22 @@ export function CartPage({
   const canCheckout = checkoutSummary.selectedLines.length > 0;
   const isCartEmpty = lines.length === 0 && auctionBids.length === 0;
   const isCheckoutSheetOpen = checkoutSheetOpen || auctionCheckoutBid != null;
+  const pickupAddressSummary = useMemo(() => {
+    if (auctionCheckoutBid) {
+      const product = (productsQuery.data ?? []).find(
+        (item) => String(item._id) === String(auctionCheckoutBid.productId),
+      );
+      return String(product?.productPickupAddress ?? "").trim();
+    }
+    const addresses = [];
+    for (const line of checkoutSummary.selectedLines) {
+      const address = String(line.product?.productPickupAddress ?? "").trim();
+      if (address && !addresses.includes(address)) {
+        addresses.push(address);
+      }
+    }
+    return addresses.join("; ");
+  }, [auctionCheckoutBid, checkoutSummary.selectedLines, productsQuery.data]);
   const totalLabel = checkoutSummary.hasPartialSelection
     ? CART_PAGE_UI.PURCHASABLE_TOTAL_LABEL
     : CART_PAGE_UI.TOTAL_LABEL;
@@ -145,6 +161,7 @@ export function CartPage({
   };
 
   const handleCheckoutSubmit = async ({
+    fulfillmentMethod,
     deliveryAddress,
     deliveryAddressFlat,
     paymentMethod,
@@ -156,6 +173,7 @@ export function CartPage({
         await createOrderMutation.mutateAsync({
           items: [{ productId: auctionCheckoutBid.productId, quantity: 1 }],
           priceOfferId: auctionCheckoutBid._id,
+          fulfillmentMethod,
           deliveryAddress,
           deliveryAddressFlat,
           paymentMethod,
@@ -188,6 +206,7 @@ export function CartPage({
           productId: line.productId,
           quantity: line.quantity,
         })),
+        fulfillmentMethod,
         deliveryAddress,
         deliveryAddressFlat,
         paymentMethod,
@@ -355,6 +374,7 @@ export function CartPage({
         isOpen={isCheckoutSheetOpen}
         onClose={closeCheckoutSheet}
         defaultDeliveryAddress={defaultAddress}
+        pickupAddressSummary={pickupAddressSummary}
         isSubmitting={submitState.isSubmitting}
         submitError={submitState.error}
         submitSuccess={submitState.success}

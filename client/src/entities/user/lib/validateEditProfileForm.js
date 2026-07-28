@@ -14,6 +14,8 @@ import {
   USER_ROLE_USER,
 } from "../model/userConstants.js";
 import { isUserBackgroundPresetId } from "../model/userBackgroundPresets.js";
+import { isRuRegionCode } from "@molha/api-contract";
+import { EDIT_PROFILE_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 
 const DISCOUNT_MIN = 0;
 const DISCOUNT_MAX = 100;
@@ -46,6 +48,11 @@ export function validateEditProfileForm(form, options = {}) {
 
   const addressError = validateRuStructuredDeliveryAddressForm(form.structuredAddress);
   if (addressError) return addressError;
+
+  if (!isRuRegionCode(form.userRegionCode)) {
+    return EDIT_PROFILE_MODAL_UI.ERROR_REGION_REQUIRED;
+  }
+
   if (String(form.notesAboutUser).length > NOTES_ABOUT_USER_MAX_CHARS) {
     return `О себе: не больше ${NOTES_ABOUT_USER_MAX_CHARS} символов`;
   }

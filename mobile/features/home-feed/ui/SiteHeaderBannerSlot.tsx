@@ -1,5 +1,6 @@
 import { SiteHeaderBannerCarousel } from "@/entities/site-header-banner/ui/SiteHeaderBannerCarousel";
 import { useSiteHeaderBannerSlidesQuery } from "@/entities/site-header-banner/model/useSiteHeaderBannerSlidesQuery";
+import { useViewerRegion } from "@/entities/region/model/ViewerRegionProvider";
 import { SkeletonShimmer } from "@/shared/ui/SkeletonShimmer";
 import { useHomeFeedSkeletonStyles } from "@/shared/theme/homeFeedSkeletonStyles";
 
@@ -13,15 +14,17 @@ export const SiteHeaderBannerSlot = ({
   edgeToEdge = false,
 }: SiteHeaderBannerSlotProps) => {
   const skeletonStyles = useHomeFeedSkeletonStyles();
-  const slidesQuery = useSiteHeaderBannerSlidesQuery({ enabled: visible });
+  const { viewerRegionCode } = useViewerRegion();
+  const slidesQuery = useSiteHeaderBannerSlidesQuery({
+    enabled: visible,
+    regionCode: viewerRegionCode,
+  });
   const slides = visible ? (slidesQuery.data ?? []) : [];
 
   if (!visible) {
     return null;
   }
 
-  // Резервируем высоту баннера на время загрузки, чтобы появление
-  // карусели не сдвигало ленту вниз.
   if (slidesQuery.isPending) {
     return (
       <SkeletonShimmer

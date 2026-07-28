@@ -97,7 +97,7 @@ export const HomeFeaturedRafflesSection = ({ raffles }: HomeFeaturedRafflesSecti
                           await deleteStaffMutation.mutateAsync(String(raffle._id));
                           await Promise.all([
                             queryClient.invalidateQueries({
-                              queryKey: raffleQueryKeys.featured(),
+                              queryKey: [...raffleQueryKeys.all, "featured"],
                             }),
                             queryClient.invalidateQueries({
                               queryKey: raffleQueryKeys.staffQueue(),

@@ -6,9 +6,13 @@ import type { RaffleFromApi } from "../model/types";
 
 export type FeaturedRaffle = RaffleFromApi;
 
-export const fetchFeaturedRaffles = async (): Promise<FeaturedRaffle[]> => {
+export const fetchFeaturedRaffles = async ({
+  regionCode,
+}: { regionCode?: string } = {}): Promise<FeaturedRaffle[]> => {
   try {
-    const { data } = await apiClient.get("/product/raffles/featured");
+    const { data } = await apiClient.get("/product/raffles/featured", {
+      params: regionCode ? { regionCode } : undefined,
+    });
     if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }

@@ -16,6 +16,7 @@ import { computeUserStoryFrameSize } from "@/entities/user-story/lib/computeUser
 import { resolveUserStoryMediaUrl } from "@/entities/user-story/lib/resolveUserStoryMediaUrl";
 import {
   USER_STORY_IMAGE_VIEW_DURATION_MS,
+  USER_STORY_MEDIA_TYPE_IMAGE,
   USER_STORY_MEDIA_TYPE_VIDEO,
 } from "@/entities/user-story/model/constants";
 import { useUserStoryMutations } from "@/entities/user-story/model/useUserStoryMutations";
@@ -62,6 +63,7 @@ export const UserStoryViewerModal = ({
   const [actionError, setActionError] = useState("");
   const [isMediaLoading, setIsMediaLoading] = useState(true);
   const [hasMediaError, setHasMediaError] = useState(false);
+  const [underlayImageUrl, setUnderlayImageUrl] = useState<string | null>(null);
 
   const authorKey = authorId ?? "";
   const isOwn =
@@ -78,6 +80,7 @@ export const UserStoryViewerModal = ({
       setActiveIndex(0);
       setIsReportOpen(false);
       setActionError("");
+      setUnderlayImageUrl(null);
     }
   }, [visible, authorId]);
 
@@ -85,6 +88,21 @@ export const UserStoryViewerModal = ({
     setIsMediaLoading(true);
     setHasMediaError(false);
   }, [activeStory?._id]);
+
+  useEffect(() => {
+    if (isMediaLoading || hasMediaError || !activeStory) {
+      return;
+    }
+    if (activeStory.mediaType !== USER_STORY_MEDIA_TYPE_IMAGE) {
+      setUnderlayImageUrl(null);
+      return;
+    }
+    const url = resolveUserStoryMediaUrl(activeStory.mediaUrl);
+    const timerId = setTimeout(() => {
+      setUnderlayImageUrl(url);
+    }, 340);
+    return () => clearTimeout(timerId);
+  }, [activeStory, hasMediaError, isMediaLoading]);
 
   useEffect(() => {
     const story = stories[activeIndex];
@@ -161,6 +179,11 @@ export const UserStoryViewerModal = ({
     ? resolveUserStoryMediaUrl(activeStory.mediaUrl)
     : "";
   const displayError = storiesQuery.isError ? USER_STORY_UI.ERROR_GENERIC : "";
+  const showUnderlay =
+    Boolean(underlayImageUrl) &&
+    underlayImageUrl !== resolvedMediaUrl &&
+    activeStory?.mediaType === USER_STORY_MEDIA_TYPE_IMAGE;
+  const keepPreviousFrame = showUnderlay && isMediaLoading;
 
   return (
     <>
@@ -250,7 +273,7 @@ export const UserStoryViewerModal = ({
                   </Pressable>
                 </View>
 
-                {isMediaLoading ? (
+                {isMediaLoading && !keepPreviousFrame ? (
                   <View style={styles.mediaState}>
                     <ActivityIndicator color={theme.colors.onContrast} size="small" />
                     <Text style={styles.mediaStateText}>{USER_STORY_UI.MEDIA_LOADING}</Text>
@@ -264,6 +287,13 @@ export const UserStoryViewerModal = ({
                 ) : null}
 
                 <View style={styles.mediaLayer} pointerEvents="none">
+                  {showUnderlay && underlayImageUrl ? (
+                    <Image
+                      source={{ uri: underlayImageUrl }}
+                      style={[styles.media, styles.mediaUnderlay]}
+                      contentFit="cover"
+                    />
+                  ) : null}
                   {activeStory.mediaType === USER_STORY_MEDIA_TYPE_VIDEO ? (
                     <ProductPreviewVideo
                       uri={resolvedMediaUrl}
@@ -278,8 +308,13 @@ export const UserStoryViewerModal = ({
                   ) : (
                     <Image
                       source={{ uri: resolvedMediaUrl }}
-                      style={[styles.media, isMediaLoading && styles.mediaHidden]}
+                      style={[
+                        styles.media,
+                        styles.mediaActive,
+                        isMediaLoading && styles.mediaHidden,
+                      ]}
                       contentFit="cover"
+                      transition={340}
                       onLoad={() => setIsMediaLoading(false)}
                       onError={() => {
                         setHasMediaError(true);

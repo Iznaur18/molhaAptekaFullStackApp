@@ -55,7 +55,8 @@ export const introAdQueryKeys = {
 export const sellerPersonalCategoryQueryKeys = {
   all: ["seller-personal-category"] as const,
   myCampaign: () => [...sellerPersonalCategoryQueryKeys.all, "me"] as const,
-  catalogTiles: () => [...sellerPersonalCategoryQueryKeys.all, "catalog-tiles"] as const,
+  catalogTiles: (regionCode = "") =>
+    [...sellerPersonalCategoryQueryKeys.all, "catalog-tiles", { regionCode }] as const,
   moderationPending: (limit = 50) =>
     [...sellerPersonalCategoryQueryKeys.all, "moderation", "pending", limit] as const,
   moderationManaged: () =>
@@ -90,15 +91,19 @@ export const priceOfferQueryKeys = {
 
 export const curatedProductListQueryKeys = {
   all: ["curated-product-lists"] as const,
-  home: (allCities = false) => [...curatedProductListQueryKeys.all, "home", { allCities }] as const,
+  home: (regionCode = "") =>
+    [...curatedProductListQueryKeys.all, "home", { regionCode }] as const,
 };
 
 export const raffleQueryKeys = {
   all: ["raffles"] as const,
-  featured: () => [...raffleQueryKeys.all, "featured"] as const,
+  featured: (regionCode = "") =>
+    [...raffleQueryKeys.all, "featured", { regionCode }] as const,
   my: () => [...raffleQueryKeys.all, "my"] as const,
   createAdvertising: () => [...raffleQueryKeys.all, "create-advertising"] as const,
-  products: (raffleId: string) => [...raffleQueryKeys.all, "products", raffleId] as const,
+  detail: (raffleId: string) => [...raffleQueryKeys.all, "detail", raffleId] as const,
+  products: (raffleId: string, params: { limit?: number } = {}) =>
+    [...raffleQueryKeys.all, "detail", raffleId, "products", params] as const,
   staffQueue: () => [...raffleQueryKeys.all, "staff", "queue"] as const,
   pendingCount: () => [...raffleQueryKeys.all, "staff", "pending-count"] as const,
 };

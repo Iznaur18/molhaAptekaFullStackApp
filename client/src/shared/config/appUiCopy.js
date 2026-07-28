@@ -376,12 +376,22 @@ export const EMAIL_VERIFICATION_UI = {
   DISMISS_NOTICE: "Закрыть уведомление",
 };
 
+/** Регион просмотра (главная / профиль) */
+export const REGION_UI = {
+  LABEL: "Регион",
+  VIEWER_LABEL: "Регион",
+  VIEWER_ARIA: "Регион просмотра каталога",
+  PLACEHOLDER: "Выберите регион",
+  SHEET_TITLE: "Регион",
+  SHEET_CLOSE: "Закрыть",
+  SEARCH_PLACEHOLDER: "Поиск региона…",
+  SEARCH_EMPTY: "Ничего не найдено",
+};
+
 /** Главная страница каталога */
 export const HOME_PAGE_UI = {
   PRODUCT_CATEGORY_FILTER_LIST_ID: "home-product-category-filter-list",
   LOADING_CATALOG: "Загрузка каталога…",
-  CATALOG_CITY_FILTER_BANNER: (city) => `Показаны товары для ${city}`,
-  CATALOG_CITY_FILTER_SHOW_ALL: "Все города",
   LOADING_SESSION: "Загрузка…",
   FETCH_PRODUCTS_FALLBACK: "Не удалось загрузить товары",
   FETCH_PROFILE_FALLBACK: "Не удалось загрузить профиль",
@@ -583,6 +593,8 @@ export const CART_PAGE_UI = {
   CHECKOUT_BLOCKED_NOTHING_SELECTED: "Выберите товары для оформления",
   CHECKOUT_BLOCKED_ALL_UNAVAILABLE: "Все товары недоступны",
   CHECKOUT_BLOCKED_OWN_PRODUCTS_ONLY: "Нельзя оформить заказ на свои товары",
+  CHECKOUT_BLOCKED_MISSING_PICKUP:
+    "У товаров нет адреса самовывоза — оформить заказ нельзя",
   /** @param {number} left */
   STOCK_REMAINING: (left) => `Осталось ${left} шт`,
   STOCK_QUANTITY_LIMITED: "Количество ограничено",
@@ -634,6 +646,11 @@ export const ADDRESS_DELIVERY_UI = {
 /** Форма оформления заказа */
 export const CHECKOUT_FORM_UI = {
   HEADING: "Оформление заказа",
+  LABEL_FULFILLMENT: "Способ получения",
+  FULFILLMENT_PICKUP: "Самовывоз",
+  FULFILLMENT_DELIVERY: "Доставка",
+  FULFILLMENT_DELIVERY_SOON: "Скоро",
+  PICKUP_ADDRESS_LABEL: "Адрес самовывоза",
   LABEL_DELIVERY_ADDRESS: "Адрес доставки",
   PLACEHOLDER_DELIVERY_ADDRESS: "Город, улица, дом",
   LABEL_FLAT: "Квартира / офис",
@@ -643,7 +660,24 @@ export const CHECKOUT_FORM_UI = {
   SUBMIT_LOADING: "Оформляем…",
   SUCCESS: "Заказ успешно оформлен",
   ERROR_GENERIC: "Не удалось оформить заказ",
+  ERROR_PICKUP_REQUIRED: "У товара нет адреса самовывоза — оформить заказ нельзя",
   ADDRESS_MAX_LENGTH: 30,
+};
+
+export const PRODUCT_PICKUP_UI = {
+  FULFILLMENT_LEGEND: "Как покупатель получит товар",
+  FULFILLMENT_PICKUP: "Самовывоз",
+  FULFILLMENT_DELIVERY: "Доставка",
+  SOON_BADGE: " · скоро",
+  PICKUP_HINT: "Укажите адрес и отметьте точку на карте (или выберите из подсказок).",
+  ADDRESS_LABEL: "Адрес самовывоза",
+  MAP_ARIA: "Карта точки самовывоза",
+  MAP_KEY_MISSING:
+    "Карта появится после добавления VITE_YANDEX_MAPS_API_KEY. Пока укажите адрес текстом или из подсказки.",
+  DETAILS_TITLE: "Самовывоз",
+  DETAILS_ROUTE: "Маршрут",
+  DETAILS_OPEN_MAP: "Открыть на карте",
+  DETAILS_NO_ADDRESS: "Адрес самовывоза не указан",
 };
 
 /** Подписи карточки заказа (используется на Мои покупки и Все заказы) */
@@ -817,13 +851,16 @@ export const SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI = {
   CANCEL_FALLBACK: "Не удалось отменить заявку",
   CANCEL_SUCCESS: "Заявка отменена. Баллы возвращены.",
   DESCRIPTION:
-    "Ваш баннер появится в карусели под шапкой на главной после модерации. Показ длится 7 дней. Одновременно доступно до 3 платных слотов.",
+    "Ваш баннер появится в карусели под шапкой на главной после модерации. Показ длится 7 дней. Одновременно доступно до 200 платных слотов.",
   STATUS_PENDING: "На модерации. Баллы зарезервированы.",
   STATUS_ACTIVE: "Показ активен.",
   SUBMIT: "Отправить на модерацию",
   CANCEL: "Отменить заявку",
   PREVIEW: "Предпросмотр",
   OPEN_FORM: "Оформить баннер",
+  LABEL_REGION: "Регион показа",
+  HINT_REGION: "Баннер увидят покупатели только этого региона.",
+  ERROR_REGION_REQUIRED: "Выберите регион показа",
 };
 
 /** Создание розыгрыша (вкладка «Реклама») */
@@ -835,7 +872,7 @@ export const RAFFLE_ADVERTISING_PAGE_UI = {
   UNLOCK_FALLBACK: "Не удалось оплатить создание розыгрыша",
   UNLOCK_SUCCESS: "Баллы зарезервированы. Заполните розыгрыш.",
   DESCRIPTION:
-    "Создайте розыгрыш для своих товаров. После оплаты 3000 баллов откроется форма заявки. После модерации розыгрыш появится на витрине. При отклонении баллы возвращаются.",
+    "Создайте розыгрыш для своих товаров. После оплаты 3000 баллов откроется форма заявки. После модерации розыгрыш появится на витрине (до 200 активных одновременно). При отклонении баллы возвращаются.",
   /** @param {number} price */
   PRICE: (price) => `${price} баллов`,
   COST_LABEL: "Стоимость",
@@ -881,7 +918,7 @@ export const SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI = {
 export const SELLER_PERSONAL_CATEGORY_PAGE_UI = {
   SECTION_TITLE: "Личная категория",
   SECTION_LEAD:
-    "Отдельная плитка в каталоге с вашим названием и картинкой. Все одобренные товары попадают и в глобальную категорию, и в личную. После модерации баллы списываются.",
+    "Отдельная плитка в каталоге с вашим названием и картинкой. Все одобренные товары попадают и в глобальную категорию, и в личную. После модерации баллы списываются. Одновременно на сайте до 200 активных личных категорий.",
   TILES_SECTION_TITLE: "Личные категории продавцов",
   TILES_LOADING: "Загрузка личных категорий…",
   FETCH_TILES_FALLBACK: "Не удалось загрузить личные категории",
@@ -895,6 +932,9 @@ export const SELLER_PERSONAL_CATEGORY_PAGE_UI = {
   CANCEL: "Отменить заявку",
   LABEL_NAME: "Название категории",
   LABEL_IMAGE: "Картинка плитки",
+  LABEL_REGION: "Регион показа",
+  HINT_REGION: "Плитка появится в каталоге только у покупателей этого региона.",
+  ERROR_REGION_REQUIRED: "Выберите регион показа",
   LABEL_DURATION: "Срок",
   /** @param {number} balance */
   BALANCE: (balance) => `Доступно: ${balance} баллов`,
@@ -1469,6 +1509,8 @@ export const CREATE_PRODUCT_MODAL_UI = {
   PLACEHOLDER_SALE_REGION: "Выберите регион",
   HINT_SALE_REGION: "Товар будет виден покупателям этого региона",
   ERROR_SALE_REGION_REQUIRED: "Выберите регион продажи",
+  LABEL_PICKUP_ADDRESS: "Адрес самовывоза",
+  ERROR_PICKUP_COORDS: "Укажите точку на карте или выберите адрес из подсказки",
   ERROR_CATEGORY_LEAF: "Выберите конечную подкатегорию в дереве категорий",
   LABEL_AVAILABLE: "Товар в наличии",
   LABEL_STOCK_QUANTITY: "Количество в наличии (шт.)",
@@ -1543,6 +1585,8 @@ export const CREATE_PRODUCT_MODAL_UI = {
     "До 5 фото, можно выбрать несколько сразу. Первое — обложка",
   WIZARD_STEP_CATEGORY_TITLE: "Категория и регион",
   WIZARD_STEP_CATEGORY_SUBTITLE: "Помогите покупателям найти товар в каталоге",
+  WIZARD_STEP_PICKUP_TITLE: "Самовывоз",
+  WIZARD_STEP_PICKUP_SUBTITLE: "Укажите адрес, куда покупатель сможет подъехать",
   WIZARD_STEP_COMMERCE_TITLE: "Цена и наличие",
   WIZARD_STEP_COMMERCE_SUBTITLE: "Укажите стоимость и сколько единиц готовы продать",
   WIZARD_STEP_RETURNS_TITLE: "Возврат",
@@ -1626,6 +1670,7 @@ export const CREATE_PRODUCT_MODAL_UI = {
   WIZARD_STEP_LABEL_ORIGINALITY: "Оригинал",
   WIZARD_STEP_LABEL_MEDIA: "Медиа",
   WIZARD_STEP_LABEL_CATEGORY: "Категория",
+  WIZARD_STEP_LABEL_PICKUP: "Самовывоз",
   WIZARD_STEP_LABEL_COMMERCE: "Цена",
   WIZARD_STEP_LABEL_RETURNS: "Возврат",
   WIZARD_STEP_LABEL_REVIEW: "Проверка",
@@ -1689,8 +1734,8 @@ export const PRODUCT_DETAILS_MODAL_UI = {
   RETURNS_SECTION_ARIA: "Условия возврата",
   RETURNS_PLACEHOLDER: "Сведения о возврате появятся позже.",
   RETURNS_NONE: "Возврат не предусмотрен.",
-  DELIVERY_TITLE: "Доставка",
-  DELIVERY_SECTION_ARIA: "Доставка",
+  DELIVERY_TITLE: "Получение",
+  DELIVERY_SECTION_ARIA: "Самовывоз и доставка",
   DELIVERY_IN_DEVELOPMENT: "В разработке",
   COPY_ID_ARIA: "Скопировать ID",
   COPY_ID_DONE_ARIA: "ID скопирован",
@@ -1986,6 +2031,9 @@ export const CREATE_RAFFLE_MODAL_UI = {
   WITHDRAW_CONFIRM: "Розыгрыш будет удалён с модерации. Восстановить нельзя.",
   WITHDRAW_SUCCESS: "Заявка отозвана. Можно создать новый розыгрыш.",
   ERROR_TITLE: "Укажите название",
+  ERROR_REGION_REQUIRED: "Выберите регион показа",
+  LABEL_REGION: "Регион показа",
+  HINT_REGION: "Розыгрыш увидят покупатели только этого региона.",
   ERROR_TARGET: "Укажите цель продаж (число ≥ 1)",
   ERROR_INSTAGRAM: "Укажите ссылку Instagram",
   ERROR_PRIZE_IMAGE: "Загрузите фото приза",
@@ -2117,6 +2165,7 @@ export const USERS_LOYALTY_RAFFLE_ADMIN_UI = {
 
 export const RAFFLE_PRODUCTS_PAGE_UI = {
   TITLE: "Товары розыгрыша",
+  EYEBROW: "Розыгрыш",
   LOADING: "Загрузка…",
   EMPTY: "Нет товаров в этом розыгрыше.",
 };
@@ -2508,7 +2557,6 @@ export const MY_PROFILE_PAGE_UI = {
   MOBILE_NAV_TOGGLE_ARIA: "Открыть меню разделов профиля",
   MOBILE_NAV_CLOSE_ARIA: "Закрыть меню разделов",
   MOBILE_NAV_CURRENT_SECTION: "Раздел",
-  PRIVACY_LINK: "Политика конфиденциальности",
 };
 
 export const THEME_SETTINGS_UI = {
@@ -2540,6 +2588,10 @@ export const EDIT_PROFILE_MODAL_UI = {
   LABEL_BIRTH: "Дата рождения",
   LABEL_GENDER: "Пол",
   LABEL_ADDRESS: "Адрес",
+  LABEL_REGION: "Регион просмотра",
+  HINT_REGION:
+    "Товары, баннеры и розыгрыши на главной показываются для этого региона. Адрес доставки — отдельно.",
+  ERROR_REGION_REQUIRED: "Выберите регион",
   LABEL_AVATAR: "Аватар",
   LABEL_AVATAR_URL: "Аватар (ссылка или файл)",
   LABEL_BACKGROUND: "Фон профиля",
@@ -2639,11 +2691,11 @@ export const CURATED_PRODUCT_COMPACT_CARD_UI = {
 /** Админка: подборки товаров на главной */
 export const POPULAR_PRODUCTS_ADMIN_PAGE_UI = {
   TITLE: "Популярные товары",
-  HINT: "Списки с заголовком и productId. На главной — только одобренные и доступные товары; недоступные удаляются автоматически.",
+  HINT: "Списки с заголовком, регионом и productId. На главной подборка видна только в своём регионе; товары должны быть того же региона.",
   SEARCH_PLACEHOLDER: "Заголовок или productId…",
   LOAD_ERROR: "Не удалось загрузить списки",
   CREATE_ERROR: "Не удалось создать список",
-  SAVE_ERROR: "Не удалось сохранить заголовок",
+  SAVE_ERROR: "Не удалось сохранить",
   DELETE_ERROR: "Не удалось удалить список",
   REORDER_ERROR: "Не удалось изменить порядок",
   ADD_ITEM_ERROR: "Не удалось добавить товар",
@@ -2651,9 +2703,11 @@ export const POPULAR_PRODUCTS_ADMIN_PAGE_UI = {
   EMPTY: "Списков нет — создайте первый",
   CREATE_HEADING: "Новый список",
   LIST_TITLE_LABEL: "Заголовок на главной",
+  LIST_REGION_LABEL: "Регион показа",
+  REGION_REQUIRED: "Укажите регион",
   TITLE_REQUIRED: "Укажите заголовок",
   CREATE_LIST: "Создать список",
-  SAVE_TITLE: "Сохранить заголовок",
+  SAVE_TITLE: "Сохранить",
   PRODUCT_ID_LABEL: "productId",
   PRODUCT_ID_PLACEHOLDER: "MongoDB ObjectId товара",
   PRODUCT_ID_REQUIRED: "Укажите productId",

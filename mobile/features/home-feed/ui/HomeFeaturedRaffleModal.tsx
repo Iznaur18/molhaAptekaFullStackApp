@@ -11,23 +11,32 @@ import {
   type NativeSyntheticEvent,
   type ViewToken,
 } from "react-native";
+import Animated from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import type { FeaturedRaffleManage, RaffleFromApi } from "@/entities/raffle/model/types";
 import { FeaturedRaffleModalCard } from "@/entities/raffle/ui/FeaturedRaffleModalCard";
 import { HOME_FEED_UI, RAFFLE_FEATURED_BANNER_UI, RAFFLE_FEATURED_CAROUSEL_UI } from "@/shared/config";
 import { nestedHorizontalScrollProps } from "@/shared/lib/nestedHorizontalScrollProps";
 import { resolveDialogAccessibilityProps } from "@/shared/lib/resolveDialogAccessibilityProps";
+import { useAdminEditModalAnimation } from "@/shared/model/useAdminEditModalAnimation";
 import {
+  FEATURED_RAFFLE_MODAL_ANIMATION,
   RAFFLE_FEATURED_LAYOUT,
   useFeaturedRaffleModalStyles,
 } from "@/shared/theme/raffleFeaturedStyles";
+import { SquircleView } from "@/shared/ui/SquircleView";
 
-const MODAL_HORIZONTAL_PADDING = 16;
-const MODAL_MAX_WIDTH = 480;
-const MODAL_HEIGHT_RATIO = 0.8;
 const VISUAL_SIZE_RATIO = 0.94;
 const CAROUSEL_WINDOW_SIZE = 3;
 const CAROUSEL_VIEWABILITY_THRESHOLD = 60;
+
+const SHEET_CORNER_RADII = {
+  topLeft: FEATURED_RAFFLE_MODAL_ANIMATION.sheetRadius,
+  topRight: FEATURED_RAFFLE_MODAL_ANIMATION.sheetRadius,
+  bottomLeft: 0,
+  bottomRight: 0,
+} as const;
 
 const ActiveRaffleSlideIndexContext = createContext(0);
 
@@ -83,24 +92,39 @@ export const HomeFeaturedRaffleModal = ({
   getManage,
 }: HomeFeaturedRaffleModalProps) => {
   const styles = useFeaturedRaffleModalStyles();
+  const insets = useSafeAreaInsets();
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const listRef = useRef<FlatList<RaffleFromApi>>(null);
   const activeIndexRef = useRef(0);
 
-  const cardWidth = Math.min(
-    Math.max(0, windowWidth - MODAL_HORIZONTAL_PADDING * 2),
-    MODAL_MAX_WIDTH,
-  );
-  const dialogHeight = Math.round(windowHeight * MODAL_HEIGHT_RATIO);
+  const sheetSlideDistance = useMemo(() => windowHeight, [windowHeight]);
+  const { modalVisible, backdropAnimatedStyle, sheetAnimatedStyle } =
+    useAdminEditModalAnimation(visible, {
+      sheetSlideDistance,
+      enterMs: FEATURED_RAFFLE_MODAL_ANIMATION.enterMs,
+      exitMs: FEATURED_RAFFLE_MODAL_ANIMATION.exitMs,
+    });
+
+  const cardWidth = Math.max(0, windowWidth);
+  const dialogHeight = Math.round(windowHeight * FEATURED_RAFFLE_MODAL_ANIMATION.heightRatio);
   const visualSize = Math.round(cardWidth * VISUAL_SIZE_RATIO);
+  const visualInset = Math.max(0, Math.round((cardWidth - visualSize) / 2));
   const snapInterval = cardWidth + RAFFLE_FEATURED_LAYOUT.slideGap;
   const activeRaffle = raffles[activeIndex] ?? raffles[0] ?? null;
 
   const contentContainerStyle = useMemo(
     () => ({ gap: RAFFLE_FEATURED_LAYOUT.slideGap }),
     [],
+  );
+  const scrollContentStyle = useMemo(
+    () => [styles.scrollContent, { paddingTop: visualInset }],
+    [styles.scrollContent, visualInset],
+  );
+  const footerStyle = useMemo(
+    () => [styles.footer, { paddingBottom: Math.max(12, insets.bottom) }],
+    [insets.bottom, styles.footer],
   );
 
   useEffect(() => {
@@ -187,7 +211,7 @@ export const HomeFeaturedRaffleModal = ({
     [cardWidth, getManage, visible, visualSize],
   );
 
-  if (raffles.length === 0) {
+  if (raffles.length === 0 || !modalVisible) {
     return null;
   }
 
@@ -235,57 +259,66 @@ export const HomeFeaturedRaffleModal = ({
 
   return (
     <Modal
-      visible={visible}
-      animationType="fade"
+      visible={modalVisible}
+      animationType="none"
       transparent
       onRequestClose={onClose}
       statusBarTranslucent
     >
       <View style={styles.overlay}>
-        <Pressable
-          style={styles.backdropPressable}
-          accessibilityRole="button"
-          accessibilityLabel={RAFFLE_FEATURED_BANNER_UI.CLOSE}
-          onPress={onClose}
-        />
-        <View
-          style={[styles.dialog, { width: cardWidth, height: dialogHeight }]}
-          {...resolveDialogAccessibilityProps()}
-          accessibilityLabel={HOME_FEED_UI.RAFFLES_SECTION_ARIA}
+        <Animated.View
+          style={[styles.backdrop, backdropAnimatedStyle]}
+          pointerEvents="box-none"
         >
-          <View style={styles.header}>
-            <Pressable
-              style={styles.closeButton}
-              accessibilityRole="button"
-              accessibilityLabel={RAFFLE_FEATURED_BANNER_UI.CLOSE}
-              onPress={onClose}
-              hitSlop={8}
-            >
-              <Text style={styles.closeButtonText}>{RAFFLE_FEATURED_BANNER_UI.CLOSE}</Text>
-            </Pressable>
-          </View>
+          <Pressable
+            style={styles.backdropPressable}
+            accessibilityRole="button"
+            accessibilityLabel={RAFFLE_FEATURED_BANNER_UI.CLOSE}
+            onPress={onClose}
+          />
+        </Animated.View>
 
-          <ScrollView
-            style={styles.scroll}
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}
-            bounces={false}
+        <Animated.View
+          style={[styles.dialogShell, { height: dialogHeight }, sheetAnimatedStyle]}
+        >
+          <SquircleView
+            cornerRadii={SHEET_CORNER_RADII}
+            style={styles.dialog}
+            shadowStyle={styles.dialogShadow}
+            {...resolveDialogAccessibilityProps()}
+            accessibilityLabel={HOME_FEED_UI.RAFFLES_SECTION_ARIA}
           >
-            {body}
-          </ScrollView>
-
-          <View style={styles.footer}>
-            <Pressable
-              style={styles.footerButton}
-              accessibilityRole="button"
-              onPress={handleOpenProducts}
+            <ScrollView
+              style={styles.scroll}
+              contentContainerStyle={scrollContentStyle}
+              showsVerticalScrollIndicator={false}
+              bounces={false}
             >
-              <Text style={styles.footerButtonText}>
-                {RAFFLE_FEATURED_BANNER_UI.OPEN_PRODUCTS}
-              </Text>
-            </Pressable>
-          </View>
-        </View>
+              {body}
+            </ScrollView>
+
+            <View style={footerStyle}>
+              <Pressable
+                style={styles.footerButton}
+                accessibilityRole="button"
+                onPress={handleOpenProducts}
+              >
+                <Text style={styles.footerButtonText}>
+                  {RAFFLE_FEATURED_BANNER_UI.OPEN_PRODUCTS}
+                </Text>
+              </Pressable>
+              <Pressable
+                style={styles.footerClose}
+                accessibilityRole="button"
+                accessibilityLabel={RAFFLE_FEATURED_BANNER_UI.CLOSE}
+                onPress={onClose}
+                hitSlop={8}
+              >
+                <Text style={styles.footerCloseText}>{RAFFLE_FEATURED_BANNER_UI.CLOSE}</Text>
+              </Pressable>
+            </View>
+          </SquircleView>
+        </Animated.View>
       </View>
     </Modal>
   );

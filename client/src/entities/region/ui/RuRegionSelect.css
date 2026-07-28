@@ -1,0 +1,70 @@
+.ru-region-select {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.ru-region-select__native {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.ru-region-select__trigger {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: var(--iz-control-field-padding-y) var(--iz-control-field-padding-x);
+  border: var(--iz-border-hairline) solid var(--iz-color-border);
+  border-radius: var(--iz-control-input-radius);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
+  font: inherit;
+  font-size: var(--iz-control-input-font);
+  line-height: var(--iz-leading-lg);
+  text-align: left;
+  cursor: pointer;
+  appearance: none;
+}
+
+.ru-region-select__trigger:focus-visible {
+  border-color: var(--iz-color-action);
+  outline: none;
+  box-shadow: var(--iz-shadow-input-focus);
+}
+
+.ru-region-select__trigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.ru-region-select__value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ru-region-select__value--placeholder {
+  color: var(--iz-color-text-muted);
+}
+
+.ru-region-select__chevron {
+  flex-shrink: 0;
+  font-size: 1.15em;
+  line-height: 1;
+  color: var(--iz-color-text-muted);
+}

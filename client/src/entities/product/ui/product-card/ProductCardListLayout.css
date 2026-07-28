@@ -1,0 +1,92 @@
+/* List layout — staff moderation queue (and any isModerationQueue card). */
+
+.product-card--list {
+  flex-direction: column;
+  gap: 0.75rem;
+  height: auto;
+  padding: 0.85rem 1rem;
+}
+
+.product-card--list > .product-card__body,
+.product-card--list > .product-card__details-surface {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 0.85rem 1rem;
+  align-items: start;
+}
+
+.product-card--list .product-card__image-frame {
+  width: 112px;
+  aspect-ratio: 1;
+  margin: 0;
+  border-radius: 0.65rem;
+  overflow: hidden;
+}
+
+.product-card--list .product-card__heading {
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  font-size: 1.05rem;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.product-card--list .product-card__price .product-price-display__current,
+.product-card--list .product-card__price-value {
+  font-size: 1.2rem;
+}
+
+.product-card--list .product-card__fields,
+.product-card--list .product-card__fields--preview {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.product-card--list .product-card__row {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0, 1fr);
+  gap: 0.35rem 0.75rem;
+  align-items: baseline;
+  font-size: 0.9rem;
+}
+
+.product-card--list .product-card__footer-slot,
+.product-card--list .product-card__footer-actions {
+  width: 100%;
+}
+
+.product-card--list .product-moderation-details-footer__reject-input {
+  min-height: 4.5rem;
+  font-size: 1rem;
+}
+
+.product-card--list .product-moderation-details-footer__actions {
+  gap: 0.65rem;
+}
+
+.product-card--list .product-moderation-details-footer__btn {
+  min-height: 2.75rem;
+  padding: 0.55rem 1.1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .product-card--list > .product-card__body,
+  .product-card--list > .product-card__details-surface {
+    grid-template-columns: 88px minmax(0, 1fr);
+    gap: 0.65rem;
+  }
+
+  .product-card--list .product-card__image-frame {
+    width: 88px;
+  }
+
+  .product-card--list .product-card__row {
+    grid-template-columns: 1fr;
+    gap: 0.15rem;
+  }
+}

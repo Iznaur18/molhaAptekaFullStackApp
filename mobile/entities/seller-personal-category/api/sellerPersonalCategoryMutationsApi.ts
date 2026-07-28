@@ -8,6 +8,7 @@ export const submitSellerPersonalCategoryCampaign = async (body: {
   labelRu: string;
   imageUrl: string;
   tariffCode: string;
+  regionCode: string;
 }) => {
   try {
     const parsedBody = submitSellerPersonalCategoryCampaignBodySchema.parse(body);

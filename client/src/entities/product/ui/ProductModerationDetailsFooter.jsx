@@ -1,4 +1,9 @@
-import { PRODUCT_MODERATION_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import { useEffect, useState } from "react";
+
+import {
+  PRODUCT_CARD_UI,
+  PRODUCT_MODERATION_PAGE_UI,
+} from "../../../shared/config/appUiCopy.js";
 
 import "./ProductModerationDetailsFooter.css";
 
@@ -8,6 +13,9 @@ import "./ProductModerationDetailsFooter.css";
  *   onRejectCommentChange: (value: string) => void;
  *   onApprove: () => void;
  *   onReject: () => void;
+ *   onDelete?: () => void | Promise<void>;
+ *   canDelete?: boolean;
+ *   hasOpenSales?: boolean;
  *   isBusy?: boolean;
  *   errorMessage?: string;
  * }} props
@@ -17,9 +25,18 @@ export function ProductModerationDetailsFooter({
   onRejectCommentChange,
   onApprove,
   onReject,
+  onDelete,
+  canDelete = false,
+  hasOpenSales = false,
   isBusy = false,
   errorMessage = "",
 }) {
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+
+  useEffect(() => {
+    setIsDeleteConfirmOpen(false);
+  }, [onDelete]);
+
   return (
     <div className="product-moderation-details-footer">
       {errorMessage ? (
@@ -33,7 +50,7 @@ export function ProductModerationDetailsFooter({
           className="product-moderation-details-footer__reject-input"
           rows={3}
           value={rejectComment}
-          disabled={isBusy}
+          disabled={isBusy || isDeleteConfirmOpen}
           placeholder={PRODUCT_MODERATION_PAGE_UI.REJECT_COMMENT_PLACEHOLDER}
           onChange={(event) => onRejectCommentChange(event.target.value)}
         />
@@ -42,7 +59,7 @@ export function ProductModerationDetailsFooter({
         <button
           type="button"
           className="product-moderation-details-footer__btn product-moderation-details-footer__btn_approve"
-          disabled={isBusy}
+          disabled={isBusy || isDeleteConfirmOpen}
           onClick={onApprove}
         >
           {isBusy
@@ -52,11 +69,52 @@ export function ProductModerationDetailsFooter({
         <button
           type="button"
           className="product-moderation-details-footer__btn product-moderation-details-footer__btn_reject"
-          disabled={isBusy}
+          disabled={isBusy || isDeleteConfirmOpen}
           onClick={onReject}
         >
           {PRODUCT_MODERATION_PAGE_UI.REJECT}
         </button>
+        {canDelete && typeof onDelete === "function" ? (
+          hasOpenSales ? (
+            <p className="product-moderation-details-footer__open-sales-hint">
+              {PRODUCT_CARD_UI.OPEN_SALES_LOCKED_HINT}
+            </p>
+          ) : isDeleteConfirmOpen ? (
+            <>
+              <p className="product-moderation-details-footer__delete-confirm-question">
+                {PRODUCT_CARD_UI.DELETE_CONFIRM_QUESTION}
+              </p>
+              <button
+                type="button"
+                className="product-moderation-details-footer__btn product-moderation-details-footer__btn_delete"
+                disabled={isBusy}
+                onClick={() => {
+                  setIsDeleteConfirmOpen(false);
+                  void onDelete();
+                }}
+              >
+                {PRODUCT_CARD_UI.DELETE_CONFIRM_YES}
+              </button>
+              <button
+                type="button"
+                className="product-moderation-details-footer__btn product-moderation-details-footer__btn_reject"
+                disabled={isBusy}
+                onClick={() => setIsDeleteConfirmOpen(false)}
+              >
+                {PRODUCT_CARD_UI.DELETE_CONFIRM_CANCEL}
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              className="product-moderation-details-footer__btn product-moderation-details-footer__btn_delete"
+              disabled={isBusy}
+              onClick={() => setIsDeleteConfirmOpen(true)}
+            >
+              {PRODUCT_CARD_UI.DELETE_PRODUCT}
+            </button>
+          )
+        ) : null}
       </div>
     </div>
   );

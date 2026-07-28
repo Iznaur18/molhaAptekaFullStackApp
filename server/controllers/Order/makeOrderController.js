@@ -10,6 +10,7 @@ export const makeOrderController = async (req, res) => {
     items: req.body.items,
     paymentMethod: req.body.paymentMethod,
     priceOfferId: req.body.priceOfferId,
+    fulfillmentMethod: req.body.fulfillmentMethod,
     verifiedDeliveryAddress: req.verifiedDeliveryAddress,
   });
 

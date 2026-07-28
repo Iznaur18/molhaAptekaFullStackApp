@@ -233,12 +233,26 @@
 }
 
 .product-card__rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
   margin: 0.15rem 0 0;
   font-size: 0.82rem;
   font-weight: 600;
-  color: var(--iz-color-warning-text);
+  color: var(--iz-color-text-muted);
   min-height: 1.25rem;
   line-height: 1.35;
+}
+
+.product-card__rating-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.18rem;
+}
+
+.product-card__rating-count-icon {
+  flex-shrink: 0;
+  color: currentColor;
 }
 
 .product-card__rating--placeholder {

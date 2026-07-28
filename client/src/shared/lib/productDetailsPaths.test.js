@@ -4,13 +4,15 @@ import {
   isProductDetailsPath,
   parseProductIdFromPathname,
   shouldProxyProductPathToApi,
+  shouldServeProductDetailsAsSpa,
 } from "./productDetailsPaths.js";
 
 const PRODUCT_ID = "6a5f4784728ddac6b18324ad";
+const DETAILS_PATH = `/product/${PRODUCT_ID}`;
 
 describe("productDetailsPaths", () => {
   it("parseProductIdFromPathname: mongo id in SPA path", () => {
-    expect(parseProductIdFromPathname(`/product/${PRODUCT_ID}`)).toBe(PRODUCT_ID);
+    expect(parseProductIdFromPathname(DETAILS_PATH)).toBe(PRODUCT_ID);
   });
 
   it("parseProductIdFromPathname: rejects API-like single segments", () => {
@@ -19,16 +21,26 @@ describe("productDetailsPaths", () => {
   });
 
   it("isProductDetailsPath", () => {
-    expect(isProductDetailsPath(`/product/${PRODUCT_ID}`)).toBe(true);
+    expect(isProductDetailsPath(DETAILS_PATH)).toBe(true);
     expect(isProductDetailsPath("/product/my")).toBe(false);
   });
 
-  it("shouldProxyProductPathToApi: SPA vs API under /product", () => {
+  it("shouldServeProductDetailsAsSpa: only html document accept", () => {
+    expect(shouldServeProductDetailsAsSpa(DETAILS_PATH, "text/html")).toBe(true);
+    expect(
+      shouldServeProductDetailsAsSpa(DETAILS_PATH, "application/json, text/plain, */*"),
+    ).toBe(false);
+    expect(shouldServeProductDetailsAsSpa("/product/my", "text/html")).toBe(false);
+  });
+
+  it("shouldProxyProductPathToApi: XHR to /product/:id goes to API", () => {
     expect(shouldProxyProductPathToApi("/product")).toBe(true);
-    expect(shouldProxyProductPathToApi(`/product/${PRODUCT_ID}`)).toBe(false);
-    expect(shouldProxyProductPathToApi(`/product/${PRODUCT_ID}/catalog`)).toBe(
-      true,
-    );
+    expect(shouldProxyProductPathToApi(DETAILS_PATH)).toBe(true);
+    expect(
+      shouldProxyProductPathToApi(DETAILS_PATH, "application/json, text/plain, */*"),
+    ).toBe(true);
+    expect(shouldProxyProductPathToApi(DETAILS_PATH, "text/html")).toBe(false);
+    expect(shouldProxyProductPathToApi(`${DETAILS_PATH}/catalog`)).toBe(true);
     expect(shouldProxyProductPathToApi("/product/my")).toBe(true);
     expect(shouldProxyProductPathToApi("/product/categories/roots")).toBe(true);
   });

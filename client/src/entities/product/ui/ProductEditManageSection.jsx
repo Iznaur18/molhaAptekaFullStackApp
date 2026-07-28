@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 import { isProductRaffleParticipant } from "../../raffle/lib/isProductRaffleParticipant.js";
 import { PRODUCT_CARD_UI } from "../../../shared/config/appUiCopy.js";
 import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
@@ -11,10 +13,13 @@ import "./ProductEditManageSection.css";
  *   product: import("../model/types.js").ProductFromApi;
  *   onSetAvailability?: (productId: string, productIsAvailable: boolean) => void | Promise<void>;
  *   onSetAuction?: (productId: string, productAuctionEnabled: boolean) => void | Promise<void>;
+ *   onDelete?: (productId: string) => void | Promise<void>;
  *   isAvailabilityTogglePending?: boolean;
  *   isAuctionTogglePending?: boolean;
+ *   isDeletePending?: boolean;
  *   errorMessage?: string;
  *   canEdit?: boolean;
+ *   canDelete?: boolean;
  *   canToggleVisibility?: boolean;
  *   sellerRaffleActive?: boolean;
  *   onToggleRaffleParticipation?: (
@@ -31,10 +36,13 @@ export function ProductEditManageSection({
   product,
   onSetAvailability,
   onSetAuction,
+  onDelete,
   isAvailabilityTogglePending = false,
   isAuctionTogglePending = false,
+  isDeletePending = false,
   errorMessage = "",
   canEdit = true,
+  canDelete = false,
   canToggleVisibility = true,
   sellerRaffleActive = false,
   onToggleRaffleParticipation,
@@ -43,6 +51,7 @@ export function ProductEditManageSection({
   onOpenInstallmentProgram,
   canOpenInstallmentProgram = true,
 }) {
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const isListedForOthers = product.productIsAvailable !== false;
   const hasOpenSalesLocked = product.hasOpenSales === true;
   const showVisibility = typeof onSetAvailability === "function" && canToggleVisibility;
@@ -52,22 +61,30 @@ export function ProductEditManageSection({
   const showRaffleToggle =
     sellerRaffleActive && typeof onToggleRaffleParticipation === "function";
   const showInstallmentButton = typeof onOpenInstallmentProgram === "function";
+  const showDelete = canDelete && typeof onDelete === "function";
   const isRaffleParticipant = isProductRaffleParticipant(product);
   const canOpenInstallment =
     canOpenInstallmentProgram &&
     (product.productModerationStatus ?? PRODUCT_MODERATION_APPROVED) ===
       PRODUCT_MODERATION_APPROVED;
-  const showOpenSalesHint = hasOpenSalesLocked && (showAuctionToggle || showVisibility);
+  const showOpenSalesHint =
+    hasOpenSalesLocked && (showAuctionToggle || showVisibility || showDelete);
 
   const actionsLocked =
     disabled ||
     isAvailabilityTogglePending ||
     isAuctionTogglePending ||
     isRaffleParticipationPending ||
+    isDeletePending ||
+    isDeleteConfirmOpen ||
     !canEdit;
 
   const auctionActionsLocked = actionsLocked || hasOpenSalesLocked;
   const visibilityActionsLocked = actionsLocked || hasOpenSalesLocked;
+
+  useEffect(() => {
+    setIsDeleteConfirmOpen(false);
+  }, [product._id, onDelete]);
 
   return (
     <section
@@ -117,6 +134,7 @@ export function ProductEditManageSection({
               isRaffleParticipationPending ||
               isAvailabilityTogglePending ||
               isAuctionTogglePending ||
+              isDeletePending ||
               disabled
             }
             pending={isRaffleParticipationPending}
@@ -136,6 +154,7 @@ export function ProductEditManageSection({
               isAvailabilityTogglePending ||
               isAuctionTogglePending ||
               isRaffleParticipationPending ||
+              isDeletePending ||
               !canOpenInstallment
             }
             variant="installment"
@@ -163,6 +182,57 @@ export function ProductEditManageSection({
           />
         ) : null}
       </div>
+      {showDelete ? (
+        <div className="product-edit-manage__delete">
+          {isDeletePending ? (
+            <p className="product-edit-manage__delete-pending" aria-live="polite">
+              {PRODUCT_CARD_UI.DELETE_PRODUCT_PENDING}
+            </p>
+          ) : isDeleteConfirmOpen ? (
+            <div className="product-edit-manage__delete-confirm" role="group">
+              <p className="product-edit-manage__delete-confirm-question">
+                {PRODUCT_CARD_UI.DELETE_CONFIRM_QUESTION}
+              </p>
+              <div className="product-edit-manage__delete-confirm-actions">
+                <button
+                  type="button"
+                  className="product-edit-manage__delete-confirm-yes"
+                  onClick={() => {
+                    if (product._id == null) {
+                      return;
+                    }
+                    setIsDeleteConfirmOpen(false);
+                    void onDelete(String(product._id));
+                  }}
+                >
+                  {PRODUCT_CARD_UI.DELETE_CONFIRM_YES}
+                </button>
+                <button
+                  type="button"
+                  className="product-edit-manage__delete-confirm-cancel"
+                  onClick={() => setIsDeleteConfirmOpen(false)}
+                >
+                  {PRODUCT_CARD_UI.DELETE_CONFIRM_CANCEL}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              className="product-edit-manage__delete-btn"
+              disabled={disabled || hasOpenSalesLocked}
+              onClick={() => setIsDeleteConfirmOpen(true)}
+            >
+              <span className="product-edit-manage__delete-btn-title">
+                {CREATE_PRODUCT_MODAL_UI.MANAGE_DELETE_TITLE}
+              </span>
+              <span className="product-edit-manage__delete-btn-hint">
+                {CREATE_PRODUCT_MODAL_UI.MANAGE_DELETE_HINT}
+              </span>
+            </button>
+          )}
+        </div>
+      ) : null}
     </section>
   );
 }

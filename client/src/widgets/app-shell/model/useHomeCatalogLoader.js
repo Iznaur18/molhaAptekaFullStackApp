@@ -4,7 +4,6 @@ import { useCatalogBrowserLanding } from "./useCatalogBrowserLanding.js";
 import { useCatalogFilterState } from "./useCatalogFilterState.js";
 import { useCatalogQuerySync } from "./useCatalogQuerySync.js";
 import { useCatalogProductsInfiniteQuery } from "../../../entities/product/model/useCatalogProductsInfiniteQuery.js";
-import { CATALOG_QUERY_PARAM_ALL_CITIES } from "../../../entities/product/lib/catalogCatalogQuery.js";
 import { useAppShellCompactLayout } from "../../../shared/lib/useAppShellCompactLayout.js";
 
 /**
@@ -28,6 +27,7 @@ export const useHomeCatalogLoader = ({
   setProductSearchTerm,
   initialCatalogQuery,
   onCatalogError,
+  viewerRegionCode,
 }) => {
   const isCompactLayout = useAppShellCompactLayout();
 
@@ -67,6 +67,7 @@ export const useHomeCatalogLoader = ({
     setIsProductCategoryListOpen,
     setProductSearchTerm,
     onCatalogError,
+    viewerRegionCode,
   });
 
   useCatalogQuerySync({
@@ -106,6 +107,7 @@ export const useHomeCatalogLoader = ({
     selectedProductCategory: filters.selectedProductCategory,
     catalogSort: filters.catalogSort,
     myProductsModerationFilter,
+    viewerRegionCode,
   });
 
   // Спиннер в поле поиска — про реальную загрузку отправленного запроса
@@ -122,18 +124,6 @@ export const useHomeCatalogLoader = ({
     },
     [filters.setSelectedProductCategory, setIsProductCategoryListOpen],
   );
-
-  const handleShowAllCatalogCities = useCallback(() => {
-    const params = new URLSearchParams(location.search);
-    params.set(CATALOG_QUERY_PARAM_ALL_CITIES, "true");
-    navigate(
-      {
-        pathname: location.pathname,
-        search: `?${params.toString()}`,
-      },
-      { replace: true },
-    );
-  }, [location.pathname, location.search, navigate]);
 
   return {
     selectedProductCategory: filters.selectedProductCategory,
@@ -193,7 +183,5 @@ export const useHomeCatalogLoader = ({
     handleSubcategoryPickerViewAll: browser.handleSubcategoryPickerViewAll,
     handleSubcategoryPickerCategoryClick: browser.handleSubcategoryPickerCategoryClick,
     resetCatalogFollowingOnLogout: filters.resetCatalogFollowingOnLogout,
-    catalogAllCities: filters.catalogQueryFromUrl.allCities,
-    handleShowAllCatalogCities,
   };
 };

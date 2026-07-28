@@ -146,9 +146,18 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    # SPA: /product/:mongoId — до общего /product/ API (см. productDetailsPaths.js)
+    # SPA document: /product/:mongoId (тот же URL, что GET/PATCH /product/:id API —
+    # XHR с Accept: application/json уходит в API; text/html → index.html)
     location ~ ^/product/[a-f\d]{24}$ {
-        try_files $uri /index.html;
+        if ($http_accept ~* ^text/html) {
+            rewrite ^ /index.html last;
+        }
+        proxy_pass http://izibuy_api;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 
     location /product/ {

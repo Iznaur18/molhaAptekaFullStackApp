@@ -20,6 +20,7 @@ import { siteHeaderBannerCampaignQueryKeys } from "../../../entities/site-header
 import { loyaltyPointsQueryKeys } from "../../../entities/user/model/loyaltyPointsQueryKeys.js";
 import { SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { ImageUrlField } from "../../../shared/ui/ImageUrlField/ImageUrlField.jsx";
+import { RuRegionSelect } from "../../../entities/region/ui/RuRegionSelect.jsx";
 
 const DURATION_BADGE = "7 дней";
 
@@ -253,6 +254,19 @@ export function SiteHeaderBannerAdvertisingSection({ isAuthorized, loyaltyBalanc
               value={form.imageUrl}
               onChange={(value) => updateField("imageUrl", value)}
             />
+            <label className="advertising-page__field">
+              {SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI.LABEL_REGION}
+              <RuRegionSelect
+                className="advertising-page__input"
+                value={form.regionCode}
+                disabled={isSubmitting}
+                required
+                onChange={(regionCode) => updateField("regionCode", regionCode)}
+              />
+              <span className="advertising-page__hint">
+                {SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI.HINT_REGION}
+              </span>
+            </label>
             <label className="advertising-page__field">
               Alt-текст
               <input

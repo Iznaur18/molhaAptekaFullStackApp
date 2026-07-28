@@ -108,7 +108,7 @@ test("mobile product detail stat rows match web modal stats grid layout", () => 
   assert.doesNotMatch(keyStatBlock, /textTransform:\s*"uppercase"/);
   assert.match(styles, /valueStat:[\s\S]*textAlign:\s*"right"/);
   assert.match(fieldRows, /numberOfLines=\{isStatRow \? 1 : undefined\}/);
-  assert.match(registry, /productSaleCity:\s*"Город продажи"/);
+  assert.match(registry, /productRegionCode:\s*"Регион продажи"/);
 });
 
 test("mobile product description panel matches web content-switcher chrome", () => {

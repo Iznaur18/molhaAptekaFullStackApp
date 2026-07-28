@@ -17,6 +17,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { CatalogListFilters, CatalogSort } from "@/entities/product/model/catalogListFilters";
 import { buildCatalogListScopeKey } from "@/entities/product/lib/shouldRetainCatalogListPlaceholderData";
 import { useCatalogProductsInfiniteQuery } from "@/entities/product/model/useCatalogProductsInfiniteQuery";
+import { useViewerRegion } from "@/entities/region/model/ViewerRegionProvider";
 import { buildCatalogGridRows } from "@/features/catalog-grid/lib/buildCatalogGridRows";
 import type { CatalogGridRow } from "@/features/catalog-grid/lib/buildCatalogGridRows";
 import { catalogGridListPerformanceProps } from "@/features/catalog-grid/lib/catalogGridListPerformanceProps";
@@ -121,6 +122,7 @@ export default function CatalogScreen() {
     string | null
   >(null);
   const [feedFilters, setFeedFilters] = useState<FeedFiltersState>(EMPTY_FEED_FILTERS);
+  const { viewerRegionCode } = useViewerRegion();
   // Пересечение типов: рантайм-реф Reanimated отдаёт внутренний FlatList
   // (нужен useScrollToTop), а проп ref анимированного списка требует
   // Animated.FlatList.
@@ -188,6 +190,7 @@ export default function CatalogScreen() {
       auctionOnly: feedFilters.auctionOnly || undefined,
       installmentOnly: feedFilters.installmentOnly || undefined,
       saleOnly: feedFilters.saleOnly || undefined,
+      regionCode: viewerRegionCode || undefined,
     }),
     [
       submittedSearch,
@@ -195,6 +198,7 @@ export default function CatalogScreen() {
       selectedRootSlug,
       selectedSubcategoryId,
       selectedSellerPersonalCategoryId,
+      viewerRegionCode,
     ],
   );
 

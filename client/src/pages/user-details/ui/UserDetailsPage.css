@@ -1,6 +1,6 @@
 /**
  * Паритет mobile:
- * - Stack.Screen title «Профиль» + back (`app/user/[id]`)
+ * - back рядом с displayName (`app/user/[id]`)
  * - `useUserDetailsPageStyles.scrollContent`: paddingH 16, top 12, bottom 18, gap 8
  * Горизонталь: shell уже даёт `--app-shell-content-inline-padding`;
  * добираем только до 16px на узких экранах (там shell = 12px).
@@ -15,7 +15,6 @@
   --user-details-screen-padding-top: var(--iz-space-3);
   --user-details-screen-padding-bottom: 18px;
   --user-details-screen-gap: var(--iz-space-2);
-  --user-details-nav-height: 2.75rem;
 
   box-sizing: border-box;
   width: 100%;
@@ -35,16 +34,6 @@
   gap: var(--user-details-screen-gap);
 }
 
-/* Паритет native Stack header (`options={{ title: "Профиль" }}`) */
-.user-details-page__nav {
-  display: flex;
-  align-items: center;
-  gap: var(--iz-space-1);
-  min-height: var(--user-details-nav-height);
-  margin: calc(-1 * var(--user-details-screen-padding-top)) 0 0;
-  padding: 0;
-}
-
 .user-details-page__back {
   display: inline-flex;
   align-items: center;
@@ -52,7 +41,7 @@
   flex-shrink: 0;
   width: 2.5rem;
   height: 2.5rem;
-  margin: 0;
+  margin: 0 0 0 calc(-1 * 0.35rem);
   padding: 0;
   border: none;
   border-radius: var(--iz-radius-md, 10px);
@@ -70,16 +59,6 @@
   outline-offset: 2px;
 }
 
-.user-details-page__nav-title {
-  flex: 1 1 auto;
-  min-width: 0;
-  margin: 0;
-  font-size: 1.0625rem;
-  font-weight: 600;
-  line-height: 1.25;
-  color: var(--iz-color-text);
-}
-
 .user-details-page__header {
   display: flex;
   flex-direction: column;
@@ -92,6 +71,14 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--user-details-screen-gap);
+}
+
+.user-details-page__title-leading {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: var(--iz-space-1);
+  min-width: 0;
 }
 
 .user-details-page__title {

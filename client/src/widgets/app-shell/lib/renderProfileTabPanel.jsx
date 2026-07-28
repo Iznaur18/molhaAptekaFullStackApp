@@ -215,6 +215,7 @@ export function renderProfileTabPanel(mainView, props) {
         <LazyProductModerationPage
           onSellerNameClick={onSellerNameClick}
           onQueueChanged={refreshPendingModerationCount}
+          isAdmin={isAdmin}
         />
       );
     case "intro-ad-moderation":

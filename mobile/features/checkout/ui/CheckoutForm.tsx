@@ -1,10 +1,16 @@
-import { useState } from "react";
-import { Text, TextInput, View } from "react-native";
+import { useMemo, useState } from "react";
+import { Pressable, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  ORDER_FULFILLMENT_DELIVERY,
+  ORDER_FULFILLMENT_PICKUP,
+  PRODUCT_DELIVERY_FULFILLMENT_ENABLED,
+} from "@molha/api-contract";
 
 import { addressValueFromUser } from "@/entities/address/lib/addressValueFromUser";
 import { validateRuDeliveryAddressForm } from "@/entities/address/lib/validateRuDeliveryAddressForm";
 import { AddressSuggestInput } from "@/entities/address/ui/AddressSuggestInput";
+import type { OrderFulfillmentMethod } from "@/entities/order/api/createOrder";
 import {
   ORDER_PAYMENT_METHOD_CARD_PREPAID,
   type OrderPaymentMethod,
@@ -18,14 +24,15 @@ import { CheckoutPaymentMethodPicker } from "@/features/checkout/ui/CheckoutPaym
 
 type CheckoutFormProps = {
   defaultUser?: Record<string, unknown> | null;
+  pickupAddressSummary?: string;
   isSubmitting: boolean;
   submitError: string;
   submitSuccess: string;
   isDisabled?: boolean;
   showHeading?: boolean;
-  /** Sheet layout: fields сверху, кнопка прижата к низу панели. */
   pinSubmitToBottom?: boolean;
   onSubmit: (payload: {
+    fulfillmentMethod: OrderFulfillmentMethod;
     deliveryAddress: string;
     deliveryAddressFlat: string;
     paymentMethod: OrderPaymentMethod;
@@ -34,6 +41,7 @@ type CheckoutFormProps = {
 
 export const CheckoutForm = ({
   defaultUser,
+  pickupAddressSummary = "",
   isSubmitting,
   submitError,
   submitSuccess,
@@ -45,6 +53,9 @@ export const CheckoutForm = ({
   const theme = useAppTheme();
   const insets = useSafeAreaInsets();
   const checkoutStyles = useCheckoutFormStyles();
+  const [fulfillmentMethod, setFulfillmentMethod] = useState<OrderFulfillmentMethod>(
+    ORDER_FULFILLMENT_PICKUP,
+  );
   const [deliveryAddress, setDeliveryAddress] = useState<RuDeliveryAddressValue>(() =>
     addressValueFromUser(defaultUser),
   );
@@ -53,7 +64,37 @@ export const CheckoutForm = ({
   );
   const [localError, setLocalError] = useState("");
 
+  const isPickup = fulfillmentMethod === ORDER_FULFILLMENT_PICKUP;
+  const pickupReady = String(pickupAddressSummary ?? "").trim().length > 0;
+
+  const isAddressValid = useMemo(() => {
+    if (isPickup) {
+      return pickupReady;
+    }
+    return validateRuDeliveryAddressForm(deliveryAddress, { required: true }) === null;
+  }, [deliveryAddress, isPickup, pickupReady]);
+
   const handleSubmit = () => {
+    if (isPickup) {
+      if (!pickupReady) {
+        setLocalError(CHECKOUT_FORM_UI.ERROR_PICKUP_REQUIRED);
+        return;
+      }
+      setLocalError("");
+      void onSubmit({
+        fulfillmentMethod: ORDER_FULFILLMENT_PICKUP,
+        deliveryAddress: "",
+        deliveryAddressFlat: "",
+        paymentMethod,
+      });
+      return;
+    }
+
+    if (!PRODUCT_DELIVERY_FULFILLMENT_ENABLED) {
+      setLocalError(CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY_SOON);
+      return;
+    }
+
     const validationError = validateRuDeliveryAddressForm(deliveryAddress, { required: true });
     if (validationError) {
       setLocalError(validationError);
@@ -61,14 +102,13 @@ export const CheckoutForm = ({
     }
     setLocalError("");
     void onSubmit({
+      fulfillmentMethod: ORDER_FULFILLMENT_DELIVERY,
       deliveryAddress: deliveryAddress.line.trim(),
       deliveryAddressFlat: deliveryAddress.flat.trim(),
       paymentMethod,
     });
   };
 
-  const isAddressValid =
-    validateRuDeliveryAddressForm(deliveryAddress, { required: true }) === null;
   const isFormDisabled = isDisabled || isSubmitting || !isAddressValid;
   const displayError = localError || submitError;
 
@@ -79,26 +119,70 @@ export const CheckoutForm = ({
           <Text style={checkoutStyles.heading}>{CHECKOUT_FORM_UI.HEADING}</Text>
         ) : null}
 
-        <AddressSuggestInput
-          value={deliveryAddress}
-          onChange={setDeliveryAddress}
-          disabled={isDisabled || isSubmitting}
-          placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_DELIVERY_ADDRESS}
-          containerStyle={checkoutStyles.fieldGroup}
-          labelStyle={checkoutStyles.fieldLabel}
-          inputStyle={checkoutStyles.fieldInput}
-        />
+        <Text style={checkoutStyles.fieldLabel}>{CHECKOUT_FORM_UI.LABEL_FULFILLMENT}</Text>
+        <View style={checkoutStyles.fulfillmentRow}>
+          <Pressable
+            disabled={isDisabled || isSubmitting}
+            onPress={() => setFulfillmentMethod(ORDER_FULFILLMENT_PICKUP)}
+            style={[
+              checkoutStyles.fulfillmentOption,
+              isPickup && checkoutStyles.fulfillmentOptionActive,
+            ]}
+          >
+            <Text
+              style={[
+                checkoutStyles.fulfillmentOptionText,
+                isPickup && checkoutStyles.fulfillmentOptionTextActive,
+              ]}
+            >
+              {CHECKOUT_FORM_UI.FULFILLMENT_PICKUP}
+            </Text>
+          </Pressable>
+          <Pressable
+            disabled={!PRODUCT_DELIVERY_FULFILLMENT_ENABLED || isDisabled || isSubmitting}
+            style={[checkoutStyles.fulfillmentOption, checkoutStyles.fulfillmentOptionDisabled]}
+          >
+            <Text style={checkoutStyles.fulfillmentOptionTextDisabled}>
+              {CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY}
+              {" ("}
+              {CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY_SOON}
+              {")"}
+            </Text>
+          </Pressable>
+        </View>
 
-        <Text style={checkoutStyles.fieldLabel}>{CHECKOUT_FORM_UI.LABEL_FLAT}</Text>
-        <TextInput
-          style={checkoutStyles.fieldInput}
-          value={deliveryAddress.flat}
-          onChangeText={(flat) => setDeliveryAddress((prev) => ({ ...prev, flat }))}
-          placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_FLAT}
-          placeholderTextColor={theme.colors.textMuted}
-          editable={!isDisabled && !isSubmitting}
-          keyboardType="default"
-        />
+        {isPickup ? (
+          <View style={checkoutStyles.fieldGroup}>
+            <Text style={checkoutStyles.fieldLabel}>{CHECKOUT_FORM_UI.PICKUP_ADDRESS_LABEL}</Text>
+            <Text style={checkoutStyles.pickupAddressText}>
+              {pickupReady ? pickupAddressSummary : CHECKOUT_FORM_UI.ERROR_PICKUP_REQUIRED}
+            </Text>
+          </View>
+        ) : (
+          <>
+            <AddressSuggestInput
+              value={deliveryAddress}
+              onChange={setDeliveryAddress}
+              disabled={isDisabled || isSubmitting}
+              placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_DELIVERY_ADDRESS}
+              label={CHECKOUT_FORM_UI.LABEL_DELIVERY_ADDRESS}
+              containerStyle={checkoutStyles.fieldGroup}
+              labelStyle={checkoutStyles.fieldLabel}
+              inputStyle={checkoutStyles.fieldInput}
+            />
+
+            <Text style={checkoutStyles.fieldLabel}>{CHECKOUT_FORM_UI.LABEL_FLAT}</Text>
+            <TextInput
+              style={checkoutStyles.fieldInput}
+              value={deliveryAddress.flat}
+              onChangeText={(flat) => setDeliveryAddress((prev) => ({ ...prev, flat }))}
+              placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_FLAT}
+              placeholderTextColor={theme.colors.textMuted}
+              editable={!isDisabled && !isSubmitting}
+              keyboardType="default"
+            />
+          </>
+        )}
 
         <CheckoutPaymentMethodPicker
           value={paymentMethod}

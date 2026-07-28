@@ -21,7 +21,7 @@ type ProductCardPromotionCornerFlagProps = {
 
 /**
  * Угловая плашка «БУСТ» / «ТОП» / «БАННЕР» в левом верхнем углу фото —
- * цвет тарифа синхронизирован с рамкой продвижения (productPromotionTierChrome).
+ * цвет тарифа из productPromotionTierChrome (рамки карточки нет).
  */
 export const ProductCardPromotionCornerFlag = ({ tier }: ProductCardPromotionCornerFlagProps) => {
   const chrome = getProductPromotionTierChrome(tier);

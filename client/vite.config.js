@@ -4,7 +4,11 @@ import react from "@vitejs/plugin-react";
 import { visualizer } from "rollup-plugin-visualizer";
 
 import { buildSpaContentSecurityPolicy } from "../server/utils/buildSpaContentSecurityPolicy.js";
-import { shouldProxyProductPathToApi } from "./src/shared/lib/productDetailsPaths.js";
+import {
+  DEV_API_PROXY_PREFIXES,
+  shouldProxyToApi,
+} from "./src/shared/lib/devApiProxy.js";
+import { shouldServeProductDetailsAsSpa } from "./src/shared/lib/productDetailsPaths.js";
 import { shouldServeUserProfileAsSpa } from "./src/shared/lib/userProfilePaths.js";
 
 /**
@@ -19,42 +23,6 @@ const DEV_CLIENT_ORIGIN = "http://127.0.0.1:5173";
 const LOCAL_API_PROXY_TARGET = "127.0.0.1";
 const LOCAL_API_PORT = 4444;
 const LOCAL_API_ORIGIN = `http://${LOCAL_API_PROXY_TARGET}:${LOCAL_API_PORT}`;
-
-/** Префиксы путей Express (порядок: /uploads раньше /upload). */
-const DEV_API_PROXY_PREFIXES = [
-  "/auth",
-  "/cart",
-  "/favorites",
-  "/user",
-  "/vote",
-  "/order",
-  "/product",
-  "/installment",
-  "/price-offers",
-  "/address",
-  "/app-intro",
-  "/site-header-banner-campaign",
-  "/site-header-banner",
-  "/intro-ad",
-  "/seller-personal-category",
-  "/health",
-  "/uploads",
-  "/upload",
-];
-
-/** Не проксировать SPA-пути вроде `/user-list` (префикс API — только `/user` и `/user/...`). */
-const shouldProxyToApi = (prefix, pathname) => {
-  if (prefix === "/user") {
-    return /^\/user(?:\/|$)/.test(pathname);
-  }
-  if (prefix === "/site-header-banner") {
-    return /^\/site-header-banner(?:\/|$)/.test(pathname);
-  }
-  if (prefix === "/product") {
-    return shouldProxyProductPathToApi(pathname);
-  }
-  return pathname === prefix || pathname.startsWith(`${prefix}/`);
-};
 
 /** В dev cookie для localhost и 127.0.0.1 разные — редирект на один origin. */
 function devLocalhostRedirectPlugin() {
@@ -99,10 +67,14 @@ const devApiProxy = Object.fromEntries(
       configure: stripSecureFromProxySetCookie,
       bypass(req) {
         const pathname = (req.url ?? "").split("?")[0];
-        if (prefix === "/user" && shouldServeUserProfileAsSpa(pathname, req.headers.accept)) {
+        const accept = req.headers.accept;
+        if (prefix === "/user" && shouldServeUserProfileAsSpa(pathname, accept)) {
           return "/index.html";
         }
-        if (!shouldProxyToApi(prefix, pathname)) {
+        if (prefix === "/product" && shouldServeProductDetailsAsSpa(pathname, accept)) {
+          return "/index.html";
+        }
+        if (!shouldProxyToApi(prefix, pathname, accept)) {
           return "/index.html";
         }
       },

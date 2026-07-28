@@ -2,6 +2,7 @@ import { CreateProductModal } from "../../../entities/product/ui/CreateProductMo
 import { ProductPromotionModal } from "../../../entities/product/ui/ProductPromotionModal.jsx";
 import { SellerProductsLimitModal } from "../../../entities/product/ui/SellerProductsLimitModal.jsx";
 import {
+  canSellerDeleteProduct,
   canSellerEditProduct,
   canSellerToggleCatalogVisibility,
 } from "../../../entities/product/lib/getProductModerationUi.js";
@@ -28,8 +29,10 @@ export function AppShellProductModals({
   productToEdit,
   handleCloseEditProductModal,
   handleEditProductSuccess,
+  handleDeleteMyProduct,
   handleSetMyProductAvailability,
   handleSetProductAuction,
+  deletingProductId,
   togglingAvailabilityProductId,
   togglingAuctionProductId,
   myProductsCatalogError,
@@ -100,9 +103,16 @@ export function AppShellProductModals({
         canManageEdit={
           promotionProduct != null && (isAdmin || canSellerEditProduct(promotionProduct))
         }
+        canManageDelete={
+          promotionProduct != null && (isAdmin || canSellerDeleteProduct(promotionProduct))
+        }
         canManageToggleVisibility={
           promotionProduct != null &&
           (isAdmin || canSellerToggleCatalogVisibility(promotionProduct))
+        }
+        onDeleteProduct={handleDeleteMyProduct}
+        isDeletePending={
+          promotionProduct?._id != null && deletingProductId === String(promotionProduct._id)
         }
         sellerRaffleActive={sellerRaffleActive}
         onToggleRaffleParticipation={handleToggleRaffleParticipation}

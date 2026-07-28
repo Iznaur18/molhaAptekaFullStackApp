@@ -10,6 +10,7 @@ import { useMySiteHeaderBannerCampaignQuery } from "@/entities/site-header-banne
 import { useSiteHeaderBannerCampaignMutations } from "@/entities/site-header-banner-campaign/model/useSiteHeaderBannerCampaignMutations";
 import { resolvePreviewSiteHeaderBannerSlidesFromForm } from "@/entities/site-header-banner/lib/resolvePreviewSiteHeaderBannerSlidesFromForm";
 import { SiteHeaderBannerCarousel } from "@/entities/site-header-banner/ui/SiteHeaderBannerCarousel";
+import { RuRegionSelect } from "@/entities/region/ui/RuRegionSelect";
 import { resolveSiteHeaderBannerStatusPanelStyle } from "@/features/advertising-page/lib/resolveAdvertisingStatusPanelStyle";
 import { ImageUrlUploadField } from "@/features/image-upload/ui/ImageUrlUploadField";
 import { SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI } from "@/shared/config";
@@ -45,7 +46,7 @@ export const SiteHeaderBannerAdvertisingSection = ({
   const campaign = campaignQuery.data?.campaign ?? null;
   const pricePoints = campaignQuery.data?.pricePoints ?? 7_000;
   const durationDays = campaignQuery.data?.durationDays ?? 7;
-  const paidSlotLimit = campaignQuery.data?.paidSlotLimit ?? 3;
+  const paidSlotLimit = campaignQuery.data?.paidSlotLimit ?? 200;
   const activePaidSlots = campaignQuery.data?.activePaidSlots ?? 0;
   const canCancel = campaign?.status === "pending";
   const hasOpenCampaign = Boolean(campaign);
@@ -229,6 +230,14 @@ export const SiteHeaderBannerAdvertisingSection = ({
             placeholderTextColor={theme.colors.textMuted}
             autoCapitalize="none"
           />
+          <RuRegionSelect
+            value={form.regionCode}
+            disabled={isSubmitting}
+            required
+            label={SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI.LABEL_REGION}
+            onChange={(regionCode) => updateField("regionCode", regionCode)}
+          />
+          <Text style={styles.timingHint}>{SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI.HINT_REGION}</Text>
           {showPreview && previewSlides.length > 0 ? (
             <SiteHeaderBannerCarousel slides={previewSlides} />
           ) : null}

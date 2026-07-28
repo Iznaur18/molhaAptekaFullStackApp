@@ -18,6 +18,8 @@ export {
   toSellerPersonalCategoryCampaignPayload,
   toSellerPersonalCategoryTilePayload,
   assertNoOpenSellerPersonalCategoryCampaign,
+  assertSellerPersonalCategorySlotAvailable,
+  countActiveSellerPersonalCategorySlots,
   linkSellerProductsToPersonalCategory,
   unlinkSellerProductsFromPersonalCategory,
   resolveActiveSellerPersonalCategoryId,

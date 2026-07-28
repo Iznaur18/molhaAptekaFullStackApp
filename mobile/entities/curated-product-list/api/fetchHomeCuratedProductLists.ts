@@ -5,13 +5,16 @@ import { formatApiErrorMessage } from "@/shared/lib";
 export type HomeCuratedProductList = {
   _id: string;
   title: string;
+  regionCode?: string;
   products: Array<Record<string, unknown> & { _id: string }>;
 };
 
-export const fetchHomeCuratedProductLists = async ({ allCities = false }: { allCities?: boolean } = {}) => {
+export const fetchHomeCuratedProductLists = async ({
+  regionCode,
+}: { regionCode?: string } = {}) => {
   try {
     const { data } = await apiClient.get("/product/curated-lists/home", {
-      params: allCities ? { allCities: "true" } : undefined,
+      params: regionCode ? { regionCode } : undefined,
     });
     if (!data?.success || !Array.isArray(data.data?.lists)) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);

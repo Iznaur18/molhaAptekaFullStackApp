@@ -1,6 +1,10 @@
 export const siteHeaderBannerQueryKeys = {
   all: ["site-header-banner"],
-  slides: () => [...siteHeaderBannerQueryKeys.all, "slides"],
+  slides: (regionCode = "") => [
+    ...siteHeaderBannerQueryKeys.all,
+    "slides",
+    { regionCode },
+  ],
   settings: () => [...siteHeaderBannerQueryKeys.all, "settings"],
   guestProfileLoginMenuBannerImageUrl: () => [
     ...siteHeaderBannerQueryKeys.all,

@@ -35,12 +35,11 @@ export const getProductModerationBadgeVariant = (
   return "approved";
 };
 
-export const canSellerEditProduct = (product: ModerationProduct): boolean =>
-  (product.productModerationStatus ?? PRODUCT_MODERATION_APPROVED) !== PRODUCT_MODERATION_PENDING;
+/** Owner may edit at any moderation status (including pending). */
+export const canSellerEditProduct = (_product: ModerationProduct): boolean => true;
 
-export const canSellerDeleteProduct = (product: ModerationProduct): boolean =>
-  (product.productModerationStatus ?? PRODUCT_MODERATION_APPROVED) ===
-  PRODUCT_MODERATION_APPROVED;
+/** Owner may delete at any moderation status (including pending). */
+export const canSellerDeleteProduct = (_product: ModerationProduct): boolean => true;
 
 export const canSellerToggleCatalogVisibility = (product: ModerationProduct): boolean =>
   (product.productModerationStatus ?? PRODUCT_MODERATION_APPROVED) ===

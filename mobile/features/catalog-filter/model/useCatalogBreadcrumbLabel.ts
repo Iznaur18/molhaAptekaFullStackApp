@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 
+import { useViewerRegion } from "@/entities/region/model/ViewerRegionProvider";
 import { buildCategoryFilterChips } from "@/entities/product-category-display/lib/buildCategoryFilterChips";
 import { resolveActiveCatalogFeedLabel } from "@/entities/product-category-display/lib/resolveActiveCatalogFeedLabel";
 import { useProductCategoryDisplaysQuery } from "@/entities/product-category-display/model/useProductCategoryDisplaysQuery";
@@ -25,11 +26,13 @@ export const useCatalogBreadcrumbLabel = ({
   selectedSellerPersonalCategoryId,
   feedFilters,
 }: UseCatalogBreadcrumbLabelParams): string | null => {
+  const { viewerRegionCode } = useViewerRegion();
   const categoryDisplaysQuery = useProductCategoryDisplaysQuery();
   const categoryRootsQuery = useProductCategoryRootsQuery(enabled);
-  const personalTilesQuery = useSellerPersonalCategoryCatalogTilesQuery(
-    enabled && Boolean(selectedSellerPersonalCategoryId),
-  );
+  const personalTilesQuery = useSellerPersonalCategoryCatalogTilesQuery({
+    enabled: enabled && Boolean(selectedSellerPersonalCategoryId),
+    regionCode: viewerRegionCode,
+  });
   const breadcrumbQuery = useProductCategoryBreadcrumbQuery({
     categoryId: selectedSubcategoryId,
     enabled: enabled && Boolean(selectedSubcategoryId),

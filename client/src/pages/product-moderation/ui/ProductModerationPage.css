@@ -7,6 +7,23 @@
   color: var(--iz-color-danger);
 }
 
+.product-moderation-page__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.product-moderation-page__item {
+  min-width: 0;
+}
+
+.product-moderation-page__item > .product-card,
+.product-moderation-page__item > .product-card-promotion-frame,
+.product-moderation-page__item > .product-card-premium-frame {
+  width: 100%;
+  height: auto;
+}
+
 .product-moderation-badge {
   display: inline-block;
   margin: 0 0 0.35rem;

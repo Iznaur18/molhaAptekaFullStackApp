@@ -27,6 +27,7 @@ const regexSearchRankFromIntent = (searchResult) => {
  * @param {number} skip
  * @param {number} limit
  * @param {string | null} [buyerCity]
+ * @param {string | null} [viewerRegionCode]
  */
 export const findCatalogProductsPage = async (
   searchResult,
@@ -34,10 +35,18 @@ export const findCatalogProductsPage = async (
   skip,
   limit,
   buyerCity = null,
+  viewerRegionCode = null,
 ) => {
   if (searchResult.mode === CATALOG_SEARCH_MODE_ATLAS && searchResult.atlasSearch) {
     try {
-      return await findCatalogProductsPageAtlas(searchResult, sort, skip, limit, buyerCity);
+      return await findCatalogProductsPageAtlas(
+        searchResult,
+        sort,
+        skip,
+        limit,
+        buyerCity,
+        viewerRegionCode,
+      );
     } catch (error) {
       if (!isAtlasSearchUnavailableError(error)) {
         throw error;
@@ -56,6 +65,7 @@ export const findCatalogProductsPage = async (
     limit,
     searchResult.searchRank ?? regexSearchRankFromIntent(searchResult),
     buyerCity,
+    viewerRegionCode,
   );
 };
 

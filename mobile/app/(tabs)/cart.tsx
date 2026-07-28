@@ -14,6 +14,7 @@ import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useMyCartQuery } from "@/entities/cart/model/useMyCartQuery";
 import { CartLineItem } from "@/entities/cart/ui/CartLineItem";
 import { CartSelectAllRow } from "@/entities/cart/ui/CartSelectAllRow";
+import type { OrderFulfillmentMethod } from "@/entities/order/api/createOrder";
 import type { OrderPaymentMethod } from "@/entities/order/model/constants";
 import { useCreateOrderMutation } from "@/entities/order/model/useCreateOrderMutation";
 import type { MyPriceOfferBid } from "@/entities/product-price-offer/api/incomingPriceOffersApi";
@@ -95,6 +96,23 @@ export default function CartScreen() {
 
   const canCheckout = checkoutSummary.selectedLines.length > 0;
 
+  const pickupAddressSummary = useMemo(() => {
+    if (auctionCheckoutBid) {
+      const product = (productsQuery.products ?? []).find(
+        (item) => String(item._id) === String(auctionCheckoutBid.productId),
+      );
+      return String(product?.productPickupAddress ?? "").trim();
+    }
+    const addresses: string[] = [];
+    for (const line of checkoutSummary.selectedLines) {
+      const address = String(line.product?.productPickupAddress ?? "").trim();
+      if (address && !addresses.includes(address)) {
+        addresses.push(address);
+      }
+    }
+    return addresses.join("; ");
+  }, [auctionCheckoutBid, checkoutSummary.selectedLines, productsQuery.products]);
+
   const handleRefresh = useCallback(async () => {
     await Promise.all([cartQuery.refetch(), productsQuery.refetch(), acceptedBidsQuery.refetch()]);
   }, [acceptedBidsQuery, cartQuery, productsQuery]);
@@ -105,6 +123,7 @@ export default function CartScreen() {
   };
 
   const handleAuctionCheckoutSubmit = async (payload: {
+    fulfillmentMethod: OrderFulfillmentMethod;
     deliveryAddress: string;
     deliveryAddressFlat: string;
     paymentMethod: OrderPaymentMethod;
@@ -117,6 +136,7 @@ export default function CartScreen() {
       await createOrderMutation.mutateAsync({
         items: [{ productId: auctionCheckoutBid.productId, quantity: 1 }],
         priceOfferId: auctionCheckoutBid._id,
+        fulfillmentMethod: payload.fulfillmentMethod,
         deliveryAddress: payload.deliveryAddress,
         deliveryAddressFlat: payload.deliveryAddressFlat,
         paymentMethod: payload.paymentMethod,
@@ -139,6 +159,7 @@ export default function CartScreen() {
   };
 
   const handleCheckoutSubmit = async (payload: {
+    fulfillmentMethod: OrderFulfillmentMethod;
     deliveryAddress: string;
     deliveryAddressFlat: string;
     paymentMethod: OrderPaymentMethod;
@@ -151,6 +172,7 @@ export default function CartScreen() {
           productId: line.productId,
           quantity: line.quantity,
         })),
+        fulfillmentMethod: payload.fulfillmentMethod,
         deliveryAddress: payload.deliveryAddress,
         deliveryAddressFlat: payload.deliveryAddressFlat,
         paymentMethod: payload.paymentMethod,
@@ -351,6 +373,7 @@ export default function CartScreen() {
       <CheckoutSheetModal
         visible={checkoutSheetOpen}
         defaultUser={sessionQuery.data?.user}
+        pickupAddressSummary={pickupAddressSummary}
         isSubmitting={submitState.isSubmitting}
         submitError={submitState.error}
         submitSuccess={submitState.success}
@@ -362,6 +385,7 @@ export default function CartScreen() {
       <CheckoutSheetModal
         visible={auctionCheckoutBid != null}
         defaultUser={sessionQuery.data?.user}
+        pickupAddressSummary={pickupAddressSummary}
         isSubmitting={submitState.isSubmitting}
         submitError={submitState.error}
         submitSuccess={submitState.success}

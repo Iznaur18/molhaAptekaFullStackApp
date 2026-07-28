@@ -13,6 +13,7 @@ export function buildCatalogListQueryParams({
   selectedProductCategory,
   catalogSort,
   myProductsModerationFilter,
+  viewerRegionCode = null,
 }) {
   const search = appliedProductSearchTerm.trim();
   const sellerPersonalCategoryId = isMineMode
@@ -39,6 +40,6 @@ export function buildCatalogListQueryParams({
     auctionOnly: catalogQueryFromUrl.auctionOnly ? true : null,
     installmentOnly: catalogQueryFromUrl.installmentOnly ? true : null,
     saleOnly: catalogQueryFromUrl.saleOnly ? true : null,
-    regionCode: catalogQueryFromUrl.regionCode || null,
+    regionCode: isMineMode ? null : viewerRegionCode || null,
   };
 }

@@ -4,12 +4,12 @@ import { fetchSiteHeaderBannerSlides } from "../api/fetchSiteHeaderBannerSlides.
 import { siteHeaderBannerQueryKeys } from "./siteHeaderBannerQueryKeys.js";
 
 /**
- * @param {{ enabled?: boolean }} [options]
+ * @param {{ enabled?: boolean; regionCode?: string }} [options]
  */
-export function useSiteHeaderBannerSlidesQuery({ enabled = true } = {}) {
+export function useSiteHeaderBannerSlidesQuery({ enabled = true, regionCode = "" } = {}) {
   return useQuery({
-    queryKey: siteHeaderBannerQueryKeys.slides(),
-    queryFn: fetchSiteHeaderBannerSlides,
+    queryKey: siteHeaderBannerQueryKeys.slides(regionCode),
+    queryFn: () => fetchSiteHeaderBannerSlides({ regionCode: regionCode || undefined }),
     enabled,
     select: (data) => data.slides ?? [],
     staleTime: 60_000,

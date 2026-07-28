@@ -28,7 +28,7 @@ export const RAFFLE_PRIZE_MEDIA_TYPES = [
 ];
 
 /** Макс. одновременно active на витрине (карусель) */
-export const SITE_RAFFLES_ACTIVE_VITRINE_MAX = 10;
+export const SITE_RAFFLES_ACTIVE_VITRINE_MAX = 200;
 
 /** Сколько недавних completed показывать после active */
 export const SITE_RAFFLES_COMPLETED_VITRINE_MAX = 10;

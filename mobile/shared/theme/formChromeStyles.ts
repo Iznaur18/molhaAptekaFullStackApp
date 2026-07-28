@@ -408,6 +408,50 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
     color: theme.colors.text,
   },
+  fulfillmentRow: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  fulfillmentOption: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: 44,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.input,
+    backgroundColor: theme.colors.surface,
+    paddingHorizontal: 8,
+    paddingVertical: 10,
+  },
+  fulfillmentOptionActive: {
+    borderColor: theme.colors.action,
+    backgroundColor: theme.colors.action,
+  },
+  fulfillmentOptionDisabled: {
+    opacity: 0.65,
+    backgroundColor: theme.colors.surfaceMuted,
+  },
+  fulfillmentOptionText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: theme.colors.text,
+    textAlign: "center",
+  },
+  fulfillmentOptionTextActive: {
+    color: theme.colors.onContrast,
+  },
+  fulfillmentOptionTextDisabled: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: theme.colors.textMuted,
+    textAlign: "center",
+  },
+  pickupAddressText: {
+    fontSize: 15,
+    lineHeight: 22,
+    color: theme.colors.text,
+  },
   legend: {
     fontSize: 14,
     fontWeight: "600",

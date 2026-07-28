@@ -6,12 +6,12 @@ export const PRODUCT_MODERATION_STATUSES = ["pending", "approved", "rejected"];
 /** Минимальный контракт карточки; остальные поля — passthrough. */
 export const productFromApiSchema = z
   .object({
-    _id: z.string(),
-    productName: z.string().optional(),
-    productPrice: z.number().optional(),
-    productModerationStatus: z.enum(PRODUCT_MODERATION_STATUSES).optional(),
-    productModerationComment: z.string().optional(),
-    productIsAvailable: z.boolean().optional(),
-    soldQuantity: z.number().optional(),
+    _id: z.coerce.string().min(1),
+    productName: z.string().nullish(),
+    productPrice: z.number().nullish(),
+    productModerationStatus: z.enum(PRODUCT_MODERATION_STATUSES).nullish(),
+    productModerationComment: z.string().nullish(),
+    productIsAvailable: z.boolean().nullish(),
+    soldQuantity: z.number().nullish(),
   })
   .passthrough();

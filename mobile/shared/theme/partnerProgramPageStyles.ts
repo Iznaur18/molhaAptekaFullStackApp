@@ -82,7 +82,7 @@ export const usePartnerProgramPageStyles = createThemedStyles((theme) => ({
   card: {
     gap: 12,
     padding: 16,
-    borderRadius: 14,
+    borderRadius: 18,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
     backgroundColor: theme.colors.surface,
@@ -109,7 +109,7 @@ export const usePartnerProgramPageStyles = createThemedStyles((theme) => ({
     gap: 4,
     padding: 12,
     borderRadius: 12,
-    backgroundColor: theme.colors.actionSoft,
+    backgroundColor: theme.colors.surfaceMuted,
   },
   statLabel: {
     fontSize: 12,
@@ -128,7 +128,7 @@ export const usePartnerProgramPageStyles = createThemedStyles((theme) => ({
     borderWidth: 1,
     borderRadius: 12,
     borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.surfaceMuted,
     color: theme.colors.textSecondary,
     fontSize: 13,
     lineHeight: 18,
@@ -156,7 +156,7 @@ export const usePartnerProgramPageStyles = createThemedStyles((theme) => ({
     fontSize: 18,
     fontWeight: "600",
     color: theme.colors.text,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.surfaceMuted,
     fontVariant: ["tabular-nums"],
   },
   submitButton: {

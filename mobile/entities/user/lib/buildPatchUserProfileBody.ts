@@ -2,6 +2,7 @@ import {
   USER_SOCIAL_LINK_FIELD_IDS,
   normalizeSocialLinkToStoredUrl,
   validateSocialLinkInput,
+  isRuRegionCode,
 } from "@molha/api-contract";
 import { DEFAULT_USER_AVATAR_URL } from "@/entities/user/model/constants";
 import { normalizeUploadUrlForStorage } from "@/shared/lib";
@@ -71,6 +72,13 @@ export const buildPatchUserProfileBody = (
       body.userAddressHouse = form.structuredAddress.house;
       body.userAddressFlat = form.structuredAddress.flat || null;
     }
+  }
+
+  if (
+    form.userRegionCode !== initial.userRegionCode &&
+    isRuRegionCode(form.userRegionCode)
+  ) {
+    body.userRegionCode = form.userRegionCode;
   }
 
   const phoneRaw = form.userPhoneNumber.trim();

@@ -8,7 +8,7 @@ import { requiredRuRegionCodeFieldSchema } from "./ruRegions.js";
 
 export const SITE_HEADER_BANNER_CAMPAIGN_PRICE_POINTS = 7_000;
 export const SITE_HEADER_BANNER_CAMPAIGN_DURATION_DAYS = 7;
-export const SITE_HEADER_BANNER_CAMPAIGN_PAID_SLOT_LIMIT = 3;
+export const SITE_HEADER_BANNER_CAMPAIGN_PAID_SLOT_LIMIT = 200;
 
 export const SITE_HEADER_BANNER_CAMPAIGN_STATUS_PENDING = "pending";
 export const SITE_HEADER_BANNER_CAMPAIGN_STATUS_ACTIVE = "active";

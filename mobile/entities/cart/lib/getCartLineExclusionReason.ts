@@ -2,7 +2,11 @@ import { isCurrentUserProductSeller } from "@/entities/product/lib/isCurrentUser
 
 import type { CartLine } from "./selectCartLines";
 
-export type CartLineExclusionReason = "missing" | "unavailable" | "own_product";
+export type CartLineExclusionReason =
+  | "missing"
+  | "unavailable"
+  | "own_product"
+  | "missing_pickup";
 
 export const getCartLineExclusionReason = (
   line: CartLine,
@@ -18,6 +22,11 @@ export const getCartLineExclusionReason = (
 
   if (isCurrentUserProductSeller(line.product, currentUserId)) {
     return "own_product";
+  }
+
+  const pickup = String(line.product?.productPickupAddress ?? "").trim();
+  if (!pickup) {
+    return "missing_pickup";
   }
 
   return null;

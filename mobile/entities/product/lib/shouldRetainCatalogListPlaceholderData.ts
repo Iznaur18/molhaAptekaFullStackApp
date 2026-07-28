@@ -14,7 +14,7 @@ const PLACEHOLDER_SCOPE_KEYS: Array<keyof CatalogListQueryKeyParams> = [
   "auctionOnly",
   "installmentOnly",
   "saleOnly",
-  "allCities",
+  "regionCode",
 ];
 
 /** Держим предыдущие плитки только при смене сортировки в том же scope (без смены категории/поиска). */

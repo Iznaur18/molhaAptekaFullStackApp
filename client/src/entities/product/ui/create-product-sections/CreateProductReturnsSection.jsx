@@ -80,13 +80,13 @@ export function CreateProductReturnsSection({
 
   return (
     <div className={["create-product-section", className].filter(Boolean).join(" ")}>
-      <p className="create-product-section__lead">
-        {CREATE_PRODUCT_MODAL_UI.WIZARD_RETURNS_LEAD}
-      </p>
       <fieldset className="create-product-section__listing-origin" disabled={isSubmitting}>
         <legend className="create-product-section__listing-origin-legend">
           <FormFieldLabel required>{CREATE_PRODUCT_MODAL_UI.LABEL_RETURN_ENABLED}</FormFieldLabel>
         </legend>
+        <p className="create-product-section__hint">
+          {CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_RETURNS_SUBTITLE}
+        </p>
         <div
           className="create-product-section__originality-chips"
           role="radiogroup"

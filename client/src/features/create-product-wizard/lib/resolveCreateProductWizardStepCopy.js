@@ -12,7 +12,7 @@ export function resolveCreateProductWizardStepCopy(stepId) {
     case "originality":
       return {
         title: CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_ORIGINALITY_TITLE,
-        subtitle: CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_ORIGINALITY_SUBTITLE,
+        subtitle: "",
         shortLabel: CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_LABEL_ORIGINALITY,
       };
     case "media":
@@ -27,6 +27,12 @@ export function resolveCreateProductWizardStepCopy(stepId) {
         subtitle: CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_CATEGORY_SUBTITLE,
         shortLabel: CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_LABEL_CATEGORY,
       };
+    case "pickup":
+      return {
+        title: CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_PICKUP_TITLE,
+        subtitle: CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_PICKUP_SUBTITLE,
+        shortLabel: CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_LABEL_PICKUP,
+      };
     case "commerce":
       return {
         title: CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_COMMERCE_TITLE,
@@ -36,7 +42,7 @@ export function resolveCreateProductWizardStepCopy(stepId) {
     case "returns":
       return {
         title: CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_RETURNS_TITLE,
-        subtitle: CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_RETURNS_SUBTITLE,
+        subtitle: "",
         shortLabel: CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_LABEL_RETURNS,
       };
     case "review":

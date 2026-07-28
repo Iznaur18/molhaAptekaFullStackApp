@@ -74,9 +74,11 @@ export async function fetchMySellerPersonalCategoryCampaign() {
   }
 }
 
-export async function fetchSellerPersonalCategoryCatalogTiles() {
+export async function fetchSellerPersonalCategoryCatalogTiles({ regionCode } = {}) {
   try {
-    const { data } = await apiClient.get("/seller-personal-category/catalog-tiles");
+    const { data } = await apiClient.get("/seller-personal-category/catalog-tiles", {
+      params: regionCode ? { regionCode } : undefined,
+    });
     return parseApiContractData(data, sellerPersonalCategoryCatalogTilesDataSchema);
   } catch (e) {
     const message =

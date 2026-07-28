@@ -21,14 +21,19 @@ import { resolveProductReturnWriteFromBody } from "./normalizeProductReturnTerms
 import { normalizeProductListingOrigin } from "./normalizeProductListingOrigin.js";
 import { normalizeProductIsOriginal } from "./normalizeProductIsOriginal.js";
 import { resolveProductCategoryWriteFromBody } from "./resolveProductCategoryWrite.js";
+import { isRuRegionCode } from "@molha/api-contract";
 import { normalizeProductSaleCity } from "./productSaleCity.js";
 import { resolveProductSaleCityNormalized } from "./ruCityNormalized.js";
 import { assertProductStockPatchAllowed } from "./productStock.js";
+import {
+  normalizeProductPickupAddress,
+  normalizeProductPickupCoords,
+  resolveProductDeliveryEnabledForWrite,
+} from "./productPickup.js";
 
 import {
   CATALOG_VISIBILITY_BLOCK_MESSAGE,
   EMPTY_PATCH_BODY_MESSAGE,
-  PENDING_EDIT_BLOCK_MESSAGE,
 } from "./patchMyProductConstants.js";
 
 const hasBodyField = (body, field) =>
@@ -171,10 +176,46 @@ const applyRegionCodeField = (body, $set) => {
     return;
   }
   const code = String(body.productRegionCode ?? "").trim();
-  if (!code) {
-    throwFieldError(new Error("required"), "Укажите регион продажи");
+  if (!isRuRegionCode(code)) {
+    throwFieldError(new Error("Укажите регион из списка"), "Укажите регион продажи");
   }
   $set.productRegionCode = code;
+};
+
+const applyPickupFields = (body, $set, existing) => {
+  const touchesAddress = hasBodyField(body, "productPickupAddress");
+  const touchesLat = hasBodyField(body, "productPickupLat");
+  const touchesLon = hasBodyField(body, "productPickupLon");
+  const touchesDelivery = hasBodyField(body, "productDeliveryEnabled");
+
+  if (!touchesAddress && !touchesLat && !touchesLon && !touchesDelivery) {
+    return;
+  }
+
+  try {
+    if (touchesAddress) {
+      $set.productPickupAddress = normalizeProductPickupAddress(body.productPickupAddress);
+    }
+
+    if (touchesLat || touchesLon) {
+      const nextLat = touchesLat ? body.productPickupLat : existing.productPickupLat;
+      const nextLon = touchesLon ? body.productPickupLon : existing.productPickupLon;
+      const coords = normalizeProductPickupCoords(nextLat, nextLon);
+      $set.productPickupLat = coords.productPickupLat;
+      $set.productPickupLon = coords.productPickupLon;
+    }
+
+    if (touchesDelivery) {
+      $set.productDeliveryEnabled = resolveProductDeliveryEnabledForWrite(
+        body.productDeliveryEnabled,
+      );
+    }
+  } catch (error) {
+    if (error instanceof AppError) {
+      throw error;
+    }
+    throwFieldError(error, "Некорректный адрес самовывоза");
+  }
 };
 
 const applyCategoryFields = async (body, $set, existing) => {
@@ -266,21 +307,9 @@ const applyModerationAndAvailability = (body, $set, existing, isAdmin) => {
   const touchesContent = patchBodyTouchesModerationContent(body);
 
   if (!isAdmin) {
-    const pendingAuctionOnly =
-      existing.productModerationStatus === PRODUCT_MODERATION_PENDING &&
-      hasBodyField(body, "productAuctionEnabled") &&
-      !touchesContent &&
-      !hasBodyField(body, "productIsAvailable");
-
-    if (
-      existing.productModerationStatus === PRODUCT_MODERATION_PENDING &&
-      !pendingAuctionOnly
-    ) {
-      throw new AppError(409, PENDING_EDIT_BLOCK_MESSAGE);
-    }
-
+    // Pending: owner may edit content; status stays pending (no queue re-bump).
+    // Approved/rejected content → re-submit to pending + hide from catalog.
     const resubmitForModeration =
-      !pendingAuctionOnly &&
       touchesContent &&
       existing.productModerationStatus !== PRODUCT_MODERATION_PENDING;
 
@@ -361,6 +390,7 @@ export async function buildProductPatchSet({ existing, body, isAdmin, productId 
   applyPriceFields(body, $set, existing);
   applySaleCityField(body, $set);
   applyRegionCodeField(body, $set);
+  applyPickupFields(body, $set, existing);
   await applyCategoryFields(body, $set, existing);
   await applyLoyaltyField(body, $set, existing, productId);
   applyImageFields(body, $set);

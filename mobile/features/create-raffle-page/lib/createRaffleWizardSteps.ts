@@ -1,3 +1,5 @@
+import { isRuRegionCode } from "@molha/api-contract";
+
 import {
   RAFFLE_PRIZE_MEDIA_TYPE_IMAGE,
   RAFFLE_PRIZE_MEDIA_TYPE_VIDEO,
@@ -44,6 +46,9 @@ export const validateCreateRaffleFormStep = (
   if (stepId === "basic") {
     if (!form.title.trim()) {
       return CREATE_RAFFLE_PAGE_UI.ERROR_TITLE;
+    }
+    if (!isRuRegionCode(form.regionCode)) {
+      return CREATE_RAFFLE_PAGE_UI.ERROR_REGION_REQUIRED;
     }
     return null;
   }

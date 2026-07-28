@@ -20,6 +20,7 @@ import { API_CLIENT_UI, RAFFLE_MANAGE_UI } from "../../../shared/config/appUiCop
  *   currentUserId: string | null;
  *   canModerateProducts: boolean;
  *   mainView: string;
+ *   viewerRegionCode: string;
  *   onCatalogError: (message: string) => void;
  *   setRaffleModal: import('react').Dispatch<import('react').SetStateAction<
  *     | { mode: 'create' }
@@ -35,6 +36,7 @@ export function useHomeFeaturedContent({
   currentUserId,
   canModerateProducts,
   mainView,
+  viewerRegionCode,
   onCatalogError,
   setRaffleModal,
   refreshPendingRafflesCount,
@@ -43,7 +45,10 @@ export function useHomeFeaturedContent({
   const { deleteMyMutation, deleteStaffMutation, pauseMyMutation } = useRaffleMutations();
   const [isFeaturedRaffleBusy, setIsFeaturedRaffleBusy] = useState(false);
 
-  const featuredQuery = useFeaturedRafflesQuery({ enabled: isHomeCatalogMainView });
+  const featuredQuery = useFeaturedRafflesQuery({
+    enabled: isHomeCatalogMainView,
+    regionCode: viewerRegionCode,
+  });
   const { userStoriesFeed } = useUserStoriesFeedQuery({ enabled: isHomeCatalogMainView });
 
   const shouldTrackSellerRaffle =

@@ -1,5 +1,7 @@
 import { useCallback, useState } from "react";
+import { DEFAULT_VIEWER_REGION_CODE } from "@molha/api-contract";
 
+import { RuRegionSelect } from "../../../entities/region/ui/RuRegionSelect.jsx";
 import { POPULAR_PRODUCTS_ADMIN_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
 import "./CuratedProductListAdminCard.css";
@@ -13,7 +15,7 @@ import "./CuratedProductListAdminCard.css";
  *   onMoveUp: () => void;
  *   onMoveDown: () => void;
  *   onDeleteList: () => void;
- *   onSaveTitle: (title: string) => Promise<void>;
+ *   onSaveList: (payload: { title: string; regionCode: string }) => Promise<void>;
  *   onAddProduct: (productId: string) => Promise<void>;
  *   onRemoveProduct: (productId: string) => Promise<void>;
  * }} props
@@ -26,22 +28,29 @@ export function CuratedProductListAdminCard({
   onMoveUp,
   onMoveDown,
   onDeleteList,
-  onSaveTitle,
+  onSaveList,
   onAddProduct,
   onRemoveProduct,
 }) {
   const [titleDraft, setTitleDraft] = useState(list.title);
+  const [regionDraft, setRegionDraft] = useState(
+    list.regionCode || DEFAULT_VIEWER_REGION_CODE,
+  );
   const [productIdDraft, setProductIdDraft] = useState("");
   const [localError, setLocalError] = useState("");
 
-  const handleSaveTitle = useCallback(async () => {
+  const handleSaveList = useCallback(async () => {
     setLocalError("");
+    if (!regionDraft) {
+      setLocalError(POPULAR_PRODUCTS_ADMIN_PAGE_UI.REGION_REQUIRED);
+      return;
+    }
     try {
-      await onSaveTitle(titleDraft);
+      await onSaveList({ title: titleDraft, regionCode: regionDraft });
     } catch (e) {
       setLocalError(e instanceof Error ? e.message : POPULAR_PRODUCTS_ADMIN_PAGE_UI.SAVE_ERROR);
     }
-  }, [onSaveTitle, titleDraft]);
+  }, [onSaveList, regionDraft, titleDraft]);
 
   const handleAddProduct = useCallback(async () => {
     setLocalError("");
@@ -116,11 +125,20 @@ export function CuratedProductListAdminCard({
           disabled={isBusy}
         />
       </label>
+      <label className="curated-list-admin-card__label">
+        {POPULAR_PRODUCTS_ADMIN_PAGE_UI.LIST_REGION_LABEL}
+        <RuRegionSelect
+          value={regionDraft}
+          onChange={setRegionDraft}
+          disabled={isBusy}
+          required
+        />
+      </label>
       <button
         type="button"
         className="app-btn app-btn--secondary"
-        onClick={() => void handleSaveTitle()}
-        disabled={isBusy || titleDraft.trim() === ""}
+        onClick={() => void handleSaveList()}
+        disabled={isBusy || titleDraft.trim() === "" || !regionDraft}
       >
         {POPULAR_PRODUCTS_ADMIN_PAGE_UI.SAVE_TITLE}
       </button>

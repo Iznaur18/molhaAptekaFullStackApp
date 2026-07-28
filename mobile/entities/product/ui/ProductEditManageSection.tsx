@@ -1,5 +1,6 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import { Pressable, Text, View } from "react-native";
 
 import { isProductRaffleParticipant } from "@/entities/raffle/lib/isProductRaffleParticipant";
 import { ProductManageToggleRow } from "@/entities/product/ui/ProductManageToggleRow";
@@ -14,10 +15,13 @@ type ProductEditManageSectionProps = {
   product: CatalogProduct;
   onSetAvailability?: (productId: string, productIsAvailable: boolean) => void | Promise<void>;
   onSetAuction?: (productId: string, productAuctionEnabled: boolean) => void | Promise<void>;
+  onDelete?: (productId: string) => void | Promise<void>;
   isAvailabilityTogglePending?: boolean;
   isAuctionTogglePending?: boolean;
+  isDeletePending?: boolean;
   errorMessage?: string;
   canEdit?: boolean;
+  canDelete?: boolean;
   canToggleVisibility?: boolean;
   sellerRaffleActive?: boolean;
   onToggleRaffleParticipation?: (product: CatalogProduct, enabled: boolean) => void;
@@ -31,10 +35,13 @@ export const ProductEditManageSection = ({
   product,
   onSetAvailability,
   onSetAuction,
+  onDelete,
   isAvailabilityTogglePending = false,
   isAuctionTogglePending = false,
+  isDeletePending = false,
   errorMessage = "",
   canEdit = true,
+  canDelete = false,
   canToggleVisibility = true,
   sellerRaffleActive = false,
   onToggleRaffleParticipation,
@@ -44,6 +51,7 @@ export const ProductEditManageSection = ({
   disabled = false,
 }: ProductEditManageSectionProps) => {
   const styles = useProductEditManageSectionStyles();
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
   const isListedForOthers = product.productIsAvailable !== false;
   const hasOpenSalesLocked = product.hasOpenSales === true;
@@ -54,22 +62,30 @@ export const ProductEditManageSection = ({
   const showRaffleToggle =
     sellerRaffleActive && typeof onToggleRaffleParticipation === "function";
   const showInstallmentButton = typeof onOpenInstallmentProgram === "function";
+  const showDelete = canDelete && typeof onDelete === "function";
   const isRaffleParticipant = isProductRaffleParticipant(product);
   const canOpenInstallment =
     canOpenInstallmentProgram &&
     (product.productModerationStatus ?? PRODUCT_MODERATION_APPROVED) ===
       PRODUCT_MODERATION_APPROVED;
-  const showOpenSalesHint = hasOpenSalesLocked && (showAuctionToggle || showVisibility);
+  const showOpenSalesHint =
+    hasOpenSalesLocked && (showAuctionToggle || showVisibility || showDelete);
 
   const actionsLocked =
     disabled ||
     isAvailabilityTogglePending ||
     isAuctionTogglePending ||
     isRaffleParticipationPending ||
+    isDeletePending ||
+    isDeleteConfirmOpen ||
     !canEdit;
 
   const auctionActionsLocked = actionsLocked || hasOpenSalesLocked;
   const visibilityActionsLocked = actionsLocked || hasOpenSalesLocked;
+
+  useEffect(() => {
+    setIsDeleteConfirmOpen(false);
+  }, [product._id, onDelete]);
 
   return (
     <View
@@ -113,6 +129,7 @@ export const ProductEditManageSection = ({
               isRaffleParticipationPending ||
               isAvailabilityTogglePending ||
               isAuctionTogglePending ||
+              isDeletePending ||
               disabled
             }
             pending={isRaffleParticipationPending}
@@ -132,6 +149,7 @@ export const ProductEditManageSection = ({
               isAvailabilityTogglePending ||
               isAuctionTogglePending ||
               isRaffleParticipationPending ||
+              isDeletePending ||
               !canOpenInstallment
             }
             variant="installment"
@@ -159,6 +177,59 @@ export const ProductEditManageSection = ({
           />
         ) : null}
       </View>
+      {showDelete ? (
+        <View style={styles.deleteBlock}>
+          {isDeletePending ? (
+            <Text style={styles.deletePending}>{PRODUCT_CARD_UI.DELETE_PRODUCT_PENDING}</Text>
+          ) : isDeleteConfirmOpen ? (
+            <View style={styles.deleteConfirm}>
+              <Text style={styles.deleteConfirmQuestion}>
+                {PRODUCT_CARD_UI.DELETE_CONFIRM_QUESTION}
+              </Text>
+              <View style={styles.deleteConfirmActions}>
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.deleteConfirmYes,
+                    pressed && styles.deleteConfirmPressed,
+                  ]}
+                  onPress={() => {
+                    setIsDeleteConfirmOpen(false);
+                    void onDelete(String(product._id));
+                  }}
+                >
+                  <Text style={styles.deleteConfirmYesText}>
+                    {PRODUCT_CARD_UI.DELETE_CONFIRM_YES}
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.deleteConfirmCancel,
+                    pressed && styles.deleteConfirmPressed,
+                  ]}
+                  onPress={() => setIsDeleteConfirmOpen(false)}
+                >
+                  <Text style={styles.deleteConfirmCancelText}>
+                    {PRODUCT_CARD_UI.DELETE_CONFIRM_CANCEL}
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+          ) : (
+            <Pressable
+              style={({ pressed }) => [
+                styles.deleteBtn,
+                pressed && !hasOpenSalesLocked && !disabled && styles.deleteConfirmPressed,
+                (disabled || hasOpenSalesLocked) && styles.deleteBtnDisabled,
+              ]}
+              disabled={disabled || hasOpenSalesLocked}
+              onPress={() => setIsDeleteConfirmOpen(true)}
+            >
+              <Text style={styles.deleteBtnTitle}>{CREATE_PRODUCT_UI.MANAGE_DELETE_TITLE}</Text>
+              <Text style={styles.deleteBtnHint}>{CREATE_PRODUCT_UI.MANAGE_DELETE_HINT}</Text>
+            </Pressable>
+          )}
+        </View>
+      ) : null}
     </View>
   );
 };

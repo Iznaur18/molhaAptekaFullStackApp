@@ -1,6 +1,5 @@
 import { COMMON_UI } from "../../../../shared/config/appUiCopy.js";
 import { formatProductFieldForDisplay } from "../../lib/formatProductFieldForDisplay.js";
-import { resolveProductImageUrls } from "../../lib/resolveProductImageUrls.js";
 import {
   getProductDetailsModalRowClassName,
   getProductDetailsModalValueClassName,
@@ -17,7 +16,6 @@ const PRODUCT_ID_FIELD_KEY = "_id";
  */
 export function renderProductDetailsFieldRows(product, keys, handlers) {
   const { onClose, onSellerNameClick } = handlers;
-  const imageUrls = resolveProductImageUrls(product);
 
   return keys.map((key) => {
     const raw = product[key];
@@ -49,29 +47,6 @@ export function renderProductDetailsFieldRows(product, keys, handlers) {
         >
           {display}
         </button>
-      );
-    } else if (key === "productImageUrls" && imageUrls.length > 0) {
-      valueNode = (
-        <ul className="product-details-modal__image-url-list">
-          {imageUrls.map((url, index) => (
-            <li key={`${index}-${url}`}>
-              <a
-                href={url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="product-details-modal__image-url-thumb-link"
-              >
-                <img
-                  className="product-details-modal__image-url-thumb"
-                  src={url}
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                />
-              </a>
-            </li>
-          ))}
-        </ul>
       );
     } else if (showIdCopy) {
       valueNode = (

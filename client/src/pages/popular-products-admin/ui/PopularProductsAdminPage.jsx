@@ -1,10 +1,12 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
+import { DEFAULT_VIEWER_REGION_CODE } from "@molha/api-contract";
 
 import { invalidateCuratedProductLists } from "../../../entities/curated-product-list/lib/curatedProductListQueryCache.js";
 import { curatedProductListQueryKeys } from "../../../entities/curated-product-list/model/curatedProductListQueryKeys.js";
 import { useCuratedProductListAdminMutations } from "../../../entities/curated-product-list/model/useCuratedProductListAdminMutations.js";
 import { useCuratedProductListsAdminQuery } from "../../../entities/curated-product-list/model/useCuratedProductListsAdminQuery.js";
+import { RuRegionSelect } from "../../../entities/region/ui/RuRegionSelect.jsx";
 import { AdminPanelShell } from "../../../shared/ui/AdminPanel/AdminPanelShell.jsx";
 import { POPULAR_PRODUCTS_ADMIN_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
@@ -39,6 +41,7 @@ export function PopularProductsAdminPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [newTitle, setNewTitle] = useState("");
+  const [newRegionCode, setNewRegionCode] = useState(DEFAULT_VIEWER_REGION_CODE);
   const [actionError, setActionError] = useState("");
   const [pendingListId, setPendingListId] = useState(null);
 
@@ -58,6 +61,9 @@ export function PopularProductsAdminPage() {
     return lists.filter(
       (list) =>
         list.title.toLowerCase().includes(query) ||
+        String(list.regionCode ?? "")
+          .toLowerCase()
+          .includes(query) ||
         list.productIds.some((productId) => productId.toLowerCase().includes(query)),
     );
   }, [lists, searchQuery]);
@@ -90,11 +96,19 @@ export function PopularProductsAdminPage() {
       setActionError(POPULAR_PRODUCTS_ADMIN_PAGE_UI.TITLE_REQUIRED);
       return;
     }
+    if (!newRegionCode) {
+      setActionError(POPULAR_PRODUCTS_ADMIN_PAGE_UI.REGION_REQUIRED);
+      return;
+    }
 
     try {
-      const created = await createMutation.mutateAsync({ title });
+      const created = await createMutation.mutateAsync({
+        title,
+        regionCode: newRegionCode,
+      });
       updateListsCache((rows) => [...rows, created]);
       setNewTitle("");
+      setNewRegionCode(DEFAULT_VIEWER_REGION_CODE);
       setIsCreateOpen(false);
       await invalidateCuratedProductLists(queryClient);
     } catch (e) {
@@ -102,7 +116,7 @@ export function PopularProductsAdminPage() {
         e instanceof Error ? e.message : POPULAR_PRODUCTS_ADMIN_PAGE_UI.CREATE_ERROR,
       );
     }
-  }, [createMutation, newTitle, queryClient, updateListsCache]);
+  }, [createMutation, newRegionCode, newTitle, queryClient, updateListsCache]);
 
   const handleMoveList = useCallback(
     async (listId, direction) => {
@@ -160,13 +174,13 @@ export function PopularProductsAdminPage() {
     [deleteMutation, queryClient, updateListsCache],
   );
 
-  const handleSaveTitle = useCallback(
-    async (listId, title) => {
+  const handleSaveList = useCallback(
+    async (listId, { title, regionCode }) => {
       setPendingListId(listId);
       try {
         const updated = await patchMutation.mutateAsync({
           listId,
-          body: { title: title.trim() },
+          body: { title: title.trim(), regionCode },
         });
         updateListsCache((rows) =>
           rows.map((list) => (list._id === listId ? updated : list)),
@@ -239,11 +253,20 @@ export function PopularProductsAdminPage() {
               disabled={isBusy}
             />
           </label>
+          <label className="popular-products-admin__label">
+            {POPULAR_PRODUCTS_ADMIN_PAGE_UI.LIST_REGION_LABEL}
+            <RuRegionSelect
+              value={newRegionCode}
+              onChange={setNewRegionCode}
+              disabled={isBusy}
+              required
+            />
+          </label>
           <button
             type="button"
             className="app-btn app-btn--primary"
             onClick={() => void handleCreateList()}
-            disabled={isBusy || newTitle.trim() === ""}
+            disabled={isBusy || newTitle.trim() === "" || !newRegionCode}
           >
             {POPULAR_PRODUCTS_ADMIN_PAGE_UI.CREATE_LIST}
           </button>
@@ -254,7 +277,7 @@ export function PopularProductsAdminPage() {
         <p className="popular-products-admin__empty">{POPULAR_PRODUCTS_ADMIN_PAGE_UI.EMPTY}</p>
       ) : null}
       <div className="popular-products-admin__lists">
-        {filteredLists.map((list, index) => (
+        {filteredLists.map((list) => (
           <CuratedProductListAdminCard
             key={`${list._id}-${list.updatedAt ?? ""}-${list.productIds.length}`}
             list={list}
@@ -264,7 +287,7 @@ export function PopularProductsAdminPage() {
             onMoveUp={() => void handleMoveList(list._id, "up")}
             onMoveDown={() => void handleMoveList(list._id, "down")}
             onDeleteList={() => void handleDeleteList(list._id)}
-            onSaveTitle={(title) => handleSaveTitle(list._id, title)}
+            onSaveList={(payload) => handleSaveList(list._id, payload)}
             onAddProduct={(productId) => handleAddProduct(list._id, productId)}
             onRemoveProduct={(productId) => handleRemoveProduct(list._id, productId)}
           />

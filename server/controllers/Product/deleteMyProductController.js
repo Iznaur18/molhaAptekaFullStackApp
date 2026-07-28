@@ -1,5 +1,4 @@
 import { ProductModel } from "../../models/index.js";
-import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
 import { isUserAdmin } from "../../services/access/adminUserGuard.js";
 import {
   hasProductOpenSales,
@@ -22,69 +21,57 @@ import { normalizeProductPreviewVideoUrl } from "../../utils/productPreviewVideo
 import { removeProductIdsFromAllWishlists } from "../Favorites/favoritesItemHelpers.js";
 import { errorRes, successRes } from "../../services/http/index.js";
 
-/** Удаление своего товара или любого (admin). DELETE /product/:productId */
+/** Удаление своего товара (любой статус модерации) или любого (admin). DELETE /product/:productId */
 export const deleteMyProductController = async (req, res) => {
-const userId = req.userId;
-    const { productId } = req.params;
-    const isAdmin = await isUserAdmin(userId);
+  const userId = req.userId;
+  const { productId } = req.params;
+  const isAdmin = await isUserAdmin(userId);
 
-    if (await hasProductOpenSales(productId)) {
-      return errorRes(res, 409, OPEN_SALES_BLOCK_MESSAGE);
+  if (await hasProductOpenSales(productId)) {
+    return errorRes(res, 409, OPEN_SALES_BLOCK_MESSAGE);
+  }
+
+  const ownerFilter = isAdmin
+    ? { _id: productId }
+    : {
+        _id: productId,
+        productSeller: userId,
+      };
+
+  const deleted = await ProductModel.findOneAndDelete(ownerFilter).lean();
+
+  if (deleted) {
+    await removeProductIdsFromAllWishlists([String(productId)]);
+    const previewVideoUrl = normalizeProductPreviewVideoUrl(
+      deleted.productPreviewVideoUrl,
+    );
+    if (previewVideoUrl) {
+      await deleteUploadFileByUrl(previewVideoUrl);
     }
-
-    const ownerFilter = isAdmin
-      ? { _id: productId }
-      : {
-          _id: productId,
-          productSeller: userId,
-          productModerationStatus: PRODUCT_MODERATION_APPROVED,
-        };
-
-    const deleted = await ProductModel.findOneAndDelete(ownerFilter).lean();
-
-    if (deleted) {
-      await removeProductIdsFromAllWishlists([String(productId)]);
-      const previewVideoUrl = normalizeProductPreviewVideoUrl(
-        deleted.productPreviewVideoUrl,
-      );
-      if (previewVideoUrl) {
-        await deleteUploadFileByUrl(previewVideoUrl);
-      }
-      await dismissPendingReportsForProduct(productId);
-      await rejectAllPendingOffersForProduct(productId);
-      await cancelProductPromotionsForProduct({
-        productId,
-        statuses: [
-          PRODUCT_PROMOTION_STATUS_PENDING_STAFF,
-          PRODUCT_PROMOTION_STATUS_ACTIVE,
-        ],
-      });
-      const now = new Date();
-      await ProductPriceOfferModel.updateMany(
-        { productId, status: PRICE_OFFER_STATUS_ACCEPTED },
-        {
-          $set: {
-            status: PRICE_OFFER_STATUS_REJECTED,
-            reviewedAt: now,
-          },
+    await dismissPendingReportsForProduct(productId);
+    await rejectAllPendingOffersForProduct(productId);
+    await cancelProductPromotionsForProduct({
+      productId,
+      statuses: [
+        PRODUCT_PROMOTION_STATUS_PENDING_STAFF,
+        PRODUCT_PROMOTION_STATUS_ACTIVE,
+      ],
+    });
+    const now = new Date();
+    await ProductPriceOfferModel.updateMany(
+      { productId, status: PRICE_OFFER_STATUS_ACCEPTED },
+      {
+        $set: {
+          status: PRICE_OFFER_STATUS_REJECTED,
+          reviewedAt: now,
         },
-      );
-    }
+      },
+    );
+  }
 
-    if (!deleted) {
-      if (!isAdmin) {
-        const owned = await ProductModel.findOne({
-          _id: productId,
-          productSeller: userId,
-        })
-          .select("productModerationStatus")
-          .lean();
-        if (owned && owned.productModerationStatus !== PRODUCT_MODERATION_APPROVED) {
-          return errorRes(res, 409, "Удалить можно только одобренный товар");
-        }
-      }
-      return errorRes(res, 404, "Товар не найден или нет прав на удаление");
-    }
+  if (!deleted) {
+    return errorRes(res, 404, "Товар не найден или нет прав на удаление");
+  }
 
-    return successRes(res, { message: "Товар удалён" });
+  return successRes(res, { message: "Товар удалён" });
 };

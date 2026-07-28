@@ -101,7 +101,9 @@ export const RafflesStaffPage = () => {
   const syncStaffQueueCaches = useCallback(async () => {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: raffleQueryKeys.staffQueue() }),
-      queryClient.invalidateQueries({ queryKey: raffleQueryKeys.featured() }),
+      queryClient.invalidateQueries({
+        queryKey: [...raffleQueryKeys.all, "featured"],
+      }),
       queryClient.invalidateQueries({ queryKey: [...staffBadgeQueryKeys.all, "raffles"] }),
     ]);
   }, [queryClient]);

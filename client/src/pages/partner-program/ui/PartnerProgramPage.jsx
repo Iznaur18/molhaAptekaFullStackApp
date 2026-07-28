@@ -220,7 +220,7 @@ export function PartnerProgramPage({
             <button type="button" className="app-btn app-btn--secondary" onClick={handleCopy}>
               {PARTNER_PROGRAM_PAGE_UI.COPY_BUTTON}
             </button>
-            <button type="button" className="app-btn app-btn--secondary" onClick={handleShare}>
+            <button type="button" className="app-btn app-btn--primary" onClick={handleShare}>
               {PARTNER_PROGRAM_PAGE_UI.SHARE_BUTTON}
             </button>
           </div>

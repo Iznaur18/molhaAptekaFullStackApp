@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { APP_SHELL_MOBILE_NAV_BREAKPOINT_PX } from "./appShellMobileNavConstants.js";
 
 /**
- * Компактный layout (bottom nav + mobile header): реальная ширина окна ≤ 640px.
- * Не использовать content-cap — иначе планшет 600–767 ошибочно станет «mobile».
+ * Компактный layout (mobile topbar): окно ≤ tablet max (до 1024 exclusive).
+ * Desktop chrome — с `APP_SHELL_DESKTOP_MIN_PX` (1024+).
  *
  * @returns {boolean}
  */

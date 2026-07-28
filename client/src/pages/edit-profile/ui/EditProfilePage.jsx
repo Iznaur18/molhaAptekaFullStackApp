@@ -1,5 +1,6 @@
 import { useEditProfileModal } from "../../../entities/user/model/useEditProfileModal.js";
 import { AddressStructuredFields } from "../../../entities/address/ui/AddressStructuredFields.jsx";
+import { RuRegionSelect } from "../../../entities/region/ui/RuRegionSelect.jsx";
 import {
   NOTES_ABOUT_USER_MAX_CHARS,
   USER_GENDER_FEMALE,
@@ -226,6 +227,21 @@ export function EditProfilePage({
                   </option>
                 ))}
               </select>
+            </label>
+            <label className="edit-profile-modal__label">
+              {EDIT_PROFILE_MODAL_UI.LABEL_REGION}
+              <RuRegionSelect
+                className="edit-profile-modal__input"
+                value={form.userRegionCode}
+                disabled={isSubmitting}
+                required
+                onChange={(userRegionCode) =>
+                  setForm((prev) => ({ ...prev, userRegionCode }))
+                }
+              />
+              <span className="edit-profile-modal__hint">
+                {EDIT_PROFILE_MODAL_UI.HINT_REGION}
+              </span>
             </label>
             <AddressStructuredFields
               value={form.structuredAddress}

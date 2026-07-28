@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { resolveViewerRegionCode } from "@molha/api-contract";
 
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
 import { AppError } from "../../errors/AppError.js";
@@ -79,6 +80,26 @@ export const normalizeCuratedProductListTitle = (rawTitle) => {
     throw new AppError(400, "Укажите заголовок списка");
   }
   return title;
+};
+
+/**
+ * @param {string | null | undefined} rawRegionCode
+ */
+export const normalizeCuratedProductListRegionCode = (rawRegionCode) => {
+  return resolveViewerRegionCode(rawRegionCode);
+};
+
+/**
+ * Подборки только для региона зрителя.
+ *
+ * @param {import('mongoose').LeanDocument<import('../models/CuratedProductListModel.js').default>[]} lists
+ * @param {string | null | undefined} viewerRegionCode
+ */
+export const filterCuratedListsForViewerRegion = (lists, viewerRegionCode) => {
+  const code = resolveViewerRegionCode(viewerRegionCode);
+  return lists.filter(
+    (list) => resolveViewerRegionCode(list.regionCode) === code,
+  );
 };
 
 /**
@@ -174,7 +195,8 @@ export const buildHomeCuratedListsResponse = async (
   hiddenSellerIds,
   options = {},
 ) => {
-  const purgedLists = await autopurgeCuratedProductLists(lists, hiddenSellerIds);
+  const regionLists = filterCuratedListsForViewerRegion(lists, options.viewerRegionCode);
+  const purgedLists = await autopurgeCuratedProductLists(regionLists, hiddenSellerIds);
   const allProductIds = [
     ...new Set(purgedLists.flatMap((list) => (list.productIds ?? []).map((id) => String(id)))),
   ];
@@ -210,6 +232,7 @@ export const buildAdminCuratedListsResponse = async (lists, hiddenSellerIds) => 
 export const toCuratedProductListPayload = (list) => ({
   _id: String(list._id),
   title: String(list.title ?? ""),
+  regionCode: normalizeCuratedProductListRegionCode(list.regionCode),
   productIds: Array.isArray(list.productIds) ? list.productIds.map((id) => String(id)) : [],
   sortOrder: Number(list.sortOrder) || 0,
   createdAt: list.createdAt ?? null,
@@ -234,6 +257,20 @@ export const assertCuratedListProductCatalogVisible = async (productId) => {
     throw new AppError(400, "Товар недоступен в каталоге");
   }
 
+  return product;
+};
+
+/**
+ * @param {string} productId
+ * @param {string | null | undefined} listRegionCode
+ */
+export const assertCuratedListProductMatchesRegion = async (productId, listRegionCode) => {
+  const product = await assertCuratedListProductCatalogVisible(productId);
+  const listRegion = normalizeCuratedProductListRegionCode(listRegionCode);
+  const productRegion = normalizeCuratedProductListRegionCode(product.productRegionCode);
+  if (productRegion !== listRegion) {
+    throw new AppError(400, "Регион товара не совпадает с регионом подборки");
+  }
   return product;
 };
 

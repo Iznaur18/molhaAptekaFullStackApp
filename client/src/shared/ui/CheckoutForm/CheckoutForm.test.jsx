@@ -13,6 +13,7 @@ vi.mock("../../../shared/config/featureFlags.js", () => ({
 
 const baseProps = {
   defaultDeliveryAddress: {},
+  pickupAddressSummary: "Москва, Тверская 1",
   isSubmitting: false,
   submitError: "",
   submitSuccess: "",
@@ -20,40 +21,34 @@ const baseProps = {
 };
 
 describe("CheckoutForm", () => {
-  it("disables submit until address is filled", () => {
-    renderWithProviders(<CheckoutForm {...baseProps} />);
+  it("disables submit when pickup address missing", () => {
+    renderWithProviders(<CheckoutForm {...baseProps} pickupAddressSummary="" />);
 
     expect(screen.getByRole("button", { name: CHECKOUT_FORM_UI.SUBMIT_IDLE })).toBeDisabled();
   });
 
-  it("shows validation error on empty submit", async () => {
-    renderWithProviders(<CheckoutForm {...baseProps} />);
+  it("shows pickup validation error on empty pickup submit", async () => {
+    renderWithProviders(<CheckoutForm {...baseProps} pickupAddressSummary="" />);
 
     const form = screen.getByRole("heading", { name: CHECKOUT_FORM_UI.HEADING }).closest("form");
     fireEvent.submit(form);
 
-    expect(await screen.findByRole("alert")).toHaveTextContent("Укажите адрес доставки");
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      CHECKOUT_FORM_UI.ERROR_PICKUP_REQUIRED,
+    );
   });
 
-  it("submits trimmed address when valid", async () => {
+  it("submits pickup fulfillment when address present", async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
 
-    renderWithProviders(
-      <CheckoutForm
-        {...baseProps}
-        onSubmit={onSubmit}
-        defaultDeliveryAddress={{
-          userAddress: "г Москва, ул Ленина, д 1",
-          userAddressFiasId: "fias-1",
-        }}
-      />,
-    );
+    renderWithProviders(<CheckoutForm {...baseProps} onSubmit={onSubmit} />);
 
     await user.click(screen.getByRole("button", { name: CHECKOUT_FORM_UI.SUBMIT_IDLE }));
 
     expect(onSubmit).toHaveBeenCalledWith({
-      deliveryAddress: "г Москва, ул Ленина, д 1",
+      fulfillmentMethod: "pickup",
+      deliveryAddress: "",
       deliveryAddressFlat: "",
       paymentMethod: ORDER_PAYMENT_METHOD_DEFAULT,
     });

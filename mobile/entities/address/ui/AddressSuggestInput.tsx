@@ -29,6 +29,8 @@ type AddressSuggestInputProps = {
   onChange: (next: RuDeliveryAddressValue) => void;
   disabled?: boolean;
   placeholder?: string;
+  label?: string;
+  maxLength?: number;
   containerStyle?: StyleProp<ViewStyle>;
   labelStyle?: StyleProp<TextStyle>;
   inputStyle?: StyleProp<TextStyle>;
@@ -39,6 +41,8 @@ export const AddressSuggestInput = ({
   onChange,
   disabled = false,
   placeholder,
+  label,
+  maxLength,
   containerStyle,
   labelStyle,
   inputStyle,
@@ -100,7 +104,9 @@ export const AddressSuggestInput = ({
 
   return (
     <View style={[suggestStyles.wrap, containerStyle]}>
-      <Text style={[fieldStyles.labelStrong, labelStyle]}>{ADDRESS_DELIVERY_UI.LABEL_LINE}</Text>
+      <Text style={[fieldStyles.labelStrong, labelStyle]}>
+        {label ?? ADDRESS_DELIVERY_UI.LABEL_LINE}
+      </Text>
       <TextInput
         style={[fieldStyles.input, fieldStyles.inputCompact, inputStyle]}
         value={value.line}
@@ -109,6 +115,7 @@ export const AddressSuggestInput = ({
         placeholderTextColor={theme.colors.textMuted}
         editable={!disabled}
         autoCorrect={false}
+        maxLength={maxLength}
         {...textInputFocusScrollProps}
       />
 

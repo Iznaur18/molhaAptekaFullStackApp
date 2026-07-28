@@ -1,5 +1,9 @@
 import mongoose from "mongoose";
 
+import {
+  ORDER_FULFILLMENT_PICKUP,
+  PRODUCT_PICKUP_MISSING_FOR_ORDER_MESSAGE,
+} from "@molha/api-contract";
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
 import { AppError } from "../../errors/AppError.js";
 import {
@@ -37,6 +41,7 @@ const calculateTotalAmount = (items, priceById) =>
  *   name: string;
  *   loyaltyPointsPerUnit: number;
  *   sellerId: string;
+ *   pickupAddress: string;
  * }>} productById
  */
 const buildItemsWithPriceSnapshot = (items, productById) =>
@@ -66,10 +71,12 @@ const fetchAvailableProductsForOrder = async (productIds) => {
     productIsAvailable: { $ne: false },
     productStockQuantity: { $gt: 0 },
   })
-    .select("_id productPrice productName loyaltyPointsPerUnit productSeller")
+    .select(
+      "_id productPrice productName loyaltyPointsPerUnit productSeller productPickupAddress",
+    )
     .lean();
 
-  /** @type {Record<string, { price: number; name: string; loyaltyPointsPerUnit: number; sellerId: string }>} */
+  /** @type {Record<string, { price: number; name: string; loyaltyPointsPerUnit: number; sellerId: string; pickupAddress: string }>} */
   const byId = {};
   for (const product of products) {
     const id = String(product._id);
@@ -81,9 +88,32 @@ const fetchAvailableProductsForOrder = async (productIds) => {
         product.loyaltyPointsPerUnit,
       ),
       sellerId: String(product.productSeller),
+      pickupAddress: String(product.productPickupAddress ?? "").trim(),
     };
   }
   return byId;
+};
+
+/**
+ * @param {Record<string, { pickupAddress: string }>} productById
+ * @param {string[]} productIds
+ */
+const resolvePickupDeliveryAddress = (productById, productIds) => {
+  const addresses = [];
+  for (const id of productIds) {
+    const address = productById[id]?.pickupAddress ?? "";
+    if (!address) {
+      throw new AppError(400, PRODUCT_PICKUP_MISSING_FOR_ORDER_MESSAGE);
+    }
+    if (!addresses.includes(address)) {
+      addresses.push(address);
+    }
+  }
+  return {
+    displayAddress: addresses.join("; "),
+    flat: "",
+    fiasId: "",
+  };
 };
 
 const appendOrderToBuyList = async (userId, orderId, session) => {
@@ -105,11 +135,12 @@ const appendOrderToBuyList = async (userId, orderId, session) => {
  *   items: Array<{ productId: unknown; quantity: number }>;
  *   paymentMethod: string;
  *   priceOfferId?: string | null;
- *   verifiedDeliveryAddress: {
+ *   fulfillmentMethod?: string;
+ *   verifiedDeliveryAddress?: {
  *     displayAddress: string;
  *     flat?: string;
  *     fiasId: string;
- *   };
+ *   } | null;
  * }} input
  */
 export async function createOrder({
@@ -117,7 +148,8 @@ export async function createOrder({
   items,
   paymentMethod,
   priceOfferId,
-  verifiedDeliveryAddress,
+  fulfillmentMethod = ORDER_FULFILLMENT_PICKUP,
+  verifiedDeliveryAddress = null,
 }) {
   const emailCheck = await checkUserEmailVerified(userId);
   if (!emailCheck.ok) {
@@ -126,7 +158,7 @@ export async function createOrder({
 
   const uniqueProductIds = [...new Set(items.map((item) => String(item.productId)))];
 
-  /** @type {Record<string, { price: number; name: string; loyaltyPointsPerUnit: number; sellerId: string }>} */
+  /** @type {Record<string, { price: number; name: string; loyaltyPointsPerUnit: number; sellerId: string; pickupAddress: string }>} */
   let productById = {};
   let linkedPriceOfferId = null;
 
@@ -148,7 +180,7 @@ export async function createOrder({
         productId,
       );
       const product = await ProductModel.findById(productId)
-        .select("loyaltyPointsPerUnit productSeller")
+        .select("loyaltyPointsPerUnit productSeller productPickupAddress")
         .lean();
       if (!product) {
         throw new AppError(400, "Товар не найден");
@@ -160,6 +192,7 @@ export async function createOrder({
           product.loyaltyPointsPerUnit,
         ),
         sellerId: String(product.productSeller),
+        pickupAddress: String(product.productPickupAddress ?? "").trim(),
       };
       linkedPriceOfferId = priceOfferId;
     } catch (error) {
@@ -185,6 +218,18 @@ export async function createOrder({
     }
   }
 
+  const resolvedFulfillment =
+    fulfillmentMethod === "delivery" ? "delivery" : ORDER_FULFILLMENT_PICKUP;
+
+  const addressForOrder =
+    resolvedFulfillment === ORDER_FULFILLMENT_PICKUP
+      ? resolvePickupDeliveryAddress(productById, uniqueProductIds)
+      : verifiedDeliveryAddress;
+
+  if (!addressForOrder?.displayAddress) {
+    throw new AppError(400, "Адрес доставки обязателен");
+  }
+
   const itemsWithPrice = buildItemsWithPriceSnapshot(items, productById);
   const priceById = Object.fromEntries(
     Object.entries(productById).map(([id, row]) => [id, row.price]),
@@ -201,7 +246,6 @@ export async function createOrder({
 
   try {
     return await runInTransaction(async (session) => {
-      // Авторитетная проверка остатка внутри транзакции (закрывает гонку оверселла).
       await guardOrderItemsStockInTransaction(items, userId, session);
       await reserveLoyaltyPointsForNewOrder(itemsForReserve, session);
 
@@ -211,9 +255,10 @@ export async function createOrder({
             userBuyerId: userId,
             items: itemsWithPrice,
             totalAmount,
-            deliveryAddress: verifiedDeliveryAddress.displayAddress,
-            deliveryAddressFlat: verifiedDeliveryAddress.flat ?? "",
-            deliveryAddressFiasId: verifiedDeliveryAddress.fiasId,
+            deliveryAddress: addressForOrder.displayAddress,
+            deliveryAddressFlat: addressForOrder.flat ?? "",
+            deliveryAddressFiasId: addressForOrder.fiasId ?? "",
+            fulfillmentMethod: resolvedFulfillment,
             paymentMethod,
             status,
             priceOfferId: linkedPriceOfferId,

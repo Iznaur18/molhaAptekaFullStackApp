@@ -62,7 +62,7 @@
   scrollbar-width: none;
   -ms-overflow-style: none;
   -webkit-overflow-scrolling: touch;
-  touch-action: pan-x;
+  touch-action: pan-x pan-y;
 }
 
 .product-details-modal__price-badge-row-scroll::-webkit-scrollbar {
@@ -165,23 +165,23 @@
 }
 
 .product-details-modal__price-display .product-discount-badge {
-  padding: 0.17rem 0.45rem;
-  border-radius: 0.28rem;
+  padding: 0.22rem 0.55rem;
+  border-radius: 0.3rem;
   border: 0;
   background: #ffe4e6;
   color: #be123c;
-  font-size: 0.5rem;
+  font-size: 0.6875rem;
   font-weight: 800;
   line-height: 1.2;
 }
 
 .product-details-modal__price-display .product-loyalty-points-badge--detail {
-  padding: 0.17rem 0.45rem;
-  border-radius: 0.28rem;
+  padding: 0.22rem 0.55rem;
+  border-radius: 0.3rem;
   border: 0;
   background: #fef3c7;
   color: #b45309;
-  font-size: 0.5rem;
+  font-size: 0.6875rem;
   font-weight: 800;
   line-height: 1.2;
   cursor: help;

@@ -44,9 +44,9 @@ export const createProduct = async (body: CreateProductBody) => {
       payload.productPreviewVideoUrl = previewVideoUrl;
     }
 
-    const saleCity = String(parsedBody.productSaleCity ?? "").trim();
-    if (saleCity) {
-      payload.productSaleCity = saleCity;
+    const saleRegion = String(parsedBody.productRegionCode ?? "").trim();
+    if (saleRegion) {
+      payload.productRegionCode = saleRegion;
     }
 
     if (
@@ -76,6 +76,15 @@ export const createProduct = async (body: CreateProductBody) => {
     } else {
       payload.productReturnTerms = [];
     }
+
+    payload.productPickupAddress = parsedBody.productPickupAddress;
+    if (parsedBody.productPickupLat != null) {
+      payload.productPickupLat = parsedBody.productPickupLat;
+    }
+    if (parsedBody.productPickupLon != null) {
+      payload.productPickupLon = parsedBody.productPickupLon;
+    }
+    payload.productDeliveryEnabled = parsedBody.productDeliveryEnabled === true;
 
     const { data } = await apiClient.post("/product", payload);
     const parsed = parseCreateProductData(data);

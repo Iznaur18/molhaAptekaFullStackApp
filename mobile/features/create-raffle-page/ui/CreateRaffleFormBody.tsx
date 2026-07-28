@@ -15,6 +15,7 @@ import type {
 } from "@/features/create-raffle-page/lib/createRaffleForm";
 import type { CreateRaffleWizardStepId } from "@/features/create-raffle-page/lib/createRaffleWizardSteps";
 import { CreateRaffleFormSection } from "@/features/create-raffle-page/ui/CreateRaffleFormSection";
+import { RuRegionSelect } from "@/entities/region/ui/RuRegionSelect";
 import { ImageUrlUploadField } from "@/features/image-upload/ui/ImageUrlUploadField";
 import { VideoUrlUploadField } from "@/features/image-upload/ui/VideoUrlUploadField";
 import { CREATE_RAFFLE_MODAL_UI } from "@/shared/config";
@@ -96,6 +97,15 @@ export const CreateRaffleFormBody = ({
           />
           <Text style={styles.fieldHint}>{CREATE_RAFFLE_MODAL_UI.HINT_TITLE}</Text>
         </View>
+
+        <RuRegionSelect
+          value={form.regionCode}
+          disabled={isSubmitting}
+          required
+          label={CREATE_RAFFLE_MODAL_UI.LABEL_REGION}
+          onChange={(regionCode) => onFormChange({ regionCode })}
+        />
+        <Text style={styles.fieldHint}>{CREATE_RAFFLE_MODAL_UI.HINT_REGION}</Text>
 
         <View style={styles.field}>
           <Text style={styles.fieldLabel}>{CREATE_RAFFLE_MODAL_UI.LABEL_DESCRIPTION}</Text>

@@ -517,6 +517,7 @@ test("createProductBodySchema accepts relative /uploads image urls", () => {
     productListingOrigin: "own",
     productIsOriginal: true,
     productRegionCode: "RU-MOW",
+    productPickupAddress: "Москва, Тверская 1",
   });
   assert.deepEqual(parsed.productImageUrls, ["/uploads/photo.webp"]);
   assert.equal(parsed.productRegionCode, "RU-MOW");

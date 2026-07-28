@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { mongoIdSchema } from "./mongoId.js";
+import { requiredRuRegionCodeFieldSchema } from "./ruRegions.js";
 
 export const CURATED_PRODUCT_LIST_TITLE_MAX_LENGTH = 60;
 
@@ -21,10 +22,12 @@ export const curatedProductListItemParamsSchema = z.object({
 
 export const createCuratedProductListBodySchema = z.object({
   title: curatedListTitleSchema,
+  regionCode: requiredRuRegionCodeFieldSchema,
 });
 
 export const patchCuratedProductListBodySchema = z.object({
   title: curatedListTitleSchema.optional(),
+  regionCode: requiredRuRegionCodeFieldSchema.optional(),
 });
 
 export const reorderCuratedProductListsBodySchema = z.object({

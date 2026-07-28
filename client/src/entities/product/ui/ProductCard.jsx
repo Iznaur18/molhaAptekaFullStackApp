@@ -34,6 +34,9 @@ import "./ProductCard.css";
  *   onRejectCommentChange: (value: string) => void;
  *   onApprove: () => void;
  *   onReject: () => void;
+ *   onDelete?: () => void | Promise<void>;
+ *   canDelete?: boolean;
+ *   hasOpenSales?: boolean;
  *   isBusy?: boolean;
  *   errorMessage?: string;
  * } | null} [moderationActions]

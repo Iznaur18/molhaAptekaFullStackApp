@@ -13,7 +13,9 @@ export const useMyRaffleMutations = () => {
   const invalidateMyRaffle = async () => {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: raffleQueryKeys.my() }),
-      queryClient.invalidateQueries({ queryKey: raffleQueryKeys.featured() }),
+      queryClient.invalidateQueries({
+        queryKey: [...raffleQueryKeys.all, "featured"],
+      }),
       queryClient.invalidateQueries({ queryKey: raffleQueryKeys.createAdvertising() }),
       queryClient.invalidateQueries({ queryKey: loyaltyPointsQueryKeys.all }),
     ]);

@@ -287,11 +287,11 @@ export function SiteHeaderBannerCarousel({ slides }) {
    * @param {string} key
    * @param {boolean} isActive
    */
-  const renderSlide = (slide, key, isActive) => {
+  const renderSlide = (slide, key, isActive, { fullWidth = false } = {}) => {
     const imageSrc = resolveImageUrlForDisplay(slide.imageUrl);
     const isInteractive = Boolean(slide.linkPath);
     const slideStyle = {
-      width: slideWidth > 0 ? `${slideWidth}px` : "100%",
+      width: fullWidth || slideWidth <= 0 ? "100%" : `${slideWidth}px`,
       ...(slide.backgroundColor ? { backgroundColor: slide.backgroundColor } : null),
     };
 
@@ -341,7 +341,7 @@ export function SiteHeaderBannerCarousel({ slides }) {
           "--site-header-banner-height": `${SITE_HEADER_BANNER_HEIGHT_PX}px`,
         }}
       >
-        {renderSlide(slides[0], slides[0].id, true)}
+        {renderSlide(slides[0], slides[0].id, true, { fullWidth: true })}
       </section>
     );
   }

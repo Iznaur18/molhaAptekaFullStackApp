@@ -14,6 +14,7 @@ import "./HeaderCircleIconButton.css";
  *   className?: string;
  *   ariaExpanded?: boolean;
  *   ariaControls?: string;
+ *   disabled?: boolean;
  * }} props
  */
 export function HeaderCircleIconButton({
@@ -27,6 +28,7 @@ export function HeaderCircleIconButton({
   className,
   ariaExpanded,
   ariaControls,
+  disabled = false,
 }) {
   const buttonClassName = [
     "header-circle-button",
@@ -48,6 +50,7 @@ export function HeaderCircleIconButton({
       type="button"
       className={buttonClassName}
       onClick={onClick}
+      disabled={disabled}
       aria-label={ariaLabel}
       aria-current={isActive ? "page" : undefined}
       aria-expanded={ariaExpanded}

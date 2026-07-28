@@ -82,4 +82,35 @@ export const useProductModerationDetailsFooterStyles = createThemedStyles((theme
     fontWeight: "500",
     color: theme.colors.danger,
   },
+  deleteButton: {
+    paddingVertical: 7.2,
+    paddingHorizontal: 13.6,
+    borderRadius: 8,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.danger,
+    backgroundColor: theme.colors.surface,
+    alignItems: "center",
+  },
+  deleteButtonCompact: {
+    flex: 1,
+    alignItems: "center",
+  },
+  deleteText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: theme.colors.danger,
+  },
+  openSalesHint: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: theme.colors.textSecondary,
+  },
+  deleteConfirm: {
+    gap: 8,
+  },
+  deleteConfirmQuestion: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: theme.colors.text,
+  },
 }));

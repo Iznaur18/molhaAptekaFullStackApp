@@ -6,6 +6,7 @@ import { formatIntegerGroupRu } from "../../../shared/lib/numericInput.js";
 import { resolveProductLoyaltyPointsPerUnit } from "./resolveProductLoyaltyPointsPerUnit.js";
 import { isProductListingOrigin } from "./productListingOrigin.js";
 import { mapProductReturnTermsToRows } from "./productReturnTermRows.js";
+import { IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED } from "../../product-category-tree/lib/isProductCategoryTreePickerEnabled.js";
 
 export const CREATE_PRODUCT_INITIAL_FORM = {
   productName: "",
@@ -24,6 +25,10 @@ export const CREATE_PRODUCT_INITIAL_FORM = {
   loyaltyPointsPerUnit: "0",
   productCharacteristicRows: [],
   productRegionCode: "RU-MOW",
+  productPickupAddress: "",
+  productPickupLat: null,
+  productPickupLon: null,
+  productDeliveryEnabled: false,
   productReturnEnabled: null,
   returnTermRows: [],
 };
@@ -53,8 +58,12 @@ export function createProductFormStateFromProduct(product) {
     productPrice: priceStr ? formatIntegerGroupRu(priceStr) : "",
     productOldPrice: oldPriceStr ? formatIntegerGroupRu(oldPriceStr) : "",
     productCategory: product.productCategory ?? PRODUCT_CATEGORY_ELECTRONICS,
-    productCategoryId: product.productCategoryId ?? null,
-    categoryBreadcrumbRu: product.categoryBreadcrumbRu?.trim() ?? "",
+    productCategoryId: IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED
+      ? (product.productCategoryId ?? null)
+      : null,
+    categoryBreadcrumbRu: IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED
+      ? (product.categoryBreadcrumbRu?.trim() ?? "")
+      : "",
     productIsAvailable: product.productIsAvailable !== false,
     productStockQuantity:
       product.productIsAvailable !== false && product.productStockQuantity != null
@@ -63,6 +72,16 @@ export function createProductFormStateFromProduct(product) {
     loyaltyPointsPerUnit: String(resolveProductLoyaltyPointsPerUnit(product)),
     productCharacteristicRows: characteristicRowsFromApi(product.productCharacteristics),
     productRegionCode: product.productRegionCode?.trim() || "RU-MOW",
+    productPickupAddress: String(product.productPickupAddress ?? "").trim(),
+    productPickupLat:
+      product.productPickupLat != null && Number.isFinite(Number(product.productPickupLat))
+        ? Number(product.productPickupLat)
+        : null,
+    productPickupLon:
+      product.productPickupLon != null && Number.isFinite(Number(product.productPickupLon))
+        ? Number(product.productPickupLon)
+        : null,
+    productDeliveryEnabled: false,
     productReturnEnabled: product.productReturnEnabled === true,
     returnTermRows:
       product.productReturnEnabled === true

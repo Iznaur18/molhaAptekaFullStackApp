@@ -395,8 +395,15 @@ export const useStoryViewerModalStyles = createThemedStyles((theme) => ({
     zIndex: 0,
   },
   media: {
+    ...StyleSheet.absoluteFillObject,
     width: "100%",
     height: "100%",
+  },
+  mediaUnderlay: {
+    zIndex: 1,
+  },
+  mediaActive: {
+    zIndex: 2,
   },
   mediaHidden: {
     opacity: 0,
@@ -755,6 +762,78 @@ export const useProductEditManageSectionStyles = createThemedStyles((theme) => (
   },
   toggles: {
     gap: 8,
+  },
+  deleteBlock: {
+    gap: 8,
+  },
+  deleteBtn: {
+    gap: 3.2,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.danger,
+    backgroundColor: theme.colors.dangerSurface,
+  },
+  deleteBtnDisabled: {
+    opacity: 0.55,
+  },
+  deleteBtnTitle: {
+    fontSize: 15,
+    fontWeight: "650",
+    lineHeight: 20,
+    color: theme.colors.danger,
+  },
+  deleteBtnHint: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: theme.colors.danger,
+    opacity: 0.9,
+  },
+  deletePending: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: theme.colors.text,
+  },
+  deleteConfirm: {
+    gap: 8,
+  },
+  deleteConfirmQuestion: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: theme.colors.text,
+  },
+  deleteConfirmActions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  deleteConfirmYes: {
+    paddingVertical: 8.8,
+    paddingHorizontal: 13.6,
+    borderRadius: 8,
+    backgroundColor: theme.colors.danger,
+  },
+  deleteConfirmCancel: {
+    paddingVertical: 8.8,
+    paddingHorizontal: 13.6,
+    borderRadius: 8,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.borderStrong,
+    backgroundColor: theme.colors.surface,
+  },
+  deleteConfirmPressed: {
+    opacity: 0.85,
+  },
+  deleteConfirmYesText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: theme.colors.onContrast,
+  },
+  deleteConfirmCancelText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: theme.colors.text,
   },
 }));
 

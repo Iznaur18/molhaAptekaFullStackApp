@@ -35,6 +35,8 @@ export const useHomeHeaderProps = () => {
     setIsRegisterModalOpen,
     handleNavigateToFullCatalogFromBreadcrumb,
     closeCatalogProductDetails,
+    viewerRegionCode,
+    setViewerRegionCode,
   } = ctx;
 
   const inAppNotificationsCount = inAppNotifications.length;
@@ -59,8 +61,17 @@ export const useHomeHeaderProps = () => {
 
   const handleMobileHomeClick = useCallback(() => {
     closeCatalogProductDetails();
+    // С профиля/рекламы — явный уход на `/`, затем сброс фильтров ленты.
+    if (mainView !== "catalog") {
+      goToMainView("catalog");
+    }
     handleNavigateToFullCatalogFromBreadcrumb();
-  }, [closeCatalogProductDetails, handleNavigateToFullCatalogFromBreadcrumb]);
+  }, [
+    closeCatalogProductDetails,
+    goToMainView,
+    handleNavigateToFullCatalogFromBreadcrumb,
+    mainView,
+  ]);
 
   const handleMobileCatalogClick = useCallback(() => {
     closeCatalogProductDetails();
@@ -128,6 +139,8 @@ export const useHomeHeaderProps = () => {
       onNavigateToFullCatalogFromBreadcrumb: handleMobileHomeClick,
       showSiteHeaderBanner: Boolean(showHomeCatalogFeed) && mainView === "catalog",
       isCatalogBrowserLanding,
+      viewerRegionCode,
+      onViewerRegionChange: setViewerRegionCode,
     }),
     [
       mainView,
@@ -162,6 +175,8 @@ export const useHomeHeaderProps = () => {
       handleLoginClick,
       handleRegisterClick,
       showHomeCatalogFeed,
+      viewerRegionCode,
+      setViewerRegionCode,
     ],
   );
 };

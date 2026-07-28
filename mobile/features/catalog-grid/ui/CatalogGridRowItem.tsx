@@ -15,6 +15,7 @@ type CatalogGridRowItemProps = {
   tileWidth: number;
   rowIndex?: number;
   disableEntering?: boolean;
+  highlightRaffleProduct?: boolean;
 };
 
 export const CatalogGridRowItem = memo(({
@@ -24,6 +25,7 @@ export const CatalogGridRowItem = memo(({
   tileWidth,
   rowIndex = 0,
   disableEntering = false,
+  highlightRaffleProduct = false,
 }: CatalogGridRowItemProps) => {
   if (!row) {
     return null;
@@ -36,7 +38,11 @@ export const CatalogGridRowItem = memo(({
       <View style={[catalogGridRowStyles.row, { gap }]}>
         {row.products.map((product) => (
           <View key={product._id} style={{ width: tileWidth }}>
-            <ProductCard product={product} layout="catalog-grid" />
+            <ProductCard
+              product={product}
+              layout="catalog-grid"
+              highlightRaffleProduct={highlightRaffleProduct}
+            />
           </View>
         ))}
         {row.products.length < columns

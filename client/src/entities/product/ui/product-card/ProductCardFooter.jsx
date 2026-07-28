@@ -27,6 +27,9 @@ export function ProductCardFooter({ vm, sellerToolbar, stopCardDetailsActivation
           onRejectCommentChange={vm.moderationActions.onRejectCommentChange}
           onApprove={vm.moderationActions.onApprove}
           onReject={vm.moderationActions.onReject}
+          onDelete={vm.moderationActions.onDelete}
+          canDelete={vm.moderationActions.canDelete}
+          hasOpenSales={vm.moderationActions.hasOpenSales}
           isBusy={vm.moderationActions.isBusy}
           errorMessage={vm.moderationActions.errorMessage}
         />

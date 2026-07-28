@@ -18,7 +18,15 @@ export function parseApiSuccess(payload, dataSchema) {
   }
   const parsed = dataSchema.safeParse(envelope.data.data);
   if (!parsed.success) {
-    throw new Error("INVALID_API_DATA");
+    const issue = parsed.error.issues[0];
+    const detail = issue
+      ? `${issue.path.length > 0 ? issue.path.join(".") : "(root)"}: ${issue.message}`
+      : "";
+    const error = new Error("INVALID_API_DATA");
+    if (detail) {
+      error.cause = detail;
+    }
+    throw error;
   }
   return parsed.data;
 }

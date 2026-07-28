@@ -1,5 +1,7 @@
 import { useMemo } from "react";
 
+import { isProductRaffleParticipant } from "@/entities/raffle/lib/isProductRaffleParticipant";
+
 import { resolveAuctionUiState } from "./resolveAuctionUiState";
 import { resolveProductDiscountPercent } from "./computeProductDiscountPercent";
 import { resolveProductCardPromotionChrome } from "./resolveProductCardPromotionChrome";
@@ -15,6 +17,7 @@ type ChromeProduct = Record<string, unknown>;
 type ProductCardChromeOptions = {
   promotionFullWidth?: boolean;
   highlightCatalogPromotion?: boolean;
+  highlightRaffleProduct?: boolean;
   isMineMode?: boolean;
   isModerationQueue?: boolean;
 };
@@ -24,6 +27,7 @@ export const useProductCardChromeFlags = (
   {
     promotionFullWidth = false,
     highlightCatalogPromotion = true,
+    highlightRaffleProduct = false,
     isMineMode = false,
     isModerationQueue = false,
   }: ProductCardChromeOptions = {},
@@ -45,6 +49,9 @@ export const useProductCardChromeFlags = (
     const discountPercent = resolveProductDiscountPercent(product);
     const showDiscountBadge = discountPercent != null && discountPercent > 0;
     const showLoyaltyPointsBadge = shouldShowProductLoyaltyPointsBadge(product);
+    const showRaffleBadge = !isModerationQueue && isProductRaffleParticipant(product);
+    const showRaffleParticipantChrome =
+      (highlightRaffleProduct || showRaffleBadge) && !isMineMode && !isModerationQueue;
 
     const showBannerLayout =
       promotionFullWidth && isPromotionActive && promotionTier === PROMOTION_TIER_BANNER;
@@ -67,13 +74,14 @@ export const useProductCardChromeFlags = (
       showImageOverlayBadges: !showBannerLayout && (showDiscountBadge || showLoyaltyPointsBadge),
       showAuctionBadge: auctionActive,
       showInstallmentBadge: product.productInstallmentEnabled === true,
-      showRaffleBadge:
-        Boolean(product.activeRaffleId) && Boolean(product.raffleParticipationEnabledAt),
+      showRaffleBadge,
+      showRaffleParticipantChrome,
     };
   }, [
     product,
     promotionFullWidth,
     highlightCatalogPromotion,
+    highlightRaffleProduct,
     isMineMode,
     isModerationQueue,
   ]);

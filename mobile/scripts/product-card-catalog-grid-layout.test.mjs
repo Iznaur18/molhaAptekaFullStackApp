@@ -16,8 +16,8 @@ const LAYOUT = {
   bodyGap: 4,
   headingHeight: 20,
   priceHeight: 21,
-  metaHeight: 46,
-  sellerRowHeight: 13.5,
+  metaHeight: 38,
+  sellerRowHeight: 16,
 };
 
 const resolveContentBelowImageHeight = (layout) =>
@@ -36,7 +36,7 @@ test("product media display aspect ratio is square", () => {
 });
 
 test("catalog-grid text stack height unchanged", () => {
-  assert.equal(resolveContentBelowImageHeight(LAYOUT), 116.5);
+  assert.equal(resolveContentBelowImageHeight(LAYOUT), 111);
 });
 
 test("catalogProductStyles uses shared product media aspect ratio for catalog grid", () => {

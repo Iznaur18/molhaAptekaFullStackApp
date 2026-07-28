@@ -244,6 +244,82 @@ export function RegisterPage() {
   if (step === "code" && pendingRegistration) {
     return (
       <section className="auth-page">
+        <div className="auth-page__column">
+          <button
+            type="button"
+            className="auth-page__back"
+            onClick={handleBack}
+            disabled={isPending}
+          >
+            {AUTH_UI.BACK_BUTTON}
+          </button>
+          <AuthHeroBanner height={heroHeight} imageUrl={bannerImageUrl} />
+          <div className="auth-page__body">
+            <h1 className="auth-page__title">{AUTH_UI.REGISTER_CODE_TITLE}</h1>
+            <p className="auth-page__subtitle">
+              {AUTH_UI.REGISTER_CODE_SUBTITLE(pendingRegistration.email)}
+            </p>
+            <form className="auth-page__form" onSubmit={handleConfirm}>
+              <label className="auth-page__field">
+                <span className="auth-page__label">{AUTH_UI.REGISTER_CODE_LABEL}</span>
+                <input
+                  className="auth-page__input"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  value={code}
+                  onChange={handleCodeChange}
+                  placeholder={AUTH_UI.REGISTER_CODE_PLACEHOLDER}
+                  maxLength={REGISTER_CODE_LENGTH}
+                  required
+                />
+              </label>
+              {status.kind === "error" ? (
+                <p className="auth-page__error" role="alert">
+                  {status.message}
+                </p>
+              ) : null}
+              {status.kind === "success" ? (
+                <p className="auth-page__success">{status.message}</p>
+              ) : null}
+              <button
+                type="submit"
+                className="app-btn app-btn--primary auth-page__submit"
+                disabled={isPending}
+              >
+                {isPending
+                  ? REGISTER_MODAL_UI.CONFIRM_LOADING
+                  : AUTH_UI.REGISTER_CODE_CONFIRM_BUTTON}
+              </button>
+              <button
+                type="button"
+                className="auth-page__ghost"
+                disabled={isPending}
+                onClick={handleResend}
+              >
+                {AUTH_UI.REGISTER_CODE_RESEND_BUTTON}
+              </button>
+              <button
+                type="button"
+                className="auth-page__link"
+                disabled={isPending}
+                onClick={() => {
+                  setStep("form");
+                  setCode("");
+                  setStatus({ kind: "idle", message: "" });
+                }}
+              >
+                {AUTH_UI.REGISTER_CODE_BACK_BUTTON}
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="auth-page">
+      <div className="auth-page__column">
         <button
           type="button"
           className="auth-page__back"
@@ -252,198 +328,126 @@ export function RegisterPage() {
         >
           {AUTH_UI.BACK_BUTTON}
         </button>
+
         <AuthHeroBanner height={heroHeight} imageUrl={bannerImageUrl} />
+
         <div className="auth-page__body">
-          <h1 className="auth-page__title">{AUTH_UI.REGISTER_CODE_TITLE}</h1>
-          <p className="auth-page__subtitle">
-            {AUTH_UI.REGISTER_CODE_SUBTITLE(pendingRegistration.email)}
-          </p>
-          <form className="auth-page__form" onSubmit={handleConfirm}>
+          <h1 className="auth-page__title">{AUTH_UI.REGISTER_TITLE}</h1>
+          <p className="auth-page__subtitle">{AUTH_UI.REGISTER_SUBTITLE}</p>
+
+          <form className="auth-page__form" onSubmit={handleSubmit}>
             <label className="auth-page__field">
-              <span className="auth-page__label">{AUTH_UI.REGISTER_CODE_LABEL}</span>
+              <span className="auth-page__label">{AUTH_UI.EMAIL_LABEL}</span>
               <input
-                className="auth-page__input"
-                inputMode="numeric"
-                autoComplete="one-time-code"
-                value={code}
-                onChange={handleCodeChange}
-                placeholder={AUTH_UI.REGISTER_CODE_PLACEHOLDER}
-                maxLength={REGISTER_CODE_LENGTH}
+                className={withInvalidFieldClass(
+                  "auth-page__input",
+                  "email",
+                  invalidFields,
+                )}
+                type="email"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
                 required
+                autoComplete="email"
+                placeholder={AUTH_UI.EMAIL_PLACEHOLDER}
               />
             </label>
+
+            <label className="auth-page__field">
+              <span className="auth-page__label">{AUTH_UI.USER_NAME_LABEL}</span>
+              <input
+                className={withInvalidFieldClass(
+                  "auth-page__input",
+                  "userName",
+                  invalidFields,
+                )}
+                name="userName"
+                value={form.userName}
+                onChange={handleChange}
+                required
+                autoComplete="username"
+                minLength={REGISTER_MODAL_UI.USERNAME_MIN_LENGTH}
+                maxLength={REGISTER_MODAL_UI.USERNAME_MAX_LENGTH}
+                placeholder={AUTH_UI.USER_NAME_PLACEHOLDER}
+              />
+              <p className="auth-page__hint">{REGISTER_MODAL_UI.USERNAME_HINT}</p>
+            </label>
+
+            <label className="auth-page__field">
+              <span className="auth-page__label">{AUTH_UI.PASSWORD_LABEL}</span>
+              <PasswordInputField
+                className={withInvalidFieldClass(
+                  "auth-page__input",
+                  "password",
+                  invalidFields,
+                )}
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                required
+                minLength={REGISTER_MODAL_UI.PASSWORD_MIN_LENGTH}
+                autoComplete="new-password"
+                showPasswordAria={AUTH_UI.SHOW_PASSWORD_ARIA}
+                hidePasswordAria={AUTH_UI.HIDE_PASSWORD_ARIA}
+              />
+            </label>
+
+            <label className="auth-page__field">
+              <span className="auth-page__label">
+                {AUTH_UI.PASSWORD_CONFIRM_LABEL}
+              </span>
+              <PasswordInputField
+                className={withInvalidFieldClass(
+                  "auth-page__input",
+                  "passwordConfirm",
+                  invalidFields,
+                )}
+                name="passwordConfirm"
+                value={form.passwordConfirm}
+                onChange={handleChange}
+                required
+                minLength={REGISTER_MODAL_UI.PASSWORD_MIN_LENGTH}
+                autoComplete="new-password"
+                showPasswordAria={AUTH_UI.SHOW_PASSWORD_ARIA}
+                hidePasswordAria={AUTH_UI.HIDE_PASSWORD_ARIA}
+              />
+            </label>
+
+            <RegisterLegalConsentFields
+              termsAccepted={termsAccepted}
+              personalDataConsentAccepted={personalDataConsentAccepted}
+              disabled={isPending}
+              onTermsAcceptedChange={setTermsAccepted}
+              onPersonalDataConsentAcceptedChange={setPersonalDataConsentAccepted}
+            />
+
             {status.kind === "error" ? (
               <p className="auth-page__error" role="alert">
                 {status.message}
               </p>
             ) : null}
-            {status.kind === "success" ? (
-              <p className="auth-page__success">{status.message}</p>
-            ) : null}
+
             <button
               type="submit"
               className="app-btn app-btn--primary auth-page__submit"
               disabled={isPending}
             >
               {isPending
-                ? REGISTER_MODAL_UI.CONFIRM_LOADING
-                : AUTH_UI.REGISTER_CODE_CONFIRM_BUTTON}
+                ? REGISTER_MODAL_UI.SUBMIT_LOADING
+                : AUTH_UI.REGISTER_BUTTON}
             </button>
-            <button
-              type="button"
-              className="auth-page__ghost"
-              disabled={isPending}
-              onClick={handleResend}
-            >
-              {AUTH_UI.REGISTER_CODE_RESEND_BUTTON}
-            </button>
+
             <button
               type="button"
               className="auth-page__link"
               disabled={isPending}
-              onClick={() => {
-                setStep("form");
-                setCode("");
-                setStatus({ kind: "idle", message: "" });
-              }}
+              onClick={() => navigate(AUTH_LOGIN_PATH)}
             >
-              {AUTH_UI.REGISTER_CODE_BACK_BUTTON}
+              {AUTH_UI.GO_TO_LOGIN}
             </button>
           </form>
         </div>
-      </section>
-    );
-  }
-
-  return (
-    <section className="auth-page">
-      <button
-        type="button"
-        className="auth-page__back"
-        onClick={handleBack}
-        disabled={isPending}
-      >
-        {AUTH_UI.BACK_BUTTON}
-      </button>
-
-      <AuthHeroBanner height={heroHeight} imageUrl={bannerImageUrl} />
-
-      <div className="auth-page__body">
-        <h1 className="auth-page__title">{AUTH_UI.REGISTER_TITLE}</h1>
-        <p className="auth-page__subtitle">{AUTH_UI.REGISTER_SUBTITLE}</p>
-
-        <form className="auth-page__form" onSubmit={handleSubmit}>
-          <label className="auth-page__field">
-            <span className="auth-page__label">{AUTH_UI.EMAIL_LABEL}</span>
-            <input
-              className={withInvalidFieldClass(
-                "auth-page__input",
-                "email",
-                invalidFields,
-              )}
-              type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              required
-              autoComplete="email"
-              placeholder={AUTH_UI.EMAIL_PLACEHOLDER}
-            />
-          </label>
-
-          <label className="auth-page__field">
-            <span className="auth-page__label">{AUTH_UI.USER_NAME_LABEL}</span>
-            <input
-              className={withInvalidFieldClass(
-                "auth-page__input",
-                "userName",
-                invalidFields,
-              )}
-              name="userName"
-              value={form.userName}
-              onChange={handleChange}
-              required
-              autoComplete="username"
-              minLength={REGISTER_MODAL_UI.USERNAME_MIN_LENGTH}
-              maxLength={REGISTER_MODAL_UI.USERNAME_MAX_LENGTH}
-              placeholder={AUTH_UI.USER_NAME_PLACEHOLDER}
-            />
-            <p className="auth-page__hint">{REGISTER_MODAL_UI.USERNAME_HINT}</p>
-          </label>
-
-          <label className="auth-page__field">
-            <span className="auth-page__label">{AUTH_UI.PASSWORD_LABEL}</span>
-            <PasswordInputField
-              className={withInvalidFieldClass(
-                "auth-page__input",
-                "password",
-                invalidFields,
-              )}
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-              required
-              minLength={REGISTER_MODAL_UI.PASSWORD_MIN_LENGTH}
-              autoComplete="new-password"
-              showPasswordAria={AUTH_UI.SHOW_PASSWORD_ARIA}
-              hidePasswordAria={AUTH_UI.HIDE_PASSWORD_ARIA}
-            />
-          </label>
-
-          <label className="auth-page__field">
-            <span className="auth-page__label">
-              {AUTH_UI.PASSWORD_CONFIRM_LABEL}
-            </span>
-            <PasswordInputField
-              className={withInvalidFieldClass(
-                "auth-page__input",
-                "passwordConfirm",
-                invalidFields,
-              )}
-              name="passwordConfirm"
-              value={form.passwordConfirm}
-              onChange={handleChange}
-              required
-              minLength={REGISTER_MODAL_UI.PASSWORD_MIN_LENGTH}
-              autoComplete="new-password"
-              showPasswordAria={AUTH_UI.SHOW_PASSWORD_ARIA}
-              hidePasswordAria={AUTH_UI.HIDE_PASSWORD_ARIA}
-            />
-          </label>
-
-          <RegisterLegalConsentFields
-            termsAccepted={termsAccepted}
-            personalDataConsentAccepted={personalDataConsentAccepted}
-            disabled={isPending}
-            onTermsAcceptedChange={setTermsAccepted}
-            onPersonalDataConsentAcceptedChange={setPersonalDataConsentAccepted}
-          />
-
-          {status.kind === "error" ? (
-            <p className="auth-page__error" role="alert">
-              {status.message}
-            </p>
-          ) : null}
-
-          <button
-            type="submit"
-            className="app-btn app-btn--primary auth-page__submit"
-            disabled={isPending}
-          >
-            {isPending
-              ? REGISTER_MODAL_UI.SUBMIT_LOADING
-              : AUTH_UI.REGISTER_BUTTON}
-          </button>
-
-          <button
-            type="button"
-            className="auth-page__link"
-            disabled={isPending}
-            onClick={() => navigate(AUTH_LOGIN_PATH)}
-          >
-            {AUTH_UI.GO_TO_LOGIN}
-          </button>
-        </form>
       </div>
     </section>
   );

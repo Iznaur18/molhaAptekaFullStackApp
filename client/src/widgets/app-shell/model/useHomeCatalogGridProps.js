@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 
 import { useAppShellStateContext } from "./AppShellStateContext.jsx";
-import { CATALOG_SORT_CITY } from "../../../entities/product/model/productConstants.js";
 
 /** @typedef {import('../../../entities/product/model/types.js').ProductFromApi} ProductFromApi */
 
@@ -48,10 +47,7 @@ export const useHomeCatalogGridProps = () => {
     catalogAuctionOnly,
     catalogInstallmentOnly,
     catalogSaleOnly,
-    catalogAllCities,
-    catalogSort,
     authUser,
-    handleShowAllCatalogCities,
     sellerRaffleActive,
     raffleParticipationPendingProductId,
     homeCuratedProductLists,
@@ -60,7 +56,6 @@ export const useHomeCatalogGridProps = () => {
     handlePlaceProductClick,
   } = ctx;
 
-  const catalogCityFilterLabel = String(authUser?.userAddressCity ?? "").trim();
   const isCuratedProductListsLoading =
     showCuratedProductLists && curatedListsQuery.isPending;
   const isUserDataConfirmed = authUser?.isUserDataConfirmed === true;
@@ -107,14 +102,6 @@ export const useHomeCatalogGridProps = () => {
       catalogAuctionOnly,
       catalogInstallmentOnly,
       catalogSaleOnly,
-      showCatalogCityFilterBanner:
-        isAuthorized &&
-        !isMineMode &&
-        catalogCityFilterLabel !== "" &&
-        !catalogAllCities &&
-        catalogSort !== CATALOG_SORT_CITY,
-      catalogCityFilterLabel,
-      onShowAllCatalogCities: handleShowAllCatalogCities,
       showFullWidthTier3Banners: Boolean(showHomeCatalogFeed) && !isMineMode,
       sellerRaffleActive,
       raffleParticipationPendingProductId,
@@ -165,10 +152,6 @@ export const useHomeCatalogGridProps = () => {
       catalogAuctionOnly,
       catalogInstallmentOnly,
       catalogSaleOnly,
-      catalogAllCities,
-      catalogSort,
-      catalogCityFilterLabel,
-      handleShowAllCatalogCities,
       sellerRaffleActive,
       raffleParticipationPendingProductId,
       homeCuratedProductLists,

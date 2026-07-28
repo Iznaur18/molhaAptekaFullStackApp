@@ -538,51 +538,41 @@ export const useRaffleFeaturedCarouselStyles = createThemedStyles(() => ({
 
 const FEATURED_RAFFLE_MODAL_BACKDROP = "rgba(0, 0, 0, 0.62)";
 
+/** Паритет web HomeFeaturedRaffleModal bottom sheet. */
+export const FEATURED_RAFFLE_MODAL_ANIMATION = {
+  enterMs: 420,
+  exitMs: 220,
+  heightRatio: 0.8,
+  sheetRadius: 32,
+} as const;
+
 export const useFeaturedRaffleModalStyles = createThemedStyles((theme) => ({
   overlay: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 16,
+    justifyContent: "flex-end",
+    backgroundColor: "transparent",
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
     backgroundColor: FEATURED_RAFFLE_MODAL_BACKDROP,
   },
   backdropPressable: {
     ...StyleSheet.absoluteFillObject,
   },
+  dialogShell: {
+    width: "100%",
+  },
   dialog: {
-    position: "relative",
-    borderRadius: 20,
+    flex: 1,
     overflow: "hidden",
     backgroundColor: theme.colors.surface,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
+  },
+  dialogShadow: {
     shadowColor: theme.colors.ink,
-    shadowOffset: { width: 0, height: 16 },
-    shadowOpacity: 0.28,
-    shadowRadius: 28,
+    shadowOffset: { width: 0, height: -12 },
+    shadowOpacity: 0.18,
+    shadowRadius: 40,
     elevation: 12,
-  },
-  header: {
-    alignItems: "flex-end",
-    paddingTop: 8,
-    paddingHorizontal: 8,
-    paddingBottom: 4,
-  },
-  closeButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: theme.colors.surfaceMuted,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-  },
-  closeButtonText: {
-    fontSize: 13,
-    lineHeight: 16,
-    fontWeight: "600",
-    color: theme.colors.text,
   },
   scroll: {
     flex: 1,
@@ -597,6 +587,7 @@ export const useFeaturedRaffleModalStyles = createThemedStyles((theme) => ({
     overflow: "hidden",
   },
   footer: {
+    gap: 6,
     paddingHorizontal: 12,
     paddingTop: 10,
     paddingBottom: 12,
@@ -618,6 +609,19 @@ export const useFeaturedRaffleModalStyles = createThemedStyles((theme) => ({
     lineHeight: 20,
     fontWeight: "700",
     color: P.onContrast,
+  },
+  footerClose: {
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
+  footerCloseText: {
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: "500",
+    color: theme.colors.textMuted,
   },
 }));
 

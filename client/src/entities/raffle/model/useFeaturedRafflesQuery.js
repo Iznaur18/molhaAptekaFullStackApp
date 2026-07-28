@@ -4,12 +4,12 @@ import { fetchFeaturedRaffles } from "../api/fetchFeaturedRaffle.js";
 import { raffleQueryKeys } from "./raffleQueryKeys.js";
 
 /**
- * @param {{ enabled: boolean }} params
+ * @param {{ enabled: boolean; regionCode?: string }} params
  */
-export function useFeaturedRafflesQuery({ enabled }) {
+export function useFeaturedRafflesQuery({ enabled, regionCode = "" }) {
   return useQuery({
-    queryKey: raffleQueryKeys.featured(),
+    queryKey: raffleQueryKeys.featured(regionCode),
     enabled,
-    queryFn: fetchFeaturedRaffles,
+    queryFn: () => fetchFeaturedRaffles({ regionCode: regionCode || undefined }),
   });
 }

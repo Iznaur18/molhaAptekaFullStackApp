@@ -2,7 +2,7 @@ import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 
 /**
  * @typedef {'price' | 'stat' | 'block' | 'meta' | 'default'} ProductFieldReadLayout
- * @typedef {'text' | 'textarea' | 'number' | 'boolean' | 'category' | 'images' | 'video' | 'characteristics' | 'computed' | 'readonly'} ProductFieldEditKind
+ * @typedef {'text' | 'textarea' | 'number' | 'boolean' | 'category' | 'region' | 'images' | 'video' | 'characteristics' | 'computed' | 'readonly'} ProductFieldEditKind
  *
  * @typedef {Object} ProductFieldRegistryEntry
  * @property {string} labelRu
@@ -82,6 +82,13 @@ export const PRODUCT_FIELD_REGISTRY = {
     editKind: "text",
     detailsTop: true,
   },
+  productRegionCode: {
+    labelRu: CREATE_PRODUCT_MODAL_UI.LABEL_SALE_REGION,
+    editLabel: CREATE_PRODUCT_MODAL_UI.LABEL_SALE_REGION,
+    readLayout: "stat",
+    editKind: "region",
+    detailsTop: true,
+  },
   productIsAvailable: {
     labelRu: "В наличии",
     editLabel: CREATE_PRODUCT_MODAL_UI.LABEL_AVAILABLE,
@@ -154,7 +161,7 @@ export const PRODUCT_FIELD_REGISTRY = {
 const DETAILS_TOP_ROW_ORDER = [
   "productPrice",
   "productCategory",
-  "productSaleCity",
+  "productRegionCode",
   "productStockQuantity",
   "soldQuantity",
   "uniqueViewerCount",
@@ -165,7 +172,6 @@ const DETAILS_BOTTOM_ROW_ORDER = ["productDescription", "_id", "createdAt", "upd
 
 const DETAILS_BOTTOM_ROW_STAFF_ORDER = [
   "productDescription",
-  "productImageUrls",
   "_id",
   "createdAt",
   "updatedAt",
@@ -179,7 +185,7 @@ const MODEL_FIELD_ORDER = [
   "productPrice",
   "productSeller",
   "productCategory",
-  "productSaleCity",
+  "productRegionCode",
   "productIsAvailable",
   "uniqueViewerCount",
   "soldQuantity",
@@ -192,7 +198,6 @@ const CARD_PREVIEW_ORDER = ["productPrice", "productSeller"];
 const CARD_MODERATION_PREVIEW_ORDER = [
   "productPrice",
   "productSeller",
-  "productDescription",
   "createdAt",
 ];
 

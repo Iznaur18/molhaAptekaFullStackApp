@@ -377,9 +377,6 @@ export function MyProfilePage({
                   ) : null}
                   <UserProfileInfoPanel rows={rows} />
                   <div className="my-profile-page__overview-footer">
-                    <a className="my-profile-page__privacy-link" href="/privacy.html">
-                      {MY_PROFILE_PAGE_UI.PRIVACY_LINK}
-                    </a>
                     <ThemePreferenceToggle />
                   </div>
                 </>

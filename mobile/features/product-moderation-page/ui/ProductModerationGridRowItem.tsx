@@ -16,19 +16,25 @@ type ProductModerationGridRowItemProps = {
   rejectComments: Record<string, string>;
   cardErrors: Record<string, string>;
   pendingProductId: string | null;
+  canDelete?: boolean;
   onRejectCommentChange: (productId: string, value: string) => void;
   onApprove: (productId: string) => void;
   onReject: (productId: string) => void;
+  onDelete?: (productId: string) => void;
 };
 
 const buildModerationActions = (
   productId: string,
+  product: ModerationProduct,
   props: Omit<ProductModerationGridRowItemProps, "row" | "columns" | "gap" | "tileWidth">,
 ): ProductModerationActions => ({
   rejectComment: props.rejectComments[productId] ?? "",
   onRejectCommentChange: (value) => props.onRejectCommentChange(productId, value),
   onApprove: () => props.onApprove(productId),
   onReject: () => props.onReject(productId),
+  onDelete: props.canDelete && props.onDelete ? () => props.onDelete?.(productId) : undefined,
+  canDelete: Boolean(props.canDelete),
+  hasOpenSales: product.hasOpenSales === true,
   isBusy: props.pendingProductId === productId,
   errorMessage: props.cardErrors[productId] ?? "",
 });
@@ -55,7 +61,11 @@ export const ProductModerationGridRowItem = ({
           <View key={productId} style={{ width: tileWidth }}>
             <ProductModerationQueueCard
               product={product as ModerationProduct}
-              moderationActions={buildModerationActions(productId, actionProps)}
+              moderationActions={buildModerationActions(
+                productId,
+                product as ModerationProduct,
+                actionProps,
+              )}
             />
           </View>
         );

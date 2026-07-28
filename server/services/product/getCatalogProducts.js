@@ -8,10 +8,7 @@ import {
   PRODUCT_SORT_PREMIUM,
   PRODUCT_SORT_REVIEWS,
 } from "../../constants/productCatalogSort.js";
-import {
-  buildProductRegionMatch,
-  resolveViewerRegionCodeForRequest,
-} from "../user/userRegionCatalogFilter.js";
+import { resolveViewerRegionCodeForRequest } from "../user/userRegionCatalogFilter.js";
 import { getHiddenSellerIds, isUserStaff } from "../access/adminUserGuard.js";
 import { getConfirmedSellerIds } from "./confirmedSellerCatalog.js";
 import {
@@ -159,7 +156,6 @@ async function loadCatalogProducts({ userId, query }) {
     userId,
     queryRegionCode: query.regionCode,
   });
-  Object.assign(catalogBaseQuery, buildProductRegionMatch(viewerRegionCode));
 
   if (premiumOnly) {
     const premiumSellerIds = filterSellerIdsExcludingHidden(
@@ -212,7 +208,14 @@ async function loadCatalogProducts({ userId, query }) {
   const catalogSortBuyerCity = null;
 
   const [products, total] = await Promise.all([
-    findCatalogProductsPage(catalogSearchResult, sort, skip, limit, catalogSortBuyerCity),
+    findCatalogProductsPage(
+      catalogSearchResult,
+      sort,
+      skip,
+      limit,
+      catalogSortBuyerCity,
+      viewerRegionCode,
+    ),
     countCatalogProducts(catalogSearchResult),
   ]);
 

@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { Dimensions, Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 
+import type { OrderFulfillmentMethod } from "@/entities/order/api/createOrder";
 import type { OrderPaymentMethod } from "@/entities/order/model/constants";
 import { CheckoutForm } from "@/features/checkout/ui/CheckoutForm";
 import { CHECKOUT_FORM_UI, CART_PAGE_UI } from "@/shared/config";
@@ -13,12 +14,14 @@ import { ModalSheetGradientBackdrop } from "@/shared/ui/ModalSheetGradientBackdr
 type CheckoutSheetModalProps = {
   visible: boolean;
   defaultUser?: Record<string, unknown> | null;
+  pickupAddressSummary?: string;
   isSubmitting: boolean;
   submitError: string;
   submitSuccess: string;
   isDisabled?: boolean;
   onClose: () => void;
   onSubmit: (payload: {
+    fulfillmentMethod: OrderFulfillmentMethod;
     deliveryAddress: string;
     deliveryAddressFlat: string;
     paymentMethod: OrderPaymentMethod;
@@ -28,6 +31,7 @@ type CheckoutSheetModalProps = {
 export const CheckoutSheetModal = ({
   visible,
   defaultUser,
+  pickupAddressSummary = "",
   isSubmitting,
   submitError,
   submitSuccess,
@@ -81,6 +85,7 @@ export const CheckoutSheetModal = ({
             <CheckoutForm
               key={defaultUser?._id != null ? String(defaultUser._id) : "guest"}
               defaultUser={defaultUser}
+              pickupAddressSummary={pickupAddressSummary}
               isSubmitting={isSubmitting}
               submitError={submitError}
               submitSuccess={submitSuccess}

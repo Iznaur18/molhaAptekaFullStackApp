@@ -9,12 +9,16 @@ import {
 
 export const invalidateHomeFeedQueries = async (queryClient: QueryClient) => {
   await Promise.all([
-    queryClient.invalidateQueries({ queryKey: raffleQueryKeys.featured() }),
+    queryClient.invalidateQueries({
+      queryKey: [...raffleQueryKeys.all, "featured"],
+    }),
     queryClient.invalidateQueries({ queryKey: userStoriesQueryKeys.feed() }),
     queryClient.invalidateQueries({
-      queryKey: curatedProductListQueryKeys.home(false),
+      queryKey: curatedProductListQueryKeys.all,
     }),
-    queryClient.invalidateQueries({ queryKey: siteHeaderBannerQueryKeys.slides() }),
+    queryClient.invalidateQueries({
+      queryKey: [...siteHeaderBannerQueryKeys.all, "slides"],
+    }),
     queryClient.invalidateQueries({ queryKey: siteHeaderBannerQueryKeys.settings() }),
   ]);
 };

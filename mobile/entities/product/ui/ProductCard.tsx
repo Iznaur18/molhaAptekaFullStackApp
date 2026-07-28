@@ -16,6 +16,7 @@ import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useProductCardChromeFlags } from "@/entities/product/lib/useProductCardChromeFlags";
 import { resolveProductCardPromotionFrameStyle } from "@/entities/product/lib/resolveProductCardPromotionFrameStyle";
+import { resolveProductCardRaffleParticipantFrameStyle } from "@/entities/product/lib/resolveProductCardRaffleParticipantFrameStyle";
 import { useProductCardMediaState } from "@/entities/product/lib/useProductCardMediaState";
 import { ProductCardGalleryDots } from "@/entities/product/ui/ProductCardGalleryDots";
 import { ProductCardWishlistBurst } from "@/entities/product/ui/ProductCardWishlistBurst";
@@ -61,6 +62,7 @@ type ProductCardProps = {
   promotionFullWidth?: boolean;
   layout?: "default" | "catalog-grid";
   highlightCatalogPromotion?: boolean;
+  highlightRaffleProduct?: boolean;
   isMineMode?: boolean;
   isModerationQueue?: boolean;
   moderationActions?: ProductModerationActions | null;
@@ -78,6 +80,7 @@ export const ProductCard = memo(({
   promotionFullWidth = false,
   layout = "default",
   highlightCatalogPromotion = true,
+  highlightRaffleProduct = false,
   isMineMode = false,
   isModerationQueue = false,
   moderationActions = null,
@@ -100,6 +103,7 @@ export const ProductCard = memo(({
   const flags = useProductCardChromeFlags(product, {
     promotionFullWidth,
     highlightCatalogPromotion,
+    highlightRaffleProduct,
     isMineMode,
     isModerationQueue,
   });
@@ -150,6 +154,10 @@ export const ProductCard = memo(({
         colors: theme.colors,
       })
     : null;
+  const raffleParticipantFrameStyle =
+    !showCardChrome && flags.showRaffleParticipantChrome
+      ? resolveProductCardRaffleParticipantFrameStyle(theme.colors)
+      : null;
 
   const moderationBadgeVariant = getProductModerationBadgeVariant(product);
   const moderationBadgeLabel = getProductModerationBadgeLabel(product);
@@ -176,6 +184,7 @@ export const ProductCard = memo(({
         isCatalogGrid && styles.cardCatalogGrid,
         isCatalogGrid && isModerationQueue && styles.cardCatalogGridModerationQueue,
         promotionFrameStyle,
+        raffleParticipantFrameStyle,
       ]}
     >
       {showPromotionFrame && flags.promotionFrameTier ? (

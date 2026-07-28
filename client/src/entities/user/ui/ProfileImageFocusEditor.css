@@ -43,11 +43,11 @@
   border-radius: 10px;
 }
 
+/* Паритет FeaturedRaffleModalCard visual: квадрат + radius 22 */
 .profile-image-focus-editor__frame_raffle-prize {
   width: 100%;
   aspect-ratio: 1 / 1;
-  max-height: 11.5rem;
-  border-radius: 12px;
+  border-radius: 22px;
 }
 
 .profile-image-focus-editor__img {

@@ -1,4 +1,9 @@
-import { USER_SOCIAL_LINK_FIELD_IDS, storedSocialUrlToInputValue } from "@molha/api-contract";
+import {
+  USER_SOCIAL_LINK_FIELD_IDS,
+  storedSocialUrlToInputValue,
+  DEFAULT_VIEWER_REGION_CODE,
+  isRuRegionCode,
+} from "@molha/api-contract";
 
 import { addressStructuredValueFromUser } from "../../address/lib/addressStructuredValueFromUser.js";
 import { getUserAvatarFocus, getUserBackgroundFocus } from "./profileImageFocus.js";
@@ -18,6 +23,7 @@ import {
  * @property {string} userBirthDate
  * @property {'male'|'female'|'noSelected'} userGender
  * @property {import('../../address/model/structuredTypes.js').RuStructuredDeliveryAddressValue} structuredAddress
+ * @property {string} userRegionCode
  * @property {string} userPhoneNumber
  * @property {string} userAvatarUrl
  * @property {{ x: number; y: number }} userAvatarFocus
@@ -63,6 +69,9 @@ export function mapUserToEditProfileForm(user) {
     userBirthDate: birthInput,
     userGender: user.userGender ?? USER_GENDER_NO_SELECTED,
     structuredAddress: addressStructuredValueFromUser(user),
+    userRegionCode: isRuRegionCode(String(user.userRegionCode ?? "").trim())
+      ? String(user.userRegionCode).trim()
+      : DEFAULT_VIEWER_REGION_CODE,
     userPhoneNumber: maskRuPhoneInput(user.userPhoneNumber ?? ""),
     userAvatarUrl: user.userAvatarUrl ?? DEFAULT_USER_AVATAR_URL,
     userAvatarFocus: getUserAvatarFocus(user),

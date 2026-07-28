@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
+  EDIT_PRODUCT_WIZARD_STEP_COUNT,
   EDIT_PRODUCT_WIZARD_STEP_IDS,
   resolveEditProductWizardStepId,
 } from "../lib/editProductWizardSteps.js";
@@ -51,13 +52,19 @@ export function useEditProductWizard({
       return false;
     }
 
-    setStepIndex((current) => Math.min(current + 1, stepIds.length - 1));
+    setStepIndex((current) => Math.min(current + 1, EDIT_PRODUCT_WIZARD_STEP_COUNT - 1));
     setStepError("");
     return true;
-  }, [stepIds.length, validateCurrentStep]);
+  }, [validateCurrentStep]);
 
   const goBack = useCallback(() => {
     setStepIndex((current) => Math.max(current - 1, 0));
+    setStepError("");
+  }, []);
+
+  const goToStep = useCallback((index) => {
+    const safeIndex = Math.max(0, Math.min(index, EDIT_PRODUCT_WIZARD_STEP_COUNT - 1));
+    setStepIndex(safeIndex);
     setStepError("");
   }, []);
 
@@ -68,8 +75,9 @@ export function useEditProductWizard({
     stepError,
     goNext,
     goBack,
+    goToStep,
     validateCurrentStep,
     isFirstStep: stepIndex === 0,
-    isLastStep: stepIndex === stepIds.length - 1,
+    isLastStep: stepIndex === EDIT_PRODUCT_WIZARD_STEP_COUNT - 1,
   };
 }

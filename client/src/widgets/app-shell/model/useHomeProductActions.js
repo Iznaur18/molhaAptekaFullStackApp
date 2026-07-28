@@ -240,6 +240,7 @@ export const useHomeProductActions = ({
       try {
         setDeletingProductId(productId);
         setMyProductsCatalogError("");
+        setProductDetailsAdminError("");
         await deleteMutation.mutateAsync(productId);
         removeCatalogProduct(productId);
         setProductToEdit((prev) =>
@@ -249,10 +250,13 @@ export const useHomeProductActions = ({
           prev && String(prev._id) === productId ? null : prev,
         );
         void refreshCatalogFeed();
+        return true;
       } catch (e) {
-        setMyProductsCatalogError(
-          e instanceof Error ? e.message : API_CLIENT_UI.DELETE_MY_PRODUCT_FALLBACK,
-        );
+        const message =
+          e instanceof Error ? e.message : API_CLIENT_UI.DELETE_MY_PRODUCT_FALLBACK;
+        setMyProductsCatalogError(message);
+        setProductDetailsAdminError(message);
+        return false;
       } finally {
         setDeletingProductId(null);
       }
@@ -263,6 +267,7 @@ export const useHomeProductActions = ({
       removeCatalogProduct,
       setDeletingProductId,
       setMyProductsCatalogError,
+      setProductDetailsAdminError,
       setProductToEdit,
       setPromotionProduct,
     ],

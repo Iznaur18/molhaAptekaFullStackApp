@@ -2,7 +2,12 @@ import { apiClient } from "@/shared/api";
 import { API_CLIENT_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 
-export const fetchRaffleProducts = async (raffleId: string, page = 1, limit = 24) => {
+const DEFAULT_RAFFLE_PRODUCTS_LIMIT = 60;
+
+export const fetchRaffleProducts = async (
+  raffleId: string,
+  { page = 1, limit = DEFAULT_RAFFLE_PRODUCTS_LIMIT }: { page?: number; limit?: number } = {},
+) => {
   try {
     const { data } = await apiClient.get(`/product/raffles/${raffleId}/products`, {
       params: { page, limit },
@@ -15,6 +20,8 @@ export const fetchRaffleProducts = async (raffleId: string, page = 1, limit = 24
       pagination: data.data.pagination ?? null,
     };
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, "Не удалось загрузить товары розыгрыша"));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.FETCH_RAFFLE_PRODUCTS_FALLBACK),
+    );
   }
 };

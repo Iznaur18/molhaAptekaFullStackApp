@@ -6,11 +6,13 @@ import { formatApiErrorMessage } from "@/shared/lib";
 
 import type { SellerPersonalCategoryCatalogTile } from "@/entities/product-category-display/model/types";
 
-export const fetchSellerPersonalCategoryCatalogTiles = async (): Promise<
-  SellerPersonalCategoryCatalogTile[]
-> => {
+export const fetchSellerPersonalCategoryCatalogTiles = async ({
+  regionCode,
+}: { regionCode?: string } = {}): Promise<SellerPersonalCategoryCatalogTile[]> => {
   try {
-    const { data } = await apiClient.get("/seller-personal-category/catalog-tiles");
+    const { data } = await apiClient.get("/seller-personal-category/catalog-tiles", {
+      params: regionCode ? { regionCode } : undefined,
+    });
     const parsed = parseApiContractData(data, sellerPersonalCategoryCatalogTilesDataSchema);
     return parsed.tiles as SellerPersonalCategoryCatalogTile[];
   } catch (error) {

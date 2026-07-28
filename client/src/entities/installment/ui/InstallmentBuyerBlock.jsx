@@ -11,10 +11,12 @@ import { resolveInstallmentPlanPriceSummary } from "../lib/resolveInstallmentPla
 import { INSTALLMENT_UI } from "../../../shared/config/appUiCopy.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 import { useAppShellCompactLayout } from "../../../shared/lib/useAppShellCompactLayout.js";
+import { useProductDetailsPageDockHost } from "../../../shared/lib/productDetailsPageDockHostContext.js";
 import { getProductPurchaseLimit } from "../../product/lib/getProductPurchaseLimit.js";
 import { InstallmentPassportShareConsentModal } from "./InstallmentPassportShareConsentModal.jsx";
 
 import "./InstallmentBuyerBlock.css";
+import "./InstallmentBuyerBlockMobile.css";
 
 /**
  * @param {{
@@ -45,6 +47,7 @@ export function InstallmentBuyerBlock({
   const { createContractMutation } = useInstallmentMutations();
   const formId = useId();
   const isCompactLayout = useAppShellCompactLayout();
+  const pageDockHost = useProductDetailsPageDockHost();
   const dockSubmit = dockSubmitProp ?? isCompactLayout;
   const [selectedPlanId, setSelectedPlanId] = useState(program.plans[0]?._id ?? "");
   const [quantity, setQuantity] = useState(1);
@@ -168,13 +171,23 @@ export function InstallmentBuyerBlock({
     </button>
   );
 
+  const portalTarget =
+    pageDockHost === undefined
+      ? typeof document !== "undefined"
+        ? document.body
+        : null
+      : pageDockHost;
   const dockedSubmit =
-    dockSubmit && typeof document !== "undefined"
+    dockSubmit && portalTarget
       ? createPortal(
-          <div className="product-modal-shell__docked-footer installment-buyer-block__docked-footer">
-            {renderSubmitButton(true)}
-          </div>,
-          document.body,
+          pageDockHost ? (
+            renderSubmitButton(true)
+          ) : (
+            <div className="product-modal-shell__docked-footer installment-buyer-block__docked-footer">
+              {renderSubmitButton(true)}
+            </div>
+          ),
+          portalTarget,
         )
       : null;
 

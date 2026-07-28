@@ -10,7 +10,7 @@ function prefersReducedMotion() {
 }
 
 /**
- * Mount → paint closed → --open; exit ждёт dissolve перед unmount.
+ * Mount → paint closed → --open; exit ждёт slide-down перед unmount.
  *
  * @param {boolean} isOpen
  * @returns {{ mounted: boolean; isVisible: boolean }}

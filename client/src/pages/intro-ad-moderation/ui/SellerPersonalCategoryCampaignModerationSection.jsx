@@ -241,7 +241,7 @@ export function SellerPersonalCategoryCampaignModerationSection({
         queryKey: sellerPersonalCategoryQueryKeys.moderationManaged(),
       }),
       queryClient.invalidateQueries({
-        queryKey: sellerPersonalCategoryQueryKeys.catalogTiles(),
+        queryKey: [...sellerPersonalCategoryQueryKeys.all, "catalog-tiles"],
       }),
       queryClient.invalidateQueries({ queryKey: introAdQueryKeys.moderationCount() }),
     ]);

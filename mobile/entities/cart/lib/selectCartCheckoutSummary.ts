@@ -39,7 +39,16 @@ const resolveCheckoutBlockReason = (
     return CART_PAGE_UI.CHECKOUT_BLOCKED_OWN_PRODUCTS_ONLY;
   }
 
-  if (reasons.every((reason) => reason === "missing" || reason === "unavailable")) {
+  if (reasons.every((reason) => reason === "missing_pickup")) {
+    return CART_PAGE_UI.CHECKOUT_BLOCKED_MISSING_PICKUP;
+  }
+
+  if (
+    reasons.every(
+      (reason) =>
+        reason === "missing" || reason === "unavailable" || reason === "missing_pickup",
+    )
+  ) {
     return CART_PAGE_UI.CHECKOUT_BLOCKED_ALL_UNAVAILABLE;
   }
 

@@ -2,11 +2,14 @@ import { apiClient } from "../../../shared/api/index.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 
 /**
+ * @param {{ regionCode?: string }} [options]
  * @returns {Promise<import('../model/types.js').RaffleFromApi[]>}
  */
-export async function fetchFeaturedRaffles() {
+export async function fetchFeaturedRaffles({ regionCode } = {}) {
   try {
-    const { data } = await apiClient.get("/product/raffles/featured");
+    const { data } = await apiClient.get("/product/raffles/featured", {
+      params: regionCode ? { regionCode } : undefined,
+    });
     if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
@@ -28,9 +31,10 @@ export async function fetchFeaturedRaffles() {
 }
 
 /**
+ * @param {{ regionCode?: string }} [options]
  * @returns {Promise<import('../model/types.js').RaffleFromApi | null>}
  */
-export async function fetchFeaturedRaffle() {
-  const raffles = await fetchFeaturedRaffles();
+export async function fetchFeaturedRaffle(options = {}) {
+  const raffles = await fetchFeaturedRaffles(options);
   return raffles[0] ?? null;
 }

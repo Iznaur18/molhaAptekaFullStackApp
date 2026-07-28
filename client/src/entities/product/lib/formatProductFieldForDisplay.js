@@ -1,3 +1,5 @@
+import { getRuRegionByCode } from "@molha/api-contract";
+
 import { COMMON_UI, FORMAT_BOOLEAN_RU, PRODUCT_DETAILS_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { PRODUCT_CATEGORY_LABEL_RU } from "../model/productConstants.js";
 import { getProductModerationBadgeLabel } from "./getProductModerationUi.js";
@@ -75,6 +77,11 @@ export function formatProductFieldForDisplay(key, product) {
     case "productSaleCity": {
       const city = raw == null ? "" : String(raw).trim();
       return city === "" ? PRODUCT_DETAILS_MODAL_UI.SALE_CITY_ALL : city;
+    }
+    case "productRegionCode": {
+      const code = raw == null ? "" : String(raw).trim();
+      if (!code) return COMMON_UI.EM_DASH;
+      return getRuRegionByCode(code)?.name ?? code;
     }
     case "uniqueViewerCount":
     case "productWishlistCount": {

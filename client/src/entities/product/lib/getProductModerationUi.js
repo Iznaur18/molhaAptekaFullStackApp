@@ -62,23 +62,21 @@ export function getProductModerationBadgeClassName(product) {
 }
 
 /**
- * @param {import('../model/types.js').ProductFromApi} product
+ * Owner may edit at any moderation status (including pending).
+ * Delete / catalog visibility stay gated separately.
+ * @param {import('../model/types.js').ProductFromApi} [_product]
  */
-export function canSellerEditProduct(product) {
-  return (
-    (product.productModerationStatus ?? PRODUCT_MODERATION_APPROVED) !==
-    PRODUCT_MODERATION_PENDING
-  );
+export function canSellerEditProduct(_product) {
+  return true;
 }
 
 /**
- * @param {import('../model/types.js').ProductFromApi} product
+ * Owner may delete at any moderation status (including pending).
+ * Catalog visibility stays gated separately.
+ * @param {import('../model/types.js').ProductFromApi} [_product]
  */
-export function canSellerDeleteProduct(product) {
-  return (
-    (product.productModerationStatus ?? PRODUCT_MODERATION_APPROVED) ===
-    PRODUCT_MODERATION_APPROVED
-  );
+export function canSellerDeleteProduct(_product) {
+  return true;
 }
 
 /**

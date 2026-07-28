@@ -15,6 +15,7 @@
 .featured-raffle-modal-card__visual-card {
   overflow: hidden;
   border-radius: 22px;
+  corner-shape: squircle;
   background: var(--iz-color-surface-muted);
 }
 

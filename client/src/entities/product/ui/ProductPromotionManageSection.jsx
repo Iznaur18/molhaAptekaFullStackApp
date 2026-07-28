@@ -14,6 +14,9 @@ import "./ProductPromotionManageSection.css";
  * @property {string} [errorMessage]
  * @property {boolean} [canEdit]
  * @property {boolean} [canToggleVisibility]
+ * @property {(productId: string) => void | Promise<void>} [onDelete]
+ * @property {boolean} [isDeletePending]
+ * @property {boolean} [canDelete]
  * @property {boolean} [sellerRaffleActive]
  * @property {(product: import("../model/types.js").ProductFromApi, enabled: boolean) => void} [onToggleRaffleParticipation]
  * @property {boolean} [isRaffleParticipationPending]
@@ -29,10 +32,13 @@ export function ProductPromotionManageSection({
   product,
   onSetAvailability,
   onSetAuction,
+  onDelete,
   isAvailabilityTogglePending = false,
   isAuctionTogglePending = false,
+  isDeletePending = false,
   errorMessage = "",
   canEdit = true,
+  canDelete = false,
   canToggleVisibility = true,
   sellerRaffleActive = false,
   onToggleRaffleParticipation,
@@ -67,10 +73,13 @@ export function ProductPromotionManageSection({
         product={product}
         onSetAvailability={onSetAvailability}
         onSetAuction={onSetAuction}
+        onDelete={onDelete}
         isAvailabilityTogglePending={isAvailabilityTogglePending}
         isAuctionTogglePending={isAuctionTogglePending}
+        isDeletePending={isDeletePending}
         errorMessage={errorMessage}
         canEdit={canEdit}
+        canDelete={canDelete}
         canToggleVisibility={canToggleVisibility}
         sellerRaffleActive={sellerRaffleActive}
         onToggleRaffleParticipation={onToggleRaffleParticipation}

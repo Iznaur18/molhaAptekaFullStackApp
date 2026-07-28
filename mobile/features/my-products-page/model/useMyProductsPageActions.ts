@@ -17,7 +17,7 @@ export const useMyProductsPageActions = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
   const requestPromotionMutation = useRequestProductPromotionMutation();
-  const { patchMutation } = useMyProductMutations();
+  const { patchMutation, deleteMutation } = useMyProductMutations();
 
   const [catalogNotice, setCatalogNotice] = useState("");
   const [catalogError, setCatalogError] = useState("");
@@ -164,6 +164,24 @@ export const useMyProductsPageActions = () => {
     [handleClosePromotionModal, manageSupport, queryClient],
   );
 
+  const handleDeleteProduct = useCallback(
+    async (productId: string) => {
+      setManageErrorMessage("");
+      setCatalogError("");
+      try {
+        await deleteMutation.mutateAsync(productId);
+        handleClosePromotionModal();
+        setCatalogNotice("");
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : API_CLIENT_UI.DELETE_MY_PRODUCT_FALLBACK;
+        setManageErrorMessage(message);
+        setCatalogError(message);
+      }
+    },
+    [deleteMutation, handleClosePromotionModal],
+  );
+
   const promotionProductId = promotionProduct?._id != null ? String(promotionProduct._id) : null;
 
   return {
@@ -180,12 +198,14 @@ export const useMyProductsPageActions = () => {
       promotionProductId != null && togglingAvailabilityProductId === promotionProductId,
     isAuctionTogglePending:
       promotionProductId != null && togglingAuctionProductId === promotionProductId,
+    isDeletePending: deleteMutation.isPending,
     handleEditProduct,
     handlePromoteProduct,
     handleClosePromotionModal,
     handleSubmitPromotion,
     handleSetMyProductAvailability,
     handleSetProductAuction,
+    handleDeleteProduct,
     sellerRaffleActive: manageSupport.sellerRaffleActive,
     handleToggleRaffleParticipation: manageSupport.handleToggleRaffleParticipation,
     isRaffleParticipationPending: manageSupport.isRaffleParticipationPending,

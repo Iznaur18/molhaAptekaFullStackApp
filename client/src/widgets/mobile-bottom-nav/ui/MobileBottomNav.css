@@ -10,7 +10,7 @@
     var(--mobile-bottom-nav-float-offset) +
       max(var(--mobile-bottom-nav-min-edge-gap), env(safe-area-inset-bottom, 0px))
   );
-  z-index: 50;
+  z-index: calc(var(--iz-z-dropdown) + 10);
   box-sizing: border-box;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));

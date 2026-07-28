@@ -2,7 +2,7 @@ import { apiClient } from "../../../shared/api/index.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 
 /**
- * @param {{ title: string }} body
+ * @param {{ title: string; regionCode: string }} body
  * @returns {Promise<import('../model/types.js').CuratedProductListFromApi>}
  */
 export async function createCuratedProductListAdmin(body) {

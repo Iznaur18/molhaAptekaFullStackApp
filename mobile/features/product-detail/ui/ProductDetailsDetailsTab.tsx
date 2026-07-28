@@ -17,6 +17,7 @@ import { UserProfileProductsList } from "@/entities/user/ui/UserProfileProductsL
 import { ProductDetailsAuctionTeaser } from "@/features/product-detail/ui/ProductDetailsAuctionTeaser";
 import { ProductDetailsInstallmentTeaser } from "@/features/product-detail/ui/ProductDetailsInstallmentTeaser";
 import { ProductDetailsSaleTeaser } from "@/features/product-detail/ui/ProductDetailsSaleTeaser";
+import { ProductPickupDetailsPanel } from "@/features/product-detail/ui/ProductPickupDetailsPanel";
 import { PRODUCT_DETAILS_MODAL_UI, SELLER_PRODUCTS_PAGE_UI } from "@/shared/config";
 import { nestedHorizontalScrollProps } from "@/shared/lib/nestedHorizontalScrollProps";
 import { useProductDetailScreenStyles } from "@/shared/theme/catalogProductStyles";
@@ -57,9 +58,9 @@ export const ProductDetailsDetailsTab = ({
 
   const availableContentTabs: ContentTabId[] = [
     ...(hasDescription ? (["description"] as const) : []),
+    "delivery",
     ...(hasCharacteristics ? (["characteristics"] as const) : []),
     "returns",
-    "delivery",
   ];
   const resolvedContentTab = availableContentTabs.includes(contentTab)
     ? contentTab
@@ -155,6 +156,22 @@ export const ProductDetailsDetailsTab = ({
                 </Text>
               </Pressable>
             ) : null}
+            <Pressable
+              style={[
+                styles.contentSwitcherTab,
+                resolvedContentTab === "delivery" && styles.contentSwitcherTabActive,
+              ]}
+              onPress={() => setContentTab("delivery")}
+            >
+              <Text
+                style={[
+                  styles.contentSwitcherTabText,
+                  resolvedContentTab === "delivery" && styles.contentSwitcherTabTextActive,
+                ]}
+              >
+                {PRODUCT_DETAILS_MODAL_UI.DELIVERY_TITLE}
+              </Text>
+            </Pressable>
             {hasCharacteristics ? (
               <Pressable
                 style={[
@@ -188,22 +205,6 @@ export const ProductDetailsDetailsTab = ({
                 ]}
               >
                 {PRODUCT_DETAILS_MODAL_UI.RETURNS_TITLE}
-              </Text>
-            </Pressable>
-            <Pressable
-              style={[
-                styles.contentSwitcherTab,
-                resolvedContentTab === "delivery" && styles.contentSwitcherTabActive,
-              ]}
-              onPress={() => setContentTab("delivery")}
-            >
-              <Text
-                style={[
-                  styles.contentSwitcherTabText,
-                  resolvedContentTab === "delivery" && styles.contentSwitcherTabTextActive,
-                ]}
-              >
-                {PRODUCT_DETAILS_MODAL_UI.DELIVERY_TITLE}
               </Text>
             </Pressable>
           </ScrollView>
@@ -246,11 +247,7 @@ export const ProductDetailsDetailsTab = ({
             )
           ) : null}
 
-          {showDelivery ? (
-            <Text style={styles.descriptionText}>
-              {PRODUCT_DETAILS_MODAL_UI.DELIVERY_IN_DEVELOPMENT}
-            </Text>
-          ) : null}
+          {showDelivery ? <ProductPickupDetailsPanel product={product} /> : null}
         </View>
       </View>
 

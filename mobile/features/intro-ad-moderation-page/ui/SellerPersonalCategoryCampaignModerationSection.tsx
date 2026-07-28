@@ -40,7 +40,7 @@ const invalidateModerationQueries = async (queryClient: ReturnType<typeof useQue
       queryKey: sellerPersonalCategoryQueryKeys.moderationManaged(),
     }),
     queryClient.invalidateQueries({
-      queryKey: sellerPersonalCategoryQueryKeys.catalogTiles(),
+      queryKey: [...sellerPersonalCategoryQueryKeys.all, "catalog-tiles"],
     }),
     queryClient.invalidateQueries({
       queryKey: [...staffBadgeQueryKeys.all, "intro-ad"],

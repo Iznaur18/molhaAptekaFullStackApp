@@ -37,44 +37,47 @@ export type ProductCardPromotionFramePalette = {
   elevation: number;
 };
 
-/** color-mix из ProductCardFrame.css — paper fill = surface (не onContrast) */
+/** Продвижение без обводки — как обычная карточка; акцент ribbon/flag. */
 export const resolveProductCardPromotionCompactFrame = (
   c: ThemeColors,
-): Record<ProductCardPromotionTier, ProductCardPromotionFramePalette> => ({
-  [PRODUCT_CARD_PROMOTION_TIER.GOLD]: {
-    borderWidth: 2,
-    borderColor: `${c.warning}ad`,
-    gradientStart: c.surface,
-    gradientEnd: c.surface,
-    shadowColor: c.warning,
-    shadowOpacity: 0.14,
-    shadowRadius: 12,
-    shadowOffsetY: 2,
-    elevation: 2,
-  },
-  [PRODUCT_CARD_PROMOTION_TIER.TOP]: {
-    borderWidth: 2,
-    borderColor: `${c.accent}c7`,
-    gradientStart: c.accentSoft,
-    gradientEnd: c.accentSoft,
-    shadowColor: c.accent,
-    shadowOpacity: 0.28,
-    shadowRadius: 16,
-    shadowOffsetY: 4,
-    elevation: 3,
-  },
-  [PRODUCT_CARD_PROMOTION_TIER.BANNER]: {
-    borderWidth: 2,
-    borderColor: c.border,
-    gradientStart: c.surface,
-    gradientEnd: c.surface,
-    shadowColor: c.text,
-    shadowOpacity: 0.06,
-    shadowRadius: 12,
-    shadowOffsetY: 4,
-    elevation: 2,
-  },
-});
+): Record<ProductCardPromotionTier, ProductCardPromotionFramePalette> => {
+  const soft = resolveProductCardSoftElevationShadow(c);
+  return {
+    [PRODUCT_CARD_PROMOTION_TIER.GOLD]: {
+      borderWidth: 0,
+      borderColor: "transparent",
+      gradientStart: c.surface,
+      gradientEnd: c.surface,
+      shadowColor: soft.shadowColor,
+      shadowOpacity: soft.shadowOpacity,
+      shadowRadius: soft.shadowRadius,
+      shadowOffsetY: soft.shadowOffsetY,
+      elevation: soft.elevation,
+    },
+    [PRODUCT_CARD_PROMOTION_TIER.TOP]: {
+      borderWidth: 0,
+      borderColor: "transparent",
+      gradientStart: c.surface,
+      gradientEnd: c.surface,
+      shadowColor: soft.shadowColor,
+      shadowOpacity: soft.shadowOpacity,
+      shadowRadius: soft.shadowRadius,
+      shadowOffsetY: soft.shadowOffsetY,
+      elevation: soft.elevation,
+    },
+    [PRODUCT_CARD_PROMOTION_TIER.BANNER]: {
+      borderWidth: 0,
+      borderColor: "transparent",
+      gradientStart: c.surface,
+      gradientEnd: c.surface,
+      shadowColor: soft.shadowColor,
+      shadowOpacity: soft.shadowOpacity,
+      shadowRadius: soft.shadowRadius,
+      shadowOffsetY: soft.shadowOffsetY,
+      elevation: soft.elevation,
+    },
+  };
+};
 
 export type ProductCardPromotionFrameSurface = Pick<
   ProductCardPromotionFramePalette,
@@ -106,41 +109,8 @@ export const resolveProductCardPremiumOnlyFrame = (
 /** product-card-promotion-frame.product-card-premium-frame--tier-* */
 export const resolveProductCardPromotionPremiumCompactFrame = (
   c: ThemeColors,
-): Record<ProductCardPromotionTier, ProductCardPromotionFramePalette> => ({
-  [PRODUCT_CARD_PROMOTION_TIER.GOLD]: {
-    borderWidth: 2,
-    borderColor: c.warning,
-    gradientStart: c.surface,
-    gradientEnd: c.surface,
-    shadowColor: c.warning,
-    shadowOpacity: 0.14,
-    shadowRadius: 12,
-    shadowOffsetY: 2,
-    elevation: 2,
-  },
-  [PRODUCT_CARD_PROMOTION_TIER.TOP]: {
-    borderWidth: 2,
-    borderColor: c.accent,
-    gradientStart: c.surface,
-    gradientEnd: c.surface,
-    shadowColor: c.accent,
-    shadowOpacity: 0.28,
-    shadowRadius: 16,
-    shadowOffsetY: 4,
-    elevation: 3,
-  },
-  [PRODUCT_CARD_PROMOTION_TIER.BANNER]: {
-    borderWidth: 2,
-    borderColor: c.border,
-    gradientStart: c.surface,
-    gradientEnd: c.surface,
-    shadowColor: c.text,
-    shadowOpacity: 0.06,
-    shadowRadius: 12,
-    shadowOffsetY: 4,
-    elevation: 2,
-  },
-});
+): Record<ProductCardPromotionTier, ProductCardPromotionFramePalette> =>
+  resolveProductCardPromotionCompactFrame(c);
 
 /** ProductCardBannerLayout.css — inner banner card (нейтральный fill, без danger wash). */
 export const resolveProductCardPromotionBannerInnerFrame = (c: ThemeColors) => {

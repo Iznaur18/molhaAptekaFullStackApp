@@ -13,6 +13,7 @@ import { AppError } from "../../errors/AppError.js";
 import { cleanupReplacedSellerPersonalCategoryImage } from "./cleanupReplacedSellerPersonalCategoryImage.js";
 import {
   activateSellerPersonalCategoryCampaign,
+  assertSellerPersonalCategorySlotAvailable,
   notifySellerPersonalCategoryApproved,
   notifySellerPersonalCategoryCancelledByStaff,
   notifySellerPersonalCategoryDeletedByStaff,
@@ -98,6 +99,8 @@ export async function approveSellerPersonalCategoryCampaign({ staffUserId, campa
 
   try {
     const { saved, cashback } = await runInTransaction(async (session) => {
+      await assertSellerPersonalCategorySlotAvailable(session);
+
       await chargeReservedLoyaltyPoints({
         userId: String(campaign.sellerId),
         amount,
@@ -147,6 +150,12 @@ export async function approveSellerPersonalCategoryCampaign({ staffUserId, campa
       campaign: toSellerPersonalCategoryCampaignPayload(saved),
     };
   } catch (error) {
+    if (error?.message === "SELLER_PERSONAL_CATEGORY_SLOTS_FULL") {
+      throw new AppError(
+        409,
+        "Все слоты личных категорий заняты. Снимите одну или дождитесь окончания срока.",
+      );
+    }
     if (error instanceof InsufficientLoyaltyPointsError) {
       throw new AppError(
         409,
